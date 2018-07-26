@@ -1,18 +1,19 @@
 package gaia.cu9.ari.gaiaorbit.render.system;
 
+import org.lwjgl.opengl.GL11;
+
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Mesh;
 import com.badlogic.gdx.graphics.VertexAttribute;
 import com.badlogic.gdx.graphics.VertexAttributes.Usage;
 import com.badlogic.gdx.graphics.glutils.ShaderProgram;
-import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.Array;
 
-import gaia.cu9.ari.gaiaorbit.data.orbit.OrbitData;
+import gaia.cu9.ari.gaiaorbit.data.orbit.PolylineData;
+import gaia.cu9.ari.gaiaorbit.render.IGPULineRenderable;
 import gaia.cu9.ari.gaiaorbit.render.IRenderable;
 import gaia.cu9.ari.gaiaorbit.scenegraph.Gaia;
-import gaia.cu9.ari.gaiaorbit.scenegraph.Orbit;
 import gaia.cu9.ari.gaiaorbit.scenegraph.SceneGraphNode.RenderGroup;
 import gaia.cu9.ari.gaiaorbit.scenegraph.camera.ICamera;
 import gaia.cu9.ari.gaiaorbit.util.GlobalConf;
@@ -29,15 +30,12 @@ public class LineGPURenderSystem extends ImmediateRenderSystem {
     protected ICamera camera;
     protected int glType;
 
-    private Vector3 aux2;
-
     /** Hopefully we won't have more than 1000000 orbits at once **/
     private final int N_MESHES = 1000000;
 
     public LineGPURenderSystem(RenderGroup rg, float[] alphas, ShaderProgram[] shaders) {
         super(rg, alphas, shaders);
         glType = GL20.GL_LINE_STRIP;
-        aux2 = new Vector3();
     }
 
     @Override
@@ -105,9 +103,10 @@ public class LineGPURenderSystem extends ImmediateRenderSystem {
     @Override
     public void renderStud(Array<IRenderable> renderables, ICamera camera, double t) {
         // Enable GL_LINE_SMOOTH
-        Gdx.gl20.glEnable(0xB20);
+        Gdx.gl20.glEnable(GL11.GL_LINE_SMOOTH);
+        Gdx.gl.glHint(GL20.GL_NICEST, GL11.GL_LINE_SMOOTH_HINT);
         // Enable GL_LINE_WIDTH
-        Gdx.gl20.glEnable(0xB21);
+        Gdx.gl20.glEnable(GL20.GL_LINE_WIDTH);
         Gdx.gl20.glEnable(GL20.GL_DEPTH_TEST);
         Gdx.gl20.glEnable(GL20.GL_BLEND);
         Gdx.gl20.glBlendFunc(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA);
@@ -118,16 +117,17 @@ public class LineGPURenderSystem extends ImmediateRenderSystem {
         int size = renderables.size;
 
         for (int i = 0; i < size; i++) {
-            Orbit renderable = (Orbit) renderables.get(i);
+            IGPULineRenderable renderable = (IGPULineRenderable) renderables.get(i);
 
+            curr = meshes[renderable.getOffset()];
             /**
              * ADD LINES
              */
-            if (!renderable.inGpu) {
-                OrbitData od = renderable.orbitData;
+            if (!renderable.inGpu()) {
+                PolylineData od = renderable.getPolyline();
                 int npoints = od.getNumPoints();
-                renderable.offset = addMeshData(npoints);
-                float[] cc = renderable.cc;
+                renderable.setOffset(addMeshData(npoints));
+                float[] cc = renderable.getColor();
                 for (int point_i = 0; point_i < npoints; point_i++) {
                     color(cc[0], cc[1], cc[2], 1.0);
                     vertex((float) od.getX(point_i), (float) od.getY(point_i), (float) od.getZ(point_i));
@@ -136,24 +136,24 @@ public class LineGPURenderSystem extends ImmediateRenderSystem {
                 color(cc[0], cc[1], cc[2], 1.0);
                 vertex((float) od.getX(0), (float) od.getY(0), (float) od.getZ(0));
 
-                renderable.count = npoints * curr.vertexSize;
-                renderable.inGpu = true;
+                renderable.setCount(npoints * curr.vertexSize);
+                curr.mesh.setVertices(curr.vertices, 0, renderable.getCount());
+                renderable.setInGpu(true);
             }
 
             /**
              * RENDER
              */
-            curr = meshes[renderable.offset];
 
             ShaderProgram shaderProgram = getShaderProgram();
 
             shaderProgram.begin();
 
-            shaderProgram.setUniformMatrix("u_worldTransform", renderable.localTransform);
+            shaderProgram.setUniformMatrix("u_worldTransform", renderable.getLocalTransform());
             shaderProgram.setUniformMatrix("u_projModelView", camera.getCamera().combined);
-            shaderProgram.setUniformf("u_alpha", (float) (renderable.alpha) * getAlpha(renderable));
-            if (renderable.parent.name.equals("Gaia")) {
-                Vector3d ppos = ((Gaia) renderable.parent).unrotatedPos;
+            shaderProgram.setUniformf("u_alpha", (float) (renderable.getAlpha()) * getAlpha(renderable));
+            if (renderable.getParent().name.equals("Gaia")) {
+                Vector3d ppos = ((Gaia) renderable.getParent()).unrotatedPos;
                 shaderProgram.setUniformf("u_parentPos", (float) ppos.x, (float) ppos.y, (float) ppos.z);
             } else {
                 shaderProgram.setUniformf("u_parentPos", 0, 0, 0);
@@ -162,7 +162,6 @@ public class LineGPURenderSystem extends ImmediateRenderSystem {
             // Relativistic effects
             addEffectsUniforms(shaderProgram, camera);
 
-            curr.mesh.setVertices(curr.vertices, 0, renderable.count);
             curr.mesh.render(shaderProgram, glType);
 
             shaderProgram.end();

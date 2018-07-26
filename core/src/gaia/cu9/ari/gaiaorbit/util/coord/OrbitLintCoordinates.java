@@ -2,7 +2,7 @@ package gaia.cu9.ari.gaiaorbit.util.coord;
 
 import java.time.Instant;
 
-import gaia.cu9.ari.gaiaorbit.data.orbit.OrbitData;
+import gaia.cu9.ari.gaiaorbit.data.orbit.PolylineData;
 import gaia.cu9.ari.gaiaorbit.scenegraph.CelestialBody;
 import gaia.cu9.ari.gaiaorbit.scenegraph.component.OrbitComponent;
 import gaia.cu9.ari.gaiaorbit.util.Logger;
@@ -11,7 +11,7 @@ import gaia.cu9.ari.gaiaorbit.util.math.Vector3d;
 
 public class OrbitLintCoordinates extends AbstractOrbitCoordinates {
     OrbitComponent orbitalParams;
-    OrbitData data;
+    PolylineData data;
     Matrix4d transf;
     Vector3d aux = new Vector3d();
 
@@ -23,7 +23,7 @@ public class OrbitLintCoordinates extends AbstractOrbitCoordinates {
             super.doneLoading(params);
             transf = new Matrix4d();
             orbitalParams = orbit.oc;
-            data = orbit.orbitData;
+            data = orbit.getPolyline();
         }
     }
 

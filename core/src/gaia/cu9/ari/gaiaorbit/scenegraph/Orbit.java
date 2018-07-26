@@ -11,7 +11,6 @@ import com.badlogic.gdx.utils.reflect.ReflectionException;
 import gaia.cu9.ari.gaiaorbit.GaiaSky;
 import gaia.cu9.ari.gaiaorbit.assets.OrbitDataLoader;
 import gaia.cu9.ari.gaiaorbit.data.orbit.IOrbitDataProvider;
-import gaia.cu9.ari.gaiaorbit.data.orbit.OrbitData;
 import gaia.cu9.ari.gaiaorbit.render.ComponentType;
 import gaia.cu9.ari.gaiaorbit.render.system.LineRenderSystem;
 import gaia.cu9.ari.gaiaorbit.scenegraph.camera.ICamera;
@@ -25,7 +24,7 @@ import gaia.cu9.ari.gaiaorbit.util.math.Matrix4d;
 import gaia.cu9.ari.gaiaorbit.util.math.Vector3d;
 import gaia.cu9.ari.gaiaorbit.util.time.ITimeFrameProvider;
 
-public class Orbit extends LineObject {
+public class Orbit extends Polyline {
 
     /** Threshold angle **/
     protected static final float ANGLE_LIMIT = (float) Math.toRadians(1.5);
@@ -34,11 +33,9 @@ public class Orbit extends LineObject {
      */
     protected static final float SHADER_MODEL_OVERLAP_FACTOR = 20f;
 
-    public OrbitData orbitData;
     protected CelestialBody body;
     protected Vector3d prev, curr;
     public double alpha;
-    public Matrix4 localTransform;
     public Matrix4d localTransformD, transformFunction;
     protected String provider;
     protected Double multiplier = 1.0d;
@@ -49,12 +46,8 @@ public class Orbit extends LineObject {
     // Use new method for orbital elements
     public boolean newmethod = false;
 
-    /** GPU rendering attributes **/
-    public boolean inGpu = false;
     /** Orbital elements in gpu, in case there is no body **/
     public boolean elemsInGpu = false;
-    public int offset;
-    public int count;
 
     private float distUp, distDown;
 
@@ -76,7 +69,7 @@ public class Orbit extends LineObject {
                 try {
                     provider = ClassReflection.newInstance(providerClass);
                     provider.load(oc.source, new OrbitDataLoader.OrbitDataLoaderParameter(name, providerClass, oc, multiplier, 100), newmethod);
-                    orbitData = provider.getData();
+                    polylineData = provider.getData();
                 } catch (Exception e) {
                     Logger.error(e, getClass().getSimpleName());
                 }
@@ -89,8 +82,8 @@ public class Orbit extends LineObject {
     public void doneLoading(AssetManager manager) {
         alpha = cc[3];
         if (!onlybody) {
-            int last = orbitData.getNumPoints() - 1;
-            Vector3d v = new Vector3d(orbitData.x.get(last), orbitData.y.get(last), orbitData.z.get(last));
+            int last = polylineData.getNumPoints() - 1;
+            Vector3d v = new Vector3d(polylineData.x.get(last), polylineData.y.get(last), polylineData.z.get(last));
             this.size = (float) v.len() * 5;
         } else {
 
@@ -174,9 +167,9 @@ public class Orbit extends LineObject {
             }
 
             // This is so that the shape renderer does not mess up the z-buffer
-            for (int i = 1; i < orbitData.getNumPoints(); i++) {
-                orbitData.loadPoint(prev, i - 1);
-                orbitData.loadPoint(curr, i);
+            for (int i = 1; i < polylineData.getNumPoints(); i++) {
+                polylineData.loadPoint(prev, i - 1);
+                polylineData.loadPoint(curr, i);
 
                 if (parentPos != null) {
                     prev.sub(parentPos);
@@ -242,5 +235,11 @@ public class Orbit extends LineObject {
     public void setNewmethod(Boolean newmethod) {
         this.newmethod = newmethod;
     }
+
+    @Override
+    public double getAlpha() {
+        return alpha;
+    }
+
 
 }

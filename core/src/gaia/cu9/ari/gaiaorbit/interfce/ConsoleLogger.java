@@ -5,7 +5,7 @@ import java.time.Instant;
 import com.badlogic.gdx.Gdx;
 
 import gaia.cu9.ari.gaiaorbit.GaiaSky;
-import gaia.cu9.ari.gaiaorbit.data.orbit.OrbitData;
+import gaia.cu9.ari.gaiaorbit.data.orbit.PolylineData;
 import gaia.cu9.ari.gaiaorbit.event.EventManager;
 import gaia.cu9.ari.gaiaorbit.event.Events;
 import gaia.cu9.ari.gaiaorbit.event.IObserver;
@@ -140,7 +140,7 @@ public class ConsoleLogger implements IObserver {
             }
             break;
         case ORBIT_DATA_LOADED:
-            addMessage(I18n.bundle.format("notif.orbitdata.loaded", data[1], ((OrbitData) data[0]).getNumPoints()), true);
+            addMessage(I18n.bundle.format("notif.orbitdata.loaded", data[1], ((PolylineData) data[0]).getNumPoints()), true);
             break;
         case SCREENSHOT_INFO:
             addMessage(I18n.bundle.format("notif.screenshot", data[0]));

@@ -12,7 +12,7 @@ import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.reflect.ClassReflection;
 
 import gaia.cu9.ari.gaiaorbit.data.orbit.IOrbitDataProvider;
-import gaia.cu9.ari.gaiaorbit.data.orbit.OrbitData;
+import gaia.cu9.ari.gaiaorbit.data.orbit.PolylineData;
 import gaia.cu9.ari.gaiaorbit.scenegraph.component.OrbitComponent;
 import gaia.cu9.ari.gaiaorbit.util.Logger;
 
@@ -22,9 +22,9 @@ import gaia.cu9.ari.gaiaorbit.util.Logger;
  * @author Toni Sagrista
  *
  */
-public class OrbitDataLoader extends AsynchronousAssetLoader<OrbitData, OrbitDataLoader.OrbitDataLoaderParameter> {
+public class OrbitDataLoader extends AsynchronousAssetLoader<PolylineData, OrbitDataLoader.OrbitDataLoaderParameter> {
 
-    OrbitData data;
+    PolylineData data;
 
     public OrbitDataLoader(FileHandleResolver resolver) {
         super(resolver);
@@ -51,11 +51,11 @@ public class OrbitDataLoader extends AsynchronousAssetLoader<OrbitData, OrbitDat
     /**
      * 
      */
-    public OrbitData loadSync(AssetManager manager, String fileName, FileHandle file, OrbitDataLoaderParameter parameter) {
+    public PolylineData loadSync(AssetManager manager, String fileName, FileHandle file, OrbitDataLoaderParameter parameter) {
         return data;
     }
 
-    static public class OrbitDataLoaderParameter extends AssetLoaderParameters<OrbitData> {
+    static public class OrbitDataLoaderParameter extends AssetLoaderParameters<PolylineData> {
 
         Class<? extends IOrbitDataProvider> providerClass;
         public Date ini;

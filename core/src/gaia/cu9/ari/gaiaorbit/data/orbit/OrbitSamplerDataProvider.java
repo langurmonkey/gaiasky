@@ -39,7 +39,7 @@ import gaia.cu9.ari.gaiaorbit.util.math.Vector3d;
 public class OrbitSamplerDataProvider implements IOrbitDataProvider, IObserver {
     private static boolean writeData = false;
     private static final String writeDataPath = "/tmp/";
-    OrbitData data;
+    PolylineData data;
 
     public static void main(String[] args) {
         try {
@@ -96,7 +96,7 @@ public class OrbitSamplerDataProvider implements IOrbitDataProvider, IObserver {
         // If num samples is not defined, we use 300 samples per year of period
         int numSamples = parameter.numSamples > 0 ? parameter.numSamples : (int) (300 * parameter.orbitalPeriod / 365);
         numSamples = Math.max(100, Math.min(2000, numSamples));
-        data = new OrbitData();
+        data = new PolylineData();
         String bodyDesc = parameter.name;
         Instant d = Instant.ofEpochMilli(parameter.ini.getTime());
         double last = 0, accum = 0;
@@ -154,7 +154,7 @@ public class OrbitSamplerDataProvider implements IOrbitDataProvider, IObserver {
         load(file, parameter);
     }
 
-    public OrbitData getData() {
+    public PolylineData getData() {
         return data;
     }
 

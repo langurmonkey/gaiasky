@@ -7,18 +7,22 @@ import com.badlogic.gdx.utils.Array;
 
 import gaia.cu9.ari.gaiaorbit.util.math.Vector3d;
 
-public class OrbitData {
+public class PolylineData {
     // Values of x, y, z in world coordinates
     public Array<Double> x, y, z;
     public Array<Instant> time;
 
     private Vector3d v0, v1;
 
-    public OrbitData() {
-        x = new Array<Double>();
-        y = new Array<Double>();
-        z = new Array<Double>();
-        time = new Array<Instant>();
+    public PolylineData() {
+        this(16);
+    }
+
+    public PolylineData(int capacity) {
+        x = new Array<Double>(16);
+        y = new Array<Double>(16);
+        z = new Array<Double>(16);
+        time = new Array<Instant>(16);
 
         v0 = new Vector3d();
         v1 = new Vector3d();

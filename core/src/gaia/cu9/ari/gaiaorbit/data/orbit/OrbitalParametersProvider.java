@@ -19,7 +19,7 @@ import gaia.cu9.ari.gaiaorbit.util.math.Vector3d;
  *
  */
 public class OrbitalParametersProvider implements IOrbitDataProvider {
-    OrbitData data;
+    PolylineData data;
 
     @Override
     public void load(String file, OrbitDataLoaderParameter parameter) {
@@ -42,7 +42,7 @@ public class OrbitalParametersProvider implements IOrbitDataProvider {
                 double M0 = params.meananomaly * MathUtilsd.degRad;
                 double mu = params.mu;
 
-                data = new OrbitData();
+                data = new PolylineData();
 
                 // Step time in days, a full period over number of samples starting at epoch
                 double t_step = period / parameter.numSamples;
@@ -127,7 +127,7 @@ public class OrbitalParametersProvider implements IOrbitDataProvider {
 
             Matrix4d transform = new Matrix4d();
             transform.scl(Constants.KM_TO_U);
-            data = new OrbitData();
+            data = new PolylineData();
             for (Vector3d point : samples) {
                 point.mul(transform);
                 data.x.add(point.x);
@@ -141,7 +141,7 @@ public class OrbitalParametersProvider implements IOrbitDataProvider {
         }
     }
 
-    public OrbitData getData() {
+    public PolylineData getData() {
         return data;
     }
 

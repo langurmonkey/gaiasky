@@ -948,6 +948,41 @@ public interface IScriptingInterface {
     public double getDistanceTo(String name);
 
     /**
+     * Adds a new polyline with the given name, points and color. The polyline will
+     * be created with the 'Others' component type, so you need to enable the
+     * visibility of 'Others' in order to see it.
+     * @param name 
+     *            The name to identify the polyline, to possibly remove it later.
+     * @param points
+     *            The points of the polyline. It is an array containing all the 
+     *            points as in [x0, y0, z0, x1, y1, z1, ..., xn, yn, zn].
+     * @param color
+     *            A 4D array with the RGBA color, where each element is in [0..1].
+     */
+    public void addPolyline(String name, double[] points, double[] color);
+
+    /**
+     * <p>
+     * Removes the model object identified by the given name from the internal
+     * scene graph model of Gaia Sky, if it exists. 
+     * If the object has children, they are removed recursively.
+     * Be careful with this function, as it can have unexpected side effects
+     * depending on what objects are removed.
+     * For example,
+     * </p>
+     * 
+     * <code>
+     * gs.removeModelObject("Earth")
+     * </code>
+     * 
+     * <p>
+     * removes the Earth, the Moon, Gaia and any dependent object from Gaia Sky.
+     * </p>
+     * @param name The name of the object to remove.
+     */
+    public void removeModelObject(String name);
+
+    /**
      * Sets the vertical scroll position in the GUI.
      * 
      * @param pixelY
@@ -1327,5 +1362,39 @@ public interface IScriptingInterface {
      *            Activate (true) or deactivate (false)
      */
     public void setSmoothLodTransitions(boolean value);
+
+    /**
+     * Rotates a 3D vector around the given axis by the specified angle in degrees.
+     * Vectors are arrays with 3 components. If more components are there, they are ignored.
+     * @param vector Vector to rotate, with at least 3 components
+     * @param axis The axis, with at least 3 components
+     * @param angle Angle in degrees
+     * @return The new vector, rotated
+     */
+    public double[] rotate3(double[] vector, double[] axis, double angle);
+
+    /**
+     * Rotates a 2D vector by the specified angle in degrees, counter-clockwise assuming that
+     * the y axis points up.
+     * @param vector Vector to rotate, with at least 2 components
+     * @return The new vector, rotated
+     */
+    public double[] rotate2(double[] vector, double angle);
+
+    /**
+     * Computes the cross product between the two 3D vectors.
+     * @param vec1 First 3D vector
+     * @param vec2 Second 3D vector
+     * @return Cross product 3D vector
+     */
+    public double[] cross3(double[] vec1, double[] vec2);
+
+    /**
+     * Computes the dot product between the two 3D vectors.
+     * @param vec1 First 3D vector
+     * @param vec2 Second 3D vector
+     * @return The dot product scalar
+     */
+    public double dot3(double[] vec1, double[] vec2);
 
 }

@@ -22,7 +22,7 @@ public class OriginalDataLoader {
     public static void main(String[] args) {
         OriginalDataLoader l = new OriginalDataLoader();
         try {
-            OrbitData od = l.load(new FileInputStream("/home/tsagrista/Workspaces/workspace-luna/GaiaSandbox-android/assets-bak/data/ORB1_20131127_000001.topcat"));
+            PolylineData od = l.load(new FileInputStream("/home/tsagrista/Workspaces/workspace-luna/GaiaSandbox-android/assets-bak/data/ORB1_20131127_000001.topcat"));
             OrbitDataWriter.writeOrbitData("/home/tsagrista/Workspaces/workspace-luna/GaiaSandbox-android/assets/data/android/orb.GAIA.dat", od);
         } catch (Exception e) {
             System.out.println(e);
@@ -58,8 +58,8 @@ public class OriginalDataLoader {
      *            The input stream with the data to load
      * @throws Exception
      */
-    public OrbitData load(InputStream data) throws Exception {
-        OrbitData orbitData = new OrbitData();
+    public PolylineData load(InputStream data) throws Exception {
+        PolylineData orbitData = new PolylineData();
 
         BufferedReader br = new BufferedReader(new InputStreamReader(data));
         String line;
@@ -166,7 +166,7 @@ public class OriginalDataLoader {
     /**
      * Writes a file under the given path with the distance data
      */
-    public void writeDistVsTimeData(String filePath, OrbitData data) throws Exception {
+    public void writeDistVsTimeData(String filePath, PolylineData data) throws Exception {
         File file = new File(filePath);
         if (file.exists()) {
             file.delete();

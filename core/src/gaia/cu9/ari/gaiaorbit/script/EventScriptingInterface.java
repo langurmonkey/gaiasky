@@ -32,9 +32,10 @@ import gaia.cu9.ari.gaiaorbit.scenegraph.Invisible;
 import gaia.cu9.ari.gaiaorbit.scenegraph.Loc;
 import gaia.cu9.ari.gaiaorbit.scenegraph.ModelBody;
 import gaia.cu9.ari.gaiaorbit.scenegraph.Planet;
+import gaia.cu9.ari.gaiaorbit.scenegraph.Polyline;
 import gaia.cu9.ari.gaiaorbit.scenegraph.SceneGraphNode;
-import gaia.cu9.ari.gaiaorbit.scenegraph.camera.NaturalCamera;
 import gaia.cu9.ari.gaiaorbit.scenegraph.camera.CameraManager.CameraMode;
+import gaia.cu9.ari.gaiaorbit.scenegraph.camera.NaturalCamera;
 import gaia.cu9.ari.gaiaorbit.util.Constants;
 import gaia.cu9.ari.gaiaorbit.util.GlobalConf;
 import gaia.cu9.ari.gaiaorbit.util.I18n;
@@ -44,6 +45,7 @@ import gaia.cu9.ari.gaiaorbit.util.coord.AstroUtils;
 import gaia.cu9.ari.gaiaorbit.util.coord.Coordinates;
 import gaia.cu9.ari.gaiaorbit.util.math.Intersectord;
 import gaia.cu9.ari.gaiaorbit.util.math.MathUtilsd;
+import gaia.cu9.ari.gaiaorbit.util.math.Vector2d;
 import gaia.cu9.ari.gaiaorbit.util.math.Vector3d;
 import gaia.cu9.ari.gaiaorbit.util.time.ITimeFrameProvider;
 
@@ -67,7 +69,8 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
         return instance;
     }
 
-    private Vector3d aux1, aux2, aux3, aux4, aux5, aux6;
+    private Vector3d aux3d1, aux3d2, aux3d3, aux3d4, aux3d5, aux3d6;
+    private Vector2d aux2d1;
 
     private Set<AtomicBoolean> stops;
 
@@ -77,12 +80,13 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
 
         stops = new HashSet<AtomicBoolean>();
 
-        aux1 = new Vector3d();
-        aux2 = new Vector3d();
-        aux3 = new Vector3d();
-        aux4 = new Vector3d();
-        aux5 = new Vector3d();
-        aux6 = new Vector3d();
+        aux3d1 = new Vector3d();
+        aux3d2 = new Vector3d();
+        aux3d3 = new Vector3d();
+        aux3d4 = new Vector3d();
+        aux3d5 = new Vector3d();
+        aux3d6 = new Vector3d();
+        aux2d1 = new Vector2d();
 
         em.subscribe(this, Events.INPUT_EVENT, Events.DISPOSE);
     }
@@ -336,21 +340,21 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
         // Up to ecliptic north pole
         Vector3d up = new Vector3d(0, 1, 0).mul(Coordinates.eclToEq());
 
-        Vector3d focusPos = aux1;
+        Vector3d focusPos = aux3d1;
         focus.getAbsolutePosition(focusPos);
-        Vector3d otherPos = aux2;
+        Vector3d otherPos = aux3d2;
         other.getAbsolutePosition(otherPos);
 
-        Vector3d otherToFocus = aux3;
+        Vector3d otherToFocus = aux3d3;
         otherToFocus.set(focusPos).sub(otherPos).nor();
-        Vector3d focusToOther = aux4.set(otherToFocus);
+        Vector3d focusToOther = aux3d4.set(otherToFocus);
         focusToOther.scl(-dist).rotate(up, rotation);
 
         // New camera position
-        Vector3d newCamPos = aux5.set(focusToOther).add(focusPos).scl(Constants.U_TO_KM);
+        Vector3d newCamPos = aux3d5.set(focusToOther).add(focusPos).scl(Constants.U_TO_KM);
 
         // New camera direction
-        Vector3d newCamDir = aux6.set(focusToOther);
+        Vector3d newCamDir = aux3d6.set(focusToOther);
         newCamDir.scl(-1).nor();
 
         // New up vector
@@ -819,12 +823,12 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
             /* target distance */
             double target = 100 * Constants.M_TO_U;
 
-            object.getAbsolutePosition(aux1).add(cam.getInversePos()).nor();
+            object.getAbsolutePosition(aux3d1).add(cam.getInversePos()).nor();
             Vector3d dir = cam.direction;
 
             // Add forward movement while distance > target distance
             boolean distanceNotMet = (object.getDistToCamera() - object.getRadius()) > target;
-            boolean viewNotMet = Math.abs(dir.angle(aux1)) < 90;
+            boolean viewNotMet = Math.abs(dir.angle(aux3d1)) < 90;
 
             long prevtime = TimeUtils.millis();
             while ((distanceNotMet || viewNotMet) && (stop == null || (stop != null && !stop.get()))) {
@@ -851,7 +855,7 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
                 }
 
                 // focus.transform.getTranslation(aux);
-                viewNotMet = Math.abs(dir.angle(aux1)) < 90;
+                viewNotMet = Math.abs(dir.angle(aux3d1)) < 90;
                 distanceNotMet = (object.getDistToCamera() - object.getRadius()) > target;
             }
 
@@ -861,22 +865,22 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
             // Roll till done
             Vector3d up = cam.up;
             // aux1 <- camera-object
-            object.getAbsolutePosition(aux1).sub(cam.getPos());
-            double ang1 = up.angle(aux1);
-            double ang2 = up.cpy().rotate(cam.direction, 1).angle(aux1);
+            object.getAbsolutePosition(aux3d1).sub(cam.getPos());
+            double ang1 = up.angle(aux3d1);
+            double ang2 = up.cpy().rotate(cam.direction, 1).angle(aux3d1);
             double rollsign = ang1 < ang2 ? -1d : 1d;
 
             if (ang1 < 170) {
 
-                rollAndWait(rollsign * 0.02d, 170d, 50l, cam, aux1, stop);
+                rollAndWait(rollsign * 0.02d, 170d, 50l, cam, aux3d1, stop);
                 // STOP
                 cam.stopMovement();
 
-                rollAndWait(rollsign * 0.006d, 176d, 50l, cam, aux1, stop);
+                rollAndWait(rollsign * 0.006d, 176d, 50l, cam, aux3d1, stop);
                 // STOP
                 cam.stopMovement();
 
-                rollAndWait(rollsign * 0.003d, 178d, 50l, cam, aux1, stop);
+                rollAndWait(rollsign * 0.003d, 178d, 50l, cam, aux3d1, stop);
             }
             /**
              * RESTORE
@@ -1002,11 +1006,11 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
             GlobalConf.scene.CROSSHAIR = false;
 
             // Get target position
-            Vector3d target = aux1;
+            Vector3d target = aux3d1;
             planet.getPositionAboveSurface(longitude, latitude, 50, target);
 
             // Get object position
-            Vector3d objectPosition = planet.getAbsolutePosition(aux2);
+            Vector3d objectPosition = planet.getAbsolutePosition(aux3d2);
 
             // Check intersection with object
             boolean intersects = Intersectord.checkIntersectSegmentSphere(cam.getPos(), target, objectPosition, planet.getRadius());
@@ -1018,7 +1022,7 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
             while (intersects && (stop == null || (stop != null && !stop.get()))) {
                 sleep(0.1f);
 
-                objectPosition = planet.getAbsolutePosition(aux2);
+                objectPosition = planet.getAbsolutePosition(aux3d2);
                 intersects = Intersectord.checkIntersectSegmentSphere(cam.getPos(), target, objectPosition, planet.getRadius());
             }
 
@@ -1065,7 +1069,7 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
             } catch (Exception e) {
             }
 
-            ang = cam.up.angle(aux1);
+            ang = cam.up.angle(aux3d1);
         }
     }
 
@@ -1446,26 +1450,26 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
 
     @Override
     public double[] equatorialToGalactic(double[] eq) {
-        aux1.set(eq).mul(Coordinates.eqToGal());
-        return aux1.values();
+        aux3d1.set(eq).mul(Coordinates.eqToGal());
+        return aux3d1.values();
     }
 
     @Override
     public double[] equatorialToEcliptic(double[] eq) {
-        aux1.set(eq).mul(Coordinates.eqToEcl());
-        return aux1.values();
+        aux3d1.set(eq).mul(Coordinates.eqToEcl());
+        return aux3d1.values();
     }
 
     @Override
     public double[] galacticToEquatorial(double[] gal) {
-        aux1.set(gal).mul(Coordinates.galToEq());
-        return aux1.values();
+        aux3d1.set(gal).mul(Coordinates.galToEq());
+        return aux3d1.values();
     }
 
     @Override
     public double[] eclipticToEquatorial(double[] ecl) {
-        aux1.set(ecl).mul(Coordinates.eclToEq());
-        return aux1.values();
+        aux3d1.set(ecl).mul(Coordinates.eclToEq());
+        return aux3d1.values();
     }
 
     @Override
@@ -1580,6 +1584,54 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
             em.post(Events.OCTREE_PARTICLE_FADE_CMD, I18n.bundle.get("element.octreeparticlefade"), value);
         });
 
+    }
+
+    @Override
+    public double[] rotate3(double[] vector, double[] axis, double angle) {
+        Vector3d v = aux3d1.set(vector);
+        Vector3d a = aux3d2.set(axis);
+        return v.rotate(a, angle).values();
+    }
+
+    @Override
+    public double[] rotate2(double[] vector, double angle) {
+        Vector2d v = aux2d1.set(vector);
+        return v.rotate(angle).values();
+    }
+
+    @Override
+    public double[] cross3(double[] vec1, double[] vec2) {
+        return aux3d1.set(vec1).crs(aux3d2.set(vec2)).values();
+    }
+
+    @Override
+    public double dot3(double[] vec1, double[] vec2) {
+        return aux3d1.set(vec1).dot(aux3d2.set(vec2));
+    }
+
+    @Override
+    public void addPolyline(String name, double[] points, double[] color) {
+        Polyline pl = new Polyline();
+        pl.setCt("Others");
+        pl.setColor(color);
+        pl.setName(name);
+        pl.setPoints(points);
+        pl.setParent("Universe");
+        pl.initialize();
+
+        Gdx.app.postRunnable(() -> {
+            GaiaSky.instance.sg.insert(pl, true);
+        });
+    }
+
+    @Override
+    public void removeModelObject(String name) {
+        Gdx.app.postRunnable(() -> {
+            SceneGraphNode sgn = GaiaSky.instance.sg.getNode(name);
+            if (sgn != null) {
+                GaiaSky.instance.sg.remove(sgn, true);
+            }
+        });
     }
 
 }

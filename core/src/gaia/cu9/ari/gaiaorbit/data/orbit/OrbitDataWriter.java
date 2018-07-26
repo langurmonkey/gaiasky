@@ -19,7 +19,7 @@ public class OrbitDataWriter {
      *            The OrbitData instance
      * @throws IOException
      */
-    public static void writeOrbitData(String filePath, OrbitData data) throws IOException {
+    public static void writeOrbitData(String filePath, PolylineData data) throws IOException {
         IDateFormat df = DateFormatFactory.getFormatter("yyyy-MM-dd_HH:mm:ss");
 
         File f = new File(filePath);

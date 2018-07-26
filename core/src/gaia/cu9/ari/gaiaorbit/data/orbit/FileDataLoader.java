@@ -22,8 +22,8 @@ public class FileDataLoader {
      * @param data
      * @throws Exception
      */
-    public OrbitData load(InputStream data) throws Exception {
-        OrbitData orbitData = new OrbitData();
+    public PolylineData load(InputStream data) throws Exception {
+        PolylineData orbitData = new PolylineData();
 
         BufferedReader br = new BufferedReader(new InputStreamReader(data));
         String line;

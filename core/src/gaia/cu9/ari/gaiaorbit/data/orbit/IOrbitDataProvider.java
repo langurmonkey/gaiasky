@@ -21,6 +21,6 @@ public interface IOrbitDataProvider {
      */
     public void load(String file, OrbitDataLoaderParameter source, boolean newmethod);
 
-    public OrbitData getData();
+    public PolylineData getData();
 
 }

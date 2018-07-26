@@ -13,7 +13,7 @@ import gaia.cu9.ari.gaiaorbit.event.Events;
  *
  */
 public class OrbitFileDataEclipticJulianTimeProvider implements IOrbitDataProvider {
-    OrbitData data;
+    PolylineData data;
 
     @Override
     public void load(String file, OrbitDataLoaderParameter parameter) {
@@ -32,7 +32,7 @@ public class OrbitFileDataEclipticJulianTimeProvider implements IOrbitDataProvid
         load(file, parameter);
     }
 
-    public OrbitData getData() {
+    public PolylineData getData() {
         return data;
     }
 

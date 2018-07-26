@@ -15,7 +15,7 @@ import gaia.cu9.ari.gaiaorbit.util.Logger;
  *
  */
 public class OrbitFileDataProvider implements IOrbitDataProvider {
-    OrbitData data;
+    PolylineData data;
 
     @Override
     public void load(String file, OrbitDataLoaderParameter parameter) {
@@ -42,7 +42,7 @@ public class OrbitFileDataProvider implements IOrbitDataProvider {
         load(file, parameter);
     }
 
-    public OrbitData getData() {
+    public PolylineData getData() {
         return data;
     }
 

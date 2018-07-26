@@ -79,6 +79,10 @@ public class Vector2d implements Serializable {
         return this;
     }
 
+    public Vector2d set(double[] vals) {
+        return this.set(vals[0], vals[1]);
+    }
+
     /** Sets the components of this vector
      * @param x The x-component
      * @param y The y-component
@@ -314,6 +318,10 @@ public class Vector2d implements Serializable {
         this.y = newY;
 
         return this;
+    }
+
+    public double[] values() {
+        return new double[] { x, y };
     }
 
     /** Rotates the Vector2d by 90 degrees in the specified direction, where >= 0 is counter-clockwise and < 0 is clockwise. */
