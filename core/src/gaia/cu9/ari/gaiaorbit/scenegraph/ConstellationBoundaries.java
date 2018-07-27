@@ -27,7 +27,7 @@ public class ConstellationBoundaries extends LineObject {
             Vector3d previous = null;
             for (Vector3d point : points) {
                 if (previous != null) {
-                    renderer.addLine((float) previous.x, (float) previous.y, (float) previous.z, (float) point.x, (float) point.y, (float) point.z, cc[0], cc[1], cc[2], alpha);
+                    renderer.addLine(this, (float) previous.x, (float) previous.y, (float) previous.z, (float) point.x, (float) point.y, (float) point.z, cc[0], cc[1], cc[2], alpha);
                 }
                 previous = point;
             }
@@ -51,6 +51,11 @@ public class ConstellationBoundaries extends LineObject {
 
     @Override
     public void initialize() {
+    }
+
+    @Override
+    public float getLineWidth() {
+        return 1;
     }
 
 }

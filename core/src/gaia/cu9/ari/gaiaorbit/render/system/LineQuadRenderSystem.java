@@ -1,5 +1,6 @@
 package gaia.cu9.ari.gaiaorbit.render.system;
 
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Mesh;
 import com.badlogic.gdx.graphics.VertexAttribute;
@@ -17,9 +18,16 @@ import gaia.cu9.ari.gaiaorbit.util.GlobalConf;
 import gaia.cu9.ari.gaiaorbit.util.math.MathUtilsd;
 import gaia.cu9.ari.gaiaorbit.util.math.Vector3d;
 
+/**
+ * Renders lines as Polyline Quadstrips (Polyboards).
+ * Slower but higher quality.
+ * @author tsagrista
+ *
+ */
 public class LineQuadRenderSystem extends LineRenderSystem {
     private MeshDataExt currext;
     private Array<double[]> provisionalLines;
+    private Array<Line> provLines;
     private LineArraySorter sorter;
     private Pool<double[]> dpool;
 
@@ -35,14 +43,26 @@ public class LineQuadRenderSystem extends LineRenderSystem {
         }
     }
 
-    Vector3d line, camdir0, camdir1, camdir15, point, vec;
-    final static double widthAngle = Math.toRadians(0.05);
-    final static double widthAngleTan = Math.tan(widthAngle);
+    private class Line {
+        public float r, g, b, a;
+        public double widthAngleTan;
+        public double[][] points;
+        public double[] dists;
 
+        public Line() {
+            super();
+        }
+
+    }
+
+    Vector3d line, camdir0, camdir1, camdir15, point, vec;
+    final static double widthAngle = Math.toRadians(0.1);
+    final static double widthAngleTan = Math.tan(widthAngle);
     public LineQuadRenderSystem(RenderGroup rg, float[] alphas, ShaderProgram[] shaders) {
         super(rg, alphas, shaders);
         dpool = new DPool(INI_DPOOL_SIZE, MAX_DPOOL_SIZE, 14);
         provisionalLines = new Array<double[]>();
+        provLines = new Array<Line>();
         sorter = new LineArraySorter(12);
         glType = GL20.GL_TRIANGLES;
         line = new Vector3d();
@@ -69,7 +89,7 @@ public class LineQuadRenderSystem extends LineRenderSystem {
             currext.maxIndices = maxVertices + maxVertices / 2;
 
             VertexAttribute[] attribs = buildVertexAttributes();
-            currext.mesh = new Mesh(Mesh.VertexDataType.VertexArray, false, maxVertices, currext.maxIndices, attribs);
+            currext.mesh = new Mesh(false, maxVertices, currext.maxIndices, attribs);
 
             currext.indices = new short[currext.maxIndices];
             currext.vertexSize = currext.mesh.getVertexAttributes().vertexSize / 4;
@@ -100,19 +120,21 @@ public class LineQuadRenderSystem extends LineRenderSystem {
         currext.vertices[currext.vertexIdx + currext.uvOffset + 1] = v;
     }
 
-    public void addLine(double x0, double y0, double z0, double x1, double y1, double z1, float r, float g, float b, float a) {
-        addLine(x0, y0, z0, x1, y1, z1, r, g, b, a, widthAngleTan);
+    @Override
+    public void addLine(ILineRenderable lr, double x0, double y0, double z0, double x1, double y1, double z1, Color c) {
+        addLine(lr, x0, y0, z0, x1, y1, z1, c);
     }
 
-    public void addLine(double x0, double y0, double z0, double x1, double y1, double z1, float r, float g, float b, float a, double widthAngleTan) {
-        addLineInternal(x0, y0, z0, x1, y1, z1, r, g, b, a, widthAngleTan);
+    @Override
+    public void addLine(ILineRenderable lr, double x0, double y0, double z0, double x1, double y1, double z1, float r, float g, float b, float a) {
+        addLineInternal(x0, y0, z0, x1, y1, z1, r, g, b, a, lr.getLineWidth() * widthAngleTan);
     }
 
-    public void addLineInternal(double x0, double y0, double z0, double x1, double y1, double z1, float r, float g, float b, float a, double widthAngleTan) {
+    private void addLineInternal(double x0, double y0, double z0, double x1, double y1, double z1, float r, float g, float b, float a, double widthAngleTan) {
         addLineInternal(x0, y0, z0, x1, y1, z1, r, g, b, a, widthAngleTan, true);
     }
 
-    public void addLineInternal(double x0, double y0, double z0, double x1, double y1, double z1, float r, float g, float b, float a, double widthAngleTan, boolean rec) {
+    private void addLineInternal(double x0, double y0, double z0, double x1, double y1, double z1, float r, float g, float b, float a, double widthAngleTan, boolean rec) {
         double distToSegment = MathUtilsd.distancePointSegment(x0, y0, z0, x1, y1, z1, 0, 0, 0);
 
         double dist0 = Math.sqrt(x0 * x0 + y0 * y0 + z0 * z0);
@@ -124,8 +146,8 @@ public class LineQuadRenderSystem extends LineRenderSystem {
             // Projection falls in line, split line
             p15 = MathUtilsd.getClosestPoint2(x0, y0, z0, x1, y1, z1, 0, 0, 0);
 
-            addLineInternal(x0, y0, z0, p15.x, p15.y, p15.z, r, g, b, a, widthAngleTan, false);
-            addLineInternal(p15.x, p15.y, p15.z, x1, y1, z1, r, g, b, a, widthAngleTan, false);
+            addLineInternal(x0, y0, z0, p15.x, p15.y, p15.z, r, g, b, a, widthAngleTan, true);
+            addLineInternal(p15.x, p15.y, p15.z, x1, y1, z1, r, g, b, a, widthAngleTan, true);
         } else {
             // Add line to list
             // x0 y0 z0 x1 y1 z1 r g b a dist0 dist1 distMean
@@ -143,14 +165,61 @@ public class LineQuadRenderSystem extends LineRenderSystem {
             l[10] = dist0;
             l[11] = dist1;
             l[12] = (dist0 + dist1) / 2d;
-            l[13] = widthAngleTan * GlobalConf.SCALE_FACTOR;
+            l[13] = widthAngleTan;
             provisionalLines.add(l);
+        }
+    }
+
+    public void addLinePostproc(Line l) {
+        int npoints = l.points.length;
+        // Check if npoints more indices fit
+        if (currext.numVertices + npoints > shortLimit)
+            initVertices(meshIdx++);
+
+        for (int i = 1; i < npoints; i++) {
+            if (i == 1) {
+                // Line from 0 to 1
+                line.set(l.points[1][0] - l.points[0][0], l.points[1][1] - l.points[0][1], l.points[1][2] - l.points[0][2]);
+            } else if (i == npoints - 1) {
+                // Line from npoints-1 to npoints
+                line.set(l.points[npoints - 1][0] - l.points[npoints - 2][0], l.points[npoints - 1][1] - l.points[npoints - 2][1], l.points[npoints - 1][2] - l.points[npoints - 2][2]);
+            } else {
+                // Line from i-1 to i+1
+                line.set(l.points[i + 1][0] - l.points[i - 1][0], l.points[i + 1][1] - l.points[i - 1][1], l.points[i + 1][2] - l.points[i - 1][2]);
+            }
+            camdir0.set(l.points[i]);
+            camdir0.crs(line);
+            camdir0.setLength(l.widthAngleTan * l.dists[i] * camera.getFovFactor());
+
+            // P1
+            point.set(l.points[i]).add(camdir0);
+            color(l.r, l.g, l.b, l.a);
+            uv(i / (npoints - 1), 0);
+            vertex((float) point.x, (float) point.y, (float) point.z);
+
+            // P2
+            point.set(l.points[i]).sub(camdir0);
+            color(l.r, l.g, l.b, l.a);
+            uv(i / (npoints - 1), 1);
+            vertex((float) point.x, (float) point.y, (float) point.z);
+
+            // Indices
+            if (i > 1) {
+                index((short) (currext.numVertices - 4));
+                index((short) (currext.numVertices - 2));
+                index((short) (currext.numVertices - 3));
+
+                index((short) (currext.numVertices - 2));
+                index((short) (currext.numVertices - 1));
+                index((short) (currext.numVertices - 3));
+            }
+
         }
     }
 
     public void addLinePostproc(double x0, double y0, double z0, double x1, double y1, double z1, double r, double g, double b, double a, double dist0, double dist1, double widthTan) {
 
-        // Check if 6 more indices fit
+        // Check if 3 more indices fit
         if (currext.numVertices + 3 >= shortLimit) {
             // We need to open a new MeshDataExt!
             initVertices(meshIdx++);
@@ -231,6 +300,9 @@ public class LineQuadRenderSystem extends LineRenderSystem {
         for (double[] l : provisionalLines)
             addLinePostproc(l[0], l[1], l[2], l[3], l[4], l[5], l[6], l[7], l[8], l[9], l[10], l[11], l[13]);
 
+        for (Line l : provLines)
+            addLinePostproc(l);
+
         ShaderProgram shaderProgram = getShaderProgram();
 
         shaderProgram.begin();
@@ -258,6 +330,15 @@ public class LineQuadRenderSystem extends LineRenderSystem {
         for (int i = 0; i < n; i++)
             dpool.free(provisionalLines.get(i));
         provisionalLines.clear();
+
+        // Reset mesh index, current and lines
+        meshIdx = 1;
+        currext = (MeshDataExt) meshes[0];
+        curr = currext;
+        n = provLines.size;
+        //for (int i = 0; i < n; i++)
+        //    lpool.free(provLines.get(i));
+        provLines.clear();
     }
 
 }

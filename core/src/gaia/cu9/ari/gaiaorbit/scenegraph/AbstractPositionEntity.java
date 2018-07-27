@@ -202,6 +202,10 @@ public abstract class AbstractPositionEntity extends SceneGraphNode {
         return aux;
     }
 
+    public Vector3d getAbsolutePosition(String name, Vector3d aux) {
+        return this.name.toLowerCase().equals(name) ? getAbsolutePosition(aux) : null;
+    }
+
     public Matrix4d getAbsoluteOrientation(Matrix4d aux) {
         aux.set(orientation);
         AbstractPositionEntity entity = this;

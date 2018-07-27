@@ -82,7 +82,7 @@ public class StubModel extends AbstractPositionEntity implements IModelRenderabl
         Matrix4 transform = instance.transform;
         beamP0.set(0, -0.1f, 0).mul(transform);
         beamP1.set(0, -.8e15f, -1e15f).mul(transform);
-        renderer.addLine(beamP0.x, beamP0.y, beamP0.z, beamP1.x, beamP1.y - 0.1f, beamP1.z, 1f, 0.0f, 0.0f, 0.5f);
+        renderer.addLine(this, beamP0.x, beamP0.y, beamP0.z, beamP1.x, beamP1.y - 0.1f, beamP1.z, 1f, 0.0f, 0.0f, 0.5f);
     }
 
     public void setTransparency(float alpha) {
@@ -140,6 +140,11 @@ public class StubModel extends AbstractPositionEntity implements IModelRenderabl
      */
     public Vector3 getBeamP1() {
         return beamP1;
+    }
+
+    @Override
+    public float getLineWidth() {
+        return 5;
     }
 
 }

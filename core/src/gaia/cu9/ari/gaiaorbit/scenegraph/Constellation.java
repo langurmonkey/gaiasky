@@ -132,7 +132,7 @@ public class Constellation extends LineObject implements I3DTextRenderable {
                 getPosition(pair[0], campos, p1);
                 getPosition(pair[1], campos, p2);
 
-                renderer.addLine(p1.x, p1.y, p1.z, p2.x, p2.y, p2.z, cc[0], cc[1], cc[2], alpha);
+                renderer.addLine(this, p1.x, p1.y, p1.z, p2.x, p2.y, p2.z, cc[0], cc[1], cc[2], alpha);
             }
         }
 
@@ -216,6 +216,11 @@ public class Constellation extends LineObject implements I3DTextRenderable {
     @Override
     public boolean isLabel() {
         return true;
+    }
+
+    @Override
+    public float getLineWidth() {
+        return 1;
     }
 
 }

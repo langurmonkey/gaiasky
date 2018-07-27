@@ -244,7 +244,6 @@ public class OctreeNode implements ILineRenderable {
         }
     }
 
-
     /** Gets the index of this node in the parent's list **/
     protected int getParentIndex() {
         if (parent != null) {
@@ -547,10 +546,10 @@ public class OctreeNode implements ILineRenderable {
             // Compute distance and view angle
             distToCamera = auxD1.set(centre).add(cam.getInversePos()).len();
             // View angle is normalized to 40 degrees when the octant is exactly the size of the screen height, regardless of the camera fov
-            viewAngle = Math.atan(radius / distToCamera) * 2 / cam.getFovFactor();
+            viewAngle = Math.atan(radius / distToCamera) * 2;
 
-            float th0 = GlobalConf.scene.OCTANT_THRESHOLD_0 / cam.getFovFactor();
-            float th1 = GlobalConf.scene.OCTANT_THRESHOLD_1 / cam.getFovFactor();
+            float th0 = GlobalConf.scene.OCTANT_THRESHOLD_0;
+            float th1 = GlobalConf.scene.OCTANT_THRESHOLD_1;
 
             if (viewAngle < th0) {
                 // Not observed
@@ -558,11 +557,11 @@ public class OctreeNode implements ILineRenderable {
                 setChildrenObserved(false);
             } else {
                 nOctantsObserved++;
-
+                //int L_DEPTH = 5;
                 /**
                  * Load lists of pages
                  */
-                if (status == LoadStatus.NOT_LOADED && LOAD_ACTIVE) {
+                if (status == LoadStatus.NOT_LOADED && LOAD_ACTIVE /*&& depth == L_DEPTH*/) {
                     // Add to load and go on
                     StreamingOctreeLoader.queue(this);
                 } else if (status == LoadStatus.LOADED) {
@@ -578,6 +577,7 @@ public class OctreeNode implements ILineRenderable {
                     this.opacity *= alpha;
 
                     // Add objects
+                    //if (depth == L_DEPTH)
                     addObjectsTo(roulette);
                 } else if (status == LoadStatus.QUEUED) {
                     // What do? Move first in queue?
@@ -586,7 +586,7 @@ public class OctreeNode implements ILineRenderable {
                 // Update children
                 for (int i = 0; i < 8; i++) {
                     OctreeNode child = children[i];
-                    if (child != null) {
+                    if (child != null /*&& child.depth <= L_DEPTH*/) {
                         child.update(parentTransform, cam, roulette, this.opacity);
                     }
                 }
@@ -800,7 +800,7 @@ public class OctreeNode implements ILineRenderable {
 
     /** Draws a line **/
     private void line(LineRenderSystem sr, double x1, double y1, double z1, double x2, double y2, double z2, com.badlogic.gdx.graphics.Color col) {
-        sr.addLine((float) x1, (float) y1, (float) z1, (float) x2, (float) y2, (float) z2, col);
+        sr.addLine(this, (float) x1, (float) y1, (float) z1, (float) x2, (float) y2, (float) z2, col);
     }
 
     public static long hash(double x, double y, double z) {
@@ -821,6 +821,27 @@ public class OctreeNode implements ILineRenderable {
     public static long hash(double value) {
         long bits = Double.doubleToLongBits(value);
         return (bits ^ (bits >>> 32));
+    }
+
+    /**
+     * Disposes this octree node (and all children nodes recursively)
+     */
+    public void dispose() {
+        if (objects != null)
+            for (SceneGraphNode object : objects) {
+                if (object != null)
+                    object.dispose();
+            }
+        if (children != null)
+            for (OctreeNode child : children) {
+                if (child != null)
+                    child.dispose();
+            }
+    }
+
+    @Override
+    public float getLineWidth() {
+        return 1;
     }
 
 }

@@ -31,17 +31,16 @@ public class Area extends AbstractPositionEntity implements ILineRenderable {
     /** Max latitud/longitude and min latitude/longitude **/
     private Vector2 maxlonlat, minlonlat;
     /** Cartesian points correspoding to maximum lonlat and minimum lonlat **/
-    private Vector3 cart0, cart1;
+    private Vector3 cart0;
 
     public Area() {
-        cc = new float[] { 1f, 1f, 1f, 1f };
+        cc = new float[] { 0.8f, 0.8f, 0.f, 1f };
         localTransform = new Matrix4();
 
         maxlonlat = new Vector2(-1000, -1000);
         minlonlat = new Vector2(1000, 1000);
 
         cart0 = new Vector3();
-        cart1 = new Vector3();
     }
 
     public void initialize() {
@@ -60,10 +59,10 @@ public class Area extends AbstractPositionEntity implements ILineRenderable {
             float[][] linepoints = loc3d[lineidx];
             int m = linepoints.length;
             for (int pointidx = 1; pointidx < m; pointidx++) {
-                renderer.addLine(loc3d[lineidx][pointidx - 1][0], loc3d[lineidx][pointidx - 1][1], loc3d[lineidx][pointidx - 1][2], loc3d[lineidx][pointidx][0], loc3d[lineidx][pointidx][1], loc3d[lineidx][pointidx][2], cc[0], cc[1], cc[2], alpha * opacity);
+                renderer.addLine(this, loc3d[lineidx][pointidx - 1][0], loc3d[lineidx][pointidx - 1][1], loc3d[lineidx][pointidx - 1][2], loc3d[lineidx][pointidx][0], loc3d[lineidx][pointidx][1], loc3d[lineidx][pointidx][2], cc[0], cc[1], cc[2], alpha * opacity);
             }
             // Close line
-            renderer.addLine(loc3d[lineidx][m - 1][0], loc3d[lineidx][m - 1][1], loc3d[lineidx][m - 1][2], loc3d[lineidx][0][0], loc3d[lineidx][0][1], loc3d[lineidx][0][2], cc[0], cc[1], cc[2], alpha * opacity);
+            renderer.addLine(this, loc3d[lineidx][m - 1][0], loc3d[lineidx][m - 1][1], loc3d[lineidx][m - 1][2], loc3d[lineidx][0][0], loc3d[lineidx][0][1], loc3d[lineidx][0][2], cc[0], cc[1], cc[2], alpha * opacity);
         }
 
     }
@@ -83,7 +82,7 @@ public class Area extends AbstractPositionEntity implements ILineRenderable {
         float angleHigh = (float) ((ModelBody) parent).THRESHOLD_QUAD() * camera.getFovFactor() * 200f;
 
         if (isVisibilityOn() && ((ModelBody) parent).viewAngleApparent > angleLow) {
-            ModelBody papa = (ModelBody) parent;
+            //ModelBody papa = (ModelBody) parent;
             localTransform.idt();
             toCartesian(loc2d[0][0][0], loc2d[0][0][1], cart0, localTransform);
 
@@ -186,6 +185,11 @@ public class Area extends AbstractPositionEntity implements ILineRenderable {
 
     public void setCensusYear(Long census) {
         this.censusYear = census.intValue();
+    }
+
+    @Override
+    public float getLineWidth() {
+        return 1;
     }
 
 }

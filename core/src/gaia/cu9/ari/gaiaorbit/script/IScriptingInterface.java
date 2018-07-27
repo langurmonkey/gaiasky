@@ -948,9 +948,19 @@ public interface IScriptingInterface {
     public double getDistanceTo(String name);
 
     /**
+     * Gets the current position of the object identified by <code>name</code> in
+     * the internal coordinate system and internal units. If the object does not exist,
+     * it returns null
+     * @param name 
+     *            The name or id (HIP, TYC, sourceId) of the object.
+     * @return A 3-vector with the object's position in the internal reference system.
+     */
+    public double[] getObjectPosition(String name);
+
+    /**
      * Adds a new polyline with the given name, points and color. The polyline will
      * be created with the 'Others' component type, so you need to enable the
-     * visibility of 'Others' in order to see it.
+     * visibility of 'Others' in order to see it. 
      * @param name 
      *            The name to identify the polyline, to possibly remove it later.
      * @param points
@@ -960,6 +970,22 @@ public interface IScriptingInterface {
      *            A 4D array with the RGBA color, where each element is in [0..1].
      */
     public void addPolyline(String name, double[] points, double[] color);
+
+    /**
+     * Adds a new polyline with the given name, points, color and line width. The polyline will
+     * be created with the 'Others' component type, so you need to enable the
+     * visibility of 'Others' in order to see it. 
+     * @param name 
+     *            The name to identify the polyline, to possibly remove it later.
+     * @param points
+     *            The points of the polyline. It is an array containing all the 
+     *            points as in [x0, y0, z0, x1, y1, z1, ..., xn, yn, zn].
+     * @param color
+     *            A 4D array with the RGBA color, where each element is in [0..1].
+     * @param lineWidth
+     *            The line width. Usually a value between 1 (default) and 10.
+     */
+    public void addPolyline(String name, double[] points, double[] color, float lineWidth);
 
     /**
      * <p>

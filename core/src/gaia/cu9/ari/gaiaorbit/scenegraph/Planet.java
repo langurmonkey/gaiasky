@@ -236,7 +236,7 @@ public class Planet extends ModelBody implements IAtmosphereRenderable, ICloudRe
 
     @Override
     public void render(LineRenderSystem renderer, ICamera camera, float alpha) {
-        renderer.addLine(transform.position.x, transform.position.y, transform.position.z, endline.x, endline.y, endline.z, 1, 0, 0, 1);
+        renderer.addLine(this, transform.position.x, transform.position.y, transform.position.z, endline.x, endline.y, endline.z, 1, 0, 0, 1);
     }
 
     @Override
@@ -246,6 +246,11 @@ public class Planet extends ModelBody implements IAtmosphereRenderable, ICloudRe
         Vector3 aux3 = aux3f3.get();
         Vector3 aux4 = aux3f4.get();
         return super.checkClickDistance(screenX, screenY, pos, camera, pcamera, pixelSize) || CameraUtils.intersectScreenSphere(this, camera, screenX, screenY, aux1, aux2, aux3, aux4);
+    }
+
+    @Override
+    public float getLineWidth() {
+        return 1;
     }
 
 }

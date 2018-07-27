@@ -110,8 +110,6 @@ public class LineGPURenderSystem extends ImmediateRenderSystem {
         Gdx.gl20.glEnable(GL20.GL_DEPTH_TEST);
         Gdx.gl20.glEnable(GL20.GL_BLEND);
         Gdx.gl20.glBlendFunc(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA);
-        // Regular
-        Gdx.gl.glLineWidth(1f * GlobalConf.SCALE_FACTOR);
 
         this.camera = camera;
         int size = renderables.size;
@@ -149,6 +147,8 @@ public class LineGPURenderSystem extends ImmediateRenderSystem {
 
             shaderProgram.begin();
 
+            // Regular
+            Gdx.gl.glLineWidth(renderable.getLineWidth() * GlobalConf.SCALE_FACTOR);
             shaderProgram.setUniformMatrix("u_worldTransform", renderable.getLocalTransform());
             shaderProgram.setUniformMatrix("u_projModelView", camera.getCamera().combined);
             shaderProgram.setUniformf("u_alpha", (float) (renderable.getAlpha()) * getAlpha(renderable));

@@ -29,4 +29,8 @@ public interface IGPULineRenderable extends IRenderable {
 
     public void setCount(int count);
 
+    public void setLineWidth(float lineWidth);
+
+    public float getLineWidth();
+
 }

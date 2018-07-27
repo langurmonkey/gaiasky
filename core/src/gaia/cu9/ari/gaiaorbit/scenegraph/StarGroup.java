@@ -208,9 +208,6 @@ public class StarGroup extends ParticleGroup implements ILineRenderable, IStarFo
     private static ModelComponent mc;
     // Model transfomr
     private static Matrix4 modelTransform;
-    // Width of lines for stars with/without radial velocity
-    private static double radVelLineWidth = 0.002;
-    private static double noRadVelLineWidth = 0.0006;
 
 
     /** Epoch in julian days **/
@@ -714,7 +711,7 @@ public class StarGroup extends ParticleGroup implements ILineRenderable, IStarFo
                 float g = (float) ((star.mudelta() - mumin) / maxmin) * 0.8f + 0.2f;
                 float b = (float) (star.radvel()) * 0.8f + 0.2f;
 
-                renderer.addLine(p1.x, p1.y, p1.z, p2.x, p2.y, p2.z, r, g, b, alpha * this.opacity, star.radvel() != 0 ? radVelLineWidth : noRadVelLineWidth);
+                renderer.addLine(this, p1.x, p1.y, p1.z, p2.x, p2.y, p2.z, r, g, b, alpha * this.opacity);
             }
         }
 
@@ -993,15 +990,25 @@ public class StarGroup extends ParticleGroup implements ILineRenderable, IStarFo
         return pointData.size;
     }
 
+    public Vector3d getAbsolutePosition(String name, Vector3d aux) {
+        if (index.containsKey(name)) {
+            int idx = index.get(name, 0);
+            StarBean sb = (StarBean) pointData.get(idx);
+            aux.set(sb.x(), sb.y(), sb.z());
+            return aux;
+        } else {
+            return null;
+        }
+    }
 
     @Override
     protected Vector3d fetchPosition(ParticleBean pb, Vector3d campos, Vector3d dest, double deltaYears) {
         StarBean sb = (StarBean) pb;
         Vector3d pm = aux.set(sb.pmx(), sb.pmy(), sb.pmz()).scl(deltaYears);
         if (campos != null && !campos.hasNaN())
-            return dest.set(pb.data[0], pb.data[1], pb.data[2]).sub(campos).add(pm);
+            return dest.set(sb.x(), sb.y(), sb.z()).sub(campos).add(pm);
         else
-            return dest.set(pb.data[0], pb.data[1], pb.data[2]).add(pm);
+            return dest.set(sb.x(), sb.y(), sb.z()).add(pm);
     }
 
     @Override
@@ -1047,5 +1054,10 @@ public class StarGroup extends ParticleGroup implements ILineRenderable, IStarFo
             this.setFocusIndex(-1);
             EventManager.instance.post(Events.CAMERA_MODE_CMD, CameraMode.Free_Camera);
         }
+    }
+
+    @Override
+    public float getLineWidth() {
+        return 1;
     }
 }

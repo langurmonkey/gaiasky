@@ -98,6 +98,17 @@ public interface IFocus {
     public Vector3d getAbsolutePosition(Vector3d aux);
 
     /**
+     * Returns the absolute position of the entity identified by
+     * name within this entity in the native reference system
+     * @param name
+     *            The name (lowercase) of the entity to get the position from (useful in case of star groups)
+     * @param aux
+     *            Vector3d to put the return value
+     * @return The absolute position of the entity if it exists, null otherwise
+     */
+    public Vector3d getAbsolutePosition(String name, Vector3d aux);
+
+    /**
      * Gets the position in equatorial spherical coordinates
      * 
      * @return The position in alpha, delta
@@ -231,7 +242,7 @@ public interface IFocus {
      * @param camera
      *            The camera
      * @param hits
-     *            The list where the focus is to be added
+     *            The list where to add the element
      */
     public void addHit(int screenX, int screenY, int w, int h, int pxdist, NaturalCamera camera, Array<IFocus> hits);
 
@@ -258,7 +269,7 @@ public interface IFocus {
      * Prepares the candidate with the given name
      * 
      * @param name
-     *            The name
+     *            The name in lower case
      */
     public IFocus getFocus(String name);
 

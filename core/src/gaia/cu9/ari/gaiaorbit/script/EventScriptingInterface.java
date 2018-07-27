@@ -1079,12 +1079,27 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
         ISceneGraph sg = GaiaSky.instance.sg;
         if (sg.containsNode(namelc)) {
             SceneGraphNode object = sg.getNode(namelc);
-            if (object instanceof AbstractPositionEntity) {
-                AbstractPositionEntity ape = (AbstractPositionEntity) object;
-                return (ape.distToCamera - ape.getRadius()) * Constants.U_TO_KM;
+            if (object instanceof IFocus) {
+                IFocus obj = (IFocus) object;
+                return (obj.getDistToCamera() - obj.getRadius()) * Constants.U_TO_KM;
             }
         }
         return -1;
+    }
+
+    @Override
+    public double[] getObjectPosition(String name) {
+        String namelc = name.toLowerCase();
+        ISceneGraph sg = GaiaSky.instance.sg;
+        if (sg.containsNode(namelc)) {
+            SceneGraphNode object = sg.getNode(namelc);
+            if (object instanceof IFocus) {
+                IFocus obj = (IFocus) object;
+                obj.getAbsolutePosition(namelc, aux3d1);
+                return new double[] { aux3d1.x, aux3d1.y, aux3d1.z };
+            }
+        }
+        return null;
     }
 
     @Override
@@ -1382,17 +1397,17 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
     }
 
     /**
-     * Checks if the object is the current focus of the given camera. If it is
-     * not, it sets it as focus and waits if necessary.
-     * 
-     * @param object
-     *            The new focus object.
-     * @param cam
-     *            The current camera.
-     * @param waitTimeSeconds
-     *            Max time to wait for the camera to face the focus, in seconds.
-     *            If negative, we wait until the end.
-     */
+    	 * Checks if the object is the current focus of the given camera. If it is not,
+    	 * it sets it as focus and waits if necessary.
+    	 * 
+    	 * @param object
+    	 *            The new focus object.
+    	 * @param cam
+    	 *            The current camera.
+    	 * @param waitTimeSeconds
+    	 *            Max time to wait for the camera to face the focus, in seconds. If
+    	 *            negative, we wait until the end.
+    	 */
     private void changeFocusAndWait(IFocus object, NaturalCamera cam, float waitTimeSeconds) {
         // Post focus change and wait, if needed
         IFocus currentFocus = cam.getFocus();
@@ -1611,11 +1626,17 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
 
     @Override
     public void addPolyline(String name, double[] points, double[] color) {
+        addPolyline(name, points, color, 1f);
+    }
+
+    @Override
+    public void addPolyline(String name, double[] points, double[] color, float lineWidth) {
         Polyline pl = new Polyline();
         pl.setCt("Others");
         pl.setColor(color);
         pl.setName(name);
         pl.setPoints(points);
+        pl.setLineWidth(lineWidth);
         pl.setParent("Universe");
         pl.initialize();
 

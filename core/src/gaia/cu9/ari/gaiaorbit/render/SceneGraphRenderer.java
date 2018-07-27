@@ -581,7 +581,6 @@ public class SceneGraphRenderer extends AbstractRenderer implements IProcessRend
 
         // LINES VR LASER
         LineRenderSystem lineVRProc = new LineRenderSystem(RenderGroup.LINE_VR, alphas, lineShaders);
-        lineVRProc.setLineWidth(4f);
         lineVRProc.setPreRunnable(blendDepthRunnable);
 
         // MODEL FRONT

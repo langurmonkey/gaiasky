@@ -179,7 +179,7 @@ public class Orbit extends Polyline {
                 prev.mul(localTransformD);
                 curr.mul(localTransformD);
 
-                renderer.addLine((float) prev.x, (float) prev.y, (float) prev.z, (float) curr.x, (float) curr.y, (float) curr.z, cc[0], cc[1], cc[2], alpha);
+                renderer.addLine(this, (float) prev.x, (float) prev.y, (float) prev.z, (float) curr.x, (float) curr.y, (float) curr.z, cc[0], cc[1], cc[2], cc[3]);
 
             }
         }

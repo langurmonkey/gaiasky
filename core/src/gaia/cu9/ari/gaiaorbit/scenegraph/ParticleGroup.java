@@ -388,6 +388,10 @@ public class ParticleGroup extends FadeNode implements I3DTextRenderable, IFocus
         return aux.set(focusPosition);
     }
 
+    public Vector3d getAbsolutePosition(String name, Vector3d aux) {
+        return getAbsolutePosition(aux);
+    }
+
     // Same position
     public Vector3d getPredictedPosition(Vector3d aux, ITimeFrameProvider time, ICamera camera, boolean force) {
         return getAbsolutePosition(aux);

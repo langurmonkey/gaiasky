@@ -21,6 +21,9 @@ public class Polyline extends LineObject implements IGPULineRenderable {
     protected int offset;
     protected int count;
 
+    // Line width
+    protected float lineWidth = 1f;
+
     protected PolylineData polylineData;
 
     public Polyline() {
@@ -116,6 +119,20 @@ public class Polyline extends LineObject implements IGPULineRenderable {
     @Override
     public void setCount(int count) {
         this.count = count;
+    }
+
+    public void setLineWidth(Double lineWidth) {
+        this.lineWidth = lineWidth.floatValue();
+    }
+
+    @Override
+    public void setLineWidth(float lineWidth) {
+        this.lineWidth = lineWidth;
+    }
+
+    @Override
+    public float getLineWidth() {
+        return lineWidth;
     }
 
 }

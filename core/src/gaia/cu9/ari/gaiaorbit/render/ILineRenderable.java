@@ -11,6 +11,8 @@ import gaia.cu9.ari.gaiaorbit.scenegraph.camera.ICamera;
  */
 public interface ILineRenderable extends IRenderable {
 
+    public float getLineWidth();
+
     public void render(LineRenderSystem renderer, ICamera camera, float alpha);
 
 }
