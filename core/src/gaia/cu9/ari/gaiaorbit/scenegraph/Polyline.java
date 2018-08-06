@@ -18,6 +18,10 @@ public class Polyline extends LineObject implements IGPULineRenderable {
 
     /** GPU rendering attributes **/
     protected boolean inGpu = false;
+    /**
+     * Whether the meshdata has been created or not
+     */
+    protected boolean hasMeshData = false;
     protected int offset;
     protected int count;
 
@@ -114,6 +118,7 @@ public class Polyline extends LineObject implements IGPULineRenderable {
     @Override
     public void setOffset(int offset) {
         this.offset = offset;
+        this.hasMeshData = true;
     }
 
     @Override
@@ -134,5 +139,16 @@ public class Polyline extends LineObject implements IGPULineRenderable {
     public float getLineWidth() {
         return lineWidth;
     }
+
+    @Override
+    public void markForUpdate() {
+        this.inGpu = false;
+    }
+
+    @Override
+    public boolean hasMeshData() {
+        return this.hasMeshData;
+    }
+
 
 }

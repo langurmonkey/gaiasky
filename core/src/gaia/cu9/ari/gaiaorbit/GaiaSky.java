@@ -20,6 +20,7 @@ import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.assets.loaders.FileHandleResolver;
 import com.badlogic.gdx.assets.loaders.resolvers.InternalFileHandleResolver;
 import com.badlogic.gdx.audio.Music;
+import com.badlogic.gdx.backends.lwjgl3.Lwjgl3ApplicationConfiguration;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Pixmap.Format;
 import com.badlogic.gdx.graphics.g3d.Model;
@@ -212,11 +213,19 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
     public boolean savestate = true;
 
     /**
+     * Runnables
+     */
+    public Array<Runnable> runnables;
+    public Map<String, Runnable> runnablesMap;
+
+    /**
      * Creates a GaiaSky instance.
      */
     public GaiaSky() {
         super();
         instance = this;
+        this.runnables = new Array<Runnable>();
+        this.runnablesMap = new HashMap<String, Runnable>();
     }
 
     public void setSceneGraph(ISceneGraph sg) {
@@ -484,7 +493,7 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
         EventManager.instance.post(Events.TIME_CHANGE_INFO, time.getTime());
 
         // Subscribe to events
-        EventManager.instance.subscribe(this, Events.TOGGLE_AMBIENT_LIGHT, Events.AMBIENT_LIGHT_CMD, Events.RECORD_CAMERA_CMD, Events.CAMERA_MODE_CMD, Events.STEREOSCOPIC_CMD, Events.FRAME_SIZE_UDPATE, Events.SCREENSHOT_SIZE_UDPATE);
+        EventManager.instance.subscribe(this, Events.TOGGLE_AMBIENT_LIGHT, Events.AMBIENT_LIGHT_CMD, Events.RECORD_CAMERA_CMD, Events.CAMERA_MODE_CMD, Events.STEREOSCOPIC_CMD, Events.FRAME_SIZE_UDPATE, Events.SCREENSHOT_SIZE_UDPATE, Events.POST_RUNNABLE, Events.UNPOST_RUNNABLE);
 
         // Re-enable input
         if (!GlobalConf.runtime.STRIPPED_FOV_MODE)
@@ -757,6 +766,12 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
         // Update scene graph
         sg.update(time, cam);
 
+        // Run parked runnables
+        synchronized (runnables) {
+            for (Runnable r : runnables) {
+                r.run();
+            }
+        }
     }
 
     public void preRenderScene() {
@@ -1002,6 +1017,19 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
             Gdx.app.postRunnable(() -> {
                 //clearFrameBufferMap();
             });
+            break;
+        case POST_RUNNABLE:
+            synchronized (runnables) {
+                runnablesMap.put((String) data[0], (Runnable) data[1]);
+                runnables.add((Runnable) data[1]);
+            }
+            break;
+        case UNPOST_RUNNABLE:
+            synchronized (runnables) {
+                Runnable r = runnablesMap.get((String) data[0]);
+                runnables.removeValue(r, true);
+                runnablesMap.remove((String) data[0]);
+            }
             break;
         default:
             break;

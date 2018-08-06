@@ -2,8 +2,11 @@
 --------------------------
 
 [![Documentation Status](https://readthedocs.org/projects/gaia-sky/badge/?version=latest)](http://gaia-sky.readthedocs.io/en/latest/?badge=latest)
-[![Circle CI](https://circleci.com/gh/langurmonkey/gaiasky.svg?style=shield&circle-token=:circle-token)](https://circleci.com/gh/langurmonkey/gaiasky/tree/master)
+[![Build status](https://gitlab.com/langurmonkey/gaiasky/badges/master/pipeline.svg)](https://gitlab.com/langurmonkey/gaiasky/commits/master)
 [![License: MPL 2.0](https://img.shields.io/badge/License-MPL%202.0-brightgreen.svg)](https://opensource.org/licenses/MPL-2.0)
+[![GitHub issues](https://img.shields.io/github/issues/langurmonkey/gaiasky.svg)](https://github.com/langurmonkey/gaiasky/issues)
+[![GitHub forks](https://img.shields.io/github/forks/langurmonkey/gaiasky.svg)](https://github.com/langurmonkey/gaiasky/network)
+[![GitHub tag](https://img.shields.io/github/tag/langurmonkey/gaiasky.svg)](https://github.com/langurmonkey/gaiasky/tags/)
 
 [**Gaia Sky VR**](https://zah.uni-heidelberg.de/gaia/outreach/gaiasky) is a real-time, 3D, astronomy VR software that
 runs on multiple headsets and operating systems thanks to Valve's [OpenVR](https://github.com/ValveSoftware/openvr). It is developed in the framework of
@@ -12,7 +15,7 @@ To get the latest up-to-date and most complete information,
 
 *  Visit our [**home page**](https://zah.uni-heidelberg.de/gaia/outreach/gaiasky)
 *  Read the [**Documentation**](http://gaia-sky.readthedocs.io) for the non-VR version
-*  Submit a [**bug** or a **feature request**](https://github.com/langurmonkey/gaiasky/issues)
+*  Submit a [**bug** or a **feature request**](https://gitlab.com/langurmonkey/gaiasky/issues)
 *  Follow development news at [@GaiaSky_Dev](https://twitter.com/GaiaSky_Dev)
 
 This file contains the following sections:

@@ -117,14 +117,27 @@ public class LineGPURenderSystem extends ImmediateRenderSystem {
         for (int i = 0; i < size; i++) {
             IGPULineRenderable renderable = (IGPULineRenderable) renderables.get(i);
 
-            curr = meshes[renderable.getOffset()];
             /**
              * ADD LINES
              */
             if (!renderable.inGpu()) {
                 PolylineData od = renderable.getPolyline();
                 int npoints = od.getNumPoints();
-                renderable.setOffset(addMeshData(npoints));
+
+                // Initialize or fetch mesh data
+                if (!renderable.hasMeshData()) {
+                    renderable.setOffset(addMeshData(npoints));
+                } else {
+                    curr = meshes[renderable.getOffset()];
+                    // Check we still have capacity, otherwise, reinitialize.
+                    if (curr.numVertices != od.getNumPoints()) {
+                        curr.clear();
+                        curr.mesh.dispose();
+                        meshes[renderable.getOffset()] = null;
+                        renderable.setOffset(addMeshData(npoints));
+                    }
+                }
+
                 float[] cc = renderable.getColor();
                 for (int point_i = 0; point_i < npoints; point_i++) {
                     color(cc[0], cc[1], cc[2], 1.0);
@@ -138,6 +151,7 @@ public class LineGPURenderSystem extends ImmediateRenderSystem {
                 curr.mesh.setVertices(curr.vertices, 0, renderable.getCount());
                 renderable.setInGpu(true);
             }
+            curr = meshes[renderable.getOffset()];
 
             /**
              * RENDER

@@ -1655,4 +1655,19 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
         });
     }
 
+    @Override
+    public void postRunnable(Runnable runnable) {
+        Gdx.app.postRunnable(runnable);
+    }
+
+    @Override
+    public void parkRunnable(String id, Runnable runnable) {
+        em.post(Events.POST_RUNNABLE, id, runnable);
+    }
+
+    @Override
+    public void unparkRunnable(String id) {
+        em.post(Events.UNPOST_RUNNABLE, id);
+    }
+
 }

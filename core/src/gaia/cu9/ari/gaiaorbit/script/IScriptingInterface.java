@@ -1390,6 +1390,30 @@ public interface IScriptingInterface {
     public void setSmoothLodTransitions(boolean value);
 
     /**
+     * Posts a {@link Runnable} to the main loop thread. The runnable runs only once.
+     * This will execute the runnable right after the current update-render cycle has finished.
+     * @param runnable The runnable to run
+     */
+    public void postRunnable(Runnable runnable);
+
+    /**
+     * Parks a {@link Runnable} to the main loop thread, and keeps it running every frame
+     * until it finishes or it is unparked by {@link #unparkRunnable(String)}.
+     * Be careful with this function, as it probably needs a cleanup before the script is finished. Otherwise,
+     * all parked runnables will keep running until Gaia Sky is restarted, so make sure to
+     * remove them with {@link #unparkRunnable(String)} if needed.
+     * @param id The string id to identify the runnable 
+     * @param runnable The runnable to park
+     */
+    public void parkRunnable(String id, Runnable runnable);
+
+    /**
+     * Removes the runnable with the given id, if any
+     * @param id The id of the runnable to remove
+     */
+    public void unparkRunnable(String id);
+
+    /**
      * Rotates a 3D vector around the given axis by the specified angle in degrees.
      * Vectors are arrays with 3 components. If more components are there, they are ignored.
      * @param vector Vector to rotate, with at least 3 components

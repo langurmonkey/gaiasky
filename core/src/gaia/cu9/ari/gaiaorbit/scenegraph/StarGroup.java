@@ -994,7 +994,7 @@ public class StarGroup extends ParticleGroup implements ILineRenderable, IStarFo
         if (index.containsKey(name)) {
             int idx = index.get(name, 0);
             StarBean sb = (StarBean) pointData.get(idx);
-            aux.set(sb.x(), sb.y(), sb.z());
+            fetchPosition(sb, null, aux, currDeltaYears);
             return aux;
         } else {
             return null;

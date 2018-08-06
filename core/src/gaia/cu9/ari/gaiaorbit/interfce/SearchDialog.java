@@ -14,6 +14,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.Window;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener.ChangeEvent;
 import com.badlogic.gdx.utils.Align;
 
+import gaia.cu9.ari.gaiaorbit.GaiaSky;
 import gaia.cu9.ari.gaiaorbit.event.EventManager;
 import gaia.cu9.ari.gaiaorbit.event.Events;
 import gaia.cu9.ari.gaiaorbit.scenegraph.IFocus;
@@ -55,7 +56,7 @@ public class SearchDialog extends Window {
                                 SceneGraphNode node = sg.getNode(name);
                                 if (node instanceof IFocus) {
                                     IFocus focus = ((IFocus) node).getFocus(name);
-                                    if (focus != null && !focus.isCoordinatesTimeOverflow()) {
+                                    if (focus != null && !focus.isCoordinatesTimeOverflow() && GaiaSky.instance.isOn(focus.getCt())) {
                                         Gdx.app.postRunnable(() -> {
                                             EventManager.instance.post(Events.CAMERA_MODE_CMD, CameraMode.Focus, true);
                                             EventManager.instance.post(Events.FOCUS_CHANGE_CMD, focus, true);

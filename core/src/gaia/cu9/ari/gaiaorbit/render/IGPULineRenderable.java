@@ -9,6 +9,8 @@ public interface IGPULineRenderable extends IRenderable {
 
     public boolean inGpu();
 
+    public void markForUpdate();
+
     public int getOffset();
 
     public int getCount();
@@ -28,6 +30,8 @@ public interface IGPULineRenderable extends IRenderable {
     public void setOffset(int offset);
 
     public void setCount(int count);
+
+    public boolean hasMeshData();
 
     public void setLineWidth(float lineWidth);
 

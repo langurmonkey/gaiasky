@@ -780,6 +780,12 @@ public enum Events {
 
     /** A new catalog has been loaded. Contains the new catalog info object **/
     ADD_CATALOG_INFO,
+    
+    /** Posts a recurrent runnable. Contains an identifier (String) and the runnable object **/
+    POST_RUNNABLE,
+
+    /** Unposts a runnable. Contains the identifier (String) **/
+    UNPOST_RUNNABLE,
 
     /** New VR device connected. Contains the VRDevice object. **/
     VR_DEVICE_CONNECTED,
