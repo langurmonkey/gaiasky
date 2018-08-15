@@ -13,8 +13,6 @@ import gaia.cu9.ari.gaiaorbit.scenegraph.SceneGraphNode;
 import gaia.cu9.ari.gaiaorbit.scenegraph.Star;
 import gaia.cu9.ari.gaiaorbit.scenegraph.octreewrapper.AbstractOctreeWrapper;
 import gaia.cu9.ari.gaiaorbit.scenegraph.octreewrapper.OctreeWrapper;
-import gaia.cu9.ari.gaiaorbit.scenegraph.octreewrapper.OctreeWrapperConcurrent;
-import gaia.cu9.ari.gaiaorbit.util.GlobalConf;
 import gaia.cu9.ari.gaiaorbit.util.I18n;
 import gaia.cu9.ari.gaiaorbit.util.Logger;
 import gaia.cu9.ari.gaiaorbit.util.tree.LoadStatus;
@@ -30,6 +28,7 @@ import gaia.cu9.ari.gaiaorbit.util.tree.OctreeNode;
 public class OctreeSingleFileLoader implements ISceneGraphLoader {
 
     String metadata, particles;
+    String name, description;
 
     @Override
     public Array<? extends SceneGraphNode> loadData() throws FileNotFoundException {
@@ -53,12 +52,8 @@ public class OctreeSingleFileLoader implements ISceneGraphLoader {
         /**
          * CREATE OCTREE WRAPPER WITH ROOT NODE
          */
-        AbstractOctreeWrapper octreeWrapper = null;
-        if (GlobalConf.performance.MULTITHREADING) {
-            octreeWrapper = new OctreeWrapperConcurrent("Universe", root);
-        } else {
-            octreeWrapper = new OctreeWrapper("Universe", root);
-        }
+        AbstractOctreeWrapper octreeWrapper = new OctreeWrapper("Universe", root);
+
         Array<SceneGraphNode> result = new Array<SceneGraphNode>(1);
         result.add(octreeWrapper);
 
@@ -89,6 +84,14 @@ public class OctreeSingleFileLoader implements ISceneGraphLoader {
         }
         particles = files[0];
         metadata = files[1];
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
     }
 
 }

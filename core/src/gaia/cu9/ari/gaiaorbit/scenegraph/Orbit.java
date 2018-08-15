@@ -98,7 +98,7 @@ public class Orbit extends Polyline {
     }
 
     protected void updateLocalTransform(Instant date) {
-        transform.getMatrix(localTransformD);
+        translation.getMatrix(localTransformD);
         if (newmethod) {
             if (transformFunction != null) {
                 localTransformD.mul(transformFunction).rotate(0, 1, 0, 90);

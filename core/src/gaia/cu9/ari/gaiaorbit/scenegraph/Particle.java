@@ -38,7 +38,7 @@ import net.jafama.FastMath;
 public class Particle extends CelestialBody implements IStarFocus, IPointRenderable, ILineRenderable {
 
     private static final float DISC_FACTOR = 1.5f;
-    protected static final float LABEL_FACTOR = Constants.webgl ? 3f : 1f;
+    private static final float LABEL_FACTOR = Constants.webgl ? 3f : 1f;
 
     private static Random rnd = new Random();
 
@@ -203,7 +203,7 @@ public class Particle extends CelestialBody implements IStarFocus, IPointRendera
     }
 
     @Override
-    public void update(ITimeFrameProvider time, final Transform parentTransform, ICamera camera) {
+    public void update(ITimeFrameProvider time, final Vector3d parentTransform, ICamera camera) {
         update(time, parentTransform, camera, 1f);
     }
 
@@ -212,15 +212,15 @@ public class Particle extends CelestialBody implements IStarFocus, IPointRendera
      * {@link SceneGraphNode}.
      */
     @Override
-    public void update(ITimeFrameProvider time, final Transform parentTransform, ICamera camera, float opacity) {
+    public void update(ITimeFrameProvider time, final Vector3d parentTransform, ICamera camera, float opacity) {
         if (appmag <= GlobalConf.runtime.LIMIT_MAG_RUNTIME) {
             this.opacity = opacity;
-            transform.position.set(parentTransform.position).add(pos);
+            translation.set(parentTransform).add(pos);
             if (hasPm) {
                 Vector3d pmv = aux3d1.get().set(pm).scl(AstroUtils.getMsSince(time.getTime(), AstroUtils.JD_J2015_5) * Constants.MS_TO_Y);
-                transform.position.add(pmv);
+                translation.add(pmv);
             }
-            distToCamera = transform.position.len();
+            distToCamera = translation.len();
 
             if (!copy) {
                 camera.setClosestStar(this);
@@ -378,7 +378,7 @@ public class Particle extends CelestialBody implements IStarFocus, IPointRendera
      */
     @Override
     public void render(LineRenderSystem renderer, ICamera camera, float alpha) {
-        Vector3 p1 = transform.position.setVector3(aux3f1.get());
+        Vector3 p1 = translation.setVector3(aux3f1.get());
         Vector3 ppm = aux3f2.get().set(pm).scl(GlobalConf.scene.PM_LEN_FACTOR);
         Vector3 p2 = ppm.add(p1);
 
@@ -428,7 +428,7 @@ public class Particle extends CelestialBody implements IStarFocus, IPointRendera
 
     @Override
     public Vector3d getClosestPos(Vector3d out) {
-        return transform.getTranslation(out);
+        return translation.put(out);
     }
 
     @Override

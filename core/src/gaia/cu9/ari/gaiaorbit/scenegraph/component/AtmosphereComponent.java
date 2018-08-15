@@ -13,7 +13,6 @@ import com.badlogic.gdx.math.Vector3;
 
 import gaia.cu9.ari.gaiaorbit.scenegraph.Planet;
 import gaia.cu9.ari.gaiaorbit.scenegraph.SceneGraphNode;
-import gaia.cu9.ari.gaiaorbit.scenegraph.Transform;
 import gaia.cu9.ari.gaiaorbit.util.Constants;
 import gaia.cu9.ari.gaiaorbit.util.ModelCache;
 import gaia.cu9.ari.gaiaorbit.util.Pair;
@@ -68,7 +67,7 @@ public class AtmosphereComponent {
 
     }
 
-    public void update(Transform transform) {
+    public void update(Vector3d transform) {
         transform.getMatrix(localTransform).scl(size);
     }
 
@@ -149,10 +148,10 @@ public class AtmosphereComponent {
      *            The planet itself, holder of this atmosphere
      */
     public void updateAtmosphericScatteringParams(Material mat, float alpha, boolean ground, Planet planet, Vector3d vroffset) {
-        Transform transform = planet.transform;
+        Vector3d transform = planet.translation;
         RotationComponent rc = planet.rc;
         SceneGraphNode sol = planet.parent;
-        transform.getTranslation(aux3);
+        transform.put(aux3);
         if (vroffset != null) {
             aux1.set(vroffset).scl(1 / VRContext.VROFFSET_FACTOR);
             aux3.sub(aux1);
@@ -201,7 +200,7 @@ public class AtmosphereComponent {
         ((Vector3Attribute) mat.get(Vector3Attribute.CameraPos)).value.set(aux3.put(aux));
 
         // Light position respect the earth: LightPos = SunPos - EarthPos
-        sol.transform.addTranslationTo(aux3).nor();
+        aux3.add(sol.translation).nor();
         if (ground) {
             // Camera position must be corrected using the rotation angle of the planet
             aux3.mul(Coordinates.getTransformD(planet.inverseRefPlaneTransform)).rotate(rc.ascendingNode, 0, 1, 0).rotate(-rc.inclination - rc.axialTilt, 0, 0, 1).rotate(-rc.angle, 0, 1, 0);

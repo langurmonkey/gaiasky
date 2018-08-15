@@ -9,7 +9,6 @@ import gaia.cu9.ari.gaiaorbit.scenegraph.Planet;
 import gaia.cu9.ari.gaiaorbit.scenegraph.SceneGraphNode;
 import gaia.cu9.ari.gaiaorbit.scenegraph.Star;
 import gaia.cu9.ari.gaiaorbit.scenegraph.octreewrapper.OctreeWrapper;
-import gaia.cu9.ari.gaiaorbit.scenegraph.octreewrapper.OctreeWrapperConcurrent;
 import gaia.cu9.ari.gaiaorbit.util.math.Matrix4d;
 import gaia.cu9.ari.gaiaorbit.util.math.Vector2d;
 import gaia.cu9.ari.gaiaorbit.util.math.Vector3d;
@@ -26,7 +25,6 @@ public class SimplePool<T> extends Pool<T> {
     private static final int sgn = SceneGraphNode.class.hashCode();
     private static final int matrix4d = Matrix4d.class.hashCode();
     private static final int octreewrapper = OctreeWrapper.class.hashCode();
-    private static final int coctreewrapper = OctreeWrapperConcurrent.class.hashCode();
 
     final Integer typeHash;
 
@@ -65,8 +63,6 @@ public class SimplePool<T> extends Pool<T> {
 	    return (T) new Matrix4d();
 	if (typeHash == octreewrapper)
 	    return (T) new OctreeWrapper();
-	if (typeHash == coctreewrapper)
-	    return (T) new OctreeWrapperConcurrent();
 
 	Logger.warn("Class " + typeHash + " is not poolable!");
 	return null;

@@ -16,9 +16,9 @@ public class LightBeam extends ModelBody {
 
     Matrix4 orientationf;
 
-    Vector3 rotationaxis;
+    Vector3 rotation3axis;
     float angle;
-    Vector3 translation;
+    Vector3 translation3;
 
     public LightBeam() {
         orientationf = new Matrix4();
@@ -59,7 +59,7 @@ public class LightBeam extends ModelBody {
     public void setToLocalTransform(float sizeFactor, Matrix4 localTransform, boolean forceUpdate) {
         if (sizeFactor != 1 || forceUpdate) {
 
-            transform.getMatrix(localTransform).scl(size * sizeFactor);
+            translation.getMatrix(localTransform).scl(size * sizeFactor);
 
             parent.orientation.putIn(orientationf);
             localTransform.mul(orientationf);
@@ -67,7 +67,7 @@ public class LightBeam extends ModelBody {
             localTransform.rotate(1, 0, 0, 90);
 
             // First beam
-            localTransform.rotate(rotationaxis, angle).translate(translation).rotate(0, 0, 1, 180);
+            localTransform.rotate(rotation3axis, angle).translate(translation3).rotate(0, 0, 1, 180);
         } else {
             localTransform.set(this.localTransform);
         }
@@ -109,11 +109,11 @@ public class LightBeam extends ModelBody {
     }
 
     public void setRotationaxis(double[] rotationaxis) {
-        this.rotationaxis = new Vector3((float) rotationaxis[0], (float) rotationaxis[1], (float) rotationaxis[2]);
+        this.rotation3axis = new Vector3((float) rotationaxis[0], (float) rotationaxis[1], (float) rotationaxis[2]);
     }
 
     public void setTranslation(double[] translation) {
-        this.translation = new Vector3((float) translation[0], (float) translation[1], (float) translation[2]);
+        this.translation3 = new Vector3((float) translation[0], (float) translation[1], (float) translation[2]);
     }
 
     public void setAngle(Double angle) {

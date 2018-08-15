@@ -74,13 +74,6 @@ public interface IFocus {
     public boolean withinMagLimit();
 
     /**
-     * Gets the first computed ancestor of this entity. Usually it is itself
-     * 
-     * @return First computed ancestor
-     */
-    public AbstractPositionEntity getComputedAncestor();
-
-    /**
      * Gets the first ancestor of this node that is of type {@link Star}
      * 
      * @return The first ancestor of type {@link Star}

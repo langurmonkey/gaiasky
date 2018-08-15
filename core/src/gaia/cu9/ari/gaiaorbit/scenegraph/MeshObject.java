@@ -40,10 +40,14 @@ public class MeshObject extends FadeNode implements IModelRenderable, I3DTextRen
 
     /** TRANSFORMATIONS - are applied each cycle **/
     public ITransform[] transformations;
+    
+    // Aux array
+    private float[] valuesf;
 
     public MeshObject() {
         super();
         localTransform = new Matrix4();
+        valuesf = new float[3];
     }
 
     public void initialize() {
@@ -112,7 +116,7 @@ public class MeshObject extends FadeNode implements IModelRenderable, I3DTextRen
 
     public void setToLocalTransform(Matrix4 localTransform, boolean forceUpdate) {
         if (forceUpdate) {
-            float[] trnsltn = transform.getTranslationf();
+            float[] trnsltn = translation.valuesf(valuesf);
             localTransform.idt().translate(trnsltn[0], trnsltn[1], trnsltn[2]).scl((float) size).mul(coordinateSystem);
         } else {
             localTransform.set(this.localTransform);

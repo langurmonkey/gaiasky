@@ -14,8 +14,6 @@ import gaia.cu9.ari.gaiaorbit.scenegraph.AbstractPositionEntity;
 import gaia.cu9.ari.gaiaorbit.scenegraph.SceneGraphNode;
 import gaia.cu9.ari.gaiaorbit.scenegraph.octreewrapper.AbstractOctreeWrapper;
 import gaia.cu9.ari.gaiaorbit.scenegraph.octreewrapper.OctreeWrapper;
-import gaia.cu9.ari.gaiaorbit.scenegraph.octreewrapper.OctreeWrapperConcurrent;
-import gaia.cu9.ari.gaiaorbit.util.GlobalConf;
 import gaia.cu9.ari.gaiaorbit.util.I18n;
 import gaia.cu9.ari.gaiaorbit.util.Logger;
 import gaia.cu9.ari.gaiaorbit.util.math.Vector3d;
@@ -63,12 +61,7 @@ public class OctreeMultiFileLoader extends StreamingOctreeLoader {
         /**
          * CREATE OCTREE WRAPPER WITH ROOT NODE
          */
-        AbstractOctreeWrapper octreeWrapper = null;
-        if (GlobalConf.performance.MULTITHREADING) {
-            octreeWrapper = new OctreeWrapperConcurrent("Universe", root);
-        } else {
-            octreeWrapper = new OctreeWrapper("Universe", root);
-        }
+        AbstractOctreeWrapper octreeWrapper = new OctreeWrapper("Universe", root);
 
         /**
          * LOAD LOD LEVELS - LOAD PARTICLE DATA

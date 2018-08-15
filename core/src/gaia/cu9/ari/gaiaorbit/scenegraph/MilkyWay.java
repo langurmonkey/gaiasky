@@ -151,9 +151,9 @@ public class MilkyWay extends AbstractPositionEntity implements I3DTextRenderabl
 
     }
 
-    public void update(ITimeFrameProvider time, final Transform parentTransform, ICamera camera, float opacity) {
+    public void update(ITimeFrameProvider time, final Vector3d parentTransform, ICamera camera, float opacity) {
         this.opacity = opacity * this.opacity;
-        transform.set(parentTransform);
+        translation.set(parentTransform);
         this.currentDistance = camera.getDistance() * camera.getFovFactor();
 
         // Update with translation/rotation/etc
@@ -163,13 +163,13 @@ public class MilkyWay extends AbstractPositionEntity implements I3DTextRenderabl
             for (int i = 0; i < children.size; i++) {
                 float childOpacity = 1 - this.opacity;
                 SceneGraphNode child = children.get(i);
-                child.update(time, transform, camera, childOpacity);
+                child.update(time, translation, camera, childOpacity);
             }
         }
     }
 
     @Override
-    public void update(ITimeFrameProvider time, Transform parentTransform, ICamera camera) {
+    public void update(ITimeFrameProvider time, Vector3d parentTransform, ICamera camera) {
         update(time, parentTransform, camera, 1f);
     }
 
@@ -208,7 +208,7 @@ public class MilkyWay extends AbstractPositionEntity implements I3DTextRenderabl
      */
     protected void updateLocalTransform() {
         // Scale + Rotate + Tilt + Translate
-        transform.getMatrix(localTransform).scl(size);
+        translation.getMatrix(localTransform).scl(size);
         localTransform.mul(coordinateSystem);
     }
 

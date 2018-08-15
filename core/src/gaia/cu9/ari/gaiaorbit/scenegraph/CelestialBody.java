@@ -105,7 +105,7 @@ public abstract class CelestialBody extends AbstractPositionEntity implements I3
      * Overrides the update adding the magnitude limit thingy.
      */
     @Override
-    public void update(ITimeFrameProvider time, final Transform parentTransform, ICamera camera) {
+    public void update(ITimeFrameProvider time, final Vector3d parentTransform, ICamera camera) {
         if (appmag <= GlobalConf.runtime.LIMIT_MAG_RUNTIME) {
             super.update(time, parentTransform, camera);
         }
@@ -141,7 +141,7 @@ public abstract class CelestialBody extends AbstractPositionEntity implements I3
         float size = getFuzzyRenderSize(camera);
 
         Vector3 aux = aux3f1.get();
-        shader.setUniformf("u_pos", transform.getTranslationf(aux));
+        shader.setUniformf("u_pos", translation.put(aux));
         shader.setUniformf("u_size", size);
 
         shader.setUniformf("u_color", ccPale[0], ccPale[1], ccPale[2], alpha * opacity);
@@ -356,7 +356,7 @@ public abstract class CelestialBody extends AbstractPositionEntity implements I3
 
     @Override
     public void textPosition(ICamera cam, Vector3d out) {
-        transform.getTranslation(out);
+        translation.put(out);
         double len = out.len();
         out.clamp(0, len - getRadius()).scl(0.9f);
 

@@ -156,8 +156,8 @@ public abstract class AbstractPositionEntity extends SceneGraphNode {
             AbstractPositionEntity fc = (AbstractPositionEntity) this;
             AbstractPositionEntity fccopy = fc.getLineCopy();
             SceneGraphNode root = fccopy.getRoot();
-            root.transform.position.set(camera.getInversePos());
-            root.update(time, root.transform, camera);
+            root.translation.set(camera.getInversePos());
+            root.update(time, root.translation, camera);
 
             fccopy.getAbsolutePosition(aux);
 
@@ -226,10 +226,10 @@ public abstract class AbstractPositionEntity extends SceneGraphNode {
     public void updateLocal(ITimeFrameProvider time, ICamera camera) {
         updateLocalValues(time, camera);
 
-        this.transform.translate(pos);
+        this.translation.add(pos);
 
         Vector3d aux = aux3d1.get();
-        this.distToCamera = (float) transform.getTranslation(aux).len();
+        this.distToCamera = (float) aux.set(translation).len();
         this.viewAngle = (float) FastMath.atan(size / distToCamera);
         this.viewAngleApparent = this.viewAngle;
         if (!copy) {
@@ -326,7 +326,7 @@ public abstract class AbstractPositionEntity extends SceneGraphNode {
             instance.size = this.size;
             instance.distToCamera = this.distToCamera;
             instance.viewAngle = this.viewAngle;
-            instance.transform.set(this.transform);
+            instance.translation.set(this.translation);
             instance.ct = this.ct;
             instance.coordinates = this.coordinates;
             if (this.localTransform != null)
@@ -337,14 +337,6 @@ public abstract class AbstractPositionEntity extends SceneGraphNode {
             Logger.error(e);
         }
         return null;
-    }
-
-    public AbstractPositionEntity getComputedAncestor() {
-        if (!this.computed) {
-            return this.parent != null && this.parent instanceof AbstractPositionEntity ? ((AbstractPositionEntity) this.parent).getComputedAncestor() : null;
-        } else {
-            return this;
-        }
     }
 
     /**

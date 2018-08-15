@@ -527,9 +527,8 @@ public class SceneGraphRenderer extends AbstractRenderer implements IProcessRend
                         IRenderable s = renderables.get(i);
                         if (s instanceof Particle) {
                             Particle p = (Particle) s;
-                            if (!Constants.webgl && lightIndex < Glow.N && (GlobalConf.program.CUBEMAP360_MODE || GaiaSky.instance.cam.getDirection().angle(p.transform.position) < angleEdgeDeg)) {
-                                Vector3d pos3d = p.transform.getTranslation(auxd);
-                                pos3d.sub(camera.getShift());
+                            if (!Constants.webgl && lightIndex < Glow.N && (GlobalConf.program.CUBEMAP360_MODE || GaiaSky.instance.cam.getDirection().angle(p.translation) < angleEdgeDeg)) {
+                                Vector3d pos3d = p.translation.put(auxd);
 
                                 // Aberration
                                 GlobalResources.applyRelativisticAberration(pos3d, camera);

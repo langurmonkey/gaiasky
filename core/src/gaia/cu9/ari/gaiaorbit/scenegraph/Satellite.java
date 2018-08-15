@@ -86,7 +86,7 @@ public abstract class Satellite extends ModelBody {
      */
     public void setToLocalTransform(float sizeFactor, Matrix4 localTransform, boolean forceUpdate) {
         if (sizeFactor != 1 || forceUpdate) {
-            transform.getMatrix(localTransform).scl(size * sizeFactor);
+            translation.getMatrix(localTransform).scl(size * sizeFactor);
             if (parentOrientation && parentrc != null) {
                 this.orientation.idt().rotate(0, 1, 0, (float) parentrc.ascendingNode).rotate(0, 0, 1, (float) (parentrc.inclination + parentrc.axialTilt)).rotate(0, 1, 0, (float) parentrc.angle).rotate(1, 0, 1, 180);
                 this.orientation.putIn(orientationf);

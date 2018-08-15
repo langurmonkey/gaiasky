@@ -16,7 +16,6 @@ import gaia.cu9.ari.gaiaorbit.render.system.LineRenderSystem;
 import gaia.cu9.ari.gaiaorbit.scenegraph.AbstractPositionEntity;
 import gaia.cu9.ari.gaiaorbit.scenegraph.ParticleGroup;
 import gaia.cu9.ari.gaiaorbit.scenegraph.SceneGraphNode;
-import gaia.cu9.ari.gaiaorbit.scenegraph.Transform;
 import gaia.cu9.ari.gaiaorbit.scenegraph.camera.ICamera;
 import gaia.cu9.ari.gaiaorbit.util.ComponentTypes;
 import gaia.cu9.ari.gaiaorbit.util.GlobalConf;
@@ -27,6 +26,7 @@ import gaia.cu9.ari.gaiaorbit.util.math.Intersectord;
 import gaia.cu9.ari.gaiaorbit.util.math.MathUtilsd;
 import gaia.cu9.ari.gaiaorbit.util.math.Rayd;
 import gaia.cu9.ari.gaiaorbit.util.math.Vector3d;
+import net.jafama.FastMath;
 
 /**
  * Octree node implementation which contains a list of {@link IPosition} objects
@@ -46,7 +46,7 @@ public class OctreeNode implements ILineRenderable {
      * Since OctreeNode is not to be parallelised, these can be static.
      **/
     private static BoundingBoxd boxcopy = new BoundingBoxd(new Vector3d(), new Vector3d());
-    private static Vector3d auxD1 = new Vector3d(), auxD3 = new Vector3d(), auxD4 = new Vector3d();
+    private static Vector3d auxD1 = new Vector3d(), auxD2 = new Vector3d(), auxD3 = new Vector3d(), auxD4 = new Vector3d();
     private static Rayd ray = new Rayd(new Vector3d(), new Vector3d());
 
     private Vector3d aux3d1;
@@ -537,61 +537,59 @@ public class OctreeNode implements ILineRenderable {
      * @param opacity
      *            The opacity to set.
      */
-    public void update(Transform parentTransform, ICamera cam, Array<SceneGraphNode> roulette, float opacity) {
-        parentTransform.getTranslation(transform);
+    public void update(Vector3d parentTransform, ICamera cam, Array<SceneGraphNode> roulette, float opacity) {
+        parentTransform.put(transform);
         this.opacity = opacity;
         this.observed = true;
 
-        if (observed) {
-            // Compute distance and view angle
-            distToCamera = auxD1.set(centre).add(cam.getInversePos()).len();
-            // View angle is normalized to 40 degrees when the octant is exactly the size of the screen height, regardless of the camera fov
-            viewAngle = Math.atan(radius / distToCamera) * 2;
+        // Compute distance and view angle
+        distToCamera = auxD1.set(centre).add(cam.getInversePos()).len();
+        // View angle is normalized to 40 degrees when the octant is exactly the size of the screen height, regardless of the camera fov
+        viewAngle = Math.atan(radius / distToCamera) * 2;
 
-            float th0 = GlobalConf.scene.OCTANT_THRESHOLD_0;
-            float th1 = GlobalConf.scene.OCTANT_THRESHOLD_1;
+        float th0 = GlobalConf.scene.OCTANT_THRESHOLD_0;
+        float th1 = GlobalConf.scene.OCTANT_THRESHOLD_1;
 
-            if (viewAngle < th0) {
-                // Not observed
-                this.observed = false;
-                setChildrenObserved(false);
-            } else {
-                nOctantsObserved++;
-                //int L_DEPTH = 5;
-                /**
-                 * Load lists of pages
-                 */
-                if (status == LoadStatus.NOT_LOADED && LOAD_ACTIVE /*&& depth == L_DEPTH*/) {
-                    // Add to load and go on
-                    StreamingOctreeLoader.queue(this);
-                } else if (status == LoadStatus.LOADED) {
-                    // Visited last!
-                    StreamingOctreeLoader.touch(this);
+        if (viewAngle < th0) {
+            // Not observed
+            this.observed = false;
+            setChildrenObserved(false);
+        } else {
+            nOctantsObserved++;
+            //int L_DEPTH = 5;
+            /**
+             * Load lists of pages
+             */
+            if (status == LoadStatus.NOT_LOADED && LOAD_ACTIVE /*&& depth == L_DEPTH*/) {
+                // Add to load and go on
+                StreamingOctreeLoader.queue(this);
+            } else if (status == LoadStatus.LOADED) {
+                // Visited last!
+                StreamingOctreeLoader.touch(this);
 
-                    // Break down tree, fade in until th2
-                    double alpha = 1;
-                    if (GlobalConf.scene.OCTREE_PARTICLE_FADE && viewAngle < th1) {
-                        AbstractRenderSystem.POINT_UPDATE_FLAG = true;
-                        alpha = MathUtilsd.clamp(MathUtilsd.lint(viewAngle, th0, th1, 0d, 1d), 0f, 1f);
-                    }
-                    this.opacity *= alpha;
-
-                    // Add objects
-                    //if (depth == L_DEPTH)
-                    addObjectsTo(roulette);
-                } else if (status == LoadStatus.QUEUED) {
-                    // What do? Move first in queue?
+                // Break down tree, fade in until th2
+                double alpha = 1;
+                if (GlobalConf.scene.OCTREE_PARTICLE_FADE && viewAngle < th1) {
+                    AbstractRenderSystem.POINT_UPDATE_FLAG = true;
+                    alpha = MathUtilsd.clamp(MathUtilsd.lint(viewAngle, th0, th1, 0d, 1d), 0f, 1f);
                 }
+                this.opacity *= alpha;
 
-                // Update children
-                for (int i = 0; i < 8; i++) {
-                    OctreeNode child = children[i];
-                    if (child != null /*&& child.depth <= L_DEPTH*/) {
-                        child.update(parentTransform, cam, roulette, this.opacity);
-                    }
-                }
-
+                // Add objects
+                //if (depth == L_DEPTH)
+                addObjectsTo(roulette);
+            } else if (status == LoadStatus.QUEUED) {
+                // What do? Move first in queue?
             }
+
+            // Update children
+            for (int i = 0; i < 8; i++) {
+                OctreeNode child = children[i];
+                if (child != null /*&& child.depth <= L_DEPTH*/) {
+                    child.update(parentTransform, cam, roulette, this.opacity);
+                }
+            }
+
         }
     }
 
@@ -623,7 +621,7 @@ public class OctreeNode implements ILineRenderable {
      * @param parentTransform
      * @param cam
      */
-    private boolean computeObserved1(Transform parentTransform, Frustumd frustum) {
+    private boolean computeObserved1(Vector3d parentTransform, Frustumd frustum) {
         boxcopy.set(box);
         // boxcopy.mul(boxtransf.idt().translate(parentTransform.getTranslation()));
 
@@ -642,6 +640,33 @@ public class OctreeNode implements ILineRenderable {
         }
 
         return observed;
+    }
+
+    /**
+     * Second method, which uses a simplification.
+     * @param cam The camera
+     * @return Whether the octant is observed
+     */
+    private boolean computeObserved2(ICamera cam) {
+        return /*GlobalConf.program.CUBEMAP360_MODE ||*/ cam.getMode().isGaiaFov() || computeObservedFast(cam);
+    }
+
+    /**
+     * Simplification to compute octant visibility. Angle between camera direction and octant centre
+     * must be smaller than fov/2 plus a correction (for octant size, assuming sphere)
+     * @param cam The camera
+     * @return Whether the octant is observed
+     */
+    private boolean computeObservedFast(ICamera cam) {
+        Vector3d cpospos = auxD1.set(centre).sub(cam.getPos());
+        double dist = cpospos.len();
+        ray.origin.set(cam.getPos());
+        ray.direction.set(cam.getDirection());
+        if (dist < radius || Intersectord.intersectRayBoundsFast(ray, box.getCenter(auxD3), box.getDimensions(auxD4)))
+            return true;
+        double angleOverlap = FastMath.acos(radius / dist);
+        double ang = cam.getDirection().angle(cpospos);
+        return ang < cam.getCamera().fieldOfView + angleOverlap;
     }
 
     public LoadStatus getStatus() {

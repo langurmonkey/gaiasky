@@ -113,10 +113,10 @@ public class Planet extends ModelBody implements IAtmosphereRenderable, ICloudRe
     protected void updateLocalTransform() {
         super.updateLocalTransform();
         if (ac != null) {
-            ac.update(transform);
+            ac.update(translation);
         }
         if (clc != null) {
-            clc.update(transform);
+            clc.update(translation);
             setToLocalTransform(clc.size, 1, clc.localTransform, true);
         }
 
@@ -236,7 +236,7 @@ public class Planet extends ModelBody implements IAtmosphereRenderable, ICloudRe
 
     @Override
     public void render(LineRenderSystem renderer, ICamera camera, float alpha) {
-        renderer.addLine(this, transform.position.x, transform.position.y, transform.position.z, endline.x, endline.y, endline.z, 1, 0, 0, 1);
+        renderer.addLine(this, translation.x, translation.y, translation.z, endline.x, endline.y, endline.z, 1, 0, 0, 1);
     }
 
     @Override

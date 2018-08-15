@@ -23,6 +23,6 @@ public class EclipticOrbit extends Orbit {
      */
     @Override
     protected void updateLocalTransform(Instant date) {
-        transform.getMatrix(localTransformD).rotate(0, 0, 1, AstroUtils.obliquity(AstroUtils.getJulianDate(date)));
+        translation.getMatrix(localTransformD).rotate(0, 0, 1, AstroUtils.obliquity(AstroUtils.getJulianDate(date)));
     }
 }

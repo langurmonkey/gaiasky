@@ -60,10 +60,10 @@ public class Loc extends AbstractPositionEntity implements I3DTextRenderable {
         if (((ModelBody) parent).viewAngle > ((ModelBody) parent).THRESHOLD_QUAD() * 30f) {
             updateLocalValues(time, camera);
 
-            this.transform.translate(pos);
+            this.translation.add(pos);
 
             Vector3d aux = aux3d1.get();
-            this.distToCamera = (float) transform.getTranslation(aux).len();
+            this.distToCamera = (float) translation.put(aux).len();
             this.viewAngle = (float) FastMath.atan(size / distToCamera) / camera.getFovFactor();
             this.viewAngleApparent = this.viewAngle * camera.getFovFactor();
             if (!copy) {
@@ -102,7 +102,7 @@ public class Loc extends AbstractPositionEntity implements I3DTextRenderable {
             return false;
         }
         Vector3d aux = aux3d1.get();
-        transform.getTranslation(aux).scl(-1);
+        translation.put(aux).scl(-1);
 
         double cosalpha = aux.add(location3d.x, location3d.y, location3d.z).nor().dot(GaiaSky.instance.cam.getDirection().nor());
         return cosalpha < -0.3f;

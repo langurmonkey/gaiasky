@@ -26,7 +26,7 @@ public class HeliotropicOrbit extends Orbit {
      */
     protected void updateLocalTransform(Instant date) {
         angle = AstroUtils.getSunLongitude(date);
-        transform.getMatrix(localTransformD).mul(Coordinates.eclToEq()).rotate(0, 1, 0, angle + 180);
+        translation.getMatrix(localTransformD).mul(Coordinates.eclToEq()).rotate(0, 1, 0, angle + 180);
 
         localTransformD.putIn(localTransform);
     }

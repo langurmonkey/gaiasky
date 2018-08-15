@@ -27,7 +27,7 @@ public class CameraUtils {
      * @return Whether an intersection has occurred
      */
     public static boolean intersectScreenSphere(Planet p, ICamera camera, int sx, int sy, Vector3 v0, Vector3 v1, Vector3 vec, Vector3 intersection) {
-        p.transform.getTranslationf(vec);
+        p.translation.put(vec);
         v0.set(sx, sy, 0f);
         v1.set(sx, sy, 0.5f);
         camera.getCamera().unproject(v0);
@@ -46,7 +46,7 @@ public class CameraUtils {
         p.setToLocalTransform(1, localTransform, false);
 
         point.mul(localTransform);
-        p.transform.getTranslationf(pos);
+        p.translation.put(pos);
         // Here we get the absolute position of [lon|lat] in cartesian
         // coordinates
         point.add(pos);

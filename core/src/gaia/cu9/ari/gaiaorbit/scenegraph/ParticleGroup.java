@@ -194,7 +194,7 @@ public class ParticleGroup extends FadeNode implements I3DTextRenderable, IFocus
         return pointData.size;
     }
 
-    public void update(ITimeFrameProvider time, final Transform parentTransform, ICamera camera, float opacity) {
+    public void update(ITimeFrameProvider time, final Vector3d parentTransform, ICamera camera, float opacity) {
         if (pointData != null && this.isVisible()) {
             this.opacity = 1;
             super.update(time, parentTransform, camera, opacity);
@@ -206,7 +206,7 @@ public class ParticleGroup extends FadeNode implements I3DTextRenderable, IFocus
     }
 
     @Override
-    public void update(ITimeFrameProvider time, Transform parentTransform, ICamera camera) {
+    public void update(ITimeFrameProvider time, Vector3d parentTransform, ICamera camera) {
         update(time, parentTransform, camera, 1f);
     }
 

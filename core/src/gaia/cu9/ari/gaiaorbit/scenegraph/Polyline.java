@@ -46,7 +46,7 @@ public class Polyline extends LineObject implements IGPULineRenderable {
 
     @Override
     public void updateLocalValues(ITimeFrameProvider time, ICamera camera) {
-        transform.getMatrix(localTransform);
+        translation.getMatrix(localTransform);
     }
 
     /**

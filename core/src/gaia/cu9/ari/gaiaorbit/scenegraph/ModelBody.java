@@ -114,7 +114,7 @@ public abstract class ModelBody extends CelestialBody {
         super.updateLocal(time, camera);
         // Update light with global position
         if (mc != null) {
-            mc.dlight.direction.set(transform.getTranslationf());
+            translation.put(mc.dlight.direction);
             IStarFocus sf = camera.getClosestStar();
             if (sf != null) {
                 float[] col = sf.getClosestCol();
@@ -146,7 +146,7 @@ public abstract class ModelBody extends CelestialBody {
         if (sizeFactor != 1 || forceUpdate) {
             
             // NEW
-            transform.getMatrix(localTransform).scl(size * sizeFactor).mul(Coordinates.getTransformF(refPlaneTransform)).rotate(0, 1, 0, (float) rc.ascendingNode).rotate(0, 0, 1, (float) (rc.inclination + rc.axialTilt)).rotate(0, 1, 0, (float) rc.angle);
+            translation.getMatrix(localTransform).scl(size * sizeFactor).mul(Coordinates.getTransformF(refPlaneTransform)).rotate(0, 1, 0, (float) rc.ascendingNode).rotate(0, 0, 1, (float) (rc.inclination + rc.axialTilt)).rotate(0, 1, 0, (float) rc.angle);
             orientation.idt().mul(Coordinates.getTransformD(refPlaneTransform)).rotate(0, 0, 1, (float) (rc.inclination + rc.axialTilt)).rotate(0, 1, 0, (float) rc.ascendingNode);
             
             // OLD
@@ -216,7 +216,7 @@ public abstract class ModelBody extends CelestialBody {
         float size = getFuzzyRenderSize(camera);
 
         Vector3 aux = aux3f1.get();
-        shader.setUniformf("u_pos", transform.getTranslationf(aux));
+        shader.setUniformf("u_pos", translation.put(aux));
         shader.setUniformf("u_size", size);
 
         shader.setUniformf("u_color", cc[0], cc[1], cc[2], alpha * (1 - fadeOpacity));
@@ -393,7 +393,7 @@ public abstract class ModelBody extends CelestialBody {
                 Vector3d aux3d = aux3d3.get();
 
                 // aux1d contains the position of the body in the camera ref sys
-                aux1d.set(transform.position);
+                aux1d.set(translation);
                 auxf.set(aux1d.valuesf());
 
                 if (camera.direction.dot(aux1d) > 0) {
@@ -426,7 +426,7 @@ public abstract class ModelBody extends CelestialBody {
                 Vector3d aux1d = aux3d1.get();
 
                 // aux1d contains the position of the body in the camera ref sys
-                aux1d.set(transform.position);
+                aux1d.set(translation);
 
                 boolean intersect = Intersectord.checkIntersectRaySpehre(p0, p1, aux1d, getRadius());
                 if (intersect) {

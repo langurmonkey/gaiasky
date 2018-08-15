@@ -163,10 +163,10 @@ public class FovCamera extends AbstractCamera implements IObserver {
 
         /** POSITION **/
         AbstractPositionEntity fccopy = gaia.getLineCopy();
-        fccopy.getRoot().transform.position.set(0f, 0f, 0f);
+        fccopy.getRoot().translation.set(0f, 0f, 0f);
         fccopy.getRoot().update(time, null, this);
 
-        this.pos.set(fccopy.transform.getTranslation());
+        this.pos.set(fccopy.translation);
         this.posinv.set(this.pos).scl(-1);
 
         /** ORIENTATION - directions and up **/

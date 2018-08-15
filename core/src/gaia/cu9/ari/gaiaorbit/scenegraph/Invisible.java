@@ -1,10 +1,13 @@
 package gaia.cu9.ari.gaiaorbit.scenegraph;
 
 import com.badlogic.gdx.graphics.g3d.ModelBatch;
+import com.badlogic.gdx.utils.Array;
 
 import gaia.cu9.ari.gaiaorbit.render.RenderingContext;
 import gaia.cu9.ari.gaiaorbit.scenegraph.camera.ICamera;
+import gaia.cu9.ari.gaiaorbit.scenegraph.camera.NaturalCamera;
 import gaia.cu9.ari.gaiaorbit.util.Constants;
+import gaia.cu9.ari.gaiaorbit.util.math.Vector3d;
 import gaia.cu9.ari.gaiaorbit.util.time.ITimeFrameProvider;
 
 /**
@@ -28,9 +31,6 @@ public class Invisible extends CelestialBody {
         this.size = 500 * (float) Constants.M_TO_U;
     }
 
-    /**
-     * Model rendering
-     */
     @Override
     public void render(ModelBatch modelBatch, float alpha, double t, RenderingContext rc) {
     }
@@ -72,5 +72,9 @@ public class Invisible extends CelestialBody {
     @Override
     public void updateLocalValues(ITimeFrameProvider time, ICamera camera) {
     }
+
+	@Override
+	public void addHit(Vector3d p0, Vector3d p1, NaturalCamera camera, Array<IFocus> hits) {
+	}
 
 }

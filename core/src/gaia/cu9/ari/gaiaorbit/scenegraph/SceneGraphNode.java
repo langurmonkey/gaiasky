@@ -174,10 +174,9 @@ public class SceneGraphNode implements IStarContainer, IPosition {
     public Array<SceneGraphNode> children;
 
     /**
-     * Transform object. Contains the transformations that will be applied to
-     * the children.
+     * Translation object.
      */
-    public Transform transform;
+    public Vector3d translation;
 
     /**
      * Local transform matrix. Contains the transform matrix and the
@@ -236,8 +235,7 @@ public class SceneGraphNode implements IStarContainer, IPosition {
 
     public SceneGraphNode() {
         // Identity
-        this.transform = new Transform();
-        this.transform.position = new Vector3d();
+        this.translation = new Vector3d();
     }
 
     public SceneGraphNode(int id) {
@@ -468,20 +466,20 @@ public class SceneGraphNode implements IStarContainer, IPosition {
         return null;
     }
 
-    public void update(ITimeFrameProvider time, final Transform parentTransform, ICamera camera) {
+    public void update(ITimeFrameProvider time, final Vector3d parentTransform, ICamera camera) {
         update(time, parentTransform, camera, 1f);
     }
 
-    public void update(ITimeFrameProvider time, final Transform parentTransform, ICamera camera, float opacity) {
+    public void update(ITimeFrameProvider time, final Vector3d parentTransform, ICamera camera, float opacity) {
         this.opacity = opacity;
-        transform.set(parentTransform);
+        translation.set(parentTransform);
 
         // Update with translation/rotation/etc
         updateLocal(time, camera);
 
         if (children != null) {
             for (int i = 0; i < children.size; i++) {
-                children.get(i).update(time, transform, camera, opacity);
+                children.get(i).update(time, translation, camera, opacity);
             }
         }
     }

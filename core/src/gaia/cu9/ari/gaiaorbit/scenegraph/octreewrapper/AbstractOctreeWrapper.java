@@ -14,14 +14,15 @@ import gaia.cu9.ari.gaiaorbit.event.Events;
 import gaia.cu9.ari.gaiaorbit.render.ComponentType;
 import gaia.cu9.ari.gaiaorbit.render.system.AbstractRenderSystem;
 import gaia.cu9.ari.gaiaorbit.scenegraph.AbstractPositionEntity;
+import gaia.cu9.ari.gaiaorbit.scenegraph.FadeNode;
 import gaia.cu9.ari.gaiaorbit.scenegraph.IFocus;
 import gaia.cu9.ari.gaiaorbit.scenegraph.SceneGraphNode;
-import gaia.cu9.ari.gaiaorbit.scenegraph.Transform;
 import gaia.cu9.ari.gaiaorbit.scenegraph.camera.ICamera;
 import gaia.cu9.ari.gaiaorbit.util.ComponentTypes;
 import gaia.cu9.ari.gaiaorbit.util.GlobalConf;
 import gaia.cu9.ari.gaiaorbit.util.Logger;
 import gaia.cu9.ari.gaiaorbit.util.MyPools;
+import gaia.cu9.ari.gaiaorbit.util.math.Vector3d;
 import gaia.cu9.ari.gaiaorbit.util.time.ITimeFrameProvider;
 import gaia.cu9.ari.gaiaorbit.util.tree.OctreeNode;
 
@@ -32,7 +33,7 @@ import gaia.cu9.ari.gaiaorbit.util.tree.OctreeNode;
  * @author Toni Sagrista
  *
  */
-public abstract class AbstractOctreeWrapper extends SceneGraphNode implements Iterable<OctreeNode> {
+public abstract class AbstractOctreeWrapper extends FadeNode implements Iterable<OctreeNode> {
 
     public OctreeNode root;
     /** Roulette list with the objects to process **/
@@ -105,54 +106,59 @@ public abstract class AbstractOctreeWrapper extends SceneGraphNode implements It
         parenthood.remove(child);
     }
 
-    public void update(ITimeFrameProvider time, final Transform parentTransform, ICamera camera) {
+    public void update(ITimeFrameProvider time, final Vector3d parentTransform, ICamera camera) {
         update(time, parentTransform, camera, 1f);
     }
 
-    public void update(ITimeFrameProvider time, final Transform parentTransform, ICamera camera, float opacity) {
+    public void update(ITimeFrameProvider time, final Vector3d parentTransform, ICamera camera, float opacity) {
         this.opacity = opacity;
-        transform.set(parentTransform);
+        translation.set(parentTransform);
 
-        // Update octants
-        if (!copy) {
+        // Fade node visibility applies here
+        if (this.isVisible()) {
+            // Update octants
+            if (!copy) {
 
-            // Compute observed octants and fill roulette list
-            OctreeNode.nOctantsObserved = 0;
-            OctreeNode.nObjectsObserved = 0;
+                // Compute observed octants and fill roulette list
+                OctreeNode.nOctantsObserved = 0;
+                OctreeNode.nObjectsObserved = 0;
 
-            root.update(transform, camera, roulette, 1f);
+                root.updateNumbers();
 
-            if (OctreeNode.nObjectsObserved != lastNumberObjects) {
-                // Need to update the points in renderer
-                AbstractRenderSystem.POINT_UPDATE_FLAG = true;
-                lastNumberObjects = OctreeNode.nObjectsObserved;
-            }
+                root.update(translation, camera, roulette, opacity);
 
-            updateLocal(time, camera);
-
-            // Broadcast the number of objects that we will try to render
-            EventManager.instance.post(Events.DEBUG3, "On display: " + OctreeNode.nObjectsObserved + ", Total loaded: " + StreamingOctreeLoader.getNLoadedStars());
-
-            // Call the update method of all entities in the roulette list. This
-            // is implemented in the subclass.
-            updateOctreeObjects(time, transform, camera);
-
-            // Reset mask
-            roulette.clear();
-
-            // Update focus, just in case
-            IFocus focus = camera.getFocus();
-            if (focus != null) {
-                SceneGraphNode star = focus.getFirstStarAncestor();
-                OctreeNode parent = parenthood.get(star);
-                if (parent != null && !parent.isObserved()) {
-                    star.update(time, star.parent.transform, camera);
+                if (OctreeNode.nObjectsObserved != lastNumberObjects) {
+                    // Need to update the points in renderer
+                    AbstractRenderSystem.POINT_UPDATE_FLAG = true;
+                    lastNumberObjects = OctreeNode.nObjectsObserved;
                 }
-            }
-        } else {
-            // Just update children
-            for (SceneGraphNode node : children) {
-                node.update(time, transform, camera);
+
+                updateLocal(time, camera);
+
+                // Broadcast the number of objects that we will try to render
+                EventManager.instance.post(Events.DEBUG3, "On display: " + OctreeNode.nObjectsObserved + ", Total loaded: " + StreamingOctreeLoader.getNLoadedStars());
+
+                // Call the update method of all entities in the roulette list. This
+                // is implemented in the subclass.
+                updateOctreeObjects(time, translation, camera);
+
+                // Reset mask
+                roulette.clear();
+
+                // Update focus, just in case
+                IFocus focus = camera.getFocus();
+                if (focus != null) {
+                    SceneGraphNode star = focus.getFirstStarAncestor();
+                    OctreeNode parent = parenthood.get(star);
+                    if (parent != null && !parent.isObserved()) {
+                        star.update(time, star.parent.translation, camera);
+                    }
+                }
+            } else {
+                // Just update children
+                for (SceneGraphNode node : children) {
+                    node.update(time, translation, camera);
+                }
             }
         }
 
@@ -165,7 +171,7 @@ public abstract class AbstractOctreeWrapper extends SceneGraphNode implements It
      * @param parentTransform
      * @param camera
      */
-    protected abstract void updateOctreeObjects(ITimeFrameProvider time, final Transform parentTransform, ICamera camera);
+    protected abstract void updateOctreeObjects(ITimeFrameProvider time, final Vector3d parentTransform, ICamera camera);
 
     /**
      * Adds the octants to the render lists.
@@ -217,7 +223,7 @@ public abstract class AbstractOctreeWrapper extends SceneGraphNode implements It
             AbstractOctreeWrapper instance = pool.obtain();
             instance.copy = true;
             instance.name = this.name;
-            instance.transform.set(this.transform);
+            instance.translation.set(this.translation);
             instance.ct = this.ct;
             if (this.localTransform != null)
                 instance.localTransform.set(this.localTransform);
@@ -227,6 +233,20 @@ public abstract class AbstractOctreeWrapper extends SceneGraphNode implements It
             Logger.error(e);
         }
         return null;
+    }
+
+    @Override
+    public void dispose() {
+        sg.remove(this, true);
+        root.dispose();
+        parenthood.clear();
+        roulette.clear();
+        root = null;
+        OctreeNode.maxDepth = 0;
+        OctreeNode.nObjectsObserved = 0;
+        OctreeNode.nOctantsObserved = 0;
+        EventManager.instance.post(Events.DEBUG3, "On display: " + 0 + ", Total loaded: " + 0);
+        EventManager.instance.post(Events.OCTREE_DISPOSED);
     }
 
 }

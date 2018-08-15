@@ -270,7 +270,6 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
         case Focus:
             if (focus.withinMagLimit() && !focus.isCoordinatesTimeOverflow()) {
                 focusBak = focus;
-                focus = (IFocus) focus.getComputedAncestor();
                 focus.getAbsolutePosition(aux4);
                 // Hack, fix this by understanding underlying problem
                 if (!aux4.hasNaN()) {
@@ -962,10 +961,10 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
     public double getTranslateUnits() {
         double dist;
         if (parent.mode == CameraMode.Focus && focus != null) {
-            AbstractPositionEntity ancestor = focus.getComputedAncestor();
+            IFocus ancestor = focus;
             dist = ancestor.getDistToCamera() - (ancestor.getRadius() + MIN_DIST);
         } else if (parent.mode == CameraMode.Free_Camera && closest != null) {
-            AbstractPositionEntity ancestor = closest.getComputedAncestor();
+            AbstractPositionEntity ancestor = closest;
             dist = ancestor.getDistToCamera() - (ancestor.getRadius() + MIN_DIST);
         } else {
             dist = distance;
@@ -981,8 +980,8 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
     public double getRotationUnits() {
         double dist;
         if (parent.mode == CameraMode.Focus) {
-            AbstractPositionEntity ancestor = focus.getComputedAncestor();
-            dist = ancestor.distToCamera - ancestor.getRadius();
+            IFocus ancestor = focus;
+            dist = ancestor.getDistToCamera() - ancestor.getRadius();
         } else {
             dist = distance;
         }
@@ -1287,7 +1286,7 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
             } else if (getMode().equals(CameraMode.Free_Camera) && closest != null) {
                 // Orange
                 spriteBatch.setColor(1f, .7f, .2f, 1f);
-                chFocus = (IFocus) closest.getComputedAncestor();
+                chFocus = (IFocus) closest;
             }
 
             if (chFocus != null && chFocus.getDistToCamera() > chFocus.getRadius() * 2) {

@@ -17,7 +17,6 @@ import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Vector3;
 
 import gaia.cu9.ari.gaiaorbit.data.AssetBean;
-import gaia.cu9.ari.gaiaorbit.scenegraph.Transform;
 import gaia.cu9.ari.gaiaorbit.util.Constants;
 import gaia.cu9.ari.gaiaorbit.util.GlobalConf;
 import gaia.cu9.ari.gaiaorbit.util.I18n;
@@ -145,7 +144,7 @@ public class CloudComponent {
 
     }
 
-    public void update(Transform transform) {
+    public void update(Vector3d transform) {
         transform.getMatrix(localTransform).scl(size);
     }
 

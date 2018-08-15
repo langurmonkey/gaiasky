@@ -66,11 +66,11 @@ public class Constellation extends LineObject implements I3DTextRenderable {
         allConstellations.add(this);
     }
 
-    public void update(ITimeFrameProvider time, final Transform parentTransform, ICamera camera) {
+    public void update(ITimeFrameProvider time, final Vector3d parentTransform, ICamera camera) {
         update(time, parentTransform, camera, 1f);
     }
 
-    public void update(ITimeFrameProvider time, final Transform parentTransform, ICamera camera, float opacity) {
+    public void update(ITimeFrameProvider time, final Vector3d parentTransform, ICamera camera, float opacity) {
         // Recompute mean position
         pos.setZero();
         Vector3d p = aux3d1.get();
