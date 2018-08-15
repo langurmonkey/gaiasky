@@ -473,7 +473,7 @@ public class AstroUtils {
 
     public static double getJulianDate(Instant instant) {
         LocalDateTime date = LocalDateTime.ofInstant(instant, ZoneOffset.UTC);
-        int year = date.get(ChronoField.YEAR_OF_ERA);
+        int year = date.get(ChronoField.YEAR);
         int month = date.getMonthValue();
         int day = date.getDayOfMonth();
 
