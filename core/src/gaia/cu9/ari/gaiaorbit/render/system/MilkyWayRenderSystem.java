@@ -41,7 +41,7 @@ public class MilkyWayRenderSystem extends ImmediateRenderSystem implements IObse
 
 
     public MilkyWayRenderSystem(RenderGroup rg, float[] alphas, ModelBatch modelBatch, ShaderProgram[] pointShaders, ShaderProgram[] nebulaShaders) {
-        super(rg, alphas, pointShaders);
+        super(rg, alphas, pointShaders, 200000);
         this.nebulaShaders = nebulaShaders;
     }
 
@@ -76,7 +76,6 @@ public class MilkyWayRenderSystem extends ImmediateRenderSystem implements IObse
         VertexAttribute[] attribs = buildVertexAttributes();
         curr.mesh = new Mesh(false, maxVertices, 0, attribs);
 
-        curr.vertices = new float[maxVertices * (curr.mesh.getVertexAttributes().vertexSize / 4)];
         curr.vertexSize = curr.mesh.getVertexAttributes().vertexSize / 4;
         curr.colorOffset = curr.mesh.getVertexAttribute(Usage.ColorPacked) != null ? curr.mesh.getVertexAttribute(Usage.ColorPacked).offset / 4 : 0;
         pmOffset = curr.mesh.getVertexAttribute(Usage.Tangent) != null ? curr.mesh.getVertexAttribute(Usage.Tangent).offset / 4 : 0;
@@ -115,6 +114,10 @@ public class MilkyWayRenderSystem extends ImmediateRenderSystem implements IObse
                 /** STARS **/
                 curr.clear();
                 float density = GlobalConf.SCALE_FACTOR;
+                
+                checkRequiredVerticesSize(mw.starData.size * curr.vertexSize);
+                curr.vertices = vertices;
+                
                 for (ParticleBean star : mw.starData) {
                     // VERTEX
                     aux1.set((float) star.data[0], (float) star.data[1], (float) star.data[2]);
@@ -158,6 +161,8 @@ public class MilkyWayRenderSystem extends ImmediateRenderSystem implements IObse
                     curr.vertexIdx += curr.vertexSize;
 
                 }
+                curr.mesh.setVertices(curr.vertices, 0, curr.vertexIdx);
+                curr.vertices = null;
 
                 /** QUADS **/
                 quad.clear();
@@ -169,6 +174,7 @@ public class MilkyWayRenderSystem extends ImmediateRenderSystem implements IObse
                 Vector3 tr = new Vector3();
                 Vector3 normal = new Vector3();
                 Vector3 quadpoint = new Vector3();
+                
                 for (ParticleBean qp : mw.nebulaData) {
                     // 5 quads per nebula
                     for (int i = 0; i < 5; i++) {
@@ -266,6 +272,10 @@ public class MilkyWayRenderSystem extends ImmediateRenderSystem implements IObse
                     }
 
                 }
+                quad.mesh.setVertices(quad.vertices, 0, quad.vertexIdx);
+                quad.vertices = null;
+                quad.mesh.setIndices(quad.indices, 0, quad.indexIdx);
+                quad.indices = null;
 
                 // Put flag down
                 UPDATE_POINTS = false;
@@ -296,14 +306,7 @@ public class MilkyWayRenderSystem extends ImmediateRenderSystem implements IObse
                     // Relativistic effects
                     addEffectsUniforms(nebulaProgram, camera);
 
-                    quad.mesh.setVertices(quad.vertices, 0, quad.vertexIdx);
-                    quad.mesh.setIndices(quad.indices, 0, quad.indexIdx);
                     quad.mesh.render(nebulaProgram, GL20.GL_TRIANGLES, 0, quad.indexIdx);
-
-                    for (int i = 100; i < 104; i++) {
-                        int idx = i - 100;
-                        nebulatextures[idx].bind(0);
-                    }
 
                     nebulaProgram.end();
 
@@ -331,7 +334,6 @@ public class MilkyWayRenderSystem extends ImmediateRenderSystem implements IObse
                     // Relativistic effects
                     addEffectsUniforms(shaderProgram, camera);
 
-                    curr.mesh.setVertices(curr.vertices, 0, curr.vertexIdx);
                     curr.mesh.render(shaderProgram, ShapeType.Point.getGlType());
                     shaderProgram.end();
 

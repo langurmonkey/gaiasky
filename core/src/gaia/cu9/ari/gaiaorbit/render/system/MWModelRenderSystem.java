@@ -70,7 +70,7 @@ public class MWModelRenderSystem extends ImmediateRenderSystem implements IObser
     private Array<Chunk> chunks;
 
     public MWModelRenderSystem(RenderGroup rg, float[] alphas, ShaderProgram[] starShaders) {
-        super(rg, alphas, starShaders);
+        super(rg, alphas, starShaders, 200000);
 
         aux3f1 = new Vector3();
         aux3d1 = new Vector3d();
@@ -121,7 +121,6 @@ public class MWModelRenderSystem extends ImmediateRenderSystem implements IObser
         VertexAttribute[] attribs = buildVertexAttributes();
         md.mesh = new Mesh(false, nvertices, 0, attribs);
 
-        md.vertices = new float[nvertices * (md.mesh.getVertexAttributes().vertexSize / 4)];
         md.vertexSize = md.mesh.getVertexAttributes().vertexSize / 4;
         md.colorOffset = md.mesh.getVertexAttribute(Usage.ColorPacked) != null ? md.mesh.getVertexAttribute(Usage.ColorPacked).offset / 4 : 0;
         additionalOffset = md.mesh.getVertexAttribute(Usage.Generic) != null ? md.mesh.getVertexAttribute(Usage.Generic).offset / 4 : 0;
@@ -144,6 +143,10 @@ public class MWModelRenderSystem extends ImmediateRenderSystem implements IObser
         /** BULGE **/
         MeshData bulge = new MeshData();
         initMesh(bulge, mw.starData.size);
+        
+        checkRequiredVerticesSize(mw.starData.size * bulge.vertexSize);
+        bulge.vertices = vertices;
+        
         for (ParticleBean star : mw.starData) {
             // VERTEX
             aux3f1.set((float) star.data[0], (float) star.data[1], (float) star.data[2]);
@@ -186,6 +189,7 @@ public class MWModelRenderSystem extends ImmediateRenderSystem implements IObser
             bulge.vertexIdx += bulge.vertexSize;
         }
         bulge.mesh.setVertices(bulge.vertices, 0, bulge.vertexIdx);
+        bulge.vertices = null;
         Chunk bulgeChunk = new Chunk(bulge, computeCentre(mw.starData));
         chunks.add(bulgeChunk);
 
@@ -203,6 +207,10 @@ public class MWModelRenderSystem extends ImmediateRenderSystem implements IObser
         for (Array<ParticleBean> part : partition) {
             MeshData partmd = new MeshData();
             initMesh(partmd, part.size);
+            
+            checkRequiredVerticesSize(part.size * partmd.vertexSize);
+            partmd.vertices = vertices;
+            
             for (ParticleBean p : part) {
                 // VERTEX
                 aux3f1.set((float) p.data[0], (float) p.data[1], (float) p.data[2]);
@@ -237,6 +245,7 @@ public class MWModelRenderSystem extends ImmediateRenderSystem implements IObser
 
             }
             partmd.mesh.setVertices(partmd.vertices, 0, partmd.vertexIdx);
+            partmd.vertices = null;
             Chunk chunk = new Chunk(partmd, computeCentre(part), true);
             chunks.add(chunk);
         }

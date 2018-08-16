@@ -34,17 +34,16 @@ public class StarGroupRenderSystem extends ImmediateRenderSystem implements IObs
     /** Hopefully we won't have more than 5000 star groups at once **/
     private final int N_MESHES = 50000;
 
-    private Vector3 aux1, aux2;
+    private Vector3 aux1;
     private int sizeOffset, pmOffset;
     private float[] pointAlpha, alphaSizeFovBr;
 
     public StarGroupRenderSystem(RenderGroup rg, float[] alphas, ShaderProgram[] shaders) {
-        super(rg, alphas, shaders);
+        super(rg, alphas, shaders, 1500000);
         BRIGHTNESS_FACTOR = Constants.webgl ? 15 : 10;
         this.comp = new DistToCameraComparator<IRenderable>();
         this.alphaSizeFovBr = new float[4];
         aux1 = new Vector3();
-        aux2 = new Vector3();
         EventManager.instance.subscribe(this, Events.STAR_MIN_OPACITY_CMD, Events.DISPOSE_STAR_GROUP_GPU_MESH);
     }
 
@@ -88,7 +87,6 @@ public class StarGroupRenderSystem extends ImmediateRenderSystem implements IObs
         VertexAttribute[] attribs = buildVertexAttributes();
         curr.mesh = new Mesh(false, maxVertices, 0, attribs);
 
-        curr.vertices = new float[maxVertices * (curr.mesh.getVertexAttributes().vertexSize / 4)];
         curr.vertexSize = curr.mesh.getVertexAttributes().vertexSize / 4;
         curr.colorOffset = curr.mesh.getVertexAttribute(Usage.ColorPacked) != null ? curr.mesh.getVertexAttribute(Usage.ColorPacked).offset / 4 : 0;
         pmOffset = curr.mesh.getVertexAttribute(Usage.Tangent) != null ? curr.mesh.getVertexAttribute(Usage.Tangent).offset / 4 : 0;
@@ -137,6 +135,9 @@ public class StarGroupRenderSystem extends ImmediateRenderSystem implements IObs
                          */
                         if (!starGroup.inGpu) {
                             starGroup.offset = addMeshData(starGroup.size());
+                            
+                            checkRequiredVerticesSize(starGroup.size() * curr.vertexSize);
+                            curr.vertices = vertices;
 
                             for (StarBean p : starGroup.data()) {
                                 // COLOR
@@ -159,6 +160,7 @@ public class StarGroupRenderSystem extends ImmediateRenderSystem implements IObs
                             }
                             starGroup.count = starGroup.size() * curr.vertexSize;
                             curr.mesh.setVertices(curr.vertices, 0, starGroup.count);
+                            curr.vertices = null;
 
                             starGroup.inGpu = true;
 

@@ -37,7 +37,7 @@ public class PixelRenderSystem extends ImmediateRenderSystem implements IObserve
     boolean initializing = false;
 
     public PixelRenderSystem(RenderGroup rg, float[] alphas, ShaderProgram[] shaders, ComponentType ct) {
-        super(rg, alphas, shaders);
+        super(rg, alphas, shaders, 100000);
         EventManager.instance.subscribe(this, Events.TRANSIT_COLOUR_CMD, Events.ONLY_OBSERVED_STARS_CMD, Events.STAR_MIN_OPACITY_CMD);
         BRIGHTNESS_FACTOR = Constants.webgl ? 15 : 10;
         this.ct = ct;
@@ -73,7 +73,6 @@ public class PixelRenderSystem extends ImmediateRenderSystem implements IObserve
         VertexAttribute[] attribs = buildVertexAttributes();
         curr.mesh = new Mesh(false, maxVertices, 0, attribs);
 
-        curr.vertices = new float[maxVertices * (curr.mesh.getVertexAttributes().vertexSize / 4)];
         curr.vertexSize = curr.mesh.getVertexAttributes().vertexSize / 4;
         curr.colorOffset = curr.mesh.getVertexAttribute(Usage.ColorPacked) != null ? curr.mesh.getVertexAttribute(Usage.ColorPacked).offset / 4 : 0;
         pmOffset = curr.mesh.getVertexAttribute(Usage.Tangent) != null ? curr.mesh.getVertexAttribute(Usage.Tangent).offset / 4 : 0;
@@ -85,6 +84,9 @@ public class PixelRenderSystem extends ImmediateRenderSystem implements IObserve
         if (POINT_UPDATE_FLAG) {
             // Reset variables
             curr.clear();
+            
+            checkRequiredVerticesSize(renderables.size * curr.vertexSize);
+            curr.vertices = vertices;
 
             int size = renderables.size;
             for (int i = 0; i < size; i++) {

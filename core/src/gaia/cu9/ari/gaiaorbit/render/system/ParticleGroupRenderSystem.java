@@ -36,7 +36,7 @@ public class ParticleGroupRenderSystem extends ImmediateRenderSystem implements 
     Comparator<IRenderable> comp;
 
     public ParticleGroupRenderSystem(RenderGroup rg, float[] alphas, ShaderProgram[] shaders) {
-        super(rg, alphas, shaders);
+        super(rg, alphas, shaders, 1000000);
         comp = new DistToCameraComparator<IRenderable>();
         rand = new Random(123);
         aux1 = new Vector3();
@@ -81,7 +81,6 @@ public class ParticleGroupRenderSystem extends ImmediateRenderSystem implements 
         VertexAttribute[] attribs = buildVertexAttributes();
         curr.mesh = new Mesh(false, maxVertices, 0, attribs);
 
-        curr.vertices = new float[maxVertices * (curr.mesh.getVertexAttributes().vertexSize / 4)];
         curr.vertexSize = curr.mesh.getVertexAttributes().vertexSize / 4;
         curr.colorOffset = curr.mesh.getVertexAttribute(Usage.ColorPacked) != null ? curr.mesh.getVertexAttribute(Usage.ColorPacked).offset / 4 : 0;
         pmOffset = curr.mesh.getVertexAttribute(Usage.Tangent) != null ? curr.mesh.getVertexAttribute(Usage.Tangent).offset / 4 : 0;
@@ -101,6 +100,10 @@ public class ParticleGroupRenderSystem extends ImmediateRenderSystem implements 
                  */
                 if (!particleGroup.inGpu) {
                     particleGroup.offset = addMeshData(particleGroup.size());
+                    
+                    checkRequiredVerticesSize(particleGroup.size() * curr.vertexSize);
+                    curr.vertices = vertices;
+                    
                     for (ParticleBean pb : particleGroup.data()) {
                         double[] p = pb.data;
                         // COLOR
@@ -121,6 +124,7 @@ public class ParticleGroupRenderSystem extends ImmediateRenderSystem implements 
                     }
                     particleGroup.count = particleGroup.size() * curr.vertexSize;
                     curr.mesh.setVertices(curr.vertices, 0, particleGroup.count);
+                    curr.vertices = null;
 
                     particleGroup.inGpu = true;
 
@@ -130,12 +134,11 @@ public class ParticleGroupRenderSystem extends ImmediateRenderSystem implements 
                     /**
                      * PARTICLE RENDERER
                      */
-                    if (Gdx.app.getType() == ApplicationType.Desktop) {
-                        // Enable gl_PointCoord
-                        Gdx.gl20.glEnable(34913);
-                        // Enable point sizes
-                        Gdx.gl20.glEnable(0x8642);
-                    }
+                    // Enable gl_PointCoord
+                    Gdx.gl20.glEnable(34913);
+                    // Enable point sizes
+                    Gdx.gl20.glEnable(0x8642);
+                    
 
                     // Additive blending
                     Gdx.gl20.glBlendFunc(GL20.GL_ONE, GL20.GL_ONE);

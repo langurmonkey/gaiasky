@@ -27,25 +27,25 @@ import gaia.cu9.ari.gaiaorbit.util.coord.Coordinates;
 import gaia.cu9.ari.gaiaorbit.util.math.MathUtilsd;
 
 public class OrbitalElementsParticlesRenderSystem extends ImmediateRenderSystem implements IObserver {
-    private final int N_MESHES = 1;
-    private Vector3 auxf1;
-    private Matrix4 maux;
-    private int elems01Offset, elems02Offset, count;
+	private final int N_MESHES = 1;
+	private Vector3 auxf1;
+	private Matrix4 maux;
+	private int elems01Offset, elems02Offset, count;
 
-    public OrbitalElementsParticlesRenderSystem(RenderGroup rg, float[] alphas, ShaderProgram[] shaders) {
-        super(rg, alphas, shaders);
-        auxf1 = new Vector3();
-        maux = new Matrix4();
-    }
+	public OrbitalElementsParticlesRenderSystem(RenderGroup rg, float[] alphas, ShaderProgram[] shaders) {
+		super(rg, alphas, shaders, 120000);
+		auxf1 = new Vector3();
+		maux = new Matrix4();
+	}
 
-    @Override
-    protected void initShaderProgram() {
-    }
+	@Override
+	protected void initShaderProgram() {
+	}
 
-    @Override
-    protected void initVertices() {
-        meshes = new MeshData[N_MESHES];
-    }
+	@Override
+	protected void initVertices() {
+		meshes = new MeshData[N_MESHES];
+	}
 
     /**
      * Adds a new mesh data to the meshes list and increases the mesh data index
@@ -76,7 +76,6 @@ public class OrbitalElementsParticlesRenderSystem extends ImmediateRenderSystem 
         VertexAttribute[] attribs = buildVertexAttributes();
         curr.mesh = new Mesh(false, maxVertices, 0, attribs);
 
-        curr.vertices = new float[maxVertices * (curr.mesh.getVertexAttributes().vertexSize / 4)];
         curr.vertexSize = curr.mesh.getVertexAttributes().vertexSize / 4;
         curr.colorOffset = curr.mesh.getVertexAttribute(Usage.ColorPacked) != null ? curr.mesh.getVertexAttribute(Usage.ColorPacked).offset / 4 : 0;
         elems01Offset = curr.mesh.getVertexAttribute(Usage.Tangent) != null ? curr.mesh.getVertexAttribute(Usage.Tangent).offset / 4 : 0;
@@ -89,11 +88,13 @@ public class OrbitalElementsParticlesRenderSystem extends ImmediateRenderSystem 
         if (renderables.size > 0 && renderables.first().getOpacity() > 0) {
             Orbit first = (Orbit) renderables.first();
             if (!first.elemsInGpu) {
-                addMeshData(renderables.size);
+                curr = meshes[addMeshData(renderables.size)];
+                
+				checkRequiredVerticesSize(renderables.size * curr.vertexSize);
+				curr.vertices = vertices;
 
                 for (IRenderable renderable : renderables) {
                     Orbit orbitElems = (Orbit) renderable;
-                    curr = meshes[0];
 
                     if (!orbitElems.elemsInGpu) {
                         OrbitComponent oc = orbitElems.oc;
@@ -114,9 +115,10 @@ public class OrbitalElementsParticlesRenderSystem extends ImmediateRenderSystem 
                         orbitElems.elemsInGpu = true;
 
                     }
-                    count = renderables.size * curr.vertexSize;
-                    curr.mesh.setVertices(curr.vertices, 0, count);
                 }
+				count = renderables.size * curr.vertexSize;
+				curr.mesh.setVertices(curr.vertices, 0, count);
+				curr.vertices = null;
             }
 
             if (curr != null) {
