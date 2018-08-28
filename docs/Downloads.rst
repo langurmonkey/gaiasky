@@ -1,7 +1,4 @@
 Download
 ********
 
-Gaia Sky is available for **Linux**, **OS X** and **Windows**.
-
-*  Download the `latest version <https://zah.uni-heidelberg.de/gaia/outreach/gaiasky/downloads>`__ for your OS.
-*  Download `old versions <http://wwwstaff.ari.uni-heidelberg.de/gaiasandbox/>`__.
+Gaia Sky is available for **Linux**, **macOS** and **Windows**. You can get the `pre-build packages here <https://zah.uni-heidelberg.de/gaia/outreach/gaiasky/downloads>`__ or browse and `checkout the source <https://gitlab.com/langurmonkey/gaiasky>`_.

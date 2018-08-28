@@ -40,7 +40,7 @@ If you want to compile the source code, you will need the following:
    above <http://www.oracle.com/technetwork/java/javase/downloads/index.html>`__
 
 Please, be aware that only ``tags`` are guaranteed to work
-(`here <https://github.com/langurmonkey/gaiasky/tags>`__). The ``master``
+(`here <https://gitlab.com/langurmonkey/gaiasky/tags>`__). The ``master``
 branch holds the development version and the configuration files are
 possibly messed up and not ready to work out-of-the-box. So remember to
 use a ``tag`` version if you want to run it right away from source.
@@ -55,7 +55,7 @@ First, clone the repository:
 
 .. code-block:: bash
 
-    $  git clone https://github.com/langurmonkey/gaiasky.git
+    $  git clone https://gitlab.com/langurmonkey/gaiasky.git
     $  cd gaiasky
 
 Getting the catalog data
@@ -63,12 +63,7 @@ Getting the catalog data
 
 .. hint:: As of version ``2.0.3``, Gaia Sky will automatically download the default catalog if no other catalog is found.  
 
-If you have version ``2.0.3`` or above, Gaia Sky will scan some folders
-looking for catalog files. if no catalog files are found, Gaia Sky will
-offer to download the default catalog. If you want any other catalog listed
-below, you need to download it. The catalog files are not in the repository.
-
-You can get other catalogs `here <https://zah.uni-heidelberg.de/institutes/ari/gaia/outreach/gaiasky/downloads/#dr2catalogs>`_.
+You can get other DR2-based catalogs `here <https://zah.uni-heidelberg.de/institutes/ari/gaia/outreach/gaiasky/downloads/#dr2catalogs>`_.
 
 Compiling and running
 ---------------------
