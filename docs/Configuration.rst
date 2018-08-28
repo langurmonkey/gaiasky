@@ -33,21 +33,24 @@ drop-down. There are currently three visual themes available:
 -  ``dark-orange-x2``, scaled version of dark-orange (for HiDPI screens).
 -  ``bright-green``, a bright theme with greenish tones.
 -  ``bright-green-x2``, scaled version of birght-green (for HiDPI screens).
+-  ``night-red``, a red theme for low-light environments.
+-  ``night-red-x2``, scaled version of night-red (for HiDPI screens).
 
 Performance
 ===========
 
-In the ``Performance`` tab you can enable and disable multithreading.
-In our tests, multithreading provides a significant boost when more
-than 4 threads are available in the CPU. Otherwise its overhead
-makes it slower than the single-threaded version, so use it at your
-own risk. This allows the program to use more than one CPUs for the
-processing. More detailed info can be found in the :ref:`performance section <performance>`.
+In the ``Performance`` tab you can select how many background worker threads can be
+used by Gaia Sky. By default, multithreading is enabled and the number of threads 
+is equal to the number of CPU coures (setting ``let the program decide``).
+
+More detailed info can be found in the :ref:`performance section <performance>`.
 
 Draw distance
 -------------
 
-Certain big datasets use levels of detail to prevent data clutter.
+Certain big datasets use levels of detail (LOD) to prevent data clutter and make
+them manageable. Using this setting the user can adjust the draw distance, allowing
+more stars into the viewport.
 Refer to the :ref:`draw-distance` section for more info.
 
 Controls
@@ -138,11 +141,10 @@ Data
 ====
 
 As of version ``1.0.0`` you can use the **Data** tab to select the
-catalogue to load. Gaia Sky ships with two catalogues by default:
+catalogues to load. You can select as many catalogs as you want.
 
-*  **TGAS** This is based on the Tycho-Gaia Astrometric Solution (`source <http://gaia.ari.uni-heidelberg.de>`__ and contains a little over 600.000 stars. This catalogue uses levels of detail which can be configured in the *Performance* tab.
-
-*  **HYG** This is the Hipparcos, Gliese and Yale Bright Stars (`home page <http://www.astronexus.com/hyg>`__, `GitHub repository <https://github.com/astronexus/HYG-Database>`__) and contains roughly some 100.000 stars.
+The Data tab can also be used to toggle between high and low accuracy positions and
+to enalbe a catalog selection screen at startup.
 
 Gaia
 ====
@@ -152,4 +154,18 @@ the ``real attitude`` (takes a while to load but will ensure that Gaia
 points to where it should) and the ``NSL``, which is an analytical
 implementation of the nominal attitude of the satellite. It behaves the
 same as the real thing, but the observation direction is not ensured.
+
+
+System
+======
+
+Use this tab to enable and disable the debug info using the ``Show debug info`` checkbox. When the
+debug info is enabled, the program prints the frames per
+second and other useful information at the top-right of the screen. 
+
+Also, you can enable anonymous usage reporting, which connects to an analytics web service 
+to build up some usage statistics. Only the events of application startup and shutdown are reported, and they
+are totally anonymous. This setting is disabled by default to protect the user's privacy.
+
+Finally, if you want to revert to the default settings, click on the ``Reload default settings`` button.
 
