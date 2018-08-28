@@ -41,7 +41,7 @@ public class InitialGui extends AbstractGui {
 
         clearGui();
 
-        if (catalogFiles.size != 0) {
+        if (catalogFiles.size == 0) {
             // No catalog files, display downloader
             addDatasetDownloader();
         } else {
