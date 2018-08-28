@@ -71,8 +71,8 @@ Now, we can start executing functions.
     [...]
 
 
-Synchronizing with the main loop cycles
----------------------------------------
+Synchronizing with the main loop
+--------------------------------
 
 Sometimes, when updating animations or creating camera paths, it is necessary to 
 sync the execution of scripts with the thread which runs the main loop (main thread). 
