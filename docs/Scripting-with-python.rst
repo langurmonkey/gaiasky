@@ -26,6 +26,7 @@ API documentation
 The only up-to-date API documentation for each version is in the interface header files themselves. Below is a list of links to the different APIs.
 
 - `API Gaia Sky master (development branch) <https://github.com/langurmonkey/gaiasky/blob/master/core/src/gaia/cu9/ari/gaiaorbit/script/IScriptingInterface.java>`__
+- `API Gaia Sky 2.0.3 <https://github.com/langurmonkey/gaiasky/blob/2.0.3/core/src/gaia/cu9/ari/gaiaorbit/script/IScriptingInterface.java>`__
 - `API Gaia Sky 2.0.2 <https://github.com/langurmonkey/gaiasky/blob/2.0.2/core/src/gaia/cu9/ari/gaiaorbit/script/IScriptingInterface.java>`__
 - `API Gaia Sky 2.0.1 <https://github.com/langurmonkey/gaiasky/blob/2.0.1/core/src/gaia/cu9/ari/gaiaorbit/script/IScriptingInterface.java>`__
 - `API Gaia Sky 2.0.0 <https://github.com/langurmonkey/gaiasky/blob/2.0.0/core/src/gaia/cu9/ari/gaiaorbit/script/IScriptingInterface.java>`__

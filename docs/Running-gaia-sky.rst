@@ -61,46 +61,14 @@ First, clone the repository:
 Getting the catalog data
 ------------------------
 
-The TGAS catalog files (Gaia data) are **not** in the repository, so if
-you want to use TGAS when running from source you need to download the
-``tar`` file corresponding to your version --- see table below.
+.. hint:: As of version ``2.0.3``, Gaia Sky will automatically download the default catalog if no other catalog is found.  
 
-As of version ``1.5.0``, there are new GPU-bound catalogs which perform
-much better and can also be combined with the levels-of-detail structure
-to produce a good combo in terms of performance and load times. Choose
-which catalog you want to use. Usually, the single file GPU version
-should work fine (tgas GPU), and has no culling, so all particles are
-visible at all times.
+If you have version ``2.0.3`` or above, Gaia Sky will scan some folders
+looking for catalog files. if no catalog files are found, Gaia Sky will
+offer to download the default catalog. If you want any other catalog listed
+below, you need to download it. The catalog files are not in the repository.
 
-+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+----------------------------------------------------------------------------------------------------+----------------------------------------------+--------------------------------------+
-| **Catalog**                                                                                                                                                                                                                         | **Description**                                                                                    | **Location**                                 | **Catalog file**                     |
-+=====================================================================================================================================================================================================================================+====================================================================================================+==============================================+======================================+
-| `tgas LoD (1.0.3) <http://gaia.ari.uni-heidelberg.de/gaiasky/files/catalogs/tgas/20161206_tgas_gaiasky_1.0.3.tar.gz>`__                                                                                                                   | Levels of detail (lod) TGAS catalog. CPU-bound.                                                    | ``gaiasky/assets/data/octree``               | x                                    |
-+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+----------------------------------------------------------------------------------------------------+----------------------------------------------+--------------------------------------+
-| `tags LoD (1.0.4) <http://gaia.ari.uni-heidelberg.de/gaiasky/files/catalogs/tgas/20161206_tgas_gaiasky_1.0.4.tar.gz>`__                                                                                                                   | Levels of detail (lod) TGAS catalog. CPU-bound.                                                    | ``gaiasky/assets/data/octree``               | x                                    |
-+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+----------------------------------------------------------------------------------------------------+----------------------------------------------+--------------------------------------+
-| tags LoD (`1.5.0 <http://gaia.ari.uni-heidelberg.de/gaiasky/files/catalogs/tgas/20170731_tgas_lod_gaiasky_1.5.0.tar.gz>`__, `1.5.1 <http://gaia.ari.uni-heidelberg.de/gaiasky/files/catalogs/tgas/20180416_tgas_lod_gaiasky_1.5.1.tar.gz>`__)   | Levels of detail (lod) TGAS catalog. GPU-bound. Version ``1.5.1`` contains a pm fix and RAVE rv.   | ``gaiasky/assets/data/octree/tgas``          | ``data/catalog-tgas-hyg-lod.json``   |
-+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+----------------------------------------------------------------------------------------------------+----------------------------------------------+--------------------------------------+
-| tags GPU (`1.5.0 <http://gaia.ari.uni-heidelberg.de/gaiasky/files/catalogs/tgas/20170731_tgas_gpu_gaiasky_1.5.0.tar.gz>`__, `1.5.1 <http://gaia.ari.uni-heidelberg.de/gaiasky/files/catalogs/tgas/20180416_tgas_gpu_gaiasky_1.5.1.tar.gz>`__)   | TGAS catalog, GPU-bound. Version ``1.5.1`` contains a pm fix and RAVE rv.                          | ``gaiasky/assets/data/catalog``              | ``data/catalog-tgas-hyg.json``       |
-+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+----------------------------------------------------------------------------------------------------+----------------------------------------------+--------------------------------------+
-
-For versions ``1.0.x`` just extract the package in the specified
-location. For versions ``1.5.0+`` you can choose whether you want to use
-the Levels of detail catalog (LoD, multiple files, uses an octree structure
-which culls particles outside the view frustum and hides particles which
-are far away according to the view distance setting) or the regular
-catalog (single file, loaded once at startup, contains the full catalog,
-which is sent to GPU memory). Then, you need to point the key
-``data.json.catalog`` in your ``$HOME/.gaiasky/global.properties`` file
-to the file specified in the last column in the table.
-
-Albeit **not recommended** for performance reasons, the legacy
-particle-based (CPU-bound) version of the catalog (version ``1.0.4``)
-can still be used with newer versions. To do so, extract the package in
-``gaiasky/assets/data/octree/tgas`` so that the ``metadata.bin``
-file and the ``particles`` folder are directly within that folder and
-edit the configuration file so that ``data.json.catalog`` points to
-``data/catalog-tgas-hyg-lod-old.json``.
+You can get other catalogs `here <https://zah.uni-heidelberg.de/institutes/ari/gaia/outreach/gaiasky/downloads/#dr2catalogs>`_.
 
 Compiling and running
 ---------------------
