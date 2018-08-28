@@ -210,7 +210,7 @@ task dist (dependsOn: gaiaskyJar, description: "Compiles the project, creates th
         copy {
             from "../assets/data"
             into "$distDir/data"
-
+            
             exclude "**/tgas_final"
             exclude "**/octree/tgas/group-bin-all"
             exclude "**/octree/tgas/group-bin-old"
