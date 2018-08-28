@@ -211,7 +211,7 @@ For example, if we have the file ``xbox360.controller`` is defined in the config
 ``xbox360.linux.controller`` if on Linux, and so on. If found, the file is used. Otherwise, the default ``xbox360.controller`` file is used. Gaia Sky
 provides the default ``xbox360.controller`` file, which defines the Linux mappings, and also the Windows mappings ``xbox360.win.controller``.
 
-The mappings files (see `here <https://github.com/langurmonkey/gaiasky/blob/master/assets/mappings/xbox360.controller>`__)
+The mappings files (see `here <https://gitlab.com/langurmonkey/gaiasky/blob/master/assets/mappings/xbox360.controller>`__)
 must be in the ``$GS_INSTALL_LOCATION/mappings`` or in the ``$HOME/.gaiasky/mappings`` folder, and basically assign the button and axis codes for the particular
 controller to the actions.
 
@@ -247,7 +247,7 @@ In order to enable the controller debug mode, set the property ``controls.debugm
 
 Put your new files in ``$GS_INSTALL_LOCATION/mappings/`` or ``$HOME/.gaiasky/mappings/``. The name of the file should be ``[controller brand and model].mappings``. For example, ``xboxone.mappings`` or ``logitech_f310.mappings``.
 
-Please, if you create mappings files for new game controllers, create a pull request in the `gaiasky github <https://github.com/langurmonkey/gaiasky/pulls>`__ so that the community can benefit.
+Please, if you create mappings files for new game controllers, create a pull request in the `gaiasky gitlab <https://gitlab.com/langurmonkey/gaiasky/pulls>`__ so that the community can benefit.
 
 
 .. _gamepad-focus-mode:

@@ -1,7 +1,7 @@
 SAMP integration
 ****************
 
-As of commit `4d0d133 <https://github.com/langurmonkey/gaiasky/commit/4d0d13304d1e2b6991ad2cc84429a37083ae0954>`__, or
+As of commit `4d0d133 <https://gitlab.com/langurmonkey/gaiasky/commit/4d0d13304d1e2b6991ad2cc84429a37083ae0954>`__, or
 version ``2.0.0``, Gaia Sky supports interoperability via `SAMP <http://www.ivoa.net/documents/SAMP/>`__.
 However, due to the nature of Gaia Sky, not all functions are yet implemented and not all types of data tables
 are supported.

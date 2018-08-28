@@ -49,7 +49,7 @@ Creating spherical (360) videos
 ===============================
 
 First, you need to capture the 360 video. To do so, capture the images and use ``ffmpeg`` to encode them or capture the video directly using a screen recorder. See the :ref:`capture-videos` section for more information.
-Once you have the ``.mp4`` video file, you must use the `spatial media <https://github.com/google/spatial-media>`__ project to inject the spherical metadata so that video players that support it can play it correctly.
+Once you have the ``.mp4`` video file, you must use the `spatial media <https://gitlab.com/google/spatial-media>`__ project to inject the spherical metadata so that video players that support it can play it correctly.
 
 First, clone the project.
 

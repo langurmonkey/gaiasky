@@ -5,7 +5,7 @@ Gaia Sky offers the possibility to run ``Python`` scripts in the same
 ``JVM`` using `Jython <http://www.jython.org/>`__.
 
 You can find some example scripts in the
-`scripts <http://github.com/langurmonkey/gaiasky/tree/master/assets/scripts>`__
+`scripts <http://gitlab.com/langurmonkey/gaiasky/tree/master/assets/scripts>`__
 folder of the project.
 
 .. hint:: Add your own scripts to the folder ``$HOME/.gaiasky/scripts`` so that Gaia Sky can run them.
@@ -25,17 +25,17 @@ API documentation
 
 The only up-to-date API documentation for each version is in the interface header files themselves. Below is a list of links to the different APIs.
 
-- `API Gaia Sky master (development branch) <https://github.com/langurmonkey/gaiasky/blob/master/core/src/gaia/cu9/ari/gaiaorbit/script/IScriptingInterface.java>`__
-- `API Gaia Sky 2.0.3 <https://github.com/langurmonkey/gaiasky/blob/2.0.3/core/src/gaia/cu9/ari/gaiaorbit/script/IScriptingInterface.java>`__
-- `API Gaia Sky 2.0.2 <https://github.com/langurmonkey/gaiasky/blob/2.0.2/core/src/gaia/cu9/ari/gaiaorbit/script/IScriptingInterface.java>`__
-- `API Gaia Sky 2.0.1 <https://github.com/langurmonkey/gaiasky/blob/2.0.1/core/src/gaia/cu9/ari/gaiaorbit/script/IScriptingInterface.java>`__
-- `API Gaia Sky 2.0.0 <https://github.com/langurmonkey/gaiasky/blob/2.0.0/core/src/gaia/cu9/ari/gaiaorbit/script/IScriptingInterface.java>`__
-- `API Gaia Sky 1.5.0 <https://github.com/langurmonkey/gaiasky/blob/1.5.0/core/src/gaia/cu9/ari/gaiaorbit/script/IScriptingInterface.java>`__
-- `API Gaia Sky 1.0.4 <https://github.com/langurmonkey/gaiasky/blob/1.0.4/core/src/gaia/cu9/ari/gaiaorbit/script/IScriptingInterface.java>`__
-- `API Gaia Sky 1.0.3 <https://github.com/langurmonkey/gaiasky/blob/1.0.3/core/src/gaia/cu9/ari/gaiaorbit/script/IScriptingInterface.java>`__
-- `API Gaia Sky 1.0.2 <https://github.com/langurmonkey/gaiasky/blob/1.0.2/core/src/gaia/cu9/ari/gaiaorbit/script/IScriptingInterface.java>`__
-- `API Gaia Sky 1.0.1 <https://github.com/langurmonkey/gaiasky/blob/1.0.1/core/src/gaia/cu9/ari/gaiaorbit/script/IScriptingInterface.java>`__
-- `API Gaia Sky 1.0.0 <https://github.com/langurmonkey/gaiasky/blob/1.0.0/core/src/gaia/cu9/ari/gaiaorbit/script/IScriptingInterface.java>`__
+- `API Gaia Sky master (development branch) <https://gitlab.com/langurmonkey/gaiasky/blob/master/core/src/gaia/cu9/ari/gaiaorbit/script/IScriptingInterface.java>`__
+- `API Gaia Sky 2.0.3 <https://gitlab.com/langurmonkey/gaiasky/blob/2.0.3/core/src/gaia/cu9/ari/gaiaorbit/script/IScriptingInterface.java>`__
+- `API Gaia Sky 2.0.2 <https://gitlab.com/langurmonkey/gaiasky/blob/2.0.2/core/src/gaia/cu9/ari/gaiaorbit/script/IScriptingInterface.java>`__
+- `API Gaia Sky 2.0.1 <https://gitlab.com/langurmonkey/gaiasky/blob/2.0.1/core/src/gaia/cu9/ari/gaiaorbit/script/IScriptingInterface.java>`__
+- `API Gaia Sky 2.0.0 <https://gitlab.com/langurmonkey/gaiasky/blob/2.0.0/core/src/gaia/cu9/ari/gaiaorbit/script/IScriptingInterface.java>`__
+- `API Gaia Sky 1.5.0 <https://gitlab.com/langurmonkey/gaiasky/blob/1.5.0/core/src/gaia/cu9/ari/gaiaorbit/script/IScriptingInterface.java>`__
+- `API Gaia Sky 1.0.4 <https://gitlab.com/langurmonkey/gaiasky/blob/1.0.4/core/src/gaia/cu9/ari/gaiaorbit/script/IScriptingInterface.java>`__
+- `API Gaia Sky 1.0.3 <https://gitlab.com/langurmonkey/gaiasky/blob/1.0.3/core/src/gaia/cu9/ari/gaiaorbit/script/IScriptingInterface.java>`__
+- `API Gaia Sky 1.0.2 <https://gitlab.com/langurmonkey/gaiasky/blob/1.0.2/core/src/gaia/cu9/ari/gaiaorbit/script/IScriptingInterface.java>`__
+- `API Gaia Sky 1.0.1 <https://gitlab.com/langurmonkey/gaiasky/blob/1.0.1/core/src/gaia/cu9/ari/gaiaorbit/script/IScriptingInterface.java>`__
+- `API Gaia Sky 1.0.0 <https://gitlab.com/langurmonkey/gaiasky/blob/1.0.0/core/src/gaia/cu9/ari/gaiaorbit/script/IScriptingInterface.java>`__
 
 
 Using the scripting API
@@ -136,7 +136,7 @@ More examples
 -------------
 
 You can find more examples by looking at the ``scripts``
-`folder <http://github.com/langurmonkey/gaiasky/tree/master/assets/scripts>`__ in the
+`folder <http://gitlab.com/langurmonkey/gaiasky/tree/master/assets/scripts>`__ in the
 Gaia Sky package.
 
 How to run scripts

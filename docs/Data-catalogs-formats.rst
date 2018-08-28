@@ -112,7 +112,7 @@ corresponding ``"files"`` property. Obviously, each loader needs to know how to 
 
 The files are sent to the Scene Graph JSON Loader, which iterates on each loader-files pair
 in each file, instantiates the loader and uses it to load the files. All loaders need to adhere
-to a contract, defined in the interface ``ISceneGraphLoader`` --`here <https://github.com/langurmonkey/gaiasky/blob/master/core/src/gaia/cu9/ari/gaiaorbit/data/ISceneGraphLoader.java>`__--.
+to a contract, defined in the interface ``ISceneGraphLoader`` --`here <https://gitlab.com/langurmonkey/gaiasky/blob/master/core/src/gaia/cu9/ari/gaiaorbit/data/ISceneGraphLoader.java>`__--.
 The ``loadData()`` method of each loader must return a list of Scene Graph objects, which is then
 added to a global list containing all the previously loaded files. At the end, we have a list
 with all the objects in the scene. This list is passed on to the Scene Graph instance, which 
@@ -120,13 +120,13 @@ constructs the screne graph tree structure which will contains the object model.
 
 
 As we said, each loader will load a different kind of data; the
-``JSONLoader`` --`here <https://github.com/langurmonkey/gaiasky/blob/master/core/src/gaia/cu9/ari/gaiaorbit/data/JsonLoader.java>`__--
+``JSONLoader`` --`here <https://gitlab.com/langurmonkey/gaiasky/blob/master/core/src/gaia/cu9/ari/gaiaorbit/data/JsonLoader.java>`__--
 loads non-catalog data (planets, satellites, orbits, etc.), the
-``STILDataProvider`` --`here <https://github.com/langurmonkey/gaiasky/blob/master/core/src/gaia/cu9/ari/gaiaorbit/data/group/STILDataProvider.java>`__--
+``STILDataProvider`` --`here <https://gitlab.com/langurmonkey/gaiasky/blob/master/core/src/gaia/cu9/ari/gaiaorbit/data/group/STILDataProvider.java>`__--
 loads ``VOTables``, ``FITS``, ``CSV`` and other files through the `STIL <http://www.star.bristol.ac.uk/~mbt/stil/>`__ library,
-``ConstellationsLoader`` --`here <https://github.com/langurmonkey/gaiasky/blob/master/core/src/gaia/cu9/ari/gaiaorbit/data/constel/ConstellationsLoader.java>`__--
+``ConstellationsLoader`` --`here <https://gitlab.com/langurmonkey/gaiasky/blob/master/core/src/gaia/cu9/ari/gaiaorbit/data/constel/ConstellationsLoader.java>`__--
 and
-``ConstellationsBoundariesLoader`` --`here <https://github.com/langurmonkey/gaiasky/blob/master/core/src/gaia/cu9/ari/gaiaorbit/data/constel/ConstelBoundariesLoader.java>`__--
+``ConstellationsBoundariesLoader`` --`here <https://gitlab.com/langurmonkey/gaiasky/blob/master/core/src/gaia/cu9/ari/gaiaorbit/data/constel/ConstelBoundariesLoader.java>`__--
 load constellation data and constellation boundary data respectively
 and so on.
 
@@ -194,13 +194,13 @@ Let's go over the attributes:
 -  ``size``  -- The size of the particles. In a non HiDPI screen, this is in pixel units. In HiDPI screens, the size will be scaled up to maintain the proportions.
 -  ``labelcolor``  -- The color of the label as an ``rgba`` array.
 -  ``labelposition``  -- The cartesian position (see :ref:`internal reference system <reference-system>`) of the label, in parsecs.
--  ``ct``  -- The ``ComponentType`` --`here <https://github.com/langurmonkey/gaiasky/blob/master/core/src/gaia/cu9/ari/gaiaorbit/render/SceneGraphRenderer.java#L59>`__--. This is basically a ``string`` that will be matched to the entity type in ``ComponentType`` enum. Valid component types are ``Stars``, ``Planets``, ``Moons``, ``Satellites``, ``Atmospheres``, ``Constellations``, etc.
+-  ``ct``  -- The ``ComponentType`` --`here <https://gitlab.com/langurmonkey/gaiasky/blob/master/core/src/gaia/cu9/ari/gaiaorbit/render/SceneGraphRenderer.java#L59>`__--. This is basically a ``string`` that will be matched to the entity type in ``ComponentType`` enum. Valid component types are ``Stars``, ``Planets``, ``Moons``, ``Satellites``, ``Atmospheres``, ``Constellations``, etc.
 -  ``fadein``  -- The fade in inetrpolation distances, in parsecs. If this property is defined, there will be a fade-in effect applied to the particle group between the distance ``fadein[0]`` and the distance ``fadein[1]``.
 -  ``fadeout``  -- The fade out inetrpolation distances, in parsecs. If this property is defined, there will be a fade-in effect applied to the particle group between the distance ``fadein[0]`` and the distance ``fadein[1]``.
 -  ``profiledecay``  -- This attribute controls how particles are rendered. This is basically the opacity profile decay of each particle, as in ``(1.0 - dist)^profiledecay``, where dist is the distance from the center (center dist is 0, edge dist is 1).
 -  ``parent``  -- The name of the parent object in the scenegraph.
 -  ``impl``  -- The full name of the model class. This should always be ``gaia.cu9.ari.gaiaorbit.scenegraph.ParticleGroup``.
--  ``provider``  -- The full name of the data provider class. This must extend ``gaia.cu9.ari.gaiaorbit.data.group.IParticleGroupDataProvider`` (see `here <https://github.com/langurmonkey/gaiasky/blob/master/core/src/gaia/cu9/ari/gaiaorbit/data/group/IParticleGroupDataProvider.java>`__).
+-  ``provider``  -- The full name of the data provider class. This must extend ``gaia.cu9.ari.gaiaorbit.data.group.IParticleGroupDataProvider`` (see `here <https://gitlab.com/langurmonkey/gaiasky/blob/master/core/src/gaia/cu9/ari/gaiaorbit/data/group/IParticleGroupDataProvider.java>`__).
 -  ``factor``  -- A factor to be applied to each coordinate of each data point. If not specified, defaults to 1.
 -  ``datafile``  -- The actual file with the data. It must be in a format that the data provider specified in ``provider`` knows how to load.
 
@@ -259,7 +259,7 @@ The file ``tgas-pg.json`` contains a single object with the actual star group de
 	]}
 	
 In this case, the data file, ``tgashyg.bin``, is a binary file which contains java objects serialized. These can be loaded using the ``SerializedDataProvider``. However,
-anyone can implement a new provider to load any other kind of catalog file by implementing the ``IStarGroupDataProvider`` --`here <https://github.com/langurmonkey/gaiasky/blob/master/core/src/gaia/cu9/ari/gaiaorbit/data/group/IStarGroupDataProvider.java>`__
+anyone can implement a new provider to load any other kind of catalog file by implementing the ``IStarGroupDataProvider`` --`here <https://gitlab.com/langurmonkey/gaiasky/blob/master/core/src/gaia/cu9/ari/gaiaorbit/data/group/IStarGroupDataProvider.java>`__
 interface.
 
 Star groups can also be combined with octrees (levels of detail method) to allow for huge catalogs like DR2 (hundreds of millions of points). This option is still not implemented. 
@@ -271,11 +271,11 @@ Octree catalog loader
 As of version ``1.5.0``, a new on-demand catalog loader exists, called Octree multifile loader. 
 This is a version of the octree catalog loader specially designed for very large datasets. This version
 does not load everything at startup. It needs the catalog to be organised into several files, each one corresponding to 
-a particluar octree node. This is an option in the `OctreeGeneratorTest <https://github.com/langurmonkey/gaiasky/blob/master/src/gaia/cu9/ari/gaiaorbit/data/OctreeGeneratorTest.java>`__.
+a particluar octree node. This is an option in the `OctreeGeneratorTest <https://gitlab.com/langurmonkey/gaiasky/blob/master/src/gaia/cu9/ari/gaiaorbit/data/OctreeGeneratorTest.java>`__.
 Back to the loader, it can pre-load files down to a certain depth level; the rest of the
 files will be loaded when needed and unloaded if necessary. This offers a convenient way in which the data is streamed from disk
 to the main memory as the user explores the dataset. It also results in a very fast program startup.
-This loader is called ``OctreeMultiFileLoader`` and is implemented `here <https://github.com/langurmonkey/gaiasky/blob/master/core/src/gaia/cu9/ari/gaiaorbit/data/stars/OctreeMultiFileLoader.java>`__. 
+This loader is called ``OctreeMultiFileLoader`` and is implemented `here <https://gitlab.com/langurmonkey/gaiasky/blob/master/core/src/gaia/cu9/ari/gaiaorbit/data/stars/OctreeMultiFileLoader.java>`__. 
 
 Some discussion on memory issues and the streaming loader can be found :ref:`here <data-streaming-lod>`.
 
@@ -295,7 +295,7 @@ Non-particle data: Planets, Moons, Asteroids, etc.
 Most of the entities and celestial bodies that are not stars in the Gaia
 Sky scene are defined in a series of ``json`` files and are loaded
 using the
-``JsonLoader`` --`here <https://github.com/langurmonkey/gaiasky/blob/master/core/src/gaia/cu9/ari/gaiaorbit/data/JsonLoader.java>`__--.
+``JsonLoader`` --`here <https://gitlab.com/langurmonkey/gaiasky/blob/master/core/src/gaia/cu9/ari/gaiaorbit/data/JsonLoader.java>`__--.
 The format is very flexible and loosely matches the underneath data
 model, which is a scene graph tree.
 
@@ -307,7 +307,7 @@ properties:
 
 - ``name``: The name of the object. 
 - ``color``: The colour of the object. This will translate to the line colour in orbits, to the colour of the point for planets when they are far away and to the colour of the grid in grids.
-- ``ct`` -- The ``ComponentType`` --`here <https://github.com/langurmonkey/gaiasky/blob/master/core/src/gaia/cu9/ari/gaiaorbit/render/SceneGraphRenderer.java#L59>`__--. This is basically a ``string`` that will be matched to the entity type in ``ComponentType`` enum. Valid component types are ``Stars``, ``Planets``, ``Moons``, ``Satellites``, ``Atmospheres``, ``Constellations``, etc.
+- ``ct`` -- The ``ComponentType`` --`here <https://gitlab.com/langurmonkey/gaiasky/blob/master/core/src/gaia/cu9/ari/gaiaorbit/render/SceneGraphRenderer.java#L59>`__--. This is basically a ``string`` that will be matched to the entity type in ``ComponentType`` enum. Valid component types are ``Stars``, ``Planets``, ``Moons``, ``Satellites``, ``Atmospheres``, ``Constellations``, etc.
 - ``impl`` -- The package and class name of the implementing class.
 - ``parent``: The name of the parent entity.
   
@@ -335,7 +335,7 @@ Planets, moons, asteroids and all rigid bodies
 ----------------------------------------------
 
 Planets, moons and asteroids all use the model object
-``Planet`` -`here <https://github.com/langurmonkey/gaiasky/blob/master/core/src/gaia/cu9/ari/gaiaorbit/scenegraph/Planet.java>`__-.
+``Planet`` -`here <https://gitlab.com/langurmonkey/gaiasky/blob/master/core/src/gaia/cu9/ari/gaiaorbit/scenegraph/Planet.java>`__-.
 This provides a series of utilities that make their ``json``
 specifications look similar.
 
@@ -345,7 +345,7 @@ Coordinates
 Within the ``coordinates`` object one specifies how to get the
 positional data of the entity given a time. This object contains a
 reference to the implementation class (which must implement
-``IBodyCoordinates`` -`here <https://github.com/langurmonkey/gaiasky/blob/master/core/src/gaia/cu9/ari/gaiaorbit/util/coord/IBodyCoordinates.java>`__-)
+``IBodyCoordinates`` -`here <https://gitlab.com/langurmonkey/gaiasky/blob/master/core/src/gaia/cu9/ari/gaiaorbit/util/coord/IBodyCoordinates.java>`__-)
 and the necessary parameters to initialize it. There are currently a
 bunch of implementations that can be of use:
 
@@ -485,7 +485,7 @@ Orbits
 When we talk about orbits in this context we talk about orbit lines. In
 the Gaia Sky orbit lines may be created from two different sources.
 The sources are used by a class implementing the
-``IOrbitDataProvider`` --`here <https://github.com/langurmonkey/gaiasky/blob/master/core/src/gaia/cu9/ari/gaiaorbit/data/orbit/IOrbitDataProvider.java>`__--
+``IOrbitDataProvider`` --`here <https://gitlab.com/langurmonkey/gaiasky/blob/master/core/src/gaia/cu9/ari/gaiaorbit/data/orbit/IOrbitDataProvider.java>`__--
 interface, which is also specified in ther ``orbit`` object.
 
 - An **orbit data file**. In this case, the orbit data provider is ``OrbitFileDataProvider``.
@@ -580,7 +580,7 @@ If you still need to create your own loader, keep reading.
 
 In order to create a loader for your catalogue, one only needs to
 provide an implementation to the
-``ISceneGraphLoader`` --`here <https://github.com/langurmonkey/gaiasky/blob/master/core/src/gaia/cu9/ari/gaiaorbit/data/ISceneGraphLoader.java>`__--
+``ISceneGraphLoader`` --`here <https://gitlab.com/langurmonkey/gaiasky/blob/master/core/src/gaia/cu9/ari/gaiaorbit/data/ISceneGraphLoader.java>`__--
 interface.
 
 .. code:: java
@@ -591,14 +591,14 @@ interface.
     }
 
 The main method to implement is
-``List<? extends SceneGraphNode> loadData()`` --`here <https://github.com/langurmonkey/gaiasky/blob/master/core/src/gaia/cu9/ari/gaiaorbit/data/ISceneGraphLoader.java#L10>`__--,
+``List<? extends SceneGraphNode> loadData()`` --`here <https://gitlab.com/langurmonkey/gaiasky/blob/master/core/src/gaia/cu9/ari/gaiaorbit/data/ISceneGraphLoader.java#L10>`__--,
 which must return a list of elements that extend ``SceneGraphNode``.
 
 But how do we know which file to load? You need to create a
 ``catalog-*.json`` file, add your loader there and create the properties
 you desire. Usually, there is a property called ``files`` which contains
 a list of files to load. Once you've done that, implement the
-``initialize(String[])`` --`here <https://github.com/langurmonkey/gaiasky/blob/master/core/src/gaia/cu9/ari/gaiaorbit/data/ISceneGraphLoader.java#L12>`__--
+``initialize(String[])`` --`here <https://gitlab.com/langurmonkey/gaiasky/blob/master/core/src/gaia/cu9/ari/gaiaorbit/data/ISceneGraphLoader.java#L12>`__--
 method knowing that all the properties defined in the ``catalog-*.json``
 file with your catalogue loader as a prefix will be passed in the
 ``Properties p`` object without prefix.
@@ -612,7 +612,7 @@ Add your implementing ``jar`` file to the ``classpath`` (usually putting it in t
 to go.
 
 Take a look at already implemented catalogue loaders such as the
-``OctreeCatalogLoader`` --`here <https://github.com/langurmonkey/gaiasky/blob/master/core/src/gaia/cu9/ari/gaiaorbit/data/stars/OctreeCatalogLoader.java>`__--
+``OctreeCatalogLoader`` --`here <https://gitlab.com/langurmonkey/gaiasky/blob/master/core/src/gaia/cu9/ari/gaiaorbit/data/stars/OctreeCatalogLoader.java>`__--
 to see how it works.
 
 Loading data using scripts
