@@ -16,6 +16,7 @@ import gaia.cu9.ari.gaiaorbit.scenegraph.Particle;
 import gaia.cu9.ari.gaiaorbit.scenegraph.Star;
 import gaia.cu9.ari.gaiaorbit.util.GlobalConf;
 import gaia.cu9.ari.gaiaorbit.util.Logger;
+import gaia.cu9.ari.gaiaorbit.util.Logger.Log;
 import gaia.cu9.ari.gaiaorbit.util.math.Vector3d;
 
 /**
@@ -60,6 +61,7 @@ import gaia.cu9.ari.gaiaorbit.util.math.Vector3d;
  *
  */
 public class ParticleDataBinaryIO {
+    private static final Log logger = Logger.getLogger(ParticleDataBinaryIO.class);
 
     public void writeParticles(Array<AbstractPositionEntity> particles, OutputStream out) {
 
@@ -115,7 +117,7 @@ public class ParticleDataBinaryIO {
             data_out.close();
             out.close();
         } catch (Exception e) {
-            Logger.error(e);
+            logger.error(e);
         }
     }
 
@@ -192,17 +194,17 @@ public class ParticleDataBinaryIO {
                         stars.add(s);
                     }
                 } catch (EOFException eof) {
-                    Logger.error(eof);
+                    logger.error(eof);
                 }
             }
 
         } catch (IOException e) {
-            Logger.error(e);
+            logger.error(e);
         } finally {
             try {
                 data_in.close();
             } catch (IOException e) {
-                Logger.error(e);
+                logger.error(e);
             }
         }
 

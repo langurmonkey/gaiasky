@@ -7,6 +7,7 @@ import gaia.cu9.ari.gaiaorbit.event.Events;
 import gaia.cu9.ari.gaiaorbit.event.IObserver;
 import gaia.cu9.ari.gaiaorbit.util.Constants;
 import gaia.cu9.ari.gaiaorbit.util.Logger;
+import gaia.cu9.ari.gaiaorbit.util.Logger.Log;
 import gaia.cu9.ari.gaiaorbit.util.Nature;
 
 /**
@@ -17,6 +18,7 @@ import gaia.cu9.ari.gaiaorbit.util.Nature;
  *
  */
 public class GlobalClock implements IObserver, ITimeFrameProvider {
+    private static final Log logger = Logger.getLogger(GlobalClock.class);
 
     private static final double MS_TO_HOUR = 1 / 3600000d;
 
@@ -183,12 +185,12 @@ public class GlobalClock implements IObserver, ITimeFrameProvider {
             boolean updt = false;
             if (newt > Constants.MAX_TIME_MS) {
                 newt = Constants.MAX_TIME_MS;
-                Logger.info(this.getClass().getSimpleName(), "Time overflow, set to maximum (" + (Constants.MIN_TIME_MS * Nature.MS_TO_Y) + " years)");
+                logger.info("Time overflow, set to maximum (" + (Constants.MIN_TIME_MS * Nature.MS_TO_Y) + " years)");
                 updt = true;
             }
             if (newt < Constants.MIN_TIME_MS) {
                 newt = Constants.MIN_TIME_MS;
-                Logger.info(this.getClass().getSimpleName(), "Time overflow, set to minimum (" + (Constants.MIN_TIME_MS * Nature.MS_TO_Y) + " years)");
+                logger.info("Time overflow, set to minimum (" + (Constants.MIN_TIME_MS * Nature.MS_TO_Y) + " years)");
                 updt = true;
             }
             if (updt) {

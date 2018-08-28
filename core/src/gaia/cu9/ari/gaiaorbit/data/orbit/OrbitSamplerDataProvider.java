@@ -144,11 +144,11 @@ public class OrbitSamplerDataProvider implements IOrbitDataProvider {
             try {
                 OrbitDataWriter.writeOrbitData(writeDataPath + "orb." + bodyDesc.toString().toUpperCase() + ".dat", data);
             } catch (IOException e) {
-                Logger.error(e);
+                Logger.getLogger(this.getClass()).error(e);
             }
         }
 
-        Logger.info(this.getClass().getSimpleName(), I18n.bundle.format("notif.orbitdataof.loaded", parameter.name, data.getNumPoints()));
+        Logger.getLogger(this.getClass()).info(I18n.bundle.format("notif.orbitdataof.loaded", parameter.name, data.getNumPoints()));
 
     }
 

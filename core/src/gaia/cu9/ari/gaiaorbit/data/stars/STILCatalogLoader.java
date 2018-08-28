@@ -16,6 +16,7 @@ import gaia.cu9.ari.gaiaorbit.util.Constants;
 import gaia.cu9.ari.gaiaorbit.util.GlobalConf;
 import gaia.cu9.ari.gaiaorbit.util.I18n;
 import gaia.cu9.ari.gaiaorbit.util.Logger;
+import gaia.cu9.ari.gaiaorbit.util.Logger.Log;
 import gaia.cu9.ari.gaiaorbit.util.coord.Coordinates;
 import gaia.cu9.ari.gaiaorbit.util.math.Vector3d;
 import gaia.cu9.ari.gaiaorbit.util.units.Position;
@@ -28,6 +29,7 @@ import uk.ac.starlink.util.DataSource;
 import uk.ac.starlink.util.FileDataSource;
 
 public class STILCatalogLoader extends AbstractCatalogLoader {
+    private static final Log logger = Logger.getLogger(STILCatalogLoader.class);
 
     @Override
     public Array<AbstractPositionEntity> loadData() throws FileNotFoundException {
@@ -35,10 +37,10 @@ public class STILCatalogLoader extends AbstractCatalogLoader {
 
         Array<AbstractPositionEntity> result = new Array<AbstractPositionEntity>();
         StarTableFactory factory = new StarTableFactory();
-        Logger.info(this.getClass().getSimpleName(), I18n.bundle.format("notif.limitmag", GlobalConf.data.LIMIT_MAG_LOAD));
+        logger.info(I18n.bundle.format("notif.limitmag", GlobalConf.data.LIMIT_MAG_LOAD));
 
         for (String file : files) {
-            Logger.info(this.getClass().getSimpleName(), I18n.bundle.format("notif.datafile", file));
+            logger.info(I18n.bundle.format("notif.datafile", file));
             try {
                 Map<String, ColumnInfo> ucds = new HashMap<String, ColumnInfo>();
                 Map<String, Integer> ucdsi = new HashMap<String, Integer>();
@@ -58,7 +60,7 @@ public class STILCatalogLoader extends AbstractCatalogLoader {
                         table = t;
                     }
                 }
-                Logger.info(this.getClass().getSimpleName(), "Selected table " + table.getName() + ": " + table.getRowCount() + " elements");
+                logger.info("Selected table " + table.getName() + ": " + table.getRowCount() + " elements");
 
                 int count = table.getColumnCount();
                 ColumnInfo[] colInfo = new ColumnInfo[count];
@@ -244,11 +246,11 @@ public class STILCatalogLoader extends AbstractCatalogLoader {
                 }
 
             } catch (Exception e) {
-                Logger.error(e);
+                logger.error(e);
             }
         }
 
-        Logger.info(this.getClass().getSimpleName(), I18n.bundle.format("notif.catalog.init", result.size));
+        logger.info(I18n.bundle.format("notif.catalog.init", result.size));
         return result;
     }
 

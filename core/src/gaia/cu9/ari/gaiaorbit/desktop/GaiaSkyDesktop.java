@@ -59,6 +59,7 @@ import gaia.cu9.ari.gaiaorbit.util.ConfInit;
 import gaia.cu9.ari.gaiaorbit.util.GlobalConf;
 import gaia.cu9.ari.gaiaorbit.util.I18n;
 import gaia.cu9.ari.gaiaorbit.util.Logger;
+import gaia.cu9.ari.gaiaorbit.util.Logger.Log;
 import gaia.cu9.ari.gaiaorbit.util.MusicManager;
 import gaia.cu9.ari.gaiaorbit.util.SysUtilsFactory;
 import gaia.cu9.ari.gaiaorbit.util.format.DateFormatFactory;
@@ -72,6 +73,8 @@ import gaia.cu9.ari.gaiaorbit.util.math.MathManager;
  *
  */
 public class GaiaSkyDesktop implements IObserver {
+    private static final Log logger = Logger.getLogger(GaiaSkyDesktop.class);
+
     /* Configuration file version of the source code */
     private static int SOURCE_CONF_VERSION = 251;
     private static GaiaSkyDesktop gsd;
@@ -308,7 +311,7 @@ public class GaiaSkyDesktop implements IObserver {
                     activate.invoke(null, new Object[0]);
                 } catch (NoSuchMethodException | SecurityException | IllegalAccessException | IllegalArgumentException
                         | InvocationTargetException e) {
-                    Logger.error(e);
+                    logger.error(e);
                 }
             }
             break;
@@ -320,7 +323,7 @@ public class GaiaSkyDesktop implements IObserver {
                     stop.invoke(null, new Object[0]);
                 } catch (NoSuchMethodException | SecurityException | IllegalAccessException | IllegalArgumentException
                         | InvocationTargetException e) {
-                    Logger.error(e);
+                    logger.error(e);
                 }
             }
             break;
@@ -492,7 +495,7 @@ public class GaiaSkyDesktop implements IObserver {
                 try {
                     f1.get(2000, TimeUnit.MILLISECONDS);
                 } catch (Exception e) {
-                    Logger.error(e);
+                    logger.error(e);
                 }
 
         }

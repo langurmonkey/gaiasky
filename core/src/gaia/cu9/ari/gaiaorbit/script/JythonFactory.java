@@ -19,6 +19,7 @@ import gaia.cu9.ari.gaiaorbit.event.Events;
 import gaia.cu9.ari.gaiaorbit.event.IObserver;
 import gaia.cu9.ari.gaiaorbit.util.I18n;
 import gaia.cu9.ari.gaiaorbit.util.Logger;
+import gaia.cu9.ari.gaiaorbit.util.Logger.Log;
 
 /**
  * Factory class to create, execute and cancel Jython scripts.
@@ -26,6 +27,8 @@ import gaia.cu9.ari.gaiaorbit.util.Logger;
  *
  */
 public class JythonFactory extends ScriptingFactory implements IObserver {
+    private static final Log logger = Logger.getLogger(JythonFactory.class);
+    
     /** Singleton pattern **/
     private static JythonFactory instance = null;
 
@@ -103,7 +106,7 @@ public class JythonFactory extends ScriptingFactory implements IObserver {
                 run.run();
             }
         } else {
-            Logger.info(this.getClass().getSimpleName(), I18n.bundle.format("notif.script.max", maxScripts));
+            logger.info(I18n.bundle.format("notif.script.max", maxScripts));
         }
     }
 
@@ -217,7 +220,7 @@ public class JythonFactory extends ScriptingFactory implements IObserver {
         public void run() {
             if (currentScripts.size() < maxScripts) {
                 if (currentScripts.containsKey(path)) {
-                    Logger.info(this.getClass().getSimpleName(), I18n.bundle.format("notif.script.already", path));
+                    logger.info(I18n.bundle.format("notif.script.already", path));
                     return;
                 }
                 currentScripts.put(path, this);
@@ -227,9 +230,9 @@ public class JythonFactory extends ScriptingFactory implements IObserver {
                     cleanup();
                 } catch (Exception e) {
                     if (e.getCause() instanceof ThreadDeath) {
-                        Logger.info(this.getClass().getSimpleName(), "Script stopped");
+                        logger.info("Script stopped");
                     } else {
-                        Logger.error(e, this.getClass().getSimpleName());
+                        logger.error(e);
                     }
                 }
             }

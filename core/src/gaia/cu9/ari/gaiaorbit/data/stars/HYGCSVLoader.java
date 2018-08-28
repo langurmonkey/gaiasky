@@ -20,6 +20,7 @@ import gaia.cu9.ari.gaiaorbit.util.Constants;
 import gaia.cu9.ari.gaiaorbit.util.GlobalConf;
 import gaia.cu9.ari.gaiaorbit.util.I18n;
 import gaia.cu9.ari.gaiaorbit.util.Logger;
+import gaia.cu9.ari.gaiaorbit.util.Logger.Log;
 import gaia.cu9.ari.gaiaorbit.util.Nature;
 import gaia.cu9.ari.gaiaorbit.util.coord.Coordinates;
 import gaia.cu9.ari.gaiaorbit.util.math.MathUtilsd;
@@ -33,6 +34,8 @@ import gaia.cu9.ari.gaiaorbit.util.parse.Parser;
  *
  */
 public class HYGCSVLoader extends AbstractCatalogLoader implements ISceneGraphLoader {
+    private static final Log logger = Logger.getLogger(HYGCSVLoader.class);
+    
     private static final String separator = "\t";
     private static final String pmseparator = ",";
 
@@ -62,12 +65,12 @@ public class HYGCSVLoader extends AbstractCatalogLoader implements ISceneGraphLo
                     }
                 }
             } catch (Exception e) {
-                Logger.error(e);
+                logger.error(e);
             } finally {
                 try {
                     pmbr.close();
                 } catch (IOException e) {
-                    Logger.error(e);
+                    logger.error(e);
                 }
 
             }
@@ -92,18 +95,18 @@ public class HYGCSVLoader extends AbstractCatalogLoader implements ISceneGraphLo
                     addStar(line, stars, pmMap);
                 }
             } catch (IOException e) {
-                Logger.error(e);
+                logger.error(e);
             } finally {
                 try {
                     br.close();
                 } catch (IOException e) {
-                    Logger.error(e);
+                    logger.error(e);
                 }
 
             }
         }
 
-        Logger.info(this.getClass().getSimpleName(), I18n.bundle.format("notif.catalog.init", stars.size));
+        logger.info(I18n.bundle.format("notif.catalog.init", stars.size));
         return stars;
     }
 

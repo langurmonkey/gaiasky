@@ -43,9 +43,9 @@ public class Positions2DExtractor {
             DateFormatFactory.initialize(new DesktopDateFormatFactory());
             ConfInit.initialize(new DesktopConfInit(SysUtilsFactory.getSysUtils().getAssetsLocation()));
         } catch (IOException e) {
-            Logger.error(e);
+            Logger.getLogger(Positions2DExtractor.class).error(e);
         } catch (Exception e) {
-            Logger.error(e);
+            Logger.getLogger(Positions2DExtractor.class).error(e);
         }
 
         p2d.process();

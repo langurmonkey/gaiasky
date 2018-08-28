@@ -7,12 +7,15 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.utils.I18NBundle;
 
+import gaia.cu9.ari.gaiaorbit.util.Logger.Log;
+
 /**
  * Manages the i18n system.
  * @author Toni Sagrista
  *
  */
 public class I18n {
+    private static final Log logger = Logger.getLogger(I18n.class);
 
     public static I18NBundle bundle;
     public static Locale locale;
@@ -41,13 +44,13 @@ public class I18n {
             bundle = I18NBundle.createBundle(baseFileHandle, locale);
             return true;
         } catch (MissingResourceException e) {
-            Logger.info(I18n.class.getSimpleName(), e.getLocalizedMessage());
+            logger.info(e.getLocalizedMessage());
             // Use default locale - en_GB
             locale = new Locale("en", "GB");
             try {
                 bundle = I18NBundle.createBundle(baseFileHandle, locale);
             } catch (Exception e2) {
-                Logger.error(e, I18n.class.getSimpleName());
+                logger.error(e);
             }
             return false;
         }

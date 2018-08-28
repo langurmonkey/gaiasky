@@ -212,7 +212,7 @@ public class FovCamera extends AbstractCamera implements IObserver {
             if (lastTime != 0 && currentTime - lastTime > MAX_OVERLAP_TIME) {
                 if (((GlobalClock) time).fps < 0) {
                     ((GlobalClock) time).fps = 10;
-                    Logger.info(this.getClass().getSimpleName(), I18n.bundle.get("notif.timeprovider.fixed"));
+                    logger.info(I18n.bundle.get("notif.timeprovider.fixed"));
                 }
                 for (long t = lastTime + MAX_OVERLAP_TIME; t < currentTime; t += MAX_OVERLAP_TIME) {
                     interpolatedDirections.add(getDirections(new Date(t)));
@@ -220,7 +220,7 @@ public class FovCamera extends AbstractCamera implements IObserver {
             } else {
                 if (((GlobalClock) time).fps > 0) {
                     ((GlobalClock) time).fps = -1;
-                    Logger.info(this.getClass().getSimpleName(), I18n.bundle.get("notif.timeprovider.real"));
+                    logger.info(I18n.bundle.get("notif.timeprovider.real"));
                 }
             }
         }

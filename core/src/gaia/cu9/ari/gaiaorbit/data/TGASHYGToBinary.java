@@ -54,7 +54,7 @@ public class TGASHYGToBinary {
             tgashyg.loadData("nofile", 1);
 
         } catch (Exception e) {
-            Logger.error(e);
+            Logger.getLogger(TGASHYGToBinary.class).error(e);
         }
 
     }

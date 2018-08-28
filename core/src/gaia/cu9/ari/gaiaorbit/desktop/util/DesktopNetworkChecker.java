@@ -28,12 +28,13 @@ import gaia.cu9.ari.gaiaorbit.util.scene2d.Link;
 import gaia.cu9.ari.gaiaorbit.util.scene2d.OwnTextButton;
 
 public class DesktopNetworkChecker extends Thread implements INetworkChecker {
+    private static final Log logger = Logger.getLogger(DesktopNetworkChecker.class);
+
     private static String URL_SIMBAD = "http://simbad.u-strasbg.fr/simbad/sim-id?Ident=";
     // TODO Use Wikipedia API to get localized content to the current language
     private static String URL_WIKIPEDIA = "https://en.wikipedia.org/wiki/";
 
     private static int TIMEOUT_MS = 5000;
-    private static Log logger = Logger.getLogger(DesktopNetworkChecker.class);
 
     private boolean running = true;
 
@@ -78,7 +79,7 @@ public class DesktopNetworkChecker extends Thread implements INetworkChecker {
             try {
                 monitor.wait();
             } catch (InterruptedException e) {
-                Logger.error(e);
+                logger.error(e);
             }
         }
     }
@@ -187,7 +188,7 @@ public class DesktopNetworkChecker extends Thread implements INetworkChecker {
             }
 
         } catch (Exception e) {
-            Logger.error(e);
+            logger.error(e);
         }
     }
 

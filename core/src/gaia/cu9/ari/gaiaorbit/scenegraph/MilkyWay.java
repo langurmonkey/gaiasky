@@ -79,7 +79,7 @@ public class MilkyWay extends AbstractPositionEntity implements I3DTextRenderabl
                 dustPartition = new int[dustData.size];
             }
         } catch (Exception e) {
-            Logger.error(e, getClass().getSimpleName());
+            Logger.getLogger(this.getClass()).error(e);
         }
 
     }

@@ -89,16 +89,15 @@ public class ConstellationsLoader<T extends SceneGraphNode> implements ISceneGra
                         lastid = -1;
                     }
                 } catch (IOException e) {
-                    Logger.error(e);
+                    Logger.getLogger(this.getClass()).error(e);
                 }
 
             } catch (Exception e) {
-                Logger.error(e, this.getClass().getSimpleName());
-                Logger.error(e);
+                Logger.getLogger(this.getClass()).error(e);
             }
         }
 
-        Logger.info(this.getClass().getSimpleName(), I18n.bundle.format("notif.constellations.init", constellations.size));
+        Logger.getLogger(this.getClass()).info(I18n.bundle.format("notif.constellations.init", constellations.size));
         return constellations;
     }
 

@@ -37,7 +37,7 @@ public class HYGDataProvider extends AbstractStarGroupDataProvider {
     }
 
     public Array<StarBean> loadData(String file, double factor) {
-        Logger.info(this.getClass().getSimpleName(), I18n.bundle.format("notif.datafile", file));
+        logger.info(I18n.bundle.format("notif.datafile", file));
 
         FileHandle f = Gdx.files.internal(file);
 
@@ -45,7 +45,7 @@ public class HYGDataProvider extends AbstractStarGroupDataProvider {
         loadData(f.read(), factor);
 
         if (list != null)
-            Logger.info(this.getClass().getSimpleName(), I18n.bundle.format("notif.nodeloader", list.size, file));
+            logger.info(I18n.bundle.format("notif.nodeloader", list.size, file));
 
         return list;
     }
@@ -124,7 +124,7 @@ public class HYGDataProvider extends AbstractStarGroupDataProvider {
                         countsPerMag[(int) appclmp] += 1;
                     }
                 } catch (EOFException eof) {
-                    Logger.error(eof, HYGBinaryLoader.class.getSimpleName());
+                    logger.error(eof);
                     list = null;
                 }
             }
@@ -136,7 +136,7 @@ public class HYGDataProvider extends AbstractStarGroupDataProvider {
             }
 
         } catch (Exception e) {
-            Logger.error(e, HYGDataProvider.class.getName());
+            logger.error(e);
         }
 
         return list;

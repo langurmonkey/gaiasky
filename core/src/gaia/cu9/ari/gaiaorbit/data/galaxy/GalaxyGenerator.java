@@ -19,8 +19,6 @@ import gaia.cu9.ari.gaiaorbit.desktop.format.DesktopNumberFormatFactory;
 import gaia.cu9.ari.gaiaorbit.desktop.util.DesktopConfInit;
 import gaia.cu9.ari.gaiaorbit.desktop.util.DesktopSysUtilsFactory;
 import gaia.cu9.ari.gaiaorbit.desktop.util.LogWriter;
-import gaia.cu9.ari.gaiaorbit.event.Events;
-import gaia.cu9.ari.gaiaorbit.event.IObserver;
 import gaia.cu9.ari.gaiaorbit.util.ConfInit;
 import gaia.cu9.ari.gaiaorbit.util.I18n;
 import gaia.cu9.ari.gaiaorbit.util.Logger;
@@ -235,7 +233,7 @@ public class GalaxyGenerator {
 
         // Generate arms
         for (int i = 0; i < Narms; i++) {
-            Logger.info("Generating arm " + (i + 1));
+            Logger.getLogger(GalaxyGenerator.class).info("Generating arm " + (i + 1));
             float zplus = bar ? barLength / 2f * (i < Narms / 2 ? 1f : -1f) : 0f;
 
             angle = bar && i == Narms / 2 ? 190f : angle;
@@ -298,7 +296,7 @@ public class GalaxyGenerator {
 
         bw.close();
 
-        Logger.info("File written to " + filePath);
+        Logger.getLogger(GalaxyGenerator.class).info("File written to " + filePath);
     }
 
 }

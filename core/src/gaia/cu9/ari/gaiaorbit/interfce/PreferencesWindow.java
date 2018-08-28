@@ -1475,7 +1475,7 @@ public class PreferencesWindow extends GenericDialog {
             }
 
         } catch (Exception e) {
-            Logger.error(e, "Error copying default preferences file to user folder: " + userFolderConfFile.getAbsolutePath());
+            Logger.getLogger(this.getClass()).error(e, "Error copying default preferences file to user folder: " + userFolderConfFile.getAbsolutePath());
         }
 
     }
@@ -1547,7 +1547,7 @@ public class PreferencesWindow extends GenericDialog {
             // Windows backend crashes for some reason
             Gdx.graphics.setVSync(GlobalConf.screen.VSYNC);
         } catch (Exception e) {
-            Logger.error(e, this.getClass().getSimpleName());
+            Logger.getLogger(this.getClass()).error(e);
         }
 
         if (limitfpsCb.isChecked()) {

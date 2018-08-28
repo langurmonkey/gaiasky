@@ -1,5 +1,6 @@
 package gaia.cu9.ari.gaiaorbit.scenegraph.camera;
 
+
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.PerspectiveCamera;
 
@@ -8,12 +9,15 @@ import gaia.cu9.ari.gaiaorbit.scenegraph.IStarFocus;
 import gaia.cu9.ari.gaiaorbit.util.Constants;
 import gaia.cu9.ari.gaiaorbit.util.GlobalConf;
 import gaia.cu9.ari.gaiaorbit.util.GlobalResources;
+import gaia.cu9.ari.gaiaorbit.util.Logger;
+import gaia.cu9.ari.gaiaorbit.util.Logger.Log;
 import gaia.cu9.ari.gaiaorbit.util.math.Frustumd;
 import gaia.cu9.ari.gaiaorbit.util.math.Matrix4d;
 import gaia.cu9.ari.gaiaorbit.util.math.Vector3d;
 import gaia.cu9.ari.gaiaorbit.util.time.ITimeFrameProvider;
 
 public abstract class AbstractCamera implements ICamera {
+    protected static final Log logger = Logger.getLogger(AbstractCamera.class);
 
     /** Camera far value **/
     public static final double CAM_FAR = 1e16 * Constants.PC_TO_U;

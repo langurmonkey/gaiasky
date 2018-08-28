@@ -30,11 +30,14 @@ import gaia.cu9.ari.gaiaorbit.util.CatalogInfo;
 import gaia.cu9.ari.gaiaorbit.util.CatalogInfo.CatalogInfoType;
 import gaia.cu9.ari.gaiaorbit.util.GlobalConf;
 import gaia.cu9.ari.gaiaorbit.util.Logger;
+import gaia.cu9.ari.gaiaorbit.util.Logger.Log;
 import gaia.cu9.ari.gaiaorbit.util.parse.Parser;
 import uk.ac.starlink.util.DataSource;
 import uk.ac.starlink.util.URLDataSource;
 
 public class SAMPClient implements IObserver {
+    private static final Log logger = Logger.getLogger(SAMPClient.class);
+    
     private static SAMPClient instance;
 
     public static SAMPClient getInstance() {
@@ -93,9 +96,9 @@ public class SAMPClient implements IObserver {
                 boolean loaded = loadVOTable(url, id, name);
 
                 if (loaded) {
-                    Logger.info(SAMPClient.class.getSimpleName(), "VOTable " + name + " loaded successfully");
+                    logger.info("VOTable " + name + " loaded successfully");
                 } else {
-                    Logger.info(SAMPClient.class.getSimpleName(), "Error loading VOTable " + name);
+                    logger.info("Error loading VOTable " + name);
                 }
 
                 return null;
@@ -114,7 +117,7 @@ public class SAMPClient implements IObserver {
 
                 // If table here, select
                 if (loaded) {
-                    Logger.info(SAMPClient.class.getSimpleName(), "Select row " + row + " of " + id);
+                    logger.info("Select row " + row + " of " + id);
 
                     if (mapIdSg.containsKey(id)) {
                         StarGroup sg = mapIdSg.get(id);
@@ -140,7 +143,7 @@ public class SAMPClient implements IObserver {
 
                 // If table here, select
                 if (loaded && rows != null && !rows.isEmpty()) {
-                    Logger.info(SAMPClient.class.getSimpleName(), "Select " + rows.size() + " rows of " + id + ". Gaia Sky does not support multiple selection, so only the first entry is selected.");
+                    logger.info("Select " + rows.size() + " rows of " + id + ". Gaia Sky does not support multiple selection, so only the first entry is selected.");
                     // We use the first one, as multiple selections are not supported in Gaia Sky
                     int row = Integer.parseInt(rows.get(0));
                     if (mapIdSg.containsKey(id)) {
@@ -162,7 +165,7 @@ public class SAMPClient implements IObserver {
                 // do stuff
                 float ra = Float.parseFloat((String) msg.getParam("ra"));
                 float dec = Float.parseFloat((String) msg.getParam("dec"));
-                Logger.info(SAMPClient.class.getSimpleName(), "Point to coordinate (ra,dec): (" + ra + ", " + dec + ")");
+                logger.info("Point to coordinate (ra,dec): (" + ra + ", " + dec + ")");
 
                 EventManager.instance.post(Events.CAMERA_MODE_CMD, CameraMode.Free_Camera);
                 EventManager.instance.post(Events.FREE_MODE_COORD_CMD, ra, dec);
@@ -190,7 +193,7 @@ public class SAMPClient implements IObserver {
      * @return Boolean indicating whether loading succeeded or not
      */
     private boolean loadVOTable(String url, String id, String name) {
-        Logger.info(SAMPClient.class.getSimpleName(), "Loading VOTable: " + name + " from " + url);
+        logger.info("Loading VOTable: " + name + " from " + url);
 
         try {
             DataSource ds = new URLDataSource(new URL(url));
@@ -220,14 +223,14 @@ public class SAMPClient implements IObserver {
                     sg.doneLoading(null);
                     GaiaSky.instance.sg.insert(sg, true);
                 });
-                Logger.info(data.size + " objects loaded via SAMP");
+                logger.info(data.size + " objects loaded via SAMP");
                 return true;
             } else {
                 // No data has been loaded
                 return false;
             }
         } catch (Exception e) {
-            Logger.error(e);
+            logger.error(e);
             return false;
         }
     }
@@ -252,7 +255,7 @@ public class SAMPClient implements IObserver {
                     try {
                         conn.getConnection().notifyAll(msg);
                     } catch (SampException e) {
-                        Logger.error(e);
+                        logger.error(e);
                     }
                 }
             }

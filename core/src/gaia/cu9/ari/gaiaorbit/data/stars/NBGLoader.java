@@ -16,6 +16,7 @@ import gaia.cu9.ari.gaiaorbit.scenegraph.Particle;
 import gaia.cu9.ari.gaiaorbit.util.Constants;
 import gaia.cu9.ari.gaiaorbit.util.I18n;
 import gaia.cu9.ari.gaiaorbit.util.Logger;
+import gaia.cu9.ari.gaiaorbit.util.Logger.Log;
 import gaia.cu9.ari.gaiaorbit.util.coord.Coordinates;
 import gaia.cu9.ari.gaiaorbit.util.math.Vector3d;
 import gaia.cu9.ari.gaiaorbit.util.parse.Parser;
@@ -44,6 +45,8 @@ import gaia.cu9.ari.gaiaorbit.util.parse.Parser;
  *
  */
 public class NBGLoader extends AbstractCatalogLoader implements ISceneGraphLoader {
+    private static final Log logger = Logger.getLogger(NBGLoader.class);
+    
     boolean active = true;
 
     @Override
@@ -92,18 +95,18 @@ public class NBGLoader extends AbstractCatalogLoader implements ISceneGraphLoade
 			linenum++;
 		    }
 		} catch (IOException e) {
-		    Logger.error(e);
+		    logger.error(e);
 		} finally {
 		    try {
 			br.close();
 		    } catch (IOException e) {
-			Logger.error(e);
+			logger.error(e);
 		    }
 
 		}
 	    }
 
-	Logger.info(this.getClass().getSimpleName(), I18n.bundle.format("notif.catalog.init", galaxies.size));
+	logger.info(I18n.bundle.format("notif.catalog.init", galaxies.size));
 	return galaxies;
     }
 

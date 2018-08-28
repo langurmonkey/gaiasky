@@ -143,7 +143,7 @@ public class OortGenerator {
 
         bw.close();
 
-        Logger.info("File written to " + filePath);
+        Logger.getLogger(OortGenerator.class).info("File written to " + filePath);
     }
 
 }

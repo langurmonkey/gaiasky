@@ -89,18 +89,18 @@ public class MWSCLoader extends AbstractCatalogLoader implements ISceneGraphLoad
                     }
 
                 } catch (IOException e) {
-                    Logger.error(e);
+                    Logger.getLogger(this.getClass()).error(e);
                 } finally {
                     try {
                         br.close();
                     } catch (IOException e) {
-                        Logger.error(e);
+                        Logger.getLogger(this.getClass()).error(e);
                     }
 
                 }
             }
 
-        Logger.info(this.getClass().getSimpleName(), I18n.bundle.format("notif.catalog.init", clusters.size));
+        Logger.getLogger(this.getClass()).info(I18n.bundle.format("notif.catalog.init", clusters.size));
         return clusters;
     }
 

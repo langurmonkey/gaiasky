@@ -210,7 +210,6 @@ public class StarGroup extends ParticleGroup implements ILineRenderable, IStarFo
     // Model transfomr
     private static Matrix4 modelTransform;
 
-
     /** Epoch in julian days **/
     private double epoch_jd = AstroUtils.JD_J2015_5;
     /** Current computed epoch time **/
@@ -351,7 +350,7 @@ public class StarGroup extends ParticleGroup implements ILineRenderable, IStarFo
             this.setData(l);
 
         } catch (Exception e) {
-            Logger.error(e, getClass().getSimpleName());
+            Logger.getLogger(this.getClass()).error(e);
             pointData = null;
         }
 

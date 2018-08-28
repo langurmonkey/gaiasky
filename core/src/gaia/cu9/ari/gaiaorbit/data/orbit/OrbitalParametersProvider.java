@@ -98,7 +98,7 @@ public class OrbitalParametersProvider implements IOrbitDataProvider {
 
                 EventManager.instance.post(Events.ORBIT_DATA_LOADED, data, parameter.name);
             } catch (Exception e) {
-                Logger.error(e);
+                Logger.getLogger(this.getClass()).error(e);
             }
         } else {
             loadOld(file, parameter);
@@ -138,7 +138,7 @@ public class OrbitalParametersProvider implements IOrbitDataProvider {
             }
             EventManager.instance.post(Events.ORBIT_DATA_LOADED, data, parameter.name);
         } catch (Exception e) {
-            Logger.error(e);
+            Logger.getLogger(this.getClass()).error(e);
         }
     }
 

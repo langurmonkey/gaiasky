@@ -74,7 +74,7 @@ public class MilkyWayReal extends AbstractPositionEntity implements I3DTextRende
             starData = provider.loadData(gc.starsource);
             nebulaData = provider.loadData(gc.nebulasource);
         } catch (Exception e) {
-            Logger.error(e, getClass().getSimpleName());
+            Logger.getLogger(this.getClass()).error(e);
         }
         mc.initialize();
         mc.env.set(new ColorAttribute(ColorAttribute.AmbientLight, cc[0], cc[1], cc[2], 1));

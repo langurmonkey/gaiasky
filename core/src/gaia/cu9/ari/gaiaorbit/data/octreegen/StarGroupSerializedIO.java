@@ -15,6 +15,7 @@ import gaia.cu9.ari.gaiaorbit.scenegraph.AbstractPositionEntity;
 import gaia.cu9.ari.gaiaorbit.scenegraph.StarGroup;
 import gaia.cu9.ari.gaiaorbit.scenegraph.StarGroup.StarBean;
 import gaia.cu9.ari.gaiaorbit.util.Logger;
+import gaia.cu9.ari.gaiaorbit.util.Logger.Log;
 
 /**
  * Loads and writes star groups
@@ -23,6 +24,7 @@ import gaia.cu9.ari.gaiaorbit.util.Logger;
  *
  */
 public class StarGroupSerializedIO implements IStarGroupIO {
+    private static final Log logger = Logger.getLogger(StarGroupSerializedIO.class);
 
     IStarGroupDataProvider provider;
 
@@ -52,7 +54,7 @@ public class StarGroupSerializedIO implements IStarGroupIO {
                 oos.close();
 
             } catch (Exception e) {
-                Logger.error(e);
+                logger.error(e);
             }
         }
     }

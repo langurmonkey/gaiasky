@@ -16,6 +16,7 @@ import gaia.cu9.ari.gaiaorbit.scenegraph.octreewrapper.AbstractOctreeWrapper;
 import gaia.cu9.ari.gaiaorbit.scenegraph.octreewrapper.OctreeWrapper;
 import gaia.cu9.ari.gaiaorbit.util.I18n;
 import gaia.cu9.ari.gaiaorbit.util.Logger;
+import gaia.cu9.ari.gaiaorbit.util.Logger.Log;
 import gaia.cu9.ari.gaiaorbit.util.math.Vector3d;
 import gaia.cu9.ari.gaiaorbit.util.tree.LoadStatus;
 import gaia.cu9.ari.gaiaorbit.util.tree.OctreeNode;
@@ -28,6 +29,8 @@ import gaia.cu9.ari.gaiaorbit.util.tree.OctreeNode;
  * @author tsagrista
  */
 public class OctreeMultiFileLoader extends StreamingOctreeLoader {
+    private static final Log logger = Logger.getLogger(OctreeMultiFileLoader.class);
+    
     /**
      * Data will be pre-loaded at startup down to this octree depth.
      */
@@ -50,13 +53,13 @@ public class OctreeMultiFileLoader extends StreamingOctreeLoader {
          * LOAD METADATA
          */
 
-        Logger.info(this.getClass().getSimpleName(), I18n.bundle.format("notif.loading", metadata));
+        logger.info(I18n.bundle.format("notif.loading", metadata));
 
         MetadataBinaryIO metadataReader = new MetadataBinaryIO();
         OctreeNode root = metadataReader.readMetadata(Gdx.files.internal(metadata).read());
 
-        Logger.info(this.getClass().getSimpleName(), I18n.bundle.format("notif.nodeloader", root.numNodes(), metadata));
-        Logger.info(this.getClass().getSimpleName(), I18n.bundle.format("notif.loading", particles));
+        logger.info(I18n.bundle.format("notif.nodeloader", root.numNodes(), metadata));
+        logger.info(I18n.bundle.format("notif.loading", particles));
 
         /**
          * CREATE OCTREE WRAPPER WITH ROOT NODE
@@ -85,7 +88,7 @@ public class OctreeMultiFileLoader extends StreamingOctreeLoader {
             }
 
         } catch (IOException e) {
-            Logger.error(e);
+            logger.error(e);
         }
         return octreeWrapper;
     }

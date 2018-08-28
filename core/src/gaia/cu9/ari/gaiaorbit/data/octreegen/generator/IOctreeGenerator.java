@@ -7,12 +7,14 @@ import com.badlogic.gdx.utils.Array;
 import gaia.cu9.ari.gaiaorbit.scenegraph.StarGroup.StarBean;
 import gaia.cu9.ari.gaiaorbit.util.Constants;
 import gaia.cu9.ari.gaiaorbit.util.Logger;
+import gaia.cu9.ari.gaiaorbit.util.Logger.Log;
 import gaia.cu9.ari.gaiaorbit.util.math.BoundingBoxd;
 import gaia.cu9.ari.gaiaorbit.util.math.Longref;
 import gaia.cu9.ari.gaiaorbit.util.math.Vector3d;
 import gaia.cu9.ari.gaiaorbit.util.tree.OctreeNode;
 
 public interface IOctreeGenerator {
+    public static final Log logger = Logger.getLogger(IOctreeGenerator.class);
 
     public OctreeNode generateOctree(Array<StarBean> catalog);
 
@@ -26,7 +28,7 @@ public interface IOctreeGenerator {
 
     static OctreeNode startGeneration(Array<StarBean> catalog, Class<?> clazz, OctreeGeneratorParams params) {
         
-        Logger.info(clazz.getSimpleName(), "Starting generation of octree");
+        logger.info("Starting generation of octree");
 
         /** Maximum distance allowed **/
         double maxdist = Double.MIN_VALUE;

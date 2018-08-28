@@ -13,6 +13,7 @@ import gaia.cu9.ari.gaiaorbit.util.GlobalConf;
 import gaia.cu9.ari.gaiaorbit.util.GlobalConf.ImageFormat;
 import gaia.cu9.ari.gaiaorbit.util.I18n;
 import gaia.cu9.ari.gaiaorbit.util.Logger;
+import gaia.cu9.ari.gaiaorbit.util.Logger.Log;
 
 /**
  * Buffers the writing of images to disk.
@@ -21,6 +22,8 @@ import gaia.cu9.ari.gaiaorbit.util.Logger;
  *
  */
 public class BufferedFileImageRenderer implements IFileImageRenderer {
+    private static final Log logger = Logger.getLogger(BufferedFileImageRenderer.class);
+    
     /** Daemon timer **/
     private static Timer timer = new Timer(true);
 
@@ -70,7 +73,7 @@ public class BufferedFileImageRenderer implements IFileImageRenderer {
             final int size = outputFrameBufferCopy.size();
             if (size > 0) {
                 // Notify
-                Logger.info(I18n.bundle.get("notif.flushframebuffer"));
+                logger.info(I18n.bundle.get("notif.flushframebuffer"));
 
                 TimerTask tt = new TimerTask() {
                     @Override
@@ -82,7 +85,7 @@ public class BufferedFileImageRenderer implements IFileImageRenderer {
                             folder = bf.folder;
                             bfPool.free(bf);
                         }
-                        Logger.info(I18n.bundle.format("notif.flushframebuffer.finished", size, folder));
+                        logger.info(I18n.bundle.format("notif.flushframebuffer.finished", size, folder));
                     }
                 };
                 timer.schedule(tt, 0);

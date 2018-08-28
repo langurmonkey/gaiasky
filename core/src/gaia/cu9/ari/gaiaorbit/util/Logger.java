@@ -25,7 +25,7 @@ public class Logger {
 
     public static LoggerLevel level = LoggerLevel.INFO;
 
-    public static void error(Throwable t, String tag) {
+    private static void error(Throwable t, String tag) {
         if (inLevel(LoggerLevel.ERROR))
             if (EventManager.instance.hasSubscriptors(Events.JAVA_EXCEPTION)) {
                 EventManager.instance.post(Events.JAVA_EXCEPTION, t, tag);
@@ -35,7 +35,7 @@ public class Logger {
             }
     }
 
-    public static void error(Throwable t) {
+    private static void error(Throwable t) {
         if (inLevel(LoggerLevel.ERROR))
             if (EventManager.instance.hasSubscriptors(Events.JAVA_EXCEPTION)) {
                 EventManager.instance.post(Events.JAVA_EXCEPTION, t);
@@ -54,7 +54,7 @@ public class Logger {
             log(messages);
     }
 
-    public static void info(Object... messages) {
+    private static void info(Object... messages) {
         if (inLevel(LoggerLevel.INFO)) {
             log(messages);
         }

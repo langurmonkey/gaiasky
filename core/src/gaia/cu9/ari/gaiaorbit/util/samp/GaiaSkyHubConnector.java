@@ -4,6 +4,7 @@ import org.astrogrid.samp.client.ClientProfile;
 import org.astrogrid.samp.client.HubConnector;
 
 import gaia.cu9.ari.gaiaorbit.util.Logger;
+import gaia.cu9.ari.gaiaorbit.util.Logger.Log;
 
 /**
  * Extends hub connector to provide some very basic logging using
@@ -12,7 +13,8 @@ import gaia.cu9.ari.gaiaorbit.util.Logger;
  *
  */
 public class GaiaSkyHubConnector extends HubConnector {
-
+    private static final Log logger = Logger.getLogger(GaiaSkyHubConnector.class);
+    
     public GaiaSkyHubConnector(ClientProfile profile) {
         super(profile);
     }
@@ -20,13 +22,13 @@ public class GaiaSkyHubConnector extends HubConnector {
     @Override
     protected void connectionChanged(boolean isConnected) {
         super.connectionChanged(isConnected);
-        Logger.info(this.getClass().getSimpleName(), isConnected ? "Connected to SAMP hub" : "Disconnected from SAMP hub");
+        logger.info(isConnected ? "Connected to SAMP hub" : "Disconnected from SAMP hub");
     }
 
     @Override
     protected void disconnect() {
         super.disconnect();
-        Logger.info(this.getClass().getSimpleName(), "Disconnected from SAMP hub");
+        logger.info("Disconnected from SAMP hub");
     }
 
 }

@@ -12,9 +12,11 @@ import com.badlogic.gdx.utils.Array;
 import gaia.cu9.ari.gaiaorbit.event.EventManager;
 import gaia.cu9.ari.gaiaorbit.event.Events;
 import gaia.cu9.ari.gaiaorbit.event.IObserver;
+import gaia.cu9.ari.gaiaorbit.util.Logger.Log;
 
 public class MusicManager implements IObserver {
-
+    private static final Log logger = Logger.getLogger(MusicManager.class);
+    
     public static MusicManager instance;
     private static FileHandle[] folders;
 
@@ -46,7 +48,7 @@ public class MusicManager implements IObserver {
             for (FileHandle folder : folders) {
                 GlobalResources.listRec(folder, musicFiles, new MusicFileFilter());
             }
-            Logger.info(I18n.bundle.format("gui.music.load", musicFiles.size));
+            logger.info(I18n.bundle.format("gui.music.load", musicFiles.size));
         } else {
             musicFiles = new Array<FileHandle>();
         }
@@ -87,9 +89,9 @@ public class MusicManager implements IObserver {
                 }
             });
             currentMusic.play();
-            Logger.info(I18n.bundle.format("gui.music.playing", musicFiles.get(i).name()));
+            logger.info(I18n.bundle.format("gui.music.playing", musicFiles.get(i).name()));
         } catch (Exception e) {
-            Logger.error(e);
+            logger.error(e);
         }
     }
 

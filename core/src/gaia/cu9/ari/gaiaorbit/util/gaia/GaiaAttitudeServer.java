@@ -6,6 +6,7 @@ import gaia.cu9.ari.gaiaorbit.util.BinarySearchTree;
 import gaia.cu9.ari.gaiaorbit.util.GlobalConf;
 import gaia.cu9.ari.gaiaorbit.util.I18n;
 import gaia.cu9.ari.gaiaorbit.util.Logger;
+import gaia.cu9.ari.gaiaorbit.util.Logger.Log;
 import gaia.cu9.ari.gaiaorbit.util.math.Quaterniond;
 
 /**
@@ -17,6 +18,7 @@ import gaia.cu9.ari.gaiaorbit.util.math.Quaterniond;
  *
  */
 public class GaiaAttitudeServer {
+    private static final Log logger = Logger.getLogger(GaiaAttitudeServer.class);
 
     public static GaiaAttitudeServer instance;
 
@@ -64,7 +66,7 @@ public class GaiaAttitudeServer {
 
                 if (prevAttitude != null && !att.equals(prevAttitude)) {
                     // Change!
-                    Logger.info(this.getClass().getSimpleName(), I18n.bundle.format("notif.attitude.changed", att.toString(), att.activationTime));
+                    logger.info(I18n.bundle.format("notif.attitude.changed", att.toString(), att.activationTime));
                 }
 
                 prevAttitude = att;

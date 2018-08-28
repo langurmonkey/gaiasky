@@ -93,7 +93,7 @@ public abstract class ImmediateRenderSystem extends AbstractRenderSystem {
 
 	protected void checkRequiredVerticesSize(int requiredSize) {
 		if (vertices.length < requiredSize) {
-			Logger.info(this.getClass().getSimpleName(), "Allocating new vertex array: " + vertices.length + " > " + requiredSize);
+			logger.info("Allocating new vertex array: " + vertices.length + " > " + requiredSize);
 			vertices = new float[requiredSize];
 		}
 	}

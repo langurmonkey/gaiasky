@@ -135,7 +135,7 @@ public abstract class Satellite extends ModelBody {
         try {
             this.parentOrientation = Boolean.parseBoolean(parentorientation);
         } catch (Exception e) {
-            Logger.error(e);
+            Logger.getLogger(this.getClass()).error(e);
         }
     }
 
@@ -143,7 +143,7 @@ public abstract class Satellite extends ModelBody {
         try {
             this.hidden = Boolean.parseBoolean(hidden);
         } catch (Exception e) {
-            Logger.error(e);
+            Logger.getLogger(this.getClass()).error(e);
         }
     }
 

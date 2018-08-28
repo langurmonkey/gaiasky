@@ -32,9 +32,9 @@ public class BinaryDataProvider extends AbstractStarGroupDataProvider {
 
     @Override
     public Array<? extends ParticleBean> loadData(String file, double factor) {
-        Logger.info(this.getClass().getSimpleName(), I18n.bundle.format("notif.datafile", file));
+        logger.info(I18n.bundle.format("notif.datafile", file));
         loadDataMapped(file, factor);
-        Logger.info(this.getClass().getSimpleName(), I18n.bundle.format("notif.nodeloader", list.size, file));
+        logger.info(I18n.bundle.format("notif.nodeloader", list.size, file));
 
         return list;
     }
@@ -56,12 +56,12 @@ public class BinaryDataProvider extends AbstractStarGroupDataProvider {
             }
 
         } catch (Exception e) {
-            Logger.error(e);
+            logger.error(e);
         } finally {
             try {
                 data_out.close();
             } catch (IOException e) {
-                Logger.error(e);
+                logger.error(e);
             }
         }
 
@@ -99,12 +99,12 @@ public class BinaryDataProvider extends AbstractStarGroupDataProvider {
             }
 
         } catch (IOException e) {
-            Logger.error(e);
+            logger.error(e);
         } finally {
             try {
                 data_in.close();
             } catch (IOException e) {
-                Logger.error(e);
+                logger.error(e);
             }
         }
 
@@ -152,7 +152,7 @@ public class BinaryDataProvider extends AbstractStarGroupDataProvider {
             return list;
 
         } catch (Exception e) {
-            Logger.error(e);
+            logger.error(e);
         }
         return null;
     }

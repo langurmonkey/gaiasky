@@ -19,12 +19,14 @@ import gaia.cu9.ari.gaiaorbit.scenegraph.ParticleGroup.ParticleBean;
 import gaia.cu9.ari.gaiaorbit.util.Constants;
 import gaia.cu9.ari.gaiaorbit.util.I18n;
 import gaia.cu9.ari.gaiaorbit.util.Logger;
+import gaia.cu9.ari.gaiaorbit.util.Logger.Log;
 import gaia.cu9.ari.gaiaorbit.util.SysUtilsFactory;
 import gaia.cu9.ari.gaiaorbit.util.parse.Parser;
 import gaia.cu9.ari.gaiaorbit.util.units.Position;
 import gaia.cu9.ari.gaiaorbit.util.units.Position.PositionType;
 
 public class SDSSDataProvider implements IParticleGroupDataProvider {
+    private static final Log logger = Logger.getLogger(SDSSDataProvider.class);
 
     public Array<ParticleBean> loadData(String file) {
         return loadData(file, 1d);
@@ -37,7 +39,7 @@ public class SDSSDataProvider implements IParticleGroupDataProvider {
         //Array<ParticleBean> pointData = (Array<ParticleBean>) loadData(f.read(), factor);
         Array<ParticleBean> pointData = (Array<ParticleBean>) loadDataMapped(SysUtilsFactory.getSysUtils().getTruePath(file), factor);
         if (pointData != null)
-            Logger.info(this.getClass().getSimpleName(), I18n.bundle.format("notif.nodeloader", pointData.size, file));
+            logger.info(I18n.bundle.format("notif.nodeloader", pointData.size, file));
 
         return pointData;
     }
@@ -52,7 +54,7 @@ public class SDSSDataProvider implements IParticleGroupDataProvider {
             br.close();
 
         } catch (Exception e) {
-            Logger.error(e, SDSSDataProvider.class.getName());
+            logger.error(e);
             return null;
         }
 
@@ -109,7 +111,7 @@ public class SDSSDataProvider implements IParticleGroupDataProvider {
             }
             fc.close();
         } catch (Exception e) {
-            Logger.error(e, SDSSDataProvider.class.getName());
+            logger.error(e);
             return null;
         }
         return pointData;

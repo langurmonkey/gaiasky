@@ -27,6 +27,7 @@ import gaia.cu9.ari.gaiaorbit.util.math.MathUtilsd;
  */
 public class GlobalConf {
     private static final Log logger = Logger.getLogger(GlobalConf.class);
+    
     public static final String APPLICATION_NAME = "Gaia Sky";
     public static final String WEBPAGE = "https://www.zah.uni-heidelberg.de/gaia/outreach/gaiasky";
     public static final String WEBPAGE_DOWNLOADS = "https://www.zah.uni-heidelberg.de/gaia/outreach/gaiasky/downloads";
@@ -689,8 +690,8 @@ public class GlobalConf {
                         EventManager.instance.post(Events.DISPLAY_GUI_CMD, I18n.bundle.get("notif.cleanmode"), true);
                     }
 
-                    Logger.info("You have entered 3D mode. Go back to normal mode using <CTRL+S>");
-                    Logger.info("Switch between stereoscopic modes using <CTRL+SHIFT+S>");
+                    logger.info("You have entered 3D mode. Go back to normal mode using <CTRL+S>");
+                    logger.info("Switch between stereoscopic modes using <CTRL+SHIFT+S>");
                 }
                 break;
             case STEREO_PROFILE_CMD:
@@ -700,12 +701,12 @@ public class GlobalConf {
                 CUBEMAP360_MODE = (Boolean) data[0];
                 EventManager.instance.post(Events.DISPLAY_GUI_CMD, I18n.bundle.get("notif.cleanmode"), !CUBEMAP360_MODE);
 
-                Logger.info("You have entered the 360 mode.  Go back to normal mode using <CTRL+K>");
-                Logger.info("Switch between cubemap projections using <CTRL+SHIFT+K>");
+                logger.info("You have entered the 360 mode.  Go back to normal mode using <CTRL+K>");
+                logger.info("Switch between cubemap projections using <CTRL+SHIFT+K>");
                 break;
             case CUBEMAP_PROJECTION_CMD:
                 CUBEMAP_PROJECTION = (CubemapProjection) data[0];
-                Logger.info("Cubemap projection set to " + CUBEMAP_PROJECTION.toString());
+                logger.info("Cubemap projection set to " + CUBEMAP_PROJECTION.toString());
                 break;
             default:
                 break;

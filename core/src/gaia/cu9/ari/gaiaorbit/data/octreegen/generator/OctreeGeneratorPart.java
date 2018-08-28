@@ -50,7 +50,7 @@ public class OctreeGeneratorPart implements IOctreeGenerator {
      * @param percentage
      */
     private void treatLevel(Map<OctreeNode, Array<StarBean>> inputLists, int level, Array<OctreeNode>[] octantsPerLevel, float percentage) {
-        Logger.info(this.getClass().getSimpleName(), "Generating level " + level);
+        logger.info("Generating level " + level);
         Array<OctreeNode> levelOctants = octantsPerLevel[level];
 
         octantsPerLevel[level + 1] = new Array<OctreeNode>(levelOctants.size * 8);

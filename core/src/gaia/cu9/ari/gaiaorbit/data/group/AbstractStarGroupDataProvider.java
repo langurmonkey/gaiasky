@@ -31,7 +31,8 @@ import gaia.cu9.ari.gaiaorbit.util.math.Vector3d;
 import gaia.cu9.ari.gaiaorbit.util.parse.Parser;
 
 public abstract class AbstractStarGroupDataProvider implements IStarGroupDataProvider {
-    private static Log logger = Logger.getLogger(AbstractStarGroupDataProvider.class);
+    protected static Log logger = Logger.getLogger(AbstractStarGroupDataProvider.class);
+
     protected Array<StarBean> list;
     protected LongMap<double[]> sphericalPositions;
     protected LongMap<float[]> colors;

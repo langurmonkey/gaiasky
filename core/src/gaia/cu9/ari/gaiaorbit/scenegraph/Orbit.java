@@ -18,6 +18,7 @@ import gaia.cu9.ari.gaiaorbit.scenegraph.component.OrbitComponent;
 import gaia.cu9.ari.gaiaorbit.util.Constants;
 import gaia.cu9.ari.gaiaorbit.util.GlobalConf;
 import gaia.cu9.ari.gaiaorbit.util.Logger;
+import gaia.cu9.ari.gaiaorbit.util.Logger.Log;
 import gaia.cu9.ari.gaiaorbit.util.coord.Coordinates;
 import gaia.cu9.ari.gaiaorbit.util.math.MathUtilsd;
 import gaia.cu9.ari.gaiaorbit.util.math.Matrix4d;
@@ -25,6 +26,7 @@ import gaia.cu9.ari.gaiaorbit.util.math.Vector3d;
 import gaia.cu9.ari.gaiaorbit.util.time.ITimeFrameProvider;
 
 public class Orbit extends Polyline {
+    private static final Log logger = Logger.getLogger(Orbit.class);
 
     /** Threshold angle **/
     protected static final float ANGLE_LIMIT = (float) Math.toRadians(1.5);
@@ -59,6 +61,7 @@ public class Orbit extends Polyline {
         curr = new Vector3d();
     }
 
+    @SuppressWarnings("unchecked")
     @Override
     public void initialize() {
         if (!onlybody)
@@ -71,10 +74,10 @@ public class Orbit extends Polyline {
                     provider.load(oc.source, new OrbitDataLoader.OrbitDataLoaderParameter(name, providerClass, oc, multiplier, 100), newmethod);
                     polylineData = provider.getData();
                 } catch (Exception e) {
-                    Logger.error(e, getClass().getSimpleName());
+                    logger.error(e);
                 }
             } catch (ReflectionException e) {
-                Logger.error(e, getClass().getSimpleName());
+                logger.error(e);
             }
     }
 
@@ -212,7 +215,7 @@ public class Orbit extends Polyline {
                 Method m = ClassReflection.getMethod(Coordinates.class, transformFunction);
                 this.transformFunction = (Matrix4d) m.invoke(null);
             } catch (Exception e) {
-                Logger.error(e);
+                logger.error(e);
             }
 
         }

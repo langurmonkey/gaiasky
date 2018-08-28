@@ -23,11 +23,11 @@ public class SerializedDataProvider extends AbstractStarGroupDataProvider {
     }
 
     public Array<StarBean> loadData(String file, double factor) {
-        Logger.info(this.getClass().getSimpleName(), I18n.bundle.format("notif.datafile", file));
+        logger.info(I18n.bundle.format("notif.datafile", file));
 
         FileHandle f = Gdx.files.internal(file);
         loadData(f.read(), factor);
-        Logger.info(this.getClass().getSimpleName(), I18n.bundle.format("notif.nodeloader", list.size, file));
+        logger.info(I18n.bundle.format("notif.nodeloader", list.size, file));
 
         return list;
     }
@@ -50,7 +50,7 @@ public class SerializedDataProvider extends AbstractStarGroupDataProvider {
 
             return list;
         } catch (Exception e) {
-            Logger.error(e, this.getClass().getSimpleName());
+            logger.error(e);
         }
         return null;
     }

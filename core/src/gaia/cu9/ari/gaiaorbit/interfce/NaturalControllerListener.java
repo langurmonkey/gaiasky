@@ -13,9 +13,11 @@ import gaia.cu9.ari.gaiaorbit.scenegraph.camera.CameraManager.CameraMode;
 import gaia.cu9.ari.gaiaorbit.scenegraph.camera.NaturalCamera;
 import gaia.cu9.ari.gaiaorbit.util.GlobalConf;
 import gaia.cu9.ari.gaiaorbit.util.Logger;
+import gaia.cu9.ari.gaiaorbit.util.Logger.Log;
 import gaia.cu9.ari.gaiaorbit.util.SysUtilsFactory;
 
 public class NaturalControllerListener implements ControllerListener, IObserver {
+    private static final Log logger = Logger.getLogger(NaturalControllerListener.class);
 
     NaturalCamera cam;
     IControllerMappings mappings;
@@ -36,7 +38,7 @@ public class NaturalControllerListener implements ControllerListener, IObserver 
         String osMappingsFile = pre + "." + os + "." + post;
         if (Gdx.files.absolute(osMappingsFile).exists()) {
             mappingsFile = osMappingsFile;
-            Logger.info("Controller mappings file set to " + mappingsFile);
+            logger.info("Controller mappings file set to " + mappingsFile);
         }
 
         if (Gdx.files.absolute(mappingsFile).exists())
@@ -50,18 +52,18 @@ public class NaturalControllerListener implements ControllerListener, IObserver 
 
     @Override
     public void connected(Controller controller) {
-        Logger.info(this.getClass().getSimpleName(), "Controller connected: " + controller.getName());
+        logger.info("Controller connected: " + controller.getName());
     }
 
     @Override
     public void disconnected(Controller controller) {
-        Logger.info(this.getClass().getSimpleName(), "Controller disconnected: " + controller.getName());
+        logger.info("Controller disconnected: " + controller.getName());
     }
 
     @Override
     public boolean buttonDown(Controller controller, int buttonCode) {
         if (GlobalConf.controls.DEBUG_MODE) {
-            Logger.info("button down [controller/code]: " + controller.getName() + " / " + buttonCode);
+            logger.info("button down [controller/code]: " + controller.getName() + " / " + buttonCode);
         }
 
         if (buttonCode == mappings.getButtonVelocityMultiplierHalf()) {
@@ -81,7 +83,7 @@ public class NaturalControllerListener implements ControllerListener, IObserver 
     @Override
     public boolean buttonUp(Controller controller, int buttonCode) {
         if (GlobalConf.controls.DEBUG_MODE) {
-            Logger.info("button up [controller/code]: " + controller.getName() + " / " + buttonCode);
+            logger.info("button up [controller/code]: " + controller.getName() + " / " + buttonCode);
         }
 
         if (buttonCode == mappings.getButtonVelocityMultiplierHalf()) {
@@ -102,7 +104,7 @@ public class NaturalControllerListener implements ControllerListener, IObserver 
     public boolean axisMoved(Controller controller, int axisCode, float value) {
         if (GlobalConf.controls.DEBUG_MODE) {
             if (Math.abs(value) > 0.1)
-                Logger.info("axis moved [controller/code/value]: " + controller.getName() + " / " + axisCode + " / " + value);
+                logger.info("axis moved [controller/code/value]: " + controller.getName() + " / " + axisCode + " / " + value);
         }
 
         boolean treated = false;

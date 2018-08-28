@@ -469,12 +469,12 @@ public class SpacecraftCamera extends AbstractCamera implements IObserver {
 
         @Override
         public void connected(Controller controller) {
-            Logger.info(this.getClass().getSimpleName(), "Controller connected: " + controller.getName());
+            logger.info("Controller connected: " + controller.getName());
         }
 
         @Override
         public void disconnected(Controller controller) {
-            Logger.info(this.getClass().getSimpleName(), "Controller disconnected: " + controller.getName());
+            logger.info("Controller disconnected: " + controller.getName());
         }
 
         @Override

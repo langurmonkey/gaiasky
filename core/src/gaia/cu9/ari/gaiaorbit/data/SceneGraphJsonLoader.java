@@ -89,7 +89,7 @@ public class SceneGraphJsonLoader {
             sg.initialize(nodes, time, hasOctree, hasStarGroup);
 
         } catch (Exception e) {
-            Logger.error(e);
+            Logger.getLogger(SceneGraphJsonLoader.class).error(e);
         }
         return sg;
     }

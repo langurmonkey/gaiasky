@@ -70,6 +70,7 @@ import gaia.cu9.ari.gaiaorbit.util.ComponentTypes;
 import gaia.cu9.ari.gaiaorbit.util.GlobalConf;
 import gaia.cu9.ari.gaiaorbit.util.GlobalResources;
 import gaia.cu9.ari.gaiaorbit.util.Logger;
+import gaia.cu9.ari.gaiaorbit.util.Logger.Log;
 import gaia.cu9.ari.gaiaorbit.util.gravwaves.RelativisticEffectsManager;
 import gaia.cu9.ari.gaiaorbit.util.math.MathUtilsd;
 import gaia.cu9.ari.gaiaorbit.util.math.Vector3d;
@@ -85,6 +86,7 @@ import gaia.cu9.ari.gaiaorbit.util.override.ShaderProgramProvider.ShaderProgramP
  *
  */
 public class SceneGraphRenderer extends AbstractRenderer implements IProcessRenderer, IObserver {
+    private static final Log logger = Logger.getLogger(SceneGraphRenderer.class);
 
     /** Contains the flags representing each type's visibility **/
     public static ComponentTypes visible;
@@ -273,7 +275,7 @@ public class SceneGraphRenderer extends AbstractRenderer implements IProcessRend
         for (int i = 0; i < n; i++) {
             shaders[i] = manager.get(descriptors[i]);
             if (!shaders[i].isCompiled()) {
-                Logger.error(new RuntimeException(), this.getClass().getName() + " - " + names[i] + " shader compilation failed:\n" + shaders[i].getLog());
+                logger.error(new RuntimeException(), names[i] + " shader compilation failed:\n" + shaders[i].getLog());
             }
         }
         return shaders;
@@ -283,7 +285,7 @@ public class SceneGraphRenderer extends AbstractRenderer implements IProcessRend
         IntBuffer intBuffer = BufferUtils.newIntBuffer(16);
         Gdx.gl20.glGetIntegerv(GL20.GL_MAX_TEXTURE_SIZE, intBuffer);
         maxTexSize = intBuffer.get();
-        Logger.info(this.getClass().getSimpleName(), "Max texture size: " + maxTexSize + "^2 pixels");
+        logger.info("Max texture size: " + maxTexSize + "^2 pixels");
 
         /**
          * STAR SHADER
@@ -300,7 +302,7 @@ public class SceneGraphRenderer extends AbstractRenderer implements IProcessRend
          */
         fontShader = manager.get("shader/font.vertex.glsl");
         if (!fontShader.isCompiled()) {
-            Logger.error(new RuntimeException(), this.getClass().getName() + " - Font shader compilation failed:\n" + fontShader.getLog());
+            logger.error(new RuntimeException(), "Font shader compilation failed:\n" + fontShader.getLog());
         }
 
         /**

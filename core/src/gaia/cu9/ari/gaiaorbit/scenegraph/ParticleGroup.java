@@ -165,7 +165,7 @@ public class ParticleGroup extends FadeNode implements I3DTextRenderable, IFocus
             }
 
         } catch (Exception e) {
-            Logger.error(e, getClass().getSimpleName());
+            Logger.getLogger(this.getClass()).error(e);
             pointData = null;
         }
     }

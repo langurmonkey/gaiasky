@@ -18,7 +18,7 @@ public class OrbitLintCoordinates extends AbstractOrbitCoordinates {
     @Override
     public void doneLoading(Object... params) {
         if (params.length == 0) {
-            Logger.error(new RuntimeException("OrbitLintCoordinates need the scene graph"));
+            logger.error(new RuntimeException("OrbitLintCoordinates need the scene graph"));
         } else {
             super.doneLoading(params);
             transf = new Matrix4d();

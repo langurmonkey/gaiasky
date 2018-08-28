@@ -38,13 +38,13 @@ public class OctreeGeneratorMag implements IOctreeGenerator {
 
         Map<OctreeNode, Array<StarBean>> sbMap = new HashMap<OctreeNode, Array<StarBean>>();
 
-        Logger.info(this.getClass().getSimpleName(), "Sorting source catalog with " + catalog.size + " stars");
+        logger.info("Sorting source catalog with " + catalog.size + " stars");
         catalog.sort(comp);
-        Logger.info(this.getClass().getSimpleName(), "Catalog sorting done");
+        logger.info("Catalog sorting done");
 
         int catalogIndex = 0;
         for (int level = 0; level < 25; level++) {
-            Logger.info(this.getClass().getSimpleName(), "Generating level " + level + " (" + (catalog.size - catalogIndex) + " stars left)");
+            logger.info("Generating level " + level + " (" + (catalog.size - catalogIndex) + " stars left)");
             while (catalogIndex < catalog.size) {
                 // Add star beans to octants till we reach max capacity
                 StarBean sb = catalog.get(catalogIndex++);
@@ -105,9 +105,9 @@ public class OctreeGeneratorMag implements IOctreeGenerator {
                 }
             }
 
-            Logger.info("POSTPROCESS EMPTY STATS:");
-            Logger.info("    Merged nodes:    " + mergedNodes);
-            Logger.info("    Merged objects:  " + mergedObjects);
+            logger.info("POSTPROCESS EMPTY STATS:");
+            logger.info("    Merged nodes:    " + mergedNodes);
+            logger.info("    Merged objects:  " + mergedObjects);
         }
 
         // Tree is ready, create star groups

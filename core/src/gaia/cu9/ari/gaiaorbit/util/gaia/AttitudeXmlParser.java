@@ -18,6 +18,7 @@ import com.badlogic.gdx.utils.XmlReader;
 import gaia.cu9.ari.gaiaorbit.util.BinarySearchTree;
 import gaia.cu9.ari.gaiaorbit.util.I18n;
 import gaia.cu9.ari.gaiaorbit.util.Logger;
+import gaia.cu9.ari.gaiaorbit.util.Logger.Log;
 import gaia.cu9.ari.gaiaorbit.util.Nature;
 import gaia.cu9.ari.gaiaorbit.util.coord.AstroUtils;
 import gaia.cu9.ari.gaiaorbit.util.format.DateFormatFactory;
@@ -32,7 +33,8 @@ import gaia.cu9.ari.gaiaorbit.util.units.Quantity;
  * @author Toni Sagrista
  */
 public class AttitudeXmlParser {
-
+    private static final Log logger = Logger.getLogger(AttitudeXmlParser.class);
+    
     private static Instant endOfMission;
     private static IDateFormat format;
 
@@ -94,7 +96,7 @@ public class AttitudeXmlParser {
                     datesMap.put(date, fh);
                 }
             } catch (IOException e) {
-                Logger.error(e, I18n.bundle.format("error.file.parse", fh.name()));
+                logger.error(e, I18n.bundle.format("error.file.parse", fh.name()));
             }
         }
         Map<FileHandle, Duration> durationMap = new HashMap<FileHandle, Duration>();
@@ -128,18 +130,18 @@ public class AttitudeXmlParser {
 
         // PARSE ATTITUDES
         for (FileHandle fh : list) {
-            Logger.info(I18n.bundle.format("notif.attitude.loadingfile", fh.name()));
+            logger.info(I18n.bundle.format("notif.attitude.loadingfile", fh.name()));
             try {
                 AttitudeIntervalBean att = parseFile(fh, durationMap.get(fh), findActivationDate(fh, datesMap));
                 bst.insert(att);
             } catch (IOException e) {
-                Logger.error(e, I18n.bundle.format("error.file.parse", fh.name()));
+                logger.error(e, I18n.bundle.format("error.file.parse", fh.name()));
             } catch (Exception e) {
-                Logger.error(e, I18n.bundle.format("notif.error", e.getMessage()));
+                logger.error(e, I18n.bundle.format("notif.error", e.getMessage()));
             }
         }
 
-        Logger.info(I18n.bundle.format("notif.attitude.initialized", list.length));
+        logger.info(I18n.bundle.format("notif.attitude.initialized", list.length));
         return bst;
     }
 
