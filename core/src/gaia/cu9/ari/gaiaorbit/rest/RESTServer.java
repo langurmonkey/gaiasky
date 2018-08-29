@@ -20,6 +20,7 @@ import com.google.gson.GsonBuilder;
 
 import gaia.cu9.ari.gaiaorbit.script.EventScriptingInterface;
 import gaia.cu9.ari.gaiaorbit.script.IScriptingInterface;
+import gaia.cu9.ari.gaiaorbit.util.GlobalConf;
 import gaia.cu9.ari.gaiaorbit.util.Logger;
 import gaia.cu9.ari.gaiaorbit.util.Logger.Log;
 
@@ -119,7 +120,7 @@ public class RESTServer {
 	/**
 	 * REST server static files location.
 	 */
-	private static String rest_static_location = System.getProperty("assets.location") + "rest-static";
+	private static String rest_static_location = GlobalConf.ASSETS_LOC + "/rest-static";
 
         /**
          * Logger

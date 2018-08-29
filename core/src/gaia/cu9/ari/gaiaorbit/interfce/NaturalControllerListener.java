@@ -6,6 +6,7 @@ import com.badlogic.gdx.controllers.ControllerListener;
 import com.badlogic.gdx.controllers.PovDirection;
 import com.badlogic.gdx.math.Vector3;
 
+import gaia.cu9.ari.gaiaorbit.desktop.util.SysUtils;
 import gaia.cu9.ari.gaiaorbit.event.EventManager;
 import gaia.cu9.ari.gaiaorbit.event.Events;
 import gaia.cu9.ari.gaiaorbit.event.IObserver;
@@ -14,7 +15,6 @@ import gaia.cu9.ari.gaiaorbit.scenegraph.camera.NaturalCamera;
 import gaia.cu9.ari.gaiaorbit.util.GlobalConf;
 import gaia.cu9.ari.gaiaorbit.util.Logger;
 import gaia.cu9.ari.gaiaorbit.util.Logger.Log;
-import gaia.cu9.ari.gaiaorbit.util.SysUtilsFactory;
 
 public class NaturalControllerListener implements ControllerListener, IObserver {
     private static final Log logger = Logger.getLogger(NaturalControllerListener.class);
@@ -30,7 +30,7 @@ public class NaturalControllerListener implements ControllerListener, IObserver 
 
     public boolean updateControllerMappings(String mappingsFile) {
         // We look for OS-specific mappings for the given controller. If not found, it defaults to the base
-        String os = SysUtilsFactory.getSysUtils().getOSFamily();
+        String os = SysUtils.getOSFamily();
         int extensionstart = mappingsFile.lastIndexOf('.');
         String pre = mappingsFile.substring(0, extensionstart);
         String post = mappingsFile.substring(extensionstart + 1, mappingsFile.length());

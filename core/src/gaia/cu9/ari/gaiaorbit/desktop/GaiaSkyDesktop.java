@@ -39,7 +39,6 @@ import gaia.cu9.ari.gaiaorbit.desktop.util.CamRecorder;
 import gaia.cu9.ari.gaiaorbit.desktop.util.DesktopConfInit;
 import gaia.cu9.ari.gaiaorbit.desktop.util.DesktopMusicActors;
 import gaia.cu9.ari.gaiaorbit.desktop.util.DesktopNetworkChecker;
-import gaia.cu9.ari.gaiaorbit.desktop.util.DesktopSysUtilsFactory;
 import gaia.cu9.ari.gaiaorbit.desktop.util.LogWriter;
 import gaia.cu9.ari.gaiaorbit.desktop.util.MemInfoWindow;
 import gaia.cu9.ari.gaiaorbit.desktop.util.RunCameraWindow;
@@ -61,7 +60,6 @@ import gaia.cu9.ari.gaiaorbit.util.I18n;
 import gaia.cu9.ari.gaiaorbit.util.Logger;
 import gaia.cu9.ari.gaiaorbit.util.Logger.Log;
 import gaia.cu9.ari.gaiaorbit.util.MusicManager;
-import gaia.cu9.ari.gaiaorbit.util.SysUtilsFactory;
 import gaia.cu9.ari.gaiaorbit.util.format.DateFormatFactory;
 import gaia.cu9.ari.gaiaorbit.util.format.NumberFormatFactory;
 import gaia.cu9.ari.gaiaorbit.util.math.MathManager;
@@ -116,13 +114,8 @@ public class GaiaSkyDesktop implements IObserver {
             javaVersionCheck();
 
             gsd = new GaiaSkyDesktop();
-            // Assets location
-            ASSETS_LOC = (System.getProperty("assets.location") != null ? System.getProperty("assets.location") : "");
-
+            
             Gdx.files = new LwjglFiles();
-
-            // Sys utils
-            SysUtilsFactory.initialize(new DesktopSysUtilsFactory());
 
             // Initialize number format
             NumberFormatFactory.initialize(new DesktopNumberFormatFactory());
@@ -140,7 +133,7 @@ public class GaiaSkyDesktop implements IObserver {
             }
 
             // Init global configuration
-            ConfInit.initialize(new DesktopConfInit(ASSETS_LOC));
+            ConfInit.initialize(new DesktopConfInit());
 
             if (gsargs.version) {
                 System.out.println(GlobalConf.APPLICATION_NAME + " " + GlobalConf.version.version);
@@ -179,7 +172,7 @@ public class GaiaSkyDesktop implements IObserver {
             MusicActorsManager.initialize(new DesktopMusicActors());
 
             // Init music manager
-            MusicManager.initialize(Gdx.files.absolute(ASSETS_LOC + "music"), Gdx.files.absolute(SysUtilsFactory.getSysUtils().getDefaultMusicDir().getAbsolutePath()));
+            MusicManager.initialize(Gdx.files.absolute(ASSETS_LOC + "music"), Gdx.files.absolute(SysUtils.getDefaultMusicDir().getAbsolutePath()));
 
             // Initialize post processor factory
             PostProcessorFactory.initialize(new DesktopPostProcessorFactory());
@@ -334,12 +327,12 @@ public class GaiaSkyDesktop implements IObserver {
     }
 
     private static void initUserDirectory() {
-        SysUtilsFactory.getSysUtils().getGSHomeDir().mkdirs();
-        SysUtilsFactory.getSysUtils().getDefaultFramesDir().mkdirs();
-        SysUtilsFactory.getSysUtils().getDefaultScreenshotsDir().mkdirs();
-        SysUtilsFactory.getSysUtils().getDefaultMusicDir().mkdirs();
-        SysUtilsFactory.getSysUtils().getDefaultScriptDir().mkdirs();
-        SysUtilsFactory.getSysUtils().getDefaultCameraDir().mkdirs();
+        SysUtils.getGSHomeDir().mkdirs();
+        SysUtils.getDefaultFramesDir().mkdirs();
+        SysUtils.getDefaultScreenshotsDir().mkdirs();
+        SysUtils.getDefaultMusicDir().mkdirs();
+        SysUtils.getDefaultScriptDir().mkdirs();
+        SysUtils.getDefaultCameraDir().mkdirs();
     }
 
     /**
@@ -355,7 +348,7 @@ public class GaiaSkyDesktop implements IObserver {
     	 */
     private static String initConfigFile(boolean ow) throws IOException {
         // Use user folder
-        File userFolder = SysUtilsFactory.getSysUtils().getGSHomeDir();
+        File userFolder = SysUtils.getGSHomeDir();
         userFolder.mkdirs();
         File userFolderConfFile = new File(userFolder, "global.properties");
 

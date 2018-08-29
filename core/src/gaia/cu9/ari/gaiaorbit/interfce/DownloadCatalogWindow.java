@@ -32,11 +32,10 @@ import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener.ChangeEvent;
 
+import gaia.cu9.ari.gaiaorbit.desktop.util.SysUtils;
 import gaia.cu9.ari.gaiaorbit.util.GlobalConf;
-import gaia.cu9.ari.gaiaorbit.util.ISysUtils;
 import gaia.cu9.ari.gaiaorbit.util.Logger;
 import gaia.cu9.ari.gaiaorbit.util.Logger.Log;
-import gaia.cu9.ari.gaiaorbit.util.SysUtilsFactory;
 import gaia.cu9.ari.gaiaorbit.util.format.INumberFormat;
 import gaia.cu9.ari.gaiaorbit.util.format.NumberFormatFactory;
 import gaia.cu9.ari.gaiaorbit.util.scene2d.FileChooser;
@@ -83,11 +82,10 @@ public class DownloadCatalogWindow extends GenericDialog {
         downloadTable.add(hg).left().colspan(2).padBottom(pad).row();
         downloadTable.add(catalogsLocLabel).left().padBottom(pad);
 
-        ISysUtils su = SysUtilsFactory.getSysUtils();
-        su.getDefaultCatalogsDir().mkdirs();
+        SysUtils.getDefaultCatalogsDir().mkdirs();
         String catLoc;
         if (GlobalConf.data.CATALOG_LOCATIONS == null || GlobalConf.data.CATALOG_LOCATIONS.length == 0) {
-            catLoc = su.getDefaultCatalogsDir().getAbsolutePath();
+            catLoc = SysUtils.getDefaultCatalogsDir().getAbsolutePath();
             GlobalConf.data.CATALOG_LOCATIONS = new String[] { catLoc };
         } else {
             catLoc = GlobalConf.data.CATALOG_LOCATIONS[0];

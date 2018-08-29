@@ -15,13 +15,13 @@ import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.utils.Array;
 
+import gaia.cu9.ari.gaiaorbit.desktop.util.SysUtils;
 import gaia.cu9.ari.gaiaorbit.scenegraph.ParticleGroup.ParticleBean;
 import gaia.cu9.ari.gaiaorbit.scenegraph.StarGroup.StarBean;
 import gaia.cu9.ari.gaiaorbit.util.Constants;
 import gaia.cu9.ari.gaiaorbit.util.I18n;
 import gaia.cu9.ari.gaiaorbit.util.Logger;
 import gaia.cu9.ari.gaiaorbit.util.Logger.Log;
-import gaia.cu9.ari.gaiaorbit.util.SysUtilsFactory;
 import gaia.cu9.ari.gaiaorbit.util.color.ColourUtils;
 import gaia.cu9.ari.gaiaorbit.util.coord.AstroUtils;
 import gaia.cu9.ari.gaiaorbit.util.coord.Coordinates;
@@ -109,14 +109,14 @@ public class DR2DataProvider extends AbstractStarGroupDataProvider {
             });
             int fn = 0;
             for (FileHandle fh : files) {
-                loadDataMapped(SysUtilsFactory.getSysUtils().getTruePath(fh.path()), factor, fn + 1);
+                loadDataMapped(SysUtils.getTruePath(fh.path()), factor, fn + 1);
                 //loadFileFh(fh, factor, fn + 1);
                 fn++;
                 if (fileNumberCap > 0 && fn >= fileNumberCap)
                     break;
             }
         } else if (f.name().endsWith(".csv") || f.name().endsWith(".gz")) {
-            loadDataMapped(SysUtilsFactory.getSysUtils().getTruePath(file), factor, 1);
+            loadDataMapped(SysUtils.getTruePath(file), factor, 1);
             //loadFileFh(f, factor, 1);
         } else {
             logger.warn("File skipped: " + f.path());

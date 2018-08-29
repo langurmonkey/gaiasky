@@ -20,7 +20,6 @@ import gaia.cu9.ari.gaiaorbit.util.GlobalConf;
 import gaia.cu9.ari.gaiaorbit.util.I18n;
 import gaia.cu9.ari.gaiaorbit.util.Logger;
 import gaia.cu9.ari.gaiaorbit.util.Logger.Log;
-import gaia.cu9.ari.gaiaorbit.util.SysUtilsFactory;
 import gaia.cu9.ari.gaiaorbit.util.math.Vector3d;
 import gaia.cu9.ari.gaiaorbit.util.parse.Parser;
 import gaia.cu9.ari.gaiaorbit.util.time.ITimeFrameProvider;
@@ -154,7 +153,7 @@ public class CamRecorder implements IObserver {
                     return;
                 }
                 // Annotate by date
-                f = new File(SysUtilsFactory.getSysUtils().getDefaultCameraDir(), df.format(new Date()) + "_gscamera.dat");
+                f = new File(SysUtils.getDefaultCameraDir(), df.format(new Date()) + "_gscamera.dat");
                 if (f.exists()) {
                     f.delete();
                 }

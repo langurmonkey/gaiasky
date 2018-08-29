@@ -35,15 +35,14 @@ import gaia.cu9.ari.gaiaorbit.data.octreegen.generator.OctreeGeneratorParams;
 import gaia.cu9.ari.gaiaorbit.desktop.format.DesktopDateFormatFactory;
 import gaia.cu9.ari.gaiaorbit.desktop.format.DesktopNumberFormatFactory;
 import gaia.cu9.ari.gaiaorbit.desktop.util.DesktopConfInit;
-import gaia.cu9.ari.gaiaorbit.desktop.util.DesktopSysUtilsFactory;
 import gaia.cu9.ari.gaiaorbit.desktop.util.LogWriter;
 import gaia.cu9.ari.gaiaorbit.scenegraph.StarGroup.StarBean;
 import gaia.cu9.ari.gaiaorbit.util.ConfInit;
 import gaia.cu9.ari.gaiaorbit.util.Constants;
+import gaia.cu9.ari.gaiaorbit.util.GlobalConf;
 import gaia.cu9.ari.gaiaorbit.util.I18n;
 import gaia.cu9.ari.gaiaorbit.util.Logger;
 import gaia.cu9.ari.gaiaorbit.util.Logger.Log;
-import gaia.cu9.ari.gaiaorbit.util.SysUtilsFactory;
 import gaia.cu9.ari.gaiaorbit.util.format.DateFormatFactory;
 import gaia.cu9.ari.gaiaorbit.util.format.NumberFormatFactory;
 import gaia.cu9.ari.gaiaorbit.util.math.Vector3d;
@@ -158,12 +157,9 @@ public class OctreeGeneratorRun {
             }
 
             // Assets location
-            String ASSETS_LOC = (System.getProperty("assets.location") != null ? System.getProperty("assets.location") : "");
+            String ASSETS_LOC = GlobalConf.ASSETS_LOC;
 
             Gdx.files = new LwjglFiles();
-
-            // Sys utils
-            SysUtilsFactory.initialize(new DesktopSysUtilsFactory());
 
             // Initialize number format
             NumberFormatFactory.initialize(new DesktopNumberFormatFactory());

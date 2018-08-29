@@ -19,11 +19,10 @@ import com.badlogic.gdx.scenes.scene2d.ui.TextTooltip;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener.ChangeEvent;
 import com.badlogic.gdx.utils.Align;
 
+import gaia.cu9.ari.gaiaorbit.desktop.util.SysUtils;
 import gaia.cu9.ari.gaiaorbit.util.GlobalConf;
 import gaia.cu9.ari.gaiaorbit.util.I18n;
-import gaia.cu9.ari.gaiaorbit.util.ISysUtils;
 import gaia.cu9.ari.gaiaorbit.util.Logger;
-import gaia.cu9.ari.gaiaorbit.util.SysUtilsFactory;
 import gaia.cu9.ari.gaiaorbit.util.format.DateFormatFactory;
 import gaia.cu9.ari.gaiaorbit.util.format.DateFormatFactory.DateType;
 import gaia.cu9.ari.gaiaorbit.util.format.IDateFormat;
@@ -120,8 +119,7 @@ public class LogWindow extends GenericDialog {
 
     public void export() {
         String filename = Instant.now().toString() + "_gaiasky.log";
-        ISysUtils su = SysUtilsFactory.getSysUtils();
-        File gshome = su.getGSHomeDir();
+        File gshome = SysUtils.getGSHomeDir();
         File log = new File(gshome, filename);
 
         try {

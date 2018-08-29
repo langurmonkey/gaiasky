@@ -13,15 +13,11 @@ import com.badlogic.gdx.files.FileHandle;
 
 import gaia.cu9.ari.gaiaorbit.desktop.format.DesktopDateFormatFactory;
 import gaia.cu9.ari.gaiaorbit.desktop.format.DesktopNumberFormatFactory;
-import gaia.cu9.ari.gaiaorbit.event.EventManager;
-import gaia.cu9.ari.gaiaorbit.event.Events;
-import gaia.cu9.ari.gaiaorbit.event.IObserver;
 import gaia.cu9.ari.gaiaorbit.util.ConfInit;
 import gaia.cu9.ari.gaiaorbit.util.Constants;
 import gaia.cu9.ari.gaiaorbit.util.I18n;
 import gaia.cu9.ari.gaiaorbit.util.Logger;
 import gaia.cu9.ari.gaiaorbit.util.Nature;
-import gaia.cu9.ari.gaiaorbit.util.SysUtilsFactory;
 import gaia.cu9.ari.gaiaorbit.util.coord.MoonAACoordinates;
 import gaia.cu9.ari.gaiaorbit.util.coord.vsop87.AbstractVSOP87;
 import gaia.cu9.ari.gaiaorbit.util.coord.vsop87.VSOP87;
@@ -41,7 +37,7 @@ public class Positions2DExtractor {
         try {
             NumberFormatFactory.initialize(new DesktopNumberFormatFactory());
             DateFormatFactory.initialize(new DesktopDateFormatFactory());
-            ConfInit.initialize(new DesktopConfInit(SysUtilsFactory.getSysUtils().getAssetsLocation()));
+            ConfInit.initialize(new DesktopConfInit());
         } catch (IOException e) {
             Logger.getLogger(Positions2DExtractor.class).error(e);
         } catch (Exception e) {

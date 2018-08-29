@@ -21,7 +21,7 @@ public class ChooseCatalogWindow extends GenericDialog {
 
     public ChooseCatalogWindow(Stage stage, Skin skin) {
         super(txt("gui.dschooser.title"), skin, stage);
-        assetsLoc = System.getProperty("assets.location") != null ? System.getProperty("assets.location") : "";
+        assetsLoc = GlobalConf.ASSETS_LOC;
 
         setCancelText(txt("gui.exit"));
         setAcceptText(txt("gui.start"));

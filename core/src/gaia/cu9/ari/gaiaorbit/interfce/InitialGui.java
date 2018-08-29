@@ -35,7 +35,7 @@ public class InitialGui extends AbstractGui {
         ui = new Stage(new ScreenViewport(), GlobalResources.spriteBatch);
         skin = GlobalResources.skin;
 
-        String assetsLoc = System.getProperty("assets.location") != null ? System.getProperty("assets.location") : "";
+        String assetsLoc = GlobalConf.ASSETS_LOC; 
         DatasetsWidget dw = new DatasetsWidget(skin, assetsLoc);
         Array<FileHandle> catalogFiles = dw.buildCatalogFiles();
 

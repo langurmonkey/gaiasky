@@ -40,7 +40,6 @@ import gaia.cu9.ari.gaiaorbit.util.GlobalConf.SpacecraftConf;
 import gaia.cu9.ari.gaiaorbit.util.GlobalConf.VersionConf;
 import gaia.cu9.ari.gaiaorbit.util.Logger;
 import gaia.cu9.ari.gaiaorbit.util.Logger.Log;
-import gaia.cu9.ari.gaiaorbit.util.SysUtilsFactory;
 import gaia.cu9.ari.gaiaorbit.util.format.DateFormatFactory;
 import gaia.cu9.ari.gaiaorbit.util.format.IDateFormat;
 import gaia.cu9.ari.gaiaorbit.util.math.MathUtilsd;
@@ -60,7 +59,7 @@ public class DesktopConfInit extends ConfInit {
 
     IDateFormat df = DateFormatFactory.getFormatter("dd/MM/yyyy HH:mm:ss");
 
-    public DesktopConfInit(String assetsLocation) {
+    public DesktopConfInit() {
         super();
         try {
             String propsFileProperty = System.getProperty("properties.file");
@@ -75,7 +74,7 @@ public class DesktopConfInit extends ConfInit {
             InputStream vis = GaiaSkyDesktop.class.getResourceAsStream("/version");
             if (vis == null) {
                 // In case of running in 'developer' mode
-                vis = new FileInputStream(assetsLocation + "data/dummyversion");
+                vis = new FileInputStream(GlobalConf.ASSETS_LOC + "data/dummyversion");
             }
             vp = new Properties();
             vp.load(vis);
@@ -295,7 +294,7 @@ public class DesktopConfInit extends ConfInit {
         /** FRAME CONF **/
         String renderFolder = null;
         if (p.getProperty("graphics.render.folder") == null || p.getProperty("graphics.render.folder").isEmpty()) {
-            File framesDir = SysUtilsFactory.getSysUtils().getDefaultFramesDir();
+            File framesDir = SysUtils.getDefaultFramesDir();
             framesDir.mkdirs();
             renderFolder = framesDir.getAbsolutePath();
         } else {
@@ -332,7 +331,7 @@ public class DesktopConfInit extends ConfInit {
         /** SCREENSHOT CONF **/
         String screenshotFolder = null;
         if (p.getProperty("screenshot.folder") == null || p.getProperty("screenshot.folder").isEmpty()) {
-            File screenshotDir = SysUtilsFactory.getSysUtils().getDefaultScreenshotsDir();
+            File screenshotDir = SysUtils.getDefaultScreenshotsDir();
             screenshotDir.mkdirs();
             screenshotFolder = screenshotDir.getAbsolutePath();
         } else {
@@ -527,7 +526,7 @@ public class DesktopConfInit extends ConfInit {
 
     private String initConfigFile(boolean ow) throws IOException {
         // Use user folder
-        File userFolder = SysUtilsFactory.getSysUtils().getGSHomeDir();
+        File userFolder = SysUtils.getGSHomeDir();
         userFolder.mkdirs();
         File userFolderConfFile = new File(userFolder, "global.properties");
 

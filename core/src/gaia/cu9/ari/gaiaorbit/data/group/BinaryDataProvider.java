@@ -11,11 +11,10 @@ import java.nio.channels.FileChannel;
 
 import com.badlogic.gdx.utils.Array;
 
+import gaia.cu9.ari.gaiaorbit.desktop.util.SysUtils;
 import gaia.cu9.ari.gaiaorbit.scenegraph.ParticleGroup.ParticleBean;
 import gaia.cu9.ari.gaiaorbit.scenegraph.StarGroup.StarBean;
 import gaia.cu9.ari.gaiaorbit.util.I18n;
-import gaia.cu9.ari.gaiaorbit.util.Logger;
-import gaia.cu9.ari.gaiaorbit.util.SysUtilsFactory;
 
 /**
  * Reads arrays of star beans from binary files, usually to go in an octree.
@@ -137,7 +136,7 @@ public class BinaryDataProvider extends AbstractStarGroupDataProvider {
 
     public Array<? extends ParticleBean> loadDataMapped(String file, double factor) {
         try {
-            FileChannel fc = new RandomAccessFile(SysUtilsFactory.getSysUtils().getTruePath(file), "r").getChannel();
+            FileChannel fc = new RandomAccessFile(SysUtils.getTruePath(file), "r").getChannel();
 
             MappedByteBuffer mem = fc.map(FileChannel.MapMode.READ_ONLY, 0, fc.size());
             // Read size of stars

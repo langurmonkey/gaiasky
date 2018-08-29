@@ -27,7 +27,7 @@ import gaia.cu9.ari.gaiaorbit.util.math.MathUtilsd;
  */
 public class GlobalConf {
     private static final Log logger = Logger.getLogger(GlobalConf.class);
-    
+
     public static final String APPLICATION_NAME = "Gaia Sky";
     public static final String WEBPAGE = "https://www.zah.uni-heidelberg.de/gaia/outreach/gaiasky";
     public static final String WEBPAGE_DOWNLOADS = "https://www.zah.uni-heidelberg.de/gaia/outreach/gaiasky/downloads";
@@ -39,6 +39,10 @@ public class GlobalConf {
 
     public static final String TEXTURES_FOLDER = "data/tex/";
 
+    // Assets location for this instance of Gaia Sky
+    public static final String ASSETS_LOC = System.getProperty("assets.location") != null ? System.getProperty("assets.location") : "";
+
+    // Scale factor
     public static float SCALE_FACTOR = -1.0f;
 
     public static void updateScaleFactor(float sf) {
@@ -454,7 +458,7 @@ public class GlobalConf {
 
         /** Locations to look for catalog files additionally to internal **/
         public String[] CATALOG_LOCATIONS;
-        
+
         /** The json data file in case of local data source **/
         public String OBJECTS_JSON_FILES;
 
@@ -577,8 +581,7 @@ public class GlobalConf {
          * List of slave URL locations. Only relevant if {{@link #NET_MASTER} is true
          */
         public List<String> NET_MASTER_SLAVES;
-        
-        
+
         public boolean DISPLAY_TUTORIAL;
         public String TUTORIAL_POINTER_SCRIPT_LOCATION;
         public String TUTORIAL_SCRIPT_LOCATION;
@@ -669,13 +672,13 @@ public class GlobalConf {
         public boolean isUINightMode() {
             return UI_THEME.contains("night");
         }
-        
+
         public String getNetName() {
-        	if(NET_MASTER)
-        		return " MASTER";
-        	else if(NET_SLAVE)
-        		return " SLAVE";
-        	return "";
+            if (NET_MASTER)
+                return " MASTER";
+            else if (NET_SLAVE)
+                return " SLAVE";
+            return "";
         }
 
         @Override

@@ -45,6 +45,7 @@ import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.Array;
 
 import gaia.cu9.ari.gaiaorbit.GaiaSky;
+import gaia.cu9.ari.gaiaorbit.desktop.util.SysUtils;
 import gaia.cu9.ari.gaiaorbit.event.EventManager;
 import gaia.cu9.ari.gaiaorbit.event.Events;
 import gaia.cu9.ari.gaiaorbit.interfce.KeyBindings.ProgramAction;
@@ -60,7 +61,6 @@ import gaia.cu9.ari.gaiaorbit.util.GlobalConf.ScreenshotMode;
 import gaia.cu9.ari.gaiaorbit.util.GlobalResources;
 import gaia.cu9.ari.gaiaorbit.util.I18n;
 import gaia.cu9.ari.gaiaorbit.util.Logger;
-import gaia.cu9.ari.gaiaorbit.util.SysUtilsFactory;
 import gaia.cu9.ari.gaiaorbit.util.format.INumberFormat;
 import gaia.cu9.ari.gaiaorbit.util.format.NumberFormatFactory;
 import gaia.cu9.ari.gaiaorbit.util.math.MathUtilsd;
@@ -617,7 +617,7 @@ public class PreferencesWindow extends GenericDialog {
 
         // LANGUAGE
         OwnLabel langLabel = new OwnLabel(txt("gui.ui.language"), skin);
-        File i18nfolder = new File((System.getProperty("assets.location") != null ? System.getProperty("assets.location") : "") + "i18n/");
+        File i18nfolder = new File(GlobalConf.ASSETS_LOC + "/i18n/");
         String i18nname = "gsbundle";
         String[] files = i18nfolder.list();
         LangComboBoxBean[] langs = new LangComboBoxBean[files.length];
@@ -804,8 +804,8 @@ public class PreferencesWindow extends GenericDialog {
         // CONTROLLER MAPPINGS
         OwnLabel mappingsLabel = new OwnLabel(txt("gui.controller.mappingsfile"), skin);
         Array<FileComboBoxBean> controllerMappingsFiles = new Array<FileComboBoxBean>();
-        FileHandle externalfolder = Gdx.files.absolute(SysUtilsFactory.getSysUtils().getAssetsLocation() + "./mappings/");
-        FileHandle homefolder = Gdx.files.absolute(SysUtilsFactory.getSysUtils().getDefaultMappingsDir().getPath());
+        FileHandle externalfolder = Gdx.files.absolute(GlobalConf.ASSETS_LOC + "./mappings/");
+        FileHandle homefolder = Gdx.files.absolute(SysUtils.getDefaultMappingsDir().getPath());
         Array<FileHandle> mappingFiles = new Array<FileHandle>();
         GlobalResources.listRec(externalfolder, mappingFiles, ".controller");
         GlobalResources.listRec(homefolder, mappingFiles, ".controller");
@@ -1240,7 +1240,7 @@ public class PreferencesWindow extends GenericDialog {
         // DATA SOURCE
         OwnLabel titleData = new OwnLabel(txt("gui.data.source"), skin, "help-title");
 
-        String assetsLoc = System.getProperty("assets.location") != null ? System.getProperty("assets.location") : "";
+        String assetsLoc = GlobalConf.ASSETS_LOC;
         dw = new DatasetsWidget(skin, assetsLoc);
         Array<FileHandle> catalogFiles = dw.buildCatalogFiles();
         Actor datasource = dw.buildDatasetsWidget(catalogFiles, false);
@@ -1449,7 +1449,7 @@ public class PreferencesWindow extends GenericDialog {
 
     private void reloadDefaultPreferences() {
         // User config file
-        File userFolder = SysUtilsFactory.getSysUtils().getGSHomeDir();
+        File userFolder = SysUtils.getGSHomeDir();
         File userFolderConfFile = new File(userFolder, "global.properties");
 
         // Internal config

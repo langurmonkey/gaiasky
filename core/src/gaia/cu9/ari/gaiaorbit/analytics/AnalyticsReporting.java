@@ -90,10 +90,9 @@ public class AnalyticsReporting {
 
 		// INITIALISE PARAMS
 		Gdx.files = new LwjglFiles();
-		String ASSETS_LOC = "../android/assets/";
 		DateFormatFactory.initialize(new DesktopDateFormatFactory());
-		ConfInit.initialize(new DesktopConfInit(ASSETS_LOC));
-		I18n.initialize(Gdx.files.absolute(ASSETS_LOC + "i18n/gsbundle"));
+		ConfInit.initialize(new DesktopConfInit());
+		I18n.initialize(Gdx.files.absolute(GlobalConf.ASSETS_LOC + "/i18n/gsbundle"));
 
 		AnalyticsReporting.initialize(new IPermission() {
 			@Override
