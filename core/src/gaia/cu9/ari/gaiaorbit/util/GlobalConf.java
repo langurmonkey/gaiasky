@@ -1,9 +1,11 @@
 package gaia.cu9.ari.gaiaorbit.util;
 
+import java.nio.file.Paths;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.math.MathUtils;
 import com.bitfire.postprocessing.effects.CubemapProjections.CubemapProjection;
 
@@ -456,8 +458,8 @@ public class GlobalConf {
      */
     public static class DataConf implements IConf {
 
-        /** Locations to look for catalog files additionally to internal **/
-        public String[] CATALOG_LOCATIONS;
+        /** Location of the data folder. Usually within the '.gaiasky' folder in the user's home directory **/
+        public String DATA_LOCATION; 
 
         /** The json data file in case of local data source **/
         public String OBJECTS_JSON_FILES;
@@ -480,9 +482,9 @@ public class GlobalConf {
          **/
         public boolean REAL_GAIA_ATTITUDE;
 
-        public void initialize(String[] cATALOG_LOCATIONS, String cATALOG_JSON_FILE, String oBJECTS_JSON_FILE, float lIMIT_MAG_LOAD, boolean rEAL_GAIA_ATTITUDE, boolean hIGH_ACCURACY_POSITIONS) {
+        public void initialize(String dATA_LOCATION, String cATALOG_JSON_FILE, String oBJECTS_JSON_FILE, float lIMIT_MAG_LOAD, boolean rEAL_GAIA_ATTITUDE, boolean hIGH_ACCURACY_POSITIONS) {
 
-            CATALOG_LOCATIONS = cATALOG_LOCATIONS;
+            DATA_LOCATION = dATA_LOCATION;
             CATALOG_JSON_FILES = cATALOG_JSON_FILE;
             OBJECTS_JSON_FILES = oBJECTS_JSON_FILE;
             LIMIT_MAG_LOAD = lIMIT_MAG_LOAD;
@@ -501,6 +503,13 @@ public class GlobalConf {
             this.OBJECTS_JSON_FILES = dATA_JSON_FILE;
             this.LIMIT_MAG_LOAD = lIMIT_MAG_LOAD;
             this.REAL_GAIA_ATTITUDE = rEAL_GAIA_ATTITUDE;
+        }
+        
+        public FileHandle dataFile(String path) {
+            if(path.startsWith("data/")) {
+                path = path.substring(5);
+            }
+            return new FileHandle(Paths.get(DATA_LOCATION, path).toFile());
         }
     }
 
@@ -589,7 +598,7 @@ public class GlobalConf {
         public Instant LAST_CHECKED;
         public String LAST_VERSION_TIME;
         public String VERSION_CHECK_URL;
-        public String DEFAULT_CATALOG_URL;
+        public String DATA_DESCRIPTOR_URL;
         public String UI_THEME;
         public String SCRIPT_LOCATION;
         public int REST_PORT;
@@ -613,7 +622,7 @@ public class GlobalConf {
         }
 
         public void initialize(boolean dISPLAY_TUTORIAL, String tUTORIAL_POINTER_SCRIPT_LOCATION, String tUTORIAL_SCRIPT_LOCATION, boolean sHOW_DEBUG_INFO, Instant lAST_CHECKED, String lAST_VERSION_TIME,
-                String vERSION_CHECK_URL, String dEFAULT_CATALOG_URL, String uI_THEME, String sCRIPT_LOCATION, int rEST_PORT, String lOCALE, boolean sTEREOSCOPIC_MODE, StereoProfile sTEREO_PROFILE, boolean cUBEMAP360_MODE,
+                String vERSION_CHECK_URL, String dATA_DESCRIPTOR_URL, String uI_THEME, String sCRIPT_LOCATION, int rEST_PORT, String lOCALE, boolean sTEREOSCOPIC_MODE, StereoProfile sTEREO_PROFILE, boolean cUBEMAP360_MODE,
                 boolean aNALYTICS_ENABLED, boolean dISPLAY_HUD, boolean dISPLAY_POINTER_COORDS, boolean dISPLAY_DATASET_DIALOG, boolean nET_MASTER, boolean nET_SLAVE, List<String> nET_MASTER_SLAVES) {
             DISPLAY_TUTORIAL = dISPLAY_TUTORIAL;
             TUTORIAL_POINTER_SCRIPT_LOCATION = tUTORIAL_POINTER_SCRIPT_LOCATION;
@@ -622,7 +631,7 @@ public class GlobalConf {
             LAST_CHECKED = lAST_CHECKED;
             LAST_VERSION_TIME = lAST_VERSION_TIME;
             VERSION_CHECK_URL = vERSION_CHECK_URL;
-            DEFAULT_CATALOG_URL = dEFAULT_CATALOG_URL;
+            DATA_DESCRIPTOR_URL = dATA_DESCRIPTOR_URL;
             UI_THEME = uI_THEME;
             SCRIPT_LOCATION = sCRIPT_LOCATION;
             REST_PORT = rEST_PORT;

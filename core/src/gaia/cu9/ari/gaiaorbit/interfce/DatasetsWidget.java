@@ -44,9 +44,8 @@ public class DatasetsWidget {
         // Discover datasets, add as buttons
         Array<FileHandle> catalogLocations = new Array<FileHandle>();
         catalogLocations.add(Gdx.files.absolute(assetsLoc + File.separatorChar + "data"));
-        for (String loc : GlobalConf.data.CATALOG_LOCATIONS) {
-            catalogLocations.add(Gdx.files.absolute(loc.trim()));
-        }
+        catalogLocations.add(Gdx.files.absolute(GlobalConf.data.DATA_LOCATION));
+        
         Array<FileHandle> catalogFiles = new Array<FileHandle>();
 
         for (FileHandle catalogLocation : catalogLocations) {

@@ -76,7 +76,6 @@ public class GaiaSkyDesktop implements IObserver {
     /* Configuration file version of the source code */
     private static int SOURCE_CONF_VERSION = 251;
     private static GaiaSkyDesktop gsd;
-    public static String ASSETS_LOC;
     private static boolean REST_ENABLED = false;
     private static Class<?> REST_SERVER_CLASS = null;
 
@@ -132,6 +131,9 @@ public class GaiaSkyDesktop implements IObserver {
                 props = initConfigFile(false);
             }
 
+            // Initialize i18n
+            I18n.initialize(Gdx.files.internal("i18n/gsbundle"));
+            
             // Init global configuration
             ConfInit.initialize(new DesktopConfInit());
 
@@ -145,11 +147,9 @@ public class GaiaSkyDesktop implements IObserver {
                 return;
             }
 
-            // Initialize i18n
-            I18n.initialize(Gdx.files.internal("i18n/gsbundle"));
 
             // Dev mode
-            I18n.initialize(Gdx.files.absolute(ASSETS_LOC + "i18n/gsbundle"));
+            I18n.initialize(Gdx.files.absolute(GlobalConf.ASSETS_LOC + "i18n/gsbundle"));
 
             // Jython
             ScriptingFactory.initialize(JythonFactory.getInstance());
@@ -172,7 +172,7 @@ public class GaiaSkyDesktop implements IObserver {
             MusicActorsManager.initialize(new DesktopMusicActors());
 
             // Init music manager
-            MusicManager.initialize(Gdx.files.absolute(ASSETS_LOC + "music"), Gdx.files.absolute(SysUtils.getDefaultMusicDir().getAbsolutePath()));
+            MusicManager.initialize(Gdx.files.absolute(GlobalConf.ASSETS_LOC + "music"), Gdx.files.absolute(SysUtils.getDefaultMusicDir().getAbsolutePath()));
 
             // Initialize post processor factory
             PostProcessorFactory.initialize(new DesktopPostProcessorFactory());

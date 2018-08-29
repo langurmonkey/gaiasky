@@ -113,7 +113,7 @@ public class SysUtils {
     private static final String SCRIPT_DIR_NAME = "script";
     private static final String MUSIC_DIR_NAME = "music";
     private static final String MAPPINGS_DIR_NAME = "mappings";
-    private static final String CATALOGS_DIR_NAME = "catalogs";
+    private static final String DATA_DIR_NAME = "data";
 
     /**
      * Gets a file pointer to the $HOME/.gaiasky/camera directory.
@@ -171,12 +171,12 @@ public class SysUtils {
     }
 
     /**
-     * Gets a file pointer to the $HOME/.gaiasky/catalogs directory.
+     * Gets a file pointer to the $HOME/.gaiasky/data directory.
      * 
-     * @return A pointer to the Gaia Sky catalogs directory in the user's home.
+     * @return A pointer to the Gaia Sky data directory in the user's home.
      */
-    public static File getDefaultCatalogsDir() {
-        return new File(System.getProperty("user.home") + File.separator + GAIASKY_DIR_NAME + File.separator + CATALOGS_DIR_NAME + File.separator);
+    public static File getDefaultDataDir() {
+        return new File(System.getProperty("user.home") + File.separator + GAIASKY_DIR_NAME + File.separator + DATA_DIR_NAME + File.separator);
     }
 
     public static void main(String[] args) {

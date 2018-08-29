@@ -1,5 +1,10 @@
 package gaia.cu9.ari.gaiaorbit.interfce;
 
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.scenes.scene2d.Stage;
@@ -8,8 +13,11 @@ import com.badlogic.gdx.utils.viewport.ScreenViewport;
 
 import gaia.cu9.ari.gaiaorbit.event.EventManager;
 import gaia.cu9.ari.gaiaorbit.event.Events;
+import gaia.cu9.ari.gaiaorbit.util.DownloadHelper;
 import gaia.cu9.ari.gaiaorbit.util.GlobalConf;
 import gaia.cu9.ari.gaiaorbit.util.GlobalResources;
+import gaia.cu9.ari.gaiaorbit.util.Logger;
+import gaia.cu9.ari.gaiaorbit.util.Logger.Log;
 
 /**
  * Displays dataset downloader and dataset chooser screen if needed.
@@ -18,8 +26,9 @@ import gaia.cu9.ari.gaiaorbit.util.GlobalResources;
  *
  */
 public class InitialGui extends AbstractGui {
+    private static final Log logger = Logger.getLogger(InitialGui.class);
 
-    protected DownloadCatalogWindow ddw;
+    protected DownloadDataWindow ddw;
     protected ChooseCatalogWindow cdw;
 
     /** Lock object for synchronisation **/
@@ -35,18 +44,23 @@ public class InitialGui extends AbstractGui {
         ui = new Stage(new ScreenViewport(), GlobalResources.spriteBatch);
         skin = GlobalResources.skin;
 
-        String assetsLoc = GlobalConf.ASSETS_LOC; 
-        DatasetsWidget dw = new DatasetsWidget(skin, assetsLoc);
+        DatasetsWidget dw = new DatasetsWidget(skin, GlobalConf.ASSETS_LOC);
         Array<FileHandle> catalogFiles = dw.buildCatalogFiles();
 
         clearGui();
 
-        if (catalogFiles.size == 0) {
-            // No catalog files, display downloader
-            addDatasetDownloader();
-        } else {
-            displayChooser();
-        }
+        DownloadHelper.downloadFile(GlobalConf.program.DATA_DESCRIPTOR_URL, Gdx.files.absolute(GlobalConf.data.DATA_LOCATION + "/gaiasky-data.json"), 
+                null, 
+                () -> {
+                    if (!basicDataPresent() || catalogFiles.size != 0) {
+                        // No catalog files, display downloader
+                        addDownloaderWindow();
+                    } else {
+                        displayChooser();
+                    }
+                }, 
+                null, 
+                null);
 
     }
 
@@ -61,13 +75,42 @@ public class InitialGui extends AbstractGui {
 
     }
 
+    /**
+     * Checks if the basic Gaia Sky data folders are present
+     * in the default data folder
+     * @return
+     */
+    private boolean basicDataPresent() {
+        Path dataPath = Paths.get(GlobalConf.data.DATA_LOCATION).normalize();
+
+        // Add all paths to check in this list
+        Array<Path> required = new Array<Path>();
+        required.add(dataPath.resolve("data-main.json"));
+        required.add(dataPath.resolve("asteroids.json"));
+        required.add(dataPath.resolve("planets.json"));
+        required.add(dataPath.resolve("satellites.json"));
+        required.add(dataPath.resolve("tex"));
+        required.add(dataPath.resolve("attitudexml"));
+        required.add(dataPath.resolve("meshes"));
+        required.add(dataPath.resolve("sdss"));
+
+        for (Path p : required) {
+            if (!Files.exists(p) || !Files.isReadable(p)) {
+                logger.info("Data files not found: " + dataPath.toString());
+                return false;
+            }
+        }
+
+        return true;
+    }
+
     @Override
     public void doneLoading(AssetManager assetManager) {
     }
 
-    private void addDatasetDownloader() {
+    private void addDownloaderWindow() {
         if (ddw == null) {
-            ddw = new DownloadCatalogWindow(ui, skin);
+            ddw = new DownloadDataWindow(ui, skin);
             ddw.setAcceptRunnable(() -> {
                 displayChooser();
             });
