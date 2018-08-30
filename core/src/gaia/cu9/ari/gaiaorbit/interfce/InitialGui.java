@@ -53,7 +53,7 @@ public class InitialGui extends AbstractGui {
                 null, 
                 () -> {
                     Gdx.app.postRunnable(() -> {
-                        if (!basicDataPresent() || catalogFiles.size == 0) {
+                        if (!basicDataPresent() || catalogFiles.size != 0) {
                             // No catalog files, display downloader
                             addDownloaderWindow();
                         } else {

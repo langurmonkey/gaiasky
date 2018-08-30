@@ -10,9 +10,8 @@ import java.nio.ByteOrder;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Set;
+import java.util.LinkedList;
+import java.util.List;
 
 import org.python.apache.commons.compress.archivers.tar.TarArchiveEntry;
 import org.python.apache.commons.compress.archivers.tar.TarArchiveInputStream;
@@ -40,14 +39,18 @@ import gaia.cu9.ari.gaiaorbit.util.DownloadHelper;
 import gaia.cu9.ari.gaiaorbit.util.GlobalConf;
 import gaia.cu9.ari.gaiaorbit.util.Logger;
 import gaia.cu9.ari.gaiaorbit.util.Logger.Log;
+import gaia.cu9.ari.gaiaorbit.util.Pair;
 import gaia.cu9.ari.gaiaorbit.util.ProgressRunnable;
+import gaia.cu9.ari.gaiaorbit.util.Trio;
 import gaia.cu9.ari.gaiaorbit.util.format.INumberFormat;
 import gaia.cu9.ari.gaiaorbit.util.format.NumberFormatFactory;
 import gaia.cu9.ari.gaiaorbit.util.scene2d.FileChooser;
 import gaia.cu9.ari.gaiaorbit.util.scene2d.FileChooser.ResultListener;
 import gaia.cu9.ari.gaiaorbit.util.scene2d.OwnCheckBox;
+import gaia.cu9.ari.gaiaorbit.util.scene2d.OwnImageButton;
 import gaia.cu9.ari.gaiaorbit.util.scene2d.OwnLabel;
 import gaia.cu9.ari.gaiaorbit.util.scene2d.OwnTextButton;
+import gaia.cu9.ari.gaiaorbit.util.scene2d.OwnTextTooltip;
 
 public class DownloadDataWindow extends GenericDialog {
     private static final Log logger = Logger.getLogger(DownloadDataWindow.class);
@@ -57,15 +60,15 @@ public class DownloadDataWindow extends GenericDialog {
 
     private INumberFormat nf;
     private JsonReader reader;
-    private Map<JsonValue, OwnCheckBox> choiceMap;
-    private Array<JsonValue> toDownload;
+    private List<Trio<JsonValue, OwnCheckBox, OwnLabel>> choiceList;
+    private Array<Trio<JsonValue, OwnCheckBox, OwnLabel>> toDownload;
     private int current = -1;
 
     public DownloadDataWindow(Stage stage, Skin skin) {
         super(txt("gui.download.title"), skin, stage);
         this.nf = NumberFormatFactory.getFormatter("##0.0");
         this.reader = new JsonReader();
-        this.choiceMap = new HashMap<JsonValue, OwnCheckBox>();
+        this.choiceList = new LinkedList<Trio<JsonValue, OwnCheckBox, OwnLabel>>();
 
         setCancelText(txt("gui.exit"));
         setAcceptText(txt("gui.start"));
@@ -76,7 +79,8 @@ public class DownloadDataWindow extends GenericDialog {
 
     @Override
     protected void build() {
-        float pad = 10 * GlobalConf.SCALE_FACTOR;
+        float pad = 5 * GlobalConf.SCALE_FACTOR;
+
         float buttonpad = 1 * GlobalConf.SCALE_FACTOR;
 
         Cell<Actor> topCell = content.add((Actor) null);
@@ -110,10 +114,10 @@ public class DownloadDataWindow extends GenericDialog {
         JsonValue dataDesc = reader.parse(Gdx.files.absolute(catLoc + "/gaiasky-data.json"));
 
         Table datasetsTable = new Table(skin);
-        datasetsTable.add(new OwnLabel("To download", skin, "orange")).left().padRight(pad).padBottom(pad);
-        datasetsTable.add(new OwnLabel("Description", skin, "orange")).left().padRight(pad).padBottom(pad);
-        datasetsTable.add(new OwnLabel("Type", skin, "orange")).left().padRight(pad).padBottom(pad);
-        datasetsTable.add(new OwnLabel("Have", skin, "orange")).center().padRight(pad).padBottom(pad).row();
+        datasetsTable.add(new OwnLabel("To download", skin, "header")).left().padRight(pad).padBottom(pad);
+        datasetsTable.add(new OwnLabel("Description", skin, "header")).left().padRight(pad).padBottom(pad);
+        datasetsTable.add(new OwnLabel("Type", skin, "header")).left().padRight(pad).padBottom(pad);
+        datasetsTable.add(new OwnLabel("Have", skin, "header")).center().padRight(pad).padBottom(pad).row();
 
         JsonValue dataset = dataDesc.child().child();
         while (dataset != null) {
@@ -134,14 +138,35 @@ public class DownloadDataWindow extends GenericDialog {
             else
                 haveit.setColor(1, 0, 0, 1);
 
+            // Can't proceed without base data - force download
+            if (baseData && !exists) {
+                me.acceptButton.setDisabled(true);
+            }
+
+            String description = dataset.getString("description");
+            String shortDescription;
+            HorizontalGroup descGroup = new HorizontalGroup();
+            descGroup.space(pad);
+            if (description.contains("-")) {
+                shortDescription = description.substring(0, description.indexOf("-"));
+            } else {
+                shortDescription = description;
+            }
+            OwnLabel desc = new OwnLabel(shortDescription, skin);
+            // Info
+            OwnImageButton imgTooltip = new OwnImageButton(skin, "tooltip");
+            imgTooltip.addListener(new OwnTextTooltip(description, skin, 10));
+            descGroup.addActor(imgTooltip);
+            descGroup.addActor(desc);
+
             datasetsTable.add(cb).left().padRight(pad).padBottom(pad);
-            datasetsTable.add(new OwnLabel(dataset.getString("description"), skin)).left().padRight(pad).padBottom(pad);
+            datasetsTable.add(descGroup).left().padRight(pad).padBottom(pad);
             datasetsTable.add(new OwnLabel(dataset.getString("type"), skin)).left().padRight(pad).padBottom(pad);
             datasetsTable.add(haveit).center().padBottom(pad);
 
             datasetsTable.row();
 
-            choiceMap.put(dataset, cb);
+            choiceList.add(new Trio<JsonValue, OwnCheckBox, OwnLabel>(dataset, cb, haveit));
 
             dataset = dataset.next();
 
@@ -157,11 +182,11 @@ public class DownloadDataWindow extends GenericDialog {
 
         downloadButton.addListener((event) -> {
             if (event instanceof ChangeEvent) {
-                downloadAndExtractFiles(choiceMap);
+                downloadAndExtractFiles(choiceList);
             }
             return true;
         });
-        
+
         currentDownloadFile = new OwnLabel("", skin);
         downloadTable.add(currentDownloadFile).center().colspan(2);
 
@@ -205,15 +230,15 @@ public class DownloadDataWindow extends GenericDialog {
 
     }
 
-    private synchronized void downloadAndExtractFiles(Map<JsonValue, OwnCheckBox> choices) {
-        toDownload = new Array<JsonValue>();
-        Set<Map.Entry<JsonValue, OwnCheckBox>> entries = choices.entrySet();
-        for (Map.Entry<JsonValue, OwnCheckBox> entry : entries) {
-            if (entry.getValue().isChecked())
-                toDownload.add(entry.getKey());
-            
+    private synchronized void downloadAndExtractFiles(List<Trio<JsonValue, OwnCheckBox, OwnLabel>> choices) {
+        toDownload = new Array<Trio<JsonValue, OwnCheckBox, OwnLabel>>();
+
+        for (Trio<JsonValue, OwnCheckBox, OwnLabel> entry : choices) {
+            if (entry.getSecond().isChecked())
+                toDownload.add(entry);
+
             // Disable all
-            entry.getValue().setDisabled(true);
+            entry.getSecond().setDisabled(true);
         }
 
         logger.info(toDownload.size + " new data files selected to download");
@@ -227,7 +252,8 @@ public class DownloadDataWindow extends GenericDialog {
         current++;
         if (current >= 0 && current < toDownload.size) {
             // Download next
-            JsonValue currentJson = toDownload.get(current);
+            Trio<JsonValue, OwnCheckBox, OwnLabel> trio = toDownload.get(current);
+            JsonValue currentJson = trio.getFirst();
             String url = currentJson.getString("file");
             String type = currentJson.getString("type");
 
@@ -272,15 +298,18 @@ public class DownloadDataWindow extends GenericDialog {
 
                 me.acceptButton.setDisabled(false);
                 currentDownloadFile.setText("");
-                
-                Gdx.app.postRunnable(()->{
+
+                trio.getThird().setText("V");
+                trio.getThird().setColor(0, 1, 0, 1);
+
+                Gdx.app.postRunnable(() -> {
                     downloadNext();
                 });
             };
 
             // Download
             me.acceptButton.setDisabled(true);
-            currentDownloadFile.setText("Current dataset: " +  currentJson.getString("name"));
+            currentDownloadFile.setText("Current dataset: " + currentJson.getString("name"));
             DownloadHelper.downloadFile(url, downloadedFile, pr, finish, null, null);
         } else {
             // Finished all downloads!

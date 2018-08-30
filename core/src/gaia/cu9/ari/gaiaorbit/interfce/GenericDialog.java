@@ -84,7 +84,6 @@ public abstract class GenericDialog extends CollapsibleWindow {
     public void buildSuper() {
         pad = 5 * GlobalConf.SCALE_FACTOR;
 
-        build();
 
         /** BUTTONS **/
         HorizontalGroup buttonGroup = new HorizontalGroup();
@@ -213,7 +212,10 @@ public abstract class GenericDialog extends CollapsibleWindow {
                 return false;
             }
         });
-
+        
+        // Build actual content
+        build();
+        
         // Set position
         setPosition(Math.round(stage.getWidth() / 2f - this.getWidth() / 2f), Math.round(stage.getHeight() / 2f - this.getHeight() / 2f));
 

@@ -6,7 +6,7 @@
             "type" : "data-pack",
             "check": "data-main.json",
             "version" : 251,
-            "description" : "Default data pack for Gaia Sky",
+            "description" : "Default data pack for Gaia Sky - Contains the Solar System, constellations, NBG, SDSS, meshes and more",
             "file" : "http://gaia.ari.uni-heidelberg.de/gaiasky/files/autodownload/20180829_gaiasky_data.tar.gz" 
         },
 
@@ -14,7 +14,7 @@
             "name" : "catalog-dr2-default",
             "type" : "catalog-lod",
             "check": "catalog-dr2-default.json",
-            "description": "Default DR2 catalog - 7.5 million stars",
+            "description": "Default DR2 catalog - 20%/5% parallax relative errors for bright/faint stars - 7.5 million stars",
             "file" : "http://gaia.ari.uni-heidelberg.de/gaiasky/files/autodownload/catalog-dr2-default.tar.gz"
         }
 
