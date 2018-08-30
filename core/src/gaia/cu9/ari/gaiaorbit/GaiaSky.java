@@ -17,6 +17,7 @@ import com.badlogic.gdx.assets.loaders.FileHandleResolver;
 import com.badlogic.gdx.assets.loaders.resolvers.InternalFileHandleResolver;
 import com.badlogic.gdx.audio.Music;
 import com.badlogic.gdx.backends.lwjgl.LwjglApplicationConfiguration;
+import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Pixmap.Format;
 import com.badlogic.gdx.graphics.g3d.Model;
@@ -240,18 +241,25 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
         TooltipManager.getInstance().hideAll();
 
         // Initialise asset manager
-        FileHandleResolver resolver = new InternalFileHandleResolver();
-        manager = new AssetManager(resolver);
+        FileHandleResolver internalResolver = new InternalFileHandleResolver();
+        FileHandleResolver dataResolver = new FileHandleResolver() {
+            @Override
+            public FileHandle resolve(String fileName) {
+                return GlobalConf.data.dataFileHandle(fileName);
+            }
+            
+        };
+        manager = new AssetManager(internalResolver);
         //manager.setLoader(Model.class, ".obj", new AdvancedObjLoader(resolver));
-        manager.setLoader(ISceneGraph.class, new SGLoader(resolver));
-        manager.setLoader(PolylineData.class, new OrbitDataLoader(resolver));
-        manager.setLoader(GaiaAttitudeServer.class, new GaiaAttitudeLoader(resolver));
-        manager.setLoader(ShaderProgram.class, new ShaderProgramProvider(resolver, ".vertex.glsl", ".fragment.glsl"));
+        manager.setLoader(ISceneGraph.class, new SGLoader(dataResolver));
+        manager.setLoader(PolylineData.class, new OrbitDataLoader(dataResolver));
+        manager.setLoader(GaiaAttitudeServer.class, new GaiaAttitudeLoader(dataResolver));
+        manager.setLoader(ShaderProgram.class, new ShaderProgramProvider(internalResolver, ".vertex.glsl", ".fragment.glsl"));
         //manager.setLoader(DefaultShaderProvider.class, new DefaultShaderProviderLoader<>(resolver));
-        manager.setLoader(AtmosphereShaderProvider.class, new AtmosphereShaderProviderLoader<>(resolver));
-        manager.setLoader(GroundShaderProvider.class, new GroundShaderProviderLoader<>(resolver));
-        manager.setLoader(RelativisticShaderProvider.class, new RelativisticShaderProviderLoader<>(resolver));
-        manager.setLoader(Model.class, ".obj", new ObjLoader(resolver));
+        manager.setLoader(AtmosphereShaderProvider.class, new AtmosphereShaderProviderLoader<>(internalResolver));
+        manager.setLoader(GroundShaderProvider.class, new GroundShaderProviderLoader<>(internalResolver));
+        manager.setLoader(RelativisticShaderProvider.class, new RelativisticShaderProviderLoader<>(internalResolver));
+        manager.setLoader(Model.class, ".obj", new ObjLoader(internalResolver));
 
         // Init global resources
         GlobalResources.initialize(manager);

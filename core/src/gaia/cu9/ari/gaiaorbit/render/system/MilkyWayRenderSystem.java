@@ -57,7 +57,7 @@ public class MilkyWayRenderSystem extends ImmediateRenderSystem implements IObse
 
         nebulatextures = new Texture[4];
         for (int i = 0; i < 4; i++) {
-            Texture tex = new Texture(Gdx.files.internal(GlobalConf.TEXTURES_FOLDER + "nebula00" + (i + 1) + ".png"));
+            Texture tex = new Texture(GlobalConf.data.dataFile("tex/nebula00" + (i + 1) + ".png"));
             tex.setFilter(TextureFilter.Linear, TextureFilter.Linear);
             nebulatextures[i] = tex;
         }

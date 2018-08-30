@@ -39,7 +39,6 @@ public class GlobalConf {
     public static final String AUTHOR_EMAIL = "tsagrista@ari.uni-heidelberg.de";
     public static final String AUTHOR_AFFILIATION = "Heidelberg University, Zentrum fuer Astronomie, Astronomisches Rechen-Institut";
 
-    public static final String TEXTURES_FOLDER = "data/tex/";
 
     // Assets location for this instance of Gaia Sky
     public static final String ASSETS_LOC = System.getProperty("assets.location") != null ? System.getProperty("assets.location") : "";
@@ -504,12 +503,18 @@ public class GlobalConf {
             this.LIMIT_MAG_LOAD = lIMIT_MAG_LOAD;
             this.REAL_GAIA_ATTITUDE = rEAL_GAIA_ATTITUDE;
         }
+       
         
-        public FileHandle dataFile(String path) {
+        
+        public String dataFile(String path) {
             if(path.startsWith("data/")) {
                 path = path.substring(5);
             }
-            return new FileHandle(Paths.get(DATA_LOCATION, path).toFile());
+            return Paths.get(DATA_LOCATION, path).toString();
+        }
+        
+        public FileHandle dataFileHandle(String path) {
+            return new FileHandle(dataFile(path));
         }
     }
 

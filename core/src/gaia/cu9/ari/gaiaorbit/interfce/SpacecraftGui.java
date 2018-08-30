@@ -151,7 +151,7 @@ public class SpacecraftGui extends AbstractGui {
         db = new DecalBatch(new CameraGroupStrategy(aiCam));
         mb = new ModelBatch();
 
-        assetManager.load("data/tex/attitudeindicator.png", Texture.class);
+        assetManager.load(GlobalConf.data.dataFile("tex/attitudeindicator.png"), Texture.class);
         assetManager.load("img/ai-pointer.png", Texture.class);
         assetManager.load("img/ai-vel.png", Texture.class);
         assetManager.load("img/ai-antivel.png", Texture.class);
@@ -165,7 +165,7 @@ public class SpacecraftGui extends AbstractGui {
     public void doneLoading(AssetManager assetManager) {
         skin = GlobalResources.skin;
 
-        aiTexture = assetManager.get("data/tex/attitudeindicator.png", Texture.class);
+        aiTexture = assetManager.get(GlobalConf.data.dataFile("tex/attitudeindicator.png"), Texture.class);
         aiTexture.setFilter(TextureFilter.Linear, TextureFilter.Linear);
         aiPointerTexture = assetManager.get("img/ai-pointer.png", Texture.class);
         aiPointerTexture.setFilter(TextureFilter.Linear, TextureFilter.Linear);

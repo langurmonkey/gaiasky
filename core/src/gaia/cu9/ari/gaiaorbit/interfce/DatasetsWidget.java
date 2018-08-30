@@ -151,6 +151,12 @@ public class DatasetsWidget {
         bg.setMinCheckCount(0);
         bg.setMaxCheckCount(catalogFiles.size);
         bg.add(cbs);
+        
+        
+        // No files
+        if(catalogFiles.size == 0) {
+            dstable.add(new OwnLabel("No catalogs found", skin)).center();
+        }
 
         float maxw = 0;
         for (Button b : cbs) {

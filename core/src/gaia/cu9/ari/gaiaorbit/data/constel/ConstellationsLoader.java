@@ -13,6 +13,7 @@ import gaia.cu9.ari.gaiaorbit.render.ComponentType;
 import gaia.cu9.ari.gaiaorbit.scenegraph.Constellation;
 import gaia.cu9.ari.gaiaorbit.scenegraph.SceneGraphNode;
 import gaia.cu9.ari.gaiaorbit.util.ComponentTypes;
+import gaia.cu9.ari.gaiaorbit.util.GlobalConf;
 import gaia.cu9.ari.gaiaorbit.util.I18n;
 import gaia.cu9.ari.gaiaorbit.util.Logger;
 import gaia.cu9.ari.gaiaorbit.util.parse.Parser;
@@ -32,7 +33,7 @@ public class ConstellationsLoader<T extends SceneGraphNode> implements ISceneGra
         for (String f : files) {
             try {
                 // load constellations
-                FileHandle file = Gdx.files.internal(f);
+                FileHandle file = GlobalConf.data.dataFileHandle(f);
                 BufferedReader br = new BufferedReader(new InputStreamReader(file.read()));
 
                 try {

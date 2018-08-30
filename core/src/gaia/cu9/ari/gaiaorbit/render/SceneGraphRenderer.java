@@ -604,7 +604,7 @@ public class SceneGraphRenderer extends AbstractRenderer implements IProcessRend
         labelsProc.setPreRunnable(blendNoDepthRunnable);
 
         // BILLBOARD SSO
-        AbstractRenderSystem billboardSSOProc = new BillboardStarRenderSystem(RenderGroup.BILLBOARD_SSO, alphas, starShaders, "img/sso.png", -1);
+        AbstractRenderSystem billboardSSOProc = new BillboardStarRenderSystem(RenderGroup.BILLBOARD_SSO, alphas, starShaders, "data/tex/sso.png", -1);
         billboardSSOProc.setPreRunnable(additiveBlendDepthRunnable);
         billboardSSOProc.setPostRunnable(restoreRegularBlend);
 

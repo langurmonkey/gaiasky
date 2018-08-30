@@ -14,6 +14,7 @@ import gaia.cu9.ari.gaiaorbit.data.ISceneGraphLoader;
 import gaia.cu9.ari.gaiaorbit.scenegraph.Galaxy;
 import gaia.cu9.ari.gaiaorbit.scenegraph.Particle;
 import gaia.cu9.ari.gaiaorbit.util.Constants;
+import gaia.cu9.ari.gaiaorbit.util.GlobalConf;
 import gaia.cu9.ari.gaiaorbit.util.I18n;
 import gaia.cu9.ari.gaiaorbit.util.Logger;
 import gaia.cu9.ari.gaiaorbit.util.Logger.Log;
@@ -56,7 +57,7 @@ public class NBGLoader extends AbstractCatalogLoader implements ISceneGraphLoade
 	long offset = 0;
 	if (active)
 	    for (String file : files) {
-		FileHandle f = Gdx.files.internal(file);
+		FileHandle f = GlobalConf.data.dataFileHandle(file);
 		InputStream data = f.read();
 		BufferedReader br = new BufferedReader(new InputStreamReader(data));
 

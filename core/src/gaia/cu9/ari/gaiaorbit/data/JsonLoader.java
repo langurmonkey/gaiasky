@@ -67,7 +67,7 @@ public class JsonLoader<T extends SceneGraphNode> implements ISceneGraphLoader {
         try {
             JsonReader json = new JsonReader();
             for (String filePath : filePaths) {
-                FileHandle file = Gdx.files.internal(filePath);
+                FileHandle file = GlobalConf.data.dataFileHandle(filePath);
                 JsonValue model = json.parse(file.read());
                 JsonValue child = model.get("objects").child;
                 int size = 0;

@@ -224,23 +224,23 @@ public class TextureComponent {
     }
 
     public void setBase(String base) {
-        this.base = base;
+        this.base = GlobalConf.data.dataFile(base);
     }
 
     public void setSpecular(String specular) {
-        this.specular = specular;
+        this.specular = GlobalConf.data.dataFile(specular);
     }
 
     public void setNormal(String normal) {
-        this.normal = normal;
+        this.normal = GlobalConf.data.dataFile(normal);
     }
 
     public void setNight(String night) {
-        this.night = night;
+        this.night = GlobalConf.data.dataFile(night);
     }
 
     public void setRing(String ring) {
-        this.ring = ring;
+        this.ring = GlobalConf.data.dataFile(ring);
     }
 
     public void setColoriftex(Boolean coloriftex) {

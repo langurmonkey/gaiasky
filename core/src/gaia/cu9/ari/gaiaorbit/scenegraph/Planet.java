@@ -86,7 +86,7 @@ public class Planet extends ModelBody implements IAtmosphereRenderable, ICloudRe
             Planet.manager = manager;
         }
         if (auxTex == null) {
-            auxTex = new Texture(Gdx.files.internal("data/tex/star.jpg"));
+            auxTex = new Texture(GlobalConf.data.dataFileHandle("data/tex/star.jpg"));
         }
 
         // INITIALIZE ATMOSPHERE

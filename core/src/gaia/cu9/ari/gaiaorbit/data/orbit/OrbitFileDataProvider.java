@@ -6,6 +6,7 @@ import com.badlogic.gdx.files.FileHandle;
 import gaia.cu9.ari.gaiaorbit.assets.OrbitDataLoader.OrbitDataLoaderParameter;
 import gaia.cu9.ari.gaiaorbit.event.EventManager;
 import gaia.cu9.ari.gaiaorbit.event.Events;
+import gaia.cu9.ari.gaiaorbit.util.GlobalConf;
 import gaia.cu9.ari.gaiaorbit.util.Logger;
 
 /**
@@ -21,7 +22,7 @@ public class OrbitFileDataProvider implements IOrbitDataProvider {
     public void load(String file, OrbitDataLoaderParameter parameter) {
         FileDataLoader odl = new FileDataLoader();
         try {
-            FileHandle f = Gdx.files.internal(file);
+            FileHandle f = GlobalConf.data.dataFileHandle(file);
             data = odl.load(f.read());
             if (parameter.multiplier != 1f) {
                 int n = data.x.size;
