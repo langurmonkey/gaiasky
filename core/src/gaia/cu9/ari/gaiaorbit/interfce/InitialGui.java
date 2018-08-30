@@ -98,7 +98,7 @@ public class InitialGui extends AbstractGui {
         for (Path p : required) {
             if (!Files.exists(p) || !Files.isReadable(p)) {
                 logger.info("Data files not found: " + dataPath.toString());
-                return true;
+                return false;
             }
         }
 

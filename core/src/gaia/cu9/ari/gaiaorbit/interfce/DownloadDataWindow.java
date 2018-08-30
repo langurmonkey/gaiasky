@@ -10,6 +10,9 @@ import java.nio.ByteOrder;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Set;
 
 import org.python.apache.commons.compress.archivers.tar.TarArchiveEntry;
 import org.python.apache.commons.compress.archivers.tar.TarArchiveInputStream;
@@ -28,6 +31,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener.ChangeEvent;
+import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.JsonReader;
 import com.badlogic.gdx.utils.JsonValue;
 
@@ -47,13 +51,21 @@ import gaia.cu9.ari.gaiaorbit.util.scene2d.OwnTextButton;
 
 public class DownloadDataWindow extends GenericDialog {
     private static final Log logger = Logger.getLogger(DownloadDataWindow.class);
+
+    private OwnTextButton downloadButton;
+    private OwnLabel currentDownloadFile;
+
     private INumberFormat nf;
     private JsonReader reader;
+    private Map<JsonValue, OwnCheckBox> choiceMap;
+    private Array<JsonValue> toDownload;
+    private int current = -1;
 
     public DownloadDataWindow(Stage stage, Skin skin) {
         super(txt("gui.download.title"), skin, stage);
         this.nf = NumberFormatFactory.getFormatter("##0.0");
         this.reader = new JsonReader();
+        this.choiceMap = new HashMap<JsonValue, OwnCheckBox>();
 
         setCancelText(txt("gui.exit"));
         setAcceptText(txt("gui.start"));
@@ -98,10 +110,10 @@ public class DownloadDataWindow extends GenericDialog {
         JsonValue dataDesc = reader.parse(Gdx.files.absolute(catLoc + "/gaiasky-data.json"));
 
         Table datasetsTable = new Table(skin);
-        datasetsTable.add(new OwnLabel("Name", skin, "header")).left().padRight(pad).padBottom(pad);
-        datasetsTable.add(new OwnLabel("Description", skin, "header")).left().padRight(pad).padBottom(pad);
-        datasetsTable.add(new OwnLabel("Type", skin, "header")).left().padRight(pad).padBottom(pad);
-        datasetsTable.add(new OwnLabel("Have", skin, "header")).center().padRight(pad).padBottom(pad).row();
+        datasetsTable.add(new OwnLabel("To download", skin, "orange")).left().padRight(pad).padBottom(pad);
+        datasetsTable.add(new OwnLabel("Description", skin, "orange")).left().padRight(pad).padBottom(pad);
+        datasetsTable.add(new OwnLabel("Type", skin, "orange")).left().padRight(pad).padBottom(pad);
+        datasetsTable.add(new OwnLabel("Have", skin, "orange")).center().padRight(pad).padBottom(pad).row();
 
         JsonValue dataset = dataDesc.child().child();
         while (dataset != null) {
@@ -112,8 +124,9 @@ public class DownloadDataWindow extends GenericDialog {
             String name = dataset.getString("name");
             // Add dataset to desc table
             OwnCheckBox cb = new OwnCheckBox(name, skin, pad);
-            boolean baseData = name.equals("default-data"); 
-            cb.setChecked(!exists && baseData);
+            boolean baseData = name.equals("default-data");
+            boolean defaultDataset = name.contains("default");
+            cb.setChecked(!exists && (baseData || defaultDataset));
             cb.setDisabled(baseData);
             OwnLabel haveit = new OwnLabel(exists ? "V" : "X", skin);
             if (exists)
@@ -128,23 +141,29 @@ public class DownloadDataWindow extends GenericDialog {
 
             datasetsTable.row();
 
+            choiceMap.put(dataset, cb);
+
             dataset = dataset.next();
+
         }
 
         downloadTable.add(datasetsTable).center().padBottom(pad * 2).colspan(2).row();
 
-        OwnTextButton downloadNow = new OwnTextButton(txt("gui.download.download").toUpperCase(), skin, "download");
-        downloadNow.pad(buttonpad * 4);
-        downloadNow.setMinWidth(catalogsLoc.getWidth());
-        downloadNow.setMinHeight(50 * GlobalConf.SCALE_FACTOR);
-        downloadTable.add(downloadNow).center().colspan(2);
+        downloadButton = new OwnTextButton(txt("gui.download.download").toUpperCase(), skin, "download");
+        downloadButton.pad(buttonpad * 4);
+        downloadButton.setMinWidth(catalogsLoc.getWidth());
+        downloadButton.setMinHeight(50 * GlobalConf.SCALE_FACTOR);
+        downloadTable.add(downloadButton).center().colspan(2).padBottom(pad).row();
 
-        downloadNow.addListener((event) -> {
+        downloadButton.addListener((event) -> {
             if (event instanceof ChangeEvent) {
-                parseDataDesc(Gdx.files.absolute(catLoc + "/gaiasky-data.json"), downloadNow);
+                downloadAndExtractFiles(choiceMap);
             }
             return true;
         });
+        
+        currentDownloadFile = new OwnLabel("", skin);
+        downloadTable.add(currentDownloadFile).center().colspan(2);
 
         catalogsLoc.addListener((event) -> {
             if (event instanceof ChangeEvent) {
@@ -186,62 +205,87 @@ public class DownloadDataWindow extends GenericDialog {
 
     }
 
-    /**
-     * Parses the data descriptor file and takes the necessary actions which may be
-     * exposing downloads to the user, downloading default data package, etc.
-     * @param fh The file where the descriptor is
-     * @param downloadNow The download button in the interface
-     */
-    private void parseDataDesc(FileHandle fh, OwnTextButton downloadNow) {
-        // Parse descriptor file
-        JsonValue dataDesc = reader.parse(fh);
-        JsonValue firstItemDesc = dataDesc.get("files").child();
-        String url = firstItemDesc.getString("file");
-        String name = firstItemDesc.getString("name");
+    private synchronized void downloadAndExtractFiles(Map<JsonValue, OwnCheckBox> choices) {
+        toDownload = new Array<JsonValue>();
+        Set<Map.Entry<JsonValue, OwnCheckBox>> entries = choices.entrySet();
+        for (Map.Entry<JsonValue, OwnCheckBox> entry : entries) {
+            if (entry.getValue().isChecked())
+                toDownload.add(entry.getKey());
+            
+            // Disable all
+            entry.getValue().setDisabled(true);
+        }
 
-        FileHandle archiveFile = Gdx.files.absolute(GlobalConf.data.DATA_LOCATION + "/temp.tar.gz");
+        logger.info(toDownload.size + " new data files selected to download");
 
-        ProgressRunnable pr = (progress) -> {
-            final String progressString = progress >= 100 ? txt("gui.done") : txt("gui.download.downloading", nf.format(progress));
+        current = -1;
+        downloadNext();
 
-            // Since we are downloading on a background thread, post a runnable to touch UI
-            Gdx.app.postRunnable(() -> {
-                if (progress == 100) {
-                    downloadNow.setDisabled(true);
+    }
+
+    private void downloadNext() {
+        current++;
+        if (current >= 0 && current < toDownload.size) {
+            // Download next
+            JsonValue currentJson = toDownload.get(current);
+            String url = currentJson.getString("file");
+            String type = currentJson.getString("type");
+
+            FileHandle downloadedFile = Gdx.files.absolute(GlobalConf.data.DATA_LOCATION + "/temp.tar.gz");
+
+            ProgressRunnable pr = (progress) -> {
+                final String progressString = progress >= 100 ? txt("gui.done") : txt("gui.download.downloading", nf.format(progress));
+
+                // Since we are downloading on a background thread, post a runnable to touch UI
+                Gdx.app.postRunnable(() -> {
+                    if (progress == 100) {
+                        downloadButton.setDisabled(true);
+                    }
+                    downloadButton.setText(progressString);
+                });
+            };
+
+            Runnable finish = () -> {
+                // Unpack
+                logger.info("Extracting: " + downloadedFile.path());
+                String dataLocation = GlobalConf.data.DATA_LOCATION + File.separatorChar;
+                try {
+                    decompress(downloadedFile.path(), new File(dataLocation), downloadButton);
+                } catch (Exception e) {
+                    logger.error(e, "Error decompressing: " + downloadedFile.path());
                 }
-                downloadNow.setText(progressString);
-            });
-        };
 
-        Runnable finish = () -> {
-            // Unpack
-            logger.info("Extracting: " + archiveFile.path());
-            String dataLocation = GlobalConf.data.DATA_LOCATION + File.separatorChar;
-            try {
-                decompress(archiveFile.path(), new File(dataLocation), downloadNow);
-            } catch (Exception e) {
-                logger.error(e, "Error decompressing: " + archiveFile.path());
-            }
+                // Remove archive
+                downloadedFile.file().delete();
 
-            // Remove archive
-            archiveFile.file().delete();
+                // Done
+                Gdx.app.postRunnable(() -> {
+                    downloadButton.setText(txt("gui.done"));
+                });
 
-            // Descriptor file
-            FileHandle descFile = Gdx.files.absolute(GlobalConf.data.DATA_LOCATION + "/catalog-dr2-default.json");
+                // Select dataset if needed
+                if (type.startsWith("catalog-")) {
+                    // Descriptor file
+                    FileHandle descFile = Gdx.files.absolute(GlobalConf.data.DATA_LOCATION + File.separator + currentJson.getString("check"));
+                    GlobalConf.data.CATALOG_JSON_FILES = descFile.path();
+                }
 
-            // Done
-            Gdx.app.postRunnable(() -> {
-                downloadNow.setText(txt("gui.done"));
-            });
+                me.acceptButton.setDisabled(false);
+                currentDownloadFile.setText("");
+                
+                Gdx.app.postRunnable(()->{
+                    downloadNext();
+                });
+            };
 
-            // Select dataset
-            GlobalConf.data.CATALOG_JSON_FILES = descFile.path();
-            me.acceptButton.setDisabled(false);
-        };
-
-        // Download
-        DownloadHelper.downloadFile(url, archiveFile, pr, finish, null, null);
-
+            // Download
+            me.acceptButton.setDisabled(true);
+            currentDownloadFile.setText("Current dataset: " +  currentJson.getString("name"));
+            DownloadHelper.downloadFile(url, downloadedFile, pr, finish, null, null);
+        } else {
+            // Finished all downloads!
+            // Wait for user to click OK
+        }
     }
 
     private void decompress(String in, File out, OwnTextButton b) throws Exception {
