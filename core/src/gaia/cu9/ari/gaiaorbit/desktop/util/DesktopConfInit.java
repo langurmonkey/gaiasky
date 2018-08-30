@@ -57,6 +57,7 @@ public class DesktopConfInit extends ConfInit {
 
     CommentedProperties p;
     Properties vp;
+    
 
     IDateFormat df = DateFormatFactory.getFormatter("dd/MM/yyyy HH:mm:ss");
 
@@ -166,7 +167,7 @@ public class DesktopConfInit extends ConfInit {
         if(DATA_LOCATION == null || DATA_LOCATION.isEmpty())
             DATA_LOCATION = SysUtils.getDefaultDataDir().getAbsolutePath();
 
-        String CATALOG_JSON_FILE = p.getProperty("data.json.catalog");
+        String CATALOG_JSON_FILE = p.getProperty("data.json.catalog", "");
 
         String OBJECTS_JSON_FILE = p.getProperty("data.json.objects");
 

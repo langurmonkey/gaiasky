@@ -52,12 +52,14 @@ public class InitialGui extends AbstractGui {
         DownloadHelper.downloadFile(GlobalConf.program.DATA_DESCRIPTOR_URL, Gdx.files.absolute(GlobalConf.data.DATA_LOCATION + "/gaiasky-data.json"), 
                 null, 
                 () -> {
-                    if (!basicDataPresent() || catalogFiles.size != 0) {
-                        // No catalog files, display downloader
-                        addDownloaderWindow();
-                    } else {
-                        displayChooser();
-                    }
+                    Gdx.app.postRunnable(() -> {
+                        if (!basicDataPresent() || catalogFiles.size == 0) {
+                            // No catalog files, display downloader
+                            addDownloaderWindow();
+                        } else {
+                            displayChooser();
+                        }
+                    });
                 }, 
                 null, 
                 null);
@@ -82,7 +84,6 @@ public class InitialGui extends AbstractGui {
      */
     private boolean basicDataPresent() {
         Path dataPath = Paths.get(GlobalConf.data.DATA_LOCATION).normalize();
-
         // Add all paths to check in this list
         Array<Path> required = new Array<Path>();
         required.add(dataPath.resolve("data-main.json"));
@@ -97,7 +98,7 @@ public class InitialGui extends AbstractGui {
         for (Path p : required) {
             if (!Files.exists(p) || !Files.isReadable(p)) {
                 logger.info("Data files not found: " + dataPath.toString());
-                return false;
+                return true;
             }
         }
 
