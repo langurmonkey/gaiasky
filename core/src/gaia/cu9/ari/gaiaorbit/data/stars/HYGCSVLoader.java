@@ -49,7 +49,7 @@ public class HYGCSVLoader extends AbstractCatalogLoader implements ISceneGraphLo
 
         if (pmFile != null) {
             pmMap = new HashMap<Integer, float[]>();
-            FileHandle pmf = Gdx.files.internal(pmFile);
+            FileHandle pmf = GlobalConf.data.dataFileHandle(pmFile);
             InputStream pmdata = pmf.read();
             BufferedReader pmbr = new BufferedReader(new InputStreamReader(pmdata));
             try {
@@ -78,7 +78,7 @@ public class HYGCSVLoader extends AbstractCatalogLoader implements ISceneGraphLo
 
         Array<AbstractPositionEntity> stars = new Array<AbstractPositionEntity>();
         for (String file : files) {
-            FileHandle f = Gdx.files.internal(file);
+            FileHandle f = GlobalConf.data.dataFileHandle(file);
             InputStream data = f.read();
             BufferedReader br = new BufferedReader(new InputStreamReader(data));
 

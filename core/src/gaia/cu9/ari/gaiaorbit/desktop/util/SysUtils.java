@@ -92,10 +92,6 @@ public class SysUtils {
         return System.getProperty("os.version");
     }
 
-    public static String getTruePath(String file) {
-        return (new File(file)).isAbsolute() ? file : GlobalConf.ASSETS_LOC + File.separator + file;
-    }
-
     /**
      * Gets a file pointer to the home directory. It is $HOME/.gaiasky in Linux
      * systems and C:\Users\$USERNAME\.gaiasky in Windows.

@@ -1,6 +1,7 @@
 package gaia.cu9.ari.gaiaorbit;
 
 import java.io.File;
+import java.nio.file.Paths;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -103,7 +104,7 @@ import gaia.cu9.ari.gaiaorbit.util.tree.OctreeNode;
  */
 public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
     private static final Log logger = Logger.getLogger(GaiaSky.class);
-    
+
     /**
      * Private state boolean indicating whether we are still loading resources.
      */
@@ -131,7 +132,7 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
     // TODO make this private again
     public SceneGraphRenderer sgr;
     private IPostProcessor pp;
-    
+
     // Initial gui
     private boolean INITGUI = true;
 
@@ -247,7 +248,7 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
             public FileHandle resolve(String fileName) {
                 return GlobalConf.data.dataFileHandle(fileName);
             }
-            
+
         };
         manager = new AssetManager(internalResolver);
         //manager.setLoader(Model.class, ".obj", new AdvancedObjLoader(resolver));
@@ -263,7 +264,7 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
 
         // Init global resources
         GlobalResources.initialize(manager);
-        
+
         // Initialise master manager
         MasterManager.initialize();
 

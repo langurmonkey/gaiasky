@@ -6,6 +6,7 @@ import com.badlogic.gdx.files.FileHandle;
 import gaia.cu9.ari.gaiaorbit.assets.OrbitDataLoader.OrbitDataLoaderParameter;
 import gaia.cu9.ari.gaiaorbit.event.EventManager;
 import gaia.cu9.ari.gaiaorbit.event.Events;
+import gaia.cu9.ari.gaiaorbit.util.GlobalConf;
 
 /**
  * Reads an orbit file into an OrbitData object.
@@ -19,7 +20,7 @@ public class OrbitFileDataEclipticJulianTimeProvider implements IOrbitDataProvid
     public void load(String file, OrbitDataLoaderParameter parameter) {
         FileDataLoaderEclipticJulianTime odl = new FileDataLoaderEclipticJulianTime();
         try {
-            FileHandle f = Gdx.files.internal(file);
+            FileHandle f = GlobalConf.data.dataFileHandle(file);
             data = odl.load(f.read());
             EventManager.instance.post(Events.ORBIT_DATA_LOADED, data, file);
         } catch (Exception e) {

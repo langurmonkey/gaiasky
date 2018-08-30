@@ -39,7 +39,7 @@ public class HYGDataProvider extends AbstractStarGroupDataProvider {
     public Array<StarBean> loadData(String file, double factor) {
         logger.info(I18n.bundle.format("notif.datafile", file));
 
-        FileHandle f = Gdx.files.internal(file);
+        FileHandle f = GlobalConf.data.dataFileHandle(file);
 
         initLists(f);
         loadData(f.read(), factor);

@@ -16,6 +16,7 @@ import java.util.List;
 import java.util.Map;
 
 import gaia.cu9.ari.gaiaorbit.desktop.util.SysUtils;
+import gaia.cu9.ari.gaiaorbit.util.GlobalConf;
 import gaia.cu9.ari.gaiaorbit.util.Logger;
 import gaia.cu9.ari.gaiaorbit.util.Logger.Log;
 import gaia.cu9.ari.gaiaorbit.util.Pair;
@@ -134,7 +135,7 @@ public class MetadataBinaryIO {
         nodesMap = new HashMap<Long, Pair<OctreeNode, long[]>>();
 
         try {
-            FileChannel fc = new RandomAccessFile(SysUtils.getTruePath(file), "r").getChannel();
+            FileChannel fc = new RandomAccessFile(GlobalConf.data.dataFile(file), "r").getChannel();
 
             MappedByteBuffer mem = fc.map(FileChannel.MapMode.READ_ONLY, 0, fc.size());
 

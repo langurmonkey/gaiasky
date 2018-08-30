@@ -111,7 +111,7 @@ public class TextureComponent {
             // Try to figure out which is it
             String suffix = getQualitySuffix();
             String texSuffix = tex.replace("*", suffix);
-            if (Gdx.files.internal(texSuffix).exists()) {
+            if (GlobalConf.data.dataFileHandle(texSuffix).exists()) {
                 tex = texSuffix;
             } else {
                 tex = tex.replace("*", "");
