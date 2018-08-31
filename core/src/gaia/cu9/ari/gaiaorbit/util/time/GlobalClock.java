@@ -20,8 +20,6 @@ import gaia.cu9.ari.gaiaorbit.util.Nature;
 public class GlobalClock implements IObserver, ITimeFrameProvider {
     private static final Log logger = Logger.getLogger(GlobalClock.class);
 
-    private static final double MS_TO_HOUR = 1 / 3600000d;
-
     /** The current time of the clock **/
     public Instant time;
     long lastTime;
@@ -127,7 +125,7 @@ public class GlobalClock implements IObserver, ITimeFrameProvider {
                 lastUpdate = 0;
             }
         } else if (time.toEpochMilli() - lastTime != 0) {
-            hdiff = (time.toEpochMilli() - lastTime) * MS_TO_HOUR;
+            hdiff = (time.toEpochMilli() - lastTime) * Nature.MS_TO_H;
             lastTime = time.toEpochMilli();
         } else {
             hdiff = 0d;

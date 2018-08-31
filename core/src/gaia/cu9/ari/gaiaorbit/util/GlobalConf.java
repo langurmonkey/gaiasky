@@ -1,5 +1,7 @@
 package gaia.cu9.ari.gaiaorbit.util;
 
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.Instant;
 import java.util.ArrayList;
@@ -509,7 +511,12 @@ public class GlobalConf {
                 if (path.startsWith("data/")) {
                     path = path.substring(5);
                 } 
-                return Paths.get(DATA_LOCATION, path).toString();
+                Path p = Paths.get(DATA_LOCATION, path);
+                if(Files.exists(p)) {
+                    return p.toString();
+                }else {
+                    return path;
+                }
             }
         }
 

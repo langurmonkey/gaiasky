@@ -139,8 +139,8 @@ public class DesktopNetworkChecker extends Thread implements INetworkChecker {
                         simbadLink = new Link("Simbad", linkStyle, "");
                         wikiLink = new Link("Wikipedia ", linkStyle, "");
 
-                        simbadCell = table.add().left();
-                        wikiCell = table.add().left();
+                        simbadCell = table.add((Link) null).left();
+                        wikiCell = table.add((Link) null).left();
 
                         String wikiname = focus.getName().replace(' ', '_');
 
