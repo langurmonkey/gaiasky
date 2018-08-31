@@ -6,91 +6,95 @@ import com.badlogic.gdx.graphics.glutils.ShaderProgram;
 
 import gaia.cu9.ari.gaiaorbit.scenegraph.SceneGraphNode.RenderGroup;
 import gaia.cu9.ari.gaiaorbit.util.Logger;
+import gaia.cu9.ari.gaiaorbit.util.Logger.Log;
 
 public abstract class ImmediateRenderSystem extends AbstractRenderSystem {
-	protected static final int shortLimit = (int) Math.pow(2, 2 * 8);
+        protected static final Log logger = Logger.getLogger(ImmediateRenderSystem.class);
 
-	protected int meshIdx;
-	protected MeshData[] meshes;
-	protected MeshData curr;
-	// Auxiliary array that holds vertices temporarily
-	protected float[] vertices;
+        protected static final int DEFAULT_VERTICES_SIZE = 1500000;
+protected static final int shortLimit = (int) Math.pow(2, 2 * 8);
 
-	protected class MeshData {
+protected int meshIdx;
+protected MeshData[] meshes;
+protected MeshData curr;
+// Auxiliary array that holds vertices temporarily
+protected float[] vertices;
 
-		protected Mesh mesh;
+protected class MeshData {
 
-		protected int colorOffset;
+protected Mesh mesh;
 
-		protected int vertexIdx;
-		// Size of each vertex in number of entries in array. Multiply by array type
-		// size to get vertex size in bytes.
-		protected int vertexSize;
-		// Vertex array, this usually is just a reference to an external temp array
-		protected float[] vertices;
+protected int colorOffset;
 
-		protected int indexIdx;
-		protected short indexVert;
-		protected short[] indices;
-		protected int numVertices;
+protected int vertexIdx;
+// Size of each vertex in number of entries in array. Multiply by array type
+// size to get vertex size in bytes.
+protected int vertexSize;
+// Vertex array, this usually is just a reference to an external temp array
+protected float[] vertices;
 
-		public void clear() {
-			vertexIdx = 0;
-			indexIdx = 0;
-			indexVert = 0;
-			numVertices = 0;
-		}
-	}
+protected int indexIdx;
+protected short indexVert;
+protected short[] indices;
+protected int numVertices;
 
-	protected int maxVertices;
+public void clear() {
+vertexIdx = 0;
+indexIdx = 0;
+indexVert = 0;
+numVertices = 0;
+}
+}
 
-	protected ImmediateRenderSystem(RenderGroup rg, float[] alphas, ShaderProgram[] programs) {
-		this(rg, alphas, programs, -1);
-	}
+protected int maxVertices;
 
-	protected ImmediateRenderSystem(RenderGroup rg, float[] alphas, ShaderProgram[] programs, int numVertices) {
-		super(rg, alphas, programs);
-		initShaderProgram();
-		initVertices();
-		meshIdx = 0;
-		if (numVertices > 0)
-			vertices = new float[numVertices];
-	}
+protected ImmediateRenderSystem(RenderGroup rg, float[] alphas, ShaderProgram[] programs) {
+this(rg, alphas, programs, -1);
+}
 
-	protected abstract void initShaderProgram();
+protected ImmediateRenderSystem(RenderGroup rg, float[] alphas, ShaderProgram[] programs, int numVertices) {
+super(rg, alphas, programs);
+initShaderProgram();
+initVertices();
+meshIdx = 0;
+if (numVertices > 0)
+vertices = new float[numVertices];
+}
 
-	protected abstract void initVertices();
+protected abstract void initShaderProgram();
 
-	public void color(Color color) {
-		curr.vertices[curr.vertexIdx + curr.colorOffset] = color.toFloatBits();
-	}
+protected abstract void initVertices();
 
-	public void color(float r, float g, float b, float a) {
-		curr.vertices[curr.vertexIdx + curr.colorOffset] = Color.toFloatBits(r, g, b, a);
-	}
+public void color(Color color) {
+curr.vertices[curr.vertexIdx + curr.colorOffset] = color.toFloatBits();
+}
 
-	public void color(double r, double g, double b, double a) {
-		curr.vertices[curr.vertexIdx + curr.colorOffset] = Color.toFloatBits((float) r, (float) g, (float) b,
-				(float) a);
-	}
+public void color(float r, float g, float b, float a) {
+curr.vertices[curr.vertexIdx + curr.colorOffset] = Color.toFloatBits(r, g, b, a);
+}
 
-	public void color(float colorBits) {
-		curr.vertices[curr.vertexIdx + curr.colorOffset] = colorBits;
-	}
+public void color(double r, double g, double b, double a) {
+curr.vertices[curr.vertexIdx + curr.colorOffset] = Color.toFloatBits((float) r, (float) g, (float) b,
+(float) a);
+}
 
-	public void vertex(float x, float y, float z) {
-		curr.vertices[curr.vertexIdx] = x;
-		curr.vertices[curr.vertexIdx + 1] = y;
-		curr.vertices[curr.vertexIdx + 2] = z;
+public void color(float colorBits) {
+curr.vertices[curr.vertexIdx + curr.colorOffset] = colorBits;
+}
 
-		curr.vertexIdx += curr.vertexSize;
-		curr.numVertices++;
-	}
+public void vertex(float x, float y, float z) {
+curr.vertices[curr.vertexIdx] = x;
+curr.vertices[curr.vertexIdx + 1] = y;
+curr.vertices[curr.vertexIdx + 2] = z;
 
-	protected void checkRequiredVerticesSize(int requiredSize) {
-		if (vertices.length < requiredSize) {
-			Logger.info(this.getClass().getSimpleName(), "Allocating new vertex array: " + vertices.length + " > " + requiredSize);
-			vertices = new float[requiredSize];
-		}
-	}
+curr.vertexIdx += curr.vertexSize;
+curr.numVertices++;
+}
+
+protected void checkRequiredVerticesSize(int requiredSize) {
+if (vertices.length < requiredSize) {
+logger.info("Allocating new vertex array: " + vertices.length + " > " + requiredSize);
+vertices = new float[requiredSize];
+}
+}
 }

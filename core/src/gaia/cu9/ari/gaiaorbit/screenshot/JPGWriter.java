@@ -14,6 +14,7 @@ import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.Pixmap;
 
 import gaia.cu9.ari.gaiaorbit.util.Logger;
+import gaia.cu9.ari.gaiaorbit.util.Logger.Log;
 
 /**
  * Writes JPG images
@@ -22,6 +23,7 @@ import gaia.cu9.ari.gaiaorbit.util.Logger;
  *
  */
 public class JPGWriter {
+    private static final Log logger = Logger.getLogger(JPGWriter.class);
 
     /**
      * Quality setting, from 0 to 1
@@ -45,8 +47,10 @@ public class JPGWriter {
     }
 
     public static void setQuality(float quality) {
-        JPGWriter.QUALITY = quality;
-        updateJPEGParams();
+        if (quality != JPGWriter.QUALITY) {
+            JPGWriter.QUALITY = quality;
+            updateJPEGParams();
+        }
     }
 
     public static void write(FileHandle file, Pixmap pix) {
@@ -58,12 +62,12 @@ public class JPGWriter {
             writer.write(null, new IIOImage(pixmapToBufferedImage(pix), null, null), jpegParams);
 
         } catch (IOException e) {
-            Logger.error(e, JPGWriter.class.getSimpleName());
+            logger.error(e);
         } finally {
             try {
                 fios.close();
             } catch (IOException e) {
-                Logger.error(e, JPGWriter.class.getSimpleName());
+                logger.error(e);
             }
 
         }

@@ -21,8 +21,8 @@ import gaia.cu9.ari.gaiaorbit.event.Events;
 import gaia.cu9.ari.gaiaorbit.event.IObserver;
 import gaia.cu9.ari.gaiaorbit.render.IPostProcessor.PostProcessBean;
 import gaia.cu9.ari.gaiaorbit.scenegraph.IFocus;
-import gaia.cu9.ari.gaiaorbit.scenegraph.camera.ICamera;
 import gaia.cu9.ari.gaiaorbit.scenegraph.camera.CameraManager.CameraMode;
+import gaia.cu9.ari.gaiaorbit.scenegraph.camera.ICamera;
 import gaia.cu9.ari.gaiaorbit.util.Constants;
 import gaia.cu9.ari.gaiaorbit.util.GlobalConf;
 import gaia.cu9.ari.gaiaorbit.util.GlobalConf.ProgramConf.StereoProfile;
@@ -105,8 +105,10 @@ public class SGRStereoscopic extends SGRAbstract implements ISGR, IObserver {
                 separation = Math.tan(Math.toRadians(EYE_ANGLE_DEG)) * distToFocus;
             }
             // Lets cap it to 100 AU
-            separationCapped = Math.min(separation, 1e2 * Constants.AU_TO_U);
+            separationCapped = Math.min(separation, 1 * Constants.AU_TO_U);
             dirangleDeg = EYE_ANGLE_DEG;
+        } else {
+            separationCapped = Math.min(separation, 1 * Constants.AU_TO_U);
         }
 
         // Aux5d contains the direction to the side of the camera, normalised
@@ -119,7 +121,7 @@ public class SGRStereoscopic extends SGRAbstract implements ISGR, IObserver {
         Vector3 backupDir = aux3.set(cam.direction);
         Vector3d backupPosd = aux1d.set(camera.getPos());
 
-        if (GlobalConf.program.STEREO_PROFILE == StereoProfile.ANAGLYPHIC) {
+        if (GlobalConf.program.STEREO_PROFILE.isAnaglyphic()) {
             // Update viewport
             extendViewport.setCamera(camera.getCamera());
             extendViewport.setWorldSize(rw, rh);
@@ -178,18 +180,44 @@ public class SGRStereoscopic extends SGRAbstract implements ISGR, IObserver {
             Gdx.gl.glActiveTexture(GL20.GL_TEXTURE0);
         } else {
 
-            boolean stretch = GlobalConf.program.STEREO_PROFILE == StereoProfile.HD_3DTV;
+            int srw, srh, boundsw, boundsh, start2w, start2h;
+
+            boolean stretch = GlobalConf.program.STEREO_PROFILE == StereoProfile.HD_3DTV_HORIZONTAL || GlobalConf.program.STEREO_PROFILE == StereoProfile.HD_3DTV_VERTICAL;
             boolean changesides = GlobalConf.program.STEREO_PROFILE == StereoProfile.CROSSEYE;
+
+            if (GlobalConf.program.STEREO_PROFILE.isHorizontal()) {
+                if (stretch) {
+                    srw = rw;
+                } else {
+                    srw = rw / 2;
+                }
+                srh = rh;
+                boundsw = rw / 2;
+                boundsh = rh;
+                start2w = boundsw;
+                start2h = 0;
+            } else {
+                if (stretch) {
+                    srh = rh;
+                } else {
+                    srh = rh / 2;
+                }
+                srw = rw;
+                boundsw = rw;
+                boundsh = rh / 2;
+                start2w = 0;
+                start2h = boundsh;
+            }
 
             // Side by side rendering
             Viewport viewport = stretch ? stretchViewport : extendViewport;
 
             viewport.setCamera(camera.getCamera());
-            viewport.setWorldSize(stretch ? rw : rw / 2, rh);
+            viewport.setWorldSize(srw, srh);
 
             /** LEFT EYE **/
 
-            viewport.setScreenBounds(0, 0, rw / 2, rh);
+            viewport.setScreenBounds(0, 0, boundsw, boundsh);
             viewport.apply();
 
             // Camera to left
@@ -200,12 +228,12 @@ public class SGRStereoscopic extends SGRAbstract implements ISGR, IObserver {
 
             sgr.renderGlowPass(camera);
 
-            FrameBuffer fb3d = getFrameBuffer(rw / 2, rh);
-            boolean postproc = postprocessCapture(ppb, fb3d, rw / 2, rh);
+            FrameBuffer fb3d = getFrameBuffer(boundsw, boundsh);
+            boolean postproc = postprocessCapture(ppb, fb3d, boundsw, boundsh);
             sgr.renderScene(camera, t, rc);
 
             Texture tex = null;
-            postprocessRender(ppb, fb3d, postproc, camera, rw / 2, rh);
+            postprocessRender(ppb, fb3d, postproc, camera, boundsw, boundsh);
             tex = fb3d.getColorBufferTexture();
 
             if (fb != null) {
@@ -214,7 +242,7 @@ public class SGRStereoscopic extends SGRAbstract implements ISGR, IObserver {
 
             GlobalResources.spriteBatch.begin();
             GlobalResources.spriteBatch.setColor(1f, 1f, 1f, 1f);
-            GlobalResources.spriteBatch.draw(tex, 0, 0, 0, 0, rw / 2, rh, 1, 1, 0, 0, 0, rw / 2, rh, false, true);
+            GlobalResources.spriteBatch.draw(tex, 0, 0, 0, 0, boundsw, boundsh, 1, 1, 0, 0, 0, boundsw, boundsh, false, true);
             GlobalResources.spriteBatch.end();
 
             if (fb != null)
@@ -222,7 +250,7 @@ public class SGRStereoscopic extends SGRAbstract implements ISGR, IObserver {
 
             /** RIGHT EYE **/
 
-            viewport.setScreenBounds(rw / 2, 0, rw / 2, rh);
+            viewport.setScreenBounds(start2w, start2h, boundsw, boundsh);
             viewport.apply();
 
             // Camera to right
@@ -234,10 +262,10 @@ public class SGRStereoscopic extends SGRAbstract implements ISGR, IObserver {
 
             sgr.renderGlowPass(camera);
 
-            postproc = postprocessCapture(ppb, fb3d, rw / 2, rh);
+            postproc = postprocessCapture(ppb, fb3d, boundsw, boundsh);
             sgr.renderScene(camera, t, rc);
 
-            postprocessRender(ppb, fb3d, postproc, camera, rw / 2, rh);
+            postprocessRender(ppb, fb3d, postproc, camera, boundsw, boundsh);
             tex = fb3d.getColorBufferTexture();
 
             if (fb != null)
@@ -245,7 +273,7 @@ public class SGRStereoscopic extends SGRAbstract implements ISGR, IObserver {
 
             GlobalResources.spriteBatch.begin();
             GlobalResources.spriteBatch.setColor(1f, 1f, 1f, 1f);
-            GlobalResources.spriteBatch.draw(tex, rw / 2, 0, 0, 0, rw / 2, rh, 1, 1, 0, 0, 0, rw / 2, rh, false, true);
+            GlobalResources.spriteBatch.draw(tex, start2w, start2h, 0, 0, boundsw, boundsh, 1, 1, 0, 0, 0, boundsw, boundsh, false, true);
             GlobalResources.spriteBatch.end();
 
             if (fb != null)
@@ -265,7 +293,6 @@ public class SGRStereoscopic extends SGRAbstract implements ISGR, IObserver {
         camera.setPos(backupPosd);
         cam.position.set(backupPos);
         cam.direction.set(backupDir);
-        camera.getShift().scl(0d);
     }
 
     private void moveCamera(ICamera camera, Vector3d sideRemainder, Vector3d side, Vector3d sideCapped, double angle, boolean switchSides) {
@@ -278,7 +305,6 @@ public class SGRStereoscopic extends SGRAbstract implements ISGR, IObserver {
 
             // Uncomment to enable 3D in points
             camera.getPos().add(sideRemainder);
-            camera.setShift(sideRemainder);
 
         } else {
             cam.position.sub(sidef);
@@ -286,8 +312,6 @@ public class SGRStereoscopic extends SGRAbstract implements ISGR, IObserver {
 
             // Uncomment to enable 3D in points
             camera.getPos().sub(sideRemainder);
-            camera.setShift(sideRemainder);
-            camera.getShift().scl(-1d);
         }
         cam.update();
     }

@@ -38,10 +38,10 @@ import gaia.cu9.ari.gaiaorbit.scenegraph.IStarFocus;
 import gaia.cu9.ari.gaiaorbit.scenegraph.Planet;
 import gaia.cu9.ari.gaiaorbit.scenegraph.camera.CameraManager.CameraMode;
 import gaia.cu9.ari.gaiaorbit.util.ComponentTypes;
-import gaia.cu9.ari.gaiaorbit.util.Constants;
 import gaia.cu9.ari.gaiaorbit.util.GlobalConf;
 import gaia.cu9.ari.gaiaorbit.util.GlobalResources;
 import gaia.cu9.ari.gaiaorbit.util.Logger;
+import gaia.cu9.ari.gaiaorbit.util.Logger.Log;
 import gaia.cu9.ari.gaiaorbit.util.camera.CameraUtils;
 import gaia.cu9.ari.gaiaorbit.util.format.INumberFormat;
 import gaia.cu9.ari.gaiaorbit.util.format.NumberFormatFactory;
@@ -58,7 +58,8 @@ import gaia.cu9.ari.gaiaorbit.util.scene2d.OwnLabel;
  *
  */
 public class FullGui extends AbstractGui {
-
+    private static final Log logger = Logger.getLogger(FullGui.class);
+    
     protected ControlsWindow controlsWindow;
     protected MinimapWindow minimapWindow;
 
@@ -87,7 +88,7 @@ public class FullGui extends AbstractGui {
     // Uncertainties disabled by default
     private boolean uncertainties = false;
     // Rel effects off
-    private boolean releffects = true;
+    private boolean releffects = false;
 
     public FullGui() {
         super();
@@ -101,7 +102,7 @@ public class FullGui extends AbstractGui {
 
     @Override
     public void doneLoading(AssetManager assetManager) {
-        Logger.info(txt("notif.gui.init"));
+        logger.info(txt("notif.gui.init"));
 
         skin = GlobalResources.skin;
         interfaces = new Array<IGuiInterface>();
@@ -150,10 +151,11 @@ public class FullGui extends AbstractGui {
         interfaces.add(messagesInterface);
 
         // INPUT STATE
-        runStateInterface = new RunStateInterface(skin);
+        runStateInterface = new RunStateInterface(skin, true);
         runStateInterface.setFillParent(true);
-        runStateInterface.right().top();
-        runStateInterface.pad(100, 0, 0, 5);
+        runStateInterface.center().bottom();
+        //runStateInterface.pad(GlobalConf.SCALE_FACTOR == 1 ? 135 : 200, 0, 0, 5);
+        runStateInterface.pad(0,0, 5, 0);
         interfaces.add(runStateInterface);
 
         // CUSTOM OBJECTS INTERFACE
@@ -210,7 +212,7 @@ public class FullGui extends AbstractGui {
                 ui.addActor(messagesInterface);
             if (focusInterface != null && !GlobalConf.runtime.STRIPPED_FOV_MODE)
                 ui.addActor(fi);
-            if (runStateInterface != null && Constants.desktop) {
+            if (runStateInterface != null) {
                 ui.addActor(runStateInterface);
             }
             if (pointerXCoord != null && pointerYCoord != null) {
@@ -322,7 +324,7 @@ public class FullGui extends AbstractGui {
                 Method m = ClassReflection.getMethod(this.getClass(), method);
                 m.invoke(this);
             } catch (ReflectionException e) {
-                Logger.error(e);
+                logger.error(e);
             }
             rebuildGui();
             break;
@@ -333,7 +335,7 @@ public class FullGui extends AbstractGui {
                 Method m = ClassReflection.getMethod(this.getClass(), method);
                 m.invoke(this);
             } catch (ReflectionException e) {
-                Logger.error(e);
+                logger.error(e);
             }
             rebuildGui();
             break;

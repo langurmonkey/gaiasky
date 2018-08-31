@@ -27,7 +27,6 @@ import gaia.cu9.ari.gaiaorbit.event.Events;
 import gaia.cu9.ari.gaiaorbit.util.GlobalConf;
 import gaia.cu9.ari.gaiaorbit.util.GlobalResources;
 import gaia.cu9.ari.gaiaorbit.util.I18n;
-import gaia.cu9.ari.gaiaorbit.util.SysUtilsFactory;
 import gaia.cu9.ari.gaiaorbit.util.scene2d.CollapsibleWindow;
 import gaia.cu9.ari.gaiaorbit.util.scene2d.OwnImageButton;
 import gaia.cu9.ari.gaiaorbit.util.scene2d.OwnLabel;
@@ -138,7 +137,7 @@ public class RunCameraWindow extends CollapsibleWindow {
         table.clear();
 
         // Choose script
-        FileHandle scriptFolder = Gdx.files.absolute(SysUtilsFactory.getSysUtils().getDefaultCameraDir().getPath());
+        FileHandle scriptFolder = Gdx.files.absolute(SysUtils.getDefaultCameraDir().getPath());
 
         scripts = new Array<FileHandle>();
 
@@ -150,7 +149,7 @@ public class RunCameraWindow extends CollapsibleWindow {
         HorizontalGroup titlegroup = new HorizontalGroup();
         titlegroup.space(pad);
         ImageButton tooltip = new OwnImageButton(skin, "tooltip");
-        tooltip.addListener(new TextTooltip(txt("gui.tooltip.camera", SysUtilsFactory.getSysUtils().getDefaultCameraDir()), skin));
+        tooltip.addListener(new TextTooltip(txt("gui.tooltip.camera", SysUtils.getDefaultCameraDir()), skin));
         Label choosetitle = new OwnLabel(txt("gui.camera.choose"), skin, "help-title");
         titlegroup.addActor(choosetitle);
         titlegroup.addActor(tooltip);

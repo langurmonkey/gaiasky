@@ -594,6 +594,8 @@ public enum Events {
     DEBUG2,
     DEBUG3,
     DEBUG4,
+    /** Frame buffers info **/
+    DEBUG_BUFFERS,
     /**
      * Notifies from a java exception, it sends the Throwable and an optional
      * tag.

@@ -6,6 +6,7 @@ import java.io.FileWriter;
 import java.time.Instant;
 import java.util.List;
 
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Button;
 import com.badlogic.gdx.scenes.scene2d.ui.HorizontalGroup;
@@ -18,11 +19,10 @@ import com.badlogic.gdx.scenes.scene2d.ui.TextTooltip;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener.ChangeEvent;
 import com.badlogic.gdx.utils.Align;
 
+import gaia.cu9.ari.gaiaorbit.desktop.util.SysUtils;
 import gaia.cu9.ari.gaiaorbit.util.GlobalConf;
 import gaia.cu9.ari.gaiaorbit.util.I18n;
-import gaia.cu9.ari.gaiaorbit.util.ISysUtils;
 import gaia.cu9.ari.gaiaorbit.util.Logger;
-import gaia.cu9.ari.gaiaorbit.util.SysUtilsFactory;
 import gaia.cu9.ari.gaiaorbit.util.format.DateFormatFactory;
 import gaia.cu9.ari.gaiaorbit.util.format.DateFormatFactory.DateType;
 import gaia.cu9.ari.gaiaorbit.util.format.IDateFormat;
@@ -46,7 +46,7 @@ public class LogWindow extends GenericDialog {
         super(txt("gui.log.title"), skin, stage);
 
         this.format = DateFormatFactory.getFormatter(I18n.locale, DateType.DATETIME);
-
+        this.setResizable(true);
         setCancelText(txt("gui.close"));
 
         // Build
@@ -56,8 +56,8 @@ public class LogWindow extends GenericDialog {
 
     @Override
     protected void build() {
-        w = 500 * GlobalConf.SCALE_FACTOR;
-        h = 500 * GlobalConf.SCALE_FACTOR;
+        w = Math.min(500 * GlobalConf.SCALE_FACTOR, Gdx.graphics.getWidth() - 200);
+        h = Math.min(400 * GlobalConf.SCALE_FACTOR, Gdx.graphics.getHeight() - 150);
         pad = 10 * GlobalConf.SCALE_FACTOR;
 
         logs = new Table(skin);
@@ -119,8 +119,7 @@ public class LogWindow extends GenericDialog {
 
     public void export() {
         String filename = Instant.now().toString() + "_gaiasky.log";
-        ISysUtils su = SysUtilsFactory.getSysUtils();
-        File gshome = su.getGSHomeDir();
+        File gshome = SysUtils.getGSHomeDir();
         File log = new File(gshome, filename);
 
         try {
@@ -131,9 +130,9 @@ public class LogWindow extends GenericDialog {
             }
             bw.flush();
             bw.close();
-            Logger.info("Log file written to " + log.getAbsolutePath());
+            Logger.getLogger(this.getClass()).info("Log file written to " + log.getAbsolutePath());
         } catch (Exception e) {
-            Logger.error(e, this.getClass().getSimpleName());
+            Logger.getLogger(this.getClass()).error(e);
         }
 
     }

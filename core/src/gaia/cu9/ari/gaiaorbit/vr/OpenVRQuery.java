@@ -20,13 +20,16 @@ import org.lwjgl.openvr.OpenVR;
 import org.lwjgl.system.MemoryStack;
 
 import gaia.cu9.ari.gaiaorbit.util.Logger;
+import gaia.cu9.ari.gaiaorbit.util.Logger.Log;
 
 public class OpenVRQuery {
+    private static final Log logger = Logger.getLogger(OpenVRQuery.class);
+
     public static void queryOpenVr() {
-        Logger.info("==== Querying OpenVR status ====");
-        Logger.info("OpenVR runtime installed: " + VR_IsRuntimeInstalled());
-        Logger.info("OpenVR runtime path: " + VR_RuntimePath());
-        Logger.info("HMD present: " + VR_IsHmdPresent());
+        logger.info("==== Querying OpenVR status ====");
+        logger.info("OpenVR runtime installed: " + VR_IsRuntimeInstalled());
+        logger.info("OpenVR runtime path: " + VR_RuntimePath());
+        logger.info("HMD present: " + VR_IsHmdPresent());
 
         try (MemoryStack stack = stackPush()) {
             IntBuffer peError = stack.mallocInt(1);
@@ -36,20 +39,20 @@ public class OpenVRQuery {
                 try {
                     OpenVR.create(token);
 
-                    Logger.info("Model Number : " + VRSystem_GetStringTrackedDeviceProperty(k_unTrackedDeviceIndex_Hmd, ETrackedDeviceProperty_Prop_ModelNumber_String, peError));
-                    Logger.info("Serial Number: " + VRSystem_GetStringTrackedDeviceProperty(k_unTrackedDeviceIndex_Hmd, ETrackedDeviceProperty_Prop_SerialNumber_String, peError));
+                    logger.info("Model Number : " + VRSystem_GetStringTrackedDeviceProperty(k_unTrackedDeviceIndex_Hmd, ETrackedDeviceProperty_Prop_ModelNumber_String, peError));
+                    logger.info("Serial Number: " + VRSystem_GetStringTrackedDeviceProperty(k_unTrackedDeviceIndex_Hmd, ETrackedDeviceProperty_Prop_SerialNumber_String, peError));
 
                     IntBuffer w = stack.mallocInt(1);
                     IntBuffer h = stack.mallocInt(1);
                     VRSystem_GetRecommendedRenderTargetSize(w, h);
-                    Logger.info("Recommended width : " + w.get(0));
-                    Logger.info("Recommended height: " + h.get(0));
+                    logger.info("Recommended width : " + w.get(0));
+                    logger.info("Recommended height: " + h.get(0));
                 } finally {
                     VR_ShutdownInternal();
                 }
             } else {
-                Logger.error("INIT ERROR SYMBOL: " + VR_GetVRInitErrorAsSymbol(peError.get(0)));
-                Logger.error("INIT ERROR  DESCR: " + VR_GetVRInitErrorAsEnglishDescription(peError.get(0)));
+                logger.error("INIT ERROR SYMBOL: " + VR_GetVRInitErrorAsSymbol(peError.get(0)));
+                logger.error("INIT ERROR  DESCR: " + VR_GetVRInitErrorAsEnglishDescription(peError.get(0)));
             }
         }
     }

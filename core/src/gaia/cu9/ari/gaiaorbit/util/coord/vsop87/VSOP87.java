@@ -8,8 +8,10 @@ import com.badlogic.gdx.utils.reflect.ReflectionException;
 
 import gaia.cu9.ari.gaiaorbit.interfce.TextUtils;
 import gaia.cu9.ari.gaiaorbit.util.Logger;
+import gaia.cu9.ari.gaiaorbit.util.Logger.Log;
 
 public class VSOP87 {
+    private static final Log logger = Logger.getLogger(VSOP87.class);
     public static VSOP87 instance;
     static {
         instance = new VSOP87();
@@ -37,7 +39,7 @@ public class VSOP87 {
             try {
                 elements.put(cb, (iVSOP87) ClassReflection.newInstance(clazz));
             } catch (ReflectionException e) {
-                Logger.error("VSOP87", e.getLocalizedMessage());
+                logger.error(e);
             }
             tried.put(cb, true);
         }

@@ -10,6 +10,7 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.GL30;
 import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.Texture.TextureFilter;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Stage;
@@ -59,7 +60,7 @@ public class AboutWindow extends GenericDialog {
     private OwnLabel checkLabel;
 
     public AboutWindow(Stage stage, Skin skin) {
-        super(txt("gui.help.help") + " - v" + GlobalConf.version.version + " - " + txt("gui.build", GlobalConf.version.build), skin, stage);
+        super(txt("gui.help.help") + " - " + GlobalConf.version.version + " - " + txt("gui.build", GlobalConf.version.build), skin, stage);
         this.linkStyle = skin.get("link", LabelStyle.class);
 
         setCancelText(txt("gui.close"));
@@ -107,7 +108,14 @@ public class AboutWindow extends GenericDialog {
         /** CONTENT 1 - HELP **/
         final Table contentHelp = new Table(skin);
         contentHelp.align(Align.top);
-        Image gaiasky = new Image(skin.getDrawable("gaiasky-logo"));
+
+        FileHandle gslogo = Gdx.files.internal("img/gaiasky-logo.png");
+        Texture logotex = new Texture(gslogo);
+        logotex.setFilter(TextureFilter.Linear, TextureFilter.Linear);
+        Image gaiasky = new Image(logotex);
+        float scl = GlobalConf.SCALE_FACTOR / 2.5f;
+        gaiasky.setScale(scl);
+        gaiasky.setOrigin(Align.center);
 
         // User manual
         Label usermantitle = new OwnLabel(txt("gui.help.usermanual"), skin);
@@ -320,16 +328,20 @@ public class AboutWindow extends GenericDialog {
         Label glslversion = new OwnLabel(Gdx.gl.glGetString(GL20.GL_SHADING_LANGUAGE_VERSION), skin);
 
         Label glextensionstitle = new OwnLabel(txt("gui.help.glextensions"), skin);
+        String extensions = Gdx.gl.glGetString(GL20.GL_EXTENSIONS);
         IntBuffer buf = BufferUtils.newIntBuffer(16);
-        Gdx.gl.glGetIntegerv(GL30.GL_NUM_EXTENSIONS, buf);
-        int next = buf.get(0);
-        String[] extensionsstr = new String[next];
-        for (int i = 0; i < next; i++) {
-            extensionsstr[i] = Gdx.gl30.glGetStringi(GL30.GL_EXTENSIONS, i);
+        if (extensions.isEmpty() || extensions == null) {
+            Gdx.gl.glGetIntegerv(GL30.GL_NUM_EXTENSIONS, buf);
+            int next = buf.get(0);
+            String[] extensionsstr = new String[next];
+            for (int i = 0; i < next; i++) {
+                extensionsstr[i] = Gdx.gl30.glGetStringi(GL30.GL_EXTENSIONS, i);
+            }
+            extensions = arrayToStr(extensionsstr);
         }
         Gdx.gl.glGetIntegerv(GL20.GL_MAX_TEXTURE_SIZE, buf);
         int maxSize = buf.get(0);
-        TextArea glextensions = new TextArea("Max texture size: " + maxSize + "\r" + arrayToStr(extensionsstr), skin, "no-disabled");
+        TextArea glextensions = new TextArea("Max texture size: " + maxSize + "\r" + extensions, skin, "no-disabled");
         glextensions.setDisabled(true);
         glextensions.setPrefRows(lines);
         glextensions.clearListeners();

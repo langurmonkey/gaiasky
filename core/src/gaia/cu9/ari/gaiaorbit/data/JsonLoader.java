@@ -20,6 +20,7 @@ import gaia.cu9.ari.gaiaorbit.scenegraph.SceneGraphNode;
 import gaia.cu9.ari.gaiaorbit.util.GlobalResources;
 import gaia.cu9.ari.gaiaorbit.util.I18n;
 import gaia.cu9.ari.gaiaorbit.util.Logger;
+import gaia.cu9.ari.gaiaorbit.util.Logger.Log;
 import gaia.cu9.ari.gaiaorbit.util.coord.IBodyCoordinates;
 
 /**
@@ -30,6 +31,8 @@ import gaia.cu9.ari.gaiaorbit.util.coord.IBodyCoordinates;
  * @param <T>
  */
 public class JsonLoader<T extends SceneGraphNode> implements ISceneGraphLoader {
+    private static final Log logger = Logger.getLogger(JsonLoader.class);
+    
     private static final String COMPONENTS_PACKAGE = "gaia.cu9.ari.gaiaorbit.scenegraph.component.";
     /** Params to skip in the normal processing **/
     private static final List<String> PARAM_SKIP = Arrays.asList("args", "impl", "comment", "comments");
@@ -57,20 +60,22 @@ public class JsonLoader<T extends SceneGraphNode> implements ISceneGraphLoader {
                     size++;
                     String clazzName = child.getString("impl");
 
+                    @SuppressWarnings("unchecked")
                     Class<Object> clazz = (Class<Object>) ClassReflection.forName(clazzName);
 
                     // Convert to object and add to list
+                    @SuppressWarnings("unchecked")
                     T object = (T) convertJsonToObject(child, clazz);
 
                     bodies.add(object);
 
                     child = child.next;
                 }
-                Logger.info(this.getClass().getSimpleName(), I18n.bundle.format("notif.nodeloader", size, filePath));
+                logger.info(I18n.bundle.format("notif.nodeloader", size, filePath));
             }
 
         } catch (Exception e) {
-            Logger.error(e);
+            logger.error(e);
         }
 
         return bodies;
@@ -146,6 +151,7 @@ public class JsonLoader<T extends SceneGraphNode> implements ISceneGraphLoader {
                         int i = 0;
                         while (vectorattrib != null) {
                             String clazzName = vectorattrib.getString("impl");
+                            @SuppressWarnings("unchecked")
                             Class<Object> childclazz = (Class<Object>) ClassReflection.forName(clazzName);
                             ((Object[]) value)[i] = convertJsonToObject(vectorattrib, childclazz);
                             i++;
@@ -248,7 +254,7 @@ public class JsonLoader<T extends SceneGraphNode> implements ISceneGraphLoader {
                     m = ClassReflection.getMethod(source, methodName, IBodyCoordinates.class);
                 }
             } catch (ReflectionException e1) {
-                Logger.error(e1);
+                logger.error(e1);
             }
         }
         return m;
@@ -294,5 +300,13 @@ public class JsonLoader<T extends SceneGraphNode> implements ISceneGraphLoader {
             break;
         }
         return valueClass;
+    }
+
+    @Override
+    public void setName(String name) {
+    }
+
+    @Override
+    public void setDescription(String description) {
     }
 }

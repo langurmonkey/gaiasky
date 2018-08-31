@@ -19,6 +19,13 @@ public abstract class AbstractCatalogLoader {
     public String[] files;
     public List<CatalogFilter> filters;
 
+    /**
+     * Name
+     */
+    protected String name;
+    /** Description **/
+    protected String description;
+
     public void initialize(String[] files) {
         this.files = files;
         this.filters = new ArrayList<CatalogFilter>(0);
@@ -58,5 +65,13 @@ public abstract class AbstractCatalogLoader {
                 return true;
         }
         return false;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
     }
 }

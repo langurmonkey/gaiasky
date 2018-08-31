@@ -18,6 +18,7 @@ import gaia.cu9.ari.gaiaorbit.scenegraph.camera.CameraManager.CameraMode;
 import gaia.cu9.ari.gaiaorbit.scenegraph.camera.NaturalCamera;
 import gaia.cu9.ari.gaiaorbit.util.GlobalConf;
 import gaia.cu9.ari.gaiaorbit.util.Logger;
+import gaia.cu9.ari.gaiaorbit.util.Logger.Log;
 import gaia.cu9.ari.gaiaorbit.util.comp.ViewAngleComparator;
 import gaia.cu9.ari.gaiaorbit.util.math.Vector3d;
 import gaia.cu9.ari.gaiaorbit.vr.VRContext.VRControllerAxes;
@@ -26,6 +27,8 @@ import gaia.cu9.ari.gaiaorbit.vr.VRContext.VRDevice;
 import gaia.cu9.ari.gaiaorbit.vr.VRDeviceListener;
 
 public class OpenVRListener implements VRDeviceListener {
+    private static final Log logger = Logger.getLogger(OpenVRListener.class);
+    
     /** The natural camera **/
     private NaturalCamera cam;
     /** Focus comparator **/
@@ -54,12 +57,12 @@ public class OpenVRListener implements VRDeviceListener {
     }
 
     public void connected(VRDevice device) {
-        Logger.info(device + " connected");
+        logger.info(device + " connected");
         EventManager.instance.post(Events.VR_DEVICE_CONNECTED, device);
     }
 
     public void disconnected(VRDevice device) {
-        Logger.info(device + " disconnected");
+        logger.info(device + " disconnected");
         EventManager.instance.post(Events.VR_DEVICE_DISCONNECTED, device);
     }
 
@@ -86,7 +89,7 @@ public class OpenVRListener implements VRDeviceListener {
 
     public void buttonPressed(VRDevice device, int button) {
         if (GlobalConf.controls.DEBUG_MODE) {
-            Logger.info("vr button down [device/code]: " + device.toString() + " / " + button);
+            logger.info("vr button down [device/code]: " + device.toString() + " / " + button);
         }
         lazyInit();
         // Add to pressed
@@ -101,7 +104,7 @@ public class OpenVRListener implements VRDeviceListener {
 
     public void buttonReleased(VRDevice device, int button) {
         if (GlobalConf.controls.DEBUG_MODE) {
-            Logger.info("vr button released [device/code]: " + device.toString() + " / " + button);
+            logger.info("vr button released [device/code]: " + device.toString() + " / " + button);
         }
 
         // Removed from pressed
@@ -122,7 +125,7 @@ public class OpenVRListener implements VRDeviceListener {
                         EventManager.instance.post(Events.CAMERA_MODE_CMD, CameraMode.Focus);
                     }
                 } else {
-                    Logger.info("Model corresponding to device not found");
+                    logger.info("Model corresponding to device not found");
                 }
             }
 
@@ -172,28 +175,28 @@ public class OpenVRListener implements VRDeviceListener {
     @Override
     public void event(int code) {
         if (GlobalConf.controls.DEBUG_MODE) {
-            Logger.info("Unhandled event: " + code);
+            logger.info("Unhandled event: " + code);
         }
     }
 
     @Override
     public void buttonTouched(VRDevice device, int button) {
         if (GlobalConf.controls.DEBUG_MODE) {
-            Logger.info("vr button touched [device/code]: " + device.toString() + " / " + button);
+            logger.info("vr button touched [device/code]: " + device.toString() + " / " + button);
         }
     }
 
     @Override
     public void buttonUntouched(VRDevice device, int button) {
         if (GlobalConf.controls.DEBUG_MODE) {
-            Logger.info("vr button untouched [device/code]: " + device.toString() + " / " + button);
+            logger.info("vr button untouched [device/code]: " + device.toString() + " / " + button);
         }
     }
 
     @Override
     public void axisMoved(VRDevice device, int axis, float valueX, float valueY) {
         if (GlobalConf.controls.DEBUG_MODE) {
-            Logger.info("axis moved: [device/axis/x/y]: " + device.toString() + " / " + axis + " / " + valueX + " / " + valueY);
+            logger.info("axis moved: [device/axis/x/y]: " + device.toString() + " / " + axis + " / " + valueX + " / " + valueY);
         }
         lazyInit();
 

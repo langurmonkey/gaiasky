@@ -31,7 +31,6 @@ import gaia.cu9.ari.gaiaorbit.script.JythonFactory;
 import gaia.cu9.ari.gaiaorbit.util.GlobalConf;
 import gaia.cu9.ari.gaiaorbit.util.GlobalResources;
 import gaia.cu9.ari.gaiaorbit.util.I18n;
-import gaia.cu9.ari.gaiaorbit.util.SysUtilsFactory;
 import gaia.cu9.ari.gaiaorbit.util.scene2d.CollapsibleWindow;
 import gaia.cu9.ari.gaiaorbit.util.scene2d.OwnImageButton;
 import gaia.cu9.ari.gaiaorbit.util.scene2d.OwnLabel;
@@ -128,9 +127,9 @@ public class RunScriptWindow extends CollapsibleWindow {
             }
 
         });
-        buttonGroup.addActor(cancel);
-        buttonGroup.addActor(reload);
         buttonGroup.addActor(run);
+        buttonGroup.addActor(reload);
+        buttonGroup.addActor(cancel);
 
         add(table).pad(pad);
         row();
@@ -145,7 +144,7 @@ public class RunScriptWindow extends CollapsibleWindow {
 
         // Choose script
         FileHandle scriptFolder1 = Gdx.files.internal(GlobalConf.program.SCRIPT_LOCATION);
-        FileHandle scriptFolder2 = Gdx.files.absolute(SysUtilsFactory.getSysUtils().getDefaultScriptDir().getPath());
+        FileHandle scriptFolder2 = Gdx.files.absolute(SysUtils.getDefaultScriptDir().getPath());
 
         scripts = new Array<FileHandle>();
 
@@ -162,7 +161,7 @@ public class RunScriptWindow extends CollapsibleWindow {
         HorizontalGroup titlegroup = new HorizontalGroup();
         titlegroup.space(pad);
         ImageButton tooltip = new OwnImageButton(skin, "tooltip");
-        tooltip.addListener(new TextTooltip(txt("gui.tooltip.script", SysUtilsFactory.getSysUtils().getDefaultScriptDir()), skin));
+        tooltip.addListener(new TextTooltip(txt("gui.tooltip.script", SysUtils.getDefaultScriptDir()), skin));
         Label choosetitle = new OwnLabel(txt("gui.script.choose"), skin, "help-title");
         titlegroup.addActor(choosetitle);
         titlegroup.addActor(tooltip);
@@ -196,7 +195,7 @@ public class RunScriptWindow extends CollapsibleWindow {
                         if (internal)
                             name = name.substring(INTERNAL_PREFIX.length(), name.length());
                         for (FileHandle fh : scripts) {
-                            if ((internal && fh.file().getPath().startsWith(GlobalConf.program.SCRIPT_LOCATION)) || (!internal && fh.file().getPath().startsWith(SysUtilsFactory.getSysUtils().getDefaultScriptDir().getAbsolutePath()))) {
+                            if ((internal && fh.file().getPath().startsWith(GlobalConf.program.SCRIPT_LOCATION)) || (!internal && fh.file().getPath().startsWith(SysUtils.getDefaultScriptDir().getAbsolutePath()))) {
                                 if (fh.name().equals(name)) {
                                     selectedScript = fh;
                                     break;

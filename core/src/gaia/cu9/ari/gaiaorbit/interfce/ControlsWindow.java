@@ -35,7 +35,6 @@ import gaia.cu9.ari.gaiaorbit.interfce.components.VisibilityComponent;
 import gaia.cu9.ari.gaiaorbit.interfce.components.VisualEffectsComponent;
 import gaia.cu9.ari.gaiaorbit.render.ComponentType;
 import gaia.cu9.ari.gaiaorbit.scenegraph.ISceneGraph;
-import gaia.cu9.ari.gaiaorbit.util.Constants;
 import gaia.cu9.ari.gaiaorbit.util.GlobalConf;
 import gaia.cu9.ari.gaiaorbit.util.I18n;
 import gaia.cu9.ari.gaiaorbit.util.math.MathUtilsd;
@@ -114,34 +113,32 @@ public class ControlsWindow extends CollapsibleWindow implements IObserver {
         panes.put(timeComponent.getClass().getSimpleName(), time);
 
         /** ----CAMERA---- **/
-        if (Constants.desktop) {
-            // Record camera button
-            recCamera = new OwnImageButton(skin, "rec");
-            recCamera.setName("recCam");
-            recCamera.setChecked(GlobalConf.runtime.RECORD_CAMERA);
-            recCamera.addListener(event -> {
-                if (event instanceof ChangeEvent) {
-                    EventManager.instance.post(Events.RECORD_CAMERA_CMD, recCamera.isChecked(), true);
-                    return true;
-                }
-                return false;
-            });
-            recCamera.addListener(new TextTooltip(txt("gui.tooltip.reccamera"), skin));
+        // Record camera button
+        recCamera = new OwnImageButton(skin, "rec");
+        recCamera.setName("recCam");
+        recCamera.setChecked(GlobalConf.runtime.RECORD_CAMERA);
+        recCamera.addListener(event -> {
+            if (event instanceof ChangeEvent) {
+                EventManager.instance.post(Events.RECORD_CAMERA_CMD, recCamera.isChecked(), true);
+                return true;
+            }
+            return false;
+        });
+        recCamera.addListener(new TextTooltip(txt("gui.tooltip.reccamera"), skin));
 
-            // Play camera button
-            playCamera = new OwnImageButton(skin, "play");
-            playCamera.setName("playCam");
-            playCamera.setChecked(false);
-            playCamera.addListener(event -> {
-                if (event instanceof ChangeEvent) {
-                    EventManager.instance.post(Events.SHOW_PLAYCAMERA_ACTION, ui, skin);
-                    return true;
-                }
-                return false;
-            });
+        // Play camera button
+        playCamera = new OwnImageButton(skin, "play");
+        playCamera.setName("playCam");
+        playCamera.setChecked(false);
+        playCamera.addListener(event -> {
+            if (event instanceof ChangeEvent) {
+                EventManager.instance.post(Events.SHOW_PLAYCAMERA_ACTION, ui, skin);
+                return true;
+            }
+            return false;
+        });
 
-            playCamera.addListener(new TextTooltip(txt("gui.tooltip.playcamera"), skin));
-        }
+        playCamera.addListener(new TextTooltip(txt("gui.tooltip.playcamera"), skin));
 
         CameraComponent cameraComponent = new CameraComponent(skin, ui);
         cameraComponent.initialize();
@@ -317,8 +314,7 @@ public class ControlsWindow extends CollapsibleWindow implements IObserver {
         mainVertical.align(Align.right).align(Align.top);
         mainVertical.addActor(windowScroll);
         // Add buttons only in desktop version
-        if (Constants.desktop)
-            mainVertical.addActor(buttonsTable);
+        mainVertical.addActor(buttonsTable);
         mainVertical.pack();
 
         /** ADD TO MAIN WINDOW **/

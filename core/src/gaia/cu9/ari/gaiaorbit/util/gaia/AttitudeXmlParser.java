@@ -16,9 +16,10 @@ import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.utils.XmlReader;
 
 import gaia.cu9.ari.gaiaorbit.util.BinarySearchTree;
-import gaia.cu9.ari.gaiaorbit.util.Constants;
 import gaia.cu9.ari.gaiaorbit.util.I18n;
 import gaia.cu9.ari.gaiaorbit.util.Logger;
+import gaia.cu9.ari.gaiaorbit.util.Logger.Log;
+import gaia.cu9.ari.gaiaorbit.util.Nature;
 import gaia.cu9.ari.gaiaorbit.util.coord.AstroUtils;
 import gaia.cu9.ari.gaiaorbit.util.format.DateFormatFactory;
 import gaia.cu9.ari.gaiaorbit.util.format.IDateFormat;
@@ -32,7 +33,8 @@ import gaia.cu9.ari.gaiaorbit.util.units.Quantity;
  * @author Toni Sagrista
  */
 public class AttitudeXmlParser {
-
+    private static final Log logger = Logger.getLogger(AttitudeXmlParser.class);
+    
     private static Instant endOfMission;
     private static IDateFormat format;
 
@@ -94,7 +96,7 @@ public class AttitudeXmlParser {
                     datesMap.put(date, fh);
                 }
             } catch (IOException e) {
-                Logger.error(e, I18n.bundle.format("error.file.parse", fh.name()));
+                logger.error(e, I18n.bundle.format("error.file.parse", fh.name()));
             }
         }
         Map<FileHandle, Duration> durationMap = new HashMap<FileHandle, Duration>();
@@ -109,7 +111,7 @@ public class AttitudeXmlParser {
                 } else {
                     long elapsed = date.toEpochMilli() - lastDate.toEpochMilli();
 
-                    Duration d = new Hours(elapsed * Constants.MS_TO_H);
+                    Duration d = new Hours(elapsed * Nature.MS_TO_H);
                     durationMap.put(lastFH, d);
                 }
             }
@@ -122,24 +124,24 @@ public class AttitudeXmlParser {
             durationMap.put(lastFH, d);
         } else {
             long elapsed = endOfMission.toEpochMilli() - lastDate.toEpochMilli();
-            Duration d = new Hours(elapsed * Constants.MS_TO_H);
+            Duration d = new Hours(elapsed * Nature.MS_TO_H);
             durationMap.put(lastFH, d);
         }
 
         // PARSE ATTITUDES
         for (FileHandle fh : list) {
-            Logger.info(I18n.bundle.format("notif.attitude.loadingfile", fh.name()));
+            logger.info(I18n.bundle.format("notif.attitude.loadingfile", fh.name()));
             try {
                 AttitudeIntervalBean att = parseFile(fh, durationMap.get(fh), findActivationDate(fh, datesMap));
                 bst.insert(att);
             } catch (IOException e) {
-                Logger.error(e, I18n.bundle.format("error.file.parse", fh.name()));
+                logger.error(e, I18n.bundle.format("error.file.parse", fh.name()));
             } catch (Exception e) {
-                Logger.error(e, I18n.bundle.format("notif.error", e.getMessage()));
+                logger.error(e, I18n.bundle.format("notif.error", e.getMessage()));
             }
         }
 
-        Logger.info(I18n.bundle.format("notif.attitude.initialized", list.length));
+        logger.info(I18n.bundle.format("notif.attitude.initialized", list.length));
         return bst;
     }
 
@@ -175,14 +177,14 @@ public class AttitudeXmlParser {
         String name = model.get("name");
         String className = model.get("classname");
         String activTime = model.get("starttime");
-        double startTimeNsSince2010 = (AstroUtils.getJulianDate(activationTime) - AstroUtils.JD_J2010) * AstroUtils.DAY_TO_NS;
+        double startTimeNsSince2010 = (AstroUtils.getJulianDate(activationTime) - AstroUtils.JD_J2010) * Nature.D_TO_NS;
 
         /** SCAN LAW ELEMENT **/
         XmlReader.Element scanlaw = model.getChildByName("scanlaw");
         String epochRef = scanlaw.getAttribute("epochref");
         Instant refEpochDate = getDate(epochRef);
-        double refEpoch = AstroUtils.getJulianDate(refEpochDate) * AstroUtils.DAY_TO_NS;
-        double refEpochJ2010 = refEpoch - AstroUtils.JD_J2010 * AstroUtils.DAY_TO_NS;
+        double refEpoch = AstroUtils.getJulianDate(refEpochDate) * Nature.D_TO_NS;
+        double refEpochJ2010 = refEpoch - AstroUtils.JD_J2010 * Nature.D_TO_NS;
 
         // Spin phase
         XmlReader.Element spinphase = scanlaw.getChildByName("spinphase");

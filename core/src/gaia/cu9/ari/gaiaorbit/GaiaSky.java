@@ -20,7 +20,6 @@ import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.assets.loaders.FileHandleResolver;
 import com.badlogic.gdx.assets.loaders.resolvers.InternalFileHandleResolver;
 import com.badlogic.gdx.audio.Music;
-import com.badlogic.gdx.backends.lwjgl3.Lwjgl3ApplicationConfiguration;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Pixmap.Format;
 import com.badlogic.gdx.graphics.g3d.Model;
@@ -77,11 +76,11 @@ import gaia.cu9.ari.gaiaorbit.scenegraph.component.ModelComponent;
 import gaia.cu9.ari.gaiaorbit.script.HiddenHelperUser;
 import gaia.cu9.ari.gaiaorbit.util.ComponentTypes;
 import gaia.cu9.ari.gaiaorbit.util.ConfInit;
-import gaia.cu9.ari.gaiaorbit.util.Constants;
 import gaia.cu9.ari.gaiaorbit.util.GlobalConf;
 import gaia.cu9.ari.gaiaorbit.util.GlobalResources;
 import gaia.cu9.ari.gaiaorbit.util.I18n;
 import gaia.cu9.ari.gaiaorbit.util.Logger;
+import gaia.cu9.ari.gaiaorbit.util.Logger.Log;
 import gaia.cu9.ari.gaiaorbit.util.MemInfo;
 import gaia.cu9.ari.gaiaorbit.util.MusicManager;
 import gaia.cu9.ari.gaiaorbit.util.g3d.loader.ObjLoader;
@@ -109,7 +108,8 @@ import gaia.cu9.ari.gaiaorbit.vr.VRContext.VRDeviceType;
  *
  */
 public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
-
+    private static final Log logger = Logger.getLogger(GaiaSky.class);
+    
     /**
      * Private state boolean indicating whether we are still loading resources.
      */
@@ -146,16 +146,13 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
     // Data load string
     private String dataLoadString;
 
-    /**
-     * Whether the dataset has been chosen. If this is set to false, a window
-     * will prompt at startup asking for the dataset to use.
-     */
-    private boolean DSCHOSEN;
-
     public ISceneGraph sg;
     // TODO make this private again
     public SceneGraphRenderer sgr;
     private IPostProcessor pp;
+    
+    // Initial gui
+    private boolean INITGUI = true;
 
     // Start time
     private long startTime;
@@ -243,10 +240,8 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
         // Disable all kinds of input
         EventManager.instance.post(Events.INPUT_ENABLED_CMD, false);
 
-        DSCHOSEN = !GlobalConf.program.DISPLAY_DATASET_DIALOG;
-
         if (!GlobalConf.initialized()) {
-            Logger.error(new RuntimeException("FATAL: Global configuration not initlaized"));
+            logger.error(new RuntimeException("FATAL: Global configuration not initlaized"));
             return;
         }
 
@@ -325,11 +320,9 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
         initialGui.initialize(manager);
         Gdx.input.setInputProcessor(initialGui.getGuiStage());
 
-        if (DSCHOSEN) {
-            EventManager.instance.post(Events.LOAD_DATA_CMD);
-        }
-
-        Logger.info(this.getClass().getSimpleName(), I18n.bundle.format("notif.glslversion", Gdx.gl.glGetString(GL20.GL_SHADING_LANGUAGE_VERSION)));
+        logger.info(GlobalConf.version.version + " - " + I18n.bundle.format("gui.build", GlobalConf.version.build));
+        logger.info("Display mode set to " + Gdx.graphics.getWidth() + "x" + Gdx.graphics.getHeight() + ", fullscreen: " + Gdx.graphics.isFullscreen());
+        logger.info(I18n.bundle.format("notif.glslversion", Gdx.gl.glGetString(GL20.GL_SHADING_LANGUAGE_VERSION)));
     }
 
     /** All {@link ModelInstance}s to be rendered **/
@@ -345,18 +338,18 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
             vrContext.pollEvents();
 
             VRDevice hmd = vrContext.getDeviceByType(VRDeviceType.HeadMountedDisplay);
-            Logger.info("Initialization of VR successful");
+            logger.info("Initialization of VR successful");
             if (hmd == null) {
-                Logger.info("HMD device is null!");
+                logger.info("HMD device is null!");
             } else {
-                Logger.info("HMD device is not null: " + vrContext.getDeviceByType(VRDeviceType.HeadMountedDisplay).toString());
+                logger.info("HMD device is not null: " + vrContext.getDeviceByType(VRDeviceType.HeadMountedDisplay).toString());
             }
 
             vrDeviceToModel = new HashMap<VRDevice, StubModel>();
 
             GlobalConf.runtime.OPENVR = true;
             if (false && GlobalConf.screen.SCREEN_WIDTH != vrContext.getWidth()) {
-                Logger.info("Warning, resizing according to VRSystem values:  [" + GlobalConf.screen.SCREEN_WIDTH + "x" + GlobalConf.screen.SCREEN_HEIGHT + "] -> [" + vrContext.getWidth() + "x" + vrContext.getHeight() + "]");
+                logger.info("Warning, resizing according to VRSystem values:  [" + GlobalConf.screen.SCREEN_WIDTH + "x" + GlobalConf.screen.SCREEN_HEIGHT + "] -> [" + vrContext.getWidth() + "x" + vrContext.getHeight() + "]");
                 GlobalConf.screen.SCREEN_HEIGHT = vrContext.getHeight();
                 GlobalConf.screen.SCREEN_WIDTH = vrContext.getWidth();
                 this.resizeImmediate(vrContext.getWidth(), vrContext.getHeight(), true, true, true);
@@ -389,7 +382,7 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
             // managed otherwise
             //Gdx.graphics.setVSync(true);
 
-            Logger.error("Initialisation of VR context failed - falling back to desktop mode");
+            logger.error("Initialisation of VR context failed - falling back to desktop mode");
             GlobalConf.runtime.OPENVR = false;
             return;
         }
@@ -401,7 +394,6 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
      * to their classes and removes the Loading message
      */
     private void doneLoading() {
-
         // Dispose of initial and loading GUIs
         initialGui.dispose();
         initialGui = null;
@@ -596,7 +588,7 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
     @Override
     public void dispose() {
 
-        if (Constants.desktop && savestate)
+        if (savestate)
             ConfInit.instance.persistGlobalConf(new File(System.getProperty("properties.file")));
 
         EventManager.instance.post(Events.DISPOSE);
@@ -620,14 +612,16 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
             // Memory
             EventManager.instance.post(Events.DEBUG2, MemInfo.getUsedMemory(), MemInfo.getFreeMemory(), MemInfo.getTotalMemory(), MemInfo.getMaxMemory());
             // Observed octants
-            EventManager.instance.post(Events.DEBUG4, GLFrameBuffer.getManagedStatus() + ", Observed octants: " + OctreeNode.nOctantsObserved + ", Load queue: " + StreamingOctreeLoader.getLoadQueueSize());
+            EventManager.instance.post(Events.DEBUG4, "Observed octants: " + OctreeNode.nOctantsObserved + ", Load queue: " + StreamingOctreeLoader.getLoadQueueSize());
+            // Frame buffers
+            EventManager.instance.post(Events.DEBUG_BUFFERS, GLFrameBuffer.getManagedStatus());
         }
     };
 
     @Override
     public void render() {
         try {
-            if (!DSCHOSEN) {
+            if (INITGUI) {
                 renderGui(initialGui);
             } else if (LOADING) {
                 if (manager.update()) {
@@ -697,7 +691,7 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
 
             }
         } catch (Throwable t) {
-            Logger.error(t);
+            logger.error(t);
             // TODO implement error reporting?
         }
     }
@@ -916,7 +910,7 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
                 loadingGuiVR.initialize(manager);
             }
 
-            DSCHOSEN = true;
+            INITGUI = false;
             LOADING = true;
 
             /** LOAD SCENE GRAPH **/

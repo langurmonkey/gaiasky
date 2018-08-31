@@ -13,14 +13,11 @@ import com.badlogic.gdx.files.FileHandle;
 
 import gaia.cu9.ari.gaiaorbit.desktop.format.DesktopDateFormatFactory;
 import gaia.cu9.ari.gaiaorbit.desktop.format.DesktopNumberFormatFactory;
-import gaia.cu9.ari.gaiaorbit.event.EventManager;
-import gaia.cu9.ari.gaiaorbit.event.Events;
-import gaia.cu9.ari.gaiaorbit.event.IObserver;
 import gaia.cu9.ari.gaiaorbit.util.ConfInit;
 import gaia.cu9.ari.gaiaorbit.util.Constants;
 import gaia.cu9.ari.gaiaorbit.util.I18n;
 import gaia.cu9.ari.gaiaorbit.util.Logger;
-import gaia.cu9.ari.gaiaorbit.util.SysUtilsFactory;
+import gaia.cu9.ari.gaiaorbit.util.Nature;
 import gaia.cu9.ari.gaiaorbit.util.coord.MoonAACoordinates;
 import gaia.cu9.ari.gaiaorbit.util.coord.vsop87.AbstractVSOP87;
 import gaia.cu9.ari.gaiaorbit.util.coord.vsop87.VSOP87;
@@ -28,11 +25,11 @@ import gaia.cu9.ari.gaiaorbit.util.format.DateFormatFactory;
 import gaia.cu9.ari.gaiaorbit.util.format.NumberFormatFactory;
 import gaia.cu9.ari.gaiaorbit.util.math.Vector3d;
 
-public class Positions2DExtractor implements IObserver {
+public class Positions2DExtractor {
 
     public static void main(String[] args) throws IOException {
         Positions2DExtractor p2d = new Positions2DExtractor();
-        EventManager.instance.subscribe(p2d, Events.POST_NOTIFICATION, Events.JAVA_EXCEPTION);
+        new LogWriter();
 
         I18n.initialize(new FileHandle("/home/tsagrista/git/gaiasandbox/android/assets/i18n/gsbundle"));
 
@@ -40,11 +37,11 @@ public class Positions2DExtractor implements IObserver {
         try {
             NumberFormatFactory.initialize(new DesktopNumberFormatFactory());
             DateFormatFactory.initialize(new DesktopDateFormatFactory());
-            ConfInit.initialize(new DesktopConfInit(SysUtilsFactory.getSysUtils().getAssetsLocation()));
+            ConfInit.initialize(new DesktopConfInit());
         } catch (IOException e) {
-            Logger.error(e);
+            Logger.getLogger(Positions2DExtractor.class).error(e);
         } catch (Exception e) {
-            Logger.error(e);
+            Logger.getLogger(Positions2DExtractor.class).error(e);
         }
 
         p2d.process();
@@ -64,7 +61,7 @@ public class Positions2DExtractor implements IObserver {
     double Mm = 7.34767309e22;
 
     int steps = 1000;
-    long MS_IN_YEAR = (long) Constants.Y_TO_S * 1000l;
+    long MS_IN_YEAR = (long) Nature.Y_TO_S * 1000l;
 
     public void process() throws IOException {
 
@@ -130,27 +127,6 @@ public class Positions2DExtractor implements IObserver {
         }
 
         bw.close();
-    }
-
-    @Override
-    public void notify(Events event, Object... data) {
-        switch (event) {
-        case POST_NOTIFICATION:
-            StringBuilder sb = new StringBuilder();
-            int i = 0;
-            for (Object ob : data) {
-                sb.append(ob);
-                if (i < data.length - 1) {
-                    sb.append(" - ");
-                }
-                i++;
-            }
-            System.out.println(sb);
-            break;
-        case JAVA_EXCEPTION:
-            ((Throwable) data[0]).printStackTrace(System.err);
-        }
-
     }
 
 }

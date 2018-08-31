@@ -1,7 +1,6 @@
 package gaia.cu9.ari.gaiaorbit.render.system;
 
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Mesh;
 import com.badlogic.gdx.graphics.PerspectiveCamera;
 import com.badlogic.gdx.graphics.VertexAttribute;
@@ -24,14 +23,14 @@ import gaia.cu9.ari.gaiaorbit.scenegraph.camera.FovCamera;
 import gaia.cu9.ari.gaiaorbit.scenegraph.camera.ICamera;
 import gaia.cu9.ari.gaiaorbit.util.Constants;
 import gaia.cu9.ari.gaiaorbit.util.GlobalConf;
-import gaia.cu9.ari.gaiaorbit.util.GlobalConf.ProgramConf.StereoProfile;
 import gaia.cu9.ari.gaiaorbit.util.Logger;
+import gaia.cu9.ari.gaiaorbit.util.Nature;
 import gaia.cu9.ari.gaiaorbit.util.comp.DistToCameraComparator;
 import gaia.cu9.ari.gaiaorbit.util.coord.AstroUtils;
 
 public class StarGroupRenderSystem extends ImmediateRenderSystem implements IObserver {
     private final double BRIGHTNESS_FACTOR;
-    /** Hopefully we won't have more than 5000 star groups at once **/
+    /** Hopefully we won't have more than 50000 star groups at once **/
     private final int N_MESHES = 50000;
 
     private Vector3 aux1;
@@ -40,7 +39,7 @@ public class StarGroupRenderSystem extends ImmediateRenderSystem implements IObs
 
     public StarGroupRenderSystem(RenderGroup rg, float[] alphas, ShaderProgram[] shaders) {
         super(rg, alphas, shaders, 1500000);
-        BRIGHTNESS_FACTOR = Constants.webgl ? 15 : 10;
+        BRIGHTNESS_FACTOR = 10;
         this.comp = new DistToCameraComparator<IRenderable>();
         this.alphaSizeFovBr = new float[4];
         aux1 = new Vector3();
@@ -61,8 +60,7 @@ public class StarGroupRenderSystem extends ImmediateRenderSystem implements IObs
     /**
      * Adds a new mesh data to the meshes list and increases the mesh data index
      * 
-     * @param nVertices
-     *            The max number of vertices this mesh data can hold
+     * @param nVertices The max number of vertices this mesh data can hold
      * @return The index of the new mesh data
      */
     private int addMeshData(int nVertices) {
@@ -75,7 +73,7 @@ public class StarGroupRenderSystem extends ImmediateRenderSystem implements IObs
         }
 
         if (mdi >= N_MESHES) {
-            Logger.error(this.getClass().getSimpleName(), "No more free meshes!");
+            logger.error("No more free meshes!");
             return -1;
         }
 
@@ -97,8 +95,7 @@ public class StarGroupRenderSystem extends ImmediateRenderSystem implements IObs
     /**
      * Clears the mesh data at the index i
      * 
-     * @param i
-     *            The index
+     * @param i The index
      */
     public void clearMeshData(int i) {
         assert i >= 0 && i < meshes.length : "Mesh data index out of bounds: " + i + " (n meshes = " + N_MESHES + ")";
@@ -120,10 +117,7 @@ public class StarGroupRenderSystem extends ImmediateRenderSystem implements IObs
         // Enable point sizes
         Gdx.gl20.glEnable(0x8642);
 
-        // Additive blending
-        Gdx.gl20.glBlendFunc(GL20.GL_ONE, GL20.GL_ONE);
-
-        //renderables.sort(comp);
+        // renderables.sort(comp);
         if (renderables.size > 0) {
             for (IRenderable renderable : renderables) {
                 StarGroup starGroup = (StarGroup) renderable;
@@ -135,7 +129,7 @@ public class StarGroupRenderSystem extends ImmediateRenderSystem implements IObs
                          */
                         if (!starGroup.inGpu) {
                             starGroup.offset = addMeshData(starGroup.size());
-                            
+
                             checkRequiredVerticesSize(starGroup.size() * curr.vertexSize);
                             curr.vertices = vertices;
 
@@ -191,8 +185,8 @@ public class StarGroupRenderSystem extends ImmediateRenderSystem implements IObs
                             shaderProgram.setUniform4fv("u_alphaSizeFovBr", alphaSizeFovBr, 0, 4);
 
                             // Days since epoch
-                            shaderProgram.setUniformi("u_t", (int) (AstroUtils.getMsSince(GaiaSky.instance.time.getTime(), starGroup.getEpoch()) * Constants.MS_TO_D));
-                            shaderProgram.setUniformf("u_ar", GlobalConf.program.STEREOSCOPIC_MODE && (GlobalConf.program.STEREO_PROFILE != StereoProfile.HD_3DTV && GlobalConf.program.STEREO_PROFILE != StereoProfile.ANAGLYPHIC) ? 0.5f : 1f);
+                            shaderProgram.setUniformi("u_t", (int) (AstroUtils.getMsSince(GaiaSky.instance.time.getTime(), starGroup.getEpoch()) * Nature.MS_TO_D));
+                            shaderProgram.setUniformf("u_ar", GlobalConf.program.isStereoHalfWidth() ? 0.5f : 1f);
                             shaderProgram.setUniformf("u_thAnglePoint", (float) 1e-8);
 
                             // Update projection if fovmode is 3
@@ -206,7 +200,7 @@ public class StarGroupRenderSystem extends ImmediateRenderSystem implements IObs
                             try {
                                 curr.mesh.render(shaderProgram, ShapeType.Point.getGlType());
                             } catch (IllegalArgumentException e) {
-                                Logger.error("Render exception");
+                                logger.error("Render exception");
                             }
                             shaderProgram.end();
                         }
@@ -214,8 +208,6 @@ public class StarGroupRenderSystem extends ImmediateRenderSystem implements IObs
                 }
             }
         }
-        // Restore
-        Gdx.gl.glBlendFunc(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA);
     }
 
     protected VertexAttribute[] buildVertexAttributes() {

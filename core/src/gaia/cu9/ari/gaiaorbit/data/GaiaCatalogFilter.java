@@ -27,7 +27,6 @@ import gaia.cu9.ari.gaiaorbit.scenegraph.Star;
 import gaia.cu9.ari.gaiaorbit.util.GlobalConf;
 import gaia.cu9.ari.gaiaorbit.util.I18n;
 import gaia.cu9.ari.gaiaorbit.util.Pair;
-import gaia.cu9.ari.gaiaorbit.util.SysUtilsFactory;
 import gaia.cu9.ari.gaiaorbit.util.format.DateFormatFactory;
 import gaia.cu9.ari.gaiaorbit.util.gaia.GaiaAttitudeServer;
 import gaia.cu9.ari.gaiaorbit.util.gaia.Satellite;
@@ -73,7 +72,7 @@ public class GaiaCatalogFilter {
         DateFormatFactory.initialize(new DesktopDateFormatFactory());
 
         // Init global conf
-        DesktopConfInit confInit = new DesktopConfInit(SysUtilsFactory.getSysUtils().getAssetsLocation());
+        DesktopConfInit confInit = new DesktopConfInit();
         confInit.initGlobalConf();
 
         // Initialize i18n

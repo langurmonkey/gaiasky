@@ -34,6 +34,7 @@ import gaia.cu9.ari.gaiaorbit.scenegraph.IStarFocus;
 import gaia.cu9.ari.gaiaorbit.util.GlobalConf;
 import gaia.cu9.ari.gaiaorbit.util.I18n;
 import gaia.cu9.ari.gaiaorbit.util.Logger;
+import gaia.cu9.ari.gaiaorbit.util.Logger.Log;
 import gaia.cu9.ari.gaiaorbit.util.scene2d.CollapsibleWindow;
 import gaia.cu9.ari.gaiaorbit.util.scene2d.Link;
 import gaia.cu9.ari.gaiaorbit.util.scene2d.OwnLabel;
@@ -41,6 +42,8 @@ import gaia.cu9.ari.gaiaorbit.util.scene2d.OwnScrollPane;
 import gaia.cu9.ari.gaiaorbit.util.scene2d.OwnTextButton;
 
 public class GaiaCatalogWindow extends CollapsibleWindow {
+    private static final Log logger = Logger.getLogger(GaiaCatalogWindow.class);
+    
     private static String URL_WEB = "http://gaia.ari.uni-heidelberg.de/singlesource.html";
 
     private static String URL_GAIA_CSV_SOURCE = "http://gaia.ari.uni-heidelberg.de/tap/sync?REQUEST=doQuery&LANG=ADQL&FORMAT=csv&QUERY=SELECT+*+FROM+gaiadr2.gaia_source+WHERE+source_id=";
@@ -238,9 +241,9 @@ public class GaiaCatalogWindow extends CollapsibleWindow {
                 out.append(buffer, 0, rsz);
             }
         } catch (UnsupportedEncodingException ex) {
-            Logger.error(ex);
+            logger.error(ex);
         } catch (IOException ex) {
-            Logger.error(ex);
+            logger.error(ex);
         }
         return out.toString();
     }

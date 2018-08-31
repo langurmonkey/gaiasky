@@ -12,8 +12,9 @@ import gaia.cu9.ari.gaiaorbit.render.I3DTextRenderable;
 import gaia.cu9.ari.gaiaorbit.render.IAnnotationsRenderable;
 import gaia.cu9.ari.gaiaorbit.render.IRenderable;
 import gaia.cu9.ari.gaiaorbit.scenegraph.SceneGraphNode.RenderGroup;
-import gaia.cu9.ari.gaiaorbit.scenegraph.camera.ICamera;
 import gaia.cu9.ari.gaiaorbit.scenegraph.Text2D;
+import gaia.cu9.ari.gaiaorbit.scenegraph.camera.ICamera;
+import gaia.cu9.ari.gaiaorbit.util.GlobalConf;
 import gaia.cu9.ari.gaiaorbit.util.comp.DistToCameraComparator;
 
 public class FontRenderSystem extends AbstractRenderSystem {
@@ -21,12 +22,14 @@ public class FontRenderSystem extends AbstractRenderSystem {
     private SpriteBatch batch;
     public BitmapFont font3d, font2d, fontTitles;
     private Comparator<IRenderable> comp;
+    private float[] red;
 
     public FontRenderSystem(RenderGroup rg, float[] alphas, SpriteBatch batch, ShaderProgram program) {
         super(rg, alphas, new ShaderProgram[] { program });
         this.batch = batch;
         // Init comparator
         comp = new DistToCameraComparator<IRenderable>();
+        red = new float[] { 1f, 0f, 0f, 1f };
     }
 
     public FontRenderSystem(RenderGroup rg, float[] alphas, SpriteBatch batch, ShaderProgram program, BitmapFont font3d, BitmapFont font2d, BitmapFont fontTitles) {
@@ -60,7 +63,7 @@ public class FontRenderSystem extends AbstractRenderSystem {
                 // Regular mode, we use 3D distance field font
                 I3DTextRenderable lr = (I3DTextRenderable) s;
                 // Label color
-                program.setUniform4fv("u_color", lr.textColour(), 0, 4);
+                program.setUniform4fv("u_color", GlobalConf.program.isUINightMode() ? red : lr.textColour(), 0, 4);
                 // Component alpha
                 program.setUniformf("u_componentAlpha", getAlpha(s) * (s instanceof Text2D ? 1 : lalpha));
                 // Font opacity multiplier, take into account element opacity

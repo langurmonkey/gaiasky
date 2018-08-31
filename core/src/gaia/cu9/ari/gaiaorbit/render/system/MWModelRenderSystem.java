@@ -26,7 +26,6 @@ import gaia.cu9.ari.gaiaorbit.scenegraph.SceneGraphNode.RenderGroup;
 import gaia.cu9.ari.gaiaorbit.scenegraph.camera.ICamera;
 import gaia.cu9.ari.gaiaorbit.util.GlobalConf;
 import gaia.cu9.ari.gaiaorbit.util.GlobalConf.ProgramConf.StereoProfile;
-import gaia.cu9.ari.gaiaorbit.util.Logger;
 import gaia.cu9.ari.gaiaorbit.util.math.MathUtilsd;
 import gaia.cu9.ari.gaiaorbit.util.math.Vector3d;
 
@@ -85,8 +84,8 @@ public class MWModelRenderSystem extends ImmediateRenderSystem implements IObser
 
             postShader = new ShaderProgram(Gdx.files.internal("shader/galaxy.post.vertex.glsl"), Gdx.files.internal("shader/galaxy.post.fragment.glsl"));
             if (!postShader.isCompiled()) {
-                Logger.error("Galaxy post shader compilation failed:");
-                Logger.error(postShader.getLog());
+                logger.error("Galaxy post shader compilation failed:");
+                logger.error(postShader.getLog());
             }
 
             postShader.begin();
@@ -95,7 +94,7 @@ public class MWModelRenderSystem extends ImmediateRenderSystem implements IObser
             postShader.setUniformi("tex_accum", accumLoc);
             postShader.setUniformi("tex_reveal", revealLoc);
             postShader.end();
-            
+
             /** Post mesh **/
             postMesh = new FullscreenQuad();
         }
@@ -143,10 +142,10 @@ public class MWModelRenderSystem extends ImmediateRenderSystem implements IObser
         /** BULGE **/
         MeshData bulge = new MeshData();
         initMesh(bulge, mw.starData.size);
-        
+
         checkRequiredVerticesSize(mw.starData.size * bulge.vertexSize);
         bulge.vertices = vertices;
-        
+
         for (ParticleBean star : mw.starData) {
             // VERTEX
             aux3f1.set((float) star.data[0], (float) star.data[1], (float) star.data[2]);
@@ -207,10 +206,10 @@ public class MWModelRenderSystem extends ImmediateRenderSystem implements IObser
         for (Array<ParticleBean> part : partition) {
             MeshData partmd = new MeshData();
             initMesh(partmd, part.size);
-            
+
             checkRequiredVerticesSize(part.size * partmd.vertexSize);
             partmd.vertices = vertices;
-            
+
             for (ParticleBean p : part) {
                 // VERTEX
                 aux3f1.set((float) p.data[0], (float) p.data[1], (float) p.data[2]);
@@ -293,7 +292,7 @@ public class MWModelRenderSystem extends ImmediateRenderSystem implements IObser
                 shaderProgram.setUniformMatrix("u_view", camera.getCamera().view);
                 shaderProgram.setUniformf("u_camPos", camera.getCurrent().getPos().put(aux3f1));
                 shaderProgram.setUniformf("u_alpha", mw.opacity * alpha);
-                shaderProgram.setUniformf("u_ar", GlobalConf.program.STEREOSCOPIC_MODE && (GlobalConf.program.STEREO_PROFILE != StereoProfile.HD_3DTV && GlobalConf.program.STEREO_PROFILE != StereoProfile.ANAGLYPHIC) ? 0.5f : 1f);
+                shaderProgram.setUniformf("u_ar", GlobalConf.program.STEREOSCOPIC_MODE && (GlobalConf.program.STEREO_PROFILE != StereoProfile.HD_3DTV_HORIZONTAL && GlobalConf.program.STEREO_PROFILE != StereoProfile.ANAGLYPHIC) ? 0.5f : 1f);
 
                 // Relativistic effects
                 addEffectsUniforms(shaderProgram, camera);
@@ -302,7 +301,6 @@ public class MWModelRenderSystem extends ImmediateRenderSystem implements IObser
                     chunk.data.mesh.render(shaderProgram, ShapeType.Point.getGlType());
                 shaderProgram.end();
                 oitFb.end();
-
 
                 // Restore
                 Gdx.gl.glBlendFunc(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA);
@@ -392,7 +390,7 @@ public class MWModelRenderSystem extends ImmediateRenderSystem implements IObser
 
                 shaderProgram.setUniformf("u_camPos", camera.getCurrent().getPos().put(aux3f1));
                 shaderProgram.setUniformf("u_alpha", mw.opacity * alpha);
-                shaderProgram.setUniformf("u_ar", GlobalConf.program.STEREOSCOPIC_MODE && (GlobalConf.program.STEREO_PROFILE != StereoProfile.HD_3DTV && GlobalConf.program.STEREO_PROFILE != StereoProfile.ANAGLYPHIC) ? 0.5f : 1f);
+                shaderProgram.setUniformf("u_ar", GlobalConf.program.STEREOSCOPIC_MODE && (GlobalConf.program.STEREO_PROFILE != StereoProfile.HD_3DTV_HORIZONTAL && GlobalConf.program.STEREO_PROFILE != StereoProfile.ANAGLYPHIC) ? 0.5f : 1f);
                 // Relativistic effects
                 addEffectsUniforms(shaderProgram, camera);
 

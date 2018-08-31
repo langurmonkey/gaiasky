@@ -32,6 +32,7 @@ import gaia.cu9.ari.gaiaorbit.scenegraph.camera.CameraManager.CameraMode;
 import gaia.cu9.ari.gaiaorbit.util.GlobalConf;
 import gaia.cu9.ari.gaiaorbit.util.GlobalResources;
 import gaia.cu9.ari.gaiaorbit.util.Logger;
+import gaia.cu9.ari.gaiaorbit.util.Logger.Log;
 import gaia.cu9.ari.gaiaorbit.util.TwoWayHashmap;
 import gaia.cu9.ari.gaiaorbit.util.comp.CelestialBodyComparator;
 import gaia.cu9.ari.gaiaorbit.util.scene2d.OwnCheckBox;
@@ -40,6 +41,7 @@ import gaia.cu9.ari.gaiaorbit.util.scene2d.OwnScrollPane;
 import gaia.cu9.ari.gaiaorbit.util.scene2d.OwnTextField;
 
 public class ObjectsComponent extends GuiComponent implements IObserver {
+    private static final Log logger = Logger.getLogger(ObjectsComponent.class);
     boolean tree = false;
     boolean list = true;
 
@@ -103,7 +105,7 @@ public class ObjectsComponent extends GuiComponent implements IObserver {
 
         treeToModel = new TwoWayHashmap<SceneGraphNode, Node>();
 
-        Logger.info(txt("notif.sgtree.init"));
+        logger.info(txt("notif.sgtree.init"));
 
         if (tree) {
             final Tree objectsTree = new Tree(skin, "bright");
@@ -189,7 +191,7 @@ public class ObjectsComponent extends GuiComponent implements IObserver {
             });
             objectsList = focusList;
         }
-        Logger.info(txt("notif.sgtree.initialised"));
+        logger.info(txt("notif.sgtree.initialised"));
 
         if (tree || list) {
             focusListScrollPane = new OwnScrollPane(objectsList, skin, "minimalist");

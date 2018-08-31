@@ -8,7 +8,6 @@ import java.io.IOException;
 import java.nio.channels.FileChannel;
 import java.util.Arrays;
 import java.util.Comparator;
-import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
@@ -38,17 +37,15 @@ import com.badlogic.gdx.scenes.scene2d.ui.Slider;
 import com.badlogic.gdx.scenes.scene2d.ui.Stack;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.TextArea;
-import com.badlogic.gdx.scenes.scene2d.ui.TextField.TextFieldStyle;
 import com.badlogic.gdx.scenes.scene2d.ui.TextTooltip;
 import com.badlogic.gdx.scenes.scene2d.ui.VerticalGroup;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener.ChangeEvent;
 import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.Array;
-import com.badlogic.gdx.utils.JsonReader;
-import com.badlogic.gdx.utils.JsonValue;
 
 import gaia.cu9.ari.gaiaorbit.GaiaSky;
+import gaia.cu9.ari.gaiaorbit.desktop.util.SysUtils;
 import gaia.cu9.ari.gaiaorbit.event.EventManager;
 import gaia.cu9.ari.gaiaorbit.event.Events;
 import gaia.cu9.ari.gaiaorbit.interfce.KeyBindings.ProgramAction;
@@ -64,7 +61,6 @@ import gaia.cu9.ari.gaiaorbit.util.GlobalConf.ScreenshotMode;
 import gaia.cu9.ari.gaiaorbit.util.GlobalResources;
 import gaia.cu9.ari.gaiaorbit.util.I18n;
 import gaia.cu9.ari.gaiaorbit.util.Logger;
-import gaia.cu9.ari.gaiaorbit.util.SysUtilsFactory;
 import gaia.cu9.ari.gaiaorbit.util.format.INumberFormat;
 import gaia.cu9.ari.gaiaorbit.util.format.NumberFormatFactory;
 import gaia.cu9.ari.gaiaorbit.util.math.MathUtilsd;
@@ -99,7 +95,7 @@ public class PreferencesWindow extends GenericDialog {
 
     private INumberFormat nf3, nf1;
 
-    private CheckBox fullscreen, windowed, vsync, limitfpsCb, multithreadCb, lodFadeCb, cbAutoCamrec, real, nsl, report, inverty, highAccuracyPositions, shadowsCb, pointerCoords, datasetChooser;
+    private CheckBox fullscreen, windowed, vsync, limitfpsCb, multithreadCb, lodFadeCb, cbAutoCamrec, real, nsl, report, inverty, highAccuracyPositions, shadowsCb, pointerCoords, datasetChooser, debugInfo;
     private OwnSelectBox<DisplayMode> fullscreenResolutions;
     private OwnSelectBox<ComboBoxBean> gquality, aa, orbitRenderer, lineRenderer, numThreads, screenshotMode, frameoutputMode, nshadows;
     private OwnSelectBox<LangComboBoxBean> lang;
@@ -108,15 +104,14 @@ public class PreferencesWindow extends GenericDialog {
     private OwnTextField widthField, heightField, sswidthField, ssheightField, frameoutputPrefix, frameoutputFps, fowidthField, foheightField, camrecFps, cmResolution, smResolution, limitFps;
     private OwnSlider lodTransitions;
     private OwnTextButton screenshotsLocation, frameoutputLocation;
-    private OwnTextButton[] catalogs;
-    private Map<Button, String> candidates;
+    private DatasetsWidget dw;
 
     // Backup values
     private float brightnessBak, contrastBak, hueBak, saturationBak, gammaBak, motionblurBak, bloomBak;
-    private boolean lensflareBak, lightglowBak;
+    private boolean lensflareBak, lightglowBak, debugInfoBak;
 
     public PreferencesWindow(Stage stage, Skin skin) {
-        super(txt("gui.settings") + " - v" + GlobalConf.version.version + " - " + txt("gui.build", GlobalConf.version.build), skin, stage);
+        super(txt("gui.settings") + " - " + GlobalConf.version.version + " - " + txt("gui.build", GlobalConf.version.build), skin, stage);
 
         this.contents = new Array<Actor>();
         this.labels = new Array<OwnLabel>();
@@ -421,7 +416,7 @@ public class PreferencesWindow extends GenericDialog {
         graphics.add(gqualityLabel).left().padRight(pad * 4).padBottom(pad);
         graphics.add(gquality).left().padRight(pad * 2).padBottom(pad);
         graphics.add(gqualityTooltip).left().padBottom(pad).row();
-        final Cell<Actor> noticeGraphicsCell = graphics.add();
+        final Cell<Actor> noticeGraphicsCell = graphics.add((Actor) null);
         noticeGraphicsCell.colspan(3).left().row();
         graphics.add(aaLabel).left().padRight(pad * 4).padBottom(pad);
         graphics.add(aa).left().padRight(pad * 2).padBottom(pad);
@@ -436,27 +431,6 @@ public class PreferencesWindow extends GenericDialog {
         graphics.add(lensFlare).colspan(3).left().padBottom(pad).row();
         graphics.add(lightGlow).colspan(3).left().padBottom(pad).row();
         graphics.add(motionBlur).colspan(3).left().padBottom(pad).row();
-
-        EventListener graphicsChangeListener = new EventListener() {
-            @Override
-            public boolean handle(Event event) {
-                if (event instanceof ChangeEvent) {
-                    if (noticeGraphicsCell.getActor() == null) {
-                        String nextinfostr = txt("gui.ui.info") + '\n';
-                        int lines = GlobalResources.countOccurrences(nextinfostr, '\n');
-                        TextArea nextTimeInfo = new OwnTextArea(nextinfostr, skin, "info");
-                        nextTimeInfo.setDisabled(true);
-                        nextTimeInfo.setPrefRows(lines + 1);
-                        nextTimeInfo.setWidth(tawidth);
-                        nextTimeInfo.clearListeners();
-                        noticeGraphicsCell.setActor(nextTimeInfo);
-                    }
-                    return true;
-                }
-                return false;
-            }
-        };
-        //gquality.addListener(graphicsChangeListener);
 
         // Add to content
         contentGraphicsTable.add(titleGraphics).left().padBottom(pad * 2).row();
@@ -643,7 +617,7 @@ public class PreferencesWindow extends GenericDialog {
 
         // LANGUAGE
         OwnLabel langLabel = new OwnLabel(txt("gui.ui.language"), skin);
-        File i18nfolder = new File((System.getProperty("assets.location") != null ? System.getProperty("assets.location") : "") + "i18n/");
+        File i18nfolder = new File(GlobalConf.ASSETS_LOC + "/i18n/");
         String i18nname = "gsbundle";
         String[] files = i18nfolder.list();
         LangComboBoxBean[] langs = new LangComboBoxBean[files.length];
@@ -741,7 +715,7 @@ public class PreferencesWindow extends GenericDialog {
         multithread.add(multithreadCb).colspan(2).left().padBottom(pad).row();
         multithread.add(numThreadsLabel).left().padRight(pad * 4).padBottom(pad);
         multithread.add(numThreads).left().padBottom(pad).row();
-        final Cell<Actor> noticeMulithreadCell = multithread.add();
+        final Cell<Actor> noticeMulithreadCell = multithread.add((Actor) null);
         noticeMulithreadCell.colspan(2).left();
 
         multithreadCb.addListener(new EventListener() {
@@ -830,8 +804,8 @@ public class PreferencesWindow extends GenericDialog {
         // CONTROLLER MAPPINGS
         OwnLabel mappingsLabel = new OwnLabel(txt("gui.controller.mappingsfile"), skin);
         Array<FileComboBoxBean> controllerMappingsFiles = new Array<FileComboBoxBean>();
-        FileHandle externalfolder = Gdx.files.absolute(SysUtilsFactory.getSysUtils().getAssetsLocation() + "./mappings/");
-        FileHandle homefolder = Gdx.files.absolute(SysUtilsFactory.getSysUtils().getDefaultMappingsDir().getPath());
+        FileHandle externalfolder = Gdx.files.absolute(GlobalConf.ASSETS_LOC + "./mappings/");
+        FileHandle homefolder = Gdx.files.absolute(SysUtils.getDefaultMappingsDir().getPath());
         Array<FileHandle> mappingFiles = new Array<FileHandle>();
         GlobalResources.listRec(externalfolder, mappingFiles, ".controller");
         GlobalResources.listRec(homefolder, mappingFiles, ".controller");
@@ -947,8 +921,6 @@ public class PreferencesWindow extends GenericDialog {
                             return true;
                         }
                     });
-                    fc.setOkButtonText(txt("gui.ok"));
-                    fc.setCancelButtonText(txt("gui.cancel"));
                     fc.setFilter(new FileFilter() {
                         @Override
                         public boolean accept(File pathname) {
@@ -1069,8 +1041,6 @@ public class PreferencesWindow extends GenericDialog {
                             return true;
                         }
                     });
-                    fc.setOkButtonText(txt("gui.ok"));
-                    fc.setCancelButtonText(txt("gui.cancel"));
                     fc.setFilter(new FileFilter() {
                         @Override
                         public boolean accept(File pathname) {
@@ -1269,100 +1239,11 @@ public class PreferencesWindow extends GenericDialog {
 
         // DATA SOURCE
         OwnLabel titleData = new OwnLabel(txt("gui.data.source"), skin, "help-title");
-        Table datasource = new Table(skin);
 
-        String assetsLoc = System.getProperty("assets.location") != null ? System.getProperty("assets.location") : "";
-        FileHandle dataFolder = Gdx.files.absolute(assetsLoc + File.separatorChar + "data");
-        FileHandle[] catalogFiles = dataFolder.list(new FileFilter() {
-            @Override
-            public boolean accept(File pathname) {
-                return pathname.getName().startsWith("catalog-dr2-") && pathname.getName().endsWith(".json");
-            }
-        });
-        JsonReader reader = new JsonReader();
-
-        // Sort by name
-        Comparator<FileHandle> byName = (FileHandle a, FileHandle b) -> a.name().compareTo(b.name());
-        Arrays.sort(catalogFiles, byName);
-        candidates = new HashMap<Button, String>();
-        catalogs = new OwnTextButton[catalogFiles.length];
-        i = 0;
-        float taheight = GlobalConf.SCALE_FACTOR > 1 ? 50 : 35;
-        String[] currentSetting = GlobalConf.data.CATALOG_JSON_FILES.split("\\s*,\\s*");
-        Table datasets = new Table();
-        for (FileHandle catalogFile : catalogFiles) {
-            String candidate = catalogFile.path().substring(assetsLoc.length(), catalogFile.path().length());
-
-            String name = null;
-            String desc = null;
-            try {
-                JsonValue val = reader.parse(catalogFile);
-                if (val.has("description"))
-                    desc = val.get("description").asString();
-                if (val.has("name"))
-                    name = val.get("name").asString();
-            } catch (Exception e) {
-            }
-            if (desc == null)
-                desc = candidate;
-            if (name == null)
-                name = catalogFile.nameWithoutExtension();
-
-            OwnTextButton cb = new OwnTextButton(name, skin, "toggle-big");
-
-            cb.setChecked(contains(catalogFile.name(), currentSetting));
-            cb.addListener(new TextTooltip(candidate, skin));
-            datasets.add(cb).left().top().padRight(pad);
-
-            // Description
-            TextArea description = new OwnTextArea(desc, skin.get("regular", TextFieldStyle.class));
-            description.setDisabled(true);
-            description.setPrefRows(2);
-            description.setWidth(tawidth);
-            description.setHeight(taheight);
-            datasets.add(description).left().top().padTop(pad / 2).padLeft(pad).row();
-
-            candidates.put(cb, candidate);
-
-            catalogs[i++] = cb;
-        }
-        datasource.add(datasets).colspan(2).row();
-        ButtonGroup<OwnTextButton> bg = new ButtonGroup<OwnTextButton>();
-        bg.setMinCheckCount(0);
-        bg.setMaxCheckCount(1);
-        bg.add(catalogs);
-        float maxw = 0;
-        for (Button b : catalogs) {
-            if (b.getWidth() > maxw)
-                maxw = b.getWidth();
-        }
-        for (Button b : catalogs)
-            b.setWidth(maxw + 10 * GlobalConf.SCALE_FACTOR);
-
-        final Cell<Actor> noticeDataCell = datasource.add();
-        noticeDataCell.colspan(2).left().row();
-
-        EventListener dataNoticeListener = new EventListener() {
-            @Override
-            public boolean handle(Event event) {
-                if (event instanceof ChangeEvent) {
-                    if (noticeDataCell.getActor() == null) {
-                        String nextinfostr = txt("gui.ui.info") + '\n';
-                        int lines = GlobalResources.countOccurrences(nextinfostr, '\n');
-                        TextArea nextTimeInfo = new OwnTextArea(nextinfostr, skin, "info");
-                        nextTimeInfo.setDisabled(true);
-                        nextTimeInfo.setPrefRows(lines + 1);
-                        nextTimeInfo.setWidth(tawidth);
-                        nextTimeInfo.clearListeners();
-                        noticeDataCell.setActor(nextTimeInfo);
-                    }
-                    return true;
-                }
-                return false;
-            }
-        };
-        for (OwnTextButton cb : catalogs)
-            cb.addListener(dataNoticeListener);
+        String assetsLoc = GlobalConf.ASSETS_LOC;
+        dw = new DatasetsWidget(skin, assetsLoc);
+        Array<FileHandle> catalogFiles = dw.buildCatalogFiles();
+        Actor datasource = dw.buildDatasetsWidget(catalogFiles, false);
 
         datasetChooser = new OwnCheckBox(txt("gui.data.dschooser"), skin, pad);
         datasetChooser.setChecked(GlobalConf.program.DISPLAY_DATASET_DIALOG);
@@ -1395,7 +1276,7 @@ public class PreferencesWindow extends GenericDialog {
         // Add to table
         attitude.add(nsl).left().padBottom(pad).row();
         attitude.add(real).left().padBottom(pad).row();
-        final Cell<Actor> noticeAttCell = attitude.add();
+        final Cell<Actor> noticeAttCell = attitude.add((Actor) null);
         noticeAttCell.colspan(2).left();
 
         EventListener attNoticeListener = new EventListener() {
@@ -1435,6 +1316,17 @@ public class PreferencesWindow extends GenericDialog {
         OwnLabel titleStats = new OwnLabel(txt("gui.system.reporting"), skin, "help-title");
         Table stats = new Table(skin);
 
+        debugInfoBak = GlobalConf.program.SHOW_DEBUG_INFO;
+        debugInfo = new OwnCheckBox(txt("gui.system.debuginfo"), skin, pad);
+        debugInfo.setChecked(GlobalConf.program.SHOW_DEBUG_INFO);
+        debugInfo.addListener((event) -> {
+            if (event instanceof ChangeEvent) {
+                EventManager.instance.post(Events.SHOW_DEBUG_CMD, !GlobalConf.program.SHOW_DEBUG_INFO);
+                return true;
+            }
+            return false;
+        });
+
         report = new OwnCheckBox(txt("gui.system.allowreporting"), skin, pad);
         report.setChecked(GlobalConf.program.ANALYTICS_ENABLED);
 
@@ -1461,6 +1353,7 @@ public class PreferencesWindow extends GenericDialog {
         OwnLabel warningLabel = new OwnLabel(txt("gui.system.reloaddefaults.warn"), skin, "default-red");
 
         // Add to table
+        stats.add(debugInfo).left().padBottom(pad).row();
         stats.add(report).left().padBottom(pad * 5).row();
         stats.add(warningLabel).left().padBottom(pad).row();
         stats.add(reloadDefaults).left();
@@ -1544,13 +1437,6 @@ public class PreferencesWindow extends GenericDialog {
 
     }
 
-    private boolean contains(String name, String[] list) {
-        for (String candidate : list)
-            if (candidate.contains(name))
-                return true;
-        return false;
-    }
-
     @Override
     protected void accept() {
         saveCurrentPreferences();
@@ -1563,7 +1449,7 @@ public class PreferencesWindow extends GenericDialog {
 
     private void reloadDefaultPreferences() {
         // User config file
-        File userFolder = SysUtilsFactory.getSysUtils().getGSHomeDir();
+        File userFolder = SysUtils.getGSHomeDir();
         File userFolderConfFile = new File(userFolder, "global.properties");
 
         // Internal config
@@ -1589,7 +1475,7 @@ public class PreferencesWindow extends GenericDialog {
             }
 
         } catch (Exception e) {
-            Logger.error(e, "Error copying default preferences file to user folder: " + userFolderConfFile.getAbsolutePath());
+            Logger.getLogger(this.getClass()).error(e, "Error copying default preferences file to user folder: " + userFolderConfFile.getAbsolutePath());
         }
 
     }
@@ -1608,16 +1494,20 @@ public class PreferencesWindow extends GenericDialog {
 
         FileChannel source = null;
         FileChannel destination = null;
+        FileInputStream fis = null;
+        FileOutputStream fos = null;
         try {
-            source = new FileInputStream(sourceFile).getChannel();
-            destination = new FileOutputStream(destFile).getChannel();
+            source = (fis = new FileInputStream(sourceFile)).getChannel();
+            destination = (fos = new FileOutputStream(destFile)).getChannel();
             destination.transferFrom(source, 0, source.size());
         } finally {
             if (source != null) {
                 source.close();
+                fis.close();
             }
             if (destination != null) {
                 destination.close();
+                fos.close();
             }
         }
     }
@@ -1657,7 +1547,7 @@ public class PreferencesWindow extends GenericDialog {
             // Windows backend crashes for some reason
             Gdx.graphics.setVSync(GlobalConf.screen.VSYNC);
         } catch (Exception e) {
-            Logger.error(e, this.getClass().getSimpleName());
+            Logger.getLogger(this.getClass()).error(e);
         }
 
         if (limitfpsCb.isChecked()) {
@@ -1714,13 +1604,13 @@ public class PreferencesWindow extends GenericDialog {
         }
         GlobalConf.data.CATALOG_JSON_FILES = "";
         boolean first = true;
-        for (Button b : catalogs) {
+        for (Button b : dw.cbs) {
             if (b.isChecked()) {
                 // Add all selected to list
                 if (!first) {
-                    GlobalConf.data.CATALOG_JSON_FILES += "," + candidates.get(b);
+                    GlobalConf.data.CATALOG_JSON_FILES += "," + dw.candidates.get(b);
                 } else {
-                    GlobalConf.data.CATALOG_JSON_FILES += candidates.get(b);
+                    GlobalConf.data.CATALOG_JSON_FILES += dw.candidates.get(b);
                     first = false;
                 }
             }
@@ -1782,6 +1672,9 @@ public class PreferencesWindow extends GenericDialog {
 
         // System
         GlobalConf.program.ANALYTICS_ENABLED = report.isChecked();
+        if (GlobalConf.program.SHOW_DEBUG_INFO != debugInfoBak) {
+            EventManager.instance.post(Events.SHOW_DEBUG_CMD, !debugInfoBak);
+        }
 
         // Save configuration
         ConfInit.instance.persistGlobalConf(new File(System.getProperty("properties.file")));
@@ -1828,6 +1721,7 @@ public class PreferencesWindow extends GenericDialog {
         EventManager.instance.post(Events.LENS_FLARE_CMD, lensflareBak, true);
         EventManager.instance.post(Events.LIGHT_SCATTERING_CMD, lightglowBak, true);
         EventManager.instance.post(Events.BLOOM_CMD, bloomBak, true);
+        EventManager.instance.post(Events.SHOW_DEBUG_CMD, debugInfoBak);
     }
 
     private void reloadUI() {

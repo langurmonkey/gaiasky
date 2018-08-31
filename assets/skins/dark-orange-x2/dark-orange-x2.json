@@ -45,7 +45,8 @@ com.badlogic.gdx.scenes.scene2d.ui.Button$ButtonStyle: {
 	toggle: { down: default-round-down, checked: default-round-down, up: default-round }
 },
 com.badlogic.gdx.scenes.scene2d.ui.TextButton$TextButtonStyle: {
-	default: { down: default-round-down, up: default-round, font: ui-18, fontColor: white },
+	default: { down: default-round-down, up: default-round, font: ui-18, fontColor: white, disabledFontColor: dark-gray },
+	download: { down: default-round-down, up: default-round, font: ui-21, fontColor: orange },
 	toggle: { down: default-round-down, up: default-round, checked: default-round-down, font: ui-18, fontColor: white, downFontColor: orange },
 	toggle-big: { down: default-round-down, up: default-round, checked: default-round-down, font: ui-21, fontColor: white, downFontColor: orange },
 	link: { font: ui-18, fontColor: blue, downFontColor: orange }
@@ -140,8 +141,8 @@ com.badlogic.gdx.scenes.scene2d.ui.Label$LabelStyle: {
 	headline:   { font: ui-25, fontColor: white},
 	subhead:   { font: ui-18, fontColor: white},
 	
-	hud:	 { font: ui-18, fontColor: white },
-	hud-med:	 { font: ui-17-bold, fontColor: white },
+	hud:	 { font: ui-16, fontColor: white },
+	hud-med:	 { font: ui-17, fontColor: white },
 	hud-big:	 { font: ui-19, fontColor: white },
 	hud-header:	 { font: ui-25, fontColor: orange },
 	hud-subheader:	 { font: ui-17, fontColor: orange },

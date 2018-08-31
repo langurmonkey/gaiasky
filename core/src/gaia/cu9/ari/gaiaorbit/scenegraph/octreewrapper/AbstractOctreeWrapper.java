@@ -230,7 +230,7 @@ public abstract class AbstractOctreeWrapper extends FadeNode implements Iterable
 
             return (T) instance;
         } catch (Exception e) {
-            Logger.error(e);
+            Logger.getLogger(this.getClass()).error(e);
         }
         return null;
     }

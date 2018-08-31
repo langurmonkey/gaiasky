@@ -21,7 +21,6 @@ import gaia.cu9.ari.gaiaorbit.render.IRenderable;
 import gaia.cu9.ari.gaiaorbit.scenegraph.CelestialBody;
 import gaia.cu9.ari.gaiaorbit.scenegraph.SceneGraphNode.RenderGroup;
 import gaia.cu9.ari.gaiaorbit.scenegraph.camera.ICamera;
-import gaia.cu9.ari.gaiaorbit.util.Constants;
 import gaia.cu9.ari.gaiaorbit.util.GlobalConf;
 import gaia.cu9.ari.gaiaorbit.util.coord.AstroUtils;
 
@@ -37,9 +36,9 @@ public class PixelRenderSystem extends ImmediateRenderSystem implements IObserve
     boolean initializing = false;
 
     public PixelRenderSystem(RenderGroup rg, float[] alphas, ShaderProgram[] shaders, ComponentType ct) {
-        super(rg, alphas, shaders, 100000);
+        super(rg, alphas, shaders, 10000);
         EventManager.instance.subscribe(this, Events.TRANSIT_COLOUR_CMD, Events.ONLY_OBSERVED_STARS_CMD, Events.STAR_MIN_OPACITY_CMD);
-        BRIGHTNESS_FACTOR = Constants.webgl ? 15 : 10;
+        BRIGHTNESS_FACTOR = 10;
         this.ct = ct;
         this.alphaSizeFovBr = new float[4];
         initializing = true;

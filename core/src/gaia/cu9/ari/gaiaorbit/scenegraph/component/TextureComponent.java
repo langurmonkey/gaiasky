@@ -16,7 +16,6 @@ import com.badlogic.gdx.graphics.g3d.attributes.IntAttribute;
 import com.badlogic.gdx.graphics.g3d.attributes.TextureAttribute;
 
 import gaia.cu9.ari.gaiaorbit.data.AssetBean;
-import gaia.cu9.ari.gaiaorbit.util.Constants;
 import gaia.cu9.ari.gaiaorbit.util.GlobalConf;
 
 /**
@@ -30,9 +29,9 @@ public class TextureComponent {
     protected static final TextureParameter textureParams;
     static {
         textureParams = new TextureParameter();
-        textureParams.genMipMaps = !Constants.webgl;
+        textureParams.genMipMaps = true;
         textureParams.magFilter = TextureFilter.Linear;
-        textureParams.minFilter = Constants.webgl ? TextureFilter.Linear : TextureFilter.MipMapLinearNearest;
+        textureParams.minFilter = TextureFilter.MipMapLinearNearest;
     }
 
     public String base, specular, normal, night, ring;
@@ -186,44 +185,41 @@ public class TextureComponent {
      *            Plain color used if there is no texture.
      */
     public void initMaterial(AssetManager manager, Map<String, Material> materials, float[] cc, boolean culling) {
-        Material material = materials.containsKey("base") ? materials.get("base") : materials.size() > 0 ? materials.get(materials.keySet().iterator().next()) : null;
+        Material material = materials.get("base");
+        if (base != null) {
+            baseTex = manager.get(baseT, Texture.class);
+            material.set(new TextureAttribute(TextureAttribute.Diffuse, baseTex));
+        }
+        if (cc != null && (coloriftex || base == null)) {
+            // Add diffuse colour
+            material.set(new ColorAttribute(ColorAttribute.Diffuse, cc[0], cc[1], cc[2], cc[3]));
+        }
 
-        if (material != null) {
-            if (base != null) {
-                baseTex = manager.get(baseT, Texture.class);
-                material.set(new TextureAttribute(TextureAttribute.Diffuse, baseTex));
-            }
-            if (cc != null && (coloriftex || base == null)) {
-                // Add diffuse colour
-                material.set(new ColorAttribute(ColorAttribute.Diffuse, cc[0], cc[1], cc[2], cc[3]));
-            }
-
-            if (normal != null) {
-                Texture tex = manager.get(normalT, Texture.class);
-                material.set(new TextureAttribute(TextureAttribute.Normal, tex));
-            }
-            if (specular != null) {
-                Texture tex = manager.get(specularT, Texture.class);
-                material.set(new TextureAttribute(TextureAttribute.Specular, tex));
-                // Control amount of specularity
-                material.set(new ColorAttribute(ColorAttribute.Specular, 0.5f, 0.5f, 0.5f, 1f));
-            }
-            if (night != null) {
-                Texture tex = manager.get(nightT, Texture.class);
-                material.set(new TextureAttribute(TextureAttribute.Emissive, tex));
-            }
-            if (materials.containsKey("ring")) {
-                // Ring material
-                Material ringMat = materials.get("ring");
-                Texture tex = manager.get(ringT, Texture.class);
-                ringMat.set(new TextureAttribute(TextureAttribute.Diffuse, tex));
-                ringMat.set(new BlendingAttribute(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA));
-                if (!culling)
-                    ringMat.set(new IntAttribute(IntAttribute.CullFace, GL20.GL_NONE));
-            }
-            if (!culling) {
-                material.set(new IntAttribute(IntAttribute.CullFace, GL20.GL_NONE));
-            }
+        if (normal != null) {
+            Texture tex = manager.get(normalT, Texture.class);
+            material.set(new TextureAttribute(TextureAttribute.Normal, tex));
+        }
+        if (specular != null) {
+            Texture tex = manager.get(specularT, Texture.class);
+            material.set(new TextureAttribute(TextureAttribute.Specular, tex));
+            // Control amount of specularity
+            material.set(new ColorAttribute(ColorAttribute.Specular, 0.5f, 0.5f, 0.5f, 1f));
+        }
+        if (night != null) {
+            Texture tex = manager.get(nightT, Texture.class);
+            material.set(new TextureAttribute(TextureAttribute.Emissive, tex));
+        }
+        if (materials.containsKey("ring")) {
+            // Ring material
+            Material ringMat = materials.get("ring");
+            Texture tex = manager.get(ringT, Texture.class);
+            ringMat.set(new TextureAttribute(TextureAttribute.Diffuse, tex));
+            ringMat.set(new BlendingAttribute(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA));
+            if (!culling)
+                ringMat.set(new IntAttribute(IntAttribute.CullFace, GL20.GL_NONE));
+        }
+        if (!culling) {
+            material.set(new IntAttribute(IntAttribute.CullFace, GL20.GL_NONE));
         }
     }
 
@@ -250,6 +246,7 @@ public class TextureComponent {
     public void setColoriftex(Boolean coloriftex) {
         this.coloriftex = coloriftex;
     }
+
 
     /** Disposes all currently loaded textures **/
     public void disposeTextures(AssetManager manager) {

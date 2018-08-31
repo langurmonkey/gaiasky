@@ -18,7 +18,7 @@
  */
 package gaia.cu9.ari.gaiaorbit.util.gaia;
 
-import gaia.cu9.ari.gaiaorbit.util.Constants;
+import gaia.cu9.ari.gaiaorbit.util.Nature;
 import gaia.cu9.ari.gaiaorbit.util.coord.NslSun;
 import gaia.cu9.ari.gaiaorbit.util.gaia.time.Duration;
 import gaia.cu9.ari.gaiaorbit.util.math.Quaterniond;
@@ -153,7 +153,7 @@ public class TransitionScanningLaw extends AnalyticalAttitudeDataServer {
         }
 
         om0 = getOmegaRef();
-        om1 = getTargetScanRate() * Constants.Nature.ARCSECOND_RADIAN * Constants.Nature.DAY_SECOND;
+        om1 = getTargetScanRate() * Nature.ARCSEC_TO_RAD * Nature.D_TO_S;
         om2 = -acc * cosXi / 2;
         om3 = -sign * acc * sinXi * lSunDotRef / 6;
         om4 = -sign * acc * sinXi * lSunDotDotRef / 8;
@@ -176,7 +176,7 @@ public class TransitionScanningLaw extends AnalyticalAttitudeDataServer {
         }
 
         // t = time in [days] from tRef
-        double t = (time - getRefTime()) * 1e-9 / Constants.Nature.DAY_SECOND;
+        double t = (time - getRefTime()) * 1e-9 / Nature.D_TO_S;
 
         double tNorm = t / ramp.asDays();
         // tNorm must by in [-eps, |ramp|+eps] for a valid t

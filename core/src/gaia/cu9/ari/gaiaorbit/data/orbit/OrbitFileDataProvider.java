@@ -33,7 +33,7 @@ public class OrbitFileDataProvider implements IOrbitDataProvider {
             }
             EventManager.instance.post(Events.ORBIT_DATA_LOADED, data, file);
         } catch (Exception e) {
-            Logger.error(e, OrbitFileDataProvider.class.getName());
+            Logger.getLogger(this.getClass()).error(e);
         }
     }
 

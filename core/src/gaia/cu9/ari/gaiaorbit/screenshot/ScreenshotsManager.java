@@ -16,8 +16,8 @@ import gaia.cu9.ari.gaiaorbit.render.IMainRenderer;
 import gaia.cu9.ari.gaiaorbit.render.IPostProcessor.PostProcessBean;
 import gaia.cu9.ari.gaiaorbit.render.IPostProcessor.RenderType;
 import gaia.cu9.ari.gaiaorbit.scenegraph.camera.ICamera;
-import gaia.cu9.ari.gaiaorbit.screenshot.ImageRenderer.ImageType;
 import gaia.cu9.ari.gaiaorbit.util.GlobalConf;
+import gaia.cu9.ari.gaiaorbit.util.GlobalConf.ImageFormat;
 
 public class ScreenshotsManager implements IObserver {
     public static ScreenshotsManager system;
@@ -65,12 +65,12 @@ public class ScreenshotsManager implements IObserver {
 
             switch (GlobalConf.frame.FRAME_MODE) {
             case simple:
-                frameRenderer.saveScreenshot(GlobalConf.frame.RENDER_FOLDER, GlobalConf.frame.RENDER_FILE_NAME, Gdx.graphics.getWidth(), Gdx.graphics.getHeight(), true, ImageType.JPG);
+                frameRenderer.saveScreenshot(GlobalConf.frame.RENDER_FOLDER, GlobalConf.frame.RENDER_FILE_NAME, Gdx.graphics.getWidth(), Gdx.graphics.getHeight(), true, GlobalConf.frame.FRAME_FORMAT, GlobalConf.frame.FRAME_QUALITY);
                 break;
             case redraw:
                 // Do not resize post processor
                 GaiaSky.instance.resizeImmediate(GlobalConf.frame.RENDER_WIDTH, GlobalConf.frame.RENDER_HEIGHT, false, true, false);
-                renderToImage(mr, mr.getCameraManager(), mr.getT(), mr.getPostProcessor().getPostProcessBean(RenderType.frame), GlobalConf.frame.RENDER_WIDTH, GlobalConf.frame.RENDER_HEIGHT, GlobalConf.frame.RENDER_FOLDER, GlobalConf.frame.RENDER_FILE_NAME, frameRenderer, ImageType.JPG);
+                renderToImage(mr, mr.getCameraManager(), mr.getT(), mr.getPostProcessor().getPostProcessBean(RenderType.frame), GlobalConf.frame.RENDER_WIDTH, GlobalConf.frame.RENDER_HEIGHT, GlobalConf.frame.RENDER_FOLDER, GlobalConf.frame.RENDER_FILE_NAME, frameRenderer, GlobalConf.frame.FRAME_FORMAT, GlobalConf.frame.FRAME_QUALITY);
                 GaiaSky.instance.resizeImmediate(Gdx.graphics.getWidth(), Gdx.graphics.getHeight(), false, true, false);
                 break;
             }
@@ -83,12 +83,12 @@ public class ScreenshotsManager implements IObserver {
             String filename = getCurrentTimeStamp() + "_" + ScreenshotCmd.FILENAME;
             switch (GlobalConf.screenshot.SCREENSHOT_MODE) {
             case simple:
-                file = ImageRenderer.renderToImageGl20(screenshot.folder, filename, Gdx.graphics.getWidth(), Gdx.graphics.getHeight(), ImageType.JPG);
+                file = ImageRenderer.renderToImageGl20(screenshot.folder, filename, Gdx.graphics.getWidth(), Gdx.graphics.getHeight(), GlobalConf.screenshot.SCREENSHOT_FORMAT, GlobalConf.screenshot.SCREENSHOT_QUALITY);
                 break;
             case redraw:
                 // Do not resize post processor
                 GaiaSky.instance.resizeImmediate(screenshot.width, screenshot.height, false, true, false);
-                file = renderToImage(mr, mr.getCameraManager(), mr.getT(), mr.getPostProcessor().getPostProcessBean(RenderType.screenshot), screenshot.width, screenshot.height, screenshot.folder, filename, screenshotRenderer, ImageType.JPG);
+                file = renderToImage(mr, mr.getCameraManager(), mr.getT(), mr.getPostProcessor().getPostProcessBean(RenderType.screenshot), screenshot.width, screenshot.height, screenshot.folder, filename, screenshotRenderer, GlobalConf.screenshot.SCREENSHOT_FORMAT, GlobalConf.screenshot.SCREENSHOT_QUALITY);
                 GaiaSky.instance.resizeImmediate(Gdx.graphics.getWidth(), Gdx.graphics.getHeight(), false, true, false);
                 break;
             }
@@ -101,7 +101,7 @@ public class ScreenshotsManager implements IObserver {
     }
 
     public void renderCurrentFrameBuffer(String folder, String file, int w, int h) {
-        String f = ImageRenderer.renderToImageGl20(folder, file, w, h, ImageType.JPG);
+        String f = ImageRenderer.renderToImageGl20(folder, file, w, h, GlobalConf.screenshot.SCREENSHOT_FORMAT, GlobalConf.screenshot.SCREENSHOT_QUALITY);
         if (f != null) {
             EventManager.instance.post(Events.SCREENSHOT_INFO, f);
         }
@@ -124,7 +124,7 @@ public class ScreenshotsManager implements IObserver {
      *            the {@link IFileImageRenderer} to use.
      * @return String with the path to the screenshot image file.
      */
-    public String renderToImage(IMainRenderer mr, ICamera camera, double dt, PostProcessBean ppb, int width, int height, String folder, String filename, IFileImageRenderer renderer, ImageType type) {
+    public String renderToImage(IMainRenderer mr, ICamera camera, double dt, PostProcessBean ppb, int width, int height, String folder, String filename, IFileImageRenderer renderer, ImageFormat type, float quality) {
         FrameBuffer frameBuffer = mr.getFrameBuffer(width, height);
         // TODO That's a dirty trick, we should find a better way (i.e. making
         // buildEnabledEffectsList() method public)
@@ -154,7 +154,7 @@ public class ScreenshotsManager implements IObserver {
             renderGui().render(width, height);
         }
 
-        String res = renderer.saveScreenshot(folder, filename, width, height, false, type);
+        String res = renderer.saveScreenshot(folder, filename, width, height, false, type, quality);
 
         frameBuffer.end();
         return res;

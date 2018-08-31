@@ -1,12 +1,12 @@
 package gaia.cu9.ari.gaiaorbit.util.gaia.utils;
 
-import gaia.cu9.ari.gaiaorbit.util.Constants;
+import gaia.cu9.ari.gaiaorbit.util.Nature;
 import gaia.cu9.ari.gaiaorbit.util.math.MathUtilsd;
 import gaia.cu9.ari.gaiaorbit.util.math.Quaterniond;
 
 public class Interpolator {
 
-    protected static double dtMin = 0.02 / Constants.Nature.DAY_SECOND;
+    protected static double dtMin = 0.02 / Nature.D_TO_S;
 
     /**
      * Static method for cubic Hermite interpolation between two points, given

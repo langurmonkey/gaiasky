@@ -19,19 +19,18 @@ import gaia.cu9.ari.gaiaorbit.data.constel.ConstellationsLoader;
 import gaia.cu9.ari.gaiaorbit.data.stars.HYGBinaryLoader;
 import gaia.cu9.ari.gaiaorbit.desktop.format.DesktopDateFormatFactory;
 import gaia.cu9.ari.gaiaorbit.desktop.format.DesktopNumberFormatFactory;
-import gaia.cu9.ari.gaiaorbit.event.EventManager;
-import gaia.cu9.ari.gaiaorbit.event.Events;
-import gaia.cu9.ari.gaiaorbit.event.IObserver;
 import gaia.cu9.ari.gaiaorbit.scenegraph.AbstractPositionEntity;
 import gaia.cu9.ari.gaiaorbit.scenegraph.Constellation;
 import gaia.cu9.ari.gaiaorbit.scenegraph.Star;
 import gaia.cu9.ari.gaiaorbit.util.ConfInit;
 import gaia.cu9.ari.gaiaorbit.util.I18n;
 import gaia.cu9.ari.gaiaorbit.util.Logger;
+import gaia.cu9.ari.gaiaorbit.util.Logger.Log;
 import gaia.cu9.ari.gaiaorbit.util.format.DateFormatFactory;
 import gaia.cu9.ari.gaiaorbit.util.format.NumberFormatFactory;
 
-public class ConstellationHIPUpdater implements IObserver {
+public class ConstellationHIPUpdater  {
+    private static final Log logger = Logger.getLogger(ConstellationHIPUpdater.class);
 
     public static void main(String[] args) {
         try {
@@ -48,7 +47,7 @@ public class ConstellationHIPUpdater implements IObserver {
             I18n.initialize(new FileHandle("/home/tsagrista/git/gaiasandbox/android/assets/i18n/gsbundle"));
 
             // Add notif watch
-            EventManager.instance.subscribe(new ConstellationHIPUpdater(), Events.POST_NOTIFICATION, Events.JAVA_EXCEPTION);
+            new LogWriter();
 
             updateConstellations();
 
@@ -99,7 +98,7 @@ public class ConstellationHIPUpdater implements IObserver {
                     else
                         nids[i] = oldid;
 
-                    Logger.info("id/hip: " + oldid + "/" + nids[i]);
+                    logger.info("id/hip: " + oldid + "/" + nids[i]);
                 }
                 newids.add(nids);
             }
@@ -108,7 +107,7 @@ public class ConstellationHIPUpdater implements IObserver {
             constellation.ids = newids;
         }
 
-        Logger.info(cons.size() + " constellations processed");
+        logger.info(cons.size() + " constellations processed");
 
         String temp = System.getProperty("java.io.tmpdir");
 
@@ -150,32 +149,7 @@ public class ConstellationHIPUpdater implements IObserver {
         }
         bw.close();
 
-        Logger.info("Constellations written to " + constelfile.getAbsolutePath());
-
-    }
-
-    @Override
-    public void notify(Events event, Object... data) {
-        switch (event) {
-        case POST_NOTIFICATION:
-            String message = "";
-            for (int i = 0; i < data.length; i++) {
-                if (!(i == data.length - 1 && data[i] instanceof Boolean)) {
-                    message += (String) data[i];
-                    if (i < data.length - 1 && !(i == data.length - 2 && data[data.length - 1] instanceof Boolean)) {
-                        message += " - ";
-                    }
-                }
-            }
-            System.out.println(message);
-            break;
-        case JAVA_EXCEPTION:
-            Exception e = (Exception) data[0];
-            e.printStackTrace(System.err);
-            break;
-        default:
-            break;
-        }
+        logger.info("Constellations written to " + constelfile.getAbsolutePath());
 
     }
 

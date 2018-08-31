@@ -79,7 +79,7 @@ public class MilkyWay extends AbstractPositionEntity implements I3DTextRenderabl
                 dustPartition = new int[dustData.size];
             }
         } catch (Exception e) {
-            Logger.error(e, getClass().getSimpleName());
+            Logger.getLogger(this.getClass()).error(e);
         }
 
     }
@@ -101,7 +101,7 @@ public class MilkyWay extends AbstractPositionEntity implements I3DTextRenderabl
                 coordinateSystem = trf.putIn(new Matrix4());
 
             } catch (ReflectionException e) {
-                Logger.error(this.getClass().getName(), "Error getting/invoking method Coordinates." + transformName + "()");
+                Logger.getLogger(this.getClass()).error("Error getting/invoking method Coordinates." + transformName + "()");
             }
         } else {
             // Equatorial, nothing

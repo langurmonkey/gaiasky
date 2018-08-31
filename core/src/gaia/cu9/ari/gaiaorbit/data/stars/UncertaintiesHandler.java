@@ -63,9 +63,9 @@ public class UncertaintiesHandler implements IObserver {
                 }
             }
         } catch (NoSuchFileException e) {
-            Logger.error("Directory " + path + " not found");
+            Logger.getLogger(this.getClass()).error("Directory " + path + " not found");
         } catch (IOException e) {
-            Logger.error(e);
+            Logger.getLogger(this.getClass()).error(e);
         }
 
         EventManager.instance.subscribe(this, Events.SHOW_UNCERTAINTIES, Events.HIDE_UNCERTAINTIES);

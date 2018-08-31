@@ -28,6 +28,9 @@ public class SceneGraphJsonLoader {
                 InputStream is = jsonFile.read();
                 JsonValue model = jsonReader.parse(is);
 
+                String name = model.get("name") != null ? model.get("name").asString() : null;
+                String desc = model.get("description") != null ? model.get("description").asString() : null;
+
                 JsonValue child = model.get("data").child;
                 while (child != null) {
                     String clazzName = child.getString("loader");
@@ -40,6 +43,11 @@ public class SceneGraphJsonLoader {
 
                         Constructor c = ClassReflection.getConstructor(clazz);
                         ISceneGraphLoader loader = (ISceneGraphLoader) c.newInstance();
+
+                        if (name != null)
+                            loader.setName(name);
+                        if (desc != null)
+                            loader.setDescription(desc);
 
                         // Init loader
                         loader.initialize(files);
@@ -81,7 +89,7 @@ public class SceneGraphJsonLoader {
             sg.initialize(nodes, time, hasOctree, hasStarGroup);
 
         } catch (Exception e) {
-            Logger.error(e);
+            Logger.getLogger(SceneGraphJsonLoader.class).error(e);
         }
         return sg;
     }

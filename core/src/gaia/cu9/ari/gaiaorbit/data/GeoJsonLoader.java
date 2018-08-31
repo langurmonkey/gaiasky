@@ -49,11 +49,11 @@ public class GeoJsonLoader<T extends SceneGraphNode> implements ISceneGraphLoade
 
                     child = child.next;
                 }
-                Logger.info(this.getClass().getSimpleName(), I18n.bundle.format("notif.nodeloader", size, filePath));
+                Logger.getLogger(this.getClass()).info(I18n.bundle.format("notif.nodeloader", size, filePath));
             }
 
         } catch (Exception e) {
-            Logger.error(e);
+            Logger.getLogger(this.getClass()).error(e);
         }
 
         return bodies;
@@ -128,5 +128,13 @@ public class GeoJsonLoader<T extends SceneGraphNode> implements ISceneGraphLoade
         } else {
             return 1;
         }
+    }
+
+    @Override
+    public void setName(String name) {
+    }
+
+    @Override
+    public void setDescription(String description) {
     }
 }

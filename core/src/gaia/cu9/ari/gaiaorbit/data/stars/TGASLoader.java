@@ -20,7 +20,8 @@ import gaia.cu9.ari.gaiaorbit.util.Constants;
 import gaia.cu9.ari.gaiaorbit.util.GlobalConf;
 import gaia.cu9.ari.gaiaorbit.util.I18n;
 import gaia.cu9.ari.gaiaorbit.util.Logger;
-import gaia.cu9.ari.gaiaorbit.util.coord.AstroUtils;
+import gaia.cu9.ari.gaiaorbit.util.Logger.Log;
+import gaia.cu9.ari.gaiaorbit.util.Nature;
 import gaia.cu9.ari.gaiaorbit.util.coord.Coordinates;
 import gaia.cu9.ari.gaiaorbit.util.math.Vector3d;
 import gaia.cu9.ari.gaiaorbit.util.parse.Parser;
@@ -40,6 +41,7 @@ import gaia.cu9.ari.gaiaorbit.util.parse.Parser;
  *
  */
 public class TGASLoader extends AbstractCatalogLoader implements ISceneGraphLoader {
+    private static final Log logger = Logger.getLogger(TGASLoader.class);
 
     // Version to load; 0 - old, 1 - new
     public static int VERSION = 1;
@@ -95,7 +97,7 @@ public class TGASLoader extends AbstractCatalogLoader implements ISceneGraphLoad
             separator = separator_new;
             indices = indices_new;
         } else {
-            Logger.error("VERSION number not recognized");
+            logger.error("VERSION number not recognized");
             return null;
         }
 
@@ -121,14 +123,14 @@ public class TGASLoader extends AbstractCatalogLoader implements ISceneGraphLoad
                 try {
                     br.close();
                 } catch (IOException e) {
-                    Logger.error(e);
+                    logger.error(e);
                 }
 
             }
         }
 
-        Logger.info(this.getClass().getSimpleName(), "SourceId matched to HIP in " + sidhipfound + " stars");
-        Logger.info(this.getClass().getSimpleName(), I18n.bundle.format("notif.catalog.init", stars.size));
+        logger.info("SourceId matched to HIP in " + sidhipfound + " stars");
+        logger.info(I18n.bundle.format("notif.catalog.init", stars.size));
         return stars;
     }
 
@@ -163,15 +165,15 @@ public class TGASLoader extends AbstractCatalogLoader implements ISceneGraphLoad
                 Vector3d pos = Coordinates.sphericalToCartesian(Math.toRadians(ra), Math.toRadians(dec), dist, new Vector3d());
 
                 /** PROPER MOTIONS in mas/yr **/
-                double mualphastar = Parser.parseDouble(st[indices[MUALPHA]].trim()) * AstroUtils.MILLARCSEC_TO_DEG;
-                double mudelta = Parser.parseDouble(st[indices[MUDELTA]].trim()) * AstroUtils.MILLARCSEC_TO_DEG;
+                double mualphastar = Parser.parseDouble(st[indices[MUALPHA]].trim()) * Nature.MILLARCSEC_TO_DEG;
+                double mudelta = Parser.parseDouble(st[indices[MUDELTA]].trim()) * Nature.MILLARCSEC_TO_DEG;
                 double mualpha = mualphastar / Math.cos(Math.toRadians(dec));
 
                 /** RADIAL VELOCITY in km/s, convert to u/ur **/
                 double radvel = radialVelocities != null && radialVelocities.containsKey(sourceid) ? radialVelocities.get(sourceid) : 0;
 
                 /** PROPER MOTION VECTOR = (pos+dx) - pos **/
-                Vector3d pm = Coordinates.sphericalToCartesian(Math.toRadians(ra + mualpha), Math.toRadians(dec + mudelta), dist + radvel * Constants.KM_TO_U / Constants.S_TO_Y, new Vector3d());
+                Vector3d pm = Coordinates.sphericalToCartesian(Math.toRadians(ra + mualpha), Math.toRadians(dec + mudelta), dist + radvel * Constants.KM_TO_U / Nature.S_TO_Y, new Vector3d());
                 pm.sub(pos);
 
                 Vector3 pmfloat = pm.toVector3();
@@ -231,7 +233,7 @@ public class TGASLoader extends AbstractCatalogLoader implements ISceneGraphLoad
             try {
                 br.close();
             } catch (IOException e) {
-                Logger.error(e);
+                logger.error(e);
             }
 
         }
@@ -267,7 +269,7 @@ public class TGASLoader extends AbstractCatalogLoader implements ISceneGraphLoad
             try {
                 br.close();
             } catch (IOException e) {
-                Logger.error(e);
+                logger.error(e);
             }
 
         }

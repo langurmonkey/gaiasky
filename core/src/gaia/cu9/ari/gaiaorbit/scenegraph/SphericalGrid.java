@@ -55,7 +55,7 @@ public class SphericalGrid extends BackgroundModel implements IAnnotationsRender
                 trf.putIn(aux);
                 annotTransform.mul(aux);
             } catch (ReflectionException e) {
-                Logger.error(SphericalGrid.class.getName(), "Error getting/invoking method Coordinates." + transformName + "()");
+                Logger.getLogger(this.getClass()).error("Error getting/invoking method Coordinates." + transformName + "()");
             }
         } else {
             // Equatorial, nothing

@@ -36,10 +36,11 @@ import gaia.cu9.ari.gaiaorbit.desktop.util.CamRecorder;
 import gaia.cu9.ari.gaiaorbit.desktop.util.DesktopConfInit;
 import gaia.cu9.ari.gaiaorbit.desktop.util.DesktopMusicActors;
 import gaia.cu9.ari.gaiaorbit.desktop.util.DesktopNetworkChecker;
-import gaia.cu9.ari.gaiaorbit.desktop.util.DesktopSysUtilsFactory;
+import gaia.cu9.ari.gaiaorbit.desktop.util.LogWriter;
 import gaia.cu9.ari.gaiaorbit.desktop.util.MemInfoWindow;
 import gaia.cu9.ari.gaiaorbit.desktop.util.RunCameraWindow;
 import gaia.cu9.ari.gaiaorbit.desktop.util.RunScriptWindow;
+import gaia.cu9.ari.gaiaorbit.desktop.util.SysUtils;
 import gaia.cu9.ari.gaiaorbit.event.EventManager;
 import gaia.cu9.ari.gaiaorbit.event.Events;
 import gaia.cu9.ari.gaiaorbit.event.IObserver;
@@ -51,12 +52,11 @@ import gaia.cu9.ari.gaiaorbit.screenshot.ScreenshotsManager;
 import gaia.cu9.ari.gaiaorbit.script.JythonFactory;
 import gaia.cu9.ari.gaiaorbit.script.ScriptingFactory;
 import gaia.cu9.ari.gaiaorbit.util.ConfInit;
-import gaia.cu9.ari.gaiaorbit.util.Constants;
 import gaia.cu9.ari.gaiaorbit.util.GlobalConf;
 import gaia.cu9.ari.gaiaorbit.util.I18n;
 import gaia.cu9.ari.gaiaorbit.util.Logger;
+import gaia.cu9.ari.gaiaorbit.util.Logger.Log;
 import gaia.cu9.ari.gaiaorbit.util.MusicManager;
-import gaia.cu9.ari.gaiaorbit.util.SysUtilsFactory;
 import gaia.cu9.ari.gaiaorbit.util.format.DateFormatFactory;
 import gaia.cu9.ari.gaiaorbit.util.format.NumberFormatFactory;
 import gaia.cu9.ari.gaiaorbit.util.math.MathManager;
@@ -68,16 +68,21 @@ import gaia.cu9.ari.gaiaorbit.util.math.MathManager;
  *
  */
 public class GaiaSkyDesktop implements IObserver {
+    private static final Log logger = Logger.getLogger(GaiaSkyDesktop.class);
+
+    /* Configuration file version of the source code */
+    private static int SOURCE_CONF_VERSION = 251;
     private static GaiaSkyDesktop gsd;
     public static String ASSETS_LOC;
 
     private MemInfoWindow memInfoWindow;
 
     /**
-     * Program arguments
-     * @author Toni Sagrista
-     *
-     */
+    	 * Program arguments
+    	 * 
+    	 * @author Toni Sagrista
+    	 *
+    	 */
     private static class GaiaSkyArgs {
         @Parameter(names = { "-h", "--help" }, help = true)
         private boolean help = false;
@@ -100,14 +105,12 @@ public class GaiaSkyDesktop implements IObserver {
             return;
         }
         try {
+            // Check java version
+            javaVersionCheck();
+
             gsd = new GaiaSkyDesktop();
-            // Assets location
-            ASSETS_LOC = (System.getProperty("assets.location") != null ? System.getProperty("assets.location") : "");
 
             Gdx.files = new Lwjgl3Files();
-
-            // Sys utils
-            SysUtilsFactory.initialize(new DesktopSysUtilsFactory());
 
             // Initialize number format
             NumberFormatFactory.initialize(new DesktopNumberFormatFactory());
@@ -125,7 +128,7 @@ public class GaiaSkyDesktop implements IObserver {
             }
 
             // Init global configuration
-            ConfInit.initialize(new DesktopConfInit(ASSETS_LOC));
+            ConfInit.initialize(new DesktopConfInit());
             GlobalConf.screen.SCREEN_WIDTH = 1080;
             GlobalConf.screen.SCREEN_HEIGHT = 1200;
 
@@ -158,13 +161,12 @@ public class GaiaSkyDesktop implements IObserver {
             MusicActorsManager.initialize(new DesktopMusicActors());
 
             // Init music manager
-            MusicManager.initialize(Gdx.files.absolute(ASSETS_LOC + "music"), Gdx.files.absolute(SysUtilsFactory.getSysUtils().getDefaultMusicDir().getAbsolutePath()));
+            MusicManager.initialize(Gdx.files.absolute(ASSETS_LOC + "music"), Gdx.files.absolute(SysUtils.getDefaultMusicDir().getAbsolutePath()));
 
             // Initialize post processor factory
             PostProcessorFactory.initialize(new DesktopPostProcessorFactory());
 
             // Key mappings
-            Constants.desktop = true;
             KeyBindings.initialize();
 
             // Scene graph implementation provider
@@ -195,15 +197,20 @@ public class GaiaSkyDesktop implements IObserver {
         while (keys.hasMoreElements()) {
             Object key = keys.nextElement();
             Object value = UIManager.get(key);
-            if (value != null && value instanceof javax.swing.plaf.FontUIResource && ((FontUIResource) value).getSize() > f.getSize()) {
+            if (value != null && value instanceof javax.swing.plaf.FontUIResource
+                    && ((FontUIResource) value).getSize() > f.getSize()) {
                 UIManager.put(key, f);
             }
         }
     }
 
+    private LogWriter lw;
+
     public GaiaSkyDesktop() {
         super();
-        EventManager.instance.subscribe(this, Events.SHOW_RUNSCRIPT_ACTION, Events.JAVA_EXCEPTION, Events.SHOW_PLAYCAMERA_ACTION, Events.DISPLAY_MEM_INFO_WINDOW);
+        lw = new LogWriter();
+        EventManager.instance.subscribe(this, Events.SHOW_RUNSCRIPT_ACTION, Events.SHOW_PLAYCAMERA_ACTION, Events.DISPLAY_MEM_INFO_WINDOW);
+        EventManager.instance.subscribe(this, Events.SCENE_GRAPH_LOADED, Events.DISPOSE);
     }
 
     private void init() {
@@ -226,7 +233,8 @@ public class GaiaSkyDesktop implements IObserver {
         Lwjgl3Application app = new Lwjgl3Application(new GaiaSky(), cfg);
         //app.addLifecycleListener(new GaiaSkyWindowListener());
 
-        EventManager.instance.unsubscribe(this, Events.POST_NOTIFICATION, Events.JAVA_EXCEPTION);
+        if (lw != null)
+            EventManager.instance.removeAllSubscriptions(lw);
     }
 
     RunScriptWindow scriptWindow = null;
@@ -272,12 +280,12 @@ public class GaiaSkyDesktop implements IObserver {
     }
 
     private static void initUserDirectory() {
-        SysUtilsFactory.getSysUtils().getGSHomeDir().mkdirs();
-        SysUtilsFactory.getSysUtils().getDefaultFramesDir().mkdirs();
-        SysUtilsFactory.getSysUtils().getDefaultScreenshotsDir().mkdirs();
-        SysUtilsFactory.getSysUtils().getDefaultMusicDir().mkdirs();
-        SysUtilsFactory.getSysUtils().getDefaultScriptDir().mkdirs();
-        SysUtilsFactory.getSysUtils().getDefaultCameraDir().mkdirs();
+        SysUtils.getGSHomeDir().mkdirs();
+        SysUtils.getDefaultFramesDir().mkdirs();
+        SysUtils.getDefaultScreenshotsDir().mkdirs();
+        SysUtils.getDefaultMusicDir().mkdirs();
+        SysUtils.getDefaultScriptDir().mkdirs();
+        SysUtils.getDefaultCameraDir().mkdirs();
     }
 
     /**
@@ -294,7 +302,7 @@ public class GaiaSkyDesktop implements IObserver {
      */
     private static String initConfigFile(boolean ow) throws IOException {
         // Use user folder
-        File userFolder = SysUtilsFactory.getSysUtils().getGSHomeDir();
+        File userFolder = SysUtils.getGSHomeDir();
         userFolder.mkdirs();
         File userFolderConfFile = new File(userFolder, "global.vr.properties");
 
@@ -306,7 +314,7 @@ public class GaiaSkyDesktop implements IObserver {
         if (userFolderConfFile.exists()) {
             Properties userprops = new Properties();
             userprops.load(new FileInputStream(userFolderConfFile));
-            int internalversion = 250;
+            int internalversion = SOURCE_CONF_VERSION;
             if (internalFolderConfFile.exists()) {
                 Properties internalprops = new Properties();
                 internalprops.load(new FileInputStream(internalFolderConfFile));
@@ -314,8 +322,11 @@ public class GaiaSkyDesktop implements IObserver {
             }
 
             // Check latest version
-            if (!userprops.containsKey("properties.version") || (userprops.containsKey("properties.version") && Integer.parseInt(userprops.getProperty("properties.version")) < internalversion)) {
-                System.out.println("Properties file version mismatch, overwriting with new version: found " + Integer.parseInt(userprops.getProperty("properties.version")) + ", required " + internalversion);
+            if (!userprops.containsKey("properties.version") || (userprops.containsKey("properties.version")
+                    && Integer.parseInt(userprops.getProperty("properties.version")) < internalversion)) {
+                System.out.println("Properties file version mismatch, overwriting with new version: found "
+                        + Integer.parseInt(userprops.getProperty("properties.version")) + ", required "
+                        + internalversion);
                 overwrite = true;
             }
         }
@@ -366,6 +377,31 @@ public class GaiaSkyDesktop implements IObserver {
         }
     }
 
+    /**
+     * Checks for incompatibilities between the java version and the OS. Prints the necessary warnings for known issues.
+     */
+    private static void javaVersionCheck() {
+        double jv = getVersion();
+        SysUtils sys = new SysUtils();
+        boolean linux = sys.isLinux();
+        boolean gnome = sys.checkGnome();
+        if (jv >= 10 && linux && gnome) {
+            System.out.println("======================================= WARNING ========================================");
+            System.out.println("It looks like you are running Gaia Sky with java " + jv + " in Linux with Gnome.\n"
+                    + "This version may crash. If it does, comment out the property\n"
+                    + "'assistive_technologies' in the '/etc/java-[version]/accessibility.properties' file.");
+            System.out.println("========================================================================================");
+            System.out.println();
+        }
+    }
+
+    private static double getVersion() {
+        String version = System.getProperty("java.version");
+        int pos = version.indexOf('.');
+        pos = version.indexOf('.', pos + 1);
+        return Double.parseDouble(version.substring(0, pos));
+    }
+
     private class GaiaSkyWindowListener implements LifecycleListener {
 
         @Override
@@ -389,7 +425,7 @@ public class GaiaSkyDesktop implements IObserver {
                 try {
                     f1.get(2000, TimeUnit.MILLISECONDS);
                 } catch (Exception e) {
-                    Logger.error(e);
+                    logger.error(e);
                 }
 
         }

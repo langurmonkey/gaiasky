@@ -23,7 +23,7 @@ public class VRGui implements IGui {
             left = clazz.newInstance();
             left.setHoffset(hoffset);
         } catch (Exception e) {
-            Logger.error(e);
+            Logger.getLogger(this.getClass()).error(e);
         }
 
     }

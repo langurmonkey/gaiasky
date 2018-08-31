@@ -87,15 +87,23 @@ public class ConstelBoundariesLoader<T extends SceneGraphNode> implements IScene
                     boundary.setBoundaries(list);
                     boundaries.add(boundary);
                 } catch (IOException e) {
-                    Logger.error(e, this.getClass().getSimpleName());
+                    Logger.getLogger(this.getClass()).error(e);
                 }
             } catch (Exception e) {
-                Logger.error(e, this.getClass().getSimpleName());
+                Logger.getLogger(this.getClass()).error(e);
             }
         }
 
-        Logger.info(this.getClass().getSimpleName(), I18n.bundle.format("notif.boundaries.init", n));
+        Logger.getLogger(this.getClass()).info(I18n.bundle.format("notif.boundaries.init", n));
 
         return boundaries;
+    }
+
+    @Override
+    public void setName(String name) {
+    }
+
+    @Override
+    public void setDescription(String description) {
     }
 }

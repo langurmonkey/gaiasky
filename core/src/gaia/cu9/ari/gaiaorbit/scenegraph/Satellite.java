@@ -6,7 +6,7 @@ import com.badlogic.gdx.math.Matrix4;
 import gaia.cu9.ari.gaiaorbit.scenegraph.camera.ICamera;
 import gaia.cu9.ari.gaiaorbit.scenegraph.component.RotationComponent;
 import gaia.cu9.ari.gaiaorbit.util.Logger;
-import gaia.cu9.ari.gaiaorbit.util.coord.AstroUtils;
+import gaia.cu9.ari.gaiaorbit.util.Nature;
 import gaia.cu9.ari.gaiaorbit.util.coord.Coordinates;
 import gaia.cu9.ari.gaiaorbit.util.math.Vector3d;
 import gaia.cu9.ari.gaiaorbit.util.time.ITimeFrameProvider;
@@ -72,7 +72,7 @@ public abstract class Satellite extends ModelBody {
             // Convert to cartesian coordinates and put them in aux3 vector
             Vector3d aux3 = aux3d1.get();
             Coordinates.cartesianToSpherical(pos, aux3);
-            posSph.set((float) (AstroUtils.TO_DEG * aux3.x), (float) (AstroUtils.TO_DEG * aux3.y));
+            posSph.set((float) (Nature.TO_DEG * aux3.x), (float) (Nature.TO_DEG * aux3.y));
         }
     }
 
@@ -135,7 +135,7 @@ public abstract class Satellite extends ModelBody {
         try {
             this.parentOrientation = Boolean.parseBoolean(parentorientation);
         } catch (Exception e) {
-            Logger.error(e);
+            Logger.getLogger(this.getClass()).error(e);
         }
     }
 
@@ -143,7 +143,7 @@ public abstract class Satellite extends ModelBody {
         try {
             this.hidden = Boolean.parseBoolean(hidden);
         } catch (Exception e) {
-            Logger.error(e);
+            Logger.getLogger(this.getClass()).error(e);
         }
     }
 

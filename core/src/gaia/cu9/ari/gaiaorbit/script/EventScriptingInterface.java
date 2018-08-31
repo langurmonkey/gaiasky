@@ -23,7 +23,6 @@ import gaia.cu9.ari.gaiaorbit.event.Events;
 import gaia.cu9.ari.gaiaorbit.event.IObserver;
 import gaia.cu9.ari.gaiaorbit.interfce.ControlsWindow;
 import gaia.cu9.ari.gaiaorbit.interfce.IGui;
-import gaia.cu9.ari.gaiaorbit.scenegraph.AbstractPositionEntity;
 import gaia.cu9.ari.gaiaorbit.scenegraph.CelestialBody;
 import gaia.cu9.ari.gaiaorbit.scenegraph.IFocus;
 import gaia.cu9.ari.gaiaorbit.scenegraph.ISceneGraph;
@@ -40,8 +39,9 @@ import gaia.cu9.ari.gaiaorbit.util.Constants;
 import gaia.cu9.ari.gaiaorbit.util.GlobalConf;
 import gaia.cu9.ari.gaiaorbit.util.I18n;
 import gaia.cu9.ari.gaiaorbit.util.Logger;
+import gaia.cu9.ari.gaiaorbit.util.Logger.Log;
 import gaia.cu9.ari.gaiaorbit.util.LruCache;
-import gaia.cu9.ari.gaiaorbit.util.coord.AstroUtils;
+import gaia.cu9.ari.gaiaorbit.util.Nature;
 import gaia.cu9.ari.gaiaorbit.util.coord.Coordinates;
 import gaia.cu9.ari.gaiaorbit.util.math.Intersectord;
 import gaia.cu9.ari.gaiaorbit.util.math.MathUtilsd;
@@ -56,6 +56,8 @@ import gaia.cu9.ari.gaiaorbit.util.time.ITimeFrameProvider;
  *
  */
 public class EventScriptingInterface implements IScriptingInterface, IObserver {
+    private static final Log logger = Logger.getLogger(EventScriptingInterface.class);
+
     private EventManager em;
     private AssetManager manager;
     private LruCache<String, Texture> textures;
@@ -672,14 +674,14 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
     public void setObjectSizeScaling(String name, double scalingFactor) {
         SceneGraphNode sgn = getObject(name);
         if (sgn == null) {
-            Logger.error("Object '" + name + "' does not exist");
+            logger.error("Object '" + name + "' does not exist");
             return;
         }
         if (sgn instanceof ModelBody) {
             ModelBody m = (ModelBody) sgn;
             m.setSizescalefactor(scalingFactor);
         } else {
-            Logger.error("Object '" + name + "' is not a model object");
+            logger.error("Object '" + name + "' is not a model object");
             return;
         }
     }
@@ -932,7 +934,7 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
                 landOnObjectLocation(object, location.getLocation().x, location.getLocation().y, stop);
                 return;
             }
-            Logger.info("Location '" + locationName + "' not found on object '" + object.getCandidateName() + "'");
+            logger.info("Location '" + locationName + "' not found on object '" + object.getCandidateName() + "'");
         }
     }
 
@@ -1438,21 +1440,21 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
 
     @Override
     public double[] galacticToInternalCartesian(double l, double b, double r) {
-        Vector3d pos = Coordinates.sphericalToCartesian(l * AstroUtils.TO_RAD, b * AstroUtils.TO_RAD, r, new Vector3d());
+        Vector3d pos = Coordinates.sphericalToCartesian(l * Nature.TO_RAD, b * Nature.TO_RAD, r, new Vector3d());
         pos.mul(Coordinates.galacticToEquatorial());
         return new double[] { pos.x, pos.y, pos.z };
     }
 
     @Override
     public double[] eclipticToInternalCartesian(double l, double b, double r) {
-        Vector3d pos = Coordinates.sphericalToCartesian(l * AstroUtils.TO_RAD, b * AstroUtils.TO_RAD, r, new Vector3d());
+        Vector3d pos = Coordinates.sphericalToCartesian(l * Nature.TO_RAD, b * Nature.TO_RAD, r, new Vector3d());
         pos.mul(Coordinates.eclipticToEquatorial());
         return new double[] { pos.x, pos.y, pos.z };
     }
 
     @Override
     public double[] equatorialToInternalCartesian(double ra, double dec, double r) {
-        Vector3d pos = Coordinates.sphericalToCartesian(ra * AstroUtils.TO_RAD, dec * AstroUtils.TO_RAD, r, new Vector3d());
+        Vector3d pos = Coordinates.sphericalToCartesian(ra * Nature.TO_RAD, dec * Nature.TO_RAD, r, new Vector3d());
         return new double[] { pos.x, pos.y, pos.z };
     }
 
@@ -1460,7 +1462,7 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
         Vector3d in = new Vector3d(x, y, z);
         Vector3d out = new Vector3d();
         Coordinates.cartesianToSpherical(in, out);
-        return new double[] { out.x * AstroUtils.TO_DEG, out.y * AstroUtils.TO_DEG, in.len() };
+        return new double[] { out.x * Nature.TO_DEG, out.y * Nature.TO_DEG, in.len() };
     }
 
     @Override
@@ -1534,7 +1536,7 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
                 em.post(Events.CUBEMAP_RESOLUTION_CMD, resolution);
             });
         } else {
-            Logger.error("Cubemap resolution must be 20 <= resolution <= 15000");
+            logger.error("Cubemap resolution must be 20 <= resolution <= 15000");
         }
     }
 

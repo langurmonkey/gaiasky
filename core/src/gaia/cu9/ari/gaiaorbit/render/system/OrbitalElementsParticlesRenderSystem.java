@@ -64,7 +64,7 @@ public class OrbitalElementsParticlesRenderSystem extends ImmediateRenderSystem 
         }
 
         if (mdi >= N_MESHES) {
-            Logger.error(this.getClass().getSimpleName(), "No more free meshes!");
+            logger.error(this.getClass().getSimpleName(), "No more free meshes!");
             return -1;
         }
 
@@ -137,10 +137,10 @@ public class OrbitalElementsParticlesRenderSystem extends ImmediateRenderSystem 
                 shaderProgram.setUniformMatrix("u_eclToEq", maux.setToRotation(0, 1, 0, -90).mul(Coordinates.equatorialToEclipticF()));
                 shaderProgram.setUniformf("u_camPos", camera.getCurrent().getPos().put(auxf1));
                 shaderProgram.setUniformf("u_alpha", alphas[first.ct.getFirstOrdinal()] * first.getOpacity());
-                shaderProgram.setUniformf("u_ar", GlobalConf.program.STEREOSCOPIC_MODE && (GlobalConf.program.STEREO_PROFILE != StereoProfile.HD_3DTV && GlobalConf.program.STEREO_PROFILE != StereoProfile.ANAGLYPHIC) ? 0.5f : 1f);
+                shaderProgram.setUniformf("u_ar", GlobalConf.program.STEREOSCOPIC_MODE && (GlobalConf.program.STEREO_PROFILE != StereoProfile.HD_3DTV_HORIZONTAL && GlobalConf.program.STEREO_PROFILE != StereoProfile.ANAGLYPHIC) ? 0.5f : 1f);
                 shaderProgram.setUniformf("u_size", rc.scaleFactor);
                 shaderProgram.setUniformf("u_scaleFactor", GlobalConf.SCALE_FACTOR);
-                shaderProgram.setUniformf("u_ar", GlobalConf.program.STEREOSCOPIC_MODE && (GlobalConf.program.STEREO_PROFILE != StereoProfile.HD_3DTV && GlobalConf.program.STEREO_PROFILE != StereoProfile.ANAGLYPHIC) ? 0.5f : 1f);
+                shaderProgram.setUniformf("u_ar", GlobalConf.program.STEREOSCOPIC_MODE && (GlobalConf.program.STEREO_PROFILE != StereoProfile.HD_3DTV_HORIZONTAL && GlobalConf.program.STEREO_PROFILE != StereoProfile.ANAGLYPHIC) ? 0.5f : 1f);
                 shaderProgram.setUniformf("u_profileDecay", 0.1f);
                 double currt = AstroUtils.getJulianDate(GaiaSky.instance.time.getTime());
                 shaderProgram.setUniformf("u_t", (float) currt);

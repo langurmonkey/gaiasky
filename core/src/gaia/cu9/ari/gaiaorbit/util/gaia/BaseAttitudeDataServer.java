@@ -21,6 +21,7 @@ package gaia.cu9.ari.gaiaorbit.util.gaia;
 
 import java.util.Date;
 
+import gaia.cu9.ari.gaiaorbit.util.Nature;
 import gaia.cu9.ari.gaiaorbit.util.coord.AstroUtils;
 import gaia.cu9.ari.gaiaorbit.util.gaia.time.TimeContext;
 
@@ -74,7 +75,7 @@ public abstract class BaseAttitudeDataServer<A extends Attitude> {
     }
 
     public A getAttitude(Date date) {
-        long tNs = (long) ((AstroUtils.getJulianDateCache(date.toInstant()) - AstroUtils.JD_J2010) * AstroUtils.DAY_TO_NS);
+        long tNs = (long) ((AstroUtils.getJulianDateCache(date.toInstant()) - AstroUtils.JD_J2010) * Nature.D_TO_NS);
         return getAttitudeNative(tNs);
     }
 

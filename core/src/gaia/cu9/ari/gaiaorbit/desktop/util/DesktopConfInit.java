@@ -38,7 +38,7 @@ import gaia.cu9.ari.gaiaorbit.util.GlobalConf.ScreenshotMode;
 import gaia.cu9.ari.gaiaorbit.util.GlobalConf.SpacecraftConf;
 import gaia.cu9.ari.gaiaorbit.util.GlobalConf.VersionConf;
 import gaia.cu9.ari.gaiaorbit.util.Logger;
-import gaia.cu9.ari.gaiaorbit.util.SysUtilsFactory;
+import gaia.cu9.ari.gaiaorbit.util.Logger.Log;
 import gaia.cu9.ari.gaiaorbit.util.format.DateFormatFactory;
 import gaia.cu9.ari.gaiaorbit.util.format.IDateFormat;
 import gaia.cu9.ari.gaiaorbit.util.math.MathUtilsd;
@@ -51,12 +51,14 @@ import gaia.cu9.ari.gaiaorbit.util.math.MathUtilsd;
  *
  */
 public class DesktopConfInit extends ConfInit {
+    private static final Log logger = Logger.getLogger(DesktopConfInit.class);
+    
     CommentedProperties p;
     Properties vp;
 
     IDateFormat df = DateFormatFactory.getFormatter("dd/MM/yyyy HH:mm:ss");
 
-    public DesktopConfInit(String assetsLocation) {
+    public DesktopConfInit() {
         super();
         try {
             String propsFileProperty = System.getProperty("properties.vr.file");
@@ -71,7 +73,7 @@ public class DesktopConfInit extends ConfInit {
             InputStream vis = GaiaSkyDesktop.class.getResourceAsStream("/version");
             if (vis == null) {
                 // In case of running in 'developer' mode
-                vis = new FileInputStream(assetsLocation + "data/dummyversion");
+                vis = new FileInputStream(GlobalConf.ASSETS_LOC + "data/dummyversion");
             }
             vp = new Properties();
             vp.load(vis);
@@ -80,7 +82,7 @@ public class DesktopConfInit extends ConfInit {
             p.load(fis);
 
         } catch (Exception e) {
-            Logger.error(e);
+            logger.error(e);
         }
     }
 
@@ -93,7 +95,7 @@ public class DesktopConfInit extends ConfInit {
             p = new CommentedProperties();
             p.load(fis);
         } catch (Exception e) {
-            Logger.error(e);
+            logger.error(e);
         }
     }
 
@@ -103,7 +105,7 @@ public class DesktopConfInit extends ConfInit {
             p = new CommentedProperties();
             p.load(fis);
         } catch (Exception e) {
-            Logger.error(e);
+            logger.error(e);
         }
     }
 
@@ -123,11 +125,11 @@ public class DesktopConfInit extends ConfInit {
             try {
                 buildtime = LocalDateTime.parse(vp.getProperty("buildtime"), df).toInstant(ZoneOffset.UTC);
             } catch (DateTimeParseException e1) {
-                Logger.error(e1);
+                logger.error(e1);
             }
         }
         vc.initialize(versionStr, buildtime, vp.getProperty("builder"), vp.getProperty("system"), vp.getProperty("build"));
-        Logger.info("Gaia Sky version " + vc.version + " - build " + vc.build);
+        logger.info("Gaia Sky version " + vc.version + " - build " + vc.build);
 
         /** PERFORMANCE CONF **/
         PerformanceConf pc = new PerformanceConf();
@@ -157,6 +159,14 @@ public class DesktopConfInit extends ConfInit {
 
         /** DATA CONF **/
         DataConf dc = new DataConf();
+        
+        String[] CATALOG_LOCATIONS;
+        String cloc = p.getProperty("data.catalog.locations");
+        if (cloc == null || cloc.isEmpty()) {
+            CATALOG_LOCATIONS = new String[] {};
+        } else {
+            CATALOG_LOCATIONS = cloc.replaceAll(" ", "").split(",");
+        }
 
         String CATALOG_JSON_FILE = p.getProperty("data.json.catalog");
 
@@ -171,7 +181,7 @@ public class DesktopConfInit extends ConfInit {
         } else {
             LIMIT_MAG_LOAD = Float.MAX_VALUE;
         }
-        dc.initialize(CATALOG_JSON_FILE, OBJECTS_JSON_FILE, LIMIT_MAG_LOAD, REAL_GAIA_ATTITUDE, HIGH_ACCURACY_POSITIONS);
+        dc.initialize(CATALOG_LOCATIONS, CATALOG_JSON_FILE, OBJECTS_JSON_FILE, LIMIT_MAG_LOAD, REAL_GAIA_ATTITUDE, HIGH_ACCURACY_POSITIONS);
 
         /** PROGRAM CONF **/
         ProgramConf prc = new ProgramConf();
@@ -188,7 +198,8 @@ public class DesktopConfInit extends ConfInit {
             LAST_CHECKED = null;
         }
         String LAST_VERSION = p.getProperty("program.lastversion", "0.0.0");
-        String VERSION_CHECK_URL = p.getProperty("program.versioncheckurl");
+        String VERSION_CHECK_URL = p.getProperty("program.url.versioncheck");
+        String DEFAULT_CATALOG_URL = p.getProperty("program.url.catalog.default");
         String UI_THEME = p.getProperty("program.ui.theme");
         // Update scale factor according to theme - for HiDPI screens
         GlobalConf.updateScaleFactor(UI_THEME.endsWith("x2") ? 2f : 1f);
@@ -201,9 +212,9 @@ public class DesktopConfInit extends ConfInit {
         boolean ANALYTICS_ENABLED = Boolean.parseBoolean(p.getProperty("program.analytics", "true"));
         boolean DISPLAY_HUD = Boolean.parseBoolean(p.getProperty("program.displayhud", "false"));
         boolean DISPLAY_POINTER_COORDS = Boolean.parseBoolean(p.getProperty("program.displaypointercoords", "true"));
-        boolean DISPLAY_DATASET_DIALOG = Boolean.parseBoolean(p.getProperty("program.dataset.dialog", "false"));
+        boolean DISPLAY_DATASET_DIALOG = Boolean.parseBoolean(p.getProperty("program.catalog.chooser", "false"));
 
-        prc.initialize(DISPLAY_TUTORIAL, TUTORIAL_POINTER_SCRIPT_LOCATION, TUTORIAL_SCRIPT_LOCATION, SHOW_DEBUG_INFO, LAST_CHECKED, LAST_VERSION, VERSION_CHECK_URL, UI_THEME, SCRIPT_LOCATION, REST_PORT, LOCALE, STEREOSCOPIC_MODE, STEREO_PROFILE, CUBEMAPE360_MODE, ANALYTICS_ENABLED, DISPLAY_HUD, DISPLAY_POINTER_COORDS, DISPLAY_DATASET_DIALOG);
+        prc.initialize(DISPLAY_TUTORIAL, TUTORIAL_POINTER_SCRIPT_LOCATION, TUTORIAL_SCRIPT_LOCATION, SHOW_DEBUG_INFO, LAST_CHECKED, LAST_VERSION, VERSION_CHECK_URL, DEFAULT_CATALOG_URL, UI_THEME, SCRIPT_LOCATION, REST_PORT, LOCALE, STEREOSCOPIC_MODE, STEREO_PROFILE, CUBEMAPE360_MODE, ANALYTICS_ENABLED, DISPLAY_HUD, DISPLAY_POINTER_COORDS, DISPLAY_DATASET_DIALOG);
 
         /** SCENE CONF **/
         int GRAPHICS_QUALITY = Integer.parseInt(p.getProperty("scene.graphics.quality"));
@@ -269,7 +280,7 @@ public class DesktopConfInit extends ConfInit {
         /** FRAME CONF **/
         String renderFolder = null;
         if (p.getProperty("graphics.render.folder") == null || p.getProperty("graphics.render.folder").isEmpty()) {
-            File framesDir = SysUtilsFactory.getSysUtils().getDefaultFramesDir();
+            File framesDir = SysUtils.getDefaultFramesDir();
             framesDir.mkdirs();
             renderFolder = framesDir.getAbsolutePath();
         } else {
@@ -306,7 +317,7 @@ public class DesktopConfInit extends ConfInit {
         /** SCREENSHOT CONF **/
         String screenshotFolder = null;
         if (p.getProperty("screenshot.folder") == null || p.getProperty("screenshot.folder").isEmpty()) {
-            File screenshotDir = SysUtilsFactory.getSysUtils().getDefaultScreenshotsDir();
+            File screenshotDir = SysUtils.getDefaultScreenshotsDir();
             screenshotDir.mkdirs();
             screenshotFolder = screenshotDir.getAbsolutePath();
         } else {
@@ -410,7 +421,8 @@ public class DesktopConfInit extends ConfInit {
         p.setProperty("program.displaypointercoords", Boolean.toString(GlobalConf.program.DISPLAY_POINTER_COORDS));
         p.setProperty("program.debuginfo", Boolean.toString(GlobalConf.program.SHOW_DEBUG_INFO));
         p.setProperty("program.lastchecked", GlobalConf.program.LAST_CHECKED != null ? df.format(GlobalConf.program.LAST_CHECKED) : "");
-        p.setProperty("program.versioncheckurl", GlobalConf.program.VERSION_CHECK_URL);
+        p.setProperty("program.url.versioncheck", GlobalConf.program.VERSION_CHECK_URL);
+        p.setProperty("program.url.catalog.default", GlobalConf.program.DEFAULT_CATALOG_URL);
         p.setProperty("program.ui.theme", GlobalConf.program.UI_THEME);
         p.setProperty("program.scriptlocation", GlobalConf.program.SCRIPT_LOCATION);
         p.setProperty("program.restport", Integer.toString(GlobalConf.program.REST_PORT));
@@ -482,16 +494,16 @@ public class DesktopConfInit extends ConfInit {
             FileOutputStream fos = new FileOutputStream(propsFile);
             p.store(fos, null);
             fos.close();
-            Logger.info("Configuration saved to " + propsFile.getAbsolutePath());
+            logger.info("Configuration saved to " + propsFile.getAbsolutePath());
         } catch (Exception e) {
-            Logger.error(e);
+            logger.error(e);
         }
 
     }
 
     private String initConfigFile(boolean ow) throws IOException {
         // Use user folder
-        File userFolder = SysUtilsFactory.getSysUtils().getGSHomeDir();
+        File userFolder = SysUtils.getGSHomeDir();
         userFolder.mkdirs();
         File userFolderConfFile = new File(userFolder, "global.vr.properties");
 
@@ -533,6 +545,19 @@ public class DesktopConfInit extends ConfInit {
             if (destinationFis != null)
                 destinationFis.close();
         }
+    }
+    
+    private String stringArrayToString(String[] in, String sep) {
+        if (in == null || in.length == 0 || sep == null)
+            return "";
+        StringBuilder sb = new StringBuilder();
+        int i = 0;
+        for (String str : in) {
+            if (i > 0)
+                sb.append(sep);
+            sb.append(str);
+        }
+        return sb.toString();
     }
 
 }

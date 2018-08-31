@@ -451,7 +451,7 @@ public class AttitudeUtils {
                     }
                     maxk = 2;
                     if (k == 1) {
-                        Logger.warn("out of small angle approximation: insignificant result");
+                        Logger.getLogger(AttitudeUtils.class).warn("out of small angle approximation: insignificant result");
                     }
                     break;
                 }

@@ -64,7 +64,7 @@ public class SimplePool<T> extends Pool<T> {
 	if (typeHash == octreewrapper)
 	    return (T) new OctreeWrapper();
 
-	Logger.warn("Class " + typeHash + " is not poolable!");
+	Logger.getLogger(this.getClass()).warn("Class " + typeHash + " is not poolable!");
 	return null;
     }
 }

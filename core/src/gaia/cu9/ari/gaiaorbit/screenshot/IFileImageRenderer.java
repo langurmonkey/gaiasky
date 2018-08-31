@@ -1,6 +1,6 @@
 package gaia.cu9.ari.gaiaorbit.screenshot;
 
-import gaia.cu9.ari.gaiaorbit.screenshot.ImageRenderer.ImageType;
+import gaia.cu9.ari.gaiaorbit.util.GlobalConf.ImageFormat;
 
 public interface IFileImageRenderer {
 
@@ -20,9 +20,11 @@ public interface IFileImageRenderer {
      *            Forces synchronous immediate write to disk.
      * @param type
      *            The image type, JPG or PNG
+     * @param quality
+     *            The quality in the case of JPG in [0..1]
      * @return String with the path to the screenshot image file
      */
-    public String saveScreenshot(String folder, String fileprefix, int w, int h, boolean immediate, ImageType type);
+    public String saveScreenshot(String folder, String fileprefix, int w, int h, boolean immediate, ImageFormat type, float quality);
 
     /**
      * Flushes the renderer causing the images to be written, if needed.

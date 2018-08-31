@@ -15,12 +15,13 @@ import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.utils.Array;
 
+import gaia.cu9.ari.gaiaorbit.desktop.util.SysUtils;
 import gaia.cu9.ari.gaiaorbit.scenegraph.ParticleGroup.ParticleBean;
 import gaia.cu9.ari.gaiaorbit.scenegraph.StarGroup.StarBean;
 import gaia.cu9.ari.gaiaorbit.util.Constants;
 import gaia.cu9.ari.gaiaorbit.util.I18n;
 import gaia.cu9.ari.gaiaorbit.util.Logger;
-import gaia.cu9.ari.gaiaorbit.util.SysUtilsFactory;
+import gaia.cu9.ari.gaiaorbit.util.Logger.Log;
 import gaia.cu9.ari.gaiaorbit.util.color.ColourUtils;
 import gaia.cu9.ari.gaiaorbit.util.coord.AstroUtils;
 import gaia.cu9.ari.gaiaorbit.util.coord.Coordinates;
@@ -39,7 +40,7 @@ import gaia.cu9.ari.gaiaorbit.util.parse.Parser;
  *
  */
 public class DR2DataProvider extends AbstractStarGroupDataProvider {
-
+    private static final Log logger = Logger.getLogger(DR2DataProvider.class);
     private static final String comma = ",";
 
     private static final String separator = comma;
@@ -108,19 +109,19 @@ public class DR2DataProvider extends AbstractStarGroupDataProvider {
             });
             int fn = 0;
             for (FileHandle fh : files) {
-                loadDataMapped(SysUtilsFactory.getSysUtils().getTruePath(fh.path()), factor, fn + 1);
+                loadDataMapped(SysUtils.getTruePath(fh.path()), factor, fn + 1);
                 //loadFileFh(fh, factor, fn + 1);
                 fn++;
                 if (fileNumberCap > 0 && fn >= fileNumberCap)
                     break;
             }
         } else if (f.name().endsWith(".csv") || f.name().endsWith(".gz")) {
-            loadDataMapped(SysUtilsFactory.getSysUtils().getTruePath(file), factor, 1);
+            loadDataMapped(SysUtils.getTruePath(file), factor, 1);
             //loadFileFh(f, factor, 1);
         } else {
-            Logger.warn(this.getClass().getSimpleName(), "File skipped: " + f.path());
+            logger.warn("File skipped: " + f.path());
         }
-        Logger.info(this.getClass().getSimpleName(), I18n.bundle.format("notif.nodeloader", list.size, f.path()));
+        logger.info(I18n.bundle.format("notif.nodeloader", list.size, f.path()));
         return list;
     }
 
@@ -133,7 +134,7 @@ public class DR2DataProvider extends AbstractStarGroupDataProvider {
     }
 
     public void loadFileFh(FileHandle fh, double factor, int fileNumber) {
-        //Logger.info(this.getClass().getSimpleName(), I18n.bundle.format("notif.datafile", fh.path()));
+        //logger.info(this.getClass().getSimpleName(), I18n.bundle.format("notif.datafile", fh.path()));
         boolean gz = fh.name().endsWith(".gz");
 
         // Simple case
@@ -143,14 +144,14 @@ public class DR2DataProvider extends AbstractStarGroupDataProvider {
             try {
                 data = new GZIPInputStream(data);
             } catch (IOException e) {
-                Logger.error(e);
+                logger.error(e);
                 return;
             }
         }
         LongWrap addedStars = new LongWrap(0l);
         LongWrap discardedStars = new LongWrap(0l);
         loadFileIs(data, factor, addedStars, discardedStars);
-        Logger.info(this.getClass().getSimpleName(), fileNumber + " - " + fh.name() + " --> " + addedStars.value + "/" + (addedStars.value + discardedStars.value) + " stars (" + (100 * addedStars.value / (addedStars.value + discardedStars.value)) + "%)");
+        logger.info(fileNumber + " - " + fh.name() + " --> " + addedStars.value + "/" + (addedStars.value + discardedStars.value) + " stars (" + (100 * addedStars.value / (addedStars.value + discardedStars.value)) + "%)");
     }
 
     public void loadFileIs(InputStream is, double factor, LongWrap addedStars, LongWrap discardedStars) {
@@ -173,12 +174,12 @@ public class DR2DataProvider extends AbstractStarGroupDataProvider {
                 i++;
             }
         } catch (IOException e) {
-            Logger.error(e);
+            logger.error(e);
         } finally {
             try {
                 br.close();
             } catch (IOException e) {
-                Logger.error(e);
+                logger.error(e);
             }
 
         }
@@ -371,7 +372,7 @@ public class DR2DataProvider extends AbstractStarGroupDataProvider {
      * @return
      */
     public Array<? extends ParticleBean> loadDataMapped(String file, double factor, int fileNumber) {
-        //Logger.info(this.getClass().getSimpleName(), I18n.bundle.format("notif.datafile", fh.path()));
+        //logger.info(this.getClass().getSimpleName(), I18n.bundle.format("notif.datafile", fh.path()));
         boolean gz = file.endsWith(".gz");
         FileChannel fc = null;
         try {
@@ -383,23 +384,23 @@ public class DR2DataProvider extends AbstractStarGroupDataProvider {
                 try {
                     data = new GZIPInputStream(data);
                 } catch (IOException e) {
-                    Logger.error(e);
+                    logger.error(e);
                 }
             }
             LongWrap addedStars = new LongWrap(0l);
             LongWrap discardedStars = new LongWrap(0l);
             loadFileIs(data, factor, addedStars, discardedStars);
-            Logger.info(this.getClass().getSimpleName(), fileNumber + " - " + file + " --> " + addedStars.value + "/" + (addedStars.value + discardedStars.value) + " stars (" + (100 * addedStars.value / (addedStars.value + discardedStars.value)) + "%)");
+            logger.info(fileNumber + " - " + file + " --> " + addedStars.value + "/" + (addedStars.value + discardedStars.value) + " stars (" + (100 * addedStars.value / (addedStars.value + discardedStars.value)) + "%)");
 
             return list;
         } catch (Exception e) {
-            Logger.error(e);
+            logger.error(e);
         } finally {
             if (fc != null)
                 try {
                     fc.close();
                 } catch (Exception e) {
-                    Logger.error(e);
+                    logger.error(e);
                 }
         }
         return null;

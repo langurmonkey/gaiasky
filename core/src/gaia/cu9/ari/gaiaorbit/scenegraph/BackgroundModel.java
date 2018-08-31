@@ -21,6 +21,7 @@ import gaia.cu9.ari.gaiaorbit.scenegraph.camera.ICamera;
 import gaia.cu9.ari.gaiaorbit.scenegraph.component.ModelComponent;
 import gaia.cu9.ari.gaiaorbit.util.Constants;
 import gaia.cu9.ari.gaiaorbit.util.Logger;
+import gaia.cu9.ari.gaiaorbit.util.Logger.Log;
 import gaia.cu9.ari.gaiaorbit.util.coord.Coordinates;
 import gaia.cu9.ari.gaiaorbit.util.math.Matrix4d;
 import gaia.cu9.ari.gaiaorbit.util.math.Vector3d;
@@ -34,7 +35,6 @@ import gaia.cu9.ari.gaiaorbit.util.time.ITimeFrameProvider;
  *
  */
 public class BackgroundModel extends FadeNode implements IModelRenderable, I3DTextRenderable {
-
     protected String transformName;
     public ModelComponent mc;
     private boolean label, label2d;
@@ -69,7 +69,7 @@ public class BackgroundModel extends FadeNode implements IModelRenderable, I3DTe
                 Matrix4 aux = trf.putIn(new Matrix4());
                 localTransform.mul(aux);
             } catch (ReflectionException e) {
-                Logger.error(BackgroundModel.class.getName(), "Error getting/invoking method Coordinates." + transformName + "()");
+                Logger.getLogger(this.getClass()).error("Error getting/invoking method Coordinates." + transformName + "()");
             }
         } else {
             // Equatorial, nothing

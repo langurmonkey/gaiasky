@@ -122,7 +122,7 @@ public class LineQuadRenderSystem extends LineRenderSystem {
 
     @Override
     public void addLine(ILineRenderable lr, double x0, double y0, double z0, double x1, double y1, double z1, Color c) {
-        addLine(lr, x0, y0, z0, x1, y1, z1, c);
+        addLine(lr, x0, y0, z0, x1, y1, z1, c.r, c.g, c.b, c.a);
     }
 
     @Override

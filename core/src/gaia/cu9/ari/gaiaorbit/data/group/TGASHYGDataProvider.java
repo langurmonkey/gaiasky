@@ -93,7 +93,7 @@ public class TGASHYGDataProvider extends AbstractStarGroupDataProvider {
             dumpToDisk(list, "/tmp/tgashyg." + format, format);
         }
 
-        Logger.info(this.getClass().getSimpleName(), I18n.bundle.format("notif.nodeloader", list.size, file));
+        logger.info(I18n.bundle.format("notif.nodeloader", list.size, file));
 
         return list;
     }

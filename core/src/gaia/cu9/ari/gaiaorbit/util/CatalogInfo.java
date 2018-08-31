@@ -5,8 +5,10 @@ import com.badlogic.gdx.utils.Array;
 import gaia.cu9.ari.gaiaorbit.event.EventManager;
 import gaia.cu9.ari.gaiaorbit.event.Events;
 import gaia.cu9.ari.gaiaorbit.scenegraph.FadeNode;
+import gaia.cu9.ari.gaiaorbit.util.Logger.Log;
 
 public class CatalogInfo {
+    private static final Log logger =Logger.getLogger(CatalogInfo.class);
 
     public static Array<CatalogInfo> catalogs = new Array<CatalogInfo>(20);
     private static Object lock = new Object();
@@ -52,7 +54,7 @@ public class CatalogInfo {
      */
     public void removeCatalog() {
         if (this.object != null) {
-            Logger.info("Removing dataset " + name);
+            logger.info("Removing dataset " + name);
             this.object.dispose();
         }
     }

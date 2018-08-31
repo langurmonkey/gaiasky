@@ -18,7 +18,8 @@ import gaia.cu9.ari.gaiaorbit.util.Constants;
 import gaia.cu9.ari.gaiaorbit.util.GlobalConf;
 import gaia.cu9.ari.gaiaorbit.util.I18n;
 import gaia.cu9.ari.gaiaorbit.util.Logger;
-import gaia.cu9.ari.gaiaorbit.util.coord.AstroUtils;
+import gaia.cu9.ari.gaiaorbit.util.Logger.Log;
+import gaia.cu9.ari.gaiaorbit.util.Nature;
 import gaia.cu9.ari.gaiaorbit.util.coord.Coordinates;
 import gaia.cu9.ari.gaiaorbit.util.math.Vector3d;
 
@@ -47,6 +48,7 @@ import gaia.cu9.ari.gaiaorbit.util.math.Vector3d;
  *
  */
 public class HYGBinaryLoader extends AbstractCatalogLoader implements ISceneGraphLoader {
+    private static final Log logger = Logger.getLogger(HYGBinaryLoader.class);
 
     @Override
     public Array<AbstractPositionEntity> loadData() throws FileNotFoundException {
@@ -56,10 +58,7 @@ public class HYGBinaryLoader extends AbstractCatalogLoader implements ISceneGrap
             InputStream data = file.read();
             DataInputStream data_in = new DataInputStream(data);
 
-            // Logger.info(this.getClass().getSimpleName(),
-            // I18n.bundle.format("notif.limitmag",
-            // GlobalConf.data.LIMIT_MAG_LOAD));
-            Logger.info(this.getClass().getSimpleName(), I18n.bundle.format("notif.catalog.loading", file.name()));
+            logger.info(I18n.bundle.format("notif.catalog.loading", file.name()));
 
             try {
                 // Read size of stars
@@ -90,7 +89,7 @@ public class HYGBinaryLoader extends AbstractCatalogLoader implements ISceneGrap
                         if (appmag < GlobalConf.data.LIMIT_MAG_LOAD) {
                             Vector3d pos = Coordinates.sphericalToCartesian(Math.toRadians(ra), Math.toRadians(dec), dist, new Vector3d());
                             Vector3 pmSph = new Vector3(mualpha, mudelta, radvel);
-                            Vector3d pm = Coordinates.sphericalToCartesian(Math.toRadians(ra + mualpha * AstroUtils.MILLARCSEC_TO_DEG), Math.toRadians(dec + mudelta * AstroUtils.MILLARCSEC_TO_DEG), dist + radvel * Constants.KM_TO_U * Constants.S_TO_Y, new Vector3d());
+                            Vector3d pm = Coordinates.sphericalToCartesian(Math.toRadians(ra + mualpha * Nature.MILLARCSEC_TO_DEG), Math.toRadians(dec + mudelta * Nature.MILLARCSEC_TO_DEG), dist + radvel * Constants.KM_TO_U * Nature.S_TO_Y, new Vector3d());
                             pm.sub(pos);
                             Vector3 pmfloat = pm.toVector3();
 
@@ -99,23 +98,23 @@ public class HYGBinaryLoader extends AbstractCatalogLoader implements ISceneGrap
                                 stars.add(s);
                         }
                     } catch (EOFException eof) {
-                        Logger.error(eof, HYGBinaryLoader.class.getSimpleName());
+                        logger.error(eof);
                     }
                 }
 
             } catch (IOException e) {
-                Logger.error(e, HYGBinaryLoader.class.getSimpleName());
+                logger.error(e);
             } finally {
                 try {
                     data_in.close();
                 } catch (IOException e) {
-                    Logger.error(e);
+                    logger.error(e);
                 }
 
             }
         }
 
-        Logger.info(this.getClass().getSimpleName(), I18n.bundle.format("notif.catalog.init", stars.size));
+        logger.info(I18n.bundle.format("notif.catalog.init", stars.size));
         return stars;
     }
 

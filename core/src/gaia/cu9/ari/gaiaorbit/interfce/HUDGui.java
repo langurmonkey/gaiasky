@@ -11,7 +11,6 @@ import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import gaia.cu9.ari.gaiaorbit.render.ComponentType;
 import gaia.cu9.ari.gaiaorbit.scenegraph.ISceneGraph;
 import gaia.cu9.ari.gaiaorbit.util.ComponentTypes;
-import gaia.cu9.ari.gaiaorbit.util.Constants;
 import gaia.cu9.ari.gaiaorbit.util.GlobalConf;
 import gaia.cu9.ari.gaiaorbit.util.GlobalResources;
 
@@ -84,14 +83,12 @@ public class HUDGui implements IGui {
         messagesInterface.pad(0, 300 * GlobalConf.SCALE_FACTOR, 150 * GlobalConf.SCALE_FACTOR, 0);
         interfaces.add(messagesInterface);
 
-        if (Constants.desktop) {
-            // INPUT STATE
-            inputInterface = new RunStateInterface(skin);
-            inputInterface.setFillParent(true);
-            inputInterface.right().top();
-            inputInterface.pad(50 * GlobalConf.SCALE_FACTOR, 0, 0, pad);
-            interfaces.add(inputInterface);
-        }
+        // INPUT STATE
+        inputInterface = new RunStateInterface(skin);
+        inputInterface.setFillParent(true);
+        inputInterface.right().top();
+        inputInterface.pad(50 * GlobalConf.SCALE_FACTOR, 0, 0, pad);
+        interfaces.add(inputInterface);
 
         // Add to GUI
         rebuildGui();

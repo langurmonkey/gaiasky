@@ -23,10 +23,13 @@ import gaia.cu9.ari.gaiaorbit.scenegraph.IFocus;
 import gaia.cu9.ari.gaiaorbit.scenegraph.IStarFocus;
 import gaia.cu9.ari.gaiaorbit.scenegraph.ModelBody;
 import gaia.cu9.ari.gaiaorbit.util.Logger;
+import gaia.cu9.ari.gaiaorbit.util.Logger.Log;
 import gaia.cu9.ari.gaiaorbit.util.scene2d.Link;
 import gaia.cu9.ari.gaiaorbit.util.scene2d.OwnTextButton;
 
 public class DesktopNetworkChecker extends Thread implements INetworkChecker {
+    private static final Log logger = Logger.getLogger(DesktopNetworkChecker.class);
+    
     private static String URL_SIMBAD = "http://simbad.u-strasbg.fr/simbad/sim-id?Ident=";
     // TODO Use Wikipedia API to get localized content to the current language
     private static String URL_WIKIPEDIA = "https://en.wikipedia.org/wiki/";
@@ -76,7 +79,7 @@ public class DesktopNetworkChecker extends Thread implements INetworkChecker {
             try {
                 monitor.wait();
             } catch (InterruptedException e) {
-                Logger.error(e);
+                logger.error(e);
             }
         }
     }
@@ -124,7 +127,7 @@ public class DesktopNetworkChecker extends Thread implements INetworkChecker {
 
                 Gdx.app.postRunnable(() -> {
                     if (focus != null) {
-                        Logger.debug(this.getClass().getSimpleName(), "Looking up network resources for '" + focus.getName() + "'");
+                        logger.debug( "Looking up network resources for '" + focus.getName() + "'");
 
                         // Add table
                         if (focus instanceof IStarFocus) {
@@ -185,7 +188,7 @@ public class DesktopNetworkChecker extends Thread implements INetworkChecker {
             }
 
         } catch (Exception e) {
-            Logger.error(e);
+            logger.error(e);
         }
     }
 
@@ -225,7 +228,7 @@ public class DesktopNetworkChecker extends Thread implements INetworkChecker {
             }
 
         } catch (Exception e) {
-            Logger.error(e);
+            logger.error(e);
             listener.ko(null);
         }
 

@@ -17,7 +17,7 @@ import gaia.cu9.ari.gaiaorbit.scenegraph.StarCluster;
 import gaia.cu9.ari.gaiaorbit.util.Constants;
 import gaia.cu9.ari.gaiaorbit.util.I18n;
 import gaia.cu9.ari.gaiaorbit.util.Logger;
-import gaia.cu9.ari.gaiaorbit.util.coord.AstroUtils;
+import gaia.cu9.ari.gaiaorbit.util.Nature;
 import gaia.cu9.ari.gaiaorbit.util.coord.Coordinates;
 import gaia.cu9.ari.gaiaorbit.util.math.Vector3d;
 import gaia.cu9.ari.gaiaorbit.util.parse.Parser;
@@ -71,11 +71,11 @@ public class MWSCLoader extends AbstractCatalogLoader implements ISceneGraphLoad
                             int nstars = Parser.parseInt(tokens[8]);
 
                             Vector3d pos = Coordinates.sphericalToCartesian(Math.toRadians(ra), Math.toRadians(dec), dist, new Vector3d());
-                            Vector3d pm = Coordinates.sphericalToCartesian(Math.toRadians(ra + mualpha), Math.toRadians(dec + mudelta), dist + radvel * Constants.KM_TO_U / Constants.S_TO_Y, new Vector3d());
+                            Vector3d pm = Coordinates.sphericalToCartesian(Math.toRadians(ra + mualpha), Math.toRadians(dec + mudelta), dist + radvel * Constants.KM_TO_U / Nature.S_TO_Y, new Vector3d());
                             pm.sub(pos);
 
                             Vector3d posSph = new Vector3d((float) ra, (float) dec, (float) dist);
-                            Vector3 pmSph = new Vector3((float) (mualpha * AstroUtils.DEG_TO_MILLARCSEC), (float) (mudelta * AstroUtils.DEG_TO_MILLARCSEC), (float) radvel);
+                            Vector3 pmSph = new Vector3((float) (mualpha * Nature.DEG_TO_MILLARCSEC), (float) (mudelta * Nature.DEG_TO_MILLARCSEC), (float) radvel);
 
                             StarCluster c = new StarCluster(name, "MWSC", pos, pm, posSph, pmSph, radius, nstars);
 
@@ -89,18 +89,18 @@ public class MWSCLoader extends AbstractCatalogLoader implements ISceneGraphLoad
                     }
 
                 } catch (IOException e) {
-                    Logger.error(e);
+                    Logger.getLogger(this.getClass()).error(e);
                 } finally {
                     try {
                         br.close();
                     } catch (IOException e) {
-                        Logger.error(e);
+                        Logger.getLogger(this.getClass()).error(e);
                     }
 
                 }
             }
 
-        Logger.info(this.getClass().getSimpleName(), I18n.bundle.format("notif.catalog.init", clusters.size));
+        Logger.getLogger(this.getClass()).info(I18n.bundle.format("notif.catalog.init", clusters.size));
         return clusters;
     }
 

@@ -35,7 +35,7 @@ public abstract class HermiteInterpolatedAttitudeDataServer extends
         try {
             super.gtis.add(tStart, tEnd);
         } catch (RuntimeException e) {
-            Logger.error(e);
+            Logger.getLogger(this.getClass()).error(e);
         }
     }
 

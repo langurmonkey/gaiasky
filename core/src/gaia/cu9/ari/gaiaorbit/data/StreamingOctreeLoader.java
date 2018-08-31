@@ -25,6 +25,7 @@ import gaia.cu9.ari.gaiaorbit.scenegraph.octreewrapper.AbstractOctreeWrapper;
 import gaia.cu9.ari.gaiaorbit.util.GlobalConf;
 import gaia.cu9.ari.gaiaorbit.util.I18n;
 import gaia.cu9.ari.gaiaorbit.util.Logger;
+import gaia.cu9.ari.gaiaorbit.util.Logger.Log;
 import gaia.cu9.ari.gaiaorbit.util.tree.LoadStatus;
 import gaia.cu9.ari.gaiaorbit.util.tree.OctreeNode;
 
@@ -36,6 +37,7 @@ import gaia.cu9.ari.gaiaorbit.util.tree.OctreeNode;
  *
  */
 public abstract class StreamingOctreeLoader implements IObserver, ISceneGraphLoader {
+    private static final Log logger = Logger.getLogger(StreamingOctreeLoader.class);
     /**
      * Data will be pre-loaded at startup down to this octree depth.
      */
@@ -70,6 +72,9 @@ public abstract class StreamingOctreeLoader implements IObserver, ISceneGraphLoa
 
     /** Last time of a queue clear event went through **/
     protected long lastQueueClearMs = 0;
+    
+    // Dataset name and description
+    protected String name, description;
 
     /**
      * This queue is sorted ascending by access date, so that we know which
@@ -96,7 +101,7 @@ public abstract class StreamingOctreeLoader implements IObserver, ISceneGraphLoa
         // GPU ~ 32 byte/star
         // CPU ~ 136 byte/star
         maxLoadedStars = GlobalConf.scene.MAX_LOADED_STARS;
-        Logger.info(this.getClass().getSimpleName(), "Maximum loaded stars setting: " + maxLoadedStars);
+        logger.info(this.getClass().getSimpleName(), "Maximum loaded stars setting: " + maxLoadedStars);
 
         Comparator<OctreeNode> depthComparator = (OctreeNode o1, OctreeNode o2) -> Integer.compare(o1.depth, o2.depth);
         toLoadQueue = new PriorityBlockingQueue<OctreeNode>(LOAD_QUEUE_MAX_SIZE, depthComparator);
@@ -148,7 +153,7 @@ public abstract class StreamingOctreeLoader implements IObserver, ISceneGraphLoa
             Array<SceneGraphNode> result = new Array<SceneGraphNode>(1);
             result.add(octreeWrapper);
 
-            Logger.info(this.getClass().getSimpleName(), I18n.bundle.format("notif.catalog.init", octreeWrapper.root.countObjects()));
+            logger.info(I18n.bundle.format("notif.catalog.init", octreeWrapper.root.countObjects()));
 
             return result;
         } else {
@@ -167,7 +172,7 @@ public abstract class StreamingOctreeLoader implements IObserver, ISceneGraphLoa
     protected void flushLoadedIds() {
         if (idxLoadedIds > 0) {
             String str = "[" + loadedIds[0] + ", ..., " + loadedIds[idxLoadedIds - 1] + "]";
-            Logger.info(I18n.bundle.format("notif.octantsloaded", loadedObjects, idxLoadedIds, str));
+            logger.info(I18n.bundle.format("notif.octantsloaded", loadedObjects, idxLoadedIds, str));
 
             idxLoadedIds = 0;
             loadedObjects = 0;
@@ -246,7 +251,7 @@ public abstract class StreamingOctreeLoader implements IObserver, ISceneGraphLoa
                 octant.setStatus(LoadStatus.NOT_LOADED);
             }
             toLoadQueue.clear();
-            Logger.info(I18n.bundle.format("notif.loadingoctants.emtpied", n));
+            logger.info(I18n.bundle.format("notif.loadingoctants.emtpied", n));
         }
     }
 
@@ -467,13 +472,13 @@ public abstract class StreamingOctreeLoader implements IObserver, ISceneGraphLoa
 
                     // Load octants if any
                     if (toLoad.size > 0) {
-                        Logger.debug(I18n.bundle.format("notif.loadingoctants", toLoad.size));
+                        logger.debug(I18n.bundle.format("notif.loadingoctants", toLoad.size));
                         try {
                             int loaded = loader.loadOctants(toLoad, octreeWrapper, abort);
-                            Logger.debug(I18n.bundle.format("notif.loadingoctants.finished", loaded));
+                            logger.debug(I18n.bundle.format("notif.loadingoctants.finished", loaded));
                         } catch (Exception e) {
                             // This will happen when the queue has been cleared during processing
-                            Logger.debug(I18n.bundle.get("notif.loadingoctants.fail"));
+                            logger.debug(I18n.bundle.get("notif.loadingoctants.fail"));
                         }
                     }
 
@@ -523,12 +528,12 @@ public abstract class StreamingOctreeLoader implements IObserver, ISceneGraphLoa
         case PAUSE_BACKGROUND_LOADING:
             loadingPaused = true;
             clearQueue();
-            Logger.info(this.getClass().getSimpleName(), "Background data loading thread paused");
+            logger.info("Background data loading thread paused");
             break;
         case RESUME_BACKGROUND_LOADING:
             loadingPaused = false;
             clearQueue();
-            Logger.info(this.getClass().getSimpleName(), "Background data loading thread resumed");
+            logger.info("Background data loading thread resumed");
             break;
         case DISPOSE:
             if (daemon != null) {
@@ -541,4 +546,11 @@ public abstract class StreamingOctreeLoader implements IObserver, ISceneGraphLoa
 
     }
 
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
 }

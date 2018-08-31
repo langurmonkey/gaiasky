@@ -15,6 +15,7 @@ import gaia.cu9.ari.gaiaorbit.scenegraph.StarGroup.StarBean;
 import gaia.cu9.ari.gaiaorbit.util.Constants;
 import gaia.cu9.ari.gaiaorbit.util.I18n;
 import gaia.cu9.ari.gaiaorbit.util.Logger;
+import gaia.cu9.ari.gaiaorbit.util.Logger.Log;
 import gaia.cu9.ari.gaiaorbit.util.Pair;
 import gaia.cu9.ari.gaiaorbit.util.color.ColourUtils;
 import gaia.cu9.ari.gaiaorbit.util.coord.Coordinates;
@@ -34,6 +35,7 @@ import uk.ac.starlink.util.FileDataSource;
  *
  */
 public class STILDataProvider extends AbstractStarGroupDataProvider {
+    private static Log logger = Logger.getLogger(STILDataProvider.class);
     private StarTableFactory factory;
     private long starid = 10000000;
 
@@ -51,11 +53,11 @@ public class STILDataProvider extends AbstractStarGroupDataProvider {
 
     @Override
     public Array<? extends ParticleBean> loadData(String file, double factor) {
-        Logger.info(this.getClass().getSimpleName(), I18n.bundle.format("notif.datafile", file));
+        logger.info(this.getClass().getSimpleName(), I18n.bundle.format("notif.datafile", file));
         try {
             loadData(new FileDataSource(file), factor);
         } catch (Exception e) {
-            Logger.error(e);
+            logger.error(e);
         }
         return list;
     }
@@ -211,17 +213,17 @@ public class STILDataProvider extends AbstractStarGroupDataProvider {
 
                         list.add(new StarBean(point, id, name));
                     } catch (Exception e) {
-                        Logger.debug(e);
-                        Logger.debug("Exception parsing row " + i + ": skipping");
+                        logger.debug(e);
+                        logger.debug("Exception parsing row " + i + ": skipping");
                     }
 
                 }
             } else {
-                Logger.error("Table not loaded: Position not found");
+                logger.error("Table not loaded: Position not found");
             }
 
         } catch (Exception e) {
-            Logger.error(e);
+            logger.error(e);
         }
 
         return list;

@@ -15,10 +15,11 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import gaia.cu9.ari.gaiaorbit.desktop.util.SysUtils;
 import gaia.cu9.ari.gaiaorbit.util.Constants;
 import gaia.cu9.ari.gaiaorbit.util.Logger;
+import gaia.cu9.ari.gaiaorbit.util.Logger.Log;
 import gaia.cu9.ari.gaiaorbit.util.Pair;
-import gaia.cu9.ari.gaiaorbit.util.SysUtilsFactory;
 import gaia.cu9.ari.gaiaorbit.util.tree.LoadStatus;
 import gaia.cu9.ari.gaiaorbit.util.tree.OctreeNode;
 
@@ -44,6 +45,8 @@ import gaia.cu9.ari.gaiaorbit.util.tree.OctreeNode;
  *
  */
 public class MetadataBinaryIO {
+    private static final Log logger = Logger.getLogger(MetadataBinaryIO.class);
+
     public Map<Long, Pair<OctreeNode, long[]>> nodesMap;
 
     /**
@@ -104,7 +107,7 @@ public class MetadataBinaryIO {
                     }
 
                 } catch (EOFException eof) {
-                    Logger.error(eof);
+                    logger.error(eof);
                 }
             }
 
@@ -113,13 +116,13 @@ public class MetadataBinaryIO {
             if (root != null) {
                 root.resolveChildren(nodesMap);
             } else {
-                Logger.error(new RuntimeException("No root node in visualization-metadata"));
+                logger.error(new RuntimeException("No root node in visualization-metadata"));
             }
 
             return root;
 
         } catch (IOException e) {
-            Logger.error(e);
+            logger.error(e);
         }
         return null;
     }
@@ -132,7 +135,7 @@ public class MetadataBinaryIO {
         nodesMap = new HashMap<Long, Pair<OctreeNode, long[]>>();
 
         try {
-            FileChannel fc = new RandomAccessFile(SysUtilsFactory.getSysUtils().getTruePath(file), "r").getChannel();
+            FileChannel fc = new RandomAccessFile(SysUtils.getTruePath(file), "r").getChannel();
 
             MappedByteBuffer mem = fc.map(FileChannel.MapMode.READ_ONLY, 0, fc.size());
 
@@ -176,7 +179,7 @@ public class MetadataBinaryIO {
                     }
 
                 } catch (BufferUnderflowException bue) {
-                    Logger.error(bue);
+                    logger.error(bue);
                 }
             }
 
@@ -185,7 +188,7 @@ public class MetadataBinaryIO {
             if (root != null) {
                 root.resolveChildren(nodesMap);
             } else {
-                Logger.error(new RuntimeException("No root node in visualization-metadata"));
+                logger.error(new RuntimeException("No root node in visualization-metadata"));
             }
 
             fc.close();
@@ -193,7 +196,7 @@ public class MetadataBinaryIO {
             return root;
 
         } catch (Exception e) {
-            Logger.error(e);
+            logger.error(e);
         }
         return null;
 
@@ -238,7 +241,7 @@ public class MetadataBinaryIO {
             out.close();
 
         } catch (IOException e) {
-            Logger.error(e);
+            logger.error(e);
         }
 
     }

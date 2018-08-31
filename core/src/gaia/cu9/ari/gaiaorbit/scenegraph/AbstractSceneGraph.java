@@ -16,11 +16,13 @@ import gaia.cu9.ari.gaiaorbit.scenegraph.octreewrapper.AbstractOctreeWrapper;
 import gaia.cu9.ari.gaiaorbit.util.GlobalConf;
 import gaia.cu9.ari.gaiaorbit.util.I18n;
 import gaia.cu9.ari.gaiaorbit.util.Logger;
+import gaia.cu9.ari.gaiaorbit.util.Logger.Log;
 import gaia.cu9.ari.gaiaorbit.util.time.ITimeFrameProvider;
 import gaia.cu9.ari.gaiaorbit.util.tree.IPosition;
 
 public abstract class AbstractSceneGraph implements ISceneGraph {
-
+    private static Log logger = Logger.getLogger(AbstractSceneGraph.class);
+    
     /** The root of the tree **/
     public SceneGraphNode root;
     /** Quick lookup map. Name to node. **/
@@ -60,7 +62,7 @@ public abstract class AbstractSceneGraph implements ISceneGraph {
      */
     @Override
     public void initialize(Array<SceneGraphNode> nodes, ITimeFrameProvider time, boolean hasOctree, boolean hasStarGroup) {
-        Logger.info(this.getClass().getSimpleName(), I18n.bundle.format("notif.sg.insert", nodes.size));
+        logger.info(I18n.bundle.format("notif.sg.insert", nodes.size));
 
         // Set the reference
         SceneGraphNode.sg = this;
@@ -95,7 +97,7 @@ public abstract class AbstractSceneGraph implements ISceneGraph {
             insert(node, false);
         }
 
-        Logger.info(this.getClass().getSimpleName(), I18n.bundle.format("notif.sg.init", root.numChildren));
+        logger.info(I18n.bundle.format("notif.sg.init", root.numChildren));
     }
 
     public void insert(SceneGraphNode node, boolean addToIndex) {
@@ -135,7 +137,7 @@ public abstract class AbstractSceneGraph implements ISceneGraph {
                 CelestialBody s = (CelestialBody) node;
                 if (s instanceof Star && ((Star) s).hip > 0) {
                     if (hipMap.containsKey(((Star) s).hip)) {
-                        Logger.debug(this.getClass().getSimpleName(), "Duplicated HIP id: " + ((Star) s).hip);
+                        logger.debug("Duplicated HIP id: " + ((Star) s).hip);
                     } else {
                         hipMap.put(((Star) s).hip, (Star) s);
                     }

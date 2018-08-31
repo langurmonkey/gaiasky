@@ -48,7 +48,7 @@ public class ControllerMappings implements IControllerMappings {
             BUTTON_VEL_MULT_HALF = Integer.parseInt(mappings.getProperty("button.velocityhalf"));
 
         } catch (Exception e) {
-            Logger.error(e, "Error reading controller mappings");
+            Logger.getLogger(this.getClass()).error(e, "Error reading controller mappings");
         }
     }
 

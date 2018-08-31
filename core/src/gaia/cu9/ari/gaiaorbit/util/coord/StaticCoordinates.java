@@ -57,7 +57,7 @@ public class StaticCoordinates implements IBodyCoordinates {
                 trf = new Matrix4d(transform);
 
             } catch (ReflectionException e) {
-                Logger.error(this.getClass().getName(), "Error getting/invoking method Coordinates." + transformName + "()");
+                Logger.getLogger(this.getClass()).error("Error getting/invoking method Coordinates." + transformName + "()");
             }
         } else {
             // Equatorial, nothing

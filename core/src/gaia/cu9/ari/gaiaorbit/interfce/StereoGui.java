@@ -42,7 +42,7 @@ public class StereoGui extends AbstractGui {
      * Constructs the interface
      */
     public void doneLoading(AssetManager assetManager) {
-        Logger.info(txt("notif.gui.init"));
+        Logger.getLogger(this.getClass()).info(txt("notif.gui.init"));
 
         interfaces = new Array<IGuiInterface>();
 
@@ -63,14 +63,14 @@ public class StereoGui extends AbstractGui {
         nf = NumberFormatFactory.getFormatter("##0.###");
 
         // NOTIFICATIONS ONE - BOTTOM LEFT
-        notificationsOne = new NotificationsInterface(skin, lock, true, true, false);
+        notificationsOne = new NotificationsInterface(skin, lock, true, true, false, false);
         notificationsOne.setFillParent(true);
         notificationsOne.left().bottom();
         notificationsOne.pad(0, 5, 5, 0);
         interfaces.add(notificationsOne);
 
         // NOTIFICATIONS TWO - BOTTOM CENTRE
-        notificationsTwo = new NotificationsInterface(skin, lock, true, true, false);
+        notificationsTwo = new NotificationsInterface(skin, lock, true, true, false, false);
         notificationsTwo.setFillParent(true);
         notificationsTwo.bottom();
         notificationsTwo.setX(Gdx.graphics.getWidth() / 2);

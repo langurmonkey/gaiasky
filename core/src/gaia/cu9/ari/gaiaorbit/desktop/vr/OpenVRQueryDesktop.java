@@ -7,23 +7,17 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.backends.lwjgl3.Lwjgl3Files;
 import com.badlogic.gdx.files.FileHandle;
 
-import gaia.cu9.ari.gaiaorbit.desktop.concurrent.SingleThreadLocalFactory;
-import gaia.cu9.ari.gaiaorbit.desktop.concurrent.ThreadLocalFactory;
 import gaia.cu9.ari.gaiaorbit.desktop.format.DesktopDateFormatFactory;
 import gaia.cu9.ari.gaiaorbit.desktop.format.DesktopNumberFormatFactory;
 import gaia.cu9.ari.gaiaorbit.desktop.util.DesktopConfInit;
-import gaia.cu9.ari.gaiaorbit.desktop.util.DesktopSysUtilsFactory;
-import gaia.cu9.ari.gaiaorbit.event.EventManager;
-import gaia.cu9.ari.gaiaorbit.event.Events;
-import gaia.cu9.ari.gaiaorbit.event.IObserver;
+import gaia.cu9.ari.gaiaorbit.desktop.util.LogWriter;
 import gaia.cu9.ari.gaiaorbit.util.ConfInit;
 import gaia.cu9.ari.gaiaorbit.util.I18n;
-import gaia.cu9.ari.gaiaorbit.util.SysUtilsFactory;
 import gaia.cu9.ari.gaiaorbit.util.format.DateFormatFactory;
 import gaia.cu9.ari.gaiaorbit.util.format.NumberFormatFactory;
 import gaia.cu9.ari.gaiaorbit.vr.OpenVRQuery;
 
-public class OpenVRQueryDesktop implements IObserver {
+public class OpenVRQueryDesktop {
 
     public static void main(String[] args) {
         OpenVRQueryDesktop ovrq = new OpenVRQueryDesktop();
@@ -31,10 +25,9 @@ public class OpenVRQueryDesktop implements IObserver {
             // Assets location
             String ASSETS_LOC = (System.getProperty("assets.location") != null ? System.getProperty("assets.location") : "../android/assets/");
 
-            Gdx.files = new Lwjgl3Files();
+            new LogWriter();
 
-            // Sys utils
-            SysUtilsFactory.initialize(new DesktopSysUtilsFactory());
+            Gdx.files = new Lwjgl3Files();
 
             // Initialize number format
             NumberFormatFactory.initialize(new DesktopNumberFormatFactory());
@@ -46,39 +39,12 @@ public class OpenVRQueryDesktop implements IObserver {
 
             I18n.initialize(new FileHandle(ASSETS_LOC + "i18n/gsbundle"));
 
-            ThreadLocalFactory.initialize(new SingleThreadLocalFactory());
-
-            EventManager.instance.subscribe(ovrq, Events.POST_NOTIFICATION, Events.JAVA_EXCEPTION);
-
             OpenVRQuery.queryOpenVr();
 
         } catch (Exception e) {
 
         }
 
-    }
-
-    @Override
-    public void notify(Events event, Object... data) {
-        switch (event) {
-        case POST_NOTIFICATION:
-            StringBuilder sb = new StringBuilder();
-            int i = 0;
-            for (Object ob : data) {
-                sb.append(ob);
-                if (i < data.length - 1) {
-                    sb.append(" - ");
-                }
-                i++;
-            }
-            System.out.println(sb);
-            break;
-        case JAVA_EXCEPTION:
-            ((Throwable) data[0]).printStackTrace(System.err);
-            break;
-        default:
-            break;
-        }
     }
 
 }

@@ -61,7 +61,7 @@ public class VersionChecker implements Runnable {
                                     // Here is the commit object
                                     listener.handle(new VersionCheckEvent(tag, tagDate.toInstant(ZoneOffset.UTC)));
                                 } catch (DateTimeParseException e) {
-                                    Logger.error(e);
+                                    Logger.getLogger(this.getClass()).error(e);
                                 }
                             }
 

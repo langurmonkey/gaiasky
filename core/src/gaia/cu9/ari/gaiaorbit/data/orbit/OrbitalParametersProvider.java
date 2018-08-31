@@ -8,6 +8,7 @@ import gaia.cu9.ari.gaiaorbit.event.Events;
 import gaia.cu9.ari.gaiaorbit.scenegraph.component.OrbitComponent;
 import gaia.cu9.ari.gaiaorbit.util.Constants;
 import gaia.cu9.ari.gaiaorbit.util.Logger;
+import gaia.cu9.ari.gaiaorbit.util.Nature;
 import gaia.cu9.ari.gaiaorbit.util.coord.AstroUtils;
 import gaia.cu9.ari.gaiaorbit.util.math.MathUtilsd;
 import gaia.cu9.ari.gaiaorbit.util.math.Matrix4d;
@@ -48,7 +49,7 @@ public class OrbitalParametersProvider implements IOrbitDataProvider {
                 double t_step = period / parameter.numSamples;
                 for (double t = 0; t <= period; t += t_step) {
                     // 1
-                    double deltat = t * Constants.D_TO_S;
+                    double deltat = t * Nature.D_TO_S;
                     double M = M0 + deltat * Math.sqrt(mu / Math.pow(a, 3d));
 
                     // 2
@@ -97,7 +98,7 @@ public class OrbitalParametersProvider implements IOrbitDataProvider {
 
                 EventManager.instance.post(Events.ORBIT_DATA_LOADED, data, parameter.name);
             } catch (Exception e) {
-                Logger.error(e);
+                Logger.getLogger(this.getClass()).error(e);
             }
         } else {
             loadOld(file, parameter);
@@ -137,7 +138,7 @@ public class OrbitalParametersProvider implements IOrbitDataProvider {
             }
             EventManager.instance.post(Events.ORBIT_DATA_LOADED, data, parameter.name);
         } catch (Exception e) {
-            Logger.error(e);
+            Logger.getLogger(this.getClass()).error(e);
         }
     }
 

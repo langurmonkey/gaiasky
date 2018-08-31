@@ -14,7 +14,7 @@ import com.bitfire.utils.ShaderLoader;
 import gaia.cu9.ari.gaiaorbit.render.IRenderable;
 import gaia.cu9.ari.gaiaorbit.render.RenderingContext;
 import gaia.cu9.ari.gaiaorbit.scenegraph.camera.ICamera;
-import gaia.cu9.ari.gaiaorbit.util.Constants;
+import gaia.cu9.ari.gaiaorbit.util.math.Vector3d;
 
 /**
  * Renders volumetric clouds in the galaxy. Just a test for now.
@@ -55,11 +55,11 @@ public class VolumeCloudsRenderSystem extends AbstractRenderSystem {
         // Init uniforms
         shaderProgram.begin();
         shaderProgram.setUniformi("u_texture0", 0);
-        shaderProgram.setUniformf("u_iterations", 100f);
+        shaderProgram.setUniformf("u_iterations", 80f);
         shaderProgram.setUniformf("u_cloudDensity", 0.5f);
         shaderProgram.setUniformf("u_viewDistance", 6.0f);
-        shaderProgram.setUniformf("u_cloudColor", 1.0f, 1.0f, 1.0f);
-        shaderProgram.setUniformf("u_skyColor", 0.0f, 0.0f, 0.0f);
+        shaderProgram.setUniformf("u_cloudColor", 1.0f, 0.8f, 0.5f);
+        shaderProgram.setUniformf("u_skyColor", 0.6f, 0.6f, 0.9f);
         shaderProgram.end();
     }
 
@@ -71,12 +71,22 @@ public class VolumeCloudsRenderSystem extends AbstractRenderSystem {
         shaderProgram.begin();
         staticTex.bind(0);
         // Set uniforms - camera and viewport basically
+        shaderProgram.setUniformf("u_iterations", 80f);
         shaderProgram.setUniformf("u_time", (float) ((TimeUtils.millis() - initime) / 1000d));
         shaderProgram.setUniformf("u_opacity", opacity);
         shaderProgram.setUniformf("u_viewport", rc.w(), rc.h());
-        shaderProgram.setUniformf("u_camPos", camera.getPos().setVector3(camPos).scl((float) Constants.U_TO_PC));
-        shaderProgram.setUniformf("u_camDir", camera.getDirection().setVector3(camDir).nor());
-        shaderProgram.setUniformf("u_camUp", camera.getUp().setVector3(camUp).nor());
+
+        Vector3d cp = camera.getInversePos();
+        camPos.set((float) cp.z, (float) -cp.x, (float) cp.y).scl(5e-12f);
+        shaderProgram.setUniformf("u_camPos", camPos);
+
+        Vector3d cd = camera.getDirection();
+        camDir.set((float) cd.z, (float) cd.x, (float) cd.y).nor();
+        shaderProgram.setUniformf("u_camDir", camDir);
+
+        Vector3d cu = camera.getUp();
+        camUp.set((float) cu.z, (float) cu.x, (float) cu.y).nor();
+        shaderProgram.setUniformf("u_camUp", camUp);
 
         // Render
         quad.render(shaderProgram);

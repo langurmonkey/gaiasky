@@ -232,10 +232,10 @@ public class DesktopPostProcessor implements IPostProcessor, IObserver {
             ((Fxaa) ppb.antialiasing).setSpanMax(8f);
             ((Fxaa) ppb.antialiasing).setReduceMin(1f / 16f);
             ((Fxaa) ppb.antialiasing).setReduceMul(1f / 8f);
-            Logger.info(this.getClass().getSimpleName(), I18n.bundle.format("notif.selected", "FXAA"));
+            Logger.getLogger(this.getClass()).info(I18n.bundle.format("notif.selected", "FXAA"));
         } else if (aavalue.equals(Antialias.NFAA)) {
             ppb.antialiasing = new Nfaa(width, height);
-            Logger.info(this.getClass().getSimpleName(), I18n.bundle.format("notif.selected", "NFAA"));
+            Logger.getLogger(this.getClass()).info(I18n.bundle.format("notif.selected", "NFAA"));
         }
         if (ppb.antialiasing != null) {
             ppb.antialiasing.setEnabled(GlobalConf.postprocess.POSTPROCESS_ANTIALIAS.isPostProcessAntialias());
@@ -553,7 +553,7 @@ public class DesktopPostProcessor implements IPostProcessor, IObserver {
 
     private void updateStereo(boolean stereo, StereoProfile profile) {
         boolean curvatureEnabled = stereo && profile == StereoProfile.VR_HEADSET;
-        boolean viewportHalved = stereo && profile != StereoProfile.ANAGLYPHIC && profile != StereoProfile.HD_3DTV;
+        boolean viewportHalved = stereo && profile != StereoProfile.ANAGLYPHIC && profile != StereoProfile.HD_3DTV_HORIZONTAL;
 
         for (int i = 0; i < RenderType.values().length; i++) {
             if (pps[i] != null) {

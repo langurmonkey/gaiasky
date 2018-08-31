@@ -1,5 +1,7 @@
 package gaia.cu9.ari.gaiaorbit.interfce;
 
+import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 
@@ -12,46 +14,62 @@ import gaia.cu9.ari.gaiaorbit.util.format.NumberFormatFactory;
 import gaia.cu9.ari.gaiaorbit.util.scene2d.OwnLabel;
 
 public class DebugInterface extends Table implements IObserver, IGuiInterface {
-    private OwnLabel debug1, debug2, debug3, debug4, fps;
+    private OwnLabel debug1, debug2, debug3, debug4, debugBuffers, fps, spf, device;
     /** Lock object for synchronization **/
     private Object lock;
 
-    private INumberFormat fpsFormatter, memFormatter, timeFormatter;
+    private INumberFormat fpsFormatter, spfFormatter, memFormatter, timeFormatter;
 
     public DebugInterface(Skin skin, Object lock) {
         super(skin);
+        float spacing = 10 * GlobalConf.SCALE_FACTOR;
+        
+        
         // Formatters
-        fpsFormatter = NumberFormatFactory.getFormatter("###.00");
+        fpsFormatter = NumberFormatFactory.getFormatter("#.00");
+        spfFormatter = NumberFormatFactory.getFormatter("#.00##");
         memFormatter = NumberFormatFactory.getFormatter("#000.00");
         timeFormatter = NumberFormatFactory.getFormatter("00");
 
-        fps = new OwnLabel("", skin, "hud-med");
+        fps = new OwnLabel("", skin, "hud-big");
         add(fps).right();
         row();
 
-        debug1 = new OwnLabel("", skin, "hud-med");
-        add(debug1).right();
+        spf = new OwnLabel("", skin, "hud-med");
+        add(spf).right();
+        row();
+        
+        device = new OwnLabel(Gdx.gl.glGetString(GL20.GL_RENDERER), skin, "hud-big");
+        add(device).right().padTop(spacing);
+        row();
+        
+        debug1 = new OwnLabel("", skin, "hud");
+        add(debug1).right().padTop(spacing);
         row();
 
-        debug2 = new OwnLabel("", skin, "hud-med");
+        debug2 = new OwnLabel("", skin, "hud");
         add(debug2).right();
         row();
 
-        debug3 = new OwnLabel("", skin, "hud-med");
+        debug3 = new OwnLabel("", skin, "hud");
         add(debug3).right();
         row();
 
-        debug4 = new OwnLabel("", skin, "hud-med");
+        debug4 = new OwnLabel("", skin, "hud");
         add(debug4).right();
+        row();
+
+        debugBuffers = new OwnLabel("", skin, "hud");
+        add(debugBuffers).right();
         row();
 
         this.setVisible(GlobalConf.program.SHOW_DEBUG_INFO);
         this.lock = lock;
-        EventManager.instance.subscribe(this, Events.DEBUG1, Events.DEBUG2, Events.DEBUG3, Events.DEBUG4, Events.FPS_INFO, Events.SHOW_DEBUG_CMD);
+        EventManager.instance.subscribe(this, Events.DEBUG1, Events.DEBUG2, Events.DEBUG3, Events.DEBUG4, Events.DEBUG_BUFFERS, Events.FPS_INFO, Events.SHOW_DEBUG_CMD);
     }
 
     private void unsubscribe() {
-        EventManager.instance.unsubscribe(this, Events.DEBUG1, Events.DEBUG2, Events.DEBUG3, Events.DEBUG4, Events.FPS_INFO, Events.SHOW_DEBUG_CMD);
+        EventManager.instance.removeAllSubscriptions(this);
     }
 
     @Override
@@ -87,9 +105,17 @@ public class DebugInterface extends Table implements IObserver, IGuiInterface {
                 if (GlobalConf.program.SHOW_DEBUG_INFO && data.length > 0 && data[0] != null)
                     debug4.setText((String) data[0]);
                 break;
-            case FPS_INFO:
+            case DEBUG_BUFFERS:
                 if (GlobalConf.program.SHOW_DEBUG_INFO && data.length > 0 && data[0] != null)
-                    fps.setText(fpsFormatter.format((Float) data[0]).concat(" FPS"));
+                    debugBuffers.setText((String) data[0]);
+                break;
+            case FPS_INFO:
+                if (GlobalConf.program.SHOW_DEBUG_INFO && data.length > 0 && data[0] != null) {
+                    double dfps = (Float)data[0];
+                    double dspf = 1000 / dfps;
+                    fps.setText(fpsFormatter.format(dfps).concat(" FPS"));
+                    spf.setText(spfFormatter.format(dspf).concat(" ms"));
+                }
                 break;
             case SHOW_DEBUG_CMD:
                 boolean shw;

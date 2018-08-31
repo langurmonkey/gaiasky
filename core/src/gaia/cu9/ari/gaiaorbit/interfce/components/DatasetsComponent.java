@@ -20,12 +20,13 @@ import gaia.cu9.ari.gaiaorbit.event.IObserver;
 import gaia.cu9.ari.gaiaorbit.util.CatalogInfo;
 import gaia.cu9.ari.gaiaorbit.util.GlobalConf;
 import gaia.cu9.ari.gaiaorbit.util.Logger;
+import gaia.cu9.ari.gaiaorbit.util.Logger.Log;
 import gaia.cu9.ari.gaiaorbit.util.scene2d.OwnImageButton;
 import gaia.cu9.ari.gaiaorbit.util.scene2d.OwnLabel;
 import gaia.cu9.ari.gaiaorbit.util.scene2d.OwnScrollPane;
 
 public class DatasetsComponent extends GuiComponent implements IObserver {
-
+    private static final Log logger = Logger.getLogger(DatasetsComponent.class);
     private VerticalGroup group;
     private float pad = 3 * GlobalConf.SCALE_FACTOR;
 
@@ -87,7 +88,7 @@ public class DatasetsComponent extends GuiComponent implements IObserver {
                 if (ci.object != null) {
                     boolean newvis = !ci.object.isVisible();
                     ci.object.setVisible(newvis);
-                    Logger.info(txt("notif.visibility." + (newvis ? "on" : "off"), ci.name));
+                    logger.info(txt("notif.visibility." + (newvis ? "on" : "off"), ci.name));
                 }
                 return true;
             }

@@ -25,11 +25,13 @@ import gaia.cu9.ari.gaiaorbit.scenegraph.StarGroup.StarBean;
 import gaia.cu9.ari.gaiaorbit.util.Constants;
 import gaia.cu9.ari.gaiaorbit.util.LargeLongMap;
 import gaia.cu9.ari.gaiaorbit.util.Logger;
+import gaia.cu9.ari.gaiaorbit.util.Logger.Log;
 import gaia.cu9.ari.gaiaorbit.util.coord.Coordinates;
 import gaia.cu9.ari.gaiaorbit.util.math.Vector3d;
 import gaia.cu9.ari.gaiaorbit.util.parse.Parser;
 
 public abstract class AbstractStarGroupDataProvider implements IStarGroupDataProvider {
+    protected static Log logger = Logger.getLogger(AbstractStarGroupDataProvider.class);
 
     protected Array<StarBean> list;
     protected LongMap<double[]> sphericalPositions;
@@ -104,7 +106,7 @@ public abstract class AbstractStarGroupDataProvider implements IStarGroupDataPro
             int lines = countLines(f);
             initLists(lines - 1);
         } catch (Exception e) {
-            Logger.error(e);
+            logger.error(e);
         }
     }
 
@@ -236,9 +238,9 @@ public abstract class AbstractStarGroupDataProvider implements IStarGroupDataPro
                 ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(filename));
                 oos.writeObject(l);
                 oos.close();
-                Logger.info("File " + filename + " written with " + l.size() + " stars");
+                logger.info("File " + filename + " written with " + l.size() + " stars");
             } catch (Exception e) {
-                Logger.error(e);
+                logger.error(e);
             }
         } else {
             // Use own binary format
@@ -246,9 +248,9 @@ public abstract class AbstractStarGroupDataProvider implements IStarGroupDataPro
             try {
                 int n = data.get(0).data.length;
                 io.writeData(data, new FileOutputStream(filename));
-                Logger.info("File " + filename + " written with " + n + " stars");
+                logger.info("File " + filename + " written with " + n + " stars");
             } catch (Exception e) {
-                Logger.error(e);
+                logger.error(e);
             }
         }
     }
@@ -271,9 +273,9 @@ public abstract class AbstractStarGroupDataProvider implements IStarGroupDataPro
                 n++;
             }
             writer.close();
-            Logger.info("File " + filename + " written with " + n + " stars");
+            logger.info("File " + filename + " written with " + n + " stars");
         } catch (Exception e) {
-            Logger.error(e);
+            logger.error(e);
         }
     }
 
@@ -324,12 +326,12 @@ public abstract class AbstractStarGroupDataProvider implements IStarGroupDataPro
         geoDistances = new LargeLongMap<Double>(10);
         geoDistErrors = 0;
 
-        Logger.info("Loading geometric distances from " + geoDistFile);
+        logger.info("Loading geometric distances from " + geoDistFile);
 
         Path f = Paths.get(geoDistFile);
         loadGeometricDistances(f);
 
-        Logger.info(geoDistances.size() + " geometric distances loaded (" + geoDistErrors + " negative or nan values)");
+        logger.info(geoDistances.size() + " geometric distances loaded (" + geoDistErrors + " negative or nan values)");
     }
 
     private void loadGeometricDistances(Path f) {
@@ -340,7 +342,7 @@ public abstract class AbstractStarGroupDataProvider implements IStarGroupDataPro
             int i = 1;
             for (File file : files) {
                 if(i % mod == 0){
-                    Logger.info("Loading file " + i + "/" + nfiles);
+                    logger.info("Loading file " + i + "/" + nfiles);
                 }
                 loadGeometricDistances(file.toPath());
                 i++;
@@ -349,7 +351,7 @@ public abstract class AbstractStarGroupDataProvider implements IStarGroupDataPro
             try {
                 loadGeometricDistanceFile(f);
             } catch (Exception e) {
-                Logger.error(e, "Loading failed: " + f.toString());
+                logger.error(e, "Loading failed: " + f.toString());
             }
         }
     }
@@ -369,14 +371,14 @@ public abstract class AbstractStarGroupDataProvider implements IStarGroupDataPro
                 if (!dist.isNaN() && dist >= 0) {
                     geoDistances.put(sourceId, dist);
                 } else {
-                    Logger.debug("Distance " + i + " is NaN or negative: " + dist + " (file " + f.toString() + ")");
+                    logger.debug("Distance " + i + " is NaN or negative: " + dist + " (file " + f.toString() + ")");
                     geoDistErrors++;
                 }
                 i++;
             }
             br.close();
         } catch (Exception e) {
-            Logger.error(e);
+            logger.error(e);
             br.close();
         }
     }

@@ -17,6 +17,7 @@ import gaia.cu9.ari.gaiaorbit.scenegraph.StarGroup.StarBean;
 import gaia.cu9.ari.gaiaorbit.util.Constants;
 import gaia.cu9.ari.gaiaorbit.util.I18n;
 import gaia.cu9.ari.gaiaorbit.util.Logger;
+import gaia.cu9.ari.gaiaorbit.util.Logger.Log;
 import gaia.cu9.ari.gaiaorbit.util.Pair;
 import gaia.cu9.ari.gaiaorbit.util.color.ColourUtils;
 import gaia.cu9.ari.gaiaorbit.util.coord.AstroUtils;
@@ -26,6 +27,7 @@ import gaia.cu9.ari.gaiaorbit.util.math.Vector3d;
 import gaia.cu9.ari.gaiaorbit.util.parse.Parser;
 
 public class TGASDataProvider extends AbstractStarGroupDataProvider {
+    private static Log logger = Logger.getLogger(TGASDataProvider.class);
     private static final boolean dumpToDisk = false;
     /** Colors BT, VT for all Tycho2 stars file **/
     private static final String btvtColorsFile = "data/tgas_final/bt-vt-tycho.csv";
@@ -42,7 +44,7 @@ public class TGASDataProvider extends AbstractStarGroupDataProvider {
     }
 
     public Array<StarBean> loadData(String file, double factor) {
-        Logger.info(this.getClass().getSimpleName(), I18n.bundle.format("notif.datafile", file));
+        logger.info(I18n.bundle.format("notif.datafile", file));
 
         FileHandle f = Gdx.files.internal(file);
 
@@ -50,7 +52,7 @@ public class TGASDataProvider extends AbstractStarGroupDataProvider {
         loadData(f.read(), factor);
 
         if (list != null)
-            Logger.info(this.getClass().getSimpleName(), I18n.bundle.format("notif.nodeloader", list.size, file));
+            logger.info(I18n.bundle.format("notif.nodeloader", list.size, file));
 
         return list;
     }
@@ -193,12 +195,12 @@ public class TGASDataProvider extends AbstractStarGroupDataProvider {
             }
 
         } catch (Exception e) {
-            Logger.error(e, TGASDataProvider.class.getName());
+            logger.error(e);
             list = null;
         }
 
         if (radialVelocities != null)
-            Logger.info(TGASDataProvider.class.getSimpleName(), "Found " + raveStars + " with RAVE radial velocities in TGAS");
+            logger.info("Found " + raveStars + " with RAVE radial velocities in TGAS");
 
         return list;
     }
@@ -239,7 +241,7 @@ public class TGASDataProvider extends AbstractStarGroupDataProvider {
             try {
                 br.close();
             } catch (IOException e) {
-                Logger.error(e);
+                logger.error(e);
             }
 
         }
@@ -266,7 +268,7 @@ public class TGASDataProvider extends AbstractStarGroupDataProvider {
                 if (!line.startsWith(comment))
                     // Add B-V colour
                     addInfo(line, colors, hips, comma);
-                Logger.debug("Line " + i++);
+                logger.debug("Line " + i++);
             }
         } catch (IOException e) {
             e.printStackTrace();
@@ -274,7 +276,7 @@ public class TGASDataProvider extends AbstractStarGroupDataProvider {
             try {
                 br.close();
             } catch (IOException e) {
-                Logger.error(e);
+                logger.error(e);
             }
 
         }

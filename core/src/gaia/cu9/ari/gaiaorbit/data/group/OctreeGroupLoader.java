@@ -13,8 +13,11 @@ import gaia.cu9.ari.gaiaorbit.scenegraph.StarGroup;
 import gaia.cu9.ari.gaiaorbit.scenegraph.StarGroup.StarBean;
 import gaia.cu9.ari.gaiaorbit.scenegraph.octreewrapper.AbstractOctreeWrapper;
 import gaia.cu9.ari.gaiaorbit.scenegraph.octreewrapper.OctreeWrapper;
+import gaia.cu9.ari.gaiaorbit.util.CatalogInfo;
+import gaia.cu9.ari.gaiaorbit.util.CatalogInfo.CatalogInfoType;
 import gaia.cu9.ari.gaiaorbit.util.I18n;
 import gaia.cu9.ari.gaiaorbit.util.Logger;
+import gaia.cu9.ari.gaiaorbit.util.Logger.Log;
 import gaia.cu9.ari.gaiaorbit.util.tree.LoadStatus;
 import gaia.cu9.ari.gaiaorbit.util.tree.OctreeNode;
 
@@ -26,6 +29,7 @@ import gaia.cu9.ari.gaiaorbit.util.tree.OctreeNode;
  * @author tsagrista
  */
 public class OctreeGroupLoader extends StreamingOctreeLoader {
+    private static final Log logger = Logger.getLogger(OctreeGroupLoader.class);
 
     /**
      * Whether to use the binary file format. If false, we use the java
@@ -49,20 +53,24 @@ public class OctreeGroupLoader extends StreamingOctreeLoader {
          * LOAD METADATA
          */
 
-        Logger.info(this.getClass().getSimpleName(), I18n.bundle.format("notif.loading", metadata));
+        logger.info(I18n.bundle.format("notif.loading", metadata));
 
         MetadataBinaryIO metadataReader = new MetadataBinaryIO();
         OctreeNode root = metadataReader.readMetadataMapped(metadata);
 
         if (root != null) {
-            Logger.info(this.getClass().getSimpleName(), I18n.bundle.format("notif.nodeloader", root.numNodes(), metadata));
-            Logger.info(this.getClass().getSimpleName(), I18n.bundle.format("notif.loading", particles));
+            logger.info(I18n.bundle.format("notif.nodeloader", root.numNodes(), metadata));
+            logger.info(I18n.bundle.format("notif.loading", particles));
 
             /**
              * CREATE OCTREE WRAPPER WITH ROOT NODE - particle group is by default
              * parallel, so we never use OctreeWrapperConcurrent
              */
             AbstractOctreeWrapper octreeWrapper = new OctreeWrapper("Universe", root);
+            // Catalog info
+            String name = this.name != null ? this.name : "LOD data";
+            String description = this.description != null ? this.description : "Octree-based LOD dataset";
+            new CatalogInfo(name, description, null, CatalogInfoType.LOD, octreeWrapper);
 
             /**
              * LOAD LOD LEVELS - LOAD PARTICLE DATA
@@ -73,12 +81,12 @@ public class OctreeGroupLoader extends StreamingOctreeLoader {
                 loadLod(depthLevel, octreeWrapper);
                 flushLoadedIds();
             } catch (IOException e) {
-                Logger.error(e);
+                logger.error(e);
             }
 
             return octreeWrapper;
         } else {
-            Logger.info("Dataset not found: " + metadata + " - " + particles);
+            logger.info("Dataset not found: " + metadata + " - " + particles);
             return null;
         }
     }

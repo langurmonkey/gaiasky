@@ -13,6 +13,7 @@ import gaia.cu9.ari.gaiaorbit.event.Events;
 import gaia.cu9.ari.gaiaorbit.event.IObserver;
 import gaia.cu9.ari.gaiaorbit.render.ComponentType;
 import gaia.cu9.ari.gaiaorbit.render.system.AbstractRenderSystem;
+import gaia.cu9.ari.gaiaorbit.util.Logger.Log;
 import gaia.cu9.ari.gaiaorbit.util.format.DateFormatFactory;
 import gaia.cu9.ari.gaiaorbit.util.format.DateFormatFactory.DateType;
 import gaia.cu9.ari.gaiaorbit.util.format.IDateFormat;
@@ -25,6 +26,8 @@ import gaia.cu9.ari.gaiaorbit.util.math.MathUtilsd;
  *
  */
 public class GlobalConf {
+    private static final Log logger = Logger.getLogger(GlobalConf.class);
+
     public static final String APPLICATION_NAME = "Gaia Sky";
     public static final String WEBPAGE = "https://www.zah.uni-heidelberg.de/gaia/outreach/gaiasky";
     public static final String WEBPAGE_DOWNLOADS = "https://www.zah.uni-heidelberg.de/gaia/outreach/gaiasky/downloads";
@@ -36,11 +39,15 @@ public class GlobalConf {
 
     public static final String TEXTURES_FOLDER = "data/tex/";
 
+    // Assets location for this instance of Gaia Sky
+    public static final String ASSETS_LOC = System.getProperty("assets.location") != null ? System.getProperty("assets.location") : "";
+
+    // Scale factor
     public static float SCALE_FACTOR = -1.0f;
 
     public static void updateScaleFactor(float sf) {
         SCALE_FACTOR = sf;
-        Logger.debug(GlobalConf.class.getSimpleName(), "GUI scale factor set to " + GlobalConf.SCALE_FACTOR);
+        logger.debug("GUI scale factor set to " + GlobalConf.SCALE_FACTOR);
     }
 
     public static interface IConf {
@@ -461,6 +468,9 @@ public class GlobalConf {
      */
     public static class DataConf implements IConf {
 
+        /** Locations to look for catalog files additionally to internal **/
+        public String[] CATALOG_LOCATIONS;
+
         /** The json data file in case of local data source **/
         public String OBJECTS_JSON_FILES;
 
@@ -482,8 +492,9 @@ public class GlobalConf {
          **/
         public boolean REAL_GAIA_ATTITUDE;
 
-        public void initialize(String cATALOG_JSON_FILE, String oBJECTS_JSON_FILE, float lIMIT_MAG_LOAD, boolean rEAL_GAIA_ATTITUDE, boolean hIGH_ACCURACY_POSITIONS) {
+        public void initialize(String[] cATALOG_LOCATIONS, String cATALOG_JSON_FILE, String oBJECTS_JSON_FILE, float lIMIT_MAG_LOAD, boolean rEAL_GAIA_ATTITUDE, boolean hIGH_ACCURACY_POSITIONS) {
 
+            CATALOG_LOCATIONS = cATALOG_LOCATIONS;
             CATALOG_JSON_FILES = cATALOG_JSON_FILE;
             OBJECTS_JSON_FILES = oBJECTS_JSON_FILE;
             LIMIT_MAG_LOAD = lIMIT_MAG_LOAD;
@@ -545,13 +556,27 @@ public class GlobalConf {
             /** Left image -> left eye, distortion **/
             VR_HEADSET,
             /** Left image -> left eye, distortion **/
-            HD_3DTV,
+            HD_3DTV_HORIZONTAL,
+            /** Top-bottom **/
+            HD_3DTV_VERTICAL,
             /** Left image -> right eye, no distortion **/
             CROSSEYE,
             /** Left image -> left eye, no distortion **/
             PARALLEL_VIEW,
             /** Red-cyan anaglyphic 3D mode **/
-            ANAGLYPHIC
+            ANAGLYPHIC;
+
+            public boolean isHorizontal() {
+                return this.equals(VR_HEADSET) || this.equals(HD_3DTV_HORIZONTAL) || this.equals(CROSSEYE) || this.equals(PARALLEL_VIEW);
+            }
+
+            public boolean isVertical() {
+                return this.equals(HD_3DTV_VERTICAL);
+            }
+
+            public boolean isAnaglyphic() {
+                return this.equals(ANAGLYPHIC);
+            }
         }
 
         public boolean DISPLAY_TUTORIAL;
@@ -561,6 +586,7 @@ public class GlobalConf {
         public Instant LAST_CHECKED;
         public String LAST_VERSION_TIME;
         public String VERSION_CHECK_URL;
+        public String DEFAULT_CATALOG_URL;
         public String UI_THEME;
         public String SCRIPT_LOCATION;
         public int REST_PORT;
@@ -584,7 +610,7 @@ public class GlobalConf {
         }
 
         public void initialize(boolean dISPLAY_TUTORIAL, String tUTORIAL_POINTER_SCRIPT_LOCATION, String tUTORIAL_SCRIPT_LOCATION, boolean sHOW_DEBUG_INFO, Instant lAST_CHECKED, String lAST_VERSION_TIME,
-                String vERSION_CHECK_URL, String uI_THEME, String sCRIPT_LOCATION, int rEST_PORT, String lOCALE, boolean sTEREOSCOPIC_MODE, StereoProfile sTEREO_PROFILE, boolean cUBEMAP360_MODE,
+                String vERSION_CHECK_URL, String dEFAULT_CATALOG_URL, String uI_THEME, String sCRIPT_LOCATION, int rEST_PORT, String lOCALE, boolean sTEREOSCOPIC_MODE, StereoProfile sTEREO_PROFILE, boolean cUBEMAP360_MODE,
                 boolean aNALYTICS_ENABLED, boolean dISPLAY_HUD, boolean dISPLAY_POINTER_COORDS, boolean dISPLAY_DATASET_DIALOG) {
             DISPLAY_TUTORIAL = dISPLAY_TUTORIAL;
             TUTORIAL_POINTER_SCRIPT_LOCATION = tUTORIAL_POINTER_SCRIPT_LOCATION;
@@ -593,6 +619,7 @@ public class GlobalConf {
             LAST_CHECKED = lAST_CHECKED;
             LAST_VERSION_TIME = lAST_VERSION_TIME;
             VERSION_CHECK_URL = vERSION_CHECK_URL;
+            DEFAULT_CATALOG_URL = dEFAULT_CATALOG_URL;
             UI_THEME = uI_THEME;
             SCRIPT_LOCATION = sCRIPT_LOCATION;
             REST_PORT = rEST_PORT;
@@ -621,7 +648,7 @@ public class GlobalConf {
         }
 
         public boolean isStereoHalfWidth() {
-            return STEREOSCOPIC_MODE && (STEREO_PROFILE != StereoProfile.HD_3DTV && STEREO_PROFILE != StereoProfile.ANAGLYPHIC);
+            return STEREOSCOPIC_MODE && (STEREO_PROFILE != StereoProfile.HD_3DTV_HORIZONTAL && STEREO_PROFILE != StereoProfile.ANAGLYPHIC);
         }
 
         public boolean isStereoFullWidth() {
@@ -652,8 +679,8 @@ public class GlobalConf {
                         EventManager.instance.post(Events.DISPLAY_GUI_CMD, I18n.bundle.get("notif.cleanmode"), true);
                     }
 
-                    Logger.info("You have entered 3D mode. Go back to normal mode using <CTRL+S>");
-                    Logger.info("Switch between stereoscopic modes using <CTRL+SHIFT+S>");
+                    logger.info("You have entered 3D mode. Go back to normal mode using <CTRL+S>");
+                    logger.info("Switch between stereoscopic modes using <CTRL+SHIFT+S>");
                 }
                 break;
             case STEREO_PROFILE_CMD:
@@ -663,12 +690,12 @@ public class GlobalConf {
                 CUBEMAP360_MODE = (Boolean) data[0];
                 EventManager.instance.post(Events.DISPLAY_GUI_CMD, I18n.bundle.get("notif.cleanmode"), !CUBEMAP360_MODE);
 
-                Logger.info("You have entered the 360 mode.  Go back to normal mode using <CTRL+K>");
-                Logger.info("Switch between cubemap projections using <CTRL+SHIFT+K>");
+                logger.info("You have entered the 360 mode.  Go back to normal mode using <CTRL+K>");
+                logger.info("Switch between cubemap projections using <CTRL+SHIFT+K>");
                 break;
             case CUBEMAP_PROJECTION_CMD:
                 CUBEMAP_PROJECTION = (CubemapProjection) data[0];
-                Logger.info("Cubemap projection set to " + CUBEMAP_PROJECTION.toString());
+                logger.info("Cubemap projection set to " + CUBEMAP_PROJECTION.toString());
                 break;
             default:
                 break;

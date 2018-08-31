@@ -20,7 +20,7 @@ public class DesktopDateFormat implements IDateFormat {
     public DesktopDateFormat(Locale loc, boolean date, boolean time) {
         assert date || time : "Formatter must include date or time";
         if (date && !time) {
-            df = DateTimeFormatter.ofLocalizedDate(FormatStyle.MEDIUM).withLocale(Locale.US).withZone(ZoneOffset.UTC);
+            df = DateTimeFormatter.ofPattern("MMM dd uuuu").withLocale(Locale.US).withZone(ZoneOffset.UTC);
         } else if (!date && time)
             df = DateTimeFormatter.ofLocalizedTime(FormatStyle.MEDIUM).withLocale(Locale.US).withZone(ZoneOffset.UTC);
         else if (date && time)

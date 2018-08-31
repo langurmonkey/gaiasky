@@ -139,8 +139,8 @@ public class NaturalInputListener extends GestureDetector {
         this.camera = camera;
         this.comp = new ViewAngleComparator<IFocus>();
         // 1% of width
-        this.MOVE_PX_DIST = !Constants.mobile ? (float) Math.max(5, Gdx.graphics.getWidth() * 0.01) : (float) Math.max(80, Gdx.graphics.getWidth() * 0.05);
-        this.MIN_PIX_DIST = !Constants.mobile ? 5 : (int) (160 * GlobalConf.SCALE_FACTOR);
+        this.MOVE_PX_DIST = (float) Math.max(5, Gdx.graphics.getWidth() * 0.01);
+        this.MIN_PIX_DIST = (int) (5 * GlobalConf.SCALE_FACTOR);
 
         this.dragDx = 0;
         this.dragDy = 0;

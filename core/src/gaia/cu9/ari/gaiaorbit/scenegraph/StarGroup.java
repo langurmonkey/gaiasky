@@ -55,6 +55,7 @@ import gaia.cu9.ari.gaiaorbit.util.GlobalConf;
 import gaia.cu9.ari.gaiaorbit.util.GlobalResources;
 import gaia.cu9.ari.gaiaorbit.util.Logger;
 import gaia.cu9.ari.gaiaorbit.util.ModelCache;
+import gaia.cu9.ari.gaiaorbit.util.Nature;
 import gaia.cu9.ari.gaiaorbit.util.Pair;
 import gaia.cu9.ari.gaiaorbit.util.coord.AstroUtils;
 import gaia.cu9.ari.gaiaorbit.util.gravwaves.RelativisticEffectsManager;
@@ -209,7 +210,6 @@ public class StarGroup extends ParticleGroup implements ILineRenderable, IStarFo
     // Model transfomr
     private static Matrix4 modelTransform;
 
-
     /** Epoch in julian days **/
     private double epoch_jd = AstroUtils.JD_J2015_5;
     /** Current computed epoch time **/
@@ -350,7 +350,7 @@ public class StarGroup extends ParticleGroup implements ILineRenderable, IStarFo
             this.setData(l);
 
         } catch (Exception e) {
-            Logger.error(e, getClass().getSimpleName());
+            Logger.getLogger(this.getClass()).error(e);
             pointData = null;
         }
 
@@ -455,7 +455,7 @@ public class StarGroup extends ParticleGroup implements ILineRenderable, IStarFo
         // Fade node visibility
         if (this.isVisible()) {
             // Delta years
-            currDeltaYears = AstroUtils.getMsSince(time.getTime(), epoch_jd) * Constants.MS_TO_Y;
+            currDeltaYears = AstroUtils.getMsSince(time.getTime(), epoch_jd) * Nature.MS_TO_Y;
 
             super.update(time, parentTransform, camera, opacity);
 
@@ -509,7 +509,7 @@ public class StarGroup extends ParticleGroup implements ILineRenderable, IStarFo
         if (time.getDt() == 0 && !force) {
             return getAbsolutePosition(aux);
         } else {
-            double deltaYears = AstroUtils.getMsSince(time.getTime(), epoch_jd) * Constants.MS_TO_Y;
+            double deltaYears = AstroUtils.getMsSince(time.getTime(), epoch_jd) * Nature.MS_TO_Y;
             return this.fetchPosition((StarBean) pointData.get(focusIndex), null, aux, deltaYears);
         }
     }
@@ -521,7 +521,7 @@ public class StarGroup extends ParticleGroup implements ILineRenderable, IStarFo
      */
     public void updateAdditional(ITimeFrameProvider time, ICamera camera) {
         Vector3d cpos = camera.getPos();
-        double deltaYears = AstroUtils.getMsSince(time.getTime(), epoch_jd) * Constants.MS_TO_Y;
+        double deltaYears = AstroUtils.getMsSince(time.getTime(), epoch_jd) * Nature.MS_TO_Y;
         int n = pointData.size;
         for (int i = 0; i < n; i++) {
             StarBean d = (StarBean) pointData.get(i);

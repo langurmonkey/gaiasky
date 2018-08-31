@@ -10,9 +10,11 @@ import gaia.cu9.ari.gaiaorbit.event.IObserver;
 import gaia.cu9.ari.gaiaorbit.util.GlobalConf;
 import gaia.cu9.ari.gaiaorbit.util.I18n;
 import gaia.cu9.ari.gaiaorbit.util.Logger;
+import gaia.cu9.ari.gaiaorbit.util.Logger.Log;
 
 public class ScreenModeCmd implements IObserver {
-
+    private static final Log logger = Logger.getLogger(ScreenModeCmd.class);
+    
     public static ScreenModeCmd instance;
 
     public static void initialize() {
@@ -51,7 +53,7 @@ public class ScreenModeCmd implements IObserver {
                 // set the window to fullscreen mode
                 boolean good = Gdx.graphics.setFullscreenMode(mymode);
                 if (!good) {
-                    Logger.error(I18n.bundle.format("notif.error", I18n.bundle.get("gui.fullscreen")));
+                    logger.error(I18n.bundle.format("notif.error", I18n.bundle.get("gui.fullscreen")));
                 }
 
             } else {
@@ -60,7 +62,7 @@ public class ScreenModeCmd implements IObserver {
 
                 boolean good = Gdx.graphics.setWindowedMode(width, height);
                 if (!good) {
-                    Logger.error(I18n.bundle.format("notif.error", I18n.bundle.get("gui.windowed")));
+                    logger.error(I18n.bundle.format("notif.error", I18n.bundle.get("gui.windowed")));
                 }
 
             }

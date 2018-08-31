@@ -43,7 +43,7 @@ public class OrbitDataLoader extends AsynchronousAssetLoader<PolylineData, Orbit
             provider.load(fileName, parameter);
             data = provider.getData();
         } catch (Exception e) {
-            Logger.error(e, getClass().getSimpleName());
+            Logger.getLogger(this.getClass()).error(e);
         }
 
     }

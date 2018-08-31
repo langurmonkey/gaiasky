@@ -16,9 +16,9 @@ import gaia.cu9.ari.gaiaorbit.scenegraph.IStarFocus;
 import gaia.cu9.ari.gaiaorbit.scenegraph.Planet;
 import gaia.cu9.ari.gaiaorbit.util.Constants;
 import gaia.cu9.ari.gaiaorbit.util.GlobalConf;
+import gaia.cu9.ari.gaiaorbit.util.Nature;
 import gaia.cu9.ari.gaiaorbit.util.TwoWayHashmap;
 import gaia.cu9.ari.gaiaorbit.util.camera.CameraUtils;
-import gaia.cu9.ari.gaiaorbit.util.coord.AstroUtils;
 import gaia.cu9.ari.gaiaorbit.util.coord.Coordinates;
 import gaia.cu9.ari.gaiaorbit.util.math.Vector3d;
 import gaia.cu9.ari.gaiaorbit.util.time.ITimeFrameProvider;
@@ -35,6 +35,8 @@ public class CameraManager implements ICamera, IObserver {
         Free_Camera,
         /** Focus **/
         Focus,
+        /** Relativistic camera **/
+        //Relativistic,
         /** Gaia Scene **/
         Gaia_Scene,
         /** Spacecraft **/
@@ -51,6 +53,7 @@ public class CameraManager implements ICamera, IObserver {
         static {
             String fc = "Free camera";
             String foc = "Focus object";
+            //String rel = "Relativistic camera";
             String gs = "Gaia scene";
             String sc = "Spacecraft";
             String f1 = "Gaia FoV 1";
@@ -60,6 +63,7 @@ public class CameraManager implements ICamera, IObserver {
             equivalences = new TwoWayHashmap<String, CameraMode>();
             equivalences.add(fc, Free_Camera);
             equivalences.add(foc, Focus);
+            //equivalences.add(rel, Relativistic);
             equivalences.add(gs, Gaia_Scene);
             equivalences.add(sc, Spacecraft);
             equivalences.add(f1, Gaia_FOV1);
@@ -133,6 +137,7 @@ public class CameraManager implements ICamera, IObserver {
     public NaturalCamera naturalCamera;
     public FovCamera fovCamera;
     public SpacecraftCamera spacecraftCamera;
+    public RelativisticCamera relativisticCamera;
 
     private ICamera[] cameras;
 
@@ -153,6 +158,7 @@ public class CameraManager implements ICamera, IObserver {
         naturalCamera = new NaturalCamera(manager, this);
         fovCamera = new FovCamera(manager, this);
         spacecraftCamera = new SpacecraftCamera(manager, this);
+        relativisticCamera = new RelativisticCamera(manager, this);
 
         cameras = new ICamera[] { naturalCamera, fovCamera, spacecraftCamera };
 
@@ -173,23 +179,37 @@ public class CameraManager implements ICamera, IObserver {
         EventManager.instance.subscribe(this, Events.CAMERA_MODE_CMD, Events.FOV_CHANGE_NOTIFICATION);
     }
 
-    public void updateCurrentCamera(CameraMode previousMode) {
+    private AbstractCamera backupCam(ICamera current) {
+        if (current instanceof AbstractCamera)
+            return (AbstractCamera) current;
+        else
+            return null;
+    }
 
+    private void restoreCam(AbstractCamera cam, AbstractCamera copy) {
+        if (copy != null)
+            cam.copyParamsFrom(copy);
+    }
+
+    public void updateCurrentCamera(CameraMode previousMode) {
+        AbstractCamera aux = null;
         // Update
         switch (mode) {
         case Free_Camera:
         case Focus:
         case Gaia_Scene:
+            aux = backupCam(current);
             current = naturalCamera;
-            // Copy
-            if (previousMode == CameraMode.Spacecraft)
-                naturalCamera.copyParamsFrom(spacecraftCamera);
+            restoreCam(naturalCamera, aux);
             break;
+        // case Relativistic:
+        //     aux = backupCam(current);
+        //     current = relativisticCamera;
+        //     restoreCam(relativisticCamera, aux);
         case Spacecraft:
+            aux = backupCam(current);
             current = spacecraftCamera;
-            // Copy
-            if (previousMode == CameraMode.Free_Camera || previousMode == CameraMode.Focus || previousMode == CameraMode.Gaia_Scene)
-                spacecraftCamera.copyParamsFrom(naturalCamera);
+            restoreCam(spacecraftCamera, aux);
             break;
         case Gaia_FOV1:
         case Gaia_FOV2:
@@ -268,7 +288,7 @@ public class CameraManager implements ICamera, IObserver {
         // Speed = dx/dt
         velocity.set(lastPos).sub(current.getPos());
         velocitynor.set(velocity).nor();
-        speed = (velocity.len() * Constants.U_TO_KM) / (dt * Constants.S_TO_H);
+        speed = (velocity.len() * Constants.U_TO_KM) / (dt * Nature.S_TO_H);
 
         // High speed?
         if (speed > 5e6) {
@@ -300,8 +320,8 @@ public class CameraManager implements ICamera, IObserver {
         in.set(vec);
         Coordinates.cartesianToSpherical(in, out);
 
-        double pointerRA = out.x * AstroUtils.TO_DEG;
-        double pointerDEC = out.y * AstroUtils.TO_DEG;
+        double pointerRA = out.x * Nature.TO_DEG;
+        double pointerDEC = out.y * Nature.TO_DEG;
 
         // View
         vec.set(viewX, viewY, 0.5f);
@@ -309,8 +329,8 @@ public class CameraManager implements ICamera, IObserver {
         in.set(vec);
         Coordinates.cartesianToSpherical(in, out);
 
-        double viewRA = out.x * AstroUtils.TO_DEG;
-        double viewDEC = out.y * AstroUtils.TO_DEG;
+        double viewRA = out.x * Nature.TO_DEG;
+        double viewDEC = out.y * Nature.TO_DEG;
 
         EventManager.instance.post(Events.RA_DEC_UPDATED, pointerRA, pointerDEC, viewRA, viewDEC, pointerX, pointerY);
 

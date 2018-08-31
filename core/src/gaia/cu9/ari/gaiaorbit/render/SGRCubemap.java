@@ -87,8 +87,6 @@ public class SGRCubemap extends SGRAbstract implements ISGR, IObserver {
         viewport.setScreenBounds(0, 0, wh, wh);
         viewport.apply();
 
-        boolean postproc;
-
         // RIGHT +X
         rc.cubemapSide = CubemapSide.SIDE_RIGHT;
 

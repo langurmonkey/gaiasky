@@ -37,7 +37,7 @@ public class LineRenderSystem extends ImmediateRenderSystem {
     protected MeshData curr_outline;
 
     public LineRenderSystem(RenderGroup rg, float[] alphas, ShaderProgram[] shaders) {
-        super(rg, alphas, shaders);
+        super(rg, alphas, shaders, -1);
         dpool = new DPool(INI_DPOOL_SIZE, MAX_DPOOL_SIZE, 11);
         provisionalLines = new Array<double[]>();
         sorter = new LineArraySorter(10);

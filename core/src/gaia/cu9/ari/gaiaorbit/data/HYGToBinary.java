@@ -13,12 +13,9 @@ import com.badlogic.gdx.utils.Array;
 
 import gaia.cu9.ari.gaiaorbit.data.stars.HYGBinaryLoader;
 import gaia.cu9.ari.gaiaorbit.data.stars.HYGCSVLoader;
-import gaia.cu9.ari.gaiaorbit.desktop.concurrent.SingleThreadLocalFactory;
-import gaia.cu9.ari.gaiaorbit.desktop.concurrent.ThreadLocalFactory;
 import gaia.cu9.ari.gaiaorbit.desktop.format.DesktopDateFormatFactory;
 import gaia.cu9.ari.gaiaorbit.desktop.format.DesktopNumberFormatFactory;
 import gaia.cu9.ari.gaiaorbit.desktop.util.DesktopConfInit;
-import gaia.cu9.ari.gaiaorbit.desktop.util.DesktopSysUtilsFactory;
 import gaia.cu9.ari.gaiaorbit.event.EventManager;
 import gaia.cu9.ari.gaiaorbit.event.Events;
 import gaia.cu9.ari.gaiaorbit.event.IObserver;
@@ -30,7 +27,7 @@ import gaia.cu9.ari.gaiaorbit.util.ConfInit;
 import gaia.cu9.ari.gaiaorbit.util.GlobalConf;
 import gaia.cu9.ari.gaiaorbit.util.I18n;
 import gaia.cu9.ari.gaiaorbit.util.Logger;
-import gaia.cu9.ari.gaiaorbit.util.SysUtilsFactory;
+import gaia.cu9.ari.gaiaorbit.util.Logger.Log;
 import gaia.cu9.ari.gaiaorbit.util.format.DateFormatFactory;
 import gaia.cu9.ari.gaiaorbit.util.format.NumberFormatFactory;
 
@@ -46,6 +43,7 @@ import gaia.cu9.ari.gaiaorbit.util.format.NumberFormatFactory;
  * @author Toni Sagrista
  */
 public class HYGToBinary implements IObserver {
+    private static final Log logger = Logger.getLogger(HYGToBinary.class);
 
     static String fileIn = "/home/tsagrista/git/gaiasky/android/assets-bak/data/hygxyz.csv";
     static String fileInPm = "/home/tsagrista/git/gaiasky/android/assets-bak/data/hip_pm.csv";
@@ -60,9 +58,6 @@ public class HYGToBinary implements IObserver {
 
             Gdx.files = new Lwjgl3Files();
 
-            // Sys utils
-            SysUtilsFactory.initialize(new DesktopSysUtilsFactory());
-
             // Initialize number format
             NumberFormatFactory.initialize(new DesktopNumberFormatFactory());
 
@@ -73,8 +68,6 @@ public class HYGToBinary implements IObserver {
 
             I18n.initialize(new FileHandle(ASSETS_LOC + "i18n/gsbundle"));
 
-            ThreadLocalFactory.initialize(new SingleThreadLocalFactory());
-
             GlobalConf.data.LIMIT_MAG_LOAD = 20;
 
             EventManager.instance.subscribe(hyg, Events.POST_NOTIFICATION, Events.JAVA_EXCEPTION);
@@ -84,7 +77,7 @@ public class HYGToBinary implements IObserver {
             hyg.convertToBinary(fileIn, fileInPm, fileOut);
 
         } catch (Exception e) {
-            Logger.error(e);
+            logger.error(e);
         }
 
     }
@@ -110,12 +103,12 @@ public class HYGToBinary implements IObserver {
                 CelestialBody bins = (CelestialBody) binStars.get(i);
 
                 if (!equals(csvs, bins) && csvs.name.equals("Betelgeuse")) {
-                    Logger.info("Different stars: " + csvs + " // " + bins);
+                    logger.info("Different stars: " + csvs + " // " + bins);
                     different++;
                 }
             }
 
-            Logger.info("Found " + different + " different stars");
+            logger.info("Found " + different + " different stars");
 
         } catch (IOException e) {
             e.printStackTrace();

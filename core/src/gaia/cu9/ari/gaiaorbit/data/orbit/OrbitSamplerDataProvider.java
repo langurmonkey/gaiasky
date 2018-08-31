@@ -15,14 +15,12 @@ import gaia.cu9.ari.gaiaorbit.assets.OrbitDataLoader.OrbitDataLoaderParameter;
 import gaia.cu9.ari.gaiaorbit.desktop.format.DesktopDateFormatFactory;
 import gaia.cu9.ari.gaiaorbit.desktop.format.DesktopNumberFormatFactory;
 import gaia.cu9.ari.gaiaorbit.desktop.util.DesktopConfInit;
-import gaia.cu9.ari.gaiaorbit.desktop.util.DesktopSysUtilsFactory;
 import gaia.cu9.ari.gaiaorbit.event.EventManager;
 import gaia.cu9.ari.gaiaorbit.event.Events;
 import gaia.cu9.ari.gaiaorbit.event.IObserver;
 import gaia.cu9.ari.gaiaorbit.util.ConfInit;
 import gaia.cu9.ari.gaiaorbit.util.I18n;
 import gaia.cu9.ari.gaiaorbit.util.Logger;
-import gaia.cu9.ari.gaiaorbit.util.SysUtilsFactory;
 import gaia.cu9.ari.gaiaorbit.util.coord.AstroUtils;
 import gaia.cu9.ari.gaiaorbit.util.coord.Coordinates;
 import gaia.cu9.ari.gaiaorbit.util.format.DateFormatFactory;
@@ -36,7 +34,7 @@ import gaia.cu9.ari.gaiaorbit.util.math.Vector3d;
  * @author Toni Sagrista
  *
  */
-public class OrbitSamplerDataProvider implements IOrbitDataProvider, IObserver {
+public class OrbitSamplerDataProvider implements IOrbitDataProvider {
     private static boolean writeData = false;
     private static final String writeDataPath = "/tmp/";
     PolylineData data;
@@ -47,9 +45,6 @@ public class OrbitSamplerDataProvider implements IOrbitDataProvider, IObserver {
             String ASSETS_LOC = (System.getProperty("assets.location") != null ? System.getProperty("assets.location") : "");
 
             Gdx.files = new Lwjgl3Files();
-
-            // Sys utils
-            SysUtilsFactory.initialize(new DesktopSysUtilsFactory());
 
             // Initialize number format
             NumberFormatFactory.initialize(new DesktopNumberFormatFactory());
@@ -66,7 +61,6 @@ public class OrbitSamplerDataProvider implements IOrbitDataProvider, IObserver {
 
             OrbitSamplerDataProvider.writeData = true;
             OrbitSamplerDataProvider me = new OrbitSamplerDataProvider();
-            EventManager.instance.subscribe(me, Events.JAVA_EXCEPTION, Events.POST_NOTIFICATION);
 
             Date now = new Date();
             String[] bodies = new String[] { "Mercury", "Venus", "Earth", "Mars", "Jupiter", "Saturn", "Uranus", "Neptune", "Moon", "Pluto" };
@@ -141,11 +135,11 @@ public class OrbitSamplerDataProvider implements IOrbitDataProvider, IObserver {
             try {
                 OrbitDataWriter.writeOrbitData(writeDataPath + "orb." + bodyDesc.toString().toUpperCase() + ".dat", data);
             } catch (IOException e) {
-                Logger.error(e);
+                Logger.getLogger(this.getClass()).error(e);
             }
         }
 
-        Logger.info(this.getClass().getSimpleName(), I18n.bundle.format("notif.orbitdataof.loaded", parameter.name, data.getNumPoints()));
+        Logger.getLogger(this.getClass()).info(I18n.bundle.format("notif.orbitdataof.loaded", parameter.name, data.getNumPoints()));
 
     }
 
@@ -156,18 +150,6 @@ public class OrbitSamplerDataProvider implements IOrbitDataProvider, IObserver {
 
     public PolylineData getData() {
         return data;
-    }
-
-    @Override
-    public void notify(Events event, Object... data) {
-        switch (event) {
-        case JAVA_EXCEPTION:
-            System.err.println((Exception) data[0]);
-            break;
-        case POST_NOTIFICATION:
-            System.out.println((String) data[0] + " -" + (String) data[1]);
-        }
-
     }
 
 }
