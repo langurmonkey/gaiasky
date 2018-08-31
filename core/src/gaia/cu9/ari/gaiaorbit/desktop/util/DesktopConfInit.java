@@ -52,7 +52,7 @@ import gaia.cu9.ari.gaiaorbit.util.math.MathUtilsd;
  */
 public class DesktopConfInit extends ConfInit {
     private static final Log logger = Logger.getLogger(DesktopConfInit.class);
-    
+
     CommentedProperties p;
     Properties vp;
 
@@ -159,7 +159,7 @@ public class DesktopConfInit extends ConfInit {
 
         /** DATA CONF **/
         DataConf dc = new DataConf();
-        
+
         String[] CATALOG_LOCATIONS;
         String cloc = p.getProperty("data.catalog.locations");
         if (cloc == null || cloc.isEmpty()) {
@@ -273,7 +273,7 @@ public class DesktopConfInit extends ConfInit {
             }
         }
         float STAR_POINT_SIZE = Float.parseFloat(p.getProperty("scene.star.point.size", "-1"));
-        boolean LAZY_TEXTURE_INIT = false;
+        boolean LAZY_TEXTURE_INIT = true;
         SceneConf sc = new SceneConf();
         sc.initialize(GRAPHICS_QUALITY, OBJECT_FADE_MS, STAR_BRIGHTNESS, AMBIENT_LIGHT, CAMERA_FOV, CAMERA_SPEED, TURNING_SPEED, ROTATION_SPEED, CAMERA_SPEED_LIMIT_IDX, FOCUS_LOCK, FOCUS_LOCK_ORIENTATION, LABEL_SIZE_FACTOR, LABEL_NUMBER_FACTOR, VISIBILITY, ORBIT_RENDERER, LINE_RENDERER, STAR_TH_ANGLE_NONE, STAR_TH_ANGLE_POINT, STAR_TH_ANGLE_QUAD, POINT_ALPHA_MIN, POINT_ALPHA_MAX, OCTREE_PARTICLE_FADE, OCTANT_THRESHOLD_0, OCTANT_THRESHOLD_1, PROPER_MOTION_VECTORS, PM_NUM_FACTOR, PM_LEN_FACTOR, STAR_POINT_SIZE, GALAXY_3D, CUBEMAP_FACE_RESOLUTION, CROSSHAIR, CINEMATIC_CAMERA, LAZY_TEXTURE_INIT, FREE_CAMERA_TARGET_MODE_ON, SHADOW_MAPPING, SHADOW_MAPPING_N_SHADOWS, SHADOW_MAPPING_RESOLUTION, MAX_LOADED_STARS);
 
@@ -546,7 +546,7 @@ public class DesktopConfInit extends ConfInit {
                 destinationFis.close();
         }
     }
-    
+
     private String stringArrayToString(String[] in, String sep) {
         if (in == null || in.length == 0 || sep == null)
             return "";
