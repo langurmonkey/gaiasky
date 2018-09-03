@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.FileFilter;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
+import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
@@ -199,7 +200,7 @@ public class DownloadDataWindow extends GenericDialog {
 
             datasetsTable.add(cb).left().padRight(padl).padBottom(pad);
             datasetsTable.add(descGroup).left().padRight(padl).padBottom(pad);
-            datasetsTable.add(type).left().padRight(padl * 2).padBottom(pad);
+            datasetsTable.add(type).left().padRight(padl).padBottom(pad);
             datasetsTable.add(size).left().padRight(padl).padBottom(pad);
             datasetsTable.add(haveit).center().padBottom(pad);
 
@@ -217,6 +218,7 @@ public class DownloadDataWindow extends GenericDialog {
         datasetsScroll.setSmoothScrolling(true);
         datasetsScroll.setFadeScrollBars(false);
         datasetsScroll.setHeight(Math.min(Gdx.graphics.getHeight() * 0.38f, 350 * GlobalConf.SCALE_FACTOR));
+        datasetsScroll.setWidth(550 * GlobalConf.SCALE_FACTOR);
 
         downloadTable.add(datasetsScroll).center().padBottom(padl).colspan(2).row();
 
@@ -308,7 +310,7 @@ public class DownloadDataWindow extends GenericDialog {
             String url = currentJson.getString("file");
             String type = currentJson.getString("type");
 
-            FileHandle downloadedFile = Gdx.files.absolute(GlobalConf.data.DATA_LOCATION + "/temp.tar.gz");
+            FileHandle tempDownload = Gdx.files.absolute(GlobalConf.data.DATA_LOCATION + "/temp.tar.gz");
 
             ProgressRunnable pr = (progress) -> {
                 final String progressString = progress >= 100 ? txt("gui.done") : txt("gui.download.downloading", nf.format(progress));
@@ -325,7 +327,7 @@ public class DownloadDataWindow extends GenericDialog {
             ChecksumRunnable finish = (md5sum) -> {
                 // Unpack
                 int errors = 0;
-                logger.info("Extracting: " + downloadedFile.path());
+                logger.info("Extracting: " + tempDownload.path());
                 String dataLocation = GlobalConf.data.DATA_LOCATION + File.separatorChar;
                 // Checksum
                 if (currentJson.has("md5")) {
@@ -348,9 +350,9 @@ public class DownloadDataWindow extends GenericDialog {
 
                 if (errors == 0)
                     try {
-                        decompress(downloadedFile.path(), new File(dataLocation), downloadButton);
+                        decompress(tempDownload.path(), new File(dataLocation), downloadButton);
                         // Remove archive
-                        downloadedFile.file().delete();
+                        cleanupTempFiles();
                     } catch (Exception e) {
                         logger.error(e, "Error decompressing: " + name);
                         errors++;
@@ -388,7 +390,7 @@ public class DownloadDataWindow extends GenericDialog {
             // Download
             me.acceptButton.setDisabled(true);
             currentDownloadFile.setText("Current dataset: " + currentJson.getString("name"));
-            DownloadHelper.downloadFile(url, downloadedFile, pr, finish, null, null);
+            DownloadHelper.downloadFile(url, tempDownload, pr, finish, null, null);
         } else {
             // Finished all downloads!
         }
@@ -428,14 +430,27 @@ public class DownloadDataWindow extends GenericDialog {
         return fileSize;
     }
 
+    private void cleanupTempFiles() {
+        Path tempDownload = Paths.get(GlobalConf.data.DATA_LOCATION, "temp.tar.gz");
+        if (Files.exists(tempDownload)) {
+            try {
+                Files.delete(tempDownload);
+            } catch (IOException e) {
+                logger.error(e, "Failed cleaning up file: " + tempDownload.toString());
+            }
+        }
+    }
+
     @Override
     protected void accept() {
         // No change to execute exit event, manually restore cursor to default
         Gdx.graphics.setSystemCursor(SystemCursor.Arrow);
+        cleanupTempFiles();
     }
 
     @Override
     protected void cancel() {
+        cleanupTempFiles();
         Gdx.app.exit();
     }
 
