@@ -503,20 +503,16 @@ public class GlobalConf {
         }
 
         public String dataFile(String path) {
-             if (Paths.get(path).isAbsolute()) {
-                 // Absolute path, just leave it
+            if (Paths.get(path).isAbsolute()) {
+                // Absolute path, just leave it
                 return path;
             } else {
                 // Relative path, just remove leading 'data/' and prepend data location
                 if (path.startsWith("data/")) {
                     path = path.substring(5);
-                } 
-                Path p = Paths.get(DATA_LOCATION, path);
-                if(Files.exists(p)) {
-                    return p.toString();
-                }else {
-                    return path;
                 }
+                Path p = Paths.get(DATA_LOCATION, path);
+                return p.toString();
             }
         }
 

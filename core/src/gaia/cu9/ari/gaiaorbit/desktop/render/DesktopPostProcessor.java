@@ -131,7 +131,7 @@ public class DesktopPostProcessor implements IPostProcessor, IObserver {
             lglowNSamples = 8;
             lgw = 1000;
             lgh = Math.round(lgw / ar);
-            glow = manager.get(GlobalConf.data.dataFile("tex/star_glow.png"));
+            glow = manager.get(GlobalConf.data.dataFile("tex/star_glow_s.png"));
             Glow.N = 20;
         } else {
             lglowNSamples = 4;
