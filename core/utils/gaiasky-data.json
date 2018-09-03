@@ -17,6 +17,7 @@
             "type" : "catalog-lod",
             "size" : 804873253,
             "check": "catalog-dr2-default.json",
+            "md5"  : "fdf635fda844bf812ea9559c38ce783b",
             "description": "Default DR2 catalog - 20%/0.5% parallax relative errors for bright/faint stars - 7.5 million stars",
             "file" : "http://gaia.ari.uni-heidelberg.de/gaiasky/files/autodownload/catalog-dr2-default.tar.gz"
         },

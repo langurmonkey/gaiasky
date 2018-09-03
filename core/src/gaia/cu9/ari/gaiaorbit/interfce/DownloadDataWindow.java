@@ -211,7 +211,12 @@ public class DownloadDataWindow extends GenericDialog {
 
         }
 
-        OwnScrollPane datasetsScroll = new OwnScrollPane(datasetsTable);
+        OwnScrollPane datasetsScroll = new OwnScrollPane(datasetsTable, skin, "minimalist-nobg");
+        datasetsScroll.setScrollingDisabled(true, false);
+        datasetsScroll.setForceScroll(false, false);
+        datasetsScroll.setSmoothScrolling(true);
+        datasetsScroll.setFadeScrollBars(false);
+        datasetsScroll.setHeight(Math.min(Gdx.graphics.getHeight() * 0.38f, 350 * GlobalConf.SCALE_FACTOR));
 
         downloadTable.add(datasetsScroll).center().padBottom(padl).colspan(2).row();
 
@@ -325,17 +330,16 @@ public class DownloadDataWindow extends GenericDialog {
                 // Checksum
                 if (currentJson.has("md5")) {
                     String serverMd5 = currentJson.getString("md5");
-                    logger.info("Checking md5 checksum : " + name);
                     try {
                         boolean ok = serverMd5.equals(md5sum);
                         if (ok) {
-                            logger.info("Checksum ok: " + name);
+                            logger.info("MD5 checksum ok: " + name);
                         } else {
-                            logger.error("Checkum failed: " + name);
+                            logger.error("MD5 checkum failed: " + name);
                             errors++;
                         }
                     } catch (Exception e) {
-                        logger.info("Error checking md5: " + name);
+                        logger.info("Error checking MD5: " + name);
                         errors++;
                     }
                 } else {
@@ -387,7 +391,6 @@ public class DownloadDataWindow extends GenericDialog {
             DownloadHelper.downloadFile(url, downloadedFile, pr, finish, null, null);
         } else {
             // Finished all downloads!
-            // Wait for user to click OK
         }
 
     }
