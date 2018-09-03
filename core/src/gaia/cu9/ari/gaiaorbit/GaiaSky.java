@@ -110,9 +110,6 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
      */
     private static boolean LOADING = false;
 
-    /** Config object **/
-    private LwjglApplicationConfiguration cfg;
-
     /** Attitude folder **/
     private static String ATTITUDE_FOLDER = "data/attitudexml/";
 
@@ -185,6 +182,16 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
     private boolean camRecording = false;
 
     private boolean initialized = false;
+    
+    /**
+     * Forces the dataset download window
+     */
+    private boolean dsdownload;
+    
+    /**
+     * Forces the catalog chooser window
+     */
+    private boolean catchooser;
 
     /**
      * Save state on exit
@@ -198,15 +205,27 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
     public Map<String, Runnable> runnablesMap;
 
     /**
-     * Creates a GaiaSky instance.
+     * Creates an instance of Gaia Sky.
      */
-    public GaiaSky(LwjglApplicationConfiguration cfg) {
+    public GaiaSky() {
+        this(false, false);
+    }
+    
+    /**
+     * Creates an instance of Gaia Sky.
+     * @param dsdownload Force-show the datasets download window
+     * @param catchooser Force-show the catalog chooser window
+     */
+    public GaiaSky(boolean dsdownload, boolean catchooser) {
         super();
         instance = this;
-        this.cfg = cfg;
         this.runnables = new Array<Runnable>();
         this.runnablesMap = new HashMap<String, Runnable>();
+        this.dsdownload = dsdownload;
+        this.catchooser = catchooser;
     }
+    
+    
 
     public void setSceneGraph(ISceneGraph sg) {
         this.sg = sg;
@@ -306,7 +325,7 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
 
         EventManager.instance.subscribe(this, Events.LOAD_DATA_CMD);
 
-        initialGui = new InitialGui();
+        initialGui = new InitialGui(dsdownload, catchooser);
         initialGui.initialize(manager);
         Gdx.input.setInputProcessor(initialGui.getGuiStage());
 
@@ -809,10 +828,6 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
             }
         }
         return out;
-    }
-
-    public LwjglApplicationConfiguration getConfig() {
-        return this.cfg;
     }
 
     @Override

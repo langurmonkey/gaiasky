@@ -80,6 +80,7 @@ public class GaiaSkyDesktop implements IObserver {
     private static Class<?> REST_SERVER_CLASS = null;
 
     private MemInfoWindow memInfoWindow;
+    private static GaiaSkyArgs gsargs;
 
     /**
     	 * Program arguments
@@ -93,10 +94,16 @@ public class GaiaSkyDesktop implements IObserver {
 
         @Parameter(names = { "-v", "--version" }, description = "Lists version and build inforamtion")
         private boolean version = false;
+        
+        @Parameter(names = { "-d", "--ds-download" }, description = "Displays the download dialog at startup")
+        private boolean download = false;
+        
+        @Parameter(names = { "-c", "--cat-chooser" }, description = "Displays the catalog chooser dialog at startup")
+        private boolean catalogchooser = false;
     }
 
     public static void main(String[] args) {
-        GaiaSkyArgs gsargs = new GaiaSkyArgs();
+        gsargs = new GaiaSkyArgs();
         try {
             JCommander jc = new JCommander(gsargs, args);
             jc.setProgramName("gaiasky");
@@ -249,7 +256,7 @@ public class GaiaSkyDesktop implements IObserver {
         cfg.addIcon("icon/ic_launcher.png", Files.FileType.Internal);
 
         // Launch app
-        LwjglApplication app = new LwjglApplication(new GaiaSky(cfg), cfg);
+        LwjglApplication app = new LwjglApplication(new GaiaSky(gsargs.download, gsargs.catalogchooser), cfg);
         app.addLifecycleListener(new GaiaSkyWindowListener());
 
         if (lw != null)

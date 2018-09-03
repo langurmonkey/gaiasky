@@ -1,6 +1,13 @@
 package gaia.cu9.ari.gaiaorbit.util;
 
+import java.io.FileInputStream;
 import java.io.FilenameFilter;
+import java.io.IOException;
+import java.nio.ByteBuffer;
+import java.nio.channels.FileChannel;
+import java.nio.file.Path;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -25,6 +32,7 @@ import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.ScreenUtils;
 
 import gaia.cu9.ari.gaiaorbit.scenegraph.camera.ICamera;
+import gaia.cu9.ari.gaiaorbit.util.Logger.Log;
 import gaia.cu9.ari.gaiaorbit.util.math.MathUtilsd;
 import gaia.cu9.ari.gaiaorbit.util.math.Vector3d;
 import net.jafama.FastMath;
@@ -36,6 +44,7 @@ import net.jafama.FastMath;
  *
  */
 public class GlobalResources {
+    private static final Log logger = Logger.getLogger(GlobalResources.class);
 
     public static ShaderProgram spriteShader;
     /** Global all-purpose sprite batch **/
@@ -481,4 +490,55 @@ public class GlobalResources {
         return pos;
     }
 
+    /**
+     * Converts bytes to a human readable format
+     * @param bytes The bytes
+     * @param si Whether to use SI units or binary
+     * @return The size in a human readable form
+     */
+    public static String humanReadableByteCount(long bytes, boolean si) {
+        int unit = si ? 1000 : 1024;
+        if (bytes < unit)
+            return bytes + " B";
+        int exp = (int) (Math.log(bytes) / Math.log(unit));
+        String pre = (si ? "kMGTPE" : "KMGTPE").charAt(exp - 1) + (si ? "" : "i");
+        return String.format("%.1f %sB", bytes / Math.pow(unit, exp), pre);
+    }
+
+    public static boolean checkFileMD5(String md5, FileHandle file) throws NoSuchAlgorithmException, IOException {
+        String myChecksum = generateMD5(new FileInputStream(file.file()));
+        return myChecksum.equals(md5);
+    }
+
+    private static String generateMD5(FileInputStream inputStream) {
+        if (inputStream == null) {
+            return null;
+        }
+        MessageDigest md;
+        try {
+            md = MessageDigest.getInstance("MD5");
+            FileChannel channel = inputStream.getChannel();
+            ByteBuffer buff = ByteBuffer.allocate(2048);
+            while (channel.read(buff) != -1) {
+                buff.flip();
+                md.update(buff);
+                buff.clear();
+            }
+            byte[] hashValue = md.digest();
+            return new String(hashValue);
+        } catch (NoSuchAlgorithmException e) {
+            logger.error(e);
+            return null;
+        } catch (IOException e) {
+            logger.error(e);
+            return null;
+        } finally {
+            try {
+                if (inputStream != null)
+                    inputStream.close();
+            } catch (IOException e) {
+                logger.error(e);
+            }
+        }
+    }
 }

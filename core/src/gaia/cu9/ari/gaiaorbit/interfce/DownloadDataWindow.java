@@ -10,8 +10,10 @@ import java.nio.ByteOrder;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 
 import org.python.apache.commons.compress.archivers.tar.TarArchiveEntry;
 import org.python.apache.commons.compress.archivers.tar.TarArchiveInputStream;
@@ -35,11 +37,12 @@ import com.badlogic.gdx.utils.JsonReader;
 import com.badlogic.gdx.utils.JsonValue;
 
 import gaia.cu9.ari.gaiaorbit.desktop.util.SysUtils;
+import gaia.cu9.ari.gaiaorbit.util.ChecksumRunnable;
 import gaia.cu9.ari.gaiaorbit.util.DownloadHelper;
 import gaia.cu9.ari.gaiaorbit.util.GlobalConf;
+import gaia.cu9.ari.gaiaorbit.util.GlobalResources;
 import gaia.cu9.ari.gaiaorbit.util.Logger;
 import gaia.cu9.ari.gaiaorbit.util.Logger.Log;
-import gaia.cu9.ari.gaiaorbit.util.Pair;
 import gaia.cu9.ari.gaiaorbit.util.ProgressRunnable;
 import gaia.cu9.ari.gaiaorbit.util.Trio;
 import gaia.cu9.ari.gaiaorbit.util.format.INumberFormat;
@@ -49,11 +52,29 @@ import gaia.cu9.ari.gaiaorbit.util.scene2d.FileChooser.ResultListener;
 import gaia.cu9.ari.gaiaorbit.util.scene2d.OwnCheckBox;
 import gaia.cu9.ari.gaiaorbit.util.scene2d.OwnImageButton;
 import gaia.cu9.ari.gaiaorbit.util.scene2d.OwnLabel;
+import gaia.cu9.ari.gaiaorbit.util.scene2d.OwnScrollPane;
 import gaia.cu9.ari.gaiaorbit.util.scene2d.OwnTextButton;
 import gaia.cu9.ari.gaiaorbit.util.scene2d.OwnTextTooltip;
 
 public class DownloadDataWindow extends GenericDialog {
     private static final Log logger = Logger.getLogger(DownloadDataWindow.class);
+
+    private static final Map<String, String> iconMap;
+    static {
+        iconMap = new HashMap<String, String>();
+        iconMap.put("other", "icon-elem-others");
+        iconMap.put("data-pack", "icon-elem-others");
+        iconMap.put("catalog-lod", "icon-elem-stars");
+        iconMap.put("catalog", "icon-elem-stars");
+        iconMap.put("mesh", "icon-elem-meshes");
+        iconMap.put("texture-pack", "icon-elem-moons");
+    }
+
+    private static String getIcon(String type) {
+        if (type != null && iconMap.containsKey(type))
+            return iconMap.get(type);
+        return "icon-elements-other";
+    }
 
     private OwnTextButton downloadButton;
     private OwnLabel currentDownloadFile;
@@ -79,7 +100,8 @@ public class DownloadDataWindow extends GenericDialog {
 
     @Override
     protected void build() {
-        float pad = 5 * GlobalConf.SCALE_FACTOR;
+        float pad = 2 * GlobalConf.SCALE_FACTOR;
+        float padl = 9 * GlobalConf.SCALE_FACTOR;
 
         float buttonpad = 1 * GlobalConf.SCALE_FACTOR;
 
@@ -98,26 +120,27 @@ public class DownloadDataWindow extends GenericDialog {
         hg.addActor(system);
         hg.addActor(downloadInfo);
 
-        downloadTable.add(hg).left().colspan(2).padBottom(pad).row();
-        downloadTable.add(catalogsLocLabel).left().padBottom(pad);
+        downloadTable.add(hg).left().colspan(2).padBottom(padl).row();
+        downloadTable.add(catalogsLocLabel).left().padBottom(padl);
 
         SysUtils.getDefaultDataDir().mkdirs();
         String catLoc = GlobalConf.data.DATA_LOCATION;
         OwnTextButton catalogsLoc = new OwnTextButton(catLoc, skin);
         catalogsLoc.pad(buttonpad * 4);
         catalogsLoc.setMinWidth(GlobalConf.SCALE_FACTOR == 1 ? 450 : 650);
-        downloadTable.add(catalogsLoc).left().padLeft(pad).padBottom(pad).row();
-        Cell<Actor> notice = downloadTable.add((Actor) null).colspan(2).padBottom(pad);
+        downloadTable.add(catalogsLoc).left().padLeft(pad).padBottom(padl).row();
+        Cell<Actor> notice = downloadTable.add((Actor) null).colspan(2).padBottom(padl);
         notice.row();
 
         // Parse available files
         JsonValue dataDesc = reader.parse(Gdx.files.absolute(catLoc + "/gaiasky-data.json"));
 
         Table datasetsTable = new Table(skin);
-        datasetsTable.add(new OwnLabel("To download", skin, "header")).left().padRight(pad).padBottom(pad);
-        datasetsTable.add(new OwnLabel("Description", skin, "header")).left().padRight(pad).padBottom(pad);
-        datasetsTable.add(new OwnLabel("Type", skin, "header")).left().padRight(pad).padBottom(pad);
-        datasetsTable.add(new OwnLabel("Have", skin, "header")).center().padRight(pad).padBottom(pad).row();
+        datasetsTable.add(new OwnLabel("To download", skin, "header")).left().padRight(padl).padBottom(pad);
+        datasetsTable.add(new OwnLabel("Description", skin, "header")).left().padRight(padl).padBottom(pad);
+        datasetsTable.add(new OwnLabel("Type", skin, "header")).left().padRight(padl).padBottom(pad);
+        datasetsTable.add(new OwnLabel("Size", skin, "header")).left().padRight(padl).padBottom(pad);
+        datasetsTable.add(new OwnLabel("Status", skin, "header")).center().padRight(padl).padBottom(pad).row();
 
         JsonValue dataset = dataDesc.child().child();
         while (dataset != null) {
@@ -131,12 +154,13 @@ public class DownloadDataWindow extends GenericDialog {
             boolean baseData = name.equals("default-data");
             boolean defaultDataset = name.contains("default");
             cb.setChecked(!exists && (baseData || defaultDataset));
-            cb.setDisabled(baseData);
-            OwnLabel haveit = new OwnLabel(exists ? "V" : "X", skin);
-            if (exists)
+            cb.setDisabled(baseData || exists);
+            OwnLabel haveit = new OwnLabel(exists ? "Found" : "Not found", skin);
+            if (exists) {
                 haveit.setColor(0, 1, 0, 1);
-            else
+            } else {
                 haveit.setColor(1, 0, 0, 1);
+            }
 
             // Can't proceed without base data - force download
             if (baseData && !exists) {
@@ -146,7 +170,7 @@ public class DownloadDataWindow extends GenericDialog {
             String description = dataset.getString("description");
             String shortDescription;
             HorizontalGroup descGroup = new HorizontalGroup();
-            descGroup.space(pad);
+            descGroup.space(padl);
             if (description.contains("-")) {
                 shortDescription = description.substring(0, description.indexOf("-"));
             } else {
@@ -159,9 +183,24 @@ public class DownloadDataWindow extends GenericDialog {
             descGroup.addActor(imgTooltip);
             descGroup.addActor(desc);
 
-            datasetsTable.add(cb).left().padRight(pad).padBottom(pad);
-            datasetsTable.add(descGroup).left().padRight(pad).padBottom(pad);
-            datasetsTable.add(new OwnLabel(dataset.getString("type"), skin)).left().padRight(pad).padBottom(pad);
+            // Type icon
+            String typeimg = getIcon(dataset.getString("type"));
+            Image type = new Image(skin.getDrawable(typeimg));
+            type.addListener(new OwnTextTooltip(dataset.getString("type"), skin, 10));
+
+            // Size
+            String size = "";
+            try {
+                long bytes = dataset.getLong("size");
+                size = GlobalResources.humanReadableByteCount(bytes, true);
+            } catch (IllegalArgumentException e) {
+                size = "?";
+            }
+
+            datasetsTable.add(cb).left().padRight(padl).padBottom(pad);
+            datasetsTable.add(descGroup).left().padRight(padl).padBottom(pad);
+            datasetsTable.add(type).left().padRight(padl * 2).padBottom(pad);
+            datasetsTable.add(size).left().padRight(padl).padBottom(pad);
             datasetsTable.add(haveit).center().padBottom(pad);
 
             datasetsTable.row();
@@ -172,13 +211,15 @@ public class DownloadDataWindow extends GenericDialog {
 
         }
 
-        downloadTable.add(datasetsTable).center().padBottom(pad * 2).colspan(2).row();
+        OwnScrollPane datasetsScroll = new OwnScrollPane(datasetsTable);
+
+        downloadTable.add(datasetsScroll).center().padBottom(padl).colspan(2).row();
 
         downloadButton = new OwnTextButton(txt("gui.download.download").toUpperCase(), skin, "download");
         downloadButton.pad(buttonpad * 4);
         downloadButton.setMinWidth(catalogsLoc.getWidth());
         downloadButton.setMinHeight(50 * GlobalConf.SCALE_FACTOR);
-        downloadTable.add(downloadButton).center().colspan(2).padBottom(pad).row();
+        downloadTable.add(downloadButton).center().colspan(2).padBottom(padl).row();
 
         downloadButton.addListener((event) -> {
             if (event instanceof ChangeEvent) {
@@ -250,10 +291,15 @@ public class DownloadDataWindow extends GenericDialog {
 
     private void downloadNext() {
         current++;
+        downloadCurrent();
+    }
+
+    private void downloadCurrent() {
         if (current >= 0 && current < toDownload.size) {
             // Download next
             Trio<JsonValue, OwnCheckBox, OwnLabel> trio = toDownload.get(current);
             JsonValue currentJson = trio.getFirst();
+            String name = currentJson.getString("name");
             String url = currentJson.getString("file");
             String type = currentJson.getString("type");
 
@@ -271,40 +317,68 @@ public class DownloadDataWindow extends GenericDialog {
                 });
             };
 
-            Runnable finish = () -> {
+            ChecksumRunnable finish = (md5sum) -> {
                 // Unpack
+                int errors = 0;
                 logger.info("Extracting: " + downloadedFile.path());
                 String dataLocation = GlobalConf.data.DATA_LOCATION + File.separatorChar;
-                try {
-                    decompress(downloadedFile.path(), new File(dataLocation), downloadButton);
-                } catch (Exception e) {
-                    logger.error(e, "Error decompressing: " + downloadedFile.path());
+                // Checksum
+                if (currentJson.has("md5")) {
+                    String serverMd5 = currentJson.getString("md5");
+                    logger.info("Checking md5 checksum : " + name);
+                    try {
+                        boolean ok = serverMd5.equals(md5sum);
+                        if (ok) {
+                            logger.info("Checksum ok: " + name);
+                        } else {
+                            logger.error("Checkum failed: " + name);
+                            errors++;
+                        }
+                    } catch (Exception e) {
+                        logger.info("Error checking md5: " + name);
+                        errors++;
+                    }
+                } else {
+                    logger.info("No checksum found for dataset: " + name);
                 }
 
-                // Remove archive
-                downloadedFile.file().delete();
+                if (errors == 0)
+                    try {
+                        decompress(downloadedFile.path(), new File(dataLocation), downloadButton);
+                        // Remove archive
+                        downloadedFile.file().delete();
+                    } catch (Exception e) {
+                        logger.error(e, "Error decompressing: " + name);
+                        errors++;
+                    }
 
-                // Done
-                Gdx.app.postRunnable(() -> {
-                    downloadButton.setText(txt("gui.done"));
-                });
+                if (errors == 0) {
+                    // Done
+                    Gdx.app.postRunnable(() -> {
+                        downloadButton.setText(txt("gui.done"));
+                    });
 
-                // Select dataset if needed
-                if (type.startsWith("catalog-")) {
-                    // Descriptor file
-                    FileHandle descFile = Gdx.files.absolute(GlobalConf.data.DATA_LOCATION + File.separator + currentJson.getString("check"));
-                    GlobalConf.data.CATALOG_JSON_FILES = descFile.path();
+                    // Select dataset if needed
+                    if (type.startsWith("catalog-")) {
+                        // Descriptor file
+                        FileHandle descFile = Gdx.files.absolute(GlobalConf.data.DATA_LOCATION + File.separator + currentJson.getString("check"));
+                        GlobalConf.data.CATALOG_JSON_FILES = descFile.path();
+                    }
+
+                    me.acceptButton.setDisabled(false);
+                    currentDownloadFile.setText("");
+
+                    trio.getThird().setText("Found");
+                    trio.getThird().setColor(0, 1, 0, 1);
+
+                    Gdx.app.postRunnable(() -> {
+                        downloadNext();
+                    });
+                } else {
+                    logger.info("Error getting dataset: " + name);
+                    trio.getThird().setText("Failed");
+                    trio.getThird().setColor(1, 1, 0, 1);
                 }
-
-                me.acceptButton.setDisabled(false);
-                currentDownloadFile.setText("");
-
-                trio.getThird().setText("V");
-                trio.getThird().setColor(0, 1, 0, 1);
-
-                Gdx.app.postRunnable(() -> {
-                    downloadNext();
-                });
             };
 
             // Download
@@ -315,6 +389,7 @@ public class DownloadDataWindow extends GenericDialog {
             // Finished all downloads!
             // Wait for user to click OK
         }
+
     }
 
     private void decompress(String in, File out, OwnTextButton b) throws Exception {

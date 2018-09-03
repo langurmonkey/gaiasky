@@ -28,13 +28,22 @@ import gaia.cu9.ari.gaiaorbit.util.Logger.Log;
 public class InitialGui extends AbstractGui {
     private static final Log logger = Logger.getLogger(InitialGui.class);
 
+    private boolean dsdownload, catchooser;
+    
     protected DownloadDataWindow ddw;
     protected ChooseCatalogWindow cdw;
 
     /** Lock object for synchronisation **/
 
-    public InitialGui() {
+    /**
+     * Creates an initial GUI
+     * @param dsdownload Forces dataset download window
+     * @param catchooser Forces catalog chooser window
+     */
+    public InitialGui(boolean dsdownload, boolean catchooser) {
         lock = new Object();
+        this.catchooser = catchooser;
+        this.dsdownload = dsdownload;
     }
 
     @Override
@@ -51,9 +60,9 @@ public class InitialGui extends AbstractGui {
 
         DownloadHelper.downloadFile(GlobalConf.program.DATA_DESCRIPTOR_URL, Gdx.files.absolute(GlobalConf.data.DATA_LOCATION + "/gaiasky-data.json"), 
                 null, 
-                () -> {
+                (md5sum) -> {
                     Gdx.app.postRunnable(() -> {
-                        if (!basicDataPresent() || catalogFiles.size == 0) {
+                        if (dsdownload || !basicDataPresent() || catalogFiles.size == 0) {
                             // No catalog files, display downloader
                             addDownloaderWindow();
                         } else {
@@ -68,7 +77,7 @@ public class InitialGui extends AbstractGui {
 
     private void displayChooser() {
         clearGui();
-        if (GlobalConf.program.DISPLAY_DATASET_DIALOG) {
+        if (catchooser || GlobalConf.program.DISPLAY_DATASET_DIALOG) {
             addDatasetChooser();
         } else {
             // Event

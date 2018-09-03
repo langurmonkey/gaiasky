@@ -2,6 +2,8 @@ package gaia.cu9.ari.gaiaorbit.util;
 
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.security.DigestInputStream;
+import java.security.MessageDigest;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Net.HttpMethods;
@@ -25,7 +27,7 @@ public class DownloadHelper {
      * progress {@link ProgressRunnable} while downloading, and running the finish {@link java.lang.Runnable}
      * when finished.
      */
-    public static void downloadFile(String url, FileHandle to, ProgressRunnable progress, Runnable finish, Runnable fail, Runnable cancel) {
+    public static void downloadFile(String url, FileHandle to, ProgressRunnable progress, ChecksumRunnable finish, Runnable fail, Runnable cancel) {
 
         // Make a GET request to get data descriptor
         HttpRequest request = new HttpRequest(HttpMethods.GET);
@@ -48,8 +50,10 @@ public class DownloadHelper {
                 long read = 0;
                 try {
                     logger.info("Downloading: " + GlobalConf.program.DATA_DESCRIPTOR_URL);
+                MessageDigest md = MessageDigest.getInstance("MD5");
+                DigestInputStream dis = new DigestInputStream(is, md);
                     // Keep reading bytes and storing them until there are no more.
-                    while ((count = is.read(bytes, 0, bytes.length)) != -1) {
+                    while ((count = dis.read(bytes, 0, bytes.length)) != -1) {
                         os.write(bytes, 0, count);
                         read += count;
 
@@ -65,8 +69,20 @@ public class DownloadHelper {
                     logger.info(txt("gui.download.finished", to.path()));
 
                     // Run finish runnable
-                    if (finish != null)
-                        finish.run();
+                    if (finish != null) {
+                        byte[] digest = md.digest();
+                        StringBuffer md5 = new StringBuffer();
+                        for (int i = 0; i < digest.length; i++) {
+                            if ((0xff & digest[i]) < 0x10) {
+                                md5.append("0"
+                                        + Integer.toHexString((0xFF & digest[i])));
+                            } else {
+                                md5.append(Integer.toHexString(0xFF & digest[i]));
+                            }
+                        }
+                        String md5sum = md5.toString();
+                        finish.run(md5sum);
+                    }
                 } catch (Exception e) {
                     logger.error(e);
                     if (fail != null)
