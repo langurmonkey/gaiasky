@@ -158,7 +158,7 @@ public class Constants {
     /** Minimum angle where the LOD transitions start **/
     public static final float MIN_LOD_TRANS_ANGLE_DEG = 0f;
     /** Maximum angle where the LOD transitions end **/
-    public static final float MAX_LOD_TRANS_ANGLE_DEG = 93f;
+    public static final float MAX_LOD_TRANS_ANGLE_DEG = 120f;
 
     /** Minimum star pixel size **/
     public static final float MIN_STAR_POINT_SIZE = 0.5f;
