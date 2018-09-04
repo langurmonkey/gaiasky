@@ -70,5 +70,48 @@
             "file" : "http://gaia.ari.uni-heidelberg.de/gaiasky/files/autodownload/catalog-dr2-extralarge.tar.gz"
         },
 
+
+        {
+            "name" : "mesh-dr2-hot-very",
+            "type" : "mesh",
+            "size" : 15711473,
+            "check": "autoload-meshes-dr2-hot-very.json",
+            "description": "Very ionizing star map - Isosurfaces of very ionizing hot OB stars",
+            "file" : "http://gaia.ari.uni-heidelberg.de/gaiasky/files/autodownload/meshes-dr2-hot-very.tar.gz"
+        },
+        {
+            "name" : "mesh-dr2-hot-some",
+            "type" : "mesh",
+            "size" : 15849733,
+            "check": "autoload-meshes-dr2-hot-some.json",
+            "description": "Some ionizing star map - Isosurfaces of somewhat ionizing hot OB stars",
+            "file" : "http://gaia.ari.uni-heidelberg.de/gaiasky/files/autodownload/meshes-dr2-hot-some.tar.gz"
+        },
+        {
+            "name" : "mesh-dr2-hot-non",
+            "type" : "mesh",
+            "size" : 18570118,
+            "check": "autoload-meshes-dr2-hot-none.json",
+            "description": "Non-ionizing star map - Isosurfaces of non-ionizing hot OB stars (x <= 50)",
+            "file" : "http://gaia.ari.uni-heidelberg.de/gaiasky/files/autodownload/meshes-dr2-hot-non.tar.gz"
+        },
+        {
+            "name" : "mesh-dr2-hot-non-medium",
+            "type" : "mesh",
+            "size" : 33856669,
+            "check": "autoload-meshes-dr2-hot-none-medium.json",
+            "description": "Non-ionizing star map - Isosurfaces of very ionizing hot OB stars (25 < x <= 50)",
+            "file" : "http://gaia.ari.uni-heidelberg.de/gaiasky/files/autodownload/meshes-dr2-hot-non-medium.tar.gz"
+        },
+        
+        
+        {
+            "name" : "hi-res-textures",
+            "type" : "texture-pack",
+            "size" : 52583247,
+            "check": "tex/earth-day-high.jpg",
+            "description": "High resolution textures - High resolution texture pack including some 4K and 8K textures for planet surfaces and asteroids.",
+            "file" : "http://gaia.ari.uni-heidelberg.de/gaiasky/files/autodownload/hi-res-texture-pack.tar.gz"
+        }
     ]
 }
