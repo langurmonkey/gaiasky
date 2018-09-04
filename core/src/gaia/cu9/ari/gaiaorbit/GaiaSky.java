@@ -307,11 +307,9 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
 
         // GUI
         guis = new ArrayList<IGui>(3);
-        reinitialiseGUI1();
 
         // Post-processor
         pp = PostProcessorFactory.instance.getPostProcessor();
-        pp.initialize(manager);
 
         // Scene graph renderer
         sgr = new SceneGraphRenderer();
@@ -834,9 +832,14 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
     public void notify(Events event, Object... data) {
         switch (event) {
         case LOAD_DATA_CMD:
+            // Init components that need assets in data folder
+            reinitialiseGUI1();
+            pp.initialize(manager);
+            
             // Initialise loading screen
             loadingGui = new LoadingGui();
             loadingGui.initialize(manager);
+            
             Gdx.input.setInputProcessor(loadingGui.getGuiStage());
             INITGUI = false;
             LOADING = true;
