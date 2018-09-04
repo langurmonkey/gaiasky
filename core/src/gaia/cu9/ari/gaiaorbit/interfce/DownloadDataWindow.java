@@ -141,11 +141,11 @@ public class DownloadDataWindow extends GenericDialog {
         JsonValue dataDesc = reader.parse(Gdx.files.absolute(catLoc + "/gaiasky-data.json"));
 
         Table datasetsTable = new Table(skin);
-        datasetsTable.add(new OwnLabel("To download", skin, "header")).left().padRight(padl).padBottom(pad);
-        datasetsTable.add(new OwnLabel("Description", skin, "header")).left().padRight(padl).padBottom(pad);
-        datasetsTable.add(new OwnLabel("Type", skin, "header")).left().padRight(padl).padBottom(pad);
-        datasetsTable.add(new OwnLabel("Size", skin, "header")).left().padRight(padl).padBottom(pad);
-        datasetsTable.add(new OwnLabel("Status", skin, "header")).center().padRight(padl).padBottom(pad).row();
+        datasetsTable.add(new OwnLabel(txt("gui.download.header.cb"), skin, "header")).left().padRight(padl).padBottom(pad);
+        datasetsTable.add(new OwnLabel(txt("gui.download.header.desc"), skin, "header")).left().padRight(padl).padBottom(pad);
+        datasetsTable.add(new OwnLabel(txt("gui.download.header.type"), skin, "header")).left().padRight(padl).padBottom(pad);
+        datasetsTable.add(new OwnLabel(txt("gui.download.header.size"), skin, "header")).left().padRight(padl).padBottom(pad);
+        datasetsTable.add(new OwnLabel(txt("gui.download.header.status"), skin, "header")).center().padRight(padl).padBottom(pad).row();
 
         JsonValue dataset = dataDesc.child().child();
         while (dataset != null) {
@@ -227,7 +227,7 @@ public class DownloadDataWindow extends GenericDialog {
         downloadTable.add(datasetsScroll).center().padBottom(padl).colspan(2).row();
 
         // Current dataset info
-        currentDownloadFile = new OwnLabel("Idle", skin);
+        currentDownloadFile = new OwnLabel(txt("gui.download.idle"), skin);
         downloadTable.add(currentDownloadFile).center().colspan(2).padBottom(padl).row();
 
         // Download button
@@ -396,7 +396,7 @@ public class DownloadDataWindow extends GenericDialog {
                         GlobalConf.data.CATALOG_JSON_FILES = descFile.path();
                     }
 
-                    setMessageOk("Idle");
+                    setMessageOk(txt("gui.download.idle"));
                     setStatusFound(trio.getThird());
 
                     Gdx.app.postRunnable(() -> {
@@ -405,7 +405,7 @@ public class DownloadDataWindow extends GenericDialog {
                 } else {
                     logger.info("Error getting dataset: " + name);
                     setStatusError(trio.getThird());
-                    setMessageError("Failed : " + name);
+                    setMessageError(txt("gui.download.failed", name));
                 }
 
             };
@@ -413,7 +413,7 @@ public class DownloadDataWindow extends GenericDialog {
             Runnable fail = () -> {
                 logger.error("Download failed: " + name);
                 setStatusError(trio.getThird());
-                setMessageError("Failed : " + name);
+                setMessageError(txt("gui.download.failed", name));
                 me.acceptButton.setDisabled(false);
                 downloadProgress.setVisible(false);
                 Gdx.app.postRunnable(() -> {
@@ -424,7 +424,7 @@ public class DownloadDataWindow extends GenericDialog {
             Runnable cancel = () -> {
                 logger.error("Download cancelled: " + name);
                 setStatusCancelled(trio.getThird());
-                setMessageError("Failed : " + name);
+                setMessageError(txt("gui.download.failed", name));
                 me.acceptButton.setDisabled(false);
                 downloadProgress.setVisible(false);
                 Gdx.app.postRunnable(() -> {
@@ -436,7 +436,7 @@ public class DownloadDataWindow extends GenericDialog {
             me.acceptButton.setDisabled(true);
             downloadProgress.setVisible(true);
             setStatusProgress(trio.getThird());
-            setMessageOk("File " + (current + 1) + "/" + toDownload.size + " : " + currentJson.getString("name"));
+            setMessageOk(txt("gui.download.downloading.info", (current + 1), toDownload.size, currentJson.getString("name")));
             DownloadHelper.downloadFile(url, tempDownload, pr, finish, fail, cancel);
         } else {
             // Finished all downloads!
@@ -505,27 +505,28 @@ public class DownloadDataWindow extends GenericDialog {
     }
 
     private void setStatusFound(OwnLabel label) {
-        label.setText("Found");
+        label.setText(txt("gui.download.status.found"));
         label.setColor(0, 1, 0, 1);
     }
 
     private void setStatusNotFound(OwnLabel label) {
-        label.setText("Not found");
+        label.setText(txt("gui.download.status.notfound"));
         label.setColor(1, 1, 0, 1);
     }
 
     private void setStatusError(OwnLabel label) {
         label.setText("Failed");
+        label.setText(txt("gui.download.status.failed"));
         label.setColor(1, 0, 0, 1);
     }
 
     private void setStatusCancelled(OwnLabel label) {
-        label.setText("Cancelled");
+        label.setText(txt("gui.download.status.cancelled"));
         label.setColor(1, 0, 0, 1);
     }
 
     private void setStatusProgress(OwnLabel label) {
-        label.setText("Working");
+        label.setText(txt("gui.download.status.working"));
         label.setColor(.3f, .3f, 1, 1);
     }
 
