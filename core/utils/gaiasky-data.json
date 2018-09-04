@@ -92,7 +92,7 @@
             "type" : "mesh",
             "size" : 18570118,
             "check": "autoload-meshes-dr2-hot-none.json",
-            "description": "Non-ionizing star map - Isosurfaces of non-ionizing hot OB stars (x <= 50)",
+            "description": "Nonionizing star map - Isosurfaces of non-ionizing hot OB stars (x <= 50)",
             "file" : "http://gaia.ari.uni-heidelberg.de/gaiasky/files/autodownload/meshes-dr2-hot-non.tar.gz"
         },
         {
@@ -100,7 +100,7 @@
             "type" : "mesh",
             "size" : 33856669,
             "check": "autoload-meshes-dr2-hot-none-medium.json",
-            "description": "Non-ionizing star map - Isosurfaces of very ionizing hot OB stars (25 < x <= 50)",
+            "description": "Nonionizing star map - Isosurfaces of very ionizing hot OB stars (25 < x <= 50)",
             "file" : "http://gaia.ari.uni-heidelberg.de/gaiasky/files/autodownload/meshes-dr2-hot-non-medium.tar.gz"
         },
         

@@ -11,6 +11,7 @@ import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 
+import gaia.cu9.ari.gaiaorbit.desktop.util.SysUtils;
 import gaia.cu9.ari.gaiaorbit.event.EventManager;
 import gaia.cu9.ari.gaiaorbit.event.Events;
 import gaia.cu9.ari.gaiaorbit.util.DownloadHelper;
@@ -58,7 +59,7 @@ public class InitialGui extends AbstractGui {
 
         clearGui();
 
-        DownloadHelper.downloadFile(GlobalConf.program.DATA_DESCRIPTOR_URL, Gdx.files.absolute(GlobalConf.data.DATA_LOCATION + "/gaiasky-data.json"), 
+        DownloadHelper.downloadFile(GlobalConf.program.DATA_DESCRIPTOR_URL, Gdx.files.absolute(SysUtils.getDefaultTmpDir() + "/gaiasky-data.json"), 
                 null, 
                 (md5sum) -> {
                     Gdx.app.postRunnable(() -> {

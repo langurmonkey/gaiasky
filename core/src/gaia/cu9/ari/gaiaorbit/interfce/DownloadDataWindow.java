@@ -138,7 +138,7 @@ public class DownloadDataWindow extends GenericDialog {
         notice.row();
 
         // Parse available files
-        JsonValue dataDesc = reader.parse(Gdx.files.absolute(catLoc + "/gaiasky-data.json"));
+        JsonValue dataDesc = reader.parse(Gdx.files.absolute(SysUtils.getDefaultTmpDir() + "/gaiasky-data.json"));
 
         Table datasetsTable = new Table(skin);
         datasetsTable.add(new OwnLabel(txt("gui.download.header.cb"), skin, "header")).left().padRight(padl).padBottom(pad);
@@ -269,6 +269,10 @@ public class DownloadDataWindow extends GenericDialog {
                                 catalogsLoc.setText(result.path());
                                 GlobalConf.data.DATA_LOCATION = result.path();
                                 me.pack();
+                                Gdx.app.postRunnable(() -> {
+                                    me.content.clear();
+                                    me.build();
+                                });
                             } else {
                                 Label warn = new OwnLabel(txt("gui.download.pickloc.permissions"), skin);
                                 warn.setColor(1f, .4f, .4f, 1f);
@@ -336,9 +340,6 @@ public class DownloadDataWindow extends GenericDialog {
 
                 // Since we are downloading on a background thread, post a runnable to touch UI
                 Gdx.app.postRunnable(() -> {
-                    if (progress == 100) {
-                        downloadButton.setDisabled(false);
-                    }
                     downloadButton.setText(progressString);
                     downloadProgress.setValue((float) progress);
                 });
@@ -433,6 +434,7 @@ public class DownloadDataWindow extends GenericDialog {
             };
 
             // Download
+            downloadButton.setDisabled(true);
             me.acceptButton.setDisabled(true);
             downloadProgress.setVisible(true);
             setStatusProgress(trio.getThird());
@@ -442,6 +444,7 @@ public class DownloadDataWindow extends GenericDialog {
             // Finished all downloads!
             // Enable all
             setDisabled(choiceList, false);
+            downloadButton.setDisabled(false);
         }
 
     }

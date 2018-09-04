@@ -110,6 +110,7 @@ public class SysUtils {
     private static final String MUSIC_DIR_NAME = "music";
     private static final String MAPPINGS_DIR_NAME = "mappings";
     private static final String DATA_DIR_NAME = "data";
+    private static final String TMP_DIR_NAME = "tmp";
 
     /**
      * Gets a file pointer to the $HOME/.gaiasky/camera directory.
@@ -173,6 +174,15 @@ public class SysUtils {
      */
     public static File getDefaultDataDir() {
         return new File(System.getProperty("user.home") + File.separator + GAIASKY_DIR_NAME + File.separator + DATA_DIR_NAME + File.separator);
+    }
+
+    /**
+     * Gets a file pointer to the $HOME/.gaiasky/tmp directory.
+     * 
+     * @return A pointer to the Gaia Sky temporary directory in the user's home.
+     */
+    public static File getDefaultTmpDir() {
+        return new File(System.getProperty("user.home") + File.separator + GAIASKY_DIR_NAME + File.separator + TMP_DIR_NAME + File.separator);
     }
 
     public static void main(String[] args) {
