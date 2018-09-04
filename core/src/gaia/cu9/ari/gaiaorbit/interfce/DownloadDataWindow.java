@@ -30,6 +30,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.Cell;
 import com.badlogic.gdx.scenes.scene2d.ui.HorizontalGroup;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
+import com.badlogic.gdx.scenes.scene2d.ui.ProgressBar;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener.ChangeEvent;
@@ -50,9 +51,11 @@ import gaia.cu9.ari.gaiaorbit.util.format.INumberFormat;
 import gaia.cu9.ari.gaiaorbit.util.format.NumberFormatFactory;
 import gaia.cu9.ari.gaiaorbit.util.scene2d.FileChooser;
 import gaia.cu9.ari.gaiaorbit.util.scene2d.FileChooser.ResultListener;
+import gaia.cu9.ari.gaiaorbit.util.scene2d.Link;
 import gaia.cu9.ari.gaiaorbit.util.scene2d.OwnCheckBox;
 import gaia.cu9.ari.gaiaorbit.util.scene2d.OwnImageButton;
 import gaia.cu9.ari.gaiaorbit.util.scene2d.OwnLabel;
+import gaia.cu9.ari.gaiaorbit.util.scene2d.OwnProgressBar;
 import gaia.cu9.ari.gaiaorbit.util.scene2d.OwnScrollPane;
 import gaia.cu9.ari.gaiaorbit.util.scene2d.OwnTextButton;
 import gaia.cu9.ari.gaiaorbit.util.scene2d.OwnTextTooltip;
@@ -78,6 +81,7 @@ public class DownloadDataWindow extends GenericDialog {
     }
 
     private OwnTextButton downloadButton;
+    private OwnProgressBar downloadProgress;
     private OwnLabel currentDownloadFile;
 
     private INumberFormat nf;
@@ -156,11 +160,11 @@ public class DownloadDataWindow extends GenericDialog {
             boolean defaultDataset = name.contains("default");
             cb.setChecked(!exists && (baseData || defaultDataset));
             cb.setDisabled(baseData || exists);
-            OwnLabel haveit = new OwnLabel(exists ? "Found" : "Not found", skin);
+            OwnLabel haveit = new OwnLabel("", skin);
             if (exists) {
-                haveit.setColor(0, 1, 0, 1);
+                setStatusFound(haveit);
             } else {
-                haveit.setColor(1, 0, 0, 1);
+                setStatusNotFound(haveit);
             }
 
             // Can't proceed without base data - force download
@@ -222,11 +226,23 @@ public class DownloadDataWindow extends GenericDialog {
 
         downloadTable.add(datasetsScroll).center().padBottom(padl).colspan(2).row();
 
+        // Current dataset info
+        currentDownloadFile = new OwnLabel("Idle", skin);
+        downloadTable.add(currentDownloadFile).center().colspan(2).padBottom(padl).row();
+
+        // Download button
         downloadButton = new OwnTextButton(txt("gui.download.download").toUpperCase(), skin, "download");
         downloadButton.pad(buttonpad * 4);
         downloadButton.setMinWidth(catalogsLoc.getWidth());
         downloadButton.setMinHeight(50 * GlobalConf.SCALE_FACTOR);
-        downloadTable.add(downloadButton).center().colspan(2).padBottom(padl).row();
+        downloadTable.add(downloadButton).center().colspan(2).padBottom(0).row();
+
+        // Progress bar
+        downloadProgress = new OwnProgressBar(0, 100, 0.1f, false, skin, "default-horizontal");
+        downloadProgress.setValue(0);
+        downloadProgress.setVisible(false);
+        downloadProgress.setPrefWidth(catalogsLoc.getWidth());
+        downloadTable.add(downloadProgress).center().colspan(2).padBottom(padl).row();
 
         downloadButton.addListener((event) -> {
             if (event instanceof ChangeEvent) {
@@ -235,8 +251,11 @@ public class DownloadDataWindow extends GenericDialog {
             return true;
         });
 
-        currentDownloadFile = new OwnLabel("", skin);
-        downloadTable.add(currentDownloadFile).center().colspan(2);
+        // Progress
+
+        // External download link
+        Link manualDownload = new Link("Manual download", skin, "link", "http://gaia.ari.uni-heidelberg.de/gaiasky/files/autodownload");
+        downloadTable.add(manualDownload).center().colspan(2);
 
         catalogsLoc.addListener((event) -> {
             if (event instanceof ChangeEvent) {
@@ -284,10 +303,10 @@ public class DownloadDataWindow extends GenericDialog {
         for (Trio<JsonValue, OwnCheckBox, OwnLabel> entry : choices) {
             if (entry.getSecond().isChecked())
                 toDownload.add(entry);
-
-            // Disable all
-            entry.getSecond().setDisabled(true);
         }
+
+        // Disable all checkboxes
+        setDisabled(choices, true);
 
         logger.info(toDownload.size + " new data files selected to download");
 
@@ -318,9 +337,10 @@ public class DownloadDataWindow extends GenericDialog {
                 // Since we are downloading on a background thread, post a runnable to touch UI
                 Gdx.app.postRunnable(() -> {
                     if (progress == 100) {
-                        downloadButton.setDisabled(true);
+                        downloadButton.setDisabled(false);
                     }
                     downloadButton.setText(progressString);
+                    downloadProgress.setValue((float) progress);
                 });
             };
 
@@ -350,7 +370,7 @@ public class DownloadDataWindow extends GenericDialog {
 
                 if (errors == 0)
                     try {
-                        decompress(tempDownload.path(), new File(dataLocation), downloadButton);
+                        decompress(tempDownload.path(), new File(dataLocation), downloadButton, downloadProgress);
                         // Remove archive
                         cleanupTempFiles();
                     } catch (Exception e) {
@@ -358,12 +378,17 @@ public class DownloadDataWindow extends GenericDialog {
                         errors++;
                     }
 
-                if (errors == 0) {
-                    // Done
-                    Gdx.app.postRunnable(() -> {
-                        downloadButton.setText(txt("gui.done"));
-                    });
+                // Done
+                Gdx.app.postRunnable(() -> {
+                    downloadButton.setText(txt("gui.download.download"));
+                    downloadProgress.setValue(0);
+                    downloadProgress.setVisible(false);
+                    me.acceptButton.setDisabled(false);
+                    // Enable all
+                    setDisabled(choiceList, false);
+                });
 
+                if (errors == 0) {
                     // Select dataset if needed
                     if (type.startsWith("catalog-")) {
                         // Descriptor file
@@ -371,35 +396,71 @@ public class DownloadDataWindow extends GenericDialog {
                         GlobalConf.data.CATALOG_JSON_FILES = descFile.path();
                     }
 
-                    me.acceptButton.setDisabled(false);
-                    currentDownloadFile.setText("");
-
-                    trio.getThird().setText("Found");
-                    trio.getThird().setColor(0, 1, 0, 1);
+                    setMessageOk("Idle");
+                    setStatusFound(trio.getThird());
 
                     Gdx.app.postRunnable(() -> {
                         downloadNext();
                     });
                 } else {
                     logger.info("Error getting dataset: " + name);
-                    trio.getThird().setText("Failed");
-                    trio.getThird().setColor(1, 1, 0, 1);
+                    setStatusError(trio.getThird());
+                    setMessageError("Failed : " + name);
                 }
+
+            };
+
+            Runnable fail = () -> {
+                logger.error("Download failed: " + name);
+                setStatusError(trio.getThird());
+                setMessageError("Failed : " + name);
+                me.acceptButton.setDisabled(false);
+                downloadProgress.setVisible(false);
+                Gdx.app.postRunnable(() -> {
+                    downloadNext();
+                });
+            };
+
+            Runnable cancel = () -> {
+                logger.error("Download cancelled: " + name);
+                setStatusCancelled(trio.getThird());
+                setMessageError("Failed : " + name);
+                me.acceptButton.setDisabled(false);
+                downloadProgress.setVisible(false);
+                Gdx.app.postRunnable(() -> {
+                    downloadNext();
+                });
             };
 
             // Download
             me.acceptButton.setDisabled(true);
-            currentDownloadFile.setText("Current dataset: " + currentJson.getString("name"));
-            DownloadHelper.downloadFile(url, tempDownload, pr, finish, null, null);
+            downloadProgress.setVisible(true);
+            setStatusProgress(trio.getThird());
+            setMessageOk("File " + (current + 1) + "/" + toDownload.size + " : " + currentJson.getString("name"));
+            DownloadHelper.downloadFile(url, tempDownload, pr, finish, fail, cancel);
         } else {
             // Finished all downloads!
+            // Enable all
+            setDisabled(choiceList, false);
         }
 
     }
 
-    private void decompress(String in, File out, OwnTextButton b) throws Exception {
+    private void setDisabled(List<Trio<JsonValue, OwnCheckBox, OwnLabel>> choices, boolean disabled) {
+        for (Trio<JsonValue, OwnCheckBox, OwnLabel> t : choices) {
+            // Uncheck all if enabling again
+            if (!disabled)
+                t.getSecond().setChecked(false);
+            // Only enable datasets which we don't have
+            if (disabled || (!disabled && !t.getThird().getText().toString().equals("Found")))
+                t.getSecond().setDisabled(disabled);
+        }
+    }
+
+    private void decompress(String in, File out, OwnTextButton b, ProgressBar p) throws Exception {
         try (TarArchiveInputStream fin = new TarArchiveInputStream(new GzipCompressorInputStream(new FileInputStream(in)))) {
-            String bytes = nf.format(uncompressedSize(in) / 1000d);
+            double bytes = uncompressedSize(in) / 1000d;
+            String bytesStr = nf.format(bytes);
             TarArchiveEntry entry;
             while ((entry = fin.getNextTarEntry()) != null) {
                 if (entry.isDirectory()) {
@@ -412,7 +473,9 @@ public class DownloadDataWindow extends GenericDialog {
                 }
                 IOUtils.copy(fin, new FileOutputStream(curfile));
                 Gdx.app.postRunnable(() -> {
-                    b.setText(txt("gui.download.extracting", nf.format(fin.getBytesRead() / 1000d) + "/" + bytes + " Kb"));
+                    float val = (float) ((fin.getBytesRead() / 1000d) / bytes);
+                    b.setText(txt("gui.download.extracting", nf.format(fin.getBytesRead() / 1000d) + "/" + bytesStr + " Kb"));
+                    p.setValue(val * 100);
                 });
             }
         }
@@ -439,6 +502,41 @@ public class DownloadDataWindow extends GenericDialog {
                 logger.error(e, "Failed cleaning up file: " + tempDownload.toString());
             }
         }
+    }
+
+    private void setStatusFound(OwnLabel label) {
+        label.setText("Found");
+        label.setColor(0, 1, 0, 1);
+    }
+
+    private void setStatusNotFound(OwnLabel label) {
+        label.setText("Not found");
+        label.setColor(1, 1, 0, 1);
+    }
+
+    private void setStatusError(OwnLabel label) {
+        label.setText("Failed");
+        label.setColor(1, 0, 0, 1);
+    }
+
+    private void setStatusCancelled(OwnLabel label) {
+        label.setText("Cancelled");
+        label.setColor(1, 0, 0, 1);
+    }
+
+    private void setStatusProgress(OwnLabel label) {
+        label.setText("Working");
+        label.setColor(.3f, .3f, 1, 1);
+    }
+
+    private void setMessageOk(String text) {
+        currentDownloadFile.setText(text);
+        currentDownloadFile.setColor(currentDownloadFile.getStyle().fontColor);
+    }
+
+    private void setMessageError(String text) {
+        currentDownloadFile.setText(text);
+        currentDownloadFile.setColor(1, 0, 0, 1);
     }
 
     @Override
