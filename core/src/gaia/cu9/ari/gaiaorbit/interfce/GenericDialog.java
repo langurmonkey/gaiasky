@@ -40,6 +40,7 @@ public abstract class GenericDialog extends CollapsibleWindow {
     protected Table content;
     protected float pad;
     private String acceptText = null, cancelText = null;
+    
     protected TextButton acceptButton, cancelButton;
 
     private Runnable acceptRunnable, cancelRunnable;

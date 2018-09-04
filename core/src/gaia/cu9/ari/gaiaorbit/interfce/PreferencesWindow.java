@@ -1248,12 +1248,25 @@ public class PreferencesWindow extends GenericDialog {
         datasetChooser = new OwnCheckBox(txt("gui.data.dschooser"), skin, pad);
         datasetChooser.setChecked(GlobalConf.program.DISPLAY_DATASET_DIALOG);
 
+        OwnTextButton dataDownload = new OwnTextButton(txt("gui.download.title"), skin);
+        dataDownload.setSize(300, 50);
+        dataDownload.addListener((event) -> {
+            if (event instanceof ChangeEvent) {
+                DownloadDataWindow ddw = new DownloadDataWindow(stage, skin, false, txt("gui.close"), null);
+                ddw.setModal(true);
+                ddw.show(stage);
+                return true;
+            }
+            return false;
+        });
+
         // Add to content
         contentDataTable.add(titleGeneralData).left().padBottom(pad * 2).row();
         contentDataTable.add(haGroup).left().padBottom(pad * 2).row();
         contentDataTable.add(titleData).left().padBottom(pad * 2).row();
         contentDataTable.add(datasource).left().padBottom(pad * 2).row();
-        contentDataTable.add(datasetChooser).left();
+        contentDataTable.add(datasetChooser).left().padBottom(pad * 2).row();
+        contentDataTable.add(dataDownload).left();
 
         /**
          * ==== GAIA ====

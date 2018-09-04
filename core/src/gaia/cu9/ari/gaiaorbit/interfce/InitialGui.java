@@ -7,6 +7,7 @@ import java.nio.file.Paths;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.files.FileHandle;
+import com.badlogic.gdx.graphics.Cursor.SystemCursor;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
@@ -30,7 +31,7 @@ public class InitialGui extends AbstractGui {
     private static final Log logger = Logger.getLogger(InitialGui.class);
 
     private boolean dsdownload, catchooser;
-    
+
     protected DownloadDataWindow ddw;
     protected ChooseCatalogWindow cdw;
 
@@ -59,20 +60,16 @@ public class InitialGui extends AbstractGui {
 
         clearGui();
 
-        DownloadHelper.downloadFile(GlobalConf.program.DATA_DESCRIPTOR_URL, Gdx.files.absolute(SysUtils.getDefaultTmpDir() + "/gaiasky-data.json"), 
-                null, 
-                (md5sum) -> {
-                    Gdx.app.postRunnable(() -> {
-                        if (dsdownload || !basicDataPresent() || catalogFiles.size == 0) {
-                            // No catalog files, display downloader
-                            addDownloaderWindow();
-                        } else {
-                            displayChooser();
-                        }
-                    });
-                }, 
-                null, 
-                null);
+        DownloadHelper.downloadFile(GlobalConf.program.DATA_DESCRIPTOR_URL, Gdx.files.absolute(SysUtils.getDefaultTmpDir() + "/gaiasky-data.json"), null, (md5sum) -> {
+            Gdx.app.postRunnable(() -> {
+                if (dsdownload || !basicDataPresent() || catalogFiles.size == 0) {
+                    // No catalog files, display downloader
+                    addDownloaderWindow();
+                } else {
+                    displayChooser();
+                }
+            });
+        }, null, null);
 
     }
 
@@ -123,7 +120,11 @@ public class InitialGui extends AbstractGui {
         if (ddw == null) {
             ddw = new DownloadDataWindow(ui, skin);
             ddw.setAcceptRunnable(() -> {
+                Gdx.graphics.setSystemCursor(SystemCursor.Arrow);
                 displayChooser();
+            });
+            ddw.setCancelRunnable(() -> {
+                Gdx.app.exit();
             });
         }
         ddw.show(ui);

@@ -23,7 +23,6 @@ import org.python.apache.commons.compress.utils.IOUtils;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.files.FileHandle;
-import com.badlogic.gdx.graphics.Cursor.SystemCursor;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Cell;
@@ -84,6 +83,9 @@ public class DownloadDataWindow extends GenericDialog {
     private OwnProgressBar downloadProgress;
     private OwnLabel currentDownloadFile;
 
+    // Whether to show the data location chooser
+    private boolean dataLocation;
+
     private INumberFormat nf;
     private JsonReader reader;
     private List<Trio<JsonValue, OwnCheckBox, OwnLabel>> choiceList;
@@ -91,13 +93,19 @@ public class DownloadDataWindow extends GenericDialog {
     private int current = -1;
 
     public DownloadDataWindow(Stage stage, Skin skin) {
+        this(stage, skin, true, txt("gui.start"), txt("gui.exit"));
+    }
+
+    public DownloadDataWindow(Stage stage, Skin skin, boolean dataLocation, String acceptText, String cancelText) {
         super(txt("gui.download.title"), skin, stage);
         this.nf = NumberFormatFactory.getFormatter("##0.0");
         this.reader = new JsonReader();
         this.choiceList = new LinkedList<Trio<JsonValue, OwnCheckBox, OwnLabel>>();
 
-        setCancelText(txt("gui.exit"));
-        setAcceptText(txt("gui.start"));
+        this.dataLocation = dataLocation;
+
+        setCancelText(cancelText);
+        setAcceptText(acceptText);
 
         // Build
         buildSuper();
@@ -107,6 +115,7 @@ public class DownloadDataWindow extends GenericDialog {
     protected void build() {
         float pad = 2 * GlobalConf.SCALE_FACTOR;
         float padl = 9 * GlobalConf.SCALE_FACTOR;
+        float minw = GlobalConf.SCALE_FACTOR == 1 ? 450 : 650;
 
         float buttonpad = 1 * GlobalConf.SCALE_FACTOR;
 
@@ -126,16 +135,61 @@ public class DownloadDataWindow extends GenericDialog {
         hg.addActor(downloadInfo);
 
         downloadTable.add(hg).left().colspan(2).padBottom(padl).row();
-        downloadTable.add(catalogsLocLabel).left().padBottom(padl);
 
         SysUtils.getDefaultDataDir().mkdirs();
         String catLoc = GlobalConf.data.DATA_LOCATION;
-        OwnTextButton catalogsLoc = new OwnTextButton(catLoc, skin);
-        catalogsLoc.pad(buttonpad * 4);
-        catalogsLoc.setMinWidth(GlobalConf.SCALE_FACTOR == 1 ? 450 : 650);
-        downloadTable.add(catalogsLoc).left().padLeft(pad).padBottom(padl).row();
-        Cell<Actor> notice = downloadTable.add((Actor) null).colspan(2).padBottom(padl);
-        notice.row();
+
+        if (dataLocation) {
+            OwnTextButton catalogsLoc = new OwnTextButton(catLoc, skin);
+            catalogsLoc.pad(buttonpad * 4);
+            catalogsLoc.setMinWidth(minw);
+            downloadTable.add(catalogsLocLabel).left().padBottom(padl);
+            downloadTable.add(catalogsLoc).left().padLeft(pad).padBottom(padl).row();
+            Cell<Actor> notice = downloadTable.add((Actor) null).colspan(2).padBottom(padl);
+            notice.row();
+            
+            catalogsLoc.addListener((event) -> {
+                if (event instanceof ChangeEvent) {
+                    FileChooser fc = FileChooser.createPickDialog(txt("gui.download.pickloc"), skin, Gdx.files.absolute(GlobalConf.data.DATA_LOCATION));
+                    fc.setResultListener(new ResultListener() {
+                        @Override
+                        public boolean result(boolean success, FileHandle result) {
+                            if (success) {
+                                if (result.file().canRead() && result.file().canWrite()) {
+                                    // do stuff with result
+                                    catalogsLoc.setText(result.path());
+                                    GlobalConf.data.DATA_LOCATION = result.path();
+                                    me.pack();
+                                    Gdx.app.postRunnable(() -> {
+                                        me.content.clear();
+                                        me.build();
+                                        // Reset datasets
+                                        GlobalConf.data.CATALOG_JSON_FILES = "";
+                                    });
+                                } else {
+                                    Label warn = new OwnLabel(txt("gui.download.pickloc.permissions"), skin);
+                                    warn.setColor(1f, .4f, .4f, 1f);
+                                    notice.setActor(warn);
+                                    return false;
+                                }
+                            }
+                            notice.clearActor();
+                            return true;
+                        }
+                    });
+                    fc.setFilter(new FileFilter() {
+                        @Override
+                        public boolean accept(File pathname) {
+                            return pathname.isDirectory();
+                        }
+                    });
+                    fc.show(stage);
+
+                    return true;
+                }
+                return false;
+            });
+        }
 
         // Parse available files
         JsonValue dataDesc = reader.parse(Gdx.files.absolute(SysUtils.getDefaultTmpDir() + "/gaiasky-data.json"));
@@ -233,7 +287,7 @@ public class DownloadDataWindow extends GenericDialog {
         // Download button
         downloadButton = new OwnTextButton(txt("gui.download.download").toUpperCase(), skin, "download");
         downloadButton.pad(buttonpad * 4);
-        downloadButton.setMinWidth(catalogsLoc.getWidth());
+        downloadButton.setMinWidth(minw);
         downloadButton.setMinHeight(50 * GlobalConf.SCALE_FACTOR);
         downloadTable.add(downloadButton).center().colspan(2).padBottom(0).row();
 
@@ -241,7 +295,7 @@ public class DownloadDataWindow extends GenericDialog {
         downloadProgress = new OwnProgressBar(0, 100, 0.1f, false, skin, "default-horizontal");
         downloadProgress.setValue(0);
         downloadProgress.setVisible(false);
-        downloadProgress.setPrefWidth(catalogsLoc.getWidth());
+        downloadProgress.setPrefWidth(minw);
         downloadTable.add(downloadProgress).center().colspan(2).padBottom(padl).row();
 
         downloadButton.addListener((event) -> {
@@ -256,48 +310,6 @@ public class DownloadDataWindow extends GenericDialog {
         // External download link
         Link manualDownload = new Link("Manual download", skin, "link", "http://gaia.ari.uni-heidelberg.de/gaiasky/files/autodownload");
         downloadTable.add(manualDownload).center().colspan(2);
-
-        catalogsLoc.addListener((event) -> {
-            if (event instanceof ChangeEvent) {
-                FileChooser fc = FileChooser.createPickDialog(txt("gui.download.pickloc"), skin, Gdx.files.absolute(GlobalConf.data.DATA_LOCATION));
-                fc.setResultListener(new ResultListener() {
-                    @Override
-                    public boolean result(boolean success, FileHandle result) {
-                        if (success) {
-                            if (result.file().canRead() && result.file().canWrite()) {
-                                // do stuff with result
-                                catalogsLoc.setText(result.path());
-                                GlobalConf.data.DATA_LOCATION = result.path();
-                                me.pack();
-                                Gdx.app.postRunnable(() -> {
-                                    me.content.clear();
-                                    me.build();
-                                    // Reset datasets
-                                    GlobalConf.data.CATALOG_JSON_FILES = "";
-                                });
-                            } else {
-                                Label warn = new OwnLabel(txt("gui.download.pickloc.permissions"), skin);
-                                warn.setColor(1f, .4f, .4f, 1f);
-                                notice.setActor(warn);
-                                return false;
-                            }
-                        }
-                        notice.clearActor();
-                        return true;
-                    }
-                });
-                fc.setFilter(new FileFilter() {
-                    @Override
-                    public boolean accept(File pathname) {
-                        return pathname.isDirectory();
-                    }
-                });
-                fc.show(stage);
-
-                return true;
-            }
-            return false;
-        });
 
         topCell.setActor(downloadTable);
 
@@ -547,15 +559,12 @@ public class DownloadDataWindow extends GenericDialog {
 
     @Override
     protected void accept() {
-        // No change to execute exit event, manually restore cursor to default
-        Gdx.graphics.setSystemCursor(SystemCursor.Arrow);
         cleanupTempFiles();
     }
 
     @Override
     protected void cancel() {
         cleanupTempFiles();
-        Gdx.app.exit();
     }
 
 }
