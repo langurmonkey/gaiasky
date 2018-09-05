@@ -205,57 +205,6 @@ task dist (dependsOn: gaiaskyJar, description: "Compiles the project, creates th
             into "$distDir/conf"
         }
 
-        // Copy data folder
-        mkdir "$distDir/data"
-        copy {
-            from "../assets/data"
-            into "$distDir/data"
-            
-            exclude "**/tgas_final"
-            exclude "**/octree/tgas/group-bin-all"
-            exclude "**/octree/tgas/group-bin-old"
-            exclude "**/hyg"
-            exclude "**/catalog"
-            exclude "**/octree"
-
-            exclude "**/models/cassini"
-            exclude "**/models/rosetta"
-            exclude "**/models/iss"
-
-            exclude "**/orbits_asteroid_extra.json"
-            exclude "**/cassini.xyz"
-            exclude "**/rosetta.xyz"
-
-            exclude "**/uvdebug.png"
-
-            exclude "**/*-wgl.json"
-            exclude "**/*-wgl-fp.json"
-
-            exclude "**/catalog-*.json"
-            
-            exclude "**/music"
-
-            exclude "**/meshes/dr2/meshes_hot/"
-            exclude "**/meshes/dr2/**/source/"
-            exclude "**/meshes/tgas"
-
-            exclude "meshes-tgas.json"
-            exclude "meshes-dr2-hot-*.json"
-            exclude "orbits_asteroids_extra.json"
-            exclude "orbits_asteroids_extra_sample.json"
-
-            exclude "**/particles-dr2.json"
-            exclude "**/particles-tgas.json"
-
-            exclude "**/constel_id.csv"
-
-            exclude "**/tex/*-high.jpg"
-            exclude "**/tex/*-high.png"
-
-            exclude "dummyversion"
-
-        }
-
         // Copy i18n files
         mkdir "$distDir/i18n"
         copy {

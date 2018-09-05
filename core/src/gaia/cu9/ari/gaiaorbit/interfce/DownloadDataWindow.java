@@ -115,7 +115,7 @@ public class DownloadDataWindow extends GenericDialog {
     protected void build() {
         float pad = 2 * GlobalConf.SCALE_FACTOR;
         float padl = 9 * GlobalConf.SCALE_FACTOR;
-        float minw = GlobalConf.SCALE_FACTOR == 1 ? 450 : 650;
+        float minw = GlobalConf.SCALE_FACTOR == 1 ? 550 : 650;
 
         float buttonpad = 1 * GlobalConf.SCALE_FACTOR;
 
@@ -276,7 +276,7 @@ public class DownloadDataWindow extends GenericDialog {
         datasetsScroll.setSmoothScrolling(true);
         datasetsScroll.setFadeScrollBars(false);
         datasetsScroll.setHeight(Math.min(Gdx.graphics.getHeight() * 0.38f, 350 * GlobalConf.SCALE_FACTOR));
-        datasetsScroll.setWidth(550 * GlobalConf.SCALE_FACTOR);
+        datasetsScroll.setWidth(650 * GlobalConf.SCALE_FACTOR);
 
         downloadTable.add(datasetsScroll).center().padBottom(padl).colspan(2).row();
 
