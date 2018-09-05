@@ -168,13 +168,13 @@ First, clone the [GitLab](https://gitlab.com/langurmonkey/gaiasky) repository:
 
 ```
 $  git clone https://gitlab.com/langurmonkey/gaiasky.git
-$  cd gaiasky
 ```
 
 #### 2.2.1 Getting the data
 
 As of version `2.1.0`, Gaia Sky offers an automated way to download all data packs and catalogs from within the application. When Gaia Sky starts, if no base data or catalogs are found, the downloader window will prompt automatically. Otherwise, you can force the download window at startup with the `-d` argument. Just select the data packs and catalogs that you want to download, press `Download now` and wait for the process to finish.
-You can also download the data packs manually [here](http://gaia.ari.uni-heidelberg.de/gaiasky/files/autodownload/).
+
+You can also download the **data packs manually** [here](http://gaia.ari.uni-heidelberg.de/gaiasky/files/autodownload/).
 
 
 #### 2.2.2 Running
@@ -194,7 +194,7 @@ On Windows, do:
 Et voilà ! The bleeding edge Gaia Sky is running in your machine.
 
 
-### 2.4 Program arguments
+### 2.4 CLI arguments
 
 Gaia Sky accepts a few command-line arguments:
 

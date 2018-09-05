@@ -32,22 +32,7 @@ methods available.
 
 *  `Download Gaia Sky <https://zah.uni-heidelberg.de/gaia/outreach/gaiasky/downloads/>`__
 
-Windows
--------
-
-Two windows installers are available for 32 and 64-bit systems.
-
--  ``gaiasky_windows_<version>.exe`` -- 32 bit installer.
--  ``gaiasky_windows-x64_<version>.exe`` -- 64 bit installer.
-
-To install the Gaia Sky, just double click on the installer and then
-follow the on-screen instructions. You will need to choose the directory
-where the application is to be installed.
-
-In order to **uninstall** the application you can use the Windows
-Control Panel or you can use the provided uninstaller in the Gaia Sky
-folder.
-
+  
 Linux
 -----
 
@@ -134,6 +119,24 @@ Follow the on-screen instructions to proceed with the installation.
 In order to **uninstall**, just execute the ``uninstall`` file in the
 installation folder.
 
+
+Windows
+-------
+
+Two windows installers are available for 32 and 64-bit systems.
+
+-  ``gaiasky_windows_<version>.exe`` -- 32 bit installer.
+-  ``gaiasky_windows-x64_<version>.exe`` -- 64 bit installer.
+
+To install the Gaia Sky, just double click on the installer and then
+follow the on-screen instructions. You will need to choose the directory
+where the application is to be installed.
+
+In order to **uninstall** the application you can use the Windows
+Control Panel or you can use the provided uninstaller in the Gaia Sky
+folder.
+
+
 macOS X
 -------
 
@@ -151,11 +154,11 @@ It will work in all systems but you need to unpack it yourself and
 create the desired shortcuts. In **Windows**, use an archiver software
 (7zip, iZArc, etc.) to unpack it.
 
-In **Linux** and **OS X**, you can use:
+In **Linux** and **macOS**, you can use:
 
 .. code-block:: bash
 
-    $ tar zxvf gaiasky-<version>.tgz
+    $ tar xzvf gaiasky-<version>.tgz -C [target_folder]
 
 Running from source
 ===================

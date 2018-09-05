@@ -5,15 +5,15 @@ If you installed the software using an installer or a package manager
 system (``rpm``, ``deb``), you just need to use the standard running
 procedures of your Operating System to run the application.
 
-**Windows**
-
-In windows, this means clicking on ``Start`` and then browsing the start
-menu folder ``Gaia Sky``. You can run the executable from there.
-
 **Linux**
 
 Just type ``gaiasky`` in a terminal or use your favourite desktop
 environment search engine to run the Gaia Sky launcher.
+
+**Windows**
+
+In windows, this means clicking on ``Start`` and then browsing the start
+menu folder ``Gaia Sky``. You can run the executable from there.
 
 **macOS X**
 
@@ -24,6 +24,29 @@ Locate the launcher in your install directory (usually ``/Applications``) and do
 However, if you are a maverick and do not like installers, you can also
 run the Gaia Sky directly from the source code in ``GitHub`` or
 using the ``tgz`` package.
+
+CLI arguments
+=============
+
+Gaia Sky offers a few command line arguments:
+
+.. code-block:: bash
+
+    $  gaiasky -h
+            
+       Usage: gaiasky [options]
+           Options:
+              -c, --cat-chooser
+                Displays the catalog chooser dialog at startup
+                Default: false
+              -d, --ds-download
+                Displays the download dialog at startup
+                Default: false
+              -h, --help
+                Shows help
+              -v, --version
+                Lists version and build inforamtion
+                Default: false
 
 
 .. _running-from-source:
@@ -36,8 +59,8 @@ Requirements
 
 If you want to compile the source code, you will need the following:
 
--  `JDK8 or
-   above <http://www.oracle.com/technetwork/java/javase/downloads/index.html>`__
+-  ``JDK8+``
+-  ``git``
 
 Please, be aware that only ``tags`` are guaranteed to work
 (`here <https://gitlab.com/langurmonkey/gaiasky/tags>`__). The ``master``
@@ -45,25 +68,22 @@ branch holds the development version and the configuration files are
 possibly messed up and not ready to work out-of-the-box. So remember to
 use a ``tag`` version if you want to run it right away from source.
 
-Also, this guide is for **Unix-like systems only**. If you are working
-on Windows, you will need `git for
-windows <http://git-scm.com/download/win>`__, which contains a version of
-MinGW (bash) packed with ``git``, ``vim`` and some other utils. All other
-parts of the process should work the same under Windows systems.
-
 First, clone the repository:
 
 .. code-block:: bash
 
     $  git clone https://gitlab.com/langurmonkey/gaiasky.git
-    $  cd gaiasky
 
 Getting the catalog data
 ------------------------
 
-.. hint:: As of version ``2.0.3``, Gaia Sky will automatically download the default catalog if no other catalog is found.  
+.. hint:: As of version ``2.1.0``, Gaia Sky provides a self-contained downloader to get all the data packs available.  
 
-You can get other DR2-based catalogs `here <https://zah.uni-heidelberg.de/institutes/ari/gaia/outreach/gaiasky/downloads/#dr2catalogs>`_.
+Gaia Sky offers a downloader to get the desired data packs. The ``base-data`` pack is necessary for Gaia Sky to run, and
+contains the solar system, the Milky Way model, NBG, SDSS, etc. Catalog files are optional. You can bring up the downloader at
+any time by clicking on the button ``Data download`` in the preferences window, data tab.
+
+You can also download the data packs manually `here <http://gaia.ari.uni-heidelberg.de/gaiasky/files/autodownload>`_.
 
 Compiling and running
 ---------------------
@@ -79,8 +99,6 @@ In order to pull the latest changes from the GitHub repository:
 .. code-block:: bash
 
 	$  git pull
-	
-Remember that the master branch is the development branch and therefore intrinsically unstable. It is not guaranteed to always work.
 
 
 Packaging Gaia Sky

@@ -9,6 +9,8 @@ In the mean time, you can visit our `home page <http://www.zah.uni-heidelberg.de
 `download Gaia Sky <http://www.zah.uni-heidelberg.de/gaia/outreach/gaiasky/downloads/>`__ or submit a
 `bug or a feature request <https://gitlab.com/langurmonkey/gaiasky/issues>`__.
 
+Gaia Sky is described in the paper `Gaia Sky: Navigating the Gaia Catalog <http://dx.doi.org/10.1109/TVCG.2018.2864508>`__.
+
 
 .. |Build status| image:: https://circleci.com/gh/langurmonkey/gaiasky.svg?style=shield&circle-token=:circle-token
    :target: https://circleci.com/gh/langurmonkey/gaiasky/tree/master
