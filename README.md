@@ -173,14 +173,9 @@ Make sure you have the `JDK8+` installed.
 
 ### 2.3 Getting the data
 
-As of version `2.0.3`, Gaia Sky downloads the default catalog automatically at startup if no catalog files are found. Also, catalog files can now be stored in an external location, choosen in the Download Catalog window.
+As of version `2.1.0`, Gaia Sky offers an automated way to download all data packs and catalogs from within the application. When Gaia Sky starts, if no base data or catalogs are found, the downloader window will prompt automatically. Otherwise, you can force the download window at startup with the `-d` argument. Just select the data packs and catalogs that you want to download, press `Download now` and wait for the process to finish.
+You can also download the data packs manually [here](http://gaia.ari.uni-heidelberg.de/gaiasky/files/autodownload/).
 
-More larger (and smaller) catalogs are available for download [here](https://zah.uni-heidelberg.de/institutes/ari/gaia/outreach/gaiasky/downloads/#dr2catalogs).
-
-First, choose the package corresponding to your Gaia Sky version and extract it into the specified **Extract location**. Then, download the catalog file(s) and put them in `gaiasky/assets/data` or in the folder defined under the key `data.catalog.locations` of Gaia Sky's configuration file.
-
-Then, you need to point the key `data.json.catalog` in your `$HOME/.gaiasky/global.properties` file to the
-file specified in the last column in the table (**Catalog file**).
 
 ### 2.4 Running
 
@@ -205,6 +200,26 @@ $  git pull
 ```
 
 Remember that the master branch is the development branch and therefore intrinsically unstable. It is not guaranteed to always work.
+
+### 2.4 Program arguments
+
+Gaia Sky accepts a few command-line arguments:
+
+```
+Usage: gaiasky [options]
+ Options:
+    -c, --cat-chooser
+      Displays the catalog chooser dialog at startup
+      Default: false
+    -d, --ds-download
+      Displays the download dialog at startup
+      Default: false
+    -h, --help
+      Shows help
+    -v, --version
+      Lists version and build inforamtion
+      Default: false
+```
 
 ##  3. Documentation and help
 
