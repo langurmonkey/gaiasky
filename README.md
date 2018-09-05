@@ -154,13 +154,15 @@ $  tar -zxvf gaiasky-<version>.tgz
 ### 2.1 Running Gaia Sky
 
 In order to run the program just click on the shortcut
-provided in your operating system.
+provided in your operating system or use the CLI command `gaiasky`.
 
-If Windows is your OS of choice, you first need to install [Git for Windows](https://git-scm.com/download/win).
-Also, on Windows you will need to use the `gradlew.bat` script instead of the bash `gradlew`, so
-make sure to substitute this in the commands below.
 
 ### 2.2 Running from source
+
+In order to compile and run Gaia Sky from source, you need the following installed in your system:
+
+- `JDK8+`
+- `git`
 
 First, clone the [GitLab](https://gitlab.com/langurmonkey/gaiasky) repository:
 
@@ -168,8 +170,6 @@ First, clone the [GitLab](https://gitlab.com/langurmonkey/gaiasky) repository:
 $  git clone https://gitlab.com/langurmonkey/gaiasky.git
 $  cd gaiasky
 ```
-
-Make sure you have the `JDK8+` installed.
 
 #### 2.2.1 Getting the data
 
@@ -193,13 +193,6 @@ On Windows, do:
 
 Et voilà ! The bleeding edge Gaia Sky is running in your machine.
 
-In order to pull the latest version from the repository, just run the following from the `gaiasky` folder.
-
-```
-$  git pull
-```
-
-Remember that the master branch is the development branch and therefore intrinsically unstable. It is not guaranteed to always work.
 
 ### 2.4 Program arguments
 
