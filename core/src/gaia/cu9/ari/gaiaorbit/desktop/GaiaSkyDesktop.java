@@ -74,7 +74,7 @@ public class GaiaSkyDesktop implements IObserver {
     private static final Log logger = Logger.getLogger(GaiaSkyDesktop.class);
 
     /* Configuration file version of the source code */
-    private static int SOURCE_CONF_VERSION = 251;
+    private static int SOURCE_CONF_VERSION = 252;
     private static GaiaSkyDesktop gsd;
     private static boolean REST_ENABLED = false;
     private static Class<?> REST_SERVER_CLASS = null;
