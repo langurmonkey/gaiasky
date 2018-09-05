@@ -135,8 +135,6 @@ if __name__ == '__main__':
                 for key in arguments.__dict__:
                     if "&%s&" % key in cmd:
                         cmd = cmd.replace("&%s&" % key, "%s" % arguments.__dict__[key])
-                        if ' ' in cmd:
-                            cmd = "\"%s\"" % cmd
                 cmdstr.append(cmd)
             
             print("==> RUNNING: %s" % cmdstr)

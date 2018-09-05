@@ -1,5 +1,24 @@
 # Change Log
 
+## [2.1.0](https://github.com/langurmonkey/gaiasky/tree/2.1.0) (2018-09-05)
+[Full Changelog](https://github.com/langurmonkey/gaiasky/compare/test...2.1.0)
+
+## [test](https://github.com/langurmonkey/gaiasky/tree/test) (2018-09-05)
+[Full Changelog](https://github.com/langurmonkey/gaiasky/compare/2.0.3...test)
+
+**Implemented enhancements:**
+
+- Provide integrated and unified way to download the data and the catalogs [\#303](https://github.com/langurmonkey/gaiasky/issues/303)
+
+**Fixed bugs:**
+
+- Fix dark-orange-x2 header label color [\#302](https://github.com/langurmonkey/gaiasky/issues/302)
+- Fix null pointer when opening preferences window with no catalog selected [\#301](https://github.com/langurmonkey/gaiasky/issues/301)
+
+**Closed issues:**
+
+- Asteroids not shown [\#295](https://github.com/langurmonkey/gaiasky/issues/295)
+
 ## [2.0.3](https://github.com/langurmonkey/gaiasky/tree/2.0.3) (2018-08-28)
 [Full Changelog](https://github.com/langurmonkey/gaiasky/compare/2.0.2-vr...2.0.3)
 

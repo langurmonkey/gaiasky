@@ -5,8 +5,6 @@ import java.io.OutputStream;
 import java.security.DigestInputStream;
 import java.security.MessageDigest;
 
-import org.eclipse.jetty.http.HttpStatus;
-
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Net.HttpMethods;
 import com.badlogic.gdx.Net.HttpRequest;
@@ -44,7 +42,7 @@ public class DownloadHelper {
                 long length = Long.parseLong(httpResponse.getHeader("Content-Length"));
 
                 int status = httpResponse.getStatus().getStatusCode();
-                if (status < HttpStatus.BAD_REQUEST_400) {
+                if (status < 400) {
                     // We're going to download the file, create the streams
                     InputStream is = httpResponse.getResultAsStream();
                     OutputStream os = to.write(false);
