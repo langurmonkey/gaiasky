@@ -1,7 +1,6 @@
 ![Gaia Sky](https://zah.uni-heidelberg.de/fileadmin/user_upload/gaia/gaiasky/img/GaiaSkyBanner.jpg)
 --------------------------
 
-[![Documentation Status](https://readthedocs.org/projects/gaia-sky/badge/?version=latest)](http://gaia-sky.readthedocs.io/en/latest/?badge=latest)
 [![Build status](https://gitlab.com/langurmonkey/gaiasky/badges/master/pipeline.svg)](https://gitlab.com/langurmonkey/gaiasky/commits/master)
 [![License: MPL 2.0](https://img.shields.io/badge/License-MPL%202.0-brightgreen.svg)](https://opensource.org/licenses/MPL-2.0)
 [![GitHub issues](https://img.shields.io/github/issues/langurmonkey/gaiasky.svg)](https://github.com/langurmonkey/gaiasky/issues)
@@ -14,7 +13,7 @@ runs on Windows, Linux and macOS. It is developed in the framework of
 To get the latest up-to-date and most complete information,
 
 *  Visit our [**home page**](https://zah.uni-heidelberg.de/gaia/outreach/gaiasky)
-*  Read the [**Documentation**](http://gaia-sky.readthedocs.io)
+*  Read the [**Documentation**](http://gaia.ari.uni-heidelberg.de/gaiasky/docs/html/latest)
 *  Submit a [**bug** or a **feature request**](https://gitlab.com/langurmonkey/gaiasky/issues)
 *  Follow development news at [@GaiaSky_Dev](https://twitter.com/GaiaSky_Dev)
 
@@ -216,7 +215,9 @@ Usage: gaiasky [options]
 
 ##  3. Documentation and help
 
-The most up-to-date documentation of Gaia Sky is always in [gaia-sky.readthedocs.io](http://gaia-sky.readthedocs.io).
+The most up-to-date documentation of Gaia Sky is always in [gaia.ari.uni-heidelberg.de/gaiasky/docs/html/latest](http://gaia.ari.uni-heidelberg.de/gaiasky/docs/html/latest). For older versions and other formats, see [here](http://gaia.ari.uni-heidelberg.de/gaiasky/docs).
+
+We also have a mirror at [gaia-sky.rtfd.org](https://gaia-sky.readthedocs.io).
 
 ##  4. Copyright and licensing information
 
