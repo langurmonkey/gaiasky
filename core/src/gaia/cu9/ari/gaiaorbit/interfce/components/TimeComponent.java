@@ -57,11 +57,11 @@ public class TimeComponent extends GuiComponent implements IObserver {
     @Override
     public void initialize() {
         // Time
-        date = new OwnLabel("date UT", skin, "lcd");
+        date = new OwnLabel("date UT", skin, "mono");
         date.setName("label date");
         date.setWidth(150 * GlobalConf.SCALE_FACTOR);
 
-        time = new OwnLabel("time UT", skin, "lcd");
+        time = new OwnLabel("time UT", skin, "mono");
         time.setName("label time");
         time.setWidth(150 * GlobalConf.SCALE_FACTOR);
 
