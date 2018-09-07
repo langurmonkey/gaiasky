@@ -15,7 +15,7 @@ import com.badlogic.gdx.files.FileHandle;
 import gaia.cu9.ari.gaiaorbit.util.Logger.Log;
 
 /**
- * Contains utilities to download and uncompress files
+ * Contains utilities to download files
  * @author tsagrista
  *
  */
