@@ -2,7 +2,7 @@
    :alt: Gaia Sky logo
 
 |Build status| |License|
-
+ 
 
 These are the official documentation pages of Gaia Sky. Find below the contents table to navigate around.
 In the mean time, you can visit our `home page <http://www.zah.uni-heidelberg.de/gaia/outreach/gaiasky/>`__,
