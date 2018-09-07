@@ -1,6 +1,8 @@
 User Interface
 **************
 
+.. _download-manager:
+
 Data download manager
 =====================
 
