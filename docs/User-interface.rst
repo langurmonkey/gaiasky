@@ -1,23 +1,41 @@
 User Interface
 **************
 
+Data download manager
+=====================
+
+As of version ``2.1.0`` Gaia Sky provides an integrated download manager to help visualize and obtain the
+available data packs and catalogs. Chances are that the download manager is the first thing you see when you launch
+Gaia Sky for the first time.
+
+.. figure:: img/dm/dm.png
+  :alt: The download manager in action
+  :width: 100%
+  
+The download manager pops up automatically when Gaia Sky is started if no base data or no catalog files are detected. It
+can also be launched manually from the preferences window, data tab.
+
+Using the download manager, the user can select whatever datasets she wants, then click download and wait for the download and
+extract processes to finish. Once done, the data will be available to Gaia Sky the next time it starts.
+
+
 GUI window
 ==========
 
-The Gaia Sky GUI is divided into six panes, `Time <#time>`__,
-`Camera <#camera>`__, `Type visibility <#type-visibility>`__, `Lighting <#lighting>`__, `Objects <#objects>`__,  and `Music <#music>`__.
+The Gaia Sky GUI is divided into seven panes, `Time <#time>`__,
+`Camera <#camera>`__, `Type visibility <#type-visibility>`__, `Visual settings <#visual-settings>`__, `Datasets <#datasets>`__, `Objects <#objects>`__,  and `Music <#music>`__.
 
 +----------------------------------------------------+-----------------------------------------------+
-| .. image:: img/ui/gs-interface-collapsed.jpg       | Controls window with all panes, except the    |
+| .. image:: img/ui/gs-interface-collapsed.png       | Controls window with all panes, except the    |
 |   :width: 15%                                      | Time pane, collapsed.                         |
 |   :alt: User interface with all panes collapsed    |                                               |
 +----------------------------------------------------+-----------------------------------------------+            
-| .. image:: img/ui/gs-interface-expanded.jpg        | Controls window with the Time pane and the    |
+| .. image:: img/ui/gs-interface-expanded.png        | Controls window with the Time pane and the    |
 |   :width: 15%                                      | Camera pane expanded.                         |
 |   :alt: User interface with camera pane expanded   |                                               |
 +----------------------------------------------------+-----------------------------------------------+
 
-The six panes, except for the Time pane, are collapsed at startup. To expand them and reveal its controls just click on the little plus 
+The seven panes, except for the Time pane, are collapsed at startup. To expand them and reveal its controls just click on the little plus 
 icon |plus-icon| at the right of the pane title. Use the minus icon |minus-icon| to collapse it again. Panes can also be detached
 to their own window. To do so, use the detach icon |detach-icon|.
 
@@ -77,16 +95,6 @@ the focus so that the same transformation matrix is applied to both.
 Additionally, we can also enable the **crosshair**, which will mark the
 currently focused object.
 
-Objects
--------
-
-There is a list of focus objects that can be selected from the
-interface. When an object is selected the camera automatically centers
-it in the view and you can rotate around it or zoom in and out. Objects
-can also be selected by double-clicking on them directly in the view or
-by using the search box provided above the list. You can also invoke a
-search dialogue by pressing ``CTRL+F``.
-
 Type visibility
 ---------------
 
@@ -117,9 +125,10 @@ number of displayed proper motions and their length by using the two
 sliders that appear.
 
 .. _interface-lighting:
+.. _visua-settings:
 
-Lighting
---------
+Visual settings
+---------------
 
 Here are a few options to control the lighting of the scene:
 
@@ -128,15 +137,25 @@ Here are a few options to control the lighting of the scene:
 -  **Min. star opacity**: Sets a minimum opacity for the faintest stars.
 -  **Ambient light**: Controls the amount of ambient light. This only
    affects the models such as the planets or satellites.
--  **Bloom effect**: Controls the bloom effect.
--  **Brightness**: Controls the brightness of the image.
--  **Contrast**: Controls the contrast of the image.
--  **Motion blur**: Enable or disable the motion blur effect.
--  **Lens flare**: Enable or disable the lens flare.
--  **Star glow**: Enable or disable star glows. If enabled, the stars
-   are rendered using a glow texture in a post-processing step. This can
-   have a performance hit on some older graphics cards.
+-  **Label size**: Controls the size of the labels.
 
+Objects
+-------
+
+There is a list of focus objects that can be selected from the
+interface. When an object is selected the camera automatically centers
+it in the view and you can rotate around it or zoom in and out. Objects
+can also be selected by double-clicking on them directly in the view or
+by using the search box provided above the list. You can also invoke a
+search dialogue by pressing ``CTRL+F``.
+
+Datasets
+--------
+
+This tab contains all the datasets currently loaded. Datasets are usually star
+catalogs which can be loaded independently. For example, any DR2 catalogs will
+be shown here. Also, datasets added with SAMP are displayed in this section. 
+For each dataset, controls to mute/unmute it and delete it are provided.
 
 Music
 -----
@@ -157,10 +176,26 @@ The volume can be controlled using the slider at the bottom of the pane.
 .. |audio-bwd| image:: img/ui/audio-bwd.png
 
 
+Bottom buttons
+==============
+
+The buttons at the bottom of the control panel are described here.
+
+Preferences window
+------------------
+
+You can launch the preferences window any time during the execution of
+the program. To do so, click on the |prefsicon| ``Preferences`` button at the bottom
+of the GUI window. For a detailed description of the configuration
+options refer to the :ref:`Configuration
+Instructions <configuration>`.
+
+.. |prefsicon| image:: img/ui/prefs-icon.png
+
 .. _running-scripts:
 
 Running scripts
-===============
+---------------
 
 In order to run Python scripts, click on the |scriptrun| ``Run script`` button at
 the bottom of the GUI window. A new window will pop up allowing you to
@@ -175,13 +210,28 @@ the script until these errors are dealt with.
 
 .. |scriptrun| image:: img/ui/car-icon.png
 
-Preferences window
-==================
+About/help
+----------
 
-You can launch the preferences window any time during the execution of
-the program. To do so, click on the |prefsicon| ``Preferences`` button at the bottom
-of the GUI window. For a detailed description of the configuration
-options refer to the :ref:`Configuration
-Instructions <configuration>`.
+The help button |helpicon| brings up the help dialog, where information on the current system,
+OpenGL settings, Java memory, updates and contact can be found.
 
-.. |prefsicon| image:: img/ui/prefs-icon.png
+.. |helpicon| image:: img/ui/help-icon.png
+
+Log
+---
+
+The log button |logicon| brings up the log window, which displays the Gaia Sky log
+for the current session. The log can be exported to a file by clicking on the ``Export to
+file`` button. The location of the exported log files is ``~/.gaiasky``.
+
+.. |logicon| image:: img/ui/log-icon.png
+
+
+Spacecraft UI controls
+======================
+
+The spacecraft mode UI is described in  the `spacecraft mode section <spacecraft-mode>`.
+
+
+

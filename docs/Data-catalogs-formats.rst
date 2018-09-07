@@ -104,6 +104,9 @@ containing ``[loader: files]`` correspondences.
 Each ``"loader"`` contains the classes that will load the list of files under the
 corresponding ``"files"`` property. Obviously, each loader needs to know how to load the provided files.
 
+As of version ``2.1.0``, any descriptor file with the format ``autoload-*.json`` dropped into the data
+folder will be loaded by default without need to be referenced from any of the properties.
+
 .. figure:: img/gaiasky_loading.svg
    :alt: Gaia Sky data loading diagram
 

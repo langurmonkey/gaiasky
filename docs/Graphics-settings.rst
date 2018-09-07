@@ -93,3 +93,29 @@ This option limits the frames per second to match your monitor's refresh
 rate and prevent screen tearing. It is recommended to leave it enabled
 unless you want to test how many FPS you can get or you want to fry your
 card.
+
+Maximum frame rate (FPS)
+========================
+
+This option lets the user choose the maximum frame rate of Gaia Sky. If set, the
+frame rate of the application will be capped to that value using delays in the 
+main loop.
+
+Other graphics settings
+=======================
+
+Here are other graphics settings offered in the configuration window.
+
+-  **Bloom effect**: Controls the bloom effect, causing light to bleed over the edges of darker parts.
+-  **Motion blur**: Enable or disable the screen space motion blur effect.
+-  **Lens flare**: Enable or disable the screen space lens flare effect.
+-  **Star glow**: Enable or disable star glows. If enabled, the stars
+   are rendered using a glow texture in a post-processing step. This can
+   have a performance hit on some older graphics cards.
+-  **Brightness**: Controls the overall brightness of the image.
+-  **Contrast**: Controls the overall contrast of the image.
+-  **Hue**: Controls the hue value of the image.
+-  **Saturation**: Controls the saturation value of the image.
+-  **Gamma correction**: Controls the gamma correction value of the image. This should be calibrated with your monitor.
+
+
