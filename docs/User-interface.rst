@@ -10,7 +10,7 @@ As of version ``2.1.0`` Gaia Sky provides an integrated download manager to help
 available data packs and catalogs. Chances are that the download manager is the first thing you see when you launch
 Gaia Sky for the first time.
 
-.. figure:: img/dm/dm.png
+.. figure:: img/dm/dm.gif
   :alt: The download manager in action
   :width: 100%
   
