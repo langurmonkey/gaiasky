@@ -233,7 +233,7 @@ file`` button. The location of the exported log files is ``~/.gaiasky``.
 Spacecraft UI controls
 ======================
 
-The spacecraft mode UI is described in  the `spacecraft mode section <spacecraft-mode>`.
+The spacecraft mode UI is described in  :ref:`spacecraft-mode`.
 
 
 

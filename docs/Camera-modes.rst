@@ -85,7 +85,7 @@ Additionally, it is possible to adjust three more parameters:
 
 .. figure:: img/sc/sc-controls.png
   :alt: Spacecraft mode controls view, with the attitude indicator ball at the center, the control buttons at the bottom and the engine power to the left.
-  :width: 100%
+  :width: 50%
 
   Spacecraft mode controls view, with the attitude indicator ball at the center, the control buttons at the bottom and the engine power to the left.
 

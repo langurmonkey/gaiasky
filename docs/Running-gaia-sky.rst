@@ -82,7 +82,7 @@ Getting the catalog data
 Gaia Sky offers a downloade manager to get the desired data packs. The ``base-data`` pack is necessary for Gaia Sky to run, and
 contains the solar system, the Milky Way model, NBG, SDSS, etc. Catalog files are optional. You can bring up the downloade manager at
 any time by clicking on the button ``Data download`` in the preferences window, data tab. More information on the download
-manager can be found `here <download-manager>`.
+manager can be found in :ref:`download-manager`.
 
 You can also download the data packs manually `here <http://gaia.ari.uni-heidelberg.de/gaiasky/files/autodownload>`_.
 
