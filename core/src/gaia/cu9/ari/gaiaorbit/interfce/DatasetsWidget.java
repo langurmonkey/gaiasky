@@ -27,6 +27,11 @@ import gaia.cu9.ari.gaiaorbit.util.scene2d.OwnScrollPane;
 import gaia.cu9.ari.gaiaorbit.util.scene2d.OwnTextArea;
 import gaia.cu9.ari.gaiaorbit.util.scene2d.OwnTextButton;
 
+/**
+ * Widget which lists all detected catalogs and offers a way to select them.
+ * @author tsagrista
+ *
+ */
 public class DatasetsWidget {
 
     private Skin skin;

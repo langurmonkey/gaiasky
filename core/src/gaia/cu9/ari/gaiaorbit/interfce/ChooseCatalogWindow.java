@@ -15,6 +15,12 @@ import gaia.cu9.ari.gaiaorbit.event.EventManager;
 import gaia.cu9.ari.gaiaorbit.event.Events;
 import gaia.cu9.ari.gaiaorbit.util.GlobalConf;
 
+
+/**
+ * GUI window to choose the catalog to use
+ * @author tsagrista
+ *
+ */
 public class ChooseCatalogWindow extends GenericDialog {
 
     private DatasetsWidget dw;

@@ -59,6 +59,13 @@ import gaia.cu9.ari.gaiaorbit.util.scene2d.OwnScrollPane;
 import gaia.cu9.ari.gaiaorbit.util.scene2d.OwnTextButton;
 import gaia.cu9.ari.gaiaorbit.util.scene2d.OwnTextTooltip;
 
+/**
+ * Download manager. It gets a descriptor file from the server containing all 
+ * available datasets, detects them in the current system and offers and manages
+ * their downloads. 
+ * @author tsagrista
+ *
+ */
 public class DownloadDataWindow extends GenericDialog {
     private static final Log logger = Logger.getLogger(DownloadDataWindow.class);
 
