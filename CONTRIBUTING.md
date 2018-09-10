@@ -36,7 +36,7 @@ Add relativistic camera mode which makes use of the already implemented relativi
 Fixes #123
 ```
 
-#### <type>
+#### type
 
 -  **feat**: new feature
 -  **fix**: bug fix, should possibly reference the issue id in footer
@@ -46,15 +46,15 @@ Fixes #123
 -  **perf**: changes that improve performance
 -  **build**: changes to the build and continuous integration systems
 
-#### <subject>
+#### subject
 
 Contains a condensed description of the change. Uses imperative present tense (change and add instead of changes/changed or adds/added). It shouldn't be capitalized and without a period at the end.
 
-#### <body>
+#### body
 
 Thorough description of the change. You can elaborate at will. Not required.
 
-#### <footer>
+#### footer
 
 Cites any issues that the commit closes. Not required.
 
