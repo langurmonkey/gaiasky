@@ -2,11 +2,20 @@
 <a name="2.1.0"></a>
 ## [2.1.0](https://gitlab.com/langurmonkey/gaiasky/compare/2.0.3...2.1.0) (2018-09-10)
 
+### Build
+
+* new changelog generator in release script
+* add changelog generator script
+
 ### Docs
 
 * add gaiasky-docs submodule
 * add commit message style guidelines
-* Fix download helper docs
+* fix download helper docs
+
+### Feat
+
+* add download manager and infrastructure
 
 ### Style
 
