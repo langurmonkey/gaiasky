@@ -219,6 +219,16 @@ The most up-to-date documentation of Gaia Sky is always in [gaia.ari.uni-heidelb
 
 We also have a mirror at [gaia-sky.rtfd.org](https://gaia-sky.readthedocs.io).
 
+### 3.1. Documentation submodule
+
+In order to add the documentation submodule to the project, do:
+
+```
+$  git submodule add git@gitlab.com:langurmonkey/gaiasky-docs.git docs/
+```
+
+The documentation project will be checked out in the `docs/` folder.
+
 ##  4. Copyright and licensing information
 
 This software is published and distributed under the MPL 2.0
