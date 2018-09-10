@@ -1,19 +1,4 @@
 
-<a name="2.1.0"></a>
-## [2.1.0](https://gitlab.com/langurmonkey/gaiasky/compare/2.0.3...2.1.0) (2018-09-10)
-
-### Docs
-
-* add gaiasky-docs submodule
-* add commit message style guidelines
-* Fix download helper docs
-
-### Style
-
-* fix style of contributing once and for all
-* fix style in contributing.md
-
-
 ## [2.0.3](https://github.com/langurmonkey/gaiasky/tree/2.0.3) (2018-08-28)
 [Full Changelog](https://github.com/langurmonkey/gaiasky/compare/2.0.2-vr...2.0.3)
 
