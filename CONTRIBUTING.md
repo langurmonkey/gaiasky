@@ -14,6 +14,51 @@ Pull requests should never contain configuration files unless totally necessary 
 
 The code style format is available in the root of the project, [eclipse-formatter.xml](eclipse-formatter.xml).
 
+#### Commit message format
+
+Gaia Sky adheres to a standard commit message format that should be kept in order to generate meaningful changelogs:
+
+```
+<type>: <subject>
+<BLANK LINE>
+<body>
+<BLANK LINE>
+<footer>
+```
+
+Commit message example:
+
+```
+feat: adds relativistic camera mode
+
+Add relativistic camera mode which makes use of the already implemented relativistic aberration and gravitational wave model.
+
+Fixes #123
+```
+
+##### <type>
+
+-  *feat*: new feature
+-  *fix*: bug fix, should possibly reference the issue id in footer
+-  *docs*: changes to the documentation
+-  *style*: changes that don't affect functionality or such as cosmetic changes or formatting
+-  *refactor*: code refactorings which do not modify functionality or fix a bug, class changes, name changes, moves, etc.
+-  *perf*: changes that improve performance
+-  *build*: changes to the build and continuous integration systems
+
+##### <subject>
+
+Contains a condensed description of the change. Uses imperative present tense (change and add instead of changes/changed or adds/added). It shouldn't be capitalized and without a period at the end.
+
+##### <body>
+
+Thorough description of the change. You can elaborate at will. Not required.
+
+##### <footer>
+
+Cites any issues that the commit closes. Not required.
+
+
 ### Bug reports and requests
 
 Issues are the way to go.
