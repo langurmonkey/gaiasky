@@ -33,6 +33,7 @@ import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.ObjectIntMap;
+import com.badlogic.gdx.utils.ObjectMap;
 import com.badlogic.gdx.utils.TimeUtils;
 
 import gaia.cu9.ari.gaiaorbit.GaiaSky;
@@ -1033,6 +1034,16 @@ public class StarGroup extends ParticleGroup implements ILineRenderable, IStarFo
      */
     public Double getEpoch() {
         return this.epoch_jd;
+    }
+
+    @Override
+    protected void addToIndex(ObjectMap<String, SceneGraphNode> map) {
+        if (index != null) {
+            ObjectIntMap.Keys<String> keys = index.keys();
+            for (String key : keys) {
+                map.put(key, this);
+            }
+        }
     }
 
     @Override

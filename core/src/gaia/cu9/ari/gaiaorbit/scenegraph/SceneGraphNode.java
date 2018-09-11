@@ -8,6 +8,7 @@ import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Bits;
+import com.badlogic.gdx.utils.ObjectMap;
 
 import gaia.cu9.ari.gaiaorbit.GaiaSky;
 import gaia.cu9.ari.gaiaorbit.render.ComponentType;
@@ -771,12 +772,19 @@ public class SceneGraphNode implements IStarContainer, IPosition {
             return this.parent.getSceneGraphDepth() + 1;
         }
     }
+   
+    /**
+     * Special actions to be taken for this object when adding to the index.
+     * @param map The index
+     */
+    protected void addToIndex(ObjectMap<String, SceneGraphNode> map) {
+    }
     
     /**
      * Whether to add this node to the index
      * @return True if the node needs to be added to the index.
      */
-    public boolean addToIndex() {
+    public boolean mustAddToIndex() {
         return true;
     }
 }
