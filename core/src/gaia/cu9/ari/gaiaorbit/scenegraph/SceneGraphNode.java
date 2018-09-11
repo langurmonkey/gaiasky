@@ -771,4 +771,12 @@ public class SceneGraphNode implements IStarContainer, IPosition {
             return this.parent.getSceneGraphDepth() + 1;
         }
     }
+    
+    /**
+     * Whether to add this node to the index
+     * @return True if the node needs to be added to the index.
+     */
+    public boolean addToIndex() {
+        return true;
+    }
 }

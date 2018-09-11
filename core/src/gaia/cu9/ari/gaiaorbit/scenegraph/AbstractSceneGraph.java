@@ -177,7 +177,7 @@ public abstract class AbstractSceneGraph implements ISceneGraph {
     }
 
     private void addToIndex(SceneGraphNode node, ObjectMap<String, SceneGraphNode> map) {
-        if (node.name != null && !node.name.isEmpty()) {
+        if (node.name != null && !node.name.isEmpty() && node.addToIndex()) {
             map.put(node.name, node);
             map.put(node.name.toLowerCase(), node);
 

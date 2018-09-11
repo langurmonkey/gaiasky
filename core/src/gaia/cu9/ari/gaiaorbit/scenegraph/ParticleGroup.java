@@ -650,6 +650,9 @@ public class ParticleGroup extends FadeNode implements I3DTextRenderable, IFocus
         return false;
     }
 
+    public boolean addToIndex() {
+        return false;
+    }
 
     @Override
     public void dispose() {
