@@ -1,6 +1,6 @@
 
 <a name="2.1.0"></a>
-## [2.1.0](https://gitlab.com/langurmonkey/gaiasky/compare/2.0.3...2.1.0) (2018-09-10)
+## [2.1.0](https://gitlab.com/langurmonkey/gaiasky/compare/2.0.3...2.1.0) (2018-09-11)
 
 ### Build
 
@@ -9,13 +9,20 @@
 
 ### Docs
 
+* updated changelog
 * add gaiasky-docs submodule
 * add commit message style guidelines
-* fix download helper docs
+* Fix download helper docs
 
 ### Feat
 
 * add download manager and infrastructure
+
+### Fix
+
+* fix previous fix of search dialog
+* search dialog crash if starts with number
+* fix error loading lens dirt hi res texture
 
 ### Style
 
