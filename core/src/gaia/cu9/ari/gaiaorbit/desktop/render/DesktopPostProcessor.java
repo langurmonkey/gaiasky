@@ -153,7 +153,7 @@ public class DesktopPostProcessor implements IPostProcessor, IObserver {
         float lensFboScale = 0.2f;
         Texture lcol = manager.get(GlobalConf.data.dataFile("tex/lenscolor.png"));
         lcol.setFilter(TextureFilter.Linear, TextureFilter.Linear);
-        Texture ldirt = GlobalConf.scene.isHighQuality() ? manager.get("data/tex/lensdirt.jpg") : manager.get(GlobalConf.data.dataFile("tex/lensdirt_s.jpg"));
+        Texture ldirt = GlobalConf.scene.isHighQuality() ? manager.get(GlobalConf.data.dataFile("data/tex/lensdirt.jpg")) : manager.get(GlobalConf.data.dataFile("tex/lensdirt_s.jpg"));
         ldirt.setFilter(TextureFilter.Linear, TextureFilter.Linear);
         Texture lburst = manager.get(GlobalConf.data.dataFile("tex/lensstarburst.jpg"));
         lburst.setFilter(TextureFilter.Linear, TextureFilter.Linear);
