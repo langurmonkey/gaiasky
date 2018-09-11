@@ -224,7 +224,8 @@ We also have a mirror at [gaia-sky.rtfd.org](https://gaia-sky.readthedocs.io).
 In order to add the documentation submodule to the project, do:
 
 ```
-$  git submodule add git@gitlab.com:langurmonkey/gaiasky-docs.git docs/
+$  git submodule init
+$  git submodule update
 ```
 
 The documentation project will be checked out in the `docs/` folder.
