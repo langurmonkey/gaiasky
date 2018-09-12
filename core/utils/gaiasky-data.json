@@ -58,7 +58,7 @@
             "type" : "catalog-lod",
             "size" : 54424990548,
             "check": "catalog-dr2-verylarge.json",
-            "description": "Large DR2 catalog - 90%/90% parallax relative errors for bright/faint stars - 601 million stars",
+            "description": "Very large DR2 catalog - 90%/90% parallax relative errors for bright/faint stars - 601 million stars",
             "file" : "http://gaia.ari.uni-heidelberg.de/gaiasky/files/autodownload/catalog-dr2-verylarge.tar.gz"
         },
         {

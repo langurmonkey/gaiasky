@@ -53,12 +53,43 @@ sourceSets {
     }
 }
 
-task run(dependsOn: jar, type: JavaExec, description: "Runs the desktop project in Linux and Windows systems") {
+task run(dependsOn: jar, type: JavaExec, description: "Runs Gaia Sky") {
     main = project.mainClassName
     systemProperties['properties.file'] = ''
     systemProperties['assets.location'] = '../assets/'
     systemProperties['org.slf4j.simpleLogger.defaultLogLevel'] = 'warn'  // logging levels (e.g. REST server warn, info, debug)
     systemProperties['org.slf4j.simpleLogger.showThreadName'] = 'false'
+
+    // Parallel GC
+    //jvmArgs = ['-Xms2g', '-Xmx4g', '-XX:+UseParNewGC']
+    // CMS GC
+    //jvmArgs = ['-server', '-Xms2g', '-Xmx3g', '-XX:+UseConcMarkSweepGC', '-XX:+UseParNewGC', '-XX:MaxGCPauseMillis=5', '-XX:+CMSParallelRemarkEnabled', '-XX:CMSInitiatingOccupancyFraction=60', '-XX:MaxTenuringThreshold=4', '-XX:MaxNewSize=384m', '-XX:NewSize=384m', '-XX:SurvivorRatio=12']
+    // G1 GC
+    jvmArgs = [
+        '-Xms3g',
+        '-Xmx6g',
+        '-XX:+UseG1GC'
+    ]
+    // Verbose GC
+    // jvmArgs = ['-verbose:gc']
+    classpath = sourceSets.main.runtimeClasspath
+    classpath += files(project.assetsDir)
+    standardInput = System.in
+    workingDir = project.workDir
+    ignoreExitValue = true
+}
+
+task rund(dependsOn: jar, type: JavaExec, description: "Runs Gaia Sky - forces download manager and catalog chooser") {
+    main = project.mainClassName
+    systemProperties['properties.file'] = ''
+    systemProperties['assets.location'] = '../assets/'
+    systemProperties['org.slf4j.simpleLogger.defaultLogLevel'] = 'warn'  // logging levels (e.g. REST server warn, info, debug)
+    systemProperties['org.slf4j.simpleLogger.showThreadName'] = 'false'
+
+    args = [
+        "-d",
+        "-c"
+    ]
 
     // Parallel GC
     //jvmArgs = ['-Xms2g', '-Xmx4g', '-XX:+UseParNewGC']
