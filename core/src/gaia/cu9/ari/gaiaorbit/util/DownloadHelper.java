@@ -98,7 +98,7 @@ public class DownloadHelper {
 
             @Override
             public void failed(Throwable t) {
-                logger.error(t, txt("gui.download.fail"));
+                System.out.println(txt("gui.download.fail"));
                 if (fail != null)
                     fail.run();
             }

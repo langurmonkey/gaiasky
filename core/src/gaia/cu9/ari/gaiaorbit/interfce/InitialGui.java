@@ -20,6 +20,8 @@ import gaia.cu9.ari.gaiaorbit.util.GlobalConf;
 import gaia.cu9.ari.gaiaorbit.util.GlobalResources;
 import gaia.cu9.ari.gaiaorbit.util.Logger;
 import gaia.cu9.ari.gaiaorbit.util.Logger.Log;
+import gaia.cu9.ari.gaiaorbit.util.scene2d.Link;
+import gaia.cu9.ari.gaiaorbit.util.scene2d.OwnLabel;
 
 /**
  * Displays dataset downloader and dataset chooser screen if needed.
@@ -69,7 +71,22 @@ public class InitialGui extends AbstractGui {
                     displayChooser();
                 }
             });
-        }, null, null);
+        }, () -> {
+            // Fail?
+            logger.error("No internet connection! We will attempt to continue");
+            if (basicDataPresent()) {
+                // Go on all in
+                Gdx.app.postRunnable(() -> {
+                    displayChooser();
+                });
+            } else {
+                // Error and exit
+                logger.error("No base data present - need an internet connection to continue, exiting");
+                Gdx.app.postRunnable(() -> {
+                    addExitWindow();
+                });
+            }
+        }, null);
 
     }
 
@@ -114,6 +131,34 @@ public class InitialGui extends AbstractGui {
 
     @Override
     public void doneLoading(AssetManager assetManager) {
+    }
+
+    private void addExitWindow() {
+        GenericDialog exitw = new GenericDialog(txt("notif.error", "No internet connection"), skin, ui) {
+
+            @Override
+            protected void build() {
+                OwnLabel info = new OwnLabel("No internet connection and no base data found.\n" + "Gaia Sky will exit now", skin);
+                Link manualDownload = new Link("Manual download", skin, "link", "http://gaia.ari.uni-heidelberg.de/gaiasky/files/autodownload");
+                content.add(info).pad(10).row();
+                content.add(manualDownload).pad(10);
+            }
+
+            @Override
+            protected void accept() {
+                Gdx.app.exit();
+            }
+
+            @Override
+            protected void cancel() {
+                Gdx.app.exit();
+            }
+
+        };
+        exitw.setAcceptText(txt("gui.exit"));
+        exitw.setCancelText(null);
+        exitw.buildSuper();
+        exitw.show(ui);
     }
 
     private void addDownloaderWindow() {

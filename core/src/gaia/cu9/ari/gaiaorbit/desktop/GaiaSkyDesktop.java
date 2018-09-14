@@ -242,7 +242,7 @@ public class GaiaSkyDesktop implements IObserver {
     public void launchMainApp() {
         LwjglApplicationConfiguration cfg = new LwjglApplicationConfiguration();
         LwjglApplicationConfiguration.disableAudio = false;
-        cfg.title = GlobalConf.getFullApplicationName();
+        cfg.title = GlobalConf.APPLICATION_NAME;
         cfg.fullscreen = GlobalConf.screen.FULLSCREEN;
         cfg.resizable = GlobalConf.screen.RESIZABLE;
         cfg.width = GlobalConf.screen.getScreenWidth();
