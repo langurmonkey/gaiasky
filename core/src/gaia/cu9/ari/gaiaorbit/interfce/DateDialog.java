@@ -182,6 +182,8 @@ public class DateDialog extends CollapsibleWindow {
 
         /** BUTTONS **/
         HorizontalGroup buttonGroup = new HorizontalGroup();
+        buttonGroup.pad(pad);
+        buttonGroup.space(pad);
         TextButton ok = new OwnTextButton(I18n.bundle.get("gui.ok"), skin, "default");
         ok.setName("close");
         ok.addListener(new EventListener() {
@@ -232,7 +234,7 @@ public class DateDialog extends CollapsibleWindow {
         cancel.setSize(70 * GlobalConf.SCALE_FACTOR, 20 * GlobalConf.SCALE_FACTOR);
         buttonGroup.align(Align.right).space(10);
 
-        add(buttonGroup).colspan(2).pad(pad, 0, 0, 0).bottom().right();
+        add(buttonGroup).colspan(2).pad(pad).bottom().right();
         getTitleTable().align(Align.left);
 
         pack();

@@ -16,6 +16,7 @@ import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Container;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.ScrollPane;
+import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.TextField;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener.ChangeEvent;
 import com.badlogic.gdx.utils.Align;
@@ -27,6 +28,9 @@ import com.badlogic.gdx.utils.viewport.ScreenViewport;
 
 import gaia.cu9.ari.gaiaorbit.GaiaSky;
 import gaia.cu9.ari.gaiaorbit.data.stars.UncertaintiesHandler;
+import gaia.cu9.ari.gaiaorbit.desktop.util.MemInfoWindow;
+import gaia.cu9.ari.gaiaorbit.desktop.util.RunCameraWindow;
+import gaia.cu9.ari.gaiaorbit.desktop.util.RunScriptWindow;
 import gaia.cu9.ari.gaiaorbit.event.EventManager;
 import gaia.cu9.ari.gaiaorbit.event.Events;
 import gaia.cu9.ari.gaiaorbit.interfce.components.VisualEffectsComponent;
@@ -59,7 +63,7 @@ import gaia.cu9.ari.gaiaorbit.util.scene2d.OwnLabel;
  */
 public class FullGui extends AbstractGui {
     private static final Log logger = Logger.getLogger(FullGui.class);
-    
+
     protected ControlsWindow controlsWindow;
     protected MinimapWindow minimapWindow;
 
@@ -72,6 +76,9 @@ public class FullGui extends AbstractGui {
 
     protected SearchDialog searchDialog;
     protected AboutWindow aboutWindow;
+    protected RunScriptWindow runscriptWindow;
+    protected RunCameraWindow runcameraWindow;
+    protected MemInfoWindow memInfoWindow;
     protected LogWindow logWindow;
     protected PreferencesWindow preferencesWindow;
     protected VisualEffectsComponent visualEffectsComponent;
@@ -110,7 +117,7 @@ public class FullGui extends AbstractGui {
         buildGui();
 
         // We must subscribe to the desired events
-        EventManager.instance.subscribe(this, Events.FOV_CHANGED_CMD, Events.SHOW_TUTORIAL_ACTION, Events.SHOW_SEARCH_ACTION, Events.REMOVE_KEYBOARD_FOCUS, Events.REMOVE_GUI_COMPONENT, Events.ADD_GUI_COMPONENT, Events.SHOW_ABOUT_ACTION, Events.SHOW_LOG_ACTION, Events.RA_DEC_UPDATED, Events.LON_LAT_UPDATED, Events.POPUP_MENU_FOCUS, Events.SHOW_PREFERENCES_ACTION, Events.SHOW_LAND_AT_LOCATION_ACTION, Events.DISPLAY_POINTER_COORDS_CMD, Events.TOGGLE_MINIMAP);
+        EventManager.instance.subscribe(this, Events.FOV_CHANGED_CMD, Events.SHOW_TUTORIAL_ACTION, Events.SHOW_SEARCH_ACTION, Events.SHOW_RUNSCRIPT_ACTION, Events.SHOW_PLAYCAMERA_ACTION, Events.SHOW_ABOUT_ACTION, Events.DISPLAY_MEM_INFO_WINDOW, Events.REMOVE_KEYBOARD_FOCUS, Events.REMOVE_GUI_COMPONENT, Events.ADD_GUI_COMPONENT, Events.SHOW_ABOUT_ACTION, Events.SHOW_LOG_ACTION, Events.RA_DEC_UPDATED, Events.LON_LAT_UPDATED, Events.POPUP_MENU_FOCUS, Events.SHOW_PREFERENCES_ACTION, Events.SHOW_LAND_AT_LOCATION_ACTION, Events.DISPLAY_POINTER_COORDS_CMD, Events.TOGGLE_MINIMAP);
     }
 
     protected void buildGui() {
@@ -155,7 +162,7 @@ public class FullGui extends AbstractGui {
         runStateInterface.setFillParent(true);
         runStateInterface.center().bottom();
         //runStateInterface.pad(GlobalConf.SCALE_FACTOR == 1 ? 135 : 200, 0, 0, 5);
-        runStateInterface.pad(0,0, 5, 0);
+        runStateInterface.pad(0, 0, 5, 0);
         interfaces.add(runStateInterface);
 
         // CUSTOM OBJECTS INTERFACE
@@ -302,6 +309,26 @@ public class FullGui extends AbstractGui {
                 aboutWindow = new AboutWindow(ui, skin);
             }
             aboutWindow.show(ui);
+            break;
+        case SHOW_RUNSCRIPT_ACTION:
+            if (runscriptWindow != null)
+                runscriptWindow.remove();
+            
+            runscriptWindow = new RunScriptWindow(ui, skin);
+            runscriptWindow.show(ui);
+            break;
+        case SHOW_PLAYCAMERA_ACTION:
+            if (runcameraWindow != null)
+                runcameraWindow.remove();
+
+            runcameraWindow = new RunCameraWindow(ui, skin);
+            runcameraWindow.show(ui);
+            break;
+        case DISPLAY_MEM_INFO_WINDOW:
+            if (memInfoWindow == null) {
+                memInfoWindow = new MemInfoWindow(ui, skin);
+            }
+            memInfoWindow.show(ui);
             break;
         case SHOW_LOG_ACTION:
             if (logWindow == null) {

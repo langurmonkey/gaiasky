@@ -79,7 +79,6 @@ public class GaiaSkyDesktop implements IObserver {
     private static boolean REST_ENABLED = false;
     private static Class<?> REST_SERVER_CLASS = null;
 
-    private MemInfoWindow memInfoWindow;
     private static GaiaSkyArgs gsargs;
 
     /**
@@ -227,7 +226,6 @@ public class GaiaSkyDesktop implements IObserver {
     public GaiaSkyDesktop() {
         super();
         lw = new LogWriter();
-        EventManager.instance.subscribe(this, Events.SHOW_RUNSCRIPT_ACTION, Events.SHOW_PLAYCAMERA_ACTION, Events.DISPLAY_MEM_INFO_WINDOW);
         EventManager.instance.subscribe(this, Events.SCENE_GRAPH_LOADED, Events.DISPOSE);
     }
 
@@ -263,39 +261,9 @@ public class GaiaSkyDesktop implements IObserver {
             EventManager.instance.removeAllSubscriptions(lw);
     }
 
-    RunScriptWindow scriptWindow = null;
-    RunCameraWindow cameraWindow = null;
-
     @Override
     public void notify(Events event, final Object... data) {
         switch (event) {
-        case SHOW_PLAYCAMERA_ACTION:
-            Gdx.app.postRunnable(new Runnable() {
-                @Override
-                public void run() {
-                    if (cameraWindow == null)
-                        cameraWindow = new RunCameraWindow((Stage) data[0], (Skin) data[1]);
-                    cameraWindow.display();
-                }
-            });
-            break;
-        case SHOW_RUNSCRIPT_ACTION:
-            Gdx.app.postRunnable(new Runnable() {
-                @Override
-                public void run() {
-                    if (scriptWindow == null)
-                        scriptWindow = new RunScriptWindow((Stage) data[0], (Skin) data[1]);
-                    scriptWindow.display();
-                }
-            });
-
-            break;
-        case DISPLAY_MEM_INFO_WINDOW:
-            if (memInfoWindow == null) {
-                memInfoWindow = new MemInfoWindow((Stage) data[0], (Skin) data[1]);
-            }
-            memInfoWindow.show((Stage) data[0]);
-            break;
         case JAVA_EXCEPTION:
             ((Throwable) data[0]).printStackTrace(System.err);
             break;

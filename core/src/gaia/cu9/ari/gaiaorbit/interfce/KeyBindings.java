@@ -9,6 +9,7 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input.Keys;
 import com.bitfire.postprocessing.effects.CubemapProjections.CubemapProjection;
 
+import gaia.cu9.ari.gaiaorbit.GaiaSky;
 import gaia.cu9.ari.gaiaorbit.event.EventManager;
 import gaia.cu9.ari.gaiaorbit.event.Events;
 import gaia.cu9.ari.gaiaorbit.scenegraph.camera.CameraManager.CameraMode;
@@ -72,27 +73,43 @@ public class KeyBindings {
     public void initDefault() {
 
         // F1 -> Help dialog
-        addMapping(new ProgramAction(txt("action.help"), new Runnable() {
-            @Override
-            public void run() {
+        addMapping(new ProgramAction(txt("action.help"), () -> {
                 EventManager.instance.post(Events.SHOW_ABOUT_ACTION);
-            }
         }), Keys.F1);
 
+        // h -> Help dialog
+        addMapping(new ProgramAction(txt("action.help"), ()->{
+            EventManager.instance.post(Events.SHOW_ABOUT_ACTION);
+        }), Keys.H);
+
         // ESCAPE -> Exit
-        addMapping(new ProgramAction(txt("action.exit"), new Runnable() {
-            @Override
-            public void run() {
+        addMapping(new ProgramAction(txt("action.exit"), () -> {
                 Gdx.app.exit();
-            }
         }), Keys.ESCAPE);
 
+        // q -> Exit
+        addMapping(new ProgramAction(txt("action.exit"), () -> {
+                Gdx.app.exit();
+        }), Keys.Q);
+        
+        // p -> Show preferences dialog
+        addMapping(new ProgramAction(txt("action.preferences"), ()->{
+            EventManager.instance.post(Events.SHOW_PREFERENCES_ACTION);
+        }), Keys.P);
+
+        // r -> Show run script dialog
+        addMapping(new ProgramAction(txt("action.runscript"), ()->{
+            EventManager.instance.post(Events.SHOW_RUNSCRIPT_ACTION);
+        }), Keys.R);
+
+        // c -> Show play camera dialog
+        addMapping(new ProgramAction(txt("action.playcamera"), ()->{
+            EventManager.instance.post(Events.SHOW_PLAYCAMERA_ACTION);
+        }), Keys.C);
+
         // SHIFT+O -> Toggle orbits
-        addMapping(new ProgramAction(txt("action.toggle", txt("element.orbits")), new Runnable() {
-            @Override
-            public void run() {
+        addMapping(new ProgramAction(txt("action.toggle", txt("element.orbits")), ()-> {
                 EventManager.instance.post(Events.TOGGLE_VISIBILITY_CMD, "element.orbits", false);
-            }
         }), SPECIAL2, Keys.O);
 
         // SHIFT+P -> Toggle planets
