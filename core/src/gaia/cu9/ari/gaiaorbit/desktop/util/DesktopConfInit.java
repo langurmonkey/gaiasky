@@ -57,7 +57,6 @@ public class DesktopConfInit extends ConfInit {
 
     CommentedProperties p;
     Properties vp;
-    
 
     IDateFormat df = DateFormatFactory.getFormatter("dd/MM/yyyy HH:mm:ss");
 
@@ -164,7 +163,7 @@ public class DesktopConfInit extends ConfInit {
         DataConf dc = new DataConf();
 
         String DATA_LOCATION = p.getProperty("data.location");
-        if(DATA_LOCATION == null || DATA_LOCATION.isEmpty())
+        if (DATA_LOCATION == null || DATA_LOCATION.isEmpty())
             DATA_LOCATION = SysUtils.getDefaultDataDir().getAbsolutePath();
 
         String CATALOG_JSON_FILE = p.getProperty("data.json.catalog", "");
@@ -202,9 +201,7 @@ public class DesktopConfInit extends ConfInit {
         String UI_THEME = p.getProperty("program.ui.theme");
         // Update scale factor according to theme - for HiDPI screens
         GlobalConf.updateScaleFactor(UI_THEME.endsWith("x2") ? 2f : 1f);
-        String SCRIPT_LOCATION = p.getProperty("program.scriptlocation").isEmpty()
-                ? System.getProperty("user.dir") + File.separatorChar + "scripts"
-                : p.getProperty("program.scriptlocation");
+        String SCRIPT_LOCATION = p.getProperty("program.scriptlocation").isEmpty() ? System.getProperty("user.dir") + File.separatorChar + "scripts" : p.getProperty("program.scriptlocation");
         int REST_PORT = Integer.parseInt(p.getProperty("program.restport", "-1"));
 
         boolean STEREOSCOPIC_MODE = Boolean.parseBoolean(p.getProperty("program.stereoscopic"));

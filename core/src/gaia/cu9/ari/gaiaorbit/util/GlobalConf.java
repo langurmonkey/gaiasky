@@ -1,6 +1,6 @@
 package gaia.cu9.ari.gaiaorbit.util;
 
-import java.nio.file.Files;
+import java.io.File;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.Instant;
@@ -503,16 +503,17 @@ public class GlobalConf {
         }
 
         public String dataFile(String path) {
-            if (Paths.get(path).isAbsolute()) {
+            String pth = path.replace('*', 'X');
+            if (Paths.get(pth).isAbsolute()) {
                 // Absolute path, just leave it
-                return path;
+                return path.replace('\\', '/');
             } else {
                 // Relative path, just remove leading 'data/' and prepend data location
                 if (path.startsWith("data/")) {
                     path = path.substring(5);
                 }
-                Path p = Paths.get(DATA_LOCATION, path);
-                return p.toString();
+                Path p = Paths.get(DATA_LOCATION);
+                return (p.toString() + File.separator + path).replace('\\', '/');
             }
         }
 
