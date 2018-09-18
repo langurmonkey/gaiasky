@@ -74,42 +74,42 @@ public class KeyBindings {
 
         // F1 -> Help dialog
         addMapping(new ProgramAction(txt("action.help"), () -> {
-                EventManager.instance.post(Events.SHOW_ABOUT_ACTION);
+            EventManager.instance.post(Events.SHOW_ABOUT_ACTION);
         }), Keys.F1);
 
         // h -> Help dialog
-        addMapping(new ProgramAction(txt("action.help"), ()->{
+        addMapping(new ProgramAction(txt("action.help"), () -> {
             EventManager.instance.post(Events.SHOW_ABOUT_ACTION);
         }), Keys.H);
 
         // ESCAPE -> Exit
         addMapping(new ProgramAction(txt("action.exit"), () -> {
-                Gdx.app.exit();
+            Gdx.app.exit();
         }), Keys.ESCAPE);
 
         // q -> Exit
         addMapping(new ProgramAction(txt("action.exit"), () -> {
-                Gdx.app.exit();
+            Gdx.app.exit();
         }), Keys.Q);
-        
+
         // p -> Show preferences dialog
-        addMapping(new ProgramAction(txt("action.preferences"), ()->{
+        addMapping(new ProgramAction(txt("action.preferences"), () -> {
             EventManager.instance.post(Events.SHOW_PREFERENCES_ACTION);
         }), Keys.P);
 
         // r -> Show run script dialog
-        addMapping(new ProgramAction(txt("action.runscript"), ()->{
+        addMapping(new ProgramAction(txt("action.runscript"), () -> {
             EventManager.instance.post(Events.SHOW_RUNSCRIPT_ACTION);
         }), Keys.R);
 
         // c -> Show play camera dialog
-        addMapping(new ProgramAction(txt("action.playcamera"), ()->{
+        addMapping(new ProgramAction(txt("action.playcamera"), () -> {
             EventManager.instance.post(Events.SHOW_PLAYCAMERA_ACTION);
         }), Keys.C);
 
         // SHIFT+O -> Toggle orbits
-        addMapping(new ProgramAction(txt("action.toggle", txt("element.orbits")), ()-> {
-                EventManager.instance.post(Events.TOGGLE_VISIBILITY_CMD, "element.orbits", false);
+        addMapping(new ProgramAction(txt("action.toggle", txt("element.orbits")), () -> {
+            EventManager.instance.post(Events.TOGGLE_VISIBILITY_CMD, "element.orbits", false);
         }), SPECIAL2, Keys.O);
 
         // SHIFT+P -> Toggle planets
@@ -377,20 +377,19 @@ public class KeyBindings {
         }
 
         // CTRL + D -> Toggle debug information
-        addMapping(new ProgramAction(txt("action.toggle", txt("element.debugmode")), new Runnable() {
-            @Override
-            public void run() {
-                EventManager.instance.post(Events.SHOW_DEBUG_CMD);
-            }
+        addMapping(new ProgramAction(txt("action.toggle", txt("element.debugmode")), () -> {
+            EventManager.instance.post(Events.SHOW_DEBUG_CMD);
         }), SPECIAL1, Keys.D);
 
         // CTRL + F -> Search dialog
-        addMapping(new ProgramAction(txt("action.search"), new Runnable() {
-            @Override
-            public void run() {
-                EventManager.instance.post(Events.SHOW_SEARCH_ACTION);
-            }
+        addMapping(new ProgramAction(txt("action.search"), () -> {
+            EventManager.instance.post(Events.SHOW_SEARCH_ACTION);
         }), SPECIAL1, Keys.F);
+
+        // f -> Search dialog
+        addMapping(new ProgramAction(txt("action.search"), () -> {
+            EventManager.instance.post(Events.SHOW_SEARCH_ACTION);
+        }), Keys.F);
 
         // CTRL + SHIFT + O -> Toggle particle fade
         addMapping(new ProgramAction(txt("action.toggle", txt("element.octreeparticlefade")), new Runnable() {
