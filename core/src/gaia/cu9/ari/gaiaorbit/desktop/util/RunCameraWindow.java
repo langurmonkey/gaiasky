@@ -50,16 +50,10 @@ public class RunCameraWindow extends GenericDialog {
     public RunCameraWindow(Stage stg, Skin skin) {
         super(txt("gui.camera.title"), skin, stg);
 
-        this.me = this;
-
-        pad = 5 * GlobalConf.SCALE_FACTOR;
-
         setAcceptText(txt("gui.camera.run"));
         setCancelText(txt("gui.cancel"));
 
         buildSuper();
-
-        this.setPosition(Math.round(stage.getWidth() / 2f - this.getWidth() / 2f), Math.round(stage.getHeight() / 2f - this.getHeight() / 2f));
     }
 
     @Override

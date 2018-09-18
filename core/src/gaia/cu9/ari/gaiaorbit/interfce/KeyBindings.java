@@ -9,7 +9,6 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input.Keys;
 import com.bitfire.postprocessing.effects.CubemapProjections.CubemapProjection;
 
-import gaia.cu9.ari.gaiaorbit.GaiaSky;
 import gaia.cu9.ari.gaiaorbit.event.EventManager;
 import gaia.cu9.ari.gaiaorbit.event.Events;
 import gaia.cu9.ari.gaiaorbit.scenegraph.camera.CameraManager.CameraMode;
@@ -84,12 +83,12 @@ public class KeyBindings {
 
         // ESCAPE -> Exit
         addMapping(new ProgramAction(txt("action.exit"), () -> {
-            Gdx.app.exit();
+            EventManager.instance.post(Events.SHOW_QUIT_ACTION);
         }), Keys.ESCAPE);
 
         // q -> Exit
         addMapping(new ProgramAction(txt("action.exit"), () -> {
-            Gdx.app.exit();
+            EventManager.instance.post(Events.SHOW_QUIT_ACTION);
         }), Keys.Q);
 
         // p -> Show preferences dialog

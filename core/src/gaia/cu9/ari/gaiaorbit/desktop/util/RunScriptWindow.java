@@ -7,7 +7,6 @@ import org.python.core.PySyntaxError;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.files.FileHandle;
-import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Event;
 import com.badlogic.gdx.scenes.scene2d.EventListener;
@@ -31,7 +30,6 @@ import gaia.cu9.ari.gaiaorbit.interfce.GenericDialog;
 import gaia.cu9.ari.gaiaorbit.script.JythonFactory;
 import gaia.cu9.ari.gaiaorbit.util.GlobalConf;
 import gaia.cu9.ari.gaiaorbit.util.GlobalResources;
-import gaia.cu9.ari.gaiaorbit.util.I18n;
 import gaia.cu9.ari.gaiaorbit.util.scene2d.OwnImageButton;
 import gaia.cu9.ari.gaiaorbit.util.scene2d.OwnLabel;
 import gaia.cu9.ari.gaiaorbit.util.scene2d.OwnScrollPane;
@@ -59,14 +57,10 @@ public class RunScriptWindow extends GenericDialog {
     public RunScriptWindow(Stage stg, Skin skin) {
         super(txt("gui.script.title"), skin, stg);
 
-        pad = 5 * GlobalConf.SCALE_FACTOR;
-
         setAcceptText(txt("gui.camera.run"));
         setCancelText(txt("gui.cancel"));
 
         buildSuper();
-
-        this.setPosition(Math.round(stage.getWidth() / 2f - this.getWidth() / 2f), Math.round(stage.getHeight() / 2f - this.getHeight() / 2f));
     }
 
     @Override

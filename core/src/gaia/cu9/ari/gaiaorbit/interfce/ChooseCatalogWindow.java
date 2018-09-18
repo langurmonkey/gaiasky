@@ -8,13 +8,11 @@ import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Button;
 import com.badlogic.gdx.scenes.scene2d.ui.Cell;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
-import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.Array;
 
 import gaia.cu9.ari.gaiaorbit.event.EventManager;
 import gaia.cu9.ari.gaiaorbit.event.Events;
 import gaia.cu9.ari.gaiaorbit.util.GlobalConf;
-
 
 /**
  * GUI window to choose the catalog to use
@@ -46,11 +44,9 @@ public class ChooseCatalogWindow extends GenericDialog {
 
         cell.clearActor();
         cell.space(3 * GlobalConf.SCALE_FACTOR);
-        cell.padTop(10 *GlobalConf.SCALE_FACTOR);
+        cell.padTop(10 * GlobalConf.SCALE_FACTOR);
         cell.setActor(dw.buildDatasetsWidget(catalogFiles));
     }
-
-
 
     @Override
     protected void accept() {

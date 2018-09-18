@@ -60,7 +60,7 @@ public class KeyInputController extends InputAdapter {
             }
         } else if (keycode == Keys.ESCAPE) {
             // If input is not enabled, only escape works
-            Gdx.app.exit();
+            EventManager.instance.post(Events.SHOW_QUIT_ACTION);
         }
         pressedKeys.remove(keycode);
         return false;
