@@ -16,7 +16,7 @@
 
 ### Bug Fixes
 
-- fix for windows paths ([#309](https://github.com/langurmonkey/gaiasky/issues/309))
+- fix for windows paths [#309](https://github.com/langurmonkey/gaiasky/issues/309) 
 - fix run script and play camera windows 
 - update changelog 
 ### Features
@@ -30,7 +30,7 @@
 
 ### Bug Fixes
 
-- crash if no internet connection present ([#308](https://github.com/langurmonkey/gaiasky/issues/308))
+- crash if no internet connection present [#308](https://github.com/langurmonkey/gaiasky/issues/308) 
 - fix description of very large catalog 
 ### Documentation
 
@@ -43,8 +43,8 @@
 
 ### Bug Fixes
 
-- fix previous fix of search dialog ([#307](https://github.com/langurmonkey/gaiasky/issues/307))
-- search dialog crash if starts with number ([#307](https://github.com/langurmonkey/gaiasky/issues/307))
+- fix previous fix of search dialog [#307](https://github.com/langurmonkey/gaiasky/issues/307) 
+- search dialog crash if starts with number [#307](https://github.com/langurmonkey/gaiasky/issues/307) 
 - fix error loading lens dirt hi res texture 
 ### Build system
 
@@ -58,7 +58,7 @@
 - Fix download helper docs 
 ### Features
 
-- add download manager and infrastructure ([#291](https://github.com/langurmonkey/gaiasky/issues/291)[#303](https://github.com/langurmonkey/gaiasky/issues/303))
+- add download manager and infrastructure [#291](https://github.com/langurmonkey/gaiasky/issues/291) [#303](https://github.com/langurmonkey/gaiasky/issues/303) 
 ### Style
 
 - fix style of contributing once and for all 

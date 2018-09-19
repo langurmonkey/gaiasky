@@ -21,7 +21,7 @@
 {{ range .CommitGroups -}}
 ### {{ .Title }}
 {{ range .Commits }}
-- {{ .Subject }} {{ if .Refs -}} ({{ range .Refs }}{{ if .Action }}[#{{ .Ref }}]({{ $.Info.RepositoryURL }}/issues/{{ .Ref }}){{ end }}{{end}}){{ end }}{{ end }}
+- {{ .Subject }} {{ if .Refs -}} {{ range .Refs }}{{ if .Action }}[#{{ .Ref }}]({{ $.Info.RepositoryURL }}/issues/{{ .Ref }}) {{ end }}{{end}}{{ end }}{{ end }}
 {{ end }}
 
 {{- if .RevertCommits -}}
