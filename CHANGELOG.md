@@ -1,5 +1,6 @@
 <a name="unreleased"></a>
-## [Unreleased]
+## [Unreleased](https://github.com/langurmonkey/gaiasky/tree/master)
+[Full changelog](https://github.com/langurmonkey/gaiasky/compare/2.1.2...HEAD)
 
 ### Documentation
 - improve git-chglog configuration
@@ -10,64 +11,58 @@
 
 
 <a name="2.1.2"></a>
-## [2.1.2](https://github.com/langurmonkey/gaiasky/compare/2.1.1...2.1.2) (2018-09-18)
+## [2.1.2](https://github.com/langurmonkey/gaiasky/tree/2.1.1) (2018-09-18)
+[Full changelog](https://github.com/langurmonkey/gaiasky/compare/2.1.1...2.1.2)
 
 ### Bug Fixes
 
-* fix for windows paths
-* fix run script and play camera windows
-* update changelog
-
+- fix for windows paths ((#309)[https://github.com/langurmonkey/gaiasky/issues/309])
+- fix run script and play camera windows 
+- update changelog 
 ### Features
 
-* add quit confirmation dialog
-* add new key bindings for simple actions
-
+- add quit confirmation dialog 
+- add new key bindings for simple actions 
 
 <a name="2.1.1"></a>
-## [2.1.1](https://github.com/langurmonkey/gaiasky/compare/2.1.0...2.1.1) (2018-09-14)
+## [2.1.1](https://github.com/langurmonkey/gaiasky/tree/2.1.0) (2018-09-14)
+[Full changelog](https://github.com/langurmonkey/gaiasky/compare/2.1.0...2.1.1)
 
 ### Bug Fixes
 
-* crash if no internet connection present
-* fix description of very large catalog
-
+- crash if no internet connection present ((#308)[https://github.com/langurmonkey/gaiasky/issues/308])
+- fix description of very large catalog 
 ### Documentation
 
-* update changelog
-* mended submodule init and update
-
+- update changelog 
+- mended submodule init and update 
 
 <a name="2.1.0"></a>
-## [2.1.0](https://github.com/langurmonkey/gaiasky/compare/2.0.3...2.1.0) (2018-09-11)
+## [2.1.0](https://github.com/langurmonkey/gaiasky/tree/2.0.3) (2018-09-11)
+[Full changelog](https://github.com/langurmonkey/gaiasky/compare/2.0.3...2.1.0)
 
 ### Bug Fixes
 
-* fix previous fix of search dialog
-* search dialog crash if starts with number
-* fix error loading lens dirt hi res texture
-
+- fix previous fix of search dialog ((#307)[https://github.com/langurmonkey/gaiasky/issues/307])
+- search dialog crash if starts with number ((#307)[https://github.com/langurmonkey/gaiasky/issues/307])
+- fix error loading lens dirt hi res texture 
 ### Build system
 
-* new changelog generator in release script
-* add changelog generator script
-
+- new changelog generator in release script 
+- add changelog generator script 
 ### Documentation
 
-* updated changelog
-* add gaiasky-docs submodule
-* add commit message style guidelines
-* Fix download helper docs
-
+- updated changelog 
+- add gaiasky-docs submodule 
+- add commit message style guidelines 
+- Fix download helper docs 
 ### Features
 
-* add download manager and infrastructure
-
+- add download manager and infrastructure ((#291)[https://github.com/langurmonkey/gaiasky/issues/291](#303)[https://github.com/langurmonkey/gaiasky/issues/303])
 ### Style
 
-* fix style of contributing once and for all
-* fix style in contributing.md
-
+- fix style of contributing once and for all 
+- fix style in contributing.md 
 
 ## [2.0.3](https://github.com/langurmonkey/gaiasky/tree/2.0.3) (2018-08-28)
 [Full Changelog](https://github.com/langurmonkey/gaiasky/compare/2.0.2-vr...2.0.3)
