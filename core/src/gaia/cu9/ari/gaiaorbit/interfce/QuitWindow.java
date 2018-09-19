@@ -6,6 +6,12 @@ import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 
 import gaia.cu9.ari.gaiaorbit.util.scene2d.OwnLabel;
 
+/**
+ * Generic dialog that displays the confirmation quit message and offers options
+ * to cancel it or go through.
+ * @author tsagrista
+ *
+ */
 public class QuitWindow extends GenericDialog {
 
     public QuitWindow(Stage ui, Skin skin) {

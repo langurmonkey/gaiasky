@@ -153,14 +153,10 @@ public class LogWindow extends GenericDialog {
 
     @Override
     protected void accept() {
-        // TODO Auto-generated method stub
-
     }
 
     @Override
     protected void cancel() {
-        // TODO Auto-generated method stub
-
     }
 
 }
