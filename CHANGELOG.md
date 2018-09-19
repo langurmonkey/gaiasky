@@ -2,34 +2,40 @@
 <a name="2.1.2"></a>
 ## [2.1.2](https://gitlab.com/langurmonkey/gaiasky/compare/2.1.1...2.1.2) (2018-09-18)
 
-### Feat
-
-* add quit confirmation dialog
-* add new key bindings for simple actions
-
-### Fix
+### Bug Fixes
 
 * fix for windows paths
 * fix run script and play camera windows
 * update changelog
 
+### Features
+
+* add quit confirmation dialog
+* add new key bindings for simple actions
+
 
 <a name="2.1.1"></a>
 ## [2.1.1](https://gitlab.com/langurmonkey/gaiasky/compare/2.1.0...2.1.1) (2018-09-14)
+
+### Bug Fixes
+
+* crash if no internet connection present
+* fix description of very large catalog
 
 ### Docs
 
 * update changelog
 * mended submodule init and update
 
-### Fix
-
-* crash if no internet connection present
-* fix description of very large catalog
-
 
 <a name="2.1.0"></a>
 ## [2.1.0](https://gitlab.com/langurmonkey/gaiasky/compare/2.0.3...2.1.0) (2018-09-11)
+
+### Bug Fixes
+
+* fix previous fix of search dialog
+* search dialog crash if starts with number
+* fix error loading lens dirt hi res texture
 
 ### Build
 
@@ -43,15 +49,9 @@
 * add commit message style guidelines
 * Fix download helper docs
 
-### Feat
+### Features
 
 * add download manager and infrastructure
-
-### Fix
-
-* fix previous fix of search dialog
-* search dialog crash if starts with number
-* fix error loading lens dirt hi res texture
 
 ### Style
 

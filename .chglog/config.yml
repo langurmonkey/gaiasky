@@ -1,27 +1,48 @@
 style: gitlab
 template: CHANGELOG.tpl.md
 info:
-  title: CHANGELOG
-  repository_url: https://gitlab.com/langurmonkey/gaiasky
+    title: CHANGELOG
+    repository_url: https://gitlab.com/langurmonkey/gaiasky
 options:
-  commits:
-    # filters:
-    #   Type:
-    #     - feat
-    #     - fix
-    #     - perf
-    #     - refactor
-  commit_groups:
-    # title_maps:
-    #   feat: Features
-    #   fix: Bug Fixes
-    #   perf: Performance Improvements
-    #   refactor: Code Refactoring
-  header:
-    pattern: "^(\\w*)\\:\\s(.*)$"
-    pattern_maps:
-      - Type
-      - Subject
-  notes:
-    keywords:
-      - BREAKING CHANGE
+
+    commits:
+        filters:
+            Type:
+                - feat
+                - fix
+                - style
+                - docs
+                - perf
+                - refactor
+                - build
+        sort_by: Title
+
+    commit_groups:
+        group_by: Type
+        sort_by: Title
+        title_maps:
+            feat: Features
+            fix: Bug Fixes
+            perf: Performance Improvements
+            refactor: Code Refactoring
+
+    issues:
+        prefix:
+            - #
+
+    refs:
+        actions:
+            - Closes
+            - Close
+            - Fixes
+            - Fix
+
+    header:
+        pattern: "^(\\w*)\\:\\s(.*)$"
+        pattern_maps:
+            - Type
+            - Subject
+
+    notes:
+        keywords:
+            - BREAKING CHANGE
