@@ -1,6 +1,16 @@
+<a name="unreleased"></a>
+## [Unreleased]
+
+### Documentation
+- improve git-chglog configuration
+- update changelog
+
+### Style
+- minor style issues
+
 
 <a name="2.1.2"></a>
-## [2.1.2](https://gitlab.com/langurmonkey/gaiasky/compare/2.1.1...2.1.2) (2018-09-18)
+## [2.1.2](https://github.com/langurmonkey/gaiasky/compare/2.1.1...2.1.2) (2018-09-18)
 
 ### Bug Fixes
 
@@ -15,21 +25,21 @@
 
 
 <a name="2.1.1"></a>
-## [2.1.1](https://gitlab.com/langurmonkey/gaiasky/compare/2.1.0...2.1.1) (2018-09-14)
+## [2.1.1](https://github.com/langurmonkey/gaiasky/compare/2.1.0...2.1.1) (2018-09-14)
 
 ### Bug Fixes
 
 * crash if no internet connection present
 * fix description of very large catalog
 
-### Docs
+### Documentation
 
 * update changelog
 * mended submodule init and update
 
 
 <a name="2.1.0"></a>
-## [2.1.0](https://gitlab.com/langurmonkey/gaiasky/compare/2.0.3...2.1.0) (2018-09-11)
+## [2.1.0](https://github.com/langurmonkey/gaiasky/compare/2.0.3...2.1.0) (2018-09-11)
 
 ### Bug Fixes
 
@@ -37,12 +47,12 @@
 * search dialog crash if starts with number
 * fix error loading lens dirt hi res texture
 
-### Build
+### Build system
 
 * new changelog generator in release script
 * add changelog generator script
 
-### Docs
+### Documentation
 
 * updated changelog
 * add gaiasky-docs submodule
