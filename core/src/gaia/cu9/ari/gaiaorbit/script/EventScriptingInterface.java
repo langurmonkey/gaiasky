@@ -1139,6 +1139,20 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
 	}
 
 	@Override
+    public void enableGui() {
+       Gdx.app.postRunnable(()->{
+           em.post(Events.DISPLAY_GUI_CMD, I18n.bundle.get("notif.cleanmode"), true);
+       }); 
+    }
+
+    @Override
+    public void disableGui() {
+       Gdx.app.postRunnable(()->{
+           em.post(Events.DISPLAY_GUI_CMD, I18n.bundle.get("notif.cleanmode"), false);
+       }); 
+    }
+
+    @Override
 	public void displayMessageObject(final int id, final String message, final float x, final float y, final float r,
 			final float g, final float b, final float a, final float fontSize) {
 		Gdx.app.postRunnable(() -> {

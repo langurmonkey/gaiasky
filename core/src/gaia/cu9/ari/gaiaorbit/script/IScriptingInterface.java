@@ -1036,6 +1036,19 @@ public interface IScriptingInterface {
     public void setGuiScrollPosition(float pixelY);
 
     /**
+     * Enables the GUI rendering. This makes the user interface
+     * to be rendered and updated again if it was previously disabled. Otherwise, it has
+     * no effect.
+     */
+    public void enableGui();
+    
+    /**
+     * Disables the GUI rendering. This causes the user interface
+     * to no longer be rendered or updated.
+     */
+    public void disableGui();
+    
+    /**
      * Maximizes the interface window.
      */
     public void maximizeInterfaceWindow();

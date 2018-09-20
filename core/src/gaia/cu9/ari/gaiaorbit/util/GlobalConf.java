@@ -719,7 +719,6 @@ public class GlobalConf {
                 break;
             case CUBEMAP360_CMD:
                 CUBEMAP360_MODE = (Boolean) data[0];
-                EventManager.instance.post(Events.DISPLAY_GUI_CMD, I18n.bundle.get("notif.cleanmode"), !CUBEMAP360_MODE);
 
                 logger.info("You have entered the 360 mode.  Go back to normal mode using <CTRL+K>");
                 logger.info("Switch between cubemap projections using <CTRL+SHIFT+K>");
