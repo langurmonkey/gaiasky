@@ -407,13 +407,7 @@ public class SpacecraftCamera extends AbstractCamera implements IObserver {
                     sc.setYawPower(sc.yawp - step);
                     EventManager.instance.post(Events.SPACECRAFT_STABILISE_CMD, false);
                     break;
-                case Keys.PAGE_UP:
-                    // Increase thrust factor
-                    sc.increaseThrustFactorIndex(true);
-                    break;
-                case Keys.PAGE_DOWN:
-                    // Decrease thrust length
-                    sc.decreaseThrustFactorIndex(true);
+                default:
                     break;
                 }
             }
@@ -449,9 +443,19 @@ public class SpacecraftCamera extends AbstractCamera implements IObserver {
                     // level spaceship
                     EventManager.instance.post(Events.SPACECRAFT_STABILISE_CMD, true);
                     break;
-                case Keys.P:
+                case Keys.K:
                     // stop spaceship
                     EventManager.instance.post(Events.SPACECRAFT_STOP_CMD, true);
+                    break;
+                case Keys.PAGE_UP:
+                    // Increase thrust factor
+                    sc.increaseThrustFactorIndex(true);
+                    break;
+                case Keys.PAGE_DOWN:
+                    // Decrease thrust length
+                    sc.decreaseThrustFactorIndex(true);
+                    break;
+                default:
                     break;
                 }
             }

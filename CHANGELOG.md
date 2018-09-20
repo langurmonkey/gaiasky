@@ -3,6 +3,7 @@
 [Full changelog](https://github.com/langurmonkey/gaiasky/compare/2.1.2...HEAD)
 
 ### Documentation
+- small tweak to changelog template
 - improve git-chglog configuration
 - update changelog
 
