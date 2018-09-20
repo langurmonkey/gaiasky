@@ -158,7 +158,7 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
     /**
      * The user interfaces
      */
-    public IGui initialGui, loadingGui, mainGui, spacecraftGui, stereoGui, debugGui, currentGui, previousGui;
+    public IGui initialGui, loadingGui, mainGui, spacecraftGui, stereoGui, debugGui;
 
     /**
      * List of GUIs
@@ -382,19 +382,22 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
             sgn.doneLoading(manager);
         }
 
-        // Initialise input handlers
+        // Initialise input multiplexer to handle various input processors
         inputMultiplexer = new InputMultiplexer();
+        GuiRegistry.setInputMultiplexer(inputMultiplexer);
+        Gdx.input.setInputProcessor(inputMultiplexer);
 
+        // Init GuiRegistry object which will be in charge of listening to 'show dialog' events
+        new GuiRegistry(GlobalResources.skin);
+        
         // Init GUIs, step 2
         reinitialiseGUI2();
 
         // Publish visibility
         EventManager.instance.post(Events.VISIBILITY_OF_COMPONENTS, new Object[] { SceneGraphRenderer.visible });
 
-        // Key bindings controller
+        // Key bindings
         inputMultiplexer.addProcessor(new KeyInputController());
-
-        Gdx.input.setInputProcessor(inputMultiplexer);
 
         EventManager.instance.post(Events.SCENE_GRAPH_LOADED, sg);
 
@@ -486,17 +489,11 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
             gui.doneLoading(manager);
 
         if (GlobalConf.program.STEREOSCOPIC_MODE) {
-            GuiRegistry.registerGui(stereoGui);
-            inputMultiplexer.addProcessor(stereoGui.getGuiStage());
-            // Initialise current and previous
-            currentGui = stereoGui;
-            previousGui = mainGui;
+            GuiRegistry.set(stereoGui);
+            GuiRegistry.setPrevious(mainGui);
         } else {
-            GuiRegistry.registerGui(mainGui);
-            inputMultiplexer.addProcessor(mainGui.getGuiStage());
-            // Initialise current and previous
-            currentGui = mainGui;
-            previousGui = null;
+            GuiRegistry.set(mainGui);
+            GuiRegistry.setPrevious(null);
         }
         GuiRegistry.registerGui(debugGui);
     }
@@ -865,75 +862,25 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
             }
             break;
         case CAMERA_MODE_CMD:
-            InputMultiplexer im = (InputMultiplexer) Gdx.input.getInputProcessor();
+            InputMultiplexer im = inputMultiplexer;
             // Register/unregister GUI
             CameraMode mode = (CameraMode) data[0];
             if (GlobalConf.program.isStereoHalfViewport()) {
-                if (currentGui != stereoGui) {
-                    // Remove current GUI
-                    GuiRegistry.unregisterGui(currentGui);
-                    im.removeProcessor(currentGui.getGuiStage());
-
-                    // Add spacecraft GUI
-                    GuiRegistry.registerGui(stereoGui);
-                    im.addProcessor(0, stereoGui.getGuiStage());
-
-                    // Update state
-                    currentGui = stereoGui;
-                }
+                GuiRegistry.change(stereoGui);
             } else if (mode == CameraMode.Spacecraft) {
-                // Remove current GUI
-                GuiRegistry.unregisterGui(currentGui);
-                im.removeProcessor(currentGui.getGuiStage());
-
-                // Add spacecraft GUI
-                GuiRegistry.registerGui(spacecraftGui);
-                im.addProcessor(0, spacecraftGui.getGuiStage());
-
-                // Update state
-                currentGui = spacecraftGui;
-
+                GuiRegistry.change(spacecraftGui);
             } else {
-                // Remove current GUI
-                GuiRegistry.unregisterGui(currentGui);
-                im.removeProcessor(currentGui.getGuiStage());
-
-                // Add main GUI
-                GuiRegistry.registerGui(mainGui);
-                im.addProcessor(0, mainGui.getGuiStage());
-
-                // Update state
-                currentGui = mainGui;
+                GuiRegistry.change(mainGui);
             }
             break;
         case STEREOSCOPIC_CMD:
             boolean stereomode = (Boolean) data[0];
-            im = (InputMultiplexer) Gdx.input.getInputProcessor();
-            if (stereomode && currentGui != stereoGui) {
-                // Remove current GUI
-                GuiRegistry.unregisterGui(currentGui);
-                im.removeProcessor(currentGui.getGuiStage());
-
-                // Add stereo GUI
-                GuiRegistry.registerGui(stereoGui);
-                im.addProcessor(0, stereoGui.getGuiStage());
-
-                // Update state
-                previousGui = currentGui;
-                currentGui = stereoGui;
-            } else if (!stereomode && previousGui != stereoGui) {
-                // Remove current GUI
-                GuiRegistry.unregisterGui(currentGui);
-                im.removeProcessor(currentGui.getGuiStage());
-
-                // Add backed up GUI
-                if (previousGui == null)
-                    previousGui = mainGui;
-                GuiRegistry.registerGui(previousGui);
-                im.addProcessor(0, previousGui.getGuiStage());
-
-                // Update state
-                currentGui = previousGui;
+            im = inputMultiplexer;
+            if (stereomode && GuiRegistry.current != stereoGui) {
+                GuiRegistry.change(stereoGui);
+            } else if (!stereomode && GuiRegistry.previous != stereoGui) {
+                IGui prev = GuiRegistry.current != null ? GuiRegistry.current : mainGui;
+                GuiRegistry.change(GuiRegistry.previous, prev);
             }
 
             break;

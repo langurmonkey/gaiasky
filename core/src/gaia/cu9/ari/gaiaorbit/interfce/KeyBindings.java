@@ -5,7 +5,6 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.TreeSet;
 
-import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input.Keys;
 import com.bitfire.postprocessing.effects.CubemapProjections.CubemapProjection;
 
@@ -70,6 +69,11 @@ public class KeyBindings {
      * read from a configuration file.
      */
     public void initDefault() {
+        
+        /** Condition which checks the current GUI is the FullGui **/
+        BooleanRunnable fullGuiCondition = ()->{
+            return GuiRegistry.current instanceof FullGui;
+        };
 
         // F1 -> Help dialog
         addMapping(new ProgramAction(txt("action.help"), () -> {
@@ -99,12 +103,12 @@ public class KeyBindings {
         // r -> Show run script dialog
         addMapping(new ProgramAction(txt("action.runscript"), () -> {
             EventManager.instance.post(Events.SHOW_RUNSCRIPT_ACTION);
-        }), Keys.R);
+        }, fullGuiCondition), Keys.R);
 
         // c -> Show play camera dialog
         addMapping(new ProgramAction(txt("action.playcamera"), () -> {
             EventManager.instance.post(Events.SHOW_PLAYCAMERA_ACTION);
-        }), Keys.C);
+        }, fullGuiCondition), Keys.C);
 
         // SHIFT+O -> Toggle orbits
         addMapping(new ProgramAction(txt("action.toggle", txt("element.orbits")), () -> {
@@ -302,7 +306,7 @@ public class KeyBindings {
             public void run() {
                 EventManager.instance.post(Events.GUI_FOLD_CMD);
             }
-        }), Keys.U);
+        }, fullGuiCondition), Keys.U);
 
         // CTRL+K -> toggle cubemap mode
         addMapping(new ProgramAction(txt("action.toggle", txt("element.360")), new Runnable() {
@@ -383,12 +387,12 @@ public class KeyBindings {
         // CTRL + F -> Search dialog
         addMapping(new ProgramAction(txt("action.search"), () -> {
             EventManager.instance.post(Events.SHOW_SEARCH_ACTION);
-        }), SPECIAL1, Keys.F);
+        }, fullGuiCondition), SPECIAL1, Keys.F);
 
         // f -> Search dialog
         addMapping(new ProgramAction(txt("action.search"), () -> {
             EventManager.instance.post(Events.SHOW_SEARCH_ACTION);
-        }), Keys.F);
+        }, fullGuiCondition), Keys.F);
 
         // CTRL + SHIFT + O -> Toggle particle fade
         addMapping(new ProgramAction(txt("action.toggle", txt("element.octreeparticlefade")), new Runnable() {
@@ -476,23 +480,39 @@ public class KeyBindings {
     }
 
     /**
-     * A simple program action.
+     * A simple program action. It can optionally contain a condition which must
+     * evaluate to true for the action to be run.
      * 
      * @author Toni Sagrista
      *
      */
     public class ProgramAction implements Runnable, Comparable<ProgramAction> {
         public final String actionName;
+        /** Action to run **/
         private final Runnable action;
 
-        public ProgramAction(String actionName, Runnable action) {
+        /** Condition that must be met **/
+        private final BooleanRunnable condition;
+
+        public ProgramAction(String actionName, Runnable action, BooleanRunnable condition) {
             this.actionName = actionName;
             this.action = action;
+            this.condition = condition;
+        }
+        
+        public ProgramAction(String actionName, Runnable action) {
+            this(actionName, action, null);
         }
 
         @Override
         public void run() {
-            action.run();
+            // Run if condition not set or condition is met
+            if (condition != null) {
+                if(condition.run())
+                    action.run();
+            } else {
+                action.run();
+            }
         }
 
         @Override
@@ -500,6 +520,10 @@ public class KeyBindings {
             return actionName.toLowerCase().compareTo(other.actionName.toLowerCase());
         }
 
+    }
+
+    public interface BooleanRunnable {
+        public boolean run();
     }
 
     protected static String txt(String key) {
