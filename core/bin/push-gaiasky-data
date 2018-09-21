@@ -1,0 +1,6 @@
+#!/bin/bash
+
+# This script pushes the local gaiasky-data.json to the server.
+# You must have the right private ssh key to connect.
+
+scp $GS/core/utils/gaiasky-data.json tsagrista@mintaka:/dataB/gaiasky/files/autodownload/
