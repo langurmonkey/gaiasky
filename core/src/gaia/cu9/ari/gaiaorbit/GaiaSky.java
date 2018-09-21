@@ -1,7 +1,6 @@
 package gaia.cu9.ari.gaiaorbit;
 
 import java.io.File;
-import java.nio.file.Paths;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -17,7 +16,6 @@ import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.assets.loaders.FileHandleResolver;
 import com.badlogic.gdx.assets.loaders.resolvers.InternalFileHandleResolver;
 import com.badlogic.gdx.audio.Music;
-import com.badlogic.gdx.backends.lwjgl.LwjglApplicationConfiguration;
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Pixmap.Format;
@@ -862,7 +860,6 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
             }
             break;
         case CAMERA_MODE_CMD:
-            InputMultiplexer im = inputMultiplexer;
             // Register/unregister GUI
             CameraMode mode = (CameraMode) data[0];
             if (GlobalConf.program.isStereoHalfViewport()) {
@@ -875,7 +872,6 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
             break;
         case STEREOSCOPIC_CMD:
             boolean stereomode = (Boolean) data[0];
-            im = inputMultiplexer;
             if (stereomode && GuiRegistry.current != stereoGui) {
                 GuiRegistry.change(stereoGui);
             } else if (!stereomode && GuiRegistry.previous != stereoGui) {
