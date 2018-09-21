@@ -2,10 +2,24 @@
 ## [Unreleased](https://github.com/langurmonkey/gaiasky/tree/master)
 [Full changelog](https://github.com/langurmonkey/gaiasky/compare/2.1.2...HEAD)
 
+### Bug Fixes
+- global key bindings affect invisible GUIs
+- fix `p` double-mapping
+
+### Build system
+- add javadoc generator and publisher
+
+### Code Refactoring
+- bin to scripts, now settled
+- scripts moved to bin, bin in git
+
 ### Documentation
 - small tweak to changelog template
 - improve git-chglog configuration
 - update changelog
+
+### Features
+- API calls to disable and enable the GUI
 
 ### Style
 - minor style issues
