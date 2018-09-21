@@ -32,7 +32,7 @@ allprojects {
         ashleyVersion = '1.4.0'
         aiVersion = '1.5.0'
         jythonVersion = '2.7.0'
-        lwjglVersion = '2.9.3'
+        lwjglVersion = '3.2.0'
         jcommanderVersion = '1.64'
         googleanalyticsjavaVersion = '1.1.2'
         slf4jVersion = '1.7.25'
@@ -129,6 +129,11 @@ project(":core") {
         // ************
         // REGULAR DEPS
         // ************
+        compile "org.lwjgl:lwjgl:$lwjglVersion"
+        compile "org.lwjgl:lwjgl-glfw:$lwjglVersion"
+        compile "org.lwjgl:lwjgl-jemalloc:$lwjglVersion"
+        compile "org.lwjgl:lwjgl-opengl:$lwjglVersion"
+        compile "org.lwjgl:lwjgl-openal:$lwjglVersion"
         compile "com.badlogicgames.gdx:gdx-backend-lwjgl3:$gdxVersion"
         compile "com.badlogicgames.gdx:gdx:$gdxVersion"
         compile "com.badlogicgames.gdx:gdx-controllers-lwjgl3:$gdxVersion"
