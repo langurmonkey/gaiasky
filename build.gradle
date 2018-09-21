@@ -134,6 +134,7 @@ project(":core") {
         compile "org.lwjgl:lwjgl-jemalloc:$lwjglVersion"
         compile "org.lwjgl:lwjgl-opengl:$lwjglVersion"
         compile "org.lwjgl:lwjgl-openal:$lwjglVersion"
+        
         compile "com.badlogicgames.gdx:gdx-backend-lwjgl3:$gdxVersion"
         compile "com.badlogicgames.gdx:gdx:$gdxVersion"
         compile "com.badlogicgames.gdx:gdx-controllers-lwjgl3:$gdxVersion"
