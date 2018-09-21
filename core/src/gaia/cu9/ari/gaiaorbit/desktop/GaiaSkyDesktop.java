@@ -16,10 +16,11 @@ import javax.swing.plaf.FontUIResource;
 
 import com.badlogic.gdx.Files;
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.Graphics.DisplayMode;
 import com.badlogic.gdx.LifecycleListener;
-import com.badlogic.gdx.backends.lwjgl.LwjglApplication;
-import com.badlogic.gdx.backends.lwjgl.LwjglApplicationConfiguration;
-import com.badlogic.gdx.backends.lwjgl.LwjglFiles;
+import com.badlogic.gdx.backends.lwjgl3.Lwjgl3Application;
+import com.badlogic.gdx.backends.lwjgl3.Lwjgl3ApplicationConfiguration;
+import com.badlogic.gdx.backends.lwjgl3.Lwjgl3Files;
 import com.beust.jcommander.JCommander;
 import com.beust.jcommander.Parameter;
 import com.brsanthu.googleanalytics.GoogleAnalyticsResponse;
@@ -115,7 +116,7 @@ public class GaiaSkyDesktop implements IObserver {
 
             gsd = new GaiaSkyDesktop();
             
-            Gdx.files = new LwjglFiles();
+            Gdx.files = new Lwjgl3Files();
 
             // Initialize number format
             NumberFormatFactory.initialize(new DesktopNumberFormatFactory());
@@ -233,23 +234,33 @@ public class GaiaSkyDesktop implements IObserver {
     }
 
     public void launchMainApp() {
-        LwjglApplicationConfiguration cfg = new LwjglApplicationConfiguration();
-        LwjglApplicationConfiguration.disableAudio = false;
-        cfg.title = GlobalConf.APPLICATION_NAME;
-        cfg.fullscreen = GlobalConf.screen.FULLSCREEN;
-        cfg.resizable = GlobalConf.screen.RESIZABLE;
-        cfg.width = GlobalConf.screen.getScreenWidth();
-        cfg.height = GlobalConf.screen.getScreenHeight();
-        cfg.samples = 0;
-        cfg.vSyncEnabled = GlobalConf.screen.VSYNC;
-        cfg.foregroundFPS = 0;
-        cfg.backgroundFPS = 0;
-        cfg.useHDPI = true;
-        cfg.useGL30 = false;
-        cfg.addIcon("icon/ic_launcher.png", Files.FileType.Internal);
+        Lwjgl3ApplicationConfiguration cfg = new Lwjgl3ApplicationConfiguration();
+        cfg.setTitle(GlobalConf.getFullApplicationName());
+        if (GlobalConf.screen.FULLSCREEN) {
+            // Get mode
+            DisplayMode[] modes = Lwjgl3ApplicationConfiguration.getDisplayModes();
+            DisplayMode mymode = null;
+            for (DisplayMode mode : modes) {
+                if (mode.height == GlobalConf.screen.FULLSCREEN_HEIGHT && mode.width == GlobalConf.screen.FULLSCREEN_WIDTH) {
+                    mymode = mode;
+                    break;
+                }
+            }
+            if (mymode == null)
+                mymode = Lwjgl3ApplicationConfiguration.getDisplayMode(Gdx.graphics.getPrimaryMonitor());
+            cfg.setFullscreenMode(mymode);
+        } else {
+            cfg.setWindowedMode(GlobalConf.screen.getScreenWidth(), GlobalConf.screen.getScreenHeight());
+            cfg.setResizable(GlobalConf.screen.RESIZABLE);
+        }
+        cfg.setBackBufferConfig(8, 8, 8, 8, 24, 0, 0);
+        cfg.setIdleFPS(0);
+        cfg.useVsync(GlobalConf.screen.VSYNC);
+        cfg.setWindowIcon(Files.FileType.Internal, "icon/ic_launcher.png");
+        cfg.useOpenGL3(false, 3, 2);
 
         // Launch app
-        LwjglApplication app = new LwjglApplication(new GaiaSky(gsargs.download, gsargs.catalogchooser), cfg);
+        Lwjgl3Application app = new Lwjgl3Application(new GaiaSky(gsargs.download, gsargs.catalogchooser), cfg);
         app.addLifecycleListener(new GaiaSkyWindowListener());
 
         if (lw != null)

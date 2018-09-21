@@ -4,7 +4,7 @@ import java.io.File;
 import java.io.FileInputStream;
 
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.backends.lwjgl.LwjglFiles;
+import com.badlogic.gdx.backends.lwjgl3.Lwjgl3Files;
 import com.badlogic.gdx.files.FileHandle;
 
 import gaia.cu9.ari.gaiaorbit.data.group.TGASHYGDataProvider;
@@ -33,7 +33,7 @@ public class TGASHYGToBinary {
             // Assets location
             String ASSETS_LOC = GlobalConf.ASSETS_LOC;
 
-            Gdx.files = new LwjglFiles();
+            Gdx.files = new Lwjgl3Files();
 
             // Initialize number format
             NumberFormatFactory.initialize(new DesktopNumberFormatFactory());
