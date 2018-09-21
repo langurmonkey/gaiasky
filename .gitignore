@@ -52,7 +52,6 @@ out/
 # All gen and bin  folders #
 ############################
 **/gen/
-**/bin/
 
 # All jar files #
 #################
@@ -67,7 +66,8 @@ pickled_dict
 **.iws
 **.iml
 **/.idea
-/build/
+**/build
+**/bin
 **/.settings
 **.classpath
 **.project
