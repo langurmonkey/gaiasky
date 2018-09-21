@@ -7,7 +7,7 @@ import java.util.concurrent.TimeUnit;
 import org.apache.http.NameValuePair;
 
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.backends.lwjgl.LwjglFiles;
+import com.badlogic.gdx.backends.lwjgl3.Lwjgl3Files;
 import com.badlogic.gdx.utils.TimeUtils;
 import com.brsanthu.googleanalytics.GoogleAnalytics;
 import com.brsanthu.googleanalytics.GoogleAnalyticsResponse;
@@ -89,7 +89,7 @@ public class AnalyticsReporting {
 	public static void main(String[] args) throws Exception {
 
 		// INITIALISE PARAMS
-		Gdx.files = new LwjglFiles();
+		Gdx.files = new Lwjgl3Files();
 		DateFormatFactory.initialize(new DesktopDateFormatFactory());
 		ConfInit.initialize(new DesktopConfInit());
 		I18n.initialize(Gdx.files.absolute(GlobalConf.ASSETS_LOC + "/i18n/gsbundle"));
