@@ -30,6 +30,7 @@ public class AtmosphereShaderProviderLoader<T extends AtmosphereShaderProviderLo
     }
 
     @Override
+    @SuppressWarnings("rawtypes")
     public Array<AssetDescriptor> getDependencies(String fileName, FileHandle file, AtmosphereShaderProviderParameter parameter) {
         return null;
     }

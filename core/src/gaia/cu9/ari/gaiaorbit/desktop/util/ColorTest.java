@@ -10,8 +10,6 @@ import java.util.Scanner;
 import javax.swing.JComponent;
 import javax.swing.JFrame;
 
-import com.badlogic.gdx.math.MathUtils;
-
 import gaia.cu9.ari.gaiaorbit.util.color.ColourUtils;
 import gaia.cu9.ari.gaiaorbit.util.math.MathUtilsd;
 
@@ -74,18 +72,6 @@ public class ColorTest {
             return val;
         } catch (Exception e) {
             System.err.println("Input is not a valid float");
-            System.exit(1);
-        }
-        return 0;
-    }
-
-    private static int readInteger(Scanner sc) {
-        try {
-            int val = sc.nextInt();
-            MathUtils.clamp(val, 1000, 50000);
-            return val;
-        } catch (Exception e) {
-            System.err.println("Input is not a valid integer, try again");
             System.exit(1);
         }
         return 0;

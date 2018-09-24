@@ -149,7 +149,6 @@ public class GaiaSkyDesktop implements IObserver {
                 return;
             }
 
-
             // Dev mode
             I18n.initialize(Gdx.files.absolute(GlobalConf.ASSETS_LOC + "i18n/gsbundle"));
 
@@ -393,6 +392,7 @@ public class GaiaSkyDesktop implements IObserver {
         }
     }
 
+    @SuppressWarnings("resource")
     private static void copyFile(File sourceFile, File destFile, boolean ow) throws IOException {
         if (destFile.exists()) {
             if (ow) {
@@ -426,9 +426,8 @@ public class GaiaSkyDesktop implements IObserver {
      */
     private static void javaVersionCheck() {
         double jv = getVersion();
-        SysUtils sys = new SysUtils();
-        boolean linux = sys.isLinux();
-        boolean gnome = sys.checkGnome();
+        boolean linux = SysUtils.isLinux();
+        boolean gnome = SysUtils.checkGnome();
         if (jv >= 10 && linux && gnome) {
             System.out.println("======================================= WARNING ========================================");
             System.out.println("It looks like you are running Gaia Sky with java " + jv + " in Linux with Gnome.\n"

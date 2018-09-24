@@ -31,6 +31,7 @@ public class OrbitDataLoader extends AsynchronousAssetLoader<PolylineData, Orbit
     }
 
     @Override
+    @SuppressWarnings("rawtypes")
     public Array<AssetDescriptor> getDependencies(String fileName, FileHandle file, OrbitDataLoaderParameter parameter) {
         return null;
     }

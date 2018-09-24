@@ -87,7 +87,6 @@ import gaia.cu9.ari.gaiaorbit.util.validator.RegexpValidator;
  *
  */
 public class PreferencesWindow extends GenericDialog {
-
     private Array<Actor> contents;
     private Array<OwnLabel> labels;
 

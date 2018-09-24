@@ -76,6 +76,7 @@ public class ConstellationHIPUpdater  {
             if (p instanceof Star)
                 stars.add((Star) p);
 
+        @SuppressWarnings("unchecked")
         List<Constellation> cons = (List<Constellation>) constel.loadData();
 
         Map<Integer, Star> idmap = new HashMap<Integer, Star>();
