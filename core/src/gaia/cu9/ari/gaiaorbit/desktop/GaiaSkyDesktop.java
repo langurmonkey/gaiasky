@@ -149,7 +149,6 @@ public class GaiaSkyDesktop implements IObserver {
                 return;
             }
 
-
             // Dev mode
             I18n.initialize(Gdx.files.absolute(GlobalConf.ASSETS_LOC + "i18n/gsbundle"));
 
