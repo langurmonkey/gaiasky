@@ -23,7 +23,6 @@ import gaia.cu9.ari.gaiaorbit.scenegraph.SceneGraphNode.RenderGroup;
 import gaia.cu9.ari.gaiaorbit.scenegraph.camera.ICamera;
 import gaia.cu9.ari.gaiaorbit.util.GlobalConf;
 import gaia.cu9.ari.gaiaorbit.util.GlobalConf.ProgramConf.StereoProfile;
-import gaia.cu9.ari.gaiaorbit.util.Logger;
 import gaia.cu9.ari.gaiaorbit.util.comp.DistToCameraComparator;
 
 public class ParticleGroupRenderSystem extends ImmediateRenderSystem implements IObserver {
@@ -199,7 +198,8 @@ public class ParticleGroupRenderSystem extends ImmediateRenderSystem implements 
             Integer meshIdx = (Integer) data[0];
             clearMeshData(meshIdx);
             break;
-
+        default:
+            break;
         }
     }
 

@@ -32,6 +32,7 @@ public class SGLoader extends AsynchronousAssetLoader<ISceneGraph, SGLoader.SGLo
     }
 
     @Override
+    @SuppressWarnings("rawtypes")
     public Array<AssetDescriptor> getDependencies(String fileName, FileHandle file, SGLoaderParameter parameter) {
         return null;
     }

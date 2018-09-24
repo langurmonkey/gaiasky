@@ -1,6 +1,5 @@
 package gaia.cu9.ari.gaiaorbit.data;
 
-import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.JsonReader;
@@ -44,6 +43,7 @@ public class GeoJsonLoader<T extends SceneGraphNode> implements ISceneGraphLoade
                     size++;
 
                     // Convert to object and add to list
+                    @SuppressWarnings("unchecked")
                     T object = (T) convertJsonToArea(child);
 
                     bodies.add(object);

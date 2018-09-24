@@ -2,8 +2,6 @@ package gaia.cu9.ari.gaiaorbit.desktop.util;
 
 import java.io.File;
 
-import gaia.cu9.ari.gaiaorbit.util.GlobalConf;
-
 /**
  * Wee utility class to check the operating system and the desktop environment.
  * It also offers retrieval of common system folders.

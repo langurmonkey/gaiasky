@@ -79,7 +79,7 @@ public class LandAtWindow extends GenericDialog {
         });
         location = new OwnTextField("", skin, new ExistingLocationValidator(target));
 
-        new ButtonGroup(latlonCb, locationCb);
+        new ButtonGroup<CheckBox>(latlonCb, locationCb);
 
         content.add(locationCb).left().top().padBottom(pad).colspan(4).row();
         content.add(new OwnLabel(txt("context.location"), skin)).left().top().padRight(pad);

@@ -20,8 +20,6 @@ import com.badlogic.gdx.LifecycleListener;
 import com.badlogic.gdx.backends.lwjgl.LwjglApplication;
 import com.badlogic.gdx.backends.lwjgl.LwjglApplicationConfiguration;
 import com.badlogic.gdx.backends.lwjgl.LwjglFiles;
-import com.badlogic.gdx.scenes.scene2d.Stage;
-import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.beust.jcommander.JCommander;
 import com.beust.jcommander.Parameter;
 import com.brsanthu.googleanalytics.GoogleAnalyticsResponse;
@@ -40,9 +38,6 @@ import gaia.cu9.ari.gaiaorbit.desktop.util.DesktopConfInit;
 import gaia.cu9.ari.gaiaorbit.desktop.util.DesktopMusicActors;
 import gaia.cu9.ari.gaiaorbit.desktop.util.DesktopNetworkChecker;
 import gaia.cu9.ari.gaiaorbit.desktop.util.LogWriter;
-import gaia.cu9.ari.gaiaorbit.desktop.util.MemInfoWindow;
-import gaia.cu9.ari.gaiaorbit.desktop.util.RunCameraWindow;
-import gaia.cu9.ari.gaiaorbit.desktop.util.RunScriptWindow;
 import gaia.cu9.ari.gaiaorbit.desktop.util.SysUtils;
 import gaia.cu9.ari.gaiaorbit.event.EventManager;
 import gaia.cu9.ari.gaiaorbit.event.Events;
@@ -387,6 +382,7 @@ public class GaiaSkyDesktop implements IObserver {
         }
     }
 
+    @SuppressWarnings("resource")
     private static void copyFile(File sourceFile, File destFile, boolean ow) throws IOException {
         if (destFile.exists()) {
             if (ow) {
@@ -420,9 +416,8 @@ public class GaiaSkyDesktop implements IObserver {
      */
     private static void javaVersionCheck() {
         double jv = getVersion();
-        SysUtils sys = new SysUtils();
-        boolean linux = sys.isLinux();
-        boolean gnome = sys.checkGnome();
+        boolean linux = SysUtils.isLinux();
+        boolean gnome = SysUtils.checkGnome();
         if (jv >= 10 && linux && gnome) {
             System.out.println("======================================= WARNING ========================================");
             System.out.println("It looks like you are running Gaia Sky with java " + jv + " in Linux with Gnome.\n"

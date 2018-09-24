@@ -9,7 +9,6 @@ import gaia.cu9.ari.gaiaorbit.event.EventManager;
 import gaia.cu9.ari.gaiaorbit.event.Events;
 import gaia.cu9.ari.gaiaorbit.event.IObserver;
 import gaia.cu9.ari.gaiaorbit.util.I18n;
-import gaia.cu9.ari.gaiaorbit.util.format.DateFormatFactory.DateType;
 import gaia.cu9.ari.gaiaorbit.util.format.IDateFormat;
 
 /**

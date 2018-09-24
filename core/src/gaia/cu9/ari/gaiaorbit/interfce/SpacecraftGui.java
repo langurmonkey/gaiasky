@@ -191,10 +191,6 @@ public class SpacecraftGui extends AbstractGui {
 
     }
 
-    private void unsubscribe() {
-        EventManager.instance.unsubscribe(this, Events.SPACECRAFT_STABILISE_CMD, Events.SPACECRAFT_STOP_CMD, Events.SPACECRAFT_INFO, Events.SPACECRAFT_NEAREST_INFO, Events.SPACECRAFT_THRUST_INFO);
-    }
-
     private void buildGui() {
         float factor = GlobalConf.SCALE_FACTOR;
 

@@ -141,6 +141,7 @@ public class RunCameraWindow extends GenericDialog {
                 if (event instanceof ChangeEvent) {
                     ChangeEvent ce = (ChangeEvent) event;
                     Actor actor = ce.getTarget();
+                    @SuppressWarnings("unchecked")
                     final String name = ((com.badlogic.gdx.scenes.scene2d.ui.List<String>) actor).getSelected();
                     select(name);
                     return true;

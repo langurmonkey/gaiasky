@@ -16,8 +16,6 @@ import gaia.cu9.ari.gaiaorbit.desktop.format.DesktopDateFormatFactory;
 import gaia.cu9.ari.gaiaorbit.desktop.format.DesktopNumberFormatFactory;
 import gaia.cu9.ari.gaiaorbit.desktop.util.DesktopConfInit;
 import gaia.cu9.ari.gaiaorbit.desktop.util.LogWriter;
-import gaia.cu9.ari.gaiaorbit.event.Events;
-import gaia.cu9.ari.gaiaorbit.event.IObserver;
 import gaia.cu9.ari.gaiaorbit.util.ConfInit;
 import gaia.cu9.ari.gaiaorbit.util.I18n;
 import gaia.cu9.ari.gaiaorbit.util.Logger;
@@ -30,9 +28,6 @@ public class OortGenerator {
 
     /** Whether to write the results to disk **/
     private static final boolean writeFile = true;
-
-    /** Inner radius in AU **/
-    private static double inner_radius = 2000;
 
     /** Outer radius in AU **/
     private static float outer_radius = 15000;
@@ -84,9 +79,6 @@ public class OortGenerator {
 
         Array<double[]> particles = new Array<double[]>(N);
 
-        Vector3d yAxis = new Vector3d(0, 1, 0);
-        Vector3d xAxis = new Vector3d(1, 0, 0);
-        double thickness = outer_radius - inner_radius;
         Vector3d particle = new Vector3d();
         int n = 0;
         // Generate only in z, we'll randomly rotate later

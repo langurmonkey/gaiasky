@@ -172,6 +172,7 @@ public class ObjectsComponent extends GuiComponent implements IObserver {
                 if (event instanceof ChangeEvent) {
                     ChangeEvent ce = (ChangeEvent) event;
                     Actor actor = ce.getTarget();
+                    @SuppressWarnings("unchecked")
                     final String name = ((com.badlogic.gdx.scenes.scene2d.ui.List<String>) actor).getSelected();
                     if (sg.containsNode(name)) {
                         SceneGraphNode node = sg.getNode(name);
@@ -316,6 +317,7 @@ public class ObjectsComponent extends GuiComponent implements IObserver {
                     focusListScrollPane.setScrollY(focusListScrollPane.getMaxY() - node.getActor().getY());
                 } else if (list) {
                     // Update focus selection in focus list
+                    @SuppressWarnings("unchecked")
                     com.badlogic.gdx.scenes.scene2d.ui.List<String> objList = (com.badlogic.gdx.scenes.scene2d.ui.List<String>) objectsList;
                     Array<String> items = objList.getItems();
                     SceneGraphNode node = (SceneGraphNode) data[0];

@@ -162,6 +162,7 @@ public class RunScriptWindow extends GenericDialog {
                 if (event instanceof ChangeEvent) {
                     ChangeEvent ce = (ChangeEvent) event;
                     Actor actor = ce.getTarget();
+                    @SuppressWarnings("unchecked")
                     String name = ((List<String>) actor).getSelected();
 
                     if (name != null) {

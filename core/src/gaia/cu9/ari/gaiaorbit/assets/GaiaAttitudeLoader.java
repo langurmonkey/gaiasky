@@ -32,6 +32,7 @@ public class GaiaAttitudeLoader extends AsynchronousAssetLoader<GaiaAttitudeServ
     }
 
     @Override
+    @SuppressWarnings("rawtypes")
     public Array<AssetDescriptor> getDependencies(String fileName, FileHandle file, GaiaAttitudeLoaderParameter parameter) {
         return null;
     }
