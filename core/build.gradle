@@ -70,6 +70,10 @@ task run(dependsOn: jar, type: JavaExec, description: "Runs Gaia Sky") {
         '-Xmx6g',
         '-XX:+UseG1GC'
     ]
+    if (System.getProperty("os.name").toLowerCase().contains("mac")) {
+         // Required to run lwjgl java apps on macOS
+         jvmArgsi.add("-XstartOnFirstThread")
+    }
     // Verbose GC
     // jvmArgs = ['-verbose:gc']
     classpath = sourceSets.main.runtimeClasspath
@@ -101,6 +105,10 @@ task rund(dependsOn: jar, type: JavaExec, description: "Runs Gaia Sky - forces d
         '-Xmx6g',
         '-XX:+UseG1GC'
     ]
+    if (System.getProperty("os.name").toLowerCase().contains("mac")) {
+         // Required to run lwjgl java apps on macOS
+         jvmArgsi.add("-XstartOnFirstThread")
+    }
     // Verbose GC
     // jvmArgs = ['-verbose:gc']
     classpath = sourceSets.main.runtimeClasspath
