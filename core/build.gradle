@@ -97,10 +97,21 @@ task rund(dependsOn: jar, type: JavaExec, description: "Runs Gaia Sky - forces d
     // CMS GC
     //jvmArgs = ['-server', '-XX:+UseConcMarkSweepGC', '-XX:+UseParNewGC', '-XX:MaxGCPauseMillis=5', '-XX:+CMSParallelRemarkEnabled', '-XX:CMSInitiatingOccupancyFraction=60', '-XX:MaxTenuringThreshold=4', '-XX:MaxNewSize=384m', '-XX:NewSize=384m', '-XX:SurvivorRatio=12']
     // G1 GC
+<<<<<<< HEAD
     jvmArgs = [ '-XX:+UseG1GC' ]
     if (System.getProperty("os.name").toLowerCase().contains("mac")) {
          // Required to run lwjgl java apps on macOS
          jvmArgs += "-XstartOnFirstThread"
+=======
+    jvmArgs = [
+        '-Xms3g',
+        '-Xmx6g',
+        '-XX:+UseG1GC'
+    ]
+    if (System.getProperty("os.name").toLowerCase().contains("mac")) {
+         // Required to run lwjgl java apps on macOS
+         jvmArgsi.add("-XstartOnFirstThread")
+>>>>>>> fix: macOS -XstartOnFirstThread flag
     }
     // Verbose GC
     // jvmArgs = ['-verbose:gc']
