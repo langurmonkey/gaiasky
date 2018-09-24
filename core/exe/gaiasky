@@ -49,9 +49,9 @@ OPTS="$OPTS -XX:+UseG1GC"
 #OPTS="$OPTS -XX:+UnlockDiagnosticVMOptions -XX:+TraceClassLoading -XX:+LogCompilation -XX:+PrintAssembly"
 
 # macOS hack - needs a couple of args to be happy
-#if [[ "$OSTYPE" == "darwin"* ]]; then
-#	OPTS="$OPTS -XstartOnFirstThread -Djava.awt.headless=true"
-#fi
+if [[ "$OSTYPE" == "darwin"* ]]; then
+	OPTS="$OPTS -XstartOnFirstThread -Djava.awt.headless=true"
+fi
 
 # Assets location
 OPTS="$OPTS -Dassets.location=\"$GSDIR/\""
