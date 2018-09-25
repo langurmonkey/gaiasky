@@ -145,4 +145,23 @@ public interface ISceneGraph extends Disposable {
      */
     public void removeFromStringToNode(SceneGraphNode node);
 
+    /**
+     * Gets the current position of the object identified by the given name.
+     * The given position is in the internal reference system and corrects stars
+     * for proper motions and other objects for their specific motions as well.
+     * @param name The name of the object
+     * @return The current position, if the object exists and has a position. Null otherwise.
+     */
+    public double[] getObjectPosition(String name);
+    
+    /**
+     * Same as {@link ISceneGraph#getObjectPosition(String)} but passing a doulbe array
+     * of at least 3 slots to store the result.
+     * @param name The name of the object
+     * @param out The out double array
+     * @return The out double array if the object exists, has a position and out has 3 or more
+     * slots. Null otherwise.
+     */
+    public double[] getObjectPosition(String name, double[] out);
+
 }

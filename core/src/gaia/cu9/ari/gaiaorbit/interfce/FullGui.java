@@ -35,6 +35,7 @@ import gaia.cu9.ari.gaiaorbit.event.Events;
 import gaia.cu9.ari.gaiaorbit.interfce.components.VisualEffectsComponent;
 import gaia.cu9.ari.gaiaorbit.render.ComponentType;
 import gaia.cu9.ari.gaiaorbit.scenegraph.CelestialBody;
+import gaia.cu9.ari.gaiaorbit.scenegraph.CosmicRuler;
 import gaia.cu9.ari.gaiaorbit.scenegraph.IFocus;
 import gaia.cu9.ari.gaiaorbit.scenegraph.ISceneGraph;
 import gaia.cu9.ari.gaiaorbit.scenegraph.IStarFocus;
@@ -90,11 +91,6 @@ public class FullGui extends AbstractGui {
     private boolean[] visible;
 
     private List<Actor> invisibleInStereoMode;
-
-    // Uncertainties disabled by default
-    private boolean uncertainties = false;
-    // Rel effects off
-    private boolean releffects = false;
 
     public FullGui() {
         super();
@@ -306,7 +302,7 @@ public class FullGui extends AbstractGui {
         case SHOW_RUNSCRIPT_ACTION:
             if (runscriptWindow != null)
                 runscriptWindow.remove();
-            
+
             runscriptWindow = new RunScriptWindow(ui, skin);
             runscriptWindow.show(ui);
             break;
@@ -391,184 +387,12 @@ public class FullGui extends AbstractGui {
             int screenX = Gdx.input.getX();
             int screenY = Gdx.input.getY();
 
-            ContextMenu popup = new ContextMenu(skin, "default");
+            GaiaSkyContextMenu popup = new GaiaSkyContextMenu(skin, "default", screenX, screenY, candidate);
 
-            if (candidate != null) {
-                MenuItem select = new MenuItem(txt("context.select", candidate.getCandidateName()), skin, "default");
-                select.addListener(new EventListener() {
-
-                    @Override
-                    public boolean handle(Event event) {
-                        if (event instanceof ChangeEvent) {
-                            EventManager.instance.post(Events.CAMERA_MODE_CMD, CameraMode.Focus);
-                            EventManager.instance.post(Events.FOCUS_CHANGE_CMD, candidate);
-                        }
-                        return false;
-                    }
-
-                });
-                popup.addItem(select);
-
-                MenuItem go = new MenuItem(txt("context.goto", candidate.getCandidateName()), skin, "default");
-                go.addListener(new EventListener() {
-
-                    @Override
-                    public boolean handle(Event event) {
-                        if (event instanceof ChangeEvent) {
-                            candidate.makeFocus();
-                            EventManager.instance.post(Events.NAVIGATE_TO_OBJECT, candidate);
-                        }
-                        return false;
-                    }
-
-                });
-                popup.addItem(go);
-
-                if (candidate instanceof Planet) {
-                    popup.addSeparator();
-
-                    MenuItem landOn = new MenuItem(txt("context.landon", candidate.getCandidateName()), skin, "default");
-                    landOn.addListener(new EventListener() {
-
-                        @Override
-                        public boolean handle(Event event) {
-                            if (event instanceof ChangeEvent) {
-                                EventManager.instance.post(Events.LAND_ON_OBJECT, candidate);
-                                return true;
-                            }
-                            return false;
-                        }
-
-                    });
-                    popup.addItem(landOn);
-
-                    double[] lonlat = new double[2];
-                    boolean ok = CameraUtils.getLonLat((Planet) candidate, GaiaSky.instance.getICamera(), screenX, screenY, new Vector3(), new Vector3(), new Vector3(), new Vector3(), new Vector3d(), new Vector3d(), new Matrix4(), lonlat);
-                    if (ok) {
-                        final Double pointerLon = lonlat[0];
-                        final Double pointerLat = lonlat[1];
-                        // Add mouse pointer
-                        MenuItem landOnPointer = new MenuItem(txt("context.landatpointer", candidate.getCandidateName()), skin, "default");
-                        landOnPointer.addListener(new EventListener() {
-
-                            @Override
-                            public boolean handle(Event event) {
-                                if (event instanceof ChangeEvent) {
-                                    EventManager.instance.post(Events.LAND_AT_LOCATION_OF_OBJECT, candidate, pointerLon, pointerLat);
-                                    return true;
-                                }
-                                return false;
-                            }
-
-                        });
-                        popup.addItem(landOnPointer);
-                    }
-
-                    MenuItem landOnCoord = new MenuItem(txt("context.landatcoord", candidate.getCandidateName()), skin, "default");
-                    landOnCoord.addListener(new EventListener() {
-
-                        @Override
-                        public boolean handle(Event event) {
-                            if (event instanceof ChangeEvent) {
-                                EventManager.instance.post(Events.SHOW_LAND_AT_LOCATION_ACTION, candidate);
-                                return true;
-                            }
-                            return false;
-                        }
-
-                    });
-                    popup.addItem(landOnCoord);
-                }
-
-                if (candidate instanceof IStarFocus && uncertainties) {
-                    boolean sep = false;
-                    if (UncertaintiesHandler.getInstance().containsStar(candidate.getCandidateId())) {
-                        popup.addSeparator();
-                        sep = true;
-
-                        MenuItem showUncertainties = new MenuItem(txt("context.showuncertainties"), skin, "default");
-                        showUncertainties.addListener(new EventListener() {
-
-                            @Override
-                            public boolean handle(Event event) {
-                                if (event instanceof ChangeEvent) {
-                                    EventManager.instance.post(Events.SHOW_UNCERTAINTIES, candidate);
-                                    return true;
-                                }
-                                return false;
-                            }
-
-                        });
-                        popup.addItem(showUncertainties);
-                    }
-
-                    if (UncertaintiesHandler.getInstance().containsUncertainties()) {
-                        if (!sep)
-                            popup.addSeparator();
-
-                        MenuItem hideUncertainties = new MenuItem(txt("context.hideuncertainties"), skin, "default");
-                        hideUncertainties.addListener(new EventListener() {
-
-                            @Override
-                            public boolean handle(Event event) {
-                                if (event instanceof ChangeEvent) {
-                                    EventManager.instance.post(Events.HIDE_UNCERTAINTIES, candidate);
-                                    return true;
-                                }
-                                return false;
-                            }
-
-                        });
-                        popup.addItem(hideUncertainties);
-
-                    }
-                }
-
-                popup.addSeparator();
-            }
-
-            if (releffects) {
-                // Spawn gravitational waves
-                MenuItem gravWaveStart = new MenuItem(txt("context.startgravwave"), skin, "default");
-                gravWaveStart.addListener(new EventListener() {
-
-                    @Override
-                    public boolean handle(Event event) {
-                        if (event instanceof ChangeEvent) {
-                            EventManager.instance.post(Events.GRAV_WAVE_START, screenX, screenY);
-                            return true;
-                        }
-                        return false;
-                    }
-
-                });
-                popup.addItem(gravWaveStart);
-
-                if (RelativisticEffectsManager.getInstance().gravWavesOn()) {
-                    // Cancel gravitational waves
-                    MenuItem gravWaveStop = new MenuItem(txt("context.stopgravwave"), skin, "default");
-                    gravWaveStop.addListener(new EventListener() {
-
-                        @Override
-                        public boolean handle(Event event) {
-                            if (event instanceof ChangeEvent) {
-                                EventManager.instance.post(Events.GRAV_WAVE_STOP);
-                                return true;
-                            }
-                            return false;
-                        }
-
-                    });
-                    popup.addItem(gravWaveStop);
-                }
-            }
-
-            int mx = Gdx.input.getX();
-            int my = Gdx.input.getY();
             int h = Gdx.graphics.getHeight();
 
-            float px = mx;
-            float py = h - my - 20 * GlobalConf.SCALE_FACTOR;
+            float px = screenX;
+            float py = h - screenY - 20 * GlobalConf.SCALE_FACTOR;
 
             popup.showMenu(ui, px, py);
 

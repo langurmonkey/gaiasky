@@ -683,6 +683,14 @@ public enum Events {
     MUSIC_NEXT_CMD,
     /** Reload music files **/
     MUSIC_RELOAD_CMD,
+    
+    
+    /** Attach object to first end of ruler. Contains object name **/
+    RULER_ATTACH_0,
+    /** Attach object to second end of ruler. Contains object name **/
+    RULER_ATTACH_1,
+    /** Clear all objects from ruler **/
+    RULER_CLEAR,
 
     /** Contains the spacecraft object after it has been loaded **/
     SPACECRAFT_LOADED,
