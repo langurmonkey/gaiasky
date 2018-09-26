@@ -19,7 +19,6 @@ import gaia.cu9.ari.gaiaorbit.event.EventManager;
 import gaia.cu9.ari.gaiaorbit.event.Events;
 import gaia.cu9.ari.gaiaorbit.event.IObserver;
 import gaia.cu9.ari.gaiaorbit.render.ComponentType;
-import gaia.cu9.ari.gaiaorbit.scenegraph.CosmicRuler;
 import gaia.cu9.ari.gaiaorbit.scenegraph.IFocus;
 import gaia.cu9.ari.gaiaorbit.scenegraph.IProperMotion;
 import gaia.cu9.ari.gaiaorbit.scenegraph.IStarFocus;
@@ -503,13 +502,13 @@ public class FocusInfoInterface extends Table implements IObserver, IGuiInterfac
         return in;
     }
 
-    @SuppressWarnings({ "unused", "unchecked", "rawtypes" })
+    @SuppressWarnings({ "unchecked", "rawtypes" })
     private void displayInfo(Cell cell, Actor info) {
         cell.setActor(info);
         pack();
     }
 
-    @SuppressWarnings({ "unused", "rawtypes" })
+    @SuppressWarnings({ "rawtypes" })
     private void hideInfo(Cell cell) {
         cell.clearActor();
         pack();
