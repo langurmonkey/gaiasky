@@ -234,7 +234,7 @@ public class GaiaSkyDesktop implements IObserver {
 
     public void launchMainApp() {
         Lwjgl3ApplicationConfiguration cfg = new Lwjgl3ApplicationConfiguration();
-        cfg.setTitle(GlobalConf.getFullApplicationName());
+        cfg.setTitle(GlobalConf.APPLICATION_NAME);
         if (GlobalConf.screen.FULLSCREEN) {
             // Get mode
             DisplayMode[] modes = Lwjgl3ApplicationConfiguration.getDisplayModes();
