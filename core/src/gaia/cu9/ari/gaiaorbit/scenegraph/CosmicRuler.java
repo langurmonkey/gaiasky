@@ -50,7 +50,7 @@ public class CosmicRuler extends LineObject implements I3DTextRenderable, IObser
         this.name = "Cosmicruler";
         this.cc = new float[] { 1f, 1f, 0f };
         this.nf = new DesktopNumberFormat("0.#########E0");
-        setCt("Others");
+        setCt("Ruler");
         EventManager.instance.subscribe(this, Events.RULER_ATTACH_0, Events.RULER_ATTACH_1, Events.RULER_CLEAR);
     }
 

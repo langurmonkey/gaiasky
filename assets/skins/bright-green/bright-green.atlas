@@ -6,7 +6,7 @@ filter: Nearest,Nearest
 repeat: none
 3d-icon
   rotate: false
-  xy: 309, 50
+  xy: 335, 50
   size: 22, 22
   orig: 22, 22
   offset: 0, 0
@@ -20,28 +20,28 @@ audio-bwd
   index: -1
 audio-fwd
   rotate: false
-  xy: 221, 14
+  xy: 196, 14
   size: 14, 14
   orig: 14, 14
   offset: 0, 0
   index: -1
 audio-pause
   rotate: false
-  xy: 237, 14
+  xy: 212, 14
   size: 14, 14
   orig: 14, 14
   offset: 0, 0
   index: -1
 audio-play
   rotate: false
-  xy: 253, 14
+  xy: 228, 14
   size: 14, 14
   orig: 14, 14
   offset: 0, 0
   index: -1
 bg-clear
   rotate: false
-  xy: 111, 7
+  xy: 95, 28
   size: 1, 1
   orig: 1, 1
   offset: 0, 0
@@ -55,7 +55,7 @@ bin-icon
   index: -1
 border
   rotate: false
-  xy: 416, 23
+  xy: 174, 25
   size: 3, 3
   split: 1, 1, 1, 1
   orig: 3, 3
@@ -104,49 +104,49 @@ camera-stop
   index: -1
 car-icon
   rotate: false
-  xy: 333, 50
+  xy: 359, 50
   size: 22, 22
   orig: 22, 22
   offset: 0, 0
   index: -1
 check-off
   rotate: false
-  xy: 332, 18
+  xy: 292, 2
   size: 12, 12
   orig: 12, 12
   offset: 0, 0
   index: -1
 check-off-disabled
   rotate: false
-  xy: 346, 18
+  xy: 306, 2
   size: 12, 12
   orig: 12, 12
   offset: 0, 0
   index: -1
 check-on
   rotate: false
-  xy: 360, 18
+  xy: 307, 16
   size: 12, 12
   orig: 12, 12
   offset: 0, 0
   index: -1
 check-on-disabled
   rotate: false
-  xy: 374, 18
+  xy: 320, 2
   size: 12, 12
   orig: 12, 12
   offset: 0, 0
   index: -1
 cubemap-icon
   rotate: false
-  xy: 357, 50
+  xy: 383, 50
   size: 22, 22
   orig: 22, 22
   offset: 0, 0
   index: -1
 cursor
   rotate: false
-  xy: 424, 32
+  xy: 494, 46
   size: 3, 3
   split: 1, 1, 1, 1
   orig: 3, 3
@@ -154,21 +154,21 @@ cursor
   index: -1
 dark-grey
   rotate: false
-  xy: 123, 25
+  xy: 98, 28
   size: 1, 1
   orig: 1, 1
   offset: 0, 0
   index: -1
 darker-grey
   rotate: false
-  xy: 507, 75
+  xy: 79, 41
   size: 1, 1
   orig: 1, 1
   offset: 0, 0
   index: -1
 default-pane-noborder
   rotate: false
-  xy: 507, 75
+  xy: 79, 41
   size: 1, 1
   split: 0, 0, 0, 0
   orig: 1, 1
@@ -183,7 +183,7 @@ dataload-pause
   index: -1
 default-pane
   rotate: false
-  xy: 133, 2
+  xy: 487, 46
   size: 5, 3
   split: 1, 1, 1, 1
   orig: 5, 3
@@ -191,7 +191,7 @@ default-pane
   index: -1
 default-rect-pad
   rotate: false
-  xy: 133, 2
+  xy: 487, 46
   size: 5, 3
   split: 1, 1, 1, 1
   orig: 5, 3
@@ -199,7 +199,7 @@ default-rect-pad
   index: -1
 default-rect
   rotate: false
-  xy: 429, 32
+  xy: 492, 41
   size: 3, 3
   split: 1, 1, 1, 1
   orig: 3, 3
@@ -207,7 +207,7 @@ default-rect
   index: -1
 default-rect-down
   rotate: false
-  xy: 444, 41
+  xy: 487, 41
   size: 3, 3
   split: 1, 1, 1, 1
   orig: 3, 3
@@ -215,7 +215,7 @@ default-rect-down
   index: -1
 default-rect-selection
   rotate: false
-  xy: 451, 46
+  xy: 452, 36
   size: 3, 3
   split: 1, 1, 1, 1
   orig: 3, 3
@@ -223,7 +223,7 @@ default-rect-selection
   index: -1
 default-select-selection
   rotate: false
-  xy: 451, 46
+  xy: 452, 36
   size: 3, 3
   split: 1, 1, 1, 1
   orig: 3, 3
@@ -231,7 +231,7 @@ default-select-selection
   index: -1
 default-round
   rotate: false
-  xy: 501, 39
+  xy: 426, 32
   size: 9, 16
   split: 2, 2, 2, 2
   orig: 9, 16
@@ -239,7 +239,7 @@ default-round
   index: -1
 default-round-down
   rotate: false
-  xy: 501, 57
+  xy: 114, 10
   size: 9, 16
   split: 2, 2, 2, 2
   orig: 9, 16
@@ -279,7 +279,7 @@ default-select-disabled
   index: -1
 default-slider
   rotate: false
-  xy: 114, 2
+  xy: 503, 49
   size: 7, 11
   split: 0, 0, 0, 0
   orig: 7, 11
@@ -287,21 +287,21 @@ default-slider
   index: -1
 default-slider-knob
   rotate: false
-  xy: 114, 15
+  xy: 503, 62
   size: 7, 11
   orig: 7, 11
   offset: 0, 0
   index: -1
 default-slider-knob-before
   rotate: false
-  xy: 147, 11
+  xy: 414, 5
   size: 1, 11
   orig: 1, 11
   offset: 0, 0
   index: -1
 default-splitpane
   rotate: false
-  xy: 444, 46
+  xy: 437, 27
   size: 5, 3
   split: 2, 2, 0, 0
   orig: 5, 3
@@ -309,7 +309,7 @@ default-splitpane
   index: -1
 default-splitpane-vertical
   rotate: false
-  xy: 507, 78
+  xy: 447, 34
   size: 3, 5
   split: 0, 0, 2, 2
   orig: 3, 5
@@ -325,28 +325,28 @@ default-window
   index: -1
 detach-disabled-icon
   rotate: false
-  xy: 137, 14
+  xy: 419, 22
   size: 8, 8
   orig: 8, 8
   offset: 0, 0
   index: -1
 detach-icon
   rotate: false
-  xy: 150, 2
+  xy: 404, 8
   size: 8, 8
   orig: 8, 8
   offset: 0, 0
   index: -1
 disabled-icon
   rotate: false
-  xy: 160, 2
+  xy: 437, 41
   size: 8, 8
   orig: 8, 8
   offset: 0, 0
   index: -1
 dome-icon
   rotate: false
-  xy: 381, 50
+  xy: 407, 50
   size: 22, 22
   orig: 22, 22
   offset: 0, 0
@@ -360,21 +360,21 @@ drive-icon
   index: -1
 edit-icon
   rotate: false
-  xy: 150, 30
+  xy: 174, 30
   size: 16, 16
   orig: 16, 16
   offset: 0, 0
   index: -1
 eye-closed-icon
   rotate: false
-  xy: 168, 30
+  xy: 192, 30
   size: 16, 16
   orig: 16, 16
   offset: 0, 0
   index: -1
 eye-icon
   rotate: false
-  xy: 186, 30
+  xy: 210, 30
   size: 16, 16
   orig: 16, 16
   offset: 0, 0
@@ -388,28 +388,28 @@ frameoutput
   index: -1
 go-to
   rotate: false
-  xy: 403, 75
+  xy: 430, 75
   size: 24, 24
   orig: 24, 24
   offset: 0, 0
   index: -1
 grey
   rotate: false
-  xy: 144, 11
+  xy: 508, 82
   size: 1, 1
   orig: 1, 1
   offset: 0, 0
   index: -1
 grid-icon
   rotate: false
-  xy: 204, 13
+  xy: 179, 13
   size: 15, 15
   orig: 15, 15
   offset: 0, 0
   index: -1
 help-icon
   rotate: false
-  xy: 405, 51
+  xy: 431, 51
   size: 22, 22
   orig: 22, 22
   offset: 0, 0
@@ -561,135 +561,142 @@ icon-elem-planets
   orig: 25, 25
   offset: 0, 0
   index: -1
-icon-elem-satellites
+icon-elem-ruler
   rotate: false
   xy: 322, 74
   size: 25, 25
   orig: 25, 25
   offset: 0, 0
   index: -1
-icon-elem-stars
+icon-elem-satellites
   rotate: false
   xy: 349, 74
   size: 25, 25
   orig: 25, 25
   offset: 0, 0
   index: -1
-icon-elem-titles
+icon-elem-stars
   rotate: false
   xy: 376, 74
   size: 25, 25
   orig: 25, 25
   offset: 0, 0
   index: -1
+icon-elem-titles
+  rotate: false
+  xy: 403, 74
+  size: 25, 25
+  orig: 25, 25
+  offset: 0, 0
+  index: -1
 icon-p-360
   rotate: false
-  xy: 204, 30
+  xy: 228, 30
   size: 16, 16
   orig: 16, 16
   offset: 0, 0
   index: -1
 icon-p-camera
   rotate: false
-  xy: 222, 30
+  xy: 246, 30
   size: 16, 16
   orig: 16, 16
   offset: 0, 0
   index: -1
 icon-p-controls
   rotate: false
-  xy: 240, 30
+  xy: 264, 30
   size: 16, 16
   orig: 16, 16
   offset: 0, 0
   index: -1
 icon-p-data
   rotate: false
-  xy: 258, 30
+  xy: 282, 30
   size: 16, 16
   orig: 16, 16
   offset: 0, 0
   index: -1
 icon-p-frameoutput
   rotate: false
-  xy: 276, 30
+  xy: 300, 30
   size: 16, 16
   orig: 16, 16
   offset: 0, 0
   index: -1
 icon-p-gaia
   rotate: false
-  xy: 294, 30
+  xy: 318, 30
   size: 16, 16
   orig: 16, 16
   offset: 0, 0
   index: -1
 icon-p-graphics
   rotate: false
-  xy: 312, 32
+  xy: 336, 32
   size: 16, 16
   orig: 16, 16
   offset: 0, 0
   index: -1
 icon-p-interface
   rotate: false
-  xy: 330, 32
+  xy: 354, 32
   size: 16, 16
   orig: 16, 16
   offset: 0, 0
   index: -1
 icon-p-performance
   rotate: false
-  xy: 348, 32
+  xy: 372, 32
   size: 16, 16
   orig: 16, 16
   offset: 0, 0
   index: -1
 icon-p-screenshots
   rotate: false
-  xy: 366, 32
+  xy: 390, 32
   size: 16, 16
   orig: 16, 16
   offset: 0, 0
   index: -1
 icon-p-system
   rotate: false
-  xy: 384, 32
+  xy: 408, 32
   size: 16, 16
   orig: 16, 16
   offset: 0, 0
   index: -1
 land-at
   rotate: false
-  xy: 429, 75
+  xy: 456, 75
   size: 24, 24
   orig: 24, 24
   offset: 0, 0
   index: -1
 land-on
   rotate: false
-  xy: 455, 75
+  xy: 482, 75
   size: 24, 24
   orig: 24, 24
   offset: 0, 0
   index: -1
 light-grey
   rotate: false
-  xy: 111, 4
+  xy: 419, 19
   size: 1, 1
   orig: 1, 1
   offset: 0, 0
   index: -1
 log-icon
   rotate: false
-  xy: 429, 51
+  xy: 455, 51
   size: 22, 22
   orig: 22, 22
   offset: 0, 0
   index: -1
 minus-icon
   rotate: false
-  xy: 170, 2
+  xy: 447, 41
   size: 8, 8
   orig: 8, 8
   offset: 0, 0
@@ -710,28 +717,28 @@ pause-icon
   index: -1
 play-icon
   rotate: false
-  xy: 150, 12
+  xy: 125, 6
   size: 16, 16
   orig: 16, 16
   offset: 0, 0
   index: -1
 plus-icon
   rotate: false
-  xy: 180, 2
+  xy: 457, 41
   size: 8, 8
   orig: 8, 8
   offset: 0, 0
   index: -1
 pointer-icon
   rotate: false
-  xy: 481, 75
+  xy: 101, 48
   size: 24, 24
   orig: 24, 24
   offset: 0, 0
   index: -1
 prefs-icon
   rotate: false
-  xy: 453, 51
+  xy: 479, 51
   size: 22, 22
   orig: 22, 22
   offset: 0, 0
@@ -746,7 +753,7 @@ progress-bg
   index: -1
 progress-knob
   rotate: false
-  xy: 507, 85
+  xy: 508, 85
   size: 2, 14
   split: 0, 0, 6, 6
   orig: 2, 14
@@ -754,7 +761,7 @@ progress-knob
   index: -1
 progress-knob-before
   rotate: false
-  xy: 269, 14
+  xy: 244, 14
   size: 14, 14
   split: 2, 2, 6, 6
   orig: 14, 14
@@ -762,56 +769,56 @@ progress-knob-before
   index: -1
 radio-off
   rotate: false
-  xy: 388, 18
+  xy: 321, 16
   size: 12, 12
   orig: 12, 12
   offset: 0, 0
   index: -1
 radio-off-disabled
   rotate: false
-  xy: 123, 10
+  xy: 334, 2
   size: 12, 12
   orig: 12, 12
   offset: 0, 0
   index: -1
 radio-on
   rotate: false
-  xy: 317, 4
+  xy: 335, 16
   size: 12, 12
   orig: 12, 12
   offset: 0, 0
   index: -1
 radio-on-disabled
   rotate: false
-  xy: 331, 4
+  xy: 348, 2
   size: 12, 12
   orig: 12, 12
   offset: 0, 0
   index: -1
 rec-icon-gray
   rotate: false
-  xy: 168, 12
+  xy: 143, 6
   size: 16, 16
   orig: 16, 16
   offset: 0, 0
   index: -1
 rec-icon-red
   rotate: false
-  xy: 186, 12
+  xy: 161, 6
   size: 16, 16
   orig: 16, 16
   offset: 0, 0
   index: -1
 reload
   rotate: false
-  xy: 285, 14
+  xy: 260, 14
   size: 14, 14
   orig: 14, 14
   offset: 0, 0
   index: -1
 sc-engine-power-bg
   rotate: false
-  xy: 317, 18
+  xy: 292, 16
   size: 13, 12
   split: 0, 0, 0, 0
   orig: 13, 12
@@ -819,14 +826,14 @@ sc-engine-power-bg
   index: -1
 sc-engine-power-down
   rotate: false
-  xy: 345, 4
+  xy: 349, 18
   size: 12, 12
   orig: 12, 12
   offset: 0, 0
   index: -1
 sc-engine-power-down-checked
   rotate: false
-  xy: 359, 4
+  xy: 363, 18
   size: 12, 12
   orig: 12, 12
   offset: 0, 0
@@ -840,70 +847,70 @@ sc-engine-power-knob
   index: -1
 sc-engine-power-knob-before
   rotate: false
-  xy: 123, 7
+  xy: 179, 10
   size: 13, 1
   orig: 13, 1
   offset: 0, 0
   index: -1
 sc-engine-power-up
   rotate: false
-  xy: 373, 4
+  xy: 377, 18
   size: 12, 12
   orig: 12, 12
   offset: 0, 0
   index: -1
 sc-engine-power-up-checked
   rotate: false
-  xy: 387, 4
+  xy: 391, 18
   size: 12, 12
   orig: 12, 12
   offset: 0, 0
   index: -1
 sc-exit
   rotate: false
-  xy: 101, 48
+  xy: 127, 48
   size: 24, 24
   orig: 24, 24
   offset: 0, 0
   index: -1
 sc-exit-checked
   rotate: false
-  xy: 127, 48
+  xy: 153, 48
   size: 24, 24
   orig: 24, 24
   offset: 0, 0
   index: -1
 sc-stabilise
   rotate: false
-  xy: 153, 48
+  xy: 179, 48
   size: 24, 24
   orig: 24, 24
   offset: 0, 0
   index: -1
 sc-stabilise-checked
   rotate: false
-  xy: 179, 48
+  xy: 205, 48
   size: 24, 24
   orig: 24, 24
   offset: 0, 0
   index: -1
 sc-stop
   rotate: false
-  xy: 205, 48
+  xy: 231, 48
   size: 24, 24
   orig: 24, 24
   offset: 0, 0
   index: -1
 sc-stop-checked
   rotate: false
-  xy: 231, 48
+  xy: 257, 48
   size: 24, 24
   orig: 24, 24
   offset: 0, 0
   index: -1
 sc-thrust-bg
   rotate: false
-  xy: 137, 11
+  xy: 111, 2
   size: 5, 1
   split: 0, 0, 0, 0
   orig: 5, 1
@@ -911,28 +918,28 @@ sc-thrust-bg
   index: -1
 sc-thrust-knob-before
   rotate: false
-  xy: 402, 19
+  xy: 118, 2
   size: 5, 1
   orig: 5, 1
   offset: 0, 0
   index: -1
 screen-mode
   rotate: false
-  xy: 257, 48
+  xy: 283, 48
   size: 24, 24
   orig: 24, 24
   offset: 0, 0
   index: -1
 script-stop
   rotate: false
-  xy: 477, 51
+  xy: 126, 24
   size: 22, 22
   orig: 22, 22
   offset: 0, 0
   index: -1
 scrollbar-bg
   rotate: false
-  xy: 210, 4
+  xy: 437, 32
   size: 8, 7
   split: 2, 2, 2, 2
   orig: 8, 7
@@ -940,7 +947,7 @@ scrollbar-bg
   index: -1
 scrollbar-knob
   rotate: false
-  xy: 416, 28
+  xy: 429, 23
   size: 6, 7
   split: 2, 2, 2, 2
   orig: 6, 7
@@ -948,28 +955,28 @@ scrollbar-knob
   index: -1
 selection
   rotate: false
-  xy: 95, 28
+  xy: 179, 7
   size: 1, 1
   orig: 1, 1
   offset: 0, 0
   index: -1
 separator
   rotate: false
-  xy: 123, 2
+  xy: 111, 5
   size: 8, 3
   orig: 8, 3
   offset: 0, 0
   index: -1
 separator-context
   rotate: false
-  xy: 98, 28
+  xy: 404, 5
   size: 1, 1
   orig: 1, 1
   offset: 0, 0
   index: -1
 separator-menu
   rotate: false
-  xy: 79, 41
+  xy: 404, 2
   size: 1, 1
   orig: 1, 1
   offset: 0, 0
@@ -983,21 +990,21 @@ sub-menu
   index: -1
 table-bg
   rotate: false
-  xy: 421, 25
+  xy: 121, 7
   size: 1, 1
   orig: 1, 1
   offset: 0, 0
   index: -1
 table-bg-inv
   rotate: false
-  xy: 424, 29
+  xy: 437, 24
   size: 1, 1
   orig: 1, 1
   offset: 0, 0
   index: -1
 textfield
   rotate: false
-  xy: 402, 22
+  xy: 362, 4
   size: 12, 12
   split: 2, 2, 2, 2
   orig: 12, 12
@@ -1005,7 +1012,7 @@ textfield
   index: -1
 textfield-disabled
   rotate: false
-  xy: 402, 36
+  xy: 405, 18
   size: 12, 12
   split: 2, 2, 2, 2
   orig: 12, 12
@@ -1013,70 +1020,70 @@ textfield-disabled
   index: -1
 tooltip-bg
   rotate: false
-  xy: 444, 38
+  xy: 444, 29
   size: 1, 1
   orig: 1, 1
   offset: 0, 0
   index: -1
 tooltip-icon
   rotate: false
-  xy: 301, 14
+  xy: 276, 14
   size: 14, 14
   orig: 14, 14
   offset: 0, 0
   index: -1
 transparent
   rotate: false
-  xy: 449, 43
+  xy: 447, 31
   size: 1, 1
   orig: 1, 1
   offset: 0, 0
   index: -1
 tree-minus
   rotate: false
-  xy: 416, 37
+  xy: 376, 4
   size: 12, 12
   orig: 12, 12
   offset: 0, 0
   index: -1
 tree-plus
   rotate: false
-  xy: 430, 37
+  xy: 390, 4
   size: 12, 12
   orig: 12, 12
   offset: 0, 0
   index: -1
 tutorial-icon
   rotate: false
-  xy: 126, 24
+  xy: 150, 24
   size: 22, 22
   orig: 22, 22
   offset: 0, 0
   index: -1
 view-icon
   rotate: false
-  xy: 283, 48
+  xy: 309, 48
   size: 24, 24
   orig: 24, 24
   offset: 0, 0
   index: -1
 white
   rotate: false
-  xy: 456, 48
+  xy: 499, 48
   size: 1, 1
   orig: 1, 1
   offset: 0, 0
   index: -1
 window-collapse
   rotate: false
-  xy: 190, 2
+  xy: 467, 41
   size: 8, 8
   orig: 8, 8
   offset: 0, 0
   index: -1
 window-expand
   rotate: false
-  xy: 200, 2
+  xy: 477, 41
   size: 8, 8
   orig: 8, 8
   offset: 0, 0
