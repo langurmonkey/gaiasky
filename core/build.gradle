@@ -84,6 +84,7 @@ task run(dependsOn: jar, type: JavaExec, description: "Runs Gaia Sky") {
 
 task rund(dependsOn: jar, type: JavaExec, description: "Runs Gaia Sky - forces download manager and catalog chooser") {
     main = project.mainClassName
+    args = ['-d']
     systemProperties['properties.file'] = ''
     systemProperties['assets.location'] = '../assets/'
     systemProperties['org.slf4j.simpleLogger.defaultLogLevel'] = 'warn'  // logging levels (e.g. REST server warn, info, debug)

@@ -4,6 +4,7 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShaderProgram;
+import com.badlogic.gdx.math.Vector3;
 
 import gaia.cu9.ari.gaiaorbit.GaiaSky;
 import gaia.cu9.ari.gaiaorbit.desktop.format.DesktopNumberFormat;
@@ -15,10 +16,10 @@ import gaia.cu9.ari.gaiaorbit.render.RenderingContext;
 import gaia.cu9.ari.gaiaorbit.render.system.FontRenderSystem;
 import gaia.cu9.ari.gaiaorbit.render.system.LineRenderSystem;
 import gaia.cu9.ari.gaiaorbit.scenegraph.camera.ICamera;
-import gaia.cu9.ari.gaiaorbit.util.Constants;
 import gaia.cu9.ari.gaiaorbit.util.GlobalResources;
 import gaia.cu9.ari.gaiaorbit.util.Pair;
 import gaia.cu9.ari.gaiaorbit.util.format.INumberFormat;
+import gaia.cu9.ari.gaiaorbit.util.math.MathUtilsd;
 import gaia.cu9.ari.gaiaorbit.util.math.Vector3d;
 import gaia.cu9.ari.gaiaorbit.util.time.ITimeFrameProvider;
 import net.jafama.FastMath;
@@ -72,14 +73,17 @@ public class CosmicRuler extends LineObject implements I3DTextRenderable, IObser
         // Main line
         renderer.addLine(this, p0.x, p0.y, p0.z, p1.x, p1.y, p1.z, cc[0], cc[1], cc[2], alpha);
         // Cap 1
-        addCap(p0, p1, camera.getPos(), va, renderer, alpha);
+        addCap(p0, p1, va, renderer, alpha);
         // Cap 1
-        addCap(p1, p0, camera.getPos(), va, renderer, alpha);
+        addCap(p1, p0, va, renderer, alpha);
     }
     
-    private void addCap(Vector3d p0, Vector3d p1, Vector3d cpos, double va, LineRenderSystem renderer, float alpha) {
-        Vector3d cp = aux3d2.get().set(p0).sub(cpos);
-        Vector3d crs = aux3d1.get().set(p0).sub(p1).crs(cp);
+    private void addCap(Vector3d p0, Vector3d p1, double va, LineRenderSystem renderer, float alpha) {
+        // cpos-p0
+        Vector3d cp = aux3d2.get().set(p0);
+        // cross(cpos-p0, p0-p1)
+        Vector3d crs = aux3d1.get().set(p1).sub(p0).crs(cp);
+        
         double d = p0.len();
         double caplen = FastMath.tan(va) * d;
         crs.setLength(caplen);
