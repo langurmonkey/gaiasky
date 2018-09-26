@@ -131,6 +131,10 @@ public class CosmicRuler extends LineObject implements I3DTextRenderable, IObser
             double dst = p0.dst(p1);
             Pair<Double, String> d = GlobalResources.doubleToDistanceString(dst);
             dist = nf.format(d.getFirst()) + " " + d.getSecond();
+            
+            Gdx.app.postRunnable(()->{
+               EventManager.instance.post(Events.RULER_DIST, dst, dist); 
+            });
         } else {
             dist = null;
         }
@@ -155,6 +159,14 @@ public class CosmicRuler extends LineObject implements I3DTextRenderable, IObser
 
     public boolean rulerOk() {
         return rulerOk;
+    }
+    
+    /**
+     * Returns true if the ruler is attached to at least one object.
+     * @return Ture if the ruler is attached.
+     */
+    public boolean hasAttached() {
+        return name0 != null || name1 != null;
     }
 
     public boolean hasObject0() {

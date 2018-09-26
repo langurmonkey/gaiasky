@@ -691,6 +691,8 @@ public enum Events {
     RULER_ATTACH_1,
     /** Clear all objects from ruler **/
     RULER_CLEAR,
+    /** Notifies new distances for the ruler. Contains a double with the distance in internal units and a formatted string **/
+    RULER_DIST,
 
     /** Contains the spacecraft object after it has been loaded **/
     SPACECRAFT_LOADED,
