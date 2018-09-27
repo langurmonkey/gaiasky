@@ -248,20 +248,17 @@ public class GaiaSkyDesktop implements IObserver {
         cfg.useGL30 = false;
         cfg.addIcon("icon/ic_launcher.png", Files.FileType.Internal);
 
+        if (lw != null)
+            EventManager.instance.removeAllSubscriptions(lw);
+
         // Launch app
         LwjglApplication app = new LwjglApplication(new GaiaSky(gsargs.download, gsargs.catalogchooser), cfg);
         app.addLifecycleListener(new GaiaSkyWindowListener());
-
-        if (lw != null)
-            EventManager.instance.removeAllSubscriptions(lw);
     }
 
     @Override
     public void notify(Events event, final Object... data) {
         switch (event) {
-        case JAVA_EXCEPTION:
-            ((Throwable) data[0]).printStackTrace(System.err);
-            break;
         case SCENE_GRAPH_LOADED:
             if (REST_ENABLED) {
                 /*
