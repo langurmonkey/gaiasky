@@ -1,9 +1,11 @@
 package gaia.cu9.ari.gaiaorbit.interfce;
 
 import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Event;
 import com.badlogic.gdx.scenes.scene2d.EventListener;
 import com.badlogic.gdx.scenes.scene2d.ui.Button;
+import com.badlogic.gdx.scenes.scene2d.ui.Cell;
 import com.badlogic.gdx.scenes.scene2d.ui.HorizontalGroup;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
@@ -45,17 +47,20 @@ import gaia.cu9.ari.gaiaorbit.util.scene2d.OwnTextIconButton;
  */
 public class FocusInfoInterface extends Table implements IObserver, IGuiInterface {
     static private INetworkChecker daemon;
+    static private int MAX_RULER_NAME_LEN = 9;
 
     protected OwnLabel focusName, focusType, focusId, focusRA, focusDEC, focusMuAlpha, focusMuDelta, focusRadVel, focusAngle, focusDistCam, focusDistSol, focusAppMag, focusAbsMag, focusRadius;
     protected Button goTo, landOn, landAt;
     protected OwnLabel pointerName, pointerLonLat, pointerRADEC, viewRADEC;
     protected OwnLabel camName, camVel, camPos, lonLatLabel, RADECPointerLabel, RADECViewLabel, appmagLabel, absmagLabel;
+    protected OwnLabel rulerName, rulerName0, rulerName1, rulerDist;
 
     protected HorizontalGroup focusNameGroup;
 
     protected IFocus currentFocus;
 
-    private Table focusInfo, pointerInfo, cameraInfo, moreInfo;
+    private Table focusInfo, pointerInfo, cameraInfo, moreInfo, rulerInfo;
+    private Cell<?> focusInfoCell, rulerCell;
     Vector3d pos;
 
     INumberFormat nf, sf;
@@ -82,6 +87,8 @@ public class FocusInfoInterface extends Table implements IObserver, IGuiInterfac
         pointerInfo = new Table();
         pointerInfo.pad(pad5);
         moreInfo = new Table();
+        rulerInfo = new Table();
+        rulerInfo.pad(pad5);
 
         // Focus
         focusName = new OwnLabel("", skin, "hud-header");
@@ -128,6 +135,17 @@ public class FocusInfoInterface extends Table implements IObserver, IGuiInterfac
         camName = new OwnLabel(I18n.bundle.get("gui.camera"), skin, "hud-header");
         camVel = new OwnLabel("", skin, "hud");
         camPos = new OwnLabel("", skin, "hud");
+
+        // Ruler
+        rulerName = new OwnLabel(I18n.bundle.get("gui.ruler.title"), skin, "hud-header");
+        rulerName0 = new OwnLabel("-", skin, "hud");
+        rulerName1 = new OwnLabel("-", skin, "hud");
+        HorizontalGroup rulerNameGroup = new HorizontalGroup();
+        rulerNameGroup.space(pad5);
+        rulerNameGroup.addActor(rulerName0);
+        rulerNameGroup.addActor(new OwnLabel("<-->", skin, "hud"));
+        rulerNameGroup.addActor(rulerName1);
+        rulerDist = new OwnLabel("-", skin, "hud");
 
         // GoTo, LandOn and LandAt
         Image gotoimg = new Image(skin.getDrawable("go-to"));
@@ -269,12 +287,22 @@ public class FocusInfoInterface extends Table implements IObserver, IGuiInterfac
         cameraInfo.row();
         cameraInfo.add(camPos).left().colspan(2);
 
-        add(focusInfo).align(Align.left);
+        /** RULER INFO **/
+        rulerInfo.add(rulerName).left();
+        rulerInfo.row();
+        rulerInfo.add(rulerNameGroup).left();
+        rulerInfo.row();
+        rulerInfo.add(rulerDist).left();
+
+        focusInfoCell = add(focusInfo).align(Align.left);
         row();
         add(pointerInfo).align(Align.left);
         row();
         add(cameraInfo).align(Align.left);
+        row();
+        rulerCell = add(rulerInfo).align(Align.left);
         pack();
+        rulerCell.clearActor();
 
         if (daemon == null) {
             daemon = NetworkCheckerManager.getNewtorkChecker();
@@ -283,11 +311,11 @@ public class FocusInfoInterface extends Table implements IObserver, IGuiInterfac
         }
 
         pos = new Vector3d();
-        EventManager.instance.subscribe(this, Events.FOCUS_CHANGED, Events.FOCUS_INFO_UPDATED, Events.CAMERA_MOTION_UPDATED, Events.CAMERA_MODE_CMD, Events.LON_LAT_UPDATED, Events.RA_DEC_UPDATED);
+        EventManager.instance.subscribe(this, Events.FOCUS_CHANGED, Events.FOCUS_INFO_UPDATED, Events.CAMERA_MOTION_UPDATED, Events.CAMERA_MODE_CMD, Events.LON_LAT_UPDATED, Events.RA_DEC_UPDATED, Events.RULER_ATTACH_0, Events.RULER_ATTACH_1, Events.RULER_CLEAR, Events.RULER_DIST);
     }
 
     private void unsubscribe() {
-        EventManager.instance.unsubscribe(this, Events.FOCUS_CHANGED, Events.FOCUS_INFO_UPDATED, Events.CAMERA_MOTION_UPDATED, Events.CAMERA_MODE_CMD, Events.LON_LAT_UPDATED, Events.RA_DEC_UPDATED);
+        EventManager.instance.removeAllSubscriptions(this);
     }
 
     @Override
@@ -423,9 +451,9 @@ public class FocusInfoInterface extends Table implements IObserver, IGuiInterfac
             // Update camera mode selection
             CameraMode mode = (CameraMode) data[0];
             if (mode.equals(CameraMode.Focus)) {
-                displayFocusInfo();
+                displayInfo(focusInfoCell, focusInfo);
             } else {
-                hideFocusInfo();
+                hideInfo(focusInfoCell);
             }
             break;
         case LON_LAT_UPDATED:
@@ -441,32 +469,53 @@ public class FocusInfoInterface extends Table implements IObserver, IGuiInterfac
             pointerRADEC.setText(nf.format(pra) + "°/" + nf.format(pdec) + "°");
             viewRADEC.setText(nf.format(vra) + "°/" + nf.format(vdec) + "°");
             break;
+        case RULER_ATTACH_0:
+            String n0 = (String) data[0];
+            rulerName0.setText(capString(n0, MAX_RULER_NAME_LEN));
+            displayInfo(rulerCell, rulerInfo);
+            break;
+        case RULER_ATTACH_1:
+            String n1 = (String) data[0];
+            rulerName1.setText(capString(n1, MAX_RULER_NAME_LEN));
+            displayInfo(rulerCell, rulerInfo);
+            break;
+        case RULER_CLEAR:
+            rulerName0.setText("-");
+            rulerName1.setText("-");
+            rulerDist.setText(I18n.bundle.get("gui.sc.distance") + ": -");
+            hideInfo(rulerCell);
+            break;
+        case RULER_DIST:
+            String rd = (String) data[1];
+            rulerDist.setText(I18n.bundle.get("gui.sc.distance") + ": " + rd);
+            break;
         default:
             break;
         }
 
     }
 
+    private String capString(String in, int maxLen) {
+        if (in.length() > maxLen) {
+            return in.substring(0, maxLen) + "...";
+        }
+        return in;
+    }
+
+    @SuppressWarnings({ "unchecked", "rawtypes" })
+    private void displayInfo(Cell cell, Actor info) {
+        cell.setActor(info);
+        pack();
+    }
+
+    @SuppressWarnings({ "rawtypes" })
+    private void hideInfo(Cell cell) {
+        cell.clearActor();
+        pack();
+    }
+
     private String txt(String key) {
         return I18n.bundle.get(key);
-    }
-
-    public void displayFocusInfo() {
-        this.clearChildren();
-        add(focusInfo).align(Align.left);
-        row();
-        add(pointerInfo).align(Align.left);
-        row();
-        add(cameraInfo).align(Align.left);
-        pack();
-    }
-
-    public void hideFocusInfo() {
-        this.clearChildren();
-        add(pointerInfo).align(Align.left);
-        row();
-        add(cameraInfo).align(Align.left);
-        pack();
     }
 
     public void dispose() {
