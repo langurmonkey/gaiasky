@@ -242,20 +242,18 @@ public class GaiaSkyDesktop implements IObserver {
         cfg.setWindowedMode(GlobalConf.screen.SCREEN_WIDTH, GlobalConf.screen.SCREEN_HEIGHT);
         cfg.setResizable(true);
 
+        if (lw != null)
+            EventManager.instance.removeAllSubscriptions(lw);
+        
         // Launch app
         Lwjgl3Application app = new Lwjgl3Application(new GaiaSky(gsargs.download, gsargs.catalogchooser), cfg);
         app.addLifecycleListener(new GaiaSkyWindowListener());
 
-        if (lw != null)
-            EventManager.instance.removeAllSubscriptions(lw);
     }
 
     @Override
     public void notify(Events event, final Object... data) {
         switch (event) {
-        case JAVA_EXCEPTION:
-            ((Throwable) data[0]).printStackTrace(System.err);
-            break;
         case SCENE_GRAPH_LOADED:
             if (REST_ENABLED) {
                 /*
