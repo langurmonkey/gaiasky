@@ -69,7 +69,7 @@ public class MWModelRenderSystem extends ImmediateRenderSystem implements IObser
     private Array<Chunk> chunks;
 
     public MWModelRenderSystem(RenderGroup rg, float[] alphas, ShaderProgram[] starShaders) {
-        super(rg, alphas, starShaders, 200000);
+        super(rg, alphas, starShaders, 250000);
 
         aux3f1 = new Vector3();
         aux3d1 = new Vector3d();
@@ -94,7 +94,7 @@ public class MWModelRenderSystem extends ImmediateRenderSystem implements IObser
             postShader.setUniformi("tex_accum", accumLoc);
             postShader.setUniformi("tex_reveal", revealLoc);
             postShader.end();
-
+            
             /** Post mesh **/
             postMesh = new FullscreenQuad();
         }
@@ -142,10 +142,10 @@ public class MWModelRenderSystem extends ImmediateRenderSystem implements IObser
         /** BULGE **/
         MeshData bulge = new MeshData();
         initMesh(bulge, mw.starData.size);
-
+        
         checkRequiredVerticesSize(mw.starData.size * bulge.vertexSize);
         bulge.vertices = vertices;
-
+        
         for (ParticleBean star : mw.starData) {
             // VERTEX
             aux3f1.set((float) star.data[0], (float) star.data[1], (float) star.data[2]);
@@ -206,10 +206,10 @@ public class MWModelRenderSystem extends ImmediateRenderSystem implements IObser
         for (Array<ParticleBean> part : partition) {
             MeshData partmd = new MeshData();
             initMesh(partmd, part.size);
-
+            
             checkRequiredVerticesSize(part.size * partmd.vertexSize);
             partmd.vertices = vertices;
-
+            
             for (ParticleBean p : part) {
                 // VERTEX
                 aux3f1.set((float) p.data[0], (float) p.data[1], (float) p.data[2]);
@@ -301,6 +301,7 @@ public class MWModelRenderSystem extends ImmediateRenderSystem implements IObser
                     chunk.data.mesh.render(shaderProgram, ShapeType.Point.getGlType());
                 shaderProgram.end();
                 oitFb.end();
+
 
                 // Restore
                 Gdx.gl.glBlendFunc(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA);

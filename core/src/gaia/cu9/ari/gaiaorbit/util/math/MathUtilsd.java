@@ -354,4 +354,29 @@ public final class MathUtilsd {
         return result;
     }
 
+/**
+     * Gets perpendicular vector to in vector
+     * @param in
+     * @return
+     */
+    public static Vector3d perpendicular(Vector3d in, Vector3d out) {
+        /*
+        arr[0] = (c,c,-a-b) arr[1] = (-b-c, a,a)
+        int selectIndex = ((c != 0) && (-a != b)) // this is not a branch
+        perpendicularVector = arr[selectIndex]
+        
+        If (c, c, -a-b) is zero, selectIndex is 1 and the other vector will be selected.
+        */
+        boolean si = in.z != 0 && -in.x != in.y;
+        if (si) {
+            out.set(-in.y - in.z, in.x, in.x);
+        } else {
+            out.set(in.z, in.z, -in.x - in.y);
+        }
+
+        return out;
+    }
+
 }
+
+

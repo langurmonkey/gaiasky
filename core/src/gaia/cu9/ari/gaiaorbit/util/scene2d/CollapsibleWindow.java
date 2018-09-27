@@ -43,6 +43,7 @@ import gaia.cu9.ari.gaiaorbit.util.I18n;
  * @author langurmonkey
  **/
 public class CollapsibleWindow extends Window {
+    private float ownwidth = 0f, ownheight = 0f;
     private boolean collapsed, collapsing = false, expanding = false;
     private float collapseHeight;
     private float expandHeight;
@@ -65,7 +66,7 @@ public class CollapsibleWindow extends Window {
         this.skin = skin;
         this.collapseSpeed = collapseSpeed;
         this.collapseHeight = 20f * GlobalConf.SCALE_FACTOR;
-
+      
         vec2 = new Vector2();
         addListener(new ClickListener() {
             private float startx, starty;
@@ -218,4 +219,5 @@ public class CollapsibleWindow extends Window {
         collapsed = false;
         super.pack();
     }
+
 }

@@ -20,7 +20,7 @@ backup=()
 options=()
 install=gaiasky.install
 changelog=CHANGELOG.md
-source=("http://wwwstaff.ari.uni-heidelberg.de/gaiasandbox/$pkgver/$pkgname-$pkgver.tar.gz")
+source=("http://gaia.ari.uni-heidelberg.de/gaiasky/files/releases/$pkgver/$pkgname-$pkgver.tar.gz")
 noextract=()
 md5sums=("@md5checksum@")
 validpgpkeys=()
@@ -39,7 +39,6 @@ check() {
 
 package() {
 	cd "$pkgname-$pkgver"
-	rm gaiasky.bat
 	mkdir -p "$pkgdir/opt/gaiasky/"
 	mv * "$pkgdir/opt/gaiasky/"
 }

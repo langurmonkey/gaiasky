@@ -32,6 +32,7 @@ public enum ComponentType {
 
     Atmospheres("icon-elem-atmospheres"),
     Clouds("icon-elem-clouds"),
+    Ruler("icon-elem-ruler"),
     Others("icon-elem-others");
 
     private static Map<String, ComponentType> keysMap = new HashMap<String, ComponentType>();

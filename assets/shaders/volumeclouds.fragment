@@ -50,9 +50,13 @@ float fbm(vec3 pos) {
 
 vec4 frag(vec2 uv)
 {
-    vec3 camRight = cross(u_camUp, u_camDir);
-    vec3 ray = u_camUp * uv.y + camRight * uv.x + u_camDir;
-    vec3 pos = u_camPos;
+	vec3 camUp = normalize(u_camUp);
+	vec3 camPos = vec3(u_camPos);
+    vec3 camDir = normalize(u_camDir);
+    vec3 camRight = cross(camUp, camDir);
+    
+    vec3 ray = camUp * uv.y + camRight * uv.x + camDir;
+    vec3 pos = camPos;
 
     // So now we have a position, and a ray defined for our current fragment, and we know from earlier in this article that it matches the field of view and aspect ratio of the camera. And we can now start iterating and creating our clouds. 
     // We will not be ray-marching towards any distance field in this example. So the following code should be much easier to understand.
@@ -100,5 +104,5 @@ void main()
 
 	vec4 col = frag(uv);
 	float level = luma(col);
-    gl_FragColor = vec4(1.0, 1.0, 1.0, level);
+    gl_FragColor = col;
 }

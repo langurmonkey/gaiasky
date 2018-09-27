@@ -48,11 +48,6 @@ public class LineQuadRenderSystem extends LineRenderSystem {
         public double widthAngleTan;
         public double[][] points;
         public double[] dists;
-
-        public Line() {
-            super();
-        }
-
     }
 
     Vector3d line, camdir0, camdir1, camdir15, point, vec;

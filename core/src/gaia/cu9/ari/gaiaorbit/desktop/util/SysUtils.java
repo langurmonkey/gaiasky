@@ -2,8 +2,6 @@ package gaia.cu9.ari.gaiaorbit.desktop.util;
 
 import java.io.File;
 
-import gaia.cu9.ari.gaiaorbit.util.GlobalConf;
-
 /**
  * Wee utility class to check the operating system and the desktop environment.
  * It also offers retrieval of common system folders.
@@ -92,10 +90,6 @@ public class SysUtils {
         return System.getProperty("os.version");
     }
 
-    public static String getTruePath(String file) {
-        return (new File(file)).isAbsolute() ? file : GlobalConf.ASSETS_LOC + File.separator + file;
-    }
-
     /**
      * Gets a file pointer to the home directory. It is $HOME/.gaiasky in Linux
      * systems and C:\Users\$USERNAME\.gaiasky in Windows.
@@ -113,7 +107,8 @@ public class SysUtils {
     private static final String SCRIPT_DIR_NAME = "script";
     private static final String MUSIC_DIR_NAME = "music";
     private static final String MAPPINGS_DIR_NAME = "mappings";
-    private static final String CATALOGS_DIR_NAME = "catalogs";
+    private static final String DATA_DIR_NAME = "data";
+    private static final String TMP_DIR_NAME = "tmp";
 
     /**
      * Gets a file pointer to the $HOME/.gaiasky/camera directory.
@@ -171,12 +166,21 @@ public class SysUtils {
     }
 
     /**
-     * Gets a file pointer to the $HOME/.gaiasky/catalogs directory.
+     * Gets a file pointer to the $HOME/.gaiasky/data directory.
      * 
-     * @return A pointer to the Gaia Sky catalogs directory in the user's home.
+     * @return A pointer to the Gaia Sky data directory in the user's home.
      */
-    public static File getDefaultCatalogsDir() {
-        return new File(System.getProperty("user.home") + File.separator + GAIASKY_DIR_NAME + File.separator + CATALOGS_DIR_NAME + File.separator);
+    public static File getDefaultDataDir() {
+        return new File(System.getProperty("user.home") + File.separator + GAIASKY_DIR_NAME + File.separator + DATA_DIR_NAME + File.separator);
+    }
+
+    /**
+     * Gets a file pointer to the $HOME/.gaiasky/tmp directory.
+     * 
+     * @return A pointer to the Gaia Sky temporary directory in the user's home.
+     */
+    public static File getDefaultTmpDir() {
+        return new File(System.getProperty("user.home") + File.separator + GAIASKY_DIR_NAME + File.separator + TMP_DIR_NAME + File.separator);
     }
 
     public static void main(String[] args) {

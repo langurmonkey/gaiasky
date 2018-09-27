@@ -1,7 +1,8 @@
 { "data" : [
 	{
 		"loader": gaia.cu9.ari.gaiaorbit.data.JsonLoader,
-		"files": [  "data/meshes-tgas.json",
+		"files": [  "data/meshes-dr2-dust.json",
+					"data/meshes-dr2-hii.json",
 		            
 		            "data/planets.json",
 					"data/moons.json",

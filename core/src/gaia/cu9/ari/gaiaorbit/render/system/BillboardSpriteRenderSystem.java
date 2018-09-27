@@ -127,7 +127,6 @@ public class BillboardSpriteRenderSystem extends AbstractRenderSystem {
             // General uniforms
             shaderProgram.setUniformMatrix("u_projTrans", camera.getCamera().combined);
             shaderProgram.setUniformf("u_quaternion", quaternion.x, quaternion.y, quaternion.z, quaternion.w);
-            shaderProgram.setUniformf("u_camShift", camera.getCurrent().getShift().put(aux));
 
             // Relativistic effects
             addEffectsUniforms(shaderProgram, camera);

@@ -1,0 +1,50 @@
+bin: git
+style: github
+template: CHANGELOG.tpl.md
+info:
+    title: Gaia Sky changelog
+    repository_url: https://github.com/langurmonkey/gaiasky
+
+options:
+
+    commits:
+        filters:
+            Type:
+                - feat
+                - fix
+                - style
+                - docs
+                - perf
+                - refactor
+                - build
+        sort_by: Title
+
+    commit_groups:
+        group_by: Type
+        sort_by: Title
+        title_maps:
+            feat: Features
+            fix: Bug Fixes
+            style: Style
+            docs: Documentation
+            perf: Performance Improvements
+            refactor: Code Refactoring
+            build: Build system
+
+    issues:
+        prefix: #
+
+    refs:
+        actions:
+            - Closes
+            - Fixes
+
+    header:
+        pattern: "^(\\w*)\\:\\s(.*)$"
+        pattern_maps:
+            - Type
+            - Subject
+
+    notes:
+        keywords:
+            - BREAKING CHANGE

@@ -327,56 +327,6 @@ public class Coordinates {
         return galacticToEclipticF;
     }
 
-    /**
-     * Transforms from ecliptic to galactic coordinates
-     * 
-     * @param vec
-     *            Vector with ecliptic longitude (&lambda;) and ecliptic
-     *            latitude (&beta;) in radians.
-     * @return Vector with galactic longitude (l) and galactic latitude (b) in
-     *         radians.
-     */
-    public static Vector2d eclipticToGalactic(Vector2d vec) {
-        return new Vector2d();
-    }
-
-    /**
-     * Transforms from galactic to ecliptic coordinates
-     * 
-     * @param vec
-     *            Vector with galactic longitude (l) and galactic latitude (b)
-     *            in radians.
-     * @return Vector with ecliptic longitude (&lambda;) and ecliptic latitude
-     *         (&beta;) in radians.
-     */
-    public static Vector2d galacticToEcliptic(Vector2d vec) {
-        return new Vector2d();
-    }
-
-    /**
-     * Transforms from equatorial to galactic coordinates. TODO!
-     * 
-     * @param vec
-     *            Vector with ra (&alpha;) and dec (&delta;) in radians.
-     * @return Vector with galactic longitude (l) and galactic latitude (b) in
-     *         radians.
-     */
-    public static Vector2d equatorialToGalactic(Vector2d vec) {
-
-        return new Vector2d();
-    }
-
-    /**
-     * Transforms from galactic to equatorial coordinates
-     * 
-     * @param vec
-     *            Vector with galactic longitude (l) and galactic latitude (b)
-     *            in radians.
-     * @return Vector with ra (&alpha;) and dec (&delta;) in radians.
-     */
-    public static Vector2d galacticToEquatorial(Vector2d vec) {
-        return new Vector2d();
-    }
 
     /**
      * Converts from spherical to Cartesian coordinates, given a longitude

@@ -9,6 +9,7 @@ import com.badlogic.gdx.utils.ObjectMap;
 import com.badlogic.gdx.utils.ObjectMap.Keys;
 import com.badlogic.gdx.utils.ObjectSet;
 
+import gaia.cu9.ari.gaiaorbit.GaiaSky;
 import gaia.cu9.ari.gaiaorbit.render.system.PixelRenderSystem;
 import gaia.cu9.ari.gaiaorbit.scenegraph.StarGroup.StarBean;
 import gaia.cu9.ari.gaiaorbit.scenegraph.camera.ICamera;
@@ -17,12 +18,13 @@ import gaia.cu9.ari.gaiaorbit.util.GlobalConf;
 import gaia.cu9.ari.gaiaorbit.util.I18n;
 import gaia.cu9.ari.gaiaorbit.util.Logger;
 import gaia.cu9.ari.gaiaorbit.util.Logger.Log;
+import gaia.cu9.ari.gaiaorbit.util.math.Vector3d;
 import gaia.cu9.ari.gaiaorbit.util.time.ITimeFrameProvider;
 import gaia.cu9.ari.gaiaorbit.util.tree.IPosition;
 
 public abstract class AbstractSceneGraph implements ISceneGraph {
     private static Log logger = Logger.getLogger(AbstractSceneGraph.class);
-    
+
     /** The root of the tree **/
     public SceneGraphNode root;
     /** Quick lookup map. Name to node. **/
@@ -39,6 +41,8 @@ public abstract class AbstractSceneGraph implements ISceneGraph {
     /** Does it contain a star group **/
     protected boolean hasStarGroup;
 
+    private Vector3d aux3d1;
+
     public AbstractSceneGraph() {
         // Id = -1 for root
         root = new SceneGraphNode(-1);
@@ -46,6 +50,8 @@ public abstract class AbstractSceneGraph implements ISceneGraph {
 
         // Objects per thread
         objectsPerThread = new int[1];
+
+        aux3d1 = new Vector3d();
     }
 
     /**
@@ -176,38 +182,22 @@ public abstract class AbstractSceneGraph implements ISceneGraph {
         }
     }
 
-    private void addToIndex(SceneGraphNode node, ObjectMap<String, SceneGraphNode> map) {
+    protected void addToIndex(SceneGraphNode node, ObjectMap<String, SceneGraphNode> map) {
         if (node.name != null && !node.name.isEmpty()) {
-            map.put(node.name, node);
-            map.put(node.name.toLowerCase(), node);
 
-            // Id
-            if (node.id > 0) {
-                String id = String.valueOf(node.id);
-                map.put(id, node);
-            }
+            if (node.mustAddToIndex()) {
+                map.put(node.name, node);
+                map.put(node.name.toLowerCase(), node);
 
-            if (node instanceof Star) {
-                // Hip
-                if (((Star) node).hip > 0) {
-                    String hipid = "hip " + ((Star) node).hip;
-                    map.put(hipid, node);
-                }
-                // Tycho
-                if (((Star) node).tycho != null && !((Star) node).tycho.isEmpty()) {
-                    map.put(((Star) node).tycho, node);
-                }
-
-            } else if (node instanceof StarGroup) {
-                StarGroup sg = (StarGroup) node;
-                if (sg.index != null) {
-                    ObjectIntMap.Keys<String> keys = sg.index.keys();
-                    for (String key : keys) {
-                        map.put(key, sg);
-                    }
+                // Id
+                if (node.id > 0) {
+                    String id = String.valueOf(node.id);
+                    map.put(id, node);
                 }
             }
 
+            // Special cases
+            node.addToIndex(map);
         }
     }
 
@@ -355,4 +345,28 @@ public abstract class AbstractSceneGraph implements ISceneGraph {
         }
     }
 
+    @Override
+    public double[] getObjectPosition(String name) {
+        return getObjectPosition(name, new double[3]);
+    }
+
+    @Override
+    public double[] getObjectPosition(String name, double[] out) {
+        if (out.length >= 3 && name != null) {
+            String namelc = name.toLowerCase();
+            ISceneGraph sg = GaiaSky.instance.sg;
+            if (sg.containsNode(namelc)) {
+                SceneGraphNode object = sg.getNode(namelc);
+                if (object instanceof IFocus) {
+                    IFocus obj = (IFocus) object;
+                    obj.getAbsolutePosition(namelc, aux3d1);
+                    out[0] = aux3d1.x;
+                    out[1] = aux3d1.y;
+                    out[2] = aux3d1.z;
+                    return out;
+                }
+            }
+        }
+        return null;
+    }
 }

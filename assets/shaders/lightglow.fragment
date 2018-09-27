@@ -66,7 +66,8 @@ void main()
 		 
 		 float lum = 0.0;
 		 for(int idx = 1; idx < u_nSamples; idx++){
-		 	lum += (texture2D(u_texture2, u_lightPositions[li] + vec2(fx(t, a) / ar, fy(t, a)))).r;
+			vec2 curr_coord = u_lightPositions[li] + vec2(fx(t, a) / ar, fy(t, a));
+		 	lum += (texture2D(u_texture2, curr_coord)).r;
 		 	t += dt;
 		 }
 		 

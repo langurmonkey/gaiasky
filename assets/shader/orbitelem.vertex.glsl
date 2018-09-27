@@ -116,7 +116,7 @@ void main() {
     
     v_col = vec4(0.8, 0.8, 0.8, 1.0) * u_alpha;
 
-    float distNorm = dist / 300000.0;
+    float distNorm = dist / 300.0;
     gl_PointSize = clamp(u_size / distNorm, 1.5, 3.5) * u_scaleFactor;
     gl_Position = u_projModelView * vec4(pos, 0.0);
 }

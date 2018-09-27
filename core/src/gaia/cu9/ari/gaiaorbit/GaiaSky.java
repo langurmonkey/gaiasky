@@ -20,6 +20,7 @@ import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.assets.loaders.FileHandleResolver;
 import com.badlogic.gdx.assets.loaders.resolvers.InternalFileHandleResolver;
 import com.badlogic.gdx.audio.Music;
+import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Pixmap.Format;
 import com.badlogic.gdx.graphics.g3d.Model;
@@ -76,11 +77,13 @@ import gaia.cu9.ari.gaiaorbit.scenegraph.component.ModelComponent;
 import gaia.cu9.ari.gaiaorbit.script.HiddenHelperUser;
 import gaia.cu9.ari.gaiaorbit.util.ComponentTypes;
 import gaia.cu9.ari.gaiaorbit.util.ConfInit;
+import gaia.cu9.ari.gaiaorbit.util.Constants;
 import gaia.cu9.ari.gaiaorbit.util.GlobalConf;
 import gaia.cu9.ari.gaiaorbit.util.GlobalResources;
 import gaia.cu9.ari.gaiaorbit.util.I18n;
 import gaia.cu9.ari.gaiaorbit.util.Logger;
 import gaia.cu9.ari.gaiaorbit.util.Logger.Log;
+import gaia.cu9.ari.gaiaorbit.util.MasterManager;
 import gaia.cu9.ari.gaiaorbit.util.MemInfo;
 import gaia.cu9.ari.gaiaorbit.util.MusicManager;
 import gaia.cu9.ari.gaiaorbit.util.g3d.loader.ObjLoader;
@@ -109,7 +112,7 @@ import gaia.cu9.ari.gaiaorbit.vr.VRContext.VRDeviceType;
  */
 public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
     private static final Log logger = Logger.getLogger(GaiaSky.class);
-    
+
     /**
      * Private state boolean indicating whether we are still loading resources.
      */
@@ -179,7 +182,7 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
     /**
      * The user interfaces
      */
-    public IGui initialGui, loadingGui, loadingGuiVR, mainGui, spacecraftGui, stereoGui, debugGui, currentGui, previousGui;
+    public IGui initialGui, loadingGui, loadingGuiVR, mainGui, spacecraftGui, stereoGui, debugGui;
 
     /**
      * List of GUIs
@@ -203,6 +206,16 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
     private boolean camRecording = false;
 
     private boolean initialized = false;
+    
+    /**
+     * Forces the dataset download window
+     */
+    private boolean dsdownload;
+    
+    /**
+     * Forces the catalog chooser window
+     */
+    private boolean catchooser;
 
     /**
      * Save state on exit
@@ -216,14 +229,31 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
     public Map<String, Runnable> runnablesMap;
 
     /**
+<<<<<<< HEAD
      * Creates a GaiaSky instance.
+=======
+     * Creates an instance of Gaia Sky.
+>>>>>>> lwjgl3
      */
     public GaiaSky() {
+        this(false, false);
+    }
+    
+    /**
+     * Creates an instance of Gaia Sky.
+     * @param dsdownload Force-show the datasets download window
+     * @param catchooser Force-show the catalog chooser window
+     */
+    public GaiaSky(boolean dsdownload, boolean catchooser) {
         super();
         instance = this;
         this.runnables = new Array<Runnable>();
         this.runnablesMap = new HashMap<String, Runnable>();
+        this.dsdownload = dsdownload;
+        this.catchooser = catchooser;
     }
+    
+    
 
     public void setSceneGraph(ISceneGraph sg) {
         this.sg = sg;
@@ -259,21 +289,31 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
         TooltipManager.getInstance().hideAll();
 
         // Initialise asset manager
-        FileHandleResolver resolver = new InternalFileHandleResolver();
-        manager = new AssetManager(resolver);
+        FileHandleResolver internalResolver = new InternalFileHandleResolver();
+        FileHandleResolver dataResolver = new FileHandleResolver() {
+            @Override
+            public FileHandle resolve(String fileName) {
+                return GlobalConf.data.dataFileHandle(fileName);
+            }
+
+        };
+        manager = new AssetManager(internalResolver);
         //manager.setLoader(Model.class, ".obj", new AdvancedObjLoader(resolver));
-        manager.setLoader(ISceneGraph.class, new SGLoader(resolver));
-        manager.setLoader(PolylineData.class, new OrbitDataLoader(resolver));
-        manager.setLoader(GaiaAttitudeServer.class, new GaiaAttitudeLoader(resolver));
-        manager.setLoader(ShaderProgram.class, new ShaderProgramProvider(resolver, ".vertex.glsl", ".fragment.glsl"));
+        manager.setLoader(ISceneGraph.class, new SGLoader(dataResolver));
+        manager.setLoader(PolylineData.class, new OrbitDataLoader(dataResolver));
+        manager.setLoader(GaiaAttitudeServer.class, new GaiaAttitudeLoader(dataResolver));
+        manager.setLoader(ShaderProgram.class, new ShaderProgramProvider(internalResolver, ".vertex.glsl", ".fragment.glsl"));
         //manager.setLoader(DefaultShaderProvider.class, new DefaultShaderProviderLoader<>(resolver));
-        manager.setLoader(AtmosphereShaderProvider.class, new AtmosphereShaderProviderLoader<>(resolver));
-        manager.setLoader(GroundShaderProvider.class, new GroundShaderProviderLoader<>(resolver));
-        manager.setLoader(RelativisticShaderProvider.class, new RelativisticShaderProviderLoader<>(resolver));
-        manager.setLoader(Model.class, ".obj", new ObjLoader(resolver));
+        manager.setLoader(AtmosphereShaderProvider.class, new AtmosphereShaderProviderLoader<>(internalResolver));
+        manager.setLoader(GroundShaderProvider.class, new GroundShaderProviderLoader<>(internalResolver));
+        manager.setLoader(RelativisticShaderProvider.class, new RelativisticShaderProviderLoader<>(internalResolver));
+        manager.setLoader(Model.class, ".obj", new ObjLoader(internalResolver));
 
         // Init global resources
         GlobalResources.initialize(manager);
+
+        // Initialise master manager
+        MasterManager.initialize();
 
         // Initialise Cameras
         cam = new CameraManager(manager, CameraMode.Focus);
@@ -295,11 +335,9 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
 
         // GUI
         guis = new ArrayList<IGui>(3);
-        reinitialiseGUI1();
 
         // Post-processor
         pp = PostProcessorFactory.instance.getPostProcessor();
-        pp.initialize(manager);
 
         // Create vr context
         createVR();
@@ -316,11 +354,10 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
 
         EventManager.instance.subscribe(this, Events.LOAD_DATA_CMD);
 
-        initialGui = new InitialGui();
+        initialGui = new InitialGui(dsdownload, catchooser);
         initialGui.initialize(manager);
         Gdx.input.setInputProcessor(initialGui.getGuiStage());
 
-        logger.info(GlobalConf.version.version + " - " + I18n.bundle.format("gui.build", GlobalConf.version.build));
         logger.info("Display mode set to " + Gdx.graphics.getWidth() + "x" + Gdx.graphics.getHeight() + ", fullscreen: " + Gdx.graphics.isFullscreen());
         logger.info(I18n.bundle.format("notif.glslversion", Gdx.gl.glGetString(GL20.GL_SHADING_LANGUAGE_VERSION)));
     }
@@ -456,19 +493,22 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
             sgn.doneLoading(manager);
         }
 
-        // Initialise input handlers
+        // Initialise input multiplexer to handle various input processors
         inputMultiplexer = new InputMultiplexer();
+        GuiRegistry.setInputMultiplexer(inputMultiplexer);
+        Gdx.input.setInputProcessor(inputMultiplexer);
 
+        // Init GuiRegistry object which will be in charge of listening to 'show dialog' events
+        new GuiRegistry(GlobalResources.skin);
+        
         // Init GUIs, step 2
         reinitialiseGUI2();
 
         // Publish visibility
         EventManager.instance.post(Events.VISIBILITY_OF_COMPONENTS, new Object[] { SceneGraphRenderer.visible });
 
-        // Key bindings controller
+        // Key bindings
         inputMultiplexer.addProcessor(new KeyInputController());
-
-        Gdx.input.setInputProcessor(inputMultiplexer);
 
         EventManager.instance.post(Events.SCENE_GRAPH_LOADED, sg);
 
@@ -501,20 +541,18 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
         // Initialise frames
         frames = 0;
 
-        if (sg.containsNode("Earth")) {
+        if (sg.containsNode("Earth") && !GlobalConf.program.NET_SLAVE) {
             // Set focus to Earth
             EventManager.instance.post(Events.CAMERA_MODE_CMD, CameraMode.Focus);
             EventManager.instance.post(Events.FOCUS_CHANGE_CMD, sg.getNode("Earth"), true);
             EventManager.instance.post(Events.GO_TO_OBJECT_CMD);
             EventManager.instance.post(Events.CAMERA_MODE_CMD, CameraMode.Free_Camera);
         } else {
-            // Origin
+            // At 5 AU in Y looking towards origin (top-down look)
             EventManager.instance.post(Events.CAMERA_MODE_CMD, CameraMode.Free_Camera);
-            EventManager.instance.post(Events.CAMERA_POS_CMD, new double[] { 0, 0, 0 });
-            EventManager.instance.post(Events.CAMERA_DIR_CMD, new double[] { 0, 1, 0 });
-            EventManager.instance.post(Events.CAMERA_UP_CMD, new double[] { 0, 0, 1 });
-        }
-
+            EventManager.instance.post(Events.CAMERA_POS_CMD, new double[] { 0, 5 * Constants.AU_TO_U, 0 });
+            EventManager.instance.post(Events.CAMERA_DIR_CMD, new double[] { 0, -1, 0 });
+        } 
         initialized = true;
     }
 
@@ -561,17 +599,11 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
             gui.doneLoading(manager);
 
         if (GlobalConf.program.STEREOSCOPIC_MODE) {
-            GuiRegistry.registerGui(stereoGui);
-            inputMultiplexer.addProcessor(stereoGui.getGuiStage());
-            // Initialise current and previous
-            currentGui = stereoGui;
-            previousGui = mainGui;
+            GuiRegistry.set(stereoGui);
+            GuiRegistry.setPrevious(mainGui);
         } else {
-            GuiRegistry.registerGui(mainGui);
-            inputMultiplexer.addProcessor(mainGui.getGuiStage());
-            // Initialise current and previous
-            currentGui = mainGui;
-            previousGui = null;
+            GuiRegistry.set(mainGui);
+            GuiRegistry.setPrevious(null);
         }
         GuiRegistry.registerGui(debugGui);
     }
@@ -653,7 +685,6 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
                 manager.update();
 
                 if (!GlobalConf.runtime.UPDATE_PAUSE) {
-
                     /**
                      * UPDATE
                      */
@@ -899,9 +930,14 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
     public void notify(Events event, Object... data) {
         switch (event) {
         case LOAD_DATA_CMD:
+            // Init components that need assets in data folder
+            reinitialiseGUI1();
+            pp.initialize(manager);
+            
             // Initialise loading screen
             loadingGui = new LoadingGui();
             loadingGui.initialize(manager);
+            
             Gdx.input.setInputProcessor(loadingGui.getGuiStage());
 
             // Also VR
@@ -934,75 +970,23 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
             }
             break;
         case CAMERA_MODE_CMD:
-            InputMultiplexer im = (InputMultiplexer) Gdx.input.getInputProcessor();
             // Register/unregister GUI
             CameraMode mode = (CameraMode) data[0];
             if (GlobalConf.program.isStereoHalfViewport()) {
-                if (currentGui != stereoGui) {
-                    // Remove current GUI
-                    GuiRegistry.unregisterGui(currentGui);
-                    im.removeProcessor(currentGui.getGuiStage());
-
-                    // Add spacecraft GUI
-                    GuiRegistry.registerGui(stereoGui);
-                    im.addProcessor(0, stereoGui.getGuiStage());
-
-                    // Update state
-                    currentGui = stereoGui;
-                }
+                GuiRegistry.change(stereoGui);
             } else if (mode == CameraMode.Spacecraft) {
-                // Remove current GUI
-                GuiRegistry.unregisterGui(currentGui);
-                im.removeProcessor(currentGui.getGuiStage());
-
-                // Add spacecraft GUI
-                GuiRegistry.registerGui(spacecraftGui);
-                im.addProcessor(0, spacecraftGui.getGuiStage());
-
-                // Update state
-                currentGui = spacecraftGui;
-
+                GuiRegistry.change(spacecraftGui);
             } else {
-                // Remove current GUI
-                GuiRegistry.unregisterGui(currentGui);
-                im.removeProcessor(currentGui.getGuiStage());
-
-                // Add main GUI
-                GuiRegistry.registerGui(mainGui);
-                im.addProcessor(0, mainGui.getGuiStage());
-
-                // Update state
-                currentGui = mainGui;
+                GuiRegistry.change(mainGui);
             }
             break;
         case STEREOSCOPIC_CMD:
             boolean stereomode = (Boolean) data[0];
-            im = (InputMultiplexer) Gdx.input.getInputProcessor();
-            if (stereomode && currentGui != stereoGui) {
-                // Remove current GUI
-                GuiRegistry.unregisterGui(currentGui);
-                im.removeProcessor(currentGui.getGuiStage());
-
-                // Add stereo GUI
-                GuiRegistry.registerGui(stereoGui);
-                im.addProcessor(0, stereoGui.getGuiStage());
-
-                // Update state
-                previousGui = currentGui;
-                currentGui = stereoGui;
-            } else if (!stereomode && previousGui != stereoGui) {
-                // Remove current GUI
-                GuiRegistry.unregisterGui(currentGui);
-                im.removeProcessor(currentGui.getGuiStage());
-
-                // Add backed up GUI
-                if (previousGui == null)
-                    previousGui = mainGui;
-                GuiRegistry.registerGui(previousGui);
-                im.addProcessor(0, previousGui.getGuiStage());
-
-                // Update state
-                currentGui = previousGui;
+            if (stereomode && GuiRegistry.current != stereoGui) {
+                GuiRegistry.change(stereoGui);
+            } else if (!stereomode && GuiRegistry.previous != stereoGui) {
+                IGui prev = GuiRegistry.current != null ? GuiRegistry.current : mainGui;
+                GuiRegistry.change(GuiRegistry.previous, prev);
             }
 
             break;

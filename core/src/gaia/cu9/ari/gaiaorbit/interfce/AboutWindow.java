@@ -300,7 +300,7 @@ public class AboutWindow extends GenericDialog {
         memoryinfobutton.setSize(150 * GlobalConf.SCALE_FACTOR, 20 * GlobalConf.SCALE_FACTOR);
         memoryinfobutton.addListener(event -> {
             if (event instanceof ChangeEvent) {
-                EventManager.instance.post(Events.DISPLAY_MEM_INFO_WINDOW, stage, skin);
+                EventManager.instance.post(Events.DISPLAY_MEM_INFO_WINDOW);
                 return true;
             }
             return false;

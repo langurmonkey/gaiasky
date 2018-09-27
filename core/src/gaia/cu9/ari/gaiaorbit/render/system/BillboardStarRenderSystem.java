@@ -18,6 +18,7 @@ import gaia.cu9.ari.gaiaorbit.render.IRenderable;
 import gaia.cu9.ari.gaiaorbit.scenegraph.SceneGraphNode.RenderGroup;
 import gaia.cu9.ari.gaiaorbit.scenegraph.camera.ICamera;
 import gaia.cu9.ari.gaiaorbit.util.DecalUtils;
+import gaia.cu9.ari.gaiaorbit.util.GlobalConf;
 import gaia.cu9.ari.gaiaorbit.util.comp.DistToCameraComparator;
 
 public class BillboardStarRenderSystem extends AbstractRenderSystem {
@@ -73,7 +74,7 @@ public class BillboardStarRenderSystem extends AbstractRenderSystem {
     }
 
     public void setTexture0(String tex0) {
-        texture0 = new Texture(Gdx.files.internal(tex0), true);
+        texture0 = new Texture(GlobalConf.data.dataFileHandle(tex0), true);
         texture0.setFilter(TextureFilter.Linear, TextureFilter.Linear);
     }
 
@@ -140,7 +141,6 @@ public class BillboardStarRenderSystem extends AbstractRenderSystem {
             // General uniforms
             shaderProgram.setUniformMatrix("u_projTrans", camera.getCamera().combined);
             shaderProgram.setUniformf("u_quaternion", quaternion.x, quaternion.y, quaternion.z, quaternion.w);
-            shaderProgram.setUniformf("u_camShift", camera.getCurrent().getShift().put(aux));
 
             // Relativistic effects
             addEffectsUniforms(shaderProgram, camera);

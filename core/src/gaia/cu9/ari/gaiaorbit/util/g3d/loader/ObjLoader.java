@@ -45,6 +45,7 @@ import com.badlogic.gdx.math.Quaternion;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.FloatArray;
+import com.badlogic.gdx.utils.IntArray;
 
 /**
  * {@link ModelLoader} to load Wavefront OBJ files. Only intended for testing
@@ -164,7 +165,7 @@ public class ObjLoader extends ModelLoader<ObjLoader.ObjLoaderParameters> {
                     }
                 } else if (firstChar == 'f') {
                     String[] parts;
-                    Array<Integer> faces = activeGroup.faces;
+                    IntArray faces = activeGroup.faces;
                     for (int i = 1; i < tokens.length - 2; i--) {
                         parts = tokens[1].split("/");
                         faces.add(getIndex(parts[0], verts.size));
@@ -234,7 +235,7 @@ public class ObjLoader extends ModelLoader<ObjLoader.ObjLoaderParameters> {
 
         for (int g = 0; g < numGroups; g++) {
             Group group = groups.get(g);
-            Array<Integer> faces = group.faces;
+            IntArray faces = group.faces;
             final int numElements = faces.size;
             final int numFaces = group.numFaces;
             final boolean hasNorms = group.hasNorms;
@@ -349,17 +350,15 @@ public class ObjLoader extends ModelLoader<ObjLoader.ObjLoaderParameters> {
     private class Group {
         final String name;
         String materialName;
-        Array<Integer> faces;
+        IntArray faces;
         int numFaces;
         boolean hasNorms;
         boolean hasUVs;
-        Material mat;
 
         Group(String name) {
             this.name = name;
-            this.faces = new Array<Integer>(200);
+            this.faces = new IntArray(200);
             this.numFaces = 0;
-            this.mat = new Material("");
             this.materialName = "default";
         }
     }

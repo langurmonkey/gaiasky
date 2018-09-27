@@ -61,10 +61,10 @@ public class LineGPURenderSystem extends ImmediateRenderSystem {
 			}
 		}
 
-if (mdi >= N_MESHES) {
-logger.error("No more free meshes!");
-return -1;
-}
+		if (mdi >= N_MESHES) {
+			logger.error("No more free meshes!");
+			return -1;
+		}
 
 		curr = new MeshData();
 		meshes[mdi] = curr;

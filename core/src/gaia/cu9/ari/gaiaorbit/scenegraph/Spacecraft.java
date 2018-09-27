@@ -17,12 +17,14 @@ import gaia.cu9.ari.gaiaorbit.render.ComponentType;
 import gaia.cu9.ari.gaiaorbit.render.ILineRenderable;
 import gaia.cu9.ari.gaiaorbit.render.RenderingContext;
 import gaia.cu9.ari.gaiaorbit.render.system.LineRenderSystem;
-import gaia.cu9.ari.gaiaorbit.scenegraph.camera.ICamera;
 import gaia.cu9.ari.gaiaorbit.scenegraph.camera.CameraManager.CameraMode;
+import gaia.cu9.ari.gaiaorbit.scenegraph.camera.ICamera;
 import gaia.cu9.ari.gaiaorbit.scenegraph.component.ModelComponent;
 import gaia.cu9.ari.gaiaorbit.util.ComponentTypes;
 import gaia.cu9.ari.gaiaorbit.util.Constants;
 import gaia.cu9.ari.gaiaorbit.util.GlobalConf;
+import gaia.cu9.ari.gaiaorbit.util.Logger;
+import gaia.cu9.ari.gaiaorbit.util.Logger.Log;
 import gaia.cu9.ari.gaiaorbit.util.Pair;
 import gaia.cu9.ari.gaiaorbit.util.math.Intersectord;
 import gaia.cu9.ari.gaiaorbit.util.math.MathUtilsd;
@@ -36,6 +38,8 @@ import gaia.cu9.ari.gaiaorbit.util.time.ITimeFrameProvider;
  *
  */
 public class Spacecraft extends GenericSpacecraft implements ILineRenderable, IObserver {
+    private static final Log logger = Logger.getLogger(Spacecraft.class);
+    
     /** This is the power **/
     public static final double thrustLength = 1e12d;
 
@@ -263,7 +267,7 @@ public class Spacecraft extends GenericSpacecraft implements ILineRenderable, IO
             double twoRadiuses = closest.getRadius() + this.getRadius();
             // d1 is the new distance to the centre of the object
             if (!vel.isZero() && Intersectord.distanceSegmentPoint(pos, position, closest.pos) < twoRadiuses) {
-                EventManager.instance.post(Events.POST_NOTIFICATION, this.getClass().getSimpleName(), "Crashed against " + closest.name + "!");
+                logger.info( "Crashed against " + closest.name + "!");
 
                 Array<Vector3d> intersections = Intersectord.intersectRaySphere(pos, position, closest.pos, twoRadiuses);
 
@@ -308,9 +312,9 @@ public class Spacecraft extends GenericSpacecraft implements ILineRenderable, IO
         rollv += rolla * dt;
 
         // pos
-        double yawdiff = yawv * dt;
-        double pitchdiff = pitchv * dt;
-        double rolldiff = rollv * dt;
+        double yawdiff = (yawv * dt) % 360d;
+        double pitchdiff = (pitchv * dt) % 360d;
+        double rolldiff = (rollv * dt) % 360d;
 
         Vector3d direction = pair.getFirst();
         Vector3d up = pair.getSecond();
@@ -336,7 +340,7 @@ public class Spacecraft extends GenericSpacecraft implements ILineRenderable, IO
             //double dt = time.getDt() * Constants.H_TO_S;
             double dt = Gdx.graphics.getDeltaTime();
             // Poll keys
-            pollKeys(dt);
+            pollKeys(Gdx.graphics.getDeltaTime());
 
             /** POSITION **/
             pos = computePosition(dt, camera.getClosest2(), enginePower, thrust, direction, force, accel, vel, pos);
@@ -469,7 +473,7 @@ public class Spacecraft extends GenericSpacecraft implements ILineRenderable, IO
 
     public void increaseThrustFactorIndex(boolean broadcast) {
         thrustFactorIndex = (thrustFactorIndex + 1) % thrustFactor.length;
-        EventManager.instance.post(Events.POST_NOTIFICATION, this.getClass().getSimpleName(), "Thrust factor: " + thrustFactor[thrustFactorIndex]);
+        logger.info( "Thrust factor: " + thrustFactor[thrustFactorIndex]);
         if (broadcast)
             EventManager.instance.post(Events.SPACECRAFT_THRUST_INFO, thrustFactorIndex);
     }
@@ -478,7 +482,7 @@ public class Spacecraft extends GenericSpacecraft implements ILineRenderable, IO
         thrustFactorIndex = thrustFactorIndex - 1;
         if (thrustFactorIndex < 0)
             thrustFactorIndex = thrustFactor.length - 1;
-        EventManager.instance.post(Events.POST_NOTIFICATION, this.getClass().getSimpleName(), "Thrust factor: " + thrustFactor[thrustFactorIndex]);
+        logger.info( "Thrust factor: " + thrustFactor[thrustFactorIndex]);
         if (broadcast)
             EventManager.instance.post(Events.SPACECRAFT_THRUST_INFO, thrustFactorIndex);
     }
@@ -486,7 +490,7 @@ public class Spacecraft extends GenericSpacecraft implements ILineRenderable, IO
     public void setThrustFactorIndex(int i, boolean broadcast) {
         assert i >= 0 && i < thrustFactor.length : "Index " + i + " out of range of thrustFactor vector: [0.." + (thrustFactor.length - 1);
         thrustFactorIndex = i;
-        EventManager.instance.post(Events.POST_NOTIFICATION, this.getClass().getSimpleName(), "Thrust factor: " + thrustFactor[thrustFactorIndex]);
+        logger.info( "Thrust factor: " + thrustFactor[thrustFactorIndex]);
         if (broadcast)
             EventManager.instance.post(Events.SPACECRAFT_THRUST_INFO, thrustFactorIndex);
     }
@@ -567,8 +571,8 @@ public class Spacecraft extends GenericSpacecraft implements ILineRenderable, IO
         prepareShadowEnvironment();
         mc.touch();
         mc.setTransparency(alpha * fadeOpacity);
-        // In Spacecraft mode, we are not affected by relativistic aberration or Doppler shift
         if (cam.getMode().isSpacecraft())
+            // In Spacecraft mode, we are not affected by relativistic aberration or Doppler shift
             mc.updateRelativisticEffects(cam, 0);
         else
             mc.updateRelativisticEffects(cam);
@@ -581,8 +585,8 @@ public class Spacecraft extends GenericSpacecraft implements ILineRenderable, IO
         ICamera cam = GaiaSky.instance.getICamera();
         mc.touch();
         mc.setTransparency(alpha * fadeOpacity);
-        // In Spacecraft mode, we are not affected by relativistic aberration or Doppler shift
         if (cam.getMode().isSpacecraft())
+            // In Spacecraft mode, we are not affected by relativistic aberration or Doppler shift
             mc.updateRelativisticEffects(cam, 0);
         else
             mc.updateRelativisticEffects(cam);

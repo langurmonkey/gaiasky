@@ -54,7 +54,7 @@ public class HYGBinaryLoader extends AbstractCatalogLoader implements ISceneGrap
     public Array<AbstractPositionEntity> loadData() throws FileNotFoundException {
         Array<AbstractPositionEntity> stars = new Array<AbstractPositionEntity>();
         for (String f : files) {
-            FileHandle file = Gdx.files.internal(f);
+            FileHandle file = GlobalConf.data.dataFileHandle(f);
             InputStream data = file.read();
             DataInputStream data_in = new DataInputStream(data);
 

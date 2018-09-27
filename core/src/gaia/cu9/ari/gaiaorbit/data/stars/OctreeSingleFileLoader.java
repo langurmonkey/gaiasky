@@ -13,6 +13,7 @@ import gaia.cu9.ari.gaiaorbit.scenegraph.SceneGraphNode;
 import gaia.cu9.ari.gaiaorbit.scenegraph.Star;
 import gaia.cu9.ari.gaiaorbit.scenegraph.octreewrapper.AbstractOctreeWrapper;
 import gaia.cu9.ari.gaiaorbit.scenegraph.octreewrapper.OctreeWrapper;
+import gaia.cu9.ari.gaiaorbit.util.GlobalConf;
 import gaia.cu9.ari.gaiaorbit.util.I18n;
 import gaia.cu9.ari.gaiaorbit.util.Logger;
 import gaia.cu9.ari.gaiaorbit.util.Logger.Log;
@@ -37,13 +38,13 @@ public class OctreeSingleFileLoader implements ISceneGraphLoader {
         logger.info(I18n.bundle.format("notif.loading", metadata));
 
         MetadataBinaryIO metadataReader = new MetadataBinaryIO();
-        OctreeNode root = metadataReader.readMetadata(Gdx.files.internal(metadata).read(), LoadStatus.LOADED);
+        OctreeNode root = metadataReader.readMetadata(GlobalConf.data.dataFileHandle(metadata).read(), LoadStatus.LOADED);
 
         logger.info(I18n.bundle.format("notif.nodeloader", root.numNodes(), metadata));
         logger.info(I18n.bundle.format("notif.loading", particles));
 
         ParticleDataBinaryIO particleReader = new ParticleDataBinaryIO();
-        Array<AbstractPositionEntity> particleList = particleReader.readParticles(Gdx.files.internal(particles).read());
+        Array<AbstractPositionEntity> particleList = particleReader.readParticles(GlobalConf.data.dataFileHandle(particles).read());
 
         logger.info(I18n.bundle.format("notif.nodeloader", particleList.size, particles));
 

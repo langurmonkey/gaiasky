@@ -1,0 +1,12 @@
+{
+	"name" : "DR2 very large - 90%/90%",
+	"description" : "Gaia DR2 int6 (90%/90% parallax error). 601M stars.",
+	"data" : [
+	{
+		"loader": "gaia.cu9.ari.gaiaorbit.data.group.OctreeGroupLoader",
+		//"files": [ "/media/tsagrista/Daten/Gaia/data/GDR2/dr2int6/out/45-adp-060000-0.9-0.9/particles/", "/media/tsagrista/Daten/Gaia/data/GDR2/dr2int6/out/45-adp-060000-0.9-0.9/metadata.bin" ]
+		//"files": [ "/media/tsagrista/Daten/Gaia/data/GDR2/dr2int6/out/57-mag-100000-0.9-0.9/particles/", "/media/tsagrista/Daten/Gaia/data/GDR2/dr2int6/out/57-mag-100000-0.9-0.9/metadata.bin" ]
+		//"files": [ "/media/tsagrista/Daten/Gaia/data/GDR2/dr2int6/out/63-mag-100000-0.9-0.9/particles/", "/media/tsagrista/Daten/Gaia/data/GDR2/dr2int6/out/63-mag-100000-0.9-0.9/metadata.bin" ]
+		"files": [ "/media/tsagrista/Daten/Gaia/data/GDR2/dr2int6/out/64-mag-100000-0.9-0.9/particles/", "/media/tsagrista/Daten/Gaia/data/GDR2/dr2int6/out/64-mag-100000-0.9-0.9/metadata.bin" ]
+}
+]}

@@ -1,0 +1,9 @@
+{
+	"name" : "DR2 default - 20%/0.5%",
+	"description" : "Gaia DR2 int6 (20%/0.5% parallax error). 7.5M stars.",
+	"data" : [
+	{
+		"loader": "gaia.cu9.ari.gaiaorbit.data.group.OctreeGroupLoader",
+		"files": [ "/media/tsagrista/Daten/Gaia/data/GDR2/dr2int6/out/66-mag-100000-0.2-0.005/particles/", "/media/tsagrista/Daten/Gaia/data/GDR2/dr2int6/out/66-mag-100000-0.2-0.005/metadata.bin" ]
+	}
+]}

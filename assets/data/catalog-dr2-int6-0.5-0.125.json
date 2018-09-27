@@ -1,0 +1,9 @@
+{
+	"name" : "DR2 large - 50%/12.5%",
+	"description" : "Gaia DR2 int6 (50%/12.5% error, adaptive). 96.6M stars.",
+	"data" : [
+	{
+		"loader": "gaia.cu9.ari.gaiaorbit.data.group.OctreeGroupLoader",
+		"files": [ "/media/tsagrista/Daten/Gaia/data/GDR2/dr2int6/out/65-mag-090000-0.5-0.125/particles/", "/media/tsagrista/Daten/Gaia/data/GDR2/dr2int6/out/65-mag-090000-0.5-0.125/metadata.bin" ]
+	}
+]}

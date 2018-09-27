@@ -35,7 +35,6 @@ import gaia.cu9.ari.gaiaorbit.scenegraph.camera.NaturalCamera;
 import gaia.cu9.ari.gaiaorbit.scenegraph.component.ModelComponent;
 import gaia.cu9.ari.gaiaorbit.scenegraph.component.RotationComponent;
 import gaia.cu9.ari.gaiaorbit.util.ComponentTypes;
-import gaia.cu9.ari.gaiaorbit.util.Constants;
 import gaia.cu9.ari.gaiaorbit.util.GlobalConf;
 import gaia.cu9.ari.gaiaorbit.util.GlobalResources;
 import gaia.cu9.ari.gaiaorbit.util.ModelCache;
@@ -112,7 +111,7 @@ public class StarCluster extends AbstractPositionEntity implements IFocus, IProp
 
     public void initModel() {
         if (clusterTex == null) {
-            clusterTex = new Texture(Gdx.files.internal("data/tex/cluster-tex.png"), true);
+            clusterTex = new Texture(GlobalConf.data.dataFileHandle("data/tex/cluster-tex.png"), true);
             clusterTex.setFilter(TextureFilter.MipMapLinearNearest, TextureFilter.Linear);
         }
         if (model == null) {

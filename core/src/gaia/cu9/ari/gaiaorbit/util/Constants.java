@@ -16,6 +16,7 @@ public class Constants {
      * Conversion from original to VR scaling
      */
     public static final double M_TO_U_CONV = M_TO_U / M_TO_U_ORIGINAL;
+    public static final double SCENE_SCALE_FACTOR = 5e-6;
 
     /**
      * Local unit to m conversion.
@@ -66,7 +67,7 @@ public class Constants {
      */
     public static final double U_TO_KPC = U_TO_PC / 1000d;
 
-    
+
     /**
      * Speed of light in m/s
      */
@@ -98,7 +99,7 @@ public class Constants {
     public static final double U_TO_Ro = 1 / Ro_TO_U;
 
     /** Multiplier for all KM values in the application **/
-    public static final double KM_MULTIPLIER = Nature.KM_TO_PC * 1e9 * 5e-6;
+    public static final double KM_MULTIPLIER = Nature.KM_TO_PC * 1e9 * SCENE_SCALE_FACTOR;
 
     /** Distance from Sun that marks the end of the solar system **/
     public static final double SOLAR_SYSTEM_THRESHOLD = 5e9 * KM_MULTIPLIER;
@@ -164,7 +165,7 @@ public class Constants {
     /** Minimum angle where the LOD transitions start **/
     public static final float MIN_LOD_TRANS_ANGLE_DEG = 0f;
     /** Maximum angle where the LOD transitions end **/
-    public static final float MAX_LOD_TRANS_ANGLE_DEG = 93f;
+    public static final float MAX_LOD_TRANS_ANGLE_DEG = 120f;
 
     /** Minimum star pixel size **/
     public static final float MIN_STAR_POINT_SIZE = 0.5f;

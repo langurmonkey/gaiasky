@@ -1,11 +1,176 @@
-# Change Log
+<a name="unreleased"></a>
+## [Unreleased](https://github.com/langurmonkey/gaiasky/tree/master)
+[Full changelog](https://github.com/langurmonkey/gaiasky/compare/2.1.2...HEAD)
 
-## [Unreleased](https://github.com/langurmonkey/gaiasky/tree/HEAD)
+### Bug Fixes
+- global key bindings affect invisible GUIs
+- fix `p` double-mapping
 
-[Full Changelog](https://github.com/langurmonkey/gaiasky/compare/1.5.0...HEAD)
+### Build system
+- add javadoc generator and publisher
+
+### Code Refactoring
+- bin to scripts, now settled
+- scripts moved to bin, bin in git
+
+### Documentation
+- small tweak to changelog template
+- improve git-chglog configuration
+- update changelog
+
+### Features
+- API calls to disable and enable the GUI
+
+### Style
+- minor style issues
+
+
+<a name="2.1.2"></a>
+## [2.1.2](https://github.com/langurmonkey/gaiasky/tree/2.1.1) (2018-09-18)
+[Full changelog](https://github.com/langurmonkey/gaiasky/compare/2.1.1...2.1.2)
+
+### Bug Fixes
+
+- fix for windows paths [#309](https://github.com/langurmonkey/gaiasky/issues/309) 
+- fix run script and play camera windows 
+- update changelog 
+### Features
+
+- add quit confirmation dialog 
+- add new key bindings for simple actions 
+
+<a name="2.1.1"></a>
+## [2.1.1](https://github.com/langurmonkey/gaiasky/tree/2.1.0) (2018-09-14)
+[Full changelog](https://github.com/langurmonkey/gaiasky/compare/2.1.0...2.1.1)
+
+### Bug Fixes
+
+- crash if no internet connection present [#308](https://github.com/langurmonkey/gaiasky/issues/308) 
+- fix description of very large catalog 
+### Documentation
+
+- update changelog 
+- mended submodule init and update 
+
+<a name="2.1.0"></a>
+## [2.1.0](https://github.com/langurmonkey/gaiasky/tree/2.0.3) (2018-09-11)
+[Full changelog](https://github.com/langurmonkey/gaiasky/compare/2.0.3...2.1.0)
+
+### Bug Fixes
+
+- fix previous fix of search dialog [#307](https://github.com/langurmonkey/gaiasky/issues/307) 
+- search dialog crash if starts with number [#307](https://github.com/langurmonkey/gaiasky/issues/307) 
+- fix error loading lens dirt hi res texture 
+### Build system
+
+- new changelog generator in release script 
+- add changelog generator script 
+### Documentation
+
+- updated changelog 
+- add gaiasky-docs submodule 
+- add commit message style guidelines 
+- Fix download helper docs 
+### Features
+
+- add download manager and infrastructure [#291](https://github.com/langurmonkey/gaiasky/issues/291) [#303](https://github.com/langurmonkey/gaiasky/issues/303) 
+### Style
+
+- fix style of contributing once and for all 
+- fix style in contributing.md 
+
+## [2.0.3](https://github.com/langurmonkey/gaiasky/tree/2.0.3) (2018-08-28)
+[Full Changelog](https://github.com/langurmonkey/gaiasky/compare/2.0.2-vr...2.0.3)
 
 **Implemented enhancements:**
 
+- Clean up logging code [\#299](https://github.com/langurmonkey/gaiasky/issues/299)
+- Improve debug info [\#298](https://github.com/langurmonkey/gaiasky/issues/298)
+- Handle vertex data more efficiently [\#297](https://github.com/langurmonkey/gaiasky/issues/297)
+- API: Provide a way to hook into main loop thread [\#294](https://github.com/langurmonkey/gaiasky/issues/294)
+- Add support for different line widths [\#293](https://github.com/langurmonkey/gaiasky/issues/293)
+- API call: lines between arbitrary positions [\#292](https://github.com/langurmonkey/gaiasky/issues/292)
+- Add Top/Bottom to the mode profiles for 3DTV [\#268](https://github.com/langurmonkey/gaiasky/issues/268)
+
+**Merged pull requests:**
+
+- REST server static files use assets.location [\#300](https://github.com/langurmonkey/gaiasky/pull/300) ([vga101](https://github.com/vga101))
+- Re-introduce REST API [\#281](https://github.com/langurmonkey/gaiasky/pull/281) ([vga101](https://github.com/vga101))
+
+## [2.0.2-vr](https://github.com/langurmonkey/gaiasky/tree/2.0.2-vr) (2018-07-25)
+[Full Changelog](https://github.com/langurmonkey/gaiasky/compare/2.0.2...2.0.2-vr)
+
+## [2.0.2](https://github.com/langurmonkey/gaiasky/tree/2.0.2) (2018-07-06)
+[Full Changelog](https://github.com/langurmonkey/gaiasky/compare/2.0.1...2.0.2)
+
+**Implemented enhancements:**
+
+- Add controls to manage datasets [\#290](https://github.com/langurmonkey/gaiasky/issues/290)
+- Separate base texture from clouds texture [\#289](https://github.com/langurmonkey/gaiasky/issues/289)
+- Add gamma correction [\#288](https://github.com/langurmonkey/gaiasky/issues/288)
+- Add label size control [\#287](https://github.com/langurmonkey/gaiasky/issues/287)
+- Rearrange graphical settings into preferences dialog [\#286](https://github.com/langurmonkey/gaiasky/issues/286)
+
+**Fixed bugs:**
+
+- Fix objects pane minimize button disappearing [\#285](https://github.com/langurmonkey/gaiasky/issues/285)
+
+**Merged pull requests:**
+
+- Fix broken link to DR2 default catalog [\#280](https://github.com/langurmonkey/gaiasky/pull/280) ([vga101](https://github.com/vga101))
+
+## [2.0.1](https://github.com/langurmonkey/gaiasky/tree/2.0.1) (2018-06-14)
+[Full Changelog](https://github.com/langurmonkey/gaiasky/compare/2.0.0-vr...2.0.1)
+
+**Implemented enhancements:**
+
+- Lazy mesh initialization [\#284](https://github.com/langurmonkey/gaiasky/issues/284)
+- Improve DR2 catalogs [\#283](https://github.com/langurmonkey/gaiasky/issues/283)
+- Add support for new galaxy meshes [\#282](https://github.com/langurmonkey/gaiasky/issues/282)
+- Fix Gaia Sky logo resolution [\#279](https://github.com/langurmonkey/gaiasky/issues/279)
+- Add utility to see logs [\#278](https://github.com/langurmonkey/gaiasky/issues/278)
+- Improve grid rendering [\#277](https://github.com/langurmonkey/gaiasky/issues/277)
+- Add maximum FPS option [\#273](https://github.com/langurmonkey/gaiasky/issues/273)
+- Create contributing.md files with guidelines as to how to contribute [\#272](https://github.com/langurmonkey/gaiasky/issues/272)
+- Only Xbox 360 controls, no XBone [\#199](https://github.com/langurmonkey/gaiasky/issues/199)
+
+**Fixed bugs:**
+
+- Fix Windows 32-bit build [\#274](https://github.com/langurmonkey/gaiasky/issues/274)
+
+**Closed issues:**
+
+- Maximum time reached [\#271](https://github.com/langurmonkey/gaiasky/issues/271)
+
+## [2.0.0-vr](https://github.com/langurmonkey/gaiasky/tree/2.0.0-vr) (2018-05-09)
+[Full Changelog](https://github.com/langurmonkey/gaiasky/compare/2.0.0...2.0.0-vr)
+
+**Implemented enhancements:**
+
+- Add night theme [\#270](https://github.com/langurmonkey/gaiasky/issues/270)
+
+**Fixed bugs:**
+
+- Fix SAMP issues when loading [\#266](https://github.com/langurmonkey/gaiasky/issues/266)
+- Fix constellation name flickering when planets are turned off [\#264](https://github.com/langurmonkey/gaiasky/issues/264)
+
+**Closed issues:**
+
+- Is it possible to extend the size of the user interface [\#269](https://github.com/langurmonkey/gaiasky/issues/269)
+
+## [2.0.0](https://github.com/langurmonkey/gaiasky/tree/2.0.0) (2018-04-24)
+[Full Changelog](https://github.com/langurmonkey/gaiasky/compare/1.5.0...2.0.0)
+
+**Implemented enhancements:**
+
+- Add hue and saturation to levels [\#263](https://github.com/langurmonkey/gaiasky/issues/263)
+- Add support for asteroind positions additionally to orbits [\#262](https://github.com/langurmonkey/gaiasky/issues/262)
+- Add Hammer-Aitoff and cylindrical projections to cubemap mode [\#260](https://github.com/langurmonkey/gaiasky/issues/260)
+- Expose dataset chooser to prefs window [\#259](https://github.com/langurmonkey/gaiasky/issues/259)
+- Add projection minimaps [\#255](https://github.com/langurmonkey/gaiasky/issues/255)
+- Add image format and quality for screenshots and frames to config [\#253](https://github.com/langurmonkey/gaiasky/issues/253)
+- Add reset time hotkey [\#252](https://github.com/langurmonkey/gaiasky/issues/252)
+- Apply graphics quality without restart [\#251](https://github.com/langurmonkey/gaiasky/issues/251)
 - Add gravitational wave model [\#249](https://github.com/langurmonkey/gaiasky/issues/249)
 - Add CMB [\#248](https://github.com/langurmonkey/gaiasky/issues/248)
 - Add SAMP support [\#246](https://github.com/langurmonkey/gaiasky/issues/246)
@@ -51,6 +216,12 @@
 
 **Fixed bugs:**
 
+<<<<<<< HEAD
+=======
+- Fix position discrepancy of stars in stereo mode \(points vs billboards\) [\#258](https://github.com/langurmonkey/gaiasky/issues/258)
+- Screenshot and frame mode switch from simple to advanced produces null pointer [\#257](https://github.com/langurmonkey/gaiasky/issues/257)
+- Refactor time [\#256](https://github.com/langurmonkey/gaiasky/issues/256)
+>>>>>>> lwjgl3
 - Streaming catalog loader never attempts previously discarded pages [\#241](https://github.com/langurmonkey/gaiasky/issues/241)
 - Fix returning from panorama mode through stereo mode [\#238](https://github.com/langurmonkey/gaiasky/issues/238)
 - Add object scaling to scripting API [\#227](https://github.com/langurmonkey/gaiasky/issues/227)
@@ -74,6 +245,12 @@
 
 **Closed issues:**
 
+<<<<<<< HEAD
+=======
+- Is this update also coming? [\#261](https://github.com/langurmonkey/gaiasky/issues/261)
+- Enable particle effects [\#254](https://github.com/langurmonkey/gaiasky/issues/254)
+- Add-ons [\#250](https://github.com/langurmonkey/gaiasky/issues/250)
+>>>>>>> lwjgl3
 - Crash with TGAS GPU dataset [\#236](https://github.com/langurmonkey/gaiasky/issues/236)
 - Preferences window shows wrong version number [\#234](https://github.com/langurmonkey/gaiasky/issues/234)
 - Cannot build desktop:dist [\#233](https://github.com/langurmonkey/gaiasky/issues/233)
@@ -81,6 +258,7 @@
 - Adding meshes [\#205](https://github.com/langurmonkey/gaiasky/issues/205)
 - On Windows, install fails with "Could not determine java version from '9.0.1' [\#204](https://github.com/langurmonkey/gaiasky/issues/204)
 - Docs don't mention where record data appears [\#198](https://github.com/langurmonkey/gaiasky/issues/198)
+- So....I...uhh...broke it in the most beautiful way I could think...ever. [\#196](https://github.com/langurmonkey/gaiasky/issues/196)
 - Javadocs no longer available [\#183](https://github.com/langurmonkey/gaiasky/issues/183)
 - Not truly compatible with Oculus Rift [\#44](https://github.com/langurmonkey/gaiasky/issues/44)
 

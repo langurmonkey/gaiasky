@@ -34,8 +34,8 @@ public class GlobalClock implements IObserver, ITimeFrameProvider {
     // Seconds since last event POST
     private float lastUpdate = 1;
     /**
-     * The fixed frame rate when not in real time. Set negative to use real time
-     **/
+    	 * The fixed frame rate when not in real time. Set negative to use real time
+    	 **/
     public float fps = -1;
 
     /**
@@ -82,7 +82,8 @@ public class GlobalClock implements IObserver, ITimeFrameProvider {
             // Check target time
             if (targetTime != null) {
                 long target = targetTime.toEpochMilli();
-                if ((timeWarp > 0 && currentTime <= target && newTime > target) || (timeWarp < 0 && currentTime >= target && newTime < target)) {
+                if ((timeWarp > 0 && currentTime <= target && newTime > target)
+                        || (timeWarp < 0 && currentTime >= target && newTime < target)) {
                     newTime = target;
                     // Unset target time
                     targetTime = null;

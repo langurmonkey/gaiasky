@@ -15,10 +15,9 @@ import gaia.cu9.ari.gaiaorbit.assets.OrbitDataLoader.OrbitDataLoaderParameter;
 import gaia.cu9.ari.gaiaorbit.desktop.format.DesktopDateFormatFactory;
 import gaia.cu9.ari.gaiaorbit.desktop.format.DesktopNumberFormatFactory;
 import gaia.cu9.ari.gaiaorbit.desktop.util.DesktopConfInit;
-import gaia.cu9.ari.gaiaorbit.event.EventManager;
-import gaia.cu9.ari.gaiaorbit.event.Events;
-import gaia.cu9.ari.gaiaorbit.event.IObserver;
+import gaia.cu9.ari.gaiaorbit.desktop.util.LogWriter;
 import gaia.cu9.ari.gaiaorbit.util.ConfInit;
+import gaia.cu9.ari.gaiaorbit.util.GlobalConf;
 import gaia.cu9.ari.gaiaorbit.util.I18n;
 import gaia.cu9.ari.gaiaorbit.util.Logger;
 import gaia.cu9.ari.gaiaorbit.util.coord.AstroUtils;
@@ -42,7 +41,10 @@ public class OrbitSamplerDataProvider implements IOrbitDataProvider {
     public static void main(String[] args) {
         try {
             // Assets location
-            String ASSETS_LOC = (System.getProperty("assets.location") != null ? System.getProperty("assets.location") : "");
+            String ASSETS_LOC = GlobalConf.ASSETS_LOC;
+            
+            // Logger
+            new LogWriter();
 
             Gdx.files = new Lwjgl3Files();
 

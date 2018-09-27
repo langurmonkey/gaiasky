@@ -15,11 +15,6 @@ public class OwnScrollPane extends ScrollPane {
     private float ownwidth = 0f, ownheight = 0f;
 
     /** @param widget May be null. */
-    public OwnScrollPane(Actor widget) {
-        this(widget, new ScrollPaneStyle());
-    }
-
-    /** @param widget May be null. */
     public OwnScrollPane(Actor widget, Skin skin) {
         this(widget, skin.get(ScrollPaneStyle.class));
     }

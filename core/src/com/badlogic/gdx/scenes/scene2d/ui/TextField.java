@@ -1012,7 +1012,6 @@ public class TextField extends Widget implements Disableable {
                         String insertion = enter ? "\n" : String.valueOf(character);
                         text = insert(cursor++, insertion, text);
                     }
-                    String tempUndoText = undoText;
                     if (changeText(oldText, text)) {
                         long time = System.currentTimeMillis();
                         if (time - 750 > lastChangeTime)

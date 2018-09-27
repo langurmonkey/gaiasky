@@ -16,6 +16,7 @@ import gaia.cu9.ari.gaiaorbit.scenegraph.ConstellationBoundaries;
 import gaia.cu9.ari.gaiaorbit.scenegraph.SceneGraphNode;
 import gaia.cu9.ari.gaiaorbit.util.ComponentTypes;
 import gaia.cu9.ari.gaiaorbit.util.Constants;
+import gaia.cu9.ari.gaiaorbit.util.GlobalConf;
 import gaia.cu9.ari.gaiaorbit.util.I18n;
 import gaia.cu9.ari.gaiaorbit.util.Logger;
 import gaia.cu9.ari.gaiaorbit.util.coord.Coordinates;
@@ -39,7 +40,7 @@ public class ConstelBoundariesLoader<T extends SceneGraphNode> implements IScene
         for (String f : files) {
             try {
                 // load boundaries
-                FileHandle file = Gdx.files.internal(f);
+                FileHandle file = GlobalConf.data.dataFileHandle(f);
                 BufferedReader br = new BufferedReader(new InputStreamReader(file.read()));
 
                 try {

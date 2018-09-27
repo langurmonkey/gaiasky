@@ -9,12 +9,11 @@
 [![GitHub tag](https://img.shields.io/github/tag/langurmonkey/gaiasky.svg)](https://github.com/langurmonkey/gaiasky/tags/)
 
 [**Gaia Sky VR**](https://zah.uni-heidelberg.de/gaia/outreach/gaiasky) is a real-time, 3D, astronomy VR software that
-runs on multiple headsets and operating systems thanks to Valve's [OpenVR](https://github.com/ValveSoftware/openvr). It is developed in the framework of
-[ESA](http://www.esa.int/ESA)'s [Gaia mission](http://sci.esa.int/gaia) to chart about 1 billion stars of our Galaxy.
+runs on multiple headsets and operating systems thanks to Valve's [OpenVR](https://github.com/ValveSoftware/openvr). It is developed in the framework of [ESA](http://www.esa.int/ESA)'s [Gaia mission](http://sci.esa.int/gaia) to chart about 1 billion stars of our Galaxy.
 To get the latest up-to-date and most complete information,
 
 *  Visit our [**home page**](https://zah.uni-heidelberg.de/gaia/outreach/gaiasky)
-*  Read the [**Documentation**](http://gaia-sky.readthedocs.io) for the non-VR version
+*  Read the [**Documentation**](http://gaia.ari.uni-heidelberg.de/gaiasky/docs/html/latest) for the non-VR version
 *  Submit a [**bug** or a **feature request**](https://gitlab.com/langurmonkey/gaiasky/issues)
 *  Follow development news at [@GaiaSky_Dev](https://twitter.com/GaiaSky_Dev)
 
@@ -45,7 +44,7 @@ This guide is for running Gaia Sky VR with the Oculus Rift in Windows. You will 
 
 ### 1.2. Cloning the repository
 
-First, open the Git for Windows CLI and clone the [GitHub](https://github.com/langurmonkey/gaiasky) repository and checkout the `2.0.0-vr` tag. This should give you a working version:
+First, open the Git for Windows CLI and clone the [Gitlab](https://gitlab.com/langurmonkey/gaiasky) repository and checkout the `2.0.0-vr` tag. This should give you a working version:
 
 ```
 $  git clone https://github.com/langurmonkey/gaiasky.git
@@ -59,28 +58,10 @@ Make sure you have at least `JDK8` installed.
 
 ### 1.3. Getting the data
 
-The TGAS catalog files (Gaia data) are **not** in the repository, so if you want to use the TGAS or DR2 data when running
-from source you need to download
-the corresponding `tar` file — see table below.
+As of version `2.1.2-vr` Gaia Sky will offer to download the data automatically at startup if it is not detected.
 
-| **Catalog** | **Description** | **Extract location** | **Catalog file** |
-|---------|-------------|----------|----------|
-| [TGAS](http://gaia.ari.uni-heidelberg.de/gaiasky/files/catalogs/tgas/20171204_tgas_gpu_gaiasky_1.5.1.tar.gz)  | TGAS catalog. ~700 K stars. | `gaiasky/assets/data/catalog` | `data/catalog-tgas-hyg.json` | 
-| [Gaia DR2](http://gaia.ari.uni-heidelberg.de/gaiasky/files/catalogs/dr2/20180618/dr2-20-0.5.tar.gz)  | Gaia DR2 catalog (20%/0.5%). ~7.5 M stars.  | `gaiasky/assets/data/octree/dr2` | [`data/catalog-dr2-default.json`](http://gaia.ari.uni-heidelberg.de/gaiasky/files/catalogs/dr2/20180618/catalog-dr2-default.json) | 
+You can also manually download the packages [here](https://zah.uni-heidelberg.de/institutes/ari/gaia/outreach/gaiasky/downloads/#dr2catalogs). Just extract the packages into your `$HOME/.gaiasky/data` folder and you are set.
 
-Find more catalogs to download [here](https://zah.uni-heidelberg.de/institutes/ari/gaia/outreach/gaiasky/downloads/#dr2catalogs).
-
-To set up the catalog, first download the catalog data file (first column, **Catalog**) and extract it into the specified **Extract location** column. 
-Then, download the catalog descriptor file from the **Catalog file** column in the downloads table and save it in `assets/data`.
-Finally, open the file `$HOME/.gaiasky/global.vr.properties` (probably in C:/Users/[username]/.gaiasky in Windows) and edit the
-line that starts with `data.json.catalog` so that it points to the descriptor file you just downloaded, so if you are using the default
-Gaia DR2 catalog, it should look like this:
-
-```
-[...]
-data.json.catalog=data/catalog-dr2-default.json
-[...]
-```
 
 ### 1.4. Running
 
@@ -92,39 +73,58 @@ $  gradlew.bat core:run
 
 Et voilà! Gaia Sky VR dev branch is running.
 
-In order to pull the latest version from the repository, just run the following from the `gaiasky` folder.
+### 1.5 CLI arguments
+
+Gaia Sky accepts a few command-line arguments:
 
 ```
-$  git pull origin vr
+Usage: gaiasky [options]
+ Options:
+    -c, --cat-chooser
+      Displays the catalog chooser dialog at startup
+      Default: false
+    -d, --ds-download
+      Displays the download dialog at startup
+      Default: false
+    -h, --help
+      Shows help
+    -v, --version
+      Lists version and build inforamtion
+      Default: false
 ```
 
-Remember that the master branch is the development branch and therefore intrinsically unstable. It is not guaranteed to always work.
+##  3. Documentation and help
 
-##  2. Documentation and help
+The most up-to-date documentation of Gaia Sky is always in [gaia.ari.uni-heidelberg.de/gaiasky/docs/html/latest](http://gaia.ari.uni-heidelberg.de/gaiasky/docs/html/latest). For older versions and other formats, see [here](http://gaia.ari.uni-heidelberg.de/gaiasky/docs).
 
-The most up-to-date documentation of Gaia Sky is always in [gaia-sky.readthedocs.io](http://gaia-sky.readthedocs.io).
+We also have a mirror at [gaia-sky.rtfd.org](https://gaia-sky.readthedocs.io).
 
-###  2.1 Controls
+### 3.1. Documentation submodule
 
-Unfortunately, only the Oculus VR controllers are supported. When I get a chance to borrow an HTC Vive, I'll add mappings for it too.
+In order to add the documentation submodule to the project, do:
 
-Here are the current controller mappings:
+```
+$  git submodule init
+$  git submodule update
+```
 
-<img src="assets/img/controller/controller-info.png" alt="Gaia Sky VR controls" width="500px" />
+The documentation project will be checked out in the `docs/` folder.
 
-##  3. Copyright and licensing information
+
+##  4. Copyright and licensing information
 
 This software is published and distributed under the MPL 2.0
 (Mozilla Public License 2.0). You can find the full license
-text here https://github.com/langurmonkey/gaiasky/blob/master/LICENSE.md
+text here https://gitlab.com/langurmonkey/gaiasky/blob/master/LICENSE.md
 or visiting https://opensource.org/licenses/MPL-2.0
 
-##  4. Contact information
+##  5. Contact information
 
 The main webpage of the project is
 **[https://www.zah.uni-heidelberg.de/gaia/outreach/gaiasky](https://www.zah.uni-heidelberg.de/gaia/outreach/gaiasky)**. There you can find
 the latest versions and the latest information on Gaia Sky.
 
-##  5. Acknowledgements
+##  6. Acknowledgements
 
-The latest acknowledgements are always in the [ACKNOWLEDGEMENTS.md](https://github.com/langurmonkey/gaiasky/blob/master/ACKNOWLEDGEMENTS.md) file.
+The latest acknowledgements are always in the [ACKNOWLEDGEMENTS.md](https://gitlab.com/langurmonkey/gaiasky/blob/master/ACKNOWLEDGEMENTS.md) file.
+

@@ -430,7 +430,7 @@ public class MeshBuilder2 implements MeshPartBuilder2 {
                 if (colSize > 3)
                     vertex[colOffset + 3] = col.a;
             } else if (cpOffset > 0)
-                vertex[cpOffset] = col.toFloatBits(); // FIXME cache packed color?
+                vertex[cpOffset] = col.toFloatBits();
         }
         if (uv != null && uvOffset >= 0) {
             vertex[uvOffset] = uv.x;

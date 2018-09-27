@@ -12,7 +12,7 @@ varying vec4 v_col;
 
 float programmatic(vec2 uv) {
     float dist_center = 1.0 - clamp(distance(vec2(0.5, 0.5), uv) * 2.0, 0.0, 1.0);
-    return pow(dist_center, 6.0) * 0.4 + dist_center * 0.05;
+    return pow(dist_center, 3.0) * 0.3 + dist_center * 0.05;
 }
 
 

@@ -358,6 +358,7 @@ public enum Events {
     SHOW_PREFERENCES_ACTION,
     SHOW_RUNSCRIPT_ACTION,
     SHOW_LAND_AT_LOCATION_ACTION,
+    SHOW_QUIT_ACTION,
     /** Shows the camera path file selector, contains the stage and the skin **/
     SHOW_PLAYCAMERA_ACTION,
     /** Informs about the number of running scripts **/
@@ -688,6 +689,16 @@ public enum Events {
     MUSIC_NEXT_CMD,
     /** Reload music files **/
     MUSIC_RELOAD_CMD,
+    
+    
+    /** Attach object to first end of ruler. Contains object name **/
+    RULER_ATTACH_0,
+    /** Attach object to second end of ruler. Contains object name **/
+    RULER_ATTACH_1,
+    /** Clear all objects from ruler **/
+    RULER_CLEAR,
+    /** Notifies new distances for the ruler. Contains a double with the distance in internal units and a formatted string **/
+    RULER_DIST,
 
     /** Contains the spacecraft object after it has been loaded **/
     SPACECRAFT_LOADED,
@@ -782,7 +793,7 @@ public enum Events {
 
     /** A new catalog has been loaded. Contains the new catalog info object **/
     ADD_CATALOG_INFO,
-    
+
     /** Posts a recurrent runnable. Contains an identifier (String) and the runnable object **/
     POST_RUNNABLE,
 
@@ -795,6 +806,9 @@ public enum Events {
     /** VR device disconnected. Contains the VRDevice object. **/
     VR_DEVICE_DISCONNECTED,
 
+    // INPUT LISTENER EVENTS
+    TOUCH_DOWN, TOUCH_UP, TOUCH_DRAGGED, SCROLLED, KEY_DOWN, KEY_UP,
+    
     /** Dispose all resources, app is shutting down **/
     DISPOSE;
 

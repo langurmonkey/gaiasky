@@ -263,7 +263,7 @@ public class MilkyWay extends AbstractPositionEntity implements I3DTextRenderabl
 
     @Override
     public float textSize() {
-        return (float) distToCamera * 3e-3f;
+        return (float) distToCamera * 2e-3f;
     }
 
     @Override

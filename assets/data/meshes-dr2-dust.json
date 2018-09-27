@@ -1,0 +1,60 @@
+{"objects" : [
+	{
+	"name" : "Dust 15%",
+	"description" : "Dust isosurface for the 15% density level",
+	"color" : [0.0, 0.7, 0.5, 0.4],
+	// Parsec to units
+	"size" :  3.0856775814913705E7,
+	"labelcolor" : [0.4, 0.7, 0.4, 1.0],
+	// Position in parsecs
+	"labelposition" : [-60.0, -200.0, -40.0]
+	"ct" : Meshes,
+	
+	// Fade out in pc
+	"fadeout" : [8000.0, 16000.0],
+	
+	"parent" : "Universe", 
+	"impl" : "gaia.cu9.ari.gaiaorbit.scenegraph.MeshObject",
+	
+	// Transformations
+	"transformName" : galacticToEquatorialF,
+	"scale" : [5.0, 5.0, 5.0],
+	"rotate" : [1.0, 0.0, 0.0, -90.0],
+	"translate" : [-2045.0, -1995.0, -300.0],
+	
+	"model"		: {
+					"args" : [true],
+					"staticlight" : True,
+					"model" : "data/meshes/dr2/meshes_dust/dust_15.g3db"
+				}
+	},
+	{
+	"name" : "Dust 60%",
+	"description" : "Dust isosurface for the 60% density level",
+	"color" : [0.0, 0.8, 0.0, 0.2],
+	// Parsec to units
+	"size" :  3.0856775814913705E7,
+	"labelcolor" : [0.2, 1.0, 0.2, 1.0],
+	// Position in parsecs
+	"labelposition" : [-600.0, 40.0, 150.0]
+	"ct" : Meshes,
+	
+	// Fade out in pc
+	"fadeout" : [8000.0, 16000.0],
+	
+	"parent" : "Universe", 
+	"impl" : "gaia.cu9.ari.gaiaorbit.scenegraph.MeshObject",
+	
+	// Transformations
+	"transformName" : galacticToEquatorialF,
+	"scale" : [5.0, 5.0, 5.0],
+	"rotate" : [1.0, 0.0, 0.0, -90.0],
+	"translate" : [-2045.0, -1995.0, -300.0],
+	
+	"model"		: {
+					"args" : [true],
+					"staticlight" : True,
+					"model" : "data/meshes/dr2/meshes_dust/dust_60.g3db"
+				}
+	}
+]}	

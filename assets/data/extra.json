@@ -9,6 +9,7 @@
 
 	"parent" : "Universe", 
 	"impl" : "gaia.cu9.ari.gaiaorbit.scenegraph.SphericalGrid",
+<<<<<<< HEAD:assets/data/extra.json
 	
 	"coordinates" : {
 				// This must implement gaia.cu9.ari.gaiaorbit.util.coord.IBodyCoordinates				
@@ -16,6 +17,15 @@
 				"position" : [0.0, 0.0, 0.0]
 				},
 	
+=======
+	
+	"coordinates" : {
+				// This must implement gaia.cu9.ari.gaiaorbit.util.coord.IBodyCoordinates				
+				"impl" : "gaia.cu9.ari.gaiaorbit.util.coord.StaticCoordinates",
+				"position" : [0.0, 0.0, 0.0]
+				},
+	
+>>>>>>> lwjgl3:assets/data/extra.json
  	"model" : {
 				"args" : [true],
 				"type" : "sphere",
@@ -192,6 +202,8 @@
 		"name" : "Cosmic Microwave Background",
 		"color" : [1.0, 1.0, 1.0, 0.5],
 		"size" : 1e4,
+<<<<<<< HEAD:assets/data/extra.json
+=======
 		"ct" : Others,
 		"transformName" : galacticToEquatorial,
 		"label" : true,
@@ -201,6 +213,57 @@
 
 		// Fade distances, in parsecs
 		"fadein" : [1.0e9, 20.0e9],
+		
+		"parent" : "Universe", 
+		"impl" : "gaia.cu9.ari.gaiaorbit.scenegraph.BackgroundModel",
+	
+		"coordinates" : {
+				// This must implement gaia.cu9.ari.gaiaorbit.util.coord.IBodyCoordinates				
+				"impl" : "gaia.cu9.ari.gaiaorbit.util.coord.StaticCoordinates",
+				"position" : [0.0, 0.0, 0.0]
+				},			
+	
+ 		"model" : {
+				"args" : [true],
+				"type" : "sphere",
+				"params" : {
+							"quality" : 90,
+							"diameter" : 1.0,
+							"flip" : true
+							},
+				"texture" : {
+							"base" : "data/tex/PlanckFig_map_columbi1_IDL_HighDR_colbar_70GHz_cart*.jpg"
+							}
+				}
+	},
+	
+	{
+		"name" : "Oort cloud",
+		"position" : [0.0, 0.0, 0.0],
+		// Color of particles
+		"color" : [0.6, 0.6, 0.65, 0.8],
+		// Size of particles
+		"size" : 1.5,
+		"labelcolor" : [0.3, 0.6, 1.0, 1.0],
+		// Position in parsecs
+		"labelposition" : [0.0484814, 0.0, 0.0484814]
+>>>>>>> lwjgl3:assets/data/extra.json
+		"ct" : Others,
+		"transformName" : galacticToEquatorial,
+		"label" : true,
+		"label2d" : true,
+		// x, y, scale
+		"labelposition" : [200.0, 200.0, 2.0],
+
+		// Fade distances, in parsecs
+<<<<<<< HEAD:assets/data/extra.json
+		"fadein" : [1.0e9, 20.0e9],
+=======
+		"fadein" : [0.0004, 0.004],
+		"fadeout" : [0.1, 1.8],
+		
+		"profiledecay" : 0.1,
+>>>>>>> lwjgl3:assets/data/extra.json
 		
 		"parent" : "Universe", 
 		"impl" : "gaia.cu9.ari.gaiaorbit.scenegraph.BackgroundModel",
@@ -360,4 +423,8 @@
  	    "parent" : "Universe", 
  	    "impl" : "gaia.cu9.ari.gaiaorbit.scenegraph.Text2D"
  	}
+<<<<<<< HEAD:assets/data/extra.json
+=======
+ 	
+>>>>>>> lwjgl3:assets/data/extra.json
 ]}

@@ -33,6 +33,7 @@ import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.ObjectIntMap;
+import com.badlogic.gdx.utils.ObjectMap;
 import com.badlogic.gdx.utils.TimeUtils;
 
 import gaia.cu9.ari.gaiaorbit.GaiaSky;
@@ -217,8 +218,8 @@ public class StarGroup extends ParticleGroup implements ILineRenderable, IStarFo
 
     private static void initModel() {
         if (mc == null) {
-            Texture tex = new Texture(Gdx.files.internal(GlobalConf.TEXTURES_FOLDER + "star.jpg"));
-            Texture lut = new Texture(Gdx.files.internal(GlobalConf.TEXTURES_FOLDER + "lut.jpg"));
+            Texture tex = new Texture(GlobalConf.data.dataFile("tex/star.jpg"));
+            Texture lut = new Texture(GlobalConf.data.dataFile("tex/lut.jpg"));
             tex.setFilter(TextureFilter.Linear, TextureFilter.Linear);
 
             Map<String, Object> params = new TreeMap<String, Object>();
@@ -1033,6 +1034,17 @@ public class StarGroup extends ParticleGroup implements ILineRenderable, IStarFo
      */
     public Double getEpoch() {
         return this.epoch_jd;
+    }
+
+    @Override
+
+    protected void addToIndex(ObjectMap<String, SceneGraphNode> map) {
+        if (index != null) {
+            ObjectIntMap.Keys<String> keys = index.keys();
+            for (String key : keys) {
+                map.put(key, this);
+            }
+        }
     }
 
     @Override

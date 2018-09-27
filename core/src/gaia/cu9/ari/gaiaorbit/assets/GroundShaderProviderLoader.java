@@ -30,6 +30,7 @@ public class GroundShaderProviderLoader<T extends GroundShaderProviderLoader.Gro
     }
 
     @Override
+    @SuppressWarnings("rawtypes")
     public Array<AssetDescriptor> getDependencies(String fileName, FileHandle file, GroundShaderProviderParameter parameter) {
         return null;
     }

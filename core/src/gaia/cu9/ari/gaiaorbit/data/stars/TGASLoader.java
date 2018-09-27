@@ -106,7 +106,7 @@ public class TGASLoader extends AbstractCatalogLoader implements ISceneGraphLoad
 
         Array<Particle> stars = new Array<Particle>();
         for (String file : files) {
-            FileHandle f = Gdx.files.internal(file);
+            FileHandle f = GlobalConf.data.dataFileHandle(file);
             InputStream data = f.read();
             BufferedReader br = new BufferedReader(new InputStreamReader(data));
 
@@ -209,7 +209,7 @@ public class TGASLoader extends AbstractCatalogLoader implements ISceneGraphLoad
     private Map<Long, Double> loadRadialVelocities(String file) {
         Map<Long, Double> result = new HashMap<Long, Double>();
 
-        FileHandle f = Gdx.files.internal(file);
+        FileHandle f = GlobalConf.data.dataFileHandle(file);
 
         if (!f.exists())
             return null;
@@ -250,7 +250,7 @@ public class TGASLoader extends AbstractCatalogLoader implements ISceneGraphLoad
      */
     private Map<String, Float> loadTYCBVColours(String file) {
         Map<String, Float> result = new HashMap<String, Float>();
-        FileHandle f = Gdx.files.internal(file);
+        FileHandle f = GlobalConf.data.dataFileHandle(file);
         InputStream data = f.read();
         BufferedReader br = new BufferedReader(new InputStreamReader(data));
         try {

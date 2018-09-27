@@ -14,6 +14,11 @@ import gaia.cu9.ari.gaiaorbit.event.EventManager;
 import gaia.cu9.ari.gaiaorbit.event.Events;
 import gaia.cu9.ari.gaiaorbit.util.GlobalConf;
 
+/**
+ * GUI window to choose the catalog to use
+ * @author tsagrista
+ *
+ */
 public class ChooseCatalogWindow extends GenericDialog {
 
     private DatasetsWidget dw;
@@ -39,10 +44,9 @@ public class ChooseCatalogWindow extends GenericDialog {
 
         cell.clearActor();
         cell.space(3 * GlobalConf.SCALE_FACTOR);
+        cell.padTop(10 * GlobalConf.SCALE_FACTOR);
         cell.setActor(dw.buildDatasetsWidget(catalogFiles));
     }
-
-
 
     @Override
     protected void accept() {

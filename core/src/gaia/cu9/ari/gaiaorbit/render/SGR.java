@@ -14,6 +14,7 @@ import gaia.cu9.ari.gaiaorbit.scenegraph.camera.ICamera;
  */
 public class SGR extends SGRAbstract implements ISGR {
 
+
     public SGR() {
         super();
     }

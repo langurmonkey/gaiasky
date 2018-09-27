@@ -460,6 +460,7 @@ public class BoundingBoxd implements Serializable {
     @Override
     public String toString() {
         return "[" + min + "|" + max + "]";
+        //return "[" + min.x * Constants.U_TO_KPC + "," + min.y * Constants.U_TO_KPC + "," + min.z * Constants.U_TO_KPC + "|" + max.x * Constants.U_TO_KPC + "," + max.y * Constants.U_TO_KPC + "," + max.z * Constants.U_TO_KPC + "]";
     }
 
     /**

@@ -64,7 +64,7 @@ public class HipparcosLoader extends AbstractCatalogLoader implements ISceneGrap
 
         Array<Particle> stars = new Array<Particle>();
         for (String file : files) {
-            FileHandle f = Gdx.files.internal(file);
+            FileHandle f = GlobalConf.data.dataFileHandle(file);
             InputStream data = f.read();
             BufferedReader br = new BufferedReader(new InputStreamReader(data));
 

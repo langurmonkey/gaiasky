@@ -19,6 +19,7 @@ import gaia.cu9.ari.gaiaorbit.desktop.util.SysUtils;
 import gaia.cu9.ari.gaiaorbit.scenegraph.ParticleGroup.ParticleBean;
 import gaia.cu9.ari.gaiaorbit.scenegraph.StarGroup.StarBean;
 import gaia.cu9.ari.gaiaorbit.util.Constants;
+import gaia.cu9.ari.gaiaorbit.util.GlobalConf;
 import gaia.cu9.ari.gaiaorbit.util.I18n;
 import gaia.cu9.ari.gaiaorbit.util.Logger;
 import gaia.cu9.ari.gaiaorbit.util.Logger.Log;
@@ -100,7 +101,7 @@ public class DR2DataProvider extends AbstractStarGroupDataProvider {
     public Array<StarBean> loadData(String file, double factor) {
         initLists(10000000);
 
-        FileHandle f = Gdx.files.internal(file);
+        FileHandle f = GlobalConf.data.dataFileHandle(file);
         if (f.isDirectory()) {
             // Recursive
             FileHandle[] files = f.list();
@@ -109,14 +110,14 @@ public class DR2DataProvider extends AbstractStarGroupDataProvider {
             });
             int fn = 0;
             for (FileHandle fh : files) {
-                loadDataMapped(SysUtils.getTruePath(fh.path()), factor, fn + 1);
+                loadDataMapped(fh.path(), factor, fn + 1);
                 //loadFileFh(fh, factor, fn + 1);
                 fn++;
                 if (fileNumberCap > 0 && fn >= fileNumberCap)
                     break;
             }
         } else if (f.name().endsWith(".csv") || f.name().endsWith(".gz")) {
-            loadDataMapped(SysUtils.getTruePath(file), factor, 1);
+            loadDataMapped(file, factor, 1);
             //loadFileFh(f, factor, 1);
         } else {
             logger.warn("File skipped: " + f.path());

@@ -1,6 +1,5 @@
 package gaia.cu9.ari.gaiaorbit.data;
 
-import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.JsonReader;
@@ -9,6 +8,7 @@ import com.badlogic.gdx.utils.reflect.ReflectionException;
 
 import gaia.cu9.ari.gaiaorbit.scenegraph.Area;
 import gaia.cu9.ari.gaiaorbit.scenegraph.SceneGraphNode;
+import gaia.cu9.ari.gaiaorbit.util.GlobalConf;
 import gaia.cu9.ari.gaiaorbit.util.I18n;
 import gaia.cu9.ari.gaiaorbit.util.Logger;
 
@@ -35,7 +35,7 @@ public class GeoJsonLoader<T extends SceneGraphNode> implements ISceneGraphLoade
         try {
             JsonReader json = new JsonReader();
             for (String filePath : filePaths) {
-                FileHandle file = Gdx.files.internal(filePath);
+                FileHandle file = GlobalConf.data.dataFileHandle(filePath);
                 JsonValue model = json.parse(file.read());
                 JsonValue child = model.get("features").child;
                 int size = 0;
@@ -43,6 +43,7 @@ public class GeoJsonLoader<T extends SceneGraphNode> implements ISceneGraphLoade
                     size++;
 
                     // Convert to object and add to list
+                    @SuppressWarnings("unchecked")
                     T object = (T) convertJsonToArea(child);
 
                     bodies.add(object);

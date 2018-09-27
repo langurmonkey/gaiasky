@@ -18,10 +18,10 @@ import com.badlogic.gdx.utils.TimeUtils;
 import gaia.cu9.ari.gaiaorbit.GaiaSky;
 import gaia.cu9.ari.gaiaorbit.event.EventManager;
 import gaia.cu9.ari.gaiaorbit.event.Events;
+import gaia.cu9.ari.gaiaorbit.event.IObserver;
 import gaia.cu9.ari.gaiaorbit.scenegraph.IFocus;
-import gaia.cu9.ari.gaiaorbit.scenegraph.camera.NaturalCamera;
 import gaia.cu9.ari.gaiaorbit.scenegraph.camera.CameraManager.CameraMode;
-import gaia.cu9.ari.gaiaorbit.util.Constants;
+import gaia.cu9.ari.gaiaorbit.scenegraph.camera.NaturalCamera;
 import gaia.cu9.ari.gaiaorbit.util.GlobalConf;
 import gaia.cu9.ari.gaiaorbit.util.comp.ViewAngleComparator;
 
@@ -31,21 +31,21 @@ import gaia.cu9.ari.gaiaorbit.util.comp.ViewAngleComparator;
  * @author tsagrista
  *
  */
-public class NaturalInputListener extends GestureDetector {
+public class NaturalInputListener extends GestureDetector implements IObserver {
 
     /**
-     * The button for rotating the camera either around its center or around the
-     * focus.
-     */
+    	 * The button for rotating the camera either around its center or around the
+    	 * focus.
+    	 */
     public int leftMouseButton = Buttons.LEFT;
     /** The button for panning the camera along the up/right plane */
     public int rightMouseButton = Buttons.RIGHT;
     /** The button for moving the camera along the direction axis */
     public int middleMouseButton = Buttons.MIDDLE;
     /**
-     * Whether scrolling requires the activeKey to be pressed (false) or always
-     * allow scrolling (true).
-     */
+    	 * Whether scrolling requires the activeKey to be pressed (false) or always
+    	 * allow scrolling (true).
+    	 */
     public boolean alwaysScroll = true;
     /** The weight for each scrolled amount. */
     public float scrollFactor = -0.1f;
@@ -130,7 +130,7 @@ public class NaturalInputListener extends GestureDetector {
         }
     };
 
-    protected final GaiaGestureListener gestureListener;
+    public final GaiaGestureListener gestureListener;
 
     protected NaturalInputListener(final GaiaGestureListener gestureListener, NaturalCamera camera) {
         super(gestureListener);
@@ -155,6 +155,7 @@ public class NaturalInputListener extends GestureDetector {
 
     public NaturalInputListener(final NaturalCamera camera) {
         this(new GaiaGestureListener(), camera);
+        EventManager.instance.subscribe(this, Events.TOUCH_DOWN, Events.TOUCH_UP, Events.TOUCH_DRAGGED, Events.SCROLLED, Events.KEY_DOWN, Events.KEY_UP);
     }
 
     private int touched;
@@ -351,8 +352,55 @@ public class NaturalInputListener extends GestureDetector {
 
     }
 
+    public void updateKeys() {
+        if (isKeyPressed(Keys.UP)) {
+            camera.addForwardForce(1.0f);
+        }
+        if (isKeyPressed(Keys.DOWN)) {
+            camera.addForwardForce(-1.0f);
+        }
+        if (isKeyPressed(Keys.RIGHT)) {
+            if (camera.getMode().isFocus())
+                camera.addHorizontalRotation(-1.0f, true);
+            else
+                camera.addYaw(1.0f, true);
+        }
+        if (isKeyPressed(Keys.LEFT)) {
+            if (camera.getMode().isFocus())
+                camera.addHorizontalRotation(1.0f, true);
+            else
+                camera.addYaw(-1.0f, true);
+        }
+    }
+
     public boolean isKeyPressed(int keycode) {
         return pressedKeys.contains(keycode);
+    }
+
+    @Override
+    public void notify(Events event, Object... data) {
+        switch (event) {
+        case TOUCH_DOWN:
+            this.touchDown((int) data[0], (int) data[1], (int) data[2], (int) data[3]);
+            break;
+        case TOUCH_UP:
+            this.touchUp((int) data[0], (int) data[1], (int) data[2], (int) data[3]);
+            break;
+        case TOUCH_DRAGGED:
+            this.touchDragged((int) data[0], (int) data[1], (int) data[2]);
+            break;
+        case SCROLLED:
+            this.scrolled((int) data[0]);
+            break;
+        case KEY_DOWN:
+            this.keyDown((int) data[0]);
+            break;
+        case KEY_UP:
+            this.keyUp((int) data[0]);
+            break;
+        default:
+            break;
+        }
     }
 
 }

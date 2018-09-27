@@ -1,0 +1,9 @@
+{
+	"name" : "DR2 - extra large",
+	"description" : "Gaia DR2 int6 (geometric distances). 1.33B stars.",
+	"data" : [
+	{
+		"loader": "gaia.cu9.ari.gaiaorbit.data.group.OctreeGroupLoader",
+		"files": [ "/media/tsagrista/Daten/Gaia/data/GDR2/dr2int6/out/68-100000-geodist/particles/", "/media/tsagrista/Daten/Gaia/data/GDR2/dr2int6/out/68-100000-geodist/metadata.bin" ]
+}
+]}

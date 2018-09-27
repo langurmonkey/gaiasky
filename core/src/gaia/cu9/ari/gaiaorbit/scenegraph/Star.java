@@ -3,7 +3,6 @@ package gaia.cu9.ari.gaiaorbit.scenegraph;
 import java.util.Map;
 import java.util.TreeMap;
 
-import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Texture;
@@ -20,6 +19,7 @@ import com.badlogic.gdx.graphics.g3d.attributes.FloatAttribute;
 import com.badlogic.gdx.graphics.g3d.attributes.TextureAttribute;
 import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Vector3;
+import com.badlogic.gdx.utils.ObjectMap;
 
 import gaia.cu9.ari.gaiaorbit.GaiaSky;
 import gaia.cu9.ari.gaiaorbit.render.ComponentType;
@@ -55,8 +55,8 @@ public class Star extends Particle {
 
     public static void initModel() {
         if (mc == null) {
-            Texture tex = new Texture(Gdx.files.internal(GlobalConf.TEXTURES_FOLDER + "star.jpg"));
-            Texture lut = new Texture(Gdx.files.internal(GlobalConf.TEXTURES_FOLDER + "lut.jpg"));
+            Texture tex = new Texture(GlobalConf.data.dataFile("tex/star.jpg"));
+            Texture lut = new Texture(GlobalConf.data.dataFile("tex/lut.jpg"));
             tex.setFilter(TextureFilter.Linear, TextureFilter.Linear);
 
             Map<String, Object> params = new TreeMap<String, Object>();
@@ -257,7 +257,7 @@ public class Star extends Particle {
     protected void addToRenderLists(ICamera camera) {
         if (camera.getCurrent() instanceof FovCamera) {
             // Render as point, do nothing
-                addToRender(this, RenderGroup.BILLBOARD_STAR);
+            addToRender(this, RenderGroup.BILLBOARD_STAR);
         } else {
             if (viewAngleApparent >= thpointTimesFovfactor) {
                 addToRender(this, RenderGroup.BILLBOARD_STAR);
@@ -335,6 +335,18 @@ public class Star extends Particle {
     @Override
     public String getTycho() {
         return tycho;
+    }
+
+    protected void addToIndex(ObjectMap<String, SceneGraphNode> map) {
+        // Hip
+        if (hip > 0) {
+            String hipid = "hip " + hip;
+            map.put(hipid, this);
+        }
+        // Tycho
+        if (tycho != null && !tycho.isEmpty()) {
+            map.put(tycho, this);
+        }
     }
 
 }

@@ -1,0 +1,177 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   width="210mm"
+   height="297mm"
+   viewBox="0 0 210 297"
+   version="1.1"
+   id="svg8"
+   inkscape:version="0.92.2 (5c3e80d, 2017-08-06)"
+   sodipodi:docname="minimaps.svg">
+  <defs
+     id="defs2" />
+  <sodipodi:namedview
+     id="base"
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1.0"
+     inkscape:pageopacity="0.0"
+     inkscape:pageshadow="2"
+     inkscape:zoom="1.979899"
+     inkscape:cx="-46.615259"
+     inkscape:cy="603.17326"
+     inkscape:document-units="mm"
+     inkscape:current-layer="layer1"
+     showgrid="false"
+     showguides="true"
+     inkscape:guide-bbox="true"
+     inkscape:window-width="3840"
+     inkscape:window-height="2022"
+     inkscape:window-x="0"
+     inkscape:window-y="0"
+     inkscape:window-maximized="1">
+    <sodipodi:guide
+       position="33.742777,220.02965"
+       orientation="0,1"
+       id="guide825"
+       inkscape:locked="false" />
+    <sodipodi:guide
+       position="58.93293,217.42377"
+       orientation="0,1"
+       id="guide827"
+       inkscape:locked="false" />
+    <sodipodi:guide
+       position="78.710874,235.5981"
+       orientation="1,0"
+       id="guide829"
+       inkscape:locked="false" />
+    <sodipodi:guide
+       position="70.158249,235.73173"
+       orientation="1,0"
+       id="guide831"
+       inkscape:locked="false" />
+    <sodipodi:guide
+       position="87.196681,240.47576"
+       orientation="1,0"
+       id="guide833"
+       inkscape:locked="false" />
+    <sodipodi:guide
+       position="19.560267,223.9509"
+       orientation="1,0"
+       id="guide852"
+       inkscape:locked="false" />
+    <sodipodi:guide
+       position="42.711309,140.70164"
+       orientation="0,1"
+       id="guide854"
+       inkscape:locked="false" />
+  </sodipodi:namedview>
+  <metadata
+     id="metadata5">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title></dc:title>
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <g
+     inkscape:label="Layer 1"
+     inkscape:groupmode="layer"
+     id="layer1">
+    <rect
+       style="fill:#000010;fill-opacity:1;stroke:none;stroke-width:0.17115976;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;paint-order:normal"
+       id="rect815"
+       width="120"
+       height="30"
+       x="19.654833"
+       y="62.738998"
+       inkscape:export-filename="/home/tsagrista/git/gaiasky/assets/img/minimap-side.png"
+       inkscape:export-xdpi="150"
+       inkscape:export-ydpi="150" />
+    <path
+       style="fill:none;stroke:#00ff00;stroke-width:0.30000001;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       d="m 28.998743,76.903542 h 41.226324 c 2.196987,-0.03544 4.829059,-4.952521 8.455268,-4.88165 4.464844,-0.08268 6.110177,5.003895 8.626081,4.980271 H 129.158 c 3.49121,0 3.50791,2.574067 0,2.574067 H 87.19668 c -2.527716,-0.03543 -3.992948,4.737172 -8.432292,4.868384 -3.874256,-0.118118 -6.568074,-4.971365 -8.528825,-4.924118 H 28.965334 c -2.973374,0.06682 -2.856443,-2.550137 0.03341,-2.616954 z"
+       id="path835"
+       inkscape:connector-curvature="0"
+       sodipodi:nodetypes="ccccccccccc"
+       inkscape:export-filename="/home/tsagrista/git/gaiasky/assets/img/minimap-side.png"
+       inkscape:export-xdpi="150"
+       inkscape:export-ydpi="150" />
+    <rect
+       style="fill:#000010;fill-opacity:1;stroke:none;stroke-width:0.34231949;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;paint-order:normal"
+       id="rect815-3"
+       width="120"
+       height="120"
+       x="19.562254"
+       y="95.67939"
+       inkscape:export-filename="/home/tsagrista/git/gaiasky/assets/img/minimap-top.png"
+       inkscape:export-xdpi="150"
+       inkscape:export-ydpi="150" />
+    <circle
+       style="fill:none;fill-opacity:1;stroke:#00ff00;stroke-width:0.31923321;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;paint-order:normal"
+       id="path856"
+       cx="78.603447"
+       cy="156.40578"
+       r="6.8403835"
+       inkscape:export-filename="/home/tsagrista/git/gaiasky/assets/img/minimap-top.png"
+       inkscape:export-xdpi="150"
+       inkscape:export-ydpi="150" />
+    <circle
+       style="fill:none;fill-opacity:1;stroke:#00ff00;stroke-width:0.2725364;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;paint-order:normal"
+       id="path860"
+       cx="78.556847"
+       cy="156.27289"
+       r="13.863731"
+       inkscape:export-filename="/home/tsagrista/git/gaiasky/assets/img/minimap-top.png"
+       inkscape:export-xdpi="150"
+       inkscape:export-ydpi="150" />
+    <circle
+       style="fill:none;fill-opacity:1;stroke:#00ff00;stroke-width:0.30000001;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;paint-order:normal"
+       id="path862"
+       cx="78.710876"
+       cy="156.29836"
+       r="21.119417"
+       inkscape:export-filename="/home/tsagrista/git/gaiasky/assets/img/minimap-top.png"
+       inkscape:export-xdpi="150"
+       inkscape:export-ydpi="150" />
+    <circle
+       style="fill:none;fill-opacity:1;stroke:#00ff00;stroke-width:0.30000001;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;paint-order:normal"
+       id="path864"
+       cx="78.710876"
+       cy="156.29836"
+       r="29.340401"
+       inkscape:export-filename="/home/tsagrista/git/gaiasky/assets/img/minimap-top.png"
+       inkscape:export-xdpi="150"
+       inkscape:export-ydpi="150" />
+    <circle
+       style="fill:none;fill-opacity:1;stroke:#00ff00;stroke-width:0.30000001;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;paint-order:normal"
+       id="path866"
+       cx="78.710876"
+       cy="156.29836"
+       r="39.237572"
+       inkscape:export-filename="/home/tsagrista/git/gaiasky/assets/img/minimap-top.png"
+       inkscape:export-xdpi="150"
+       inkscape:export-ydpi="150" />
+    <circle
+       style="fill:none;fill-opacity:1;stroke:#00ff00;stroke-width:0.30000001;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;paint-order:normal"
+       id="path868"
+       cx="78.710876"
+       cy="156.29836"
+       r="48.242153"
+       inkscape:export-filename="/home/tsagrista/git/gaiasky/assets/img/minimap-top.png"
+       inkscape:export-xdpi="150"
+       inkscape:export-ydpi="150" />
+  </g>
+</svg>

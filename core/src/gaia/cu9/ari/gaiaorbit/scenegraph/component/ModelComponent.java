@@ -5,6 +5,7 @@ import java.util.Map;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.assets.AssetManager;
+import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.VertexAttributes.Usage;
 import com.badlogic.gdx.graphics.g3d.Environment;
@@ -109,13 +110,14 @@ public class ModelComponent implements Disposable, IObserver {
     }
 
     public void initialize(boolean mesh) {
+        FileHandle model = modelFile != null ? GlobalConf.data.dataFileHandle(modelFile) : null;
         if (mesh) {
-            if (!GlobalConf.scene.LAZY_MESH_INIT && modelFile != null && Gdx.files.internal(modelFile).exists()) {
-                AssetBean.addAsset(modelFile, Model.class);
+            if (!GlobalConf.scene.LAZY_MESH_INIT && modelFile != null && model.exists()) {
+                AssetBean.addAsset(GlobalConf.data.dataFile(modelFile), Model.class);
             }
         } else {
-            if (modelFile != null && Gdx.files.internal(modelFile).exists()) {
-                AssetBean.addAsset(modelFile, Model.class);
+            if (modelFile != null && model.exists()) {
+                AssetBean.addAsset(GlobalConf.data.dataFile(modelFile), Model.class);
             }
         }
 
@@ -179,9 +181,9 @@ public class ModelComponent implements Disposable, IObserver {
     private Pair<Model, Map<String, Material>> initModelFile() {
         Model model = null;
         Map<String, Material> materials = null;
-        if (modelFile != null && manager.isLoaded(modelFile)) {
+        if (modelFile != null && manager.isLoaded(GlobalConf.data.dataFile(modelFile))) {
             // Model comes from file (probably .obj or .g3db)
-            model = manager.get(modelFile, Model.class);
+            model = manager.get(GlobalConf.data.dataFile(modelFile), Model.class);
             materials = new HashMap<String, Material>();
             if (model.materials.size == 0) {
                 Material material = new Material();
@@ -250,9 +252,9 @@ public class ModelComponent implements Disposable, IObserver {
         if (localTransform != null && GlobalConf.scene.LAZY_MESH_INIT && !modelInitialised) {
             if (!modelLoading) {
                 logger.info(I18n.bundle.format("notif.loading", modelFile));
-                AssetBean.addAsset(modelFile, Model.class);
+                AssetBean.addAsset(GlobalConf.data.dataFile(modelFile), Model.class);
                 modelLoading = true;
-            } else if (manager.isLoaded(modelFile)) {
+            } else if (manager.isLoaded(GlobalConf.data.dataFile(modelFile))) {
                 Model model = null;
                 Map<String, Material> materials = null;
                 Pair<Model, Map<String, Material>> modmat = initModelFile();

@@ -32,7 +32,7 @@ fi
 #OPTS="$OPTS -Dproperties.file=$GSDIRESC/conf/global.properties"
 
 # Memory
-OPTS="$OPTS -Xms2g -Xmx3g"
+OPTS="$OPTS -Xms2g -Xmx4g"
 
 # Parallel GC 
 #OPTS="$OPTS -XX:+UseParallelGC"
@@ -49,9 +49,15 @@ OPTS="$OPTS -XX:+UseG1GC"
 #OPTS="$OPTS -XX:+UnlockDiagnosticVMOptions -XX:+TraceClassLoading -XX:+LogCompilation -XX:+PrintAssembly"
 
 # macOS hack - needs a couple of args to be happy
-#if [[ "$OSTYPE" == "darwin"* ]]; then
-#	OPTS="$OPTS -XstartOnFirstThread -Djava.awt.headless=true"
-#fi
+if [[ "$OSTYPE" == "darwin"* ]]; then
+	OPTS="$OPTS -XstartOnFirstThread -Djava.awt.headless=true"
+fi
+
+# Assets location
+OPTS="$OPTS -Dassets.location=\"$GSDIR/\""
+
+# SimpleLogger defaults 
+OPTS="$OPTS -Dorg.slf4j.simpleLogger.defaultLogLevel=warn -Dorg.slf4j.simpleLogger.showThreadName=false"
 
 # Assets location
 OPTS="$OPTS -Dassets.location=\"$GSDIR/\""

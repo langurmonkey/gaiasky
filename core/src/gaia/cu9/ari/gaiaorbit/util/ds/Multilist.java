@@ -8,7 +8,7 @@ import com.badlogic.gdx.utils.Array;
  * A multiple list, holding a number of indexed lists. Useful for threaded
  * applications. Not all methods of {@link java.util.List} are implemented,
  * check the comments.
- * 
+ * @deprecated Since the scene graph concurrent is no more, there is no need for this. 
  * @author Toni Sagrista
  *
  * @param <T>

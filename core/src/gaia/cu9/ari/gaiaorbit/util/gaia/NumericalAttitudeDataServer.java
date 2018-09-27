@@ -13,7 +13,7 @@ import gaia.cu9.ari.gaiaorbit.util.gaia.time.GtiList;
  * 
  */
 public abstract class NumericalAttitudeDataServer<A extends Attitude> extends BaseAttitudeDataServer<A> {
-    //protected boolean initialized = false;
+    //	protected boolean initialized = false;
 
     /**
      * List of good time intervals

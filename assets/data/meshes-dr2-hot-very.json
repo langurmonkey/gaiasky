@@ -1,0 +1,60 @@
+{"objects" : [
+	{
+	"name" : "Very ionizing ranges",
+	"description" : "Isosurface of very ionizing ranges of hot OB stars",
+	"color" : [0.4, 0.1, 0.7, 0.5],
+	// Parsec to units
+	"size" :  3.0856775814913705E7,
+	"labelcolor" : [0.9, 0.3, 0.9, 1.0],
+	// Position in parsecs
+	"labelposition" : [800.0, 0.0, 0.0]
+	"ct" : Meshes,
+	
+	// Fade out in pc
+	"fadeout" : [8000.0, 16000.0],
+	
+	"parent" : "Universe", 
+	"impl" : "gaia.cu9.ari.gaiaorbit.scenegraph.MeshObject",
+	
+	// Transformations
+	"transformName" : galacticToEquatorialF,
+	"scale" : [3.0, 3.0, 3.0],
+	"rotate" : [1.0, 0.0, 0.0, -90.0],
+	"translate" : [-3027.0, -2997.0, -597.0],
+	
+	"model"		: {
+					"args" : [true],
+					"staticlight" : True,
+					"model" : "data/meshes/dr2/meshes_hot/very_ionizing_ranges.g3db"
+				}
+	},
+	{
+	"name" : "Very ionizing peaks",
+	"description" : "Isosurface of very ionizing peaks of hot OB stars",
+	"color" : [0.3, 0.1, 0.7, 0.3],
+	// Parsec to units
+	"size" :  3.0856775814913705E7,
+	"labelcolor" : [1.0, 0.0, 1.0, 1.0],
+	// Position in parsecs
+	"labelposition" : [800.0, 400.0, 0.0]
+	"ct" : Meshes,
+	
+	// Fade out in pc
+	"fadeout" : [8000.0, 16000.0],
+	
+	"parent" : "Universe", 
+	"impl" : "gaia.cu9.ari.gaiaorbit.scenegraph.MeshObject",
+	
+	// Transformations
+	"transformName" : galacticToEquatorialF,
+	"scale" : [3.0, 3.0, 3.0],
+	"rotate" : [1.0, 0.0, 0.0, -90.0],
+	"translate" : [-3027.0, -2997.0, -597.0],
+	
+	"model"		: {
+					"args" : [true],
+					"staticlight" : True,
+					"model" : "data/meshes/dr2/meshes_hot/very_ionizing_peaks.g3db"
+				}
+	}
+]}	

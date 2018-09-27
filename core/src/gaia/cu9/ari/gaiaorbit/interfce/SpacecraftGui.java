@@ -151,7 +151,7 @@ public class SpacecraftGui extends AbstractGui {
         db = new DecalBatch(new CameraGroupStrategy(aiCam));
         mb = new ModelBatch();
 
-        assetManager.load("data/tex/attitudeindicator.png", Texture.class);
+        assetManager.load(GlobalConf.data.dataFile("tex/attitudeindicator.png"), Texture.class);
         assetManager.load("img/ai-pointer.png", Texture.class);
         assetManager.load("img/ai-vel.png", Texture.class);
         assetManager.load("img/ai-antivel.png", Texture.class);
@@ -165,7 +165,7 @@ public class SpacecraftGui extends AbstractGui {
     public void doneLoading(AssetManager assetManager) {
         skin = GlobalResources.skin;
 
-        aiTexture = assetManager.get("data/tex/attitudeindicator.png", Texture.class);
+        aiTexture = assetManager.get(GlobalConf.data.dataFile("tex/attitudeindicator.png"), Texture.class);
         aiTexture.setFilter(TextureFilter.Linear, TextureFilter.Linear);
         aiPointerTexture = assetManager.get("img/ai-pointer.png", Texture.class);
         aiPointerTexture.setFilter(TextureFilter.Linear, TextureFilter.Linear);
@@ -189,10 +189,6 @@ public class SpacecraftGui extends AbstractGui {
         EventManager.instance.subscribe(this, Events.SPACECRAFT_STABILISE_CMD, Events.SPACECRAFT_STOP_CMD, Events.SPACECRAFT_INFO, Events.SPACECRAFT_NEAREST_INFO, Events.SPACECRAFT_THRUST_INFO);
         EventManager.instance.unsubscribe(this, Events.SPACECRAFT_LOADED);
 
-    }
-
-    private void unsubscribe() {
-        EventManager.instance.unsubscribe(this, Events.SPACECRAFT_STABILISE_CMD, Events.SPACECRAFT_STOP_CMD, Events.SPACECRAFT_INFO, Events.SPACECRAFT_NEAREST_INFO, Events.SPACECRAFT_THRUST_INFO);
     }
 
     private void buildGui() {
@@ -226,7 +222,8 @@ public class SpacecraftGui extends AbstractGui {
         stop = new OwnImageButton(skin, "sc-stop");
         stop.setProgrammaticChangeEvents(false);
         stop.setName("stop spacecraft");
-        stop.setChecked(sc.isStopping());
+        if (sc != null)
+            stop.setChecked(sc.isStopping());
         stop.addListener(new EventListener() {
             @Override
             public boolean handle(Event event) {

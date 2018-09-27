@@ -11,7 +11,7 @@ import java.util.Map;
 
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
-import com.badlogic.gdx.utils.Array;
+import com.badlogic.gdx.utils.IntArray;
 
 /**
  * Helper generic class to create icospheres.
@@ -117,8 +117,8 @@ public class IcoSphereCreator extends ModelCreator {
         return i;
     }
 
-    private Array<Integer> detectWrappedUVCoordinates() {
-        Array<Integer> indices = new Array<Integer>();
+    private IntArray detectWrappedUVCoordinates() {
+        IntArray indices = new IntArray();
         for (int i = faces.size() - 1; i >= 0; i--) {
             IFace face = faces.get(i);
 
@@ -135,7 +135,7 @@ public class IcoSphereCreator extends ModelCreator {
     }
 
     private void repairTextureWrapSeam() {
-        Array<Integer> indices = detectWrappedUVCoordinates();
+        IntArray indices = detectWrappedUVCoordinates();
 
     }
 

@@ -20,40 +20,37 @@ import gaia.cu9.ari.gaiaorbit.scenegraph.SceneGraphNode.RenderGroup;
 import gaia.cu9.ari.gaiaorbit.scenegraph.camera.ICamera;
 import gaia.cu9.ari.gaiaorbit.scenegraph.component.OrbitComponent;
 import gaia.cu9.ari.gaiaorbit.util.GlobalConf;
-import gaia.cu9.ari.gaiaorbit.util.GlobalConf.ProgramConf.StereoProfile;
-import gaia.cu9.ari.gaiaorbit.util.Logger;
 import gaia.cu9.ari.gaiaorbit.util.coord.AstroUtils;
 import gaia.cu9.ari.gaiaorbit.util.coord.Coordinates;
 import gaia.cu9.ari.gaiaorbit.util.math.MathUtilsd;
 
 public class OrbitalElementsParticlesRenderSystem extends ImmediateRenderSystem implements IObserver {
-	private final int N_MESHES = 1;
-	private Vector3 auxf1;
-	private Matrix4 maux;
-	private int elems01Offset, elems02Offset, count;
+    private final int N_MESHES = 1;
+    private Vector3 auxf1;
+    private Matrix4 maux;
+    private int elems01Offset, elems02Offset, count;
 
-	public OrbitalElementsParticlesRenderSystem(RenderGroup rg, float[] alphas, ShaderProgram[] shaders) {
-		super(rg, alphas, shaders, 120000);
-		auxf1 = new Vector3();
-		maux = new Matrix4();
-	}
+    public OrbitalElementsParticlesRenderSystem(RenderGroup rg, float[] alphas, ShaderProgram[] shaders) {
+        super(rg, alphas, shaders, 120000);
+        auxf1 = new Vector3();
+        maux = new Matrix4();
+    }
 
-	@Override
-	protected void initShaderProgram() {
-	}
+    @Override
+    protected void initShaderProgram() {
+    }
 
-	@Override
-	protected void initVertices() {
-		meshes = new MeshData[N_MESHES];
-	}
+    @Override
+    protected void initVertices() {
+        meshes = new MeshData[N_MESHES];
+    }
 
     /**
-     * Adds a new mesh data to the meshes list and increases the mesh data index
-     * 
-     * @param nVertices
-     *            The max number of vertices this mesh data can hold
-     * @return The index of the new mesh data
-     */
+    	 * Adds a new mesh data to the meshes list and increases the mesh data index
+    	 * 
+    	 * @param nVertices The max number of vertices this mesh data can hold
+    	 * @return The index of the new mesh data
+    	 */
     private int addMeshData(int nVertices) {
         // look for index
         int mdi;
@@ -64,7 +61,7 @@ public class OrbitalElementsParticlesRenderSystem extends ImmediateRenderSystem 
         }
 
         if (mdi >= N_MESHES) {
-            logger.error(this.getClass().getSimpleName(), "No more free meshes!");
+            logger.error("No more free meshes!");
             return -1;
         }
 
@@ -89,19 +86,21 @@ public class OrbitalElementsParticlesRenderSystem extends ImmediateRenderSystem 
             Orbit first = (Orbit) renderables.first();
             if (!first.elemsInGpu) {
                 curr = meshes[addMeshData(renderables.size)];
-                
-				checkRequiredVerticesSize(renderables.size * curr.vertexSize);
-				curr.vertices = vertices;
+
+                checkRequiredVerticesSize(renderables.size * curr.vertexSize);
+                curr.vertices = vertices;
 
                 for (IRenderable renderable : renderables) {
                     Orbit orbitElems = (Orbit) renderable;
 
                     if (!orbitElems.elemsInGpu) {
+
                         OrbitComponent oc = orbitElems.oc;
                         // ORBIT ELEMS 01
                         curr.vertices[curr.vertexIdx + elems01Offset + 0] = (float) Math.sqrt(AstroUtils.MU_SOL / Math.pow(oc.semimajoraxis * 1000d, 3d));
                         curr.vertices[curr.vertexIdx + elems01Offset + 1] = (float) oc.epoch;
-                        curr.vertices[curr.vertexIdx + elems01Offset + 2] = (float) (oc.semimajoraxis * 1000d); // In metres
+                        curr.vertices[curr.vertexIdx + elems01Offset + 2] = (float) (oc.semimajoraxis * 1000d); // In
+                        // metres
                         curr.vertices[curr.vertexIdx + elems01Offset + 3] = (float) oc.e;
 
                         // ORBIT ELEMS 02
@@ -116,9 +115,9 @@ public class OrbitalElementsParticlesRenderSystem extends ImmediateRenderSystem 
 
                     }
                 }
-				count = renderables.size * curr.vertexSize;
-				curr.mesh.setVertices(curr.vertices, 0, count);
-				curr.vertices = null;
+                count = renderables.size * curr.vertexSize;
+                curr.mesh.setVertices(curr.vertices, 0, count);
+                curr.vertices = null;
             }
 
             if (curr != null) {
@@ -132,15 +131,17 @@ public class OrbitalElementsParticlesRenderSystem extends ImmediateRenderSystem 
 
                 ShaderProgram shaderProgram = getShaderProgram();
 
+                boolean stereohw = GlobalConf.program.isStereoHalfWidth();
+
                 shaderProgram.begin();
                 shaderProgram.setUniformMatrix("u_projModelView", camera.getCamera().combined);
                 shaderProgram.setUniformMatrix("u_eclToEq", maux.setToRotation(0, 1, 0, -90).mul(Coordinates.equatorialToEclipticF()));
                 shaderProgram.setUniformf("u_camPos", camera.getCurrent().getPos().put(auxf1));
                 shaderProgram.setUniformf("u_alpha", alphas[first.ct.getFirstOrdinal()] * first.getOpacity());
-                shaderProgram.setUniformf("u_ar", GlobalConf.program.STEREOSCOPIC_MODE && (GlobalConf.program.STEREO_PROFILE != StereoProfile.HD_3DTV_HORIZONTAL && GlobalConf.program.STEREO_PROFILE != StereoProfile.ANAGLYPHIC) ? 0.5f : 1f);
+                shaderProgram.setUniformf("u_ar", stereohw ? 0.5f : 1f);
                 shaderProgram.setUniformf("u_size", rc.scaleFactor);
-                shaderProgram.setUniformf("u_scaleFactor", GlobalConf.SCALE_FACTOR);
-                shaderProgram.setUniformf("u_ar", GlobalConf.program.STEREOSCOPIC_MODE && (GlobalConf.program.STEREO_PROFILE != StereoProfile.HD_3DTV_HORIZONTAL && GlobalConf.program.STEREO_PROFILE != StereoProfile.ANAGLYPHIC) ? 0.5f : 1f);
+                shaderProgram.setUniformf("u_scaleFactor", 2 * (stereohw ? 2 : 1));
+                shaderProgram.setUniformf("u_ar", stereohw ? 0.5f : 1f);
                 shaderProgram.setUniformf("u_profileDecay", 0.1f);
                 double currt = AstroUtils.getJulianDate(GaiaSky.instance.time.getTime());
                 shaderProgram.setUniformf("u_t", (float) currt);

@@ -15,6 +15,7 @@ import com.badlogic.gdx.utils.Array;
 import gaia.cu9.ari.gaiaorbit.scenegraph.ParticleGroup.ParticleBean;
 import gaia.cu9.ari.gaiaorbit.scenegraph.StarGroup.StarBean;
 import gaia.cu9.ari.gaiaorbit.util.Constants;
+import gaia.cu9.ari.gaiaorbit.util.GlobalConf;
 import gaia.cu9.ari.gaiaorbit.util.I18n;
 import gaia.cu9.ari.gaiaorbit.util.Logger;
 import gaia.cu9.ari.gaiaorbit.util.Logger.Log;
@@ -46,7 +47,7 @@ public class TGASDataProvider extends AbstractStarGroupDataProvider {
     public Array<StarBean> loadData(String file, double factor) {
         logger.info(I18n.bundle.format("notif.datafile", file));
 
-        FileHandle f = Gdx.files.internal(file);
+        FileHandle f = GlobalConf.data.dataFileHandle(file);
 
         initLists(f);
         loadData(f.read(), factor);
@@ -215,7 +216,7 @@ public class TGASDataProvider extends AbstractStarGroupDataProvider {
     private Map<Long, Double> loadRadialVelocities(String file) {
         Map<Long, Double> result = new HashMap<Long, Double>(220000);
 
-        FileHandle f = Gdx.files.internal(file);
+        FileHandle f = GlobalConf.data.dataFileHandle(file);
 
         if (!f.exists())
             return null;
@@ -255,7 +256,7 @@ public class TGASDataProvider extends AbstractStarGroupDataProvider {
 
         Map<String, Float> colors = new HashMap<String, Float>();
         Map<String, Integer> hips = new HashMap<String, Integer>();
-        FileHandle f = Gdx.files.internal(file);
+        FileHandle f = GlobalConf.data.dataFileHandle(file);
         InputStream data = f.read();
         BufferedReader br = new BufferedReader(new InputStreamReader(data));
         try {

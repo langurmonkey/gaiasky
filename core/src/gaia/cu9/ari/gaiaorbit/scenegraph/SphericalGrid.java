@@ -1,5 +1,6 @@
 package gaia.cu9.ari.gaiaorbit.scenegraph;
 
+
 import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
@@ -41,6 +42,7 @@ public class SphericalGrid extends BackgroundModel implements IAnnotationsRender
         auxd = new Vector3d();
     }
 
+
     @Override
     public void doneLoading(AssetManager manager) {
         super.doneLoading(manager);
@@ -71,6 +73,7 @@ public class SphericalGrid extends BackgroundModel implements IAnnotationsRender
         addToRender(this, RenderGroup.MODEL_GRIDS);
         addToRender(this, RenderGroup.FONT_ANNOTATION);
     }
+
 
     /**
      * Annotation rendering

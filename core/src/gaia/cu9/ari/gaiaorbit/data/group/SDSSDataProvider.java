@@ -18,6 +18,7 @@ import com.badlogic.gdx.utils.Array;
 import gaia.cu9.ari.gaiaorbit.desktop.util.SysUtils;
 import gaia.cu9.ari.gaiaorbit.scenegraph.ParticleGroup.ParticleBean;
 import gaia.cu9.ari.gaiaorbit.util.Constants;
+import gaia.cu9.ari.gaiaorbit.util.GlobalConf;
 import gaia.cu9.ari.gaiaorbit.util.I18n;
 import gaia.cu9.ari.gaiaorbit.util.Logger;
 import gaia.cu9.ari.gaiaorbit.util.Logger.Log;
@@ -33,11 +34,11 @@ public class SDSSDataProvider implements IParticleGroupDataProvider {
     }
 
     public Array<ParticleBean> loadData(String file, double factor) {
-        FileHandle f = Gdx.files.internal(file);
+        FileHandle f = GlobalConf.data.dataFileHandle(file);
 
         @SuppressWarnings("unchecked")
         //Array<ParticleBean> pointData = (Array<ParticleBean>) loadData(f.read(), factor);
-        Array<ParticleBean> pointData = (Array<ParticleBean>) loadDataMapped(SysUtils.getTruePath(file), factor);
+        Array<ParticleBean> pointData = (Array<ParticleBean>) loadDataMapped(GlobalConf.data.dataFile(file), factor);
         if (pointData != null)
             logger.info(I18n.bundle.format("notif.nodeloader", pointData.size, file));
 

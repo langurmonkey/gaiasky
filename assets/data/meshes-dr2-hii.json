@@ -1,0 +1,29 @@
+{"objects" : [
+	{
+	"name" : "HII regions",
+	"description" : "HII regions, clouds of partially ionized gas",
+	"color" : [0.95, 0.2, 0.2, 0.5],
+	// Parsec to units
+	"size" :  3.0856775814913705E7,
+	"labelcolor" : [0.95, 0.1, 0.1, 1.0],
+	// Position in parsecs
+	"labelposition" : [1000.0, 0.0, 0.0]
+	"ct" : Meshes,
+	
+	// Fade out in pc
+	"fadeout" : [8000.0, 16000.0],
+	
+	"parent" : "Universe", 
+	"impl" : "gaia.cu9.ari.gaiaorbit.scenegraph.MeshObject",
+	
+	// Transformations
+	"transformName" : galacticToEquatorialF,
+	"rotate" : [0.0, 1.0, 0.0, -90.0],
+	
+	"model"		: {
+					"args" : [true],
+					"staticlight" : True,
+					"model" : "data/meshes/dr2/meshes_hii/hii.g3db"
+				}
+	}
+]}	

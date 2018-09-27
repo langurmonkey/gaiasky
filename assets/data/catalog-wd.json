@@ -1,0 +1,9 @@
+{ 
+	"name" : "White Dwarfs",
+	"description" : "White Dwarfs catalog",
+	"data" : [
+	{
+		"loader": "gaia.cu9.ari.gaiaorbit.data.JsonLoader",
+		"files": [ "data/particles-wd.json" ]
+	}
+]}

@@ -30,6 +30,7 @@ public class RelativisticShaderProviderLoader<T extends RelativisticShaderProvid
     }
 
     @Override
+    @SuppressWarnings("rawtypes")
     public Array<AssetDescriptor> getDependencies(String fileName, FileHandle file, RelativisticShaderProviderParameter parameter) {
         return null;
     }

@@ -3,7 +3,7 @@
 	"description" : "Hipparcos + Yale bright stars + Gliese nearby stars. 120K stars.",
 	"data" : [
 	{
-		"loader": "gaia.cu9.ari.gaiaorbit.data.stars.HYGBinaryLoader",
-		"files": [ "data/hyg/hygxyz.bin" ]
+		"loader": "gaia.cu9.ari.gaiaorbit.data.JsonLoader",
+		"files": [ "data/particles-hyg.json" ]
 	}
 ]}

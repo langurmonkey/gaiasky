@@ -15,8 +15,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import gaia.cu9.ari.gaiaorbit.desktop.util.SysUtils;
 import gaia.cu9.ari.gaiaorbit.util.Constants;
+import gaia.cu9.ari.gaiaorbit.util.GlobalConf;
 import gaia.cu9.ari.gaiaorbit.util.Logger;
 import gaia.cu9.ari.gaiaorbit.util.Logger.Log;
 import gaia.cu9.ari.gaiaorbit.util.Pair;
@@ -46,7 +46,7 @@ import gaia.cu9.ari.gaiaorbit.util.tree.OctreeNode;
  */
 public class MetadataBinaryIO {
     private static final Log logger = Logger.getLogger(MetadataBinaryIO.class);
-
+    
     public Map<Long, Pair<OctreeNode, long[]>> nodesMap;
 
     /**
@@ -125,6 +125,7 @@ public class MetadataBinaryIO {
             logger.error(e);
         }
         return null;
+
     }
 
     public OctreeNode readMetadataMapped(String file) {
@@ -135,7 +136,7 @@ public class MetadataBinaryIO {
         nodesMap = new HashMap<Long, Pair<OctreeNode, long[]>>();
 
         try {
-            FileChannel fc = new RandomAccessFile(SysUtils.getTruePath(file), "r").getChannel();
+            FileChannel fc = new RandomAccessFile(GlobalConf.data.dataFile(file), "r").getChannel();
 
             MappedByteBuffer mem = fc.map(FileChannel.MapMode.READ_ONLY, 0, fc.size());
 
@@ -148,10 +149,10 @@ public class MetadataBinaryIO {
                 try {
                     // name_length, name, appmag, absmag, colorbv, ra, dec, dist
                     long pageId = mem.getInt();
-                    float x = mem.getFloat() * (float) Constants.M_TO_U_CONV;
-                    float y = mem.getFloat() * (float) Constants.M_TO_U_CONV;
-                    float z = mem.getFloat() * (float) Constants.M_TO_U_CONV;
-                    float hsx = (mem.getFloat() / 2f) * (float) Constants.M_TO_U_CONV;
+                    float x = mem.getFloat();
+                    float y = mem.getFloat();
+                    float z = mem.getFloat();
+                    float hsx = mem.getFloat() / 2f;
                     //float hsy = mem.getFloat() / 2f;
                     mem.position(mem.position() + 4); // skip hsy
                     float hsy = hsx;

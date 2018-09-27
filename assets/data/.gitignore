@@ -3,7 +3,10 @@ catalog/
 tgas_*/
 gdr2hip/
 meshes/dr2/
-orbits_asteroids_extra*.json
 kepler-exoplanets.csv
 countries.csv
 meshes-dr2.json
+kepler-exoplanets.csv
+countries.csv
+meshes-dr2.json
+gaiasky-data.json

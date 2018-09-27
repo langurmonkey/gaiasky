@@ -132,7 +132,7 @@ public class ControlsWindow extends CollapsibleWindow implements IObserver {
         playCamera.setChecked(false);
         playCamera.addListener(event -> {
             if (event instanceof ChangeEvent) {
-                EventManager.instance.post(Events.SHOW_PLAYCAMERA_ACTION, ui, skin);
+                EventManager.instance.post(Events.SHOW_PLAYCAMERA_ACTION);
                 return true;
             }
             return false;
@@ -255,7 +255,7 @@ public class ControlsWindow extends CollapsibleWindow implements IObserver {
             @Override
             public boolean handle(Event event) {
                 if (event instanceof ChangeEvent) {
-                    EventManager.instance.post(Events.SHOW_RUNSCRIPT_ACTION, ui, skin);
+                    EventManager.instance.post(Events.SHOW_RUNSCRIPT_ACTION);
                 }
                 return false;
             }

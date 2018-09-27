@@ -14,6 +14,7 @@ import gaia.cu9.ari.gaiaorbit.scenegraph.StarGroup.StarBean;
 import gaia.cu9.ari.gaiaorbit.scenegraph.octreewrapper.AbstractOctreeWrapper;
 import gaia.cu9.ari.gaiaorbit.scenegraph.octreewrapper.OctreeWrapper;
 import gaia.cu9.ari.gaiaorbit.util.CatalogInfo;
+import gaia.cu9.ari.gaiaorbit.util.GlobalConf;
 import gaia.cu9.ari.gaiaorbit.util.CatalogInfo.CatalogInfoType;
 import gaia.cu9.ari.gaiaorbit.util.I18n;
 import gaia.cu9.ari.gaiaorbit.util.Logger;
@@ -92,7 +93,7 @@ public class OctreeGroupLoader extends StreamingOctreeLoader {
     }
 
     public boolean loadOctant(final OctreeNode octant, final AbstractOctreeWrapper octreeWrapper, boolean fullinit) throws IOException {
-        FileHandle octantFile = Gdx.files.internal(particles + "particles_" + String.format("%06d", octant.pageId) + ".bin");
+        FileHandle octantFile = GlobalConf.data.dataFileHandle(particles + "particles_" + String.format("%06d", octant.pageId) + ".bin");
         if (!octantFile.exists() || octantFile.isDirectory()) {
             return false;
         }
@@ -100,7 +101,7 @@ public class OctreeGroupLoader extends StreamingOctreeLoader {
         Array<StarBean> data = (Array<StarBean>) particleReader.loadDataMapped(octantFile.path(), 1.0);
         StarGroup sg = new StarGroup();
         sg.setName("stargroup-" + sg.id);
-        sg.setFadeout(new double[] { 21e2, .5e5 });
+        sg.setFadeout(new double[] { 21e5, .5e9 });
         sg.setLabelcolor(new double[] { 1.0, 1.0, 1.0, 1.0 });
         sg.setColor(new double[] { 1.0, 1.0, 1.0, 0.25 });
         sg.setSize(6.0);

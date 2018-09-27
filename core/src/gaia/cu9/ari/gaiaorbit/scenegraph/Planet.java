@@ -1,6 +1,5 @@
 package gaia.cu9.ari.gaiaorbit.scenegraph;
 
-import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.graphics.PerspectiveCamera;
 import com.badlogic.gdx.graphics.Texture;
@@ -87,7 +86,7 @@ public class Planet extends ModelBody implements IAtmosphereRenderable, ICloudRe
             Planet.manager = manager;
         }
         if (auxTex == null) {
-            auxTex = new Texture(Gdx.files.internal("data/tex/star.jpg"));
+            auxTex = new Texture(GlobalConf.data.dataFileHandle("data/tex/star.jpg"));
         }
 
         // INITIALIZE ATMOSPHERE

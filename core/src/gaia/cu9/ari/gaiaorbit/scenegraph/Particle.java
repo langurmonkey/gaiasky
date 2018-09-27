@@ -28,7 +28,6 @@ import gaia.cu9.ari.gaiaorbit.util.color.ColourUtils;
 import gaia.cu9.ari.gaiaorbit.util.coord.AstroUtils;
 import gaia.cu9.ari.gaiaorbit.util.math.Vector3d;
 import gaia.cu9.ari.gaiaorbit.util.time.ITimeFrameProvider;
-import net.jafama.FastMath;
 
 /**
  * A point particle which may represent a star, a galaxy, etc.
@@ -321,7 +320,7 @@ public class Particle extends CelestialBody implements IStarFocus, IPointRendera
 
     @Override
     public float textScale() {
-        return (float) FastMath.atan(labelMax()) * labelFactor() * 1e3f;
+        return 5e-1f;
     }
 
     @Override
@@ -331,7 +330,7 @@ public class Particle extends CelestialBody implements IStarFocus, IPointRendera
 
     @Override
     protected float labelMax() {
-        return 0.015f;
+        return 0.01f;
     }
 
     public float getFuzzyRenderSize(ICamera camera) {
@@ -343,7 +342,7 @@ public class Particle extends CelestialBody implements IStarFocus, IPointRendera
             }
             computedSize = this.size * (dist / this.radius) * Constants.THRESHOLD_DOWN;
         }
-        computedSize *= GlobalConf.scene.STAR_BRIGHTNESS * 0.12;
+        computedSize *= GlobalConf.scene.STAR_BRIGHTNESS * 0.14;
 
         return (float) computedSize;
     }

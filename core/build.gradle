@@ -4,37 +4,45 @@ apply plugin: "com.install4j.gradle"
 sourceCompatibility = 1.8
 [compileJava, compileTestJava]*.options*.encoding = 'UTF-8'
 
-sourceSets.main.java.srcDirs = [ "src/" ]
+sourceSets {
+    main {
+        java {
+            srcDir 'src'
+            // Only enable when building desktop Gaia Sky
+            //exclude "**/rest/**"
+       }
+   }
+}
 
 project.ext.mainClassName = "gaia.cu9.ari.gaiaorbit.desktop.GaiaSkyDesktop"
 project.ext.assetsDir = new File("../assets");
 project.ext.workDir = new File(".");
 
 task versionFile {
-	doLast {
-		File versionFile = file('build/classes/java/main/version')
-		delete versionFile
-		def writer = new FileWriter(versionFile)
-		
-		try {
-		   writer.write('buildtime=' + project(':core').buildtime + '\n')
-		   writer.write('build=' + project(':core').rev + '\n')
-		   writer.write('version=' + project(':core').tag + '\n')
-		   writer.write('builder=' + project(':core').builder + '\n')
-		   writer.write('system=' + project(':core').system + '\n')
-		   writer.flush()
-		} finally {
-		   writer.close()
-		}
+    doLast {
+        File versionFile = file('build/classes/java/main/version')
+        delete versionFile
+        def writer = new FileWriter(versionFile)
+
+        try {
+            writer.write('buildtime=' + project(':core').buildtime + '\n')
+            writer.write('build=' + project(':core').rev + '\n')
+            writer.write('version=' + project(':core').tag + '\n')
+            writer.write('builder=' + project(':core').builder + '\n')
+            writer.write('system=' + project(':core').system + '\n')
+            writer.flush()
+        } finally {
+            writer.close()
+        }
     }
 }
 
-jar{
+jar { 
     dependsOn versionFile
 }
 
-install4j {
-    installDir = file('/home/tsagrista/Programs/install4j6')
+install4j { 
+    installDir = file('/home/tsagrista/Programs/install4j6') 
 }
 
 sourceSets {
@@ -45,19 +53,28 @@ sourceSets {
     }
 }
 
-task run(dependsOn: jar, type: JavaExec, description: "Runs the desktop project in Linux and Windows systems") {
+task run(dependsOn: jar, type: JavaExec, description: "Runs Gaia Sky") {
     main = project.mainClassName
     systemProperties['properties.file'] = ''
     systemProperties['assets.location'] = '../assets/'
-    //systemProperties['org.slf4j.simpleLogger.defaultLogLevel'] = 'warn'  // logging levels (e.g. REST server warn, info, debug)
-    //systemProperties['org.slf4j.simpleLogger.showThreadName'] = 'false'
-    	
+    systemProperties['org.slf4j.simpleLogger.defaultLogLevel'] = 'warn'  // logging levels (e.g. REST server warn, info, debug)
+    systemProperties['org.slf4j.simpleLogger.showThreadName'] = 'false'
+
+    minHeapSize = "3g"
+    maxHeapSize = "6g"
+
     // Parallel GC
-    //jvmArgs = ['-Xms2g', '-Xmx4g', '-XX:+UseParNewGC']
+    //jvmArgs = [ '-XX:+UseParNewGC']
     // CMS GC
-    // jvmArgs = ['-server', '-Xms2g', '-Xmx3g', '-XX:+UseConcMarkSweepGC', '-XX:+UseParNewGC', '-XX:MaxGCPauseMillis=5', '-XX:+CMSParallelRemarkEnabled', '-XX:CMSInitiatingOccupancyFraction=60', '-XX:MaxTenuringThreshold=4', '-XX:MaxNewSize=384m', '-XX:NewSize=384m', '-XX:SurvivorRatio=12']
+    //jvmArgs = ['-server', '-XX:+UseConcMarkSweepGC', '-XX:+UseParNewGC', '-XX:MaxGCPauseMillis=5', '-XX:+CMSParallelRemarkEnabled', '-XX:CMSInitiatingOccupancyFraction=60', '-XX:MaxTenuringThreshold=4', '-XX:MaxNewSize=384m', '-XX:NewSize=384m', '-XX:SurvivorRatio=12']
     // G1 GC
-    jvmArgs = ['-Xms4g', '-Xmx8g', '-XX:+UseG1GC']
+    jvmArgs = [ '-XX:+UseG1GC' ]
+    if (System.getProperty("os.name").toLowerCase().contains("mac")) {
+         // Required to run lwjgl java apps on macOS
+         jvmArgs += " -XstartOnFirstThread"
+    }
+    // Verbose GC
+    // jvmArgs = ['-verbose:gc']
     classpath = sourceSets.main.runtimeClasspath
     classpath += files(project.assetsDir)
     standardInput = System.in
@@ -65,17 +82,29 @@ task run(dependsOn: jar, type: JavaExec, description: "Runs the desktop project 
     ignoreExitValue = true
 }
 
-task runMacOS(dependsOn: jar, type: JavaExec, description: "Runs the desktop project in macOS systems") {
+task rund(dependsOn: jar, type: JavaExec, description: "Runs Gaia Sky - forces download manager and catalog chooser") {
     main = project.mainClassName
+    args = ['-d']
     systemProperties['properties.file'] = ''
     systemProperties['assets.location'] = '../assets/'
-    
+    systemProperties['org.slf4j.simpleLogger.defaultLogLevel'] = 'warn'  // logging levels (e.g. REST server warn, info, debug)
+    systemProperties['org.slf4j.simpleLogger.showThreadName'] = 'false'
+
+    minHeapSize = "3g"
+    maxHeapSize = "6g"
+
     // Parallel GC
-    //jvmArgs = ['-Xms2g', '-Xmx4g', '-XX:+UseParNewGC']
+    //jvmArgs = ['-XX:+UseParNewGC']
     // CMS GC
-    jvmArgs = ['-server', '-Xms2g', '-Xmx3g', '-XstartOnFirstThread', '-Djava.awt.headless=true', '-XX:+UseConcMarkSweepGC', '-XX:+UseParNewGC', '-XX:MaxGCPauseMillis=5', '-XX:+CMSParallelRemarkEnabled', '-XX:CMSInitiatingOccupancyFraction=60', '-XX:MaxTenuringThreshold=4', '-XX:MaxNewSize=384m', '-XX:NewSize=384m', '-XX:SurvivorRatio=12']
+    //jvmArgs = ['-server', '-XX:+UseConcMarkSweepGC', '-XX:+UseParNewGC', '-XX:MaxGCPauseMillis=5', '-XX:+CMSParallelRemarkEnabled', '-XX:CMSInitiatingOccupancyFraction=60', '-XX:MaxTenuringThreshold=4', '-XX:MaxNewSize=384m', '-XX:NewSize=384m', '-XX:SurvivorRatio=12']
     // G1 GC
-    //jvmArgs = ['-Xms2g', '-Xmx4g', '-XX:+UseG1GC']
+    jvmArgs = [ '-XX:+UseG1GC' ]
+    if (System.getProperty("os.name").toLowerCase().contains("mac")) {
+         // Required to run lwjgl java apps on macOS
+         jvmArgs += "-XstartOnFirstThread"
+    }
+    // Verbose GC
+    // jvmArgs = ['-verbose:gc']
     classpath = sourceSets.main.runtimeClasspath
     classpath += files(project.assetsDir)
     standardInput = System.in
@@ -96,8 +125,18 @@ task runCatalogFilter(dependsOn: jar, type: JavaExec, description: "Runs the cat
 task runOctreeGeneratorParticles(dependsOn: jar, type: JavaExec, description: "Runs the octree generator with single particles to create the lod structure from a base catalog") {
     main = 'gaia.cu9.ari.gaiaorbit.data.OctreeGeneratorTest'
     systemProperties['properties.file'] = '../assets/conf/global.properties'
-    args = ["--input", "/media/tsagrista/Daten/Gaia/GDR2/earlydr2/data/", "--output", "/media/tsagrista/Daten/Gaia/GDR2/earlydr2/out/"]
-    jvmArgs = ['-server', '-Xms10g', '-Xmx20g']
+    args = [
+        "--input",
+        "/media/tsagrista/Daten/Gaia/GDR2/earlydr2/data/",
+        "--output",
+        "/media/tsagrista/Daten/Gaia/GDR2/earlydr2/out/"
+    ]
+
+    minHeapSize = "10g"
+    maxHeapSize = "20g"
+
+    jvmArgs = [ '-server', ]
+
     classpath = sourceSets.main.runtimeClasspath
     classpath += files(project.assetsDir)
     standardInput = System.in
@@ -106,10 +145,20 @@ task runOctreeGeneratorParticles(dependsOn: jar, type: JavaExec, description: "R
 }
 
 task runOctreeGenerator(dependsOn: jar, type: JavaExec, description: "Runs the octree generator with star groups to create the lod structure from a base catalog") {
-    main = 'gaia.cu9.ari.gaiaorbit.data.OctreeGroupGeneratorTest'
-    systemProperties['properties.file'] = '../assets/conf/global.properties'
-    args = ["--input", "/media/tsagrista/Daten/Gaia/GDR2/earlydr2/data/", "--output", "/media/tsagrista/Daten/Gaia/GDR2/earlydr2/out/"]
-    jvmArgs = ['-server', '-Xms10g', '-Xmx22g']
+    main = 'gaia.cu9.ari.gaiaorbit.data.OctreeGeneratorRun'
+    systemProperties['properties.file'] = '../..//assets/conf/global.properties'
+    args = [
+        "--input",
+        "/media/tsagrista/Daten/Gaia/GDR2/earlydr2/data/",
+        "--output",
+        "/media/tsagrista/Daten/Gaia/GDR2/earlydr2/out/"
+    ]
+
+    minHeapSize = "10g"
+    maxHeapSize = "20g"
+
+    jvmArgs = [ '-server', ]
+
     classpath = sourceSets.main.runtimeClasspath
     classpath += files(project.assetsDir)
     standardInput = System.in
@@ -128,224 +177,185 @@ task runGalaxyGenerator(dependsOn: jar, type: JavaExec, description: "Runs the g
 }
 
 task createDistDir (description: "Creates the releases/dist folder") {
-	doLast {
-	    File distDir = new File(project.distDir)
-	    // Prepare output directory
-	    delete distDir
-	    mkdir distDir
-	}
+    doLast {
+        File distDir = new File(project.distDir)
+        // Prepare output directory
+        delete distDir
+        mkdir distDir
+    }
 }
 
 task copyToLib (dependsOn: createDistDir, description: "Copies the runtime dependencies to releases/dist/lib") {
-	doLast {
-	    // Create releases/dist/lib
-	    File distLib = new File(project.distDir, 'lib')
-	    mkdir distLib
-	    project.ext.distLib = distLib.getPath()
-	
-	    // Copy deps to dist lib folder
-	    ['runtime'].each { mode ->
-	        copy {
-	            from configurations.getByName(mode).files
-	            into project.distLib
-	            exclude "**/data"
-	            exclude "**/assets-bak"
-	            exclude "**/core-1.0.jar"
-	            exclude "**/core-" + version + ".jar"
-	        }
-	    }
-	
-	    // Remove folders
-	    delete project.distLib + '/conf'
-	    delete project.distLib + '/data'
-	    delete project.distLib + '/font'
-	    delete project.distLib + '/i18n'
-	    delete project.distLib + '/icon'
-	    delete project.distLib + '/img'
-	    delete project.distLib + '/music'
-	    delete project.distLib + '/mappings'
-	    delete project.distLib + '/scripts'
-	    delete project.distLib + '/shader'
-	    delete project.distLib + '/shaders'
-	    delete project.distLib + '/skins'
-	    delete project.distLib + '/postprocessing-sources.jar'
-	    // Comment this if you need to use the REST API
-	    delete project.distLib + '/rest-static'
-	}
+    doLast {
+        // Create releases/dist/lib
+        File distLib = new File(project.distDir, 'lib')
+        mkdir distLib
+        project.ext.distLib = distLib.getPath()
+
+        // Copy deps to dist lib folder
+        ['runtime'].each { mode ->
+            copy {
+                from configurations.getByName(mode).files
+                into project.distLib
+                exclude "**/data"
+                exclude "**/assets-bak"
+                exclude "**/core-" + version + ".jar"
+                exclude "dummyversion"
+            }
+        }
+
+        // Remove folders
+        delete project.distLib + '/conf'
+        delete project.distLib + '/data'
+        delete project.distLib + '/font'
+        delete project.distLib + '/i18n'
+        delete project.distLib + '/icon'
+        delete project.distLib + '/img'
+        delete project.distLib + '/music'
+        delete project.distLib + '/mappings'
+        delete project.distLib + '/rest-static'
+        delete project.distLib + '/scripts'
+        delete project.distLib + '/shader'
+        delete project.distLib + '/shaders'
+        delete project.distLib + '/skins'
+        delete project.distLib + '/postprocessing-sources.jar'
+    }
 }
 
 task gaiaskyJar (dependsOn: [compileJava, jar, copyToLib],  description: "Creates the gaiasky jar and puts it to the dist folder") {
     doLast {
-	    copy {
-	        from "$baseDir/core/build/libs/core-" + version + ".jar"
-	        into "$distLib/"
-	    }
-	    file("$distLib/core-" + version + ".jar").renameTo(file("$distLib/gaiasky-core.jar"))
+        copy {
+            from "$baseDir/core/build/libs/core-" + version + ".jar"
+            into "$distLib/"
+        }
+        file("$distLib/core-" + version + ".jar").renameTo(file("$distLib/gaiasky-core.jar"))
     }
 }
 
 task dist (dependsOn: gaiaskyJar, description: "Compiles the project, creates the jar and moves it all to releases/gaiasky-\$tag-\$rev") {
     doLast {
-	    // Copy conf
-	    mkdir "$distDir/conf"
-	    copy {
-	        from "$baseDir/assets/conf"
-	        into "$distDir/conf"
-	    }
-	
-	    // Copy data
-	    mkdir "$distDir/data"
-	    copy {
-	        from "../assets/data"
-	        into "$distDir/data"
-	
-			exclude "**/tgas_final"
-			exclude "**/octree/tgas/group-bin-all"
-			exclude "**/octree/tgas/group-bin-old"
-			exclude "**/hyg"
-			exclude "**/catalog"
-			exclude "**/octree/dr2"
-			
-			exclude "**/models/cassini"
-			exclude "**/models/rosetta"
-			exclude "**/models/iss"
-			
-			exclude "**/orbits_asteroid_extra.json"
-			exclude "**/cassini.xyz"
-			exclude "**/rosetta.xyz"
-	
-			exclude "**/uvdebug.png"
-	        
-	                exclude "**/*-wgl.json"
-	                exclude "**/*-wgl-fp.json"
-	                
-	                exclude "**/catalog-dr2*.json"
-	                exclude "**/catalog-hyg.json"
-	                exclude "**/catalog-sun.json"
-	                exclude "**/catalog-tgas-hyg-lod-old.json"
-	                exclude "**/catalog-tgas.json"
-	                exclude "**/catalog-wgl*.json"
-	                
-	                exclude "**/particles-dr2.json"
-	                exclude "**/particles-wgl*.json"
-	                
-	                exclude "**/constel_id.csv"
-	                
-	                exclude "**/tex/*-high.jpg"
-	                exclude "**/tex/*-high.png"
-	                
-	                exclude "dummyversion"
-	
-	    }
+        // Copy conf
+        mkdir "$distDir/conf"
+        copy {
+            from "$baseDir/assets/conf"
+            into "$distDir/conf"
+        }
 
-	    // Copy i18n files
-	    mkdir "$distDir/i18n"
-	    copy {
-	        from "$baseDir/assets/i18n"
-	        into "$distDir/i18n"
-	    }
-	    
-	    // Copy music
-	    mkdir "$distDir/music"
-	    copy{
-	    	from "../assets/music"
-	    	into "$distDir/music"
-	    }
-	    
-	    // Copy mappings
-	    mkdir "$distDir/mappings"
-	    copy{
-	    	from "../assets/mappings"
-	    	into "$distDir/mappings"
-	    }
-	
-	    // Copy script files
-	    mkdir "$distDir/scripts"
-	    copy {
-	        from "$baseDir/assets/scripts"
-	        into "$distDir/scripts"
-	    }
-	
-	    // Copy scripts, README, LICENSE and AUTHORS
-	    copy {
-	        from "exe"
-	        into "$distDir"
-	        exclude "*.sh"
-	        exclude "octreegen"
-	    }
-	    copy {
-	        from "$baseDir/"
-	        into "$distDir"
-	        include "README.md"
-	        include "LICENSE"
-	        include "AUTHORS"
-	    }
-	    copy {
-	        from "$baseDir/assets/icon"
-	        into "$distDir"
-	        include "ic_launcher.png"
-	        include "ic_launcher.ico"
-	        include "ic_launcher.svg"
-	    }
-	
-	    // Make gaiasky script executable
-	    def cmd = "chmod u+x $distDir/gaiasky"
-	    cmd.execute()
-	
-	    // Replace version in readme file
-	    project.ext.versionFile = file("build/classes/java/main/version").text
-	    ant.replace(file: "$distDir/README.md", token: "--------------------------", value: "$versionFile")
-	}
+        // Copy i18n files
+        mkdir "$distDir/i18n"
+        copy {
+            from "$baseDir/assets/i18n"
+            into "$distDir/i18n"
+        }
+
+        // Copy music
+        mkdir "$distDir/music"
+        copy{
+            from "../assets/music"
+            into "$distDir/music"
+        }
+
+        // Copy mappings
+        mkdir "$distDir/mappings"
+        copy{
+            from "../assets/mappings"
+            into "$distDir/mappings"
+        }
+
+        // Copy rest-static
+        mkdir "$distDir/rest-static"
+        copy{
+            from "../assets/rest-static"
+            into "$distDir/rest-static"
+        }
+
+        // Copy script files
+        mkdir "$distDir/scripts"
+        copy {
+            from "$baseDir/assets/scripts"
+            into "$distDir/scripts"
+        }
+
+        // Copy scripts, README, LICENSE and AUTHORS
+        copy {
+            from "exe"
+            into "$distDir"
+            exclude "*.sh"
+            exclude "octreegen"
+        }
+        copy {
+            from "$baseDir/"
+            into "$distDir"
+            include "README.md"
+            include "LICENSE"
+            include "AUTHORS"
+        }
+        copy {
+            from "$baseDir/assets/icon"
+            into "$distDir"
+            include "ic_launcher.png"
+            include "ic_launcher.ico"
+            include "ic_launcher.svg"
+        }
+
+        // Make gaiasky script executable
+        def cmd = "chmod u+x $distDir/gaiasky"
+        cmd.execute()
+
+        // Replace version in readme file
+        project.ext.versionFile = file("build/classes/java/main/version").text
+        ant.replace(file: "$distDir/README.md", token: "--------------------------", value: "$versionFile")
+    }
 }
 dist.dependsOn classes
 
 task createTar(dependsOn: dist, description: "Creates application tar package") {
-	doLast {
-	    File packageDir = new File(project.packageDir)
-	
-	    delete packageDir
-	    mkdir packageDir
-	
-	    ant.tar(destfile: "$packageDir/" + project.distName + ".tar.gz", compression: 'gzip', longfile: 'gnu') {
-	        tarfileset(dir: "$releasesDir") {
-	        	include (name: "$distName/**")
-	            exclude (name: "$distName/gaiasky")
-	        }
-	        tarfileset(dir: "$releasesDir", filemode:'755') {
-	            include(name: "$distName/gaiasky")
-	        }
-	    }
-	}
+    doLast {
+        File packageDir = new File(project.packageDir)
+
+        delete packageDir
+        mkdir packageDir
+
+        ant.tar(destfile: "$packageDir/" + project.distName + ".tar.gz", compression: 'gzip', longfile: 'gnu') {
+            tarfileset(dir: "$releasesDir") {
+                include (name: "$distName/**")
+                exclude (name: "$distName/gaiasky")
+            }
+            tarfileset(dir: "$releasesDir", filemode:'755') {
+                include(name: "$distName/gaiasky")
+            }
+        }
+    }
 }
 
 task createArch(dependsOn: createTar, description: "Copies Arch Linux AUR build scripts PKGBUILD and gaiasky.install and replaces version and md5") {
-	doLast {
-		File archDir = new File(project.packageDir + "/arch/")
-		mkdir archDir
-		copy {
-			from "installerscripts/arch"
-			into "$packageDir/arch"
-		}
-		
-		File tarFile = new File("$packageDir/" + project.distName + ".tar.gz")
-		ant.checksum(file: tarFile, algorithm: "md5", todir: "$packageDir/")
-		
-		String md5Tar = new File("$packageDir/" + project.distName + ".tar.gz.md5").text
-		md5Tar = md5Tar.replace("\n", "").replace("\r", "");
-		
-		ant.replace(file: "$packageDir/arch/PKGBUILD", token: '@version.revision@', value: "$tagRev")
-		ant.replace(file: "$packageDir/arch/PKGBUILD", token: '@md5checksum@', value: md5Tar)
-		
-		copy {
-			from "$baseDir/CHANGELOG.md"
-			into "$packageDir/arch/"
-		}
-		
-		// Run makepkg to create .SRCINFO
-		//exec {
-	    // 	executable "makepkg"
-	    //	args "--printsrcinfo",">","$packageDir/arch/.SRCINFO"
-	    //}
+    doLast {
+        File archDir = new File(project.packageDir + "/arch/")
+        mkdir archDir
+        copy {
+            from "installerscripts/arch"
+            into "$packageDir/arch"
+        }
+
+        File tarFile = new File("$packageDir/" + project.distName + ".tar.gz")
+        ant.checksum(file: tarFile, algorithm: "md5", todir: "$packageDir/")
+
+        String md5Tar = new File("$packageDir/" + project.distName + ".tar.gz.md5").text
+        md5Tar = md5Tar.replace("\n", "").replace("\r", "");
+
+        ant.replace(file: "$packageDir/arch/PKGBUILD", token: '@version.revision@', value: "$tagRev")
+        ant.replace(file: "$packageDir/arch/PKGBUILD", token: '@md5checksum@', value: md5Tar)
+
+        copy {
+            from "$baseDir/CHANGELOG.md"
+            into "$packageDir/arch/"
+        }
+
+        // Run makepkg to create .SRCINFO
+        //exec {
+        // 	executable "makepkg"
+        //	args "--printsrcinfo",">","$packageDir/arch/.SRCINFO"
+        //}
     }
 }
 
@@ -354,59 +364,59 @@ def buildTime() {
 }
 
 def distDirSize() {
-	File dist = new File(project.distDir)
-	return Math.round(dist.directorySize() / 1024)
+    File dist = new File(project.distDir)
+    return Math.round(dist.directorySize() / 1024)
 }
 
 task createDeb(dependsOn: createArch, description: "Creates the .deb package") {
-	doLast {
-		// Base deb directory
-		File debDir = new File(project.packageDir + "/$distName")
-		// Opt dir
-		File debOptDir = new File(project.packageDir + "/$distName/opt/gaiasky")
-		mkdir debOptDir
-		// DEBIAN directory
-		File debDEBIANDir = new File(project.packageDir + "/$distName/DEBIAN")
-		mkdir debDEBIANDir
-		
-		copy {
-			from "installerscripts/debian"
-			into "$packageDir/$distName/DEBIAN"
-		}
-		
-		ant.replace(file: "$packageDir/$distName/DEBIAN/control", token: '@version.revision@', value: "$tagRev")
-		ant.replace(file: "$packageDir/$distName/DEBIAN/control", token: '@installedsize@', value: "${distDirSize()}")
-		ant.replace(file: "$packageDir/$distName/DEBIAN/control", token: '@date@', value: "${buildTime()}")
-		
-		copy {
-			from "$distDir"
-			into "$packageDir/$distName/opt/gaiasky/"
-		}
-		
-		// Create deb
-		exec {
-	     	executable "dpkg-deb"
-	    	args "--build","$packageDir/$distName"
-	    }
-	    
-	    // Remove temp dir directory
-	    delete debDir
+    doLast {
+        // Base deb directory
+        File debDir = new File(project.packageDir + "/$distName")
+        // Opt dir
+        File debOptDir = new File(project.packageDir + "/$distName/opt/gaiasky")
+        mkdir debOptDir
+        // DEBIAN directory
+        File debDEBIANDir = new File(project.packageDir + "/$distName/DEBIAN")
+        mkdir debDEBIANDir
+
+        copy {
+            from "installerscripts/debian"
+            into "$packageDir/$distName/DEBIAN"
+        }
+
+        ant.replace(file: "$packageDir/$distName/DEBIAN/control", token: '@version.revision@', value: "$tagRev")
+        ant.replace(file: "$packageDir/$distName/DEBIAN/control", token: '@installedsize@', value: "${distDirSize()}")
+        ant.replace(file: "$packageDir/$distName/DEBIAN/control", token: '@date@', value: "${buildTime()}")
+
+        copy {
+            from "$distDir"
+            into "$packageDir/$distName/opt/gaiasky/"
+        }
+
+        // Create deb
+        exec {
+            executable "dpkg-deb"
+            args "--build","$packageDir/$distName"
+        }
+
+        // Remove temp dir directory
+        delete debDir
     }
 }
 
 task prepareInstall4jScript (dependsOn: createArch, description: "Prepares the install4j script and copies it to the packages folder") {
     doLast {
-	    copy {
-	        from "installerscripts/template.install4j"
-	        into "$packageDir"
-	    }
-	    file("$packageDir/template.install4j").renameTo(file("$packageDir/" + project.distName + ".install4j"))
-	
-	    project.ext.releaseFolder = "$baseDir/releases/$distName"
-	
-	    ant.replace(file: "$packageDir/" + project.distName + ".install4j", token: '@gs-release-folder@', value: "$distDir")
-	    ant.replace(file: "$packageDir/" + project.distName + ".install4j", token: '@gs-git-folder@', value: "$baseDir")
-	    ant.replace(file: "$packageDir/" + project.distName + ".install4j", token: '@version-tag@', value: "$tagRev")
+        copy {
+            from "installerscripts/template.install4j"
+            into "$packageDir"
+        }
+        file("$packageDir/template.install4j").renameTo(file("$packageDir/" + project.distName + ".install4j"))
+
+        project.ext.releaseFolder = "$baseDir/releases/$distName"
+
+        ant.replace(file: "$packageDir/" + project.distName + ".install4j", token: '@gs-release-folder@', value: "$distDir")
+        ant.replace(file: "$packageDir/" + project.distName + ".install4j", token: '@gs-git-folder@', value: "$baseDir")
+        ant.replace(file: "$packageDir/" + project.distName + ".install4j", token: '@version-tag@', value: "$tagRev")
     }
 }
 
@@ -418,10 +428,7 @@ task install4jMedia(type: com.install4j.gradle.Install4jTask, description: "Runs
 }
 
 
-task pack (dependsOn: install4jMedia, description: "Creates the releases for windows, mac, linux and the tar package") {
-	doLast {
-	}
-}
+task pack (dependsOn: install4jMedia, description: "Creates the releases for windows, mac, linux and the tar package") { doLast { } }
 
 eclipse {
     project {

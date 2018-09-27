@@ -4,6 +4,8 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.nio.channels.FileChannel;
 import java.util.Properties;
 import java.util.concurrent.Future;
@@ -12,13 +14,13 @@ import java.util.concurrent.TimeUnit;
 import javax.swing.UIManager;
 import javax.swing.plaf.FontUIResource;
 
+import com.badlogic.gdx.Files;
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.Graphics.DisplayMode;
 import com.badlogic.gdx.LifecycleListener;
 import com.badlogic.gdx.backends.lwjgl3.Lwjgl3Application;
 import com.badlogic.gdx.backends.lwjgl3.Lwjgl3ApplicationConfiguration;
 import com.badlogic.gdx.backends.lwjgl3.Lwjgl3Files;
-import com.badlogic.gdx.scenes.scene2d.Stage;
-import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.beust.jcommander.JCommander;
 import com.beust.jcommander.Parameter;
 import com.brsanthu.googleanalytics.GoogleAnalyticsResponse;
@@ -37,9 +39,6 @@ import gaia.cu9.ari.gaiaorbit.desktop.util.DesktopConfInit;
 import gaia.cu9.ari.gaiaorbit.desktop.util.DesktopMusicActors;
 import gaia.cu9.ari.gaiaorbit.desktop.util.DesktopNetworkChecker;
 import gaia.cu9.ari.gaiaorbit.desktop.util.LogWriter;
-import gaia.cu9.ari.gaiaorbit.desktop.util.MemInfoWindow;
-import gaia.cu9.ari.gaiaorbit.desktop.util.RunCameraWindow;
-import gaia.cu9.ari.gaiaorbit.desktop.util.RunScriptWindow;
 import gaia.cu9.ari.gaiaorbit.desktop.util.SysUtils;
 import gaia.cu9.ari.gaiaorbit.event.EventManager;
 import gaia.cu9.ari.gaiaorbit.event.Events;
@@ -71,11 +70,12 @@ public class GaiaSkyDesktop implements IObserver {
     private static final Log logger = Logger.getLogger(GaiaSkyDesktop.class);
 
     /* Configuration file version of the source code */
-    private static int SOURCE_CONF_VERSION = 251;
+    private static int SOURCE_CONF_VERSION = 252;
     private static GaiaSkyDesktop gsd;
-    public static String ASSETS_LOC;
+    private static boolean REST_ENABLED = false;
+    private static Class<?> REST_SERVER_CLASS = null;
 
-    private MemInfoWindow memInfoWindow;
+    private static GaiaSkyArgs gsargs;
 
     /**
     	 * Program arguments
@@ -89,10 +89,16 @@ public class GaiaSkyDesktop implements IObserver {
 
         @Parameter(names = { "-v", "--version" }, description = "Lists version and build inforamtion")
         private boolean version = false;
+        
+        @Parameter(names = { "-d", "--ds-download" }, description = "Displays the download dialog at startup")
+        private boolean download = false;
+        
+        @Parameter(names = { "-c", "--cat-chooser" }, description = "Displays the catalog chooser dialog at startup")
+        private boolean catalogchooser = false;
     }
 
     public static void main(String[] args) {
-        GaiaSkyArgs gsargs = new GaiaSkyArgs();
+        gsargs = new GaiaSkyArgs();
         try {
             JCommander jc = new JCommander(gsargs, args);
             jc.setProgramName("gaiasky");
@@ -109,7 +115,7 @@ public class GaiaSkyDesktop implements IObserver {
             javaVersionCheck();
 
             gsd = new GaiaSkyDesktop();
-
+            
             Gdx.files = new Lwjgl3Files();
 
             // Initialize number format
@@ -127,6 +133,9 @@ public class GaiaSkyDesktop implements IObserver {
                 props = initConfigFile(false);
             }
 
+            // Initialize i18n
+            I18n.initialize(Gdx.files.internal("i18n/gsbundle"));
+            
             // Init global configuration
             ConfInit.initialize(new DesktopConfInit());
             GlobalConf.screen.SCREEN_WIDTH = 1080;
@@ -142,14 +151,19 @@ public class GaiaSkyDesktop implements IObserver {
                 return;
             }
 
-            // Initialize i18n
-            I18n.initialize(Gdx.files.internal("i18n/gsbundle"));
-
             // Dev mode
-            I18n.initialize(Gdx.files.absolute(ASSETS_LOC + "i18n/gsbundle"));
+            I18n.initialize(Gdx.files.absolute(GlobalConf.ASSETS_LOC + "i18n/gsbundle"));
 
             // Jython
             ScriptingFactory.initialize(JythonFactory.getInstance());
+
+            // REST API server
+            REST_ENABLED = GlobalConf.program.REST_PORT >= 0 && checkRestDepsInClasspath();
+            if (REST_ENABLED) {
+                REST_SERVER_CLASS = Class.forName("gaia.cu9.ari.gaiaorbit.rest.RESTServer");
+                Method init = REST_SERVER_CLASS.getMethod("initialize", Integer.class);
+                init.invoke(null, GlobalConf.program.REST_PORT);
+            }
 
             // Fullscreen command
             ScreenModeCmd.initialize();
@@ -161,7 +175,7 @@ public class GaiaSkyDesktop implements IObserver {
             MusicActorsManager.initialize(new DesktopMusicActors());
 
             // Init music manager
-            MusicManager.initialize(Gdx.files.absolute(ASSETS_LOC + "music"), Gdx.files.absolute(SysUtils.getDefaultMusicDir().getAbsolutePath()));
+            MusicManager.initialize(Gdx.files.absolute(GlobalConf.ASSETS_LOC + "music"), Gdx.files.absolute(SysUtils.getDefaultMusicDir().getAbsolutePath()));
 
             // Initialize post processor factory
             PostProcessorFactory.initialize(new DesktopPostProcessorFactory());
@@ -209,7 +223,6 @@ public class GaiaSkyDesktop implements IObserver {
     public GaiaSkyDesktop() {
         super();
         lw = new LogWriter();
-        EventManager.instance.subscribe(this, Events.SHOW_RUNSCRIPT_ACTION, Events.SHOW_PLAYCAMERA_ACTION, Events.DISPLAY_MEM_INFO_WINDOW);
         EventManager.instance.subscribe(this, Events.SCENE_GRAPH_LOADED, Events.DISPOSE);
     }
 
@@ -230,48 +243,46 @@ public class GaiaSkyDesktop implements IObserver {
         cfg.setResizable(true);
 
         // Launch app
-        Lwjgl3Application app = new Lwjgl3Application(new GaiaSky(), cfg);
-        //app.addLifecycleListener(new GaiaSkyWindowListener());
+        Lwjgl3Application app = new Lwjgl3Application(new GaiaSky(gsargs.download, gsargs.catalogchooser), cfg);
+        app.addLifecycleListener(new GaiaSkyWindowListener());
 
         if (lw != null)
             EventManager.instance.removeAllSubscriptions(lw);
     }
 
-    RunScriptWindow scriptWindow = null;
-    RunCameraWindow cameraWindow = null;
-
     @Override
     public void notify(Events event, final Object... data) {
         switch (event) {
-        case SHOW_PLAYCAMERA_ACTION:
-            Gdx.app.postRunnable(new Runnable() {
-                @Override
-                public void run() {
-                    if (cameraWindow == null)
-                        cameraWindow = new RunCameraWindow((Stage) data[0], (Skin) data[1]);
-                    cameraWindow.display();
-                }
-            });
-            break;
-        case SHOW_RUNSCRIPT_ACTION:
-            Gdx.app.postRunnable(new Runnable() {
-                @Override
-                public void run() {
-                    if (scriptWindow == null)
-                        scriptWindow = new RunScriptWindow((Stage) data[0], (Skin) data[1]);
-                    scriptWindow.display();
-                }
-            });
-
-            break;
-        case DISPLAY_MEM_INFO_WINDOW:
-            if (memInfoWindow == null) {
-                memInfoWindow = new MemInfoWindow((Stage) data[0], (Skin) data[1]);
-            }
-            memInfoWindow.show((Stage) data[0]);
-            break;
         case JAVA_EXCEPTION:
             ((Throwable) data[0]).printStackTrace(System.err);
+            break;
+        case SCENE_GRAPH_LOADED:
+            if (REST_ENABLED) {
+                /*
+                				 * Notify REST server that GUI is loaded and everything should be in a
+                				 * well-defined state
+                				 */
+                Method activate;
+                try {
+                    activate = REST_SERVER_CLASS.getMethod("activate");
+                    activate.invoke(null, new Object[0]);
+                } catch (NoSuchMethodException | SecurityException | IllegalAccessException | IllegalArgumentException
+                        | InvocationTargetException e) {
+                    logger.error(e);
+                }
+            }
+            break;
+        case DISPOSE:
+            if (REST_ENABLED) {
+                /* Shutdown REST server thread on termination */
+                try {
+                    Method stop = REST_SERVER_CLASS.getMethod("stop");
+                    stop.invoke(null, new Object[0]);
+                } catch (NoSuchMethodException | SecurityException | IllegalAccessException | IllegalArgumentException
+                        | InvocationTargetException e) {
+                    logger.error(e);
+                }
+            }
             break;
         default:
             break;
@@ -289,17 +300,16 @@ public class GaiaSkyDesktop implements IObserver {
     }
 
     /**
-     * Initialises the configuration file. Tries to load first the file in
-     * <code>$HOME/.gaiasky/global.vr.properties</code>. Checks the
-     * <code>properties.version</code> key to determine whether the file is
-     * compatible or not. If it is, it uses the existing file. If it is not, it
-     * replaces it with the default file.
-     * 
-     * @param ow
-     *            Whether to overwrite
-     * @return The path of the file used
-     * @throws IOException
-     */
+    	 * Initialises the configuration file. Tries to load first the file in
+    	 * <code>$HOME/.gaiasky/global.properties</code>. Checks the
+    	 * <code>properties.version</code> key to determine whether the file is
+    	 * compatible or not. If it is, it uses the existing file. If it is not, it
+    	 * replaces it with the default file.
+    	 * 
+    	 * @param ow Whether to overwrite
+    	 * @return The path of the file used
+    	 * @throws IOException
+    	 */
     private static String initConfigFile(boolean ow) throws IOException {
         // Use user folder
         File userFolder = SysUtils.getGSHomeDir();
@@ -349,6 +359,24 @@ public class GaiaSkyDesktop implements IObserver {
         return props;
     }
 
+    /**
+    	 * Checks whether the REST server dependencies are in the classpath.
+    	 * 
+    	 * @return True if REST dependencies are loaded.
+    	 */
+    private static boolean checkRestDepsInClasspath() {
+        try {
+            Class.forName("com.google.gson.Gson");
+            Class.forName("spark.Spark");
+            Class.forName("gaia.cu9.ari.gaiaorbit.rest.RESTServer");
+            return true;
+        } catch (ClassNotFoundException e) {
+            // my class isn't there!
+            return false;
+        }
+    }
+
+    @SuppressWarnings("resource")
     private static void copyFile(File sourceFile, File destFile, boolean ow) throws IOException {
         if (destFile.exists()) {
             if (ow) {
@@ -382,9 +410,8 @@ public class GaiaSkyDesktop implements IObserver {
      */
     private static void javaVersionCheck() {
         double jv = getVersion();
-        SysUtils sys = new SysUtils();
-        boolean linux = sys.isLinux();
-        boolean gnome = sys.checkGnome();
+        boolean linux = SysUtils.isLinux();
+        boolean gnome = SysUtils.checkGnome();
         if (jv >= 10 && linux && gnome) {
             System.out.println("======================================= WARNING ========================================");
             System.out.println("It looks like you are running Gaia Sky with java " + jv + " in Linux with Gnome.\n"

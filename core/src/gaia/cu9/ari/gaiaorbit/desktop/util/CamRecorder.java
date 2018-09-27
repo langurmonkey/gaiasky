@@ -234,6 +234,8 @@ public class CamRecorder implements IObserver {
             // Stop frame output if it is on!
             EventManager.instance.post(Events.FRAME_OUTPUT_CMD, false);
             break;
+        default:
+            break;
         }
 
     }

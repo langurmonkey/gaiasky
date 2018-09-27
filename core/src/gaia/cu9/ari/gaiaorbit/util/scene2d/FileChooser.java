@@ -12,6 +12,8 @@ import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.InputEvent.Type;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Dialog;
+import com.badlogic.gdx.scenes.scene2d.ui.HorizontalGroup;
+import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.List;
 import com.badlogic.gdx.scenes.scene2d.ui.ScrollPane;
@@ -26,6 +28,9 @@ import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.TimeUtils;
 
+import gaia.cu9.ari.gaiaorbit.util.GlobalConf;
+import gaia.cu9.ari.gaiaorbit.util.I18n;
+
 public class FileChooser extends Dialog {
 
     public interface ResultListener {
@@ -39,6 +44,8 @@ public class FileChooser extends Dialog {
     private final FileHandle baseDir;
     private final Label fileListLabel;
     private final List<FileListItem> fileList;
+    private final HorizontalGroup driveButtonsList;
+    private final Array<TextButton> driveButtons;
 
     private FileHandle currentDir;
     protected String result;
@@ -55,10 +62,10 @@ public class FileChooser extends Dialog {
                 return -1;
             }
             if (file1.file.isDirectory() && file2.file.isDirectory()) {
-                return 0;
+                return file1.name.compareTo(file2.name);
             }
             if (!file1.file.isDirectory() && !file2.file.isDirectory()) {
-                return 0;
+                return file1.name.compareTo(file2.name);
             }
             return 1;
         }
@@ -78,6 +85,28 @@ public class FileChooser extends Dialog {
 
         final Table content = getContentTable();
         content.top().left();
+        content.defaults().space(5 * GlobalConf.SCALE_FACTOR);
+        this.padLeft(10 * GlobalConf.SCALE_FACTOR);
+        this.padRight(10 * GlobalConf.SCALE_FACTOR);
+
+        // In windows, we need to be able to change drives
+        driveButtonsList = new HorizontalGroup();
+        driveButtonsList.left().space(10 * GlobalConf.SCALE_FACTOR);
+        File[] drives = File.listRoots();
+        driveButtons = new Array<TextButton>(drives.length);
+        for (File drive : drives) {
+            Image driveIcon = new Image(skin.getDrawable("drive-icon"));
+            TextButton driveButton = new OwnTextIconButton(drive.toString(), driveIcon, skin);
+            driveButton.addListener(new ClickListener() {
+                @Override
+                public void clicked(InputEvent event, float x, float y) {
+                    changeDirectory(new FileHandle(drive));
+                    lastClick = 0;
+                }
+            });
+            driveButtons.add(driveButton);
+            driveButtonsList.addActor(driveButton);
+        }
 
         fileListLabel = new Label("", skin);
         fileListLabel.setAlignment(Align.left);
@@ -94,11 +123,14 @@ public class FileChooser extends Dialog {
             }
         });
 
-        ok = new TextButton("Ok", skin);
+        ok = new OwnTextButton(I18n.bundle.get("gui.select"), skin);
         button(ok, true);
+        ok.setWidth(150 * GlobalConf.SCALE_FACTOR);
 
-        cancel = new TextButton("Cancel", skin);
+        cancel = new OwnTextButton(I18n.bundle.get("gui.cancel"), skin);
         button(cancel, false);
+        cancel.setWidth(150 * GlobalConf.SCALE_FACTOR);
+
         key(Keys.ENTER, true);
         key(Keys.ESCAPE, false);
 
@@ -137,7 +169,16 @@ public class FileChooser extends Dialog {
     public FileHandle getResult() {
         String path = currentDir.path() + "/";
         if (result != null && result.length() > 0) {
-            path += result;
+            String folder = currentDir.file().getName();
+            if (folder.equals(result)) {
+                if ((new FileHandle(path + result)).exists()) {
+                    path += result;
+                } else {
+                    // Nothing
+                }
+            } else {
+                path += result;
+            }
         }
         return new FileHandle(path);
     }
@@ -178,8 +219,9 @@ public class FileChooser extends Dialog {
     @Override
     public Dialog show(Stage stage, Action action) {
         final Table content = getContentTable();
+        content.add(driveButtonsList).top().left().expandX().fillX().row();
         content.add(fileListLabel).top().left().expandX().fillX().row();
-        content.add(new ScrollPane(fileList, skin)).size(300, 150).fill().expand().row();
+        content.add(new ScrollPane(fileList, skin)).size(300 * GlobalConf.SCALE_FACTOR, 200 * GlobalConf.SCALE_FACTOR).fill().expand().row();
 
         if (fileNameEnabled) {
             content.add(fileNameLabel).fillX().expandX().row();

@@ -23,7 +23,6 @@ import gaia.cu9.ari.gaiaorbit.scenegraph.camera.FovCamera;
 import gaia.cu9.ari.gaiaorbit.scenegraph.camera.ICamera;
 import gaia.cu9.ari.gaiaorbit.util.Constants;
 import gaia.cu9.ari.gaiaorbit.util.GlobalConf;
-import gaia.cu9.ari.gaiaorbit.util.Logger;
 import gaia.cu9.ari.gaiaorbit.util.Nature;
 import gaia.cu9.ari.gaiaorbit.util.comp.DistToCameraComparator;
 import gaia.cu9.ari.gaiaorbit.util.coord.AstroUtils;
@@ -58,11 +57,11 @@ public class StarGroupRenderSystem extends ImmediateRenderSystem implements IObs
     }
 
     /**
-     * Adds a new mesh data to the meshes list and increases the mesh data index
-     * 
-     * @param nVertices The max number of vertices this mesh data can hold
-     * @return The index of the new mesh data
-     */
+    	 * Adds a new mesh data to the meshes list and increases the mesh data index
+    	 * 
+    	 * @param nVertices The max number of vertices this mesh data can hold
+    	 * @return The index of the new mesh data
+    	 */
     private int addMeshData(int nVertices) {
         // look for index
         int mdi;

@@ -47,7 +47,7 @@ void main() {
         pos = computeGravitationalWaves(pos, u_gw, u_gwmat3, u_ts, u_omgw, u_hterms);
     #endif // gravitationalWaves
     
-    v_col = vec4(a_color.rgb, a_color.a * u_alpha );
+    v_col = vec4(a_color.rgb, a_color.a * u_alpha);
 
     gl_Position = u_projModelView * vec4(pos, 0.0);
     gl_PointSize = a_size * u_sizeFactor;

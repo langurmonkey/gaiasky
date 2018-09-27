@@ -1,15 +1,27 @@
 package gaia.cu9.ari.gaiaorbit.interfce;
 
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.files.FileHandle;
+import com.badlogic.gdx.graphics.Cursor.SystemCursor;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 
+import gaia.cu9.ari.gaiaorbit.desktop.util.SysUtils;
 import gaia.cu9.ari.gaiaorbit.event.EventManager;
 import gaia.cu9.ari.gaiaorbit.event.Events;
+import gaia.cu9.ari.gaiaorbit.util.DownloadHelper;
 import gaia.cu9.ari.gaiaorbit.util.GlobalConf;
 import gaia.cu9.ari.gaiaorbit.util.GlobalResources;
+import gaia.cu9.ari.gaiaorbit.util.Logger;
+import gaia.cu9.ari.gaiaorbit.util.Logger.Log;
+import gaia.cu9.ari.gaiaorbit.util.scene2d.Link;
+import gaia.cu9.ari.gaiaorbit.util.scene2d.OwnLabel;
 
 /**
  * Displays dataset downloader and dataset chooser screen if needed.
@@ -18,14 +30,24 @@ import gaia.cu9.ari.gaiaorbit.util.GlobalResources;
  *
  */
 public class InitialGui extends AbstractGui {
+    private static final Log logger = Logger.getLogger(InitialGui.class);
 
-    protected DownloadCatalogWindow ddw;
+    private boolean dsdownload, catchooser;
+
+    protected DownloadDataWindow ddw;
     protected ChooseCatalogWindow cdw;
 
     /** Lock object for synchronisation **/
 
-    public InitialGui() {
+    /**
+     * Creates an initial GUI
+     * @param dsdownload Forces dataset download window
+     * @param catchooser Forces catalog chooser window
+     */
+    public InitialGui(boolean dsdownload, boolean catchooser) {
         lock = new Object();
+        this.catchooser = catchooser;
+        this.dsdownload = dsdownload;
     }
 
     @Override
@@ -35,24 +57,42 @@ public class InitialGui extends AbstractGui {
         ui = new Stage(new ScreenViewport(), GlobalResources.spriteBatch);
         skin = GlobalResources.skin;
 
-        String assetsLoc = GlobalConf.ASSETS_LOC; 
-        DatasetsWidget dw = new DatasetsWidget(skin, assetsLoc);
+        DatasetsWidget dw = new DatasetsWidget(skin, GlobalConf.ASSETS_LOC);
         Array<FileHandle> catalogFiles = dw.buildCatalogFiles();
 
         clearGui();
 
-        if (catalogFiles.size == 0) {
-            // No catalog files, display downloader
-            addDatasetDownloader();
-        } else {
-            displayChooser();
-        }
+        DownloadHelper.downloadFile(GlobalConf.program.DATA_DESCRIPTOR_URL, Gdx.files.absolute(SysUtils.getDefaultTmpDir() + "/gaiasky-data.json"), null, (md5sum) -> {
+            Gdx.app.postRunnable(() -> {
+                if (dsdownload || !basicDataPresent() || catalogFiles.size == 0) {
+                    // No catalog files, display downloader
+                    addDownloaderWindow();
+                } else {
+                    displayChooser();
+                }
+            });
+        }, () -> {
+            // Fail?
+            logger.error("No internet connection! We will attempt to continue");
+            if (basicDataPresent()) {
+                // Go on all in
+                Gdx.app.postRunnable(() -> {
+                    displayChooser();
+                });
+            } else {
+                // Error and exit
+                logger.error("No base data present - need an internet connection to continue, exiting");
+                Gdx.app.postRunnable(() -> {
+                    addExitWindow();
+                });
+            }
+        }, null);
 
     }
 
     private void displayChooser() {
         clearGui();
-        if (GlobalConf.program.DISPLAY_DATASET_DIALOG) {
+        if (catchooser || GlobalConf.program.DISPLAY_DATASET_DIALOG) {
             addDatasetChooser();
         } else {
             // Event
@@ -61,15 +101,75 @@ public class InitialGui extends AbstractGui {
 
     }
 
+    /**
+     * Checks if the basic Gaia Sky data folders are present
+     * in the default data folder
+     * @return
+     */
+    private boolean basicDataPresent() {
+        Path dataPath = Paths.get(GlobalConf.data.DATA_LOCATION).normalize();
+        // Add all paths to check in this list
+        Array<Path> required = new Array<Path>();
+        required.add(dataPath.resolve("data-main.json"));
+        required.add(dataPath.resolve("asteroids.json"));
+        required.add(dataPath.resolve("planets.json"));
+        required.add(dataPath.resolve("satellites.json"));
+        required.add(dataPath.resolve("tex"));
+        required.add(dataPath.resolve("attitudexml"));
+        required.add(dataPath.resolve("meshes"));
+        required.add(dataPath.resolve("sdss"));
+
+        for (Path p : required) {
+            if (!Files.exists(p) || !Files.isReadable(p)) {
+                logger.info("Data files not found: " + dataPath.toString());
+                return false;
+            }
+        }
+
+        return true;
+    }
+
     @Override
     public void doneLoading(AssetManager assetManager) {
     }
 
-    private void addDatasetDownloader() {
+    private void addExitWindow() {
+        GenericDialog exitw = new GenericDialog(txt("notif.error", "No internet connection"), skin, ui) {
+
+            @Override
+            protected void build() {
+                OwnLabel info = new OwnLabel("No internet connection and no base data found.\n" + "Gaia Sky will exit now", skin);
+                Link manualDownload = new Link("Manual download", skin, "link", "http://gaia.ari.uni-heidelberg.de/gaiasky/files/autodownload");
+                content.add(info).pad(10).row();
+                content.add(manualDownload).pad(10);
+            }
+
+            @Override
+            protected void accept() {
+                Gdx.app.exit();
+            }
+
+            @Override
+            protected void cancel() {
+                Gdx.app.exit();
+            }
+
+        };
+        exitw.setAcceptText(txt("gui.exit"));
+        exitw.setCancelText(null);
+        exitw.buildSuper();
+        exitw.show(ui);
+    }
+
+    private void addDownloaderWindow() {
         if (ddw == null) {
-            ddw = new DownloadCatalogWindow(ui, skin);
+            ddw = new DownloadDataWindow(ui, skin);
             ddw.setAcceptRunnable(() -> {
+                Gdx.graphics.setSystemCursor(SystemCursor.Arrow);
                 displayChooser();
+            });
+            ddw.setCancelRunnable(() -> {
+                Gdx.app.exit();
             });
         }
         ddw.show(ui);

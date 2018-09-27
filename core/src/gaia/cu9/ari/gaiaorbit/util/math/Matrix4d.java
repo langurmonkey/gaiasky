@@ -784,6 +784,14 @@ public class Matrix4d implements Serializable {
         return this;
     }
 
+    public Matrix4d setToTranslation(Vector3 vector) {
+        idt();
+        val[M03] = vector.x;
+        val[M13] = vector.y;
+        val[M23] = vector.z;
+        return this;
+    }
+
     /**
      * Sets this matrix to a translation matrix, overwriting it first by an
      * identity matrix and then setting the 4th column to the translation

@@ -11,7 +11,6 @@ import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Button;
 import com.badlogic.gdx.scenes.scene2d.ui.Container;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
-import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener.ChangeEvent;
 import com.badlogic.gdx.utils.Align;
@@ -23,6 +22,7 @@ import gaia.cu9.ari.gaiaorbit.event.Events;
 import gaia.cu9.ari.gaiaorbit.util.GlobalConf;
 import gaia.cu9.ari.gaiaorbit.util.GlobalResources;
 import gaia.cu9.ari.gaiaorbit.util.I18n;
+import gaia.cu9.ari.gaiaorbit.util.scene2d.OwnLabel;
 import gaia.cu9.ari.gaiaorbit.util.scene2d.OwnTextIconButton;
 
 /**
@@ -32,7 +32,7 @@ import gaia.cu9.ari.gaiaorbit.util.scene2d.OwnTextIconButton;
  *
  */
 public class LoadingGui extends AbstractGui {
-    protected Table center;
+    protected Table center, bottom;
     protected Container<Button> screenMode;
 
     public NotificationsInterface notificationsInterface;
@@ -62,6 +62,11 @@ public class LoadingGui extends AbstractGui {
             center.padLeft(hoffset);
         else if (hoffset < 0)
             center.padRight(-hoffset);
+        
+        bottom = new Table();
+        bottom.setFillParent(true);
+        bottom.right().bottom();
+        bottom.pad(pad10);
 
         FileHandle gslogo = Gdx.files.internal("img/gaiasky-logo.png");
         Texture logotex = new Texture(gslogo);
@@ -73,9 +78,11 @@ public class LoadingGui extends AbstractGui {
 
         center.add(logoimg).center();
         center.row().padBottom(pad30);
-        center.add(new Label(I18n.bundle.get("notif.loading.wait"), skin, "header"));
+        center.add(new OwnLabel(I18n.bundle.get("notif.loading.wait"), skin, "hud-header"));
         center.row();
 
+        bottom.add(new OwnLabel(GlobalConf.version.version + " - build " + GlobalConf.version.build, skin, "hud-med"));
+        
         // SCREEN MODE BUTTON - TOP RIGHT
         screenMode = new Container<Button>();
         screenMode.setFillParent(true);
@@ -100,6 +107,7 @@ public class LoadingGui extends AbstractGui {
         // MESSAGE INTERFACE - BOTTOM
         notificationsInterface = new NotificationsInterface(skin, lock, false, false, false, false);
         center.add(notificationsInterface);
+        
         interfaces.add(notificationsInterface);
 
         rebuildGui();
@@ -115,6 +123,7 @@ public class LoadingGui extends AbstractGui {
             ui.clear();
             ui.addActor(screenMode);
             ui.addActor(center);
+            ui.addActor(bottom);
         }
     }
 

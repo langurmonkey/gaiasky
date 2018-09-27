@@ -16,6 +16,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.TextArea;
 import com.badlogic.gdx.scenes.scene2d.ui.TextField.TextFieldStyle;
 import com.badlogic.gdx.scenes.scene2d.ui.TextTooltip;
+import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.JsonReader;
 import com.badlogic.gdx.utils.JsonValue;
@@ -26,6 +27,11 @@ import gaia.cu9.ari.gaiaorbit.util.scene2d.OwnScrollPane;
 import gaia.cu9.ari.gaiaorbit.util.scene2d.OwnTextArea;
 import gaia.cu9.ari.gaiaorbit.util.scene2d.OwnTextButton;
 
+/**
+ * Widget which lists all detected catalogs and offers a way to select them.
+ * @author tsagrista
+ *
+ */
 public class DatasetsWidget {
 
     private Skin skin;
@@ -43,10 +49,8 @@ public class DatasetsWidget {
     public Array<FileHandle> buildCatalogFiles() {
         // Discover datasets, add as buttons
         Array<FileHandle> catalogLocations = new Array<FileHandle>();
-        catalogLocations.add(Gdx.files.absolute(assetsLoc + File.separatorChar + "data"));
-        for (String loc : GlobalConf.data.CATALOG_LOCATIONS) {
-            catalogLocations.add(Gdx.files.absolute(loc.trim()));
-        }
+        catalogLocations.add(Gdx.files.absolute(GlobalConf.data.DATA_LOCATION));
+        
         Array<FileHandle> catalogFiles = new Array<FileHandle>();
 
         for (FileHandle catalogLocation : catalogLocations) {
@@ -78,6 +82,7 @@ public class DatasetsWidget {
 
         // Containers
         Table dstable = new Table(skin);
+        dstable.align(Align.top);
 
         Actor result;
 
@@ -152,6 +157,12 @@ public class DatasetsWidget {
         bg.setMinCheckCount(0);
         bg.setMaxCheckCount(catalogFiles.size);
         bg.add(cbs);
+        
+        
+        // No files
+        if(catalogFiles.size == 0) {
+            dstable.add(new OwnLabel("No catalogs found", skin)).center();
+        }
 
         float maxw = 0;
         for (Button b : cbs) {

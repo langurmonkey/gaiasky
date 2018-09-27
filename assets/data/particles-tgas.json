@@ -18,6 +18,12 @@
 		"parent" : "Universe", 
 		"impl" : "gaia.cu9.ari.gaiaorbit.scenegraph.StarGroup",
 		
+		"cataloginfo" : {
+			"name" : "TGAS+HYG",
+			"description" : "Tycho-Gaia Astrometric Solution. 1.5 million stars.",
+			"type" : "DEFAULT"
+		},
+		
 		// Extends IParticleGroupDataProvider
 		"provider" : "gaia.cu9.ari.gaiaorbit.data.group.BinaryDataProvider",
 		"datafile" : "data/catalog/tgashyg.bin"

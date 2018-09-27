@@ -11,6 +11,7 @@ import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
+import java.util.LinkedList;
 import java.util.Locale;
 import java.util.Properties;
 
@@ -37,6 +38,7 @@ import gaia.cu9.ari.gaiaorbit.util.GlobalConf.ScreenshotConf;
 import gaia.cu9.ari.gaiaorbit.util.GlobalConf.ScreenshotMode;
 import gaia.cu9.ari.gaiaorbit.util.GlobalConf.SpacecraftConf;
 import gaia.cu9.ari.gaiaorbit.util.GlobalConf.VersionConf;
+import gaia.cu9.ari.gaiaorbit.util.I18n;
 import gaia.cu9.ari.gaiaorbit.util.Logger;
 import gaia.cu9.ari.gaiaorbit.util.Logger.Log;
 import gaia.cu9.ari.gaiaorbit.util.format.DateFormatFactory;
@@ -51,7 +53,7 @@ import gaia.cu9.ari.gaiaorbit.util.math.MathUtilsd;
  *
  */
 public class DesktopConfInit extends ConfInit {
-    private static final Log logger = Logger.getLogger(DesktopConfInit.class);
+    private static final Log logger = Logger.getLogger("GaiaSky");
 
     CommentedProperties p;
     Properties vp;
@@ -73,7 +75,7 @@ public class DesktopConfInit extends ConfInit {
             InputStream vis = GaiaSkyDesktop.class.getResourceAsStream("/version");
             if (vis == null) {
                 // In case of running in 'developer' mode
-                vis = new FileInputStream(GlobalConf.ASSETS_LOC + "data/dummyversion");
+                vis = new FileInputStream(GlobalConf.ASSETS_LOC + "dummyversion");
             }
             vp = new Properties();
             vp.load(vis);
@@ -129,7 +131,7 @@ public class DesktopConfInit extends ConfInit {
             }
         }
         vc.initialize(versionStr, buildtime, vp.getProperty("builder"), vp.getProperty("system"), vp.getProperty("build"));
-        logger.info("Gaia Sky version " + vc.version + " - build " + vc.build);
+        logger.info(vc.version, I18n.bundle.format("gui.build", vc.build));
 
         /** PERFORMANCE CONF **/
         PerformanceConf pc = new PerformanceConf();
@@ -160,15 +162,11 @@ public class DesktopConfInit extends ConfInit {
         /** DATA CONF **/
         DataConf dc = new DataConf();
 
-        String[] CATALOG_LOCATIONS;
-        String cloc = p.getProperty("data.catalog.locations");
-        if (cloc == null || cloc.isEmpty()) {
-            CATALOG_LOCATIONS = new String[] {};
-        } else {
-            CATALOG_LOCATIONS = cloc.replaceAll(" ", "").split(",");
-        }
+        String DATA_LOCATION = p.getProperty("data.location");
+        if (DATA_LOCATION == null || DATA_LOCATION.isEmpty())
+            DATA_LOCATION = SysUtils.getDefaultDataDir().getAbsolutePath();
 
-        String CATALOG_JSON_FILE = p.getProperty("data.json.catalog");
+        String CATALOG_JSON_FILE = p.getProperty("data.json.catalog", "");
 
         String OBJECTS_JSON_FILE = p.getProperty("data.json.objects");
 
@@ -181,7 +179,7 @@ public class DesktopConfInit extends ConfInit {
         } else {
             LIMIT_MAG_LOAD = Float.MAX_VALUE;
         }
-        dc.initialize(CATALOG_LOCATIONS, CATALOG_JSON_FILE, OBJECTS_JSON_FILE, LIMIT_MAG_LOAD, REAL_GAIA_ATTITUDE, HIGH_ACCURACY_POSITIONS);
+        dc.initialize(DATA_LOCATION, CATALOG_JSON_FILE, OBJECTS_JSON_FILE, LIMIT_MAG_LOAD, REAL_GAIA_ATTITUDE, HIGH_ACCURACY_POSITIONS);
 
         /** PROGRAM CONF **/
         ProgramConf prc = new ProgramConf();
@@ -199,7 +197,7 @@ public class DesktopConfInit extends ConfInit {
         }
         String LAST_VERSION = p.getProperty("program.lastversion", "0.0.0");
         String VERSION_CHECK_URL = p.getProperty("program.url.versioncheck");
-        String DEFAULT_CATALOG_URL = p.getProperty("program.url.catalog.default");
+        String DATA_DESCRIPTOR_URL = p.getProperty("program.url.data.descriptor");
         String UI_THEME = p.getProperty("program.ui.theme");
         // Update scale factor according to theme - for HiDPI screens
         GlobalConf.updateScaleFactor(UI_THEME.endsWith("x2") ? 2f : 1f);
@@ -213,8 +211,19 @@ public class DesktopConfInit extends ConfInit {
         boolean DISPLAY_HUD = Boolean.parseBoolean(p.getProperty("program.displayhud", "false"));
         boolean DISPLAY_POINTER_COORDS = Boolean.parseBoolean(p.getProperty("program.displaypointercoords", "true"));
         boolean DISPLAY_DATASET_DIALOG = Boolean.parseBoolean(p.getProperty("program.catalog.chooser", "false"));
+        boolean NET_MASTER = Boolean.parseBoolean(p.getProperty("program.net.master", "false"));
+        boolean NET_SLAVE = Boolean.parseBoolean(p.getProperty("program.net.slave", "false"));
 
-        prc.initialize(DISPLAY_TUTORIAL, TUTORIAL_POINTER_SCRIPT_LOCATION, TUTORIAL_SCRIPT_LOCATION, SHOW_DEBUG_INFO, LAST_CHECKED, LAST_VERSION, VERSION_CHECK_URL, DEFAULT_CATALOG_URL, UI_THEME, SCRIPT_LOCATION, REST_PORT, LOCALE, STEREOSCOPIC_MODE, STEREO_PROFILE, CUBEMAPE360_MODE, ANALYTICS_ENABLED, DISPLAY_HUD, DISPLAY_POINTER_COORDS, DISPLAY_DATASET_DIALOG);
+        LinkedList<String> NET_MASTER_SLAVES = null;
+        if (NET_MASTER) {
+            NET_MASTER_SLAVES = new LinkedList<String>();
+            String value;
+            for (int i = 0; (value = p.getProperty("program.net.master.slaves." + i)) != null; i++) {
+                NET_MASTER_SLAVES.add(value);
+            }
+        }
+
+        prc.initialize(DISPLAY_TUTORIAL, TUTORIAL_POINTER_SCRIPT_LOCATION, TUTORIAL_SCRIPT_LOCATION, SHOW_DEBUG_INFO, LAST_CHECKED, LAST_VERSION, VERSION_CHECK_URL, DATA_DESCRIPTOR_URL, UI_THEME, SCRIPT_LOCATION, REST_PORT, LOCALE, STEREOSCOPIC_MODE, STEREO_PROFILE, CUBEMAPE360_MODE, ANALYTICS_ENABLED, DISPLAY_HUD, DISPLAY_POINTER_COORDS, DISPLAY_DATASET_DIALOG, NET_MASTER, NET_SLAVE, NET_MASTER_SLAVES);
 
         /** SCENE CONF **/
         int GRAPHICS_QUALITY = Integer.parseInt(p.getProperty("scene.graphics.quality"));
@@ -395,6 +404,7 @@ public class DesktopConfInit extends ConfInit {
         p.setProperty("graphics.render.quality", Float.toString(GlobalConf.frame.FRAME_QUALITY));
 
         /** DATA **/
+        p.setProperty("data.location", GlobalConf.data.DATA_LOCATION);
         p.setProperty("data.json.catalog", GlobalConf.data.CATALOG_JSON_FILES);
         p.setProperty("data.json.objects", GlobalConf.data.OBJECTS_JSON_FILES);
         p.setProperty("data.limit.mag", Float.toString(GlobalConf.data.LIMIT_MAG_LOAD));
@@ -422,7 +432,7 @@ public class DesktopConfInit extends ConfInit {
         p.setProperty("program.debuginfo", Boolean.toString(GlobalConf.program.SHOW_DEBUG_INFO));
         p.setProperty("program.lastchecked", GlobalConf.program.LAST_CHECKED != null ? df.format(GlobalConf.program.LAST_CHECKED) : "");
         p.setProperty("program.url.versioncheck", GlobalConf.program.VERSION_CHECK_URL);
-        p.setProperty("program.url.catalog.default", GlobalConf.program.DEFAULT_CATALOG_URL);
+        p.setProperty("program.url.data.descriptor", GlobalConf.program.DATA_DESCRIPTOR_URL);
         p.setProperty("program.ui.theme", GlobalConf.program.UI_THEME);
         p.setProperty("program.scriptlocation", GlobalConf.program.SCRIPT_LOCATION);
         p.setProperty("program.restport", Integer.toString(GlobalConf.program.REST_PORT));
@@ -430,7 +440,15 @@ public class DesktopConfInit extends ConfInit {
         p.setProperty("program.stereoscopic", Boolean.toString(GlobalConf.program.STEREOSCOPIC_MODE));
         p.setProperty("program.stereoscopic.profile", Integer.toString(GlobalConf.program.STEREO_PROFILE.ordinal()));
         p.setProperty("program.cubemap360", Boolean.toString(GlobalConf.program.CUBEMAP360_MODE));
-        p.setProperty("program.dataset.dialog", Boolean.toString(GlobalConf.program.DISPLAY_DATASET_DIALOG));
+        p.setProperty("program.catalog.chooser", Boolean.toString(GlobalConf.program.DISPLAY_DATASET_DIALOG));
+        p.setProperty("program.net.master", Boolean.toString(GlobalConf.program.NET_MASTER));
+        int i = 0;
+        if (GlobalConf.program.NET_MASTER_SLAVES != null)
+            for (String slave : GlobalConf.program.NET_MASTER_SLAVES) {
+                p.setProperty("program.net.master.slaves." + i, slave);
+                i++;
+            }
+        p.setProperty("program.net.slave", Boolean.toString(GlobalConf.program.NET_SLAVE));
 
         /** SCENE **/
         p.setProperty("scene.graphics.quality", Integer.toString(GlobalConf.scene.GRAPHICS_QUALITY));

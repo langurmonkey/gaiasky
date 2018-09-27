@@ -29,7 +29,7 @@ import gaia.cu9.ari.gaiaorbit.util.scene2d.OwnTextButton;
 
 public class DesktopNetworkChecker extends Thread implements INetworkChecker {
     private static final Log logger = Logger.getLogger(DesktopNetworkChecker.class);
-    
+
     private static String URL_SIMBAD = "http://simbad.u-strasbg.fr/simbad/sim-id?Ident=";
     // TODO Use Wikipedia API to get localized content to the current language
     private static String URL_WIKIPEDIA = "https://en.wikipedia.org/wiki/";
@@ -127,7 +127,7 @@ public class DesktopNetworkChecker extends Thread implements INetworkChecker {
 
                 Gdx.app.postRunnable(() -> {
                     if (focus != null) {
-                        logger.debug( "Looking up network resources for '" + focus.getName() + "'");
+                        logger.debug("Looking up network resources for '" + focus.getName() + "'");
 
                         // Add table
                         if (focus instanceof IStarFocus) {
@@ -139,8 +139,8 @@ public class DesktopNetworkChecker extends Thread implements INetworkChecker {
                         simbadLink = new Link("Simbad", linkStyle, "");
                         wikiLink = new Link("Wikipedia ", linkStyle, "");
 
-                        simbadCell = table.add().left();
-                        wikiCell = table.add().left();
+                        simbadCell = table.add((Link) null).left();
+                        wikiCell = table.add((Link) null).left();
 
                         String wikiname = focus.getName().replace(' ', '_');
 

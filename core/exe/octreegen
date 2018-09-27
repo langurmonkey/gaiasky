@@ -48,6 +48,9 @@ OPTS="$OPTS -XX:+UseConcMarkSweepGC"
 # Even more JIT compiler debugging - This produces a huge XML log file (for JITWatch)
 #OPTS="$OPTS -XX:+UnlockDiagnosticVMOptions -XX:+TraceClassLoading -XX:+LogCompilation -XX:+PrintAssembly"
 
+# Assets location
+OPTS="$OPTS -Dassets.location=$GSDIR/"
+
 #
 # Run.
 #

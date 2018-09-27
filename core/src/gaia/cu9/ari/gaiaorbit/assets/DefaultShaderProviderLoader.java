@@ -29,6 +29,7 @@ public class DefaultShaderProviderLoader<T extends DefaultShaderProviderLoader.D
     }
 
     @Override
+    @SuppressWarnings("rawtypes")
     public Array<AssetDescriptor> getDependencies(String fileName, FileHandle file, DefaultShaderProviderParameter parameter) {
         return null;
     }

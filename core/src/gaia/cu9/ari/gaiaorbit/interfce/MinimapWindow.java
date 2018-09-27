@@ -37,7 +37,7 @@ public class MinimapWindow extends GenericDialog {
         ShapeRenderer sr = new ShapeRenderer();
         sr.setAutoShapeType(true);
 
-        SpriteBatch sb = new SpriteBatch();
+        SpriteBatch sb = new SpriteBatch(1000, GlobalResources.spriteShader);
 
         BitmapFont font = skin.getFont(GlobalConf.SCALE_FACTOR != 1 ? "ui-20" : "ui-11");
 

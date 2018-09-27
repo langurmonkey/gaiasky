@@ -1,0 +1,13 @@
+image: java:8
+
+stages:
+    - compile
+
+before_script:
+    - ./gradlew init
+
+compile:
+    stage: compile
+    script:
+        - ./gradlew clean
+        - ./gradlew compileJava

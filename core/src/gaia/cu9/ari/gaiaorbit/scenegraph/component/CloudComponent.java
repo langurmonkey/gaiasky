@@ -177,7 +177,7 @@ public class CloudComponent {
     }
 
     public void setCloud(String cloud) {
-        this.cloud = cloud;
+        this.cloud = GlobalConf.data.dataFile(cloud);
     }
 
     public void setCloudtrans(String cloudtrans) {

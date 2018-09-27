@@ -22,22 +22,22 @@
  *.tar
  *.zip
   
-  # Logs and databases #
-  ######################
-  *.log
-  *.sql
-  *.sqlite
+# Logs and databases #
+######################
+*.log
+*.sql
+*.sqlite
 nohup.out
 
-   # OS generated files #
-   ######################
-   .DS_Store
-   .DS_Store?
-   ._*
-   .Spotlight-V100
-   .Trashes
-   ehthumbs.db
-   Thumbs.db
+# OS generated files #
+######################
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
 
 
 # Vim files #
@@ -52,7 +52,6 @@ out/
 # All gen and bin  folders #
 ############################
 **/gen/
-**/bin/
 
 # All jar files #
 #################
@@ -67,7 +66,8 @@ pickled_dict
 **.iws
 **.iml
 **/.idea
-/build/
+**/build
+**/bin
 **/.settings
 **.classpath
 **.project
@@ -76,5 +76,4 @@ pickled_dict
 # Gradle cache #
 ################
 **/.gradle
-
 .gitchangelog.rc

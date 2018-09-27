@@ -39,10 +39,12 @@ public class MilkyWayRenderSystem extends ImmediateRenderSystem implements IObse
     private MeshData quad;
     private Texture[] nebulatextures;
 
+    private ModelBatch modelBatch;
 
     public MilkyWayRenderSystem(RenderGroup rg, float[] alphas, ModelBatch modelBatch, ShaderProgram[] pointShaders, ShaderProgram[] nebulaShaders) {
-        super(rg, alphas, pointShaders, 200000);
+        super(rg, alphas, pointShaders, 450000);
         this.nebulaShaders = nebulaShaders;
+        this.modelBatch = modelBatch;
     }
 
     @Override
@@ -56,7 +58,7 @@ public class MilkyWayRenderSystem extends ImmediateRenderSystem implements IObse
 
         nebulatextures = new Texture[4];
         for (int i = 0; i < 4; i++) {
-            Texture tex = new Texture(Gdx.files.internal(GlobalConf.TEXTURES_FOLDER + "nebula00" + (i + 1) + ".png"));
+            Texture tex = new Texture(GlobalConf.data.dataFile("tex/nebula00" + (i + 1) + ".png"));
             tex.setFilter(TextureFilter.Linear, TextureFilter.Linear);
             nebulatextures[i] = tex;
         }
@@ -142,8 +144,7 @@ public class MilkyWayRenderSystem extends ImmediateRenderSystem implements IObse
                     // SIZE
                     double starSize = 0;
                     if (star.data.length > 3) {
-                        starSize = (star.data[3] * 3 + 1) /** (Constants.webgl ? 0.08f : 1f) */
-                        ;
+                        starSize = (star.data[3] * 3 + 1);
                     } else {
                         starSize = (float) Math.abs(rand.nextGaussian()) * 8f + 1.0f;
                     }

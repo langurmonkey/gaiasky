@@ -10,6 +10,7 @@ import com.badlogic.gdx.utils.Array;
 
 import gaia.cu9.ari.gaiaorbit.scenegraph.ParticleGroup.ParticleBean;
 import gaia.cu9.ari.gaiaorbit.scenegraph.StarGroup.StarBean;
+import gaia.cu9.ari.gaiaorbit.util.GlobalConf;
 import gaia.cu9.ari.gaiaorbit.util.I18n;
 import gaia.cu9.ari.gaiaorbit.util.Logger;
 
@@ -25,7 +26,7 @@ public class SerializedDataProvider extends AbstractStarGroupDataProvider {
     public Array<StarBean> loadData(String file, double factor) {
         logger.info(I18n.bundle.format("notif.datafile", file));
 
-        FileHandle f = Gdx.files.internal(file);
+        FileHandle f = GlobalConf.data.dataFileHandle(file);
         loadData(f.read(), factor);
         logger.info(I18n.bundle.format("notif.nodeloader", list.size, file));
 
