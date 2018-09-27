@@ -173,6 +173,7 @@ public class StarGroupRenderSystem extends ImmediateRenderSystem implements IObs
                             shaderProgram.setUniformf("u_camPos", camera.getCurrent().getPos().put(aux1));
                             shaderProgram.setUniformf("u_camDir", camera.getCurrent().getCamera().direction);
                             shaderProgram.setUniformi("u_cubemap", GlobalConf.program.CUBEMAP360_MODE ? 1 : 0);
+                            shaderProgram.setUniformf("u_vrScale", (float) Constants.VR_SCALE);
 
                             // Relativistic effects
                             addEffectsUniforms(shaderProgram, camera);

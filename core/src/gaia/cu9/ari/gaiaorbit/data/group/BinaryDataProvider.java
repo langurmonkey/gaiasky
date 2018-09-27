@@ -117,13 +117,13 @@ public class BinaryDataProvider extends AbstractStarGroupDataProvider {
         for (int i = 0; i < StarBean.I_APPMAG; i++) {
             data[i] = in.readDouble();
             if (i < 6)
-                data[i] *= Constants.M_TO_U_CONV;
+                data[i] *= Constants.VR_SCALE;
         }
         // Float
         for (int i = StarBean.I_APPMAG; i < StarBean.I_HIP; i++) {
             data[i] = in.readFloat();
             if (i == StarBean.I_SIZE)
-                data[i] *= Constants.M_TO_U_CONV;
+                data[i] *= Constants.VR_SCALE;
         }
         // Int
         for (int i = StarBean.I_HIP; i < StarBean.SIZE; i++) {
@@ -167,13 +167,13 @@ public class BinaryDataProvider extends AbstractStarGroupDataProvider {
         for (int i = 0; i < StarBean.I_APPMAG; i++) {
             data[i] = mem.getDouble();
             if (i < 6)
-                data[i] *= Constants.M_TO_U_CONV;
+                data[i] *= Constants.VR_SCALE;
         }
         // Float
         for (int i = StarBean.I_APPMAG; i < StarBean.I_HIP; i++) {
             data[i] = mem.getFloat();
             if (i == StarBean.I_SIZE)
-                data[i] *= Constants.M_TO_U_CONV;
+                data[i] *= Constants.VR_SCALE;
         }
         // Int
         for (int i = StarBean.I_HIP; i < StarBean.SIZE; i++) {

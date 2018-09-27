@@ -2,7 +2,7 @@
 
 	{
 		"name" : "Mercury orbit",
-		"color" : [.91, .52, .28, 0.4],
+		"color" : [.71, .32, .08, 0.7],
 		"ct": [ "Orbits", "Planets" ],
 		
 		"parent" : "Sol", 
@@ -17,7 +17,7 @@
 	
 	{
 		"name" : "Venus orbit",
-		"color" : [.86, .4, .24, 0.4],
+		"color" : [.76, .1, .04, 0.7],
 		"ct": [ "Orbits", "Planets" ],
 		
 		"parent" : "Sol", 
@@ -32,7 +32,7 @@
 	
 	{
 		"name" : "Earth orbit",
-		"color" : [.33, .56, .99, 0.4],
+		"color" : [.13, .26, .89, 0.7],
 		"ct": [ "Orbits", "Planets" ],
 		
 		"parent" : "Sol", 
@@ -47,7 +47,7 @@
 	
 	{
 		"name" : "Mars orbit",
-		"color" : [1.0, .4, .28, 0.4],
+		"color" : [1.0, .28, .08, 0.7],
 		"ct": [ "Orbits", "Planets" ],
 		
 		"parent" : "Sol", 
@@ -62,7 +62,7 @@
 	
 	{
 		"name" : "Jupiter orbit",
-		"color" : [.97, .72, .50, 0.4],
+		"color" : [.87, .62, .40, 0.7],
 		"ct": [ "Orbits", "Planets" ],
 		
 		"parent" : "Sol", 
@@ -77,7 +77,7 @@
 	
 	{
 		"name" : "Saturn orbit",
-		"color" : [.97, .83, .69, 0.4],
+		"color" : [.87, .73, .59, 0.7],
 		"ct": [ "Orbits", "Planets" ],
 		
 		"parent" : "Sol", 
@@ -92,7 +92,7 @@
 	
 	{
 		"name" : "Uranus orbit",
-		"color" : [.4, .7, .99, 0.4],
+		"color" : [.20, .56, .92, 0.7],
 		"ct": [ "Orbits", "Planets" ],
 		
 		"parent" : "Sol", 
@@ -107,7 +107,7 @@
 	
 	{
 		"name" : "Neptune orbit",
-		"color" : [.4, .7, .99, 0.4],
+		"color" : [.23, .36, .99, 0.7],
 		"ct": [ "Orbits", "Planets" ],
 		
 		"parent" : "Sol", 
@@ -121,7 +121,7 @@
 	
 	{
 		"name" : "Pluto orbit",
-		"color" : [.8, .68, .38, 0.4],
+		"color" : [.36, .18, .08, 0.7],
 		"ct": [ "Orbits", "Planets" ],
 		
 		"parent" : "Sol", 

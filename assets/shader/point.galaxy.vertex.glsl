@@ -13,6 +13,7 @@ uniform float u_pointAlphaMax;
 uniform float u_starBrightness;
 uniform mat4 u_projModelView;
 uniform vec3 u_camPos;
+uniform float u_vrScale;
 
 #ifdef relativisticEffects
     uniform vec3 u_velDir; // Velocity vector
@@ -44,7 +45,7 @@ void main() {
         pos = computeGravitationalWaves(pos, u_gw, u_gwmat3, u_ts, u_omgw, u_hterms);
     #endif // gravitationalWaves
     
-    float distNorm = dist / 1e15;
+    float distNorm = dist / (800000000000.0 * u_vrScale);
 
     v_col = a_color;
 

@@ -19,6 +19,7 @@ import gaia.cu9.ari.gaiaorbit.scenegraph.Orbit;
 import gaia.cu9.ari.gaiaorbit.scenegraph.SceneGraphNode.RenderGroup;
 import gaia.cu9.ari.gaiaorbit.scenegraph.camera.ICamera;
 import gaia.cu9.ari.gaiaorbit.scenegraph.component.OrbitComponent;
+import gaia.cu9.ari.gaiaorbit.util.Constants;
 import gaia.cu9.ari.gaiaorbit.util.GlobalConf;
 import gaia.cu9.ari.gaiaorbit.util.coord.AstroUtils;
 import gaia.cu9.ari.gaiaorbit.util.coord.Coordinates;
@@ -147,6 +148,8 @@ public class OrbitalElementsParticlesRenderSystem extends ImmediateRenderSystem 
                 shaderProgram.setUniformf("u_t", (float) currt);
                 // dt in seconds
                 shaderProgram.setUniformf("u_dt_s", (float) (86400d * (currt - ((Orbit) renderables.first()).oc.epoch)));
+                // VR scale
+                shaderProgram.setUniformf("u_vrScale", (float) Constants.VR_SCALE);
 
                 // Relativistic effects
                 addEffectsUniforms(shaderProgram, camera);

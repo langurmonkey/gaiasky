@@ -101,7 +101,7 @@ public class OctreeGroupLoader extends StreamingOctreeLoader {
         Array<StarBean> data = (Array<StarBean>) particleReader.loadDataMapped(octantFile.path(), 1.0);
         StarGroup sg = new StarGroup();
         sg.setName("stargroup-" + sg.id);
-        sg.setFadeout(new double[] { 21e5, .5e9 });
+        sg.setFadeout(new double[] { 21e2, .5e5 });
         sg.setLabelcolor(new double[] { 1.0, 1.0, 1.0, 1.0 });
         sg.setColor(new double[] { 1.0, 1.0, 1.0, 0.25 });
         sg.setSize(6.0);

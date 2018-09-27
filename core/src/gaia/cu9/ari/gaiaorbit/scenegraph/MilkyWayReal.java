@@ -71,8 +71,8 @@ public class MilkyWayReal extends AbstractPositionEntity implements I3DTextRende
         /** Load data **/
         PointDataProvider provider = new PointDataProvider();
         try {
-            starData = provider.loadData(gc.starsource);
-            nebulaData = provider.loadData(gc.nebulasource);
+            starData = provider.loadData(gc.starsource, 1d / Constants.VR_SCALE);
+            nebulaData = provider.loadData(gc.nebulasource, 1d / Constants.VR_SCALE);
         } catch (Exception e) {
             Logger.getLogger(this.getClass()).error(e);
         }

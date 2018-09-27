@@ -80,12 +80,12 @@ public class MetadataBinaryIO {
                 try {
                     // name_length, name, appmag, absmag, colorbv, ra, dec, dist
                     long pageId = data_in.readInt();
-                    float x = data_in.readFloat() * (float) Constants.M_TO_U_CONV;
-                    float y = data_in.readFloat() * (float) Constants.M_TO_U_CONV;
-                    float z = data_in.readFloat() * (float) Constants.M_TO_U_CONV;
-                    float hsx = (data_in.readFloat() / 2f) * (float) Constants.M_TO_U_CONV;
-                    float hsy = (data_in.readFloat() / 2f) * (float) Constants.M_TO_U_CONV;
-                    float hsz = (data_in.readFloat() / 2f) * (float) Constants.M_TO_U_CONV;
+                    float x = data_in.readFloat() * (float) Constants.VR_SCALE;
+                    float y = data_in.readFloat() * (float) Constants.VR_SCALE;
+                    float z = data_in.readFloat() * (float) Constants.VR_SCALE;
+                    float hsx = (data_in.readFloat() / 2f) * (float) Constants.VR_SCALE;
+                    float hsy = (data_in.readFloat() / 2f) * (float) Constants.VR_SCALE;
+                    float hsz = (data_in.readFloat() / 2f) * (float) Constants.VR_SCALE;
                     long[] childrenIds = new long[8];
                     for (int i = 0; i < 8; i++) {
                         childrenIds[i] = data_in.readInt();
@@ -149,10 +149,10 @@ public class MetadataBinaryIO {
                 try {
                     // name_length, name, appmag, absmag, colorbv, ra, dec, dist
                     long pageId = mem.getInt();
-                    float x = mem.getFloat();
-                    float y = mem.getFloat();
-                    float z = mem.getFloat();
-                    float hsx = mem.getFloat() / 2f;
+                    float x = mem.getFloat() * (float) Constants.VR_SCALE;
+                    float y = mem.getFloat() * (float) Constants.VR_SCALE;
+                    float z = mem.getFloat() * (float) Constants.VR_SCALE;
+                    float hsx = (mem.getFloat() / 2f) * (float) Constants.VR_SCALE;
                     //float hsy = mem.getFloat() / 2f;
                     mem.position(mem.position() + 4); // skip hsy
                     float hsy = hsx;

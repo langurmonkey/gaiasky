@@ -5,7 +5,7 @@
 		"ct": [ "Locations" ],
 		"name" : "FoV2",				
 		"location" : [141.0, 62.0],
-		"size" : 10.0,
+		"size" : 0.00003,
 		"distFactor" : 0.55
 	},
 	{
@@ -14,7 +14,7 @@
 		"ct": [ "Locations" ],
 		"name" : "FoV1",				
 		"location" : [35.0, 62.0],
-		"size" : 10.0,
+		"size" : 0.00003,
 		"distFactor" : 0.55
 	},
 	{
@@ -23,7 +23,7 @@
 		"ct": [ "Locations" ],
 		"name" : "Sunshield",				
 		"location" : [0.0, -90.0],
-		"size" : 10.0,
+		"size" : 0.00003,
 		"distFactor" : 0.1
 	}
 ]}

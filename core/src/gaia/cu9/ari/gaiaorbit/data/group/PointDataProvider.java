@@ -4,11 +4,11 @@ import java.io.BufferedReader;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 
-import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.utils.Array;
 
 import gaia.cu9.ari.gaiaorbit.scenegraph.ParticleGroup.ParticleBean;
+import gaia.cu9.ari.gaiaorbit.util.Constants;
 import gaia.cu9.ari.gaiaorbit.util.GlobalConf;
 import gaia.cu9.ari.gaiaorbit.util.I18n;
 import gaia.cu9.ari.gaiaorbit.util.Logger;
@@ -23,7 +23,7 @@ import gaia.cu9.ari.gaiaorbit.util.Logger.Log;
  */
 public class PointDataProvider implements IParticleGroupDataProvider {
     private static final Log logger = Logger.getLogger(PointDataProvider.class);
-    
+
     public Array<? extends ParticleBean> loadData(String file) {
         return loadData(file, 1d);
     }
@@ -31,7 +31,7 @@ public class PointDataProvider implements IParticleGroupDataProvider {
     public Array<? extends ParticleBean> loadData(String file, double factor) {
         FileHandle f = GlobalConf.data.dataFileHandle(file);
         @SuppressWarnings("unchecked")
-        Array<ParticleBean> pointData = (Array<ParticleBean>) loadData(f.read(), factor);
+        Array<ParticleBean> pointData = (Array<ParticleBean>) loadData(f.read(), factor * Constants.VR_SCALE);
 
         if (pointData != null)
             logger.info(I18n.bundle.format("notif.nodeloader", pointData.size, file));

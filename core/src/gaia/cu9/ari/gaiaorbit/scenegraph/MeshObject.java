@@ -21,6 +21,7 @@ import gaia.cu9.ari.gaiaorbit.render.system.FontRenderSystem;
 import gaia.cu9.ari.gaiaorbit.scenegraph.camera.ICamera;
 import gaia.cu9.ari.gaiaorbit.scenegraph.component.ITransform;
 import gaia.cu9.ari.gaiaorbit.scenegraph.component.ModelComponent;
+import gaia.cu9.ari.gaiaorbit.util.Constants;
 import gaia.cu9.ari.gaiaorbit.util.Logger;
 import gaia.cu9.ari.gaiaorbit.util.coord.Coordinates;
 import gaia.cu9.ari.gaiaorbit.util.math.Vector3d;
@@ -39,7 +40,7 @@ public class MeshObject extends FadeNode implements IModelRenderable, I3DTextRen
 
     /** TRANSFORMATIONS - are applied each cycle **/
     public ITransform[] transformations;
-    
+
     // Aux array
     private float[] valuesf;
 
@@ -241,6 +242,16 @@ public class MeshObject extends FadeNode implements IModelRenderable, I3DTextRen
     @Override
     public boolean isLabel() {
         return true;
+    }
+
+    @Override
+    public void setSize(Double size) {
+        this.size = (float) (size * Constants.VR_SCALE);
+    }
+
+    @Override
+    public void setSize(Long size) {
+        this.size = (float) (size.doubleValue() * Constants.VR_SCALE);
     }
 
 }

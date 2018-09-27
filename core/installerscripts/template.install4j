@@ -39,11 +39,7 @@
           <versionLine x="20" y="40" text="version ${compiler:sys.version}" fontSize="8" fontColor="0,0,0" bold="false" />
         </text>
       </splashScreen>
-<<<<<<< HEAD:core/installerscripts/template.install4j
-      <java mainClass="gaia.cu9.ari.gaiaorbit.desktop.GaiaSkyDesktop" vmParameters="-Xms2g -Xmx3g -XX:+UseG1GC -Dassets.location=./" arguments="" allowVMPassthroughParameters="true" preferredVM="" bundleRuntime="true">
-=======
       <java mainClass="gaia.cu9.ari.gaiaorbit.desktop.GaiaSkyDesktop" vmParameters="-Xms2g -Xmx4g -XX:+UseG1GC -Dassets.location=${launcher:sys.launcherDirectory}/" arguments="" allowVMPassthroughParameters="true" preferredVM="" bundleRuntime="true">
->>>>>>> lwjgl3:core/installerscripts/template.install4j
         <classPath>
           <scanDirectory location="lib" failOnError="false" />
         </classPath>
@@ -66,8 +62,6 @@
         <file path="@gs-git-folder@/assets/icon/gs_032.png" />
         <file path="@gs-git-folder@/assets/icon/gs_064.png" />
         <file path="@gs-git-folder@/assets/icon/gs_128.png" />
-<<<<<<< HEAD:core/installerscripts/template.install4j
-=======
       </iconImageFiles>
     </launcher>
     <launcher name="gaiasky32" id="227" customizedId="" external="false" excludeFromMenu="false" unixMode="755" unixAutoStart="true" menuName="${compiler:sys.fullName}" icnsFile="" customMacBundleIdentifier="false" macBundleIdentifier="" swtApp="false" fileset="" macBundleBinary="JavaApplicationStub" addMacEntitlements="false" macEntitlementsFile="" useCustomMacosExecutableName="false" customMacosExecutableName="" useJavaMinVersionOverride="false" javaMinVersionOverride="" useJavaMaxVersionOverride="false" javaMaxVersionOverride="">
@@ -138,7 +132,6 @@
         <file path="@gs-git-folder@/assets/icon/gs_032.png" />
         <file path="@gs-git-folder@/assets/icon/gs_064.png" />
         <file path="@gs-git-folder@/assets/icon/gs_128.png" />
->>>>>>> lwjgl3:core/installerscripts/template.install4j
       </iconImageFiles>
     </launcher>
   </launchers>
@@ -519,11 +512,7 @@
     </applications>
   </installerGui>
   <mediaSets>
-<<<<<<< HEAD:core/installerscripts/template.install4j
-    <windows name="Windows 64" id="25" customizedId="" mediaFileName="" installDir="${compiler:sys.fullName}" overridePrincipalLanguage="false" jreBitType="64" runPostProcessor="false" postProcessor="" failOnPostProcessorError="false" useLegacyMediaFileIds="false" legacyMediaFileIds="" downloadURL="" includeAllDownloadableComponents="false" includedJRE="windows-amd64-1.8.0_162" manualJREEntry="false" bundleType="1" jreURL="" jreShared="false" directDownload="false" installOnlyIfNecessary="false" customInstallBaseDir="" contentFilesType="1" verifyIntegrity="true">
-=======
     <windows name="Windows 64" id="25" customizedId="" mediaFileName="" installDir="${compiler:sys.fullName}" overridePrincipalLanguage="false" jreBitType="64" runPostProcessor="false" postProcessor="" failOnPostProcessorError="false" useLegacyMediaFileIds="false" legacyMediaFileIds="" downloadURL="" includeAllDownloadableComponents="false" includedJRE="windows-amd64-1.8.0_181" manualJREEntry="false" bundleType="1" jreURL="" jreShared="false" directDownload="false" installOnlyIfNecessary="false" customInstallBaseDir="" contentFilesType="1" verifyIntegrity="true">
->>>>>>> lwjgl3:core/installerscripts/template.install4j
       <excludedComponents />
       <includedDownloadableComponents />
       <excludedLaunchers>
@@ -545,11 +534,7 @@
         <customAttributes />
       </autoUpdate>
     </windows>
-<<<<<<< HEAD:core/installerscripts/template.install4j
-    <windows name="Windows 32" id="76" customizedId="" mediaFileName="" installDir="${compiler:sys.fullName}" overridePrincipalLanguage="false" jreBitType="32" runPostProcessor="false" postProcessor="" failOnPostProcessorError="false" useLegacyMediaFileIds="false" legacyMediaFileIds="" downloadURL="" includeAllDownloadableComponents="false" includedJRE="windows-x86-1.8.0_162" manualJREEntry="false" bundleType="1" jreURL="" jreShared="false" directDownload="false" installOnlyIfNecessary="false" customInstallBaseDir="" contentFilesType="1" verifyIntegrity="true">
-=======
     <windows name="Windows 32" id="76" customizedId="" mediaFileName="" installDir="${compiler:sys.fullName}" overridePrincipalLanguage="false" jreBitType="32" runPostProcessor="false" postProcessor="" failOnPostProcessorError="false" useLegacyMediaFileIds="false" legacyMediaFileIds="" downloadURL="" includeAllDownloadableComponents="false" includedJRE="windows-x86-1.8.0_181" manualJREEntry="false" bundleType="1" jreURL="" jreShared="false" directDownload="false" installOnlyIfNecessary="false" customInstallBaseDir="" contentFilesType="1" verifyIntegrity="true">
->>>>>>> lwjgl3:core/installerscripts/template.install4j
       <excludedComponents />
       <includedDownloadableComponents />
       <excludedLaunchers>
@@ -571,19 +556,12 @@
         <customAttributes />
       </autoUpdate>
     </windows>
-<<<<<<< HEAD:core/installerscripts/template.install4j
-    <macos name="macOS Single Bundle" id="221" customizedId="" mediaFileName="" installDir="${compiler:sys.fullName}" overridePrincipalLanguage="false" jreBitType="all" runPostProcessor="false" postProcessor="" failOnPostProcessorError="false" useLegacyMediaFileIds="false" legacyMediaFileIds="" downloadURL="" includeAllDownloadableComponents="false" includedJRE="macosx-amd64-1.8.0_162_unpacked" manualJREEntry="false" bundleType="1" jreURL="" jreShared="false" directDownload="false" installOnlyIfNecessary="false" appleJre="false" requiredVmIdPrefix="" customInstallBaseDir="" contentFilesType="1" installerName="${i18n:InstallerName(${compiler:sys.fullName})}" volumeName="${compiler:sys.shortName}" compressDmg="false" launcherId="22">
-=======
     <macos name="macOS Single Bundle" id="221" customizedId="" mediaFileName="" installDir="${compiler:sys.fullName}" overridePrincipalLanguage="false" jreBitType="all" runPostProcessor="false" postProcessor="" failOnPostProcessorError="false" useLegacyMediaFileIds="false" legacyMediaFileIds="" downloadURL="" includeAllDownloadableComponents="false" includedJRE="macosx-amd64-1.8.0_181" manualJREEntry="false" bundleType="1" jreURL="" jreShared="false" directDownload="false" installOnlyIfNecessary="false" appleJre="false" requiredVmIdPrefix="" customInstallBaseDir="" contentFilesType="1" installerName="${i18n:InstallerName(${compiler:sys.fullName})}" volumeName="${compiler:sys.shortName}" compressDmg="false" launcherId="342">
->>>>>>> lwjgl3:core/installerscripts/template.install4j
       <excludedComponents />
       <includedDownloadableComponents />
       <excludedBeans />
       <overriddenPrincipalLanguage id="en" customLocalizationFile="" />
       <exclude>
-<<<<<<< HEAD:core/installerscripts/template.install4j
-        <entry location="gaiasky.cmd" fileType="regular" />
-=======
         <entry location="gs.desktop" fileType="regular" />
         <entry location="gaiasky.cmd" fileType="regular" />
       </exclude>
@@ -602,7 +580,6 @@
       <exclude>
         <entry location="gs.desktop" fileType="regular" />
         <entry location="gaiasky.cmd" fileType="regular" />
->>>>>>> lwjgl3:core/installerscripts/template.install4j
       </exclude>
       <variables />
       <autoUpdate useMinUpdatableVersion="false" minUpdatableVersion="" useMaxUpdatableVersion="false" maxUpdatableVersion="">

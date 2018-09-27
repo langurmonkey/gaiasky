@@ -20,6 +20,8 @@ uniform float u_scaleFactor;
 uniform float u_t;
 // dt in seconds since epoch (assumes all objects have the same epoch!)
 uniform float u_dt_s;
+// VR scaling, if any
+uniform float u_vrScale;
 
 #ifdef relativisticEffects
     uniform vec3 u_velDir; // Velocity vector
@@ -39,7 +41,7 @@ uniform float u_dt_s;
     
 varying vec4 v_col;
 
-#define M_TO_U 1e-6
+#define M_TO_U 1e-9
 
 // see https://downloads.rene-schwarz.com/download/M001-Keplerian_Orbit_Elements_to_Cartesian_State_Vectors.pdf
 vec4 keplerToCartesian() {
@@ -93,9 +95,10 @@ vec4 keplerToCartesian() {
     float z = ox * (sinomega * sini) + oy * (cosomega * sini);
     
     // 7
-    x *= M_TO_U;
-    y *= M_TO_U;
-    z *= M_TO_U;
+    float fac = M_TO_U * u_vrScale;
+    x *= fac;
+    y *= fac;
+    z *= fac;
     
     return vec4(y, z, x, 1.0);
 }

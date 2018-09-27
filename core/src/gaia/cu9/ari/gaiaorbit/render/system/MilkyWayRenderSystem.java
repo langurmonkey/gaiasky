@@ -125,10 +125,10 @@ public class MilkyWayRenderSystem extends ImmediateRenderSystem implements IObse
                     aux1.set((float) star.data[0], (float) star.data[1], (float) star.data[2]);
                     double distanceCenter = aux1.sub(center).len() / (mw.getRadius() * 2f);
 
-                    float[] col = new float[] { (float) (rand.nextGaussian() * 0.02f) + 0.9f, (float) (rand.nextGaussian() * 0.02) + 0.7f, (float) (rand.nextGaussian() * 0.02) + 0.97f, rand.nextFloat() * 0.5f + 0.4f };
+                    float[] col = new float[] { (float) (rand.nextGaussian() * 0.02f) + 0.93f, (float) (rand.nextGaussian() * 0.02) + 0.8f, (float) (rand.nextGaussian() * 0.02) + 0.97f, rand.nextFloat() * 0.5f + 0.4f };
 
                     if (distanceCenter < 1f) {
-                        float add = (float) MathUtilsd.clamp(1f - distanceCenter, 0f, 1f) * 0.3f;
+                        float add = (float) MathUtilsd.clamp(1f - distanceCenter, 0f, 1f) * 0.5f;
                         col[0] = col[0] + add;
                         col[1] = col[1] + add;
                         col[2] = col[2] + add;
@@ -187,7 +187,7 @@ public class MilkyWayRenderSystem extends ImmediateRenderSystem implements IObse
                         } else {
                             texnum = rand.nextInt(4);
                         }
-                        quadsize = (float) ((qp.data.length > 3 ? (qp.data[3] + 0.7f) * .2e11f : (rand.nextFloat() + 1.0f) * 0.7e11f) * Constants.M_TO_U_CONV);
+                        quadsize = (float) ((qp.data.length > 3 ? (qp.data[3] + 0.7f) * .2e11f : (rand.nextFloat() + 1.0f) * 0.7e11f) * Constants.VR_SCALE);
                         alphamultiplier = MathUtilsd.lint(quadpointdist, 0, mw.size * 3, 6.0f, 1.0f);
 
                         rotaxis.set(rand.nextFloat(), rand.nextFloat(), rand.nextFloat());
@@ -331,6 +331,7 @@ public class MilkyWayRenderSystem extends ImmediateRenderSystem implements IObse
                     shaderProgram.setUniformf("u_camPos", camera.getCurrent().getPos().put(aux1));
                     shaderProgram.setUniformf("u_alpha", mw.opacity * alpha * 0.2f);
                     shaderProgram.setUniformf("u_ar", GlobalConf.program.STEREOSCOPIC_MODE && (GlobalConf.program.STEREO_PROFILE != StereoProfile.HD_3DTV_HORIZONTAL && GlobalConf.program.STEREO_PROFILE != StereoProfile.ANAGLYPHIC) ? 0.5f : 1f);
+                    shaderProgram.setUniformf("u_vrScale", (float) Constants.VR_SCALE);
 
                     // Relativistic effects
                     addEffectsUniforms(shaderProgram, camera);

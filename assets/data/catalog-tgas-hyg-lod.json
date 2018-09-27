@@ -4,6 +4,6 @@
 	"data" : [
 	{
 		"loader": "gaia.cu9.ari.gaiaorbit.data.group.OctreeGroupLoader",
-		"files": [ "data/octree/tgas/group-bin/particles/", "data/octree/tgas/group-bin/metadata.bin" ]
+		"files": [ "data/octree/tgas/tgas-0.9-0.125/particles/", "data/octree/tgas/tgas-0.9-0.125/metadata.bin" ]
 	}
 ]}

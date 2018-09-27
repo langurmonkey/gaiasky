@@ -5,7 +5,7 @@
 	"wikiname" : "Gaia (spacecraft)",
 	"color" : [0.7, 0.8, 0.1, 1.0],
 	// 5m of radius, 0.005 Km
-	"size" : 2000.0,
+	"size" : 0.005,
 	"ct" : Satellites,
 
 	"mag" : 3.78,
@@ -14,7 +14,6 @@
 	"impl" : "gaia.cu9.ari.gaiaorbit.scenegraph.Gaia",
 
 	"locvamultiplier" : 7.0,
-	"locthoverfactor" : 4E-9,
 
 	"coordinates" : {
 				// This must implement gaia.cu9.ari.gaiaorbit.util.coord.IBodyCoordinates				
@@ -36,7 +35,7 @@
 	"name" : "Spacecraft",
 	"color" : [0.3, 0.5, 0.9, 1.0],
 	// in Km
-	"size" : 10000.0,
+	"size" : 10.0,
 	"ct" : Satellites,
 	// in Kg
 	"mass" : 2e5,
@@ -60,11 +59,7 @@
         "name" : "Solar sail",
         "color" : [0.3, 0.5, 0.9, 1.0],
         // in Km
-<<<<<<< HEAD:assets/data/satellites.json
-        "size" : 2000.0,
-=======
         "size" : 0.01,
->>>>>>> lwjgl3:assets/data/satellites.json
         "ct" : Satellites,
 
         "parent" : "Universe",

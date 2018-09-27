@@ -3,19 +3,15 @@ package gaia.cu9.ari.gaiaorbit.util;
 public class Constants {
 
     /**
-     * Scale factor that applies to all distances.
+     * Spatial unit scaling in VR
      */
-    public static final double M_TO_U_ORIGINAL = 1e-9;
+    public static final double VR_SCALE = 1000d;
 
     /**
      * Metre to local unit conversion. Multiply this by all values in m.
      */
-    public static final double M_TO_U = 1e-6;
+    public static final double M_TO_U = 1e-9 * VR_SCALE;
 
-    /**
-     * Conversion from original to VR scaling
-     */
-    public static final double M_TO_U_CONV = M_TO_U / M_TO_U_ORIGINAL;
     public static final double SCENE_SCALE_FACTOR = 5e-6;
 
     /**
@@ -66,7 +62,6 @@ public class Constants {
      * Local unit to Kpc conversion.
      */
     public static final double U_TO_KPC = U_TO_PC / 1000d;
-
 
     /**
      * Speed of light in m/s
