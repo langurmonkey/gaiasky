@@ -1,5 +1,10 @@
 package gaia.cu9.ari.gaiaorbit.interfce.components;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.graphics.Color;
@@ -24,6 +29,7 @@ import gaia.cu9.ari.gaiaorbit.event.EventManager;
 import gaia.cu9.ari.gaiaorbit.event.Events;
 import gaia.cu9.ari.gaiaorbit.event.IObserver;
 import gaia.cu9.ari.gaiaorbit.interfce.NaturalInputListener;
+import gaia.cu9.ari.gaiaorbit.scenegraph.Constellation;
 import gaia.cu9.ari.gaiaorbit.scenegraph.IFocus;
 import gaia.cu9.ari.gaiaorbit.scenegraph.ISceneGraph;
 import gaia.cu9.ari.gaiaorbit.scenegraph.MeshObject;
@@ -37,7 +43,9 @@ import gaia.cu9.ari.gaiaorbit.util.TwoWayHashmap;
 import gaia.cu9.ari.gaiaorbit.util.comp.CelestialBodyComparator;
 import gaia.cu9.ari.gaiaorbit.util.scene2d.OwnCheckBox;
 import gaia.cu9.ari.gaiaorbit.util.scene2d.OwnImageButton;
+import gaia.cu9.ari.gaiaorbit.util.scene2d.OwnLabel;
 import gaia.cu9.ari.gaiaorbit.util.scene2d.OwnScrollPane;
+import gaia.cu9.ari.gaiaorbit.util.scene2d.OwnTextButton;
 import gaia.cu9.ari.gaiaorbit.util.scene2d.OwnTextField;
 
 public class ObjectsComponent extends GuiComponent implements IObserver {
@@ -63,6 +71,8 @@ public class ObjectsComponent extends GuiComponent implements IObserver {
 
     @Override
     public void initialize() {
+        float sp1 = 1 * GlobalConf.SCALE_FACTOR;
+        float sp4 = 4 * GlobalConf.SCALE_FACTOR;
         float componentWidth = 160 * GlobalConf.SCALE_FACTOR;
         searchBox = new OwnTextField("", skin);
         searchBox.setName("search box");
@@ -103,6 +113,10 @@ public class ObjectsComponent extends GuiComponent implements IObserver {
             return false;
         });
 
+        /**
+         * OBJECTS
+         */
+
         treeToModel = new TwoWayHashmap<SceneGraphNode, Node>();
 
         logger.info(txt("notif.sgtree.init"));
@@ -110,8 +124,8 @@ public class ObjectsComponent extends GuiComponent implements IObserver {
         if (tree) {
             final Tree objectsTree = new Tree(skin, "bright");
             objectsTree.setName("objects list");
-            objectsTree.setPadding(1 * GlobalConf.SCALE_FACTOR);
-            objectsTree.setIconSpacing(1 * GlobalConf.SCALE_FACTOR, 1 * GlobalConf.SCALE_FACTOR);
+            objectsTree.setPadding(sp1);
+            objectsTree.setIconSpacing(sp1, sp1);
             objectsTree.setYSpacing(0);
             Array<Node> nodes = createTree(sg.getRoot().children);
             for (Node node : nodes) {
@@ -205,6 +219,10 @@ public class ObjectsComponent extends GuiComponent implements IObserver {
             focusListScrollPane.setWidth(componentWidth);
         }
 
+        /**
+         * MESHES
+         */
+
         // Get meshes
         Array<SceneGraphNode> meshes = new Array<SceneGraphNode>();
         sg.getRoot().getChildrenByType(MeshObject.class, meshes);
@@ -215,7 +233,7 @@ public class ObjectsComponent extends GuiComponent implements IObserver {
             meshesGroup = new VerticalGroup();
             meshesGroup.left();
             meshesGroup.columnLeft();
-            meshesGroup.space(4 * GlobalConf.SCALE_FACTOR);
+            meshesGroup.space(sp4);
 
             Label meshesLabel = new Label(txt("gui.meshes"), skin, "header");
             meshesGroup.addActor(meshesLabel);
@@ -223,7 +241,7 @@ public class ObjectsComponent extends GuiComponent implements IObserver {
             VerticalGroup meshesVertical = new VerticalGroup();
             meshesVertical.left();
             meshesVertical.columnLeft();
-            meshesVertical.space(4 * GlobalConf.SCALE_FACTOR);
+            meshesVertical.space(sp4);
             OwnScrollPane meshesScroll = new OwnScrollPane(meshesVertical, skin, "minimalist-nobg");
             meshesScroll.setScrollingDisabled(false, true);
             meshesScroll.setForceScroll(true, false);
@@ -235,9 +253,9 @@ public class ObjectsComponent extends GuiComponent implements IObserver {
             for (SceneGraphNode node : meshes) {
                 MeshObject mesh = (MeshObject) node;
                 HorizontalGroup meshGroup = new HorizontalGroup();
-                meshGroup.space(4 * GlobalConf.SCALE_FACTOR);
+                meshGroup.space(sp4);
                 meshGroup.left();
-                OwnCheckBox meshCb = new OwnCheckBox(mesh.name, skin, 5 * GlobalConf.SCALE_FACTOR);
+                OwnCheckBox meshCb = new OwnCheckBox(mesh.name, skin, sp4);
                 meshCb.setChecked(true);
                 meshCb.addListener((event) -> {
                     if (event instanceof ChangeEvent) {
@@ -259,7 +277,96 @@ public class ObjectsComponent extends GuiComponent implements IObserver {
             meshesGroup.addActor(meshesScroll);
         }
 
-        VerticalGroup objectsGroup = new VerticalGroup().align(Align.left).columnAlign(Align.left).space(3 * GlobalConf.SCALE_FACTOR);
+        /**
+         * CONSTELLATIONS
+         */
+
+        VerticalGroup constelList = new VerticalGroup();
+        constelList.space(sp4);
+        constelList.left();
+        constelList.columnLeft();
+        Array<SceneGraphNode> constelObjects = new Array<SceneGraphNode>();
+        List<OwnCheckBox> constelCbs = new ArrayList<OwnCheckBox>();
+        sg.getRoot().getChildrenByType(Constellation.class, constelObjects);
+        Array<String> constelNames = new Array<String>(constelObjects.size);
+        Map<String, Constellation> cmap = new HashMap<String, Constellation>();
+
+        for (SceneGraphNode constel : constelObjects) {
+            // Omit stars with no proper names
+            if (constel.getName() != null && !GlobalResources.isNumeric(constel.getName())) {
+                constelNames.add(constel.getName());
+                cmap.put(constel.getName(), (Constellation) constel);
+            }
+        }
+        constelNames.sort();
+
+        for (String name : constelNames) {
+            OwnCheckBox constelCb = new OwnCheckBox(name, skin, sp4);
+            constelCb.setChecked(cmap.get(name).isVisible());
+
+            constelCb.addListener((event) -> {
+                if (event instanceof ChangeEvent && cmap.containsKey(name)) {
+                    Gdx.app.postRunnable(() -> {
+                        cmap.get(name).setVisible(constelCb.isChecked());
+                    });
+                    return true;
+                }
+                return false;
+            });
+
+            constelList.addActor(constelCb);
+            constelCbs.add(constelCb);
+        }
+
+        constelList.pack();
+        OwnScrollPane constelScrollPane = new OwnScrollPane(constelList, skin, "minimalist-nobg");
+        constelScrollPane.setName("constellations scroll");
+
+        constelScrollPane.setFadeScrollBars(false);
+        constelScrollPane.setScrollingDisabled(true, false);
+
+        constelScrollPane.setHeight(100 * GlobalConf.SCALE_FACTOR);
+        constelScrollPane.setWidth(componentWidth);
+
+        HorizontalGroup constelButtons = new HorizontalGroup();
+        constelButtons.space(sp4);
+        OwnTextButton selAll = new OwnTextButton(txt("gui.select.all"), skin);
+        selAll.addListener((event) -> {
+            if (event instanceof ChangeEvent) {
+                Gdx.app.postRunnable(()->{
+                   constelCbs.stream().forEach((i) -> i.setChecked(true));
+                });
+                return true;
+            }
+            return false;
+        });
+        OwnTextButton selNone = new OwnTextButton(txt("gui.select.none"), skin);
+        selNone.addListener((event) -> {
+            if (event instanceof ChangeEvent) {
+                Gdx.app.postRunnable(()->{
+                   constelCbs.stream().forEach((i) -> i.setChecked(false));
+                });
+                return true;
+            }
+            return false;
+        });
+        constelButtons.addActor(selAll);
+        constelButtons.addActor(selNone);
+        
+        VerticalGroup constelGroup = new VerticalGroup();
+        constelGroup.left();
+        constelGroup.columnLeft();
+        constelGroup.space(sp4);
+
+        constelGroup.addActor(new OwnLabel(GlobalResources.trueCapitalise(txt("element.constellations")), skin, "header"));
+        constelGroup.addActor(constelScrollPane);
+        constelGroup.addActor(constelButtons);
+
+        /**
+         * ADD TO CONTENT
+         */
+
+        VerticalGroup objectsGroup = new VerticalGroup().align(Align.left).columnAlign(Align.left).space(sp4);
         objectsGroup.addActor(searchBox);
         if (focusListScrollPane != null) {
             objectsGroup.addActor(focusListScrollPane);
@@ -267,6 +374,10 @@ public class ObjectsComponent extends GuiComponent implements IObserver {
 
         if (meshesGroup != null) {
             objectsGroup.addActor(meshesGroup);
+        }
+
+        if (constelList != null) {
+            objectsGroup.addActor(constelGroup);
         }
 
         component = objectsGroup;
