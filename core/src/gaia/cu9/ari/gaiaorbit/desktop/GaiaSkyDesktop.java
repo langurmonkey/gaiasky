@@ -244,11 +244,10 @@ public class GaiaSkyDesktop implements IObserver {
 
         if (lw != null)
             EventManager.instance.removeAllSubscriptions(lw);
-        
+
         // Launch app
         Lwjgl3Application app = new Lwjgl3Application(new GaiaSky(gsargs.download, gsargs.catalogchooser), cfg);
         app.addLifecycleListener(new GaiaSkyWindowListener());
-
     }
 
     @Override

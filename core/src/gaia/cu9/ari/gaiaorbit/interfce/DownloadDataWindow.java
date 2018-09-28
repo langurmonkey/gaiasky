@@ -120,6 +120,7 @@ public class DownloadDataWindow extends GenericDialog {
 
     @Override
     protected void build() {
+        me.acceptButton.setDisabled(false);
         float pad = 2 * GlobalConf.SCALE_FACTOR;
         float padl = 9 * GlobalConf.SCALE_FACTOR;
         float minw = GlobalConf.SCALE_FACTOR == 1 ? 550 : 650;
@@ -154,7 +155,7 @@ public class DownloadDataWindow extends GenericDialog {
             downloadTable.add(catalogsLoc).left().padLeft(pad).padBottom(padl).row();
             Cell<Actor> notice = downloadTable.add((Actor) null).colspan(2).padBottom(padl);
             notice.row();
-            
+
             catalogsLoc.addListener((event) -> {
                 if (event instanceof ChangeEvent) {
                     FileChooser fc = FileChooser.createPickDialog(txt("gui.download.pickloc"), skin, Gdx.files.absolute(GlobalConf.data.DATA_LOCATION));
@@ -232,7 +233,7 @@ public class DownloadDataWindow extends GenericDialog {
             if (baseData && !exists) {
                 me.acceptButton.setDisabled(true);
             }
-
+            
             String description = dataset.getString("description");
             String shortDescription;
             HorizontalGroup descGroup = new HorizontalGroup();
