@@ -11,6 +11,7 @@ import com.badlogic.gdx.utils.IntMap;
 import gaia.cu9.ari.gaiaorbit.GaiaSky;
 import gaia.cu9.ari.gaiaorbit.render.ComponentType;
 import gaia.cu9.ari.gaiaorbit.render.I3DTextRenderable;
+import gaia.cu9.ari.gaiaorbit.render.ILineRenderable;
 import gaia.cu9.ari.gaiaorbit.render.RenderingContext;
 import gaia.cu9.ari.gaiaorbit.render.system.FontRenderSystem;
 import gaia.cu9.ari.gaiaorbit.render.system.LineRenderSystem;
@@ -30,7 +31,7 @@ import gaia.cu9.ari.gaiaorbit.util.tree.IPosition;
  * @author Toni Sagrista
  *
  */
-public class Constellation extends LineObject implements I3DTextRenderable {
+public class Constellation extends FadeNode implements ILineRenderable, I3DTextRenderable {
     private static Array<Constellation> allConstellations = new Array<Constellation>(88);
     private double deltaYears;
 
@@ -86,6 +87,9 @@ public class Constellation extends LineObject implements I3DTextRenderable {
         }
         pos.scl((1d / nstars));
         pos.nor().scl(100 * Constants.PC_TO_U);
+        
+        super.updateLocal(time, camera);
+        
         addToRenderLists(camera);
 
         deltaYears = AstroUtils.getMsSince(time.getTime(), AstroUtils.JD_J2015_5) * Nature.MS_TO_Y;
@@ -121,7 +125,7 @@ public class Constellation extends LineObject implements I3DTextRenderable {
     @Override
     public void render(LineRenderSystem renderer, ICamera camera, float alpha) {
         constalpha = alpha;
-        alpha *= this.alpha;
+        alpha *= this.alpha * opacity;
 
         Vector3 campos = aux3f1.get();
         Vector3 p1 = aux3f2.get();
@@ -165,10 +169,11 @@ public class Constellation extends LineObject implements I3DTextRenderable {
 
     @Override
     protected void addToRenderLists(ICamera camera) {
+        if(isVisible()) {
         addToRender(this, RenderGroup.LINE);
         if (renderText()) {
             addToRender(this, RenderGroup.FONT_LABEL);
-
+        }
         }
     }
 
@@ -223,5 +228,5 @@ public class Constellation extends LineObject implements I3DTextRenderable {
     public float getLineWidth() {
         return 1;
     }
-
+    
 }
