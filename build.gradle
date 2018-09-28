@@ -22,7 +22,7 @@ allprojects {
     apply plugin: "eclipse"
     apply plugin: "idea"
 
-    version = "2.0.2"
+    version = "2.1.2"
 
     ext {
         appName = "GaiaSky"
@@ -32,7 +32,7 @@ allprojects {
         ashleyVersion = "1.4.0"
         aiVersion = "1.5.0"
         jythonVersion = "2.7.0"
-        lwjglVersion = "3.2.0"
+        lwjglVersion = "3.1.6"
         jcommanderVersion = "1.64"
         googleanalyticsjavaVersion = "1.1.2"
         slf4jVersion = "1.7.25"
@@ -134,7 +134,11 @@ project(":core") {
         compile group: "org.lwjgl", name: "lwjgl-jemalloc", version: "$lwjglVersion"
         compile group: "org.lwjgl", name: "lwjgl-opengl", version: "$lwjglVersion"
         compile group: "org.lwjgl", name: "lwjgl-openal", version: "$lwjglVersion"
+        
         compile group: "org.lwjgl", name: "lwjgl-openvr", version: "$lwjglVersion"
+        compile "org.lwjgl:lwjgl-openvr:$lwjglVersion:natives-linux"
+        compile "org.lwjgl:lwjgl-openvr:$lwjglVersion:natives-windows"
+        compile "org.lwjgl:lwjgl-openvr:$lwjglVersion:natives-macos"
         
         compile "com.badlogicgames.gdx:gdx-backend-lwjgl3:$gdxVersion"
         compile "com.badlogicgames.gdx:gdx:$gdxVersion"

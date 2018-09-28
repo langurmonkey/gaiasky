@@ -116,10 +116,10 @@ public class MilkyWayRenderSystem extends ImmediateRenderSystem implements IObse
                 /** STARS **/
                 curr.clear();
                 float density = GlobalConf.SCALE_FACTOR;
-                
+
                 checkRequiredVerticesSize(mw.starData.size * curr.vertexSize);
                 curr.vertices = vertices;
-                
+
                 for (ParticleBean star : mw.starData) {
                     // VERTEX
                     aux1.set((float) star.data[0], (float) star.data[1], (float) star.data[2]);
@@ -175,7 +175,7 @@ public class MilkyWayRenderSystem extends ImmediateRenderSystem implements IObse
                 Vector3 tr = new Vector3();
                 Vector3 normal = new Vector3();
                 Vector3 quadpoint = new Vector3();
-                
+
                 for (ParticleBean qp : mw.nebulaData) {
                     // 5 quads per nebula
                     for (int i = 0; i < 5; i++) {
@@ -346,14 +346,15 @@ public class MilkyWayRenderSystem extends ImmediateRenderSystem implements IObse
                 /**
                  * IMAGE RENDERER
                  */
-                //                mw.mc.touch();
-                //                //mw.mc.setTransparency(mw.opacity * alpha * (GlobalConf.scene.GALAXY_3D ? 0.6f : 0.8f));
-                //                mw.mc.setTransparency(mw.opacity * alpha * 1f);
-                //                mw.mc.updateRelativisticEffects(camera);
-                //
-                //                modelBatch.begin(camera.getCamera());
-                //                modelBatch.render(mw.mc.instance, mw.mc.env);
-                //                modelBatch.end();
+                //mw.mc.touch();
+                //mw.mc.setTransparency(mw.opacity * alpha * (GlobalConf.scene.GALAXY_3D ? 0.6f : 0.8f));
+                //mw.mc.setTransparency(mw.opacity * alpha * 1f);
+                //mw.mc.updateRelativisticEffects(camera);
+
+                // Needed to restore render pipeline
+                modelBatch.begin(camera.getCamera());
+                //modelBatch.render(mw.mc.instance, mw.mc.env);
+                modelBatch.end();
 
             }
         }

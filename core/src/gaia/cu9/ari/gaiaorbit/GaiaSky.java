@@ -153,7 +153,7 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
     // TODO make this private again
     public SceneGraphRenderer sgr;
     private IPostProcessor pp;
-    
+
     // Initial gui
     private boolean INITGUI = true;
 
@@ -206,12 +206,12 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
     private boolean camRecording = false;
 
     private boolean initialized = false;
-    
+
     /**
      * Forces the dataset download window
      */
     private boolean dsdownload;
-    
+
     /**
      * Forces the catalog chooser window
      */
@@ -229,16 +229,16 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
     public Map<String, Runnable> runnablesMap;
 
     /**
-<<<<<<< HEAD
+    <<<<<<< HEAD
      * Creates a GaiaSky instance.
-=======
+    =======
      * Creates an instance of Gaia Sky.
->>>>>>> lwjgl3
+    >>>>>>> lwjgl3
      */
     public GaiaSky() {
         this(false, false);
     }
-    
+
     /**
      * Creates an instance of Gaia Sky.
      * @param dsdownload Force-show the datasets download window
@@ -252,8 +252,6 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
         this.dsdownload = dsdownload;
         this.catchooser = catchooser;
     }
-    
-    
 
     public void setSceneGraph(ISceneGraph sg) {
         this.sg = sg;
@@ -500,7 +498,7 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
 
         // Init GuiRegistry object which will be in charge of listening to 'show dialog' events
         new GuiRegistry(GlobalResources.skin);
-        
+
         // Init GUIs, step 2
         reinitialiseGUI2();
 
@@ -552,7 +550,7 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
             EventManager.instance.post(Events.CAMERA_MODE_CMD, CameraMode.Free_Camera);
             EventManager.instance.post(Events.CAMERA_POS_CMD, new double[] { 0, 5 * Constants.AU_TO_U, 0 });
             EventManager.instance.post(Events.CAMERA_DIR_CMD, new double[] { 0, -1, 0 });
-        } 
+        }
         initialized = true;
     }
 
@@ -933,11 +931,11 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
             // Init components that need assets in data folder
             reinitialiseGUI1();
             pp.initialize(manager);
-            
+
             // Initialise loading screen
             loadingGui = new LoadingGui();
             loadingGui.initialize(manager);
-            
+
             Gdx.input.setInputProcessor(loadingGui.getGuiStage());
 
             // Also VR
