@@ -39,7 +39,7 @@
           <versionLine x="20" y="40" text="version ${compiler:sys.version}" fontSize="8" fontColor="0,0,0" bold="false" />
         </text>
       </splashScreen>
-      <java mainClass="gaia.cu9.ari.gaiaorbit.desktop.GaiaSkyDesktop" vmParameters="-Xms2g -Xmx4g -XX:+UseG1GC -Dassets.location=./" arguments="" allowVMPassthroughParameters="true" preferredVM="" bundleRuntime="true">
+      <java mainClass="gaia.cu9.ari.gaiaorbit.desktop.GaiaSkyDesktop" vmParameters="-Xms2g -Xmx4g -XX:+UseG1GC -Dpython.console.encoding=UTF-8 -Dassets.location=./" arguments="" allowVMPassthroughParameters="true" preferredVM="" bundleRuntime="true">
         <classPath>
           <scanDirectory location="lib" failOnError="false" />
         </classPath>
@@ -74,7 +74,7 @@
           <versionLine x="20" y="40" text="version ${compiler:sys.version}" fontSize="8" fontColor="0,0,0" bold="false" />
         </text>
       </splashScreen>
-      <java mainClass="gaia.cu9.ari.gaiaorbit.desktop.GaiaSkyDesktop" vmParameters="-Xms512m -Xmx1500m -XX:+UseG1GC -Dassets.location=./" arguments="" allowVMPassthroughParameters="true" preferredVM="" bundleRuntime="true">
+      <java mainClass="gaia.cu9.ari.gaiaorbit.desktop.GaiaSkyDesktop" vmParameters="-Xms512m -Xmx1500m -XX:+UseG1GC -Dpython.console.encoding=UTF-8 -Dassets.location=./" arguments="" allowVMPassthroughParameters="true" preferredVM="" bundleRuntime="true">
         <classPath>
           <scanDirectory location="lib" failOnError="false" />
         </classPath>
