@@ -1,29 +1,86 @@
 <a name="unreleased"></a>
 ## [Unreleased](https://github.com/langurmonkey/gaiasky/tree/master)
-[Full changelog](https://github.com/langurmonkey/gaiasky/compare/2.1.2...HEAD)
+[Full changelog](https://github.com/langurmonkey/gaiasky/compare/2.1.2-vr...HEAD)
 
 ### Bug Fixes
-- global key bindings affect invisible GUIs
-- fix `p` double-mapping
-
-### Build system
-- add javadoc generator and publisher
-
-### Code Refactoring
-- bin to scripts, now settled
-- scripts moved to bin, bin in git
-
-### Documentation
-- small tweak to changelog template
-- improve git-chglog configuration
-- update changelog
+- accents and umlauts in user folder path (win)
+- start button status update
 
 ### Features
-- API calls to disable and enable the GUI
+- individual constellation selectors
 
+
+<a name="2.1.2-vr"></a>
+## [2.1.2-vr](https://github.com/langurmonkey/gaiasky/tree/2.1.2) (2018-09-28)
+[Full changelog](https://github.com/langurmonkey/gaiasky/compare/2.1.2...2.1.2-vr)
+
+### Bug Fixes
+
+- remove version from window title 
+- assets location in install4j template 
+- heap sizes in build script 
+- macOS -XstartOnFirstThread flag 
+- macos builds tweaks 
+- heap sizes in build script 
+- macOS -XstartOnFirstThread flag 
+- assets location in install4j template 
+- macos builds tweaks 
+- heap sizes in build script 
+- macOS -XstartOnFirstThread flag 
+- macos builds tweaks 
+- macos builds tweaks 
+- heap sizes in build scripts 
+- heap sizes in build script 
+- macOS -XstartOnFirstThread flag 
+- macOS -XstartOnFirstThread flag 
+- global key bindings affect invisible GUIs [#311](https://github.com/langurmonkey/gaiasky/issues/311) 
+- fix `p` double-mapping [#310](https://github.com/langurmonkey/gaiasky/issues/310) 
+### Build system
+
+- installer detects and removes previous versions 
+- new gradle 5 compile dep format 
+- update to lwjgl 3.2.3 
+- update to lwjgl 3.2.3 
+- missing flag in rund, fix caps in ruler 
+- new gradle 5 compile dep format 
+- update to lwjgl 3.2.3 
+- update to lwjgl 3.2.3 
+- new gradle 5 compile dep format 
+- update to lwjgl 3.2.3 
+- new gradle 5 compile dep format 
+- update to lwjgl 3.2.3 
+- update to lwjgl 3.2.3 
+- add javadoc generator and publisher 
+### Code Refactoring
+
+- bin to scripts, now settled 
+- scripts moved to bin, bin in git 
+### Documentation
+
+- small tweak to changelog template 
+- improve git-chglog configuration 
+- update changelog 
+### Features
+
+- update to lwjgl3 backend 
+- update to lwjgl3 backend 
+- update to lwjgl3 backend 
+- update to lwjgl3 backend 
+- update to lwjgl3 backend 
+- update to lwjgl3 backend 
+- cosmic ruler [#296](https://github.com/langurmonkey/gaiasky/issues/296) 
+- update to lwjgl3 backend 
+- update to lwjgl3 backend 
+- update to lwjgl3 backend 
+- update to lwjgl3 backend 
+- update to lwjgl3 backend 
+- API calls to disable and enable the GUI [#312](https://github.com/langurmonkey/gaiasky/issues/312) 
 ### Style
-- minor style issues
 
+- fix issues with merge to bring it back to a working state 
+- add ruler component type 
+- general code cleanup 
+- minor style issues 
 
 <a name="2.1.2"></a>
 ## [2.1.2](https://github.com/langurmonkey/gaiasky/tree/2.1.1) (2018-09-18)
