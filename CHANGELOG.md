@@ -21,60 +21,35 @@
 - heap sizes in build script 
 - macOS -XstartOnFirstThread flag 
 - macos builds tweaks 
-- heap sizes in build script 
-- macOS -XstartOnFirstThread flag 
-- assets location in install4j template 
-- macos builds tweaks 
-- heap sizes in build script 
-- macOS -XstartOnFirstThread flag 
-- macos builds tweaks 
-- macos builds tweaks 
-- heap sizes in build scripts 
-- heap sizes in build script 
-- macOS -XstartOnFirstThread flag 
-- macOS -XstartOnFirstThread flag 
 - global key bindings affect invisible GUIs [#311](https://github.com/langurmonkey/gaiasky/issues/311) 
 - fix `p` double-mapping [#310](https://github.com/langurmonkey/gaiasky/issues/310) 
+
 ### Build system
 
 - installer detects and removes previous versions 
 - new gradle 5 compile dep format 
 - update to lwjgl 3.2.3 
-- update to lwjgl 3.2.3 
 - missing flag in rund, fix caps in ruler 
 - new gradle 5 compile dep format 
-- update to lwjgl 3.2.3 
-- update to lwjgl 3.2.3 
-- new gradle 5 compile dep format 
-- update to lwjgl 3.2.3 
-- new gradle 5 compile dep format 
-- update to lwjgl 3.2.3 
-- update to lwjgl 3.2.3 
 - add javadoc generator and publisher 
+
 ### Code Refactoring
 
 - bin to scripts, now settled 
 - scripts moved to bin, bin in git 
+
 ### Documentation
 
 - small tweak to changelog template 
 - improve git-chglog configuration 
 - update changelog 
+
 ### Features
 
-- update to lwjgl3 backend 
-- update to lwjgl3 backend 
-- update to lwjgl3 backend 
-- update to lwjgl3 backend 
-- update to lwjgl3 backend 
-- update to lwjgl3 backend 
 - cosmic ruler [#296](https://github.com/langurmonkey/gaiasky/issues/296) 
 - update to lwjgl3 backend 
-- update to lwjgl3 backend 
-- update to lwjgl3 backend 
-- update to lwjgl3 backend 
-- update to lwjgl3 backend 
 - API calls to disable and enable the GUI [#312](https://github.com/langurmonkey/gaiasky/issues/312) 
+
 ### Style
 
 - fix issues with merge to bring it back to a working state 
@@ -91,6 +66,7 @@
 - fix for windows paths [#309](https://github.com/langurmonkey/gaiasky/issues/309) 
 - fix run script and play camera windows 
 - update changelog 
+
 ### Features
 
 - add quit confirmation dialog 
@@ -122,15 +98,18 @@
 
 - new changelog generator in release script 
 - add changelog generator script 
+
 ### Documentation
 
 - updated changelog 
 - add gaiasky-docs submodule 
 - add commit message style guidelines 
 - Fix download helper docs 
+
 ### Features
 
 - add download manager and infrastructure [#291](https://github.com/langurmonkey/gaiasky/issues/291) [#303](https://github.com/langurmonkey/gaiasky/issues/303) 
+
 ### Style
 
 - fix style of contributing once and for all 
