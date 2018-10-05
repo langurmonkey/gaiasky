@@ -25,6 +25,9 @@ public class UCDParser {
     private static String[] pllxcolnames = new String[] { "plx", "parallax", "pllx" };
     private static String[] magcolnames = new String[] { "phot_g_mean_mag", "mag", "bmag", "gmag" };
     private static String[] colorcolnames = new String[] { "b_v", "v_i", "bp_rp", "bp_g", "g_rp" };
+    private static String[] pmracolnames = new String[] { "pmra", "pmalpha" };
+    private static String[] pmdeccolnames = new String[] { "pmdec", "pmdelta" };
+    private static String[] rdvelcolnames = new String[] { "radial_velocity", "radvel" };
 
     public Map<UCDType, Set<UCD>> ucdmap;
 
@@ -37,7 +40,8 @@ public class UCDParser {
     public Set<UCD> POS1, POS2, POS3;
 
     // PROPER MOTIONS
-    // TODO - not supported yet
+    public boolean haspm = false;
+    public Set<UCD> PMRA, PMDEC, RADVEL;
 
     // MAGNITUDES
     public boolean hasmag = false;
@@ -59,6 +63,9 @@ public class UCDParser {
         POS3 = new HashSet<UCD>();
         MAG = new HashSet<UCD>();
         COL = new HashSet<UCD>();
+        PMRA = new HashSet<UCD>();
+        PMDEC = new HashSet<UCD>();
+        RADVEL = new HashSet<UCD>();
     }
 
     /**
