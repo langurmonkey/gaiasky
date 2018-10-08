@@ -52,7 +52,7 @@ The `aur` package can be installed using any `AUR` helper.
 ##### 1.2.1.1 DEB
 
 This is the package for Debian-based distros (Debian, Ubuntu, Mint, SteamOS, etc.).
-Download the `gaiasandbox_linux_<version>.deb` file and run the
+Download the `gaiasky_linux_<version>.deb` file and run the
 following command. You will need root privileges to install a `deb` package in
 your system.
 
@@ -100,7 +100,7 @@ $  sudo yum remove gaiasky-x86
 
 We also provide a Linux installer ([here](https://zah.uni-heidelberg.de/gaia/outreach/gaiasky/downloads/)) which will trigger a graphical interface
 where you can choose the installation location and some other settings.
-Download the file `gaiasandbox_unix_<version>.sh` to your disk.
+Download the file `gaiasky_unix_<version>.sh` to your disk.
 Then run the following to start the installation.
 
 ```

@@ -18,11 +18,15 @@ import gaia.cu9.ari.gaiaorbit.util.Logger;
 import gaia.cu9.ari.gaiaorbit.util.Logger.Log;
 import gaia.cu9.ari.gaiaorbit.util.Pair;
 import gaia.cu9.ari.gaiaorbit.util.color.ColourUtils;
+import gaia.cu9.ari.gaiaorbit.util.coord.AstroUtils;
 import gaia.cu9.ari.gaiaorbit.util.coord.Coordinates;
 import gaia.cu9.ari.gaiaorbit.util.math.Vector3d;
 import gaia.cu9.ari.gaiaorbit.util.ucd.UCD;
 import gaia.cu9.ari.gaiaorbit.util.ucd.UCDParser;
 import gaia.cu9.ari.gaiaorbit.util.units.Position;
+import gaia.cu9.ari.gaiaorbit.util.units.Position.PositionType;
+import gaia.cu9.ari.gaiaorbit.util.units.Quantity.Angle;
+import gaia.cu9.ari.gaiaorbit.util.units.Quantity.Angle.AngleUnit;
 import uk.ac.starlink.table.StarTable;
 import uk.ac.starlink.table.StarTableFactory;
 import uk.ac.starlink.table.TableSequence;
@@ -142,12 +146,33 @@ public class STILDataProvider extends AbstractStarGroupDataProvider {
                             unitc = c.getFirst().unit;
                         }
 
-                        Position p = new Position(a.getSecond(), a.getFirst().unit, b.getSecond(), b.getFirst().unit, c.getSecond(), unitc, ucdp.getPositionType(a.getFirst(), b.getFirst(), c.getFirst()));
+                        PositionType pt = ucdp.getPositionType(a.getFirst(), b.getFirst(), c.getFirst());
+                        Position p = new Position(a.getSecond(), a.getFirst().unit, b.getSecond(), b.getFirst().unit, c.getSecond(), unitc, pt);
                         double distpc = p.gsposition.len();
                         p.gsposition.scl(Constants.PC_TO_U);
                         // Find out RA/DEC/Dist
                         Vector3d sph = new Vector3d();
                         Coordinates.cartesianToSpherical(p.gsposition, sph);
+
+                        /** PROPER MOTION **/
+                        Vector3d pm = null;
+                        double mualphastar = 0, mudelta = 0, radvel = 0;
+                        // Only supported if position is equatorial spherical coordinates (ra/dec)
+                        if (pt == PositionType.EQ_SPH_DIST || pt == PositionType.EQ_SPH_PLX) {
+                            Pair<UCD, Double> pma = getDoubleUcd(ucdp.PMRA, row);
+                            Pair<UCD, Double> pmb = getDoubleUcd(ucdp.PMDEC, row);
+                            Pair<UCD, Double> pmc = getDoubleUcd(ucdp.RADVEL, row);
+
+                            mualphastar = pma != null ? pma.getSecond() : 0;
+                            mudelta = pmb != null ? pmb.getSecond() : 0;
+                            radvel = pmc != null ? pmc.getSecond() : 0;
+
+                            double rarad = new Angle(a.getSecond(), a.getFirst().unit).get(AngleUnit.RAD);
+                            double decrad = new Angle(b.getSecond(), b.getFirst().unit).get(AngleUnit.RAD);
+                            pm = AstroUtils.properMotionsToCartesian(mualphastar, mudelta, radvel, rarad, decrad, distpc);
+                        } else {
+                            pm = new Vector3d(Vector3d.Zero);
+                        }
 
                         /** MAGNITUDE **/
                         double appmag;
@@ -198,12 +223,12 @@ public class STILDataProvider extends AbstractStarGroupDataProvider {
                         point[StarBean.I_X] = p.gsposition.x;
                         point[StarBean.I_Y] = p.gsposition.y;
                         point[StarBean.I_Z] = p.gsposition.z;
-                        point[StarBean.I_PMX] = 0;
-                        point[StarBean.I_PMY] = 0;
-                        point[StarBean.I_PMZ] = 0;
-                        point[StarBean.I_MUALPHA] = 0;
-                        point[StarBean.I_MUDELTA] = 0;
-                        point[StarBean.I_RADVEL] = 0;
+                        point[StarBean.I_PMX] = pm.x;
+                        point[StarBean.I_PMY] = pm.y;
+                        point[StarBean.I_PMZ] = pm.z;
+                        point[StarBean.I_MUALPHA] = mualphastar;
+                        point[StarBean.I_MUDELTA] = mudelta;
+                        point[StarBean.I_RADVEL] = radvel;
                         point[StarBean.I_COL] = col;
                         point[StarBean.I_SIZE] = size;
                         //point[StarBean.I_RADIUS] = radius;

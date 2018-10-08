@@ -25,6 +25,9 @@ public class UCDParser {
     private static String[] pllxcolnames = new String[] { "plx", "parallax", "pllx" };
     private static String[] magcolnames = new String[] { "phot_g_mean_mag", "mag", "bmag", "gmag" };
     private static String[] colorcolnames = new String[] { "b_v", "v_i", "bp_rp", "bp_g", "g_rp" };
+    private static String[] pmracolnames = new String[] { "pmra", "pmalpha" };
+    private static String[] pmdeccolnames = new String[] { "pmdec", "pmdelta" };
+    private static String[] rdvelcolnames = new String[] { "radial_velocity", "radvel" };
 
     public Map<UCDType, Set<UCD>> ucdmap;
 
@@ -37,7 +40,8 @@ public class UCDParser {
     public Set<UCD> POS1, POS2, POS3;
 
     // PROPER MOTIONS
-    // TODO - not supported yet
+    public boolean haspm = false;
+    public Set<UCD> PMRA, PMDEC, RADVEL;
 
     // MAGNITUDES
     public boolean hasmag = false;
@@ -59,6 +63,9 @@ public class UCDParser {
         POS3 = new HashSet<UCD>();
         MAG = new HashSet<UCD>();
         COL = new HashSet<UCD>();
+        PMRA = new HashSet<UCD>();
+        PMDEC = new HashSet<UCD>();
+        RADVEL = new HashSet<UCD>();
     }
 
     /**
@@ -164,7 +171,41 @@ public class UCDParser {
         this.haspos = !this.POS1.isEmpty() && !this.POS2.isEmpty();
 
         /** PROPER MOTIONS **/
-        // TODO - not supported yet
+        
+        // RA/DEC
+        if (pos != null) {
+            for (UCD candidate : pos) {
+                if (candidate.ucd[0][1].equals("pm")) {
+                    // Proper motion: pos.pm
+                    // Followed by pos.[refsys].[coord]
+                    try {
+                        String refsys = candidate.ucd[1][1];
+                        String coord = candidate.ucd[1][2];
+                        if (refsys.equals("eq")) {
+                            switch (coord) {
+                            case "ra":
+                                this.PMRA.add(candidate);
+                                break;
+                            case "dec":
+                                this.PMDEC.add(candidate);
+                                break;
+                            }
+                        }
+
+                    } catch (Exception e) {
+                        // No proper motion
+                    }
+                }
+            }
+        }
+        
+        // RADIAL VELOCITY
+        Set<UCD> spect = ucdmap.get(UCDType.SPECT);
+        if(spect != null)
+            for(UCD candidate : spect) {
+                if(candidate.ucd[0][1].equalsIgnoreCase("dopplerVeloc"))
+                    this.RADVEL.add(candidate);
+            }
 
         /** MAGNITUDES **/
         Set<UCD> mag = ucdmap.get(UCDType.PHOT);
@@ -228,15 +269,15 @@ public class UCDParser {
         }
 
         if (pos3 != null) {
-        meaning = pos3.ucd[0][1];
-        switch (meaning) {
-        case "parallax":
-            disttype = "PLX";
-            break;
-        case "distance":
-            disttype = "DIST";
-            break;
-        }
+            meaning = pos3.ucd[0][1];
+            switch (meaning) {
+            case "parallax":
+                disttype = "PLX";
+                break;
+            case "distance":
+                disttype = "DIST";
+                break;
+            }
         } else {
             disttype = "PLX";
         }
@@ -252,6 +293,7 @@ public class UCDParser {
     private Set<UCD> getByColNames(String[] colnames) {
         return getByColNames(colnames, null);
     }
+
     private Set<UCD> getByColNames(String[] colnames, String defaultunit) {
         return getByColNames(new UCDType[] { UCDType.UNKNOWN, UCDType.MISSING }, colnames, defaultunit);
     }
