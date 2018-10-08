@@ -3,6 +3,8 @@ package gaia.cu9.ari.gaiaorbit.util.samp;
 import org.astrogrid.samp.client.ClientProfile;
 import org.astrogrid.samp.client.HubConnector;
 
+import gaia.cu9.ari.gaiaorbit.event.EventManager;
+import gaia.cu9.ari.gaiaorbit.event.Events;
 import gaia.cu9.ari.gaiaorbit.util.Logger;
 import gaia.cu9.ari.gaiaorbit.util.Logger.Log;
 
@@ -14,7 +16,7 @@ import gaia.cu9.ari.gaiaorbit.util.Logger.Log;
  */
 public class GaiaSkyHubConnector extends HubConnector {
     private static final Log logger = Logger.getLogger(GaiaSkyHubConnector.class);
-    
+
     public GaiaSkyHubConnector(ClientProfile profile) {
         super(profile);
     }

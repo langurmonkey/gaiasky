@@ -14,7 +14,7 @@ import gaia.cu9.ari.gaiaorbit.util.format.NumberFormatFactory;
 import gaia.cu9.ari.gaiaorbit.util.scene2d.OwnLabel;
 
 public class DebugInterface extends Table implements IObserver, IGuiInterface {
-    private OwnLabel debug1, debug2, debug3, debug4, debugBuffers, fps, spf, device;
+    private OwnLabel debug1, debug2, debug3, debug4, debugBuffers, debugSamp, fps, spf, device;
     /** Lock object for synchronization **/
     private Object lock;
 
@@ -23,8 +23,7 @@ public class DebugInterface extends Table implements IObserver, IGuiInterface {
     public DebugInterface(Skin skin, Object lock) {
         super(skin);
         float spacing = 10 * GlobalConf.SCALE_FACTOR;
-        
-        
+
         // Formatters
         fpsFormatter = NumberFormatFactory.getFormatter("#.00");
         spfFormatter = NumberFormatFactory.getFormatter("#.00##");
@@ -38,11 +37,11 @@ public class DebugInterface extends Table implements IObserver, IGuiInterface {
         spf = new OwnLabel("", skin, "hud-med");
         add(spf).right();
         row();
-        
+
         device = new OwnLabel(Gdx.gl.glGetString(GL20.GL_RENDERER), skin, "hud-big");
         add(device).right().padTop(spacing);
         row();
-        
+
         debug1 = new OwnLabel("", skin, "hud");
         add(debug1).right().padTop(spacing);
         row();
@@ -63,9 +62,13 @@ public class DebugInterface extends Table implements IObserver, IGuiInterface {
         add(debugBuffers).right();
         row();
 
+        debugSamp = new OwnLabel("", skin, "hud");
+        add(debugSamp).right().padTop(spacing);
+        row();
+
         this.setVisible(GlobalConf.program.SHOW_DEBUG_INFO);
         this.lock = lock;
-        EventManager.instance.subscribe(this, Events.DEBUG1, Events.DEBUG2, Events.DEBUG3, Events.DEBUG4, Events.DEBUG_BUFFERS, Events.FPS_INFO, Events.SHOW_DEBUG_CMD);
+        EventManager.instance.subscribe(this, Events.DEBUG1, Events.DEBUG2, Events.DEBUG3, Events.DEBUG4, Events.DEBUG_BUFFERS, Events.FPS_INFO, Events.SHOW_DEBUG_CMD, Events.SAMP_INFO);
     }
 
     private void unsubscribe() {
@@ -94,9 +97,7 @@ public class DebugInterface extends Table implements IObserver, IGuiInterface {
                     Double max = (Double) data[3];
                     debug2.setText("Mem[MB] - used: " + memFormatter.format(used) + "  free: " + memFormatter.format(free) + "  total: " + memFormatter.format(total) + "  max: " + memFormatter.format(max));
                 }
-
                 break;
-
             case DEBUG3:
                 if (GlobalConf.program.SHOW_DEBUG_INFO && data.length > 0 && data[0] != null)
                     debug3.setText((String) data[0]);
@@ -111,10 +112,15 @@ public class DebugInterface extends Table implements IObserver, IGuiInterface {
                 break;
             case FPS_INFO:
                 if (GlobalConf.program.SHOW_DEBUG_INFO && data.length > 0 && data[0] != null) {
-                    double dfps = (Float)data[0];
+                    double dfps = (Float) data[0];
                     double dspf = 1000 / dfps;
                     fps.setText(fpsFormatter.format(dfps).concat(" FPS"));
                     spf.setText(spfFormatter.format(dspf).concat(" ms"));
+                }
+                break;
+            case SAMP_INFO:
+                if (GlobalConf.program.SHOW_DEBUG_INFO && data.length > 0 && data[0] != null) {
+                    debugSamp.setText("SAMP: " + (String) data[0]);
                 }
                 break;
             case SHOW_DEBUG_CMD:

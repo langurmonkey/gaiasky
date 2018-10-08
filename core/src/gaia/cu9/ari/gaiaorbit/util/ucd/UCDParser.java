@@ -171,7 +171,41 @@ public class UCDParser {
         this.haspos = !this.POS1.isEmpty() && !this.POS2.isEmpty();
 
         /** PROPER MOTIONS **/
-        // TODO - not supported yet
+        
+        // RA/DEC
+        if (pos != null) {
+            for (UCD candidate : pos) {
+                if (candidate.ucd[0][1].equals("pm")) {
+                    // Proper motion: pos.pm
+                    // Followed by pos.[refsys].[coord]
+                    try {
+                        String refsys = candidate.ucd[1][1];
+                        String coord = candidate.ucd[1][2];
+                        if (refsys.equals("eq")) {
+                            switch (coord) {
+                            case "ra":
+                                this.PMRA.add(candidate);
+                                break;
+                            case "dec":
+                                this.PMDEC.add(candidate);
+                                break;
+                            }
+                        }
+
+                    } catch (Exception e) {
+                        // No proper motion
+                    }
+                }
+            }
+        }
+        
+        // RADIAL VELOCITY
+        Set<UCD> spect = ucdmap.get(UCDType.SPECT);
+        if(spect != null)
+            for(UCD candidate : spect) {
+                if(candidate.ucd[0][1].equalsIgnoreCase("dopplerVeloc"))
+                    this.RADVEL.add(candidate);
+            }
 
         /** MAGNITUDES **/
         Set<UCD> mag = ucdmap.get(UCDType.PHOT);
@@ -235,15 +269,15 @@ public class UCDParser {
         }
 
         if (pos3 != null) {
-        meaning = pos3.ucd[0][1];
-        switch (meaning) {
-        case "parallax":
-            disttype = "PLX";
-            break;
-        case "distance":
-            disttype = "DIST";
-            break;
-        }
+            meaning = pos3.ucd[0][1];
+            switch (meaning) {
+            case "parallax":
+                disttype = "PLX";
+                break;
+            case "distance":
+                disttype = "DIST";
+                break;
+            }
         } else {
             disttype = "PLX";
         }
@@ -259,6 +293,7 @@ public class UCDParser {
     private Set<UCD> getByColNames(String[] colnames) {
         return getByColNames(colnames, null);
     }
+
     private Set<UCD> getByColNames(String[] colnames, String defaultunit) {
         return getByColNames(new UCDType[] { UCDType.UNKNOWN, UCDType.MISSING }, colnames, defaultunit);
     }
