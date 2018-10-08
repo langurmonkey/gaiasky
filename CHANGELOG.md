@@ -1,29 +1,13 @@
 <a name="unreleased"></a>
 ## [Unreleased](https://github.com/langurmonkey/gaiasky/tree/master)
-[Full changelog](https://github.com/langurmonkey/gaiasky/compare/2.1.2...HEAD)
+[Full changelog](https://github.com/langurmonkey/gaiasky/compare/2.1.2-vr...HEAD)
 
 ### Bug Fixes
-- global key bindings affect invisible GUIs
-- fix `p` double-mapping
-
-### Build system
-- add javadoc generator and publisher
-
-### Code Refactoring
-- bin to scripts, now settled
-- scripts moved to bin, bin in git
-
-### Documentation
-- small tweak to changelog template
-- improve git-chglog configuration
-- update changelog
+- accents and umlauts in user folder path (win)
+- start button status update
 
 ### Features
-- API calls to disable and enable the GUI
-
-### Style
-- minor style issues
-
+- individual constellation selectors
 
 <a name="2.1.2"></a>
 ## [2.1.2](https://github.com/langurmonkey/gaiasky/tree/2.1.1) (2018-09-18)
@@ -34,6 +18,7 @@
 - fix for windows paths [#309](https://github.com/langurmonkey/gaiasky/issues/309) 
 - fix run script and play camera windows 
 - update changelog 
+
 ### Features
 
 - add quit confirmation dialog 
@@ -65,15 +50,18 @@
 
 - new changelog generator in release script 
 - add changelog generator script 
+
 ### Documentation
 
 - updated changelog 
 - add gaiasky-docs submodule 
 - add commit message style guidelines 
 - Fix download helper docs 
+
 ### Features
 
 - add download manager and infrastructure [#291](https://github.com/langurmonkey/gaiasky/issues/291) [#303](https://github.com/langurmonkey/gaiasky/issues/303) 
+
 ### Style
 
 - fix style of contributing once and for all 
@@ -96,9 +84,6 @@
 
 - REST server static files use assets.location [\#300](https://github.com/langurmonkey/gaiasky/pull/300) ([vga101](https://github.com/vga101))
 - Re-introduce REST API [\#281](https://github.com/langurmonkey/gaiasky/pull/281) ([vga101](https://github.com/vga101))
-
-## [2.0.2-vr](https://github.com/langurmonkey/gaiasky/tree/2.0.2-vr) (2018-07-25)
-[Full Changelog](https://github.com/langurmonkey/gaiasky/compare/2.0.2...2.0.2-vr)
 
 ## [2.0.2](https://github.com/langurmonkey/gaiasky/tree/2.0.2) (2018-07-06)
 [Full Changelog](https://github.com/langurmonkey/gaiasky/compare/2.0.1...2.0.2)
@@ -141,22 +126,6 @@
 **Closed issues:**
 
 - Maximum time reached [\#271](https://github.com/langurmonkey/gaiasky/issues/271)
-
-## [2.0.0-vr](https://github.com/langurmonkey/gaiasky/tree/2.0.0-vr) (2018-05-09)
-[Full Changelog](https://github.com/langurmonkey/gaiasky/compare/2.0.0...2.0.0-vr)
-
-**Implemented enhancements:**
-
-- Add night theme [\#270](https://github.com/langurmonkey/gaiasky/issues/270)
-
-**Fixed bugs:**
-
-- Fix SAMP issues when loading [\#266](https://github.com/langurmonkey/gaiasky/issues/266)
-- Fix constellation name flickering when planets are turned off [\#264](https://github.com/langurmonkey/gaiasky/issues/264)
-
-**Closed issues:**
-
-- Is it possible to extend the size of the user interface [\#269](https://github.com/langurmonkey/gaiasky/issues/269)
 
 ## [2.0.0](https://github.com/langurmonkey/gaiasky/tree/2.0.0) (2018-04-24)
 [Full Changelog](https://github.com/langurmonkey/gaiasky/compare/1.5.0...2.0.0)

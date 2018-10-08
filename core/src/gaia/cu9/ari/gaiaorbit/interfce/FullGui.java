@@ -75,12 +75,10 @@ public class FullGui extends AbstractGui {
     protected RunStateInterface runStateInterface;
 
     protected SearchDialog searchDialog;
-    protected AboutWindow aboutWindow;
     protected RunScriptWindow runscriptWindow;
     protected RunCameraWindow runcameraWindow;
     protected MemInfoWindow memInfoWindow;
     protected LogWindow logWindow;
-    protected PreferencesWindow preferencesWindow;
     protected VisualEffectsComponent visualEffectsComponent;
 
     protected INumberFormat nf;

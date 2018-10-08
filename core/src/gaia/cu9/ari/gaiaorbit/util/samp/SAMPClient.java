@@ -185,6 +185,22 @@ public class SAMPClient implements IObserver {
 
     }
 
+    public String getStatus() {
+        if (conn == null) {
+            return "Not initialized";
+        } else {
+            if (conn.isConnected()) {
+                try {
+                    return "Connected: " + conn.getConnection().getRegInfo().getHubId();
+                }catch(Exception e) {
+                    return "Error getting state";
+                }
+            } else {
+                return "Not connected";
+            }
+        }
+    }
+
     /**
      * Loads a VOTable into a star group
      * @param url The URL to fetch the table

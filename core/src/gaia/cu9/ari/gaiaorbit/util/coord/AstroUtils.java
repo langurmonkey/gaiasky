@@ -702,6 +702,7 @@ public class AstroUtils {
      * Converts proper motions + radial velocity into a cartesian vector
      * @param mualphastar Mu alpha star, in mas/yr
      * @param mudelta Mu delta, in mas/yr
+     * @param radvel Radial velocity in km/s
      * @param ra Right ascension in radians
      * @param dec Declination in radians
      * @param distpc Distance in parsecs to the star

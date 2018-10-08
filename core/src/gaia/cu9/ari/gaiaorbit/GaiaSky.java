@@ -31,6 +31,8 @@ import com.badlogic.gdx.graphics.glutils.ShaderProgram;
 import com.badlogic.gdx.scenes.scene2d.ui.TooltipManager;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.TimeUtils;
+import com.badlogic.gdx.utils.Timer;
+import com.badlogic.gdx.utils.Timer.Task;
 
 import gaia.cu9.ari.gaiaorbit.assets.AtmosphereShaderProviderLoader;
 import gaia.cu9.ari.gaiaorbit.assets.GaiaAttitudeLoader;
@@ -229,11 +231,7 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
     public Map<String, Runnable> runnablesMap;
 
     /**
-    <<<<<<< HEAD
-     * Creates a GaiaSky instance.
-    =======
      * Creates an instance of Gaia Sky.
-    >>>>>>> lwjgl3
      */
     public GaiaSky() {
         this(false, false);
@@ -551,6 +549,36 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
             EventManager.instance.post(Events.CAMERA_POS_CMD, new double[] { 0, 5 * Constants.AU_TO_U, 0 });
             EventManager.instance.post(Events.CAMERA_DIR_CMD, new double[] { 0, -1, 0 });
         }
+
+        // Debug info scheduler
+        Task debugTask1 = new Task() {
+            @Override
+            public void run() {
+                // FPS
+                EventManager.instance.post(Events.FPS_INFO, 1f / Gdx.graphics.getDeltaTime());
+                // Current session time
+                EventManager.instance.post(Events.DEBUG1, TimeUtils.timeSinceMillis(startTime) / 1000d);
+                // Memory
+                EventManager.instance.post(Events.DEBUG2, MemInfo.getUsedMemory(), MemInfo.getFreeMemory(), MemInfo.getTotalMemory(), MemInfo.getMaxMemory());
+                // Observed octants
+                EventManager.instance.post(Events.DEBUG4, "Observed octants: " + OctreeNode.nOctantsObserved + ", Load queue: " + StreamingOctreeLoader.getLoadQueueSize());
+                // Frame buffers
+                EventManager.instance.post(Events.DEBUG_BUFFERS, GLFrameBuffer.getManagedStatus());
+            }
+        };
+        
+        Task debugTask10 = new Task() {
+            @Override
+            public void run() {
+                EventManager.instance.post(Events.SAMP_INFO, SAMPClient.getInstance().getStatus());
+            }
+        };
+        
+        // Each 1 second
+        Timer.schedule(debugTask1, 1, 1);
+        // Every 10 seconds
+        Timer.schedule(debugTask10, 1, 10);
+        
         initialized = true;
     }
 
@@ -629,25 +657,6 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
 
     }
 
-    long lastDebugTime = -1;
-    // Debug info scheduler
-    Runnable debugTask = new Runnable() {
-
-        @Override
-        public void run() {
-            // FPS
-            EventManager.instance.post(Events.FPS_INFO, 1f / Gdx.graphics.getDeltaTime());
-            // Current session time
-            EventManager.instance.post(Events.DEBUG1, TimeUtils.timeSinceMillis(startTime) / 1000d);
-            // Memory
-            EventManager.instance.post(Events.DEBUG2, MemInfo.getUsedMemory(), MemInfo.getFreeMemory(), MemInfo.getTotalMemory(), MemInfo.getMaxMemory());
-            // Observed octants
-            EventManager.instance.post(Events.DEBUG4, "Observed octants: " + OctreeNode.nOctantsObserved + ", Load queue: " + StreamingOctreeLoader.getLoadQueueSize());
-            // Frame buffers
-            EventManager.instance.post(Events.DEBUG_BUFFERS, GLFrameBuffer.getManagedStatus());
-        }
-    };
-
     @Override
     public void render() {
         try {
@@ -711,11 +720,6 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
                         sleep(GlobalConf.screen.LIMIT_FPS);
                     }
 
-                    /** DEBUG - each 1 secs **/
-                    if (TimeUtils.millis() - lastDebugTime > 1000) {
-                        Gdx.app.postRunnable(debugTask);
-                        lastDebugTime = TimeUtils.millis();
-                    }
                 }
 
             }
