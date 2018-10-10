@@ -27,7 +27,7 @@ public class UCDParser {
     private static String[] colorcolnames = new String[] { "b_v", "v_i", "bp_rp", "bp_g", "g_rp" };
     private static String[] pmracolnames = new String[] { "pmra", "pmalpha" };
     private static String[] pmdeccolnames = new String[] { "pmdec", "pmdelta" };
-    private static String[] rdvelcolnames = new String[] { "radial_velocity", "radvel" };
+    private static String[] radvelcolnames = new String[] { "radial_velocity", "radvel" };
 
     public Map<UCDType, Set<UCD>> ucdmap;
 
@@ -71,7 +71,7 @@ public class UCDParser {
     /**
      * Parses the given table and puts the UCD info 
      * into the ucdmap. The map and all the indices are overwritten.
-     * @param ucds
+     * @param table The {@link StarTable} to parse
      */
     public void parse(StarTable table) {
         ucdmap.clear();
@@ -158,7 +158,7 @@ public class UCDParser {
         if (this.POS1.isEmpty() || this.POS2.isEmpty()) {
             // Try to work out from names
             this.POS1 = getByColNames(pos1colnames, "deg");
-            if (this.POS1 != null) {
+            if (this.POS1 != null && !this.POS1.isEmpty()) {
                 this.POS2 = getByColNames(pos2colnames, "deg");
                 this.POS3 = getByColNames(distcolnames, "pc");
                 if (this.POS3 == null || this.POS3.isEmpty()) {
@@ -198,7 +198,15 @@ public class UCDParser {
                 }
             }
         }
-        
+        if (this.PMRA.isEmpty() || this.PMDEC.isEmpty()) {
+            // Try to work out from names
+            this.PMRA = getByColNames(pmracolnames, "mas/yr");
+            if (this.PMRA != null && !this.PMRA.isEmpty()) {
+                this.PMDEC = getByColNames(pmdeccolnames, "mas/yr");
+                this.RADVEL = getByColNames(radvelcolnames, "km/s");
+            }
+        }
+
         // RADIAL VELOCITY
         Set<UCD> spect = ucdmap.get(UCDType.SPECT);
         if(spect != null)

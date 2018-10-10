@@ -1,18 +1,12 @@
 package gaia.cu9.ari.gaiaorbit.data.group;
 
-import java.io.InputStream;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Set;
-import java.util.logging.Level;
-
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.LongMap;
-
 import gaia.cu9.ari.gaiaorbit.scenegraph.ParticleGroup.ParticleBean;
 import gaia.cu9.ari.gaiaorbit.scenegraph.StarGroup.StarBean;
 import gaia.cu9.ari.gaiaorbit.util.Constants;
+import gaia.cu9.ari.gaiaorbit.util.GlobalConf;
 import gaia.cu9.ari.gaiaorbit.util.I18n;
 import gaia.cu9.ari.gaiaorbit.util.Logger;
 import gaia.cu9.ari.gaiaorbit.util.Logger.Log;
@@ -32,6 +26,12 @@ import uk.ac.starlink.table.StarTableFactory;
 import uk.ac.starlink.table.TableSequence;
 import uk.ac.starlink.util.DataSource;
 import uk.ac.starlink.util.FileDataSource;
+
+import java.io.InputStream;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Set;
+import java.util.logging.Level;
 
 /**
  * Loads VOTables, FITS, etc.
@@ -59,14 +59,14 @@ public class STILDataProvider extends AbstractStarGroupDataProvider {
     public Array<? extends ParticleBean> loadData(String file, double factor) {
         logger.info(this.getClass().getSimpleName(), I18n.bundle.format("notif.datafile", file));
         try {
-            loadData(new FileDataSource(file), factor);
+            loadData(new FileDataSource(GlobalConf.data.dataFile(file)), factor);
         } catch (Exception e) {
             logger.error(e);
         }
         return list;
     }
 
-    /**
+    /*
      * Gets the first ucd that can be translated to a double from the set.
      * @param ucds
      * @param row

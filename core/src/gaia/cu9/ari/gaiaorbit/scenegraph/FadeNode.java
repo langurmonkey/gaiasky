@@ -19,9 +19,8 @@ import gaia.cu9.ari.gaiaorbit.util.time.ITimeFrameProvider;
 
 /**
  * Node that offers fade-in and fade-out capabilities.
- * 
- * @author tsagrista
  *
+ * @author tsagrista
  */
 public class FadeNode extends AbstractPositionEntity {
 
@@ -84,8 +83,7 @@ public class FadeNode extends AbstractPositionEntity {
         super(name, parent);
     }
 
-    @Override
-    public void doneLoading(AssetManager manager) {
+    @Override public void doneLoading(AssetManager manager) {
         super.doneLoading(manager);
         if (positionobjectname != null) {
             this.position = (AbstractPositionEntity) sg.getNode(positionobjectname);
@@ -114,8 +112,7 @@ public class FadeNode extends AbstractPositionEntity {
         }
     }
 
-    @Override
-    public void updateLocal(ITimeFrameProvider time, ICamera camera) {
+    @Override public void updateLocal(ITimeFrameProvider time, ICamera camera) {
         this.distToCamera = this.position == null ? (float) pos.dst(camera.getPos()) : this.position.distToCamera;
 
         // Update alpha
@@ -143,12 +140,10 @@ public class FadeNode extends AbstractPositionEntity {
         return 1;
     }
 
-    @Override
-    protected void addToRenderLists(ICamera camera) {
+    @Override protected void addToRenderLists(ICamera camera) {
     }
 
-    @Override
-    public void updateLocalValues(ITimeFrameProvider time, ICamera camera) {
+    @Override public void updateLocalValues(ITimeFrameProvider time, ICamera camera) {
     }
 
     public void setFadein(double[] fadein) {
@@ -166,7 +161,7 @@ public class FadeNode extends AbstractPositionEntity {
     /**
      * Sets the position of the label, in parsecs and in the internal reference
      * frame
-     * 
+     *
      * @param labelposition
      */
     public void setLabelposition(double[] labelposition) {
@@ -175,7 +170,7 @@ public class FadeNode extends AbstractPositionEntity {
 
     /**
      * Sets the label color
-     * 
+     *
      * @param labelcolor
      */
     public void setLabelcolor(double[] labelcolor) {

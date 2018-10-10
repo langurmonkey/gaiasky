@@ -66,6 +66,7 @@ public class DatasetsComponent extends GuiComponent implements IObserver {
 
         HorizontalGroup ciGroup = new HorizontalGroup();
         ciGroup.space(pad);
+        ciGroup.align(Align.left);
 
         // Info
         ScrollPane scroll = new OwnScrollPane(t, skin, "minimalist-nobg");
