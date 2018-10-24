@@ -60,6 +60,9 @@ public class MinimapWindow extends GenericDialog {
         // Build
         buildSuper();
 
+        // Pack
+        pack();
+
         setModal(false);
     }
 
