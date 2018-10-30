@@ -1,11 +1,9 @@
 package gaia.cu9.ari.gaiaorbit.interfce;
 
-import java.time.Instant;
-
 import com.badlogic.gdx.Gdx;
-
 import gaia.cu9.ari.gaiaorbit.GaiaSky;
 import gaia.cu9.ari.gaiaorbit.data.orbit.PolylineData;
+import gaia.cu9.ari.gaiaorbit.desktop.format.DesktopDateFormat;
 import gaia.cu9.ari.gaiaorbit.event.EventManager;
 import gaia.cu9.ari.gaiaorbit.event.Events;
 import gaia.cu9.ari.gaiaorbit.event.IObserver;
@@ -16,6 +14,8 @@ import gaia.cu9.ari.gaiaorbit.util.I18n;
 import gaia.cu9.ari.gaiaorbit.util.format.DateFormatFactory;
 import gaia.cu9.ari.gaiaorbit.util.format.DateFormatFactory.DateType;
 import gaia.cu9.ari.gaiaorbit.util.format.IDateFormat;
+
+import java.time.Instant;
 
 /**
  * Widget that captures and displays messages in a GUI.
@@ -31,27 +31,37 @@ public class ConsoleLogger implements IObserver {
     boolean writeDates = true;
     boolean useHistorical = true;
 
+    public ConsoleLogger(){
+        this(true, true);
+    }
+
     /**
      * Initializes the notifications interface.
      * 
      * @param writeDates
      *            Log the date and time.
+     * @param useHistorical
+     *            Keep logs.
      */
     public ConsoleLogger(boolean writeDates, boolean useHistorical) {
         this.msTimeout = DEFAULT_TIMEOUT;
         this.useHistorical = useHistorical;
 
-        this.df = DateFormatFactory.getFormatter(I18n.locale, DateType.DATETIME);
+        try {
+            this.df = DateFormatFactory.getFormatter(I18n.locale, DateType.DATETIME);
+        }catch (Exception e){
+            this.df = new DesktopDateFormat(I18n.locale, true, true);
+        }
         EventManager.instance.subscribe(this, Events.POST_NOTIFICATION, Events.FOCUS_CHANGED, Events.TOGGLE_TIME_CMD, Events.TOGGLE_VISIBILITY_CMD, Events.CAMERA_MODE_CMD, Events.PACE_CHANGED_INFO, Events.FOCUS_LOCK_CMD, Events.TOGGLE_AMBIENT_LIGHT, Events.FOV_CHANGE_NOTIFICATION, Events.JAVA_EXCEPTION, Events.ORBIT_DATA_LOADED, Events.SCREENSHOT_INFO, Events.COMPUTE_GAIA_SCAN_CMD, Events.ONLY_OBSERVED_STARS_CMD, Events.TRANSIT_COLOUR_CMD, Events.LIMIT_MAG_CMD, Events.STEREOSCOPIC_CMD, Events.DISPLAY_GUI_CMD, Events.FRAME_OUTPUT_CMD, Events.STEREO_PROFILE_CMD, Events.OCTREE_PARTICLE_FADE_CMD);
     }
 
     public void unsubscribe() {
-        EventManager.instance.unsubscribe(this, Events.POST_NOTIFICATION, Events.FOCUS_CHANGED, Events.TOGGLE_TIME_CMD, Events.TOGGLE_VISIBILITY_CMD, Events.CAMERA_MODE_CMD, Events.PACE_CHANGED_INFO, Events.FOCUS_LOCK_CMD, Events.TOGGLE_AMBIENT_LIGHT, Events.FOV_CHANGE_NOTIFICATION, Events.JAVA_EXCEPTION, Events.ORBIT_DATA_LOADED, Events.SCREENSHOT_INFO, Events.COMPUTE_GAIA_SCAN_CMD, Events.ONLY_OBSERVED_STARS_CMD, Events.TRANSIT_COLOUR_CMD, Events.LIMIT_MAG_CMD, Events.STEREOSCOPIC_CMD, Events.DISPLAY_GUI_CMD, Events.FRAME_OUTPUT_CMD, Events.STEREO_PROFILE_CMD, Events.OCTREE_PARTICLE_FADE_CMD);
+        EventManager.instance.removeAllSubscriptions(this);
     }
 
     private void addMessage(String msg) {
         Instant date = Instant.now();
-        Gdx.app.log(df.format(date), msg);
+        log(df.format(date), msg, false);
         if (useHistorical) {
             NotificationsInterface.historical.add(new MessageBean(date, msg));
         }
@@ -59,12 +69,20 @@ public class ConsoleLogger implements IObserver {
 
     private void addMessage(String msg, boolean debug) {
         Instant date = Instant.now();
-        if (debug)
-            Gdx.app.debug(df.format(date), msg);
-        else
-            Gdx.app.log(df.format(date), msg);
+        log(df.format(date), msg, debug);
         if (useHistorical) {
             NotificationsInterface.historical.add(new MessageBean(date, msg));
+        }
+    }
+
+    private void log(String date, String msg, boolean debug){
+        if(Gdx.app != null){
+            if(debug)
+                Gdx.app.debug(date, msg);
+            else
+                Gdx.app.log(date, msg);
+        }else{
+            System.out.println(date + ": " + msg);
         }
     }
 
