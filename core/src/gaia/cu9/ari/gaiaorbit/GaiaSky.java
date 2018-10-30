@@ -222,6 +222,13 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
         Gdx.app.setLogLevel(Application.LOG_INFO);
         clogger = new ConsoleLogger(true, true);
 
+        // Basic info
+        logger.info("Display mode", Gdx.graphics.getWidth() + "x" + Gdx.graphics.getHeight(), "Fullscreen: " + Gdx.graphics.isFullscreen());
+        logger.info("Device",  Gdx.gl.glGetString(GL20.GL_RENDERER));
+        logger.info(I18n.bundle.format("notif.glslversion", Gdx.gl.glGetString(GL20.GL_SHADING_LANGUAGE_VERSION)));
+        logger.info("Java version", System.getProperty("java.version"), System.getProperty("java.vendor"));
+
+        // Frame buffer map
         fbmap = new HashMap<String, FrameBuffer>();
 
         // Disable all kinds of input
@@ -315,8 +322,6 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
         initialGui.initialize(manager);
         Gdx.input.setInputProcessor(initialGui.getGuiStage());
 
-        logger.info("Display mode set to " + Gdx.graphics.getWidth() + "x" + Gdx.graphics.getHeight() + ", fullscreen: " + Gdx.graphics.isFullscreen());
-        logger.info(I18n.bundle.format("notif.glslversion", Gdx.gl.glGetString(GL20.GL_SHADING_LANGUAGE_VERSION)));
     }
 
     /** All {@link ModelInstance}s to be rendered **/
