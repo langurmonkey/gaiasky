@@ -221,7 +221,7 @@ public class NotificationsInterface extends Table implements IObserver, IGuiInte
                     if (i == data.length - 1 && data[i] instanceof Boolean) {
                         perm = (Boolean) data[i];
                     } else {
-                        message += (String) data[i];
+                        message += data[i].toString();
                         if (i < data.length - 1 && !(i == data.length - 2 && data[data.length - 1] instanceof Boolean)) {
                             message += TAG_SEPARATOR;
                         }

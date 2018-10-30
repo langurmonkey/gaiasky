@@ -204,18 +204,6 @@ public class GaiaSkyDesktop implements IObserver {
 
     }
 
-    public static void setUIFont(javax.swing.plaf.FontUIResource f) {
-        java.util.Enumeration<Object> keys = UIManager.getDefaults().keys();
-        while (keys.hasMoreElements()) {
-            Object key = keys.nextElement();
-            Object value = UIManager.get(key);
-            if (value != null && value instanceof javax.swing.plaf.FontUIResource
-                    && ((FontUIResource) value).getSize() > f.getSize()) {
-                UIManager.put(key, f);
-            }
-        }
-    }
-
     private LogWriter lw;
 
     public GaiaSkyDesktop() {

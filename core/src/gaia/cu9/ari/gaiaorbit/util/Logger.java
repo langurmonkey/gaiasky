@@ -1,10 +1,13 @@
 package gaia.cu9.ari.gaiaorbit.util;
 
-import java.util.HashMap;
-import java.util.Map;
-
 import gaia.cu9.ari.gaiaorbit.event.EventManager;
 import gaia.cu9.ari.gaiaorbit.event.Events;
+import gaia.cu9.ari.gaiaorbit.util.format.DateFormatFactory;
+import gaia.cu9.ari.gaiaorbit.util.format.DateFormatFactory.DateType;
+import gaia.cu9.ari.gaiaorbit.util.format.IDateFormat;
+
+import java.util.HashMap;
+import java.util.Map;
 
 public class Logger {
 
@@ -24,6 +27,14 @@ public class Logger {
     }
 
     public static LoggerLevel level = LoggerLevel.INFO;
+    private static IDateFormat df;
+
+    private static IDateFormat getDf() {
+        if (df == null) {
+            df = DateFormatFactory.getFormatter(I18n.locale, DateType.DATETIME);
+        }
+        return df;
+    }
 
     private static void error(Throwable t, String tag) {
         if (inLevel(LoggerLevel.ERROR))
@@ -67,28 +78,29 @@ public class Logger {
 
     private static void log(Object... messages) {
         int idx = -1;
-        for(int i = 0; i < messages.length; i++) {
+        for (int i = 0; i < messages.length; i++) {
             Object msg = messages[i];
-            if(msg instanceof String && ((String)msg).contains("{}")) {
+            if (msg instanceof String && ((String) msg).contains("{}")) {
                 idx = i;
                 break;
             }
         }
-        
+        Object[] msgs;
         if (idx >= 0) {
             String msg = parse((String) messages[idx], removeFirstN(messages, idx + 1));
-            Object[] msgs = getFirstNPlus(messages, idx, msg);
-            EventManager.instance.post(Events.POST_NOTIFICATION, msgs);
+            msgs = getFirstNPlus(messages, idx, msg);
         } else {
-            EventManager.instance.post(Events.POST_NOTIFICATION, messages);
+            msgs = messages;
         }
 
+        EventManager.instance.post(Events.POST_NOTIFICATION, msgs);
     }
 
     /**
      * Removes first n elements of given array
+     *
      * @param arr The array
-     * @param n Number of elements to remove from beginning
+     * @param n   Number of elements to remove from beginning
      * @return The resulting array
      */
     private static Object[] removeFirstN(Object[] arr, int n) {
@@ -97,10 +109,10 @@ public class Logger {
             res[i] = arr[i + n];
         return res;
     }
-    
+
     private static Object[] getFirstNPlus(Object[] arr, int n, Object additional) {
-        Object[] res = new Object[n+1];
-        for(int i =0; i< n; i++) {
+        Object[] res = new Object[n + 1];
+        for (int i = 0; i < n; i++) {
             res[i] = arr[i];
         }
         res[n] = additional;
@@ -129,23 +141,26 @@ public class Logger {
 
     /**
      * Returns default logger
+     *
      * @return The default logger
      */
     public static Log getLogger() {
         return getLogger("");
     }
-    
+
     /**
      * Gets the logger for the particular class
+     *
      * @param clazz The class
      * @return The logger
      */
     public static Log getLogger(Class<?> clazz) {
         return getLogger(clazz.getSimpleName());
     }
-    
+
     /**
      * Gets a logger for an arbitary string tag
+     *
      * @param tag The tag
      * @return The logger
      */
@@ -159,39 +174,43 @@ public class Logger {
         }
     }
 
-    public static class Log{
+    public static class Log {
         private final String tag;
-        
+
         private Log(Class<?> clazz) {
             super();
             this.tag = clazz.getSimpleName();
         }
-        
+
         private Log(String tag) {
             super();
             this.tag = tag;
         }
-        
+
         public void error(Throwable t) {
             Logger.error(t, tag);
         }
-        
+
+        public void error(Throwable t, String message) {
+            Logger.error(prependTag(new Object[]{t, message}));
+        }
+
         public void error(Object... messages) {
             Logger.error(prependTag(messages));
         }
-        
+
         public void warn(Object... messages) {
             Logger.warn(prependTag(messages));
         }
-        
+
         public void debug(Object... messages) {
             Logger.debug(prependTag(messages));
         }
-        
+
         public void info(Object... messages) {
             Logger.info(prependTag(messages));
         }
-        
+
         private Object[] prependTag(Object[] msgs) {
             Object[] result = new Object[msgs.length + 1];
             System.arraycopy(msgs, 0, result, 1, msgs.length);
@@ -199,5 +218,5 @@ public class Logger {
             return result;
         }
     }
-        
+
 }

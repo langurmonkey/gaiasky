@@ -142,6 +142,8 @@ public abstract class AbstractOctreeWrapper extends FadeNode implements Iterable
                 // is implemented in the subclass.
                 updateOctreeObjects(time, translation, camera);
 
+                addToRenderLists(camera, root);
+
                 // Reset mask
                 roulette.clear();
 
