@@ -1,5 +1,42 @@
 package gaia.cu9.ari.gaiaorbit.desktop;
 
+import com.badlogic.gdx.Files;
+import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.Graphics.DisplayMode;
+import com.badlogic.gdx.LifecycleListener;
+import com.badlogic.gdx.backends.lwjgl3.Lwjgl3Application;
+import com.badlogic.gdx.backends.lwjgl3.Lwjgl3ApplicationConfiguration;
+import com.badlogic.gdx.backends.lwjgl3.Lwjgl3Files;
+import com.beust.jcommander.JCommander;
+import com.beust.jcommander.Parameter;
+import com.brsanthu.googleanalytics.GoogleAnalyticsResponse;
+import gaia.cu9.ari.gaiaorbit.GaiaSky;
+import gaia.cu9.ari.gaiaorbit.analytics.AnalyticsPermission;
+import gaia.cu9.ari.gaiaorbit.analytics.AnalyticsReporting;
+import gaia.cu9.ari.gaiaorbit.data.DesktopSceneGraphImplementationProvider;
+import gaia.cu9.ari.gaiaorbit.data.SceneGraphImplementationProvider;
+import gaia.cu9.ari.gaiaorbit.desktop.format.DesktopDateFormatFactory;
+import gaia.cu9.ari.gaiaorbit.desktop.format.DesktopNumberFormatFactory;
+import gaia.cu9.ari.gaiaorbit.desktop.render.DesktopPostProcessorFactory;
+import gaia.cu9.ari.gaiaorbit.desktop.render.ScreenModeCmd;
+import gaia.cu9.ari.gaiaorbit.desktop.util.*;
+import gaia.cu9.ari.gaiaorbit.event.EventManager;
+import gaia.cu9.ari.gaiaorbit.event.Events;
+import gaia.cu9.ari.gaiaorbit.event.IObserver;
+import gaia.cu9.ari.gaiaorbit.interfce.KeyBindings;
+import gaia.cu9.ari.gaiaorbit.interfce.MusicActorsManager;
+import gaia.cu9.ari.gaiaorbit.interfce.NetworkCheckerManager;
+import gaia.cu9.ari.gaiaorbit.interfce.ConsoleLogger;
+import gaia.cu9.ari.gaiaorbit.render.PostProcessorFactory;
+import gaia.cu9.ari.gaiaorbit.screenshot.ScreenshotsManager;
+import gaia.cu9.ari.gaiaorbit.script.JythonFactory;
+import gaia.cu9.ari.gaiaorbit.script.ScriptingFactory;
+import gaia.cu9.ari.gaiaorbit.util.*;
+import gaia.cu9.ari.gaiaorbit.util.Logger.Log;
+import gaia.cu9.ari.gaiaorbit.util.format.DateFormatFactory;
+import gaia.cu9.ari.gaiaorbit.util.format.NumberFormatFactory;
+import gaia.cu9.ari.gaiaorbit.util.math.MathManager;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -11,60 +48,10 @@ import java.util.Properties;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 
-import javax.swing.UIManager;
-import javax.swing.plaf.FontUIResource;
-
-import com.badlogic.gdx.Files;
-import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.Graphics.DisplayMode;
-import com.badlogic.gdx.LifecycleListener;
-import com.badlogic.gdx.backends.lwjgl3.Lwjgl3Application;
-import com.badlogic.gdx.backends.lwjgl3.Lwjgl3ApplicationConfiguration;
-import com.badlogic.gdx.backends.lwjgl3.Lwjgl3Files;
-import com.beust.jcommander.JCommander;
-import com.beust.jcommander.Parameter;
-import com.brsanthu.googleanalytics.GoogleAnalyticsResponse;
-
-import gaia.cu9.ari.gaiaorbit.GaiaSky;
-import gaia.cu9.ari.gaiaorbit.analytics.AnalyticsPermission;
-import gaia.cu9.ari.gaiaorbit.analytics.AnalyticsReporting;
-import gaia.cu9.ari.gaiaorbit.data.DesktopSceneGraphImplementationProvider;
-import gaia.cu9.ari.gaiaorbit.data.SceneGraphImplementationProvider;
-import gaia.cu9.ari.gaiaorbit.desktop.format.DesktopDateFormatFactory;
-import gaia.cu9.ari.gaiaorbit.desktop.format.DesktopNumberFormatFactory;
-import gaia.cu9.ari.gaiaorbit.desktop.render.DesktopPostProcessorFactory;
-import gaia.cu9.ari.gaiaorbit.desktop.render.ScreenModeCmd;
-import gaia.cu9.ari.gaiaorbit.desktop.util.CamRecorder;
-import gaia.cu9.ari.gaiaorbit.desktop.util.DesktopConfInit;
-import gaia.cu9.ari.gaiaorbit.desktop.util.DesktopMusicActors;
-import gaia.cu9.ari.gaiaorbit.desktop.util.DesktopNetworkChecker;
-import gaia.cu9.ari.gaiaorbit.desktop.util.LogWriter;
-import gaia.cu9.ari.gaiaorbit.desktop.util.SysUtils;
-import gaia.cu9.ari.gaiaorbit.event.EventManager;
-import gaia.cu9.ari.gaiaorbit.event.Events;
-import gaia.cu9.ari.gaiaorbit.event.IObserver;
-import gaia.cu9.ari.gaiaorbit.interfce.KeyBindings;
-import gaia.cu9.ari.gaiaorbit.interfce.MusicActorsManager;
-import gaia.cu9.ari.gaiaorbit.interfce.NetworkCheckerManager;
-import gaia.cu9.ari.gaiaorbit.render.PostProcessorFactory;
-import gaia.cu9.ari.gaiaorbit.screenshot.ScreenshotsManager;
-import gaia.cu9.ari.gaiaorbit.script.JythonFactory;
-import gaia.cu9.ari.gaiaorbit.script.ScriptingFactory;
-import gaia.cu9.ari.gaiaorbit.util.ConfInit;
-import gaia.cu9.ari.gaiaorbit.util.GlobalConf;
-import gaia.cu9.ari.gaiaorbit.util.I18n;
-import gaia.cu9.ari.gaiaorbit.util.Logger;
-import gaia.cu9.ari.gaiaorbit.util.Logger.Log;
-import gaia.cu9.ari.gaiaorbit.util.MusicManager;
-import gaia.cu9.ari.gaiaorbit.util.format.DateFormatFactory;
-import gaia.cu9.ari.gaiaorbit.util.format.NumberFormatFactory;
-import gaia.cu9.ari.gaiaorbit.util.math.MathManager;
-
 /**
  * Main class for the desktop launcher
- * 
- * @author Toni Sagrista
  *
+ * @author Toni Sagrista
  */
 public class GaiaSkyDesktop implements IObserver {
     private static final Log logger = Logger.getLogger(GaiaSkyDesktop.class);
@@ -78,23 +65,18 @@ public class GaiaSkyDesktop implements IObserver {
     private static GaiaSkyArgs gsargs;
 
     /**
-    	 * Program arguments
-    	 * 
-    	 * @author Toni Sagrista
-    	 *
-    	 */
+     * Program arguments
+     *
+     * @author Toni Sagrista
+     */
     private static class GaiaSkyArgs {
-        @Parameter(names = { "-h", "--help" }, help = true)
-        private boolean help = false;
+        @Parameter(names = { "-h", "--help" }, help = true) private boolean help = false;
 
-        @Parameter(names = { "-v", "--version" }, description = "Lists version and build inforamtion")
-        private boolean version = false;
-        
-        @Parameter(names = { "-d", "--ds-download" }, description = "Displays the download dialog at startup")
-        private boolean download = false;
-        
-        @Parameter(names = { "-c", "--cat-chooser" }, description = "Displays the catalog chooser dialog at startup")
-        private boolean catalogchooser = false;
+        @Parameter(names = { "-v", "--version" }, description = "Lists version and build inforamtion") private boolean version = false;
+
+        @Parameter(names = { "-d", "--ds-download" }, description = "Displays the download dialog at startup") private boolean download = false;
+
+        @Parameter(names = { "-c", "--cat-chooser" }, description = "Displays the catalog chooser dialog at startup") private boolean catalogchooser = false;
     }
 
     public static void main(String[] args) {
@@ -135,7 +117,7 @@ public class GaiaSkyDesktop implements IObserver {
 
             // Initialize i18n
             I18n.initialize(Gdx.files.internal("i18n/gsbundle"));
-            
+
             // Init global configuration
             ConfInit.initialize(new DesktopConfInit());
 
@@ -204,11 +186,11 @@ public class GaiaSkyDesktop implements IObserver {
 
     }
 
-    private LogWriter lw;
+    private ConsoleLogger clogger;
 
     public GaiaSkyDesktop() {
         super();
-        lw = new LogWriter();
+        clogger = new ConsoleLogger();
         EventManager.instance.subscribe(this, Events.SCENE_GRAPH_LOADED, Events.DISPOSE);
     }
 
@@ -246,29 +228,29 @@ public class GaiaSkyDesktop implements IObserver {
         cfg.setWindowIcon(Files.FileType.Internal, "icon/ic_launcher.png");
         cfg.useOpenGL3(false, 3, 2);
 
-        if (lw != null)
-            EventManager.instance.removeAllSubscriptions(lw);
+        if (clogger != null) {
+            clogger.unsubscribe();
+            clogger = null;
+        }
 
         // Launch app
         Lwjgl3Application app = new Lwjgl3Application(new GaiaSky(gsargs.download, gsargs.catalogchooser), cfg);
         app.addLifecycleListener(new GaiaSkyWindowListener());
     }
 
-    @Override
-    public void notify(Events event, final Object... data) {
+    @Override public void notify(Events event, final Object... data) {
         switch (event) {
         case SCENE_GRAPH_LOADED:
             if (REST_ENABLED) {
                 /*
-                				 * Notify REST server that GUI is loaded and everything should be in a
-                				 * well-defined state
-                				 */
+                 * Notify REST server that GUI is loaded and everything should be in a
+                 * well-defined state
+                 */
                 Method activate;
                 try {
                     activate = REST_SERVER_CLASS.getMethod("activate");
                     activate.invoke(null, new Object[0]);
-                } catch (NoSuchMethodException | SecurityException | IllegalAccessException | IllegalArgumentException
-                        | InvocationTargetException e) {
+                } catch (NoSuchMethodException | SecurityException | IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
                     logger.error(e);
                 }
             }
@@ -279,8 +261,7 @@ public class GaiaSkyDesktop implements IObserver {
                 try {
                     Method stop = REST_SERVER_CLASS.getMethod("stop");
                     stop.invoke(null, new Object[0]);
-                } catch (NoSuchMethodException | SecurityException | IllegalAccessException | IllegalArgumentException
-                        | InvocationTargetException e) {
+                } catch (NoSuchMethodException | SecurityException | IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
                     logger.error(e);
                 }
             }
@@ -301,16 +282,16 @@ public class GaiaSkyDesktop implements IObserver {
     }
 
     /**
-    	 * Initialises the configuration file. Tries to load first the file in
-    	 * <code>$HOME/.gaiasky/global.properties</code>. Checks the
-    	 * <code>properties.version</code> key to determine whether the file is
-    	 * compatible or not. If it is, it uses the existing file. If it is not, it
-    	 * replaces it with the default file.
-    	 * 
-    	 * @param ow Whether to overwrite
-    	 * @return The path of the file used
-    	 * @throws IOException
-    	 */
+     * Initialises the configuration file. Tries to load first the file in
+     * <code>$HOME/.gaiasky/global.properties</code>. Checks the
+     * <code>properties.version</code> key to determine whether the file is
+     * compatible or not. If it is, it uses the existing file. If it is not, it
+     * replaces it with the default file.
+     *
+     * @param ow Whether to overwrite
+     * @return The path of the file used
+     * @throws IOException
+     */
     private static String initConfigFile(boolean ow) throws IOException {
         // Use user folder
         File userFolder = SysUtils.getGSHomeDir();
@@ -333,11 +314,8 @@ public class GaiaSkyDesktop implements IObserver {
             }
 
             // Check latest version
-            if (!userprops.containsKey("properties.version") || (userprops.containsKey("properties.version")
-                    && Integer.parseInt(userprops.getProperty("properties.version")) < internalversion)) {
-                System.out.println("Properties file version mismatch, overwriting with new version: found "
-                        + Integer.parseInt(userprops.getProperty("properties.version")) + ", required "
-                        + internalversion);
+            if (!userprops.containsKey("properties.version") || (userprops.containsKey("properties.version") && Integer.parseInt(userprops.getProperty("properties.version")) < internalversion)) {
+                System.out.println("Properties file version mismatch, overwriting with new version: found " + Integer.parseInt(userprops.getProperty("properties.version")) + ", required " + internalversion);
                 overwrite = true;
             }
         }
@@ -361,10 +339,10 @@ public class GaiaSkyDesktop implements IObserver {
     }
 
     /**
-    	 * Checks whether the REST server dependencies are in the classpath.
-    	 * 
-    	 * @return True if REST dependencies are loaded.
-    	 */
+     * Checks whether the REST server dependencies are in the classpath.
+     *
+     * @return True if REST dependencies are loaded.
+     */
     private static boolean checkRestDepsInClasspath() {
         try {
             Class.forName("com.google.gson.Gson");
@@ -377,8 +355,7 @@ public class GaiaSkyDesktop implements IObserver {
         }
     }
 
-    @SuppressWarnings("resource")
-    private static void copyFile(File sourceFile, File destFile, boolean ow) throws IOException {
+    @SuppressWarnings("resource") private static void copyFile(File sourceFile, File destFile, boolean ow) throws IOException {
         if (destFile.exists()) {
             if (ow) {
                 // Overwrite, delete file
@@ -415,9 +392,7 @@ public class GaiaSkyDesktop implements IObserver {
         boolean gnome = SysUtils.checkGnome();
         if (jv >= 10 && linux && gnome) {
             System.out.println("======================================= WARNING ========================================");
-            System.out.println("It looks like you are running Gaia Sky with java " + jv + " in Linux with Gnome.\n"
-                    + "This version may crash. If it does, comment out the property\n"
-                    + "'assistive_technologies' in the '/etc/java-[version]/accessibility.properties' file.");
+            System.out.println("It looks like you are running Gaia Sky with java " + jv + " in Linux with Gnome.\n" + "This version may crash. If it does, comment out the property\n" + "'assistive_technologies' in the '/etc/java-[version]/accessibility.properties' file.");
             System.out.println("========================================================================================");
             System.out.println();
         }
@@ -432,18 +407,15 @@ public class GaiaSkyDesktop implements IObserver {
 
     private class GaiaSkyWindowListener implements LifecycleListener {
 
-        @Override
-        public void pause() {
+        @Override public void pause() {
 
         }
 
-        @Override
-        public void resume() {
+        @Override public void resume() {
 
         }
 
-        @Override
-        public void dispose() {
+        @Override public void dispose() {
             // Terminate here
 
             // Analytics stop event

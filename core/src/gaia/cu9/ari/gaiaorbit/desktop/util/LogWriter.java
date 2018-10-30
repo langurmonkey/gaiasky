@@ -37,9 +37,9 @@ public class LogWriter implements IObserver {
         switch (event) {
         case JAVA_EXCEPTION:
             if (data.length == 1) {
-                message = df.format(now) + TAG_SEPARATOR + ((Throwable) data[0]).getLocalizedMessage();
+                message = df.format(now) + ": " + ((Throwable) data[0]).getLocalizedMessage();
             } else {
-                message = df.format(now) + TAG_SEPARATOR + (String) data[1] + TAG_SEPARATOR + ((Throwable) data[0]).getLocalizedMessage();
+                message = df.format(now) + ": " + (String) data[1] + TAG_SEPARATOR + ((Throwable) data[0]).getLocalizedMessage();
             }
             logMessages.add(message);
             System.out.println(message);
