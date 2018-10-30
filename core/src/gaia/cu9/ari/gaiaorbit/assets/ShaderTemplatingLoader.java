@@ -7,7 +7,7 @@ import com.badlogic.gdx.files.FileHandle;
 
 /**
  * Loads shaders with extra functionality to add code from other shaders.
- * Recognizes the directive <INCLUDE shader.glsl> in glsl files.
+ * Recognizes the directive #include shader.glsl in <code>.glsl</code> files.
  * @author tsagrista
  *
  */
@@ -26,9 +26,9 @@ public class ShaderTemplatingLoader {
         Scanner scanner = new Scanner(in);
         while (scanner.hasNextLine()) {
             String line = scanner.nextLine();
-            if (line.matches("\\s*<INCLUDE \\S+\\.glsl>\\s*")) {
+            if (line.matches("\\s*#include\\s+\\S+\\.glsl\\s*")) {
                 // Load file and include
-                String inc = line.substring(line.indexOf("<INCLUDE") + 9, line.length() - 1);
+                String inc = line.substring(line.indexOf("#include") + 9);
                 String incSource = ShaderTemplatingLoader.load(inc);
                 sb.append(incSource);
                 sb.append('\n');

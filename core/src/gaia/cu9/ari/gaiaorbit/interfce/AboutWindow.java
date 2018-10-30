@@ -338,10 +338,13 @@ public class AboutWindow extends GenericDialog {
                 extensionsstr[i] = Gdx.gl30.glGetStringi(GL30.GL_EXTENSIONS, i);
             }
             extensions = arrayToStr(extensionsstr);
+        } else {
+            extensions = extensions.replaceAll(" ", "\n");
         }
         Gdx.gl.glGetIntegerv(GL20.GL_MAX_TEXTURE_SIZE, buf);
         int maxSize = buf.get(0);
-        TextArea glextensions = new TextArea("Max texture size: " + maxSize + "\r" + extensions, skin, "no-disabled");
+        lines = GlobalResources.countOccurrences(extensions, '\n');
+        OwnTextArea glextensions = new OwnTextArea("Max texture size: " + maxSize + '\n' + extensions, skin, "no-disabled");
         glextensions.setDisabled(true);
         glextensions.setPrefRows(lines);
         glextensions.clearListeners();
@@ -472,11 +475,11 @@ public class AboutWindow extends GenericDialog {
     }
 
     private String arrayToStr(String[] arr) {
-        StringBuffer buff = new StringBuffer();
+        String buff = new String();
         for (int i = 0; i < arr.length; i++) {
-            buff.append(arr[i] + '\n');
+            buff += arr[i] + '\n';
         }
-        return buff.toString();
+        return buff;
     }
 
     @Override

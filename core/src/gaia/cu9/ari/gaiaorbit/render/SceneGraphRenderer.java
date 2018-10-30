@@ -185,21 +185,23 @@ public class SceneGraphRenderer extends AbstractRenderer implements IProcessRend
         /** LOAD SHADER PROGRAMS WITH ASSET MANAGER **/
         manager.load("shader/font.vertex.glsl", ShaderProgram.class);
 
-        starDesc = loadShader(manager, "shader/star.vertex.glsl", "shader/star.fragment.glsl", new String[] { "star", "starRel", "starGrav", "starRelGrav" }, new String[] { "", "#define relativisticEffects\n", "#define gravitationalWaves\n", "#define relativisticEffects\n#define gravitationalWaves\n" });
-        spriteDesc = loadShader(manager, "shader/sprite.vertex.glsl", "shader/sprite.fragment.glsl", new String[] { "sprite", "spriteRel", "spriteGrav", "spriteRelGrav" }, new String[] { "", "#define relativisticEffects\n", "#define gravitationalWaves\n", "#define relativisticEffects\n#define gravitationalWaves\n" });
-        pixelDesc = loadShader(manager, "shader/point.vertex.glsl", "shader/point.fragment.glsl", new String[] { "pixel", "pixelRel", "pixelGrav", "pixelRelGrav" }, new String[] { "", "#define relativisticEffects\n", "#define gravitationalWaves\n", "#define relativisticEffects\n#define gravitationalWaves\n" });
-        mwPointDesc = loadShader(manager, "shader/point.galaxy.vertex.glsl", "shader/point.galaxy.fragment.glsl", new String[] { "pointGal", "pointGalRel", "pointGalGrav", "pointGalRelGrav" }, new String[] { "", "#define relativisticEffects\n", "#define gravitationalWaves\n", "#define relativisticEffects\n#define gravitationalWaves\n" });
-        mwOitDesc = loadShader(manager, "shader/galaxy.oit.vertex.glsl", "shader/galaxy.oit.fragment.glsl", new String[] { "galOit", "galOitRel", "galOitGrav", "galOitRelGrav" }, new String[] { "", "#define relativisticEffects\n", "#define gravitationalWaves\n", "#define relativisticEffects\n#define gravitationalWaves\n" });
+        String[] defines = new String[]{ "", "#define relativisticEffects\n", "#define gravitationalWaves\n", "#define relativisticEffects\n#define gravitationalWaves\n" };
 
-        mwNebulaDesc = loadShader(manager, "shader/nebula.vertex.glsl", "shader/nebula.fragment.glsl", new String[] { "nebula", "nebulaRel", "nebulaGrav", "nebulaRelGrav" }, new String[] { "", "#define relativisticEffects\n", "#define gravitationalWaves\n", "#define relativisticEffects\n#define gravitationalWaves\n" });
-        lineDesc = loadShader(manager, "shader/line.vertex.glsl", "shader/line.fragment.glsl", new String[] { "line", "lineRel", "lineGrav", "lineRelGrav" }, new String[] { "", "#define relativisticEffects\n", "#define gravitationalWaves\n", "#define relativisticEffects\n#define gravitationalWaves\n" });
-        lineQuadDesc = loadShader(manager, "shader/line.quad.vertex.glsl", "shader/line.quad.fragment.glsl", new String[] { "lineQuad", "lineQuadRel", "lineQuadGrav", "lineQuadRelGrav" }, new String[] { "", "#define relativisticEffects\n", "#define gravitationalWaves\n", "#define relativisticEffects\n#define gravitationalWaves\n" });
-        lineGpuDesc = loadShader(manager, "shader/line.gpu.vertex.glsl", "shader/line.gpu.fragment.glsl", new String[] { "lineGpu", "lineGpuRel", "lineGpuGrav", "lineGpuRelGrav" }, new String[] { "", "#define relativisticEffects\n", "#define gravitationalWaves\n", "#define relativisticEffects\n#define gravitationalWaves\n" });
-        galDesc = loadShader(manager, "shader/gal.vertex.glsl", "shader/gal.fragment.glsl", new String[] { "gal", "galRel", "galGrav", "galRelGrav" }, new String[] { "", "#define relativisticEffects\n", "#define gravitationalWaves\n", "#define relativisticEffects\n#define gravitationalWaves\n" });
-        particleEffectDesc = loadShader(manager, "shader/particle.effect.vertex.glsl", "shader/particle.effect.fragment.glsl", new String[] { "particleEffect", "particleEffectRel", "particleEffectGrav", "particleEffectRelGrav" }, new String[] { "", "#define relativisticEffects\n", "#define gravitationalWaves\n", "#define relativisticEffects\n#define gravitationalWaves\n" });
-        particleGroupDesc = loadShader(manager, "shader/particle.group.vertex.glsl", "shader/particle.group.fragment.glsl", new String[] { "particleGroup", "particleGroupRel", "particleGroupGrav", "particleGroupRelGrav" }, new String[] { "", "#define relativisticEffects\n", "#define gravitationalWaves\n", "#define relativisticEffects\n#define gravitationalWaves\n" });
-        starGroupDesc = loadShader(manager, "shader/star.group.vertex.glsl", "shader/star.group.fragment.glsl", new String[] { "starGroup", "starGroupRel", "starGroupGrav", "starGroupRelGrav" }, new String[] { "", "#define relativisticEffects\n", "#define gravitationalWaves\n", "#define relativisticEffects\n#define gravitationalWaves\n" });
-        orbitElemDesc = loadShader(manager, "shader/orbitelem.vertex.glsl", "shader/particle.group.fragment.glsl", new String[] { "orbitElem", "orbitElemRel", "orbitElemGrav", "orbitElemRelGrav" }, new String[] { "", "#define relativisticEffects\n", "#define gravitationalWaves\n", "#define relativisticEffects\n#define gravitationalWaves\n" });
+        starDesc = loadShader(manager, "shader/star.vertex.glsl", "shader/star.fragment.glsl", genShaderNames("star"), defines);
+        spriteDesc = loadShader(manager, "shader/sprite.vertex.glsl", "shader/sprite.fragment.glsl", genShaderNames("sprite"), defines);
+        pixelDesc = loadShader(manager, "shader/point.vertex.glsl", "shader/point.fragment.glsl", genShaderNames("pixel"), defines);
+        mwPointDesc = loadShader(manager, "shader/point.galaxy.vertex.glsl", "shader/point.galaxy.fragment.glsl", genShaderNames("pointGal"), defines);
+        mwOitDesc = loadShader(manager, "shader/galaxy.oit.vertex.glsl", "shader/galaxy.oit.fragment.glsl", genShaderNames("galOit"), defines);
+
+        mwNebulaDesc = loadShader(manager, "shader/nebula.vertex.glsl", "shader/nebula.fragment.glsl", genShaderNames("nebula"), defines);
+        lineDesc = loadShader(manager, "shader/line.vertex.glsl", "shader/line.fragment.glsl", genShaderNames("line"), defines);
+        lineQuadDesc = loadShader(manager, "shader/line.quad.vertex.glsl", "shader/line.quad.fragment.glsl", genShaderNames("lineQuad"), defines);
+        lineGpuDesc = loadShader(manager, "shader/line.gpu.vertex.glsl", "shader/line.gpu.fragment.glsl", genShaderNames("lineGpu"), defines);
+        galDesc = loadShader(manager, "shader/gal.vertex.glsl", "shader/gal.fragment.glsl", genShaderNames("gal"), defines);
+        particleEffectDesc = loadShader(manager, "shader/particle.effect.vertex.glsl", "shader/particle.effect.fragment.glsl", genShaderNames("particleEffect"), defines);
+        particleGroupDesc = loadShader(manager, "shader/particle.group.vertex.glsl", "shader/particle.group.fragment.glsl", genShaderNames("particleGroup"), defines);
+        starGroupDesc = loadShader(manager, "shader/star.group.vertex.glsl", "shader/star.group.fragment.glsl", genShaderNames("starGroup"), defines);
+        orbitElemDesc = loadShader(manager, "shader/orbitelem.vertex.glsl", "shader/particle.group.fragment.glsl", genShaderNames("orbitElem"), defines);
 
         manager.load("atmgrounddefault", GroundShaderProvider.class, new GroundShaderProviderParameter("shader/default.vertex.glsl", "shader/default.fragment.glsl"));
         manager.load("additive", RelativisticShaderProvider.class, new RelativisticShaderProviderParameter("shader/default.vertex.glsl", "shader/default.additive.fragment.glsl"));
@@ -296,13 +298,12 @@ public class SceneGraphRenderer extends AbstractRenderer implements IProcessRend
         /**
          * STAR SHADER
          */
-        starShaders = fetchShaderProgram(manager, starDesc, "Star", "Star (rel)", "Star (grav)");
+        starShaders = fetchShaderProgram(manager, starDesc, genShaderFullNames("star"));
 
         /**
          * GALAXY SHADER
          */
-        galShaders = fetchShaderProgram(manager, galDesc, "Galaxy", "Galaxy (rel)", "Galaxy (grav)");
-
+        galShaders = fetchShaderProgram(manager, galDesc, genShaderFullNames( "galaxy"));
         /**
          * FONT SHADER
          */
@@ -314,62 +315,62 @@ public class SceneGraphRenderer extends AbstractRenderer implements IProcessRend
         /**
          * SPRITE SHADER
          */
-        spriteShaders = fetchShaderProgram(manager, spriteDesc, "Sprite", "Sprite (rel)", "Sprite (grav)");
+        spriteShaders = fetchShaderProgram(manager, spriteDesc, genShaderFullNames("sprite"));
 
         /**
          * LINE
          */
-        lineShaders = fetchShaderProgram(manager, lineDesc, "Line", "Line (rel)", "Line (grav)");
+        lineShaders = fetchShaderProgram(manager, lineDesc, genShaderFullNames("line"));
 
         /**
          * LINE QUAD
          */
-        lineQuadShaders = fetchShaderProgram(manager, lineQuadDesc, "Line quad", "Line quad (rel)", "Line quad (grav)");
+        lineQuadShaders = fetchShaderProgram(manager, lineQuadDesc, genShaderFullNames("line-quad"));
 
         /**
          * LINE GPU
          */
-        lineGpuShaders = fetchShaderProgram(manager, lineGpuDesc, "Line GPU", "Line GPU (rel)", "Line GPU (grav)");
+        lineGpuShaders = fetchShaderProgram(manager, lineGpuDesc, genShaderFullNames("line-gpu"));
 
         /**
          * MW POINTS
          */
-        mwPointShaders = fetchShaderProgram(manager, mwPointDesc, "MW point", "MW point (rel)", "MW point (grav)");
+        mwPointShaders = fetchShaderProgram(manager, mwPointDesc, genShaderFullNames("mw-point"));
 
         /**
          * MW Order-Independent Transparency
          */
-        mwOitShaders = fetchShaderProgram(manager, mwOitDesc, "Gal OIT", "Gal OIT (rel)", "Gal OIT (grav)");
+        mwOitShaders = fetchShaderProgram(manager, mwOitDesc, genShaderFullNames("gal-oit"));
 
         /**
          * MW NEBULAE
          */
-        mwNebulaShaders = fetchShaderProgram(manager, mwNebulaDesc, "MW nebula", "MW nebula (rel)", "MW nebula (grav)");
+        mwNebulaShaders = fetchShaderProgram(manager, mwNebulaDesc, genShaderFullNames("mw-nebula"));
 
         /**
          * PARTICLE EFFECT - default and relativistic
          */
-        particleEffectShaders = fetchShaderProgram(manager, particleEffectDesc, "Particle effects", "Particle effects (rel)", "Particle effects (grav)");
+        particleEffectShaders = fetchShaderProgram(manager, particleEffectDesc, genShaderFullNames("particle-effects"));
 
         /**
          * PARTICLE GROUP - default and relativistic
          */
-        particleGroupShaders = fetchShaderProgram(manager, particleGroupDesc, "Particle group", "Particle group (rel)", "Particle group (grav)");
+        particleGroupShaders = fetchShaderProgram(manager, particleGroupDesc, genShaderFullNames("particle-group"));
 
         /**
          * STAR GROUP - default and relativistic
          */
-        starGroupShaders = fetchShaderProgram(manager, starGroupDesc, "Star group", "Star group (rel)", "Star group (grav)");
+        starGroupShaders = fetchShaderProgram(manager, starGroupDesc, genShaderFullNames("star-group"));
 
         /**
          * PIXEL
          */
-        pixelShaders = fetchShaderProgram(manager, pixelDesc, "Pixel", "Pixel (rel), Pixel (grav)");
+        pixelShaders = fetchShaderProgram(manager, pixelDesc, genShaderFullNames("pixel"));
 
         /**
          * ORBITAL ELEMENTS PARTICLES - default and relativistic
          */
-        orbitElemShaders = fetchShaderProgram(manager, orbitElemDesc, "Orbital elements particles", "Orbital elements particles (rel)", "Orbital elements particles (grav)");
+        orbitElemShaders = fetchShaderProgram(manager, orbitElemDesc, genShaderFullNames("orbital-elements-particles"));
 
         RenderGroup[] renderGroups = RenderGroup.values();
         render_lists = new Array<Array<IRenderable>>(renderGroups.length);
@@ -692,6 +693,14 @@ public class SceneGraphRenderer extends AbstractRenderer implements IProcessRend
 
         EventManager.instance.subscribe(this, Events.TOGGLE_VISIBILITY_CMD, Events.PIXEL_RENDERER_UPDATE, Events.LINE_RENDERER_UPDATE, Events.STEREOSCOPIC_CMD, Events.CAMERA_MODE_CMD, Events.CUBEMAP360_CMD, Events.REBUILD_SHADOW_MAP_DATA_CMD, Events.LIGHT_SCATTERING_CMD);
 
+    }
+
+    private String[] genShaderNames(String baseName){
+        return new String[]{ baseName, baseName + "Rel", baseName + "Grav", baseName + "RelGrav"};
+    }
+
+    private String[] genShaderFullNames(String baseName){
+        return new String[]{ baseName, baseName + " (rel)", baseName + " (grav)", baseName + " (rel+grav)"};
     }
 
     private void initSGR(ICamera camera) {
@@ -1144,7 +1153,7 @@ public class SceneGraphRenderer extends AbstractRenderer implements IProcessRend
      * 
      * @param type
      *            The component type.
-     * @param now
+     * @param t
      *            The current time in seconds.
      * @return The alpha value.
      */

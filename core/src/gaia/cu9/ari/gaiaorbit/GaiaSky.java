@@ -1,17 +1,5 @@
 package gaia.cu9.ari.gaiaorbit;
 
-import java.io.File;
-import java.time.Instant;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
-import org.lwjgl.openvr.Texture;
-import org.lwjgl.openvr.VR;
-import org.lwjgl.openvr.VRCompositor;
-
 import com.badlogic.gdx.Application;
 import com.badlogic.gdx.ApplicationListener;
 import com.badlogic.gdx.Gdx;
@@ -33,14 +21,8 @@ import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.TimeUtils;
 import com.badlogic.gdx.utils.Timer;
 import com.badlogic.gdx.utils.Timer.Task;
-
-import gaia.cu9.ari.gaiaorbit.assets.AtmosphereShaderProviderLoader;
-import gaia.cu9.ari.gaiaorbit.assets.GaiaAttitudeLoader;
+import gaia.cu9.ari.gaiaorbit.assets.*;
 import gaia.cu9.ari.gaiaorbit.assets.GaiaAttitudeLoader.GaiaAttitudeLoaderParameter;
-import gaia.cu9.ari.gaiaorbit.assets.GroundShaderProviderLoader;
-import gaia.cu9.ari.gaiaorbit.assets.OrbitDataLoader;
-import gaia.cu9.ari.gaiaorbit.assets.RelativisticShaderProviderLoader;
-import gaia.cu9.ari.gaiaorbit.assets.SGLoader;
 import gaia.cu9.ari.gaiaorbit.assets.SGLoader.SGLoaderParameter;
 import gaia.cu9.ari.gaiaorbit.data.AssetBean;
 import gaia.cu9.ari.gaiaorbit.data.StreamingOctreeLoader;
@@ -48,46 +30,18 @@ import gaia.cu9.ari.gaiaorbit.data.orbit.PolylineData;
 import gaia.cu9.ari.gaiaorbit.event.EventManager;
 import gaia.cu9.ari.gaiaorbit.event.Events;
 import gaia.cu9.ari.gaiaorbit.event.IObserver;
-import gaia.cu9.ari.gaiaorbit.interfce.ConsoleLogger;
-import gaia.cu9.ari.gaiaorbit.interfce.DebugGui;
-import gaia.cu9.ari.gaiaorbit.interfce.FullGui;
-import gaia.cu9.ari.gaiaorbit.interfce.GuiRegistry;
-import gaia.cu9.ari.gaiaorbit.interfce.IGui;
-import gaia.cu9.ari.gaiaorbit.interfce.InitialGui;
-import gaia.cu9.ari.gaiaorbit.interfce.KeyInputController;
-import gaia.cu9.ari.gaiaorbit.interfce.LoadingGui;
-import gaia.cu9.ari.gaiaorbit.interfce.SpacecraftGui;
-import gaia.cu9.ari.gaiaorbit.interfce.StereoGui;
-import gaia.cu9.ari.gaiaorbit.interfce.VRGui;
-import gaia.cu9.ari.gaiaorbit.render.AbstractRenderer;
-import gaia.cu9.ari.gaiaorbit.render.ComponentType;
-import gaia.cu9.ari.gaiaorbit.render.IMainRenderer;
-import gaia.cu9.ari.gaiaorbit.render.IPostProcessor;
+import gaia.cu9.ari.gaiaorbit.interfce.*;
+import gaia.cu9.ari.gaiaorbit.render.*;
 import gaia.cu9.ari.gaiaorbit.render.IPostProcessor.PostProcessBean;
 import gaia.cu9.ari.gaiaorbit.render.IPostProcessor.RenderType;
-import gaia.cu9.ari.gaiaorbit.render.PostProcessorFactory;
-import gaia.cu9.ari.gaiaorbit.render.SceneGraphRenderer;
-import gaia.cu9.ari.gaiaorbit.scenegraph.IFocus;
-import gaia.cu9.ari.gaiaorbit.scenegraph.ISceneGraph;
-import gaia.cu9.ari.gaiaorbit.scenegraph.Particle;
-import gaia.cu9.ari.gaiaorbit.scenegraph.SceneGraphNode;
-import gaia.cu9.ari.gaiaorbit.scenegraph.StubModel;
+import gaia.cu9.ari.gaiaorbit.scenegraph.*;
 import gaia.cu9.ari.gaiaorbit.scenegraph.camera.CameraManager;
 import gaia.cu9.ari.gaiaorbit.scenegraph.camera.CameraManager.CameraMode;
 import gaia.cu9.ari.gaiaorbit.scenegraph.camera.ICamera;
 import gaia.cu9.ari.gaiaorbit.scenegraph.component.ModelComponent;
 import gaia.cu9.ari.gaiaorbit.script.HiddenHelperUser;
-import gaia.cu9.ari.gaiaorbit.util.ComponentTypes;
-import gaia.cu9.ari.gaiaorbit.util.ConfInit;
-import gaia.cu9.ari.gaiaorbit.util.Constants;
-import gaia.cu9.ari.gaiaorbit.util.GlobalConf;
-import gaia.cu9.ari.gaiaorbit.util.GlobalResources;
-import gaia.cu9.ari.gaiaorbit.util.I18n;
-import gaia.cu9.ari.gaiaorbit.util.Logger;
+import gaia.cu9.ari.gaiaorbit.util.*;
 import gaia.cu9.ari.gaiaorbit.util.Logger.Log;
-import gaia.cu9.ari.gaiaorbit.util.MasterManager;
-import gaia.cu9.ari.gaiaorbit.util.MemInfo;
-import gaia.cu9.ari.gaiaorbit.util.MusicManager;
 import gaia.cu9.ari.gaiaorbit.util.g3d.loader.ObjLoader;
 import gaia.cu9.ari.gaiaorbit.util.gaia.GaiaAttitudeServer;
 import gaia.cu9.ari.gaiaorbit.util.gravwaves.RelativisticEffectsManager;
@@ -104,6 +58,13 @@ import gaia.cu9.ari.gaiaorbit.vr.OpenVRQuery;
 import gaia.cu9.ari.gaiaorbit.vr.VRContext;
 import gaia.cu9.ari.gaiaorbit.vr.VRContext.VRDevice;
 import gaia.cu9.ari.gaiaorbit.vr.VRContext.VRDeviceType;
+import org.lwjgl.openvr.Texture;
+import org.lwjgl.openvr.VR;
+import org.lwjgl.openvr.VRCompositor;
+
+import java.io.File;
+import java.time.Instant;
+import java.util.*;
 
 /**
  * The main class. Holds all the entities manages the update/draw cycle as well
@@ -431,10 +392,6 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
         initialGui.dispose();
         initialGui = null;
 
-        // Destroy console logger
-        clogger.dispose();
-        clogger = null;
-
         loadingGui.dispose();
         loadingGui = null;
 
@@ -496,6 +453,10 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
 
         // Init GuiRegistry object which will be in charge of listening to 'show dialog' events
         new GuiRegistry(GlobalResources.skin);
+
+        // Destroy console logger
+        clogger.dispose();
+        clogger = null;
 
         // Init GUIs, step 2
         reinitialiseGUI2();
@@ -726,6 +687,9 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
         } catch (Throwable t) {
             logger.error(t);
             // TODO implement error reporting?
+
+            // Quit
+            Gdx.app.exit();
         }
     }
 

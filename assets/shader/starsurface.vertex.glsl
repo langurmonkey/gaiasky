@@ -121,8 +121,8 @@ varying vec3 v_ambientLight;
     uniform float u_vc; // v/c
     uniform vec3 u_velDir; // Camera velocity direction
 
-    <INCLUDE shader/lib_geometry.glsl>
-    <INCLUDE shader/lib_relativity.glsl>
+    #include shader/lib_geometry.glsl
+    #include shader/lib_relativity.glsl
 #endif // relativisticEffects
 
 
@@ -135,7 +135,7 @@ varying vec3 v_ambientLight;
     uniform mat3 u_gwmat3; // Rotation matrix so that u_gw = u_gw_mat * (0 0 1)^T
     uniform float u_ts; // Time in seconds since start
     uniform float u_omgw; // Wave frequency
-    <INCLUDE shader/lib_gravwaves.glsl>
+    #include shader/lib_gravwaves.glsl>
 #endif // gravitationalWaves
 
 void main() {

@@ -224,8 +224,8 @@ varying vec4 v_atmosphereColor;
     uniform float u_vc; // v/c
     uniform vec3 u_velDir; // Camera velocity direction
 
-    <INCLUDE shader/lib_geometry.glsl>
-    <INCLUDE shader/lib_relativity.glsl>
+    #include shader/lib_geometry.glsl
+    #include shader/lib_relativity.glsl
 #endif // relativisticEffects
 
 
@@ -238,7 +238,7 @@ varying vec4 v_atmosphereColor;
     uniform mat3 u_gwmat3; // Rotation matrix so that u_gw = u_gw_mat * (0 0 1)^T
     uniform float u_ts; // Time in seconds since start
     uniform float u_omgw; // Wave frequency
-    <INCLUDE shader/lib_gravwaves.glsl>
+    #include shader/lib_gravwaves.glsl
 #endif // gravitationalWaves
 
 // Uniforms which are always available
@@ -315,25 +315,22 @@ varying float v_alphaTest;
 #elif defined(binormalFlag) && defined(tangentFlag)
     #define calculateTangentVectors() g_normal = cross(g_binormal, g_tangent)
 #elif defined(normalFlag) || defined(binormalFlag) || defined(tangentFlag)
-#if defined(normalFlag)
-    void calculateTangentVectors()
-    {
-		g_binormal = vec3(0, g_normal.z, -g_normal.y);
-		g_tangent = normalize(cross(g_normal, g_binormal));
-    }
-#elif defined(binormalFlag)
-    void calculateTangentVectors()
-    {
-		g_tangent = vec3(-g_binormal.z, 0, g_binormal.x);
-		g_normal = normalize(cross(g_binormal, g_tangent));
-    }
-#elif defined(tangentFlag)
-    void calculateTangentVectors()
-    {
-		g_binormal = vec3(-g_tangent.z, 0, g_tangent.x);
-		g_normal = normalize(cross(g_tangent, g_binormal));
-    }
-#endif
+    #if defined(normalFlag)
+        void calculateTangentVectors() {
+            g_binormal = vec3(0, g_normal.z, -g_normal.y);
+            g_tangent = normalize(cross(g_normal, g_binormal));
+        }
+    #elif defined(binormalFlag)
+        void calculateTangentVectors() {
+            g_tangent = vec3(-g_binormal.z, 0, g_binormal.x);
+            g_normal = normalize(cross(g_binormal, g_tangent));
+        }
+    #elif defined(tangentFlag)
+        void calculateTangentVectors() {
+            g_binormal = vec3(-g_tangent.z, 0, g_tangent.x);
+            g_normal = normalize(cross(g_tangent, g_binormal));
+        }
+    #endif
 #else
     #define calculateTangentVectors() nop()
 #endif
