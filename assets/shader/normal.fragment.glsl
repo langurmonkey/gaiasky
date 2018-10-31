@@ -285,18 +285,13 @@ void main() {
 		#endif // reflectionColorFlag
     #endif // environmentCubemapFlag
 
-    vec3 emissiveColor = (v_lightCol * emissive.rgb);
-    #ifndef emissiveColorFlag
-        emissiveColor *= max(0.0, (0.6 - NL));
-    #endif
-    
     #ifdef shadowMapFlag
     	float shdw = clamp(getShadow(), 0.05, 1.0);
         vec3 dayColor = (v_lightCol * diffuse.rgb) * NL * shdw + (ambient * diffuse.rgb) * (1.0 - NL);
-        gl_FragColor = vec4(dayColor + emissiveColor, diffuse.a * v_opacity);
+        gl_FragColor = vec4(dayColor + emissive.rgb, diffuse.a * v_opacity);
     #else
         vec3 dayColor = (v_lightCol * diffuse.rgb) * NL + (ambient * diffuse.rgb) * (1.0 - NL);
-        gl_FragColor = vec4(dayColor + emissiveColor, diffuse.a * v_opacity);
+        gl_FragColor = vec4(dayColor + emissive.rgb, diffuse.a * v_opacity);
     #endif // shadowMapFlag
 
     gl_FragColor.rgb += selfShadow * spec * specular;
