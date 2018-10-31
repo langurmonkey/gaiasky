@@ -34,7 +34,7 @@
     	"git tag -a &tag& -m &tag_annotation&",
     	"git push --tags",
     	"git push --tags gitlab",
-    	"core/utils/generate-changelog",
+    	"core/scripts/generate-changelog",
     	"gradlew core:pack"
     ]
     	
