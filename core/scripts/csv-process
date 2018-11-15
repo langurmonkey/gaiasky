@@ -1,0 +1,41 @@
+#!/bin/bash
+
+# Processes the source GDR2 *.csv.gz files extracting the desired columns for Gaia Sky
+
+
+print_usage() {
+    echo "Usage:"
+    echo "  $0 <INPUT_FOLDER>"
+}
+
+# This flag controls whether we overwrite the files or not
+OW=1
+
+if [ $# -lt 1 ]; then
+    print_usage
+    exit 1
+fi
+
+IN_FOLDER=$1
+
+if [ ! -d "${IN_FOLDER}" ]; then
+    echo "Error: $IN_FOLDER is not a directory!"
+    print_usage
+    exit 1
+fi
+
+count=0
+for FILE in $IN_FOLDER/*.csv.gz; do
+    echo "Processing: $FILE"
+    NAME=`echo "$FILE" | cut -d'.' -f1`
+    NEW_NAME=$NAME.csv.processed.gz
+
+    zcat $FILE | awk -F "," '{print $3 "," $6 "," $8 "," $10 "," $7 "," $9 "," $11 "," $13 "," $15 "," $67 "," $14 "," $16 "," $68 "," $51 "," $56 "," $61 "," $5 "," $79 "," $89 "," $82 "," $85 }' | gzip > $NEW_NAME
+    (( count++ ))
+    if [ $OW -eq 1 ]; then
+        # Overwrite
+        mv $NEW_NAME $FILE
+    fi
+done
+
+echo "Processed $count files in $IN_FOLDER"
