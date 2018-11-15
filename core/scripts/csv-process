@@ -4,11 +4,16 @@
 
 
 print_usage() {
+    echo "$0: convert DR2 csv.gz files for use in Gaia Sky octree generator"
+    echo
     echo "Usage:"
-    echo "  $0 <INPUT_FOLDER>"
+    echo "  $0 input_folder [output_folder]"
 }
 
 # This flag controls whether we overwrite the files or not
+# 0 - do not overwrite in same folder
+# 1 - overwrite
+# 2 - do not overwrite, different folder
 OW=1
 
 if [ $# -lt 1 ]; then
@@ -17,6 +22,11 @@ if [ $# -lt 1 ]; then
 fi
 
 IN_FOLDER=$1
+
+if [ $# -gt 1 ]; then
+    OUT_FOLDER=$2
+    OW=2
+fi
 
 if [ ! -d "${IN_FOLDER}" ]; then
     echo "Error: $IN_FOLDER is not a directory!"
@@ -35,6 +45,8 @@ for FILE in $IN_FOLDER/*.csv.gz; do
     if [ $OW -eq 1 ]; then
         # Overwrite
         mv $NEW_NAME $FILE
+    elif [ $OW -eq 2 ]; then
+        mv $NEW_NAME $OUT_FOLDER/$NAME.csv.gz
     fi
 done
 
