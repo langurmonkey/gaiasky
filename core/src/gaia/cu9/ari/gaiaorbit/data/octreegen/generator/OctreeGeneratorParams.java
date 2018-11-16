@@ -1,5 +1,10 @@
 package gaia.cu9.ari.gaiaorbit.data.octreegen.generator;
 
+/**
+ * Holds the parameters for the octree generation
+ *
+ * @author Toni Sagrista
+ */
 public class OctreeGeneratorParams {
 
     public int maxPart;

@@ -69,6 +69,14 @@
             "description": "Extra large DR2 catalog - Based on bayesian geometric distances of Bayler-Jones et al. - 1.33 billion stars",
             "file" : "http://gaia.ari.uni-heidelberg.de/gaiasky/files/autodownload/catalog-dr2-extralarge.tar.gz"
         },
+        {
+            "name" : "catalog-hipparcos-newred",
+            "type" : "catalog",
+            "size" : 5359664,
+            "check": "catalog-hip.json",
+            "description": "Hipparcos - Hipparcos new reduction (van Leeuwen, 2007) - 177955 stars",
+            "file" : "http://gaia.ari.uni-heidelberg.de/gaiasky/files/autodownload/catalog-hipparcos-newreduction.tar.gz"
+        },
 
 
         {

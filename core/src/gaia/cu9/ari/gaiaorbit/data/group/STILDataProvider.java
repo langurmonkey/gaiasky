@@ -206,13 +206,23 @@ public class STILDataProvider extends AbstractStarGroupDataProvider {
                         /** IDENTIFIER AND NAME **/
                         String name;
                         Long id;
-                        if (!ucdp.ID.isEmpty()) {
-                            Pair<UCD, String> namepair = getStringUcd(ucdp.ID, row);
+                        if(ucdp.NAME.isEmpty()) {
+                            // Empty name
+                            if (!ucdp.ID.isEmpty()) {
+                                // We have ID
+                                Pair<UCD, String> namepair = getStringUcd(ucdp.ID, row);
+                                name = namepair.getSecond();
+                                id = ++starid;
+                            } else {
+                                // Emtpy ID
+                                id = ++starid;
+                                name = id.toString();
+                            }
+                        } else {
+                            // We have name
+                            Pair<UCD,String> namepair = getStringUcd(ucdp.NAME, row);
                             name = namepair.getSecond();
                             id = ++starid;
-                        } else {
-                            id = ++starid;
-                            name = id.toString();
                         }
 
                         double[] point = new double[StarBean.SIZE];
