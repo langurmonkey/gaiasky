@@ -1,17 +1,15 @@
 package gaia.cu9.ari.gaiaorbit.data.group;
 
-import java.io.InputStream;
-import java.util.HashSet;
-import java.util.Set;
-
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.ObjectIntMap;
-
 import gaia.cu9.ari.gaiaorbit.scenegraph.ParticleGroup.ParticleBean;
 import gaia.cu9.ari.gaiaorbit.scenegraph.StarGroup;
 import gaia.cu9.ari.gaiaorbit.scenegraph.StarGroup.StarBean;
 import gaia.cu9.ari.gaiaorbit.util.I18n;
-import gaia.cu9.ari.gaiaorbit.util.Logger;
+
+import java.io.InputStream;
+import java.util.HashSet;
+import java.util.Set;
 
 public class TGASHYGDataProvider extends AbstractStarGroupDataProvider {
     private static boolean dumpToDisk = false;
@@ -22,12 +20,12 @@ public class TGASHYGDataProvider extends AbstractStarGroupDataProvider {
         TGASHYGDataProvider.format = format;
     }
 
-    HYGDataProvider hyg;
+    STILDataProvider hip;
     TGASDataProvider tgas;
 
     public TGASHYGDataProvider() {
         super();
-        hyg = new HYGDataProvider();
+        hip = new STILDataProvider();
         tgas = new TGASDataProvider();
     }
 
@@ -47,11 +45,11 @@ public class TGASHYGDataProvider extends AbstractStarGroupDataProvider {
     @Override
     public Array<StarBean> loadData(String file, double factor) {
         Array<StarBean> tgasdata = tgas.loadData("data/tgas_final/tgas.csv");
-        Array<StarBean> hygdata = hyg.loadData("data/hyg/hygxyz.bin");
+        Array<StarBean> hipdata = (Array<StarBean>) hip.loadData("data/catalog/hipparcos/hip.vot");
 
         StarGroup aux = new StarGroup();
         ObjectIntMap<String> tgasindex = aux.generateIndex(tgasdata);
-        ObjectIntMap<String> hygindex = aux.generateIndex(hygdata);
+        ObjectIntMap<String> hygindex = aux.generateIndex(hipdata);
 
         // Merge everything, discarding hyg stars already in tgas
         // Contains removed HIP numbers
@@ -66,8 +64,8 @@ public class TGASHYGDataProvider extends AbstractStarGroupDataProvider {
         }
 
         // Add from hip to TGAS
-        for (int i = 0; i < hygdata.size; i++) {
-            StarBean curr = hygdata.get(i);
+        for (int i = 0; i < hipdata.size; i++) {
+            StarBean curr = hipdata.get(i);
             Integer hip = (int) curr.data[StarBean.I_HIP];
             if (!removed.contains(hip)) {
                 // Add to TGAS data
@@ -83,10 +81,10 @@ public class TGASHYGDataProvider extends AbstractStarGroupDataProvider {
 
         list = tgasdata;
 
-        sphericalPositions = hyg.sphericalPositions;
+        sphericalPositions = hip.sphericalPositions;
         sphericalPositions.putAll(tgas.sphericalPositions);
 
-        colors = hyg.colors;
+        colors = hip.colors;
         colors.putAll(tgas.colors);
 
         if (dumpToDisk) {

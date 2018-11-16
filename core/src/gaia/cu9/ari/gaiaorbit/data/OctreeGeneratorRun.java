@@ -153,9 +153,12 @@ public class OctreeGeneratorRun {
             // Initialize date format
             DateFormatFactory.initialize(new DesktopDateFormatFactory());
 
+            // Initialize i18n
+            I18n.initialize(new FileHandle(ASSETS_LOC + "i18n/gsbundle"));
+
+            // Initialize configuration
             ConfInit.initialize(new DesktopConfInit(new FileInputStream(new File(ASSETS_LOC + "conf/global.properties")), new FileInputStream(new File(ASSETS_LOC + "data/dummyversion"))));
 
-            I18n.initialize(new FileHandle(ASSETS_LOC + "i18n/gsbundle"));
 
             // Add notification watch
             lw = new LogWriter();

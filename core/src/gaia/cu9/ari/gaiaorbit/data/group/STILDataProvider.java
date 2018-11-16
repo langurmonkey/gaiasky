@@ -46,6 +46,7 @@ public class STILDataProvider extends AbstractStarGroupDataProvider {
         java.util.logging.Logger.getLogger("org.astrogrid").setLevel(Level.OFF);
         factory = new StarTableFactory();
         countsPerMag = new long[22];
+        initLists();
     }
 
     @Override
@@ -239,6 +240,10 @@ public class STILDataProvider extends AbstractStarGroupDataProvider {
                                 id = ++starid;
                             }
                         }
+
+                        // Populate provider lists
+                        colors.put(id, rgb);
+                        sphericalPositions.put(id, new double[] { sph.x, sph.y, sph.z });
 
                         double[] point = new double[StarBean.SIZE];
                         point[StarBean.I_HIP] = hip;
