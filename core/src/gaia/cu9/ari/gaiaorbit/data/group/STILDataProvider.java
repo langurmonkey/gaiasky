@@ -5,15 +5,12 @@ import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.LongMap;
 import gaia.cu9.ari.gaiaorbit.scenegraph.ParticleGroup.ParticleBean;
 import gaia.cu9.ari.gaiaorbit.scenegraph.StarGroup.StarBean;
-import gaia.cu9.ari.gaiaorbit.util.Constants;
-import gaia.cu9.ari.gaiaorbit.util.GlobalConf;
-import gaia.cu9.ari.gaiaorbit.util.I18n;
-import gaia.cu9.ari.gaiaorbit.util.Logger;
+import gaia.cu9.ari.gaiaorbit.util.*;
 import gaia.cu9.ari.gaiaorbit.util.Logger.Log;
-import gaia.cu9.ari.gaiaorbit.util.Pair;
 import gaia.cu9.ari.gaiaorbit.util.color.ColourUtils;
 import gaia.cu9.ari.gaiaorbit.util.coord.AstroUtils;
 import gaia.cu9.ari.gaiaorbit.util.coord.Coordinates;
+import gaia.cu9.ari.gaiaorbit.util.math.MathUtilsd;
 import gaia.cu9.ari.gaiaorbit.util.math.Vector3d;
 import gaia.cu9.ari.gaiaorbit.util.ucd.UCD;
 import gaia.cu9.ari.gaiaorbit.util.ucd.UCDParser;
@@ -48,6 +45,7 @@ public class STILDataProvider extends AbstractStarGroupDataProvider {
         // Disable logging
         java.util.logging.Logger.getLogger("org.astrogrid").setLevel(Level.OFF);
         factory = new StarTableFactory();
+        countsPerMag = new long[22];
     }
 
     @Override
@@ -206,13 +204,19 @@ public class STILDataProvider extends AbstractStarGroupDataProvider {
                         /** IDENTIFIER AND NAME **/
                         String name;
                         Long id;
+                        int hip = -1;
                         if(ucdp.NAME.isEmpty()) {
                             // Empty name
                             if (!ucdp.ID.isEmpty()) {
                                 // We have ID
                                 Pair<UCD, String> namepair = getStringUcd(ucdp.ID, row);
                                 name = namepair.getSecond();
-                                id = ++starid;
+                                if(namepair.getFirst().colname.equalsIgnoreCase("hip")){
+                                    hip = Integer.valueOf(namepair.getSecond());
+                                    id = new Long(hip);
+                                }else {
+                                    id = ++starid;
+                                }
                             } else {
                                 // Emtpy ID
                                 id = ++starid;
@@ -222,11 +226,22 @@ public class STILDataProvider extends AbstractStarGroupDataProvider {
                             // We have name
                             Pair<UCD,String> namepair = getStringUcd(ucdp.NAME, row);
                             name = namepair.getSecond();
-                            id = ++starid;
+                            // Take care of HIP stars
+                            if(!ucdp.ID.isEmpty()){
+                                Pair<UCD, String> idpair = getStringUcd(ucdp.ID, row);
+                                if(idpair.getFirst().colname.equalsIgnoreCase("hip")){
+                                    hip = Integer.valueOf(idpair.getSecond());
+                                    id = new Long(hip);
+                                }else {
+                                    id = ++starid;
+                                }
+                            } else {
+                                id = ++starid;
+                            }
                         }
 
                         double[] point = new double[StarBean.SIZE];
-                        point[StarBean.I_HIP] = -1;
+                        point[StarBean.I_HIP] = hip;
                         point[StarBean.I_TYC1] = -1;
                         point[StarBean.I_TYC2] = -1;
                         point[StarBean.I_TYC3] = -1;
@@ -247,6 +262,9 @@ public class STILDataProvider extends AbstractStarGroupDataProvider {
                         point[StarBean.I_ABSMAG] = absmag;
 
                         list.add(new StarBean(point, id, name));
+
+                        int appclmp = (int) MathUtilsd.clamp(appmag, 0, 21);
+                        countsPerMag[(int) appclmp] += 1;
                     } catch (Exception e) {
                         logger.debug(e);
                         logger.debug("Exception parsing row " + i + ": skipping");
