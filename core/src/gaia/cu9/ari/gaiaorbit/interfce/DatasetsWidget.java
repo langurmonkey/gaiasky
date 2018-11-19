@@ -1,31 +1,25 @@
 package gaia.cu9.ari.gaiaorbit.interfce;
 
-import java.io.File;
-import java.io.FileFilter;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.Map;
-
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.scenes.scene2d.Actor;
-import com.badlogic.gdx.scenes.scene2d.ui.Button;
-import com.badlogic.gdx.scenes.scene2d.ui.ButtonGroup;
-import com.badlogic.gdx.scenes.scene2d.ui.Skin;
-import com.badlogic.gdx.scenes.scene2d.ui.Table;
-import com.badlogic.gdx.scenes.scene2d.ui.TextArea;
+import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.scenes.scene2d.ui.TextField.TextFieldStyle;
-import com.badlogic.gdx.scenes.scene2d.ui.TextTooltip;
 import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.JsonReader;
 import com.badlogic.gdx.utils.JsonValue;
-
 import gaia.cu9.ari.gaiaorbit.util.GlobalConf;
 import gaia.cu9.ari.gaiaorbit.util.scene2d.OwnLabel;
 import gaia.cu9.ari.gaiaorbit.util.scene2d.OwnScrollPane;
 import gaia.cu9.ari.gaiaorbit.util.scene2d.OwnTextArea;
 import gaia.cu9.ari.gaiaorbit.util.scene2d.OwnTextButton;
+
+import java.io.File;
+import java.io.FileFilter;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Widget which lists all detected catalogs and offers a way to select them.
@@ -47,7 +41,7 @@ public class DatasetsWidget {
     }
 
     public Array<FileHandle> buildCatalogFiles() {
-        // Discover datasets, add as buttons
+        // Discover data sets, add as buttons
         Array<FileHandle> catalogLocations = new Array<FileHandle>();
         catalogLocations.add(Gdx.files.absolute(GlobalConf.data.DATA_LOCATION));
         
@@ -71,8 +65,8 @@ public class DatasetsWidget {
 
     public Actor buildDatasetsWidget(Array<FileHandle> catalogFiles, boolean scrollOn) {
         float pad = 3 * GlobalConf.SCALE_FACTOR;
-        float tawidth = 300 * GlobalConf.SCALE_FACTOR;
-        float taheight = GlobalConf.SCALE_FACTOR > 1 ? 50 : 35;
+        float taWidth = 300 * GlobalConf.SCALE_FACTOR;
+        float taHeight = GlobalConf.SCALE_FACTOR > 1 ? 50 : 35;
 
         JsonReader reader = new JsonReader();
 
@@ -81,13 +75,13 @@ public class DatasetsWidget {
         catalogFiles.sort(byName);
 
         // Containers
-        Table dstable = new Table(skin);
-        dstable.align(Align.top);
+        Table dsTable = new Table(skin);
+        dsTable.align(Align.top);
 
         Actor result;
 
         if (scrollOn) {
-            OwnScrollPane scroll = new OwnScrollPane(dstable, skin, "minimalist-nobg");
+            OwnScrollPane scroll = new OwnScrollPane(dsTable, skin, "minimalist-nobg");
             scroll.setHeight(300 * GlobalConf.SCALE_FACTOR);
             scroll.setWidth(600 * GlobalConf.SCALE_FACTOR);
             scroll.setFadeScrollBars(false);
@@ -96,7 +90,7 @@ public class DatasetsWidget {
 
             result = scroll;
         } else {
-            result = dstable;
+            result = dsTable;
         }
 
         cbs = new OwnTextButton[catalogFiles.size];
@@ -137,16 +131,16 @@ public class DatasetsWidget {
             cb.setChecked(contains(catalogFile.path(), currentSetting));
             cb.addListener(new TextTooltip(candidate, skin));
 
-            dstable.add(cb).left().top().padRight(pad);
-            dstable.add(type).left().top().padRight(pad);
+            dsTable.add(cb).left().top().padRight(pad);
+            dsTable.add(type).left().top().padRight(pad);
 
             // Description
             TextArea description = new OwnTextArea(desc, skin.get("regular", TextFieldStyle.class));
             description.setDisabled(true);
             description.setPrefRows(2);
-            description.setWidth(tawidth);
-            description.setHeight(taheight);
-            dstable.add(description).left().top().padTop(pad).padLeft(pad).row();
+            description.setWidth(taWidth);
+            description.setHeight(taHeight);
+            dsTable.add(description).left().top().padTop(pad).padLeft(pad).row();
 
             candidates.put(cb, candidate);
 
@@ -161,7 +155,7 @@ public class DatasetsWidget {
         
         // No files
         if(catalogFiles.size == 0) {
-            dstable.add(new OwnLabel("No catalogs found", skin)).center();
+            dsTable.add(new OwnLabel("No catalogs found", skin)).center();
         }
 
         float maxw = 0;

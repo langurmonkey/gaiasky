@@ -4,122 +4,222 @@
         {
             "name" : "default-data",
             "type" : "data-pack",
+            "version" : 0,
             "size" : 54860771,
             "check": "data-main.json",
+            "data" : [
+                        "data-main.json",
+                        "asteroids-dr2.json",
+                        "asteroids.json",
+                        "attitudexml",
+                        "constellations",
+                        "countries",
+                        "extra.json",
+                        "gaiasky-data.json",
+                        "galaxy",
+                        "locations-earth.json",
+                        "locations.json",
+                        "locations-moon.json",
+                        "meshes/dr2/meshes_dust",
+                        "meshes/dr2/meshes_hii",
+                        "meshes-dr2-dust.json",
+                        "meshes-dr2-hii.json",
+                        "models",
+                        "moons.json",
+                        "mwsc",
+                        "nbg",
+                        "oort",
+                        "orbit",
+                        "orbits-asteroid.json",
+                        "orbits-asteroids-dr2.json",
+                        "orbits-moon.json",
+                        "orbits-planet.json",
+                        "orbits-satellite.json",
+                        "particles-hyg.json",
+                        "particles-wd.json",
+                        "planets.json",
+                        "satellites.json",
+                        "sdss",
+                        "tex"
+            ],
             "md5"  : "a6ad8e450f68c7df533564bdb33dd62b",
-            "version" : 251,
             "description" : "Default data pack for Gaia Sky - Contains the Solar System, constellations, NBG, SDSS, meshes and more",
-            "file" : "http://gaia.ari.uni-heidelberg.de/gaiasky/files/autodownload/20180829_gaiasky_data.tar.gz" 
+            "file" : "http://gaia.ari.uni-heidelberg.de/gaiasky/files/autodownload/basedata/000_20180829/gaiasky_data.tar.gz" 
         },
 
         {
-            "name" : "catalog-dr2-default",
-            "type" : "catalog-lod",
-            "size" : 804873253,
-            "check": "catalog-dr2-default.json",
-            "md5"  : "fdf635fda844bf812ea9559c38ce783b",
-            "description": "Default DR2 catalog - 20%/0.5% parallax relative errors for bright/faint stars - 7.5 million stars",
-            "file" : "http://gaia.ari.uni-heidelberg.de/gaiasky/files/autodownload/catalog-dr2-default.tar.gz"
-        },
-        {
             "name" : "catalog-dr2-verysmall",
             "type" : "catalog-lod",
-            "size" : 544122892,
+            "version" : 1,
+            "size" : 537523623,
             "check": "catalog-dr2-verysmall.json",
+            "data" : [ 
+                    "catalog-dr2-verysmall.json",
+                    "catalog/dr2-verysmall/"
+            ],
             "description": "Very small DR2 catalog - 5%/0.5% parallax relative errors for bright/faint stars - 5.1 million stars",
-            "file" : "http://gaia.ari.uni-heidelberg.de/gaiasky/files/autodownload/catalog-dr2-verysmall.tar.gz"
+            "md5" : "42c9064bf44936322df4e8bbe84b8702",
+            "file" : "http://gaia.ari.uni-heidelberg.de/gaiasky/files/autodownload/dr2/001_20181116/catalog-dr2-verysmall.tar.gz"
         },
         {
             "name" : "catalog-dr2-small",
             "type" : "catalog-lod",
+            "version" : 1,
             "size" : 718930987,
             "check": "catalog-dr2-small.json",
+            "data" : [ 
+                    "catalog-dr2-small.json",
+                    "catalog/dr2-small"
+            ],
             "description": "Small DR2 catalog - 10%/0.5% parallax relative errors for bright/faint stars - 6.7 million stars",
-            "file" : "http://gaia.ari.uni-heidelberg.de/gaiasky/files/autodownload/catalog-dr2-small.tar.gz"
+            "file" : "http://gaia.ari.uni-heidelberg.de/gaiasky/files/autodownload/dr2/001_20181116/catalog-dr2-small.tar.gz"
+        },
+        {
+            "name" : "catalog-dr2-default",
+            "type" : "catalog-lod",
+            "version" : 1,
+            "size" : 804873253,
+            "check": "catalog-dr2-default.json",
+            "data" : [ 
+                    "catalog-dr2-default.json",
+                    "catalog/dr2-default/"
+            ],
+            "md5"  : "fdf635fda844bf812ea9559c38ce783b",
+            "description": "Default DR2 catalog - 20%/0.5% parallax relative errors for bright/faint stars - 7.5 million stars",
+            "file" : "http://gaia.ari.uni-heidelberg.de/gaiasky/files/autodownload/dr2/001_20181116/catalog-dr2-default.tar.gz"
         },
         {
             "name" : "catalog-dr2-bright",
             "type" : "catalog-lod",
+            "version" : 1,
             "size" : 823494116,
             "check": "catalog-dr2-bright.json",
+            "data" : [ 
+                    "catalog-dr2-bright.json",
+                    "catalog/dr2-bright"
+            ],
             "description": "Bright DR2 catalog - 90% parallax relative errors for bright stars - 7.7 million stars",
-            "file" : "http://gaia.ari.uni-heidelberg.de/gaiasky/files/autodownload/catalog-dr2-bright.tar.gz"
+            "file" : "http://gaia.ari.uni-heidelberg.de/gaiasky/files/autodownload/dr2/001_20181116/catalog-dr2-bright.tar.gz"
         },
         {
             "name" : "catalog-dr2-large",
             "type" : "catalog-lod",
+            "version" : 1,
             "size" : 9743019582,
             "check": "catalog-dr2-large.json",
+            "data" : [ 
+                    "catalog-dr2-large.json",
+                    "catalog/dr2-large"
+            ],
             "description": "Large DR2 catalog - 50%/12.5% parallax relative errors for bright/faint stars - 97 million stars",
-            "file" : "http://gaia.ari.uni-heidelberg.de/gaiasky/files/autodownload/catalog-dr2-large.tar.gz"
+            "file" : "http://gaia.ari.uni-heidelberg.de/gaiasky/files/autodownload/dr2/001_20181116/catalog-dr2-large.tar.gz"
         },
         {
             "name" : "catalog-dr2-verylarge",
             "type" : "catalog-lod",
+            "version" : 1,
             "size" : 54424990548,
             "check": "catalog-dr2-verylarge.json",
+            "data" : [ 
+                    "catalog-dr2-verylarge.json",
+                    "catalog/dr2-verylarge"
+            ],
             "description": "Very large DR2 catalog - 90%/90% parallax relative errors for bright/faint stars - 601 million stars",
-            "file" : "http://gaia.ari.uni-heidelberg.de/gaiasky/files/autodownload/catalog-dr2-verylarge.tar.gz"
+            "file" : "http://gaia.ari.uni-heidelberg.de/gaiasky/files/autodownload/dr2/001_20181116/catalog-dr2-verylarge.tar.gz"
         },
         {
             "name" : "catalog-dr2-extralarge",
             "type" : "catalog-lod",
+            "version" : 1,
             "size" : 71014376468,
             "check": "catalog-dr2-extralarge.json",
+            "data" : [ 
+                    "catalog-dr2-extralarge.json",
+                    "catalog/dr2-extralarge"
+            ],
             "description": "Extra large DR2 catalog - Based on bayesian geometric distances of Bayler-Jones et al. - 1.33 billion stars",
-            "file" : "http://gaia.ari.uni-heidelberg.de/gaiasky/files/autodownload/catalog-dr2-extralarge.tar.gz"
+            "file" : "http://gaia.ari.uni-heidelberg.de/gaiasky/files/autodownload/dr2/001_20181116/catalog-dr2-extralarge.tar.gz"
         },
         {
             "name" : "catalog-hipparcos-newred",
             "type" : "catalog",
+            "version" : 0,
             "size" : 5359664,
             "check": "catalog-hip.json",
+            "data" : [ 
+                    "catalog-hip.json",
+                    "catalog/hipparcos"
+            ],
             "description": "Hipparcos - Hipparcos new reduction (van Leeuwen, 2007) - 177955 stars",
-            "file" : "http://gaia.ari.uni-heidelberg.de/gaiasky/files/autodownload/catalog-hipparcos-newreduction.tar.gz"
+            "file" : "http://gaia.ari.uni-heidelberg.de/gaiasky/files/autodownload/hipparcos/000_20181116/catalog-hipparcos-newreduction.tar.gz"
         },
 
 
         {
             "name" : "mesh-dr2-hot-very",
             "type" : "mesh",
+            "version" : 0,
             "size" : 15711473,
             "check": "autoload-meshes-dr2-hot-very.json",
+            "data" : [ 
+                    "autoload-meshes-dr2-hot-very.json",
+                    "meshes/dr2/meshes_hot/very_ionizing*.g3db"
+            ],
             "description": "Very ionizing star map - Isosurfaces of very ionizing hot OB stars",
-            "file" : "http://gaia.ari.uni-heidelberg.de/gaiasky/files/autodownload/meshes-dr2-hot-very.tar.gz"
+            "file" : "http://gaia.ari.uni-heidelberg.de/gaiasky/files/autodownload/meshes/000_20180904/meshes-dr2-hot-very.tar.gz"
         },
         {
             "name" : "mesh-dr2-hot-some",
             "type" : "mesh",
+            "version" : 0,
             "size" : 15849733,
             "check": "autoload-meshes-dr2-hot-some.json",
+            "data" : [ 
+                    "autoload-meshes-dr2-hot-some.json",
+                    "meshes/dr2/meshes_hot/some_ionizing*.g3db"
+            ],
             "description": "Some ionizing star map - Isosurfaces of somewhat ionizing hot OB stars",
-            "file" : "http://gaia.ari.uni-heidelberg.de/gaiasky/files/autodownload/meshes-dr2-hot-some.tar.gz"
+            "file" : "http://gaia.ari.uni-heidelberg.de/gaiasky/files/autodownload/meshes/000_20180904/meshes-dr2-hot-some.tar.gz"
         },
         {
             "name" : "mesh-dr2-hot-non",
             "type" : "mesh",
+            "version" : 0,
             "size" : 18570118,
             "check": "autoload-meshes-dr2-hot-none.json",
+            "data" : [ 
+                    "autoload-meshes-dr2-hot-none.json",
+                    "meshes/dr2/meshes_hot/non_ionizing_ge*.g3db"
+            ],
             "description": "Nonionizing star map - Isosurfaces of non-ionizing hot OB stars (x <= 50)",
-            "file" : "http://gaia.ari.uni-heidelberg.de/gaiasky/files/autodownload/meshes-dr2-hot-non.tar.gz"
+            "file" : "http://gaia.ari.uni-heidelberg.de/gaiasky/files/autodownload/meshes/000_20180904/meshes-dr2-hot-non.tar.gz"
         },
         {
             "name" : "mesh-dr2-hot-non-medium",
             "type" : "mesh",
+            "version" : 0,
             "size" : 33856669,
             "check": "autoload-meshes-dr2-hot-none-medium.json",
+            "data" : [ 
+                    "autoload-meshes-dr2-hot-none-medium.json",
+                    "meshes/dr2/meshes_hot/non_ionizing_25*.g3db"
+            ],
             "description": "Nonionizing star map - Isosurfaces of very ionizing hot OB stars (25 < x <= 50)",
-            "file" : "http://gaia.ari.uni-heidelberg.de/gaiasky/files/autodownload/meshes-dr2-hot-non-medium.tar.gz"
+            "file" : "http://gaia.ari.uni-heidelberg.de/gaiasky/files/autodownload/meshes/000_20180904/meshes-dr2-hot-non-medium.tar.gz"
         },
         
         
         {
             "name" : "hi-res-textures",
             "type" : "texture-pack",
+            "version" : 0,
             "size" : 52583247,
             "check": "tex/earth-day-high.jpg",
+            "data" : [ 
+                    "tex/*-high.jpg"
+            ],
             "description": "High resolution textures - High resolution texture pack including some 4K and 8K textures for planet surfaces and asteroids.",
-            "file" : "http://gaia.ari.uni-heidelberg.de/gaiasky/files/autodownload/hi-res-texture-pack.tar.gz"
+            "file" : "http://gaia.ari.uni-heidelberg.de/gaiasky/files/autodownload/tex/000_20180904/hi-res-texture-pack.tar.gz"
         }
     ]
 }
