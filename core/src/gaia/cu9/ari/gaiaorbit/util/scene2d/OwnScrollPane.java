@@ -40,9 +40,9 @@ public class OwnScrollPane extends ScrollPane {
             if (e instanceof InputEvent) {
                 InputEvent ie = (InputEvent) e;
                 e.setBubbles(false);
-                if (ie.getType() == InputEvent.Type.enter) {
+                if (ie.getType() == InputEvent.Type.enter && this.getStage() != null) {
                     return this.getStage().setScrollFocus(this);
-                } else if (ie.getType() == InputEvent.Type.exit) {
+                } else if (ie.getType() == InputEvent.Type.exit && this.getStage() != null) {
                     return this.getStage().setScrollFocus(null);
                 }
             }

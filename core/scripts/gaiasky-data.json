@@ -51,14 +51,14 @@
             "name" : "catalog-dr2-verysmall",
             "type" : "catalog-lod",
             "version" : 1,
-            "size" : 537523623,
+            "size" : 548621127,
             "check": "catalog-dr2-verysmall.json",
             "data" : [ 
                     "catalog-dr2-verysmall.json",
-                    "catalog/dr2-verysmall/"
+                    "catalog/dr2-verysmall"
             ],
             "description": "Very small DR2 catalog - 5%/0.5% parallax relative errors for bright/faint stars - 5.1 million stars",
-            "md5" : "42c9064bf44936322df4e8bbe84b8702",
+            "md5" : "b137fcfbc3f516282407040298fcd214",
             "file" : "http://gaia.ari.uni-heidelberg.de/gaiasky/files/autodownload/dr2/001_20181116/catalog-dr2-verysmall.tar.gz"
         },
         {
@@ -82,7 +82,7 @@
             "check": "catalog-dr2-default.json",
             "data" : [ 
                     "catalog-dr2-default.json",
-                    "catalog/dr2-default/"
+                    "catalog/dr2-default"
             ],
             "md5"  : "fdf635fda844bf812ea9559c38ce783b",
             "description": "Default DR2 catalog - 20%/0.5% parallax relative errors for bright/faint stars - 7.5 million stars",

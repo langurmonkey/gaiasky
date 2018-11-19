@@ -276,6 +276,9 @@ public class DownloadDataWindow extends GenericDialog {
                             String[] filesToDelete = data.asStringArray();
                             for (String fileToDelete : filesToDelete) {
                                 try {
+                                    if (fileToDelete.endsWith("/")) {
+                                        fileToDelete = fileToDelete.substring(0, fileToDelete.length() - 1);
+                                    }
                                     // Expand possible wildcards
                                     String basePath = "";
                                     String baseName = fileToDelete;
