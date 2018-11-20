@@ -65,26 +65,27 @@
             "name" : "catalog-dr2-small",
             "type" : "catalog-lod",
             "version" : 1,
-            "size" : 718930987,
+            "size" : 723553339,
             "check": "catalog-dr2-small.json",
             "data" : [ 
                     "catalog-dr2-small.json",
                     "catalog/dr2-small"
             ],
             "description": "Small DR2 catalog - 10%/0.5% parallax relative errors for bright/faint stars - 6.7 million stars",
+            "md5" : "4d98353b0f31e110ba753e063de079f9",
             "file" : "http://gaia.ari.uni-heidelberg.de/gaiasky/files/autodownload/dr2/001_20181116/catalog-dr2-small.tar.gz"
         },
         {
             "name" : "catalog-dr2-default",
             "type" : "catalog-lod",
             "version" : 1,
-            "size" : 804873253,
+            "size" : 809625821,
             "check": "catalog-dr2-default.json",
             "data" : [ 
                     "catalog-dr2-default.json",
                     "catalog/dr2-default"
             ],
-            "md5"  : "fdf635fda844bf812ea9559c38ce783b",
+            "md5"  : "1bfefbbc482dbbdd8daaa4e4f23967d6",
             "description": "Default DR2 catalog - 20%/0.5% parallax relative errors for bright/faint stars - 7.5 million stars",
             "file" : "http://gaia.ari.uni-heidelberg.de/gaiasky/files/autodownload/dr2/001_20181116/catalog-dr2-default.tar.gz"
         },
@@ -92,13 +93,14 @@
             "name" : "catalog-dr2-bright",
             "type" : "catalog-lod",
             "version" : 1,
-            "size" : 823494116,
+            "size" : 828258450,
             "check": "catalog-dr2-bright.json",
             "data" : [ 
                     "catalog-dr2-bright.json",
                     "catalog/dr2-bright"
             ],
             "description": "Bright DR2 catalog - 90% parallax relative errors for bright stars - 7.7 million stars",
+            "md5" : "050f940ea77eceb1540d8959b78ee962",
             "file" : "http://gaia.ari.uni-heidelberg.de/gaiasky/files/autodownload/dr2/001_20181116/catalog-dr2-bright.tar.gz"
         },
         {
