@@ -57,7 +57,7 @@
                     "catalog-dr2-verysmall.json",
                     "catalog/dr2-verysmall"
             ],
-            "description": "Very small DR2 catalog - 5%/0.5% parallax relative errors for bright/faint stars - 5.1 million stars",
+            "description": "DR2 catalog: Very small - 5%/0.5% parallax relative errors for bright/faint stars - 5.1 million stars",
             "md5" : "b137fcfbc3f516282407040298fcd214",
             "file" : "http://gaia.ari.uni-heidelberg.de/gaiasky/files/autodownload/dr2/001_20181116/catalog-dr2-verysmall.tar.gz"
         },
@@ -71,7 +71,7 @@
                     "catalog-dr2-small.json",
                     "catalog/dr2-small"
             ],
-            "description": "Small DR2 catalog - 10%/0.5% parallax relative errors for bright/faint stars - 6.7 million stars",
+            "description": "DR2 catalog: Small - 10%/0.5% parallax relative errors for bright/faint stars - 6.7 million stars",
             "md5" : "4d98353b0f31e110ba753e063de079f9",
             "file" : "http://gaia.ari.uni-heidelberg.de/gaiasky/files/autodownload/dr2/001_20181116/catalog-dr2-small.tar.gz"
         },
@@ -86,7 +86,7 @@
                     "catalog/dr2-default"
             ],
             "md5"  : "1bfefbbc482dbbdd8daaa4e4f23967d6",
-            "description": "Default DR2 catalog - 20%/0.5% parallax relative errors for bright/faint stars - 7.5 million stars",
+            "description": "DR2 catalog: Default - 20%/0.5% parallax relative errors for bright/faint stars - 7.5 million stars",
             "file" : "http://gaia.ari.uni-heidelberg.de/gaiasky/files/autodownload/dr2/001_20181116/catalog-dr2-default.tar.gz"
         },
         {
@@ -99,7 +99,7 @@
                     "catalog-dr2-bright.json",
                     "catalog/dr2-bright"
             ],
-            "description": "Bright DR2 catalog - 90% parallax relative errors for bright stars - 7.7 million stars",
+            "description": "DR2 catalog: Bright - 90% parallax relative errors for bright stars - 7.7 million stars",
             "md5" : "050f940ea77eceb1540d8959b78ee962",
             "file" : "http://gaia.ari.uni-heidelberg.de/gaiasky/files/autodownload/dr2/001_20181116/catalog-dr2-bright.tar.gz"
         },
@@ -107,39 +107,42 @@
             "name" : "catalog-dr2-large",
             "type" : "catalog-lod",
             "version" : 1,
-            "size" : 9743019582,
+            "size" : 9758400804,
             "check": "catalog-dr2-large.json",
             "data" : [ 
                     "catalog-dr2-large.json",
                     "catalog/dr2-large"
             ],
-            "description": "Large DR2 catalog - 50%/12.5% parallax relative errors for bright/faint stars - 97 million stars",
+            "description": "DR2 catalog: Large - 50%/12.5% parallax relative errors for bright/faint stars - 97 million stars",
+            "md5" : "7d286b30441b1474be62a16f9e1381ca",
             "file" : "http://gaia.ari.uni-heidelberg.de/gaiasky/files/autodownload/dr2/001_20181116/catalog-dr2-large.tar.gz"
         },
         {
             "name" : "catalog-dr2-verylarge",
             "type" : "catalog-lod",
             "version" : 1,
-            "size" : 54424990548,
+            "size" : 58792668285,
             "check": "catalog-dr2-verylarge.json",
             "data" : [ 
                     "catalog-dr2-verylarge.json",
                     "catalog/dr2-verylarge"
             ],
-            "description": "Very large DR2 catalog - 90%/90% parallax relative errors for bright/faint stars - 601 million stars",
+            "description": "DR2 catalog: Very large - 90%/90% parallax relative errors for bright/faint stars - 601 million stars",
+            "md5" : "a8c09ad05790798c753df78f15c02538",
             "file" : "http://gaia.ari.uni-heidelberg.de/gaiasky/files/autodownload/dr2/001_20181116/catalog-dr2-verylarge.tar.gz"
         },
         {
             "name" : "catalog-dr2-extralarge",
             "type" : "catalog-lod",
             "version" : 1,
-            "size" : 71014376468,
+            "size" : 56141654594,
             "check": "catalog-dr2-extralarge.json",
             "data" : [ 
                     "catalog-dr2-extralarge.json",
                     "catalog/dr2-extralarge"
             ],
-            "description": "Extra large DR2 catalog - Based on bayesian geometric distances of Bayler-Jones et al. - 1.33 billion stars",
+            "description": "DR2 catalog: Complete - Based on bayesian geometric distances of Bayler-Jones et al. - 1.33 billion stars",
+            "md5" : "5eb98578f14250a232bbfb34001e0f0c",
             "file" : "http://gaia.ari.uni-heidelberg.de/gaiasky/files/autodownload/dr2/001_20181116/catalog-dr2-extralarge.tar.gz"
         },
         {

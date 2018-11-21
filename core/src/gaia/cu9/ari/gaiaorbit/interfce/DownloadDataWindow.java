@@ -178,160 +178,186 @@ public class DownloadDataWindow extends GenericDialog {
         // Parse available files
         JsonValue dataDesc = reader.parse(Gdx.files.absolute(SysUtils.getDefaultTmpDir() + "/gaiasky-data.json"));
 
+        Map<String, List<JsonValue>> typeMap = new HashMap<String, List<JsonValue>>();
+        // We don't want repeated elements but want to keep insertion order
+        Set<String> types = new LinkedHashSet<String>();
+
+        JsonValue dst = dataDesc.child().child();
+        while(dst != null){
+            String type = dst.getString("type");
+            // Add to map
+            if(typeMap.containsKey(type)){
+                typeMap.get(type).add(dst);
+            } else {
+                List<JsonValue> aux = new ArrayList<JsonValue>();
+                aux.add(dst);
+                typeMap.put(type, aux);
+            }
+
+            // Add to set
+            types.add(type);
+
+            // Next
+            dst = dst.next();
+        }
+
         Table datasetsTable = new Table(skin);
-        datasetsTable.add(new OwnLabel(txt("gui.download.header.cb"), skin, "header")).left().padRight(padl).padBottom(pad);
-        datasetsTable.add(new OwnLabel(txt("gui.download.header.desc"), skin, "header")).left().padRight(padl).padBottom(pad);
-        datasetsTable.add(new OwnLabel(txt("gui.download.header.version"), skin, "header")).left().padRight(padl).padBottom(pad);
-        datasetsTable.add(new OwnLabel(txt("gui.download.header.type"), skin, "header")).left().padRight(padl).padBottom(pad);
-        datasetsTable.add(new OwnLabel(txt("gui.download.header.size"), skin, "header")).left().padRight(padl).padBottom(pad);
-        datasetsTable.add(new OwnLabel(txt("gui.download.header.status"), skin, "header")).center().padRight(padl).padBottom(pad).row();
-        datasetsTable.add().padLeft(padl).row();
 
-        JsonValue dataset = dataDesc.child().child();
-        while (dataset != null) {
-            // Check if we have it
-            final Path check = Paths.get(GlobalConf.data.DATA_LOCATION, dataset.getString("check"));
-            boolean exists = Files.exists(check) && Files.isReadable(check);
-            int myVersion = checkJsonVersion(check);
-            int serverVersion = dataset.getInt("version", 0);
-            boolean outdated = serverVersion > myVersion;
 
-            String name = dataset.getString("name");
-            // Add dataset to desc table
-            OwnCheckBox cb = new OwnCheckBox(name, skin, pad * 2);
-            boolean baseData = name.equals("default-data");
-            boolean defaultDataset = name.contains("default");
-            cb.setChecked((!exists || (exists && outdated)) && (baseData || defaultDataset));
-            cb.setDisabled(baseData || (exists && !outdated));
-            OwnLabel haveit = new OwnLabel("", skin);
-            if (exists) {
-                if (outdated) {
-                    setStatusOutdated(haveit);
+        for(String typeStr : types) {
+            List<JsonValue> datasets = typeMap.get(typeStr);
+
+            datasetsTable.add(new OwnLabel(txt("gui.download.type." + typeStr), skin, "hud-header")).colspan(6).left().padBottom(pad * 3).padTop(padl * 2).row();
+
+            for(JsonValue dataset : datasets){
+                // Check if we have it
+                final Path check = Paths.get(GlobalConf.data.DATA_LOCATION, dataset.getString("check"));
+                boolean exists = Files.exists(check) && Files.isReadable(check);
+                int myVersion = checkJsonVersion(check);
+                int serverVersion = dataset.getInt("version", 0);
+                boolean outdated = serverVersion > myVersion;
+
+                String name = dataset.getString("name");
+                // Add dataset to desc table
+                OwnCheckBox cb = new OwnCheckBox(name, skin, pad * 2);
+                boolean baseData = name.equals("default-data");
+                boolean defaultDataset = name.contains("default");
+                cb.setChecked((!exists || (exists && outdated)) && (baseData || defaultDataset));
+                cb.setDisabled(baseData || (exists && !outdated));
+                OwnLabel haveit = new OwnLabel("", skin);
+                if (exists) {
+                    if (outdated) {
+                        setStatusOutdated(haveit);
+                    } else {
+                        setStatusFound(haveit);
+                    }
                 } else {
-                    setStatusFound(haveit);
+                    setStatusNotFound(haveit);
                 }
-            } else {
-                setStatusNotFound(haveit);
-            }
 
-            // Can't proceed without base data - force download
-            if (baseData && !exists) {
-                me.acceptButton.setDisabled(true);
-            }
+                // Can't proceed without base data - force download
+                if (baseData && !exists) {
+                    me.acceptButton.setDisabled(true);
+                }
 
-            // Description
-            String description = dataset.getString("description");
-            String shortDescription;
-            HorizontalGroup descGroup = new HorizontalGroup();
-            descGroup.space(padl);
-            if (description.contains("-")) {
-                shortDescription = description.substring(0, description.indexOf("-"));
-            } else {
-                shortDescription = description;
-            }
-            OwnLabel desc = new OwnLabel(shortDescription, skin);
-            // Info
-            OwnImageButton imgTooltip = new OwnImageButton(skin, "tooltip");
-            imgTooltip.addListener(new OwnTextTooltip(description, skin, 10));
-            descGroup.addActor(imgTooltip);
-            descGroup.addActor(desc);
+                // Description
+                String description = dataset.getString("description");
+                String shortDescription;
+                HorizontalGroup descGroup = new HorizontalGroup();
+                descGroup.space(padl);
+                if (description.contains("-")) {
+                    shortDescription = description.substring(0, description.indexOf("-"));
+                } else {
+                    shortDescription = description;
+                }
+                OwnLabel desc = new OwnLabel(shortDescription, skin);
+                // Info
+                OwnImageButton imgTooltip = new OwnImageButton(skin, "tooltip");
+                imgTooltip.addListener(new OwnTextTooltip(description, skin, 10));
+                descGroup.addActor(imgTooltip);
+                descGroup.addActor(desc);
 
-            // Version
-            OwnLabel vers = new OwnLabel(exists && outdated ? Integer.toString(myVersion) + " -> " + Integer.toString(serverVersion) : Integer.toString(serverVersion), skin);
-            if (!exists) {
-                vers.addListener(new OwnTextTooltip(txt("gui.download.version.server", Integer.toString(serverVersion)), skin, 10));
-            } else if (outdated) {
-                // New version!
-                vers.setColor(1, 1, 0, 1);
-                vers.addListener(new OwnTextTooltip(txt("gui.download.version.new", Integer.toString(serverVersion), Integer.toString(myVersion)), skin, 10));
-            } else {
-                vers.addListener(new OwnTextTooltip(txt("gui.download.version.ok"), skin, 10));
-            }
+                // Version
+                OwnLabel vers = new OwnLabel(exists && outdated ? Integer.toString(myVersion) + " -> " + Integer.toString(serverVersion) : Integer.toString(serverVersion), skin);
+                if (!exists) {
+                    vers.addListener(new OwnTextTooltip(txt("gui.download.version.server", Integer.toString(serverVersion)), skin, 10));
+                } else if (outdated) {
+                    // New version!
+                    vers.setColor(1, 1, 0, 1);
+                    vers.addListener(new OwnTextTooltip(txt("gui.download.version.new", Integer.toString(serverVersion), Integer.toString(myVersion)), skin, 10));
+                } else {
+                    vers.addListener(new OwnTextTooltip(txt("gui.download.version.ok"), skin, 10));
+                }
 
-            // Type icon
-            String typeimg = getIcon(dataset.getString("type"));
-            Image type = new Image(skin.getDrawable(typeimg));
-            type.addListener(new OwnTextTooltip(dataset.getString("type"), skin, 10));
+                // Type icon
+                String typeimg = getIcon(dataset.getString("type"));
+                Image typeImage = new OwnImage(skin.getDrawable(typeimg));
+                float scl = 0.7f;
+                float iw =typeImage.getWidth();
+                float ih = typeImage.getHeight();
+                //typeImage.setScale(scl, scl);
+                //typeImage.setOrigin(Align.center);
+                typeImage.setWidth(iw * scl);
+                typeImage.setHeight(ih * scl);
+                typeImage.addListener(new OwnTextTooltip(dataset.getString("type"), skin, 10));
 
-            // Size
-            String size = "";
-            try {
-                long bytes = dataset.getLong("size");
-                size = GlobalResources.humanReadableByteCount(bytes, true);
-            } catch (IllegalArgumentException e) {
-                size = "?";
-            }
+                // Size
+                String size = "";
+                try {
+                    long bytes = dataset.getLong("size");
+                    size = GlobalResources.humanReadableByteCount(bytes, true);
+                } catch (IllegalArgumentException e) {
+                    size = "?";
+                }
 
-            // Delete
-            final JsonValue ds = dataset;
-            ImageButton rubbish = null;
-            if (exists) {
-                rubbish = new OwnImageButton(skin, "rubbish-bin");
-                rubbish.addListener(new TextTooltip(txt("gui.dataset.tooltip.remove"), skin));
-                rubbish.addListener((event) -> {
-                    if (event instanceof ChangeEvent) {
-                        // Remove dataset
-                        if (ds.has("data")) {
-                            JsonValue data = ds.get("data");
-                            String[] filesToDelete = data.asStringArray();
-                            for (String fileToDelete : filesToDelete) {
-                                try {
-                                    if (fileToDelete.endsWith("/")) {
-                                        fileToDelete = fileToDelete.substring(0, fileToDelete.length() - 1);
-                                    }
-                                    // Expand possible wildcards
-                                    String basePath = "";
-                                    String baseName = fileToDelete;
-                                    if (fileToDelete.contains("/")) {
-                                        basePath = fileToDelete.substring(0, fileToDelete.lastIndexOf('/'));
-                                        baseName = fileToDelete.substring(fileToDelete.lastIndexOf('/') + 1, fileToDelete.length());
-                                    }
-                                    File dataLoc = new File(GlobalConf.data.DATA_LOCATION);
-                                    File directory = new File(dataLoc, basePath);
-                                    Collection<File> files = FileUtils.listFilesAndDirs(directory, new WildcardFileFilter(baseName), new WildcardFileFilter(baseName));
-                                    for (File file : files) {
-                                        if (!file.equals(directory) && file.exists()) {
-                                            FileUtils.forceDelete(file);
+                // Delete
+                final JsonValue ds = dataset;
+                ImageButton rubbish = null;
+                if (exists) {
+                    rubbish = new OwnImageButton(skin, "rubbish-bin");
+                    rubbish.addListener(new TextTooltip(txt("gui.dataset.tooltip.remove"), skin));
+                    rubbish.addListener((event) -> {
+                        if (event instanceof ChangeEvent) {
+                            // Remove dataset
+                            if (ds.has("data")) {
+                                JsonValue data = ds.get("data");
+                                String[] filesToDelete = data.asStringArray();
+                                for (String fileToDelete : filesToDelete) {
+                                    try {
+                                        if (fileToDelete.endsWith("/")) {
+                                            fileToDelete = fileToDelete.substring(0, fileToDelete.length() - 1);
                                         }
+                                        // Expand possible wildcards
+                                        String basePath = "";
+                                        String baseName = fileToDelete;
+                                        if (fileToDelete.contains("/")) {
+                                            basePath = fileToDelete.substring(0, fileToDelete.lastIndexOf('/'));
+                                            baseName = fileToDelete.substring(fileToDelete.lastIndexOf('/') + 1, fileToDelete.length());
+                                        }
+                                        File dataLoc = new File(GlobalConf.data.DATA_LOCATION);
+                                        File directory = new File(dataLoc, basePath);
+                                        Collection<File> files = FileUtils.listFilesAndDirs(directory, new WildcardFileFilter(baseName), new WildcardFileFilter(baseName));
+                                        for (File file : files) {
+                                            if (!file.equals(directory) && file.exists()) {
+                                                FileUtils.forceDelete(file);
+                                            }
+                                        }
+                                    } catch (Exception e) {
+                                        logger.error(e);
                                     }
-                                } catch (Exception e) {
+                                }
+                            } else {
+                                // Only remove "check"
+                                try {
+                                    FileUtils.forceDelete(check.toFile());
+                                } catch (IOException e) {
                                     logger.error(e);
                                 }
                             }
-                        } else {
-                            // Only remove "check"
-                            try {
-                                FileUtils.forceDelete(check.toFile());
-                            } catch (IOException e) {
-                                logger.error(e);
-                            }
+                            // RELOAD DATASETS VIEW
+                            Gdx.app.postRunnable(() -> {
+                                reloadAll();
+                            });
+
+                            return true;
                         }
-                        // RELOAD DATASETS VIEW
-                        Gdx.app.postRunnable(() -> {
-                            reloadAll();
-                        });
+                        return false;
+                    });
+                }
 
-                        return true;
-                    }
-                    return false;
-                });
+                datasetsTable.add(cb).left().padRight(padl).padBottom(pad);
+                datasetsTable.add(descGroup).left().padRight(padl).padBottom(pad);
+                datasetsTable.add(vers).center().padRight(padl).padBottom(pad);
+                datasetsTable.add(typeImage).center().padRight(padl).padBottom(pad);
+                datasetsTable.add(size).left().padRight(padl).padBottom(pad);
+                datasetsTable.add(haveit).center().padBottom(pad);
+                if (exists) {
+                    datasetsTable.add(rubbish).center().padLeft(padl * 2.5f);
+                }
+                datasetsTable.row();
+
+                choiceList.add(new Trio<JsonValue, OwnCheckBox, OwnLabel>(dataset, cb, haveit));
             }
-
-            datasetsTable.add(cb).left().padRight(padl).padBottom(pad);
-            datasetsTable.add(descGroup).left().padRight(padl).padBottom(pad);
-            datasetsTable.add(vers).center().padRight(padl).padBottom(pad);
-            datasetsTable.add(type).left().padRight(padl).padBottom(pad);
-            datasetsTable.add(size).left().padRight(padl).padBottom(pad);
-            datasetsTable.add(haveit).center().padBottom(pad);
-            if (exists) {
-                datasetsTable.add(rubbish).center().padLeft(padl);
-            }
-
-            datasetsTable.row();
-
-            choiceList.add(new Trio<JsonValue, OwnCheckBox, OwnLabel>(dataset, cb, haveit));
-
-            dataset = dataset.next();
 
         }
 
