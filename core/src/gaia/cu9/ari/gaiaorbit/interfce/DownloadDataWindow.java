@@ -222,7 +222,7 @@ public class DownloadDataWindow extends GenericDialog {
                 OwnCheckBox cb = new OwnCheckBox(name, skin, pad * 2);
                 boolean baseData = name.equals("default-data");
                 boolean defaultDataset = name.contains("default");
-                cb.setChecked((!exists || (exists && outdated)) && (baseData || defaultDataset));
+                cb.setChecked((!exists || (exists && outdated)) && baseData);
                 cb.setDisabled(baseData || (exists && !outdated));
                 OwnLabel haveit = new OwnLabel("", skin);
                 if (exists) {
