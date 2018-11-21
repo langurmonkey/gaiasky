@@ -258,7 +258,7 @@ public class DownloadDataWindow extends GenericDialog {
                 descGroup.addActor(desc);
 
                 // Version
-                OwnLabel vers = new OwnLabel(exists && outdated ? Integer.toString(myVersion) + " -> " + Integer.toString(serverVersion) : Integer.toString(serverVersion), skin);
+                OwnLabel vers = new OwnLabel(exists && outdated ? Integer.toString(myVersion) + " -> v-" + Integer.toString(serverVersion) : "v-"+Integer.toString(serverVersion), skin);
                 if (!exists) {
                     vers.addListener(new OwnTextTooltip(txt("gui.download.version.server", Integer.toString(serverVersion)), skin, 10));
                 } else if (outdated) {
@@ -270,15 +270,11 @@ public class DownloadDataWindow extends GenericDialog {
                 }
 
                 // Type icon
-                String typeimg = getIcon(dataset.getString("type"));
-                Image typeImage = new OwnImage(skin.getDrawable(typeimg));
+                Image typeImage = new OwnImage(skin.getDrawable(getIcon(dataset.getString("type"))));
                 float scl = 0.7f;
                 float iw =typeImage.getWidth();
                 float ih = typeImage.getHeight();
-                //typeImage.setScale(scl, scl);
-                //typeImage.setOrigin(Align.center);
-                typeImage.setWidth(iw * scl);
-                typeImage.setHeight(ih * scl);
+                typeImage.setSize(iw*scl, ih*scl);
                 typeImage.addListener(new OwnTextTooltip(dataset.getString("type"), skin, 10));
 
                 // Size
@@ -366,8 +362,8 @@ public class DownloadDataWindow extends GenericDialog {
         datasetsScroll.setForceScroll(false, false);
         datasetsScroll.setSmoothScrolling(false);
         datasetsScroll.setFadeScrollBars(false);
-        datasetsScroll.setHeight(Math.min(Gdx.graphics.getHeight() * 0.38f, 350 * GlobalConf.SCALE_FACTOR));
-        datasetsScroll.setWidth(650 * GlobalConf.SCALE_FACTOR);
+        datasetsScroll.setHeight(Math.min(Gdx.graphics.getHeight() * 0.45f, 750 * GlobalConf.SCALE_FACTOR));
+        datasetsScroll.setWidth(Math.min(Gdx.graphics.getWidth() * 0.9f, GlobalConf.SCALE_FACTOR > 1.4f ? 600 * GlobalConf.SCALE_FACTOR : 750 * GlobalConf.SCALE_FACTOR));
 
         downloadTable.add(datasetsScroll).center().padBottom(padl).colspan(2).row();
 
