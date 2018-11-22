@@ -2,6 +2,28 @@
 ## [Unreleased](https://github.com/langurmonkey/gaiasky/tree/master)
 [Full changelog](https://github.com/langurmonkey/gaiasky/compare/2.1.3...HEAD)
 
+### Bug Fixes
+- german translation and locale initialisation
+- do not preselect default dataset, only base data
+- sizing of download manager window
+- data download url log message
+- null pointer when updating scroll focus, slash at end
+- multiple scroll focus objects
+- octree generator
+- emission shader code
+
+### Build system
+- add xorg-xrandr as dep in aur pkg
+
+### Features
+- improve usability of download manager
+- ensure correct java version before building
+- dataset versioning
+- STIL provider adds HIP indices
+- name support and more for STIL loader
+- script to query HIP names in simbad
+- add optional output folder to csv process
+- script to process dr2 csv files
 
 <a name="2.1.3"></a>
 ## [2.1.3](https://github.com/langurmonkey/gaiasky/tree/2.1.2-vr) (2018-10-31)
@@ -13,23 +35,74 @@
 - minimap window 
 - accents and umlauts in user folder path (win) [#314](https://github.com/langurmonkey/gaiasky/issues/314) 
 - start button status update [#313](https://github.com/langurmonkey/gaiasky/issues/313) 
+
 ### Code Refactoring
 
 - startup log 
-- shader include directive changed 
+- shader include directive changed
+
 ### Documentation
 
 - remove old references to `gaiasandbox` 
+
 ### Features
 
 - new shader init & various improvements 
 - add proper motions to stil data provider 
 - initial support for proper motions over SAMP 
 - individual constellation selectors [#275](https://github.com/langurmonkey/gaiasky/issues/275) 
+
 ### Style
 
 - GaiaSky.java to use LF instead of CRLF 
 - remove leftover variables in full gui 
+
+<a name="2.1.2-vr"></a>
+## [2.1.2-vr](https://github.com/langurmonkey/gaiasky/tree/2.1.2) (2018-09-28)
+[Full changelog](https://github.com/langurmonkey/gaiasky/compare/2.1.2...2.1.2-vr)
+
+### Bug Fixes
+
+- remove version from window title 
+- assets location in install4j template 
+- heap sizes in build script 
+- macOS -XstartOnFirstThread flag 
+- macos builds tweaks 
+- global key bindings affect invisible GUIs [#311](https://github.com/langurmonkey/gaiasky/issues/311) 
+- fix `p` double-mapping [#310](https://github.com/langurmonkey/gaiasky/issues/310) 
+
+### Build system
+
+- installer detects and removes previous versions 
+- new gradle 5 compile dep format 
+- update to lwjgl 3.2.3 
+- missing flag in rund, fix caps in ruler 
+- new gradle 5 compile dep format 
+- add javadoc generator and publisher 
+
+### Code Refactoring
+
+- bin to scripts, now settled 
+- scripts moved to bin, bin in git 
+
+### Documentation
+
+- small tweak to changelog template 
+- improve git-chglog configuration 
+- update changelog 
+
+### Features
+
+- update to lwjgl3 backend 
+- cosmic ruler [#296](https://github.com/langurmonkey/gaiasky/issues/296) 
+- API calls to disable and enable the GUI [#312](https://github.com/langurmonkey/gaiasky/issues/312) 
+
+### Style
+
+- fix issues with merge to bring it back to a working state 
+- add ruler component type 
+- general code cleanup 
+- minor style issues 
 
 <a name="2.1.2"></a>
 ## [2.1.2](https://github.com/langurmonkey/gaiasky/tree/2.1.1) (2018-09-18)
@@ -102,6 +175,9 @@
 
 - REST server static files use assets.location [\#300](https://github.com/langurmonkey/gaiasky/pull/300) ([vga101](https://github.com/vga101))
 - Re-introduce REST API [\#281](https://github.com/langurmonkey/gaiasky/pull/281) ([vga101](https://github.com/vga101))
+
+## [2.0.2-vr](https://github.com/langurmonkey/gaiasky/tree/2.0.2-vr) (2018-07-25)
+[Full Changelog](https://github.com/langurmonkey/gaiasky/compare/2.0.2...2.0.2-vr)
 
 ## [2.0.2](https://github.com/langurmonkey/gaiasky/tree/2.0.2) (2018-07-06)
 [Full Changelog](https://github.com/langurmonkey/gaiasky/compare/2.0.1...2.0.2)
