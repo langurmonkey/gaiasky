@@ -115,13 +115,16 @@ public class GaiaSkyDesktop implements IObserver {
                 props = initConfigFile(false);
             }
 
-            // Initialize i18n
+            // Initialize i18n (only for global config logging)
             I18n.initialize(Gdx.files.internal("i18n/gsbundle"));
 
             // Init global configuration
             ConfInit.initialize(new DesktopConfInit());
             GlobalConf.screen.SCREEN_WIDTH = 1080;
             GlobalConf.screen.SCREEN_HEIGHT = 1200;
+
+            // Reinitialize with user-defined locale
+            I18n.initialize(Gdx.files.absolute(GlobalConf.ASSETS_LOC + "i18n/gsbundle"));
 
             if (gsargs.version) {
                 System.out.println(GlobalConf.APPLICATION_NAME + " " + GlobalConf.version.version);
@@ -133,8 +136,6 @@ public class GaiaSkyDesktop implements IObserver {
                 return;
             }
 
-            // Dev mode
-            I18n.initialize(Gdx.files.absolute(GlobalConf.ASSETS_LOC + "i18n/gsbundle"));
 
             // Jython
             ScriptingFactory.initialize(JythonFactory.getInstance());

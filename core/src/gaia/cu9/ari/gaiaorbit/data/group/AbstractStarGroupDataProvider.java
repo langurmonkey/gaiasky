@@ -97,9 +97,8 @@ public abstract class AbstractStarGroupDataProvider implements IStarGroupDataPro
     /**
      * Initialises the lists and structures given a file by counting the number
      * of lines
-     * 
-     * @param f
-     *            The file handle to count the lines
+     *
+     * @param f The file handle to count the lines
      */
     protected void initLists(FileHandle f) {
         try {
@@ -112,7 +111,7 @@ public abstract class AbstractStarGroupDataProvider implements IStarGroupDataPro
 
     /**
      * Initialises the lists and structures given number of elements
-     * 
+     *
      * @param f
      */
     protected void initLists(int elems) {
@@ -140,9 +139,9 @@ public abstract class AbstractStarGroupDataProvider implements IStarGroupDataPro
      * accepted = pllx > 0 && pllx_err < pllx * pllx_err_factor && pllx_err <= 1, otherwise
      * </pre>
      * </p>
-     * 
-     * @param appmag Apparent magnitude of star
-     * @param pllx Parallax of star
+     *
+     * @param appmag  Apparent magnitude of star
+     * @param pllx    Parallax of star
      * @param pllxerr Parallax error of star
      * @return True if parallax is accepted, false otherwise
      */
@@ -161,6 +160,7 @@ public abstract class AbstractStarGroupDataProvider implements IStarGroupDataPro
     /**
      * Gets the distance in parsecs to the star from the geometric distances
      * map, if it exists. Otherwise, it returns a negative value.
+     *
      * @param sourceId The source id of the source
      * @return The geometric distance in parsecs if it exists, -1 otherwise.
      */
@@ -172,6 +172,7 @@ public abstract class AbstractStarGroupDataProvider implements IStarGroupDataPro
 
     /**
      * Checks whether to accept the distance
+     *
      * @param distance Distance in parsecs
      * @return Whether to accept the distance or not
      */
@@ -196,9 +197,8 @@ public abstract class AbstractStarGroupDataProvider implements IStarGroupDataPro
 
     /**
      * Counts the lines on this input stream
-     * 
-     * @param is
-     *            The input stream
+     *
+     * @param is The input stream
      * @return The number of lines
      * @throws IOException
      */
@@ -314,7 +314,8 @@ public abstract class AbstractStarGroupDataProvider implements IStarGroupDataPro
     @Override
     public void setGeoDistancesFile(String geoDistFile) {
         this.geoDistFile = geoDistFile;
-        loadGeometricDistances();
+        if (geoDistFile != null)
+            loadGeometricDistances();
     }
 
     @Override
@@ -341,7 +342,7 @@ public abstract class AbstractStarGroupDataProvider implements IStarGroupDataPro
             int mod = nfiles / 20;
             int i = 1;
             for (File file : files) {
-                if(i % mod == 0){
+                if (i % mod == 0) {
                     logger.info("Loading file " + i + "/" + nfiles);
                 }
                 loadGeometricDistances(file.toPath());

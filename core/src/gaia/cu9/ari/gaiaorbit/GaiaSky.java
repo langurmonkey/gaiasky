@@ -69,9 +69,8 @@ import java.util.*;
 /**
  * The main class. Holds all the entities manages the update/draw cycle as well
  * as the image rendering.
- * 
- * @author Toni Sagrista
  *
+ * @author Toni Sagrista
  */
 public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
     private static final Log logger = Logger.getLogger(GaiaSky.class);
@@ -200,6 +199,7 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
 
     /**
      * Creates an instance of Gaia Sky.
+     *
      * @param dsdownload Force-show the datasets download window
      * @param catchooser Force-show the catalog chooser window
      */
@@ -224,7 +224,7 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
 
         // Basic info
         logger.info("Display mode", Gdx.graphics.getWidth() + "x" + Gdx.graphics.getHeight(), "Fullscreen: " + Gdx.graphics.isFullscreen());
-        logger.info("Device",  Gdx.gl.glGetString(GL20.GL_RENDERER));
+        logger.info("Device", Gdx.gl.glGetString(GL20.GL_RENDERER));
         logger.info(I18n.bundle.format("notif.glslversion", Gdx.gl.glGetString(GL20.GL_SHADING_LANGUAGE_VERSION)));
         logger.info("Java version", System.getProperty("java.version"), System.getProperty("java.vendor"));
 
@@ -532,19 +532,19 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
                 EventManager.instance.post(Events.DEBUG_BUFFERS, GLFrameBuffer.getManagedStatus());
             }
         };
-        
+
         Task debugTask10 = new Task() {
             @Override
             public void run() {
                 EventManager.instance.post(Events.SAMP_INFO, SAMPClient.getInstance().getStatus());
             }
         };
-        
+
         // Each 1 second
         Timer.schedule(debugTask1, 1, 1);
         // Every 10 seconds
         Timer.schedule(debugTask10, 1, 10);
-        
+
         initialized = true;
     }
 
@@ -716,9 +716,8 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
 
     /**
      * Update method.
-     * 
-     * @param deltat
-     *            Delta time in seconds.
+     *
+     * @param deltat Delta time in seconds.
      */
     public void update(double deltat) {
         if (GlobalConf.frame.RENDER_OUTPUT) {
@@ -815,9 +814,8 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
 
     /**
      * Renders a particular GUI
-     * 
-     * @param gui
-     *            The GUI to render
+     *
+     * @param gui The GUI to render
      */
     private void renderGui(IGui gui) {
         gui.update(Gdx.graphics.getDeltaTime());
