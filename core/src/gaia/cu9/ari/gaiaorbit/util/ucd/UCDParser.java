@@ -19,14 +19,15 @@ import uk.ac.starlink.table.StarTable;
 public class UCDParser {
 
     private static String[] idcolnames = new String[] { "hip", "id", "source_id", "tycho2_id" };
+    private static String[] namecolnames = new String[] { "name", "proper", "proper_name", "common_name" };
     private static String[] pos1colnames = new String[] { "ra", "right_ascension", "rightascension", "alpha" };
-    private static String[] pos2colnames = new String[] { "dec", "declination", "delta" };
+    private static String[] pos2colnames = new String[] { "dec", "de", "declination", "delta" };
     private static String[] distcolnames = new String[] { "dist", "distance" };
     private static String[] pllxcolnames = new String[] { "plx", "parallax", "pllx" };
     private static String[] magcolnames = new String[] { "phot_g_mean_mag", "mag", "bmag", "gmag" };
     private static String[] colorcolnames = new String[] { "b_v", "v_i", "bp_rp", "bp_g", "g_rp" };
-    private static String[] pmracolnames = new String[] { "pmra", "pmalpha" };
-    private static String[] pmdeccolnames = new String[] { "pmdec", "pmdelta" };
+    private static String[] pmracolnames = new String[] { "pmra", "pmalpha", "pm_ra" };
+    private static String[] pmdeccolnames = new String[] { "pmdec", "pmdelta", "pm_dec", "pm_de" };
     private static String[] radvelcolnames = new String[] { "radial_velocity", "radvel" };
 
     public Map<UCDType, Set<UCD>> ucdmap;
@@ -34,6 +35,10 @@ public class UCDParser {
     // IDS
     public boolean hasid = false;
     public Set<UCD> ID;
+
+    // NAME
+    public boolean hasname = false;
+    public Set<UCD> NAME;
 
     // POSITIONS
     public boolean haspos = false;
@@ -58,6 +63,7 @@ public class UCDParser {
         super();
         ucdmap = new HashMap<UCDType, Set<UCD>>();
         ID = new HashSet<UCD>();
+        NAME = new HashSet<UCD>();
         POS1 = new HashSet<UCD>();
         POS2 = new HashSet<UCD>();
         POS3 = new HashSet<UCD>();
@@ -99,6 +105,11 @@ public class UCDParser {
             this.ID.addAll(getByColNames(idcolnames));
         }
         this.hasid = this.ID != null && !this.ID.isEmpty();
+
+        if(this.NAME.isEmpty()) {
+            this.NAME.addAll(getByColNames(namecolnames));
+        }
+        this.hasname = this.NAME != null && !this.NAME.isEmpty();
 
         /** POSITIONS **/
         Set<UCD> pos = ucdmap.get(UCDType.POS);

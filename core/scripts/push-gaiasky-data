@@ -3,6 +3,13 @@
 # This script pushes the local gaiasky-data.json to the server.
 # You must have the right private ssh key to connect.
 
+if [ $# -lt 1 ]; then
+    echo "$0"
+    echo "Usage: "
+    echo "   $0 version"
+    exit 1
+fi
+
 # Directory where script is
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null && pwd )"
-scp $DIR/gaiasky-data.json tsagrista@mintaka:/dataB/gaiasky/files/autodownload/
+scp $DIR/gaiasky-data.json tsagrista@mintaka:/dataB/gaiasky/files/autodownload/gaiasky-data/gaiasky-data_v$1.json

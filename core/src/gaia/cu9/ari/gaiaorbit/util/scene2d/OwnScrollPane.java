@@ -2,6 +2,7 @@ package gaia.cu9.ari.gaiaorbit.util.scene2d;
 
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.EventListener;
+import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.ui.ScrollPane;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.utils.ActorGestureListener;
@@ -33,6 +34,20 @@ public class OwnScrollPane extends ScrollPane {
                 removeListener(cl);
             }
         }
+
+        // Focus listener
+        addListener((e) -> {
+            if (e instanceof InputEvent) {
+                InputEvent ie = (InputEvent) e;
+                e.setBubbles(false);
+                if (ie.getType() == InputEvent.Type.enter && this.getStage() != null) {
+                    return this.getStage().setScrollFocus(this);
+                } else if (ie.getType() == InputEvent.Type.exit && this.getStage() != null) {
+                    return this.getStage().setScrollFocus(null);
+                }
+            }
+            return true;
+        });
     }
 
     @Override

@@ -1,20 +1,5 @@
 package gaia.cu9.ari.gaiaorbit.data;
 
-import java.io.BufferedOutputStream;
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.PrintStream;
-import java.io.PrintWriter;
-import java.text.DecimalFormat;
-import java.text.NumberFormat;
-import java.util.HashMap;
-import java.util.Map;
-
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.backends.lwjgl3.Lwjgl3Files;
 import com.badlogic.gdx.files.FileHandle;
@@ -22,9 +7,8 @@ import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.TimeUtils;
 import com.beust.jcommander.JCommander;
 import com.beust.jcommander.Parameter;
-
-import gaia.cu9.ari.gaiaorbit.data.group.HYGDataProvider;
 import gaia.cu9.ari.gaiaorbit.data.group.IStarGroupDataProvider;
+import gaia.cu9.ari.gaiaorbit.data.group.STILDataProvider;
 import gaia.cu9.ari.gaiaorbit.data.octreegen.IStarGroupIO;
 import gaia.cu9.ari.gaiaorbit.data.octreegen.MetadataBinaryIO;
 import gaia.cu9.ari.gaiaorbit.data.octreegen.StarGroupBinaryIO;
@@ -37,17 +21,19 @@ import gaia.cu9.ari.gaiaorbit.desktop.format.DesktopNumberFormatFactory;
 import gaia.cu9.ari.gaiaorbit.desktop.util.DesktopConfInit;
 import gaia.cu9.ari.gaiaorbit.desktop.util.LogWriter;
 import gaia.cu9.ari.gaiaorbit.scenegraph.StarGroup.StarBean;
-import gaia.cu9.ari.gaiaorbit.util.ConfInit;
-import gaia.cu9.ari.gaiaorbit.util.Constants;
-import gaia.cu9.ari.gaiaorbit.util.GlobalConf;
-import gaia.cu9.ari.gaiaorbit.util.I18n;
-import gaia.cu9.ari.gaiaorbit.util.Logger;
+import gaia.cu9.ari.gaiaorbit.util.*;
 import gaia.cu9.ari.gaiaorbit.util.Logger.Log;
 import gaia.cu9.ari.gaiaorbit.util.format.DateFormatFactory;
 import gaia.cu9.ari.gaiaorbit.util.format.NumberFormatFactory;
 import gaia.cu9.ari.gaiaorbit.util.math.Vector3d;
 import gaia.cu9.ari.gaiaorbit.util.parse.Parser;
 import gaia.cu9.ari.gaiaorbit.util.tree.OctreeNode;
+
+import java.io.*;
+import java.text.DecimalFormat;
+import java.text.NumberFormat;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Generates an octree of star groups. Each octant should have only one object,
@@ -119,10 +105,10 @@ public class OctreeGeneratorRun {
     @Parameter(names = "--nfiles", description = "Caps the number of data files to load. Defaults to unlimited")
     private int fileNumCap = -1;
 
-    @Parameter(names = { "--hyg", "--addhyg" }, description = "Add the HYG catalog additionally to the provided by -l")
-    private boolean addHYG = true;
+    @Parameter(names = { "--hip", "--addhip" }, description = "Add the Hipparcos catalog additionally to the provided by -l")
+    private boolean addHip = true;
 
-    @Parameter(names = "--xmatchfile", description = "Crossmatch file with source_id to hip, only if --hyg is enabled")
+    @Parameter(names = "--xmatchfile", description = "Crossmatch file with source_id to hip, only if --hip is enabled")
     private String xmatchFile = null;
 
     @Parameter(names = "--geodistfile", description = "Use this file or directory to lookup distances. Argument is a file or directory with files of of <sourceid, dist[pc]>. If this argument is used, both --pllxerrfaint and --pllxerrbright are ignored")
@@ -167,9 +153,12 @@ public class OctreeGeneratorRun {
             // Initialize date format
             DateFormatFactory.initialize(new DesktopDateFormatFactory());
 
+            // Initialize i18n
+            I18n.initialize(new FileHandle(ASSETS_LOC + "i18n/gsbundle"));
+
+            // Initialize configuration
             ConfInit.initialize(new DesktopConfInit(new FileInputStream(new File(ASSETS_LOC + "conf/global.properties")), new FileInputStream(new File(ASSETS_LOC + "data/dummyversion"))));
 
-            I18n.initialize(new FileHandle(ASSETS_LOC + "i18n/gsbundle"));
 
             // Add notification watch
             lw = new LogWriter();
@@ -206,7 +195,7 @@ public class OctreeGeneratorRun {
         IOctreeGenerator og = new OctreeGeneratorMag(ogp);
 
         /** HIP **/
-        HYGDataProvider hyg = new HYGDataProvider();
+        STILDataProvider stil = new STILDataProvider();
 
         /** CATALOG **/
         String fullLoaderClass = "gaia.cu9.ari.gaiaorbit.data.group." + loaderClass;
@@ -225,11 +214,11 @@ public class OctreeGeneratorRun {
         Array<StarBean> listGaia = (Array<StarBean>) loader.loadData(input);
         Array<StarBean> list;
 
-        if (addHYG) {
+        if (addHip) {
             /** LOAD HYG **/
-            Array<StarBean> listHip = hyg.loadData("data/hyg/hygxyz.bin");
-            long[] cpmhyg = hyg.getCountsPerMag();
-            combineCpm(cpm, cpmhyg);
+            Array<StarBean> listHip = (Array<StarBean>) stil.loadData("data/catalog/hipparcos/hip.vot");
+            long[] cpmhip = stil.getCountsPerMag();
+            combineCpm(cpm, cpmhip);
 
             /** Check x-match file **/
             Map<Long, Integer> xmatchTable = null;

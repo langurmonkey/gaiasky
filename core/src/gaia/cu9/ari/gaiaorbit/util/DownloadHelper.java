@@ -1,18 +1,17 @@
 package gaia.cu9.ari.gaiaorbit.util;
 
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.security.DigestInputStream;
-import java.security.MessageDigest;
-
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Net.HttpMethods;
 import com.badlogic.gdx.Net.HttpRequest;
 import com.badlogic.gdx.Net.HttpResponse;
 import com.badlogic.gdx.Net.HttpResponseListener;
 import com.badlogic.gdx.files.FileHandle;
-
 import gaia.cu9.ari.gaiaorbit.util.Logger.Log;
+
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.security.DigestInputStream;
+import java.security.MessageDigest;
 
 /**
  * Contains utilities to download files
@@ -51,7 +50,7 @@ public class DownloadHelper {
                     int count = -1;
                     long read = 0;
                     try {
-                        logger.info("Downloading: " + GlobalConf.program.DATA_DESCRIPTOR_URL);
+                        logger.info("Downloading: " + url);
                         MessageDigest md = MessageDigest.getInstance("MD5");
                         DigestInputStream dis = new DigestInputStream(is, md);
                         // Keep reading bytes and storing them until there are no more.

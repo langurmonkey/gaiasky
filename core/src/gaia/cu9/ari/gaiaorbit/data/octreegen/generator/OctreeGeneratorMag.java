@@ -17,6 +17,15 @@ import gaia.cu9.ari.gaiaorbit.util.math.BoundingBoxd;
 import gaia.cu9.ari.gaiaorbit.util.math.Vector3d;
 import gaia.cu9.ari.gaiaorbit.util.tree.OctreeNode;
 
+/**
+ * Implements the magnitude to level map, where octants in a level are filled with
+ * magnitude-sorted stars until one of them is saturated before proceeding to lower
+ * levels. This uses more memory than the outdated {@link OctreeGeneratorPart} but
+ * it generally produces artifact-free octrees and properly implements the
+ * bijective mapping f: mag -> level.
+ *
+ * @author Toni Sagrista
+ */
 public class OctreeGeneratorMag implements IOctreeGenerator {
 
     private OctreeGeneratorParams params;

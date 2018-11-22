@@ -1,5 +1,4 @@
-import org.apache.tools.ant.taskdefs.condition.Os
-import org.gradle.api.JavaVersion
+import org.apache.tools.ant.taskdefs.condition.Os 
 
 buildscript {
     repositories {
@@ -40,6 +39,7 @@ allprojects {
         gsonVersion = "2.8.0"
         jafamaVersion = "2.1.0"
         compressVersion = "1.18"
+        commonsioVersion = '2.6'
     }
 
     repositories {
@@ -146,6 +146,7 @@ project(":core") {
         compile "com.beust:jcommander:$jcommanderVersion"
         compile "com.brsanthu:google-analytics-java:$googleanalyticsjavaVersion"
         compile "net.jafama:jafama:$jafamaVersion"
+        compile group: "commons-io", name: "commons-io", version: "$commonsioVersion"
         //compile "org.apache.commons:commons-compress:$compressVersion"
 
 

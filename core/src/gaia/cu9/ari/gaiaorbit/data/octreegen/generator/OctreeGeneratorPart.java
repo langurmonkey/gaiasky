@@ -1,16 +1,23 @@
 package gaia.cu9.ari.gaiaorbit.data.octreegen.generator;
 
+import com.badlogic.gdx.math.MathUtils;
+import com.badlogic.gdx.utils.Array;
+import gaia.cu9.ari.gaiaorbit.scenegraph.StarGroup.StarBean;
+import gaia.cu9.ari.gaiaorbit.util.tree.OctreeNode;
+
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 
-import com.badlogic.gdx.math.MathUtils;
-import com.badlogic.gdx.utils.Array;
-
-import gaia.cu9.ari.gaiaorbit.scenegraph.StarGroup.StarBean;
-import gaia.cu9.ari.gaiaorbit.util.Logger;
-import gaia.cu9.ari.gaiaorbit.util.tree.OctreeNode;
-
+/**
+ * Greedy generator where octants in a level are filled up with as many
+ * stars as possible before proceeding to lower levels. This approach is
+ * outdated and should not be used. Use {@link OctreeGeneratorMag} instead.
+ * This uses less memory than the its magnitude counterpart, but does not
+ * implement the bijective map f: mag -> level.
+ *
+ * @author Toni Sagrista
+ */
 public class OctreeGeneratorPart implements IOctreeGenerator {
 
     private OctreeGeneratorParams params;
