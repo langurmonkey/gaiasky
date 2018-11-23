@@ -120,16 +120,16 @@
         {
             "name" : "catalog-dr2-verylarge",
             "type" : "catalog-lod",
-            "version" : 1,
-            "size" : 58792668285,
+            "version" : 2,
+            "size" : 49714482421,
             "check": "catalog-dr2-verylarge.json",
             "data" : [ 
                     "catalog-dr2-verylarge.json",
                     "catalog/dr2-verylarge"
             ],
             "description": "DR2 catalog: Very large - 90%/90% parallax relative errors for bright/faint stars - 601 million stars",
-            "md5" : "a8c09ad05790798c753df78f15c02538",
-            "file" : "http://gaia.ari.uni-heidelberg.de/gaiasky/files/autodownload/dr2/001_20181116/catalog-dr2-verylarge.tar.gz"
+            "md5" : "a82efcd2f75d175dbb862d0d2a4fc762",
+            "file" : "http://gaia.ari.uni-heidelberg.de/gaiasky/files/autodownload/dr2/002_20181122/catalog-dr2-verylarge.tar.gz"
         },
         {
             "name" : "catalog-dr2-extralarge",
