@@ -1,9 +1,5 @@
 package gaia.cu9.ari.gaiaorbit.interfce;
 
-import java.nio.IntBuffer;
-import java.time.Instant;
-import java.util.Date;
-
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.Color;
@@ -14,43 +10,30 @@ import com.badlogic.gdx.graphics.Texture.TextureFilter;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Stage;
-import com.badlogic.gdx.scenes.scene2d.ui.Button;
-import com.badlogic.gdx.scenes.scene2d.ui.ButtonGroup;
-import com.badlogic.gdx.scenes.scene2d.ui.Container;
-import com.badlogic.gdx.scenes.scene2d.ui.HorizontalGroup;
-import com.badlogic.gdx.scenes.scene2d.ui.Image;
-import com.badlogic.gdx.scenes.scene2d.ui.Label;
+import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.scenes.scene2d.ui.Label.LabelStyle;
-import com.badlogic.gdx.scenes.scene2d.ui.Skin;
-import com.badlogic.gdx.scenes.scene2d.ui.Stack;
-import com.badlogic.gdx.scenes.scene2d.ui.Table;
-import com.badlogic.gdx.scenes.scene2d.ui.TextArea;
-import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.ui.TextField.TextFieldStyle;
-import com.badlogic.gdx.scenes.scene2d.ui.VerticalGroup;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener.ChangeEvent;
 import com.badlogic.gdx.scenes.scene2d.utils.SpriteDrawable;
 import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.BufferUtils;
-
 import gaia.cu9.ari.gaiaorbit.event.EventManager;
 import gaia.cu9.ari.gaiaorbit.event.Events;
 import gaia.cu9.ari.gaiaorbit.util.GlobalConf;
 import gaia.cu9.ari.gaiaorbit.util.GlobalResources;
-import gaia.cu9.ari.gaiaorbit.util.scene2d.Link;
-import gaia.cu9.ari.gaiaorbit.util.scene2d.OwnLabel;
-import gaia.cu9.ari.gaiaorbit.util.scene2d.OwnScrollPane;
-import gaia.cu9.ari.gaiaorbit.util.scene2d.OwnTextArea;
-import gaia.cu9.ari.gaiaorbit.util.scene2d.OwnTextButton;
+import gaia.cu9.ari.gaiaorbit.util.scene2d.*;
 import gaia.cu9.ari.gaiaorbit.util.update.VersionCheckEvent;
 import gaia.cu9.ari.gaiaorbit.util.update.VersionChecker;
+
+import java.nio.IntBuffer;
+import java.time.Instant;
+import java.util.Date;
 
 /**
  * The help window with About, Help and System sections.
  *
  * @author tsagrista
- *
  */
 public class AboutWindow extends GenericDialog {
     private static long versionCheckIntervalMs = 1 * 24 * 60 * 60 * 1000;
@@ -503,17 +486,15 @@ public class AboutWindow extends GenericDialog {
      * <li>Display a "you have the latest version" message and a "check now"
      * button if the given version is older.</li>
      * </ul>
-     * 
-     * @param version
-     *            The version to check.
-     * @param tagdate
-     *            The date
+     *
+     * @param tagVersion The version to check.
+     * @param tagDate    The date
      */
-    private void newVersionCheck(String tagversion, Instant tagdate) {
+    private void newVersionCheck(String tagVersion, Instant tagDate) {
         GlobalConf.program.LAST_CHECKED = Instant.now();
-        if (tagdate.isAfter(GlobalConf.version.buildtime)) {
+        if (tagDate.isAfter(GlobalConf.version.buildtime)) {
             // There's a new version!
-            checkLabel.setText(txt("gui.newversion.available", GlobalConf.version, tagversion));
+            checkLabel.setText(txt("gui.newversion.available", GlobalConf.version, tagVersion));
             final String uri = GlobalConf.WEBPAGE_DOWNLOADS;
 
             OwnTextButton button = new OwnTextButton(txt("gui.newversion.getit"), skin);
