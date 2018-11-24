@@ -183,10 +183,10 @@ public class DownloadDataWindow extends GenericDialog {
         Set<String> types = new LinkedHashSet<String>();
 
         JsonValue dst = dataDesc.child().child();
-        while(dst != null){
+        while (dst != null) {
             String type = dst.getString("type");
             // Add to map
-            if(typeMap.containsKey(type)){
+            if (typeMap.containsKey(type)) {
                 typeMap.get(type).add(dst);
             } else {
                 List<JsonValue> aux = new ArrayList<JsonValue>();
@@ -204,12 +204,12 @@ public class DownloadDataWindow extends GenericDialog {
         Table datasetsTable = new Table(skin);
 
 
-        for(String typeStr : types) {
+        for (String typeStr : types) {
             List<JsonValue> datasets = typeMap.get(typeStr);
 
             datasetsTable.add(new OwnLabel(txt("gui.download.type." + typeStr), skin, "hud-header")).colspan(6).left().padBottom(pad * 3).padTop(padl * 2).row();
 
-            for(JsonValue dataset : datasets){
+            for (JsonValue dataset : datasets) {
                 // Check if we have it
                 final Path check = Paths.get(GlobalConf.data.DATA_LOCATION, dataset.getString("check"));
                 boolean exists = Files.exists(check) && Files.isReadable(check);
@@ -258,7 +258,7 @@ public class DownloadDataWindow extends GenericDialog {
                 descGroup.addActor(desc);
 
                 // Version
-                OwnLabel vers = new OwnLabel(exists && outdated ? Integer.toString(myVersion) + " -> v-" + Integer.toString(serverVersion) : "v-"+Integer.toString(serverVersion), skin);
+                OwnLabel vers = new OwnLabel(exists && outdated ? Integer.toString(myVersion) + " -> v-" + Integer.toString(serverVersion) : "v-" + Integer.toString(serverVersion), skin);
                 if (!exists) {
                     vers.addListener(new OwnTextTooltip(txt("gui.download.version.server", Integer.toString(serverVersion)), skin, 10));
                 } else if (outdated) {
@@ -272,9 +272,9 @@ public class DownloadDataWindow extends GenericDialog {
                 // Type icon
                 Image typeImage = new OwnImage(skin.getDrawable(getIcon(dataset.getString("type"))));
                 float scl = 0.7f;
-                float iw =typeImage.getWidth();
+                float iw = typeImage.getWidth();
                 float ih = typeImage.getHeight();
-                typeImage.setSize(iw*scl, ih*scl);
+                typeImage.setSize(iw * scl, ih * scl);
                 typeImage.addListener(new OwnTextTooltip(dataset.getString("type"), skin, 10));
 
                 // Size
@@ -436,8 +436,10 @@ public class DownloadDataWindow extends GenericDialog {
 
             FileHandle tempDownload = Gdx.files.absolute(GlobalConf.data.DATA_LOCATION + "/temp.tar.gz");
 
-            ProgressRunnable pr = (progress) -> {
-                final String progressString = progress >= 100 ? txt("gui.done") : txt("gui.download.downloading", nf.format(progress));
+            ProgressRunnable pr = (read, total, progress) -> {
+                double readMb = (double) read / 1e6d;
+                double totalMb = (double) total / 1e6d;
+                final String progressString = progress >= 100 ? txt("gui.done") : txt("gui.download.downloading", nf.format(readMb) + " MB of " + nf.format(totalMb) + " MB (" + nf.format(progress)) + ")";
 
                 // Since we are downloading on a background thread, post a runnable to touch UI
                 Gdx.app.postRunnable(() -> {

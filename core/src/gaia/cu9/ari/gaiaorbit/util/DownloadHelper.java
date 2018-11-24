@@ -63,7 +63,7 @@ public class DownloadHelper {
 
                             // Run progress runnable
                             if (progress != null)
-                                progress.run(progressValue);
+                                progress.run(read, length, progressValue);
                         }
                         is.close();
                         os.close();

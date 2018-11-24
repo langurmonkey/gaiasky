@@ -1,5 +1,11 @@
 package gaia.cu9.ari.gaiaorbit.util;
 
 public interface ProgressRunnable {
-    public void run(double progress);
+    /**
+     * Informs of progress
+     * @param read Bytes read
+     * @param total Total bytes to read
+     * @param progress Progress in %
+     */
+    public void run(long read, long total, double progress);
 }
