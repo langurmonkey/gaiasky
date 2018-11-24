@@ -49,6 +49,9 @@ public class DownloadHelper {
                     byte[] bytes = new byte[1024];
                     int count = -1;
                     long read = 0;
+                    long lastTimeMs = System.currentTimeMillis();
+                    long lastRead = 0;
+                    double bytesPerMs = 0;
                     try {
                         logger.info("Downloading: " + url);
                         MessageDigest md = MessageDigest.getInstance("MD5");
@@ -61,9 +64,25 @@ public class DownloadHelper {
                             // Compute progress value
                             final double progressValue = ((double) read / (double) length) * 100;
 
+                            // Compute speed
+                            long currentTimeMs = System.currentTimeMillis();
+                            // Update each second
+                            boolean updateSpeed = currentTimeMs - lastTimeMs >= 1000;
+                            if(updateSpeed) {
+                                long elapsedMs = currentTimeMs - lastTimeMs;
+                                long readInterval = read - lastRead;
+                                bytesPerMs = readInterval / elapsedMs;
+                            }
+
                             // Run progress runnable
                             if (progress != null)
-                                progress.run(read, length, progressValue);
+                                progress.run(read, length, progressValue, bytesPerMs);
+
+                            // Reset
+                            if(updateSpeed) {
+                                lastTimeMs = currentTimeMs;
+                                lastRead = read;
+                            }
                         }
                         is.close();
                         os.close();

@@ -62,7 +62,7 @@ public class DownloadDataWindow extends GenericDialog {
 
     private OwnTextButton downloadButton;
     private OwnProgressBar downloadProgress;
-    private OwnLabel currentDownloadFile;
+    private OwnLabel currentDownloadFile, downloadSpeed;
     private OwnScrollPane datasetsScroll;
     private float scrollX = 0, scrollY = 0;
 
@@ -385,6 +385,11 @@ public class DownloadDataWindow extends GenericDialog {
         downloadProgress.setPrefWidth(minw);
         downloadTable.add(downloadProgress).center().colspan(2).padBottom(padl).row();
 
+        // Download info
+        downloadSpeed = new OwnLabel("", skin);
+        downloadSpeed.setVisible(false);
+        downloadTable.add(downloadSpeed).center().colspan(2).padBottom(padl).row();
+
         downloadButton.addListener((event) -> {
             if (event instanceof ChangeEvent) {
                 downloadAndExtractFiles(choiceList);
@@ -436,15 +441,17 @@ public class DownloadDataWindow extends GenericDialog {
 
             FileHandle tempDownload = Gdx.files.absolute(GlobalConf.data.DATA_LOCATION + "/temp.tar.gz");
 
-            ProgressRunnable pr = (read, total, progress) -> {
+            ProgressRunnable pr = (read, total, progress, speed) -> {
                 double readMb = (double) read / 1e6d;
                 double totalMb = (double) total / 1e6d;
-                final String progressString = progress >= 100 ? txt("gui.done") : txt("gui.download.downloading", nf.format(readMb) + " MB of " + nf.format(totalMb) + " MB (" + nf.format(progress)) + ")";
-
+                final String progressString = progress >= 100 ? txt("gui.done") : txt("gui.download.downloading", nf.format(progress));
+                double mbPerSecond = speed / 1000d;
+                final String speedString = nf.format(readMb) + "/" + nf.format(totalMb) + " MB   -   " + nf.format(mbPerSecond) + " MB/s";
                 // Since we are downloading on a background thread, post a runnable to touch UI
                 Gdx.app.postRunnable(() -> {
                     downloadButton.setText(progressString);
                     downloadProgress.setValue((float) progress);
+                    downloadSpeed.setText(speedString);
                 });
             };
 
@@ -487,6 +494,8 @@ public class DownloadDataWindow extends GenericDialog {
                     downloadButton.setText(txt("gui.download.download"));
                     downloadProgress.setValue(0);
                     downloadProgress.setVisible(false);
+                    downloadSpeed.setText("");
+                    downloadSpeed.setVisible(false);
                     me.acceptButton.setDisabled(false);
                     // Enable all
                     setDisabled(choiceList, false);
@@ -520,6 +529,7 @@ public class DownloadDataWindow extends GenericDialog {
                 setMessageError(txt("gui.download.failed", name));
                 me.acceptButton.setDisabled(false);
                 downloadProgress.setVisible(false);
+                downloadSpeed.setVisible(false);
                 Gdx.app.postRunnable(() -> {
                     downloadNext();
                 });
@@ -531,6 +541,7 @@ public class DownloadDataWindow extends GenericDialog {
                 setMessageError(txt("gui.download.failed", name));
                 me.acceptButton.setDisabled(false);
                 downloadProgress.setVisible(false);
+                downloadSpeed.setVisible(false);
                 Gdx.app.postRunnable(() -> {
                     downloadNext();
                 });
@@ -540,6 +551,7 @@ public class DownloadDataWindow extends GenericDialog {
             downloadButton.setDisabled(true);
             me.acceptButton.setDisabled(true);
             downloadProgress.setVisible(true);
+            downloadSpeed.setVisible(true);
             setStatusProgress(trio.getThird());
             setMessageOk(txt("gui.download.downloading.info", (current + 1), toDownload.size, currentJson.getString("name")));
             DownloadHelper.downloadFile(url, tempDownload, pr, finish, fail, cancel);

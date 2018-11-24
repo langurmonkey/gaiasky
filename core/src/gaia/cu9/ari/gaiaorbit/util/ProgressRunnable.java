@@ -5,7 +5,8 @@ public interface ProgressRunnable {
      * Informs of progress
      * @param read Bytes read
      * @param total Total bytes to read
-     * @param progress Progress in %
+     * @param progress Progress in percentage
+     * @param speed Download speed in bytes per millisecond
      */
-    public void run(long read, long total, double progress);
+    public void run(long read, long total, double progress, double speed);
 }
