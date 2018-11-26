@@ -4,18 +4,15 @@ buildscript {
     repositories {
         mavenCentral()
         maven { url "https://oss.sonatype.org/content/repositories/snapshots/" }
-        maven { url "http://maven.ej-technologies.com/repository" }
         maven { url "https://plugins.gradle.org/m2/" }
         jcenter()
         flatDir { dirs 'lib' }
     }
-    dependencies {
-        classpath 'de.richsource.gradle.plugins:gwt-gradle-plugin:0.6'
-        classpath "gradle.plugin.install4j.install4j:gradle_plugin:6.1.2"
-    }
 }
 
-plugins { id "com.install4j.gradle" version "6.1.2" }
+plugins {
+  id "com.install4j.gradle" version "7.0.8"
+}
 
 allprojects {
     apply plugin: "eclipse"
