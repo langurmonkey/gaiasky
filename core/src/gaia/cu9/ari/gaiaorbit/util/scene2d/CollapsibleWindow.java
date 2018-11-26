@@ -17,6 +17,7 @@
 package gaia.cu9.ari.gaiaorbit.util.scene2d;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.Cursor.SystemCursor;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.math.Vector2;
@@ -30,7 +31,6 @@ import com.badlogic.gdx.scenes.scene2d.ui.TextTooltip;
 import com.badlogic.gdx.scenes.scene2d.ui.Window;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.scenes.scene2d.utils.Drawable;
-
 import gaia.cu9.ari.gaiaorbit.util.GlobalConf;
 import gaia.cu9.ari.gaiaorbit.util.GlobalResources;
 import gaia.cu9.ari.gaiaorbit.util.I18n;
@@ -86,7 +86,10 @@ public class CollapsibleWindow extends Window {
                 // pixels of margin
                 if (vec2.len() < 3) {
                     if (getHeight() - y <= getPadTop() && y < getHeight() && x > 0 && x < getWidth())
-                        toggleCollapsed();
+                        if(button == Input.Buttons.LEFT) {
+                            // Left mouse button on title toggles collapse
+                            toggleCollapsed();
+                        }
                 }
                 super.touchUp(event, x, y, pointer, button);
             }

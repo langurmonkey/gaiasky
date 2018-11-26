@@ -36,7 +36,6 @@ import java.util.Date;
  * @author tsagrista
  */
 public class AboutWindow extends GenericDialog {
-    private static long versionCheckIntervalMs = 1 * 24 * 60 * 60 * 1000;
 
     private LabelStyle linkStyle;
     private Table checkTable;
@@ -410,7 +409,7 @@ public class AboutWindow extends GenericDialog {
         checkLabel = new OwnLabel("", skin);
 
         checkTable.add(checkLabel).top().left().padBottom(pad).row();
-        if (GlobalConf.program.LAST_CHECKED == null || new Date().getTime() - GlobalConf.program.LAST_CHECKED.toEpochMilli() > versionCheckIntervalMs) {
+        if (GlobalConf.program.VERSION_LAST_TIME == null || new Date().getTime() - GlobalConf.program.VERSION_LAST_TIME.toEpochMilli() > GlobalConf.ProgramConf.VERSION_CHECK_INTERVAL_MS) {
             // Check!
             checkLabel.setText(txt("gui.newversion.checking"));
             getCheckVersionThread().start();
@@ -491,7 +490,7 @@ public class AboutWindow extends GenericDialog {
      * @param tagDate    The date
      */
     private void newVersionCheck(String tagVersion, Instant tagDate) {
-        GlobalConf.program.LAST_CHECKED = Instant.now();
+        GlobalConf.program.VERSION_LAST_TIME = Instant.now();
         if (tagDate.isAfter(GlobalConf.version.buildtime)) {
             // There's a new version!
             checkLabel.setText(txt("gui.newversion.available", GlobalConf.version, tagVersion));
