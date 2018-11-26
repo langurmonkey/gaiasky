@@ -57,7 +57,7 @@ following command. You will need root privileges to install a `deb` package in
 your system.
 
 ```
-$  sudo dpkg -i gaiasky_linux_<version>.deb
+$  dpkg -i gaiasky_linux_<version>.deb
 ```
 
 This will install the application in the `/opt/gaiasky/` folder
@@ -66,14 +66,14 @@ and it will create the necessary shortcuts.
 In order to **uninstall**, just type:
 
 ```
-$  sudo apt-get remove gaiasky
+$  apt remove gaiasky
 ```
 ##### 1.2.1.2 AUR
 
-We also provide an [AUR package](https://aur.archlinux.org/packages/gaiasky/) called `gaiasky`. You can install it easily with any tool capable of accessing `AUR`, for example `yaourt`.
+We also provide an [AUR package](https://aur.archlinux.org/packages/gaiasky/) called `gaiasky`. You can install it easily with any tool capable of accessing `AUR`, for example `yay`.
 
 ```
-$  yaourt -S gaiasky
+$  yay -S gaiasky
 ```
  
 ##### 1.2.1.3 RPM
@@ -84,16 +84,16 @@ following command. You will need root privileges to install a `rpm` package in
 your system.
 
 ```
-$  sudo yum install gaiasky_linux_<version>.rpm
+$  rpm -ivh --nodigest gaiasky_linux_<version>.rpm
 ```
 
 This will install the application in the `/opt/gaiasky/` folder
 and it will create the necessary shortcuts.
 
-In order to **uninstall**, just type:
+In order to **uninstall** using `yum` (replace by `dnf` if needed), just type:
 
 ```
-$  sudo yum remove gaiasky-x86
+$  yum remove gaiasky.x86_64
 ```
 
 ##### 1.2.1.4 Linux installer
