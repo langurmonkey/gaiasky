@@ -118,6 +118,20 @@
             "file" : "http://gaia.ari.uni-heidelberg.de/gaiasky/files/autodownload/dr2/001_20181116/catalog-dr2-large.tar.gz"
         },
         {
+            "name" : "catalog-dr2-ratherlarge",
+            "type" : "catalog-lod",
+            "version" : 1,
+            "size" : 39076959088,
+            "check": "catalog-dr2-ratherlarge.json",
+            "data" : [ 
+                    "catalog-dr2-ratherlarge.json",
+                    "catalog/dr2-ratherlarge"
+            ],
+            "description": "DR2 catalog: Rather large - 50% parallax relative error - 400 million stars",
+            "md5" : "fe639d60e7a55b82ca726dc6456b1fcf",
+            "file" : "http://gaia.ari.uni-heidelberg.de/gaiasky/files/autodownload/dr2/002_20181122/catalog-dr2-ratherlarge.tar.gz"
+        },
+        {
             "name" : "catalog-dr2-verylarge",
             "type" : "catalog-lod",
             "version" : 2,

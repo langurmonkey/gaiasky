@@ -1338,6 +1338,7 @@ return console.askYesNo(message, true);
         <entry location="data/dummyversion" fileType="regular" />
         <entry location="ic_launcher.svg" fileType="regular" />
         <entry location="gs.desktop" fileType="regular" />
+        <entry location="rest-static" fileType="regular" />
       </exclude>
       <variables />
       <autoUpdate useMinUpdatableVersion="false" minUpdatableVersion="" useMaxUpdatableVersion="false" maxUpdatableVersion="">
@@ -1359,6 +1360,7 @@ return console.askYesNo(message, true);
         <entry location="data/dummyversion" fileType="regular" />
         <entry location="ic_launcher.svg" fileType="regular" />
         <entry location="gs.desktop" fileType="regular" />
+        <entry location="rest-static" fileType="regular" />
       </exclude>
       <variables />
       <autoUpdate useMinUpdatableVersion="false" minUpdatableVersion="" useMaxUpdatableVersion="false" maxUpdatableVersion="">
@@ -1373,6 +1375,8 @@ return console.askYesNo(message, true);
       <overriddenPrincipalLanguage id="en" customLocalizationFile="" />
       <exclude>
         <entry location="gaiasky.cmd" fileType="regular" />
+        <entry location="data/dummyversion" fileType="regular" />
+        <entry location="rest-static" fileType="regular" />
       </exclude>
       <variables />
       <autoUpdate useMinUpdatableVersion="false" minUpdatableVersion="" useMaxUpdatableVersion="false" maxUpdatableVersion="">
@@ -1393,6 +1397,7 @@ return console.askYesNo(message, true);
         <entry location="ic_launcher.ico" fileType="regular" />
         <entry location="gaiasky.cmd" fileType="regular" />
         <entry location="data/dummyversion" fileType="regular" />
+        <entry location="rest-static" fileType="regular" />
       </exclude>
       <variables />
       <autoUpdate useMinUpdatableVersion="false" minUpdatableVersion="" useMaxUpdatableVersion="false" maxUpdatableVersion="">
@@ -1415,6 +1420,7 @@ return console.askYesNo(message, true);
         <entry location="ic_launcher.ico" fileType="regular" />
         <entry location="gaiasky.cmd" fileType="regular" />
         <entry location="data/dummyversion" fileType="regular" />
+        <entry location="rest-static" fileType="regular" />
       </exclude>
       <variables />
       <autoUpdate useMinUpdatableVersion="false" minUpdatableVersion="" useMaxUpdatableVersion="false" maxUpdatableVersion="">
@@ -1446,6 +1452,7 @@ return console.askYesNo(message, true);
         <entry location="ic_launcher.ico" fileType="regular" />
         <entry location="gaiasky.cmd" fileType="regular" />
         <entry location="data/dummyversion" fileType="regular" />
+        <entry location="rest-static" fileType="regular" />
       </exclude>
       <variables />
       <autoUpdate useMinUpdatableVersion="false" minUpdatableVersion="" useMaxUpdatableVersion="false" maxUpdatableVersion="">

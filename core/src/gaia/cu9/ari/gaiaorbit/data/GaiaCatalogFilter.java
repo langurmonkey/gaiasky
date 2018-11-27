@@ -1,26 +1,13 @@
 package gaia.cu9.ari.gaiaorbit.data;
 
-import java.io.DataOutputStream;
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.text.DecimalFormat;
-import java.text.NumberFormat;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.GregorianCalendar;
-import java.util.HashSet;
-import java.util.Set;
-
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.backends.lwjgl.LwjglFiles;
 import com.badlogic.gdx.utils.Array;
-
 import gaia.cu9.ari.gaiaorbit.data.stars.HYGBinaryLoader;
 import gaia.cu9.ari.gaiaorbit.data.stars.STILCatalogLoader;
 import gaia.cu9.ari.gaiaorbit.desktop.format.DesktopDateFormatFactory;
 import gaia.cu9.ari.gaiaorbit.desktop.util.DesktopConfInit;
-import gaia.cu9.ari.gaiaorbit.desktop.util.LogWriter;
+import gaia.cu9.ari.gaiaorbit.interfce.ConsoleLogger;
 import gaia.cu9.ari.gaiaorbit.scenegraph.AbstractPositionEntity;
 import gaia.cu9.ari.gaiaorbit.scenegraph.CelestialBody;
 import gaia.cu9.ari.gaiaorbit.scenegraph.Star;
@@ -35,12 +22,19 @@ import gaia.cu9.ari.gaiaorbit.util.math.Quaterniond;
 import gaia.cu9.ari.gaiaorbit.util.math.Vector3d;
 import net.jafama.FastMath;
 
+import java.io.DataOutputStream;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.text.DecimalFormat;
+import java.text.NumberFormat;
+import java.util.*;
+
 /**
  * Loads a catalog and selects the stars that are observed during a certain
  * period of time.
- * 
- * @author tsagrista
  *
+ * @author tsagrista
  */
 public class GaiaCatalogFilter {
 
@@ -51,7 +45,6 @@ public class GaiaCatalogFilter {
     Matrix4d trf;
 
     NumberFormat nf;
-    LogWriter lw;
 
     String catal = "tycho";
 
@@ -66,7 +59,7 @@ public class GaiaCatalogFilter {
         Gdx.files = new LwjglFiles();
 
         // Init log writer
-        lw = new LogWriter();
+        new ConsoleLogger();
 
         // Initialize date format
         DateFormatFactory.initialize(new DesktopDateFormatFactory());
@@ -115,19 +108,13 @@ public class GaiaCatalogFilter {
 
     /**
      * Produces the filtered catalogs for each day between the selected dates.
-     * 
-     * @param iniY
-     *            The initial year.
-     * @param iniM
-     *            The initial month. Starts at 1 for January.
-     * @param iniD
-     *            The initial day of the month. Starts at 1.
-     * @param endY
-     *            The end year.
-     * @param endM
-     *            The end month. Starts at 1 for January.
-     * @param endD
-     *            The end day of the month. Starts at 1.
+     *
+     * @param iniY The initial year.
+     * @param iniM The initial month. Starts at 1 for January.
+     * @param iniD The initial day of the month. Starts at 1.
+     * @param endY The end year.
+     * @param endM The end month. Starts at 1 for January.
+     * @param endD The end day of the month. Starts at 1.
      */
     public void filterCatalog(int iniY, int iniM, int iniD, int endY, int endM, int endD) {
         // Some constants
