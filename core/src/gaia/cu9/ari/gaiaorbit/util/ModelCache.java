@@ -1,17 +1,16 @@
 package gaia.cu9.ari.gaiaorbit.util;
 
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Set;
-
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.VertexAttributes.Usage;
 import com.badlogic.gdx.graphics.g3d.Material;
 import com.badlogic.gdx.graphics.g3d.Model;
-
 import gaia.cu9.ari.gaiaorbit.util.g3d.MeshPartBuilder2.VertexInfo;
 import gaia.cu9.ari.gaiaorbit.util.g3d.ModelBuilder2;
+
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Set;
 
 public class ModelCache {
     final Map<String, Model> modelCache;
@@ -60,7 +59,7 @@ public class ModelCache {
             case "disc":
                 // Prepare model
                 float diameter2 = ((Double) params.get("diameter")).floatValue() / 2f;
-                // Initialize milky way model
+                // Initialize disc model
 
                 // TOP VERTICES
                 VertexInfo vt00 = new VertexInfo();
@@ -97,6 +96,52 @@ public class ModelCache {
                 vb10.setPos(-diameter2, 0, diameter2);
                 vb10.setNor(0, 1, 0);
                 vb10.setUV(1, 0);
+
+                mb.begin();
+                mb.part("up", GL20.GL_TRIANGLES, attributes, mat).rect(vt00, vt01, vt11, vt10);
+                mb.part("down", GL20.GL_TRIANGLES, attributes, mat).rect(vb00, vb10, vb11, vb01);
+                model = mb.end();
+                break;
+            case "twofacedbillboard":
+                // Prepare model
+                diameter2 = ((Double) params.get("diameter")).floatValue() / 2f;
+                // Initialize disc model
+
+                // TOP VERTICES
+                 vt00 = new VertexInfo();
+                vt00.setPos(-diameter2, -diameter2,0);
+                vt00.setNor(0, 1, 0);
+                vt00.setUV(1, 0);
+                 vt01 = new VertexInfo();
+                vt01.setPos(-diameter2,  diameter2, 0);
+                vt01.setNor(0, 1, 0);
+                vt01.setUV(1, 1);
+                 vt11 = new VertexInfo();
+                vt11.setPos(diameter2,  diameter2, 0);
+                vt11.setNor(0, 1, 0);
+                vt11.setUV(0, 1);
+                 vt10 = new VertexInfo();
+                vt10.setPos(diameter2, -diameter2, 0);
+                vt10.setNor(0, 1, 0);
+                vt10.setUV(0, 0);
+
+                // BOTTOM VERTICES
+                vb00 = new VertexInfo();
+                vb00.setPos(-diameter2, -diameter2, 0);
+                vb00.setNor(0, 1, 0);
+                vb00.setUV(1, 0);
+                 vb01 = new VertexInfo();
+                vb01.setPos(-diameter2, diameter2, 0);
+                vb01.setNor(0, 1, 0);
+                vb01.setUV(1, 1);
+                 vb11 = new VertexInfo();
+                vb11.setPos(diameter2, diameter2, 0);
+                vb11.setNor(0, 1, 0);
+                vb11.setUV(0, 1);
+                 vb10 = new VertexInfo();
+                vb10.setPos(diameter2, -diameter2, 0);
+                vb10.setNor(0, 1, 0);
+                vb10.setUV(0, 0);
 
                 mb.begin();
                 mb.part("up", GL20.GL_TRIANGLES, attributes, mat).rect(vt00, vt01, vt11, vt10);

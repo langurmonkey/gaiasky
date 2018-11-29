@@ -1,18 +1,11 @@
 package gaia.cu9.ari.gaiaorbit.scenegraph;
 
-import java.util.Map;
-import java.util.TreeMap;
-
 import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.Texture.TextureFilter;
 import com.badlogic.gdx.graphics.VertexAttributes.Usage;
-import com.badlogic.gdx.graphics.g3d.Environment;
-import com.badlogic.gdx.graphics.g3d.Material;
-import com.badlogic.gdx.graphics.g3d.Model;
-import com.badlogic.gdx.graphics.g3d.ModelBatch;
-import com.badlogic.gdx.graphics.g3d.ModelInstance;
+import com.badlogic.gdx.graphics.g3d.*;
 import com.badlogic.gdx.graphics.g3d.attributes.BlendingAttribute;
 import com.badlogic.gdx.graphics.g3d.attributes.ColorAttribute;
 import com.badlogic.gdx.graphics.g3d.attributes.FloatAttribute;
@@ -20,19 +13,18 @@ import com.badlogic.gdx.graphics.g3d.attributes.TextureAttribute;
 import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.ObjectMap;
-
 import gaia.cu9.ari.gaiaorbit.GaiaSky;
 import gaia.cu9.ari.gaiaorbit.render.ComponentType;
 import gaia.cu9.ari.gaiaorbit.scenegraph.camera.FovCamera;
 import gaia.cu9.ari.gaiaorbit.scenegraph.camera.ICamera;
 import gaia.cu9.ari.gaiaorbit.scenegraph.component.ModelComponent;
-import gaia.cu9.ari.gaiaorbit.util.ComponentTypes;
-import gaia.cu9.ari.gaiaorbit.util.Constants;
-import gaia.cu9.ari.gaiaorbit.util.GlobalConf;
 import gaia.cu9.ari.gaiaorbit.util.ModelCache;
-import gaia.cu9.ari.gaiaorbit.util.Pair;
+import gaia.cu9.ari.gaiaorbit.util.*;
 import gaia.cu9.ari.gaiaorbit.util.math.MathUtilsd;
 import gaia.cu9.ari.gaiaorbit.util.math.Vector3d;
+
+import java.util.Map;
+import java.util.TreeMap;
 
 /**
  * Represents a star. The Gaia sourceid is put in the id attribute. Otherwise,
@@ -336,6 +328,7 @@ public class Star extends Particle {
         return tycho;
     }
 
+    @Override
     protected void addToIndex(ObjectMap<String, SceneGraphNode> map) {
         // Hip
         if (hip > 0) {
@@ -345,6 +338,19 @@ public class Star extends Particle {
         // Tycho
         if (tycho != null && !tycho.isEmpty()) {
             map.put(tycho, this);
+        }
+    }
+
+    @Override
+    protected void removeFromIndex(ObjectMap<String, SceneGraphNode> map) {
+        // Hip
+        if (hip > 0) {
+            String hipid = "hip " + hip;
+            map.remove(hipid);
+        }
+        // Tycho
+        if (tycho != null && !tycho.isEmpty()) {
+            map.remove(tycho);
         }
     }
 

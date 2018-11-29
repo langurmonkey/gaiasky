@@ -4,32 +4,17 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Event;
 import com.badlogic.gdx.scenes.scene2d.EventListener;
-import com.badlogic.gdx.scenes.scene2d.ui.Button;
-import com.badlogic.gdx.scenes.scene2d.ui.Cell;
-import com.badlogic.gdx.scenes.scene2d.ui.HorizontalGroup;
-import com.badlogic.gdx.scenes.scene2d.ui.Image;
-import com.badlogic.gdx.scenes.scene2d.ui.Skin;
-import com.badlogic.gdx.scenes.scene2d.ui.Table;
-import com.badlogic.gdx.scenes.scene2d.ui.TextTooltip;
+import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener.ChangeEvent;
 import com.badlogic.gdx.utils.Align;
-
 import gaia.cu9.ari.gaiaorbit.GaiaSky;
 import gaia.cu9.ari.gaiaorbit.event.EventManager;
 import gaia.cu9.ari.gaiaorbit.event.Events;
 import gaia.cu9.ari.gaiaorbit.event.IObserver;
 import gaia.cu9.ari.gaiaorbit.render.ComponentType;
-import gaia.cu9.ari.gaiaorbit.scenegraph.IFocus;
-import gaia.cu9.ari.gaiaorbit.scenegraph.IProperMotion;
-import gaia.cu9.ari.gaiaorbit.scenegraph.IStarFocus;
-import gaia.cu9.ari.gaiaorbit.scenegraph.Planet;
-import gaia.cu9.ari.gaiaorbit.scenegraph.StarCluster;
+import gaia.cu9.ari.gaiaorbit.scenegraph.*;
 import gaia.cu9.ari.gaiaorbit.scenegraph.camera.CameraManager.CameraMode;
-import gaia.cu9.ari.gaiaorbit.util.Constants;
-import gaia.cu9.ari.gaiaorbit.util.GlobalConf;
-import gaia.cu9.ari.gaiaorbit.util.GlobalResources;
-import gaia.cu9.ari.gaiaorbit.util.I18n;
-import gaia.cu9.ari.gaiaorbit.util.Pair;
+import gaia.cu9.ari.gaiaorbit.util.*;
 import gaia.cu9.ari.gaiaorbit.util.coord.Coordinates;
 import gaia.cu9.ari.gaiaorbit.util.format.INumberFormat;
 import gaia.cu9.ari.gaiaorbit.util.format.NumberFormatFactory;
@@ -41,9 +26,8 @@ import gaia.cu9.ari.gaiaorbit.util.scene2d.OwnTextIconButton;
 /**
  * Part of the user interface which holds the information on the current focus
  * object and on the camera.
- * 
- * @author tsagrista
  *
+ * @author tsagrista
  */
 public class FocusInfoInterface extends Table implements IObserver, IGuiInterface {
     static private INetworkChecker daemon;
@@ -340,7 +324,11 @@ public class FocusInfoInterface extends Table implements IObserver, IGuiInterfac
                 } else if (sf.getTycho() != null && sf.getTycho().length() > 0) {
                     id = "TYC " + sf.getTycho();
                 }
-
+            } else if (focus instanceof IGalaxyFocus) {
+                IGalaxyFocus gal = (IGalaxyFocus) focus;
+                // Special case of messier object
+                if(gal.getAltname() != null && !gal.getAltname().isEmpty())
+                    id = gal.getAltname();
             }
             if (id.length() == 0) {
                 id = "-";

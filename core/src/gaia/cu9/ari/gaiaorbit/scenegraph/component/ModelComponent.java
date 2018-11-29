@@ -1,8 +1,5 @@
 package gaia.cu9.ari.gaiaorbit.scenegraph.component;
 
-import java.util.HashMap;
-import java.util.Map;
-
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.files.FileHandle;
@@ -19,28 +16,30 @@ import com.badlogic.gdx.graphics.g3d.attributes.TextureAttribute;
 import com.badlogic.gdx.graphics.g3d.environment.DirectionalLight;
 import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.utils.Disposable;
-
 import gaia.cu9.ari.gaiaorbit.data.AssetBean;
 import gaia.cu9.ari.gaiaorbit.event.EventManager;
 import gaia.cu9.ari.gaiaorbit.event.Events;
 import gaia.cu9.ari.gaiaorbit.event.IObserver;
 import gaia.cu9.ari.gaiaorbit.scenegraph.camera.ICamera;
-import gaia.cu9.ari.gaiaorbit.util.GlobalConf;
-import gaia.cu9.ari.gaiaorbit.util.I18n;
-import gaia.cu9.ari.gaiaorbit.util.Logger;
+import gaia.cu9.ari.gaiaorbit.util.*;
 import gaia.cu9.ari.gaiaorbit.util.Logger.Log;
-import gaia.cu9.ari.gaiaorbit.util.ModelCache;
-import gaia.cu9.ari.gaiaorbit.util.Pair;
+
+import java.util.HashMap;
+import java.util.Map;
 
 public class ModelComponent implements Disposable, IObserver {
     private static final Log logger = Logger.getLogger(ModelComponent.class);
-    
+
     public boolean forceinit = false;
     private static ColorAttribute ambient;
     /**
-     * Light never changes
+     * Light never changes; set fixed ambient light for this model
      */
     private Boolean staticLight = false;
+    /** Ambient light level for static light objects **/
+    private float staticLightLevel = 0.6f;
+    /** Flag **/
+    private boolean updateStaticLight = false;
 
     static {
         ambient = new ColorAttribute(ColorAttribute.AmbientLight, (float) GlobalConf.scene.AMBIENT_LIGHT, (float) GlobalConf.scene.AMBIENT_LIGHT, (float) GlobalConf.scene.AMBIENT_LIGHT, 1f);
@@ -56,9 +55,8 @@ public class ModelComponent implements Disposable, IObserver {
 
     /**
      * Sets the ambient light
-     * 
-     * @param level
-     *            Ambient light level between 0 and 1
+     *
+     * @param level Ambient light level between 0 and 1
      */
     public static void setAmbientLight(float level) {
         ambient.color.set(level, level, level, 1f);
@@ -143,8 +141,12 @@ public class ModelComponent implements Disposable, IObserver {
             // Remove dir and global ambient. Add ambient
             //env.remove(dlight);
             // Ambient
-            ColorAttribute alight = new ColorAttribute(ColorAttribute.AmbientLight, .6f, .6f, .6f, 1f);
+
+            // If lazy texture init, we turn off the lights until the texture is loaded
+            float level = GlobalConf.scene.LAZY_TEXTURE_INIT ? 0f : staticLightLevel;
+            ColorAttribute alight = new ColorAttribute(ColorAttribute.AmbientLight, level, level, level, 1f);
             env.set(alight);
+            updateStaticLight = GlobalConf.scene.LAZY_TEXTURE_INIT;
         }
 
         if (!mesh || (mesh && !GlobalConf.scene.LAZY_MESH_INIT)) {
@@ -236,6 +238,7 @@ public class ModelComponent implements Disposable, IObserver {
                     });
 
                     // Set to initialised
+                    updateStaticLight();
                     texInitialised = true;
                     texLoading = false;
                 }
@@ -243,6 +246,7 @@ public class ModelComponent implements Disposable, IObserver {
                 // Use color if necessary
                 addColorToMat();
                 // Set to initialised
+                updateStaticLight();
                 texInitialised = true;
                 texLoading = false;
             }
@@ -273,6 +277,19 @@ public class ModelComponent implements Disposable, IObserver {
             }
         }
 
+    }
+
+
+    private void updateStaticLight() {
+        Gdx.app.postRunnable(()-> {
+            // Update static
+            if (updateStaticLight) {
+                ColorAttribute ambient = (ColorAttribute) env.get(ColorAttribute.AmbientLight);
+                if (ambient != null)
+                    ambient.color.set(staticLightLevel, staticLightLevel, staticLightLevel, 1.0f);
+                updateStaticLight = false;
+            }
+        });
     }
 
     public void addColorToMat() {
@@ -336,10 +353,9 @@ public class ModelComponent implements Disposable, IObserver {
 
     /**
      * Sets the type of the model to construct.
-     * 
-     * @param type
-     *            The type. Currently supported types are
-     *            sphere|cylinder|ring|disc.
+     *
+     * @param type The type. Currently supported types are
+     *             sphere|cylinder|ring|disc.
      */
     public void setType(String type) {
         this.type = type;
@@ -351,7 +367,7 @@ public class ModelComponent implements Disposable, IObserver {
 
     /**
      * Sets the model file path (this must be a .g3db, .g3dj or .obj).
-     * 
+     *
      * @param model
      */
     public void setModel(String model) {
@@ -359,7 +375,16 @@ public class ModelComponent implements Disposable, IObserver {
     }
 
     public void setStaticlight(String staticLight) {
-        this.staticLight = Boolean.valueOf(staticLight);
+        setStaticlight(Boolean.valueOf(staticLight));
+    }
+
+    public void setStaticlight(Boolean staticLight) {
+        this.staticLight = staticLight;
+    }
+
+    public void setStaticlight(Double lightLevel) {
+        this.staticLight = true;
+        this.staticLightLevel = lightLevel.floatValue();
     }
 
     public void setParams(Map<String, Object> params) {

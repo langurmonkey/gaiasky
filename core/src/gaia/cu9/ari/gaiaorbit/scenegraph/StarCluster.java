@@ -462,6 +462,11 @@ public class StarCluster extends AbstractPositionEntity implements IFocus, IProp
     }
 
     @Override
+    public float getTextOpacity(){
+        return getOpacity();
+    }
+
+    @Override
     public <T extends SceneGraphNode> T getSimpleCopy() {
         StarCluster copy = (StarCluster) super.getSimpleCopy();
         copy.localTransform.set(this.localTransform);

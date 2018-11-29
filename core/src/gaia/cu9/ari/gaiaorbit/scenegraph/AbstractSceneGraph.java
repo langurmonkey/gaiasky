@@ -210,27 +210,8 @@ public abstract class AbstractSceneGraph implements ISceneGraph {
                 map.remove(id);
             }
 
-            if (node instanceof Star) {
-                // Hip
-                if (((Star) node).hip > 0) {
-                    String hipid = "hip " + ((Star) node).hip;
-                    map.remove(hipid);
-                }
-
-                // Tycho
-                if (((Star) node).tycho != null && !((Star) node).tycho.isEmpty()) {
-                    map.remove(((Star) node).tycho);
-                }
-            } else if (node instanceof StarGroup) {
-                StarGroup sg = (StarGroup) node;
-                if (sg.index != null) {
-                    ObjectIntMap.Keys<String> keys = sg.index.keys();
-                    for (String key : keys) {
-                        map.remove(key);
-                    }
-                }
-            }
-
+            // Special cases
+            node.removeFromIndex(map);
         }
     }
 

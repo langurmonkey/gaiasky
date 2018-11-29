@@ -320,4 +320,9 @@ public class MilkyWayReal extends AbstractPositionEntity implements I3DTextRende
     public void setModel(ModelComponent mc) {
         this.mc = mc;
     }
+
+    @Override
+    public float getTextOpacity(){
+        return getOpacity();
+    }
 }

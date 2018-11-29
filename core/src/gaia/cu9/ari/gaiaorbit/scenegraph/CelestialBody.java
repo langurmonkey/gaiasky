@@ -499,4 +499,9 @@ public abstract class CelestialBody extends AbstractPositionEntity implements I3
         return coordinatesTimeOverflow;
     }
 
+    @Override
+    public float getTextOpacity(){
+        return getOpacity();
+    }
+
 }

@@ -1,15 +1,11 @@
 package gaia.cu9.ari.gaiaorbit.scenegraph;
 
-import java.util.Iterator;
-import java.util.List;
-
 import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Bits;
 import com.badlogic.gdx.utils.ObjectMap;
-
 import gaia.cu9.ari.gaiaorbit.GaiaSky;
 import gaia.cu9.ari.gaiaorbit.render.ComponentType;
 import gaia.cu9.ari.gaiaorbit.render.IRenderable;
@@ -23,6 +19,9 @@ import gaia.cu9.ari.gaiaorbit.util.math.Vector2d;
 import gaia.cu9.ari.gaiaorbit.util.math.Vector3d;
 import gaia.cu9.ari.gaiaorbit.util.time.ITimeFrameProvider;
 import gaia.cu9.ari.gaiaorbit.util.tree.IPosition;
+
+import java.util.Iterator;
+import java.util.List;
 
 /**
  * A scene graph entity.
@@ -73,42 +72,47 @@ public class SceneGraphNode implements IStarContainer, IPosition {
         BILLBOARD_GAL(3),
         /** Shader - front (planets, satellites...) **/
         BILLBOARD_SSO(4),
+        /** Billboard with custom texture **/
+        BILLBOARD_TEX(5),
         /** Single pixel **/
-        POINT_STAR(5),
+        POINT_STAR(6),
         /** Line **/
-        LINE(6),
+        LINE(7),
         /** Annotations **/
-        FONT_ANNOTATION(7),
+        FONT_ANNOTATION(8),
         /** Atmospheres of planets **/
-        MODEL_ATM(8),
+        MODEL_ATM(9),
         /** Label **/
-        FONT_LABEL(9),
+        FONT_LABEL(10),
         /** Model star **/
-        MODEL_STAR(10),
+        MODEL_STAR(11),
         /** Galaxy as a whole **/
-        GALAXY(11),
+        GALAXY(12),
         /** Model close up **/
-        MODEL_CLOSEUP(12),
+        MODEL_CLOSEUP(13),
         /** Beams **/
-        MODEL_BEAM(13),
+        MODEL_BEAM(14),
         /** Particle grup **/
-        PARTICLE_GROUP(14),
+        PARTICLE_GROUP(15),
         /** Star grup **/
-        STAR_GROUP(15),
+        STAR_GROUP(16),
         /** Shapes **/
-        SHAPE(16),
+        SHAPE(17),
         /** Regular billboard sprite **/
-        BILLBOARD_SPRITE(17),
+        BILLBOARD_SPRITE(18),
         /** Line GPU **/
-        LINE_GPU(18),
+        LINE_GPU(19),
         /** Particle positions from orbital elements **/
-        PARTICLE_ORBIT_ELEMENTS(19),
+        PARTICLE_ORBIT_ELEMENTS(20),
         /** Transparent meshes **/
-        MODEL_MESH(20),
+        MODEL_MESH(21),
         /** Grids shader **/
-        MODEL_GRIDS(21),
+        MODEL_GRIDS(22),
         /** Clouds **/
-        MODEL_CLOUD(22),
+        MODEL_CLOUD(23),
+        /** Using normal shader for per-pixel lighting, with additive blending **/
+        MODEL_NORMAL_ADDITIVE(24),
+
 
         /** None **/
         NONE(-1);
@@ -222,7 +226,7 @@ public class SceneGraphNode implements IStarContainer, IPosition {
     public boolean computed = true;
 
     /**
-     * The transparency value (alpha)
+     * The ownOpacity value (alpha)
      */
     public float opacity = 1f;
 
@@ -536,6 +540,10 @@ public class SceneGraphNode implements IStarContainer, IPosition {
         }
     }
 
+    public void setId(Long id){
+        this.id = id;
+    }
+
     public long getId() {
         return id;
     }
@@ -779,7 +787,14 @@ public class SceneGraphNode implements IStarContainer, IPosition {
      */
     protected void addToIndex(ObjectMap<String, SceneGraphNode> map) {
     }
-    
+
+    /**
+     * Special actions to be taken for this object when removing from the index. Must implement if addToIndex is implemented
+     * @param map The index
+     */
+    protected void removeFromIndex(ObjectMap<String, SceneGraphNode> map) {
+    }
+
     /**
      * Whether to add this node to the index
      * @return True if the node needs to be added to the index.

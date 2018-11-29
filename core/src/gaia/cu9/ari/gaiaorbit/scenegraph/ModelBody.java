@@ -60,9 +60,6 @@ public abstract class ModelBody extends CelestialBody {
     /** ThOverFactor for Locs **/
     public float locThOverFactor = 1f;
 
-    /** Render size, different from actual size **/
-    public float renderSize;
-
     /** Size factor, which can be set to scale model objects up or down **/
     public float sizeScaleFactor = 1f;
 
@@ -143,14 +140,9 @@ public abstract class ModelBody extends CelestialBody {
 
     public void setToLocalTransform(float size, float sizeFactor, Matrix4 localTransform, boolean forceUpdate) {
         if (sizeFactor != 1 || forceUpdate) {
-            
             // NEW
             translation.getMatrix(localTransform).scl(size * sizeFactor).mul(Coordinates.getTransformF(refPlaneTransform)).rotate(0, 1, 0, (float) rc.ascendingNode).rotate(0, 0, 1, (float) (rc.inclination + rc.axialTilt)).rotate(0, 1, 0, (float) rc.angle);
             orientation.idt().mul(Coordinates.getTransformD(refPlaneTransform)).rotate(0, 0, 1, (float) (rc.inclination + rc.axialTilt)).rotate(0, 1, 0, (float) rc.ascendingNode);
-            
-            // OLD
-            //transform.getMatrix(localTransform).scl(size * sizeFactor).rotate(0, 1, 0, (float) rc.ascendingNode).rotate(0, 0, 1, (float) (rc.inclination + rc.axialTilt)).rotate(0, 1, 0, (float) rc.angle);
-            //orientation.idt().rotate(0, 1, 0, (float) rc.ascendingNode).rotate(0, 0, 1, (float) (rc.inclination + rc.axialTilt));
         } else {
             localTransform.set(this.localTransform);
         }
