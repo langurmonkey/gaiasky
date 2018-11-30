@@ -1440,7 +1440,7 @@ return console.askYesNo(message, true);
         <content />
       </postUninstallScript>
     </linuxDeb>
-    <linuxRPM name="Linux RPM" id="77" customizedId="" mediaFileName="" installDir="/opt/${compiler:sys.shortName}" overridePrincipalLanguage="false" jreBitType="all" runPostProcessor="false" postProcessor="" failOnPostProcessorError="false" useLegacyMediaFileIds="false" legacyMediaFileIds="" downloadURL="" includeAllDownloadableComponents="true" includedJRE="" manualJREEntry="false" overwriteNeverAsConfigFiles="false" dependencies="java-openjdk-headless" os="linux" arch="x86_64">
+    <linuxRPM name="Linux RPM" id="77" customizedId="" mediaFileName="" installDir="/opt/${compiler:sys.shortName}" overridePrincipalLanguage="false" jreBitType="all" runPostProcessor="false" postProcessor="" failOnPostProcessorError="false" useLegacyMediaFileIds="false" legacyMediaFileIds="" downloadURL="" includeAllDownloadableComponents="true" includedJRE="" manualJREEntry="false" overwriteNeverAsConfigFiles="false" dependencies="" os="linux" arch="x86_64">
       <excludedComponents />
       <includedDownloadableComponents />
       <excludedLaunchers>
