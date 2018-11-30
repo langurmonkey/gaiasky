@@ -14,7 +14,7 @@ import gaia.cu9.ari.gaiaorbit.util.GlobalConf;
 import gaia.cu9.ari.gaiaorbit.util.math.Vector3d;
 import gaia.cu9.ari.gaiaorbit.util.time.ITimeFrameProvider;
 
-public class NBGalaxy extends Particle implements IGalaxyFocus {
+public class NBGalaxy extends Particle {
 
     /** Bmag [-4.6/21.4] - Apparent integral B band magnitude **/
     float bmag;
@@ -163,12 +163,4 @@ public class NBGalaxy extends Particle implements IGalaxyFocus {
         return 0.00004f;
     }
 
-    public void setAltname(String altname){
-        this.altname = altname;
-    }
-
-    @Override
-    public String getAltname() {
-        return altname;
-    }
 }

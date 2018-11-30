@@ -10,7 +10,6 @@ import com.badlogic.gdx.graphics.glutils.ShaderProgram;
 import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.Array;
-
 import gaia.cu9.ari.gaiaorbit.GaiaSky;
 import gaia.cu9.ari.gaiaorbit.render.ComponentType;
 import gaia.cu9.ari.gaiaorbit.render.SceneGraphRenderer;
@@ -446,4 +445,5 @@ public abstract class ModelBody extends CelestialBody {
         this.refPlaneTransform = refplane + "toequatorial";
         this.inverseRefPlaneTransform = "equatorialto" + refplane;
     }
+
 }

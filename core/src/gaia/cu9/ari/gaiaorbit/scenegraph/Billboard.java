@@ -13,7 +13,7 @@ import gaia.cu9.ari.gaiaorbit.util.time.ITimeFrameProvider;
 
 public class Billboard extends ModelBody {
 
-    protected static final double TH_ANGLE_NONE = ModelBody.TH_ANGLE_POINT / 1e18;
+    protected static final double TH_ANGLE_NONE = 0.002;
     protected static final double TH_ANGLE_POINT = ModelBody.TH_ANGLE_POINT / 1e9;
     protected static final double TH_ANGLE_QUAD = ModelBody.TH_ANGLE_POINT / 8;
 
@@ -100,8 +100,7 @@ public class Billboard extends ModelBody {
     @Override
     protected void addToRenderLists(ICamera camera) {
         if (GaiaSky.instance.isOn(ct)) {
-            double thPoint = (THRESHOLD_POINT() * camera.getFovFactor()) / sizeScaleFactor;
-            if (viewAngleApparent >= thPoint) {
+            if (viewAngleApparent >= TH_ANGLE_NONE) {
                 addToRender(this, RenderGroup.MODEL_NORMAL);
                 if (renderText()) {
                     addToRender(this, RenderGroup.FONT_LABEL);
@@ -120,6 +119,16 @@ public class Billboard extends ModelBody {
         return !hidden && super.renderText();
     }
 
+    @Override
+    public float getTextOpacity() {
+        return Math.max(getOpacity(), fadeOpacity);
+    }
+
+
+    @Override
+    public float labelSizeConcrete() {
+        return size * .5e-2f;
+    }
 
     @Override
     protected float labelMax() {

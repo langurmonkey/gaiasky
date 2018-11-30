@@ -324,11 +324,11 @@ public class FocusInfoInterface extends Table implements IObserver, IGuiInterfac
                 } else if (sf.getTycho() != null && sf.getTycho().length() > 0) {
                     id = "TYC " + sf.getTycho();
                 }
-            } else if (focus instanceof IGalaxyFocus) {
-                IGalaxyFocus gal = (IGalaxyFocus) focus;
+            } else if (focus instanceof CelestialBody) {
+                CelestialBody cb = (CelestialBody) focus;
                 // Special case of messier object
-                if(gal.getAltname() != null && !gal.getAltname().isEmpty())
-                    id = gal.getAltname();
+                if(cb.getAltname() != null && !cb.getAltname().isEmpty())
+                    id = cb.getAltname();
             }
             if (id.length() == 0) {
                 id = "-";

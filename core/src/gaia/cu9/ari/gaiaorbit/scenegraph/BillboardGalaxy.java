@@ -4,7 +4,6 @@ import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Mesh;
 import com.badlogic.gdx.graphics.glutils.ShaderProgram;
 import com.badlogic.gdx.math.Vector3;
-import com.badlogic.gdx.utils.ObjectMap;
 import gaia.cu9.ari.gaiaorbit.GaiaSky;
 import gaia.cu9.ari.gaiaorbit.render.ComponentType;
 import gaia.cu9.ari.gaiaorbit.scenegraph.camera.ICamera;
@@ -16,11 +15,14 @@ import gaia.cu9.ari.gaiaorbit.util.time.ITimeFrameProvider;
 import java.util.HashMap;
 import java.util.Map;
 
-public class BillboardGalaxy extends Billboard implements IGalaxyFocus {
+public class BillboardGalaxy extends Billboard {
 
     protected static final double TH_ANGLE_POINT_M = Math.toRadians(0.9);
 
-    private String altname;
+
+    public BillboardGalaxy(){
+        super();
+    }
 
     public BillboardGalaxy(String name, String altname, double alpha, double delta, double dist, double sizePc, String tex) {
         super();
@@ -94,43 +96,4 @@ public class BillboardGalaxy extends Billboard implements IGalaxyFocus {
         return name != null && GaiaSky.instance.isOn(ComponentType.Labels) && (opacity > 0 || fadeOpacity > 0);
     }
 
-    @Override
-    public float labelSizeConcrete() {
-        return size * .5e-2f;
-    }
-
-    @Override
-    public float getTextOpacity() {
-        return Math.max(getOpacity(), fadeOpacity);
-    }
-
-    public void setAltname(String altname) {
-        this.altname = altname;
-    }
-
-    public String getAltname() {
-        return this.altname;
-    }
-
-    @Override
-    protected void addToIndex(ObjectMap<String, SceneGraphNode> map) {
-        if (altname != null && !altname.isEmpty()) {
-            map.put(altname.toLowerCase(), this);
-        }
-    }
-
-    @Override
-    protected void removeFromIndex(ObjectMap<String, SceneGraphNode> map) {
-        if (altname != null && !altname.isEmpty()) {
-            map.remove(altname.toLowerCase());
-        }
-    }
-    @Override
-    public IFocus getFocus(String name) {
-        IFocus res = super.getFocus(name);
-        if(res == null && (altname != null && altname.toLowerCase().equals(name))){
-            res = this;
-        }
-        return res;
-    }
 }
