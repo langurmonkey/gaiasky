@@ -1,35 +1,41 @@
 <a name="unreleased"></a>
 ## [Unreleased](https://github.com/langurmonkey/gaiasky/tree/master)
-[Full changelog](https://github.com/langurmonkey/gaiasky/compare/2.1.4...HEAD)
+[Full changelog](https://github.com/langurmonkey/gaiasky/compare/2.1.5...HEAD)
+
+
+<a name="2.1.5"></a>
+## [2.1.5](https://github.com/langurmonkey/gaiasky/tree/2.1.4) (2018-12-03)
+[Full changelog](https://github.com/langurmonkey/gaiasky/compare/2.1.4...2.1.5)
 
 ### Bug Fixes
-- null pointer when unloading stars
 
+- null pointer when unloading stars [#322](https://github.com/langurmonkey/gaiasky/issues/322) 
 ### Build system
-- remove rpm deps as they depend on distro
-- update build scripts to install4j 7.0.8
-- update to libgdx 1.9.9
-- update data with new dr2-verylarge catalog
 
+- remove rpm deps as they depend on distro 
+- update build scripts to install4j 7.0.8 
+- update to libgdx 1.9.9 
+- update data with new dr2-verylarge catalog 
 ### Code Refactoring
-- regular textures to tex/base
-- cleaned up logger situation
 
+- regular textures to tex/base 
+- cleaned up logger situation 
 ### Documentation
-- update rpm install command
 
+- update changelog 
+- update rpm install command [#317](https://github.com/langurmonkey/gaiasky/issues/317) 
 ### Features
-- LMC, SMC, datasets can require min gs version
-- add support for nebulae
-- non-jsonloader autoload files
-- billboard galaxies
-- passive update notifier
-- add download speed and progress in downloaded/total to download manager
-- add progress MB data to downloader
 
+- LMC, SMC, datasets can require min gs version 
+- add support for nebulae 
+- non-jsonloader autoload files 
+- billboard galaxies 
+- passive update notifier [#321](https://github.com/langurmonkey/gaiasky/issues/321) 
+- add download speed and progress in downloaded/total to download manager 
+- add progress MB data to downloader 
 ### Style
-- fix info message
 
+- fix info message 
 
 <a name="2.1.4"></a>
 ## [2.1.4](https://github.com/langurmonkey/gaiasky/tree/2.1.3) (2018-11-23)
@@ -101,6 +107,8 @@
 - assets location in install4j template 
 - heap sizes in build script 
 - macOS -XstartOnFirstThread flag 
+- macos builds tweaks 
+- assets location in install4j template 
 - global key bindings affect invisible GUIs [#311](https://github.com/langurmonkey/gaiasky/issues/311) 
 - fix `p` double-mapping [#310](https://github.com/langurmonkey/gaiasky/issues/310) 
 ### Build system
