@@ -5,6 +5,7 @@
             "name" : "default-data",
             "type" : "data-pack",
             "version" : 0,
+            "mingsversion" : 261,
             "size" : 54860771,
             "check": "data-main.json",
             "data" : [
