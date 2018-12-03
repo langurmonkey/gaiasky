@@ -179,6 +179,7 @@ public class DownloadDataWindow extends GenericDialog {
         // Parse available files
         JsonValue dataDesc = reader.parse(Gdx.files.absolute(SysUtils.getDefaultTmpDir() + "/gaiasky-data.json"));
 
+        Map<String, JsonValue> bestDs = new HashMap<String, JsonValue>();
         Map<String, List<JsonValue>> typeMap = new HashMap<String, List<JsonValue>>();
         // We don't want repeated elements but want to keep insertion order
         Set<String> types = new LinkedHashSet<String>();
@@ -186,8 +187,28 @@ public class DownloadDataWindow extends GenericDialog {
         JsonValue dst = dataDesc.child().child();
         while (dst != null) {
             boolean hasVersion = dst.has("mingsversion");
-            if (!hasVersion || hasVersion && dst.getInt("mingsversion", 0) <= GaiaSkyDesktop.SOURCE_CONF_VERSION) {
+            int thisVersion = dst.getInt("mingsversion", 0);
+            if (!hasVersion || hasVersion && thisVersion <= GaiaSkyDesktop.SOURCE_CONF_VERSION) {
+                // Dataset type
                 String type = dst.getString("type");
+
+                // Check if better option already exists
+                String dsName = dst.getString("name");
+                if(bestDs.containsKey(dsName)){
+                    JsonValue other = bestDs.get(dsName);
+                    int otherVersion = other.getInt("mingsversion", 0);
+                    if(otherVersion >= thisVersion){
+                        // Ignore this version
+                        dst = dst.next();
+                        continue;
+                    } else if(thisVersion > otherVersion) {
+                        // Remove other version, use this
+                        typeMap.get(type).remove(other);
+                        bestDs.remove(dsName);
+                    }
+                }
+
+
                 // Add to map
                 if (typeMap.containsKey(type)) {
                     typeMap.get(type).add(dst);
@@ -199,6 +220,8 @@ public class DownloadDataWindow extends GenericDialog {
 
                 // Add to set
                 types.add(type);
+                // Add to bestDs
+                bestDs.put(dsName, dst);
             }
             // Next
             dst = dst.next();

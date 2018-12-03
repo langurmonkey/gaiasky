@@ -110,7 +110,7 @@ public class StarCluster extends AbstractPositionEntity implements IFocus, IProp
 
     public void initModel() {
         if (clusterTex == null) {
-            clusterTex = new Texture(GlobalConf.data.dataFileHandle("data/tex/cluster-tex.png"), true);
+            clusterTex = new Texture(GlobalConf.data.dataFileHandle("data/tex/base/cluster-tex.png"), true);
             clusterTex.setFilter(TextureFilter.MipMapLinearNearest, TextureFilter.Linear);
         }
         if (model == null) {

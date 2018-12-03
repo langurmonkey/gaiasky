@@ -5,7 +5,6 @@
             "name" : "default-data",
             "type" : "data-pack",
             "version" : 0,
-            "mingsversion" : 261,
             "size" : 54860771,
             "check": "data-main.json",
             "data" : [
@@ -46,6 +45,47 @@
             "md5"  : "a6ad8e450f68c7df533564bdb33dd62b",
             "description" : "Default data pack for Gaia Sky - Contains the Solar System, constellations, NBG, SDSS, meshes and more",
             "file" : "http://gaia.ari.uni-heidelberg.de/gaiasky/files/autodownload/basedata/000_20180829/gaiasky_data.tar.gz" 
+        },
+        {
+            "name" : "default-data",
+            "type" : "data-pack",
+            "version" : 1,
+            "mingsversion" : 260,
+            "size" : 44533007,
+            "check": "data-main.json",
+            "data" : [
+                        "data-main.json",
+                        "asteroids-dr2.json",
+                        "asteroids.json",
+                        "attitudexml",
+                        "constellations",
+                        "countries",
+                        "extra.json",
+                        "galaxy",
+                        "locations-earth.json",
+                        "locations.json",
+                        "locations-moon.json",
+                        "meshes/dr2/meshes_dust",
+                        "meshes/dr2/meshes_hii",
+                        "meshes-dr2-dust.json",
+                        "meshes-dr2-hii.json",
+                        "models",
+                        "moons.json",
+                        "mwsc",
+                        "oort",
+                        "orbit",
+                        "orbits-asteroid.json",
+                        "orbits-asteroids-dr2.json",
+                        "orbits-moon.json",
+                        "orbits-planet.json",
+                        "orbits-satellite.json",
+                        "planets.json",
+                        "satellites.json",
+                        "tex/base"
+            ],
+            "md5"  : "17ea4bf3ff1e5e68c1df4fc6248b6b57",
+            "description" : "Default data pack for Gaia Sky - For Gaia Sky 2.1.5 and above. Contains the Solar System, constellations, meshes and more",
+            "file" : "http://gaia.ari.uni-heidelberg.de/gaiasky/files/autodownload/basedata/001_20181129/gaiasky_data.tar.gz" 
         },
 
         {
@@ -171,8 +211,71 @@
                     "catalog/hipparcos"
             ],
             "description": "Hipparcos - Hipparcos new reduction (van Leeuwen, 2007) - 177955 stars",
+            "md5" : "b1961e699488caa1a082291aa8387a34",
             "file" : "http://gaia.ari.uni-heidelberg.de/gaiasky/files/autodownload/hipparcos/000_20181116/catalog-hipparcos-newreduction.tar.gz"
         },
+        {
+            "name" : "catalog-nbg",
+            "type" : "catalog",
+            "version" : 0,
+            "mingsversion" : 260,
+            "size" : 11232650,
+            "check": "autoload-nbg.json",
+            "data" : [ 
+                    "autoload-nbg.json",
+                    "nbg",
+                    "tex/extragal"
+            ],
+            "description": "NBG catalog - Nearby Galaxies Catalog - 870 galaxies",
+            "md5" : "aae97eeb5a524896074bdb0eede3ebb0",
+            "file" : "http://gaia.ari.uni-heidelberg.de/gaiasky/files/autodownload/galaxies/001_20181129/nbg-galaxies.tar.gz"
+        },
+        {
+            "name" : "catalog-sdss-12",
+            "type" : "catalog",
+            "version" : 0,
+            "mingsversion" : 260,
+            "size" : 10296078,
+            "check": "autoload-sdss-small.json",
+            "data" : [ 
+                    "autoload-sdss-small.json",
+                    "sdss/sdss_dr12_small.csv"
+            ],
+            "description": "SDSS DR12 - Part of Sloan Digital Sky Survey DR12 - 500000 galaxies",
+            "md5" : "20b3c704b297d5c8ec4f10eb31465915",
+            "file" : "http://gaia.ari.uni-heidelberg.de/gaiasky/files/autodownload/galaxies/001_20181129/sdss-12-galaxies.tar.gz"
+        },
+        {
+            "name" : "catalog-sdss-14",
+            "type" : "catalog",
+            "version" : 0,
+            "mingsversion" : 260,
+            "size" : 79126936,
+            "check": "autoload-sdss-large.json",
+            "data" : [ 
+                    "autoload-sdss-large.json",
+                    "sdss/sdss_dr14_large.csv"
+            ],
+            "description": "SDSS DR14 - Sloan Digital Sky Survey DR14 - 3.9 million galaxies",
+            "md5" : "0477808710c71cfeac3bc318683b855b",
+            "file" : "http://gaia.ari.uni-heidelberg.de/gaiasky/files/autodownload/galaxies/001_20181129/sdss-14-galaxies.tar.gz"
+        },
+        {
+            "name" : "catalog-nebulae",
+            "type" : "catalog",
+            "version" : 0,
+            "mingsversion" : 260,
+            "size" : 15407761,
+            "check": "autoload-nebulae.json",
+            "data" : [ 
+                    "autoload-nebulae.json",
+                    "tex/nebulae"
+            ],
+            "description": "Nebulae - A few nebulae with textures",
+            "md5" : "37eb29c52e1ed3004b4541897a5fe8a1",
+            "file" : "http://gaia.ari.uni-heidelberg.de/gaiasky/files/autodownload/nebulae/001_20181129/nebulae.tar.gz"
+        },
+
 
 
         {
@@ -239,7 +342,24 @@
                     "tex/*-high.jpg"
             ],
             "description": "High resolution textures - High resolution texture pack including some 4K and 8K textures for planet surfaces and asteroids.",
+            "md5sum" : "4a33a91e16d799645960294dd7c4c179",
             "file" : "http://gaia.ari.uni-heidelberg.de/gaiasky/files/autodownload/tex/000_20180904/hi-res-texture-pack.tar.gz"
+        },
+
+        {
+            "name" : "hi-res-textures",
+            "type" : "texture-pack",
+            "version" : 1,
+            "mingsversion" : 260,
+            "size" : 52583819,
+            "check": "hi-res-tex-desc.json",
+            "data" : [ 
+                    "hi-res-tex-desc.json",
+                    "tex/base/*-high.jpg"
+            ],
+            "description": "High resolution textures - High resolution texture pack including some 4K and 8K textures for planet surfaces and asteroids.",
+            "md5" : "7e480c26e0126336b5776d2c26be466d",
+            "file" : "http://gaia.ari.uni-heidelberg.de/gaiasky/files/autodownload/tex/001_20181129/hi-res-texture-pack.tar.gz"
         }
     ]
 }

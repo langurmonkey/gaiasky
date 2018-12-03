@@ -204,8 +204,8 @@ public class StarGroup extends ParticleGroup implements ILineRenderable, IStarFo
 
     private static void initModel() {
         if (mc == null) {
-            Texture tex = new Texture(GlobalConf.data.dataFile("tex/star.jpg"));
-            Texture lut = new Texture(GlobalConf.data.dataFile("tex/lut.jpg"));
+            Texture tex = new Texture(GlobalConf.data.dataFile("tex/base/star.jpg"));
+            Texture lut = new Texture(GlobalConf.data.dataFile("tex/base/lut.jpg"));
             tex.setFilter(TextureFilter.Linear, TextureFilter.Linear);
 
             Map<String, Object> params = new TreeMap<String, Object>();
