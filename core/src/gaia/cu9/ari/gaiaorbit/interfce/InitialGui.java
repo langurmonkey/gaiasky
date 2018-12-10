@@ -1,9 +1,5 @@
 package gaia.cu9.ari.gaiaorbit.interfce;
 
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.files.FileHandle;
@@ -11,7 +7,6 @@ import com.badlogic.gdx.graphics.Cursor.SystemCursor;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
-
 import gaia.cu9.ari.gaiaorbit.desktop.util.SysUtils;
 import gaia.cu9.ari.gaiaorbit.event.EventManager;
 import gaia.cu9.ari.gaiaorbit.event.Events;
@@ -23,11 +18,14 @@ import gaia.cu9.ari.gaiaorbit.util.Logger.Log;
 import gaia.cu9.ari.gaiaorbit.util.scene2d.Link;
 import gaia.cu9.ari.gaiaorbit.util.scene2d.OwnLabel;
 
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+
 /**
  * Displays dataset downloader and dataset chooser screen if needed.
- * 
- * @author Toni Sagrista
  *
+ * @author Toni Sagrista
  */
 public class InitialGui extends AbstractGui {
     private static final Log logger = Logger.getLogger(InitialGui.class);
@@ -41,6 +39,7 @@ public class InitialGui extends AbstractGui {
 
     /**
      * Creates an initial GUI
+     *
      * @param dsdownload Forces dataset download window
      * @param catchooser Forces catalog chooser window
      */
@@ -64,6 +63,12 @@ public class InitialGui extends AbstractGui {
 
         DownloadHelper.downloadFile(GlobalConf.program.DATA_DESCRIPTOR_URL, Gdx.files.absolute(SysUtils.getDefaultTmpDir() + "/gaiasky-data.json"), null, (md5sum) -> {
             Gdx.app.postRunnable(() -> {
+                /**
+                 * Display download manager if:
+                 * - force display (args), or
+                 * - base data not found, or
+                 * - no catalogs found in data folder
+                 */
                 if (dsdownload || !basicDataPresent() || catalogFiles.size == 0) {
                     // No catalog files, display downloader
                     addDownloaderWindow();
@@ -90,9 +95,21 @@ public class InitialGui extends AbstractGui {
 
     }
 
+    private boolean isCatalogSelected() {
+        return GlobalConf.data.CATALOG_JSON_FILES != null && !GlobalConf.data.CATALOG_JSON_FILES.isEmpty();
+    }
+
     private void displayChooser() {
+        DatasetsWidget dw = new DatasetsWidget(skin, GlobalConf.ASSETS_LOC);
+        Array<FileHandle> catalogFiles = dw.buildCatalogFiles();
         clearGui();
-        if (catchooser || GlobalConf.program.DISPLAY_DATASET_DIALOG) {
+        /**
+         * Display chooser if:
+         * - force display (args), or
+         * - force display (conf), or
+         * - catalogs available and yet no catalog is selected
+         */
+        if (catchooser || GlobalConf.program.DISPLAY_DATASET_DIALOG || (catalogFiles.size > 0 && !isCatalogSelected())) {
             addDatasetChooser();
         } else {
             // Event
@@ -104,6 +121,7 @@ public class InitialGui extends AbstractGui {
     /**
      * Checks if the basic Gaia Sky data folders are present
      * in the default data folder
+     *
      * @return
      */
     private boolean basicDataPresent() {
