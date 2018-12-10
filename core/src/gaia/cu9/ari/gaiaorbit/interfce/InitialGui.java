@@ -110,7 +110,8 @@ public class InitialGui extends AbstractGui {
          * - catalogs available and yet no catalog is selected
          */
         if (catchooser || GlobalConf.program.DISPLAY_DATASET_DIALOG || (catalogFiles.size > 0 && !isCatalogSelected())) {
-            addDatasetChooser();
+            String noticeKey = "gui.dschooser.nocatselected";
+            addDatasetChooser(noticeKey);
         } else {
             // Event
             EventManager.instance.post(Events.LOAD_DATA_CMD);
@@ -193,9 +194,9 @@ public class InitialGui extends AbstractGui {
         ddw.show(ui);
     }
 
-    private void addDatasetChooser() {
+    private void addDatasetChooser(String noticeKey) {
         if (cdw == null)
-            cdw = new ChooseCatalogWindow(ui, skin);
+            cdw = new ChooseCatalogWindow(ui, skin, noticeKey);
         cdw.show(ui);
     }
 

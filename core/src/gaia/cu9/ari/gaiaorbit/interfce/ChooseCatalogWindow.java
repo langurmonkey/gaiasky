@@ -9,10 +9,10 @@ import com.badlogic.gdx.scenes.scene2d.ui.Button;
 import com.badlogic.gdx.scenes.scene2d.ui.Cell;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.utils.Array;
-
 import gaia.cu9.ari.gaiaorbit.event.EventManager;
 import gaia.cu9.ari.gaiaorbit.event.Events;
 import gaia.cu9.ari.gaiaorbit.util.GlobalConf;
+import gaia.cu9.ari.gaiaorbit.util.scene2d.OwnLabel;
 
 /**
  * GUI window to choose the catalog to use
@@ -23,9 +23,15 @@ public class ChooseCatalogWindow extends GenericDialog {
 
     private DatasetsWidget dw;
     private String assetsLoc;
+    private String notice;
 
-    public ChooseCatalogWindow(Stage stage, Skin skin) {
+    public ChooseCatalogWindow(Stage stage, Skin skin){
+        this(stage, skin, null);
+    }
+
+    public ChooseCatalogWindow(Stage stage, Skin skin, String noticeKey) {
         super(txt("gui.dschooser.title"), skin, stage);
+        this.notice = txt(noticeKey);
         assetsLoc = GlobalConf.ASSETS_LOC;
 
         setCancelText(txt("gui.exit"));
@@ -37,6 +43,10 @@ public class ChooseCatalogWindow extends GenericDialog {
 
     @Override
     protected void build() {
+        if(notice != null && !notice.isEmpty()){
+            content.add(new OwnLabel(notice, skin)).left().pad(15 * GlobalConf.SCALE_FACTOR).row();
+        }
+
         Cell<Actor> cell = content.add((Actor) null);
 
         dw = new DatasetsWidget(skin, assetsLoc);
