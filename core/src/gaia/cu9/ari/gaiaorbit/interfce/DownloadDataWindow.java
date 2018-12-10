@@ -98,11 +98,11 @@ public class DownloadDataWindow extends GenericDialog {
     @Override
     protected void build() {
         me.acceptButton.setDisabled(false);
-        float pad = 2 * GlobalConf.SCALE_FACTOR;
-        float padl = 9 * GlobalConf.SCALE_FACTOR;
-        float minw = GlobalConf.SCALE_FACTOR == 1 ? 550 : 650;
+        float pad = 2f * GlobalConf.SCALE_FACTOR;
+        float padl = 9f * GlobalConf.SCALE_FACTOR;
+        float minw = GlobalConf.SCALE_FACTOR == 1 ? 550f : 650f;
 
-        float buttonpad = 1 * GlobalConf.SCALE_FACTOR;
+        float buttonpad = 1f * GlobalConf.SCALE_FACTOR;
 
         Cell<Actor> topCell = content.add((Actor) null);
         topCell.row();
@@ -113,7 +113,7 @@ public class DownloadDataWindow extends GenericDialog {
         OwnLabel catalogsLocLabel = new OwnLabel(txt("gui.download.location") + ":", skin);
 
         HorizontalGroup hg = new HorizontalGroup();
-        hg.space(15 * GlobalConf.SCALE_FACTOR);
+        hg.space(15f * GlobalConf.SCALE_FACTOR);
         Image system = new Image(skin.getDrawable("tooltip-icon"));
         OwnLabel downloadInfo = new OwnLabel(txt("gui.download.info"), skin);
         hg.addActor(system);
@@ -126,7 +126,7 @@ public class DownloadDataWindow extends GenericDialog {
 
         if (dataLocation) {
             OwnTextButton catalogsLoc = new OwnTextButton(catLoc, skin);
-            catalogsLoc.pad(buttonpad * 4);
+            catalogsLoc.pad(buttonpad * 4f);
             catalogsLoc.setMinWidth(minw);
             downloadTable.add(catalogsLocLabel).left().padBottom(padl);
             downloadTable.add(catalogsLoc).left().padLeft(pad).padBottom(padl).row();
@@ -232,7 +232,7 @@ public class DownloadDataWindow extends GenericDialog {
         for (String typeStr : types) {
             List<JsonValue> datasets = typeMap.get(typeStr);
 
-            datasetsTable.add(new OwnLabel(txt("gui.download.type." + typeStr), skin, "hud-header")).colspan(6).left().padBottom(pad * 3).padTop(padl * 2).row();
+            datasetsTable.add(new OwnLabel(txt("gui.download.type." + typeStr), skin, "hud-header")).colspan(6).left().padBottom(pad * 3f).padTop(padl * 2f).row();
 
             for (JsonValue dataset : datasets) {
                 // Check if dataset requires a minimum version of Gaia Sky
@@ -248,7 +248,7 @@ public class DownloadDataWindow extends GenericDialog {
 
                     String name = dataset.getString("name");
                     // Add dataset to desc table
-                    OwnCheckBox cb = new OwnCheckBox(name, skin, pad * 2);
+                    OwnCheckBox cb = new OwnCheckBox(name, skin, pad * 2f);
                     boolean baseData = name.equals("default-data");
                     boolean defaultDataset = name.contains("default");
                     cb.setChecked((!exists || (exists && outdated)) && baseData);
@@ -392,8 +392,8 @@ public class DownloadDataWindow extends GenericDialog {
         datasetsScroll.setForceScroll(false, false);
         datasetsScroll.setSmoothScrolling(false);
         datasetsScroll.setFadeScrollBars(false);
-        datasetsScroll.setHeight(Math.min(Gdx.graphics.getHeight() * 0.45f, 750 * GlobalConf.SCALE_FACTOR));
-        datasetsScroll.setWidth(Math.min(Gdx.graphics.getWidth() * 0.9f, GlobalConf.SCALE_FACTOR > 1.4f ? 600 * GlobalConf.SCALE_FACTOR : 750 * GlobalConf.SCALE_FACTOR));
+        datasetsScroll.setHeight(Math.min(Gdx.graphics.getHeight() * 0.45f, 750f * GlobalConf.SCALE_FACTOR));
+        datasetsScroll.setWidth(Math.min(Gdx.graphics.getWidth() * 0.9f, GlobalConf.SCALE_FACTOR > 1.4f ? 600f * GlobalConf.SCALE_FACTOR : 750f * GlobalConf.SCALE_FACTOR));
 
         downloadTable.add(datasetsScroll).center().padBottom(padl).colspan(2).row();
 
@@ -403,10 +403,10 @@ public class DownloadDataWindow extends GenericDialog {
 
         // Download button
         downloadButton = new OwnTextButton(txt("gui.download.download"), skin, "download");
-        downloadButton.pad(buttonpad * 4);
+        downloadButton.pad(buttonpad * 4f);
         downloadButton.setMinWidth(minw);
-        downloadButton.setMinHeight(50 * GlobalConf.SCALE_FACTOR);
-        downloadTable.add(downloadButton).center().colspan(2).padBottom(0).row();
+        downloadButton.setMinHeight(50f * GlobalConf.SCALE_FACTOR);
+        downloadTable.add(downloadButton).center().colspan(2).padBottom(0f).row();
 
         // Progress bar
         downloadProgress = new OwnProgressBar(0, 100, 0.1f, false, skin, "default-horizontal");

@@ -261,7 +261,6 @@ public class GlobalConf {
         public boolean INPUT_ENABLED;
         public boolean RECORD_CAMERA;
         public float LIMIT_MAG_RUNTIME;
-        public int OUTPUT_FRAME_BUFFER_SIZE = 50;
         public boolean STRIPPED_FOV_MODE = false;
         /** Whether octree drawing is active or not **/
         public boolean DRAW_OCTREE;
