@@ -1,36 +1,21 @@
 package gaia.cu9.ari.gaiaorbit.interfce.components;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import com.badlogic.gdx.scenes.scene2d.Stage;
-import com.badlogic.gdx.scenes.scene2d.ui.Button;
-import com.badlogic.gdx.scenes.scene2d.ui.CheckBox;
-import com.badlogic.gdx.scenes.scene2d.ui.HorizontalGroup;
-import com.badlogic.gdx.scenes.scene2d.ui.Image;
-import com.badlogic.gdx.scenes.scene2d.ui.Label;
-import com.badlogic.gdx.scenes.scene2d.ui.SelectBox;
-import com.badlogic.gdx.scenes.scene2d.ui.Skin;
-import com.badlogic.gdx.scenes.scene2d.ui.Slider;
-import com.badlogic.gdx.scenes.scene2d.ui.TextTooltip;
-import com.badlogic.gdx.scenes.scene2d.ui.VerticalGroup;
+import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener.ChangeEvent;
 import com.badlogic.gdx.utils.Align;
-
 import gaia.cu9.ari.gaiaorbit.event.EventManager;
 import gaia.cu9.ari.gaiaorbit.event.Events;
 import gaia.cu9.ari.gaiaorbit.event.IObserver;
 import gaia.cu9.ari.gaiaorbit.scenegraph.camera.CameraManager.CameraMode;
 import gaia.cu9.ari.gaiaorbit.util.Constants;
 import gaia.cu9.ari.gaiaorbit.util.GlobalConf;
-import gaia.cu9.ari.gaiaorbit.util.GlobalResources;
+import gaia.cu9.ari.gaiaorbit.util.TextUtils;
 import gaia.cu9.ari.gaiaorbit.util.math.MathUtilsd;
-import gaia.cu9.ari.gaiaorbit.util.scene2d.OwnCheckBox;
-import gaia.cu9.ari.gaiaorbit.util.scene2d.OwnLabel;
-import gaia.cu9.ari.gaiaorbit.util.scene2d.OwnSelectBox;
-import gaia.cu9.ari.gaiaorbit.util.scene2d.OwnSlider;
-import gaia.cu9.ari.gaiaorbit.util.scene2d.OwnTextIconButton;
-import gaia.cu9.ari.gaiaorbit.util.scene2d.Separator;
+import gaia.cu9.ari.gaiaorbit.util.scene2d.*;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class CameraComponent extends GuiComponent implements IObserver {
 
@@ -99,7 +84,7 @@ public class CameraComponent extends GuiComponent implements IObserver {
         Image imgCubemap = new Image(skin.getDrawable("cubemap-icon"));
 
         button3d = new OwnTextIconButton("", img3d, skin, "toggle");
-        button3d.addListener(new TextTooltip(GlobalResources.capitalise(txt("element.stereomode")), skin));
+        button3d.addListener(new TextTooltip(TextUtils.capitalise(txt("element.stereomode")), skin));
         button3d.setName("3d");
         button3d.addListener(event -> {
             if (event instanceof ChangeEvent) {
@@ -110,7 +95,7 @@ public class CameraComponent extends GuiComponent implements IObserver {
         });
 
         buttonDome = new OwnTextIconButton("", imgDome, skin, "toggle");
-        buttonDome.addListener(new TextTooltip(GlobalResources.capitalise(txt("element.planetarium")), skin));
+        buttonDome.addListener(new TextTooltip(TextUtils.capitalise(txt("element.planetarium")), skin));
         buttonDome.setName("dome");
         buttonDome.addListener(event -> {
             if (event instanceof ChangeEvent) {
@@ -123,7 +108,7 @@ public class CameraComponent extends GuiComponent implements IObserver {
 
         buttonCubemap = new OwnTextIconButton("", imgCubemap, skin, "toggle");
         buttonCubemap.setProgrammaticChangeEvents(false);
-        buttonCubemap.addListener(new TextTooltip(GlobalResources.capitalise(txt("element.360")), skin));
+        buttonCubemap.addListener(new TextTooltip(TextUtils.capitalise(txt("element.360")), skin));
         buttonCubemap.setName("cubemap");
         buttonCubemap.addListener(event -> {
             if (event instanceof ChangeEvent) {

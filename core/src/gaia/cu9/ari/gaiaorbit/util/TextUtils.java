@@ -1,6 +1,20 @@
-package gaia.cu9.ari.gaiaorbit.interfce;
+package gaia.cu9.ari.gaiaorbit.util;
+
+import com.badlogic.gdx.scenes.scene2d.ui.Label;
+import com.badlogic.gdx.utils.StringBuilder;
 
 public class TextUtils {
+
+    public static void capLabelWidth(Label l, float targetWidth){
+        while(l.getWidth() > targetWidth){
+            StringBuilder currText = l.getText();
+            currText.deleteCharAt(currText.length);
+            l.setText(currText);
+            l.pack();
+        }
+        l.setText(l.getText() + "...");
+    }
+
     public static CharSequence limitWidth(CharSequence text, float width, float letterWidth) {
         int lettersPerLine = (int) (width / letterWidth);
         StringBuilder out = new StringBuilder();
