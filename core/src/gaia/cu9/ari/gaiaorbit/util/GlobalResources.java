@@ -1,22 +1,5 @@
 package gaia.cu9.ari.gaiaorbit.util;
 
-import java.io.FileInputStream;
-import java.io.FilenameFilter;
-import java.io.IOException;
-import java.nio.ByteBuffer;
-import java.nio.channels.FileChannel;
-import java.nio.file.Path;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.files.FileHandle;
@@ -30,12 +13,20 @@ import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.ScreenUtils;
-
 import gaia.cu9.ari.gaiaorbit.scenegraph.camera.ICamera;
 import gaia.cu9.ari.gaiaorbit.util.Logger.Log;
 import gaia.cu9.ari.gaiaorbit.util.math.MathUtilsd;
 import gaia.cu9.ari.gaiaorbit.util.math.Vector3d;
 import net.jafama.FastMath;
+
+import java.io.FileInputStream;
+import java.io.FilenameFilter;
+import java.io.IOException;
+import java.nio.ByteBuffer;
+import java.nio.channels.FileChannel;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
+import java.util.*;
 
 /**
  * Holds and initialises resources utilised globally.
@@ -88,48 +79,6 @@ public class GlobalResources {
     }
 
     public static void doneLoading(AssetManager manager) {
-    }
-
-    /**
-     * Converts from property name to method name by removing the separator dots
-     * and capitalising each chunk. Example: model.texture.bump ->
-     * ModelTextureBump
-     * 
-     * @param property
-     *            The property name
-     * @return The method name
-     */
-    public static String propertyToMethodName(String property) {
-        String[] parts = property.split("\\.");
-        StringBuilder b = new StringBuilder();
-        for (String part : parts) {
-            b.append(capitalise(part));
-        }
-        return b.toString();
-    }
-
-    /**
-     * Returns the given string with the first letter capitalised
-     * 
-     * @param line
-     *            The string to capitalise
-     * @return The string capitalised
-     */
-    public static String capitalise(String line) {
-        return Character.toUpperCase(line.charAt(0)) + line.substring(1);
-    }
-
-    /**
-     * Returns the given string with the first letter capitalised and all the
-     * others in lower case.
-     * 
-     * @param line
-     *            The string to capitalise
-     * @return The string with the first letter in upper case and the others in
-     *         lower case
-     */
-    public static String trueCapitalise(String line) {
-        return Character.toUpperCase(line.charAt(0)) + line.substring(1).toLowerCase();
     }
 
     /**
@@ -503,11 +452,6 @@ public class GlobalResources {
         int exp = (int) (Math.log(bytes) / Math.log(unit));
         String pre = (si ? "kMGTPE" : "KMGTPE").charAt(exp - 1) + (si ? "" : "i");
         return String.format("%.1f %sB", bytes / Math.pow(unit, exp), pre);
-    }
-
-    public static boolean checkFileMD5(String md5, FileHandle file) throws NoSuchAlgorithmException, IOException {
-        String myChecksum = generateMD5(new FileInputStream(file.file()));
-        return myChecksum.equals(md5);
     }
 
     private static String generateMD5(FileInputStream inputStream) {

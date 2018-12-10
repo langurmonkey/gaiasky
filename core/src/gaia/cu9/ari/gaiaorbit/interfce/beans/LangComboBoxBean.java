@@ -2,7 +2,7 @@ package gaia.cu9.ari.gaiaorbit.interfce.beans;
 
 import java.util.Locale;
 
-import gaia.cu9.ari.gaiaorbit.interfce.TextUtils;
+import gaia.cu9.ari.gaiaorbit.util.TextUtils;
 
 public class LangComboBoxBean implements Comparable<LangComboBoxBean> {
     public Locale locale;

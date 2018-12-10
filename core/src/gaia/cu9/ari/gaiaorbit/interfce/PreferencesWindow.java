@@ -92,7 +92,7 @@ public class PreferencesWindow extends GenericDialog {
         float contentw = 700 * GlobalConf.SCALE_FACTOR;
         float contenth = 700 * GlobalConf.SCALE_FACTOR;
         final float tawidth = 400 * GlobalConf.SCALE_FACTOR;
-        float tabwidth = 180 * GlobalConf.SCALE_FACTOR;
+        float tabwidth = (GlobalConf.SCALE_FACTOR > 1.5 ? 180 : 220) * GlobalConf.SCALE_FACTOR;
         float textwidth = 65 * GlobalConf.SCALE_FACTOR;
         float scrollh = 330 * GlobalConf.SCALE_FACTOR;
         float controlsscrollw = 410 * GlobalConf.SCALE_FACTOR;
