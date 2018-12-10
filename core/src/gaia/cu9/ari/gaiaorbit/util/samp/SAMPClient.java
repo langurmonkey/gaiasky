@@ -1,23 +1,7 @@
 package gaia.cu9.ari.gaiaorbit.util.samp;
 
-import java.net.URL;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.logging.Level;
-
-import org.astrogrid.samp.Message;
-import org.astrogrid.samp.Metadata;
-import org.astrogrid.samp.client.AbstractMessageHandler;
-import org.astrogrid.samp.client.ClientProfile;
-import org.astrogrid.samp.client.DefaultClientProfile;
-import org.astrogrid.samp.client.HubConnection;
-import org.astrogrid.samp.client.HubConnector;
-import org.astrogrid.samp.client.SampException;
-
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.utils.Array;
-
 import gaia.cu9.ari.gaiaorbit.GaiaSky;
 import gaia.cu9.ari.gaiaorbit.data.group.STILDataProvider;
 import gaia.cu9.ari.gaiaorbit.event.EventManager;
@@ -32,12 +16,21 @@ import gaia.cu9.ari.gaiaorbit.util.GlobalConf;
 import gaia.cu9.ari.gaiaorbit.util.Logger;
 import gaia.cu9.ari.gaiaorbit.util.Logger.Log;
 import gaia.cu9.ari.gaiaorbit.util.parse.Parser;
+import org.astrogrid.samp.Message;
+import org.astrogrid.samp.Metadata;
+import org.astrogrid.samp.client.*;
 import uk.ac.starlink.util.DataSource;
 import uk.ac.starlink.util.URLDataSource;
 
+import java.net.URL;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.logging.Level;
+
 public class SAMPClient implements IObserver {
     private static final Log logger = Logger.getLogger(SAMPClient.class);
-    
+
     private static SAMPClient instance;
 
     public static SAMPClient getInstance() {
@@ -192,7 +185,7 @@ public class SAMPClient implements IObserver {
             if (conn.isConnected()) {
                 try {
                     return "Connected: " + conn.getConnection().getRegInfo().getHubId();
-                }catch(Exception e) {
+                } catch (Exception e) {
                     return "Error getting state";
                 }
             } else {
@@ -203,8 +196,9 @@ public class SAMPClient implements IObserver {
 
     /**
      * Loads a VOTable into a star group
-     * @param url The URL to fetch the table
-     * @param id The table id
+     *
+     * @param url  The URL to fetch the table
+     * @param id   The table id
      * @param name The table name
      * @return Boolean indicating whether loading succeeded or not
      */
@@ -213,8 +207,7 @@ public class SAMPClient implements IObserver {
 
         try {
             DataSource ds = new URLDataSource(new URL(url));
-            @SuppressWarnings("unchecked")
-            Array<StarBean> data = (Array<StarBean>) provider.loadData(ds, 1.0f);
+            @SuppressWarnings("unchecked") Array<StarBean> data = (Array<StarBean>) provider.loadData(ds, 1.0f);
 
             if (data != null && data.size > 0) {
                 StarGroup sg = new StarGroup();

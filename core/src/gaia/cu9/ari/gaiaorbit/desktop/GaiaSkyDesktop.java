@@ -1,8 +1,6 @@
 package gaia.cu9.ari.gaiaorbit.desktop;
 
-import com.badlogic.gdx.Files;
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.Graphics.DisplayMode;
 import com.badlogic.gdx.LifecycleListener;
 import com.badlogic.gdx.backends.lwjgl3.Lwjgl3Application;
 import com.badlogic.gdx.backends.lwjgl3.Lwjgl3ApplicationConfiguration;
@@ -23,10 +21,10 @@ import gaia.cu9.ari.gaiaorbit.desktop.util.*;
 import gaia.cu9.ari.gaiaorbit.event.EventManager;
 import gaia.cu9.ari.gaiaorbit.event.Events;
 import gaia.cu9.ari.gaiaorbit.event.IObserver;
+import gaia.cu9.ari.gaiaorbit.interfce.ConsoleLogger;
 import gaia.cu9.ari.gaiaorbit.interfce.KeyBindings;
 import gaia.cu9.ari.gaiaorbit.interfce.MusicActorsManager;
 import gaia.cu9.ari.gaiaorbit.interfce.NetworkCheckerManager;
-import gaia.cu9.ari.gaiaorbit.interfce.ConsoleLogger;
 import gaia.cu9.ari.gaiaorbit.render.PostProcessorFactory;
 import gaia.cu9.ari.gaiaorbit.screenshot.ScreenshotsManager;
 import gaia.cu9.ari.gaiaorbit.script.JythonFactory;
@@ -57,7 +55,7 @@ public class GaiaSkyDesktop implements IObserver {
     private static final Log logger = Logger.getLogger(GaiaSkyDesktop.class);
 
     /* Configuration file version of the source code */
-    private static int SOURCE_CONF_VERSION = 252;
+    public static int SOURCE_CONF_VERSION = 260;
     private static GaiaSkyDesktop gsd;
     private static boolean REST_ENABLED = false;
     private static Class<?> REST_SERVER_CLASS = null;

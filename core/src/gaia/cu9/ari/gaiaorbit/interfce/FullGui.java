@@ -1,32 +1,20 @@
 package gaia.cu9.ari.gaiaorbit.interfce;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.assets.AssetManager;
-import com.badlogic.gdx.math.Matrix4;
-import com.badlogic.gdx.math.Vector3;
-import com.badlogic.gdx.scenes.scene2d.Actor;
-import com.badlogic.gdx.scenes.scene2d.Event;
-import com.badlogic.gdx.scenes.scene2d.EventListener;
-import com.badlogic.gdx.scenes.scene2d.InputEvent;
+import com.badlogic.gdx.scenes.scene2d.*;
 import com.badlogic.gdx.scenes.scene2d.InputEvent.Type;
-import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Container;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.ScrollPane;
 import com.badlogic.gdx.scenes.scene2d.ui.TextField;
-import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener.ChangeEvent;
 import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.Array;
+import com.badlogic.gdx.utils.Timer;
 import com.badlogic.gdx.utils.reflect.ClassReflection;
 import com.badlogic.gdx.utils.reflect.Method;
 import com.badlogic.gdx.utils.reflect.ReflectionException;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
-
-import gaia.cu9.ari.gaiaorbit.GaiaSky;
-import gaia.cu9.ari.gaiaorbit.data.stars.UncertaintiesHandler;
 import gaia.cu9.ari.gaiaorbit.desktop.util.MemInfoWindow;
 import gaia.cu9.ari.gaiaorbit.desktop.util.RunCameraWindow;
 import gaia.cu9.ari.gaiaorbit.desktop.util.RunScriptWindow;
@@ -35,31 +23,27 @@ import gaia.cu9.ari.gaiaorbit.event.Events;
 import gaia.cu9.ari.gaiaorbit.interfce.components.VisualEffectsComponent;
 import gaia.cu9.ari.gaiaorbit.render.ComponentType;
 import gaia.cu9.ari.gaiaorbit.scenegraph.CelestialBody;
-import gaia.cu9.ari.gaiaorbit.scenegraph.CosmicRuler;
 import gaia.cu9.ari.gaiaorbit.scenegraph.IFocus;
 import gaia.cu9.ari.gaiaorbit.scenegraph.ISceneGraph;
-import gaia.cu9.ari.gaiaorbit.scenegraph.IStarFocus;
-import gaia.cu9.ari.gaiaorbit.scenegraph.Planet;
-import gaia.cu9.ari.gaiaorbit.scenegraph.camera.CameraManager.CameraMode;
 import gaia.cu9.ari.gaiaorbit.util.ComponentTypes;
 import gaia.cu9.ari.gaiaorbit.util.GlobalConf;
 import gaia.cu9.ari.gaiaorbit.util.GlobalResources;
 import gaia.cu9.ari.gaiaorbit.util.Logger;
 import gaia.cu9.ari.gaiaorbit.util.Logger.Log;
-import gaia.cu9.ari.gaiaorbit.util.camera.CameraUtils;
 import gaia.cu9.ari.gaiaorbit.util.format.INumberFormat;
 import gaia.cu9.ari.gaiaorbit.util.format.NumberFormatFactory;
-import gaia.cu9.ari.gaiaorbit.util.gravwaves.RelativisticEffectsManager;
-import gaia.cu9.ari.gaiaorbit.util.math.Vector3d;
-import gaia.cu9.ari.gaiaorbit.util.scene2d.ContextMenu;
-import gaia.cu9.ari.gaiaorbit.util.scene2d.MenuItem;
 import gaia.cu9.ari.gaiaorbit.util.scene2d.OwnLabel;
+import gaia.cu9.ari.gaiaorbit.util.update.VersionCheckEvent;
+import gaia.cu9.ari.gaiaorbit.util.update.VersionChecker;
+
+import java.time.Instant;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Full OpenGL GUI with all the controls and whistles.
- * 
- * @author Toni Sagrista
  *
+ * @author Toni Sagrista
  */
 public class FullGui extends AbstractGui {
     private static final Log logger = Logger.getLogger(FullGui.class);
@@ -188,6 +172,55 @@ public class FullGui extends AbstractGui {
         // invisibleInStereoMode.add(customInterface);
         invisibleInStereoMode.add(pointerXCoord);
         invisibleInStereoMode.add(pointerYCoord);
+
+        /** VERSION CHECK **/
+        if (GlobalConf.program.VERSION_LAST_TIME == null || Instant.now().toEpochMilli() - GlobalConf.program.VERSION_LAST_TIME.toEpochMilli() > GlobalConf.ProgramConf.VERSION_CHECK_INTERVAL_MS) {
+            // Start version check
+            VersionChecker vc = new VersionChecker(GlobalConf.program.VERSION_CHECK_URL);
+            vc.setListener(event -> {
+                if (event instanceof VersionCheckEvent) {
+                    VersionCheckEvent vce = (VersionCheckEvent) event;
+                    if (!vce.isFailed()) {
+                        // Check version
+                        String tagVersion = vce.getTag();
+                        Instant tagDate = vce.getTagTime();
+
+                        GlobalConf.program.VERSION_LAST_TIME = Instant.now();
+
+                        if (tagDate.isAfter(GlobalConf.version.buildtime)) {
+                            // There's a new version!
+                            UpdatePopup newVersion = new UpdatePopup(tagVersion, ui, skin);
+                            newVersion.pack();
+                            float ww = newVersion.getWidth();
+                            float margin = 5 * GlobalConf.SCALE_FACTOR;
+                            newVersion.setPosition(Gdx.graphics.getWidth() - ww - margin, margin);
+                            ui.addActor(newVersion);
+                        }else{
+                            // No new version
+                            logger.info(txt("gui.newversion.nonew", GlobalConf.program.getLastCheckedString()));
+                        }
+
+                    } else {
+                        // Handle failed case
+                        // Do nothing
+                        logger.info(txt("gui.newversion.fail"));
+                    }
+                }
+                return false;
+            });
+
+            // Start in 10 seconds
+            Thread vct = new Thread(vc);
+            Timer.Task t = new Timer.Task() {
+                @Override
+                public void run() {
+                    logger.info(txt("gui.newversion.checking"));
+                    vct.start();
+                }
+            };
+            Timer.schedule(t, 10);
+        }
+
     }
 
     public void recalculateOptionsSize() {
@@ -265,7 +298,7 @@ public class FullGui extends AbstractGui {
     /**
      * Removes the focus from this Gui and returns true if the focus was in the
      * GUI, false otherwise.
-     * 
+     *
      * @return true if the focus was in the GUI, false otherwise.
      */
     public boolean cancelTouchFocus() {

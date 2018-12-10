@@ -1,9 +1,9 @@
 package gaia.cu9.ari.gaiaorbit.render;
 
+import gaia.cu9.ari.gaiaorbit.util.I18n;
+
 import java.util.HashMap;
 import java.util.Map;
-
-import gaia.cu9.ari.gaiaorbit.util.I18n;
 
 public enum ComponentType {
     Stars("icon-elem-stars"),
@@ -15,24 +15,25 @@ public enum ComponentType {
     Clusters("icon-elem-clusters"),
     MilkyWay("icon-elem-milkyway"),
     Galaxies("icon-elem-galaxies"),
+    Nebulae("icon-elem-nebulae"),
     Meshes("icon-elem-meshes"),
-    Effects("icon-elem-effects"),
 
-    Labels("icon-elem-labels"),
-    Titles("icon-elem-titles"),
-    Orbits("icon-elem-orbits"),
-    Locations("icon-elem-locations"),
-    Countries("icon-elem-countries"),
-
-    Constellations("icon-elem-constellations"),
-    Boundaries("icon-elem-boundaries"),
     Equatorial("icon-elem-equatorial"),
     Ecliptic("icon-elem-ecliptic"),
     Galactic("icon-elem-galactic"),
+    Labels("icon-elem-labels"),
+    Titles("icon-elem-titles"),
 
+    Orbits("icon-elem-orbits"),
+    Locations("icon-elem-locations"),
+    Countries("icon-elem-countries"),
+    Constellations("icon-elem-constellations"),
+    Boundaries("icon-elem-boundaries"),
+
+    Ruler("icon-elem-ruler"),
+    Effects("icon-elem-effects"),
     Atmospheres("icon-elem-atmospheres"),
     Clouds("icon-elem-clouds"),
-    Ruler("icon-elem-ruler"),
     Others("icon-elem-others");
 
     private static Map<String, ComponentType> keysMap = new HashMap<String, ComponentType>();

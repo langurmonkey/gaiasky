@@ -2,8 +2,6 @@ package gaia.cu9.ari.gaiaorbit.util;
 
 import gaia.cu9.ari.gaiaorbit.event.EventManager;
 import gaia.cu9.ari.gaiaorbit.event.Events;
-import gaia.cu9.ari.gaiaorbit.util.format.DateFormatFactory;
-import gaia.cu9.ari.gaiaorbit.util.format.DateFormatFactory.DateType;
 import gaia.cu9.ari.gaiaorbit.util.format.IDateFormat;
 
 import java.util.HashMap;
@@ -28,13 +26,6 @@ public class Logger {
 
     public static LoggerLevel level = LoggerLevel.INFO;
     private static IDateFormat df;
-
-    private static IDateFormat getDf() {
-        if (df == null) {
-            df = DateFormatFactory.getFormatter(I18n.locale, DateType.DATETIME);
-        }
-        return df;
-    }
 
     private static void error(Throwable t, String tag) {
         if (inLevel(LoggerLevel.ERROR))

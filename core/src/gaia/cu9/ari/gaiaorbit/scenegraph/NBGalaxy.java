@@ -4,7 +4,6 @@ import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Mesh;
 import com.badlogic.gdx.graphics.glutils.ShaderProgram;
 import com.badlogic.gdx.math.Vector3;
-
 import gaia.cu9.ari.gaiaorbit.GaiaSky;
 import gaia.cu9.ari.gaiaorbit.render.IRenderable;
 import gaia.cu9.ari.gaiaorbit.render.SceneGraphRenderer;
@@ -15,7 +14,7 @@ import gaia.cu9.ari.gaiaorbit.util.GlobalConf;
 import gaia.cu9.ari.gaiaorbit.util.math.Vector3d;
 import gaia.cu9.ari.gaiaorbit.util.time.ITimeFrameProvider;
 
-public class Galaxy extends Particle {
+public class NBGalaxy extends Particle {
 
     /** Bmag [-4.6/21.4] - Apparent integral B band magnitude **/
     float bmag;
@@ -43,11 +42,10 @@ public class Galaxy extends Particle {
      **/
     String mcl;
 
-    public Galaxy() {
-        super();
-    }
+    /** Alternative name **/
+    String altname;
 
-    public Galaxy(Vector3d pos, float appmag, float absmag, float colorbv, String name, float ra, float dec, float bmag, float a26, float ba, int hrv, int i, int tt, String mcl, long starid) {
+    public NBGalaxy(Vector3d pos, float appmag, float absmag, float colorbv, String name, float ra, float dec, float bmag, float a26, float ba, int hrv, int i, int tt, String mcl, long starid) {
         super(pos, appmag, absmag, colorbv, name, ra, dec, starid);
         this.bmag = bmag;
         this.a26 = a26;
@@ -98,8 +96,6 @@ public class Galaxy extends Particle {
             this.opacity = opacity;
 
             if (!copy) {
-                // addToRender(this, RenderGroup.POINT_GAL);
-
                 viewAngle = (radius / distToCamera) / camera.getFovFactor();
                 viewAngleApparent = viewAngle * GlobalConf.scene.STAR_BRIGHTNESS;
 

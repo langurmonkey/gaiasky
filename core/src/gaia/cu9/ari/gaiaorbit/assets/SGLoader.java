@@ -8,13 +8,17 @@ import com.badlogic.gdx.assets.loaders.AsynchronousAssetLoader;
 import com.badlogic.gdx.assets.loaders.FileHandleResolver;
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.utils.Array;
-
 import gaia.cu9.ari.gaiaorbit.data.SceneGraphJsonLoader;
 import gaia.cu9.ari.gaiaorbit.scenegraph.ISceneGraph;
 import gaia.cu9.ari.gaiaorbit.scenegraph.SceneGraphNode;
+import gaia.cu9.ari.gaiaorbit.util.GlobalConf;
 import gaia.cu9.ari.gaiaorbit.util.I18n;
 import gaia.cu9.ari.gaiaorbit.util.Logger;
 import gaia.cu9.ari.gaiaorbit.util.time.ITimeFrameProvider;
+
+import java.io.File;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 
 /**
  * {@link AssetLoader} for all the {@link SceneGraphNode} instances. Loads all
@@ -41,9 +45,19 @@ public class SGLoader extends AsynchronousAssetLoader<ISceneGraph, SGLoader.SGLo
     public void loadAsync(AssetManager manager, String files, FileHandle file, SGLoaderParameter parameter) {
         String[] tokens = files.split("\\s*,\\s*");
 
-        FileHandle[] filehandles = new FileHandle[tokens.length];
-        for (int i = 0; i < tokens.length; i++) {
-            filehandles[i] = this.resolve(tokens[i]);
+        // Add autoload files to the mix
+        Array<String> filePaths = new Array<String>(tokens);
+        Path dataFolder = Paths.get(GlobalConf.data.DATA_LOCATION);
+        File[] autoloadFiles = dataFolder.toFile().listFiles((dir, name) -> {
+            return name != null && name.startsWith("autoload-") && name.endsWith(".json");
+        });
+        for(File autoloadFile : autoloadFiles) {
+            filePaths.add(autoloadFile.getAbsolutePath());
+        }
+
+        FileHandle[] filehandles = new FileHandle[filePaths.size];
+        for (int i = 0; i < filePaths.size; i++) {
+            filehandles[i] = this.resolve(filePaths.get(i));
         }
 
         sg = SceneGraphJsonLoader.loadSceneGraph(filehandles, parameter.time, parameter.multithreading, parameter.maxThreads);

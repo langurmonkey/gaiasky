@@ -63,15 +63,15 @@ public class DesktopPostProcessor implements IPostProcessor, IObserver {
 
     public void initialize(AssetManager manager) {
         this.manager = manager;
-        manager.load(GlobalConf.data.dataFile("tex/lenscolor.png"), Texture.class);
+        manager.load(GlobalConf.data.dataFile("tex/base/lenscolor.png"), Texture.class);
         if (GlobalConf.scene.isHighQuality()) {
-            manager.load(GlobalConf.data.dataFile("tex/lensdirt.jpg"), Texture.class);
-            manager.load(GlobalConf.data.dataFile("tex/star_glow.png"), Texture.class);
+            manager.load(GlobalConf.data.dataFile("tex/base/lensdirt.jpg"), Texture.class);
+            manager.load(GlobalConf.data.dataFile("tex/base/star_glow.png"), Texture.class);
         } else {
-            manager.load(GlobalConf.data.dataFile("tex/lensdirt_s.jpg"), Texture.class);
-            manager.load(GlobalConf.data.dataFile("tex/star_glow_s.png"), Texture.class);
+            manager.load(GlobalConf.data.dataFile("tex/base/lensdirt_s.jpg"), Texture.class);
+            manager.load(GlobalConf.data.dataFile("tex/base/star_glow_s.png"), Texture.class);
         }
-        manager.load(GlobalConf.data.dataFile("tex/lensstarburst.jpg"), Texture.class);
+        manager.load(GlobalConf.data.dataFile("tex/base/lensstarburst.jpg"), Texture.class);
     }
 
     public void doneLoading(AssetManager manager) {
@@ -125,19 +125,19 @@ public class DesktopPostProcessor implements IPostProcessor, IObserver {
             lglowNSamples = 12;
             lgw = 1280;
             lgh = Math.round(lgw / ar);
-            glow = manager.get(GlobalConf.data.dataFile("tex/star_glow.png"));
+            glow = manager.get(GlobalConf.data.dataFile("tex/base/star_glow.png"));
             Glow.N = 30;
         } else if (GlobalConf.scene.isNormalQuality()) {
             lglowNSamples = 8;
             lgw = 1000;
             lgh = Math.round(lgw / ar);
-            glow = manager.get(GlobalConf.data.dataFile("tex/star_glow_s.png"));
+            glow = manager.get(GlobalConf.data.dataFile("tex/base/star_glow_s.png"));
             Glow.N = 20;
         } else {
             lglowNSamples = 4;
             lgw = 1000;
             lgh = Math.round(lgw / ar);
-            glow = manager.get(GlobalConf.data.dataFile("tex/star_glow_s.png"));
+            glow = manager.get(GlobalConf.data.dataFile("tex/base/star_glow_s.png"));
             Glow.N = 10;
         }
         glow.setFilter(TextureFilter.Linear, TextureFilter.Linear);
@@ -151,11 +151,11 @@ public class DesktopPostProcessor implements IPostProcessor, IObserver {
 
         // LENS FLARE
         float lensFboScale = 0.2f;
-        Texture lcol = manager.get(GlobalConf.data.dataFile("tex/lenscolor.png"));
+        Texture lcol = manager.get(GlobalConf.data.dataFile("tex/base/lenscolor.png"));
         lcol.setFilter(TextureFilter.Linear, TextureFilter.Linear);
-        Texture ldirt = GlobalConf.scene.isHighQuality() ? manager.get(GlobalConf.data.dataFile("data/tex/lensdirt.jpg")) : manager.get(GlobalConf.data.dataFile("tex/lensdirt_s.jpg"));
+        Texture ldirt = GlobalConf.scene.isHighQuality() ? manager.get(GlobalConf.data.dataFile("data/tex/base/lensdirt.jpg")) : manager.get(GlobalConf.data.dataFile("tex/base/lensdirt_s.jpg"));
         ldirt.setFilter(TextureFilter.Linear, TextureFilter.Linear);
-        Texture lburst = manager.get(GlobalConf.data.dataFile("tex/lensstarburst.jpg"));
+        Texture lburst = manager.get(GlobalConf.data.dataFile("tex/base/lensstarburst.jpg"));
         lburst.setFilter(TextureFilter.Linear, TextureFilter.Linear);
         ppb.lens = new LensFlare2((int) (width * lensFboScale), (int) (height * lensFboScale));
         ppb.lens.setGhosts(nghosts);

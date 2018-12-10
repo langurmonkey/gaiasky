@@ -1,7 +1,5 @@
 package gaia.cu9.ari.gaiaorbit.render.system;
 
-import java.util.Random;
-
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
@@ -12,7 +10,6 @@ import com.badlogic.gdx.graphics.glutils.ShaderProgram;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer.ShapeType;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.Array;
-
 import gaia.cu9.ari.gaiaorbit.event.EventManager;
 import gaia.cu9.ari.gaiaorbit.event.Events;
 import gaia.cu9.ari.gaiaorbit.event.IObserver;
@@ -24,6 +21,8 @@ import gaia.cu9.ari.gaiaorbit.scenegraph.camera.ICamera;
 import gaia.cu9.ari.gaiaorbit.util.GlobalConf;
 import gaia.cu9.ari.gaiaorbit.util.GlobalConf.ProgramConf.StereoProfile;
 import gaia.cu9.ari.gaiaorbit.util.comp.DistToCameraComparator;
+
+import java.util.Random;
 
 public class ParticleGroupRenderSystem extends ImmediateRenderSystem implements IObserver {
     private final int N_MESHES = 50;
@@ -159,11 +158,13 @@ public class ParticleGroupRenderSystem extends ImmediateRenderSystem implements 
 
                     shaderProgram.begin();
                     shaderProgram.setUniformMatrix("u_projModelView", camera.getCamera().combined);
-                    shaderProgram.setUniformf("u_camPos", camera.getCurrent().getPos().put(aux1));
                     shaderProgram.setUniformf("u_alpha", particleGroup.opacity * alphas[particleGroup.ct.getFirstOrdinal()]);
                     shaderProgram.setUniformf("u_ar", GlobalConf.program.STEREOSCOPIC_MODE && (GlobalConf.program.STEREO_PROFILE != StereoProfile.HD_3DTV_HORIZONTAL && GlobalConf.program.STEREO_PROFILE != StereoProfile.ANAGLYPHIC) ? 0.5f : 1f);
                     shaderProgram.setUniformf("u_profileDecay", particleGroup.profileDecay);
                     shaderProgram.setUniformf("u_sizeFactor", rc.scaleFactor);
+                    shaderProgram.setUniformf("u_camPos", camera.getCurrent().getPos().put(aux1));
+                    shaderProgram.setUniformf("u_camDir", camera.getCurrent().getCamera().direction);
+                    shaderProgram.setUniformi("u_cubemap", GlobalConf.program.CUBEMAP360_MODE ? 1 : 0);
 
                     // Relativistic effects
                     addEffectsUniforms(shaderProgram, camera);

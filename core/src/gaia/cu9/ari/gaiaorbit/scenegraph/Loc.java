@@ -184,4 +184,8 @@ public class Loc extends AbstractPositionEntity implements I3DTextRenderable {
         this.displayName = '\u02D9' + " " + name;
     }
 
+    @Override
+    public float getTextOpacity(){
+        return getOpacity();
+    }
 }

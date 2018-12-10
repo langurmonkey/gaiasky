@@ -87,4 +87,10 @@ public interface I3DTextRenderable extends IRenderable {
      */
     public boolean isLabel();
 
+    /**
+     * Gets the text opacity
+     * @return Text opacity
+     */
+    public float getTextOpacity();
+
 }

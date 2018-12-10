@@ -19,7 +19,9 @@ import gaia.cu9.ari.gaiaorbit.data.octreegen.generator.OctreeGeneratorParams;
 import gaia.cu9.ari.gaiaorbit.desktop.format.DesktopDateFormatFactory;
 import gaia.cu9.ari.gaiaorbit.desktop.format.DesktopNumberFormatFactory;
 import gaia.cu9.ari.gaiaorbit.desktop.util.DesktopConfInit;
-import gaia.cu9.ari.gaiaorbit.desktop.util.LogWriter;
+import gaia.cu9.ari.gaiaorbit.interfce.ConsoleLogger;
+import gaia.cu9.ari.gaiaorbit.interfce.MessageBean;
+import gaia.cu9.ari.gaiaorbit.interfce.NotificationsInterface;
 import gaia.cu9.ari.gaiaorbit.scenegraph.StarGroup.StarBean;
 import gaia.cu9.ari.gaiaorbit.util.*;
 import gaia.cu9.ari.gaiaorbit.util.Logger.Log;
@@ -122,8 +124,6 @@ public class OctreeGeneratorRun {
 
     protected Map<Long, float[]> colors;
 
-    private LogWriter lw;
-
     public OctreeGeneratorRun() {
         super();
         colors = new HashMap<Long, float[]>();
@@ -161,7 +161,7 @@ public class OctreeGeneratorRun {
 
 
             // Add notification watch
-            lw = new LogWriter();
+            new ConsoleLogger();
 
             generateOctree();
 
@@ -174,8 +174,8 @@ public class OctreeGeneratorRun {
                 out.print(argstr);
                 out.println();
                 out.println();
-                for (String msg : lw.logMessages) {
-                    out.println(msg);
+                for (MessageBean msg : NotificationsInterface.getHistorical()) {
+                    out.println(msg.toString());
                 }
             }
         } catch (FileNotFoundException e) {

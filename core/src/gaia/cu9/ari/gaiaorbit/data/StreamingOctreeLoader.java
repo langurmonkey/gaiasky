@@ -1,19 +1,8 @@
 package gaia.cu9.ari.gaiaorbit.data;
 
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.util.Comparator;
-import java.util.Queue;
-import java.util.Timer;
-import java.util.TimerTask;
-import java.util.concurrent.ArrayBlockingQueue;
-import java.util.concurrent.PriorityBlockingQueue;
-import java.util.concurrent.atomic.AtomicBoolean;
-
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.TimeUtils;
-
 import gaia.cu9.ari.gaiaorbit.GaiaSky;
 import gaia.cu9.ari.gaiaorbit.event.EventManager;
 import gaia.cu9.ari.gaiaorbit.event.Events;
@@ -28,6 +17,16 @@ import gaia.cu9.ari.gaiaorbit.util.Logger;
 import gaia.cu9.ari.gaiaorbit.util.Logger.Log;
 import gaia.cu9.ari.gaiaorbit.util.tree.LoadStatus;
 import gaia.cu9.ari.gaiaorbit.util.tree.OctreeNode;
+
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.util.Comparator;
+import java.util.Queue;
+import java.util.Timer;
+import java.util.TimerTask;
+import java.util.concurrent.ArrayBlockingQueue;
+import java.util.concurrent.PriorityBlockingQueue;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
  * Contains the infrastructure common to all multifile octree loaders which
@@ -387,6 +386,7 @@ public abstract class StreamingOctreeLoader implements IObserver, ISceneGraphLoa
             if (objects != null) {
                 Gdx.app.postRunnable(() -> {
                     for (AbstractPositionEntity object : objects) {
+                        int count = object.getStarCount();
                         object.dispose();
                         object.octant = null;
                         octreeWrapper.removeParenthood(object);
@@ -394,7 +394,7 @@ public abstract class StreamingOctreeLoader implements IObserver, ISceneGraphLoa
                         if (GaiaSky.instance != null && GaiaSky.instance.sg != null)
                             GaiaSky.instance.sg.removeNodeAuxiliaryInfo(object);
 
-                        nLoadedStars -= object.getStarCount();
+                        nLoadedStars -= count;
                     }
                     objects.clear();
                     octant.setStatus(LoadStatus.NOT_LOADED);

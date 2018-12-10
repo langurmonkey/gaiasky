@@ -1,7 +1,5 @@
 package gaia.cu9.ari.gaiaorbit.scenegraph;
 
-import java.io.Serializable;
-
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.graphics.GL20;
@@ -12,7 +10,6 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.TimeUtils;
-
 import gaia.cu9.ari.gaiaorbit.GaiaSky;
 import gaia.cu9.ari.gaiaorbit.data.group.IParticleGroupDataProvider;
 import gaia.cu9.ari.gaiaorbit.event.EventManager;
@@ -36,6 +33,8 @@ import gaia.cu9.ari.gaiaorbit.util.math.MathUtilsd;
 import gaia.cu9.ari.gaiaorbit.util.math.Quaterniond;
 import gaia.cu9.ari.gaiaorbit.util.math.Vector3d;
 import gaia.cu9.ari.gaiaorbit.util.time.ITimeFrameProvider;
+
+import java.io.Serializable;
 
 /**
  * This class represents a group of non-focusable particles, all with the same
@@ -715,5 +714,10 @@ public class ParticleGroup extends FadeNode implements I3DTextRenderable, IFocus
             this.setFocusIndex(-1);
             EventManager.instance.post(Events.CAMERA_MODE_CMD, CameraMode.Free_Camera);
         }
+    }
+
+    @Override
+    public float getTextOpacity(){
+        return getOpacity();
     }
 }

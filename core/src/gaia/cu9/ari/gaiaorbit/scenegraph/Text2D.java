@@ -172,6 +172,11 @@ public class Text2D extends FadeNode implements I3DTextRenderable, IShapeRendera
     }
 
     @Override
+    public float getTextOpacity(){
+        return getOpacity();
+    }
+
+    @Override
     public void notify(Events event, Object... data) {
         switch (event) {
         case UI_THEME_RELOAD_INFO:

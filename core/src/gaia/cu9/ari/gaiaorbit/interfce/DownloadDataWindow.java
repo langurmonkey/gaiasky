@@ -9,6 +9,7 @@ import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener.ChangeEvent;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.JsonReader;
 import com.badlogic.gdx.utils.JsonValue;
+import gaia.cu9.ari.gaiaorbit.desktop.GaiaSkyDesktop;
 import gaia.cu9.ari.gaiaorbit.desktop.util.SysUtils;
 import gaia.cu9.ari.gaiaorbit.util.*;
 import gaia.cu9.ari.gaiaorbit.util.Logger.Log;
@@ -29,8 +30,8 @@ import java.nio.ByteOrder;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.*;
 import java.util.List;
+import java.util.*;
 
 /**
  * Download manager. It gets a descriptor file from the server containing all
@@ -62,7 +63,7 @@ public class DownloadDataWindow extends GenericDialog {
 
     private OwnTextButton downloadButton;
     private OwnProgressBar downloadProgress;
-    private OwnLabel currentDownloadFile;
+    private OwnLabel currentDownloadFile, downloadSpeed;
     private OwnScrollPane datasetsScroll;
     private float scrollX = 0, scrollY = 0;
 
@@ -97,11 +98,11 @@ public class DownloadDataWindow extends GenericDialog {
     @Override
     protected void build() {
         me.acceptButton.setDisabled(false);
-        float pad = 2 * GlobalConf.SCALE_FACTOR;
-        float padl = 9 * GlobalConf.SCALE_FACTOR;
-        float minw = GlobalConf.SCALE_FACTOR == 1 ? 550 : 650;
+        float pad = 2f * GlobalConf.SCALE_FACTOR;
+        float padl = 9f * GlobalConf.SCALE_FACTOR;
+        float minw = GlobalConf.SCALE_FACTOR == 1 ? 550f : 650f;
 
-        float buttonpad = 1 * GlobalConf.SCALE_FACTOR;
+        float buttonpad = 1f * GlobalConf.SCALE_FACTOR;
 
         Cell<Actor> topCell = content.add((Actor) null);
         topCell.row();
@@ -112,7 +113,7 @@ public class DownloadDataWindow extends GenericDialog {
         OwnLabel catalogsLocLabel = new OwnLabel(txt("gui.download.location") + ":", skin);
 
         HorizontalGroup hg = new HorizontalGroup();
-        hg.space(15 * GlobalConf.SCALE_FACTOR);
+        hg.space(15f * GlobalConf.SCALE_FACTOR);
         Image system = new Image(skin.getDrawable("tooltip-icon"));
         OwnLabel downloadInfo = new OwnLabel(txt("gui.download.info"), skin);
         hg.addActor(system);
@@ -125,7 +126,7 @@ public class DownloadDataWindow extends GenericDialog {
 
         if (dataLocation) {
             OwnTextButton catalogsLoc = new OwnTextButton(catLoc, skin);
-            catalogsLoc.pad(buttonpad * 4);
+            catalogsLoc.pad(buttonpad * 4f);
             catalogsLoc.setMinWidth(minw);
             downloadTable.add(catalogsLocLabel).left().padBottom(padl);
             downloadTable.add(catalogsLoc).left().padLeft(pad).padBottom(padl).row();
@@ -178,181 +179,210 @@ public class DownloadDataWindow extends GenericDialog {
         // Parse available files
         JsonValue dataDesc = reader.parse(Gdx.files.absolute(SysUtils.getDefaultTmpDir() + "/gaiasky-data.json"));
 
+        Map<String, JsonValue> bestDs = new HashMap<String, JsonValue>();
         Map<String, List<JsonValue>> typeMap = new HashMap<String, List<JsonValue>>();
         // We don't want repeated elements but want to keep insertion order
         Set<String> types = new LinkedHashSet<String>();
 
         JsonValue dst = dataDesc.child().child();
-        while(dst != null){
-            String type = dst.getString("type");
-            // Add to map
-            if(typeMap.containsKey(type)){
-                typeMap.get(type).add(dst);
-            } else {
-                List<JsonValue> aux = new ArrayList<JsonValue>();
-                aux.add(dst);
-                typeMap.put(type, aux);
+        while (dst != null) {
+            boolean hasVersion = dst.has("mingsversion");
+            int thisVersion = dst.getInt("mingsversion", 0);
+            if (!hasVersion || hasVersion && thisVersion <= GaiaSkyDesktop.SOURCE_CONF_VERSION) {
+                // Dataset type
+                String type = dst.getString("type");
+
+                // Check if better option already exists
+                String dsName = dst.getString("name");
+                if(bestDs.containsKey(dsName)){
+                    JsonValue other = bestDs.get(dsName);
+                    int otherVersion = other.getInt("mingsversion", 0);
+                    if(otherVersion >= thisVersion){
+                        // Ignore this version
+                        dst = dst.next();
+                        continue;
+                    } else if(thisVersion > otherVersion) {
+                        // Remove other version, use this
+                        typeMap.get(type).remove(other);
+                        bestDs.remove(dsName);
+                    }
+                }
+
+
+                // Add to map
+                if (typeMap.containsKey(type)) {
+                    typeMap.get(type).add(dst);
+                } else {
+                    List<JsonValue> aux = new ArrayList<JsonValue>();
+                    aux.add(dst);
+                    typeMap.put(type, aux);
+                }
+
+                // Add to set
+                types.add(type);
+                // Add to bestDs
+                bestDs.put(dsName, dst);
             }
-
-            // Add to set
-            types.add(type);
-
             // Next
             dst = dst.next();
         }
 
         Table datasetsTable = new Table(skin);
 
-
-        for(String typeStr : types) {
+        for (String typeStr : types) {
             List<JsonValue> datasets = typeMap.get(typeStr);
 
-            datasetsTable.add(new OwnLabel(txt("gui.download.type." + typeStr), skin, "hud-header")).colspan(6).left().padBottom(pad * 3).padTop(padl * 2).row();
+            datasetsTable.add(new OwnLabel(txt("gui.download.type." + typeStr), skin, "hud-header")).colspan(6).left().padBottom(pad * 3f).padTop(padl * 2f).row();
 
-            for(JsonValue dataset : datasets){
-                // Check if we have it
-                final Path check = Paths.get(GlobalConf.data.DATA_LOCATION, dataset.getString("check"));
-                boolean exists = Files.exists(check) && Files.isReadable(check);
-                int myVersion = checkJsonVersion(check);
-                int serverVersion = dataset.getInt("version", 0);
-                boolean outdated = serverVersion > myVersion;
+            for (JsonValue dataset : datasets) {
+                // Check if dataset requires a minimum version of Gaia Sky
+                boolean hasVersion = dataset.has("mingsversion");
+                if (!hasVersion || hasVersion && dataset.getInt("mingsversion", 0) <= GaiaSkyDesktop.SOURCE_CONF_VERSION) {
 
-                String name = dataset.getString("name");
-                // Add dataset to desc table
-                OwnCheckBox cb = new OwnCheckBox(name, skin, pad * 2);
-                boolean baseData = name.equals("default-data");
-                boolean defaultDataset = name.contains("default");
-                cb.setChecked((!exists || (exists && outdated)) && baseData);
-                cb.setDisabled(baseData || (exists && !outdated));
-                OwnLabel haveit = new OwnLabel("", skin);
-                if (exists) {
-                    if (outdated) {
-                        setStatusOutdated(haveit);
+                    // Check if we have it
+                    final Path check = Paths.get(GlobalConf.data.DATA_LOCATION, dataset.getString("check"));
+                    boolean exists = Files.exists(check) && Files.isReadable(check);
+                    int myVersion = checkJsonVersion(check);
+                    int serverVersion = dataset.getInt("version", 0);
+                    boolean outdated = serverVersion > myVersion;
+
+                    String name = dataset.getString("name");
+                    // Add dataset to desc table
+                    OwnCheckBox cb = new OwnCheckBox(name, skin, pad * 2f);
+                    boolean baseData = name.equals("default-data");
+                    boolean defaultDataset = name.contains("default");
+                    cb.setChecked((!exists || (exists && outdated)) && baseData);
+                    cb.setDisabled(baseData || (exists && !outdated));
+                    OwnLabel haveit = new OwnLabel("", skin);
+                    if (exists) {
+                        if (outdated) {
+                            setStatusOutdated(haveit);
+                        } else {
+                            setStatusFound(haveit);
+                        }
                     } else {
-                        setStatusFound(haveit);
+                        setStatusNotFound(haveit);
                     }
-                } else {
-                    setStatusNotFound(haveit);
-                }
 
-                // Can't proceed without base data - force download
-                if (baseData && !exists) {
-                    me.acceptButton.setDisabled(true);
-                }
+                    // Can't proceed without base data - force download
+                    if (baseData && !exists) {
+                        me.acceptButton.setDisabled(true);
+                    }
 
-                // Description
-                String description = dataset.getString("description");
-                String shortDescription;
-                HorizontalGroup descGroup = new HorizontalGroup();
-                descGroup.space(padl);
-                if (description.contains("-")) {
-                    shortDescription = description.substring(0, description.indexOf("-"));
-                } else {
-                    shortDescription = description;
-                }
-                OwnLabel desc = new OwnLabel(shortDescription, skin);
-                // Info
-                OwnImageButton imgTooltip = new OwnImageButton(skin, "tooltip");
-                imgTooltip.addListener(new OwnTextTooltip(description, skin, 10));
-                descGroup.addActor(imgTooltip);
-                descGroup.addActor(desc);
+                    // Description
+                    String description = dataset.getString("description");
+                    String shortDescription;
+                    HorizontalGroup descGroup = new HorizontalGroup();
+                    descGroup.space(padl);
+                    if (description.contains("-")) {
+                        shortDescription = description.substring(0, description.indexOf("-"));
+                    } else {
+                        shortDescription = description;
+                    }
+                    OwnLabel desc = new OwnLabel(shortDescription, skin);
+                    // Info
+                    OwnImageButton imgTooltip = new OwnImageButton(skin, "tooltip");
+                    imgTooltip.addListener(new OwnTextTooltip(description, skin, 10));
+                    descGroup.addActor(imgTooltip);
+                    descGroup.addActor(desc);
 
-                // Version
-                OwnLabel vers = new OwnLabel(exists && outdated ? Integer.toString(myVersion) + " -> v-" + Integer.toString(serverVersion) : "v-"+Integer.toString(serverVersion), skin);
-                if (!exists) {
-                    vers.addListener(new OwnTextTooltip(txt("gui.download.version.server", Integer.toString(serverVersion)), skin, 10));
-                } else if (outdated) {
-                    // New version!
-                    vers.setColor(1, 1, 0, 1);
-                    vers.addListener(new OwnTextTooltip(txt("gui.download.version.new", Integer.toString(serverVersion), Integer.toString(myVersion)), skin, 10));
-                } else {
-                    vers.addListener(new OwnTextTooltip(txt("gui.download.version.ok"), skin, 10));
-                }
+                    // Version
+                    OwnLabel vers = new OwnLabel(exists && outdated ? Integer.toString(myVersion) + " -> v-" + Integer.toString(serverVersion) : "v-" + Integer.toString(serverVersion), skin);
+                    if (!exists) {
+                        vers.addListener(new OwnTextTooltip(txt("gui.download.version.server", Integer.toString(serverVersion)), skin, 10));
+                    } else if (outdated) {
+                        // New version!
+                        vers.setColor(1, 1, 0, 1);
+                        vers.addListener(new OwnTextTooltip(txt("gui.download.version.new", Integer.toString(serverVersion), Integer.toString(myVersion)), skin, 10));
+                    } else {
+                        vers.addListener(new OwnTextTooltip(txt("gui.download.version.ok"), skin, 10));
+                    }
 
-                // Type icon
-                Image typeImage = new OwnImage(skin.getDrawable(getIcon(dataset.getString("type"))));
-                float scl = 0.7f;
-                float iw =typeImage.getWidth();
-                float ih = typeImage.getHeight();
-                typeImage.setSize(iw*scl, ih*scl);
-                typeImage.addListener(new OwnTextTooltip(dataset.getString("type"), skin, 10));
+                    // Type icon
+                    Image typeImage = new OwnImage(skin.getDrawable(getIcon(dataset.getString("type"))));
+                    float scl = 0.7f;
+                    float iw = typeImage.getWidth();
+                    float ih = typeImage.getHeight();
+                    typeImage.setSize(iw * scl, ih * scl);
+                    typeImage.addListener(new OwnTextTooltip(dataset.getString("type"), skin, 10));
 
-                // Size
-                String size = "";
-                try {
-                    long bytes = dataset.getLong("size");
-                    size = GlobalResources.humanReadableByteCount(bytes, true);
-                } catch (IllegalArgumentException e) {
-                    size = "?";
-                }
+                    // Size
+                    String size = "";
+                    try {
+                        long bytes = dataset.getLong("size");
+                        size = GlobalResources.humanReadableByteCount(bytes, true);
+                    } catch (IllegalArgumentException e) {
+                        size = "?";
+                    }
 
-                // Delete
-                final JsonValue ds = dataset;
-                ImageButton rubbish = null;
-                if (exists) {
-                    rubbish = new OwnImageButton(skin, "rubbish-bin");
-                    rubbish.addListener(new TextTooltip(txt("gui.dataset.tooltip.remove"), skin));
-                    rubbish.addListener((event) -> {
-                        if (event instanceof ChangeEvent) {
-                            // Remove dataset
-                            if (ds.has("data")) {
-                                JsonValue data = ds.get("data");
-                                String[] filesToDelete = data.asStringArray();
-                                for (String fileToDelete : filesToDelete) {
-                                    try {
-                                        if (fileToDelete.endsWith("/")) {
-                                            fileToDelete = fileToDelete.substring(0, fileToDelete.length() - 1);
-                                        }
-                                        // Expand possible wildcards
-                                        String basePath = "";
-                                        String baseName = fileToDelete;
-                                        if (fileToDelete.contains("/")) {
-                                            basePath = fileToDelete.substring(0, fileToDelete.lastIndexOf('/'));
-                                            baseName = fileToDelete.substring(fileToDelete.lastIndexOf('/') + 1, fileToDelete.length());
-                                        }
-                                        File dataLoc = new File(GlobalConf.data.DATA_LOCATION);
-                                        File directory = new File(dataLoc, basePath);
-                                        Collection<File> files = FileUtils.listFilesAndDirs(directory, new WildcardFileFilter(baseName), new WildcardFileFilter(baseName));
-                                        for (File file : files) {
-                                            if (!file.equals(directory) && file.exists()) {
-                                                FileUtils.forceDelete(file);
+                    // Delete
+                    final JsonValue ds = dataset;
+                    ImageButton rubbish = null;
+                    if (exists) {
+                        rubbish = new OwnImageButton(skin, "rubbish-bin");
+                        rubbish.addListener(new TextTooltip(txt("gui.dataset.tooltip.remove"), skin));
+                        rubbish.addListener((event) -> {
+                            if (event instanceof ChangeEvent) {
+                                // Remove dataset
+                                if (ds.has("data")) {
+                                    JsonValue data = ds.get("data");
+                                    String[] filesToDelete = data.asStringArray();
+                                    for (String fileToDelete : filesToDelete) {
+                                        try {
+                                            if (fileToDelete.endsWith("/")) {
+                                                fileToDelete = fileToDelete.substring(0, fileToDelete.length() - 1);
                                             }
+                                            // Expand possible wildcards
+                                            String basePath = "";
+                                            String baseName = fileToDelete;
+                                            if (fileToDelete.contains("/")) {
+                                                basePath = fileToDelete.substring(0, fileToDelete.lastIndexOf('/'));
+                                                baseName = fileToDelete.substring(fileToDelete.lastIndexOf('/') + 1, fileToDelete.length());
+                                            }
+                                            File dataLoc = new File(GlobalConf.data.DATA_LOCATION);
+                                            File directory = new File(dataLoc, basePath);
+                                            Collection<File> files = FileUtils.listFilesAndDirs(directory, new WildcardFileFilter(baseName), new WildcardFileFilter(baseName));
+                                            for (File file : files) {
+                                                if (!file.equals(directory) && file.exists()) {
+                                                    FileUtils.forceDelete(file);
+                                                }
+                                            }
+                                        } catch (Exception e) {
+                                            logger.error(e);
                                         }
-                                    } catch (Exception e) {
+                                    }
+                                } else {
+                                    // Only remove "check"
+                                    try {
+                                        FileUtils.forceDelete(check.toFile());
+                                    } catch (IOException e) {
                                         logger.error(e);
                                     }
                                 }
-                            } else {
-                                // Only remove "check"
-                                try {
-                                    FileUtils.forceDelete(check.toFile());
-                                } catch (IOException e) {
-                                    logger.error(e);
-                                }
+                                // RELOAD DATASETS VIEW
+                                Gdx.app.postRunnable(() -> {
+                                    reloadAll();
+                                });
+
+                                return true;
                             }
-                            // RELOAD DATASETS VIEW
-                            Gdx.app.postRunnable(() -> {
-                                reloadAll();
-                            });
+                            return false;
+                        });
+                    }
 
-                            return true;
-                        }
-                        return false;
-                    });
+                    datasetsTable.add(cb).left().padRight(padl).padBottom(pad);
+                    datasetsTable.add(descGroup).left().padRight(padl).padBottom(pad);
+                    datasetsTable.add(vers).center().padRight(padl).padBottom(pad);
+                    datasetsTable.add(typeImage).center().padRight(padl).padBottom(pad);
+                    datasetsTable.add(size).left().padRight(padl).padBottom(pad);
+                    datasetsTable.add(haveit).center().padBottom(pad);
+                    if (exists) {
+                        datasetsTable.add(rubbish).center().padLeft(padl * 2.5f);
+                    }
+                    datasetsTable.row();
+
+                    choiceList.add(new Trio<JsonValue, OwnCheckBox, OwnLabel>(dataset, cb, haveit));
                 }
-
-                datasetsTable.add(cb).left().padRight(padl).padBottom(pad);
-                datasetsTable.add(descGroup).left().padRight(padl).padBottom(pad);
-                datasetsTable.add(vers).center().padRight(padl).padBottom(pad);
-                datasetsTable.add(typeImage).center().padRight(padl).padBottom(pad);
-                datasetsTable.add(size).left().padRight(padl).padBottom(pad);
-                datasetsTable.add(haveit).center().padBottom(pad);
-                if (exists) {
-                    datasetsTable.add(rubbish).center().padLeft(padl * 2.5f);
-                }
-                datasetsTable.row();
-
-                choiceList.add(new Trio<JsonValue, OwnCheckBox, OwnLabel>(dataset, cb, haveit));
             }
 
         }
@@ -362,8 +392,8 @@ public class DownloadDataWindow extends GenericDialog {
         datasetsScroll.setForceScroll(false, false);
         datasetsScroll.setSmoothScrolling(false);
         datasetsScroll.setFadeScrollBars(false);
-        datasetsScroll.setHeight(Math.min(Gdx.graphics.getHeight() * 0.45f, 750 * GlobalConf.SCALE_FACTOR));
-        datasetsScroll.setWidth(Math.min(Gdx.graphics.getWidth() * 0.9f, GlobalConf.SCALE_FACTOR > 1.4f ? 600 * GlobalConf.SCALE_FACTOR : 750 * GlobalConf.SCALE_FACTOR));
+        datasetsScroll.setHeight(Math.min(Gdx.graphics.getHeight() * 0.45f, 750f * GlobalConf.SCALE_FACTOR));
+        datasetsScroll.setWidth(Math.min(Gdx.graphics.getWidth() * 0.9f, GlobalConf.SCALE_FACTOR > 1.4f ? 600f * GlobalConf.SCALE_FACTOR : 750f * GlobalConf.SCALE_FACTOR));
 
         downloadTable.add(datasetsScroll).center().padBottom(padl).colspan(2).row();
 
@@ -373,10 +403,10 @@ public class DownloadDataWindow extends GenericDialog {
 
         // Download button
         downloadButton = new OwnTextButton(txt("gui.download.download"), skin, "download");
-        downloadButton.pad(buttonpad * 4);
+        downloadButton.pad(buttonpad * 4f);
         downloadButton.setMinWidth(minw);
-        downloadButton.setMinHeight(50 * GlobalConf.SCALE_FACTOR);
-        downloadTable.add(downloadButton).center().colspan(2).padBottom(0).row();
+        downloadButton.setMinHeight(50f * GlobalConf.SCALE_FACTOR);
+        downloadTable.add(downloadButton).center().colspan(2).padBottom(0f).row();
 
         // Progress bar
         downloadProgress = new OwnProgressBar(0, 100, 0.1f, false, skin, "default-horizontal");
@@ -384,6 +414,11 @@ public class DownloadDataWindow extends GenericDialog {
         downloadProgress.setVisible(false);
         downloadProgress.setPrefWidth(minw);
         downloadTable.add(downloadProgress).center().colspan(2).padBottom(padl).row();
+
+        // Download info
+        downloadSpeed = new OwnLabel("", skin);
+        downloadSpeed.setVisible(false);
+        downloadTable.add(downloadSpeed).center().colspan(2).padBottom(padl).row();
 
         downloadButton.addListener((event) -> {
             if (event instanceof ChangeEvent) {
@@ -436,13 +471,17 @@ public class DownloadDataWindow extends GenericDialog {
 
             FileHandle tempDownload = Gdx.files.absolute(GlobalConf.data.DATA_LOCATION + "/temp.tar.gz");
 
-            ProgressRunnable pr = (progress) -> {
+            ProgressRunnable pr = (read, total, progress, speed) -> {
+                double readMb = (double) read / 1e6d;
+                double totalMb = (double) total / 1e6d;
                 final String progressString = progress >= 100 ? txt("gui.done") : txt("gui.download.downloading", nf.format(progress));
-
+                double mbPerSecond = speed / 1000d;
+                final String speedString = nf.format(readMb) + "/" + nf.format(totalMb) + " MB   -   " + nf.format(mbPerSecond) + " MB/s";
                 // Since we are downloading on a background thread, post a runnable to touch UI
                 Gdx.app.postRunnable(() -> {
                     downloadButton.setText(progressString);
                     downloadProgress.setValue((float) progress);
+                    downloadSpeed.setText(speedString);
                 });
             };
 
@@ -485,6 +524,8 @@ public class DownloadDataWindow extends GenericDialog {
                     downloadButton.setText(txt("gui.download.download"));
                     downloadProgress.setValue(0);
                     downloadProgress.setVisible(false);
+                    downloadSpeed.setText("");
+                    downloadSpeed.setVisible(false);
                     me.acceptButton.setDisabled(false);
                     // Enable all
                     setDisabled(choiceList, false);
@@ -518,6 +559,7 @@ public class DownloadDataWindow extends GenericDialog {
                 setMessageError(txt("gui.download.failed", name));
                 me.acceptButton.setDisabled(false);
                 downloadProgress.setVisible(false);
+                downloadSpeed.setVisible(false);
                 Gdx.app.postRunnable(() -> {
                     downloadNext();
                 });
@@ -529,6 +571,7 @@ public class DownloadDataWindow extends GenericDialog {
                 setMessageError(txt("gui.download.failed", name));
                 me.acceptButton.setDisabled(false);
                 downloadProgress.setVisible(false);
+                downloadSpeed.setVisible(false);
                 Gdx.app.postRunnable(() -> {
                     downloadNext();
                 });
@@ -538,6 +581,7 @@ public class DownloadDataWindow extends GenericDialog {
             downloadButton.setDisabled(true);
             me.acceptButton.setDisabled(true);
             downloadProgress.setVisible(true);
+            downloadSpeed.setVisible(true);
             setStatusProgress(trio.getThird());
             setMessageOk(txt("gui.download.downloading.info", (current + 1), toDownload.size, currentJson.getString("name")));
             DownloadHelper.downloadFile(url, tempDownload, pr, finish, fail, cancel);

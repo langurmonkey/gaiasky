@@ -41,8 +41,8 @@ public class BillboardStarRenderSystem extends AbstractRenderSystem {
      *            The render group.
      * @param alphas
      *            The alphas list.
-     * @param shaderProgram
-     *            The shader program to render the quad with.
+     * @param shaderPrograms
+     *            The shader programs to render the quad with.
      */
     public BillboardStarRenderSystem(RenderGroup rg, float[] alphas, ShaderProgram[] shaderPrograms, String tex0, int ctindex) {
         this(rg, alphas, shaderPrograms, tex0, ctindex, 2, 2);

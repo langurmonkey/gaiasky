@@ -30,11 +30,8 @@ public class Planet extends ModelBody implements IAtmosphereRenderable, ICloudRe
     private static final double TH_ANGLE_POINT = ModelBody.TH_ANGLE_POINT / 2e4;
     private static final double TH_ANGLE_QUAD = ModelBody.TH_ANGLE_POINT / 2f;
 
-    Vector3d endline = new Vector3d();
-    Vector3d dx = new Vector3d();
-
+    private Vector3d endLine = new Vector3d();
     static Texture auxTex;
-    double previousOrientationAngle = 0;
 
     @Override
     public double THRESHOLD_NONE() {
@@ -86,7 +83,7 @@ public class Planet extends ModelBody implements IAtmosphereRenderable, ICloudRe
             Planet.manager = manager;
         }
         if (auxTex == null) {
-            auxTex = new Texture(GlobalConf.data.dataFileHandle("data/tex/star.jpg"));
+            auxTex = new Texture(GlobalConf.data.dataFileHandle("data/tex/base/star.jpg"));
         }
 
         // INITIALIZE ATMOSPHERE
@@ -235,7 +232,7 @@ public class Planet extends ModelBody implements IAtmosphereRenderable, ICloudRe
 
     @Override
     public void render(LineRenderSystem renderer, ICamera camera, float alpha) {
-        renderer.addLine(this, translation.x, translation.y, translation.z, endline.x, endline.y, endline.z, 1, 0, 0, 1);
+        renderer.addLine(this, translation.x, translation.y, translation.z, endLine.x, endLine.y, endLine.z, 1, 0, 0, 1);
     }
 
     @Override

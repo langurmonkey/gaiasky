@@ -1,16 +1,8 @@
 package gaia.cu9.ari.gaiaorbit.util;
 
-import java.io.File;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.time.Instant;
-import java.util.ArrayList;
-import java.util.List;
-
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.math.MathUtils;
 import com.bitfire.postprocessing.effects.CubemapProjections.CubemapProjection;
-
 import gaia.cu9.ari.gaiaorbit.GaiaSky;
 import gaia.cu9.ari.gaiaorbit.event.EventManager;
 import gaia.cu9.ari.gaiaorbit.event.Events;
@@ -22,6 +14,13 @@ import gaia.cu9.ari.gaiaorbit.util.format.DateFormatFactory;
 import gaia.cu9.ari.gaiaorbit.util.format.DateFormatFactory.DateType;
 import gaia.cu9.ari.gaiaorbit.util.format.IDateFormat;
 import gaia.cu9.ari.gaiaorbit.util.math.MathUtilsd;
+
+import java.io.File;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.time.Instant;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Holds the global configuration options
@@ -264,7 +263,6 @@ public class GlobalConf {
         public boolean INPUT_ENABLED;
         public boolean RECORD_CAMERA;
         public float LIMIT_MAG_RUNTIME;
-        public int OUTPUT_FRAME_BUFFER_SIZE = 50;
         public boolean STRIPPED_FOV_MODE = false;
         /** Whether octree drawing is active or not **/
         public boolean DRAW_OCTREE;
@@ -617,9 +615,13 @@ public class GlobalConf {
         public String TUTORIAL_POINTER_SCRIPT_LOCATION;
         public String TUTORIAL_SCRIPT_LOCATION;
         public boolean SHOW_DEBUG_INFO;
-        public Instant LAST_CHECKED;
-        public String LAST_VERSION_TIME;
+
+        // Update checker
+        public static long VERSION_CHECK_INTERVAL_MS = 1 * 24 * 60 * 60 * 1000;
+        public Instant VERSION_LAST_TIME;
+        public String VERSION_LAST_VERSION;
         public String VERSION_CHECK_URL;
+
         public String DATA_DESCRIPTOR_URL;
         public String UI_THEME;
         public String SCRIPT_LOCATION;
@@ -643,14 +645,14 @@ public class GlobalConf {
             EventManager.instance.subscribe(this, Events.STEREOSCOPIC_CMD, Events.STEREO_PROFILE_CMD, Events.CUBEMAP360_CMD, Events.CUBEMAP_PROJECTION_CMD);
         }
 
-        public void initialize(boolean dISPLAY_TUTORIAL, String tUTORIAL_POINTER_SCRIPT_LOCATION, String tUTORIAL_SCRIPT_LOCATION, boolean sHOW_DEBUG_INFO, Instant lAST_CHECKED, String lAST_VERSION_TIME, String vERSION_CHECK_URL, String dATA_DESCRIPTOR_URL, String uI_THEME, String sCRIPT_LOCATION, int rEST_PORT, String lOCALE, boolean sTEREOSCOPIC_MODE, StereoProfile sTEREO_PROFILE, boolean cUBEMAP360_MODE, boolean aNALYTICS_ENABLED, boolean dISPLAY_HUD, boolean dISPLAY_POINTER_COORDS,
+        public void initialize(boolean dISPLAY_TUTORIAL, String tUTORIAL_POINTER_SCRIPT_LOCATION, String tUTORIAL_SCRIPT_LOCATION, boolean sHOW_DEBUG_INFO, Instant lAST_CHECKED, String lAST_VERSION, String vERSION_CHECK_URL, String dATA_DESCRIPTOR_URL, String uI_THEME, String sCRIPT_LOCATION, int rEST_PORT, String lOCALE, boolean sTEREOSCOPIC_MODE, StereoProfile sTEREO_PROFILE, boolean cUBEMAP360_MODE, boolean aNALYTICS_ENABLED, boolean dISPLAY_HUD, boolean dISPLAY_POINTER_COORDS,
                 boolean dISPLAY_DATASET_DIALOG, boolean nET_MASTER, boolean nET_SLAVE, List<String> nET_MASTER_SLAVES) {
             DISPLAY_TUTORIAL = dISPLAY_TUTORIAL;
             TUTORIAL_POINTER_SCRIPT_LOCATION = tUTORIAL_POINTER_SCRIPT_LOCATION;
             TUTORIAL_SCRIPT_LOCATION = tUTORIAL_SCRIPT_LOCATION;
             SHOW_DEBUG_INFO = sHOW_DEBUG_INFO;
-            LAST_CHECKED = lAST_CHECKED;
-            LAST_VERSION_TIME = lAST_VERSION_TIME;
+            VERSION_LAST_TIME = lAST_CHECKED;
+            VERSION_LAST_VERSION = lAST_VERSION;
             VERSION_CHECK_URL = vERSION_CHECK_URL;
             DATA_DESCRIPTOR_URL = dATA_DESCRIPTOR_URL;
             UI_THEME = uI_THEME;
@@ -680,7 +682,7 @@ public class GlobalConf {
 
         public String getLastCheckedString() {
             IDateFormat df = DateFormatFactory.getFormatter(I18n.locale, DateType.DATE);
-            return df.format(LAST_CHECKED);
+            return df.format(VERSION_LAST_TIME);
         }
 
         public boolean isStereoHalfWidth() {

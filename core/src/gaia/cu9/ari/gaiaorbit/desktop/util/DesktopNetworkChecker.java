@@ -208,7 +208,7 @@ public class DesktopNetworkChecker extends Thread implements INetworkChecker {
         }
     }
 
-    private String[] suffixes = { "_(planet)", "_(moon)", "_(asteroid)", "_(dwarf_planet)", "_(spacecraft)" };
+    private String[] suffixes = { "_(planet)", "_(moon)", "_(asteroid)", "_(dwarf_planet)", "_(spacecraft)", "" };
 
     private void setWikiLink(String wikiname, IFocus focus, LinkListener listener) {
         try {

@@ -1,18 +1,5 @@
 package gaia.cu9.ari.gaiaorbit.interfce;
 
-import java.io.File;
-import java.io.FileFilter;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.nio.channels.FileChannel;
-import java.util.Arrays;
-import java.util.Comparator;
-import java.util.Locale;
-import java.util.Map;
-import java.util.Set;
-import java.util.TreeSet;
-
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Graphics.DisplayMode;
 import com.badlogic.gdx.Input.Keys;
@@ -24,26 +11,12 @@ import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Event;
 import com.badlogic.gdx.scenes.scene2d.EventListener;
 import com.badlogic.gdx.scenes.scene2d.Stage;
-import com.badlogic.gdx.scenes.scene2d.ui.Button;
-import com.badlogic.gdx.scenes.scene2d.ui.ButtonGroup;
-import com.badlogic.gdx.scenes.scene2d.ui.Cell;
-import com.badlogic.gdx.scenes.scene2d.ui.CheckBox;
-import com.badlogic.gdx.scenes.scene2d.ui.HorizontalGroup;
-import com.badlogic.gdx.scenes.scene2d.ui.Image;
-import com.badlogic.gdx.scenes.scene2d.ui.Label;
-import com.badlogic.gdx.scenes.scene2d.ui.SelectBox;
-import com.badlogic.gdx.scenes.scene2d.ui.Skin;
-import com.badlogic.gdx.scenes.scene2d.ui.Slider;
 import com.badlogic.gdx.scenes.scene2d.ui.Stack;
-import com.badlogic.gdx.scenes.scene2d.ui.Table;
-import com.badlogic.gdx.scenes.scene2d.ui.TextArea;
-import com.badlogic.gdx.scenes.scene2d.ui.TextTooltip;
-import com.badlogic.gdx.scenes.scene2d.ui.VerticalGroup;
+import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener.ChangeEvent;
 import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.Array;
-
 import gaia.cu9.ari.gaiaorbit.GaiaSky;
 import gaia.cu9.ari.gaiaorbit.desktop.util.SysUtils;
 import gaia.cu9.ari.gaiaorbit.event.EventManager;
@@ -53,32 +26,21 @@ import gaia.cu9.ari.gaiaorbit.interfce.beans.ComboBoxBean;
 import gaia.cu9.ari.gaiaorbit.interfce.beans.FileComboBoxBean;
 import gaia.cu9.ari.gaiaorbit.interfce.beans.LangComboBoxBean;
 import gaia.cu9.ari.gaiaorbit.scenegraph.camera.CameraManager;
-import gaia.cu9.ari.gaiaorbit.util.ConfInit;
-import gaia.cu9.ari.gaiaorbit.util.Constants;
-import gaia.cu9.ari.gaiaorbit.util.GlobalConf;
+import gaia.cu9.ari.gaiaorbit.util.*;
 import gaia.cu9.ari.gaiaorbit.util.GlobalConf.PostprocessConf.Antialias;
 import gaia.cu9.ari.gaiaorbit.util.GlobalConf.ScreenshotMode;
-import gaia.cu9.ari.gaiaorbit.util.GlobalResources;
-import gaia.cu9.ari.gaiaorbit.util.I18n;
-import gaia.cu9.ari.gaiaorbit.util.Logger;
 import gaia.cu9.ari.gaiaorbit.util.format.INumberFormat;
 import gaia.cu9.ari.gaiaorbit.util.format.NumberFormatFactory;
 import gaia.cu9.ari.gaiaorbit.util.math.MathUtilsd;
-import gaia.cu9.ari.gaiaorbit.util.scene2d.FileChooser;
+import gaia.cu9.ari.gaiaorbit.util.scene2d.*;
 import gaia.cu9.ari.gaiaorbit.util.scene2d.FileChooser.ResultListener;
-import gaia.cu9.ari.gaiaorbit.util.scene2d.OwnCheckBox;
-import gaia.cu9.ari.gaiaorbit.util.scene2d.OwnImageButton;
-import gaia.cu9.ari.gaiaorbit.util.scene2d.OwnLabel;
-import gaia.cu9.ari.gaiaorbit.util.scene2d.OwnScrollPane;
-import gaia.cu9.ari.gaiaorbit.util.scene2d.OwnSelectBox;
-import gaia.cu9.ari.gaiaorbit.util.scene2d.OwnSlider;
-import gaia.cu9.ari.gaiaorbit.util.scene2d.OwnTextArea;
-import gaia.cu9.ari.gaiaorbit.util.scene2d.OwnTextButton;
-import gaia.cu9.ari.gaiaorbit.util.scene2d.OwnTextField;
-import gaia.cu9.ari.gaiaorbit.util.scene2d.OwnTextIconButton;
 import gaia.cu9.ari.gaiaorbit.util.validator.IValidator;
 import gaia.cu9.ari.gaiaorbit.util.validator.IntValidator;
 import gaia.cu9.ari.gaiaorbit.util.validator.RegexpValidator;
+
+import java.io.*;
+import java.nio.channels.FileChannel;
+import java.util.*;
 
 /**
  * The default preferences window.
@@ -643,7 +605,20 @@ public class PreferencesWindow extends GenericDialog {
         lang = new OwnSelectBox<LangComboBoxBean>(skin);
         lang.setWidth(textwidth * 3f);
         lang.setItems(langs);
-        lang.setSelected(langs[idxLang(GlobalConf.program.LOCALE, langs)]);
+        if(!GlobalConf.program.LOCALE.isEmpty()) {
+            lang.setSelected(langs[idxLang(GlobalConf.program.LOCALE, langs)]);
+        } else {
+            // Empty locale
+            int lidx = idxLang(null, langs);
+            if(lidx < 0 || lidx >= langs.length){
+                lidx = idxLang(Locale.getDefault().toLanguageTag(), langs);
+                if(lidx < 0 || lidx >= langs.length){
+                    // Default is en_GB
+                    lidx = 2;
+                }
+            }
+            lang.setSelected(langs[lidx]);
+        }
 
         // THEME
         OwnLabel themeLabel = new OwnLabel(txt("gui.ui.theme"), skin);
@@ -1780,7 +1755,7 @@ public class PreferencesWindow extends GenericDialog {
     }
 
     private int idxLang(String code, LangComboBoxBean[] langs) {
-        if (code.isEmpty()) {
+        if (code == null || code.isEmpty()) {
             code = I18n.bundle.getLocale().toLanguageTag();
         }
         for (int i = 0; i < langs.length; i++) {

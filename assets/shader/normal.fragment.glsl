@@ -300,6 +300,10 @@ void main() {
     // Prevent saturation
     gl_FragColor = clamp(gl_FragColor, 0.0, 1.0);
     gl_FragColor.rgb *= 0.95;
+
+    if(gl_FragColor.a == 0.0){
+        discard;
+    }
     
 
 

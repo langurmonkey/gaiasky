@@ -371,7 +371,7 @@ public class MWModelRenderSystem extends ImmediateRenderSystem implements IObser
                 // Additive blending (RGBs + RGBd)
                 //Gdx.gl20.glBlendFunc(GL20.GL_ONE, GL20.GL_ONE);
 
-                // Transparency blending - Order dependent transparency
+                // Transparency blending - Order dependent ownOpacity
                 //Gdx.gl20.glBlendFunc(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA);
 
                 // Sort chunks

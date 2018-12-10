@@ -1,7 +1,5 @@
 package gaia.cu9.ari.gaiaorbit.render.system;
 
-import java.util.Random;
-
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
@@ -11,7 +9,6 @@ import com.badlogic.gdx.graphics.VertexAttributes.Usage;
 import com.badlogic.gdx.graphics.glutils.ShaderProgram;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.Array;
-
 import gaia.cu9.ari.gaiaorbit.render.ComponentType;
 import gaia.cu9.ari.gaiaorbit.render.IRenderable;
 import gaia.cu9.ari.gaiaorbit.render.RenderingContext;
@@ -24,8 +21,10 @@ import gaia.cu9.ari.gaiaorbit.util.GlobalConf.ProgramConf.StereoProfile;
 import gaia.cu9.ari.gaiaorbit.util.math.MathUtilsd;
 import gaia.cu9.ari.gaiaorbit.util.math.Vector3d;
 
+import java.util.Random;
+
 public class ParticleEffectsRenderSystem extends ImmediateRenderSystem {
-    private static int N_PARTICLES = 100;
+    private static int N_PARTICLES = GlobalConf.scene.isHighQuality() ? 300 : (GlobalConf.scene.isNormalQuality() ? 200 : 100);
 
     private Random rand;
     private Vector3 aux1f;
@@ -92,6 +91,11 @@ public class ParticleEffectsRenderSystem extends ImmediateRenderSystem {
     private void updatePositions(ICamera cam) {
         double tu = cam.getCurrent().getTranslateUnits();
         double dist = 1200000 * tu * Constants.KM_TO_U * getFactor(GlobalConf.scene.CAMERA_SPEED);
+
+        // If focus is very close, stop (jittering errors kick in)
+        if(cam.getMode().isFocus() && cam.getFocus().getDistToCamera() < Constants.KM_TO_U * 1000){
+            return;
+        }
         double dists = dist - dist * 0.1;
         Vector3d campos = aux1.set(cam.getPos());
         for (int i = 0; i < N_PARTICLES * 2; i++) {

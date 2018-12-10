@@ -1,23 +1,12 @@
 package gaia.cu9.ari.gaiaorbit.desktop.util;
 
-import java.io.BufferedWriter;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.time.Instant;
-import java.util.Calendar;
-import java.util.Date;
-
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.backends.lwjgl3.Lwjgl3Files;
 import com.badlogic.gdx.files.FileHandle;
-
 import gaia.cu9.ari.gaiaorbit.desktop.format.DesktopDateFormatFactory;
 import gaia.cu9.ari.gaiaorbit.desktop.format.DesktopNumberFormatFactory;
-import gaia.cu9.ari.gaiaorbit.util.ConfInit;
-import gaia.cu9.ari.gaiaorbit.util.Constants;
-import gaia.cu9.ari.gaiaorbit.util.I18n;
-import gaia.cu9.ari.gaiaorbit.util.Logger;
-import gaia.cu9.ari.gaiaorbit.util.Nature;
+import gaia.cu9.ari.gaiaorbit.interfce.ConsoleLogger;
+import gaia.cu9.ari.gaiaorbit.util.*;
 import gaia.cu9.ari.gaiaorbit.util.coord.MoonAACoordinates;
 import gaia.cu9.ari.gaiaorbit.util.coord.vsop87.AbstractVSOP87;
 import gaia.cu9.ari.gaiaorbit.util.coord.vsop87.VSOP87;
@@ -25,11 +14,18 @@ import gaia.cu9.ari.gaiaorbit.util.format.DateFormatFactory;
 import gaia.cu9.ari.gaiaorbit.util.format.NumberFormatFactory;
 import gaia.cu9.ari.gaiaorbit.util.math.Vector3d;
 
+import java.io.BufferedWriter;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.time.Instant;
+import java.util.Calendar;
+import java.util.Date;
+
 public class Positions2DExtractor {
 
     public static void main(String[] args) throws IOException {
         Positions2DExtractor p2d = new Positions2DExtractor();
-        new LogWriter();
+        new ConsoleLogger();
 
         I18n.initialize(new FileHandle("/home/tsagrista/git/gaiasandbox/android/assets/i18n/gsbundle"));
 
