@@ -8,13 +8,12 @@ import com.badlogic.gdx.utils.reflect.ClassReflection;
 import com.badlogic.gdx.utils.reflect.Constructor;
 import com.badlogic.gdx.utils.reflect.Method;
 import com.badlogic.gdx.utils.reflect.ReflectionException;
-import gaia.cu9.ari.gaiaorbit.interfce.TextUtils;
 import gaia.cu9.ari.gaiaorbit.scenegraph.SceneGraphNode;
 import gaia.cu9.ari.gaiaorbit.util.GlobalConf;
-import gaia.cu9.ari.gaiaorbit.util.GlobalResources;
 import gaia.cu9.ari.gaiaorbit.util.I18n;
 import gaia.cu9.ari.gaiaorbit.util.Logger;
 import gaia.cu9.ari.gaiaorbit.util.Logger.Log;
+import gaia.cu9.ari.gaiaorbit.util.TextUtils;
 import gaia.cu9.ari.gaiaorbit.util.coord.IBodyCoordinates;
 
 import java.io.File;
@@ -197,7 +196,7 @@ public class JsonLoader<T extends SceneGraphNode> implements ISceneGraphLoader {
                     }
 
                 }
-                String methodName = "set" + GlobalResources.propertyToMethodName(attribute.name);
+                String methodName = "set" + TextUtils.propertyToMethodName(attribute.name);
                 //                Method m = ClassReflection.getMethod(clazz, methodName, valueClass);
                 Method m = searchMethod(methodName, valueClass, clazz);
                 if (m != null)
