@@ -1,9 +1,12 @@
 package gaia.cu9.ari.gaiaorbit.render;
 
+import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.FrameBuffer;
 
 import gaia.cu9.ari.gaiaorbit.render.IPostProcessor.PostProcessBean;
 import gaia.cu9.ari.gaiaorbit.scenegraph.camera.ICamera;
+import gaia.cu9.ari.gaiaorbit.util.GlobalConf;
+import gaia.cu9.ari.gaiaorbit.util.GlobalResources;
 
 /**
  * Normal SGR, takes care of the regular to-screen rednering with no strange
@@ -14,9 +17,11 @@ import gaia.cu9.ari.gaiaorbit.scenegraph.camera.ICamera;
  */
 public class SGR extends SGRAbstract implements ISGR {
 
+    SpriteBatch sb;
 
     public SGR() {
         super();
+        sb = new SpriteBatch(GlobalConf.scene.SHADOW_MAPPING_N_SHADOWS, GlobalResources.spriteShader);
     }
 
     @Override

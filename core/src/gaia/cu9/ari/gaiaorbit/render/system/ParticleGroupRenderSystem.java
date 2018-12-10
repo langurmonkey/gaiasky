@@ -49,11 +49,11 @@ public class ParticleGroupRenderSystem extends ImmediateRenderSystem implements 
     }
 
     /**
-     * Adds a new mesh data to the meshes list and increases the mesh data index
-     * 
-     * @param nVertices The max number of vertices this mesh data can hold
-     * @return The index of the new mesh data
-     */
+    	 * Adds a new mesh data to the meshes list and increases the mesh data index
+    	 *
+    	 * @param nVertices The max number of vertices this mesh data can hold
+    	 * @return The index of the new mesh data
+    	 */
     private int addMeshData(int nVertices) {
         // look for index
         int mdi;
@@ -84,10 +84,10 @@ public class ParticleGroupRenderSystem extends ImmediateRenderSystem implements 
     }
 
     /**
-     * Clears the mesh data at the index i
-     * 
-     * @param i The index
-     */
+    	 * Clears the mesh data at the index i
+    	 *
+    	 * @param i The index
+    	 */
     public void clearMeshData(int i) {
         assert i >= 0 && i < meshes.length : "Mesh data index out of bounds: " + i + " (n meshes = " + N_MESHES + ")";
 
@@ -144,8 +144,8 @@ public class ParticleGroupRenderSystem extends ImmediateRenderSystem implements 
 
                 if (curr != null) {
                     /**
-                     * PARTICLE RENDERER
-                     */
+                    					 * PARTICLE RENDERER
+                    					 */
                     // Enable gl_PointCoord
                     Gdx.gl20.glEnable(34913);
                     // Enable point sizes

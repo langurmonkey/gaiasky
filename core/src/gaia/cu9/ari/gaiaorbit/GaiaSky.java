@@ -514,6 +514,7 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
             EventManager.instance.post(Events.CAMERA_MODE_CMD, CameraMode.Free_Camera);
             EventManager.instance.post(Events.CAMERA_POS_CMD, new double[] { 0, 5 * Constants.AU_TO_U, 0 });
             EventManager.instance.post(Events.CAMERA_DIR_CMD, new double[] { 0, -1, 0 });
+            EventManager.instance.post(Events.CAMERA_UP_CMD, new double[] { 0, 0, 1 });
         }
 
         // Debug info scheduler

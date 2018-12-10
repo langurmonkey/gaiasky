@@ -74,11 +74,6 @@ public class FullGui extends AbstractGui {
 
     private List<Actor> invisibleInStereoMode;
 
-    // Uncertainties disabled by default
-    private boolean uncertainties = false;
-    // Rel effects off
-    private boolean releffects = false;
-
     public FullGui() {
         super();
     }

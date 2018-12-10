@@ -205,7 +205,7 @@ public class GaiaSkyDesktop implements IObserver {
 
     public void launchMainApp() {
         Lwjgl3ApplicationConfiguration cfg = new Lwjgl3ApplicationConfiguration();
-        cfg.setTitle(GlobalConf.getFullApplicationName());
+        cfg.setTitle(GlobalConf.APPLICATION_NAME);
         // Note that we disable VSync! The VRContext manages vsync with respect to the HMD
         cfg.useVsync(false);
         cfg.setWindowedMode(GlobalConf.screen.SCREEN_WIDTH, GlobalConf.screen.SCREEN_HEIGHT);

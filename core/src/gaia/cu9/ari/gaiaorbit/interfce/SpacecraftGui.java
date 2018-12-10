@@ -642,9 +642,9 @@ public class SpacecraftGui extends AbstractGui {
             double ppow = (Double) data[7];
             double rpow = (Double) data[8];
 
-            yawvel.setText(nf.format(y) + "�");
-            pitchvel.setText(nf.format(p) + "�");
-            rollvel.setText(nf.format(r) + "�");
+            yawvel.setText(nf.format(y) + "°");
+            pitchvel.setText(nf.format(p) + "°");
+            rollvel.setText(nf.format(r) + "°");
 
             Pair<Double, String> velstr = GlobalResources.doubleToVelocityString(v);
             mainvel.setText(sf.format(velstr.getFirst()) + " " + velstr.getSecond());

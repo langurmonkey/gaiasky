@@ -543,17 +543,4 @@ public class DesktopConfInit extends ConfInit {
         }
     }
 
-    private String stringArrayToString(String[] in, String sep) {
-        if (in == null || in.length == 0 || sep == null)
-            return "";
-        StringBuilder sb = new StringBuilder();
-        int i = 0;
-        for (String str : in) {
-            if (i > 0)
-                sb.append(sep);
-            sb.append(str);
-        }
-        return sb.toString();
-    }
-
 }

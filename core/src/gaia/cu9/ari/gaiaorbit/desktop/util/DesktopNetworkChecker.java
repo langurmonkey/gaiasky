@@ -127,7 +127,7 @@ public class DesktopNetworkChecker extends Thread implements INetworkChecker {
 
                 Gdx.app.postRunnable(() -> {
                     if (focus != null) {
-                        logger.debug("Looking up network resources for '" + focus.getName() + "'");
+                        logger.debug(this.getClass().getSimpleName(), "Looking up network resources for '" + focus.getName() + "'");
 
                         // Add table
                         if (focus instanceof IStarFocus) {
