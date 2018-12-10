@@ -12,44 +12,41 @@ import gaia.cu9.ari.gaiaorbit.scenegraph.camera.CameraManager.CameraMode;
 import gaia.cu9.ari.gaiaorbit.util.GlobalConf.ProgramConf.StereoProfile;
 import gaia.cu9.ari.gaiaorbit.util.I18n;
 import gaia.cu9.ari.gaiaorbit.util.format.DateFormatFactory;
-import gaia.cu9.ari.gaiaorbit.util.format.DateFormatFactory.DateType;
 import gaia.cu9.ari.gaiaorbit.util.format.IDateFormat;
 
 import java.time.Instant;
 
 /**
  * Widget that captures and displays messages in a GUI.
- * 
- * @author Toni Sagrista
  *
+ * @author Toni Sagrista
  */
 public class ConsoleLogger implements IObserver {
     private static final long DEFAULT_TIMEOUT = 5000;
     private static final String TAG_SEPARATOR = " - ";
     IDateFormat df;
     long msTimeout;
-    boolean writeDates = true;
-    boolean useHistorical = true;
+    boolean writeDates;
+    boolean useHistorical;
 
-    public ConsoleLogger(){
+    public ConsoleLogger() {
         this(true, true);
     }
 
     /**
      * Initializes the notifications interface.
-     * 
-     * @param writeDates
-     *            Log the date and time.
-     * @param useHistorical
-     *            Keep logs.
+     *
+     * @param writeDates    Log the date and time.
+     * @param useHistorical Keep logs.
      */
     public ConsoleLogger(boolean writeDates, boolean useHistorical) {
         this.msTimeout = DEFAULT_TIMEOUT;
         this.useHistorical = useHistorical;
+        this.writeDates = writeDates;
 
         try {
-            this.df = DateFormatFactory.getFormatter(I18n.locale, DateType.DATETIME);
-        }catch (Exception e){
+            this.df = DateFormatFactory.getFormatter("uuuu-MM-dd HH:mm:ss");
+        } catch (Exception e) {
             this.df = new DesktopDateFormat(I18n.locale, true, true);
         }
         EventManager.instance.subscribe(this, Events.POST_NOTIFICATION, Events.FOCUS_CHANGED, Events.TOGGLE_TIME_CMD, Events.TOGGLE_VISIBILITY_CMD, Events.CAMERA_MODE_CMD, Events.PACE_CHANGED_INFO, Events.FOCUS_LOCK_CMD, Events.TOGGLE_AMBIENT_LIGHT, Events.FOV_CHANGE_NOTIFICATION, Events.JAVA_EXCEPTION, Events.ORBIT_DATA_LOADED, Events.SCREENSHOT_INFO, Events.COMPUTE_GAIA_SCAN_CMD, Events.ONLY_OBSERVED_STARS_CMD, Events.TRANSIT_COLOUR_CMD, Events.LIMIT_MAG_CMD, Events.STEREOSCOPIC_CMD, Events.DISPLAY_GUI_CMD, Events.FRAME_OUTPUT_CMD, Events.STEREO_PROFILE_CMD, Events.OCTREE_PARTICLE_FADE_CMD);
@@ -75,14 +72,24 @@ public class ConsoleLogger implements IObserver {
         }
     }
 
-    private void log(String date, String msg, boolean debug){
-        if(Gdx.app != null){
-            if(debug)
-                Gdx.app.debug(date, msg);
+    private void log(String date, String msg, boolean debug) {
+        if (Gdx.app != null) {
+            if (debug) {
+                if (writeDates)
+                    Gdx.app.debug(date, msg);
+                else
+                    Gdx.app.debug(this.getClass().getSimpleName(), msg);
+            } else {
+                if (writeDates)
+                    Gdx.app.log(date, msg);
+                else
+                    Gdx.app.log(this.getClass().getSimpleName(), msg);
+            }
+        } else {
+            if (writeDates)
+                System.out.println("[" + date + "] " + msg);
             else
-                Gdx.app.log(date, msg);
-        }else{
-            System.out.println(date + ": " + msg);
+                System.out.println(msg);
         }
     }
 
@@ -152,9 +159,16 @@ public class ConsoleLogger implements IObserver {
             break;
         case JAVA_EXCEPTION:
             if (data.length == 1) {
-                addMessage(I18n.bundle.format("notif.error", ((Throwable) data[0]).toString()));
+                if(I18n.bundle != null)
+                    addMessage(I18n.bundle.format("notif.error", ((Throwable) data[0]).getMessage()));
+                else
+                    addMessage("Error: " + ((Throwable)data[0]).getMessage());
             } else {
-                addMessage(I18n.bundle.format("notif.error", data[1] + TAG_SEPARATOR + ((Throwable) data[0]).toString()));
+                if(I18n.bundle != null)
+                addMessage(I18n.bundle.format("notif.error", data[1] + TAG_SEPARATOR + ((Throwable) data[0]).getMessage()));
+                else
+                    addMessage("Error: " + data[1] + TAG_SEPARATOR + ((Throwable) data[0]).getMessage());
+
             }
             break;
         case ORBIT_DATA_LOADED:

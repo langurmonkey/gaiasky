@@ -1,22 +1,15 @@
 package gaia.cu9.ari.gaiaorbit.data;
 
-import java.io.DataOutputStream;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
-
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.backends.lwjgl3.Lwjgl3Files;
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.utils.Array;
-
 import gaia.cu9.ari.gaiaorbit.data.stars.HYGBinaryLoader;
 import gaia.cu9.ari.gaiaorbit.data.stars.HYGCSVLoader;
 import gaia.cu9.ari.gaiaorbit.desktop.format.DesktopDateFormatFactory;
 import gaia.cu9.ari.gaiaorbit.desktop.format.DesktopNumberFormatFactory;
 import gaia.cu9.ari.gaiaorbit.desktop.util.DesktopConfInit;
-import gaia.cu9.ari.gaiaorbit.desktop.util.LogWriter;
+import gaia.cu9.ari.gaiaorbit.interfce.ConsoleLogger;
 import gaia.cu9.ari.gaiaorbit.scenegraph.AbstractPositionEntity;
 import gaia.cu9.ari.gaiaorbit.scenegraph.CelestialBody;
 import gaia.cu9.ari.gaiaorbit.scenegraph.Particle;
@@ -29,6 +22,8 @@ import gaia.cu9.ari.gaiaorbit.util.Logger.Log;
 import gaia.cu9.ari.gaiaorbit.util.format.DateFormatFactory;
 import gaia.cu9.ari.gaiaorbit.util.format.NumberFormatFactory;
 
+import java.io.*;
+
 /**
  * Small utility to convert a the HYG CSV catalog to binary in the following
  * format: - 32 bits (int) with the number of stars, starNum repeat the
@@ -37,10 +32,10 @@ import gaia.cu9.ari.gaiaorbit.util.format.NumberFormatFactory;
  * - 32 bits (float) - appmag - 32 bits (float) - absmag - 32 bits (float) -
  * colorbv - 32 bits (float) - ra - 32 bits (float) - dec - 32 bits (float) -
  * distance
- * 
+ *
  * @author Toni Sagrista
  */
-public class HYGToBinary { 
+public class HYGToBinary {
     private static final Log logger = Logger.getLogger(HYGToBinary.class);
 
     static String fileIn = "/home/tsagrista/git/gaiasky/android/assets-bak/data/hygxyz.csv";
@@ -52,11 +47,11 @@ public class HYGToBinary {
 
         try {
             // Assets location
-            String ASSETS_LOC = GlobalConf.ASSETS_LOC; 
+            String ASSETS_LOC = GlobalConf.ASSETS_LOC;
 
             // Init logger
-            new LogWriter();
-            
+            new ConsoleLogger();
+
             // Init files
             Gdx.files = new Lwjgl3Files();
 
@@ -161,7 +156,6 @@ public class HYGToBinary {
             e.printStackTrace();
         }
     }
-
 
     private boolean equals(CelestialBody s1, CelestialBody s2) {
         return s1.id == s2.id && s1.posSph.x == s2.posSph.x && s1.posSph.y == s2.posSph.y && s1.pos.x == s2.pos.x && s1.pos.y == s2.pos.y && s1.pos.z == s2.pos.z && s1.absmag == s2.absmag;

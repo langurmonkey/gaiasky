@@ -16,7 +16,9 @@ uniform float u_alpha;
 
 uniform mat4 u_projModelView;
 uniform vec3 u_camPos;
+uniform vec3 u_camDir;
 uniform float u_sizeFactor;
+uniform int u_cubemap;
 
 #ifdef relativisticEffects
     uniform vec3 u_velDir; // Velocity vector
@@ -38,7 +40,18 @@ varying vec4 v_col;
 
 void main() {
     vec3 pos = a_position.xyz - u_camPos;
-    
+
+    // Distance to point
+    float dist = length(pos);
+
+    float cubemapSizeFactor = 1.0;
+    if(u_cubemap == 1) {
+        // Cosine of angle between star position and camera direction
+        // Correct point primitive size error due to perspective projection
+        float cosphi = pow(dot(u_camDir, pos) / dist, 2.0);
+        cubemapSizeFactor = 1.0 - cosphi * 0.65;
+    }
+
     #ifdef relativisticEffects
         pos = computeRelativisticAberration(pos, length(pos), u_velDir, u_vc);
     #endif // relativisticEffects
@@ -50,5 +63,5 @@ void main() {
     v_col = vec4(a_color.rgb, a_color.a * u_alpha);
 
     gl_Position = u_projModelView * vec4(pos, 0.0);
-    gl_PointSize = a_size * u_sizeFactor;
+    gl_PointSize = a_size * u_sizeFactor * cubemapSizeFactor;
 }

@@ -1,13 +1,9 @@
 package gaia.cu9.ari.gaiaorbit.interfce;
 
-import java.util.LinkedList;
-import java.util.List;
-
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
-
 import gaia.cu9.ari.gaiaorbit.GaiaSky;
 import gaia.cu9.ari.gaiaorbit.data.orbit.PolylineData;
 import gaia.cu9.ari.gaiaorbit.event.EventManager;
@@ -18,9 +14,11 @@ import gaia.cu9.ari.gaiaorbit.scenegraph.camera.CameraManager.CameraMode;
 import gaia.cu9.ari.gaiaorbit.util.GlobalConf.ProgramConf.StereoProfile;
 import gaia.cu9.ari.gaiaorbit.util.I18n;
 import gaia.cu9.ari.gaiaorbit.util.format.DateFormatFactory;
-import gaia.cu9.ari.gaiaorbit.util.format.DateFormatFactory.DateType;
 import gaia.cu9.ari.gaiaorbit.util.format.IDateFormat;
 import gaia.cu9.ari.gaiaorbit.util.scene2d.OwnLabel;
+
+import java.util.LinkedList;
+import java.util.List;
 
 /**
  * Widget that captures and displays messages in a GUI.
@@ -159,7 +157,7 @@ public class NotificationsInterface extends Table implements IObserver, IGuiInte
         message1 = new OwnLabel("", skin, "hud-med");
         this.add(message1).left();
 
-        this.df = DateFormatFactory.getFormatter(I18n.locale, DateType.DATETIME);
+        this.df = DateFormatFactory.getFormatter("uuuu-MM-dd HH:mm:ss");
         EventManager.instance.subscribe(this, Events.POST_NOTIFICATION, Events.FOCUS_CHANGED, Events.TOGGLE_TIME_CMD, Events.TOGGLE_VISIBILITY_CMD, Events.CAMERA_MODE_CMD, Events.PACE_CHANGED_INFO, Events.FOCUS_LOCK_CMD, Events.TOGGLE_AMBIENT_LIGHT, Events.FOV_CHANGE_NOTIFICATION, Events.JAVA_EXCEPTION, Events.ORBIT_DATA_LOADED, Events.SCREENSHOT_INFO, Events.COMPUTE_GAIA_SCAN_CMD, Events.ONLY_OBSERVED_STARS_CMD, Events.TRANSIT_COLOUR_CMD, Events.LIMIT_MAG_CMD, Events.STEREOSCOPIC_CMD, Events.DISPLAY_GUI_CMD, Events.FRAME_OUTPUT_CMD, Events.STEREO_PROFILE_CMD, Events.OCTREE_PARTICLE_FADE_CMD);
     }
 
@@ -313,11 +311,11 @@ public class NotificationsInterface extends Table implements IObserver, IGuiInte
         }
     }
 
-    public int getNumberMessages() {
+    public static int getNumberMessages() {
         return historical.size();
     }
 
-    public List<MessageBean> getHistorical() {
+    public static List<MessageBean> getHistorical() {
         return historical;
     }
 

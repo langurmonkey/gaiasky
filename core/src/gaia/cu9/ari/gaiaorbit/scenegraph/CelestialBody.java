@@ -9,14 +9,9 @@ import com.badlogic.gdx.graphics.glutils.ShaderProgram;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.Array;
-
+import com.badlogic.gdx.utils.ObjectMap;
 import gaia.cu9.ari.gaiaorbit.GaiaSky;
-import gaia.cu9.ari.gaiaorbit.render.ComponentType;
-import gaia.cu9.ari.gaiaorbit.render.I3DTextRenderable;
-import gaia.cu9.ari.gaiaorbit.render.IModelRenderable;
-import gaia.cu9.ari.gaiaorbit.render.IQuadRenderable;
-import gaia.cu9.ari.gaiaorbit.render.PostProcessorFactory;
-import gaia.cu9.ari.gaiaorbit.render.RenderingContext;
+import gaia.cu9.ari.gaiaorbit.render.*;
 import gaia.cu9.ari.gaiaorbit.render.system.FontRenderSystem;
 import gaia.cu9.ari.gaiaorbit.scenegraph.camera.FovCamera;
 import gaia.cu9.ari.gaiaorbit.scenegraph.camera.ICamera;
@@ -85,6 +80,9 @@ public abstract class CelestialBody extends AbstractPositionEntity implements I3
 
     /** Component alpha mirror **/
     public float compalpha;
+
+    /** Alternative name **/
+    private String altname;
 
     /**
      * Whether we are out of the time baseline range in the algorithm that works
@@ -364,7 +362,7 @@ public abstract class CelestialBody extends AbstractPositionEntity implements I3
 
         aux.crs(out).nor();
 
-        float dist = -0.045f * (float) out.len();
+        float dist = (float) (MathUtilsd.lint(viewAngleApparent, 1e-8, 0.5, -0.005, -0.06) * out.len());
 
         aux.add(cam.getUp()).nor().scl(dist);
 
@@ -487,16 +485,42 @@ public abstract class CelestialBody extends AbstractPositionEntity implements I3
     }
 
     @Override
-    public IFocus getFocus(String name) {
-        if (this.name.toLowerCase().equals(name))
-            return this;
-        else
-            return null;
+    public boolean isCoordinatesTimeOverflow() {
+        return coordinatesTimeOverflow;
     }
 
     @Override
-    public boolean isCoordinatesTimeOverflow() {
-        return coordinatesTimeOverflow;
+    public float getTextOpacity(){
+        return getOpacity();
+    }
+
+    public void setAltname(String altname) {
+        this.altname = altname;
+    }
+
+    public String getAltname() {
+        return this.altname;
+    }
+
+    @Override
+    protected void addToIndex(ObjectMap<String, SceneGraphNode> map) {
+        if (altname != null && !altname.isEmpty()) {
+            map.put(altname.toLowerCase(), this);
+        }
+    }
+
+    @Override
+    protected void removeFromIndex(ObjectMap<String, SceneGraphNode> map) {
+        if (altname != null && !altname.isEmpty()) {
+            map.remove(altname.toLowerCase());
+        }
+    }
+    @Override
+    public IFocus getFocus(String name) {
+        if (this.name.toLowerCase().equals(name) || (altname != null && altname.toLowerCase().equals(name)))
+            return this;
+
+        return null;
     }
 
 }

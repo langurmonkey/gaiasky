@@ -1,10 +1,18 @@
 package gaia.cu9.ari.gaiaorbit.desktop.util;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
+import com.badlogic.gdx.Gdx;
+import gaia.cu9.ari.gaiaorbit.desktop.GaiaSkyDesktop;
+import gaia.cu9.ari.gaiaorbit.render.ComponentType;
+import gaia.cu9.ari.gaiaorbit.util.*;
+import gaia.cu9.ari.gaiaorbit.util.GlobalConf.*;
+import gaia.cu9.ari.gaiaorbit.util.GlobalConf.PostprocessConf.Antialias;
+import gaia.cu9.ari.gaiaorbit.util.GlobalConf.ProgramConf.StereoProfile;
+import gaia.cu9.ari.gaiaorbit.util.Logger.Log;
+import gaia.cu9.ari.gaiaorbit.util.format.DateFormatFactory;
+import gaia.cu9.ari.gaiaorbit.util.format.IDateFormat;
+import gaia.cu9.ari.gaiaorbit.util.math.MathUtilsd;
+
+import java.io.*;
 import java.nio.channels.FileChannel;
 import java.time.Instant;
 import java.time.LocalDateTime;
@@ -14,36 +22,6 @@ import java.time.format.DateTimeParseException;
 import java.util.LinkedList;
 import java.util.Locale;
 import java.util.Properties;
-
-import com.badlogic.gdx.Gdx;
-
-import gaia.cu9.ari.gaiaorbit.desktop.GaiaSkyDesktop;
-import gaia.cu9.ari.gaiaorbit.render.ComponentType;
-import gaia.cu9.ari.gaiaorbit.util.ConfInit;
-import gaia.cu9.ari.gaiaorbit.util.Constants;
-import gaia.cu9.ari.gaiaorbit.util.GlobalConf;
-import gaia.cu9.ari.gaiaorbit.util.GlobalConf.ControlsConf;
-import gaia.cu9.ari.gaiaorbit.util.GlobalConf.DataConf;
-import gaia.cu9.ari.gaiaorbit.util.GlobalConf.FrameConf;
-import gaia.cu9.ari.gaiaorbit.util.GlobalConf.ImageFormat;
-import gaia.cu9.ari.gaiaorbit.util.GlobalConf.PerformanceConf;
-import gaia.cu9.ari.gaiaorbit.util.GlobalConf.PostprocessConf;
-import gaia.cu9.ari.gaiaorbit.util.GlobalConf.PostprocessConf.Antialias;
-import gaia.cu9.ari.gaiaorbit.util.GlobalConf.ProgramConf;
-import gaia.cu9.ari.gaiaorbit.util.GlobalConf.ProgramConf.StereoProfile;
-import gaia.cu9.ari.gaiaorbit.util.GlobalConf.RuntimeConf;
-import gaia.cu9.ari.gaiaorbit.util.GlobalConf.SceneConf;
-import gaia.cu9.ari.gaiaorbit.util.GlobalConf.ScreenConf;
-import gaia.cu9.ari.gaiaorbit.util.GlobalConf.ScreenshotConf;
-import gaia.cu9.ari.gaiaorbit.util.GlobalConf.ScreenshotMode;
-import gaia.cu9.ari.gaiaorbit.util.GlobalConf.SpacecraftConf;
-import gaia.cu9.ari.gaiaorbit.util.GlobalConf.VersionConf;
-import gaia.cu9.ari.gaiaorbit.util.I18n;
-import gaia.cu9.ari.gaiaorbit.util.Logger;
-import gaia.cu9.ari.gaiaorbit.util.Logger.Log;
-import gaia.cu9.ari.gaiaorbit.util.format.DateFormatFactory;
-import gaia.cu9.ari.gaiaorbit.util.format.IDateFormat;
-import gaia.cu9.ari.gaiaorbit.util.math.MathUtilsd;
 
 /**
  * Desktop GlobalConf initialiser, where the configuration comes from a
@@ -118,14 +96,14 @@ public class DesktopConfInit extends ConfInit {
         /** VERSION CONF **/
         VersionConf vc = new VersionConf();
         String versionStr = vp.getProperty("version");
-        DateTimeFormatter df = DateTimeFormatter.ofPattern("EEE MMM dd kk:mm:ss z yyyy", Locale.ENGLISH);
+        DateTimeFormatter mydf = DateTimeFormatter.ofPattern("EEE MMM dd kk:mm:ss z yyyy", Locale.ENGLISH);
         Instant buildtime = null;
         try {
-            buildtime = LocalDateTime.parse(vp.getProperty("buildtime"), df).toInstant(ZoneOffset.UTC);
+            buildtime = LocalDateTime.parse(vp.getProperty("buildtime"), mydf).toInstant(ZoneOffset.UTC);
         } catch (DateTimeParseException e) {
-            df = DateTimeFormatter.ofPattern("dd/MM/yyyy hh:mm a", Locale.ENGLISH);
+            mydf = DateTimeFormatter.ofPattern("dd/MM/yyyy hh:mm a", Locale.ENGLISH);
             try {
-                buildtime = LocalDateTime.parse(vp.getProperty("buildtime"), df).toInstant(ZoneOffset.UTC);
+                buildtime = LocalDateTime.parse(vp.getProperty("buildtime"), mydf).toInstant(ZoneOffset.UTC);
             } catch (DateTimeParseException e1) {
                 logger.error(e1);
             }
@@ -191,7 +169,7 @@ public class DesktopConfInit extends ConfInit {
         boolean SHOW_DEBUG_INFO = Boolean.parseBoolean(p.getProperty("program.debuginfo"));
         Instant LAST_CHECKED;
         try {
-            LAST_CHECKED = LocalDateTime.parse(p.getProperty("program.lastchecked"), df).toInstant(ZoneOffset.UTC);
+            LAST_CHECKED = df.parse(p.getProperty("program.lastchecked"));
         } catch (Exception e) {
             LAST_CHECKED = null;
         }
@@ -430,7 +408,7 @@ public class DesktopConfInit extends ConfInit {
         p.setProperty("program.displayhud", Boolean.toString(GlobalConf.program.DISPLAY_HUD));
         p.setProperty("program.displaypointercoords", Boolean.toString(GlobalConf.program.DISPLAY_POINTER_COORDS));
         p.setProperty("program.debuginfo", Boolean.toString(GlobalConf.program.SHOW_DEBUG_INFO));
-        p.setProperty("program.lastchecked", GlobalConf.program.LAST_CHECKED != null ? df.format(GlobalConf.program.LAST_CHECKED) : "");
+        p.setProperty("program.lastchecked", GlobalConf.program.VERSION_LAST_TIME != null ? df.format(GlobalConf.program.VERSION_LAST_TIME) : "");
         p.setProperty("program.url.versioncheck", GlobalConf.program.VERSION_CHECK_URL);
         p.setProperty("program.url.data.descriptor", GlobalConf.program.DATA_DESCRIPTOR_URL);
         p.setProperty("program.ui.theme", GlobalConf.program.UI_THEME);

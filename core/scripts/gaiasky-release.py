@@ -151,7 +151,7 @@ if __name__ == '__main__':
         print()
         print(" > Your release %s is in %s/releases" % (arguments.tag, arguments.gs_folder))
         print(" > Upload the files in mintaka.ari.uni-heidelberg.de:/dataB/gaiasky/files/releases/")
-        print(" > Generate the html listings for the new files: index-creator.sh")
+        print(" > Generate the html listings for the new files: dir2html")
         print(" > Update TYPO3 ARI website: http://zah.uni-heidelberg.de/typo3")
         print(" > Update docs if necessary: %s/docs" % arguments.gs_folder)
         print(" > Update the website (TYPO3) pointing to the new files")

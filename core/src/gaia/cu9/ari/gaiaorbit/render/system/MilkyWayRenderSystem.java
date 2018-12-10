@@ -1,22 +1,15 @@
 package gaia.cu9.ari.gaiaorbit.render.system;
 
-import java.util.Random;
-
 import com.badlogic.gdx.Application.ApplicationType;
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.graphics.GL20;
-import com.badlogic.gdx.graphics.Mesh;
-import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.*;
 import com.badlogic.gdx.graphics.Texture.TextureFilter;
-import com.badlogic.gdx.graphics.VertexAttribute;
 import com.badlogic.gdx.graphics.VertexAttributes.Usage;
 import com.badlogic.gdx.graphics.g3d.ModelBatch;
 import com.badlogic.gdx.graphics.glutils.ShaderProgram;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer.ShapeType;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.Array;
-
 import gaia.cu9.ari.gaiaorbit.event.Events;
 import gaia.cu9.ari.gaiaorbit.event.IObserver;
 import gaia.cu9.ari.gaiaorbit.render.IRenderable;
@@ -27,6 +20,8 @@ import gaia.cu9.ari.gaiaorbit.scenegraph.camera.ICamera;
 import gaia.cu9.ari.gaiaorbit.util.GlobalConf;
 import gaia.cu9.ari.gaiaorbit.util.GlobalConf.ProgramConf.StereoProfile;
 import gaia.cu9.ari.gaiaorbit.util.math.MathUtilsd;
+
+import java.util.Random;
 
 public class MilkyWayRenderSystem extends ImmediateRenderSystem implements IObserver {
     private boolean UPDATE_POINTS = true;
@@ -57,7 +52,7 @@ public class MilkyWayRenderSystem extends ImmediateRenderSystem implements IObse
 
         nebulatextures = new Texture[4];
         for (int i = 0; i < 4; i++) {
-            Texture tex = new Texture(GlobalConf.data.dataFile("tex/nebula00" + (i + 1) + ".png"));
+            Texture tex = new Texture(GlobalConf.data.dataFile("tex/base/nebula00" + (i + 1) + ".png"));
             tex.setFilter(TextureFilter.Linear, TextureFilter.Linear);
             nebulatextures[i] = tex;
         }

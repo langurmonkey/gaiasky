@@ -327,4 +327,9 @@ public class MilkyWay extends AbstractPositionEntity implements I3DTextRenderabl
 
     public void setModel(ModelComponent mc) {
     }
+
+    @Override
+    public float getTextOpacity(){
+        return getOpacity();
+    }
 }

@@ -225,6 +225,11 @@ public class Constellation extends FadeNode implements ILineRenderable, I3DTextR
     }
 
     @Override
+    public float getTextOpacity(){
+        return getOpacity();
+    }
+
+    @Override
     public float getLineWidth() {
         return 1;
     }

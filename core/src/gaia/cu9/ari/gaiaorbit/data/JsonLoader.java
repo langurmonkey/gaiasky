@@ -1,13 +1,5 @@
 package gaia.cu9.ari.gaiaorbit.data;
 
-import java.io.File;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
-import java.util.TreeMap;
-
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.JsonReader;
@@ -16,7 +8,6 @@ import com.badlogic.gdx.utils.reflect.ClassReflection;
 import com.badlogic.gdx.utils.reflect.Constructor;
 import com.badlogic.gdx.utils.reflect.Method;
 import com.badlogic.gdx.utils.reflect.ReflectionException;
-
 import gaia.cu9.ari.gaiaorbit.interfce.TextUtils;
 import gaia.cu9.ari.gaiaorbit.scenegraph.SceneGraphNode;
 import gaia.cu9.ari.gaiaorbit.util.GlobalConf;
@@ -25,6 +16,14 @@ import gaia.cu9.ari.gaiaorbit.util.I18n;
 import gaia.cu9.ari.gaiaorbit.util.Logger;
 import gaia.cu9.ari.gaiaorbit.util.Logger.Log;
 import gaia.cu9.ari.gaiaorbit.util.coord.IBodyCoordinates;
+
+import java.io.File;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
+import java.util.TreeMap;
 
 /**
  * Implements the loading of scene graph nodes using libgdx's json library.
@@ -68,24 +67,26 @@ public class JsonLoader<T extends SceneGraphNode> implements ISceneGraphLoader {
             for (String filePath : filePaths) {
                 FileHandle file = GlobalConf.data.dataFileHandle(filePath);
                 JsonValue model = json.parse(file.read());
-                JsonValue child = model.get("objects").child;
-                int size = 0;
-                while (child != null) {
-                    size++;
-                    String clazzName = child.getString("impl");
 
-                    @SuppressWarnings("unchecked")
-                    Class<Object> clazz = (Class<Object>) ClassReflection.forName(clazzName);
+                // Must have an 'objects' element
+                if(model.has("objects")) {
+                    JsonValue child = model.get("objects").child;
+                    int size = 0;
+                    while (child != null) {
+                        size++;
+                        String clazzName = child.getString("impl");
 
-                    // Convert to object and add to list
-                    @SuppressWarnings("unchecked")
-                    T object = (T) convertJsonToObject(child, clazz);
+                        @SuppressWarnings("unchecked") Class<Object> clazz = (Class<Object>) ClassReflection.forName(clazzName);
 
-                    bodies.add(object);
+                        // Convert to object and add to list
+                        @SuppressWarnings("unchecked") T object = (T) convertJsonToObject(child, clazz);
 
-                    child = child.next;
+                        bodies.add(object);
+
+                        child = child.next;
+                    }
+                    logger.info(I18n.bundle.format("notif.nodeloader", size, filePath));
                 }
-                logger.info(I18n.bundle.format("notif.nodeloader", size, filePath));
             }
 
         } catch (Exception e) {

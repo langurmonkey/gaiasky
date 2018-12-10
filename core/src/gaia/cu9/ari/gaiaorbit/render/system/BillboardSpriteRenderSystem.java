@@ -37,8 +37,8 @@ public class BillboardSpriteRenderSystem extends AbstractRenderSystem {
      *            The render group
      * @param alphas
      *            The alphas list
-     * @param shaderProgram
-     *            The shader program to render the quad with
+     * @param programs
+     *            The shader programs to render the quad with
      * @param ctindex
      *            The component type index
      */

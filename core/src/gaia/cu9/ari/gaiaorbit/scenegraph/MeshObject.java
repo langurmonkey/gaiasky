@@ -243,4 +243,9 @@ public class MeshObject extends FadeNode implements IModelRenderable, I3DTextRen
         return true;
     }
 
+    @Override
+    public float getTextOpacity(){
+        return getOpacity();
+    }
+
 }

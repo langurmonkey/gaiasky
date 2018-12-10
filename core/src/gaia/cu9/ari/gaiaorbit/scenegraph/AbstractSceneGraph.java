@@ -1,14 +1,7 @@
 package gaia.cu9.ari.gaiaorbit.scenegraph;
 
-import java.util.Set;
-
-import com.badlogic.gdx.utils.Array;
-import com.badlogic.gdx.utils.IntMap;
-import com.badlogic.gdx.utils.ObjectIntMap;
-import com.badlogic.gdx.utils.ObjectMap;
+import com.badlogic.gdx.utils.*;
 import com.badlogic.gdx.utils.ObjectMap.Keys;
-import com.badlogic.gdx.utils.ObjectSet;
-
 import gaia.cu9.ari.gaiaorbit.GaiaSky;
 import gaia.cu9.ari.gaiaorbit.render.system.PixelRenderSystem;
 import gaia.cu9.ari.gaiaorbit.scenegraph.StarGroup.StarBean;
@@ -21,6 +14,8 @@ import gaia.cu9.ari.gaiaorbit.util.Logger.Log;
 import gaia.cu9.ari.gaiaorbit.util.math.Vector3d;
 import gaia.cu9.ari.gaiaorbit.util.time.ITimeFrameProvider;
 import gaia.cu9.ari.gaiaorbit.util.tree.IPosition;
+
+import java.util.Set;
 
 public abstract class AbstractSceneGraph implements ISceneGraph {
     private static Log logger = Logger.getLogger(AbstractSceneGraph.class);
@@ -174,9 +169,12 @@ public abstract class AbstractSceneGraph implements ISceneGraph {
                 }
             } else if (node instanceof StarGroup) {
                 StarGroup sg = (StarGroup) node;
-                for (StarBean sb : sg.data()) {
-                    if (sb.hip() >= 0)
-                        hipMap.remove(sb.hip());
+                Array<StarBean> arr = sg.data();
+                if(arr != null) {
+                    for (StarBean sb : arr) {
+                        if (sb != null && sb.hip() >= 0)
+                            hipMap.remove(sb.hip());
+                    }
                 }
             }
         }
@@ -212,27 +210,8 @@ public abstract class AbstractSceneGraph implements ISceneGraph {
                 map.remove(id);
             }
 
-            if (node instanceof Star) {
-                // Hip
-                if (((Star) node).hip > 0) {
-                    String hipid = "hip " + ((Star) node).hip;
-                    map.remove(hipid);
-                }
-
-                // Tycho
-                if (((Star) node).tycho != null && !((Star) node).tycho.isEmpty()) {
-                    map.remove(((Star) node).tycho);
-                }
-            } else if (node instanceof StarGroup) {
-                StarGroup sg = (StarGroup) node;
-                if (sg.index != null) {
-                    ObjectIntMap.Keys<String> keys = sg.index.keys();
-                    for (String key : keys) {
-                        map.remove(key);
-                    }
-                }
-            }
-
+            // Special cases
+            node.removeFromIndex(map);
         }
     }
 

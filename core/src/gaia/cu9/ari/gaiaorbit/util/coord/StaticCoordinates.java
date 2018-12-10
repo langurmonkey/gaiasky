@@ -1,16 +1,16 @@
 package gaia.cu9.ari.gaiaorbit.util.coord;
 
-import java.time.Instant;
-
 import com.badlogic.gdx.utils.reflect.ClassReflection;
 import com.badlogic.gdx.utils.reflect.Method;
 import com.badlogic.gdx.utils.reflect.ReflectionException;
-
 import gaia.cu9.ari.gaiaorbit.scenegraph.Orbit;
 import gaia.cu9.ari.gaiaorbit.util.Constants;
 import gaia.cu9.ari.gaiaorbit.util.Logger;
+import gaia.cu9.ari.gaiaorbit.util.math.MathUtilsd;
 import gaia.cu9.ari.gaiaorbit.util.math.Matrix4d;
 import gaia.cu9.ari.gaiaorbit.util.math.Vector3d;
+
+import java.time.Instant;
 
 /**
  * A position that never changes
@@ -70,7 +70,18 @@ public class StaticCoordinates implements IBodyCoordinates {
 
     public void setPosition(double[] position) {
         this.position = new Vector3d(position[0] * Constants.KM_TO_U, position[1] * Constants.KM_TO_U, position[2] * Constants.KM_TO_U);
+    }
 
+    /**
+     * Sets equatorial coordinates as a vector of [ra, de, distance]
+     * @param equatorial Vector with [ra, dec, distance] with angles in degrees and distance in parsecs
+     */
+    public void setEquatorial(double[] equatorial) {
+        double ra = MathUtilsd.degRad * equatorial[0];
+        double dec = MathUtilsd.degRad * equatorial[1];
+        double dist = Constants.PC_TO_U * equatorial[2];
+        this.position = new Vector3d();
+        Coordinates.sphericalToCartesian(ra, dec, dist, this.position);
     }
 
     @Override
