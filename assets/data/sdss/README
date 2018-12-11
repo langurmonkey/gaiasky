@@ -1,9 +1,0 @@
-URL: http://cas.sdss.org/dr12/en/tools/search/sql.aspx
-SQL:
-
-SELECT p.ra,p.dec,s.z as redshift
-FROM PhotoObj AS p
-   JOIN SpecObj AS s ON s.bestobjid = p.objid
-WHERE 
-   p.u BETWEEN 0 AND 19.6
-   AND g BETWEEN 0 AND 20
