@@ -743,7 +743,7 @@ public class StarGroup extends ParticleGroup implements ILineRenderable, IStarFo
                     float textSize = (float) FastMath.tanh(viewAngle) * distToCamera * 1e5f;
                     float alpha = Math.min((float) FastMath.atan(textSize / distToCamera), 1.e-3f);
                     textSize = (float) FastMath.tan(alpha) * distToCamera * 0.5f;
-                    render3DLabel(batch, shader, sys.font3d, camera, rc, star.name, lpos, textScale * camera.getFovFactor(), textSize * camera.getFovFactor());
+                    render3DLabel(batch, shader, sys.fontDistanceField, camera, rc, star.name, lpos, textScale * camera.getFovFactor(), textSize * camera.getFovFactor());
 
                 }
             }

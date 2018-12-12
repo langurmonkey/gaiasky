@@ -223,7 +223,7 @@ public class MilkyWay extends AbstractPositionEntity implements I3DTextRenderabl
         shader.setUniformf("u_viewAnglePow", 1f);
         shader.setUniformf("u_thOverFactor", 1f);
         shader.setUniformf("u_thOverFactorScl", 1f);
-        render3DLabel(batch, shader, sys.font3d, camera, rc, text(), pos, textScale(), textSize() * camera.getFovFactor());
+        render3DLabel(batch, shader, sys.fontDistanceField, camera, rc, text(), pos, textScale(), textSize() * camera.getFovFactor());
     }
 
     public void setTransformName(String transformName) {
