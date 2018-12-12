@@ -230,7 +230,7 @@ public class DesktopPostProcessor implements IPostProcessor, IObserver {
         if (aavalue.equals(Antialias.FXAA)) {
             ppb.antialiasing = new Fxaa(width, height);
             ((Fxaa) ppb.antialiasing).setSpanMax(8f);
-            ((Fxaa) ppb.antialiasing).setReduceMin(1f / 128f);
+            ((Fxaa) ppb.antialiasing).setReduceMin(1f / 16f);
             ((Fxaa) ppb.antialiasing).setReduceMul(1f / 8f);
             Logger.getLogger(this.getClass()).info(I18n.bundle.format("notif.selected", "FXAA"));
         } else if (aavalue.equals(Antialias.NFAA)) {
