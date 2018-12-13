@@ -72,7 +72,7 @@ public class SceneGraphRenderer extends AbstractRenderer implements IProcessRend
 
     public AbstractRenderSystem[] pixelRenderSystems;
 
-    private BitmapFont font3d, font2d, fontTitles, fontNormal;
+    private BitmapFont font3d, font2d, fontTitles;
 
     private ShaderProgram distanceFieldFontShader;
 
@@ -189,7 +189,6 @@ public class SceneGraphRenderer extends AbstractRenderer implements IProcessRend
         manager.load("font/main-font.fnt", BitmapFont.class, bfp);
         manager.load("font/font2d.fnt", BitmapFont.class, bfp);
         manager.load("font/font-titles.fnt", BitmapFont.class, bfp);
-        manager.load("font/main-normal.fnt", BitmapFont.class, bfp);
 
         stars = new Array<IRenderable>();
 
@@ -384,7 +383,6 @@ public class SceneGraphRenderer extends AbstractRenderer implements IProcessRend
         font3d = manager.get("font/main-font.fnt");
         font2d = manager.get("font/font2d.fnt");
         fontTitles = manager.get("font/font-titles.fnt");
-        fontNormal = manager.get("font/main-normal.fnt");
 
         // Sprites
         spriteBatch = GlobalResources.spriteBatch;
