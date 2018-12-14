@@ -217,9 +217,9 @@
         {
             "name" : "catalog-nbg",
             "type" : "catalog",
-            "version" : 1,
+            "version" : 2,
             "mingsversion" : 260,
-            "size" : 13697437,
+            "size" : 15495600,
             "check": "autoload-nbg.json",
             "data" : [ 
                     "autoload-nbg.json",
@@ -227,8 +227,8 @@
                     "tex/extragal"
             ],
             "description": "NBG catalog - Nearby Galaxies Catalog - 870 galaxies",
-            "md5" : "c4d59cd0c1fb4e7fb2f9573e13f63123",
-            "file" : "http://gaia.ari.uni-heidelberg.de/gaiasky/files/autodownload/galaxies/002_20181211/nbg-galaxies.tar.gz"
+            "md5" : "b1a829727bef8b703d465b2104e92178",
+            "file" : "http://gaia.ari.uni-heidelberg.de/gaiasky/files/autodownload/galaxies/002_20181213/nbg-galaxies.tar.gz"
         },
         {
             "name" : "catalog-sdss-12",

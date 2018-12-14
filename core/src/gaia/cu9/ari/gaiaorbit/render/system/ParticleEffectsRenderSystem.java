@@ -105,7 +105,7 @@ public class ParticleEffectsRenderSystem extends ImmediateRenderSystem {
                 return;
             }
         }
-        double dists = dist - dist * 0.1;
+        double dists = dist * 0.9;
         Vector3d campos = aux1.set(cam.getPos());
         for (int i = 0; i < N_PARTICLES * 2; i++) {
             Vector3d pos = aux5.set(positions[i]);
