@@ -972,10 +972,6 @@ public class StarGroup extends ParticleGroup implements ILineRenderable, IStarFo
         return this;
     }
 
-    @Override
-    public int getStarCount() {
-        return pointData.size;
-    }
 
     public Vector3d getAbsolutePosition(String name, Vector3d aux) {
         if (index.containsKey(name)) {

@@ -349,6 +349,11 @@ public class ParticleGroup extends FadeNode implements I3DTextRenderable, IFocus
         return name;
     }
 
+    @Override
+    public int getStarCount() {
+        return pointData.size;
+    }
+
     public boolean isActive() {
         return focusIndex >= 0;
     }

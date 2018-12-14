@@ -1,13 +1,7 @@
 package gaia.cu9.ari.gaiaorbit.util.tree;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Map;
-import java.util.TreeSet;
-
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.utils.Array;
-
 import gaia.cu9.ari.gaiaorbit.data.StreamingOctreeLoader;
 import gaia.cu9.ari.gaiaorbit.render.ComponentType;
 import gaia.cu9.ari.gaiaorbit.render.ILineRenderable;
@@ -20,13 +14,13 @@ import gaia.cu9.ari.gaiaorbit.scenegraph.camera.ICamera;
 import gaia.cu9.ari.gaiaorbit.util.ComponentTypes;
 import gaia.cu9.ari.gaiaorbit.util.GlobalConf;
 import gaia.cu9.ari.gaiaorbit.util.Pair;
-import gaia.cu9.ari.gaiaorbit.util.math.BoundingBoxd;
-import gaia.cu9.ari.gaiaorbit.util.math.Frustumd;
-import gaia.cu9.ari.gaiaorbit.util.math.Intersectord;
-import gaia.cu9.ari.gaiaorbit.util.math.MathUtilsd;
-import gaia.cu9.ari.gaiaorbit.util.math.Rayd;
-import gaia.cu9.ari.gaiaorbit.util.math.Vector3d;
+import gaia.cu9.ari.gaiaorbit.util.math.*;
 import net.jafama.FastMath;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Map;
+import java.util.TreeSet;
 
 /**
  * Octree node implementation which contains a list of {@link IPosition} objects
@@ -198,7 +192,7 @@ public class OctreeNode implements ILineRenderable {
 
     /**
      * Constructs an octree node.
-     * @param pageId
+     * @param pageid
      *            The octant id 
      * @param x
      *            The x coordinate of the center.
@@ -540,7 +534,7 @@ public class OctreeNode implements ILineRenderable {
     public void update(Vector3d parentTransform, ICamera cam, Array<SceneGraphNode> roulette, float opacity) {
         parentTransform.put(transform);
         this.opacity = opacity;
-        this.observed = true;
+        this.observed = false;
 
         // Compute distance and view angle
         distToCamera = auxD1.set(centre).add(cam.getInversePos()).len();
@@ -554,7 +548,7 @@ public class OctreeNode implements ILineRenderable {
             // Not observed
             this.observed = false;
             setChildrenObserved(false);
-        } else {
+        } else if(this.observed = computeObserved2(cam)){
             nOctantsObserved++;
             //int L_DEPTH = 5;
             /**
@@ -616,8 +610,8 @@ public class OctreeNode implements ILineRenderable {
     /**
      * Checks whether the given frustum intersects with the current octant.
      * 
-     * @param parentTransform
-     * @param cam
+     * @param parentTransform The parent transform
+     * @param frustum The frustum
      */
     private boolean computeObserved1(Vector3d parentTransform, Frustumd frustum) {
         boxcopy.set(box);
@@ -646,25 +640,27 @@ public class OctreeNode implements ILineRenderable {
      * @return Whether the octant is observed
      */
     private boolean computeObserved2(ICamera cam) {
-        return /*GlobalConf.program.CUBEMAP360_MODE ||*/ cam.getMode().isGaiaFov() || computeObservedFast(cam);
+        return GlobalConf.program.CUBEMAP360_MODE || cam.getMode().isGaiaFov() || computeObservedFast(cam);
     }
 
     /**
      * Simplification to compute octant visibility. Angle between camera direction and octant centre
-     * must be smaller than fov/2 plus a correction (for octant size, assuming sphere)
+     * must be smaller than fov/2 plus a correction (approximates octants to spheres)
      * @param cam The camera
      * @return Whether the octant is observed
      */
     private boolean computeObservedFast(ICamera cam) {
+        // vector from camera to center of box
         Vector3d cpospos = auxD1.set(centre).sub(cam.getPos());
-        double dist = cpospos.len();
-        ray.origin.set(cam.getPos());
-        ray.direction.set(cam.getDirection());
-        if (dist < radius || Intersectord.intersectRayBoundsFast(ray, box.getCenter(auxD3), box.getDimensions(auxD4)))
-            return true;
-        double angleOverlap = FastMath.acos(radius / dist);
-        double ang = cam.getDirection().angle(cpospos);
-        return ang < cam.getCamera().fieldOfView + angleOverlap;
+        // auxD2 rotation axis
+        Vector3d axis = auxD2.set(cam.getDirection()).crs(centre);
+        Vector3d edge = auxD3.set(cam.getDirection()).rotate(axis, cam.getCamera().fieldOfView / 2d);
+        // get angle at edge (when far side is radius)
+        double angle1 = FastMath.toDegrees(FastMath.atan(radius / cpospos.len()));
+        // get actual angle
+        double angle2 = edge.angle(cpospos);
+        // We're in the containing sphere or centre is in front of us
+        return distToCamera <= radius || angle2 < angle1;
     }
 
     public LoadStatus getStatus() {
@@ -704,14 +700,11 @@ public class OctreeNode implements ILineRenderable {
      */
     public void updateNumbers() {
         // Number of own objects
-        if (objects == null) {
-            this.ownObjects = 0;
-        } else {
-            this.ownObjects = 0;
+        this.ownObjects = 0;
+        if (objects != null) {
             for (AbstractPositionEntity ape : objects) {
-                this.ownObjects += ape instanceof ParticleGroup ? ((ParticleGroup) ape).size() : 1;
+                this.ownObjects += ape.getStarCount();
             }
-
         }
 
         // Number of recursive objects
