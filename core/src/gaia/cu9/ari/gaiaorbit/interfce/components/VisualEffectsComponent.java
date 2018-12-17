@@ -1,14 +1,9 @@
 package gaia.cu9.ari.gaiaorbit.interfce.components;
 
 import com.badlogic.gdx.scenes.scene2d.Stage;
-import com.badlogic.gdx.scenes.scene2d.ui.HorizontalGroup;
-import com.badlogic.gdx.scenes.scene2d.ui.Label;
-import com.badlogic.gdx.scenes.scene2d.ui.Skin;
-import com.badlogic.gdx.scenes.scene2d.ui.Slider;
-import com.badlogic.gdx.scenes.scene2d.ui.VerticalGroup;
+import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener.ChangeEvent;
 import com.badlogic.gdx.utils.Align;
-
 import gaia.cu9.ari.gaiaorbit.event.EventManager;
 import gaia.cu9.ari.gaiaorbit.event.Events;
 import gaia.cu9.ari.gaiaorbit.event.IObserver;
@@ -17,7 +12,6 @@ import gaia.cu9.ari.gaiaorbit.util.GlobalConf;
 import gaia.cu9.ari.gaiaorbit.util.math.MathUtilsd;
 import gaia.cu9.ari.gaiaorbit.util.scene2d.OwnLabel;
 import gaia.cu9.ari.gaiaorbit.util.scene2d.OwnSlider;
-import gaia.cu9.ari.gaiaorbit.util.scene2d.Separator;
 
 public class VisualEffectsComponent extends GuiComponent implements IObserver {
 
@@ -141,16 +135,12 @@ public class VisualEffectsComponent extends GuiComponent implements IObserver {
         lightingGroup.space(space2);
         lightingGroup.addActor(sbrightnessLabel);
         lightingGroup.addActor(sbrightnessGroup);
-        lightingGroup.addActor(new Separator(skin));
         lightingGroup.addActor(sizeLabel);
         lightingGroup.addActor(sizeGroup);
-        lightingGroup.addActor(new Separator(skin));
         lightingGroup.addActor(opacityLabel);
         lightingGroup.addActor(opacityGroup);
-        lightingGroup.addActor(new Separator(skin));
         lightingGroup.addActor(ambientLightLabel);
         lightingGroup.addActor(ambientGroup);
-        lightingGroup.addActor(new Separator(skin));
         lightingGroup.addActor(labelSizeLabel);
         lightingGroup.addActor(labelSizeGroup);
 

@@ -41,6 +41,7 @@ This guide is for running Gaia Sky VR with the Oculus Rift in Windows. You will 
 1. Download and install [Git for Windows](http://gitforwindows.org/) and get used to the unix-like command line interface.
 2. If you are using the Oculus Rift headset, follow the provided instructions and install the Oculus app with the runtime.
 3. Download and install [Steam](http://store.steampowered.com/) and then install [SteamVR](http://store.steampowered.com/steamvr).
+4. JDK 1.8
 
 ### 1.2. Cloning the repository
 
@@ -54,14 +55,6 @@ $  git checkout tags/2.0.2-vr
 
 You can also use the `vr` branch directly (`git checkout vr`), but since it is a development branch, it is not guaranteed to work.
 
-Make sure you have at least `JDK8` installed.
-
-### 1.3. Getting the data
-
-As of version `2.1.2-vr` Gaia Sky will offer to download the data automatically at startup if it is not detected.
-
-You can also manually download the packages [here](https://zah.uni-heidelberg.de/institutes/ari/gaia/outreach/gaiasky/downloads/#dr2catalogs). Just extract the packages into your `$HOME/.gaiasky/data` folder and you are set.
-
 
 ### 1.4. Running
 
@@ -71,7 +64,12 @@ To run Gaia Sky VR, make sure that both the Oculus runtime and Steam VR are runn
 $  gradlew.bat core:run
 ```
 
-Et voilà! Gaia Sky VR dev branch is running.
+**Tip**: Gaia Sky will check that you are using Java 1.8 when running the build. You can still use a newer JDK version (e.g. JDK 10) by setting the following environment variable to `false` in the context of gradle:
+
+```
+$  export GS_JAVA_VERSION_CHECK=false
+```
+
 
 ### 1.5 CLI arguments
 
@@ -92,6 +90,13 @@ Usage: gaiasky [options]
       Lists version and build inforamtion
       Default: false
 ```
+
+### 2.5 Getting the data
+
+As of version `2.1.0`, Gaia Sky offers an automated way to download all data packs and catalogs from within the application. When Gaia Sky starts, if no base data or catalogs are found, the downloader window will prompt automatically. Otherwise, you can force the download window at startup with the `-d` argument (`gradlew core:rund` with the gradle wrapper). Just select the data packs and catalogs that you want to download, press `Download now` and wait for the process to finish.
+
+You can also download the **data packs manually** [here](http://gaia.ari.uni-heidelberg.de/gaiasky/files/autodownload/).
+
 
 ##  3. Documentation and help
 

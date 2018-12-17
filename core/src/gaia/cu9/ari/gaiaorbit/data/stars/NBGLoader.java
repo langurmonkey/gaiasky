@@ -68,7 +68,8 @@ public class NBGLoader extends AbstractCatalogLoader implements ISceneGraphLoade
 			    String altname = tokens[1];
 			    double ra = Parser.parseDouble(tokens[2]);
 			    double dec = Parser.parseDouble(tokens[3]);
-			    double dist = Parser.parseDouble(tokens[4]);
+			    double distMpc = Parser.parseDouble(tokens[4]);
+			    double distPc = distMpc * 1e6d;
 			    double kmag = Parser.parseDouble(tokens[5]);
 			    double bmag = Parser.parseDouble(tokens[6]);
 			    double a26 = Parser.parseDouble(tokens[7]);
@@ -83,12 +84,12 @@ public class NBGLoader extends AbstractCatalogLoader implements ISceneGraphLoade
 			    CelestialBody g;
 			    if(img == null || img.isEmpty()){
 			    	// Regular shaded light point
-					dist *= Constants.MPC_TO_U;
+					double dist = distMpc * Constants.MPC_TO_U;
 					Vector3d pos = Coordinates.sphericalToCartesian(Math.toRadians(ra), Math.toRadians(dec),
 							dist, new Vector3d());
 					float colorbv = 0;
 					float absmag = (float) (kmag
-							- 2.5 * Math.log10(Math.pow(dist * Constants.U_TO_PC / 10d, 2d)));
+							- 2.5 * Math.log10(Math.pow(distPc / 10d, 2d)));
 
 					NBGalaxy gal = new NBGalaxy(pos, (float) kmag, absmag, colorbv, name, (float) ra, (float) dec,
 							(float) bmag, (float) a26, (float) ba, hrv, i, tt, Mcl, baseid + offset);
@@ -97,10 +98,9 @@ public class NBGLoader extends AbstractCatalogLoader implements ISceneGraphLoade
 					g = gal;
 				} else {
 			    	// Billboard
-					dist *= 1000000; // In parsecs
-					BillboardGalaxy gal = new BillboardGalaxy(name,altname,ra, dec, dist, sizepc, "data/tex/extragal/" + img);
+					BillboardGalaxy gal = new BillboardGalaxy(name,altname,ra, dec, distPc, sizepc, "data/tex/extragal/" + img);
 					// Fade in parsecs from sun
-					gal.setFade(new double[]{dist / 3d, dist  * 2d/3d});
+					gal.setFade(new double[]{distPc / 3d, distPc  * 2d/3d});
 					g = gal;
 				}
 			    galaxies.add(g);

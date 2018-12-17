@@ -1,14 +1,7 @@
 package gaia.cu9.ari.gaiaorbit.scenegraph.octreewrapper;
 
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Pool;
-
-import gaia.cu9.ari.gaiaorbit.data.StreamingOctreeLoader;
 import gaia.cu9.ari.gaiaorbit.event.EventManager;
 import gaia.cu9.ari.gaiaorbit.event.Events;
 import gaia.cu9.ari.gaiaorbit.render.ComponentType;
@@ -25,6 +18,11 @@ import gaia.cu9.ari.gaiaorbit.util.MyPools;
 import gaia.cu9.ari.gaiaorbit.util.math.Vector3d;
 import gaia.cu9.ari.gaiaorbit.util.time.ITimeFrameProvider;
 import gaia.cu9.ari.gaiaorbit.util.tree.OctreeNode;
+
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Abstract Octree wrapper with the common parts of the regular Octree wrapper
@@ -123,8 +121,6 @@ public abstract class AbstractOctreeWrapper extends FadeNode implements Iterable
                 OctreeNode.nOctantsObserved = 0;
                 OctreeNode.nObjectsObserved = 0;
 
-                root.updateNumbers();
-
                 root.update(translation, camera, roulette, opacity);
 
                 if (OctreeNode.nObjectsObserved != lastNumberObjects) {
@@ -134,9 +130,6 @@ public abstract class AbstractOctreeWrapper extends FadeNode implements Iterable
                 }
 
                 updateLocal(time, camera);
-
-                // Broadcast the number of objects that we will try to render
-                EventManager.instance.post(Events.DEBUG3, "On display: " + OctreeNode.nObjectsObserved + ", Total loaded: " + StreamingOctreeLoader.getNLoadedStars());
 
                 // Call the update method of all entities in the roulette list. This
                 // is implemented in the subclass.

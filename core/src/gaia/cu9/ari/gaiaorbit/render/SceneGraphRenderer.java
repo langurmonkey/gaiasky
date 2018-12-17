@@ -76,7 +76,7 @@ public class SceneGraphRenderer extends AbstractRenderer implements IProcessRend
 
     private BitmapFont font3d, font2d, fontTitles;
 
-    private ShaderProgram fontShader;
+    private ShaderProgram distanceFieldFontShader;
 
     private ShaderProgram[] starGroupShaders, particleGroupShaders, particleEffectShaders, orbitElemShaders, lineShaders, lineQuadShaders, lineGpuShaders, mwPointShaders, mwOitShaders, mwNebulaShaders, pixelShaders, galShaders, spriteShaders, starShaders;
     private AssetDescriptor<ShaderProgram>[] starGroupDesc, particleGroupDesc, particleEffectDesc, orbitElemDesc, lineDesc, lineQuadDesc, lineGpuDesc, mwPointDesc, mwOitDesc, mwNebulaDesc, pixelDesc, galDesc, spriteDesc, starDesc;
@@ -279,12 +279,13 @@ public class SceneGraphRenderer extends AbstractRenderer implements IProcessRend
          * GALAXY SHADER
          */
         galShaders = fetchShaderProgram(manager, galDesc, genShaderFullNames( "galaxy"));
+
         /**
          * FONT SHADER
          */
-        fontShader = manager.get("shader/font.vertex.glsl");
-        if (!fontShader.isCompiled()) {
-            logger.error(new RuntimeException(), "Font shader compilation failed:\n" + fontShader.getLog());
+        distanceFieldFontShader = manager.get("shader/font.vertex.glsl");
+        if (!distanceFieldFontShader.isCompiled()) {
+            logger.error(new RuntimeException(), "Distance field font shader compilation failed:\n" + distanceFieldFontShader.getLog());
         }
 
         /**
@@ -384,7 +385,7 @@ public class SceneGraphRenderer extends AbstractRenderer implements IProcessRend
         modelBatchDepth = new ModelBatch(spdepth, noSorter);
         modelBatchOpaque = new ModelBatch(spopaque, noSorter);
 
-        // Fonts
+        // Fonts - all of these are distance field fonts
         font3d = manager.get("font/main-font.fnt");
         font2d = manager.get("font/font2d.fnt");
         fontTitles = manager.get("font/font-titles.fnt");
@@ -394,7 +395,7 @@ public class SceneGraphRenderer extends AbstractRenderer implements IProcessRend
         spriteBatch.enableBlending();
 
         // Font batch
-        fontBatch = new SpriteBatch(2000, fontShader);
+        fontBatch = new SpriteBatch(2000, distanceFieldFontShader);
         fontBatch.enableBlending();
 
         ComponentType[] comps = ComponentType.values();
@@ -587,7 +588,7 @@ public class SceneGraphRenderer extends AbstractRenderer implements IProcessRend
         modelStarsProc.setPreRunnable(blendDepthRunnable);
 
         // LABELS
-        AbstractRenderSystem labelsProc = new FontRenderSystem(RenderGroup.FONT_LABEL, alphas, fontBatch, fontShader, font3d, font2d, fontTitles);
+        AbstractRenderSystem labelsProc = new FontRenderSystem(RenderGroup.FONT_LABEL, alphas, fontBatch, distanceFieldFontShader, font3d, font2d, fontTitles);
         labelsProc.setPreRunnable(blendNoDepthRunnable);
 
         // BILLBOARD SSO

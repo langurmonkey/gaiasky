@@ -120,7 +120,7 @@ public class BackgroundModel extends FadeNode implements IModelRenderable, I3DTe
     @Override
     public void render(SpriteBatch batch, ShaderProgram shader, FontRenderSystem sys, RenderingContext rc, ICamera camera) {
         if (label2d) {
-            render2DLabel(batch, shader, rc, sys.font3d, camera, text(), (float) labelPosition.x, (float) labelPosition.y, (float) labelPosition.z);
+            render2DLabel(batch, shader, rc, sys.fontDistanceField, camera, text(), (float) labelPosition.x, (float) labelPosition.y, (float) labelPosition.z);
         } else {
             // 3D distance font
             Vector3d pos = aux3d1.get();
@@ -130,7 +130,7 @@ public class BackgroundModel extends FadeNode implements IModelRenderable, I3DTe
             shader.setUniformf("u_thOverFactor", 1);
             shader.setUniformf("u_thOverFactorScl", 1);
 
-            render3DLabel(batch, shader, sys.font3d, camera, rc, text(), pos, textScale(), textSize() * camera.getFovFactor());
+            render3DLabel(batch, shader, sys.fontDistanceField, camera, rc, text(), pos, textScale(), textSize() * camera.getFovFactor());
         }
 
     }
