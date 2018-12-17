@@ -66,7 +66,7 @@ public class DatasetsWidget {
     public Actor buildDatasetsWidget(Array<FileHandle> catalogFiles, boolean scrollOn) {
         float pad = 3 * GlobalConf.SCALE_FACTOR;
         float taWidth = 300 * GlobalConf.SCALE_FACTOR;
-        float taHeight = GlobalConf.SCALE_FACTOR > 1 ? 50 : 35;
+        float taHeight = GlobalConf.SCALE_FACTOR > 1 ? 70 : 55;
 
         JsonReader reader = new JsonReader();
 
@@ -139,7 +139,7 @@ public class DatasetsWidget {
             description.setDisabled(true);
             description.setPrefRows(2);
             description.setWidth(taWidth);
-            description.setHeight(taHeight);
+            description.setHeight(taHeight * (desc.length() > 90 ? 1.1f : 1));
             dsTable.add(description).left().top().padTop(pad).padLeft(pad).row();
 
             candidates.put(cb, candidate);

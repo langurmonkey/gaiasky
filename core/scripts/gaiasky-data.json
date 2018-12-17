@@ -202,6 +202,22 @@
             "file" : "http://gaia.ari.uni-heidelberg.de/gaiasky/files/autodownload/dr2/001_20181116/catalog-dr2-extralarge.tar.gz"
         },
         {
+            "name" : "catalog-whitedwarfs",
+            "type" : "catalog",
+            "version" : 0,
+            "size" : 34471385,
+            "check": "catalog-wd.json",
+            "data" : [ 
+                    "catalog-wd.json",
+                    "particles-wd.json",
+                    "catalog/wd"
+            ],
+            "description": "GDR2 white dwarfs - White dwarfs catalog based on GDR2 by Gentile Fusillo et al. 2018, MNRAS 482, 4579 - Brightnesses increased by 10 mag - 177955 stars",
+            "link" : "http://adsabs.harvard.edu/abs/2019MNRAS.482.4570G",
+            "md5" : "26b804a474f026287b8887cceb77ce85",
+            "file" : "http://gaia.ari.uni-heidelberg.de/gaiasky/files/autodownload/whitedwarfs/000_20181217/catalog-wd.tar.gz"
+        },
+        {
             "name" : "catalog-hipparcos-newred",
             "type" : "catalog",
             "version" : 0,
@@ -209,6 +225,7 @@
             "check": "catalog-hip.json",
             "data" : [ 
                     "catalog-hip.json",
+                    "particles-hip.json",
                     "catalog/hipparcos"
             ],
             "description": "Hipparcos - Hipparcos new reduction (van Leeuwen, 2007) - 177955 stars",

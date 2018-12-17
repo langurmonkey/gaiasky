@@ -56,12 +56,13 @@ public class STILDataProvider extends AbstractStarGroupDataProvider {
 
     @Override
     public Array<? extends ParticleBean> loadData(String file, double factor) {
-        logger.info(this.getClass().getSimpleName(), I18n.bundle.format("notif.datafile", file));
+        logger.info(I18n.bundle.format("notif.datafile", file));
         try {
             loadData(new FileDataSource(GlobalConf.data.dataFile(file)), factor);
         } catch (Exception e) {
             logger.error(e);
         }
+        logger.info(I18n.bundle.format("notif.nodeloader", list.size, file));
         return list;
     }
 

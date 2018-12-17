@@ -50,6 +50,7 @@ public class DownloadDataWindow extends GenericDialog {
         iconMap.put("other", "icon-elem-others");
         iconMap.put("data-pack", "icon-elem-others");
         iconMap.put("catalog-lod", "icon-elem-stars");
+        iconMap.put("catalog-gaia", "icon-elem-stars");
         iconMap.put("catalog", "icon-elem-stars");
         iconMap.put("mesh", "icon-elem-meshes");
         iconMap.put("texture-pack", "icon-elem-moons");
