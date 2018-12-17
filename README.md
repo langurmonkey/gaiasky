@@ -160,13 +160,20 @@ provided in your operating system or use the CLI command `gaiasky`.
 
 In order to compile and run Gaia Sky from source, you need the following installed in your system:
 
-- `JDK8+`
+- `JDK8`
 - `git`
 
 First, clone the [GitLab](https://gitlab.com/langurmonkey/gaiasky) repository:
 
 ```
 $  git clone https://gitlab.com/langurmonkey/gaiasky.git
+```
+
+**Tip**: Gaia Sky will check that you are using Java 1.8 when running the build. You can still use a newer JDK version (e.g. JDK 10) by setting the following environment variable to `false` in the context of gradle:
+
+```
+$  export GS_JAVA_VERSION_CHECK=false
+$  gradlew core:run
 ```
 
 

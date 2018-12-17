@@ -640,7 +640,7 @@ public class OctreeNode implements ILineRenderable {
      * @return Whether the octant is observed
      */
     private boolean computeObserved2(ICamera cam) {
-        return GlobalConf.program.CUBEMAP360_MODE || cam.getMode().isGaiaFov() || computeObservedFast(cam);
+        return cam.getMode().isGaiaFov() || computeObservedFast(cam);
     }
 
     /**
