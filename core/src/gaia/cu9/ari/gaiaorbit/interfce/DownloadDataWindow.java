@@ -50,6 +50,7 @@ public class DownloadDataWindow extends GenericDialog {
         iconMap.put("other", "icon-elem-others");
         iconMap.put("data-pack", "icon-elem-others");
         iconMap.put("catalog-lod", "icon-elem-stars");
+        iconMap.put("catalog-gaia", "icon-elem-stars");
         iconMap.put("catalog", "icon-elem-stars");
         iconMap.put("mesh", "icon-elem-meshes");
         iconMap.put("texture-pack", "icon-elem-moons");
@@ -285,6 +286,12 @@ public class DownloadDataWindow extends GenericDialog {
                     imgTooltip.addListener(new OwnTextTooltip(description, skin, 10));
                     descGroup.addActor(imgTooltip);
                     descGroup.addActor(desc);
+                    // Link
+                    if(dataset.has("link")){
+                        String link = dataset.getString("link");
+                        LinkButton imgLink = new LinkButton(link, skin);
+                        descGroup.addActor(imgLink);
+                    }
 
                     // Version
                     OwnLabel vers = new OwnLabel(exists && outdated ? Integer.toString(myVersion) + " -> v-" + Integer.toString(serverVersion) : "v-" + Integer.toString(serverVersion), skin);
