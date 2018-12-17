@@ -173,7 +173,6 @@ $  git clone https://gitlab.com/langurmonkey/gaiasky.git
 
 ```
 $  export GS_JAVA_VERSION_CHECK=false
-$  gradlew core:run
 ```
 
 
