@@ -76,7 +76,8 @@ com.badlogic.gdx.scenes.scene2d.ui.ImageButton$ImageButtonStyle: {
 	land-at: {imageUp: land-at},
 	land-on: {imageUp: land-on},
 	rubbish-bin: {imageUp: bin-icon},
-	eye-toggle: {imageUp: eye-icon, imageChecked: eye-closed-icon }
+	eye-toggle: {imageUp: eye-icon, imageChecked: eye-closed-icon },
+	link: {	imageUp: link, imageChecked: link }
 },
 com.badlogic.gdx.scenes.scene2d.ui.ScrollPane$ScrollPaneStyle: {
 	default: { vScroll: default-round-down, hScrollKnob: default-round, background: default-rect, hScroll: default-round-down, vScrollKnob: default-round },

@@ -197,6 +197,7 @@
                     "catalog/dr2-extralarge"
             ],
             "description": "DR2 catalog: Complete - Based on bayesian geometric distances of Bayler-Jones et al. - 1.33 billion stars",
+            "link" : "https://arxiv.org/abs/1804.10121",
             "md5" : "502545302670ece11d2655d219d3b460",
             "file" : "http://gaia.ari.uni-heidelberg.de/gaiasky/files/autodownload/dr2/001_20181116/catalog-dr2-extralarge.tar.gz"
         },
@@ -243,7 +244,7 @@
             ],
             "description": "SDSS DR12 - Part of Sloan Digital Sky Survey DR12 - 500000 galaxies",
             "md5" : "20b3c704b297d5c8ec4f10eb31465915",
-            "file" : "http://gaia.ari.uni-heidelberg.de/gaiasky/files/autodownload/galaxies/001_20181129/sdss-12-galaxies.tar.gz"
+            "file" : "http://gaia.ari.uni-heidelberg.de/gaiasky/files/autodownload/galaxies/000_20181129/sdss-12-galaxies.tar.gz"
         },
         {
             "name" : "catalog-sdss-14",
@@ -258,7 +259,7 @@
             ],
             "description": "SDSS DR14 - Sloan Digital Sky Survey DR14 - 3.9 million galaxies",
             "md5" : "0477808710c71cfeac3bc318683b855b",
-            "file" : "http://gaia.ari.uni-heidelberg.de/gaiasky/files/autodownload/galaxies/001_20181129/sdss-14-galaxies.tar.gz"
+            "file" : "http://gaia.ari.uni-heidelberg.de/gaiasky/files/autodownload/galaxies/000_20181129/sdss-14-galaxies.tar.gz"
         },
         {
             "name" : "catalog-nebulae",
