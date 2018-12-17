@@ -292,22 +292,16 @@ public class CameraComponent extends GuiComponent implements IObserver {
 
         cameraGroup.addActor(modeLabel);
         cameraGroup.addActor(cameraMode);
-        cameraGroup.addActor(new Separator(skin));
         cameraGroup.addActor(new Label(txt("gui.camera.speedlimit"), skin, "default"));
         cameraGroup.addActor(cameraSpeedLimit);
-        cameraGroup.addActor(new Separator(skin));
         cameraGroup.addActor(fovLabel);
         cameraGroup.addActor(fovGroup);
-        cameraGroup.addActor(new Separator(skin));
         cameraGroup.addActor(new Label(txt("gui.camera.speed"), skin, "default"));
         cameraGroup.addActor(speedGroup);
-        cameraGroup.addActor(new Separator(skin));
         cameraGroup.addActor(new Label(txt("gui.rotation.speed"), skin, "default"));
         cameraGroup.addActor(rotateGroup);
-        cameraGroup.addActor(new Separator(skin));
         cameraGroup.addActor(new Label(txt("gui.turn.speed"), skin, "default"));
         cameraGroup.addActor(turnGroup);
-        cameraGroup.addActor(new Separator(skin));
         cameraGroup.addActor(cinematic);
         cameraGroup.addActor(focusLock);
         cameraGroup.addActor(orientationLock);

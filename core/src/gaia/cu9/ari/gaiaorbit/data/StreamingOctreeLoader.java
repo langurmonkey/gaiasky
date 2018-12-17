@@ -503,6 +503,8 @@ public abstract class StreamingOctreeLoader implements IObserver, ISceneGraphLoa
                         }
 
                     Gdx.app.postRunnable(() -> {
+                        // Update octree numbers
+                        octreeWrapper.root.updateNumbers();
                         // Update constellations :S
                         Constellation.updateConstellations();
                     });

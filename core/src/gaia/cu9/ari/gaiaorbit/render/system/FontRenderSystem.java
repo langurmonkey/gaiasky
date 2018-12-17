@@ -19,7 +19,7 @@ import java.util.Comparator;
 public class FontRenderSystem extends AbstractRenderSystem {
 
     private SpriteBatch batch;
-    public BitmapFont font3d, font2d, fontTitles;
+    public BitmapFont fontDistanceField, font2d, fontTitles;
     private Comparator<IRenderable> comp;
     private float[] red;
 
@@ -31,10 +31,10 @@ public class FontRenderSystem extends AbstractRenderSystem {
         red = new float[] { 1f, 0f, 0f, 1f };
     }
 
-    public FontRenderSystem(RenderGroup rg, float[] alphas, SpriteBatch batch, ShaderProgram program, BitmapFont font3d, BitmapFont font2d, BitmapFont fontTitles) {
+    public FontRenderSystem(RenderGroup rg, float[] alphas, SpriteBatch batch, ShaderProgram program, BitmapFont fontDistanceField, BitmapFont font2d, BitmapFont fontTitles) {
         this(rg, alphas, batch, program);
 
-        this.font3d = font3d;
+        this.fontDistanceField = fontDistanceField;
         this.font2d = font2d;
         this.fontTitles = fontTitles;
 
@@ -55,7 +55,7 @@ public class FontRenderSystem extends AbstractRenderSystem {
             }
         } else {
             float lalpha = alphas[ComponentType.Labels.ordinal()];
-            font3d.getData().setScale(0.6f);
+            fontDistanceField.getData().setScale(0.6f);
             for (int i = 0; i < size; i++) {
                 I3DTextRenderable s = (I3DTextRenderable) renderables.get(i);
 

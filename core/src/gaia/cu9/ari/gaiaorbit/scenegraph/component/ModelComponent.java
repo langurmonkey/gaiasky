@@ -266,6 +266,8 @@ public class ModelComponent implements Disposable, IObserver {
                 materials = modmat.getSecond();
                 instance = new ModelInstance(model, localTransform);
 
+                updateStaticLight();
+
                 // COLOR IF NO TEXTURE
                 if (tc == null && instance != null) {
                     addColorToMat();

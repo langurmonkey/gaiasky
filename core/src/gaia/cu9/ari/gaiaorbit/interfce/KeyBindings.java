@@ -1,13 +1,7 @@
 package gaia.cu9.ari.gaiaorbit.interfce;
 
-import java.time.Instant;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.TreeSet;
-
 import com.badlogic.gdx.Input.Keys;
 import com.bitfire.postprocessing.effects.CubemapProjections.CubemapProjection;
-
 import gaia.cu9.ari.gaiaorbit.event.EventManager;
 import gaia.cu9.ari.gaiaorbit.event.Events;
 import gaia.cu9.ari.gaiaorbit.scenegraph.camera.CameraManager.CameraMode;
@@ -15,6 +9,11 @@ import gaia.cu9.ari.gaiaorbit.util.GlobalConf;
 import gaia.cu9.ari.gaiaorbit.util.GlobalConf.ProgramConf.StereoProfile;
 import gaia.cu9.ari.gaiaorbit.util.GlobalResources;
 import gaia.cu9.ari.gaiaorbit.util.I18n;
+
+import java.time.Instant;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.TreeSet;
 
 /**
  * Contains the key mappings and the actions. This should be persisted somehow
@@ -393,6 +392,11 @@ public class KeyBindings {
         addMapping(new ProgramAction(txt("action.search"), () -> {
             EventManager.instance.post(Events.SHOW_SEARCH_ACTION);
         }, fullGuiCondition), Keys.F);
+
+        // / -> Search dialog
+        addMapping(new ProgramAction(txt("action.search"), () -> {
+            EventManager.instance.post(Events.SHOW_SEARCH_ACTION);
+        }, fullGuiCondition), Keys.SLASH);
 
         // CTRL + SHIFT + O -> Toggle particle fade
         addMapping(new ProgramAction(txt("action.toggle", txt("element.octreeparticlefade")), new Runnable() {

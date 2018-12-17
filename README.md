@@ -160,7 +160,7 @@ provided in your operating system or use the CLI command `gaiasky`.
 
 In order to compile and run Gaia Sky from source, you need the following installed in your system:
 
-- `JDK8+`
+- `JDK8`
 - `git`
 
 First, clone the [GitLab](https://gitlab.com/langurmonkey/gaiasky) repository:
@@ -169,11 +169,12 @@ First, clone the [GitLab](https://gitlab.com/langurmonkey/gaiasky) repository:
 $  git clone https://gitlab.com/langurmonkey/gaiasky.git
 ```
 
-#### 2.2.1 Getting the data
+**Tip**: Gaia Sky will check that you are using Java 1.8 when running the build. You can still use a newer JDK version (e.g. JDK 10) by setting the following environment variable to `false` in the context of gradle:
 
-As of version `2.1.0`, Gaia Sky offers an automated way to download all data packs and catalogs from within the application. When Gaia Sky starts, if no base data or catalogs are found, the downloader window will prompt automatically. Otherwise, you can force the download window at startup with the `-d` argument. Just select the data packs and catalogs that you want to download, press `Download now` and wait for the process to finish.
-
-You can also download the **data packs manually** [here](http://gaia.ari.uni-heidelberg.de/gaiasky/files/autodownload/).
+```
+$  export GS_JAVA_VERSION_CHECK=false
+$  gradlew core:run
+```
 
 
 #### 2.2.2 Running
@@ -212,6 +213,13 @@ Usage: gaiasky [options]
       Lists version and build inforamtion
       Default: false
 ```
+
+### 2.5 Getting the data
+
+As of version `2.1.0`, Gaia Sky offers an automated way to download all data packs and catalogs from within the application. When Gaia Sky starts, if no base data or catalogs are found, the downloader window will prompt automatically. Otherwise, you can force the download window at startup with the `-d` argument. Just select the data packs and catalogs that you want to download, press `Download now` and wait for the process to finish.
+
+You can also download the **data packs manually** [here](http://gaia.ari.uni-heidelberg.de/gaiasky/files/autodownload/).
+
 
 ##  3. Documentation and help
 

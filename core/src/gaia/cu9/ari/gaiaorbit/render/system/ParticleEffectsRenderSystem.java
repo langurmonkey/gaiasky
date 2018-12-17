@@ -93,10 +93,19 @@ public class ParticleEffectsRenderSystem extends ImmediateRenderSystem {
         double dist = 1200000 * tu * Constants.KM_TO_U * getFactor(GlobalConf.scene.CAMERA_SPEED);
 
         // If focus is very close, stop (jittering errors kick in)
-        if(cam.getMode().isFocus() && cam.getFocus().getDistToCamera() < Constants.KM_TO_U * 1000){
-            return;
+        if(cam.getMode().isFocus()) {
+            /**
+             * Empirical fit to determine where the particle effects start to break down wrt distance to sol (since they are positioned globally)
+             * <a href="https://mycurvefit.com/share/7b20c3bf-267d-4a8a-9498-844832d6509b">See curve and fit</a>
+             */
+            double distToSol = cam.getFocus().getAbsolutePosition(aux1).len() * Constants.U_TO_KM;
+            double focusDistKm = cam.getFocus().getDistToCamera() * Constants.U_TO_KM;
+            double cutDistKm = 11714150000000000d + (1900.228d - 11714150000000000d) / (1d + Math.pow(distToSol / 93302269999999990000d, 1.541734d));
+            if (focusDistKm < cutDistKm) {
+                return;
+            }
         }
-        double dists = dist - dist * 0.1;
+        double dists = dist * 0.9;
         Vector3d campos = aux1.set(cam.getPos());
         for (int i = 0; i < N_PARTICLES * 2; i++) {
             Vector3d pos = aux5.set(positions[i]);
