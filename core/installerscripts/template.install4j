@@ -243,7 +243,7 @@
                         </void>
                         <void property="imageFile">
                           <object class="com.install4j.api.beans.ExternalFile">
-                            <string>@gs-git-folder@/assets/assets-bak/img/installer-img.png</string>
+                            <string>@gs-git-folder@/assets/img/installer-img.png</string>
                           </object>
                         </void>
                       </object>
@@ -569,7 +569,7 @@ return console.askOkCancel(message, true);
                         </void>
                         <void property="imageFile">
                           <object class="com.install4j.api.beans.ExternalFile">
-                            <string>@gs-git-folder@/assets/assets-bak/img/installer-img.png</string>
+                            <string>@gs-git-folder@/assets/img/installer-img.png</string>
                           </object>
                         </void>
                       </object>
@@ -711,7 +711,7 @@ return console.askOkCancel(message, true);
                         </void>
                         <void property="imageFile">
                           <object class="com.install4j.api.beans.ExternalFile">
-                            <string>@gs-git-folder@/assets/assets-bak/img/installer-img.png</string>
+                            <string>@gs-git-folder@/assets/img/installer-img.png</string>
                           </object>
                         </void>
                       </object>
@@ -838,7 +838,7 @@ return console.askYesNo(message, true);
                         </void>
                         <void property="imageFile">
                           <object class="com.install4j.api.beans.ExternalFile">
-                            <string>@gs-git-folder@/assets/assets-bak/img/installer-img.png</string>
+                            <string>@gs-git-folder@/assets/img/installer-img.png</string>
                           </object>
                         </void>
                       </object>
