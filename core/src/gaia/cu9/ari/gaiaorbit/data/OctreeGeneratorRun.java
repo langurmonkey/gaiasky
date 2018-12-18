@@ -63,10 +63,10 @@ public class OctreeGeneratorRun {
     }
 
     @Parameter(names = { "-l", "--loader" }, description = "Name of the star group loader class", required = true)
-    private String loaderClass;
+    private String loaderClass = null;
 
     @Parameter(names = { "-i", "--input" }, description = "Location of the input catalog", required = true)
-    private String input;
+    private String input = null;
 
     @Parameter(names = { "-o", "--output" }, description = "Output folder. Defaults to system temp")
     private String outFolder;
@@ -82,9 +82,6 @@ public class OctreeGeneratorRun {
 
     @Parameter(names = "--pllxerrbright", description = "Parallax error factor for bright (gmag<13.1) stars, acceptance criteria as a percentage of parallax error with respect to parallax, in [0..1]")
     private double pllxerrbright = 0.25;
-
-    @Parameter(names = "--adaptivepllx", description = "On by default, this enables the adaptive parallax criterion, which relaxes the threshold for bright stars to avoid artifacts")
-    private boolean adaptivepllx = true;
 
     @Parameter(names = "--pllxzeropoint", description = "Zero point value for the parallax in mas")
     private double pllxzeropoint = 0d;
@@ -118,6 +115,12 @@ public class OctreeGeneratorRun {
 
     @Parameter(names = "--distcap", description = "Specifies a maximum distance in parsecs. Stars beyond this distance are not loaded")
     private double distcap = Long.MAX_VALUE;
+
+    @Parameter(names = "--ruwe", description = "RUWE threshold value. All stars with a RUWE larger than this value will not be used. Must be used in conjunction with --ruwe-file. Also, if present, --pllxerrfaint and --pllxerrbright are ignored")
+    private double ruwe = Double.NaN;
+
+    @Parameter(names = "--ruwe-file", description = "Location of gzipped file containing the RUWE value for each source id")
+    private String ruweFile = null;
 
     @Parameter(names = { "-h", "--help" }, help = true)
     private boolean help = false;
@@ -207,6 +210,8 @@ public class OctreeGeneratorRun {
         loader.setMagCorrections(magCorrections);
         loader.setDistanceCap(distcap);
         loader.setGeoDistancesFile(geodistFile);
+        loader.setRUWEFile(ruweFile);
+        loader.setRUWECap(ruwe);
         long[] cpm = loader.getCountsPerMag();
 
         /** LOAD CATALOG **/
