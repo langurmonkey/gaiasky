@@ -161,15 +161,15 @@
         {
             "name" : "catalog-dr2-ratherlarge",
             "type" : "catalog-lod",
-            "version" : 1,
-            "size" : 39076959088,
+            "version" : 2,
+            "size" : 39077053045,
             "check": "catalog-dr2-ratherlarge.json",
             "data" : [ 
                     "catalog-dr2-ratherlarge.json",
                     "catalog/dr2-ratherlarge"
             ],
             "description": "DR2 catalog: Rather large - 50% parallax relative error - 400 million stars",
-            "md5" : "fe639d60e7a55b82ca726dc6456b1fcf",
+            "md5" : "d2420c62c3fe8ad42df0bdca79597be1",
             "file" : "http://gaia.ari.uni-heidelberg.de/gaiasky/files/autodownload/dr2/002_20181122/catalog-dr2-ratherlarge.tar.gz"
         },
         {
@@ -220,8 +220,8 @@
         {
             "name" : "catalog-hipparcos-newred",
             "type" : "catalog",
-            "version" : 0,
-            "size" : 5359664,
+            "version" : 1,
+            "size" : 5360300,
             "check": "catalog-hip.json",
             "data" : [ 
                     "catalog-hip.json",
@@ -229,8 +229,9 @@
                     "catalog/hipparcos"
             ],
             "description": "Hipparcos - Hipparcos new reduction (van Leeuwen, 2007) - 177955 stars",
-            "md5" : "b1961e699488caa1a082291aa8387a34",
-            "file" : "http://gaia.ari.uni-heidelberg.de/gaiasky/files/autodownload/hipparcos/000_20181116/catalog-hipparcos-newreduction.tar.gz"
+            "link" : "http://adsabs.harvard.edu/abs/2007ASSL..350.....V",
+            "md5" : "76a4f200441ef1437ae27a6ead3486ea",
+            "file" : "http://gaia.ari.uni-heidelberg.de/gaiasky/files/autodownload/hipparcos/001_20181218/catalog-hipparcos-newreduction.tar.gz"
         },
         {
             "name" : "catalog-nbg",
