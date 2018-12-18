@@ -190,7 +190,7 @@
             "name" : "catalog-dr2-extralarge",
             "type" : "catalog-lod",
             "version" : 1,
-            "size" : 56141654594,
+            "size" : 56141672778,
             "check": "catalog-dr2-extralarge.json",
             "data" : [ 
                     "catalog-dr2-extralarge.json",
@@ -198,7 +198,7 @@
             ],
             "description": "DR2 catalog: Complete - Based on bayesian geometric distances of Bayler-Jones et al. - 1.33 billion stars",
             "link" : "https://arxiv.org/abs/1804.10121",
-            "md5" : "502545302670ece11d2655d219d3b460",
+            "md5" : "1834b10ad98014c94ec0b5fa116053bd",
             "file" : "http://gaia.ari.uni-heidelberg.de/gaiasky/files/autodownload/dr2/001_20181116/catalog-dr2-extralarge.tar.gz"
         },
         {
