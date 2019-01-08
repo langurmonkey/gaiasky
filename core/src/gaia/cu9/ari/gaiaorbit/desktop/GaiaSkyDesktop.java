@@ -124,15 +124,14 @@ public class GaiaSkyDesktop implements IObserver {
             I18n.initialize(Gdx.files.absolute(GlobalConf.ASSETS_LOC + "i18n/gsbundle"));
 
             if (gsargs.version) {
-                System.out.println(GlobalConf.APPLICATION_NAME + " " + GlobalConf.version.version);
-                System.out.println("   version name : " + GlobalConf.version.version);
-                System.out.println("   build        : " + GlobalConf.version.build);
-                System.out.println("   build time   : " + GlobalConf.version.buildtime);
-                System.out.println("   build system : " + GlobalConf.version.system);
-                System.out.println("   builder      : " + GlobalConf.version.builder);
+                System.out.println(GlobalConf.getFullApplicationName());
+                System.out.println("   version       : " + GlobalConf.version.version);
+                System.out.println("   build         : " + GlobalConf.version.build);
+                System.out.println("   build time    : " + GlobalConf.version.buildtime);
+                System.out.println("   build system  : " + GlobalConf.version.system);
+                System.out.println("   builder       : " + GlobalConf.version.builder);
                 return;
             }
-
 
             // Jython
             ScriptingFactory.initialize(JythonFactory.getInstance());
