@@ -35,6 +35,14 @@ public class TextUtils {
         return out;
     }
 
+    public static String capString(String in, int targetLength){
+        if(in.length() <= targetLength){
+            return in;
+        }else{
+            return in.substring(0, targetLength - 3) + "...";
+        }
+    }
+
     /**
      * Converts from property displayName to method displayName by removing the
      * separator dots and capitalising each chunk. Example: model.texture.bump

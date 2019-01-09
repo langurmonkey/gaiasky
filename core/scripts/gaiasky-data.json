@@ -161,15 +161,15 @@
         {
             "name" : "catalog-dr2-ratherlarge",
             "type" : "catalog-lod",
-            "version" : 1,
-            "size" : 39076959088,
+            "version" : 2,
+            "size" : 39077053045,
             "check": "catalog-dr2-ratherlarge.json",
             "data" : [ 
                     "catalog-dr2-ratherlarge.json",
                     "catalog/dr2-ratherlarge"
             ],
             "description": "DR2 catalog: Rather large - 50% parallax relative error - 400 million stars",
-            "md5" : "fe639d60e7a55b82ca726dc6456b1fcf",
+            "md5" : "d2420c62c3fe8ad42df0bdca79597be1",
             "file" : "http://gaia.ari.uni-heidelberg.de/gaiasky/files/autodownload/dr2/002_20181122/catalog-dr2-ratherlarge.tar.gz"
         },
         {
@@ -190,7 +190,7 @@
             "name" : "catalog-dr2-extralarge",
             "type" : "catalog-lod",
             "version" : 1,
-            "size" : 56141654594,
+            "size" : 56141672778,
             "check": "catalog-dr2-extralarge.json",
             "data" : [ 
                     "catalog-dr2-extralarge.json",
@@ -198,14 +198,14 @@
             ],
             "description": "DR2 catalog: Complete - Based on bayesian geometric distances of Bayler-Jones et al. - 1.33 billion stars",
             "link" : "https://arxiv.org/abs/1804.10121",
-            "md5" : "502545302670ece11d2655d219d3b460",
+            "md5" : "1834b10ad98014c94ec0b5fa116053bd",
             "file" : "http://gaia.ari.uni-heidelberg.de/gaiasky/files/autodownload/dr2/001_20181116/catalog-dr2-extralarge.tar.gz"
         },
         {
             "name" : "catalog-whitedwarfs",
             "type" : "catalog",
             "version" : 0,
-            "size" : 34471385,
+            "size" : 34471681,
             "check": "catalog-wd.json",
             "data" : [ 
                     "catalog-wd.json",
@@ -214,14 +214,14 @@
             ],
             "description": "GDR2 white dwarfs - White dwarfs catalog based on GDR2 by Gentile Fusillo et al. 2018, MNRAS 482, 4579 - Brightnesses increased by 10 mag - 177955 stars",
             "link" : "http://adsabs.harvard.edu/abs/2019MNRAS.482.4570G",
-            "md5" : "26b804a474f026287b8887cceb77ce85",
+            "md5" : "bbb9b888a155e78c9ce85be42c2607b4",
             "file" : "http://gaia.ari.uni-heidelberg.de/gaiasky/files/autodownload/whitedwarfs/000_20181217/catalog-wd.tar.gz"
         },
         {
             "name" : "catalog-hipparcos-newred",
             "type" : "catalog",
-            "version" : 0,
-            "size" : 5359664,
+            "version" : 1,
+            "size" : 5360300,
             "check": "catalog-hip.json",
             "data" : [ 
                     "catalog-hip.json",
@@ -229,8 +229,9 @@
                     "catalog/hipparcos"
             ],
             "description": "Hipparcos - Hipparcos new reduction (van Leeuwen, 2007) - 177955 stars",
-            "md5" : "b1961e699488caa1a082291aa8387a34",
-            "file" : "http://gaia.ari.uni-heidelberg.de/gaiasky/files/autodownload/hipparcos/000_20181116/catalog-hipparcos-newreduction.tar.gz"
+            "link" : "http://adsabs.harvard.edu/abs/2007ASSL..350.....V",
+            "md5" : "76a4f200441ef1437ae27a6ead3486ea",
+            "file" : "http://gaia.ari.uni-heidelberg.de/gaiasky/files/autodownload/hipparcos/001_20181218/catalog-hipparcos-newreduction.tar.gz"
         },
         {
             "name" : "catalog-nbg",

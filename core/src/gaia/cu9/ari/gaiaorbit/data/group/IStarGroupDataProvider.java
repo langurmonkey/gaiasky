@@ -72,6 +72,18 @@ public interface IStarGroupDataProvider extends IParticleGroupDataProvider {
     public void setGeoDistancesFile(String geoDistFile);
 
     /**
+     * Sets the location of the gzipped RUWE file
+     * @param RUWEFile Gzipped file with RUWE values for each source id
+     */
+    public void setRUWEFile(String RUWEFile);
+
+    /**
+     * Sets the RUWE criteria. RUWE file must have been set
+     * @param RUWE The criteria (usually 1.4)
+     */
+    public void setRUWECap(double RUWE);
+
+    /**
      * Sets a distance cap. Stars beyond this distance will not be loaded
      * @param distCap The distance cap, in parsecs
      */

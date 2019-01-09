@@ -249,7 +249,7 @@ public class DownloadDataWindow extends GenericDialog {
 
                     String name = dataset.getString("name");
                     // Add dataset to desc table
-                    OwnCheckBox cb = new OwnCheckBox(name, skin, pad * 2f);
+                    OwnCheckBox cb = new OwnCheckBox(name, skin, "title", pad * 2f);
                     boolean baseData = name.equals("default-data");
                     boolean defaultDataset = name.contains("default");
                     cb.setChecked((!exists || (exists && outdated)) && baseData);

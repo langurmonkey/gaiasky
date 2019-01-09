@@ -109,7 +109,6 @@ public class DesktopConfInit extends ConfInit {
             }
         }
         vc.initialize(versionStr, buildtime, vp.getProperty("builder"), vp.getProperty("system"), vp.getProperty("build"));
-        logger.info(vc.version, I18n.bundle.format("gui.build", vc.build));
 
         /** PERFORMANCE CONF **/
         PerformanceConf pc = new PerformanceConf();
