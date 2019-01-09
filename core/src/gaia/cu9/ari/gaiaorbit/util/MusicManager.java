@@ -1,22 +1,21 @@
 package gaia.cu9.ari.gaiaorbit.util;
 
-import java.io.File;
-import java.io.FilenameFilter;
-
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.audio.Music;
 import com.badlogic.gdx.audio.Music.OnCompletionListener;
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.utils.Array;
-
 import gaia.cu9.ari.gaiaorbit.event.EventManager;
 import gaia.cu9.ari.gaiaorbit.event.Events;
 import gaia.cu9.ari.gaiaorbit.event.IObserver;
 import gaia.cu9.ari.gaiaorbit.util.Logger.Log;
 
+import java.io.File;
+import java.io.FilenameFilter;
+
 public class MusicManager implements IObserver {
     private static final Log logger = Logger.getLogger(MusicManager.class);
-    
+
     public static MusicManager instance;
     private static FileHandle[] folders;
 
@@ -61,6 +60,10 @@ public class MusicManager implements IObserver {
         }
     }
 
+    public boolean isPlaying() {
+        return currentMusic != null && currentMusic.isPlaying();
+    }
+
     private void playNextMusic() {
         i = (i + 1) % musicFiles.size;
         playIndex(i);
@@ -75,8 +78,9 @@ public class MusicManager implements IObserver {
         FileHandle f = musicFiles.get(i);
 
         if (currentMusic != null) {
-            if (currentMusic.isPlaying())
+            if (currentMusic.isPlaying()) {
                 currentMusic.stop();
+            }
             currentMusic.dispose();
         }
         try {
@@ -88,7 +92,9 @@ public class MusicManager implements IObserver {
                     playNextMusic();
                 }
             });
+
             currentMusic.play();
+            EventManager.instance.post(Events.MUSIC_TRACK_INFO, musicFiles.get(i).name());
             logger.info(I18n.bundle.format("gui.music.playing", musicFiles.get(i).name()));
         } catch (Exception e) {
             logger.error(e);
@@ -96,7 +102,18 @@ public class MusicManager implements IObserver {
     }
 
     /**
-     * Sets the volume of this music manager. The volume must be given in the range [0,1] with 0 being silent and 1 being the maximum volume.
+     * Gets the current play position in seconds
+     * @return The play position in seconds
+     */
+    public float getPosition() {
+        if (currentMusic == null)
+            return 0;
+        return currentMusic.getPosition();
+    }
+
+    /**
+     * Sets the seeker of this music manager. The seeker must be given in the range [0,1] with 0 being silent and 1 being the maximum seeker.
+     *
      * @param volume
      */
     public void setVolume(float volume) {
