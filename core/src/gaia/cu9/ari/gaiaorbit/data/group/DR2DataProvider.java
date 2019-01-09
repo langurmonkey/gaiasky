@@ -1,21 +1,8 @@
 package gaia.cu9.ari.gaiaorbit.data.group;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.RandomAccessFile;
-import java.nio.MappedByteBuffer;
-import java.nio.channels.FileChannel;
-import java.util.Arrays;
-import java.util.zip.GZIPInputStream;
-
-import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.utils.Array;
-
-import gaia.cu9.ari.gaiaorbit.desktop.util.SysUtils;
 import gaia.cu9.ari.gaiaorbit.scenegraph.ParticleGroup.ParticleBean;
 import gaia.cu9.ari.gaiaorbit.scenegraph.StarGroup.StarBean;
 import gaia.cu9.ari.gaiaorbit.util.Constants;
@@ -31,12 +18,18 @@ import gaia.cu9.ari.gaiaorbit.util.math.MathUtilsd;
 import gaia.cu9.ari.gaiaorbit.util.math.Vector3d;
 import gaia.cu9.ari.gaiaorbit.util.parse.Parser;
 
+import java.io.*;
+import java.nio.MappedByteBuffer;
+import java.nio.channels.FileChannel;
+import java.util.Arrays;
+import java.util.zip.GZIPInputStream;
+
 /**
  * Loads the DR2 catalog in CSV format
- * 
+ *
  * Source position and corresponding errors are in radians, parallax in mas and
  * proper motion in mas/yr.
- * 
+ *
  * @author Toni Sagrista
  *
  */
@@ -55,7 +48,7 @@ public class DR2DataProvider extends AbstractStarGroupDataProvider {
 
     /**
      * INDICES:
-     * 
+     *
      * source_id ra[deg] dec[deg] parallax[mas] ra_err[mas] dec_err[mas]
      * pllx_err[mas] mualpha[mas/yr] mudelta[mas/yr] radvel[km/s]
      * mualpha_err[mas/yr] mudelta_err[mas/yr] radvel_err[km/s] gmag[mag]
@@ -188,7 +181,7 @@ public class DR2DataProvider extends AbstractStarGroupDataProvider {
 
     /**
      * Adds the star if it meets the criteria.
-     * 
+     *
      * @param line
      *            The string line
      * @return True if star was added, false otherwise
@@ -213,6 +206,16 @@ public class DR2DataProvider extends AbstractStarGroupDataProvider {
                 /** DISTANCE **/
                 double distpc = (1000d / pllx);
                 double geodistpc = getGeoDistance(sourceid);
+
+                if(!ruwe.isNaN()) {
+                    // RUWE test!
+                    float ruweVal = getRuweValue(sourceid);
+
+                    if(ruweVal > ruwe){
+                        // Do not accept
+                        return false;
+                    }
+                }
 
                 // If we have geometric distances, we only accept those, otherwise, accept all
                 if (!hasGeoDistances() || (hasGeoDistances() && hasGeoDistance(sourceid))) {

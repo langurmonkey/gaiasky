@@ -178,6 +178,7 @@ com.badlogic.gdx.scenes.scene2d.ui.TextField$TextFieldStyle: {
 },
 com.badlogic.gdx.scenes.scene2d.ui.CheckBox$CheckBoxStyle: {
 	default: { checkboxOn: check-on, checkboxOnDisabled: check-on-disabled, checkboxOff: check-off, checkboxOffDisabled: check-off-disabled,font: ui-18, fontColor: red },
+	title: { checkboxOn: check-on, checkboxOnDisabled: check-on-disabled, checkboxOff: check-off, checkboxOffDisabled: check-off-disabled,font: ui-19, fontColor: red },
 	radio: { checkboxOn: radio-on, checkboxOnDisabled: radio-on-disabled,checkboxOff: radio-off, checkboxOffDisabled: radio-off-disabled, font: ui-18, fontColor: red }
 },
 com.badlogic.gdx.scenes.scene2d.ui.List$ListStyle: {

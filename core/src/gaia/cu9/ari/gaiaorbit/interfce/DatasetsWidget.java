@@ -4,16 +4,14 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.ui.*;
-import com.badlogic.gdx.scenes.scene2d.ui.TextField.TextFieldStyle;
 import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.JsonReader;
 import com.badlogic.gdx.utils.JsonValue;
 import gaia.cu9.ari.gaiaorbit.util.GlobalConf;
-import gaia.cu9.ari.gaiaorbit.util.scene2d.OwnLabel;
-import gaia.cu9.ari.gaiaorbit.util.scene2d.OwnScrollPane;
-import gaia.cu9.ari.gaiaorbit.util.scene2d.OwnTextArea;
-import gaia.cu9.ari.gaiaorbit.util.scene2d.OwnTextButton;
+import gaia.cu9.ari.gaiaorbit.util.GlobalResources;
+import gaia.cu9.ari.gaiaorbit.util.TextUtils;
+import gaia.cu9.ari.gaiaorbit.util.scene2d.*;
 
 import java.io.File;
 import java.io.FileFilter;
@@ -23,14 +21,14 @@ import java.util.Map;
 
 /**
  * Widget which lists all detected catalogs and offers a way to select them.
- * @author tsagrista
  *
+ * @author tsagrista
  */
 public class DatasetsWidget {
 
     private Skin skin;
     private String assetsLoc;
-    public OwnTextButton[] cbs;
+    public OwnCheckBox[] cbs;
     public Map<Button, String> candidates;
 
     public DatasetsWidget(Skin skin, String assetsLoc) {
@@ -44,7 +42,7 @@ public class DatasetsWidget {
         // Discover data sets, add as buttons
         Array<FileHandle> catalogLocations = new Array<FileHandle>();
         catalogLocations.add(Gdx.files.absolute(GlobalConf.data.DATA_LOCATION));
-        
+
         Array<FileHandle> catalogFiles = new Array<FileHandle>();
 
         for (FileHandle catalogLocation : catalogLocations) {
@@ -80,8 +78,9 @@ public class DatasetsWidget {
 
         Actor result;
 
+        OwnScrollPane scroll = null;
         if (scrollOn) {
-            OwnScrollPane scroll = new OwnScrollPane(dsTable, skin, "minimalist-nobg");
+            scroll = new OwnScrollPane(dsTable, skin, "minimalist-nobg");
             scroll.setHeight(300 * GlobalConf.SCALE_FACTOR);
             scroll.setWidth(600 * GlobalConf.SCALE_FACTOR);
             scroll.setFadeScrollBars(false);
@@ -93,68 +92,109 @@ public class DatasetsWidget {
             result = dsTable;
         }
 
-        cbs = new OwnTextButton[catalogFiles.size];
+        cbs = new OwnCheckBox[catalogFiles.size];
         int i = 0;
         String[] currentSetting = GlobalConf.data.CATALOG_JSON_FILES.split("\\s*,\\s*");
         for (FileHandle catalogFile : catalogFiles) {
             String path = catalogFile.path();
-            boolean internal = path.contains(assetsLoc);
 
-            String candidate = internal ? path.substring(assetsLoc.length(), catalogFile.path().length()) : path;
-
-            String name = null;
-            String desc = null;
+            String name = "";
+            String desc = "";
+            String link = null;
+            int version = -1;
+            long bytes = -1;
+            long nobjects = -1;
             try {
                 JsonValue val = reader.parse(catalogFile);
                 if (val.has("description"))
-                    desc = val.get("description").asString();
+                    desc = val.getString("description");
                 if (val.has("name"))
-                    name = val.get("name").asString();
+                    name = val.getString("name");
+                if (val.has("link"))
+                    link = val.getString("link");
+                if (val.has("size"))
+                    bytes = val.getLong("size");
+                if (val.has("nobjects"))
+                    nobjects = val.getLong("nobjects");
+                if (val.has("version"))
+                    version = val.getInt("version");
             } catch (Exception e) {
             }
             if (desc == null)
-                desc = candidate;
+                desc = path;
             if (name == null)
                 name = catalogFile.nameWithoutExtension();
 
-            OwnLabel type = new OwnLabel(internal ? "[internal]" : "[custom]", skin);
-            if (internal) {
-                type.setColor(.4f, .4f, 1f, 1f);
-            } else {
-                type.setColor(.4f, 1f, .4f, 1f);
-            }
-            type.addListener(new TextTooltip(path, skin));
-
-            OwnTextButton cb = new OwnTextButton(name, skin, "toggle-big");
+            OwnCheckBox cb = new OwnCheckBox(name, skin, "title", pad * 2f);
             cb.bottom().left();
 
             cb.setChecked(contains(catalogFile.path(), currentSetting));
-            cb.addListener(new TextTooltip(candidate, skin));
+            cb.addListener(new TextTooltip(path, skin));
 
-            dsTable.add(cb).left().top().padRight(pad);
-            dsTable.add(type).left().top().padRight(pad);
+            dsTable.add(cb).left().padRight(pad * 6f).padBottom(pad);
 
             // Description
-            TextArea description = new OwnTextArea(desc, skin.get("regular", TextFieldStyle.class));
-            description.setDisabled(true);
-            description.setPrefRows(2);
-            description.setWidth(taWidth);
-            description.setHeight(taHeight * (desc.length() > 90 ? 1.1f : 1));
-            dsTable.add(description).left().top().padTop(pad).padLeft(pad).row();
+            HorizontalGroup descGroup = new HorizontalGroup();
+            descGroup.space(pad * 2f);
+            String shortDesc = TextUtils.capString(desc != null ? desc : "", 40);
+            OwnLabel description = new OwnLabel(shortDesc, skin);
+            // Info
+            OwnImageButton imgTooltip = new OwnImageButton(skin, "tooltip");
+            imgTooltip.addListener(new OwnTextTooltip(desc, skin, 10));
+            descGroup.addActor(imgTooltip);
+            descGroup.addActor(description);
+            // Link
+            if (link != null) {
+                LinkButton imgLink = new LinkButton(link, skin);
+                descGroup.addActor(imgLink);
+            }
+            dsTable.add(descGroup).left().padRight(pad * 6f).padBottom(pad);
 
-            candidates.put(cb, candidate);
+            // Version
+            String vers = "v-0";
+            if (version >= 0) {
+                vers = "v-" + version;
+            }
+            OwnLabel versionLabel = new OwnLabel(vers, skin);
+            dsTable.add(versionLabel).left().padRight(pad * 6f).padBottom(pad);
+
+            // Size
+            String size = "";
+            try {
+                if (bytes > 0)
+                    size = GlobalResources.humanReadableByteCount(bytes, true);
+                else
+                    size = "";
+            } catch (IllegalArgumentException e) {
+                size = "? MB";
+            }
+            OwnLabel sizeLabel = new OwnLabel(size, skin);
+            dsTable.add(sizeLabel).left().padRight(pad * 6f).padBottom(pad);
+
+            // # objects
+            String nobjs = "";
+            if (nobjects > 0)
+                nobjs = nobjects + " objs";
+            OwnLabel nobjsLabel = new OwnLabel(nobjs, skin);
+            dsTable.add(nobjsLabel).left().padBottom(pad).row();
+
+            candidates.put(cb, path);
 
             cbs[i++] = cb;
 
         }
-        ButtonGroup<OwnTextButton> bg = new ButtonGroup<OwnTextButton>();
+        ButtonGroup<OwnCheckBox> bg = new ButtonGroup<OwnCheckBox>();
         bg.setMinCheckCount(0);
         bg.setMaxCheckCount(catalogFiles.size);
         bg.add(cbs);
-        
-        
+
+        dsTable.pack();
+        if (scroll != null) {
+            scroll.setWidth(Math.min(800 * GlobalConf.SCALE_FACTOR, dsTable.getWidth() + pad * 15f));
+        }
+
         // No files
-        if(catalogFiles.size == 0) {
+        if (catalogFiles.size == 0) {
             dsTable.add(new OwnLabel("No catalogs found", skin)).center();
         }
 

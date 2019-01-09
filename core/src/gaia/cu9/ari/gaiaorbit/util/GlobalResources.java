@@ -24,15 +24,20 @@ import java.io.FilenameFilter;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.channels.FileChannel;
+import java.nio.file.FileVisitResult;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.SimpleFileVisitor;
+import java.nio.file.attribute.BasicFileAttributes;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.*;
+import java.util.concurrent.atomic.AtomicLong;
 
 /**
  * Holds and initialises resources utilised globally.
- * 
- * @author Toni Sagrista
  *
+ * @author Toni Sagrista
  */
 public class GlobalResources {
     private static final Log logger = Logger.getLogger(GlobalResources.class);
@@ -83,9 +88,8 @@ public class GlobalResources {
 
     /**
      * Converts this double to the string representation of a distance
-     * 
-     * @param d
-     *            In internal units
+     *
+     * @param d In internal units
      * @return An array containing the float number and the string units
      */
     public static Pair<Double, String> doubleToDistanceString(double d) {
@@ -109,9 +113,8 @@ public class GlobalResources {
     /**
      * Converts the double to the string representation of a velocity (always in
      * seconds)
-     * 
-     * @param d
-     *            In internal units
+     *
+     * @param d In internal units
      * @return Array containing the number and the units
      */
     public static Pair<Double, String> doubleToVelocityString(double d) {
@@ -122,9 +125,8 @@ public class GlobalResources {
 
     /**
      * Converts this float to the string representation of a distance
-     * 
-     * @param f
-     *            In internal units
+     *
+     * @param f In internal units
      * @return An array containing the float number and the string units
      */
     public static Pair<Float, String> floatToDistanceString(float f) {
@@ -135,9 +137,8 @@ public class GlobalResources {
     /**
      * Transforms the given double array into a float array by casting each of
      * its numbers
-     * 
-     * @param array
-     *            The array of doubles
+     *
+     * @param array The array of doubles
      * @return The array of floats
      */
     public static float[] toFloatArray(double[] array) {
@@ -151,14 +152,11 @@ public class GlobalResources {
      * Computes whether a body with the given position is visible by a camera
      * with the given direction and angle. Coordinates are assumed to be in the
      * camera-origin system
-     * 
-     * @param point
-     *            The position of the body in the reference system of the camera
-     *            (i.e. camera is at origin)
-     * @param coneAngle
-     *            The cone angle of the camera
-     * @param dir
-     *            The direction
+     *
+     * @param point     The position of the body in the reference system of the camera
+     *                  (i.e. camera is at origin)
+     * @param coneAngle The cone angle of the camera
+     * @param dir       The direction
      * @return True if the body is visible
      */
     public static boolean isInView(Vector3d point, float coneAngle, Vector3d dir) {
@@ -169,16 +167,12 @@ public class GlobalResources {
      * Computes whether a body with the given position is visible by a camera
      * with the given direction and angle. Coordinates are assumed to be in the
      * camera-origin system
-     * 
-     * @param point
-     *            The position of the body in the reference system of the camera
-     *            (i.e. camera is at origin)
-     * @param len
-     *            The point length
-     * @param coneAngle
-     *            The cone angle of the camera
-     * @param dir
-     *            The direction
+     *
+     * @param point     The position of the body in the reference system of the camera
+     *                  (i.e. camera is at origin)
+     * @param len       The point length
+     * @param coneAngle The cone angle of the camera
+     * @param dir       The direction
      * @return True if the body is visible
      */
     public static boolean isInView(Vector3d point, double len, float coneAngle, Vector3d dir) {
@@ -189,13 +183,10 @@ public class GlobalResources {
      * Computes whether any of the given points is visible by a camera with the
      * given direction and the given cone angle. Coordinates are assumed to be
      * in the camera-origin system
-     * 
-     * @param points
-     *            The array of points to check
-     * @param coneAngle
-     *            The cone angle of the camera (field of view)
-     * @param dir
-     *            The direction
+     *
+     * @param points    The array of points to check
+     * @param coneAngle The cone angle of the camera (field of view)
+     * @param dir       The direction
      * @return True if any of the points is in the camera view cone
      */
     public static boolean isAnyInView(Vector3d[] points, float coneAngle, Vector3d dir) {
@@ -209,12 +200,10 @@ public class GlobalResources {
 
     /**
      * Compares a given buffer with another buffer.
-     * 
-     * @param buf
-     *            Buffer to compare against
-     * @param compareTo
-     *            Buffer to compare to (content should be ASCII lowercase if
-     *            possible)
+     *
+     * @param buf       Buffer to compare against
+     * @param compareTo Buffer to compare to (content should be ASCII lowercase if
+     *                  possible)
      * @return True if the buffers compare favourably, false otherwise
      */
     public static boolean equal(String buf, char[] compareTo, boolean ignoreCase) {
@@ -266,13 +255,10 @@ public class GlobalResources {
 
     /**
      * Gets all the files with the given extension in the given file handle f.
-     * 
-     * @param f
-     *            The directory to get all the files
-     * @param l
-     *            The list with re results
-     * @param extension
-     *            The extension of the files
+     *
+     * @param f         The directory to get all the files
+     * @param l         The list with re results
+     * @param extension The extension of the files
      * @return The list l
      */
     public static Array<FileHandle> listRec(FileHandle f, Array<FileHandle> l, String extension) {
@@ -337,9 +323,8 @@ public class GlobalResources {
     /**
      * Converts a texture to a pixmap by drawing it to a frame buffer and
      * getting the data
-     * 
-     * @param tex
-     *            The texture to convert
+     *
+     * @param tex The texture to convert
      * @return The resulting pixmap
      */
     public static Pixmap textureToPixmap(TextureRegion tex) {
@@ -391,9 +376,8 @@ public class GlobalResources {
 
     /**
      * Inverts a map
-     * 
-     * @param map
-     *            The map to invert
+     *
+     * @param map The map to invert
      * @return The inverted map
      */
     public static final <T, U> Map<U, List<T>> invertMap(Map<T, U> map) {
@@ -441,8 +425,9 @@ public class GlobalResources {
 
     /**
      * Converts bytes to a human readable format
+     *
      * @param bytes The bytes
-     * @param si Whether to use SI units or binary
+     * @param si    Whether to use SI units or binary
      * @return The size in a human readable form
      */
     public static String humanReadableByteCount(long bytes, boolean si) {
@@ -484,5 +469,45 @@ public class GlobalResources {
                 logger.error(e);
             }
         }
+    }
+
+    /**
+     * Attempts to calculate the size of a file or directory.
+     *
+     * <p>
+     * Since the operation is non-atomic, the returned value may be inaccurate.
+     * However, this method is quick and does its best.
+     */
+    public static long size(Path path) throws IOException {
+
+        final AtomicLong size = new AtomicLong(0);
+
+        Files.walkFileTree(path, new SimpleFileVisitor<Path>() {
+            @Override
+            public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) {
+
+                size.addAndGet(attrs.size());
+                return FileVisitResult.CONTINUE;
+            }
+
+            @Override
+            public FileVisitResult visitFileFailed(Path file, IOException exc) {
+
+                System.out.println("skipped: " + file + " (" + exc + ")");
+                // Skip folders that can't be traversed
+                return FileVisitResult.CONTINUE;
+            }
+
+            @Override
+            public FileVisitResult postVisitDirectory(Path dir, IOException exc) {
+
+                if (exc != null)
+                    System.out.println("had trouble traversing: " + dir + " (" + exc + ")");
+                // Ignore errors traversing a folder
+                return FileVisitResult.CONTINUE;
+            }
+        });
+
+        return size.get();
     }
 }

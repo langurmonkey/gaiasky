@@ -1,26 +1,8 @@
 package gaia.cu9.ari.gaiaorbit.data.group;
 
-import java.io.BufferedInputStream;
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.ObjectOutputStream;
-import java.io.PrintWriter;
-import java.nio.file.Files;
-import java.nio.file.LinkOption;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.List;
-
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.LongMap;
-
 import gaia.cu9.ari.gaiaorbit.scenegraph.StarGroup.StarBean;
 import gaia.cu9.ari.gaiaorbit.util.Constants;
 import gaia.cu9.ari.gaiaorbit.util.LargeLongMap;
@@ -30,6 +12,15 @@ import gaia.cu9.ari.gaiaorbit.util.coord.Coordinates;
 import gaia.cu9.ari.gaiaorbit.util.math.Vector3d;
 import gaia.cu9.ari.gaiaorbit.util.parse.Parser;
 
+import java.io.*;
+import java.nio.file.Files;
+import java.nio.file.LinkOption;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.zip.GZIPInputStream;
+
 public abstract class AbstractStarGroupDataProvider implements IStarGroupDataProvider {
     protected static Log logger = Logger.getLogger(AbstractStarGroupDataProvider.class);
 
@@ -38,11 +29,22 @@ public abstract class AbstractStarGroupDataProvider implements IStarGroupDataPro
     protected LongMap<float[]> colors;
     protected long[] countsPerMag;
     protected LargeLongMap<Double> geoDistances = null;
+    protected LargeLongMap<Float> ruweValues = null;
 
     /**
      * Points to the location of a file or directory which contains a set of <sourceId, distance[pc]>
      */
     protected String geoDistFile = null;
+
+    /**
+     * Location of gzipped file with <sourceId, RUWE>
+     */
+    protected String ruweFile = null;
+
+    /**
+     * RUWE cap value. Will accept all stars with star_ruwe <= ruwe
+     */
+    protected Double ruwe = Double.NaN;
 
     /**
      * Errors (negative or nan values) reading geometric distance files
@@ -112,7 +114,7 @@ public abstract class AbstractStarGroupDataProvider implements IStarGroupDataPro
     /**
      * Initialises the lists and structures given number of elements
      *
-     * @param f
+     * @param elems
      */
     protected void initLists(int elems) {
         list = new Array<StarBean>(elems);
@@ -155,6 +157,12 @@ public abstract class AbstractStarGroupDataProvider implements IStarGroupDataPro
         } else {
             return pllx >= 0 && pllxerr < pllx * parallaxErrorFactorFaint && pllxerr <= 1;
         }
+    }
+
+    protected float getRuweValue(long sourceId){
+        if(ruweValues != null && ruweValues.containsKey(sourceId))
+            return ruweValues.get(sourceId);
+        return Float.NaN;
     }
 
     /**
@@ -321,6 +329,49 @@ public abstract class AbstractStarGroupDataProvider implements IStarGroupDataPro
     @Override
     public void setDistanceCap(double distCap) {
         this.distCap = distCap;
+    }
+
+    @Override
+    public void setRUWEFile(String RUWEFile) {
+        this.ruweFile = RUWEFile;
+        if(this.ruweFile != null)
+            loadRuweFile();
+    }
+
+    @Override
+    public void setRUWECap(double RUWE) {
+        this.ruwe = RUWE;
+    }
+
+    private void loadRuweFile() {
+        if(ruweFile != null) {
+            ruweValues = new LargeLongMap<Float>(20);
+            logger.info("Loading RUWE values from " + ruweFile);
+
+            Path f = Paths.get(ruweFile);
+            try {
+                loadRuweFile(f);
+                logger.info(ruweValues.size() + " RUWE values loaded");
+            } catch (Exception e) {
+                logger.error(e, "Loading RUWE file failed: " + f.toString());
+            }
+
+        }
+    }
+
+    private void loadRuweFile(Path p) throws IOException {
+            InputStream fileStream = new FileInputStream(p.toFile());
+            InputStream gzipStream = new GZIPInputStream(fileStream);
+            BufferedReader br = new BufferedReader(new InputStreamReader(gzipStream));
+            String line;
+            while ((line = br.readLine()) != null) {
+                String[] tokens = line.split("\\s+");
+                Long sourceId = Parser.parseLong(tokens[0].trim());
+                Double ruweVal = Parser.parseDouble(tokens[1].trim());
+                ruweValues.put(sourceId, ruweVal.floatValue());
+
+            }
+            br.close();
     }
 
     private void loadGeometricDistances() {

@@ -61,7 +61,8 @@ public class InitialGui extends AbstractGui {
 
         clearGui();
 
-        DownloadHelper.downloadFile(GlobalConf.program.DATA_DESCRIPTOR_URL, Gdx.files.absolute(SysUtils.getDefaultTmpDir() + "/gaiasky-data.json"), null, (md5sum) -> {
+        FileHandle dataDescriptor = Gdx.files.absolute(SysUtils.getDefaultTmpDir() + "/gaiasky-data.json");
+        DownloadHelper.downloadFile(GlobalConf.program.DATA_DESCRIPTOR_URL, dataDescriptor, null, (md5sum) -> {
             Gdx.app.postRunnable(() -> {
                 /**
                  * Display download manager if:
@@ -136,11 +137,10 @@ public class InitialGui extends AbstractGui {
         required.add(dataPath.resolve("tex"));
         required.add(dataPath.resolve("attitudexml"));
         required.add(dataPath.resolve("meshes"));
-        required.add(dataPath.resolve("sdss"));
 
         for (Path p : required) {
             if (!Files.exists(p) || !Files.isReadable(p)) {
-                logger.info("Data files not found: " + dataPath.toString());
+                logger.info("Data files not found: " + p.toString());
                 return false;
             }
         }

@@ -67,6 +67,7 @@ OPTS="$OPTS -Dassets.location=\"$GSDIR/\""
 #
 
 CMD="$JAVA $OPTS -cp \"$LIB_PATH\" gaia.cu9.ari.gaiaorbit.desktop.GaiaSkyDesktop $@"
-echo "$CMD"
+# Uncomment to print run command
+# echo "$CMD"
 
 ( cd "$GSDIR" && eval $CMD )
