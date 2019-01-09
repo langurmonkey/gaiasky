@@ -7,7 +7,6 @@ import com.badlogic.gdx.InputMultiplexer;
 import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.assets.loaders.FileHandleResolver;
 import com.badlogic.gdx.assets.loaders.resolvers.InternalFileHandleResolver;
-import com.badlogic.gdx.audio.Music;
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Pixmap.Format;
@@ -71,9 +70,10 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
     private static final Log logger = Logger.getLogger(GaiaSky.class);
 
     /**
-     * Private state boolean indicating whether we are still loading resources.
-     */
-    private static boolean LOADING = false;
+     * Current render process.
+     * One of {@link #runnableInitialGui}, {@link #runnableLoadingGui} or {@link #runnableRender}.
+     **/
+    private Runnable renderProcess;
 
     /** Attitude folder **/
     private static String ATTITUDE_FOLDER = "data/attitudexml/";
@@ -94,9 +94,6 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
     // TODO make this private again
     public SceneGraphRenderer sgr;
     private IPostProcessor pp;
-
-    // Initial gui
-    private boolean INITGUI = true;
 
     // Start time
     private long startTime;
@@ -135,11 +132,6 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
      */
     public ITimeFrameProvider time;
     private ITimeFrameProvider clock, real;
-
-    /**
-     * Music
-     */
-    public Music music;
 
     /**
      * Camera recording or not?
@@ -189,6 +181,7 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
         this.runnablesMap = new HashMap<String, Runnable>();
         this.dsdownload = dsdownload;
         this.catchooser = catchooser;
+        this.renderProcess = runnableInitialGui;
     }
 
     public void setSceneGraph(ISceneGraph sg) {
@@ -540,67 +533,73 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
 
     }
 
-    @Override
-    public void render() {
-        try {
-            if (INITGUI) {
-                renderGui(initialGui);
-            } else if (LOADING) {
-                if (manager.update()) {
-                    doneLoading();
 
-                    LOADING = false;
-                } else {
-                    // Display loading screen
-                    renderGui(loadingGui);
-                }
-            } else {
+    /** Renders the scene **/
+    private Runnable runnableRender = () -> {
+        // Asynchronous load of textures and resources
+        manager.update();
 
-                // Asynchronous load of textures and resources
-                manager.update();
+        if (!GlobalConf.runtime.UPDATE_PAUSE) {
+            /**
+             * UPDATE
+             */
+            update(Gdx.graphics.getDeltaTime());
 
-                if (!GlobalConf.runtime.UPDATE_PAUSE) {
-                    /**
-                     * UPDATE
-                     */
-                    update(Gdx.graphics.getDeltaTime());
+            /**
+             * FRAME OUTPUT
+             */
+            EventManager.instance.post(Events.RENDER_FRAME, this);
 
-                    /**
-                     * FRAME OUTPUT
-                     */
-                    EventManager.instance.post(Events.RENDER_FRAME, this);
+            /**
+             * SCREENSHOT OUTPUT - simple|redraw mode
+             */
+            EventManager.instance.post(Events.RENDER_SCREENSHOT, this);
 
-                    /**
-                     * SCREENSHOT OUTPUT - simple|redraw mode
-                     */
-                    EventManager.instance.post(Events.RENDER_SCREENSHOT, this);
+            /**
+             * SCREEN OUTPUT
+             */
+            if (GlobalConf.screen.SCREEN_OUTPUT) {
+                /** RENDER THE SCENE **/
+                preRenderScene();
+                renderSgr(cam, t, Gdx.graphics.getWidth(), Gdx.graphics.getHeight(), null, pp.getPostProcessBean(RenderType.screen));
 
-                    /**
-                     * SCREEN OUTPUT
-                     */
-                    if (GlobalConf.screen.SCREEN_OUTPUT) {
-                        /** RENDER THE SCENE **/
-                        preRenderScene();
-                        renderSgr(cam, t, Gdx.graphics.getWidth(), Gdx.graphics.getHeight(), null, pp.getPostProcessBean(RenderType.screen));
-
-                        if (GlobalConf.runtime.DISPLAY_GUI) {
-                            // Render the GUI, setting the viewport
-                            GuiRegistry.render(Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
-                        }
-
-                    }
-                    // Clean lists
-                    sgr.clearLists();
-                    // Number of frames
-                    frames++;
-
-                    if (GlobalConf.screen.LIMIT_FPS > 0) {
-                        sleep(GlobalConf.screen.LIMIT_FPS);
-                    }
-
+                if (GlobalConf.runtime.DISPLAY_GUI) {
+                    // Render the GUI, setting the viewport
+                    GuiRegistry.render(Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
                 }
 
             }
+            // Clean lists
+            sgr.clearLists();
+            // Number of frames
+            frames++;
+
+            if (GlobalConf.screen.LIMIT_FPS > 0) {
+                sleep(GlobalConf.screen.LIMIT_FPS);
+            }
+        }
+    };
+
+    /** Displays the initial GUI **/
+    private Runnable runnableInitialGui = ()->{
+        renderGui(initialGui);
+    };
+
+    /** Displays the loading GUI **/
+    private Runnable runnableLoadingGui = () ->{
+        if (manager.update()) {
+            doneLoading();
+            renderProcess = runnableRender;
+        } else {
+            // Display loading screen
+            renderGui(loadingGui);
+        }
+    };
+
+    @Override
+    public void render() {
+        try {
+            renderProcess.run();
         } catch (Throwable t) {
             logger.error(t);
             // TODO implement error reporting?
@@ -754,15 +753,6 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
         return w + "x" + h;
     }
 
-    public void clearFrameBufferMap() {
-        Set<String> keySet = fbmap.keySet();
-        for (String key : keySet) {
-            FrameBuffer fb = fbmap.get(key);
-            fb.dispose();
-        }
-        fbmap.clear();
-    }
-
     public ICamera getICamera() {
         return cam.current;
     }
@@ -816,8 +806,7 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
             loadingGui.initialize(manager);
 
             Gdx.input.setInputProcessor(loadingGui.getGuiStage());
-            INITGUI = false;
-            LOADING = true;
+            this.renderProcess = runnableLoadingGui;
 
             /** LOAD SCENE GRAPH **/
             if (sg == null) {
