@@ -31,7 +31,7 @@ import java.util.List;
 public class GlobalConf {
     private static final Log logger = Logger.getLogger(GlobalConf.class);
 
-    public static final String APPLICATION_NAME = "Gaia Sky";
+    public static final String APPLICATION_NAME = "Gaia Sky VR";
     public static final String WEBPAGE = "https://www.zah.uni-heidelberg.de/gaia/outreach/gaiasky";
     public static final String WEBPAGE_DOWNLOADS = "https://www.zah.uni-heidelberg.de/gaia/outreach/gaiasky/downloads";
     public static final String DOCUMENTATION = "http://gaia-sky.rtfd.io";
