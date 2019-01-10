@@ -83,20 +83,19 @@ public class AboutWindow extends GenericDialog {
         group.addActor(tabUpdates);
         content.add(group).align(Align.left).padLeft(pad);
         content.row();
+        content.pad(pad * 2);
 
         // Create the tab content. Just using images here for simplicity.
         Stack tabContent = new Stack();
 
         /** CONTENT 1 - HELP **/
         final Table contentHelp = new Table(skin);
-        contentHelp.align(Align.top);
+        contentHelp.align(Align.top | Align.left);
 
-        FileHandle gslogo = Gdx.files.internal("img/gaiasky-logo.png");
+        FileHandle gslogo = Gdx.files.internal(GlobalConf.SCALE_FACTOR > 1.5f ? "img/gaiasky-logo.png" : "img/gaiasky-logo-s.png");
         Texture logotex = new Texture(gslogo);
         logotex.setFilter(TextureFilter.Linear, TextureFilter.Linear);
         Image gaiasky = new Image(logotex);
-        float scl = GlobalConf.SCALE_FACTOR / 2.5f;
-        gaiasky.setScale(scl);
         gaiasky.setOrigin(Align.center);
 
         // User manual
@@ -117,10 +116,12 @@ public class AboutWindow extends GenericDialog {
         }
         String readmestr = readmefile.readString();
         int lines = GlobalResources.countOccurrences(readmestr, '\n');
-        TextArea readme = new TextArea(readmestr, skin, "no-disabled");
+        OwnTextArea readme = new OwnTextArea(readmestr, skin, "no-disabled");
         readme.setDisabled(true);
         readme.setPrefRows(lines);
         readme.clearListeners();
+        if (GlobalConf.SCALE_FACTOR < 1.5f)
+            readme.setWidth(tawidth * 1.3f);
 
         OwnScrollPane readmescroll = new OwnScrollPane(readme, skin, "minimalist-nobg");
         readmescroll.setWidth(tawidth);
@@ -128,11 +129,13 @@ public class AboutWindow extends GenericDialog {
         readmescroll.setForceScroll(false, true);
         readmescroll.setSmoothScrolling(true);
         readmescroll.setFadeScrollBars(false);
+        if (GlobalConf.SCALE_FACTOR < 1.5f)
+            readmescroll.setWidth(tawidth * 1.35f);
 
         scrolls.add(readmescroll);
 
         // Add all to content
-        contentHelp.add(gaiasky).colspan(2);
+        contentHelp.add(gaiasky).pad(pad * 4).colspan(2);
         contentHelp.row();
         contentHelp.add(usermantitle).align(Align.left).padRight(pad * 2);
         contentHelp.add(usermantxt).align(Align.left);
@@ -236,7 +239,7 @@ public class AboutWindow extends GenericDialog {
 
         /** CONTENT 3 - SYSTEM **/
         final Table contentSystem = new Table(skin);
-        contentSystem.align(Align.top);
+        contentSystem.align(Align.top | Align.left);
 
         // Build info
         Label buildinfo = new OwnLabel(txt("gui.help.buildinfo"), skin, "help-title");
