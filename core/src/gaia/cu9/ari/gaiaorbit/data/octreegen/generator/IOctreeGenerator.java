@@ -1,9 +1,6 @@
 package gaia.cu9.ari.gaiaorbit.data.octreegen.generator;
 
-import java.util.Iterator;
-
 import com.badlogic.gdx.utils.Array;
-
 import gaia.cu9.ari.gaiaorbit.scenegraph.StarGroup.StarBean;
 import gaia.cu9.ari.gaiaorbit.util.Constants;
 import gaia.cu9.ari.gaiaorbit.util.Logger;
@@ -12,6 +9,8 @@ import gaia.cu9.ari.gaiaorbit.util.math.BoundingBoxd;
 import gaia.cu9.ari.gaiaorbit.util.math.Longref;
 import gaia.cu9.ari.gaiaorbit.util.math.Vector3d;
 import gaia.cu9.ari.gaiaorbit.util.tree.OctreeNode;
+
+import java.util.Iterator;
 
 public interface IOctreeGenerator {
     public static final Log logger = Logger.getLogger(IOctreeGenerator.class);

@@ -32,7 +32,7 @@ allprojects {
         ashleyVersion = "1.4.0"
         aiVersion = "1.5.0"
         jythonVersion = "2.7.0"
-        lwjglVersion = "3.1.6"
+        lwjglVersion = "3.2.0"
         jcommanderVersion = "1.64"
         googleanalyticsjavaVersion = "1.1.2"
         slf4jVersion = "1.7.25"
@@ -147,11 +147,11 @@ project(":core") {
 
         compile "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-desktop"
         compile "org.python:jython-standalone:$jythonVersion"
+        compile group: "commons-io", name: "commons-io", version: "$commonsioVersion"
+        compile group: "org.python", name: "jython-standalone", version: "$jythonVersion"
         compile "com.beust:jcommander:$jcommanderVersion"
         compile "com.brsanthu:google-analytics-java:$googleanalyticsjavaVersion"
         compile "net.jafama:jafama:$jafamaVersion"
-        compile group: "commons-io", name: "commons-io", version: "$commonsioVersion"
-        //compile "org.apache.commons:commons-compress:$compressVersion"
 
 
         // ****************

@@ -691,6 +691,8 @@ public enum Events {
     MUSIC_NEXT_CMD,
     /** Reload music files **/
     MUSIC_RELOAD_CMD,
+    /** Info about current track **/
+    MUSIC_TRACK_INFO,
     
     
     /** Attach object to first end of ruler. Contains object name **/

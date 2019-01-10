@@ -7,7 +7,6 @@ import com.badlogic.gdx.InputMultiplexer;
 import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.assets.loaders.FileHandleResolver;
 import com.badlogic.gdx.assets.loaders.resolvers.InternalFileHandleResolver;
-import com.badlogic.gdx.audio.Music;
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Pixmap.Format;
@@ -76,9 +75,10 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
     private static final Log logger = Logger.getLogger(GaiaSky.class);
 
     /**
-     * Private state boolean indicating whether we are still loading resources.
-     */
-    private static boolean LOADING = false;
+     * Current render process.
+     * One of {@link #runnableInitialGui}, {@link #runnableLoadingGui} or {@link #runnableRender}.
+     **/
+    private Runnable renderProcess;
 
     /** Attitude folder **/
     private static String ATTITUDE_FOLDER = "data/attitudexml/";
@@ -115,9 +115,6 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
     // TODO make this private again
     public SceneGraphRenderer sgr;
     private IPostProcessor pp;
-
-    // Initial gui
-    private boolean INITGUI = true;
 
     // Start time
     private long startTime;
@@ -156,11 +153,6 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
      */
     public ITimeFrameProvider time;
     private ITimeFrameProvider clock, real;
-
-    /**
-     * Music
-     */
-    public Music music;
 
     /**
      * Camera recording or not?
@@ -210,6 +202,7 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
         this.runnablesMap = new HashMap<String, Runnable>();
         this.dsdownload = dsdownload;
         this.catchooser = catchooser;
+        this.renderProcess = runnableInitialGui;
     }
 
     public void setSceneGraph(ISceneGraph sg) {
@@ -627,72 +620,79 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
 
     }
 
-    @Override
-    public void render() {
-        try {
-            if (INITGUI) {
-                renderGui(initialGui);
-            } else if (LOADING) {
-                if (manager.update()) {
-                    doneLoading();
 
-                    LOADING = false;
-                } else {
-                    // Display loading screen
-                    renderGui(loadingGui);
-                    if (GlobalConf.runtime.OPENVR) {
-                        vrContext.pollEvents();
+    /** Renders the scene **/
+    private Runnable runnableRender = () -> {
+        // Asynchronous load of textures and resources
+        manager.update();
 
-                        vrLoadingLeftFb.begin();
-                        renderGui(((VRGui) loadingGuiVR).left());
-                        vrLoadingLeftFb.end();
+        if (!GlobalConf.runtime.UPDATE_PAUSE) {
+            /**
+             * UPDATE
+             */
+            update(Gdx.graphics.getDeltaTime());
 
-                        vrLoadingRightFb.begin();
-                        renderGui(((VRGui) loadingGuiVR).right());
-                        vrLoadingRightFb.end();
+            /**
+             * SCREEN OUTPUT
+             */
+            if (GlobalConf.screen.SCREEN_OUTPUT) {
+                /** RENDER THE SCENE **/
+                preRenderScene();
+                renderSgr(cam, t, Gdx.graphics.getWidth(), Gdx.graphics.getHeight(), null, pp.getPostProcessBean(RenderType.screen));
 
-                        /** SUBMIT TO VR COMPOSITOR **/
-                        VRCompositor.VRCompositor_Submit(VR.EVREye_Eye_Left, vrLoadingLeftTex, null, VR.EVRSubmitFlags_Submit_Default);
-                        VRCompositor.VRCompositor_Submit(VR.EVREye_Eye_Right, vrLoadingRightTex, null, VR.EVRSubmitFlags_Submit_Default);
-                    }
-                }
-            } else {
-
-                // Asynchronous load of textures and resources
-                manager.update();
-
-                if (!GlobalConf.runtime.UPDATE_PAUSE) {
-                    /**
-                     * UPDATE
-                     */
-                    update(Gdx.graphics.getDeltaTime());
-
-                    /**
-                     * SCREEN OUTPUT
-                     */
-                    if (GlobalConf.screen.SCREEN_OUTPUT) {
-                        /** RENDER THE SCENE **/
-                        preRenderScene();
-                        renderSgr(cam, t, Gdx.graphics.getWidth(), Gdx.graphics.getHeight(), null, pp.getPostProcessBean(RenderType.screen));
-
-                        if (GlobalConf.runtime.DISPLAY_GUI) {
-                            // Render the GUI, setting the viewport
-                            GuiRegistry.render(Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
-                        }
-
-                    }
-                    // Clean lists
-                    sgr.clearLists();
-                    // Number of frames
-                    frames++;
-
-                    if (GlobalConf.screen.LIMIT_FPS > 0) {
-                        sleep(GlobalConf.screen.LIMIT_FPS);
-                    }
-
+                if (GlobalConf.runtime.DISPLAY_GUI) {
+                    // Render the GUI, setting the viewport
+                    GuiRegistry.render(Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
                 }
 
             }
+            // Clean lists
+            sgr.clearLists();
+            // Number of frames
+            frames++;
+
+            if (GlobalConf.screen.LIMIT_FPS > 0) {
+                sleep(GlobalConf.screen.LIMIT_FPS);
+            }
+        }
+    };
+
+    /** Displays the initial GUI **/
+    private Runnable runnableInitialGui = ()->{
+        renderGui(initialGui);
+    };
+
+    /** Displays the loading GUI **/
+    private Runnable runnableLoadingGui = () ->{
+        if (manager.update()) {
+            doneLoading();
+
+            renderProcess = runnableRender;
+        } else {
+            // Display loading screen
+            renderGui(loadingGui);
+            if (GlobalConf.runtime.OPENVR) {
+                vrContext.pollEvents();
+
+                vrLoadingLeftFb.begin();
+                renderGui(((VRGui) loadingGuiVR).left());
+                vrLoadingLeftFb.end();
+
+                vrLoadingRightFb.begin();
+                renderGui(((VRGui) loadingGuiVR).right());
+                vrLoadingRightFb.end();
+
+                /** SUBMIT TO VR COMPOSITOR **/
+                VRCompositor.VRCompositor_Submit(VR.EVREye_Eye_Left, vrLoadingLeftTex, null, VR.EVRSubmitFlags_Submit_Default);
+                VRCompositor.VRCompositor_Submit(VR.EVREye_Eye_Right, vrLoadingRightTex, null, VR.EVRSubmitFlags_Submit_Default);
+            }
+        }
+    };
+
+    @Override
+    public void render() {
+        try {
+            renderProcess.run();
         } catch (Throwable t) {
             logger.error(t);
             // TODO implement error reporting?
@@ -846,15 +846,6 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
         return w + "x" + h;
     }
 
-    public void clearFrameBufferMap() {
-        Set<String> keySet = fbmap.keySet();
-        for (String key : keySet) {
-            FrameBuffer fb = fbmap.get(key);
-            fb.dispose();
-        }
-        fbmap.clear();
-    }
-
     public HashMap<VRDevice, StubModel> getVRDeviceToModel() {
         return vrDeviceToModel;
     }
@@ -919,8 +910,7 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
                 loadingGuiVR.initialize(manager);
             }
 
-            INITGUI = false;
-            LOADING = true;
+            this.renderProcess = runnableLoadingGui;
 
             /** LOAD SCENE GRAPH **/
             if (sg == null) {
