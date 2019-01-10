@@ -75,7 +75,7 @@ com.badlogic.gdx.scenes.scene2d.ui.ImageButton$ImageButtonStyle: {
 	go-to: {imageUp: go-to},
 	land-at: {imageUp: land-at},
 	land-on: {imageUp: land-on},
-	rubbish-bin: {imageUp: bin-icon},
+	rubbish-bin: {imageUp: bin-icon, "imageDisabled": bin-icon-grey	},
 	eye-toggle: {imageUp: eye-icon, imageChecked: eye-closed-icon },
 	link: {	imageUp: link, imageChecked: link }
 },

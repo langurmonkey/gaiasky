@@ -15,6 +15,7 @@ import gaia.cu9.ari.gaiaorbit.util.*;
 import gaia.cu9.ari.gaiaorbit.util.Logger.Log;
 import gaia.cu9.ari.gaiaorbit.util.format.INumberFormat;
 import gaia.cu9.ari.gaiaorbit.util.format.NumberFormatFactory;
+import gaia.cu9.ari.gaiaorbit.util.io.FileInfoInputStream;
 import gaia.cu9.ari.gaiaorbit.util.scene2d.*;
 import gaia.cu9.ari.gaiaorbit.util.scene2d.FileChooser.ResultListener;
 import org.apache.commons.io.FileUtils;
@@ -75,6 +76,7 @@ public class DownloadDataWindow extends GenericDialog {
     private JsonReader reader;
     private List<Trio<JsonValue, OwnCheckBox, OwnLabel>> choiceList;
     private Array<Trio<JsonValue, OwnCheckBox, OwnLabel>> toDownload;
+    private Array<OwnImageButton> rubbishes;
     private int current = -1;
 
     public DownloadDataWindow(Stage stage, Skin skin) {
@@ -86,6 +88,7 @@ public class DownloadDataWindow extends GenericDialog {
         this.nf = NumberFormatFactory.getFormatter("##0.0");
         this.reader = new JsonReader();
         this.choiceList = new LinkedList<Trio<JsonValue, OwnCheckBox, OwnLabel>>();
+        this.rubbishes = new Array<OwnImageButton>();
 
         this.dataLocation = dataLocation;
 
@@ -195,20 +198,19 @@ public class DownloadDataWindow extends GenericDialog {
 
                 // Check if better option already exists
                 String dsName = dst.getString("name");
-                if(bestDs.containsKey(dsName)){
+                if (bestDs.containsKey(dsName)) {
                     JsonValue other = bestDs.get(dsName);
                     int otherVersion = other.getInt("mingsversion", 0);
-                    if(otherVersion >= thisVersion){
+                    if (otherVersion >= thisVersion) {
                         // Ignore this version
                         dst = dst.next();
                         continue;
-                    } else if(thisVersion > otherVersion) {
+                    } else if (thisVersion > otherVersion) {
                         // Remove other version, use this
                         typeMap.get(type).remove(other);
                         bestDs.remove(dsName);
                     }
                 }
-
 
                 // Add to map
                 if (typeMap.containsKey(type)) {
@@ -287,7 +289,7 @@ public class DownloadDataWindow extends GenericDialog {
                     descGroup.addActor(imgTooltip);
                     descGroup.addActor(desc);
                     // Link
-                    if(dataset.has("link")){
+                    if (dataset.has("link")) {
                         String link = dataset.getString("link");
                         LinkButton imgLink = new LinkButton(link, skin);
                         descGroup.addActor(imgLink);
@@ -324,7 +326,7 @@ public class DownloadDataWindow extends GenericDialog {
 
                     // Delete
                     final JsonValue ds = dataset;
-                    ImageButton rubbish = null;
+                    OwnImageButton rubbish = null;
                     if (exists) {
                         rubbish = new OwnImageButton(skin, "rubbish-bin");
                         rubbish.addListener(new TextTooltip(txt("gui.dataset.tooltip.remove"), skin));
@@ -375,6 +377,7 @@ public class DownloadDataWindow extends GenericDialog {
                             }
                             return false;
                         });
+                        rubbishes.add(rubbish);
                     }
 
                     datasetsTable.add(cb).left().padRight(padl).padBottom(pad);
@@ -454,6 +457,8 @@ public class DownloadDataWindow extends GenericDialog {
 
         // Disable all checkboxes
         setDisabled(choices, true);
+        // Disable all rubbishes
+        setDisabled(rubbishes, true);
 
         logger.info(toDownload.size + " new data files selected to download");
 
@@ -498,7 +503,7 @@ public class DownloadDataWindow extends GenericDialog {
                 logger.info("Extracting: " + tempDownload.path());
                 String dataLocation = GlobalConf.data.DATA_LOCATION + File.separatorChar;
                 // Checksum
-                if (currentJson.has("md5")) {
+                if (md5sum != null && currentJson.has("md5")) {
                     String serverMd5 = currentJson.getString("md5");
                     try {
                         boolean ok = serverMd5.equals(md5sum);
@@ -518,6 +523,7 @@ public class DownloadDataWindow extends GenericDialog {
 
                 if (errors == 0)
                     try {
+                        // Extract
                         decompress(tempDownload.path(), new File(dataLocation), downloadButton, downloadProgress);
                         // Remove archive
                         cleanupTempFiles();
@@ -536,6 +542,8 @@ public class DownloadDataWindow extends GenericDialog {
                     me.acceptButton.setDisabled(false);
                     // Enable all
                     setDisabled(choiceList, false);
+                    // Enable rubbishes
+                    setDisabled(rubbishes, false);
                 });
 
                 if (errors == 0) {
@@ -628,47 +636,81 @@ public class DownloadDataWindow extends GenericDialog {
         }
     }
 
+    private void setDisabled(Array<OwnImageButton> l, boolean disabled) {
+        for (OwnImageButton b : l)
+            b.setDisabled(disabled);
+    }
+
     private void setDisabled(List<Trio<JsonValue, OwnCheckBox, OwnLabel>> choices, boolean disabled) {
         for (Trio<JsonValue, OwnCheckBox, OwnLabel> t : choices) {
             // Uncheck all if enabling again
             if (!disabled)
                 t.getSecond().setChecked(false);
             // Only enable datasets which we don't have
-            if (disabled || (!disabled && !t.getThird().getText().toString().equals(txt("gui.download.status.found"))))
+            if (disabled || (!t.getThird().getText().toString().equals(txt("gui.download.status.found"))))
                 t.getSecond().setDisabled(disabled);
         }
     }
 
     private void decompress(String in, File out, OwnTextButton b, ProgressBar p) throws Exception {
-        try (TarArchiveInputStream fin = new TarArchiveInputStream(new GzipCompressorInputStream(new FileInputStream(in)))) {
-            double bytes = uncompressedSize(in) / 1000d;
-            String bytesStr = nf.format(bytes);
-            TarArchiveEntry entry;
-            while ((entry = fin.getNextTarEntry()) != null) {
-                if (entry.isDirectory()) {
-                    continue;
-                }
-                File curfile = new File(out, entry.getName());
-                File parent = curfile.getParentFile();
-                if (!parent.exists()) {
-                    parent.mkdirs();
-                }
-                IOUtils.copy(fin, new FileOutputStream(curfile));
-                Gdx.app.postRunnable(() -> {
-                    float val = (float) ((fin.getBytesRead() / 1000d) / bytes);
-                    b.setText(txt("gui.download.extracting", nf.format(fin.getBytesRead() / 1000d) + "/" + bytesStr + " Kb"));
-                    p.setValue(val * 100);
-                });
+        FileInfoInputStream fin = new FileInfoInputStream(in);
+        GzipCompressorInputStream gzin = new GzipCompressorInputStream(fin);
+        TarArchiveInputStream tarin = new TarArchiveInputStream(gzin);
+        double sizeKb = fileSize(in) / 1000d;
+        String sizeKbStr = nf.format(sizeKb);
+        TarArchiveEntry entry;
+        long last = 0;
+        while ((entry = tarin.getNextTarEntry()) != null) {
+            if (entry.isDirectory()) {
+                continue;
             }
+            File curFile = new File(out, entry.getName());
+            File parent = curFile.getParentFile();
+            if (!parent.exists()) {
+                parent.mkdirs();
+            }
+
+            IOUtils.copy(tarin, new FileOutputStream(curFile));
+
+            // Every 250 ms we update the view
+            long current = System.currentTimeMillis();
+            long elapsed = current - last;
+            if(elapsed > 250){
+               Gdx.app.postRunnable(()->{
+                   float val = (float) ((fin.getBytesRead() / 1000d) / sizeKb);
+                   b.setText(txt("gui.download.extracting", nf.format(fin.getBytesRead() / 1000d) + "/" + sizeKbStr + " Kb"));
+                   p.setValue(val * 100);
+               });
+               last = current;
+            }
+
         }
     }
 
-    private int uncompressedSize(String inputFilePath) throws Exception {
+    /**
+     * Returns the file size
+     *
+     * @param inputFilePath A file
+     * @return The size in bytes
+     * @throws Exception
+     */
+    private long fileSize(String inputFilePath) throws Exception {
+        return new File(inputFilePath).length();
+    }
+
+    /**
+     * Returns the GZ uncompressed size
+     *
+     * @param inputFilePath A gzipped file
+     * @return The uncompressed size in bytes
+     * @throws Exception
+     */
+    private long fileSizeGZUncompressed(String inputFilePath) throws Exception {
         RandomAccessFile raf = new RandomAccessFile(inputFilePath, "r");
         raf.seek(raf.length() - 4);
         byte[] bytes = new byte[4];
         raf.read(bytes);
-        int fileSize = ByteBuffer.wrap(bytes).order(ByteOrder.LITTLE_ENDIAN).getInt();
+        long fileSize = ByteBuffer.wrap(bytes).order(ByteOrder.nativeOrder()).getLong();
         if (fileSize < 0)
             fileSize += (1L << 32);
         raf.close();
@@ -678,11 +720,11 @@ public class DownloadDataWindow extends GenericDialog {
     private void cleanupTempFiles() {
         Path tempDownload = Paths.get(GlobalConf.data.DATA_LOCATION, "temp.tar.gz");
         if (Files.exists(tempDownload)) {
-            try {
-                Files.delete(tempDownload);
-            } catch (IOException e) {
-                logger.error(e, "Failed cleaning up file: " + tempDownload.toString());
-            }
+            //try {
+                //Files.delete(tempDownload);
+            //} catch (IOException e) {
+            //    logger.error(e, "Failed cleaning up file: " + tempDownload.toString());
+            //}
         }
     }
 
