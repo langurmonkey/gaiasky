@@ -1,6 +1,7 @@
 package gaia.cu9.ari.gaiaorbit.util.scene2d;
 
 import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.utils.Disableable;
@@ -33,6 +34,22 @@ public class OwnLabel extends Label implements Disableable {
     public OwnLabel(CharSequence text, Skin skin, String styleName) {
         super(text, skin, styleName);
         this.regularColor = this.getColor().cpy();
+    }
+
+    public void receiveScrollEvents(){
+            // Focus listener
+            addListener((e) -> {
+                if (e instanceof InputEvent) {
+                    InputEvent ie = (InputEvent) e;
+                    e.setBubbles(false);
+                    if (ie.getType() == InputEvent.Type.enter && this.getStage() != null) {
+                        return this.getStage().setScrollFocus(this);
+                    } else if (ie.getType() == InputEvent.Type.exit && this.getStage() != null) {
+                        return this.getStage().setScrollFocus(null);
+                    }
+                }
+                return true;
+            });
     }
 
     @Override
