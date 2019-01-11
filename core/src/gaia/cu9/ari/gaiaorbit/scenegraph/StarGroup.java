@@ -1048,6 +1048,12 @@ public class StarGroup extends ParticleGroup implements ILineRenderable, IStarFo
         // Shut down pool
         if (pool != null && !pool.isShutdown()) {
             pool.shutdown();
+            try {
+                // Wait for task to end before proceeding
+                pool.awaitTermination(500, TimeUnit.MILLISECONDS);
+            }catch(Exception e){
+                Logger.getLogger(this.getClass().getSimpleName()).error(e);
+            }
         }
         // Dispose of GPU data
         EventManager.instance.post(Events.DISPOSE_STAR_GROUP_GPU_MESH, this.offset);
