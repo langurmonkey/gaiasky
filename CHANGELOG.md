@@ -19,6 +19,10 @@
 ### Code Refactoring
 
 - topmost render method rewritten to avoid conditionals 
+### Documentation
+
+- fix build system title case 
+- update changelog 
 ### Features
 
 - data download dialog details 
