@@ -29,7 +29,7 @@ options:
             docs: Documentation
             perf: Performance Improvements
             refactor: Code Refactoring
-            build: Build system
+            build: Build System
 
     issues:
         prefix: #
