@@ -285,17 +285,17 @@ public class ObjectsComponent extends GuiComponent implements IObserver {
         }
 
         objectsVgroup.pack();
-        OwnScrollPane constelScrollPane = new OwnScrollPane(objectsVgroup, skin, "minimalist-nobg");
-        constelScrollPane.setName(id + " scroll");
+        OwnScrollPane scrollPane = new OwnScrollPane(objectsVgroup, skin, "minimalist-nobg");
+        scrollPane.setName(id + " scroll");
 
-        constelScrollPane.setFadeScrollBars(false);
-        constelScrollPane.setScrollingDisabled(true, false);
+        scrollPane.setFadeScrollBars(false);
+        scrollPane.setScrollingDisabled(true, false);
 
-        constelScrollPane.setHeight(Math.min(100 * GlobalConf.SCALE_FACTOR, objectsVgroup.getHeight()));
-        constelScrollPane.setWidth(componentWidth);
+        scrollPane.setHeight(Math.min(100 * GlobalConf.SCALE_FACTOR, objectsVgroup.getHeight()));
+        scrollPane.setWidth(componentWidth);
 
-        HorizontalGroup constelButtons = new HorizontalGroup();
-        constelButtons.space(sp4);
+        HorizontalGroup buttons = new HorizontalGroup();
+        buttons.space(sp4);
         OwnTextButton selAll = new OwnTextButton(txt("gui.select.all"), skin);
         selAll.addListener((event) -> {
             if (event instanceof ChangeEvent) {
@@ -316,8 +316,8 @@ public class ObjectsComponent extends GuiComponent implements IObserver {
             }
             return false;
         });
-        constelButtons.addActor(selAll);
-        constelButtons.addActor(selNone);
+        buttons.addActor(selAll);
+        buttons.addActor(selNone);
 
         VerticalGroup group = new VerticalGroup();
         group.left();
@@ -325,8 +325,8 @@ public class ObjectsComponent extends GuiComponent implements IObserver {
         group.space(sp4);
 
         group.addActor(new OwnLabel(TextUtils.trueCapitalise(title), skin, "header"));
-        group.addActor(constelScrollPane);
-        group.addActor(constelButtons);
+        group.addActor(scrollPane);
+        group.addActor(buttons);
 
         return objects == null || objects.size == 0 ? null : group;
     }
