@@ -44,9 +44,8 @@ import java.util.*;
 
 /**
  * The default preferences window.
- * 
- * @author tsagrista
  *
+ * @author tsagrista
  */
 public class PreferencesWindow extends GenericDialog {
 
@@ -606,14 +605,14 @@ public class PreferencesWindow extends GenericDialog {
         lang = new OwnSelectBox<LangComboBoxBean>(skin);
         lang.setWidth(textwidth * 3f);
         lang.setItems(langs);
-        if(!GlobalConf.program.LOCALE.isEmpty()) {
+        if (!GlobalConf.program.LOCALE.isEmpty()) {
             lang.setSelected(langs[idxLang(GlobalConf.program.LOCALE, langs)]);
         } else {
             // Empty locale
             int lidx = idxLang(null, langs);
-            if(lidx < 0 || lidx >= langs.length){
+            if (lidx < 0 || lidx >= langs.length) {
                 lidx = idxLang(Locale.getDefault().toLanguageTag(), langs);
-                if(lidx < 0 || lidx >= langs.length){
+                if (lidx < 0 || lidx >= langs.length) {
                     // Default is en_GB
                     lidx = 2;
                 }
@@ -771,10 +770,16 @@ public class PreferencesWindow extends GenericDialog {
 
         OwnLabel titleController = new OwnLabel(txt("gui.controller"), skin, "help-title");
 
-        // DETECTED CONTROLLER
+        // DETECTED CONTROLLER NAMES
         OwnLabel detectedLabel = new OwnLabel(txt("gui.controller.detected"), skin);
         Array<Controller> controllers = Controllers.getControllers();
-        OwnLabel controllerName = new OwnLabel(controllers.size == 0 ? txt("gui.controller.nocontrollers") : controllers.get(0).getName(), skin);
+
+        Array<OwnLabel> controllerNames = new Array<OwnLabel>();
+        for (Controller c : controllers) {
+            controllerNames.add(new OwnLabel(c.getName(), skin));
+        }
+        if (controllerNames.isEmpty())
+            controllerNames.add(new OwnLabel(txt("gui.controller.nocontrollers"), skin));
 
         // CONTROLLER MAPPINGS
         OwnLabel mappingsLabel = new OwnLabel(txt("gui.controller.mappingsfile"), skin);
@@ -848,7 +853,13 @@ public class PreferencesWindow extends GenericDialog {
         // Add to content
         contentControls.add(titleController).colspan(2).left().padBottom(pad * 2).row();
         contentControls.add(detectedLabel).left().padBottom(pad * 2);
-        contentControls.add(controllerName).left().padBottom(pad * 2).row();
+        int ci = 0;
+        for (OwnLabel cn : controllerNames) {
+            if(ci > 0)
+                contentControls.add();
+            contentControls.add(cn).left().padBottom(pad * 2).row();
+            ci++;
+        }
         contentControls.add(mappingsLabel).left().padBottom(pad * 2);
         contentControls.add(controllerMappings).left().padBottom(pad * 2).row();
         contentControls.add(inverty).left().colspan(2).padBottom(pad * 2).row();
