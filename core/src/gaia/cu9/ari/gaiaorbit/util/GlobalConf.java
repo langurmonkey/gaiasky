@@ -233,15 +233,32 @@ public class GlobalConf {
         public String CONTROLLER_MAPPINGS_FILE;
         public boolean INVERT_LOOK_Y_AXIS;
         public boolean DEBUG_MODE;
+        /** Controller name blacklist. Check out names in the preferences window. **/
+        public String[] CONTROLLER_BLACKLIST;
 
         public ControlsConf() {
 
         }
 
-        public void initialize(String cONTROLLER_MAPPINGS_FILE, boolean iNVERT_LOOK_Y_AXIS, boolean dEBUG_MODE) {
+        public void initialize(String cONTROLLER_MAPPINGS_FILE, boolean iNVERT_LOOK_Y_AXIS, boolean dEBUG_MODE, String[] cONTROLLER_BLACKLIST) {
             CONTROLLER_MAPPINGS_FILE = cONTROLLER_MAPPINGS_FILE;
             INVERT_LOOK_Y_AXIS = iNVERT_LOOK_Y_AXIS;
             DEBUG_MODE = dEBUG_MODE;
+            CONTROLLER_BLACKLIST = cONTROLLER_BLACKLIST;
+
+        }
+
+        public boolean isControllerBlacklisted(String controllerName){
+            if(CONTROLLER_BLACKLIST == null || CONTROLLER_BLACKLIST.length == 0){
+                return false;
+            }else{
+                for(String cn : CONTROLLER_BLACKLIST){
+                    if(controllerName.equalsIgnoreCase(cn))
+                        return true;
+                }
+            }
+            return false;
+
         }
     }
 

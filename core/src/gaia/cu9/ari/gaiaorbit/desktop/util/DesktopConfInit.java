@@ -26,9 +26,8 @@ import java.util.Properties;
 /**
  * Desktop GlobalConf initialiser, where the configuration comes from a
  * global.properties file.
- * 
- * @author tsagrista
  *
+ * @author tsagrista
  */
 public class DesktopConfInit extends ConfInit {
     private static final Log logger = Logger.getLogger("GaiaSky");
@@ -323,8 +322,9 @@ public class DesktopConfInit extends ConfInit {
         String CONTROLLER_MAPPINGS_FILE = p.getProperty("controls.mappings.file", "mappings/xbox360.controller");
         boolean INVERT_LOOK_Y_AXIS = Boolean.parseBoolean(p.getProperty("controls.invert.y", "true"));
         boolean DEBUG_MODE = Boolean.parseBoolean(p.getProperty("controls.debugmode", "false"));
+        String[] CONTROLLER_BLACKLIST = GlobalResources.parseWhitespaceSeparatedList(p.getProperty("controls.blacklist"));
 
-        cc.initialize(CONTROLLER_MAPPINGS_FILE, INVERT_LOOK_Y_AXIS, DEBUG_MODE);
+        cc.initialize(CONTROLLER_MAPPINGS_FILE, INVERT_LOOK_Y_AXIS, DEBUG_MODE, CONTROLLER_BLACKLIST);
 
         /** SPACECRAFT CONF **/
         SpacecraftConf scc = new SpacecraftConf();
@@ -478,6 +478,8 @@ public class DesktopConfInit extends ConfInit {
         p.setProperty("controls.mappings.file", GlobalConf.controls.CONTROLLER_MAPPINGS_FILE);
         p.setProperty("controls.invert.y", Boolean.toString(GlobalConf.controls.INVERT_LOOK_Y_AXIS));
         p.setProperty("controls.debugmode", Boolean.toString(GlobalConf.controls.DEBUG_MODE));
+        if (GlobalConf.controls.CONTROLLER_BLACKLIST != null)
+            p.setProperty("controls.blacklist", GlobalResources.toWhitespaceSeparatedList(GlobalConf.controls.CONTROLLER_BLACKLIST));
 
         /** SPACECRAFT **/
         p.setProperty("spacecraft.responsiveness", Float.toString(MathUtilsd.lint(GlobalConf.spacecraft.SC_RESPONSIVENESS, Constants.MIN_SC_RESPONSIVENESS, Constants.MAX_SC_RESPONSIVENESS, 0, 1)));

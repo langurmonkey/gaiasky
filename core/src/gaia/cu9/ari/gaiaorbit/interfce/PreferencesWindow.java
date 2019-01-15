@@ -776,7 +776,13 @@ public class PreferencesWindow extends GenericDialog {
 
         Array<OwnLabel> controllerNames = new Array<OwnLabel>();
         for (Controller c : controllers) {
-            controllerNames.add(new OwnLabel(c.getName(), skin));
+            OwnLabel cl = new OwnLabel(c.getName(), skin);
+            if (GlobalConf.controls.isControllerBlacklisted(c.getName())) {
+                cl.setText(cl.getText() + " [*]");
+                cl.setColor(1, 0, 0, 1);
+                cl.addListener(new TextTooltip(txt("gui.controller.blacklist.tooltip"), skin));
+            }
+            controllerNames.add(cl);
         }
         if (controllerNames.isEmpty())
             controllerNames.add(new OwnLabel(txt("gui.controller.nocontrollers"), skin));
@@ -855,7 +861,7 @@ public class PreferencesWindow extends GenericDialog {
         contentControls.add(detectedLabel).left().padBottom(pad * 2);
         int ci = 0;
         for (OwnLabel cn : controllerNames) {
-            if(ci > 0)
+            if (ci > 0)
                 contentControls.add();
             contentControls.add(cn).left().padBottom(pad * 2).row();
             ci++;

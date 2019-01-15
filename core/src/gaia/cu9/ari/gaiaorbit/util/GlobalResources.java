@@ -510,4 +510,54 @@ public class GlobalResources {
 
         return size.get();
     }
+
+    /**
+     * Parses the string and creates a string array. The string is a list of whitespace-separated
+     * tokens, each surrounded by double qutotes '"':
+     * str = '"a" "bc" "d" "efghi"'
+     * @param str The string
+     * @return The resulting array
+     */
+    public static String[] parseWhitespaceSeparatedList(String str) {
+        if(str == null || str.isEmpty())
+            return null;
+
+        List<String> l = new ArrayList<String>();
+        int n = str.length();
+        StringBuilder current = new StringBuilder();
+        boolean inString = false;
+        for (int i = 0; i < n; i++) {
+            char c = str.charAt(i);
+            if(c == '"'){
+                if(inString){
+                    l.add(current.toString());
+                    current = new StringBuilder();
+                    inString = false;
+                } else {
+                    inString = true;
+                }
+            } else {
+                if(inString)
+                    current.append(c);
+            }
+        }
+        return l.toArray(new String[l.size()]);
+    }
+
+    /**
+     * Converts the string array into a whitespace-separated string
+     * where each element is double quoted.
+     * @param l The string array
+     * @return The resulting string
+     */
+    public static String toWhitespaceSeparatedList(String[] l){
+        if(l == null || l.length == 0)
+            return null;
+
+        StringBuilder sb = new StringBuilder();
+        for(String s : l){
+            sb.append("\"").append(s).append("\" ");
+        }
+        return sb.toString().trim();
+    }
 }
