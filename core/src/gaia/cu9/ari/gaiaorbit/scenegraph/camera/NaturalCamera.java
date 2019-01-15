@@ -917,7 +917,7 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
 					im.addProcessor(im.size(), inputController);
 				// Register controller listener
 				Controllers.clearListeners();
-				Controllers.addListener(controllerListener);
+				GlobalConf.controls.addControllerListener(controllerListener);
 			});
 			break;
 		default:
@@ -925,7 +925,7 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
 				// Unregister input controllers
 				im.removeProcessor(inputController);
 				// Unregister controller listener
-				Controllers.removeListener(controllerListener);
+                GlobalConf.controls.removeControllerListener(controllerListener);
 			});
 			break;
 		}

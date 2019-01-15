@@ -1,7 +1,11 @@
 package gaia.cu9.ari.gaiaorbit.util;
 
+import com.badlogic.gdx.controllers.Controller;
+import com.badlogic.gdx.controllers.ControllerListener;
+import com.badlogic.gdx.controllers.Controllers;
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.math.MathUtils;
+import com.badlogic.gdx.utils.Array;
 import com.bitfire.postprocessing.effects.CubemapProjections.CubemapProjection;
 import gaia.cu9.ari.gaiaorbit.GaiaSky;
 import gaia.cu9.ari.gaiaorbit.event.EventManager;
@@ -258,7 +262,24 @@ public class GlobalConf {
                 }
             }
             return false;
+        }
 
+        public void addControllerListener(ControllerListener listener){
+            Array<Controller> controllers = Controllers.getControllers();
+            for(Controller controller : controllers){
+               if(!isControllerBlacklisted(controller.getName())) {
+                   controller.addListener(listener);
+               }
+            }
+        }
+
+        public void removeControllerListener(ControllerListener listener){
+            Array<Controller> controllers = Controllers.getControllers();
+            for(Controller controller : controllers){
+                if(!isControllerBlacklisted(controller.getName())) {
+                    controller.removeListener(listener);
+                }
+            }
         }
     }
 

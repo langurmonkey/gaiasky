@@ -14,7 +14,6 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.input.GestureDetector;
 import com.badlogic.gdx.input.GestureDetector.GestureAdapter;
 import com.badlogic.gdx.math.Vector3;
-
 import gaia.cu9.ari.gaiaorbit.GaiaSky;
 import gaia.cu9.ari.gaiaorbit.event.EventManager;
 import gaia.cu9.ari.gaiaorbit.event.Events;
@@ -27,7 +26,6 @@ import gaia.cu9.ari.gaiaorbit.scenegraph.camera.CameraManager.CameraMode;
 import gaia.cu9.ari.gaiaorbit.util.Constants;
 import gaia.cu9.ari.gaiaorbit.util.GlobalConf;
 import gaia.cu9.ari.gaiaorbit.util.GlobalResources;
-import gaia.cu9.ari.gaiaorbit.util.Logger;
 import gaia.cu9.ari.gaiaorbit.util.Pair;
 import gaia.cu9.ari.gaiaorbit.util.math.Vector3d;
 import gaia.cu9.ari.gaiaorbit.util.time.ITimeFrameProvider;
@@ -282,7 +280,7 @@ public class SpacecraftCamera extends AbstractCamera implements IObserver {
                     im.addProcessor(im.size(), inputController);
                 // Register controller listener
                 Controllers.clearListeners();
-                Controllers.addListener(controllerListener);
+                GlobalConf.controls.addControllerListener(controllerListener);
                 sc.stopAllMovement();
                 if (firstTime) {
                     // Put spacecraft close to earth
@@ -300,7 +298,7 @@ public class SpacecraftCamera extends AbstractCamera implements IObserver {
                     // Unregister input controller
                     im.removeProcessor(inputController);
                     // Unregister controller listener
-                    Controllers.removeListener(controllerListener);
+                    GlobalConf.controls.removeControllerListener(controllerListener);
                     sc.stopAllMovement();
                 });
         }
