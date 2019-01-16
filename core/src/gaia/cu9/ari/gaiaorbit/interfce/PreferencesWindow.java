@@ -858,7 +858,7 @@ public class PreferencesWindow extends GenericDialog {
 
         // Add to content
         contentControls.add(titleController).colspan(2).left().padBottom(pad * 2).row();
-        contentControls.add(detectedLabel).left().padBottom(pad * 2);
+        contentControls.add(detectedLabel).left().padBottom(pad * 2).padRight(pad);
         int ci = 0;
         for (OwnLabel cn : controllerNames) {
             if (ci > 0)
@@ -866,7 +866,7 @@ public class PreferencesWindow extends GenericDialog {
             contentControls.add(cn).left().padBottom(pad * 2).row();
             ci++;
         }
-        contentControls.add(mappingsLabel).left().padBottom(pad * 2);
+        contentControls.add(mappingsLabel).left().padBottom(pad * 2).padRight(pad);
         contentControls.add(controllerMappings).left().padBottom(pad * 2).row();
         contentControls.add(inverty).left().colspan(2).padBottom(pad * 2).row();
         contentControls.add(titleKeybindings).colspan(2).left().padBottom(pad * 2).row();
