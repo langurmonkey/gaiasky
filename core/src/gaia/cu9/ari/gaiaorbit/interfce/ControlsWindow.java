@@ -1,10 +1,5 @@
 package gaia.cu9.ari.gaiaorbit.interfce;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Texture.TextureWrap;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
@@ -12,37 +7,26 @@ import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Event;
 import com.badlogic.gdx.scenes.scene2d.EventListener;
 import com.badlogic.gdx.scenes.scene2d.Stage;
-import com.badlogic.gdx.scenes.scene2d.ui.Button;
-import com.badlogic.gdx.scenes.scene2d.ui.Image;
-import com.badlogic.gdx.scenes.scene2d.ui.Skin;
-import com.badlogic.gdx.scenes.scene2d.ui.Table;
-import com.badlogic.gdx.scenes.scene2d.ui.TextTooltip;
-import com.badlogic.gdx.scenes.scene2d.ui.VerticalGroup;
+import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener.ChangeEvent;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.badlogic.gdx.scenes.scene2d.utils.TiledDrawable;
 import com.badlogic.gdx.utils.Align;
-
 import gaia.cu9.ari.gaiaorbit.event.EventManager;
 import gaia.cu9.ari.gaiaorbit.event.Events;
 import gaia.cu9.ari.gaiaorbit.event.IObserver;
-import gaia.cu9.ari.gaiaorbit.interfce.components.CameraComponent;
-import gaia.cu9.ari.gaiaorbit.interfce.components.DatasetsComponent;
-import gaia.cu9.ari.gaiaorbit.interfce.components.MusicComponent;
-import gaia.cu9.ari.gaiaorbit.interfce.components.ObjectsComponent;
-import gaia.cu9.ari.gaiaorbit.interfce.components.TimeComponent;
-import gaia.cu9.ari.gaiaorbit.interfce.components.VisibilityComponent;
-import gaia.cu9.ari.gaiaorbit.interfce.components.VisualEffectsComponent;
+import gaia.cu9.ari.gaiaorbit.interfce.components.*;
 import gaia.cu9.ari.gaiaorbit.render.ComponentType;
 import gaia.cu9.ari.gaiaorbit.scenegraph.ISceneGraph;
 import gaia.cu9.ari.gaiaorbit.util.GlobalConf;
 import gaia.cu9.ari.gaiaorbit.util.I18n;
 import gaia.cu9.ari.gaiaorbit.util.math.MathUtilsd;
-import gaia.cu9.ari.gaiaorbit.util.scene2d.CollapsiblePane;
-import gaia.cu9.ari.gaiaorbit.util.scene2d.CollapsibleWindow;
-import gaia.cu9.ari.gaiaorbit.util.scene2d.OwnImageButton;
-import gaia.cu9.ari.gaiaorbit.util.scene2d.OwnScrollPane;
-import gaia.cu9.ari.gaiaorbit.util.scene2d.OwnTextIconButton;
+import gaia.cu9.ari.gaiaorbit.util.scene2d.*;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public class ControlsWindow extends CollapsibleWindow implements IObserver {
     /**
@@ -53,7 +37,7 @@ public class ControlsWindow extends CollapsibleWindow implements IObserver {
     protected VerticalGroup mainVertical;
     protected OwnScrollPane windowScroll;
     protected Table guiLayout;
-    protected OwnImageButton recCamera = null, playCamera = null, playstop = null;
+    protected OwnImageButton recCamera = null, recKeyframeCamera = null, playCamera = null, playstop = null;
     protected TiledDrawable separator;
     /**
      * The scene graph
@@ -126,6 +110,18 @@ public class ControlsWindow extends CollapsibleWindow implements IObserver {
         });
         recCamera.addListener(new TextTooltip(txt("gui.tooltip.reccamera"), skin));
 
+        // Record camera (keyframes)
+        recKeyframeCamera = new OwnImageButton(skin, "rec-key");
+        recKeyframeCamera.setName("recKeyframeCamera");
+        recKeyframeCamera.setChecked(GlobalConf.runtime.RECORD_KEYFRAME_CAMERA);
+        recKeyframeCamera.addListener(event -> {
+            if(event instanceof ChangeEvent){
+                EventManager.instance.post(Events.SHOW_KEYFRAMES_WINDOW_ACTION);
+                return true;
+            }
+           return false;
+        });
+
         // Play camera button
         playCamera = new OwnImageButton(skin, "play");
         playCamera.setName("playCam");
@@ -143,7 +139,7 @@ public class ControlsWindow extends CollapsibleWindow implements IObserver {
         CameraComponent cameraComponent = new CameraComponent(skin, ui);
         cameraComponent.initialize();
 
-        CollapsiblePane camera = new CollapsiblePane(ui, txt("gui.camera"), cameraComponent.getActor(), skin, false, recCamera, playCamera);
+        CollapsiblePane camera = new CollapsiblePane(ui, txt("gui.camera"), cameraComponent.getActor(), skin, false, recCamera, recKeyframeCamera, playCamera);
         camera.align(Align.left);
         mainActors.add(camera);
         panes.put(cameraComponent.getClass().getSimpleName(), camera);

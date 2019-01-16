@@ -1,6 +1,6 @@
 package gaia.cu9.ari.gaiaorbit.util.validator;
 
-public class IntValidator implements IValidator {
+public class IntValidator extends CallbackValidator {
 
     private int min;
     private int max;
@@ -15,7 +15,8 @@ public class IntValidator implements IValidator {
         this.max = max;
     }
 
-    public boolean validate(String value) {
+    @Override
+    protected boolean validateLocal(String value) {
         Integer val = null;
         try {
             val = Integer.parseInt(value);

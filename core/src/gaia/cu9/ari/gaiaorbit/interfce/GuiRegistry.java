@@ -11,8 +11,8 @@ import gaia.cu9.ari.gaiaorbit.event.IObserver;
 
 /**
  * Manages the Graphical User Interfaces of Gaia Sky
- * @author tsagrista
  *
+ * @author tsagrista
  */
 public class GuiRegistry implements IObserver {
 
@@ -43,7 +43,8 @@ public class GuiRegistry implements IObserver {
     /**
      * Switches the current GUI with the given one, updating the processors.
      * It also sets the previous GUI to the given value.
-     * @param gui The new GUI
+     *
+     * @param gui      The new GUI
      * @param previous The new previous GUI
      */
     public static void change(IGui gui, IGui previous) {
@@ -55,6 +56,7 @@ public class GuiRegistry implements IObserver {
 
     /**
      * Switches the current GUI with the given one, updating the processors
+     *
      * @param gui The new gui
      */
     public static void change(IGui gui) {
@@ -73,6 +75,7 @@ public class GuiRegistry implements IObserver {
 
     /**
      * Unsets the given GUI and sets it as previous
+     *
      * @param gui The GUI
      */
     public static void unset(IGui gui) {
@@ -85,6 +88,7 @@ public class GuiRegistry implements IObserver {
 
     /**
      * Sets the given GUI as current
+     *
      * @param gui The new GUI
      */
     public static void set(IGui gui) {
@@ -97,6 +101,7 @@ public class GuiRegistry implements IObserver {
 
     /**
      * Sets the given GUI as previous
+     *
      * @param gui The new previous GUI
      */
     public static void setPrevious(IGui gui) {
@@ -105,6 +110,7 @@ public class GuiRegistry implements IObserver {
 
     /**
      * Registers a new GUI
+     *
      * @param gui The GUI to register
      */
     public static void registerGui(IGui gui) {
@@ -114,6 +120,7 @@ public class GuiRegistry implements IObserver {
 
     /**
      * Unregisters a GUI
+     *
      * @param gui The GUI to unregister
      * @return True if the GUI was unregistered
      */
@@ -123,6 +130,7 @@ public class GuiRegistry implements IObserver {
 
     /**
      * Unregisters all GUIs
+     *
      * @return True if operation succeeded
      */
     public static boolean unregisterAll() {
@@ -132,6 +140,7 @@ public class GuiRegistry implements IObserver {
 
     /**
      * Renders the registered GUIs
+     *
      * @param rw The render width
      * @param rh The render height
      */
@@ -146,6 +155,7 @@ public class GuiRegistry implements IObserver {
 
     /**
      * Updates the registered GUIs
+     *
      * @param dt The delta time in seconds
      */
     public static void update(double dt) {
@@ -155,6 +165,9 @@ public class GuiRegistry implements IObserver {
 
     private Skin skin;
 
+    /** Keyframes window **/
+    private KeyframesWindow keyframesWindow;
+
     /**
      * One object to handle observer pattern
      */
@@ -162,7 +175,7 @@ public class GuiRegistry implements IObserver {
         super();
         this.skin = skin;
         // Windows which are visible from any GUI
-        EventManager.instance.subscribe(this, Events.SHOW_QUIT_ACTION, Events.SHOW_ABOUT_ACTION, Events.SHOW_PREFERENCES_ACTION);
+        EventManager.instance.subscribe(this, Events.SHOW_QUIT_ACTION, Events.SHOW_ABOUT_ACTION, Events.SHOW_PREFERENCES_ACTION, Events.SHOW_KEYFRAMES_WINDOW_ACTION);
     }
 
     @Override
@@ -179,6 +192,12 @@ public class GuiRegistry implements IObserver {
                 break;
             case SHOW_PREFERENCES_ACTION:
                 (new PreferencesWindow(ui, skin)).show(ui);
+                break;
+            case SHOW_KEYFRAMES_WINDOW_ACTION:
+                if (keyframesWindow == null)
+                    keyframesWindow = new KeyframesWindow(ui, skin);
+                if (!keyframesWindow.isVisible() || !keyframesWindow.hasParent())
+                    keyframesWindow.show(ui);
                 break;
             default:
                 break;

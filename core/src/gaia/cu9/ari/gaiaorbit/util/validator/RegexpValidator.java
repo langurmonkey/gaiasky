@@ -1,6 +1,6 @@
 package gaia.cu9.ari.gaiaorbit.util.validator;
 
-public class RegexpValidator implements IValidator {
+public class RegexpValidator extends CallbackValidator {
     private String expr;
 
     public RegexpValidator(String expression) {
@@ -9,7 +9,7 @@ public class RegexpValidator implements IValidator {
     }
 
     @Override
-    public boolean validate(String value) {
+    protected boolean validateLocal(String value) {
         return value.matches(expr);
     }
 

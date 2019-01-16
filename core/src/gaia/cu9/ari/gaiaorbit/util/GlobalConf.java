@@ -298,6 +298,7 @@ public class GlobalConf {
         public boolean REAL_TIME;
         public boolean INPUT_ENABLED;
         public boolean RECORD_CAMERA;
+        public boolean RECORD_KEYFRAME_CAMERA;
         public float LIMIT_MAG_RUNTIME;
         public boolean STRIPPED_FOV_MODE = false;
         /** Whether octree drawing is active or not **/

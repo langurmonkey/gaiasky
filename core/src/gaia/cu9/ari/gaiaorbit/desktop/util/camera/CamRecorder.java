@@ -1,18 +1,7 @@
-package gaia.cu9.ari.gaiaorbit.desktop.util;
-
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
-import java.time.Instant;
-import java.util.Date;
+package gaia.cu9.ari.gaiaorbit.desktop.util.camera;
 
 import com.badlogic.gdx.files.FileHandle;
-
+import gaia.cu9.ari.gaiaorbit.desktop.util.SysUtils;
 import gaia.cu9.ari.gaiaorbit.event.EventManager;
 import gaia.cu9.ari.gaiaorbit.event.Events;
 import gaia.cu9.ari.gaiaorbit.event.IObserver;
@@ -23,6 +12,12 @@ import gaia.cu9.ari.gaiaorbit.util.Logger.Log;
 import gaia.cu9.ari.gaiaorbit.util.math.Vector3d;
 import gaia.cu9.ari.gaiaorbit.util.parse.Parser;
 import gaia.cu9.ari.gaiaorbit.util.time.ITimeFrameProvider;
+
+import java.io.*;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.time.Instant;
+import java.util.Date;
 
 /**
  * Contains the logic to record the camera state at each frame. The format is as
@@ -43,11 +38,18 @@ public class CamRecorder implements IObserver {
 
     Vector3d dir, upp, aux1, aux2;
 
-    public enum RecorderMode {
-        RECORDING, PLAYING, IDLE
+    public enum RecorderState {
+        // Recording in classical mode (one state per frame)
+        RECORDING,
+        // Playing classical recording
+        PLAYING,
+        // Idle
+        IDLE
     }
 
-    private RecorderMode mode;
+
+
+    private RecorderState mode;
     private BufferedWriter os;
     private BufferedReader is;
     private File f;
@@ -57,12 +59,14 @@ public class CamRecorder implements IObserver {
     float time;
 
     public static void initialize() {
+        // Initialize own
         instance = new CamRecorder();
+        // Initialize keyframe manager
+        CameraKeyframeManager.initialize();
     }
 
     public CamRecorder() {
-        this.mode = RecorderMode.IDLE;
-        EventManager.instance.subscribe(this, Events.RECORD_CAMERA_CMD, Events.PLAY_CAMERA_CMD, Events.UPDATE_CAM_RECORDER, Events.STOP_CAMERA_PLAY);
+        this.mode = RecorderState.IDLE;
 
         df = new SimpleDateFormat("yyyyMMdd_HH-mm-ss-SSS");
 
@@ -70,6 +74,8 @@ public class CamRecorder implements IObserver {
         upp = new Vector3d();
         aux1 = new Vector3d();
         aux2 = new Vector3d();
+
+        EventManager.instance.subscribe(this, Events.RECORD_CAMERA_CMD, Events.PLAY_CAMERA_CMD, Events.UPDATE_CAM_RECORDER, Events.STOP_CAMERA_PLAY);
     }
 
     public void update(ITimeFrameProvider time, Vector3d position, Vector3d direction, Vector3d up) {
@@ -106,7 +112,7 @@ public class CamRecorder implements IObserver {
                         // Finish off
                         is.close();
                         is = null;
-                        mode = RecorderMode.IDLE;
+                        mode = RecorderState.IDLE;
                         // Stop camera
                         EventManager.instance.post(Events.CAMERA_STOP);
                         // Post notification
@@ -133,22 +139,23 @@ public class CamRecorder implements IObserver {
     public void notify(Events event, Object... data) {
         switch (event) {
         case RECORD_CAMERA_CMD:
-            RecorderMode m = null;
+            // Start recording
+            RecorderState m = null;
             if (data[0] != null) {
                 if ((Boolean) data[0]) {
-                    m = RecorderMode.RECORDING;
+                    m = RecorderState.RECORDING;
 
                 } else {
-                    m = RecorderMode.IDLE;
+                    m = RecorderState.IDLE;
                 }
             } else {
-                m = (mode == RecorderMode.RECORDING) ? RecorderMode.IDLE : RecorderMode.RECORDING;
+                m = (mode == RecorderState.RECORDING) ? RecorderState.IDLE : RecorderState.RECORDING;
 
             }
 
-            if (m == RecorderMode.RECORDING) {
+            if (m == RecorderState.RECORDING) {
                 // We start recording, prepare buffer!
-                if (mode == RecorderMode.RECORDING) {
+                if (mode == RecorderState.RECORDING) {
                     logger.info(I18n.bundle.get("error.camerarecord.already"));
                     return;
                 }
@@ -167,11 +174,11 @@ public class CamRecorder implements IObserver {
                 logger.info(I18n.bundle.get("notif.camerarecord.start"));
                 startMs = System.currentTimeMillis();
                 time = 0;
-                mode = RecorderMode.RECORDING;
+                mode = RecorderState.RECORDING;
 
-            } else if (m == RecorderMode.IDLE) {
+            } else if (m == RecorderState.IDLE) {
                 // Flush and close
-                if (mode == RecorderMode.IDLE) {
+                if (mode == RecorderState.IDLE) {
                     // No recording to cancel
                     return;
                 }
@@ -186,14 +193,15 @@ public class CamRecorder implements IObserver {
                 float secs = elapsed / 1000f;
                 logger.info(I18n.bundle.format("notif.camerarecord.done", f.getAbsolutePath(), secs));
                 f = null;
-                mode = RecorderMode.IDLE;
+                mode = RecorderState.IDLE;
             }
             break;
         case PLAY_CAMERA_CMD:
+            // Start playing
             if (is != null) {
                 logger.warn("Hey, we are already playing another movie!");
             }
-            if (mode != RecorderMode.IDLE) {
+            if (mode != RecorderState.IDLE) {
                 throw new RuntimeException("The recorder is busy! The current mode is " + mode);
             }
             FileHandle file = (FileHandle) data[0];
@@ -201,7 +209,7 @@ public class CamRecorder implements IObserver {
             is = new BufferedReader(new InputStreamReader(file.read()));
 
             logger.info(I18n.bundle.format("notif.cameraplay.start", file.path()));
-            mode = RecorderMode.PLAYING;
+            mode = RecorderState.PLAYING;
 
             // Issue message informing playing has started
             EventManager.instance.post(Events.CAMERA_PLAY_INFO, true);
@@ -214,6 +222,7 @@ public class CamRecorder implements IObserver {
 
             break;
         case UPDATE_CAM_RECORDER:
+            // Update with current position
             ITimeFrameProvider dt = (ITimeFrameProvider) data[0];
             Vector3d pos = (Vector3d) data[1];
             Vector3d dir = (Vector3d) data[2];
@@ -221,7 +230,8 @@ public class CamRecorder implements IObserver {
             update(dt, pos, dir, up);
             break;
         case STOP_CAMERA_PLAY:
-            mode = RecorderMode.IDLE;
+            // Stop playing
+            mode = RecorderState.IDLE;
             // Stop camera
             EventManager.instance.post(Events.CAMERA_STOP);
             // Post notification

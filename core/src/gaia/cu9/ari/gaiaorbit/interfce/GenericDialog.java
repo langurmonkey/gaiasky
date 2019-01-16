@@ -33,7 +33,8 @@ public abstract class GenericDialog extends CollapsibleWindow {
     protected Table content;
     protected float pad;
     private String acceptText = null, cancelText = null;
-    
+    protected boolean modal = true;
+
     protected TextButton acceptButton, cancelButton;
 
     private Runnable acceptRunnable, cancelRunnable;
@@ -67,6 +68,11 @@ public abstract class GenericDialog extends CollapsibleWindow {
         this.cancelText = cancelText;
     }
 
+    public void setModal(boolean modal) {
+        this.modal = modal;
+        super.setModal(modal);
+    }
+
     protected void recalculateButtonSize() {
         float w = Math.max(Math.max(acceptButton != null ? acceptButton.getWidth() : 0, cancelButton != null ? cancelButton.getWidth() : 0) + 10 * GlobalConf.SCALE_FACTOR, 80 * GlobalConf.SCALE_FACTOR);
         if (acceptButton != null)
@@ -77,7 +83,6 @@ public abstract class GenericDialog extends CollapsibleWindow {
 
     public void buildSuper() {
         pad = 5 * GlobalConf.SCALE_FACTOR;
-
 
         /** BUTTONS **/
         HorizontalGroup buttonGroup = new HorizontalGroup();
@@ -133,36 +138,33 @@ public abstract class GenericDialog extends CollapsibleWindow {
         pack();
 
         // Add keys for ESC and ENTER
-        me.addListener(new EventListener() {
-            @Override
-            public boolean handle(Event event) {
-                if (event instanceof InputEvent) {
-                    InputEvent ievent = (InputEvent) event;
-                    if (ievent.getType() == Type.keyUp) {
-                        int key = ievent.getKeyCode();
-                        switch (key) {
-                        case Keys.ESCAPE:
-                            // Exit
-                            cancel();
-                            if (cancelRunnable != null)
-                                cancelRunnable.run();
-                            me.hide();
-                            return true;
-                        case Keys.ENTER:
-                            // Exit
-                            accept();
-                            if (acceptRunnable != null)
-                                acceptRunnable.run();
-                            me.hide();
-                            return true;
-                        default:
-                            // Nothing
-                            break;
-                        }
+        me.addListener(event -> {
+            if (event instanceof InputEvent) {
+                InputEvent ievent = (InputEvent) event;
+                if (ievent.getType() == Type.keyUp) {
+                    int key = ievent.getKeyCode();
+                    switch (key) {
+                    case Keys.ESCAPE:
+                        // Exit
+                        cancel();
+                        if (cancelRunnable != null)
+                            cancelRunnable.run();
+                        me.hide();
+                        return true;
+                    case Keys.ENTER:
+                        // Exit
+                        accept();
+                        if (acceptRunnable != null)
+                            acceptRunnable.run();
+                        me.hide();
+                        return true;
+                    default:
+                        // Nothing
+                        break;
                     }
                 }
-                return false;
             }
+            return false;
         });
 
         focusListener = new FocusListener() {
@@ -188,7 +190,6 @@ public abstract class GenericDialog extends CollapsibleWindow {
 
         /** CAPTURE SCROLL FOCUS **/
         stage.addListener(new EventListener() {
-
             @Override
             public boolean handle(Event event) {
                 if (event instanceof InputEvent) {
@@ -206,15 +207,15 @@ public abstract class GenericDialog extends CollapsibleWindow {
                 return false;
             }
         });
-        
+
         // Build actual content
         build();
-        
+
         // Set position
         setPosition(Math.round(stage.getWidth() / 2f - this.getWidth() / 2f), Math.round(stage.getHeight() / 2f - this.getHeight() / 2f));
 
         // Modal
-        setModal(true);
+        setModal(this.modal);
     }
 
     /**
@@ -257,8 +258,9 @@ public abstract class GenericDialog extends CollapsibleWindow {
         if (action != null)
             addAction(action);
 
-        // Disable input
-        EventManager.instance.post(Events.INPUT_ENABLED_CMD, false);
+        if (this.modal)
+            // Disable input
+            EventManager.instance.post(Events.INPUT_ENABLED_CMD, false);
 
         return this;
     }
@@ -308,12 +310,14 @@ public abstract class GenericDialog extends CollapsibleWindow {
         } else
             remove();
 
-        // Enable input
-        EventManager.instance.post(Events.INPUT_ENABLED_CMD, true);
+        if (this.modal)
+            // Enable input
+            EventManager.instance.post(Events.INPUT_ENABLED_CMD, true);
     }
 
     /**
      * Sets the runnable which runs when accept is clicked
+     *
      * @param r The runnable
      */
     public void setAcceptRunnable(Runnable r) {
@@ -322,6 +326,7 @@ public abstract class GenericDialog extends CollapsibleWindow {
 
     /**
      * Sets the runnable which runs when cancel is clicked
+     *
      * @param r The runnable
      */
     public void setCancelRunnable(Runnable r) {
@@ -334,13 +339,13 @@ public abstract class GenericDialog extends CollapsibleWindow {
      * then removes it from the stage.
      */
     public void hide() {
-        hide(sequence(fadeOut(0.4f, Interpolation.fade), Actions.removeActor()));
+        hide(sequence(fadeOut(0.4f, Interpolation.fade)));
         stage.setKeyboardFocus(previousKeyboardFocus);
     }
 
     /**
      * Sets the enabled property on the given components
-     * 
+     *
      * @param enabled
      * @param components
      */

@@ -58,6 +58,16 @@ public class OwnTextField extends TextField {
         this.errorColor = errorColor;
     }
 
+    /**
+     * Checks the validity of the value. If the text field has no validator, all
+     * values are valid. If it has a validator, it checks whether the value
+     * is ok
+     * @return True if the value is valid or the text field has no validator, false otherwise
+     */
+    public boolean isValid(){
+        return this.validator == null || this.validator.validate(this.getText());
+    }
+
     private void initValidator() {
         if (validator != null) {
             errorColor = new Color(0xff6666ff);

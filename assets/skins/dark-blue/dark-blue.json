@@ -55,6 +55,7 @@ com.badlogic.gdx.scenes.scene2d.ui.ImageButton$ImageButtonStyle: {
 	edit: { imageUp: edit-icon },
 	playstop: { imageUp: play-icon, imageChecked: pause-icon },
 	rec: { imageUp: rec-icon-gray, imageChecked: rec-icon-red },
+	rec-key: { imageUp: rec-key-icon-gray, imageDown: rec-key-icon-red },
 	play: { imageUp: play-icon, imageChecked: play-icon },
 	eye: { imageUp: eye-icon },
 	expand-collapse: { imageUp: plus-icon, imageChecked: minus-icon, imageDisabled: disabled-icon },

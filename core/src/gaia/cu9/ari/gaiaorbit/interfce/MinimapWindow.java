@@ -32,6 +32,8 @@ public class MinimapWindow extends GenericDialog {
         sideshort = (int) (GlobalConf.SCALE_FACTOR * 112.5);
         sideshort2 = sideshort / 2;
 
+        setModal(false);
+
         OrthographicCamera ortho = new OrthographicCamera();
 
         ShapeRenderer sr = new ShapeRenderer();
@@ -63,7 +65,6 @@ public class MinimapWindow extends GenericDialog {
         // Pack
         pack();
 
-        setModal(false);
     }
 
     @Override

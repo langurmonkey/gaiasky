@@ -279,6 +279,16 @@ public enum Events {
     UPDATE_CAM_RECORDER,
 
     /**
+     * Saves the given array of keyframes to a keyframes file
+     */
+    KEYFRAMES_FILE_SAVE,
+
+    /**
+     * Exports the given array of keyframes to a camera path file
+     */
+    KEYFRAMES_EXPORT,
+
+    /**
      * Issues the command to change the high accuracy setting. Contains a
      * boolean with the setting
      */
@@ -359,6 +369,7 @@ public enum Events {
     SHOW_RUNSCRIPT_ACTION,
     SHOW_LAND_AT_LOCATION_ACTION,
     SHOW_QUIT_ACTION,
+    SHOW_KEYFRAMES_WINDOW_ACTION,
     /** Shows the camera path file selector, contains the stage and the skin **/
     SHOW_PLAYCAMERA_ACTION,
     /** Informs about the number of running scripts **/

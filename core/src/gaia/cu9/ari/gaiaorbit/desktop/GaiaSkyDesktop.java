@@ -19,6 +19,7 @@ import gaia.cu9.ari.gaiaorbit.desktop.format.DesktopNumberFormatFactory;
 import gaia.cu9.ari.gaiaorbit.desktop.render.DesktopPostProcessorFactory;
 import gaia.cu9.ari.gaiaorbit.desktop.render.ScreenModeCmd;
 import gaia.cu9.ari.gaiaorbit.desktop.util.*;
+import gaia.cu9.ari.gaiaorbit.desktop.util.camera.CamRecorder;
 import gaia.cu9.ari.gaiaorbit.event.EventManager;
 import gaia.cu9.ari.gaiaorbit.event.Events;
 import gaia.cu9.ari.gaiaorbit.event.IObserver;
