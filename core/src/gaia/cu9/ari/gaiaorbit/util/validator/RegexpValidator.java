@@ -4,7 +4,11 @@ public class RegexpValidator extends CallbackValidator {
     private String expr;
 
     public RegexpValidator(String expression) {
-        super();
+        this(null, expression);
+    }
+
+    public RegexpValidator(IValidator parent, String expression) {
+        super(parent);
         this.expr = expression;
     }
 

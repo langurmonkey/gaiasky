@@ -5,6 +5,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import gaia.cu9.ari.gaiaorbit.util.GlobalConf;
 import gaia.cu9.ari.gaiaorbit.util.scene2d.OwnLabel;
 import gaia.cu9.ari.gaiaorbit.util.scene2d.OwnTextField;
+import gaia.cu9.ari.gaiaorbit.util.validator.LengthValidator;
 import gaia.cu9.ari.gaiaorbit.util.validator.RegexpValidator;
 
 public class FileNameWindow extends GenericDialog{
@@ -28,9 +29,9 @@ public class FileNameWindow extends GenericDialog{
     @Override
     protected void build() {
         OwnLabel label = new OwnLabel("File name: ", skin);
-
-        RegexpValidator rv = new RegexpValidator("^[^*&%\\s\\+\\=\\\\\\/@#\\$&\\*()~]+$");
-        fileName = new OwnTextField(defaultName, skin, rv);
+        LengthValidator lengthValidator = new LengthValidator(3, 30);
+        RegexpValidator nameValidator = new RegexpValidator(lengthValidator, "^[^*&%\\s\\+\\=\\\\\\/@#\\$&\\*()~]+$");
+        fileName = new OwnTextField(defaultName, skin, nameValidator);
         fileName.setWidth(250 * GlobalConf.SCALE_FACTOR);
 
         content.add(label).padRight(pad).padBottom(pad);

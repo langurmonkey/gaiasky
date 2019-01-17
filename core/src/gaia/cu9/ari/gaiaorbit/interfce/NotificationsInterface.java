@@ -5,7 +5,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import gaia.cu9.ari.gaiaorbit.GaiaSky;
-import gaia.cu9.ari.gaiaorbit.data.orbit.PolylineData;
+import gaia.cu9.ari.gaiaorbit.data.util.PointCloudData;
 import gaia.cu9.ari.gaiaorbit.event.EventManager;
 import gaia.cu9.ari.gaiaorbit.event.Events;
 import gaia.cu9.ari.gaiaorbit.event.IObserver;
@@ -283,7 +283,7 @@ public class NotificationsInterface extends Table implements IObserver, IGuiInte
                 }
                 break;
             case ORBIT_DATA_LOADED:
-                addMessage(I18n.bundle.format("notif.orbitdata.loaded", data[1], ((PolylineData) data[0]).getNumPoints()));
+                addMessage(I18n.bundle.format("notif.orbitdata.loaded", data[1], ((PointCloudData) data[0]).getNumPoints()));
                 break;
             case SCREENSHOT_INFO:
                 addMessage(I18n.bundle.format("notif.screenshot", data[0]));

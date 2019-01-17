@@ -13,6 +13,7 @@ import gaia.cu9.ari.gaiaorbit.desktop.util.camera.Keyframe;
 import gaia.cu9.ari.gaiaorbit.event.EventManager;
 import gaia.cu9.ari.gaiaorbit.event.Events;
 import gaia.cu9.ari.gaiaorbit.event.IObserver;
+import gaia.cu9.ari.gaiaorbit.scenegraph.PathObject;
 import gaia.cu9.ari.gaiaorbit.scenegraph.camera.CameraManager;
 import gaia.cu9.ari.gaiaorbit.util.GlobalConf;
 import gaia.cu9.ari.gaiaorbit.util.Logger;
@@ -22,6 +23,8 @@ import gaia.cu9.ari.gaiaorbit.util.math.Vector3d;
 import gaia.cu9.ari.gaiaorbit.util.scene2d.*;
 import gaia.cu9.ari.gaiaorbit.util.time.ITimeFrameProvider;
 import gaia.cu9.ari.gaiaorbit.util.validator.FloatValidator;
+import gaia.cu9.ari.gaiaorbit.util.validator.LengthValidator;
+import gaia.cu9.ari.gaiaorbit.util.validator.RegexpValidator;
 
 import java.io.File;
 import java.io.FileFilter;
@@ -66,6 +69,9 @@ public class KeyframesWindow extends GenericDialog implements IObserver {
     /** Last loaded keyframe file name **/
     private String lastKeyframeFileName = null;
 
+    /** Model object to represent the path **/
+    private PathObject pathObject;
+
     public KeyframesWindow(Stage stage, Skin skin) {
         super("Camera recorder - Keyframes", skin, stage);
 
@@ -79,6 +85,15 @@ public class KeyframesWindow extends GenericDialog implements IObserver {
 
         // Build UI
         buildSuper();
+
+        // Add {@link gaia.cu9.ari.gaiaorbit.scenegraph.PathObject} to model
+        pathObject = new PathObject();
+        pathObject.setCt("Others");
+        pathObject.setParent("Universe");
+        pathObject.setName("Keyframe path");
+        pathObject.initialize();
+        pathObject.doneLoading(null);
+        EventManager.instance.post(Events.SCENE_GRAPH_ADD_OBJECT_CMD, pathObject, false);
 
         EventManager.instance.subscribe(this, Events.UPDATE_CAM_RECORDER);
     }
@@ -98,7 +113,9 @@ public class KeyframesWindow extends GenericDialog implements IObserver {
         addKeyframe.addListener(event -> {
             if (event instanceof ChangeListener.ChangeEvent) {
                 try {
-                    if (secondsInput.isValid()) {
+                    boolean secOk = secondsInput.isValid();
+                    boolean nameOk = nameInput.isValid();
+                    if (secOk && nameOk) {
                         // Create new instances for the current keyframe
                         Vector3d cPos = new Vector3d();
                         Vector3d cDir = new Vector3d();
@@ -132,9 +149,9 @@ public class KeyframesWindow extends GenericDialog implements IObserver {
                         keyframes.add(kf);
                         nframes = frameNumber;
 
-                        addKeyframeToTable(kf, keyframes.size - 1, keyframesTable);
+                        addKeyframeToTable(kf, keyframes.size - 1, keyframesTable, true);
                     } else {
-                        logger.info("Keyframe not added - Invalid value for 'seconds' input: " + secondsInput.getText());
+                        logger.info("Keyframe not added - Seconds value: " + (secOk ? "ok" : "ko") + ", Name value: " + (nameOk ? "ok" : "ko"));
                     }
                 } catch (Exception e) {
                     logger.error("Keyframe not added - error in input", e);
@@ -162,7 +179,9 @@ public class KeyframesWindow extends GenericDialog implements IObserver {
         left.add(secondsInput).bottom().left().padBottom(pad).row();
 
         // NAME
-        nameInput = new OwnTextField("", skin);
+        LengthValidator lengthValidator = new LengthValidator(0, 15);
+        RegexpValidator nameValidator = new RegexpValidator(lengthValidator, "^[^*&%\\s\\+\\=\\\\\\/@#\\$&\\*()~]*$");
+        nameInput = new OwnTextField("", skin, nameValidator);
         nameInput.setWidth(60 * GlobalConf.SCALE_FACTOR);
         OwnLabel nameLabel = new OwnLabel("Name (optional):", skin);
         left.add(nameLabel).bottom().left().padRight(pad5).padBottom(pad);
@@ -176,8 +195,9 @@ public class KeyframesWindow extends GenericDialog implements IObserver {
 
         // ADD SCROLL
         rightScroll = new OwnScrollPane(keyframesTable, skin, "minimalist-nobg");
+        rightScroll.setScrollingDisabled(true, false);
         rightScroll.setHeight(100 * GlobalConf.SCALE_FACTOR);
-        rightScroll.setWidth(250 * GlobalConf.SCALE_FACTOR);
+        rightScroll.setWidth(300 * GlobalConf.SCALE_FACTOR);
         rightScroll.setFadeScrollBars(true);
 
         right.add(keyframesTitle).top().left().padBottom(pad).row();
@@ -305,15 +325,43 @@ public class KeyframesWindow extends GenericDialog implements IObserver {
         Table table = new Table(skin);
         table.align(Align.top | Align.left);
 
-        int i = 0;
-        for (Keyframe kf : keyframes) {
-            addKeyframeToTable(kf, i, table);
-            i++;
-        }
+        addKeyframesToTable(keyframes, table);
+
         return table;
     }
 
+    private void addKeyframesToTable(Array<Keyframe> keyframes, Table table) {
+        double[] kfPositions = new double[keyframes.size * 3];
+        int i = 0;
+        for (Keyframe kf : keyframes) {
+            // Add to UI table
+            addKeyframeToTable(kf, i, table);
+            // Fill model table
+            kfPositions[i * 3 + 0] = kf.pos.x;
+            kfPositions[i * 3 + 1] = kf.pos.y;
+            kfPositions[i * 3 + 2] = kf.pos.z;
+            i++;
+        }
+        if (pathObject != null) {
+            Gdx.app.postRunnable(() -> {
+                pathObject.knots.setPoints(kfPositions);
+                if (keyframes.size > 1) {
+                    pathObject.segments.setPoints(kfPositions);
+                    double[] pathSamples = CameraKeyframeManager.instance.samplePath(kfPositions, 20);
+                    pathObject.path.setPoints(pathSamples);
+                } else {
+                    pathObject.segments.clear();
+                    pathObject.path.clear();
+                }
+            });
+        }
+    }
+
     private void addKeyframeToTable(Keyframe kf, int index, Table table) {
+        addKeyframeToTable(kf, index, table, false);
+    }
+
+    private void addKeyframeToTable(Keyframe kf, int index, Table table, boolean addToModel) {
         // Time
         double t = (double) kf.frame / (double) framerate;
         table.add(new OwnLabel(secondsFormatter.format(t), skin, "hud-header")).left().padRight(pad).padBottom(pad5);
@@ -330,7 +378,7 @@ public class KeyframesWindow extends GenericDialog implements IObserver {
             if (event instanceof ChangeListener.ChangeEvent) {
                 // Go to keyframe
                 EventManager.instance.post(Events.CAMERA_MODE_CMD, CameraManager.CameraMode.Free_Camera);
-                Gdx.app.postRunnable(()->{
+                Gdx.app.postRunnable(() -> {
                     EventManager.instance.post(Events.CAMERA_POS_CMD, kf.pos.values());
                     EventManager.instance.post(Events.CAMERA_DIR_CMD, kf.dir.values());
                     EventManager.instance.post(Events.CAMERA_UP_CMD, kf.up.values());
@@ -370,24 +418,60 @@ public class KeyframesWindow extends GenericDialog implements IObserver {
 
         this.pack();
 
+        if (addToModel && pathObject != null) {
+            Gdx.app.postRunnable(() -> {
+                // Update model data
+                pathObject.knots.addPoint(kf.pos);
+                if (keyframes.size > 1) {
+                    pathObject.segments.addPoint(kf.pos);
+                    resamplePath(keyframes);
+                } else {
+                    pathObject.segments.clear();
+                    pathObject.path.clear();
+                }
+            });
+        }
+
+    }
+
+    private void resamplePath(Array<Keyframe> keyframes) {
+        if (pathObject != null) {
+            double[] kfPositions = new double[keyframes.size * 3];
+            int i = 0;
+            for (Keyframe kf : keyframes) {
+                // Fill model table
+                kfPositions[i * 3 + 0] = kf.pos.x;
+                kfPositions[i * 3 + 1] = kf.pos.y;
+                kfPositions[i * 3 + 2] = kf.pos.z;
+                i++;
+            }
+            double[] pathSamples = CameraKeyframeManager.instance.samplePath(kfPositions, 20);
+            pathObject.path.setPoints(pathSamples);
+        }
     }
 
     private void reinitialiseKeyframes(Array<Keyframe> kfs) {
-        clean();
+        clean(false);
         keyframes.addAll(kfs);
-        for (int i = 0; i < keyframes.size; i++) {
-            addKeyframeToTable(keyframes.get(i), i, keyframesTable);
-        }
+        addKeyframesToTable(keyframes, keyframesTable);
         nframes = keyframes.isEmpty() ? 0 : keyframes.get(keyframes.size - 1).frame;
     }
 
     private void clean() {
+        clean(true);
+    }
+
+    private void clean(boolean cleanModel) {
         keyframes.clear();
         keyframesTable.clearChildren();
         nframes = 0;
         nameInput.setText("");
         secondsInput.setText("1.0");
         lastKeyframeFileName = null;
+        if (cleanModel)
+            Gdx.app.postRunnable(() -> {
+                pathObject.clear();
+            });
     }
 
     @Override

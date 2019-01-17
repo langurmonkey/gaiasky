@@ -5,6 +5,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.sql.Timestamp;
 
+import gaia.cu9.ari.gaiaorbit.data.util.PointCloudData;
 import gaia.cu9.ari.gaiaorbit.util.Constants;
 import gaia.cu9.ari.gaiaorbit.util.math.Matrix4d;
 import gaia.cu9.ari.gaiaorbit.util.math.Vector3d;
@@ -22,8 +23,8 @@ public class FileDataLoader {
      * @param data
      * @throws Exception
      */
-    public PolylineData load(InputStream data) throws Exception {
-        PolylineData orbitData = new PolylineData();
+    public PointCloudData load(InputStream data) throws Exception {
+        PointCloudData orbitData = new PointCloudData();
 
         BufferedReader br = new BufferedReader(new InputStreamReader(data));
         String line;

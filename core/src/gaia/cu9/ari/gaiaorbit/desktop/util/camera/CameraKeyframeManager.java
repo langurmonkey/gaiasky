@@ -6,7 +6,9 @@ import gaia.cu9.ari.gaiaorbit.event.EventManager;
 import gaia.cu9.ari.gaiaorbit.event.Events;
 import gaia.cu9.ari.gaiaorbit.event.IObserver;
 import gaia.cu9.ari.gaiaorbit.util.Logger;
+import gaia.cu9.ari.gaiaorbit.util.math.CatmullRomSplined;
 import gaia.cu9.ari.gaiaorbit.util.math.Lineard;
+import gaia.cu9.ari.gaiaorbit.util.math.Pathd;
 import gaia.cu9.ari.gaiaorbit.util.math.Vector3d;
 import gaia.cu9.ari.gaiaorbit.util.parse.Parser;
 
@@ -31,6 +33,27 @@ public class CameraKeyframeManager implements IObserver {
         super();
 
         EventManager.instance.subscribe(this, Events.KEYFRAMES_FILE_SAVE, Events.KEYFRAMES_EXPORT);
+    }
+
+    public enum PathType {
+        SPLINE, LINEAR
+    }
+
+    public PathType pathType = PathType.SPLINE;
+
+    private Pathd<Vector3d> getPath(Vector3d[] data) {
+        if (pathType == PathType.LINEAR) {
+            return new Lineard<>(data);
+        } else if (pathType == PathType.SPLINE) {
+            // Needs extra points at beginning and end
+            Vector3d[] extData = new Vector3d[data.length + 2];
+            System.arraycopy(data, 0, extData, 1, data.length);
+            extData[0] = data[0];
+            extData[data.length + 1] = data[data.length - 1];
+            return new CatmullRomSplined<>(extData, false);
+        }
+        // Default
+        return new Lineard<>(data);
     }
 
     public Array<Keyframe> loadKeyframesFile(File file) throws RuntimeException {
@@ -101,6 +124,30 @@ public class CameraKeyframeManager implements IObserver {
 
     }
 
+    public double[] samplePath(double[] points, int samplesPerSegment) {
+        Vector3d[] pts = new Vector3d[points.length / 3];
+        for (int i = 0; i < pts.length; i++) {
+            int j = i * 3;
+            pts[i] = new Vector3d(points[j], points[j + 1], points[j + 2]);
+        }
+        int nSamples = (pts.length - 1) * samplesPerSegment + 1;
+        int nChunks = nSamples - 1;
+        double[] result = new double[nSamples * 3];
+
+        Vector3d aux = new Vector3d();
+        Pathd<Vector3d> sampler = getPath(pts);
+        double step = 1d / nChunks;
+        int i = 0;
+        for (double t = 0d; i < result.length; t += step) {
+            sampler.valueAt(aux, t);
+            result[i + 0] = aux.x;
+            result[i + 1] = aux.y;
+            result[i + 2] = aux.z;
+            i += 3;
+        }
+        return result;
+    }
+
     public void exportKeyframesFile(Array<Keyframe> keyframes, String fileName) {
         File f = new File(SysUtils.getDefaultCameraDir(), fileName);
         if (f.exists()) {
@@ -118,7 +165,7 @@ public class CameraKeyframeManager implements IObserver {
             f.createNewFile();
             os = new BufferedWriter(new FileWriter(f));
 
-            Vector3d[] positions = new Vector3d[keyframes.size ];
+            Vector3d[] positions = new Vector3d[keyframes.size];
             Vector3d[] directions = new Vector3d[keyframes.size];
             Vector3d[] ups = new Vector3d[keyframes.size];
 
@@ -130,11 +177,10 @@ public class CameraKeyframeManager implements IObserver {
                 ups[i] = k.up;
             }
 
-
             // Catmull-Rom splines for pos, dir, up
-            Lineard<Vector3d> posSpline = new Lineard<Vector3d>(positions);
-            Lineard<Vector3d> dirSpline = new Lineard<Vector3d>(directions);
-            Lineard<Vector3d> upSpline = new Lineard<Vector3d>(ups);
+            Pathd<Vector3d> posSpline = getPath(positions);
+            Pathd<Vector3d> dirSpline = getPath(directions);
+            Pathd<Vector3d> upSpline = getPath(ups);
 
             Vector3d aux = new Vector3d();
 
@@ -142,7 +188,6 @@ public class CameraKeyframeManager implements IObserver {
             double splinePos = 0d;
             /** Step length between control points **/
             double splinePosStep = 1d / (positions.length - 1);
-
 
             for (int i = 1; i < keyframes.size; i++) {
                 Keyframe k0 = keyframes.get(i - 1);

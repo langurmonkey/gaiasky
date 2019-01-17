@@ -12,6 +12,7 @@ uniform mat4 u_worldTransform;
 uniform mat4 u_projModelView;
 uniform vec2 u_viewport;
 uniform vec3 u_parentPos;
+uniform float u_pointSize = 1f;
 
 varying vec4 v_col;
 
@@ -47,5 +48,6 @@ void main() {
    #endif // gravitationalWaves
    
    gl_Position = u_projModelView * pos;
+   gl_PointSize = u_pointSize;
    v_col = a_color;
 }

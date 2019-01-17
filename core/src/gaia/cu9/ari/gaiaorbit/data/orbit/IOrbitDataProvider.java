@@ -1,6 +1,7 @@
 package gaia.cu9.ari.gaiaorbit.data.orbit;
 
 import gaia.cu9.ari.gaiaorbit.assets.OrbitDataLoader.OrbitDataLoaderParameter;
+import gaia.cu9.ari.gaiaorbit.data.util.PointCloudData;
 
 public interface IOrbitDataProvider {
 
@@ -21,6 +22,6 @@ public interface IOrbitDataProvider {
      */
     public void load(String file, OrbitDataLoaderParameter source, boolean newmethod);
 
-    public PolylineData getData();
+    public PointCloudData getData();
 
 }

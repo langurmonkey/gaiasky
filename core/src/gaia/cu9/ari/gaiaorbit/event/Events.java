@@ -560,6 +560,14 @@ public enum Events {
     SCREEN_MODE_CMD,
     /** Informs the scene graph has been loaded. Program can start **/
     SCENE_GRAPH_LOADED,
+    /** Sends an object to be added to the scene graph. Contains the object and an optional Boolean indicating
+     * whether to add the object to the scene graph index. Defaults to true. **/
+    SCENE_GRAPH_ADD_OBJECT_CMD,
+    /**
+     * Removes an object from the scene graph. Contains the name of the object or the object itself plus and optional
+     * Boolean indicating whether to remove it from the index. Defaults to true.
+     */
+    SCENE_GRAPH_REMOVE_OBJECT_CMD,
     /**
      * Contains the width, height (integers) and the folder name and filename
      * (strings)

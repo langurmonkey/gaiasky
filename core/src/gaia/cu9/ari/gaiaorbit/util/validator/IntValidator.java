@@ -6,11 +6,17 @@ public class IntValidator extends CallbackValidator {
     private int max;
 
     public IntValidator() {
-        this(Integer.MIN_VALUE, Integer.MAX_VALUE);
+        this(null);
+    }
+    public IntValidator(IValidator parent) {
+        this(parent, Integer.MIN_VALUE, Integer.MAX_VALUE);
     }
 
     public IntValidator(int min, int max) {
-        super();
+        this(null, min, max);
+    }
+    public IntValidator(IValidator parent, int min, int max) {
+        super(parent);
         this.min = min;
         this.max = max;
     }

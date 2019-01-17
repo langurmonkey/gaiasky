@@ -3,9 +3,15 @@ package gaia.cu9.ari.gaiaorbit.util.validator;
 public abstract class CallbackValidator implements IValidator{
 
     private Runnable isValidCallback, isInvalidCallback;
+    private IValidator parent;
 
     public CallbackValidator(){
         super();
+    }
+
+    public CallbackValidator(IValidator parent){
+        super();
+        this.parent = parent;
     }
 
     public CallbackValidator(Runnable correctCallback, Runnable incorrectCallback) {
@@ -39,7 +45,7 @@ public abstract class CallbackValidator implements IValidator{
             runIsValidCallback();
         else
             runIsInvalidCallback();
-        return valid;
+        return valid && (parent == null || parent.validate(value));
     }
 
     protected abstract boolean validateLocal(String value);

@@ -1,37 +1,75 @@
-package gaia.cu9.ari.gaiaorbit.data.orbit;
-
-import java.time.Instant;
+package gaia.cu9.ari.gaiaorbit.data.util;
 
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.Array;
-
 import gaia.cu9.ari.gaiaorbit.util.math.Vector3d;
 
-public class PolylineData {
+import java.time.Instant;
+
+public class PointCloudData {
     // Values of x, y, z in world coordinates
     public Array<Double> x, y, z;
     public Array<Instant> time;
 
     private Vector3d v0, v1;
 
-    public PolylineData() {
+    public PointCloudData() {
         this(16);
     }
 
-    public PolylineData(int capacity) {
-        x = new Array<Double>(16);
-        y = new Array<Double>(16);
-        z = new Array<Double>(16);
-        time = new Array<Instant>(16);
+    public PointCloudData(int capacity) {
+        x = new Array<>(capacity);
+        y = new Array<>(capacity);
+        z = new Array<>(capacity);
+        time = new Array<>(capacity);
 
         v0 = new Vector3d();
         v1 = new Vector3d();
     }
 
+    /** Clears all data **/
+    public void clear() {
+        x.clear();
+        y.clear();
+        z.clear();
+        time.clear();
+        v0.setZero();
+        v1.setZero();
+    }
+
+    /**
+     * Adds the given vector to the current points. The vector
+     * is of the form [x0, y0, z0, x1, y1, z1, ..., xn, yn, zn].
+     * If the size of the vector is not a multiple of 3, no points are added
+     *
+     * @param points The points to add to this point cloud
+     */
+    public void addPoints(double[] points) {
+        if (points.length % 3 == 0) {
+            int nPoints = points.length / 3;
+            for (int i = 0; i < nPoints; i++) {
+                x.add(points[i * 3]);
+                y.add(points[i * 3 + 1]);
+                z.add(points[i * 3 + 2]);
+            }
+        }
+    }
+
+    /**
+     * Adds a single point o this point cloud
+     *
+     * @param point The point
+     */
+    public void addPoint(Vector3d point) {
+        x.add(point.x);
+        y.add(point.y);
+        z.add(point.z);
+    }
+
     /**
      * Loads the data point at the index in the vector in the Orbit reference
      * system
-     * 
+     *
      * @param v
      * @param index
      */
@@ -62,7 +100,7 @@ public class PolylineData {
     /**
      * Loads the data point at the index in the vector in the world reference
      * system
-     * 
+     *
      * @param v
      * @param index
      */
@@ -73,11 +111,9 @@ public class PolylineData {
     /**
      * Returns a vector with the data point at the given time. It uses linear
      * interpolation
-     * 
-     * @param v
-     *            The vector
-     * @param date
-     *            The date
+     *
+     * @param v       The vector
+     * @param instant The date
      * @return Whether the operation completes successfully
      */
     public boolean loadPoint(Vector3d v, Instant instant) {

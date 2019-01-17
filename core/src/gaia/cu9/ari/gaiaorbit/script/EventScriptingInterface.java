@@ -1,13 +1,5 @@
 package gaia.cu9.ari.gaiaorbit.script;
 
-import java.time.Instant;
-import java.time.LocalDateTime;
-import java.time.ZoneOffset;
-import java.time.temporal.ChronoField;
-import java.util.HashSet;
-import java.util.Set;
-import java.util.concurrent.atomic.AtomicBoolean;
-
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.assets.AssetManager;
@@ -15,7 +7,6 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Group;
 import com.badlogic.gdx.utils.TimeUtils;
-
 import gaia.cu9.ari.gaiaorbit.GaiaSky;
 import gaia.cu9.ari.gaiaorbit.event.EventManager;
 import gaia.cu9.ari.gaiaorbit.event.EventManager.TimeFrame;
@@ -23,31 +14,25 @@ import gaia.cu9.ari.gaiaorbit.event.Events;
 import gaia.cu9.ari.gaiaorbit.event.IObserver;
 import gaia.cu9.ari.gaiaorbit.interfce.ControlsWindow;
 import gaia.cu9.ari.gaiaorbit.interfce.IGui;
-import gaia.cu9.ari.gaiaorbit.scenegraph.CelestialBody;
-import gaia.cu9.ari.gaiaorbit.scenegraph.IFocus;
-import gaia.cu9.ari.gaiaorbit.scenegraph.ISceneGraph;
-import gaia.cu9.ari.gaiaorbit.scenegraph.IStarFocus;
-import gaia.cu9.ari.gaiaorbit.scenegraph.Invisible;
-import gaia.cu9.ari.gaiaorbit.scenegraph.Loc;
-import gaia.cu9.ari.gaiaorbit.scenegraph.ModelBody;
-import gaia.cu9.ari.gaiaorbit.scenegraph.Planet;
-import gaia.cu9.ari.gaiaorbit.scenegraph.Polyline;
-import gaia.cu9.ari.gaiaorbit.scenegraph.SceneGraphNode;
+import gaia.cu9.ari.gaiaorbit.scenegraph.*;
 import gaia.cu9.ari.gaiaorbit.scenegraph.camera.CameraManager.CameraMode;
 import gaia.cu9.ari.gaiaorbit.scenegraph.camera.NaturalCamera;
-import gaia.cu9.ari.gaiaorbit.util.Constants;
-import gaia.cu9.ari.gaiaorbit.util.GlobalConf;
-import gaia.cu9.ari.gaiaorbit.util.I18n;
-import gaia.cu9.ari.gaiaorbit.util.Logger;
+import gaia.cu9.ari.gaiaorbit.util.*;
 import gaia.cu9.ari.gaiaorbit.util.Logger.Log;
-import gaia.cu9.ari.gaiaorbit.util.LruCache;
-import gaia.cu9.ari.gaiaorbit.util.Nature;
 import gaia.cu9.ari.gaiaorbit.util.coord.Coordinates;
 import gaia.cu9.ari.gaiaorbit.util.math.Intersectord;
 import gaia.cu9.ari.gaiaorbit.util.math.MathUtilsd;
 import gaia.cu9.ari.gaiaorbit.util.math.Vector2d;
 import gaia.cu9.ari.gaiaorbit.util.math.Vector3d;
 import gaia.cu9.ari.gaiaorbit.util.time.ITimeFrameProvider;
+
+import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.ZoneOffset;
+import java.time.temporal.ChronoField;
+import java.util.HashSet;
+import java.util.Set;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
  * Implementation of the scripting interface using the event system.
@@ -1683,23 +1668,16 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
 		pl.setColor(color);
 		pl.setName(name);
 		pl.setPoints(points);
-		pl.setLineWidth(lineWidth);
+		pl.setPrimitiveSize(lineWidth);
 		pl.setParent("Universe");
 		pl.initialize();
 
-		Gdx.app.postRunnable(() -> {
-			GaiaSky.instance.sg.insert(pl, true);
-		});
+		em.post(Events.SCENE_GRAPH_ADD_OBJECT_CMD, pl, true);
 	}
 
 	@Override
 	public void removeModelObject(String name) {
-		Gdx.app.postRunnable(() -> {
-			SceneGraphNode sgn = GaiaSky.instance.sg.getNode(name);
-			if (sgn != null) {
-				GaiaSky.instance.sg.remove(sgn, true);
-			}
-		});
+	    em.post(Events.SCENE_GRAPH_REMOVE_OBJECT_CMD, name, true);
 	}
 
 	@Override

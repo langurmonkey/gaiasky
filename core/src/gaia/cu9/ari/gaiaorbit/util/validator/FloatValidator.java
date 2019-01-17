@@ -6,11 +6,18 @@ public class FloatValidator extends CallbackValidator {
     private float max;
 
     public FloatValidator() {
+        this(null);
+    }
+    public FloatValidator(IValidator parent) {
         this(Float.MIN_VALUE, Float.MAX_VALUE);
     }
 
     public FloatValidator(float min, float max) {
-        super();
+        this(null, min, max);
+    }
+
+    public FloatValidator(IValidator parent, float min, float max) {
+        super(parent);
         this.min = min;
         this.max = max;
     }

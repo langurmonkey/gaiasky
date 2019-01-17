@@ -1,12 +1,10 @@
 package gaia.cu9.ari.gaiaorbit.render;
 
 import com.badlogic.gdx.math.Matrix4;
-
-import gaia.cu9.ari.gaiaorbit.data.orbit.PolylineData;
+import gaia.cu9.ari.gaiaorbit.data.util.PointCloudData;
 import gaia.cu9.ari.gaiaorbit.scenegraph.SceneGraphNode;
 
-public interface IGPULineRenderable extends IRenderable {
-
+public interface IGPUVertsRenderable extends IRenderable {
     public boolean inGpu();
 
     public void markForUpdate();
@@ -15,7 +13,7 @@ public interface IGPULineRenderable extends IRenderable {
 
     public int getCount();
 
-    public PolylineData getPolyline();
+    public PointCloudData getPointCloud();
 
     public float[] getColor();
 
@@ -31,10 +29,15 @@ public interface IGPULineRenderable extends IRenderable {
 
     public void setCount(int count);
 
-    public boolean hasMeshData();
+    public boolean isClosedLoop();
 
-    public void setLineWidth(float lineWidth);
+    public void setClosedLoop(boolean closedLoop);
 
-    public float getLineWidth();
+    /**
+     * Line width for lines, point size for points
+     * @param size The size
+     */
+    public void setPrimitiveSize(float size);
 
+    public float getPrimitiveSize();
 }

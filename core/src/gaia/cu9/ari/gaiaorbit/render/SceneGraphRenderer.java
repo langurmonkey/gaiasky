@@ -534,8 +534,12 @@ public class SceneGraphRenderer extends AbstractRenderer implements IProcessRend
         AbstractRenderSystem lineProc = getLineRenderSystem();
 
         // LINES GPU
-        AbstractRenderSystem lineGpuProc = new LineGPURenderSystem(RenderGroup.LINE_GPU, alphas, lineGpuShaders);
+        AbstractRenderSystem lineGpuProc = new VertGPURenderSystem(RenderGroup.LINE_GPU, alphas, lineGpuShaders, GL20.GL_LINE_STRIP);
         lineGpuProc.setPreRunnable(blendDepthRunnable);
+
+        // POINTS GPU
+        AbstractRenderSystem pointGpuProc = new VertGPURenderSystem(RenderGroup.POINT_GPU, alphas, lineGpuShaders, GL20.GL_POINTS);
+        pointGpuProc.setPreRunnable(blendDepthRunnable);
 
         // MODEL MESH
         AbstractRenderSystem modelMeshProc = new ModelBatchRenderSystem(RenderGroup.MODEL_MESH, alphas, modelBatchMesh, ModelRenderType.NORMAL, false);
@@ -641,6 +645,7 @@ public class SceneGraphRenderer extends AbstractRenderer implements IProcessRend
         renderProcesses.add(labelsProc);
         renderProcesses.add(lineProc);
         renderProcesses.add(lineGpuProc);
+        renderProcesses.add(pointGpuProc);
         renderProcesses.add(billboardSSOProc);
 
         renderProcesses.add(modelStarsProc);

@@ -24,7 +24,7 @@ import gaia.cu9.ari.gaiaorbit.assets.GaiaAttitudeLoader.GaiaAttitudeLoaderParame
 import gaia.cu9.ari.gaiaorbit.assets.SGLoader.SGLoaderParameter;
 import gaia.cu9.ari.gaiaorbit.data.AssetBean;
 import gaia.cu9.ari.gaiaorbit.data.StreamingOctreeLoader;
-import gaia.cu9.ari.gaiaorbit.data.orbit.PolylineData;
+import gaia.cu9.ari.gaiaorbit.data.util.PointCloudData;
 import gaia.cu9.ari.gaiaorbit.event.EventManager;
 import gaia.cu9.ari.gaiaorbit.event.Events;
 import gaia.cu9.ari.gaiaorbit.event.IObserver;
@@ -237,7 +237,7 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
         manager = new AssetManager(internalResolver);
         //manager.setLoader(Model.class, ".obj", new AdvancedObjLoader(resolver));
         manager.setLoader(ISceneGraph.class, new SGLoader(dataResolver));
-        manager.setLoader(PolylineData.class, new OrbitDataLoader(dataResolver));
+        manager.setLoader(PointCloudData.class, new OrbitDataLoader(dataResolver));
         manager.setLoader(GaiaAttitudeServer.class, new GaiaAttitudeLoader(dataResolver));
         manager.setLoader(ShaderProgram.class, new ShaderProgramProvider(internalResolver, ".vertex.glsl", ".fragment.glsl"));
         //manager.setLoader(DefaultShaderProvider.class, new DefaultShaderProviderLoader<>(resolver));
@@ -377,7 +377,7 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
         EventManager.instance.post(Events.TIME_CHANGE_INFO, time.getTime());
 
         // Subscribe to events
-        EventManager.instance.subscribe(this, Events.TOGGLE_AMBIENT_LIGHT, Events.AMBIENT_LIGHT_CMD, Events.RECORD_CAMERA_CMD, Events.CAMERA_MODE_CMD, Events.STEREOSCOPIC_CMD, Events.FRAME_SIZE_UDPATE, Events.SCREENSHOT_SIZE_UDPATE, Events.POST_RUNNABLE, Events.UNPOST_RUNNABLE);
+        EventManager.instance.subscribe(this, Events.TOGGLE_AMBIENT_LIGHT, Events.AMBIENT_LIGHT_CMD, Events.RECORD_CAMERA_CMD, Events.CAMERA_MODE_CMD, Events.STEREOSCOPIC_CMD, Events.FRAME_SIZE_UDPATE, Events.SCREENSHOT_SIZE_UDPATE, Events.POST_RUNNABLE, Events.UNPOST_RUNNABLE, Events.SCENE_GRAPH_ADD_OBJECT_CMD, Events.SCENE_GRAPH_REMOVE_OBJECT_CMD);
 
         // Re-enable input
         if (!GlobalConf.runtime.STRIPPED_FOV_MODE)
@@ -533,7 +533,6 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
 
     }
 
-
     /** Renders the scene **/
     private Runnable runnableRender = () -> {
         // Asynchronous load of textures and resources
@@ -581,12 +580,12 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
     };
 
     /** Displays the initial GUI **/
-    private Runnable runnableInitialGui = ()->{
+    private Runnable runnableInitialGui = () -> {
         renderGui(initialGui);
     };
 
     /** Displays the loading GUI **/
-    private Runnable runnableLoadingGui = () ->{
+    private Runnable runnableLoadingGui = () -> {
         if (manager.update()) {
             doneLoading();
             renderProcess = runnableRender;
@@ -840,10 +839,10 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
             }
             break;
         case STEREOSCOPIC_CMD:
-            boolean stereomode = (Boolean) data[0];
-            if (stereomode && GuiRegistry.current != stereoGui) {
+            boolean stereoMode = (Boolean) data[0];
+            if (stereoMode && GuiRegistry.current != stereoGui) {
                 GuiRegistry.change(stereoGui);
-            } else if (!stereomode && GuiRegistry.previous != stereoGui) {
+            } else if (!stereoMode && GuiRegistry.previous != stereoGui) {
                 IGui prev = GuiRegistry.current != null ? GuiRegistry.current : mainGui;
                 GuiRegistry.change(GuiRegistry.previous, prev);
             }
@@ -854,6 +853,32 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
             Gdx.app.postRunnable(() -> {
                 //clearFrameBufferMap();
             });
+            break;
+        case SCENE_GRAPH_ADD_OBJECT_CMD:
+            final SceneGraphNode nodeToAdd = (SceneGraphNode) data[0];
+            final Boolean addToIndex = data.length == 1 ? true : (Boolean) data[1];
+            if (sg != null) {
+                Gdx.app.postRunnable(() -> {
+                    sg.insert(nodeToAdd, addToIndex);
+                });
+            }
+            break;
+        case SCENE_GRAPH_REMOVE_OBJECT_CMD:
+            SceneGraphNode aux = null;
+            if(data[0] instanceof String){
+                aux = sg.getNode((String) data[0]);
+                if(aux == null)
+                    return;
+            } else {
+                aux = (SceneGraphNode) data[0];
+            }
+            final SceneGraphNode nodeToRemove = aux;
+            final Boolean removeFromIndex = data.length == 1 ? true : (Boolean) data[1];
+            if(sg != null) {
+                Gdx.app.postRunnable(()->{
+                   sg.remove(nodeToRemove, removeFromIndex);
+                });
+            }
             break;
         case POST_RUNNABLE:
             synchronized (runnables) {

@@ -1,9 +1,9 @@
 package gaia.cu9.ari.gaiaorbit.data.orbit;
 
-import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.files.FileHandle;
 
 import gaia.cu9.ari.gaiaorbit.assets.OrbitDataLoader.OrbitDataLoaderParameter;
+import gaia.cu9.ari.gaiaorbit.data.util.PointCloudData;
 import gaia.cu9.ari.gaiaorbit.event.EventManager;
 import gaia.cu9.ari.gaiaorbit.event.Events;
 import gaia.cu9.ari.gaiaorbit.util.GlobalConf;
@@ -16,7 +16,7 @@ import gaia.cu9.ari.gaiaorbit.util.Logger;
  *
  */
 public class OrbitFileDataProvider implements IOrbitDataProvider {
-    PolylineData data;
+    PointCloudData data;
 
     @Override
     public void load(String file, OrbitDataLoaderParameter parameter) {
@@ -43,7 +43,7 @@ public class OrbitFileDataProvider implements IOrbitDataProvider {
         load(file, parameter);
     }
 
-    public PolylineData getData() {
+    public PointCloudData getData() {
         return data;
     }
 
