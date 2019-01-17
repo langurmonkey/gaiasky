@@ -187,7 +187,7 @@ public class FullGui extends AbstractGui {
                             float margin = 5 * GlobalConf.SCALE_FACTOR;
                             newVersion.setPosition(Gdx.graphics.getWidth() - ww - margin, margin);
                             ui.addActor(newVersion);
-                        }else{
+                        } else {
                             // No new version
                             logger.info(txt("gui.newversion.nonew", GlobalConf.program.getLastCheckedString()));
                         }
@@ -283,6 +283,17 @@ public class FullGui extends AbstractGui {
                     }
                 }
 
+            });
+
+            /** KEYBOARD FOCUS **/
+            ui.addListener((event) -> {
+                if (event instanceof InputEvent) {
+                    InputEvent ie = (InputEvent) event;
+                    if(ie.getType() == Type.touchDown && !ie.isHandled()){
+                        ui.setKeyboardFocus(null);
+                    }
+                }
+                return false;
             });
         }
     }
