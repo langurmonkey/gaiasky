@@ -112,6 +112,9 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
     // The input multiplexer
     private InputMultiplexer inputMultiplexer;
 
+    // Registry
+    private GuiRegistry guiRegistry;
+
     /**
      * Provisional console logger
      */
@@ -346,9 +349,6 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
         GuiRegistry.setInputMultiplexer(inputMultiplexer);
         Gdx.input.setInputProcessor(inputMultiplexer);
 
-        // Init GuiRegistry object which will be in charge of listening to 'show dialog' events
-        new GuiRegistry(GlobalResources.skin);
-
         // Destroy console logger
         clogger.dispose();
         clogger = null;
@@ -472,6 +472,11 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
      * Second step in GUI initialisation.
      */
     public void reinitialiseGUI2() {
+        // Reinitialise registry to listen to relevant events
+        if(guiRegistry != null)
+            guiRegistry.dispose();
+        guiRegistry = new GuiRegistry(GlobalResources.skin);
+
         // Unregister all current GUIs
         GuiRegistry.unregisterAll();
 

@@ -178,6 +178,10 @@ public class GuiRegistry implements IObserver {
         EventManager.instance.subscribe(this, Events.SHOW_QUIT_ACTION, Events.SHOW_ABOUT_ACTION, Events.SHOW_PREFERENCES_ACTION, Events.SHOW_KEYFRAMES_WINDOW_ACTION);
     }
 
+    public void dispose(){
+        EventManager.instance.removeAllSubscriptions(this);
+    }
+
     @Override
     public void notify(Events event, Object... data) {
         if (current != null) {
