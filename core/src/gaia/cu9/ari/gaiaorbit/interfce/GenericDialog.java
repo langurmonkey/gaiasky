@@ -26,12 +26,13 @@ import static com.badlogic.gdx.scenes.scene2d.actions.Actions.fadeOut;
 import static com.badlogic.gdx.scenes.scene2d.actions.Actions.sequence;
 
 public abstract class GenericDialog extends CollapsibleWindow {
+    protected static float pad = 10f * GlobalConf.SCALE_FACTOR;
+    protected static float pad5 = 5f * GlobalConf.SCALE_FACTOR;
 
     final protected Stage stage;
     final protected Skin skin;
     protected GenericDialog me;
     protected Table content;
-    protected float pad;
     private String acceptText = null, cancelText = null;
     protected boolean modal = true;
 
@@ -82,12 +83,11 @@ public abstract class GenericDialog extends CollapsibleWindow {
     }
 
     public void buildSuper() {
-        pad = 5 * GlobalConf.SCALE_FACTOR;
 
         /** BUTTONS **/
         HorizontalGroup buttonGroup = new HorizontalGroup();
-        buttonGroup.pad(pad);
-        buttonGroup.space(pad);
+        buttonGroup.pad(pad5);
+        buttonGroup.space(pad5);
 
         if (acceptText != null) {
             acceptButton = new OwnTextButton(acceptText, skin, "default");
@@ -131,8 +131,8 @@ public abstract class GenericDialog extends CollapsibleWindow {
         }
         recalculateButtonSize();
 
-        add(content).pad(pad).row();
-        add(buttonGroup).pad(pad).bottom().right();
+        add(content).pad(pad5).row();
+        add(buttonGroup).pad(pad5).bottom().right();
         getTitleTable().align(Align.left);
 
         pack();
@@ -271,7 +271,17 @@ public abstract class GenericDialog extends CollapsibleWindow {
      */
     public GenericDialog show(Stage stage) {
         show(stage, sequence(Actions.alpha(0), Actions.fadeIn(0.4f, Interpolation.fade)));
-        setPosition(Math.round((stage.getWidth() - getWidth()) / 2), Math.round((stage.getHeight() - getHeight()) / 2));
+        setPosition(Math.round((stage.getWidth() - getWidth()) / 2f), Math.round((stage.getHeight() - getHeight()) / 2f));
+        setKeyboardFocus();
+        return this;
+    }
+
+    /**
+     * {@link #pack() Packs} the dialog and adds it to the stage at the specified position
+     */
+    public GenericDialog show(Stage stage, float x, float y) {
+        show(stage, sequence(Actions.alpha(0), Actions.fadeIn(0.4f, Interpolation.fade)));
+        setPosition(x, y);
         setKeyboardFocus();
         return this;
     }

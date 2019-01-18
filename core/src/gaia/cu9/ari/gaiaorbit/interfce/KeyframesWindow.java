@@ -16,7 +16,10 @@ import gaia.cu9.ari.gaiaorbit.event.IObserver;
 import gaia.cu9.ari.gaiaorbit.scenegraph.PathObject;
 import gaia.cu9.ari.gaiaorbit.scenegraph.camera.CameraManager;
 import gaia.cu9.ari.gaiaorbit.util.GlobalConf;
+import gaia.cu9.ari.gaiaorbit.util.I18n;
 import gaia.cu9.ari.gaiaorbit.util.Logger;
+import gaia.cu9.ari.gaiaorbit.util.format.DateFormatFactory;
+import gaia.cu9.ari.gaiaorbit.util.format.IDateFormat;
 import gaia.cu9.ari.gaiaorbit.util.format.INumberFormat;
 import gaia.cu9.ari.gaiaorbit.util.format.NumberFormatFactory;
 import gaia.cu9.ari.gaiaorbit.util.math.Vector3d;
@@ -36,11 +39,12 @@ import java.util.Date;
 public class KeyframesWindow extends GenericDialog implements IObserver {
     private static final Logger.Log logger = Logger.getLogger(KeyframesWindow.class);
 
-    private static float pad = 10f * GlobalConf.SCALE_FACTOR;
-    private static float pad5 = 5f * GlobalConf.SCALE_FACTOR;
+    private static float buttonSizeS = 13 * GlobalConf.SCALE_FACTOR;
     private static float buttonSize = 15 * GlobalConf.SCALE_FACTOR;
+    private static float buttonSizeL = 17 * GlobalConf.SCALE_FACTOR;
 
     private INumberFormat secondsFormatter;
+    private IDateFormat dateFormat;
 
     /** Seconds **/
     private OwnTextField secondsInput;
@@ -79,6 +83,7 @@ public class KeyframesWindow extends GenericDialog implements IObserver {
         this.framerate = GlobalConf.frame.CAMERA_REC_TARGET_FPS;
         this.secondsFormatter = NumberFormatFactory.getFormatter("000.00");
         this.df = new SimpleDateFormat("yyyyMMdd_HH-mm-ss-SSS");
+        this.dateFormat = DateFormatFactory.getFormatter(I18n.locale, DateFormatFactory.DateType.DATETIME);
         setModal(false);
 
         setCancelText(txt("gui.close"));
@@ -197,7 +202,7 @@ public class KeyframesWindow extends GenericDialog implements IObserver {
         rightScroll = new OwnScrollPane(keyframesTable, skin, "minimalist-nobg");
         rightScroll.setScrollingDisabled(true, false);
         rightScroll.setHeight(100 * GlobalConf.SCALE_FACTOR);
-        rightScroll.setWidth(300 * GlobalConf.SCALE_FACTOR);
+        rightScroll.setWidth(350 * GlobalConf.SCALE_FACTOR);
         rightScroll.setFadeScrollBars(true);
 
         right.add(keyframesTitle).top().left().padBottom(pad).row();
@@ -309,9 +314,28 @@ public class KeyframesWindow extends GenericDialog implements IObserver {
             return false;
         });
 
+        // Keyframe preferences
+        Image prefsImg = new Image(skin.getDrawable("prefs-icon"));
+        Button preferences = new OwnTextIconButton("Preferences", prefsImg, skin);
+        preferences.setName("keyframe preferences");
+        preferences.padTop(pad5 / 2.5f);
+        preferences.padBottom(pad5 / 2.5f);
+        preferences.padRight(pad5);
+        preferences.padLeft(pad5);
+        preferences.addListener(new TextTooltip("Edit keyframe preferences", skin));
+        preferences.addListener((event) -> {
+            if (event instanceof ChangeListener.ChangeEvent) {
+                KeyframePreferencesWindow kpw = new KeyframePreferencesWindow(stage, skin);
+                kpw.show(stage, me.getWidth(), 0);
+                return true;
+            }
+            return false;
+        });
+
         buttons.addActor(open);
         buttons.addActor(save);
         buttons.addActor(export);
+        buttons.addActor(preferences);
 
         /** FINAL LAYOUT **/
         content.add(left).top().left().padRight(pad * 2f).padBottom(pad * 3f);
@@ -347,7 +371,7 @@ public class KeyframesWindow extends GenericDialog implements IObserver {
                 pathObject.knots.setPoints(kfPositions);
                 if (keyframes.size > 1) {
                     pathObject.segments.setPoints(kfPositions);
-                    double[] pathSamples = CameraKeyframeManager.instance.samplePath(kfPositions, 20);
+                    double[] pathSamples = CameraKeyframeManager.instance.samplePath(kfPositions, 20, GlobalConf.frame.KF_PATH_TYPE_POSITION);
                     pathObject.path.setPoints(pathSamples);
                 } else {
                     pathObject.segments.clear();
@@ -362,11 +386,25 @@ public class KeyframesWindow extends GenericDialog implements IObserver {
     }
 
     private void addKeyframeToTable(Keyframe kf, int index, Table table, boolean addToModel) {
-        // Time
+        // Seconds
         double t = (double) kf.frame / (double) framerate;
-        table.add(new OwnLabel(secondsFormatter.format(t), skin, "hud-header")).left().padRight(pad).padBottom(pad5);
+        OwnLabel secondsL = new OwnLabel(secondsFormatter.format(t), skin, "hud-header");
+        secondsL.addListener(new TextTooltip(t + " seconds at " + GlobalConf.frame.RENDER_TARGET_FPS + " frames per second", skin));
+        table.add(secondsL).left().padRight(pad / 2f).padBottom(pad5);
 
         // Frame number
+        OwnLabel framesL = new OwnLabel("(" + kf.frame + ")", skin);
+        framesL.addListener(new TextTooltip(kf.frame + " frames " + (1d / GlobalConf.frame.RENDER_TARGET_FPS) + " seconds per frame", skin));
+        table.add(framesL).left().padRight(pad).padBottom(pad5);
+
+        // Clock - time
+        Image clockimg = new Image(skin.getDrawable("clock"));
+        clockimg.addListener(new TextTooltip(dateFormat.format(Instant.ofEpochMilli(kf.time)), skin));
+        clockimg.setScale(0.7f);
+        clockimg.setOrigin(Align.center);
+        table.add(clockimg).left().padRight(pad).padBottom(pad5);
+
+        // Frame name
         table.add(new OwnLabel((index + 1) + ": " + kf.name, skin)).left().padRight(pad).padBottom(pad5);
 
         // Go to
@@ -393,7 +431,7 @@ public class KeyframesWindow extends GenericDialog implements IObserver {
         // Rubbish
         Image rubbishimg = new Image(skin.getDrawable("bin-icon"));
         OwnTextIconButton rubbish = new OwnTextIconButton("", rubbishimg, skin);
-        rubbish.setSize(buttonSize, buttonSize);
+        rubbish.setSize(buttonSizeL, buttonSize);
         rubbish.addListener(new TextTooltip("Remove keyframe", skin));
         rubbish.addListener((event) -> {
             if (event instanceof ChangeListener.ChangeEvent) {
@@ -445,7 +483,7 @@ public class KeyframesWindow extends GenericDialog implements IObserver {
                 kfPositions[i * 3 + 2] = kf.pos.z;
                 i++;
             }
-            double[] pathSamples = CameraKeyframeManager.instance.samplePath(kfPositions, 20);
+            double[] pathSamples = CameraKeyframeManager.instance.samplePath(kfPositions, 20, GlobalConf.frame.KF_PATH_TYPE_POSITION);
             pathObject.path.setPoints(pathSamples);
         }
     }

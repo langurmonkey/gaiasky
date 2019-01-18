@@ -4,7 +4,6 @@ import com.badlogic.gdx.InputMultiplexer;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.utils.Array;
-
 import gaia.cu9.ari.gaiaorbit.event.EventManager;
 import gaia.cu9.ari.gaiaorbit.event.Events;
 import gaia.cu9.ari.gaiaorbit.event.IObserver;
@@ -201,7 +200,7 @@ public class GuiRegistry implements IObserver {
                 if (keyframesWindow == null)
                     keyframesWindow = new KeyframesWindow(ui, skin);
                 if (!keyframesWindow.isVisible() || !keyframesWindow.hasParent())
-                    keyframesWindow.show(ui);
+                    keyframesWindow.show(ui, 0, 0);
                 break;
             default:
                 break;

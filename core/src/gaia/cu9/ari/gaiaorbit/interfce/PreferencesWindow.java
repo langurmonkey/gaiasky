@@ -104,37 +104,37 @@ public class PreferencesWindow extends GenericDialog {
         group.align(Align.left | Align.top);
 
         final Button tabGraphics = new OwnTextIconButton(txt("gui.graphicssettings"), new Image(skin.getDrawable("icon-p-graphics")), skin, "toggle-big");
-        tabGraphics.pad(pad);
+        tabGraphics.pad(pad5);
         tabGraphics.setWidth(tabwidth);
         final Button tabUI = new OwnTextIconButton(txt("gui.ui.interfacesettings"), new Image(skin.getDrawable("icon-p-interface")), skin, "toggle-big");
-        tabUI.pad(pad);
+        tabUI.pad(pad5);
         tabUI.setWidth(tabwidth);
         final Button tabPerformance = new OwnTextIconButton(txt("gui.performance"), new Image(skin.getDrawable("icon-p-performance")), skin, "toggle-big");
-        tabPerformance.pad(pad);
+        tabPerformance.pad(pad5);
         tabPerformance.setWidth(tabwidth);
         final Button tabControls = new OwnTextIconButton(txt("gui.controls"), new Image(skin.getDrawable("icon-p-controls")), skin, "toggle-big");
-        tabControls.pad(pad);
+        tabControls.pad(pad5);
         tabControls.setWidth(tabwidth);
         final Button tabScreenshots = new OwnTextIconButton(txt("gui.screenshots"), new Image(skin.getDrawable("icon-p-screenshots")), skin, "toggle-big");
-        tabScreenshots.pad(pad);
+        tabScreenshots.pad(pad5);
         tabScreenshots.setWidth(tabwidth);
         final Button tabFrames = new OwnTextIconButton(txt("gui.frameoutput.title"), new Image(skin.getDrawable("icon-p-frameoutput")), skin, "toggle-big");
-        tabFrames.pad(pad);
+        tabFrames.pad(pad5);
         tabFrames.setWidth(tabwidth);
         final Button tabCamera = new OwnTextIconButton(txt("gui.camerarec.title"), new Image(skin.getDrawable("icon-p-camera")), skin, "toggle-big");
-        tabCamera.pad(pad);
+        tabCamera.pad(pad5);
         tabCamera.setWidth(tabwidth);
         final Button tab360 = new OwnTextIconButton(txt("gui.360.title"), new Image(skin.getDrawable("icon-p-360")), skin, "toggle-big");
-        tab360.pad(pad);
+        tab360.pad(pad5);
         tab360.setWidth(tabwidth);
         final Button tabData = new OwnTextIconButton(txt("gui.data"), new Image(skin.getDrawable("icon-p-data")), skin, "toggle-big");
-        tabData.pad(pad);
+        tabData.pad(pad5);
         tabData.setWidth(tabwidth);
         final Button tabGaia = new OwnTextIconButton(txt("gui.gaia"), new Image(skin.getDrawable("icon-p-gaia")), skin, "toggle-big");
-        tabGaia.pad(pad);
+        tabGaia.pad(pad5);
         tabGaia.setWidth(tabwidth);
         final Button tabSystem = new OwnTextIconButton(txt("gui.system"), new Image(skin.getDrawable("icon-p-system")), skin, "toggle-big");
-        tabSystem.pad(pad);
+        tabSystem.pad(pad5);
         tabSystem.setWidth(tabwidth);
 
         group.addActor(tabGraphics);
@@ -148,7 +148,7 @@ public class PreferencesWindow extends GenericDialog {
         group.addActor(tabData);
         group.addActor(tabGaia);
         group.addActor(tabSystem);
-        content.add(group).align(Align.left | Align.top).padLeft(pad);
+        content.add(group).align(Align.left | Align.top).padLeft(pad5);
 
         // Create the tab content. Just using images here for simplicity.
         Stack tabContent = new Stack();
@@ -204,13 +204,13 @@ public class PreferencesWindow extends GenericDialog {
         final OwnLabel widthLabel = new OwnLabel(txt("gui.width") + ":", skin);
         final OwnLabel heightLabel = new OwnLabel(txt("gui.height") + ":", skin);
 
-        windowedResolutions.add(widthLabel).left().padRight(pad);
-        windowedResolutions.add(widthField).left().padRight(pad);
-        windowedResolutions.add(heightLabel).left().padRight(pad);
+        windowedResolutions.add(widthLabel).left().padRight(pad5);
+        windowedResolutions.add(widthField).left().padRight(pad5);
+        windowedResolutions.add(heightLabel).left().padRight(pad5);
         windowedResolutions.add(heightField).left().row();
 
         // Radio buttons
-        fullscreen = new OwnCheckBox(txt("gui.fullscreen"), skin, "radio", pad);
+        fullscreen = new OwnCheckBox(txt("gui.fullscreen"), skin, "radio", pad5);
         fullscreen.addListener(new EventListener() {
             @Override
             public boolean handle(Event event) {
@@ -223,7 +223,7 @@ public class PreferencesWindow extends GenericDialog {
         });
         fullscreen.setChecked(GlobalConf.screen.FULLSCREEN);
 
-        windowed = new OwnCheckBox(txt("gui.windowed"), skin, "radio", pad);
+        windowed = new OwnCheckBox(txt("gui.windowed"), skin, "radio", pad5);
         windowed.addListener(new EventListener() {
             @Override
             public boolean handle(Event event) {
@@ -240,7 +240,7 @@ public class PreferencesWindow extends GenericDialog {
         new ButtonGroup<CheckBox>(fullscreen, windowed);
 
         // VSYNC
-        vsync = new OwnCheckBox(txt("gui.vsync"), skin, "default", pad);
+        vsync = new OwnCheckBox(txt("gui.vsync"), skin, "default", pad5);
         vsync.setChecked(GlobalConf.screen.VSYNC);
 
         // LIMIT FPS
@@ -248,7 +248,7 @@ public class PreferencesWindow extends GenericDialog {
         limitFps = new OwnTextField(Integer.toString(MathUtils.clamp(GlobalConf.screen.LIMIT_FPS, 1, 1000)), skin, limitfpsValidator);
         limitFps.setDisabled(GlobalConf.screen.LIMIT_FPS == 0);
 
-        limitfpsCb = new OwnCheckBox(txt("gui.limitfps"), skin, "default", pad);
+        limitfpsCb = new OwnCheckBox(txt("gui.limitfps"), skin, "default", pad5);
         limitfpsCb.setChecked(GlobalConf.screen.LIMIT_FPS > 0);
         limitfpsCb.addListener((event) -> {
             if (event instanceof ChangeEvent) {
@@ -258,17 +258,17 @@ public class PreferencesWindow extends GenericDialog {
             return false;
         });
 
-        mode.add(fullscreen).left().padRight(pad * 2);
+        mode.add(fullscreen).left().padRight(pad5 * 2);
         mode.add(fullscreenResolutions).left().row();
-        mode.add(windowed).left().padRight(pad * 2).padTop(pad * 2);
-        mode.add(windowedResolutions).left().padTop(pad * 2).row();
-        mode.add(vsync).left().padTop(pad * 2).colspan(2).row();
-        mode.add(limitfpsCb).left().padRight(pad * 2);
+        mode.add(windowed).left().padRight(pad5 * 2).padTop(pad5 * 2);
+        mode.add(windowedResolutions).left().padTop(pad5 * 2).row();
+        mode.add(vsync).left().padTop(pad5 * 2).colspan(2).row();
+        mode.add(limitfpsCb).left().padRight(pad5 * 2);
         mode.add(limitFps).left();
 
         // Add to content
-        contentGraphicsTable.add(titleResolution).left().padBottom(pad * 2).row();
-        contentGraphicsTable.add(mode).left().padBottom(pad * 4).row();
+        contentGraphicsTable.add(titleResolution).left().padBottom(pad5 * 2).row();
+        contentGraphicsTable.add(mode).left().padBottom(pad5 * 4).row();
 
         // GRAPHICS SETTINGS
         Label titleGraphics = new OwnLabel(txt("gui.graphicssettings"), skin, "help-title");
@@ -374,28 +374,28 @@ public class PreferencesWindow extends GenericDialog {
             return false;
         });
 
-        graphics.add(gqualityLabel).left().padRight(pad * 4).padBottom(pad);
-        graphics.add(gquality).left().padRight(pad * 2).padBottom(pad);
-        graphics.add(gqualityTooltip).left().padBottom(pad).row();
+        graphics.add(gqualityLabel).left().padRight(pad5 * 4).padBottom(pad5);
+        graphics.add(gquality).left().padRight(pad5 * 2).padBottom(pad5);
+        graphics.add(gqualityTooltip).left().padBottom(pad5).row();
         final Cell<Actor> noticeGraphicsCell = graphics.add((Actor) null);
         noticeGraphicsCell.colspan(3).left().row();
-        graphics.add(aaLabel).left().padRight(pad * 4).padBottom(pad);
-        graphics.add(aa).left().padRight(pad * 2).padBottom(pad);
-        graphics.add(aaTooltip).left().padBottom(pad).row();
-        graphics.add(orbitsLabel).left().padRight(pad * 4).padBottom(pad);
-        graphics.add(orbitRenderer).colspan(2).left().padBottom(pad).row();
-        graphics.add(lrLabel).left().padRight(pad * 4).padBottom(pad);
-        graphics.add(lineRenderer).colspan(2).left().padBottom(pad).row();
-        graphics.add(bloomLabel).left().padRight(pad * 4).padBottom(pad);
-        graphics.add(bloomEffect).left().padBottom(pad);
-        graphics.add(bloom).left().padBottom(pad).row();
-        graphics.add(lensFlare).colspan(3).left().padBottom(pad).row();
-        graphics.add(lightGlow).colspan(3).left().padBottom(pad).row();
-        graphics.add(motionBlur).colspan(3).left().padBottom(pad).row();
+        graphics.add(aaLabel).left().padRight(pad5 * 4).padBottom(pad5);
+        graphics.add(aa).left().padRight(pad5 * 2).padBottom(pad5);
+        graphics.add(aaTooltip).left().padBottom(pad5).row();
+        graphics.add(orbitsLabel).left().padRight(pad5 * 4).padBottom(pad5);
+        graphics.add(orbitRenderer).colspan(2).left().padBottom(pad5).row();
+        graphics.add(lrLabel).left().padRight(pad5 * 4).padBottom(pad5);
+        graphics.add(lineRenderer).colspan(2).left().padBottom(pad5).row();
+        graphics.add(bloomLabel).left().padRight(pad5 * 4).padBottom(pad5);
+        graphics.add(bloomEffect).left().padBottom(pad5);
+        graphics.add(bloom).left().padBottom(pad5).row();
+        graphics.add(lensFlare).colspan(3).left().padBottom(pad5).row();
+        graphics.add(lightGlow).colspan(3).left().padBottom(pad5).row();
+        graphics.add(motionBlur).colspan(3).left().padBottom(pad5).row();
 
         // Add to content
-        contentGraphicsTable.add(titleGraphics).left().padBottom(pad * 2).row();
-        contentGraphicsTable.add(graphics).left().padBottom(pad * 4).row();
+        contentGraphicsTable.add(titleGraphics).left().padBottom(pad5 * 2).row();
+        contentGraphicsTable.add(graphics).left().padBottom(pad5 * 4).row();
 
         // SHADOWS
         Label titleShadows = new OwnLabel(txt("gui.graphics.shadows"), skin, "help-title");
@@ -420,7 +420,7 @@ public class PreferencesWindow extends GenericDialog {
         nshadows.setDisabled(!GlobalConf.scene.SHADOW_MAPPING);
 
         // ENABLE SHADOWS
-        shadowsCb = new OwnCheckBox(txt("gui.graphics.shadows.enable"), skin, "default", pad);
+        shadowsCb = new OwnCheckBox(txt("gui.graphics.shadows.enable"), skin, "default", pad5);
         shadowsCb.setChecked(GlobalConf.scene.SHADOW_MAPPING);
         shadowsCb.addListener((event) -> {
             if (event instanceof ChangeEvent) {
@@ -434,15 +434,15 @@ public class PreferencesWindow extends GenericDialog {
         // LABELS
         labels.add(smResolutionLabel);
 
-        shadows.add(shadowsCb).left().padRight(pad * 2).padBottom(pad).row();
-        shadows.add(smResolutionLabel).left().padRight(pad * 4).padBottom(pad);
-        shadows.add(smResolution).left().padRight(pad * 2).padBottom(pad).row();
-        shadows.add(nShadowsLabel).left().padRight(pad * 4).padBottom(pad);
-        shadows.add(nshadows).left().padRight(pad * 2).padBottom(pad);
+        shadows.add(shadowsCb).left().padRight(pad5 * 2).padBottom(pad5).row();
+        shadows.add(smResolutionLabel).left().padRight(pad5 * 4).padBottom(pad5);
+        shadows.add(smResolution).left().padRight(pad5 * 2).padBottom(pad5).row();
+        shadows.add(nShadowsLabel).left().padRight(pad5 * 4).padBottom(pad5);
+        shadows.add(nshadows).left().padRight(pad5 * 2).padBottom(pad5);
 
         // Add to content
-        contentGraphicsTable.add(titleShadows).left().padBottom(pad * 2).row();
-        contentGraphicsTable.add(shadows).left().padBottom(pad * 4).row();
+        contentGraphicsTable.add(titleShadows).left().padBottom(pad5 * 2).row();
+        contentGraphicsTable.add(shadows).left().padBottom(pad5 * 4).row();
 
         // DISPLAY SETTINGS
         Label titleDisplay = new OwnLabel(txt("gui.graphics.imglevels"), skin, "help-title");
@@ -471,8 +471,8 @@ public class PreferencesWindow extends GenericDialog {
             return false;
         });
 
-        display.add(brightnessl).left().padRight(pad * 4).padBottom(pad);
-        display.add(brightness).left().padRight(pad * 2).padBottom(pad);
+        display.add(brightnessl).left().padRight(pad5 * 4).padBottom(pad5);
+        display.add(brightness).left().padRight(pad5 * 2).padBottom(pad5);
         display.add(brightnessLabel).row();
 
         /** Contrast **/
@@ -492,8 +492,8 @@ public class PreferencesWindow extends GenericDialog {
             return false;
         });
 
-        display.add(contrastl).left().padRight(pad * 4).padBottom(pad);
-        display.add(contrast).left().padRight(pad * 2).padBottom(pad);
+        display.add(contrastl).left().padRight(pad5 * 4).padBottom(pad5);
+        display.add(contrast).left().padRight(pad5 * 2).padBottom(pad5);
         display.add(contrastLabel).row();
 
         /** Hue **/
@@ -513,8 +513,8 @@ public class PreferencesWindow extends GenericDialog {
             return false;
         });
 
-        display.add(huel).left().padRight(pad * 4).padBottom(pad);
-        display.add(hue).left().padRight(pad * 2).padBottom(pad);
+        display.add(huel).left().padRight(pad5 * 4).padBottom(pad5);
+        display.add(hue).left().padRight(pad5 * 2).padBottom(pad5);
         display.add(hueLabel).row();
 
         /** Saturation **/
@@ -534,8 +534,8 @@ public class PreferencesWindow extends GenericDialog {
             return false;
         });
 
-        display.add(saturationl).left().padRight(pad * 4).padBottom(pad);
-        display.add(saturation).left().padRight(pad * 2).padBottom(pad);
+        display.add(saturationl).left().padRight(pad5 * 4).padBottom(pad5);
+        display.add(saturation).left().padRight(pad5 * 2).padBottom(pad5);
         display.add(saturationLabel).row();
 
         /** Gamma **/
@@ -555,15 +555,15 @@ public class PreferencesWindow extends GenericDialog {
             return false;
         });
 
-        display.add(gammal).left().padRight(pad * 4).padBottom(pad);
-        display.add(gamma).left().padRight(pad * 2).padBottom(pad);
+        display.add(gammal).left().padRight(pad5 * 4).padBottom(pad5);
+        display.add(gamma).left().padRight(pad5 * 2).padBottom(pad5);
         display.add(gammaLabel).row();
 
         // LABELS
         labels.addAll(brightnessl, contrastl, huel, saturationl, gammal);
 
         // Add to content
-        contentGraphicsTable.add(titleDisplay).left().padBottom(pad * 2).row();
+        contentGraphicsTable.add(titleDisplay).left().padBottom(pad5 * 2).row();
         contentGraphicsTable.add(display).left();
         /**
          * ==== UI ====
@@ -629,21 +629,21 @@ public class PreferencesWindow extends GenericDialog {
         theme.setSelected(GlobalConf.program.UI_THEME);
 
         // POINTER COORDINATES
-        pointerCoords = new OwnCheckBox(txt("gui.ui.pointercoordinates"), skin, "default", pad);
+        pointerCoords = new OwnCheckBox(txt("gui.ui.pointercoordinates"), skin, "default", pad5);
         pointerCoords.setChecked(GlobalConf.program.DISPLAY_POINTER_COORDS);
 
         // LABELS
         labels.addAll(langLabel, themeLabel);
 
         // Add to table
-        ui.add(langLabel).left().padRight(pad * 4).padBottom(pad);
-        ui.add(lang).left().padBottom(pad).row();
-        ui.add(themeLabel).left().padRight(pad * 4).padBottom(pad);
-        ui.add(theme).left().padBottom(pad).row();
-        ui.add(pointerCoords).left().padRight(pad * 2).padBottom(pad).row();
+        ui.add(langLabel).left().padRight(pad5 * 4).padBottom(pad5);
+        ui.add(lang).left().padBottom(pad5).row();
+        ui.add(themeLabel).left().padRight(pad5 * 4).padBottom(pad5);
+        ui.add(theme).left().padBottom(pad5).row();
+        ui.add(pointerCoords).left().padRight(pad5 * 2).padBottom(pad5).row();
 
         // Add to content
-        contentUI.add(titleUI).left().padBottom(pad * 2).row();
+        contentUI.add(titleUI).left().padBottom(pad5 * 2).row();
         contentUI.add(ui).left();
 
         /**
@@ -670,7 +670,7 @@ public class PreferencesWindow extends GenericDialog {
         numThreads.setItems(cbs);
         numThreads.setSelectedIndex(GlobalConf.performance.NUMBER_THREADS);
 
-        multithreadCb = new OwnCheckBox(txt("gui.thread.enable"), skin, "default", pad);
+        multithreadCb = new OwnCheckBox(txt("gui.thread.enable"), skin, "default", pad5);
         multithreadCb.addListener(new EventListener() {
             @Override
             public boolean handle(Event event) {
@@ -686,9 +686,9 @@ public class PreferencesWindow extends GenericDialog {
         numThreads.setDisabled(!multithreadCb.isChecked());
 
         // Add to table
-        multithread.add(multithreadCb).colspan(2).left().padBottom(pad).row();
-        multithread.add(numThreadsLabel).left().padRight(pad * 4).padBottom(pad);
-        multithread.add(numThreads).left().padBottom(pad).row();
+        multithread.add(multithreadCb).colspan(2).left().padBottom(pad5).row();
+        multithread.add(numThreadsLabel).left().padRight(pad5 * 4).padBottom(pad5);
+        multithread.add(numThreads).left().padBottom(pad5).row();
         final Cell<Actor> noticeMulithreadCell = multithread.add((Actor) null);
         noticeMulithreadCell.colspan(2).left();
 
@@ -713,8 +713,8 @@ public class PreferencesWindow extends GenericDialog {
         });
 
         // Add to content
-        contentPerformance.add(titleMultithread).left().padBottom(pad * 2).row();
-        contentPerformance.add(multithread).left().padBottom(pad * 4).row();
+        contentPerformance.add(titleMultithread).left().padBottom(pad5 * 2).row();
+        contentPerformance.add(multithread).left().padBottom(pad5 * 4).row();
 
         // DRAW DISTANCE
         OwnLabel titleLod = new OwnLabel(txt("gui.lod"), skin, "help-title");
@@ -722,7 +722,7 @@ public class PreferencesWindow extends GenericDialog {
         Table lod = new Table(skin);
 
         // Smooth transitions
-        lodFadeCb = new OwnCheckBox(txt("gui.lod.fade"), skin, "default", pad);
+        lodFadeCb = new OwnCheckBox(txt("gui.lod.fade"), skin, "default", pad5);
         lodFadeCb.setChecked(GlobalConf.scene.OCTREE_PARTICLE_FADE);
 
         // Draw distance
@@ -751,14 +751,14 @@ public class PreferencesWindow extends GenericDialog {
         labels.addAll(numThreadsLabel, ddLabel);
 
         // Add to table
-        lod.add(lodFadeCb).colspan(4).left().padBottom(pad).row();
-        lod.add(ddLabel).left().padRight(pad * 4).padBottom(pad);
-        lod.add(lodTransitions).left().padRight(pad * 4).padBottom(pad);
-        lod.add(lodValueLabel).left().padRight(pad * 4).padBottom(pad);
-        lod.add(lodTooltip).left().padBottom(pad);
+        lod.add(lodFadeCb).colspan(4).left().padBottom(pad5).row();
+        lod.add(ddLabel).left().padRight(pad5 * 4).padBottom(pad5);
+        lod.add(lodTransitions).left().padRight(pad5 * 4).padBottom(pad5);
+        lod.add(lodValueLabel).left().padRight(pad5 * 4).padBottom(pad5);
+        lod.add(lodTooltip).left().padBottom(pad5);
 
         // Add to content
-        contentPerformance.add(titleLod).left().padBottom(pad * 2).row();
+        contentPerformance.add(titleLod).left().padBottom(pad5 * 2).row();
         contentPerformance.add(lod).left();
 
         /**
@@ -809,7 +809,7 @@ public class PreferencesWindow extends GenericDialog {
         controllerMappings.setSelected(selected);
 
         // INVERT Y
-        inverty = new OwnCheckBox("Invert look y axis", skin, "default", pad);
+        inverty = new OwnCheckBox("Invert look y axis", skin, "default", pad5);
         inverty.setChecked(GlobalConf.controls.INVERT_LOOK_Y_AXIS);
 
         // KEY BINDINGS
@@ -857,19 +857,19 @@ public class PreferencesWindow extends GenericDialog {
         scrolls.add(controlsScroll);
 
         // Add to content
-        contentControls.add(titleController).colspan(2).left().padBottom(pad * 2).row();
-        contentControls.add(detectedLabel).left().padBottom(pad * 2).padRight(pad);
+        contentControls.add(titleController).colspan(2).left().padBottom(pad5 * 2).row();
+        contentControls.add(detectedLabel).left().padBottom(pad5 * 2).padRight(pad5);
         int ci = 0;
         for (OwnLabel cn : controllerNames) {
             if (ci > 0)
                 contentControls.add();
-            contentControls.add(cn).left().padBottom(pad * 2).row();
+            contentControls.add(cn).left().padBottom(pad5 * 2).row();
             ci++;
         }
-        contentControls.add(mappingsLabel).left().padBottom(pad * 2).padRight(pad);
-        contentControls.add(controllerMappings).left().padBottom(pad * 2).row();
-        contentControls.add(inverty).left().colspan(2).padBottom(pad * 2).row();
-        contentControls.add(titleKeybindings).colspan(2).left().padBottom(pad * 2).row();
+        contentControls.add(mappingsLabel).left().padBottom(pad5 * 2).padRight(pad5);
+        contentControls.add(controllerMappings).left().padBottom(pad5 * 2).row();
+        contentControls.add(inverty).left().colspan(2).padBottom(pad5 * 2).row();
+        contentControls.add(titleKeybindings).colspan(2).left().padBottom(pad5 * 2).row();
         contentControls.add(controlsScroll).colspan(2).left();
 
         /**
@@ -897,7 +897,7 @@ public class PreferencesWindow extends GenericDialog {
         OwnLabel screenshotsLocationLabel = new OwnLabel(txt("gui.screenshots.save"), skin);
         screenshotsLocationLabel.pack();
         screenshotsLocation = new OwnTextButton(GlobalConf.screenshot.SCREENSHOT_FOLDER, skin);
-        screenshotsLocation.pad(pad);
+        screenshotsLocation.pad(pad5);
         screenshotsLocation.addListener(new EventListener() {
             @Override
             public boolean handle(Event event) {
@@ -939,7 +939,7 @@ public class PreferencesWindow extends GenericDialog {
         ssheightField.setWidth(textwidth);
         ssheightField.setDisabled(GlobalConf.screenshot.isSimpleMode());
         HorizontalGroup ssSizeGroup = new HorizontalGroup();
-        ssSizeGroup.space(pad * 2);
+        ssSizeGroup.space(pad5 * 2);
         ssSizeGroup.addActor(sswidthField);
         ssSizeGroup.addActor(xLabel);
         ssSizeGroup.addActor(ssheightField);
@@ -973,7 +973,7 @@ public class PreferencesWindow extends GenericDialog {
         screenshotsModeTooltip.addListener(new TextTooltip(txt("gui.tooltip.screenshotmode"), skin));
 
         HorizontalGroup ssModeGroup = new HorizontalGroup();
-        ssModeGroup.space(pad);
+        ssModeGroup.space(pad5);
         ssModeGroup.addActor(screenshotMode);
         ssModeGroup.addActor(screenshotsModeTooltip);
 
@@ -981,16 +981,16 @@ public class PreferencesWindow extends GenericDialog {
         labels.addAll(screenshotsLocationLabel, ssModeLabel, screenshotsSizeLabel);
 
         // Add to table
-        screenshots.add(screenshotsInfo).colspan(2).left().padBottom(pad).row();
-        screenshots.add(screenshotsLocationLabel).left().padRight(pad * 4).padBottom(pad);
-        screenshots.add(screenshotsLocation).left().expandX().padBottom(pad).row();
-        screenshots.add(ssModeLabel).left().padRight(pad * 4).padBottom(pad);
-        screenshots.add(ssModeGroup).left().expandX().padBottom(pad).row();
-        screenshots.add(screenshotsSizeLabel).left().padRight(pad * 4).padBottom(pad);
-        screenshots.add(ssSizeGroup).left().expandX().padBottom(pad).row();
+        screenshots.add(screenshotsInfo).colspan(2).left().padBottom(pad5).row();
+        screenshots.add(screenshotsLocationLabel).left().padRight(pad5 * 4).padBottom(pad5);
+        screenshots.add(screenshotsLocation).left().expandX().padBottom(pad5).row();
+        screenshots.add(ssModeLabel).left().padRight(pad5 * 4).padBottom(pad5);
+        screenshots.add(ssModeGroup).left().expandX().padBottom(pad5).row();
+        screenshots.add(screenshotsSizeLabel).left().padRight(pad5 * 4).padBottom(pad5);
+        screenshots.add(ssSizeGroup).left().expandX().padBottom(pad5).row();
 
         // Add to content
-        contentScreenshots.add(titleScreenshots).left().padBottom(pad * 2).row();
+        contentScreenshots.add(titleScreenshots).left().padBottom(pad5 * 2).row();
         contentScreenshots.add(screenshots).left();
 
         /**
@@ -1017,7 +1017,7 @@ public class PreferencesWindow extends GenericDialog {
         // Save location
         OwnLabel frameoutputLocationLabel = new OwnLabel(txt("gui.frameoutput.location"), skin);
         frameoutputLocation = new OwnTextButton(GlobalConf.frame.RENDER_FOLDER, skin);
-        frameoutputLocation.pad(pad);
+        frameoutputLocation.pad(pad5);
         frameoutputLocation.addListener(new EventListener() {
             @Override
             public boolean handle(Event event) {
@@ -1069,7 +1069,7 @@ public class PreferencesWindow extends GenericDialog {
         foheightField.setWidth(textwidth);
         foheightField.setDisabled(GlobalConf.frame.isSimpleMode());
         HorizontalGroup foSizeGroup = new HorizontalGroup();
-        foSizeGroup.space(pad * 2);
+        foSizeGroup.space(pad5 * 2);
         foSizeGroup.addActor(fowidthField);
         foSizeGroup.addActor(xLabelfo);
         foSizeGroup.addActor(foheightField);
@@ -1103,7 +1103,7 @@ public class PreferencesWindow extends GenericDialog {
         frameoutputModeTooltip.addListener(new TextTooltip(txt("gui.tooltip.screenshotmode"), skin));
 
         HorizontalGroup foModeGroup = new HorizontalGroup();
-        foModeGroup.space(pad);
+        foModeGroup.space(pad5);
         foModeGroup.addActor(frameoutputMode);
         foModeGroup.addActor(frameoutputModeTooltip);
 
@@ -1111,20 +1111,20 @@ public class PreferencesWindow extends GenericDialog {
         labels.addAll(frameoutputLocationLabel, prefixLabel, fpsLabel, fomodeLabel, frameoutputSizeLabel);
 
         // Add to table
-        frameoutput.add(frameoutputInfo).colspan(2).left().padBottom(pad).row();
-        frameoutput.add(frameoutputLocationLabel).left().padRight(pad * 4).padBottom(pad);
-        frameoutput.add(frameoutputLocation).left().expandX().padBottom(pad).row();
-        frameoutput.add(prefixLabel).left().padRight(pad * 4).padBottom(pad);
-        frameoutput.add(frameoutputPrefix).left().padBottom(pad).row();
-        frameoutput.add(fpsLabel).left().padRight(pad * 4).padBottom(pad);
-        frameoutput.add(frameoutputFps).left().padBottom(pad).row();
-        frameoutput.add(fomodeLabel).left().padRight(pad * 4).padBottom(pad);
-        frameoutput.add(foModeGroup).left().expandX().padBottom(pad).row();
-        frameoutput.add(frameoutputSizeLabel).left().padRight(pad * 4).padBottom(pad);
-        frameoutput.add(foSizeGroup).left().expandX().padBottom(pad).row();
+        frameoutput.add(frameoutputInfo).colspan(2).left().padBottom(pad5).row();
+        frameoutput.add(frameoutputLocationLabel).left().padRight(pad5 * 4).padBottom(pad5);
+        frameoutput.add(frameoutputLocation).left().expandX().padBottom(pad5).row();
+        frameoutput.add(prefixLabel).left().padRight(pad5 * 4).padBottom(pad5);
+        frameoutput.add(frameoutputPrefix).left().padBottom(pad5).row();
+        frameoutput.add(fpsLabel).left().padRight(pad5 * 4).padBottom(pad5);
+        frameoutput.add(frameoutputFps).left().padBottom(pad5).row();
+        frameoutput.add(fomodeLabel).left().padRight(pad5 * 4).padBottom(pad5);
+        frameoutput.add(foModeGroup).left().expandX().padBottom(pad5).row();
+        frameoutput.add(frameoutputSizeLabel).left().padRight(pad5 * 4).padBottom(pad5);
+        frameoutput.add(foSizeGroup).left().expandX().padBottom(pad5).row();
 
         // Add to content
-        contentFrames.add(titleFrameoutput).left().padBottom(pad * 2).row();
+        contentFrames.add(titleFrameoutput).left().padBottom(pad5 * 2).row();
         contentFrames.add(frameoutput).left();
 
         /**
@@ -1144,15 +1144,36 @@ public class PreferencesWindow extends GenericDialog {
         camrecFps = new OwnTextField(Integer.toString(GlobalConf.frame.CAMERA_REC_TARGET_FPS), skin, new IntValidator(1, 200));
         camrecFps.setWidth(textwidth * 3f);
 
+
+        // Keyframe preferences
+        Image prefsImg = new Image(skin.getDrawable("prefs-icon"));
+        Button keyframePrefs = new OwnTextIconButton("Preferences", prefsImg, skin);
+        keyframePrefs.setName("keyframe preferences");
+        keyframePrefs.pad(pad5);
+        keyframePrefs.addListener(new TextTooltip("Edit keyframe preferences", skin));
+        keyframePrefs.addListener((event) -> {
+            if (event instanceof ChangeListener.ChangeEvent) {
+                KeyframePreferencesWindow kpw = new KeyframePreferencesWindow(stage, skin);
+                kpw.setAcceptRunnable(()->{
+                    if(kpw.camrecFps != null && kpw.camrecFps.isValid()) {
+                        camrecFps.setText(kpw.camrecFps.getText());
+                    }
+                });
+                kpw.show(stage);
+                return true;
+            }
+            return false;
+        });
+
         // Activate automatically
-        cbAutoCamrec = new OwnCheckBox(txt("gui.camerarec.frameoutput"), skin, "default", pad);
+        cbAutoCamrec = new OwnCheckBox(txt("gui.camerarec.frameoutput"), skin, "default", pad5);
         cbAutoCamrec.setChecked(GlobalConf.frame.AUTO_FRAME_OUTPUT_CAMERA_PLAY);
         cbAutoCamrec.addListener(new TextTooltip(txt("gui.tooltip.playcamera.frameoutput"), skin));
         OwnImageButton camrecTooltip = new OwnImageButton(skin, "tooltip");
         camrecTooltip.addListener(new TextTooltip(txt("gui.tooltip.playcamera.frameoutput"), skin));
 
         HorizontalGroup cbGroup = new HorizontalGroup();
-        cbGroup.space(pad);
+        cbGroup.space(pad5);
         cbGroup.addActor(cbAutoCamrec);
         cbGroup.addActor(camrecTooltip);
 
@@ -1160,12 +1181,13 @@ public class PreferencesWindow extends GenericDialog {
         labels.add(camfpsLabel);
 
         // Add to table
-        camrec.add(camfpsLabel).left().padRight(pad * 4).padBottom(pad);
-        camrec.add(camrecFps).left().expandX().padBottom(pad).row();
-        camrec.add(cbGroup).colspan(2).left().padBottom(pad).row();
+        camrec.add(camfpsLabel).left().padRight(pad5 * 4).padBottom(pad5);
+        camrec.add(camrecFps).left().expandX().padBottom(pad5).row();
+        camrec.add(cbGroup).colspan(2).left().padBottom(pad5 * 2).row();
+        camrec.add(keyframePrefs).colspan(2).left().row();
 
         // Add to content
-        contentCamera.add(titleCamrec).left().padBottom(pad * 2).row();
+        contentCamera.add(titleCamrec).left().padBottom(pad5 * 2).row();
         contentCamera.add(camrec).left();
 
         /**
@@ -1197,12 +1219,12 @@ public class PreferencesWindow extends GenericDialog {
         labels.add(cmResolutionLabel);
 
         // Add to table
-        cubemap.add(cmInfo).colspan(2).left().padBottom(pad).row();
-        cubemap.add(cmResolutionLabel).left().padRight(pad * 4).padBottom(pad);
-        cubemap.add(cmResolution).left().expandX().padBottom(pad).row();
+        cubemap.add(cmInfo).colspan(2).left().padBottom(pad5).row();
+        cubemap.add(cmResolutionLabel).left().padRight(pad5 * 4).padBottom(pad5);
+        cubemap.add(cmResolution).left().expandX().padBottom(pad5).row();
 
         // Add to content
-        content360.add(titleCubemap).left().padBottom(pad * 2).row();
+        content360.add(titleCubemap).left().padBottom(pad5 * 2).row();
         content360.add(cubemap).left();
 
         /**
@@ -1218,14 +1240,14 @@ public class PreferencesWindow extends GenericDialog {
 
         // GENERAL OPTIONS
         OwnLabel titleGeneralData = new OwnLabel(txt("gui.data.options"), skin, "help-title");
-        highAccuracyPositions = new OwnCheckBox(txt("gui.data.highaccuracy"), skin, pad);
+        highAccuracyPositions = new OwnCheckBox(txt("gui.data.highaccuracy"), skin, pad5);
         highAccuracyPositions.setChecked(GlobalConf.data.HIGH_ACCURACY_POSITIONS);
         highAccuracyPositions.addListener(new TextTooltip(txt("gui.data.highaccuracy.tooltip"), skin));
         OwnImageButton highAccTooltip = new OwnImageButton(skin, "tooltip");
         highAccTooltip.addListener(new TextTooltip(txt("gui.data.highaccuracy.tooltip"), skin));
 
         HorizontalGroup haGroup = new HorizontalGroup();
-        haGroup.space(pad);
+        haGroup.space(pad5);
         haGroup.addActor(highAccuracyPositions);
         haGroup.addActor(highAccTooltip);
 
@@ -1237,7 +1259,7 @@ public class PreferencesWindow extends GenericDialog {
         Array<FileHandle> catalogFiles = dw.buildCatalogFiles();
         Actor datasource = dw.buildDatasetsWidget(catalogFiles, false);
 
-        datasetChooser = new OwnCheckBox(txt("gui.data.dschooser"), skin, pad);
+        datasetChooser = new OwnCheckBox(txt("gui.data.dschooser"), skin, pad5);
         datasetChooser.setChecked(GlobalConf.program.DISPLAY_DATASET_DIALOG);
 
         OwnTextButton dataDownload = new OwnTextButton(txt("gui.download.title"), skin);
@@ -1253,11 +1275,11 @@ public class PreferencesWindow extends GenericDialog {
         });
 
         // Add to content
-        contentDataTable.add(titleGeneralData).left().padBottom(pad * 2).row();
-        contentDataTable.add(haGroup).left().padBottom(pad * 2).row();
-        contentDataTable.add(titleData).left().padBottom(pad * 2).row();
-        contentDataTable.add(datasource).left().padBottom(pad * 2).row();
-        contentDataTable.add(datasetChooser).left().padBottom(pad * 2).row();
+        contentDataTable.add(titleGeneralData).left().padBottom(pad5 * 2).row();
+        contentDataTable.add(haGroup).left().padBottom(pad5 * 2).row();
+        contentDataTable.add(titleData).left().padBottom(pad5 * 2).row();
+        contentDataTable.add(datasource).left().padBottom(pad5 * 2).row();
+        contentDataTable.add(datasetChooser).left().padBottom(pad5 * 2).row();
         contentDataTable.add(dataDownload).left();
 
         /**
@@ -1271,16 +1293,16 @@ public class PreferencesWindow extends GenericDialog {
         OwnLabel titleAttitude = new OwnLabel(txt("gui.gaia.attitude"), skin, "help-title");
         Table attitude = new Table(skin);
 
-        real = new OwnCheckBox(txt("gui.gaia.real"), skin, "radio", pad);
+        real = new OwnCheckBox(txt("gui.gaia.real"), skin, "radio", pad5);
         real.setChecked(GlobalConf.data.REAL_GAIA_ATTITUDE);
-        nsl = new OwnCheckBox(txt("gui.gaia.nsl"), skin, "radio", pad);
+        nsl = new OwnCheckBox(txt("gui.gaia.nsl"), skin, "radio", pad5);
         nsl.setChecked(!GlobalConf.data.REAL_GAIA_ATTITUDE);
 
         new ButtonGroup<CheckBox>(real, nsl);
 
         // Add to table
-        attitude.add(nsl).left().padBottom(pad).row();
-        attitude.add(real).left().padBottom(pad).row();
+        attitude.add(nsl).left().padBottom(pad5).row();
+        attitude.add(real).left().padBottom(pad5).row();
         final Cell<Actor> noticeAttCell = attitude.add((Actor) null);
         noticeAttCell.colspan(2).left();
 
@@ -1307,7 +1329,7 @@ public class PreferencesWindow extends GenericDialog {
         nsl.addListener(attNoticeListener);
 
         // Add to content
-        contentGaia.add(titleAttitude).left().padBottom(pad * 2).row();
+        contentGaia.add(titleAttitude).left().padBottom(pad5 * 2).row();
         contentGaia.add(attitude).left();
 
         /**
@@ -1322,7 +1344,7 @@ public class PreferencesWindow extends GenericDialog {
         Table stats = new Table(skin);
 
         debugInfoBak = GlobalConf.program.SHOW_DEBUG_INFO;
-        debugInfo = new OwnCheckBox(txt("gui.system.debuginfo"), skin, pad);
+        debugInfo = new OwnCheckBox(txt("gui.system.debuginfo"), skin, pad5);
         debugInfo.setChecked(GlobalConf.program.SHOW_DEBUG_INFO);
         debugInfo.addListener((event) -> {
             if (event instanceof ChangeEvent) {
@@ -1332,7 +1354,7 @@ public class PreferencesWindow extends GenericDialog {
             return false;
         });
 
-        report = new OwnCheckBox(txt("gui.system.allowreporting"), skin, pad);
+        report = new OwnCheckBox(txt("gui.system.allowreporting"), skin, pad5);
         report.setChecked(GlobalConf.program.ANALYTICS_ENABLED);
 
         // RELOAD DEFAULTS
@@ -1358,13 +1380,13 @@ public class PreferencesWindow extends GenericDialog {
         OwnLabel warningLabel = new OwnLabel(txt("gui.system.reloaddefaults.warn"), skin, "default-red");
 
         // Add to table
-        stats.add(debugInfo).left().padBottom(pad).row();
-        stats.add(report).left().padBottom(pad * 5).row();
-        stats.add(warningLabel).left().padBottom(pad).row();
+        stats.add(debugInfo).left().padBottom(pad5).row();
+        stats.add(report).left().padBottom(pad5 * 5).row();
+        stats.add(warningLabel).left().padBottom(pad5).row();
         stats.add(reloadDefaults).left();
 
         // Add to content
-        contentSystem.add(titleStats).left().padBottom(pad * 2).row();
+        contentSystem.add(titleStats).left().padBottom(pad5 * 2).row();
         contentSystem.add(stats).left();
 
         /** COMPUTE LABEL WIDTH **/

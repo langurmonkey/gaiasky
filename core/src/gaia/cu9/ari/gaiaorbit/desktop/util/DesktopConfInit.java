@@ -2,6 +2,7 @@ package gaia.cu9.ari.gaiaorbit.desktop.util;
 
 import com.badlogic.gdx.Gdx;
 import gaia.cu9.ari.gaiaorbit.desktop.GaiaSkyDesktop;
+import gaia.cu9.ari.gaiaorbit.desktop.util.camera.CameraKeyframeManager;
 import gaia.cu9.ari.gaiaorbit.render.ComponentType;
 import gaia.cu9.ari.gaiaorbit.util.*;
 import gaia.cu9.ari.gaiaorbit.util.GlobalConf.*;
@@ -283,8 +284,12 @@ public class DesktopConfInit extends ConfInit {
         ScreenshotMode FRAME_MODE = ScreenshotMode.valueOf(p.getProperty("graphics.render.mode"));
         ImageFormat FRAME_FORMAT = ImageFormat.valueOf(p.getProperty("graphics.render.format", "jpg").toUpperCase());
         float FRAME_QUALITY = Float.parseFloat(p.getProperty("graphics.render.quality", "0.93"));
+
+        CameraKeyframeManager.PathType KF_POS = CameraKeyframeManager.PathType.valueOf(p.getProperty("graphics.camera.keyframe.path.position", CameraKeyframeManager.PathType.SPLINE.toString()));
+        CameraKeyframeManager.PathType KF_ORI = CameraKeyframeManager.PathType.valueOf(p.getProperty("graphics.camera.keyframe.path.orientation", CameraKeyframeManager.PathType.SPLINE.toString()));
+
         FrameConf fc = new FrameConf();
-        fc.initialize(RENDER_WIDTH, RENDER_HEIGHT, RENDER_TARGET_FPS, CAMERA_REC_TARGET_FPS, AUTO_FRAME_OUTPUT_CAMERA_PLAY, RENDER_FOLDER, RENDER_FILE_NAME, RENDER_SCREENSHOT_TIME, RENDER_SCREENSHOT_TIME, FRAME_MODE, FRAME_FORMAT, FRAME_QUALITY);
+        fc.initialize(RENDER_WIDTH, RENDER_HEIGHT, RENDER_TARGET_FPS, CAMERA_REC_TARGET_FPS, AUTO_FRAME_OUTPUT_CAMERA_PLAY, RENDER_FOLDER, RENDER_FILE_NAME, RENDER_SCREENSHOT_TIME, RENDER_SCREENSHOT_TIME, FRAME_MODE, FRAME_FORMAT, FRAME_QUALITY, KF_POS, KF_ORI);
 
         /** SCREEN CONF **/
         int SCREEN_WIDTH = Integer.parseInt(p.getProperty("graphics.screen.width"));
@@ -375,6 +380,8 @@ public class DesktopConfInit extends ConfInit {
         p.setProperty("graphics.render.targetfps", Integer.toString(GlobalConf.frame.RENDER_TARGET_FPS));
         p.setProperty("graphics.camera.recording.targetfps", Integer.toString(GlobalConf.frame.CAMERA_REC_TARGET_FPS));
         p.setProperty("graphics.camera.recording.frameoutputauto", Boolean.toString(GlobalConf.frame.AUTO_FRAME_OUTPUT_CAMERA_PLAY));
+        p.setProperty("graphics.camera.keyframe.path.position", GlobalConf.frame.KF_PATH_TYPE_POSITION.toString());
+        p.setProperty("graphics.camera.keyframe.path.orientation", GlobalConf.frame.KF_PATH_TYPE_ORIENTATION.toString());
         p.setProperty("graphics.render.time", Boolean.toString(GlobalConf.frame.RENDER_SCREENSHOT_TIME));
         p.setProperty("graphics.render.mode", GlobalConf.frame.FRAME_MODE.toString());
         p.setProperty("graphics.render.format", GlobalConf.frame.FRAME_FORMAT.toString().toLowerCase());

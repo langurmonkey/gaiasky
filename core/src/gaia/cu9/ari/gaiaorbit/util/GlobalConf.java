@@ -8,6 +8,7 @@ import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.utils.Array;
 import com.bitfire.postprocessing.effects.CubemapProjections.CubemapProjection;
 import gaia.cu9.ari.gaiaorbit.GaiaSky;
+import gaia.cu9.ari.gaiaorbit.desktop.util.camera.CameraKeyframeManager;
 import gaia.cu9.ari.gaiaorbit.event.EventManager;
 import gaia.cu9.ari.gaiaorbit.event.Events;
 import gaia.cu9.ari.gaiaorbit.event.IObserver;
@@ -30,7 +31,6 @@ import java.util.List;
  * Holds the global configuration options
  *
  * @author Toni Sagrista
- *
  */
 public class GlobalConf {
     private static final Log logger = Logger.getLogger(GlobalConf.class);
@@ -252,31 +252,31 @@ public class GlobalConf {
 
         }
 
-        public boolean isControllerBlacklisted(String controllerName){
-            if(CONTROLLER_BLACKLIST == null || CONTROLLER_BLACKLIST.length == 0){
+        public boolean isControllerBlacklisted(String controllerName) {
+            if (CONTROLLER_BLACKLIST == null || CONTROLLER_BLACKLIST.length == 0) {
                 return false;
-            }else{
-                for(String cn : CONTROLLER_BLACKLIST){
-                    if(controllerName.equalsIgnoreCase(cn))
+            } else {
+                for (String cn : CONTROLLER_BLACKLIST) {
+                    if (controllerName.equalsIgnoreCase(cn))
                         return true;
                 }
             }
             return false;
         }
 
-        public void addControllerListener(ControllerListener listener){
+        public void addControllerListener(ControllerListener listener) {
             Array<Controller> controllers = Controllers.getControllers();
-            for(Controller controller : controllers){
-               if(!isControllerBlacklisted(controller.getName())) {
-                   controller.addListener(listener);
-               }
+            for (Controller controller : controllers) {
+                if (!isControllerBlacklisted(controller.getName())) {
+                    controller.addListener(listener);
+                }
             }
         }
 
-        public void removeControllerListener(ControllerListener listener){
+        public void removeControllerListener(ControllerListener listener) {
             Array<Controller> controllers = Controllers.getControllers();
-            for(Controller controller : controllers){
-                if(!isControllerBlacklisted(controller.getName())) {
+            for (Controller controller : controllers) {
+                if (!isControllerBlacklisted(controller.getName())) {
                     controller.removeListener(listener);
                 }
             }
@@ -287,7 +287,6 @@ public class GlobalConf {
      * Runtime configuration values, which are never persisted.
      *
      * @author Toni Sagrista
-     *
      */
     public static class RuntimeConf implements IConf, IObserver {
 
@@ -396,7 +395,6 @@ public class GlobalConf {
      * recording.
      *
      * @author Toni Sagrista
-     *
      */
     public static class FrameConf implements IConf, IObserver {
         public static final int MIN_FRAME_SIZE = 50;
@@ -429,6 +427,11 @@ public class GlobalConf {
         /** Quality, in case format is JPG **/
         public float FRAME_QUALITY;
 
+        /** Path type of camera position **/
+        public CameraKeyframeManager.PathType KF_PATH_TYPE_POSITION;
+        /** Path type of camera orientation **/
+        public CameraKeyframeManager.PathType KF_PATH_TYPE_ORIENTATION;
+
         public FrameConf() {
             EventManager.instance.subscribe(this, Events.CONFIG_FRAME_OUTPUT, Events.FRAME_OUTPUT_CMD);
         }
@@ -441,7 +444,7 @@ public class GlobalConf {
             return FRAME_MODE.equals(ScreenshotMode.redraw);
         }
 
-        public void initialize(int rENDER_WIDTH, int rENDER_HEIGHT, int rENDER_TARGET_FPS, int cAMERA_REC_TARGET_FPS, boolean aUTO_FRAME_OUTPUT_CAMERA_PLAY, String rENDER_FOLDER, String rENDER_FILE_NAME, boolean rENDER_SCREENSHOT_TIME, boolean rENDER_OUTPUT, ScreenshotMode fRAME_MODE, ImageFormat fRAME_FORMAT, float fRAME_QUALITY) {
+        public void initialize(int rENDER_WIDTH, int rENDER_HEIGHT, int rENDER_TARGET_FPS, int cAMERA_REC_TARGET_FPS, boolean aUTO_FRAME_OUTPUT_CAMERA_PLAY, String rENDER_FOLDER, String rENDER_FILE_NAME, boolean rENDER_SCREENSHOT_TIME, boolean rENDER_OUTPUT, ScreenshotMode fRAME_MODE, ImageFormat fRAME_FORMAT, float fRAME_QUALITY, CameraKeyframeManager.PathType kF_PATH_TYPE_POSITION, CameraKeyframeManager.PathType kF_PATH_TYPE_ORIENTATION) {
             RENDER_WIDTH = rENDER_WIDTH;
             RENDER_HEIGHT = rENDER_HEIGHT;
             RENDER_TARGET_FPS = rENDER_TARGET_FPS;
@@ -454,6 +457,8 @@ public class GlobalConf {
             FRAME_MODE = fRAME_MODE;
             FRAME_FORMAT = fRAME_FORMAT;
             FRAME_QUALITY = fRAME_QUALITY;
+            KF_PATH_TYPE_ORIENTATION = kF_PATH_TYPE_ORIENTATION;
+            KF_PATH_TYPE_POSITION = kF_PATH_TYPE_POSITION;
         }
 
         @Override
@@ -488,7 +493,6 @@ public class GlobalConf {
      * Holds all configuration values related to data.
      *
      * @author Toni Sagrista
-     *
      */
     public static class DataConf implements IConf {
 
@@ -622,7 +626,7 @@ public class GlobalConf {
             }
         }
 
-        /** 
+        /**
          * In a client-server configuration, this instance of Gaia Sky acts as a slave and
          * receives the state over the network if this is set to true
          */
@@ -725,6 +729,7 @@ public class GlobalConf {
 
         /**
          * Returns whether the UI theme is in night mode
+         *
          * @return
          */
         public boolean isUINightMode() {
@@ -936,8 +941,8 @@ public class GlobalConf {
         public float OCTANT_THRESHOLD_1;
 
         /**
-         * In the case of multifile LOD datasets (such as DR2+), this setting contains 
-         * the maximum number of stars loaded at a time. If the number of loaded stars 
+         * In the case of multifile LOD datasets (such as DR2+), this setting contains
+         * the maximum number of stars loaded at a time. If the number of loaded stars
          * surpasses this setting, the system will start looking for the best candidates
          * to be unloaded and start unloading data. Should not be set too low, and this should
          * be balanced with the dataset and the draw distance.

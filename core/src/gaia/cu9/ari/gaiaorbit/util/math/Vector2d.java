@@ -207,13 +207,13 @@ public class Vector2d implements Serializable, Vectord<Vector2d> {
     public static double dst(double x1, double y1, double x2, double y2) {
         final double x_d = x2 - x1;
         final double y_d = y2 - y1;
-        return (double) Math.sqrt(x_d * x_d + y_d * y_d);
+        return Math.sqrt(x_d * x_d + y_d * y_d);
     }
 
     public double dst(Vector2d v) {
         final double x_d = v.x - x;
         final double y_d = v.y - y;
-        return (double) Math.sqrt(x_d * x_d + y_d * y_d);
+        return Math.sqrt(x_d * x_d + y_d * y_d);
     }
 
     /**
@@ -224,7 +224,7 @@ public class Vector2d implements Serializable, Vectord<Vector2d> {
     public double dst(double x, double y) {
         final double x_d = x - this.x;
         final double y_d = y - this.y;
-        return (double) Math.sqrt(x_d * x_d + y_d * y_d);
+        return Math.sqrt(x_d * x_d + y_d * y_d);
     }
 
     public static double dst2(double x1, double y1, double x2, double y2) {

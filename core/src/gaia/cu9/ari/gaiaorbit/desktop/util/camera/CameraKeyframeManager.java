@@ -5,6 +5,7 @@ import gaia.cu9.ari.gaiaorbit.desktop.util.SysUtils;
 import gaia.cu9.ari.gaiaorbit.event.EventManager;
 import gaia.cu9.ari.gaiaorbit.event.Events;
 import gaia.cu9.ari.gaiaorbit.event.IObserver;
+import gaia.cu9.ari.gaiaorbit.util.GlobalConf;
 import gaia.cu9.ari.gaiaorbit.util.Logger;
 import gaia.cu9.ari.gaiaorbit.util.math.CatmullRomSplined;
 import gaia.cu9.ari.gaiaorbit.util.math.Lineard;
@@ -36,12 +37,10 @@ public class CameraKeyframeManager implements IObserver {
     }
 
     public enum PathType {
-        SPLINE, LINEAR
+        LINEAR, SPLINE
     }
 
-    public PathType pathType = PathType.SPLINE;
-
-    private Pathd<Vector3d> getPath(Vector3d[] data) {
+    private Pathd<Vector3d> getPath(Vector3d[] data, PathType pathType) {
         if (pathType == PathType.LINEAR) {
             return new Lineard<>(data);
         } else if (pathType == PathType.SPLINE) {
@@ -124,7 +123,7 @@ public class CameraKeyframeManager implements IObserver {
 
     }
 
-    public double[] samplePath(double[] points, int samplesPerSegment) {
+    public double[] samplePath(double[] points, int samplesPerSegment, PathType pathType) {
         Vector3d[] pts = new Vector3d[points.length / 3];
         for (int i = 0; i < pts.length; i++) {
             int j = i * 3;
@@ -135,7 +134,7 @@ public class CameraKeyframeManager implements IObserver {
         double[] result = new double[nSamples * 3];
 
         Vector3d aux = new Vector3d();
-        Pathd<Vector3d> sampler = getPath(pts);
+        Pathd<Vector3d> sampler = getPath(pts, pathType);
         double step = 1d / nChunks;
         int i = 0;
         for (double t = 0d; i < result.length; t += step) {
@@ -178,9 +177,9 @@ public class CameraKeyframeManager implements IObserver {
             }
 
             // Catmull-Rom splines for pos, dir, up
-            Pathd<Vector3d> posSpline = getPath(positions);
-            Pathd<Vector3d> dirSpline = getPath(directions);
-            Pathd<Vector3d> upSpline = getPath(ups);
+            Pathd<Vector3d> posSpline = getPath(positions, GlobalConf.frame.KF_PATH_TYPE_POSITION);
+            Pathd<Vector3d> dirSpline = getPath(directions, GlobalConf.frame.KF_PATH_TYPE_ORIENTATION);
+            Pathd<Vector3d> upSpline = getPath(ups, GlobalConf.frame.KF_PATH_TYPE_ORIENTATION);
 
             Vector3d aux = new Vector3d();
 
