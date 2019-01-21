@@ -864,7 +864,11 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
             final Boolean addToIndex = data.length == 1 ? true : (Boolean) data[1];
             if (sg != null) {
                 Gdx.app.postRunnable(() -> {
-                    sg.insert(nodeToAdd, addToIndex);
+                    try {
+                        sg.insert(nodeToAdd, addToIndex);
+                    }catch (Exception e){
+                        logger.error(e);
+                    }
                 });
             }
             break;

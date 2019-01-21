@@ -36,6 +36,7 @@ public abstract class GenericDialog extends CollapsibleWindow {
     private String acceptText = null, cancelText = null;
     protected boolean modal = true;
 
+    protected HorizontalGroup buttonGroup;
     protected TextButton acceptButton, cancelButton;
 
     private Runnable acceptRunnable, cancelRunnable;
@@ -75,17 +76,19 @@ public abstract class GenericDialog extends CollapsibleWindow {
     }
 
     protected void recalculateButtonSize() {
-        float w = Math.max(Math.max(acceptButton != null ? acceptButton.getWidth() : 0, cancelButton != null ? cancelButton.getWidth() : 0) + 10 * GlobalConf.SCALE_FACTOR, 80 * GlobalConf.SCALE_FACTOR);
-        if (acceptButton != null)
-            acceptButton.setWidth(w);
-        if (cancelButton != null)
-            cancelButton.setWidth(w);
+        float w = 80 * GlobalConf.SCALE_FACTOR;
+        for(Actor button : buttonGroup.getChildren()){
+            w = Math.max(button.getWidth(), w);
+        }
+        for(Actor button : buttonGroup.getChildren()){
+            button.setWidth(w);
+        }
     }
 
     public void buildSuper() {
 
         /** BUTTONS **/
-        HorizontalGroup buttonGroup = new HorizontalGroup();
+        buttonGroup = new HorizontalGroup();
         buttonGroup.pad(pad5);
         buttonGroup.space(pad5);
 

@@ -1,7 +1,9 @@
 package gaia.cu9.ari.gaiaorbit.interfce;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.Input;
 import com.badlogic.gdx.files.FileHandle;
+import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
@@ -33,6 +35,8 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.time.Instant;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 
 public class KeyframesWindow extends GenericDialog implements IObserver {
     private static final Logger.Log logger = Logger.getLogger(KeyframesWindow.class);
@@ -56,6 +60,8 @@ public class KeyframesWindow extends GenericDialog implements IObserver {
     private Table keyframesTable;
     /** Notice cell **/
     private Cell notice;
+    /** Seconds cells **/
+    private Map<Keyframe, Cell> secondsCells;
     /** Scroll for keyframes **/
     private OwnScrollPane rightScroll;
     /** Frames per second **/
@@ -75,7 +81,8 @@ public class KeyframesWindow extends GenericDialog implements IObserver {
     public KeyframesWindow(Stage stage, Skin skin) {
         super("Camera recorder - Keyframes", skin, stage);
 
-        this.keyframes = new Array<Keyframe>();
+        this.keyframes = new Array<>();
+        this.secondsCells = new HashMap<>();
         this.framerate = GlobalConf.frame.CAMERA_REC_TARGET_FPS;
         this.secondsFormatter = NumberFormatFactory.getFormatter("000.00");
         this.df = new SimpleDateFormat("yyyyMMdd_HH-mm-ss-SSS");
@@ -280,9 +287,9 @@ public class KeyframesWindow extends GenericDialog implements IObserver {
         preferences.addListener((event) -> {
             if (event instanceof ChangeListener.ChangeEvent) {
                 KeyframePreferencesWindow kpw = new KeyframePreferencesWindow(stage, skin);
-                kpw.setAcceptRunnable(()->{
+                kpw.setAcceptRunnable(() -> {
                     // Resample
-                    Gdx.app.postRunnable(()->{
+                    Gdx.app.postRunnable(() -> {
                         resamplePath(keyframes);
                     });
                 });
@@ -303,6 +310,20 @@ public class KeyframesWindow extends GenericDialog implements IObserver {
         notice = content.add();
         notice.padBottom(pad * 2f).center().colspan(2).row();
         content.add(buttons).colspan(2).right();
+
+        OwnTextButton clear = new OwnTextButton("Clear", skin);
+        clear.setName("clear");
+        clear.addListener((event) -> {
+            if (event instanceof ChangeListener.ChangeEvent) {
+                Gdx.app.postRunnable(() -> {
+                    clean();
+                });
+                return true;
+            }
+            return false;
+        });
+        buttonGroup.addActorAt(0, clear);
+        recalculateButtonSize();
     }
 
     /**
@@ -330,8 +351,8 @@ public class KeyframesWindow extends GenericDialog implements IObserver {
                     cUp.set(up);
                 }
 
-                // Seconds after
-                double secsAfter = Double.parseDouble(secondsInput.getText());
+                // Seconds after - first keyframe at zero
+                double secsAfter = keyframes.size == 0 ? 0 : Double.parseDouble(secondsInput.getText());
 
                 // Name
                 String name;
@@ -425,11 +446,67 @@ public class KeyframesWindow extends GenericDialog implements IObserver {
         addKeyframeToTable(kf, prevT, index, table, false);
     }
 
+    private long lastMs = 0l;
+
+    private void addSecondsL(Keyframe kf, double prevT, int index, Table table) {
+        // Seconds
+        OwnLabel secondsL = new OwnLabel(secondsFormatter.format(prevT + kf.seconds), skin, "hud-header");
+        Cell secondsCell = null;
+        if (secondsCells.containsKey(kf))
+            secondsCell = secondsCells.get(kf);
+        else {
+            secondsCell = table.add();
+            secondsCells.put(kf, secondsCell);
+        }
+        secondsCell.setActor(secondsL).left().padRight(pad / 2f).padBottom(pad5);
+        secondsL.addListener(new TextTooltip(kf.seconds + " seconds after previous keyframe - @" + GlobalConf.frame.RENDER_TARGET_FPS + "FPS", skin));
+        if (index > 0)
+            secondsL.addListener((event) -> {
+                if (event instanceof InputEvent) {
+                    InputEvent ie = (InputEvent) event;
+                    if (ie.getType().equals(InputEvent.Type.touchDown)) {
+                        String valText = secondsL.getText().toString();
+                        secondsL.clear();
+                        secondsCells.get(kf).clearActor();
+                        OwnTextField secondsInput = new OwnTextField(valText, skin, new FloatValidator(0.0001f, 500f));
+                        secondsInput.setWidth(55 * GlobalConf.SCALE_FACTOR);
+                        secondsInput.addListener((evt) -> {
+                            if (secondsInput.isValid() && evt instanceof InputEvent && System.currentTimeMillis() - lastMs > 1500) {
+                                InputEvent ievt = (InputEvent) evt;
+                                if (ievt.getKeyCode() == Input.Keys.ENTER) {
+                                    double val = Double.parseDouble(secondsInput.getText());
+                                    double t = 0;
+                                    for (Keyframe k : keyframes) {
+                                        if (k == kf)
+                                            break;
+                                        t += k.seconds;
+                                    }
+                                    if (val > t) {
+                                        kf.seconds = val - t;
+                                        Gdx.app.postRunnable(() -> {
+                                            secondsCells.get(kf).clearActor();
+                                            secondsInput.clear();
+                                            // Rebuild
+                                            reinitialiseKeyframes(keyframes);
+                                        });
+                                    }
+                                }
+                            }
+                            evt.setBubbles(false);
+                            return true;
+                        });
+                        secondsCells.get(kf).setActor(secondsInput);
+                        lastMs = System.currentTimeMillis();
+                    }
+                }
+                return true;
+            });
+
+    }
+
     private void addKeyframeToTable(Keyframe kf, double prevT, int index, Table table, boolean addToModel) {
         // Seconds
-        OwnLabel secondsL = new OwnLabel(secondsFormatter.format(prevT), skin, "hud-header");
-        secondsL.addListener(new TextTooltip(kf.seconds + " seconds after previous keyframe - @" + GlobalConf.frame.RENDER_TARGET_FPS + "FPS", skin));
-        table.add(secondsL).left().padRight(pad / 2f).padBottom(pad5);
+        addSecondsL(kf, prevT, index, table);
 
         // Frame number
         double t = 0;
@@ -438,7 +515,7 @@ public class KeyframesWindow extends GenericDialog implements IObserver {
                 break;
             t += keyframes.get(i).seconds;
         }
-        long frame = (long) (t * GlobalConf.frame.RENDER_TARGET_FPS);
+        long frame = (long) ((t + kf.seconds) * GlobalConf.frame.RENDER_TARGET_FPS);
 
         OwnLabel framesL = new OwnLabel("(" + frame + ")", skin);
         framesL.addListener(new TextTooltip(frame + " frames - @" + (1d / GlobalConf.frame.RENDER_TARGET_FPS) + "SPF", skin));
@@ -483,7 +560,13 @@ public class KeyframesWindow extends GenericDialog implements IObserver {
         addKeyframe.addListener(event -> {
             if (event instanceof ChangeListener.ChangeEvent) {
                 // Add at end
-                return addKeyframe(index + 1);
+                boolean ret = addKeyframe(index + 1);
+                if (rightScroll != null) {
+                    Gdx.app.postRunnable(() -> {
+                        rightScroll.setScrollPercentY(110f);
+                    });
+                }
+                return ret;
             }
             return false;
         });
@@ -497,10 +580,16 @@ public class KeyframesWindow extends GenericDialog implements IObserver {
         rubbish.addListener((event) -> {
             if (event instanceof ChangeListener.ChangeEvent) {
                 // Remove keyframe
-                Array<Keyframe> newKfs = new Array<Keyframe>(keyframes.size - 1);
-                for (Keyframe k : keyframes)
+                Array<Keyframe> newKfs = new Array<>(keyframes.size - 1);
+                for (Keyframe k : keyframes) {
                     if (k != kf)
                         newKfs.add(k);
+                }
+
+                // In case we removed the first
+                if(!newKfs.isEmpty())
+                    newKfs.get(0).seconds = 0;
+
                 reinitialiseKeyframes(newKfs);
                 logger.info("Removed keyframe: " + kf.name);
                 return true;
@@ -509,11 +598,6 @@ public class KeyframesWindow extends GenericDialog implements IObserver {
         });
         table.add(rubbish).left().padBottom(pad5).row();
         table.pack();
-        if (rightScroll != null) {
-            Gdx.app.postRunnable(() -> {
-                rightScroll.setScrollPercentY(110f);
-            });
-        }
 
         this.pack();
 
@@ -550,8 +634,6 @@ public class KeyframesWindow extends GenericDialog implements IObserver {
             keyframes.addAll(kfs);
 
         addKeyframesToTable(keyframes, keyframesTable);
-        rightScroll.setScrollPercentX(0);
-        rightScroll.setScrollPercentY(0);
     }
 
     private void clean() {
@@ -562,6 +644,7 @@ public class KeyframesWindow extends GenericDialog implements IObserver {
         if (cleanKeyframesList)
             keyframes.clear();
 
+        secondsCells.clear();
         keyframesTable.clearChildren();
         nameInput.setText("");
         secondsInput.setText("1.0");
