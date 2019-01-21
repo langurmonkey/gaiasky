@@ -9,14 +9,14 @@ public class Keyframe {
         public String name;
         public Vector3d pos, dir, up;
         public long time;
-        public long frame;
+        public double seconds;
 
-        public Keyframe(String name, Vector3d pos, Vector3d dir, Vector3d up, long time, long frame) {
+        public Keyframe(String name, Vector3d pos, Vector3d dir, Vector3d up, long time, double secs) {
             this.name = name;
             this.pos = pos;
             this.dir = dir;
             this.up = up;
             this.time = time;
-            this.frame = frame;
+            this.seconds = secs;
         }
 }

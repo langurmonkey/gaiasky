@@ -61,15 +61,16 @@ public class CameraKeyframeManager implements IObserver {
         try {
             br = new BufferedReader(new FileReader(file));
             String line;
+            double lastSecs = 0;
             while ((line = br.readLine()) != null) {
                 String[] tokens = line.split(ksep);
-                long frame = Parser.parseLong(tokens[0]);
+                double secs = Parser.parseDouble(tokens[0]);
                 long time = Parser.parseLong(tokens[1]);
                 Vector3d pos = new Vector3d(Parser.parseDouble(tokens[2]), Parser.parseDouble(tokens[3]), Parser.parseDouble(tokens[4]));
                 Vector3d dir = new Vector3d(Parser.parseDouble(tokens[5]), Parser.parseDouble(tokens[6]), Parser.parseDouble(tokens[7]));
                 Vector3d up = new Vector3d(Parser.parseDouble(tokens[8]), Parser.parseDouble(tokens[9]), Parser.parseDouble(tokens[10]));
                 String name = tokens[11];
-                Keyframe kf = new Keyframe(name, pos, dir, up, time, frame);
+                Keyframe kf = new Keyframe(name, pos, dir, up, time, secs);
                 result.add(kf);
             }
 
@@ -101,7 +102,7 @@ public class CameraKeyframeManager implements IObserver {
             os = new BufferedWriter(new FileWriter(f));
 
             for (Keyframe kf : keyframes) {
-                os.append(Long.toString(kf.frame)).append(ksep).append(Long.toString(kf.time)).append(ksep);
+                os.append(Double.toString(kf.seconds)).append(ksep).append(Long.toString(kf.time)).append(ksep);
                 os.append(Double.toString(kf.pos.x)).append(ksep).append(Double.toString(kf.pos.y)).append(ksep).append(Double.toString(kf.pos.z)).append(ksep);
                 os.append(Double.toString(kf.dir.x)).append(ksep).append(Double.toString(kf.dir.y)).append(ksep).append(Double.toString(kf.dir.z)).append(ksep);
                 os.append(Double.toString(kf.up.x)).append(ksep).append(Double.toString(kf.up.y)).append(ksep).append(Double.toString(kf.up.z)).append(ksep);
@@ -159,6 +160,7 @@ public class CameraKeyframeManager implements IObserver {
 
         /** Frame counter **/
         long frames = 0;
+        long frameRate = GlobalConf.frame.CAMERA_REC_TARGET_FPS;
 
         try {
             f.createNewFile();
@@ -183,6 +185,7 @@ public class CameraKeyframeManager implements IObserver {
 
             Vector3d aux = new Vector3d();
 
+
             /** Current position in the spline. Coincides with the control points **/
             double splinePos = 0d;
             /** Step length between control points **/
@@ -192,7 +195,7 @@ public class CameraKeyframeManager implements IObserver {
                 Keyframe k0 = keyframes.get(i - 1);
                 Keyframe k1 = keyframes.get(i);
 
-                long nFrames = k1.frame - k0.frame;
+                long nFrames = (long) (k1.seconds * frameRate);
                 double splinePosSubstep = splinePosStep / nFrames;
 
                 long dt = k1.time - k0.time;
@@ -238,7 +241,7 @@ public class CameraKeyframeManager implements IObserver {
                     logger.error(e);
                 }
         }
-        logger.info(keyframes.size + " keyframes (" + frames + " frames) exported to camera file " + f.getName());
+        logger.info(keyframes.size + " keyframes (" + frames + " frames, " + frameRate + " FPS) exported to camera file " + f.getName());
     }
 
     @Override
