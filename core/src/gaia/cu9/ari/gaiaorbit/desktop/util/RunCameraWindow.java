@@ -1,25 +1,15 @@
 package gaia.cu9.ari.gaiaorbit.desktop.util;
 
-import java.util.Comparator;
-
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Event;
 import com.badlogic.gdx.scenes.scene2d.EventListener;
 import com.badlogic.gdx.scenes.scene2d.Stage;
-import com.badlogic.gdx.scenes.scene2d.ui.Button;
-import com.badlogic.gdx.scenes.scene2d.ui.HorizontalGroup;
-import com.badlogic.gdx.scenes.scene2d.ui.Image;
-import com.badlogic.gdx.scenes.scene2d.ui.ImageButton;
-import com.badlogic.gdx.scenes.scene2d.ui.Label;
-import com.badlogic.gdx.scenes.scene2d.ui.ScrollPane;
-import com.badlogic.gdx.scenes.scene2d.ui.Skin;
-import com.badlogic.gdx.scenes.scene2d.ui.TextTooltip;
+import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener.ChangeEvent;
 import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.Array;
-
 import gaia.cu9.ari.gaiaorbit.event.EventManager;
 import gaia.cu9.ari.gaiaorbit.event.Events;
 import gaia.cu9.ari.gaiaorbit.interfce.GenericDialog;
@@ -29,6 +19,8 @@ import gaia.cu9.ari.gaiaorbit.util.scene2d.OwnImageButton;
 import gaia.cu9.ari.gaiaorbit.util.scene2d.OwnLabel;
 import gaia.cu9.ari.gaiaorbit.util.scene2d.OwnScrollPane;
 import gaia.cu9.ari.gaiaorbit.util.scene2d.OwnTextIconButton;
+
+import java.util.Comparator;
 
 /**
  * The run camera path file window, which allows the user to choose a script to
@@ -70,15 +62,15 @@ public class RunCameraWindow extends GenericDialog {
         content.add(titlegroup).align(Align.left).padTop(pad * 2);
         content.row();
 
-        ScrollPane scriptsScroll = new OwnScrollPane(generateFileList(), skin, "minimalist");
-        scriptsScroll.setName("camera path files list scroll");
-        scriptsScroll.setFadeScrollBars(false);
-        scriptsScroll.setScrollingDisabled(true, false);
+        ScrollPane scroll = new OwnScrollPane(generateFileList(), skin, "minimalist");
+        scroll.setName("camera path files list scroll");
+        scroll.setFadeScrollBars(false);
+        scroll.setScrollingDisabled(true, false);
 
-        scriptsScroll.setHeight(200 * GlobalConf.SCALE_FACTOR);
-        scriptsScroll.setWidth(300 * GlobalConf.SCALE_FACTOR);
+        scroll.setHeight(200 * GlobalConf.SCALE_FACTOR);
+        scroll.setWidth(300 * GlobalConf.SCALE_FACTOR);
 
-        content.add(scriptsScroll).align(Align.center).pad(pad);
+        content.add(scroll).align(Align.center).pad(pad);
         content.row();
 
         Image reloadImg = new Image(skin.getDrawable("reload"));
@@ -87,7 +79,7 @@ public class RunCameraWindow extends GenericDialog {
         reload.addListener(new TextTooltip(txt("gui.camera.reload"), skin));
         reload.addListener((event) -> {
             if (event instanceof ChangeEvent) {
-                scriptsScroll.setActor(generateFileList());
+                scroll.setActor(generateFileList());
             }
             return false;
         });
