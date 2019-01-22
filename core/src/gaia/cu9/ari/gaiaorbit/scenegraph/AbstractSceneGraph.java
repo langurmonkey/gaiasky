@@ -287,6 +287,7 @@ public abstract class AbstractSceneGraph implements ISceneGraph {
         return objects;
     }
 
+
     public IFocus findFocus(String name) {
         SceneGraphNode node = getNode(name);
         if (node == null || !(node instanceof IFocus))

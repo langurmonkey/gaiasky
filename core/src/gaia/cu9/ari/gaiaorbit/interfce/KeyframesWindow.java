@@ -101,6 +101,7 @@ public class KeyframesWindow extends GenericDialog implements IObserver {
         keyframesPathObject.setName("Keyframe path");
         keyframesPathObject.initialize();
         keyframesPathObject.doneLoading(null);
+        keyframesPathObject.setKeyframes(keyframes);
         EventManager.instance.post(Events.SCENE_GRAPH_ADD_OBJECT_CMD, keyframesPathObject, false);
 
         EventManager.instance.subscribe(this, Events.UPDATE_CAM_RECORDER);
@@ -409,9 +410,11 @@ public class KeyframesWindow extends GenericDialog implements IObserver {
         int i = 0;
         double prevT = 0;
         for (Keyframe kf : keyframes) {
+
             // Add to UI table
             addKeyframeToTable(kf, prevT, i, table);
-            // Fill model table
+
+            // Fill vectors
             kfPositions[i * 3 + 0] = kf.pos.x;
             kfPositions[i * 3 + 1] = kf.pos.y;
             kfPositions[i * 3 + 2] = kf.pos.z;
@@ -429,6 +432,7 @@ public class KeyframesWindow extends GenericDialog implements IObserver {
         }
         if (keyframesPathObject != null) {
             Gdx.app.postRunnable(() -> {
+                keyframesPathObject.setKeyframes(keyframes);
                 keyframesPathObject.setPathKnots(kfPositions, kfDirections, kfUps);
                 if (keyframes.size > 1) {
                     keyframesPathObject.segments.setPoints(kfPositions);
@@ -629,10 +633,17 @@ public class KeyframesWindow extends GenericDialog implements IObserver {
     }
 
     private void reinitialiseKeyframes(Array<Keyframe> kfs) {
+        // Clean
         clean(kfs != keyframes, false);
+
+        // Update list
         if (kfs != keyframes)
             keyframes.addAll(kfs);
 
+        // Set to model
+        keyframesPathObject.setKeyframes(keyframes);
+
+        // Add to table
         addKeyframesToTable(keyframes, keyframesTable);
     }
 
@@ -657,8 +668,7 @@ public class KeyframesWindow extends GenericDialog implements IObserver {
 
     @Override
     protected void accept() {
-        // Convert to camera path file?
-        EventManager.instance.removeAllSubscriptions(this);
+        // Accept not present
     }
 
     @Override

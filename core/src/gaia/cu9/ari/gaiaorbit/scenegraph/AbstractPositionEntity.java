@@ -306,6 +306,10 @@ public abstract class AbstractPositionEntity extends SceneGraphNode {
         this.cc = GlobalResources.toFloatArray(color);
     }
 
+    public void setColor(float[] color) {
+        this.cc = color;
+    }
+
     public Vector3d computeFuturePosition() {
         return null;
     }

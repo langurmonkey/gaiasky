@@ -5,39 +5,43 @@ import gaia.cu9.ari.gaiaorbit.data.util.PointCloudData;
 import gaia.cu9.ari.gaiaorbit.scenegraph.SceneGraphNode;
 
 public interface IGPUVertsRenderable extends IRenderable {
-    public boolean inGpu();
+    boolean inGpu();
 
-    public void markForUpdate();
+    void markForUpdate();
 
-    public int getOffset();
+    int getOffset();
 
-    public int getCount();
+    int getCount();
 
-    public PointCloudData getPointCloud();
+    PointCloudData getPointCloud();
 
-    public float[] getColor();
+    float[] getColor();
 
-    public double getAlpha();
+    double getAlpha();
 
-    public Matrix4 getLocalTransform();
+    Matrix4 getLocalTransform();
 
-    public SceneGraphNode getParent();
+    SceneGraphNode getParent();
 
-    public void setInGpu(boolean inGpu);
+    void setInGpu(boolean inGpu);
 
-    public void setOffset(int offset);
+    void setOffset(int offset);
 
-    public void setCount(int count);
+    void setCount(int count);
 
-    public boolean isClosedLoop();
+    boolean isClosedLoop();
 
-    public void setClosedLoop(boolean closedLoop);
+    void setClosedLoop(boolean closedLoop);
+
+    void blend();
+    void depth();
 
     /**
      * Line width for lines, point size for points
+     *
      * @param size The size
      */
-    public void setPrimitiveSize(float size);
+    void setPrimitiveSize(float size);
 
-    public float getPrimitiveSize();
+    float getPrimitiveSize();
 }

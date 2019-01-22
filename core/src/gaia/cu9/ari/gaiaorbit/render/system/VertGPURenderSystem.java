@@ -110,9 +110,6 @@ public class VertGPURenderSystem<T extends IGPUVertsRenderable> extends Immediat
             // Enable GL_LINE_WIDTH
             Gdx.gl20.glEnable(GL20.GL_LINE_WIDTH);
         }
-        Gdx.gl20.glEnable(GL20.GL_DEPTH_TEST);
-        Gdx.gl20.glEnable(GL20.GL_BLEND);
-        Gdx.gl20.glBlendFunc(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA);
 
         this.camera = camera;
         int size = renderables.size;
@@ -177,6 +174,9 @@ public class VertGPURenderSystem<T extends IGPUVertsRenderable> extends Immediat
             ShaderProgram shaderProgram = getShaderProgram();
 
             shaderProgram.begin();
+
+            renderable.blend();
+            renderable.depth();
 
             // Regular
             if (isLine())

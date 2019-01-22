@@ -1,5 +1,7 @@
 package gaia.cu9.ari.gaiaorbit.scenegraph;
 
+import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.math.Matrix4;
 import gaia.cu9.ari.gaiaorbit.data.util.PointCloudData;
 import gaia.cu9.ari.gaiaorbit.render.IGPUVertsRenderable;
@@ -19,6 +21,8 @@ public class VertsObject extends AbstractPositionEntity implements IGPUVertsRend
     /** Indicates the index of the mesh data in the renderer **/
     protected int offset = -1;
     protected int count;
+
+    protected boolean blend = true, depth = true;
 
     /** The render group **/
     protected RenderGroup renderGroup;
@@ -94,6 +98,10 @@ public class VertsObject extends AbstractPositionEntity implements IGPUVertsRend
             markForUpdate();
         }
 
+    }
+
+    public boolean isEmpty() {
+        return pointCloudData.isEmpty();
     }
 
     /**
@@ -178,9 +186,37 @@ public class VertsObject extends AbstractPositionEntity implements IGPUVertsRend
         this.closedLoop = closedLoop;
     }
 
+    public void setBlend(boolean blend) {
+        this.blend = blend;
+    }
+
+    public void setDepth(boolean depth) {
+        this.depth = depth;
+    }
+
+    @Override
+    public void blend() {
+        if (blend) {
+            Gdx.gl20.glEnable(GL20.GL_BLEND);
+            Gdx.gl20.glBlendFunc(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA);
+        } else {
+            Gdx.gl20.glDisable(GL20.GL_BLEND);
+        }
+    }
+
+    @Override
+    public void depth() {
+        Gdx.gl20.glDepthMask(depth);
+        if (depth) {
+            Gdx.gl20.glEnable(GL20.GL_DEPTH_TEST);
+        } else {
+            Gdx.gl20.glDisable(GL20.GL_DEPTH_TEST);
+        }
+    }
+
     @Override
     public void markForUpdate() {
         this.inGpu = false;
     }
-
 }
+

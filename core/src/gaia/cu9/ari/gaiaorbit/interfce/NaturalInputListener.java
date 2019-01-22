@@ -1,10 +1,5 @@
 package gaia.cu9.ari.gaiaorbit.interfce;
 
-import java.util.Comparator;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.Set;
-
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.Input.Buttons;
@@ -14,38 +9,43 @@ import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.TimeUtils;
-
 import gaia.cu9.ari.gaiaorbit.GaiaSky;
 import gaia.cu9.ari.gaiaorbit.event.EventManager;
 import gaia.cu9.ari.gaiaorbit.event.Events;
 import gaia.cu9.ari.gaiaorbit.event.IObserver;
 import gaia.cu9.ari.gaiaorbit.scenegraph.IFocus;
+import gaia.cu9.ari.gaiaorbit.scenegraph.KeyframesPathObject;
+import gaia.cu9.ari.gaiaorbit.scenegraph.SceneGraphNode;
 import gaia.cu9.ari.gaiaorbit.scenegraph.camera.CameraManager.CameraMode;
 import gaia.cu9.ari.gaiaorbit.scenegraph.camera.NaturalCamera;
 import gaia.cu9.ari.gaiaorbit.util.GlobalConf;
 import gaia.cu9.ari.gaiaorbit.util.comp.ViewAngleComparator;
 
+import java.util.Comparator;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.Set;
+
 /**
  * Input listener for the natural camera.
- * 
- * @author tsagrista
  *
+ * @author tsagrista
  */
 public class NaturalInputListener extends GestureDetector implements IObserver {
 
     /**
-    	 * The button for rotating the camera either around its center or around the
-    	 * focus.
-    	 */
+     * The button for rotating the camera either around its center or around the
+     * focus.
+     */
     public int leftMouseButton = Buttons.LEFT;
     /** The button for panning the camera along the up/right plane */
     public int rightMouseButton = Buttons.RIGHT;
     /** The button for moving the camera along the direction axis */
     public int middleMouseButton = Buttons.MIDDLE;
     /**
-    	 * Whether scrolling requires the activeKey to be pressed (false) or always
-    	 * allow scrolling (true).
-    	 */
+     * Whether scrolling requires the activeKey to be pressed (false) or always
+     * allow scrolling (true).
+     */
     public boolean alwaysScroll = true;
     /** The weight for each scrolled amount. */
     public float scrollFactor = -0.1f;
@@ -128,7 +128,9 @@ public class NaturalInputListener extends GestureDetector implements IObserver {
         public boolean pinch(Vector2 initialPointer1, Vector2 initialPointer2, Vector2 pointer1, Vector2 pointer2) {
             return false;
         }
-    };
+    }
+
+    ;
 
     public final GaiaGestureListener gestureListener;
 
@@ -179,6 +181,16 @@ public class NaturalInputListener extends GestureDetector implements IObserver {
         return super.touchDown(screenX, screenY, pointer, button);
     }
 
+    private KeyframesPathObject getKeyframeCollision(int screenX, int screenY) {
+        Array<SceneGraphNode> l = GaiaSky.instance.sg.getRoot().getChildrenByType(KeyframesPathObject.class, new Array<SceneGraphNode>(1));
+        if (!l.isEmpty()) {
+            KeyframesPathObject kpo = (KeyframesPathObject) l.get(0);
+            if (kpo.select(screenX, screenY, Gdx.graphics.getWidth(), Gdx.graphics.getHeight(), MIN_PIX_DIST, camera))
+                return kpo;
+        }
+        return null;
+    }
+
     private Array<IFocus> getHits(int screenX, int screenY) {
         Array<IFocus> l = GaiaSky.instance.getFocusableEntities();
 
@@ -224,11 +236,17 @@ public class NaturalInputListener extends GestureDetector implements IObserver {
                         gesture.set(0, 0);
 
                         if (doubleClick && !stopped && !focusRemoved) {
-                            // Select star, if any
-                            IFocus hit = getBestHit(screenX, screenY);
-                            if (hit != null) {
-                                EventManager.instance.post(Events.FOCUS_CHANGE_CMD, hit);
-                                EventManager.instance.post(Events.CAMERA_MODE_CMD, CameraMode.Focus);
+                            // Keyframes
+                            KeyframesPathObject kpo = getKeyframeCollision(screenX, screenY);
+
+                            // Focus
+                            if (kpo == null) {
+                                // Select star, if any
+                                IFocus hit = getBestHit(screenX, screenY);
+                                if (hit != null) {
+                                    EventManager.instance.post(Events.FOCUS_CHANGE_CMD, hit);
+                                    EventManager.instance.post(Events.CAMERA_MODE_CMD, CameraMode.Focus);
+                                }
                             }
                         }
                     }

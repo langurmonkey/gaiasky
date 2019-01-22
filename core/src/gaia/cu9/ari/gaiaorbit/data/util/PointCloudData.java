@@ -37,6 +37,10 @@ public class PointCloudData {
         v1.setZero();
     }
 
+    public boolean isEmpty(){
+        return x.isEmpty() && y.isEmpty() && z.isEmpty();
+    }
+
     /**
      * Adds the given vector to the current points. The vector
      * is of the form [x0, y0, z0, x1, y1, z1, ..., xn, yn, zn].
