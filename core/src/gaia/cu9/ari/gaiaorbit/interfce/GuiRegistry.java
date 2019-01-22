@@ -174,10 +174,10 @@ public class GuiRegistry implements IObserver {
         super();
         this.skin = skin;
         // Windows which are visible from any GUI
-        EventManager.instance.subscribe(this, Events.SHOW_QUIT_ACTION, Events.SHOW_ABOUT_ACTION, Events.SHOW_PREFERENCES_ACTION, Events.SHOW_KEYFRAMES_WINDOW_ACTION);
+        EventManager.instance.subscribe(this, Events.SHOW_QUIT_ACTION, Events.SHOW_ABOUT_ACTION, Events.SHOW_PREFERENCES_ACTION, Events.SHOW_KEYFRAMES_WINDOW_ACTION, Events.UI_THEME_RELOAD_INFO);
     }
 
-    public void dispose(){
+    public void dispose() {
         EventManager.instance.removeAllSubscriptions(this);
     }
 
@@ -201,6 +201,13 @@ public class GuiRegistry implements IObserver {
                     keyframesWindow = new KeyframesWindow(ui, skin);
                 if (!keyframesWindow.isVisible() || !keyframesWindow.hasParent())
                     keyframesWindow.show(ui, 0, 0);
+                break;
+            case UI_THEME_RELOAD_INFO:
+                if (keyframesWindow != null) {
+                    keyframesWindow.clear();
+                    keyframesWindow = null;
+                }
+                this.skin = (Skin) data[0];
                 break;
             default:
                 break;

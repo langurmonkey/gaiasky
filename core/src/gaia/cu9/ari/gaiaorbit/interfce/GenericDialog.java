@@ -26,8 +26,17 @@ import static com.badlogic.gdx.scenes.scene2d.actions.Actions.fadeOut;
 import static com.badlogic.gdx.scenes.scene2d.actions.Actions.sequence;
 
 public abstract class GenericDialog extends CollapsibleWindow {
-    protected static float pad = 10f * GlobalConf.SCALE_FACTOR;
-    protected static float pad5 = 5f * GlobalConf.SCALE_FACTOR;
+    protected static float pad;
+    protected static float pad5;
+
+    static{
+        updatePads();
+    }
+
+    public static void updatePads(){
+        pad = 10f * GlobalConf.SCALE_FACTOR;
+        pad5 = 5f * GlobalConf.SCALE_FACTOR;
+    }
 
     final protected Stage stage;
     final protected Skin skin;

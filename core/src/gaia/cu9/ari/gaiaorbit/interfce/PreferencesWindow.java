@@ -1756,6 +1756,7 @@ public class PreferencesWindow extends GenericDialog {
         Gdx.app.postRunnable(() -> {
             // Reinitialise GUI system
             GlobalResources.updateSkin();
+            GenericDialog.updatePads();
             GaiaSky.instance.reinitialiseGUI1();
             EventManager.instance.post(Events.SPACECRAFT_LOADED, GaiaSky.instance.sg.getNode("Spacecraft"));
             GaiaSky.instance.reinitialiseGUI2();

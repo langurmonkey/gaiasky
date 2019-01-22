@@ -42,9 +42,6 @@ import java.util.Map;
 public class KeyframesWindow extends GenericDialog implements IObserver {
     private static final Logger.Log logger = Logger.getLogger(KeyframesWindow.class);
 
-    private static float buttonSizeS = 13 * GlobalConf.SCALE_FACTOR;
-    private static float buttonSize = 15 * GlobalConf.SCALE_FACTOR;
-    private static float buttonSizeL = 17 * GlobalConf.SCALE_FACTOR;
 
     private INumberFormat secondsFormatter;
     private IDateFormat dateFormat;
@@ -79,8 +76,13 @@ public class KeyframesWindow extends GenericDialog implements IObserver {
     /** Model object to represent the path **/
     private KeyframesPathObject keyframesPathObject;
 
+    private float buttonSize, buttonSizeL;
+
     public KeyframesWindow(Stage stage, Skin skin) {
         super("Camera recorder - Keyframes", skin, stage);
+
+        buttonSize = 15 * GlobalConf.SCALE_FACTOR;
+        buttonSizeL = 17 * GlobalConf.SCALE_FACTOR;
 
         this.keyframes = new Array<>();
         this.secondsCells = new HashMap<>();
@@ -111,7 +113,9 @@ public class KeyframesWindow extends GenericDialog implements IObserver {
     @Override
     protected void build() {
         left = new Table(skin);
+        left.align(Align.top | Align.left);
         right = new Table(skin);
+        right.align(Align.top | Align.left);
 
         /** LEFT - CONTROLS **/
 
@@ -154,22 +158,25 @@ public class KeyframesWindow extends GenericDialog implements IObserver {
         left.add(nameLabel).bottom().left().padRight(pad5).padBottom(pad);
         left.add(nameInput).bottom().left().padBottom(pad).row();
 
+        left.pack();
+
         /** RIGHT - KEYFRAMES **/
         OwnLabel keyframesTitle = new OwnLabel("Keyframes list", skin, "hud-header");
 
         // KEYFRAMES TABLE
         keyframesTable = buildKeyframesTable();
-        keyframesTable.getRows();
 
         // ADD SCROLL
         rightScroll = new OwnScrollPane(keyframesTable, skin, "minimalist-nobg");
         rightScroll.setScrollingDisabled(true, false);
         rightScroll.setHeight(100 * GlobalConf.SCALE_FACTOR);
-        rightScroll.setWidth(350 * GlobalConf.SCALE_FACTOR);
+        rightScroll.setWidth(360 * GlobalConf.SCALE_FACTOR);
         rightScroll.setFadeScrollBars(true);
 
         right.add(keyframesTitle).top().left().padBottom(pad).row();
         right.add(rightScroll).top().left();
+
+        right.pack();
 
         /** ACTION BUTTONS **/
         HorizontalGroup buttons = new HorizontalGroup();
@@ -309,10 +316,10 @@ public class KeyframesWindow extends GenericDialog implements IObserver {
 
         /** FINAL LAYOUT **/
         content.add(left).top().left().padRight(pad * 2f).padBottom(pad * 3f);
-        content.add(right).top().left().row();
+        content.add(right).width(370 * GlobalConf.SCALE_FACTOR).top().left().padBottom(pad * 3f).row();
         notice = content.add();
         notice.padBottom(pad * 2f).center().colspan(2).row();
-        content.add(buttons).colspan(2).right();
+        content.add(buttons).colspan(2).right().row();
 
         OwnTextButton clear = new OwnTextButton("Clear", skin);
         clear.setName("clear");

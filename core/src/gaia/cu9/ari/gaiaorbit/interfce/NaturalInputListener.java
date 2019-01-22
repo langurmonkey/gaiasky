@@ -86,7 +86,7 @@ public class NaturalInputListener extends GestureDetector implements IObserver {
     private static final long doubleClickTime = 400;
 
     /** We're dragging or selecting a keyframe **/
-    private boolean keyframeMode = false;
+    private boolean keyframeBeingDragged = false;
 
     protected static class GaiaGestureListener extends GestureAdapter {
         public NaturalInputListener controller;
@@ -181,7 +181,9 @@ public class NaturalInputListener extends GestureDetector implements IObserver {
             }
             if (button == Buttons.RIGHT) {
                 // Select keyframes
-                keyframeMode = getKeyframeCollision(screenX, screenY);
+                if (!(anyPressed(Keys.ALT_LEFT, Keys.SHIFT_LEFT, Keys.CONTROL_LEFT) && getKeyframesPathObject().isSelected())) {
+                    keyframeBeingDragged = getKeyframeCollision(screenX, screenY);
+                }
             }
         }
         camera.setInputByController(false);
@@ -206,15 +208,18 @@ public class NaturalInputListener extends GestureDetector implements IObserver {
         return getKeyframesPathObject().select(screenX, screenY, MIN_PIX_DIST, camera);
     }
 
-    private boolean dragKeyframe(int screenX, int screenY) {
+    private boolean dragKeyframe(int screenX, int screenY, double dragDx, double dragDy) {
+        if (isKeyPressed(Keys.SHIFT_LEFT) && !anyPressed(Keys.CONTROL_LEFT, Keys.ALT_LEFT)) {
+            // Rotate around up (rotate dir)
+            return getKeyframesPathObject().rotateAroundUp(dragDx, dragDy, camera);
+        } else if (isKeyPressed(Keys.CONTROL_LEFT) && !anyPressed(Keys.SHIFT_LEFT, Keys.ALT_LEFT)) {
+            // Rotate around dir (rotate up)
+            return getKeyframesPathObject().rotateAroundDir(dragDx, dragDy, camera);
+        } else if (isKeyPressed(Keys.ALT_LEFT) && !anyPressed(Keys.SHIFT_LEFT, Keys.CONTROL_LEFT)) {
+            // Rotate around dir.crs(up)
+            return getKeyframesPathObject().rotateAroundCrs(dragDx, dragDy, camera);
+        }
         return getKeyframesPathObject().moveSelection(screenX, screenY, camera);
-    }
-
-    private boolean consolidateKeyframe(){
-        boolean ok = getKeyframesPathObject().consolidateMove();
-        keyframeMode = false;
-        EventManager.instance.post(Events.KEYFRAMES_REFRESH);
-        return ok;
     }
 
     private Array<IFocus> getHits(int screenX, int screenY) {
@@ -275,9 +280,10 @@ public class NaturalInputListener extends GestureDetector implements IObserver {
                 dragDy = 0;
                 lastClickTime = currentTime;
             } else if (button == this.button && button == Input.Buttons.RIGHT) {
-                if (keyframeMode) {
-                    consolidateKeyframe();
-                    keyframeMode = false;
+                if (keyframeBeingDragged) {
+                    keyframeBeingDragged = false;
+                } else if (getKeyframesPathObject() != null && getKeyframesPathObject().isSelected()) {
+                    getKeyframesPathObject().unselect();
                 } else {
                     // Ensure Octants observed property is computed
                     Gdx.app.postRunnable(() -> {
@@ -332,9 +338,9 @@ public class NaturalInputListener extends GestureDetector implements IObserver {
                 camera.addRotateMovement(dragDx, dragDy, false, accel);
             }
         } else if (button == rightMouseButton) {
-            if (keyframeMode) {
+            if (keyframeBeingDragged || (getKeyframesPathObject().isSelected() && anyPressed(Keys.SHIFT_LEFT, Keys.CONTROL_LEFT, Keys.ALT_LEFT))) {
                 // Drag keyframe
-                dragKeyframe(screenX, screenY);
+                dragKeyframe(screenX, screenY, dragDx, dragDy);
             } else {
                 camera.addRotateMovement(dragDx, dragDy, true, accel);
             }
@@ -421,6 +427,34 @@ public class NaturalInputListener extends GestureDetector implements IObserver {
 
     public boolean isKeyPressed(int keycode) {
         return pressedKeys.contains(keycode);
+    }
+
+    /**
+     * Returns true if all keys are pressed
+     *
+     * @param keys The keys to test
+     * @return True if all are pressed
+     */
+    public boolean allPressed(int... keys) {
+        for (int k : keys) {
+            if (!pressedKeys.contains(k))
+                return false;
+        }
+        return true;
+    }
+
+    /**
+     * Returns true if any of the keys are pressed
+     *
+     * @param keys The keys to test
+     * @return True if any is pressed
+     */
+    public boolean anyPressed(int... keys) {
+        for (int k : keys) {
+            if (pressedKeys.contains(k))
+                return true;
+        }
+        return false;
     }
 
     @Override

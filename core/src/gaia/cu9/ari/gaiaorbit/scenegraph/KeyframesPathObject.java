@@ -105,11 +105,14 @@ public class KeyframesPathObject extends VertsObject implements I3DTextRenderabl
         this.keyframes = keyframes;
     }
 
-    public void refreshData(){
+    /**
+     * Refreshes the positions and orientations from the keyframes
+     */
+    public void refreshData() {
         double[] kfPositions = new double[keyframes.size * 3];
         double[] kfDirections = new double[keyframes.size * 3];
         double[] kfUps = new double[keyframes.size * 3];
-        int i =0;
+        int i = 0;
         for (Keyframe kf : keyframes) {
 
             // Fill vectors
@@ -138,7 +141,35 @@ public class KeyframesPathObject extends VertsObject implements I3DTextRenderabl
         }
     }
 
-    public void resamplePath(){
+    /**
+     * Refreshes the orientations from the keyframes
+     */
+    public void refreshOrientations() {
+        int i = 0;
+        for (Keyframe kf : keyframes) {
+            VertsObject dir = orientations.get(i);
+            VertsObject up = orientations.get(i + 1);
+
+            refreshSingleVector(dir, kf.pos, kf.dir);
+            refreshSingleVector(up, kf.pos, kf.up);
+
+            i += 2;
+        }
+    }
+
+    public void refreshSingleVector(VertsObject vo, Vector3d pos, Vector3d vec){
+        PointCloudData p = vo.pointCloudData;
+        p.x.set(0, pos.x);
+        p.y.set(0, pos.y);
+        p.z.set(0, pos.z);
+
+        p.x.set(1, pos.x + vec.x);
+        p.y.set(1, pos.y + vec.y);
+        p.z.set(1, pos.z + vec.z);
+        vo.markForUpdate();
+    }
+
+    public void resamplePath() {
         double[] kfPositions = new double[keyframes.size * 3];
         int i = 0;
         for (Keyframe kf : keyframes) {
@@ -155,10 +186,32 @@ public class KeyframesPathObject extends VertsObject implements I3DTextRenderabl
     public void setPathKnots(double[] kts, double[] dirs, double[] ups) {
         // Points
         knots.setPoints(kts);
-        clearOrientations();
+
         int n = kts.length;
-        for (int i = 0; i < n; i += 3) {
-            addKnotOrientation(i / 3, kts[i], kts[i + 1], kts[i + 2], dirs[i], dirs[i + 1], dirs[i + 2], ups[i], ups[i + 1], ups[i + 2]);
+        if (orientations.size == (dirs.length + ups.length) / 3) {
+            // We can just update what we have
+            int j = 0;
+            for (int i = 0; i < orientations.size; i++) {
+                double[] targ = (i % 2 == 0) ? dirs : ups;
+                VertsObject vo = orientations.get(i);
+                PointCloudData p = vo.getPointCloud();
+                p.x.set(0, kts[i / 2 * 3]);
+                p.y.set(0, kts[i / 2 * 3 + 1]);
+                p.z.set(0, kts[i / 2 * 3 + 2]);
+
+                p.x.set(1, kts[i / 2 * 3] + targ[j]);
+                p.y.set(1, kts[i / 2 * 3 + 1] + targ[j + 1]);
+                p.z.set(1, kts[i / 2 * 3 + 2] + targ[j + 2]);
+
+                if (i % 2 == 1)
+                    j += 3;
+            }
+        } else {
+            // We start from scratch
+            clearOrientations();
+            for (int i = 0; i < n; i += 3) {
+                addKnotOrientation(i / 3, kts[i], kts[i + 1], kts[i + 2], dirs[i], dirs[i + 1], dirs[i + 2], ups[i], ups[i + 1], ups[i + 2]);
+            }
         }
     }
 
@@ -259,8 +312,6 @@ public class KeyframesPathObject extends VertsObject implements I3DTextRenderabl
                 }
             }
         }
-        // Not hit, unselect
-        unselect();
         return false;
     }
 
@@ -269,21 +320,40 @@ public class KeyframesPathObject extends VertsObject implements I3DTextRenderabl
     }
 
     public void select(Keyframe kf) {
+        unselect();
         selected = kf;
         selectedKnot.setPoints(kf.pos.values());
+        int i = keyframes.indexOf(kf, true) * 2;
+        if (i >= 0) {
+            VertsObject dir = orientations.get(i);
+            VertsObject up = orientations.get(i + 1);
+
+            dir.setPrimitiveSize(3f);
+            up.setPrimitiveSize(3f);
+        }
     }
 
     public void unselect() {
-        selected = null;
-        selectedKnot.clear();
+        if (selected != null) {
+            int i = keyframes.indexOf(selected, true) * 2;
+            if (i >= 0) {
+                VertsObject dir = orientations.get(i);
+                VertsObject up = orientations.get(i + 1);
+
+                dir.setPrimitiveSize(1f);
+                up.setPrimitiveSize(1f);
+            }
+            selected = null;
+            selectedKnot.clear();
+        }
     }
 
     public boolean isSelected() {
         return selected != null;
     }
 
-    public boolean moveSelection(int screenX, int screenY, NaturalCamera camera){
-        if(selected != null){
+    public boolean moveSelection(int screenX, int screenY, NaturalCamera camera) {
+        if (selected != null) {
             double originalDist = aux3d1.get().set(selected.pos).add(camera.getInversePos()).len();
             Vector3 aux = aux3f1.get().set(screenX, screenY, 0.5f);
             camera.getCamera().unproject(aux);
@@ -296,14 +366,34 @@ public class KeyframesPathObject extends VertsObject implements I3DTextRenderabl
         return false;
     }
 
-    public boolean consolidateMove(){
-        if(selected != null) {
-
+    public boolean rotateAroundDir(double dx, double dy, NaturalCamera camera) {
+        if (selected != null) {
+            selected.up.rotate(selected.dir, (float) ((dx + dy) * 500d));
+            refreshOrientations();
             return true;
         }
         return false;
     }
 
+    public boolean rotateAroundUp(double dx, double dy, NaturalCamera camera) {
+        if (selected != null) {
+            selected.dir.rotate(selected.up, (float) ((dx + dy) * 500d));
+            refreshOrientations();
+            return true;
+        }
+        return false;
+    }
+
+    public boolean rotateAroundCrs(double dx, double dy, NaturalCamera camera){
+        if (selected != null) {
+            Vector3d crs = aux3d1.get().set(selected.dir).crs(selected.up);
+            selected.dir.rotate(crs, (float) ((dx + dy) * 500d));
+            selected.up.rotate(crs, (float) ((dx + dy) * 500d));
+            refreshOrientations();
+            return true;
+        }
+        return false;
+    }
 
     @Override
     protected void addToRenderLists(ICamera camera) {
