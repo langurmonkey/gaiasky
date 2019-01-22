@@ -288,6 +288,9 @@ public enum Events {
      */
     KEYFRAMES_EXPORT,
 
+    /** Refreshes the keyframes from the model **/
+    KEYFRAMES_REFRESH,
+
     /**
      * Issues the command to change the high accuracy setting. Contains a
      * boolean with the setting

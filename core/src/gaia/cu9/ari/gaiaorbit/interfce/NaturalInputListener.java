@@ -85,6 +85,9 @@ public class NaturalInputListener extends GestureDetector implements IObserver {
     /** Maximum double click time, in ms **/
     private static final long doubleClickTime = 400;
 
+    /** We're dragging or selecting a keyframe **/
+    private boolean keyframeMode = false;
+
     protected static class GaiaGestureListener extends GestureAdapter {
         public NaturalInputListener controller;
         private float previousZoom;
@@ -176,19 +179,42 @@ public class NaturalInputListener extends GestureDetector implements IObserver {
                 gesture.set(startX, startY);
                 this.button = button;
             }
+            if (button == Buttons.RIGHT) {
+                // Select keyframes
+                keyframeMode = getKeyframeCollision(screenX, screenY);
+            }
         }
         camera.setInputByController(false);
         return super.touchDown(screenX, screenY, pointer, button);
     }
 
-    private KeyframesPathObject getKeyframeCollision(int screenX, int screenY) {
+    private KeyframesPathObject kpo;
+
+    private KeyframesPathObject getKeyframesPathObject() {
+        if (kpo != null)
+            return kpo;
+
         Array<SceneGraphNode> l = GaiaSky.instance.sg.getRoot().getChildrenByType(KeyframesPathObject.class, new Array<SceneGraphNode>(1));
         if (!l.isEmpty()) {
-            KeyframesPathObject kpo = (KeyframesPathObject) l.get(0);
-            if (kpo.select(screenX, screenY, Gdx.graphics.getWidth(), Gdx.graphics.getHeight(), MIN_PIX_DIST, camera))
-                return kpo;
+            kpo = (KeyframesPathObject) l.get(0);
+            return kpo;
         }
         return null;
+    }
+
+    private boolean getKeyframeCollision(int screenX, int screenY) {
+        return getKeyframesPathObject().select(screenX, screenY, MIN_PIX_DIST, camera);
+    }
+
+    private boolean dragKeyframe(int screenX, int screenY) {
+        return getKeyframesPathObject().moveSelection(screenX, screenY, camera);
+    }
+
+    private boolean consolidateKeyframe(){
+        boolean ok = getKeyframesPathObject().consolidateMove();
+        keyframeMode = false;
+        EventManager.instance.post(Events.KEYFRAMES_REFRESH);
+        return ok;
     }
 
     private Array<IFocus> getHits(int screenX, int screenY) {
@@ -236,17 +262,11 @@ public class NaturalInputListener extends GestureDetector implements IObserver {
                         gesture.set(0, 0);
 
                         if (doubleClick && !stopped && !focusRemoved) {
-                            // Keyframes
-                            KeyframesPathObject kpo = getKeyframeCollision(screenX, screenY);
-
-                            // Focus
-                            if (kpo == null) {
-                                // Select star, if any
-                                IFocus hit = getBestHit(screenX, screenY);
-                                if (hit != null) {
-                                    EventManager.instance.post(Events.FOCUS_CHANGE_CMD, hit);
-                                    EventManager.instance.post(Events.CAMERA_MODE_CMD, CameraMode.Focus);
-                                }
+                            // Select star, if any
+                            IFocus hit = getBestHit(screenX, screenY);
+                            if (hit != null) {
+                                EventManager.instance.post(Events.FOCUS_CHANGE_CMD, hit);
+                                EventManager.instance.post(Events.CAMERA_MODE_CMD, CameraMode.Focus);
                             }
                         }
                     }
@@ -255,19 +275,24 @@ public class NaturalInputListener extends GestureDetector implements IObserver {
                 dragDy = 0;
                 lastClickTime = currentTime;
             } else if (button == this.button && button == Input.Buttons.RIGHT) {
-                // Ensure Octants observed property is computed
-                Gdx.app.postRunnable(() -> {
-                    // 5% of width pixels distance
-                    if (gesture.dst(screenX, screenY) < MOVE_PX_DIST) {
-                        // Stop
-                        camera.setYaw(0);
-                        camera.setPitch(0);
+                if (keyframeMode) {
+                    consolidateKeyframe();
+                    keyframeMode = false;
+                } else {
+                    // Ensure Octants observed property is computed
+                    Gdx.app.postRunnable(() -> {
+                        // 5% of width pixels distance
+                        if (gesture.dst(screenX, screenY) < MOVE_PX_DIST) {
+                            // Stop
+                            camera.setYaw(0);
+                            camera.setPitch(0);
 
-                        // Right click, context menu
-                        IFocus hit = getBestHit(screenX, screenY);
-                        EventManager.instance.post(Events.POPUP_MENU_FOCUS, hit, screenX, screenY);
-                    }
-                });
+                            // Right click, context menu
+                            IFocus hit = getBestHit(screenX, screenY);
+                            EventManager.instance.post(Events.POPUP_MENU_FOCUS, hit, screenX, screenY);
+                        }
+                    });
+                }
             }
 
             // Remove keyboard focus from GUI elements
@@ -279,7 +304,7 @@ public class NaturalInputListener extends GestureDetector implements IObserver {
         return super.touchUp(screenX, screenY, pointer, button);
     }
 
-    protected boolean processDrag(double deltaX, double deltaY, int button) {
+    protected boolean processDrag(int screenX, int screenY, double deltaX, double deltaY, int button) {
         boolean accel = GlobalConf.scene.CINEMATIC_CAMERA;
         if (accel) {
             dragDx = deltaX;
@@ -301,15 +326,18 @@ public class NaturalInputListener extends GestureDetector implements IObserver {
 
         if (button == leftMouseButton) {
             if (isKeyPressed(rollKey)) {
-                // camera.rotate(camera.direction, deltaX * rotateAngle);
                 if (dragDx != 0)
                     camera.addRoll(dragDx, accel);
             } else {
                 camera.addRotateMovement(dragDx, dragDy, false, accel);
             }
         } else if (button == rightMouseButton) {
-            // cam.naturalCamera.addPanMovement(deltaX, deltaY);
-            camera.addRotateMovement(dragDx, dragDy, true, accel);
+            if (keyframeMode) {
+                // Drag keyframe
+                dragKeyframe(screenX, screenY);
+            } else {
+                camera.addRotateMovement(dragDx, dragDy, true, accel);
+            }
         } else if (button == middleMouseButton) {
             if (dragDx != 0)
                 camera.addForwardForce(dragDx);
@@ -332,7 +360,7 @@ public class NaturalInputListener extends GestureDetector implements IObserver {
             final double deltaY = (startY - screenY) / Gdx.graphics.getHeight();
             startX = screenX;
             startY = screenY;
-            return processDrag(deltaX, deltaY, button);
+            return processDrag(screenX, screenY, deltaX, deltaY, button);
         }
         return false;
     }

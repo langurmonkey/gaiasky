@@ -8,6 +8,7 @@ import com.badlogic.gdx.graphics.glutils.ShaderProgram;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.Array;
 import gaia.cu9.ari.gaiaorbit.data.util.PointCloudData;
+import gaia.cu9.ari.gaiaorbit.desktop.util.camera.CameraKeyframeManager;
 import gaia.cu9.ari.gaiaorbit.desktop.util.camera.Keyframe;
 import gaia.cu9.ari.gaiaorbit.render.I3DTextRenderable;
 import gaia.cu9.ari.gaiaorbit.render.RenderingContext;
@@ -104,6 +105,53 @@ public class KeyframesPathObject extends VertsObject implements I3DTextRenderabl
         this.keyframes = keyframes;
     }
 
+    public void refreshData(){
+        double[] kfPositions = new double[keyframes.size * 3];
+        double[] kfDirections = new double[keyframes.size * 3];
+        double[] kfUps = new double[keyframes.size * 3];
+        int i =0;
+        for (Keyframe kf : keyframes) {
+
+            // Fill vectors
+            kfPositions[i * 3 + 0] = kf.pos.x;
+            kfPositions[i * 3 + 1] = kf.pos.y;
+            kfPositions[i * 3 + 2] = kf.pos.z;
+
+            kfDirections[i * 3 + 0] = kf.dir.x;
+            kfDirections[i * 3 + 1] = kf.dir.y;
+            kfDirections[i * 3 + 2] = kf.dir.z;
+
+            kfUps[i * 3 + 0] = kf.up.x;
+            kfUps[i * 3 + 1] = kf.up.y;
+            kfUps[i * 3 + 2] = kf.up.z;
+
+            i++;
+        }
+        setPathKnots(kfPositions, kfDirections, kfUps);
+        if (keyframes.size > 1) {
+            segments.setPoints(kfPositions);
+            double[] pathSamples = CameraKeyframeManager.instance.samplePath(kfPositions, 20, GlobalConf.frame.KF_PATH_TYPE_POSITION);
+            path.setPoints(pathSamples);
+        } else {
+            segments.clear();
+            path.clear();
+        }
+    }
+
+    public void resamplePath(){
+        double[] kfPositions = new double[keyframes.size * 3];
+        int i = 0;
+        for (Keyframe kf : keyframes) {
+            // Fill model table
+            kfPositions[i * 3 + 0] = kf.pos.x;
+            kfPositions[i * 3 + 1] = kf.pos.y;
+            kfPositions[i * 3 + 2] = kf.pos.z;
+            i++;
+        }
+        double[] pathSamples = CameraKeyframeManager.instance.samplePath(kfPositions, 20, GlobalConf.frame.KF_PATH_TYPE_POSITION);
+        path.setPoints(pathSamples);
+    }
+
     public void setPathKnots(double[] kts, double[] dirs, double[] ups) {
         // Points
         knots.setPoints(kts);
@@ -171,7 +219,7 @@ public class KeyframesPathObject extends VertsObject implements I3DTextRenderabl
         this.addToRenderLists(camera);
     }
 
-    public boolean select(int screenX, int screenY, int w, int h, int minPixDist, NaturalCamera camera) {
+    public boolean select(int screenX, int screenY, int minPixDist, NaturalCamera camera) {
 
         Vector3 pos = aux3f1.get();
         Vector3d aux = aux3d1.get();
@@ -229,6 +277,33 @@ public class KeyframesPathObject extends VertsObject implements I3DTextRenderabl
         selected = null;
         selectedKnot.clear();
     }
+
+    public boolean isSelected() {
+        return selected != null;
+    }
+
+    public boolean moveSelection(int screenX, int screenY, NaturalCamera camera){
+        if(selected != null){
+            double originalDist = aux3d1.get().set(selected.pos).add(camera.getInversePos()).len();
+            Vector3 aux = aux3f1.get().set(screenX, screenY, 0.5f);
+            camera.getCamera().unproject(aux);
+            Vector3d newLocation = aux3d2.get().set(aux).setLength(originalDist);
+            selected.pos.set(newLocation).add(camera.getPos());
+            selectedKnot.setPoints(selected.pos.values());
+            refreshData();
+            return true;
+        }
+        return false;
+    }
+
+    public boolean consolidateMove(){
+        if(selected != null) {
+
+            return true;
+        }
+        return false;
+    }
+
 
     @Override
     protected void addToRenderLists(ICamera camera) {
@@ -290,7 +365,7 @@ public class KeyframesPathObject extends VertsObject implements I3DTextRenderabl
 
     @Override
     public float textSize() {
-        return 1e-3f;
+        return .5e-3f;
     }
 
     @Override
