@@ -52,6 +52,8 @@ public class KeyframesPathObject extends VertsObject implements I3DTextRenderabl
     /** Objects **/
     private Array<VertsObject> objects;
 
+    private float ss = 1f;
+
     public KeyframesPathObject() {
         super(null);
 
@@ -65,7 +67,7 @@ public class KeyframesPathObject extends VertsObject implements I3DTextRenderabl
         path.ct = this.ct;
         path.setColor(ggreen);
         path.setClosedLoop(false);
-        path.setPrimitiveSize(2f);
+        path.setPrimitiveSize(2f * ss);
         path.initialize();
 
         segments = new Polyline();
@@ -73,7 +75,7 @@ public class KeyframesPathObject extends VertsObject implements I3DTextRenderabl
         segments.ct = this.ct;
         segments.setColor(gyellow);
         segments.setClosedLoop(false);
-        segments.setPrimitiveSize(1f);
+        segments.setPrimitiveSize(1f * ss);
         segments.initialize();
 
         knots = new VertsObject(RenderGroup.POINT_GPU);
@@ -81,7 +83,7 @@ public class KeyframesPathObject extends VertsObject implements I3DTextRenderabl
         knots.ct = this.ct;
         knots.setColor(gwhite);
         knots.setClosedLoop(false);
-        knots.setPrimitiveSize(4f);
+        knots.setPrimitiveSize(4f * ss);
         knots.initialize();
 
         selectedKnot = new VertsObject(RenderGroup.POINT_GPU);
@@ -89,7 +91,7 @@ public class KeyframesPathObject extends VertsObject implements I3DTextRenderabl
         selectedKnot.ct = this.ct;
         selectedKnot.setColor(gpink);
         selectedKnot.setClosedLoop(false);
-        selectedKnot.setPrimitiveSize(8f);
+        selectedKnot.setPrimitiveSize(8f * ss);
         selectedKnot.setDepth(false);
         selectedKnot.initialize();
 
@@ -157,7 +159,7 @@ public class KeyframesPathObject extends VertsObject implements I3DTextRenderabl
         }
     }
 
-    public void refreshSingleVector(VertsObject vo, Vector3d pos, Vector3d vec){
+    public void refreshSingleVector(VertsObject vo, Vector3d pos, Vector3d vec) {
         PointCloudData p = vo.pointCloudData;
         p.x.set(0, pos.x);
         p.y.set(0, pos.y);
@@ -226,7 +228,7 @@ public class KeyframesPathObject extends VertsObject implements I3DTextRenderabl
         dir.ct = this.ct;
         dir.setColor(gred);
         dir.setClosedLoop(false);
-        dir.setPrimitiveSize(1f);
+        dir.setPrimitiveSize(1f * ss);
         dir.initialize();
 
         VertsObject up = new Polyline();
@@ -234,7 +236,7 @@ public class KeyframesPathObject extends VertsObject implements I3DTextRenderabl
         up.ct = this.ct;
         up.setColor(gblue);
         up.setClosedLoop(false);
-        up.setPrimitiveSize(1f);
+        up.setPrimitiveSize(1f * ss);
         up.initialize();
 
         dir.setPoints(new double[] { px, py, pz, px + dx, py + dy, pz + dz });
@@ -328,8 +330,8 @@ public class KeyframesPathObject extends VertsObject implements I3DTextRenderabl
             VertsObject dir = orientations.get(i);
             VertsObject up = orientations.get(i + 1);
 
-            dir.setPrimitiveSize(3f);
-            up.setPrimitiveSize(3f);
+            dir.setPrimitiveSize(3f * ss);
+            up.setPrimitiveSize(3f * ss);
         }
     }
 
@@ -340,8 +342,8 @@ public class KeyframesPathObject extends VertsObject implements I3DTextRenderabl
                 VertsObject dir = orientations.get(i);
                 VertsObject up = orientations.get(i + 1);
 
-                dir.setPrimitiveSize(1f);
-                up.setPrimitiveSize(1f);
+                dir.setPrimitiveSize(1f * ss);
+                up.setPrimitiveSize(1f * ss);
             }
             selected = null;
             selectedKnot.clear();
@@ -384,7 +386,7 @@ public class KeyframesPathObject extends VertsObject implements I3DTextRenderabl
         return false;
     }
 
-    public boolean rotateAroundCrs(double dx, double dy, NaturalCamera camera){
+    public boolean rotateAroundCrs(double dx, double dy, NaturalCamera camera) {
         if (selected != null) {
             Vector3d crs = aux3d1.get().set(selected.dir).crs(selected.up);
             selected.dir.rotate(crs, (float) ((dx + dy) * 500d));
