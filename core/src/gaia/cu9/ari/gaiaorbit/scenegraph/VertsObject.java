@@ -218,5 +218,13 @@ public class VertsObject extends AbstractPositionEntity implements IGPUVertsRend
     public void markForUpdate() {
         this.inGpu = false;
     }
+
+    public boolean isLine(){
+        return renderGroup == RenderGroup.LINE_GPU;
+    }
+
+    public boolean isPoint(){
+        return renderGroup == RenderGroup.POINT_GPU;
+    }
 }
 

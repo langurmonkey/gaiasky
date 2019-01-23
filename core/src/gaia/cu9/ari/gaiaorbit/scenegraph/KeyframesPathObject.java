@@ -11,8 +11,10 @@ import gaia.cu9.ari.gaiaorbit.data.util.PointCloudData;
 import gaia.cu9.ari.gaiaorbit.desktop.util.camera.CameraKeyframeManager;
 import gaia.cu9.ari.gaiaorbit.desktop.util.camera.Keyframe;
 import gaia.cu9.ari.gaiaorbit.render.I3DTextRenderable;
+import gaia.cu9.ari.gaiaorbit.render.ILineRenderable;
 import gaia.cu9.ari.gaiaorbit.render.RenderingContext;
 import gaia.cu9.ari.gaiaorbit.render.system.FontRenderSystem;
+import gaia.cu9.ari.gaiaorbit.render.system.LineRenderSystem;
 import gaia.cu9.ari.gaiaorbit.scenegraph.camera.FovCamera;
 import gaia.cu9.ari.gaiaorbit.scenegraph.camera.ICamera;
 import gaia.cu9.ari.gaiaorbit.scenegraph.camera.NaturalCamera;
@@ -22,7 +24,7 @@ import gaia.cu9.ari.gaiaorbit.util.gravwaves.RelativisticEffectsManager;
 import gaia.cu9.ari.gaiaorbit.util.math.Vector3d;
 import gaia.cu9.ari.gaiaorbit.util.time.ITimeFrameProvider;
 
-public class KeyframesPathObject extends VertsObject implements I3DTextRenderable {
+public class KeyframesPathObject extends VertsObject implements I3DTextRenderable, ILineRenderable {
     private static float[] ggreen = new float[] { 0f / 255f, 135f / 255f, 68f / 255f, 1f };
     private static float[] gblue = new float[] { 0f / 255f, 87f / 255f, 231f / 255f, 1f };
     private static float[] gred = new float[] { 214f / 255f, 45f / 255f, 32f / 255f, 1f };
@@ -52,6 +54,10 @@ public class KeyframesPathObject extends VertsObject implements I3DTextRenderabl
     /** Objects **/
     private Array<VertsObject> objects;
 
+    /** Aux vectors **/
+    private Vector3d prev, curr;
+
+    /** Multiplier to primitive size **/
     private float ss = 1f;
 
     public KeyframesPathObject() {
@@ -101,6 +107,8 @@ public class KeyframesPathObject extends VertsObject implements I3DTextRenderabl
         objects.add(knots);
         objects.add(selectedKnot);
 
+        prev = new Vector3d();
+        curr = new Vector3d();
     }
 
     public void setKeyframes(Array<Keyframe> keyframes) {
@@ -402,6 +410,9 @@ public class KeyframesPathObject extends VertsObject implements I3DTextRenderabl
         if (selected != null) {
             addToRender(this, RenderGroup.FONT_LABEL);
         }
+        if (GlobalConf.scene.ORBIT_RENDERER == 0) {
+            addToRender(this, RenderGroup.LINE);
+        }
     }
 
     @Override
@@ -501,5 +512,34 @@ public class KeyframesPathObject extends VertsObject implements I3DTextRenderabl
     @Override
     public float getTextOpacity() {
         return getOpacity();
+    }
+
+    @Override
+    public float getLineWidth() {
+        return 1;
+    }
+
+    @Override
+    public void render(LineRenderSystem renderer, ICamera camera, float alpha) {
+        for (VertsObject vo : objects)
+            if (vo.isLine())
+                renderVertsObject(vo, renderer, camera, alpha);
+    }
+
+    private void renderVertsObject(VertsObject vo, LineRenderSystem renderer, ICamera camera, float alpha) {
+        // This is so that the shape renderer does not mess up the z-buffer
+        PointCloudData pointCloudData = vo.pointCloudData;
+        if (pointCloudData != null && pointCloudData.getNumPoints() > 0) {
+            float[] cc = vo.getColor();
+            for (int i = 1; i < pointCloudData.getNumPoints(); i++) {
+                pointCloudData.loadPoint(prev, i - 1);
+                pointCloudData.loadPoint(curr, i);
+
+                prev.add(camera.getInversePos());
+                curr.add(camera.getInversePos());
+
+                renderer.addLine(this, (float) prev.x, (float) prev.y, (float) prev.z, (float) curr.x, (float) curr.y, (float) curr.z, cc[0], cc[1], cc[2], alpha * cc[3]);
+            }
+        }
     }
 }
