@@ -125,27 +125,34 @@ public class CameraKeyframeManager implements IObserver {
     }
 
     public double[] samplePath(double[] points, int samplesPerSegment, PathType pathType) {
-        Vector3d[] pts = new Vector3d[points.length / 3];
-        for (int i = 0; i < pts.length; i++) {
-            int j = i * 3;
-            pts[i] = new Vector3d(points[j], points[j + 1], points[j + 2]);
-        }
-        int nSamples = (pts.length - 1) * samplesPerSegment + 1;
-        int nChunks = nSamples - 1;
-        double[] result = new double[nSamples * 3];
+        if(pathType == PathType.LINEAR){
+            // No need to sample a linear interpolation
+            double[] result = new double[points.length];
+            System.arraycopy(points, 0, result, 0, points.length);
+            return result;
+        }else {
+            Vector3d[] pts = new Vector3d[points.length / 3];
+            for (int i = 0; i < pts.length; i++) {
+                int j = i * 3;
+                pts[i] = new Vector3d(points[j], points[j + 1], points[j + 2]);
+            }
+            int nSamples = (pts.length - 1) * samplesPerSegment + 1;
+            int nChunks = nSamples - 1;
+            double[] result = new double[nSamples * 3];
 
-        Vector3d aux = new Vector3d();
-        Pathd<Vector3d> sampler = getPath(pts, pathType);
-        double step = 1d / nChunks;
-        int i = 0;
-        for (double t = 0d; i < result.length; t += step) {
-            sampler.valueAt(aux, t);
-            result[i + 0] = aux.x;
-            result[i + 1] = aux.y;
-            result[i + 2] = aux.z;
-            i += 3;
+            Vector3d aux = new Vector3d();
+            Pathd<Vector3d> sampler = getPath(pts, pathType);
+            double step = 1d / nChunks;
+            int i = 0;
+            for (double t = 0d; i < result.length; t += step) {
+                sampler.valueAt(aux, t);
+                result[i + 0] = aux.x;
+                result[i + 1] = aux.y;
+                result[i + 2] = aux.z;
+                i += 3;
+            }
+            return result;
         }
-        return result;
     }
 
     public void exportKeyframesFile(Array<Keyframe> keyframes, String fileName) {

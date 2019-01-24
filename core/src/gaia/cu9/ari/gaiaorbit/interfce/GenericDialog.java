@@ -29,11 +29,11 @@ public abstract class GenericDialog extends CollapsibleWindow {
     protected static float pad;
     protected static float pad5;
 
-    static{
+    static {
         updatePads();
     }
 
-    public static void updatePads(){
+    public static void updatePads() {
         pad = 10f * GlobalConf.SCALE_FACTOR;
         pad5 = 5f * GlobalConf.SCALE_FACTOR;
     }
@@ -86,10 +86,10 @@ public abstract class GenericDialog extends CollapsibleWindow {
 
     protected void recalculateButtonSize() {
         float w = 80 * GlobalConf.SCALE_FACTOR;
-        for(Actor button : buttonGroup.getChildren()){
-            w = Math.max(button.getWidth(), w);
+        for (Actor button : buttonGroup.getChildren()) {
+            w = Math.max(button.getWidth() + pad * 4f, w);
         }
-        for(Actor button : buttonGroup.getChildren()){
+        for (Actor button : buttonGroup.getChildren()) {
             button.setWidth(w);
         }
     }
@@ -98,25 +98,20 @@ public abstract class GenericDialog extends CollapsibleWindow {
 
         /** BUTTONS **/
         buttonGroup = new HorizontalGroup();
-        buttonGroup.pad(pad5);
         buttonGroup.space(pad5);
 
         if (acceptText != null) {
             acceptButton = new OwnTextButton(acceptText, skin, "default");
             acceptButton.setName("accept");
-            acceptButton.addListener(new EventListener() {
-
-                @Override
-                public boolean handle(Event event) {
-                    if (event instanceof ChangeEvent) {
-                        accept();
-                        if (acceptRunnable != null)
-                            acceptRunnable.run();
-                        me.hide();
-                        return true;
-                    }
-                    return false;
+            acceptButton.addListener((event) -> {
+                if (event instanceof ChangeEvent) {
+                    accept();
+                    if (acceptRunnable != null)
+                        acceptRunnable.run();
+                    me.hide();
+                    return true;
                 }
+                return false;
 
             });
             buttonGroup.addActor(acceptButton);
@@ -124,27 +119,23 @@ public abstract class GenericDialog extends CollapsibleWindow {
         if (cancelText != null) {
             cancelButton = new OwnTextButton(cancelText, skin, "default");
             cancelButton.setName("cancel");
-            cancelButton.addListener(new EventListener() {
-                @Override
-                public boolean handle(Event event) {
-                    if (event instanceof ChangeEvent) {
-                        cancel();
-                        if (cancelRunnable != null)
-                            cancelRunnable.run();
-                        me.hide();
-                        return true;
-                    }
-
-                    return false;
+            cancelButton.addListener((event) -> {
+                if (event instanceof ChangeEvent) {
+                    cancel();
+                    if (cancelRunnable != null)
+                        cancelRunnable.run();
+                    me.hide();
+                    return true;
                 }
 
+                return false;
             });
             buttonGroup.addActor(cancelButton);
         }
         recalculateButtonSize();
 
-        add(content).pad(pad5).row();
-        add(buttonGroup).pad(pad5).bottom().right();
+        add(content).pad(pad).row();
+        add(buttonGroup).pad(pad).bottom().right();
         getTitleTable().align(Align.left);
 
         pack();

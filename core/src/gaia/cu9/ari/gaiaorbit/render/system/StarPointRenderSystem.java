@@ -24,7 +24,7 @@ import gaia.cu9.ari.gaiaorbit.scenegraph.camera.ICamera;
 import gaia.cu9.ari.gaiaorbit.util.GlobalConf;
 import gaia.cu9.ari.gaiaorbit.util.coord.AstroUtils;
 
-public class PixelRenderSystem extends ImmediateRenderSystem implements IObserver {
+public class StarPointRenderSystem extends ImmediateRenderSystem implements IObserver {
     private final double BRIGHTNESS_FACTOR;
 
     boolean starColorTransit = false;
@@ -35,7 +35,7 @@ public class PixelRenderSystem extends ImmediateRenderSystem implements IObserve
 
     boolean initializing = false;
 
-    public PixelRenderSystem(RenderGroup rg, float[] alphas, ShaderProgram[] shaders, ComponentType ct) {
+    public StarPointRenderSystem(RenderGroup rg, float[] alphas, ShaderProgram[] shaders, ComponentType ct) {
         super(rg, alphas, shaders, 10000);
         EventManager.instance.subscribe(this, Events.TRANSIT_COLOUR_CMD, Events.ONLY_OBSERVED_STARS_CMD, Events.STAR_MIN_OPACITY_CMD);
         BRIGHTNESS_FACTOR = 10;
@@ -67,7 +67,7 @@ public class PixelRenderSystem extends ImmediateRenderSystem implements IObserve
         aux = new Vector3();
 
         /** Init renderer **/
-        maxVertices = 3000000;
+        maxVertices = 3000;
 
         VertexAttribute[] attribs = buildVertexAttributes();
         curr.mesh = new Mesh(false, maxVertices, 0, attribs);
@@ -76,6 +76,19 @@ public class PixelRenderSystem extends ImmediateRenderSystem implements IObserve
         curr.colorOffset = curr.mesh.getVertexAttribute(Usage.ColorPacked) != null ? curr.mesh.getVertexAttribute(Usage.ColorPacked).offset / 4 : 0;
         pmOffset = curr.mesh.getVertexAttribute(Usage.Tangent) != null ? curr.mesh.getVertexAttribute(Usage.Tangent).offset / 4 : 0;
         sizeOffset = curr.mesh.getVertexAttribute(Usage.Generic) != null ? curr.mesh.getVertexAttribute(Usage.Generic).offset / 4 : 0;
+    }
+
+    protected VertexAttribute[] buildVertexAttributes() {
+        Array<VertexAttribute> attribs = new Array<VertexAttribute>();
+        attribs.add(new VertexAttribute(Usage.Position, 3, ShaderProgram.POSITION_ATTRIBUTE));
+        attribs.add(new VertexAttribute(Usage.Tangent, 3, "a_pm"));
+        attribs.add(new VertexAttribute(Usage.ColorPacked, 4, ShaderProgram.COLOR_ATTRIBUTE));
+        attribs.add(new VertexAttribute(Usage.Generic, 1, "a_size"));
+
+        VertexAttribute[] array = new VertexAttribute[attribs.size];
+        for (int i = 0; i < attribs.size; i++)
+            array[i] = attribs.get(i);
+        return array;
     }
 
     @Override
@@ -157,18 +170,6 @@ public class PixelRenderSystem extends ImmediateRenderSystem implements IObserve
 
     }
 
-    protected VertexAttribute[] buildVertexAttributes() {
-        Array<VertexAttribute> attribs = new Array<VertexAttribute>();
-        attribs.add(new VertexAttribute(Usage.Position, 3, ShaderProgram.POSITION_ATTRIBUTE));
-        attribs.add(new VertexAttribute(Usage.Tangent, 3, "a_pm"));
-        attribs.add(new VertexAttribute(Usage.ColorPacked, 4, ShaderProgram.COLOR_ATTRIBUTE));
-        attribs.add(new VertexAttribute(Usage.Generic, 1, "a_size"));
-
-        VertexAttribute[] array = new VertexAttribute[attribs.size];
-        for (int i = 0; i < attribs.size; i++)
-            array[i] = attribs.get(i);
-        return array;
-    }
 
     @Override
     public void notify(Events event, Object... data) {

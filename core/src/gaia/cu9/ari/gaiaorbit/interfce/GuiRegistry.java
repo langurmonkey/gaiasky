@@ -204,7 +204,7 @@ public class GuiRegistry implements IObserver {
                 break;
             case UI_THEME_RELOAD_INFO:
                 if (keyframesWindow != null) {
-                    keyframesWindow.clear();
+                    keyframesWindow.dispose();
                     keyframesWindow = null;
                 }
                 this.skin = (Skin) data[0];

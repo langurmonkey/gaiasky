@@ -35,7 +35,7 @@ public class KeyframePreferencesWindow extends GenericDialog {
         // fps
         OwnLabel camfpsLabel = new OwnLabel("Target frames per second", skin);
         camrecFps = new OwnTextField(Integer.toString(GlobalConf.frame.CAMERA_REC_TARGET_FPS), skin, new IntValidator(1, 200));
-        camrecFps.setWidth(60 * GlobalConf.SCALE_FACTOR * 3f);
+        camrecFps.setWidth(150 * GlobalConf.SCALE_FACTOR);
 
         OwnLabel interpTitle = new OwnLabel("Interpolation method", skin, "hud-header");
 
@@ -45,6 +45,7 @@ public class KeyframePreferencesWindow extends GenericDialog {
         posMethod.setItems(interpolation);
         posMethod.setSelectedIndex(GlobalConf.frame.KF_PATH_TYPE_POSITION.ordinal());
         posMethod.setItems(interpolation);
+        posMethod.setWidth(150 * GlobalConf.SCALE_FACTOR);
 
         // Camera orientation
         OwnLabel orientation = new OwnLabel("Camera orientation", skin);
@@ -52,6 +53,7 @@ public class KeyframePreferencesWindow extends GenericDialog {
         orientationMethod.setItems(interpolation);
         orientationMethod.setSelectedIndex(GlobalConf.frame.KF_PATH_TYPE_ORIENTATION.ordinal());
         orientationMethod.setItems(interpolation);
+        orientationMethod.setWidth(150 * GlobalConf.SCALE_FACTOR);
 
         // Time
         OwnLabel time = new OwnLabel("Time", skin);
@@ -59,19 +61,19 @@ public class KeyframePreferencesWindow extends GenericDialog {
 
         content.add(generalTitle).left().top().colspan(2).padBottom(pad).row();
 
-        content.add(camfpsLabel).left().padRight(pad).padBottom(pad5);
-        content.add(camrecFps).left().padBottom(pad5).padBottom(pad).row();
+        content.add(camfpsLabel).left().padRight(pad).padBottom(pad * 3f);
+        content.add(camrecFps).left().padBottom(pad * 3f).row();
 
         content.add(interpTitle).left().top().colspan(2).padBottom(pad).row();
 
-        content.add(pos).left().padRight(pad).padBottom(pad5);
-        content.add(posMethod).left().padBottom(pad5).row();
+        content.add(pos).left().padRight(pad).padBottom(pad);
+        content.add(posMethod).left().padBottom(pad).row();
 
-        content.add(orientation).left().padRight(pad).padBottom(pad5);
-        content.add(orientationMethod).left().padBottom(pad5).row();
+        content.add(orientation).left().padRight(pad).padBottom(pad);
+        content.add(orientationMethod).left().padBottom(pad).row();
 
-        content.add(time).left().padRight(pad).padBottom(pad5);
-        content.add(timeMethod).left().padBottom(pad5).row();
+        content.add(time).left().padRight(pad).padBottom(pad * 3f);
+        content.add(timeMethod).left().padBottom(pad * 3f).row();
 
     }
 

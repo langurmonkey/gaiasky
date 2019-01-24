@@ -56,9 +56,8 @@ import java.util.Map;
 
 /**
  * Renders a scenegraph.
- * 
- * @author Toni Sagrista
  *
+ * @author Toni Sagrista
  */
 public class SceneGraphRenderer extends AbstractRenderer implements IProcessRenderer, IObserver {
     private static final Log logger = Logger.getLogger(SceneGraphRenderer.class);
@@ -76,8 +75,8 @@ public class SceneGraphRenderer extends AbstractRenderer implements IProcessRend
 
     private ShaderProgram distanceFieldFontShader;
 
-    private ShaderProgram[] starGroupShaders, particleGroupShaders, particleEffectShaders, orbitElemShaders, lineShaders, lineQuadShaders, lineGpuShaders, mwPointShaders, mwOitShaders, mwNebulaShaders, pixelShaders, galShaders, spriteShaders, starShaders;
-    private AssetDescriptor<ShaderProgram>[] starGroupDesc, particleGroupDesc, particleEffectDesc, orbitElemDesc, lineDesc, lineQuadDesc, lineGpuDesc, mwPointDesc, mwOitDesc, mwNebulaDesc, pixelDesc, galDesc, spriteDesc, starDesc;
+    private ShaderProgram[] starGroupShaders, particleGroupShaders, particleEffectShaders, orbitElemShaders, pointShaders, lineShaders, lineQuadShaders, lineGpuShaders, mwPointShaders, mwOitShaders, mwNebulaShaders, starPointShaders, galShaders, spriteShaders, starBillboardShaders;
+    private AssetDescriptor<ShaderProgram>[] starGroupDesc, particleGroupDesc, particleEffectDesc, orbitElemDesc, pointDesc, lineDesc, lineQuadDesc, lineGpuDesc, mwPointDesc, mwOitDesc, mwNebulaDesc, starPointDesc, galDesc, spriteDesc, starBillboardDesc;
 
     private int maxTexSize;
 
@@ -127,8 +126,7 @@ public class SceneGraphRenderer extends AbstractRenderer implements IProcessRend
     }
 
     private AssetDescriptor<ShaderProgram>[] loadShader(AssetManager manager, String vfile, String ffile, String[] names, String[] prependVertex) {
-        @SuppressWarnings("unchecked")
-        AssetDescriptor<ShaderProgram>[] result = new AssetDescriptor[prependVertex.length];
+        @SuppressWarnings("unchecked") AssetDescriptor<ShaderProgram>[] result = new AssetDescriptor[prependVertex.length];
 
         int i = 0;
         for (String prep : prependVertex) {
@@ -154,16 +152,17 @@ public class SceneGraphRenderer extends AbstractRenderer implements IProcessRend
         /** LOAD SHADER PROGRAMS WITH ASSET MANAGER **/
         manager.load("shader/font.vertex.glsl", ShaderProgram.class);
 
-        String[] defines = new String[]{ "", "#define relativisticEffects\n", "#define gravitationalWaves\n", "#define relativisticEffects\n#define gravitationalWaves\n" };
+        String[] defines = new String[] { "", "#define relativisticEffects\n", "#define gravitationalWaves\n", "#define relativisticEffects\n#define gravitationalWaves\n" };
 
-        starDesc = loadShader(manager, "shader/star.vertex.glsl", "shader/star.fragment.glsl", genShaderNames("star"), defines);
+        starBillboardDesc = loadShader(manager, "shader/star.billboard.vertex.glsl", "shader/star.billboard.fragment.glsl", genShaderNames("starBillboard"), defines);
         spriteDesc = loadShader(manager, "shader/sprite.vertex.glsl", "shader/sprite.fragment.glsl", genShaderNames("sprite"), defines);
-        pixelDesc = loadShader(manager, "shader/point.vertex.glsl", "shader/point.fragment.glsl", genShaderNames("pixel"), defines);
-        mwPointDesc = loadShader(manager, "shader/point.galaxy.vertex.glsl", "shader/point.galaxy.fragment.glsl", genShaderNames("pointGal"), defines);
+        starPointDesc = loadShader(manager, "shader/star.point.vertex.glsl", "shader/star.point.fragment.glsl", genShaderNames("starPoint"), defines);
+        mwPointDesc = loadShader(manager, "shader/point.galaxy.vertex.glsl", "shader/point.galaxy.fragment.glsl", genShaderNames("mwPoint"), defines);
         mwOitDesc = loadShader(manager, "shader/galaxy.oit.vertex.glsl", "shader/galaxy.oit.fragment.glsl", genShaderNames("galOit"), defines);
 
         mwNebulaDesc = loadShader(manager, "shader/nebula.vertex.glsl", "shader/nebula.fragment.glsl", genShaderNames("nebula"), defines);
-        lineDesc = loadShader(manager, "shader/line.vertex.glsl", "shader/line.fragment.glsl", genShaderNames("line"), defines);
+        pointDesc = loadShader(manager, "shader/point.cpu.vertex.glsl", "shader/point.cpu.fragment.glsl", genShaderNames("pointCpu"), defines);
+        lineDesc = loadShader(manager, "shader/line.cpu.vertex.glsl", "shader/line.cpu.fragment.glsl", genShaderNames("lineCpu"), defines);
         lineQuadDesc = loadShader(manager, "shader/line.quad.vertex.glsl", "shader/line.quad.fragment.glsl", genShaderNames("lineQuad"), defines);
         lineGpuDesc = loadShader(manager, "shader/line.gpu.vertex.glsl", "shader/line.gpu.fragment.glsl", genShaderNames("lineGpu"), defines);
         galDesc = loadShader(manager, "shader/gal.vertex.glsl", "shader/gal.fragment.glsl", genShaderNames("gal"), defines);
@@ -265,14 +264,14 @@ public class SceneGraphRenderer extends AbstractRenderer implements IProcessRend
         logger.info("Max texture size: " + maxTexSize + "^2 pixels");
 
         /**
-         * STAR SHADER
+         * STAR BILLBOARD SHADER
          */
-        starShaders = fetchShaderProgram(manager, starDesc, genShaderFullNames("star"));
+        starBillboardShaders = fetchShaderProgram(manager, starBillboardDesc, genShaderFullNames("star-billboard"));
 
         /**
          * GALAXY SHADER
          */
-        galShaders = fetchShaderProgram(manager, galDesc, genShaderFullNames( "galaxy"));
+        galShaders = fetchShaderProgram(manager, galDesc, genShaderFullNames("galaxy"));
 
         /**
          * FONT SHADER
@@ -288,9 +287,14 @@ public class SceneGraphRenderer extends AbstractRenderer implements IProcessRend
         spriteShaders = fetchShaderProgram(manager, spriteDesc, genShaderFullNames("sprite"));
 
         /**
-         * LINE
+         * POINT CPU
          */
-        lineShaders = fetchShaderProgram(manager, lineDesc, genShaderFullNames("line"));
+        pointShaders = fetchShaderProgram(manager, pointDesc, genShaderFullNames("point-cpu"));
+
+        /**
+         * LINE CPU
+         */
+        lineShaders = fetchShaderProgram(manager, lineDesc, genShaderFullNames("line-cpu"));
 
         /**
          * LINE QUAD
@@ -333,9 +337,9 @@ public class SceneGraphRenderer extends AbstractRenderer implements IProcessRend
         starGroupShaders = fetchShaderProgram(manager, starGroupDesc, genShaderFullNames("star-group"));
 
         /**
-         * PIXEL
+         * STAR POINT
          */
-        pixelShaders = fetchShaderProgram(manager, pixelDesc, genShaderFullNames("pixel"));
+        starPointShaders = fetchShaderProgram(manager, starPointDesc, genShaderFullNames("star-point"));
 
         /**
          * ORBITAL ELEMENTS PARTICLES - default and relativistic
@@ -427,7 +431,7 @@ public class SceneGraphRenderer extends AbstractRenderer implements IProcessRend
          **/
 
         // POINTS
-        AbstractRenderSystem pixelStarProc = new PixelRenderSystem(RenderGroup.POINT_STAR, alphas, pixelShaders, ComponentType.Stars);
+        AbstractRenderSystem pixelStarProc = new StarPointRenderSystem(RenderGroup.POINT_STAR, alphas, starPointShaders, ComponentType.Stars);
         pixelStarProc.setPreRunnable(blendNoDepthRunnable);
 
         // MODEL FRONT-BACK - NO CULL FACE
@@ -468,7 +472,7 @@ public class SceneGraphRenderer extends AbstractRenderer implements IProcessRend
         });
 
         // BILLBOARD STARS
-        billboardStarsProc = new BillboardStarRenderSystem(RenderGroup.BILLBOARD_STAR, alphas, starShaders, "data/tex/base/star_glow_s.png", ComponentType.Stars.ordinal());
+        billboardStarsProc = new BillboardStarRenderSystem(RenderGroup.BILLBOARD_STAR, alphas, starBillboardShaders, "data/tex/base/star_glow_s.png", ComponentType.Stars.ordinal());
         billboardStarsProc.setPreRunnable(blendNoDepthRunnable);
         billboardStarsProc.setPostRunnable(new RenderSystemRunnable() {
 
@@ -537,6 +541,9 @@ public class SceneGraphRenderer extends AbstractRenderer implements IProcessRend
         AbstractRenderSystem lineGpuProc = new VertGPURenderSystem(RenderGroup.LINE_GPU, alphas, lineGpuShaders, GL20.GL_LINE_STRIP);
         lineGpuProc.setPreRunnable(blendDepthRunnable);
 
+        // POINTS CPU
+        AbstractRenderSystem pointProc = new PointRenderSystem(RenderGroup.POINT, alphas, pointShaders);
+
         // POINTS GPU
         AbstractRenderSystem pointGpuProc = new VertGPURenderSystem(RenderGroup.POINT_GPU, alphas, lineGpuShaders, GL20.GL_POINTS);
         pointGpuProc.setPreRunnable(blendDepthRunnable);
@@ -585,7 +592,7 @@ public class SceneGraphRenderer extends AbstractRenderer implements IProcessRend
         labelsProc.setPreRunnable(blendNoDepthRunnable);
 
         // BILLBOARD SSO
-        AbstractRenderSystem billboardSSOProc = new BillboardStarRenderSystem(RenderGroup.BILLBOARD_SSO, alphas, starShaders, "data/tex/base/sso.png", -1);
+        AbstractRenderSystem billboardSSOProc = new BillboardStarRenderSystem(RenderGroup.BILLBOARD_SSO, alphas, starBillboardShaders, "data/tex/base/sso.png", -1);
         billboardSSOProc.setPreRunnable(additiveBlendDepthRunnable);
         billboardSSOProc.setPostRunnable(restoreRegularBlend);
 
@@ -638,14 +645,21 @@ public class SceneGraphRenderer extends AbstractRenderer implements IProcessRend
         // Billboard for sprites
         renderProcesses.add(billboardSpritesProc);
 
+        // Models
         renderProcesses.add(modelFrontProc);
         renderProcesses.add(modelBeamProc);
         renderProcesses.add(modelMeshProc);
 
+        // Labels
         renderProcesses.add(labelsProc);
+
+        // Primitives
         renderProcesses.add(lineProc);
         renderProcesses.add(lineGpuProc);
+        renderProcesses.add(pointProc);
         renderProcesses.add(pointGpuProc);
+
+        // Billboards SSO
         renderProcesses.add(billboardSSOProc);
 
         renderProcesses.add(modelStarsProc);
@@ -664,12 +678,12 @@ public class SceneGraphRenderer extends AbstractRenderer implements IProcessRend
 
     }
 
-    private String[] genShaderNames(String baseName){
-        return new String[]{ baseName, baseName + "Rel", baseName + "Grav", baseName + "RelGrav"};
+    private String[] genShaderNames(String baseName) {
+        return new String[] { baseName, baseName + "Rel", baseName + "Grav", baseName + "RelGrav" };
     }
 
-    private String[] genShaderFullNames(String baseName){
-        return new String[]{ baseName, baseName + " (rel)", baseName + " (grav)", baseName + " (rel+grav)"};
+    private String[] genShaderFullNames(String baseName) {
+        return new String[] { baseName, baseName + " (rel)", baseName + " (grav)", baseName + " (rel+grav)" };
     }
 
     private void initSGR(ICamera camera) {
@@ -861,13 +875,10 @@ public class SceneGraphRenderer extends AbstractRenderer implements IProcessRend
 
     /**
      * Renders the scene
-     * 
-     * @param camera
-     *            The camera to use
-     * @param t
-     *            The time in seconds since the start
-     * @param rc
-     *            The render context
+     *
+     * @param camera The camera to use
+     * @param t      The time in seconds since the start
+     * @param rc     The render context
      */
     public void renderScene(ICamera camera, double t, RenderingContext rc) {
         // Update time difference since last update
@@ -892,15 +903,11 @@ public class SceneGraphRenderer extends AbstractRenderer implements IProcessRend
 
     /**
      * Renders all the systems which are the same type of the given class
-     * 
-     * @param camera
-     *            The camera to use
-     * @param t
-     *            The time in seconds since the start
-     * @param rc
-     *            The render contex
-     * @param clazz
-     *            The class
+     *
+     * @param camera The camera to use
+     * @param t      The time in seconds since the start
+     * @param rc     The render contex
+     * @param clazz  The class
      */
     public void renderSystem(ICamera camera, double t, RenderingContext rc, Class<? extends IRenderSystem> clazz) {
         // Update time difference since last update
@@ -946,9 +953,8 @@ public class SceneGraphRenderer extends AbstractRenderer implements IProcessRend
 
     /**
      * Checks if a given component type is on
-     * 
-     * @param comp
-     *            The component
+     *
+     * @param comp The component
      * @return Whether the component is on
      */
     public boolean isOn(ComponentType comp) {
@@ -957,9 +963,8 @@ public class SceneGraphRenderer extends AbstractRenderer implements IProcessRend
 
     /**
      * Checks if the component types are all on
-     * 
-     * @param comp
-     *            The components
+     *
+     * @param comp The components
      * @return Whether the components are all on
      */
     public boolean isOn(ComponentTypes comp) {
@@ -1073,11 +1078,9 @@ public class SceneGraphRenderer extends AbstractRenderer implements IProcessRend
 
     /**
      * Computes the alpha for the given component type.
-     * 
-     * @param type
-     *            The component type.
-     * @param t
-     *            The current time in seconds.
+     *
+     * @param type The component type.
+     * @param t    The current time in seconds.
      * @return The alpha value.
      */
     private float calculateAlpha(ComponentType type, double t) {

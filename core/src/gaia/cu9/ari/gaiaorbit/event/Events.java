@@ -291,6 +291,15 @@ public enum Events {
     /** Refreshes the keyframes from the model **/
     KEYFRAMES_REFRESH,
 
+    /** The given keyframe has been selected **/
+    KEYFRAME_SELECT,
+
+    /** The given keyframe is no longer selected **/
+    KEYFRAME_UNSELECT,
+
+    /** Add new keyframe at the end with the current camera settings **/
+    KEYFRAME_ADD,
+
     /**
      * Issues the command to change the high accuracy setting. Contains a
      * boolean with the setting

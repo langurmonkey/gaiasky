@@ -7,9 +7,9 @@ precision mediump int;
 
 attribute vec4 a_position;
 attribute vec4 a_color;
+attribute float a_size;
 
 uniform mat4 u_projModelView;
-uniform vec2 u_viewport;
 
 varying vec4 v_col;
 
@@ -42,5 +42,6 @@ void main() {
     #endif // gravitationalWaves
     
     gl_Position = u_projModelView * pos;
+    gl_PointSize = a_size;
     v_col = a_color;
 }

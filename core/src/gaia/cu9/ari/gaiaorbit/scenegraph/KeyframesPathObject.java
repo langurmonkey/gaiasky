@@ -10,11 +10,15 @@ import com.badlogic.gdx.utils.Array;
 import gaia.cu9.ari.gaiaorbit.data.util.PointCloudData;
 import gaia.cu9.ari.gaiaorbit.desktop.util.camera.CameraKeyframeManager;
 import gaia.cu9.ari.gaiaorbit.desktop.util.camera.Keyframe;
+import gaia.cu9.ari.gaiaorbit.event.EventManager;
+import gaia.cu9.ari.gaiaorbit.event.Events;
 import gaia.cu9.ari.gaiaorbit.render.I3DTextRenderable;
 import gaia.cu9.ari.gaiaorbit.render.ILineRenderable;
+import gaia.cu9.ari.gaiaorbit.render.IPointRenderable;
 import gaia.cu9.ari.gaiaorbit.render.RenderingContext;
 import gaia.cu9.ari.gaiaorbit.render.system.FontRenderSystem;
 import gaia.cu9.ari.gaiaorbit.render.system.LineRenderSystem;
+import gaia.cu9.ari.gaiaorbit.render.system.PointRenderSystem;
 import gaia.cu9.ari.gaiaorbit.scenegraph.camera.FovCamera;
 import gaia.cu9.ari.gaiaorbit.scenegraph.camera.ICamera;
 import gaia.cu9.ari.gaiaorbit.scenegraph.camera.NaturalCamera;
@@ -24,7 +28,7 @@ import gaia.cu9.ari.gaiaorbit.util.gravwaves.RelativisticEffectsManager;
 import gaia.cu9.ari.gaiaorbit.util.math.Vector3d;
 import gaia.cu9.ari.gaiaorbit.util.time.ITimeFrameProvider;
 
-public class KeyframesPathObject extends VertsObject implements I3DTextRenderable, ILineRenderable {
+public class KeyframesPathObject extends VertsObject implements I3DTextRenderable, ILineRenderable, IPointRenderable {
     private static float[] ggreen = new float[] { 0f / 255f, 135f / 255f, 68f / 255f, 1f };
     private static float[] gblue = new float[] { 0f / 255f, 87f / 255f, 231f / 255f, 1f };
     private static float[] gred = new float[] { 214f / 255f, 45f / 255f, 32f / 255f, 1f };
@@ -54,9 +58,6 @@ public class KeyframesPathObject extends VertsObject implements I3DTextRenderabl
     /** Objects **/
     private Array<VertsObject> objects;
 
-    /** Aux vectors **/
-    private Vector3d prev, curr;
-
     /** Multiplier to primitive size **/
     private float ss = 1f;
 
@@ -68,7 +69,7 @@ public class KeyframesPathObject extends VertsObject implements I3DTextRenderabl
     public void initialize() {
         orientations = new Array<>();
 
-        path = new Polyline();
+        path = new Polyline(RenderGroup.LINE);
         path.setName("Keyframes.path");
         path.ct = this.ct;
         path.setColor(ggreen);
@@ -76,7 +77,7 @@ public class KeyframesPathObject extends VertsObject implements I3DTextRenderabl
         path.setPrimitiveSize(2f * ss);
         path.initialize();
 
-        segments = new Polyline();
+        segments = new Polyline(RenderGroup.LINE);
         segments.setName("Keyframes.segments");
         segments.ct = this.ct;
         segments.setColor(gyellow);
@@ -84,7 +85,7 @@ public class KeyframesPathObject extends VertsObject implements I3DTextRenderabl
         segments.setPrimitiveSize(1f * ss);
         segments.initialize();
 
-        knots = new VertsObject(RenderGroup.POINT_GPU);
+        knots = new Points(RenderGroup.POINT);
         knots.setName("Keyframes.knots");
         knots.ct = this.ct;
         knots.setColor(gwhite);
@@ -92,12 +93,12 @@ public class KeyframesPathObject extends VertsObject implements I3DTextRenderabl
         knots.setPrimitiveSize(4f * ss);
         knots.initialize();
 
-        selectedKnot = new VertsObject(RenderGroup.POINT_GPU);
+        selectedKnot = new Points(RenderGroup.POINT);
         selectedKnot.setName("Keyframes.selknot");
         selectedKnot.ct = this.ct;
         selectedKnot.setColor(gpink);
         selectedKnot.setClosedLoop(false);
-        selectedKnot.setPrimitiveSize(8f * ss);
+        selectedKnot.setPrimitiveSize(10f * ss);
         selectedKnot.setDepth(false);
         selectedKnot.initialize();
 
@@ -106,9 +107,6 @@ public class KeyframesPathObject extends VertsObject implements I3DTextRenderabl
         objects.add(segments);
         objects.add(knots);
         objects.add(selectedKnot);
-
-        prev = new Vector3d();
-        curr = new Vector3d();
     }
 
     public void setKeyframes(Array<Keyframe> keyframes) {
@@ -180,17 +178,19 @@ public class KeyframesPathObject extends VertsObject implements I3DTextRenderabl
     }
 
     public void resamplePath() {
-        double[] kfPositions = new double[keyframes.size * 3];
-        int i = 0;
-        for (Keyframe kf : keyframes) {
-            // Fill model table
-            kfPositions[i * 3 + 0] = kf.pos.x;
-            kfPositions[i * 3 + 1] = kf.pos.y;
-            kfPositions[i * 3 + 2] = kf.pos.z;
-            i++;
+        if (keyframes.size > 0) {
+            double[] kfPositions = new double[keyframes.size * 3];
+            int i = 0;
+            for (Keyframe kf : keyframes) {
+                // Fill model table
+                kfPositions[i * 3 + 0] = kf.pos.x;
+                kfPositions[i * 3 + 1] = kf.pos.y;
+                kfPositions[i * 3 + 2] = kf.pos.z;
+                i++;
+            }
+            double[] pathSamples = CameraKeyframeManager.instance.samplePath(kfPositions, 20, GlobalConf.frame.KF_PATH_TYPE_POSITION);
+            path.setPoints(pathSamples);
         }
-        double[] pathSamples = CameraKeyframeManager.instance.samplePath(kfPositions, 20, GlobalConf.frame.KF_PATH_TYPE_POSITION);
-        path.setPoints(pathSamples);
     }
 
     public void setPathKnots(double[] kts, double[] dirs, double[] ups) {
@@ -231,7 +231,7 @@ public class KeyframesPathObject extends VertsObject implements I3DTextRenderabl
     }
 
     private void addKnotOrientation(int idx, double px, double py, double pz, double dx, double dy, double dz, double ux, double uy, double uz) {
-        VertsObject dir = new Polyline();
+        VertsObject dir = new Polyline(RenderGroup.LINE);
         dir.setName("Keyframes.dir" + idx);
         dir.ct = this.ct;
         dir.setColor(gred);
@@ -239,7 +239,7 @@ public class KeyframesPathObject extends VertsObject implements I3DTextRenderabl
         dir.setPrimitiveSize(1f * ss);
         dir.initialize();
 
-        VertsObject up = new Polyline();
+        VertsObject up = new Polyline(RenderGroup.LINE);
         up.setName("Keyframes.up" + idx);
         up.ct = this.ct;
         up.setColor(gblue);
@@ -341,6 +341,7 @@ public class KeyframesPathObject extends VertsObject implements I3DTextRenderabl
             dir.setPrimitiveSize(3f * ss);
             up.setPrimitiveSize(3f * ss);
         }
+        EventManager.instance.post(Events.KEYFRAME_SELECT, kf);
     }
 
     public void unselect() {
@@ -353,8 +354,10 @@ public class KeyframesPathObject extends VertsObject implements I3DTextRenderabl
                 dir.setPrimitiveSize(1f * ss);
                 up.setPrimitiveSize(1f * ss);
             }
+            Keyframe aux = selected;
             selected = null;
             selectedKnot.clear();
+            EventManager.instance.post(Events.KEYFRAME_UNSELECT, aux);
         }
     }
 
@@ -410,9 +413,6 @@ public class KeyframesPathObject extends VertsObject implements I3DTextRenderabl
         if (selected != null) {
             addToRender(this, RenderGroup.FONT_LABEL);
         }
-        if (GlobalConf.scene.ORBIT_RENDERER == 0) {
-            addToRender(this, RenderGroup.LINE);
-        }
     }
 
     @Override
@@ -443,6 +443,14 @@ public class KeyframesPathObject extends VertsObject implements I3DTextRenderabl
         return selected != null;
     }
 
+    /**
+     * Label render
+     * @param batch  The sprite batch
+     * @param shader The shader
+     * @param sys    The font render system
+     * @param rc     The render context
+     * @param camera The camera
+     */
     @Override
     public void render(SpriteBatch batch, ShaderProgram shader, FontRenderSystem sys, RenderingContext rc, ICamera camera) {
         if (camera.getCurrent() instanceof FovCamera) {
@@ -485,7 +493,7 @@ public class KeyframesPathObject extends VertsObject implements I3DTextRenderabl
 
         aux.crs(out).nor();
 
-        aux.add(cam.getUp()).nor().scl(-2e-3f);
+        aux.add(cam.getUp()).nor().scl(-Math.tan(0.00872) * out.len());
 
         out.add(aux);
 
@@ -521,25 +529,13 @@ public class KeyframesPathObject extends VertsObject implements I3DTextRenderabl
 
     @Override
     public void render(LineRenderSystem renderer, ICamera camera, float alpha) {
-        for (VertsObject vo : objects)
-            if (vo.isLine())
-                renderVertsObject(vo, renderer, camera, alpha);
+        // Void
     }
 
-    private void renderVertsObject(VertsObject vo, LineRenderSystem renderer, ICamera camera, float alpha) {
-        // This is so that the shape renderer does not mess up the z-buffer
-        PointCloudData pointCloudData = vo.pointCloudData;
-        if (pointCloudData != null && pointCloudData.getNumPoints() > 0) {
-            float[] cc = vo.getColor();
-            for (int i = 1; i < pointCloudData.getNumPoints(); i++) {
-                pointCloudData.loadPoint(prev, i - 1);
-                pointCloudData.loadPoint(curr, i);
-
-                prev.add(camera.getInversePos());
-                curr.add(camera.getInversePos());
-
-                renderer.addLine(this, (float) prev.x, (float) prev.y, (float) prev.z, (float) curr.x, (float) curr.y, (float) curr.z, cc[0], cc[1], cc[2], alpha * cc[3]);
-            }
-        }
+    @Override
+    public void render(PointRenderSystem renderer, ICamera camera, float alpha) {
+        // Void
     }
+
+
 }

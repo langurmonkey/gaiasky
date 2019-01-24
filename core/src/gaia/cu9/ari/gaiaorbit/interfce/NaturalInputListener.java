@@ -282,7 +282,7 @@ public class NaturalInputListener extends GestureDetector implements IObserver {
             } else if (button == this.button && button == Input.Buttons.RIGHT) {
                 if (keyframeBeingDragged) {
                     keyframeBeingDragged = false;
-                } else if (getKeyframesPathObject() != null && getKeyframesPathObject().isSelected()) {
+                } else if (getKeyframesPathObject() != null && getKeyframesPathObject().isSelected() && !anyPressed(Keys.CONTROL_LEFT, Keys.SHIFT_LEFT, Keys.ALT_LEFT)) {
                     getKeyframesPathObject().unselect();
                 } else {
                     // Ensure Octants observed property is computed
