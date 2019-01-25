@@ -29,12 +29,6 @@ import gaia.cu9.ari.gaiaorbit.util.math.Vector3d;
 import gaia.cu9.ari.gaiaorbit.util.time.ITimeFrameProvider;
 
 public class KeyframesPathObject extends VertsObject implements I3DTextRenderable, ILineRenderable, IPointRenderable {
-    private static float[] ggreen = new float[] { 0f / 255f, 135f / 255f, 68f / 255f, 1f };
-    private static float[] gblue = new float[] { 0f / 255f, 87f / 255f, 231f / 255f, 1f };
-    private static float[] gred = new float[] { 214f / 255f, 45f / 255f, 32f / 255f, 1f };
-    private static float[] gyellow = new float[] { 255f / 255f, 167f / 255f, 0f / 255f, 1f };
-    private static float[] gwhite = new float[] { 255f / 255f, 255f / 255f, 255f / 255f, 1f };
-    private static float[] gpink = new float[] { 255f / 255f, 102f / 255f, 255f / 255f, 1f };
 
     /**
      * Keyframe objects
@@ -72,7 +66,7 @@ public class KeyframesPathObject extends VertsObject implements I3DTextRenderabl
         path = new Polyline(RenderGroup.LINE);
         path.setName("Keyframes.path");
         path.ct = this.ct;
-        path.setColor(ggreen);
+        path.setColor(GlobalResources.gGreen);
         path.setClosedLoop(false);
         path.setPrimitiveSize(2f * ss);
         path.initialize();
@@ -80,7 +74,7 @@ public class KeyframesPathObject extends VertsObject implements I3DTextRenderabl
         segments = new Polyline(RenderGroup.LINE);
         segments.setName("Keyframes.segments");
         segments.ct = this.ct;
-        segments.setColor(gyellow);
+        segments.setColor(GlobalResources.gYellow);
         segments.setClosedLoop(false);
         segments.setPrimitiveSize(1f * ss);
         segments.initialize();
@@ -88,7 +82,7 @@ public class KeyframesPathObject extends VertsObject implements I3DTextRenderabl
         knots = new Points(RenderGroup.POINT);
         knots.setName("Keyframes.knots");
         knots.ct = this.ct;
-        knots.setColor(gwhite);
+        knots.setColor(GlobalResources.gWhite);
         knots.setClosedLoop(false);
         knots.setPrimitiveSize(4f * ss);
         knots.initialize();
@@ -96,7 +90,7 @@ public class KeyframesPathObject extends VertsObject implements I3DTextRenderabl
         selectedKnot = new Points(RenderGroup.POINT);
         selectedKnot.setName("Keyframes.selknot");
         selectedKnot.ct = this.ct;
-        selectedKnot.setColor(gpink);
+        selectedKnot.setColor(GlobalResources.gPink);
         selectedKnot.setClosedLoop(false);
         selectedKnot.setPrimitiveSize(10f * ss);
         selectedKnot.setDepth(false);
@@ -234,7 +228,7 @@ public class KeyframesPathObject extends VertsObject implements I3DTextRenderabl
         VertsObject dir = new Polyline(RenderGroup.LINE);
         dir.setName("Keyframes.dir" + idx);
         dir.ct = this.ct;
-        dir.setColor(gred);
+        dir.setColor(GlobalResources.gRed);
         dir.setClosedLoop(false);
         dir.setPrimitiveSize(1f * ss);
         dir.initialize();
@@ -242,7 +236,7 @@ public class KeyframesPathObject extends VertsObject implements I3DTextRenderabl
         VertsObject up = new Polyline(RenderGroup.LINE);
         up.setName("Keyframes.up" + idx);
         up.ct = this.ct;
-        up.setColor(gblue);
+        up.setColor(GlobalResources.gBlue);
         up.setClosedLoop(false);
         up.setPrimitiveSize(1f * ss);
         up.initialize();
@@ -471,7 +465,7 @@ public class KeyframesPathObject extends VertsObject implements I3DTextRenderabl
 
     @Override
     public float[] textColour() {
-        return gpink;
+        return GlobalResources.gPink;
     }
 
     @Override

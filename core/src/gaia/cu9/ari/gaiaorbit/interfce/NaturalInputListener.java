@@ -205,7 +205,10 @@ public class NaturalInputListener extends GestureDetector implements IObserver {
     }
 
     private boolean getKeyframeCollision(int screenX, int screenY) {
-        return getKeyframesPathObject().select(screenX, screenY, MIN_PIX_DIST, camera);
+        if (getKeyframesPathObject() != null)
+            return getKeyframesPathObject().select(screenX, screenY, MIN_PIX_DIST, camera);
+        else
+            return false;
     }
 
     private boolean dragKeyframe(int screenX, int screenY, double dragDx, double dragDy) {
@@ -338,7 +341,7 @@ public class NaturalInputListener extends GestureDetector implements IObserver {
                 camera.addRotateMovement(dragDx, dragDy, false, accel);
             }
         } else if (button == rightMouseButton) {
-            if (keyframeBeingDragged || (getKeyframesPathObject().isSelected() && anyPressed(Keys.SHIFT_LEFT, Keys.CONTROL_LEFT, Keys.ALT_LEFT))) {
+            if (keyframeBeingDragged || (getKeyframesPathObject() != null && getKeyframesPathObject().isSelected() && anyPressed(Keys.SHIFT_LEFT, Keys.CONTROL_LEFT, Keys.ALT_LEFT))) {
                 // Drag keyframe
                 dragKeyframe(screenX, screenY, dragDx, dragDy);
             } else {

@@ -3,6 +3,7 @@ package gaia.cu9.ari.gaiaorbit.util;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.files.FileHandle;
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
@@ -53,6 +54,26 @@ public class GlobalResources {
     public static Skin skin;
 
     private static Vector3d aux = new Vector3d();
+
+
+    /** GOOGLE COLORS **/
+
+    public static float[] gGreen = new float[] { 0f / 255f, 135f / 255f, 68f / 255f, 1f };
+    public static Color gGreenC =getCol(gGreen);
+    public static float[] gBlue = new float[] { 0f / 255f, 87f / 255f, 231f / 255f, 1f };
+    public static Color gBlueC =getCol(gBlue);
+    public static float[] gRed = new float[] { 214f / 255f, 45f / 255f, 32f / 255f, 1f };
+    public static Color gRedC =getCol(gRed);
+    public static float[] gYellow = new float[] { 255f / 255f, 167f / 255f, 0f / 255f, 1f };
+    public static Color gYellowC =getCol(gYellow);
+    public static float[] gWhite = new float[] { 255f / 255f, 255f / 255f, 255f / 255f, 1f };
+    public static Color gWhiteC =getCol(gWhite);
+    public static float[] gPink = new float[] { 255f / 255f, 102f / 255f, 255f / 255f, 1f };
+    public static Color gPinkC =getCol(gPink);
+
+    private static Color getCol(float[] c){
+        return new Color(c[0], c[1], c[2], c[3]);
+    }
 
     /**
      * Model for atmosphere scattering
