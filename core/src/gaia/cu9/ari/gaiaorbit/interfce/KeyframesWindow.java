@@ -379,7 +379,7 @@ public class KeyframesWindow extends GenericDialog implements IObserver {
                     name = "Keyframe " + (keyframes.size + 1);
                 }
 
-                Keyframe kf = new Keyframe(name, cPos, cDir, cUp, cTime, secsAfter);
+                Keyframe kf = new Keyframe(name, cPos, cDir, cUp, cTime, secsAfter, false);
                 final boolean insert = index >= 0 && index != keyframes.size;
                 if (!insert) {
                     keyframes.add(kf);
@@ -575,6 +575,24 @@ public class KeyframesWindow extends GenericDialog implements IObserver {
             return false;
         });
         table.add(goTo).left().padRight(pad5).padBottom(pad5);
+
+        // Seam
+        OwnTextIconButton seam = new OwnTextIconButton("", skin, "seam", "toggle");
+        seam.setSize(buttonSize, buttonSize);
+        seam.setChecked(kf.seam);
+        seam.addListener(new TextTooltip("Make seam, breaking the spline", skin));
+        seam.addListener((event) -> {
+            if (event instanceof ChangeListener.ChangeEvent) {
+                // Make seam
+                kf.seam = seam.isChecked();
+                Gdx.app.postRunnable(() -> {
+                    keyframesPathObject.resamplePath();
+                });
+                return true;
+            }
+            return false;
+        });
+        table.add(seam).left().padRight(pad5).padBottom(pad5);
 
         // Add after
         OwnTextIconButton addKeyframe = new OwnTextIconButton("", skin, "add");

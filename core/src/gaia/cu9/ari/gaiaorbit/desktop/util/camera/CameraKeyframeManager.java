@@ -17,13 +17,19 @@ import java.io.*;
 
 public class CameraKeyframeManager implements IObserver {
     private static final Logger.Log logger = Logger.getLogger(CameraKeyframeManager.class);
-    /** Singleton **/
+    /**
+     * Singleton
+     **/
     public static CameraKeyframeManager instance;
 
-    /** Separator for keyframes files **/
+    /**
+     * Separator for keyframes files
+     **/
     private static final String ksep = ",";
 
-    /** Separator for camera files **/
+    /**
+     * Separator for camera files
+     **/
     private static final String sep = " ";
 
     public static void initialize() {
@@ -61,7 +67,6 @@ public class CameraKeyframeManager implements IObserver {
         try {
             br = new BufferedReader(new FileReader(file));
             String line;
-            double lastSecs = 0;
             while ((line = br.readLine()) != null) {
                 String[] tokens = line.split(ksep);
                 double secs = Parser.parseDouble(tokens[0]);
@@ -69,8 +74,9 @@ public class CameraKeyframeManager implements IObserver {
                 Vector3d pos = new Vector3d(Parser.parseDouble(tokens[2]), Parser.parseDouble(tokens[3]), Parser.parseDouble(tokens[4]));
                 Vector3d dir = new Vector3d(Parser.parseDouble(tokens[5]), Parser.parseDouble(tokens[6]), Parser.parseDouble(tokens[7]));
                 Vector3d up = new Vector3d(Parser.parseDouble(tokens[8]), Parser.parseDouble(tokens[9]), Parser.parseDouble(tokens[10]));
-                String name = tokens[11];
-                Keyframe kf = new Keyframe(name, pos, dir, up, time, secs);
+                boolean seam = Parser.parseInt(tokens[11]) == 1;
+                String name = tokens[12];
+                Keyframe kf = new Keyframe(name, pos, dir, up, time, secs, seam);
                 result.add(kf);
             }
 
@@ -106,6 +112,7 @@ public class CameraKeyframeManager implements IObserver {
                 os.append(Double.toString(kf.pos.x)).append(ksep).append(Double.toString(kf.pos.y)).append(ksep).append(Double.toString(kf.pos.z)).append(ksep);
                 os.append(Double.toString(kf.dir.x)).append(ksep).append(Double.toString(kf.dir.y)).append(ksep).append(Double.toString(kf.dir.z)).append(ksep);
                 os.append(Double.toString(kf.up.x)).append(ksep).append(Double.toString(kf.up.y)).append(ksep).append(Double.toString(kf.up.z)).append(ksep);
+                os.append(Integer.toString(kf.seam ? 1 : 0)).append(ksep);
                 os.append(kf.name).append("\n");
             }
 
@@ -124,35 +131,48 @@ public class CameraKeyframeManager implements IObserver {
 
     }
 
-    public double[] samplePath(double[] points, int samplesPerSegment, PathType pathType) {
-        if(pathType == PathType.LINEAR){
+    public double[] samplePaths(Array<Array<Vector3d>> pointsSep, double[] points, int samplesPerSegment, PathType pathType) {
+        if (pathType == PathType.LINEAR) {
             // No need to sample a linear interpolation
             double[] result = new double[points.length];
             System.arraycopy(points, 0, result, 0, points.length);
             return result;
-        }else {
-            Vector3d[] pts = new Vector3d[points.length / 3];
-            for (int i = 0; i < pts.length; i++) {
-                int j = i * 3;
-                pts[i] = new Vector3d(points[j], points[j + 1], points[j + 2]);
-            }
-            int nSamples = (pts.length - 1) * samplesPerSegment + 1;
-            int nChunks = nSamples - 1;
-            double[] result = new double[nSamples * 3];
+        } else {
+            Array<Double> res = new Array<>();
+            for (Array<Vector3d> vec : pointsSep) {
+                int nSamples = (vec.size - 1) * samplesPerSegment + 1;
+                int nChunks = nSamples - 1;
 
-            Vector3d aux = new Vector3d();
-            Pathd<Vector3d> sampler = getPath(pts, pathType);
-            double step = 1d / nChunks;
-            int i = 0;
-            for (double t = 0d; i < result.length; t += step) {
-                sampler.valueAt(aux, t);
-                result[i + 0] = aux.x;
-                result[i + 1] = aux.y;
-                result[i + 2] = aux.z;
-                i += 3;
+                Vector3d aux = new Vector3d();
+                Pathd<Vector3d> sampler = getPath(toArray(vec), pathType);
+                double step = 1d / nChunks;
+                int i = 0;
+                for (double t = 0d; i < nSamples * 3; t += step) {
+                    sampler.valueAt(aux, t);
+                    res.add(aux.x);
+                    res.add(aux.y);
+                    res.add(aux.z);
+                    i += 3;
+                }
+
             }
+
+            double[] result = new double[res.size];
+            int i = 0;
+            for (Double d : res) {
+                result[i] = d;
+                i++;
+            }
+
             return result;
         }
+    }
+
+    private Vector3d[] toArray(Array<Vector3d> v) {
+        Vector3d[] out = new Vector3d[v.size];
+        for (int i = 0; i < v.size; i++)
+            out[i] = v.get(i);
+        return out;
     }
 
     public void exportKeyframesFile(Array<Keyframe> keyframes, String fileName) {
@@ -173,20 +193,17 @@ public class CameraKeyframeManager implements IObserver {
             f.createNewFile();
             os = new BufferedWriter(new FileWriter(f));
 
-            Vector3d[] positions = new Vector3d[keyframes.size];
             Vector3d[] directions = new Vector3d[keyframes.size];
             Vector3d[] ups = new Vector3d[keyframes.size];
 
-            // Fill in vectors, with first and last elements duplicated, as Catmull-Rom needs these
+            // Fill in vectors
             for (int i = 0; i < keyframes.size; i++) {
                 Keyframe k = keyframes.get(i);
-                positions[i] = k.pos;
                 directions[i] = k.dir;
                 ups[i] = k.up;
             }
 
-            // Catmull-Rom splines for pos, dir, up
-            Pathd<Vector3d> posSpline = getPath(positions, GlobalConf.frame.KF_PATH_TYPE_POSITION);
+            PathPart[] posSplines = positionsToPathParts(keyframes, GlobalConf.frame.KF_PATH_TYPE_POSITION);
             Pathd<Vector3d> dirSpline = getPath(directions, GlobalConf.frame.KF_PATH_TYPE_ORIENTATION);
             Pathd<Vector3d> upSpline = getPath(ups, GlobalConf.frame.KF_PATH_TYPE_ORIENTATION);
 
@@ -194,37 +211,49 @@ public class CameraKeyframeManager implements IObserver {
 
 
             /** Current position in the spline. Coincides with the control points **/
-            double splinePos = 0d;
+            double splineIdx = 0d;
             /** Step length between control points **/
-            double splinePosStep = 1d / (positions.length - 1);
+            double splineStep = 1d / (directions.length - 1);
+
+            PathPart currentPosSpline = posSplines[0];
+            int k = 0;
+            /** Position in current position spline **/
+            double splinePosIdx = 0d;
+            /** Step length in between control positions **/
+            double splinePosStep = 1d / (currentPosSpline.nPoints - 1);
+
 
             for (int i = 1; i < keyframes.size; i++) {
                 Keyframe k0 = keyframes.get(i - 1);
                 Keyframe k1 = keyframes.get(i);
 
                 long nFrames = (long) (k1.seconds * frameRate);
+                double splineSubstep = splineStep / nFrames;
                 double splinePosSubstep = splinePosStep / nFrames;
 
                 long dt = k1.time - k0.time;
                 long tStep = dt / nFrames;
 
                 for (long fr = 0; fr < nFrames; fr++) {
-                    double posIdx = splinePos + splinePosSubstep * fr;
+                    // Global spline index in 0..1
+                    double a = splineIdx + splineSubstep * fr;
+                    // Partial position spline index in 0..1
+                    double b = splinePosIdx + splinePosSubstep * fr;
 
                     // TIME
                     os.append(Long.toString(k0.time + tStep * fr)).append(sep);
 
                     // POS
-                    posSpline.valueAt(aux, posIdx);
+                    currentPosSpline.path.valueAt(aux, b);
                     os.append(Double.toString(aux.x)).append(sep).append(Double.toString(aux.y)).append(sep).append(Double.toString(aux.z)).append(sep);
 
                     // DIR
-                    dirSpline.valueAt(aux, posIdx);
+                    dirSpline.valueAt(aux, a);
                     aux.nor();
                     os.append(Double.toString(aux.x)).append(sep).append(Double.toString(aux.y)).append(sep).append(Double.toString(aux.z)).append(sep);
 
                     // UP
-                    upSpline.valueAt(aux, posIdx);
+                    upSpline.valueAt(aux, a);
                     aux.nor();
                     os.append(Double.toString(aux.x)).append(sep).append(Double.toString(aux.y)).append(sep).append(Double.toString(aux.z));
 
@@ -234,7 +263,15 @@ public class CameraKeyframeManager implements IObserver {
                     frames++;
                 }
 
-                splinePos += splinePosStep;
+                splineIdx += splineStep;
+                splinePosIdx += splinePosStep;
+
+                if (k1.seam && GlobalConf.frame.KF_PATH_TYPE_POSITION == PathType.SPLINE) {
+                    // Jump to next spline
+                    currentPosSpline = posSplines[++k];
+                    splinePosIdx = 0;
+                    splinePosStep = 1d / (currentPosSpline.nPoints - 1);
+                }
             }
 
         } catch (IOException e) {
@@ -251,22 +288,74 @@ public class CameraKeyframeManager implements IObserver {
         logger.info(keyframes.size + " keyframes (" + frames + " frames, " + frameRate + " FPS) exported to camera file " + f.getName());
     }
 
+    private PathPart[] positionsToPathParts(Array<Keyframe> keyframes, PathType pathType) {
+        long frameRate = GlobalConf.frame.CAMERA_REC_TARGET_FPS;
+        Array<Array<Vector3d>> positionsSep = new Array<>();
+        Array<Vector3d> current = new Array<>();
+        Array<Double> times = new Array<>();
+        int i = 0;
+        double secs = 0;
+        for (Keyframe kf : keyframes) {
+
+            // Fill positions
+            if (kf.seam && pathType == PathType.SPLINE) {
+                if (i > 0 && i < keyframes.size - 1) {
+                    current.add(kf.pos);
+                    positionsSep.add(current);
+                    times.add(secs + kf.seconds);
+                    current = new Array<>();
+                    secs = -kf.seconds;
+                }
+            }
+            secs += kf.seconds;
+            current.add(kf.pos);
+            i++;
+        }
+        // Last
+        positionsSep.add(current);
+        times.add(secs);
+
+        PathPart[] res = new PathPart[positionsSep.size];
+        int j = 0;
+        for (Array<Vector3d> part : positionsSep) {
+            double elapsed = times.get(j);
+            PathPart pp = new PathPart(getPath(toArray(part), pathType), part.size, (long) (frameRate * elapsed));
+            res[j] = pp;
+            j++;
+        }
+        return res;
+    }
+
     @Override
     public void notify(Events event, Object... data) {
 
         switch (event) {
-        case KEYFRAMES_FILE_SAVE:
-            Array<Keyframe> keyframes = (Array<Keyframe>) data[0];
-            String fileName = (String) data[1];
-            saveKeyframesFile(keyframes, fileName);
-            break;
-        case KEYFRAMES_EXPORT:
-            keyframes = (Array<Keyframe>) data[0];
-            fileName = (String) data[1];
-            exportKeyframesFile(keyframes, fileName);
-            break;
-        default:
-            break;
+            case KEYFRAMES_FILE_SAVE:
+                Array<Keyframe> keyframes = (Array<Keyframe>) data[0];
+                String fileName = (String) data[1];
+                saveKeyframesFile(keyframes, fileName);
+                break;
+            case KEYFRAMES_EXPORT:
+                keyframes = (Array<Keyframe>) data[0];
+                fileName = (String) data[1];
+                exportKeyframesFile(keyframes, fileName);
+                break;
+            default:
+                break;
         }
+    }
+
+    class PathPart {
+        Pathd<Vector3d> path;
+        int nPoints, nChunks;
+        long nFrames;
+
+        public PathPart(Pathd<Vector3d> path, int nPoints, long nFrames) {
+            this.path = path;
+            this.nPoints = nPoints;
+            this.nChunks = nPoints - 1;
+            this.nFrames = nFrames;
+        }
+
     }
 }

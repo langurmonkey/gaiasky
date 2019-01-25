@@ -260,6 +260,9 @@
     }
   },
   "gaia.cu9.ari.gaiaorbit.util.scene2d.OwnTextIconButton$TextIconButtonStyle": {
+    "seam": {
+      "imageUp": "seam"
+    },
     "open": {
       "imageUp": "open"
     },

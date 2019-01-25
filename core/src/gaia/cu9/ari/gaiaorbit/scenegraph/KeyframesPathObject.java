@@ -111,13 +111,24 @@ public class KeyframesPathObject extends VertsObject implements I3DTextRenderabl
      * Refreshes the positions and orientations from the keyframes
      */
     public void refreshData() {
+        Array<Array<Vector3d>> kfPositionsSep = new Array<>();
         double[] kfPositions = new double[keyframes.size * 3];
         double[] kfDirections = new double[keyframes.size * 3];
         double[] kfUps = new double[keyframes.size * 3];
+        Array<Vector3d> current = new Array<>();
         int i = 0;
         for (Keyframe kf : keyframes) {
 
-            // Fill vectors
+            // Fill positions
+            if(kf.seam){
+                if(i > 0 && i < keyframes.size-1){
+                    current.add(kf.pos);
+                    kfPositionsSep.add(current);
+                    current = new Array<>();
+                }
+            }
+            current.add(kf.pos);
+
             kfPositions[i * 3 + 0] = kf.pos.x;
             kfPositions[i * 3 + 1] = kf.pos.y;
             kfPositions[i * 3 + 2] = kf.pos.z;
@@ -132,10 +143,12 @@ public class KeyframesPathObject extends VertsObject implements I3DTextRenderabl
 
             i++;
         }
+        kfPositionsSep.add(current);
+
         setPathKnots(kfPositions, kfDirections, kfUps);
         if (keyframes.size > 1) {
             segments.setPoints(kfPositions);
-            double[] pathSamples = CameraKeyframeManager.instance.samplePath(kfPositions, 20, GlobalConf.frame.KF_PATH_TYPE_POSITION);
+            double[] pathSamples = CameraKeyframeManager.instance.samplePaths(kfPositionsSep, kfPositions, 20, GlobalConf.frame.KF_PATH_TYPE_POSITION);
             path.setPoints(pathSamples);
         } else {
             segments.clear();
@@ -173,16 +186,29 @@ public class KeyframesPathObject extends VertsObject implements I3DTextRenderabl
 
     public void resamplePath() {
         if (keyframes.size > 0) {
+            Array<Array<Vector3d>> kfPositionsSep = new Array<>();
             double[] kfPositions = new double[keyframes.size * 3];
+            Array<Vector3d> current = new Array<>();
             int i = 0;
             for (Keyframe kf : keyframes) {
                 // Fill model table
+                if(kf.seam){
+                    if(i > 0 && i < keyframes.size-1){
+                        current.add(kf.pos);
+                        kfPositionsSep.add(current);
+                        current = new Array<>();
+                    }
+                }
+                current.add(kf.pos);
+
                 kfPositions[i * 3 + 0] = kf.pos.x;
                 kfPositions[i * 3 + 1] = kf.pos.y;
                 kfPositions[i * 3 + 2] = kf.pos.z;
                 i++;
             }
-            double[] pathSamples = CameraKeyframeManager.instance.samplePath(kfPositions, 20, GlobalConf.frame.KF_PATH_TYPE_POSITION);
+            kfPositionsSep.add(current);
+
+            double[] pathSamples = CameraKeyframeManager.instance.samplePaths(kfPositionsSep, kfPositions, 20, GlobalConf.frame.KF_PATH_TYPE_POSITION);
             path.setPoints(pathSamples);
         }
     }
@@ -327,6 +353,11 @@ public class KeyframesPathObject extends VertsObject implements I3DTextRenderabl
         unselect();
         selected = kf;
         selectedKnot.setPoints(kf.pos.values());
+        if(selected.seam){
+            selectedKnot.setColor(GlobalResources.gRed);
+        }else{
+            selectedKnot.setColor(GlobalResources.gPink);
+        }
         int i = keyframes.indexOf(kf, true) * 2;
         if (i >= 0) {
             VertsObject dir = orientations.get(i);
