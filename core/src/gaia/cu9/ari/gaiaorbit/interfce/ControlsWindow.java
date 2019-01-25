@@ -204,8 +204,7 @@ public class ControlsWindow extends CollapsibleWindow implements IObserver {
 
         Table buttonsTable = null;
         /** BUTTONS **/
-        Image prefsImg = new Image(skin.getDrawable("prefs-icon"));
-        Button preferences = new OwnTextIconButton("", prefsImg, skin);
+        Button preferences = new OwnTextIconButton("", skin, "preferences");
         preferences.setName("preferences");
         preferences.addListener(new TextTooltip(txt("gui.preferences"), skin));
         preferences.addListener(new EventListener() {
@@ -217,8 +216,7 @@ public class ControlsWindow extends CollapsibleWindow implements IObserver {
                 return false;
             }
         });
-        Image tutImg = new Image(skin.getDrawable("tutorial-icon"));
-        Button tutorial = new OwnTextIconButton("", tutImg, skin);
+        Button tutorial = new OwnTextIconButton("", skin, "tutorial");
         tutorial.setName("tutorial");
         tutorial.addListener(new TextTooltip(txt("gui.tutorial"), skin));
         tutorial.addListener(new EventListener() {
@@ -230,8 +228,7 @@ public class ControlsWindow extends CollapsibleWindow implements IObserver {
                 return false;
             }
         });
-        Image helpImg = new Image(skin.getDrawable("help-icon"));
-        Button about = new OwnTextIconButton("", helpImg, skin);
+        Button about = new OwnTextIconButton("", skin,"help");
         about.setName("about");
         about.addListener(new TextTooltip(txt("gui.help"), skin));
         about.addListener(new EventListener() {
@@ -243,8 +240,7 @@ public class ControlsWindow extends CollapsibleWindow implements IObserver {
                 return false;
             }
         });
-        Image carImg = new Image(skin.getDrawable("car-icon"));
-        Button runScript = new OwnTextIconButton("", carImg, skin);
+        Button runScript = new OwnTextIconButton("", skin, "car");
         runScript.setName("run script");
         runScript.addListener(new TextTooltip(txt("gui.script.runscript"), skin));
         runScript.addListener(new EventListener() {
@@ -256,8 +252,7 @@ public class ControlsWindow extends CollapsibleWindow implements IObserver {
                 return false;
             }
         });
-        Image logImg = new Image(skin.getDrawable("log-icon"));
-        Button showLog = new OwnTextIconButton("", logImg, skin);
+        Button showLog = new OwnTextIconButton("", skin, "log");
         showLog.setName("show log");
         showLog.addListener(new TextTooltip(txt("gui.log.tooltip"), skin));
         showLog.addListener((event) -> {

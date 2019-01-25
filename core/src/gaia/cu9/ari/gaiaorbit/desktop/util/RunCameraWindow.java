@@ -73,8 +73,7 @@ public class RunCameraWindow extends GenericDialog {
         content.add(scroll).align(Align.center).pad(pad);
         content.row();
 
-        Image reloadImg = new Image(skin.getDrawable("reload"));
-        Button reload = new OwnTextIconButton("", reloadImg, skin);
+        Button reload = new OwnTextIconButton("", skin, "reload");
         reload.setName("reload camera files");
         reload.addListener(new TextTooltip(txt("gui.camera.reload"), skin));
         reload.addListener((event) -> {

@@ -122,8 +122,7 @@ public class KeyframesWindow extends GenericDialog implements IObserver {
         /** LEFT - CONTROLS **/
 
         // ADD
-        Image addImg = new Image(skin.getDrawable("sc-engine-power-up"));
-        OwnTextIconButton addKeyframe = new OwnTextIconButton("Add keyframe at the end", addImg, skin);
+        OwnTextIconButton addKeyframe = new OwnTextIconButton("Add keyframe at the end", skin,"add");
         addKeyframe.addListener(new TextTooltip("Add new keyframe at the end with the current camera configuration and time", skin));
         addKeyframe.pad(pad5);
         left.add(addKeyframe).left().colspan(2).padBottom(pad5).row();
@@ -185,8 +184,7 @@ public class KeyframesWindow extends GenericDialog implements IObserver {
         buttons.space(pad);
 
         // Open keyframes
-        Image openImg = new Image(skin.getDrawable("open"));
-        OwnTextIconButton open = new OwnTextIconButton("Load keyframes file", openImg, skin);
+        OwnTextIconButton open = new OwnTextIconButton("Load keyframes file", skin, "open");
         open.addListener(new TextTooltip("Load keyframes file from disk", skin));
         open.pad(pad5);
         open.addListener((event) -> {
@@ -236,8 +234,7 @@ public class KeyframesWindow extends GenericDialog implements IObserver {
         });
 
         // Save keyframes
-        Image saveImg = new Image(skin.getDrawable("save"));
-        OwnTextIconButton save = new OwnTextIconButton("Save keyframes to file", saveImg, skin);
+        OwnTextIconButton save = new OwnTextIconButton("Save keyframes to file", skin, "save");
         save.addListener(new TextTooltip("Save current keyframes to a keyframes file", skin));
         save.pad(pad5);
         save.addListener((event) -> {
@@ -263,8 +260,7 @@ public class KeyframesWindow extends GenericDialog implements IObserver {
         });
 
         // Export to camera path
-        Image exportImg = new Image(skin.getDrawable("export"));
-        OwnTextIconButton export = new OwnTextIconButton("Export to camera path", exportImg, skin);
+        OwnTextIconButton export = new OwnTextIconButton("Export to camera path", skin, "export");
         export.addListener(new TextTooltip("Export current keyframes to a camera path file", skin));
         export.pad(pad5);
         export.addListener((event) -> {
@@ -289,8 +285,7 @@ public class KeyframesWindow extends GenericDialog implements IObserver {
         });
 
         // Keyframe preferences
-        Image prefsImg = new Image(skin.getDrawable("prefs-icon"));
-        Button preferences = new OwnTextIconButton("Preferences", prefsImg, skin);
+        Button preferences = new OwnTextIconButton("Preferences", skin, "preferences");
         preferences.setName("keyframe preferences");
         preferences.padTop(pad5 / 2.5f);
         preferences.padBottom(pad5 / 2.5f);
@@ -324,6 +319,8 @@ public class KeyframesWindow extends GenericDialog implements IObserver {
         notice.padBottom(pad * 2f).center().colspan(2).row();
         content.add(buttons).colspan(2).right().row();
 
+
+        // CLEAR
         OwnTextButton clear = new OwnTextButton("Clear", skin);
         clear.setName("clear");
         clear.addListener((event) -> {
@@ -336,7 +333,22 @@ public class KeyframesWindow extends GenericDialog implements IObserver {
             return false;
         });
         buttonGroup.addActorAt(0, clear);
+
+        // HIDE
+        OwnTextButton hide = new OwnTextButton("Hide", skin);
+        hide.setName("hide");
+        hide.addListener((event) -> {
+            if (event instanceof ChangeListener.ChangeEvent) {
+                hide();
+                return true;
+            }
+            return false;
+        });
+        buttonGroup.addActorAt(1, hide);
+
+
         recalculateButtonSize();
+
     }
 
     /**
@@ -545,8 +557,7 @@ public class KeyframesWindow extends GenericDialog implements IObserver {
         keyframeNames.put(kf, frameName);
 
         // Go to
-        Image gotoimg = new Image(skin.getDrawable("go-to"));
-        OwnTextIconButton goTo = new OwnTextIconButton("", gotoimg, skin);
+        OwnTextIconButton goTo = new OwnTextIconButton("", skin, "go-to");
         goTo.setSize(buttonSize, buttonSize);
         goTo.addListener(new TextTooltip("Go to keyframe, put camera in this keyframe's state", skin));
         goTo.addListener((event) -> {
@@ -566,8 +577,7 @@ public class KeyframesWindow extends GenericDialog implements IObserver {
         table.add(goTo).left().padRight(pad5).padBottom(pad5);
 
         // Add after
-        Image addImg = new Image(skin.getDrawable("sc-engine-power-up"));
-        OwnTextIconButton addKeyframe = new OwnTextIconButton("", addImg, skin);
+        OwnTextIconButton addKeyframe = new OwnTextIconButton("", skin, "add");
         addKeyframe.setSize(buttonSizeL, buttonSize);
         addKeyframe.addListener(new TextTooltip("Add new keyframe after this one, interpolating position, direction and time with the next one", skin));
         addKeyframe.addListener(event -> {
@@ -602,8 +612,7 @@ public class KeyframesWindow extends GenericDialog implements IObserver {
         table.add(addKeyframe).left().padRight(pad5).padBottom(pad5);
 
         // Rubbish
-        Image rubbishimg = new Image(skin.getDrawable("bin-icon"));
-        OwnTextIconButton rubbish = new OwnTextIconButton("", rubbishimg, skin);
+        OwnTextIconButton rubbish = new OwnTextIconButton("", skin, "rubbish");
         rubbish.setSize(buttonSizeL, buttonSize);
         rubbish.addListener(new TextTooltip("Remove this keyframe", skin));
         rubbish.addListener((event) -> {

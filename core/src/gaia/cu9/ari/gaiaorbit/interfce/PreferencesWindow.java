@@ -1146,8 +1146,7 @@ public class PreferencesWindow extends GenericDialog {
 
 
         // Keyframe preferences
-        Image prefsImg = new Image(skin.getDrawable("prefs-icon"));
-        Button keyframePrefs = new OwnTextIconButton("Preferences", prefsImg, skin);
+        Button keyframePrefs = new OwnTextIconButton("Preferences", skin, "preferences");
         keyframePrefs.setName("keyframe preferences");
         keyframePrefs.pad(pad5);
         keyframePrefs.addListener(new TextTooltip("Edit keyframe preferences", skin));

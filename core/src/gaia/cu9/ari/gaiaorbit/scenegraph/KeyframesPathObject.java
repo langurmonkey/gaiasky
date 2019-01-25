@@ -68,7 +68,7 @@ public class KeyframesPathObject extends VertsObject implements I3DTextRenderabl
         path.ct = this.ct;
         path.setColor(GlobalResources.gGreen);
         path.setClosedLoop(false);
-        path.setPrimitiveSize(2f * ss);
+        path.setPrimitiveSize(1.5f * ss);
         path.initialize();
 
         segments = new Polyline(RenderGroup.LINE);
@@ -92,7 +92,7 @@ public class KeyframesPathObject extends VertsObject implements I3DTextRenderabl
         selectedKnot.ct = this.ct;
         selectedKnot.setColor(GlobalResources.gPink);
         selectedKnot.setClosedLoop(false);
-        selectedKnot.setPrimitiveSize(10f * ss);
+        selectedKnot.setPrimitiveSize(8f * ss);
         selectedKnot.setDepth(false);
         selectedKnot.initialize();
 
@@ -264,7 +264,7 @@ public class KeyframesPathObject extends VertsObject implements I3DTextRenderabl
             p1.set(p.x.get(1), p.y.get(1), p.z.get(1));
 
             Vector3d c = aux3d3.get().set(camera.getPos());
-            double len = Math.max(0.00005, Math.atan(0.02) * c.dst(p0));
+            double len = Math.max(0.00008, Math.atan(0.03) * c.dst(p0));
 
             Vector3d v = c.set(p1).sub(p0).nor().scl(len);
             p.x.set(1, p0.x + v.x);
@@ -332,8 +332,8 @@ public class KeyframesPathObject extends VertsObject implements I3DTextRenderabl
             VertsObject dir = orientations.get(i);
             VertsObject up = orientations.get(i + 1);
 
-            dir.setPrimitiveSize(3f * ss);
-            up.setPrimitiveSize(3f * ss);
+            dir.setPrimitiveSize(2f * ss);
+            up.setPrimitiveSize(2f * ss);
         }
         EventManager.instance.post(Events.KEYFRAME_SELECT, kf);
     }

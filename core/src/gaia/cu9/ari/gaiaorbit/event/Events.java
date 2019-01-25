@@ -382,6 +382,7 @@ public enum Events {
     SHOW_LAND_AT_LOCATION_ACTION,
     SHOW_QUIT_ACTION,
     SHOW_KEYFRAMES_WINDOW_ACTION,
+    SHOW_MINIMAP_WINDOW_ACTION,
     /** Shows the camera path file selector, contains the stage and the skin **/
     SHOW_PLAYCAMERA_ACTION,
     /** Informs about the number of running scripts **/

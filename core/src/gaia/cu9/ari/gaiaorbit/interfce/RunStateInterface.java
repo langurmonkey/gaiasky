@@ -1,14 +1,8 @@
 package gaia.cu9.ari.gaiaorbit.interfce;
 
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.scenes.scene2d.ui.Cell;
-import com.badlogic.gdx.scenes.scene2d.ui.Image;
-import com.badlogic.gdx.scenes.scene2d.ui.Skin;
-import com.badlogic.gdx.scenes.scene2d.ui.Table;
-import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
-import com.badlogic.gdx.scenes.scene2d.ui.TextTooltip;
+import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener.ChangeEvent;
-
 import gaia.cu9.ari.gaiaorbit.event.EventManager;
 import gaia.cu9.ari.gaiaorbit.event.Events;
 import gaia.cu9.ari.gaiaorbit.event.IObserver;
@@ -28,7 +22,7 @@ public class RunStateInterface extends Table implements IObserver, IGuiInterface
 
     private Cell<?> keyboardImgCell, stopScriptCell, stopCameraCell, pauseBgCell, frameoutputImgCell;
     private Image keyboardImg, frameoutputImg;
-    private TextButton cancelScript, cancelCamera, bgLoading;
+    private OwnTextIconButton cancelScript, cancelCamera, bgLoading;
     private boolean loadingPaused = false;
 
     public RunStateInterface(Skin skin) {
@@ -45,8 +39,7 @@ public class RunStateInterface extends Table implements IObserver, IGuiInterface
         frameoutputImg = new Image(skin.getDrawable("frameoutput"));
         frameoutputImg.addListener(new TextTooltip(txt("gui.tooltip.frameoutputon"), skin));
 
-        Image dataloadPauseImg = new Image(skin.getDrawable("dataload-pause"));
-        bgLoading = new OwnTextIconButton("", dataloadPauseImg, skin, "toggle");
+        bgLoading = new OwnTextIconButton("", skin, "dataload-bg", "toggle");
         TextTooltip pauseBgTT = new TextTooltip(txt("gui.tooltip.pausebg"), skin);
         bgLoading.addListener(pauseBgTT);
         bgLoading.addListener((event) -> {
@@ -65,8 +58,7 @@ public class RunStateInterface extends Table implements IObserver, IGuiInterface
         });
 
         int num = ScriptingFactory.getInstance().getNumRunningScripts();
-        Image scriptStopImg = new Image(skin.getDrawable("script-stop"));
-        cancelScript = new OwnTextIconButton("", scriptStopImg, skin);
+        cancelScript = new OwnTextIconButton("",  skin, "script-stop");
         cancelScript.addListener(new TextTooltip(I18n.bundle.format("gui.script.stop", num), skin));
         cancelScript.addListener((event) -> {
             if (event instanceof ChangeEvent) {
@@ -75,8 +67,7 @@ public class RunStateInterface extends Table implements IObserver, IGuiInterface
             return false;
         });
 
-        Image cameraStopImg = new Image(skin.getDrawable("camera-stop"));
-        cancelCamera = new OwnTextIconButton("", cameraStopImg, skin);
+        cancelCamera = new OwnTextIconButton("", skin, "camera-stop");
         cancelCamera.addListener(new TextTooltip(I18n.bundle.get("gui.stop"), skin));
         cancelCamera.addListener((event) -> {
             if (event instanceof ChangeEvent) {

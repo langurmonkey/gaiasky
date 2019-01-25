@@ -79,8 +79,7 @@ public class LoadingGui extends AbstractGui {
         screenMode.setFillParent(true);
         screenMode.top().right();
         screenMode.pad(pad10);
-        Image smImg = new Image(skin.getDrawable("screen-mode"));
-        OwnTextIconButton screenModeButton = new OwnTextIconButton("", smImg, skin);
+        OwnTextIconButton screenModeButton = new OwnTextIconButton("", skin, "screen-mode");
         screenModeButton.setCursor(GlobalResources.linkCursor);
         screenModeButton.addListener(new EventListener() {
             @Override

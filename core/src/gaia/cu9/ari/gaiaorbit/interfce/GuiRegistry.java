@@ -1,5 +1,6 @@
 package gaia.cu9.ari.gaiaorbit.interfce;
 
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.InputMultiplexer;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
@@ -167,6 +168,9 @@ public class GuiRegistry implements IObserver {
     /** Keyframes window **/
     private KeyframesWindow keyframesWindow;
 
+    /** Minimap window **/
+    private MinimapWindow minimapWindow;
+
     /**
      * One object to handle observer pattern
      */
@@ -174,7 +178,7 @@ public class GuiRegistry implements IObserver {
         super();
         this.skin = skin;
         // Windows which are visible from any GUI
-        EventManager.instance.subscribe(this, Events.SHOW_QUIT_ACTION, Events.SHOW_ABOUT_ACTION, Events.SHOW_PREFERENCES_ACTION, Events.SHOW_KEYFRAMES_WINDOW_ACTION, Events.UI_THEME_RELOAD_INFO);
+        EventManager.instance.subscribe(this, Events.SHOW_QUIT_ACTION, Events.SHOW_ABOUT_ACTION, Events.SHOW_PREFERENCES_ACTION, Events.SHOW_KEYFRAMES_WINDOW_ACTION, Events.UI_THEME_RELOAD_INFO, Events.TOGGLE_MINIMAP);
     }
 
     public void dispose() {
@@ -195,6 +199,14 @@ public class GuiRegistry implements IObserver {
                 break;
             case SHOW_PREFERENCES_ACTION:
                 (new PreferencesWindow(ui, skin)).show(ui);
+                break;
+            case TOGGLE_MINIMAP:
+                if(minimapWindow == null)
+                    minimapWindow = new MinimapWindow(ui, skin);
+                if(!minimapWindow.isVisible() || !minimapWindow.hasParent())
+                    minimapWindow.show(ui, Gdx.graphics.getWidth() - minimapWindow.getWidth(), Gdx.graphics.getHeight() - minimapWindow.getHeight());
+                else
+                    minimapWindow.hide();
                 break;
             case SHOW_KEYFRAMES_WINDOW_ACTION:
                 if (keyframesWindow == null)

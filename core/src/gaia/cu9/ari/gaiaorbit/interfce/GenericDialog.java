@@ -22,7 +22,6 @@ import gaia.cu9.ari.gaiaorbit.util.scene2d.CollapsibleWindow;
 import gaia.cu9.ari.gaiaorbit.util.scene2d.OwnScrollPane;
 import gaia.cu9.ari.gaiaorbit.util.scene2d.OwnTextButton;
 
-import static com.badlogic.gdx.scenes.scene2d.actions.Actions.fadeOut;
 import static com.badlogic.gdx.scenes.scene2d.actions.Actions.sequence;
 
 public abstract class GenericDialog extends CollapsibleWindow {
@@ -352,8 +351,7 @@ public abstract class GenericDialog extends CollapsibleWindow {
      * then removes it from the stage.
      */
     public void hide() {
-        hide(sequence(fadeOut(0.4f, Interpolation.fade)));
-        stage.setKeyboardFocus(previousKeyboardFocus);
+        hide(Actions.fadeOut(0.4f, Interpolation.fade));
     }
 
     /**
