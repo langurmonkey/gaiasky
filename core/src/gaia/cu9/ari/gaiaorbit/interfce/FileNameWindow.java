@@ -29,7 +29,7 @@ public class FileNameWindow extends GenericDialog{
     @Override
     protected void build() {
         OwnLabel label = new OwnLabel("File name: ", skin);
-        LengthValidator lengthValidator = new LengthValidator(3, 30);
+        LengthValidator lengthValidator = new LengthValidator(3, 40);
         RegexpValidator nameValidator = new RegexpValidator(lengthValidator, "^[^*&%\\s\\+\\=\\\\\\/@#\\$&\\*()~]+$");
         fileName = new OwnTextField(defaultName, skin, nameValidator);
         fileName.setWidth(250 * GlobalConf.SCALE_FACTOR);
