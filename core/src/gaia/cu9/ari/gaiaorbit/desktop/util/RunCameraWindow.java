@@ -3,8 +3,6 @@ package gaia.cu9.ari.gaiaorbit.desktop.util;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.scenes.scene2d.Actor;
-import com.badlogic.gdx.scenes.scene2d.Event;
-import com.badlogic.gdx.scenes.scene2d.EventListener;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener.ChangeEvent;
@@ -109,12 +107,12 @@ public class RunCameraWindow extends GenericDialog {
         // Init files
         FileHandle scriptFolder = Gdx.files.absolute(SysUtils.getDefaultCameraDir().getPath());
         if (scripts == null)
-            scripts = new Array<FileHandle>();
+            scripts = new Array<>();
         else
             scripts.clear();
         
         if (scriptFolder.exists())
-            scripts = GlobalResources.listRec(scriptFolder, scripts, ".dat");
+            scripts = GlobalResources.listRec(scriptFolder, scripts, ".dat", ".gsc");
         scripts.sort(new FileHandleComparator());
         
         final com.badlogic.gdx.scenes.scene2d.ui.List<FileHandle> scriptsList = new com.badlogic.gdx.scenes.scene2d.ui.List<FileHandle>(skin, "normal");
@@ -126,19 +124,16 @@ public class RunCameraWindow extends GenericDialog {
 
         scriptsList.setItems(names);
         scriptsList.pack();//
-        scriptsList.addListener(new EventListener() {
-            @Override
-            public boolean handle(Event event) {
-                if (event instanceof ChangeEvent) {
-                    ChangeEvent ce = (ChangeEvent) event;
-                    Actor actor = ce.getTarget();
-                    @SuppressWarnings("unchecked")
-                    final String name = ((com.badlogic.gdx.scenes.scene2d.ui.List<String>) actor).getSelected();
-                    select(name);
-                    return true;
-                }
-                return false;
+        scriptsList.addListener(event -> {
+            if (event instanceof ChangeEvent) {
+                ChangeEvent ce = (ChangeEvent) event;
+                Actor actor = ce.getTarget();
+                @SuppressWarnings("unchecked")
+                final String name = ((List<String>) actor).getSelected();
+                select(name);
+                return true;
             }
+            return false;
         });
         // Select first
         Gdx.app.postRunnable(new Runnable() {

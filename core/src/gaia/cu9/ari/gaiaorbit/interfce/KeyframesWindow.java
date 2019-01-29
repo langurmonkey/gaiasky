@@ -290,7 +290,7 @@ public class KeyframesWindow extends GenericDialog implements IObserver {
         export.pad(pad5);
         export.addListener((event) -> {
             if (event instanceof ChangeListener.ChangeEvent) {
-                String suggestedName = df.format(new Date()) + "_gscamera.dat";
+                String suggestedName = df.format(new Date()) + ".gsc";
                 FileNameWindow fnw = new FileNameWindow(suggestedName, stage, skin);
                 OwnTextField textField = fnw.getFileNameField();
                 fnw.setAcceptRunnable(() -> {

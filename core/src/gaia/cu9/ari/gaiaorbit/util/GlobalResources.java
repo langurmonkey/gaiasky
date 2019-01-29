@@ -277,27 +277,35 @@ public class GlobalResources {
     /**
      * Gets all the files with the given extension in the given file handle f.
      *
-     * @param f         The directory to get all the files
-     * @param l         The list with re results
-     * @param extension The extension of the files
+     * @param f          The directory to get all the files
+     * @param l          The list with re results
+     * @param extensions The allowed extensions
      * @return The list l
      */
-    public static Array<FileHandle> listRec(FileHandle f, Array<FileHandle> l, String extension) {
+    public static Array<FileHandle> listRec(FileHandle f, Array<FileHandle> l, String... extensions) {
         if (f.exists()) {
             if (f.isDirectory()) {
                 FileHandle[] partial = f.list();
                 for (FileHandle fh : partial) {
-                    l = listRec(fh, l, extension);
+                    l = listRec(fh, l, extensions);
                 }
 
             } else {
-                if (f.name().endsWith(extension)) {
+                if (endsWithAny(f.name(), extensions)) {
                     l.add(f);
                 }
             }
         }
 
         return l;
+    }
+
+    private static boolean endsWithAny(String str, String... extensions){
+        for(String ext: extensions){
+            if(str.endsWith(ext))
+                return true;
+        }
+        return false;
     }
 
     public static Array<FileHandle> listRec(FileHandle f, Array<FileHandle> l, FilenameFilter filter) {

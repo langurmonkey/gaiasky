@@ -266,8 +266,8 @@ public class CameraKeyframeManager implements IObserver {
                 splineIdx += splineStep;
                 splinePosIdx += splinePosStep;
 
-                if (k1.seam && GlobalConf.frame.KF_PATH_TYPE_POSITION == PathType.SPLINE) {
-                    // Jump to next spline
+                // If k1 is seam and not last and we're doing splines, jump to next spline
+                if (k1.seam && i < keyframes.size -1 && GlobalConf.frame.KF_PATH_TYPE_POSITION == PathType.SPLINE) {
                     currentPosSpline = posSplines[++k];
                     splinePosIdx = 0;
                     splinePosStep = 1d / (currentPosSpline.nPoints - 1);

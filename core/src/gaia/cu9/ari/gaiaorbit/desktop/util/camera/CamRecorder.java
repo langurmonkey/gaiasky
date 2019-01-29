@@ -160,7 +160,7 @@ public class CamRecorder implements IObserver {
                     return;
                 }
                 // Annotate by date
-                f = new File(SysUtils.getDefaultCameraDir(), df.format(new Date()) + "_gscamera.dat");
+                f = new File(SysUtils.getDefaultCameraDir(), df.format(new Date()) + ".gsc");
                 if (f.exists()) {
                     f.delete();
                 }
