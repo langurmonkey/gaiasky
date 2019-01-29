@@ -34,25 +34,45 @@ public class KeyframesPathObject extends VertsObject implements I3DTextRenderabl
      * Keyframe objects
      */
     public Array<Keyframe> keyframes;
-    /** Selected keyframe **/
+    /**
+     * Selected keyframe
+     **/
     public Keyframe selected = null;
 
-    /** The actual path **/
+    /**
+     * The actual path
+     **/
     public VertsObject path;
-    /** The segments joining the knots **/
+    /**
+     * The segments joining the knots
+     **/
     public VertsObject segments;
-    /** The knots, or keyframe positions **/
+    /**
+     * The knots, or keyframe positions
+     **/
     public VertsObject knots;
-    /** Selected knot **/
+    /**
+     * Knots which are also seams
+     **/
+    public VertsObject knotsSeam;
+    /**
+     * Selected knot
+     **/
     public VertsObject selectedKnot;
 
-    /** Contains pairs of {direction, up} representing the orientation at each knot **/
+    /**
+     * Contains pairs of {direction, up} representing the orientation at each knot
+     **/
     public Array<VertsObject> orientations;
 
-    /** Objects **/
+    /**
+     * Objects
+     **/
     private Array<VertsObject> objects;
 
-    /** Multiplier to primitive size **/
+    /**
+     * Multiplier to primitive size
+     **/
     private float ss = 1f;
 
     public KeyframesPathObject() {
@@ -87,6 +107,14 @@ public class KeyframesPathObject extends VertsObject implements I3DTextRenderabl
         knots.setPrimitiveSize(4f * ss);
         knots.initialize();
 
+        knotsSeam = new Points(RenderGroup.POINT);
+        knotsSeam.setName("Keyframes.knots.seam");
+        knotsSeam.ct = this.ct;
+        knotsSeam.setColor(GlobalResources.gRed);
+        knotsSeam.setClosedLoop(false);
+        knotsSeam.setPrimitiveSize(4f * ss);
+        knotsSeam.initialize();
+
         selectedKnot = new Points(RenderGroup.POINT);
         selectedKnot.setName("Keyframes.selknot");
         selectedKnot.ct = this.ct;
@@ -100,6 +128,7 @@ public class KeyframesPathObject extends VertsObject implements I3DTextRenderabl
         objects.add(path);
         objects.add(segments);
         objects.add(knots);
+        objects.add(knotsSeam);
         objects.add(selectedKnot);
     }
 
@@ -115,13 +144,14 @@ public class KeyframesPathObject extends VertsObject implements I3DTextRenderabl
         double[] kfPositions = new double[keyframes.size * 3];
         double[] kfDirections = new double[keyframes.size * 3];
         double[] kfUps = new double[keyframes.size * 3];
+        boolean[] kfSeams = new boolean[keyframes.size];
         Array<Vector3d> current = new Array<>();
         int i = 0;
         for (Keyframe kf : keyframes) {
 
             // Fill positions
-            if(kf.seam){
-                if(i > 0 && i < keyframes.size-1){
+            if (kf.seam) {
+                if (i > 0 && i < keyframes.size - 1) {
                     current.add(kf.pos);
                     kfPositionsSep.add(current);
                     current = new Array<>();
@@ -141,11 +171,13 @@ public class KeyframesPathObject extends VertsObject implements I3DTextRenderabl
             kfUps[i * 3 + 1] = kf.up.y;
             kfUps[i * 3 + 2] = kf.up.z;
 
+            kfSeams[i] = kf.seam;
+
             i++;
         }
         kfPositionsSep.add(current);
 
-        setPathKnots(kfPositions, kfDirections, kfUps);
+        setPathKnots(kfPositions, kfDirections, kfUps, kfSeams);
         if (keyframes.size > 1) {
             segments.setPoints(kfPositions);
             double[] pathSamples = CameraKeyframeManager.instance.samplePaths(kfPositionsSep, kfPositions, 20, GlobalConf.frame.KF_PATH_TYPE_POSITION);
@@ -192,8 +224,8 @@ public class KeyframesPathObject extends VertsObject implements I3DTextRenderabl
             int i = 0;
             for (Keyframe kf : keyframes) {
                 // Fill model table
-                if(kf.seam){
-                    if(i > 0 && i < keyframes.size-1){
+                if (kf.seam) {
+                    if (i > 0 && i < keyframes.size - 1) {
                         current.add(kf.pos);
                         kfPositionsSep.add(current);
                         current = new Array<>();
@@ -213,9 +245,33 @@ public class KeyframesPathObject extends VertsObject implements I3DTextRenderabl
         }
     }
 
-    public void setPathKnots(double[] kts, double[] dirs, double[] ups) {
-        // Points
-        knots.setPoints(kts);
+    public void setPathKnots(double[] kts, double[] dirs, double[] ups, boolean[] seams) {
+        // Points - distribute seams and no seams
+        int nSeams = 0, nNoSeams = 0;
+        for (int i = 0; i < seams.length; i++) {
+            if (seams[i])
+                nSeams++;
+            else
+                nNoSeams++;
+        }
+        double[] ktsS = new double[nSeams * 3];
+        double[] ktsN = new double[nNoSeams * 3];
+        int ktsi = 0, ktsni = 0;
+        for (int i = 0; i < seams.length; i++) {
+            if (seams[i]) {
+                ktsS[ktsi] = kts[i * 3];
+                ktsS[ktsi + 1] = kts[i * 3 + 1];
+                ktsS[ktsi + 2] = kts[i * 3 + 2];
+                ktsi += 3;
+            } else {
+                ktsN[ktsni] = kts[i * 3];
+                ktsN[ktsni + 1] = kts[i * 3 + 1];
+                ktsN[ktsni + 2] = kts[i * 3 + 2];
+                ktsni += 3;
+            }
+        }
+        knots.setPoints(ktsN);
+        knotsSeam.setPoints(ktsS);
 
         int n = kts.length;
         if (orientations.size == (dirs.length + ups.length) / 3) {
@@ -245,8 +301,11 @@ public class KeyframesPathObject extends VertsObject implements I3DTextRenderabl
         }
     }
 
-    public void addKnot(Vector3d knot, Vector3d dir, Vector3d up) {
-        knots.addPoint(knot);
+    public void addKnot(Vector3d knot, Vector3d dir, Vector3d up, boolean seam) {
+        if (seam)
+            knotsSeam.addPoint(knot);
+        else
+            knots.addPoint(knot);
         addKnotOrientation(orientations.size / 2, knot.x, knot.y, knot.z, dir.x, dir.y, dir.z, up.x, up.y, up.z);
     }
 
@@ -267,8 +326,8 @@ public class KeyframesPathObject extends VertsObject implements I3DTextRenderabl
         up.setPrimitiveSize(1f * ss);
         up.initialize();
 
-        dir.setPoints(new double[] { px, py, pz, px + dx, py + dy, pz + dz });
-        up.setPoints(new double[] { px, py, pz, px + ux, py + uy, pz + uz });
+        dir.setPoints(new double[]{px, py, pz, px + dx, py + dy, pz + dz});
+        up.setPoints(new double[]{px, py, pz, px + ux, py + uy, pz + uz});
 
         objects.add(dir);
         objects.add(up);
@@ -353,9 +412,9 @@ public class KeyframesPathObject extends VertsObject implements I3DTextRenderabl
         unselect();
         selected = kf;
         selectedKnot.setPoints(kf.pos.values());
-        if(selected.seam){
+        if (selected.seam) {
             selectedKnot.setColor(GlobalResources.gRed);
-        }else{
+        } else {
             selectedKnot.setColor(GlobalResources.gPink);
         }
         int i = keyframes.indexOf(kf, true) * 2;
@@ -470,6 +529,7 @@ public class KeyframesPathObject extends VertsObject implements I3DTextRenderabl
 
     /**
      * Label render
+     *
      * @param batch  The sprite batch
      * @param shader The shader
      * @param sys    The font render system

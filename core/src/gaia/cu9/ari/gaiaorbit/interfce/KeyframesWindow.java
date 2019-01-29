@@ -20,6 +20,7 @@ import gaia.cu9.ari.gaiaorbit.event.IObserver;
 import gaia.cu9.ari.gaiaorbit.scenegraph.KeyframesPathObject;
 import gaia.cu9.ari.gaiaorbit.scenegraph.camera.CameraManager;
 import gaia.cu9.ari.gaiaorbit.util.GlobalConf;
+import gaia.cu9.ari.gaiaorbit.util.GlobalResources;
 import gaia.cu9.ari.gaiaorbit.util.I18n;
 import gaia.cu9.ari.gaiaorbit.util.Logger;
 import gaia.cu9.ari.gaiaorbit.util.format.DateFormatFactory;
@@ -47,36 +48,60 @@ public class KeyframesWindow extends GenericDialog implements IObserver {
     private INumberFormat secondsFormatter;
     private IDateFormat dateFormat;
 
-    /** Seconds **/
+    /**
+     * Seconds
+     **/
     private OwnTextField secondsInput;
-    /** Name **/
+    /**
+     * Name
+     **/
     private OwnTextField nameInput;
-    /** Current keyframes **/
+    /**
+     * Current keyframes
+     **/
     private Array<Keyframe> keyframes;
-    /** Right and left tables **/
+    /**
+     * Right and left tables
+     **/
     private Table left, right;
-    /** Keyframes table **/
+    /**
+     * Keyframes table
+     **/
     private Table keyframesTable;
-    /** Notice cell **/
+    /**
+     * Notice cell
+     **/
     private Cell notice;
-    /** Seconds cells **/
+    /**
+     * Seconds cells
+     **/
     private Map<Keyframe, Cell> secondsCells;
     /**
      * Keyframe cells
      */
     private Map<Keyframe, OwnLabel> keyframeNames;
-    /** Scroll for keyframes **/
+    /**
+     * Scroll for keyframes
+     **/
     private OwnScrollPane rightScroll;
-    /** Current camera params **/
+    /**
+     * Current camera params
+     **/
     private Object lock = new Object();
     private Vector3d pos, dir, up;
     private ITimeFrameProvider t;
-    /** Date format **/
+    /**
+     * Date format
+     **/
     private DateFormat df;
-    /** Last loaded keyframe file name **/
+    /**
+     * Last loaded keyframe file name
+     **/
     private String lastKeyframeFileName = null;
 
-    /** Model object to represent the path **/
+    /**
+     * Model object to represent the path
+     **/
     private KeyframesPathObject keyframesPathObject;
 
     private float buttonSize, buttonSizeL;
@@ -122,7 +147,7 @@ public class KeyframesWindow extends GenericDialog implements IObserver {
         /** LEFT - CONTROLS **/
 
         // ADD
-        OwnTextIconButton addKeyframe = new OwnTextIconButton("Add keyframe at the end", skin,"add");
+        OwnTextIconButton addKeyframe = new OwnTextIconButton("Add keyframe at the end", skin, "add");
         addKeyframe.addListener(new TextTooltip("Add new keyframe at the end with the current camera configuration and time", skin));
         addKeyframe.pad(pad5);
         left.add(addKeyframe).left().colspan(2).padBottom(pad5).row();
@@ -586,7 +611,14 @@ public class KeyframesWindow extends GenericDialog implements IObserver {
                 // Make seam
                 kf.seam = seam.isChecked();
                 Gdx.app.postRunnable(() -> {
-                    keyframesPathObject.resamplePath();
+                    keyframesPathObject.refreshData();
+                    if (keyframesPathObject.selected == kf) {
+                        if (seam.isChecked())
+                            keyframesPathObject.selectedKnot.setColor(GlobalResources.gRed);
+                        else
+                            keyframesPathObject.selectedKnot.setColor(GlobalResources.gWhite);
+
+                    }
                 });
                 return true;
             }
@@ -661,7 +693,7 @@ public class KeyframesWindow extends GenericDialog implements IObserver {
         if (addToModel && keyframesPathObject != null) {
             Gdx.app.postRunnable(() -> {
                 // Update model data
-                keyframesPathObject.addKnot(kf.pos, kf.dir, kf.up);
+                keyframesPathObject.addKnot(kf.pos, kf.dir, kf.up, kf.seam);
                 keyframesPathObject.segments.addPoint(kf.pos);
                 if (keyframes.size > 1)
                     keyframesPathObject.resamplePath();
@@ -748,38 +780,38 @@ public class KeyframesWindow extends GenericDialog implements IObserver {
     @Override
     public void notify(Events event, Object... data) {
         switch (event) {
-        case KEYFRAME_ADD:
-            addKeyframe(-1);
-            break;
-        case UPDATE_CAM_RECORDER:
-            synchronized (lock) {
-                t = (ITimeFrameProvider) data[0];
-                pos = (Vector3d) data[1];
-                dir = (Vector3d) data[2];
-                up = (Vector3d) data[3];
-            }
-            break;
-        case KEYFRAMES_REFRESH:
-            reinitialiseKeyframes(keyframes, null);
-            break;
-        case KEYFRAME_SELECT:
-            Keyframe kf = (Keyframe) data[0];
-            OwnLabel nl = keyframeNames.get(kf);
-            if (nl != null) {
-                colorBak = nl.getColor().cpy();
-                nl.setColor(skin.getColor("theme"));
-                scrollToKeyframe(kf);
-            }
-            break;
-        case KEYFRAME_UNSELECT:
-            kf = (Keyframe) data[0];
-            nl = keyframeNames.get(kf);
-            if (nl != null && colorBak != null) {
-                nl.setColor(colorBak);
-            }
-            break;
-        default:
-            break;
+            case KEYFRAME_ADD:
+                addKeyframe(-1);
+                break;
+            case UPDATE_CAM_RECORDER:
+                synchronized (lock) {
+                    t = (ITimeFrameProvider) data[0];
+                    pos = (Vector3d) data[1];
+                    dir = (Vector3d) data[2];
+                    up = (Vector3d) data[3];
+                }
+                break;
+            case KEYFRAMES_REFRESH:
+                reinitialiseKeyframes(keyframes, null);
+                break;
+            case KEYFRAME_SELECT:
+                Keyframe kf = (Keyframe) data[0];
+                OwnLabel nl = keyframeNames.get(kf);
+                if (nl != null) {
+                    colorBak = nl.getColor().cpy();
+                    nl.setColor(skin.getColor("theme"));
+                    scrollToKeyframe(kf);
+                }
+                break;
+            case KEYFRAME_UNSELECT:
+                kf = (Keyframe) data[0];
+                nl = keyframeNames.get(kf);
+                if (nl != null && colorBak != null) {
+                    nl.setColor(colorBak);
+                }
+                break;
+            default:
+                break;
         }
     }
 
