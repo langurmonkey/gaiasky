@@ -77,6 +77,10 @@ public class KeyframesWindow extends GenericDialog implements IObserver {
      **/
     private Map<Keyframe, Cell> secondsCells;
     /**
+     * Names cells
+     **/
+    private Map<Keyframe, Cell> namesCells;
+    /**
      * Keyframe cells
      */
     private Map<Keyframe, OwnLabel> keyframeNames;
@@ -114,6 +118,7 @@ public class KeyframesWindow extends GenericDialog implements IObserver {
 
         this.keyframes = new Array<>();
         this.secondsCells = new HashMap<>();
+        this.namesCells = new HashMap<>();
         this.keyframeNames = new HashMap<>();
         this.secondsFormatter = NumberFormatFactory.getFormatter("000.00");
         this.df = new SimpleDateFormat("yyyyMMdd_HH-mm-ss-SSS");
@@ -196,7 +201,7 @@ public class KeyframesWindow extends GenericDialog implements IObserver {
         rightScroll = new OwnScrollPane(keyframesTable, skin, "minimalist-nobg");
         rightScroll.setScrollingDisabled(true, false);
         rightScroll.setHeight((GlobalConf.SCALE_FACTOR > 1.5f ? 100 : 110) * GlobalConf.SCALE_FACTOR);
-        rightScroll.setWidth(360 * GlobalConf.SCALE_FACTOR);
+        rightScroll.setWidth((GlobalConf.SCALE_FACTOR > 1.5f ? 360 : 390) * GlobalConf.SCALE_FACTOR);
         rightScroll.setFadeScrollBars(true);
 
         right.add(keyframesTitle).top().left().padBottom(pad).row();
@@ -491,10 +496,11 @@ public class KeyframesWindow extends GenericDialog implements IObserver {
 
     private long lastMs = 0l;
 
-    private Cell addSecondsL(Keyframe kf, double prevT, int index, Table table) {
+    private Cell addFrameSeconds(Keyframe kf, double prevT, int index, Table table) {
         // Seconds
         OwnLabel secondsL = new OwnLabel(secondsFormatter.format(prevT + kf.seconds), skin, "hud-header");
-        Cell secondsCell = null;
+        secondsL.setWidth((GlobalConf.SCALE_FACTOR > 1.5f ? 60 : 80) * GlobalConf.SCALE_FACTOR);
+        Cell secondsCell;
         if (secondsCells.containsKey(kf))
             secondsCell = secondsCells.get(kf);
         else {
@@ -503,6 +509,7 @@ public class KeyframesWindow extends GenericDialog implements IObserver {
         }
         secondsCell.setActor(secondsL).left().padRight(pad / 2f).padBottom(pad5);
         secondsL.addListener(new TextTooltip(kf.seconds + " seconds after previous keyframe - @" + GlobalConf.frame.RENDER_TARGET_FPS + "FPS", skin));
+        // Can't modify time of first keyframe; it's always zero
         if (index > 0)
             secondsL.addListener((event) -> {
                 if (event instanceof InputEvent) {
@@ -513,10 +520,12 @@ public class KeyframesWindow extends GenericDialog implements IObserver {
                         secondsCells.get(kf).clearActor();
                         OwnTextField secondsInput = new OwnTextField(valText, skin, new FloatValidator(0.0001f, 500f));
                         secondsInput.setWidth(55 * GlobalConf.SCALE_FACTOR);
+                        secondsInput.selectAll();
+                        stage.setKeyboardFocus(secondsInput);
                         secondsInput.addListener((evt) -> {
                             if (secondsInput.isValid() && evt instanceof InputEvent && System.currentTimeMillis() - lastMs > 1500) {
                                 InputEvent ievt = (InputEvent) evt;
-                                if (ievt.getKeyCode() == Input.Keys.ENTER) {
+                                if (ievt.getKeyCode() == Input.Keys.ENTER || ievt.getKeyCode() == Input.Keys.ESCAPE) {
                                     double val = Double.parseDouble(secondsInput.getText());
                                     double t = 0;
                                     for (Keyframe k : keyframes) {
@@ -547,10 +556,61 @@ public class KeyframesWindow extends GenericDialog implements IObserver {
         return secondsCell;
     }
 
+    private Cell addFrameName(Keyframe kf, int index, Table table) {
+        // Seconds
+        OwnLabel nameL = new OwnLabel((index + 1) + ": " + kf.name, skin);
+        nameL.setWidth((GlobalConf.SCALE_FACTOR > 1.5f ? 100 : 130) * GlobalConf.SCALE_FACTOR);
+        Cell nameCell;
+        if (namesCells.containsKey(kf))
+            nameCell = namesCells.get(kf);
+        else {
+            nameCell = table.add();
+            namesCells.put(kf, nameCell);
+        }
+        nameCell.clearActor();
+        nameCell.setActor(nameL).left().padRight(pad / 2f).padBottom(pad5);
+        keyframeNames.put(kf, nameL);
+        nameL.addListener(new TextTooltip("Keyframe name", skin));
+        nameL.addListener((event) -> {
+            if (event instanceof InputEvent) {
+                InputEvent ie = (InputEvent) event;
+                if (ie.getType().equals(InputEvent.Type.touchDown)) {
+                    String valText = nameL.getText().toString();
+                    valText = valText.substring(valText.indexOf(":") + 2);
+                    nameL.clear();
+                    keyframeNames.remove(kf);
+                    namesCells.get(kf).clearActor();
+                    LengthValidator lengthValidator = new LengthValidator(0, 15);
+                    RegexpValidator nameValidator = new RegexpValidator(lengthValidator, "^[^*&%\\+\\=\\\\\\/@#\\$&\\*()~]*$");
+                    OwnTextField nameInput = new OwnTextField(valText, skin, nameValidator);
+                    nameInput.setWidth(55 * GlobalConf.SCALE_FACTOR);
+                    nameInput.selectAll();
+                    stage.setKeyboardFocus(nameInput);
+                    nameInput.addListener((evt) -> {
+                        if (nameInput.isValid() && evt instanceof InputEvent && System.currentTimeMillis() - lastMs > 1500) {
+                            InputEvent ievt = (InputEvent) evt;
+                            if (ievt.getKeyCode() == Input.Keys.ENTER) {
+                                kf.name = nameInput.getText();
+                                addFrameName(kf, index, table);
+                            }
+                        }
+                        evt.setBubbles(false);
+                        return true;
+                    });
+                    namesCells.get(kf).setActor(nameInput);
+                    lastMs = System.currentTimeMillis();
+                }
+            }
+            return true;
+        });
+        return nameCell;
+    }
+
+
     private void addKeyframeToTable(Keyframe kf, double prevT, int index, Table table, boolean addToModel) {
 
         // Seconds
-        addSecondsL(kf, prevT, index, table);
+        addFrameSeconds(kf, prevT, index, table);
 
         // Frame number
         double t = 0;
@@ -562,6 +622,7 @@ public class KeyframesWindow extends GenericDialog implements IObserver {
         long frame = (long) ((t + kf.seconds) * GlobalConf.frame.RENDER_TARGET_FPS);
 
         OwnLabel framesL = new OwnLabel("(" + frame + ")", skin);
+        framesL.setWidth(40 * GlobalConf.SCALE_FACTOR);
         framesL.addListener(new TextTooltip(frame + " frames - @" + (1d / GlobalConf.frame.RENDER_TARGET_FPS) + "SPF", skin));
         table.add(framesL).left().padRight(pad).padBottom(pad5);
 
@@ -573,13 +634,7 @@ public class KeyframesWindow extends GenericDialog implements IObserver {
         table.add(clockimg).left().padRight(pad).padBottom(pad5);
 
         // Frame name
-        OwnLabel frameName = new OwnLabel((index + 1) + ": " + kf.name, skin);
-        if (keyframesPathObject.selected == kf) {
-            colorBak = frameName.getColor().cpy();
-            frameName.setColor(skin.getColor("theme"));
-        }
-        table.add(frameName).left().padRight(pad).padBottom(pad5);
-        keyframeNames.put(kf, frameName);
+        addFrameName(kf, index, table);
 
         // Go to
         OwnTextIconButton goTo = new OwnTextIconButton("", skin, "go-to");
@@ -739,6 +794,7 @@ public class KeyframesWindow extends GenericDialog implements IObserver {
         if (cleanKeyframesList)
             keyframes.clear();
 
+        namesCells.clear();
         secondsCells.clear();
         keyframesTable.clearChildren();
         nameInput.setText("");
