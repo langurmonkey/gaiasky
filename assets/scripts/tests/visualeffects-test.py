@@ -15,7 +15,7 @@ gs.sleep(3)
 gs.setCinematicCamera(True)
 gs.cameraRotate(1.0, 0.0)
 
-print("Bloom")
+gs.print("Bloom")
 gs.setBloom(100.0)
 gs.sleep(4)
 gs.setBloom(50.0)
@@ -23,21 +23,21 @@ gs.sleep(4)
 gs.setBloom(10.0)
 gs.sleep(4)
 
-print("Star glow")
+gs.print("Star glow")
 gs.setStarGlow(False)
 gs.sleep(4)
 gs.setStarGlow(True)
 gs.sleep(4)
 
 
-print("Motion blur")
+gs.print("Motion blur")
 gs.setMotionBlur(True)
 gs.sleep(4)
 gs.setMotionBlur(False)
 gs.sleep(4)
 
 
-print("Lens flare")
+gs.print("Lens flare")
 gs.setLensFlare(True)
 gs.sleep(4)
 gs.setLensFlare(False)

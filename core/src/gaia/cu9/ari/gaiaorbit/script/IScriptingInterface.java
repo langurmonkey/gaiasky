@@ -233,7 +233,7 @@ public interface IScriptingInterface {
      * Sets the camera in focus mode with the given focus object and instantly moves
      * the camera next to the focus object.
      *
-     * @param focusName
+     * @param focusName The name of the new focus object.
      */
     void setCameraFocusInstantAndGo(final String focusName);
 
@@ -812,6 +812,14 @@ public interface IScriptingInterface {
     void goToObject(String name, double viewAngle, float waitTimeSeconds);
 
     /**
+     * Sets the camera in focus mode with the given focus object and instantly moves
+     * the camera next to the focus object.
+     *
+     * @param name The name of the new focus object.
+     */
+    void goToObjectInstant(String name);
+
+    /**
      * Lands on the object with the given name, if it is an instance of
      * {@link gaia.cu9.ari.gaiaorbit.scenegraph.Planet}. The land location is
      * determined by the line of sight from the current position of the camera
@@ -1050,6 +1058,35 @@ public interface IScriptingInterface {
      *             file to finish. Otherwise, it returns immediately.
      */
     void runCameraPath(String file, boolean sync);
+
+    /**
+     * Creates a smooth transition from the current camera state to the given camera state {camPos, camDir, camUp} in
+     * the given number of seconds. This function waits for the transition to finish and then returns control
+     * to the script.
+     * This function will put the camera in free mode, so make sure to change it afterwards if you need to. Also,
+     * this only works with the natural camera.
+     *
+     * @param camPos The target camera position in the internal reference system.
+     * @param camDir The target camera direction in the internal reference system.
+     * @param camUp The target camera up in the internal reference system.
+     * @param seconds The duration of the transition in seconds.
+     */
+    void cameraTransition(double[] camPos, double[] camDir, double[] camUp, double seconds);
+
+    /**
+     * Creates a smooth transition from the current camera state to the given camera state {camPos, camDir, camUp} in
+     * the given number of seconds. Optionally, the transition may be run synchronously or asynchronously to the
+     * current script.
+     * This function will put the camera in free mode, so make sure to change it afterwards if you need to. Also,
+     * this only works with the natural camera.
+     *
+     * @param camPos The target camera position in the internal reference system.
+     * @param camDir The target camera direction in the internal reference system.
+     * @param camUp The target camera up in the internal reference system.
+     * @param seconds The duration of the transition in seconds.
+     * @param sync If true, the call waits for the transition to finish before returning, otherwise it returns immediately
+     */
+    void cameraTransition(double[] camPos, double[] camDir, double[] camUp, double seconds, boolean sync);
 
     /**
      * Sleeps for the given number of seconds in the application time (FPS), so
@@ -1355,5 +1392,23 @@ public interface IScriptingInterface {
      * @return The dot product scalar
      */
     double dot3(double[] vec1, double[] vec2);
+
+    /**
+     * Print text using the internal logging system
+     * @param message The message
+     */
+    void print(String message);
+
+    /**
+     * Print text using the internal logging system
+     * @param message The message
+     */
+    void log(String message);
+
+    /**
+     * Log an error using the internal logging system
+     * @param message The error message
+     */
+    void error(String message);
 
 }

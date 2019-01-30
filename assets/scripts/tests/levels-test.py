@@ -8,7 +8,7 @@ gs = EventScriptingInterface.instance()
 gs.disableInput()
 gs.cameraStop()
 
-print("Testing brightness")
+gs.print("Testing brightness")
 
 gs.setBrightnessLevel(-1.0)
 gs.sleep(1)
@@ -23,7 +23,7 @@ gs.sleep(1)
 gs.setBrightnessLevel(0.0)
 gs.sleep(1)
 
-print("Testing contrast")
+gs.print("Testing contrast")
 
 gs.setContrastLevel(0.0)
 gs.sleep(1)
@@ -38,7 +38,7 @@ gs.sleep(1)
 gs.setContrastLevel(1.0)
 gs.sleep(1)
 
-print("Testing hue")
+gs.print("Testing hue")
 
 gs.setHueLevel(0.0)
 gs.sleep(1)
@@ -53,7 +53,7 @@ gs.sleep(1)
 gs.setHueLevel(1.0)
 gs.sleep(1)
 
-print("Testing saturation")
+gs.print("Testing saturation")
 
 gs.setSaturationLevel(0.0)
 gs.sleep(1)
@@ -68,7 +68,7 @@ gs.sleep(1)
 gs.setSaturationLevel(1.0)
 gs.sleep(1)
 
-print("Check out of bounds parameter still works")
+gs.print("Check out of bounds parameter still works")
 gs.setContrastLevel(4.0)
 gs.sleep(1)
 gs.setContrastLevel(1.0)

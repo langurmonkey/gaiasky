@@ -20,10 +20,7 @@ import gaia.cu9.ari.gaiaorbit.scenegraph.camera.NaturalCamera;
 import gaia.cu9.ari.gaiaorbit.util.*;
 import gaia.cu9.ari.gaiaorbit.util.Logger.Log;
 import gaia.cu9.ari.gaiaorbit.util.coord.Coordinates;
-import gaia.cu9.ari.gaiaorbit.util.math.Intersectord;
-import gaia.cu9.ari.gaiaorbit.util.math.MathUtilsd;
-import gaia.cu9.ari.gaiaorbit.util.math.Vector2d;
-import gaia.cu9.ari.gaiaorbit.util.math.Vector3d;
+import gaia.cu9.ari.gaiaorbit.util.math.*;
 import gaia.cu9.ari.gaiaorbit.util.time.ITimeFrameProvider;
 
 import java.time.Instant;
@@ -778,6 +775,11 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
     }
 
     @Override
+    public void goToObjectInstant(String name){
+        setCameraFocusInstantAndGo(name);
+    }
+
+    @Override
     public void landOnObject(String name) {
         landOnObject(name, null);
     }
@@ -1227,7 +1229,7 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
             try {
                 Thread.sleep(100);
             } catch (InterruptedException e) {
-                em.post(Events.JAVA_EXCEPTION, e);
+                logger.error(e);
             }
         }
         // Consume
@@ -1241,7 +1243,7 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
             try {
                 Thread.sleep(100);
             } catch (InterruptedException e) {
-                em.post(Events.JAVA_EXCEPTION, e);
+                logger.error(e);
             }
         }
         // Consume
@@ -1254,7 +1256,7 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
             try {
                 Thread.sleep(50);
             } catch (InterruptedException e) {
-                em.post(Events.JAVA_EXCEPTION, e);
+                logger.error(e);
             }
         }
         // Consume
@@ -1317,7 +1319,7 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
     @Override
     public void expandGuiComponent(String name) {
         IGui gui = GaiaSky.instance.mainGui;
-        ControlsWindow controls = (ControlsWindow) gui.getGuiStage().getRoot()
+        ControlsWindow controls = gui.getGuiStage().getRoot()
                 .findActor(I18n.bundle.get("gui.controlpanel"));
         controls.getCollapsiblePane(name).expandPane();
     }
@@ -1325,7 +1327,7 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
     @Override
     public void collapseGuiComponent(String name) {
         IGui gui = GaiaSky.instance.mainGui;
-        ControlsWindow controls = (ControlsWindow) gui.getGuiStage().getRoot()
+        ControlsWindow controls = gui.getGuiStage().getRoot()
                 .findActor(I18n.bundle.get("gui.controlpanel"));
         controls.getCollapsiblePane(name).collapsePane();
     }
@@ -1343,7 +1345,7 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
             try {
                 Thread.sleep(100);
             } catch (InterruptedException e) {
-                em.post(Events.JAVA_EXCEPTION, e);
+                logger.error(e);
             }
             long spent = TimeUtils.millis() - iniTime;
             if (timeoutMs > 0 && spent > timeoutMs) {
@@ -1376,7 +1378,7 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
                 try {
                     Thread.sleep(50);
                 } catch (InterruptedException e) {
-                    em.post(Events.JAVA_EXCEPTION, e);
+                    logger.error(e);
                 }
             }
             Texture tex = manager.get(path, Texture.class);
@@ -1437,6 +1439,110 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
         runCameraPath(file, false);
     }
 
+    class CameraTransitionRunnable implements Runnable {
+        NaturalCamera cam;
+        double seconds;
+        double elapsed;
+        double[] targetPos, targetDir, targetUp;
+        Pathd<Vector3d> posl, dirl, upl;
+
+        Runnable end;
+        Object lock;
+
+        Vector3d aux;
+
+        public CameraTransitionRunnable(NaturalCamera cam, double[] pos, double[] dir, double[] up, double seconds, Runnable end) {
+            this.cam = cam;
+            this.targetPos = pos;
+            this.targetDir = dir;
+            this.targetUp = up;
+            this.seconds = seconds;
+            this.elapsed = 0;
+            this.end = end;
+            this.lock = new Object();
+
+            // Set up interpolators
+            posl = getPathd(cam.getPos(), pos);
+            dirl = getPathd(cam.getDirection(), dir);
+            upl = getPathd(cam.getUp(), up);
+
+            // Aux
+            aux = new Vector3d();
+        }
+
+        private Pathd<Vector3d> getPathd(Vector3d p0, double[] p1) {
+            Vector3d[] points = new Vector3d[]{new Vector3d(p0), new Vector3d(p1[0], p1[1], p1[2])};
+            return new Lineard<>(points);
+        }
+
+        @Override
+        public void run() {
+            // Update elapsed time
+            elapsed += Gdx.graphics.getDeltaTime();
+
+            // Interpolation variable
+            double alpha = MathUtilsd.clamp(elapsed / seconds, 0.0, 0.99999999999999);
+
+            // Set camera state
+            cam.setPos(posl.valueAt(aux, alpha));
+            cam.setDirection(dirl.valueAt(aux, alpha));
+            cam.setUp(upl.valueAt(aux, alpha));
+
+            // Finish if needed
+            if (elapsed >= seconds) {
+                // On end, run runnable if present, otherwise notify lock
+                if (end != null) {
+                    end.run();
+                } else {
+                    synchronized (lock) {
+                        lock.notify();
+                    }
+                }
+            }
+        }
+    }
+
+    @Override
+    public void cameraTransition(double[] camPos, double[] camDir, double[] camUp, double seconds) {
+        cameraTransition(camPos, camDir, camUp, seconds, true);
+    }
+
+    private int cTransSeq = 0;
+
+    @Override
+    public void cameraTransition(double[] camPos, double[] camDir, double[] camUp, double seconds, boolean sync) {
+        NaturalCamera cam = GaiaSky.instance.cam.naturalCamera;
+
+        // Put in focus mode
+        em.post(Events.CAMERA_MODE_CMD, CameraMode.Free_Camera);
+
+        // Set up final actions
+        String name = "cameraTransition" + (cTransSeq++);
+        Runnable end = null;
+        if (!sync)
+            end = () -> {
+                unparkRunnable(name);
+            };
+
+        // Create and park runnable
+        CameraTransitionRunnable r = new CameraTransitionRunnable(cam, camPos, camDir, camUp, seconds, end);
+        parkRunnable(name, r);
+
+        if (sync) {
+            // Wait on lock
+            synchronized (r.lock) {
+                try {
+                    r.lock.wait();
+                } catch (InterruptedException e) {
+                    logger.error(e);
+                }
+            }
+
+            // Unpark and return
+            unparkRunnable(name);
+        }
+    }
+
     @Override
     public void sleep(float seconds) {
         if (this.isFrameOutputActive()) {
@@ -1445,7 +1551,7 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
             try {
                 Thread.sleep(Math.round(seconds * 1000));
             } catch (InterruptedException e) {
-                em.post(Events.JAVA_EXCEPTION, e);
+                logger.error(e);
             }
         }
 
@@ -1459,7 +1565,7 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
             try {
                 Thread.sleep(100);
             } catch (InterruptedException e) {
-                em.post(Events.JAVA_EXCEPTION, e);
+                logger.error(e);
             }
         }
 
@@ -1750,5 +1856,21 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
             em.post(Events.TIME_CHANGE_CMD, Instant.ofEpochMilli(time));
         });
     }
+
+    @Override
+    public void print(String message) {
+        logger.info(message);
+    }
+
+    @Override
+    public void log(String message) {
+        logger.info(message);
+    }
+
+    @Override
+    public void error(String message) {
+        logger.error(message);
+    }
+
 
 }

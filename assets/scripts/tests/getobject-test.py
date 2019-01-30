@@ -18,7 +18,7 @@ gs.goToObject(obj, 3.5)
 
 rad = gs.getObjectRadius(obj)
 
-print("%s radius: %f Km" % (obj, rad))
+gs.print("%s radius: %f Km" % (obj, rad))
 
 gs.sleep(1)
 
@@ -27,7 +27,7 @@ absmag = body.getAbsmag()
 appmag = body.getAppmag()
 radec = body.getPosSph()
 
-print("Absmag: %f, appmag: %f, RA: %f, DEC: %f" % (absmag, appmag, radec.x, radec.y))
+gs.print("Absmag: %f, appmag: %f, RA: %f, DEC: %f" % (absmag, appmag, radec.x, radec.y))
 
 
 # Now stop at a certain distance of earth

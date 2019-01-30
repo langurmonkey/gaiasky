@@ -1,16 +1,15 @@
 package gaia.cu9.ari.gaiaorbit.script;
 
-import java.util.concurrent.atomic.AtomicBoolean;
-
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.TimeUtils;
-
 import gaia.cu9.ari.gaiaorbit.GaiaSky;
 import gaia.cu9.ari.gaiaorbit.event.EventManager;
 import gaia.cu9.ari.gaiaorbit.event.Events;
 import gaia.cu9.ari.gaiaorbit.event.IObserver;
 import gaia.cu9.ari.gaiaorbit.scenegraph.CelestialBody;
 import gaia.cu9.ari.gaiaorbit.scenegraph.IFocus;
+
+import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
  * This guy implements high level operations which run concurrently to the main
@@ -39,7 +38,7 @@ public class HiddenHelperUser implements IObserver {
 
     private HiddenHelperUser() {
         super();
-        currentTasks = new Array<HelperTask>(5);
+        currentTasks = new Array<>(5);
         lastCommandTime = -1;
         EventManager.instance.subscribe(this, Events.NAVIGATE_TO_OBJECT, Events.LAND_ON_OBJECT, Events.LAND_AT_LOCATION_OF_OBJECT, Events.INPUT_EVENT);
     }
