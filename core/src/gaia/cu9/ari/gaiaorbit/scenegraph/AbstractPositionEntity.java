@@ -121,6 +121,14 @@ public abstract class AbstractPositionEntity extends SceneGraphNode {
             coordinates.doneLoading(sg, this);
     }
 
+    public Vector3d getPos(){
+        return pos;
+    }
+
+    public boolean isCopy(){
+        return copy;
+    }
+
     /**
      * Returns the position of this entity in the internal reference system.
      * 

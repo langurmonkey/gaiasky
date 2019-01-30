@@ -22,6 +22,7 @@ import gaia.cu9.ari.gaiaorbit.render.system.PointRenderSystem;
 import gaia.cu9.ari.gaiaorbit.scenegraph.camera.FovCamera;
 import gaia.cu9.ari.gaiaorbit.scenegraph.camera.ICamera;
 import gaia.cu9.ari.gaiaorbit.scenegraph.camera.NaturalCamera;
+import gaia.cu9.ari.gaiaorbit.util.Constants;
 import gaia.cu9.ari.gaiaorbit.util.GlobalConf;
 import gaia.cu9.ari.gaiaorbit.util.GlobalResources;
 import gaia.cu9.ari.gaiaorbit.util.gravwaves.RelativisticEffectsManager;
@@ -439,7 +440,7 @@ public class KeyframesPathObject extends VertsObject implements I3DTextRenderabl
 
     private void initFocus(){
        if(focus == null || focus.parent == null){
-           focus = new Invisible("Keyframe focus " + this.hashCode());
+           focus = new Invisible("", 500 * Constants.KM_TO_U);
            EventManager.instance.post(Events.SCENE_GRAPH_ADD_OBJECT_CMD, focus, false);
        }
     }
@@ -454,6 +455,8 @@ public class KeyframesPathObject extends VertsObject implements I3DTextRenderabl
                 dir.setPrimitiveSize(1f * ss);
                 up.setPrimitiveSize(1f * ss);
             }
+            initFocus();
+            focus.name = "";
             Keyframe aux = selected;
             selected = null;
             selectedKnot.clear();

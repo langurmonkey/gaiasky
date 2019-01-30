@@ -1,6 +1,6 @@
 package gaia.cu9.ari.gaiaorbit.script;
 
-import gaia.cu9.ari.gaiaorbit.scenegraph.CelestialBody;
+import gaia.cu9.ari.gaiaorbit.scenegraph.IFocus;
 import gaia.cu9.ari.gaiaorbit.scenegraph.SceneGraphNode;
 
 /**
@@ -455,11 +455,11 @@ public interface IScriptingInterface {
 
     /**
      * Returns the closest object to the camera in this instant as a
-     * {@link gaia.cu9.ari.gaiaorbit.scenegraph.CelestialBody}.
+     * {@link gaia.cu9.ari.gaiaorbit.scenegraph.IFocus}.
      *
      * @return The closest object to the camera
      */
-    CelestialBody getClosestObjectToCamera();
+    IFocus getClosestObjectToCamera();
 
     /**
      * Changes the field of view of the camera.

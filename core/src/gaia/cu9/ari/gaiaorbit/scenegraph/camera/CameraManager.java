@@ -448,8 +448,8 @@ public class CameraManager implements ICamera, IObserver {
     }
 
     @Override
-    public void checkClosest(CelestialBody cb) {
-        current.checkClosest(cb);
+    public void checkClosest(IFocus focus) {
+        current.checkClosest(focus);
     }
 
     @Override
@@ -502,12 +502,12 @@ public class CameraManager implements ICamera, IObserver {
     }
 
     @Override
-    public CelestialBody getClosest() {
+    public IFocus getClosest() {
         return current.getClosest();
     }
 
     @Override
-    public CelestialBody getClosest2() {
+    public IFocus getClosest2() {
         return current.getClosest2();
     }
 
