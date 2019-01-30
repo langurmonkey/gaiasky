@@ -970,7 +970,7 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
 
         if (!sg.containsNode(nameStub)) {
             Invisible invisible = new Invisible(nameStub);
-            sg.insert(invisible, true);
+            EventManager.instance.post(Events.SCENE_GRAPH_ADD_OBJECT_CMD, invisible, true);
         }
         Invisible invisible = (Invisible) sg.getNode(nameStub);
 

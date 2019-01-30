@@ -166,30 +166,6 @@ public class NaturalInputListener extends GestureDetector implements IObserver {
     private int touched;
     private boolean multiTouch;
 
-    @Override
-    public boolean touchDown(int screenX, int screenY, int pointer, int button) {
-        if (GlobalConf.runtime.INPUT_ENABLED) {
-            touched |= (1 << pointer);
-            multiTouch = !MathUtils.isPowerOfTwo(touched);
-            if (multiTouch)
-                this.button = -1;
-            else if (this.button < 0) {
-                startX = screenX;
-                startY = screenY;
-                gesture.set(startX, startY);
-                this.button = button;
-            }
-            if (button == Buttons.RIGHT) {
-                // Select keyframes
-                if (!(anyPressed(Keys.ALT_LEFT, Keys.SHIFT_LEFT, Keys.CONTROL_LEFT) && getKeyframesPathObject().isSelected())) {
-                    keyframeBeingDragged = getKeyframeCollision(screenX, screenY);
-                }
-            }
-        }
-        camera.setInputByController(false);
-        return super.touchDown(screenX, screenY, pointer, button);
-    }
-
     private KeyframesPathObject kpo;
 
     private KeyframesPathObject getKeyframesPathObject() {
@@ -204,11 +180,11 @@ public class NaturalInputListener extends GestureDetector implements IObserver {
         return null;
     }
 
-    private boolean getKeyframeCollision(int screenX, int screenY) {
+    private IFocus getKeyframeCollision(int screenX, int screenY) {
         if (getKeyframesPathObject() != null)
             return getKeyframesPathObject().select(screenX, screenY, MIN_PIX_DIST, camera);
         else
-            return false;
+            return null;
     }
 
     private boolean dragKeyframe(int screenX, int screenY, double dragDx, double dragDy) {
@@ -252,6 +228,37 @@ public class NaturalInputListener extends GestureDetector implements IObserver {
     }
 
     @Override
+    public boolean touchDown(int screenX, int screenY, int pointer, int button) {
+        if (GlobalConf.runtime.INPUT_ENABLED) {
+            touched |= (1 << pointer);
+            multiTouch = !MathUtils.isPowerOfTwo(touched);
+            if (multiTouch)
+                this.button = -1;
+            else if (this.button < 0) {
+                startX = screenX;
+                startY = screenY;
+                gesture.set(startX, startY);
+                this.button = button;
+            }
+            if (button == Buttons.RIGHT) {
+                // Select keyframes
+                if (!(anyPressed(Keys.ALT_LEFT, Keys.SHIFT_LEFT, Keys.CONTROL_LEFT) && getKeyframesPathObject().isSelected())) {
+                    IFocus hit = null;
+                    keyframeBeingDragged = ((hit = getKeyframeCollision(screenX, screenY)) != null);
+                    if(keyframeBeingDragged){
+                        // Focus, do not center
+                        EventManager.instance.post(Events.FOCUS_CHANGE_CMD, hit, false);
+                        EventManager.instance.post(Events.CAMERA_MODE_CMD, CameraMode.Focus, false);
+                    }
+                }
+            }
+        }
+        camera.setInputByController(false);
+        return super.touchDown(screenX, screenY, pointer, button);
+    }
+
+
+    @Override
     public boolean touchUp(final int screenX, final int screenY, final int pointer, final int button) {
         EventManager.instance.post(Events.INPUT_EVENT, button);
         if (GlobalConf.runtime.INPUT_ENABLED) {
@@ -285,7 +292,8 @@ public class NaturalInputListener extends GestureDetector implements IObserver {
             } else if (button == this.button && button == Input.Buttons.RIGHT) {
                 if (keyframeBeingDragged) {
                     keyframeBeingDragged = false;
-                } else if (getKeyframesPathObject() != null && getKeyframesPathObject().isSelected() && !anyPressed(Keys.CONTROL_LEFT, Keys.SHIFT_LEFT, Keys.ALT_LEFT)) {
+                } else if (gesture.dst(screenX, screenY) < MOVE_PX_DIST &&  getKeyframesPathObject() != null && getKeyframesPathObject().isSelected() && !anyPressed(Keys.CONTROL_LEFT, Keys.SHIFT_LEFT, Keys.ALT_LEFT)) {
+                    EventManager.instance.post(Events.CAMERA_MODE_CMD, CameraMode.Free_Camera);
                     getKeyframesPathObject().unselect();
                 } else {
                     // Ensure Octants observed property is computed

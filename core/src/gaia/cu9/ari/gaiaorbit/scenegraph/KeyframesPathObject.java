@@ -71,13 +71,17 @@ public class KeyframesPathObject extends VertsObject implements I3DTextRenderabl
     private Array<VertsObject> objects;
 
     /**
+     * Invisible focus for camera
+     */
+    private Invisible focus;
+
+    /**
      * Multiplier to primitive size
      **/
     private float ss = 1f;
 
     public KeyframesPathObject() {
         super(null);
-
     }
 
     public void initialize() {
@@ -130,6 +134,7 @@ public class KeyframesPathObject extends VertsObject implements I3DTextRenderabl
         objects.add(knots);
         objects.add(knotsSeam);
         objects.add(selectedKnot);
+
     }
 
     public void setKeyframes(Array<Keyframe> keyframes) {
@@ -361,7 +366,7 @@ public class KeyframesPathObject extends VertsObject implements I3DTextRenderabl
         this.addToRenderLists(camera);
     }
 
-    public boolean select(int screenX, int screenY, int minPixDist, NaturalCamera camera) {
+    public IFocus select(int screenX, int screenY, int minPixDist, NaturalCamera camera) {
 
         Vector3 pos = aux3f1.get();
         Vector3d aux = aux3d1.get();
@@ -397,11 +402,15 @@ public class KeyframesPathObject extends VertsObject implements I3DTextRenderabl
                 if (checkClickDistance(screenX, screenY, pos, camera, pcamera, pixelSize)) {
                     //Hit
                     select(kf);
-                    return true;
+                    initFocus();
+                    focus.pos.set(selected.pos);
+                    focus.name = selected.name;
+
+                    return focus;
                 }
             }
         }
-        return false;
+        return null;
     }
 
     protected boolean checkClickDistance(int screenX, int screenY, Vector3 pos, NaturalCamera camera, PerspectiveCamera pcamera, double pixelSize) {
@@ -426,6 +435,13 @@ public class KeyframesPathObject extends VertsObject implements I3DTextRenderabl
             up.setPrimitiveSize(2f * ss);
         }
         EventManager.instance.post(Events.KEYFRAME_SELECT, kf);
+    }
+
+    private void initFocus(){
+       if(focus == null || focus.parent == null){
+           focus = new Invisible("Keyframe focus " + this.hashCode());
+           EventManager.instance.post(Events.SCENE_GRAPH_ADD_OBJECT_CMD, focus, false);
+       }
     }
 
     public void unselect() {

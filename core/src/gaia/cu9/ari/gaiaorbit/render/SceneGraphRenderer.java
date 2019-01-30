@@ -404,8 +404,9 @@ public class SceneGraphRenderer extends AbstractRenderer implements IProcessRend
             if (GlobalConf.scene.VISIBILITY[i]) {
                 visible.set(ComponentType.values()[i].ordinal());
             }
-
         }
+        // Invisible are always visible :_D
+        visible.set(ComponentType.Invisible.ordinal());
 
         times = new long[comps.length];
         alphas = new float[comps.length];

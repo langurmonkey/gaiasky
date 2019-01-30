@@ -359,12 +359,12 @@ public class CameraManager implements ICamera, IObserver {
      * 
      * @param mode
      */
-    public void updateMode(CameraMode mode, boolean postEvent) {
+    public void updateMode(CameraMode mode, boolean centerFocus, boolean postEvent) {
         CameraMode previousMode = this.mode;
         this.mode = mode;
         updateCurrentCamera(previousMode);
         for (ICamera cam : cameras) {
-            cam.updateMode(mode, postEvent);
+            cam.updateMode(mode, centerFocus, postEvent);
         }
 
         if (postEvent) {
@@ -377,7 +377,10 @@ public class CameraManager implements ICamera, IObserver {
         switch (event) {
         case CAMERA_MODE_CMD:
             CameraMode cm = (CameraMode) data[0];
-            updateMode(cm, true);
+            boolean centerFocus = true;
+            if(data.length > 1)
+                centerFocus = (Boolean)data[1];
+            updateMode(cm, centerFocus, true);
             break;
         case FOV_CHANGE_NOTIFICATION:
             updateAngleEdge(Gdx.graphics.getWidth(), Gdx.graphics.getHeight());

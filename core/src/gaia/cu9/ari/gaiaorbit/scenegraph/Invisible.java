@@ -1,8 +1,9 @@
 package gaia.cu9.ari.gaiaorbit.scenegraph;
 
 import com.badlogic.gdx.graphics.g3d.ModelBatch;
-
+import gaia.cu9.ari.gaiaorbit.render.ComponentType;
 import gaia.cu9.ari.gaiaorbit.scenegraph.camera.ICamera;
+import gaia.cu9.ari.gaiaorbit.util.ComponentTypes;
 import gaia.cu9.ari.gaiaorbit.util.Constants;
 import gaia.cu9.ari.gaiaorbit.util.time.ITimeFrameProvider;
 
@@ -18,6 +19,7 @@ public class Invisible extends CelestialBody {
         super();
         this.parentName = "Universe";
         this.size = 500 * (float) Constants.M_TO_U;
+        this.ct = new ComponentTypes(ComponentType.Invisible);
     }
 
     public Invisible(String name) {
@@ -25,6 +27,7 @@ public class Invisible extends CelestialBody {
         this.name = name;
         this.parentName = "Universe";
         this.size = 500 * (float) Constants.M_TO_U;
+        this.ct = new ComponentTypes(ComponentType.Invisible);
     }
 
     @Override

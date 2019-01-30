@@ -106,6 +106,7 @@ public enum Events {
      * Informs that the focus has somehow changed and the GUI must be updated.
      * <ul>
      * <li>[0] - The new focus object OR its name.</li>
+     * <li>[1] - Optional boolean that, if set to true, prevents the camera from actually centering on the focus.</li>
      * </ul>
      **/
     FOCUS_CHANGED,

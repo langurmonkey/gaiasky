@@ -96,7 +96,7 @@ public class RelativisticCamera extends AbstractCamera {
     }
 
     @Override
-    public void updateMode(CameraMode mode, boolean postEvent) {
+    public void updateMode(CameraMode mode, boolean centerFocus, boolean postEvent) {
         // TODO Auto-generated method stub
 
     }

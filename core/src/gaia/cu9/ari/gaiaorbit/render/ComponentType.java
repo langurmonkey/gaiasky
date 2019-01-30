@@ -4,6 +4,7 @@ import gaia.cu9.ari.gaiaorbit.util.I18n;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.MissingResourceException;
 
 public enum ComponentType {
     Stars("icon-elem-stars"),
@@ -34,7 +35,10 @@ public enum ComponentType {
     Effects("icon-elem-effects"),
     Atmospheres("icon-elem-atmospheres"),
     Clouds("icon-elem-clouds"),
-    Others("icon-elem-others");
+    Others("icon-elem-others"),
+
+    // ALWAYS LAST
+    Invisible(null);
 
     private static Map<String, ComponentType> keysMap = new HashMap<String, ComponentType>();
 
@@ -53,7 +57,11 @@ public enum ComponentType {
     }
 
     public String getName() {
-        return I18n.bundle.get(key);
+        try {
+            return I18n.bundle.get(key);
+        }catch (MissingResourceException e){
+            return null;
+        }
     }
 
     @Override

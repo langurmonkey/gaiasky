@@ -69,7 +69,7 @@ public interface ICamera {
      */
     public void update(double dt, ITimeFrameProvider time);
 
-    public void updateMode(CameraMode mode, boolean postEvent);
+    public void updateMode(CameraMode mode, boolean centerFocus, boolean postEvent);
 
     public CameraMode getMode();
 

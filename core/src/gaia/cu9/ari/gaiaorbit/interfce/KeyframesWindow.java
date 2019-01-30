@@ -138,6 +138,7 @@ public class KeyframesWindow extends GenericDialog implements IObserver {
         keyframesPathObject.initialize();
         keyframesPathObject.doneLoading(null);
         keyframesPathObject.setKeyframes(keyframes);
+
         EventManager.instance.post(Events.SCENE_GRAPH_ADD_OBJECT_CMD, keyframesPathObject, false);
 
     }
@@ -499,7 +500,7 @@ public class KeyframesWindow extends GenericDialog implements IObserver {
     private Cell addFrameSeconds(Keyframe kf, double prevT, int index, Table table) {
         // Seconds
         OwnLabel secondsL = new OwnLabel(secondsFormatter.format(prevT + kf.seconds), skin, "hud-header");
-        secondsL.setWidth((GlobalConf.SCALE_FACTOR > 1.5f ? 60 : 80) * GlobalConf.SCALE_FACTOR);
+        secondsL.setWidth((GlobalConf.SCALE_FACTOR > 1.5f ? 60 : 75) * GlobalConf.SCALE_FACTOR);
         Cell secondsCell;
         if (secondsCells.containsKey(kf))
             secondsCell = secondsCells.get(kf);
@@ -631,7 +632,7 @@ public class KeyframesWindow extends GenericDialog implements IObserver {
         clockimg.addListener(new TextTooltip(dateFormat.format(Instant.ofEpochMilli(kf.time)), skin));
         clockimg.setScale(0.7f);
         clockimg.setOrigin(Align.center);
-        table.add(clockimg).left().padRight(pad).padBottom(pad5);
+        table.add(clockimg).width(clockimg.getWidth()).left().padRight(pad).padBottom(pad5);
 
         // Frame name
         addFrameName(kf, index, table);
