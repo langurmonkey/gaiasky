@@ -239,9 +239,11 @@ task dist (dependsOn: gaiaskyJar, description: "Compiles the project, creates th
     if(vsc.equalsIgnoreCase("false")){
         if(!javaVersionOk){
             println("WARNING: Gaia Sky must be built with Java  " + JavaVersion.VERSION_1_8 + ", you are using " + JavaVersion.current())
+            println("WARNING: export GS_JAVA_VERSION_CHECK=false to skip check")
         }
     } else {
         if(!javaVersionOk){
+            println("WARNING: export GS_JAVA_VERSION_CHECK=false to skip check")
             throw new GradleException("This built must be run with java " + JavaVersion.VERSION_1_8 + ", you are using " + JavaVersion.current())
         }
     }
