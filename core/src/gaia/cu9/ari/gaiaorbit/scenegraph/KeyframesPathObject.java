@@ -440,7 +440,7 @@ public class KeyframesPathObject extends VertsObject implements I3DTextRenderabl
 
     private void initFocus(){
        if(focus == null || focus.parent == null){
-           focus = new Invisible("", 500 * Constants.KM_TO_U);
+           focus = new Invisible("", 5 * Constants.KM_TO_U);
            EventManager.instance.post(Events.SCENE_GRAPH_ADD_OBJECT_CMD, focus, false);
        }
     }
