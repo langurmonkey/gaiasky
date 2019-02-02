@@ -70,13 +70,23 @@ public class GaiaSkyDesktop implements IObserver {
      * @author Toni Sagrista
      */
     private static class GaiaSkyArgs {
-        @Parameter(names = { "-h", "--help" }, help = true) private boolean help = false;
+        @Parameter(names = {"-h", "--help"}, description = "Shows usage information", help = true)
+        private boolean help = false;
 
-        @Parameter(names = { "-v", "--version" }, description = "Lists version and build inforamtion") private boolean version = false;
+        @Parameter(names = {"-v", "--version"}, description = "Lists version and build inforamtion.")
+        private boolean version = false;
 
-        @Parameter(names = { "-d", "--ds-download" }, description = "Displays the download dialog at startup") private boolean download = false;
+        @Parameter(names = {"-d", "--ds-download"}, description = "Displays the download dialog at startup.")
+        private boolean download = false;
 
-        @Parameter(names = { "-c", "--cat-chooser" }, description = "Displays the catalog chooser dialog at startup") private boolean catalogchooser = false;
+        @Parameter(names = {"-c", "--cat-chooser"}, description = "Displays the catalog chooser dialog at startup.")
+        private boolean catalogChooser = false;
+
+        @Parameter(names = {"-p", "--properties"}, description = "Specify the location of the properties file. Defaults to ~/.gaiasky/global.properties.")
+        private String propertiesFile = null;
+
+        @Parameter(names = {"-a", "--assetsloc"}, description = "Specify a different location for the assets folder. If not present, the default assets location is used.")
+        private String assetsLocation = null;
     }
 
     public static void main(String[] args) {
@@ -95,6 +105,16 @@ public class GaiaSkyDesktop implements IObserver {
         try {
             // Check java version
             javaVersionCheck();
+
+            // Set properties file from arguments to VM params if needed
+            if (gsargs.propertiesFile != null && !gsargs.propertiesFile.isEmpty()) {
+                System.setProperty("properties.file", gsargs.propertiesFile);
+            }
+
+            // Set assets location to VM params if needed
+            if (gsargs.assetsLocation != null && !gsargs.assetsLocation.isEmpty()) {
+                System.setProperty("assets.location", gsargs.assetsLocation);
+            }
 
             gsd = new GaiaSkyDesktop();
 
@@ -224,40 +244,41 @@ public class GaiaSkyDesktop implements IObserver {
         }
 
         // Launch app
-        LwjglApplication app = new LwjglApplication(new GaiaSky(gsargs.download, gsargs.catalogchooser), cfg);
+        LwjglApplication app = new LwjglApplication(new GaiaSky(gsargs.download, gsargs.catalogChooser), cfg);
         app.addLifecycleListener(new GaiaSkyWindowListener());
     }
 
-    @Override public void notify(Events event, final Object... data) {
+    @Override
+    public void notify(Events event, final Object... data) {
         switch (event) {
-        case SCENE_GRAPH_LOADED:
-            if (REST_ENABLED) {
-                /*
-                 * Notify REST server that GUI is loaded and everything should be in a
-                 * well-defined state
-                 */
-                Method activate;
-                try {
-                    activate = REST_SERVER_CLASS.getMethod("activate");
-                    activate.invoke(null, new Object[0]);
-                } catch (NoSuchMethodException | SecurityException | IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
-                    logger.error(e);
+            case SCENE_GRAPH_LOADED:
+                if (REST_ENABLED) {
+                    /*
+                     * Notify REST server that GUI is loaded and everything should be in a
+                     * well-defined state
+                     */
+                    Method activate;
+                    try {
+                        activate = REST_SERVER_CLASS.getMethod("activate");
+                        activate.invoke(null, new Object[0]);
+                    } catch (NoSuchMethodException | SecurityException | IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
+                        logger.error(e);
+                    }
                 }
-            }
-            break;
-        case DISPOSE:
-            if (REST_ENABLED) {
-                /* Shutdown REST server thread on termination */
-                try {
-                    Method stop = REST_SERVER_CLASS.getMethod("stop");
-                    stop.invoke(null, new Object[0]);
-                } catch (NoSuchMethodException | SecurityException | IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
-                    logger.error(e);
+                break;
+            case DISPOSE:
+                if (REST_ENABLED) {
+                    /* Shutdown REST server thread on termination */
+                    try {
+                        Method stop = REST_SERVER_CLASS.getMethod("stop");
+                        stop.invoke(null, new Object[0]);
+                    } catch (NoSuchMethodException | SecurityException | IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
+                        logger.error(e);
+                    }
                 }
-            }
-            break;
-        default:
-            break;
+                break;
+            default:
+                break;
         }
 
     }
@@ -345,7 +366,8 @@ public class GaiaSkyDesktop implements IObserver {
         }
     }
 
-    @SuppressWarnings("resource") private static void copyFile(File sourceFile, File destFile, boolean ow) throws IOException {
+    @SuppressWarnings("resource")
+    private static void copyFile(File sourceFile, File destFile, boolean ow) throws IOException {
         if (destFile.exists()) {
             if (ow) {
                 // Overwrite, delete file
@@ -397,15 +419,18 @@ public class GaiaSkyDesktop implements IObserver {
 
     private class GaiaSkyWindowListener implements LifecycleListener {
 
-        @Override public void pause() {
+        @Override
+        public void pause() {
 
         }
 
-        @Override public void resume() {
+        @Override
+        public void resume() {
 
         }
 
-        @Override public void dispose() {
+        @Override
+        public void dispose() {
             // Terminate here
 
             // Analytics stop event
