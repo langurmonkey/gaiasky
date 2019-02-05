@@ -162,7 +162,7 @@ public class GaiaSkyDesktop implements IObserver {
             // Init properties file
             String props = System.getProperty("properties.file");
             if (props == null || props.isEmpty()) {
-                props = initConfigFile(false);
+                initConfigFile(false);
             }
 
             // Initialize i18n (only for global config logging)

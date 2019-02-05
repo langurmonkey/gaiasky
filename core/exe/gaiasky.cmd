@@ -1,6 +1,10 @@
 ::
+::
 :: Gaia Sky start script
 ::
+
+@ECHO OFF
+SETLOCAL ENABLEEXTENSIONS
 
 :: Gaia Sky location
 SET GSDIR=%~dp0
@@ -14,23 +18,19 @@ SET OPTS=%OPTS% -Dassets.location=%GSDIR%
 :: SimpleLogger defaults
 SET OPTS=%OPTS% -Dorg.slf4j.simpleLogger.defaultLogLevel=warn -Dorg.slf4j.simpleLogger.showThreadName=false
 
-IF EXIST %GSDIR%jre\bin\java (
+IF EXIST %GSDIR%jre\bin\java.exe (
     :: Use bundled java
     SET JAVA_CMD=%GSDIR%jre\bin\java.exe
-    @ECHO Using bundled java: %JAVA_CMD%
 ) ELSE (
     :: Look for java
-    FOR /f %%j IN ("java.exe") DO (
-        SET JAVA_LOC=%%~dp$PATH:j
-    )
-
-    IF %JAVA_LOC%.==. (
-        @ECHO Java installation not found! Exiting.
-        @EXIT 1
+    IF "%JAVA_HOME%"=="" (
+        ECHO Java installation not found! Exiting
+        GOTO :END
     ) ELSE (
-        SET JAVA_CMD=%JAVA_LOC%jre\bin\java.exe
-        @ECHO Using system java: %JAVA_CMD%
+        SET JAVA_CMD=%JAVA_HOME%\bin\java.exe
     )
 )
+@ECHO ON
 :: Run
-%JAVA_CMD% %OPTS% -cp "%GSDIR%lib\*" gaia.cu9.ari.gaiaorbit.desktop.GaiaSkyDesktop
+"%JAVA_CMD%" %OPTS% -cp "%GSDIR%lib\*" gaia.cu9.ari.gaiaorbit.desktop.GaiaSkyDesktop
+:END
