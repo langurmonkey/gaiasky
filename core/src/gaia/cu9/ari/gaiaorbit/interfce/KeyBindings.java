@@ -348,7 +348,7 @@ public class KeyBindings {
             }
         }), SPECIAL1, SPECIAL2, Keys.R);
 
-        // I -> new keyframe
+        // CTRL + W -> new keyframe
         addMapping(new ProgramAction(txt("action.keyframe"), ()->{
             EventManager.instance.post(Events.KEYFRAME_ADD);
         }), SPECIAL1, Keys.W);
