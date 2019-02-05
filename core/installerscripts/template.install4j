@@ -1339,6 +1339,7 @@ return console.askYesNo(message, true);
         <entry location="ic_launcher.svg" fileType="regular" />
         <entry location="gs.desktop" fileType="regular" />
         <entry location="rest-static" fileType="regular" />
+        <entry location="gaiasky.6.gz" fileType="regular" />
       </exclude>
       <variables />
       <autoUpdate useMinUpdatableVersion="false" minUpdatableVersion="" useMaxUpdatableVersion="false" maxUpdatableVersion="">
@@ -1361,6 +1362,7 @@ return console.askYesNo(message, true);
         <entry location="ic_launcher.svg" fileType="regular" />
         <entry location="gs.desktop" fileType="regular" />
         <entry location="rest-static" fileType="regular" />
+        <entry location="gaiasky.6.gz" fileType="regular" />
       </exclude>
       <variables />
       <autoUpdate useMinUpdatableVersion="false" minUpdatableVersion="" useMaxUpdatableVersion="false" maxUpdatableVersion="">
@@ -1377,6 +1379,7 @@ return console.askYesNo(message, true);
         <entry location="gaiasky.cmd" fileType="regular" />
         <entry location="data/dummyversion" fileType="regular" />
         <entry location="rest-static" fileType="regular" />
+        <entry location="gaiasky.6.gz" fileType="regular" />
       </exclude>
       <variables />
       <autoUpdate useMinUpdatableVersion="false" minUpdatableVersion="" useMaxUpdatableVersion="false" maxUpdatableVersion="">
@@ -1430,10 +1433,10 @@ return console.askYesNo(message, true);
       <preInstallScript mode="1" file="">
         <content />
       </preInstallScript>
-      <postInstallScript mode="2" file="@gs-git-folder@/core/exe/create-shortcut-deb.sh">
+      <postInstallScript mode="2" file="@gs-git-folder@/core/installerscripts/post-install.sh">
         <content />
       </postInstallScript>
-      <preUninstallScript mode="2" file="@gs-git-folder@/core/exe/remove-shortcut-deb.sh">
+      <preUninstallScript mode="2" file="@gs-git-folder@/core/installerscripts/pre-uninstall.sh">
         <content />
       </preUninstallScript>
       <postUninstallScript mode="1" file="">
@@ -1462,10 +1465,10 @@ return console.askYesNo(message, true);
       <preInstallScript mode="1" file="">
         <content />
       </preInstallScript>
-      <postInstallScript mode="2" file="@gs-git-folder@/core/exe/create-shortcut-rpm.sh">
+      <postInstallScript mode="2" file="@gs-git-folder@/core/installerscripts/post-install.sh">
         <content />
       </postInstallScript>
-      <preUninstallScript mode="2" file="@gs-git-folder@/core/exe/remove-shortcut-rpm.sh">
+      <preUninstallScript mode="2" file="@gs-git-folder@/core/installerscripts/pre-uninstall.sh">
         <content />
       </preUninstallScript>
       <postUninstallScript mode="1" file="">

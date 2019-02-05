@@ -2,7 +2,7 @@
 Type=Application
 Encoding=UTF-8
 Name=Gaia Sky
-Comment=Gaia Sky 3D astronomy software developed in the Astronomisches Rechen-Institut (Heidelberg)
+Comment=Gaia Sky 3D Universe software
 Exec=gaiasky
 Icon=/opt/gaiasky/ic_launcher.svg
 Terminal=false

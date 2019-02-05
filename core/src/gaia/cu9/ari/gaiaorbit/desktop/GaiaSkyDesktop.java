@@ -89,17 +89,47 @@ public class GaiaSkyDesktop implements IObserver {
         private String assetsLocation = null;
     }
 
+    /**
+     * Formats the regular usage so that it removes the left padding characters.
+     * This is necessary so that help2man recognizes the OPTIONS block.
+     * @param jc The JCommander object
+     */
+    private static void printUsage(JCommander jc){
+        StringBuilder sb = new StringBuilder();
+        jc.usage(sb, "");
+        String usage = sb.toString();
+
+        sb = new StringBuilder();
+        String[] lines = usage.split("\n");
+        for(int i =0; i < lines.length; i++){
+            if(i==0){
+                // Add extra line between usage and options
+                sb.append(lines[i] + "\n\n");
+            } else {
+                sb.append(lines[i].substring(2) + '\n');
+            }
+        }
+        System.out.println(sb.toString());
+    }
+
+    /**
+     * Main method
+     * @param args Arguments
+     */
     public static void main(String[] args) {
         gsargs = new GaiaSkyArgs();
+        JCommander jc = JCommander.newBuilder().addObject(gsargs).build();
+        jc.setProgramName("gaiasky");
         try {
-            JCommander jc = new JCommander(gsargs, args);
-            jc.setProgramName("gaiasky");
+            jc.parse(args);
+
             if (gsargs.help) {
-                jc.usage();
+                printUsage(jc);
                 return;
             }
         } catch (Exception e) {
-            System.out.println("Bad program arguments");
+            System.out.print("gaiasky: bad program arguments\n\n");
+            printUsage(jc);
             return;
         }
         try {
@@ -145,12 +175,10 @@ public class GaiaSkyDesktop implements IObserver {
             I18n.initialize(Gdx.files.absolute(GlobalConf.ASSETS_LOC + "i18n/gsbundle"));
 
             if (gsargs.version) {
-                System.out.println(GlobalConf.getFullApplicationName());
-                System.out.println("   version       : " + GlobalConf.version.version);
-                System.out.println("   build         : " + GlobalConf.version.build);
-                System.out.println("   build time    : " + GlobalConf.version.buildtime);
-                System.out.println("   build system  : " + GlobalConf.version.system);
-                System.out.println("   builder       : " + GlobalConf.version.builder);
+                System.out.println(GlobalConf.getShortApplicationName());
+                System.out.println("License MPL 2.0: Mozilla Public License 2.0 <https://www.mozilla.org/en-US/MPL/2.0/>");
+                System.out.println();
+                System.out.println("Written by Toni Sagrista Selles <tsagrista@ari.uni-heidelberg.de>");
                 return;
             }
 

@@ -294,7 +294,6 @@ task dist (dependsOn: gaiaskyJar, description: "Compiles the project, creates th
         copy {
             from "exe"
             into "$distDir"
-            exclude "*.sh"
             exclude "octreegen"
         }
         copy {
@@ -312,16 +311,22 @@ task dist (dependsOn: gaiaskyJar, description: "Compiles the project, creates th
             include "ic_launcher.svg"
         }
 
-        // Make gaiasky script executable
-        def cmd = "chmod u+x $distDir/gaiasky"
-        cmd.execute()
-
         // Replace version in readme file
         project.ext.versionFile = file("build/classes/java/main/version").text
         ant.replace(file: "$distDir/README.md", token: "--------------------------", value: "$versionFile")
+
+        // Generate man
+        println("Generate man: $distDir/gaiasky.6.gz")
+        exec {
+            commandLine "help2man", "-N", "--section=6", "--include", "$baseDir/core/man/gaiasky.h2m", "--output=$distDir/gaiasky.6", "$distDir/gaiasky"
+        }
+        exec {
+            commandLine "gzip", "$distDir/gaiasky.6"
+        }
     }
 }
 dist.dependsOn classes
+
 
 task createTar(dependsOn: dist, description: "Creates application tar package") {
     doLast {
