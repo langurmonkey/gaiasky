@@ -14,6 +14,13 @@ import gaia.cu9.ari.gaiaorbit.util.time.ITimeFrameProvider;
  */
 public class Invisible extends CelestialBody {
 
+    /**
+     * Needed for reflection in {@link AbstractPositionEntity#getSimpleCopy()}
+     **/
+    @SuppressWarnings("unused")
+    public Invisible() {
+    }
+
     public Invisible(String name) {
         this(name, 500 * Constants.M_TO_U);
     }

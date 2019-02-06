@@ -283,7 +283,7 @@ public abstract class CelestialBody extends AbstractPositionEntity implements I3
 
     @Override
     public <T extends SceneGraphNode> T getSimpleCopy() {
-        CelestialBody copy = (CelestialBody) super.getSimpleCopy();
+        CelestialBody copy = super.getSimpleCopy();
         copy.absmag = this.absmag;
         copy.appmag = this.appmag;
         copy.colorbv = this.colorbv;
