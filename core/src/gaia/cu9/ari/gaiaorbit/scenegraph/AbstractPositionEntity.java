@@ -161,7 +161,7 @@ public abstract class AbstractPositionEntity extends SceneGraphNode {
         } else {
             // Get copy of focus and update it to know where it will be in the
             // next step
-            AbstractPositionEntity fc = (AbstractPositionEntity) this;
+            AbstractPositionEntity fc = this;
             AbstractPositionEntity fccopy = fc.getLineCopy();
             SceneGraphNode root = fccopy.getRoot();
             root.translation.set(camera.getInversePos());
