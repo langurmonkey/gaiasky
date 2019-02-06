@@ -55,6 +55,9 @@ public class GlobalResources {
 
     private static Vector3d aux = new Vector3d();
 
+    /** Instance **/
+    public static GlobalResources instance;
+
 
     /** GOOGLE COLORS **/
 
@@ -75,33 +78,35 @@ public class GlobalResources {
         return new Color(c[0], c[1], c[2], c[3]);
     }
 
-    /**
-     * Model for atmosphere scattering
-     */
-    public static final String atmModelLocation = "models/atm/atm-uv.g3db";
-
     public static void initialize(AssetManager manager) {
         // Sprite shader
         spriteShader = new ShaderProgram(Gdx.files.internal("shader/spritebatch.vertex.glsl"), Gdx.files.internal("shader/spritebatch.fragment.glsl"));
         // Sprite batch
         spriteBatch = new SpriteBatch(1000, spriteShader);
 
+        updateSkin();
+
+        instance = new GlobalResources();
+    }
+
+    public static void updateSkin() {
+        initLinkCursor();
+        FileHandle fh = Gdx.files.internal("skins/" + GlobalConf.program.UI_THEME + "/" + GlobalConf.program.UI_THEME + ".json");
+        skin = new Skin(fh);
+    }
+
+    private static void initLinkCursor(){
         // Create skin right now, it is needed.
         if (GlobalConf.program.UI_THEME.endsWith("-x2")) {
             GlobalConf.updateScaleFactor(2.0f);
             // Cursor for links
             linkCursor = new Pixmap(Gdx.files.internal("img/cursor-link-x2.png"));
         } else {
+            GlobalConf.updateScaleFactor(1.0f);
             // Cursor for links
             linkCursor = new Pixmap(Gdx.files.internal("img/cursor-link.png"));
         }
-        updateSkin();
 
-    }
-
-    public static void updateSkin() {
-        FileHandle fh = Gdx.files.internal("skins/" + GlobalConf.program.UI_THEME + "/" + GlobalConf.program.UI_THEME + ".json");
-        skin = new Skin(fh);
     }
 
     public static void doneLoading(AssetManager manager) {
@@ -589,4 +594,5 @@ public class GlobalResources {
         }
         return sb.toString().trim();
     }
+
 }

@@ -81,6 +81,7 @@ public class OwnImageButton extends ImageButton {
                     Type type = ((InputEvent) event).getType();
                     if (type == Type.enter) {
                         if (!me.isDisabled())
+
                             Gdx.graphics.setCursor(Gdx.graphics.newCursor(cursor, 4, 0));
                         return true;
                     } else if (type == Type.exit) {
