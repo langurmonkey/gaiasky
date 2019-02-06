@@ -4,13 +4,13 @@ import com.badlogic.gdx.utils.LongMap;
 
 public class LargeLongMap<T> {
 
-    private int N = 1;
+    private int N;
     private LongMap<T>[] maps;
     private boolean empty = true;
 
     /**
      * Creates a LargeLongMap with the given number of backend maps
-     * @param N
+     * @param N Number of maps to back this long map
      */
     public LargeLongMap(int N) {
         this.N = N;

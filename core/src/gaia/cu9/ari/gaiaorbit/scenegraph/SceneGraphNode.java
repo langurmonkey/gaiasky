@@ -123,7 +123,7 @@ public class SceneGraphNode implements IStarContainer, IPosition {
 
         private int index;
 
-        private RenderGroup(int index) {
+        RenderGroup(int index) {
             this.index = index;
         }
 

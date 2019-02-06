@@ -61,7 +61,7 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
         em = EventManager.instance;
         manager = GaiaSky.instance.manager;
 
-        stops = new HashSet<AtomicBoolean>();
+        stops = new HashSet<>();
 
         aux3d1 = new Vector3d();
         aux3d2 = new Vector3d();
@@ -74,80 +74,60 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
         em.subscribe(this, Events.INPUT_EVENT, Events.DISPOSE);
     }
 
-    public void initializeTextures() {
+    private void initializeTextures() {
         if (textures == null) {
-            textures = new LruCache<String, Texture>(100);
+            textures = new LruCache<>(100);
         }
     }
 
     @Override
     public void activateRealTimeFrame() {
-        Gdx.app.postRunnable(() -> {
-            em.post(Events.EVENT_TIME_FRAME_CMD, TimeFrame.REAL_TIME);
-        });
+        Gdx.app.postRunnable(() -> em.post(Events.EVENT_TIME_FRAME_CMD, TimeFrame.REAL_TIME));
     }
 
     @Override
     public void activateSimulationTimeFrame() {
-        Gdx.app.postRunnable(() -> {
-            em.post(Events.EVENT_TIME_FRAME_CMD, TimeFrame.SIMULATION_TIME);
-        });
+        Gdx.app.postRunnable(() -> em.post(Events.EVENT_TIME_FRAME_CMD, TimeFrame.SIMULATION_TIME));
     }
 
     @Override
     public void setHeadlineMessage(final String headline) {
-        Gdx.app.postRunnable(() -> {
-            em.post(Events.POST_HEADLINE_MESSAGE, headline);
-        });
+        Gdx.app.postRunnable(() -> em.post(Events.POST_HEADLINE_MESSAGE, headline));
     }
 
     @Override
     public void setSubheadMessage(final String subhead) {
-        Gdx.app.postRunnable(() -> {
-            em.post(Events.POST_SUBHEAD_MESSAGE, subhead);
-        });
+        Gdx.app.postRunnable(() -> em.post(Events.POST_SUBHEAD_MESSAGE, subhead));
     }
 
     @Override
     public void clearHeadlineMessage() {
-        Gdx.app.postRunnable(() -> {
-            em.post(Events.CLEAR_HEADLINE_MESSAGE);
-        });
+        Gdx.app.postRunnable(() -> em.post(Events.CLEAR_HEADLINE_MESSAGE));
     }
 
     @Override
     public void clearSubheadMessage() {
-        Gdx.app.postRunnable(() -> {
-            em.post(Events.CLEAR_SUBHEAD_MESSAGE);
-        });
+        Gdx.app.postRunnable(() -> em.post(Events.CLEAR_SUBHEAD_MESSAGE));
     }
 
     @Override
     public void clearAllMessages() {
-        Gdx.app.postRunnable(() -> {
-            em.post(Events.CLEAR_MESSAGES);
-        });
+        Gdx.app.postRunnable(() -> em.post(Events.CLEAR_MESSAGES));
     }
 
     @Override
     public void disableInput() {
-        Gdx.app.postRunnable(() -> {
-            em.post(Events.INPUT_ENABLED_CMD, false);
-        });
+        Gdx.app.postRunnable(() -> em.post(Events.INPUT_ENABLED_CMD, false));
     }
 
     @Override
     public void enableInput() {
-        Gdx.app.postRunnable(() -> {
-            em.post(Events.INPUT_ENABLED_CMD, true);
-        });
+        Gdx.app.postRunnable(() -> em.post(Events.INPUT_ENABLED_CMD, true));
     }
 
     @Override
     public void setCinematicCamera(boolean cinematic) {
-        Gdx.app.postRunnable(() -> {
-            em.post(Events.CAMERA_CINEMATIC_CMD, cinematic, false);
-        });
+        Gdx.app.postRunnable(() -> em.post(Events.CAMERA_CINEMATIC_CMD, cinematic, false));
     }
 
     @Override
@@ -200,38 +180,28 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
 
     @Override
     public void setCameraLock(final boolean lock) {
-        Gdx.app.postRunnable(() -> {
-            em.post(Events.FOCUS_LOCK_CMD, I18n.bundle.get("gui.camera.lock"), lock);
-        });
+        Gdx.app.postRunnable(() -> em.post(Events.FOCUS_LOCK_CMD, I18n.bundle.get("gui.camera.lock"), lock));
 
     }
 
     @Override
     public void setCameraFree() {
-        Gdx.app.postRunnable(() -> {
-            em.post(Events.CAMERA_MODE_CMD, CameraMode.Free_Camera);
-        });
+        Gdx.app.postRunnable(() -> em.post(Events.CAMERA_MODE_CMD, CameraMode.Free_Camera));
     }
 
     @Override
     public void setCameraFov1() {
-        Gdx.app.postRunnable(() -> {
-            em.post(Events.CAMERA_MODE_CMD, CameraMode.Gaia_FOV1);
-        });
+        Gdx.app.postRunnable(() -> em.post(Events.CAMERA_MODE_CMD, CameraMode.Gaia_FOV1));
     }
 
     @Override
     public void setCameraFov2() {
-        Gdx.app.postRunnable(() -> {
-            em.post(Events.CAMERA_MODE_CMD, CameraMode.Gaia_FOV2);
-        });
+        Gdx.app.postRunnable(() -> em.post(Events.CAMERA_MODE_CMD, CameraMode.Gaia_FOV2));
     }
 
     @Override
     public void setCameraFov1and2() {
-        Gdx.app.postRunnable(() -> {
-            em.post(Events.CAMERA_MODE_CMD, CameraMode.Gaia_FOV1and2);
-        });
+        Gdx.app.postRunnable(() -> em.post(Events.CAMERA_MODE_CMD, CameraMode.Gaia_FOV1and2));
     }
 
     @Override
@@ -263,9 +233,7 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
 
     @Override
     public void setCameraDirection(final double[] dir) {
-        Gdx.app.postRunnable(() -> {
-            em.post(Events.CAMERA_DIR_CMD, dir);
-        });
+        Gdx.app.postRunnable(() -> em.post(Events.CAMERA_DIR_CMD, dir));
 
     }
 
@@ -277,9 +245,7 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
 
     @Override
     public void setCameraUp(final double[] up) {
-        Gdx.app.postRunnable(() -> {
-            em.post(Events.CAMERA_UP_CMD, up);
-        });
+        Gdx.app.postRunnable(() -> em.post(Events.CAMERA_UP_CMD, up));
 
     }
 
@@ -310,7 +276,7 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
         em.post(Events.FREE_MODE_COORD_CMD, (float) ra, (float) dec);
     }
 
-    public void setCameraPositionAndFocus(IFocus focus, IFocus other, double rotation, double viewAngle) {
+    private void setCameraPositionAndFocus(IFocus focus, IFocus other, double rotation, double viewAngle) {
         assert viewAngle > 0 : "View angle must be larger than zero";
         assert focus != null : "Focus can't be null";
         assert other != null : "Other can't be null";
@@ -341,13 +307,10 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
         Vector3d newCamDir = aux3d6.set(focusToOther);
         newCamDir.scl(-1).nor();
 
-        // New up vector
-        Vector3d newCamUp = up;
-
         // Finally, set values
         setCameraPosition(newCamPos.values());
         setCameraDirection(newCamDir.values());
-        setCameraUp(newCamUp.values());
+        setCameraUp(up.values());
 
     }
 
@@ -355,9 +318,7 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
     public void setCameraSpeed(final float speed) {
         assert speed >= Constants.MIN_SLIDER && speed <= Constants.MAX_SLIDER : "Speed must be between "
                 + Constants.MIN_SLIDER + " and " + Constants.MAX_SLIDER;
-        Gdx.app.postRunnable(() -> {
-            em.post(Events.CAMERA_SPEED_CMD, speed / 10f, false);
-        });
+        Gdx.app.postRunnable(() -> em.post(Events.CAMERA_SPEED_CMD, speed / 10f, false));
 
     }
 
@@ -370,44 +331,34 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
     public void setRotationCameraSpeed(final float speed) {
         assert speed >= Constants.MIN_SLIDER && speed <= Constants.MAX_SLIDER : "Speed must be between "
                 + Constants.MIN_SLIDER + " and " + Constants.MAX_SLIDER;
-        Gdx.app.postRunnable(() -> {
-            em.post(Events.ROTATION_SPEED_CMD, MathUtilsd.lint(speed, Constants.MIN_SLIDER, Constants.MAX_SLIDER,
-                    Constants.MIN_ROT_SPEED, Constants.MAX_ROT_SPEED), false);
-        });
+        Gdx.app.postRunnable(() -> em.post(Events.ROTATION_SPEED_CMD, MathUtilsd.lint(speed, Constants.MIN_SLIDER, Constants.MAX_SLIDER,
+                Constants.MIN_ROT_SPEED, Constants.MAX_ROT_SPEED), false));
     }
 
     @Override
     public void setTurningCameraSpeed(final float speed) {
         assert speed >= Constants.MIN_SLIDER && speed <= Constants.MAX_SLIDER : "Speed must be between "
                 + Constants.MIN_SLIDER + " and " + Constants.MAX_SLIDER;
-        Gdx.app.postRunnable(() -> {
-            em.post(Events.TURNING_SPEED_CMD, MathUtilsd.lint(speed, Constants.MIN_SLIDER, Constants.MAX_SLIDER,
-                    Constants.MIN_TURN_SPEED, Constants.MAX_TURN_SPEED), false);
-        });
+        Gdx.app.postRunnable(() -> em.post(Events.TURNING_SPEED_CMD, MathUtilsd.lint(speed, Constants.MIN_SLIDER, Constants.MAX_SLIDER,
+                Constants.MIN_TURN_SPEED, Constants.MAX_TURN_SPEED), false));
 
     }
 
     @Override
     public void setCameraSpeedLimit(int index) {
         assert index >= 0 && index <= 18 : "Speed limit index must be in [0..18]";
-        Gdx.app.postRunnable(() -> {
-            em.post(Events.SPEED_LIMIT_CMD, index, false);
-        });
+        Gdx.app.postRunnable(() -> em.post(Events.SPEED_LIMIT_CMD, index, false));
     }
 
     @Override
     public void setCameraOrientationLock(boolean lock) {
-        Gdx.app.postRunnable(() -> {
-            em.post(Events.ORIENTATION_LOCK_CMD, I18n.bundle.get("gui.camera.lock.orientation"), lock, false);
-        });
+        Gdx.app.postRunnable(() -> em.post(Events.ORIENTATION_LOCK_CMD, I18n.bundle.get("gui.camera.lock.orientation"), lock, false));
     }
 
     @Override
     public void cameraForward(final double value) {
         assert value >= -1d && value <= 1d : "Value must be between -1 and 1";
-        Gdx.app.postRunnable(() -> {
-            em.post(Events.CAMERA_FWD, value);
-        });
+        Gdx.app.postRunnable(() -> em.post(Events.CAMERA_FWD, value));
 
     }
 
@@ -415,42 +366,32 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
     public void cameraRotate(final double deltaX, final double deltaY) {
         assert deltaX >= 0d && deltaX <= 1d && deltaY >= 0d
                 && deltaY <= 1d : "DeltaX and deltaY must be between 0 and 1";
-        Gdx.app.postRunnable(() -> {
-            em.post(Events.CAMERA_ROTATE, deltaX, deltaY);
-        });
+        Gdx.app.postRunnable(() -> em.post(Events.CAMERA_ROTATE, deltaX, deltaY));
 
     }
 
     @Override
     public void cameraRoll(final double roll) {
         assert roll >= 0d && roll <= 1d : "Roll must be between 0 and 1";
-        Gdx.app.postRunnable(() -> {
-            em.post(Events.CAMERA_ROLL, roll);
-        });
+        Gdx.app.postRunnable(() -> em.post(Events.CAMERA_ROLL, roll));
     }
 
     @Override
     public void cameraTurn(final double deltaX, final double deltaY) {
         assert deltaX >= 0d && deltaX <= 1d && deltaY >= 0d
                 && deltaY <= 1d : "DeltaX and deltaY must be between 0 and 1";
-        Gdx.app.postRunnable(() -> {
-            em.post(Events.CAMERA_TURN, deltaX, deltaY);
-        });
+        Gdx.app.postRunnable(() -> em.post(Events.CAMERA_TURN, deltaX, deltaY));
     }
 
     @Override
     public void cameraStop() {
-        Gdx.app.postRunnable(() -> {
-            em.post(Events.CAMERA_STOP);
-        });
+        Gdx.app.postRunnable(() -> em.post(Events.CAMERA_STOP));
 
     }
 
     @Override
     public void cameraCenter() {
-        Gdx.app.postRunnable(() -> {
-            em.post(Events.CAMERA_CENTER);
-        });
+        Gdx.app.postRunnable(() -> em.post(Events.CAMERA_CENTER));
     }
 
     @Override
@@ -462,9 +403,7 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
     public void setFov(final float newFov) {
         assert newFov >= Constants.MIN_FOV && newFov <= Constants.MAX_FOV : "Fov value must be between "
                 + Constants.MIN_FOV + " and " + Constants.MAX_FOV;
-        Gdx.app.postRunnable(() -> {
-            em.post(Events.FOV_CHANGED_CMD, newFov);
-        });
+        Gdx.app.postRunnable(() -> em.post(Events.FOV_CHANGED_CMD, newFov));
     }
 
     @Override
@@ -480,32 +419,24 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
 
     @Override
     public void setProperMotionsNumberFactor(float factor) {
-        Gdx.app.postRunnable(() -> {
-            EventManager.instance.post(Events.PM_NUM_FACTOR_CMD, MathUtilsd.lint(factor, Constants.MIN_SLIDER,
-                    Constants.MAX_SLIDER, Constants.MIN_PM_NUM_FACTOR, Constants.MAX_PM_NUM_FACTOR), false);
-        });
+        Gdx.app.postRunnable(() -> EventManager.instance.post(Events.PM_NUM_FACTOR_CMD, MathUtilsd.lint(factor, Constants.MIN_SLIDER,
+                Constants.MAX_SLIDER, Constants.MIN_PM_NUM_FACTOR, Constants.MAX_PM_NUM_FACTOR), false));
     }
 
     @Override
     public void setProperMotionsLengthFactor(float factor) {
-        Gdx.app.postRunnable(() -> {
-            EventManager.instance.post(Events.PM_LEN_FACTOR_CMD, factor, false);
-        });
+        Gdx.app.postRunnable(() -> EventManager.instance.post(Events.PM_LEN_FACTOR_CMD, factor, false));
     }
 
     @Override
     public void setCrosshairVisibility(boolean visible) {
-        Gdx.app.postRunnable(() -> {
-            em.post(Events.CROSSHAIR_CMD, visible);
-        });
+        Gdx.app.postRunnable(() -> em.post(Events.CROSSHAIR_CMD, visible));
     }
 
     @Override
     public void setAmbientLight(final float value) {
         assert value >= Constants.MIN_SLIDER && value <= Constants.MAX_SLIDER : "Value must be between 0 and 100";
-        Gdx.app.postRunnable(() -> {
-            em.post(Events.AMBIENT_LIGHT_CMD, value / 100f);
-        });
+        Gdx.app.postRunnable(() -> em.post(Events.AMBIENT_LIGHT_CMD, value / 100f));
     }
 
     @Override
@@ -582,10 +513,8 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
     public void setStarBrightness(final float brightness) {
         assert brightness >= Constants.MIN_SLIDER
                 && brightness <= Constants.MAX_SLIDER : "Brightness value must be between 0 and 100";
-        Gdx.app.postRunnable(() -> {
-            em.post(Events.STAR_BRIGHTNESS_CMD, MathUtilsd.lint(brightness, Constants.MIN_SLIDER, Constants.MAX_SLIDER,
-                    Constants.MIN_STAR_BRIGHT, Constants.MAX_STAR_BRIGHT), false);
-        });
+        Gdx.app.postRunnable(() -> em.post(Events.STAR_BRIGHTNESS_CMD, MathUtilsd.lint(brightness, Constants.MIN_SLIDER, Constants.MAX_SLIDER,
+                Constants.MIN_STAR_BRIGHT, Constants.MAX_STAR_BRIGHT), false));
     }
 
     @Override
@@ -597,10 +526,8 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
     @Override
     public void setStarSize(final float size) {
         assert size >= Constants.MIN_SLIDER && size <= Constants.MAX_SLIDER : "Size value must be between 0 and 100";
-        Gdx.app.postRunnable(() -> {
-            em.post(Events.STAR_POINT_SIZE_CMD, MathUtilsd.lint(size, Constants.MIN_SLIDER, Constants.MAX_SLIDER,
-                    Constants.MIN_STAR_POINT_SIZE, Constants.MAX_STAR_POINT_SIZE), false);
-        });
+        Gdx.app.postRunnable(() -> em.post(Events.STAR_POINT_SIZE_CMD, MathUtilsd.lint(size, Constants.MIN_SLIDER, Constants.MAX_SLIDER,
+                Constants.MIN_STAR_POINT_SIZE, Constants.MAX_STAR_POINT_SIZE), false));
     }
 
     @Override
@@ -619,10 +546,8 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
     public void setMinStarOpacity(float opacity) {
         assert opacity >= Constants.MIN_SLIDER
                 && opacity <= Constants.MAX_SLIDER : "Opacity value must be between 0 and 100";
-        Gdx.app.postRunnable(() -> {
-            EventManager.instance.post(Events.STAR_MIN_OPACITY_CMD, MathUtilsd.lint(opacity, Constants.MIN_SLIDER,
-                    Constants.MAX_SLIDER, Constants.MIN_STAR_MIN_OPACITY, Constants.MAX_STAR_MIN_OPACITY), false);
-        });
+        Gdx.app.postRunnable(() -> EventManager.instance.post(Events.STAR_MIN_OPACITY_CMD, MathUtilsd.lint(opacity, Constants.MIN_SLIDER,
+                Constants.MAX_SLIDER, Constants.MIN_STAR_MIN_OPACITY, Constants.MAX_STAR_MIN_OPACITY), false));
     }
 
     @Override
@@ -682,7 +607,6 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
             m.setSizescalefactor(scalingFactor);
         } else {
             logger.error("Object '" + name + "' is not a model object");
-            return;
         }
     }
 
@@ -715,7 +639,7 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
         goToObject(name, viewAngle, waitTimeSeconds, null);
     }
 
-    public void goToObject(String name, double viewAngle, float waitTimeSeconds, AtomicBoolean stop) {
+    private void goToObject(String name, double viewAngle, float waitTimeSeconds, AtomicBoolean stop) {
         assert name != null : "Name can't be null";
 
         String namelc = name.toLowerCase();
@@ -726,7 +650,7 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
         }
     }
 
-    public void goToObject(IFocus object, double viewAngle, float waitTimeSeconds, AtomicBoolean stop) {
+    void goToObject(IFocus object, double viewAngle, float waitTimeSeconds, AtomicBoolean stop) {
         assert object != null : "Object can't be null";
         assert viewAngle > 0 : "Angle must be larger than zero";
 
@@ -743,7 +667,7 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
         long prevtime = TimeUtils.millis();
         if (object.getViewAngleApparent() < target) {
             // Add forward movement while distance > target distance
-            while (object.getViewAngleApparent() < target && (stop == null || (stop != null && !stop.get()))) {
+            while (object.getViewAngleApparent() < target && (stop == null || !stop.get())) {
                 // dt in ms
                 long dt = TimeUtils.timeSinceMillis(prevtime);
                 prevtime = TimeUtils.millis();
@@ -752,11 +676,12 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
                 try {
                     Thread.sleep(5);
                 } catch (Exception e) {
+                    logger.error(e);
                 }
             }
         } else {
             // Add backward movement while distance > target distance
-            while (object.getViewAngleApparent() > target && (stop == null || (stop != null && !stop.get()))) {
+            while (object.getViewAngleApparent() > target && (stop == null || !stop.get())) {
                 // dt in ms
                 long dt = TimeUtils.timeSinceMillis(prevtime);
                 prevtime = TimeUtils.millis();
@@ -765,6 +690,7 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
                 try {
                     Thread.sleep(5);
                 } catch (Exception e) {
+                    logger.error(e);
                 }
             }
         }
@@ -784,7 +710,7 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
         landOnObject(name, null);
     }
 
-    public void landOnObject(String name, AtomicBoolean stop) {
+    private void landOnObject(String name, AtomicBoolean stop) {
         assert name != null : "Name can't be null";
 
         String namelc = name.toLowerCase();
@@ -796,7 +722,7 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
 
     }
 
-    public void landOnObject(IFocus object, AtomicBoolean stop) {
+    void landOnObject(IFocus object, AtomicBoolean stop) {
         assert object != null : "Object can't be null";
 
         stops.add(stop);
@@ -839,7 +765,7 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
             boolean viewNotMet = Math.abs(dir.angle(aux3d1)) < 90;
 
             long prevtime = TimeUtils.millis();
-            while ((distanceNotMet || viewNotMet) && (stop == null || (stop != null && !stop.get()))) {
+            while ((distanceNotMet || viewNotMet) && (stop == null || !stop.get())) {
                 // dt in ms
                 long dt = TimeUtils.timeSinceMillis(prevtime);
                 prevtime = TimeUtils.millis();
@@ -860,6 +786,7 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
                 try {
                     Thread.sleep(20);
                 } catch (Exception e) {
+                    logger.error(e);
                 }
 
                 // focus.transform.getTranslation(aux);
@@ -880,17 +807,17 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
 
             if (ang1 < 170) {
 
-                rollAndWait(rollsign * 0.02d, 170d, 50l, cam, aux3d1, stop);
+                rollAndWait(rollsign * 0.02d, 170d, 50L, cam, aux3d1, stop);
                 // STOP
                 cam.stopMovement();
 
-                rollAndWait(rollsign * 0.006d, 176d, 50l, cam, aux3d1, stop);
+                rollAndWait(rollsign * 0.006d, 176d, 50L, cam, aux3d1, stop);
                 // STOP
                 cam.stopMovement();
 
-                rollAndWait(rollsign * 0.003d, 178d, 50l, cam, aux3d1, stop);
+                rollAndWait(rollsign * 0.003d, 178d, 50L, cam, aux3d1, stop);
             }
-            /**
+            /*
              * RESTORE
              */
 
@@ -915,7 +842,7 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
         landOnObjectLocation(name, locationName, null);
     }
 
-    public void landOnObjectLocation(String name, String locationName, AtomicBoolean stop) {
+    private void landOnObjectLocation(String name, String locationName, AtomicBoolean stop) {
         assert name != null : "Name can't be null";
 
         stops.add(stop);
@@ -927,7 +854,7 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
         }
     }
 
-    public void landOnObjectLocation(IFocus object, String locationName, AtomicBoolean stop) {
+    void landOnObjectLocation(IFocus object, String locationName, AtomicBoolean stop) {
         assert object != null : "Name can't be null";
         assert locationName != null : "locationName can't be null";
 
@@ -949,7 +876,7 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
         landOnObjectLocation(name, longitude, latitude, null);
     }
 
-    public void landOnObjectLocation(String name, double longitude, double latitude, AtomicBoolean stop) {
+    private void landOnObjectLocation(String name, double longitude, double latitude, AtomicBoolean stop) {
         assert name != null : "Name can't be null";
 
         String namelc = name.toLowerCase();
@@ -961,7 +888,7 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
 
     }
 
-    public void landOnObjectLocation(IFocus object, double longitude, double latitude, AtomicBoolean stop) {
+    void landOnObjectLocation(IFocus object, double longitude, double latitude, AtomicBoolean stop) {
         assert object != null : "Object can't be null";
         assert latitude >= -90 && latitude <= 90 && longitude >= 0
                 && longitude <= 360 : "Latitude must be in [-90..90] and longitude must be in [0..360]";
@@ -983,7 +910,7 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
             double targetAngle = 35 * MathUtilsd.degRad;
             if (planet.viewAngle > targetAngle) {
                 // Zoom out
-                while (planet.viewAngle > targetAngle && (stop == null || (stop != null && !stop.get()))) {
+                while (planet.viewAngle > targetAngle && (stop == null || !stop.get())) {
                     cam.addForwardForce(-5d);
                     sleep(0.3f);
                 }
@@ -1031,7 +958,7 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
                 cameraRotate(5, 5);
             }
 
-            while (intersects && (stop == null || (stop != null && !stop.get()))) {
+            while (intersects && (stop == null || !stop.get())) {
                 sleep(0.1f);
 
                 objectPosition = planet.getAbsolutePosition(aux3d2);
@@ -1075,12 +1002,13 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
         // Apply roll and wait
         double ang = cam.up.angle(camobj);
 
-        while (ang < target && (stop == null || (stop != null && !stop.get()))) {
+        while (ang < target && (stop == null || !stop.get())) {
             cam.addRoll(roll, false);
 
             try {
                 Thread.sleep(sleep);
             } catch (Exception e) {
+                logger.error(e);
             }
 
             ang = cam.up.angle(aux3d1);
@@ -1118,41 +1046,31 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
 
     @Override
     public void setGuiScrollPosition(final float pixelY) {
-        Gdx.app.postRunnable(() -> {
-            em.post(Events.GUI_SCROLL_POSITION_CMD, pixelY);
-        });
+        Gdx.app.postRunnable(() -> em.post(Events.GUI_SCROLL_POSITION_CMD, pixelY));
 
     }
 
     @Override
     public void enableGui() {
-        Gdx.app.postRunnable(() -> {
-            em.post(Events.DISPLAY_GUI_CMD, I18n.bundle.get("notif.cleanmode"), true);
-        });
+        Gdx.app.postRunnable(() -> em.post(Events.DISPLAY_GUI_CMD, I18n.bundle.get("notif.cleanmode"), true));
     }
 
     @Override
     public void disableGui() {
-        Gdx.app.postRunnable(() -> {
-            em.post(Events.DISPLAY_GUI_CMD, I18n.bundle.get("notif.cleanmode"), false);
-        });
+        Gdx.app.postRunnable(() -> em.post(Events.DISPLAY_GUI_CMD, I18n.bundle.get("notif.cleanmode"), false));
     }
 
     @Override
     public void displayMessageObject(final int id, final String message, final float x, final float y, final float r,
                                      final float g, final float b, final float a, final float fontSize) {
-        Gdx.app.postRunnable(() -> {
-            em.post(Events.ADD_CUSTOM_MESSAGE, id, message, x, y, r, g, b, a, fontSize);
-        });
+        Gdx.app.postRunnable(() -> em.post(Events.ADD_CUSTOM_MESSAGE, id, message, x, y, r, g, b, a, fontSize));
 
     }
 
     @Override
     public void displayTextObject(final int id, final String text, final float x, final float y, final float maxWidth,
                                   final float maxHeight, final float r, final float g, final float b, final float a, final float fontSize) {
-        Gdx.app.postRunnable(() -> {
-            em.post(Events.ADD_CUSTOM_TEXT, id, text, x, y, maxWidth, maxHeight, r, g, b, a, fontSize);
-        });
+        Gdx.app.postRunnable(() -> em.post(Events.ADD_CUSTOM_TEXT, id, text, x, y, maxWidth, maxHeight, r, g, b, a, fontSize));
 
     }
 
@@ -1177,49 +1095,37 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
 
     @Override
     public void removeAllObjects() {
-        Gdx.app.postRunnable(() -> {
-            em.post(Events.REMOVE_ALL_OBJECTS);
-        });
+        Gdx.app.postRunnable(() -> em.post(Events.REMOVE_ALL_OBJECTS));
 
     }
 
     @Override
     public void removeObject(final int id) {
-        Gdx.app.postRunnable(() -> {
-            em.post(Events.REMOVE_OBJECTS, new int[]{id});
-        });
+        Gdx.app.postRunnable(() -> em.post(Events.REMOVE_OBJECTS, new int[]{id}));
 
     }
 
     @Override
     public void removeObjects(final int[] ids) {
-        Gdx.app.postRunnable(() -> {
-            em.post(Events.REMOVE_OBJECTS, ids);
-        });
+        Gdx.app.postRunnable(() -> em.post(Events.REMOVE_OBJECTS, ids));
 
     }
 
     @Override
     public void maximizeInterfaceWindow() {
-        Gdx.app.postRunnable(() -> {
-            em.post(Events.GUI_FOLD_CMD, false);
-        });
+        Gdx.app.postRunnable(() -> em.post(Events.GUI_FOLD_CMD, false));
 
     }
 
     @Override
     public void minimizeInterfaceWindow() {
-        Gdx.app.postRunnable(() -> {
-            em.post(Events.GUI_FOLD_CMD, true);
-        });
+        Gdx.app.postRunnable(() -> em.post(Events.GUI_FOLD_CMD, true));
 
     }
 
     @Override
     public void setGuiPosition(final float x, final float y) {
-        Gdx.app.postRunnable(() -> {
-            em.post(Events.GUI_MOVE_CMD, x, y);
-        });
+        Gdx.app.postRunnable(() -> em.post(Events.GUI_MOVE_CMD, x, y));
 
     }
 
@@ -1368,12 +1274,7 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
         initializeTextures();
         for (final String path : paths) {
             // This only works in async mode!
-            Gdx.app.postRunnable(new Runnable() {
-                @Override
-                public void run() {
-                    manager.load(path, Texture.class);
-                }
-            });
+            Gdx.app.postRunnable(() -> manager.load(path, Texture.class));
             while (!manager.isLoaded(path)) {
                 try {
                     Thread.sleep(50);
@@ -1447,7 +1348,7 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
         Pathd<Vector3d> posl, dirl, upl;
 
         Runnable end;
-        Object lock;
+        final Object lock;
 
         Vector3d aux;
 
@@ -1520,9 +1421,7 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
         String name = "cameraTransition" + (cTransSeq++);
         Runnable end = null;
         if (!sync)
-            end = () -> {
-                unparkRunnable(name);
-            };
+            end = () -> unparkRunnable(name);
 
         // Create and park runnable
         CameraTransitionRunnable r = new CameraTransitionRunnable(cam, camPos, camDir, camUp, seconds, end);
@@ -1603,6 +1502,7 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
                 try {
                     Thread.sleep(100);
                 } catch (Exception e) {
+                    logger.error(e);
                 }
             }
         }
@@ -1664,50 +1564,38 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
 
     @Override
     public void setBrightnessLevel(double level) {
-        assert level >= -1d && level <= 1d : "Brightness level value must be in [-1..1]: " + Double.toString(level);
-        Gdx.app.postRunnable(() -> {
-            em.post(Events.BRIGHTNESS_CMD, (float) level, false);
-        });
+        assert level >= -1d && level <= 1d : "Brightness level value must be in [-1..1]: " + level;
+        Gdx.app.postRunnable(() -> em.post(Events.BRIGHTNESS_CMD, (float) level, false));
 
     }
 
     @Override
     public void setContrastLevel(double level) {
-        assert level >= 0d && level <= 2d : "Contrast level value must be in [0..2]: " + Double.toString(level);
-        Gdx.app.postRunnable(() -> {
-            em.post(Events.CONTRAST_CMD, (float) level, false);
-        });
+        assert level >= 0d && level <= 2d : "Contrast level value must be in [0..2]: " + level;
+        Gdx.app.postRunnable(() -> em.post(Events.CONTRAST_CMD, (float) level, false));
     }
 
     @Override
     public void setHueLevel(double level) {
-        assert level >= 0d && level <= 2d : "Hue level value must be in [0..2]: " + Double.toString(level);
-        Gdx.app.postRunnable(() -> {
-            em.post(Events.HUE_CMD, (float) level, false);
-        });
+        assert level >= 0d && level <= 2d : "Hue level value must be in [0..2]: " + level;
+        Gdx.app.postRunnable(() -> em.post(Events.HUE_CMD, (float) level, false));
     }
 
     @Override
     public void setSaturationLevel(double level) {
-        assert level >= 0d && level <= 2d : "Saturation level value must be in [0..2]: " + Double.toString(level);
-        Gdx.app.postRunnable(() -> {
-            em.post(Events.SATURATION_CMD, (float) level, false);
-        });
+        assert level >= 0d && level <= 2d : "Saturation level value must be in [0..2]: " + level;
+        Gdx.app.postRunnable(() -> em.post(Events.SATURATION_CMD, (float) level, false));
     }
 
     @Override
     public void set360Mode(boolean state) {
-        Gdx.app.postRunnable(() -> {
-            em.post(Events.CUBEMAP360_CMD, state, false);
-        });
+        Gdx.app.postRunnable(() -> em.post(Events.CUBEMAP360_CMD, state, false));
     }
 
     @Override
     public void setCubemapResolution(int resolution) {
         if (resolution > 19 && resolution < 15000) {
-            Gdx.app.postRunnable(() -> {
-                em.post(Events.CUBEMAP_RESOLUTION_CMD, resolution);
-            });
+            Gdx.app.postRunnable(() -> em.post(Events.CUBEMAP_RESOLUTION_CMD, resolution));
         } else {
             logger.error("Cubemap resolution must be 20 <= resolution <= 15000");
         }
@@ -1715,23 +1603,17 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
 
     @Override
     public void setStereoscopicMode(boolean state) {
-        Gdx.app.postRunnable(() -> {
-            em.post(Events.STEREOSCOPIC_CMD, state, false);
-        });
+        Gdx.app.postRunnable(() -> em.post(Events.STEREOSCOPIC_CMD, state, false));
     }
 
     @Override
     public void setStereoscopicProfile(int index) {
-        Gdx.app.postRunnable(() -> {
-            em.post(Events.STEREO_PROFILE_CMD, index);
-        });
+        Gdx.app.postRunnable(() -> em.post(Events.STEREO_PROFILE_CMD, index));
     }
 
     @Override
     public void setPlanetariumMode(boolean state) {
-        Gdx.app.postRunnable(() -> {
-            em.post(Events.PLANETARIUM_CMD, state, false);
-        });
+        Gdx.app.postRunnable(() -> em.post(Events.PLANETARIUM_CMD, state, false));
 
     }
 
@@ -1742,37 +1624,27 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
 
     @Override
     public void setLensFlare(boolean state) {
-        Gdx.app.postRunnable(() -> {
-            em.post(Events.LENS_FLARE_CMD, state, false);
-        });
+        Gdx.app.postRunnable(() -> em.post(Events.LENS_FLARE_CMD, state, false));
     }
 
     @Override
     public void setMotionBlur(boolean state) {
-        Gdx.app.postRunnable(() -> {
-            em.post(Events.MOTION_BLUR_CMD, state ? Constants.MOTION_BLUR_VALUE : 0f, false);
-        });
+        Gdx.app.postRunnable(() -> em.post(Events.MOTION_BLUR_CMD, state ? Constants.MOTION_BLUR_VALUE : 0f, false));
     }
 
     @Override
     public void setStarGlow(boolean state) {
-        Gdx.app.postRunnable(() -> {
-            em.post(Events.LIGHT_SCATTERING_CMD, state, false);
-        });
+        Gdx.app.postRunnable(() -> em.post(Events.LIGHT_SCATTERING_CMD, state, false));
     }
 
     @Override
     public void setBloom(float value) {
-        Gdx.app.postRunnable(() -> {
-            em.post(Events.BLOOM_CMD, value, false);
-        });
+        Gdx.app.postRunnable(() -> em.post(Events.BLOOM_CMD, value, false));
     }
 
     @Override
     public void setSmoothLodTransitions(boolean value) {
-        Gdx.app.postRunnable(() -> {
-            em.post(Events.OCTREE_PARTICLE_FADE_CMD, I18n.bundle.get("element.octreeparticlefade"), value);
-        });
+        Gdx.app.postRunnable(() -> em.post(Events.OCTREE_PARTICLE_FADE_CMD, I18n.bundle.get("element.octreeparticlefade"), value));
 
     }
 

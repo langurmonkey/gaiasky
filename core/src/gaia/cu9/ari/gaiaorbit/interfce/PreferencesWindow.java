@@ -1567,7 +1567,7 @@ public class PreferencesWindow extends GenericDialog {
         LangComboBoxBean lbean = lang.getSelected();
         boolean reloadUI = GlobalConf.program.UI_THEME != theme.getSelected() || !lbean.locale.toLanguageTag().equals(GlobalConf.program.LOCALE);
         GlobalConf.program.LOCALE = lbean.locale.toLanguageTag();
-        I18n.forceinit(Gdx.files.internal("i18n/gsbundle"));
+        I18n.forceInit(Gdx.files.internal("i18n/gsbundle"));
         GlobalConf.program.UI_THEME = theme.getSelected();
         boolean previousPointerCoords = GlobalConf.program.DISPLAY_POINTER_COORDS;
         GlobalConf.program.DISPLAY_POINTER_COORDS = pointerCoords.isChecked();
