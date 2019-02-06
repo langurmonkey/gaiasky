@@ -7,7 +7,6 @@ import com.badlogic.gdx.InputMultiplexer;
 import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.assets.loaders.FileHandleResolver;
 import com.badlogic.gdx.assets.loaders.resolvers.InternalFileHandleResolver;
-import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Pixmap.Format;
 import com.badlogic.gdx.graphics.g3d.Model;
@@ -146,17 +145,17 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
     /**
      * Forces the dataset download window
      */
-    private boolean dsdownload;
+    private boolean dsDownload;
 
     /**
      * Forces the catalog chooser window
      */
-    private boolean catchooser;
+    private boolean catChooser;
 
     /**
      * Save state on exit
      */
-    public boolean savestate = true;
+    public boolean saveState = true;
 
     /**
      * Runnables
@@ -180,10 +179,10 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
     public GaiaSky(boolean dsdownload, boolean catchooser) {
         super();
         instance = this;
-        this.runnables = new Array<Runnable>();
-        this.runnablesMap = new HashMap<String, Runnable>();
-        this.dsdownload = dsdownload;
-        this.catchooser = catchooser;
+        this.runnables = new Array<>();
+        this.runnablesMap = new HashMap<>();
+        this.dsDownload = dsdownload;
+        this.catChooser = catchooser;
         this.renderProcess = runnableInitialGui;
     }
 
@@ -230,13 +229,7 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
 
         // Initialise asset manager
         FileHandleResolver internalResolver = new InternalFileHandleResolver();
-        FileHandleResolver dataResolver = new FileHandleResolver() {
-            @Override
-            public FileHandle resolve(String fileName) {
-                return GlobalConf.data.dataFileHandle(fileName);
-            }
-
-        };
+        FileHandleResolver dataResolver = fileName -> GlobalConf.data.dataFileHandle(fileName);
         manager = new AssetManager(internalResolver);
         //manager.setLoader(Model.class, ".obj", new AdvancedObjLoader(resolver));
         manager.setLoader(ISceneGraph.class, new SGLoader(dataResolver));
@@ -291,7 +284,7 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
 
         EventManager.instance.subscribe(this, Events.LOAD_DATA_CMD);
 
-        initialGui = new InitialGui(dsdownload, catchooser);
+        initialGui = new InitialGui(dsDownload, catChooser);
         initialGui.initialize(manager);
         Gdx.input.setInputProcessor(initialGui.getGuiStage());
 
@@ -509,7 +502,7 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
     @Override
     public void dispose() {
 
-        if (savestate)
+        if (saveState)
             ConfInit.instance.persistGlobalConf(new File(System.getProperty("properties.file")));
 
         // Flush frames
@@ -873,7 +866,7 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
             }
             break;
         case SCENE_GRAPH_REMOVE_OBJECT_CMD:
-            SceneGraphNode aux = null;
+            SceneGraphNode aux;
             if(data[0] instanceof String){
                 aux = sg.getNode((String) data[0]);
                 if(aux == null)
@@ -897,9 +890,9 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
             break;
         case UNPOST_RUNNABLE:
             synchronized (runnables) {
-                Runnable r = runnablesMap.get((String) data[0]);
+                Runnable r = runnablesMap.get(data[0]);
                 runnables.removeValue(r, true);
-                runnablesMap.remove((String) data[0]);
+                runnablesMap.remove(data[0]);
             }
             break;
         default:

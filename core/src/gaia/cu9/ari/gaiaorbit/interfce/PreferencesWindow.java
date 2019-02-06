@@ -74,8 +74,8 @@ public class PreferencesWindow extends GenericDialog {
     public PreferencesWindow(Stage stage, Skin skin) {
         super(txt("gui.settings") + " - " + GlobalConf.version.version + " - " + txt("gui.build", GlobalConf.version.build), skin, stage);
 
-        this.contents = new Array<Actor>();
-        this.labels = new Array<OwnLabel>();
+        this.contents = new Array<>();
+        this.labels = new Array<>();
 
         this.nf1 = NumberFormatFactory.getFormatter("0.0");
         this.nf3 = NumberFormatFactory.getFormatter("0.000");
@@ -171,13 +171,7 @@ public class PreferencesWindow extends GenericDialog {
 
         // Full screen mode resolutions
         Array<DisplayMode> modes = new Array<DisplayMode>(Gdx.graphics.getDisplayModes());
-        modes.sort(new Comparator<DisplayMode>() {
-
-            @Override
-            public int compare(DisplayMode o1, DisplayMode o2) {
-                return Integer.compare(o2.height * o2.width, o1.height * o1.width);
-            }
-        });
+        modes.sort((o1, o2) -> Integer.compare(o2.height * o2.width, o1.height * o1.width));
         fullscreenResolutions = new OwnSelectBox<DisplayMode>(skin);
         fullscreenResolutions.setWidth(textwidth * 3.3f);
         fullscreenResolutions.setItems(modes);
@@ -211,33 +205,27 @@ public class PreferencesWindow extends GenericDialog {
 
         // Radio buttons
         fullscreen = new OwnCheckBox(txt("gui.fullscreen"), skin, "radio", pad5);
-        fullscreen.addListener(new EventListener() {
-            @Override
-            public boolean handle(Event event) {
-                if (event instanceof ChangeEvent) {
-                    selectFullscreen(fullscreen.isChecked(), widthField, heightField, fullscreenResolutions, widthLabel, heightLabel);
-                    return true;
-                }
-                return false;
+        fullscreen.addListener(event -> {
+            if (event instanceof ChangeEvent) {
+                selectFullscreen(fullscreen.isChecked(), widthField, heightField, fullscreenResolutions, widthLabel, heightLabel);
+                return true;
             }
+            return false;
         });
         fullscreen.setChecked(GlobalConf.screen.FULLSCREEN);
 
         windowed = new OwnCheckBox(txt("gui.windowed"), skin, "radio", pad5);
-        windowed.addListener(new EventListener() {
-            @Override
-            public boolean handle(Event event) {
-                if (event instanceof ChangeEvent) {
-                    selectFullscreen(!windowed.isChecked(), widthField, heightField, fullscreenResolutions, widthLabel, heightLabel);
-                    return true;
-                }
-                return false;
+        windowed.addListener(event -> {
+            if (event instanceof ChangeEvent) {
+                selectFullscreen(!windowed.isChecked(), widthField, heightField, fullscreenResolutions, widthLabel, heightLabel);
+                return true;
             }
+            return false;
         });
         windowed.setChecked(!GlobalConf.screen.FULLSCREEN);
         selectFullscreen(GlobalConf.screen.FULLSCREEN, widthField, heightField, fullscreenResolutions, widthLabel, heightLabel);
 
-        new ButtonGroup<CheckBox>(fullscreen, windowed);
+        new ButtonGroup<>(fullscreen, windowed);
 
         // VSYNC
         vsync = new OwnCheckBox(txt("gui.vsync"), skin, "default", pad5);
@@ -278,7 +266,7 @@ public class PreferencesWindow extends GenericDialog {
         gqualityLabel.addListener(new TextTooltip(txt("gui.gquality.info"), skin));
 
         ComboBoxBean[] gqs = new ComboBoxBean[] { new ComboBoxBean(txt("gui.gquality.high"), 0), new ComboBoxBean(txt("gui.gquality.normal"), 1), new ComboBoxBean(txt("gui.gquality.low"), 2) };
-        gquality = new OwnSelectBox<ComboBoxBean>(skin);
+        gquality = new OwnSelectBox<>(skin);
         gquality.setItems(gqs);
         gquality.setWidth(textwidth * 3f);
         gquality.setSelected(gqs[GlobalConf.scene.GRAPHICS_QUALITY]);
@@ -291,7 +279,7 @@ public class PreferencesWindow extends GenericDialog {
         aaLabel.addListener(new TextTooltip(txt("gui.aa.info"), skin));
 
         ComboBoxBean[] aas = new ComboBoxBean[] { new ComboBoxBean(txt("gui.aa.no"), 0), new ComboBoxBean(txt("gui.aa.fxaa"), -1), new ComboBoxBean(txt("gui.aa.nfaa"), -2) };
-        aa = new OwnSelectBox<ComboBoxBean>(skin);
+        aa = new OwnSelectBox<>(skin);
         aa.setItems(aas);
         aa.setWidth(textwidth * 3f);
         aa.setSelected(aas[idxAa(2, GlobalConf.postprocess.POSTPROCESS_ANTIALIAS)]);
@@ -1018,33 +1006,22 @@ public class PreferencesWindow extends GenericDialog {
         OwnLabel frameoutputLocationLabel = new OwnLabel(txt("gui.frameoutput.location"), skin);
         frameoutputLocation = new OwnTextButton(GlobalConf.frame.RENDER_FOLDER, skin);
         frameoutputLocation.pad(pad5);
-        frameoutputLocation.addListener(new EventListener() {
-            @Override
-            public boolean handle(Event event) {
-                if (event instanceof ChangeEvent) {
-                    FileChooser fc = FileChooser.createPickDialog(txt("gui.frameoutput.directory.choose"), skin, Gdx.files.absolute(GlobalConf.frame.RENDER_FOLDER));
-                    fc.setResultListener(new ResultListener() {
-                        @Override
-                        public boolean result(boolean success, FileHandle result) {
-                            if (success) {
-                                // do stuff with result
-                                frameoutputLocation.setText(result.path());
-                            }
-                            return true;
-                        }
-                    });
-                    fc.setFilter(new FileFilter() {
-                        @Override
-                        public boolean accept(File pathname) {
-                            return pathname.isDirectory();
-                        }
-                    });
-                    fc.show(stage);
-
+        frameoutputLocation.addListener(event -> {
+            if (event instanceof ChangeEvent) {
+                FileChooser fc = FileChooser.createPickDialog(txt("gui.frameoutput.directory.choose"), skin, Gdx.files.absolute(GlobalConf.frame.RENDER_FOLDER));
+                fc.setResultListener((success, result) -> {
+                    if (success) {
+                        // do stuff with result
+                        frameoutputLocation.setText(result.path());
+                    }
                     return true;
-                }
-                return false;
+                });
+                fc.setFilter(pathname -> pathname.isDirectory());
+                fc.show(stage);
+
+                return true;
             }
+            return false;
         });
 
         // Prefix
@@ -1053,7 +1030,7 @@ public class PreferencesWindow extends GenericDialog {
         frameoutputPrefix.setWidth(textwidth * 3f);
 
         // FPS
-        OwnLabel fpsLabel = new OwnLabel(txt("gui.frameoutput.fps"), skin);
+        OwnLabel fpsLabel = new OwnLabel(txt("gui.target.fps"), skin);
         frameoutputFps = new OwnTextField(Integer.toString(GlobalConf.frame.RENDER_TARGET_FPS), skin, new IntValidator(1, 200));
         frameoutputFps.setWidth(textwidth * 3f);
 
@@ -1077,24 +1054,21 @@ public class PreferencesWindow extends GenericDialog {
         // Mode
         OwnLabel fomodeLabel = new OwnLabel(txt("gui.screenshots.mode"), skin);
         ComboBoxBean[] frameoutputModes = new ComboBoxBean[] { new ComboBoxBean(txt("gui.screenshots.mode.simple"), 0), new ComboBoxBean(txt("gui.screenshots.mode.redraw"), 1) };
-        frameoutputMode = new OwnSelectBox<ComboBoxBean>(skin);
+        frameoutputMode = new OwnSelectBox<>(skin);
         frameoutputMode.setItems(frameoutputModes);
         frameoutputMode.setWidth(textwidth * 3f);
-        frameoutputMode.addListener(new EventListener() {
-            @Override
-            public boolean handle(Event event) {
-                if (event instanceof ChangeEvent) {
-                    if (frameoutputMode.getSelected().value == 0) {
-                        // Simple
-                        enableComponents(false, fowidthField, foheightField, frameoutputSizeLabel, xLabelfo);
-                    } else {
-                        // Redraw
-                        enableComponents(true, fowidthField, foheightField, frameoutputSizeLabel, xLabelfo);
-                    }
-                    return true;
+        frameoutputMode.addListener(event -> {
+            if (event instanceof ChangeEvent) {
+                if (frameoutputMode.getSelected().value == 0) {
+                    // Simple
+                    enableComponents(false, fowidthField, foheightField, frameoutputSizeLabel, xLabelfo);
+                } else {
+                    // Redraw
+                    enableComponents(true, fowidthField, foheightField, frameoutputSizeLabel, xLabelfo);
                 }
-                return false;
+                return true;
             }
+            return false;
         });
         frameoutputMode.setSelected(frameoutputModes[GlobalConf.frame.FRAME_MODE.ordinal()]);
         frameoutputMode.addListener(new TextTooltip(txt("gui.tooltip.screenshotmode"), skin));
@@ -1140,16 +1114,16 @@ public class PreferencesWindow extends GenericDialog {
         OwnLabel titleCamrec = new OwnLabel(txt("gui.camerarec.title"), skin, "help-title");
 
         // fps
-        OwnLabel camfpsLabel = new OwnLabel(txt("gui.camerarec.fps"), skin);
+        OwnLabel camfpsLabel = new OwnLabel(txt("gui.target.fps"), skin);
         camrecFps = new OwnTextField(Integer.toString(GlobalConf.frame.CAMERA_REC_TARGET_FPS), skin, new IntValidator(1, 200));
         camrecFps.setWidth(textwidth * 3f);
 
 
         // Keyframe preferences
-        Button keyframePrefs = new OwnTextIconButton("Preferences", skin, "preferences");
+        Button keyframePrefs = new OwnTextIconButton(txt("gui.keyframes.preferences"), skin, "preferences");
         keyframePrefs.setName("keyframe preferences");
         keyframePrefs.pad(pad5);
-        keyframePrefs.addListener(new TextTooltip("Edit keyframe preferences", skin));
+        keyframePrefs.addListener(new TextTooltip(txt("gui.tooltip.kf.editprefs"), skin));
         keyframePrefs.addListener((event) -> {
             if (event instanceof ChangeListener.ChangeEvent) {
                 KeyframePreferencesWindow kpw = new KeyframePreferencesWindow(stage, skin);
@@ -1305,24 +1279,21 @@ public class PreferencesWindow extends GenericDialog {
         final Cell<Actor> noticeAttCell = attitude.add((Actor) null);
         noticeAttCell.colspan(2).left();
 
-        EventListener attNoticeListener = new EventListener() {
-            @Override
-            public boolean handle(Event event) {
-                if (event instanceof ChangeEvent) {
-                    if (noticeAttCell.getActor() == null) {
-                        String nextinfostr = txt("gui.ui.info") + '\n';
-                        int lines = GlobalResources.countOccurrences(nextinfostr, '\n');
-                        TextArea nextTimeInfo = new OwnTextArea(nextinfostr, skin, "info");
-                        nextTimeInfo.setDisabled(true);
-                        nextTimeInfo.setPrefRows(lines + 1);
-                        nextTimeInfo.setWidth(tawidth);
-                        nextTimeInfo.clearListeners();
-                        noticeAttCell.setActor(nextTimeInfo);
-                    }
-                    return true;
+        EventListener attNoticeListener = event -> {
+            if (event instanceof ChangeEvent) {
+                if (noticeAttCell.getActor() == null) {
+                    String nextinfostr = txt("gui.ui.info") + '\n';
+                    int lines1 = GlobalResources.countOccurrences(nextinfostr, '\n');
+                    TextArea nextTimeInfo = new OwnTextArea(nextinfostr, skin, "info");
+                    nextTimeInfo.setDisabled(true);
+                    nextTimeInfo.setPrefRows(lines1 + 1);
+                    nextTimeInfo.setWidth(tawidth);
+                    nextTimeInfo.clearListeners();
+                    noticeAttCell.setActor(nextTimeInfo);
                 }
-                return false;
+                return true;
             }
+            return false;
         };
         real.addListener(attNoticeListener);
         nsl.addListener(attNoticeListener);
@@ -1358,21 +1329,17 @@ public class PreferencesWindow extends GenericDialog {
 
         // RELOAD DEFAULTS
         OwnTextButton reloadDefaults = new OwnTextButton(txt("gui.system.reloaddefaults"), skin);
-        reloadDefaults.addListener(new EventListener() {
-            @Override
-            public boolean handle(Event event) {
-                if (event instanceof ChangeEvent) {
-                    reloadDefaultPreferences();
-                    me.hide();
-                    // Prevent saving current state
-                    GaiaSky.instance.savestate = false;
-                    Gdx.app.exit();
-                    return true;
-                }
-
-                return false;
+        reloadDefaults.addListener(event -> {
+            if (event instanceof ChangeEvent) {
+                reloadDefaultPreferences();
+                me.hide();
+                // Prevent saving current state
+                GaiaSky.instance.saveState = false;
+                Gdx.app.exit();
+                return true;
             }
 
+            return false;
         });
         reloadDefaults.setWidth(180 * GlobalConf.SCALE_FACTOR);
 

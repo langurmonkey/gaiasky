@@ -16,7 +16,7 @@ public class KeyframePreferencesWindow extends GenericDialog {
     OwnTextField camrecFps;
 
     public KeyframePreferencesWindow(Stage stage, Skin skin) {
-        super("Keyframe preferences", skin, stage);
+        super(txt("gui.keyframes.preferences"), skin, stage);
         setModal(true);
 
         setAcceptText(txt("gui.saveprefs"));
@@ -28,19 +28,19 @@ public class KeyframePreferencesWindow extends GenericDialog {
     @Override
     protected void build() {
 
-        ComboBoxBean[] interpolation = new ComboBoxBean[] { new ComboBoxBean("Linear", CameraKeyframeManager.PathType.LINEAR.ordinal()), new ComboBoxBean("Catmull-Rom Spline", CameraKeyframeManager.PathType.SPLINE.ordinal()) };
+        ComboBoxBean[] interpolation = new ComboBoxBean[] { new ComboBoxBean(txt("gui.interpolation.linear"), CameraKeyframeManager.PathType.LINEAR.ordinal()), new ComboBoxBean(txt("gui.interpolation.catmull"), CameraKeyframeManager.PathType.SPLINE.ordinal()) };
 
-        OwnLabel generalTitle = new OwnLabel("General", skin, "hud-header");
+        OwnLabel generalTitle = new OwnLabel(txt("gui.general"), skin, "hud-header");
 
         // fps
-        OwnLabel camfpsLabel = new OwnLabel("Target frames per second", skin);
+        OwnLabel camfpsLabel = new OwnLabel(txt("gui.target.fps"), skin);
         camrecFps = new OwnTextField(Integer.toString(GlobalConf.frame.CAMERA_REC_TARGET_FPS), skin, new IntValidator(1, 200));
         camrecFps.setWidth(150 * GlobalConf.SCALE_FACTOR);
 
-        OwnLabel interpTitle = new OwnLabel("Interpolation method", skin, "hud-header");
+        OwnLabel interpTitle = new OwnLabel(txt("gui.keyframes.interp"), skin, "hud-header");
 
         // Camera position
-        OwnLabel pos = new OwnLabel("Camera position", skin);
+        OwnLabel pos = new OwnLabel(txt("gui.cam.pos"), skin);
         posMethod = new OwnSelectBox<>(skin);
         posMethod.setItems(interpolation);
         posMethod.setSelectedIndex(GlobalConf.frame.KF_PATH_TYPE_POSITION.ordinal());
@@ -48,7 +48,7 @@ public class KeyframePreferencesWindow extends GenericDialog {
         posMethod.setWidth(150 * GlobalConf.SCALE_FACTOR);
 
         // Camera orientation
-        OwnLabel orientation = new OwnLabel("Camera orientation", skin);
+        OwnLabel orientation = new OwnLabel(txt("gui.cam.orientation"), skin);
         orientationMethod = new OwnSelectBox<>(skin);
         orientationMethod.setItems(interpolation);
         orientationMethod.setSelectedIndex(GlobalConf.frame.KF_PATH_TYPE_ORIENTATION.ordinal());
@@ -56,8 +56,8 @@ public class KeyframePreferencesWindow extends GenericDialog {
         orientationMethod.setWidth(150 * GlobalConf.SCALE_FACTOR);
 
         // Time
-        OwnLabel time = new OwnLabel("Time", skin);
-        OwnLabel timeMethod = new OwnLabel("Linear", skin);
+        OwnLabel time = new OwnLabel(txt("gui.time"), skin);
+        OwnLabel timeMethod = new OwnLabel(txt("gui.interpolation.linear"), skin);
 
         content.add(generalTitle).left().top().colspan(2).padBottom(pad).row();
 

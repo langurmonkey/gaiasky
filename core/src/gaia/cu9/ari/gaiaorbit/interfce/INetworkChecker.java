@@ -7,21 +7,20 @@ import gaia.cu9.ari.gaiaorbit.scenegraph.IFocus;
 
 /**
  * Interface all network checkers must comply.
- * 
- * @author tsagrista
  *
+ * @author tsagrista
  */
 public interface INetworkChecker {
 
-    public void start();
+    void start();
 
-    public boolean executing();
+    boolean executing();
 
-    public void setFocus(IFocus focus);
+    void setFocus(IFocus focus);
 
-    public void doNotify();
+    void doNotify();
 
-    public void stopExecution();
+    void stopExecution();
 
-    public void setParameters(Table table, Skin skin, float pad);
+    void setParameters(Table table, Skin skin, float pad);
 }
