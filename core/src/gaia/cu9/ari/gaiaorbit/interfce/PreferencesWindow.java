@@ -780,7 +780,7 @@ public class PreferencesWindow extends GenericDialog {
             if (GlobalConf.controls.isControllerBlacklisted(c.getName())) {
                 cl.setText(cl.getText() + " [*]");
                 cl.setColor(1, 0, 0, 1);
-                cl.addListener(new TextTooltip(txt("gui.controller.blacklist.tooltip"), skin));
+                cl.addListener(new TextTooltip(txt("gui.tooltip.controller.blacklist"), skin));
             }
             controllerNames.add(cl);
         }
@@ -1241,9 +1241,9 @@ public class PreferencesWindow extends GenericDialog {
         OwnLabel titleGeneralData = new OwnLabel(txt("gui.data.options"), skin, "help-title");
         highAccuracyPositions = new OwnCheckBox(txt("gui.data.highaccuracy"), skin, pad5);
         highAccuracyPositions.setChecked(GlobalConf.data.HIGH_ACCURACY_POSITIONS);
-        highAccuracyPositions.addListener(new TextTooltip(txt("gui.data.highaccuracy.tooltip"), skin));
+        highAccuracyPositions.addListener(new TextTooltip(txt("gui.tooltip.data.highaccuracy"), skin));
         OwnImageButton highAccTooltip = new OwnImageButton(skin, "tooltip");
-        highAccTooltip.addListener(new TextTooltip(txt("gui.data.highaccuracy.tooltip"), skin));
+        highAccTooltip.addListener(new TextTooltip(txt("gui.tooltip.data.highaccuracy"), skin));
 
         HorizontalGroup haGroup = new HorizontalGroup();
         haGroup.space(pad5);

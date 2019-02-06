@@ -121,6 +121,7 @@ public class ControlsWindow extends CollapsibleWindow implements IObserver {
             }
            return false;
         });
+        recKeyframeCamera.addListener(new TextTooltip(txt("gui.tooltip.reccamerakeyframe"), skin));
 
         // Play camera button
         playCamera = new OwnImageButton(skin, "play");
@@ -254,7 +255,7 @@ public class ControlsWindow extends CollapsibleWindow implements IObserver {
         });
         Button showLog = new OwnTextIconButton("", skin, "log");
         showLog.setName("show log");
-        showLog.addListener(new TextTooltip(txt("gui.log.tooltip"), skin));
+        showLog.addListener(new TextTooltip(txt("gui.tooltip.log"), skin));
         showLog.addListener((event) -> {
             if (event instanceof ChangeEvent) {
                 EventManager.instance.post(Events.SHOW_LOG_ACTION);

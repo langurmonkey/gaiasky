@@ -70,22 +70,22 @@ public class GaiaSkyDesktop implements IObserver {
      * @author Toni Sagrista
      */
     private static class GaiaSkyArgs {
-        @Parameter(names = {"-h", "--help"}, description = "Shows usage information", help = true)
+        @Parameter(names = {"-h", "--help"}, description = "Show program options and usage information", help = true, order = 0)
         private boolean help = false;
 
-        @Parameter(names = {"-v", "--version"}, description = "Lists version and build inforamtion.")
+        @Parameter(names = {"-v", "--version"}, description = "List Gaia Sky version and relevant information.", order = 1)
         private boolean version = false;
 
-        @Parameter(names = {"-d", "--ds-download"}, description = "Displays the download dialog at startup.")
+        @Parameter(names = {"-d", "--ds-download"}, description = "Display the data download dialog at startup. If no data is found, the download dialog is shown automatically.", order = 2)
         private boolean download = false;
 
-        @Parameter(names = {"-c", "--cat-chooser"}, description = "Displays the catalog chooser dialog at startup.")
+        @Parameter(names = {"-c", "--cat-chooser"}, description = "Display the catalog chooser dialog at startup. This enables the selection of different available catalogs when Gaia Sky starts.", order = 3)
         private boolean catalogChooser = false;
 
-        @Parameter(names = {"-p", "--properties"}, description = "Specify the location of the properties file. Defaults to ~/.gaiasky/global.properties.")
+        @Parameter(names = {"-p", "--properties"}, description = "Specify the location of the properties file. Default: ~/.gaiasky/global.properties.", order = 4)
         private String propertiesFile = null;
 
-        @Parameter(names = {"-a", "--assetsloc"}, description = "Specify a different location for the assets folder. If not present, the default assets location is used.")
+        @Parameter(names = {"-a", "--assets"}, description = "Specify the location of the assets folder. If not present, the default assets location is used.", order = 5)
         private String assetsLocation = null;
     }
 
