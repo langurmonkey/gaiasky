@@ -2,8 +2,6 @@ package gaia.cu9.ari.gaiaorbit.interfce;
 
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.Actor;
-import com.badlogic.gdx.scenes.scene2d.Event;
-import com.badlogic.gdx.scenes.scene2d.EventListener;
 import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener.ChangeEvent;
 import com.badlogic.gdx.utils.Align;
@@ -102,16 +100,13 @@ public class FocusInfoInterface extends Table implements IObserver, IGuiInterfac
         lonLatLabel = new OwnLabel("Lat/Lon", skin, "hud-big");
         RADECPointerLabel = new OwnLabel(txt("gui.focusinfo.alpha") + "/" + txt("gui.focusinfo.delta"), skin, "hud-big");
         RADECViewLabel = new OwnLabel(txt("gui.focusinfo.alpha") + "/" + txt("gui.focusinfo.delta"), skin, "hud-big");
-        Image pointerimg1 = new Image(skin.getDrawable("pointer-icon"));
-        Button pointerImgBtn1 = new OwnTextIconButton("", pointerimg1, skin);
+        Button pointerImgBtn1 = new OwnTextIconButton("", skin, "pointer");
         pointerImgBtn1.setSize(imgSize, imgSize);
         pointerImgBtn1.addListener(new TextTooltip(txt("gui.focusinfo.pointer"), skin));
-        Image pointerimg2 = new Image(skin.getDrawable("pointer-icon"));
-        Button pointerImgBtn2 = new OwnTextIconButton("", pointerimg2, skin);
+        Button pointerImgBtn2 = new OwnTextIconButton("", skin, "pointer");
         pointerImgBtn2.setSize(imgSize, imgSize);
         pointerImgBtn2.addListener(new TextTooltip(txt("gui.focusinfo.pointer"), skin));
-        Image viewimg = new Image(skin.getDrawable("view-icon"));
-        Button viewImgBtn = new OwnTextIconButton("", viewimg, skin);
+        Button viewImgBtn = new OwnTextIconButton("", skin, "view");
         viewImgBtn.setSize(imgSize, imgSize);
         viewImgBtn.addListener(new TextTooltip(txt("gui.focusinfo.view"), skin));
 
@@ -132,48 +127,38 @@ public class FocusInfoInterface extends Table implements IObserver, IGuiInterfac
         rulerDist = new OwnLabel("-", skin, "hud");
 
         // GoTo, LandOn and LandAt
-        Image gotoimg = new Image(skin.getDrawable("go-to"));
-        goTo = new OwnTextIconButton("", gotoimg, skin);
+        goTo = new OwnTextIconButton("", skin, "go-to");
         goTo.setSize(buttonSize, buttonSize);
-        goTo.addListener(new EventListener() {
-            @Override
-            public boolean handle(Event event) {
+        goTo.addListener((event) -> {
                 if (currentFocus != null && event instanceof ChangeEvent) {
                     EventManager.instance.post(Events.NAVIGATE_TO_OBJECT, currentFocus);
                     return true;
                 }
                 return false;
-            }
+
         });
         goTo.addListener(new TextTooltip(txt("gui.focusinfo.goto"), skin));
 
-        Image landonimg = new Image(skin.getDrawable("land-on"));
-        landOn = new OwnTextIconButton("", landonimg, skin);
+        landOn = new OwnTextIconButton("", skin, "land-on");
         landOn.setSize(buttonSize, buttonSize);
-        landOn.addListener(new EventListener() {
-            @Override
-            public boolean handle(Event event) {
+        landOn.addListener(( event)-> {
                 if (currentFocus != null && event instanceof ChangeEvent) {
                     EventManager.instance.post(Events.LAND_ON_OBJECT, currentFocus);
                     return true;
                 }
                 return false;
-            }
+
         });
         landOn.addListener(new TextTooltip(txt("gui.focusinfo.landon"), skin));
 
-        Image landatimg = new Image(skin.getDrawable("land-at"));
-        landAt = new OwnTextIconButton("", landatimg, skin);
+        landAt = new OwnTextIconButton("", skin, "land-at");
         landAt.setSize(buttonSize, buttonSize);
-        landAt.addListener(new EventListener() {
-            @Override
-            public boolean handle(Event event) {
+        landAt.addListener((event) ->{
                 if (currentFocus != null && event instanceof ChangeEvent) {
                     EventManager.instance.post(Events.SHOW_LAND_AT_LOCATION_ACTION, currentFocus);
                     return true;
                 }
                 return false;
-            }
         });
         landAt.addListener(new TextTooltip(txt("gui.focusinfo.landat"), skin));
 

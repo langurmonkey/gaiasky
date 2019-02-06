@@ -1,8 +1,6 @@
 package gaia.cu9.ari.gaiaorbit.util.samp;
 
-import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.utils.Array;
-import gaia.cu9.ari.gaiaorbit.GaiaSky;
 import gaia.cu9.ari.gaiaorbit.data.group.STILDataProvider;
 import gaia.cu9.ari.gaiaorbit.event.EventManager;
 import gaia.cu9.ari.gaiaorbit.event.Events;
@@ -220,6 +218,7 @@ public class SAMPClient implements IObserver {
                 sg.setLabelposition(new double[] { 0.0, -5.0e7, -4e8 });
                 sg.setCt("Stars");
                 sg.setData(data);
+                sg.doneLoading(null);
 
                 // Catalog info
                 new CatalogInfo(name, url, null, CatalogInfoType.SAMP, sg);
@@ -228,10 +227,8 @@ public class SAMPClient implements IObserver {
                 mapIdUrl.put(id, url);
 
                 // Insert
-                Gdx.app.postRunnable(() -> {
-                    sg.doneLoading(null);
-                    GaiaSky.instance.sg.insert(sg, true);
-                });
+                EventManager.instance.post(Events.SCENE_GRAPH_ADD_OBJECT_CMD, sg, true);
+
                 logger.info(data.size + " objects loaded via SAMP");
                 return true;
             } else {

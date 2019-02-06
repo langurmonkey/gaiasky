@@ -1,5 +1,10 @@
 package gaia.cu9.ari.gaiaorbit.util.math;
 
+import com.badlogic.gdx.math.MathUtils;
+import com.badlogic.gdx.math.RandomXS128;
+
+import java.util.Random;
+
 /**
  * Utility and fast math functions.
  * <p>
@@ -38,6 +43,148 @@ public final class MathUtilsd {
     static public final double degRad = degreesToRadians;
 
     // ---
+    static private class Sin {
+        static final double[] table = new double[SIN_COUNT];
+
+        static {
+            for (int i = 0; i < SIN_COUNT; i++)
+                table[i] = Math.sin((i + 0.5) / SIN_COUNT * radFull);
+            for (int i = 0; i < 360; i += 90)
+                table[(int)(i * degToIndex) & SIN_MASK] = Math.sin(i * degreesToRadians);
+        }
+    }
+
+    /** Returns the sine in radians from a lookup table. */
+    static public double sin (double radians) {
+        return Sin.table[(int)(radians * radToIndex) & SIN_MASK];
+    }
+
+    /** Returns the cosine in radians from a lookup table. */
+    static public double cos (double radians) {
+        return Sin.table[(int)((radians + PI / 2) * radToIndex) & SIN_MASK];
+    }
+
+    /** Returns the sine in radians from a lookup table. */
+    static public double sinDeg (double degrees) {
+        return Sin.table[(int)(degrees * degToIndex) & SIN_MASK];
+    }
+
+    /** Returns the cosine in radians from a lookup table. */
+    static public double cosDeg (double degrees) {
+        return Sin.table[(int)((degrees + 90) * degToIndex) & SIN_MASK];
+    }
+
+    // ---
+
+    /** Returns atan2 in radians, faster but less accurate than Math.atan2. Average error of 0.00231 radians (0.1323 degrees),
+     * largest error of 0.00488 radians (0.2796 degrees). */
+    static public double atan2 (double y, double x) {
+        if (x == 0) {
+            if (y > 0) return PI / 2;
+            if (y == 0) return 0;
+            return -PI / 2;
+        }
+        final double atan, z = y / x;
+        if (Math.abs(z) < 1) {
+            atan = z / (1 + 0.28 * z * z);
+            if (x < 0) return atan + (y < 0 ? -PI : PI);
+            return atan;
+        }
+        atan = PI / 2 - z / (z * z + 0.28);
+        return y < 0 ? atan - PI : atan;
+    }
+
+    static public Random random = new RandomXS128();
+
+    /** Returns a random number between 0 (inclusive) and the specified value (inclusive). */
+    static public int random (int range) {
+        return random.nextInt(range + 1);
+    }
+
+    /** Returns a random number between start (inclusive) and end (inclusive). */
+    static public int random (int start, int end) {
+        return start + random.nextInt(end - start + 1);
+    }
+
+    /** Returns a random number between 0 (inclusive) and the specified value (inclusive). */
+    static public long random (long range) {
+        return (long)(random.nextDouble() * range);
+    }
+
+    /** Returns a random number between start (inclusive) and end (inclusive). */
+    static public long random (long start, long end) {
+        return start + (long)(random.nextDouble() * (end - start));
+    }
+
+    /** Returns a random boolean value. */
+    static public boolean randomBoolean () {
+        return random.nextBoolean();
+    }
+
+    /** Returns true if a random value between 0 and 1 is less than the specified value. */
+    static public boolean randomBoolean (double chance) {
+        return MathUtils.random() < chance;
+    }
+
+    /** Returns random number between 0.0 (inclusive) and 1.0 (exclusive). */
+    static public double random () {
+        return random.nextDouble();
+    }
+
+    /** Returns a random number between 0 (inclusive) and the specified value (exclusive). */
+    static public double random (double range) {
+        return random.nextDouble() * range;
+    }
+
+    /** Returns a random number between start (inclusive) and end (exclusive). */
+    static public double random (double start, double end) {
+        return start + random.nextDouble() * (end - start);
+    }
+
+    /** Returns -1 or 1, randomly. */
+    static public int randomSign () {
+        return 1 | (random.nextInt() >> 31);
+    }
+
+    /** Returns a triangularly distributed random number between -1.0 (exclusive) and 1.0 (exclusive), where values around zero are
+     * more likely.
+     * <p>
+     * This is an optimized version of {@link #randomTriangular(double, double, double) randomTriangular(-1, 1, 0)} */
+    public static double randomTriangular () {
+        return random.nextDouble() - random.nextDouble();
+    }
+
+    /** Returns a triangularly distributed random number between {@code -max} (exclusive) and {@code max} (exclusive), where values
+     * around zero are more likely.
+     * <p>
+     * This is an optimized version of {@link #randomTriangular(double, double, double) randomTriangular(-max, max, 0)}
+     * @param max the upper limit */
+    public static double randomTriangular (double max) {
+        return (random.nextDouble() - random.nextDouble()) * max;
+    }
+
+    /** Returns a triangularly distributed random number between {@code min} (inclusive) and {@code max} (exclusive), where the
+     * {@code mode} argument defaults to the midpoint between the bounds, giving a symmetric distribution.
+     * <p>
+     * This method is equivalent of {@link #randomTriangular(double, double, double) randomTriangular(min, max, (min + max) * .5f)}
+     * @param min the lower limit
+     * @param max the upper limit */
+    public static double randomTriangular (double min, double max) {
+        return randomTriangular(min, max, (min + max) * 0.5f);
+    }
+
+    /** Returns a triangularly distributed random number between {@code min} (inclusive) and {@code max} (exclusive), where values
+     * around {@code mode} are more likely.
+     * @param min the lower limit
+     * @param max the upper limit
+     * @param mode the point around which the values are more likely */
+    public static double randomTriangular (double min, double max, double mode) {
+        double u = random.nextDouble();
+        double d = max - min;
+        if (u <= (mode - min) / d) return min + (double)Math.sqrt(u * d * (mode - min));
+        return max - (double)Math.sqrt((1 - u) * d * (max - mode));
+    }
+
 
     static public int clamp(int value, int min, int max) {
         if (value < min)

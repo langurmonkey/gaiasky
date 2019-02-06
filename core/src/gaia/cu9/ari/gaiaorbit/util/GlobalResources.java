@@ -55,7 +55,6 @@ public class GlobalResources {
 
     private static Vector3d aux = new Vector3d();
 
-
     /** GOOGLE COLORS **/
 
     public static float[] gGreen = new float[] { 0f / 255f, 135f / 255f, 68f / 255f, 1f };
@@ -75,33 +74,34 @@ public class GlobalResources {
         return new Color(c[0], c[1], c[2], c[3]);
     }
 
-    /**
-     * Model for atmosphere scattering
-     */
-    public static final String atmModelLocation = "models/atm/atm-uv.g3db";
-
     public static void initialize(AssetManager manager) {
         // Sprite shader
         spriteShader = new ShaderProgram(Gdx.files.internal("shader/spritebatch.vertex.glsl"), Gdx.files.internal("shader/spritebatch.fragment.glsl"));
         // Sprite batch
         spriteBatch = new SpriteBatch(1000, spriteShader);
 
+        updateSkin();
+
+    }
+
+    public static void updateSkin() {
+        initLinkCursor();
+        FileHandle fh = Gdx.files.internal("skins/" + GlobalConf.program.UI_THEME + "/" + GlobalConf.program.UI_THEME + ".json");
+        skin = new Skin(fh);
+    }
+
+    private static void initLinkCursor(){
         // Create skin right now, it is needed.
         if (GlobalConf.program.UI_THEME.endsWith("-x2")) {
             GlobalConf.updateScaleFactor(2.0f);
             // Cursor for links
             linkCursor = new Pixmap(Gdx.files.internal("img/cursor-link-x2.png"));
         } else {
+            GlobalConf.updateScaleFactor(1.0f);
             // Cursor for links
             linkCursor = new Pixmap(Gdx.files.internal("img/cursor-link.png"));
         }
-        updateSkin();
 
-    }
-
-    public static void updateSkin() {
-        FileHandle fh = Gdx.files.internal("skins/" + GlobalConf.program.UI_THEME + "/" + GlobalConf.program.UI_THEME + ".json");
-        skin = new Skin(fh);
     }
 
     public static void doneLoading(AssetManager manager) {
@@ -277,27 +277,35 @@ public class GlobalResources {
     /**
      * Gets all the files with the given extension in the given file handle f.
      *
-     * @param f         The directory to get all the files
-     * @param l         The list with re results
-     * @param extension The extension of the files
+     * @param f          The directory to get all the files
+     * @param l          The list with re results
+     * @param extensions The allowed extensions
      * @return The list l
      */
-    public static Array<FileHandle> listRec(FileHandle f, Array<FileHandle> l, String extension) {
+    public static Array<FileHandle> listRec(FileHandle f, Array<FileHandle> l, String... extensions) {
         if (f.exists()) {
             if (f.isDirectory()) {
                 FileHandle[] partial = f.list();
                 for (FileHandle fh : partial) {
-                    l = listRec(fh, l, extension);
+                    l = listRec(fh, l, extensions);
                 }
 
             } else {
-                if (f.name().endsWith(extension)) {
+                if (endsWithAny(f.name(), extensions)) {
                     l.add(f);
                 }
             }
         }
 
         return l;
+    }
+
+    private static boolean endsWithAny(String str, String... extensions){
+        for(String ext: extensions){
+            if(str.endsWith(ext))
+                return true;
+        }
+        return false;
     }
 
     public static Array<FileHandle> listRec(FileHandle f, Array<FileHandle> l, FilenameFilter filter) {
@@ -327,14 +335,10 @@ public class GlobalResources {
     }
 
     public static <K, V extends Comparable<? super V>> Map<K, V> sortByValue(Map<K, V> map) {
-        List<Map.Entry<K, V>> list = new LinkedList<Map.Entry<K, V>>(map.entrySet());
-        Collections.sort(list, new Comparator<Map.Entry<K, V>>() {
-            public int compare(Map.Entry<K, V> o1, Map.Entry<K, V> o2) {
-                return (o1.getValue()).compareTo(o2.getValue());
-            }
-        });
+        List<Map.Entry<K, V>> list = new LinkedList<>(map.entrySet());
+        list.sort(Comparator.comparing(Map.Entry::getValue));
 
-        Map<K, V> result = new LinkedHashMap<K, V>();
+        Map<K, V> result = new LinkedHashMap<>();
         for (Map.Entry<K, V> entry : list) {
             result.put(entry.getKey(), entry.getValue());
         }
@@ -476,16 +480,12 @@ public class GlobalResources {
             }
             byte[] hashValue = md.digest();
             return new String(hashValue);
-        } catch (NoSuchAlgorithmException e) {
-            logger.error(e);
-            return null;
-        } catch (IOException e) {
+        } catch (NoSuchAlgorithmException | IOException e) {
             logger.error(e);
             return null;
         } finally {
             try {
-                if (inputStream != null)
-                    inputStream.close();
+                inputStream.close();
             } catch (IOException e) {
                 logger.error(e);
             }
@@ -581,4 +581,5 @@ public class GlobalResources {
         }
         return sb.toString().trim();
     }
+
 }

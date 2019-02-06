@@ -4,6 +4,7 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.backends.lwjgl.LwjglFiles;
 import com.badlogic.gdx.files.FileHandle;
 import gaia.cu9.ari.gaiaorbit.assets.OrbitDataLoader.OrbitDataLoaderParameter;
+import gaia.cu9.ari.gaiaorbit.data.util.PointCloudData;
 import gaia.cu9.ari.gaiaorbit.desktop.format.DesktopDateFormatFactory;
 import gaia.cu9.ari.gaiaorbit.desktop.format.DesktopNumberFormatFactory;
 import gaia.cu9.ari.gaiaorbit.desktop.util.DesktopConfInit;
@@ -34,7 +35,7 @@ import java.util.Date;
 public class OrbitSamplerDataProvider implements IOrbitDataProvider {
     private static boolean writeData = false;
     private static final String writeDataPath = "/tmp/";
-    PolylineData data;
+    PointCloudData data;
 
     public static void main(String[] args) {
         try {
@@ -90,7 +91,7 @@ public class OrbitSamplerDataProvider implements IOrbitDataProvider {
         // If num samples is not defined, we use 300 samples per year of period
         int numSamples = parameter.numSamples > 0 ? parameter.numSamples : (int) (300 * parameter.orbitalPeriod / 365);
         numSamples = Math.max(100, Math.min(2000, numSamples));
-        data = new PolylineData();
+        data = new PointCloudData();
         String bodyDesc = parameter.name;
         Instant d = Instant.ofEpochMilli(parameter.ini.getTime());
         double last = 0, accum = 0;
@@ -148,7 +149,7 @@ public class OrbitSamplerDataProvider implements IOrbitDataProvider {
         load(file, parameter);
     }
 
-    public PolylineData getData() {
+    public PointCloudData getData() {
         return data;
     }
 

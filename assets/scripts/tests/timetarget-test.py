@@ -28,8 +28,8 @@ while(gs.isSimulationTimeOn()):
     sleep(0.2)
 
 timearr = gs.getSimulationTimeArr()
-print("%s - Time is:        %i/%i/%i %i:%i:%i.%i" % (datetime.now().time(), timearr[2], timearr[1], timearr[0], timearr[3], timearr[4], timearr[5], timearr[6]))
-print("%s - Time should be: 1/1/50000 10:05:00.000" % datetime.now().time())
+gs.print("%s - Time is:        %i/%i/%i %i:%i:%i.%i" % (datetime.now().time(), timearr[2], timearr[1], timearr[0], timearr[3], timearr[4], timearr[5], timearr[6]))
+gs.print("%s - Time should be: 1/1/50000 10:05:00.000" % datetime.now().time())
 gs.sleep(2)
 
 # Back to 2017
@@ -42,7 +42,7 @@ gs.startSimulationTime()
 while(gs.isSimulationTimeOn()):
     sleep(0.2)
     
-print("Time should now be 1/12/2017 10:05:00.000")
+gs.print("Time should now be 1/12/2017 10:05:00.000")
 gs.sleep(2)
 
 # Never forget to unset the target time, otherwise Gaia Sky will always stop at that time bookmark!

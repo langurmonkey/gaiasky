@@ -19,7 +19,6 @@ import gaia.cu9.ari.gaiaorbit.event.EventManager;
 import gaia.cu9.ari.gaiaorbit.event.Events;
 import gaia.cu9.ari.gaiaorbit.event.IObserver;
 import gaia.cu9.ari.gaiaorbit.interfce.XBox360Mappings;
-import gaia.cu9.ari.gaiaorbit.scenegraph.CelestialBody;
 import gaia.cu9.ari.gaiaorbit.scenegraph.IFocus;
 import gaia.cu9.ari.gaiaorbit.scenegraph.Spacecraft;
 import gaia.cu9.ari.gaiaorbit.scenegraph.camera.CameraManager.CameraMode;
@@ -59,7 +58,7 @@ public class SpacecraftCamera extends AbstractCamera implements IObserver {
     private float chw2, chh2;
 
     /** Closest body apart from the spacecraft **/
-    private CelestialBody closest2;
+    private IFocus closest2;
 
     private Vector3d aux1, aux2, todesired, desired, scthrust, scforce, scaccel, scvel, scpos, scdir, scup;
     private Pair<Vector3d, Vector3d> dirup;
@@ -196,9 +195,9 @@ public class SpacecraftCamera extends AbstractCamera implements IObserver {
             double closestStarDist = closestStar.getClosestDist();
             String closestStarName = closestStar.getClosestName();
             if (closest2 != null) {
-                if (closest2.distToCamera < closestStarDist) {
-                    clname = closest2.name;
-                    cldist = closest2.distToCamera;
+                if (closest2.getDistToCamera() < closestStarDist) {
+                    clname = closest2.getName();
+                    cldist = closest2.getDistToCamera();
                 } else {
                     clname = closestStarName;
                     cldist = closestStarDist;
@@ -258,7 +257,7 @@ public class SpacecraftCamera extends AbstractCamera implements IObserver {
         fovFactor = camera.fieldOfView / 40f;
         camera.near = (float) (targetDistance * 0.6);
         if (closest != null) {
-            camera.near = Math.min(camera.near, ((float) closest.pos.dst(pos) - (float) closest.getRadius()) * (float) sc.sizeFactor / 2.5f) * (float) sc.sizeFactor;
+            camera.near = Math.min(camera.near, ((float) closest.getPos().dst(pos) - (float) closest.getRadius()) * (float) sc.sizeFactor / 2.5f) * (float) sc.sizeFactor;
         }
         camera.position.set(0, 0, 0);
         direction.put(camera.direction);
@@ -271,7 +270,7 @@ public class SpacecraftCamera extends AbstractCamera implements IObserver {
     }
 
     @Override
-    public void updateMode(CameraMode mode, boolean postEvent) {
+    public void updateMode(CameraMode mode, boolean centerFocus, boolean postEvent) {
         InputMultiplexer im = (InputMultiplexer) Gdx.input.getInputProcessor();
         if (mode == CameraMode.Spacecraft && sc != null) {
             Gdx.app.postRunnable(() -> {
@@ -572,15 +571,15 @@ public class SpacecraftCamera extends AbstractCamera implements IObserver {
     }
 
     @Override
-    public void checkClosest(CelestialBody cb) {
+    public void checkClosest(IFocus cb) {
         super.checkClosest(cb);
         if (sc != null)
-            if (closest2 == null || (closest2 != null && cb != sc && cb.distToCamera < closest2.distToCamera))
+            if (closest2 == null || (closest2 != null && cb != sc && cb.getDistToCamera() < closest2.getDistToCamera()))
                 closest2 = cb;
     }
 
     @Override
-    public CelestialBody getClosest2() {
+    public IFocus getClosest2() {
         return closest2;
     }
 

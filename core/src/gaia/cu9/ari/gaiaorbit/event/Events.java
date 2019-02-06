@@ -106,6 +106,7 @@ public enum Events {
      * Informs that the focus has somehow changed and the GUI must be updated.
      * <ul>
      * <li>[0] - The new focus object OR its name.</li>
+     * <li>[1] - Optional boolean that, if set to true, prevents the camera from actually centering on the focus.</li>
      * </ul>
      **/
     FOCUS_CHANGED,
@@ -279,6 +280,28 @@ public enum Events {
     UPDATE_CAM_RECORDER,
 
     /**
+     * Saves the given array of keyframes to a keyframes file
+     */
+    KEYFRAMES_FILE_SAVE,
+
+    /**
+     * Exports the given array of keyframes to a camera path file
+     */
+    KEYFRAMES_EXPORT,
+
+    /** Refreshes the keyframes from the model **/
+    KEYFRAMES_REFRESH,
+
+    /** The given keyframe has been selected **/
+    KEYFRAME_SELECT,
+
+    /** The given keyframe is no longer selected **/
+    KEYFRAME_UNSELECT,
+
+    /** Add new keyframe at the end with the current camera settings **/
+    KEYFRAME_ADD,
+
+    /**
      * Issues the command to change the high accuracy setting. Contains a
      * boolean with the setting
      */
@@ -359,6 +382,8 @@ public enum Events {
     SHOW_RUNSCRIPT_ACTION,
     SHOW_LAND_AT_LOCATION_ACTION,
     SHOW_QUIT_ACTION,
+    SHOW_KEYFRAMES_WINDOW_ACTION,
+    SHOW_MINIMAP_WINDOW_ACTION,
     /** Shows the camera path file selector, contains the stage and the skin **/
     SHOW_PLAYCAMERA_ACTION,
     /** Informs about the number of running scripts **/
@@ -549,6 +574,14 @@ public enum Events {
     SCREEN_MODE_CMD,
     /** Informs the scene graph has been loaded. Program can start **/
     SCENE_GRAPH_LOADED,
+    /** Sends an object to be added to the scene graph. Contains the object and an optional Boolean indicating
+     * whether to add the object to the scene graph index. Defaults to true. **/
+    SCENE_GRAPH_ADD_OBJECT_CMD,
+    /**
+     * Removes an object from the scene graph. Contains the name of the object or the object itself plus and optional
+     * Boolean indicating whether to remove it from the index. Defaults to true.
+     */
+    SCENE_GRAPH_REMOVE_OBJECT_CMD,
     /**
      * Contains the width, height (integers) and the folder name and filename
      * (strings)

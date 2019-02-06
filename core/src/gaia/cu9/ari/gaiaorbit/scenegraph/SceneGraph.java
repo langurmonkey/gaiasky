@@ -7,9 +7,8 @@ import gaia.cu9.ari.gaiaorbit.util.time.ITimeFrameProvider;
 
 /**
  * Implementation of a 3D scene graph.
- * 
- * @author Toni Sagrista
  *
+ * @author Toni Sagrista
  */
 public class SceneGraph extends AbstractSceneGraph {
 

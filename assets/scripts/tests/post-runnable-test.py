@@ -6,7 +6,7 @@ from java.lang import Runnable
 
 class PrintRunnable(Runnable):
     def run(self):
-        print("I RUN!")
+        gs.print("I RUN!")
         
 class FrameCounterRunnable(Runnable):
     def __init__(self):
@@ -15,7 +15,7 @@ class FrameCounterRunnable(Runnable):
     def run(self):
         self.n = self.n + 1
         if self.n % 30 == 0:
-            print "Number of frames: %d" % self.n
+            gs.print("Number of frames: %d" % self.n)
         
 
 gs = EventScriptingInterface.instance()
@@ -32,5 +32,5 @@ gs.sleep(30.0)
 # We unpark the frame counter
 gs.unparkRunnable("frame_counter")
 
-print "Exiting script"
+gs.print("Exiting script")
 

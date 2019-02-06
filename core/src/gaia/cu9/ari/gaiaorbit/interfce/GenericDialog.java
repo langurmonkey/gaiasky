@@ -22,18 +22,29 @@ import gaia.cu9.ari.gaiaorbit.util.scene2d.CollapsibleWindow;
 import gaia.cu9.ari.gaiaorbit.util.scene2d.OwnScrollPane;
 import gaia.cu9.ari.gaiaorbit.util.scene2d.OwnTextButton;
 
-import static com.badlogic.gdx.scenes.scene2d.actions.Actions.fadeOut;
 import static com.badlogic.gdx.scenes.scene2d.actions.Actions.sequence;
 
 public abstract class GenericDialog extends CollapsibleWindow {
+    protected static float pad;
+    protected static float pad5;
+
+    static {
+        updatePads();
+    }
+
+    public static void updatePads() {
+        pad = 10f * GlobalConf.SCALE_FACTOR;
+        pad5 = 5f * GlobalConf.SCALE_FACTOR;
+    }
 
     final protected Stage stage;
     final protected Skin skin;
     protected GenericDialog me;
     protected Table content;
-    protected float pad;
     private String acceptText = null, cancelText = null;
-    
+    protected boolean modal = true;
+
+    protected HorizontalGroup buttonGroup;
     protected TextButton acceptButton, cancelButton;
 
     private Runnable acceptRunnable, cancelRunnable;
@@ -67,39 +78,39 @@ public abstract class GenericDialog extends CollapsibleWindow {
         this.cancelText = cancelText;
     }
 
+    public void setModal(boolean modal) {
+        this.modal = modal;
+        super.setModal(modal);
+    }
+
     protected void recalculateButtonSize() {
-        float w = Math.max(Math.max(acceptButton != null ? acceptButton.getWidth() : 0, cancelButton != null ? cancelButton.getWidth() : 0) + 10 * GlobalConf.SCALE_FACTOR, 80 * GlobalConf.SCALE_FACTOR);
-        if (acceptButton != null)
-            acceptButton.setWidth(w);
-        if (cancelButton != null)
-            cancelButton.setWidth(w);
+        float w = 80 * GlobalConf.SCALE_FACTOR;
+        for (Actor button : buttonGroup.getChildren()) {
+            w = Math.max(button.getWidth() + pad * 4f, w);
+        }
+        for (Actor button : buttonGroup.getChildren()) {
+            button.setWidth(w);
+        }
     }
 
     public void buildSuper() {
-        pad = 5 * GlobalConf.SCALE_FACTOR;
-
 
         /** BUTTONS **/
-        HorizontalGroup buttonGroup = new HorizontalGroup();
-        buttonGroup.pad(pad);
-        buttonGroup.space(pad);
+        buttonGroup = new HorizontalGroup();
+        buttonGroup.space(pad5);
 
         if (acceptText != null) {
             acceptButton = new OwnTextButton(acceptText, skin, "default");
             acceptButton.setName("accept");
-            acceptButton.addListener(new EventListener() {
-
-                @Override
-                public boolean handle(Event event) {
-                    if (event instanceof ChangeEvent) {
-                        accept();
-                        if (acceptRunnable != null)
-                            acceptRunnable.run();
-                        me.hide();
-                        return true;
-                    }
-                    return false;
+            acceptButton.addListener((event) -> {
+                if (event instanceof ChangeEvent) {
+                    accept();
+                    if (acceptRunnable != null)
+                        acceptRunnable.run();
+                    me.hide();
+                    return true;
                 }
+                return false;
 
             });
             buttonGroup.addActor(acceptButton);
@@ -107,20 +118,16 @@ public abstract class GenericDialog extends CollapsibleWindow {
         if (cancelText != null) {
             cancelButton = new OwnTextButton(cancelText, skin, "default");
             cancelButton.setName("cancel");
-            cancelButton.addListener(new EventListener() {
-                @Override
-                public boolean handle(Event event) {
-                    if (event instanceof ChangeEvent) {
-                        cancel();
-                        if (cancelRunnable != null)
-                            cancelRunnable.run();
-                        me.hide();
-                        return true;
-                    }
-
-                    return false;
+            cancelButton.addListener((event) -> {
+                if (event instanceof ChangeEvent) {
+                    cancel();
+                    if (cancelRunnable != null)
+                        cancelRunnable.run();
+                    me.hide();
+                    return true;
                 }
 
+                return false;
             });
             buttonGroup.addActor(cancelButton);
         }
@@ -133,36 +140,33 @@ public abstract class GenericDialog extends CollapsibleWindow {
         pack();
 
         // Add keys for ESC and ENTER
-        me.addListener(new EventListener() {
-            @Override
-            public boolean handle(Event event) {
-                if (event instanceof InputEvent) {
-                    InputEvent ievent = (InputEvent) event;
-                    if (ievent.getType() == Type.keyUp) {
-                        int key = ievent.getKeyCode();
-                        switch (key) {
-                        case Keys.ESCAPE:
-                            // Exit
-                            cancel();
-                            if (cancelRunnable != null)
-                                cancelRunnable.run();
-                            me.hide();
-                            return true;
-                        case Keys.ENTER:
-                            // Exit
-                            accept();
-                            if (acceptRunnable != null)
-                                acceptRunnable.run();
-                            me.hide();
-                            return true;
-                        default:
-                            // Nothing
-                            break;
-                        }
+        me.addListener(event -> {
+            if (event instanceof InputEvent) {
+                InputEvent ievent = (InputEvent) event;
+                if (ievent.getType() == Type.keyUp) {
+                    int key = ievent.getKeyCode();
+                    switch (key) {
+                    case Keys.ESCAPE:
+                        // Exit
+                        cancel();
+                        if (cancelRunnable != null)
+                            cancelRunnable.run();
+                        me.hide();
+                        return true;
+                    case Keys.ENTER:
+                        // Exit
+                        accept();
+                        if (acceptRunnable != null)
+                            acceptRunnable.run();
+                        me.hide();
+                        return true;
+                    default:
+                        // Nothing
+                        break;
                     }
                 }
-                return false;
             }
+            return false;
         });
 
         focusListener = new FocusListener() {
@@ -188,7 +192,6 @@ public abstract class GenericDialog extends CollapsibleWindow {
 
         /** CAPTURE SCROLL FOCUS **/
         stage.addListener(new EventListener() {
-
             @Override
             public boolean handle(Event event) {
                 if (event instanceof InputEvent) {
@@ -206,15 +209,15 @@ public abstract class GenericDialog extends CollapsibleWindow {
                 return false;
             }
         });
-        
+
         // Build actual content
         build();
-        
+
         // Set position
         setPosition(Math.round(stage.getWidth() / 2f - this.getWidth() / 2f), Math.round(stage.getHeight() / 2f - this.getHeight() / 2f));
 
         // Modal
-        setModal(true);
+        setModal(this.modal);
     }
 
     /**
@@ -257,8 +260,9 @@ public abstract class GenericDialog extends CollapsibleWindow {
         if (action != null)
             addAction(action);
 
-        // Disable input
-        EventManager.instance.post(Events.INPUT_ENABLED_CMD, false);
+        if (this.modal)
+            // Disable input
+            EventManager.instance.post(Events.INPUT_ENABLED_CMD, false);
 
         return this;
     }
@@ -269,7 +273,17 @@ public abstract class GenericDialog extends CollapsibleWindow {
      */
     public GenericDialog show(Stage stage) {
         show(stage, sequence(Actions.alpha(0), Actions.fadeIn(0.4f, Interpolation.fade)));
-        setPosition(Math.round((stage.getWidth() - getWidth()) / 2), Math.round((stage.getHeight() - getHeight()) / 2));
+        setPosition(Math.round((stage.getWidth() - getWidth()) / 2f), Math.round((stage.getHeight() - getHeight()) / 2f));
+        setKeyboardFocus();
+        return this;
+    }
+
+    /**
+     * {@link #pack() Packs} the dialog and adds it to the stage at the specified position
+     */
+    public GenericDialog show(Stage stage, float x, float y) {
+        show(stage, sequence(Actions.alpha(0), Actions.fadeIn(0.4f, Interpolation.fade)));
+        setPosition(x, y);
         setKeyboardFocus();
         return this;
     }
@@ -308,12 +322,14 @@ public abstract class GenericDialog extends CollapsibleWindow {
         } else
             remove();
 
-        // Enable input
-        EventManager.instance.post(Events.INPUT_ENABLED_CMD, true);
+        if (this.modal)
+            // Enable input
+            EventManager.instance.post(Events.INPUT_ENABLED_CMD, true);
     }
 
     /**
      * Sets the runnable which runs when accept is clicked
+     *
      * @param r The runnable
      */
     public void setAcceptRunnable(Runnable r) {
@@ -322,6 +338,7 @@ public abstract class GenericDialog extends CollapsibleWindow {
 
     /**
      * Sets the runnable which runs when cancel is clicked
+     *
      * @param r The runnable
      */
     public void setCancelRunnable(Runnable r) {
@@ -334,13 +351,12 @@ public abstract class GenericDialog extends CollapsibleWindow {
      * then removes it from the stage.
      */
     public void hide() {
-        hide(sequence(fadeOut(0.4f, Interpolation.fade), Actions.removeActor()));
-        stage.setKeyboardFocus(previousKeyboardFocus);
+        hide(Actions.fadeOut(0.4f, Interpolation.fade));
     }
 
     /**
      * Sets the enabled property on the given components
-     * 
+     *
      * @param enabled
      * @param components
      */

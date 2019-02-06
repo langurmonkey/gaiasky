@@ -43,7 +43,6 @@ import gaia.cu9.ari.gaiaorbit.util.I18n;
  * @author langurmonkey
  **/
 public class CollapsibleWindow extends Window {
-    private float ownwidth = 0f, ownheight = 0f;
     private boolean collapsed, collapsing = false, expanding = false;
     private float collapseHeight;
     private float expandHeight;

@@ -27,7 +27,7 @@ public class QuitWindow extends GenericDialog {
     protected void build() {
         content.clear();
        
-        content.add(new OwnLabel(txt("gui.quit.sure"), skin)).left().pad(pad).row();
+        content.add(new OwnLabel(txt("gui.quit.sure"), skin)).left().pad(pad5).row();
     }
 
     @Override

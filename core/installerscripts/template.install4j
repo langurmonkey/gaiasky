@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <install4j version="7.0.8" transformSequenceNumber="7">
   <directoryPresets config="./" />
-  <application name="Gaia Sky" distributionSourceDir="" applicationId="8310-5272-6362-8592" mediaDir="./" mediaFilePattern="${compiler:sys.shortName}_${compiler:sys.platform}_${compiler:sys.version}" compression="9" lzmaCompression="false" pack200Compression="false" excludeSignedFromPacking="true" commonExternalFiles="false" createMd5Sums="true" shrinkRuntime="true" shortName="gaiasky" publisher="ARI - ZAH - Universität Heidelberg" publisherWeb="http://www.zah.uni-heidelberg.de/gaia/outreach/gaiasky" version="@version-tag@" allPathsRelative="true" backupOnSave="false" autoSave="false" convertDotsToUnderscores="true" macSignature="????" macVolumeId="c3380c949a34b4f7" javaMinVersion="1.8" javaMaxVersion="" allowBetaVM="false" jdkMode="runtimeJre" jdkName="">
+  <application name="GaiaSky" distributionSourceDir="" applicationId="8310-5272-6362-8592" mediaDir="./" mediaFilePattern="${compiler:sys.shortName}_${compiler:sys.platform}_${compiler:sys.version}" compression="9" lzmaCompression="false" pack200Compression="false" excludeSignedFromPacking="true" commonExternalFiles="false" createMd5Sums="true" shrinkRuntime="true" shortName="gaiasky" publisher="ARI - ZAH - Universität Heidelberg" publisherWeb="http://www.zah.uni-heidelberg.de/gaia/outreach/gaiasky" version="@version-tag@" allPathsRelative="true" backupOnSave="false" autoSave="false" convertDotsToUnderscores="true" macSignature="????" macVolumeId="c3380c949a34b4f7" javaMinVersion="1.8" javaMaxVersion="" allowBetaVM="false" jdkMode="runtimeJre" jdkName="">
     <languages skipLanguageSelection="false" languageSelectionInPrincipalLanguage="false">
       <principalLanguage id="en" customLocalizationFile="" />
       <additionalLanguages />
@@ -34,7 +34,7 @@
   <launchers>
     <launcher name="gaiasky" id="22" customizedId="" external="false" excludeFromMenu="false" unixMode="755" unixAutoStart="true" menuName="${compiler:sys.fullName}" icnsFile="" customMacBundleIdentifier="false" macBundleIdentifier="" swtApp="false" fileset="" macBundleBinary="JavaApplicationStub" addMacEntitlements="false" macEntitlementsFile="" useCustomMacosExecutableName="false" customMacosExecutableName="" useJavaMinVersionOverride="false" javaMinVersionOverride="" useJavaMaxVersionOverride="false" javaMaxVersionOverride="" checkUpdater="false" updateExecutionMode="unattendedProgress" unattendedUpdateTitle="${i18n:updater.WindowTitle(&quot;${compiler:sys.fullName}&quot;)}">
       <executable name="${compiler:sys.shortName}" type="1" iconSet="true" iconFile="@gs-git-folder@/assets/icon/ic_launcher.ico" executableDir="" redirectStderr="true" stderrFile="error.log" stderrMode="overwrite" redirectStdout="true" stdoutFile="output.log" stdoutMode="overwrite" failOnStderrOutput="true" executableMode="1" changeWorkingDirectory="true" workingDirectory="." singleInstance="true" serviceStartType="2" serviceDependencies="" serviceDescription="" jreLocation="" executionLevel="asInvoker" checkConsoleParameter="false" globalSingleInstance="false" singleInstanceActivate="true" dpiAware="false">
-        <versionInfo include="true" fileVersion="" fileDescription="3D Universe application focused on ESA's Gaia mission" legalCopyright="MPL" internalName="Gaia Sky" productName="${compiler:sys.fullName}" />
+        <versionInfo include="true" fileVersion="" fileDescription="3D Universe application focused on ESA's Gaia mission" legalCopyright="MPL" internalName="GaiaSky" productName="${compiler:sys.fullName}" />
       </executable>
       <splashScreen show="false" width="0" height="0" bitmapFile="" textOverlay="false">
         <text>
@@ -70,7 +70,7 @@
     </launcher>
     <launcher name="gaiasky32" id="227" customizedId="" external="false" excludeFromMenu="false" unixMode="755" unixAutoStart="true" menuName="${compiler:sys.fullName}" icnsFile="" customMacBundleIdentifier="false" macBundleIdentifier="" swtApp="false" fileset="" macBundleBinary="JavaApplicationStub" addMacEntitlements="false" macEntitlementsFile="" useCustomMacosExecutableName="false" customMacosExecutableName="" useJavaMinVersionOverride="false" javaMinVersionOverride="" useJavaMaxVersionOverride="false" javaMaxVersionOverride="">
       <executable name="${compiler:sys.shortName}" type="1" iconSet="true" iconFile="@gs-git-folder@/assets/icon/ic_launcher.ico" executableDir="" redirectStderr="true" stderrFile="error.log" stderrMode="overwrite" redirectStdout="true" stdoutFile="output.log" stdoutMode="overwrite" failOnStderrOutput="true" executableMode="1" changeWorkingDirectory="true" workingDirectory="." singleInstance="true" serviceStartType="2" serviceDependencies="" serviceDescription="" jreLocation="" executionLevel="asInvoker" checkConsoleParameter="false" globalSingleInstance="false" singleInstanceActivate="true" dpiAware="false">
-        <versionInfo include="true" fileVersion="" fileDescription="3D Universe application focused on ESA's Gaia mission" legalCopyright="MPL" internalName="Gaia Sky" productName="${compiler:sys.fullName}" />
+        <versionInfo include="true" fileVersion="" fileDescription="3D Universe application focused on ESA's Gaia mission" legalCopyright="MPL" internalName="GaiaSky" productName="${compiler:sys.fullName}" />
       </executable>
       <splashScreen show="false" width="0" height="0" bitmapFile="" textOverlay="false">
         <text>
@@ -1339,6 +1339,7 @@ return console.askYesNo(message, true);
         <entry location="ic_launcher.svg" fileType="regular" />
         <entry location="gs.desktop" fileType="regular" />
         <entry location="rest-static" fileType="regular" />
+        <entry location="gaiasky.6.gz" fileType="regular" />
       </exclude>
       <variables />
       <autoUpdate useMinUpdatableVersion="false" minUpdatableVersion="" useMaxUpdatableVersion="false" maxUpdatableVersion="">
@@ -1361,6 +1362,7 @@ return console.askYesNo(message, true);
         <entry location="ic_launcher.svg" fileType="regular" />
         <entry location="gs.desktop" fileType="regular" />
         <entry location="rest-static" fileType="regular" />
+        <entry location="gaiasky.6.gz" fileType="regular" />
       </exclude>
       <variables />
       <autoUpdate useMinUpdatableVersion="false" minUpdatableVersion="" useMaxUpdatableVersion="false" maxUpdatableVersion="">
@@ -1377,6 +1379,7 @@ return console.askYesNo(message, true);
         <entry location="gaiasky.cmd" fileType="regular" />
         <entry location="data/dummyversion" fileType="regular" />
         <entry location="rest-static" fileType="regular" />
+        <entry location="gaiasky.6.gz" fileType="regular" />
       </exclude>
       <variables />
       <autoUpdate useMinUpdatableVersion="false" minUpdatableVersion="" useMaxUpdatableVersion="false" maxUpdatableVersion="">
@@ -1430,10 +1433,10 @@ return console.askYesNo(message, true);
       <preInstallScript mode="1" file="">
         <content />
       </preInstallScript>
-      <postInstallScript mode="2" file="@gs-git-folder@/core/exe/create-shortcut-deb.sh">
+      <postInstallScript mode="2" file="@gs-git-folder@/core/installerscripts/post-install.sh">
         <content />
       </postInstallScript>
-      <preUninstallScript mode="2" file="@gs-git-folder@/core/exe/remove-shortcut-deb.sh">
+      <preUninstallScript mode="2" file="@gs-git-folder@/core/installerscripts/pre-uninstall.sh">
         <content />
       </preUninstallScript>
       <postUninstallScript mode="1" file="">
@@ -1462,10 +1465,10 @@ return console.askYesNo(message, true);
       <preInstallScript mode="1" file="">
         <content />
       </preInstallScript>
-      <postInstallScript mode="2" file="@gs-git-folder@/core/exe/create-shortcut-rpm.sh">
+      <postInstallScript mode="2" file="@gs-git-folder@/core/installerscripts/post-install.sh">
         <content />
       </postInstallScript>
-      <preUninstallScript mode="2" file="@gs-git-folder@/core/exe/remove-shortcut-rpm.sh">
+      <preUninstallScript mode="2" file="@gs-git-folder@/core/installerscripts/pre-uninstall.sh">
         <content />
       </preUninstallScript>
       <postUninstallScript mode="1" file="">

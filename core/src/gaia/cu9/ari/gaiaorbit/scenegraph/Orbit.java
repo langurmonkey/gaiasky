@@ -72,7 +72,7 @@ public class Orbit extends Polyline {
                 try {
                     provider = ClassReflection.newInstance(providerClass);
                     provider.load(oc.source, new OrbitDataLoader.OrbitDataLoaderParameter(name, providerClass, oc, multiplier, 100), newmethod);
-                    polylineData = provider.getData();
+                    pointCloudData = provider.getData();
                 } catch (Exception e) {
                     logger.error(e);
                 }
@@ -85,8 +85,8 @@ public class Orbit extends Polyline {
     public void doneLoading(AssetManager manager) {
         alpha = cc[3];
         if (!onlybody) {
-            int last = polylineData.getNumPoints() - 1;
-            Vector3d v = new Vector3d(polylineData.x.get(last), polylineData.y.get(last), polylineData.z.get(last));
+            int last = pointCloudData.getNumPoints() - 1;
+            Vector3d v = new Vector3d(pointCloudData.x.get(last), pointCloudData.y.get(last), pointCloudData.z.get(last));
             this.size = (float) v.len() * 5;
         } else {
 
@@ -170,9 +170,9 @@ public class Orbit extends Polyline {
             }
 
             // This is so that the shape renderer does not mess up the z-buffer
-            for (int i = 1; i < polylineData.getNumPoints(); i++) {
-                polylineData.loadPoint(prev, i - 1);
-                polylineData.loadPoint(curr, i);
+            for (int i = 1; i < pointCloudData.getNumPoints(); i++) {
+                pointCloudData.loadPoint(prev, i - 1);
+                pointCloudData.loadPoint(curr, i);
 
                 if (parentPos != null) {
                     prev.sub(parentPos);

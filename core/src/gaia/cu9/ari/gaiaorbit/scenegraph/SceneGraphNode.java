@@ -112,6 +112,10 @@ public class SceneGraphNode implements IStarContainer, IPosition {
         MODEL_CLOUD(23),
         /** Using normal shader for per-pixel lighting, with additive blending **/
         MODEL_NORMAL_ADDITIVE(24),
+        /** Point **/
+        POINT(25),
+        /** Point GPU **/
+        POINT_GPU(26),
 
 
         /** None **/
@@ -119,7 +123,7 @@ public class SceneGraphNode implements IStarContainer, IPosition {
 
         private int index;
 
-        private RenderGroup(int index) {
+        RenderGroup(int index) {
             this.index = index;
         }
 

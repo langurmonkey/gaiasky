@@ -41,7 +41,7 @@ gs.setFov(49)
 
 gs.goToObject("Earth", 91.38e-2)
 
-print("We will now add a line between the Earth and Moon")
+gs.print("We will now add a line between the Earth and Moon")
 
 gs.sleep(2)
 
@@ -63,7 +63,7 @@ gs.sleep(30)
 
 gs.stopSimulationTime()
 
-print("Cleaning up and ending")
+gs.print("Cleaning up and ending")
 
 gs.unparkRunnable("line-updater")
 gs.removeModelObject("line-em")
