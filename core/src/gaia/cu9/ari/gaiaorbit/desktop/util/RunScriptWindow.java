@@ -1,29 +1,15 @@
 package gaia.cu9.ari.gaiaorbit.desktop.util;
 
-import java.io.File;
-
-import org.python.core.PyCode;
-import org.python.core.PySyntaxError;
-
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Event;
 import com.badlogic.gdx.scenes.scene2d.EventListener;
 import com.badlogic.gdx.scenes.scene2d.Stage;
-import com.badlogic.gdx.scenes.scene2d.ui.Button;
-import com.badlogic.gdx.scenes.scene2d.ui.HorizontalGroup;
-import com.badlogic.gdx.scenes.scene2d.ui.Image;
-import com.badlogic.gdx.scenes.scene2d.ui.ImageButton;
-import com.badlogic.gdx.scenes.scene2d.ui.Label;
-import com.badlogic.gdx.scenes.scene2d.ui.List;
-import com.badlogic.gdx.scenes.scene2d.ui.ScrollPane;
-import com.badlogic.gdx.scenes.scene2d.ui.Skin;
-import com.badlogic.gdx.scenes.scene2d.ui.TextTooltip;
+import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener.ChangeEvent;
 import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.Array;
-
 import gaia.cu9.ari.gaiaorbit.event.EventManager;
 import gaia.cu9.ari.gaiaorbit.event.Events;
 import gaia.cu9.ari.gaiaorbit.interfce.GenericDialog;
@@ -34,6 +20,10 @@ import gaia.cu9.ari.gaiaorbit.util.scene2d.OwnImageButton;
 import gaia.cu9.ari.gaiaorbit.util.scene2d.OwnLabel;
 import gaia.cu9.ari.gaiaorbit.util.scene2d.OwnScrollPane;
 import gaia.cu9.ari.gaiaorbit.util.scene2d.OwnTextIconButton;
+import org.python.core.PyCode;
+import org.python.core.PySyntaxError;
+
+import java.io.File;
 
 /**
  * The run script window, which allows the user to choose a script to run.
@@ -88,8 +78,7 @@ public class RunScriptWindow extends GenericDialog {
         content.add(scriptsScroll).align(Align.center).pad(pad);
         content.row();
 
-        Image reloadImg = new Image(skin.getDrawable("reload"));
-        Button reload = new OwnTextIconButton("", reloadImg, skin);
+        Button reload = new OwnTextIconButton("", skin, "reload");
         reload.setName("reload script files");
         reload.addListener(new TextTooltip(txt("gui.script.reload"), skin));
         reload.addListener((event) -> {

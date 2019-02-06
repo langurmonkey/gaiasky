@@ -15,7 +15,7 @@ import com.bitfire.postprocessing.effects.LightScattering;
 import com.bitfire.postprocessing.effects.MotionBlur;
 
 public interface IPostProcessor extends Disposable {
-    public class PostProcessBean {
+    class PostProcessBean {
         public PostProcessor pp;
         public Bloom bloom;
         public Antialiasing antialiasing;
@@ -55,26 +55,26 @@ public interface IPostProcessor extends Disposable {
 
     }
 
-    public enum RenderType {
+    enum RenderType {
         screen(0), screenshot(1), frame(2);
 
         public int index;
 
-        private RenderType(int index) {
+        RenderType(int index) {
             this.index = index;
         }
 
     }
 
-    public void initialize(AssetManager manager);
+    void initialize(AssetManager manager);
 
-    public void doneLoading(AssetManager manager);
+    void doneLoading(AssetManager manager);
 
-    public PostProcessBean getPostProcessBean(RenderType type);
+    PostProcessBean getPostProcessBean(RenderType type);
 
-    public void resize(int width, int height);
+    void resize(int width, int height);
 
-    public void resizeImmediate(int width, int height);
+    void resizeImmediate(int width, int height);
 
-    public boolean isLightScatterEnabled();
+    boolean isLightScatterEnabled();
 }

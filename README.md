@@ -195,23 +195,7 @@ Et voilà ! The bleeding edge Gaia Sky is running in your machine.
 
 ### 2.4 CLI arguments
 
-Gaia Sky accepts a few command-line arguments:
-
-```
-Usage: gaiasky [options]
- Options:
-    -c, --cat-chooser
-      Displays the catalog chooser dialog at startup
-      Default: false
-    -d, --ds-download
-      Displays the download dialog at startup
-      Default: false
-    -h, --help
-      Shows help
-    -v, --version
-      Lists version and build inforamtion
-      Default: false
-```
+Run `gaiasky -h` or `man gaiasky` to find out about how to launch Gaia Sky and what arguments are accepted.
 
 ### 2.5 Getting the data
 

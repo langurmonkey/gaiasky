@@ -5,6 +5,7 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 
+import gaia.cu9.ari.gaiaorbit.data.util.PointCloudData;
 import gaia.cu9.ari.gaiaorbit.util.Constants;
 import gaia.cu9.ari.gaiaorbit.util.format.DateFormatFactory;
 import gaia.cu9.ari.gaiaorbit.util.format.IDateFormat;
@@ -19,7 +20,7 @@ public class OrbitDataWriter {
      *            The OrbitData instance
      * @throws IOException
      */
-    public static void writeOrbitData(String filePath, PolylineData data) throws IOException {
+    public static void writeOrbitData(String filePath, PointCloudData data) throws IOException {
         IDateFormat df = DateFormatFactory.getFormatter("yyyy-MM-dd_HH:mm:ss");
 
         File f = new File(filePath);

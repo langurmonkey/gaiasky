@@ -33,9 +33,9 @@ public class MyPools {
 
     /** Obtains an object from the {@link #get(Class) pool}. */
     static public <T> T obtain(Class<T> type) {
-        T obj = null;
+        T obj;
         synchronized (lock) {
-            obj = (T) get(type).obtain();
+            obj = get(type).obtain();
         }
         return obj;
     }

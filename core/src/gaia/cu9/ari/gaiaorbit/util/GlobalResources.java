@@ -3,6 +3,7 @@ package gaia.cu9.ari.gaiaorbit.util;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.files.FileHandle;
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
@@ -54,10 +55,24 @@ public class GlobalResources {
 
     private static Vector3d aux = new Vector3d();
 
-    /**
-     * Model for atmosphere scattering
-     */
-    public static final String atmModelLocation = "models/atm/atm-uv.g3db";
+    /** GOOGLE COLORS **/
+
+    public static float[] gGreen = new float[] { 0f / 255f, 135f / 255f, 68f / 255f, 1f };
+    public static Color gGreenC =getCol(gGreen);
+    public static float[] gBlue = new float[] { 0f / 255f, 87f / 255f, 231f / 255f, 1f };
+    public static Color gBlueC =getCol(gBlue);
+    public static float[] gRed = new float[] { 214f / 255f, 45f / 255f, 32f / 255f, 1f };
+    public static Color gRedC =getCol(gRed);
+    public static float[] gYellow = new float[] { 255f / 255f, 167f / 255f, 0f / 255f, 1f };
+    public static Color gYellowC =getCol(gYellow);
+    public static float[] gWhite = new float[] { 255f / 255f, 255f / 255f, 255f / 255f, 1f };
+    public static Color gWhiteC =getCol(gWhite);
+    public static float[] gPink = new float[] { 255f / 255f, 102f / 255f, 255f / 255f, 1f };
+    public static Color gPinkC =getCol(gPink);
+
+    private static Color getCol(float[] c){
+        return new Color(c[0], c[1], c[2], c[3]);
+    }
 
     public static void initialize(AssetManager manager) {
         // Sprite shader
@@ -65,22 +80,28 @@ public class GlobalResources {
         // Sprite batch
         spriteBatch = new SpriteBatch(1000, spriteShader);
 
+        updateSkin();
+
+    }
+
+    public static void updateSkin() {
+        initLinkCursor();
+        FileHandle fh = Gdx.files.internal("skins/" + GlobalConf.program.UI_THEME + "/" + GlobalConf.program.UI_THEME + ".json");
+        skin = new Skin(fh);
+    }
+
+    private static void initLinkCursor(){
         // Create skin right now, it is needed.
         if (GlobalConf.program.UI_THEME.endsWith("-x2")) {
             GlobalConf.updateScaleFactor(2.0f);
             // Cursor for links
             linkCursor = new Pixmap(Gdx.files.internal("img/cursor-link-x2.png"));
         } else {
+            GlobalConf.updateScaleFactor(1.0f);
             // Cursor for links
             linkCursor = new Pixmap(Gdx.files.internal("img/cursor-link.png"));
         }
-        updateSkin();
 
-    }
-
-    public static void updateSkin() {
-        FileHandle fh = Gdx.files.internal("skins/" + GlobalConf.program.UI_THEME + "/" + GlobalConf.program.UI_THEME + ".json");
-        skin = new Skin(fh);
     }
 
     public static void doneLoading(AssetManager manager) {
@@ -256,27 +277,35 @@ public class GlobalResources {
     /**
      * Gets all the files with the given extension in the given file handle f.
      *
-     * @param f         The directory to get all the files
-     * @param l         The list with re results
-     * @param extension The extension of the files
+     * @param f          The directory to get all the files
+     * @param l          The list with re results
+     * @param extensions The allowed extensions
      * @return The list l
      */
-    public static Array<FileHandle> listRec(FileHandle f, Array<FileHandle> l, String extension) {
+    public static Array<FileHandle> listRec(FileHandle f, Array<FileHandle> l, String... extensions) {
         if (f.exists()) {
             if (f.isDirectory()) {
                 FileHandle[] partial = f.list();
                 for (FileHandle fh : partial) {
-                    l = listRec(fh, l, extension);
+                    l = listRec(fh, l, extensions);
                 }
 
             } else {
-                if (f.name().endsWith(extension)) {
+                if (endsWithAny(f.name(), extensions)) {
                     l.add(f);
                 }
             }
         }
 
         return l;
+    }
+
+    private static boolean endsWithAny(String str, String... extensions){
+        for(String ext: extensions){
+            if(str.endsWith(ext))
+                return true;
+        }
+        return false;
     }
 
     public static Array<FileHandle> listRec(FileHandle f, Array<FileHandle> l, FilenameFilter filter) {
@@ -306,14 +335,10 @@ public class GlobalResources {
     }
 
     public static <K, V extends Comparable<? super V>> Map<K, V> sortByValue(Map<K, V> map) {
-        List<Map.Entry<K, V>> list = new LinkedList<Map.Entry<K, V>>(map.entrySet());
-        Collections.sort(list, new Comparator<Map.Entry<K, V>>() {
-            public int compare(Map.Entry<K, V> o1, Map.Entry<K, V> o2) {
-                return (o1.getValue()).compareTo(o2.getValue());
-            }
-        });
+        List<Map.Entry<K, V>> list = new LinkedList<>(map.entrySet());
+        list.sort(Comparator.comparing(Map.Entry::getValue));
 
-        Map<K, V> result = new LinkedHashMap<K, V>();
+        Map<K, V> result = new LinkedHashMap<>();
         for (Map.Entry<K, V> entry : list) {
             result.put(entry.getKey(), entry.getValue());
         }
@@ -455,16 +480,12 @@ public class GlobalResources {
             }
             byte[] hashValue = md.digest();
             return new String(hashValue);
-        } catch (NoSuchAlgorithmException e) {
-            logger.error(e);
-            return null;
-        } catch (IOException e) {
+        } catch (NoSuchAlgorithmException | IOException e) {
             logger.error(e);
             return null;
         } finally {
             try {
-                if (inputStream != null)
-                    inputStream.close();
+                inputStream.close();
             } catch (IOException e) {
                 logger.error(e);
             }
@@ -510,4 +531,55 @@ public class GlobalResources {
 
         return size.get();
     }
+
+    /**
+     * Parses the string and creates a string array. The string is a list of whitespace-separated
+     * tokens, each surrounded by double qutotes '"':
+     * str = '"a" "bc" "d" "efghi"'
+     * @param str The string
+     * @return The resulting array
+     */
+    public static String[] parseWhitespaceSeparatedList(String str) {
+        if(str == null || str.isEmpty())
+            return null;
+
+        List<String> l = new ArrayList<String>();
+        int n = str.length();
+        StringBuilder current = new StringBuilder();
+        boolean inString = false;
+        for (int i = 0; i < n; i++) {
+            char c = str.charAt(i);
+            if(c == '"'){
+                if(inString){
+                    l.add(current.toString());
+                    current = new StringBuilder();
+                    inString = false;
+                } else {
+                    inString = true;
+                }
+            } else {
+                if(inString)
+                    current.append(c);
+            }
+        }
+        return l.toArray(new String[l.size()]);
+    }
+
+    /**
+     * Converts the string array into a whitespace-separated string
+     * where each element is double quoted.
+     * @param l The string array
+     * @return The resulting string
+     */
+    public static String toWhitespaceSeparatedList(String[] l){
+        if(l == null || l.length == 0)
+            return null;
+
+        StringBuilder sb = new StringBuilder();
+        for(String s : l){
+            sb.append("\"").append(s).append("\" ");
+        }
+        return sb.toString().trim();
+    }
+
 }

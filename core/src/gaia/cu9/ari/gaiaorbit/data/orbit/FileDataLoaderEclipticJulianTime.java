@@ -6,6 +6,7 @@ import java.io.InputStreamReader;
 import java.sql.Timestamp;
 import java.util.Calendar;
 
+import gaia.cu9.ari.gaiaorbit.data.util.PointCloudData;
 import gaia.cu9.ari.gaiaorbit.util.Constants;
 import gaia.cu9.ari.gaiaorbit.util.coord.AstroUtils;
 import gaia.cu9.ari.gaiaorbit.util.math.Matrix4d;
@@ -23,8 +24,8 @@ public class FileDataLoaderEclipticJulianTime {
      *            The input stream
      * @return The orbit data
      */
-    public PolylineData load(InputStream data) throws Exception {
-        PolylineData orbitData = new PolylineData();
+    public PointCloudData load(InputStream data) throws Exception {
+        PointCloudData orbitData = new PointCloudData();
 
         BufferedReader br = new BufferedReader(new InputStreamReader(data));
         String line;

@@ -57,11 +57,11 @@ public class StarGroupRenderSystem extends ImmediateRenderSystem implements IObs
     }
 
     /**
-    	 * Adds a new mesh data to the meshes list and increases the mesh data index
-    	 * 
-    	 * @param nVertices The max number of vertices this mesh data can hold
-    	 * @return The index of the new mesh data
-    	 */
+     * Adds a new mesh data to the meshes list and increases the mesh data index
+     *
+     * @param nVertices The max number of vertices this mesh data can hold
+     * @return The index of the new mesh data
+     */
     private int addMeshData(int nVertices) {
         // look for index
         int mdi;
@@ -92,10 +92,10 @@ public class StarGroupRenderSystem extends ImmediateRenderSystem implements IObs
     }
 
     /**
-    	 * Clears the mesh data at the index i
-    	 * 
-    	 * @param i The index
-    	 */
+     * Clears the mesh data at the index i
+     *
+     * @param i The index
+     */
     public void clearMeshData(int i) {
         assert i >= 0 && i < meshes.length : "Mesh data index out of bounds: " + i + " (n meshes = " + N_MESHES + ")";
 
@@ -124,8 +124,8 @@ public class StarGroupRenderSystem extends ImmediateRenderSystem implements IObs
                     if (!starGroup.disposed) {
                         curr = meshes[starGroup.offset];
                         /**
-                        						 * ADD PARTICLES
-                        						 */
+                         * ADD PARTICLES
+                         */
                         if (!starGroup.inGpu) {
                             starGroup.offset = addMeshData(starGroup.size());
 
@@ -160,8 +160,8 @@ public class StarGroupRenderSystem extends ImmediateRenderSystem implements IObs
                         }
 
                         /**
-                        						 * RENDER
-                        						 */
+                         * RENDER
+                         */
                         if (curr != null) {
                             int fovmode = camera.getMode().getGaiaFovMode();
 

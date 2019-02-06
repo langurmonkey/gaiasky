@@ -1,19 +1,10 @@
 package gaia.cu9.ari.gaiaorbit.interfce.components;
 
-import java.util.Iterator;
-
 import com.badlogic.gdx.scenes.scene2d.Stage;
-import com.badlogic.gdx.scenes.scene2d.ui.HorizontalGroup;
-import com.badlogic.gdx.scenes.scene2d.ui.ImageButton;
-import com.badlogic.gdx.scenes.scene2d.ui.ScrollPane;
-import com.badlogic.gdx.scenes.scene2d.ui.Skin;
-import com.badlogic.gdx.scenes.scene2d.ui.Table;
-import com.badlogic.gdx.scenes.scene2d.ui.TextTooltip;
-import com.badlogic.gdx.scenes.scene2d.ui.VerticalGroup;
+import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener.ChangeEvent;
 import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.Array;
-
 import gaia.cu9.ari.gaiaorbit.event.EventManager;
 import gaia.cu9.ari.gaiaorbit.event.Events;
 import gaia.cu9.ari.gaiaorbit.event.IObserver;
@@ -24,6 +15,8 @@ import gaia.cu9.ari.gaiaorbit.util.Logger.Log;
 import gaia.cu9.ari.gaiaorbit.util.scene2d.OwnImageButton;
 import gaia.cu9.ari.gaiaorbit.util.scene2d.OwnLabel;
 import gaia.cu9.ari.gaiaorbit.util.scene2d.OwnScrollPane;
+
+import java.util.Iterator;
 
 public class DatasetsComponent extends GuiComponent implements IObserver {
     private static final Log logger = Logger.getLogger(DatasetsComponent.class);
@@ -82,7 +75,7 @@ public class DatasetsComponent extends GuiComponent implements IObserver {
         VerticalGroup controls = new VerticalGroup();
         controls.space(pad);
         ImageButton eye = new OwnImageButton(skin, "eye-toggle");
-        eye.addListener(new TextTooltip(txt("gui.dataset.tooltip.toggle"), skin));
+        eye.addListener(new TextTooltip(txt("gui.tooltip.dataset.toggle"), skin));
         eye.addListener((event) -> {
             if (event instanceof ChangeEvent) {
                 // Toggle visibility
@@ -96,7 +89,7 @@ public class DatasetsComponent extends GuiComponent implements IObserver {
             return false;
         });
         ImageButton rubbish = new OwnImageButton(skin, "rubbish-bin");
-        rubbish.addListener(new TextTooltip(txt("gui.dataset.tooltip.remove"), skin));
+        rubbish.addListener(new TextTooltip(txt("gui.tooltip.dataset.remove"), skin));
         rubbish.addListener((event) -> {
             if (event instanceof ChangeEvent) {
                 // Remove dataset

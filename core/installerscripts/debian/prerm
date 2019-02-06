@@ -1,9 +1,0 @@
-#!/bin/sh
-
-# Remove .desktop file
-rm /usr/share/applications/gaiasky.desktop
-
-# Remove executable
-rm "/usr/local/bin/gaiasky" 2>/dev/null
-
-exit 0

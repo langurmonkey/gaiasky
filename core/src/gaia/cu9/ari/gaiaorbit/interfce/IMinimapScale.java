@@ -9,11 +9,11 @@ import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import gaia.cu9.ari.gaiaorbit.util.math.Vector3d;
 
 public interface IMinimapScale {
-    public boolean isActive(Vector3d campos);
+    boolean isActive(Vector3d campos);
 
-    public void initialize(OrthographicCamera ortho, SpriteBatch sb, ShapeRenderer sr, BitmapFont font, int side, int sideshort);
+    void initialize(OrthographicCamera ortho, SpriteBatch sb, ShapeRenderer sr, BitmapFont font, int side, int sideshort);
 
-    public void renderSideProjection(FrameBuffer fb);
+    void renderSideProjection(FrameBuffer fb);
 
-    public void renderTopProjection(FrameBuffer fb);
+    void renderTopProjection(FrameBuffer fb);
 }

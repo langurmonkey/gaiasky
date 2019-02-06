@@ -7,7 +7,6 @@ import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.TextField;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener.ChangeEvent;
 import com.badlogic.gdx.scenes.scene2d.utils.FocusListener.FocusEvent;
-
 import gaia.cu9.ari.gaiaorbit.util.validator.IValidator;
 
 /**
@@ -56,6 +55,16 @@ public class OwnTextField extends TextField {
 
     public void setErrorColor(Color errorColor) {
         this.errorColor = errorColor;
+    }
+
+    /**
+     * Checks the validity of the value. If the text field has no validator, all
+     * values are valid. If it has a validator, it checks whether the value
+     * is ok
+     * @return True if the value is valid or the text field has no validator, false otherwise
+     */
+    public boolean isValid(){
+        return this.validator == null || this.validator.validate(this.getText());
     }
 
     private void initValidator() {

@@ -21,8 +21,8 @@ import gaia.cu9.ari.gaiaorbit.util.math.Vector3d;
 /**
  * Renders lines as Polyline Quadstrips (Polyboards).
  * Slower but higher quality.
- * @author tsagrista
  *
+ * @author tsagrista
  */
 public class LineQuadRenderSystem extends LineRenderSystem {
     private MeshDataExt currext;
@@ -51,8 +51,9 @@ public class LineQuadRenderSystem extends LineRenderSystem {
     }
 
     Vector3d line, camdir0, camdir1, camdir15, point, vec;
-    final static double widthAngle = Math.toRadians(0.1);
+    final static double widthAngle = Math.toRadians(0.05);
     final static double widthAngleTan = Math.tan(widthAngle);
+
     public LineQuadRenderSystem(RenderGroup rg, float[] alphas, ShaderProgram[] shaders) {
         super(rg, alphas, shaders);
         dpool = new DPool(INI_DPOOL_SIZE, MAX_DPOOL_SIZE, 14);
@@ -113,6 +114,23 @@ public class LineQuadRenderSystem extends LineRenderSystem {
     public void uv(float u, float v) {
         currext.vertices[currext.vertexIdx + currext.uvOffset] = u;
         currext.vertices[currext.vertexIdx + currext.uvOffset + 1] = v;
+    }
+
+    private boolean two = false;
+    private Vector3d aux = new Vector3d();
+
+    public void breakLine(){
+        two = false;
+    }
+
+    public void addPoint(ILineRenderable lr, double x, double y, double z, float r, float g, float b, float a) {
+        if (!two) {
+            aux.set(x, y, z);
+            two = true;
+        } else {
+            addLine(lr, aux.x, aux.y, aux.z, x, y, z, r, g, b, a);
+            aux.set(x, y, z);
+        }
     }
 
     @Override
@@ -334,6 +352,22 @@ public class LineQuadRenderSystem extends LineRenderSystem {
         //for (int i = 0; i < n; i++)
         //    lpool.free(provLines.get(i));
         provLines.clear();
+    }
+
+    protected class DPool extends Pool<double[]> {
+
+        private int dsize;
+
+        public DPool(int initialCapacity, int max, int dsize) {
+            super(initialCapacity, max);
+            this.dsize = dsize;
+        }
+
+        @Override
+        protected double[] newObject() {
+            return new double[dsize];
+        }
+
     }
 
 }

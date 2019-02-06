@@ -26,7 +26,7 @@ import gaia.cu9.ari.gaiaorbit.util.coord.Coordinates;
 import gaia.cu9.ari.gaiaorbit.util.math.Vector3d;
 import gaia.cu9.ari.gaiaorbit.util.time.ITimeFrameProvider;
 
-public class MeshObject extends FadeNode implements IModelRenderable, I3DTextRenderable {
+public class MeshObject extends FadeNode implements IModelRenderable, I3DTextRenderable, IVisibilitySwitch {
 
     private String description;
     private String transformName;
