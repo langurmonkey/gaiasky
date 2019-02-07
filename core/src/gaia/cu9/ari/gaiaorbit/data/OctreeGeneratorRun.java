@@ -40,21 +40,21 @@ import java.util.Map;
 /**
  * Generates an octree of star groups. Each octant should have only one object,
  * a star group.
- * 
- * @author tsagrista
  *
+ * @author tsagrista
  */
 public class OctreeGeneratorRun {
     private static final Log logger = Logger.getLogger(OctreeGeneratorRun.class);
-    
+
     private static JCommander jc;
     private static String[] arguments;
 
     public static void main(String[] args) {
         arguments = args;
         OctreeGeneratorRun ogt = new OctreeGeneratorRun();
-        jc = new JCommander(ogt, args);
+        jc = JCommander.newBuilder().addObject(ogt).build();
         jc.setProgramName("OctreeGeneratorTest");
+        jc.parse(args);
         if (ogt.help) {
             jc.usage();
         } else {
@@ -62,13 +62,13 @@ public class OctreeGeneratorRun {
         }
     }
 
-    @Parameter(names = { "-l", "--loader" }, description = "Name of the star group loader class", required = true)
+    @Parameter(names = {"-l", "--loader"}, description = "Name of the star group loader class", required = true)
     private String loaderClass = null;
 
-    @Parameter(names = { "-i", "--input" }, description = "Location of the input catalog", required = true)
+    @Parameter(names = {"-i", "--input"}, description = "Location of the input catalog", required = true)
     private String input = null;
 
-    @Parameter(names = { "-o", "--output" }, description = "Output folder. Defaults to system temp")
+    @Parameter(names = {"-o", "--output"}, description = "Output folder. Defaults to system temp")
     private String outFolder;
 
     @Parameter(names = "--maxpart", description = "Maximum number of objects in an octant")
@@ -86,10 +86,10 @@ public class OctreeGeneratorRun {
     @Parameter(names = "--pllxzeropoint", description = "Zero point value for the parallax in mas")
     private double pllxzeropoint = 0d;
 
-    @Parameter(names = { "-c", "--magcorrections" }, description = "Flag to apply magnitude and color corrections for extinction and reddening")
+    @Parameter(names = {"-c", "--magcorrections"}, description = "Flag to apply magnitude and color corrections for extinction and reddening")
     private boolean magCorrections = false;
 
-    @Parameter(names = { "-p", "--postprocess" }, description = "Low object count nodes (<=100) will be merged with their parents if parents have less than 1000 objects. Avoids very large and mostly empty subtrees")
+    @Parameter(names = {"-p", "--postprocess"}, description = "Low object count nodes (<=100) will be merged with their parents if parents have less than 1000 objects. Avoids very large and mostly empty subtrees")
     private boolean postprocess = false;
 
     @Parameter(names = "--childcount", description = "If --postprocess is on, children nodes with less than --childcount objects and whose parents have less than --parentcount objects) will be merged with thier parents. Defaults to 100")
@@ -98,14 +98,14 @@ public class OctreeGeneratorRun {
     @Parameter(names = "--parentcount", description = "If --postprocess is on, children nodes with less than --childcount objects and whose parent has less than --parentcount objects will be merged with thier parents. Defaults to 1000")
     private long parentCount = 1000;
 
-    @Parameter(names = { "-s", "--suncentre", "--suncenter" }, description = "Make the Sun the centre of the octree")
+    @Parameter(names = {"-s", "--suncentre", "--suncenter"}, description = "Make the Sun the centre of the octree")
     private boolean sunCentre = false;
 
     @Parameter(names = "--nfiles", description = "Caps the number of data files to load. Defaults to unlimited")
     private int fileNumCap = -1;
 
-    @Parameter(names = { "--hip", "--addhip" }, description = "Add the Hipparcos catalog additionally to the provided by -l")
-    private boolean addHip = true;
+    @Parameter(names = {"--hip", "--addhip"}, description = "Add the Hipparcos catalog additionally to the catalog provided by -l")
+    private boolean addHip = false;
 
     @Parameter(names = "--xmatchfile", description = "Crossmatch file with source_id to hip, only if --hip is enabled")
     private String xmatchFile = null;
@@ -122,14 +122,14 @@ public class OctreeGeneratorRun {
     @Parameter(names = "--ruwe-file", description = "Location of gzipped file containing the RUWE value for each source id")
     private String ruweFile = null;
 
-    @Parameter(names = { "-h", "--help" }, help = true)
+    @Parameter(names = {"-h", "--help"}, help = true)
     private boolean help = false;
 
     protected Map<Long, float[]> colors;
 
     public OctreeGeneratorRun() {
         super();
-        colors = new HashMap<Long, float[]>();
+        colors = new HashMap<>();
     }
 
     public void run() {
@@ -197,9 +197,6 @@ public class OctreeGeneratorRun {
         //IOctreeGenerator og = new OctreeGeneratorPart(ogp);
         IOctreeGenerator og = new OctreeGeneratorMag(ogp);
 
-        /* HIP */
-        STILDataProvider stil = new STILDataProvider();
-
         /* CATALOG */
         String fullLoaderClass = "gaia.cu9.ari.gaiaorbit.data.group." + loaderClass;
         IStarGroupDataProvider loader = (IStarGroupDataProvider) Class.forName(fullLoaderClass).newInstance();
@@ -220,12 +217,14 @@ public class OctreeGeneratorRun {
         Array<StarBean> list;
 
         if (addHip) {
-            /* Load Hipparcos */
+            /* HIPPARCOS */
+            STILDataProvider stil = new STILDataProvider();
+
             Array<StarBean> listHip = (Array<StarBean>) stil.loadData("data/catalog/hipparcos/hip.vot");
             long[] cpmhip = stil.getCountsPerMag();
             combineCpm(cpm, cpmhip);
             Map<Integer, StarBean> hipMap = new HashMap<>();
-            for(StarBean star : listHip){
+            for (StarBean star : listHip) {
                 hipMap.put(star.hip(), star);
             }
 
