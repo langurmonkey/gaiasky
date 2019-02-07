@@ -1,10 +1,5 @@
 #version 120
 
-#ifdef GL_ES
-precision mediump float;
-precision mediump int;
-#endif
-
 attribute vec3 a_position;
 uniform mat4 u_projViewTrans;
 uniform mat4 u_worldTrans;
