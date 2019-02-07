@@ -20,4 +20,12 @@ public class TwoWayHashmap<K extends Object, V extends Object> {
     public synchronized K getBackward(V key) {
         return backward.get(key);
     }
+
+    public synchronized boolean containsKey(K key){
+        return forward.containsKey(key);
+    }
+
+    public synchronized boolean containsValue(V value){
+        return backward.containsKey(value);
+    }
 }

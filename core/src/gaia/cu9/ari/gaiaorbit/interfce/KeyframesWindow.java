@@ -110,12 +110,95 @@ public class KeyframesWindow extends GenericDialog implements IObserver {
 
     private float buttonSize, buttonSizeL;
 
+    /**
+     * Contains info on field currently being edited
+     */
+    private class Editing{
+        private int type = -1;
+        private Keyframe kf;
+        private int index;
+        private OwnTextField tf;
+        private Map<String, Object> map;
+
+        public Editing(){
+            map = new HashMap<>();
+        }
+
+        public boolean notEmpty(){
+            return tf != null;
+        }
+
+        public boolean isEmpty(){
+            return tf == null;
+        }
+
+        public void revert(){
+            if(isName()){
+                addFrameName(kf, index, keyframesTable);
+            }else if(isSeconds()){
+                addFrameSeconds(kf, (Double) map.get("prevT"), index, keyframesTable);
+            }
+        }
+
+        public void setParam(String key, Object value){
+            map.put(key, value);
+        }
+
+        public boolean isName(){
+            return !isEmpty() && type == 1;
+        }
+
+        public boolean isSeconds(){
+            return !isEmpty() && type == 0;
+        }
+
+        public void set(Keyframe kf, int idx, OwnTextField tf){
+            this.kf = kf;
+            this.index = idx;
+            this.tf = tf;
+        }
+
+        public void setName(Keyframe kf, int idx, OwnTextField tf){
+            type = 1;
+            set(kf, idx, tf);
+        }
+
+        public void setSeconds(Keyframe kf, int idx, OwnTextField tf, double prevT){
+            type = 0;
+            setParam("prevT", prevT);
+            set(kf, idx, tf);
+        }
+
+        public void unset(){
+            type = -1;
+            kf = null;
+            index = -1;
+            tf = null;
+            map.clear();
+        }
+
+        public Keyframe kf(){
+            return kf;
+        }
+
+        public int index(){
+            return index;
+        }
+
+        public OwnTextField tf(){
+            return tf;
+        }
+
+    }
+    private Editing editing;
+
     public KeyframesWindow(Stage stage, Skin skin) {
         super(txt("gui.keyframes.title"), skin, stage);
 
         buttonSize = 15 * GlobalConf.SCALE_FACTOR;
         buttonSizeL = 17 * GlobalConf.SCALE_FACTOR;
 
+        this.editing = new Editing();
         this.keyframes = new Array<>();
         this.secondsCells = new HashMap<>();
         this.namesCells = new HashMap<>();
@@ -500,7 +583,7 @@ public class KeyframesWindow extends GenericDialog implements IObserver {
     private Cell addFrameSeconds(Keyframe kf, double prevT, int index, Table table) {
         // Seconds
         OwnLabel secondsL = new OwnLabel(secondsFormatter.format(prevT + kf.seconds), skin, "hud-header");
-        secondsL.setWidth((GlobalConf.SCALE_FACTOR > 1.5f ? 60 : 75) * GlobalConf.SCALE_FACTOR);
+        secondsL.setWidth((GlobalConf.SCALE_FACTOR > 1.5f ? 60f : 75f) * GlobalConf.SCALE_FACTOR);
         Cell secondsCell;
         if (secondsCells.containsKey(kf))
             secondsCell = secondsCells.get(kf);
@@ -516,17 +599,23 @@ public class KeyframesWindow extends GenericDialog implements IObserver {
                 if (event instanceof InputEvent) {
                     InputEvent ie = (InputEvent) event;
                     if (ie.getType().equals(InputEvent.Type.touchDown)) {
+                        if(editing.notEmpty()){
+                            // Remove current
+                            editing.revert();
+                            editing.unset();
+                        }
                         String valText = secondsL.getText().toString();
                         secondsL.clear();
                         secondsCells.get(kf).clearActor();
                         OwnTextField secondsInput = new OwnTextField(valText, skin, new FloatValidator(0.0001f, 500f));
-                        secondsInput.setWidth(55 * GlobalConf.SCALE_FACTOR);
+                        secondsInput.setWidth((GlobalConf.SCALE_FACTOR > 1.5f ? 55f : 75f) * GlobalConf.SCALE_FACTOR);
                         secondsInput.selectAll();
                         stage.setKeyboardFocus(secondsInput);
+                        editing.setSeconds(kf, index, secondsInput, prevT);
                         secondsInput.addListener((evt) -> {
                             if (secondsInput.isValid() && evt instanceof InputEvent && System.currentTimeMillis() - lastMs > 1500) {
                                 InputEvent ievt = (InputEvent) evt;
-                                if (ievt.getKeyCode() == Input.Keys.ENTER || ievt.getKeyCode() == Input.Keys.ESCAPE) {
+                                if (ievt.getType () == InputEvent.Type.keyDown && (ievt.getKeyCode() == Input.Keys.ENTER || ievt.getKeyCode() == Input.Keys.ESCAPE)) {
                                     double val = Double.parseDouble(secondsInput.getText());
                                     double t = 0;
                                     for (Keyframe k : keyframes) {
@@ -543,6 +632,7 @@ public class KeyframesWindow extends GenericDialog implements IObserver {
                                             reinitialiseKeyframes(keyframes, null);
                                         });
                                     }
+                                    editing.unset();
                                 }
                             }
                             evt.setBubbles(false);
@@ -560,7 +650,7 @@ public class KeyframesWindow extends GenericDialog implements IObserver {
     private Cell addFrameName(Keyframe kf, int index, Table table) {
         // Seconds
         OwnLabel nameL = new OwnLabel((index + 1) + ": " + kf.name, skin);
-        nameL.setWidth((GlobalConf.SCALE_FACTOR > 1.5f ? 100 : 130) * GlobalConf.SCALE_FACTOR);
+        nameL.setWidth((GlobalConf.SCALE_FACTOR > 1.5f ? 100f : 130f) * GlobalConf.SCALE_FACTOR);
         Cell nameCell;
         if (namesCells.containsKey(kf))
             nameCell = namesCells.get(kf);
@@ -576,6 +666,11 @@ public class KeyframesWindow extends GenericDialog implements IObserver {
             if (event instanceof InputEvent) {
                 InputEvent ie = (InputEvent) event;
                 if (ie.getType().equals(InputEvent.Type.touchDown)) {
+                    if(editing.notEmpty()){
+                        // Remove current
+                        editing.revert();
+                        editing.unset();
+                    }
                     String valText = nameL.getText().toString();
                     valText = valText.substring(valText.indexOf(":") + 2);
                     nameL.clear();
@@ -584,15 +679,17 @@ public class KeyframesWindow extends GenericDialog implements IObserver {
                     LengthValidator lengthValidator = new LengthValidator(0, 15);
                     RegexpValidator nameValidator = new RegexpValidator(lengthValidator, "^[^*&%\\+\\=\\\\\\/@#\\$&\\*()~]*$");
                     OwnTextField nameInput = new OwnTextField(valText, skin, nameValidator);
-                    nameInput.setWidth(55 * GlobalConf.SCALE_FACTOR);
+                    nameInput.setWidth((GlobalConf.SCALE_FACTOR > 1.5f ? 100f : 130f) * GlobalConf.SCALE_FACTOR);
                     nameInput.selectAll();
                     stage.setKeyboardFocus(nameInput);
+                    editing.setName(kf, index, nameInput);
                     nameInput.addListener((evt) -> {
                         if (nameInput.isValid() && evt instanceof InputEvent && System.currentTimeMillis() - lastMs > 1500) {
                             InputEvent ievt = (InputEvent) evt;
-                            if (ievt.getKeyCode() == Input.Keys.ENTER) {
+                            if (ievt.getType() == InputEvent.Type.keyDown && (ievt.getKeyCode() == Input.Keys.ENTER || ievt.getKeyCode() == Input.Keys.ESCAPE)) {
                                 kf.name = nameInput.getText();
                                 addFrameName(kf, index, table);
+                                editing.unset();
                             }
                         }
                         evt.setBubbles(false);

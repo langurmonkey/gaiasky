@@ -326,6 +326,46 @@ public class GlobalResources {
         return l;
     }
 
+    /**
+     * Recursively count files in a directory
+     * @param dir The directory
+     * @return The number of files
+     * @throws IOException
+     */
+    public static long fileCount(Path dir) throws IOException {
+        return fileCount(dir, null);
+    }
+
+    /**
+     * Count files matching a certain ending in a directory, recursively
+     * @param dir The directory
+     * @return The number of files
+     * @throws IOException
+     */
+    public static long fileCount(Path dir, String[] extensions) throws IOException {
+        return Files.walk(dir)
+                .parallel()
+                .filter(p -> (!p.toFile().isDirectory() && endsWith(p.toFile().getName(), extensions)))
+                .count();
+    }
+
+    /**
+     * Returns true if the string ends with any of the endings
+     * @param s The string
+     * @param endings The endings
+     * @return True if the string ends with any of the endings
+     */
+    public static boolean endsWith(String s, String[] endings){
+        if(endings == null){
+            return true;
+        }
+        for(String ending : endings){
+            if(s.endsWith(ending))
+                return true;
+        }
+        return false;
+    }
+
     public static boolean isNumeric(String str) {
         for (char c : str.toCharArray()) {
             if (!Character.isDigit(c))

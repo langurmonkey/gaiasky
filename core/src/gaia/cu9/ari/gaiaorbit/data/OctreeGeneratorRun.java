@@ -197,10 +197,10 @@ public class OctreeGeneratorRun {
         //IOctreeGenerator og = new OctreeGeneratorPart(ogp);
         IOctreeGenerator og = new OctreeGeneratorMag(ogp);
 
-        /** HIP **/
+        /* HIP */
         STILDataProvider stil = new STILDataProvider();
 
-        /** CATALOG **/
+        /* CATALOG */
         String fullLoaderClass = "gaia.cu9.ari.gaiaorbit.data.group." + loaderClass;
         IStarGroupDataProvider loader = (IStarGroupDataProvider) Class.forName(fullLoaderClass).newInstance();
         loader.setParallaxErrorFactorFaint(pllxerrfaint);
@@ -214,18 +214,22 @@ public class OctreeGeneratorRun {
         loader.setRUWECap(ruwe);
         long[] cpm = loader.getCountsPerMag();
 
-        /** LOAD CATALOG **/
+        /* LOAD CATALOG */
         @SuppressWarnings("unchecked")
         Array<StarBean> listGaia = (Array<StarBean>) loader.loadData(input);
         Array<StarBean> list;
 
         if (addHip) {
-            /** LOAD HYG **/
+            /* Load Hipparcos */
             Array<StarBean> listHip = (Array<StarBean>) stil.loadData("data/catalog/hipparcos/hip.vot");
             long[] cpmhip = stil.getCountsPerMag();
             combineCpm(cpm, cpmhip);
+            Map<Integer, StarBean> hipMap = new HashMap<>();
+            for(StarBean star : listHip){
+                hipMap.put(star.hip(), star);
+            }
 
-            /** Check x-match file **/
+            /* Check x-match file */
             Map<Long, Integer> xmatchTable = null;
             if (xmatchFile != null && !xmatchFile.isEmpty()) {
                 // Load xmatchTable
@@ -233,13 +237,29 @@ public class OctreeGeneratorRun {
             }
             int gaianum = listGaia.size;
             int gaiahits = 0;
-            for (StarBean s : listGaia) {
+            for (StarBean gaiaStar : listGaia) {
                 // Check if star is also in HYG catalog
-                if ((xmatchTable == null || (xmatchTable != null && !xmatchTable.containsKey(s.id)))) {
+                if ((xmatchTable == null || (xmatchTable != null && !xmatchTable.containsKey(gaiaStar.id)))) {
                     // No hit, add to main list
-                    listHip.add(s);
+                    listHip.add(gaiaStar);
                 } else {
-                    // Keep HIP star, ignore Gaia star
+                    // Update hipStar using gaiaStar data
+                    int hipNum = xmatchTable.get(gaiaStar.id);
+                    StarBean hipStar = hipMap.get(hipNum);
+                    hipStar.id = gaiaStar.id;
+                    hipStar.data[StarBean.I_X] = gaiaStar.x();
+                    hipStar.data[StarBean.I_Y] = gaiaStar.y();
+                    hipStar.data[StarBean.I_Z] = gaiaStar.z();
+                    hipStar.data[StarBean.I_PMX] = gaiaStar.pmx();
+                    hipStar.data[StarBean.I_PMY] = gaiaStar.pmy();
+                    hipStar.data[StarBean.I_PMZ] = gaiaStar.pmz();
+                    hipStar.data[StarBean.I_MUALPHA] = gaiaStar.mualpha();
+                    hipStar.data[StarBean.I_MUDELTA] = gaiaStar.mudelta();
+                    hipStar.data[StarBean.I_RADVEL] = gaiaStar.radvel();
+                    hipStar.data[StarBean.I_APPMAG] = gaiaStar.appmag();
+                    hipStar.data[StarBean.I_ABSMAG] = gaiaStar.absmag();
+                    hipStar.data[StarBean.I_COL] = gaiaStar.col();
+                    hipStar.data[StarBean.I_SIZE] = gaiaStar.size();
                     gaiahits++;
                 }
             }
@@ -250,7 +270,6 @@ public class OctreeGeneratorRun {
 
             // Free some memory
             listGaia.clear();
-            listGaia = null;
         } else {
             list = listGaia;
         }
@@ -363,7 +382,7 @@ public class OctreeGeneratorRun {
         File xm = new File(xmatchFile);
         if (xm.exists()) {
             try {
-                Map<Long, Integer> map = new HashMap<Long, Integer>();
+                Map<Long, Integer> map = new HashMap<>();
                 BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(xm)));
                 // Skip header line
                 br.readLine();
