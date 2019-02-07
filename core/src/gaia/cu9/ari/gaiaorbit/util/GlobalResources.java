@@ -4,6 +4,7 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.graphics.Cursor;
 import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
@@ -46,10 +47,8 @@ public class GlobalResources {
     public static ShaderProgram spriteShader;
     /** Global all-purpose sprite batch **/
     public static SpriteBatch spriteBatch;
-    /** Cursor file **/
-    public static String cursorFile;
-    /** Link cursor **/
-    public static Pixmap linkCursor;
+    /** Cursors **/
+    public static Cursor linkCursor, resizeXCursor, resizeYCursor;
     /** The global skin **/
     public static Skin skin;
 
@@ -85,21 +84,23 @@ public class GlobalResources {
     }
 
     public static void updateSkin() {
-        initLinkCursor();
+        initCursors();
         FileHandle fh = Gdx.files.internal("skins/" + GlobalConf.program.UI_THEME + "/" + GlobalConf.program.UI_THEME + ".json");
         skin = new Skin(fh);
     }
 
-    private static void initLinkCursor(){
+    private static void initCursors(){
         // Create skin right now, it is needed.
         if (GlobalConf.program.UI_THEME.endsWith("-x2")) {
             GlobalConf.updateScaleFactor(2.0f);
-            // Cursor for links
-            linkCursor = new Pixmap(Gdx.files.internal("img/cursor-link-x2.png"));
+            linkCursor = Gdx.graphics.newCursor(new Pixmap(Gdx.files.internal("img/cursor-link-x2.png")), 8, 0);
+            resizeXCursor = Gdx.graphics.newCursor(new Pixmap(Gdx.files.internal("img/cursor-resizex-x2.png")), 16, 16);
+            resizeYCursor = Gdx.graphics.newCursor(new Pixmap(Gdx.files.internal("img/cursor-resizey-x2.png")), 16, 16);
         } else {
             GlobalConf.updateScaleFactor(1.0f);
-            // Cursor for links
-            linkCursor = new Pixmap(Gdx.files.internal("img/cursor-link.png"));
+            linkCursor = Gdx.graphics.newCursor(new Pixmap(Gdx.files.internal("img/cursor-link.png")), 4, 0);
+            resizeXCursor = Gdx.graphics.newCursor(new Pixmap(Gdx.files.internal("img/cursor-resizex.png")), 8, 8);
+            resizeYCursor = Gdx.graphics.newCursor(new Pixmap(Gdx.files.internal("img/cursor-resizey.png")), 8, 8);
         }
 
     }

@@ -67,7 +67,7 @@ public abstract class GenericDialog extends CollapsibleWindow {
         this.stage = stage;
         this.me = this;
         this.content = new Table(skin);
-        this.scrolls = new Array<OwnScrollPane>(5);
+        this.scrolls = new Array<>(5);
     }
 
     protected void setAcceptText(String acceptText) {
@@ -134,8 +134,12 @@ public abstract class GenericDialog extends CollapsibleWindow {
         recalculateButtonSize();
 
         add(content).pad(pad).row();
+        add().expandY().bottom().row();
         add(buttonGroup).pad(pad).bottom().right();
         getTitleTable().align(Align.left);
+
+        // Align top left
+        align(Align.top | Align.left);
 
         pack();
 
@@ -146,23 +150,23 @@ public abstract class GenericDialog extends CollapsibleWindow {
                 if (ievent.getType() == Type.keyUp) {
                     int key = ievent.getKeyCode();
                     switch (key) {
-                    case Keys.ESCAPE:
-                        // Exit
-                        cancel();
-                        if (cancelRunnable != null)
-                            cancelRunnable.run();
-                        me.hide();
-                        return true;
-                    case Keys.ENTER:
-                        // Exit
-                        accept();
-                        if (acceptRunnable != null)
-                            acceptRunnable.run();
-                        me.hide();
-                        return true;
-                    default:
-                        // Nothing
-                        break;
+                        case Keys.ESCAPE:
+                            // Exit
+                            cancel();
+                            if (cancelRunnable != null)
+                                cancelRunnable.run();
+                            me.hide();
+                            return true;
+                        case Keys.ENTER:
+                            // Exit
+                            accept();
+                            if (acceptRunnable != null)
+                                acceptRunnable.run();
+                            me.hide();
+                            return true;
+                        default:
+                            // Nothing
+                            break;
                     }
                 }
             }
@@ -191,23 +195,20 @@ public abstract class GenericDialog extends CollapsibleWindow {
         };
 
         /** CAPTURE SCROLL FOCUS **/
-        stage.addListener(new EventListener() {
-            @Override
-            public boolean handle(Event event) {
-                if (event instanceof InputEvent) {
-                    InputEvent ie = (InputEvent) event;
+        stage.addListener(event -> {
+            if (event instanceof InputEvent) {
+                InputEvent ie = (InputEvent) event;
 
-                    if (ie.getType() == Type.mouseMoved) {
-                        for (OwnScrollPane scroll : scrolls) {
-                            if (ie.getTarget().isDescendantOf(scroll)) {
-                                stage.setScrollFocus(scroll);
-                            }
+                if (ie.getType() == Type.mouseMoved) {
+                    for (OwnScrollPane scroll : scrolls) {
+                        if (ie.getTarget().isDescendantOf(scroll)) {
+                            stage.setScrollFocus(scroll);
                         }
-                        return true;
                     }
+                    return true;
                 }
-                return false;
             }
+            return false;
         });
 
         // Build actual content

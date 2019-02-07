@@ -224,6 +224,8 @@ public class KeyframesWindow extends GenericDialog implements IObserver {
 
         EventManager.instance.post(Events.SCENE_GRAPH_ADD_OBJECT_CMD, keyframesPathObject, false);
 
+        // Resizable
+        setResizable(false, true);
     }
 
     @Override
@@ -283,13 +285,14 @@ public class KeyframesWindow extends GenericDialog implements IObserver {
 
         // ADD SCROLL
         rightScroll = new OwnScrollPane(keyframesTable, skin, "minimalist-nobg");
+        rightScroll.setExpand(true);
         rightScroll.setScrollingDisabled(true, false);
         rightScroll.setHeight((GlobalConf.SCALE_FACTOR > 1.5f ? 100 : 110) * GlobalConf.SCALE_FACTOR);
         rightScroll.setWidth((GlobalConf.SCALE_FACTOR > 1.5f ? 360 : 390) * GlobalConf.SCALE_FACTOR);
         rightScroll.setFadeScrollBars(true);
 
         right.add(keyframesTitle).top().left().padBottom(pad).row();
-        right.add(rightScroll).top().left();
+        right.add(rightScroll).center().left();
 
         right.pack();
 
@@ -304,43 +307,38 @@ public class KeyframesWindow extends GenericDialog implements IObserver {
         open.addListener((event) -> {
             if (event instanceof ChangeListener.ChangeEvent) {
                 FileChooser fc = FileChooser.createPickDialog(txt("gui.download.pickloc"), skin, new FileHandle(SysUtils.getDefaultCameraDir()));
-                fc.setResultListener(new FileChooser.ResultListener() {
-                    @Override
-                    public boolean result(boolean success, FileHandle result) {
-                        if (success) {
-                            if (result.file().exists() && result.file().isFile()) {
-                                // Load selected file
-                                try {
-                                    Array<Keyframe> kfs = CameraKeyframeManager.instance.loadKeyframesFile(result.file());
-                                    // Update current instance
-                                    reinitialiseKeyframes(kfs, null);
-                                    keyframesPathObject.unselect();
-                                    lastKeyframeFileName = result.file().getName();
-                                    logger.info(txt("gui.keyframes.load.success", keyframes.size, result.file().getName()));
-                                } catch (RuntimeException e) {
-                                    logger.error(txt("gui.keyframes.load.error", result.file().getName()), e);
-                                    Label warn = new OwnLabel(txt("error.loading.format", result.file().getName()), skin);
-                                    warn.setColor(1f, .4f, .4f, 1f);
-                                    notice.setActor(warn);
-                                    return false;
-                                }
-
-                            } else {
-                                logger.error(txt("error.loading.notexistent", result.file().getName()));
-                                Label warn = new OwnLabel(txt("error.loading.notexistent", result.file().getName()), skin);
+                fc.setResultListener((success, result) -> {
+                    if (success) {
+                        if (result.file().exists() && result.file().isFile()) {
+                            // Load selected file
+                            try {
+                                Array<Keyframe> kfs = CameraKeyframeManager.instance.loadKeyframesFile(result.file());
+                                // Update current instance
+                                reinitialiseKeyframes(kfs, null);
+                                keyframesPathObject.unselect();
+                                lastKeyframeFileName = result.file().getName();
+                                logger.info(txt("gui.keyframes.load.success", keyframes.size, result.file().getName()));
+                            } catch (RuntimeException e) {
+                                logger.error(txt("gui.keyframes.load.error", result.file().getName()), e);
+                                Label warn = new OwnLabel(txt("error.loading.format", result.file().getName()), skin);
                                 warn.setColor(1f, .4f, .4f, 1f);
                                 notice.setActor(warn);
                                 return false;
                             }
+
+                        } else {
+                            logger.error(txt("error.loading.notexistent", result.file().getName()));
+                            Label warn = new OwnLabel(txt("error.loading.notexistent", result.file().getName()), skin);
+                            warn.setColor(1f, .4f, .4f, 1f);
+                            notice.setActor(warn);
+                            return false;
                         }
-                        notice.clearActor();
-                        return true;
                     }
+                    notice.clearActor();
+                    return true;
                 });
 
-                fc.setFilter((pathname) -> {
-                    return pathname.isFile() && pathname.getName().endsWith(".gkf");
-                });
+                fc.setFilter((pathname) -> pathname.isFile() && pathname.getName().endsWith(".gkf"));
                 fc.show(stage);
                 return true;
             }
@@ -428,11 +426,10 @@ public class KeyframesWindow extends GenericDialog implements IObserver {
 
         /** FINAL LAYOUT **/
         content.add(left).top().left().padRight(pad * 2f).padBottom(pad * 3f);
-        content.add(right).width(370 * GlobalConf.SCALE_FACTOR).top().left().padBottom(pad * 3f).row();
+        content.add(right).width(370 * GlobalConf.SCALE_FACTOR).top().left().padBottom(pad).row();
         notice = content.add();
-        notice.padBottom(pad * 2f).center().colspan(2).row();
-        content.add(buttons).colspan(2).right().row();
-
+        notice.padBottom(pad).expandY().center().colspan(2).row();
+        content.add(buttons).colspan(2).bottom().right().row();
 
         // CLEAR
         OwnTextButton clear = new OwnTextButton(txt("gui.clear"), skin);
@@ -841,8 +838,6 @@ public class KeyframesWindow extends GenericDialog implements IObserver {
         rub.row();
         table.pack();
 
-        this.pack();
-
         if (addToModel && keyframesPathObject != null) {
             Gdx.app.postRunnable(() -> {
                 // Update model data
@@ -892,6 +887,7 @@ public class KeyframesWindow extends GenericDialog implements IObserver {
         if (cleanKeyframesList)
             keyframes.clear();
 
+        notice.clearActor();
         namesCells.clear();
         secondsCells.clear();
         keyframesTable.clearChildren();

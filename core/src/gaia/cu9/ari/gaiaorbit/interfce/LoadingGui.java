@@ -5,8 +5,6 @@ import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.Texture.TextureFilter;
-import com.badlogic.gdx.scenes.scene2d.Event;
-import com.badlogic.gdx.scenes.scene2d.EventListener;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Button;
 import com.badlogic.gdx.scenes.scene2d.ui.Container;
@@ -16,7 +14,6 @@ import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener.ChangeEvent;
 import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
-
 import gaia.cu9.ari.gaiaorbit.event.EventManager;
 import gaia.cu9.ari.gaiaorbit.event.Events;
 import gaia.cu9.ari.gaiaorbit.util.GlobalConf;
@@ -75,22 +72,18 @@ public class LoadingGui extends AbstractGui {
         bottom.add(new OwnLabel(GlobalConf.version.version + " - build " + GlobalConf.version.build, skin, "hud-med"));
         
         // SCREEN MODE BUTTON - TOP RIGHT
-        screenMode = new Container<Button>();
+        screenMode = new Container<>();
         screenMode.setFillParent(true);
         screenMode.top().right();
         screenMode.pad(pad10);
         OwnTextIconButton screenModeButton = new OwnTextIconButton("", skin, "screen-mode");
-        screenModeButton.setCursor(GlobalResources.linkCursor);
-        screenModeButton.addListener(new EventListener() {
-            @Override
-            public boolean handle(Event event) {
-                if (event instanceof ChangeEvent) {
-                    GlobalConf.screen.FULLSCREEN = !GlobalConf.screen.FULLSCREEN;
-                    EventManager.instance.post(Events.SCREEN_MODE_CMD);
-                    return true;
-                }
-                return false;
+        screenModeButton.addListener(event -> {
+            if (event instanceof ChangeEvent) {
+                GlobalConf.screen.FULLSCREEN = !GlobalConf.screen.FULLSCREEN;
+                EventManager.instance.post(Events.SCREEN_MODE_CMD);
+                return true;
             }
+            return false;
         });
         screenMode.setActor(screenModeButton);
 
