@@ -6,7 +6,7 @@ attribute vec4 a_color;
 uniform mat4 u_worldTransform;
 uniform mat4 u_projModelView;
 uniform vec3 u_parentPos;
-uniform float u_pointSize = 1f;
+uniform float u_pointSize;
 
 varying vec4 v_col;
 
