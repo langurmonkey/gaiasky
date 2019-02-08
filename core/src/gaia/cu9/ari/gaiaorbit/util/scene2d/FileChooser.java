@@ -8,7 +8,6 @@ import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.InputEvent.Type;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.*;
-import com.badlogic.gdx.scenes.scene2d.ui.TextField.TextFieldListener;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.utils.Align;
@@ -45,27 +44,19 @@ public class FileChooser extends Dialog {
     private final TextButton ok;
     private final TextButton cancel;
 
-    private static final Comparator<FileListItem> dirListComparator = new Comparator<FileListItem>() {
-        @Override
-        public int compare(FileListItem file1, FileListItem file2) {
-            if (file1.file.isDirectory() && !file2.file.isDirectory()) {
-                return -1;
-            }
-            if (file1.file.isDirectory() && file2.file.isDirectory()) {
-                return file1.name.compareTo(file2.name);
-            }
-            if (!file1.file.isDirectory() && !file2.file.isDirectory()) {
-                return file1.name.compareTo(file2.name);
-            }
-            return 1;
+    private static final Comparator<FileListItem> dirListComparator = (file1, file2) -> {
+        if (file1.file.isDirectory() && !file2.file.isDirectory()) {
+            return -1;
         }
-    };
-    private FileFilter filter = new FileFilter() {
-        @Override
-        public boolean accept(File pathname) {
-            return true;
+        if (file1.file.isDirectory() && file2.file.isDirectory()) {
+            return file1.name.compareTo(file2.name);
         }
+        if (!file1.file.isDirectory() && !file2.file.isDirectory()) {
+            return file1.name.compareTo(file2.name);
+        }
+        return 1;
     };
+    private FileFilter filter = pathname -> true;
     private boolean directoryBrowsingEnabled = true;
 
     public FileChooser(String title, final Skin skin, FileHandle baseDir) {
@@ -105,12 +96,7 @@ public class FileChooser extends Dialog {
 
         fileNameInput = new TextField("", skin);
         fileNameLabel = new Label("File name:", skin);
-        fileNameInput.setTextFieldListener(new TextFieldListener() {
-            @Override
-            public void keyTyped(TextField textField, char c) {
-                result = textField.getText();
-            }
-        });
+        fileNameInput.setTextFieldListener((textField, c) -> result = textField.getText());
 
         getButtonTable().pad(10 * GlobalConf.SCALE_FACTOR);
 

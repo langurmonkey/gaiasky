@@ -39,7 +39,7 @@ import gaia.cu9.ari.gaiaorbit.util.I18n;
  * the title bar.
  *
  * @author Xoppa
- * @author langurmonkey
+ * @author Toni Sagrista
  **/
 public class CollapsibleWindow extends Window {
     private boolean collapsed, collapsing = false, expanding = false;

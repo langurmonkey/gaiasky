@@ -337,6 +337,10 @@ public abstract class GenericDialog extends CollapsibleWindow {
         this.acceptRunnable = r;
     }
 
+    public boolean hasAcceptRunnable(){
+        return acceptRunnable != null;
+    }
+
     /**
      * Sets the runnable which runs when cancel is clicked
      *
@@ -344,6 +348,10 @@ public abstract class GenericDialog extends CollapsibleWindow {
      */
     public void setCancelRunnable(Runnable r) {
         this.cancelRunnable = r;
+    }
+
+    public boolean hasCancelRunnable(){
+        return cancelRunnable != null;
     }
 
     /**

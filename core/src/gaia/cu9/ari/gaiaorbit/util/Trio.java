@@ -1,5 +1,13 @@
 package gaia.cu9.ari.gaiaorbit.util;
 
+/**
+ * Simple impelementation of a trio of objects.
+ * @param <A> First type
+ * @param <B> Second type
+ * @param <C> Third type
+ *
+ * @author Toni Sagrista
+ */
 public class Trio<A, B, C> {
     
     private A first;

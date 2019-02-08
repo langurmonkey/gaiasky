@@ -26,7 +26,7 @@ public class FontRenderSystem extends AbstractRenderSystem {
         super(rg, alphas, new ShaderProgram[] { program });
         this.batch = batch;
         // Init comparator
-        comp = new DistToCameraComparator<IRenderable>();
+        comp = new DistToCameraComparator<>();
         red = new float[] { 1f, 0f, 0f, 1f };
     }
 

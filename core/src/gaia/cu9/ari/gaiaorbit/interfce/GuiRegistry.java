@@ -204,7 +204,11 @@ public class GuiRegistry implements IObserver {
             // Treats windows that can appear in any GUI
             switch (event) {
                 case SHOW_QUIT_ACTION:
-                    (new QuitWindow(ui, skin)).show(ui);
+                    QuitWindow quit = new QuitWindow(ui, skin);
+                    if(data.length > 0){
+                        quit.setAcceptRunnable((Runnable) data[0]);
+                    }
+                    quit.show(ui);
                     break;
                 case SHOW_ABOUT_ACTION:
                     (new AboutWindow(ui, skin)).show(ui);

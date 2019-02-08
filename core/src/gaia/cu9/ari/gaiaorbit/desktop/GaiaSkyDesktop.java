@@ -246,10 +246,6 @@ public class GaiaSkyDesktop implements IObserver {
         launchMainApp();
     }
 
-    public void terminate() {
-        System.exit(0);
-    }
-
     public void launchMainApp() {
         LwjglApplicationConfiguration cfg = new LwjglApplicationConfiguration();
         LwjglApplicationConfiguration.disableAudio = false;

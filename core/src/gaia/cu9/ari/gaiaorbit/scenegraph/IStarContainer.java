@@ -4,6 +4,6 @@ import com.badlogic.gdx.utils.Disposable;
 
 public interface IStarContainer extends Disposable {
 
-    public int getStarCount();
+    int getStarCount();
 
 }

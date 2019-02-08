@@ -496,7 +496,6 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
 
     @Override
     public void dispose() {
-
         if (saveState)
             ConfInit.instance.persistGlobalConf(new File(System.getProperty("properties.file")));
 
@@ -523,7 +522,6 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
 
         // Dispose music manager
         MusicManager.dispose();
-
     }
 
     /**

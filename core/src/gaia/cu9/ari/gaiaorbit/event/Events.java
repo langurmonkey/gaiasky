@@ -381,6 +381,7 @@ public enum Events {
     SHOW_PREFERENCES_ACTION,
     SHOW_RUNSCRIPT_ACTION,
     SHOW_LAND_AT_LOCATION_ACTION,
+    /** Quit action, can contain optional Runnable to run on accept() **/
     SHOW_QUIT_ACTION,
     SHOW_KEYFRAMES_WINDOW_ACTION,
     SHOW_MINIMAP_WINDOW_ACTION,

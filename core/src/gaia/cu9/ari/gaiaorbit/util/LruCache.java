@@ -4,7 +4,7 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 
 /**
- * 
+ * Least Recently Used cache implementation
  * @author Toni Sagrista
  *
  * @param <A>
