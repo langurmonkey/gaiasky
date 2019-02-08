@@ -1,31 +1,25 @@
 package gaia.cu9.ari.gaiaorbit.data.group;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.util.HashMap;
-import java.util.Map;
-
-import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.utils.Array;
-
 import gaia.cu9.ari.gaiaorbit.scenegraph.ParticleGroup.ParticleBean;
 import gaia.cu9.ari.gaiaorbit.scenegraph.StarGroup.StarBean;
-import gaia.cu9.ari.gaiaorbit.util.Constants;
-import gaia.cu9.ari.gaiaorbit.util.GlobalConf;
-import gaia.cu9.ari.gaiaorbit.util.I18n;
-import gaia.cu9.ari.gaiaorbit.util.Logger;
+import gaia.cu9.ari.gaiaorbit.util.*;
 import gaia.cu9.ari.gaiaorbit.util.Logger.Log;
-import gaia.cu9.ari.gaiaorbit.util.Pair;
 import gaia.cu9.ari.gaiaorbit.util.color.ColourUtils;
 import gaia.cu9.ari.gaiaorbit.util.coord.AstroUtils;
 import gaia.cu9.ari.gaiaorbit.util.coord.Coordinates;
 import gaia.cu9.ari.gaiaorbit.util.math.MathUtilsd;
 import gaia.cu9.ari.gaiaorbit.util.math.Vector3d;
 import gaia.cu9.ari.gaiaorbit.util.parse.Parser;
+
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.util.HashMap;
+import java.util.Map;
 
 public class TGASDataProvider extends AbstractStarGroupDataProvider {
     private static Log logger = Logger.getLogger(TGASDataProvider.class);
@@ -131,7 +125,6 @@ public class TGASDataProvider extends AbstractStarGroupDataProvider {
                             /** PROPER MOTIONS in mas/yr **/
                             double mualphastar = Parser.parseDouble(tokens[5]);
                             double mudelta = Parser.parseDouble(tokens[6]);
-                            //double mualpha = mualphastar / Math.cos(Math.toRadians(dec));
 
                             /** RADIAL VELOCITY in km/s **/
                             double radvel = 0;
@@ -282,7 +275,7 @@ public class TGASDataProvider extends AbstractStarGroupDataProvider {
 
         }
 
-        return new Pair<Map<String, Float>, Map<String, Integer>>(colors, hips);
+        return new Pair<>(colors, hips);
     }
 
     private void addInfo(String line, Map<String, Float> colors, Map<String, Integer> hips, String split) {

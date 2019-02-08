@@ -234,8 +234,8 @@ public class OctreeGeneratorRun {
                 // Load xmatchTable
                 xmatchTable = readXmatchTable(xmatchFile);
             }
-            int gaianum = listGaia.size;
-            int gaiahits = 0;
+            int hipnum = listHip.size;
+            int starhits = 0;
             for (StarBean gaiaStar : listGaia) {
                 // Check if star is also in HYG catalog
                 if ((xmatchTable == null || (xmatchTable != null && !xmatchTable.containsKey(gaiaStar.id)))) {
@@ -243,8 +243,8 @@ public class OctreeGeneratorRun {
                     listHip.add(gaiaStar);
                 } else {
                     // Update hipStar using gaiaStar data
-                    int hipNum = xmatchTable.get(gaiaStar.id);
-                    StarBean hipStar = hipMap.get(hipNum);
+                    int hipId = xmatchTable.get(gaiaStar.id);
+                    StarBean hipStar = hipMap.get(hipId);
                     hipStar.id = gaiaStar.id;
                     hipStar.data[StarBean.I_X] = gaiaStar.x();
                     hipStar.data[StarBean.I_Y] = gaiaStar.y();
@@ -259,10 +259,10 @@ public class OctreeGeneratorRun {
                     hipStar.data[StarBean.I_ABSMAG] = gaiaStar.absmag();
                     hipStar.data[StarBean.I_COL] = gaiaStar.col();
                     hipStar.data[StarBean.I_SIZE] = gaiaStar.size();
-                    gaiahits++;
+                    starhits++;
                 }
             }
-            logger.info(gaiahits + " of " + gaianum + " Gaia stars discarded due to being matched to a HIP star");
+            logger.info(starhits + " of " + hipnum + " HIP stars' data updated due to being matched to a Gaia star");
 
             // Main list is listHip
             list = listHip;
@@ -388,9 +388,9 @@ public class OctreeGeneratorRun {
                 String line;
                 while ((line = br.readLine()) != null) {
                     String[] tokens = line.split(",");
-                    Long sourceid = Parser.parseLong(tokens[0]);
+                    Long sourceId = Parser.parseLong(tokens[0]);
                     Integer hip = Parser.parseInt(tokens[1]);
-                    map.put(sourceid, hip);
+                    map.put(sourceId, hip);
                 }
                 br.close();
                 return map;

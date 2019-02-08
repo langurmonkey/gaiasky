@@ -16,7 +16,9 @@ import gaia.cu9.ari.gaiaorbit.event.IObserver;
  */
 public class GuiRegistry implements IObserver {
 
-    /** Registered GUI array **/
+    /**
+     * Registered GUI array
+     **/
     private static Array<IGui> guis;
 
     static {
@@ -28,12 +30,18 @@ public class GuiRegistry implements IObserver {
      */
     public static Object guirenderlock = new Object();
 
-    /** Current GUI object **/
+    /**
+     * Current GUI object
+     **/
     public static IGui current;
-    /** Previous GUI object, if any **/
+    /**
+     * Previous GUI object, if any
+     **/
     public static IGui previous;
 
-    /** Global input multiplexer **/
+    /**
+     * Global input multiplexer
+     **/
     private static InputMultiplexer im = null;
 
     public static void setInputMultiplexer(InputMultiplexer im) {
@@ -165,10 +173,14 @@ public class GuiRegistry implements IObserver {
 
     private Skin skin;
 
-    /** Keyframes window **/
+    /**
+     * Keyframes window
+     **/
     private KeyframesWindow keyframesWindow;
 
-    /** Minimap window **/
+    /**
+     * Minimap window
+     **/
     private MinimapWindow minimapWindow;
 
     /**
@@ -191,38 +203,39 @@ public class GuiRegistry implements IObserver {
             Stage ui = current.getGuiStage();
             // Treats windows that can appear in any GUI
             switch (event) {
-            case SHOW_QUIT_ACTION:
-                (new QuitWindow(ui, skin)).show(ui);
-                break;
-            case SHOW_ABOUT_ACTION:
-                (new AboutWindow(ui, skin)).show(ui);
-                break;
-            case SHOW_PREFERENCES_ACTION:
-                (new PreferencesWindow(ui, skin)).show(ui);
-                break;
-            case TOGGLE_MINIMAP:
-                if(minimapWindow == null)
-                    minimapWindow = new MinimapWindow(ui, skin);
-                if(!minimapWindow.isVisible() || !minimapWindow.hasParent())
-                    minimapWindow.show(ui, Gdx.graphics.getWidth() - minimapWindow.getWidth(), Gdx.graphics.getHeight() - minimapWindow.getHeight());
-                else
-                    minimapWindow.hide();
-                break;
-            case SHOW_KEYFRAMES_WINDOW_ACTION:
-                if (keyframesWindow == null)
-                    keyframesWindow = new KeyframesWindow(ui, skin);
-                if (!keyframesWindow.isVisible() || !keyframesWindow.hasParent())
-                    keyframesWindow.show(ui, 0, 0);
-                break;
-            case UI_THEME_RELOAD_INFO:
-                if (keyframesWindow != null) {
-                    keyframesWindow.dispose();
-                    keyframesWindow = null;
-                }
-                this.skin = (Skin) data[0];
-                break;
-            default:
-                break;
+                case SHOW_QUIT_ACTION:
+                    (new QuitWindow(ui, skin)).show(ui);
+                    break;
+                case SHOW_ABOUT_ACTION:
+                    (new AboutWindow(ui, skin)).show(ui);
+                    break;
+                case SHOW_PREFERENCES_ACTION:
+                    (new PreferencesWindow(ui, skin)).show(ui);
+                    break;
+                case TOGGLE_MINIMAP:
+                    if (minimapWindow == null)
+                        minimapWindow = new MinimapWindow(ui, skin);
+                    if (!minimapWindow.isVisible() || !minimapWindow.hasParent())
+                        minimapWindow.show(ui, Gdx.graphics.getWidth() - minimapWindow.getWidth(), Gdx.graphics.getHeight() - minimapWindow.getHeight());
+                    else
+                        minimapWindow.hide();
+                    break;
+                case SHOW_KEYFRAMES_WINDOW_ACTION:
+                    if (keyframesWindow == null) {
+                        keyframesWindow = new KeyframesWindow(ui, skin);
+                    }
+                    if (!keyframesWindow.isVisible() || !keyframesWindow.hasParent())
+                        keyframesWindow.show(ui, 0, 0);
+                    break;
+                case UI_THEME_RELOAD_INFO:
+                    if (keyframesWindow != null) {
+                        keyframesWindow.dispose();
+                        keyframesWindow = null;
+                    }
+                    this.skin = (Skin) data[0];
+                    break;
+                default:
+                    break;
             }
         }
     }

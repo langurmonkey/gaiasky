@@ -227,7 +227,6 @@ public class DR2DataProvider extends AbstractStarGroupDataProvider {
                         /** PROPER MOTIONS in mas/yr **/
                         double mualphastar = Parser.parseDouble(tokens[indices[MUALPHA]]);
                         double mudelta = Parser.parseDouble(tokens[indices[MUDELTA]]);
-                        //double mualpha = mualphastar / Math.cos(decrad);
 
                         /** RADIAL VELOCITY in km/s **/
                         double radvel = Parser.parseDouble(tokens[indices[RADVEL]]);
@@ -368,7 +367,7 @@ public class DR2DataProvider extends AbstractStarGroupDataProvider {
     public Array<? extends ParticleBean> loadDataMapped(String file, double factor, int fileNumber, long totalFiles) {
         //logger.info(this.getClass().getSimpleName(), I18n.bundle.format("notif.datafile", fh.path()));
         boolean gz = file.endsWith(".gz");
-        String fileName = file.substring(file.lastIndexOf('/'));
+        String fileName = file.substring(file.lastIndexOf('/') + 1);
         FileChannel fc = null;
         try {
             fc = new RandomAccessFile(file, "r").getChannel();
@@ -387,7 +386,7 @@ public class DR2DataProvider extends AbstractStarGroupDataProvider {
             loadFileIs(data, factor, addedStars, discardedStars);
 
             if (fileNumber >= 0 && totalFiles >= 0)
-                logger.info("{" + fileNumber + "/" + totalFiles + " (" + nf.format((double) fileNumber * 100d / (double) totalFiles) + "%)} " + fileName + " --> " + addedStars.value + "/" + (addedStars.value + discardedStars.value) + " stars (" + nf.format(100d * (double) addedStars.value / (double) (addedStars.value + discardedStars.value)) + "%)");
+                logger.info(fileNumber + "/" + totalFiles + " (" + nf.format((double) fileNumber * 100d / (double) totalFiles) + "%): " + fileName + " --> " + addedStars.value + "/" + (addedStars.value + discardedStars.value) + " stars (" + nf.format(100d * (double) addedStars.value / (double) (addedStars.value + discardedStars.value)) + "%)");
             else
                 logger.info(fileName + " --> " + addedStars.value + "/" + (addedStars.value + discardedStars.value) + " stars (" + nf.format(100d * (double) addedStars.value / (double) (addedStars.value + discardedStars.value)) + "%)");
 
