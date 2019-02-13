@@ -35,6 +35,7 @@ import java.io.*;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
 
 /**
@@ -211,6 +212,16 @@ public class OctreeGeneratorRun {
         loader.setRUWECap(ruwe);
         long[] cpm = loader.getCountsPerMag();
 
+        Map<Long, Integer> xmatchTable = null;
+        if (addHip && xmatchFile != null && !xmatchFile.isEmpty()) {
+            // Load xmatchTable
+            xmatchTable = readXmatchTable(xmatchFile);
+            if(!xmatchTable.isEmpty()){
+                // IDs which must be loaded regardless (we need them to update x-matched HIP stars)
+                loader.setMustLoadIds(new HashSet<>(xmatchTable.keySet()));
+            }
+        }
+
         /* LOAD CATALOG */
         @SuppressWarnings("unchecked")
         Array<StarBean> listGaia = (Array<StarBean>) loader.loadData(input);
@@ -229,16 +240,11 @@ public class OctreeGeneratorRun {
             }
 
             /* Check x-match file */
-            Map<Long, Integer> xmatchTable = null;
-            if (xmatchFile != null && !xmatchFile.isEmpty()) {
-                // Load xmatchTable
-                xmatchTable = readXmatchTable(xmatchFile);
-            }
             int hipnum = listHip.size;
             int starhits = 0;
             for (StarBean gaiaStar : listGaia) {
                 // Check if star is also in HYG catalog
-                if ((xmatchTable == null || (xmatchTable != null && !xmatchTable.containsKey(gaiaStar.id)))) {
+                if (xmatchTable == null || !xmatchTable.containsKey(gaiaStar.id)) {
                     // No hit, add to main list
                     listHip.add(gaiaStar);
                 } else {
@@ -393,6 +399,7 @@ public class OctreeGeneratorRun {
                     map.put(sourceId, hip);
                 }
                 br.close();
+                logger.error("Cross-match table read: " + xmatchFile);
                 return map;
             } catch (Exception e) {
                 logger.error(e);

@@ -181,6 +181,11 @@ public class DR2DataProvider extends AbstractStarGroupDataProvider {
 
         // Check that parallax exists (5-param solution), otherwise we have no distance
         if (!tokens[indices[PLLX]].isEmpty()) {
+            /** ID **/
+            long sourceid = Parser.parseLong(tokens[indices[SOURCE_ID]]);
+            boolean mustLoad = mustLoad(sourceid);
+
+            /** PARALLAX **/
             // Add the zero point to the parallax
             double pllx = Parser.parseDouble(tokens[indices[PLLX]]) + parallaxZeroPoint;
             //pllx = 0.0200120072;
@@ -188,18 +193,15 @@ public class DR2DataProvider extends AbstractStarGroupDataProvider {
             double appmag = Parser.parseDouble(tokens[indices[G_MAG]]);
 
             // Keep only stars with relevant parallaxes
-            if (acceptParallax(appmag, pllx, pllxerr)) {
-                /** ID **/
-                long sourceid = Parser.parseLong(tokens[indices[SOURCE_ID]]);
+            if (mustLoad || acceptParallax(appmag, pllx, pllxerr)) {
 
                 /** DISTANCE **/
                 double distpc = (1000d / pllx);
                 double geodistpc = getGeoDistance(sourceid);
 
-                if (!ruwe.isNaN()) {
+                if (!mustLoad && !ruwe.isNaN()) {
                     // RUWE test!
                     float ruweVal = getRuweValue(sourceid);
-
                     if (ruweVal > ruwe) {
                         // Do not accept
                         return false;
@@ -207,10 +209,10 @@ public class DR2DataProvider extends AbstractStarGroupDataProvider {
                 }
 
                 // If we have geometric distances, we only accept those, otherwise, accept all
-                if (!hasGeoDistances() || (hasGeoDistances() && hasGeoDistance(sourceid))) {
+                if (mustLoad || !hasGeoDistances() || (hasGeoDistances() && hasGeoDistance(sourceid))) {
                     distpc = geodistpc > 0 ? geodistpc : distpc;
 
-                    if (acceptDistance(distpc)) {
+                    if (mustLoad || acceptDistance(distpc)) {
 
                         double dist = distpc * Constants.PC_TO_U;
 

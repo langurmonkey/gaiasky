@@ -2,6 +2,8 @@ package gaia.cu9.ari.gaiaorbit.data.group;
 
 import com.badlogic.gdx.utils.LongMap;
 
+import java.util.Set;
+
 /**
  * Data provider for a star group, which contains an index map with the names
  * and indices of the stars.
@@ -91,4 +93,12 @@ public interface IStarGroupDataProvider extends IParticleGroupDataProvider {
      * Gets the star counts per magnitude
      **/
     long[] getCountsPerMag();
+
+
+    /**
+     * Adds a set with all the ids which will be loaded regardless of any other
+     * conditions (i.e. parallax error thresholds)
+     * @param ids The ids that must be loaded
+     */
+    void setMustLoadIds(Set<Long>ids);
 }
