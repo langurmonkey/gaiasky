@@ -79,7 +79,7 @@ public class STILDataProvider extends AbstractStarGroupDataProvider {
                 if (Double.isNaN(num)) {
                     throw new Exception();
                 }
-                return new Pair<UCD, Double>(ucd, num);
+                return new Pair<>(ucd, num);
             } catch (Exception e) {
                 // not working, try next
             }
@@ -97,7 +97,7 @@ public class STILDataProvider extends AbstractStarGroupDataProvider {
         for (UCD ucd : ucds) {
             try {
                 String str = row[ucd.index].toString();
-                return new Pair<UCD, String>(ucd, str);
+                return new Pair<>(ucd, str);
             } catch (Exception e) {
                 // not working, try next
             }
@@ -130,7 +130,7 @@ public class STILDataProvider extends AbstractStarGroupDataProvider {
                 long rowcount = table.getRowCount();
                 for (long i = 0; i < rowcount; i++) {
                     Object[] row = table.getRow(i);
-
+                    boolean skip = false;
                     try {
                         /** POSITION **/
                         Pair<UCD, Double> a = getDoubleUcd(ucdp.POS1, row);
@@ -139,7 +139,7 @@ public class STILDataProvider extends AbstractStarGroupDataProvider {
                         String unitc;
 
                         if (ucdp.POS3.isEmpty() || getDoubleUcd(ucdp.POS3, row) == null) {
-                            c = new Pair<UCD, Double>(null, 0.04);
+                            c = new Pair<>(null, 0.04);
                             unitc = "mas";
                         } else {
                             c = getDoubleUcd(ucdp.POS3, row);
@@ -147,7 +147,15 @@ public class STILDataProvider extends AbstractStarGroupDataProvider {
                         }
 
                         PositionType pt = ucdp.getPositionType(a.getFirst(), b.getFirst(), c.getFirst());
+                        // Check negative parallaxes. What to do?
+                        // Simply ignore object
+                        if(pt.isParallax() && c.getSecond() <= 0){
+                            skip = true;
+                        }
+
                         Position p = new Position(a.getSecond(), a.getFirst().unit, b.getSecond(), b.getFirst().unit, c.getSecond(), unitc, pt);
+
+
                         double distpc = p.gsposition.len();
                         p.gsposition.scl(Constants.PC_TO_U);
                         // Find out RA/DEC/Dist
@@ -155,7 +163,7 @@ public class STILDataProvider extends AbstractStarGroupDataProvider {
                         Coordinates.cartesianToSpherical(p.gsposition, sph);
 
                         /** PROPER MOTION **/
-                        Vector3d pm = null;
+                        Vector3d pm;
                         double mualphastar = 0, mudelta = 0, radvel = 0;
                         // Only supported if position is equatorial spherical coordinates (ra/dec)
                         if (pt == PositionType.EQ_SPH_DIST || pt == PositionType.EQ_SPH_PLX) {
@@ -183,9 +191,9 @@ public class STILDataProvider extends AbstractStarGroupDataProvider {
                             // Default magnitude
                             appmag = 15;
                         }
-                        double absmag = (appmag - 2.5 * Math.log10(Math.pow(distpc / 10d, 2d)));
-                        double flux = Math.pow(10, -absmag / 2.5f);
-                        double size = Math.min((Math.pow(flux, 0.5f) * Constants.PC_TO_U * 0.16f), 1e9f) / 1.5;
+                        double absmag = (appmag - 2.5 * Math.log10(Math.pow(distpc / 10.0, 2.0)));
+                        double flux = Math.pow(10, -absmag / 2.5);
+                        double size = Math.min((Math.pow(flux, 0.5) * Constants.PC_TO_U * 0.16), 1e9) / 1.5;
 
                         /** COLOR **/
                         float color;
@@ -240,6 +248,16 @@ public class STILDataProvider extends AbstractStarGroupDataProvider {
                             } else {
                                 id = ++starid;
                             }
+                        }
+
+
+                        if(mustLoad(id)){
+                            // Check must load
+                            skip = false;
+                        }
+
+                        if(skip){
+                            break;
                         }
 
                         // Populate provider lists

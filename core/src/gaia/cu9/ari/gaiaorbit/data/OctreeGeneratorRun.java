@@ -34,9 +34,7 @@ import gaia.cu9.ari.gaiaorbit.util.tree.OctreeNode;
 import java.io.*;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Generates an octree of star groups. Each octant should have only one object,
@@ -151,6 +149,9 @@ public class OctreeGeneratorRun {
 
             Gdx.files = new LwjglFiles();
 
+            // Add notification watch
+            new ConsoleLogger();
+
             // Initialize number format
             NumberFormatFactory.initialize(new DesktopNumberFormatFactory());
 
@@ -162,10 +163,6 @@ public class OctreeGeneratorRun {
 
             // Initialize configuration
             ConfInit.initialize(new DesktopConfInit(new FileInputStream(new File(ASSETS_LOC + "conf/global.properties")), new FileInputStream(new File(ASSETS_LOC + "data/dummyversion"))));
-
-
-            // Add notification watch
-            new ConsoleLogger();
 
             generateOctree();
 
@@ -183,11 +180,11 @@ public class OctreeGeneratorRun {
                 }
             }
         } catch (FileNotFoundException e) {
-            e.printStackTrace();
+            logger.error(e);
         } catch (IOException e) {
-            e.printStackTrace();
+            logger.error(e);
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.error(e);
         }
     }
 
@@ -230,6 +227,11 @@ public class OctreeGeneratorRun {
         if (addHip) {
             /* HIPPARCOS */
             STILDataProvider stil = new STILDataProvider();
+
+            // All hip stars for which we have a Gaia star, bypass plx >= 0 condition in STILDataProvider
+            Set<Long> mustLoad = new HashSet<>();
+            xmatchTable.values().stream().forEach(hip -> mustLoad.add(new Long(hip)));
+            stil.setMustLoadIds(mustLoad);
 
             Array<StarBean> listHip = (Array<StarBean>) stil.loadData("data/catalog/hipparcos/hip.vot");
             long[] cpmhip = stil.getCountsPerMag();

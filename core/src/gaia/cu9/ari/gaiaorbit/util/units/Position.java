@@ -28,7 +28,11 @@ public class Position {
 
         EQ_XYZ,
         ECL_XYZ,
-        GAL_XYZ
+        GAL_XYZ;
+
+        public boolean isParallax(){
+            return this.equals(EQ_SPH_PLX) || this.equals(ECL_SPH_PLX) || this.equals(GAL_SPH_PLX);
+        }
     }
 
     public final Vector3d gsposition;
@@ -47,6 +51,7 @@ public class Position {
      */
     public Position(double a, String unitA, double b, String unitB, double c, String unitC, PositionType type) {
         if (Double.isNaN(c)) {
+            // Parallax not available
             c = 0.04;
             unitC = "mas";
         }
@@ -72,6 +77,7 @@ public class Position {
 
             break;
         case GAL_SPH_DIST:
+
             lon = new Angle(a, unitA);
             lat = new Angle(b, unitB);
             dist = new Length(c, unitC);
@@ -80,6 +86,7 @@ public class Position {
             gsposition.mul(Coordinates.galToEq());
             break;
         case GAL_SPH_PLX:
+
             lon = new Angle(a, unitA);
             lat = new Angle(b, unitB);
             dist = new Angle(c, unitC).getParallaxDistance();
@@ -88,6 +95,7 @@ public class Position {
             gsposition.mul(Coordinates.galToEq());
             break;
         case ECL_SPH_DIST:
+
             lon = new Angle(a, unitA);
             lat = new Angle(b, unitB);
             dist = new Length(c, unitC);
@@ -96,6 +104,7 @@ public class Position {
             gsposition.mul(Coordinates.eclToEq());
             break;
         case ECL_SPH_PLX:
+
             lon = new Angle(a, unitA);
             lat = new Angle(b, unitB);
             dist = new Angle(c, unitC).getParallaxDistance();
@@ -104,6 +113,7 @@ public class Position {
             gsposition.mul(Coordinates.eclToEq());
             break;
         case EQ_XYZ:
+
             Length x = new Length(a, unitA);
             Length y = new Length(b, unitB);
             Length z = new Length(c, unitC);
@@ -112,6 +122,7 @@ public class Position {
 
             break;
         case GAL_XYZ:
+
             x = new Length(a, unitA);
             y = new Length(b, unitB);
             z = new Length(c, unitC);
@@ -120,6 +131,7 @@ public class Position {
             gsposition.mul(Coordinates.galToEq());
             break;
         case ECL_XYZ:
+
             x = new Length(a, unitA);
             y = new Length(b, unitB);
             z = new Length(c, unitC);
