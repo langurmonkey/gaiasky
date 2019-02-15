@@ -258,7 +258,8 @@ public class STILDataProvider extends AbstractStarGroupDataProvider {
                         }
 
                         if (skip) {
-                            break;
+                            // Next
+                            continue;
                         }
 
                         // Populate provider lists

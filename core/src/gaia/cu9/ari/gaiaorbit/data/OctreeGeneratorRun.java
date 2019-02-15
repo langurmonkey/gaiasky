@@ -162,7 +162,11 @@ public class OctreeGeneratorRun {
             I18n.initialize(new FileHandle(ASSETS_LOC + "i18n/gsbundle"));
 
             // Initialize configuration
-            ConfInit.initialize(new DesktopConfInit(new FileInputStream(new File(ASSETS_LOC + "conf/global.properties")), new FileInputStream(new File(ASSETS_LOC + "data/dummyversion"))));
+            File dummyv = new File(ASSETS_LOC + "data/dummyversion");
+            if(!dummyv.exists()){
+                dummyv = new File(ASSETS_LOC + "dummyversion");
+            }
+            ConfInit.initialize(new DesktopConfInit(new FileInputStream(new File(ASSETS_LOC + "conf/global.properties")), new FileInputStream(dummyv)));
 
             generateOctree();
 
@@ -273,7 +277,7 @@ public class OctreeGeneratorRun {
                     }
                 }
             }
-            logger.info(starhits + " of " + hipnum + " HIP stars' data updated due to being matched to a Gaia star (" + notFoundHipStars + " not found in HIP - due to negative parallax?)");
+            logger.info(starhits + " of " + hipnum + " HIP stars' data updated due to being matched to a Gaia star (" + notFoundHipStars + " not found - negative parallax?)");
 
             // Main list is listHip
             list = listHip;
