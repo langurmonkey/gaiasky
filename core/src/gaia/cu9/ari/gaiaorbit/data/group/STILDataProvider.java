@@ -32,8 +32,8 @@ import java.util.logging.Level;
 
 /**
  * Loads VOTables, FITS, etc.
- * @author tsagrista
  *
+ * @author tsagrista
  */
 public class STILDataProvider extends AbstractStarGroupDataProvider {
     private static Log logger = Logger.getLogger(STILDataProvider.class);
@@ -89,6 +89,7 @@ public class STILDataProvider extends AbstractStarGroupDataProvider {
 
     /**
      * Gets the first ucd as a string from the set.
+     *
      * @param ucds
      * @param row
      * @return
@@ -113,7 +114,7 @@ public class STILDataProvider extends AbstractStarGroupDataProvider {
             List<StarTable> tables = new LinkedList<StarTable>();
             StarTable table = null;
             long maxElems = 0;
-            for (StarTable t; (t = ts.nextTable()) != null;) {
+            for (StarTable t; (t = ts.nextTable()) != null; ) {
                 tables.add(t);
                 if (t.getRowCount() > maxElems) {
                     maxElems = t.getRowCount();
@@ -149,7 +150,7 @@ public class STILDataProvider extends AbstractStarGroupDataProvider {
                         PositionType pt = ucdp.getPositionType(a.getFirst(), b.getFirst(), c.getFirst());
                         // Check negative parallaxes. What to do?
                         // Simply ignore object
-                        if(pt.isParallax() && c.getSecond() <= 0){
+                        if (pt.isParallax() && (c.getSecond() == null || c.getSecond().isNaN() || c.getSecond() <= 0)) {
                             skip = true;
                         }
 
@@ -215,16 +216,16 @@ public class STILDataProvider extends AbstractStarGroupDataProvider {
                         String name;
                         Long id;
                         int hip = -1;
-                        if(ucdp.NAME.isEmpty()) {
+                        if (ucdp.NAME.isEmpty()) {
                             // Empty name
                             if (!ucdp.ID.isEmpty()) {
                                 // We have ID
                                 Pair<UCD, String> namepair = getStringUcd(ucdp.ID, row);
                                 name = namepair.getSecond();
-                                if(namepair.getFirst().colname.equalsIgnoreCase("hip")){
+                                if (namepair.getFirst().colname.equalsIgnoreCase("hip")) {
                                     hip = Integer.valueOf(namepair.getSecond());
                                     id = new Long(hip);
-                                }else {
+                                } else {
                                     id = ++starid;
                                 }
                             } else {
@@ -234,15 +235,15 @@ public class STILDataProvider extends AbstractStarGroupDataProvider {
                             }
                         } else {
                             // We have name
-                            Pair<UCD,String> namepair = getStringUcd(ucdp.NAME, row);
+                            Pair<UCD, String> namepair = getStringUcd(ucdp.NAME, row);
                             name = namepair.getSecond();
                             // Take care of HIP stars
-                            if(!ucdp.ID.isEmpty()){
+                            if (!ucdp.ID.isEmpty()) {
                                 Pair<UCD, String> idpair = getStringUcd(ucdp.ID, row);
-                                if(idpair.getFirst().colname.equalsIgnoreCase("hip")){
+                                if (idpair.getFirst().colname.equalsIgnoreCase("hip")) {
                                     hip = Integer.valueOf(idpair.getSecond());
                                     id = new Long(hip);
-                                }else {
+                                } else {
                                     id = ++starid;
                                 }
                             } else {
@@ -251,18 +252,18 @@ public class STILDataProvider extends AbstractStarGroupDataProvider {
                         }
 
 
-                        if(mustLoad(id)){
+                        if (mustLoad(id)) {
                             // Check must load
                             skip = false;
                         }
 
-                        if(skip){
+                        if (skip) {
                             break;
                         }
 
                         // Populate provider lists
                         colors.put(id, rgb);
-                        sphericalPositions.put(id, new double[] { sph.x, sph.y, sph.z });
+                        sphericalPositions.put(id, new double[]{sph.x, sph.y, sph.z});
 
                         double[] point = new double[StarBean.SIZE];
                         point[StarBean.I_HIP] = hip;

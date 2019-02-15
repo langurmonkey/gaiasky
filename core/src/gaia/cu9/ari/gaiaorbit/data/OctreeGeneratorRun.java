@@ -179,12 +179,10 @@ public class OctreeGeneratorRun {
                     out.println(msg.toString());
                 }
             }
-        } catch (FileNotFoundException e) {
-            logger.error(e);
-        } catch (IOException e) {
-            logger.error(e);
         } catch (Exception e) {
-            logger.error(e);
+            StringWriter sw = new StringWriter();
+            e.printStackTrace(new PrintWriter(sw));
+            logger.error(e, sw.toString());
         }
     }
 
@@ -391,8 +389,7 @@ public class OctreeGeneratorRun {
             try {
                 Map<Long, Integer> map = new HashMap<>();
                 BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(xm)));
-                // Skip header line
-                br.readLine();
+                // Assume no header
                 String line;
                 while ((line = br.readLine()) != null) {
                     String[] tokens = line.split(",");
@@ -401,7 +398,7 @@ public class OctreeGeneratorRun {
                     map.put(sourceId, hip);
                 }
                 br.close();
-                logger.error("Cross-match table read: " + xmatchFile);
+                logger.error("Cross-match table read with " + map.size() + " entries: " + xmatchFile);
                 return map;
             } catch (Exception e) {
                 logger.error(e);
