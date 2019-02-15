@@ -211,7 +211,7 @@ public class OctreeGeneratorRun {
         if (addHip && xmatchFile != null && !xmatchFile.isEmpty()) {
             // Load xmatchTable
             xmatchTable = readXmatchTable(xmatchFile);
-            if(!xmatchTable.isEmpty()){
+            if (!xmatchTable.isEmpty()) {
                 // IDs which must be loaded regardless (we need them to update x-matched HIP stars)
                 loader.setMustLoadIds(new HashSet<>(xmatchTable.keySet()));
             }
@@ -242,6 +242,7 @@ public class OctreeGeneratorRun {
             /* Check x-match file */
             int hipnum = listHip.size;
             int starhits = 0;
+            int notFoundHipStars = 0;
             for (StarBean gaiaStar : listGaia) {
                 // Check if star is also in HYG catalog
                 if (xmatchTable == null || !xmatchTable.containsKey(gaiaStar.id)) {
@@ -250,25 +251,29 @@ public class OctreeGeneratorRun {
                 } else {
                     // Update hipStar using gaiaStar data
                     int hipId = xmatchTable.get(gaiaStar.id);
-                    StarBean hipStar = hipMap.get(hipId);
-                    hipStar.id = gaiaStar.id;
-                    hipStar.data[StarBean.I_X] = gaiaStar.x();
-                    hipStar.data[StarBean.I_Y] = gaiaStar.y();
-                    hipStar.data[StarBean.I_Z] = gaiaStar.z();
-                    hipStar.data[StarBean.I_PMX] = gaiaStar.pmx();
-                    hipStar.data[StarBean.I_PMY] = gaiaStar.pmy();
-                    hipStar.data[StarBean.I_PMZ] = gaiaStar.pmz();
-                    hipStar.data[StarBean.I_MUALPHA] = gaiaStar.mualpha();
-                    hipStar.data[StarBean.I_MUDELTA] = gaiaStar.mudelta();
-                    hipStar.data[StarBean.I_RADVEL] = gaiaStar.radvel();
-                    hipStar.data[StarBean.I_APPMAG] = gaiaStar.appmag();
-                    hipStar.data[StarBean.I_ABSMAG] = gaiaStar.absmag();
-                    hipStar.data[StarBean.I_COL] = gaiaStar.col();
-                    hipStar.data[StarBean.I_SIZE] = gaiaStar.size();
-                    starhits++;
+                    if (hipMap.containsKey(hipId)) {
+                        StarBean hipStar = hipMap.get(hipId);
+                        hipStar.id = gaiaStar.id;
+                        hipStar.data[StarBean.I_X] = gaiaStar.x();
+                        hipStar.data[StarBean.I_Y] = gaiaStar.y();
+                        hipStar.data[StarBean.I_Z] = gaiaStar.z();
+                        hipStar.data[StarBean.I_PMX] = gaiaStar.pmx();
+                        hipStar.data[StarBean.I_PMY] = gaiaStar.pmy();
+                        hipStar.data[StarBean.I_PMZ] = gaiaStar.pmz();
+                        hipStar.data[StarBean.I_MUALPHA] = gaiaStar.mualpha();
+                        hipStar.data[StarBean.I_MUDELTA] = gaiaStar.mudelta();
+                        hipStar.data[StarBean.I_RADVEL] = gaiaStar.radvel();
+                        hipStar.data[StarBean.I_APPMAG] = gaiaStar.appmag();
+                        hipStar.data[StarBean.I_ABSMAG] = gaiaStar.absmag();
+                        hipStar.data[StarBean.I_COL] = gaiaStar.col();
+                        hipStar.data[StarBean.I_SIZE] = gaiaStar.size();
+                        starhits++;
+                    } else {
+                        notFoundHipStars++;
+                    }
                 }
             }
-            logger.info(starhits + " of " + hipnum + " HIP stars' data updated due to being matched to a Gaia star");
+            logger.info(starhits + " of " + hipnum + " HIP stars' data updated due to being matched to a Gaia star (" + notFoundHipStars + " not found in HIP - due to negative parallax?)");
 
             // Main list is listHip
             list = listHip;
