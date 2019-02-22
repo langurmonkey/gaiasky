@@ -540,7 +540,8 @@ public class GlobalConf {
     public static class DataConf implements IConf {
 
         /**
-         * Location of the data folder. Usually within the '.gaiasky' folder in the user's home directory
+         * Location of the data folder. Usually within the '.gaiasky' folder in the user's home directory in Windows
+         * and macOS, or in ~/.local/share/gaiasky in Linux
          **/
         public String DATA_LOCATION;
 

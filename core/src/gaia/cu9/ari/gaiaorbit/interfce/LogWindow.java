@@ -110,7 +110,7 @@ public class LogWindow extends GenericDialog {
 
     public void export() {
         String filename = Instant.now().toString() + "_gaiasky.log";
-        File gshome = SysUtils.getGSHomeDir();
+        File gshome = SysUtils.getDataDir();
         File log = new File(gshome, filename);
 
         try {

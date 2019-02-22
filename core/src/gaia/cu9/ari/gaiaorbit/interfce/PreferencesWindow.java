@@ -1442,7 +1442,7 @@ public class PreferencesWindow extends GenericDialog {
 
     private void reloadDefaultPreferences() {
         // User config file
-        File userFolder = SysUtils.getGSHomeDir();
+        File userFolder = SysUtils.getConfigDir();
         File userFolderConfFile = new File(userFolder, "global.properties");
 
         // Internal config

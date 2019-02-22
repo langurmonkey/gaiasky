@@ -156,8 +156,8 @@ public class GaiaSkyDesktop implements IObserver {
             // Initialize date format
             DateFormatFactory.initialize(new DesktopDateFormatFactory());
 
-            // Init .gaiasky folder in user's home folder
-            initUserDirectory();
+            // Init gaiasky directories
+            SysUtils.mkdirs();
 
             // Init properties file
             String props = System.getProperty("properties.file");
@@ -307,15 +307,6 @@ public class GaiaSkyDesktop implements IObserver {
 
     }
 
-    private static void initUserDirectory() {
-        SysUtils.getGSHomeDir().mkdirs();
-        SysUtils.getDefaultFramesDir().mkdirs();
-        SysUtils.getDefaultScreenshotsDir().mkdirs();
-        SysUtils.getDefaultMusicDir().mkdirs();
-        SysUtils.getDefaultScriptDir().mkdirs();
-        SysUtils.getDefaultCameraDir().mkdirs();
-    }
-
     /**
      * Initialises the configuration file. Tries to load first the file in
      * <code>$HOME/.gaiasky/global.properties</code>. Checks the
@@ -329,9 +320,7 @@ public class GaiaSkyDesktop implements IObserver {
      */
     private static String initConfigFile(boolean ow) throws IOException {
         // Use user folder
-        File userFolder = SysUtils.getGSHomeDir();
-        userFolder.mkdirs();
-        File userFolderConfFile = new File(userFolder, "global.properties");
+        File userFolderConfFile = new File(SysUtils.getConfigDir(), "global.properties");
 
         // Internal config
         File confFolder = new File("conf" + File.separator);

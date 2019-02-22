@@ -5,17 +5,37 @@ import java.io.File;
 /**
  * Wee utility class to check the operating system and the desktop environment.
  * It also offers retrieval of common system folders.
- * 
- * @author Toni Sagrista
  *
+ * @author Toni Sagrista
  */
 public class SysUtils {
 
+    /**
+     * Initialise directories
+     */
+    public static void mkdirs() {
+        // Top level
+        getDataDir().mkdirs();
+        getConfigDir().mkdirs();
+        // Bottom level
+        getDefaultCameraDir().mkdirs();
+        getDefaultScriptDir().mkdirs();
+        getDefaultMusicDir().mkdirs();
+        getDefaultFramesDir().mkdirs();
+        getDefaultScreenshotsDir().mkdirs();
+        getDefaultTmpDir().mkdirs();
+        getDefaultMappingsDir().mkdirs();
+    }
+
     private static String OS = System.getProperty("os.name").toLowerCase();
+
+    public static String getXdgDesktop(){
+        return System.getenv("XDG_CURRENT_DESKTOP");
+    }
 
     public static boolean checkLinuxDesktop(String desktop) {
         try {
-            String value = System.getenv("XDG_CURRENT_DESKTOP");
+            String value = getXdgDesktop();
             return value != null && !value.isEmpty() && value.equalsIgnoreCase(desktop);
         } catch (Exception e) {
             e.printStackTrace(System.err);
@@ -41,6 +61,10 @@ public class SysUtils {
 
     public static boolean checkBudgie() {
         return isLinux() && checkLinuxDesktop("budgie:GNOME");
+    }
+
+    public static boolean checkI3(){
+        return isLinux() && checkLinuxDesktop("i3");
     }
 
     public static String getOSName() {
@@ -90,17 +114,8 @@ public class SysUtils {
         return System.getProperty("os.version");
     }
 
-    /**
-     * Gets a file pointer to the home directory. It is $HOME/.gaiasky in Linux
-     * systems and C:\Users\$USERNAME\.gaiasky in Windows.
-     * 
-     * @return A pointer to the Gaia Sky directory in the user's home.
-     */
-    public static File getGSHomeDir() {
-        return new File(System.getProperty("user.home") + File.separator + GAIASKY_DIR_NAME + File.separator);
-    }
-
-    private static final String GAIASKY_DIR_NAME = ".gaiasky";
+    private static final String GAIASKY_DIR_NAME = "gaiasky";
+    private static final String DOTGAIASKY_DIR_NAME = ".gaiasky";
     private static final String CAMERA_DIR_NAME = "camera";
     private static final String SCREENSHOTS_DIR_NAME = "screenshots";
     private static final String FRAMES_DIR_NAME = "frames";
@@ -111,85 +126,123 @@ public class SysUtils {
     private static final String TMP_DIR_NAME = "tmp";
 
     /**
-     * Gets a file pointer to the $HOME/.gaiasky/camera directory.
-     * 
-     * @return A pointer to the Gaia Sky camera directory in the user's home.
+     * Gets a file pointer to the camera directory.
+     *
+     * @return A pointer to the Gaia Sky camera directory
      */
     public static File getDefaultCameraDir() {
-        return new File(System.getProperty("user.home") + File.separator + GAIASKY_DIR_NAME + File.separator + CAMERA_DIR_NAME + File.separator);
+        return new File(getDataDir(), CAMERA_DIR_NAME);
     }
 
     /**
-     * Gets a file pointer to the $HOME/.gaiasky/screenshots directory.
-     * 
-     * @return A pointer to the Gaia Sky screenshots directory in the user's
-     *         home.
+     * Gets a file pointer to the default screenshots directory.
+     *
+     * @return A pointer to the Gaia Sky screenshots directory
      */
     public static File getDefaultScreenshotsDir() {
-        return new File(System.getProperty("user.home") + File.separator + GAIASKY_DIR_NAME + File.separator + SCREENSHOTS_DIR_NAME + File.separator);
+        return new File(getDataDir(), SCREENSHOTS_DIR_NAME);
     }
 
     /**
-     * Gets a file pointer to the $HOME/.gaiasky/frames directory.
-     * 
-     * @return A pointer to the Gaia Sky frames directory in the user's home.
+     * Gets a file pointer to the frames directory.
+     *
+     * @return A pointer to the Gaia Sky frames directory
      */
     public static File getDefaultFramesDir() {
-        return new File(System.getProperty("user.home") + File.separator + GAIASKY_DIR_NAME + File.separator + FRAMES_DIR_NAME + File.separator);
+        return new File(getDataDir(), FRAMES_DIR_NAME);
     }
 
     /**
-     * Gets a file pointer to the $HOME/.gaiasky/script directory.
-     * 
-     * @return A pointer to the Gaia Sky script directory in the user's home.
+     * Gets a file pointer to the script directory.
+     *
+     * @return A pointer to the Gaia Sky script directory
      */
     public static File getDefaultScriptDir() {
-        return new File(System.getProperty("user.home") + File.separator + GAIASKY_DIR_NAME + File.separator + SCRIPT_DIR_NAME + File.separator);
+        return new File(getDataDir(), SCRIPT_DIR_NAME);
     }
 
     /**
-     * Gets a file pointer to the $HOME/.gaiasky/music directory.
-     * 
-     * @return A pointer to the Gaia Sky music directory in the user's home.
+     * Gets a file pointer to the music directory.
+     *
+     * @return A pointer to the Gaia Sky music directory
      */
     public static File getDefaultMusicDir() {
-        return new File(System.getProperty("user.home") + File.separator + GAIASKY_DIR_NAME + File.separator + MUSIC_DIR_NAME + File.separator);
+            return new File(getDataDir(), MUSIC_DIR_NAME);
     }
 
     /**
-     * Gets a file pointer to the $HOME/.gaiasky/mappings directory.
-     * 
-     * @return A pointer to the Gaia Sky mappings directory in the user's home.
+     * Gets a file pointer to the mappings directory.
+     *
+     * @return A pointer to the Gaia Sky mappings directory
      */
     public static File getDefaultMappingsDir() {
-        return new File(System.getProperty("user.home") + File.separator + GAIASKY_DIR_NAME + File.separator + MAPPINGS_DIR_NAME + File.separator);
+        if (isLinux()) {
+            return new File(getConfigDir(), MAPPINGS_DIR_NAME);
+        } else {
+            return new File(System.getProperty("user.home") + File.separator + GAIASKY_DIR_NAME + File.separator + MAPPINGS_DIR_NAME + File.separator);
+        }
     }
 
     /**
-     * Gets a file pointer to the $HOME/.gaiasky/data directory.
-     * 
-     * @return A pointer to the Gaia Sky data directory in the user's home.
+     * Gets a file pointer to the local data directory where the data files are downloaded and stored.
+     *
+     * @return A pointer to the local data directory where the data files are
      */
-    public static File getDefaultDataDir() {
-        return new File(System.getProperty("user.home") + File.separator + GAIASKY_DIR_NAME + File.separator + DATA_DIR_NAME + File.separator);
+    public static File getLocalDataDir() {
+        if (isLinux()) {
+            return new File(getDataDir(), DATA_DIR_NAME);
+        } else {
+            return new File(System.getProperty("user.home") + File.separator + GAIASKY_DIR_NAME + File.separator + DATA_DIR_NAME + File.separator);
+        }
     }
 
     /**
      * Gets a file pointer to the $HOME/.gaiasky/tmp directory.
-     * 
+     *
      * @return A pointer to the Gaia Sky temporary directory in the user's home.
      */
     public static File getDefaultTmpDir() {
-        return new File(System.getProperty("user.home") + File.separator + GAIASKY_DIR_NAME + File.separator + TMP_DIR_NAME + File.separator);
+        return new File(getDataDir(), TMP_DIR_NAME);
     }
 
-    public static void main(String[] args) {
-        System.out.println(OS);
-        System.out.println("Unity: " + checkUnity());
-        System.out.println("KDE: " + checkKDE());
-        System.out.println("Gnome: " + checkGnome());
-        System.out.println("Xfce: " + checkXfce());
-        System.out.println("Budgie: " + checkBudgie());
+    /**
+     * Returns the default data directory. That is ~/.gaiasky/ in Windows and macOS, and ~/.local/share/gaiasky
+     * in Linux.
+     * @return
+     */
+    public static File getDataDir() {
+        if (isLinux()) {
+            return new File(getXdgDataHome(), GAIASKY_DIR_NAME + File.separator);
+        } else {
+            return new File(System.getProperty("user.home"), DOTGAIASKY_DIR_NAME + File.separator);
+        }
+    }
+
+    public static File getConfigDir() {
+        if (isLinux()) {
+            return new File(getXdgConfigHome(), GAIASKY_DIR_NAME + File.separator);
+        } else {
+            return new File(System.getProperty("user.home"), DOTGAIASKY_DIR_NAME + File.separator);
+        }
+    }
+
+    private static String getXdgDataHome(){
+        String dhome = System.getenv("XDG_DATA_HOME");
+        if(dhome == null || dhome.isEmpty()){
+            return System.getProperty("user.home") + File.separator + ".local" + File.separator + "share";
+        } else {
+            return dhome;
+        }
+    }
+
+    private static String getXdgConfigHome(){
+        String chome = System.getenv("XDG_CONFIG_HOME");
+        if(chome == null || chome.isEmpty()){
+            return System.getProperty("user.home") + File.separator + ".config";
+        } else {
+            return chome;
+        }
+
     }
 
 }
