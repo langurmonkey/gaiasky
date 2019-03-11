@@ -11,7 +11,6 @@ import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener.ChangeEvent;
 import com.badlogic.gdx.scenes.scene2d.utils.Disableable;
-import com.badlogic.gdx.scenes.scene2d.utils.FocusListener;
 import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.Array;
 import gaia.cu9.ari.gaiaorbit.event.EventManager;
@@ -50,7 +49,6 @@ public abstract class GenericDialog extends CollapsibleWindow {
     private Runnable acceptRunnable, cancelRunnable;
 
     private Actor previousKeyboardFocus, previousScrollFocus;
-    private FocusListener focusListener;
 
     protected InputListener ignoreTouchDown = new InputListener() {
         public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
@@ -143,7 +141,7 @@ public abstract class GenericDialog extends CollapsibleWindow {
 
         pack();
 
-        // Add keys for ESC and ENTER
+        // Add keys for ESC, ENTER and TAB
         me.addListener(event -> {
             if (event instanceof InputEvent) {
                 InputEvent ievent = (InputEvent) event;
@@ -164,6 +162,10 @@ public abstract class GenericDialog extends CollapsibleWindow {
                                 acceptRunnable.run();
                             me.hide();
                             return true;
+                        case Keys.TAB:
+                            // Next focus
+
+                            return true;
                         default:
                             // Nothing
                             break;
@@ -172,27 +174,6 @@ public abstract class GenericDialog extends CollapsibleWindow {
             }
             return false;
         });
-
-        focusListener = new FocusListener() {
-            public void keyboardFocusChanged(FocusEvent event, Actor actor, boolean focused) {
-                if (!focused)
-                    focusChanged(event);
-            }
-
-            public void scrollFocusChanged(FocusEvent event, Actor actor, boolean focused) {
-                if (!focused)
-                    focusChanged(event);
-            }
-
-            private void focusChanged(FocusEvent event) {
-                Stage stage = getStage();
-                if (isModal() && stage != null && stage.getRoot().getChildren().size > 0 && stage.getRoot().getChildren().peek() == GenericDialog.this) { // Dialog is top most actor.
-                    Actor newFocusedActor = event.getRelatedActor();
-                    if (newFocusedActor != null && !newFocusedActor.isDescendantOf(GenericDialog.this) && !(newFocusedActor.equals(previousKeyboardFocus) || newFocusedActor.equals(previousScrollFocus)))
-                        event.cancel();
-                }
-            }
-        };
 
         /** CAPTURE SCROLL FOCUS **/
         stage.addListener(event -> {
@@ -304,7 +285,6 @@ public abstract class GenericDialog extends CollapsibleWindow {
     public void hide(Action action) {
         Stage stage = getStage();
         if (stage != null) {
-            removeListener(focusListener);
             if (previousKeyboardFocus != null && previousKeyboardFocus.getStage() == null)
                 previousKeyboardFocus = null;
             Actor actor = stage.getKeyboardFocus();
