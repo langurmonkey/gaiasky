@@ -2,7 +2,6 @@ package gaia.cu9.ari.gaiaorbit.util;
 
 import gaia.cu9.ari.gaiaorbit.event.EventManager;
 import gaia.cu9.ari.gaiaorbit.event.Events;
-import gaia.cu9.ari.gaiaorbit.util.format.IDateFormat;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -25,7 +24,6 @@ public class Logger {
     }
 
     public static LoggerLevel level = LoggerLevel.INFO;
-    private static IDateFormat df;
 
     private static void error(Throwable t, String tag) {
         if (inLevel(LoggerLevel.ERROR))
@@ -96,24 +94,20 @@ public class Logger {
      */
     private static Object[] removeFirstN(Object[] arr, int n) {
         Object[] res = new Object[arr.length - n];
-        for (int i = 0; i < arr.length - n; i++)
-            res[i] = arr[i + n];
+        if (arr.length - n >= 0) System.arraycopy(arr, 0 + n, res, 0, arr.length - n);
         return res;
     }
 
     private static Object[] getFirstNPlus(Object[] arr, int n, Object additional) {
         Object[] res = new Object[n + 1];
-        for (int i = 0; i < n; i++) {
-            res[i] = arr[i];
-        }
+        if (n >= 0) System.arraycopy(arr, 0, res, 0, n);
         res[n] = additional;
         return res;
     }
 
     private static String parse(String msg, Object... args) {
-        int n = args.length;
-        for (int i = 0; i < n; i++) {
-            String arg = args[i] != null ? args[i].toString() : "null";
+        for (Object arg1 : args) {
+            String arg = arg1 != null ? arg1.toString() : "null";
             msg = msg.replaceFirst("\\{\\}", arg);
         }
         return msg;

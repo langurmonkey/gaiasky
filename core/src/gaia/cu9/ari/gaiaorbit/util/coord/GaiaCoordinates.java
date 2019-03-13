@@ -1,15 +1,15 @@
 package gaia.cu9.ari.gaiaorbit.util.coord;
 
-import java.time.Instant;
-
-import gaia.cu9.ari.gaiaorbit.data.orbit.PolylineData;
+import gaia.cu9.ari.gaiaorbit.data.util.PointCloudData;
 import gaia.cu9.ari.gaiaorbit.scenegraph.CelestialBody;
 import gaia.cu9.ari.gaiaorbit.scenegraph.HeliotropicOrbit;
 import gaia.cu9.ari.gaiaorbit.scenegraph.ISceneGraph;
 import gaia.cu9.ari.gaiaorbit.util.math.Vector3d;
 
+import java.time.Instant;
+
 public class GaiaCoordinates extends AbstractOrbitCoordinates {
-    PolylineData data;
+    PointCloudData data;
 
     @Override
     public void doneLoading(Object... params) {
@@ -17,7 +17,7 @@ public class GaiaCoordinates extends AbstractOrbitCoordinates {
         orbit = (HeliotropicOrbit) ((ISceneGraph) params[0]).getNode("Gaia orbit");
         if (params[1] instanceof CelestialBody)
             orbit.setBody((CelestialBody) params[1]);
-        data = orbit.getPolyline();
+        data = orbit.getPointCloud();
     }
 
     @Override

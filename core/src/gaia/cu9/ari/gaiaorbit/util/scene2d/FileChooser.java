@@ -1,9 +1,5 @@
 package gaia.cu9.ari.gaiaorbit.util.scene2d;
 
-import java.io.File;
-import java.io.FileFilter;
-import java.util.Comparator;
-
 import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.scenes.scene2d.Action;
@@ -11,25 +7,18 @@ import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.InputEvent.Type;
 import com.badlogic.gdx.scenes.scene2d.Stage;
-import com.badlogic.gdx.scenes.scene2d.ui.Dialog;
-import com.badlogic.gdx.scenes.scene2d.ui.HorizontalGroup;
-import com.badlogic.gdx.scenes.scene2d.ui.Image;
-import com.badlogic.gdx.scenes.scene2d.ui.Label;
-import com.badlogic.gdx.scenes.scene2d.ui.List;
-import com.badlogic.gdx.scenes.scene2d.ui.ScrollPane;
-import com.badlogic.gdx.scenes.scene2d.ui.Skin;
-import com.badlogic.gdx.scenes.scene2d.ui.Table;
-import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
-import com.badlogic.gdx.scenes.scene2d.ui.TextField;
-import com.badlogic.gdx.scenes.scene2d.ui.TextField.TextFieldListener;
+import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.TimeUtils;
-
 import gaia.cu9.ari.gaiaorbit.util.GlobalConf;
 import gaia.cu9.ari.gaiaorbit.util.I18n;
+
+import java.io.File;
+import java.io.FileFilter;
+import java.util.Comparator;
 
 public class FileChooser extends Dialog {
 
@@ -55,27 +44,19 @@ public class FileChooser extends Dialog {
     private final TextButton ok;
     private final TextButton cancel;
 
-    private static final Comparator<FileListItem> dirListComparator = new Comparator<FileListItem>() {
-        @Override
-        public int compare(FileListItem file1, FileListItem file2) {
-            if (file1.file.isDirectory() && !file2.file.isDirectory()) {
-                return -1;
-            }
-            if (file1.file.isDirectory() && file2.file.isDirectory()) {
-                return file1.name.compareTo(file2.name);
-            }
-            if (!file1.file.isDirectory() && !file2.file.isDirectory()) {
-                return file1.name.compareTo(file2.name);
-            }
-            return 1;
+    private static final Comparator<FileListItem> dirListComparator = (file1, file2) -> {
+        if (file1.file.isDirectory() && !file2.file.isDirectory()) {
+            return -1;
         }
-    };
-    private FileFilter filter = new FileFilter() {
-        @Override
-        public boolean accept(File pathname) {
-            return true;
+        if (file1.file.isDirectory() && file2.file.isDirectory()) {
+            return file1.name.compareTo(file2.name);
         }
+        if (!file1.file.isDirectory() && !file2.file.isDirectory()) {
+            return file1.name.compareTo(file2.name);
+        }
+        return 1;
     };
+    private FileFilter filter = pathname -> true;
     private boolean directoryBrowsingEnabled = true;
 
     public FileChooser(String title, final Skin skin, FileHandle baseDir) {
@@ -93,10 +74,9 @@ public class FileChooser extends Dialog {
         driveButtonsList = new HorizontalGroup();
         driveButtonsList.left().space(10 * GlobalConf.SCALE_FACTOR);
         File[] drives = File.listRoots();
-        driveButtons = new Array<TextButton>(drives.length);
+        driveButtons = new Array<>(drives.length);
         for (File drive : drives) {
-            Image driveIcon = new Image(skin.getDrawable("drive-icon"));
-            TextButton driveButton = new OwnTextIconButton(drive.toString(), driveIcon, skin);
+            TextButton driveButton = new OwnTextIconButton(drive.toString(), skin, "drive");
             driveButton.addListener(new ClickListener() {
                 @Override
                 public void clicked(InputEvent event, float x, float y) {
@@ -111,17 +91,14 @@ public class FileChooser extends Dialog {
         fileListLabel = new Label("", skin);
         fileListLabel.setAlignment(Align.left);
 
-        fileList = new List<FileListItem>(skin, "light");
+        fileList = new List<>(skin, "light");
         fileList.getSelection().setProgrammaticChangeEvents(false);
 
         fileNameInput = new TextField("", skin);
         fileNameLabel = new Label("File name:", skin);
-        fileNameInput.setTextFieldListener(new TextFieldListener() {
-            @Override
-            public void keyTyped(TextField textField, char c) {
-                result = textField.getText();
-            }
-        });
+        fileNameInput.setTextFieldListener((textField, c) -> result = textField.getText());
+
+        getButtonTable().pad(10 * GlobalConf.SCALE_FACTOR);
 
         ok = new OwnTextButton(I18n.bundle.get("gui.select"), skin);
         button(ok, true);

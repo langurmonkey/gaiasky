@@ -58,38 +58,39 @@ public class VisibilityComponent extends GuiComponent implements IObserver {
             for (int i = 0; i < visibilityEntities.length; i++) {
                 final ComponentType ct = visibilityEntities[i];
                 final String name = ct.getName();
-
-                Button button = null;
-                if (ct.style != null) {
-                    Image icon = new Image(skin.getDrawable(ct.style));
-                    button = new OwnTextIconButton("", icon, skin, "toggle");
-                } else {
-                    button = new OwnTextButton(name, skin, "toggle");
-                }
-                button.setName(name);
-                // Tooltip
-                button.addListener(new TextTooltip(TextUtils.capitalise(name), skin));
-
-                buttonMap.put(name, button);
-                if (!ct.key.equals(name))
-                    buttonMap.put(ct.key, button);
-
-                button.setChecked(visible[i]);
-                button.addListener(new EventListener() {
-                    @Override
-                    public boolean handle(Event event) {
-                        if (event instanceof ChangeEvent) {
-                            EventManager.instance.post(Events.TOGGLE_VISIBILITY_CMD, ct.key, true, ((Button) event.getListenerActor()).isChecked());
-                            return true;
-                        }
-                        return false;
+                if (name != null) {
+                    Button button = null;
+                    if (ct.style != null) {
+                        Image icon = new Image(skin.getDrawable(ct.style));
+                        button = new OwnTextIconButton("", icon, skin, "toggle");
+                    } else {
+                        button = new OwnTextButton(name, skin, "toggle");
                     }
-                });
-                visibilityTable.add(button).pad(GlobalConf.SCALE_FACTOR).left();
-                if ((i + 1) % visTableCols == 0) {
-                    visibilityTable.row().padBottom(2 * GlobalConf.SCALE_FACTOR);
+                    button.setName(name);
+                    // Tooltip
+                    button.addListener(new TextTooltip(TextUtils.capitalise(name), skin));
+
+                    buttonMap.put(name, button);
+                    if (!ct.key.equals(name))
+                        buttonMap.put(ct.key, button);
+
+                    button.setChecked(visible[i]);
+                    button.addListener(new EventListener() {
+                        @Override
+                        public boolean handle(Event event) {
+                            if (event instanceof ChangeEvent) {
+                                EventManager.instance.post(Events.TOGGLE_VISIBILITY_CMD, ct.key, true, ((Button) event.getListenerActor()).isChecked());
+                                return true;
+                            }
+                            return false;
+                        }
+                    });
+                    visibilityTable.add(button).pad(GlobalConf.SCALE_FACTOR).left();
+                    if ((i + 1) % visTableCols == 0) {
+                        visibilityTable.row().padBottom(2 * GlobalConf.SCALE_FACTOR);
+                    }
+                    buttons.add(button);
                 }
-                buttons.add(button);
             }
         }
 
@@ -190,54 +191,54 @@ public class VisibilityComponent extends GuiComponent implements IObserver {
     @Override
     public void notify(Events event, Object... data) {
         switch (event) {
-        case TOGGLE_VISIBILITY_CMD:
-            boolean interf = (Boolean) data[1];
-            if (!interf) {
-                String key = (String) data[0];
-                Button b = buttonMap.get(key);
+            case TOGGLE_VISIBILITY_CMD:
+                boolean interf = (Boolean) data[1];
+                if (!interf) {
+                    String key = (String) data[0];
+                    Button b = buttonMap.get(key);
 
-                b.setProgrammaticChangeEvents(false);
-                if (b != null) {
-                    if (data.length == 3) {
-                        b.setChecked((Boolean) data[2]);
-                    } else {
-                        b.setChecked(!b.isChecked());
+                    b.setProgrammaticChangeEvents(false);
+                    if (b != null) {
+                        if (data.length == 3) {
+                            b.setChecked((Boolean) data[2]);
+                        } else {
+                            b.setChecked(!b.isChecked());
+                        }
                     }
+                    b.setProgrammaticChangeEvents(true);
                 }
-                b.setProgrammaticChangeEvents(true);
-            }
-            break;
-        case PROPER_MOTIONS_CMD:
-            String key = (String) data[0];
-            if (key.equals("element.propermotions")) {
-                sendEvents = false;
-                properMotions.setChecked((Boolean) data[1]);
-                sendEvents = true;
-            }
-            break;
-        case PM_LEN_FACTOR_CMD:
-            interf = (Boolean) data[1];
-            if (!interf) {
-                sendEvents = false;
-                float value = (Float) data[0];
-                pmLenFactorSlider.setValue(value);
-                pmLenFactorLabel.setText(Integer.toString(Math.round(value)));
-                sendEvents = true;
-            }
-            break;
-        case PM_NUM_FACTOR_CMD:
-            interf = (Boolean) data[1];
-            if (!interf) {
-                sendEvents = false;
-                float value = (Float) data[0];
-                float val = MathUtilsd.lint(value, Constants.MIN_PM_NUM_FACTOR, Constants.MAX_PM_NUM_FACTOR, Constants.MIN_SLIDER_1, Constants.MAX_SLIDER);
-                pmNumFactorSlider.setValue(val);
-                pmNumFactor.setText(Integer.toString((int) val));
-                sendEvents = true;
-            }
-            break;
-        default:
-            break;
+                break;
+            case PROPER_MOTIONS_CMD:
+                String key = (String) data[0];
+                if (key.equals("element.propermotions")) {
+                    sendEvents = false;
+                    properMotions.setChecked((Boolean) data[1]);
+                    sendEvents = true;
+                }
+                break;
+            case PM_LEN_FACTOR_CMD:
+                interf = (Boolean) data[1];
+                if (!interf) {
+                    sendEvents = false;
+                    float value = (Float) data[0];
+                    pmLenFactorSlider.setValue(value);
+                    pmLenFactorLabel.setText(Integer.toString(Math.round(value)));
+                    sendEvents = true;
+                }
+                break;
+            case PM_NUM_FACTOR_CMD:
+                interf = (Boolean) data[1];
+                if (!interf) {
+                    sendEvents = false;
+                    float value = (Float) data[0];
+                    float val = MathUtilsd.lint(value, Constants.MIN_PM_NUM_FACTOR, Constants.MAX_PM_NUM_FACTOR, Constants.MIN_SLIDER_1, Constants.MAX_SLIDER);
+                    pmNumFactorSlider.setValue(val);
+                    pmNumFactor.setText(Integer.toString((int) val));
+                    sendEvents = true;
+                }
+                break;
+            default:
+                break;
         }
 
     }

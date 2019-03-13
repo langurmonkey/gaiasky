@@ -125,7 +125,7 @@ public class DownloadDataWindow extends GenericDialog {
 
         downloadTable.add(hg).left().colspan(2).padBottom(padl).row();
 
-        SysUtils.getDefaultDataDir().mkdirs();
+        SysUtils.getLocalDataDir().mkdirs();
         String catLoc = GlobalConf.data.DATA_LOCATION;
 
         if (dataLocation) {
@@ -329,7 +329,7 @@ public class DownloadDataWindow extends GenericDialog {
                     OwnImageButton rubbish = null;
                     if (exists) {
                         rubbish = new OwnImageButton(skin, "rubbish-bin");
-                        rubbish.addListener(new TextTooltip(txt("gui.dataset.tooltip.remove"), skin));
+                        rubbish.addListener(new TextTooltip(txt("gui.tooltip.dataset.remove"), skin));
                         rubbish.addListener((event) -> {
                             if (event instanceof ChangeEvent) {
                                 // Remove dataset

@@ -24,15 +24,15 @@ public class I18n {
      */
     public static void initialize() {
         if (bundle == null) {
-            forceinit(Gdx.files.internal("i18n/gsbundle"));
+            forceInit(Gdx.files.internal("i18n/gsbundle"));
         }
     }
 
     public static void initialize(FileHandle fh) {
-        forceinit(fh);
+        forceInit(fh);
     }
 
-    public static boolean forceinit(FileHandle baseFileHandle) {
+    public static boolean forceInit(FileHandle baseFileHandle) {
         if (GlobalConf.program == null || GlobalConf.program.LOCALE.isEmpty()) {
             // Use system default
             locale = Locale.getDefault();
@@ -58,7 +58,7 @@ public class I18n {
 
     }
 
-    public static Locale forLanguageTag(String languageTag) {
+    private static Locale forLanguageTag(String languageTag) {
         String[] tags = languageTag.split("-");
         if (tags.length > 1) {
             return new Locale(tags[0], tags[1]);

@@ -19,6 +19,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 import java.util.zip.GZIPInputStream;
 
 public abstract class AbstractStarGroupDataProvider implements IStarGroupDataProvider {
@@ -30,6 +31,7 @@ public abstract class AbstractStarGroupDataProvider implements IStarGroupDataPro
     protected long[] countsPerMag;
     protected LargeLongMap<Double> geoDistances = null;
     protected LargeLongMap<Float> ruweValues = null;
+    protected Set<Long> mustLoadIds = null;
 
     /**
      * Points to the location of a file or directory which contains a set of <sourceId, distance[pc]>
@@ -127,6 +129,15 @@ public abstract class AbstractStarGroupDataProvider implements IStarGroupDataPro
     }
 
     /**
+     * Returns whether the star must be loaded or not
+     * @param id The star ID
+     * @return Whether the star with the given ID must be loaded
+     */
+    protected boolean mustLoad(long id){
+        return mustLoadIds == null || mustLoadIds.contains(id);
+    }
+
+    /**
      * Checks whether the parallax is accepted or not.
      * <p>
      * <b>If adaptive is not enabled:</b>
@@ -201,6 +212,12 @@ public abstract class AbstractStarGroupDataProvider implements IStarGroupDataPro
     protected int countLines(FileHandle f) throws IOException {
         InputStream is = new BufferedInputStream(f.read());
         return countLines(is);
+    }
+
+
+    @Override
+    public void setMustLoadIds(Set<Long> ids) {
+        this.mustLoadIds = ids;
     }
 
     /**

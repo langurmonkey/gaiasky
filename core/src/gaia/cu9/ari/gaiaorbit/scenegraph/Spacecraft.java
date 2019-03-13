@@ -212,7 +212,7 @@ public class Spacecraft extends GenericSpacecraft implements ILineRenderable, IO
 
     }
 
-    public Vector3d computePosition(double dt, CelestialBody closest, double enginePower, Vector3d thrust, Vector3d direction, Vector3d force, Vector3d accel, Vector3d vel, Vector3d pos) {
+    public Vector3d computePosition(double dt, IFocus closest, double enginePower, Vector3d thrust, Vector3d direction, Vector3d force, Vector3d accel, Vector3d vel, Vector3d pos) {
         enginePower = Math.signum(enginePower);
         // Compute force from thrust
         thrust.set(direction).scl(thrustLength * thrustFactor[thrustFactorIndex] * enginePower);
@@ -266,18 +266,18 @@ public class Spacecraft extends GenericSpacecraft implements ILineRenderable, IO
         if (closest != null && closest != this && !this.copy) {
             double twoRadiuses = closest.getRadius() + this.getRadius();
             // d1 is the new distance to the centre of the object
-            if (!vel.isZero() && Intersectord.distanceSegmentPoint(pos, position, closest.pos) < twoRadiuses) {
-                logger.info( "Crashed against " + closest.name + "!");
+            if (!vel.isZero() && Intersectord.distanceSegmentPoint(pos, position, closest.getPos()) < twoRadiuses) {
+                logger.info( "Crashed against " + closest.getName() + "!");
 
-                Array<Vector3d> intersections = Intersectord.intersectRaySphere(pos, position, closest.pos, twoRadiuses);
+                Array<Vector3d> intersections = Intersectord.intersectRaySphere(pos, position, closest.getPos(), twoRadiuses);
 
                 if (intersections.size >= 1) {
                     pos.set(intersections.get(0));
                 }
 
                 stopAllMovement();
-            } else if (pos.dst(closest.pos) < twoRadiuses) {
-                Vector3d newpos = aux3d1.get().set(pos).sub(closest.pos).nor().scl(pos.dst(closest.pos));
+            } else if (pos.dst(closest.getPos()) < twoRadiuses) {
+                Vector3d newpos = aux3d1.get().set(pos).sub(closest.getPos()).nor().scl(pos.dst(closest.getPos()));
                 pos.set(newpos);
             } else {
                 pos.set(position);

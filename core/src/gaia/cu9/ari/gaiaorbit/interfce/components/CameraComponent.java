@@ -79,11 +79,8 @@ public class CameraComponent extends GuiComponent implements IObserver {
         });
 
         List<Button> buttonList = new ArrayList<Button>();
-        Image img3d = new Image(skin.getDrawable("3d-icon"));
-        Image imgDome = new Image(skin.getDrawable("dome-icon"));
-        Image imgCubemap = new Image(skin.getDrawable("cubemap-icon"));
 
-        button3d = new OwnTextIconButton("", img3d, skin, "toggle");
+        button3d = new OwnTextIconButton("", skin, "3d");
         button3d.addListener(new TextTooltip(TextUtils.capitalise(txt("element.stereomode")), skin));
         button3d.setName("3d");
         button3d.addListener(event -> {
@@ -94,7 +91,7 @@ public class CameraComponent extends GuiComponent implements IObserver {
             return false;
         });
 
-        buttonDome = new OwnTextIconButton("", imgDome, skin, "toggle");
+        buttonDome = new OwnTextIconButton("", skin, "dome");
         buttonDome.addListener(new TextTooltip(TextUtils.capitalise(txt("element.planetarium")), skin));
         buttonDome.setName("dome");
         buttonDome.addListener(event -> {
@@ -106,7 +103,7 @@ public class CameraComponent extends GuiComponent implements IObserver {
             return false;
         });
 
-        buttonCubemap = new OwnTextIconButton("", imgCubemap, skin, "toggle");
+        buttonCubemap = new OwnTextIconButton("", skin, "cubemap");
         buttonCubemap.setProgrammaticChangeEvents(false);
         buttonCubemap.addListener(new TextTooltip(TextUtils.capitalise(txt("element.360")), skin));
         buttonCubemap.setName("cubemap");

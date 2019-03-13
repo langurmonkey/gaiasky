@@ -1,8 +1,3 @@
-#ifdef GL_ES
-precision mediump float;
-precision mediump int;
-#endif
-
 #define exposure 0.5
 
 uniform vec3 v3LightPos;

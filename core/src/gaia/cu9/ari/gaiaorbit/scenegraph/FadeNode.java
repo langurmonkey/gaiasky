@@ -1,11 +1,8 @@
 package gaia.cu9.ari.gaiaorbit.scenegraph;
 
-import java.util.Map;
-
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.math.Vector2;
-
 import gaia.cu9.ari.gaiaorbit.GaiaSky;
 import gaia.cu9.ari.gaiaorbit.scenegraph.camera.ICamera;
 import gaia.cu9.ari.gaiaorbit.util.CatalogInfo;
@@ -16,6 +13,8 @@ import gaia.cu9.ari.gaiaorbit.util.GlobalResources;
 import gaia.cu9.ari.gaiaorbit.util.math.MathUtilsd;
 import gaia.cu9.ari.gaiaorbit.util.math.Vector3d;
 import gaia.cu9.ari.gaiaorbit.util.time.ITimeFrameProvider;
+
+import java.util.Map;
 
 /**
  * Node that offers fade-in and fade-out capabilities.
@@ -50,8 +49,8 @@ public class FadeNode extends AbstractPositionEntity {
     private double currentDistance;
 
     /**
-     * If set, the fade distance will be computed against this object.
-     * Otherwise, we use the static position in {@link SceneGraphNode.pos}
+     * If set, the fade distance is the distance between the current fade node and this object.
+     * Otherwise, it is the length of the current object's position.
      */
     private AbstractPositionEntity position;
 

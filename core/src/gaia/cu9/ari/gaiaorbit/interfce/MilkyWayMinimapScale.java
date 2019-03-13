@@ -9,11 +9,11 @@ import com.badlogic.gdx.graphics.glutils.FrameBuffer;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer.ShapeType;
 import com.badlogic.gdx.math.Vector2;
-
 import gaia.cu9.ari.gaiaorbit.GaiaSky;
 import gaia.cu9.ari.gaiaorbit.scenegraph.camera.ICamera;
 import gaia.cu9.ari.gaiaorbit.util.Constants;
 import gaia.cu9.ari.gaiaorbit.util.GlobalConf;
+import gaia.cu9.ari.gaiaorbit.util.GlobalResources;
 import gaia.cu9.ari.gaiaorbit.util.I18n;
 import gaia.cu9.ari.gaiaorbit.util.coord.Coordinates;
 import gaia.cu9.ari.gaiaorbit.util.math.Vector2d;
@@ -60,6 +60,8 @@ public class MilkyWayMinimapScale implements IMinimapScale {
 
     @Override
     public void renderSideProjection(FrameBuffer fb) {
+        Gdx.gl.glEnable(GL20.GL_BLEND);
+
         ortho.setToOrtho(true, side, sideshort);
         sr.setProjectionMatrix(ortho.combined);
         sb.setProjectionMatrix(ortho.combined);
@@ -79,16 +81,18 @@ public class MilkyWayMinimapScale implements IMinimapScale {
         float cy = gal2Px(campos2.y, sideshort2);
         // Direction
         Vector3d dir = aux3d2.set(cam.getDirection()).mul(Coordinates.eqToGal());
-        Vector2d camdir2 = aux2d2.set(dir.z, dir.y).nor().scl(px(35f));
+        Vector2d camdir2 = aux2d2.set(dir.z, dir.y).nor().scl(px(15f));
 
-        sr.begin(ShapeType.Line);
-        // Mw
-        sr.setColor(0.3f, 0.3f, 0.9f, 1f);
+        sr.begin(ShapeType.Filled);
+        // Mw disk
+        sr.setColor(0.15f, 0.15f, 0.35f, 1f);
         sr.ellipse(0, sideshort2 - side * 0.015f, side, side * 0.03f);
+        // Mw bulge
+        sr.setColor(0.05f, 0.05f, 0.2f, 1f);
         sr.circle(side2, sideshort2, side * 0.08f);
 
         // Camera
-        sr.setColor(0.4f, 0.9f, 0.4f, 1f);
+        sr.setColor(GlobalResources.gRedC);
         sr.circle(cx, cy, 8f);
         Vector2d endx = aux2d1.set(camdir2.x, camdir2.y);
         endx.rotate(-cam.getCamera().fieldOfView / 2d);
@@ -98,19 +102,32 @@ public class MilkyWayMinimapScale implements IMinimapScale {
         endx.rotate(cam.getCamera().fieldOfView / 2d);
         sr.triangle(cx, cy, c1x, c1y, (float) endx.x + cx, (float) endx.y + cy);
 
-        sr.end();
+        // Camera span
+        sr.setColor(1,1,1,0.1f);
+        endx = aux2d1.set(camdir2.x, camdir2.y).scl(40f);
+        endx.rotate(-cam.getCamera().fieldOfView / 2d);
+        c1x = (float) endx.x + cx;
+        c1y = (float) endx.y + cy;
+        endx.set(camdir2.x, camdir2.y).scl(40f);
+        endx.rotate(cam.getCamera().fieldOfView / 2d);
+        sr.triangle(cx, cy, c1x, c1y, (float) endx.x + cx, (float) endx.y + cy);
 
         // Sun position, 8 Kpc to do galactocentric
-        sr.begin(ShapeType.Filled);
         sr.setColor(1f, 1f, 0f, 1f);
         sr.circle(gal2Px(-8000, side2), gal2Px(0, sideshort2), px(2.5f));
+        // GC
+        sr.setColor(0f, 0f, 0f, 1f);
+        sr.circle(gal2Px(0, side2), gal2Px(0, sideshort2), px(2.5f));
         sr.end();
+
+
+
 
         // Fonts
         sb.begin();
         font.setColor(1, 1, 0, 1);
         font.draw(sb, txt("gui.minimap.sun"), gal2Px(-8000, side2), gal2Px(0, sideshort2) - px(8));
-        font.setColor(.5f, .5f, 1, 1);
+        font.setColor(.6f, .6f, .9f, 1);
         font.draw(sb, txt("gui.minimap.gc"), side2, sideshort2 - px(4));
         sb.end();
 
@@ -120,6 +137,8 @@ public class MilkyWayMinimapScale implements IMinimapScale {
 
     @Override
     public void renderTopProjection(FrameBuffer fb) {
+        Gdx.gl.glEnable(GL20.GL_BLEND);
+
         ortho.setToOrtho(true, side, side);
         sr.setProjectionMatrix(ortho.combined);
         sb.setProjectionMatrix(ortho.combined);
@@ -138,17 +157,20 @@ public class MilkyWayMinimapScale implements IMinimapScale {
         float cy = gal2Px(campos2.y, side2);
         // Direction
         Vector3d dir = aux3d2.set(cam.getDirection()).mul(Coordinates.eqToGal());
-        Vector2d camdir2 = aux2d2.set(dir.x, dir.z).nor().scl(px(35));
+        Vector2d camdir2 = aux2d2.set(dir.x, dir.z).nor().scl(px(15f));
 
-        sr.begin(ShapeType.Line);
+        sr.begin(ShapeType.Filled);
         // Grid
-        sr.setColor(0.3f, 0.3f, 0.9f, 1f);
-        for (int i = 4000; i <= 16000; i += 4000) {
+        float col = 0.0f;
+        for (int i = 16000; i >= 4000; i -= 4000) {
+            sr.setColor(0.15f-col, 0.15f-col, 0.35f-col, 1f);
             sr.circle(side2, side2, i * side / 32000);
+            col += 0.05f;
         }
         sr.circle(side2, side2, 1.5f);
+
         // Camera
-        sr.setColor(0.4f, 0.9f, 0.4f, 1f);
+        sr.setColor(GlobalResources.gRedC);
         sr.circle(cx, cy, 8f);
         Vector2d endx = aux2d1.set(camdir2.x, camdir2.y);
         endx.rotate(-cam.getCamera().fieldOfView / 2d);
@@ -158,19 +180,29 @@ public class MilkyWayMinimapScale implements IMinimapScale {
         endx.rotate(cam.getCamera().fieldOfView / 2d);
         sr.triangle(cx, cy, c1x, c1y, (float) endx.x + cx, (float) endx.y + cy);
 
-        sr.end();
+        // Camera span
+        sr.setColor(1,1,1,0.1f);
+        endx = aux2d1.set(camdir2.x, camdir2.y).scl(40f);
+        endx.rotate(-cam.getCamera().fieldOfView / 2d);
+        c1x = (float) endx.x + cx;
+        c1y = (float) endx.y + cy;
+        endx.set(camdir2.x, camdir2.y).scl(40f);
+        endx.rotate(cam.getCamera().fieldOfView / 2d);
+        sr.triangle(cx, cy, c1x, c1y, (float) endx.x + cx, (float) endx.y + cy);
 
         // Sun position, 8 Kpc to do galactocentric
-        sr.begin(ShapeType.Filled);
         sr.setColor(1f, 1f, 0f, 1f);
         sr.circle(sunPos.x, sunPos.y, px(2.5f));
+        // GC
+        sr.setColor(0f, 0f, 0f, 1f);
+        sr.circle(side2, side2, px(2.5f));
         sr.end();
 
         // Fonts
         sb.begin();
         font.setColor(1, 1, 0, 1);
         font.draw(sb, txt("gui.minimap.sun"), side2, sunPos.y - px(8));
-        font.setColor(.5f, .5f, 1, 1);
+        font.setColor(.6f, .6f, 0.9f, 1);
         font.draw(sb, txt("gui.minimap.gc"), side2 + px(4), side2 - px(4));
         for (int i = 4000; i <= 16000; i += 4000) {
             font.draw(sb, "" + (i / 1000) + "Kpc", side2, (16000 + i) * side / 32000 - px(6));

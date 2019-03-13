@@ -1,19 +1,15 @@
 package gaia.cu9.ari.gaiaorbit.scenegraph;
 
-import java.util.Random;
-
 import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.graphics.g3d.ModelBatch;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
-
 import gaia.cu9.ari.gaiaorbit.GaiaSky;
 import gaia.cu9.ari.gaiaorbit.event.EventManager;
 import gaia.cu9.ari.gaiaorbit.event.Events;
 import gaia.cu9.ari.gaiaorbit.event.IObserver;
 import gaia.cu9.ari.gaiaorbit.render.ComponentType;
 import gaia.cu9.ari.gaiaorbit.render.ILineRenderable;
-import gaia.cu9.ari.gaiaorbit.render.IPointRenderable;
 import gaia.cu9.ari.gaiaorbit.render.IRenderable;
 import gaia.cu9.ari.gaiaorbit.render.RenderingContext;
 import gaia.cu9.ari.gaiaorbit.render.SceneGraphRenderer;
@@ -29,13 +25,15 @@ import gaia.cu9.ari.gaiaorbit.util.coord.AstroUtils;
 import gaia.cu9.ari.gaiaorbit.util.math.Vector3d;
 import gaia.cu9.ari.gaiaorbit.util.time.ITimeFrameProvider;
 
+import java.util.Random;
+
 /**
  * A point particle which may represent a star, a galaxy, etc.
  * 
  * @author Toni Sagrista
  *
  */
-public class Particle extends CelestialBody implements IStarFocus, IPointRenderable, ILineRenderable {
+public class Particle extends CelestialBody implements IStarFocus, ILineRenderable {
 
     private static final float DISC_FACTOR = 1.5f;
     private static final float LABEL_FACTOR = 1f;

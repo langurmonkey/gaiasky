@@ -29,7 +29,9 @@ import gaia.cu9.ari.gaiaorbit.util.coord.AstroUtils;
 
 public class StarGroupRenderSystem extends ImmediateRenderSystem implements IObserver {
     private final double BRIGHTNESS_FACTOR;
-    /** Hopefully we won't have more than 50000 star groups at once **/
+    /**
+     * Hopefully we won't have more than 50000 star groups at once
+     **/
     private final int N_MESHES = 50000;
 
     private Vector3 aux1;
@@ -47,7 +49,7 @@ public class StarGroupRenderSystem extends ImmediateRenderSystem implements IObs
 
     @Override
     protected void initShaderProgram() {
-        pointAlpha = new float[] { GlobalConf.scene.POINT_ALPHA_MIN, GlobalConf.scene.POINT_ALPHA_MIN + GlobalConf.scene.POINT_ALPHA_MAX };
+        pointAlpha = new float[]{GlobalConf.scene.POINT_ALPHA_MIN, GlobalConf.scene.POINT_ALPHA_MIN + GlobalConf.scene.POINT_ALPHA_MAX};
     }
 
     @Override
@@ -57,11 +59,11 @@ public class StarGroupRenderSystem extends ImmediateRenderSystem implements IObs
     }
 
     /**
-    	 * Adds a new mesh data to the meshes list and increases the mesh data index
-    	 * 
-    	 * @param nVertices The max number of vertices this mesh data can hold
-    	 * @return The index of the new mesh data
-    	 */
+     * Adds a new mesh data to the meshes list and increases the mesh data index
+     *
+     * @param nVertices The max number of vertices this mesh data can hold
+     * @return The index of the new mesh data
+     */
     private int addMeshData(int nVertices) {
         // look for index
         int mdi;
@@ -93,7 +95,7 @@ public class StarGroupRenderSystem extends ImmediateRenderSystem implements IObs
 
     /**
      * Clears the mesh data at the index i
-     * 
+     *
      * @param i The index
      */
     public void clearMeshData(int i) {
@@ -226,28 +228,28 @@ public class StarGroupRenderSystem extends ImmediateRenderSystem implements IObs
     @Override
     public void notify(Events event, Object... data) {
         switch (event) {
-        case STAR_MIN_OPACITY_CMD:
-            pointAlpha[0] = (float) data[0];
-            pointAlpha[1] = (float) data[0] + GlobalConf.scene.POINT_ALPHA_MAX;
-            for (ShaderProgram p : programs) {
-                if (p != null && p.isCompiled()) {
-                    Gdx.app.postRunnable(new Runnable() {
-                        @Override
-                        public void run() {
-                            p.begin();
-                            p.setUniform2fv("u_pointAlpha", pointAlpha, 0, 2);
-                            p.end();
-                        }
-                    });
+            case STAR_MIN_OPACITY_CMD:
+                pointAlpha[0] = (float) data[0];
+                pointAlpha[1] = (float) data[0] + GlobalConf.scene.POINT_ALPHA_MAX;
+                for (ShaderProgram p : programs) {
+                    if (p != null && p.isCompiled()) {
+                        Gdx.app.postRunnable(new Runnable() {
+                            @Override
+                            public void run() {
+                                p.begin();
+                                p.setUniform2fv("u_pointAlpha", pointAlpha, 0, 2);
+                                p.end();
+                            }
+                        });
+                    }
                 }
-            }
-            break;
-        case DISPOSE_STAR_GROUP_GPU_MESH:
-            Integer meshIdx = (Integer) data[0];
-            clearMeshData(meshIdx);
-            break;
-        default:
-            break;
+                break;
+            case DISPOSE_STAR_GROUP_GPU_MESH:
+                Integer meshIdx = (Integer) data[0];
+                clearMeshData(meshIdx);
+                break;
+            default:
+                break;
         }
     }
 

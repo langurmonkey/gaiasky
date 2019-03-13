@@ -2,6 +2,36 @@
 ## [Unreleased](https://github.com/langurmonkey/gaiasky/tree/master)
 [Full changelog](https://github.com/langurmonkey/gaiasky/compare/2.1.7...HEAD)
 
+### Bug Fixes
+- hot-switching themes no longer uses previous skin in some dialogs
+- keyboard focus lost when clicking outside input fields
+
+### Code Refactoring
+- various code refactors and cleanups
+- i18n files synced with en_GB
+- general code and keys refactor
+- rearrange and clean up i18n files
+- text icon button styles in skin
+- visibility switch lists are unified under a same interface and code
+
+### Features
+- update link cursor size when theme changes
+- generate man page automatically
+- add CLI arguments -p and -a
+- add man file and utils to generate
+- add h2m help2man file
+- info on gs\_java\_version\_check when run on java other than 1.8
+- new cameraTransition() API call
+- sync and async camera file playback API calls
+- add sync and async camera path running funcs
+- improve minimap
+- implement controller blacklist
+- add controllers blacklist to properties
+- list multiple connected controllers instead of just one
+
+### Style
+- variable name changes
+
 
 <a name="2.1.7"></a>
 ## [2.1.7](https://github.com/langurmonkey/gaiasky/tree/2.1.6) (2019-01-11)
@@ -9,6 +39,7 @@
 
 ### Bug Fixes
 
+- restored download code 
 - wait for tasks to finish before shutting down 
 - about window layout in non-hidpi mode 
 - 'data files not found' problem 

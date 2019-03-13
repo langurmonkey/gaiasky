@@ -5,8 +5,10 @@
 
 if [ $# -lt 1 ]; then
     echo "$0"
-    echo "Usage: "
+    echo "Usage:"
     echo "   $0 version"
+    echo "Example:"
+    echo "   $0 005"
     exit 1
 fi
 

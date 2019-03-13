@@ -31,7 +31,7 @@ import gaia.cu9.ari.gaiaorbit.util.tree.IPosition;
  * @author Toni Sagrista
  *
  */
-public class Constellation extends FadeNode implements ILineRenderable, I3DTextRenderable {
+public class Constellation extends FadeNode implements ILineRenderable, I3DTextRenderable, IVisibilitySwitch {
     private static Array<Constellation> allConstellations = new Array<Constellation>(88);
     private double deltaYears;
 
@@ -233,5 +233,13 @@ public class Constellation extends FadeNode implements ILineRenderable, I3DTextR
     public float getLineWidth() {
         return 1;
     }
-    
+
+    @Override
+    public String getDescription() {
+        return null;
+    }
+
+    @Override
+    public void setDescription(String name) {
+    }
 }

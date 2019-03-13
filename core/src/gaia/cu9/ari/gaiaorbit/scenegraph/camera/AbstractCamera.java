@@ -3,8 +3,8 @@ package gaia.cu9.ari.gaiaorbit.scenegraph.camera;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.PerspectiveCamera;
-
 import gaia.cu9.ari.gaiaorbit.scenegraph.CelestialBody;
+import gaia.cu9.ari.gaiaorbit.scenegraph.IFocus;
 import gaia.cu9.ari.gaiaorbit.scenegraph.IStarFocus;
 import gaia.cu9.ari.gaiaorbit.util.Constants;
 import gaia.cu9.ari.gaiaorbit.util.GlobalConf;
@@ -42,7 +42,7 @@ public abstract class AbstractCamera implements ICamera {
     protected CameraManager parent;
 
     /** Closest entity to camera **/
-    protected CelestialBody closest;
+    protected IFocus closest;
 
     /** The main camera **/
     public PerspectiveCamera camera;
@@ -187,25 +187,25 @@ public abstract class AbstractCamera implements ICamera {
     }
 
     @Override
-    public void checkClosest(CelestialBody cb) {
+    public void checkClosest(IFocus cb) {
         // A copy can never bee the closest
-        if (!cb.copy)
+        if (!cb.isCopy())
             if (closest == null) {
                 closest = cb;
             } else {
-                if (closest.distToCamera - closest.getRadius() > cb.distToCamera - cb.getRadius()) {
+                if (closest.getDistToCamera() - closest.getRadius() > cb.getDistToCamera() - cb.getRadius()) {
                     closest = cb;
                 }
             }
     }
 
     @Override
-    public CelestialBody getClosest() {
+    public IFocus getClosest() {
         return closest;
     }
 
     @Override
-    public CelestialBody getClosest2() {
+    public IFocus getClosest2() {
         return closest;
     }
 

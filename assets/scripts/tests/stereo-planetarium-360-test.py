@@ -11,19 +11,19 @@ gs = EventScriptingInterface.instance()
 
 gs.sleep(3)
 
-print("360 mode")
+gs.print("360 mode")
 gs.set360Mode(True)
 gs.sleep(3)
 gs.set360Mode(False)
 gs.sleep(3)
 
-print("Planetarium mode")
+gs.print("Planetarium mode")
 gs.setPlanetariumMode(True)
 gs.sleep(3)
 gs.setPlanetariumMode(False)
 gs.sleep(3)
 
-print("Stereoscopic mode and profiles")
+gs.print("Stereoscopic mode and profiles")
 gs.setStereoscopicMode(True)
 gs.sleep(3)
 

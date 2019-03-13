@@ -1,17 +1,12 @@
 #version 120
 
-#ifdef GL_ES
-precision mediump float;
-precision mediump int;
-#endif
-
 attribute vec4 a_position;
 attribute vec4 a_color;
 
 uniform mat4 u_worldTransform;
 uniform mat4 u_projModelView;
-uniform vec2 u_viewport;
 uniform vec3 u_parentPos;
+uniform float u_pointSize;
 
 varying vec4 v_col;
 
@@ -47,5 +42,6 @@ void main() {
    #endif // gravitationalWaves
    
    gl_Position = u_projModelView * pos;
+   gl_PointSize = u_pointSize;
    v_col = a_color;
 }

@@ -1,9 +1,12 @@
 package gaia.cu9.ari.gaiaorbit.scenegraph;
 
-import com.badlogic.gdx.utils.*;
+import com.badlogic.gdx.utils.Array;
+import com.badlogic.gdx.utils.IntMap;
+import com.badlogic.gdx.utils.ObjectMap;
 import com.badlogic.gdx.utils.ObjectMap.Keys;
+import com.badlogic.gdx.utils.ObjectSet;
 import gaia.cu9.ari.gaiaorbit.GaiaSky;
-import gaia.cu9.ari.gaiaorbit.render.system.PixelRenderSystem;
+import gaia.cu9.ari.gaiaorbit.render.system.StarPointRenderSystem;
 import gaia.cu9.ari.gaiaorbit.scenegraph.StarGroup.StarBean;
 import gaia.cu9.ari.gaiaorbit.scenegraph.camera.ICamera;
 import gaia.cu9.ari.gaiaorbit.scenegraph.octreewrapper.AbstractOctreeWrapper;
@@ -238,7 +241,7 @@ public abstract class AbstractSceneGraph implements ISceneGraph {
     public void update(ITimeFrameProvider time, ICamera camera) {
         // Check if we need to update the points
         if (GlobalConf.scene.COMPUTE_GAIA_SCAN && time.getDt() != 0) {
-            PixelRenderSystem.POINT_UPDATE_FLAG = true;
+            StarPointRenderSystem.POINT_UPDATE_FLAG = true;
         }
     }
 
@@ -283,6 +286,7 @@ public abstract class AbstractSceneGraph implements ISceneGraph {
         root.addFocusableObjects(objects);
         return objects;
     }
+
 
     public IFocus findFocus(String name) {
         SceneGraphNode node = getNode(name);

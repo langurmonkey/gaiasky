@@ -151,7 +151,7 @@ public class Text2D extends FadeNode implements I3DTextRenderable, IShapeRendera
 
     @Override
     public boolean isLabel() {
-        return true;
+        return false;
     }
 
     @Override

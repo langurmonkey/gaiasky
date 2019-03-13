@@ -1,5 +1,16 @@
 package gaia.cu9.ari.gaiaorbit.script;
 
+import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.files.FileHandle;
+import gaia.cu9.ari.gaiaorbit.event.EventManager;
+import gaia.cu9.ari.gaiaorbit.event.Events;
+import gaia.cu9.ari.gaiaorbit.event.IObserver;
+import gaia.cu9.ari.gaiaorbit.util.I18n;
+import gaia.cu9.ari.gaiaorbit.util.Logger;
+import gaia.cu9.ari.gaiaorbit.util.Logger.Log;
+import org.python.core.PyCode;
+import org.python.util.PythonInterpreter;
+
 import java.io.File;
 import java.io.FileReader;
 import java.util.Collections;
@@ -7,19 +18,6 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.atomic.AtomicInteger;
-
-import org.python.core.PyCode;
-import org.python.util.PythonInterpreter;
-
-import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.files.FileHandle;
-
-import gaia.cu9.ari.gaiaorbit.event.EventManager;
-import gaia.cu9.ari.gaiaorbit.event.Events;
-import gaia.cu9.ari.gaiaorbit.event.IObserver;
-import gaia.cu9.ari.gaiaorbit.util.I18n;
-import gaia.cu9.ari.gaiaorbit.util.Logger;
-import gaia.cu9.ari.gaiaorbit.util.Logger.Log;
 
 /**
  * Factory class to create, execute and cancel Jython scripts.
@@ -79,7 +77,7 @@ public class JythonFactory extends ScriptingFactory implements IObserver {
         EventManager.instance.subscribe(this, Events.RUN_SCRIPT_PYCODE, Events.RUN_SCRIPT_PATH, Events.CANCEL_SCRIPT_CMD);
     }
 
-    public PyCode compileJythonScript(String script) throws Exception {
+    private PyCode compileJythonScript(String script) {
         return interpreter.compile(script);
     }
 
@@ -94,7 +92,7 @@ public class JythonFactory extends ScriptingFactory implements IObserver {
      * @param async Boolean indicating whether to run the script in a separate thread or not. If 
      * true, the execution is asynchronous and the call returns immediately.
      */
-    public void runJythonScript(final PyCode code, String path, boolean async) {
+    private void runJythonScript(final PyCode code, String path, boolean async) {
         if (currentScripts.size() < maxScripts) {
             Thread run = new ScriptRunnable(code, path);
             // Maximum priority to script
@@ -117,7 +115,7 @@ public class JythonFactory extends ScriptingFactory implements IObserver {
      * @param async Boolean indicating whether to run the script in a separate thread or not. If 
      * true, the execution is asynchronous and the call returns immediately.
      */
-    public void runJythonScript(final String script, String path, boolean async) {
+    private void runJythonScript(final String script, String path, boolean async) {
         try {
             runJythonScript(compileJythonScript(script), path, async);
         } catch (Exception e) {
@@ -133,7 +131,7 @@ public class JythonFactory extends ScriptingFactory implements IObserver {
             PyCode code = (PyCode) data[0];
             String path = (String) data[1];
             boolean async = true;
-            if (data.length > 1)
+            if (data.length > 2)
                 async = (Boolean) data[2];
             runJythonScript(code, path, async);
             break;
@@ -187,7 +185,7 @@ public class JythonFactory extends ScriptingFactory implements IObserver {
      * Cancels the running script identified by the given path.
      * @param path The path.
      */
-    public void cancelScript(String path) {
+    private void cancelScript(String path) {
         if (currentScripts.containsKey(path)) {
             ScriptRunnable sr = currentScripts.get(path);
             try {
@@ -211,7 +209,7 @@ public class JythonFactory extends ScriptingFactory implements IObserver {
         final String path;
         PythonInterpreter interpreter;
 
-        public ScriptRunnable(PyCode code, String path) {
+        ScriptRunnable(PyCode code, String path) {
             this.code = code;
             this.path = path;
         }
@@ -238,7 +236,7 @@ public class JythonFactory extends ScriptingFactory implements IObserver {
             }
         }
 
-        public void cleanup() {
+        void cleanup() {
             // Re-enable input and remove objects, just in case
             EventManager.instance.post(Events.REMOVE_ALL_OBJECTS);
             EventManager.instance.post(Events.CLEAR_MESSAGES);

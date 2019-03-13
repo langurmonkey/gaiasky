@@ -8,39 +8,29 @@ import gaia.cu9.ari.gaiaorbit.scenegraph.camera.ICamera;
 
 /**
  * Interface that must be extended by all types of scene graph renderers
- * 
- * @author tsagrista
  *
+ * @author tsagrista
  */
 public interface ISGR extends Disposable {
     /**
      * Renders the scene
-     * 
-     * @param sgr
-     *            The scene graph renderer object
-     * @param camera
-     *            The camera.
-     * @param t
-     *            The time in seconds since the start
-     * @param rw
-     *            The width
-     * @param rh
-     *            The height
-     * @param fb
-     *            The frame buffer, if any
-     * @param ppb
-     *            The post processing bean
+     *
+     * @param sgr    The scene graph renderer object
+     * @param camera The camera.
+     * @param t      The time in seconds since the start
+     * @param rw     The width
+     * @param rh     The height
+     * @param fb     The frame buffer, if any
+     * @param ppb    The post processing bean
      */
-    public void render(SceneGraphRenderer sgr, ICamera camera, double t, int rw, int rh, FrameBuffer fb, PostProcessBean ppb);
+    void render(SceneGraphRenderer sgr, ICamera camera, double t, int rw, int rh, FrameBuffer fb, PostProcessBean ppb);
 
     /**
      * Resizes the assets of this renderer to the given new size
-     * 
-     * @param w
-     *            New width
-     * @param h
-     *            New height
+     *
+     * @param w New width
+     * @param h New height
      */
-    public void resize(final int w, final int h);
+    void resize(final int w, final int h);
 
 }

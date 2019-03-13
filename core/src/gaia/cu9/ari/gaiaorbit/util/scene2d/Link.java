@@ -4,13 +4,10 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input.Buttons;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Cursor.SystemCursor;
-import com.badlogic.gdx.scenes.scene2d.Event;
-import com.badlogic.gdx.scenes.scene2d.EventListener;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.InputEvent.Type;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
-
 import gaia.cu9.ari.gaiaorbit.util.GlobalResources;
 
 /**
@@ -54,23 +51,20 @@ public class Link extends Label {
     }
 
     private void initialize() {
-        this.addListener(new EventListener() {
-            @Override
-            public boolean handle(Event event) {
-                if (event instanceof InputEvent) {
-                    Type type = ((InputEvent) event).getType();
-                    // Click
-                    if (type == Type.touchUp && ((InputEvent) event).getButton() == Buttons.LEFT) {
-                        Gdx.net.openURI(linkURL);
-                    } else if (type == Type.enter) {
-                        Gdx.graphics.setCursor(Gdx.graphics.newCursor(GlobalResources.linkCursor, 4, 0));
-                    } else if (type == Type.exit) {
-                        Gdx.graphics.setSystemCursor(SystemCursor.Arrow);
-                    }
-                    return true;
+        this.addListener(event -> {
+            if (event instanceof InputEvent) {
+                Type type = ((InputEvent) event).getType();
+                // Click
+                if (type == Type.touchUp && ((InputEvent) event).getButton() == Buttons.LEFT) {
+                    Gdx.net.openURI(linkURL);
+                } else if (type == Type.enter) {
+                    Gdx.graphics.setCursor(GlobalResources.linkCursor);
+                } else if (type == Type.exit) {
+                    Gdx.graphics.setSystemCursor(SystemCursor.Arrow);
                 }
-                return false;
+                return true;
             }
+            return false;
         });
     }
 

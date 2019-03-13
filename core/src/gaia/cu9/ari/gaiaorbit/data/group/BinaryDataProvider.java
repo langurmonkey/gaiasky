@@ -1,21 +1,15 @@
 package gaia.cu9.ari.gaiaorbit.data.group;
 
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.io.RandomAccessFile;
-import java.nio.MappedByteBuffer;
-import java.nio.channels.FileChannel;
-
 import com.badlogic.gdx.utils.Array;
-
 import gaia.cu9.ari.gaiaorbit.scenegraph.ParticleGroup.ParticleBean;
 import gaia.cu9.ari.gaiaorbit.scenegraph.StarGroup.StarBean;
 import gaia.cu9.ari.gaiaorbit.util.Constants;
 import gaia.cu9.ari.gaiaorbit.util.GlobalConf;
 import gaia.cu9.ari.gaiaorbit.util.I18n;
+
+import java.io.*;
+import java.nio.MappedByteBuffer;
+import java.nio.channels.FileChannel;
 
 /**
  * Reads arrays of star beans from binary files, usually to go in an octree.
