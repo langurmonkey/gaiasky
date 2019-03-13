@@ -233,21 +233,21 @@ task gaiaskyJar (dependsOn: [compileJava, jar, copyToLib],  description: "Create
 }
 
 task dist (dependsOn: gaiaskyJar, description: "Compiles the project, creates the jar and moves it all to releases/gaiasky-\$tag-\$rev") {
-    // Version check
-    String vsc = "${System.env.GS_JAVA_VERSION_CHECK}"
-    boolean javaVersionOk = JavaVersion.current() == JavaVersion.VERSION_1_8
-    if(vsc.equalsIgnoreCase("false")){
-        if(!javaVersionOk){
-            println("WARNING: Gaia Sky must be built with Java  " + JavaVersion.VERSION_1_8 + ", you are using " + JavaVersion.current())
-        }
-    } else {
-        if(!javaVersionOk){
-            print("FAILURE: Do 'export GS_JAVA_VERSION_CHECK=false' to skip this check")
-            throw new GradleException("This built must be run with java " + JavaVersion.VERSION_1_8 + ", you are using " + JavaVersion.current())
-        }
-    }
-
     doLast {
+        // Version check
+        String vsc = "${System.env.GS_JAVA_VERSION_CHECK}"
+        boolean javaVersionOk = JavaVersion.current() == JavaVersion.VERSION_1_8
+        if(vsc.equalsIgnoreCase("false")){
+            if(!javaVersionOk){
+                println("WARNING: Gaia Sky must be built with Java  " + JavaVersion.VERSION_1_8 + ", you are using " + JavaVersion.current())
+            }
+        } else {
+            if(!javaVersionOk){
+                print("FAILURE: Do 'export GS_JAVA_VERSION_CHECK=false' to skip this check")
+                throw new GradleException("This built must be run with java " + JavaVersion.VERSION_1_8 + ", you are using " + JavaVersion.current())
+            }
+        }
+
         // Copy conf
         mkdir "$distDir/conf"
         copy {

@@ -141,7 +141,7 @@ public class DesktopConfInit extends ConfInit {
 
         String DATA_LOCATION = p.getProperty("data.location");
         if (DATA_LOCATION == null || DATA_LOCATION.isEmpty())
-            DATA_LOCATION = SysUtils.getDefaultDataDir().getAbsolutePath();
+            DATA_LOCATION = SysUtils.getLocalDataDir().getAbsolutePath();
 
         String CATALOG_JSON_FILE = p.getProperty("data.json.catalog", "");
 
@@ -507,8 +507,7 @@ public class DesktopConfInit extends ConfInit {
 
     private String initConfigFile(boolean ow) throws IOException {
         // Use user folder
-        File userFolder = SysUtils.getGSHomeDir();
-        userFolder.mkdirs();
+        File userFolder = SysUtils.getConfigDir();
         File userFolderConfFile = new File(userFolder, "global.properties");
 
         if (ow || !userFolderConfFile.exists()) {

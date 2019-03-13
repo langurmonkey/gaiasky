@@ -5,6 +5,7 @@ import com.badlogic.gdx.Input;
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.scenes.scene2d.Action;
+import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.*;
@@ -110,12 +111,96 @@ public class KeyframesWindow extends GenericDialog implements IObserver {
 
     private float buttonSize, buttonSizeL;
 
+    /**
+     * Contains info on field currently being edited
+     */
+    private class Editing {
+        private int type = -1;
+        private Keyframe kf;
+        private int index;
+        private OwnTextField tf;
+        private Map<String, Object> map;
+
+        public Editing() {
+            map = new HashMap<>();
+        }
+
+        public boolean notEmpty() {
+            return tf != null;
+        }
+
+        public boolean isEmpty() {
+            return tf == null;
+        }
+
+        public void revert() {
+            if (isName()) {
+                addFrameName(kf, index, keyframesTable);
+            } else if (isSeconds()) {
+                addFrameSeconds(kf, (Double) map.get("prevT"), index, keyframesTable);
+            }
+        }
+
+        public void setParam(String key, Object value) {
+            map.put(key, value);
+        }
+
+        public boolean isName() {
+            return !isEmpty() && type == 1;
+        }
+
+        public boolean isSeconds() {
+            return !isEmpty() && type == 0;
+        }
+
+        public void set(Keyframe kf, int idx, OwnTextField tf) {
+            this.kf = kf;
+            this.index = idx;
+            this.tf = tf;
+        }
+
+        public void setName(Keyframe kf, int idx, OwnTextField tf) {
+            type = 1;
+            set(kf, idx, tf);
+        }
+
+        public void setSeconds(Keyframe kf, int idx, OwnTextField tf, double prevT) {
+            type = 0;
+            setParam("prevT", prevT);
+            set(kf, idx, tf);
+        }
+
+        public void unset() {
+            type = -1;
+            kf = null;
+            index = -1;
+            tf = null;
+            map.clear();
+        }
+
+        public Keyframe kf() {
+            return kf;
+        }
+
+        public int index() {
+            return index;
+        }
+
+        public OwnTextField tf() {
+            return tf;
+        }
+
+    }
+
+    private Editing editing;
+
     public KeyframesWindow(Stage stage, Skin skin) {
         super(txt("gui.keyframes.title"), skin, stage);
 
         buttonSize = 15 * GlobalConf.SCALE_FACTOR;
         buttonSizeL = 17 * GlobalConf.SCALE_FACTOR;
 
+        this.editing = new Editing();
         this.keyframes = new Array<>();
         this.secondsCells = new HashMap<>();
         this.namesCells = new HashMap<>();
@@ -141,6 +226,8 @@ public class KeyframesWindow extends GenericDialog implements IObserver {
 
         EventManager.instance.post(Events.SCENE_GRAPH_ADD_OBJECT_CMD, keyframesPathObject, false);
 
+        // Resizable
+        setResizable(false, true);
     }
 
     @Override
@@ -200,13 +287,14 @@ public class KeyframesWindow extends GenericDialog implements IObserver {
 
         // ADD SCROLL
         rightScroll = new OwnScrollPane(keyframesTable, skin, "minimalist-nobg");
+        rightScroll.setExpand(true);
         rightScroll.setScrollingDisabled(true, false);
         rightScroll.setHeight((GlobalConf.SCALE_FACTOR > 1.5f ? 100 : 110) * GlobalConf.SCALE_FACTOR);
         rightScroll.setWidth((GlobalConf.SCALE_FACTOR > 1.5f ? 360 : 390) * GlobalConf.SCALE_FACTOR);
         rightScroll.setFadeScrollBars(true);
 
         right.add(keyframesTitle).top().left().padBottom(pad).row();
-        right.add(rightScroll).top().left();
+        right.add(rightScroll).center().left();
 
         right.pack();
 
@@ -221,43 +309,38 @@ public class KeyframesWindow extends GenericDialog implements IObserver {
         open.addListener((event) -> {
             if (event instanceof ChangeListener.ChangeEvent) {
                 FileChooser fc = FileChooser.createPickDialog(txt("gui.download.pickloc"), skin, new FileHandle(SysUtils.getDefaultCameraDir()));
-                fc.setResultListener(new FileChooser.ResultListener() {
-                    @Override
-                    public boolean result(boolean success, FileHandle result) {
-                        if (success) {
-                            if (result.file().exists() && result.file().isFile()) {
-                                // Load selected file
-                                try {
-                                    Array<Keyframe> kfs = CameraKeyframeManager.instance.loadKeyframesFile(result.file());
-                                    // Update current instance
-                                    reinitialiseKeyframes(kfs, null);
-                                    keyframesPathObject.unselect();
-                                    lastKeyframeFileName = result.file().getName();
-                                    logger.info(txt("gui.keyframes.load.success", keyframes.size, result.file().getName()));
-                                } catch (RuntimeException e) {
-                                    logger.error(txt("gui.keyframes.load.error", result.file().getName()), e);
-                                    Label warn = new OwnLabel(txt("error.loading.format", result.file().getName()), skin);
-                                    warn.setColor(1f, .4f, .4f, 1f);
-                                    notice.setActor(warn);
-                                    return false;
-                                }
-
-                            } else {
-                                logger.error(txt("error.loading.notexistent", result.file().getName()));
-                                Label warn = new OwnLabel(txt("error.loading.notexistent", result.file().getName()), skin);
+                fc.setResultListener((success, result) -> {
+                    if (success) {
+                        if (result.file().exists() && result.file().isFile()) {
+                            // Load selected file
+                            try {
+                                Array<Keyframe> kfs = CameraKeyframeManager.instance.loadKeyframesFile(result.file());
+                                // Update current instance
+                                reinitialiseKeyframes(kfs, null);
+                                keyframesPathObject.unselect();
+                                lastKeyframeFileName = result.file().getName();
+                                logger.info(txt("gui.keyframes.load.success", keyframes.size, result.file().getName()));
+                            } catch (RuntimeException e) {
+                                logger.error(txt("gui.keyframes.load.error", result.file().getName()), e);
+                                Label warn = new OwnLabel(txt("error.loading.format", result.file().getName()), skin);
                                 warn.setColor(1f, .4f, .4f, 1f);
                                 notice.setActor(warn);
                                 return false;
                             }
+
+                        } else {
+                            logger.error(txt("error.loading.notexistent", result.file().getName()));
+                            Label warn = new OwnLabel(txt("error.loading.notexistent", result.file().getName()), skin);
+                            warn.setColor(1f, .4f, .4f, 1f);
+                            notice.setActor(warn);
+                            return false;
                         }
-                        notice.clearActor();
-                        return true;
                     }
+                    notice.clearActor();
+                    return true;
                 });
 
-                fc.setFilter((pathname) -> {
-                    return pathname.isFile() && pathname.getName().endsWith(".gkf");
-                });
+                fc.setFilter((pathname) -> pathname.isFile() && pathname.getName().endsWith(".gkf"));
                 fc.show(stage);
                 return true;
             }
@@ -345,11 +428,10 @@ public class KeyframesWindow extends GenericDialog implements IObserver {
 
         /** FINAL LAYOUT **/
         content.add(left).top().left().padRight(pad * 2f).padBottom(pad * 3f);
-        content.add(right).width(370 * GlobalConf.SCALE_FACTOR).top().left().padBottom(pad * 3f).row();
+        content.add(right).width(370 * GlobalConf.SCALE_FACTOR).top().left().padBottom(pad).row();
         notice = content.add();
-        notice.padBottom(pad * 2f).center().colspan(2).row();
-        content.add(buttons).colspan(2).right().row();
-
+        notice.padBottom(pad).expandY().center().colspan(2).row();
+        content.add(buttons).colspan(2).bottom().right().row();
 
         // CLEAR
         OwnTextButton clear = new OwnTextButton(txt("gui.clear"), skin);
@@ -500,7 +582,7 @@ public class KeyframesWindow extends GenericDialog implements IObserver {
     private Cell addFrameSeconds(Keyframe kf, double prevT, int index, Table table) {
         // Seconds
         OwnLabel secondsL = new OwnLabel(secondsFormatter.format(prevT + kf.seconds), skin, "hud-header");
-        secondsL.setWidth((GlobalConf.SCALE_FACTOR > 1.5f ? 60 : 75) * GlobalConf.SCALE_FACTOR);
+        secondsL.setWidth((GlobalConf.SCALE_FACTOR > 1.5f ? 60f : 75f) * GlobalConf.SCALE_FACTOR);
         Cell secondsCell;
         if (secondsCells.containsKey(kf))
             secondsCell = secondsCells.get(kf);
@@ -516,17 +598,23 @@ public class KeyframesWindow extends GenericDialog implements IObserver {
                 if (event instanceof InputEvent) {
                     InputEvent ie = (InputEvent) event;
                     if (ie.getType().equals(InputEvent.Type.touchDown)) {
+                        if (editing.notEmpty()) {
+                            // Remove current
+                            editing.revert();
+                            editing.unset();
+                        }
                         String valText = secondsL.getText().toString();
                         secondsL.clear();
                         secondsCells.get(kf).clearActor();
                         OwnTextField secondsInput = new OwnTextField(valText, skin, new FloatValidator(0.0001f, 500f));
-                        secondsInput.setWidth(55 * GlobalConf.SCALE_FACTOR);
+                        secondsInput.setWidth((GlobalConf.SCALE_FACTOR > 1.5f ? 55f : 75f) * GlobalConf.SCALE_FACTOR);
                         secondsInput.selectAll();
                         stage.setKeyboardFocus(secondsInput);
+                        editing.setSeconds(kf, index, secondsInput, prevT);
                         secondsInput.addListener((evt) -> {
                             if (secondsInput.isValid() && evt instanceof InputEvent && System.currentTimeMillis() - lastMs > 1500) {
                                 InputEvent ievt = (InputEvent) evt;
-                                if (ievt.getKeyCode() == Input.Keys.ENTER || ievt.getKeyCode() == Input.Keys.ESCAPE) {
+                                if (ievt.getType() == InputEvent.Type.keyDown && (ievt.getKeyCode() == Input.Keys.ENTER || ievt.getKeyCode() == Input.Keys.ESCAPE)) {
                                     double val = Double.parseDouble(secondsInput.getText());
                                     double t = 0;
                                     for (Keyframe k : keyframes) {
@@ -543,6 +631,7 @@ public class KeyframesWindow extends GenericDialog implements IObserver {
                                             reinitialiseKeyframes(keyframes, null);
                                         });
                                     }
+                                    editing.unset();
                                 }
                             }
                             evt.setBubbles(false);
@@ -554,13 +643,14 @@ public class KeyframesWindow extends GenericDialog implements IObserver {
                 }
                 return true;
             });
+        addHighlightListener(secondsL, kf);
         return secondsCell;
     }
 
     private Cell addFrameName(Keyframe kf, int index, Table table) {
         // Seconds
         OwnLabel nameL = new OwnLabel((index + 1) + ": " + kf.name, skin);
-        nameL.setWidth((GlobalConf.SCALE_FACTOR > 1.5f ? 100 : 130) * GlobalConf.SCALE_FACTOR);
+        nameL.setWidth((GlobalConf.SCALE_FACTOR > 1.5f ? 100f : 130f) * GlobalConf.SCALE_FACTOR);
         Cell nameCell;
         if (namesCells.containsKey(kf))
             nameCell = namesCells.get(kf);
@@ -575,7 +665,12 @@ public class KeyframesWindow extends GenericDialog implements IObserver {
         nameL.addListener((event) -> {
             if (event instanceof InputEvent) {
                 InputEvent ie = (InputEvent) event;
-                if (ie.getType().equals(InputEvent.Type.touchDown)) {
+                if (ie.getType() == InputEvent.Type.touchDown) {
+                    if (editing.notEmpty()) {
+                        // Remove current
+                        editing.revert();
+                        editing.unset();
+                    }
                     String valText = nameL.getText().toString();
                     valText = valText.substring(valText.indexOf(":") + 2);
                     nameL.clear();
@@ -584,15 +679,17 @@ public class KeyframesWindow extends GenericDialog implements IObserver {
                     LengthValidator lengthValidator = new LengthValidator(0, 15);
                     RegexpValidator nameValidator = new RegexpValidator(lengthValidator, "^[^*&%\\+\\=\\\\\\/@#\\$&\\*()~]*$");
                     OwnTextField nameInput = new OwnTextField(valText, skin, nameValidator);
-                    nameInput.setWidth(55 * GlobalConf.SCALE_FACTOR);
+                    nameInput.setWidth((GlobalConf.SCALE_FACTOR > 1.5f ? 100f : 130f) * GlobalConf.SCALE_FACTOR);
                     nameInput.selectAll();
                     stage.setKeyboardFocus(nameInput);
+                    editing.setName(kf, index, nameInput);
                     nameInput.addListener((evt) -> {
                         if (nameInput.isValid() && evt instanceof InputEvent && System.currentTimeMillis() - lastMs > 1500) {
                             InputEvent ievt = (InputEvent) evt;
-                            if (ievt.getKeyCode() == Input.Keys.ENTER) {
+                            if (ievt.getType() == InputEvent.Type.keyDown && (ievt.getKeyCode() == Input.Keys.ENTER || ievt.getKeyCode() == Input.Keys.ESCAPE)) {
                                 kf.name = nameInput.getText();
                                 addFrameName(kf, index, table);
+                                editing.unset();
                             }
                         }
                         evt.setBubbles(false);
@@ -604,6 +701,7 @@ public class KeyframesWindow extends GenericDialog implements IObserver {
             }
             return true;
         });
+        addHighlightListener(nameL, kf);
         return nameCell;
     }
 
@@ -625,6 +723,7 @@ public class KeyframesWindow extends GenericDialog implements IObserver {
         OwnLabel framesL = new OwnLabel("(" + frame + ")", skin);
         framesL.setWidth(40 * GlobalConf.SCALE_FACTOR);
         framesL.addListener(new TextTooltip(txt("gui.tooltip.kf.frames", frame, (1d / GlobalConf.frame.RENDER_TARGET_FPS)), skin));
+        addHighlightListener(framesL, kf);
         table.add(framesL).left().padRight(pad).padBottom(pad5);
 
         // Clock - time
@@ -632,6 +731,7 @@ public class KeyframesWindow extends GenericDialog implements IObserver {
         clockimg.addListener(new TextTooltip(dateFormat.format(Instant.ofEpochMilli(kf.time)), skin));
         clockimg.setScale(0.7f);
         clockimg.setOrigin(Align.center);
+        addHighlightListener(clockimg, kf);
         table.add(clockimg).width(clockimg.getWidth()).left().padRight(pad).padBottom(pad5);
 
         // Frame name
@@ -655,6 +755,7 @@ public class KeyframesWindow extends GenericDialog implements IObserver {
             }
             return false;
         });
+        addHighlightListener(goTo, kf);
         table.add(goTo).left().padRight(pad5).padBottom(pad5);
 
         // Seam
@@ -680,6 +781,7 @@ public class KeyframesWindow extends GenericDialog implements IObserver {
             }
             return false;
         });
+        addHighlightListener(seam, kf);
         table.add(seam).left().padRight(pad5).padBottom(pad5);
 
         // Add after
@@ -715,6 +817,7 @@ public class KeyframesWindow extends GenericDialog implements IObserver {
             }
             return false;
         });
+        addHighlightListener(addKeyframe, kf);
         table.add(addKeyframe).left().padRight(pad5).padBottom(pad5);
 
         // Rubbish
@@ -740,11 +843,10 @@ public class KeyframesWindow extends GenericDialog implements IObserver {
             }
             return false;
         });
+        addHighlightListener(rubbish, kf);
         Cell rub = table.add(rubbish).left().padBottom(pad5);
         rub.row();
         table.pack();
-
-        this.pack();
 
         if (addToModel && keyframesPathObject != null) {
             Gdx.app.postRunnable(() -> {
@@ -756,6 +858,21 @@ public class KeyframesWindow extends GenericDialog implements IObserver {
             });
         }
 
+    }
+
+    private void addHighlightListener(Actor a, Keyframe kf){
+        a.addListener(event -> {
+            if (event instanceof InputEvent) {
+                InputEvent ie = (InputEvent) event;
+                if (ie.getType() == InputEvent.Type.enter) {
+                    keyframesPathObject.highlight(kf);
+                } else if (ie.getType() == InputEvent.Type.exit) {
+                    keyframesPathObject.unhighlight(kf);
+                }
+                return true;
+            }
+            return false;
+        });
     }
 
     @Override
@@ -795,6 +912,7 @@ public class KeyframesWindow extends GenericDialog implements IObserver {
         if (cleanKeyframesList)
             keyframes.clear();
 
+        notice.clearActor();
         namesCells.clear();
         secondsCells.clear();
         keyframesTable.clearChildren();

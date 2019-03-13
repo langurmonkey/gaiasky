@@ -1,19 +1,18 @@
 package gaia.cu9.ari.gaiaorbit.data;
 
-import java.io.FileNotFoundException;
-
 import com.badlogic.gdx.utils.Array;
-
 import gaia.cu9.ari.gaiaorbit.scenegraph.SceneGraphNode;
+
+import java.io.FileNotFoundException;
 
 public interface ISceneGraphLoader {
 
-    public Array<? extends SceneGraphNode> loadData() throws FileNotFoundException;
+    Array<? extends SceneGraphNode> loadData() throws FileNotFoundException;
 
-    public void setName(String name);
+    void setName(String name);
 
-    public void setDescription(String description);
+    void setDescription(String description);
 
-    public void initialize(String[] files) throws RuntimeException;
+    void initialize(String[] files) throws RuntimeException;
 
 }

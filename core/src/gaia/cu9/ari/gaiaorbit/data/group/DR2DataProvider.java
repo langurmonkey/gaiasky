@@ -5,14 +5,13 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.utils.Array;
 import gaia.cu9.ari.gaiaorbit.scenegraph.ParticleGroup.ParticleBean;
 import gaia.cu9.ari.gaiaorbit.scenegraph.StarGroup.StarBean;
-import gaia.cu9.ari.gaiaorbit.util.Constants;
-import gaia.cu9.ari.gaiaorbit.util.GlobalConf;
-import gaia.cu9.ari.gaiaorbit.util.I18n;
-import gaia.cu9.ari.gaiaorbit.util.Logger;
+import gaia.cu9.ari.gaiaorbit.util.*;
 import gaia.cu9.ari.gaiaorbit.util.Logger.Log;
 import gaia.cu9.ari.gaiaorbit.util.color.ColourUtils;
 import gaia.cu9.ari.gaiaorbit.util.coord.AstroUtils;
 import gaia.cu9.ari.gaiaorbit.util.coord.Coordinates;
+import gaia.cu9.ari.gaiaorbit.util.format.INumberFormat;
+import gaia.cu9.ari.gaiaorbit.util.format.NumberFormatFactory;
 import gaia.cu9.ari.gaiaorbit.util.io.ByteBufferInputStream;
 import gaia.cu9.ari.gaiaorbit.util.math.MathUtilsd;
 import gaia.cu9.ari.gaiaorbit.util.math.Vector3d;
@@ -21,17 +20,18 @@ import gaia.cu9.ari.gaiaorbit.util.parse.Parser;
 import java.io.*;
 import java.nio.MappedByteBuffer;
 import java.nio.channels.FileChannel;
+import java.nio.file.Paths;
 import java.util.Arrays;
+import java.util.Comparator;
 import java.util.zip.GZIPInputStream;
 
 /**
  * Loads the DR2 catalog in CSV format
- *
+ * <p>
  * Source position and corresponding errors are in radians, parallax in mas and
  * proper motion in mas/yr.
  *
  * @author Toni Sagrista
- *
  */
 public class DR2DataProvider extends AbstractStarGroupDataProvider {
     private static final Log logger = Logger.getLogger(DR2DataProvider.class);
@@ -40,15 +40,8 @@ public class DR2DataProvider extends AbstractStarGroupDataProvider {
     private static final String separator = comma;
 
     /**
-     * Maximum file count to load. 0 or negative for unlimited
-     */
-    private int fileNumberCap = -1;
-    /** Whether to load the sourceId->HIP correspondences file **/
-    public boolean useHIP = false;
-
-    /**
      * INDICES:
-     *
+     * <p>
      * source_id ra[deg] dec[deg] parallax[mas] ra_err[mas] dec_err[mas]
      * pllx_err[mas] mualpha[mas/yr] mudelta[mas/yr] radvel[km/s]
      * mualpha_err[mas/yr] mudelta_err[mas/yr] radvel_err[km/s] gmag[mag]
@@ -76,11 +69,26 @@ public class DR2DataProvider extends AbstractStarGroupDataProvider {
     private static final int A_G = 19;
     private static final int E_BP_MIN_RP = 20;
 
-    private static final int[] indices = new int[] { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20 };
+    private static final int[] indices = new int[]{0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20};
+
+    /**
+     * Maximum file count to load. 0 or negative for unlimited
+     */
+    private int fileNumberCap = -1;
+    /**
+     * Whether to load the sourceId->HIP correspondences file
+     **/
+    public boolean useHIP = false;
+
+    /**
+     * Number formatter
+     */
+    private INumberFormat nf;
 
     public DR2DataProvider() {
         super();
         countsPerMag = new long[22];
+        nf = NumberFormatFactory.getFormatter("###.##");
     }
 
     public void setFileNumberCap(int cap) {
@@ -91,27 +99,31 @@ public class DR2DataProvider extends AbstractStarGroupDataProvider {
         return loadData(file, 1d);
     }
 
+
     public Array<StarBean> loadData(String file, double factor) {
         initLists(10000000);
 
         FileHandle f = GlobalConf.data.dataFileHandle(file);
         if (f.isDirectory()) {
+            long numFiles = 0;
+            try {
+                numFiles = GlobalResources.fileCount(Paths.get(file));
+            }catch(IOException e){
+                logger.error("Error counting files in dir: " + file);
+            }
             // Recursive
             FileHandle[] files = f.list();
-            Arrays.sort(files, (FileHandle a, FileHandle b) -> {
-                return a.name().compareTo(b.name());
-            });
+            Arrays.sort(files, Comparator.comparing(FileHandle::name));
             int fn = 0;
             for (FileHandle fh : files) {
-                loadDataMapped(fh.path(), factor, fn + 1);
+                loadDataMapped(fh.path(), factor, fn + 1, numFiles);
                 //loadFileFh(fh, factor, fn + 1);
                 fn++;
                 if (fileNumberCap > 0 && fn >= fileNumberCap)
                     break;
             }
         } else if (f.name().endsWith(".csv") || f.name().endsWith(".gz")) {
-            loadDataMapped(file, factor, 1);
-            //loadFileFh(f, factor, 1);
+            loadDataMapped(file, factor, 1, 1);
         } else {
             logger.warn("File skipped: " + f.path());
         }
@@ -125,27 +137,6 @@ public class DR2DataProvider extends AbstractStarGroupDataProvider {
         loadFileIs(is, factor, new LongWrap(0l), new LongWrap(0l));
 
         return list;
-    }
-
-    public void loadFileFh(FileHandle fh, double factor, int fileNumber) {
-        //logger.info(this.getClass().getSimpleName(), I18n.bundle.format("notif.datafile", fh.path()));
-        boolean gz = fh.name().endsWith(".gz");
-
-        // Simple case
-        InputStream data = fh.read();
-
-        if (gz) {
-            try {
-                data = new GZIPInputStream(data);
-            } catch (IOException e) {
-                logger.error(e);
-                return;
-            }
-        }
-        LongWrap addedStars = new LongWrap(0l);
-        LongWrap discardedStars = new LongWrap(0l);
-        loadFileIs(data, factor, addedStars, discardedStars);
-        logger.info(fileNumber + " - " + fh.name() + " --> " + addedStars.value + "/" + (addedStars.value + discardedStars.value) + " stars (" + (100 * addedStars.value / (addedStars.value + discardedStars.value)) + "%)");
     }
 
     public void loadFileIs(InputStream is, double factor, LongWrap addedStars, LongWrap discardedStars) {
@@ -175,15 +166,13 @@ public class DR2DataProvider extends AbstractStarGroupDataProvider {
             } catch (IOException e) {
                 logger.error(e);
             }
-
         }
     }
 
     /**
      * Adds the star if it meets the criteria.
      *
-     * @param line
-     *            The string line
+     * @param line The string line
      * @return True if star was added, false otherwise
      */
     private boolean addStar(String line) {
@@ -192,6 +181,11 @@ public class DR2DataProvider extends AbstractStarGroupDataProvider {
 
         // Check that parallax exists (5-param solution), otherwise we have no distance
         if (!tokens[indices[PLLX]].isEmpty()) {
+            /** ID **/
+            long sourceid = Parser.parseLong(tokens[indices[SOURCE_ID]]);
+            boolean mustLoad = mustLoad(sourceid);
+
+            /** PARALLAX **/
             // Add the zero point to the parallax
             double pllx = Parser.parseDouble(tokens[indices[PLLX]]) + parallaxZeroPoint;
             //pllx = 0.0200120072;
@@ -199,29 +193,26 @@ public class DR2DataProvider extends AbstractStarGroupDataProvider {
             double appmag = Parser.parseDouble(tokens[indices[G_MAG]]);
 
             // Keep only stars with relevant parallaxes
-            if (acceptParallax(appmag, pllx, pllxerr)) {
-                /** ID **/
-                long sourceid = Parser.parseLong(tokens[indices[SOURCE_ID]]);
+            if (mustLoad || acceptParallax(appmag, pllx, pllxerr)) {
 
                 /** DISTANCE **/
                 double distpc = (1000d / pllx);
                 double geodistpc = getGeoDistance(sourceid);
 
-                if(!ruwe.isNaN()) {
+                if (!mustLoad && !ruwe.isNaN()) {
                     // RUWE test!
                     float ruweVal = getRuweValue(sourceid);
-
-                    if(ruweVal > ruwe){
+                    if (ruweVal > ruwe) {
                         // Do not accept
                         return false;
                     }
                 }
 
                 // If we have geometric distances, we only accept those, otherwise, accept all
-                if (!hasGeoDistances() || (hasGeoDistances() && hasGeoDistance(sourceid))) {
+                if (mustLoad || !hasGeoDistances() || (hasGeoDistances() && hasGeoDistance(sourceid))) {
                     distpc = geodistpc > 0 ? geodistpc : distpc;
 
-                    if (acceptDistance(distpc)) {
+                    if (mustLoad || acceptDistance(distpc)) {
 
                         double dist = distpc * Constants.PC_TO_U;
 
@@ -238,7 +229,6 @@ public class DR2DataProvider extends AbstractStarGroupDataProvider {
                         /** PROPER MOTIONS in mas/yr **/
                         double mualphastar = Parser.parseDouble(tokens[indices[MUALPHA]]);
                         double mudelta = Parser.parseDouble(tokens[indices[MUDELTA]]);
-                        //double mualpha = mualphastar / Math.cos(decrad);
 
                         /** RADIAL VELOCITY in km/s **/
                         double radvel = Parser.parseDouble(tokens[indices[RADVEL]]);
@@ -364,20 +354,22 @@ public class DR2DataProvider extends AbstractStarGroupDataProvider {
 
     @Override
     public Array<? extends ParticleBean> loadDataMapped(String file, double factor) {
-        return loadDataMapped(file, factor, 0);
+        return loadDataMapped(file, factor, -1, -1);
     }
 
     /**
      * Uses memory mapped files to load catalog files.
      * This is not working right now
+     *
      * @param file
      * @param factor
      * @param fileNumber
      * @return
      */
-    public Array<? extends ParticleBean> loadDataMapped(String file, double factor, int fileNumber) {
+    public Array<? extends ParticleBean> loadDataMapped(String file, double factor, int fileNumber, long totalFiles) {
         //logger.info(this.getClass().getSimpleName(), I18n.bundle.format("notif.datafile", fh.path()));
         boolean gz = file.endsWith(".gz");
+        String fileName = file.substring(file.lastIndexOf('/') + 1);
         FileChannel fc = null;
         try {
             fc = new RandomAccessFile(file, "r").getChannel();
@@ -394,7 +386,11 @@ public class DR2DataProvider extends AbstractStarGroupDataProvider {
             LongWrap addedStars = new LongWrap(0l);
             LongWrap discardedStars = new LongWrap(0l);
             loadFileIs(data, factor, addedStars, discardedStars);
-            logger.info(fileNumber + " - " + file + " --> " + addedStars.value + "/" + (addedStars.value + discardedStars.value) + " stars (" + (100 * addedStars.value / (addedStars.value + discardedStars.value)) + "%)");
+
+            if (fileNumber >= 0 && totalFiles >= 0)
+                logger.info(fileNumber + "/" + totalFiles + " (" + nf.format((double) fileNumber * 100d / (double) totalFiles) + "%): " + fileName + " --> " + addedStars.value + "/" + (addedStars.value + discardedStars.value) + " stars (" + nf.format(100d * (double) addedStars.value / (double) (addedStars.value + discardedStars.value)) + "%)");
+            else
+                logger.info(fileName + " --> " + addedStars.value + "/" + (addedStars.value + discardedStars.value) + " stars (" + nf.format(100d * (double) addedStars.value / (double) (addedStars.value + discardedStars.value)) + "%)");
 
             return list;
         } catch (Exception e) {

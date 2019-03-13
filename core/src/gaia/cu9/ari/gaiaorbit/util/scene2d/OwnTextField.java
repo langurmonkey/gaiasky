@@ -1,8 +1,6 @@
 package gaia.cu9.ari.gaiaorbit.util.scene2d;
 
 import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.scenes.scene2d.Event;
-import com.badlogic.gdx.scenes.scene2d.EventListener;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.TextField;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener.ChangeEvent;
@@ -71,32 +69,29 @@ public class OwnTextField extends TextField {
         if (validator != null) {
             errorColor = new Color(0xff6666ff);
             regularColor = getColor().cpy();
-            addListener(new EventListener() {
-                @Override
-                public boolean handle(Event event) {
-                    if (event instanceof ChangeEvent) {
-                        String str = getText();
-                        if (validator.validate(str)) {
-                            setColor(regularColor);
-                            lastCorrectText = str;
-                        } else {
-                            setColor(errorColor);
-                        }
-                        return true;
-                    } else if (event instanceof FocusEvent) {
-                        if (!((FocusEvent) event).isFocused()) {
-                            // We lost focus, return to last correct text if current not valid
-                            String str = getText();
-                            if (!validator.validate(str)) {
-                                setText(lastCorrectText);
-                                setColor(regularColor);
-                            }
-
-                        }
-                        return true;
+            addListener(event -> {
+                if (event instanceof ChangeEvent) {
+                    String str = getText();
+                    if (validator.validate(str)) {
+                        setColor(regularColor);
+                        lastCorrectText = str;
+                    } else {
+                        setColor(errorColor);
                     }
-                    return false;
+                    return true;
+                } else if (event instanceof FocusEvent) {
+                    if (!((FocusEvent) event).isFocused()) {
+                        // We lost focus, return to last correct text if current not valid
+                        String str = getText();
+                        if (!validator.validate(str)) {
+                            setText(lastCorrectText);
+                            setColor(regularColor);
+                        }
+
+                    }
+                    return true;
                 }
+                return false;
             });
         }
     }

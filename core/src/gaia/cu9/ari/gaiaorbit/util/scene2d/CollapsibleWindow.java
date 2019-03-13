@@ -1,12 +1,12 @@
 /*******************************************************************************
  * Copyright 2011 See AUTHORS file.
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not
  * use this file except in compliance with the License. You may obtain a copy of
  * the License at
- * 
+ *
  * http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
  * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
@@ -22,8 +22,6 @@ import com.badlogic.gdx.graphics.Cursor.SystemCursor;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.Actor;
-import com.badlogic.gdx.scenes.scene2d.Event;
-import com.badlogic.gdx.scenes.scene2d.EventListener;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.InputEvent.Type;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
@@ -31,6 +29,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.TextTooltip;
 import com.badlogic.gdx.scenes.scene2d.ui.Window;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.scenes.scene2d.utils.Drawable;
+import com.badlogic.gdx.utils.Align;
 import gaia.cu9.ari.gaiaorbit.util.GlobalConf;
 import gaia.cu9.ari.gaiaorbit.util.GlobalResources;
 import gaia.cu9.ari.gaiaorbit.util.I18n;
@@ -38,9 +37,9 @@ import gaia.cu9.ari.gaiaorbit.util.I18n;
 /**
  * A {@code CollapsableWindow} can be expanded/collapsed with a single click on
  * the title bar.
- * 
+ *
  * @author Xoppa
- * @author langurmonkey
+ * @author Toni Sagrista
  **/
 public class CollapsibleWindow extends Window {
     private boolean collapsed, collapsing = false, expanding = false;
@@ -49,7 +48,11 @@ public class CollapsibleWindow extends Window {
     private Vector2 vec2;
     protected Actor me;
     protected Skin skin;
-    /** Collapse speed in pixels per second **/
+
+    private float maxWidth = -1, maxHeight = -1;
+    /**
+     * Collapse speed in pixels per second
+     **/
     protected float collapseSpeed;
 
     String expandIcon = "window-expand";
@@ -65,7 +68,7 @@ public class CollapsibleWindow extends Window {
         this.skin = skin;
         this.collapseSpeed = collapseSpeed;
         this.collapseHeight = 20f * GlobalConf.SCALE_FACTOR;
-      
+
         vec2 = new Vector2();
         addListener(new ClickListener() {
             private float startx, starty;
@@ -85,7 +88,7 @@ public class CollapsibleWindow extends Window {
                 // pixels of margin
                 if (vec2.len() < 3) {
                     if (getHeight() - y <= getPadTop() && y < getHeight() && x > 0 && x < getWidth())
-                        if(button == Input.Buttons.LEFT) {
+                        if (button == Input.Buttons.LEFT) {
                             // Left mouse button on title toggles collapse
                             toggleCollapsed();
                         }
@@ -98,21 +101,37 @@ public class CollapsibleWindow extends Window {
         // Pad title cell
         getTitleTable().getCells().get(0).padLeft(5 * GlobalConf.SCALE_FACTOR);
         // Mouse pointer on title
-        getTitleTable().addListener(new EventListener() {
-            @Override
-            public boolean handle(Event event) {
+        getTitleTable().addListener(event -> {
+            if (event instanceof InputEvent) {
+                Type type = ((InputEvent) event).getType();
+                // Click
+                if (type == Type.mouseMoved) {
+                    Gdx.graphics.setCursor(GlobalResources.linkCursor);
+                } else if (type == Type.exit) {
+                    Gdx.graphics.setSystemCursor(SystemCursor.Arrow);
+                }
+                return true;
+            }
+            return false;
+        });
+
+        addListener(event -> {
+            if (isResizable()) {
                 if (event instanceof InputEvent) {
                     Type type = ((InputEvent) event).getType();
-                    // Click
-                    if (type == Type.enter) {
-                        Gdx.graphics.setCursor(Gdx.graphics.newCursor(GlobalResources.linkCursor, 4, 0));
+                    if (type == Type.mouseMoved) {
+                        if ((edge & Align.bottom) != 0 && maxHeight == -1) {
+                            Gdx.graphics.setCursor(GlobalResources.resizeYCursor);
+                        } else if ((edge & Align.right) != 0 && maxWidth == -1) {
+                            Gdx.graphics.setCursor(GlobalResources.resizeXCursor);
+                        }
                     } else if (type == Type.exit) {
                         Gdx.graphics.setSystemCursor(SystemCursor.Arrow);
                     }
-                    return true;
+
                 }
-                return false;
             }
+            return false;
         });
         getTitleTable().addListener(new TextTooltip(I18n.bundle.get("gui.tooltip.expandcollapse"), skin));
 
@@ -222,4 +241,67 @@ public class CollapsibleWindow extends Window {
         super.pack();
     }
 
+    public void setResizable(boolean w, boolean h) {
+        setResizable(w || h);
+        if (w) {
+            maxWidth = -1;
+        } else {
+            pack();
+            maxWidth = this.getWidth();
+        }
+        if (h) {
+            maxHeight = -1;
+        } else {
+            pack();
+            maxHeight = this.getHeight();
+        }
+    }
+
+    @Override
+    public float getPrefWidth() {
+        if (maxWidth < 0)
+            return super.getPrefWidth();
+        else
+            return maxWidth;
+    }
+
+    @Override
+    public float getMaxWidth() {
+        if (maxWidth < 0)
+            return super.getMaxWidth();
+        else
+            return maxWidth;
+    }
+
+    @Override
+    public float getWidth() {
+        if (maxWidth < 0)
+            return super.getWidth();
+        else
+            return maxWidth;
+    }
+
+    @Override
+    public float getPrefHeight() {
+        if (maxHeight < 0)
+            return super.getPrefHeight();
+        else
+            return maxHeight;
+    }
+
+    @Override
+    public float getMaxHeight() {
+        if (maxHeight < 0)
+            return super.getMaxHeight();
+        else
+            return maxHeight;
+    }
+
+    @Override
+    public float getHeight() {
+        if (maxHeight < 0)
+            return super.getHeight();
+        else
+            return maxHeight;
+    }
 }

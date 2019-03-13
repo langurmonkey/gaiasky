@@ -125,7 +125,7 @@ public class DownloadDataWindow extends GenericDialog {
 
         downloadTable.add(hg).left().colspan(2).padBottom(padl).row();
 
-        SysUtils.getDefaultDataDir().mkdirs();
+        SysUtils.getLocalDataDir().mkdirs();
         String catLoc = GlobalConf.data.DATA_LOCATION;
 
         if (dataLocation) {

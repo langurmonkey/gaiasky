@@ -73,6 +73,7 @@ public class LogWindow extends GenericDialog {
 
         Button reload = new OwnTextIconButton("", skin, "reload");
         reload.setName("update log");
+        reload.pad(pad5);
         reload.addListener(new TextTooltip(txt("gui.log.update"), skin));
         reload.addListener((event) -> {
             if (event instanceof ChangeEvent) {
@@ -84,6 +85,7 @@ public class LogWindow extends GenericDialog {
 
         Button export = new OwnTextButton(txt("gui.log.export"), skin);
         export.setName("export log");
+        export.pad(pad5);
         export.addListener((event) -> {
             if (event instanceof ChangeEvent) {
                 export();
@@ -110,7 +112,8 @@ public class LogWindow extends GenericDialog {
 
     public void export() {
         String filename = Instant.now().toString() + "_gaiasky.log";
-        File gshome = SysUtils.getGSHomeDir();
+        filename = filename.replace(":", "-");
+        File gshome = SysUtils.getDataDir();
         File log = new File(gshome, filename);
 
         try {

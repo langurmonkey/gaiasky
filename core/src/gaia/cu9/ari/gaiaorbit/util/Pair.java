@@ -1,5 +1,12 @@
 package gaia.cu9.ari.gaiaorbit.util;
 
+/**
+ * Simple implementation of a pair of objects.
+ * @param <A> First type
+ * @param <B> Second type
+ *
+ * @author Toni Sagrista
+ */
 public class Pair<A, B> {
     private A first;
     private B second;

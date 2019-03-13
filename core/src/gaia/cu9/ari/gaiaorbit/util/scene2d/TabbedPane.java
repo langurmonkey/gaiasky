@@ -119,14 +119,14 @@ public class TabbedPane extends Table {
         Cell<?> rightCell = add(new Image(style.titleEnd));
         switch (tabTitleAlign) {
         case Align.left:
-            leftCell.width(((Image) leftCell.getActor()).getWidth()).bottom();
+            leftCell.width(leftCell.getActor().getWidth()).bottom();
             midCell.left();
             rightCell.expandX().fillX().bottom();
             break;
         case Align.right:
             leftCell.expandX().fillX().bottom();
             midCell.right();
-            rightCell.width(((Image) rightCell.getActor()).getWidth()).bottom();
+            rightCell.width(rightCell.getActor().getWidth()).bottom();
             break;
         case Align.center:
             leftCell.expandX().fillX().bottom();

@@ -1,12 +1,15 @@
 package gaia.cu9.ari.gaiaorbit.scenegraph;
 
 public interface IVisibilitySwitch {
-    public String getName();
-    public void setName(String name);
+    String getName();
 
-    public String getDescription();
-    public void setDescription(String name);
+    void setName(String name);
 
-    public boolean isVisible();
-    public void setVisible(boolean visible);
+    String getDescription();
+
+    void setDescription(String name);
+
+    boolean isVisible();
+
+    void setVisible(boolean visible);
 }

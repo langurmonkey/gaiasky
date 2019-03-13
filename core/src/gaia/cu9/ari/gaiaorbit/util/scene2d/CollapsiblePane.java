@@ -83,15 +83,12 @@ public class CollapsiblePane extends Table {
 	// Expand icon
 	expandIcon = new OwnImageButton(skin, expandButtonStyle);
 	expandIcon.setName("expand-collapse");
-	expandIcon.addListener(new EventListener() {
-	    @Override
-	    public boolean handle(Event event) {
-		if (event instanceof ChangeEvent) {
-		    toggleExpandCollapse();
-		    return true;
-		}
-		return false;
-	    }
+	expandIcon.addListener(event -> {
+	if (event instanceof ChangeEvent) {
+		toggleExpandCollapse();
+		return true;
+	}
+	return false;
 	});
 	expandIcon.addListener(new TextTooltip(I18n.bundle.get("gui.tooltip.expandcollapse.group"), skin));
 
@@ -99,15 +96,12 @@ public class CollapsiblePane extends Table {
 	detachIcon = new OwnImageButton(skin, detachButtonStyle);
 	detachIcon.setName("expand-collapse");
 	detachIcon.setChecked(false);
-	detachIcon.addListener(new EventListener() {
-	    @Override
-	    public boolean handle(Event event) {
-		if (event instanceof ChangeEvent) {
-		    detach();
-		    return true;
-		}
-		return false;
-	    }
+	detachIcon.addListener(event -> {
+	if (event instanceof ChangeEvent) {
+		detach();
+		return true;
+	}
+	return false;
 	});
 	detachIcon.addListener(new TextTooltip(I18n.bundle.get("gui.tooltip.detach.group"), skin));
 

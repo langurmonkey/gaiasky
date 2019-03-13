@@ -39,6 +39,10 @@ public class KeyframesPathObject extends VertsObject implements I3DTextRenderabl
      * Selected keyframe
      **/
     public Keyframe selected = null;
+    /**
+     * Highlighted keyframe
+     */
+    public Keyframe highlighted = null;
 
     /**
      * The actual path
@@ -60,6 +64,11 @@ public class KeyframesPathObject extends VertsObject implements I3DTextRenderabl
      * Selected knot
      **/
     public VertsObject selectedKnot;
+
+    /**
+     * Highlighted knot
+     */
+    public VertsObject highlightedKnot;
 
     /**
      * Contains pairs of {direction, up} representing the orientation at each knot
@@ -129,12 +138,22 @@ public class KeyframesPathObject extends VertsObject implements I3DTextRenderabl
         selectedKnot.setDepth(false);
         selectedKnot.initialize();
 
+        highlightedKnot = new Points(RenderGroup.POINT);
+        highlightedKnot.setName("Keyframes.highknot");
+        highlightedKnot.ct = this.ct;
+        highlightedKnot.setColor(GlobalResources.gYellow);
+        highlightedKnot.setClosedLoop(false);
+        highlightedKnot.setPrimitiveSize(8f * ss);
+        highlightedKnot.setDepth(false);
+        highlightedKnot.initialize();
+
         objects = new Array<>();
         objects.add(path);
         objects.add(segments);
         objects.add(knots);
         objects.add(knotsSeam);
         objects.add(selectedKnot);
+        objects.add(highlightedKnot);
 
     }
 
@@ -418,6 +437,25 @@ public class KeyframesPathObject extends VertsObject implements I3DTextRenderabl
         return pos.dst(screenX % pcamera.viewportWidth, screenY, pos.z) <= pixelSize;
     }
 
+    public void highlight(Keyframe kf) {
+        unhighlight();
+        highlighted = kf;
+        highlightedKnot.setPoints(kf.pos.values());
+    }
+
+    public void unhighlight(Keyframe kf) {
+        if (highlighted == kf) {
+            unhighlight();
+        }
+    }
+
+    public void unhighlight() {
+        if (highlighted != null) {
+            highlighted = null;
+            highlightedKnot.clear();
+        }
+    }
+
     public void select(Keyframe kf) {
         unselect();
         selected = kf;
@@ -438,11 +476,11 @@ public class KeyframesPathObject extends VertsObject implements I3DTextRenderabl
         EventManager.instance.post(Events.KEYFRAME_SELECT, kf);
     }
 
-    private void initFocus(){
-       if(focus == null || focus.parent == null){
-           focus = new Invisible("", 5 * Constants.KM_TO_U);
-           EventManager.instance.post(Events.SCENE_GRAPH_ADD_OBJECT_CMD, focus, false);
-       }
+    private void initFocus() {
+        if (focus == null || focus.parent == null) {
+            focus = new Invisible("", 5 * Constants.KM_TO_U);
+            EventManager.instance.post(Events.SCENE_GRAPH_ADD_OBJECT_CMD, focus, false);
+        }
     }
 
     public void unselect() {
@@ -513,7 +551,7 @@ public class KeyframesPathObject extends VertsObject implements I3DTextRenderabl
 
     @Override
     protected void addToRenderLists(ICamera camera) {
-        if (selected != null) {
+        if (selected != null || highlighted != null) {
             addToRender(this, RenderGroup.FONT_LABEL);
         }
     }
@@ -559,23 +597,38 @@ public class KeyframesPathObject extends VertsObject implements I3DTextRenderabl
     public void render(SpriteBatch batch, ShaderProgram shader, FontRenderSystem sys, RenderingContext rc, ICamera camera) {
         if (camera.getCurrent() instanceof FovCamera) {
         } else {
-            // 3D distance font
-            Vector3d pos = aux3d1.get();
-            textPosition(camera, pos);
-            float distToCam = (float) aux3d2.get().set(selected.pos).add(camera.getInversePos()).len();
-            shader.setUniformf("u_viewAngle", 90f);
-            shader.setUniformf("u_viewAnglePow", 1);
-            shader.setUniformf("u_thOverFactor", 1);
-            shader.setUniformf("u_thOverFactorScl", 1);
-
-            render3DLabel(batch, shader, sys.fontDistanceField, camera, rc, text(), pos, textScale() * camera.getFovFactor(), textSize() * camera.getFovFactor() * distToCam);
+            if (selected != null)
+                renderKeyframeLabel(selected, batch, shader, sys, rc, camera);
+            if (highlighted != null)
+                renderKeyframeLabel(highlighted, batch, shader, sys, rc, camera);
         }
+
+    }
+
+    private void renderKeyframeLabel(Keyframe kf, SpriteBatch batch, ShaderProgram shader, FontRenderSystem sys, RenderingContext rc, ICamera camera) {
+        Vector3d pos = aux3d1.get();
+        getTextPosition(camera, pos, kf);
+        float distToCam = (float) aux3d2.get().set(kf.pos).add(camera.getInversePos()).len();
+        shader.setUniformf("u_viewAngle", 90f);
+        shader.setUniformf("u_viewAnglePow", 1);
+        shader.setUniformf("u_thOverFactor", 1);
+        shader.setUniformf("u_thOverFactorScl", 1);
+        shader.setUniform4fv("u_color", textColour(kf), 0, 4);
+
+        render3DLabel(batch, shader, sys.fontDistanceField, camera, rc, getText(kf), pos, textScale() * camera.getFovFactor(), textSize() * camera.getFovFactor() * distToCam);
 
     }
 
     @Override
     public float[] textColour() {
         return GlobalResources.gPink;
+    }
+
+    public float[] textColour(Keyframe kf) {
+        if (kf == highlighted)
+            return GlobalResources.gYellow;
+        else
+            return textColour();
     }
 
     @Override
@@ -590,7 +643,11 @@ public class KeyframesPathObject extends VertsObject implements I3DTextRenderabl
 
     @Override
     public void textPosition(ICamera cam, Vector3d out) {
-        selected.pos.put(out).add(cam.getInversePos());
+        getTextPosition(cam, out, selected);
+    }
+
+    public void getTextPosition(ICamera cam, Vector3d out, Keyframe kf) {
+        kf.pos.put(out).add(cam.getInversePos());
 
         Vector3d aux = aux3d2.get();
         aux.set(cam.getUp());
@@ -607,7 +664,11 @@ public class KeyframesPathObject extends VertsObject implements I3DTextRenderabl
 
     @Override
     public String text() {
-        return selected.name;
+        return getText(selected);
+    }
+
+    public String getText(Keyframe kf) {
+        return kf.name;
     }
 
     @Override

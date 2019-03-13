@@ -1,7 +1,5 @@
 package gaia.cu9.ari.gaiaorbit.util.time;
 
-import java.time.Instant;
-
 import gaia.cu9.ari.gaiaorbit.event.EventManager;
 import gaia.cu9.ari.gaiaorbit.event.Events;
 import gaia.cu9.ari.gaiaorbit.event.IObserver;
@@ -9,6 +7,8 @@ import gaia.cu9.ari.gaiaorbit.util.Constants;
 import gaia.cu9.ari.gaiaorbit.util.Logger;
 import gaia.cu9.ari.gaiaorbit.util.Logger.Log;
 import gaia.cu9.ari.gaiaorbit.util.Nature;
+
+import java.time.Instant;
 
 /**
  * Keeps pace of the simulation time vs real time and holds the global clock. It
@@ -93,7 +93,6 @@ public class GlobalClock implements IObserver, ITimeFrameProvider {
             }
 
             if (newTime > Constants.MAX_TIME_MS) {
-                newTime = Constants.MAX_TIME_MS;
                 if (currentTime < Constants.MAX_TIME_MS) {
                     EventManager.instance.post(Events.POST_NOTIFICATION, "Maximum time reached (" + (Constants.MAX_TIME_MS * Nature.MS_TO_Y) + " years)!");
                     // Turn off time
@@ -104,7 +103,6 @@ public class GlobalClock implements IObserver, ITimeFrameProvider {
                 EventManager.instance.post(Events.TIME_CHANGE_INFO, time);
                 lastUpdate = 0;
             } else if (newTime < Constants.MIN_TIME_MS) {
-                newTime = Constants.MIN_TIME_MS;
                 if (currentTime > Constants.MIN_TIME_MS) {
                     EventManager.instance.post(Events.POST_NOTIFICATION, "Minimum time reached (" + (Constants.MIN_TIME_MS * Nature.MS_TO_Y) + " years)!");
                     // Turn off time
