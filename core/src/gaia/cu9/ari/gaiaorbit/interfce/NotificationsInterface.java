@@ -22,14 +22,13 @@ import java.util.List;
 
 /**
  * Widget that captures and displays messages in a GUI.
- * 
- * @author Toni Sagrista
  *
+ * @author Toni Sagrista
  */
 public class NotificationsInterface extends Table implements IObserver, IGuiInterface {
     private static final long DEFAULT_TIMEOUT = 5000;
     private static final String TAG_SEPARATOR = " - ";
-    static LinkedList<MessageBean> historical = new LinkedList<MessageBean>();
+    static LinkedList<MessageBean> historical = new LinkedList<>();
     IDateFormat df;
     long msTimeout;
     Label message1;
@@ -41,22 +40,19 @@ public class NotificationsInterface extends Table implements IObserver, IGuiInte
     boolean multiple = false;
     boolean writeDates = true;
 
-    /** Lock object for synchronization **/
+    /**
+     * Lock object for synchronization
+     **/
     Object lock;
 
     /**
      * Initializes the notifications interface.
-     * 
-     * @param skin
-     *            The skin.
-     * @param lock
-     *            The lock object.
-     * @param multiple
-     *            Allow multiple messages?
-     * @param writeDates
-     *            Write dates with messages?
-     * @param consoleLog
-     *            Log to console
+     *
+     * @param skin       The skin.
+     * @param lock       The lock object.
+     * @param multiple   Allow multiple messages?
+     * @param writeDates Write dates with messages?
+     * @param consoleLog Log to console
      */
     public NotificationsInterface(Skin skin, Object lock, boolean multiple, boolean writeDates, boolean consoleLog) {
         this(skin, lock, multiple);
@@ -66,19 +62,13 @@ public class NotificationsInterface extends Table implements IObserver, IGuiInte
 
     /**
      * Initializes the notifications interface.
-     * 
-     * @param skin
-     *            The skin.
-     * @param lock
-     *            The lock object.
-     * @param multiple
-     *            Allow multiple messages?
-     * @param writeDates
-     *            Write dates with messages?
-     * @param consoleLog
-     *            Log to console
-     * @param historicalLog
-     *            Save logs to historical list
+     *
+     * @param skin          The skin.
+     * @param lock          The lock object.
+     * @param multiple      Allow multiple messages?
+     * @param writeDates    Write dates with messages?
+     * @param consoleLog    Log to console
+     * @param historicalLog Save logs to historical list
      */
     public NotificationsInterface(Skin skin, Object lock, boolean multiple, boolean writeDates, boolean consoleLog, boolean historicalLog) {
         this(skin, lock, multiple, writeDates, consoleLog);
@@ -87,30 +77,10 @@ public class NotificationsInterface extends Table implements IObserver, IGuiInte
 
     /**
      * Initializes the notifications interface.
-     * 
-     * @param skin
-     *            The skin.
-     * @param lock
-     *            The lock object.
-     * @param multiple
-     *            Allow multiple messages?
-     * @param writeDates
-     *            Write dates with messages?
-     */
-    public NotificationsInterface(Skin skin, Object lock, boolean multiple, boolean writeDates) {
-        this(skin, lock, multiple);
-        this.writeDates = writeDates;
-    }
-
-    /**
-     * Initializes the notifications interface.
-     * 
-     * @param skin
-     *            The skin.
-     * @param lock
-     *            The lock object.
-     * @param multiple
-     *            Allow multiple messages?
+     *
+     * @param skin     The skin.
+     * @param lock     The lock object.
+     * @param multiple Allow multiple messages?
      */
     public NotificationsInterface(Skin skin, Object lock, boolean multiple) {
         this(null, DEFAULT_TIMEOUT, skin, multiple);
@@ -120,31 +90,16 @@ public class NotificationsInterface extends Table implements IObserver, IGuiInte
 
     /**
      * Initializes the notifications interface.
-     * @param logs
-     *            Loading logs. 
-     * @param skin
-     *            The skin.
-     * @param lock
-     *            The lock object.
-     * @param multiple
-     *            Allow multiple messages?
-     */
-    public NotificationsInterface(List<MessageBean> logs, Skin skin, Object lock, boolean multiple) {
-        this(logs, DEFAULT_TIMEOUT, skin, multiple);
-        this.lock = lock;
-
-    }
-
-    /**
-     * Initializes the notifications interface.
-     * @param logs Current logs
-     * @param msTimeout
-     *            The timeout in ms.
-     * @param skin
-     *            The skin.
+     *
+     * @param logs      Current logs
+     * @param msTimeout The timeout in ms
+     * @param skin      The skin
+     * @param multiple  Multiple messages enabled
      */
     public NotificationsInterface(List<MessageBean> logs, long msTimeout, Skin skin, boolean multiple) {
         super(skin);
+        if (logs != null)
+            this.historical.addAll(logs);
         this.msTimeout = msTimeout;
         this.multiple = multiple;
 
@@ -212,101 +167,101 @@ public class NotificationsInterface extends Table implements IObserver, IGuiInte
     public void notify(Events event, Object... data) {
         synchronized (lock) {
             switch (event) {
-            case POST_NOTIFICATION:
-                String message = "";
-                boolean perm = false;
-                for (int i = 0; i < data.length; i++) {
-                    if (i == data.length - 1 && data[i] instanceof Boolean) {
-                        perm = (Boolean) data[i];
-                    } else {
-                        message += data[i].toString();
-                        if (i < data.length - 1 && !(i == data.length - 2 && data[data.length - 1] instanceof Boolean)) {
-                            message += TAG_SEPARATOR;
+                case POST_NOTIFICATION:
+                    String message = "";
+                    boolean perm = false;
+                    for (int i = 0; i < data.length; i++) {
+                        if (i == data.length - 1 && data[i] instanceof Boolean) {
+                            perm = (Boolean) data[i];
+                        } else {
+                            message += data[i].toString();
+                            if (i < data.length - 1 && !(i == data.length - 2 && data[data.length - 1] instanceof Boolean)) {
+                                message += TAG_SEPARATOR;
+                            }
                         }
                     }
-                }
-                addMessage(message, perm);
-                break;
-            case FOCUS_CHANGED:
-                if (data[0] != null) {
-                    IFocus sgn = null;
-                    if (data[0] instanceof String) {
-                        sgn = GaiaSky.instance.sg.findFocus((String) data[0]);
-                    } else {
-                        sgn = (IFocus) data[0];
+                    addMessage(message, perm);
+                    break;
+                case FOCUS_CHANGED:
+                    if (data[0] != null) {
+                        IFocus sgn = null;
+                        if (data[0] instanceof String) {
+                            sgn = GaiaSky.instance.sg.findFocus((String) data[0]);
+                        } else {
+                            sgn = (IFocus) data[0];
+                        }
+                        addMessage(I18n.bundle.format("notif.camerafocus", sgn.getName()));
                     }
-                    addMessage(I18n.bundle.format("notif.camerafocus", sgn.getName()));
-                }
-                break;
-            case TOGGLE_TIME_CMD:
-                Boolean bool = (Boolean) data[0];
-                if (bool == null) {
-                    addMessage(I18n.bundle.format("notif.toggle", I18n.bundle.format("gui.time")));
-                } else {
-                    addMessage(I18n.bundle.format("notif.simulation." + (bool ? "resume" : "pause")));
-                }
-                break;
-            case TOGGLE_VISIBILITY_CMD:
-                if (data.length == 3)
-                    addMessage(I18n.bundle.format("notif.visibility." + (((Boolean) data[2]) ? "on" : "off"), I18n.bundle.get((String) data[0])));
-                else
-                    addMessage(I18n.bundle.format("notif.visibility.toggle", I18n.bundle.get((String) data[0])));
-                break;
-            case FOCUS_LOCK_CMD:
-            case ORIENTATION_LOCK_CMD:
-            case TOGGLE_AMBIENT_LIGHT:
-            case COMPUTE_GAIA_SCAN_CMD:
-            case ONLY_OBSERVED_STARS_CMD:
-            case TRANSIT_COLOUR_CMD:
-            case OCTREE_PARTICLE_FADE_CMD:
-                addMessage(data[0] + (((Boolean) data[1]) ? " on" : " off"));
-                break;
-            case CAMERA_MODE_CMD:
-                CameraMode cm = (CameraMode) data[0];
-                if (cm != CameraMode.Focus)
-                    addMessage(I18n.bundle.format("notif.cameramode.change", (CameraMode) data[0]));
-                break;
-            case PACE_CHANGED_INFO:
-                addMessage(I18n.bundle.format("notif.timepace.change", data[0]));
-                break;
-            case LIMIT_MAG_CMD:
-                addMessage(I18n.bundle.format("notif.limitmag", data[0]));
-                break;
-            case FOV_CHANGE_NOTIFICATION:
-                // addMessage("Field of view changed to " + (float) data[0]);
-                break;
-            case JAVA_EXCEPTION:
-                if (data.length == 1) {
-                    addMessage(I18n.bundle.format("notif.error", ((Throwable) data[0]).toString()));
-                } else {
-                    addMessage(I18n.bundle.format("notif.error", data[1] + TAG_SEPARATOR + ((Throwable) data[0]).toString()));
-                }
-                break;
-            case ORBIT_DATA_LOADED:
-                addMessage(I18n.bundle.format("notif.orbitdata.loaded", data[1], ((PointCloudData) data[0]).getNumPoints()));
-                break;
-            case SCREENSHOT_INFO:
-                addMessage(I18n.bundle.format("notif.screenshot", data[0]));
-                break;
-            case STEREOSCOPIC_CMD:
-                addMessage(I18n.bundle.format("notif.toggle", I18n.bundle.get("notif.stereoscopic")));
-                break;
-            case DISPLAY_GUI_CMD:
-                addMessage(I18n.bundle.format("notif.toggle", data[0]));
-                break;
-            case STEREO_PROFILE_CMD:
-                addMessage(I18n.bundle.format("notif.stereoscopic.profile", StereoProfile.values()[(Integer) data[0]].toString()));
-                break;
-            case FRAME_OUTPUT_CMD:
-                boolean activated = (Boolean) data[0];
-                if (activated) {
-                    addMessage(I18n.bundle.format("notif.activated", I18n.bundle.get("element.frameoutput")));
-                } else {
-                    addMessage(I18n.bundle.format("notif.deactivated", I18n.bundle.get("element.frameoutput")));
-                }
-                break;
-            default:
-                break;
+                    break;
+                case TOGGLE_TIME_CMD:
+                    Boolean bool = (Boolean) data[0];
+                    if (bool == null) {
+                        addMessage(I18n.bundle.format("notif.toggle", I18n.bundle.format("gui.time")));
+                    } else {
+                        addMessage(I18n.bundle.format("notif.simulation." + (bool ? "resume" : "pause")));
+                    }
+                    break;
+                case TOGGLE_VISIBILITY_CMD:
+                    if (data.length == 3)
+                        addMessage(I18n.bundle.format("notif.visibility." + (((Boolean) data[2]) ? "on" : "off"), I18n.bundle.get((String) data[0])));
+                    else
+                        addMessage(I18n.bundle.format("notif.visibility.toggle", I18n.bundle.get((String) data[0])));
+                    break;
+                case FOCUS_LOCK_CMD:
+                case ORIENTATION_LOCK_CMD:
+                case TOGGLE_AMBIENT_LIGHT:
+                case COMPUTE_GAIA_SCAN_CMD:
+                case ONLY_OBSERVED_STARS_CMD:
+                case TRANSIT_COLOUR_CMD:
+                case OCTREE_PARTICLE_FADE_CMD:
+                    addMessage(data[0] + (((Boolean) data[1]) ? " on" : " off"));
+                    break;
+                case CAMERA_MODE_CMD:
+                    CameraMode cm = (CameraMode) data[0];
+                    if (cm != CameraMode.Focus)
+                        addMessage(I18n.bundle.format("notif.cameramode.change", (CameraMode) data[0]));
+                    break;
+                case PACE_CHANGED_INFO:
+                    addMessage(I18n.bundle.format("notif.timepace.change", data[0]));
+                    break;
+                case LIMIT_MAG_CMD:
+                    addMessage(I18n.bundle.format("notif.limitmag", data[0]));
+                    break;
+                case FOV_CHANGE_NOTIFICATION:
+                    // addMessage("Field of view changed to " + (float) data[0]);
+                    break;
+                case JAVA_EXCEPTION:
+                    if (data.length == 1) {
+                        addMessage(I18n.bundle.format("notif.error", ((Throwable) data[0]).toString()));
+                    } else {
+                        addMessage(I18n.bundle.format("notif.error", data[1] + TAG_SEPARATOR + ((Throwable) data[0]).toString()));
+                    }
+                    break;
+                case ORBIT_DATA_LOADED:
+                    addMessage(I18n.bundle.format("notif.orbitdata.loaded", data[1], ((PointCloudData) data[0]).getNumPoints()));
+                    break;
+                case SCREENSHOT_INFO:
+                    addMessage(I18n.bundle.format("notif.screenshot", data[0]));
+                    break;
+                case STEREOSCOPIC_CMD:
+                    addMessage(I18n.bundle.format("notif.toggle", I18n.bundle.get("notif.stereoscopic")));
+                    break;
+                case DISPLAY_GUI_CMD:
+                    addMessage(I18n.bundle.format("notif.toggle", data[0]));
+                    break;
+                case STEREO_PROFILE_CMD:
+                    addMessage(I18n.bundle.format("notif.stereoscopic.profile", StereoProfile.values()[(Integer) data[0]].toString()));
+                    break;
+                case FRAME_OUTPUT_CMD:
+                    boolean activated = (Boolean) data[0];
+                    if (activated) {
+                        addMessage(I18n.bundle.format("notif.activated", I18n.bundle.get("element.frameoutput")));
+                    } else {
+                        addMessage(I18n.bundle.format("notif.deactivated", I18n.bundle.get("element.frameoutput")));
+                    }
+                    break;
+                default:
+                    break;
             }
         }
     }

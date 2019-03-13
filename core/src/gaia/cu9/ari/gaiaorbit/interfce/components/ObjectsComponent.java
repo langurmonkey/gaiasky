@@ -94,7 +94,7 @@ public class ObjectsComponent extends GuiComponent implements IObserver {
             return false;
         });
 
-        /**
+        /*
          * OBJECTS
          */
 
@@ -199,17 +199,17 @@ public class ObjectsComponent extends GuiComponent implements IObserver {
             focusListScrollPane.setWidth(componentWidth);
         }
 
-        /**
+        /*
          * MESHES
          */
         Group meshesGroup = visibilitySwitcher(MeshObject.class, txt("gui.meshes"), "meshes");
 
-        /**
+        /*
          * CONSTELLATIONS
          */
         Group constelGroup = visibilitySwitcher(Constellation.class, txt("element.constellations"), "constellation");
 
-        /**
+        /*
          * ADD TO CONTENT
          */
 
@@ -238,11 +238,11 @@ public class ObjectsComponent extends GuiComponent implements IObserver {
         objectsVgroup.space(sp4);
         objectsVgroup.left();
         objectsVgroup.columnLeft();
-        Array<SceneGraphNode> objects = new Array<SceneGraphNode>();
-        List<OwnCheckBox> cbs = new ArrayList<OwnCheckBox>();
+        Array<SceneGraphNode> objects = new Array<>();
+        List<OwnCheckBox> cbs = new ArrayList<>();
         sg.getRoot().getChildrenByType(clazz, objects);
-        Array<String> names = new Array<String>(objects.size);
-        Map<String, IVisibilitySwitch> cmap = new HashMap<String, IVisibilitySwitch>();
+        Array<String> names = new Array<>(objects.size);
+        Map<String, IVisibilitySwitch> cmap = new HashMap<>();
 
         for (SceneGraphNode object : objects) {
             // Omit stars with no proper names
@@ -328,7 +328,7 @@ public class ObjectsComponent extends GuiComponent implements IObserver {
         group.addActor(scrollPane);
         group.addActor(buttons);
 
-        return objects == null || objects.size == 0 ? null : group;
+        return objects.size == 0 ? null : group;
     }
 
     private Array<Node> createTree(Array<SceneGraphNode> nodes) {

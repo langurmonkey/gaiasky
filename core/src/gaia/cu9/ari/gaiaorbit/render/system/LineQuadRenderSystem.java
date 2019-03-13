@@ -342,15 +342,8 @@ public class LineQuadRenderSystem extends LineRenderSystem {
         int n = provisionalLines.size;
         for (int i = 0; i < n; i++)
             dpool.free(provisionalLines.get(i));
-        provisionalLines.clear();
 
-        // Reset mesh index, current and lines
-        meshIdx = 1;
-        currext = (MeshDataExt) meshes[0];
-        curr = currext;
-        n = provLines.size;
-        //for (int i = 0; i < n; i++)
-        //    lpool.free(provLines.get(i));
+        provisionalLines.clear();
         provLines.clear();
     }
 

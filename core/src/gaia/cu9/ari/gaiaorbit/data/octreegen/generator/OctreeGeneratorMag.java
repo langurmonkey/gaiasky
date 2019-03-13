@@ -1,21 +1,15 @@
 package gaia.cu9.ari.gaiaorbit.data.octreegen.generator;
 
-import java.util.Arrays;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Set;
-
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.LongMap;
-
 import gaia.cu9.ari.gaiaorbit.data.octreegen.StarBrightnessComparator;
 import gaia.cu9.ari.gaiaorbit.scenegraph.StarGroup;
 import gaia.cu9.ari.gaiaorbit.scenegraph.StarGroup.StarBean;
-import gaia.cu9.ari.gaiaorbit.util.Logger;
 import gaia.cu9.ari.gaiaorbit.util.math.BoundingBoxd;
 import gaia.cu9.ari.gaiaorbit.util.math.Vector3d;
 import gaia.cu9.ari.gaiaorbit.util.tree.OctreeNode;
+
+import java.util.*;
 
 /**
  * Implements the magnitude to level map, where octants in a level are filled with
@@ -39,7 +33,7 @@ public class OctreeGeneratorMag implements IOctreeGenerator {
 
     @Override
     public OctreeNode generateOctree(Array<StarBean> catalog) {
-        root = IOctreeGenerator.startGeneration(catalog, this.getClass(), params);
+        root = IOctreeGenerator.startGeneration(catalog, params);
 
         // Holds all octree nodes indexed by id
         LongMap<OctreeNode> idMap = new LongMap<OctreeNode>();
@@ -60,7 +54,7 @@ public class OctreeGeneratorMag implements IOctreeGenerator {
                 double x = sb.data[StarBean.I_X];
                 double y = sb.data[StarBean.I_Y];
                 double z = sb.data[StarBean.I_Z];
-                int addedNum = 0;
+                int addedNum;
 
                 Long nodeId = getPositionOctantId(x, y, z, level);
                 if (!idMap.containsKey(nodeId)) {

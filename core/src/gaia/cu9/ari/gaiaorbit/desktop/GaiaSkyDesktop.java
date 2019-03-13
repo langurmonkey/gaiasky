@@ -338,7 +338,7 @@ public class GaiaSkyDesktop implements IObserver {
             }
 
             // Check latest version
-            if (!userprops.containsKey("properties.version") || (userprops.containsKey("properties.version") && Integer.parseInt(userprops.getProperty("properties.version")) < internalversion)) {
+            if (!userprops.containsKey("properties.version") || Integer.parseInt(userprops.getProperty("properties.version")) < internalversion) {
                 System.out.println("Properties file version mismatch, overwriting with new version: found " + Integer.parseInt(userprops.getProperty("properties.version")) + ", required " + internalversion);
                 overwrite = true;
             }
@@ -427,7 +427,7 @@ public class GaiaSkyDesktop implements IObserver {
         String version = System.getProperty("java.version");
         int pos = version.indexOf('.');
         pos = version.indexOf('.', pos + 1);
-        return Double.parseDouble(version.substring(0, pos));
+        return Double.parseDouble(version.substring(0, pos)); //-V6009
     }
 
     private class GaiaSkyWindowListener implements LifecycleListener {

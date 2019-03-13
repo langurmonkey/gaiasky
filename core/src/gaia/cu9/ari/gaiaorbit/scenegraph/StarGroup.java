@@ -547,7 +547,7 @@ public class StarGroup extends ParticleGroup implements ILineRenderable, IStarFo
 
             @Override
             public void run() {
-                if (active == indices1) {
+                if (active == indices1) { //-V6013
                     active = indices2;
                     background = indices1;
                 } else {
@@ -966,9 +966,7 @@ public class StarGroup extends ParticleGroup implements ILineRenderable, IStarFo
 
     @Override
     public IFocus getFocus(String name) {
-        Integer idx = index.get(name, -1);
-        if (idx != null && idx >= 0)
-            candidateFocusIndex = idx;
+        candidateFocusIndex = index.get(name, -1);
         return this;
     }
 

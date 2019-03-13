@@ -1,5 +1,7 @@
 package gaia.cu9.ari.gaiaorbit.desktop.format;
 
+import gaia.cu9.ari.gaiaorbit.util.format.IDateFormat;
+
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
@@ -7,8 +9,6 @@ import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.time.format.FormatStyle;
 import java.util.Locale;
-
-import gaia.cu9.ari.gaiaorbit.util.format.IDateFormat;
 
 public class DesktopDateFormat implements IDateFormat {
     private DateTimeFormatter df;
@@ -19,12 +19,14 @@ public class DesktopDateFormat implements IDateFormat {
 
     public DesktopDateFormat(Locale loc, boolean date, boolean time) {
         assert date || time : "Formatter must include date or time";
+        if(loc == null)
+            loc = Locale.US;
         if (date && !time) {
-            df = DateTimeFormatter.ofPattern("MMM dd uuuu").withLocale(Locale.US).withZone(ZoneOffset.UTC);
+            df = DateTimeFormatter.ofPattern("MMM dd uuuu").withLocale(loc).withZone(ZoneOffset.UTC);
         } else if (!date && time)
-            df = DateTimeFormatter.ofLocalizedTime(FormatStyle.MEDIUM).withLocale(Locale.US).withZone(ZoneOffset.UTC);
+            df = DateTimeFormatter.ofLocalizedTime(FormatStyle.MEDIUM).withLocale(loc).withZone(ZoneOffset.UTC);
         else if (date && time)
-            df = DateTimeFormatter.ofLocalizedDateTime(FormatStyle.MEDIUM, FormatStyle.MEDIUM).withLocale(Locale.US).withZone(ZoneOffset.UTC);
+            df = DateTimeFormatter.ofLocalizedDateTime(FormatStyle.MEDIUM, FormatStyle.MEDIUM).withLocale(loc).withZone(ZoneOffset.UTC);
     }
 
     @Override

@@ -192,7 +192,7 @@ public class DownloadDataWindow extends GenericDialog {
         while (dst != null) {
             boolean hasVersion = dst.has("mingsversion");
             int thisVersion = dst.getInt("mingsversion", 0);
-            if (!hasVersion || hasVersion && thisVersion <= GaiaSkyDesktop.SOURCE_CONF_VERSION) {
+            if (!hasVersion || thisVersion <= GaiaSkyDesktop.SOURCE_CONF_VERSION) {
                 // Dataset type
                 String type = dst.getString("type");
 
@@ -205,7 +205,7 @@ public class DownloadDataWindow extends GenericDialog {
                         // Ignore this version
                         dst = dst.next();
                         continue;
-                    } else if (thisVersion > otherVersion) {
+                    } else {
                         // Remove other version, use this
                         typeMap.get(type).remove(other);
                         bestDs.remove(dsName);
@@ -240,7 +240,7 @@ public class DownloadDataWindow extends GenericDialog {
             for (JsonValue dataset : datasets) {
                 // Check if dataset requires a minimum version of Gaia Sky
                 boolean hasVersion = dataset.has("mingsversion");
-                if (!hasVersion || hasVersion && dataset.getInt("mingsversion", 0) <= GaiaSkyDesktop.SOURCE_CONF_VERSION) {
+                if (!hasVersion || dataset.getInt("mingsversion", 0) <= GaiaSkyDesktop.SOURCE_CONF_VERSION) {
 
                     // Check if we have it
                     final Path check = Paths.get(GlobalConf.data.DATA_LOCATION, dataset.getString("check"));
@@ -253,8 +253,7 @@ public class DownloadDataWindow extends GenericDialog {
                     // Add dataset to desc table
                     OwnCheckBox cb = new OwnCheckBox(name, skin, "title", pad * 2f);
                     boolean baseData = name.equals("default-data");
-                    boolean defaultDataset = name.contains("default");
-                    cb.setChecked((!exists || (exists && outdated)) && baseData);
+                    cb.setChecked((!exists || outdated) && baseData);
                     cb.setDisabled(baseData || (exists && !outdated));
                     OwnLabel haveit = new OwnLabel("", skin);
                     if (exists) {

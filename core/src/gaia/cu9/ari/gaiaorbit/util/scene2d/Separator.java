@@ -49,7 +49,7 @@ public class Separator extends Widget {
     }
 
     @Override
-    public float getPrefHeight() {
+    public float getPrefHeight() { //-V6032
         return style.thickness;
     }
 

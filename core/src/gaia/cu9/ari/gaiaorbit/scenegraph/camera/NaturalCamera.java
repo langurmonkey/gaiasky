@@ -1379,7 +1379,7 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
             // }
 
             // Gravitational waves crosshair
-            if (GlobalConf.runtime.GRAVITATIONAL_WAVES && draw) {
+            if (GlobalConf.runtime.GRAVITATIONAL_WAVES) {
                 RelativisticEffectsManager gw = RelativisticEffectsManager.getInstance();
 
                 float chw = gravWaveCrosshair.getWidth();

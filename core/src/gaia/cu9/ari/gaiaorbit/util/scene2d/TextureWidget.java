@@ -24,12 +24,12 @@ public class TextureWidget extends Widget {
     }
 
     @Override
-    public float getMinWidth() {
+    public float getMinWidth() { //-V6032
         return width;
     }
 
     @Override
-    public float getMinHeight() {
+    public float getMinHeight() { //-V6032
         return height;
     }
 

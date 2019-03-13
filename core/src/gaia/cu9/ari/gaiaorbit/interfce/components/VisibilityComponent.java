@@ -197,15 +197,15 @@ public class VisibilityComponent extends GuiComponent implements IObserver {
                     String key = (String) data[0];
                     Button b = buttonMap.get(key);
 
-                    b.setProgrammaticChangeEvents(false);
                     if (b != null) {
+                        b.setProgrammaticChangeEvents(false);
                         if (data.length == 3) {
                             b.setChecked((Boolean) data[2]);
                         } else {
                             b.setChecked(!b.isChecked());
                         }
+                        b.setProgrammaticChangeEvents(true);
                     }
-                    b.setProgrammaticChangeEvents(true);
                 }
                 break;
             case PROPER_MOTIONS_CMD:

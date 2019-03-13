@@ -450,10 +450,12 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
         stereoGui = new StereoGui();
         stereoGui.initialize(manager);
 
-        guis.add(mainGui);
-        guis.add(debugGui);
-        guis.add(spacecraftGui);
-        guis.add(stereoGui);
+        if (guis != null) {
+            guis.add(mainGui);
+            guis.add(debugGui);
+            guis.add(spacecraftGui);
+            guis.add(stereoGui);
+        }
     }
 
     /**

@@ -79,16 +79,24 @@ public class SpacecraftGui extends AbstractGui {
     private OwnLabel mainvel, yawvel, pitchvel, rollvel, closestname, closestdist, thrustfactor;
     private CheckBox velToDir;
 
-    /** The spacecraft object **/
+    /**
+     * The spacecraft object
+     **/
     private Spacecraft sc;
 
-    /** Number format **/
+    /**
+     * Number format
+     **/
     private INumberFormat nf, sf;
 
-    /** Camera to render the attitude indicator system **/
+    /**
+     * Camera to render the attitude indicator system
+     **/
     private PerspectiveCamera aiCam;
 
-    /** Attitude indicator **/
+    /**
+     * Attitude indicator
+     **/
     private ModelBatch mb;
     private DecalBatch db;
     private SpriteBatch sb;
@@ -100,14 +108,20 @@ public class SpacecraftGui extends AbstractGui {
     private Matrix4 aiTransform;
     private Viewport aiViewport;
     private DirectionalLight dlight;
-    /** Reference to spacecraft camera rotation quaternion **/
+    /**
+     * Reference to spacecraft camera rotation quaternion
+     **/
     private Quaternion qf;
-    /** Reference to spacecraft camera velocity vector **/
+    /**
+     * Reference to spacecraft camera velocity vector
+     **/
     private Vector3d vel;
 
     private float indicatorw, indicatorh, indicatorx, indicatory;
 
-    /** Aux vectors **/
+    /**
+     * Aux vectors
+     **/
     private Vector3 aux3f1, aux3f2;
 
     private boolean thrustEvents = true;
@@ -512,38 +526,38 @@ public class SpacecraftGui extends AbstractGui {
             ui.addActor(nearestGroup);
             ui.addActor(thrustContainer);
             ui.addActor(thrustGroup);
-        }
 
-        /** CAPTURE SCROLL FOCUS **/
-        ui.addListener(new EventListener() {
+            /** CAPTURE SCROLL FOCUS **/
+            ui.addListener(new EventListener() {
 
-            @Override
-            public boolean handle(Event event) {
-                if (event instanceof InputEvent) {
-                    InputEvent ie = (InputEvent) event;
+                @Override
+                public boolean handle(Event event) {
+                    if (event instanceof InputEvent) {
+                        InputEvent ie = (InputEvent) event;
 
-                    if (ie.getType() == Type.mouseMoved) {
-                        Actor scrollPanelAncestor = getScrollPanelAncestor(ie.getTarget());
-                        ui.setScrollFocus(scrollPanelAncestor);
-                    } else if (ie.getType() == Type.touchDown) {
-                        if (ie.getTarget() instanceof TextField)
-                            ui.setKeyboardFocus(ie.getTarget());
+                        if (ie.getType() == Type.mouseMoved) {
+                            Actor scrollPanelAncestor = getScrollPanelAncestor(ie.getTarget());
+                            ui.setScrollFocus(scrollPanelAncestor);
+                        } else if (ie.getType() == Type.touchDown) {
+                            if (ie.getTarget() instanceof TextField)
+                                ui.setKeyboardFocus(ie.getTarget());
+                        }
+                    }
+                    return false;
+                }
+
+                private Actor getScrollPanelAncestor(Actor actor) {
+                    if (actor == null) {
+                        return null;
+                    } else if (actor instanceof ScrollPane) {
+                        return actor;
+                    } else {
+                        return getScrollPanelAncestor(actor.getParent());
                     }
                 }
-                return false;
-            }
 
-            private Actor getScrollPanelAncestor(Actor actor) {
-                if (actor == null) {
-                    return null;
-                } else if (actor instanceof ScrollPane) {
-                    return actor;
-                } else {
-                    return getScrollPanelAncestor(actor.getParent());
-                }
-            }
-
-        });
+            });
+        }
     }
 
     @Override
@@ -618,65 +632,65 @@ public class SpacecraftGui extends AbstractGui {
     @Override
     public void notify(Events event, Object... data) {
         switch (event) {
-        case SPACECRAFT_LOADED:
-            this.sc = (Spacecraft) data[0];
-            this.qf = sc.getRotationQuaternion();
-            this.vel = sc.vel;
-            break;
-        case SPACECRAFT_STABILISE_CMD:
-            Boolean state = (Boolean) data[0];
-            stabilise.setChecked(state);
-            break;
-        case SPACECRAFT_STOP_CMD:
-            state = (Boolean) data[0];
-            stop.setChecked(state);
-            break;
-        case SPACECRAFT_INFO:
-            double y = -(Double) data[0];
-            double p = -(Double) data[1];
-            double r = (Double) data[2];
-            double v = (Double) data[3];
-            double thf = (Double) data[4];
-            double epow = (Double) data[5];
-            double ypow = (Double) data[6];
-            double ppow = (Double) data[7];
-            double rpow = (Double) data[8];
+            case SPACECRAFT_LOADED:
+                this.sc = (Spacecraft) data[0];
+                this.qf = sc.getRotationQuaternion();
+                this.vel = sc.vel;
+                break;
+            case SPACECRAFT_STABILISE_CMD:
+                Boolean state = (Boolean) data[0];
+                stabilise.setChecked(state);
+                break;
+            case SPACECRAFT_STOP_CMD:
+                state = (Boolean) data[0];
+                stop.setChecked(state);
+                break;
+            case SPACECRAFT_INFO:
+                double y = -(Double) data[0];
+                double p = -(Double) data[1];
+                double r = (Double) data[2];
+                double v = (Double) data[3];
+                double thf = (Double) data[4];
+                double epow = (Double) data[5];
+                double ypow = (Double) data[6];
+                double ppow = (Double) data[7];
+                double rpow = (Double) data[8];
 
-            yawvel.setText(nf.format(y) + "°");
-            pitchvel.setText(nf.format(p) + "°");
-            rollvel.setText(nf.format(r) + "°");
+                yawvel.setText(nf.format(y) + "°");
+                pitchvel.setText(nf.format(p) + "°");
+                rollvel.setText(nf.format(r) + "°");
 
-            Pair<Double, String> velstr = GlobalResources.doubleToVelocityString(v);
-            mainvel.setText(sf.format(velstr.getFirst()) + " " + velstr.getSecond());
+                Pair<Double, String> velstr = GlobalResources.doubleToVelocityString(v);
+                mainvel.setText(sf.format(velstr.getFirst()) + " " + velstr.getSecond());
 
-            thrustfactor.setText("x" + (thf > 1000 ? sf.format(thf) : nf.format(thf)));
+                thrustfactor.setText("x" + (thf > 1000 ? sf.format(thf) : nf.format(thf)));
 
-            setPowerValuesSlider(thrustv, thrustvm, epow);
-            setPowerValuesSlider(thrusty, thrustym, ypow);
-            setPowerValuesSlider(thrustp, thrustpm, ppow);
-            setPowerValuesSlider(thrustr, thrustrm, rpow);
+                setPowerValuesSlider(thrustv, thrustvm, epow);
+                setPowerValuesSlider(thrusty, thrustym, ypow);
+                setPowerValuesSlider(thrustp, thrustpm, ppow);
+                setPowerValuesSlider(thrustr, thrustrm, rpow);
 
-            break;
-        case SPACECRAFT_NEAREST_INFO:
-            if (data[0] != null) {
-                closestname.setText((String) data[0]);
-                Pair<Double, String> cldist = GlobalResources.doubleToDistanceString((Double) data[1]);
-                closestdist.setText(sf.format(cldist.getFirst()) + " " + cldist.getSecond());
-            } else {
-                closestname.setText("");
-                closestdist.setText("");
-            }
+                break;
+            case SPACECRAFT_NEAREST_INFO:
+                if (data[0] != null) {
+                    closestname.setText((String) data[0]);
+                    Pair<Double, String> cldist = GlobalResources.doubleToDistanceString((Double) data[1]);
+                    closestdist.setText(sf.format(cldist.getFirst()) + " " + cldist.getSecond());
+                } else {
+                    closestname.setText("");
+                    closestdist.setText("");
+                }
 
-            break;
-        case SPACECRAFT_THRUST_INFO:
-            thrustEvents = false;
+                break;
+            case SPACECRAFT_THRUST_INFO:
+                thrustEvents = false;
 
-            enginePower.setValue((Integer) data[0]);
+                enginePower.setValue((Integer) data[0]);
 
-            thrustEvents = true;
-            break;
-        default:
-            break;
+                thrustEvents = true;
+                break;
+            default:
+                break;
         }
 
     }

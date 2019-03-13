@@ -131,7 +131,7 @@ public class Quantity {
     private static LengthUnit parseLength(String unit) {
         // Check format 'measure[unit]'
         if (unit.matches("[^\\[\\]]+\\[[^\\[\\]]+\\]")) {
-            return LengthUnit.valueOf(unit.substring(unit.indexOf('[') + 1, unit.indexOf(']')).toUpperCase());
+            return LengthUnit.valueOf(unit.substring(unit.indexOf('[') + 1, unit.indexOf(']')).toUpperCase()); //-V6009
         }else {
             return LengthUnit.valueOf(unit.toUpperCase());
         }
@@ -140,7 +140,7 @@ public class Quantity {
     private static AngleUnit parseAngle(String unit) {
         // Check format 'measure[unit]'
         if (unit.matches("[^\\[\\]]+\\[[^\\[\\]]+\\]")) {
-            return AngleUnit.valueOf(unit.substring(unit.indexOf('[') + 1, unit.indexOf(']')).toUpperCase());
+            return AngleUnit.valueOf(unit.substring(unit.indexOf('[') + 1, unit.indexOf(']')).toUpperCase()); //-V6009
         } else {
             return AngleUnit.valueOf(unit.toUpperCase());
         }
@@ -149,7 +149,7 @@ public class Quantity {
     private static BrightnessUnit parseMag(String unit) {
         // Check format 'measure[unit]'
         if (unit.matches("[^\\[\\]]+\\[[^\\[\\]]+\\]")) {
-            return BrightnessUnit.valueOf(unit.substring(unit.indexOf('[') + 1, unit.indexOf(']')).toUpperCase());
+            return BrightnessUnit.valueOf(unit.substring(unit.indexOf('[') + 1, unit.indexOf(']')).toUpperCase()); //-V6009
         } else {
             return BrightnessUnit.valueOf(unit.toUpperCase());
         }

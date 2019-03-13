@@ -8,7 +8,6 @@ import com.badlogic.gdx.controllers.Controllers;
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.scenes.scene2d.Actor;
-import com.badlogic.gdx.scenes.scene2d.Event;
 import com.badlogic.gdx.scenes.scene2d.EventListener;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Stack;
@@ -33,12 +32,14 @@ import gaia.cu9.ari.gaiaorbit.util.format.INumberFormat;
 import gaia.cu9.ari.gaiaorbit.util.format.NumberFormatFactory;
 import gaia.cu9.ari.gaiaorbit.util.math.MathUtilsd;
 import gaia.cu9.ari.gaiaorbit.util.scene2d.*;
-import gaia.cu9.ari.gaiaorbit.util.scene2d.FileChooser.ResultListener;
 import gaia.cu9.ari.gaiaorbit.util.validator.IValidator;
 import gaia.cu9.ari.gaiaorbit.util.validator.IntValidator;
 import gaia.cu9.ari.gaiaorbit.util.validator.RegexpValidator;
 
-import java.io.*;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.nio.channels.FileChannel;
 import java.util.*;
 
@@ -154,9 +155,9 @@ public class PreferencesWindow extends GenericDialog {
         Stack tabContent = new Stack();
         tabContent.setSize(contentw, contenth);
 
-        /**
+        /*
          * ==== GRAPHICS ====
-         **/
+         */
         final Table contentGraphicsTable = new Table(skin);
         final OwnScrollPane contentGraphics = new OwnScrollPane(contentGraphicsTable, skin, "minimalist-nobg");
         contentGraphics.setHeight(scrollh);
@@ -172,7 +173,7 @@ public class PreferencesWindow extends GenericDialog {
         // Full screen mode resolutions
         Array<DisplayMode> modes = new Array<DisplayMode>(Gdx.graphics.getDisplayModes());
         modes.sort((o1, o2) -> Integer.compare(o2.height * o2.width, o1.height * o1.width));
-        fullscreenResolutions = new OwnSelectBox<DisplayMode>(skin);
+        fullscreenResolutions = new OwnSelectBox<>(skin);
         fullscreenResolutions.setWidth(textwidth * 3.3f);
         fullscreenResolutions.setItems(modes);
 
@@ -290,7 +291,7 @@ public class PreferencesWindow extends GenericDialog {
         // ORBITS
         OwnLabel orbitsLabel = new OwnLabel(txt("gui.orbitrenderer"), skin);
         ComboBoxBean[] orbitItems = new ComboBoxBean[] { new ComboBoxBean(txt("gui.orbitrenderer.line"), 0), new ComboBoxBean(txt("gui.orbitrenderer.gpu"), 1) };
-        orbitRenderer = new OwnSelectBox<ComboBoxBean>(skin);
+        orbitRenderer = new OwnSelectBox<>(skin);
         orbitRenderer.setItems(orbitItems);
         orbitRenderer.setWidth(textwidth * 3f);
         orbitRenderer.setSelected(orbitItems[GlobalConf.scene.ORBIT_RENDERER]);
@@ -298,7 +299,7 @@ public class PreferencesWindow extends GenericDialog {
         // LINE RENDERER
         OwnLabel lrLabel = new OwnLabel(txt("gui.linerenderer"), skin);
         ComboBoxBean[] lineRenderers = new ComboBoxBean[] { new ComboBoxBean(txt("gui.linerenderer.normal"), 0), new ComboBoxBean(txt("gui.linerenderer.quad"), 1) };
-        lineRenderer = new OwnSelectBox<ComboBoxBean>(skin);
+        lineRenderer = new OwnSelectBox<>(skin);
         lineRenderer.setItems(lineRenderers);
         lineRenderer.setWidth(textwidth * 3f);
         lineRenderer.setSelected(lineRenderers[GlobalConf.scene.LINE_RENDERER]);
@@ -442,7 +443,7 @@ public class PreferencesWindow extends GenericDialog {
         saturationBak = GlobalConf.postprocess.POSTPROCESS_SATURATION;
         gammaBak = GlobalConf.postprocess.POSTPROCESS_GAMMA;
 
-        /** Brightness **/
+        /* Brightness */
         OwnLabel brightnessl = new OwnLabel(txt("gui.brightness"), skin, "default");
         Label brightnessLabel = new OwnLabel(Integer.toString((int) MathUtilsd.lint(GlobalConf.postprocess.POSTPROCESS_BRIGHTNESS, Constants.MIN_BRIGHTNESS, Constants.MAX_BRIGHTNESS, Constants.MIN_SLIDER, Constants.MAX_SLIDER)), skin);
         Slider brightness = new OwnSlider(Constants.MIN_SLIDER, Constants.MAX_SLIDER, 1, false, skin);
@@ -463,7 +464,7 @@ public class PreferencesWindow extends GenericDialog {
         display.add(brightness).left().padRight(pad5 * 2).padBottom(pad5);
         display.add(brightnessLabel).row();
 
-        /** Contrast **/
+        /* Contrast */
         OwnLabel contrastl = new OwnLabel(txt("gui.contrast"), skin, "default");
         Label contrastLabel = new OwnLabel(Integer.toString((int) MathUtilsd.lint(GlobalConf.postprocess.POSTPROCESS_CONTRAST, Constants.MIN_CONTRAST, Constants.MAX_CONTRAST, Constants.MIN_SLIDER, Constants.MAX_SLIDER)), skin);
         Slider contrast = new OwnSlider(Constants.MIN_SLIDER, Constants.MAX_SLIDER, 1, false, skin);
@@ -484,7 +485,7 @@ public class PreferencesWindow extends GenericDialog {
         display.add(contrast).left().padRight(pad5 * 2).padBottom(pad5);
         display.add(contrastLabel).row();
 
-        /** Hue **/
+        /* Hue */
         OwnLabel huel = new OwnLabel(txt("gui.hue"), skin, "default");
         Label hueLabel = new OwnLabel(Integer.toString((int) MathUtilsd.lint(GlobalConf.postprocess.POSTPROCESS_HUE, Constants.MIN_HUE, Constants.MAX_HUE, Constants.MIN_SLIDER, Constants.MAX_SLIDER)), skin);
         Slider hue = new OwnSlider(Constants.MIN_SLIDER, Constants.MAX_SLIDER, 1, false, skin);
@@ -505,7 +506,7 @@ public class PreferencesWindow extends GenericDialog {
         display.add(hue).left().padRight(pad5 * 2).padBottom(pad5);
         display.add(hueLabel).row();
 
-        /** Saturation **/
+        /* Saturation */
         OwnLabel saturationl = new OwnLabel(txt("gui.saturation"), skin, "default");
         Label saturationLabel = new OwnLabel(Integer.toString((int) MathUtilsd.lint(GlobalConf.postprocess.POSTPROCESS_SATURATION, Constants.MIN_SATURATION, Constants.MAX_SATURATION, Constants.MIN_SLIDER, Constants.MAX_SLIDER)), skin);
         Slider saturation = new OwnSlider(Constants.MIN_SLIDER, Constants.MAX_SLIDER, 1, false, skin);
@@ -526,7 +527,7 @@ public class PreferencesWindow extends GenericDialog {
         display.add(saturation).left().padRight(pad5 * 2).padBottom(pad5);
         display.add(saturationLabel).row();
 
-        /** Gamma **/
+        /* Gamma */
         OwnLabel gammal = new OwnLabel(txt("gui.gamma"), skin, "default");
         Label gammaLabel = new OwnLabel(nf1.format(GlobalConf.postprocess.POSTPROCESS_GAMMA), skin);
         Slider gamma = new OwnSlider(Constants.MIN_GAMMA, Constants.MAX_GAMMA, 0.1f, false, skin);
@@ -553,9 +554,9 @@ public class PreferencesWindow extends GenericDialog {
         // Add to content
         contentGraphicsTable.add(titleDisplay).left().padBottom(pad5 * 2).row();
         contentGraphicsTable.add(display).left();
-        /**
+        /*
          * ==== UI ====
-         **/
+         */
         final Table contentUI = new Table(skin);
         contents.add(contentUI);
         contentUI.align(Align.top | Align.left);
@@ -575,22 +576,19 @@ public class PreferencesWindow extends GenericDialog {
             if (file.startsWith("gsbundle") && file.endsWith(".properties")) {
                 String locale = file.substring(i18nname.length(), file.length() - ".properties".length());
                 // Default locale
-                if (locale == null || locale.isEmpty())
+                if (locale.isEmpty())
                     locale = "-en-GB";
-                if (locale.length() != 0) {
-                    // Remove underscore _
-                    locale = locale.substring(1).replace("_", "-");
-                    Locale loc = Locale.forLanguageTag(locale);
-                    langs[i] = new LangComboBoxBean(loc);
-                } else {
-                    langs[i] = new LangComboBoxBean(I18n.bundle.getLocale());
-                }
+
+                // Remove underscore _
+                locale = locale.substring(1).replace("_", "-");
+                Locale loc = Locale.forLanguageTag(locale);
+                langs[i] = new LangComboBoxBean(loc);
             }
             i++;
         }
         Arrays.sort(langs);
 
-        lang = new OwnSelectBox<LangComboBoxBean>(skin);
+        lang = new OwnSelectBox<>(skin);
         lang.setWidth(textwidth * 3f);
         lang.setItems(langs);
         if (!GlobalConf.program.LOCALE.isEmpty()) {
@@ -611,7 +609,7 @@ public class PreferencesWindow extends GenericDialog {
         // THEME
         OwnLabel themeLabel = new OwnLabel(txt("gui.ui.theme"), skin);
         String[] themes = new String[] { "dark-green", "dark-green-x2", "dark-blue", "dark-blue-x2", "dark-orange", "dark-orange-x2", "bright-green", "bright-green-x2", "night-red", "night-red-x2" };
-        theme = new OwnSelectBox<String>(skin);
+        theme = new OwnSelectBox<>(skin);
         theme.setWidth(textwidth * 3f);
         theme.setItems(themes);
         theme.setSelected(GlobalConf.program.UI_THEME);
@@ -634,9 +632,9 @@ public class PreferencesWindow extends GenericDialog {
         contentUI.add(titleUI).left().padBottom(pad5 * 2).row();
         contentUI.add(ui).left();
 
-        /**
+        /*
          * ==== PERFORMANCE ====
-         **/
+         */
         final Table contentPerformance = new Table(skin);
         contents.add(contentPerformance);
         contentPerformance.align(Align.top | Align.left);
@@ -653,22 +651,19 @@ public class PreferencesWindow extends GenericDialog {
         for (i = 1; i <= maxthreads; i++) {
             cbs[i] = new ComboBoxBean(txt("gui.thread", i), i);
         }
-        numThreads = new OwnSelectBox<ComboBoxBean>(skin);
+        numThreads = new OwnSelectBox<>(skin);
         numThreads.setWidth(textwidth * 3f);
         numThreads.setItems(cbs);
         numThreads.setSelectedIndex(GlobalConf.performance.NUMBER_THREADS);
 
         multithreadCb = new OwnCheckBox(txt("gui.thread.enable"), skin, "default", pad5);
-        multithreadCb.addListener(new EventListener() {
-            @Override
-            public boolean handle(Event event) {
-                if (event instanceof ChangeEvent) {
-                    numThreads.setDisabled(!multithreadCb.isChecked());
-                    // Add notice
-                    return true;
-                }
-                return false;
+        multithreadCb.addListener(event -> {
+            if (event instanceof ChangeEvent) {
+                numThreads.setDisabled(!multithreadCb.isChecked());
+                // Add notice
+                return true;
             }
+            return false;
         });
         multithreadCb.setChecked(GlobalConf.performance.MULTITHREADING);
         numThreads.setDisabled(!multithreadCb.isChecked());
@@ -680,24 +675,21 @@ public class PreferencesWindow extends GenericDialog {
         final Cell<Actor> noticeMulithreadCell = multithread.add((Actor) null);
         noticeMulithreadCell.colspan(2).left();
 
-        multithreadCb.addListener(new EventListener() {
-            @Override
-            public boolean handle(Event event) {
-                if (event instanceof ChangeEvent) {
-                    if (noticeMulithreadCell.getActor() == null) {
-                        String nextinfostr = txt("gui.ui.info") + '\n';
-                        int lines = GlobalResources.countOccurrences(nextinfostr, '\n');
-                        TextArea nextTimeInfo = new OwnTextArea(nextinfostr, skin, "info");
-                        nextTimeInfo.setDisabled(true);
-                        nextTimeInfo.setPrefRows(lines + 1);
-                        nextTimeInfo.setWidth(tawidth);
-                        nextTimeInfo.clearListeners();
-                        noticeMulithreadCell.setActor(nextTimeInfo);
-                    }
-                    return true;
+        multithreadCb.addListener(event -> {
+            if (event instanceof ChangeEvent) {
+                if (noticeMulithreadCell.getActor() == null) {
+                    String nextinfostr = txt("gui.ui.info") + '\n';
+                    int lines = GlobalResources.countOccurrences(nextinfostr, '\n');
+                    TextArea nextTimeInfo = new OwnTextArea(nextinfostr, skin, "info");
+                    nextTimeInfo.setDisabled(true);
+                    nextTimeInfo.setPrefRows(lines + 1);
+                    nextTimeInfo.setWidth(tawidth);
+                    nextTimeInfo.clearListeners();
+                    noticeMulithreadCell.setActor(nextTimeInfo);
                 }
-                return false;
+                return true;
             }
+            return false;
         });
 
         // Add to content
@@ -720,16 +712,13 @@ public class PreferencesWindow extends GenericDialog {
 
         final OwnLabel lodValueLabel = new OwnLabel(nf3.format(GlobalConf.scene.OCTANT_THRESHOLD_0 * MathUtilsd.radDeg), skin);
 
-        lodTransitions.addListener(new EventListener() {
-            @Override
-            public boolean handle(Event event) {
-                if (event instanceof ChangeEvent) {
-                    OwnSlider slider = (OwnSlider) event.getListenerActor();
-                    lodValueLabel.setText(nf3.format(MathUtilsd.lint(slider.getValue(), Constants.MIN_SLIDER, Constants.MAX_SLIDER, Constants.MIN_LOD_TRANS_ANGLE_DEG, Constants.MAX_LOD_TRANS_ANGLE_DEG)));
-                    return true;
-                }
-                return false;
+        lodTransitions.addListener(event -> {
+            if (event instanceof ChangeEvent) {
+                OwnSlider slider = (OwnSlider) event.getListenerActor();
+                lodValueLabel.setText(nf3.format(MathUtilsd.lint(slider.getValue(), Constants.MIN_SLIDER, Constants.MAX_SLIDER, Constants.MIN_LOD_TRANS_ANGLE_DEG, Constants.MAX_LOD_TRANS_ANGLE_DEG)));
+                return true;
             }
+            return false;
         });
 
         OwnImageButton lodTooltip = new OwnImageButton(skin, "tooltip");
@@ -749,9 +738,9 @@ public class PreferencesWindow extends GenericDialog {
         contentPerformance.add(titleLod).left().padBottom(pad5 * 2).row();
         contentPerformance.add(lod).left();
 
-        /**
+        /*
          * ==== CONTROLS ====
-         **/
+         */
         final Table contentControls = new Table(skin);
         contents.add(contentControls);
         contentControls.align(Align.top | Align.left);
@@ -762,7 +751,7 @@ public class PreferencesWindow extends GenericDialog {
         OwnLabel detectedLabel = new OwnLabel(txt("gui.controller.detected"), skin);
         Array<Controller> controllers = Controllers.getControllers();
 
-        Array<OwnLabel> controllerNames = new Array<OwnLabel>();
+        Array<OwnLabel> controllerNames = new Array<>();
         for (Controller c : controllers) {
             OwnLabel cl = new OwnLabel(c.getName(), skin);
             if (GlobalConf.controls.isControllerBlacklisted(c.getName())) {
@@ -777,7 +766,7 @@ public class PreferencesWindow extends GenericDialog {
 
         // CONTROLLER MAPPINGS
         OwnLabel mappingsLabel = new OwnLabel(txt("gui.controller.mappingsfile"), skin);
-        Array<FileComboBoxBean> controllerMappingsFiles = new Array<FileComboBoxBean>();
+        Array<FileComboBoxBean> controllerMappingsFiles = new Array<>();
         FileHandle externalfolder = Gdx.files.absolute(GlobalConf.ASSETS_LOC + "./mappings/");
         FileHandle homefolder = Gdx.files.absolute(SysUtils.getDefaultMappingsDir().getPath());
         Array<FileHandle> mappingFiles = new Array<FileHandle>();
@@ -792,7 +781,7 @@ public class PreferencesWindow extends GenericDialog {
             }
         }
 
-        controllerMappings = new OwnSelectBox<FileComboBoxBean>(skin);
+        controllerMappings = new OwnSelectBox<>(skin);
         controllerMappings.setItems(controllerMappingsFiles);
         controllerMappings.setSelected(selected);
 
@@ -860,9 +849,9 @@ public class PreferencesWindow extends GenericDialog {
         contentControls.add(titleKeybindings).colspan(2).left().padBottom(pad5 * 2).row();
         contentControls.add(controlsScroll).colspan(2).left();
 
-        /**
+        /*
          * ==== SCREENSHOTS ====
-         **/
+         */
         final Table contentScreenshots = new Table(skin);
         contents.add(contentScreenshots);
         contentScreenshots.align(Align.top | Align.left);
@@ -886,33 +875,22 @@ public class PreferencesWindow extends GenericDialog {
         screenshotsLocationLabel.pack();
         screenshotsLocation = new OwnTextButton(GlobalConf.screenshot.SCREENSHOT_FOLDER, skin);
         screenshotsLocation.pad(pad5);
-        screenshotsLocation.addListener(new EventListener() {
-            @Override
-            public boolean handle(Event event) {
-                if (event instanceof ChangeEvent) {
-                    FileChooser fc = FileChooser.createPickDialog(txt("gui.screenshots.directory.choose"), skin, Gdx.files.absolute(GlobalConf.screenshot.SCREENSHOT_FOLDER));
-                    fc.setResultListener(new ResultListener() {
-                        @Override
-                        public boolean result(boolean success, FileHandle result) {
-                            if (success) {
-                                // do stuff with result
-                                screenshotsLocation.setText(result.path());
-                            }
-                            return true;
-                        }
-                    });
-                    fc.setFilter(new FileFilter() {
-                        @Override
-                        public boolean accept(File pathname) {
-                            return pathname.isDirectory();
-                        }
-                    });
-                    fc.show(stage);
-
+        screenshotsLocation.addListener(event -> {
+            if (event instanceof ChangeEvent) {
+                FileChooser fc = FileChooser.createPickDialog(txt("gui.screenshots.directory.choose"), skin, Gdx.files.absolute(GlobalConf.screenshot.SCREENSHOT_FOLDER));
+                fc.setResultListener((success, result) -> {
+                    if (success) {
+                        // do stuff with result
+                        screenshotsLocation.setText(result.path());
+                    }
                     return true;
-                }
-                return false;
+                });
+                fc.setFilter(pathname -> pathname.isDirectory());
+                fc.show(stage);
+
+                return true;
             }
+            return false;
         });
 
         // Size
@@ -935,24 +913,21 @@ public class PreferencesWindow extends GenericDialog {
         // Mode
         OwnLabel ssModeLabel = new OwnLabel(txt("gui.screenshots.mode"), skin);
         ComboBoxBean[] screenshotModes = new ComboBoxBean[] { new ComboBoxBean(txt("gui.screenshots.mode.simple"), 0), new ComboBoxBean(txt("gui.screenshots.mode.redraw"), 1) };
-        screenshotMode = new OwnSelectBox<ComboBoxBean>(skin);
+        screenshotMode = new OwnSelectBox<>(skin);
         screenshotMode.setItems(screenshotModes);
         screenshotMode.setWidth(textwidth * 3f);
-        screenshotMode.addListener(new EventListener() {
-            @Override
-            public boolean handle(Event event) {
-                if (event instanceof ChangeEvent) {
-                    if (screenshotMode.getSelected().value == 0) {
-                        // Simple
-                        enableComponents(false, sswidthField, ssheightField, screenshotsSizeLabel, xLabel);
-                    } else {
-                        // Redraw
-                        enableComponents(true, sswidthField, ssheightField, screenshotsSizeLabel, xLabel);
-                    }
-                    return true;
+        screenshotMode.addListener(event -> {
+            if (event instanceof ChangeEvent) {
+                if (screenshotMode.getSelected().value == 0) {
+                    // Simple
+                    enableComponents(false, sswidthField, ssheightField, screenshotsSizeLabel, xLabel);
+                } else {
+                    // Redraw
+                    enableComponents(true, sswidthField, ssheightField, screenshotsSizeLabel, xLabel);
                 }
-                return false;
+                return true;
             }
+            return false;
         });
         screenshotMode.setSelected(screenshotModes[GlobalConf.screenshot.SCREENSHOT_MODE.ordinal()]);
         screenshotMode.addListener(new TextTooltip(txt("gui.tooltip.screenshotmode"), skin));
@@ -981,9 +956,9 @@ public class PreferencesWindow extends GenericDialog {
         contentScreenshots.add(titleScreenshots).left().padBottom(pad5 * 2).row();
         contentScreenshots.add(screenshots).left();
 
-        /**
+        /*
          * ==== FRAME OUTPUT ====
-         **/
+         */
         final Table contentFrames = new Table(skin);
         contents.add(contentFrames);
         contentFrames.align(Align.top | Align.left);
@@ -1101,9 +1076,9 @@ public class PreferencesWindow extends GenericDialog {
         contentFrames.add(titleFrameoutput).left().padBottom(pad5 * 2).row();
         contentFrames.add(frameoutput).left();
 
-        /**
+        /*
          * ==== CAMERA ====
-         **/
+         */
         final Table contentCamera = new Table(skin);
         contents.add(contentCamera);
         contentCamera.align(Align.top | Align.left);
@@ -1163,9 +1138,9 @@ public class PreferencesWindow extends GenericDialog {
         contentCamera.add(titleCamrec).left().padBottom(pad5 * 2).row();
         contentCamera.add(camrec).left();
 
-        /**
+        /*
          * ==== 360 ====
-         **/
+         */
         final Table content360 = new Table(skin);
         contents.add(content360);
         content360.align(Align.top | Align.left);
@@ -1200,9 +1175,9 @@ public class PreferencesWindow extends GenericDialog {
         content360.add(titleCubemap).left().padBottom(pad5 * 2).row();
         content360.add(cubemap).left();
 
-        /**
+        /*
          * ==== DATA ====
-         **/
+         */
         final Table contentDataTable = new Table(skin);
         contentDataTable.align(Align.top | Align.left);
         final OwnScrollPane contentData = new OwnScrollPane(contentDataTable, skin, "minimalist-nobg");
@@ -1255,9 +1230,9 @@ public class PreferencesWindow extends GenericDialog {
         contentDataTable.add(datasetChooser).left().padBottom(pad5 * 2).row();
         contentDataTable.add(dataDownload).left();
 
-        /**
+        /*
          * ==== GAIA ====
-         **/
+         */
         final Table contentGaia = new Table(skin);
         contents.add(contentGaia);
         contentGaia.align(Align.top | Align.left);
@@ -1302,9 +1277,9 @@ public class PreferencesWindow extends GenericDialog {
         contentGaia.add(titleAttitude).left().padBottom(pad5 * 2).row();
         contentGaia.add(attitude).left();
 
-        /**
+        /*
          * ==== SYSTEM ====
-         **/
+         */
         final Table contentSystem = new Table(skin);
         contents.add(contentSystem);
         contentSystem.align(Align.top | Align.left);
@@ -1355,7 +1330,7 @@ public class PreferencesWindow extends GenericDialog {
         contentSystem.add(titleStats).left().padBottom(pad5 * 2).row();
         contentSystem.add(stats).left();
 
-        /** COMPUTE LABEL WIDTH **/
+        /* COMPUTE LABEL WIDTH */
         float maxLabelWidth = 0;
         for (OwnLabel l : labels) {
             l.pack();
@@ -1366,7 +1341,7 @@ public class PreferencesWindow extends GenericDialog {
         for (OwnLabel l : labels)
             l.setWidth(maxLabelWidth);
 
-        /** ADD ALL CONTENT **/
+        /* ADD ALL CONTENT */
         tabContent.addActor(contentGraphics);
         tabContent.addActor(contentUI);
         tabContent.addActor(contentPerformance);
@@ -1379,7 +1354,7 @@ public class PreferencesWindow extends GenericDialog {
         tabContent.addActor(contentGaia);
         tabContent.addActor(contentSystem);
 
-        /** ADD TO MAIN TABLE **/
+        /* ADD TO MAIN TABLE */
         content.add(tabContent).left().padLeft(10).expand().fill();
 
         // Listen to changes in the tab button checked states
@@ -1565,7 +1540,7 @@ public class PreferencesWindow extends GenericDialog {
 
         // Interface
         LangComboBoxBean lbean = lang.getSelected();
-        boolean reloadUI = GlobalConf.program.UI_THEME != theme.getSelected() || !lbean.locale.toLanguageTag().equals(GlobalConf.program.LOCALE);
+        boolean reloadUI = !GlobalConf.program.UI_THEME.equals(theme.getSelected()) || !lbean.locale.toLanguageTag().equals(GlobalConf.program.LOCALE);
         GlobalConf.program.LOCALE = lbean.locale.toLanguageTag();
         I18n.forceInit(Gdx.files.internal("i18n/gsbundle"));
         GlobalConf.program.UI_THEME = theme.getSelected();
@@ -1654,7 +1629,7 @@ public class PreferencesWindow extends GenericDialog {
 
         // Controllers
         String mappingsFile = controllerMappings.getSelected().file;
-        if (mappingsFile != GlobalConf.controls.CONTROLLER_MAPPINGS_FILE) {
+        if (!mappingsFile.equals(GlobalConf.controls.CONTROLLER_MAPPINGS_FILE)) {
             GlobalConf.controls.CONTROLLER_MAPPINGS_FILE = mappingsFile;
             EventManager.instance.post(Events.RELOAD_CONTROLLER_MAPPINGS, mappingsFile);
         }
@@ -1758,7 +1733,7 @@ public class PreferencesWindow extends GenericDialog {
             return 2;
         if (x.getAACode() == 0)
             return 0;
-        return (int) (Math.log(x.getAACode()) / Math.log(2) + 1e-10) + 2;
+        return (int) (Math.log(x.getAACode()) / Math.log(base) + 1e-10) + 2;
     }
 
     private int idxLang(String code, LangComboBoxBean[] langs) {

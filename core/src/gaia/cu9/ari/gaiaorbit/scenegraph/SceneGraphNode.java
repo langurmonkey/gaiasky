@@ -711,7 +711,7 @@ public class SceneGraphNode implements IStarContainer, IPosition {
      */
     protected boolean addToRender(IRenderable renderable, RenderGroup rg) {
         boolean on = ct.intersects(SceneGraphRenderer.visible);
-        if (on || (!on && SceneGraphRenderer.alphas[ct.getFirstOrdinal()] > 0)) {
+        if (on || SceneGraphRenderer.alphas[ct.getFirstOrdinal()] > 0) {
             SceneGraphRenderer.render_lists.get(rg.ordinal()).add(renderable);
             return true;
         }

@@ -879,37 +879,6 @@ public class GlobalConf {
             this.build = build;
         }
 
-        public String versionString() {
-            return "Build " + this.build + " by " + this.builder + " (at " + this.buildtime + " on " + this.system + ")";
-        }
-
-        public static int[] getMajorMinorRevFromString(String version) {
-            String majorS = version.substring(0, version.indexOf("."));
-            String minorS, revS;
-            int dots = GlobalResources.countOccurrences(version, '.');
-            int idx0 = GlobalResources.nthIndexOf(version, '.', 1);
-            if (dots == 1) {
-                minorS = version.substring(version.indexOf(".", idx0) + 1, version.length());
-                revS = null;
-            } else if (dots > 1) {
-                int idx1 = GlobalResources.nthIndexOf(version, '.', 2);
-                minorS = version.substring(version.indexOf(".", idx0) + 1, version.indexOf(".", idx1));
-                revS = version.substring(version.indexOf(".", idx1) + 1, version.length());
-            } else {
-                return null;
-            }
-            if (majorS.matches("^\\D{1}\\d+$")) {
-                majorS = majorS.substring(1, majorS.length());
-            }
-            if (minorS.matches("^\\d+\\D{1}$")) {
-                minorS = minorS.substring(0, minorS.length() - 1);
-            }
-            if (revS != null && revS.matches("^\\d+\\D{1}$")) {
-                revS = revS.substring(0, revS.length() - 1);
-            }
-            return new int[]{Integer.parseInt(majorS), Integer.parseInt(minorS), revS != null ? Integer.parseInt(revS) : 0};
-        }
-
         @Override
         public String toString() {
             return version;

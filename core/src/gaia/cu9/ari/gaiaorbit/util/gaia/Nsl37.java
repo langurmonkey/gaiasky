@@ -190,7 +190,7 @@ public class Nsl37 extends AnalyticalAttitudeDataServer {
 
         c1v = s1 * (-cx * c1a) + s2 * (cx2 * s2a / 2) + s3 * (cx * c1a / 16 + cx * c1a / 16 - (cx - 4 * cx3) * c3a / 16) + s4 * (-cx2 * s2a / 96 + cx4 * s2a / 8 + (7 * cx2 - 12 * cx4) * s4a / 96);
 
-        s1v = s1 * (cx * s1a) + s2 * (cx2 / 2 + cx2 * c2a / 2) + s3 * (cx * s1a / 16 - cx * s1a / 16 + (cx - 4 * cx3) * s3a / 16) + s4 * (-(cx2 - 4 * cx4) / 16 + cx2 * c2a / 96 + cx4 * c2a / 8 + (7 * cx2 - 12 * cx4) * c4a / 96);
+        s1v = s1 * (cx * s1a) + s2 * (cx2 / 2 + cx2 * c2a / 2) + s3 * ((cx - 4 * cx3) * s3a / 16) + s4 * (-(cx2 - 4 * cx4) / 16 + cx2 * c2a / 96 + cx4 * c2a / 8 + (7 * cx2 - 12 * cx4) * c4a / 96);
 
         c2v = s2 * (-(1 + 2 * cx2) * s2a / 8) + s3 * (-(cx + 2 * cx3) * c1a / 8 - (cx + 2 * cx3) * c3a / 8) + s4 * (-(3 - 8 * cx2 - 6 * cx4) * s2a / 48 - (1 - 4 * cx2 - 12 * cx4) * s4a / 64);
 

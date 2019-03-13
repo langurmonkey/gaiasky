@@ -157,7 +157,7 @@ public class CameraManager implements ICamera, IObserver {
         CameraMode previousMode = this.mode;
         naturalCamera = new NaturalCamera(manager, this);
         fovCamera = new FovCamera(manager, this);
-        spacecraftCamera = new SpacecraftCamera(manager, this);
+        spacecraftCamera = new SpacecraftCamera(this);
         relativisticCamera = new RelativisticCamera(manager, this);
 
         cameras = new ICamera[] { naturalCamera, fovCamera, spacecraftCamera };

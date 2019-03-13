@@ -186,8 +186,8 @@ public class STILDataProvider extends AbstractStarGroupDataProvider {
                         /** MAGNITUDE **/
                         double appmag;
                         if (!ucdp.MAG.isEmpty()) {
-                            Pair<UCD, Double> appmagpair = getDoubleUcd(ucdp.MAG, row);
-                            appmag = appmagpair.getSecond();
+                            Pair<UCD, Double> appmagPair = getDoubleUcd(ucdp.MAG, row);
+                            appmag = appmagPair.getSecond();
                         } else {
                             // Default magnitude
                             appmag = 15;
@@ -199,11 +199,11 @@ public class STILDataProvider extends AbstractStarGroupDataProvider {
                         /** COLOR **/
                         float color;
                         if (!ucdp.COL.isEmpty()) {
-                            Pair<UCD, Double> colpair = getDoubleUcd(ucdp.COL, row);
-                            if (colpair == null) {
+                            Pair<UCD, Double> colPair = getDoubleUcd(ucdp.COL, row);
+                            if (colPair == null) {
                                 color = 0.656f;
                             } else {
-                                color = colpair.getSecond().floatValue();
+                                color = colPair.getSecond().floatValue();
                             }
                         } else {
                             // Default color
@@ -220,11 +220,11 @@ public class STILDataProvider extends AbstractStarGroupDataProvider {
                             // Empty name
                             if (!ucdp.ID.isEmpty()) {
                                 // We have ID
-                                Pair<UCD, String> namepair = getStringUcd(ucdp.ID, row);
-                                name = namepair.getSecond();
-                                if (namepair.getFirst().colname.equalsIgnoreCase("hip")) {
-                                    hip = Integer.valueOf(namepair.getSecond());
-                                    id = new Long(hip);
+                                Pair<UCD, String> namePair = getStringUcd(ucdp.ID, row);
+                                name = namePair.getSecond();
+                                if (namePair.getFirst().colname.equalsIgnoreCase("hip")) {
+                                    hip = Integer.valueOf(namePair.getSecond());
+                                    id = (long) hip;
                                 } else {
                                     id = ++starid;
                                 }
@@ -235,8 +235,8 @@ public class STILDataProvider extends AbstractStarGroupDataProvider {
                             }
                         } else {
                             // We have name
-                            Pair<UCD, String> namepair = getStringUcd(ucdp.NAME, row);
-                            name = namepair.getSecond();
+                            Pair<UCD, String> namePair = getStringUcd(ucdp.NAME, row);
+                            name = namePair.getSecond();
                             // Take care of HIP stars
                             if (!ucdp.ID.isEmpty()) {
                                 Pair<UCD, String> idpair = getStringUcd(ucdp.ID, row);

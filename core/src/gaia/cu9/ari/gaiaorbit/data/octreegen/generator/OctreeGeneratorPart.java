@@ -31,7 +31,7 @@ public class OctreeGeneratorPart implements IOctreeGenerator {
     }
 
     public OctreeNode generateOctree(Array<StarBean> catalog) {
-        OctreeNode root = IOctreeGenerator.startGeneration(catalog, this.getClass(), params);
+        OctreeNode root = IOctreeGenerator.startGeneration(catalog, params);
 
         Array<OctreeNode>[] octantsPerLevel = new Array[25];
         octantsPerLevel[0] = new Array<OctreeNode>(1);
@@ -51,10 +51,10 @@ public class OctreeGeneratorPart implements IOctreeGenerator {
      * Generate the octree on a per-level basis to have a uniform density in all
      * the nodes of the same level. Breadth-first.
      * 
-     * @param catalog
-     * @param level
-     * @param octantsPerLevel
-     * @param percentage
+     * @param inputLists List of star beans per octant
+     * @param level The depth
+     * @param octantsPerLevel Octants of each level
+     * @param percentage Percentage
      */
     private void treatLevel(Map<OctreeNode, Array<StarBean>> inputLists, int level, Array<OctreeNode>[] octantsPerLevel, float percentage) {
         logger.info("Generating level " + level);

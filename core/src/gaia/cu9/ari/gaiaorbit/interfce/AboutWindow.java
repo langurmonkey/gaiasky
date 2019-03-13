@@ -315,7 +315,7 @@ public class AboutWindow extends GenericDialog {
         Label glextensionstitle = new OwnLabel(txt("gui.help.glextensions"), skin);
         String extensions = Gdx.gl.glGetString(GL20.GL_EXTENSIONS);
         IntBuffer buf = BufferUtils.newIntBuffer(16);
-        if (extensions.isEmpty() || extensions == null) {
+        if (extensions == null || extensions.isEmpty()) {
             Gdx.gl.glGetIntegerv(GL30.GL_NUM_EXTENSIONS, buf);
             int next = buf.get(0);
             String[] extensionsstr = new String[next];

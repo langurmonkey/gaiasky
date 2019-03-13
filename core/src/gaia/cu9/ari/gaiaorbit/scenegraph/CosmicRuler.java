@@ -115,8 +115,7 @@ public class CosmicRuler extends AbstractPositionEntity implements I3DTextRender
     @Override
     public void updateLocalValues(ITimeFrameProvider time, ICamera camera) {
         // Update positions
-        rulerOk = true;
-        rulerOk = rulerOk && (sg.getObjectPosition(name0, pos0) != null);
+        rulerOk = (sg.getObjectPosition(name0, pos0) != null);
         rulerOk = rulerOk && (sg.getObjectPosition(name1, pos1) != null);
 
         if (rulerOk) {

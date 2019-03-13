@@ -123,7 +123,7 @@ public class ContextMenu extends Table {
                     activeItem.fireChangeEvent();
                 }
 
-                return false;
+                return true;
             }
         };
 

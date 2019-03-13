@@ -32,11 +32,7 @@ public class BSplined<T extends Vectord<T>> implements Pathd<T> {
      * @return The value of out */
     public static <T extends Vectord<T>> T cubic (final T out, final double t, final T[] points, final boolean continuous,
             final T tmp) {
-        final int n = continuous ? points.length : points.length - 3;
-        double u = t * n;
-        int i = (t >= 1f) ? (n - 1) : (int)u;
-        u -= i;
-        return cubic(out, i, u, points, continuous, tmp);
+        return cubic_derivative(out, t, points, continuous, tmp);
     }
 
     /** Calculates the cubic b-spline derivative for the given position (t).

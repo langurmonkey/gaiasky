@@ -15,7 +15,7 @@ import gaia.cu9.ari.gaiaorbit.util.validator.IValidator;
  */
 public class OwnTextField extends TextField {
 
-    private float ownwidth = 0f, ownheight = 0f;
+    private float ownWidth = 0f, ownHeight = 0f;
     private IValidator validator = null;
     private String lastCorrectText = "";
     private Color regularColor;
@@ -98,36 +98,36 @@ public class OwnTextField extends TextField {
 
     @Override
     public void setWidth(float width) {
-        ownwidth = width;
+        ownWidth = width;
         super.setWidth(width);
     }
 
     @Override
     public void setHeight(float height) {
-        ownheight = height;
+        ownHeight = height;
         super.setHeight(height);
     }
 
     @Override
     public void setSize(float width, float height) {
-        ownwidth = width;
-        ownheight = height;
+        ownWidth = width;
+        ownHeight = height;
         super.setSize(width, height);
     }
 
     @Override
-    public float getPrefWidth() {
-        if (ownwidth != 0) {
-            return ownwidth;
+    public float getPrefWidth() { //-V6052
+        if (ownWidth != 0) {
+            return ownWidth;
         } else {
             return super.getPrefWidth();
         }
     }
 
     @Override
-    public float getPrefHeight() {
-        if (ownheight != 0) {
-            return ownheight;
+    public float getPrefHeight() { //-V6052
+        if (ownHeight != 0) {
+            return ownHeight;
         } else {
             return super.getPrefHeight();
         }

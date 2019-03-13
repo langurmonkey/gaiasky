@@ -101,7 +101,7 @@ public class JythonFactory extends ScriptingFactory implements IObserver {
             if (async) {
                 run.start();
             } else {
-                run.run();
+                run.run(); //-V6064
             }
         } else {
             logger.info(I18n.bundle.format("notif.script.max", maxScripts));

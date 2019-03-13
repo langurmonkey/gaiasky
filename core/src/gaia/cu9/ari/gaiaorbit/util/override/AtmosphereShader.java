@@ -663,12 +663,8 @@ public class AtmosphereShader extends BaseShader {
     /** Material attributes which are not required but always supported. */
     private final static long optionalAttributes = IntAttribute.CullFace | DepthTestAttribute.Type;
 
-    public AtmosphereShader(final Renderable renderable) {
-        this(renderable, new Config());
-    }
-
     public AtmosphereShader(final Renderable renderable, final Config config) {
-        this(renderable, config, createPrefix(renderable, config));
+        this(renderable, config, createPrefix(renderable));
     }
 
     public AtmosphereShader(final Renderable renderable, final Config config, final String prefix) {
@@ -770,7 +766,7 @@ public class AtmosphereShader extends BaseShader {
         return mask;
     }
 
-    public static String createPrefix(final Renderable renderable, final Config config) {
+    public static String createPrefix(final Renderable renderable) {
         final Attributes attributes = combineAttributes(renderable);
         String prefix = "";
         final long attributesMask = attributes.getMask();

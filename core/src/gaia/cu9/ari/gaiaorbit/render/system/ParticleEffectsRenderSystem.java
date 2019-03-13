@@ -93,7 +93,7 @@ public class ParticleEffectsRenderSystem extends ImmediateRenderSystem {
         double dist = 1200000 * tu * Constants.KM_TO_U * getFactor(GlobalConf.scene.CAMERA_SPEED);
 
         // If focus is very close, stop (jittering errors kick in)
-        if(cam.getMode().isFocus()) {
+        if (cam.getMode().isFocus()) {
             /**
              * Empirical fit to determine where the particle effects start to break down wrt distance to sol (since they are positioned globally)
              * <a href="https://mycurvefit.com/share/7b20c3bf-267d-4a8a-9498-844832d6509b">See curve and fit</a>
@@ -135,9 +135,8 @@ public class ParticleEffectsRenderSystem extends ImmediateRenderSystem {
 
     /**
      * Adds a new mesh data to the meshes list and increases the mesh data index
-     * 
-     * @param nVertices
-     *            The max number of vertices this mesh data can hold
+     *
+     * @param nVertices The max number of vertices this mesh data can hold
      * @return The index of the new mesh data
      */
     private int addMeshData(int nVertices) {
@@ -196,27 +195,27 @@ public class ParticleEffectsRenderSystem extends ImmediateRenderSystem {
             // Regular
             Gdx.gl.glLineWidth(1f * GlobalConf.SCALE_FACTOR);
 
-            curr.vertexIdx = 0;
-            curr.numVertices = N_PARTICLES * 2;
-            for (int i = 0; i < N_PARTICLES * 2; i++) {
-                // COLOR
-                curr.vertices[curr.vertexIdx + curr.colorOffset] = additional[i].x;
-                // SIZE
-                curr.vertices[curr.vertexIdx + sizeOffset] = additional[i].y;
-                // T
-                curr.vertices[curr.vertexIdx + tOffset] = additional[i].z;
-                // POSITION
-                curr.vertices[curr.vertexIdx] = positions[i].x;
-                curr.vertices[curr.vertexIdx + 1] = positions[i].y;
-                curr.vertices[curr.vertexIdx + 2] = positions[i].z;
-
-                curr.vertexIdx += curr.vertexSize;
-            }
-
-            /**
-             * RENDER
-             */
             if (curr != null) {
+                curr.vertexIdx = 0;
+                curr.numVertices = N_PARTICLES * 2;
+                for (int i = 0; i < N_PARTICLES * 2; i++) {
+                    // COLOR
+                    curr.vertices[curr.vertexIdx + curr.colorOffset] = additional[i].x;
+                    // SIZE
+                    curr.vertices[curr.vertexIdx + sizeOffset] = additional[i].y;
+                    // T
+                    curr.vertices[curr.vertexIdx + tOffset] = additional[i].z;
+                    // POSITION
+                    curr.vertices[curr.vertexIdx] = positions[i].x;
+                    curr.vertices[curr.vertexIdx + 1] = positions[i].y;
+                    curr.vertices[curr.vertexIdx + 2] = positions[i].z;
+
+                    curr.vertexIdx += curr.vertexSize;
+                }
+
+                /**
+                 * RENDER
+                 */
                 ShaderProgram shaderProgram = getShaderProgram();
 
                 shaderProgram.begin();

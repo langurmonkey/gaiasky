@@ -546,7 +546,6 @@ public class OctreeNode implements ILineRenderable {
 
         if (viewAngle < th0) {
             // Not observed
-            this.observed = false;
             setChildrenObserved(false);
         } else if(this.observed = computeObserved2(cam)){
             nOctantsObserved++;

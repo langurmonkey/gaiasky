@@ -450,7 +450,7 @@ public final class Parser {
     public static boolean parseBoolean(Object what) {
         if (what instanceof String) {
             String text = ((String) what).toLowerCase(Locale.ENGLISH);
-            return (text.startsWith("t") || text == "1" || text == "on" || text == "yes");
+            return (text.startsWith("t") || text.equals("1") || text.equals("on") || text.equals("yes"));
         } else if (what instanceof Boolean)
             return (Boolean) what;
         else

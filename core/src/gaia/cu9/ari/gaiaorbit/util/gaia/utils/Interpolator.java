@@ -85,8 +85,8 @@ public class Interpolator {
      */
     public static Quaterniond[] qHermiteAverage(final double ta, final double tb, final double[] t, final int indx, final Quaterniond[] q, final Quaterniond[] qDot) {
 
-        Quaterniond qAve = new Quaterniond();
-        Quaterniond qDotAve = new Quaterniond();
+        Quaterniond qAve;
+        Quaterniond qDotAve;
 
         if (tb - ta < dtMin) {
             double tm = (ta + tb) / 2;

@@ -270,7 +270,7 @@ public class NaturalInputListener extends GestureDetector implements IObserver {
 
                 Gdx.app.postRunnable(() -> {
                     // 5% of width pixels distance
-                    if (!GlobalConf.scene.CINEMATIC_CAMERA || (GlobalConf.scene.CINEMATIC_CAMERA && gesture.dst(screenX, screenY) < MOVE_PX_DIST)) {
+                    if (!GlobalConf.scene.CINEMATIC_CAMERA || gesture.dst(screenX, screenY) < MOVE_PX_DIST) {
                         boolean stopped = camera.stopMovement();
                         boolean focusRemoved = GaiaSky.instance.mainGui != null && GaiaSky.instance.mainGui.cancelTouchFocus();
                         boolean doubleClick = currentTime - lastLeftTime < doubleClickTime;

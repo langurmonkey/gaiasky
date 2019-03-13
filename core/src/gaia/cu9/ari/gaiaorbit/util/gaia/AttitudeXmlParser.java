@@ -1,25 +1,9 @@
 package gaia.cu9.ari.gaiaorbit.util.gaia;
 
-import java.io.IOException;
-import java.time.Instant;
-import java.time.LocalDateTime;
-import java.time.ZoneOffset;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Set;
-import java.util.SortedMap;
-import java.util.TreeMap;
-
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.utils.XmlReader;
-
-import gaia.cu9.ari.gaiaorbit.util.BinarySearchTree;
-import gaia.cu9.ari.gaiaorbit.util.GlobalConf;
-import gaia.cu9.ari.gaiaorbit.util.I18n;
-import gaia.cu9.ari.gaiaorbit.util.Logger;
+import gaia.cu9.ari.gaiaorbit.util.*;
 import gaia.cu9.ari.gaiaorbit.util.Logger.Log;
-import gaia.cu9.ari.gaiaorbit.util.Nature;
 import gaia.cu9.ari.gaiaorbit.util.coord.AstroUtils;
 import gaia.cu9.ari.gaiaorbit.util.format.DateFormatFactory;
 import gaia.cu9.ari.gaiaorbit.util.format.IDateFormat;
@@ -27,6 +11,12 @@ import gaia.cu9.ari.gaiaorbit.util.gaia.time.Duration;
 import gaia.cu9.ari.gaiaorbit.util.gaia.time.Hours;
 import gaia.cu9.ari.gaiaorbit.util.gaia.time.Secs;
 import gaia.cu9.ari.gaiaorbit.util.units.Quantity;
+
+import java.io.IOException;
+import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.ZoneOffset;
+import java.util.*;
 
 /**
  * Parses the XML files with the attitudes and their activaton times into a binary search tree.
@@ -176,7 +166,6 @@ public class AttitudeXmlParser {
         /** MODEL ELEMENT **/
         String name = model.get("name");
         String className = model.get("classname");
-        String activTime = model.get("starttime");
         double startTimeNsSince2010 = (AstroUtils.getJulianDate(activationTime) - AstroUtils.JD_J2010) * Nature.D_TO_NS;
 
         /** SCAN LAW ELEMENT **/

@@ -22,10 +22,6 @@ public class AtmosphereShaderProvider extends DefaultShaderProvider {
         this(ShaderTemplatingLoader.load(vertexShader), ShaderTemplatingLoader.load(fragmentShader));
     }
 
-    public AtmosphereShaderProvider() {
-        this(null);
-    }
-
     @Override
     protected Shader createShader(final Renderable renderable) {
         return new AtmosphereShader(renderable, config);

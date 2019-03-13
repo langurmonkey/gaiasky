@@ -392,7 +392,7 @@ public class Particle extends CelestialBody implements IStarFocus, ILineRenderab
 
     @Override
     protected boolean checkHitCondition() {
-        return ((this.octant == null) || (this.octant != null && this.octant.observed));
+        return this.octant == null || this.octant.observed;
     }
 
     @Override

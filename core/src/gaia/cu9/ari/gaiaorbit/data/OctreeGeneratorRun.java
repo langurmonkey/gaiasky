@@ -163,7 +163,7 @@ public class OctreeGeneratorRun {
 
             // Initialize configuration
             File dummyv = new File(ASSETS_LOC + "data/dummyversion");
-            if(!dummyv.exists()){
+            if (!dummyv.exists()) {
                 dummyv = new File(ASSETS_LOC + "dummyversion");
             }
             ConfInit.initialize(new DesktopConfInit(new FileInputStream(new File(ASSETS_LOC + "conf/global.properties")), new FileInputStream(dummyv)));
@@ -231,9 +231,11 @@ public class OctreeGeneratorRun {
             STILDataProvider stil = new STILDataProvider();
 
             // All hip stars for which we have a Gaia star, bypass plx >= 0 condition in STILDataProvider
-            Set<Long> mustLoad = new HashSet<>();
-            xmatchTable.values().stream().forEach(hip -> mustLoad.add(new Long(hip)));
-            stil.setMustLoadIds(mustLoad);
+            if (xmatchTable != null) {
+                Set<Long> mustLoad = new HashSet<>();
+                xmatchTable.values().stream().forEach(hip -> mustLoad.add(new Long(hip)));
+                stil.setMustLoadIds(mustLoad);
+            }
 
             Array<StarBean> listHip = (Array<StarBean>) stil.loadData("data/catalog/hipparcos/hip.vot");
             long[] cpmhip = stil.getCountsPerMag();

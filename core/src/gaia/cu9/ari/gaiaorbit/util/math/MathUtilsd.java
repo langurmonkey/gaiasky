@@ -151,7 +151,7 @@ public final class MathUtilsd {
      * <p>
      * This is an optimized version of {@link #randomTriangular(double, double, double) randomTriangular(-1, 1, 0)} */
     public static double randomTriangular () {
-        return random.nextDouble() - random.nextDouble();
+        return random.nextDouble() - random.nextDouble(); //-V6001
     }
 
     /** Returns a triangularly distributed random number between {@code -max} (exclusive) and {@code max} (exclusive), where values
@@ -160,7 +160,7 @@ public final class MathUtilsd {
      * This is an optimized version of {@link #randomTriangular(double, double, double) randomTriangular(-max, max, 0)}
      * @param max the upper limit */
     public static double randomTriangular (double max) {
-        return (random.nextDouble() - random.nextDouble()) * max;
+        return (random.nextDouble() - random.nextDouble()) * max; //-V6001
     }
 
     /** Returns a triangularly distributed random number between {@code min} (inclusive) and {@code max} (exclusive), where the

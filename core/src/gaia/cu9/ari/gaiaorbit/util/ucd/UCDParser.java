@@ -1,14 +1,14 @@
 package gaia.cu9.ari.gaiaorbit.util.ucd;
 
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
-
 import gaia.cu9.ari.gaiaorbit.util.ucd.UCD.UCDType;
 import gaia.cu9.ari.gaiaorbit.util.units.Position.PositionType;
 import uk.ac.starlink.table.ColumnInfo;
 import uk.ac.starlink.table.StarTable;
+
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * Parses the ucds of a star table and builds some metadata on
@@ -104,12 +104,12 @@ public class UCDParser {
         if (this.ID.isEmpty()) {
             this.ID.addAll(getByColNames(idcolnames));
         }
-        this.hasid = this.ID != null && !this.ID.isEmpty();
+        this.hasid = !this.ID.isEmpty();
 
         if(this.NAME.isEmpty()) {
             this.NAME.addAll(getByColNames(namecolnames));
         }
-        this.hasname = this.NAME != null && !this.NAME.isEmpty();
+        this.hasname = !this.NAME.isEmpty();
 
         /** POSITIONS **/
         Set<UCD> pos = ucdmap.get(UCDType.POS);
@@ -169,12 +169,11 @@ public class UCDParser {
         if (this.POS1.isEmpty() || this.POS2.isEmpty()) {
             // Try to work out from names
             this.POS1 = getByColNames(pos1colnames, "deg");
-            if (this.POS1 != null && !this.POS1.isEmpty()) {
+            if (!this.POS1.isEmpty()) {
                 this.POS2 = getByColNames(pos2colnames, "deg");
                 this.POS3 = getByColNames(distcolnames, "pc");
-                if (this.POS3 == null || this.POS3.isEmpty()) {
+                if (this.POS3.isEmpty()) {
                     this.POS3 = getByColNames(pllxcolnames, "mas");
-                } else {
                 }
             }
         }
@@ -212,7 +211,7 @@ public class UCDParser {
         if (this.PMRA.isEmpty() || this.PMDEC.isEmpty()) {
             // Try to work out from names
             this.PMRA = getByColNames(pmracolnames, "mas/yr");
-            if (this.PMRA != null && !this.PMRA.isEmpty()) {
+            if (!this.PMRA.isEmpty()) {
                 this.PMDEC = getByColNames(pmdeccolnames, "mas/yr");
                 this.RADVEL = getByColNames(radvelcolnames, "km/s");
             }
@@ -236,7 +235,7 @@ public class UCDParser {
                             this.MAG.add(candidate);
                         }
                     } else {
-                        if (this.MAG == null)
+                        if (this.MAG != null)
                             this.MAG.add(candidate);
                     }
                 }
@@ -244,7 +243,7 @@ public class UCDParser {
         if (this.MAG == null || this.MAG.isEmpty()) {
             this.MAG = getByColNames(magcolnames, "mag");
         }
-        this.hasmag = this.MAG != null && !this.MAG.isEmpty();
+        this.hasmag = !this.MAG.isEmpty();
 
         /** COLORS **/
         Set<UCD> col = ucdmap.get(UCDType.PHOT);
@@ -258,7 +257,7 @@ public class UCDParser {
         if (this.COL == null || this.COL.isEmpty()) {
             this.COL = getByColNames(colorcolnames);
         }
-        this.hascol = this.COL != null && !this.COL.isEmpty();
+        this.hascol = !this.COL.isEmpty();
 
         /** PHYSICAL QUANTITIES **/
         // TODO - not supported yet
@@ -318,7 +317,7 @@ public class UCDParser {
     }
 
     private Set<UCD> getByColNames(UCDType[] types, String[] colnames, String defaultunit) {
-        Set<UCD> candidates = new HashSet<UCD>();
+        Set<UCD> candidates = new HashSet<>();
         for (UCDType type : types) {
             // Get all unknown and missing
             if (ucdmap.containsKey(type)) {

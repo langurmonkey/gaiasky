@@ -10,23 +10,23 @@ import gaia.cu9.ari.gaiaorbit.util.math.Vector3d;
  * fields necessary to define a unique attitude at a given time, plus a large
  * number of methods to compute quantities that depend only on this attitude and
  * time.
- * 
+ * <p>
  * The various scanning laws and specific attitude representations (e.g., using
  * splines, or tables for interpolation) can be implemented as providing
  * attitude objects of this type.
- * 
+ * <p>
  * In some cases (in particular for simple analytical scanning laws) there are
  * more direct ways to retrieve some of the quantities for which there are
  * methods in this class (e.g., {@link #getHeliotropicAnglesRates()}); the
  * present method(s) may then be overridden for efficiency.
- * 
+ *
  * @author Lennart Lindegren, Uwe Lammers
  */
 public class ConcreteAttitude implements Attitude {
 
     private static final double BASICANGLE_DEGREE = 106.5;
-    private static final Vector3d[] xyz = new Vector3d[] { new Vector3d(), new Vector3d(), new Vector3d() };
-    private static final Vector3d[] fovDirections = new Vector3d[] { new Vector3d(), new Vector3d() };
+    private static final Vector3d[] xyz = new Vector3d[]{new Vector3d(), new Vector3d(), new Vector3d()};
+    private static final Vector3d[] fovDirections = new Vector3d[]{new Vector3d(), new Vector3d()};
     private static final Vector3d aux = new Vector3d();
     /**
      * time to which the attitude refers, in elapsed ns since the reference epoch
@@ -41,7 +41,7 @@ public class ConcreteAttitude implements Attitude {
     /**
      * time derivative of the attitude at time t
      */
-    private Quaterniond qDot = null;
+    private Quaterniond qDot;
 
     // half the conventional basic angle Gamma [rad]
     private double halfGamma = Math.toRadians(.5 * BASICANGLE_DEGREE);
@@ -50,11 +50,9 @@ public class ConcreteAttitude implements Attitude {
      * Construct object from time, and a quaternion. This leaves the time
      * derivative undefined. It can be set later with
      * {@link #setQuaternionDot(Quaterniond)}
-     * 
-     * @param t
-     *            time of the attitude
-     * @param q
-     *            quaternion
+     *
+     * @param t time of the attitude
+     * @param q quaternion
      */
     public ConcreteAttitude(long t, Quaterniond q, boolean withZeroSigmaCorr) {
         this(t, q, null, withZeroSigmaCorr);
@@ -62,22 +60,20 @@ public class ConcreteAttitude implements Attitude {
 
     /**
      * Construct object from time, quaternion and its derivative.
-     * 
-     * @param t
-     *            time of the attitude
-     * @param q
-     *            quaternion
-     * @param qDot
-     *            time derivativ of quaternion [1/day]
+     *
+     * @param t    time of the attitude
+     * @param q    quaternion
+     * @param qDot time derivative of quaternion [1/day]
      */
     public ConcreteAttitude(long t, Quaterniond q, Quaterniond qDot,
-            boolean withZeroSigmaCorr) {
+                            boolean withZeroSigmaCorr) { //-V6022
         this.t = t;
         this.q = q;
         this.qDot = qDot;
     }
 
     /**
+     *
      */
     @Override
     public long getTime() {
@@ -88,14 +84,14 @@ public class ConcreteAttitude implements Attitude {
      * Set the time of the attitude. This usually does not make sense as the
      * time is set during construction of the object
      *
-     * @param time
-     *            time of the attitude in [ns] since reference epoch
+     * @param time time of the attitude in [ns] since reference epoch
      */
     public void setTime(long time) {
         t = time;
     }
 
     /**
+     *
      */
     @Override
     public Quaterniond getQuaternion() {
@@ -114,7 +110,7 @@ public class ConcreteAttitude implements Attitude {
 
     /**
      * Get the time derivative of the attitude.
-     * 
+     *
      * @return time derivative of the attitude quaternion [1/day]
      */
     @Override
@@ -123,14 +119,14 @@ public class ConcreteAttitude implements Attitude {
     }
 
     /**
-     * @param qDot
-     *            quaternion derivative to set - all components in [1/day]
+     * @param qDot quaternion derivative to set - all components in [1/day]
      */
     public void setQuaternionDot(Quaterniond qDot) {
         this.qDot = qDot;
     }
 
     /**
+     *
      */
     public HeliotropicAnglesRates getHeliotropicAnglesRates() {
         HeliotropicAnglesRates anglesAndRates = new HeliotropicAnglesRates();
@@ -199,6 +195,7 @@ public class ConcreteAttitude implements Attitude {
     }
 
     /**
+     *
      */
     @Override
     public Vector3d getSpinVectorInSrs() {
@@ -209,6 +206,7 @@ public class ConcreteAttitude implements Attitude {
     }
 
     /**
+     *
      */
     @Override
     public Vector3d getSpinVectorInIcrs() {
@@ -219,6 +217,7 @@ public class ConcreteAttitude implements Attitude {
     }
 
     /**
+     *
      */
     @Override
     public Vector3d[] getFovDirections() {
@@ -253,6 +252,7 @@ public class ConcreteAttitude implements Attitude {
     }
 
     /**
+     *
      */
     @Override
     public double[] getAlAcRates(double alInstrumentAngle, double acFieldAngle) {
@@ -269,14 +269,15 @@ public class ConcreteAttitude implements Attitude {
         // Across scan speed in rad/s
         double zetap = -spinRate.x * sphi + spinRate.y * cphi;
 
-        return new double[] { phip, zetap };
+        return new double[]{phip, zetap};
     }
 
     /**
+     *
      */
     @Override
     public double[] getAlAcRates(FOV fov, double alFieldAngle,
-            double acFieldAngle) {
+                                 double acFieldAngle) {
 
         return getAlAcRates(alFieldAngle + fov.getNumericalFieldIndex()
                 * halfGamma, acFieldAngle);

@@ -191,7 +191,7 @@ public class MilkyWay extends AbstractPositionEntity implements I3DTextRenderabl
 
     @Override
     protected void addToRenderLists(ICamera camera) {
-        if ((fadeIn == null || fadeIn != null && currentDistance > fadeIn.x) && (fadeOut == null || fadeOut != null && currentDistance < fadeOut.y)) {
+        if ((fadeIn == null || currentDistance > fadeIn.x) && (fadeOut == null || currentDistance < fadeOut.y)) {
 
             if (renderText()) {
                 addToRender(this, RenderGroup.FONT_LABEL);

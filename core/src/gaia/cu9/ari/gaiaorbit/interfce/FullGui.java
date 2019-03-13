@@ -216,7 +216,7 @@ public class FullGui extends AbstractGui {
 
         if (ui != null) {
             ui.clear();
-            boolean collapsed = false;
+            boolean collapsed;
             if (controlsWindow != null) {
                 collapsed = controlsWindow.isCollapsed();
                 recalculateOptionsSize();
