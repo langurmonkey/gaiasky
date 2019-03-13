@@ -37,7 +37,6 @@
 - info on gs_java_version_check when run on java other than 1.8
 - new cameraTransition() API call
 - sync and async camera file playback API calls
-- sync and async camera file playback API calls
 - add sync and async camera path running funcs
 - improve minimap
 - implement controller blacklist
