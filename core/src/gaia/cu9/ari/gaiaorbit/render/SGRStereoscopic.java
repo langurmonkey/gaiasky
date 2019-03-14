@@ -1,10 +1,5 @@
 package gaia.cu9.ari.gaiaorbit.render;
 
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map;
-import java.util.Set;
-
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.PerspectiveCamera;
@@ -15,7 +10,6 @@ import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.viewport.StretchViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
 import com.bitfire.postprocessing.effects.Anaglyphic;
-
 import gaia.cu9.ari.gaiaorbit.event.EventManager;
 import gaia.cu9.ari.gaiaorbit.event.Events;
 import gaia.cu9.ari.gaiaorbit.event.IObserver;
@@ -28,6 +22,11 @@ import gaia.cu9.ari.gaiaorbit.util.GlobalConf;
 import gaia.cu9.ari.gaiaorbit.util.GlobalConf.ProgramConf.StereoProfile;
 import gaia.cu9.ari.gaiaorbit.util.GlobalResources;
 import gaia.cu9.ari.gaiaorbit.util.math.Vector3d;
+
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * Renders all the 3D/stereoscopic modes. Renders basically two scenes, one for
@@ -58,7 +57,7 @@ public class SGRStereoscopic extends SGRAbstract implements ISGR, IObserver {
         stretchViewport = new StretchViewport(Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
 
         // INIT FRAME BUFFER FOR 3D MODE
-        fb3D = new HashMap<Integer, FrameBuffer>();
+        fb3D = new HashMap<>();
         fb3D.put(getKey(Gdx.graphics.getWidth() / 2, Gdx.graphics.getHeight()), new FrameBuffer(Format.RGB888, Gdx.graphics.getWidth() / 2, Gdx.graphics.getHeight(), true));
 
         // Init anaglyphic effect
@@ -80,12 +79,11 @@ public class SGRStereoscopic extends SGRAbstract implements ISGR, IObserver {
     @Override
     public void render(SceneGraphRenderer sgr, ICamera camera, double t, int rw, int rh, FrameBuffer fb, PostProcessBean ppb) {
         boolean movecam = camera.getMode() == CameraMode.Free_Camera || camera.getMode() == CameraMode.Focus || camera.getMode() == CameraMode.Spacecraft;
-        //movecam = false;
 
         PerspectiveCamera cam = camera.getCamera();
         // Vector of 1 meter length pointing to the side of the camera
         double separation = Constants.M_TO_U * GlobalConf.program.STEREOSCOPIC_EYE_SEPARATION_M;
-        double separationCapped = separation;
+        double separationCapped;
         double dirangleDeg = 0;
 
         IFocus currentFocus = null;
@@ -104,11 +102,11 @@ public class SGRStereoscopic extends SGRAbstract implements ISGR, IObserver {
             } else {
                 separation = Math.tan(Math.toRadians(EYE_ANGLE_DEG)) * distToFocus;
             }
-            // Lets cap it to 100 AU
-            separationCapped = Math.min(separation, 1 * Constants.AU_TO_U);
+            // Lets cap it
+            separationCapped = Math.min(separation, 0.1 * Constants.AU_TO_U);
             dirangleDeg = EYE_ANGLE_DEG;
         } else {
-            separationCapped = Math.min(separation, 1 * Constants.AU_TO_U);
+            separationCapped = Math.min(separation, 0.1 * Constants.AU_TO_U);
         }
 
         // Aux5d contains the direction to the side of the camera, normalised
@@ -232,7 +230,7 @@ public class SGRStereoscopic extends SGRAbstract implements ISGR, IObserver {
             boolean postproc = postprocessCapture(ppb, fb3d, boundsw, boundsh);
             sgr.renderScene(camera, t, rc);
 
-            Texture tex = null;
+            Texture tex;
             postprocessRender(ppb, fb3d, postproc, camera, boundsw, boundsh);
             tex = fb3d.getColorBufferTexture();
 
@@ -303,14 +301,13 @@ public class SGRStereoscopic extends SGRAbstract implements ISGR, IObserver {
             cam.position.add(sidef);
             cam.direction.rotate(cam.up, (float) -angle);
 
-            // Uncomment to enable 3D in points
+            // Uncomment to enable 3D in GPU points
             camera.getPos().add(sideRemainder);
-
         } else {
             cam.position.sub(sidef);
             cam.direction.rotate(cam.up, (float) angle);
 
-            // Uncomment to enable 3D in points
+            // Uncomment to enable 3D in GPU points
             camera.getPos().sub(sideRemainder);
         }
         cam.update();

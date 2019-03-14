@@ -19,7 +19,6 @@ import gaia.cu9.ari.gaiaorbit.scenegraph.ParticleGroup.ParticleBean;
 import gaia.cu9.ari.gaiaorbit.scenegraph.SceneGraphNode.RenderGroup;
 import gaia.cu9.ari.gaiaorbit.scenegraph.camera.ICamera;
 import gaia.cu9.ari.gaiaorbit.util.GlobalConf;
-import gaia.cu9.ari.gaiaorbit.util.GlobalConf.ProgramConf.StereoProfile;
 import gaia.cu9.ari.gaiaorbit.util.comp.DistToCameraComparator;
 
 import java.util.Random;
@@ -32,7 +31,7 @@ public class ParticleGroupRenderSystem extends ImmediateRenderSystem implements 
 
     public ParticleGroupRenderSystem(RenderGroup rg, float[] alphas, ShaderProgram[] shaders) {
         super(rg, alphas, shaders, 1500000);
-        comp = new DistToCameraComparator<IRenderable>();
+        comp = new DistToCameraComparator<>();
         rand = new Random(123);
         aux1 = new Vector3();
         EventManager.instance.subscribe(this, Events.DISPOSE_PARTICLE_GROUP_GPU_MESH);
@@ -49,11 +48,11 @@ public class ParticleGroupRenderSystem extends ImmediateRenderSystem implements 
     }
 
     /**
-    	 * Adds a new mesh data to the meshes list and increases the mesh data index
-    	 * 
-    	 * @param nVertices The max number of vertices this mesh data can hold
-    	 * @return The index of the new mesh data
-    	 */
+     * Adds a new mesh data to the meshes list and increases the mesh data index
+     *
+     * @param nVertices The max number of vertices this mesh data can hold
+     * @return The index of the new mesh data
+     */
     private int addMeshData(int nVertices) {
         // look for index
         int mdi;
@@ -84,10 +83,10 @@ public class ParticleGroupRenderSystem extends ImmediateRenderSystem implements 
     }
 
     /**
-    	 * Clears the mesh data at the index i
-    	 * 
-    	 * @param i The index
-    	 */
+     * Clears the mesh data at the index i
+     *
+     * @param i The index
+     */
     public void clearMeshData(int i) {
         assert i >= 0 && i < meshes.length : "Mesh data index out of bounds: " + i + " (n meshes = " + N_MESHES + ")";
 
@@ -108,8 +107,8 @@ public class ParticleGroupRenderSystem extends ImmediateRenderSystem implements 
                 ParticleGroup particleGroup = (ParticleGroup) renderable;
                 curr = meshes[particleGroup.offset];
                 /**
-                				 * GROUP RENDER
-                				 */
+                 * GROUP RENDER
+                 */
                 if (!particleGroup.inGpu) {
                     particleGroup.offset = addMeshData(particleGroup.size());
 
@@ -143,9 +142,6 @@ public class ParticleGroupRenderSystem extends ImmediateRenderSystem implements 
                 }
 
                 if (curr != null) {
-                    /**
-                    					 * PARTICLE RENDERER
-                    					 */
                     // Enable gl_PointCoord
                     Gdx.gl20.glEnable(34913);
                     // Enable point sizes
@@ -156,12 +152,14 @@ public class ParticleGroupRenderSystem extends ImmediateRenderSystem implements 
 
                     ShaderProgram shaderProgram = getShaderProgram();
 
+                    boolean stereohw = GlobalConf.program.isStereoHalfWidth();
+
                     shaderProgram.begin();
                     shaderProgram.setUniformMatrix("u_projModelView", camera.getCamera().combined);
-                    shaderProgram.setUniformf("u_alpha", particleGroup.opacity * alphas[particleGroup.ct.getFirstOrdinal()]);
-                    shaderProgram.setUniformf("u_ar", GlobalConf.program.STEREOSCOPIC_MODE && (GlobalConf.program.STEREO_PROFILE != StereoProfile.HD_3DTV_HORIZONTAL && GlobalConf.program.STEREO_PROFILE != StereoProfile.ANAGLYPHIC) ? 0.5f : 1f);
+                    shaderProgram.setUniformf("u_alpha", alphas[particleGroup.ct.getFirstOrdinal()] * particleGroup.getOpacity());
+                    shaderProgram.setUniformf("u_ar", stereohw ? 0.5f : 1f);
                     shaderProgram.setUniformf("u_profileDecay", particleGroup.profileDecay);
-                    shaderProgram.setUniformf("u_sizeFactor", rc.scaleFactor * GlobalConf.scene.STAR_POINT_SIZE / 5f);
+                    shaderProgram.setUniformf("u_sizeFactor", (stereohw ? 2f : 1f) * rc.scaleFactor * GlobalConf.scene.STAR_POINT_SIZE / 5f);
                     shaderProgram.setUniformf("u_camPos", camera.getCurrent().getPos().put(aux1));
                     shaderProgram.setUniformf("u_camDir", camera.getCurrent().getCamera().direction);
                     shaderProgram.setUniformi("u_cubemap", GlobalConf.program.CUBEMAP360_MODE ? 1 : 0);
@@ -177,7 +175,6 @@ public class ParticleGroupRenderSystem extends ImmediateRenderSystem implements 
                 }
             }
         }
-
     }
 
     protected VertexAttribute[] buildVertexAttributes() {

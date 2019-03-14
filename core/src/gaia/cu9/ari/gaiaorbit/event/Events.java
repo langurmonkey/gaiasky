@@ -452,7 +452,6 @@ public enum Events {
     SHOW_LOG_ACTION,
     SHOW_TUTORIAL_ACTION,
     SHOW_PREFERENCES_ACTION,
-    SHOW_RUNSCRIPT_ACTION,
     SHOW_LAND_AT_LOCATION_ACTION,
     /**
      * Quit action, can contain optional Runnable to run on accept()
@@ -464,14 +463,6 @@ public enum Events {
      * Shows the camera path file selector, contains the stage and the skin
      **/
     SHOW_PLAYCAMERA_ACTION,
-    /**
-     * Informs about the number of running scripts
-     **/
-    NUM_RUNNING_SCRIPTS,
-    /**
-     * Cancels the next script
-     **/
-    CANCEL_SCRIPT_CMD,
     SHOW_SEARCH_ACTION,
     /**
      * This event is issued when the screen has been resized. It contains the

@@ -76,6 +76,17 @@ public class Vector3d implements Serializable, Vectord<Vector3d> {
 		this.set(values[0], values[1], values[2]);
 	}
 
+	public double x(){
+		return x;
+	}
+
+	public double y(){
+		return y;
+	}
+
+	public double z(){
+		return z;
+	}
 	/**
 	 * Sets the vector to the given components
 	 *

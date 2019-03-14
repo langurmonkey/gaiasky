@@ -975,7 +975,7 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
     }
 
     public void setFocus(IFocus focus) {
-        if (focus != null ) {
+        if (focus != null && GaiaSky.instance.isOn(focus.getCt())) {
             this.focus = focus;
             this.focus.makeFocus();
             // Reset facing focus

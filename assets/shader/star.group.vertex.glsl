@@ -68,24 +68,15 @@ void main() {
     	pos = computeRelativisticAberration(pos, dist, u_velDir, u_vc);
     #endif // relativisticEffects
     
-    vec4 col = a_color;
-    
     #ifdef gravitationalWaves
         pos = computeGravitationalWaves(pos, u_gw, u_gwmat3, u_ts, u_omgw, u_hterms);
-//        float cosalpha = dot(u_gw, pos) / (length(u_gw) * length(pos));
-//        if(acos(cosalpha) < 0.035) {
-//            // Paint red
-//            col.r = 1.0;
-//            col.g = 1.0;
-//            col.b = 0.0;
-//        }
     #endif // gravitationalWaves
     
     float viewAngleApparent = atan((a_size * u_alphaSizeFovBr.w) / dist) / u_alphaSizeFovBr.z;
     float opacity = pow(lint2(viewAngleApparent, 0.0, u_thAnglePoint, u_pointAlpha.x, u_pointAlpha.y), 1.2);
 
     float fadeout = smoothstep(dist, len0, len1);
-    v_col = vec4(col.rgb, opacity * u_alphaSizeFovBr.x * fadeout);
+    v_col = vec4(a_color.rgb, opacity * u_alphaSizeFovBr.x * fadeout);
 
 	// Discard vertex if too close or Gaia Fov1or2 and not observed
     float v_discard = 1.0;

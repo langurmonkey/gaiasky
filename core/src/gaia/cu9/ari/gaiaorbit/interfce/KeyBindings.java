@@ -93,10 +93,6 @@ public class KeyBindings {
         addMapping(new ProgramAction(txt("action.preferences"), () ->
                 EventManager.instance.post(Events.SHOW_PREFERENCES_ACTION)), Keys.P);
 
-        // r -> Show run script dialog
-        addMapping(new ProgramAction(txt("action.runscript"), () ->
-                EventManager.instance.post(Events.SHOW_RUNSCRIPT_ACTION), fullGuiCondition), Keys.R);
-
         // c -> Show play camera dialog
         addMapping(new ProgramAction(txt("action.playcamera"), () ->
                 EventManager.instance.post(Events.SHOW_PLAYCAMERA_ACTION), fullGuiCondition), Keys.C);

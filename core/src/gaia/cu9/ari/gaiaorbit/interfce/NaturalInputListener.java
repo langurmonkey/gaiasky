@@ -142,7 +142,7 @@ public class NaturalInputListener extends GestureDetector implements IObserver {
         this.gestureListener = gestureListener;
         this.gestureListener.controller = this;
         this.camera = camera;
-        this.comp = new ViewAngleComparator<IFocus>();
+        this.comp = new ViewAngleComparator<>();
         // 1% of width
         this.MOVE_PX_DIST = (float) Math.max(5, Gdx.graphics.getWidth() * 0.01);
         this.MIN_PIX_DIST = (int) (5 * GlobalConf.SCALE_FACTOR);
@@ -155,7 +155,7 @@ public class NaturalInputListener extends GestureDetector implements IObserver {
         this.currentDrag = new Vector2();
         this.lastDrag = new Vector2();
 
-        pressedKeys = new HashSet<Integer>();
+        pressedKeys = new HashSet<>();
     }
 
     public NaturalInputListener(final NaturalCamera camera) {
@@ -172,7 +172,7 @@ public class NaturalInputListener extends GestureDetector implements IObserver {
         if (kpo != null)
             return kpo;
 
-        Array<SceneGraphNode> l = GaiaSky.instance.sg.getRoot().getChildrenByType(KeyframesPathObject.class, new Array<SceneGraphNode>(1));
+        Array<SceneGraphNode> l = GaiaSky.instance.sg.getRoot().getChildrenByType(KeyframesPathObject.class, new Array<>(1));
         if (!l.isEmpty()) {
             kpo = (KeyframesPathObject) l.get(0);
             return kpo;
@@ -204,7 +204,7 @@ public class NaturalInputListener extends GestureDetector implements IObserver {
     private Array<IFocus> getHits(int screenX, int screenY) {
         Array<IFocus> l = GaiaSky.instance.getFocusableEntities();
 
-        Array<IFocus> hits = new Array<IFocus>();
+        Array<IFocus> hits = new Array<>();
 
         Iterator<IFocus> it = l.iterator();
         // Add all hits
@@ -242,8 +242,8 @@ public class NaturalInputListener extends GestureDetector implements IObserver {
             }
             if (button == Buttons.RIGHT) {
                 // Select keyframes
-                if (!(anyPressed(Keys.ALT_LEFT, Keys.SHIFT_LEFT, Keys.CONTROL_LEFT) && getKeyframesPathObject().isSelected())) {
-                    IFocus hit = null;
+                if (!(anyPressed(Keys.ALT_LEFT, Keys.SHIFT_LEFT, Keys.CONTROL_LEFT) && getKeyframesPathObject() != null && getKeyframesPathObject().isSelected())) {
+                    IFocus hit;
                     keyframeBeingDragged = ((hit = getKeyframeCollision(screenX, screenY)) != null);
                     if(keyframeBeingDragged){
                         // Focus, do not center

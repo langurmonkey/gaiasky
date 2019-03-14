@@ -39,7 +39,7 @@ public class StarGroupRenderSystem extends ImmediateRenderSystem implements IObs
     public StarGroupRenderSystem(RenderGroup rg, float[] alphas, ShaderProgram[] shaders) {
         super(rg, alphas, shaders, 1500000);
         BRIGHTNESS_FACTOR = 10;
-        this.comp = new DistToCameraComparator<IRenderable>();
+        this.comp = new DistToCameraComparator<>();
         this.alphaSizeFovBr = new float[4];
         aux1 = new Vector3();
         EventManager.instance.subscribe(this, Events.STAR_MIN_OPACITY_CMD, Events.DISPOSE_STAR_GROUP_GPU_MESH);
@@ -210,7 +210,7 @@ public class StarGroupRenderSystem extends ImmediateRenderSystem implements IObs
     }
 
     protected VertexAttribute[] buildVertexAttributes() {
-        Array<VertexAttribute> attribs = new Array<VertexAttribute>();
+        Array<VertexAttribute> attribs = new Array<>();
         attribs.add(new VertexAttribute(Usage.Position, 3, ShaderProgram.POSITION_ATTRIBUTE));
         attribs.add(new VertexAttribute(Usage.Tangent, 3, "a_pm"));
         attribs.add(new VertexAttribute(Usage.ColorPacked, 4, ShaderProgram.COLOR_ATTRIBUTE));
@@ -230,13 +230,10 @@ public class StarGroupRenderSystem extends ImmediateRenderSystem implements IObs
             pointAlpha[1] = (float) data[0] + GlobalConf.scene.POINT_ALPHA_MAX;
             for (ShaderProgram p : programs) {
                 if (p != null && p.isCompiled()) {
-                    Gdx.app.postRunnable(new Runnable() {
-                        @Override
-                        public void run() {
-                            p.begin();
-                            p.setUniform2fv("u_pointAlpha", pointAlpha, 0, 2);
-                            p.end();
-                        }
+                    Gdx.app.postRunnable(() -> {
+                        p.begin();
+                        p.setUniform2fv("u_pointAlpha", pointAlpha, 0, 2);
+                        p.end();
                     });
                 }
             }

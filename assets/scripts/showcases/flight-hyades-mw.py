@@ -3,9 +3,10 @@
 ## a zoom out of the galaxy
 ##
 
-from py4j.java_gateway import JavaGateway
+from py4j.java_gateway import JavaGateway, GatewayParameters
 
-gs = JavaGateway().entry_point
+gateway = JavaGateway(gateway_parameters=GatewayParameters(auto_convert=True))
+gs = gateway.entry_point
 
 
 ## PREPPING
@@ -162,3 +163,6 @@ gs.setSaturationLevel(1.0)
 
 gs.setVisibility('element.planets',True)
 gs.setVisibility('element.moons',True)
+
+# close gateway
+gateway.close()

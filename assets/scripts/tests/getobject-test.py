@@ -2,10 +2,10 @@
 # Created by Toni Sagrista
 
 import math
-from gaia.cu9.ari.gaiaorbit.script import EventScriptingInterface
+from py4j.java_gateway import JavaGateway, GatewayParameters
 
-
-gs = EventScriptingInterface.instance()
+gateway = JavaGateway(gateway_parameters=GatewayParameters(auto_convert=True))
+gs = gateway.entry_point
 
 gs.disableInput()
 gs.cameraStop()
@@ -27,15 +27,16 @@ absmag = body.getAbsmag()
 appmag = body.getAppmag()
 radec = body.getPosSph()
 
-gs.print("Absmag: %f, appmag: %f, RA: %f, DEC: %f" % (absmag, appmag, radec.x, radec.y))
+gs.print("Absmag: %f, appmag: %f, RA: %f, DEC: %f" % (absmag, appmag, radec.x(), radec.y()))
 
 
 # Now stop at a certain distance of earth
 dist = 15000 #Km
 earthrad = gs.getObjectRadius("Earth")
-anglerad = math.acos((earthrad*2)/dist)
+anglerad = math.acos((earthrad * 2)/dist)
 
 gs.goToObject("Earth", math.degrees(anglerad))
 
-
 gs.enableInput()
+
+gateway.close()

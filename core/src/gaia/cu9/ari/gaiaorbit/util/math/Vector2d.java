@@ -62,16 +62,24 @@ public class Vector2d implements Serializable, Vectord<Vector2d> {
         set(v);
     }
 
+    public double x(){
+        return x;
+    }
+
+    public double y(){
+        return y;
+    }
+
     public Vector2d cpy() {
         return new Vector2d(this);
     }
 
     public static double len(double x, double y) {
-        return (double) Math.sqrt(x * x + y * y);
+        return Math.sqrt(x * x + y * y);
     }
 
     public double len() {
-        return (double) Math.sqrt(x * x + y * y);
+        return Math.sqrt(x * x + y * y);
     }
 
     public static double len2(double x, double y) {

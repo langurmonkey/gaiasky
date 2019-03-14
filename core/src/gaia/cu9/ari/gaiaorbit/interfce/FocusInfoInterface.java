@@ -1,6 +1,5 @@
 package gaia.cu9.ari.gaiaorbit.interfce;
 
-import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener.ChangeEvent;
@@ -17,6 +16,7 @@ import gaia.cu9.ari.gaiaorbit.util.coord.Coordinates;
 import gaia.cu9.ari.gaiaorbit.util.format.INumberFormat;
 import gaia.cu9.ari.gaiaorbit.util.format.NumberFormatFactory;
 import gaia.cu9.ari.gaiaorbit.util.math.MathUtilsd;
+import gaia.cu9.ari.gaiaorbit.util.math.Vector2d;
 import gaia.cu9.ari.gaiaorbit.util.math.Vector3d;
 import gaia.cu9.ari.gaiaorbit.util.scene2d.OwnLabel;
 import gaia.cu9.ari.gaiaorbit.util.scene2d.OwnTextIconButton;
@@ -345,7 +345,7 @@ public class FocusInfoInterface extends Table implements IObserver, IGuiInterfac
             String objectName = focus.getName();
 
             focusName.setText(objectName);
-            Vector2 posSph = focus.getPosSph();
+            Vector2d posSph = focus.getPosSph();
             if (posSph != null && posSph.len() > 0f) {
                 focusRA.setText(nf.format(posSph.x) + "°");
                 focusDEC.setText(nf.format(posSph.y) + "°");
