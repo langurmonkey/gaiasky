@@ -381,7 +381,7 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
         // Initialise frames
         frames = 0;
 
-        if (sg.containsNode("Earth") && !GlobalConf.program.NET_SLAVE) {
+        if (sg.containsNode("Earth") && !GlobalConf.program.NET_SLAVE && isOn(ComponentType.Planets.ordinal())) {
             // Set focus to Earth
             EventManager.instance.post(Events.CAMERA_MODE_CMD, CameraMode.Focus);
             EventManager.instance.post(Events.FOCUS_CHANGE_CMD, sg.getNode("Earth"), true);

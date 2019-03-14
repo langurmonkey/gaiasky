@@ -293,7 +293,7 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
         double translateUnits = Math.max(10d * Constants.M_TO_U, realTransUnits);
         switch (m) {
             case Focus:
-                if (focus.withinMagLimit() && !focus.isCoordinatesTimeOverflow()) {
+                if (focus != null && focus.withinMagLimit() && !focus.isCoordinatesTimeOverflow()) {
                     focusBak = focus;
                     focus.getAbsolutePosition(aux4);
                     // Hack, fix this by understanding underlying problem
@@ -579,8 +579,7 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
                 addYaw(deltaX, acceleration);
                 addPitch(deltaY, acceleration);
             } else {
-                // This factor slows the rotation as the focus gets closer and
-                // closer
+                // This factor slows the rotation as the focus gets closer and closer
                 double factor = vadeg > th ? Math.pow(th / vadeg, 3) : 1.0;
                 addHorizontalRotation(deltaX * factor, acceleration);
                 addVerticalRotation(deltaY * factor, acceleration);
