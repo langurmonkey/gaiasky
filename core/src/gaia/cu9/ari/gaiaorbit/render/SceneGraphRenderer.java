@@ -69,8 +69,6 @@ public class SceneGraphRenderer extends AbstractRenderer implements IProcessRend
     /** Alpha values for each type **/
     public static float[] alphas;
 
-    private AbstractRenderSystem[] pixelRenderSystems;
-
     private ShaderProgram[] starGroupShaders, particleGroupShaders, particleEffectShaders, orbitElemShaders, pointShaders, lineShaders, lineQuadShaders, lineGpuShaders, mwPointShaders, mwOitShaders, mwNebulaShaders, starPointShaders, galShaders, spriteShaders, starBillboardShaders;
     private AssetDescriptor<ShaderProgram>[] starGroupDesc, particleGroupDesc, particleEffectDesc, orbitElemDesc, pointDesc, lineDesc, lineQuadDesc, lineGpuDesc, mwPointDesc, mwOitDesc, mwNebulaDesc, starPointDesc, galDesc, spriteDesc, starBillboardDesc;
 
@@ -184,8 +182,6 @@ public class SceneGraphRenderer extends AbstractRenderer implements IProcessRend
         manager.load("font/font-titles.fnt", BitmapFont.class, bfp);
 
         stars = new Array<>();
-
-        pixelRenderSystems = new AbstractRenderSystem[3];
 
         renderProcesses = new Array<>();
 

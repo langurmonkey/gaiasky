@@ -18,19 +18,20 @@ import gaia.cu9.ari.gaiaorbit.desktop.format.DesktopDateFormatFactory;
 import gaia.cu9.ari.gaiaorbit.desktop.format.DesktopNumberFormatFactory;
 import gaia.cu9.ari.gaiaorbit.desktop.render.DesktopPostProcessorFactory;
 import gaia.cu9.ari.gaiaorbit.desktop.render.ScreenModeCmd;
-import gaia.cu9.ari.gaiaorbit.desktop.util.*;
+import gaia.cu9.ari.gaiaorbit.desktop.util.DesktopConfInit;
+import gaia.cu9.ari.gaiaorbit.desktop.util.DesktopMusicActors;
+import gaia.cu9.ari.gaiaorbit.desktop.util.DesktopNetworkChecker;
+import gaia.cu9.ari.gaiaorbit.desktop.util.SysUtils;
 import gaia.cu9.ari.gaiaorbit.desktop.util.camera.CamRecorder;
 import gaia.cu9.ari.gaiaorbit.event.EventManager;
 import gaia.cu9.ari.gaiaorbit.event.Events;
 import gaia.cu9.ari.gaiaorbit.event.IObserver;
+import gaia.cu9.ari.gaiaorbit.interfce.ConsoleLogger;
 import gaia.cu9.ari.gaiaorbit.interfce.KeyBindings;
 import gaia.cu9.ari.gaiaorbit.interfce.MusicActorsManager;
 import gaia.cu9.ari.gaiaorbit.interfce.NetworkCheckerManager;
-import gaia.cu9.ari.gaiaorbit.interfce.ConsoleLogger;
 import gaia.cu9.ari.gaiaorbit.render.PostProcessorFactory;
 import gaia.cu9.ari.gaiaorbit.screenshot.ScreenshotsManager;
-import gaia.cu9.ari.gaiaorbit.script.JythonFactory;
-import gaia.cu9.ari.gaiaorbit.script.ScriptingFactory;
 import gaia.cu9.ari.gaiaorbit.util.*;
 import gaia.cu9.ari.gaiaorbit.util.Logger.Log;
 import gaia.cu9.ari.gaiaorbit.util.format.DateFormatFactory;
@@ -181,9 +182,6 @@ public class GaiaSkyDesktop implements IObserver {
                 System.out.println("Written by Toni Sagrista Selles <tsagrista@ari.uni-heidelberg.de>");
                 return;
             }
-
-            // Jython
-            ScriptingFactory.initialize(JythonFactory.getInstance());
 
             // REST API server
             REST_ENABLED = GlobalConf.program.REST_PORT >= 0 && checkRestDepsInClasspath();

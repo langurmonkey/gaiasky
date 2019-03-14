@@ -241,18 +241,6 @@ public class ControlsWindow extends CollapsibleWindow implements IObserver {
                 return false;
             }
         });
-        Button runScript = new OwnTextIconButton("", skin, "car");
-        runScript.setName("run script");
-        runScript.addListener(new TextTooltip(txt("gui.script.runscript"), skin));
-        runScript.addListener(new EventListener() {
-            @Override
-            public boolean handle(Event event) {
-                if (event instanceof ChangeEvent) {
-                    EventManager.instance.post(Events.SHOW_RUNSCRIPT_ACTION);
-                }
-                return false;
-            }
-        });
         Button showLog = new OwnTextIconButton("", skin, "log");
         showLog.setName("show log");
         showLog.addListener(new TextTooltip(txt("gui.tooltip.log"), skin));
@@ -265,7 +253,6 @@ public class ControlsWindow extends CollapsibleWindow implements IObserver {
 
         buttonsTable = new Table(skin);
         buttonsTable.add(preferences).pad(1).top().left();
-        buttonsTable.add(runScript).pad(1).top().left();
         buttonsTable.add(about).pad(1).top().left();
         buttonsTable.add(showLog).pad(1).top().left();
 

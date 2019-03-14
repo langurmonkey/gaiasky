@@ -8,6 +8,7 @@ import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Group;
 import com.badlogic.gdx.utils.TimeUtils;
 import gaia.cu9.ari.gaiaorbit.GaiaSky;
+import gaia.cu9.ari.gaiaorbit.desktop.util.SysUtils;
 import gaia.cu9.ari.gaiaorbit.event.EventManager;
 import gaia.cu9.ari.gaiaorbit.event.EventManager.TimeFrame;
 import gaia.cu9.ari.gaiaorbit.event.Events;
@@ -28,6 +29,7 @@ import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.time.temporal.ChronoField;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicBoolean;
 
@@ -78,6 +80,24 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
         if (textures == null) {
             textures = new LruCache<>(100);
         }
+    }
+
+    private double[] dArray(List l) {
+        double[] res = new double[l.size()];
+        int i = 0;
+        for (Object o : l) {
+            res[i++] = (Double) o;
+        }
+        return res;
+    }
+
+    private int[] iArray(List l) {
+        int[] res = new int[l.size()];
+        int i = 0;
+        for (Object o : l) {
+            res[i++] = (Integer) o;
+        }
+        return res;
     }
 
     @Override
@@ -145,6 +165,10 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
             NaturalCamera cam = GaiaSky.instance.cam.naturalCamera;
             changeFocusAndWait(focus, cam, waitTimeSeconds);
         }
+    }
+
+    public void setCameraFocus(final String focusName, final int waitTimeSeconds) {
+        setCameraFocus(focusName, (float) waitTimeSeconds);
     }
 
     @Override
@@ -221,26 +245,31 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
             // Send event
             em.post(Events.CAMERA_POS_CMD, vec);
         });
+    }
 
+    public void setCameraPosition(final List vec) {
+        setCameraPosition(dArray(vec));
     }
 
     @Override
     public double[] getCameraPosition() {
         Vector3d campos = GaiaSky.instance.cam.getPos();
-        return new double[]{campos.x * Constants.U_TO_KM, campos.y * Constants.U_TO_KM,
-                campos.z * Constants.U_TO_KM};
+        return new double[] { campos.x * Constants.U_TO_KM, campos.y * Constants.U_TO_KM, campos.z * Constants.U_TO_KM };
     }
 
     @Override
     public void setCameraDirection(final double[] dir) {
         Gdx.app.postRunnable(() -> em.post(Events.CAMERA_DIR_CMD, dir));
+    }
 
+    public void setCameraDirection(final List dir) {
+        setCameraDirection(dArray(dir));
     }
 
     @Override
     public double[] getCameraDirection() {
         Vector3d camdir = GaiaSky.instance.cam.getDirection();
-        return new double[]{camdir.x, camdir.y, camdir.z};
+        return new double[] { camdir.x, camdir.y, camdir.z };
     }
 
     @Override
@@ -249,10 +278,14 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
 
     }
 
+    public void setCameraUp(final List up) {
+        setCameraUp(dArray(up));
+    }
+
     @Override
     public double[] getCameraUp() {
         Vector3d camup = GaiaSky.instance.cam.getUp();
-        return new double[]{camup.x, camup.y, camup.z};
+        return new double[] { camup.x, camup.y, camup.z };
     }
 
     @Override
@@ -271,9 +304,17 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
         }
     }
 
+    public void setCameraPositionAndFocus(String focus, String other, long rotation, long viewAngle) {
+        setCameraPositionAndFocus(focus, other, (double) rotation, (double) viewAngle);
+    }
+
     public void pointAtSkyCoordinate(double ra, double dec) {
         em.post(Events.CAMERA_MODE_CMD, CameraMode.Free_Camera);
         em.post(Events.FREE_MODE_COORD_CMD, (float) ra, (float) dec);
+    }
+
+    public void pointAtSkyCoordinate(long ra, long dec) {
+        pointAtSkyCoordinate((double) ra, (double) dec);
     }
 
     private void setCameraPositionAndFocus(IFocus focus, IFocus other, double rotation, double viewAngle) {
@@ -316,10 +357,12 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
 
     @Override
     public void setCameraSpeed(final float speed) {
-        assert speed >= Constants.MIN_SLIDER && speed <= Constants.MAX_SLIDER : "Speed must be between "
-                + Constants.MIN_SLIDER + " and " + Constants.MAX_SLIDER;
+        assert speed >= Constants.MIN_SLIDER && speed <= Constants.MAX_SLIDER : "Speed must be between " + Constants.MIN_SLIDER + " and " + Constants.MAX_SLIDER;
         Gdx.app.postRunnable(() -> em.post(Events.CAMERA_SPEED_CMD, speed / 10f, false));
+    }
 
+    public void setCameraSpeed(final int speed) {
+        setCameraSpeed((float) speed);
     }
 
     @Override
@@ -329,19 +372,23 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
 
     @Override
     public void setRotationCameraSpeed(final float speed) {
-        assert speed >= Constants.MIN_SLIDER && speed <= Constants.MAX_SLIDER : "Speed must be between "
-                + Constants.MIN_SLIDER + " and " + Constants.MAX_SLIDER;
-        Gdx.app.postRunnable(() -> em.post(Events.ROTATION_SPEED_CMD, MathUtilsd.lint(speed, Constants.MIN_SLIDER, Constants.MAX_SLIDER,
-                Constants.MIN_ROT_SPEED, Constants.MAX_ROT_SPEED), false));
+        assert speed >= Constants.MIN_SLIDER && speed <= Constants.MAX_SLIDER : "Speed must be between " + Constants.MIN_SLIDER + " and " + Constants.MAX_SLIDER;
+        Gdx.app.postRunnable(() -> em.post(Events.ROTATION_SPEED_CMD, MathUtilsd.lint(speed, Constants.MIN_SLIDER, Constants.MAX_SLIDER, Constants.MIN_ROT_SPEED, Constants.MAX_ROT_SPEED), false));
+    }
+
+    public void setRotationCameraSpeed(final int speed) {
+        setRotationCameraSpeed((float) speed);
     }
 
     @Override
     public void setTurningCameraSpeed(final float speed) {
-        assert speed >= Constants.MIN_SLIDER && speed <= Constants.MAX_SLIDER : "Speed must be between "
-                + Constants.MIN_SLIDER + " and " + Constants.MAX_SLIDER;
-        Gdx.app.postRunnable(() -> em.post(Events.TURNING_SPEED_CMD, MathUtilsd.lint(speed, Constants.MIN_SLIDER, Constants.MAX_SLIDER,
-                Constants.MIN_TURN_SPEED, Constants.MAX_TURN_SPEED), false));
+        assert speed >= Constants.MIN_SLIDER && speed <= Constants.MAX_SLIDER : "Speed must be between " + Constants.MIN_SLIDER + " and " + Constants.MAX_SLIDER;
+        Gdx.app.postRunnable(() -> em.post(Events.TURNING_SPEED_CMD, MathUtilsd.lint(speed, Constants.MIN_SLIDER, Constants.MAX_SLIDER, Constants.MIN_TURN_SPEED, Constants.MAX_TURN_SPEED), false));
 
+    }
+
+    public void setTurningCameraSpeed(final int speed) {
+        setTurningCameraSpeed((float) speed);
     }
 
     @Override
@@ -359,15 +406,28 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
     public void cameraForward(final double value) {
         assert value >= -1d && value <= 1d : "Value must be between -1 and 1";
         Gdx.app.postRunnable(() -> em.post(Events.CAMERA_FWD, value));
+    }
 
+    public void cameraForward(final long value) {
+        cameraForward((double) value);
     }
 
     @Override
     public void cameraRotate(final double deltaX, final double deltaY) {
-        assert deltaX >= 0d && deltaX <= 1d && deltaY >= 0d
-                && deltaY <= 1d : "DeltaX and deltaY must be between 0 and 1";
+        assert deltaX >= 0d && deltaX <= 1d && deltaY >= 0d && deltaY <= 1d : "DeltaX and deltaY must be between 0 and 1";
         Gdx.app.postRunnable(() -> em.post(Events.CAMERA_ROTATE, deltaX, deltaY));
+    }
 
+    public void cameraRotate(final double deltaX, final long deltaY) {
+        cameraRotate(deltaX, (double) deltaY);
+    }
+
+    public void cameraRotate(final long deltaX, final double deltaY) {
+        cameraRotate((double) deltaX, deltaY);
+    }
+
+    public void cameraRotate(final long deltaX, final long deltaY) {
+        cameraRotate((double) deltaX, (double) deltaY);
     }
 
     @Override
@@ -376,11 +436,26 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
         Gdx.app.postRunnable(() -> em.post(Events.CAMERA_ROLL, roll));
     }
 
+    public void cameraRoll(final long roll) {
+        cameraRoll((double) roll);
+    }
+
     @Override
     public void cameraTurn(final double deltaX, final double deltaY) {
-        assert deltaX >= 0d && deltaX <= 1d && deltaY >= 0d
-                && deltaY <= 1d : "DeltaX and deltaY must be between 0 and 1";
+        assert deltaX >= 0d && deltaX <= 1d && deltaY >= 0d && deltaY <= 1d : "DeltaX and deltaY must be between 0 and 1";
         Gdx.app.postRunnable(() -> em.post(Events.CAMERA_TURN, deltaX, deltaY));
+    }
+
+    public void cameraTurn(final double deltaX, final long deltaY) {
+        cameraTurn(deltaX, (double) deltaY);
+    }
+
+    public void cameraTurn(final long deltaX, final double deltaY) {
+        cameraTurn((double) deltaX, deltaY);
+    }
+
+    public void cameraTurn(final long deltaX, final long deltaY) {
+        cameraTurn((double) deltaX, (double) deltaY);
     }
 
     @Override
@@ -401,9 +476,12 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
 
     @Override
     public void setFov(final float newFov) {
-        assert newFov >= Constants.MIN_FOV && newFov <= Constants.MAX_FOV : "Fov value must be between "
-                + Constants.MIN_FOV + " and " + Constants.MAX_FOV;
+        assert newFov >= Constants.MIN_FOV && newFov <= Constants.MAX_FOV : "Fov value must be between " + Constants.MIN_FOV + " and " + Constants.MAX_FOV;
         Gdx.app.postRunnable(() -> em.post(Events.FOV_CHANGED_CMD, newFov));
+    }
+
+    public void setFov(final int newFov) {
+        setFov((float) newFov);
     }
 
     @Override
@@ -419,13 +497,20 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
 
     @Override
     public void setProperMotionsNumberFactor(float factor) {
-        Gdx.app.postRunnable(() -> EventManager.instance.post(Events.PM_NUM_FACTOR_CMD, MathUtilsd.lint(factor, Constants.MIN_SLIDER,
-                Constants.MAX_SLIDER, Constants.MIN_PM_NUM_FACTOR, Constants.MAX_PM_NUM_FACTOR), false));
+        Gdx.app.postRunnable(() -> EventManager.instance.post(Events.PM_NUM_FACTOR_CMD, MathUtilsd.lint(factor, Constants.MIN_SLIDER, Constants.MAX_SLIDER, Constants.MIN_PM_NUM_FACTOR, Constants.MAX_PM_NUM_FACTOR), false));
+    }
+
+    public void setProperMotionsNumberFactor(int factor) {
+        setProperMotionsNumberFactor((float) factor);
     }
 
     @Override
     public void setProperMotionsLengthFactor(float factor) {
         Gdx.app.postRunnable(() -> EventManager.instance.post(Events.PM_LEN_FACTOR_CMD, factor, false));
+    }
+
+    public void setProperMotionsLengthFactor(int factor) {
+        setProperMotionsLengthFactor((float) factor);
     }
 
     @Override
@@ -437,6 +522,10 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
     public void setAmbientLight(final float value) {
         assert value >= Constants.MIN_SLIDER && value <= Constants.MAX_SLIDER : "Value must be between 0 and 100";
         Gdx.app.postRunnable(() -> em.post(Events.AMBIENT_LIGHT_CMD, value / 100f));
+    }
+
+    public void setAmbientLight(final int value) {
+        setAmbientLight((float) value);
     }
 
     @Override
@@ -493,6 +582,10 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
         em.post(Events.PACE_CHANGE_CMD, pace);
     }
 
+    public void setSimulationPace(final long pace) {
+        setSimulationPace((double) pace);
+    }
+
     @Override
     public void setTargetTime(long ms) {
         em.post(Events.TARGET_TIME_CMD, Instant.ofEpochMilli(ms));
@@ -500,8 +593,7 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
 
     @Override
     public void setTargetTime(int year, int month, int day, int hour, int min, int sec, int millisec) {
-        em.post(Events.TARGET_TIME_CMD,
-                LocalDateTime.of(year, month, day, hour, min, sec, millisec).toInstant(ZoneOffset.UTC));
+        em.post(Events.TARGET_TIME_CMD, LocalDateTime.of(year, month, day, hour, min, sec, millisec).toInstant(ZoneOffset.UTC));
     }
 
     @Override
@@ -511,43 +603,47 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
 
     @Override
     public void setStarBrightness(final float brightness) {
-        assert brightness >= Constants.MIN_SLIDER
-                && brightness <= Constants.MAX_SLIDER : "Brightness value must be between 0 and 100";
-        Gdx.app.postRunnable(() -> em.post(Events.STAR_BRIGHTNESS_CMD, MathUtilsd.lint(brightness, Constants.MIN_SLIDER, Constants.MAX_SLIDER,
-                Constants.MIN_STAR_BRIGHT, Constants.MAX_STAR_BRIGHT), false));
+        assert brightness >= Constants.MIN_SLIDER && brightness <= Constants.MAX_SLIDER : "Brightness value must be between 0 and 100";
+        Gdx.app.postRunnable(() -> em.post(Events.STAR_BRIGHTNESS_CMD, MathUtilsd.lint(brightness, Constants.MIN_SLIDER, Constants.MAX_SLIDER, Constants.MIN_STAR_BRIGHT, Constants.MAX_STAR_BRIGHT), false));
+    }
+
+    public void setStarBrightness(final int brightness) {
+        setStarBrightness((float) brightness);
     }
 
     @Override
     public float getStarBrightness() {
-        return (float) MathUtilsd.lint(GlobalConf.scene.STAR_BRIGHTNESS, Constants.MIN_STAR_BRIGHT,
-                Constants.MAX_STAR_BRIGHT, Constants.MIN_SLIDER, Constants.MAX_SLIDER);
+        return (float) MathUtilsd.lint(GlobalConf.scene.STAR_BRIGHTNESS, Constants.MIN_STAR_BRIGHT, Constants.MAX_STAR_BRIGHT, Constants.MIN_SLIDER, Constants.MAX_SLIDER);
     }
 
     @Override
     public void setStarSize(final float size) {
         assert size >= Constants.MIN_SLIDER && size <= Constants.MAX_SLIDER : "Size value must be between 0 and 100";
-        Gdx.app.postRunnable(() -> em.post(Events.STAR_POINT_SIZE_CMD, MathUtilsd.lint(size, Constants.MIN_SLIDER, Constants.MAX_SLIDER,
-                Constants.MIN_STAR_POINT_SIZE, Constants.MAX_STAR_POINT_SIZE), false));
+        Gdx.app.postRunnable(() -> em.post(Events.STAR_POINT_SIZE_CMD, MathUtilsd.lint(size, Constants.MIN_SLIDER, Constants.MAX_SLIDER, Constants.MIN_STAR_POINT_SIZE, Constants.MAX_STAR_POINT_SIZE), false));
+    }
+
+    public void setStarSize(final int size) {
+        setStarSize((float) size);
     }
 
     @Override
     public float getStarSize() {
-        return MathUtilsd.lint(GlobalConf.scene.STAR_POINT_SIZE, Constants.MIN_STAR_POINT_SIZE,
-                Constants.MAX_STAR_POINT_SIZE, Constants.MIN_SLIDER, Constants.MAX_SLIDER);
+        return MathUtilsd.lint(GlobalConf.scene.STAR_POINT_SIZE, Constants.MIN_STAR_POINT_SIZE, Constants.MAX_STAR_POINT_SIZE, Constants.MIN_SLIDER, Constants.MAX_SLIDER);
     }
 
     @Override
     public float getMinStarOpacity() {
-        return MathUtilsd.lint(GlobalConf.scene.POINT_ALPHA_MIN, Constants.MIN_STAR_MIN_OPACITY,
-                Constants.MAX_STAR_MIN_OPACITY, Constants.MIN_SLIDER, Constants.MAX_SLIDER);
+        return MathUtilsd.lint(GlobalConf.scene.POINT_ALPHA_MIN, Constants.MIN_STAR_MIN_OPACITY, Constants.MAX_STAR_MIN_OPACITY, Constants.MIN_SLIDER, Constants.MAX_SLIDER);
     }
 
     @Override
     public void setMinStarOpacity(float opacity) {
-        assert opacity >= Constants.MIN_SLIDER
-                && opacity <= Constants.MAX_SLIDER : "Opacity value must be between 0 and 100";
-        Gdx.app.postRunnable(() -> EventManager.instance.post(Events.STAR_MIN_OPACITY_CMD, MathUtilsd.lint(opacity, Constants.MIN_SLIDER,
-                Constants.MAX_SLIDER, Constants.MIN_STAR_MIN_OPACITY, Constants.MAX_STAR_MIN_OPACITY), false));
+        assert opacity >= Constants.MIN_SLIDER && opacity <= Constants.MAX_SLIDER : "Opacity value must be between 0 and 100";
+        Gdx.app.postRunnable(() -> EventManager.instance.post(Events.STAR_MIN_OPACITY_CMD, MathUtilsd.lint(opacity, Constants.MIN_SLIDER, Constants.MAX_SLIDER, Constants.MIN_STAR_MIN_OPACITY, Constants.MAX_STAR_MIN_OPACITY), false));
+    }
+
+    public void setMinStarOpacity(int opacity) {
+        setMinStarOpacity((float) opacity);
     }
 
     @Override
@@ -639,6 +735,18 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
         goToObject(name, viewAngle, waitTimeSeconds, null);
     }
 
+    public void goToObject(String name, double viewAngle, int waitTimeSeconds) {
+        goToObject(name, viewAngle, (float) waitTimeSeconds);
+    }
+
+    public void goToObject(String name, long viewAngle, int waitTimeSeconds) {
+        goToObject(name, (double) viewAngle, (float) waitTimeSeconds);
+    }
+
+    public void goToObject(String name, long viewAngle, float waitTimeSeconds) {
+        goToObject(name, (double) viewAngle, waitTimeSeconds);
+    }
+
     private void goToObject(String name, double viewAngle, float waitTimeSeconds, AtomicBoolean stop) {
         assert name != null : "Name can't be null";
 
@@ -648,6 +756,10 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
             IFocus focus = sg.findFocus(namelc);
             goToObject(focus, viewAngle, waitTimeSeconds, stop);
         }
+    }
+
+    private void goToObject(String name, double viewAngle, int waitTimeSeconds, AtomicBoolean stop) {
+        goToObject(name, viewAngle, (float) waitTimeSeconds, stop);
     }
 
     void goToObject(IFocus object, double viewAngle, float waitTimeSeconds, AtomicBoolean stop) {
@@ -697,11 +809,14 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
 
         // We can stop now
         em.post(Events.CAMERA_STOP);
+    }
 
+    void goToObject(IFocus object, double viewAngle, int waitTimeSeconds, AtomicBoolean stop) {
+        goToObject(object, viewAngle, (float) waitTimeSeconds, stop);
     }
 
     @Override
-    public void goToObjectInstant(String name){
+    public void goToObjectInstant(String name) {
         setCameraFocusInstantAndGo(name);
     }
 
@@ -741,8 +856,7 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
 
             // Save turn speed, set it to 50
             double turnSpeedBak = GlobalConf.scene.TURNING_SPEED;
-            em.post(Events.TURNING_SPEED_CMD, (float) MathUtilsd.lint(20d, Constants.MIN_SLIDER, Constants.MAX_SLIDER,
-                    Constants.MIN_TURN_SPEED, Constants.MAX_TURN_SPEED), false);
+            em.post(Events.TURNING_SPEED_CMD, (float) MathUtilsd.lint(20d, Constants.MIN_SLIDER, Constants.MAX_SLIDER, Constants.MIN_TURN_SPEED, Constants.MAX_TURN_SPEED), false);
 
             // Save cinematic
             boolean cinematic = GlobalConf.scene.CINEMATIC_CAMERA;
@@ -890,8 +1004,7 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
 
     void landOnObjectLocation(IFocus object, double longitude, double latitude, AtomicBoolean stop) {
         assert object != null : "Object can't be null";
-        assert latitude >= -90 && latitude <= 90 && longitude >= 0
-                && longitude <= 360 : "Latitude must be in [-90..90] and longitude must be in [0..360]";
+        assert latitude >= -90 && latitude <= 90 && longitude >= 0 && longitude <= 360 : "Latitude must be in [-90..90] and longitude must be in [0..360]";
 
         stops.add(stop);
         ISceneGraph sg = GaiaSky.instance.sg;
@@ -927,13 +1040,11 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
 
             // Save turn speed, set it to 50
             double turnSpeedBak = GlobalConf.scene.TURNING_SPEED;
-            em.post(Events.TURNING_SPEED_CMD, (float) MathUtilsd.lint(50d, Constants.MIN_SLIDER, Constants.MAX_SLIDER,
-                    Constants.MIN_TURN_SPEED, Constants.MAX_TURN_SPEED), false);
+            em.post(Events.TURNING_SPEED_CMD, (float) MathUtilsd.lint(50d, Constants.MIN_SLIDER, Constants.MAX_SLIDER, Constants.MIN_TURN_SPEED, Constants.MAX_TURN_SPEED), false);
 
             // Save rotation speed, set it to 20
             double rotationSpeedBak = GlobalConf.scene.ROTATION_SPEED;
-            em.post(Events.ROTATION_SPEED_CMD, (float) MathUtilsd.lint(20d, Constants.MIN_SLIDER, Constants.MAX_SLIDER,
-                    Constants.MIN_ROT_SPEED, Constants.MAX_ROT_SPEED), false);
+            em.post(Events.ROTATION_SPEED_CMD, (float) MathUtilsd.lint(20d, Constants.MIN_SLIDER, Constants.MAX_SLIDER, Constants.MIN_ROT_SPEED, Constants.MAX_ROT_SPEED), false);
 
             // Save cinematic
             boolean cinematic = GlobalConf.scene.CINEMATIC_CAMERA;
@@ -951,8 +1062,7 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
             Vector3d objectPosition = planet.getAbsolutePosition(aux3d2);
 
             // Check intersection with object
-            boolean intersects = Intersectord.checkIntersectSegmentSphere(cam.pos, target, objectPosition,
-                    planet.getRadius());
+            boolean intersects = Intersectord.checkIntersectSegmentSphere(cam.pos, target, objectPosition, planet.getRadius());
 
             if (intersects) {
                 cameraRotate(5, 5);
@@ -962,8 +1072,7 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
                 sleep(0.1f);
 
                 objectPosition = planet.getAbsolutePosition(aux3d2);
-                intersects = Intersectord.checkIntersectSegmentSphere(cam.pos, target, objectPosition,
-                        planet.getRadius());
+                intersects = Intersectord.checkIntersectSegmentSphere(cam.pos, target, objectPosition, planet.getRadius());
             }
 
             cameraStop();
@@ -997,8 +1106,7 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
         sg.remove(invisible, true);
     }
 
-    private void rollAndWait(double roll, double target, long sleep, NaturalCamera cam, Vector3d camobj,
-                             AtomicBoolean stop) {
+    private void rollAndWait(double roll, double target, long sleep, NaturalCamera cam, Vector3d camobj, AtomicBoolean stop) {
         // Apply roll and wait
         double ang = cam.up.angle(camobj);
 
@@ -1038,7 +1146,7 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
             if (object instanceof IFocus) {
                 IFocus obj = (IFocus) object;
                 obj.getAbsolutePosition(namelc, aux3d1);
-                return new double[]{aux3d1.x, aux3d1.y, aux3d1.z};
+                return new double[] { aux3d1.x, aux3d1.y, aux3d1.z };
             }
         }
         return null;
@@ -1048,6 +1156,10 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
     public void setGuiScrollPosition(final float pixelY) {
         Gdx.app.postRunnable(() -> em.post(Events.GUI_SCROLL_POSITION_CMD, pixelY));
 
+    }
+
+    public void setGuiScrollPosition(final int pixelY) {
+        setGuiScrollPosition((float) pixelY);
     }
 
     @Override
@@ -1061,27 +1173,29 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
     }
 
     @Override
-    public void displayMessageObject(final int id, final String message, final float x, final float y, final float r,
-                                     final float g, final float b, final float a, final float fontSize) {
+    public void displayMessageObject(final int id, final String message, final float x, final float y, final float r, final float g, final float b, final float a, final float fontSize) {
         Gdx.app.postRunnable(() -> em.post(Events.ADD_CUSTOM_MESSAGE, id, message, x, y, r, g, b, a, fontSize));
+    }
 
+    public void displayMessageObject(final int id, final String message, final float x, final float y, final float r, final float g, final float b, final float a, final int fontSize) {
+        displayMessageObject(id, message, x, y, r, g, b, a, (float) fontSize);
     }
 
     @Override
-    public void displayTextObject(final int id, final String text, final float x, final float y, final float maxWidth,
-                                  final float maxHeight, final float r, final float g, final float b, final float a, final float fontSize) {
+    public void displayTextObject(final int id, final String text, final float x, final float y, final float maxWidth, final float maxHeight, final float r, final float g, final float b, final float a, final float fontSize) {
         Gdx.app.postRunnable(() -> em.post(Events.ADD_CUSTOM_TEXT, id, text, x, y, maxWidth, maxHeight, r, g, b, a, fontSize));
+    }
 
+    public void displayTextObject(final int id, final String text, final float x, final float y, final float maxWidth, final float maxHeight, final float r, final float g, final float b, final float a, final int fontSize) {
+        displayTextObject(id, text, x, y, maxWidth, maxHeight, r, g, b, a, (float) fontSize);
     }
 
     @Override
-    public void displayImageObject(final int id, final String path, final float x, final float y, final float r,
-                                   final float g, final float b, final float a) {
+    public void displayImageObject(final int id, final String path, final float x, final float y, final float r, final float g, final float b, final float a) {
         Gdx.app.postRunnable(() -> {
             Texture tex = getTexture(path);
             em.post(Events.ADD_CUSTOM_IMAGE, id, tex, x, y, r, g, b, a);
         });
-
     }
 
     @Override
@@ -1090,43 +1204,52 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
             Texture tex = getTexture(path);
             em.post(Events.ADD_CUSTOM_IMAGE, id, tex, x, y);
         });
-
     }
 
     @Override
     public void removeAllObjects() {
         Gdx.app.postRunnable(() -> em.post(Events.REMOVE_ALL_OBJECTS));
-
     }
 
     @Override
     public void removeObject(final int id) {
-        Gdx.app.postRunnable(() -> em.post(Events.REMOVE_OBJECTS, new int[]{id}));
-
+        Gdx.app.postRunnable(() -> em.post(Events.REMOVE_OBJECTS, new int[] { id }));
     }
 
     @Override
     public void removeObjects(final int[] ids) {
         Gdx.app.postRunnable(() -> em.post(Events.REMOVE_OBJECTS, ids));
+    }
 
+    public void removeObjects(final List ids) {
+        removeObjects(iArray(ids));
     }
 
     @Override
     public void maximizeInterfaceWindow() {
         Gdx.app.postRunnable(() -> em.post(Events.GUI_FOLD_CMD, false));
-
     }
 
     @Override
     public void minimizeInterfaceWindow() {
         Gdx.app.postRunnable(() -> em.post(Events.GUI_FOLD_CMD, true));
-
     }
 
     @Override
     public void setGuiPosition(final float x, final float y) {
         Gdx.app.postRunnable(() -> em.post(Events.GUI_MOVE_CMD, x, y));
+    }
 
+    public void setGuiPosition(final int x, final int y) {
+        setGuiPosition((float) x, (float) y);
+    }
+
+    public void setGuiPosition(final float x, final int y) {
+        setGuiPosition(x, (float) y);
+    }
+
+    public void setGuiPosition(final int x, final float y) {
+        setGuiPosition((float) x, y);
     }
 
     @Override
@@ -1174,18 +1297,18 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
     @Override
     public void notify(Events event, Object... data) {
         switch (event) {
-            case INPUT_EVENT:
-                inputCode = (Integer) data[0];
-                break;
-            case DISPOSE:
-                // Stop all
-                for (AtomicBoolean stop : stops) {
-                    if (stop != null)
-                        stop.set(true);
-                }
-                break;
-            default:
-                break;
+        case INPUT_EVENT:
+            inputCode = (Integer) data[0];
+            break;
+        case DISPOSE:
+            // Stop all
+            for (AtomicBoolean stop : stops) {
+                if (stop != null)
+                    stop.set(true);
+            }
+            break;
+        default:
+            break;
         }
 
     }
@@ -1215,7 +1338,7 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
                 y += parent.getY();
                 parent = parent.getParent();
             }
-            return new float[]{x, y, actor.getWidth(), actor.getHeight()};
+            return new float[] { x, y, actor.getWidth(), actor.getHeight() };
         } else {
             return null;
         }
@@ -1225,16 +1348,14 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
     @Override
     public void expandGuiComponent(String name) {
         IGui gui = GaiaSky.instance.mainGui;
-        ControlsWindow controls = gui.getGuiStage().getRoot()
-                .findActor(I18n.bundle.get("gui.controlpanel"));
+        ControlsWindow controls = gui.getGuiStage().getRoot().findActor(I18n.bundle.get("gui.controlpanel"));
         controls.getCollapsiblePane(name).expandPane();
     }
 
     @Override
     public void collapseGuiComponent(String name) {
         IGui gui = GaiaSky.instance.mainGui;
-        ControlsWindow controls = gui.getGuiStage().getRoot()
-                .findActor(I18n.bundle.get("gui.controlpanel"));
+        ControlsWindow controls = gui.getGuiStage().getRoot().findActor(I18n.bundle.get("gui.controlpanel"));
         controls.getCollapsiblePane(name).collapsePane();
     }
 
@@ -1264,13 +1385,18 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
 
     private Texture getTexture(String path) {
         if (textures == null || !textures.containsKey(path)) {
-            preloadTextures(path);
+            preloadTexture(path);
         }
         return textures.get(path);
     }
 
     @Override
-    public void preloadTextures(String... paths) {
+    public void preloadTexture(String path){
+        preloadTextures(new String[]{path});
+    }
+
+    @Override
+    public void preloadTextures(String[] paths) {
         initializeTextures();
         for (final String path : paths) {
             // This only works in async mode!
@@ -1306,16 +1432,16 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
             Object monitor = new Object();
             IObserver watcher = (event, data) -> {
                 switch (event) {
-                    case CAMERA_PLAY_INFO:
-                        Boolean status = (Boolean) data[0];
-                        if (!status) {
-                            synchronized (monitor) {
-                                monitor.notify();
-                            }
+                case CAMERA_PLAY_INFO:
+                    Boolean status = (Boolean) data[0];
+                    if (!status) {
+                        synchronized (monitor) {
+                            monitor.notify();
                         }
-                        break;
-                    default:
-                        break;
+                    }
+                    break;
+                default:
+                    break;
                 }
             };
             em.subscribe(watcher, Events.CAMERA_PLAY_INFO);
@@ -1372,7 +1498,7 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
         }
 
         private Pathd<Vector3d> getPathd(Vector3d p0, double[] p1) {
-            Vector3d[] points = new Vector3d[]{new Vector3d(p0), new Vector3d(p1[0], p1[1], p1[2])};
+            Vector3d[] points = new Vector3d[] { new Vector3d(p0), new Vector3d(p1[0], p1[1], p1[2]) };
             return new Lineard<>(points);
         }
 
@@ -1406,6 +1532,18 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
     @Override
     public void cameraTransition(double[] camPos, double[] camDir, double[] camUp, double seconds) {
         cameraTransition(camPos, camDir, camUp, seconds, true);
+    }
+
+    public void cameraTransition(double[] camPos, double[] camDir, double[] camUp, long seconds) {
+        cameraTransition(camPos, camDir, camUp, (double) seconds);
+    }
+
+    public void cameraTransition(List camPos, List camDir, List camUp, double seconds) {
+        cameraTransition(dArray(camPos), dArray(camDir), dArray(camUp), seconds);
+    }
+
+    public void cameraTransition(List camPos, List camDir, List camUp, long seconds) {
+        cameraTransition(camPos, camDir, camUp, (double) seconds);
     }
 
     private int cTransSeq = 0;
@@ -1442,6 +1580,14 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
         }
     }
 
+    public void cameraTransition(List camPos, List camDir, List camUp, double seconds, boolean sync) {
+        cameraTransition(dArray(camPos), dArray(camDir), dArray(camUp), seconds, sync);
+    }
+
+    public void cameraTransition(List camPos, List camDir, List camUp, long seconds, boolean sync) {
+        cameraTransition(camPos, camDir, camUp, (double) seconds, sync);
+    }
+
     @Override
     public void sleep(float seconds) {
         if (this.isFrameOutputActive()) {
@@ -1454,6 +1600,10 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
             }
         }
 
+    }
+
+    public void sleep(int seconds) {
+        sleep((float) seconds);
     }
 
     @Override
@@ -1510,32 +1660,29 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
 
     @Override
     public double[] galacticToInternalCartesian(double l, double b, double r) {
-        Vector3d pos = Coordinates.sphericalToCartesian(l * Nature.TO_RAD, b * Nature.TO_RAD, r,
-                new Vector3d());
+        Vector3d pos = Coordinates.sphericalToCartesian(l * Nature.TO_RAD, b * Nature.TO_RAD, r, new Vector3d());
         pos.mul(Coordinates.galacticToEquatorial());
-        return new double[]{pos.x, pos.y, pos.z};
+        return new double[] { pos.x, pos.y, pos.z };
     }
 
     @Override
     public double[] eclipticToInternalCartesian(double l, double b, double r) {
-        Vector3d pos = Coordinates.sphericalToCartesian(l * Nature.TO_RAD, b * Nature.TO_RAD, r,
-                new Vector3d());
+        Vector3d pos = Coordinates.sphericalToCartesian(l * Nature.TO_RAD, b * Nature.TO_RAD, r, new Vector3d());
         pos.mul(Coordinates.eclipticToEquatorial());
-        return new double[]{pos.x, pos.y, pos.z};
+        return new double[] { pos.x, pos.y, pos.z };
     }
 
     @Override
     public double[] equatorialToInternalCartesian(double ra, double dec, double r) {
-        Vector3d pos = Coordinates.sphericalToCartesian(ra * Nature.TO_RAD, dec * Nature.TO_RAD, r,
-                new Vector3d());
-        return new double[]{pos.x, pos.y, pos.z};
+        Vector3d pos = Coordinates.sphericalToCartesian(ra * Nature.TO_RAD, dec * Nature.TO_RAD, r, new Vector3d());
+        return new double[] { pos.x, pos.y, pos.z };
     }
 
     public double[] internalCartesianToEquatorial(double x, double y, double z) {
         Vector3d in = new Vector3d(x, y, z);
         Vector3d out = new Vector3d();
         Coordinates.cartesianToSpherical(in, out);
-        return new double[]{out.x * Nature.TO_DEG, out.y * Nature.TO_DEG, in.len()};
+        return new double[] { out.x * Nature.TO_DEG, out.y * Nature.TO_DEG, in.len() };
     }
 
     @Override
@@ -1544,10 +1691,18 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
         return aux3d1.values();
     }
 
+    public double[] equatorialToGalactic(List eq) {
+        return equatorialToGalactic(dArray(eq));
+    }
+
     @Override
     public double[] equatorialToEcliptic(double[] eq) {
         aux3d1.set(eq).mul(Coordinates.eqToEcl());
         return aux3d1.values();
+    }
+
+    public double[] equatorialToEcliptic(List eq) {
+        return equatorialToEcliptic(dArray(eq));
     }
 
     @Override
@@ -1556,17 +1711,28 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
         return aux3d1.values();
     }
 
+    public double[] galacticToEquatorial(List gal) {
+        return galacticToEquatorial(dArray(gal));
+    }
+
     @Override
     public double[] eclipticToEquatorial(double[] ecl) {
         aux3d1.set(ecl).mul(Coordinates.eclToEq());
         return aux3d1.values();
     }
 
+    public double[] eclipticToEquatorial(List ecl) {
+        return eclipticToEquatorial(dArray(ecl));
+    }
+
     @Override
     public void setBrightnessLevel(double level) {
         assert level >= -1d && level <= 1d : "Brightness level value must be in [-1..1]: " + level;
         Gdx.app.postRunnable(() -> em.post(Events.BRIGHTNESS_CMD, (float) level, false));
+    }
 
+    public void setBrightnessLevel(long level) {
+        setBrightnessLevel((double) level);
     }
 
     @Override
@@ -1575,16 +1741,28 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
         Gdx.app.postRunnable(() -> em.post(Events.CONTRAST_CMD, (float) level, false));
     }
 
+    public void setContrastLevel(long level) {
+        setContrastLevel((double) level);
+    }
+
     @Override
     public void setHueLevel(double level) {
         assert level >= 0d && level <= 2d : "Hue level value must be in [0..2]: " + level;
         Gdx.app.postRunnable(() -> em.post(Events.HUE_CMD, (float) level, false));
     }
 
+    public void setHueLevel(long level) {
+        setHueLevel((double) level);
+    }
+
     @Override
     public void setSaturationLevel(double level) {
         assert level >= 0d && level <= 2d : "Saturation level value must be in [0..2]: " + level;
         Gdx.app.postRunnable(() -> em.post(Events.SATURATION_CMD, (float) level, false));
+    }
+
+    public void setSaturationLevel(long level) {
+        setSaturationLevel((double) level);
     }
 
     @Override
@@ -1642,10 +1820,13 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
         Gdx.app.postRunnable(() -> em.post(Events.BLOOM_CMD, value, false));
     }
 
+    public void setBloom(int level) {
+        setBloom((float) level);
+    }
+
     @Override
     public void setSmoothLodTransitions(boolean value) {
         Gdx.app.postRunnable(() -> em.post(Events.OCTREE_PARTICLE_FADE_CMD, I18n.bundle.get("element.octreeparticlefade"), value));
-
     }
 
     @Override
@@ -1655,10 +1836,34 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
         return v.rotate(a, angle).values();
     }
 
+    public double[] rotate3(double[] vector, double[] axis, long angle) {
+        return rotate3(vector, axis, (double) angle);
+    }
+
+    public double[] rotate3(List vector, List axis, double angle) {
+        return rotate3(dArray(vector), dArray(axis), angle);
+    }
+
+    public double[] rotate3(List vector, List axis, long angle) {
+        return rotate3(vector, axis, (double) angle);
+    }
+
     @Override
     public double[] rotate2(double[] vector, double angle) {
         Vector2d v = aux2d1.set(vector);
         return v.rotate(angle).values();
+    }
+
+    public double[] rotate2(double[] vector, long angle) {
+        return rotate2(vector, (double) angle);
+    }
+
+    public double[] rotate2(List vector, double angle) {
+        return rotate2(dArray(vector), angle);
+    }
+
+    public double[] rotate2(List vector, long angle) {
+        return rotate2(vector, (double) angle);
     }
 
     @Override
@@ -1666,13 +1871,25 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
         return aux3d1.set(vec1).crs(aux3d2.set(vec2)).values();
     }
 
+    public double[] cross3(List vec1, List vec2) {
+        return cross3(dArray(vec1), dArray(vec2));
+    }
+
     @Override
     public double dot3(double[] vec1, double[] vec2) {
         return aux3d1.set(vec1).dot(aux3d2.set(vec2));
     }
 
+    public double dot3(List vec1, List vec2) {
+        return dot3(dArray(vec1), dArray(vec2));
+    }
+
     @Override
     public void addPolyline(String name, double[] points, double[] color) {
+        addPolyline(name, points, color, 1f);
+    }
+
+    public void addPolyline(String name, List points, List color) {
         addPolyline(name, points, color, 1f);
     }
 
@@ -1688,6 +1905,18 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
         pl.initialize();
 
         em.post(Events.SCENE_GRAPH_ADD_OBJECT_CMD, pl, true);
+    }
+
+    public void addPolyline(String name, double[] points, double[] color, int lineWidth) {
+        addPolyline(name, points, color, (float) lineWidth);
+    }
+
+    public void addPolyline(String name, List points, List color, float lineWidth) {
+        addPolyline(name, dArray(points), dArray(color), lineWidth);
+    }
+
+    public void addPolyline(String name, List points, List color, int lineWidth) {
+        addPolyline(name, points, color, (float) lineWidth);
     }
 
     @Override
@@ -1719,6 +1948,10 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
         });
     }
 
+    public void setCameraState(List pos, List dir, List up) {
+        setCameraState(dArray(pos), dArray(dir), dArray(up));
+    }
+
     @Override
     public void setCameraStateAndTime(double[] pos, double[] dir, double[] up, long time) {
         Gdx.app.postRunnable(() -> {
@@ -1727,6 +1960,50 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
             em.post(Events.CAMERA_UP_CMD, up);
             em.post(Events.TIME_CHANGE_CMD, Instant.ofEpochMilli(time));
         });
+    }
+
+    public void setCameraStateAndTime(List pos, List dir, List up, long time) {
+        setCameraStateAndTime(dArray(pos), dArray(dir), dArray(up), time);
+    }
+
+    @Override
+    public String getDefaultFramesDir() {
+        return SysUtils.getDefaultFramesDir().getAbsolutePath();
+    }
+
+    @Override
+    public String getDefaultScreenshotsDir() {
+        return SysUtils.getDefaultScreenshotsDir().getAbsolutePath();
+    }
+
+    @Override
+    public String getDefaultCameraDir() {
+        return SysUtils.getDefaultCameraDir().getAbsolutePath();
+    }
+
+    @Override
+    public String getDefaultMusicDir() {
+        return SysUtils.getDefaultMusicDir().getAbsolutePath();
+    }
+
+    @Override
+    public String getDefaultMappingsDir() {
+        return SysUtils.getDefaultMappingsDir().getAbsolutePath();
+    }
+
+    @Override
+    public String getDataDir() {
+        return SysUtils.getDataDir().getAbsolutePath();
+    }
+
+    @Override
+    public String getConfigDir() {
+        return SysUtils.getConfigDir().getAbsolutePath();
+    }
+
+    @Override
+    public String getLocalDataDir() {
+        return SysUtils.getLocalDataDir().getAbsolutePath();
     }
 
     @Override
@@ -1743,6 +2020,4 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
     public void error(String message) {
         logger.error(message);
     }
-
-
 }

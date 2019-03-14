@@ -6,7 +6,6 @@ import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener.ChangeEvent;
 import gaia.cu9.ari.gaiaorbit.event.EventManager;
 import gaia.cu9.ari.gaiaorbit.event.Events;
 import gaia.cu9.ari.gaiaorbit.event.IObserver;
-import gaia.cu9.ari.gaiaorbit.script.ScriptingFactory;
 import gaia.cu9.ari.gaiaorbit.util.GlobalConf;
 import gaia.cu9.ari.gaiaorbit.util.I18n;
 import gaia.cu9.ari.gaiaorbit.util.scene2d.OwnTextIconButton;
@@ -20,9 +19,9 @@ import gaia.cu9.ari.gaiaorbit.util.scene2d.OwnTextIconButton;
  */
 public class RunStateInterface extends Table implements IObserver, IGuiInterface {
 
-    private Cell<?> keyboardImgCell, stopScriptCell, stopCameraCell, pauseBgCell, frameoutputImgCell;
+    private Cell<?> keyboardImgCell, stopCameraCell, pauseBgCell, frameoutputImgCell;
     private Image keyboardImg, frameoutputImg;
-    private OwnTextIconButton cancelScript, cancelCamera, bgLoading;
+    private OwnTextIconButton cancelCamera, bgLoading;
     private boolean loadingPaused = false;
 
     public RunStateInterface(Skin skin) {
@@ -57,16 +56,6 @@ public class RunStateInterface extends Table implements IObserver, IGuiInterface
             return false;
         });
 
-        int num = ScriptingFactory.getInstance().getNumRunningScripts();
-        cancelScript = new OwnTextIconButton("",  skin, "script-stop");
-        cancelScript.addListener(new TextTooltip(I18n.bundle.format("gui.script.stop", num), skin));
-        cancelScript.addListener((event) -> {
-            if (event instanceof ChangeEvent) {
-                EventManager.instance.post(Events.CANCEL_SCRIPT_CMD);
-            }
-            return false;
-        });
-
         cancelCamera = new OwnTextIconButton("", skin, "camera-stop");
         cancelCamera.addListener(new TextTooltip(I18n.bundle.get("gui.stop"), skin));
         cancelCamera.addListener((event) -> {
@@ -79,7 +68,6 @@ public class RunStateInterface extends Table implements IObserver, IGuiInterface
         if (horizontal) {
             // Horizontal cells, centered
             pauseBgCell = this.add().bottom();
-            stopScriptCell = this.add().bottom().padLeft(pad);
             stopCameraCell = this.add().bottom().padLeft(pad);
             keyboardImgCell = this.add().bottom().padLeft(pad);
             frameoutputImgCell = this.add().bottom().padLeft(pad);
@@ -87,8 +75,6 @@ public class RunStateInterface extends Table implements IObserver, IGuiInterface
             // Vertical cells, aligned right
             pauseBgCell = this.add().right().padTop(pad);
             pauseBgCell.row();
-            stopScriptCell = this.add().right().padTop(pad);
-            stopScriptCell.row();
             stopCameraCell = this.add().right().padTop(pad);
             stopCameraCell.row();
             keyboardImgCell = this.add().right().padTop(pad);
@@ -97,7 +83,7 @@ public class RunStateInterface extends Table implements IObserver, IGuiInterface
             frameoutputImgCell.row();
         }
 
-        EventManager.instance.subscribe(this, Events.INPUT_ENABLED_CMD, Events.NUM_RUNNING_SCRIPTS, Events.CAMERA_PLAY_INFO, Events.BACKGROUND_LOADING_INFO, Events.FRAME_OUTPUT_CMD, Events.OCTREE_DISPOSED);
+        EventManager.instance.subscribe(this, Events.INPUT_ENABLED_CMD, Events.CAMERA_PLAY_INFO, Events.BACKGROUND_LOADING_INFO, Events.FRAME_OUTPUT_CMD, Events.OCTREE_DISPOSED);
     }
 
     private void unsubscribe() {
@@ -140,17 +126,6 @@ public class RunStateInterface extends Table implements IObserver, IGuiInterface
                 }
             });
 
-            break;
-        case NUM_RUNNING_SCRIPTS:
-            Gdx.app.postRunnable(() -> {
-                boolean visible = (Integer) data[0] > 0;
-                if (visible) {
-                    if (stopScriptCell.getActor() == null)
-                        stopScriptCell.setActor(cancelScript);
-                } else {
-                    stopScriptCell.setActor(null);
-                }
-            });
             break;
         case BACKGROUND_LOADING_INFO:
             Gdx.app.postRunnable(() -> {

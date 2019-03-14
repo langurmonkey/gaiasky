@@ -40,6 +40,7 @@ import gaia.cu9.ari.gaiaorbit.scenegraph.camera.CameraManager.CameraMode;
 import gaia.cu9.ari.gaiaorbit.scenegraph.camera.ICamera;
 import gaia.cu9.ari.gaiaorbit.scenegraph.component.ModelComponent;
 import gaia.cu9.ari.gaiaorbit.script.HiddenHelperUser;
+import gaia.cu9.ari.gaiaorbit.script.ScriptingServer;
 import gaia.cu9.ari.gaiaorbit.util.*;
 import gaia.cu9.ari.gaiaorbit.util.Logger.Log;
 import gaia.cu9.ari.gaiaorbit.util.g3d.loader.ObjLoader;
@@ -269,6 +270,9 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
         // Scene graph renderer
         sgr = new SceneGraphRenderer();
         sgr.initialize(manager);
+
+        // Initialise scripting gateway server
+        ScriptingServer.initialize();
 
         // Tell the asset manager to load all the assets
         Set<AssetBean> assets = AssetBean.getAssets();
@@ -513,6 +517,9 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
             sg.dispose();
         }
         ModelCache.cache.dispose();
+
+        // Scripting
+        ScriptingServer.dispose();
 
         // Renderer
         if (sgr != null)

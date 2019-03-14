@@ -1,10 +1,10 @@
 # This script tests the go-to commands. To be run asynchronously.
 # Created by Toni Sagrista
 
-from gaia.cu9.ari.gaiaorbit.script import EventScriptingInterface
+from py4j.java_gateway import JavaGateway, GatewayParameters
 
-
-gs = EventScriptingInterface.instance()
+gateway = JavaGateway(gateway_parameters=GatewayParameters(auto_convert=True))
+gs = gateway.entry_point
 
 gs.disableInput()
 gs.cameraStop()
@@ -20,5 +20,6 @@ gs.sleep(4.0)
 
 gs.setPlanetariumMode(False)
 
-
 gs.enableInput()
+
+gateway.close()

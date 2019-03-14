@@ -15,11 +15,18 @@ public interface IScriptingInterface {
 
     /**
      * Pre-loads the given images as textures for later use. They will be cached
-     * so that they do not need to be loaded in the next use.
+     * for the subsequent uses.
      *
      * @param paths The texture paths.
      */
-    void preloadTextures(String... paths);
+    void preloadTextures(String[] paths);
+
+    /**
+     * Pre-loads the given image as a texture for later use. The texture will
+     * be cached for later use.
+     * @param path
+     */
+    void preloadTexture(String path);
 
     /**
      * Sets the current time frame to <b>real time</b>. All the commands
@@ -467,7 +474,6 @@ public interface IScriptingInterface {
      * @param newFov The new field of view value in degrees, between 20 and 160.
      */
     void setFov(float newFov);
-
 
     /**
      * Sets the camera state (position, direction and up vector).
@@ -918,6 +924,7 @@ public interface IScriptingInterface {
      */
     void removeModelObject(String name);
 
+
     /**
      * Sets the vertical scroll position in the GUI.
      *
@@ -1327,6 +1334,55 @@ public interface IScriptingInterface {
      * @param value Activate (true) or deactivate (false)
      */
     void setSmoothLodTransitions(boolean value);
+
+    /**
+     * Gets the absolute path of the default directory where the still frames are saved
+     * @return Absolute path of directory where still frames are saved
+     */
+    String getDefaultFramesDir();
+
+    /**
+     * Gets the absolute path of the default directory where the screenshots are saved
+     * @return Absolute path of directory where screenshots are saved
+     */
+    String getDefaultScreenshotsDir();
+
+    /**
+     * Gets the absolute path of the default directory where the camera files are saved
+     * @return Absolute path of directory where camera files are saved
+     */
+    String getDefaultCameraDir();
+
+    /**
+     * Gets the absolute path to the location of the music files
+     * @return Absolute path to the location of the music files
+     */
+    String getDefaultMusicDir();
+
+    /**
+     * Gets the absolute path to the location of the controller mappings
+     * @return Absolute path to the location of the controller mappings
+     */
+    String getDefaultMappingsDir();
+
+    /**
+     * Gets the absolute path of the local data directory, configured in your global.properties file
+     * @return Absolute path to the location of the data files
+     */
+    String getDataDir();
+
+    /**
+     * Gets the absolute path to the location of the configuration directory
+     * @return Absolute path of config directory
+     */
+    String getConfigDir();
+
+    /**
+     * Returns the default data directory. That is ~/.gaiasky/ in Windows and macOS, and ~/.local/share/gaiasky
+     * in Linux.
+     * @return Absolute path of data directory
+     */
+    String getLocalDataDir();
 
     /**
      * Posts a {@link Runnable} to the main loop thread. The runnable runs only once.

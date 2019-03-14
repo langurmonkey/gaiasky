@@ -89,12 +89,24 @@ public class PointCloudData {
         return x.get(index);
     }
 
+    public void setX(int index, double value){
+        x.set(index, value);
+    }
+
     public double getY(int index) {
         return y.get(index);
     }
 
+    public void setY(int index, double value){
+        y.set(index, value);
+    }
+
     public double getZ(int index) {
         return z.get(index);
+    }
+
+    public void setZ(int index, double value){
+        z.set(index, value);
     }
 
     public Instant getDate(int index) {

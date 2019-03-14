@@ -6,7 +6,6 @@ import com.badlogic.gdx.graphics.Mesh;
 import com.badlogic.gdx.graphics.PerspectiveCamera;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShaderProgram;
-import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.ObjectMap;
@@ -223,10 +222,6 @@ public abstract class CelestialBody extends AbstractPositionEntity implements I3
 
     public void setAppmag(Double appmag) {
         this.appmag = appmag.floatValue();
-    }
-
-    public Vector2 getPositionSph() {
-        return posSph;
     }
 
     public float getAppmag() {

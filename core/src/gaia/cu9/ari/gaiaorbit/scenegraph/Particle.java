@@ -2,7 +2,6 @@ package gaia.cu9.ari.gaiaorbit.scenegraph;
 
 import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.graphics.g3d.ModelBatch;
-import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
 import gaia.cu9.ari.gaiaorbit.GaiaSky;
 import gaia.cu9.ari.gaiaorbit.event.EventManager;
@@ -21,6 +20,7 @@ import gaia.cu9.ari.gaiaorbit.util.GlobalConf;
 import gaia.cu9.ari.gaiaorbit.util.Nature;
 import gaia.cu9.ari.gaiaorbit.util.color.ColourUtils;
 import gaia.cu9.ari.gaiaorbit.util.coord.AstroUtils;
+import gaia.cu9.ari.gaiaorbit.util.math.Vector2d;
 import gaia.cu9.ari.gaiaorbit.util.math.Vector3d;
 import gaia.cu9.ari.gaiaorbit.util.time.ITimeFrameProvider;
 
@@ -163,13 +163,13 @@ public class Particle extends CelestialBody implements IStarFocus, ILineRenderab
 
     public Particle(Vector3d pos, float appmag, float absmag, float colorbv, String name, float ra, float dec, long starid) {
         this(pos, appmag, absmag, colorbv, name, starid);
-        this.posSph = new Vector2(ra, dec);
+        this.posSph = new Vector2d(ra, dec);
 
     }
 
     public Particle(Vector3d pos, Vector3 pm, Vector3 pmSph, float appmag, float absmag, float colorbv, String name, float ra, float dec, long starid) {
         this(pos, appmag, absmag, colorbv, name, starid);
-        this.posSph = new Vector2(ra, dec);
+        this.posSph = new Vector2d(ra, dec);
         this.pm.set(pm);
         this.pmSph.set(pmSph);
         this.hasPm = this.pm.len2() != 0;

@@ -6,7 +6,6 @@ import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.PerspectiveCamera;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShaderProgram;
-import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.TimeUtils;
@@ -30,6 +29,7 @@ import gaia.cu9.ari.gaiaorbit.util.Pair;
 import gaia.cu9.ari.gaiaorbit.util.coord.Coordinates;
 import gaia.cu9.ari.gaiaorbit.util.math.MathUtilsd;
 import gaia.cu9.ari.gaiaorbit.util.math.Quaterniond;
+import gaia.cu9.ari.gaiaorbit.util.math.Vector2d;
 import gaia.cu9.ari.gaiaorbit.util.math.Vector3d;
 import gaia.cu9.ari.gaiaorbit.util.time.ITimeFrameProvider;
 
@@ -113,7 +113,7 @@ public class ParticleGroup extends FadeNode implements I3DTextRenderable, IFocus
     /**
      * Position in equatorial coordinates of the current focus
      */
-    Vector2 focusPositionSph;
+    Vector2d focusPositionSph;
 
     /**
      * Focus attributes
@@ -138,7 +138,7 @@ public class ParticleGroup extends FadeNode implements I3DTextRenderable, IFocus
         inGpu = false;
         focusIndex = -1;
         focusPosition = new Vector3d();
-        focusPositionSph = new Vector2();
+        focusPositionSph = new Vector2d();
         EventManager.instance.subscribe(this, Events.FOCUS_CHANGED);
     }
 
@@ -401,7 +401,7 @@ public class ParticleGroup extends FadeNode implements I3DTextRenderable, IFocus
     }
 
     // Spherical position for focus info, will be computed
-    public Vector2 getPosSph() {
+    public Vector2d getPosSph() {
         return focusPositionSph;
     }
 

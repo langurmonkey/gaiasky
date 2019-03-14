@@ -5,9 +5,7 @@ import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShaderProgram;
-import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
-
 import gaia.cu9.ari.gaiaorbit.render.I3DTextRenderable;
 import gaia.cu9.ari.gaiaorbit.render.RenderingContext;
 import gaia.cu9.ari.gaiaorbit.render.RenderingContext.CubemapSide;
@@ -18,6 +16,7 @@ import gaia.cu9.ari.gaiaorbit.util.GlobalResources;
 import gaia.cu9.ari.gaiaorbit.util.Logger;
 import gaia.cu9.ari.gaiaorbit.util.coord.IBodyCoordinates;
 import gaia.cu9.ari.gaiaorbit.util.math.Matrix4d;
+import gaia.cu9.ari.gaiaorbit.util.math.Vector2d;
 import gaia.cu9.ari.gaiaorbit.util.math.Vector3d;
 import gaia.cu9.ari.gaiaorbit.util.time.ITimeFrameProvider;
 import gaia.cu9.ari.gaiaorbit.util.tree.OctreeNode;
@@ -49,7 +48,7 @@ public abstract class AbstractPositionEntity extends SceneGraphNode {
     /**
      * Position in the equatorial system; ra, dec.
      */
-    public Vector2 posSph;
+    public Vector2d posSph;
 
     /**
      * Size factor in internal units.
@@ -91,21 +90,21 @@ public abstract class AbstractPositionEntity extends SceneGraphNode {
         super();
         // Positions
         pos = new Vector3d();
-        posSph = new Vector2();
+        posSph = new Vector2d();
     }
 
     public AbstractPositionEntity(String name, SceneGraphNode parent) {
         super(name, parent);
         // Positions
         pos = new Vector3d();
-        posSph = new Vector2();
+        posSph = new Vector2d();
     }
 
     public AbstractPositionEntity(SceneGraphNode parent) {
         super(parent);
         // Positions
         pos = new Vector3d();
-        posSph = new Vector2();
+        posSph = new Vector2d();
     }
 
     public AbstractPositionEntity(String name) {
@@ -298,7 +297,7 @@ public abstract class AbstractPositionEntity extends SceneGraphNode {
         this.size = (float) size;
     }
 
-    public Vector2 getPosSph() {
+    public Vector2d getPosSph() {
         return posSph;
     }
 

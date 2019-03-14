@@ -1,10 +1,10 @@
 # This script tests the positioning of the camera with relation to two objects.
 # Created by Toni Sagrista
 
-from gaia.cu9.ari.gaiaorbit.script import EventScriptingInterface
+from py4j.java_gateway import JavaGateway, GatewayParameters
 
-
-gs = EventScriptingInterface.instance()
+gateway = JavaGateway(gateway_parameters=GatewayParameters(auto_convert=True))
+gs = gateway.entry_point
 
 gs.disableInput()
 gs.cameraStop()
@@ -32,3 +32,5 @@ gs.sleep(3)
 
 
 gs.enableInput()
+
+gateway.close()

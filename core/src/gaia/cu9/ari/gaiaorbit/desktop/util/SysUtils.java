@@ -19,7 +19,6 @@ public class SysUtils {
         getConfigDir().mkdirs();
         // Bottom level
         getDefaultCameraDir().mkdirs();
-        getDefaultScriptDir().mkdirs();
         getDefaultMusicDir().mkdirs();
         getDefaultFramesDir().mkdirs();
         getDefaultScreenshotsDir().mkdirs();
@@ -119,7 +118,6 @@ public class SysUtils {
     private static final String CAMERA_DIR_NAME = "camera";
     private static final String SCREENSHOTS_DIR_NAME = "screenshots";
     private static final String FRAMES_DIR_NAME = "frames";
-    private static final String SCRIPT_DIR_NAME = "script";
     private static final String MUSIC_DIR_NAME = "music";
     private static final String MAPPINGS_DIR_NAME = "mappings";
     private static final String DATA_DIR_NAME = "data";
@@ -150,15 +148,6 @@ public class SysUtils {
      */
     public static File getDefaultFramesDir() {
         return new File(getDataDir(), FRAMES_DIR_NAME);
-    }
-
-    /**
-     * Gets a file pointer to the script directory.
-     *
-     * @return A pointer to the Gaia Sky script directory
-     */
-    public static File getDefaultScriptDir() {
-        return new File(getDataDir(), SCRIPT_DIR_NAME);
     }
 
     /**
@@ -208,7 +197,7 @@ public class SysUtils {
     /**
      * Returns the default data directory. That is ~/.gaiasky/ in Windows and macOS, and ~/.local/share/gaiasky
      * in Linux.
-     * @return
+     * @return Default data directory
      */
     public static File getDataDir() {
         if (isLinux()) {
