@@ -8,10 +8,7 @@
 # Created by Toni Sagrista
 
 from gaia.cu9.ari.gaiaorbit.script import EventScriptingInterface
-from gaia.cu9.ari.gaiaorbit.scenegraph import Polyline
 from java.lang import Runnable
-
-
 
 class LineUpdaterRunnable(Runnable):
     def __init__(self, polyline):

@@ -3,11 +3,9 @@
 ## a zoom out of the galaxy
 ##
 
-from time import sleep
-from gaia.cu9.ari.gaiaorbit.script import EventScriptingInterface
-from gaia.cu9.ari.gaiaorbit.util import GlobalConf
+from py4j.java_gateway import JavaGateway
 
-gs = EventScriptingInterface.instance()
+gs = JavaGateway().entry_point
 
 
 ## PREPPING
@@ -35,8 +33,6 @@ gs.setSaturationLevel(1.0)
 gs.setVisibility("element.clusters", False)
 gs.setVisibility("element.propermotions", False)
 
-#gs.configureRenderOutput(1920,1080, 30, '/home/tsagrista/.gaiasky/frames/euronews_flight/', 'gs')
-
 gs.setRotationCameraSpeed(40)
 gs.setTurningCameraSpeed(30)
 gs.setCameraSpeed(30)
@@ -56,7 +52,6 @@ gs.setVisibility('element.labels',False)
 
 gs.setSaturationLevel(2)
 
-#gs.setSimulationPace(1.0)
 gs.setVisibility('element.planets',True)
 gs.setVisibility('element.moons',True)
 gs.setCinematicCamera(True)
@@ -66,7 +61,6 @@ gs.sleep(2)
 gs.setCameraFocusInstant("Bellatrix")
 
 gs.sleep(2)
-#gs.setFrameOutput(True)
 gs.sleep(2)
 
 
@@ -83,7 +77,6 @@ gs.sleep(3)
 gs.setVisibility('element.constellations',False)
 gs.setCameraSpeed(0.5)
 
-#gs.setVisibility("element.clusters", True)
 gs.sleep(5)
 gs.setVisibility("element.clusters", False)
 
@@ -152,8 +145,6 @@ gs.setFrameOutput(False)
 
 gs.enableInput()
 gs.maximizeInterfaceWindow()
-#gs.stopRecordingCameraPath()
-#gs.setFrameOutput(False)
 gs.setSimulationPace(1)
 gs.setStarBrightness(27.0)
 gs.setStarSize(8.0)

@@ -1,5 +1,8 @@
 package gaia.cu9.ari.gaiaorbit.script;
 
+/**
+ * Creates an initializes the scripting subsystems
+ */
 public abstract class ScriptingFactory {
 
     private static ScriptingFactory factory;

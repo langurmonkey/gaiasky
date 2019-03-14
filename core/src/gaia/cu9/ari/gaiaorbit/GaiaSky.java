@@ -40,6 +40,7 @@ import gaia.cu9.ari.gaiaorbit.scenegraph.camera.CameraManager.CameraMode;
 import gaia.cu9.ari.gaiaorbit.scenegraph.camera.ICamera;
 import gaia.cu9.ari.gaiaorbit.scenegraph.component.ModelComponent;
 import gaia.cu9.ari.gaiaorbit.script.HiddenHelperUser;
+import gaia.cu9.ari.gaiaorbit.script.Py4JServer;
 import gaia.cu9.ari.gaiaorbit.util.*;
 import gaia.cu9.ari.gaiaorbit.util.Logger.Log;
 import gaia.cu9.ari.gaiaorbit.util.g3d.loader.ObjLoader;
@@ -217,6 +218,9 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
         // Initialise i18n
         I18n.initialize();
 
+        // Initialise Py4J gateway server
+        Py4JServer.initialize();
+
         // Tooltips
         TooltipManager.getInstance().initialTime = 1f;
         TooltipManager.getInstance().hideAll();
@@ -381,7 +385,7 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
         // Initialise frames
         frames = 0;
 
-        if (sg.containsNode("Earth") && !GlobalConf.program.NET_SLAVE) {
+        if (sg.containsNode("Earth") && !GlobalConf.program.NET_SLAVE && isOn(ComponentType.Planets.ordinal())) {
             // Set focus to Earth
             EventManager.instance.post(Events.CAMERA_MODE_CMD, CameraMode.Focus);
             EventManager.instance.post(Events.FOCUS_CHANGE_CMD, sg.getNode("Earth"), true);
@@ -513,6 +517,9 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
             sg.dispose();
         }
         ModelCache.cache.dispose();
+
+        // Scripting
+        Py4JServer.dispose();
 
         // Renderer
         if (sgr != null)

@@ -3,8 +3,6 @@ package gaia.cu9.ari.gaiaorbit.desktop.util;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.scenes.scene2d.Actor;
-import com.badlogic.gdx.scenes.scene2d.Event;
-import com.badlogic.gdx.scenes.scene2d.EventListener;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener.ChangeEvent;
@@ -24,6 +22,7 @@ import org.python.core.PyCode;
 import org.python.core.PySyntaxError;
 
 import java.io.File;
+import java.util.Comparator;
 
 /**
  * The run script window, which allows the user to choose a script to run.
@@ -118,7 +117,7 @@ public class RunScriptWindow extends GenericDialog {
         if (scripts != null)
             scripts.clear();
         else
-            scripts = new Array<FileHandle>();
+            scripts = new Array<>();
 
         if (scriptFolder1.exists())
             scripts = GlobalResources.listRec(scriptFolder1, scripts, ".py");
@@ -126,9 +125,7 @@ public class RunScriptWindow extends GenericDialog {
         if (scriptFolder2.exists())
             scripts = GlobalResources.listRec(scriptFolder2, scripts, ".py");
 
-        scripts.sort((fh1, fh2) -> {
-            return fh1.name().compareTo(fh2.name());
-        });
+        scripts.sort(Comparator.comparing(FileHandle::name));
 
 
         final com.badlogic.gdx.scenes.scene2d.ui.List<FileHandle> scriptsList = new com.badlogic.gdx.scenes.scene2d.ui.List<FileHandle>(skin, "normal");
@@ -145,44 +142,38 @@ public class RunScriptWindow extends GenericDialog {
 
         scriptsList.setItems(names);
         scriptsList.pack();
-        scriptsList.addListener(new EventListener() {
-            @Override
-            public boolean handle(Event event) {
-                if (event instanceof ChangeEvent) {
-                    ChangeEvent ce = (ChangeEvent) event;
-                    Actor actor = ce.getTarget();
-                    @SuppressWarnings("unchecked")
-                    String name = ((List<String>) actor).getSelected();
+        scriptsList.addListener(event -> {
+            if (event instanceof ChangeEvent) {
+                ChangeEvent ce = (ChangeEvent) event;
+                Actor actor = ce.getTarget();
+                @SuppressWarnings("unchecked")
+                String name = ((List<String>) actor).getSelected();
 
-                    if (name != null) {
-                        boolean internal = name.startsWith(INTERNAL_PREFIX);
-                        if (internal)
-                            name = name.substring(INTERNAL_PREFIX.length(), name.length());
-                        for (FileHandle fh : scripts) {
-                            if ((internal && fh.file().getPath().startsWith(GlobalConf.program.SCRIPT_LOCATION)) || (!internal && fh.file().getPath().startsWith(SysUtils.getDefaultScriptDir().getAbsolutePath()))) {
-                                if (fh.name().equals(name)) {
-                                    selectedScript = fh;
-                                    break;
-                                }
+                if (name != null) {
+                    boolean internal = name.startsWith(INTERNAL_PREFIX);
+                    if (internal)
+                        name = name.substring(INTERNAL_PREFIX.length());
+                    for (FileHandle fh : scripts) {
+                        if ((internal && fh.file().getPath().startsWith(GlobalConf.program.SCRIPT_LOCATION)) || (!internal && fh.file().getPath().startsWith(SysUtils.getDefaultScriptDir().getAbsolutePath()))) {
+                            if (fh.name().equals(name)) {
+                                selectedScript = fh;
+                                break;
                             }
                         }
-                        if (selectedScript != null) {
-                            select(selectedScript);
-                        }
                     }
-                    return true;
+                    if (selectedScript != null) {
+                        select(selectedScript);
+                    }
                 }
-                return false;
+                return true;
             }
+            return false;
         });
         // Select first
-        Gdx.app.postRunnable(new Runnable() {
-            @Override
-            public void run() {
-                if (scripts.size > 0) {
-                    scriptsList.setSelectedIndex(0);
-                    select(scripts.get(0));
-                }
+        Gdx.app.postRunnable(() -> {
+            if (scripts.size > 0) {
+                scriptsList.setSelectedIndex(0);
+                select(scripts.get(0));
             }
         });
 

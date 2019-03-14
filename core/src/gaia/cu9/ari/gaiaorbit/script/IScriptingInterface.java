@@ -468,7 +468,6 @@ public interface IScriptingInterface {
      */
     void setFov(float newFov);
 
-
     /**
      * Sets the camera state (position, direction and up vector).
      *
@@ -917,6 +916,7 @@ public interface IScriptingInterface {
      * @param name The name of the object to remove.
      */
     void removeModelObject(String name);
+
 
     /**
      * Sets the vertical scroll position in the GUI.
