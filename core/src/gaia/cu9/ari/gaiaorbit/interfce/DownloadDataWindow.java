@@ -18,12 +18,12 @@ import gaia.cu9.ari.gaiaorbit.util.format.NumberFormatFactory;
 import gaia.cu9.ari.gaiaorbit.util.io.FileInfoInputStream;
 import gaia.cu9.ari.gaiaorbit.util.scene2d.*;
 import gaia.cu9.ari.gaiaorbit.util.scene2d.FileChooser.ResultListener;
+import org.apache.commons.compress.archivers.tar.TarArchiveEntry;
+import org.apache.commons.compress.archivers.tar.TarArchiveInputStream;
+import org.apache.commons.compress.compressors.gzip.GzipCompressorInputStream;
+import org.apache.commons.compress.utils.IOUtils;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.filefilter.WildcardFileFilter;
-import org.python.apache.commons.compress.archivers.tar.TarArchiveEntry;
-import org.python.apache.commons.compress.archivers.tar.TarArchiveInputStream;
-import org.python.apache.commons.compress.compressors.gzip.GzipCompressorInputStream;
-import org.python.apache.commons.compress.utils.IOUtils;
 
 import java.io.*;
 import java.nio.ByteBuffer;
