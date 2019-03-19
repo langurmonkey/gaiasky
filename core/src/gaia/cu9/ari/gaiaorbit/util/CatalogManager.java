@@ -7,6 +7,7 @@ import gaia.cu9.ari.gaiaorbit.event.IObserver;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 
 public class CatalogManager implements IObserver {
     private static final Logger.Log logger = Logger.getLogger(CatalogManager.class);
@@ -37,6 +38,13 @@ public class CatalogManager implements IObserver {
 
     public boolean contains(String dsName) {
         return ciMap.containsKey(dsName);
+    }
+
+    public Set<String> getDatasetNames(){
+        if(ciMap != null){
+            return ciMap.keySet();
+        }
+        return null;
     }
 
     @Override

@@ -3,6 +3,8 @@ package gaia.cu9.ari.gaiaorbit.script;
 import gaia.cu9.ari.gaiaorbit.scenegraph.IFocus;
 import gaia.cu9.ari.gaiaorbit.scenegraph.SceneGraphNode;
 
+import java.util.List;
+
 /**
  * Scripting interface. Provides an interface to the Gaia Sandbox core and
  * exposes all the methods that are callable from a script in order to interact
@@ -1454,6 +1456,12 @@ public interface IScriptingInterface {
      * @return False if the dataset could not be found
      */
     boolean hideDataset(String dsName);
+
+    /**
+     * Returns the names of all datasets currently loaded
+     * @return A list with all the names of the loaded datasets
+     */
+    List<String> listDatasets();
 
     /**
      * Shows (un-hides) the dataset identified by the given name, if it exists and is hidden

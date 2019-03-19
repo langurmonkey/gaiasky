@@ -34,6 +34,7 @@ import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.time.temporal.ChronoField;
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -2029,6 +2030,15 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
         if (exists)
             EventManager.instance.post(Events.CATALOG_VISIBLE, dsName, true);
         return exists;
+    }
+
+    @Override
+    public List<String> listDatasets() {
+        Set<String> names = CatalogManager.instance().getDatasetNames();
+        if (names != null)
+            return new ArrayList<>(names);
+        else
+            return new ArrayList<>();
     }
 
     @Override
