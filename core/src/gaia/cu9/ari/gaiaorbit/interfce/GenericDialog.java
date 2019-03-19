@@ -16,7 +16,6 @@ import com.badlogic.gdx.utils.Array;
 import gaia.cu9.ari.gaiaorbit.event.EventManager;
 import gaia.cu9.ari.gaiaorbit.event.Events;
 import gaia.cu9.ari.gaiaorbit.util.GlobalConf;
-import gaia.cu9.ari.gaiaorbit.util.I18n;
 import gaia.cu9.ari.gaiaorbit.util.scene2d.CollapsibleWindow;
 import gaia.cu9.ari.gaiaorbit.util.scene2d.OwnScrollPane;
 import gaia.cu9.ari.gaiaorbit.util.scene2d.OwnTextButton;
@@ -354,14 +353,6 @@ public abstract class GenericDialog extends CollapsibleWindow {
             if (c != null)
                 c.setDisabled(!enabled);
         }
-    }
-
-    protected static String txt(String key) {
-        return I18n.bundle.get(key);
-    }
-
-    protected static String txt(String key, Object... args) {
-        return I18n.bundle.format(key, args);
     }
 
 }

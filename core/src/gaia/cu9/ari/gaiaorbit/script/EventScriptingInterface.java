@@ -6,8 +6,10 @@ import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Group;
+import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.TimeUtils;
 import gaia.cu9.ari.gaiaorbit.GaiaSky;
+import gaia.cu9.ari.gaiaorbit.data.group.STILDataProvider;
 import gaia.cu9.ari.gaiaorbit.desktop.util.SysUtils;
 import gaia.cu9.ari.gaiaorbit.event.EventManager;
 import gaia.cu9.ari.gaiaorbit.event.EventManager.TimeFrame;
@@ -16,6 +18,7 @@ import gaia.cu9.ari.gaiaorbit.event.IObserver;
 import gaia.cu9.ari.gaiaorbit.interfce.ControlsWindow;
 import gaia.cu9.ari.gaiaorbit.interfce.IGui;
 import gaia.cu9.ari.gaiaorbit.scenegraph.*;
+import gaia.cu9.ari.gaiaorbit.scenegraph.StarGroup.StarBean;
 import gaia.cu9.ari.gaiaorbit.scenegraph.camera.CameraManager.CameraMode;
 import gaia.cu9.ari.gaiaorbit.scenegraph.camera.NaturalCamera;
 import gaia.cu9.ari.gaiaorbit.util.*;
@@ -23,7 +26,10 @@ import gaia.cu9.ari.gaiaorbit.util.Logger.Log;
 import gaia.cu9.ari.gaiaorbit.util.coord.Coordinates;
 import gaia.cu9.ari.gaiaorbit.util.math.*;
 import gaia.cu9.ari.gaiaorbit.util.time.ITimeFrameProvider;
+import uk.ac.starlink.util.DataSource;
+import uk.ac.starlink.util.FileDataSource;
 
+import java.io.File;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
@@ -1391,8 +1397,8 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
     }
 
     @Override
-    public void preloadTexture(String path){
-        preloadTextures(new String[]{path});
+    public void preloadTexture(String path) {
+        preloadTextures(new String[] { path });
     }
 
     @Override
@@ -1964,6 +1970,65 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
 
     public void setCameraStateAndTime(List pos, List dir, List up, long time) {
         setCameraStateAndTime(dArray(pos), dArray(dir), dArray(up), time);
+    }
+
+    @Override
+    public boolean loadDataset(String dsName, String absolutePath) {
+        try {
+            File f = new File(absolutePath);
+            if (f.exists() && f.canRead()) {
+                STILDataProvider provider = new STILDataProvider();
+                DataSource ds = new FileDataSource(f);
+                @SuppressWarnings("unchecked") Array<StarBean> data = (Array<StarBean>) provider.loadData(ds, 1.0f);
+
+                // Create star group
+                if (data != null && data.size > 0) {
+                    Gdx.app.postRunnable(() -> {
+                        StarGroup sg = StarGroup.getDefaultStarGroup(dsName, data);
+
+                        // Catalog info
+                        CatalogInfo ci = new CatalogInfo(dsName, absolutePath, null, CatalogInfo.CatalogInfoType.SCRIPT, sg);
+                        EventManager.instance.post(Events.CATALOG_ADD, ci, true);
+
+                        logger.info(data.size + " objects loaded");
+                    });
+                    return true;
+                } else {
+                    // No data has been loaded
+                    return false;
+                }
+            } else {
+                logger.error("Can't read file: " + absolutePath);
+                return false;
+            }
+        } catch (Exception e) {
+            logger.error(e);
+            return false;
+        }
+    }
+
+    @Override
+    public boolean removeDataset(String dsName) {
+        boolean exists = CatalogManager.instance().contains(dsName);
+        if (exists)
+            EventManager.instance.post(Events.CATALOG_REMOVE, dsName);
+        return exists;
+    }
+
+    @Override
+    public boolean hideDataset(String dsName) {
+        boolean exists = CatalogManager.instance().contains(dsName);
+        if (exists)
+            EventManager.instance.post(Events.CATALOG_VISIBLE, dsName, false);
+        return exists;
+    }
+
+    @Override
+    public boolean showDataset(String dsName) {
+        boolean exists = CatalogManager.instance().contains(dsName);
+        if (exists)
+            EventManager.instance.post(Events.CATALOG_VISIBLE, dsName, true);
+        return exists;
     }
 
     @Override

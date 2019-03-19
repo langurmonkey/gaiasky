@@ -1,7 +1,6 @@
 package gaia.cu9.ari.gaiaorbit.data.orbit;
 
 import com.badlogic.gdx.files.FileHandle;
-
 import gaia.cu9.ari.gaiaorbit.assets.OrbitDataLoader.OrbitDataLoaderParameter;
 import gaia.cu9.ari.gaiaorbit.data.util.PointCloudData;
 import gaia.cu9.ari.gaiaorbit.event.EventManager;

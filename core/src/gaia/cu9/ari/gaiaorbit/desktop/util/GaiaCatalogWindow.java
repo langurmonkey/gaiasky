@@ -1,45 +1,27 @@
 package gaia.cu9.ari.gaiaorbit.desktop.util;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.Reader;
-import java.io.UnsupportedEncodingException;
-
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Net.HttpMethods;
 import com.badlogic.gdx.Net.HttpRequest;
 import com.badlogic.gdx.Net.HttpResponse;
 import com.badlogic.gdx.Net.HttpResponseListener;
 import com.badlogic.gdx.net.HttpStatus;
-import com.badlogic.gdx.scenes.scene2d.Actor;
-import com.badlogic.gdx.scenes.scene2d.Event;
-import com.badlogic.gdx.scenes.scene2d.EventListener;
-import com.badlogic.gdx.scenes.scene2d.InputEvent;
+import com.badlogic.gdx.scenes.scene2d.*;
 import com.badlogic.gdx.scenes.scene2d.InputEvent.Type;
-import com.badlogic.gdx.scenes.scene2d.Stage;
-import com.badlogic.gdx.scenes.scene2d.ui.HorizontalGroup;
-import com.badlogic.gdx.scenes.scene2d.ui.ImageButton;
+import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.scenes.scene2d.ui.Label.LabelStyle;
-import com.badlogic.gdx.scenes.scene2d.ui.Skin;
-import com.badlogic.gdx.scenes.scene2d.ui.Table;
-import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
-import com.badlogic.gdx.scenes.scene2d.ui.TextTooltip;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener.ChangeEvent;
 import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.JsonReader;
 import com.badlogic.gdx.utils.JsonValue;
-
 import gaia.cu9.ari.gaiaorbit.scenegraph.IStarFocus;
 import gaia.cu9.ari.gaiaorbit.util.GlobalConf;
 import gaia.cu9.ari.gaiaorbit.util.I18n;
 import gaia.cu9.ari.gaiaorbit.util.Logger;
 import gaia.cu9.ari.gaiaorbit.util.Logger.Log;
-import gaia.cu9.ari.gaiaorbit.util.scene2d.CollapsibleWindow;
-import gaia.cu9.ari.gaiaorbit.util.scene2d.Link;
-import gaia.cu9.ari.gaiaorbit.util.scene2d.OwnLabel;
-import gaia.cu9.ari.gaiaorbit.util.scene2d.OwnScrollPane;
-import gaia.cu9.ari.gaiaorbit.util.scene2d.OwnTextButton;
+import gaia.cu9.ari.gaiaorbit.util.scene2d.*;
+
+import java.io.*;
 
 public class GaiaCatalogWindow extends CollapsibleWindow {
     private static final Log logger = Logger.getLogger(GaiaCatalogWindow.class);
@@ -74,7 +56,7 @@ public class GaiaCatalogWindow extends CollapsibleWindow {
 
         /** BUTTONS **/
         buttonGroup = new HorizontalGroup();
-        TextButton ok = new OwnTextButton(txt("gui.close"), skin, "default");
+        TextButton ok = new OwnTextButton(I18n.txt("gui.close"), skin, "default");
         ok.setName("close");
         ok.addListener(new EventListener() {
             @Override
@@ -322,17 +304,17 @@ public class GaiaCatalogWindow extends CollapsibleWindow {
                 links.space(pad);
 
                 if (hip)
-                    links.addActor(new Link(txt("gui.data.json"), linkStyle, URL_HIP_JSON_SOURCE + st.getHip()));
+                    links.addActor(new Link(I18n.txt("gui.data.json"), linkStyle, URL_HIP_JSON_SOURCE + st.getHip()));
                 else {
-                    links.addActor(new Link(txt("gui.data.json"), linkStyle, URL_GAIA_JSON_SOURCE + st.getId()));
+                    links.addActor(new Link(I18n.txt("gui.data.json"), linkStyle, URL_GAIA_JSON_SOURCE + st.getId()));
                     links.addActor(new OwnLabel("|", skin));
-                    links.addActor(new Link(txt("gui.data.archive"), linkStyle, URL_GAIA_WEB_SOURCE + st.getId()));
+                    links.addActor(new Link(I18n.txt("gui.data.archive"), linkStyle, URL_GAIA_WEB_SOURCE + st.getId()));
                 }
 
                 table.add(links).colspan(2).padTop(pad * 2).padBottom(pad * 2);
                 table.row();
 
-                table.add(new OwnLabel(txt("gui.data.name"), skin, "msg-17")).padLeft(pad * 2).left();
+                table.add(new OwnLabel(I18n.txt("gui.data.name"), skin, "msg-17")).padLeft(pad * 2).left();
                 table.add(new OwnLabel(st.getName(), skin, "msg-17")).padLeft(pad * 2).padRight(pad * 2).left();
                 table.row().padTop(pad * 2);
                 for (int col = 0; col < data[0].length; col++) {
@@ -402,14 +384,6 @@ public class GaiaCatalogWindow extends CollapsibleWindow {
             me.setPosition(Math.round(stage.getWidth() / 2f - me.getWidth() / 2f), Math.round(stage.getHeight() / 2f - me.getHeight() / 2f));
         }
 
-    }
-
-    protected String txt(String key) {
-        return I18n.bundle.get(key);
-    }
-
-    protected String txt(String key, Object... params) {
-        return I18n.bundle.format(key, params);
     }
 
 }

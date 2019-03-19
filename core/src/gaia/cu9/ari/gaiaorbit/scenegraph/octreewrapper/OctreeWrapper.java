@@ -1,7 +1,6 @@
 package gaia.cu9.ari.gaiaorbit.scenegraph.octreewrapper;
 
 import com.badlogic.gdx.utils.Array;
-
 import gaia.cu9.ari.gaiaorbit.scenegraph.AbstractPositionEntity;
 import gaia.cu9.ari.gaiaorbit.scenegraph.SceneGraphNode;
 import gaia.cu9.ari.gaiaorbit.scenegraph.camera.ICamera;

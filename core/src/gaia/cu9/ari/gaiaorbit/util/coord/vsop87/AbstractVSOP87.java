@@ -1,13 +1,13 @@
 package gaia.cu9.ari.gaiaorbit.util.coord.vsop87;
 
-import java.time.Instant;
-
 import gaia.cu9.ari.gaiaorbit.util.Constants;
 import gaia.cu9.ari.gaiaorbit.util.Nature;
 import gaia.cu9.ari.gaiaorbit.util.coord.AbstractOrbitCoordinates;
 import gaia.cu9.ari.gaiaorbit.util.coord.AstroUtils;
 import gaia.cu9.ari.gaiaorbit.util.coord.Coordinates;
 import gaia.cu9.ari.gaiaorbit.util.math.Vector3d;
+
+import java.time.Instant;
 
 public abstract class AbstractVSOP87 extends AbstractOrbitCoordinates implements iVSOP87 {
 

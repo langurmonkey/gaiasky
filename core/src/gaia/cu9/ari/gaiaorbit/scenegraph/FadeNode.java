@@ -4,6 +4,8 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.math.Vector2;
 import gaia.cu9.ari.gaiaorbit.GaiaSky;
+import gaia.cu9.ari.gaiaorbit.event.EventManager;
+import gaia.cu9.ari.gaiaorbit.event.Events;
 import gaia.cu9.ari.gaiaorbit.scenegraph.camera.ICamera;
 import gaia.cu9.ari.gaiaorbit.util.CatalogInfo;
 import gaia.cu9.ari.gaiaorbit.util.CatalogInfo.CatalogInfoType;
@@ -200,6 +202,7 @@ public class FadeNode extends AbstractPositionEntity {
 
     public void setCataloginfo(Map<String, String> map) {
         this.catalogInfo = new CatalogInfo(map.get("name"), map.get("description"), map.get("source"), CatalogInfoType.valueOf(map.get("type")), this);
+        EventManager.instance.post(Events.CATALOG_ADD, this.catalogInfo, false);
     }
 
 }

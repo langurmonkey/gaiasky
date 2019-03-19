@@ -1,16 +1,15 @@
 package gaia.cu9.ari.gaiaorbit.util.g3d;
 
+import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.math.Vector3;
+import gaia.cu9.ari.gaiaorbit.util.format.INumberFormat;
+import gaia.cu9.ari.gaiaorbit.util.format.NumberFormatFactory;
+
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.util.ArrayList;
 import java.util.List;
-
-import com.badlogic.gdx.math.Vector2;
-import com.badlogic.gdx.math.Vector3;
-
-import gaia.cu9.ari.gaiaorbit.util.format.INumberFormat;
-import gaia.cu9.ari.gaiaorbit.util.format.NumberFormatFactory;
 
 public abstract class ModelCreator {
     public interface IFace {

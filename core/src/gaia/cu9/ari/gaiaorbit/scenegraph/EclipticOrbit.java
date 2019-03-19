@@ -1,8 +1,8 @@
 package gaia.cu9.ari.gaiaorbit.scenegraph;
 
-import java.time.Instant;
-
 import gaia.cu9.ari.gaiaorbit.util.coord.AstroUtils;
+
+import java.time.Instant;
 
 /**
  * Heliotropic orbits must be corrected using the Sun longitude. They are by default

@@ -145,6 +145,10 @@ public enum Events {
      **/
     FOCUS_INFO_UPDATED,
     /**
+     * Informs that the given focus is not available anymore (not visible or unloaded)
+     */
+    FOCUS_NOT_AVAILABLE,
+    /**
      * Posts the coordinates of the free mode focus.
      * <ul>
      * <li>[0] - ra  [deg]</li>
@@ -1008,7 +1012,18 @@ public enum Events {
     /**
      * A new catalog has been loaded. Contains the new catalog info object
      **/
-    ADD_CATALOG_INFO,
+    CATALOG_ADD,
+
+    /**
+     * Removes the catalog identified by the given string name
+     */
+    CATALOG_REMOVE,
+
+    /**
+     * Sets the visibilty of a catalog given its name and an optional boolean if it comes from the UI
+     */
+    CATALOG_VISIBLE,
+
 
     /**
      * Posts a recurrent runnable. Contains an identifier (String) and the runnable object

@@ -240,6 +240,9 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
         // Init global resources
         GlobalResources.initialize(manager);
 
+        // Catalog manager
+        CatalogManager.initialize();
+
         // Initialise master manager
         MasterManager.initialize();
 

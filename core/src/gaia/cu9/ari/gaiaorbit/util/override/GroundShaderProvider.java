@@ -4,7 +4,6 @@ import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.g3d.Renderable;
 import com.badlogic.gdx.graphics.g3d.Shader;
 import com.badlogic.gdx.graphics.g3d.utils.DefaultShaderProvider;
-
 import gaia.cu9.ari.gaiaorbit.assets.ShaderTemplatingLoader;
 
 public class GroundShaderProvider extends DefaultShaderProvider {

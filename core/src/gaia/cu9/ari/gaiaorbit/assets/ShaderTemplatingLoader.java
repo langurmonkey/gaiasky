@@ -1,9 +1,9 @@
 package gaia.cu9.ari.gaiaorbit.assets;
 
-import java.util.Scanner;
-
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.files.FileHandle;
+
+import java.util.Scanner;
 
 /**
  * Loads shaders with extra functionality to add code from other shaders.

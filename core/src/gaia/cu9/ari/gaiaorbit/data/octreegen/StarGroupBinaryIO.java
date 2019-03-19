@@ -1,15 +1,14 @@
 package gaia.cu9.ari.gaiaorbit.data.octreegen;
 
-import java.io.FileNotFoundException;
-import java.io.InputStream;
-import java.io.OutputStream;
-
 import com.badlogic.gdx.utils.Array;
-
 import gaia.cu9.ari.gaiaorbit.data.group.BinaryDataProvider;
 import gaia.cu9.ari.gaiaorbit.scenegraph.AbstractPositionEntity;
 import gaia.cu9.ari.gaiaorbit.scenegraph.StarGroup;
 import gaia.cu9.ari.gaiaorbit.scenegraph.StarGroup.StarBean;
+
+import java.io.FileNotFoundException;
+import java.io.InputStream;
+import java.io.OutputStream;
 
 /**
  * Loads and writes star groups

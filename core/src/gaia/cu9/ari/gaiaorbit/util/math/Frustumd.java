@@ -19,7 +19,6 @@ package gaia.cu9.ari.gaiaorbit.util.math;
 import com.badlogic.gdx.graphics.Camera;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.PerspectiveCamera;
-
 import gaia.cu9.ari.gaiaorbit.util.math.Planed.PlaneSide;
 
 /** A truncated rectangular pyramid. Used to define the viewable region and its projection onto the screen.

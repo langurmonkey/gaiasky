@@ -12,6 +12,7 @@ import gaia.cu9.ari.gaiaorbit.event.IObserver;
 import gaia.cu9.ari.gaiaorbit.render.ComponentType;
 import gaia.cu9.ari.gaiaorbit.util.Constants;
 import gaia.cu9.ari.gaiaorbit.util.GlobalConf;
+import gaia.cu9.ari.gaiaorbit.util.I18n;
 import gaia.cu9.ari.gaiaorbit.util.TextUtils;
 import gaia.cu9.ari.gaiaorbit.util.math.MathUtilsd;
 import gaia.cu9.ari.gaiaorbit.util.scene2d.OwnLabel;
@@ -98,7 +99,7 @@ public class VisibilityComponent extends GuiComponent implements IObserver {
         float space3 = 3 * GlobalConf.SCALE_FACTOR;
 
         // NUM FACTOR
-        pmNumFactorLabel = new Label(txt("gui.pmnumfactor"), skin, "default");
+        pmNumFactorLabel = new Label(I18n.txt("gui.pmnumfactor"), skin, "default");
         pmNumFactor = new OwnLabel(Integer.toString((int) (MathUtilsd.lint(GlobalConf.scene.PM_NUM_FACTOR, Constants.MIN_PM_NUM_FACTOR, Constants.MAX_PM_NUM_FACTOR, Constants.MIN_SLIDER_1, Constants.MAX_SLIDER))), skin);
 
         pmNumFactorSlider = new Slider(Constants.MIN_SLIDER_1, Constants.MAX_SLIDER, 1, false, skin);
@@ -125,7 +126,7 @@ public class VisibilityComponent extends GuiComponent implements IObserver {
         pmNumFactorGroup.addActor(pnfg);
 
         // LEN FACTOR
-        pmLenFactorLabel = new Label(txt("gui.pmlenfactor"), skin, "default");
+        pmLenFactorLabel = new Label(I18n.txt("gui.pmlenfactor"), skin, "default");
         pmLenFactor = new OwnLabel(Integer.toString(Math.round(GlobalConf.scene.PM_LEN_FACTOR)), skin);
 
         pmLenFactorSlider = new Slider(Constants.MIN_PM_LEN_FACTOR, Constants.MAX_PM_LEN_FACTOR, 0.5f, false, skin);
@@ -152,7 +153,7 @@ public class VisibilityComponent extends GuiComponent implements IObserver {
 
         // PM CHECKBOX
         pmGroup = new VerticalGroup().align(Align.left).columnAlign(Align.left);
-        properMotions = new CheckBox(" " + txt("gui.checkbox.propermotionvectors"), skin);
+        properMotions = new CheckBox(" " + I18n.txt("gui.checkbox.propermotionvectors"), skin);
         properMotions.setName("pm vectors");
         properMotions.addListener(event -> {
             if (event instanceof ChangeEvent) {

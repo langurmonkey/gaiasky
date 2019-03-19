@@ -9,6 +9,7 @@ import gaia.cu9.ari.gaiaorbit.event.Events;
 import gaia.cu9.ari.gaiaorbit.event.IObserver;
 import gaia.cu9.ari.gaiaorbit.util.Constants;
 import gaia.cu9.ari.gaiaorbit.util.GlobalConf;
+import gaia.cu9.ari.gaiaorbit.util.I18n;
 import gaia.cu9.ari.gaiaorbit.util.math.MathUtilsd;
 import gaia.cu9.ari.gaiaorbit.util.scene2d.OwnLabel;
 import gaia.cu9.ari.gaiaorbit.util.scene2d.OwnSlider;
@@ -31,7 +32,7 @@ public class VisualEffectsComponent extends GuiComponent implements IObserver {
         float space2 = 2 * GlobalConf.SCALE_FACTOR;
         float sliderWidth = 140 * GlobalConf.SCALE_FACTOR;
         /** Star brightness **/
-        Label sbrightnessLabel = new Label(txt("gui.starbrightness"), skin, "default");
+        Label sbrightnessLabel = new Label(I18n.txt("gui.starbrightness"), skin, "default");
         starbrightnessl = new OwnLabel(Integer.toString((int) (MathUtilsd.lint(GlobalConf.scene.STAR_BRIGHTNESS, Constants.MIN_STAR_BRIGHT, Constants.MAX_STAR_BRIGHT, Constants.MIN_SLIDER, Constants.MAX_SLIDER))), skin);
         starBrightness = new OwnSlider(Constants.MIN_SLIDER, Constants.MAX_SLIDER, 1, false, skin);
         starBrightness.setName("star brightness");
@@ -51,7 +52,7 @@ public class VisualEffectsComponent extends GuiComponent implements IObserver {
         sbrightnessGroup.addActor(starbrightnessl);
 
         /** Star size **/
-        Label sizeLabel = new Label(txt("gui.star.size"), skin, "default");
+        Label sizeLabel = new Label(I18n.txt("gui.star.size"), skin, "default");
         size = new OwnLabel(Integer.toString((int) (MathUtilsd.lint(GlobalConf.scene.STAR_POINT_SIZE, Constants.MIN_STAR_POINT_SIZE, Constants.MAX_STAR_POINT_SIZE, Constants.MIN_SLIDER, Constants.MAX_SLIDER))), skin);
         starSize = new OwnSlider(Constants.MIN_SLIDER, Constants.MAX_SLIDER, 1, false, skin);
         starSize.setName("star size");
@@ -71,7 +72,7 @@ public class VisualEffectsComponent extends GuiComponent implements IObserver {
         sizeGroup.addActor(size);
 
         /** Star opacity **/
-        Label opacityLabel = new Label(txt("gui.star.opacity"), skin, "default");
+        Label opacityLabel = new Label(I18n.txt("gui.star.opacity"), skin, "default");
         opacity = new OwnLabel(Integer.toString((int) (MathUtilsd.lint(GlobalConf.scene.POINT_ALPHA_MIN, Constants.MIN_STAR_MIN_OPACITY, Constants.MAX_STAR_MIN_OPACITY, Constants.MIN_SLIDER, Constants.MAX_SLIDER))), skin);
         starOpacity = new OwnSlider(Constants.MIN_SLIDER, Constants.MAX_SLIDER, 1, false, skin);
         starOpacity.setName("star opacity");
@@ -91,7 +92,7 @@ public class VisualEffectsComponent extends GuiComponent implements IObserver {
         opacityGroup.addActor(opacity);
 
         /** Ambient light **/
-        Label ambientLightLabel = new Label(txt("gui.light.ambient"), skin, "default");
+        Label ambientLightLabel = new Label(I18n.txt("gui.light.ambient"), skin, "default");
         ambient = new OwnLabel(Integer.toString((int) (GlobalConf.scene.AMBIENT_LIGHT * 100)), skin);
         ambientLight = new OwnSlider(Constants.MIN_SLIDER, Constants.MAX_SLIDER, 1, false, skin);
         ambientLight.setName("ambient light");
@@ -111,7 +112,7 @@ public class VisualEffectsComponent extends GuiComponent implements IObserver {
         ambientGroup.addActor(ambient);
 
         /** Label size **/
-        Label labelSizeLabel = new Label(txt("gui.label.size"), skin, "default");
+        Label labelSizeLabel = new Label(I18n.txt("gui.label.size"), skin, "default");
         labels = new OwnLabel(Integer.toString((int) MathUtilsd.lint(GlobalConf.scene.LABEL_SIZE_FACTOR, Constants.MIN_LABEL_SIZE, Constants.MAX_LABEL_SIZE, Constants.MIN_SLIDER, Constants.MAX_SLIDER)), skin);
         labelSize = new OwnSlider(Constants.MIN_SLIDER, Constants.MAX_SLIDER, 1, false, skin);
         labelSize.setName("label size");

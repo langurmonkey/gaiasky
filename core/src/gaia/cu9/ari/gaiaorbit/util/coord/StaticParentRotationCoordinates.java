@@ -1,7 +1,5 @@
 package gaia.cu9.ari.gaiaorbit.util.coord;
 
-import java.time.Instant;
-
 import gaia.cu9.ari.gaiaorbit.scenegraph.AbstractPositionEntity;
 import gaia.cu9.ari.gaiaorbit.scenegraph.ModelBody;
 import gaia.cu9.ari.gaiaorbit.scenegraph.Orbit;
@@ -9,6 +7,8 @@ import gaia.cu9.ari.gaiaorbit.scenegraph.component.RotationComponent;
 import gaia.cu9.ari.gaiaorbit.util.Constants;
 import gaia.cu9.ari.gaiaorbit.util.math.Matrix4d;
 import gaia.cu9.ari.gaiaorbit.util.math.Vector3d;
+
+import java.time.Instant;
 
 /**
  * A position that never changes

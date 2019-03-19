@@ -2,7 +2,6 @@ package gaia.cu9.ari.gaiaorbit.util.g3d;
 
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
-
 import gaia.cu9.ari.gaiaorbit.util.math.MathUtilsd;
 
 /**

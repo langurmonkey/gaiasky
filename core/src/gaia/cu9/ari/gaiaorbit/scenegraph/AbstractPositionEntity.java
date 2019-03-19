@@ -30,11 +30,6 @@ import net.jafama.FastMath;
  */
 public abstract class AbstractPositionEntity extends SceneGraphNode {
     /**
-     * Overlap factor applied to angle to get the upper boundary when rendering
-     * with shader and model.
-     */
-    public static final float SHADER_MODEL_OVERLAP_FACTOR = 5;
-    /**
      * Position of this entity in the local reference system. The units are
      * {@link gaia.cu9.ari.gaiaorbit.util.Constants#U_TO_KM} by default.
      */
@@ -315,6 +310,10 @@ public abstract class AbstractPositionEntity extends SceneGraphNode {
 
     public void setColor(float[] color) {
         this.cc = color;
+    }
+
+    public OctreeNode getOctant(){
+        return octant;
     }
 
     public Vector3d computeFuturePosition() {

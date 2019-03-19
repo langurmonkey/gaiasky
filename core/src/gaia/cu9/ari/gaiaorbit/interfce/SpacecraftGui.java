@@ -9,11 +9,7 @@ import com.badlogic.gdx.graphics.Texture.TextureFilter;
 import com.badlogic.gdx.graphics.VertexAttributes.Usage;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
-import com.badlogic.gdx.graphics.g3d.Environment;
-import com.badlogic.gdx.graphics.g3d.Material;
-import com.badlogic.gdx.graphics.g3d.Model;
-import com.badlogic.gdx.graphics.g3d.ModelBatch;
-import com.badlogic.gdx.graphics.g3d.ModelInstance;
+import com.badlogic.gdx.graphics.g3d.*;
 import com.badlogic.gdx.graphics.g3d.attributes.ColorAttribute;
 import com.badlogic.gdx.graphics.g3d.attributes.TextureAttribute;
 import com.badlogic.gdx.graphics.g3d.decals.CameraGroupStrategy;
@@ -23,38 +19,20 @@ import com.badlogic.gdx.graphics.g3d.environment.DirectionalLight;
 import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Quaternion;
 import com.badlogic.gdx.math.Vector3;
-import com.badlogic.gdx.scenes.scene2d.Actor;
-import com.badlogic.gdx.scenes.scene2d.Event;
-import com.badlogic.gdx.scenes.scene2d.EventListener;
-import com.badlogic.gdx.scenes.scene2d.Group;
-import com.badlogic.gdx.scenes.scene2d.InputEvent;
+import com.badlogic.gdx.scenes.scene2d.*;
 import com.badlogic.gdx.scenes.scene2d.InputEvent.Type;
-import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.actions.Actions;
-import com.badlogic.gdx.scenes.scene2d.ui.CheckBox;
-import com.badlogic.gdx.scenes.scene2d.ui.Container;
-import com.badlogic.gdx.scenes.scene2d.ui.HorizontalGroup;
-import com.badlogic.gdx.scenes.scene2d.ui.Label;
-import com.badlogic.gdx.scenes.scene2d.ui.ScrollPane;
-import com.badlogic.gdx.scenes.scene2d.ui.Slider;
-import com.badlogic.gdx.scenes.scene2d.ui.Table;
-import com.badlogic.gdx.scenes.scene2d.ui.TextField;
-import com.badlogic.gdx.scenes.scene2d.ui.TextTooltip;
-import com.badlogic.gdx.scenes.scene2d.ui.VerticalGroup;
+import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener.ChangeEvent;
 import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.viewport.ExtendViewport;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
-
 import gaia.cu9.ari.gaiaorbit.event.EventManager;
 import gaia.cu9.ari.gaiaorbit.event.Events;
 import gaia.cu9.ari.gaiaorbit.scenegraph.Spacecraft;
 import gaia.cu9.ari.gaiaorbit.scenegraph.camera.CameraManager.CameraMode;
-import gaia.cu9.ari.gaiaorbit.util.Constants;
-import gaia.cu9.ari.gaiaorbit.util.GlobalConf;
-import gaia.cu9.ari.gaiaorbit.util.GlobalResources;
-import gaia.cu9.ari.gaiaorbit.util.Pair;
+import gaia.cu9.ari.gaiaorbit.util.*;
 import gaia.cu9.ari.gaiaorbit.util.format.INumberFormat;
 import gaia.cu9.ari.gaiaorbit.util.format.NumberFormatFactory;
 import gaia.cu9.ari.gaiaorbit.util.g3d.ModelBuilder2;
@@ -231,7 +209,7 @@ public class SpacecraftGui extends AbstractGui {
                 return false;
             }
         });
-        stabilise.addListener(new TextTooltip(txt("gui.tooltip.sc.stabilise"), skin));
+        stabilise.addListener(new TextTooltip(I18n.txt("gui.tooltip.sc.stabilise"), skin));
 
         stop = new OwnImageButton(skin, "sc-stop");
         stop.setProgrammaticChangeEvents(false);
@@ -248,7 +226,7 @@ public class SpacecraftGui extends AbstractGui {
                 return false;
             }
         });
-        stop.addListener(new TextTooltip(txt("gui.tooltip.sc.stop"), skin));
+        stop.addListener(new TextTooltip(I18n.txt("gui.tooltip.sc.stop"), skin));
 
         exit = new OwnImageButton(skin, "sc-exit");
         exit.setProgrammaticChangeEvents(false);
@@ -263,7 +241,7 @@ public class SpacecraftGui extends AbstractGui {
                 return false;
             }
         });
-        exit.addListener(new TextTooltip(txt("gui.tooltip.sc.exit"), skin));
+        exit.addListener(new TextTooltip(I18n.txt("gui.tooltip.sc.exit"), skin));
 
         buttonRow.addActor(stabilise);
         buttonRow.addActor(stop);
@@ -285,7 +263,7 @@ public class SpacecraftGui extends AbstractGui {
         engineControls.pad(0f);
 
         enginePlus = new OwnImageButton(skin, "sc-engine-power-up");
-        enginePlus.addListener(new TextTooltip(txt("gui.tooltip.sc.powerup"), skin));
+        enginePlus.addListener(new TextTooltip(I18n.txt("gui.tooltip.sc.powerup"), skin));
         enginePlus.addListener(new EventListener() {
             @Override
             public boolean handle(Event event) {
@@ -298,7 +276,7 @@ public class SpacecraftGui extends AbstractGui {
 
         });
         engineMinus = new OwnImageButton(skin, "sc-engine-power-down");
-        enginePlus.addListener(new TextTooltip(txt("gui.tooltip.sc.powerdown"), skin));
+        enginePlus.addListener(new TextTooltip(I18n.txt("gui.tooltip.sc.powerdown"), skin));
         engineMinus.addListener(new EventListener() {
             @Override
             public boolean handle(Event event) {
@@ -312,7 +290,7 @@ public class SpacecraftGui extends AbstractGui {
         });
 
         Group engineLabelRotated = new Group();
-        Label engineLabel = new OwnLabel(txt("gui.sc.enginepower"), skin);
+        Label engineLabel = new OwnLabel(I18n.txt("gui.sc.enginepower"), skin);
         engineLabelRotated.addActor(engineLabel);
         float engineLabelH = enginePowerH - enginePlus.getHeight() - engineMinus.getHeight() - 2;
         engineLabelRotated.addAction(Actions.rotateBy(-90));
@@ -371,7 +349,7 @@ public class SpacecraftGui extends AbstractGui {
             return false;
         });
 
-        velToDir = new OwnCheckBox(txt("gui.sc.veltodir"), skin, 10 * factor);
+        velToDir = new OwnCheckBox(I18n.txt("gui.sc.veltodir"), skin, 10 * factor);
         velToDir.setName("sc veltodir");
         velToDir.setChecked(GlobalConf.spacecraft.SC_VEL_TO_DIRECTION);
         velToDir.addListener(event -> {
@@ -381,9 +359,9 @@ public class SpacecraftGui extends AbstractGui {
             return false;
         });
 
-        controlsGroup.add(new OwnLabel(txt("gui.sc.responsiveness"), skin, "sc-header")).left().padRight(10 * factor).padBottom(5 * factor);
+        controlsGroup.add(new OwnLabel(I18n.txt("gui.sc.responsiveness"), skin, "sc-header")).left().padRight(10 * factor).padBottom(5 * factor);
         controlsGroup.add(responsiveness).left().padBottom(5 * factor).row();
-        controlsGroup.add(new OwnLabel(txt("gui.sc.drag"), skin, "sc-header")).left().padRight(10 * factor).padBottom(5 * factor);
+        controlsGroup.add(new OwnLabel(I18n.txt("gui.sc.drag"), skin, "sc-header")).left().padRight(10 * factor).padBottom(5 * factor);
         controlsGroup.add(drag).left().padBottom(5 * factor).row();
         controlsGroup.add(velToDir).left().colspan(2).row();
         controlsGroup.pack();
@@ -397,22 +375,22 @@ public class SpacecraftGui extends AbstractGui {
         mainvel = new OwnLabel("", skin);
         HorizontalGroup mvg = new HorizontalGroup();
         mvg.space(groupspacing);
-        mvg.addActor(new OwnLabel(txt("gui.sc.velocity") + ":", skin, "sc-header"));
+        mvg.addActor(new OwnLabel(I18n.txt("gui.sc.velocity") + ":", skin, "sc-header"));
         mvg.addActor(mainvel);
         yawvel = new OwnLabel("", skin);
         HorizontalGroup yvg = new HorizontalGroup();
         yvg.space(groupspacing);
-        yvg.addActor(new OwnLabel(txt("gui.sc.yaw") + ":", skin, "sc-header"));
+        yvg.addActor(new OwnLabel(I18n.txt("gui.sc.yaw") + ":", skin, "sc-header"));
         yvg.addActor(yawvel);
         pitchvel = new OwnLabel("", skin);
         HorizontalGroup pvg = new HorizontalGroup();
         pvg.space(groupspacing);
-        pvg.addActor(new OwnLabel(txt("gui.sc.pitch") + ":", skin, "sc-header"));
+        pvg.addActor(new OwnLabel(I18n.txt("gui.sc.pitch") + ":", skin, "sc-header"));
         pvg.addActor(pitchvel);
         rollvel = new OwnLabel("", skin);
         HorizontalGroup rvg = new HorizontalGroup();
         rvg.space(groupspacing);
-        rvg.addActor(new OwnLabel(txt("gui.sc.roll") + ":", skin, "sc-header"));
+        rvg.addActor(new OwnLabel(I18n.txt("gui.sc.roll") + ":", skin, "sc-header"));
         rvg.addActor(rollvel);
 
         motionGroup = new Table();
@@ -436,13 +414,13 @@ public class SpacecraftGui extends AbstractGui {
         HorizontalGroup cng = new HorizontalGroup();
         cng.align(Align.left);
         cng.space(groupspacing);
-        cng.addActor(new OwnLabel(txt("gui.sc.nearest") + ":", skin, "sc-header"));
+        cng.addActor(new OwnLabel(I18n.txt("gui.sc.nearest") + ":", skin, "sc-header"));
         cng.addActor(closestname);
 
         HorizontalGroup cdg = new HorizontalGroup();
         cdg.align(Align.left);
         cdg.space(groupspacing);
-        cdg.addActor(new OwnLabel(txt("gui.sc.distance") + ":", skin, "sc-header"));
+        cdg.addActor(new OwnLabel(I18n.txt("gui.sc.distance") + ":", skin, "sc-header"));
         cdg.addActor(closestdist);
 
         nearestGroup.add(cng).left().row();

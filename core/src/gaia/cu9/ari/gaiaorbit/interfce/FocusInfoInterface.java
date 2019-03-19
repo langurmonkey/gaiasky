@@ -89,8 +89,8 @@ public class FocusInfoInterface extends Table implements IObserver, IGuiInterfac
         focusRadius = new OwnLabel("", skin, "hud");
 
         // Labels
-        appmagLabel = new OwnLabel(txt("gui.focusinfo.appmag"), skin, "hud-big");
-        absmagLabel = new OwnLabel(txt("gui.focusinfo.absmag"), skin, "hud-big");
+        appmagLabel = new OwnLabel(I18n.txt("gui.focusinfo.appmag"), skin, "hud-big");
+        absmagLabel = new OwnLabel(I18n.txt("gui.focusinfo.absmag"), skin, "hud-big");
 
         // Pointer
         pointerName = new OwnLabel(I18n.bundle.get("gui.pointer"), skin, "hud-header");
@@ -98,17 +98,17 @@ public class FocusInfoInterface extends Table implements IObserver, IGuiInterfac
         pointerLonLat = new OwnLabel("", skin, "hud");
         viewRADEC = new OwnLabel("", skin, "hud");
         lonLatLabel = new OwnLabel("Lat/Lon", skin, "hud-big");
-        RADECPointerLabel = new OwnLabel(txt("gui.focusinfo.alpha") + "/" + txt("gui.focusinfo.delta"), skin, "hud-big");
-        RADECViewLabel = new OwnLabel(txt("gui.focusinfo.alpha") + "/" + txt("gui.focusinfo.delta"), skin, "hud-big");
+        RADECPointerLabel = new OwnLabel(I18n.txt("gui.focusinfo.alpha") + "/" + I18n.txt("gui.focusinfo.delta"), skin, "hud-big");
+        RADECViewLabel = new OwnLabel(I18n.txt("gui.focusinfo.alpha") + "/" + I18n.txt("gui.focusinfo.delta"), skin, "hud-big");
         Button pointerImgBtn1 = new OwnTextIconButton("", skin, "pointer");
         pointerImgBtn1.setSize(imgSize, imgSize);
-        pointerImgBtn1.addListener(new TextTooltip(txt("gui.focusinfo.pointer"), skin));
+        pointerImgBtn1.addListener(new TextTooltip(I18n.txt("gui.focusinfo.pointer"), skin));
         Button pointerImgBtn2 = new OwnTextIconButton("", skin, "pointer");
         pointerImgBtn2.setSize(imgSize, imgSize);
-        pointerImgBtn2.addListener(new TextTooltip(txt("gui.focusinfo.pointer"), skin));
+        pointerImgBtn2.addListener(new TextTooltip(I18n.txt("gui.focusinfo.pointer"), skin));
         Button viewImgBtn = new OwnTextIconButton("", skin, "view");
         viewImgBtn.setSize(imgSize, imgSize);
-        viewImgBtn.addListener(new TextTooltip(txt("gui.focusinfo.view"), skin));
+        viewImgBtn.addListener(new TextTooltip(I18n.txt("gui.focusinfo.view"), skin));
 
         // Camera
         camName = new OwnLabel(I18n.bundle.get("gui.camera"), skin, "hud-header");
@@ -137,7 +137,7 @@ public class FocusInfoInterface extends Table implements IObserver, IGuiInterfac
                 return false;
 
         });
-        goTo.addListener(new TextTooltip(txt("gui.focusinfo.goto"), skin));
+        goTo.addListener(new TextTooltip(I18n.txt("gui.focusinfo.goto"), skin));
 
         landOn = new OwnTextIconButton("", skin, "land-on");
         landOn.setSize(buttonSize, buttonSize);
@@ -149,7 +149,7 @@ public class FocusInfoInterface extends Table implements IObserver, IGuiInterfac
                 return false;
 
         });
-        landOn.addListener(new TextTooltip(txt("gui.focusinfo.landon"), skin));
+        landOn.addListener(new TextTooltip(I18n.txt("gui.focusinfo.landon"), skin));
 
         landAt = new OwnTextIconButton("", skin, "land-at");
         landAt.setSize(buttonSize, buttonSize);
@@ -160,7 +160,7 @@ public class FocusInfoInterface extends Table implements IObserver, IGuiInterfac
                 }
                 return false;
         });
-        landAt.addListener(new TextTooltip(txt("gui.focusinfo.landat"), skin));
+        landAt.addListener(new TextTooltip(I18n.txt("gui.focusinfo.landat"), skin));
 
         bw = Math.max(landOn.getWidth(), landAt.getWidth());
         bw += 2 * GlobalConf.SCALE_FACTOR;
@@ -197,19 +197,19 @@ public class FocusInfoInterface extends Table implements IObserver, IGuiInterfac
         focusInfo.add(new OwnLabel("ID", skin, "hud-big")).left();
         focusInfo.add(focusId).left().padLeft(pad10);
         focusInfo.row();
-        focusInfo.add(new OwnLabel(txt("gui.focusinfo.alpha"), skin, "hud-big")).left();
+        focusInfo.add(new OwnLabel(I18n.txt("gui.focusinfo.alpha"), skin, "hud-big")).left();
         focusInfo.add(focusRA).left().padLeft(pad10);
         focusInfo.row();
-        focusInfo.add(new OwnLabel(txt("gui.focusinfo.delta"), skin, "hud-big")).left();
+        focusInfo.add(new OwnLabel(I18n.txt("gui.focusinfo.delta"), skin, "hud-big")).left();
         focusInfo.add(focusDEC).left().padLeft(pad10);
         focusInfo.row();
-        focusInfo.add(new OwnLabel(txt("gui.focusinfo.mualpha"), skin, "hud-big")).left();
+        focusInfo.add(new OwnLabel(I18n.txt("gui.focusinfo.mualpha"), skin, "hud-big")).left();
         focusInfo.add(focusMuAlpha).left().padLeft(pad10);
         focusInfo.row();
-        focusInfo.add(new OwnLabel(txt("gui.focusinfo.mudelta"), skin, "hud-big")).left();
+        focusInfo.add(new OwnLabel(I18n.txt("gui.focusinfo.mudelta"), skin, "hud-big")).left();
         focusInfo.add(focusMuDelta).left().padLeft(pad10);
         focusInfo.row();
-        focusInfo.add(new OwnLabel(txt("gui.focusinfo.radvel"), skin, "hud-big")).left();
+        focusInfo.add(new OwnLabel(I18n.txt("gui.focusinfo.radvel"), skin, "hud-big")).left();
         focusInfo.add(focusRadVel).left().padLeft(pad10);
         focusInfo.row();
         focusInfo.add(appmagLabel).left();
@@ -218,16 +218,16 @@ public class FocusInfoInterface extends Table implements IObserver, IGuiInterfac
         focusInfo.add(absmagLabel).left();
         focusInfo.add(focusAbsMag).left().padLeft(pad10);
         focusInfo.row();
-        focusInfo.add(new OwnLabel(txt("gui.focusinfo.angle"), skin, "hud-big")).left();
+        focusInfo.add(new OwnLabel(I18n.txt("gui.focusinfo.angle"), skin, "hud-big")).left();
         focusInfo.add(focusAngle).left().padLeft(pad10);
         focusInfo.row();
-        focusInfo.add(new OwnLabel(txt("gui.focusinfo.distance.sol"), skin, "hud-big")).left();
+        focusInfo.add(new OwnLabel(I18n.txt("gui.focusinfo.distance.sol"), skin, "hud-big")).left();
         focusInfo.add(focusDistSol).left().padLeft(pad10);
         focusInfo.row();
-        focusInfo.add(new OwnLabel(txt("gui.focusinfo.distance.cam"), skin, "hud-big")).left();
+        focusInfo.add(new OwnLabel(I18n.txt("gui.focusinfo.distance.cam"), skin, "hud-big")).left();
         focusInfo.add(focusDistCam).left().padLeft(pad10);
         focusInfo.row();
-        focusInfo.add(new OwnLabel(txt("gui.focusinfo.radius"), skin, "hud-big")).left();
+        focusInfo.add(new OwnLabel(I18n.txt("gui.focusinfo.radius"), skin, "hud-big")).left();
         focusInfo.add(focusRadius).left().padLeft(pad10);
         focusInfo.row();
         focusInfo.add(moreInfo).left().colspan(2).padBottom(pad5).padTop(pad10);
@@ -251,7 +251,7 @@ public class FocusInfoInterface extends Table implements IObserver, IGuiInterfac
 
         cameraInfo.add(camName).left().colspan(2);
         cameraInfo.row();
-        cameraInfo.add(new OwnLabel(txt("gui.camera.vel"), skin, "hud-big")).left();
+        cameraInfo.add(new OwnLabel(I18n.txt("gui.camera.vel"), skin, "hud-big")).left();
         cameraInfo.add(camVel).left().padLeft(pad10);
         cameraInfo.row();
         cameraInfo.add(camPos).left().colspan(2);
@@ -331,7 +331,7 @@ public class FocusInfoInterface extends Table implements IObserver, IGuiInterfac
 
             // Type
             try {
-                focusType.setText(txt("element." + ComponentType.values()[focus.getCt().getFirstOrdinal()].toString().toLowerCase() + ".singular"));
+                focusType.setText(I18n.txt("element." + ComponentType.values()[focus.getCt().getFirstOrdinal()].toString().toLowerCase() + ".singular"));
             } catch (Exception e) {
                 focusType.setText("");
             }
@@ -368,14 +368,14 @@ public class FocusInfoInterface extends Table implements IObserver, IGuiInterfac
             }
 
             if (!(focus instanceof StarCluster)) {
-                appmagLabel.setText(txt("gui.focusinfo.appmag"));
+                appmagLabel.setText(I18n.txt("gui.focusinfo.appmag"));
                 Float appmag = focus.getAppmag();
                 focusAppMag.setText(nf.format(appmag));
-                absmagLabel.setText(txt("gui.focusinfo.absmag"));
+                absmagLabel.setText(I18n.txt("gui.focusinfo.absmag"));
                 Float absmag = focus.getAbsmag();
                 focusAbsMag.setText(nf.format(absmag));
             } else {
-                appmagLabel.setText("# " + txt("element.stars"));
+                appmagLabel.setText("# " + I18n.txt("element.stars"));
                 StarCluster sc = (StarCluster) focus;
                 focusAppMag.setText(Integer.toString(sc.getNStars()));
                 absmagLabel.setText("");
@@ -485,10 +485,6 @@ public class FocusInfoInterface extends Table implements IObserver, IGuiInterfac
     private void hideInfo(Cell cell) {
         cell.clearActor();
         pack();
-    }
-
-    private String txt(String key) {
-        return I18n.bundle.get(key);
     }
 
     public void dispose() {

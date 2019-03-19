@@ -1,10 +1,10 @@
 package gaia.cu9.ari.gaiaorbit.data;
 
-import java.util.HashSet;
-import java.util.Set;
-
 import com.badlogic.gdx.assets.AssetLoaderParameters;
 import com.badlogic.gdx.assets.AssetManager;
+
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * Utility class to hold the assets that must be loaded when the OpenGL context is present.

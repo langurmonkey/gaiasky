@@ -53,7 +53,7 @@ public abstract class AbstractOctreeWrapper extends FadeNode implements Iterable
         this.ct = new ComponentTypes(ComponentType.Others);
         this.root = root;
         this.parentName = parentName;
-        this.parenthood = new HashMap<AbstractPositionEntity, OctreeNode>();
+        this.parenthood = new HashMap<>();
     }
 
     /**
@@ -64,6 +64,10 @@ public abstract class AbstractOctreeWrapper extends FadeNode implements Iterable
     @Override
     public void initialize() {
         super.initialize();
+    }
+
+    public boolean containsObject(AbstractPositionEntity object){
+        return root.containsObject(object);
     }
 
     /**

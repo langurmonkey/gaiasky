@@ -1,11 +1,8 @@
 package gaia.cu9.ari.gaiaorbit.render.system;
 
-import java.util.Comparator;
-
 import com.badlogic.gdx.graphics.glutils.ShaderProgram;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.Array;
-
 import gaia.cu9.ari.gaiaorbit.render.IRenderable;
 import gaia.cu9.ari.gaiaorbit.render.RenderingContext;
 import gaia.cu9.ari.gaiaorbit.scenegraph.SceneGraphNode.RenderGroup;
@@ -13,6 +10,8 @@ import gaia.cu9.ari.gaiaorbit.scenegraph.camera.ICamera;
 import gaia.cu9.ari.gaiaorbit.util.ComponentTypes;
 import gaia.cu9.ari.gaiaorbit.util.GlobalConf;
 import gaia.cu9.ari.gaiaorbit.util.gravwaves.RelativisticEffectsManager;
+
+import java.util.Comparator;
 
 public abstract class AbstractRenderSystem implements IRenderSystem {
     /**

@@ -31,7 +31,10 @@ import java.util.Set;
 import java.util.logging.Level;
 
 /**
- * Loads VOTables, FITS, etc.
+ * Loads VOTables, FITS, etc. This data provider makes educated guesses using UCDs and column names to
+ * match columns to attributes.
+ *
+ * More information on this can be found <a href="http://gaia.ari.uni-heidelberg.de/gaiasky/docs/html/latest/SAMP.html#stil-data-provider">here</a>.
  *
  * @author tsagrista
  */
@@ -66,11 +69,11 @@ public class STILDataProvider extends AbstractStarGroupDataProvider {
         return list;
     }
 
-    /*
+    /**
      * Gets the first ucd that can be translated to a double from the set.
-     * @param ucds
-     * @param row
-     * @return
+     * @param ucds The set of UCDs
+     * @param row The row objects
+     * @return Pair of <UCD,Double>
      */
     private Pair<UCD, Double> getDoubleUcd(Set<UCD> ucds, Object[] row) {
         for (UCD ucd : ucds) {
@@ -90,8 +93,8 @@ public class STILDataProvider extends AbstractStarGroupDataProvider {
     /**
      * Gets the first ucd as a string from the set.
      *
-     * @param ucds
-     * @param row
+     * @param ucds The set of UCD objects
+     * @param row The row
      * @return
      */
     private Pair<UCD, String> getStringUcd(Set<UCD> ucds, Object[] row) {
@@ -133,7 +136,7 @@ public class STILDataProvider extends AbstractStarGroupDataProvider {
                     Object[] row = table.getRow(i);
                     boolean skip = false;
                     try {
-                        /** POSITION **/
+                        /* POSITION */
                         Pair<UCD, Double> a = getDoubleUcd(ucdp.POS1, row);
                         Pair<UCD, Double> b = getDoubleUcd(ucdp.POS2, row);
                         Pair<UCD, Double> c;
@@ -163,7 +166,7 @@ public class STILDataProvider extends AbstractStarGroupDataProvider {
                         Vector3d sph = new Vector3d();
                         Coordinates.cartesianToSpherical(p.gsposition, sph);
 
-                        /** PROPER MOTION **/
+                        /* PROPER MOTION */
                         Vector3d pm;
                         double mualphastar = 0, mudelta = 0, radvel = 0;
                         // Only supported if position is equatorial spherical coordinates (ra/dec)
@@ -183,7 +186,7 @@ public class STILDataProvider extends AbstractStarGroupDataProvider {
                             pm = new Vector3d(Vector3d.Zero);
                         }
 
-                        /** MAGNITUDE **/
+                        /* MAGNITUDE */
                         double appmag;
                         if (!ucdp.MAG.isEmpty()) {
                             Pair<UCD, Double> appmagPair = getDoubleUcd(ucdp.MAG, row);
@@ -196,7 +199,7 @@ public class STILDataProvider extends AbstractStarGroupDataProvider {
                         double flux = Math.pow(10, -absmag / 2.5);
                         double size = Math.min((Math.pow(flux, 0.5) * Constants.PC_TO_U * 0.16), 1e9) / 1.5;
 
-                        /** COLOR **/
+                        /* COLOR */
                         float color;
                         if (!ucdp.COL.isEmpty()) {
                             Pair<UCD, Double> colPair = getDoubleUcd(ucdp.COL, row);
@@ -212,7 +215,7 @@ public class STILDataProvider extends AbstractStarGroupDataProvider {
                         float[] rgb = ColourUtils.BVtoRGB(color);
                         double col = Color.toFloatBits(rgb[0], rgb[1], rgb[2], 1.0f);
 
-                        /** IDENTIFIER AND NAME **/
+                        /* IDENTIFIER AND NAME */
                         String name;
                         Long id;
                         int hip = -1;

@@ -18,7 +18,6 @@ package gaia.cu9.ari.gaiaorbit.util.postprocessing.effects;
 
 import com.badlogic.gdx.graphics.glutils.FrameBuffer;
 import com.bitfire.postprocessing.PostProcessorEffect;
-
 import gaia.cu9.ari.gaiaorbit.util.postprocessing.filters.GravitationalDistortionFilter;
 
 /** 

@@ -1,8 +1,8 @@
 package gaia.cu9.ari.gaiaorbit.data.octreegen;
 
-import java.util.Comparator;
-
 import gaia.cu9.ari.gaiaorbit.scenegraph.StarGroup.StarBean;
+
+import java.util.Comparator;
 
 public class StarBrightnessComparator implements Comparator<StarBean> {
     @Override

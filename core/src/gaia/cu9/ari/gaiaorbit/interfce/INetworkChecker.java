@@ -2,7 +2,6 @@ package gaia.cu9.ari.gaiaorbit.interfce;
 
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
-
 import gaia.cu9.ari.gaiaorbit.scenegraph.IFocus;
 
 /**

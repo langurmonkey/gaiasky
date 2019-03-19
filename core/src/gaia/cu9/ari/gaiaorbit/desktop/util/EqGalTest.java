@@ -1,10 +1,10 @@
 package gaia.cu9.ari.gaiaorbit.desktop.util;
 
-import java.util.Scanner;
-
 import gaia.cu9.ari.gaiaorbit.util.coord.Coordinates;
 import gaia.cu9.ari.gaiaorbit.util.math.MathUtilsd;
 import gaia.cu9.ari.gaiaorbit.util.math.Vector3d;
+
+import java.util.Scanner;
 
 public class EqGalTest {
 

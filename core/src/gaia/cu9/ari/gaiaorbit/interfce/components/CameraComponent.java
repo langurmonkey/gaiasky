@@ -10,6 +10,7 @@ import gaia.cu9.ari.gaiaorbit.event.IObserver;
 import gaia.cu9.ari.gaiaorbit.scenegraph.camera.CameraManager.CameraMode;
 import gaia.cu9.ari.gaiaorbit.util.Constants;
 import gaia.cu9.ari.gaiaorbit.util.GlobalConf;
+import gaia.cu9.ari.gaiaorbit.util.I18n;
 import gaia.cu9.ari.gaiaorbit.util.TextUtils;
 import gaia.cu9.ari.gaiaorbit.util.math.MathUtilsd;
 import gaia.cu9.ari.gaiaorbit.util.scene2d.*;
@@ -39,7 +40,7 @@ public class CameraComponent extends GuiComponent implements IObserver {
         float space2 = 2 * GlobalConf.SCALE_FACTOR;
         float width = 140 * GlobalConf.SCALE_FACTOR;
 
-        cinematic = new OwnCheckBox(txt("gui.camera.cinematic"), skin, pad);
+        cinematic = new OwnCheckBox(I18n.txt("gui.camera.cinematic"), skin, pad);
         cinematic.setName("cinematic camera");
         cinematic.setChecked(GlobalConf.scene.CINEMATIC_CAMERA);
         cinematic.addListener(event -> {
@@ -50,7 +51,7 @@ public class CameraComponent extends GuiComponent implements IObserver {
             return false;
         });
 
-        Label modeLabel = new Label(txt("gui.camera.mode"), skin, "default");
+        Label modeLabel = new Label(I18n.txt("gui.camera.mode"), skin, "default");
         int cameraModes = CameraMode.values().length;
         String[] cameraOptions = new String[cameraModes];
         for (int i = 0; i < cameraModes; i++) {
@@ -81,7 +82,7 @@ public class CameraComponent extends GuiComponent implements IObserver {
         List<Button> buttonList = new ArrayList<Button>();
 
         button3d = new OwnTextIconButton("", skin, "3d");
-        button3d.addListener(new TextTooltip(TextUtils.capitalise(txt("element.stereomode")), skin));
+        button3d.addListener(new TextTooltip(TextUtils.capitalise(I18n.txt("element.stereomode")), skin));
         button3d.setName("3d");
         button3d.addListener(event -> {
             if (event instanceof ChangeEvent) {
@@ -92,7 +93,7 @@ public class CameraComponent extends GuiComponent implements IObserver {
         });
 
         buttonDome = new OwnTextIconButton("", skin, "dome");
-        buttonDome.addListener(new TextTooltip(TextUtils.capitalise(txt("element.planetarium")), skin));
+        buttonDome.addListener(new TextTooltip(TextUtils.capitalise(I18n.txt("element.planetarium")), skin));
         buttonDome.setName("dome");
         buttonDome.addListener(event -> {
             if (event instanceof ChangeEvent) {
@@ -105,7 +106,7 @@ public class CameraComponent extends GuiComponent implements IObserver {
 
         buttonCubemap = new OwnTextIconButton("", skin, "cubemap");
         buttonCubemap.setProgrammaticChangeEvents(false);
-        buttonCubemap.addListener(new TextTooltip(TextUtils.capitalise(txt("element.360")), skin));
+        buttonCubemap.addListener(new TextTooltip(TextUtils.capitalise(I18n.txt("element.360")), skin));
         buttonCubemap.setName("cubemap");
         buttonCubemap.addListener(event -> {
             if (event instanceof ChangeEvent) {
@@ -119,7 +120,7 @@ public class CameraComponent extends GuiComponent implements IObserver {
         buttonList.add(buttonDome);
         buttonList.add(buttonCubemap);
 
-        Label fovLabel = new Label(txt("gui.camera.fov"), skin, "default");
+        Label fovLabel = new Label(I18n.txt("gui.camera.fov"), skin, "default");
         fieldOfView = new OwnSlider(Constants.MIN_FOV, Constants.MAX_FOV, 1, false, skin);
         fieldOfView.setName("field of view");
         fieldOfView.setWidth(width);
@@ -138,25 +139,25 @@ public class CameraComponent extends GuiComponent implements IObserver {
 
         /** CAMERA SPEED LIMIT **/
         String[] speedLimits = new String[19];
-        speedLimits[0] = txt("gui.camera.speedlimit.100kmh");
-        speedLimits[1] = txt("gui.camera.speedlimit.cfactor", "0.5");
-        speedLimits[2] = txt("gui.camera.speedlimit.cfactor", "0.8");
-        speedLimits[3] = txt("gui.camera.speedlimit.cfactor", "0.9");
-        speedLimits[4] = txt("gui.camera.speedlimit.cfactor", "0.99");
-        speedLimits[5] = txt("gui.camera.speedlimit.cfactor", "0.99999");
-        speedLimits[6] = txt("gui.camera.speedlimit.c");
-        speedLimits[7] = txt("gui.camera.speedlimit.cfactor", 2);
-        speedLimits[8] = txt("gui.camera.speedlimit.cfactor", 10);
-        speedLimits[9] = txt("gui.camera.speedlimit.cfactor", 1000);
-        speedLimits[10] = txt("gui.camera.speedlimit.aus", 1);
-        speedLimits[11] = txt("gui.camera.speedlimit.aus", 10);
-        speedLimits[12] = txt("gui.camera.speedlimit.aus", 1000);
-        speedLimits[13] = txt("gui.camera.speedlimit.aus", 10000);
-        speedLimits[14] = txt("gui.camera.speedlimit.pcs", 1);
-        speedLimits[15] = txt("gui.camera.speedlimit.pcs", 2);
-        speedLimits[16] = txt("gui.camera.speedlimit.pcs", 10);
-        speedLimits[17] = txt("gui.camera.speedlimit.pcs", 1000);
-        speedLimits[18] = txt("gui.camera.speedlimit.nolimit");
+        speedLimits[0] = I18n.txt("gui.camera.speedlimit.100kmh");
+        speedLimits[1] = I18n.txt("gui.camera.speedlimit.cfactor", "0.5");
+        speedLimits[2] = I18n.txt("gui.camera.speedlimit.cfactor", "0.8");
+        speedLimits[3] = I18n.txt("gui.camera.speedlimit.cfactor", "0.9");
+        speedLimits[4] = I18n.txt("gui.camera.speedlimit.cfactor", "0.99");
+        speedLimits[5] = I18n.txt("gui.camera.speedlimit.cfactor", "0.99999");
+        speedLimits[6] = I18n.txt("gui.camera.speedlimit.c");
+        speedLimits[7] = I18n.txt("gui.camera.speedlimit.cfactor", 2);
+        speedLimits[8] = I18n.txt("gui.camera.speedlimit.cfactor", 10);
+        speedLimits[9] = I18n.txt("gui.camera.speedlimit.cfactor", 1000);
+        speedLimits[10] = I18n.txt("gui.camera.speedlimit.aus", 1);
+        speedLimits[11] = I18n.txt("gui.camera.speedlimit.aus", 10);
+        speedLimits[12] = I18n.txt("gui.camera.speedlimit.aus", 1000);
+        speedLimits[13] = I18n.txt("gui.camera.speedlimit.aus", 10000);
+        speedLimits[14] = I18n.txt("gui.camera.speedlimit.pcs", 1);
+        speedLimits[15] = I18n.txt("gui.camera.speedlimit.pcs", 2);
+        speedLimits[16] = I18n.txt("gui.camera.speedlimit.pcs", 10);
+        speedLimits[17] = I18n.txt("gui.camera.speedlimit.pcs", 1000);
+        speedLimits[18] = I18n.txt("gui.camera.speedlimit.nolimit");
 
         cameraSpeedLimit = new OwnSelectBox<String>(skin);
         cameraSpeedLimit.setName("camera speed limit");
@@ -221,12 +222,12 @@ public class CameraComponent extends GuiComponent implements IObserver {
         turn = new OwnLabel(Integer.toString((int) MathUtilsd.lint(GlobalConf.scene.TURNING_SPEED, Constants.MIN_TURN_SPEED, Constants.MAX_TURN_SPEED, Constants.MIN_SLIDER, Constants.MAX_SLIDER)), skin, "default");
 
         /** Focus lock **/
-        focusLock = new CheckBox(" " + txt("gui.camera.lock"), skin);
+        focusLock = new CheckBox(" " + I18n.txt("gui.camera.lock"), skin);
         focusLock.setName("focus lock");
         focusLock.setChecked(GlobalConf.scene.FOCUS_LOCK);
         focusLock.addListener(event -> {
             if (event instanceof ChangeEvent) {
-                EventManager.instance.post(Events.FOCUS_LOCK_CMD, txt("gui.camera.lock"), focusLock.isChecked());
+                EventManager.instance.post(Events.FOCUS_LOCK_CMD, I18n.txt("gui.camera.lock"), focusLock.isChecked());
                 orientationLock.setVisible(focusLock.isChecked());
                 return true;
             }
@@ -234,20 +235,20 @@ public class CameraComponent extends GuiComponent implements IObserver {
         });
 
         /** Focus orientation lock **/
-        orientationLock = new CheckBox(" " + txt("gui.camera.lock.orientation"), skin);
+        orientationLock = new CheckBox(" " + I18n.txt("gui.camera.lock.orientation"), skin);
         orientationLock.setName("orientation lock");
         orientationLock.setChecked(GlobalConf.scene.FOCUS_LOCK_ORIENTATION);
         orientationLock.setVisible(GlobalConf.scene.FOCUS_LOCK);
         orientationLock.addListener(event -> {
             if (event instanceof ChangeEvent) {
-                EventManager.instance.post(Events.ORIENTATION_LOCK_CMD, txt("gui.camera.lock.orientation"), orientationLock.isChecked(), true);
+                EventManager.instance.post(Events.ORIENTATION_LOCK_CMD, I18n.txt("gui.camera.lock.orientation"), orientationLock.isChecked(), true);
                 return true;
             }
             return false;
         });
 
         /** Crosshair **/
-        crosshair = new OwnCheckBox("" + txt("gui.camera.crosshair"), skin, pad);
+        crosshair = new OwnCheckBox("" + I18n.txt("gui.camera.crosshair"), skin, pad);
         crosshair.setName("orientation lock");
         crosshair.setChecked(GlobalConf.scene.CROSSHAIR);
         crosshair.addListener(event -> {
@@ -289,15 +290,15 @@ public class CameraComponent extends GuiComponent implements IObserver {
 
         cameraGroup.addActor(modeLabel);
         cameraGroup.addActor(cameraMode);
-        cameraGroup.addActor(new Label(txt("gui.camera.speedlimit"), skin, "default"));
+        cameraGroup.addActor(new Label(I18n.txt("gui.camera.speedlimit"), skin, "default"));
         cameraGroup.addActor(cameraSpeedLimit);
         cameraGroup.addActor(fovLabel);
         cameraGroup.addActor(fovGroup);
-        cameraGroup.addActor(new Label(txt("gui.camera.speed"), skin, "default"));
+        cameraGroup.addActor(new Label(I18n.txt("gui.camera.speed"), skin, "default"));
         cameraGroup.addActor(speedGroup);
-        cameraGroup.addActor(new Label(txt("gui.rotation.speed"), skin, "default"));
+        cameraGroup.addActor(new Label(I18n.txt("gui.rotation.speed"), skin, "default"));
         cameraGroup.addActor(rotateGroup);
-        cameraGroup.addActor(new Label(txt("gui.turn.speed"), skin, "default"));
+        cameraGroup.addActor(new Label(I18n.txt("gui.turn.speed"), skin, "default"));
         cameraGroup.addActor(turnGroup);
         cameraGroup.addActor(cinematic);
         cameraGroup.addActor(focusLock);

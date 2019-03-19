@@ -1,13 +1,12 @@
 package gaia.cu9.ari.gaiaorbit.data.stars;
 
+import com.badlogic.gdx.utils.Array;
+import gaia.cu9.ari.gaiaorbit.scenegraph.CelestialBody;
+import gaia.cu9.ari.gaiaorbit.scenegraph.SceneGraphNode;
+
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.List;
-
-import com.badlogic.gdx.utils.Array;
-
-import gaia.cu9.ari.gaiaorbit.scenegraph.CelestialBody;
-import gaia.cu9.ari.gaiaorbit.scenegraph.SceneGraphNode;
 
 /**
  * Abstract catalog loader with the transformation from spherical to cartesian coordinates

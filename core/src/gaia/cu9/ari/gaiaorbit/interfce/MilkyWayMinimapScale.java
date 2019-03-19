@@ -11,10 +11,7 @@ import com.badlogic.gdx.graphics.glutils.ShapeRenderer.ShapeType;
 import com.badlogic.gdx.math.Vector2;
 import gaia.cu9.ari.gaiaorbit.GaiaSky;
 import gaia.cu9.ari.gaiaorbit.scenegraph.camera.ICamera;
-import gaia.cu9.ari.gaiaorbit.util.Constants;
-import gaia.cu9.ari.gaiaorbit.util.GlobalConf;
-import gaia.cu9.ari.gaiaorbit.util.GlobalResources;
-import gaia.cu9.ari.gaiaorbit.util.I18n;
+import gaia.cu9.ari.gaiaorbit.util.*;
 import gaia.cu9.ari.gaiaorbit.util.coord.Coordinates;
 import gaia.cu9.ari.gaiaorbit.util.math.Vector2d;
 import gaia.cu9.ari.gaiaorbit.util.math.Vector3d;
@@ -126,9 +123,9 @@ public class MilkyWayMinimapScale implements IMinimapScale {
         // Fonts
         sb.begin();
         font.setColor(1, 1, 0, 1);
-        font.draw(sb, txt("gui.minimap.sun"), gal2Px(-8000, side2), gal2Px(0, sideshort2) - px(8));
+        font.draw(sb, I18n.txt("gui.minimap.sun"), gal2Px(-8000, side2), gal2Px(0, sideshort2) - px(8));
         font.setColor(.6f, .6f, .9f, 1);
-        font.draw(sb, txt("gui.minimap.gc"), side2, sideshort2 - px(4));
+        font.draw(sb, I18n.txt("gui.minimap.gc"), side2, sideshort2 - px(4));
         sb.end();
 
         fb.end();
@@ -201,9 +198,9 @@ public class MilkyWayMinimapScale implements IMinimapScale {
         // Fonts
         sb.begin();
         font.setColor(1, 1, 0, 1);
-        font.draw(sb, txt("gui.minimap.sun"), side2, sunPos.y - px(8));
+        font.draw(sb, I18n.txt("gui.minimap.sun"), side2, sunPos.y - px(8));
         font.setColor(.6f, .6f, 0.9f, 1);
-        font.draw(sb, txt("gui.minimap.gc"), side2 + px(4), side2 - px(4));
+        font.draw(sb, I18n.txt("gui.minimap.gc"), side2 + px(4), side2 - px(4));
         for (int i = 4000; i <= 16000; i += 4000) {
             font.draw(sb, "" + (i / 1000) + "Kpc", side2, (16000 + i) * side / 32000 - px(6));
         }
@@ -228,7 +225,4 @@ public class MilkyWayMinimapScale implements IMinimapScale {
         return (int) ((pc / 16000d) * side + side);
     }
 
-    protected static String txt(String key) {
-        return I18n.bundle.get(key);
-    }
 }

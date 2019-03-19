@@ -1,8 +1,8 @@
 package gaia.cu9.ari.gaiaorbit.util.comp;
 
-import java.util.Comparator;
-
 import gaia.cu9.ari.gaiaorbit.scenegraph.AbstractPositionEntity;
+
+import java.util.Comparator;
 
 /**
  * Compares entities. Further entities go first, nearer entities go last.

@@ -1,15 +1,14 @@
 package gaia.cu9.ari.gaiaorbit.event;
 
-import java.util.LinkedHashSet;
-import java.util.Set;
-
 import com.badlogic.gdx.utils.IntMap;
 import com.badlogic.gdx.utils.IntMap.Keys;
 import com.badlogic.gdx.utils.ObjectMap;
 import com.badlogic.gdx.utils.Pool;
 import com.badlogic.gdx.utils.TimeUtils;
-
 import gaia.cu9.ari.gaiaorbit.GaiaSky;
+
+import java.util.LinkedHashSet;
+import java.util.Set;
 
 /**
  * Event manager that allows for subscription of observers to events (identified
@@ -61,7 +60,7 @@ public class EventManager implements IObserver {
             }
         };
         // Initialize queues, one for each time frame.
-        queues = new ObjectMap<TimeFrame, PriorityQueue<Telegram>>(TimeFrame.values().length);
+        queues = new ObjectMap<>(TimeFrame.values().length);
         for (TimeFrame tf : TimeFrame.values()) {
             PriorityQueue<Telegram> pq = new PriorityQueue<Telegram>();
             queues.put(tf, pq);

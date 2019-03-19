@@ -1,10 +1,5 @@
 package gaia.cu9.ari.gaiaorbit.util.coord;
 
-import java.time.Instant;
-import java.time.LocalDateTime;
-import java.time.ZoneOffset;
-import java.time.temporal.ChronoField;
-
 import gaia.cu9.ari.gaiaorbit.util.Constants;
 import gaia.cu9.ari.gaiaorbit.util.LruCache;
 import gaia.cu9.ari.gaiaorbit.util.Nature;
@@ -14,6 +9,11 @@ import gaia.cu9.ari.gaiaorbit.util.math.ITrigonometry;
 import gaia.cu9.ari.gaiaorbit.util.math.MathManager;
 import gaia.cu9.ari.gaiaorbit.util.math.Vector2d;
 import gaia.cu9.ari.gaiaorbit.util.math.Vector3d;
+
+import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.ZoneOffset;
+import java.time.temporal.ChronoField;
 
 /**
  * Some astronomical goodies to get the position of the Sun, Moon, work out

@@ -1,11 +1,11 @@
 package gaia.cu9.ari.gaiaorbit.interfce;
 
-import java.time.Instant;
-
 import gaia.cu9.ari.gaiaorbit.util.I18n;
 import gaia.cu9.ari.gaiaorbit.util.format.DateFormatFactory;
 import gaia.cu9.ari.gaiaorbit.util.format.DateFormatFactory.DateType;
 import gaia.cu9.ari.gaiaorbit.util.format.IDateFormat;
+
+import java.time.Instant;
 
 public class MessageBean {
     private static final String TAG_SEPARATOR = " - ";

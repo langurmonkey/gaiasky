@@ -1,8 +1,8 @@
 package gaia.cu9.ari.gaiaorbit.util.comp;
 
-import java.util.Comparator;
-
 import gaia.cu9.ari.gaiaorbit.scenegraph.IFocus;
+
+import java.util.Comparator;
 
 public class CelestialBodyComparator implements Comparator<IFocus> {
 

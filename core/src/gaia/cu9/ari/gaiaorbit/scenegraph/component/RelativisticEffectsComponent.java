@@ -1,19 +1,18 @@
 package gaia.cu9.ari.gaiaorbit.scenegraph.component;
 
-import java.util.Map;
-import java.util.Set;
-
 import com.badlogic.gdx.graphics.g3d.Material;
 import com.badlogic.gdx.math.Matrix3;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.Array;
-
 import gaia.cu9.ari.gaiaorbit.scenegraph.camera.ICamera;
 import gaia.cu9.ari.gaiaorbit.util.gravwaves.RelativisticEffectsManager;
 import gaia.cu9.ari.gaiaorbit.util.override.Matrix3Attribute;
 import gaia.cu9.ari.gaiaorbit.util.override.RelativisticEffectFloatAttribute;
 import gaia.cu9.ari.gaiaorbit.util.override.Vector3Attribute;
 import gaia.cu9.ari.gaiaorbit.util.override.Vector4Attribute;
+
+import java.util.Map;
+import java.util.Set;
 
 public class RelativisticEffectsComponent {
 

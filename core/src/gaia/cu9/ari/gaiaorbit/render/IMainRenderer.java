@@ -1,7 +1,6 @@
 package gaia.cu9.ari.gaiaorbit.render;
 
 import com.badlogic.gdx.graphics.glutils.FrameBuffer;
-
 import gaia.cu9.ari.gaiaorbit.render.IPostProcessor.PostProcessBean;
 import gaia.cu9.ari.gaiaorbit.scenegraph.camera.CameraManager;
 import gaia.cu9.ari.gaiaorbit.scenegraph.camera.ICamera;

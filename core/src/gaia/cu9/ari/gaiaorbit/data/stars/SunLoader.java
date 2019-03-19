@@ -1,14 +1,13 @@
 package gaia.cu9.ari.gaiaorbit.data.stars;
 
-import java.io.FileNotFoundException;
-
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.TimeUtils;
-
 import gaia.cu9.ari.gaiaorbit.data.ISceneGraphLoader;
 import gaia.cu9.ari.gaiaorbit.scenegraph.CelestialBody;
 import gaia.cu9.ari.gaiaorbit.scenegraph.Star;
 import gaia.cu9.ari.gaiaorbit.util.math.Vector3d;
+
+import java.io.FileNotFoundException;
 
 /**
  * Adds the sun manually

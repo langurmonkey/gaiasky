@@ -251,6 +251,19 @@ public class OctreeNode implements ILineRenderable {
         }
     }
 
+    public boolean containsObject(AbstractPositionEntity object){
+        boolean has = this.objects.contains(object, true);
+        if(!has && children != null && childrenCount > 0){
+            for(OctreeNode child : children){
+                if(child != null) {
+                    if(containsObject(object))
+                        return true;
+                }
+            }
+        }
+        return has;
+    }
+
     /**
      * Resolves and adds the children of this node using the map. It runs
      * recursively once the children have been added.
@@ -755,6 +768,18 @@ public class OctreeNode implements ILineRenderable {
             }
         }
         return null;
+    }
+
+    /**
+     * Gets the root of the tree this octant is in by successively
+     * checking the parent until it is null.
+     * @return The root of the tree
+     */
+    public OctreeNode getRoot() {
+        if(parent == null)
+            return this;
+        else
+            return parent.getRoot();
     }
 
     com.badlogic.gdx.graphics.Color col = new com.badlogic.gdx.graphics.Color();

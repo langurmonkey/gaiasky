@@ -1,11 +1,7 @@
 package gaia.cu9.ari.gaiaorbit.screenshot;
 
-import java.text.SimpleDateFormat;
-import java.util.Date;
-
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.glutils.FrameBuffer;
-
 import gaia.cu9.ari.gaiaorbit.GaiaSky;
 import gaia.cu9.ari.gaiaorbit.event.EventManager;
 import gaia.cu9.ari.gaiaorbit.event.Events;
@@ -18,6 +14,9 @@ import gaia.cu9.ari.gaiaorbit.render.IPostProcessor.RenderType;
 import gaia.cu9.ari.gaiaorbit.scenegraph.camera.ICamera;
 import gaia.cu9.ari.gaiaorbit.util.GlobalConf;
 import gaia.cu9.ari.gaiaorbit.util.GlobalConf.ImageFormat;
+
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 public class ScreenshotsManager implements IObserver {
     public static ScreenshotsManager system;

@@ -6,10 +6,10 @@ import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.VerticalGroup;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener.ChangeEvent;
 import com.badlogic.gdx.utils.Align;
-
 import gaia.cu9.ari.gaiaorbit.event.EventManager;
 import gaia.cu9.ari.gaiaorbit.event.Events;
 import gaia.cu9.ari.gaiaorbit.util.GlobalConf;
+import gaia.cu9.ari.gaiaorbit.util.I18n;
 
 public class GaiaComponent extends GuiComponent {
 
@@ -21,35 +21,35 @@ public class GaiaComponent extends GuiComponent {
 
     @Override
     public void initialize() {
-        computeGaiaScan = new CheckBox(" " + txt("gui.gaiascan.enable"), skin);
+        computeGaiaScan = new CheckBox(" " + I18n.txt("gui.gaiascan.enable"), skin);
         computeGaiaScan.setName("compute gaia scan");
         computeGaiaScan.addListener(event -> {
             if (event instanceof ChangeEvent) {
-                EventManager.instance.post(Events.COMPUTE_GAIA_SCAN_CMD, txt("gui.gaiascan.compute"), computeGaiaScan.isChecked());
+                EventManager.instance.post(Events.COMPUTE_GAIA_SCAN_CMD, I18n.txt("gui.gaiascan.compute"), computeGaiaScan.isChecked());
                 return true;
             }
             return false;
         });
         computeGaiaScan.setChecked(GlobalConf.scene.COMPUTE_GAIA_SCAN);
 
-        transitColor = new CheckBox(" " + txt("gui.gaiascan.colour"), skin);
+        transitColor = new CheckBox(" " + I18n.txt("gui.gaiascan.colour"), skin);
         transitColor.setName("transit color");
         transitColor.addListener(event -> {
             if (event instanceof ChangeEvent) {
-                EventManager.instance.post(Events.TRANSIT_COLOUR_CMD, txt("gui.gaiascan.transit"), transitColor.isChecked());
+                EventManager.instance.post(Events.TRANSIT_COLOUR_CMD, I18n.txt("gui.gaiascan.transit"), transitColor.isChecked());
                 return true;
             }
             return false;
         });
         transitColor.setChecked(GlobalConf.scene.STAR_COLOR_TRANSIT);
 
-        //        onlyObservedStars = new CheckBox(txt("gui.gaiascan.onlyobserved"), skin);
+        //        onlyObservedStars = new CheckBox(I18n.txt("gui.gaiascan.onlyobserved"), skin);
         //        onlyObservedStars.setName("only observed stars");
         //        onlyObservedStars.addListener(new EventListener() {
         //            @Override
         //            public boolean handle(Event event) {
         //                if (event instanceof ChangeEvent) {
-        //                    EventManager.instance.post(Events.ONLY_OBSERVED_STARS_CMD, txt("gui.gaiascan.only"), onlyObservedStars.isChecked());
+        //                    EventManager.instance.post(Events.ONLY_OBSERVED_STARS_CMD, I18n.txt("gui.gaiascan.only"), onlyObservedStars.isChecked());
         //                    return true;
         //                }
         //                return false;

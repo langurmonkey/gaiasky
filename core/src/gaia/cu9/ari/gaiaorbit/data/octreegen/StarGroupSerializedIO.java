@@ -1,14 +1,6 @@
 package gaia.cu9.ari.gaiaorbit.data.octreegen;
 
-import java.io.FileNotFoundException;
-import java.io.InputStream;
-import java.io.ObjectOutputStream;
-import java.io.OutputStream;
-import java.util.ArrayList;
-import java.util.List;
-
 import com.badlogic.gdx.utils.Array;
-
 import gaia.cu9.ari.gaiaorbit.data.group.IStarGroupDataProvider;
 import gaia.cu9.ari.gaiaorbit.data.group.SerializedDataProvider;
 import gaia.cu9.ari.gaiaorbit.scenegraph.AbstractPositionEntity;
@@ -16,6 +8,13 @@ import gaia.cu9.ari.gaiaorbit.scenegraph.StarGroup;
 import gaia.cu9.ari.gaiaorbit.scenegraph.StarGroup.StarBean;
 import gaia.cu9.ari.gaiaorbit.util.Logger;
 import gaia.cu9.ari.gaiaorbit.util.Logger.Log;
+
+import java.io.FileNotFoundException;
+import java.io.InputStream;
+import java.io.ObjectOutputStream;
+import java.io.OutputStream;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Loads and writes star groups

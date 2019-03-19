@@ -34,23 +34,23 @@ public class RunStateInterface extends Table implements IObserver, IGuiInterface
         float pad = 2 * GlobalConf.SCALE_FACTOR;
 
         keyboardImg = new Image(skin.getDrawable("no-input"));
-        keyboardImg.addListener(new TextTooltip(txt("gui.tooltip.noinput"), skin));
+        keyboardImg.addListener(new TextTooltip(I18n.txt("gui.tooltip.noinput"), skin));
         frameoutputImg = new Image(skin.getDrawable("frameoutput"));
-        frameoutputImg.addListener(new TextTooltip(txt("gui.tooltip.frameoutputon"), skin));
+        frameoutputImg.addListener(new TextTooltip(I18n.txt("gui.tooltip.frameoutputon"), skin));
 
         bgLoading = new OwnTextIconButton("", skin, "dataload-bg", "toggle");
-        TextTooltip pauseBgTT = new TextTooltip(txt("gui.tooltip.pausebg"), skin);
+        TextTooltip pauseBgTT = new TextTooltip(I18n.txt("gui.tooltip.pausebg"), skin);
         bgLoading.addListener(pauseBgTT);
         bgLoading.addListener((event) -> {
             if (event instanceof ChangeEvent) {
                 if (loadingPaused) {
                     EventManager.instance.post(Events.RESUME_BACKGROUND_LOADING);
                     loadingPaused = false;
-                    pauseBgTT.getActor().setText(txt("gui.tooltip.pausebg"));
+                    pauseBgTT.getActor().setText(I18n.txt("gui.tooltip.pausebg"));
                 } else {
                     EventManager.instance.post(Events.PAUSE_BACKGROUND_LOADING);
                     loadingPaused = true;
-                    pauseBgTT.getActor().setText(txt("gui.tooltip.resumebg"));
+                    pauseBgTT.getActor().setText(I18n.txt("gui.tooltip.resumebg"));
                 }
             }
             return false;
@@ -143,10 +143,6 @@ public class RunStateInterface extends Table implements IObserver, IGuiInterface
         default:
             break;
         }
-    }
-
-    private String txt(String key) {
-        return I18n.bundle.get(key);
     }
 
     @Override

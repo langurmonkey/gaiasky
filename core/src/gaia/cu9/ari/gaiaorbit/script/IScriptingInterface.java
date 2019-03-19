@@ -24,6 +24,7 @@ public interface IScriptingInterface {
     /**
      * Pre-loads the given image as a texture for later use. The texture will
      * be cached for later use.
+     *
      * @param path
      */
     void preloadTexture(String path);
@@ -924,7 +925,6 @@ public interface IScriptingInterface {
      */
     void removeModelObject(String name);
 
-
     /**
      * Sets the vertical scroll position in the GUI.
      *
@@ -1073,9 +1073,9 @@ public interface IScriptingInterface {
      * This function will put the camera in free mode, so make sure to change it afterwards if you need to. Also,
      * this only works with the natural camera.
      *
-     * @param camPos The target camera position in the internal reference system.
-     * @param camDir The target camera direction in the internal reference system.
-     * @param camUp The target camera up in the internal reference system.
+     * @param camPos  The target camera position in the internal reference system.
+     * @param camDir  The target camera direction in the internal reference system.
+     * @param camUp   The target camera up in the internal reference system.
      * @param seconds The duration of the transition in seconds.
      */
     void cameraTransition(double[] camPos, double[] camDir, double[] camUp, double seconds);
@@ -1087,11 +1087,11 @@ public interface IScriptingInterface {
      * This function will put the camera in free mode, so make sure to change it afterwards if you need to. Also,
      * this only works with the natural camera.
      *
-     * @param camPos The target camera position in the internal reference system.
-     * @param camDir The target camera direction in the internal reference system.
-     * @param camUp The target camera up in the internal reference system.
+     * @param camPos  The target camera position in the internal reference system.
+     * @param camDir  The target camera direction in the internal reference system.
+     * @param camUp   The target camera up in the internal reference system.
      * @param seconds The duration of the transition in seconds.
-     * @param sync If true, the call waits for the transition to finish before returning, otherwise it returns immediately
+     * @param sync    If true, the call waits for the transition to finish before returning, otherwise it returns immediately
      */
     void cameraTransition(double[] camPos, double[] camDir, double[] camUp, double seconds, boolean sync);
 
@@ -1337,42 +1337,49 @@ public interface IScriptingInterface {
 
     /**
      * Gets the absolute path of the default directory where the still frames are saved
+     *
      * @return Absolute path of directory where still frames are saved
      */
     String getDefaultFramesDir();
 
     /**
      * Gets the absolute path of the default directory where the screenshots are saved
+     *
      * @return Absolute path of directory where screenshots are saved
      */
     String getDefaultScreenshotsDir();
 
     /**
      * Gets the absolute path of the default directory where the camera files are saved
+     *
      * @return Absolute path of directory where camera files are saved
      */
     String getDefaultCameraDir();
 
     /**
      * Gets the absolute path to the location of the music files
+     *
      * @return Absolute path to the location of the music files
      */
     String getDefaultMusicDir();
 
     /**
      * Gets the absolute path to the location of the controller mappings
+     *
      * @return Absolute path to the location of the controller mappings
      */
     String getDefaultMappingsDir();
 
     /**
      * Gets the absolute path of the local data directory, configured in your global.properties file
+     *
      * @return Absolute path to the location of the data files
      */
     String getDataDir();
 
     /**
      * Gets the absolute path to the location of the configuration directory
+     *
      * @return Absolute path of config directory
      */
     String getConfigDir();
@@ -1380,6 +1387,7 @@ public interface IScriptingInterface {
     /**
      * Returns the default data directory. That is ~/.gaiasky/ in Windows and macOS, and ~/.local/share/gaiasky
      * in Linux.
+     *
      * @return Absolute path of data directory
      */
     String getLocalDataDir();
@@ -1410,6 +1418,51 @@ public interface IScriptingInterface {
      * @param id The id of the runnable to remove
      */
     void unparkRunnable(String id);
+
+    /**
+     * Loads a VOTable file (<code>.vot</code>) with a given name.
+     * The loading happens synchronously but the insertion of the catalog into the scene graph
+     * happens asynchronously, so it is usually not the case that the catalog is available to Gaia Sky immediately after
+     * this call returns. Usually a few milliseconds need to pass for it to be completely loaded.
+     * The loading process is carried out
+     * making educated guesses about semantics using UCDs and column names.
+     * Please check <a href="http://gaia.ari.uni-heidelberg.de/gaiasky/docs/html/latest/SAMP.html#stil-data-provider">the
+     * official documentation</a> for a complete reference on what can and what can't be loaded.
+     *
+     * @param dsName       The name of the dataset, used to identify the subsequent operations on the
+     *                     dataset
+     * @param absolutePath Absolute path to the <code>.vot</code> file to load
+     *
+     * @return False if the dataset could not be loaded, true otherwise
+     */
+    boolean loadDataset(String dsName, String absolutePath);
+
+    /**
+     * Removes the dataset identified by the given name, if it exists
+     *
+     * @param dsName The name of the dataset to remove
+     *
+     * @return False if the dataset could not be found
+     */
+    boolean removeDataset(String dsName);
+
+    /**
+     * Hides the dataset identified by the given name, if it exists and is not hidden
+     *
+     * @param dsName The name of the dataset to hide
+     *
+     * @return False if the dataset could not be found
+     */
+    boolean hideDataset(String dsName);
+
+    /**
+     * Shows (un-hides) the dataset identified by the given name, if it exists and is hidden
+     *
+     * @param dsName The name of the dataset to show
+     *
+     * @return False if the dataset could not be found
+     */
+    boolean showDataset(String dsName);
 
     /**
      * Rotates a 3D vector around the given axis by the specified angle in degrees.
@@ -1451,18 +1504,21 @@ public interface IScriptingInterface {
 
     /**
      * Print text using the internal logging system
+     *
      * @param message The message
      */
     void print(String message);
 
     /**
      * Print text using the internal logging system
+     *
      * @param message The message
      */
     void log(String message);
 
     /**
      * Log an error using the internal logging system
+     *
      * @param message The error message
      */
     void error(String message);

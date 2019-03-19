@@ -24,9 +24,9 @@
 
 package gaia.cu9.ari.gaiaorbit.util;
 
-import java.util.BitSet;
-
 import gaia.cu9.ari.gaiaorbit.render.ComponentType;
+
+import java.util.BitSet;
 
 /**
  * BitSet with some added functionality

@@ -1,10 +1,10 @@
 package gaia.cu9.ari.gaiaorbit.util.gaia.utils;
 
+import gaia.cu9.ari.gaiaorbit.util.math.Vector3d;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Random;
-
-import gaia.cu9.ari.gaiaorbit.util.math.Vector3d;
 
 /**
  * Specifies a combination of {@link Area}s.

@@ -77,9 +77,9 @@ public abstract class AbstractSceneGraph implements ISceneGraph {
         this.hasStarGroup = hasStarGroup;
 
         // Initialize stringToNode and starMap maps
-        stringToNode = new ObjectMap<String, SceneGraphNode>(nodes.size * 2);
+        stringToNode = new ObjectMap<>(nodes.size * 2);
         stringToNode.put(root.name, root);
-        hipMap = new IntMap<IPosition>();
+        hipMap = new IntMap<>();
         for (SceneGraphNode node : nodes) {
             addToIndex(node, stringToNode);
 
@@ -228,7 +228,7 @@ public abstract class AbstractSceneGraph implements ISceneGraph {
 
     public synchronized void removeFromStringToNode(SceneGraphNode node) {
         Keys<String> keys = stringToNode.keys();
-        ObjectSet<String> hits = new ObjectSet<String>();
+        ObjectSet<String> hits = new ObjectSet<>();
         for (String key : keys) {
             if (stringToNode.get(key) == node)
                 hits.add(key);
@@ -276,13 +276,13 @@ public abstract class AbstractSceneGraph implements ISceneGraph {
     }
 
     public Array<SceneGraphNode> getNodes() {
-        Array<SceneGraphNode> objects = new Array<SceneGraphNode>();
+        Array<SceneGraphNode> objects = new Array<>();
         root.addNodes(objects);
         return objects;
     }
 
     public Array<IFocus> getFocusableObjects() {
-        Array<IFocus> objects = new Array<IFocus>();
+        Array<IFocus> objects = new Array<>();
         root.addFocusableObjects(objects);
         return objects;
     }
@@ -322,7 +322,7 @@ public abstract class AbstractSceneGraph implements ISceneGraph {
             // This assumes the star group is in the first level of the scene graph, right below universe
             for (SceneGraphNode sgn : root.children) {
                 if (sgn instanceof StarGroup)
-                    n += ((StarGroup) sgn).getStarCount();
+                    n += sgn.getStarCount();
             }
             return n;
         }

@@ -16,11 +16,11 @@ package gaia.cu9.ari.gaiaorbit.util.math;
  * the License.
  ******************************************************************************/
 
-import java.io.Serializable;
-
 import com.badlogic.gdx.math.Matrix3;
 import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Vector3;
+
+import java.io.Serializable;
 
 /**
  * Encapsulates a <a href=

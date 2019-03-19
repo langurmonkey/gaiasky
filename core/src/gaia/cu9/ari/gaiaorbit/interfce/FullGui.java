@@ -78,7 +78,7 @@ public class FullGui extends AbstractGui {
 
     @Override
     public void doneLoading(AssetManager assetManager) {
-        logger.info(txt("notif.gui.init"));
+        logger.info(I18n.txt("notif.gui.init"));
 
         skin = GlobalResources.skin;
         interfaces = new Array<IGuiInterface>();
@@ -180,13 +180,13 @@ public class FullGui extends AbstractGui {
                             ui.addActor(newVersion);
                         } else {
                             // No new version
-                            logger.info(txt("gui.newversion.nonew", GlobalConf.program.getLastCheckedString()));
+                            logger.info(I18n.txt("gui.newversion.nonew", GlobalConf.program.getLastCheckedString()));
                         }
 
                     } else {
                         // Handle failed case
                         // Do nothing
-                        logger.info(txt("gui.newversion.fail"));
+                        logger.info(I18n.txt("gui.newversion.fail"));
                     }
                 }
                 return false;
@@ -197,7 +197,7 @@ public class FullGui extends AbstractGui {
             Timer.Task t = new Timer.Task() {
                 @Override
                 public void run() {
-                    logger.info(txt("gui.newversion.checking"));
+                    logger.info(I18n.txt("gui.newversion.checking"));
                     vct.start();
                 }
             };
@@ -444,7 +444,7 @@ public class FullGui extends AbstractGui {
     }
 
     public void addControlsWindow() {
-        controlsWindow = new ControlsWindow(txt("gui.controlpanel"), skin, ui);
+        controlsWindow = new ControlsWindow(I18n.txt("gui.controlpanel"), skin, ui);
         controlsWindow.setSceneGraph(sg);
         controlsWindow.setVisibilityToggles(visibilityEntities, visible);
         controlsWindow.initialize();

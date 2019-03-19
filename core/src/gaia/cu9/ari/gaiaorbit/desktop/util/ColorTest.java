@@ -1,17 +1,14 @@
 package gaia.cu9.ari.gaiaorbit.desktop.util;
 
-import java.awt.Color;
-import java.awt.Graphics;
+import gaia.cu9.ari.gaiaorbit.util.color.ColourUtils;
+import gaia.cu9.ari.gaiaorbit.util.math.MathUtilsd;
+
+import javax.swing.*;
+import java.awt.*;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.awt.image.BufferedImage;
 import java.util.Scanner;
-
-import javax.swing.JComponent;
-import javax.swing.JFrame;
-
-import gaia.cu9.ari.gaiaorbit.util.color.ColourUtils;
-import gaia.cu9.ari.gaiaorbit.util.math.MathUtilsd;
 
 /**
  * Tests the color conversion tools

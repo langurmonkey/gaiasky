@@ -12,6 +12,7 @@ import com.badlogic.gdx.utils.Array;
 import gaia.cu9.ari.gaiaorbit.event.EventManager;
 import gaia.cu9.ari.gaiaorbit.event.Events;
 import gaia.cu9.ari.gaiaorbit.util.GlobalConf;
+import gaia.cu9.ari.gaiaorbit.util.I18n;
 import gaia.cu9.ari.gaiaorbit.util.scene2d.OwnLabel;
 
 /**
@@ -30,12 +31,12 @@ public class ChooseCatalogWindow extends GenericDialog {
     }
 
     public ChooseCatalogWindow(Stage stage, Skin skin, String noticeKey) {
-        super(txt("gui.dschooser.title"), skin, stage);
-        this.notice = txt(noticeKey);
+        super(I18n.txt("gui.dschooser.title"), skin, stage);
+        this.notice = I18n.txt(noticeKey);
         assetsLoc = GlobalConf.ASSETS_LOC;
 
-        setCancelText(txt("gui.exit"));
-        setAcceptText(txt("gui.start"));
+        setCancelText(I18n.txt("gui.exit"));
+        setAcceptText(I18n.txt("gui.start"));
 
         // Build
         buildSuper();

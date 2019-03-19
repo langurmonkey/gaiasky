@@ -5,14 +5,12 @@ import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.utils.Array;
-
 import gaia.cu9.ari.gaiaorbit.event.EventManager;
 import gaia.cu9.ari.gaiaorbit.event.Events;
 import gaia.cu9.ari.gaiaorbit.event.IObserver;
 import gaia.cu9.ari.gaiaorbit.render.ComponentType;
 import gaia.cu9.ari.gaiaorbit.scenegraph.ISceneGraph;
 import gaia.cu9.ari.gaiaorbit.util.ComponentTypes;
-import gaia.cu9.ari.gaiaorbit.util.I18n;
 
 /**
  * Provides general methods and attributes that all GUIs should have
@@ -114,14 +112,6 @@ public abstract class AbstractGui implements IObserver, IGui {
     @Override
     public Actor findActor(String name) {
         return ui.getRoot().findActor(name);
-    }
-
-    protected String txt(String key) {
-        return I18n.bundle.get(key);
-    }
-
-    protected String txt(String key, Object... params) {
-        return I18n.bundle.format(key, params);
     }
 
     @Override

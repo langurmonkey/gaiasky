@@ -1,7 +1,5 @@
 package gaia.cu9.ari.gaiaorbit.data.orbit;
 
-import java.time.Instant;
-
 import gaia.cu9.ari.gaiaorbit.assets.OrbitDataLoader.OrbitDataLoaderParameter;
 import gaia.cu9.ari.gaiaorbit.data.util.PointCloudData;
 import gaia.cu9.ari.gaiaorbit.event.EventManager;
@@ -14,6 +12,8 @@ import gaia.cu9.ari.gaiaorbit.util.coord.AstroUtils;
 import gaia.cu9.ari.gaiaorbit.util.math.MathUtilsd;
 import gaia.cu9.ari.gaiaorbit.util.math.Matrix4d;
 import gaia.cu9.ari.gaiaorbit.util.math.Vector3d;
+
+import java.time.Instant;
 
 /**
  * Reads an orbit file into an OrbitData object.

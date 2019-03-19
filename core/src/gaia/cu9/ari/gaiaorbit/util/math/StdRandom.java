@@ -47,9 +47,9 @@ package gaia.cu9.ari.gaiaorbit.util.math;
  *
  ******************************************************************************/
 
-import java.util.Random;
-
 import com.badlogic.gdx.utils.TimeUtils;
+
+import java.util.Random;
 
 /**
  *  The {@code StdRandom} class provides static methods for generating

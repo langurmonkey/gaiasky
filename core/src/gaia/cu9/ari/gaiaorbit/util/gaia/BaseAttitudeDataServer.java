@@ -19,11 +19,11 @@
  */
 package gaia.cu9.ari.gaiaorbit.util.gaia;
 
-import java.util.Date;
-
 import gaia.cu9.ari.gaiaorbit.util.Nature;
 import gaia.cu9.ari.gaiaorbit.util.coord.AstroUtils;
 import gaia.cu9.ari.gaiaorbit.util.gaia.time.TimeContext;
+
+import java.util.Date;
 
 /**
  * Common base class for all attitude data servers. This holds all common fields

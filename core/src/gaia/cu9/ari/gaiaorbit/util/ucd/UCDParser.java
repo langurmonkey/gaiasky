@@ -61,17 +61,17 @@ public class UCDParser {
 
     public UCDParser() {
         super();
-        ucdmap = new HashMap<UCDType, Set<UCD>>();
-        ID = new HashSet<UCD>();
-        NAME = new HashSet<UCD>();
-        POS1 = new HashSet<UCD>();
-        POS2 = new HashSet<UCD>();
-        POS3 = new HashSet<UCD>();
-        MAG = new HashSet<UCD>();
-        COL = new HashSet<UCD>();
-        PMRA = new HashSet<UCD>();
-        PMDEC = new HashSet<UCD>();
-        RADVEL = new HashSet<UCD>();
+        ucdmap = new HashMap<>();
+        ID = new HashSet<>();
+        NAME = new HashSet<>();
+        POS1 = new HashSet<>();
+        POS2 = new HashSet<>();
+        POS3 = new HashSet<>();
+        MAG = new HashSet<>();
+        COL = new HashSet<>();
+        PMRA = new HashSet<>();
+        PMDEC = new HashSet<>();
+        RADVEL = new HashSet<>();
     }
 
     /**

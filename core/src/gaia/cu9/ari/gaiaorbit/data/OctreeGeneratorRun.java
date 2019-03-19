@@ -34,7 +34,10 @@ import gaia.cu9.ari.gaiaorbit.util.tree.OctreeNode;
 import java.io.*;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
-import java.util.*;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * Generates an octree of star groups. Each octant should have only one object,

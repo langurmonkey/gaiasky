@@ -16,10 +16,10 @@ package gaia.cu9.ari.gaiaorbit.util.math;
  * the License.
  ******************************************************************************/
 
+import com.badlogic.gdx.math.collision.BoundingBox;
+
 import java.io.Serializable;
 import java.util.List;
-
-import com.badlogic.gdx.math.collision.BoundingBox;
 
 /**
  * Encapsulates an axis aligned bounding box represented by a minimum and a

@@ -1,9 +1,9 @@
 package gaia.cu9.ari.gaiaorbit.util.gaia;
 
+import gaia.cu9.ari.gaiaorbit.util.LruCache;
+
 import java.util.Date;
 import java.util.Map;
-
-import gaia.cu9.ari.gaiaorbit.util.LruCache;
 
 /**
  * A bean that holds the attitude and its activation time.

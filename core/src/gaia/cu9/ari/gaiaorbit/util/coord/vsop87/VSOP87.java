@@ -1,14 +1,13 @@
 package gaia.cu9.ari.gaiaorbit.util.coord.vsop87;
 
-import java.util.HashMap;
-import java.util.Map;
-
 import com.badlogic.gdx.utils.reflect.ClassReflection;
 import com.badlogic.gdx.utils.reflect.ReflectionException;
-
-import gaia.cu9.ari.gaiaorbit.util.TextUtils;
 import gaia.cu9.ari.gaiaorbit.util.Logger;
 import gaia.cu9.ari.gaiaorbit.util.Logger.Log;
+import gaia.cu9.ari.gaiaorbit.util.TextUtils;
+
+import java.util.HashMap;
+import java.util.Map;
 
 public class VSOP87 {
     private static final Log logger = Logger.getLogger(VSOP87.class);

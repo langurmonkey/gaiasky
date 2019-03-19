@@ -3,6 +3,7 @@ package gaia.cu9.ari.gaiaorbit.interfce;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import gaia.cu9.ari.gaiaorbit.util.GlobalConf;
+import gaia.cu9.ari.gaiaorbit.util.I18n;
 import gaia.cu9.ari.gaiaorbit.util.scene2d.OwnLabel;
 import gaia.cu9.ari.gaiaorbit.util.scene2d.OwnTextField;
 import gaia.cu9.ari.gaiaorbit.util.validator.LengthValidator;
@@ -18,8 +19,8 @@ public class FileNameWindow extends GenericDialog{
         setModal(true);
         this.defaultName = defaultName;
 
-        setAcceptText(txt("gui.ok"));
-        setCancelText(txt("gui.cancel"));
+        setAcceptText(I18n.txt("gui.ok"));
+        setCancelText(I18n.txt("gui.cancel"));
 
         buildSuper();
 

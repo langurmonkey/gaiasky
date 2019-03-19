@@ -17,12 +17,8 @@ package gaia.cu9.ari.gaiaorbit.util.scene2d;
  ******************************************************************************/
 
 import com.badlogic.gdx.scenes.scene2d.Actor;
-import com.badlogic.gdx.scenes.scene2d.ui.Label;
-import com.badlogic.gdx.scenes.scene2d.ui.Skin;
+import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.scenes.scene2d.ui.TextTooltip.TextTooltipStyle;
-import com.badlogic.gdx.scenes.scene2d.ui.Tooltip;
-import com.badlogic.gdx.scenes.scene2d.ui.TooltipManager;
-import com.badlogic.gdx.scenes.scene2d.ui.Value;
 
 /** A tooltip that shows a label.
  * @author Nathan Sweet */

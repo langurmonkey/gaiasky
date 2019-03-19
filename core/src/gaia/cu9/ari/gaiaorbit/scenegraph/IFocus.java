@@ -10,6 +10,7 @@ import gaia.cu9.ari.gaiaorbit.util.math.Quaterniond;
 import gaia.cu9.ari.gaiaorbit.util.math.Vector2d;
 import gaia.cu9.ari.gaiaorbit.util.math.Vector3d;
 import gaia.cu9.ari.gaiaorbit.util.time.ITimeFrameProvider;
+import gaia.cu9.ari.gaiaorbit.util.tree.OctreeNode;
 
 /**
  * Contract that all focus objects must implement
@@ -271,6 +272,13 @@ public interface IFocus {
      * @return The depth of the scene graph
      */
     int getSceneGraphDepth();
+
+    /**
+     * Gets the octant this focus belongs to, if any. This will return null
+     * if this focus is not part of an octree
+     * @return The octant this focus belongs to. Null if it is not part of an octree
+     */
+    OctreeNode getOctant();
 
     /**
      * Whether this is a copy or not

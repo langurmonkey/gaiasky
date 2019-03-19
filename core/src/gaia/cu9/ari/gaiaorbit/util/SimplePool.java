@@ -2,12 +2,7 @@ package gaia.cu9.ari.gaiaorbit.util;
 
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.Pool;
-
-import gaia.cu9.ari.gaiaorbit.scenegraph.Gaia;
-import gaia.cu9.ari.gaiaorbit.scenegraph.Particle;
-import gaia.cu9.ari.gaiaorbit.scenegraph.Planet;
-import gaia.cu9.ari.gaiaorbit.scenegraph.SceneGraphNode;
-import gaia.cu9.ari.gaiaorbit.scenegraph.Star;
+import gaia.cu9.ari.gaiaorbit.scenegraph.*;
 import gaia.cu9.ari.gaiaorbit.scenegraph.octreewrapper.OctreeWrapper;
 import gaia.cu9.ari.gaiaorbit.util.math.Matrix4d;
 import gaia.cu9.ari.gaiaorbit.util.math.Vector2d;

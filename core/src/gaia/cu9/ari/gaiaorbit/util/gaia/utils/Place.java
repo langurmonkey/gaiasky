@@ -1,9 +1,9 @@
 package gaia.cu9.ari.gaiaorbit.util.gaia.utils;
 
-import java.util.Random;
-
 import gaia.cu9.ari.gaiaorbit.util.coord.Coordinates;
 import gaia.cu9.ari.gaiaorbit.util.math.Vector3d;
+
+import java.util.Random;
 
 /**
  * Specifies a celestial position

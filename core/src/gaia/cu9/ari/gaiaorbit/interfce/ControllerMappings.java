@@ -1,11 +1,10 @@
 package gaia.cu9.ari.gaiaorbit.interfce;
 
+import com.badlogic.gdx.files.FileHandle;
+import gaia.cu9.ari.gaiaorbit.util.Logger;
+
 import java.io.InputStream;
 import java.util.Properties;
-
-import com.badlogic.gdx.files.FileHandle;
-
-import gaia.cu9.ari.gaiaorbit.util.Logger;
 
 /**
  * Reads controller mappings from a file

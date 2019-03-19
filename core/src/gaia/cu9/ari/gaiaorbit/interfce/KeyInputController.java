@@ -1,16 +1,15 @@
 package gaia.cu9.ari.gaiaorbit.interfce;
 
-import java.util.HashSet;
-import java.util.Set;
-
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.InputAdapter;
-
 import gaia.cu9.ari.gaiaorbit.event.EventManager;
 import gaia.cu9.ari.gaiaorbit.event.Events;
 import gaia.cu9.ari.gaiaorbit.interfce.KeyBindings.ProgramAction;
 import gaia.cu9.ari.gaiaorbit.util.GlobalConf;
+
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * This input controller connects the input events with the key binding actions

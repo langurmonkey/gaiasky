@@ -1,8 +1,8 @@
 package gaia.cu9.ari.gaiaorbit.util.update;
 
-import java.time.Instant;
-
 import com.badlogic.gdx.scenes.scene2d.Event;
+
+import java.time.Instant;
 
 public class VersionCheckEvent extends Event {
     private final String tag;

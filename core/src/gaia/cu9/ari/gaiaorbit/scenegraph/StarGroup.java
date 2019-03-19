@@ -55,9 +55,8 @@ import java.util.concurrent.*;
 /**
  * A particle group which additionally to the xyz position, supports color and
  * magnitude. id x y z pmx pmy pmz appmag absmag col size additional
- * 
- * @author tsagrista
  *
+ * @author tsagrista
  */
 public class StarGroup extends ParticleGroup implements ILineRenderable, IStarFocus, IQuadRenderable, IModelRenderable, IObserver {
 
@@ -253,6 +252,7 @@ public class StarGroup extends ParticleGroup implements ILineRenderable, IStarFo
      */
     private static ThreadPoolExecutor pool;
     private static BlockingQueue<Runnable> workQueue;
+
     static {
         workQueue = new LinkedBlockingQueue<Runnable>();
         int nthreads = !GlobalConf.performance.MULTITHREADING ? 1 : Math.max(1, GlobalConf.performance.NUMBER_THREADS() - 1);
@@ -370,7 +370,7 @@ public class StarGroup extends ParticleGroup implements ILineRenderable, IStarFo
 
     /**
      * Returns the data list
-     * 
+     *
      * @return The data list
      */
     @SuppressWarnings("unchecked")
@@ -470,11 +470,9 @@ public class StarGroup extends ParticleGroup implements ILineRenderable, IStarFo
 
     /**
      * Updates the parameters of the focus, if the focus is active in this group
-     * 
-     * @param time
-     *            The time frame provider
-     * @param camera
-     *            The current camera
+     *
+     * @param time   The time frame provider
+     * @param camera The current camera
      */
     public void updateFocus(ITimeFrameProvider time, ICamera camera) {
         StarBean focus = (StarBean) pointData.get(focusIndex);
@@ -490,7 +488,6 @@ public class StarGroup extends ParticleGroup implements ILineRenderable, IStarFo
     /**
      * Overrides {@link ParticleGroup}'s implementation by actually integrating
      * the position using the proper motion and the given time.
-     * 
      */
     public Vector3d getPredictedPosition(Vector3d aux, ITimeFrameProvider time, ICamera camera, boolean force) {
         if (time.getDt() == 0 && !force) {
@@ -503,7 +500,7 @@ public class StarGroup extends ParticleGroup implements ILineRenderable, IStarFo
 
     /**
      * Updates the additional information array, to use for sorting.
-     * 
+     *
      * @param camera
      */
     public void updateAdditional(ITimeFrameProvider time, ICamera camera) {
@@ -830,9 +827,8 @@ public class StarGroup extends ParticleGroup implements ILineRenderable, IStarFo
 
     /**
      * Returns the size of the particle at index i
-     * 
-     * @param i
-     *            The index
+     *
+     * @param i The index
      * @return The size
      */
     public double getSize(int i) {
@@ -841,9 +837,8 @@ public class StarGroup extends ParticleGroup implements ILineRenderable, IStarFo
 
     /**
      * Uses whatever precomputed value is in index 8 to compare the values
-     * 
-     * @author tsagrista
      *
+     * @author tsagrista
      */
     private class StarGroupComparator implements Comparator<Integer> {
         @Override
@@ -970,7 +965,6 @@ public class StarGroup extends ParticleGroup implements ILineRenderable, IStarFo
         return this;
     }
 
-
     public Vector3d getAbsolutePosition(String name, Vector3d aux) {
         if (index.containsKey(name)) {
             int idx = index.get(name, 0);
@@ -999,9 +993,8 @@ public class StarGroup extends ParticleGroup implements ILineRenderable, IStarFo
 
     /**
      * Sets the epoch to use for the stars in this group
-     * 
-     * @param epochJd
-     *            The epoch in julian days (days since January 1, 4713 BCE)
+     *
+     * @param epochJd The epoch in julian days (days since January 1, 4713 BCE)
      */
     public void setEpoch(Double epochJd) {
         this.epoch_jd = epochJd;
@@ -1009,7 +1002,7 @@ public class StarGroup extends ParticleGroup implements ILineRenderable, IStarFo
 
     /**
      * Returns the epoch in Julian Days used for the stars in this group
-     * 
+     *
      * @return The epoch in julian days
      */
     public Double getEpoch() {
@@ -1048,7 +1041,7 @@ public class StarGroup extends ParticleGroup implements ILineRenderable, IStarFo
             try {
                 // Wait for task to end before proceeding
                 pool.awaitTermination(500, TimeUnit.MILLISECONDS);
-            }catch(Exception e){
+            } catch (Exception e) {
                 Logger.getLogger(this.getClass().getSimpleName()).error(e);
             }
         }
@@ -1066,5 +1059,27 @@ public class StarGroup extends ParticleGroup implements ILineRenderable, IStarFo
     @Override
     public float getLineWidth() {
         return 1;
+    }
+
+    /**
+     * Creates a default star group with some sane parameters, given the name and the data
+     *
+     * @param name The name of the star group
+     * @param data The data of the star group
+     * @return A new star group with sane parameters
+     */
+    public static StarGroup getDefaultStarGroup(String name, Array<StarBean> data) {
+        StarGroup sg = new StarGroup();
+        sg.setName(name);
+        sg.setParent("Universe");
+        sg.setFadeout(new double[] { 21e2, 1e5 });
+        sg.setLabelcolor(new double[] { 1.0, 1.0, 1.0, 1.0 });
+        sg.setColor(new double[] { 1.0, 1.0, 1.0, 0.25 });
+        sg.setSize(6.0);
+        sg.setLabelposition(new double[] { 0.0, -5.0e7, -4e8 });
+        sg.setCt("Stars");
+        sg.setData(data);
+        sg.doneLoading(null);
+        return sg;
     }
 }

@@ -1,9 +1,9 @@
 package gaia.cu9.ari.gaiaorbit.util.coord;
 
-import java.time.Instant;
-
 import gaia.cu9.ari.gaiaorbit.util.Constants;
 import gaia.cu9.ari.gaiaorbit.util.math.Vector3d;
+
+import java.time.Instant;
 
 /**
  * Coordinates of the Moon given by the algorithm in Jean Meeus' Astronomical

@@ -1,13 +1,13 @@
 package gaia.cu9.ari.gaiaorbit.util.gaia;
 
-import java.util.Date;
-
 import gaia.cu9.ari.gaiaorbit.util.BinarySearchTree;
 import gaia.cu9.ari.gaiaorbit.util.GlobalConf;
 import gaia.cu9.ari.gaiaorbit.util.I18n;
 import gaia.cu9.ari.gaiaorbit.util.Logger;
 import gaia.cu9.ari.gaiaorbit.util.Logger.Log;
 import gaia.cu9.ari.gaiaorbit.util.math.Quaterniond;
+
+import java.util.Date;
 
 /**
  * Provides caching of the last Nsl37 attitude requested. This allows for

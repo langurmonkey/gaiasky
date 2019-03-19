@@ -1,13 +1,12 @@
 package gaia.cu9.ari.gaiaorbit.data.octreegen.generator;
 
-import java.util.Comparator;
-
 import com.badlogic.gdx.utils.Array;
-
 import gaia.cu9.ari.gaiaorbit.data.octreegen.StarBrightnessComparator;
 import gaia.cu9.ari.gaiaorbit.scenegraph.StarGroup;
 import gaia.cu9.ari.gaiaorbit.scenegraph.StarGroup.StarBean;
 import gaia.cu9.ari.gaiaorbit.util.tree.OctreeNode;
+
+import java.util.Comparator;
 
 public class BrightestStarsSimple implements IAggregationAlgorithm {
     /** Maximum number of objects in the densest node of a level **/

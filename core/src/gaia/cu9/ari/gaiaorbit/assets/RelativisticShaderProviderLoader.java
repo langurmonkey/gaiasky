@@ -8,7 +8,6 @@ import com.badlogic.gdx.assets.loaders.AsynchronousAssetLoader;
 import com.badlogic.gdx.assets.loaders.FileHandleResolver;
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.utils.Array;
-
 import gaia.cu9.ari.gaiaorbit.util.override.RelativisticShaderProvider;
 
 public class RelativisticShaderProviderLoader<T extends RelativisticShaderProviderLoader.RelativisticShaderProviderParameter> extends AsynchronousAssetLoader<RelativisticShaderProvider, T> {

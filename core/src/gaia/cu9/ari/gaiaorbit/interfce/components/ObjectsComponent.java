@@ -58,7 +58,7 @@ public class ObjectsComponent extends GuiComponent implements IObserver {
         searchBox = new OwnTextField("", skin);
         searchBox.setName("search box");
         searchBox.setWidth(componentWidth);
-        searchBox.setMessageText(txt("gui.objects.search"));
+        searchBox.setMessageText(I18n.txt("gui.objects.search"));
         searchBox.addListener(event -> {
             if (event instanceof InputEvent) {
                 InputEvent ie = (InputEvent) event;
@@ -100,7 +100,7 @@ public class ObjectsComponent extends GuiComponent implements IObserver {
 
         treeToModel = new TwoWayHashmap<SceneGraphNode, Node>();
 
-        logger.info(txt("notif.sgtree.init"));
+        logger.info(I18n.txt("notif.sgtree.init"));
 
         if (tree) {
             final Tree objectsTree = new Tree(skin, "bright");
@@ -186,7 +186,7 @@ public class ObjectsComponent extends GuiComponent implements IObserver {
             });
             objectsList = focusList;
         }
-        logger.info(txt("notif.sgtree.initialised"));
+        logger.info(I18n.txt("notif.sgtree.initialised"));
 
         if (tree || list) {
             focusListScrollPane = new OwnScrollPane(objectsList, skin, "minimalist");
@@ -202,12 +202,12 @@ public class ObjectsComponent extends GuiComponent implements IObserver {
         /*
          * MESHES
          */
-        Group meshesGroup = visibilitySwitcher(MeshObject.class, txt("gui.meshes"), "meshes");
+        Group meshesGroup = visibilitySwitcher(MeshObject.class, I18n.txt("gui.meshes"), "meshes");
 
         /*
          * CONSTELLATIONS
          */
-        Group constelGroup = visibilitySwitcher(Constellation.class, txt("element.constellations"), "constellation");
+        Group constelGroup = visibilitySwitcher(Constellation.class, I18n.txt("element.constellations"), "constellation");
 
         /*
          * ADD TO CONTENT
@@ -296,7 +296,7 @@ public class ObjectsComponent extends GuiComponent implements IObserver {
 
         HorizontalGroup buttons = new HorizontalGroup();
         buttons.space(sp4);
-        OwnTextButton selAll = new OwnTextButton(txt("gui.select.all"), skin);
+        OwnTextButton selAll = new OwnTextButton(I18n.txt("gui.select.all"), skin);
         selAll.addListener((event) -> {
             if (event instanceof ChangeEvent) {
                 Gdx.app.postRunnable(() -> {
@@ -306,7 +306,7 @@ public class ObjectsComponent extends GuiComponent implements IObserver {
             }
             return false;
         });
-        OwnTextButton selNone = new OwnTextButton(txt("gui.select.none"), skin);
+        OwnTextButton selNone = new OwnTextButton(I18n.txt("gui.select.none"), skin);
         selNone.addListener((event) -> {
             if (event instanceof ChangeEvent) {
                 Gdx.app.postRunnable(() -> {

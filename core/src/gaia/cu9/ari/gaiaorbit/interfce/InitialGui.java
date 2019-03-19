@@ -10,10 +10,7 @@ import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import gaia.cu9.ari.gaiaorbit.desktop.util.SysUtils;
 import gaia.cu9.ari.gaiaorbit.event.EventManager;
 import gaia.cu9.ari.gaiaorbit.event.Events;
-import gaia.cu9.ari.gaiaorbit.util.DownloadHelper;
-import gaia.cu9.ari.gaiaorbit.util.GlobalConf;
-import gaia.cu9.ari.gaiaorbit.util.GlobalResources;
-import gaia.cu9.ari.gaiaorbit.util.Logger;
+import gaia.cu9.ari.gaiaorbit.util.*;
 import gaia.cu9.ari.gaiaorbit.util.Logger.Log;
 import gaia.cu9.ari.gaiaorbit.util.scene2d.Link;
 import gaia.cu9.ari.gaiaorbit.util.scene2d.OwnLabel;
@@ -153,7 +150,7 @@ public class InitialGui extends AbstractGui {
     }
 
     private void addExitWindow() {
-        GenericDialog exitw = new GenericDialog(txt("notif.error", "No internet connection"), skin, ui) {
+        GenericDialog exitw = new GenericDialog(I18n.txt("notif.error", "No internet connection"), skin, ui) {
 
             @Override
             protected void build() {
@@ -174,7 +171,7 @@ public class InitialGui extends AbstractGui {
             }
 
         };
-        exitw.setAcceptText(txt("gui.exit"));
+        exitw.setAcceptText(I18n.txt("gui.exit"));
         exitw.setCancelText(null);
         exitw.buildSuper();
         exitw.show(ui);
