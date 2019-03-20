@@ -119,13 +119,13 @@ public abstract class AbstractStarGroupDataProvider implements IStarGroupDataPro
      * @param elems
      */
     protected void initLists(int elems) {
-        list = new Array<StarBean>(elems);
+        list = new Array<>(elems);
     }
 
     protected void initLists() {
         initLists(1000);
-        sphericalPositions = new LongMap<double[]>();
-        colors = new LongMap<float[]>();
+        sphericalPositions = new LongMap<>();
+        colors = new LongMap<>();
     }
 
     /**

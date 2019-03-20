@@ -18,12 +18,16 @@ import gaia.cu9.ari.gaiaorbit.util.units.Position;
 import gaia.cu9.ari.gaiaorbit.util.units.Position.PositionType;
 import gaia.cu9.ari.gaiaorbit.util.units.Quantity.Angle;
 import gaia.cu9.ari.gaiaorbit.util.units.Quantity.Angle.AngleUnit;
+import uk.ac.starlink.table.RowSequence;
 import uk.ac.starlink.table.StarTable;
 import uk.ac.starlink.table.StarTableFactory;
+import uk.ac.starlink.table.formats.AsciiTableBuilder;
+import uk.ac.starlink.table.formats.CsvTableBuilder;
 import uk.ac.starlink.util.DataSource;
 import uk.ac.starlink.util.FileDataSource;
 
 import java.io.InputStream;
+import java.util.List;
 import java.util.Set;
 import java.util.logging.Level;
 
@@ -109,16 +113,24 @@ public class STILDataProvider extends AbstractStarGroupDataProvider {
     public Array<? extends ParticleBean> loadData(DataSource ds, double factor) {
 
         try {
+            // Add extra builders
+            List builders = factory.getDefaultBuilders();
+            builders.add(new CsvTableBuilder());
+            builders.add(new AsciiTableBuilder());
+
+            // Try to load
             StarTable table = factory.makeStarTable(ds);
+
             initLists((int) table.getRowCount());
 
             UCDParser ucdp = new UCDParser();
             ucdp.parse(table);
 
             if (ucdp.haspos) {
-                long rowcount = table.getRowCount();
-                for (long i = 0; i < rowcount; i++) {
-                    Object[] row = table.getRow(i);
+                int i = 0;
+                RowSequence rs = table.getRowSequence();
+                while(rs.next()){
+                    Object[] row = rs.getRow();
                     boolean skip = false;
                     try {
                         /* POSITION */
@@ -283,7 +295,7 @@ public class STILDataProvider extends AbstractStarGroupDataProvider {
                         logger.debug(e);
                         logger.debug("Exception parsing row " + i + ": skipping");
                     }
-
+                    i++;
                 }
             } else {
                 logger.error("Table not loaded: Position not found");
