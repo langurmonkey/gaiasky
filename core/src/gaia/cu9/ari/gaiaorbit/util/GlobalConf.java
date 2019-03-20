@@ -39,7 +39,7 @@ public class GlobalConf {
     public static final String APPLICATION_SHORT_NAME = "gaiasky";
     public static final String WEBPAGE = "https://www.zah.uni-heidelberg.de/gaia/outreach/gaiasky";
     public static final String WEBPAGE_DOWNLOADS = "https://www.zah.uni-heidelberg.de/gaia/outreach/gaiasky/downloads";
-    public static final String DOCUMENTATION = "http://gaia-sky.rtfd.io";
+    public static final String DOCUMENTATION = "http://gaia.ari.uni-heidelberg.de/gaiasky/docs/html/latest";
     public static final String ICON_URL = "https://github.com/langurmonkey/gaiasky/blob/master/assets/icon/gs_064.png?raw=true";
     public static final String AUTHOR_NAME = "Toni Sagrista Selles";
     public static final String AUTHOR_EMAIL = "tsagrista@ari.uni-heidelberg.de";
