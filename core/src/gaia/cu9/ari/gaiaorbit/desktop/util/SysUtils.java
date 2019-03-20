@@ -207,6 +207,14 @@ public class SysUtils {
         }
     }
 
+    public static File getHomeDir() {
+        return new File(System.getProperty("user.home"));
+    }
+
+    public static String getHomeDirString() {
+        return System.getProperty("user.home");
+    }
+
     public static File getConfigDir() {
         if (isLinux()) {
             return new File(getXdgConfigHome(), GAIASKY_DIR_NAME + File.separator);

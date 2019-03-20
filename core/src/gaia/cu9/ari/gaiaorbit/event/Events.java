@@ -455,6 +455,7 @@ public enum Events {
     SHOW_ABOUT_ACTION,
     SHOW_LOG_ACTION,
     SHOW_TUTORIAL_ACTION,
+    SHOW_LOAD_CATALOG_ACTION,
     SHOW_PREFERENCES_ACTION,
     SHOW_LAND_AT_LOCATION_ACTION,
     /**
@@ -682,6 +683,12 @@ public enum Events {
      * whether to add the object to the scene graph index. Defaults to true.
      **/
     SCENE_GRAPH_ADD_OBJECT_CMD,
+
+    /**
+     * Sends an object to be added to a scene graph, without using a post runnable. Contains the object and an optional
+     * Boolean indicating whether to add the object to the scene graph index. Defaults to true.
+     */
+    SCENE_GRAPH_ADD_OBJECT_NO_POST_CMD,
     /**
      * Removes an object from the scene graph. Contains the name of the object or the object itself plus and optional
      * Boolean indicating whether to remove it from the index. Defaults to true.

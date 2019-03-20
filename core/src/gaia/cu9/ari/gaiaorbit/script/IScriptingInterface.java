@@ -1423,9 +1423,10 @@ public interface IScriptingInterface {
 
     /**
      * Loads a VOTable file (<code>.vot</code>) with a given name.
-     * The loading happens synchronously but the insertion of the catalog into the scene graph
-     * happens asynchronously, so it is usually not the case that the catalog is available to Gaia Sky immediately after
-     * this call returns. Usually a few milliseconds need to pass for it to be completely loaded.
+     * In this version, the loading happens synchronously but the insertion of the catalog into the scene graph
+     * is delayed until the end of the current frame, so it is usually not the case that the catalog is available to Gaia Sky immediately after
+     * this call returns. Use {@link IScriptingInterface#sleepFrames(int)} after calling this to wait for one or two
+     * frames to make sure the data is available.
      * The loading process is carried out
      * making educated guesses about semantics using UCDs and column names.
      * Please check <a href="http://gaia.ari.uni-heidelberg.de/gaiasky/docs/html/latest/SAMP.html#stil-data-provider">the
@@ -1438,6 +1439,27 @@ public interface IScriptingInterface {
      * @return False if the dataset could not be loaded, true otherwise
      */
     boolean loadDataset(String dsName, String absolutePath);
+
+    /**
+     * Loads a VOTable file (<code>.vot</code>) with a given name.
+     * The call can be made synchronous or asynchronous.<br/>
+     * If <code>async</code> is false, the call acts exactly like
+     * {@link IScriptingInterface#loadDataset(String, String)}.<br/>
+     * If <code>async</code> is true, the loading happens
+     * in a new thread and the call returns immediately. In this case, you can use {@link IScriptingInterface#hasDataset(String)}
+     * to check whether the dataset is already loaded and available.
+     * making educated guesses about semantics using UCDs and column names.
+     * Please check <a href="http://gaia.ari.uni-heidelberg.de/gaiasky/docs/html/latest/SAMP.html#stil-data-provider">the
+     * official documentation</a> for a complete reference on what can and what can't be loaded.
+     *
+     * @param dsName       The name of the dataset, used to identify the subsequent operations on the
+     *                     dataset
+     * @param absolutePath Absolute path to the <code>.vot</code> file to load
+     * @param async        Whether the load must happen synchronously or asynchronously
+     *
+     * @return False if the dataset could not be loaded (sync mode). True if it could not be loaded (sync mode), or <code>async</code> is true
+     */
+    boolean loadDataset(String dsName, String absolutePath, boolean async);
 
     /**
      * Removes the dataset identified by the given name, if it exists
@@ -1462,6 +1484,13 @@ public interface IScriptingInterface {
      * @return A list with all the names of the loaded datasets
      */
     List<String> listDatasets();
+
+    /**
+     * Checks whether the dataset identified by the given name is loaded
+     * @param dsName The name of the dataset to query
+     * @return True if the dataset is loaded, false otherwise
+     */
+    boolean hasDataset(String dsName);
 
     /**
      * Shows (un-hides) the dataset identified by the given name, if it exists and is hidden

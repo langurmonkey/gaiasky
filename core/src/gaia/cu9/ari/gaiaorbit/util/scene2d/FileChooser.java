@@ -2,12 +2,10 @@ package gaia.cu9.ari.gaiaorbit.util.scene2d;
 
 import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.files.FileHandle;
-import com.badlogic.gdx.scenes.scene2d.Action;
-import com.badlogic.gdx.scenes.scene2d.Actor;
-import com.badlogic.gdx.scenes.scene2d.InputEvent;
+import com.badlogic.gdx.scenes.scene2d.*;
 import com.badlogic.gdx.scenes.scene2d.InputEvent.Type;
-import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.*;
+import com.badlogic.gdx.scenes.scene2d.utils.ArraySelection;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.utils.Align;
@@ -26,20 +24,31 @@ public class FileChooser extends Dialog {
         boolean result(boolean success, FileHandle result);
     }
 
-    private final Skin skin;
+    /**
+     * The type of files that can be choosen with this file chooser
+     */
+    public enum FileChooserTarget {FILES, DIRECTORIES, ALL}
+
+    /** Target of this file chooser **/
+    private FileChooserTarget target = FileChooserTarget.ALL;
     private boolean fileNameEnabled;
     private final TextField fileNameInput;
-    private final Label fileNameLabel;
+    private final Label fileNameLabel, acceptedFiles;
     private final FileHandle baseDir;
     private final Label fileListLabel;
     private final List<FileListItem> fileList;
     private final HorizontalGroup driveButtonsList;
     private final Array<TextButton> driveButtons;
+    private final ScrollPane scrollPane;
+    private final CheckBox hidden;
 
     private FileHandle currentDir;
     protected String result;
 
+    private boolean showHidden = false;
+
     protected ResultListener resultListener;
+    protected EventListener selectionListener;
 
     private final TextButton ok;
     private final TextButton cancel;
@@ -56,13 +65,23 @@ public class FileChooser extends Dialog {
         }
         return 1;
     };
-    private FileFilter filter = pathname -> true;
+    /** Filters files that appear in the file chooser. For internal use only! **/
+    private FileFilter filter;
+    /** Enables directories in the file chooser **/
     private boolean directoryBrowsingEnabled = true;
+    /** Enables files in the file chooser **/
+    private boolean fileBrowsingEnabled = true;
+    /** Allows setting filters on the files which are to be selected **/
+    private PathnameFilter pathnameFilter;
 
     public FileChooser(String title, final Skin skin, FileHandle baseDir) {
+        this(title, skin, baseDir, null);
+    }
+
+    public FileChooser(String title, final Skin skin, FileHandle baseDir, EventListener selectionListener) {
         super(title, skin);
-        this.skin = skin;
         this.baseDir = baseDir;
+        this.selectionListener = selectionListener;
 
         final Table content = getContentTable();
         content.top().left();
@@ -91,12 +110,53 @@ public class FileChooser extends Dialog {
         fileListLabel = new Label("", skin);
         fileListLabel.setAlignment(Align.left);
 
+        acceptedFiles = new Label("", skin);
+        acceptedFiles.setAlignment(Align.right);
+
         fileList = new List<>(skin, "light");
+        scrollPane = new ScrollPane(fileList, skin);
         fileList.getSelection().setProgrammaticChangeEvents(false);
+        if (selectionListener != null)
+            fileList.addListener(selectionListener);
+        fileList.addListener(event -> {
+            if(event instanceof InputEvent){
+                InputEvent ie = (InputEvent) event;
+                if(ie.getType() == Type.keyTyped){
+                    char ch = ie.getCharacter();
+                    Array<FileListItem> l = fileList.getItems();
+                    FileListItem toSelect = null;
+                    for(FileListItem fli : l){
+                        if(Character.toUpperCase(fli.name.charAt(0)) == Character.toUpperCase(ch)){
+                            toSelect = fli;
+                            break;
+                        }
+                    }
+                    if(toSelect != null){
+                        fileList.setSelected(toSelect);
+                        int si = fileList.getSelectedIndex();
+                        float px = si * fileList.getItemHeight();
+                        scrollPane.setScrollY(px);
+                    }
+                }
+            }
+            return false;
+        });
+
 
         fileNameInput = new TextField("", skin);
         fileNameLabel = new Label("File name:", skin);
         fileNameInput.setTextFieldListener((textField, c) -> result = textField.getText());
+
+        hidden = new OwnCheckBox("Show hidden", skin, 5 * GlobalConf.SCALE_FACTOR);
+        hidden.setChecked(false);
+        hidden.addListener(event -> {
+            if (event instanceof ChangeListener.ChangeEvent) {
+                this.showHidden = hidden.isChecked();
+                changeDirectory(currentDir);
+                return true;
+            }
+            return false;
+        });
 
         getButtonTable().pad(10 * GlobalConf.SCALE_FACTOR);
 
@@ -119,6 +179,15 @@ public class FileChooser extends Dialog {
                 fileNameInput.setText(result);
             }
         });
+
+        filter = pathname -> {
+            boolean root = (pathname.isDirectory() && directoryBrowsingEnabled) || (pathname.isFile() && fileBrowsingEnabled);
+            if (root && pathnameFilter != null && pathname.isFile()) {
+                root = pathnameFilter.accept(pathname);
+            }
+            return root;
+        };
+        setTargetListener();
     }
 
     private void changeDirectory(FileHandle directory) {
@@ -130,7 +199,10 @@ public class FileChooser extends Dialog {
 
         final FileHandle[] list = directory.list(filter);
         for (final FileHandle handle : list) {
-            items.add(new FileListItem(handle));
+            if (showHidden || !handle.name().startsWith(".")) {
+                FileListItem fli = new FileListItem(handle);
+                items.add(fli);
+            }
         }
 
         items.sort(dirListComparator);
@@ -140,7 +212,50 @@ public class FileChooser extends Dialog {
         }
 
         fileList.setSelected(null);
+        ok.setDisabled(true);
         fileList.setItems(items);
+        scrollPane.setScrollY(0);
+    }
+
+    public void setTarget(FileChooserTarget t) {
+        if (t != null) {
+            this.target = t;
+            setTargetListener();
+        }
+    }
+
+    private boolean isTargetOk(File file) {
+        switch (target) {
+        case ALL:
+            return true;
+        case FILES:
+            return file.isFile();
+        case DIRECTORIES:
+            return file.isDirectory();
+        default:
+            return true;
+        }
+    }
+
+    private void setTargetListener() {
+        setSelectionListener(event1 -> {
+            if (event1 instanceof ChangeListener.ChangeEvent) {
+                List<FileChooser.FileListItem> list = (List<FileChooser.FileListItem>) event1.getListenerActor();
+                if (list != null) {
+                    ArraySelection<FileListItem> as = list.getSelection();
+                    if (as != null && as.hasItems()) {
+                        FileChooser.FileListItem selected = as.getLastSelected();
+                        ok.setDisabled(!isTargetOk(selected.file.file()));
+                    }
+                }
+                return true;
+            }
+            return false;
+        });
+    }
+
+    public void setAcceptedFiles(String accepted) {
+        acceptedFiles.setText("Accepted: " + accepted);
     }
 
     public FileHandle getResult() {
@@ -160,13 +275,54 @@ public class FileChooser extends Dialog {
         return new FileHandle(path);
     }
 
+    /**
+     * Overrides the default filter. If you use this, the attributes {@link FileChooser#directoryBrowsingEnabled} and
+     * {@file FileChooser#fileBrowsingEnabled} won't have effect anymore. To set additional filters on the
+     * path names, use {@link FileChooser#setFileFilter(PathnameFilter)} instead.
+     *
+     * @param filter The new file filter
+     * @return This file chooser
+     */
     public FileChooser setFilter(FileFilter filter) {
         this.filter = filter;
         return this;
     }
 
+    /**
+     * Sets the file filter. This filter will be used to check whether file pathnames are accepted or not. It works
+     * in conjunction with {@file FileChooser#fileBrowsingEnabled},
+     * so you do not need to check whether the pathname is a file.
+     *
+     * @param f The file filter
+     * @return This file chooser
+     */
+    public FileChooser setFileFilter(PathnameFilter f) {
+        this.pathnameFilter = f;
+        return this;
+    }
+
     public FileChooser setOkButtonText(String text) {
         this.ok.setText(text);
+        return this;
+    }
+
+    /**
+     * Sets a listener which runs when an entry is selected. Useful to show
+     * some text, disable items, etc.
+     *
+     * @param listener The listener
+     * @return This file chooser
+     */
+    private FileChooser setSelectionListener(EventListener listener) {
+        if (listener != null) {
+            if (this.selectionListener != null)
+                fileList.removeListener(this.selectionListener);
+
+            this.selectionListener = listener;
+            if (!fileList.getListeners().contains(selectionListener, true)) {
+                fileList.addListener(selectionListener);
+            }
+        }
         return this;
     }
 
@@ -185,10 +341,14 @@ public class FileChooser extends Dialog {
         return this;
     }
 
-    public FileChooser disableDirectoryBrowsing() {
-        this.directoryBrowsingEnabled = false;
+    public FileChooser setDirectoryBrowsingEnabled(boolean directoryBrowsingEnabled) {
+        this.directoryBrowsingEnabled = directoryBrowsingEnabled;
         return this;
+    }
 
+    public FileChooser setFileBrowsingEnabled(boolean fileBrowsingEnabled) {
+        this.fileBrowsingEnabled = fileBrowsingEnabled;
+        return this;
     }
 
     long lastClick = 0l;
@@ -196,10 +356,11 @@ public class FileChooser extends Dialog {
     @Override
     public Dialog show(Stage stage, Action action) {
         final Table content = getContentTable();
+        content.add(acceptedFiles).top().left().row();
         content.add(driveButtonsList).top().left().expandX().fillX().row();
         content.add(fileListLabel).top().left().expandX().fillX().row();
-        content.add(new ScrollPane(fileList, skin)).size(300 * GlobalConf.SCALE_FACTOR, 200 * GlobalConf.SCALE_FACTOR).fill().expand().row();
-
+        content.add(scrollPane).size(330 * GlobalConf.SCALE_FACTOR, 200 * GlobalConf.SCALE_FACTOR).left().fill().expand().row();
+        content.add(hidden).top().left().row();
         if (fileNameEnabled) {
             content.add(fileNameLabel).fillX().expandX().row();
             content.add(fileNameInput).fillX().expandX().row();
@@ -280,7 +441,7 @@ public class FileChooser extends Dialog {
         return pick;
     }
 
-    private class FileListItem {
+    public class FileListItem {
 
         public FileHandle file;
         public String name;
@@ -299,6 +460,10 @@ public class FileChooser extends Dialog {
             return name;
         }
 
+    }
+
+    public interface PathnameFilter {
+        boolean accept(File pathname);
     }
 
 }

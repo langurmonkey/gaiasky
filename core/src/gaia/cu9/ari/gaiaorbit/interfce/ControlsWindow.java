@@ -4,8 +4,6 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Texture.TextureWrap;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.scenes.scene2d.Actor;
-import com.badlogic.gdx.scenes.scene2d.Event;
-import com.badlogic.gdx.scenes.scene2d.EventListener;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener.ChangeEvent;
@@ -203,43 +201,34 @@ public class ControlsWindow extends CollapsibleWindow implements IObserver {
         mainActors.add(music);
         panes.put(musicComponent.getClass().getSimpleName(), music);
 
-        Table buttonsTable = null;
+        Table buttonsTable;
         /** BUTTONS **/
         Button preferences = new OwnTextIconButton("", skin, "preferences");
         preferences.setName("preferences");
         preferences.addListener(new TextTooltip(I18n.txt("gui.preferences"), skin));
-        preferences.addListener(new EventListener() {
-            @Override
-            public boolean handle(Event event) {
-                if (event instanceof ChangeEvent) {
-                    EventManager.instance.post(Events.SHOW_PREFERENCES_ACTION);
-                }
-                return false;
+        preferences.addListener(event -> {
+            if (event instanceof ChangeEvent) {
+                EventManager.instance.post(Events.SHOW_PREFERENCES_ACTION);
             }
+            return false;
         });
-        Button tutorial = new OwnTextIconButton("", skin, "tutorial");
-        tutorial.setName("tutorial");
-        tutorial.addListener(new TextTooltip(I18n.txt("gui.tutorial"), skin));
-        tutorial.addListener(new EventListener() {
-            @Override
-            public boolean handle(Event event) {
-                if (event instanceof ChangeEvent) {
-                    EventManager.instance.post(Events.SHOW_TUTORIAL_ACTION);
-                }
-                return false;
+        Button load = new OwnTextIconButton("", skin, "load");
+        load.setName("loadcatalog");
+        load.addListener(new TextTooltip(I18n.txt("gui.loadcatalog"), skin));
+        load.addListener(event -> {
+            if (event instanceof ChangeEvent) {
+                EventManager.instance.post(Events.SHOW_LOAD_CATALOG_ACTION);
             }
+            return false;
         });
         Button about = new OwnTextIconButton("", skin,"help");
         about.setName("about");
         about.addListener(new TextTooltip(I18n.txt("gui.help"), skin));
-        about.addListener(new EventListener() {
-            @Override
-            public boolean handle(Event event) {
-                if (event instanceof ChangeEvent) {
-                    EventManager.instance.post(Events.SHOW_ABOUT_ACTION);
-                }
-                return false;
+        about.addListener(event -> {
+            if (event instanceof ChangeEvent) {
+                EventManager.instance.post(Events.SHOW_ABOUT_ACTION);
             }
+            return false;
         });
         Button showLog = new OwnTextIconButton("", skin, "log");
         showLog.setName("show log");
@@ -252,9 +241,10 @@ public class ControlsWindow extends CollapsibleWindow implements IObserver {
         });
 
         buttonsTable = new Table(skin);
+        buttonsTable.add(load).pad(1).top().left();
         buttonsTable.add(preferences).pad(1).top().left();
-        buttonsTable.add(about).pad(1).top().left();
         buttonsTable.add(showLog).pad(1).top().left();
+        buttonsTable.add(about).pad(1).top().left();
 
         buttonsTable.pack();
 

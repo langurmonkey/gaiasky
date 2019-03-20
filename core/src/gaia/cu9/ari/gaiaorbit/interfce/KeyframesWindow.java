@@ -309,6 +309,9 @@ public class KeyframesWindow extends GenericDialog implements IObserver {
         open.addListener((event) -> {
             if (event instanceof ChangeListener.ChangeEvent) {
                 FileChooser fc = FileChooser.createPickDialog(I18n.txt("gui.download.pickloc"), skin, new FileHandle(SysUtils.getDefaultCameraDir()));
+                fc.setTarget(FileChooser.FileChooserTarget.FILES);
+                fc.setFileFilter(pathname -> pathname.getName().endsWith(".gkf"));
+                fc.setAcceptedFiles("*.gkf");
                 fc.setResultListener((success, result) -> {
                     if (success) {
                         if (result.file().exists() && result.file().isFile()) {
@@ -340,7 +343,6 @@ public class KeyframesWindow extends GenericDialog implements IObserver {
                     return true;
                 });
 
-                fc.setFilter((pathname) -> pathname.isFile() && pathname.getName().endsWith(".gkf"));
                 fc.show(stage);
                 return true;
             }

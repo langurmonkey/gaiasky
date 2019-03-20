@@ -2,12 +2,21 @@ package gaia.cu9.ari.gaiaorbit.interfce;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.InputMultiplexer;
+import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.utils.Array;
+import gaia.cu9.ari.gaiaorbit.desktop.util.SysUtils;
 import gaia.cu9.ari.gaiaorbit.event.EventManager;
 import gaia.cu9.ari.gaiaorbit.event.Events;
 import gaia.cu9.ari.gaiaorbit.event.IObserver;
+import gaia.cu9.ari.gaiaorbit.script.EventScriptingInterface;
+import gaia.cu9.ari.gaiaorbit.util.CatalogInfo;
+import gaia.cu9.ari.gaiaorbit.util.I18n;
+import gaia.cu9.ari.gaiaorbit.util.Logger;
+import gaia.cu9.ari.gaiaorbit.util.scene2d.FileChooser;
+
+import java.io.File;
 
 /**
  * Manages the Graphical User Interfaces of Gaia Sky
@@ -15,14 +24,14 @@ import gaia.cu9.ari.gaiaorbit.event.IObserver;
  * @author tsagrista
  */
 public class GuiRegistry implements IObserver {
-
+    private static final Logger.Log logger = Logger.getLogger(GuiRegistry.class);
     /**
      * Registered GUI array
      **/
     private static Array<IGui> guis;
 
     static {
-        guis = new Array<IGui>(true, 2);
+        guis = new Array<>(true, 2);
     }
 
     /**
@@ -184,13 +193,18 @@ public class GuiRegistry implements IObserver {
     private MinimapWindow minimapWindow;
 
     /**
+     * Last open location
+     */
+    private File lastOpenLocation;
+
+    /**
      * One object to handle observer pattern
      */
     public GuiRegistry(Skin skin) {
         super();
         this.skin = skin;
         // Windows which are visible from any GUI
-        EventManager.instance.subscribe(this, Events.SHOW_QUIT_ACTION, Events.SHOW_ABOUT_ACTION, Events.SHOW_PREFERENCES_ACTION, Events.SHOW_KEYFRAMES_WINDOW_ACTION, Events.UI_THEME_RELOAD_INFO, Events.TOGGLE_MINIMAP);
+        EventManager.instance.subscribe(this, Events.SHOW_QUIT_ACTION, Events.SHOW_ABOUT_ACTION, Events.SHOW_LOAD_CATALOG_ACTION, Events.SHOW_PREFERENCES_ACTION, Events.SHOW_KEYFRAMES_WINDOW_ACTION, Events.UI_THEME_RELOAD_INFO, Events.TOGGLE_MINIMAP);
     }
 
     public void dispose() {
@@ -203,43 +217,78 @@ public class GuiRegistry implements IObserver {
             Stage ui = current.getGuiStage();
             // Treats windows that can appear in any GUI
             switch (event) {
-                case SHOW_QUIT_ACTION:
-                    QuitWindow quit = new QuitWindow(ui, skin);
-                    if(data.length > 0){
-                        quit.setAcceptRunnable((Runnable) data[0]);
+            case SHOW_QUIT_ACTION:
+                QuitWindow quit = new QuitWindow(ui, skin);
+                if (data.length > 0) {
+                    quit.setAcceptRunnable((Runnable) data[0]);
+                }
+                quit.show(ui);
+                break;
+            case SHOW_ABOUT_ACTION:
+                (new AboutWindow(ui, skin)).show(ui);
+                break;
+            case SHOW_PREFERENCES_ACTION:
+                (new PreferencesWindow(ui, skin)).show(ui);
+                break;
+            case SHOW_LOAD_CATALOG_ACTION:
+                if (lastOpenLocation == null) {
+                    lastOpenLocation = SysUtils.getHomeDir();
+                } else if(!lastOpenLocation.exists() || !lastOpenLocation.isDirectory()) {
+                    lastOpenLocation = SysUtils.getHomeDir();
+                }
+
+                FileChooser fc = FileChooser.createPickDialog(I18n.txt("gui.loadcatalog"), skin, new FileHandle(lastOpenLocation));
+                fc.setOkButtonText(I18n.txt("gui.loadcatalog"));
+                fc.setTarget(FileChooser.FileChooserTarget.FILES);
+                fc.setFileFilter(pathname -> pathname.getName().endsWith(".vot") || pathname.getName().endsWith(".csv"));
+                fc.setAcceptedFiles("*.vot, *.csv");
+                fc.setResultListener((success, result) -> {
+                    if (success) {
+                        if (result.file().exists() && result.file().isFile()) {
+                            // Load selected file
+                            try {
+                                EventScriptingInterface.instance().loadDataset(result.file().getName(), result.file().getAbsolutePath(), CatalogInfo.CatalogInfoType.UI, true);
+                                lastOpenLocation = result.file().getParentFile();
+                                return true;
+                            } catch (Exception e) {
+                                logger.error(I18n.txt("notif.error", result.file().getName()), e);
+                                return false;
+                            }
+
+                        } else {
+                            logger.error("Selection must be a file: " + result.file().getAbsolutePath());
+                            return false;
+                        }
                     }
-                    quit.show(ui);
-                    break;
-                case SHOW_ABOUT_ACTION:
-                    (new AboutWindow(ui, skin)).show(ui);
-                    break;
-                case SHOW_PREFERENCES_ACTION:
-                    (new PreferencesWindow(ui, skin)).show(ui);
-                    break;
-                case TOGGLE_MINIMAP:
-                    if (minimapWindow == null)
-                        minimapWindow = new MinimapWindow(ui, skin);
-                    if (!minimapWindow.isVisible() || !minimapWindow.hasParent())
-                        minimapWindow.show(ui, Gdx.graphics.getWidth() - minimapWindow.getWidth(), Gdx.graphics.getHeight() - minimapWindow.getHeight());
-                    else
-                        minimapWindow.hide();
-                    break;
-                case SHOW_KEYFRAMES_WINDOW_ACTION:
-                    if (keyframesWindow == null) {
-                        keyframesWindow = new KeyframesWindow(ui, skin);
-                    }
-                    if (!keyframesWindow.isVisible() || !keyframesWindow.hasParent())
-                        keyframesWindow.show(ui, 0, 0);
-                    break;
-                case UI_THEME_RELOAD_INFO:
-                    if (keyframesWindow != null) {
-                        keyframesWindow.dispose();
-                        keyframesWindow = null;
-                    }
-                    this.skin = (Skin) data[0];
-                    break;
-                default:
-                    break;
+                    return false;
+                });
+
+                fc.show(ui);
+                break;
+            case TOGGLE_MINIMAP:
+                if (minimapWindow == null)
+                    minimapWindow = new MinimapWindow(ui, skin);
+                if (!minimapWindow.isVisible() || !minimapWindow.hasParent())
+                    minimapWindow.show(ui, Gdx.graphics.getWidth() - minimapWindow.getWidth(), Gdx.graphics.getHeight() - minimapWindow.getHeight());
+                else
+                    minimapWindow.hide();
+                break;
+            case SHOW_KEYFRAMES_WINDOW_ACTION:
+                if (keyframesWindow == null) {
+                    keyframesWindow = new KeyframesWindow(ui, skin);
+                }
+                if (!keyframesWindow.isVisible() || !keyframesWindow.hasParent())
+                    keyframesWindow.show(ui, 0, 0);
+                break;
+            case UI_THEME_RELOAD_INFO:
+                if (keyframesWindow != null) {
+                    keyframesWindow.dispose();
+                    keyframesWindow = null;
+                }
+                this.skin = (Skin) data[0];
+                break;
+            default:
+                break;
             }
         }
     }

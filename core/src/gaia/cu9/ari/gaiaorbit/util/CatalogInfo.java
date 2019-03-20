@@ -7,7 +7,7 @@ public class CatalogInfo {
     private static final Log logger =Logger.getLogger(CatalogInfo.class);
 
     public enum CatalogInfoType {
-        INTERNAL, LOD, SAMP, SCRIPT
+        INTERNAL, LOD, SAMP, SCRIPT, UI
     }
 
     public String name;

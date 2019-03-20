@@ -299,6 +299,9 @@
     "preferences": {
       "imageUp": "prefs-icon"
     },
+    "load": {
+      "imageUp": "open-icon"
+    },
     "tutorial": {
       "imageUp": "tutorial-icon"
     },

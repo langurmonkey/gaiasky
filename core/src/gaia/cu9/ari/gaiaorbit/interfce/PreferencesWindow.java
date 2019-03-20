@@ -878,6 +878,8 @@ public class PreferencesWindow extends GenericDialog {
         screenshotsLocation.addListener(event -> {
             if (event instanceof ChangeEvent) {
                 FileChooser fc = FileChooser.createPickDialog(I18n.txt("gui.screenshots.directory.choose"), skin, Gdx.files.absolute(GlobalConf.screenshot.SCREENSHOT_FOLDER));
+                fc.setTarget(FileChooser.FileChooserTarget.DIRECTORIES);
+                fc.setFileBrowsingEnabled(false);
                 fc.setResultListener((success, result) -> {
                     if (success) {
                         // do stuff with result
@@ -885,7 +887,6 @@ public class PreferencesWindow extends GenericDialog {
                     }
                     return true;
                 });
-                fc.setFilter(pathname -> pathname.isDirectory());
                 fc.show(stage);
 
                 return true;
@@ -984,6 +985,8 @@ public class PreferencesWindow extends GenericDialog {
         frameoutputLocation.addListener(event -> {
             if (event instanceof ChangeEvent) {
                 FileChooser fc = FileChooser.createPickDialog(I18n.txt("gui.frameoutput.directory.choose"), skin, Gdx.files.absolute(GlobalConf.frame.RENDER_FOLDER));
+                fc.setTarget(FileChooser.FileChooserTarget.DIRECTORIES);
+                fc.setFileBrowsingEnabled(false);
                 fc.setResultListener((success, result) -> {
                     if (success) {
                         // do stuff with result
@@ -991,7 +994,6 @@ public class PreferencesWindow extends GenericDialog {
                     }
                     return true;
                 });
-                fc.setFilter(pathname -> pathname.isDirectory());
                 fc.show(stage);
 
                 return true;
@@ -1220,7 +1222,7 @@ public class PreferencesWindow extends GenericDialog {
         datasetChooser.setChecked(GlobalConf.program.DISPLAY_DATASET_DIALOG);
 
         OwnTextButton dataDownload = new OwnTextButton(I18n.txt("gui.download.title"), skin);
-        dataDownload.setSize(300, 50);
+        dataDownload.setSize(150 * GlobalConf.SCALE_FACTOR, 25 * GlobalConf.SCALE_FACTOR);
         dataDownload.addListener((event) -> {
             if (event instanceof ChangeEvent) {
                 DownloadDataWindow ddw = new DownloadDataWindow(stage, skin, false, I18n.txt("gui.close"), null);

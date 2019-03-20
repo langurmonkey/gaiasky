@@ -1975,7 +1975,27 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
 
     @Override
     public boolean loadDataset(String dsName, String absolutePath) {
+        return loadDataset(dsName, absolutePath, CatalogInfo.CatalogInfoType.SCRIPT, false);
+    }
+
+    @Override
+    public boolean loadDataset(String dsName, String absolutePath, boolean async) {
+        return loadDataset(dsName, absolutePath, CatalogInfo.CatalogInfoType.SCRIPT, async);
+    }
+
+    public boolean loadDataset(String dsName, String absolutePath, CatalogInfo.CatalogInfoType type, boolean async) {
+        if (!async) {
+            return loadDatasetPriv(dsName, absolutePath, type);
+        } else {
+            Thread t = new Thread(()->loadDatasetPriv(dsName, absolutePath, type));
+            t.start();
+            return true;
+        }
+    }
+
+    private boolean loadDatasetPriv(String dsName, String absolutePath, CatalogInfo.CatalogInfoType type) {
         try {
+            logger.info(I18n.txt("notif.catalog.loading", absolutePath));
             File f = new File(absolutePath);
             if (f.exists() && f.canRead()) {
                 STILDataProvider provider = new STILDataProvider();
@@ -1988,7 +2008,7 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
                         StarGroup sg = StarGroup.getDefaultStarGroup(dsName, data);
 
                         // Catalog info
-                        CatalogInfo ci = new CatalogInfo(dsName, absolutePath, null, CatalogInfo.CatalogInfoType.SCRIPT, sg);
+                        CatalogInfo ci = new CatalogInfo(dsName, absolutePath, null, type, sg);
                         EventManager.instance.post(Events.CATALOG_ADD, ci, true);
 
                         logger.info(data.size + " objects loaded");
@@ -2006,6 +2026,11 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
             logger.error(e);
             return false;
         }
+    }
+
+    @Override
+    public boolean hasDataset(String dsName) {
+        return CatalogManager.instance().contains(dsName);
     }
 
     @Override
