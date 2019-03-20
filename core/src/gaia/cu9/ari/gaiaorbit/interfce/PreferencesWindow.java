@@ -862,11 +862,11 @@ public class PreferencesWindow extends GenericDialog {
         Table screenshots = new Table(skin);
 
         // Info
-        String ssinfostr = I18n.txt("gui.screencapture.info") + '\n';
-        int lines = GlobalResources.countOccurrences(ssinfostr, '\n');
-        TextArea screenshotsInfo = new OwnTextArea(ssinfostr, skin, "info");
+        String ssInfoStr = I18n.txt("gui.screencapture.info") + '\n';
+        int ssLines = GlobalResources.countOccurrences(ssInfoStr, '\n');
+        TextArea screenshotsInfo = new OwnTextArea(ssInfoStr, skin, "info");
         screenshotsInfo.setDisabled(true);
-        screenshotsInfo.setPrefRows(lines + 1);
+        screenshotsInfo.setPrefRows(ssLines + 1);
         screenshotsInfo.setWidth(tawidth);
         screenshotsInfo.clearListeners();
 
@@ -970,10 +970,10 @@ public class PreferencesWindow extends GenericDialog {
 
         // Info
         String foinfostr = I18n.txt("gui.frameoutput.info") + '\n';
-        lines = GlobalResources.countOccurrences(foinfostr, '\n');
+        ssLines = GlobalResources.countOccurrences(foinfostr, '\n');
         TextArea frameoutputInfo = new OwnTextArea(foinfostr, skin, "info");
         frameoutputInfo.setDisabled(true);
-        frameoutputInfo.setPrefRows(lines + 1);
+        frameoutputInfo.setPrefRows(ssLines + 1);
         frameoutputInfo.setWidth(tawidth);
         frameoutputInfo.clearListeners();
 
@@ -1151,10 +1151,10 @@ public class PreferencesWindow extends GenericDialog {
 
         // Info
         String cminfostr = I18n.txt("gui.360.info") + '\n';
-        lines = GlobalResources.countOccurrences(cminfostr, '\n');
+        ssLines = GlobalResources.countOccurrences(cminfostr, '\n');
         TextArea cmInfo = new OwnTextArea(cminfostr, skin, "info");
         cmInfo.setDisabled(true);
-        cmInfo.setPrefRows(lines + 1);
+        cmInfo.setPrefRows(ssLines + 1);
         cmInfo.setWidth(tawidth);
         cmInfo.clearListeners();
 
@@ -1202,10 +1202,19 @@ public class PreferencesWindow extends GenericDialog {
         // DATA SOURCE
         OwnLabel titleData = new OwnLabel(I18n.txt("gui.data.source"), skin, "help-title");
 
+        // Info
+        String dsInfoStr = I18n.txt("gui.data.source.info") + '\n';
+        int dsLines = GlobalResources.countOccurrences(dsInfoStr, '\n');
+        TextArea dataSourceInfo = new OwnTextArea(dsInfoStr, skin, "info");
+        dataSourceInfo.setDisabled(true);
+        dataSourceInfo.setPrefRows(dsLines + 1);
+        dataSourceInfo.setWidth(tawidth);
+        dataSourceInfo.clearListeners();
+
         String assetsLoc = GlobalConf.ASSETS_LOC;
         dw = new DatasetsWidget(skin, assetsLoc);
         Array<FileHandle> catalogFiles = dw.buildCatalogFiles();
-        Actor datasource = dw.buildDatasetsWidget(catalogFiles, false);
+        Actor dataSource = dw.buildDatasetsWidget(catalogFiles, false);
 
         datasetChooser = new OwnCheckBox(I18n.txt("gui.data.dschooser"), skin, pad5);
         datasetChooser.setChecked(GlobalConf.program.DISPLAY_DATASET_DIALOG);
@@ -1226,7 +1235,8 @@ public class PreferencesWindow extends GenericDialog {
         contentDataTable.add(titleGeneralData).left().padBottom(pad5 * 2).row();
         contentDataTable.add(haGroup).left().padBottom(pad5 * 2).row();
         contentDataTable.add(titleData).left().padBottom(pad5 * 2).row();
-        contentDataTable.add(datasource).left().padBottom(pad5 * 2).row();
+        contentDataTable.add(dataSourceInfo).left().padBottom(pad5).row();
+        contentDataTable.add(dataSource).left().padBottom(pad5 * 2).row();
         contentDataTable.add(datasetChooser).left().padBottom(pad5 * 2).row();
         contentDataTable.add(dataDownload).left();
 
