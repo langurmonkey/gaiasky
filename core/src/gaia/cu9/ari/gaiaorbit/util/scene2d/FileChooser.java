@@ -1,9 +1,11 @@
 package gaia.cu9.ari.gaiaorbit.util.scene2d;
 
-import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.files.FileHandle;
-import com.badlogic.gdx.scenes.scene2d.*;
+import com.badlogic.gdx.scenes.scene2d.Actor;
+import com.badlogic.gdx.scenes.scene2d.EventListener;
+import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.InputEvent.Type;
+import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.scenes.scene2d.utils.ArraySelection;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
@@ -11,14 +13,16 @@ import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.TimeUtils;
+import gaia.cu9.ari.gaiaorbit.interfce.GenericDialog;
 import gaia.cu9.ari.gaiaorbit.util.GlobalConf;
 import gaia.cu9.ari.gaiaorbit.util.I18n;
+import gaia.cu9.ari.gaiaorbit.util.TextUtils;
 
 import java.io.File;
 import java.io.FileFilter;
 import java.util.Comparator;
 
-public class FileChooser extends Dialog {
+public class FileChooser extends GenericDialog {
 
     public interface ResultListener {
         boolean result(boolean success, FileHandle result);
@@ -32,15 +36,16 @@ public class FileChooser extends Dialog {
     /** Target of this file chooser **/
     private FileChooserTarget target = FileChooserTarget.ALL;
     private boolean fileNameEnabled;
-    private final TextField fileNameInput;
-    private final Label fileNameLabel, acceptedFiles;
-    private final FileHandle baseDir;
-    private final Label fileListLabel;
-    private final List<FileListItem> fileList;
-    private final HorizontalGroup driveButtonsList;
-    private final Array<TextButton> driveButtons;
-    private final ScrollPane scrollPane;
-    private final CheckBox hidden;
+    private TextField fileNameInput;
+    private Label fileNameLabel, acceptedFiles;
+    private FileHandle baseDir;
+    private Label fileListLabel;
+    private List<FileListItem> fileList;
+    private HorizontalGroup driveButtonsList;
+    private Array<TextButton> driveButtons;
+    private float scrollPaneWidth, maxPathLength;
+    private ScrollPane scrollPane;
+    private CheckBox hidden;
 
     private FileHandle currentDir;
     protected String result;
@@ -49,9 +54,6 @@ public class FileChooser extends Dialog {
 
     protected ResultListener resultListener;
     protected EventListener selectionListener;
-
-    private final TextButton ok;
-    private final TextButton cancel;
 
     private static final Comparator<FileListItem> dirListComparator = (file1, file2) -> {
         if (file1.file.isDirectory() && !file2.file.isDirectory()) {
@@ -74,16 +76,26 @@ public class FileChooser extends Dialog {
     /** Allows setting filters on the files which are to be selected **/
     private PathnameFilter pathnameFilter;
 
-    public FileChooser(String title, final Skin skin, FileHandle baseDir) {
-        this(title, skin, baseDir, null);
+    public FileChooser(String title, final Skin skin, Stage stage, FileHandle baseDir) {
+        this(title, skin, stage, baseDir, null);
     }
 
-    public FileChooser(String title, final Skin skin, FileHandle baseDir, EventListener selectionListener) {
-        super(title, skin);
+    public FileChooser(String title, final Skin skin, Stage stage, FileHandle baseDir, EventListener selectionListener) {
+        super(title, skin, stage);
         this.baseDir = baseDir;
         this.selectionListener = selectionListener;
 
-        final Table content = getContentTable();
+        setCancelText(I18n.txt("gui.close"));
+        setAcceptText(I18n.txt("gui.select"));
+
+        buildSuper();
+    }
+
+    @Override
+    public void build(){
+        scrollPaneWidth = 400 * GlobalConf.SCALE_FACTOR;
+        maxPathLength = GlobalConf.SCALE_FACTOR > 1.5f ? 9.5f : 5.5f;
+
         content.top().left();
         content.defaults().space(5 * GlobalConf.SCALE_FACTOR);
         this.padLeft(10 * GlobalConf.SCALE_FACTOR);
@@ -110,11 +122,14 @@ public class FileChooser extends Dialog {
         fileListLabel = new Label("", skin);
         fileListLabel.setAlignment(Align.left);
 
-        acceptedFiles = new Label("", skin);
+        acceptedFiles = new Label("", skin, "sc-header");
         acceptedFiles.setAlignment(Align.right);
 
         fileList = new List<>(skin, "light");
-        scrollPane = new ScrollPane(fileList, skin);
+        scrollPane = new OwnScrollPane(fileList, skin, "minimalist");
+        scrollPane.setScrollingDisabled(true, false);
+        scrollPane.setSmoothScrolling(true);
+        scrollPane.setFadeScrollBars(false);
         fileList.getSelection().setProgrammaticChangeEvents(false);
         if (selectionListener != null)
             fileList.addListener(selectionListener);
@@ -158,19 +173,6 @@ public class FileChooser extends Dialog {
             return false;
         });
 
-        getButtonTable().pad(10 * GlobalConf.SCALE_FACTOR);
-
-        ok = new OwnTextButton(I18n.bundle.get("gui.select"), skin);
-        button(ok, true);
-        ok.setWidth(150 * GlobalConf.SCALE_FACTOR);
-
-        cancel = new OwnTextButton(I18n.bundle.get("gui.cancel"), skin);
-        button(cancel, false);
-        cancel.setWidth(150 * GlobalConf.SCALE_FACTOR);
-
-        key(Keys.ENTER, true);
-        key(Keys.ESCAPE, false);
-
         fileList.addListener(new ChangeListener() {
             @Override
             public void changed(ChangeEvent event, Actor actor) {
@@ -188,14 +190,48 @@ public class FileChooser extends Dialog {
             return root;
         };
         setTargetListener();
+
+        content.add(acceptedFiles).top().left().row();
+        content.add(driveButtonsList).top().left().expandX().fillX().row();
+        content.add(fileListLabel).top().left().expandX().fillX().row();
+        content.add(scrollPane).size(scrollPaneWidth, 250 * GlobalConf.SCALE_FACTOR).left().fill().expand().row();
+        content.add(hidden).top().left().row();
+        if (fileNameEnabled) {
+            content.add(fileNameLabel).fillX().expandX().row();
+            content.add(fileNameInput).fillX().expandX().row();
+            stage.setKeyboardFocus(fileNameInput);
+        }
+
+        if (directoryBrowsingEnabled) {
+            fileList.addListener(new ClickListener() {
+                @Override
+                public void clicked(InputEvent event, float x, float y) {
+                    final FileListItem selected = fileList.getSelected();
+                    if (selected.file.isDirectory() && TimeUtils.millis() - lastClick < 500) {
+                        changeDirectory(selected.file);
+                        lastClick = 0;
+                    } else if (event.getType() == Type.touchUp) {
+                        lastClick = TimeUtils.millis();
+                    }
+                }
+            });
+        }
+
+        changeDirectory(baseDir);
     }
 
     private void changeDirectory(FileHandle directory) {
-
+        FileHandle lastDir = currentDir;
         currentDir = directory;
-        fileListLabel.setText(currentDir.path());
+        String path = currentDir.path();
 
-        final Array<FileListItem> items = new Array<FileListItem>();
+        maxPathLength = 6.5f;
+        while(path.length() * maxPathLength > scrollPaneWidth * 0.9f){
+            path = TextUtils.capString(path, path.length() - 4, true);
+        }
+        fileListLabel.setText(path);
+
+        final Array<FileListItem> items = new Array<>();
 
         final FileHandle[] list = directory.list(filter);
         for (final FileHandle handle : list) {
@@ -211,10 +247,25 @@ public class FileChooser extends Dialog {
             items.insert(0, new FileListItem("..", directory.parent()));
         }
 
-        fileList.setSelected(null);
-        ok.setDisabled(true);
+        acceptButton.setDisabled(true);
         fileList.setItems(items);
-        scrollPane.setScrollY(0);
+        scrollPane.layout();
+
+        if(lastDir != null && lastDir.parent().equals(currentDir)){
+            // select last if we're going back
+            Array<FileListItem> l = fileList.getItems();
+            for(FileListItem fli : l){
+                if(fli.file.equals(lastDir)){
+                    fileList.setSelected(fli);
+                    break;
+                }
+            }
+            float px = fileList.getItemHeight() * fileList.getSelectedIndex();
+            scrollPane.setScrollY(px);
+        }else {
+            fileList.setSelected(null);
+            scrollPane.setScrollY(0);
+        }
     }
 
     public void setTarget(FileChooserTarget t) {
@@ -245,7 +296,7 @@ public class FileChooser extends Dialog {
                     ArraySelection<FileListItem> as = list.getSelection();
                     if (as != null && as.hasItems()) {
                         FileChooser.FileListItem selected = as.getLastSelected();
-                        ok.setDisabled(!isTargetOk(selected.file.file()));
+                        acceptButton.setDisabled(!isTargetOk(selected.file.file()));
                     }
                 }
                 return true;
@@ -301,11 +352,6 @@ public class FileChooser extends Dialog {
         return this;
     }
 
-    public FileChooser setOkButtonText(String text) {
-        this.ok.setText(text);
-        return this;
-    }
-
     /**
      * Sets a listener which runs when an entry is selected. Useful to show
      * some text, disable items, etc.
@@ -323,11 +369,6 @@ public class FileChooser extends Dialog {
                 fileList.addListener(selectionListener);
             }
         }
-        return this;
-    }
-
-    public FileChooser setCancelButtonText(String text) {
-        this.cancel.setText(text);
         return this;
     }
 
@@ -353,92 +394,17 @@ public class FileChooser extends Dialog {
 
     long lastClick = 0l;
 
+
     @Override
-    public Dialog show(Stage stage, Action action) {
-        final Table content = getContentTable();
-        content.add(acceptedFiles).top().left().row();
-        content.add(driveButtonsList).top().left().expandX().fillX().row();
-        content.add(fileListLabel).top().left().expandX().fillX().row();
-        content.add(scrollPane).size(330 * GlobalConf.SCALE_FACTOR, 200 * GlobalConf.SCALE_FACTOR).left().fill().expand().row();
-        content.add(hidden).top().left().row();
-        if (fileNameEnabled) {
-            content.add(fileNameLabel).fillX().expandX().row();
-            content.add(fileNameInput).fillX().expandX().row();
-            stage.setKeyboardFocus(fileNameInput);
+    public void accept(){
+       if(resultListener != null){
+           resultListener.result(true, getResult());
         }
-
-        if (directoryBrowsingEnabled) {
-            fileList.addListener(new ClickListener() {
-                @Override
-                public void clicked(InputEvent event, float x, float y) {
-                    final FileListItem selected = fileList.getSelected();
-                    if (selected.file.isDirectory() && TimeUtils.millis() - lastClick < 500) {
-                        changeDirectory(selected.file);
-                        lastClick = 0;
-                    } else if (event.getType() == Type.touchUp) {
-                        lastClick = TimeUtils.millis();
-                    }
-                }
-            });
-        }
-
-        changeDirectory(baseDir);
-        return super.show(stage, action);
     }
 
-    public static FileChooser createSaveDialog(String title, final Skin skin, final FileHandle path) {
-        final FileChooser save = new FileChooser(title, skin, path) {
-            @Override
-            protected void result(Object object) {
+    @Override
+    public void cancel(){
 
-                if (resultListener == null) {
-                    return;
-                }
-
-                final boolean success = (Boolean) object;
-                if (!resultListener.result(success, getResult())) {
-                    this.cancel();
-                }
-            }
-        }.setFileNameEnabled(true).setOkButtonText("Save");
-
-        return save;
-
-    }
-
-    public static FileChooser createLoadDialog(String title, final Skin skin, final FileHandle path) {
-        final FileChooser load = new FileChooser(title, skin, path) {
-            @Override
-            protected void result(Object object) {
-
-                if (resultListener == null) {
-                    return;
-                }
-
-                final boolean success = (Boolean) object;
-                resultListener.result(success, getResult());
-            }
-        }.setFileNameEnabled(false).setOkButtonText("Load");
-
-        return load;
-
-    }
-
-    public static FileChooser createPickDialog(String title, final Skin skin, final FileHandle path) {
-        final FileChooser pick = new FileChooser(title, skin, path) {
-            @Override
-            protected void result(Object object) {
-
-                if (resultListener == null) {
-                    return;
-                }
-
-                final boolean success = (Boolean) object;
-                resultListener.result(success, getResult());
-            }
-        }.setOkButtonText("Select");
-
-        return pick;
     }
 
     public class FileListItem {

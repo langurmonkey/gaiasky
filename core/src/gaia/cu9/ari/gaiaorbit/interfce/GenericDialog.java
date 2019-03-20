@@ -69,10 +69,18 @@ public abstract class GenericDialog extends CollapsibleWindow {
 
     protected void setAcceptText(String acceptText) {
         this.acceptText = acceptText;
+        if(acceptButton != null) {
+            acceptButton.setText(acceptText);
+            recalculateButtonSize();
+        }
     }
 
     protected void setCancelText(String cancelText) {
         this.cancelText = cancelText;
+        if(cancelButton != null) {
+            cancelButton.setText(cancelText);
+            recalculateButtonSize();
+        }
     }
 
     public void setModal(boolean modal) {

@@ -20,13 +20,10 @@ import gaia.cu9.ari.gaiaorbit.util.units.Quantity.Angle;
 import gaia.cu9.ari.gaiaorbit.util.units.Quantity.Angle.AngleUnit;
 import uk.ac.starlink.table.StarTable;
 import uk.ac.starlink.table.StarTableFactory;
-import uk.ac.starlink.table.TableSequence;
 import uk.ac.starlink.util.DataSource;
 import uk.ac.starlink.util.FileDataSource;
 
 import java.io.InputStream;
-import java.util.LinkedList;
-import java.util.List;
 import java.util.Set;
 import java.util.logging.Level;
 
@@ -112,19 +109,7 @@ public class STILDataProvider extends AbstractStarGroupDataProvider {
     public Array<? extends ParticleBean> loadData(DataSource ds, double factor) {
 
         try {
-            TableSequence ts = factory.makeStarTables(ds);
-            // Find table
-            List<StarTable> tables = new LinkedList<StarTable>();
-            StarTable table = null;
-            long maxElems = 0;
-            for (StarTable t; (t = ts.nextTable()) != null; ) {
-                tables.add(t);
-                if (t.getRowCount() > maxElems) {
-                    maxElems = t.getRowCount();
-                    table = t;
-                }
-            }
-
+            StarTable table = factory.makeStarTable(ds);
             initLists((int) table.getRowCount());
 
             UCDParser ucdp = new UCDParser();

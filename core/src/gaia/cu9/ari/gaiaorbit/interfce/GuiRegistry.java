@@ -237,8 +237,8 @@ public class GuiRegistry implements IObserver {
                     lastOpenLocation = SysUtils.getHomeDir();
                 }
 
-                FileChooser fc = FileChooser.createPickDialog(I18n.txt("gui.loadcatalog"), skin, new FileHandle(lastOpenLocation));
-                fc.setOkButtonText(I18n.txt("gui.loadcatalog"));
+                FileChooser fc = new FileChooser(I18n.txt("gui.loadcatalog"), skin, ui, new FileHandle(lastOpenLocation));
+                fc.setAcceptText(I18n.txt("gui.loadcatalog"));
                 fc.setTarget(FileChooser.FileChooserTarget.FILES);
                 fc.setFileFilter(pathname -> pathname.getName().endsWith(".vot") || pathname.getName().endsWith(".csv"));
                 fc.setAcceptedFiles("*.vot, *.csv");
@@ -262,7 +262,6 @@ public class GuiRegistry implements IObserver {
                     }
                     return false;
                 });
-
                 fc.show(ui);
                 break;
             case TOGGLE_MINIMAP:

@@ -17,7 +17,6 @@ import gaia.cu9.ari.gaiaorbit.util.format.INumberFormat;
 import gaia.cu9.ari.gaiaorbit.util.format.NumberFormatFactory;
 import gaia.cu9.ari.gaiaorbit.util.io.FileInfoInputStream;
 import gaia.cu9.ari.gaiaorbit.util.scene2d.*;
-import gaia.cu9.ari.gaiaorbit.util.scene2d.FileChooser.ResultListener;
 import org.apache.commons.compress.archivers.tar.TarArchiveEntry;
 import org.apache.commons.compress.archivers.tar.TarArchiveInputStream;
 import org.apache.commons.compress.compressors.gzip.GzipCompressorInputStream;
@@ -139,38 +138,31 @@ public class DownloadDataWindow extends GenericDialog {
 
             catalogsLoc.addListener((event) -> {
                 if (event instanceof ChangeEvent) {
-                    FileChooser fc = FileChooser.createPickDialog(I18n.txt("gui.download.pickloc"), skin, Gdx.files.absolute(GlobalConf.data.DATA_LOCATION));
-                    fc.setResultListener(new ResultListener() {
-                        @Override
-                        public boolean result(boolean success, FileHandle result) {
-                            if (success) {
-                                if (result.file().canRead() && result.file().canWrite()) {
-                                    // do stuff with result
-                                    catalogsLoc.setText(result.path());
-                                    GlobalConf.data.DATA_LOCATION = result.path();
-                                    me.pack();
-                                    Gdx.app.postRunnable(() -> {
-                                        me.content.clear();
-                                        me.build();
-                                        // Reset datasets
-                                        GlobalConf.data.CATALOG_JSON_FILES = "";
-                                    });
-                                } else {
-                                    Label warn = new OwnLabel(I18n.txt("gui.download.pickloc.permissions"), skin);
-                                    warn.setColor(1f, .4f, .4f, 1f);
-                                    notice.setActor(warn);
-                                    return false;
-                                }
+                    FileChooser fc = new FileChooser(I18n.txt("gui.download.pickloc"), skin, stage, Gdx.files.absolute(GlobalConf.data.DATA_LOCATION));
+                    fc.setTarget(FileChooser.FileChooserTarget.DIRECTORIES);
+                    fc.setFileBrowsingEnabled(false);
+                    fc.setResultListener((success, result) -> {
+                        if (success) {
+                            if (result.file().canRead() && result.file().canWrite()) {
+                                // do stuff with result
+                                catalogsLoc.setText(result.path());
+                                GlobalConf.data.DATA_LOCATION = result.path();
+                                me.pack();
+                                Gdx.app.postRunnable(() -> {
+                                    me.content.clear();
+                                    me.build();
+                                    // Reset datasets
+                                    GlobalConf.data.CATALOG_JSON_FILES = "";
+                                });
+                            } else {
+                                Label warn = new OwnLabel(I18n.txt("gui.download.pickloc.permissions"), skin);
+                                warn.setColor(1f, .4f, .4f, 1f);
+                                notice.setActor(warn);
+                                return false;
                             }
-                            notice.clearActor();
-                            return true;
                         }
-                    });
-                    fc.setFilter(new FileFilter() {
-                        @Override
-                        public boolean accept(File pathname) {
-                            return pathname.isDirectory();
-                        }
+                        notice.clearActor();
+                        return true;
                     });
                     fc.show(stage);
 

@@ -36,10 +36,18 @@ public class TextUtils {
     }
 
     public static String capString(String in, int targetLength){
+        return capString(in, targetLength, false);
+    }
+
+    public static String capString(String in, int targetLength, boolean fromStart){
         if(in.length() <= targetLength){
             return in;
         }else{
-            return in.substring(0, targetLength - 3) + "...";
+            if(fromStart){
+                return "..." + in.substring(in.length() - (targetLength - 3));
+            }else {
+                return in.substring(0, targetLength - 3) + "...";
+            }
         }
     }
 
