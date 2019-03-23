@@ -1,0 +1,38 @@
+#!/bin/bash
+
+#
+# This is a script to bypass gradle in running Gaia Sky
+#
+
+print_usage() {
+  echo "$0 launcher script"
+  echo "3D Universe simulation focused on Gaia"
+  echo
+  echo "Usage: $0 [OPTION]"
+  echo
+  echo "Options:"
+  echo " -v    Print version and exit"
+  echo " -h    Print help"
+  echo " -d    Show download manager at startup"
+  echo " -c    Show catalog chooser at startup"
+}
+
+while getopts 'hvdc' flag; do
+  case "${flag}" in
+    h) args="-h " ;;
+    v) args="-v " ;;
+    d) args="-d " ;;
+    c) args="-c " ;;
+    *) print_usage
+       exit 1 ;;
+  esac
+done
+
+if [ ! -f ./gradlew ]; then
+    echo "Gradle wrapper not found, please run this from the gaiasky folder"
+    exit 1
+fi
+
+cmd="gradlew core:run --args='$args'"
+eval $cmd
+
