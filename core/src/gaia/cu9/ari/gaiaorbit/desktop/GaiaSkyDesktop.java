@@ -83,7 +83,7 @@ public class GaiaSkyDesktop implements IObserver {
         @Parameter(names = {"-c", "--cat-chooser"}, description = "Display the catalog chooser dialog at startup. This enables the selection of different available catalogs when Gaia Sky starts.", order = 3)
         private boolean catalogChooser = false;
 
-        @Parameter(names = {"-p", "--properties"}, description = "Specify the location of the properties file. Default: ~/.gaiasky/global.properties.", order = 4)
+        @Parameter(names = {"-p", "--properties"}, description = "Specify the location of the properties file.", order = 4)
         private String propertiesFile = null;
 
         @Parameter(names = {"-a", "--assets"}, description = "Specify the location of the assets folder. If not present, the default assets location is used.", order = 5)
