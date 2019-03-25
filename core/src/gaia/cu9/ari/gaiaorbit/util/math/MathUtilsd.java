@@ -278,6 +278,35 @@ public final class MathUtilsd {
     }
 
     /**
+     * Does an exponential interpolation:
+     * y = y0 + (y1-y0) * 10 ^ (exp * (x-x0)/(x1-x0))
+     * @param x
+     * @param x0
+     * @param x1
+     * @param y0
+     * @param y1
+     * @param exp
+     * @return
+     */
+    public static double eint(double x, double x0, double x1, double y0, double y1, double exp){
+        double rx0 = x0;
+        double rx1 = x1;
+        if (x0 > x1) {
+            rx0 = x1;
+            rx1 = x0;
+        }
+
+        if (x < rx0) {
+            return y0;
+        }
+        if (x > rx1) {
+            return y1;
+        }
+
+        return y0 + (y1 - y0) * Math.pow(10, exp * (x - rx0) / (rx1 - rx0));
+    }
+
+    /**
      * Linear interpolation
      * 
      * @param x
