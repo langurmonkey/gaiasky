@@ -33,6 +33,11 @@ if [ ! -f ./gradlew ]; then
     exit 1
 fi
 
-cmd="gradlew core:run --args='$args'"
+if [ -z "$args" ]; then
+    cmd="gradlew core:run"
+else
+    cmd="gradlew core:run --args='$args'"
+fi
+
 eval $cmd
 
