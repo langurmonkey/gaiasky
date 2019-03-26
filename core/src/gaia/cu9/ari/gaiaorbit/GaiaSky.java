@@ -246,6 +246,9 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
         // Initialise master manager
         MasterManager.initialize();
 
+        // Init timer if needed
+        Timer.instance();
+
         // Initialise Cameras
         cam = new CameraManager(manager, CameraMode.Focus);
 
@@ -427,10 +430,10 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
             }
         };
 
-        // Each 1 second
-        Timer.schedule(debugTask1, 1, 1);
+        // Every second
+        Timer.schedule(debugTask1, 2, 1);
         // Every 10 seconds
-        Timer.schedule(debugTask10, 1, 10);
+        Timer.schedule(debugTask10, 2, 10);
 
         initialized = true;
     }
@@ -544,6 +547,7 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
         manager.update();
 
         if (!GlobalConf.runtime.UPDATE_PAUSE) {
+            EventManager.instance.post(Events.FRAME_TICK, frames);
             /*
              * UPDATE
              */
@@ -637,6 +641,7 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
      * @param deltat Delta time in seconds.
      */
     public void update(double deltat) {
+        Timer.instance();
         // The current actual dt in seconds
         double dt;
         if (GlobalConf.frame.RENDER_OUTPUT) {

@@ -747,15 +747,26 @@ public interface IScriptingInterface {
     void setFrameOutput(boolean active);
 
     /**
-     * Gets an object by <code>name</code> or id (HIP, TYC, sourceId).
+     * Gets an object from the scene graph by <code>name</code> or id (HIP, TYC, Gaia SourceId).
      *
-     * @param name The name or id (HIP, TYC, sourceId) of the object.
+     * @param name The name or id (HIP, TYC, Gaia SourceId) of the object.
      * @return The object as a
      * {@link gaia.cu9.ari.gaiaorbit.scenegraph.SceneGraphNode}, or null
      * if it does not exist.
      */
     SceneGraphNode getObject(String name);
 
+    /**
+     * Gets an object by <code>name</code> or id (HIP, TYC, Gaia SourceID), optionally waiting
+     * until the object is available, with a timeout.
+     *
+     * @param name The name or id (HIP, TYC, Gaia SourceId) of the object
+     * @param sync If true, the call is synchronous and won't return until the object is available or the timeout has passed.
+     * @param timeOutSeconds The timeout in seconds to wait until returning.
+     * @return The object if it exists, or null if it does not and block is false, or if block is true and
+     * the timeout has passed.
+     */
+    SceneGraphNode getObject(String name, boolean sync, double timeOutSeconds);
     /**
      * Sets the given size scaling factor to the object identified by
      * <code>name</code>. This method will only work with model objects such as
@@ -1112,7 +1123,7 @@ public interface IScriptingInterface {
      *
      * @param frames The number of frames to wait.
      */
-    void sleepFrames(int frames);
+    void sleepFrames(long frames);
 
     /**
      * Expands the component with the given name.
@@ -1423,11 +1434,9 @@ public interface IScriptingInterface {
 
     /**
      * Loads a VOTable file (<code>.vot</code>) with a given name.
-     * In this version, the loading happens synchronously but the insertion of the catalog into the scene graph
-     * is delayed until the end of the current frame, so it is usually not the case that the catalog is available to Gaia Sky immediately after
-     * this call returns. Use {@link IScriptingInterface#sleepFrames(int)} after calling this to wait for one or two
-     * frames to make sure the data is available.
-     * The loading process is carried out
+     * In this version, the loading happens synchronously, so the catalog is available to Gaia Sky immediately after
+     * this call returns.
+     * The actual loading process is carried out
      * making educated guesses about semantics using UCDs and column names.
      * Please check <a href="http://gaia.ari.uni-heidelberg.de/gaiasky/docs/html/latest/SAMP.html#stil-data-provider">the
      * official documentation</a> for a complete reference on what can and what can't be loaded.
@@ -1443,23 +1452,23 @@ public interface IScriptingInterface {
     /**
      * Loads a VOTable file (<code>.vot</code>) with a given name.
      * The call can be made synchronous or asynchronous.<br/>
-     * If <code>async</code> is false, the call acts exactly like
+     * If <code>sync</code> is true, the call acts exactly like
      * {@link IScriptingInterface#loadDataset(String, String)}.<br/>
-     * If <code>async</code> is true, the loading happens
+     * If <code>sync</code> is false, the loading happens
      * in a new thread and the call returns immediately. In this case, you can use {@link IScriptingInterface#hasDataset(String)}
      * to check whether the dataset is already loaded and available.
-     * making educated guesses about semantics using UCDs and column names.
+     * The actual loading process is carried out making educated guesses about semantics using UCDs and column names.
      * Please check <a href="http://gaia.ari.uni-heidelberg.de/gaiasky/docs/html/latest/SAMP.html#stil-data-provider">the
      * official documentation</a> for a complete reference on what can and what can't be loaded.
      *
      * @param dsName       The name of the dataset, used to identify the subsequent operations on the
      *                     dataset
      * @param absolutePath Absolute path to the <code>.vot</code> file to load
-     * @param async        Whether the load must happen synchronously or asynchronously
+     * @param sync        Whether the load must happen synchronously or asynchronously
      *
-     * @return False if the dataset could not be loaded (sync mode). True if it could not be loaded (sync mode), or <code>async</code> is true
+     * @return False if the dataset could not be loaded (sync mode). True if it could not be loaded (sync mode), or <code>sync</code> is false
      */
-    boolean loadDataset(String dsName, String absolutePath, boolean async);
+    boolean loadDataset(String dsName, String absolutePath, boolean sync);
 
     /**
      * Removes the dataset identified by the given name, if it exists

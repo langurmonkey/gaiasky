@@ -1046,6 +1046,11 @@ public enum Events {
     TOUCH_DOWN, TOUCH_UP, TOUCH_DRAGGED, SCROLLED, KEY_DOWN, KEY_UP,
 
     /**
+     * Event sent before the start of every frame. Contains a long with the frame number
+     */
+    FRAME_TICK,
+
+    /**
      * Dispose all resources, app is shutting down
      **/
     DISPOSE;

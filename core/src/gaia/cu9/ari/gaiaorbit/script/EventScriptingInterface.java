@@ -66,9 +66,22 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
 
     private Set<AtomicBoolean> stops;
 
+    /**
+     * Used to wait for new frames
+     */
+    private Object frameMonitor;
+
+    /**
+     * Contains the current frame number. Available right after
+     * notify() is called on frameMonitor.
+     */
+    private long frameNumber;
+
     private EventScriptingInterface() {
         em = EventManager.instance;
         manager = GaiaSky.instance.manager;
+
+        frameMonitor = new Object();
 
         stops = new HashSet<>();
 
@@ -80,7 +93,7 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
         aux3d6 = new Vector3d();
         aux2d1 = new Vector2d();
 
-        em.subscribe(this, Events.INPUT_EVENT, Events.DISPOSE);
+        em.subscribe(this, Events.INPUT_EVENT, Events.DISPOSE, Events.FRAME_TICK);
     }
 
     private void initializeTextures() {
@@ -170,7 +183,7 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
         if (sg.containsNode(focusName.toLowerCase())) {
             IFocus focus = sg.findFocus(focusName.toLowerCase());
             NaturalCamera cam = GaiaSky.instance.cam.naturalCamera;
-            changeFocusAndWait(focus, cam, waitTimeSeconds);
+            changeFocus(focus, cam, waitTimeSeconds);
         }
     }
 
@@ -694,8 +707,22 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
 
     @Override
     public SceneGraphNode getObject(String name) {
+        return getObject(name, false, 0);
+    }
+
+    @Override
+    public SceneGraphNode getObject(String name, boolean sync, double timeOutSeconds) {
         ISceneGraph sg = GaiaSky.instance.sg;
-        return sg.getNode(name.toLowerCase());
+        String n = name.toLowerCase();
+        SceneGraphNode obj = sg.getNode(n);
+        double startMs = System.currentTimeMillis();
+        double elapsedSeconds = 0;
+        while (obj == null && sync && elapsedSeconds <= timeOutSeconds) {
+            sleepFrames(1);
+            obj = sg.getNode(n);
+            elapsedSeconds = (System.currentTimeMillis() - startMs) / 1000d;
+        }
+        return obj;
     }
 
     @Override
@@ -776,7 +803,7 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
         stops.add(stop);
         NaturalCamera cam = GaiaSky.instance.cam.naturalCamera;
 
-        changeFocusAndWait(object, cam, waitTimeSeconds);
+        changeFocus(object, cam, waitTimeSeconds);
 
         /* target angle */
         double target = Math.toRadians(viewAngle);
@@ -793,7 +820,7 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
 
                 em.post(Events.CAMERA_FWD, 1d * dt);
                 try {
-                    Thread.sleep(5);
+                    sleepFrames(1);
                 } catch (Exception e) {
                     logger.error(e);
                 }
@@ -807,7 +834,7 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
 
                 em.post(Events.CAMERA_FWD, -1d * dt);
                 try {
-                    Thread.sleep(5);
+                    sleepFrames(1);
                 } catch (Exception e) {
                     logger.error(e);
                 }
@@ -873,7 +900,7 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
              * FOCUS
              */
 
-            changeFocusAndWait(object, cam, waitTimeSeconds);
+            changeFocus(object, cam, waitTimeSeconds);
 
             /* target distance */
             double target = 100 * Constants.M_TO_U;
@@ -905,7 +932,7 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
                 }
 
                 try {
-                    Thread.sleep(20);
+                    sleepFrames(1);
                 } catch (Exception e) {
                     logger.error(e);
                 }
@@ -1021,7 +1048,7 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
             Invisible invisible = new Invisible(nameStub);
             EventManager.instance.post(Events.SCENE_GRAPH_ADD_OBJECT_CMD, invisible, true);
         }
-        Invisible invisible = (Invisible) sg.getNode(nameStub);
+        Invisible invisible = (Invisible) getObject(nameStub, true, 3);
 
         if (object instanceof Planet) {
             Planet planet = (Planet) object;
@@ -1032,7 +1059,7 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
                 // Zoom out
                 while (planet.viewAngle > targetAngle && (stop == null || !stop.get())) {
                     cam.addForwardForce(-5d);
-                    sleep(0.3f);
+                    sleepFrames(1);
                 }
                 // STOP
                 cam.stopMovement();
@@ -1121,7 +1148,7 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
             cam.addRoll(roll, false);
 
             try {
-                Thread.sleep(sleep);
+                sleep(sleep);
             } catch (Exception e) {
                 logger.error(e);
             }
@@ -1262,11 +1289,7 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
     @Override
     public void waitForInput() {
         while (inputCode < 0) {
-            try {
-                Thread.sleep(100);
-            } catch (InterruptedException e) {
-                logger.error(e);
-            }
+            sleepFrames(1);
         }
         // Consume
         inputCode = -1;
@@ -1276,11 +1299,7 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
     @Override
     public void waitForEnter() {
         while (inputCode != Keys.ENTER) {
-            try {
-                Thread.sleep(100);
-            } catch (InterruptedException e) {
-                logger.error(e);
-            }
+            sleepFrames(1);
         }
         // Consume
         inputCode = -1;
@@ -1289,36 +1308,13 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
     @Override
     public void waitForInput(int keyCode) {
         while (inputCode != keyCode) {
-            try {
-                Thread.sleep(50);
-            } catch (InterruptedException e) {
-                logger.error(e);
-            }
+            sleepFrames(1);
         }
         // Consume
         inputCode = -1;
     }
 
     int inputCode = -1;
-
-    @Override
-    public void notify(Events event, Object... data) {
-        switch (event) {
-        case INPUT_EVENT:
-            inputCode = (Integer) data[0];
-            break;
-        case DISPOSE:
-            // Stop all
-            for (AtomicBoolean stop : stops) {
-                if (stop != null)
-                    stop.set(true);
-            }
-            break;
-        default:
-            break;
-        }
-
-    }
 
     @Override
     public int getScreenWidth() {
@@ -1376,11 +1372,7 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
         long iniTime = TimeUtils.millis();
         NaturalCamera cam = GaiaSky.instance.cam.naturalCamera;
         while (cam.focus == null || !cam.focus.getName().equalsIgnoreCase(name)) {
-            try {
-                Thread.sleep(100);
-            } catch (InterruptedException e) {
-                logger.error(e);
-            }
+            sleepFrames(1);
             long spent = TimeUtils.millis() - iniTime;
             if (timeoutMs > 0 && spent > timeoutMs) {
                 // Timeout!
@@ -1409,11 +1401,7 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
             // This only works in async mode!
             Gdx.app.postRunnable(() -> manager.load(path, Texture.class));
             while (!manager.isLoaded(path)) {
-                try {
-                    Thread.sleep(50);
-                } catch (InterruptedException e) {
-                    logger.error(e);
-                }
+                sleepFrames(1);
             }
             Texture tex = manager.get(path, Texture.class);
             textures.put(path, tex);
@@ -1614,17 +1602,18 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
     }
 
     @Override
-    public void sleepFrames(int frames) {
-        long iniframe = GaiaSky.instance.frames;
-        while (GaiaSky.instance.frames - iniframe < frames) {
-            // Active wait, fix this
+    public void sleepFrames(long frames) {
+        long frameCount = 0;
+        while (frameCount < frames) {
             try {
-                Thread.sleep(100);
+                synchronized (frameMonitor) {
+                    frameMonitor.wait();
+                }
+                frameCount++;
             } catch (InterruptedException e) {
-                logger.error(e);
+                logger.error("Error while waiting on frameMonitor", e);
             }
         }
-
     }
 
     /**
@@ -1636,7 +1625,7 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
      * @param waitTimeSeconds Max time to wait for the camera to face the focus, in
      *                        seconds. If negative, we wait until the end.
      */
-    private void changeFocusAndWait(IFocus object, NaturalCamera cam, float waitTimeSeconds) {
+    private void changeFocus(IFocus object, NaturalCamera cam, double waitTimeSeconds) {
         // Post focus change and wait, if needed
         IFocus currentFocus = cam.getFocus();
         if (currentFocus != object) {
@@ -1645,22 +1634,18 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
 
             // Wait til camera is facing focus or
             if (waitTimeSeconds < 0) {
-                waitTimeSeconds = Float.MAX_VALUE;
+                waitTimeSeconds = Double.MAX_VALUE;
             }
             long start = System.currentTimeMillis();
-            long elapsedTimeMs;
-            while (!cam.facingFocus) {
-                elapsedTimeMs = System.currentTimeMillis() - start;
-                if (elapsedTimeMs / 1000f > waitTimeSeconds) {
-                    // We've waited long enough, stop!
-                    break;
-                }
+            double elapsedSeconds = 0;
+            while (!cam.facingFocus && elapsedSeconds < waitTimeSeconds) {
                 // Wait
                 try {
-                    Thread.sleep(100);
+                    sleepFrames(1);
                 } catch (Exception e) {
                     logger.error(e);
                 }
+                elapsedSeconds = (System.currentTimeMillis() - start) / 1000d;
             }
         }
     }
@@ -1975,25 +1960,25 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
 
     @Override
     public boolean loadDataset(String dsName, String absolutePath) {
-        return loadDataset(dsName, absolutePath, CatalogInfo.CatalogInfoType.SCRIPT, false);
+        return loadDataset(dsName, absolutePath, CatalogInfo.CatalogInfoType.SCRIPT, true);
     }
 
     @Override
-    public boolean loadDataset(String dsName, String absolutePath, boolean async) {
-        return loadDataset(dsName, absolutePath, CatalogInfo.CatalogInfoType.SCRIPT, async);
+    public boolean loadDataset(String dsName, String absolutePath, boolean sync) {
+        return loadDataset(dsName, absolutePath, CatalogInfo.CatalogInfoType.SCRIPT, sync);
     }
 
-    public boolean loadDataset(String dsName, String absolutePath, CatalogInfo.CatalogInfoType type, boolean async) {
-        if (!async) {
-            return loadDatasetPriv(dsName, absolutePath, type);
+    public boolean loadDataset(String dsName, String absolutePath, CatalogInfo.CatalogInfoType type, boolean sync) {
+        if (sync) {
+            return loadDatasetPriv(dsName, absolutePath, type, true);
         } else {
-            Thread t = new Thread(()->loadDatasetPriv(dsName, absolutePath, type));
+            Thread t = new Thread(() -> loadDatasetPriv(dsName, absolutePath, type, false));
             t.start();
             return true;
         }
     }
 
-    private boolean loadDatasetPriv(String dsName, String absolutePath, CatalogInfo.CatalogInfoType type) {
+    private boolean loadDatasetPriv(String dsName, String absolutePath, CatalogInfo.CatalogInfoType type, boolean sync) {
         try {
             logger.info(I18n.txt("notif.catalog.loading", absolutePath));
             File f = new File(absolutePath);
@@ -2013,6 +1998,10 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
 
                         logger.info(data.size + " objects loaded");
                     });
+                    // Sync waiting
+                    while(sync && !CatalogManager.instance().contains(dsName)){
+                        sleepFrames(1);
+                    }
                     return true;
                 } else {
                     // No data has been loaded
@@ -2037,7 +2026,8 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
     public boolean removeDataset(String dsName) {
         boolean exists = CatalogManager.instance().contains(dsName);
         if (exists)
-            EventManager.instance.post(Events.CATALOG_REMOVE, dsName);
+            Gdx.app.postRunnable(() -> EventManager.instance.post(Events.CATALOG_REMOVE, dsName));
+
         return exists;
     }
 
@@ -2120,4 +2110,31 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
     public void error(String message) {
         logger.error(message);
     }
+
+    @Override
+    public void notify(Events event, Object... data) {
+        switch (event) {
+        case INPUT_EVENT:
+            inputCode = (Integer) data[0];
+            break;
+        case FRAME_TICK:
+            // New frame
+            frameNumber = (Long) data[0];
+            synchronized (frameMonitor) {
+                frameMonitor.notify();
+            }
+            break;
+        case DISPOSE:
+            // Stop all
+            for (AtomicBoolean stop : stops) {
+                if (stop != null)
+                    stop.set(true);
+            }
+            break;
+        default:
+            break;
+        }
+
+    }
+
 }
