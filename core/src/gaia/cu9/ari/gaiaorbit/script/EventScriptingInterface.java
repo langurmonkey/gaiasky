@@ -707,17 +707,22 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
 
     @Override
     public SceneGraphNode getObject(String name) {
-        return getObject(name, false, 0);
+        return getObject(name, 0);
     }
 
     @Override
-    public SceneGraphNode getObject(String name, boolean sync, double timeOutSeconds) {
+    public SceneGraphNode getObject(String name, double timeOutSeconds) {
         ISceneGraph sg = GaiaSky.instance.sg;
         String n = name.toLowerCase();
         SceneGraphNode obj = sg.getNode(n);
+
+        // If negative, no limit in waiting
+        if(timeOutSeconds < 0)
+            timeOutSeconds = Double.MAX_VALUE;
+
         double startMs = System.currentTimeMillis();
         double elapsedSeconds = 0;
-        while (obj == null && sync && elapsedSeconds <= timeOutSeconds) {
+        while (obj == null && elapsedSeconds < timeOutSeconds) {
             sleepFrames(1);
             obj = sg.getNode(n);
             elapsedSeconds = (System.currentTimeMillis() - startMs) / 1000d;
@@ -1048,7 +1053,7 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
             Invisible invisible = new Invisible(nameStub);
             EventManager.instance.post(Events.SCENE_GRAPH_ADD_OBJECT_CMD, invisible, true);
         }
-        Invisible invisible = (Invisible) getObject(nameStub, true, 3);
+        Invisible invisible = (Invisible) getObject(nameStub, 5);
 
         if (object instanceof Planet) {
             Planet planet = (Planet) object;

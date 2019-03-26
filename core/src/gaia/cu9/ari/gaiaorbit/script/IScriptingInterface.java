@@ -761,12 +761,12 @@ public interface IScriptingInterface {
      * until the object is available, with a timeout.
      *
      * @param name The name or id (HIP, TYC, Gaia SourceId) of the object
-     * @param sync If true, the call is synchronous and won't return until the object is available or the timeout has passed.
      * @param timeOutSeconds The timeout in seconds to wait until returning.
+     *                       If negative, it waits indefinitely.
      * @return The object if it exists, or null if it does not and block is false, or if block is true and
      * the timeout has passed.
      */
-    SceneGraphNode getObject(String name, boolean sync, double timeOutSeconds);
+    SceneGraphNode getObject(String name, double timeOutSeconds);
     /**
      * Sets the given size scaling factor to the object identified by
      * <code>name</code>. This method will only work with model objects such as
