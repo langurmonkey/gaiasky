@@ -194,11 +194,12 @@ public abstract class AbstractOctreeWrapper extends FadeNode implements Iterable
 
     @Override
     public void highlight(boolean hl) {
-        super.highlight(hl);
+        int index = nextHightlightColorIndex();
+        super.highlight(hl, index);
         Array<SceneGraphNode> l = new Array<>();
-        getChildrenByType(FadeNode.class, l);
+        getChildrenByType(StarGroup.class, l);
         for (SceneGraphNode n : l) {
-            ((FadeNode) n).highlight(hl);
+            ((StarGroup) n).highlight(hl, index);
         }
     }
 

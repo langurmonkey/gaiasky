@@ -233,12 +233,19 @@ public class FadeNode extends AbstractPositionEntity {
         EventManager.instance.post(Events.CATALOG_ADD, this.catalogInfo, false);
     }
 
+    public static int nextHightlightColorIndex(){
+        hli = (hli + 1) % hlColor.length;
+        return hli;
+    }
+
     public void highlight(boolean hl){
+        highlight(hl, nextHightlightColorIndex());
+    }
+
+    public void highlight(boolean hl, int colorIndex){
         this.highlighted = hl;
-        // update index
         if(hl) {
-            hli = (hli + 1) % hlColor.length;
-            this.hlci = hli;
+            this.hlci = colorIndex;
         }
     }
 
