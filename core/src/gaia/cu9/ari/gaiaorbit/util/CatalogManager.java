@@ -29,7 +29,7 @@ public class CatalogManager implements IObserver {
     CatalogManager() {
         super();
         ciMap = new HashMap<>();
-        EventManager.instance.subscribe(this, Events.CATALOG_ADD, Events.CATALOG_REMOVE, Events.CATALOG_VISIBLE);
+        EventManager.instance.subscribe(this, Events.CATALOG_ADD, Events.CATALOG_REMOVE, Events.CATALOG_VISIBLE, Events.CATALOG_HIGHLIGHT);
     }
 
     public Collection<CatalogInfo> getCatalogInfos() {
@@ -40,8 +40,8 @@ public class CatalogManager implements IObserver {
         return ciMap.containsKey(dsName);
     }
 
-    public Set<String> getDatasetNames(){
-        if(ciMap != null){
+    public Set<String> getDatasetNames() {
+        if (ciMap != null) {
             return ciMap.keySet();
         }
         return null;
@@ -78,6 +78,17 @@ public class CatalogManager implements IObserver {
                     EventManager.instance.post(Events.FOCUS_NOT_AVAILABLE, ci.object);
                 ci.setVisibility(visible);
                 logger.info(I18n.txt("notif.visibility." + (visible ? "on" : "off"), ci.name));
+            }
+            break;
+        case CATALOG_HIGHLIGHT:
+            dsName = (String) data[0];
+            if (ciMap.containsKey(dsName)) {
+                ci = ciMap.get(dsName);
+                ci.hightlight(!ci.highlighted);
+                if (ci.highlighted)
+                    logger.info(I18n.txt("notif.highlight.on", ci.name));
+                else
+                    logger.info(I18n.txt("notif.highlight.off", ci.name));
             }
             break;
         default:

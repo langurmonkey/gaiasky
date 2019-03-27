@@ -41,9 +41,8 @@ import java.io.Serializable;
  * stay there, so all particles get rendered directly in the GPU from the GPU
  * with no CPU intervention. This allows for much faster rendering. Use this for
  * large groups of particles.
- * 
- * @author tsagrista
  *
+ * @author tsagrista
  */
 public class ParticleGroup extends FadeNode implements I3DTextRenderable, IFocus, IObserver {
     public static class ParticleBean implements Serializable {
@@ -176,7 +175,7 @@ public class ParticleGroup extends FadeNode implements I3DTextRenderable, IFocus
 
     /**
      * Returns the data list
-     * 
+     *
      * @return The data list
      */
     public Array<? extends ParticleBean> data() {
@@ -185,7 +184,7 @@ public class ParticleGroup extends FadeNode implements I3DTextRenderable, IFocus
 
     /**
      * Number of objects of this group
-     * 
+     *
      * @return The number of objects
      */
     public int size() {
@@ -210,11 +209,9 @@ public class ParticleGroup extends FadeNode implements I3DTextRenderable, IFocus
 
     /**
      * Updates the parameters of the focus, if the focus is active in this group
-     * 
-     * @param time
-     *            The time frame provider
-     * @param camera
-     *            The current camera
+     *
+     * @param time   The time frame provider
+     * @param camera The current camera
      */
     public void updateFocus(ITimeFrameProvider time, ICamera camera) {
 
@@ -328,7 +325,7 @@ public class ParticleGroup extends FadeNode implements I3DTextRenderable, IFocus
 
     /**
      * Default size if not in data, 1e5 km
-     * 
+     *
      * @return The size
      */
     public double getFocusSize() {
@@ -368,7 +365,7 @@ public class ParticleGroup extends FadeNode implements I3DTextRenderable, IFocus
 
     /**
      * Adds all the children that are focusable objects to the list.
-     * 
+     *
      * @param list
      */
     public void addFocusableObjects(Array<IFocus> list) {
@@ -435,9 +432,8 @@ public class ParticleGroup extends FadeNode implements I3DTextRenderable, IFocus
 
     /**
      * Returns the size of the particle at index i
-     * 
-     * @param i
-     *            The index
+     *
+     * @param i The index
      * @return The size
      */
     public double getSize(int i) {
@@ -467,6 +463,15 @@ public class ParticleGroup extends FadeNode implements I3DTextRenderable, IFocus
     @Override
     public Quaterniond getOrientationQuaternion() {
         return null;
+    }
+
+    public float[] getColor() {
+        return highlighted ? hlColor[hlci] : cc;
+
+    }
+
+    public float highlightedSizeFactor() {
+        return highlighted ? 2f : 1f;
     }
 
     public void addHit(int screenX, int screenY, int w, int h, int pxdist, NaturalCamera camera, Array<IFocus> hits) {
@@ -620,17 +625,13 @@ public class ParticleGroup extends FadeNode implements I3DTextRenderable, IFocus
     /**
      * Fetches the real position of the particle. It will apply the necessary
      * integrations (i.e. proper motion).
-     * 
-     * @param pb
-     *            The particle bean
-     * @param campos
-     *            The position of the camera. If null, the camera position is
-     *            not subtracted so that the coordinates are given in the global
-     *            reference system instead of the camera reference system.
-     * @param dest
-     *            The destination fector
-     * @param deltaYears
-     *            The delta years
+     *
+     * @param pb         The particle bean
+     * @param campos     The position of the camera. If null, the camera position is
+     *                   not subtracted so that the coordinates are given in the global
+     *                   reference system instead of the camera reference system.
+     * @param dest       The destination fector
+     * @param deltaYears The delta years
      * @return The vector for chaining
      */
     protected Vector3d fetchPosition(ParticleBean pb, Vector3d campos, Vector3d dest, double deltaYears) {
@@ -642,7 +643,7 @@ public class ParticleGroup extends FadeNode implements I3DTextRenderable, IFocus
 
     /**
      * Returns the delta years to integrate the proper motion.
-     * 
+     *
      * @return
      */
     protected double getDeltaYears() {
@@ -676,7 +677,14 @@ public class ParticleGroup extends FadeNode implements I3DTextRenderable, IFocus
     }
 
     @Override
-    public float getTextOpacity(){
+    public float getTextOpacity() {
         return getOpacity();
     }
+
+    @Override
+    public void highlight(boolean hl) {
+        this.inGpu = this.highlighted == hl;
+        super.highlight(hl);
+    }
+
 }

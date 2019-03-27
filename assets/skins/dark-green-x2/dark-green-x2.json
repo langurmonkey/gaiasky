@@ -449,6 +449,10 @@
       "imageUp": "eye-icon",
       "imageChecked": "eye-closed-icon"
     },
+    "highlight-ds": {
+      "imageUp": "highlight-off",
+      "imageChecked" : "highlight-on"
+    },
     "link": {
       "imageUp": "link",
       "imageChecked": "link"

@@ -216,7 +216,7 @@ public class DR2DataProvider extends AbstractStarGroupDataProvider {
                         double dist = distpc * Constants.PC_TO_U;
 
                         /** NAME **/
-                        String name = String.valueOf((long) sourceid);
+                        String name = String.valueOf(sourceid);
 
                         /** RA and DEC **/
                         double ra = Parser.parseDouble(tokens[IDX_RA]);

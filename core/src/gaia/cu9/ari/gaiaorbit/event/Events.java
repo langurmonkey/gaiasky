@@ -1031,6 +1031,11 @@ public enum Events {
      */
     CATALOG_VISIBLE,
 
+    /**
+     * Mark catalog
+     */
+    CATALOG_HIGHLIGHT,
+
 
     /**
      * Posts a recurrent runnable. Contains an identifier (String) and the runnable object

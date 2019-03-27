@@ -118,11 +118,11 @@ public class ParticleGroupRenderSystem extends ImmediateRenderSystem implements 
                     for (ParticleBean pb : particleGroup.data()) {
                         double[] p = pb.data;
                         // COLOR
-                        float[] c = particleGroup.cc;
+                        float[] c = particleGroup.getColor();
                         curr.vertices[curr.vertexIdx + curr.colorOffset] = Color.toFloatBits(c[0], c[1], c[2], c[3]);
 
                         // SIZE
-                        curr.vertices[curr.vertexIdx + additionalOffset] = particleGroup.size + (float) (rand.nextGaussian() * particleGroup.size / 4d);
+                        curr.vertices[curr.vertexIdx + additionalOffset] = (particleGroup.size + (float) (rand.nextGaussian() * particleGroup.size / 4d)) * particleGroup.highlightedSizeFactor();
 
                         // cb.transform.getTranslationf(aux);
                         // POSITION
@@ -159,7 +159,7 @@ public class ParticleGroupRenderSystem extends ImmediateRenderSystem implements 
                     shaderProgram.setUniformf("u_alpha", alphas[particleGroup.ct.getFirstOrdinal()] * particleGroup.getOpacity());
                     shaderProgram.setUniformf("u_ar", stereohw ? 0.5f : 1f);
                     shaderProgram.setUniformf("u_profileDecay", particleGroup.profileDecay);
-                    shaderProgram.setUniformf("u_sizeFactor", (stereohw ? 2f : 1f) * rc.scaleFactor * GlobalConf.scene.STAR_POINT_SIZE / 5f);
+                    shaderProgram.setUniformf("u_sizeFactor", (((stereohw ? 2f : 1f) * rc.scaleFactor * GlobalConf.scene.STAR_POINT_SIZE / 5f)) * particleGroup.highlightedSizeFactor());
                     shaderProgram.setUniformf("u_camPos", camera.getCurrent().getPos().put(aux1));
                     shaderProgram.setUniformf("u_camDir", camera.getCurrent().getCamera().direction);
                     shaderProgram.setUniformi("u_cubemap", GlobalConf.program.CUBEMAP360_MODE ? 1 : 0);

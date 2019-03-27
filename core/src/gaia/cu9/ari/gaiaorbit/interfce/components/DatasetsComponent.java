@@ -31,7 +31,7 @@ public class DatasetsComponent extends GuiComponent implements IObserver {
         super(skin, stage);
         groupMap = new HashMap<>();
         imageMap = new HashMap<>();
-        EventManager.instance.subscribe(this, Events.CATALOG_ADD, Events.CATALOG_REMOVE, Events.CATALOG_VISIBLE);
+        EventManager.instance.subscribe(this, Events.CATALOG_ADD, Events.CATALOG_REMOVE, Events.CATALOG_VISIBLE, Events.CATALOG_HIGHLIGHT);
     }
 
     @Override
@@ -103,8 +103,19 @@ public class DatasetsComponent extends GuiComponent implements IObserver {
             return false;
         });
 
+        ImageButton mark = new OwnImageButton(skin, "highlight-ds");
+        mark.addListener(new TextTooltip(I18n.txt("gui.tooltip.dataset.highlight"), skin));
+        mark.addListener((event) -> {
+           if(event instanceof ChangeEvent){
+               EventManager.instance.post(Events.CATALOG_HIGHLIGHT, ci.name);
+               return true;
+           }
+           return false;
+        });
+
         controls.addActor(eye);
         controls.addActor(rubbish);
+        controls.addActor(mark);
 
         ciGroup.addActor(controls);
         ciGroup.addActor(scroll);
@@ -138,6 +149,8 @@ public class DatasetsComponent extends GuiComponent implements IObserver {
                 OwnImageButton eye = imageMap.get(ciName);
                 eye.setCheckedNoFire(!visible);
             }
+            break;
+        case CATALOG_HIGHLIGHT:
             break;
         default:
             break;

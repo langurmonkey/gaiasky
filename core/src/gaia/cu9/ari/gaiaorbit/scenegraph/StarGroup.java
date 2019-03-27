@@ -254,7 +254,7 @@ public class StarGroup extends ParticleGroup implements ILineRenderable, IStarFo
     private static BlockingQueue<Runnable> workQueue;
 
     static {
-        workQueue = new LinkedBlockingQueue<Runnable>();
+        workQueue = new LinkedBlockingQueue<>();
         int nthreads = !GlobalConf.performance.MULTITHREADING ? 1 : Math.max(1, GlobalConf.performance.NUMBER_THREADS() - 1);
         pool = new ThreadPoolExecutor(nthreads, nthreads, 5, TimeUnit.SECONDS, workQueue);
         pool.setThreadFactory(new DaemonThreadFactory());
@@ -269,11 +269,6 @@ public class StarGroup extends ParticleGroup implements ILineRenderable, IStarFo
      * Additional values
      */
     double[] additional;
-
-    /**
-     * Aux array to know whether a star has been rendered in the last cycle
-     */
-    public byte[] renderedLastCycle;
 
     // Indices list buffer 1
     Integer[] indices1;
@@ -404,7 +399,7 @@ public class StarGroup extends ParticleGroup implements ILineRenderable, IStarFo
     }
 
     public ObjectIntMap<String> generateIndex(Array<StarBean> pointData) {
-        ObjectIntMap<String> index = new ObjectIntMap<String>();
+        ObjectIntMap<String> index = new ObjectIntMap<>();
         int n = pointData.size;
         for (int i = 0; i < n; i++) {
             StarBean sb = pointData.get(i);
@@ -494,7 +489,7 @@ public class StarGroup extends ParticleGroup implements ILineRenderable, IStarFo
             return getAbsolutePosition(aux);
         } else {
             double deltaYears = AstroUtils.getMsSince(time.getTime(), epoch_jd) * Nature.MS_TO_Y;
-            return this.fetchPosition((StarBean) pointData.get(focusIndex), null, aux, deltaYears);
+            return this.fetchPosition(pointData.get(focusIndex), null, aux, deltaYears);
         }
     }
 
@@ -540,18 +535,13 @@ public class StarGroup extends ParticleGroup implements ILineRenderable, IStarFo
     }
 
     private void swapBuffers() {
-        Gdx.app.postRunnable(new Runnable() {
-
-            @Override
-            public void run() {
-                if (active == indices1) { //-V6013
-                    active = indices2;
-                    background = indices1;
-                } else {
-                    active = indices1;
-                    background = indices2;
-                }
-
+        Gdx.app.postRunnable(() -> {
+            if (active == indices1) { //-V6013
+                active = indices2;
+                background = indices1;
+            } else {
+                active = indices1;
+                background = indices2;
             }
 
         });
@@ -606,7 +596,7 @@ public class StarGroup extends ParticleGroup implements ILineRenderable, IStarFo
         double distToCamera = lpos.len();
         double viewAngle = (radius / distToCamera) / camera.getFovFactor();
         Color c = new Color();
-        Color.abgr8888ToColor(c, (float) star.col());
+        Color.abgr8888ToColor(c, getColor(i));
         if (viewAngle >= thpointTimesFovfactor) {
             double ssize = getFuzzyRenderSize(camera, size, radius, distToCamera, viewAngle, thdownOverFovfactor, thupOverFovfactor);
 
@@ -1054,6 +1044,10 @@ public class StarGroup extends ParticleGroup implements ILineRenderable, IStarFo
             this.setFocusIndex(-1);
             EventManager.instance.post(Events.CAMERA_MODE_CMD, CameraMode.Free_Camera);
         }
+    }
+
+    public float getColor(int index){
+        return highlighted ? hlColorFloat[hlci] : (float) ((Array<StarBean>)pointData).get(index).col();
     }
 
     @Override

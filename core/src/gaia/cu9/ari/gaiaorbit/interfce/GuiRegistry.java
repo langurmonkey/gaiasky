@@ -247,7 +247,17 @@ public class GuiRegistry implements IObserver {
                         if (result.file().exists() && result.file().isFile()) {
                             // Load selected file
                             try {
-                                EventScriptingInterface.instance().loadDataset(result.file().getName(), result.file().getAbsolutePath(), CatalogInfo.CatalogInfoType.UI, true);
+                                Runnable loader = () -> {
+                                    try {
+                                        EventScriptingInterface.instance().loadDataset(result.file().getName(), result.file().getAbsolutePath(), CatalogInfo.CatalogInfoType.UI, true);
+                                    }catch (Exception e){
+                                        logger.error(I18n.txt("notif.error", result.file().getName()), e);
+                                    }
+                                };
+                                // Load in new thread
+                                Thread t = new Thread(loader);
+                                t.start();
+
                                 lastOpenLocation = result.file().getParentFile();
                                 return true;
                             } catch (Exception e) {

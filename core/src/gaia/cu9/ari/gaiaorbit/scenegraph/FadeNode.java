@@ -2,6 +2,7 @@ package gaia.cu9.ari.gaiaorbit.scenegraph;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.assets.AssetManager;
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.math.Vector2;
 import gaia.cu9.ari.gaiaorbit.GaiaSky;
 import gaia.cu9.ari.gaiaorbit.event.EventManager;
@@ -75,6 +76,33 @@ public class FadeNode extends AbstractPositionEntity {
      * Information on the catalog this fade node represents (particle group, octree, etc.)
      */
     protected CatalogInfo catalogInfo = null;
+
+    /** General track of highlight index **/
+    protected static int hli = 0;
+    /**
+     * Is it highlighted?
+     */
+    protected boolean highlighted;
+    /** Highlight color index **/
+    protected int hlci;
+
+    /** Highlight color **/
+    protected static float[][] hlColor = new float[][]{
+            {1f, 0f, 0f, 1f},
+            {0f, 1f, 0f, 1f},
+            {0f, 0f, 1f, 1f},
+            {0f, 1f, 1f, 1f},
+            {1f, 0f, 1f, 1f},
+            {1f, 1f, 0f, 1f}
+    };
+    protected static float[] hlColorFloat = new float[] {
+            Color.toFloatBits(hlColor[0][0], hlColor[0][1], hlColor[0][2], hlColor[0][3]),
+            Color.toFloatBits(hlColor[1][0], hlColor[1][1], hlColor[1][2], hlColor[1][3]),
+            Color.toFloatBits(hlColor[2][0], hlColor[2][1], hlColor[2][2], hlColor[2][3]),
+            Color.toFloatBits(hlColor[3][0], hlColor[3][1], hlColor[3][2], hlColor[3][3]),
+            Color.toFloatBits(hlColor[4][0], hlColor[4][1], hlColor[4][2], hlColor[4][3]),
+            Color.toFloatBits(hlColor[5][0], hlColor[5][1], hlColor[5][2], hlColor[5][3])
+    };
 
     public FadeNode() {
         super();
@@ -203,6 +231,19 @@ public class FadeNode extends AbstractPositionEntity {
     public void setCataloginfo(Map<String, String> map) {
         this.catalogInfo = new CatalogInfo(map.get("name"), map.get("description"), map.get("source"), CatalogInfoType.valueOf(map.get("type")), this);
         EventManager.instance.post(Events.CATALOG_ADD, this.catalogInfo, false);
+    }
+
+    public void highlight(boolean hl){
+        this.highlighted = hl;
+        // update index
+        if(hl) {
+            hli = (hli + 1) % hlColor.length;
+            this.hlci = hli;
+        }
+    }
+
+    public boolean isHighlighted(){
+        return highlighted;
     }
 
 }

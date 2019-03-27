@@ -242,7 +242,7 @@ public class STILDataProvider extends AbstractStarGroupDataProvider {
                                 Pair<UCD, String> idpair = getStringUcd(ucdp.ID, row);
                                 if (idpair.getFirst().colname.equalsIgnoreCase("hip")) {
                                     hip = Integer.valueOf(idpair.getSecond());
-                                    id = new Long(hip);
+                                    id = (long) hip;
                                 } else {
                                     id = ++starid;
                                 }
@@ -290,7 +290,7 @@ public class STILDataProvider extends AbstractStarGroupDataProvider {
                         list.add(new StarBean(point, id, name));
 
                         int appclmp = (int) MathUtilsd.clamp(appmag, 0, 21);
-                        countsPerMag[(int) appclmp] += 1;
+                        countsPerMag[appclmp] += 1;
                     } catch (Exception e) {
                         logger.debug(e);
                         logger.debug("Exception parsing row " + i + ": skipping");

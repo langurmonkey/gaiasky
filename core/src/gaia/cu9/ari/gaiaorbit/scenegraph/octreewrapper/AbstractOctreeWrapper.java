@@ -6,10 +6,7 @@ import gaia.cu9.ari.gaiaorbit.event.EventManager;
 import gaia.cu9.ari.gaiaorbit.event.Events;
 import gaia.cu9.ari.gaiaorbit.render.ComponentType;
 import gaia.cu9.ari.gaiaorbit.render.system.AbstractRenderSystem;
-import gaia.cu9.ari.gaiaorbit.scenegraph.AbstractPositionEntity;
-import gaia.cu9.ari.gaiaorbit.scenegraph.FadeNode;
-import gaia.cu9.ari.gaiaorbit.scenegraph.IFocus;
-import gaia.cu9.ari.gaiaorbit.scenegraph.SceneGraphNode;
+import gaia.cu9.ari.gaiaorbit.scenegraph.*;
 import gaia.cu9.ari.gaiaorbit.scenegraph.camera.ICamera;
 import gaia.cu9.ari.gaiaorbit.util.ComponentTypes;
 import gaia.cu9.ari.gaiaorbit.util.GlobalConf;
@@ -27,9 +24,8 @@ import java.util.Map;
 /**
  * Abstract Octree wrapper with the common parts of the regular Octree wrapper
  * and the concurrent one.
- * 
- * @author Toni Sagrista
  *
+ * @author Toni Sagrista
  */
 public abstract class AbstractOctreeWrapper extends FadeNode implements Iterable<OctreeNode> {
 
@@ -66,13 +62,13 @@ public abstract class AbstractOctreeWrapper extends FadeNode implements Iterable
         super.initialize();
     }
 
-    public boolean containsObject(AbstractPositionEntity object){
+    public boolean containsObject(AbstractPositionEntity object) {
         return root.containsObject(object);
     }
 
     /**
      * Adds all the objects of the octree (recursively) to the root list.
-     * 
+     *
      * @param octant
      * @param root
      */
@@ -165,7 +161,7 @@ public abstract class AbstractOctreeWrapper extends FadeNode implements Iterable
 
     /**
      * Runs the update on all the observed and selected octree objects.
-     * 
+     *
      * @param time
      * @param parentTransform
      * @param camera
@@ -187,8 +183,7 @@ public abstract class AbstractOctreeWrapper extends FadeNode implements Iterable
     }
 
     @Override
-    /** Not implemented **/
-    public Iterator<OctreeNode> iterator() {
+    /** Not implemented **/ public Iterator<OctreeNode> iterator() {
         return null;
     }
 
@@ -197,9 +192,19 @@ public abstract class AbstractOctreeWrapper extends FadeNode implements Iterable
         return root.nObjects;
     }
 
+    @Override
+    public void highlight(boolean hl) {
+        super.highlight(hl);
+        Array<SceneGraphNode> l = new Array<>();
+        getChildrenByType(FadeNode.class, l);
+        for (SceneGraphNode n : l) {
+            ((FadeNode) n).highlight(hl);
+        }
+    }
+
     /**
      * Gets a copy of this object but does not copy its parent or children
-     * 
+     *
      * @return The copied object
      */
     @Override

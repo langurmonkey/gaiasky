@@ -16,6 +16,7 @@ public class CatalogInfo {
     public CatalogInfoType type;
 
     public FadeNode object;
+    public boolean highlighted;
 
     public CatalogInfo(String name, String description, String source, CatalogInfoType type, FadeNode object) {
         super();
@@ -42,5 +43,10 @@ public class CatalogInfo {
             logger.info("Removing dataset " + name);
             this.object.dispose();
         }
+    }
+
+    public void hightlight(boolean hl){
+        this.highlighted = hl;
+        object.highlight(hl);
     }
 }

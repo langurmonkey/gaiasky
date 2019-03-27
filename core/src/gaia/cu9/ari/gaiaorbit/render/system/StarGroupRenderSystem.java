@@ -33,13 +33,14 @@ public class StarGroupRenderSystem extends ImmediateRenderSystem implements IObs
 
     private Vector3 aux1;
     private int sizeOffset, pmOffset;
-    private float[] pointAlpha, alphaSizeFovBr;
+    private float[] pointAlpha, alphaSizeFovBr, pointAlphaHl;
 
     public StarGroupRenderSystem(RenderGroup rg, float[] alphas, ShaderProgram[] shaders) {
         super(rg, alphas, shaders, 1500000);
         BRIGHTNESS_FACTOR = 10;
         this.comp = new DistToCameraComparator<>();
         this.alphaSizeFovBr = new float[4];
+        this.pointAlphaHl = new float[]{2, 4};
         aux1 = new Vector3();
         EventManager.instance.subscribe(this, Events.STAR_MIN_OPACITY_CMD, Events.DISPOSE_STAR_GROUP_GPU_MESH);
     }
@@ -131,12 +132,14 @@ public class StarGroupRenderSystem extends ImmediateRenderSystem implements IObs
                             checkRequiredVerticesSize(starGroup.size() * curr.vertexSize);
                             curr.vertices = vertices;
 
-                            for (StarBean p : starGroup.data()) {
+                            int n = starGroup.data().size;
+                            for (int i = 0; i < n; i++) {
+                                StarBean p = starGroup.data().get(i);
                                 // COLOR
-                                curr.vertices[curr.vertexIdx + curr.colorOffset] = (float) p.col();
+                                curr.vertices[curr.vertexIdx + curr.colorOffset] = starGroup.getColor(i);
 
                                 // SIZE
-                                curr.vertices[curr.vertexIdx + sizeOffset] = (float) (p.size() * Constants.STAR_SIZE_FACTOR);
+                                curr.vertices[curr.vertexIdx + sizeOffset] = (float) (p.size() * Constants.STAR_SIZE_FACTOR) * starGroup.highlightedSizeFactor();
 
                                 // POSITION [u]
                                 curr.vertices[curr.vertexIdx] = (float) p.x();
@@ -167,7 +170,7 @@ public class StarGroupRenderSystem extends ImmediateRenderSystem implements IObs
                             ShaderProgram shaderProgram = getShaderProgram();
 
                             shaderProgram.begin();
-                            shaderProgram.setUniform2fv("u_pointAlpha", pointAlpha, 0, 2);
+                            shaderProgram.setUniform2fv("u_pointAlpha", starGroup.isHighlighted() ? pointAlphaHl : pointAlpha, 0, 2);
                             shaderProgram.setUniformMatrix("u_projModelView", camera.getCamera().combined);
                             shaderProgram.setUniformf("u_camPos", camera.getCurrent().getPos().put(aux1));
                             shaderProgram.setUniformf("u_camDir", camera.getCurrent().getCamera().direction);
@@ -177,7 +180,7 @@ public class StarGroupRenderSystem extends ImmediateRenderSystem implements IObs
                             addEffectsUniforms(shaderProgram, camera);
 
                             alphaSizeFovBr[0] = starGroup.opacity * alphas[starGroup.ct.getFirstOrdinal()];
-                            alphaSizeFovBr[1] = fovmode == 0 ? (GlobalConf.scene.STAR_POINT_SIZE * rc.scaleFactor * (GlobalConf.program.isStereoFullWidth() ? 1 : 2)) : (GlobalConf.scene.STAR_POINT_SIZE * rc.scaleFactor * 10);
+                            alphaSizeFovBr[1] = (fovmode == 0 ? (GlobalConf.scene.STAR_POINT_SIZE * rc.scaleFactor * (GlobalConf.program.isStereoFullWidth() ? 1 : 2)) : (GlobalConf.scene.STAR_POINT_SIZE * rc.scaleFactor * 10)) * starGroup.highlightedSizeFactor();
                             alphaSizeFovBr[2] = camera.getFovFactor();
                             alphaSizeFovBr[3] = (float) (GlobalConf.scene.STAR_BRIGHTNESS * BRIGHTNESS_FACTOR);
                             shaderProgram.setUniform4fv("u_alphaSizeFovBr", alphaSizeFovBr, 0, 4);
