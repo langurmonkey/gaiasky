@@ -45,8 +45,13 @@ public class CatalogInfo {
         }
     }
 
-    public void hightlight(boolean hl){
+    public void highlight(boolean hl){
         this.highlighted = hl;
         object.highlight(hl);
+    }
+
+    public void highlight(boolean hl, int colorIndex){
+        this.highlighted = hl;
+        object.highlight(hl, colorIndex);
     }
 }

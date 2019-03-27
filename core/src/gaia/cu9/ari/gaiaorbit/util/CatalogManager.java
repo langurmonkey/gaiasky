@@ -82,9 +82,15 @@ public class CatalogManager implements IObserver {
             break;
         case CATALOG_HIGHLIGHT:
             dsName = (String) data[0];
+            boolean highlight = (Boolean) data[1];
+            int colIdx = (Integer) data[2];
             if (ciMap.containsKey(dsName)) {
                 ci = ciMap.get(dsName);
-                ci.hightlight(!ci.highlighted);
+                if (colIdx < 0)
+                    ci.highlight(highlight);
+                else
+                    ci.highlight(highlight, colIdx);
+
                 if (ci.highlighted)
                     logger.info(I18n.txt("notif.highlight.on", ci.name));
                 else

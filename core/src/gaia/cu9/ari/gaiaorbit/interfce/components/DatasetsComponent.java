@@ -25,7 +25,7 @@ public class DatasetsComponent extends GuiComponent implements IObserver {
     private float pad = 3 * GlobalConf.SCALE_FACTOR;
 
     private Map<String, HorizontalGroup> groupMap;
-    private Map<String, OwnImageButton> imageMap;
+    private Map<String, OwnImageButton[]> imageMap;
 
     public DatasetsComponent(Skin skin, Stage stage) {
         super(skin, stage);
@@ -90,7 +90,6 @@ public class DatasetsComponent extends GuiComponent implements IObserver {
             }
             return false;
         });
-        imageMap.put(ci.name, eye);
 
         ImageButton rubbish = new OwnImageButton(skin, "rubbish-bin");
         rubbish.addListener(new TextTooltip(I18n.txt("gui.tooltip.dataset.remove"), skin));
@@ -103,16 +102,17 @@ public class DatasetsComponent extends GuiComponent implements IObserver {
             return false;
         });
 
-        ImageButton mark = new OwnImageButton(skin, "highlight-ds");
+        OwnImageButton mark = new OwnImageButton(skin, "highlight-ds");
         mark.addListener(new TextTooltip(I18n.txt("gui.tooltip.dataset.highlight"), skin));
         mark.addListener((event) -> {
            if(event instanceof ChangeEvent){
-               EventManager.instance.post(Events.CATALOG_HIGHLIGHT, ci.name);
+               EventManager.instance.post(Events.CATALOG_HIGHLIGHT, ci.name, mark.isChecked(), -1, true);
                return true;
            }
            return false;
         });
 
+        imageMap.put(ci.name, new OwnImageButton[]{eye, mark});
         controls.addActor(eye);
         controls.addActor(rubbish);
         controls.addActor(mark);
@@ -146,11 +146,20 @@ public class DatasetsComponent extends GuiComponent implements IObserver {
             if (!ui) {
                 ciName = (String) data[0];
                 boolean visible = (Boolean) data[1];
-                OwnImageButton eye = imageMap.get(ciName);
+                OwnImageButton eye = imageMap.get(ciName)[0];
                 eye.setCheckedNoFire(!visible);
             }
             break;
         case CATALOG_HIGHLIGHT:
+             ui = false;
+             if(data.length > 3)
+                 ui = (Boolean) data[3];
+             if(!ui){
+                 ciName = (String) data[0];
+                 boolean hl = (Boolean) data[1];
+                 OwnImageButton hig = imageMap.get(ciName)[1];
+                 hig.setCheckedNoFire(hl);
+             }
             break;
         default:
             break;

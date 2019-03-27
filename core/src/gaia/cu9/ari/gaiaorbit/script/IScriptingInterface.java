@@ -1511,6 +1511,31 @@ public interface IScriptingInterface {
     boolean showDataset(String dsName);
 
     /**
+     * Enables or disables the dataset highlight, using a cyclic color which changes every call
+     * @param dsName The dataset name
+     * @param highlight State
+     * @return False if the dataset could not be found
+     */
+    boolean highlightDataset(String dsName, boolean highlight);
+
+    /**
+     * Enables or disables the dataset highlight, using a given color index:
+     * <ul>
+     *     <li>0 - red</li>
+     *     <li>1 - green</li>
+     *     <li>2 - blue</li>
+     *     <li>3 - cyan</li>
+     *     <li>4 - magenta</li>
+     *     <li>5 - yellow</li>
+     * </ul>
+     * @param dsName The dataset name
+     * @param colorIndex Color index in [0..5]
+     * @param highlight State
+     * @return False if the dataset could not be found
+     */
+    boolean highlightDataset(String dsName, int colorIndex, boolean highlight);
+
+    /**
      * Rotates a 3D vector around the given axis by the specified angle in degrees.
      * Vectors are arrays with 3 components. If more components are there, they are ignored.
      *

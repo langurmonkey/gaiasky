@@ -1,7 +1,5 @@
 package gaia.cu9.ari.gaiaorbit.interfce.components;
 
-import com.badlogic.gdx.scenes.scene2d.Event;
-import com.badlogic.gdx.scenes.scene2d.EventListener;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener.ChangeEvent;
@@ -53,14 +51,14 @@ public class VisibilityComponent extends GuiComponent implements IObserver {
         final Table visibilityTable = new Table(skin);
         visibilityTable.setName("visibility table");
         visibilityTable.top().left();
-        buttonMap = new HashMap<String, Button>();
-        Set<Button> buttons = new HashSet<Button>();
+        buttonMap = new HashMap<>();
+        Set<Button> buttons = new HashSet<>();
         if (visibilityEntities != null) {
             for (int i = 0; i < visibilityEntities.length; i++) {
                 final ComponentType ct = visibilityEntities[i];
                 final String name = ct.getName();
                 if (name != null) {
-                    Button button = null;
+                    Button button;
                     if (ct.style != null) {
                         Image icon = new Image(skin.getDrawable(ct.style));
                         button = new OwnTextIconButton("", icon, skin, "toggle");
@@ -76,15 +74,12 @@ public class VisibilityComponent extends GuiComponent implements IObserver {
                         buttonMap.put(ct.key, button);
 
                     button.setChecked(visible[i]);
-                    button.addListener(new EventListener() {
-                        @Override
-                        public boolean handle(Event event) {
-                            if (event instanceof ChangeEvent) {
-                                EventManager.instance.post(Events.TOGGLE_VISIBILITY_CMD, ct.key, true, ((Button) event.getListenerActor()).isChecked());
-                                return true;
-                            }
-                            return false;
+                    button.addListener(event -> {
+                        if (event instanceof ChangeEvent) {
+                            EventManager.instance.post(Events.TOGGLE_VISIBILITY_CMD, ct.key, true, ((Button) event.getListenerActor()).isChecked());
+                            return true;
                         }
+                        return false;
                     });
                     visibilityTable.add(button).pad(GlobalConf.SCALE_FACTOR).left();
                     if ((i + 1) % visTableCols == 0) {
@@ -177,9 +172,6 @@ public class VisibilityComponent extends GuiComponent implements IObserver {
 
         // Set button width to max width
         visibilityTable.pack();
-        //        for (Button b : buttons) {
-        //            b.setSize(25 * GlobalConf.SCALE_FACTOR, 25 * GlobalConf.SCALE_FACTOR);
-        //        }
 
         visibilityTable.row().padBottom(3 * GlobalConf.SCALE_FACTOR);
         visibilityTable.add(pmGroup).padTop(3 * GlobalConf.SCALE_FACTOR).align(Align.left).colspan(visTableCols);

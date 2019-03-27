@@ -1032,7 +1032,7 @@ public enum Events {
     CATALOG_VISIBLE,
 
     /**
-     * Mark catalog
+     * Highlight the catalog. Contains the dataset name, the highlight status (bool), the color index (negative for automatic) and an optional boolean if it comes from the UI
      */
     CATALOG_HIGHLIGHT,
 
