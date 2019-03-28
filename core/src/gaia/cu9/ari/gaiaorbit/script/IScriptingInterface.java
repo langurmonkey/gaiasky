@@ -502,7 +502,7 @@ public interface IScriptingInterface {
      * Sets the component described by the given name visible or invisible.
      *
      * @param key     The key of the component, see
-     *                {@link gaia.cu9.ari.gaiaorbit.render.ComponentType}. Usually
+     *                {@link gaia.cu9.ari.gaiaorbit.render.ComponentTypes.ComponentType}. Usually
      *                'element.stars', 'element.moons', 'element.atmospheres', etc.
      *                Proper motion vectors are a special case not listed in component
      *                types. Use the key 'element.propermotions' to that end.
@@ -513,16 +513,29 @@ public interface IScriptingInterface {
     /**
      * Sets the number factor of proper motion vectors that are visible. In [1..100].
      *
-     * @param factor
+     * @param factor Factor in [1..100]
      */
     void setProperMotionsNumberFactor(float factor);
 
     /**
      * Sets the length of the proper motion vectors, in [500..30000].
      *
-     * @param factor
+     * @param factor Factor in [500.30000]
      */
     void setProperMotionsLengthFactor(float factor);
+
+    /**
+     * Overrides the maximum number of proper motion vectors that the program
+     * is allowed to show.
+     * @param maxNumber The maximum number of proper motion vectors. Negative to use default
+     */
+    void setProperMotionsMaxNumber(long maxNumber);
+
+    /**
+     * Returns the current maximum number of proper motion vectors allowed.
+     * @return Max number of pm vectors
+     */
+    long getProperMotionsMaxNumber();
 
     /**
      * Sets the visibility of the crosshair in focus and free modes.

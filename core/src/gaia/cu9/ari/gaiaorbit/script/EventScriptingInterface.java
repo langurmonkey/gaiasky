@@ -534,6 +534,16 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
     }
 
     @Override
+    public void setProperMotionsMaxNumber(long maxNumber) {
+        GlobalConf.scene.N_PM_STARS = maxNumber;
+    }
+
+    @Override
+    public long getProperMotionsMaxNumber() {
+        return GlobalConf.scene.N_PM_STARS;
+    }
+
+    @Override
     public void setCrosshairVisibility(boolean visible) {
         Gdx.app.postRunnable(() -> em.post(Events.CROSSHAIR_CMD, visible));
     }

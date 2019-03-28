@@ -649,13 +649,17 @@ public class StarGroup extends ParticleGroup implements ILineRenderable, IStarFo
         }
     }
 
+    private long getMaxProperMotionLines(){
+        return GlobalConf.scene.N_PM_STARS > 0 ? GlobalConf.scene.N_PM_STARS : (N_CLOSEUP_STARS * 20);
+    }
+
     /**
      * Proper motion rendering
      */
     @Override
     public void render(LineRenderSystem renderer, ICamera camera, float alpha) {
         float thpointTimesFovfactor = (float) GlobalConf.scene.STAR_THRESHOLD_POINT * camera.getFovFactor();
-        int n = Math.min(N_CLOSEUP_STARS * 20, pointData.size);
+        int n = (int) Math.min(getMaxProperMotionLines(), pointData.size);
         for (int i = n - 1; i >= 0; i--) {
             StarBean star = (StarBean) pointData.get(active[i]);
             float radius = (float) (getSize(active[i]) * Constants.STAR_SIZE_FACTOR);
