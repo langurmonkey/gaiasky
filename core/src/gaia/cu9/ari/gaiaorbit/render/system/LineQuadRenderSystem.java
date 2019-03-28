@@ -50,7 +50,7 @@ public class LineQuadRenderSystem extends LineRenderSystem {
     }
 
     Vector3d line, camdir0, camdir1, camdir15, point, vec;
-    final static double widthAngle = Math.toRadians(0.05);
+    final static double widthAngle = Math.toRadians(0.065);
     final static double widthAngleTan = Math.tan(widthAngle);
 
     public LineQuadRenderSystem(RenderGroup rg, float[] alphas, ShaderProgram[] shaders) {
