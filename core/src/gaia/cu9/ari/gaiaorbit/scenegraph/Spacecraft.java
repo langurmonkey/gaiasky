@@ -3,6 +3,7 @@ package gaia.cu9.ari.gaiaorbit.scenegraph;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.assets.AssetManager;
+import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.g3d.ModelBatch;
 import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Quaternion;
@@ -659,6 +660,11 @@ public class Spacecraft extends GenericSpacecraft implements ILineRenderable, IO
     @Override
     public float getLineWidth() {
         return 1;
+    }
+
+    @Override
+    public int getGlType() {
+        return GL20.GL_LINES;
     }
 
 }

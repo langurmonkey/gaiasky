@@ -234,6 +234,7 @@ public class ObjectsComponent extends GuiComponent implements IObserver {
     private Group visibilitySwitcher(Class<? extends FadeNode> clazz, String title, String id) {
         float componentWidth = 160 * GlobalConf.SCALE_FACTOR;
         float sp4 = 4 * GlobalConf.SCALE_FACTOR;
+        float sp8 = 8 * GlobalConf.SCALE_FACTOR;
         VerticalGroup objectsVgroup = new VerticalGroup();
         objectsVgroup.space(sp4);
         objectsVgroup.left();
@@ -297,6 +298,7 @@ public class ObjectsComponent extends GuiComponent implements IObserver {
         HorizontalGroup buttons = new HorizontalGroup();
         buttons.space(sp4);
         OwnTextButton selAll = new OwnTextButton(I18n.txt("gui.select.all"), skin);
+        selAll.pad(0, sp8, 0, sp8);
         selAll.addListener((event) -> {
             if (event instanceof ChangeEvent) {
                 Gdx.app.postRunnable(() -> {
@@ -307,6 +309,7 @@ public class ObjectsComponent extends GuiComponent implements IObserver {
             return false;
         });
         OwnTextButton selNone = new OwnTextButton(I18n.txt("gui.select.none"), skin);
+        selNone.pad(0, sp8, 0, sp8);
         selNone.addListener((event) -> {
             if (event instanceof ChangeEvent) {
                 Gdx.app.postRunnable(() -> {

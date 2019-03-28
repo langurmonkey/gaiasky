@@ -691,6 +691,11 @@ public class StarGroup extends ParticleGroup implements ILineRenderable, IStarFo
 
     }
 
+    @Override
+    public int getGlType() {
+        return GL20.GL_LINES;
+    }
+
     /**
      * Label rendering
      */

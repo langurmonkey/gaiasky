@@ -15,4 +15,6 @@ public interface ILineRenderable extends IRenderable {
 
     void render(LineRenderSystem renderer, ICamera camera, float alpha);
 
+    int getGlType();
+
 }

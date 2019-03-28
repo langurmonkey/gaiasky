@@ -1,6 +1,7 @@
 package gaia.cu9.ari.gaiaorbit.scenegraph;
 
 import com.badlogic.gdx.assets.AssetManager;
+import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.g3d.ModelBatch;
 import com.badlogic.gdx.math.Vector3;
 import gaia.cu9.ari.gaiaorbit.GaiaSky;
@@ -385,6 +386,11 @@ public class Particle extends CelestialBody implements IStarFocus, ILineRenderab
         final double mumax = 80;
         final double maxmin = mumax - mumin;
         renderer.addLine(this, p1.x, p1.y, p1.z, p2.x, p2.y, p2.z, (float) ((pmSph.x - mumin) / maxmin) * 0.8f + 0.2f, (float) ((pmSph.y - mumin) / maxmin) * 0.8f + 0.2f, (float) pmSph.z * 0.8f + 0.2f, alpha * this.opacity);
+    }
+
+    @Override
+    public int getGlType() {
+        return GL20.GL_LINES;
     }
 
     protected float getThOverFactorScl() {

@@ -56,10 +56,9 @@ public class LineQuadRenderSystem extends LineRenderSystem {
     public LineQuadRenderSystem(RenderGroup rg, float[] alphas, ShaderProgram[] shaders) {
         super(rg, alphas, shaders);
         dpool = new DPool(INI_DPOOL_SIZE, MAX_DPOOL_SIZE, 14);
-        provisionalLines = new Array<double[]>();
-        provLines = new Array<Line>();
+        provisionalLines = new Array<>();
+        provLines = new Array<>();
         sorter = new LineArraySorter(12);
-        glType = GL20.GL_TRIANGLES;
         line = new Vector3d();
         camdir0 = new Vector3d();
         camdir1 = new Vector3d();
@@ -139,7 +138,7 @@ public class LineQuadRenderSystem extends LineRenderSystem {
 
     @Override
     public void addLine(ILineRenderable lr, double x0, double y0, double z0, double x1, double y1, double z1, float r, float g, float b, float a) {
-        addLineInternal(x0, y0, z0, x1, y1, z1, r, g, b, a, lr.getLineWidth() * widthAngleTan);
+        addLineInternal(x0, y0, z0, x1, y1, z1, r, g, b, a, lr.getLineWidth() * widthAngleTan * GlobalConf.SCALE_FACTOR);
     }
 
     private void addLineInternal(double x0, double y0, double z0, double x1, double y1, double z1, float r, float g, float b, float a, double widthAngleTan) {
@@ -152,7 +151,7 @@ public class LineQuadRenderSystem extends LineRenderSystem {
         double dist0 = Math.sqrt(x0 * x0 + y0 * y0 + z0 * z0);
         double dist1 = Math.sqrt(x1 * x1 + y1 * y1 + z1 * z1);
 
-        Vector3d p15 = null;
+        Vector3d p15;
 
         if (rec && distToSegment < dist0 && distToSegment < dist1) {
             // Projection falls in line, split line
@@ -327,7 +326,7 @@ public class LineQuadRenderSystem extends LineRenderSystem {
             MeshDataExt md = (MeshDataExt) meshes[i];
             md.mesh.setVertices(md.vertices, 0, md.vertexIdx);
             md.mesh.setIndices(md.indices, 0, md.indexIdx);
-            md.mesh.render(shaderProgram, glType);
+            md.mesh.render(shaderProgram, GL20.GL_TRIANGLES);
 
             md.clear();
         }

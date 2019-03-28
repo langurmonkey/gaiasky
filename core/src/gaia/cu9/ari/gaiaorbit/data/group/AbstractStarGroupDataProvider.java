@@ -24,6 +24,7 @@ import java.util.zip.GZIPInputStream;
 
 public abstract class AbstractStarGroupDataProvider implements IStarGroupDataProvider {
     protected static Log logger = Logger.getLogger(AbstractStarGroupDataProvider.class);
+    public static double NEGATIVE_DIST = 1 * Constants.M_TO_U;
 
     protected Array<StarBean> list;
     protected LongMap<double[]> sphericalPositions;

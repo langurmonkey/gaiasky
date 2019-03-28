@@ -74,10 +74,6 @@ public class DR2DataProvider extends AbstractStarGroupDataProvider {
      * Maximum file count to load. 0 or negative for unlimited
      */
     private int fileNumberCap = -1;
-    /**
-     * Whether to load the sourceId->HIP correspondences file
-     **/
-    public boolean useHIP = false;
 
     /**
      * Number formatter
@@ -223,7 +219,8 @@ public class DR2DataProvider extends AbstractStarGroupDataProvider {
                         double dec = Parser.parseDouble(tokens[IDX_DEC]);
                         double rarad = Math.toRadians(ra);
                         double decrad = Math.toRadians(dec);
-                        Vector3d pos = Coordinates.sphericalToCartesian(rarad, decrad, dist, new Vector3d());
+                        // If distance is negative due to mustLoad, we need to be able to retrieve sph pos later on, so we use 1 m to mark it
+                        Vector3d pos = Coordinates.sphericalToCartesian(rarad, decrad, Math.max(dist, NEGATIVE_DIST), new Vector3d());
 
                         /** PROPER MOTIONS in mas/yr **/
                         double mualphastar = Parser.parseDouble(tokens[IDX_MUALPHA]);

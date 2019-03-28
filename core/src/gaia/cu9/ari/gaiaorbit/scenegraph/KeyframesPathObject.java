@@ -702,5 +702,10 @@ public class KeyframesPathObject extends VertsObject implements I3DTextRenderabl
         // Void
     }
 
+    @Override
+    public int getGlType() {
+        return GL20.GL_LINE_STRIP;
+    }
+
 
 }
