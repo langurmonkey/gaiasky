@@ -19,9 +19,14 @@ LIB_PATH="$GSDIR/lib/*"
 #
 # Choose java - use JAVA_HOME, if set.
 #
-if [ "$JAVA_HOME" != "" ]; then
+if [[ "$OSTYPE" == "darwin" ]]; then
+    # macOS, use bundled JRE
+    JAVA="$GSDIR/../../PlugIns/jre.bundle/Contents/Home/jre/bin/java"
+elif [[ "$JAVA_HOME" != "" ]]; then
+    # Use $JAVA_HOME
 	JAVA="$JAVA_HOME/bin/java"
 else
+    # Use system default
 	JAVA="java"
 fi
 
