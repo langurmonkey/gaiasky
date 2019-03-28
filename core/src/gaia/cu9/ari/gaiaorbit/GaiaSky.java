@@ -29,6 +29,7 @@ import gaia.cu9.ari.gaiaorbit.event.Events;
 import gaia.cu9.ari.gaiaorbit.event.IObserver;
 import gaia.cu9.ari.gaiaorbit.interfce.*;
 import gaia.cu9.ari.gaiaorbit.render.*;
+import gaia.cu9.ari.gaiaorbit.render.ComponentTypes.ComponentType;
 import gaia.cu9.ari.gaiaorbit.render.IPostProcessor.PostProcessBean;
 import gaia.cu9.ari.gaiaorbit.render.IPostProcessor.RenderType;
 import gaia.cu9.ari.gaiaorbit.scenegraph.IFocus;
@@ -780,7 +781,7 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
         return sgr.isOn(ordinal);
     }
 
-    public boolean isOn(ComponentType comp) {
+    public boolean isOn(ComponentTypes.ComponentType comp) {
         return sgr.isOn(comp);
     }
 

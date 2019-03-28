@@ -8,7 +8,7 @@ import com.badlogic.gdx.utils.reflect.ReflectionException;
 import gaia.cu9.ari.gaiaorbit.GaiaSky;
 import gaia.cu9.ari.gaiaorbit.assets.OrbitDataLoader;
 import gaia.cu9.ari.gaiaorbit.data.orbit.IOrbitDataProvider;
-import gaia.cu9.ari.gaiaorbit.render.ComponentType;
+import gaia.cu9.ari.gaiaorbit.render.ComponentTypes.ComponentType;
 import gaia.cu9.ari.gaiaorbit.render.system.LineRenderSystem;
 import gaia.cu9.ari.gaiaorbit.scenegraph.camera.ICamera;
 import gaia.cu9.ari.gaiaorbit.scenegraph.component.OrbitComponent;

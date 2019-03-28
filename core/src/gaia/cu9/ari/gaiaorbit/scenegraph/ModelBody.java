@@ -11,7 +11,7 @@ import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.Array;
 import gaia.cu9.ari.gaiaorbit.GaiaSky;
-import gaia.cu9.ari.gaiaorbit.render.ComponentType;
+import gaia.cu9.ari.gaiaorbit.render.ComponentTypes.ComponentType;
 import gaia.cu9.ari.gaiaorbit.render.SceneGraphRenderer;
 import gaia.cu9.ari.gaiaorbit.render.ShadowMapImpl;
 import gaia.cu9.ari.gaiaorbit.scenegraph.camera.ICamera;

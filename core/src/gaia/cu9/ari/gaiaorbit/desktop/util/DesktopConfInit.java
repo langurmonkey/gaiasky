@@ -3,7 +3,7 @@ package gaia.cu9.ari.gaiaorbit.desktop.util;
 import com.badlogic.gdx.Gdx;
 import gaia.cu9.ari.gaiaorbit.desktop.GaiaSkyDesktop;
 import gaia.cu9.ari.gaiaorbit.desktop.util.camera.CameraKeyframeManager;
-import gaia.cu9.ari.gaiaorbit.render.ComponentType;
+import gaia.cu9.ari.gaiaorbit.render.ComponentTypes.ComponentType;
 import gaia.cu9.ari.gaiaorbit.util.*;
 import gaia.cu9.ari.gaiaorbit.util.GlobalConf.*;
 import gaia.cu9.ari.gaiaorbit.util.GlobalConf.PostprocessConf.Antialias;

@@ -4,9 +4,10 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.g3d.ModelBatch;
 import com.badlogic.gdx.utils.Array;
 import gaia.cu9.ari.gaiaorbit.render.*;
+import gaia.cu9.ari.gaiaorbit.render.ComponentTypes.ComponentType;
 import gaia.cu9.ari.gaiaorbit.scenegraph.SceneGraphNode.RenderGroup;
 import gaia.cu9.ari.gaiaorbit.scenegraph.camera.ICamera;
-import gaia.cu9.ari.gaiaorbit.util.ComponentTypes;
+import gaia.cu9.ari.gaiaorbit.render.ComponentTypes;
 import gaia.cu9.ari.gaiaorbit.util.GlobalConf;
 import gaia.cu9.ari.gaiaorbit.util.comp.ModelComparator;
 
@@ -44,7 +45,7 @@ public class ModelBatchRenderSystem extends AbstractRenderSystem {
         super(rg, alphas, null);
         this.batch = batch;
         this.type = type;
-        comp = new ModelComparator<IRenderable>();
+        comp = new ModelComparator<>();
 
         this.ctAtm = new ComponentTypes(ComponentType.Atmospheres);
         this.ctClouds = new ComponentTypes(ComponentType.Clouds);
