@@ -300,10 +300,9 @@ public class KeyBindings {
         addMapping(new ProgramAction(I18n.txt("action.toggle", I18n.txt("element.galaxy3d")), () ->
                 EventManager.instance.post(Events.GALAXY_3D_CMD, !GlobalConf.scene.GALAXY_3D)), SPECIAL1, SPECIAL2, Keys.G);
 
-        // HOME -> Back to Earth
+        // HOME -> Back home
         addMapping(new ProgramAction(I18n.txt("action.home"), () -> {
-            EventManager.instance.post(Events.FOCUS_CHANGE_CMD, "Earth");
-            EventManager.instance.post(Events.GO_TO_OBJECT_CMD);
+            EventManager.instance.post(Events.HOME_CMD);
         }), Keys.HOME);
 
         // TAB -> Minimap toggle

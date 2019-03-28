@@ -135,7 +135,7 @@ public enum Events {
      * Informs that the focus has somehow changed and the GUI must be updated.
      * <ul>
      * <li>[0] - The new focus object OR its name.</li>
-     * <li>[1] - Optional boolean that, if set to true, prevents the camera from actually centering on the focus.</li>
+     * <li>[1] - Center focus (bool). If true, the focus is centered on the view.</li>
      * </ul>
      **/
     FOCUS_CHANGED,
@@ -1054,6 +1054,11 @@ public enum Events {
      * Event sent before the start of every frame. Contains a long with the frame number
      */
     FRAME_TICK,
+
+    /**
+     * Runs the 'Go home' action
+     */
+    HOME_CMD,
 
     /**
      * Dispose all resources, app is shutting down
