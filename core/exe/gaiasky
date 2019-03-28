@@ -17,9 +17,9 @@ GSDIRESC=$(printf %q "$GSDIR")
 LIB_PATH="$GSDIR/lib/*"
 
 #
-# Choose java - use JAVA_HOME, if set.
+# Choose jre
 #
-if [[ "$OSTYPE" == "darwin" ]]; then
+if [[ "$OSTYPE" == "darwin"* ]]; then
     # macOS, use bundled JRE
     JAVA="$GSDIR/../../PlugIns/jre.bundle/Contents/Home/jre/bin/java"
 elif [[ "$JAVA_HOME" != "" ]]; then
@@ -29,6 +29,9 @@ else
     # Use system default
     JAVA="java"
 fi
+
+# Escape
+JAVA=$(printf %q "$JAVA")
 
 #
 # Settings.
@@ -53,7 +56,7 @@ OPTS="$OPTS -XX:+UseG1GC"
 # Even more JIT compiler debugging - This produces a huge XML log file (for JITWatch)
 #OPTS="$OPTS -XX:+UnlockDiagnosticVMOptions -XX:+TraceClassLoading -XX:+LogCompilation -XX:+PrintAssembly"
 
-# macOS hack - needs a couple of args to be happy
+# macOS hack - needs a couple of args to be happy (lwjgl3 only)
 #if [[ "$OSTYPE" == "darwin"* ]]; then
 #	OPTS="$OPTS -XstartOnFirstThread -Djava.awt.headless=true"
 #fi
