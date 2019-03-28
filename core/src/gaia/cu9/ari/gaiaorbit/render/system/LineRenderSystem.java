@@ -24,13 +24,11 @@ public class LineRenderSystem extends ImmediateRenderSystem {
     protected static final int INI_DPOOL_SIZE = 5000;
     protected static final int MAX_DPOOL_SIZE = 100000;
     protected ICamera camera;
-    protected int glType;
 
     protected Vector3 aux2;
 
     public LineRenderSystem(RenderGroup rg, float[] alphas, ShaderProgram[] shaders) {
         super(rg, alphas, shaders, -1);
-        glType = GL20.GL_LINE_STRIP;
         aux2 = new Vector3();
     }
 
@@ -99,7 +97,7 @@ public class LineRenderSystem extends ImmediateRenderSystem {
                 renderable.render(this, camera, getAlpha(renderable));
 
             curr.mesh.setVertices(curr.vertices, 0, curr.vertexIdx);
-            curr.mesh.render(shaderProgram, glType);
+            curr.mesh.render(shaderProgram, renderable.getGlType());
 
             curr.clear();
         }

@@ -135,7 +135,7 @@ public class BinaryDataProvider extends AbstractStarGroupDataProvider {
             MappedByteBuffer mem = fc.map(FileChannel.MapMode.READ_ONLY, 0, fc.size());
             // Read size of stars
             int size = mem.getInt();
-            list = new Array<StarBean>(size);
+            list = new Array<>(size);
             for (int i = 0; i < size; i++) {
                 list.add(readStarBean(mem));
             }

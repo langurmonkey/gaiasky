@@ -1,6 +1,7 @@
 package gaia.cu9.ari.gaiaorbit.scenegraph;
 
 import com.badlogic.gdx.assets.AssetManager;
+import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.PerspectiveCamera;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g3d.ModelBatch;
@@ -231,6 +232,11 @@ public class Planet extends ModelBody implements IAtmosphereRenderable, ICloudRe
     @Override
     public void render(LineRenderSystem renderer, ICamera camera, float alpha) {
         renderer.addLine(this, translation.x, translation.y, translation.z, endLine.x, endLine.y, endLine.z, 1, 0, 0, 1);
+    }
+
+    @Override
+    public int getGlType() {
+        return GL20.GL_LINE_STRIP;
     }
 
     @Override

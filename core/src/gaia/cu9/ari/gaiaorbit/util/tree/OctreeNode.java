@@ -1,6 +1,7 @@
 package gaia.cu9.ari.gaiaorbit.util.tree;
 
 import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.utils.Array;
 import gaia.cu9.ari.gaiaorbit.data.StreamingOctreeLoader;
 import gaia.cu9.ari.gaiaorbit.render.ComponentType;
@@ -884,4 +885,9 @@ public class OctreeNode implements ILineRenderable {
         return 1;
     }
 
+
+    @Override
+    public int getGlType() {
+        return GL20.GL_LINE_STRIP;
+    }
 }

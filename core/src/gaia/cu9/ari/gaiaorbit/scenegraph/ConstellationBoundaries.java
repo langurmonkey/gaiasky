@@ -1,5 +1,6 @@
 package gaia.cu9.ari.gaiaorbit.scenegraph;
 
+import com.badlogic.gdx.graphics.GL20;
 import gaia.cu9.ari.gaiaorbit.render.ILineRenderable;
 import gaia.cu9.ari.gaiaorbit.render.system.LineRenderSystem;
 import gaia.cu9.ari.gaiaorbit.scenegraph.camera.ICamera;
@@ -59,4 +60,8 @@ public class ConstellationBoundaries extends AbstractPositionEntity implements I
         return 1;
     }
 
+    @Override
+    public int getGlType() {
+        return GL20.GL_LINES;
+    }
 }

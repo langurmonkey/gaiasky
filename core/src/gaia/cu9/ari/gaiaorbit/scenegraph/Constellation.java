@@ -26,9 +26,8 @@ import gaia.cu9.ari.gaiaorbit.util.tree.IPosition;
 
 /**
  * Represents a constellation object.
- * 
- * @author Toni Sagrista
  *
+ * @author Toni Sagrista
  */
 public class Constellation extends FadeNode implements ILineRenderable, I3DTextRenderable, IVisibilitySwitch {
     private static Array<Constellation> allConstellations = new Array<Constellation>(88);
@@ -86,9 +85,9 @@ public class Constellation extends FadeNode implements ILineRenderable, I3DTextR
         }
         pos.scl((1d / nstars));
         pos.nor().scl(100 * Constants.PC_TO_U);
-        
+
         super.updateLocal(time, camera);
-        
+
         addToRenderLists(camera);
 
         deltaYears = AstroUtils.getMsSince(time.getTime(), AstroUtils.JD_J2015_5) * Nature.MS_TO_Y;
@@ -224,7 +223,7 @@ public class Constellation extends FadeNode implements ILineRenderable, I3DTextR
     }
 
     @Override
-    public float getTextOpacity(){
+    public float getTextOpacity() {
         return getOpacity();
     }
 
@@ -240,5 +239,10 @@ public class Constellation extends FadeNode implements ILineRenderable, I3DTextR
 
     @Override
     public void setDescription(String name) {
+    }
+
+    @Override
+    public int getGlType() {
+        return GL20.GL_LINES;
     }
 }

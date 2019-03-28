@@ -427,7 +427,7 @@ public abstract class StreamingOctreeLoader implements IObserver, ISceneGraphLoa
             this.abort = new AtomicBoolean(false);
             this.loader = loader;
             this.octreeWrapper = aow;
-            this.toLoad = new Array<OctreeNode>();
+            this.toLoad = new Array<>();
         }
 
         /**
@@ -452,7 +452,7 @@ public abstract class StreamingOctreeLoader implements IObserver, ISceneGraphLoa
                     toLoad.clear();
                     int i = 0;
                     while (instance.toLoadQueue.peek() != null && i <= MAX_LOAD_CHUNK) {
-                        OctreeNode octant = (OctreeNode) instance.toLoadQueue.poll();
+                        OctreeNode octant = instance.toLoadQueue.poll();
                         toLoad.add(octant);
                         i++;
                     }
@@ -474,7 +474,7 @@ public abstract class StreamingOctreeLoader implements IObserver, ISceneGraphLoa
                     int nStars = loader.nLoadedStars;
                     if (running && nStars >= loader.maxLoadedStars) //-V6007
                         while (true) {
-                            // Get first in queue (unaccessed for the longest time)
+                            // Get first in queue (non-accessed for the longest time)
                             // and release it
                             OctreeNode octant = loader.toUnloadQueue.poll();
                             if (octant != null && octant.getStatus() == LoadStatus.LOADED) {
