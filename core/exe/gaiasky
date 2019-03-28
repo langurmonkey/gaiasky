@@ -24,10 +24,10 @@ if [[ "$OSTYPE" == "darwin" ]]; then
     JAVA="$GSDIR/../../PlugIns/jre.bundle/Contents/Home/jre/bin/java"
 elif [[ "$JAVA_HOME" != "" ]]; then
     # Use $JAVA_HOME
-	JAVA="$JAVA_HOME/bin/java"
+    JAVA="$JAVA_HOME/bin/java"
 else
     # Use system default
-	JAVA="java"
+    JAVA="java"
 fi
 
 #
