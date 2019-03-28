@@ -169,19 +169,13 @@ First, clone the [GitLab](https://gitlab.com/langurmonkey/gaiasky) repository:
 $  git clone https://gitlab.com/langurmonkey/gaiasky.git
 ```
 
-**Tip**: Gaia Sky will check that you are using Java 1.8 when running the build. You can still use a newer JDK version (e.g. JDK 10) by setting the following environment variable to `false` in the context of gradle:
-
-```
-$  export GS_JAVA_VERSION_CHECK=false
-```
-
 
 #### 2.2.2 Running
 
-Finally, run Gaia Sky (Linux, macOS) with:
+Finally, run Gaia Sky (Linux, macOS) with the provided script:
 
 ```
-$  gradlew core:run
+$  gaiasky
 ```
 
 On Windows, do:

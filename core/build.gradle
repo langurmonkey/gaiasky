@@ -121,37 +121,14 @@ task runCatalogFilter(dependsOn: jar, type: JavaExec, description: "Runs the cat
     ignoreExitValue = true
 }
 
-
-task runOctreeGeneratorParticles(dependsOn: jar, type: JavaExec, description: "Runs the octree generator with single particles to create the lod structure from a base catalog") {
-    main = 'gaia.cu9.ari.gaiaorbit.data.OctreeGeneratorTest'
-    systemProperties['properties.file'] = '../assets/conf/global.properties'
-    args = [
-        "--input",
-        "/media/tsagrista/Daten/Gaia/GDR2/earlydr2/data/",
-        "--output",
-        "/media/tsagrista/Daten/Gaia/GDR2/earlydr2/out/"
-    ]
-
-    minHeapSize = "10g"
-    maxHeapSize = "20g"
-
-    jvmArgs = [ '-server', ]
-
-    classpath = sourceSets.main.runtimeClasspath
-    classpath += files(project.assetsDir)
-    standardInput = System.in
-    workingDir = project.workDir
-    ignoreExitValue = true
-}
-
 task runOctreeGenerator(dependsOn: jar, type: JavaExec, description: "Runs the octree generator with star groups to create the lod structure from a base catalog") {
     main = 'gaia.cu9.ari.gaiaorbit.data.OctreeGeneratorRun'
     systemProperties['properties.file'] = '../..//assets/conf/global.properties'
     args = [
         "--input",
-        "/media/tsagrista/Daten/Gaia/GDR2/earlydr2/data/",
+        "/media/tsagrista/Daten/Gaia/data/GDR2/dr2/csv/",
         "--output",
-        "/media/tsagrista/Daten/Gaia/GDR2/earlydr2/out/"
+        "/media/tsagrista/Daten/Gaia/data/GDR2/dr2/out/"
     ]
 
     minHeapSize = "10g"
