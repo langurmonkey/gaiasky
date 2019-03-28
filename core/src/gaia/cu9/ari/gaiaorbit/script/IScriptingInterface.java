@@ -1536,6 +1536,13 @@ public interface IScriptingInterface {
     boolean highlightDataset(String dsName, int colorIndex, boolean highlight);
 
     /**
+     * Gets the current frame number. The number begins at 0 for the first frame produced
+     * when Gaia Sky is started and increases continuously.
+     * @return The current frame number
+     */
+    long getFrameNumber();
+
+    /**
      * Rotates a 3D vector around the given axis by the specified angle in degrees.
      * Vectors are arrays with 3 components. If more components are there, they are ignored.
      *

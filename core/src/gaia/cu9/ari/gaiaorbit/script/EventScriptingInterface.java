@@ -2078,6 +2078,11 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
     }
 
     @Override
+    public long getFrameNumber(){
+        return frameNumber;
+    }
+
+    @Override
     public String getDefaultFramesDir() {
         return SysUtils.getDefaultFramesDir().getAbsolutePath();
     }
