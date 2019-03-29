@@ -877,8 +877,7 @@ public class PreferencesWindow extends GenericDialog {
         screenshotsLocation.pad(pad5);
         screenshotsLocation.addListener(event -> {
             if (event instanceof ChangeEvent) {
-                FileChooser fc = new FileChooser(I18n.txt("gui.screenshots.directory.choose"), skin, stage, Gdx.files.absolute(GlobalConf.screenshot.SCREENSHOT_FOLDER));
-                fc.setTarget(FileChooser.FileChooserTarget.DIRECTORIES);
+                FileChooser fc = new FileChooser(I18n.txt("gui.screenshots.directory.choose"), skin, stage, Gdx.files.absolute(GlobalConf.screenshot.SCREENSHOT_FOLDER), FileChooser.FileChooserTarget.DIRECTORIES);
                 fc.setFileBrowsingEnabled(false);
                 fc.setResultListener((success, result) -> {
                     if (success) {
@@ -984,8 +983,7 @@ public class PreferencesWindow extends GenericDialog {
         frameoutputLocation.pad(pad5);
         frameoutputLocation.addListener(event -> {
             if (event instanceof ChangeEvent) {
-                FileChooser fc = new FileChooser(I18n.txt("gui.frameoutput.directory.choose"), skin, stage, Gdx.files.absolute(GlobalConf.frame.RENDER_FOLDER));
-                fc.setTarget(FileChooser.FileChooserTarget.DIRECTORIES);
+                FileChooser fc = new FileChooser(I18n.txt("gui.frameoutput.directory.choose"), skin, stage, Gdx.files.absolute(GlobalConf.frame.RENDER_FOLDER), FileChooser.FileChooserTarget.DIRECTORIES);
                 fc.setFileBrowsingEnabled(false);
                 fc.setResultListener((success, result) -> {
                     if (success) {

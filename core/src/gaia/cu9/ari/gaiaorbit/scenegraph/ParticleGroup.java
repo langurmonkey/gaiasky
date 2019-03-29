@@ -48,10 +48,33 @@ public class ParticleGroup extends FadeNode implements I3DTextRenderable, IFocus
     public static class ParticleBean implements Serializable {
         private static final long serialVersionUID = 1L;
 
+        /* INDICES */
+
+        /* doubles */
+        public static final int I_X = 0;
+        public static final int I_Y = 1;
+        public static final int I_Z = 2;
+
         public double[] data;
 
         public ParticleBean(double[] data) {
             this.data = data;
+        }
+
+        public Vector3d pos(Vector3d aux) {
+            return aux.set(x(), y(), z());
+        }
+
+        public double x() {
+            return data[I_X];
+        }
+
+        public double y() {
+            return data[I_Y];
+        }
+
+        public double z() {
+            return data[I_Z];
         }
     }
 
@@ -125,6 +148,11 @@ public class ParticleGroup extends FadeNode implements I3DTextRenderable, IFocus
     protected long lastSortTime;
 
     /**
+     * Geometric centre at epoch, for render sorting
+     */
+    private static Vector3d geomCentre;
+
+    /**
      * Reference to the current focus
      */
     ParticleBean focus;
@@ -180,6 +208,30 @@ public class ParticleGroup extends FadeNode implements I3DTextRenderable, IFocus
      */
     public Array<? extends ParticleBean> data() {
         return pointData;
+    }
+
+    /**
+     * Computes the geometric centre of this data cloud
+     */
+    public Vector3d computeGeomCentre(){
+        return computeGeomCentre(false);
+    }
+
+    /**
+     * Computes the geometric centre of this data cloud
+     * @param forceRecompute Recomputes the geometric centre even if it has been already computed
+     */
+    public Vector3d computeGeomCentre(boolean forceRecompute){
+        if(pointData != null && (forceRecompute || geomCentre == null)){
+            geomCentre = new Vector3d(0,0,0);
+            int n = pointData.size;
+            for(int i =0; i < n; i++){
+                ParticleBean pb = pointData.get(i);
+                geomCentre.add(pb.x(), pb.y(), pb.z());
+            }
+            geomCentre.scl(1d / (double) n);
+        }
+        return geomCentre;
     }
 
     /**

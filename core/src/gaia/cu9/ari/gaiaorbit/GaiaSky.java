@@ -790,7 +790,7 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
         return sgr.isOn(ordinal);
     }
 
-    public boolean isOn(ComponentTypes.ComponentType comp) {
+    public boolean isOn(ComponentType comp) {
         return sgr.isOn(comp);
     }
 

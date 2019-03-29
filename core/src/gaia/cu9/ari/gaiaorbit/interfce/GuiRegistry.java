@@ -237,9 +237,8 @@ public class GuiRegistry implements IObserver {
                     lastOpenLocation = SysUtils.getHomeDir();
                 }
 
-                FileChooser fc = new FileChooser(I18n.txt("gui.loadcatalog"), skin, ui, new FileHandle(lastOpenLocation));
+                FileChooser fc = new FileChooser(I18n.txt("gui.loadcatalog"), skin, ui, new FileHandle(lastOpenLocation), FileChooser.FileChooserTarget.FILES);
                 fc.setAcceptText(I18n.txt("gui.loadcatalog"));
-                fc.setTarget(FileChooser.FileChooserTarget.FILES);
                 fc.setFileFilter(pathname -> pathname.getName().endsWith(".vot") || pathname.getName().endsWith(".csv"));
                 fc.setAcceptedFiles("*.vot, *.csv");
                 fc.setResultListener((success, result) -> {
@@ -250,6 +249,9 @@ public class GuiRegistry implements IObserver {
                                 Runnable loader = () -> {
                                     try {
                                         EventScriptingInterface.instance().loadDataset(result.file().getName(), result.file().getAbsolutePath(), CatalogInfo.CatalogInfoType.UI, true);
+                                        // Open UI datasets
+                                        EventScriptingInterface.instance().maximizeInterfaceWindow();
+                                        EventScriptingInterface.instance().expandGuiComponent("DatasetsComponent");
                                     }catch (Exception e){
                                         logger.error(I18n.txt("notif.error", result.file().getName()), e);
                                     }

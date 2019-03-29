@@ -29,12 +29,16 @@ public class FileChooser extends GenericDialog {
     }
 
     /**
-     * The type of files that can be choosen with this file chooser
+     * The type of files that can be chosen with this file chooser
      */
-    public enum FileChooserTarget {FILES, DIRECTORIES, ALL}
+    public enum FileChooserTarget {
+        FILES,
+        DIRECTORIES,
+        ALL
+    }
 
     /** Target of this file chooser **/
-    private FileChooserTarget target = FileChooserTarget.ALL;
+    final private FileChooserTarget target;
     private boolean fileNameEnabled;
     private TextField fileNameInput;
     private Label fileNameLabel, acceptedFiles;
@@ -76,14 +80,15 @@ public class FileChooser extends GenericDialog {
     /** Allows setting filters on the files which are to be selected **/
     private PathnameFilter pathnameFilter;
 
-    public FileChooser(String title, final Skin skin, Stage stage, FileHandle baseDir) {
-        this(title, skin, stage, baseDir, null);
+    public FileChooser(String title, final Skin skin, Stage stage, FileHandle baseDir, FileChooserTarget target) {
+        this(title, skin, stage, baseDir, target, null);
     }
 
-    public FileChooser(String title, final Skin skin, Stage stage, FileHandle baseDir, EventListener selectionListener) {
+    public FileChooser(String title, final Skin skin, Stage stage, FileHandle baseDir, FileChooserTarget target, EventListener selectionListener) {
         super(title, skin, stage);
         this.baseDir = baseDir;
         this.selectionListener = selectionListener;
+        this.target = target;
 
         setCancelText(I18n.txt("gui.close"));
         setAcceptText(I18n.txt("gui.select"));
@@ -92,7 +97,7 @@ public class FileChooser extends GenericDialog {
     }
 
     @Override
-    public void build(){
+    public void build() {
         scrollPaneWidth = 400 * GlobalConf.SCALE_FACTOR;
         maxPathLength = GlobalConf.SCALE_FACTOR > 1.5f ? 9.5f : 5.5f;
 
@@ -133,20 +138,21 @@ public class FileChooser extends GenericDialog {
         fileList.getSelection().setProgrammaticChangeEvents(false);
         if (selectionListener != null)
             fileList.addListener(selectionListener);
+        // Lookup with keyboard
         fileList.addListener(event -> {
-            if(event instanceof InputEvent){
+            if (event instanceof InputEvent) {
                 InputEvent ie = (InputEvent) event;
-                if(ie.getType() == Type.keyTyped){
+                if (ie.getType() == Type.keyTyped) {
                     char ch = ie.getCharacter();
                     Array<FileListItem> l = fileList.getItems();
                     FileListItem toSelect = null;
-                    for(FileListItem fli : l){
-                        if(Character.toUpperCase(fli.name.charAt(0)) == Character.toUpperCase(ch)){
+                    for (FileListItem fli : l) {
+                        if (Character.toUpperCase(fli.name.charAt(0)) == Character.toUpperCase(ch)) {
                             toSelect = fli;
                             break;
                         }
                     }
-                    if(toSelect != null){
+                    if (toSelect != null) {
                         fileList.setSelected(toSelect);
                         int si = fileList.getSelectedIndex();
                         float px = si * fileList.getItemHeight();
@@ -156,7 +162,38 @@ public class FileChooser extends GenericDialog {
             }
             return false;
         });
+        // Select items
+        fileList.addListener(new ChangeListener() {
+            @Override
+            public void changed(ChangeEvent event, Actor actor) {
+                final FileListItem selected = fileList.getSelected();
+                result = selected.name;
+                fileNameInput.setText(result);
+            }
+        });
+        // Double-click behaviour
+        fileList.addListener(new ClickListener() {
+            @Override
+            public void clicked(InputEvent event, float x, float y) {
+                final FileListItem selected = fileList.getSelected();
+                if (TimeUtils.millis() - lastClick < 500) {
+                    FileHandle sel = selected.file;
+                    // Double click
+                    if (directoryBrowsingEnabled && sel.isDirectory()) {
+                        // Change directory
+                        changeDirectory(sel);
+                        lastClick = 0;
+                    } else if (target == FileChooserTarget.FILES && (filter == null || filter.accept(sel.file()))) {
+                        // Accept
+                        acceptButton.fire(new ChangeListener.ChangeEvent());
 
+                        lastClick = 0;
+                    }
+                } else if (event.getType() == Type.touchUp) {
+                    lastClick = TimeUtils.millis();
+                }
+            }
+        });
 
         fileNameInput = new TextField("", skin);
         fileNameLabel = new Label("File name:", skin);
@@ -171,15 +208,6 @@ public class FileChooser extends GenericDialog {
                 return true;
             }
             return false;
-        });
-
-        fileList.addListener(new ChangeListener() {
-            @Override
-            public void changed(ChangeEvent event, Actor actor) {
-                final FileListItem selected = fileList.getSelected();
-                result = selected.name;
-                fileNameInput.setText(result);
-            }
         });
 
         filter = pathname -> {
@@ -202,21 +230,6 @@ public class FileChooser extends GenericDialog {
             stage.setKeyboardFocus(fileNameInput);
         }
 
-        if (directoryBrowsingEnabled) {
-            fileList.addListener(new ClickListener() {
-                @Override
-                public void clicked(InputEvent event, float x, float y) {
-                    final FileListItem selected = fileList.getSelected();
-                    if (selected.file.isDirectory() && TimeUtils.millis() - lastClick < 500) {
-                        changeDirectory(selected.file);
-                        lastClick = 0;
-                    } else if (event.getType() == Type.touchUp) {
-                        lastClick = TimeUtils.millis();
-                    }
-                }
-            });
-        }
-
         changeDirectory(baseDir);
     }
 
@@ -226,7 +239,7 @@ public class FileChooser extends GenericDialog {
         String path = currentDir.path();
 
         maxPathLength = 6.5f;
-        while(path.length() * maxPathLength > scrollPaneWidth * 0.9f){
+        while (path.length() * maxPathLength > scrollPaneWidth * 0.9f) {
             path = TextUtils.capString(path, path.length() - 4, true);
         }
         fileListLabel.setText(path);
@@ -251,27 +264,20 @@ public class FileChooser extends GenericDialog {
         fileList.setItems(items);
         scrollPane.layout();
 
-        if(lastDir != null && lastDir.parent().equals(currentDir)){
+        if (lastDir != null && lastDir.parent().equals(currentDir)) {
             // select last if we're going back
             Array<FileListItem> l = fileList.getItems();
-            for(FileListItem fli : l){
-                if(fli.file.equals(lastDir)){
+            for (FileListItem fli : l) {
+                if (fli.file.equals(lastDir)) {
                     fileList.setSelected(fli);
                     break;
                 }
             }
             float px = fileList.getItemHeight() * fileList.getSelectedIndex();
             scrollPane.setScrollY(px);
-        }else {
+        } else {
             fileList.setSelected(null);
             scrollPane.setScrollY(0);
-        }
-    }
-
-    public void setTarget(FileChooserTarget t) {
-        if (t != null) {
-            this.target = t;
-            setTargetListener();
         }
     }
 
@@ -394,16 +400,15 @@ public class FileChooser extends GenericDialog {
 
     long lastClick = 0l;
 
-
     @Override
-    public void accept(){
-       if(resultListener != null){
-           resultListener.result(true, getResult());
+    public void accept() {
+        if (resultListener != null) {
+            resultListener.result(true, getResult());
         }
     }
 
     @Override
-    public void cancel(){
+    public void cancel() {
 
     }
 

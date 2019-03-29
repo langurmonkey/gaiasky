@@ -67,12 +67,9 @@ public class StarGroup extends ParticleGroup implements ILineRenderable, IStarFo
         private static final long serialVersionUID = 1L;
 
         public static final int SIZE = 17;
-        /** INDICES **/
+        /* INDICES */
 
-        /** Stored doubles **/
-        public static final int I_X = 0;
-        public static final int I_Y = 1;
-        public static final int I_Z = 2;
+        /* Stored doubles */
         public static final int I_PMX = 3;
         public static final int I_PMY = 4;
         public static final int I_PMZ = 5;
@@ -80,13 +77,13 @@ public class StarGroup extends ParticleGroup implements ILineRenderable, IStarFo
         public static final int I_MUDELTA = 7;
         public static final int I_RADVEL = 8;
 
-        /** Stored as float **/
+        /* Stored as float */
         public static final int I_APPMAG = 9;
         public static final int I_ABSMAG = 10;
         public static final int I_COL = 11;
         public static final int I_SIZE = 12;
 
-        /** Stored as int **/
+        /* Stored as int */
         public static final int I_HIP = 13;
         public static final int I_TYC1 = 14;
         public static final int I_TYC2 = 15;
@@ -103,21 +100,6 @@ public class StarGroup extends ParticleGroup implements ILineRenderable, IStarFo
             this.octant = null;
         }
 
-        public Vector3d pos(Vector3d aux) {
-            return aux.set(x(), y(), z());
-        }
-
-        public double x() {
-            return data[I_X];
-        }
-
-        public double y() {
-            return data[I_Y];
-        }
-
-        public double z() {
-            return data[I_Z];
-        }
 
         public double pmx() {
             return data[I_PMX];
@@ -193,7 +175,7 @@ public class StarGroup extends ParticleGroup implements ILineRenderable, IStarFo
     private static long idseq = 0;
     /** Star model **/
     private static ModelComponent mc;
-    // Model transfomr
+    // Model transform
     private static Matrix4 modelTransform;
 
     /** Epoch in julian days **/
@@ -322,7 +304,7 @@ public class StarGroup extends ParticleGroup implements ILineRenderable, IStarFo
         /** Load data **/
         try {
             Class<?> clazz = Class.forName(provider);
-            IStarGroupDataProvider provider = (IStarGroupDataProvider) clazz.newInstance();
+            IStarGroupDataProvider provider = (IStarGroupDataProvider) clazz.getConstructor().newInstance();
 
             if (factor == null)
                 factor = 1d;
@@ -373,12 +355,6 @@ public class StarGroup extends ParticleGroup implements ILineRenderable, IStarFo
         return (Array<StarBean>) pointData;
     }
 
-    public void setData(Array<StarBean> pointData, ObjectIntMap<String> index) {
-        this.pointData = pointData;
-        this.N_CLOSEUP_STARS = getNCloseupStars();
-        this.index = index;
-    }
-
     public void setData(Array<StarBean> pointData) {
         setData(pointData, true);
     }
@@ -386,6 +362,8 @@ public class StarGroup extends ParticleGroup implements ILineRenderable, IStarFo
     public void setData(Array<StarBean> pointData, boolean regenerateIndex) {
         this.pointData = pointData;
         this.N_CLOSEUP_STARS = getNCloseupStars();
+
+        // Regenerate index
         if (regenerateIndex)
             regenerateIndex();
     }
@@ -398,6 +376,12 @@ public class StarGroup extends ParticleGroup implements ILineRenderable, IStarFo
         index = generateIndex(data());
     }
 
+    /**
+     * Generates the index (maps star name and id to array index)
+     * and computes the geometric center of this star group
+     * @param pointData The star data
+     * @return An map{string,int} mapping names/ids to indexes
+     */
     public ObjectIntMap<String> generateIndex(Array<StarBean> pointData) {
         ObjectIntMap<String> index = new ObjectIntMap<>();
         int n = pointData.size;

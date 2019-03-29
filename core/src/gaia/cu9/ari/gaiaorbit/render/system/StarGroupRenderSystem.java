@@ -25,6 +25,9 @@ import gaia.cu9.ari.gaiaorbit.util.GlobalConf;
 import gaia.cu9.ari.gaiaorbit.util.Nature;
 import gaia.cu9.ari.gaiaorbit.util.comp.DistToCameraComparator;
 import gaia.cu9.ari.gaiaorbit.util.coord.AstroUtils;
+import gaia.cu9.ari.gaiaorbit.util.math.Vector3d;
+
+import java.util.Comparator;
 
 public class StarGroupRenderSystem extends ImmediateRenderSystem implements IObserver {
     private final double BRIGHTNESS_FACTOR;
@@ -34,6 +37,7 @@ public class StarGroupRenderSystem extends ImmediateRenderSystem implements IObs
     private Vector3 aux1;
     private int sizeOffset, pmOffset;
     private float[] pointAlpha, alphaSizeFovBr, pointAlphaHl;
+    private ICamera cam;
 
     public StarGroupRenderSystem(RenderGroup rg, float[] alphas, ShaderProgram[] shaders) {
         super(rg, alphas, shaders, 1500000);
@@ -41,7 +45,8 @@ public class StarGroupRenderSystem extends ImmediateRenderSystem implements IObs
         this.comp = new DistToCameraComparator<>();
         this.alphaSizeFovBr = new float[4];
         this.pointAlphaHl = new float[]{2, 4};
-        aux1 = new Vector3();
+        this.aux1 = new Vector3();
+
         EventManager.instance.subscribe(this, Events.STAR_MIN_OPACITY_CMD, Events.DISPOSE_STAR_GROUP_GPU_MESH);
     }
 
@@ -116,8 +121,10 @@ public class StarGroupRenderSystem extends ImmediateRenderSystem implements IObs
         // Enable point sizes
         Gdx.gl20.glEnable(0x8642);
 
-        // renderables.sort(comp);
+        this.cam = camera;
+        //renderables.sort(comp);
         if (renderables.size > 0) {
+
             for (IRenderable renderable : renderables) {
                 StarGroup starGroup = (StarGroup) renderable;
                 synchronized (starGroup) {
@@ -246,6 +253,33 @@ public class StarGroupRenderSystem extends ImmediateRenderSystem implements IObs
             break;
         default:
             break;
+        }
+    }
+
+    /**
+     * Compares highlighted star groups and sorts them according to their geometric
+     * centres. Non-highlighted star groups are rendered last in an undetermined
+     * order.
+     */
+    private class StarGroupGeometricCentreComparator implements Comparator<IRenderable>{
+
+        @Override
+        public int compare(IRenderable ir1, IRenderable ir2) {
+            StarGroup s1 = (StarGroup) ir1;
+            StarGroup s2 = (StarGroup) ir2;
+
+            if(s1.isHighlighted() && !s2.isHighlighted()){
+                return -1;
+            } else if(!s1.isHighlighted() && s2.isHighlighted()){
+                return 1;
+            } else if(!s1.isHighlighted() && !s2.isHighlighted()){
+                return 1;
+            } else {
+                // Both are highlighted, use distances to centres
+                Vector3d s1c = s1.computeGeomCentre();
+                Vector3d s2c = s2.computeGeomCentre();
+                return Double.compare(cam.getPos().dst(s1c), cam.getPos().dst(s2c));
+            }
         }
     }
 
