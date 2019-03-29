@@ -10,7 +10,7 @@
 runs on Linux, Windows and macOS. It is developed in the framework of
 [ESA](http://www.esa.int/ESA)'s [Gaia mission](http://sci.esa.int/gaia) to chart about 1 billion stars of our Galaxy.
 
-<img src="header.jpg" alt="Gaia Sky header" style="max-hight: 20em" />
+<img src="header.jpg" alt="Gaia Sky header" style="max-height: 20em" />
 
 To get the latest up-to-date and most complete information,
 
