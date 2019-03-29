@@ -10,7 +10,7 @@
 runs on Linux, Windows and macOS. It is developed in the framework of
 [ESA](http://www.esa.int/ESA)'s [Gaia mission](http://sci.esa.int/gaia) to chart about 1 billion stars of our Galaxy.
 
-![Gaia Sky](header.jpg)
+![Gaia Sky header](header.jpg)
 
 To get the latest up-to-date and most complete information,
 
@@ -33,12 +33,12 @@ This file contains the following sections:
 
 ### 1.1 Requirements
 
-| **Operating system**  | Linux / Windows 7+ / macOS |
-| :---: | :--- |
-| **CPU** | Intel Core i5 3rd Generation or similar  |
-| **GPU** | Intel HD 4000, Nvidia GeForce 9800 GT, Radeon HD 5670 / 1 GB VRAM / OpenGL 3.0 |
-| **Memory** | 4+ GB RAM |
-| **Hard drive**  | 1 GB of free disk space  |
+| **Operating system**  | Linux / Windows 7+ / macOS                                                     |
+| :-------------------: | :----------------------------------------------------------------------------- |
+| **CPU**               | Intel Core i5 3rd Generation or similar                                        |
+| **GPU**               | Intel HD 4000, Nvidia GeForce 9800 GT, Radeon HD 5670 / 1 GB VRAM / OpenGL 3.0 |
+| **Memory**            | 4+ GB RAM                                                                      |
+| **Hard drive**        | 1 GB of free disk space                                                        |
 
 ### 1.2 Installation and uninstallation
 
