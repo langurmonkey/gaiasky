@@ -13,5 +13,5 @@ public interface CatalogFilter {
      * @param s The celestial body
      * @return True if the celestial body passes the filter and should be added to the final catalog, false otherwise
      */
-    public boolean filter(CelestialBody s);
+    boolean filter(CelestialBody s);
 }

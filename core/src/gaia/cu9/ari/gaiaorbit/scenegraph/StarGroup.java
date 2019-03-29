@@ -66,7 +66,7 @@ public class StarGroup extends ParticleGroup implements ILineRenderable, IStarFo
     public static class StarBean extends ParticleBean {
         private static final long serialVersionUID = 1L;
 
-        public static final int SIZE = 17;
+        public static final int SIZE = 14;
         /* INDICES */
 
         /* Stored doubles */
@@ -85,9 +85,6 @@ public class StarGroup extends ParticleGroup implements ILineRenderable, IStarFo
 
         /* Stored as int */
         public static final int I_HIP = 13;
-        public static final int I_TYC1 = 14;
-        public static final int I_TYC2 = 15;
-        public static final int I_TYC3 = 16;
 
         public Long id;
         public transient OctreeNode octant;
@@ -137,22 +134,6 @@ public class StarGroup extends ParticleGroup implements ILineRenderable, IStarFo
             return (int) data[I_HIP];
         }
 
-        public int tyc1() {
-            return (int) data[I_TYC1];
-        }
-
-        public int tyc2() {
-            return (int) data[I_TYC2];
-        }
-
-        public int tyc3() {
-            return (int) data[I_TYC3];
-        }
-
-        public String tyc() {
-            return tyc1() + "-" + tyc2() + "-" + tyc3();
-        }
-
         public double mualpha() {
             return data[I_MUALPHA];
         }
@@ -189,7 +170,7 @@ public class StarGroup extends ParticleGroup implements ILineRenderable, IStarFo
             Texture lut = new Texture(GlobalConf.data.dataFile("tex/base/lut.jpg"));
             tex.setFilter(TextureFilter.Linear, TextureFilter.Linear);
 
-            Map<String, Object> params = new TreeMap<String, Object>();
+            Map<String, Object> params = new TreeMap<>();
             params.put("quality", 120l);
             params.put("diameter", 1d);
             params.put("flip", false);
@@ -397,11 +378,6 @@ public class StarGroup extends ParticleGroup implements ILineRenderable, IStarFo
                 String lchip = "hip " + sb.hip();
                 if (!lchip.equals(lcname))
                     index.put(lchip, i);
-            }
-            if (sb.tyc1() > 0) {
-                String lctyc = "tyc " + sb.tyc();
-                if (!lctyc.equals(lcname))
-                    index.put(lctyc, i);
             }
         }
         return index;
@@ -880,13 +856,6 @@ public class StarGroup extends ParticleGroup implements ILineRenderable, IStarFo
         if (focus != null && focus.data[StarBean.I_HIP] > 0)
             return (int) focus.data[StarBean.I_HIP];
         return -1;
-    }
-
-    @Override
-    public String getTycho() {
-        if (focus != null && focus.data[StarBean.I_TYC1] > 0)
-            return (int) focus.data[StarBean.I_TYC1] + "-" + (int) focus.data[StarBean.I_TYC2] + "-" + (int) focus.data[StarBean.I_TYC3];
-        return null;
     }
 
     @Override

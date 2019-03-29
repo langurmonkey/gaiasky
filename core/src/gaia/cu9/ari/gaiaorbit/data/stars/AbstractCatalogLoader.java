@@ -27,7 +27,7 @@ public abstract class AbstractCatalogLoader {
 
     public void initialize(String[] files) {
         this.files = files;
-        this.filters = new ArrayList<CatalogFilter>(0);
+        this.filters = new ArrayList<>(0);
     }
 
     public abstract Array<? extends SceneGraphNode> loadData() throws FileNotFoundException;

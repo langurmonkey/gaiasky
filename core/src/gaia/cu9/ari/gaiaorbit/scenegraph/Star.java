@@ -327,11 +327,6 @@ public class Star extends Particle {
     }
 
     @Override
-    public String getTycho() {
-        return tycho;
-    }
-
-    @Override
     protected void addToIndex(ObjectMap<String, SceneGraphNode> map) {
         // Hip
         if (hip > 0) {

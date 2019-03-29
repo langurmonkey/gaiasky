@@ -17,6 +17,9 @@ import java.nio.MappedByteBuffer;
 import java.nio.channels.FileChannel;
 import java.nio.charset.Charset;
 
+/**
+ * Loads SDSS data from a text file with a series of [ra, dec, z]
+ */
 public class SDSSDataProvider implements IParticleGroupDataProvider {
     private static final Log logger = Logger.getLogger(SDSSDataProvider.class);
 
@@ -25,8 +28,6 @@ public class SDSSDataProvider implements IParticleGroupDataProvider {
     }
 
     public Array<ParticleBean> loadData(String file, double factor) {
-        @SuppressWarnings("unchecked")
-        //Array<ParticleBean> pointData = (Array<ParticleBean>) loadData(f.read(), factor);
         Array<ParticleBean> pointData = (Array<ParticleBean>) loadDataMapped(GlobalConf.data.dataFile(file), factor);
         if (pointData != null)
             logger.info(I18n.bundle.format("notif.nodeloader", pointData.size, file));

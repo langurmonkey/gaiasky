@@ -197,8 +197,6 @@ public class DesktopNetworkChecker extends Thread implements INetworkChecker {
             IStarFocus st = (IStarFocus) focus;
             if (st.getHip() > 0) {
                 listener.ok(url + "HIP+" + st.getHip());
-            } else if (st.getTycho() != null) {
-                listener.ok(url + "TYC+" + st.getTycho());
             } else {
                 listener.ko(null);
             }

@@ -306,8 +306,6 @@ public class FocusInfoInterface extends Table implements IObserver, IGuiInterfac
                     id = String.valueOf(sf.getId());
                 } else if (sf.getHip() > 0) {
                     id = "HIP " + sf.getHip();
-                } else if (sf.getTycho() != null && sf.getTycho().length() > 0) {
-                    id = "TYC " + sf.getTycho();
                 }
             } else if (focus instanceof CelestialBody) {
                 CelestialBody cb = (CelestialBody) focus;

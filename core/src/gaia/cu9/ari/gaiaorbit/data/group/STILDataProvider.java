@@ -271,9 +271,9 @@ public class STILDataProvider extends AbstractStarGroupDataProvider {
 
                         double[] point = new double[StarBean.SIZE];
                         point[StarBean.I_HIP] = hip;
-                        point[StarBean.I_TYC1] = -1;
-                        point[StarBean.I_TYC2] = -1;
-                        point[StarBean.I_TYC3] = -1;
+                        //point[StarBean.I_TYC1] = -1;
+                        //point[StarBean.I_TYC2] = -1;
+                        //point[StarBean.I_TYC3] = -1;
                         point[StarBean.I_X] = p.gsposition.x;
                         point[StarBean.I_Y] = p.gsposition.y;
                         point[StarBean.I_Z] = p.gsposition.z;

@@ -47,8 +47,8 @@ public class NBGLoader extends AbstractCatalogLoader implements ISceneGraphLoade
     boolean active = true;
 
     @Override
-    public Array<CelestialBody> loadData() throws FileNotFoundException {
-	Array<CelestialBody> galaxies = new Array<CelestialBody>(900);
+    public Array<CelestialBody> loadData() {
+	Array<CelestialBody> galaxies = new Array<>(900);
 	long baseid = 5000;
 	long offset = 0;
 	if (active)

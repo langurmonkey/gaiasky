@@ -13,8 +13,8 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 
 /**
- * This provider loads point data in the internal reference system format, [x,
- * y, z]
+ * This provider loads point data in the internal reference system format from text
+ * files with a series of [x, y, z]
  * 
  * @author tsagrista
  *

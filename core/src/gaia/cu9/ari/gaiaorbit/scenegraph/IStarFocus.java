@@ -33,13 +33,6 @@ public interface IStarFocus extends IFocus, IProperMotion {
     int getHip();
 
     /**
-     * Returns the TYC string identifier or null if it does not have one
-     *
-     * @return The TYC string
-     */
-    String getTycho();
-
-    /**
      * Returns the closest star distance to the camera
      *
      * @return Distance of closest star to camera

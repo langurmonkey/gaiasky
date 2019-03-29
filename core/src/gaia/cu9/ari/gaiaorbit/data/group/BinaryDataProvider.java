@@ -12,9 +12,8 @@ import java.nio.channels.FileChannel;
 
 /**
  * Reads arrays of star beans from binary files, usually to go in an octree.
- * 
- * @author tsagrista
  *
+ * @author tsagrista
  */
 public class BinaryDataProvider extends AbstractStarGroupDataProvider {
 
@@ -70,9 +69,12 @@ public class BinaryDataProvider extends AbstractStarGroupDataProvider {
             out.writeFloat((float) sb.data[i]);
         }
         // Int
-        for (int i = StarBean.I_HIP; i < StarBean.SIZE; i++) {
-            out.writeInt((int) sb.data[i]);
-        }
+        out.writeInt((int) sb.data[StarBean.I_HIP]);
+
+        // 3 integers, keep compatibility
+        out.writeInt(-1);
+        out.writeInt(-1);
+        out.writeInt(-1);
 
         out.writeLong(sb.id);
         out.writeInt(sb.name.length());
@@ -86,7 +88,7 @@ public class BinaryDataProvider extends AbstractStarGroupDataProvider {
         try {
             // Read size of stars
             int size = data_in.readInt();
-            data = new Array<StarBean>(size);
+            data = new Array<>(size);
             for (int i = 0; i < size; i++) {
                 data.add(readStarBean(data_in));
             }
@@ -115,9 +117,12 @@ public class BinaryDataProvider extends AbstractStarGroupDataProvider {
             data[i] = in.readFloat();
         }
         // Int
-        for (int i = StarBean.I_HIP; i < StarBean.SIZE; i++) {
-            data[i] = in.readInt();
-        }
+        data[StarBean.I_HIP] = in.readInt();
+
+        // Skip unused tycho numbers, 3 Integers
+        in.readInt();
+        in.readInt();
+        in.readInt();
 
         Long id = in.readLong();
         int nameLength = in.readInt();
@@ -161,9 +166,12 @@ public class BinaryDataProvider extends AbstractStarGroupDataProvider {
             data[i] = mem.getFloat();
         }
         // Int
-        for (int i = StarBean.I_HIP; i < StarBean.SIZE; i++) {
-            data[i] = mem.getInt();
-        }
+        data[StarBean.I_HIP] = mem.getInt();
+
+        // Skip unused tycho numbers, 3 Integers
+        mem.getInt();
+        mem.getInt();
+        mem.getInt();
 
         Long id = mem.getLong();
         int nameLength = mem.getInt();

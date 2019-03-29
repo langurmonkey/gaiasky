@@ -277,8 +277,8 @@ public class DR2DataProvider extends AbstractStarGroupDataProvider {
                         double xp;
                         if (IDX_BP_MAG >= 0 && IDX_RP_MAG >= 0) { //-V6057
                             // Real TGAS
-                            float bp = new Double(Parser.parseDouble(tokens[IDX_BP_MAG].trim())).floatValue();
-                            float rp = new Double(Parser.parseDouble(tokens[IDX_RP_MAG].trim())).floatValue();
+                            float bp = (float) Parser.parseDouble(tokens[IDX_BP_MAG].trim());
+                            float rp = (float) Parser.parseDouble(tokens[IDX_RP_MAG].trim());
                             xp = bp - rp - ebr;
                         } else {
                             // Use color value in BP
@@ -303,9 +303,9 @@ public class DR2DataProvider extends AbstractStarGroupDataProvider {
                         double col = Color.toFloatBits(rgb[0], rgb[1], rgb[2], 1.0f);
 
                         point[StarBean.I_HIP] = -1;
-                        point[StarBean.I_TYC1] = -1;
-                        point[StarBean.I_TYC2] = -1;
-                        point[StarBean.I_TYC3] = -1;
+                        //point[StarBean.I_TYC1] = -1;
+                        //point[StarBean.I_TYC2] = -1;
+                        //point[StarBean.I_TYC3] = -1;
                         point[StarBean.I_X] = pos.x;
                         point[StarBean.I_Y] = pos.y;
                         point[StarBean.I_Z] = pos.z;
@@ -325,7 +325,7 @@ public class DR2DataProvider extends AbstractStarGroupDataProvider {
                         list.add(new StarBean(point, sourceid, name));
 
                         int appclmp = (int) MathUtilsd.clamp(appmag, 0, 21);
-                        countsPerMag[(int) appclmp] += 1;
+                        countsPerMag[appclmp] += 1;
                         return true;
                     }
                 }
@@ -363,7 +363,6 @@ public class DR2DataProvider extends AbstractStarGroupDataProvider {
      * @return
      */
     public Array<? extends ParticleBean> loadDataMapped(String file, double factor, int fileNumber, long totalFiles) {
-        //logger.info(this.getClass().getSimpleName(), I18n.bundle.format("notif.datafile", fh.path()));
         boolean gz = file.endsWith(".gz");
         String fileName = file.substring(file.lastIndexOf('/') + 1);
         FileChannel fc = null;

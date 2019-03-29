@@ -413,11 +413,6 @@ public class Particle extends CelestialBody implements IStarFocus, ILineRenderab
     }
 
     @Override
-    public String getTycho() {
-        return null;
-    }
-
-    @Override
     public double getClosestDist() {
         return this.distToCamera;
     }
