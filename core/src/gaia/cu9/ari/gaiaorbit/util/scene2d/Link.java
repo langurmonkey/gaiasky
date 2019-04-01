@@ -9,12 +9,12 @@ import com.badlogic.gdx.scenes.scene2d.InputEvent.Type;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import gaia.cu9.ari.gaiaorbit.util.GlobalResources;
+import gaia.cu9.ari.gaiaorbit.util.Logger;
 
 /**
  * Link widget.
- * 
- * @author Toni Sagrista
  *
+ * @author Toni Sagrista
  */
 public class Link extends Label {
 

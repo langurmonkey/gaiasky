@@ -1,4 +1,4 @@
-package gaia.cu9.ari.gaiaorbit.desktop.util;
+package gaia.cu9.ari.gaiaorbit.interfce;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Net.HttpMethods;
@@ -23,8 +23,11 @@ import gaia.cu9.ari.gaiaorbit.util.scene2d.*;
 
 import java.io.*;
 
-public class GaiaCatalogWindow extends CollapsibleWindow {
-    private static final Log logger = Logger.getLogger(GaiaCatalogWindow.class);
+/**
+ * This window shows the Gaia Archive information for a single star
+ */
+public class ArchiveViewWindow extends GenericDialog {
+    private static final Log logger = Logger.getLogger(ArchiveViewWindow.class);
 
     private static String URL_GAIA_JSON_SOURCE = "http://gaia.ari.uni-heidelberg.de/tap/sync?REQUEST=doQuery&LANG=ADQL&FORMAT=json&QUERY=SELECT+*+FROM+gaiadr2.gaia_source+WHERE+source_id=";
 
@@ -34,10 +37,6 @@ public class GaiaCatalogWindow extends CollapsibleWindow {
 
     private static final String separator = "\n";
 
-    private final GaiaCatalogWindow me;
-
-    private final Stage stage;
-    private HorizontalGroup buttonGroup;
     private Table table;
     private OwnScrollPane scroll;
 
@@ -46,34 +45,20 @@ public class GaiaCatalogWindow extends CollapsibleWindow {
 
     private IStarFocus st;
 
-    public GaiaCatalogWindow(Stage stg, Skin skin) {
-        super(I18n.bundle.format("gui.data.catalog", "Gaia"), skin);
-        this.me = this;
+    public ArchiveViewWindow(Stage stage, Skin skin){
+        super(I18n.txt("gui.data.catalog", "Gaia"), skin, stage);
 
-        this.stage = stg;
+        setAcceptText(I18n.txt("gui.close"));
+
+        // Build
+        buildSuper();
+
+    }
+
+    @Override
+    protected void build(){
         this.linkStyle = skin.get("link", LabelStyle.class);
         this.pad = 5 * GlobalConf.SCALE_FACTOR;
-
-        /** BUTTONS **/
-        buttonGroup = new HorizontalGroup();
-        TextButton ok = new OwnTextButton(I18n.txt("gui.close"), skin, "default");
-        ok.setName("close");
-        ok.addListener(new EventListener() {
-            @Override
-            public boolean handle(Event event) {
-                if (event instanceof ChangeEvent) {
-                    Gdx.app.postRunnable(() -> {
-                        me.remove();
-                    });
-                    return true;
-                }
-
-                return false;
-            }
-
-        });
-        ok.setSize(70 * GlobalConf.SCALE_FACTOR, 20 * GlobalConf.SCALE_FACTOR);
-        buttonGroup.addActor(ok);
 
         /** TABLE and SCROLL **/
         table = new Table(skin);
@@ -84,34 +69,20 @@ public class GaiaCatalogWindow extends CollapsibleWindow {
         scroll.setOverscroll(false, false);
         scroll.setSmoothScrolling(true);
 
-        add(scroll).pad(pad);
-        row();
-        add(buttonGroup).colspan(2).pad(pad, pad, pad, pad).bottom().right();
+        content.add(scroll);
         getTitleTable().align(Align.left);
 
         pack();
+    }
 
-        /** CAPTURE SCROLL FOCUS **/
-        stage.addListener(new EventListener() {
+    @Override
+    protected void accept() {
+        // Nothing
+    }
 
-            @Override
-            public boolean handle(Event event) {
-                if (event instanceof InputEvent) {
-                    InputEvent ie = (InputEvent) event;
-
-                    if (ie.getType() == Type.mouseMoved) {
-                        if (scroll != null) {
-                            if (ie.getTarget().isDescendantOf(scroll)) {
-                                stage.setScrollFocus(scroll);
-                            }
-                            return true;
-                        }
-                    }
-                }
-                return false;
-            }
-        });
-
+    @Override
+    protected void cancel() {
+        // Nothing
     }
 
     public void initialize(IStarFocus st) {
@@ -121,7 +92,6 @@ public class GaiaCatalogWindow extends CollapsibleWindow {
         requestData(new GaiaDataListener(st));
         table.pack();
 
-        //scroll.setWidth(Math.max(table.getWidth() + scroll.getStyle().vScroll.getMinWidth(), 500 * GlobalConf.SCALE_FACTOR));
         pack();
         me.setPosition(Math.round(stage.getWidth() / 2f - me.getWidth() / 2f), Math.round(stage.getHeight() / 2f - me.getHeight() / 2f));
 

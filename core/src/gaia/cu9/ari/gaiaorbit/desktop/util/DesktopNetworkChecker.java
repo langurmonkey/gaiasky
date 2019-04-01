@@ -17,6 +17,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener.ChangeEvent;
 import com.badlogic.gdx.utils.Align;
 import gaia.cu9.ari.gaiaorbit.GaiaSky;
+import gaia.cu9.ari.gaiaorbit.interfce.ArchiveViewWindow;
 import gaia.cu9.ari.gaiaorbit.interfce.INetworkChecker;
 import gaia.cu9.ari.gaiaorbit.scenegraph.IFocus;
 import gaia.cu9.ari.gaiaorbit.scenegraph.IStarFocus;
@@ -105,7 +106,7 @@ public class DesktopNetworkChecker extends Thread implements INetworkChecker {
         @Override
         public boolean handle(Event event) {
             if (event instanceof ChangeEvent) {
-                GaiaCatalogWindow gaiaWindow = new GaiaCatalogWindow(GaiaSky.instance.mainGui.getGuiStage(), skin);
+                ArchiveViewWindow gaiaWindow = new ArchiveViewWindow(GaiaSky.instance.mainGui.getGuiStage(), skin);
                 gaiaWindow.initialize(focus);
                 gaiaWindow.display();
                 return true;
