@@ -699,7 +699,6 @@ public class StarGroup extends ParticleGroup implements ILineRenderable, IStarFo
     @Override
     public void render(SpriteBatch batch, ShaderProgram shader, FontRenderSystem sys, RenderingContext rc, ICamera camera) {
         float thOverFactor = (float) (GlobalConf.scene.STAR_THRESHOLD_POINT / GlobalConf.scene.LABEL_NUMBER_FACTOR / camera.getFovFactor());
-        float textScale = 2e-1f;
 
         if (camera.getCurrent() instanceof FovCamera) {
             int n = Math.min(pointData.size, N_CLOSEUP_STARS * 5);
@@ -732,7 +731,7 @@ public class StarGroup extends ParticleGroup implements ILineRenderable, IStarFo
                     float textSize = (float) FastMath.tanh(viewAngle) * distToCamera * 1e5f;
                     float alpha = Math.min((float) FastMath.atan(textSize / distToCamera), 1.e-3f);
                     textSize = (float) FastMath.tan(alpha) * distToCamera * 0.5f;
-                    render3DLabel(batch, shader, sys.fontDistanceField, camera, rc, star.name, lpos, textScale * camera.getFovFactor(), textSize * camera.getFovFactor());
+                    render3DLabel(batch, shader, sys.fontDistanceField, camera, rc, star.name, lpos, textScale() * camera.getFovFactor(), textSize * camera.getFovFactor());
 
                 }
             }
@@ -755,6 +754,11 @@ public class StarGroup extends ParticleGroup implements ILineRenderable, IStarFo
 
         GlobalResources.applyRelativisticAberration(out, cam);
         RelativisticEffectsManager.getInstance().gravitationalWavePos(out);
+    }
+
+    @Override
+    public float textScale() {
+        return 0.1f;
     }
 
     public double getFocusSize() {

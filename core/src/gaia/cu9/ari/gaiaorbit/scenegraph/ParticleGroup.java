@@ -339,7 +339,7 @@ public class ParticleGroup extends FadeNode implements I3DTextRenderable, IFocus
 
     @Override
     public float textScale() {
-        return 0.5f;
+        return 0.1f;
     }
 
     @Override

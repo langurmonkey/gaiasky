@@ -85,7 +85,7 @@ public class BillboardGalaxy extends Billboard {
         shader.setUniformf("u_apparent_angle", (float) viewAngleApparent);
         shader.setUniformf("u_time", (float) GaiaSky.instance.getT() / 5f);
 
-        shader.setUniformf("u_radius", (float) size);
+        shader.setUniformf("u_radius", size);
 
         // Sprite.render
         mesh.render(shader, GL20.GL_TRIANGLES, 0, 6);

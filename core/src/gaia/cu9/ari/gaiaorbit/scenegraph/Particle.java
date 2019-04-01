@@ -315,7 +315,7 @@ public class Particle extends CelestialBody implements IStarFocus, ILineRenderab
 
     @Override
     public float textScale() {
-        return 5e-1f;
+        return 0.2f;
     }
 
     @Override

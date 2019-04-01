@@ -163,4 +163,9 @@ public class NBGalaxy extends Particle {
         return 0.00004f;
     }
 
+    @Override
+    public float textScale() {
+        return 0.08f;
+    }
+
 }

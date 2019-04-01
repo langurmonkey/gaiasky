@@ -143,11 +143,16 @@ public class Billboard extends ModelBody {
         return 5e3f;
     }
 
+    @Override
+    public float textScale() {
+        return 0.3f;
+    }
+
     public float getFuzzyRenderSize(ICamera camera) {
         float computedSize = this.size;
         computedSize *= GlobalConf.scene.STAR_BRIGHTNESS * .6e-3;
 
-        return (float) computedSize;
+        return computedSize;
     }
 
     public void setHidden(String hidden) {
