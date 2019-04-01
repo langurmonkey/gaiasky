@@ -87,14 +87,14 @@ public class LineRenderSystem extends ImmediateRenderSystem {
         int size = renderables.size;
         for (int i = 0; i < size; i++) {
             ILineRenderable renderable = (ILineRenderable) renderables.get(i);
-            // Regular
-            Gdx.gl.glLineWidth(renderable.getLineWidth() * GlobalConf.SCALE_FACTOR);
             boolean rend = true;
             // TODO ugly hack
             if (renderable instanceof Particle && !GlobalConf.scene.PROPER_MOTION_VECTORS)
                 rend = false;
             if (rend)
                 renderable.render(this, camera, getAlpha(renderable));
+
+            Gdx.gl.glLineWidth(renderable.getLineWidth() * GlobalConf.SCALE_FACTOR);
 
             curr.mesh.setVertices(curr.vertices, 0, curr.vertexIdx);
             curr.mesh.render(shaderProgram, renderable.getGlType());

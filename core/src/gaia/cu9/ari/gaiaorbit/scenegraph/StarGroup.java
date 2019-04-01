@@ -154,14 +154,20 @@ public class StarGroup extends ParticleGroup implements ILineRenderable, IStarFo
     private static final double MIN_UPDATE_TIME_MS = 100;
     // Sequence id
     private static long idseq = 0;
-    /** Star model **/
+    /**
+     * Star model
+     **/
     private static ModelComponent mc;
     // Model transform
     private static Matrix4 modelTransform;
 
-    /** Epoch in julian days **/
+    /**
+     * Epoch in julian days
+     **/
     private double epoch_jd = AstroUtils.JD_J2015_5;
-    /** Current computed epoch time **/
+    /**
+     * Current computed epoch time
+     **/
     private double currDeltaYears = 0;
 
     private static void initModel() {
@@ -248,7 +254,9 @@ public class StarGroup extends ParticleGroup implements ILineRenderable, IStarFo
     // Updater task
     private UpdaterTask updaterTask;
 
-    /** CLOSEST **/
+    /**
+     * CLOSEST
+     **/
     private Vector3d closestPos, closestPm;
     private String closestName;
     private double closestDist;
@@ -259,7 +267,9 @@ public class StarGroup extends ParticleGroup implements ILineRenderable, IStarFo
 
     private Vector3d lastSortCameraPos;
 
-    /** Comparator **/
+    /**
+     * Comparator
+     **/
     private Comparator<Integer> comp;
 
     private Vector3d aux;
@@ -360,6 +370,7 @@ public class StarGroup extends ParticleGroup implements ILineRenderable, IStarFo
     /**
      * Generates the index (maps star name and id to array index)
      * and computes the geometric center of this star group
+     *
      * @param pointData The star data
      * @return An map{string,int} mapping names/ids to indexes
      */
@@ -512,8 +523,10 @@ public class StarGroup extends ParticleGroup implements ILineRenderable, IStarFo
         addToRender(this, RenderGroup.STAR_GROUP);
         addToRender(this, RenderGroup.BILLBOARD_STAR);
         addToRender(this, RenderGroup.MODEL_STAR);
-        if (GlobalConf.scene.PROPER_MOTION_VECTORS)
+        if (GlobalConf.scene.PROPER_MOTION_VECTORS) {
             addToRender(this, RenderGroup.LINE);
+            addToRender(this, RenderGroup.LINE);
+        }
         if (renderText()) {
             addToRender(this, RenderGroup.FONT_LABEL);
         }
@@ -609,50 +622,70 @@ public class StarGroup extends ParticleGroup implements ILineRenderable, IStarFo
         }
     }
 
-    private long getMaxProperMotionLines(){
+    private long getMaxProperMotionLines() {
         return GlobalConf.scene.N_PM_STARS > 0 ? GlobalConf.scene.N_PM_STARS : (N_CLOSEUP_STARS * 20);
     }
+
+    boolean rvLines = false;
 
     /**
      * Proper motion rendering
      */
     @Override
     public void render(LineRenderSystem renderer, ICamera camera, float alpha) {
-        float thpointTimesFovfactor = (float) GlobalConf.scene.STAR_THRESHOLD_POINT * camera.getFovFactor();
+        float thPointTimesFovfactor = (float) GlobalConf.scene.STAR_THRESHOLD_POINT * camera.getFovFactor();
         int n = (int) Math.min(getMaxProperMotionLines(), pointData.size);
         for (int i = n - 1; i >= 0; i--) {
             StarBean star = (StarBean) pointData.get(active[i]);
-            float radius = (float) (getSize(active[i]) * Constants.STAR_SIZE_FACTOR);
-            // Position
-            Vector3d lpos = fetchPosition(star, camera.getPos(), aux3d1.get(), currDeltaYears);
-            // Proper motion
-            Vector3d pm = aux3d2.get().set(star.pmx(), star.pmy(), star.pmz()).scl(currDeltaYears);
-            // Rest of attributes
-            float distToCamera = (float) lpos.len();
-            float viewAngle = (float) (((radius / distToCamera) / camera.getFovFactor()) * GlobalConf.scene.STAR_BRIGHTNESS);
-            if (viewAngle >= thpointTimesFovfactor / GlobalConf.scene.PM_NUM_FACTOR) {
+            if ((star.radvel() == 0 && !rvLines) || (star.radvel() != 0 && rvLines)) {
+                float radius = (float) (getSize(active[i]) * Constants.STAR_SIZE_FACTOR);
+                // Position
+                Vector3d lpos = fetchPosition(star, camera.getPos(), aux3d1.get(), currDeltaYears);
+                // Proper motion
+                Vector3d pm = aux3d2.get().set(star.pmx(), star.pmy(), star.pmz()).scl(currDeltaYears);
+                // Rest of attributes
+                float distToCamera = (float) lpos.len();
+                float viewAngle = (float) (((radius / distToCamera) / camera.getFovFactor()) * GlobalConf.scene.STAR_BRIGHTNESS);
+                if (viewAngle >= thPointTimesFovfactor / GlobalConf.scene.PM_NUM_FACTOR) {
 
-                Vector3d p1 = aux3d1.get().set(star.x() + pm.x, star.y() + pm.y, star.z() + pm.z).sub(camera.getPos());
-                Vector3d ppm = aux3d2.get().set(star.pmx(), star.pmy(), star.pmz()).scl(GlobalConf.scene.PM_LEN_FACTOR);
-                Vector3d p2 = ppm.add(p1);
+                    Vector3d p1 = aux3d1.get().set(star.x() + pm.x, star.y() + pm.y, star.z() + pm.z).sub(camera.getPos());
+                    Vector3d ppm = aux3d2.get().set(star.pmx(), star.pmy(), star.pmz()).scl(GlobalConf.scene.PM_LEN_FACTOR);
+                    Vector3d p2 = ppm.add(p1);
 
-                // Mualpha -> red channel
-                // Mudelta -> green channel
-                // Radvel -> blue channel
-                // Min value per channel = 0.2
-                final double mumin = -80;
-                final double mumax = 80;
-                final double maxmin = mumax - mumin;
+                    // Mualpha -> red channel
+                    // Mudelta -> green channel
+                    // Radvel -> blue channel
+                    // Min value per channel = 0.2
+                    final double mumin = -80;
+                    final double mumax = 80;
+                    final double maxmin = mumax - mumin;
 
-                // Color using orientation
-                float r = (float) ((star.mualpha() - mumin) / maxmin) * 0.8f + 0.2f;
-                float g = (float) ((star.mudelta() - mumin) / maxmin) * 0.8f + 0.2f;
-                float b = (float) (star.radvel()) * 0.8f + 0.2f;
+                    // Color using orientation
+                    float r = (float) ((star.mualpha() - mumin) / maxmin) * 0.8f + 0.2f;
+                    float g = (float) ((star.mudelta() - mumin) / maxmin) * 0.8f + 0.2f;
+                    float b = (float) (star.radvel()) * 0.8f + 0.2f;
 
-                renderer.addLine(this, p1.x, p1.y, p1.z, p2.x, p2.y, p2.z, r, g, b, alpha * this.opacity);
+                    if (star.radvel() == 0) {
+                        // Normal line width
+                        lineWidth = 0.8f;
+                    } else {
+                        // Large line width
+                        lineWidth = 2.3f;
+                    }
+
+                    renderer.addLine(this, p1.x, p1.y, p1.z, p2.x, p2.y, p2.z, r, g, b, alpha * this.opacity);
+                }
             }
         }
+        rvLines = !rvLines;
 
+    }
+
+    float lineWidth = 1f;
+
+    @Override
+    public float getLineWidth() {
+        return lineWidth;
     }
 
     @Override
@@ -827,21 +860,21 @@ public class StarGroup extends ParticleGroup implements ILineRenderable, IStarFo
         // Super handles FOCUS_CHANGED event
         super.notify(event, data);
         switch (event) {
-        case CAMERA_MOTION_UPDATED:
-            if (updaterTask != null) {
-                final Vector3d currentCameraPos = (Vector3d) data[0];
-                long t = TimeUtils.millis() - lastSortTime;
-                if (!updating && !pool.isShutdown() && !workQueue.contains(updaterTask) && this.opacity > 0 && (t > MIN_UPDATE_TIME_MS * 2 || (lastSortCameraPos.dst(currentCameraPos) > CAM_DX_TH && t > MIN_UPDATE_TIME_MS))) {
-                    updating = true;
-                    pool.execute(updaterTask);
+            case CAMERA_MOTION_UPDATED:
+                if (updaterTask != null) {
+                    final Vector3d currentCameraPos = (Vector3d) data[0];
+                    long t = TimeUtils.millis() - lastSortTime;
+                    if (!updating && !pool.isShutdown() && !workQueue.contains(updaterTask) && this.opacity > 0 && (t > MIN_UPDATE_TIME_MS * 2 || (lastSortCameraPos.dst(currentCameraPos) > CAM_DX_TH && t > MIN_UPDATE_TIME_MS))) {
+                        updating = true;
+                        pool.execute(updaterTask);
+                    }
                 }
-            }
-            break;
-        case GRAPHICS_QUALITY_UPDATED:
-            this.N_CLOSEUP_STARS = getNCloseupStars();
-            break;
-        default:
-            break;
+                break;
+            case GRAPHICS_QUALITY_UPDATED:
+                this.N_CLOSEUP_STARS = getNCloseupStars();
+                break;
+            default:
+                break;
         }
 
     }
@@ -1008,14 +1041,10 @@ public class StarGroup extends ParticleGroup implements ILineRenderable, IStarFo
         }
     }
 
-    public float getColor(int index){
-        return highlighted ? hlColorFloat[hlci] : (float) ((Array<StarBean>)pointData).get(index).col();
+    public float getColor(int index) {
+        return highlighted ? hlColorFloat[hlci] : (float) ((Array<StarBean>) pointData).get(index).col();
     }
 
-    @Override
-    public float getLineWidth() {
-        return 1;
-    }
 
     /**
      * Creates a default star group with some sane parameters, given the name and the data
@@ -1028,11 +1057,11 @@ public class StarGroup extends ParticleGroup implements ILineRenderable, IStarFo
         StarGroup sg = new StarGroup();
         sg.setName(name);
         sg.setParent("Universe");
-        sg.setFadeout(new double[] { 21e2, 1e5 });
-        sg.setLabelcolor(new double[] { 1.0, 1.0, 1.0, 1.0 });
-        sg.setColor(new double[] { 1.0, 1.0, 1.0, 0.25 });
+        sg.setFadeout(new double[]{21e2, 1e5});
+        sg.setLabelcolor(new double[]{1.0, 1.0, 1.0, 1.0});
+        sg.setColor(new double[]{1.0, 1.0, 1.0, 0.25});
         sg.setSize(6.0);
-        sg.setLabelposition(new double[] { 0.0, -5.0e7, -4e8 });
+        sg.setLabelposition(new double[]{0.0, -5.0e7, -4e8});
         sg.setCt("Stars");
         sg.setData(data);
         sg.doneLoading(null);

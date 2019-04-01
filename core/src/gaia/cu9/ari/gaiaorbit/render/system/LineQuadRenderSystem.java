@@ -50,8 +50,8 @@ public class LineQuadRenderSystem extends LineRenderSystem {
     }
 
     Vector3d line, camdir0, camdir1, camdir15, point, vec;
-    final static double widthAngle = Math.toRadians(0.065);
-    final static double widthAngleTan = Math.tan(widthAngle);
+    final static double baseWidthAngle = GlobalConf.SCALE_FACTOR > 1.5f ? Math.toRadians(0.13) : Math.toRadians(.09f);
+    final static double baseWidthAngleTan = Math.tan(baseWidthAngle);
 
     public LineQuadRenderSystem(RenderGroup rg, float[] alphas, ShaderProgram[] shaders) {
         super(rg, alphas, shaders);
@@ -138,7 +138,7 @@ public class LineQuadRenderSystem extends LineRenderSystem {
 
     @Override
     public void addLine(ILineRenderable lr, double x0, double y0, double z0, double x1, double y1, double z1, float r, float g, float b, float a) {
-        addLineInternal(x0, y0, z0, x1, y1, z1, r, g, b, a, lr.getLineWidth() * widthAngleTan * GlobalConf.SCALE_FACTOR);
+        addLineInternal(x0, y0, z0, x1, y1, z1, r, g, b, a, lr.getLineWidth() * baseWidthAngleTan);
     }
 
     private void addLineInternal(double x0, double y0, double z0, double x1, double y1, double z1, float r, float g, float b, float a, double widthAngleTan) {
