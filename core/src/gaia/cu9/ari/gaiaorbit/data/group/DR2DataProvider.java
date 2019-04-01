@@ -103,7 +103,7 @@ public class DR2DataProvider extends AbstractStarGroupDataProvider {
             long numFiles = 0;
             try {
                 numFiles = GlobalResources.fileCount(Paths.get(file));
-            }catch(IOException e){
+            } catch (IOException e) {
                 logger.error("Error counting files in dir: " + file);
             }
             // Recursive
@@ -172,7 +172,7 @@ public class DR2DataProvider extends AbstractStarGroupDataProvider {
      */
     private boolean addStar(String line) {
         String[] tokens = line.split(separator);
-        double[] point = new double[StarBean.SIZE];
+        double[] point = new double[StarBean.SIZE + 3];
 
         // Check that parallax exists (5-param solution), otherwise we have no distance
         if (!tokens[IDX_PLLX].isEmpty()) {
@@ -244,7 +244,7 @@ public class DR2DataProvider extends AbstractStarGroupDataProvider {
                                 // Take extinction from database
                                 ag = Parser.parseDouble(tokens[IDX_A_G]);
                             } else {
-                                // Compute extinction analitically
+                                // Compute extinction analytically
                                 Vector3d posgal = new Vector3d(pos);
                                 posgal.mul(Coordinates.eqToGal());
                                 Vector3d posgalsph = Coordinates.cartesianToSpherical(posgal, new Vector3d());
@@ -274,16 +274,10 @@ public class DR2DataProvider extends AbstractStarGroupDataProvider {
                             }
                         }
 
-                        double xp;
-                        if (IDX_BP_MAG >= 0 && IDX_RP_MAG >= 0) { //-V6057
-                            // Real TGAS
-                            float bp = (float) Parser.parseDouble(tokens[IDX_BP_MAG].trim());
-                            float rp = (float) Parser.parseDouble(tokens[IDX_RP_MAG].trim());
-                            xp = bp - rp - ebr;
-                        } else {
-                            // Use color value in BP
-                            xp = new Double(Parser.parseDouble(tokens[IDX_BP_MAG].trim())).floatValue();
-                        }
+                        // XP = BP - RP - Reddening
+                        float bp = (float) Parser.parseDouble(tokens[IDX_BP_MAG].trim());
+                        float rp = (float) Parser.parseDouble(tokens[IDX_RP_MAG].trim());
+                        double xp = bp - rp - ebr;
 
                         // See Gaia broad band photometry (https://doi.org/10.1051/0004-6361/201015441)
                         double teff;
@@ -324,8 +318,8 @@ public class DR2DataProvider extends AbstractStarGroupDataProvider {
 
                         list.add(new StarBean(point, sourceid, name));
 
-                        int appclmp = (int) MathUtilsd.clamp(appmag, 0, 21);
-                        countsPerMag[appclmp] += 1;
+                        int appClmp = (int) MathUtilsd.clamp(appmag, 0, 21);
+                        countsPerMag[appClmp] += 1;
                         return true;
                     }
                 }
