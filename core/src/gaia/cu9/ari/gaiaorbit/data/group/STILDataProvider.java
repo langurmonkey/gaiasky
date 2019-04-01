@@ -266,7 +266,7 @@ public class STILDataProvider extends AbstractStarGroupDataProvider {
                         colors.put(id, rgb);
                         sphericalPositions.put(id, new double[]{sph.x, sph.y, sph.z});
 
-                        double[] point = new double[StarBean.SIZE];
+                        double[] point = new double[StarBean.SIZE + 3];
                         point[StarBean.I_HIP] = hip;
                         //point[StarBean.I_TYC1] = -1;
                         //point[StarBean.I_TYC2] = -1;

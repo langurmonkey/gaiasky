@@ -67,47 +67,68 @@ public class OctreeGeneratorRun {
         }
     }
 
-    @Parameter(names = { "-l", "--loader" }, description = "Name of the star group loader class", required = true) private String loaderClass = null;
+    @Parameter(names = {"-l", "--loader"}, description = "Name of the star group loader class")
+    private String loaderClass = null;
 
-    @Parameter(names = { "-i", "--input" }, description = "Location of the input catalog", required = true) private String input = null;
+    @Parameter(names = {"-i", "--input"}, description = "Location of the input catalog")
+    private String input = null;
 
-    @Parameter(names = { "-o", "--output" }, description = "Output folder. Defaults to system temp") private String outFolder;
+    @Parameter(names = {"-o", "--output"}, description = "Output folder. Defaults to system temp")
+    private String outFolder;
 
-    @Parameter(names = "--maxpart", description = "Maximum number of objects in an octant") private int maxPart = 100000;
+    @Parameter(names = "--maxpart", description = "Maximum number of objects in an octant")
+    private int maxPart = 100000;
 
-    @Parameter(names = "--serialized", description = "Use the java serialization method instead of the binary format to output the particle files") private boolean serialized = false;
+    @Parameter(names = "--serialized", description = "Use the java serialization method instead of the binary format to output the particle files")
+    private boolean serialized = false;
 
-    @Parameter(names = "--pllxerrfaint", description = "Parallax error factor for faint (gmag>=13.1) stars, acceptance criteria as a percentage of parallax error with respect to parallax, in [0..1]") private double pllxerrfaint = 0.125;
+    @Parameter(names = "--pllxerrfaint", description = "Parallax error factor for faint (gmag>=13.1) stars, acceptance criteria as a percentage of parallax error with respect to parallax, in [0..1]")
+    private double pllxerrfaint = 0.125;
 
-    @Parameter(names = "--pllxerrbright", description = "Parallax error factor for bright (gmag<13.1) stars, acceptance criteria as a percentage of parallax error with respect to parallax, in [0..1]") private double pllxerrbright = 0.25;
+    @Parameter(names = "--pllxerrbright", description = "Parallax error factor for bright (gmag<13.1) stars, acceptance criteria as a percentage of parallax error with respect to parallax, in [0..1]")
+    private double pllxerrbright = 0.25;
 
-    @Parameter(names = "--pllxzeropoint", description = "Zero point value for the parallax in mas") private double pllxzeropoint = 0d;
+    @Parameter(names = "--pllxzeropoint", description = "Zero point value for the parallax in mas")
+    private double pllxzeropoint = 0d;
 
-    @Parameter(names = { "-c", "--magcorrections" }, description = "Flag to apply magnitude and color corrections for extinction and reddening") private boolean magCorrections = false;
+    @Parameter(names = {"-c", "--magcorrections"}, description = "Flag to apply magnitude and color corrections for extinction and reddening")
+    private boolean magCorrections = false;
 
-    @Parameter(names = { "-p", "--postprocess" }, description = "Low object count nodes (<=100) will be merged with their parents if parents have less than 1000 objects. Avoids very large and mostly empty subtrees") private boolean postprocess = false;
+    @Parameter(names = {"-p", "--postprocess"}, description = "Low object count nodes (<=100) will be merged with their parents if parents have less than 1000 objects. Avoids very large and mostly empty subtrees")
+    private boolean postprocess = false;
 
-    @Parameter(names = "--childcount", description = "If --postprocess is on, children nodes with less than --childcount objects and whose parents have less than --parentcount objects) will be merged with thier parents. Defaults to 100") private long childCount = 100;
+    @Parameter(names = "--childcount", description = "If --postprocess is on, children nodes with less than --childcount objects and whose parents have less than --parentcount objects) will be merged with thier parents. Defaults to 100")
+    private long childCount = 100;
 
-    @Parameter(names = "--parentcount", description = "If --postprocess is on, children nodes with less than --childcount objects and whose parent has less than --parentcount objects will be merged with thier parents. Defaults to 1000") private long parentCount = 1000;
+    @Parameter(names = "--parentcount", description = "If --postprocess is on, children nodes with less than --childcount objects and whose parent has less than --parentcount objects will be merged with thier parents. Defaults to 1000")
+    private long parentCount = 1000;
 
-    @Parameter(names = { "-s", "--suncentre", "--suncenter" }, description = "Make the Sun the centre of the octree") private boolean sunCentre = false;
+    @Parameter(names = {"-s", "--suncentre", "--suncenter"}, description = "Make the Sun the centre of the octree")
+    private boolean sunCentre = false;
 
-    @Parameter(names = "--nfiles", description = "Caps the number of data files to load. Defaults to unlimited") private int fileNumCap = -1;
+    @Parameter(names = "--nfiles", description = "Caps the number of data files to load. Defaults to unlimited")
+    private int fileNumCap = -1;
 
-    @Parameter(names = { "--hip", "--addhip" }, description = "Add the Hipparcos catalog additionally to the catalog provided by -l") private boolean addHip = false;
+    @Parameter(names = {"--hip", "--addhip"}, description = "Add the Hipparcos catalog additionally to the catalog provided by -l")
+    private boolean addHip = false;
 
-    @Parameter(names = "--xmatchfile", description = "Crossmatch file with source_id to hip, only if --hip is enabled") private String xmatchFile = null;
+    @Parameter(names = "--xmatchfile", description = "Crossmatch file with source_id to hip, only if --hip is enabled")
+    private String xmatchFile = null;
 
-    @Parameter(names = "--geodistfile", description = "Use this file or directory to lookup distances. Argument is a file or directory with files of of <sourceid, dist[pc]>. If this argument is used, both --pllxerrfaint and --pllxerrbright are ignored") private String geodistFile = null;
+    @Parameter(names = "--geodistfile", description = "Use this file or directory to lookup distances. Argument is a file or directory with files of of <sourceid, dist[pc]>. If this argument is used, both --pllxerrfaint and --pllxerrbright are ignored")
+    private String geodistFile = null;
 
-    @Parameter(names = "--distcap", description = "Specifies a maximum distance in parsecs. Stars beyond this distance are not loaded") private double distcap = Long.MAX_VALUE;
+    @Parameter(names = "--distcap", description = "Specifies a maximum distance in parsecs. Stars beyond this distance are not loaded")
+    private double distcap = Long.MAX_VALUE;
 
-    @Parameter(names = "--ruwe", description = "RUWE threshold value. All stars with a RUWE larger than this value will not be used. Must be used in conjunction with --ruwe-file. Also, if present, --pllxerrfaint and --pllxerrbright are ignored") private double ruwe = Double.NaN;
+    @Parameter(names = "--ruwe", description = "RUWE threshold value. All stars with a RUWE larger than this value will not be used. Must be used in conjunction with --ruwe-file. Also, if present, --pllxerrfaint and --pllxerrbright are ignored")
+    private double ruwe = Double.NaN;
 
-    @Parameter(names = "--ruwe-file", description = "Location of gzipped file containing the RUWE value for each source id") private String ruweFile = null;
+    @Parameter(names = "--ruwe-file", description = "Location of gzipped file containing the RUWE value for each source id")
+    private String ruweFile = null;
 
-    @Parameter(names = { "-h", "--help" }, help = true) private boolean help = false;
+    @Parameter(names = {"-h", "--help"}, help = true)
+    private boolean help = false;
 
     protected Map<Long, float[]> colors;
 
@@ -121,13 +142,13 @@ public class OctreeGeneratorRun {
 
             if (outFolder == null) {
                 outFolder = System.getProperty("java.io.tmpdir");
-            } else {
-                if (!outFolder.endsWith("/"))
-                    outFolder += "/";
-
-                File outfolderFile = new File(outFolder);
-                outfolderFile.mkdirs();
             }
+            if (!outFolder.endsWith("/"))
+                outFolder += "/";
+
+            File outfolderFile = new File(outFolder);
+            outfolderFile.mkdirs();
+
 
             // Assets location
             String ASSETS_LOC = GlobalConf.ASSETS_LOC;
@@ -153,19 +174,21 @@ public class OctreeGeneratorRun {
             }
             ConfInit.initialize(new DesktopConfInit(new FileInputStream(new File(ASSETS_LOC + "conf/global.properties")), new FileInputStream(dummyv)));
 
-            generateOctree();
+            OctreeNode root = generateOctree();
 
-            // Save arguments and structure
-            StringBuffer argstr = new StringBuffer();
-            for (int i = 0; i < arguments.length; i++) {
-                argstr.append(arguments[i]).append(" ");
-            }
-            try (PrintStream out = new PrintStream(new FileOutputStream(outFolder + "log"))) {
-                out.print(argstr);
-                out.println();
-                out.println();
-                for (MessageBean msg : NotificationsInterface.getHistorical()) {
-                    out.println(msg.toString());
+            if (root != null) {
+                // Save arguments and structure
+                StringBuffer argstr = new StringBuffer();
+                for (int i = 0; i < arguments.length; i++) {
+                    argstr.append(arguments[i]).append(" ");
+                }
+                try (PrintStream out = new PrintStream(new FileOutputStream(outFolder + "log"))) {
+                    out.print(argstr);
+                    out.println();
+                    out.println();
+                    for (MessageBean msg : NotificationsInterface.getHistorical()) {
+                        out.println(msg.toString());
+                    }
                 }
             }
         } catch (Exception e) {
@@ -182,33 +205,37 @@ public class OctreeGeneratorRun {
         //IOctreeGenerator og = new OctreeGeneratorPart(ogp);
         IOctreeGenerator og = new OctreeGeneratorMag(ogp);
 
-        /* CATALOG */
-        String fullLoaderClass = "gaia.cu9.ari.gaiaorbit.data.group." + loaderClass;
-        IStarGroupDataProvider loader = (IStarGroupDataProvider) Class.forName(fullLoaderClass).getDeclaredConstructor().newInstance();
-        loader.setParallaxErrorFactorFaint(pllxerrfaint);
-        loader.setParallaxErrorFactorBright(pllxerrbright);
-        loader.setParallaxZeroPoint(pllxzeropoint);
-        loader.setFileNumberCap(fileNumCap);
-        loader.setMagCorrections(magCorrections);
-        loader.setDistanceCap(distcap);
-        loader.setGeoDistancesFile(geodistFile);
-        loader.setRUWEFile(ruweFile);
-        loader.setRUWECap(ruwe);
-        long[] cpm = loader.getCountsPerMag();
-
+        Array<StarBean> listLoader = null, list = null;
         Map<Long, Integer> xmatchTable = null;
-        if (addHip && xmatchFile != null && !xmatchFile.isEmpty()) {
-            // Load xmatchTable
-            xmatchTable = readXmatchTable(xmatchFile);
-            if (!xmatchTable.isEmpty()) {
-                // IDs which must be loaded regardless (we need them to update x-matched HIP stars)
-                loader.setMustLoadIds(new HashSet<>(xmatchTable.keySet()));
-            }
-        }
+        long[] cpm = null;
 
-        /* LOAD CATALOG */
-        @SuppressWarnings("unchecked") Array<StarBean> listGaia = (Array<StarBean>) loader.loadData(input);
-        Array<StarBean> list;
+        if (loaderClass != null) {
+            /* CATALOG */
+            String fullLoaderClass = "gaia.cu9.ari.gaiaorbit.data.group." + loaderClass;
+            IStarGroupDataProvider loader = (IStarGroupDataProvider) Class.forName(fullLoaderClass).getDeclaredConstructor().newInstance();
+            loader.setParallaxErrorFactorFaint(pllxerrfaint);
+            loader.setParallaxErrorFactorBright(pllxerrbright);
+            loader.setParallaxZeroPoint(pllxzeropoint);
+            loader.setFileNumberCap(fileNumCap);
+            loader.setMagCorrections(magCorrections);
+            loader.setDistanceCap(distcap);
+            loader.setGeoDistancesFile(geodistFile);
+            loader.setRUWEFile(ruweFile);
+            loader.setRUWECap(ruwe);
+            cpm = loader.getCountsPerMag();
+
+            if (addHip && xmatchFile != null && !xmatchFile.isEmpty()) {
+                // Load xmatchTable
+                xmatchTable = readXmatchTable(xmatchFile);
+                if (!xmatchTable.isEmpty()) {
+                    // IDs which must be loaded regardless (we need them to update x-matched HIP stars)
+                    loader.setMustLoadIds(new HashSet<>(xmatchTable.keySet()));
+                }
+            }
+
+            /* LOAD CATALOG */
+            listLoader = (Array<StarBean>) loader.loadData(input);
+        }
 
         if (addHip) {
             /* HIPPARCOS */
@@ -238,70 +265,77 @@ public class OctreeGeneratorRun {
 
             Vector3d aux1 = new Vector3d();
             Vector3d aux2 = new Vector3d();
-            for (StarBean gaiaStar : listGaia) {
-                // Check if star is also in HYG catalog
-                if (xmatchTable == null || !xmatchTable.containsKey(gaiaStar.id)) {
-                    // No hit, add to main list
-                    listHip.add(gaiaStar);
-                } else {
-                    // Update hipStar using gaiaStar data
-                    int hipId = xmatchTable.get(gaiaStar.id);
-                    if (hipMap.containsKey(hipId)) {
-                        StarBean hipStar = hipMap.get(hipId);
-
-                        // POSITION
-                        double x = gaiaStar.x(), y = gaiaStar.y(), z = gaiaStar.z();
-                        aux1.set(x, y, z);
-                        if (Math.abs(aux1.len() - AbstractStarGroupDataProvider.NEGATIVE_DIST) < 1e-10) {
-                            // Negative distance in Gaia star!
-                            // Use Gaia position, HIP distance
-
-                            // Fetch Gaia RA/DEC
-                            Coordinates.cartesianToSpherical(aux1, aux2);
-                            double gaiaRA = aux2.x;
-                            double gaiaDEC = aux2.y;
-
-                            // Fetch HIP distance
-                            aux1.set(hipStar.x(), hipStar.y(), hipStar.z());
-                            Coordinates.cartesianToSpherical(aux1, aux2);
-                            double hipDIST = aux2.z;
-
-                            // Compute new cartesian position
-                            aux1.set(gaiaRA, gaiaDEC, hipDIST);
-                            Coordinates.sphericalToCartesian(aux1, aux2);
-                            x = aux2.x;
-                            y = aux2.y;
-                            z = aux2.z;
-                        }
-
-                        hipStar.id = gaiaStar.id;
-                        hipStar.data[StarBean.I_X] = x;
-                        hipStar.data[StarBean.I_Y] = y;
-                        hipStar.data[StarBean.I_Z] = z;
-                        hipStar.data[StarBean.I_PMX] = gaiaStar.pmx();
-                        hipStar.data[StarBean.I_PMY] = gaiaStar.pmy();
-                        hipStar.data[StarBean.I_PMZ] = gaiaStar.pmz();
-                        hipStar.data[StarBean.I_MUALPHA] = gaiaStar.mualpha();
-                        hipStar.data[StarBean.I_MUDELTA] = gaiaStar.mudelta();
-                        hipStar.data[StarBean.I_RADVEL] = gaiaStar.radvel();
-                        hipStar.data[StarBean.I_APPMAG] = gaiaStar.appmag();
-                        hipStar.data[StarBean.I_ABSMAG] = gaiaStar.absmag();
-                        hipStar.data[StarBean.I_COL] = gaiaStar.col();
-                        hipStar.data[StarBean.I_SIZE] = gaiaStar.size();
-                        starhits++;
+            if (listLoader != null) {
+                for (StarBean gaiaStar : listLoader) {
+                    // Check if star is also in HYG catalog
+                    if (xmatchTable == null || !xmatchTable.containsKey(gaiaStar.id)) {
+                        // No hit, add to main list
+                        listHip.add(gaiaStar);
                     } else {
-                        notFoundHipStars++;
+                        // Update hipStar using gaiaStar data
+                        int hipId = xmatchTable.get(gaiaStar.id);
+                        if (hipMap.containsKey(hipId)) {
+                            StarBean hipStar = hipMap.get(hipId);
+
+                            // POSITION
+                            double x = gaiaStar.x(), y = gaiaStar.y(), z = gaiaStar.z();
+                            aux1.set(x, y, z);
+                            if (Math.abs(aux1.len() - AbstractStarGroupDataProvider.NEGATIVE_DIST) < 1e-10) {
+                                // Negative distance in Gaia star!
+                                // Use Gaia position, HIP distance
+
+                                // Fetch Gaia RA/DEC
+                                Coordinates.cartesianToSpherical(aux1, aux2);
+                                double gaiaRA = aux2.x;
+                                double gaiaDEC = aux2.y;
+
+                                // Fetch HIP distance
+                                aux1.set(hipStar.x(), hipStar.y(), hipStar.z());
+                                Coordinates.cartesianToSpherical(aux1, aux2);
+                                double hipDIST = aux2.z;
+
+                                // Compute new cartesian position
+                                aux1.set(gaiaRA, gaiaDEC, hipDIST);
+                                Coordinates.sphericalToCartesian(aux1, aux2);
+                                x = aux2.x;
+                                y = aux2.y;
+                                z = aux2.z;
+                            }
+
+                            hipStar.id = gaiaStar.id;
+                            hipStar.data[StarBean.I_X] = x;
+                            hipStar.data[StarBean.I_Y] = y;
+                            hipStar.data[StarBean.I_Z] = z;
+                            hipStar.data[StarBean.I_PMX] = gaiaStar.pmx();
+                            hipStar.data[StarBean.I_PMY] = gaiaStar.pmy();
+                            hipStar.data[StarBean.I_PMZ] = gaiaStar.pmz();
+                            hipStar.data[StarBean.I_MUALPHA] = gaiaStar.mualpha();
+                            hipStar.data[StarBean.I_MUDELTA] = gaiaStar.mudelta();
+                            hipStar.data[StarBean.I_RADVEL] = gaiaStar.radvel();
+                            hipStar.data[StarBean.I_APPMAG] = gaiaStar.appmag();
+                            hipStar.data[StarBean.I_ABSMAG] = gaiaStar.absmag();
+                            hipStar.data[StarBean.I_COL] = gaiaStar.col();
+                            hipStar.data[StarBean.I_SIZE] = gaiaStar.size();
+                            starhits++;
+                        } else {
+                            notFoundHipStars++;
+                        }
                     }
                 }
-            } logger.info(starhits + " of " + hipnum + " HIP stars' data updated due to being matched to a Gaia star (" + notFoundHipStars + " not found - negative parallax?)");
-
+                logger.info(starhits + " of " + hipnum + " HIP stars' data updated due to being matched to a Gaia star (" + notFoundHipStars + " not found - negative parallax?)");
+                // Free up some memory
+                listLoader.clear();
+            }
             // Main list is listHip
             list = listHip;
 
-            // Free some memory
-            listGaia.clear();
         } else {
-            list = listGaia;
+            list = listLoader;
+        }
+
+        if (list == null || list.isEmpty()) {
+            logger.info("No stars were loaded, please check out the parameters");
+            return null;
         }
 
         long loadingMs = TimeUtils.millis();
