@@ -561,6 +561,7 @@ public class StarGroup extends ParticleGroup implements ILineRenderable, IStarFo
 
     }
 
+    Color c = new Color();
     private void renderCloseupStar(int i, int idx, ICamera camera, ShaderProgram shader, Mesh mesh, double thpointTimesFovfactor, double thupOverFovfactor, double thdownOverFovfactor, float alpha) {
         StarBean star = (StarBean) pointData.get(idx);
         double size = getSize(idx);
@@ -568,7 +569,7 @@ public class StarGroup extends ParticleGroup implements ILineRenderable, IStarFo
         Vector3d lpos = fetchPosition(star, camera.getPos(), aux3d1.get(), currDeltaYears);
         double distToCamera = lpos.len();
         double viewAngle = (radius / distToCamera) / camera.getFovFactor();
-        Color c = new Color();
+
         Color.abgr8888ToColor(c, getColor(i));
         if (viewAngle >= thpointTimesFovfactor) {
             double ssize = getFuzzyRenderSize(camera, size, radius, distToCamera, viewAngle, thdownOverFovfactor, thupOverFovfactor);
