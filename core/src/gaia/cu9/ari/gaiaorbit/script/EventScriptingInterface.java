@@ -524,6 +524,10 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
         setProperMotionsNumberFactor((float) factor);
     }
 
+    public void setUnfilteredProperMotionsNumberFactor(float factor){
+        GlobalConf.scene.PM_NUM_FACTOR = factor;
+    }
+
     @Override
     public void setProperMotionsLengthFactor(float factor) {
         Gdx.app.postRunnable(() -> EventManager.instance.post(Events.PM_LEN_FACTOR_CMD, factor, false));
