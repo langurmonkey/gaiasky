@@ -17,10 +17,7 @@ import com.badlogic.gdx.graphics.g3d.attributes.TextureAttribute;
 import com.badlogic.gdx.graphics.glutils.ShaderProgram;
 import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Vector3;
-import com.badlogic.gdx.utils.Array;
-import com.badlogic.gdx.utils.ObjectIntMap;
-import com.badlogic.gdx.utils.ObjectMap;
-import com.badlogic.gdx.utils.TimeUtils;
+import com.badlogic.gdx.utils.*;
 import gaia.cu9.ari.gaiaorbit.GaiaSky;
 import gaia.cu9.ari.gaiaorbit.data.group.IStarGroupDataProvider;
 import gaia.cu9.ari.gaiaorbit.event.EventManager;
@@ -36,6 +33,7 @@ import gaia.cu9.ari.gaiaorbit.scenegraph.camera.CameraManager.CameraMode;
 import gaia.cu9.ari.gaiaorbit.scenegraph.camera.FovCamera;
 import gaia.cu9.ari.gaiaorbit.scenegraph.camera.ICamera;
 import gaia.cu9.ari.gaiaorbit.scenegraph.component.ModelComponent;
+import gaia.cu9.ari.gaiaorbit.util.Logger;
 import gaia.cu9.ari.gaiaorbit.util.ModelCache;
 import gaia.cu9.ari.gaiaorbit.util.*;
 import gaia.cu9.ari.gaiaorbit.util.coord.AstroUtils;
@@ -46,10 +44,7 @@ import gaia.cu9.ari.gaiaorbit.util.time.ITimeFrameProvider;
 import gaia.cu9.ari.gaiaorbit.util.tree.OctreeNode;
 import net.jafama.FastMath;
 
-import java.util.Arrays;
-import java.util.Comparator;
-import java.util.Map;
-import java.util.TreeMap;
+import java.util.*;
 import java.util.concurrent.*;
 
 /**
@@ -96,7 +91,6 @@ public class StarGroup extends ParticleGroup implements ILineRenderable, IStarFo
             this.name = name;
             this.octant = null;
         }
-
 
         public double pmx() {
             return data[I_PMX];
@@ -406,7 +400,7 @@ public class StarGroup extends ParticleGroup implements ILineRenderable, IStarFo
 
     public void update(ITimeFrameProvider time, final Vector3d parentTransform, ICamera camera, float opacity) {
         // Fade node visibility
-        if (this.isVisible()) {
+        if (this.isVisible() && active.length > 0) {
             // Delta years
             currDeltaYears = AstroUtils.getMsSince(time.getTime(), epoch_jd) * Nature.MS_TO_Y;
 
@@ -562,6 +556,7 @@ public class StarGroup extends ParticleGroup implements ILineRenderable, IStarFo
     }
 
     Color c = new Color();
+
     private void renderCloseupStar(int i, int idx, ICamera camera, ShaderProgram shader, Mesh mesh, double thpointTimesFovfactor, double thupOverFovfactor, double thdownOverFovfactor, float alpha) {
         StarBean star = (StarBean) pointData.get(idx);
         double size = getSize(idx);
@@ -701,6 +696,7 @@ public class StarGroup extends ParticleGroup implements ILineRenderable, IStarFo
     public void render(SpriteBatch batch, ShaderProgram shader, FontRenderSystem sys, RenderingContext rc, ICamera camera) {
         float thOverFactor = (float) (GlobalConf.scene.STAR_THRESHOLD_POINT / GlobalConf.scene.LABEL_NUMBER_FACTOR / camera.getFovFactor());
 
+
         if (camera.getCurrent() instanceof FovCamera) {
             int n = Math.min(pointData.size, N_CLOSEUP_STARS * 5);
             for (int i = 0; i < n; i++) {
@@ -723,8 +719,8 @@ public class StarGroup extends ParticleGroup implements ILineRenderable, IStarFo
                 float viewAngle = (float) (((radius / distToCamera) / camera.getFovFactor()) * GlobalConf.scene.STAR_BRIGHTNESS);
 
                 if (viewAngle >= thOverFactor && camera.isVisible(GaiaSky.instance.time, viewAngle, lpos, distToCamera)) {
-
                     textPosition(camera, lpos, distToCamera, radius);
+
                     shader.setUniformf("u_viewAngle", viewAngle);
                     shader.setUniformf("u_viewAnglePow", 1f);
                     shader.setUniformf("u_thOverFactor", thOverFactor);
@@ -865,21 +861,21 @@ public class StarGroup extends ParticleGroup implements ILineRenderable, IStarFo
         // Super handles FOCUS_CHANGED event
         super.notify(event, data);
         switch (event) {
-            case CAMERA_MOTION_UPDATED:
-                if (updaterTask != null) {
-                    final Vector3d currentCameraPos = (Vector3d) data[0];
-                    long t = TimeUtils.millis() - lastSortTime;
-                    if (!updating && !pool.isShutdown() && !workQueue.contains(updaterTask) && this.opacity > 0 && (t > MIN_UPDATE_TIME_MS * 2 || (lastSortCameraPos.dst(currentCameraPos) > CAM_DX_TH && t > MIN_UPDATE_TIME_MS))) {
-                        updating = true;
-                        pool.execute(updaterTask);
-                    }
+        case CAMERA_MOTION_UPDATED:
+            if (updaterTask != null) {
+                final Vector3d currentCameraPos = (Vector3d) data[0];
+                long t = TimeUtils.millis() - lastSortTime;
+                if (!updating && !pool.isShutdown() && !workQueue.contains(updaterTask) && this.opacity > 0 && (t > MIN_UPDATE_TIME_MS * 2 || (lastSortCameraPos.dst(currentCameraPos) > CAM_DX_TH && t > MIN_UPDATE_TIME_MS))) {
+                    updating = true;
+                    pool.execute(updaterTask);
                 }
-                break;
-            case GRAPHICS_QUALITY_UPDATED:
-                this.N_CLOSEUP_STARS = getNCloseupStars();
-                break;
-            default:
-                break;
+            }
+            break;
+        case GRAPHICS_QUALITY_UPDATED:
+            this.N_CLOSEUP_STARS = getNCloseupStars();
+            break;
+        default:
+            break;
         }
 
     }
@@ -1050,7 +1046,6 @@ public class StarGroup extends ParticleGroup implements ILineRenderable, IStarFo
         return highlighted ? hlColorFloat[hlci] : (float) ((Array<StarBean>) pointData).get(index).col();
     }
 
-
     /**
      * Creates a default star group with some sane parameters, given the name and the data
      *
@@ -1062,11 +1057,11 @@ public class StarGroup extends ParticleGroup implements ILineRenderable, IStarFo
         StarGroup sg = new StarGroup();
         sg.setName(name);
         sg.setParent("Universe");
-        sg.setFadeout(new double[]{21e2, 1e5});
-        sg.setLabelcolor(new double[]{1.0, 1.0, 1.0, 1.0});
-        sg.setColor(new double[]{1.0, 1.0, 1.0, 0.25});
+        sg.setFadeout(new double[] { 21e2, 1e5 });
+        sg.setLabelcolor(new double[] { 1.0, 1.0, 1.0, 1.0 });
+        sg.setColor(new double[] { 1.0, 1.0, 1.0, 0.25 });
         sg.setSize(6.0);
-        sg.setLabelposition(new double[]{0.0, -5.0e7, -4e8});
+        sg.setLabelposition(new double[] { 0.0, -5.0e7, -4e8 });
         sg.setCt("Stars");
         sg.setData(data);
         sg.doneLoading(null);
