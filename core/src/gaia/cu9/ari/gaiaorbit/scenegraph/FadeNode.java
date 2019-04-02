@@ -120,7 +120,7 @@ public class FadeNode extends AbstractPositionEntity {
     }
 
     public void update(ITimeFrameProvider time, final Vector3d parentTransform, ICamera camera, float opacity) {
-        this.opacity = opacity * this.opacity;
+        this.opacity = opacity;
         translation.set(parentTransform);
         Vector3d aux = aux3d1.get();
 
@@ -145,7 +145,7 @@ public class FadeNode extends AbstractPositionEntity {
         this.distToCamera = this.position == null ? (float) pos.dst(camera.getPos()) : this.position.distToCamera;
 
         // Update alpha
-        this.opacity = getBaseOpacity();
+        //this.opacity = getBaseOpacity();
         if (fadeIn != null)
             this.opacity *= MathUtilsd.lint((float) this.currentDistance, fadeIn.x, fadeIn.y, 0, 1);
         if (fadeOut != null)

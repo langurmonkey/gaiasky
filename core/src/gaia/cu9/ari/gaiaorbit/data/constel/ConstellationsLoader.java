@@ -6,6 +6,7 @@ import gaia.cu9.ari.gaiaorbit.data.ISceneGraphLoader;
 import gaia.cu9.ari.gaiaorbit.render.ComponentTypes;
 import gaia.cu9.ari.gaiaorbit.render.ComponentTypes.ComponentType;
 import gaia.cu9.ari.gaiaorbit.scenegraph.Constellation;
+import gaia.cu9.ari.gaiaorbit.scenegraph.FadeNode;
 import gaia.cu9.ari.gaiaorbit.scenegraph.SceneGraphNode;
 import gaia.cu9.ari.gaiaorbit.util.GlobalConf;
 import gaia.cu9.ari.gaiaorbit.util.I18n;
@@ -26,10 +27,19 @@ public class ConstellationsLoader<T extends SceneGraphNode> implements ISceneGra
 
     @Override
     public Array<? extends SceneGraphNode> loadData() {
-        Array<Constellation> constellations = new Array<Constellation>();
+        Array<SceneGraphNode> constellations = new Array<>();
 
         for (String f : files) {
             try {
+                // Add fade node
+                FadeNode constellationsFadeNode = new FadeNode();
+                constellationsFadeNode.setPosition(new double[] { 0, 0, 0 });
+                constellationsFadeNode.setCt(new String[] { "Constellations" });
+                constellationsFadeNode.setFadeout(new double[] { 1.0e2, 2.0e4 });
+                constellationsFadeNode.setParent(SceneGraphNode.ROOT_NAME);
+                constellationsFadeNode.setName("Constellations");
+                constellations.add(constellationsFadeNode);
+
                 // load constellations
                 FileHandle file = GlobalConf.data.dataFileHandle(f);
                 BufferedReader br = new BufferedReader(new InputStreamReader(file.read()));
@@ -50,7 +60,7 @@ public class ConstellationsLoader<T extends SceneGraphNode> implements ISceneGra
 
                             if (!lastName.isEmpty() && !name.equals("JUMP") && !name.equals(lastName)) {
                                 // We finished a constellation object
-                                Constellation cons = new Constellation(lastName, SceneGraphNode.ROOT_NAME);
+                                Constellation cons = new Constellation(lastName, "Constellations");
                                 cons.ct = ct;
                                 cons.ids = partial;
                                 constellations.add(cons);
@@ -59,7 +69,7 @@ public class ConstellationsLoader<T extends SceneGraphNode> implements ISceneGra
                             }
 
                             if (partial == null) {
-                                partial = new Array<int[]>();
+                                partial = new Array<>();
                             }
 
                             // Break point sequence
@@ -80,12 +90,10 @@ public class ConstellationsLoader<T extends SceneGraphNode> implements ISceneGra
                     // Add last
                     if (!lastName.isEmpty() && !name.equals("JUMP")) {
                         // We finished a constellation object
-                        Constellation cons = new Constellation(lastName, SceneGraphNode.ROOT_NAME);
+                        Constellation cons = new Constellation(lastName, "Constellations");
                         cons.ct = ct;
                         cons.ids = partial;
                         constellations.add(cons);
-                        partial = null;
-                        lastid = -1;
                     }
                 } catch (IOException e) {
                     Logger.getLogger(this.getClass()).error(e);

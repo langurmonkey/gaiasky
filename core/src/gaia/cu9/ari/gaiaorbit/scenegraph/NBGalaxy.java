@@ -63,7 +63,7 @@ public class NBGalaxy extends Particle {
 
     @Override
     public double THRESHOLD_POINT() {
-        return (float) 4E-10;
+        return (float) 1E-9;
     }
 
     @Override
@@ -165,7 +165,7 @@ public class NBGalaxy extends Particle {
 
     @Override
     public float textScale() {
-        return 0.08f;
+        return 0.15f;
     }
 
 }

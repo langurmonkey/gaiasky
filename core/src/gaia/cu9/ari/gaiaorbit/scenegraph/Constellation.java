@@ -86,7 +86,7 @@ public class Constellation extends FadeNode implements ILineRenderable, I3DTextR
         pos.scl((1d / nstars));
         pos.nor().scl(100 * Constants.PC_TO_U);
 
-        super.updateLocal(time, camera);
+        super.update(time, parentTransform, camera, opacity);
 
         addToRenderLists(camera);
 
@@ -167,11 +167,11 @@ public class Constellation extends FadeNode implements ILineRenderable, I3DTextR
 
     @Override
     protected void addToRenderLists(ICamera camera) {
-        if(isVisible()) {
-        addToRender(this, RenderGroup.LINE);
-        if (renderText()) {
-            addToRender(this, RenderGroup.FONT_LABEL);
-        }
+        if (isVisible()) {
+            addToRender(this, RenderGroup.LINE);
+            if (renderText()) {
+                addToRender(this, RenderGroup.FONT_LABEL);
+            }
         }
     }
 
@@ -191,7 +191,7 @@ public class Constellation extends FadeNode implements ILineRenderable, I3DTextR
 
     @Override
     public float textScale() {
-        return .3f;
+        return .2f;
     }
 
     @Override
