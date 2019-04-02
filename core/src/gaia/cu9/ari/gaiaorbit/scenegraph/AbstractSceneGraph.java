@@ -28,7 +28,7 @@ public abstract class AbstractSceneGraph implements ISceneGraph {
     /** Quick lookup map. Name to node. **/
     ObjectMap<String, SceneGraphNode> stringToNode;
     /**
-     * Map from integer to position with all hipparcos stars, for the
+     * Map from integer to position with all Hipparcos stars, for the
      * constellations
      **/
     IntMap<IPosition> hipMap;
@@ -143,7 +143,7 @@ public abstract class AbstractSceneGraph implements ISceneGraph {
                     if (hipMap.containsKey(((Star) s).hip)) {
                         logger.debug("Duplicated HIP id: " + ((Star) s).hip);
                     } else {
-                        hipMap.put(((Star) s).hip, (Star) s);
+                        hipMap.put(((Star) s).hip, s);
                     }
                 }
             } else if (node instanceof StarGroup) {

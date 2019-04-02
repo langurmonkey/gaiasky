@@ -179,9 +179,9 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
     public void setCameraFocus(final String focusName, final float waitTimeSeconds) {
         assert focusName != null : "Focus name can't be null";
 
-        ISceneGraph sg = GaiaSky.instance.sg;
-        if (sg.containsNode(focusName.toLowerCase())) {
-            IFocus focus = sg.findFocus(focusName.toLowerCase());
+        SceneGraphNode sgn = getObject(focusName);
+        if (sgn != null && sgn instanceof IFocus) {
+            IFocus focus = (IFocus) sgn;
             NaturalCamera cam = GaiaSky.instance.cam.naturalCamera;
             changeFocus(focus, cam, waitTimeSeconds);
         }
@@ -195,9 +195,9 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
     public void setCameraFocusInstant(final String focusName) {
         assert focusName != null : "Focus name can't be null";
 
-        ISceneGraph sg = GaiaSky.instance.sg;
-        if (sg.containsNode(focusName.toLowerCase())) {
-            IFocus focus = sg.findFocus(focusName.toLowerCase());
+        SceneGraphNode sgn = getObject(focusName);
+        if (sgn != null && sgn instanceof IFocus) {
+            IFocus focus = (IFocus) sgn;
             em.post(Events.CAMERA_MODE_CMD, CameraMode.Focus);
             em.post(Events.FOCUS_CHANGE_CMD, focus);
 
@@ -725,9 +725,17 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
         ISceneGraph sg = GaiaSky.instance.sg;
         String n = name.toLowerCase();
         SceneGraphNode obj = sg.getNode(n);
+        if (obj == null) {
+            if (name.matches("[0-9]+")) {
+                // Check with 'HIP '
+                obj = sg.getNode("hip " + name);
+            } else if (name.matches("hip [0-9]+") || name.matches("HIP [0-9]+")) {
+                obj = sg.getNode(name.substring(4));
+            }
+        }
 
         // If negative, no limit in waiting
-        if(timeOutSeconds < 0)
+        if (timeOutSeconds < 0)
             timeOutSeconds = Double.MAX_VALUE;
 
         double startMs = System.currentTimeMillis();
@@ -877,12 +885,9 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
     private void landOnObject(String name, AtomicBoolean stop) {
         assert name != null : "Name can't be null";
 
-        String namelc = name.toLowerCase();
-        ISceneGraph sg = GaiaSky.instance.sg;
-        if (sg.containsNode(namelc)) {
-            IFocus focus = sg.findFocus(namelc);
-            landOnObject(focus, stop);
-        }
+        SceneGraphNode sgn = getObject(name);
+        if (sgn != null && sgn instanceof IFocus)
+            landOnObject((IFocus) sgn, stop);
 
     }
 
@@ -1009,12 +1014,9 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
         assert name != null : "Name can't be null";
 
         stops.add(stop);
-        String namelc = name.toLowerCase();
-        ISceneGraph sg = GaiaSky.instance.sg;
-        if (sg.containsNode(namelc)) {
-            IFocus focus = sg.findFocus(namelc);
-            landOnObjectLocation(focus, locationName, stop);
-        }
+        SceneGraphNode sgn = getObject(name);
+        if (sgn != null && sgn instanceof IFocus)
+            landOnObjectLocation((IFocus) sgn, locationName, stop);
     }
 
     void landOnObjectLocation(IFocus object, String locationName, AtomicBoolean stop) {
@@ -1043,12 +1045,9 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
         assert name != null : "Name can't be null";
 
         String namelc = name.toLowerCase();
-        ISceneGraph sg = GaiaSky.instance.sg;
-        if (sg.containsNode(namelc)) {
-            IFocus focus = sg.findFocus(namelc);
-            landOnObjectLocation(focus, longitude, latitude, stop);
-        }
-
+        SceneGraphNode sgn = getObject(name);
+        if (sgn != null && sgn instanceof IFocus)
+            landOnObjectLocation((IFocus) sgn, longitude, latitude, stop);
     }
 
     void landOnObjectLocation(IFocus object, double longitude, double latitude, AtomicBoolean stop) {
@@ -1174,29 +1173,22 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
 
     @Override
     public double getDistanceTo(String name) {
-        String namelc = name.toLowerCase();
-        ISceneGraph sg = GaiaSky.instance.sg;
-        if (sg.containsNode(namelc)) {
-            SceneGraphNode object = sg.getNode(namelc);
-            if (object instanceof IFocus) {
-                IFocus obj = (IFocus) object;
-                return (obj.getDistToCamera() - obj.getRadius()) * Constants.U_TO_KM;
-            }
+        SceneGraphNode sgn = getObject(name);
+        if (sgn != null && sgn instanceof IFocus) {
+            IFocus obj = (IFocus) sgn;
+            return (obj.getDistToCamera() - obj.getRadius()) * Constants.U_TO_KM;
         }
+
         return -1;
     }
 
     @Override
     public double[] getObjectPosition(String name) {
-        String namelc = name.toLowerCase();
-        ISceneGraph sg = GaiaSky.instance.sg;
-        if (sg.containsNode(namelc)) {
-            SceneGraphNode object = sg.getNode(namelc);
-            if (object instanceof IFocus) {
-                IFocus obj = (IFocus) object;
-                obj.getAbsolutePosition(namelc, aux3d1);
-                return new double[] { aux3d1.x, aux3d1.y, aux3d1.z };
-            }
+        SceneGraphNode sgn = getObject(name);
+        if (sgn != null && sgn instanceof IFocus) {
+            IFocus obj = (IFocus) sgn;
+            obj.getAbsolutePosition(name.toLowerCase(), aux3d1);
+            return new double[] { aux3d1.x, aux3d1.y, aux3d1.z };
         }
         return null;
     }
@@ -2014,7 +2006,7 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
                         logger.info(data.size + " objects loaded");
                     });
                     // Sync waiting
-                    while(sync && !CatalogManager.instance().contains(dsName)){
+                    while (sync && !CatalogManager.instance().contains(dsName)) {
                         sleepFrames(1);
                     }
                     return true;
@@ -2063,7 +2055,7 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
     }
 
     @Override
-    public boolean highlightDataset(String dsName, boolean highlight){
+    public boolean highlightDataset(String dsName, boolean highlight) {
         boolean exists = CatalogManager.instance().contains(dsName);
         if (exists)
             EventManager.instance.post(Events.CATALOG_HIGHLIGHT, dsName, highlight, -1, false);
@@ -2071,7 +2063,7 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
     }
 
     @Override
-    public boolean highlightDataset(String dsName, int colorIndex, boolean highlight){
+    public boolean highlightDataset(String dsName, int colorIndex, boolean highlight) {
         boolean exists = CatalogManager.instance().contains(dsName);
         if (exists)
             EventManager.instance.post(Events.CATALOG_HIGHLIGHT, dsName, highlight, colorIndex, false);
@@ -2088,7 +2080,7 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
     }
 
     @Override
-    public long getFrameNumber(){
+    public long getFrameNumber() {
         return frameNumber;
     }
 

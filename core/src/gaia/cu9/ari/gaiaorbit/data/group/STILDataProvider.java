@@ -63,8 +63,14 @@ public class STILDataProvider extends AbstractStarGroupDataProvider {
         logger.info(I18n.bundle.format("notif.datafile", file));
         try {
             loadData(new FileDataSource(GlobalConf.data.dataFile(file)), factor);
-        } catch (Exception e) {
-            logger.error(e);
+        } catch (Exception e1) {
+            try{
+                logger.info("File " + file + " not found in data folder, trying relative path");
+                loadData(new FileDataSource(file), factor);
+            }catch (Exception e2) {
+                logger.error(e1);
+                logger.error(e2);
+            }
         }
         logger.info(I18n.bundle.format("notif.nodeloader", list.size, file));
         return list;

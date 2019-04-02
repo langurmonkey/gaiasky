@@ -174,8 +174,8 @@ public class DownloadDataWindow extends GenericDialog {
         // Parse available files
         JsonValue dataDesc = reader.parse(Gdx.files.absolute(SysUtils.getDefaultTmpDir() + "/gaiasky-data.json"));
 
-        Map<String, JsonValue> bestDs = new HashMap<String, JsonValue>();
-        Map<String, List<JsonValue>> typeMap = new HashMap<String, List<JsonValue>>();
+        Map<String, JsonValue> bestDs = new HashMap<>();
+        Map<String, List<JsonValue>> typeMap = new HashMap<>();
         // We don't want repeated elements but want to keep insertion order
         Set<String> types = new LinkedHashSet<String>();
 
@@ -207,7 +207,7 @@ public class DownloadDataWindow extends GenericDialog {
                 if (typeMap.containsKey(type)) {
                     typeMap.get(type).add(dst);
                 } else {
-                    List<JsonValue> aux = new ArrayList<JsonValue>();
+                    List<JsonValue> aux = new ArrayList<>();
                     aux.add(dst);
                     typeMap.put(type, aux);
                 }
@@ -286,7 +286,7 @@ public class DownloadDataWindow extends GenericDialog {
                     }
 
                     // Version
-                    OwnLabel vers = new OwnLabel(exists && outdated ? Integer.toString(myVersion) + " -> v-" + Integer.toString(serverVersion) : "v-" + Integer.toString(serverVersion), skin);
+                    OwnLabel vers = new OwnLabel(exists && outdated ? myVersion + " -> v-" + serverVersion : "v-" + myVersion, skin);
                     if (!exists) {
                         vers.addListener(new OwnTextTooltip(I18n.txt("gui.download.version.server", Integer.toString(serverVersion)), skin, 10));
                     } else if (outdated) {
@@ -336,7 +336,7 @@ public class DownloadDataWindow extends GenericDialog {
                                             String baseName = fileToDelete;
                                             if (fileToDelete.contains("/")) {
                                                 basePath = fileToDelete.substring(0, fileToDelete.lastIndexOf('/'));
-                                                baseName = fileToDelete.substring(fileToDelete.lastIndexOf('/') + 1, fileToDelete.length());
+                                                baseName = fileToDelete.substring(fileToDelete.lastIndexOf('/') + 1);
                                             }
                                             File dataLoc = new File(GlobalConf.data.DATA_LOCATION);
                                             File directory = new File(dataLoc, basePath);
@@ -381,7 +381,7 @@ public class DownloadDataWindow extends GenericDialog {
                     }
                     datasetsTable.row();
 
-                    choiceList.add(new Trio<JsonValue, OwnCheckBox, OwnLabel>(dataset, cb, haveit));
+                    choiceList.add(new Trio<>(dataset, cb, haveit));
                 }
             }
 
@@ -438,7 +438,7 @@ public class DownloadDataWindow extends GenericDialog {
     }
 
     private synchronized void downloadAndExtractFiles(List<Trio<JsonValue, OwnCheckBox, OwnLabel>> choices) {
-        toDownload = new Array<Trio<JsonValue, OwnCheckBox, OwnLabel>>();
+        toDownload = new Array<>();
 
         for (Trio<JsonValue, OwnCheckBox, OwnLabel> entry : choices) {
             if (entry.getSecond().isChecked())
@@ -565,9 +565,7 @@ public class DownloadDataWindow extends GenericDialog {
                 me.acceptButton.setDisabled(false);
                 downloadProgress.setVisible(false);
                 downloadSpeed.setVisible(false);
-                Gdx.app.postRunnable(() -> {
-                    downloadNext();
-                });
+                Gdx.app.postRunnable(() -> downloadNext());
             };
 
             Runnable cancel = () -> {
@@ -577,9 +575,7 @@ public class DownloadDataWindow extends GenericDialog {
                 me.acceptButton.setDisabled(false);
                 downloadProgress.setVisible(false);
                 downloadSpeed.setVisible(false);
-                Gdx.app.postRunnable(() -> {
-                    downloadNext();
-                });
+                Gdx.app.postRunnable(() -> downloadNext());
             };
 
             // Download
@@ -593,9 +589,7 @@ public class DownloadDataWindow extends GenericDialog {
         } else {
             // Finished all downloads!
             // RELOAD DATASETS VIEW
-            Gdx.app.postRunnable(() -> {
-                reloadAll();
-            });
+            Gdx.app.postRunnable(() -> reloadAll());
         }
 
     }
@@ -613,7 +607,7 @@ public class DownloadDataWindow extends GenericDialog {
             File file = path.toFile();
             if (file.exists() && file.canRead() && file.isFile()) {
                 String fname = file.getName();
-                String extension = fname.substring(fname.lastIndexOf(".") + 1, fname.length());
+                String extension = fname.substring(fname.lastIndexOf(".") + 1);
                 if (extension.equalsIgnoreCase("json")) {
                     JsonValue jf = reader.parse(Gdx.files.absolute(file.getAbsolutePath()));
                     return jf.getInt("version", 0);
@@ -682,9 +676,8 @@ public class DownloadDataWindow extends GenericDialog {
      *
      * @param inputFilePath A file
      * @return The size in bytes
-     * @throws Exception
      */
-    private long fileSize(String inputFilePath) throws Exception {
+    private long fileSize(String inputFilePath) {
         return new File(inputFilePath).length();
     }
 

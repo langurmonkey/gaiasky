@@ -2,8 +2,6 @@ package gaia.cu9.ari.gaiaorbit.interfce;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input.Keys;
-import com.badlogic.gdx.scenes.scene2d.Event;
-import com.badlogic.gdx.scenes.scene2d.EventListener;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.InputEvent.Type;
 import com.badlogic.gdx.scenes.scene2d.ui.*;
@@ -34,54 +32,44 @@ public class SearchDialog extends Window {
         searchInput = new OwnTextField("", skin);
         searchInput.setWidth(150 * GlobalConf.SCALE_FACTOR);
         searchInput.setMessageText(I18n.bundle.get("gui.objects.search"));
-        searchInput.addListener(new EventListener() {
-            @Override
-            public boolean handle(Event event) {
-                if (event instanceof InputEvent) {
-                    InputEvent ie = (InputEvent) event;
-                    if (ie.getType() == Type.keyUp) {
-                        if (ie.getKeyCode() == Keys.ESCAPE || ie.getKeyCode() == Keys.ENTER) {
-                            me.remove();
-                            return true;
-                        } else if (!searchInput.getText().equals(currentInputText)) {
-                            // Process only if text changed
-                            currentInputText = searchInput.getText();
-                            String name = currentInputText.toLowerCase();
-                            if (sg.containsNode(name)) {
-                                SceneGraphNode node = sg.getNode(name);
-                                if (node instanceof IFocus) {
-                                    IFocus focus = ((IFocus) node).getFocus(name);
-                                    if (focus != null && !focus.isCoordinatesTimeOverflow() && GaiaSky.instance.isOn(focus.getCt())) {
-                                        Gdx.app.postRunnable(() -> {
-                                            EventManager.instance.post(Events.CAMERA_MODE_CMD, CameraMode.Focus, true);
-                                            EventManager.instance.post(Events.FOCUS_CHANGE_CMD, focus, true);
-                                        });
-                                    }
-                                }
+        searchInput.addListener(event -> {
+            if (event instanceof InputEvent) {
+                InputEvent ie = (InputEvent) event;
+                if (ie.getType() == Type.keyUp) {
+                    if (ie.getKeyCode() == Keys.ESCAPE || ie.getKeyCode() == Keys.ENTER) {
+                        me.remove();
+                        return true;
+                    } else if (!searchInput.getText().equals(currentInputText)) {
+                        // Process only if text changed
+                        currentInputText = searchInput.getText();
+                        String name = currentInputText.toLowerCase();
+                        if(!checkString(name, sg)){
+                            if(name.matches("[0-9]+")){
+                                // Check with 'HIP '
+                                checkString("hip " + name, sg);
+                            } else if(name.matches("hip [0-9]+") || name.matches("HIP [0-9]+")){
+                                // Check without 'HIP '
+                                checkString(name.substring(4), sg);
                             }
                         }
-
-                        NaturalInputListener.pressedKeys.remove(ie.getKeyCode());
                     }
+
+                    NaturalInputListener.pressedKeys.remove(ie.getKeyCode());
                 }
-                return false;
             }
+            return false;
         });
 
         HorizontalGroup buttonGroup = new HorizontalGroup();
         TextButton cls = new OwnTextButton(I18n.bundle.get("gui.close"), skin, "default");
         cls.setName("close");
-        cls.addListener(new EventListener() {
-            @Override
-            public boolean handle(Event event) {
-                if (event instanceof ChangeEvent) {
-                    me.remove();
-                    return true;
-                }
-
-                return false;
+        cls.addListener(event -> {
+            if (event instanceof ChangeEvent) {
+                me.remove();
+                return true;
             }
 
+            return false;
         });
         buttonGroup.addActor(cls);
         cls.setSize(70 * GlobalConf.SCALE_FACTOR, 20 * GlobalConf.SCALE_FACTOR);
@@ -95,6 +83,23 @@ public class SearchDialog extends Window {
 
         this.setPosition(Math.round(gui.getGuiStage().getWidth() / 2f - this.getWidth() / 2f), Math.round(gui.getGuiStage().getHeight() / 2f - this.getHeight() / 2f));
 
+    }
+
+    public boolean checkString(String text, ISceneGraph sg) {
+        if (sg.containsNode(text)) {
+            SceneGraphNode node = sg.getNode(text);
+            if (node instanceof IFocus) {
+                IFocus focus = ((IFocus) node).getFocus(text);
+                if (focus != null && !focus.isCoordinatesTimeOverflow() && GaiaSky.instance.isOn(focus.getCt())) {
+                    Gdx.app.postRunnable(() -> {
+                        EventManager.instance.post(Events.CAMERA_MODE_CMD, CameraMode.Focus, true);
+                        EventManager.instance.post(Events.FOCUS_CHANGE_CMD, focus, true);
+                    });
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 
     public void clearText() {
