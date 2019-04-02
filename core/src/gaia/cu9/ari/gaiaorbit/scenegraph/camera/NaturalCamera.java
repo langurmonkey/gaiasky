@@ -1053,10 +1053,10 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
             posinv.set(pos).scl(-1d);
             break;
         case CAMERA_DIR_CMD:
-            direction.set((double[]) data[0]);
+            direction.set((double[]) data[0]).nor();
             break;
         case CAMERA_UP_CMD:
-            up.set((double[]) data[0]);
+            up.set((double[]) data[0]).nor();
             break;
         case CAMERA_FWD:
             addForwardForce((double) data[0]);
