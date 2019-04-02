@@ -147,7 +147,7 @@ public class StarGroup extends ParticleGroup implements ILineRenderable, IStarFo
     // Min update time
     private static final double MIN_UPDATE_TIME_MS = 100;
     // Sequence id
-    private static long idseq = 0;
+    private static long idSeq = 0;
     /**
      * Star model
      **/
@@ -273,7 +273,7 @@ public class StarGroup extends ParticleGroup implements ILineRenderable, IStarFo
 
     public StarGroup() {
         super();
-        id = idseq++;
+        id = idSeq++;
         comp = new StarGroupComparator();
         closestPos = new Vector3d();
         closestPm = new Vector3d();
@@ -546,18 +546,18 @@ public class StarGroup extends ParticleGroup implements ILineRenderable, IStarFo
         /** RENDER ACTUAL STARS **/
         boolean focusRendered = false;
         for (int i = 0; i < N_CLOSEUP_STARS; i++) {
-            renderCloseupStar(i, active[i], camera, shader, mesh, thpointTimesFovfactor, thupOverFovfactor, thdownOverFovfactor, alph);
+            renderCloseupStar(active[i], camera, shader, mesh, thpointTimesFovfactor, thupOverFovfactor, thdownOverFovfactor, alph);
             focusRendered = focusRendered || active[i] == focusIndex;
         }
         if (focus != null && !focusRendered) {
-            renderCloseupStar(1, focusIndex, camera, shader, mesh, thpointTimesFovfactor, thupOverFovfactor, thdownOverFovfactor, alph);
+            renderCloseupStar(focusIndex, camera, shader, mesh, thpointTimesFovfactor, thupOverFovfactor, thdownOverFovfactor, alph);
         }
 
     }
 
     Color c = new Color();
 
-    private void renderCloseupStar(int i, int idx, ICamera camera, ShaderProgram shader, Mesh mesh, double thpointTimesFovfactor, double thupOverFovfactor, double thdownOverFovfactor, float alpha) {
+    private void renderCloseupStar(int idx, ICamera camera, ShaderProgram shader, Mesh mesh, double thpointTimesFovfactor, double thupOverFovfactor, double thdownOverFovfactor, float alpha) {
         StarBean star = (StarBean) pointData.get(idx);
         double size = getSize(idx);
         double radius = size * Constants.STAR_SIZE_FACTOR;
@@ -565,13 +565,13 @@ public class StarGroup extends ParticleGroup implements ILineRenderable, IStarFo
         double distToCamera = lpos.len();
         double viewAngle = (radius / distToCamera) / camera.getFovFactor();
 
-        Color.abgr8888ToColor(c, getColor(i));
+        Color.abgr8888ToColor(c, getColor(idx));
         if (viewAngle >= thpointTimesFovfactor) {
-            double ssize = getFuzzyRenderSize(camera, size, radius, distToCamera, viewAngle, thdownOverFovfactor, thupOverFovfactor);
+            double fuzzySize = getFuzzyRenderSize(size, radius, distToCamera, viewAngle, thdownOverFovfactor, thupOverFovfactor);
 
             Vector3 pos = lpos.put(aux3f3.get());
             shader.setUniformf("u_pos", pos);
-            shader.setUniformf("u_size", (float) ssize);
+            shader.setUniformf("u_size", (float) fuzzySize);
 
             shader.setUniformf("u_color", c.r, c.g, c.b, alpha);
             shader.setUniformf("u_distance", (float) distToCamera);
@@ -584,11 +584,11 @@ public class StarGroup extends ParticleGroup implements ILineRenderable, IStarFo
         }
     }
 
-    public double getFuzzyRenderSize(ICamera camera, double size, double radius, double distToCamera, double viewAngle, double thdown, double thup) {
+    public double getFuzzyRenderSize(double size, double radius, double distToCamera, double viewAngle, double thDown, double thUp) {
         double computedSize = size;
-        if (viewAngle > thdown) {
+        if (viewAngle > thDown) {
             double dist = distToCamera;
-            if (viewAngle > thup) {
+            if (viewAngle > thUp) {
                 dist = radius / Constants.THRESHOLD_UP;
             }
             computedSize = (size * (dist / radius) * Constants.THRESHOLD_DOWN);

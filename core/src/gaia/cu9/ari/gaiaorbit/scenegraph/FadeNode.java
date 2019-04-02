@@ -60,7 +60,7 @@ public class FadeNode extends AbstractPositionEntity {
     /**
      * The name of the position object
      */
-    private String positionobjectname;
+    private String positionObjectName;
 
     /**
      * Is this fade node visible?
@@ -82,7 +82,7 @@ public class FadeNode extends AbstractPositionEntity {
     /**
      * Is it highlighted?
      */
-    protected boolean highlighted;
+    protected boolean highlighted = false;
     /** Highlight color index **/
     protected int hlci;
 
@@ -114,8 +114,8 @@ public class FadeNode extends AbstractPositionEntity {
 
     @Override public void doneLoading(AssetManager manager) {
         super.doneLoading(manager);
-        if (positionobjectname != null) {
-            this.position = (AbstractPositionEntity) sg.getNode(positionobjectname);
+        if (positionObjectName != null) {
+            this.position = (AbstractPositionEntity) sg.getNode(positionObjectName);
         }
     }
 
@@ -207,7 +207,7 @@ public class FadeNode extends AbstractPositionEntity {
     }
 
     public void setPositionobjectname(String po) {
-        this.positionobjectname = po;
+        this.positionObjectName = po;
     }
 
     public void setVisible(boolean visible) {
