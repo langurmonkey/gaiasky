@@ -674,7 +674,9 @@ public enum Events {
      * Modes:
      * 0 - direction
      * 1 - length
-     * 2 - radial velocity
+     * 2 - has radial velocity: blue=stars with RV, red=stars without RV
+     * 3 - redshift: blue=-50 Km/s, red=50 Km/s
+     * 4 - unique color
      */
     PM_COLOR_MODE_CMD,
     /**

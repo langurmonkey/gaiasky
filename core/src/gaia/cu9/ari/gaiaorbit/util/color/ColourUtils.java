@@ -26,7 +26,25 @@ public class ColourUtils {
     }
 
     /**
-     * Converts a scalar normalized to de range [0:1] into a short rainbow of
+     * Converts a scalar normalized to the range [0:1] into a blue-white-red
+     * rgba color, with blue at 0, white at 0.5 and red at 1
+     * @param value The value
+     * @param rgba The color
+     */
+    public static void blue_white_red(float value, float[] rgba){
+        // Make it in [-1:1]
+        float a = value * 2f - 1f;
+        if(a <= 0){
+            rgba[0] = rgba[1] = -a;
+            rgba[2] = 1;
+        } else {
+            rgba[0] = 1;
+            rgba[1] = rgba[2] = 1 - a;
+        }
+    }
+
+    /**
+     * Converts a scalar normalized to the range [0:1] into a short rainbow of
      * rgba values. See: http://www.particleincell.com/blog/2014/colormap/
      * 
      * @param value

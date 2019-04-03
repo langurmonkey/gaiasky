@@ -952,7 +952,9 @@ public class GlobalConf {
          * <ul>
          * <li>0 - direction</li>
          * <li>1 - length</li>
-         * <li>2 - radial velocity</li>
+         * <li>2 - has radial velocity</li>
+         * <li>3 - redshift</li>
+         * <li>4 - single color</li>
          * </ul>
          */
         public int PM_COLOR_MODE;
@@ -1206,7 +1208,7 @@ public class GlobalConf {
                 PM_LEN_FACTOR = MathUtilsd.clamp((float) data[0], Constants.MIN_PM_LEN_FACTOR, Constants.MAX_PM_LEN_FACTOR);
                 break;
             case PM_COLOR_MODE_CMD:
-                PM_COLOR_MODE = MathUtilsd.clamp((int) data[0], 0, 2);
+                PM_COLOR_MODE = MathUtilsd.clamp((int) data[0], 0, 4);
                 break;
 
             case CAMERA_SPEED_CMD:

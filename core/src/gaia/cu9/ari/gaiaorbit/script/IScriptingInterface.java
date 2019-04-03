@@ -530,7 +530,9 @@ public interface IScriptingInterface {
      *             <ul>
      *             <li>0 - direction: the normalised cartesian velocity components XYZ are mapped to the color channels RGB</li>
      *             <li>1 - magnitude (speed): the magnitude of the velocity vector is mapped using a rainbow scheme (blue-green-yellow-red) with the maximum at 0.5e8</li>
-     *             <li>2 - radial velocity: blueish for stars with radial velocity, reddish for stars without</li>
+     *             <li>2 - has radial velocity: blue for stars with radial velocity, red for stars without</li>
+     *             <li>3 - redshift: blue stars have negative radial velocity, red stars have positive radial velocity. Blue is mapped to -50 km/s, red is mapped to 50 km/s</li>
+     *             <li>4 - single color: same color for all velocity vectors</li>
      *             </ul>
      */
     void setProperMotionsColorMode(int mode);

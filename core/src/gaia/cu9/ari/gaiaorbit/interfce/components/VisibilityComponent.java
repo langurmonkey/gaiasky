@@ -156,9 +156,9 @@ public class VisibilityComponent extends GuiComponent implements IObserver {
         pmLenFactorGroup.addActor(plfg);
 
         // PM COLOR MODE
-        pmColorModeLabel = new Label("Color mode", skin, "default");
+        pmColorModeLabel = new Label(I18n.txt("gui.pm.colormode"), skin, "default");
 
-        ComboBoxBean[] cms = new ComboBoxBean[] { new ComboBoxBean("direction", 0), new ComboBoxBean("speed", 1), new ComboBoxBean("radial velocity", 2) };
+        ComboBoxBean[] cms = new ComboBoxBean[] { new ComboBoxBean(I18n.txt("gui.pm.colormode.dir"), 0), new ComboBoxBean(I18n.txt("gui.pm.colormode.speed"), 1), new ComboBoxBean(I18n.txt("gui.pm.colormode.hasrv"), 2), new ComboBoxBean(I18n.txt("gui.pm.colormode.redshift"), 3), new ComboBoxBean(I18n.txt("gui.pm.colormode.single"), 4) };
         pmColorMode = new OwnSelectBox<>(skin);
         pmColorMode.setItems(cms);
         pmColorMode.setSelectedIndex(GlobalConf.scene.PM_COLOR_MODE);

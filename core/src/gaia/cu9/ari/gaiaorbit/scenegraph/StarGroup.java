@@ -630,6 +630,7 @@ public class StarGroup extends ParticleGroup implements ILineRenderable, IStarFo
 
     private boolean rvLines = false;
     private float[] rgba = new float[4];
+
     /**
      * Proper motion rendering
      */
@@ -673,16 +674,37 @@ public class StarGroup extends ParticleGroup implements ILineRenderable, IStarFo
                         b = rgba[2];
                         break;
                     case 2:
-                        // RADIAL VELOCITY
-                        if(star.radvel() == 0) {
-                            r = 0.3f;
-                            g = 0.6f;
-                            b = 1f;
+                        // HAS RADIAL VELOCITY - blue: stars with RV, red: stars without RV
+                        if (star.radvel() != 0) {
+                            r = GlobalResources.gBlue[0] + 0.09f;
+                            g = GlobalResources.gBlue[1] + 0.09f;
+                            b = GlobalResources.gBlue[2] + 0.09f;
                         } else {
-                            r = 1f;
-                            g = 0.4f;
-                            b = 0.2f;
+                            r = GlobalResources.gRed[0] + 0.09f;
+                            g = GlobalResources.gRed[1] + 0.09f;
+                            b = GlobalResources.gRed[2] + 0.09f;
                         }
+                        break;
+                    case 3:
+                        // REDSHIFT - blue: -50 Km/s, red: 50 Km/s
+                        double max = 50;
+                        double rav = star.radvel();
+                        if (rav != 0) {
+                            // rv in [0:1]
+                            double rv = ((MathUtilsd.clamp(star.radvel(), -max, max) / max) + 1) / 2;
+                            ColourUtils.blue_white_red((float) rv, rgba);
+                            r = rgba[0];
+                            g = rgba[1];
+                            b = rgba[2];
+                        } else {
+                            r = g = b = 1;
+                        }
+                        break;
+                    case 4:
+                        // SINGLE COLOR
+                        r = GlobalResources.gBlue[0] + 0.09f;
+                        g = GlobalResources.gBlue[1] + 0.09f;
+                        b = GlobalResources.gBlue[2] + 0.09f;
                         break;
                     }
 

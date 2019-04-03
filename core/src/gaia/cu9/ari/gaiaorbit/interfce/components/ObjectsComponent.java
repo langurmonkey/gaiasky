@@ -98,7 +98,7 @@ public class ObjectsComponent extends GuiComponent implements IObserver {
          * OBJECTS
          */
 
-        treeToModel = new TwoWayHashmap<SceneGraphNode, Node>();
+        treeToModel = new TwoWayHashmap<>();
 
         logger.info(I18n.txt("notif.sgtree.init"));
 
@@ -154,7 +154,7 @@ public class ObjectsComponent extends GuiComponent implements IObserver {
 
             SceneGraphNode sol = sg.getNode("Sol");
             if (sol != null) {
-                Array<IFocus> solChildren = new Array<IFocus>();
+                Array<IFocus> solChildren = new Array<>();
                 sol.addFocusableObjects(solChildren);
                 solChildren.sort(new CelestialBodyComparator());
                 for (IFocus cb : solChildren)
