@@ -28,7 +28,6 @@ import uk.ac.starlink.util.FileDataSource;
 
 import java.io.InputStream;
 import java.util.List;
-import java.util.Set;
 import java.util.logging.Level;
 
 /**
@@ -78,11 +77,11 @@ public class STILDataProvider extends AbstractStarGroupDataProvider {
 
     /**
      * Gets the first ucd that can be translated to a double from the set.
-     * @param ucds The set of UCDs
+     * @param ucds The array of UCDs. The UCDs which coincide with the names should be first.
      * @param row The row objects
      * @return Pair of <UCD,Double>
      */
-    private Pair<UCD, Double> getDoubleUcd(Set<UCD> ucds, Object[] row) {
+    private Pair<UCD, Double> getDoubleUcd(Array<UCD> ucds, Object[] row) {
         for (UCD ucd : ucds) {
             try {
                 double num = ((Number) row[ucd.index]).doubleValue();
@@ -97,6 +96,7 @@ public class STILDataProvider extends AbstractStarGroupDataProvider {
         return null;
     }
 
+
     /**
      * Gets the first ucd as a string from the set.
      *
@@ -104,7 +104,7 @@ public class STILDataProvider extends AbstractStarGroupDataProvider {
      * @param row The row
      * @return
      */
-    private Pair<UCD, String> getStringUcd(Set<UCD> ucds, Object[] row) {
+    private Pair<UCD, String> getStringUcd(Array<UCD> ucds, Object[] row) {
         for (UCD ucd : ucds) {
             try {
                 String str = row[ucd.index].toString();

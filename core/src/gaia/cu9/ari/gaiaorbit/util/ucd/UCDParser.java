@@ -1,5 +1,6 @@
 package gaia.cu9.ari.gaiaorbit.util.ucd;
 
+import com.badlogic.gdx.utils.Array;
 import gaia.cu9.ari.gaiaorbit.util.ucd.UCD.UCDType;
 import gaia.cu9.ari.gaiaorbit.util.units.Position.PositionType;
 import uk.ac.starlink.table.ColumnInfo;
@@ -12,14 +13,14 @@ import java.util.Set;
 
 /**
  * Parses the ucds of a star table and builds some metadata on
- * the relevant quantities for gaia sky (position, proper motion, magnitudes, colors, etc.) 
- * @author tsagrista
+ * the relevant quantities for gaia sky (position, proper motion, magnitudes, colors, etc.)
  *
+ * @author tsagrista
  */
 public class UCDParser {
 
     private static String[] idcolnames = new String[] { "hip", "id", "source_id", "tycho2_id" };
-    private static String[] namecolnames = new String[] { "name", "proper", "proper_name", "common_name" };
+    private static String[] namecolnames = new String[] { "name", "proper", "proper_name", "common_name", "designation" };
     private static String[] pos1colnames = new String[] { "ra", "right_ascension", "rightascension", "alpha" };
     private static String[] pos2colnames = new String[] { "dec", "de", "declination", "delta" };
     private static String[] distcolnames = new String[] { "dist", "distance" };
@@ -34,27 +35,27 @@ public class UCDParser {
 
     // IDS
     public boolean hasid = false;
-    public Set<UCD> ID;
+    public Array<UCD> ID;
 
     // NAME
     public boolean hasname = false;
-    public Set<UCD> NAME;
+    public Array<UCD> NAME;
 
     // POSITIONS
     public boolean haspos = false;
-    public Set<UCD> POS1, POS2, POS3;
+    public Array<UCD> POS1, POS2, POS3;
 
     // PROPER MOTIONS
     public boolean haspm = false;
-    public Set<UCD> PMRA, PMDEC, RADVEL;
+    public Array<UCD> PMRA, PMDEC, RADVEL;
 
     // MAGNITUDES
     public boolean hasmag = false;
-    public Set<UCD> MAG;
+    public Array<UCD> MAG;
 
     // COLORS
     public boolean hascol = false;
-    public Set<UCD> COL;
+    public Array<UCD> COL;
 
     // PHYSICAL PARAMS
     // TODO - not supported yet
@@ -62,21 +63,22 @@ public class UCDParser {
     public UCDParser() {
         super();
         ucdmap = new HashMap<>();
-        ID = new HashSet<>();
-        NAME = new HashSet<>();
-        POS1 = new HashSet<>();
-        POS2 = new HashSet<>();
-        POS3 = new HashSet<>();
-        MAG = new HashSet<>();
-        COL = new HashSet<>();
-        PMRA = new HashSet<>();
-        PMDEC = new HashSet<>();
-        RADVEL = new HashSet<>();
+        ID = new Array<>();
+        NAME = new Array<>();
+        POS1 = new Array<>();
+        POS2 = new Array<>();
+        POS3 = new Array<>();
+        MAG = new Array<>();
+        COL = new Array<>();
+        PMRA = new Array<>();
+        PMDEC = new Array<>();
+        RADVEL = new Array<>();
     }
 
     /**
-     * Parses the given table and puts the UCD info 
+     * Parses the given table and puts the UCD info
      * into the ucdmap. The map and all the indices are overwritten.
+     *
      * @param table The {@link StarTable} to parse
      */
     public void parse(StarTable table) {
@@ -106,7 +108,7 @@ public class UCDParser {
         }
         this.hasid = !this.ID.isEmpty();
 
-        if(this.NAME.isEmpty()) {
+        if (this.NAME.isEmpty()) {
             this.NAME.addAll(getByColNames(namecolnames));
         }
         this.hasname = !this.NAME.isEmpty();
@@ -118,17 +120,18 @@ public class UCDParser {
             for (UCD candidate : pos) {
                 String meaning = candidate.ucd[0][1];
                 String coord = candidate.ucd[0].length > 2 ? candidate.ucd[0][2] : null;
+                boolean derived = checkDerivedQuantity(candidate.ucd);
 
                 // Filter using best reference system (posrefsys)
-                if (meaning.equals(posrefsys) || meaning.equals("parallax") || meaning.equals("distance")) {
+                if (!derived && (meaning.equals(posrefsys) || meaning.equals("parallax") || meaning.equals("distance"))) {
                     switch (meaning) {
                     case "eq":
                         switch (coord) {
                         case "ra":
-                            this.POS1.add(candidate);
+                            add(candidate, pos1colnames, this.POS1);
                             break;
                         case "dec":
-                            this.POS2.add(candidate);
+                            add(candidate, pos2colnames, this.POS2);
                             break;
                         }
                         break;
@@ -157,10 +160,10 @@ public class UCDParser {
                         }
                         break;
                     case "parallax":
-                        this.POS3.add(candidate);
+                        add(candidate, pllxcolnames, this.POS3);
                         break;
                     case "distance":
-                        this.POS3.add(candidate);
+                        add(candidate, distcolnames, this.POS3);
                         break;
                     }
                 }
@@ -181,7 +184,7 @@ public class UCDParser {
         this.haspos = !this.POS1.isEmpty() && !this.POS2.isEmpty();
 
         /** PROPER MOTIONS **/
-        
+
         // RA/DEC
         if (pos != null) {
             for (UCD candidate : pos) {
@@ -219,9 +222,9 @@ public class UCDParser {
 
         // RADIAL VELOCITY
         Set<UCD> spect = ucdmap.get(UCDType.SPECT);
-        if(spect != null)
-            for(UCD candidate : spect) {
-                if(candidate.ucd[0][1].equalsIgnoreCase("dopplerVeloc"))
+        if (spect != null)
+            for (UCD candidate : spect) {
+                if (candidate.ucd[0][1].equalsIgnoreCase("dopplerVeloc"))
                     this.RADVEL.add(candidate);
             }
 
@@ -308,16 +311,16 @@ public class UCDParser {
         return postype;
     }
 
-    private Set<UCD> getByColNames(String[] colnames) {
+    private Array<UCD> getByColNames(String[] colnames) {
         return getByColNames(colnames, null);
     }
 
-    private Set<UCD> getByColNames(String[] colnames, String defaultunit) {
+    private Array<UCD> getByColNames(String[] colnames, String defaultunit) {
         return getByColNames(new UCDType[] { UCDType.UNKNOWN, UCDType.MISSING }, colnames, defaultunit);
     }
 
-    private Set<UCD> getByColNames(UCDType[] types, String[] colnames, String defaultunit) {
-        Set<UCD> candidates = new HashSet<>();
+    private Array<UCD> getByColNames(UCDType[] types, String[] colnames, String defaultunit) {
+        Array<UCD> candidates = new Array<>();
         for (UCDType type : types) {
             // Get all unknown and missing
             if (ucdmap.containsKey(type)) {
@@ -333,6 +336,23 @@ public class UCDParser {
             }
         }
         return candidates;
+    }
+
+    /**
+     * Adds the given UCD to the list. If the column name of the candidates is in
+     * the given array of colnames, then it is added at the position 0, otherwise, it is
+     * added at the back of the list.
+     * @param candidate The candidate UCD object
+     * @param colnames Array of column names to check
+     * @param list The list to add
+     */
+    private void add(UCD candidate, String[] colnames, Array<UCD> list){
+        if(candidate.colname != null && contains(colnames, candidate.colname)){
+            list.insert(0, candidate);
+        } else {
+            list.add(candidate);
+        }
+
     }
 
     private String getBestRefsys(Set<UCD> ucds) {
@@ -352,6 +372,31 @@ public class UCDParser {
         else if (cart)
             return "cartesian";
         return "";
+    }
+
+    /**
+     * Checks whether this UCD is a derived quantity (ratio, etc.)
+     *
+     * @param ucd The UCD to test
+     * @return True if the given UCD is a derived quantity.
+     */
+    private boolean checkDerivedQuantity(String[][] ucd) {
+        for (int i = 0; i < ucd.length; i++) {
+            if (ucd[i] != null && ucd[i].length > 0) {
+                // Check ratio or factor
+                if (ucd[i][0].equals("arith")) {
+                    if (ucd[i].length > 1 && (ucd[i][1].equals("ratio") || ucd[i][1].equals("factor"))) {
+                        return true;
+                    }
+                }
+
+                // Check statistic (correlation, etc)
+                if (ucd[i][0].equals("stat")) {
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 
     private boolean contains(String[] list, String key) {
