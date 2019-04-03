@@ -520,6 +520,11 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
         Gdx.app.postRunnable(() -> EventManager.instance.post(Events.PM_NUM_FACTOR_CMD, MathUtilsd.lint(factor, Constants.MIN_SLIDER, Constants.MAX_SLIDER, Constants.MIN_PM_NUM_FACTOR, Constants.MAX_PM_NUM_FACTOR), false));
     }
 
+    @Override
+    public void setProperMotionsColorMode(int mode){
+        Gdx.app.postRunnable(() -> EventManager.instance.post(Events.PM_COLOR_MODE_CMD, mode % 3, false));
+    }
+
     public void setProperMotionsNumberFactor(int factor) {
         setProperMotionsNumberFactor((float) factor);
     }

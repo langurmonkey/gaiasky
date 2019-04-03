@@ -17,7 +17,10 @@ import com.badlogic.gdx.graphics.g3d.attributes.TextureAttribute;
 import com.badlogic.gdx.graphics.glutils.ShaderProgram;
 import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Vector3;
-import com.badlogic.gdx.utils.*;
+import com.badlogic.gdx.utils.Array;
+import com.badlogic.gdx.utils.ObjectIntMap;
+import com.badlogic.gdx.utils.ObjectMap;
+import com.badlogic.gdx.utils.TimeUtils;
 import gaia.cu9.ari.gaiaorbit.GaiaSky;
 import gaia.cu9.ari.gaiaorbit.data.group.IStarGroupDataProvider;
 import gaia.cu9.ari.gaiaorbit.event.EventManager;
@@ -33,9 +36,9 @@ import gaia.cu9.ari.gaiaorbit.scenegraph.camera.CameraManager.CameraMode;
 import gaia.cu9.ari.gaiaorbit.scenegraph.camera.FovCamera;
 import gaia.cu9.ari.gaiaorbit.scenegraph.camera.ICamera;
 import gaia.cu9.ari.gaiaorbit.scenegraph.component.ModelComponent;
-import gaia.cu9.ari.gaiaorbit.util.Logger;
 import gaia.cu9.ari.gaiaorbit.util.ModelCache;
 import gaia.cu9.ari.gaiaorbit.util.*;
+import gaia.cu9.ari.gaiaorbit.util.color.ColourUtils;
 import gaia.cu9.ari.gaiaorbit.util.coord.AstroUtils;
 import gaia.cu9.ari.gaiaorbit.util.gravwaves.RelativisticEffectsManager;
 import gaia.cu9.ari.gaiaorbit.util.math.MathUtilsd;
@@ -44,7 +47,10 @@ import gaia.cu9.ari.gaiaorbit.util.time.ITimeFrameProvider;
 import gaia.cu9.ari.gaiaorbit.util.tree.OctreeNode;
 import net.jafama.FastMath;
 
-import java.util.*;
+import java.util.Arrays;
+import java.util.Comparator;
+import java.util.Map;
+import java.util.TreeMap;
 import java.util.concurrent.*;
 
 /**
@@ -622,8 +628,8 @@ public class StarGroup extends ParticleGroup implements ILineRenderable, IStarFo
         return GlobalConf.scene.N_PM_STARS > 0 ? GlobalConf.scene.N_PM_STARS : (N_CLOSEUP_STARS * 20);
     }
 
-    boolean rvLines = false;
-
+    private boolean rvLines = false;
+    private float[] rgba = new float[4];
     /**
      * Proper motion rendering
      */
@@ -642,31 +648,42 @@ public class StarGroup extends ParticleGroup implements ILineRenderable, IStarFo
                 // Rest of attributes
                 float distToCamera = (float) lpos.len();
                 float viewAngle = (float) (((radius / distToCamera) / camera.getFovFactor()) * GlobalConf.scene.STAR_BRIGHTNESS);
-                if (viewAngle >= thPointTimesFovfactor / GlobalConf.scene.PM_NUM_FACTOR) {
+                if (viewAngle >= thPointTimesFovfactor / GlobalConf.scene.PM_NUM_FACTOR && (star.pmx() != 0 || star.pmy() != 0 || star.pmz() != 0)) {
 
                     Vector3d p1 = aux3d1.get().set(star.x() + pm.x, star.y() + pm.y, star.z() + pm.z).sub(camera.getPos());
                     Vector3d ppm = aux3d2.get().set(star.pmx(), star.pmy(), star.pmz()).scl(GlobalConf.scene.PM_LEN_FACTOR);
-                    Vector3d p2 = ppm.add(p1);
+                    Vector3d p2 = aux3d3.get().set(ppm).add(p1);
 
-                    // Mualpha -> red channel
-                    // Mudelta -> green channel
-                    // Radvel -> blue channel
-                    // Min value per channel = 0.2
-                    final double mumin = -80;
-                    final double mumax = 80;
-                    final double maxmin = mumax - mumin;
-
-                    // Color using orientation
-                    float r = (float) ((star.mualpha() - mumin) / maxmin) * 0.8f + 0.2f;
-                    float g = (float) ((star.mudelta() - mumin) / maxmin) * 0.8f + 0.2f;
-                    float b = (float) (star.radvel()) * 0.8f + 0.2f;
-
-                    if (star.radvel() == 0) {
-                        // Normal line width
-                        lineWidth = 0.8f;
-                    } else {
-                        // Large line width
-                        lineWidth = 2.3f;
+                    float r, g, b;
+                    switch (GlobalConf.scene.PM_COLOR_MODE) {
+                    case 0:
+                    default:
+                        // DIRECTION
+                        ppm.nor();
+                        r = (float) ppm.x;
+                        g = (float) ppm.y;
+                        b = (float) ppm.z;
+                        break;
+                    case 1:
+                        // LENGTH
+                        double len = MathUtilsd.clamp(ppm.len(), 0d, .5e8d) / .5e8d;
+                        ColourUtils.long_rainbow((float) len, rgba);
+                        r = rgba[0];
+                        g = rgba[1];
+                        b = rgba[2];
+                        break;
+                    case 2:
+                        // RADIAL VELOCITY
+                        if(star.radvel() == 0) {
+                            r = 0.3f;
+                            g = 0.6f;
+                            b = 1f;
+                        } else {
+                            r = 1f;
+                            g = 0.4f;
+                            b = 0.2f;
+                        }
+                        break;
                     }
 
                     renderer.addLine(this, p1.x, p1.y, p1.z, p2.x, p2.y, p2.z, r, g, b, alpha * this.opacity);
@@ -677,11 +694,9 @@ public class StarGroup extends ParticleGroup implements ILineRenderable, IStarFo
 
     }
 
-    float lineWidth = 1f;
-
     @Override
     public float getLineWidth() {
-        return lineWidth;
+        return 0.6f;
     }
 
     @Override
@@ -695,7 +710,6 @@ public class StarGroup extends ParticleGroup implements ILineRenderable, IStarFo
     @Override
     public void render(SpriteBatch batch, ShaderProgram shader, FontRenderSystem sys, RenderingContext rc, ICamera camera) {
         float thOverFactor = (float) (GlobalConf.scene.STAR_THRESHOLD_POINT / GlobalConf.scene.LABEL_NUMBER_FACTOR / camera.getFovFactor());
-
 
         if (camera.getCurrent() instanceof FovCamera) {
             int n = Math.min(pointData.size, N_CLOSEUP_STARS * 5);

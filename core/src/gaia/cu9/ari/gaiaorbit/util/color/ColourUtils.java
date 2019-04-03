@@ -4,10 +4,6 @@ import gaia.cu9.ari.gaiaorbit.util.math.MathUtilsd;
 
 public class ColourUtils {
 
-    public enum ColorMap {
-        GRAYSCALE, SHORT_RAINBOW, LONG_RAINBOW, YELLOW_TO_RED, BLUE_TO_MAGENTA;
-    }
-
     public static float normalize(float value, float min, float max) {
         if (value > max)
             return max;

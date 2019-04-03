@@ -525,6 +525,17 @@ public interface IScriptingInterface {
     void setProperMotionsLengthFactor(float factor);
 
     /**
+     * Sets the color mode of proper motion vectors.
+     * @param mode The color mode:
+     *             <ul>
+     *             <li>0 - direction</li>
+     *             <li>1 - magnitude (speed)</li>
+     *             <li>2 - radial velocity</li>
+     *             </ul>
+     */
+    void setProperMotionsColorMode(int mode);
+
+    /**
      * Overrides the maximum number of proper motion vectors that the program
      * is allowed to show.
      * @param maxNumber The maximum number of proper motion vectors. Negative to use default

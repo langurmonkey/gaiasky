@@ -57,14 +57,14 @@ public class CameraComponent extends GuiComponent implements IObserver {
         for (int i = 0; i < cameraModes; i++) {
             cameraOptions[i] = CameraMode.getMode(i).toString();
         }
-        cameraMode = new OwnSelectBox<String>(skin);
+        cameraMode = new OwnSelectBox<>(skin);
         cameraMode.setName("camera mode");
         cameraMode.setWidth(width);
         cameraMode.setItems(cameraOptions);
         cameraMode.addListener(event -> {
             if (event instanceof ChangeEvent) {
                 String selection = cameraMode.getSelected();
-                CameraMode mode = null;
+                CameraMode mode;
                 try {
                     mode = CameraMode.fromString(selection);
                 } catch (IllegalArgumentException e) {
@@ -79,7 +79,7 @@ public class CameraComponent extends GuiComponent implements IObserver {
             return false;
         });
 
-        List<Button> buttonList = new ArrayList<Button>();
+        List<Button> buttonList = new ArrayList<>();
 
         button3d = new OwnTextIconButton("", skin, "3d");
         button3d.addListener(new TextTooltip(TextUtils.capitalise(I18n.txt("element.stereomode")), skin));

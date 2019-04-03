@@ -670,6 +670,14 @@ public enum Events {
      **/
     PM_LEN_FACTOR_CMD,
     /**
+     * Contains the mode and a boolean indicating if it comes from the interface.
+     * Modes:
+     * 0 - direction
+     * 1 - length
+     * 2 - radial velocity
+     */
+    PM_COLOR_MODE_CMD,
+    /**
      * Updates the screen mode according to whats in the
      * {@link gaia.cu9.ari.gaiaorbit.util.GlobalConf#screen} bean.
      **/
