@@ -528,9 +528,9 @@ public interface IScriptingInterface {
      * Sets the color mode of proper motion vectors.
      * @param mode The color mode:
      *             <ul>
-     *             <li>0 - direction</li>
-     *             <li>1 - magnitude (speed)</li>
-     *             <li>2 - radial velocity</li>
+     *             <li>0 - direction: the normalised cartesian velocity components XYZ are mapped to the color channels RGB</li>
+     *             <li>1 - magnitude (speed): the magnitude of the velocity vector is mapped using a rainbow scheme (blue-green-yellow-red) with the maximum at 0.5e8</li>
+     *             <li>2 - radial velocity: blueish for stars with radial velocity, reddish for stars without</li>
      *             </ul>
      */
     void setProperMotionsColorMode(int mode);
