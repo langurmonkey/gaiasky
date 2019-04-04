@@ -43,7 +43,7 @@ public class StarGroupRenderSystem extends ImmediateRenderSystem implements IObs
     private ICamera cam;
 
     public StarGroupRenderSystem(RenderGroup rg, float[] alphas, ShaderProgram[] shaders) {
-        super(rg, alphas, shaders, 1500000);
+        super(rg, alphas, shaders);
         BRIGHTNESS_FACTOR = 10;
         this.comp = new DistToCameraComparator<>();
         this.alphaSizeFovBr = new float[4];
@@ -106,33 +106,30 @@ public class StarGroupRenderSystem extends ImmediateRenderSystem implements IObs
                             starGroup.offset = addMeshData(starGroup.size());
                             curr = meshes.get(starGroup.offset);
 
-                            checkRequiredVerticesSize(starGroup.size() * curr.vertexSize);
-                            curr.vertices = verticesTemp;
-
                             int n = starGroup.data().size;
+                            ensureTempVertsSize(n * curr.vertexSize);
                             for (int i = 0; i < n; i++) {
                                 StarBean p = starGroup.data().get(i);
                                 // COLOR
-                                curr.vertices[curr.vertexIdx + curr.colorOffset] = starGroup.getColor(i);
+                                tempVerts[curr.vertexIdx + curr.colorOffset] = starGroup.getColor(i);
 
                                 // SIZE
-                                curr.vertices[curr.vertexIdx + sizeOffset] = (float) (p.size() * Constants.STAR_SIZE_FACTOR) * starGroup.highlightedSizeFactor();
+                                tempVerts[curr.vertexIdx + sizeOffset] = (float) (p.size() * Constants.STAR_SIZE_FACTOR) * starGroup.highlightedSizeFactor();
 
                                 // POSITION [u]
-                                curr.vertices[curr.vertexIdx] = (float) p.x();
-                                curr.vertices[curr.vertexIdx + 1] = (float) p.y();
-                                curr.vertices[curr.vertexIdx + 2] = (float) p.z();
+                                tempVerts[curr.vertexIdx] = (float) p.x();
+                                tempVerts[curr.vertexIdx + 1] = (float) p.y();
+                                tempVerts[curr.vertexIdx + 2] = (float) p.z();
 
                                 // PROPER MOTION [u/yr]
-                                curr.vertices[curr.vertexIdx + pmOffset] = (float) p.pmx();
-                                curr.vertices[curr.vertexIdx + pmOffset + 1] = (float) p.pmy();
-                                curr.vertices[curr.vertexIdx + pmOffset + 2] = (float) p.pmz();
+                                tempVerts[curr.vertexIdx + pmOffset] = (float) p.pmx();
+                                tempVerts[curr.vertexIdx + pmOffset + 1] = (float) p.pmy();
+                                tempVerts[curr.vertexIdx + pmOffset + 2] = (float) p.pmz();
 
                                 curr.vertexIdx += curr.vertexSize;
                             }
                             starGroup.count = starGroup.size() * curr.vertexSize;
-                            curr.mesh.setVertices(curr.vertices, 0, starGroup.count);
-                            curr.vertices = null;
+                            curr.mesh.setVertices(tempVerts, 0, starGroup.count);
 
                             starGroup.inGpu = true;
 

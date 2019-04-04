@@ -22,7 +22,7 @@ public abstract class ImmediateRenderSystem extends AbstractRenderSystem {
     protected Array<MeshData> meshes;
     protected MeshData curr;
     // Auxiliary array that holds vertices temporarily
-    protected float[] verticesTemp;
+    protected float[] tempVerts;
 
     protected class MeshData {
 
@@ -100,18 +100,32 @@ public abstract class ImmediateRenderSystem extends AbstractRenderSystem {
         this(rg, alphas, programs, -1);
     }
 
-    protected ImmediateRenderSystem(RenderGroup rg, float[] alphas, ShaderProgram[] programs, int numVertices) {
+    protected ImmediateRenderSystem(RenderGroup rg, float[] alphas, ShaderProgram[] programs, int tempVertsSize) {
         super(rg, alphas, programs);
         initShaderProgram();
         initVertices();
         meshIdx = 0;
-        if (numVertices > 0)
-            verticesTemp = new float[numVertices];
+        if (tempVertsSize > 0)
+            tempVerts = new float[tempVertsSize];
     }
 
     protected abstract void initShaderProgram();
 
     protected abstract void initVertices();
+
+    /**
+     * This function makes sure that the tempVerts array has at least
+     * the given size. After calling this function, the elements of tempVerts
+     * may have been cleared.
+     * @param size The size to ensure
+     */
+    protected void ensureTempVertsSize(int size){
+        if(tempVerts == null) {
+            tempVerts = new float[size];
+        } else if (size > tempVerts.length){
+            tempVerts = new float[size];
+        }
+    }
 
     public void color(Color color) {
         curr.vertices[curr.vertexIdx + curr.colorOffset] = color.toFloatBits();
@@ -138,10 +152,4 @@ public abstract class ImmediateRenderSystem extends AbstractRenderSystem {
         curr.numVertices++;
     }
 
-    protected void checkRequiredVerticesSize(int requiredSize) {
-        if (verticesTemp.length < requiredSize) {
-            logger.info("Allocating new vertex array: " + verticesTemp.length + " > " + requiredSize);
-            verticesTemp = new float[requiredSize];
-        }
-    }
 }

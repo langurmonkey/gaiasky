@@ -69,7 +69,7 @@ public class MWModelRenderSystem extends ImmediateRenderSystem implements IObser
     private Array<Chunk> chunks;
 
     public MWModelRenderSystem(RenderGroup rg, float[] alphas, ShaderProgram[] starShaders) {
-        super(rg, alphas, starShaders, 250000);
+        super(rg, alphas, starShaders);
 
         aux3f1 = new Vector3();
         aux3d1 = new Vector3d();
@@ -143,9 +143,7 @@ public class MWModelRenderSystem extends ImmediateRenderSystem implements IObser
         MeshData bulge = new MeshData();
         initMesh(bulge, mw.starData.size);
         
-        checkRequiredVerticesSize(mw.starData.size * bulge.vertexSize);
-        bulge.vertices = verticesTemp;
-        
+        ensureTempVertsSize(mw.starData.size * bulge.vertexSize);
         for (ParticleBean star : mw.starData) {
             // VERTEX
             aux3f1.set((float) star.data[0], (float) star.data[1], (float) star.data[2]);
@@ -165,7 +163,7 @@ public class MWModelRenderSystem extends ImmediateRenderSystem implements IObser
             col[2] = MathUtilsd.clamp(col[2], 0f, 1f);
 
             // COLOR
-            bulge.vertices[bulge.vertexIdx + bulge.colorOffset] = Color.toFloatBits(col[0], col[1], col[2], col[3]);
+            tempVerts[bulge.vertexIdx + bulge.colorOffset] = Color.toFloatBits(col[0], col[1], col[2], col[3]);
 
             // SIZE
             double starSize = 0;
@@ -174,21 +172,20 @@ public class MWModelRenderSystem extends ImmediateRenderSystem implements IObser
             } else {
                 starSize = (float) Math.abs(rand.nextGaussian()) * 8f + 1.0f;
             }
-            bulge.vertices[bulge.vertexIdx + additionalOffset] = (float) (starSize * density * 2);
-            bulge.vertices[bulge.vertexIdx + additionalOffset + 1] = 0.7f;
+            tempVerts[bulge.vertexIdx + additionalOffset] = (float) (starSize * density * 2);
+            tempVerts[bulge.vertexIdx + additionalOffset + 1] = 0.7f;
 
             // cb.transform.getTranslationf(aux);
             // POSITION
             aux3f1.set((float) star.data[0], (float) star.data[1], (float) star.data[2]);
             final int idx = bulge.vertexIdx;
-            bulge.vertices[idx] = aux3f1.x;
-            bulge.vertices[idx + 1] = aux3f1.y;
-            bulge.vertices[idx + 2] = aux3f1.z;
+            tempVerts[idx] = aux3f1.x;
+            tempVerts[idx + 1] = aux3f1.y;
+            tempVerts[idx + 2] = aux3f1.z;
 
             bulge.vertexIdx += bulge.vertexSize;
         }
-        bulge.mesh.setVertices(bulge.vertices, 0, bulge.vertexIdx);
-        bulge.vertices = null;
+        bulge.mesh.setVertices(tempVerts, 0, bulge.vertexIdx);
         Chunk bulgeChunk = new Chunk(bulge, computeCentre(mw.starData));
         chunks.add(bulgeChunk);
 
@@ -207,9 +204,7 @@ public class MWModelRenderSystem extends ImmediateRenderSystem implements IObser
             MeshData partmd = new MeshData();
             initMesh(partmd, part.size);
             
-            checkRequiredVerticesSize(part.size * partmd.vertexSize);
-            partmd.vertices = verticesTemp;
-            
+            ensureTempVertsSize(part.size * partmd.vertexSize);
             for (ParticleBean p : part) {
                 // VERTEX
                 aux3f1.set((float) p.data[0], (float) p.data[1], (float) p.data[2]);
@@ -221,7 +216,7 @@ public class MWModelRenderSystem extends ImmediateRenderSystem implements IObser
                 col[2] = MathUtilsd.clamp(col[2], 0f, 1f);
 
                 // COLOR
-                partmd.vertices[partmd.vertexIdx + partmd.colorOffset] = Color.toFloatBits(col[0], col[1], col[2], col[3]);
+                tempVerts[partmd.vertexIdx + partmd.colorOffset] = Color.toFloatBits(col[0], col[1], col[2], col[3]);
 
                 // SIZE
                 double starSize = 0;
@@ -230,21 +225,20 @@ public class MWModelRenderSystem extends ImmediateRenderSystem implements IObser
                 } else {
                     starSize = (float) Math.abs(rand.nextGaussian()) * 8f + 1.0f;
                 }
-                partmd.vertices[partmd.vertexIdx + additionalOffset] = (float) (starSize * density * 2);
-                partmd.vertices[partmd.vertexIdx + additionalOffset + 1] = 0.7f;
+                tempVerts[partmd.vertexIdx + additionalOffset] = (float) (starSize * density * 2);
+                tempVerts[partmd.vertexIdx + additionalOffset + 1] = 0.7f;
 
                 // POSITION
                 aux3f1.set((float) p.data[0], (float) p.data[1], (float) p.data[2]);
                 final int idx = partmd.vertexIdx;
-                partmd.vertices[idx] = aux3f1.x;
-                partmd.vertices[idx + 1] = aux3f1.y;
-                partmd.vertices[idx + 2] = aux3f1.z;
+                tempVerts[idx] = aux3f1.x;
+                tempVerts[idx + 1] = aux3f1.y;
+                tempVerts[idx + 2] = aux3f1.z;
 
                 partmd.vertexIdx += partmd.vertexSize;
 
             }
-            partmd.mesh.setVertices(partmd.vertices, 0, partmd.vertexIdx);
-            partmd.vertices = null;
+            partmd.mesh.setVertices(tempVerts, 0, partmd.vertexIdx);
             Chunk chunk = new Chunk(partmd, computeCentre(part), true);
             chunks.add(chunk);
         }

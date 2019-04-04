@@ -41,7 +41,7 @@ public class MilkyWayRenderSystem extends ImmediateRenderSystem implements IObse
     private ModelBatch modelBatch;
 
     public MilkyWayRenderSystem(RenderGroup rg, float[] alphas, ModelBatch modelBatch, ShaderProgram[] pointShaders, ShaderProgram[] nebulaShaders) {
-        super(rg, alphas, pointShaders, 450000);
+        super(rg, alphas, pointShaders);
         this.nebulaShaders = nebulaShaders;
         this.modelBatch = modelBatch;
     }
@@ -116,9 +116,8 @@ public class MilkyWayRenderSystem extends ImmediateRenderSystem implements IObse
                 curr.clear();
                 float density = GlobalConf.SCALE_FACTOR;
                 
-                checkRequiredVerticesSize(mw.starData.size * curr.vertexSize);
-                curr.vertices = verticesTemp;
-                
+                ensureTempVertsSize(mw.starData.size * curr.vertexSize);
+                curr.vertices = tempVerts;
                 for (ParticleBean star : mw.starData) {
                     // VERTEX
                     aux1.set((float) star.data[0], (float) star.data[1], (float) star.data[2]);

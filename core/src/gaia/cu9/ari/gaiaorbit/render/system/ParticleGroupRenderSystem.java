@@ -34,7 +34,7 @@ public class ParticleGroupRenderSystem extends ImmediateRenderSystem implements 
     Random rand;
 
     public ParticleGroupRenderSystem(RenderGroup rg, float[] alphas, ShaderProgram[] shaders) {
-        super(rg, alphas, shaders, 1500000);
+        super(rg, alphas, shaders);
         comp = new DistToCameraComparator<>();
         rand = new Random(123);
         aux1 = new Vector3();
@@ -83,30 +83,27 @@ public class ParticleGroupRenderSystem extends ImmediateRenderSystem implements 
                     particleGroup.offset = addMeshData(particleGroup.size());
                     curr = meshes.get(particleGroup.offset);
 
-                    checkRequiredVerticesSize(particleGroup.size() * curr.vertexSize);
-                    curr.vertices = verticesTemp;
-
+                    ensureTempVertsSize(particleGroup.size() * curr.vertexSize);
                     for (ParticleBean pb : particleGroup.data()) {
                         double[] p = pb.data;
                         // COLOR
                         float[] c = particleGroup.getColor();
-                        curr.vertices[curr.vertexIdx + curr.colorOffset] = Color.toFloatBits(c[0], c[1], c[2], c[3]);
+                        tempVerts[curr.vertexIdx + curr.colorOffset] = Color.toFloatBits(c[0], c[1], c[2], c[3]);
 
                         // SIZE
-                        curr.vertices[curr.vertexIdx + additionalOffset] = (particleGroup.size + (float) (rand.nextGaussian() * particleGroup.size / 4d)) * particleGroup.highlightedSizeFactor();
+                        tempVerts[curr.vertexIdx + additionalOffset] = (particleGroup.size + (float) (rand.nextGaussian() * particleGroup.size / 4d)) * particleGroup.highlightedSizeFactor();
 
                         // cb.transform.getTranslationf(aux);
                         // POSITION
                         final int idx = curr.vertexIdx;
-                        curr.vertices[idx] = (float) p[0];
-                        curr.vertices[idx + 1] = (float) p[1];
-                        curr.vertices[idx + 2] = (float) p[2];
+                        tempVerts[idx] = (float) p[0];
+                        tempVerts[idx + 1] = (float) p[1];
+                        tempVerts[idx + 2] = (float) p[2];
 
                         curr.vertexIdx += curr.vertexSize;
                     }
                     particleGroup.count = particleGroup.size() * curr.vertexSize;
-                    curr.mesh.setVertices(curr.vertices, 0, particleGroup.count);
-                    curr.vertices = null;
+                    curr.mesh.setVertices(tempVerts, 0, particleGroup.count);
 
                     particleGroup.inGpu = true;
 

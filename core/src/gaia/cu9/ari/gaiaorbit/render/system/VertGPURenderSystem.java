@@ -32,7 +32,7 @@ public class VertGPURenderSystem<T extends IGPUVertsRenderable> extends Immediat
     protected int glType;
 
     public VertGPURenderSystem(RenderGroup rg, float[] alphas, ShaderProgram[] shaders, int glType) {
-        super(rg, alphas, shaders, 100000);
+        super(rg, alphas, shaders);
         this.glType = glType;
     }
 
@@ -88,7 +88,7 @@ public class VertGPURenderSystem<T extends IGPUVertsRenderable> extends Immediat
         for (int i = 0; i < size; i++) {
             T renderable = (T) renderables.get(i);
 
-            /**
+            /*
              * ADD LINES
              */
             if (!renderable.inGpu()) {
@@ -116,9 +116,8 @@ public class VertGPURenderSystem<T extends IGPUVertsRenderable> extends Immediat
                     }
                 }
                 // Ensure vertices capacity
-                checkRequiredVerticesSize(nPoints * curr.vertexSize);
-                curr.vertices = verticesTemp;
-
+                ensureTempVertsSize(nPoints * curr.vertexSize);
+                curr.vertices = tempVerts;
                 float[] cc = renderable.getColor();
                 for (int point_i = 0; point_i < nPoints; point_i++) {
                     color(cc[0], cc[1], cc[2], 1.0);
@@ -138,10 +137,9 @@ public class VertGPURenderSystem<T extends IGPUVertsRenderable> extends Immediat
             }
             curr = meshes.get(renderable.getOffset());
 
-            /**
+            /*
              * RENDER
              */
-
             ShaderProgram shaderProgram = getShaderProgram();
 
             shaderProgram.begin();
@@ -174,12 +172,8 @@ public class VertGPURenderSystem<T extends IGPUVertsRenderable> extends Immediat
         }
     }
 
-    protected void preShaderRender(){
-
-    }
-
     protected VertexAttribute[] buildVertexAttributes() {
-        Array<VertexAttribute> attribs = new Array<VertexAttribute>();
+        Array<VertexAttribute> attribs = new Array<>();
         attribs.add(new VertexAttribute(Usage.Position, 3, ShaderProgram.POSITION_ATTRIBUTE));
         attribs.add(new VertexAttribute(Usage.ColorPacked, 4, ShaderProgram.COLOR_ATTRIBUTE));
 

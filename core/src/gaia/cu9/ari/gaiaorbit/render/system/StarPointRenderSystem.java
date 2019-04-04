@@ -37,10 +37,10 @@ public class StarPointRenderSystem extends ImmediateRenderSystem implements IObs
     ComponentType ct;
     float[] pointAlpha, alphaSizeFovBr;
 
-    boolean initializing = false;
+    boolean initializing;
 
     public StarPointRenderSystem(RenderGroup rg, float[] alphas, ShaderProgram[] shaders, ComponentType ct) {
-        super(rg, alphas, shaders, 10000);
+        super(rg, alphas, shaders);
         EventManager.instance.subscribe(this, Events.TRANSIT_COLOUR_CMD, Events.ONLY_OBSERVED_STARS_CMD, Events.STAR_MIN_OPACITY_CMD);
         BRIGHTNESS_FACTOR = 10;
         this.ct = ct;
@@ -101,32 +101,30 @@ public class StarPointRenderSystem extends ImmediateRenderSystem implements IObs
             // Reset variables
             curr.clear();
             
-            checkRequiredVerticesSize(renderables.size * curr.vertexSize);
-            curr.vertices = verticesTemp;
-
             int size = renderables.size;
+            ensureTempVertsSize(size * curr.vertexSize);
             for (int i = 0; i < size; i++) {
                 // 2 FPS gain
                 CelestialBody cb = (CelestialBody) renderables.get(i);
                 float[] col = starColorTransit ? cb.ccTransit : cb.cc;
 
                 // COLOR
-                curr.vertices[curr.vertexIdx + curr.colorOffset] = Color.toFloatBits(col[0], col[1], col[2], cb.opacity);
+                tempVerts[curr.vertexIdx + curr.colorOffset] = Color.toFloatBits(col[0], col[1], col[2], cb.opacity);
 
                 // SIZE
-                curr.vertices[curr.vertexIdx + sizeOffset] = (float) cb.getRadius();
+                tempVerts[curr.vertexIdx + sizeOffset] = (float) cb.getRadius();
 
                 // POSITION
                 aux.set((float) cb.pos.x, (float) cb.pos.y, (float) cb.pos.z);
                 final int idx = curr.vertexIdx;
-                curr.vertices[idx] = aux.x;
-                curr.vertices[idx + 1] = aux.y;
-                curr.vertices[idx + 2] = aux.z;
+                tempVerts[idx] = aux.x;
+                tempVerts[idx + 1] = aux.y;
+                tempVerts[idx + 2] = aux.z;
 
                 // PROPER MOTION
-                curr.vertices[curr.vertexIdx + pmOffset] = (float) cb.getPmX() * 0f;
-                curr.vertices[curr.vertexIdx + pmOffset + 1] = (float) cb.getPmY() * 0f;
-                curr.vertices[curr.vertexIdx + pmOffset + 2] = (float) cb.getPmZ() * 0f;
+                tempVerts[curr.vertexIdx + pmOffset] = (float) cb.getPmX() * 0f;
+                tempVerts[curr.vertexIdx + pmOffset + 1] = (float) cb.getPmY() * 0f;
+                tempVerts[curr.vertexIdx + pmOffset + 2] = (float) cb.getPmZ() * 0f;
 
                 curr.vertexIdx += curr.vertexSize;
             }
@@ -164,7 +162,7 @@ public class StarPointRenderSystem extends ImmediateRenderSystem implements IObs
             // Relativistic effects
             addEffectsUniforms(shaderProgram, camera);
 
-            curr.mesh.setVertices(curr.vertices, 0, curr.vertexIdx);
+            curr.mesh.setVertices(tempVerts, 0, curr.vertexIdx);
             curr.mesh.render(shaderProgram, ShapeType.Point.getGlType());
             shaderProgram.end();
 

@@ -29,13 +29,12 @@ import gaia.cu9.ari.gaiaorbit.util.coord.Coordinates;
 import gaia.cu9.ari.gaiaorbit.util.math.MathUtilsd;
 
 public class OrbitalElementsParticlesRenderSystem extends ImmediateRenderSystem implements IObserver {
-    private final int N_MESHES = 1;
     private Vector3 aux1;
     private Matrix4 maux;
     private int elems01Offset, elems02Offset, count;
 
     public OrbitalElementsParticlesRenderSystem(RenderGroup rg, float[] alphas, ShaderProgram[] shaders) {
-        super(rg, alphas, shaders, 120000);
+        super(rg, alphas, shaders);
         aux1 = new Vector3();
         maux = new Matrix4();
     }
@@ -76,9 +75,7 @@ public class OrbitalElementsParticlesRenderSystem extends ImmediateRenderSystem 
             if (!first.elemsInGpu) {
                 curr = meshes.get(addMeshData(renderables.size));
 
-                checkRequiredVerticesSize(renderables.size * curr.vertexSize);
-                curr.vertices = verticesTemp;
-
+                ensureTempVertsSize(renderables.size * curr.vertexSize);
                 for (IRenderable renderable : renderables) {
                     Orbit orbitElems = (Orbit) renderable;
 
@@ -86,16 +83,16 @@ public class OrbitalElementsParticlesRenderSystem extends ImmediateRenderSystem 
 
                         OrbitComponent oc = orbitElems.oc;
                         // ORBIT ELEMS 01
-                        curr.vertices[curr.vertexIdx + elems01Offset + 0] = (float) Math.sqrt(AstroUtils.MU_SOL / Math.pow(oc.semimajoraxis * 1000d, 3d));
-                        curr.vertices[curr.vertexIdx + elems01Offset + 1] = (float) oc.epoch;
-                        curr.vertices[curr.vertexIdx + elems01Offset + 2] = (float) (oc.semimajoraxis * 1000d); // In metres
-                        curr.vertices[curr.vertexIdx + elems01Offset + 3] = (float) oc.e;
+                        tempVerts[curr.vertexIdx + elems01Offset + 0] = (float) Math.sqrt(AstroUtils.MU_SOL / Math.pow(oc.semimajoraxis * 1000d, 3d));
+                        tempVerts[curr.vertexIdx + elems01Offset + 1] = (float) oc.epoch;
+                        tempVerts[curr.vertexIdx + elems01Offset + 2] = (float) (oc.semimajoraxis * 1000d); // In metres
+                        tempVerts[curr.vertexIdx + elems01Offset + 3] = (float) oc.e;
 
                         // ORBIT ELEMS 02
-                        curr.vertices[curr.vertexIdx + elems02Offset + 0] = (float) (oc.i * MathUtilsd.degRad);
-                        curr.vertices[curr.vertexIdx + elems02Offset + 1] = (float) (oc.ascendingnode * MathUtilsd.degRad);
-                        curr.vertices[curr.vertexIdx + elems02Offset + 2] = (float) (oc.argofpericenter * MathUtilsd.degRad);
-                        curr.vertices[curr.vertexIdx + elems02Offset + 3] = (float) (oc.meananomaly * MathUtilsd.degRad);
+                        tempVerts[curr.vertexIdx + elems02Offset + 0] = (float) (oc.i * MathUtilsd.degRad);
+                        tempVerts[curr.vertexIdx + elems02Offset + 1] = (float) (oc.ascendingnode * MathUtilsd.degRad);
+                        tempVerts[curr.vertexIdx + elems02Offset + 2] = (float) (oc.argofpericenter * MathUtilsd.degRad);
+                        tempVerts[curr.vertexIdx + elems02Offset + 3] = (float) (oc.meananomaly * MathUtilsd.degRad);
 
                         curr.vertexIdx += curr.vertexSize;
 
@@ -104,8 +101,7 @@ public class OrbitalElementsParticlesRenderSystem extends ImmediateRenderSystem 
                     }
                 }
                 count = renderables.size * curr.vertexSize;
-                curr.mesh.setVertices(curr.vertices, 0, count);
-                curr.vertices = null;
+                curr.mesh.setVertices(tempVerts, 0, count);
             }
 
             if (curr != null) {
