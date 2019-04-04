@@ -36,8 +36,6 @@ import java.util.Comparator;
 
 public class StarGroupRenderSystem extends ImmediateRenderSystem implements IObserver {
     private final double BRIGHTNESS_FACTOR;
-    /** Hopefully we won't have more than 50000 star groups at once **/
-    private final int N_MESHES = 50000;
 
     private Vector3 aux1;
     private int sizeOffset, pmOffset;
@@ -63,7 +61,7 @@ public class StarGroupRenderSystem extends ImmediateRenderSystem implements IObs
     @Override
     protected void initVertices() {
         /** STARS **/
-        meshes = new MeshData[N_MESHES];
+        meshes = new Array<>();
     }
 
     /**
@@ -73,50 +71,17 @@ public class StarGroupRenderSystem extends ImmediateRenderSystem implements IObs
      * @return The index of the new mesh data
      */
     private int addMeshData(int nVertices) {
-        // look for index
-        int mdi;
-        for (mdi = 0; mdi < N_MESHES; mdi++) {
-            if (meshes[mdi] == null) {
-                break;
-            }
-        }
-
-        if (mdi >= N_MESHES) {
-            logger.error("No more free meshes!");
-            return -1;
-        }
-
-        curr = new MeshData();
-        meshes[mdi] = curr;
-
-        maxVertices = nVertices;
+        int mdi = createMeshData();
+        curr = meshes.get(mdi);
 
         VertexAttribute[] attribs = buildVertexAttributes();
-        curr.mesh = new Mesh(false, maxVertices, 0, attribs);
+        curr.mesh = new Mesh(false, nVertices, 0, attribs);
 
         curr.vertexSize = curr.mesh.getVertexAttributes().vertexSize / 4;
         curr.colorOffset = curr.mesh.getVertexAttribute(Usage.ColorPacked) != null ? curr.mesh.getVertexAttribute(Usage.ColorPacked).offset / 4 : 0;
         pmOffset = curr.mesh.getVertexAttribute(Usage.Tangent) != null ? curr.mesh.getVertexAttribute(Usage.Tangent).offset / 4 : 0;
         sizeOffset = curr.mesh.getVertexAttribute(Usage.Generic) != null ? curr.mesh.getVertexAttribute(Usage.Generic).offset / 4 : 0;
         return mdi;
-    }
-
-    /**
-     * Clears the mesh data at the index i
-     *
-     * @param i The index
-     */
-    public void clearMeshData(int i) {
-        assert i >= 0 && i < meshes.length : "Mesh data index out of bounds: " + i + " (n meshes = " + N_MESHES + ")";
-
-        MeshData md = meshes[i];
-
-        if (md != null && md.mesh != null) {
-            md.mesh.dispose();
-            md.vertices = null;
-            md.indices = null;
-            meshes[i] = null;
-        }
     }
 
     @Override
@@ -134,15 +99,15 @@ public class StarGroupRenderSystem extends ImmediateRenderSystem implements IObs
                 StarGroup starGroup = (StarGroup) renderable;
                 synchronized (starGroup) {
                     if (!starGroup.disposed) {
-                        curr = meshes[starGroup.offset];
                         /**
                          * ADD PARTICLES
                          */
                         if (!starGroup.inGpu) {
                             starGroup.offset = addMeshData(starGroup.size());
+                            curr = meshes.get(starGroup.offset);
 
                             checkRequiredVerticesSize(starGroup.size() * curr.vertexSize);
-                            curr.vertices = vertices;
+                            curr.vertices = verticesTemp;
 
                             int n = starGroup.data().size;
                             for (int i = 0; i < n; i++) {
@@ -176,6 +141,7 @@ public class StarGroupRenderSystem extends ImmediateRenderSystem implements IObs
                         /**
                          * RENDER
                          */
+                        curr = meshes.get(starGroup.offset);
                         if (curr != null) {
                             int fovmode = camera.getMode().getGaiaFovMode();
 

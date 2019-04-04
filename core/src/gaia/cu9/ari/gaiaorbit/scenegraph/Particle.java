@@ -29,6 +29,7 @@ import gaia.cu9.ari.gaiaorbit.util.coord.AstroUtils;
 import gaia.cu9.ari.gaiaorbit.util.math.Vector2d;
 import gaia.cu9.ari.gaiaorbit.util.math.Vector3d;
 import gaia.cu9.ari.gaiaorbit.util.time.ITimeFrameProvider;
+import net.jafama.FastMath;
 
 import java.util.Random;
 
@@ -315,7 +316,10 @@ public class Particle extends CelestialBody implements IStarFocus, ILineRenderab
 
     @Override
     public float labelSizeConcrete() {
-        return (float) computedSize * LABEL_FACTOR;
+        float textSize = (float) (FastMath.tanh(viewAngle) * distToCamera * 1e5d);
+        float alpha = Math.min((float) FastMath.atan(textSize / distToCamera), 1.e-3f);
+        textSize = (float) (FastMath.tan(alpha) * distToCamera * 0.5d);
+        return textSize * 1e2f;
     }
 
     @Override

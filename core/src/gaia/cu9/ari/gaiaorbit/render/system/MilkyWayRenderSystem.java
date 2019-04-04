@@ -66,16 +66,16 @@ public class MilkyWayRenderSystem extends ImmediateRenderSystem implements IObse
     @Override
     protected void initVertices() {
         /** STARS **/
-        meshes = new MeshData[1];
+        meshes = new Array<>();
         curr = new MeshData();
-        meshes[0] = curr;
+        meshes.add(curr);
 
         aux1 = new Vector3();
 
-        maxVertices = 3000000;
+        int nVertices = 3000000;
 
         VertexAttribute[] attribs = buildVertexAttributes();
-        curr.mesh = new Mesh(false, maxVertices, 0, attribs);
+        curr.mesh = new Mesh(false, nVertices, 0, attribs);
 
         curr.vertexSize = curr.mesh.getVertexAttributes().vertexSize / 4;
         curr.colorOffset = curr.mesh.getVertexAttribute(Usage.ColorPacked) != null ? curr.mesh.getVertexAttribute(Usage.ColorPacked).offset / 4 : 0;
@@ -117,7 +117,7 @@ public class MilkyWayRenderSystem extends ImmediateRenderSystem implements IObse
                 float density = GlobalConf.SCALE_FACTOR;
                 
                 checkRequiredVerticesSize(mw.starData.size * curr.vertexSize);
-                curr.vertices = vertices;
+                curr.vertices = verticesTemp;
                 
                 for (ParticleBean star : mw.starData) {
                     // VERTEX
@@ -186,7 +186,7 @@ public class MilkyWayRenderSystem extends ImmediateRenderSystem implements IObse
                         } else {
                             texnum = rand.nextInt(4);
                         }
-                        quadsize = qp.data.length > 3 ? (float) (qp.data[3] + 1.0f) * .46e11f : (float) (rand.nextFloat() + 1.0f) * 2e11f;
+                        quadsize = qp.data.length > 3 ? (float) (qp.data[3] + 1.0f) * .46e11f : (rand.nextFloat() + 1.0f) * 2e11f;
                         alphamultiplier = MathUtilsd.lint(quadpointdist, 0, mw.size * 3, 6.0f, 1.0f);
 
                         rotaxis.set(rand.nextFloat(), rand.nextFloat(), rand.nextFloat());

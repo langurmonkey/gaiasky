@@ -47,7 +47,7 @@ public class SearchDialog extends Window {
                     } else if (!searchInput.getText().equals(currentInputText)) {
                         // Process only if text changed
                         currentInputText = searchInput.getText();
-                        String name = currentInputText.toLowerCase();
+                        String name = currentInputText.toLowerCase().trim();
                         if(!checkString(name, sg)){
                             if(name.matches("[0-9]+")){
                                 // Check with 'HIP '

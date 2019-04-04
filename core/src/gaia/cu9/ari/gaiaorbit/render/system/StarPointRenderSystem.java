@@ -64,17 +64,17 @@ public class StarPointRenderSystem extends ImmediateRenderSystem implements IObs
 
     @Override
     protected void initVertices() {
-        meshes = new MeshData[1];
+        meshes = new Array<>();
         curr = new MeshData();
-        meshes[0] = curr;
+        meshes.add(curr);
 
         aux = new Vector3();
 
         /** Init renderer **/
-        maxVertices = 3000;
+        int nVertices = 30;
 
         VertexAttribute[] attribs = buildVertexAttributes();
-        curr.mesh = new Mesh(false, maxVertices, 0, attribs);
+        curr.mesh = new Mesh(false, nVertices, 0, attribs);
 
         curr.vertexSize = curr.mesh.getVertexAttributes().vertexSize / 4;
         curr.colorOffset = curr.mesh.getVertexAttribute(Usage.ColorPacked) != null ? curr.mesh.getVertexAttribute(Usage.ColorPacked).offset / 4 : 0;
@@ -102,7 +102,7 @@ public class StarPointRenderSystem extends ImmediateRenderSystem implements IObs
             curr.clear();
             
             checkRequiredVerticesSize(renderables.size * curr.vertexSize);
-            curr.vertices = vertices;
+            curr.vertices = verticesTemp;
 
             int size = renderables.size;
             for (int i = 0; i < size; i++) {

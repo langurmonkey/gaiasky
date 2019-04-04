@@ -26,8 +26,6 @@ import java.util.Comparator;
 
 public class LineRenderSystem extends ImmediateRenderSystem {
     protected static final int MAX_VERTICES = 5000000;
-    protected static final int INI_DPOOL_SIZE = 5000;
-    protected static final int MAX_DPOOL_SIZE = 100000;
     protected ICamera camera;
 
     protected Vector3 aux2;
@@ -43,20 +41,23 @@ public class LineRenderSystem extends ImmediateRenderSystem {
 
     @Override
     protected void initVertices() {
-        meshes = new MeshData[100000];
-        maxVertices = MAX_VERTICES;
+        meshes = new Array<>();
 
         // ORIGINAL LINES
         curr = new MeshData();
-        meshes[0] = curr;
+        meshes.add(curr);
+
+        int nVertices = MAX_VERTICES;
 
         VertexAttribute[] attribs = buildVertexAttributes();
-        curr.mesh = new Mesh(false, maxVertices, 0, attribs);
+        curr.mesh = new Mesh(false, nVertices, 0, attribs);
 
-        curr.vertices = new float[maxVertices * (curr.mesh.getVertexAttributes().vertexSize / 4)];
+        curr.vertices = new float[nVertices * (curr.mesh.getVertexAttributes().vertexSize / 4)];
         curr.vertexSize = curr.mesh.getVertexAttributes().vertexSize / 4;
         curr.colorOffset = curr.mesh.getVertexAttribute(Usage.ColorPacked) != null ? curr.mesh.getVertexAttribute(Usage.ColorPacked).offset / 4 : 0;
     }
+
+
 
     protected VertexAttribute[] buildVertexAttributes() {
         Array<VertexAttribute> attribs = new Array<VertexAttribute>();

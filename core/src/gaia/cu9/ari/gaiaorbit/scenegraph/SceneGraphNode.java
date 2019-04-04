@@ -58,9 +58,8 @@ public class SceneGraphNode implements IStarContainer, IPosition {
         }
     }
 
-    protected static TLV3D aux3d1 = new TLV3D(), aux3d2 = new TLV3D(), aux3d3 = new TLV3D();
+    protected static TLV3D aux3d1 = new TLV3D(), aux3d2 = new TLV3D(), aux3d3 = new TLV3D(), aux3d4 = new TLV3D();
     protected static TLV3 aux3f1 = new TLV3(), aux3f2 = new TLV3(), aux3f3 = new TLV3(), aux3f4 = new TLV3();
-    protected static TLV2D aux2d1 = new TLV2D(), aux2d2 = new TLV2D(), aux2d3 = new TLV2D();
 
     /**
      * Describes to which render group this node belongs at a particular time

@@ -73,7 +73,7 @@ public class MWModelRenderSystem extends ImmediateRenderSystem implements IObser
 
         aux3f1 = new Vector3();
         aux3d1 = new Vector3d();
-        chunks = new Array<Chunk>();
+        chunks = new Array<>();
 
         if (oit) {
             FloatFrameBufferBuilder ffbb = new FloatFrameBufferBuilder(Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
@@ -144,7 +144,7 @@ public class MWModelRenderSystem extends ImmediateRenderSystem implements IObser
         initMesh(bulge, mw.starData.size);
         
         checkRequiredVerticesSize(mw.starData.size * bulge.vertexSize);
-        bulge.vertices = vertices;
+        bulge.vertices = verticesTemp;
         
         for (ParticleBean star : mw.starData) {
             // VERTEX
@@ -208,7 +208,7 @@ public class MWModelRenderSystem extends ImmediateRenderSystem implements IObser
             initMesh(partmd, part.size);
             
             checkRequiredVerticesSize(part.size * partmd.vertexSize);
-            partmd.vertices = vertices;
+            partmd.vertices = verticesTemp;
             
             for (ParticleBean p : part) {
                 // VERTEX

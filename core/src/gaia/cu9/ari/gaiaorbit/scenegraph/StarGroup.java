@@ -229,8 +229,8 @@ public class StarGroup extends ParticleGroup implements ILineRenderable, IStarFo
 
     static {
         workQueue = new LinkedBlockingQueue<>();
-        int nthreads = !GlobalConf.performance.MULTITHREADING ? 1 : Math.max(1, GlobalConf.performance.NUMBER_THREADS() - 1);
-        pool = new ThreadPoolExecutor(nthreads, nthreads, 5, TimeUnit.SECONDS, workQueue);
+        int nThreads = !GlobalConf.performance.MULTITHREADING ? 1 : Math.max(1, GlobalConf.performance.NUMBER_THREADS() - 1);
+        pool = new ThreadPoolExecutor(nThreads, nThreads, 5, TimeUnit.SECONDS, workQueue);
         pool.setThreadFactory(new DaemonThreadFactory());
     }
 
@@ -717,7 +717,7 @@ public class StarGroup extends ParticleGroup implements ILineRenderable, IStarFo
                             ppm.set(star.pmx(), star.pmy(), star.pmz());
                             // Units/year to Km/s
                             ppm.scl(Constants.U_TO_KM / Nature.Y_TO_S);
-                            Vector3d camstar = new Vector3d(p1);
+                            Vector3d camstar = aux3d4.get().set(p1);
                             double pr = ppm.dot(camstar.nor());
                             double projection = ((MathUtilsd.clamp(pr, -max, max) / max) + 1) / 2;
                             ColourUtils.blue_white_red((float) projection, rgba);

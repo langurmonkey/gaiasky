@@ -46,7 +46,7 @@ public class OrbitalElementsParticlesRenderSystem extends ImmediateRenderSystem 
 
     @Override
     protected void initVertices() {
-        meshes = new MeshData[N_MESHES];
+        meshes = new Array<>();
     }
 
     /**
@@ -56,26 +56,11 @@ public class OrbitalElementsParticlesRenderSystem extends ImmediateRenderSystem 
      * @return The index of the new mesh data
      */
     private int addMeshData(int nVertices) {
-        // look for index
-        int mdi;
-        for (mdi = 0; mdi < N_MESHES; mdi++) {
-            if (meshes[mdi] == null) {
-                break;
-            }
-        }
-
-        if (mdi >= N_MESHES) {
-            logger.error("No more free meshes!");
-            return -1;
-        }
-
-        curr = new MeshData();
-        meshes[mdi] = curr;
-
-        maxVertices = nVertices;
+        int mdi = createMeshData();
+        curr = meshes.get(mdi);
 
         VertexAttribute[] attribs = buildVertexAttributes();
-        curr.mesh = new Mesh(false, maxVertices, 0, attribs);
+        curr.mesh = new Mesh(false, nVertices, 0, attribs);
 
         curr.vertexSize = curr.mesh.getVertexAttributes().vertexSize / 4;
         curr.colorOffset = curr.mesh.getVertexAttribute(Usage.ColorPacked) != null ? curr.mesh.getVertexAttribute(Usage.ColorPacked).offset / 4 : 0;
@@ -89,10 +74,10 @@ public class OrbitalElementsParticlesRenderSystem extends ImmediateRenderSystem 
         if (renderables.size > 0 && renderables.first().getOpacity() > 0) {
             Orbit first = (Orbit) renderables.first();
             if (!first.elemsInGpu) {
-                curr = meshes[addMeshData(renderables.size)];
+                curr = meshes.get(addMeshData(renderables.size));
 
                 checkRequiredVerticesSize(renderables.size * curr.vertexSize);
-                curr.vertices = vertices;
+                curr.vertices = verticesTemp;
 
                 for (IRenderable renderable : renderables) {
                     Orbit orbitElems = (Orbit) renderable;

@@ -31,9 +31,6 @@ public class VertGPURenderSystem<T extends IGPUVertsRenderable> extends Immediat
     protected ICamera camera;
     protected int glType;
 
-    /** Hopefully we won't have more than 1000000 clouds at once **/
-    private final int N_MESHES = 1000000;
-
     public VertGPURenderSystem(RenderGroup rg, float[] alphas, ShaderProgram[] shaders, int glType) {
         super(rg, alphas, shaders, 100000);
         this.glType = glType;
@@ -53,7 +50,7 @@ public class VertGPURenderSystem<T extends IGPUVertsRenderable> extends Immediat
 
     @Override
     protected void initVertices() {
-        meshes = new MeshData[N_MESHES];
+        meshes = new Array<>();
     }
 
     /**
@@ -63,48 +60,17 @@ public class VertGPURenderSystem<T extends IGPUVertsRenderable> extends Immediat
      * @return The index of the new mesh data
      */
     private int addMeshData(int nVertices) {
-        // look for index
-        int mdi;
-        for (mdi = 0; mdi < N_MESHES; mdi++) {
-            if (meshes[mdi] == null) {
-                break;
-            }
-        }
-
-        if (mdi >= N_MESHES) {
-            logger.error("No more free meshes!");
-            return -1;
-        }
-
-        curr = new MeshData();
-        meshes[mdi] = curr;
-
-        maxVertices = nVertices + 1;
+        int mdi = createMeshData();
+        curr = meshes.get(mdi);
 
         VertexAttribute[] attribs = buildVertexAttributes();
-        curr.mesh = new Mesh(false, maxVertices, 0, attribs);
+        curr.mesh = new Mesh(false, nVertices, 0, attribs);
 
         curr.vertexSize = curr.mesh.getVertexAttributes().vertexSize / 4;
         curr.colorOffset = curr.mesh.getVertexAttribute(Usage.ColorPacked) != null ? curr.mesh.getVertexAttribute(Usage.ColorPacked).offset / 4 : 0;
         return mdi;
     }
 
-    /**
-     * Clears the mesh data at the index i
-     *
-     * @param i The index
-     */
-    public void clearMeshData(int i) {
-        assert i >= 0 && i < meshes.length : "Mesh data index out of bounds: " + i + " (n meshes = " + N_MESHES + ")";
-
-        MeshData md = meshes[i];
-
-        if (md != null && md.mesh != null) {
-            md.mesh.dispose();
-
-            meshes[i] = null;
-        }
-    }
 
     @Override
     public void renderStud(Array<IRenderable> renderables, ICamera camera, double t) {
@@ -140,18 +106,18 @@ public class VertGPURenderSystem<T extends IGPUVertsRenderable> extends Immediat
                 if (renderable.getOffset() < 0) {
                     renderable.setOffset(addMeshData(nPoints));
                 } else {
-                    curr = meshes[renderable.getOffset()];
+                    curr = meshes.get(renderable.getOffset());
                     // Check we still have capacity, otherwise, reinitialize.
                     if (curr.numVertices != od.getNumPoints()) {
                         curr.clear();
                         curr.mesh.dispose();
-                        meshes[renderable.getOffset()] = null;
+                        meshes.set(renderable.getOffset(), null);
                         renderable.setOffset(addMeshData(nPoints));
                     }
                 }
                 // Ensure vertices capacity
                 checkRequiredVerticesSize(nPoints * curr.vertexSize);
-                curr.vertices = vertices;
+                curr.vertices = verticesTemp;
 
                 float[] cc = renderable.getColor();
                 for (int point_i = 0; point_i < nPoints; point_i++) {
@@ -170,7 +136,7 @@ public class VertGPURenderSystem<T extends IGPUVertsRenderable> extends Immediat
                 curr.vertices = null;
                 renderable.setInGpu(true);
             }
-            curr = meshes[renderable.getOffset()];
+            curr = meshes.get(renderable.getOffset());
 
             /**
              * RENDER

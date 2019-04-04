@@ -29,6 +29,8 @@ import gaia.cu9.ari.gaiaorbit.util.math.Vector3d;
  * @author tsagrista
  */
 public class LineQuadRenderSystem extends LineRenderSystem {
+    protected static final int INI_DPOOL_SIZE = 1000;
+    protected static final int MAX_DPOOL_SIZE = 10000;
     private MeshDataExt currext;
     private Array<double[]> provisionalLines;
     private Array<Line> provLines;
@@ -74,36 +76,39 @@ public class LineQuadRenderSystem extends LineRenderSystem {
 
     @Override
     protected void initVertices() {
-        meshes = new MeshDataExt[1000];
+        meshes = new Array<>();
         initVertices(meshIdx++);
     }
 
     private void initVertices(int index) {
-        if (meshes[index] == null) {
+        if (index >= meshes.size){
+            meshes.setSize(index + 1);
+        }
+        if(meshes.get(index) == null) {
             currext = new MeshDataExt();
-            meshes[index] = currext;
+            meshes.set(index, currext);
             curr = currext;
 
-            maxVertices = MAX_VERTICES;
-            currext.maxIndices = maxVertices + maxVertices / 2;
+            int nVertices = MAX_VERTICES;
+            currext.maxIndices = nVertices + nVertices / 2;
 
             VertexAttribute[] attribs = buildVertexAttributes();
-            currext.mesh = new Mesh(false, maxVertices, currext.maxIndices, attribs);
+            currext.mesh = new Mesh(false, nVertices, currext.maxIndices, attribs);
 
             currext.indices = new short[currext.maxIndices];
             currext.vertexSize = currext.mesh.getVertexAttributes().vertexSize / 4;
-            currext.vertices = new float[maxVertices * currext.vertexSize];
+            currext.vertices = new float[nVertices * currext.vertexSize];
 
             currext.colorOffset = currext.mesh.getVertexAttribute(Usage.ColorPacked) != null ? currext.mesh.getVertexAttribute(Usage.ColorPacked).offset / 4 : 0;
             currext.uvOffset = currext.mesh.getVertexAttribute(Usage.TextureCoordinates) != null ? currext.mesh.getVertexAttribute(Usage.TextureCoordinates).offset / 4 : 0;
         } else {
-            currext = (MeshDataExt) meshes[index];
+            currext = (MeshDataExt) meshes.get(index);
             curr = currext;
         }
     }
 
     protected VertexAttribute[] buildVertexAttributes() {
-        Array<VertexAttribute> attribs = new Array<VertexAttribute>();
+        Array<VertexAttribute> attribs = new Array<>();
         attribs.add(new VertexAttribute(Usage.Position, 3, ShaderProgram.POSITION_ATTRIBUTE));
         attribs.add(new VertexAttribute(Usage.ColorPacked, 4, ShaderProgram.COLOR_ATTRIBUTE));
         attribs.add(new VertexAttribute(Usage.TextureCoordinates, 2, "a_uv"));
@@ -328,7 +333,7 @@ public class LineQuadRenderSystem extends LineRenderSystem {
         addEffectsUniforms(shaderProgram, camera);
 
         for (int i = 0; i < meshIdx; i++) {
-            MeshDataExt md = (MeshDataExt) meshes[i];
+            MeshDataExt md = (MeshDataExt) meshes.get(i);
             md.mesh.setVertices(md.vertices, 0, md.vertexIdx);
             md.mesh.setIndices(md.indices, 0, md.indexIdx);
             md.mesh.render(shaderProgram, GL20.GL_TRIANGLES);
@@ -340,7 +345,7 @@ public class LineQuadRenderSystem extends LineRenderSystem {
 
         // Reset mesh index and current
         meshIdx = 1;
-        currext = (MeshDataExt) meshes[0];
+        currext = (MeshDataExt) meshes.get(0);
         curr = currext;
         int n = provisionalLines.size;
         for (int i = 0; i < n; i++)

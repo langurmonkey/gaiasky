@@ -363,7 +363,7 @@ public abstract class CelestialBody extends AbstractPositionEntity implements I3
 
         aux.crs(out).nor();
 
-        float dist = (float) (MathUtilsd.lint(viewAngleApparent, 1e-8, 0.5, -0.005, -0.06) * out.len());
+        float dist = -0.02f * cam.getFovFactor() * (float) out.len();
 
         aux.add(cam.getUp()).nor().scl(dist);
 

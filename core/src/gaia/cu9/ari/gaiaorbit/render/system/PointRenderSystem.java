@@ -7,7 +7,6 @@ package gaia.cu9.ari.gaiaorbit.render.system;
 
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
-import com.badlogic.gdx.graphics.Mesh;
 import com.badlogic.gdx.graphics.VertexAttribute;
 import com.badlogic.gdx.graphics.VertexAttributes.Usage;
 import com.badlogic.gdx.graphics.glutils.ShaderProgram;
@@ -20,7 +19,6 @@ import gaia.cu9.ari.gaiaorbit.scenegraph.camera.ICamera;
 
 public class PointRenderSystem extends ImmediateRenderSystem {
     protected static final int N_MESHDATA = 100;
-    protected static final int MAX_VERTICES = 5000000;
     protected ICamera camera;
     protected int glType;
     private int sizeOffset;
@@ -43,29 +41,13 @@ public class PointRenderSystem extends ImmediateRenderSystem {
 
     @Override
     protected void initVertices() {
-        meshes = new MeshData[N_MESHDATA];
-        maxVertices = MAX_VERTICES;
+        meshes = new Array<>();
 
         // ORIGINAL POINTS
-        meshes[0] = newMeshData();
-        curr = meshes[0];
+        int idx = createMeshData();
+        curr = meshes.get(idx);
 
         meshIdx = 0;
-    }
-
-    private MeshData newMeshData() {
-
-        MeshData md = new MeshData();
-
-        VertexAttribute[] attribs = buildVertexAttributes();
-        md.mesh = new Mesh(false, maxVertices, 0, attribs);
-
-        md.vertices = new float[maxVertices * (md.mesh.getVertexAttributes().vertexSize / 4)];
-        md.vertexSize = md.mesh.getVertexAttributes().vertexSize / 4;
-        md.colorOffset = md.mesh.getVertexAttribute(Usage.ColorPacked) != null ? md.mesh.getVertexAttribute(Usage.ColorPacked).offset / 4 : 0;
-        sizeOffset = md.mesh.getVertexAttribute(Usage.Generic).offset / 4;
-        return md;
-
     }
 
     protected VertexAttribute[] buildVertexAttributes() {
