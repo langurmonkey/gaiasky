@@ -696,7 +696,7 @@ public class StarGroup extends ParticleGroup implements ILineRenderable, IStarFo
                         if (rav != 0) {
                             double max = maxSpeedKms;
                             // rv in [0:1]
-                            double rv = ((MathUtilsd.clamp(star.radvel(), -max, max) / max) + 1) / 2;
+                            double rv = ((MathUtilsd.clamp(rav, -max, max) / max) + 1) / 2;
                             ColourUtils.blue_white_red((float) rv, rgba);
                             r = rgba[0];
                             g = rgba[1];
@@ -706,7 +706,7 @@ public class StarGroup extends ParticleGroup implements ILineRenderable, IStarFo
                         }
                         break;
                     case 4:
-                        // REDSHIFT from Camera - blue: -50 Km/s, red: 50 Km/s
+                        // REDSHIFT from Camera - blue: -100 Km/s, red: 100 Km/s
                         if (ppm.len2() != 0) {
                             double max = maxSpeedKms;
                             ppm.set(star.pmx(), star.pmy(), star.pmz());
@@ -715,9 +715,6 @@ public class StarGroup extends ParticleGroup implements ILineRenderable, IStarFo
                             Vector3d camstar = new Vector3d(p1);
                             double pr = ppm.dot(camstar.nor());
                             double projection = ((MathUtilsd.clamp(pr, -max, max) / max) + 1) / 2;
-                            if(star.id.equals(2743418542234059648l)){
-                                System.out.println(projection);
-                            }
                             ColourUtils.blue_white_red((float) projection, rgba);
                             r = rgba[0];
                             g = rgba[1];
@@ -725,7 +722,6 @@ public class StarGroup extends ParticleGroup implements ILineRenderable, IStarFo
                         } else {
                             r = g = b = 1;
                         }
-
                         break;
                     case 5:
                         // SINGLE COLOR
