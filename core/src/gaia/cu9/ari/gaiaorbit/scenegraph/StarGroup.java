@@ -655,6 +655,8 @@ public class StarGroup extends ParticleGroup implements ILineRenderable, IStarFo
                     Vector3d ppm = aux3d2.get().set(star.pmx(), star.pmy(), star.pmz()).scl(GlobalConf.scene.PM_LEN_FACTOR);
                     Vector3d p2 = aux3d3.get().set(ppm).add(p1);
 
+                    // Max speed in km/s, to normalize
+                    double maxSpeedKms = 100;
                     float r, g, b;
                     switch (GlobalConf.scene.PM_COLOR_MODE) {
                     case 0:
@@ -667,8 +669,11 @@ public class StarGroup extends ParticleGroup implements ILineRenderable, IStarFo
                         break;
                     case 1:
                         // LENGTH
-                        double len = MathUtilsd.clamp(ppm.len(), 0d, .5e8d) / .5e8d;
-                        ColourUtils.long_rainbow((float) len, rgba);
+                        ppm.set(star.pmx(), star.pmy(), star.pmz());
+                        // Units/year to Km/s
+                        ppm.scl(Constants.U_TO_KM / Nature.Y_TO_S);
+                        double len = MathUtilsd.clamp(ppm.len(), 0d, maxSpeedKms) / maxSpeedKms;
+                        ColourUtils.long_rainbow((float) (1 - len), rgba);
                         r = rgba[0];
                         g = rgba[1];
                         b = rgba[2];
@@ -686,10 +691,10 @@ public class StarGroup extends ParticleGroup implements ILineRenderable, IStarFo
                         }
                         break;
                     case 3:
-                        // REDSHIFT - blue: -50 Km/s, red: 50 Km/s
-                        double max = 50;
+                        // REDSHIFT from Sun - blue: -100 Km/s, red: 100 Km/s
                         double rav = star.radvel();
                         if (rav != 0) {
+                            double max = maxSpeedKms;
                             // rv in [0:1]
                             double rv = ((MathUtilsd.clamp(star.radvel(), -max, max) / max) + 1) / 2;
                             ColourUtils.blue_white_red((float) rv, rgba);
@@ -701,6 +706,28 @@ public class StarGroup extends ParticleGroup implements ILineRenderable, IStarFo
                         }
                         break;
                     case 4:
+                        // REDSHIFT from Camera - blue: -50 Km/s, red: 50 Km/s
+                        if (ppm.len2() != 0) {
+                            double max = maxSpeedKms;
+                            ppm.set(star.pmx(), star.pmy(), star.pmz());
+                            // Units/year to Km/s
+                            ppm.scl(Constants.U_TO_KM / Nature.Y_TO_S);
+                            Vector3d camstar = new Vector3d(p1);
+                            double pr = ppm.dot(camstar.nor());
+                            double projection = ((MathUtilsd.clamp(pr, -max, max) / max) + 1) / 2;
+                            if(star.id.equals(2743418542234059648l)){
+                                System.out.println(projection);
+                            }
+                            ColourUtils.blue_white_red((float) projection, rgba);
+                            r = rgba[0];
+                            g = rgba[1];
+                            b = rgba[2];
+                        } else {
+                            r = g = b = 1;
+                        }
+
+                        break;
+                    case 5:
                         // SINGLE COLOR
                         r = GlobalResources.gBlue[0] + 0.09f;
                         g = GlobalResources.gBlue[1] + 0.09f;

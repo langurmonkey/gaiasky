@@ -35,7 +35,7 @@ public class ColourUtils {
         // Make it in [-1:1]
         float a = value * 2f - 1f;
         if(a <= 0){
-            rgba[0] = rgba[1] = -a;
+            rgba[0] = rgba[1] = 1 + a;
             rgba[2] = 1;
         } else {
             rgba[0] = 1;
