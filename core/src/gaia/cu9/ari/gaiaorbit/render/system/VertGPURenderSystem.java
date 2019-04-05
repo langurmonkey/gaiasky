@@ -115,8 +115,9 @@ public class VertGPURenderSystem<T extends IGPUVertsRenderable> extends Immediat
                         renderable.setOffset(addMeshData(nPoints));
                     }
                 }
+
                 // Ensure vertices capacity
-                ensureTempVertsSize(nPoints * curr.vertexSize);
+                ensureTempVertsSize((nPoints + 2) * curr.vertexSize);
                 curr.vertices = tempVerts;
                 float[] cc = renderable.getColor();
                 for (int point_i = 0; point_i < nPoints; point_i++) {

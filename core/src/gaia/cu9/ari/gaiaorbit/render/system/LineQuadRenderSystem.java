@@ -85,19 +85,21 @@ public class LineQuadRenderSystem extends LineRenderSystem {
             meshes.setSize(index + 1);
         }
         if(meshes.get(index) == null) {
+            if (index > 0)
+                logger.info("Capacity too small, creating new meshdata: " + curr.capacity);
             currext = new MeshDataExt();
             meshes.set(index, currext);
             curr = currext;
 
-            int nVertices = MAX_VERTICES;
-            currext.maxIndices = nVertices + nVertices / 2;
+            curr.capacity = 10000;
+            currext.maxIndices = curr.capacity + curr.capacity / 2;
 
             VertexAttribute[] attribs = buildVertexAttributes();
-            currext.mesh = new Mesh(false, nVertices, currext.maxIndices, attribs);
+            currext.mesh = new Mesh(false, curr.capacity, currext.maxIndices, attribs);
 
             currext.indices = new short[currext.maxIndices];
             currext.vertexSize = currext.mesh.getVertexAttributes().vertexSize / 4;
-            currext.vertices = new float[nVertices * currext.vertexSize];
+            currext.vertices = new float[curr.capacity * currext.vertexSize];
 
             currext.colorOffset = currext.mesh.getVertexAttribute(Usage.ColorPacked) != null ? currext.mesh.getVertexAttribute(Usage.ColorPacked).offset / 4 : 0;
             currext.uvOffset = currext.mesh.getVertexAttribute(Usage.TextureCoordinates) != null ? currext.mesh.getVertexAttribute(Usage.TextureCoordinates).offset / 4 : 0;
@@ -194,8 +196,9 @@ public class LineQuadRenderSystem extends LineRenderSystem {
     public void addLinePostproc(Line l) {
         int npoints = l.points.length;
         // Check if npoints more indices fit
-        if (currext.numVertices + npoints > shortLimit)
+        if (currext.numVertices + npoints * 2 - 2 > curr.capacity) {
             initVertices(meshIdx++);
+        }
 
         for (int i = 1; i < npoints; i++) {
             if (i == 1) {
@@ -234,14 +237,13 @@ public class LineQuadRenderSystem extends LineRenderSystem {
                 index((short) (currext.numVertices - 1));
                 index((short) (currext.numVertices - 3));
             }
-
         }
     }
 
     public void addLinePostproc(double x0, double y0, double z0, double x1, double y1, double z1, double r, double g, double b, double a, double dist0, double dist1, double widthTan) {
 
-        // Check if 3 more indices fit
-        if (currext.numVertices + 3 >= shortLimit) {
+        // Check if 4 more indices fit
+        if (currext.numVertices + 4 >= curr.capacity) {
             // We need to open a new MeshDataExt!
             initVertices(meshIdx++);
         }
@@ -305,6 +307,11 @@ public class LineQuadRenderSystem extends LineRenderSystem {
     public void renderStud(Array<IRenderable> renderables, ICamera camera, double t) {
         this.camera = camera;
 
+        // Reset
+        meshIdx = 1;
+        currext = (MeshDataExt) meshes.get(0);
+        curr = currext;
+
         int size = renderables.size;
         for (int i = 0; i < size; i++) {
             ILineRenderable renderable = (ILineRenderable) renderables.get(i);
@@ -344,9 +351,6 @@ public class LineQuadRenderSystem extends LineRenderSystem {
         shaderProgram.end();
 
         // Reset mesh index and current
-        meshIdx = 1;
-        currext = (MeshDataExt) meshes.get(0);
-        curr = currext;
         int n = provisionalLines.size;
         for (int i = 0; i < n; i++)
             dpool.free(provisionalLines.get(i));
@@ -368,6 +372,16 @@ public class LineQuadRenderSystem extends LineRenderSystem {
         protected double[] newObject() {
             return new double[dsize];
         }
+
+    }
+
+    public void dispose(){
+        super.dispose();
+        currext = null;
+        provisionalLines.clear();
+        provLines.clear();
+        provisionalLines = null;
+        provLines = null;
 
     }
 

@@ -16,8 +16,6 @@ import gaia.cu9.ari.gaiaorbit.util.Logger.Log;
 public abstract class ImmediateRenderSystem extends AbstractRenderSystem {
     protected static final Log logger = Logger.getLogger(ImmediateRenderSystem.class);
 
-    protected static final int shortLimit = (int) Math.pow(2, 2 * 8);
-
     protected int meshIdx;
     protected Array<MeshData> meshes;
     protected MeshData curr;
@@ -41,6 +39,7 @@ public abstract class ImmediateRenderSystem extends AbstractRenderSystem {
         protected short indexVert;
         protected short[] indices;
         protected int numVertices;
+        protected int capacity;
 
         public void clear() {
             vertexIdx = 0;
@@ -113,6 +112,20 @@ public abstract class ImmediateRenderSystem extends AbstractRenderSystem {
 
     protected abstract void initVertices();
 
+    public void dispose(){
+        if(meshes != null) {
+            for (int i = 0; i < meshes.size; i++) {
+                MeshData md = meshes.get(i);
+                if (md != null) {
+                    md.dispose();
+                }
+            }
+            meshes.clear();
+        }
+        tempVerts = null;
+        curr = null;
+    }
+
     /**
      * This function makes sure that the tempVerts array has at least
      * the given size. After calling this function, the elements of tempVerts
@@ -120,9 +133,7 @@ public abstract class ImmediateRenderSystem extends AbstractRenderSystem {
      * @param size The size to ensure
      */
     protected void ensureTempVertsSize(int size){
-        if(tempVerts == null) {
-            tempVerts = new float[size];
-        } else if (size > tempVerts.length){
+        if(tempVerts == null || tempVerts.length < size) {
             tempVerts = new float[size];
         }
     }

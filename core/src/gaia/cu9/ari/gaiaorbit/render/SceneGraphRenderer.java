@@ -1119,11 +1119,12 @@ public class SceneGraphRenderer extends AbstractRenderer implements IProcessRend
             AbstractRenderSystem lineSys = getLineRenderSystem();
             lineSys.setPreRunnable(blendDepthRunnable);
             renderProcesses.insert(idx, lineSys);
+            current.dispose();
         }
     }
 
     private AbstractRenderSystem getLineRenderSystem() {
-        AbstractRenderSystem sys = null;
+        AbstractRenderSystem sys;
         if (GlobalConf.scene.isNormalLineRenderer()) {
             // Normal
             sys = new LineRenderSystem(RenderGroup.LINE, alphas, lineShaders);

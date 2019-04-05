@@ -103,10 +103,9 @@ public class StarGroupRenderSystem extends ImmediateRenderSystem implements IObs
                          * ADD PARTICLES
                          */
                         if (!starGroup.inGpu) {
-                            starGroup.offset = addMeshData(starGroup.size());
+                            int n = starGroup.size();
+                            starGroup.offset = addMeshData(n);
                             curr = meshes.get(starGroup.offset);
-
-                            int n = starGroup.data().size;
                             ensureTempVertsSize(n * curr.vertexSize);
                             for (int i = 0; i < n; i++) {
                                 StarBean p = starGroup.data().get(i);
