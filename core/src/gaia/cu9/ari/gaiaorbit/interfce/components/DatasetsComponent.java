@@ -76,7 +76,7 @@ public class DatasetsComponent extends GuiComponent implements IObserver {
         scroll.setFadeScrollBars(false);
         scroll.setOverscroll(false, false);
         scroll.setSmoothScrolling(true);
-        scroll.setWidth(155 * GlobalConf.SCALE_FACTOR);
+        scroll.setWidth(140 * GlobalConf.SCALE_FACTOR);
         scroll.setHeight(GlobalConf.SCALE_FACTOR > 1 ? 90 : 50);
 
         // Controls
