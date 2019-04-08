@@ -527,7 +527,7 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
 
     @Override
     public void setProperMotionsColorMode(int mode){
-        Gdx.app.postRunnable(() -> EventManager.instance.post(Events.PM_COLOR_MODE_CMD, mode % 5, false));
+        Gdx.app.postRunnable(() -> EventManager.instance.post(Events.PM_COLOR_MODE_CMD, mode % 6, false));
     }
 
     public void setProperMotionsNumberFactor(int factor) {
