@@ -110,7 +110,7 @@ public class LineRenderSystem extends ImmediateRenderSystem {
                 renderable.render(this, camera, getAlpha(renderable));
             }
 
-            Gdx.gl.glLineWidth(renderable.getLineWidth() * GlobalConf.SCALE_FACTOR);
+            Gdx.gl.glLineWidth(renderable.getLineWidth());
 
             for (int md = 0; md < meshIdx; md++) {
                 MeshData meshd = meshes.get(md);

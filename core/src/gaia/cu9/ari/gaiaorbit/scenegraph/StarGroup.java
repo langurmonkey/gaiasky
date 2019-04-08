@@ -746,7 +746,7 @@ public class StarGroup extends ParticleGroup implements ILineRenderable, IStarFo
 
     @Override
     public float getLineWidth() {
-        return 1.0f;
+        return 2.0f;
     }
 
     @Override
