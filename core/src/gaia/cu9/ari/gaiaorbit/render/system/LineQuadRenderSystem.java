@@ -1,3 +1,8 @@
+/*
+ * This file is part of Gaia Sky, which is released under the Mozilla Public License 2.0.
+ * See the file LICENSE.md in the project root for full license details.
+ */
+
 package gaia.cu9.ari.gaiaorbit.render.system;
 
 import com.badlogic.gdx.graphics.Color;
@@ -8,7 +13,6 @@ import com.badlogic.gdx.graphics.VertexAttributes.Usage;
 import com.badlogic.gdx.graphics.glutils.ShaderProgram;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Pool;
-
 import gaia.cu9.ari.gaiaorbit.render.ILineRenderable;
 import gaia.cu9.ari.gaiaorbit.render.IRenderable;
 import gaia.cu9.ari.gaiaorbit.scenegraph.Particle;
@@ -25,6 +29,8 @@ import gaia.cu9.ari.gaiaorbit.util.math.Vector3d;
  * @author tsagrista
  */
 public class LineQuadRenderSystem extends LineRenderSystem {
+    protected static final int INI_DPOOL_SIZE = 1000;
+    protected static final int MAX_DPOOL_SIZE = 10000;
     private MeshDataExt currext;
     private Array<double[]> provisionalLines;
     private Array<Line> provLines;
@@ -51,16 +57,15 @@ public class LineQuadRenderSystem extends LineRenderSystem {
     }
 
     Vector3d line, camdir0, camdir1, camdir15, point, vec;
-    final static double widthAngle = Math.toRadians(0.05);
-    final static double widthAngleTan = Math.tan(widthAngle);
+    final static double baseWidthAngle = Math.toRadians(.13);
+    final static double baseWidthAngleTan = Math.tan(baseWidthAngle);
 
     public LineQuadRenderSystem(RenderGroup rg, float[] alphas, ShaderProgram[] shaders) {
         super(rg, alphas, shaders);
         dpool = new DPool(INI_DPOOL_SIZE, MAX_DPOOL_SIZE, 14);
-        provisionalLines = new Array<double[]>();
-        provLines = new Array<Line>();
+        provisionalLines = new Array<>();
+        provLines = new Array<>();
         sorter = new LineArraySorter(12);
-        glType = GL20.GL_TRIANGLES;
         line = new Vector3d();
         camdir0 = new Vector3d();
         camdir1 = new Vector3d();
@@ -71,36 +76,41 @@ public class LineQuadRenderSystem extends LineRenderSystem {
 
     @Override
     protected void initVertices() {
-        meshes = new MeshDataExt[1000];
+        meshes = new Array<>();
         initVertices(meshIdx++);
     }
 
     private void initVertices(int index) {
-        if (meshes[index] == null) {
+        if (index >= meshes.size){
+            meshes.setSize(index + 1);
+        }
+        if(meshes.get(index) == null) {
+            if (index > 0)
+                logger.info("Capacity too small, creating new meshdata: " + curr.capacity);
             currext = new MeshDataExt();
-            meshes[index] = currext;
+            meshes.set(index, currext);
             curr = currext;
 
-            maxVertices = MAX_VERTICES;
-            currext.maxIndices = maxVertices + maxVertices / 2;
+            curr.capacity = 10000;
+            currext.maxIndices = curr.capacity + curr.capacity / 2;
 
             VertexAttribute[] attribs = buildVertexAttributes();
-            currext.mesh = new Mesh(false, maxVertices, currext.maxIndices, attribs);
+            currext.mesh = new Mesh(false, curr.capacity, currext.maxIndices, attribs);
 
             currext.indices = new short[currext.maxIndices];
             currext.vertexSize = currext.mesh.getVertexAttributes().vertexSize / 4;
-            currext.vertices = new float[maxVertices * currext.vertexSize];
+            currext.vertices = new float[curr.capacity * currext.vertexSize];
 
             currext.colorOffset = currext.mesh.getVertexAttribute(Usage.ColorPacked) != null ? currext.mesh.getVertexAttribute(Usage.ColorPacked).offset / 4 : 0;
             currext.uvOffset = currext.mesh.getVertexAttribute(Usage.TextureCoordinates) != null ? currext.mesh.getVertexAttribute(Usage.TextureCoordinates).offset / 4 : 0;
         } else {
-            currext = (MeshDataExt) meshes[index];
+            currext = (MeshDataExt) meshes.get(index);
             curr = currext;
         }
     }
 
     protected VertexAttribute[] buildVertexAttributes() {
-        Array<VertexAttribute> attribs = new Array<VertexAttribute>();
+        Array<VertexAttribute> attribs = new Array<>();
         attribs.add(new VertexAttribute(Usage.Position, 3, ShaderProgram.POSITION_ATTRIBUTE));
         attribs.add(new VertexAttribute(Usage.ColorPacked, 4, ShaderProgram.COLOR_ATTRIBUTE));
         attribs.add(new VertexAttribute(Usage.TextureCoordinates, 2, "a_uv"));
@@ -140,7 +150,7 @@ public class LineQuadRenderSystem extends LineRenderSystem {
 
     @Override
     public void addLine(ILineRenderable lr, double x0, double y0, double z0, double x1, double y1, double z1, float r, float g, float b, float a) {
-        addLineInternal(x0, y0, z0, x1, y1, z1, r, g, b, a, lr.getLineWidth() * widthAngleTan);
+        addLineInternal(x0, y0, z0, x1, y1, z1, r, g, b, a, lr.getLineWidth() * baseWidthAngleTan);
     }
 
     private void addLineInternal(double x0, double y0, double z0, double x1, double y1, double z1, float r, float g, float b, float a, double widthAngleTan) {
@@ -153,7 +163,7 @@ public class LineQuadRenderSystem extends LineRenderSystem {
         double dist0 = Math.sqrt(x0 * x0 + y0 * y0 + z0 * z0);
         double dist1 = Math.sqrt(x1 * x1 + y1 * y1 + z1 * z1);
 
-        Vector3d p15 = null;
+        Vector3d p15;
 
         if (rec && distToSegment < dist0 && distToSegment < dist1) {
             // Projection falls in line, split line
@@ -186,8 +196,9 @@ public class LineQuadRenderSystem extends LineRenderSystem {
     public void addLinePostproc(Line l) {
         int npoints = l.points.length;
         // Check if npoints more indices fit
-        if (currext.numVertices + npoints > shortLimit)
+        if (currext.numVertices + npoints * 2 - 2 > curr.capacity) {
             initVertices(meshIdx++);
+        }
 
         for (int i = 1; i < npoints; i++) {
             if (i == 1) {
@@ -226,14 +237,13 @@ public class LineQuadRenderSystem extends LineRenderSystem {
                 index((short) (currext.numVertices - 1));
                 index((short) (currext.numVertices - 3));
             }
-
         }
     }
 
     public void addLinePostproc(double x0, double y0, double z0, double x1, double y1, double z1, double r, double g, double b, double a, double dist0, double dist1, double widthTan) {
 
-        // Check if 3 more indices fit
-        if (currext.numVertices + 3 >= shortLimit) {
+        // Check if 4 more indices fit
+        if (currext.numVertices + 4 >= curr.capacity) {
             // We need to open a new MeshDataExt!
             initVertices(meshIdx++);
         }
@@ -297,6 +307,11 @@ public class LineQuadRenderSystem extends LineRenderSystem {
     public void renderStud(Array<IRenderable> renderables, ICamera camera, double t) {
         this.camera = camera;
 
+        // Reset
+        meshIdx = 1;
+        currext = (MeshDataExt) meshes.get(0);
+        curr = currext;
+
         int size = renderables.size;
         for (int i = 0; i < size; i++) {
             ILineRenderable renderable = (ILineRenderable) renderables.get(i);
@@ -325,10 +340,10 @@ public class LineQuadRenderSystem extends LineRenderSystem {
         addEffectsUniforms(shaderProgram, camera);
 
         for (int i = 0; i < meshIdx; i++) {
-            MeshDataExt md = (MeshDataExt) meshes[i];
+            MeshDataExt md = (MeshDataExt) meshes.get(i);
             md.mesh.setVertices(md.vertices, 0, md.vertexIdx);
             md.mesh.setIndices(md.indices, 0, md.indexIdx);
-            md.mesh.render(shaderProgram, glType);
+            md.mesh.render(shaderProgram, GL20.GL_TRIANGLES);
 
             md.clear();
         }
@@ -336,21 +351,11 @@ public class LineQuadRenderSystem extends LineRenderSystem {
         shaderProgram.end();
 
         // Reset mesh index and current
-        meshIdx = 1;
-        currext = (MeshDataExt) meshes[0];
-        curr = currext;
         int n = provisionalLines.size;
         for (int i = 0; i < n; i++)
             dpool.free(provisionalLines.get(i));
-        provisionalLines.clear();
 
-        // Reset mesh index, current and lines
-        meshIdx = 1;
-        currext = (MeshDataExt) meshes[0];
-        curr = currext;
-        n = provLines.size;
-        //for (int i = 0; i < n; i++)
-        //    lpool.free(provLines.get(i));
+        provisionalLines.clear();
         provLines.clear();
     }
 
@@ -367,6 +372,16 @@ public class LineQuadRenderSystem extends LineRenderSystem {
         protected double[] newObject() {
             return new double[dsize];
         }
+
+    }
+
+    public void dispose(){
+        super.dispose();
+        currext = null;
+        provisionalLines.clear();
+        provLines.clear();
+        provisionalLines = null;
+        provLines = null;
 
     }
 

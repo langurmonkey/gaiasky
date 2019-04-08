@@ -13,9 +13,11 @@ attribute vec4 a_orbitelems02;
 uniform mat4 u_projModelView;
 uniform mat4 u_eclToEq;
 uniform vec3 u_camPos;
+uniform vec3 u_camDir;
 uniform float u_alpha;
 uniform float u_size;
 uniform float u_scaleFactor;
+uniform int u_cubemap;
 // Current julian date, in days
 uniform float u_t;
 // dt in seconds since epoch (assumes all objects have the same epoch!)
@@ -107,8 +109,18 @@ void main() {
     // Compute position for current time from orbital elements
     vec4 pos4 = keplerToCartesian() * u_eclToEq;
     vec3 pos = pos4.xyz - u_camPos;
+
+    // Distance to point
     float dist = length(pos);
-    
+
+    float cubemapSizeFactor = 1.0;
+    if(u_cubemap == 1) {
+        // Cosine of angle between star position and camera direction
+        // Correct point primitive size error due to perspective projection
+        float cosphi = pow(dot(u_camDir, pos) / dist, 2.0);
+        cubemapSizeFactor = 1.0 - cosphi * 0.65;
+    }
+
     #ifdef relativisticEffects
         pos = computeRelativisticAberration(pos, dist, u_velDir, u_vc);
     #endif // relativisticEffects
@@ -119,7 +131,7 @@ void main() {
     
     v_col = vec4(0.8, 0.8, 0.8, 1.0) * u_alpha;
 
-    float distNorm = dist / 300.0;
-    gl_PointSize = clamp(u_size / distNorm, 1.5, 3.5) * u_scaleFactor;
     gl_Position = u_projModelView * vec4(pos, 0.0);
+    float distNorm = dist / 300.0;
+    gl_PointSize = clamp(u_size / distNorm, 1.5, 3.5) * u_scaleFactor * cubemapSizeFactor;
 }

@@ -1,14 +1,14 @@
-package gaia.cu9.ari.gaiaorbit.util.g3d;
+/*
+ * This file is part of Gaia Sky, which is released under the Mozilla Public License 2.0.
+ * See the file LICENSE.md in the project root for full license details.
+ */
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+package gaia.cu9.ari.gaiaorbit.util.g3d;
 
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
+
+import java.util.*;
 
 public class OctahedronSphereCreator extends ModelCreator {
 
@@ -109,8 +109,7 @@ public class OctahedronSphereCreator extends ModelCreator {
     }
 
     public OctahedronSphereCreator create(float radius, int divisions, boolean flipNormals, boolean hardEdges) {
-        assert divisions >= 0 && divisions <= 6 : "Divisions must be in [0..6]";
-        if (divisions < 0 || divisions > 6)
+        if (divisions < 0 || divisions > 6) //-V6007
             throw new AssertionError("Divisions must be in [0..6]");
         this.flipNormals = flipNormals;
         this.hardEdges = hardEdges;

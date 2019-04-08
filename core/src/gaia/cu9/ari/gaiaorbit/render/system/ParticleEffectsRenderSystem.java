@@ -1,3 +1,8 @@
+/*
+ * This file is part of Gaia Sky, which is released under the Mozilla Public License 2.0.
+ * See the file LICENSE.md in the project root for full license details.
+ */
+
 package gaia.cu9.ari.gaiaorbit.render.system;
 
 import com.badlogic.gdx.Gdx;
@@ -9,12 +14,12 @@ import com.badlogic.gdx.graphics.VertexAttributes.Usage;
 import com.badlogic.gdx.graphics.glutils.ShaderProgram;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.Array;
-import gaia.cu9.ari.gaiaorbit.render.ComponentType;
+import gaia.cu9.ari.gaiaorbit.render.ComponentTypes;
+import gaia.cu9.ari.gaiaorbit.render.ComponentTypes.ComponentType;
 import gaia.cu9.ari.gaiaorbit.render.IRenderable;
 import gaia.cu9.ari.gaiaorbit.render.RenderingContext;
 import gaia.cu9.ari.gaiaorbit.scenegraph.SceneGraphNode.RenderGroup;
 import gaia.cu9.ari.gaiaorbit.scenegraph.camera.ICamera;
-import gaia.cu9.ari.gaiaorbit.util.ComponentTypes;
 import gaia.cu9.ari.gaiaorbit.util.Constants;
 import gaia.cu9.ari.gaiaorbit.util.GlobalConf;
 import gaia.cu9.ari.gaiaorbit.util.GlobalConf.ProgramConf.StereoProfile;
@@ -93,7 +98,7 @@ public class ParticleEffectsRenderSystem extends ImmediateRenderSystem {
         double dist = 1200000 * tu * Constants.KM_TO_U * getFactor(GlobalConf.scene.CAMERA_SPEED);
 
         // If focus is very close, stop (jittering errors kick in)
-        if(cam.getMode().isFocus()) {
+        if (cam.getMode().isFocus()) {
             /**
              * Empirical fit to determine where the particle effects start to break down wrt distance to sol (since they are positioned globally)
              * <a href="https://mycurvefit.com/share/7b20c3bf-267d-4a8a-9498-844832d6509b">See curve and fit</a>
@@ -129,30 +134,24 @@ public class ParticleEffectsRenderSystem extends ImmediateRenderSystem {
 
     @Override
     protected void initVertices() {
-        meshes = new MeshData[1];
+        meshes = new Array<>();
         addMeshData(N_PARTICLES * 2);
     }
 
     /**
      * Adds a new mesh data to the meshes list and increases the mesh data index
-     * 
-     * @param nVertices
-     *            The max number of vertices this mesh data can hold
+     *
+     * @param nVertices The max number of vertices this mesh data can hold
      * @return The index of the new mesh data
      */
     private int addMeshData(int nVertices) {
-        // look for index
-        int mdi = 0;
-
-        curr = new MeshData();
-        meshes[mdi] = curr;
-
-        maxVertices = nVertices;
+        int mdi = createMeshData();
+        curr = meshes.get(mdi);
 
         VertexAttribute[] attribs = buildVertexAttributes();
-        curr.mesh = new Mesh(false, maxVertices, 0, attribs);
+        curr.mesh = new Mesh(false, nVertices, 0, attribs);
 
-        curr.vertices = new float[maxVertices * (curr.mesh.getVertexAttributes().vertexSize / 4)];
+        curr.vertices = new float[nVertices * (curr.mesh.getVertexAttributes().vertexSize / 4)];
         curr.vertexSize = curr.mesh.getVertexAttributes().vertexSize / 4;
         curr.colorOffset = curr.mesh.getVertexAttribute(Usage.ColorPacked) != null ? curr.mesh.getVertexAttribute(Usage.ColorPacked).offset / 4 : 0;
         sizeOffset = curr.mesh.getVertexAttribute(Usage.Generic) != null ? curr.mesh.getVertexAttribute(Usage.Generic).offset / 4 : 0;
@@ -196,27 +195,27 @@ public class ParticleEffectsRenderSystem extends ImmediateRenderSystem {
             // Regular
             Gdx.gl.glLineWidth(1f * GlobalConf.SCALE_FACTOR);
 
-            curr.vertexIdx = 0;
-            curr.numVertices = N_PARTICLES * 2;
-            for (int i = 0; i < N_PARTICLES * 2; i++) {
-                // COLOR
-                curr.vertices[curr.vertexIdx + curr.colorOffset] = additional[i].x;
-                // SIZE
-                curr.vertices[curr.vertexIdx + sizeOffset] = additional[i].y;
-                // T
-                curr.vertices[curr.vertexIdx + tOffset] = additional[i].z;
-                // POSITION
-                curr.vertices[curr.vertexIdx] = positions[i].x;
-                curr.vertices[curr.vertexIdx + 1] = positions[i].y;
-                curr.vertices[curr.vertexIdx + 2] = positions[i].z;
-
-                curr.vertexIdx += curr.vertexSize;
-            }
-
-            /**
-             * RENDER
-             */
             if (curr != null) {
+                curr.vertexIdx = 0;
+                curr.numVertices = N_PARTICLES * 2;
+                for (int i = 0; i < N_PARTICLES * 2; i++) {
+                    // COLOR
+                    curr.vertices[curr.vertexIdx + curr.colorOffset] = additional[i].x;
+                    // SIZE
+                    curr.vertices[curr.vertexIdx + sizeOffset] = additional[i].y;
+                    // T
+                    curr.vertices[curr.vertexIdx + tOffset] = additional[i].z;
+                    // POSITION
+                    curr.vertices[curr.vertexIdx] = positions[i].x;
+                    curr.vertices[curr.vertexIdx + 1] = positions[i].y;
+                    curr.vertices[curr.vertexIdx + 2] = positions[i].z;
+
+                    curr.vertexIdx += curr.vertexSize;
+                }
+
+                /**
+                 * RENDER
+                 */
                 ShaderProgram shaderProgram = getShaderProgram();
 
                 shaderProgram.begin();

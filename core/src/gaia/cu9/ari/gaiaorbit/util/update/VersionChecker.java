@@ -1,9 +1,9 @@
-package gaia.cu9.ari.gaiaorbit.util.update;
+/*
+ * This file is part of Gaia Sky, which is released under the Mozilla Public License 2.0.
+ * See the file LICENSE.md in the project root for full license details.
+ */
 
-import java.time.LocalDateTime;
-import java.time.ZoneOffset;
-import java.time.format.DateTimeFormatter;
-import java.time.format.DateTimeParseException;
+package gaia.cu9.ari.gaiaorbit.util.update;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Net.HttpMethods;
@@ -13,8 +13,12 @@ import com.badlogic.gdx.Net.HttpResponseListener;
 import com.badlogic.gdx.scenes.scene2d.EventListener;
 import com.badlogic.gdx.utils.JsonReader;
 import com.badlogic.gdx.utils.JsonValue;
-
 import gaia.cu9.ari.gaiaorbit.util.Logger;
+
+import java.time.LocalDateTime;
+import java.time.ZoneOffset;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
 
 public class VersionChecker implements Runnable {
     private static final int VERSIONCHECK_TIMEOUT_MS = 5000;

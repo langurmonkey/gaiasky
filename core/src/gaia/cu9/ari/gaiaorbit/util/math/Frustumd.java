@@ -1,3 +1,8 @@
+/*
+ * This file is part of Gaia Sky, which is released under the Mozilla Public License 2.0.
+ * See the file LICENSE.md in the project root for full license details.
+ */
+
 /*******************************************************************************
  * Copyright 2011 See AUTHORS file.
  * 
@@ -19,7 +24,6 @@ package gaia.cu9.ari.gaiaorbit.util.math;
 import com.badlogic.gdx.graphics.Camera;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.PerspectiveCamera;
-
 import gaia.cu9.ari.gaiaorbit.util.math.Planed.PlaneSide;
 
 /** A truncated rectangular pyramid. Used to define the viewable region and its projection onto the screen.

@@ -1,12 +1,13 @@
+/*
+ * This file is part of Gaia Sky, which is released under the Mozilla Public License 2.0.
+ * See the file LICENSE.md in the project root for full license details.
+ */
+
 package gaia.cu9.ari.gaiaorbit.util.color;
 
 import gaia.cu9.ari.gaiaorbit.util.math.MathUtilsd;
 
 public class ColourUtils {
-
-    public enum ColorMap {
-        GRAYSCALE, SHORT_RAINBOW, LONG_RAINBOW, YELLOW_TO_RED, BLUE_TO_MAGENTA;
-    }
 
     public static float normalize(float value, float min, float max) {
         if (value > max)
@@ -30,7 +31,25 @@ public class ColourUtils {
     }
 
     /**
-     * Converts a scalar normalized to de range [0:1] into a short rainbow of
+     * Converts a scalar normalized to the range [0:1] into a blue-white-red
+     * rgba color, with blue at 0, white at 0.5 and red at 1
+     * @param value The value
+     * @param rgba The color
+     */
+    public static void blue_white_red(float value, float[] rgba){
+        // Make it in [-1:1]
+        float a = value * 2f - 1f;
+        if(a <= 0){
+            rgba[0] = rgba[1] = 1 + a;
+            rgba[2] = 1;
+        } else {
+            rgba[0] = 1;
+            rgba[1] = rgba[2] = 1 - a;
+        }
+    }
+
+    /**
+     * Converts a scalar normalized to the range [0:1] into a short rainbow of
      * rgba values. See: http://www.particleincell.com/blog/2014/colormap/
      * 
      * @param value
@@ -145,11 +164,11 @@ public class ColourUtils {
     /**
      * Converts effective temperature in Kelvin (1000-40000) to RGB
      * 
-     * @see http://www.tannerhelland.com/4435/convert-temperature-rgb-algorithm-code/
-     * @see http://www.zombieprototypes.com/?p=210
+     * @see <a href="www.tannerhelland.com/4435/convert-temperature-rgb-algorithm-code/">Temperature to RGB</a>
+     * @see <a href="www.zombieprototypes.com/?p=210">Color temperature conversion</a>
      * 
-     * @param teff
-     * @return
+     * @param teff Effective temperature
+     * @return The RGB color in a float array
      */
     public static float[] teffToRGB(double teff) {
         double r, g, b;
@@ -271,12 +290,7 @@ public class ColourUtils {
      * http://en.wikipedia.org/wiki/HSL_color_space. Assumes r, g, and b are
      * contained in the set [0..255] and returns h, s, and l in the set [0..1]
      *
-     * @param Number
-     *            r The red color value
-     * @param Number
-     *            g The green color value
-     * @param Number
-     *            b The blue color value
+     * @param rgb Float array with the RGB values
      * @return Array The HSL representation
      */
     public static float[] rgbToHsl(float[] rgb) {
@@ -312,12 +326,7 @@ public class ColourUtils {
      * http://en.wikipedia.org/wiki/HSL_color_space. Assumes h, s, and l are
      * contained in the set [0..1] and returns r, g, and b in the set [0..255].
      *
-     * @param Number
-     *            h The hue
-     * @param Number
-     *            s The saturation
-     * @param Number
-     *            l The lightness
+     * @param hsl Float array with the HSL values
      * @return Array The RGB representation
      */
     public static float[] hslToRgb(float[] hsl) {
@@ -412,4 +421,5 @@ public class ColourUtils {
     public static int getBlue(int rgb) {
         return (rgb >> 0) & 0xFF;
     }
+
 }

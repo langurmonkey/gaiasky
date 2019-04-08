@@ -1,11 +1,16 @@
-package gaia.cu9.ari.gaiaorbit.interfce;
+/*
+ * This file is part of Gaia Sky, which is released under the Mozilla Public License 2.0.
+ * See the file LICENSE.md in the project root for full license details.
+ */
 
-import java.time.Instant;
+package gaia.cu9.ari.gaiaorbit.interfce;
 
 import gaia.cu9.ari.gaiaorbit.util.I18n;
 import gaia.cu9.ari.gaiaorbit.util.format.DateFormatFactory;
 import gaia.cu9.ari.gaiaorbit.util.format.DateFormatFactory.DateType;
 import gaia.cu9.ari.gaiaorbit.util.format.IDateFormat;
+
+import java.time.Instant;
 
 public class MessageBean {
     private static final String TAG_SEPARATOR = " - ";

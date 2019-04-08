@@ -45,6 +45,7 @@ Fixes #123
 -  **refactor**: code refactorings which do not modify functionality or fix a bug, class changes, name changes, moves, etc.
 -  **perf**: changes that improve performance
 -  **build**: changes to the build and continuous integration systems
+-  **none**: minor changes that will not appear in the changelog
 
 #### subject
 

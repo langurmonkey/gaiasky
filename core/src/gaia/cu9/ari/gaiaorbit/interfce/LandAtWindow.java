@@ -1,3 +1,8 @@
+/*
+ * This file is part of Gaia Sky, which is released under the Mozilla Public License 2.0.
+ * See the file LICENSE.md in the project root for full license details.
+ */
+
 package gaia.cu9.ari.gaiaorbit.interfce;
 
 import com.badlogic.gdx.scenes.scene2d.Event;
@@ -8,10 +13,10 @@ import com.badlogic.gdx.scenes.scene2d.ui.CheckBox;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener.ChangeEvent;
 import com.badlogic.gdx.scenes.scene2d.utils.Disableable;
-
 import gaia.cu9.ari.gaiaorbit.event.EventManager;
 import gaia.cu9.ari.gaiaorbit.event.Events;
 import gaia.cu9.ari.gaiaorbit.scenegraph.CelestialBody;
+import gaia.cu9.ari.gaiaorbit.util.I18n;
 import gaia.cu9.ari.gaiaorbit.util.scene2d.OwnCheckBox;
 import gaia.cu9.ari.gaiaorbit.util.scene2d.OwnLabel;
 import gaia.cu9.ari.gaiaorbit.util.scene2d.OwnTextField;
@@ -26,11 +31,11 @@ public class LandAtWindow extends GenericDialog {
     private OwnTextField location, latitude, longitude;
 
     public LandAtWindow(CelestialBody target, Stage stage, Skin skin) {
-        super(txt("context.landatcoord", target.getName()), skin, stage);
+        super(I18n.txt("context.landatcoord", target.getName()), skin, stage);
         this.target = target;
 
-        setAcceptText(txt("gui.ok"));
-        setCancelText(txt("gui.cancel"));
+        setAcceptText(I18n.txt("gui.ok"));
+        setCancelText(I18n.txt("gui.cancel"));
 
         // Build UI
         buildSuper();
@@ -40,7 +45,7 @@ public class LandAtWindow extends GenericDialog {
     @Override
     protected void build() {
 
-        latlonCb = new OwnCheckBox(txt("context.lonlat"), skin, "radio", pad);
+        latlonCb = new OwnCheckBox(I18n.txt("context.lonlat"), skin, "radio", pad);
         latlonCb.setChecked(false);
         latlonCb.addListener(new EventListener() {
             @Override
@@ -60,7 +65,7 @@ public class LandAtWindow extends GenericDialog {
         longitude = new OwnTextField("", skin, new FloatValidator(0, 360));
         latitude = new OwnTextField("", skin, new FloatValidator(-90, 90));
 
-        locationCb = new OwnCheckBox(txt("context.location"), skin, "radio", pad);
+        locationCb = new OwnCheckBox(I18n.txt("context.location"), skin, "radio", pad);
         locationCb.setChecked(true);
         locationCb.addListener(new EventListener() {
             @Override
@@ -82,13 +87,13 @@ public class LandAtWindow extends GenericDialog {
         new ButtonGroup<CheckBox>(latlonCb, locationCb);
 
         content.add(locationCb).left().top().padBottom(pad).colspan(4).row();
-        content.add(new OwnLabel(txt("context.location"), skin)).left().top().padRight(pad);
+        content.add(new OwnLabel(I18n.txt("context.location"), skin)).left().top().padRight(pad);
         content.add(location).left().top().padBottom(pad * 2).row();
 
         content.add(latlonCb).left().top().padBottom(pad).colspan(4).row();
-        content.add(new OwnLabel(txt("context.longitude"), skin)).left().top().padRight(pad);
+        content.add(new OwnLabel(I18n.txt("context.longitude"), skin)).left().top().padRight(pad);
         content.add(longitude).left().top().padRight(pad * 2);
-        content.add(new OwnLabel(txt("context.latitude"), skin)).left().top().padRight(pad);
+        content.add(new OwnLabel(I18n.txt("context.latitude"), skin)).left().top().padRight(pad);
         content.add(latitude).left().top();
 
     }

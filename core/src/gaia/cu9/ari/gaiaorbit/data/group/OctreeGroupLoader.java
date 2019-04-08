@@ -1,26 +1,31 @@
+/*
+ * This file is part of Gaia Sky, which is released under the Mozilla Public License 2.0.
+ * See the file LICENSE.md in the project root for full license details.
+ */
+
 package gaia.cu9.ari.gaiaorbit.data.group;
 
-import java.io.IOException;
-
-import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.utils.Array;
-
 import gaia.cu9.ari.gaiaorbit.GaiaSky;
 import gaia.cu9.ari.gaiaorbit.data.StreamingOctreeLoader;
 import gaia.cu9.ari.gaiaorbit.data.octreegen.MetadataBinaryIO;
+import gaia.cu9.ari.gaiaorbit.event.EventManager;
+import gaia.cu9.ari.gaiaorbit.event.Events;
 import gaia.cu9.ari.gaiaorbit.scenegraph.StarGroup;
 import gaia.cu9.ari.gaiaorbit.scenegraph.StarGroup.StarBean;
 import gaia.cu9.ari.gaiaorbit.scenegraph.octreewrapper.AbstractOctreeWrapper;
 import gaia.cu9.ari.gaiaorbit.scenegraph.octreewrapper.OctreeWrapper;
 import gaia.cu9.ari.gaiaorbit.util.CatalogInfo;
-import gaia.cu9.ari.gaiaorbit.util.GlobalConf;
 import gaia.cu9.ari.gaiaorbit.util.CatalogInfo.CatalogInfoType;
+import gaia.cu9.ari.gaiaorbit.util.GlobalConf;
 import gaia.cu9.ari.gaiaorbit.util.I18n;
 import gaia.cu9.ari.gaiaorbit.util.Logger;
 import gaia.cu9.ari.gaiaorbit.util.Logger.Log;
 import gaia.cu9.ari.gaiaorbit.util.tree.LoadStatus;
 import gaia.cu9.ari.gaiaorbit.util.tree.OctreeNode;
+
+import java.io.IOException;
 
 /**
  * Implements the loading and streaming of octree nodes from files. This version
@@ -71,7 +76,8 @@ public class OctreeGroupLoader extends StreamingOctreeLoader {
             // Catalog info
             String name = this.name != null ? this.name : "LOD data";
             String description = this.description != null ? this.description : "Octree-based LOD dataset";
-            new CatalogInfo(name, description, null, CatalogInfoType.LOD, octreeWrapper);
+            CatalogInfo ci = new CatalogInfo(name, description, null, CatalogInfoType.LOD, octreeWrapper);
+            EventManager.instance.post(Events.CATALOG_ADD, ci, false);
 
             /**
              * LOAD LOD LEVELS - LOAD PARTICLE DATA

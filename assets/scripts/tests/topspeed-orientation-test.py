@@ -1,14 +1,15 @@
 # This script tests the speed limit and the orientation lock API calls.
 # Created by Toni Sagrista
 
-from gaia.cu9.ari.gaiaorbit.script import EventScriptingInterface
+from py4j.java_gateway import JavaGateway, GatewayParameters
 
-
-gs = EventScriptingInterface.instance()
+gateway = JavaGateway(gateway_parameters=GatewayParameters(auto_convert=True))
+gs = gateway.entry_point
 
 gs.disableInput()
 gs.cameraStop()
-gs.minimizeInterfaceWindow()
+gs.maximizeInterfaceWindow()
+gs.expandGuiComponent("CameraComponent")
 
 # Camera speed limit
 
@@ -45,6 +46,6 @@ gs.sleep(1)
 gs.setCameraOrientationLock(False)
 gs.sleep(1)
 
-
-
 gs.enableInput()
+
+gateway.close()

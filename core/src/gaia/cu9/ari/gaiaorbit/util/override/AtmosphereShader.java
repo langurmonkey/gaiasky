@@ -1,3 +1,8 @@
+/*
+ * This file is part of Gaia Sky, which is released under the Mozilla Public License 2.0.
+ * See the file LICENSE.md in the project root for full license details.
+ */
+
 package gaia.cu9.ari.gaiaorbit.util.override;
 
 /*******************************************************************************
@@ -19,17 +24,8 @@ package gaia.cu9.ari.gaiaorbit.util.override;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Camera;
 import com.badlogic.gdx.graphics.GL20;
-import com.badlogic.gdx.graphics.g3d.Attribute;
-import com.badlogic.gdx.graphics.g3d.Attributes;
-import com.badlogic.gdx.graphics.g3d.Material;
-import com.badlogic.gdx.graphics.g3d.Renderable;
-import com.badlogic.gdx.graphics.g3d.Shader;
-import com.badlogic.gdx.graphics.g3d.attributes.BlendingAttribute;
-import com.badlogic.gdx.graphics.g3d.attributes.ColorAttribute;
-import com.badlogic.gdx.graphics.g3d.attributes.DepthTestAttribute;
-import com.badlogic.gdx.graphics.g3d.attributes.FloatAttribute;
-import com.badlogic.gdx.graphics.g3d.attributes.IntAttribute;
-import com.badlogic.gdx.graphics.g3d.attributes.TextureAttribute;
+import com.badlogic.gdx.graphics.g3d.*;
+import com.badlogic.gdx.graphics.g3d.attributes.*;
 import com.badlogic.gdx.graphics.g3d.shaders.BaseShader;
 import com.badlogic.gdx.graphics.g3d.utils.RenderContext;
 import com.badlogic.gdx.graphics.glutils.ShaderProgram;
@@ -663,12 +659,8 @@ public class AtmosphereShader extends BaseShader {
     /** Material attributes which are not required but always supported. */
     private final static long optionalAttributes = IntAttribute.CullFace | DepthTestAttribute.Type;
 
-    public AtmosphereShader(final Renderable renderable) {
-        this(renderable, new Config());
-    }
-
     public AtmosphereShader(final Renderable renderable, final Config config) {
-        this(renderable, config, createPrefix(renderable, config));
+        this(renderable, config, createPrefix(renderable));
     }
 
     public AtmosphereShader(final Renderable renderable, final Config config, final String prefix) {
@@ -770,7 +762,7 @@ public class AtmosphereShader extends BaseShader {
         return mask;
     }
 
-    public static String createPrefix(final Renderable renderable, final Config config) {
+    public static String createPrefix(final Renderable renderable) {
         final Attributes attributes = combineAttributes(renderable);
         String prefix = "";
         final long attributesMask = attributes.getMask();

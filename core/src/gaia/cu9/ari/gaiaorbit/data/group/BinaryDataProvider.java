@@ -1,3 +1,8 @@
+/*
+ * This file is part of Gaia Sky, which is released under the Mozilla Public License 2.0.
+ * See the file LICENSE.md in the project root for full license details.
+ */
+
 package gaia.cu9.ari.gaiaorbit.data.group;
 
 import com.badlogic.gdx.utils.Array;
@@ -13,9 +18,8 @@ import java.nio.channels.FileChannel;
 
 /**
  * Reads arrays of star beans from binary files, usually to go in an octree.
- * 
- * @author tsagrista
  *
+ * @author tsagrista
  */
 public class BinaryDataProvider extends AbstractStarGroupDataProvider {
 
@@ -71,9 +75,12 @@ public class BinaryDataProvider extends AbstractStarGroupDataProvider {
             out.writeFloat((float) sb.data[i]);
         }
         // Int
-        for (int i = StarBean.I_HIP; i < StarBean.SIZE; i++) {
-            out.writeInt((int) sb.data[i]);
-        }
+        out.writeInt((int) sb.data[StarBean.I_HIP]);
+
+        // 3 integers, keep compatibility
+        out.writeInt(-1);
+        out.writeInt(-1);
+        out.writeInt(-1);
 
         out.writeLong(sb.id);
         out.writeInt(sb.name.length());
@@ -87,7 +94,7 @@ public class BinaryDataProvider extends AbstractStarGroupDataProvider {
         try {
             // Read size of stars
             int size = data_in.readInt();
-            data = new Array<StarBean>(size);
+            data = new Array<>(size);
             for (int i = 0; i < size; i++) {
                 data.add(readStarBean(data_in));
             }
@@ -120,9 +127,12 @@ public class BinaryDataProvider extends AbstractStarGroupDataProvider {
                 data[i] *= Constants.VR_SCALE;
         }
         // Int
-        for (int i = StarBean.I_HIP; i < StarBean.SIZE; i++) {
-            data[i] = in.readInt();
-        }
+        data[StarBean.I_HIP] = in.readInt();
+
+        // Skip unused tycho numbers, 3 Integers
+        in.readInt();
+        in.readInt();
+        in.readInt();
 
         Long id = in.readLong();
         int nameLength = in.readInt();
@@ -140,7 +150,7 @@ public class BinaryDataProvider extends AbstractStarGroupDataProvider {
             MappedByteBuffer mem = fc.map(FileChannel.MapMode.READ_ONLY, 0, fc.size());
             // Read size of stars
             int size = mem.getInt();
-            list = new Array<StarBean>(size);
+            list = new Array<>(size);
             for (int i = 0; i < size; i++) {
                 list.add(readStarBean(mem));
             }
@@ -170,9 +180,12 @@ public class BinaryDataProvider extends AbstractStarGroupDataProvider {
                 data[i] *= Constants.VR_SCALE;
         }
         // Int
-        for (int i = StarBean.I_HIP; i < StarBean.SIZE; i++) {
-            data[i] = mem.getInt();
-        }
+        data[StarBean.I_HIP] = mem.getInt();
+
+        // Skip unused tycho numbers, 3 Integers
+        mem.getInt();
+        mem.getInt();
+        mem.getInt();
 
         Long id = mem.getLong();
         int nameLength = mem.getInt();

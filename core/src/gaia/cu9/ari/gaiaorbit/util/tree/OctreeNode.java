@@ -1,9 +1,16 @@
+/*
+ * This file is part of Gaia Sky, which is released under the Mozilla Public License 2.0.
+ * See the file LICENSE.md in the project root for full license details.
+ */
+
 package gaia.cu9.ari.gaiaorbit.util.tree;
 
 import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.utils.Array;
 import gaia.cu9.ari.gaiaorbit.data.StreamingOctreeLoader;
-import gaia.cu9.ari.gaiaorbit.render.ComponentType;
+import gaia.cu9.ari.gaiaorbit.render.ComponentTypes;
+import gaia.cu9.ari.gaiaorbit.render.ComponentTypes.ComponentType;
 import gaia.cu9.ari.gaiaorbit.render.ILineRenderable;
 import gaia.cu9.ari.gaiaorbit.render.system.AbstractRenderSystem;
 import gaia.cu9.ari.gaiaorbit.render.system.LineRenderSystem;
@@ -11,7 +18,6 @@ import gaia.cu9.ari.gaiaorbit.scenegraph.AbstractPositionEntity;
 import gaia.cu9.ari.gaiaorbit.scenegraph.ParticleGroup;
 import gaia.cu9.ari.gaiaorbit.scenegraph.SceneGraphNode;
 import gaia.cu9.ari.gaiaorbit.scenegraph.camera.ICamera;
-import gaia.cu9.ari.gaiaorbit.util.ComponentTypes;
 import gaia.cu9.ari.gaiaorbit.util.GlobalConf;
 import gaia.cu9.ari.gaiaorbit.util.Pair;
 import gaia.cu9.ari.gaiaorbit.util.math.*;
@@ -249,6 +255,19 @@ public class OctreeNode implements ILineRenderable {
         } else {
             return 0;
         }
+    }
+
+    public boolean containsObject(AbstractPositionEntity object){
+        boolean has = this.objects.contains(object, true);
+        if(!has && children != null && childrenCount > 0){
+            for(OctreeNode child : children){
+                if(child != null) {
+                    if(containsObject(object))
+                        return true;
+                }
+            }
+        }
+        return has;
     }
 
     /**
@@ -546,7 +565,6 @@ public class OctreeNode implements ILineRenderable {
 
         if (viewAngle < th0) {
             // Not observed
-            this.observed = false;
             setChildrenObserved(false);
         } else if(this.observed = computeObserved2(cam)){
             nOctantsObserved++;
@@ -758,6 +776,18 @@ public class OctreeNode implements ILineRenderable {
         return null;
     }
 
+    /**
+     * Gets the root of the tree this octant is in by successively
+     * checking the parent until it is null.
+     * @return The root of the tree
+     */
+    public OctreeNode getRoot() {
+        if(parent == null)
+            return this;
+        else
+            return parent.getRoot();
+    }
+
     com.badlogic.gdx.graphics.Color col = new com.badlogic.gdx.graphics.Color();
 
     @Override
@@ -860,4 +890,9 @@ public class OctreeNode implements ILineRenderable {
         return 1;
     }
 
+
+    @Override
+    public int getGlType() {
+        return GL20.GL_LINE_STRIP;
+    }
 }

@@ -1,3 +1,8 @@
+/*
+ * This file is part of Gaia Sky, which is released under the Mozilla Public License 2.0.
+ * See the file LICENSE.md in the project root for full license details.
+ */
+
 package gaia.cu9.ari.gaiaorbit.scenegraph.component;
 
 import com.badlogic.gdx.Gdx;
@@ -149,7 +154,7 @@ public class ModelComponent implements Disposable, IObserver {
             updateStaticLight = GlobalConf.scene.LAZY_TEXTURE_INIT;
         }
 
-        if (!mesh || (mesh && !GlobalConf.scene.LAZY_MESH_INIT)) {
+        if (!mesh || !GlobalConf.scene.LAZY_MESH_INIT) {
             Pair<Model, Map<String, Material>> modmat = initModelFile();
             model = modmat.getFirst();
             materials = modmat.getSecond();
@@ -161,7 +166,7 @@ public class ModelComponent implements Disposable, IObserver {
         }
 
         // CREATE MAIN MODEL INSTANCE
-        if (!mesh || (mesh && !GlobalConf.scene.LAZY_MESH_INIT)) {
+        if (!mesh || !GlobalConf.scene.LAZY_MESH_INIT) {
             instance = new ModelInstance(model, localTransform);
         }
 
@@ -259,11 +264,9 @@ public class ModelComponent implements Disposable, IObserver {
                 AssetBean.addAsset(GlobalConf.data.dataFile(modelFile), Model.class);
                 modelLoading = true;
             } else if (manager.isLoaded(GlobalConf.data.dataFile(modelFile))) {
-                Model model = null;
-                Map<String, Material> materials = null;
-                Pair<Model, Map<String, Material>> modmat = initModelFile();
-                model = modmat.getFirst();
-                materials = modmat.getSecond();
+                Model model;
+                Pair<Model, Map<String, Material>> modMat = initModelFile();
+                model = modMat.getFirst();
                 instance = new ModelInstance(model, localTransform);
 
                 updateStaticLight();
@@ -275,12 +278,9 @@ public class ModelComponent implements Disposable, IObserver {
 
                 modelInitialised = true;
                 modelLoading = false;
-
             }
         }
-
     }
-
 
     private void updateStaticLight() {
         Gdx.app.postRunnable(()-> {

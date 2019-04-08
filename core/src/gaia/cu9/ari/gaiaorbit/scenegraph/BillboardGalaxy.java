@@ -1,3 +1,8 @@
+/*
+ * This file is part of Gaia Sky, which is released under the Mozilla Public License 2.0.
+ * See the file LICENSE.md in the project root for full license details.
+ */
+
 package gaia.cu9.ari.gaiaorbit.scenegraph;
 
 import com.badlogic.gdx.graphics.GL20;
@@ -5,7 +10,7 @@ import com.badlogic.gdx.graphics.Mesh;
 import com.badlogic.gdx.graphics.glutils.ShaderProgram;
 import com.badlogic.gdx.math.Vector3;
 import gaia.cu9.ari.gaiaorbit.GaiaSky;
-import gaia.cu9.ari.gaiaorbit.render.ComponentType;
+import gaia.cu9.ari.gaiaorbit.render.ComponentTypes.ComponentType;
 import gaia.cu9.ari.gaiaorbit.scenegraph.camera.ICamera;
 import gaia.cu9.ari.gaiaorbit.scenegraph.component.ModelComponent;
 import gaia.cu9.ari.gaiaorbit.scenegraph.component.TextureComponent;
@@ -85,7 +90,7 @@ public class BillboardGalaxy extends Billboard {
         shader.setUniformf("u_apparent_angle", (float) viewAngleApparent);
         shader.setUniformf("u_time", (float) GaiaSky.instance.getT() / 5f);
 
-        shader.setUniformf("u_radius", (float) size);
+        shader.setUniformf("u_radius", size);
 
         // Sprite.render
         mesh.render(shader, GL20.GL_TRIANGLES, 0, 6);

@@ -1,15 +1,19 @@
-package gaia.cu9.ari.gaiaorbit.event;
+/*
+ * This file is part of Gaia Sky, which is released under the Mozilla Public License 2.0.
+ * See the file LICENSE.md in the project root for full license details.
+ */
 
-import java.util.LinkedHashSet;
-import java.util.Set;
+package gaia.cu9.ari.gaiaorbit.event;
 
 import com.badlogic.gdx.utils.IntMap;
 import com.badlogic.gdx.utils.IntMap.Keys;
 import com.badlogic.gdx.utils.ObjectMap;
 import com.badlogic.gdx.utils.Pool;
 import com.badlogic.gdx.utils.TimeUtils;
-
 import gaia.cu9.ari.gaiaorbit.GaiaSky;
+
+import java.util.LinkedHashSet;
+import java.util.Set;
 
 /**
  * Event manager that allows for subscription of observers to events (identified
@@ -61,7 +65,7 @@ public class EventManager implements IObserver {
             }
         };
         // Initialize queues, one for each time frame.
-        queues = new ObjectMap<TimeFrame, PriorityQueue<Telegram>>(TimeFrame.values().length);
+        queues = new ObjectMap<>(TimeFrame.values().length);
         for (TimeFrame tf : TimeFrame.values()) {
             PriorityQueue<Telegram> pq = new PriorityQueue<Telegram>();
             queues.put(tf, pq);

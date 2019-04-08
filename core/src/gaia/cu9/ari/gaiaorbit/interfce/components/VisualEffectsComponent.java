@@ -1,5 +1,11 @@
+/*
+ * This file is part of Gaia Sky, which is released under the Mozilla Public License 2.0.
+ * See the file LICENSE.md in the project root for full license details.
+ */
+
 package gaia.cu9.ari.gaiaorbit.interfce.components;
 
+import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener.ChangeEvent;
@@ -9,6 +15,7 @@ import gaia.cu9.ari.gaiaorbit.event.Events;
 import gaia.cu9.ari.gaiaorbit.event.IObserver;
 import gaia.cu9.ari.gaiaorbit.util.Constants;
 import gaia.cu9.ari.gaiaorbit.util.GlobalConf;
+import gaia.cu9.ari.gaiaorbit.util.I18n;
 import gaia.cu9.ari.gaiaorbit.util.math.MathUtilsd;
 import gaia.cu9.ari.gaiaorbit.util.scene2d.OwnLabel;
 import gaia.cu9.ari.gaiaorbit.util.scene2d.OwnSlider;
@@ -27,11 +34,11 @@ public class VisualEffectsComponent extends GuiComponent implements IObserver {
     }
 
     public void initialize() {
-        float space3 = 3 * GlobalConf.SCALE_FACTOR;
+        float space4 = 4 * GlobalConf.SCALE_FACTOR;
         float space2 = 2 * GlobalConf.SCALE_FACTOR;
         float sliderWidth = 140 * GlobalConf.SCALE_FACTOR;
         /** Star brightness **/
-        Label sbrightnessLabel = new Label(txt("gui.starbrightness"), skin, "default");
+        Label sbrightnessLabel = new Label(I18n.txt("gui.starbrightness"), skin, "default");
         starbrightnessl = new OwnLabel(Integer.toString((int) (MathUtilsd.lint(GlobalConf.scene.STAR_BRIGHTNESS, Constants.MIN_STAR_BRIGHT, Constants.MAX_STAR_BRIGHT, Constants.MIN_SLIDER, Constants.MAX_SLIDER))), skin);
         starBrightness = new OwnSlider(Constants.MIN_SLIDER, Constants.MAX_SLIDER, 1, false, skin);
         starBrightness.setName("star brightness");
@@ -46,12 +53,12 @@ public class VisualEffectsComponent extends GuiComponent implements IObserver {
             return false;
         });
         HorizontalGroup sbrightnessGroup = new HorizontalGroup();
-        sbrightnessGroup.space(space3);
+        sbrightnessGroup.space(space4);
         sbrightnessGroup.addActor(starBrightness);
         sbrightnessGroup.addActor(starbrightnessl);
 
         /** Star size **/
-        Label sizeLabel = new Label(txt("gui.star.size"), skin, "default");
+        Label sizeLabel = new Label(I18n.txt("gui.star.size"), skin, "default");
         size = new OwnLabel(Integer.toString((int) (MathUtilsd.lint(GlobalConf.scene.STAR_POINT_SIZE, Constants.MIN_STAR_POINT_SIZE, Constants.MAX_STAR_POINT_SIZE, Constants.MIN_SLIDER, Constants.MAX_SLIDER))), skin);
         starSize = new OwnSlider(Constants.MIN_SLIDER, Constants.MAX_SLIDER, 1, false, skin);
         starSize.setName("star size");
@@ -66,12 +73,12 @@ public class VisualEffectsComponent extends GuiComponent implements IObserver {
             return false;
         });
         HorizontalGroup sizeGroup = new HorizontalGroup();
-        sizeGroup.space(space3);
+        sizeGroup.space(space4);
         sizeGroup.addActor(starSize);
         sizeGroup.addActor(size);
 
         /** Star opacity **/
-        Label opacityLabel = new Label(txt("gui.star.opacity"), skin, "default");
+        Label opacityLabel = new Label(I18n.txt("gui.star.opacity"), skin, "default");
         opacity = new OwnLabel(Integer.toString((int) (MathUtilsd.lint(GlobalConf.scene.POINT_ALPHA_MIN, Constants.MIN_STAR_MIN_OPACITY, Constants.MAX_STAR_MIN_OPACITY, Constants.MIN_SLIDER, Constants.MAX_SLIDER))), skin);
         starOpacity = new OwnSlider(Constants.MIN_SLIDER, Constants.MAX_SLIDER, 1, false, skin);
         starOpacity.setName("star opacity");
@@ -86,12 +93,12 @@ public class VisualEffectsComponent extends GuiComponent implements IObserver {
             return false;
         });
         HorizontalGroup opacityGroup = new HorizontalGroup();
-        opacityGroup.space(space3);
+        opacityGroup.space(space4);
         opacityGroup.addActor(starOpacity);
         opacityGroup.addActor(opacity);
 
         /** Ambient light **/
-        Label ambientLightLabel = new Label(txt("gui.light.ambient"), skin, "default");
+        Label ambientLightLabel = new Label(I18n.txt("gui.light.ambient"), skin, "default");
         ambient = new OwnLabel(Integer.toString((int) (GlobalConf.scene.AMBIENT_LIGHT * 100)), skin);
         ambientLight = new OwnSlider(Constants.MIN_SLIDER, Constants.MAX_SLIDER, 1, false, skin);
         ambientLight.setName("ambient light");
@@ -106,12 +113,12 @@ public class VisualEffectsComponent extends GuiComponent implements IObserver {
             return false;
         });
         HorizontalGroup ambientGroup = new HorizontalGroup();
-        ambientGroup.space(space3);
+        ambientGroup.space(space4);
         ambientGroup.addActor(ambientLight);
         ambientGroup.addActor(ambient);
 
         /** Label size **/
-        Label labelSizeLabel = new Label(txt("gui.label.size"), skin, "default");
+        Label labelSizeLabel = new Label(I18n.txt("gui.label.size"), skin, "default");
         labels = new OwnLabel(Integer.toString((int) MathUtilsd.lint(GlobalConf.scene.LABEL_SIZE_FACTOR, Constants.MIN_LABEL_SIZE, Constants.MAX_LABEL_SIZE, Constants.MIN_SLIDER, Constants.MAX_SLIDER)), skin);
         labelSize = new OwnSlider(Constants.MIN_SLIDER, Constants.MAX_SLIDER, 1, false, skin);
         labelSize.setName("label size");
@@ -127,26 +134,29 @@ public class VisualEffectsComponent extends GuiComponent implements IObserver {
             return false;
         });
         HorizontalGroup labelSizeGroup = new HorizontalGroup();
-        labelSizeGroup.space(space3);
+        labelSizeGroup.space(space4);
         labelSizeGroup.addActor(labelSize);
         labelSizeGroup.addActor(labels);
 
         VerticalGroup lightingGroup = new VerticalGroup().align(Align.left).columnAlign(Align.left);
-        lightingGroup.space(space2);
-        lightingGroup.addActor(sbrightnessLabel);
-        lightingGroup.addActor(sbrightnessGroup);
-        lightingGroup.addActor(sizeLabel);
-        lightingGroup.addActor(sizeGroup);
-        lightingGroup.addActor(opacityLabel);
-        lightingGroup.addActor(opacityGroup);
-        lightingGroup.addActor(ambientLightLabel);
-        lightingGroup.addActor(ambientGroup);
-        lightingGroup.addActor(labelSizeLabel);
-        lightingGroup.addActor(labelSizeGroup);
+        lightingGroup.space(space4);
+        lightingGroup.addActor(group(sbrightnessLabel, sbrightnessGroup, space2));
+        lightingGroup.addActor(group(sizeLabel, sizeGroup, space2));
+        lightingGroup.addActor(group(opacityLabel, opacityGroup, space2));
+        lightingGroup.addActor(group(ambientLightLabel, ambientGroup, space2));
+        lightingGroup.addActor(group(labelSizeLabel, labelSizeGroup, space2));
 
         component = lightingGroup;
 
         EventManager.instance.subscribe(this, Events.STAR_POINT_SIZE_CMD, Events.STAR_BRIGHTNESS_CMD, Events.LIGHT_SCATTERING_CMD, Events.STAR_MIN_OPACITY_CMD);
+    }
+
+    private VerticalGroup group(Actor ac1, Actor ac2, float sp){
+        VerticalGroup vg = new VerticalGroup().align(Align.left).columnAlign(Align.left);
+        vg.space(sp);
+        vg.addActor(ac1);
+        vg.addActor(ac2);
+        return vg;
     }
 
     @Override

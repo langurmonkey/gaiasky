@@ -1,4 +1,9 @@
 /*
+ * This file is part of Gaia Sky, which is released under the Mozilla Public License 2.0.
+ * See the file LICENSE.md in the project root for full license details.
+ */
+
+/*
  * Copyright 2014-2016 See AUTHORS file.
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not
@@ -49,7 +54,7 @@ public class Separator extends Widget {
     }
 
     @Override
-    public float getPrefHeight() {
+    public float getPrefHeight() { //-V6032
         return style.thickness;
     }
 

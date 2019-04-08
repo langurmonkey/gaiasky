@@ -1,3 +1,8 @@
+/*
+ * This file is part of Gaia Sky, which is released under the Mozilla Public License 2.0.
+ * See the file LICENSE.md in the project root for full license details.
+ */
+
 package gaia.cu9.ari.gaiaorbit.scenegraph;
 
 import com.badlogic.gdx.assets.AssetManager;
@@ -11,8 +16,8 @@ import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.Array;
 import gaia.cu9.ari.gaiaorbit.GaiaSky;
-import gaia.cu9.ari.gaiaorbit.render.ComponentType;
 import gaia.cu9.ari.gaiaorbit.render.RenderingContext;
+import gaia.cu9.ari.gaiaorbit.render.ComponentTypes.ComponentType;
 import gaia.cu9.ari.gaiaorbit.render.SceneGraphRenderer;
 import gaia.cu9.ari.gaiaorbit.render.ShadowMapImpl;
 import gaia.cu9.ari.gaiaorbit.scenegraph.camera.ICamera;
@@ -279,7 +284,7 @@ public abstract class ModelBody extends CelestialBody {
 
     @Override
     public float textScale() {
-        return Math.max(1f, labelSizeConcrete()) * 1e0f;
+        return Math.max(1f, labelSizeConcrete()) * 2e-1f;
     }
 
     protected float labelSizeConcrete() {

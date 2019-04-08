@@ -1,3 +1,8 @@
+/*
+ * This file is part of Gaia Sky, which is released under the Mozilla Public License 2.0.
+ * See the file LICENSE.md in the project root for full license details.
+ */
+
 package gaia.cu9.ari.gaiaorbit.scenegraph.camera;
 
 import com.badlogic.gdx.Gdx;
@@ -20,9 +25,11 @@ import gaia.cu9.ari.gaiaorbit.event.IObserver;
 import gaia.cu9.ari.gaiaorbit.interfce.NaturalControllerListener;
 import gaia.cu9.ari.gaiaorbit.interfce.NaturalInputListener;
 import gaia.cu9.ari.gaiaorbit.interfce.OpenVRListener;
+import gaia.cu9.ari.gaiaorbit.render.ComponentTypes.ComponentType;
 import gaia.cu9.ari.gaiaorbit.scenegraph.*;
 import gaia.cu9.ari.gaiaorbit.scenegraph.camera.CameraManager.CameraMode;
 import gaia.cu9.ari.gaiaorbit.scenegraph.component.RotationComponent;
+import gaia.cu9.ari.gaiaorbit.scenegraph.octreewrapper.OctreeWrapper;
 import gaia.cu9.ari.gaiaorbit.util.Constants;
 import gaia.cu9.ari.gaiaorbit.util.GlobalConf;
 import gaia.cu9.ari.gaiaorbit.util.GlobalResources;
@@ -36,6 +43,7 @@ import gaia.cu9.ari.gaiaorbit.vr.VRContext;
 import gaia.cu9.ari.gaiaorbit.vr.VRContext.Space;
 import gaia.cu9.ari.gaiaorbit.vr.VRContext.VRDevice;
 import gaia.cu9.ari.gaiaorbit.vr.VRContext.VRDeviceType;
+import gaia.cu9.ari.gaiaorbit.util.tree.OctreeNode;
 
 /**
  * Models the movement of the camera
@@ -186,7 +194,7 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
         camera.far = (float) CAM_FAR;
 
         // init cameras vector
-        cameras = new PerspectiveCamera[]{camera, camLeft, camRight};
+        cameras = new PerspectiveCamera[] { camera, camLeft, camRight };
 
         fovFactor = camera.fieldOfView / 40f;
 
@@ -250,11 +258,9 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
         hudw = sHUD.getWidth();
         hudh = sHUD.getHeight();
 
-        hudScales = new double[]{HUD_SCALE_MIN, HUD_SCALE_MIN + (HUD_SCALE_MAX - HUD_SCALE_MIN) / 3d,
-                HUD_SCALE_MIN + (HUD_SCALE_MAX - HUD_SCALE_MIN) * 2d / 3d};
+        hudScales = new double[] { HUD_SCALE_MIN, HUD_SCALE_MIN + (HUD_SCALE_MAX - HUD_SCALE_MIN) / 3d, HUD_SCALE_MIN + (HUD_SCALE_MAX - HUD_SCALE_MIN) * 2d / 3d };
         hudSprites = new Sprite[hudScales.length];
-        hudColors = new Color[]{Color.WHITE, Color.GREEN, Color.GOLD, Color.LIME, Color.PINK, Color.ORANGE,
-                Color.CORAL, Color.CYAN, Color.FIREBRICK, Color.FOREST};
+        hudColors = new Color[] { Color.WHITE, Color.GREEN, Color.GOLD, Color.LIME, Color.PINK, Color.ORANGE, Color.CORAL, Color.CYAN, Color.FIREBRICK, Color.FOREST };
 
         for (int i = 0; i < hudScales.length; i++) {
             hudSprites[i] = new Sprite(sHUD);
@@ -262,7 +268,7 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
         }
 
         // Focus is changed from GUI
-        EventManager.instance.subscribe(this, Events.FOCUS_CHANGE_CMD, Events.FOV_CHANGED_CMD, Events.ORIENTATION_LOCK_CMD, Events.CAMERA_POS_CMD, Events.CAMERA_DIR_CMD, Events.CAMERA_UP_CMD, Events.CAMERA_FWD, Events.CAMERA_PAN, Events.CAMERA_STOP, Events.CAMERA_CENTER, Events.GO_TO_OBJECT_CMD, Events.FREE_MODE_COORD_CMD);
+        EventManager.instance.subscribe(this, Events.FOCUS_CHANGE_CMD, Events.FOV_CHANGED_CMD, Events.ORIENTATION_LOCK_CMD, Events.CAMERA_POS_CMD, Events.CAMERA_DIR_CMD, Events.CAMERA_UP_CMD, Events.CAMERA_FWD, Events.CAMERA_PAN, Events.CAMERA_STOP, Events.CAMERA_CENTER, Events.GO_TO_OBJECT_CMD, Events.FREE_MODE_COORD_CMD, Events.CATALOG_VISIBLE, Events.CATALOG_REMOVE, Events.FOCUS_NOT_AVAILABLE, Events.TOGGLE_VISIBILITY_CMD);
     }
 
     public void update(double dt, ITimeFrameProvider time) {
@@ -283,7 +289,7 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
         double translateUnits = Math.max(10d * Constants.M_TO_U, realTransUnits);
         switch (m) {
         case Focus:
-            if (focus.withinMagLimit() && !focus.isCoordinatesTimeOverflow()) {
+            if (focus != null && focus.withinMagLimit() && !focus.isCoordinatesTimeOverflow()) {
                 focusBak = focus;
                 focus.getAbsolutePosition(aux4);
                 // Hack, fix this by understanding underlying problem
@@ -462,8 +468,7 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
     protected void updatePerspectiveCamera() {
         double closestStarDist = closestStar == null ? Double.MAX_VALUE : closestStar.getClosestDist();
         if (closest != null) {
-            camera.near = (float) Math.min(CAM_NEAR,
-                    Math.min(closest.getDistToCamera() - closest.getRadius(), closestStarDist) / 3);
+            camera.near = (float) Math.min(CAM_NEAR, Math.min(closest.getDistToCamera() - closest.getRadius(), closestStarDist) / 3);
         }
         camera.position.set(0f, 0f, 0f);
         camera.direction.set(direction.valuesf());
@@ -571,8 +576,7 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
                 addYaw(deltaX, acceleration);
                 addPitch(deltaY, acceleration);
             } else {
-                // This factor slows the rotation as the focus gets closer and
-                // closer
+                // This factor slows the rotation as the focus gets closer and closer
                 double factor = vadeg > th ? Math.pow(th / vadeg, 3) : 1.0;
                 addHorizontalRotation(deltaX * factor, acceleration);
                 addVerticalRotation(deltaY * factor, acceleration);
@@ -660,8 +664,7 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
      * False if camera was already still.
      */
     public boolean stopMovement() {
-        boolean stopped = (vel.len2() != 0 || yaw.y != 0 || pitch.y != 0 || roll.y != 0 || vertical.y != 0
-                || horizontal.y != 0);
+        boolean stopped = (vel.len2() != 0 || yaw.y != 0 || pitch.y != 0 || roll.y != 0 || vertical.y != 0 || horizontal.y != 0);
         force.setZero();
         vel.setZero();
         yaw.y = 0;
@@ -679,8 +682,7 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
      * False if camera was already still.
      */
     public boolean stopTotalMovement() {
-        boolean stopped = (vel.len2() != 0 || yaw.y != 0 || pitch.y != 0 || roll.y != 0 || vertical.y != 0
-                || horizontal.y != 0);
+        boolean stopped = (vel.len2() != 0 || yaw.y != 0 || pitch.y != 0 || roll.y != 0 || vertical.y != 0 || horizontal.y != 0);
         force.setZero();
         vel.setZero();
         yaw.setZero();
@@ -727,12 +729,6 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
         force.setZero();
         vel.setZero();
         return stopped;
-    }
-
-    private void checkVel() {
-        if (vel.hasNaN()) {
-            int a = 3;
-        }
     }
 
     /**
@@ -895,15 +891,12 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
     }
 
     /**
-     * Updates the camera direction and up vectors with a gentle turn towards
-     * the given target.
-     * 
-     * @param dt
-     *            The current time step
-     * @param target
-     *            The position of the target
-     * @param turnVelocity
-     *            The velocity at which to turn
+     * Updates the camera direction and up vectors with a gentle turn towards the
+     * given target.
+     *
+     * @param dt               The current time step
+     * @param target           The position of the target
+     * @param turnVelocity     The velocity at which to turn
      */
     private void directionToTarget(double dt, final Vector3d target, double turnVelocity) {
         desired.set(target).sub(pos);
@@ -936,22 +929,22 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
         case Free_Camera:
         case Gaia_Scene:
             Gdx.app.postRunnable(() -> {
-                // Register input controller
+                // Register input controllers
                 if (!im.getProcessors().contains(inputController, true))
                     im.addProcessor(im.size(), inputController);
                 // Register controller listener
                 Controllers.clearListeners();
-                Controllers.addListener(controllerListener);
+                GlobalConf.controls.addControllerListener(controllerListener);
                 if (GlobalConf.runtime.OPENVR)
                     GaiaSky.instance.vrContext.addListener(openVRListener);
             });
             break;
         default:
             Gdx.app.postRunnable(() -> {
-                // Unregister input controller
+                // Unregister input controllers
                 im.removeProcessor(inputController);
                 // Unregister controller listener
-                Controllers.removeListener(controllerListener);
+                GlobalConf.controls.removeControllerListener(controllerListener);
                 // Remove vr listener
                 if (GlobalConf.runtime.OPENVR)
                     GaiaSky.instance.vrContext.removeListener(openVRListener);
@@ -1051,10 +1044,10 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
             posinv.set(pos).add(vroffset).scl(-1d);
             break;
         case CAMERA_DIR_CMD:
-            direction.set((double[]) data[0]);
+            direction.set((double[]) data[0]).nor();
             break;
         case CAMERA_UP_CMD:
-            up.set((double[]) data[0]);
+            up.set((double[]) data[0]).nor();
             break;
         case CAMERA_FWD:
             addForwardForce((double) data[0]);
@@ -1119,6 +1112,34 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
             facingFocus = false;
             freeTargetOn = true;
             break;
+        case FOCUS_NOT_AVAILABLE:
+            if (getMode().isFocus()) {
+                boolean found = false;
+                if (data[0] instanceof IFocus) {
+                    focus = (IFocus) data[0];
+                    found = isFocus(focus);
+                } else if (data[0] instanceof OctreeWrapper) {
+                    OctreeWrapper octree = (OctreeWrapper) data[0];
+                    OctreeNode octant = this.focus.getOctant();
+                    if (octant != null && octant.getRoot() == octree.root) {
+                        found = true;
+                    }
+                }
+                if (found) {
+                    // Set camera  free
+                    EventManager.instance.post(Events.CAMERA_MODE_CMD, CameraMode.Free_Camera);
+                }
+            }
+            break;
+        case TOGGLE_VISIBILITY_CMD:
+            if(getMode().isFocus()){
+                ComponentType ct = ComponentType.getFromKey((String) data[0]);
+                if(this.focus != null && this.focus.getCt().isEnabled(ct)){
+                    // Set camera  free
+                    EventManager.instance.post(Events.CAMERA_MODE_CMD, CameraMode.Free_Camera);
+                }
+            }
+            break;
         default:
             break;
         }
@@ -1181,7 +1202,7 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
 
     @Override
     public PerspectiveCamera[] getFrontCameras() {
-        return new PerspectiveCamera[]{camera};
+        return new PerspectiveCamera[] { camera };
     }
 
     @Override
@@ -1204,13 +1225,13 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
         return up;
     }
 
-    public void setUp(Vector3d up){
+    public void setUp(Vector3d up) {
         this.up.set(up);
     }
 
     @Override
     public Vector3d[] getDirections() {
-        return new Vector3d[]{direction};
+        return new Vector3d[] { direction };
     }
 
     @Override
@@ -1287,8 +1308,7 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
 
     @Override
     public void render(int rw, int rh) {
-        boolean draw = !GlobalConf.program.CUBEMAP360_MODE && !GlobalConf.program.STEREOSCOPIC_MODE
-                && !GlobalConf.postprocess.POSTPROCESS_FISHEYE;
+        boolean draw = !GlobalConf.program.CUBEMAP360_MODE && !GlobalConf.program.STEREOSCOPIC_MODE && !GlobalConf.postprocess.POSTPROCESS_FISHEYE;
 
         spriteBatch.begin();
 
@@ -1360,8 +1380,49 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
                     spriteBatch.draw(gravWaveCrosshair, auxf1.x - chw2, auxf1.y - chh2, chw, chh);
                 }
             }
-            spriteBatch.end();
         }
+
+        if (false && GlobalConf.program.DISPLAY_HUD) {
+            // Speed HUD
+            float dx, dy;
+            float centerx = rw / 2;
+            float centery = rh / 2;
+            if (vel.len2() != 0) {
+                aux1.set(vel);
+                if (vel.anglePrecise(direction) > 90) {
+                    aux1.scl(-1);
+                }
+                projectToScreen(aux1, auxf1, rw, rh, 0, 0, 0, 0);
+                dx = auxf1.x - rw / 2;
+                dy = auxf1.y - rh / 2;
+            } else {
+                dx = 0;
+                dy = 0;
+            }
+
+            for (int i = 0; i < hudScales.length; i++) {
+                float scl = (float) hudScales[i];
+
+                float dscale = (float) MathUtilsd.lint(scl, HUD_SCALE_MIN, HUD_SCALE_MAX, 1d, 0d);
+
+                Sprite s = hudSprites[i];
+                s.setColor(hudColors[hudColor]);
+                s.setOriginCenter();
+                s.setScale(scl);
+                s.setPosition(centerx + (dx * dscale) - hudw / 2, centery + (dy * dscale) - hudh / 2);
+                s.draw(spriteBatch);
+
+            }
+        }
+
+        spriteBatch.end();
+    }
+
+    private void drawVelCrosshair(Texture tex, int rw, int rh, float chw, float chh, float chw2, float chh2, float scl) {
+        aux1.set(vel).scl(scl);
+        projectToScreen(aux1, auxf1, rw, rh, chw, chh, chw2, chh2);
+
+        spriteBatch.draw(tex, auxf1.x - chw2, auxf1.y - chh2, chw, chh);
     }
 
     /**
@@ -1378,8 +1439,7 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
      * @return False if projected point falls outside the screen bounds, true
      * otherwise
      */
-    private boolean projectToScreen(Vector3d vec, Vector3 out, int rw, int rh, float chw, float chh, float chw2,
-                                    float chh2) {
+    private boolean projectToScreen(Vector3d vec, Vector3 out, int rw, int rh, float chw, float chh, float chw2, float chh2) {
         vec.put(out);
         camera.project(out, 0, 0, rw, rh);
 

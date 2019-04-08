@@ -1,13 +1,10 @@
 # This script tests the star size commands.
 # Created by Toni Sagrista
 
-from gaia.cu9.ari.gaiaorbit.script import EventScriptingInterface
+from py4j.java_gateway import JavaGateway, GatewayParameters
 
-from gaia.cu9.ari.gaiaorbit.event import EventManager
-from gaia.cu9.ari.gaiaorbit.event import Events
-
-
-gs = EventScriptingInterface.instance()
+gateway = JavaGateway(gateway_parameters=GatewayParameters(auto_convert=True))
+gs = gateway.entry_point
 
 gs.maximizeInterfaceWindow()
 
@@ -22,3 +19,5 @@ gs.sleep(2)
 gs.setMinStarOpacity(12.0)
 gs.sleep(2)
 gs.setMinStarOpacity(0.0)
+
+gateway.close()

@@ -1,8 +1,14 @@
+/*
+ * This file is part of Gaia Sky, which is released under the Mozilla Public License 2.0.
+ * See the file LICENSE.md in the project root for full license details.
+ */
+
 package gaia.cu9.ari.gaiaorbit.interfce;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
+import gaia.cu9.ari.gaiaorbit.util.I18n;
 import gaia.cu9.ari.gaiaorbit.util.scene2d.OwnLabel;
 
 /**
@@ -14,10 +20,10 @@ import gaia.cu9.ari.gaiaorbit.util.scene2d.OwnLabel;
 public class QuitWindow extends GenericDialog {
 
     public QuitWindow(Stage ui, Skin skin) {
-        super(txt("gui.quit.title"), skin, ui);
+        super(I18n.txt("gui.quit.title"), skin, ui);
 
-        setAcceptText(txt("gui.yes"));
-        setCancelText(txt("gui.no"));
+        setAcceptText(I18n.txt("gui.yes"));
+        setCancelText(I18n.txt("gui.no"));
 
         buildSuper();
     }
@@ -26,7 +32,7 @@ public class QuitWindow extends GenericDialog {
     protected void build() {
         content.clear();
 
-        content.add(new OwnLabel(txt("gui.quit.sure"), skin)).left().pad(pad5).row();
+        content.add(new OwnLabel(I18n.txt("gui.quit.sure"), skin)).left().pad(pad5).row();
     }
 
     @Override

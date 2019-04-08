@@ -1,3 +1,8 @@
+/*
+ * This file is part of Gaia Sky, which is released under the Mozilla Public License 2.0.
+ * See the file LICENSE.md in the project root for full license details.
+ */
+
 package gaia.cu9.ari.gaiaorbit;
 
 import com.badlogic.gdx.Application;
@@ -30,6 +35,7 @@ import gaia.cu9.ari.gaiaorbit.event.Events;
 import gaia.cu9.ari.gaiaorbit.event.IObserver;
 import gaia.cu9.ari.gaiaorbit.interfce.*;
 import gaia.cu9.ari.gaiaorbit.render.*;
+import gaia.cu9.ari.gaiaorbit.render.ComponentTypes.ComponentType;
 import gaia.cu9.ari.gaiaorbit.render.IPostProcessor.PostProcessBean;
 import gaia.cu9.ari.gaiaorbit.render.IPostProcessor.RenderType;
 import gaia.cu9.ari.gaiaorbit.scenegraph.*;
@@ -38,6 +44,7 @@ import gaia.cu9.ari.gaiaorbit.scenegraph.camera.CameraManager.CameraMode;
 import gaia.cu9.ari.gaiaorbit.scenegraph.camera.ICamera;
 import gaia.cu9.ari.gaiaorbit.scenegraph.component.ModelComponent;
 import gaia.cu9.ari.gaiaorbit.script.HiddenHelperUser;
+import gaia.cu9.ari.gaiaorbit.script.ScriptingServer;
 import gaia.cu9.ari.gaiaorbit.util.*;
 import gaia.cu9.ari.gaiaorbit.util.Logger.Log;
 import gaia.cu9.ari.gaiaorbit.util.g3d.loader.ObjLoader;
@@ -264,8 +271,14 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
         // Init global resources
         GlobalResources.initialize(manager);
 
+        // Catalog manager
+        CatalogManager.initialize();
+
         // Initialise master manager
         MasterManager.initialize();
+
+        // Init timer if needed
+        Timer.instance();
 
         // Initialise Cameras
         cam = new CameraManager(manager, CameraMode.Focus);
@@ -277,7 +290,7 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
         TooltipManager.getInstance().initialTime = 1f;
 
         // Initialise Gaia attitudes
-        manager.load(ATTITUDE_FOLDER, GaiaAttitudeServer.class, new GaiaAttitudeLoaderParameter(GlobalConf.runtime.STRIPPED_FOV_MODE ? new String[]{"OPS_RSLS_0022916_rsls_nsl_gareq1_afterFirstSpinPhaseOptimization.2.xml"} : new String[]{}));
+        manager.load(ATTITUDE_FOLDER, GaiaAttitudeServer.class, new GaiaAttitudeLoaderParameter(GlobalConf.runtime.STRIPPED_FOV_MODE ? new String[] { "OPS_RSLS_0022916_rsls_nsl_gareq1_afterFirstSpinPhaseOptimization.2.xml" } : new String[] {}));
 
         // Initialise hidden helper user
         HiddenHelperUser.initialize();
@@ -297,6 +310,9 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
         // Scene graph renderer
         sgr = new SceneGraphRenderer(vrContext);
         sgr.initialize(manager);
+
+        // Initialise scripting gateway server
+        ScriptingServer.initialize();
 
         // Tell the asset manager to load all the assets
         Set<AssetBean> assets = AssetBean.getAssets();
@@ -474,7 +490,7 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
         EventManager.instance.post(Events.TIME_CHANGE_INFO, time.getTime());
 
         // Subscribe to events
-        EventManager.instance.subscribe(this, Events.TOGGLE_AMBIENT_LIGHT, Events.AMBIENT_LIGHT_CMD, Events.RECORD_CAMERA_CMD, Events.CAMERA_MODE_CMD, Events.STEREOSCOPIC_CMD, Events.FRAME_SIZE_UDPATE, Events.SCREENSHOT_SIZE_UDPATE, Events.POST_RUNNABLE, Events.UNPOST_RUNNABLE, Events.SCENE_GRAPH_ADD_OBJECT_CMD, Events.SCENE_GRAPH_REMOVE_OBJECT_CMD);
+        EventManager.instance.subscribe(this, Events.TOGGLE_AMBIENT_LIGHT, Events.AMBIENT_LIGHT_CMD, Events.RECORD_CAMERA_CMD, Events.CAMERA_MODE_CMD, Events.STEREOSCOPIC_CMD, Events.FRAME_SIZE_UDPATE, Events.SCREENSHOT_SIZE_UDPATE, Events.POST_RUNNABLE, Events.UNPOST_RUNNABLE, Events.SCENE_GRAPH_ADD_OBJECT_CMD, Events.SCENE_GRAPH_ADD_OBJECT_NO_POST_CMD, Events.SCENE_GRAPH_REMOVE_OBJECT_CMD, Events.HOME_CMD);
 
         // Re-enable input
         if (!GlobalConf.runtime.STRIPPED_FOV_MODE)
@@ -489,20 +505,6 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
 
         // Initialise frames
         frames = 0;
-
-        if (sg.containsNode("Earth") && !GlobalConf.program.NET_SLAVE) {
-            // Set focus to Earth
-            EventManager.instance.post(Events.CAMERA_MODE_CMD, CameraMode.Focus);
-            EventManager.instance.post(Events.FOCUS_CHANGE_CMD, sg.getNode("Earth"), true);
-            EventManager.instance.post(Events.GO_TO_OBJECT_CMD);
-            EventManager.instance.post(Events.CAMERA_MODE_CMD, CameraMode.Free_Camera);
-        } else {
-            // At 5 AU in Y looking towards origin (top-down look)
-            EventManager.instance.post(Events.CAMERA_MODE_CMD, CameraMode.Free_Camera);
-            EventManager.instance.post(Events.CAMERA_POS_CMD, (Object) new double[]{0, 5 * Constants.AU_TO_U, 0});
-            EventManager.instance.post(Events.CAMERA_DIR_CMD, (Object) new double[]{0, -1, 0});
-            EventManager.instance.post(Events.CAMERA_UP_CMD, (Object) new double[]{0, 0, 1});
-        }
 
         // Debug info scheduler
         Task debugTask1 = new Task() {
@@ -530,12 +532,33 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
             }
         };
 
-        // Each 1 second
-        Timer.schedule(debugTask1, 1, 1);
+        // Every second
+        Timer.schedule(debugTask1, 2, 1);
         // Every 10 seconds
-        Timer.schedule(debugTask10, 1, 10);
+        Timer.schedule(debugTask10, 2, 10);
+
+        // Go home
+        goHome();
 
         initialized = true;
+    }
+
+    /**
+     * Moves the camera home. That is either the Earth, if it exists, or somewhere close to the Sun
+     */
+    private void goHome() {
+        if (sg.containsNode("Earth") && !GlobalConf.program.NET_SLAVE && isOn(ComponentType.Planets.ordinal())) {
+            // Set focus to Earth
+            EventManager.instance.post(Events.CAMERA_MODE_CMD, CameraMode.Focus);
+            EventManager.instance.post(Events.FOCUS_CHANGE_CMD, sg.getNode("Earth"), true);
+            EventManager.instance.post(Events.GO_TO_OBJECT_CMD);
+        } else {
+            // At 5 AU in Y looking towards origin (top-down look)
+            EventManager.instance.post(Events.CAMERA_MODE_CMD, CameraMode.Free_Camera);
+            EventManager.instance.post(Events.CAMERA_POS_CMD, (Object) new double[] { 0, 5 * Constants.AU_TO_U, 0 });
+            EventManager.instance.post(Events.CAMERA_DIR_CMD, (Object) new double[] { 0, -1, 0 });
+            EventManager.instance.post(Events.CAMERA_UP_CMD, (Object) new double[] { 0, 0, 1 });
+        }
     }
 
     /**
@@ -560,10 +583,12 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
         stereoGui = new StereoGui();
         stereoGui.initialize(manager);
 
-        guis.add(mainGui);
-        guis.add(debugGui);
-        guis.add(spacecraftGui);
-        guis.add(stereoGui);
+        if (guis != null) {
+            guis.add(mainGui);
+            guis.add(debugGui);
+            guis.add(spacecraftGui);
+            guis.add(stereoGui);
+        }
     }
 
     /**
@@ -624,6 +649,7 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
         manager.update();
 
         if (!GlobalConf.runtime.UPDATE_PAUSE) {
+            EventManager.instance.post(Events.FRAME_TICK, frames);
             /*
              * UPDATE
              */
@@ -722,6 +748,7 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
      * @param deltat Delta time in seconds.
      */
     public void update(double deltat) {
+        Timer.instance();
         // The current actual dt in seconds
         double dt;
         if (GlobalConf.frame.RENDER_OUTPUT) {
@@ -872,120 +899,134 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
         return sgr.isOn(cts);
     }
 
-
     @Override
     public void notify(Events event, Object... data) {
         switch (event) {
-            case LOAD_DATA_CMD:
-                // Init components that need assets in data folder
-                reinitialiseGUI1();
-                pp.initialize(manager);
+        case LOAD_DATA_CMD:
+            // Init components that need assets in data folder
+            reinitialiseGUI1();
+            pp.initialize(manager);
 
-                // Initialise loading screen
-                loadingGui = new LoadingGui();
-                loadingGui.initialize(manager);
+            // Initialise loading screen
+            loadingGui = new LoadingGui();
+            loadingGui.initialize(manager);
 
-                Gdx.input.setInputProcessor(loadingGui.getGuiStage());
+            Gdx.input.setInputProcessor(loadingGui.getGuiStage());
 
-                // Also VR
-                if (GlobalConf.runtime.OPENVR) {
-                    loadingGuiVR = new VRGui(LoadingGui.class, 200);
-                    loadingGuiVR.initialize(manager);
-                }
+            // Also VR
+            if (GlobalConf.runtime.OPENVR) {
+                loadingGuiVR = new VRGui(LoadingGui.class, 200);
+                loadingGuiVR.initialize(manager);
+            }
 
-                this.renderProcess = runnableLoadingGui;
+            this.renderProcess = runnableLoadingGui;
 
-                /* LOAD SCENE GRAPH */
-                if (sg == null) {
-                    dataLoadString = TextUtils.concatenate(",", GlobalConf.data.CATALOG_JSON_FILES, GlobalConf.data.OBJECTS_JSON_FILES);
-                    manager.load(dataLoadString, ISceneGraph.class, new SGLoaderParameter(time, GlobalConf.performance.MULTITHREADING, GlobalConf.performance.NUMBER_THREADS()));
-                }
-                break;
-            case TOGGLE_AMBIENT_LIGHT:
-                // TODO No better place to put this??
-                ModelComponent.toggleAmbientLight((Boolean) data[1]);
-                break;
-            case AMBIENT_LIGHT_CMD:
-                ModelComponent.setAmbientLight((float) data[0]);
-                break;
-            case RECORD_CAMERA_CMD:
-                if (data != null) {
-                    camRecording = (Boolean) data[0];
-                } else {
-                    camRecording = !camRecording;
-                }
-                break;
-            case CAMERA_MODE_CMD:
-                // Register/unregister GUI
-                CameraMode mode = (CameraMode) data[0];
-                if (GlobalConf.program.isStereoHalfViewport()) {
-                    GuiRegistry.change(stereoGui);
-                } else if (mode == CameraMode.Spacecraft) {
-                    GuiRegistry.change(spacecraftGui);
-                } else {
-                    GuiRegistry.change(mainGui);
-                }
-                break;
-            case STEREOSCOPIC_CMD:
-                boolean stereoMode = (Boolean) data[0];
-                if (stereoMode && GuiRegistry.current != stereoGui) {
-                    GuiRegistry.change(stereoGui);
-                } else if (!stereoMode && GuiRegistry.previous != stereoGui) {
-                    IGui prev = GuiRegistry.current != null ? GuiRegistry.current : mainGui;
-                    GuiRegistry.change(GuiRegistry.previous, prev);
-                }
-                break;
-            case SCREENSHOT_SIZE_UDPATE:
-            case FRAME_SIZE_UDPATE:
+            /* LOAD SCENE GRAPH */
+            if (sg == null) {
+                dataLoadString = TextUtils.concatenate(",", GlobalConf.data.CATALOG_JSON_FILES, GlobalConf.data.OBJECTS_JSON_FILES);
+                manager.load(dataLoadString, ISceneGraph.class, new SGLoaderParameter(time, GlobalConf.performance.MULTITHREADING, GlobalConf.performance.NUMBER_THREADS()));
+            }
+            break;
+        case TOGGLE_AMBIENT_LIGHT:
+            // TODO No better place to put this??
+            ModelComponent.toggleAmbientLight((Boolean) data[1]);
+            break;
+        case AMBIENT_LIGHT_CMD:
+            ModelComponent.setAmbientLight((float) data[0]);
+            break;
+        case RECORD_CAMERA_CMD:
+            if (data != null) {
+                camRecording = (Boolean) data[0];
+            } else {
+                camRecording = !camRecording;
+            }
+            break;
+        case CAMERA_MODE_CMD:
+            // Register/unregister GUI
+            CameraMode mode = (CameraMode) data[0];
+            if (GlobalConf.program.isStereoHalfViewport()) {
+                GuiRegistry.change(stereoGui);
+            } else if (mode == CameraMode.Spacecraft) {
+                GuiRegistry.change(spacecraftGui);
+            } else {
+                GuiRegistry.change(mainGui);
+            }
+            break;
+        case STEREOSCOPIC_CMD:
+            boolean stereoMode = (Boolean) data[0];
+            if (stereoMode && GuiRegistry.current != stereoGui) {
+                GuiRegistry.change(stereoGui);
+            } else if (!stereoMode && GuiRegistry.previous != stereoGui) {
+                IGui prev = GuiRegistry.current != null ? GuiRegistry.current : mainGui;
+                GuiRegistry.change(GuiRegistry.previous, prev);
+            }
+
+            break;
+        case SCREENSHOT_SIZE_UDPATE:
+        case FRAME_SIZE_UDPATE:
+            Gdx.app.postRunnable(() -> {
+                //clearFrameBufferMap();
+            });
+            break;
+        case SCENE_GRAPH_ADD_OBJECT_CMD:
+            final SceneGraphNode nodeToAdd = (SceneGraphNode) data[0];
+            final boolean addToIndex = data.length == 1 ? true : (Boolean) data[1];
+            if (sg != null) {
                 Gdx.app.postRunnable(() -> {
-                    //clearFrameBufferMap();
+                    try {
+                        sg.insert(nodeToAdd, addToIndex);
+                    } catch (Exception e) {
+                        logger.error(e);
+                    }
                 });
-                break;
-            case SCENE_GRAPH_ADD_OBJECT_CMD:
-                final SceneGraphNode nodeToAdd = (SceneGraphNode) data[0];
-                final boolean addToIndex = data.length == 1 ? true : (Boolean) data[1];
-                if (sg != null) {
-                    Gdx.app.postRunnable(() -> {
-                        try {
-                            sg.insert(nodeToAdd, addToIndex);
-                        } catch (Exception e) {
-                            logger.error(e);
-                        }
-                    });
+            }
+            break;
+        case SCENE_GRAPH_ADD_OBJECT_NO_POST_CMD:
+            final SceneGraphNode nodeToAddp = (SceneGraphNode) data[0];
+            final boolean addToIndexp = data.length == 1 ? true : (Boolean) data[1];
+            if (sg != null) {
+                try {
+                    sg.insert(nodeToAddp, addToIndexp);
+                } catch (Exception e) {
+                    logger.error(e);
                 }
-                break;
-            case SCENE_GRAPH_REMOVE_OBJECT_CMD:
-                SceneGraphNode aux;
-                if (data[0] instanceof String) {
-                    aux = sg.getNode((String) data[0]);
-                    if (aux == null)
-                        return;
-                } else {
-                    aux = (SceneGraphNode) data[0];
-                }
-                final SceneGraphNode nodeToRemove = aux;
-                final boolean removeFromIndex = data.length == 1 ? true : (Boolean) data[1];
-                if (sg != null) {
-                    Gdx.app.postRunnable(() -> {
-                        sg.remove(nodeToRemove, removeFromIndex);
-                    });
-                }
-                break;
-            case POST_RUNNABLE:
-                synchronized (runnables) {
-                    runnablesMap.put((String) data[0], (Runnable) data[1]);
-                    runnables.add((Runnable) data[1]);
-                }
-                break;
-            case UNPOST_RUNNABLE:
-                synchronized (runnables) {
-                    Runnable r = runnablesMap.get(data[0]);
-                    runnables.removeValue(r, true);
-                    runnablesMap.remove(data[0]);
-                }
-                break;
-            default:
-                break;
+            }
+            break;
+        case SCENE_GRAPH_REMOVE_OBJECT_CMD:
+            SceneGraphNode aux;
+            if (data[0] instanceof String) {
+                aux = sg.getNode((String) data[0]);
+                if (aux == null)
+                    return;
+            } else {
+                aux = (SceneGraphNode) data[0];
+            }
+            final SceneGraphNode nodeToRemove = aux;
+            final boolean removeFromIndex = data.length == 1 ? true : (Boolean) data[1];
+            if (sg != null) {
+                Gdx.app.postRunnable(() -> {
+                    sg.remove(nodeToRemove, removeFromIndex);
+                });
+            }
+            break;
+        case HOME_CMD:
+            goHome();
+            break;
+        case POST_RUNNABLE:
+            synchronized (runnables) {
+                runnablesMap.put((String) data[0], (Runnable) data[1]);
+                runnables.add((Runnable) data[1]);
+            }
+            break;
+        case UNPOST_RUNNABLE:
+            synchronized (runnables) {
+                Runnable r = runnablesMap.get(data[0]);
+                runnables.removeValue(r, true);
+                runnablesMap.remove(data[0]);
+            }
+            break;
+        default:
+            break;
         }
 
     }

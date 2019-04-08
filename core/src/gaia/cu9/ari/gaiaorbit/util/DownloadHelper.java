@@ -1,3 +1,8 @@
+/*
+ * This file is part of Gaia Sky, which is released under the Mozilla Public License 2.0.
+ * See the file LICENSE.md in the project root for full license details.
+ */
+
 package gaia.cu9.ari.gaiaorbit.util;
 
 import com.badlogic.gdx.Gdx;
@@ -86,7 +91,7 @@ public class DownloadHelper {
                         }
                         is.close();
                         os.close();
-                        logger.info(txt("gui.download.finished", to.path()));
+                        logger.info(I18n.txt("gui.download.finished", to.path()));
 
                         // Run finish runnable
                         if (finish != null) {
@@ -116,7 +121,7 @@ public class DownloadHelper {
 
             @Override
             public void failed(Throwable t) {
-                System.out.println(txt("gui.download.fail"));
+                System.out.println(I18n.txt("gui.download.fail"));
                 if (fail != null)
                     fail.run();
             }
@@ -128,14 +133,6 @@ public class DownloadHelper {
                     cancel.run();
             }
         });
-    }
-
-    protected static String txt(String key) {
-        return I18n.bundle.get(key);
-    }
-
-    protected static String txt(String key, Object... args) {
-        return I18n.bundle.format(key, args);
     }
 
 }

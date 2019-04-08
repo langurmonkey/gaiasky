@@ -1,3 +1,8 @@
+/*
+ * This file is part of Gaia Sky, which is released under the Mozilla Public License 2.0.
+ * See the file LICENSE.md in the project root for full license details.
+ */
+
 package gaia.cu9.ari.gaiaorbit.data.group;
 
 import com.badlogic.gdx.files.FileHandle;
@@ -24,6 +29,7 @@ import java.util.zip.GZIPInputStream;
 
 public abstract class AbstractStarGroupDataProvider implements IStarGroupDataProvider {
     protected static Log logger = Logger.getLogger(AbstractStarGroupDataProvider.class);
+    public static double NEGATIVE_DIST = 1 * Constants.M_TO_U;
 
     protected Array<StarBean> list;
     protected LongMap<double[]> sphericalPositions;
@@ -119,13 +125,13 @@ public abstract class AbstractStarGroupDataProvider implements IStarGroupDataPro
      * @param elems
      */
     protected void initLists(int elems) {
-        list = new Array<StarBean>(elems);
+        list = new Array<>(elems);
     }
 
     protected void initLists() {
         initLists(1000);
-        sphericalPositions = new LongMap<double[]>();
-        colors = new LongMap<float[]>();
+        sphericalPositions = new LongMap<>();
+        colors = new LongMap<>();
     }
 
     /**

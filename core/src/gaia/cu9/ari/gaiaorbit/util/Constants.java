@@ -1,3 +1,8 @@
+/*
+ * This file is part of Gaia Sky, which is released under the Mozilla Public License 2.0.
+ * See the file LICENSE.md in the project root for full license details.
+ */
+
 package gaia.cu9.ari.gaiaorbit.util;
 
 public class Constants {
@@ -150,12 +155,12 @@ public class Constants {
     /** Minimum number factor for proper motion vectors **/
     public static final float MIN_PM_NUM_FACTOR = 1f;
     /** Maximum number factor for proper motion vectors **/
-    public static final float MAX_PM_NUM_FACTOR = 6f;
+    public static final float MAX_PM_NUM_FACTOR = 10f;
 
     /** Minimum length factor for proper motion vectors **/
     public static final float MIN_PM_LEN_FACTOR = 500f;
     /** Maximum length factor for proper motion vectors **/
-    public static final float MAX_PM_LEN_FACTOR = 30000f;
+    public static final float MAX_PM_LEN_FACTOR = 50000f;
 
     /** Minimum angle where the LOD transitions start **/
     public static final float MIN_LOD_TRANS_ANGLE_DEG = 0f;
@@ -177,7 +182,7 @@ public class Constants {
     /** Minimum star minimum opacity **/
     public static final float MIN_STAR_MIN_OPACITY = 0.0f;
     /** Maximum star minimum opacity **/
-    public static final float MAX_STAR_MIN_OPACITY = 0.9f;
+    public static final float MAX_STAR_MIN_OPACITY = 2.0f;
 
     public static final float MIN_BRIGHTNESS = -1.0f;
     public static final float MAX_BRIGHTNESS = 1.0f;

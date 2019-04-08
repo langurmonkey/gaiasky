@@ -1,13 +1,17 @@
+/*
+ * This file is part of Gaia Sky, which is released under the Mozilla Public License 2.0.
+ * See the file LICENSE.md in the project root for full license details.
+ */
+
 package gaia.cu9.ari.gaiaorbit.data.stars;
+
+import com.badlogic.gdx.utils.Array;
+import gaia.cu9.ari.gaiaorbit.scenegraph.CelestialBody;
+import gaia.cu9.ari.gaiaorbit.scenegraph.SceneGraphNode;
 
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.List;
-
-import com.badlogic.gdx.utils.Array;
-
-import gaia.cu9.ari.gaiaorbit.scenegraph.CelestialBody;
-import gaia.cu9.ari.gaiaorbit.scenegraph.SceneGraphNode;
 
 /**
  * Abstract catalog loader with the transformation from spherical to cartesian coordinates
@@ -28,7 +32,7 @@ public abstract class AbstractCatalogLoader {
 
     public void initialize(String[] files) {
         this.files = files;
-        this.filters = new ArrayList<CatalogFilter>(0);
+        this.filters = new ArrayList<>(0);
     }
 
     public abstract Array<? extends SceneGraphNode> loadData() throws FileNotFoundException;

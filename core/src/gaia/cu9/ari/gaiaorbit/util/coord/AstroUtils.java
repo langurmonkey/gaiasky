@@ -1,9 +1,9 @@
-package gaia.cu9.ari.gaiaorbit.util.coord;
+/*
+ * This file is part of Gaia Sky, which is released under the Mozilla Public License 2.0.
+ * See the file LICENSE.md in the project root for full license details.
+ */
 
-import java.time.Instant;
-import java.time.LocalDateTime;
-import java.time.ZoneOffset;
-import java.time.temporal.ChronoField;
+package gaia.cu9.ari.gaiaorbit.util.coord;
 
 import gaia.cu9.ari.gaiaorbit.util.Constants;
 import gaia.cu9.ari.gaiaorbit.util.LruCache;
@@ -14,6 +14,11 @@ import gaia.cu9.ari.gaiaorbit.util.math.ITrigonometry;
 import gaia.cu9.ari.gaiaorbit.util.math.MathManager;
 import gaia.cu9.ari.gaiaorbit.util.math.Vector2d;
 import gaia.cu9.ari.gaiaorbit.util.math.Vector3d;
+
+import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.ZoneOffset;
+import java.time.temporal.ChronoField;
 
 /**
  * Some astronomical goodies to get the position of the Sun, Moon, work out
@@ -699,7 +704,8 @@ public class AstroUtils {
     }
 
     /**
-     * Converts proper motions + radial velocity into a cartesian vector
+     * Converts proper motions + radial velocity into a cartesian vector.
+     * See <a href="http://www.astronexus.com/a-a/motions-long-term">this article</a>.
      * @param mualphastar Mu alpha star, in mas/yr
      * @param mudelta Mu delta, in mas/yr
      * @param radvel Radial velocity in km/s
@@ -725,9 +731,16 @@ public class AstroUtils {
         // +y to delta=0, alpha=90
         // +z to delta=90
         // components in km/s
+
+        /*
+         * vx = (vR cos \delta cos \alpha) - (vTA sin \alpha) - (vTD sin \delta cos \alpha)
+         * vy = (vR cos \delta sin \alpha) + (vTA cos \alpha) - (vTD sin \delta sin \alpha)
+         * vz = vR sin \delta + vTD cos \delta
+         */
         double vx = (radvel * cosdelta * cosalpha) - (vta * sinalpha) - (vtd * sindelta * cosalpha);
         double vy = (radvel * cosdelta * sinalpha) + (vta * cosalpha) - (vtd * sindelta * sinalpha);
-        double vz = (radvel * sinalpha) + (vtd * cosdelta);
+        double vz = (radvel * sindelta) + (vtd * cosdelta);
+
 
         return (new Vector3d(vy, vz, vx)).scl(Constants.KM_TO_U / Nature.S_TO_Y);
 

@@ -1,13 +1,11 @@
 # This script tests the star brightness commands.
 # Created by Toni Sagrista
 
-from gaia.cu9.ari.gaiaorbit.script import EventScriptingInterface
 
-from gaia.cu9.ari.gaiaorbit.event import EventManager
-from gaia.cu9.ari.gaiaorbit.event import Events
+from py4j.java_gateway import JavaGateway, GatewayParameters
 
-
-gs = EventScriptingInterface.instance()
+gateway = JavaGateway(gateway_parameters=GatewayParameters(auto_convert=True))
+gs = gateway.entry_point
 
 gs.setStarBrightness(100.0)
 gs.sleep(2)
@@ -19,3 +17,5 @@ gs.setStarBrightness(30.0)
 gs.sleep(2)
 gs.setStarBrightness(12.0)
 gs.sleep(2)
+
+gateway.close()

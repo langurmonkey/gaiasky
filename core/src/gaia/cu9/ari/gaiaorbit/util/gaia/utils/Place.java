@@ -1,9 +1,14 @@
-package gaia.cu9.ari.gaiaorbit.util.gaia.utils;
+/*
+ * This file is part of Gaia Sky, which is released under the Mozilla Public License 2.0.
+ * See the file LICENSE.md in the project root for full license details.
+ */
 
-import java.util.Random;
+package gaia.cu9.ari.gaiaorbit.util.gaia.utils;
 
 import gaia.cu9.ari.gaiaorbit.util.coord.Coordinates;
 import gaia.cu9.ari.gaiaorbit.util.math.Vector3d;
+
+import java.util.Random;
 
 /**
  * Specifies a celestial position

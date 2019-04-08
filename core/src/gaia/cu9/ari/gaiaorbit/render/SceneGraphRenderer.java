@@ -1,3 +1,8 @@
+/*
+ * This file is part of Gaia Sky, which is released under the Mozilla Public License 2.0.
+ * See the file LICENSE.md in the project root for full license details.
+ */
+
 package gaia.cu9.ari.gaiaorbit.render;
 
 import com.badlogic.gdx.Gdx;
@@ -28,6 +33,7 @@ import gaia.cu9.ari.gaiaorbit.assets.RelativisticShaderProviderLoader.Relativist
 import gaia.cu9.ari.gaiaorbit.event.EventManager;
 import gaia.cu9.ari.gaiaorbit.event.Events;
 import gaia.cu9.ari.gaiaorbit.event.IObserver;
+import gaia.cu9.ari.gaiaorbit.render.ComponentTypes.ComponentType;
 import gaia.cu9.ari.gaiaorbit.render.IPostProcessor.PostProcessBean;
 import gaia.cu9.ari.gaiaorbit.render.system.*;
 import gaia.cu9.ari.gaiaorbit.render.system.AbstractRenderSystem.RenderSystemRunnable;
@@ -37,7 +43,6 @@ import gaia.cu9.ari.gaiaorbit.scenegraph.SceneGraphNode.RenderGroup;
 import gaia.cu9.ari.gaiaorbit.scenegraph.StubModel;
 import gaia.cu9.ari.gaiaorbit.scenegraph.camera.CameraManager.CameraMode;
 import gaia.cu9.ari.gaiaorbit.scenegraph.camera.ICamera;
-import gaia.cu9.ari.gaiaorbit.util.ComponentTypes;
 import gaia.cu9.ari.gaiaorbit.util.GlobalConf;
 import gaia.cu9.ari.gaiaorbit.util.GlobalResources;
 import gaia.cu9.ari.gaiaorbit.util.Logger;
@@ -70,8 +75,6 @@ public class SceneGraphRenderer extends AbstractRenderer implements IProcessRend
     public static long[] times;
     /** Alpha values for each type **/
     public static float[] alphas;
-
-    private AbstractRenderSystem[] pixelRenderSystems;
 
     private ShaderProgram[] starGroupShaders, particleGroupShaders, particleEffectShaders, orbitElemShaders, pointShaders, lineShaders, lineQuadShaders, lineGpuShaders, mwPointShaders, mwOitShaders, mwNebulaShaders, starPointShaders, galShaders, spriteShaders, starBillboardShaders;
     private AssetDescriptor<ShaderProgram>[] starGroupDesc, particleGroupDesc, particleEffectDesc, orbitElemDesc, pointDesc, lineDesc, lineQuadDesc, lineGpuDesc, mwPointDesc, mwOitDesc, mwNebulaDesc, starPointDesc, galDesc, spriteDesc, starBillboardDesc;
@@ -190,8 +193,6 @@ public class SceneGraphRenderer extends AbstractRenderer implements IProcessRend
         manager.load("font/font-titles.fnt", BitmapFont.class, bfp);
 
         stars = new Array<>();
-
-        pixelRenderSystems = new AbstractRenderSystem[3];
 
         renderProcesses = new Array<>();
 
@@ -1185,11 +1186,12 @@ public class SceneGraphRenderer extends AbstractRenderer implements IProcessRend
             AbstractRenderSystem lineSys = getLineRenderSystem();
             lineSys.setPreRunnable(blendDepthRunnable);
             renderProcesses.insert(idx, lineSys);
+            current.dispose();
         }
     }
 
     private AbstractRenderSystem getLineRenderSystem() {
-        AbstractRenderSystem sys = null;
+        AbstractRenderSystem sys;
         if (GlobalConf.scene.isNormalLineRenderer()) {
             // Normal
             sys = new LineRenderSystem(RenderGroup.LINE, alphas, lineShaders);

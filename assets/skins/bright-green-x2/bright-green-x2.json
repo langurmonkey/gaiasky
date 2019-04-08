@@ -299,6 +299,9 @@
     "preferences": {
       "imageUp": "prefs-icon"
     },
+    "load": {
+      "imageUp": "open-icon"
+    },
     "tutorial": {
       "imageUp": "tutorial-icon"
     },
@@ -444,6 +447,10 @@
     "eye-toggle": {
       "imageUp": "eye-icon",
       "imageChecked": "eye-closed-icon"
+    },
+    "highlight-ds": {
+      "imageUp": "highlight-off",
+      "imageChecked" : "highlight-on"
     },
     "link": {
       "imageUp": "link",

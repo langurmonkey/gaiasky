@@ -1,3 +1,8 @@
+/*
+ * This file is part of Gaia Sky, which is released under the Mozilla Public License 2.0.
+ * See the file LICENSE.md in the project root for full license details.
+ */
+
 package gaia.cu9.ari.gaiaorbit.util.math;
 
 /*******************************************************************************
@@ -16,12 +21,11 @@ package gaia.cu9.ari.gaiaorbit.util.math;
  * limitations under the License.
  ******************************************************************************/
 
-import java.io.Serializable;
-
 import com.badlogic.gdx.math.Quaternion;
 import com.badlogic.gdx.utils.NumberUtils;
-
 import net.jafama.FastMath;
+
+import java.io.Serializable;
 
 /** A simple quaternion class.
  * @see <a href="http://en.wikipedia.org/wiki/Quaternion">http://en.wikipedia.org/wiki/Quaternion</a>

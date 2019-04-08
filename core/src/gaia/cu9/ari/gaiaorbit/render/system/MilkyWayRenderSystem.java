@@ -1,3 +1,8 @@
+/*
+ * This file is part of Gaia Sky, which is released under the Mozilla Public License 2.0.
+ * See the file LICENSE.md in the project root for full license details.
+ */
+
 package gaia.cu9.ari.gaiaorbit.render.system;
 
 import com.badlogic.gdx.Application.ApplicationType;
@@ -37,7 +42,7 @@ public class MilkyWayRenderSystem extends ImmediateRenderSystem implements IObse
     private ModelBatch modelBatch;
 
     public MilkyWayRenderSystem(RenderGroup rg, float[] alphas, ModelBatch modelBatch, ShaderProgram[] pointShaders, ShaderProgram[] nebulaShaders) {
-        super(rg, alphas, pointShaders, 450000);
+        super(rg, alphas, pointShaders);
         this.nebulaShaders = nebulaShaders;
         this.modelBatch = modelBatch;
     }
@@ -62,16 +67,16 @@ public class MilkyWayRenderSystem extends ImmediateRenderSystem implements IObse
     @Override
     protected void initVertices() {
         /** STARS **/
-        meshes = new MeshData[1];
+        meshes = new Array<>();
         curr = new MeshData();
-        meshes[0] = curr;
+        meshes.add(curr);
 
         aux1 = new Vector3();
 
-        maxVertices = 3000000;
+        int nVertices = 3000000;
 
         VertexAttribute[] attribs = buildVertexAttributes();
-        curr.mesh = new Mesh(false, maxVertices, 0, attribs);
+        curr.mesh = new Mesh(false, nVertices, 0, attribs);
 
         curr.vertexSize = curr.mesh.getVertexAttributes().vertexSize / 4;
         curr.colorOffset = curr.mesh.getVertexAttribute(Usage.ColorPacked) != null ? curr.mesh.getVertexAttribute(Usage.ColorPacked).offset / 4 : 0;
@@ -112,9 +117,8 @@ public class MilkyWayRenderSystem extends ImmediateRenderSystem implements IObse
                 curr.clear();
                 float density = GlobalConf.SCALE_FACTOR;
 
-                checkRequiredVerticesSize(mw.starData.size * curr.vertexSize);
-                curr.vertices = vertices;
-
+                ensureTempVertsSize(mw.starData.size * curr.vertexSize);
+                curr.vertices = tempVerts;
                 for (ParticleBean star : mw.starData) {
                     // VERTEX
                     aux1.set((float) star.data[0], (float) star.data[1], (float) star.data[2]);

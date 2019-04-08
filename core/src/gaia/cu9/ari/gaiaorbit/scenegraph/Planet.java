@@ -1,13 +1,18 @@
+/*
+ * This file is part of Gaia Sky, which is released under the Mozilla Public License 2.0.
+ * See the file LICENSE.md in the project root for full license details.
+ */
+
 package gaia.cu9.ari.gaiaorbit.scenegraph;
 
 import com.badlogic.gdx.assets.AssetManager;
+import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.PerspectiveCamera;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g3d.ModelBatch;
 import com.badlogic.gdx.math.Vector3;
-
 import gaia.cu9.ari.gaiaorbit.GaiaSky;
-import gaia.cu9.ari.gaiaorbit.render.ComponentType;
+import gaia.cu9.ari.gaiaorbit.render.ComponentTypes.ComponentType;
 import gaia.cu9.ari.gaiaorbit.render.IAtmosphereRenderable;
 import gaia.cu9.ari.gaiaorbit.render.ICloudRenderable;
 import gaia.cu9.ari.gaiaorbit.render.ILineRenderable;
@@ -233,6 +238,11 @@ public class Planet extends ModelBody implements IAtmosphereRenderable, ICloudRe
     @Override
     public void render(LineRenderSystem renderer, ICamera camera, float alpha) {
         renderer.addLine(this, translation.x, translation.y, translation.z, endLine.x, endLine.y, endLine.z, 1, 0, 0, 1);
+    }
+
+    @Override
+    public int getGlType() {
+        return GL20.GL_LINE_STRIP;
     }
 
     @Override

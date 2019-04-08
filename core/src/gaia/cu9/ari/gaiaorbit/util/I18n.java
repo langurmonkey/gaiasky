@@ -1,3 +1,8 @@
+/*
+ * This file is part of Gaia Sky, which is released under the Mozilla Public License 2.0.
+ * See the file LICENSE.md in the project root for full license details.
+ */
+
 package gaia.cu9.ari.gaiaorbit.util;
 
 import com.badlogic.gdx.Gdx;
@@ -65,6 +70,14 @@ public class I18n {
         } else {
             return new Locale(languageTag);
         }
+    }
+
+    public static String txt(String key){
+        return bundle.get(key);
+    }
+
+    public static String txt(String key, Object... params) {
+        return I18n.bundle.format(key, params);
     }
 
 }

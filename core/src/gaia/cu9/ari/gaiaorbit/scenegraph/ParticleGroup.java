@@ -1,3 +1,8 @@
+/*
+ * This file is part of Gaia Sky, which is released under the Mozilla Public License 2.0.
+ * See the file LICENSE.md in the project root for full license details.
+ */
+
 package gaia.cu9.ari.gaiaorbit.scenegraph;
 
 import com.badlogic.gdx.Gdx;
@@ -6,7 +11,6 @@ import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.PerspectiveCamera;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShaderProgram;
-import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.TimeUtils;
@@ -15,7 +19,7 @@ import gaia.cu9.ari.gaiaorbit.data.group.IParticleGroupDataProvider;
 import gaia.cu9.ari.gaiaorbit.event.EventManager;
 import gaia.cu9.ari.gaiaorbit.event.Events;
 import gaia.cu9.ari.gaiaorbit.event.IObserver;
-import gaia.cu9.ari.gaiaorbit.render.ComponentType;
+import gaia.cu9.ari.gaiaorbit.render.ComponentTypes.ComponentType;
 import gaia.cu9.ari.gaiaorbit.render.I3DTextRenderable;
 import gaia.cu9.ari.gaiaorbit.render.RenderingContext;
 import gaia.cu9.ari.gaiaorbit.render.system.FontRenderSystem;
@@ -31,6 +35,7 @@ import gaia.cu9.ari.gaiaorbit.util.coord.Coordinates;
 import gaia.cu9.ari.gaiaorbit.util.math.Intersectord;
 import gaia.cu9.ari.gaiaorbit.util.math.MathUtilsd;
 import gaia.cu9.ari.gaiaorbit.util.math.Quaterniond;
+import gaia.cu9.ari.gaiaorbit.util.math.Vector2d;
 import gaia.cu9.ari.gaiaorbit.util.math.Vector3d;
 import gaia.cu9.ari.gaiaorbit.util.time.ITimeFrameProvider;
 
@@ -42,18 +47,40 @@ import java.io.Serializable;
  * stay there, so all particles get rendered directly in the GPU from the GPU
  * with no CPU intervention. This allows for much faster rendering. Use this for
  * large groups of particles.
- * 
- * @author tsagrista
  *
+ * @author tsagrista
  */
 public class ParticleGroup extends FadeNode implements I3DTextRenderable, IFocus, IObserver {
     public static class ParticleBean implements Serializable {
         private static final long serialVersionUID = 1L;
 
+        /* INDICES */
+
+        /* doubles */
+        public static final int I_X = 0;
+        public static final int I_Y = 1;
+        public static final int I_Z = 2;
+
         public double[] data;
 
         public ParticleBean(double[] data) {
             this.data = data;
+        }
+
+        public Vector3d pos(Vector3d aux) {
+            return aux.set(x(), y(), z());
+        }
+
+        public double x() {
+            return data[I_X];
+        }
+
+        public double y() {
+            return data[I_Y];
+        }
+
+        public double z() {
+            return data[I_Z];
         }
     }
 
@@ -114,7 +141,7 @@ public class ParticleGroup extends FadeNode implements I3DTextRenderable, IFocus
     /**
      * Position in equatorial coordinates of the current focus
      */
-    Vector2 focusPositionSph;
+    Vector2d focusPositionSph;
 
     /**
      * Focus attributes
@@ -125,6 +152,11 @@ public class ParticleGroup extends FadeNode implements I3DTextRenderable, IFocus
      * Stores the time when the last sort operation finished, in ms
      */
     protected long lastSortTime;
+
+    /**
+     * Geometric centre at epoch, for render sorting
+     */
+    private static Vector3d geomCentre;
 
     /**
      * Reference to the current focus
@@ -139,7 +171,7 @@ public class ParticleGroup extends FadeNode implements I3DTextRenderable, IFocus
         inGpu = false;
         focusIndex = -1;
         focusPosition = new Vector3d();
-        focusPositionSph = new Vector2();
+        focusPositionSph = new Vector2d();
         EventManager.instance.subscribe(this, Events.FOCUS_CHANGED);
     }
 
@@ -177,7 +209,7 @@ public class ParticleGroup extends FadeNode implements I3DTextRenderable, IFocus
 
     /**
      * Returns the data list
-     * 
+     *
      * @return The data list
      */
     public Array<? extends ParticleBean> data() {
@@ -185,8 +217,32 @@ public class ParticleGroup extends FadeNode implements I3DTextRenderable, IFocus
     }
 
     /**
+     * Computes the geometric centre of this data cloud
+     */
+    public Vector3d computeGeomCentre(){
+        return computeGeomCentre(false);
+    }
+
+    /**
+     * Computes the geometric centre of this data cloud
+     * @param forceRecompute Recomputes the geometric centre even if it has been already computed
+     */
+    public Vector3d computeGeomCentre(boolean forceRecompute){
+        if(pointData != null && (forceRecompute || geomCentre == null)){
+            geomCentre = new Vector3d(0,0,0);
+            int n = pointData.size;
+            for(int i =0; i < n; i++){
+                ParticleBean pb = pointData.get(i);
+                geomCentre.add(pb.x(), pb.y(), pb.z());
+            }
+            geomCentre.scl(1d / (double) n);
+        }
+        return geomCentre;
+    }
+
+    /**
      * Number of objects of this group
-     * 
+     *
      * @return The number of objects
      */
     public int size() {
@@ -211,11 +267,9 @@ public class ParticleGroup extends FadeNode implements I3DTextRenderable, IFocus
 
     /**
      * Updates the parameters of the focus, if the focus is active in this group
-     * 
-     * @param time
-     *            The time frame provider
-     * @param camera
-     *            The current camera
+     *
+     * @param time   The time frame provider
+     * @param camera The current camera
      */
     public void updateFocus(ITimeFrameProvider time, ICamera camera) {
 
@@ -291,7 +345,7 @@ public class ParticleGroup extends FadeNode implements I3DTextRenderable, IFocus
 
     @Override
     public float textScale() {
-        return 0.5f;
+        return 0.1f;
     }
 
     @Override
@@ -329,7 +383,7 @@ public class ParticleGroup extends FadeNode implements I3DTextRenderable, IFocus
 
     /**
      * Default size if not in data, 1e5 km
-     * 
+     *
      * @return The size
      */
     public double getFocusSize() {
@@ -369,7 +423,7 @@ public class ParticleGroup extends FadeNode implements I3DTextRenderable, IFocus
 
     /**
      * Adds all the children that are focusable objects to the list.
-     * 
+     *
      * @param list
      */
     public void addFocusableObjects(Array<IFocus> list) {
@@ -402,7 +456,7 @@ public class ParticleGroup extends FadeNode implements I3DTextRenderable, IFocus
     }
 
     // Spherical position for focus info, will be computed
-    public Vector2 getPosSph() {
+    public Vector2d getPosSph() {
         return focusPositionSph;
     }
 
@@ -436,9 +490,8 @@ public class ParticleGroup extends FadeNode implements I3DTextRenderable, IFocus
 
     /**
      * Returns the size of the particle at index i
-     * 
-     * @param i
-     *            The index
+     *
+     * @param i The index
      * @return The size
      */
     public double getSize(int i) {
@@ -470,10 +523,19 @@ public class ParticleGroup extends FadeNode implements I3DTextRenderable, IFocus
         return null;
     }
 
+    public float[] getColor() {
+        return highlighted ? hlColor[hlci] : cc;
+
+    }
+
+    public float highlightedSizeFactor() {
+        return highlighted ? 2f : 1f;
+    }
+
     public void addHit(int screenX, int screenY, int w, int h, int pxdist, NaturalCamera camera, Array<IFocus> hits) {
         int n = pointData.size;
         if (GaiaSky.instance.isOn(ct) && this.opacity > 0) {
-            Array<Pair<Integer, Double>> temporalHits = new Array<Pair<Integer, Double>>();
+            Array<Pair<Integer, Double>> temporalHits = new Array<>();
             for (int i = 0; i < n; i++) {
                 ParticleBean pb = pointData.get(i);
                 Vector3 pos = aux3f1.get();
@@ -511,7 +573,7 @@ public class ParticleGroup extends FadeNode implements I3DTextRenderable, IFocus
                     // Check click distance
                     if (pos.dst(screenX % pcamera.viewportWidth, screenY, pos.z) <= pixelSize) {
                         //Hit
-                        temporalHits.add(new Pair<Integer, Double>(i, angle));
+                        temporalHits.add(new Pair<>(i, angle));
                     }
                 }
             }
@@ -587,7 +649,7 @@ public class ParticleGroup extends FadeNode implements I3DTextRenderable, IFocus
         switch (event) {
         case FOCUS_CHANGED:
             if (data[0] instanceof String) {
-                focusIndex = ((String) data[0]).equals(this.getName()) ? focusIndex : -1;
+                focusIndex = data[0].equals(this.getName()) ? focusIndex : -1;
             } else {
                 focusIndex = data[0] == this ? focusIndex : -1;
             }
@@ -666,17 +728,13 @@ public class ParticleGroup extends FadeNode implements I3DTextRenderable, IFocus
     /**
      * Fetches the real position of the particle. It will apply the necessary
      * integrations (i.e. proper motion).
-     * 
-     * @param pb
-     *            The particle bean
-     * @param campos
-     *            The position of the camera. If null, the camera position is
-     *            not subtracted so that the coordinates are given in the global
-     *            reference system instead of the camera reference system.
-     * @param dest
-     *            The destination fector
-     * @param deltaYears
-     *            The delta years
+     *
+     * @param pb         The particle bean
+     * @param campos     The position of the camera. If null, the camera position is
+     *                   not subtracted so that the coordinates are given in the global
+     *                   reference system instead of the camera reference system.
+     * @param dest       The destination fector
+     * @param deltaYears The delta years
      * @return The vector for chaining
      */
     protected Vector3d fetchPosition(ParticleBean pb, Vector3d campos, Vector3d dest, double deltaYears) {
@@ -688,7 +746,7 @@ public class ParticleGroup extends FadeNode implements I3DTextRenderable, IFocus
 
     /**
      * Returns the delta years to integrate the proper motion.
-     * 
+     *
      * @return
      */
     protected double getDeltaYears() {
@@ -722,7 +780,20 @@ public class ParticleGroup extends FadeNode implements I3DTextRenderable, IFocus
     }
 
     @Override
-    public float getTextOpacity(){
+    public float getTextOpacity() {
         return getOpacity();
     }
+
+    @Override
+    public void highlight(boolean hl) {
+        this.inGpu = this.highlighted == hl;
+        super.highlight(hl);
+    }
+
+    @Override
+    public void highlight(boolean hl, int index){
+        this.inGpu = this.highlighted == hl;
+        super.highlight(hl, index);
+    }
+
 }

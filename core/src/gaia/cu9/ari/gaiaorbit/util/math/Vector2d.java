@@ -1,3 +1,8 @@
+/*
+ * This file is part of Gaia Sky, which is released under the Mozilla Public License 2.0.
+ * See the file LICENSE.md in the project root for full license details.
+ */
+
 package gaia.cu9.ari.gaiaorbit.util.math;
 
 /*******************************************************************************
@@ -62,16 +67,24 @@ public class Vector2d implements Serializable, Vectord<Vector2d> {
         set(v);
     }
 
+    public double x(){
+        return x;
+    }
+
+    public double y(){
+        return y;
+    }
+
     public Vector2d cpy() {
         return new Vector2d(this);
     }
 
     public static double len(double x, double y) {
-        return (double) Math.sqrt(x * x + y * y);
+        return Math.sqrt(x * x + y * y);
     }
 
     public double len() {
-        return (double) Math.sqrt(x * x + y * y);
+        return Math.sqrt(x * x + y * y);
     }
 
     public static double len2(double x, double y) {

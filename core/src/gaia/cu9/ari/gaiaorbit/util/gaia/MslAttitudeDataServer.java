@@ -1,11 +1,16 @@
-package gaia.cu9.ari.gaiaorbit.util.gaia;
+/*
+ * This file is part of Gaia Sky, which is released under the Mozilla Public License 2.0.
+ * See the file LICENSE.md in the project root for full license details.
+ */
 
-import java.util.ArrayList;
-import java.util.List;
+package gaia.cu9.ari.gaiaorbit.util.gaia;
 
 import gaia.cu9.ari.gaiaorbit.util.gaia.time.Duration;
 import gaia.cu9.ari.gaiaorbit.util.gaia.utils.AttitudeUtils;
 import gaia.cu9.ari.gaiaorbit.util.math.Quaterniond;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * This class implements the Modified Scanning Law (MSL) by Hermite
@@ -99,14 +104,7 @@ public class MslAttitudeDataServer extends HermiteInterpolatedAttitudeDataServer
         //this.nativeTimeContext = TimeContext.TCB;
 
         this.msl = msl;
-        if (msl.getHighDensityAreas().length == 0) {
-            // no HD areas - a longer time step can be use
-            // issue 21834: reduced from 1000 s to 125 s
-            maxStepSec = 125.0;
-        } else {
-            // there are HD areas - better use short time step
-            maxStepSec = 125.0;
-        }
+        maxStepSec = 125.0;
         initialized = false;
     }
 

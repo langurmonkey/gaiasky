@@ -1,3 +1,8 @@
+/*
+ * This file is part of Gaia Sky, which is released under the Mozilla Public License 2.0.
+ * See the file LICENSE.md in the project root for full license details.
+ */
+
 package gaia.cu9.ari.gaiaorbit.interfce;
 
 import com.badlogic.gdx.Gdx;
@@ -58,7 +63,7 @@ public class GaiaSkyContextMenu extends ContextMenu {
 
     private void build() {
         if (candidate != null) {
-            MenuItem select = new MenuItem(txt("context.select", cname), skin, "default");
+            MenuItem select = new MenuItem(I18n.txt("context.select", cname), skin, "default");
             select.addListener(event -> {
                 if (event instanceof ChangeEvent) {
                     EventManager.instance.post(Events.CAMERA_MODE_CMD, CameraMode.Focus);
@@ -68,7 +73,7 @@ public class GaiaSkyContextMenu extends ContextMenu {
             });
             addItem(select);
 
-            MenuItem go = new MenuItem(txt("context.goto", cname), skin, "default");
+            MenuItem go = new MenuItem(I18n.txt("context.goto", cname), skin, "default");
             go.addListener(event -> {
                 if (event instanceof ChangeEvent) {
                     candidate.makeFocus();
@@ -81,7 +86,7 @@ public class GaiaSkyContextMenu extends ContextMenu {
             if (candidate instanceof Planet) {
                 addSeparator();
 
-                MenuItem landOn = new MenuItem(txt("context.landon", cname), skin, "default");
+                MenuItem landOn = new MenuItem(I18n.txt("context.landon", cname), skin, "default");
                 landOn.addListener(event -> {
                     if (event instanceof ChangeEvent) {
                         EventManager.instance.post(Events.LAND_ON_OBJECT, candidate);
@@ -97,7 +102,7 @@ public class GaiaSkyContextMenu extends ContextMenu {
                     final Double pointerLon = lonlat[0];
                     final Double pointerLat = lonlat[1];
                     // Add mouse pointer
-                    MenuItem landOnPointer = new MenuItem(txt("context.landatpointer", cname), skin, "default");
+                    MenuItem landOnPointer = new MenuItem(I18n.txt("context.landatpointer", cname), skin, "default");
                     landOnPointer.addListener(event -> {
                         if (event instanceof ChangeEvent) {
                             EventManager.instance.post(Events.LAND_AT_LOCATION_OF_OBJECT, candidate, pointerLon, pointerLat);
@@ -108,7 +113,7 @@ public class GaiaSkyContextMenu extends ContextMenu {
                     addItem(landOnPointer);
                 }
 
-                MenuItem landOnCoord = new MenuItem(txt("context.landatcoord", cname), skin, "default");
+                MenuItem landOnCoord = new MenuItem(I18n.txt("context.landatcoord", cname), skin, "default");
                 landOnCoord.addListener(event -> {
                     if (event instanceof ChangeEvent) {
                         EventManager.instance.post(Events.SHOW_LAND_AT_LOCATION_ACTION, candidate);
@@ -126,7 +131,7 @@ public class GaiaSkyContextMenu extends ContextMenu {
                     addSeparator();
                     sep = true;
 
-                    MenuItem showUncertainties = new MenuItem(txt("context.showuncertainties"), skin, "default");
+                    MenuItem showUncertainties = new MenuItem(I18n.txt("context.showuncertainties"), skin, "default");
                     showUncertainties.addListener(event -> {
                         if (event instanceof ChangeEvent) {
                             EventManager.instance.post(Events.SHOW_UNCERTAINTIES, candidate);
@@ -141,7 +146,7 @@ public class GaiaSkyContextMenu extends ContextMenu {
                     if (!sep)
                         addSeparator();
 
-                    MenuItem hideUncertainties = new MenuItem(txt("context.hideuncertainties"), skin, "default");
+                    MenuItem hideUncertainties = new MenuItem(I18n.txt("context.hideuncertainties"), skin, "default");
                     hideUncertainties.addListener(event -> {
                         if (event instanceof ChangeEvent) {
                             EventManager.instance.post(Events.HIDE_UNCERTAINTIES, candidate);
@@ -164,7 +169,7 @@ public class GaiaSkyContextMenu extends ContextMenu {
             MenuItem rulerAttach0 = null, rulerAttach1 = null;
             if (!cr.hasObject0() && !cr.hasObject1()) {
                 // No objects attached
-                rulerAttach0 = new MenuItem(txt("context.ruler.attach", "0",  cname), skin, "default");
+                rulerAttach0 = new MenuItem(I18n.txt("context.ruler.attach", "0",  cname), skin, "default");
                 rulerAttach0.addListener((ev) -> {
                     if (ev instanceof ChangeEvent) {
                         EventManager.instance.post(Events.RULER_ATTACH_0, cname);
@@ -174,7 +179,7 @@ public class GaiaSkyContextMenu extends ContextMenu {
                 });
             } else if (cr.hasObject0() && !cr.hasObject1()) {
                 // Only 0 is attached
-                rulerAttach1 = new MenuItem(txt("context.ruler.attach", "1",  cname), skin, "default");
+                rulerAttach1 = new MenuItem(I18n.txt("context.ruler.attach", "1",  cname), skin, "default");
                 rulerAttach1.addListener((ev) -> {
                     if (ev instanceof ChangeEvent) {
                         EventManager.instance.post(Events.RULER_ATTACH_1, cname);
@@ -184,7 +189,7 @@ public class GaiaSkyContextMenu extends ContextMenu {
                 });
             } else {
                 // All attached, show both
-                rulerAttach0 = new MenuItem(txt("context.ruler.attach", "0",  cname), skin, "default");
+                rulerAttach0 = new MenuItem(I18n.txt("context.ruler.attach", "0",  cname), skin, "default");
                 rulerAttach0.addListener((ev) -> {
                     if (ev instanceof ChangeEvent) {
                         Gdx.app.postRunnable(() -> {
@@ -194,7 +199,7 @@ public class GaiaSkyContextMenu extends ContextMenu {
                     }
                     return false;
                 });
-                rulerAttach1 = new MenuItem(txt("context.ruler.attach", "1",  cname), skin, "default");
+                rulerAttach1 = new MenuItem(I18n.txt("context.ruler.attach", "1",  cname), skin, "default");
                 rulerAttach1.addListener((ev) -> {
                     if (ev instanceof ChangeEvent) {
                         Gdx.app.postRunnable(() -> {
@@ -232,7 +237,7 @@ public class GaiaSkyContextMenu extends ContextMenu {
 
         if (releffects) {
             // Spawn gravitational waves
-            MenuItem gravWaveStart = new MenuItem(txt("context.startgravwave"), skin, "default");
+            MenuItem gravWaveStart = new MenuItem(I18n.txt("context.startgravwave"), skin, "default");
             gravWaveStart.addListener(event -> {
                 if (event instanceof ChangeEvent) {
                     EventManager.instance.post(Events.GRAV_WAVE_START, screenX, screenY);
@@ -244,7 +249,7 @@ public class GaiaSkyContextMenu extends ContextMenu {
 
             if (RelativisticEffectsManager.getInstance().gravWavesOn()) {
                 // Cancel gravitational waves
-                MenuItem gravWaveStop = new MenuItem(txt("context.stopgravwave"), skin, "default");
+                MenuItem gravWaveStop = new MenuItem(I18n.txt("context.stopgravwave"), skin, "default");
                 gravWaveStop.addListener(event -> {
                     if (event instanceof ChangeEvent) {
                         EventManager.instance.post(Events.GRAV_WAVE_STOP);
@@ -260,7 +265,7 @@ public class GaiaSkyContextMenu extends ContextMenu {
             addSeparator();
         }
         // Quit
-        MenuItem quit = new MenuItem(txt("context.quit"), skin, "default");
+        MenuItem quit = new MenuItem(I18n.txt("context.quit"), skin, "default");
         quit.addListener((event) -> {
             if (event instanceof ChangeEvent) {
                 EventManager.instance.post(Events.SHOW_QUIT_ACTION);
@@ -269,13 +274,5 @@ public class GaiaSkyContextMenu extends ContextMenu {
             return false;
         });
         addItem(quit);
-    }
-
-    protected String txt(String key) {
-        return I18n.bundle.get(key);
-    }
-
-    protected String txt(String key, Object... params) {
-        return I18n.bundle.format(key, params);
     }
 }

@@ -1,14 +1,20 @@
+/*
+ * This file is part of Gaia Sky, which is released under the Mozilla Public License 2.0.
+ * See the file LICENSE.md in the project root for full license details.
+ */
+
 package gaia.cu9.ari.gaiaorbit.scenegraph;
 
 import com.badlogic.gdx.assets.AssetManager;
+import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.g3d.ModelBatch;
-import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
 import gaia.cu9.ari.gaiaorbit.GaiaSky;
 import gaia.cu9.ari.gaiaorbit.event.EventManager;
 import gaia.cu9.ari.gaiaorbit.event.Events;
 import gaia.cu9.ari.gaiaorbit.event.IObserver;
-import gaia.cu9.ari.gaiaorbit.render.ComponentType;
+import gaia.cu9.ari.gaiaorbit.render.ComponentTypes;
+import gaia.cu9.ari.gaiaorbit.render.ComponentTypes.ComponentType;
 import gaia.cu9.ari.gaiaorbit.render.ILineRenderable;
 import gaia.cu9.ari.gaiaorbit.render.IRenderable;
 import gaia.cu9.ari.gaiaorbit.render.RenderingContext;
@@ -16,14 +22,15 @@ import gaia.cu9.ari.gaiaorbit.render.SceneGraphRenderer;
 import gaia.cu9.ari.gaiaorbit.render.system.LineRenderSystem;
 import gaia.cu9.ari.gaiaorbit.scenegraph.camera.FovCamera;
 import gaia.cu9.ari.gaiaorbit.scenegraph.camera.ICamera;
-import gaia.cu9.ari.gaiaorbit.util.ComponentTypes;
 import gaia.cu9.ari.gaiaorbit.util.Constants;
 import gaia.cu9.ari.gaiaorbit.util.GlobalConf;
 import gaia.cu9.ari.gaiaorbit.util.Nature;
 import gaia.cu9.ari.gaiaorbit.util.color.ColourUtils;
 import gaia.cu9.ari.gaiaorbit.util.coord.AstroUtils;
+import gaia.cu9.ari.gaiaorbit.util.math.Vector2d;
 import gaia.cu9.ari.gaiaorbit.util.math.Vector3d;
 import gaia.cu9.ari.gaiaorbit.util.time.ITimeFrameProvider;
+import net.jafama.FastMath;
 
 import java.util.Random;
 
@@ -164,13 +171,13 @@ public class Particle extends CelestialBody implements IStarFocus, ILineRenderab
 
     public Particle(Vector3d pos, float appmag, float absmag, float colorbv, String name, float ra, float dec, long starid) {
         this(pos, appmag, absmag, colorbv, name, starid);
-        this.posSph = new Vector2(ra, dec);
+        this.posSph = new Vector2d(ra, dec);
 
     }
 
     public Particle(Vector3d pos, Vector3 pm, Vector3 pmSph, float appmag, float absmag, float colorbv, String name, float ra, float dec, long starid) {
         this(pos, appmag, absmag, colorbv, name, starid);
-        this.posSph = new Vector2(ra, dec);
+        this.posSph = new Vector2d(ra, dec);
         this.pm.set(pm);
         this.pmSph.set(pmSph);
         this.hasPm = this.pm.len2() != 0;
@@ -313,12 +320,15 @@ public class Particle extends CelestialBody implements IStarFocus, ILineRenderab
 
     @Override
     public float labelSizeConcrete() {
-        return (float) computedSize * LABEL_FACTOR;
+        float textSize = (float) (FastMath.tanh(viewAngle) * distToCamera * 1e5d);
+        float alpha = Math.min((float) FastMath.atan(textSize / distToCamera), 1.e-3f);
+        textSize = (float) (FastMath.tan(alpha) * distToCamera * 0.5d);
+        return textSize * 1e2f;
     }
 
     @Override
     public float textScale() {
-        return 5e-1f;
+        return 0.2f;
     }
 
     @Override
@@ -340,7 +350,8 @@ public class Particle extends CelestialBody implements IStarFocus, ILineRenderab
             }
             computedSize = this.size * (dist / this.radius) * Constants.THRESHOLD_DOWN;
         }
-        computedSize *= GlobalConf.scene.STAR_BRIGHTNESS * 0.14;
+
+        computedSize *= GlobalConf.scene.STAR_BRIGHTNESS * 0.1;
 
         return (float) computedSize;
     }
@@ -361,7 +372,7 @@ public class Particle extends CelestialBody implements IStarFocus, ILineRenderab
     @SuppressWarnings("unchecked")
     @Override
     public <T extends SceneGraphNode> T getSimpleCopy() {
-        Particle copy = (Particle) super.getSimpleCopy();
+        Particle copy = super.getSimpleCopy();
         copy.pm = this.pm;
         copy.hasPm = this.hasPm;
         return (T) copy;
@@ -390,13 +401,18 @@ public class Particle extends CelestialBody implements IStarFocus, ILineRenderab
         renderer.addLine(this, p1.x, p1.y, p1.z, p2.x, p2.y, p2.z, (float) ((pmSph.x - mumin) / maxmin) * 0.8f + 0.2f, (float) ((pmSph.y - mumin) / maxmin) * 0.8f + 0.2f, (float) pmSph.z * 0.8f + 0.2f, alpha * this.opacity);
     }
 
+    @Override
+    public int getGlType() {
+        return GL20.GL_LINES;
+    }
+
     protected float getThOverFactorScl() {
         return fovFactor;
     }
 
     @Override
     protected boolean checkHitCondition() {
-        return ((this.octant == null) || (this.octant != null && this.octant.observed));
+        return this.octant == null || this.octant.observed;
     }
 
     @Override
@@ -407,11 +423,6 @@ public class Particle extends CelestialBody implements IStarFocus, ILineRenderab
     @Override
     public int getHip() {
         return -1;
-    }
-
-    @Override
-    public String getTycho() {
-        return null;
     }
 
     @Override

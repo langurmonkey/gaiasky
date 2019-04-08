@@ -1,9 +1,14 @@
+/*
+ * This file is part of Gaia Sky, which is released under the Mozilla Public License 2.0.
+ * See the file LICENSE.md in the project root for full license details.
+ */
+
 package gaia.cu9.ari.gaiaorbit.render.system;
 
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Mesh;
 import com.badlogic.gdx.graphics.glutils.ShaderProgram;
-
+import com.badlogic.gdx.utils.Array;
 import gaia.cu9.ari.gaiaorbit.scenegraph.SceneGraphNode.RenderGroup;
 import gaia.cu9.ari.gaiaorbit.util.Logger;
 import gaia.cu9.ari.gaiaorbit.util.Logger.Log;
@@ -11,14 +16,11 @@ import gaia.cu9.ari.gaiaorbit.util.Logger.Log;
 public abstract class ImmediateRenderSystem extends AbstractRenderSystem {
     protected static final Log logger = Logger.getLogger(ImmediateRenderSystem.class);
 
-    protected static final int DEFAULT_VERTICES_SIZE = 1500000;
-    protected static final int shortLimit = (int) Math.pow(2, 2 * 8);
-
     protected int meshIdx;
-    protected MeshData[] meshes;
+    protected Array<MeshData> meshes;
     protected MeshData curr;
     // Auxiliary array that holds vertices temporarily
-    protected float[] vertices;
+    protected float[] tempVerts;
 
     protected class MeshData {
 
@@ -37,6 +39,7 @@ public abstract class ImmediateRenderSystem extends AbstractRenderSystem {
         protected short indexVert;
         protected short[] indices;
         protected int numVertices;
+        protected int capacity;
 
         public void clear() {
             vertexIdx = 0;
@@ -44,26 +47,96 @@ public abstract class ImmediateRenderSystem extends AbstractRenderSystem {
             indexVert = 0;
             numVertices = 0;
         }
+
+        public void dispose() {
+            mesh.dispose();
+            vertices = null;
+            indices = null;
+        }
     }
 
-    protected int maxVertices;
+    /**
+     * Creates a new mesh data object and adds it to the first available index
+     * in the meshes array
+     *
+     * @return The index of the new mesh data in meshes
+     */
+    protected int createMeshData() {
+        // look for index
+        int mdi;
+        for (mdi = 0; mdi < meshes.size; mdi++) {
+            if (meshes.get(mdi) == null) {
+                break;
+            }
+        }
+
+        if (mdi >= meshes.size) {
+            meshes.setSize(mdi + 1);
+        }
+
+        meshes.set(mdi, new MeshData());
+        return mdi;
+    }
+
+    /**
+     * Clears the mesh data at the index i
+     *
+     * @param i The index of the mesh data to remove
+     */
+    public void clearMeshData(int i) {
+        try {
+            MeshData md = meshes.get(i);
+            if (md != null && md.mesh != null) {
+                md.dispose();
+                meshes.set(i, null);
+            }
+        }catch(IndexOutOfBoundsException e){
+            // Nothing
+        }
+    }
 
     protected ImmediateRenderSystem(RenderGroup rg, float[] alphas, ShaderProgram[] programs) {
         this(rg, alphas, programs, -1);
     }
 
-    protected ImmediateRenderSystem(RenderGroup rg, float[] alphas, ShaderProgram[] programs, int numVertices) {
+    protected ImmediateRenderSystem(RenderGroup rg, float[] alphas, ShaderProgram[] programs, int tempVertsSize) {
         super(rg, alphas, programs);
         initShaderProgram();
         initVertices();
         meshIdx = 0;
-        if (numVertices > 0)
-            vertices = new float[numVertices];
+        if (tempVertsSize > 0)
+            tempVerts = new float[tempVertsSize];
     }
 
     protected abstract void initShaderProgram();
 
     protected abstract void initVertices();
+
+    public void dispose(){
+        if(meshes != null) {
+            for (int i = 0; i < meshes.size; i++) {
+                MeshData md = meshes.get(i);
+                if (md != null) {
+                    md.dispose();
+                }
+            }
+            meshes.clear();
+        }
+        tempVerts = null;
+        curr = null;
+    }
+
+    /**
+     * This function makes sure that the tempVerts array has at least
+     * the given size. After calling this function, the elements of tempVerts
+     * may have been cleared.
+     * @param size The size to ensure
+     */
+    protected void ensureTempVertsSize(int size){
+        if(tempVerts == null || tempVerts.length < size) {
+            tempVerts = new float[size];
+        }
+    }
 
     public void color(Color color) {
         curr.vertices[curr.vertexIdx + curr.colorOffset] = color.toFloatBits();
@@ -90,10 +163,4 @@ public abstract class ImmediateRenderSystem extends AbstractRenderSystem {
         curr.numVertices++;
     }
 
-    protected void checkRequiredVerticesSize(int requiredSize) {
-        if (vertices.length < requiredSize) {
-            logger.info("Allocating new vertex array: " + vertices.length + " > " + requiredSize);
-            vertices = new float[requiredSize];
-        }
-    }
 }

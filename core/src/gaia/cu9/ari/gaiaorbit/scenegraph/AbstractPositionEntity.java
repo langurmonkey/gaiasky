@@ -1,3 +1,8 @@
+/*
+ * This file is part of Gaia Sky, which is released under the Mozilla Public License 2.0.
+ * See the file LICENSE.md in the project root for full license details.
+ */
+
 package gaia.cu9.ari.gaiaorbit.scenegraph;
 
 import com.badlogic.gdx.Gdx;
@@ -5,9 +10,7 @@ import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShaderProgram;
-import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
-
 import gaia.cu9.ari.gaiaorbit.render.I3DTextRenderable;
 import gaia.cu9.ari.gaiaorbit.render.RenderingContext;
 import gaia.cu9.ari.gaiaorbit.render.RenderingContext.CubemapSide;
@@ -18,6 +21,7 @@ import gaia.cu9.ari.gaiaorbit.util.GlobalResources;
 import gaia.cu9.ari.gaiaorbit.util.Logger;
 import gaia.cu9.ari.gaiaorbit.util.coord.IBodyCoordinates;
 import gaia.cu9.ari.gaiaorbit.util.math.Matrix4d;
+import gaia.cu9.ari.gaiaorbit.util.math.Vector2d;
 import gaia.cu9.ari.gaiaorbit.util.math.Vector3d;
 import gaia.cu9.ari.gaiaorbit.util.time.ITimeFrameProvider;
 import gaia.cu9.ari.gaiaorbit.util.tree.OctreeNode;
@@ -30,11 +34,6 @@ import net.jafama.FastMath;
  *
  */
 public abstract class AbstractPositionEntity extends SceneGraphNode {
-    /**
-     * Overlap factor applied to angle to get the upper boundary when rendering
-     * with shader and model.
-     */
-    public static final float SHADER_MODEL_OVERLAP_FACTOR = 5;
     /**
      * Position of this entity in the local reference system. The units are
      * {@link gaia.cu9.ari.gaiaorbit.util.Constants#U_TO_KM} by default.
@@ -49,7 +48,7 @@ public abstract class AbstractPositionEntity extends SceneGraphNode {
     /**
      * Position in the equatorial system; ra, dec.
      */
-    public Vector2 posSph;
+    public Vector2d posSph;
 
     /**
      * Size factor in internal units.
@@ -91,21 +90,21 @@ public abstract class AbstractPositionEntity extends SceneGraphNode {
         super();
         // Positions
         pos = new Vector3d();
-        posSph = new Vector2();
+        posSph = new Vector2d();
     }
 
     public AbstractPositionEntity(String name, SceneGraphNode parent) {
         super(name, parent);
         // Positions
         pos = new Vector3d();
-        posSph = new Vector2();
+        posSph = new Vector2d();
     }
 
     public AbstractPositionEntity(SceneGraphNode parent) {
         super(parent);
         // Positions
         pos = new Vector3d();
-        posSph = new Vector2();
+        posSph = new Vector2d();
     }
 
     public AbstractPositionEntity(String name) {
@@ -298,7 +297,7 @@ public abstract class AbstractPositionEntity extends SceneGraphNode {
         this.size = (float) size;
     }
 
-    public Vector2 getPosSph() {
+    public Vector2d getPosSph() {
         return posSph;
     }
 
@@ -316,6 +315,10 @@ public abstract class AbstractPositionEntity extends SceneGraphNode {
 
     public void setColor(float[] color) {
         this.cc = color;
+    }
+
+    public OctreeNode getOctant(){
+        return octant;
     }
 
     public Vector3d computeFuturePosition() {

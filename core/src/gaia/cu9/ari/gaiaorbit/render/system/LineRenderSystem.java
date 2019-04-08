@@ -1,3 +1,8 @@
+/*
+ * This file is part of Gaia Sky, which is released under the Mozilla Public License 2.0.
+ * See the file LICENSE.md in the project root for full license details.
+ */
+
 package gaia.cu9.ari.gaiaorbit.render.system;
 
 import com.badlogic.gdx.Gdx;
@@ -20,17 +25,13 @@ import org.lwjgl.opengl.GL11;
 import java.util.Comparator;
 
 public class LineRenderSystem extends ImmediateRenderSystem {
-    protected static final int MAX_VERTICES = 5000000;
-    protected static final int INI_DPOOL_SIZE = 5000;
-    protected static final int MAX_DPOOL_SIZE = 100000;
     protected ICamera camera;
-    protected int glType;
-
     protected Vector3 aux2;
+
+    private ShaderProgram shaderProgram;
 
     public LineRenderSystem(RenderGroup rg, float[] alphas, ShaderProgram[] shaders) {
         super(rg, alphas, shaders, -1);
-        glType = GL20.GL_LINE_STRIP;
         aux2 = new Vector3();
     }
 
@@ -40,23 +41,35 @@ public class LineRenderSystem extends ImmediateRenderSystem {
 
     @Override
     protected void initVertices() {
-        meshes = new MeshData[100000];
-        maxVertices = MAX_VERTICES;
+        meshes = new Array<>();
+        initVertices(meshIdx++);
+    }
 
-        // ORIGINAL LINES
-        curr = new MeshData();
-        meshes[0] = curr;
+    private void initVertices(int index) {
+        if (index >= meshes.size) {
+            meshes.setSize(index + 1);
+        }
+        if (meshes.get(index) == null) {
+            if (index > 0)
+                logger.info("Capacity too small, creating new meshdata: " + curr.capacity);
+            curr = new MeshData();
+            meshes.set(index, curr);
 
-        VertexAttribute[] attribs = buildVertexAttributes();
-        curr.mesh = new Mesh(false, maxVertices, 0, attribs);
+            curr.capacity = 10000;
 
-        curr.vertices = new float[maxVertices * (curr.mesh.getVertexAttributes().vertexSize / 4)];
-        curr.vertexSize = curr.mesh.getVertexAttributes().vertexSize / 4;
-        curr.colorOffset = curr.mesh.getVertexAttribute(Usage.ColorPacked) != null ? curr.mesh.getVertexAttribute(Usage.ColorPacked).offset / 4 : 0;
+            VertexAttribute[] attribs = buildVertexAttributes();
+            curr.mesh = new Mesh(false, curr.capacity, 0, attribs);
+
+            curr.vertexSize = curr.mesh.getVertexAttributes().vertexSize / 4;
+            curr.vertices = new float[curr.capacity * curr.vertexSize];
+            curr.colorOffset = curr.mesh.getVertexAttribute(Usage.ColorPacked) != null ? curr.mesh.getVertexAttribute(Usage.ColorPacked).offset / 4 : 0;
+        } else {
+            curr = meshes.get(index);
+        }
     }
 
     protected VertexAttribute[] buildVertexAttributes() {
-        Array<VertexAttribute> attribs = new Array<VertexAttribute>();
+        Array<VertexAttribute> attribs = new Array<>();
         attribs.add(new VertexAttribute(Usage.Position, 3, ShaderProgram.POSITION_ATTRIBUTE));
         attribs.add(new VertexAttribute(Usage.ColorPacked, 4, ShaderProgram.COLOR_ATTRIBUTE));
 
@@ -77,7 +90,7 @@ public class LineRenderSystem extends ImmediateRenderSystem {
         Gdx.gl20.glEnable(GL20.GL_BLEND);
         Gdx.gl20.glBlendFunc(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA);
 
-        ShaderProgram shaderProgram = getShaderProgram();
+        shaderProgram = getShaderProgram();
 
         shaderProgram.begin();
         shaderProgram.setUniformMatrix("u_projModelView", camera.getCamera().combined);
@@ -89,27 +102,35 @@ public class LineRenderSystem extends ImmediateRenderSystem {
         int size = renderables.size;
         for (int i = 0; i < size; i++) {
             ILineRenderable renderable = (ILineRenderable) renderables.get(i);
-            // Regular
-            Gdx.gl.glLineWidth(renderable.getLineWidth() * GlobalConf.SCALE_FACTOR);
             boolean rend = true;
             // TODO ugly hack
             if (renderable instanceof Particle && !GlobalConf.scene.PROPER_MOTION_VECTORS)
                 rend = false;
-            if (rend)
+            if (rend) {
                 renderable.render(this, camera, getAlpha(renderable));
+            }
 
-            curr.mesh.setVertices(curr.vertices, 0, curr.vertexIdx);
-            curr.mesh.render(shaderProgram, glType);
+            Gdx.gl.glLineWidth(renderable.getLineWidth() * GlobalConf.SCALE_FACTOR);
 
-            curr.clear();
+            for (int md = 0; md < meshIdx; md++) {
+                MeshData meshd = meshes.get(md);
+                meshd.mesh.setVertices(meshd.vertices, 0, meshd.vertexIdx);
+                meshd.mesh.render(shaderProgram, renderable.getGlType());
+
+                meshd.clear();
+            }
         }
         shaderProgram.end();
+
+        // Reset indices
+        meshIdx = 1;
+        curr = meshes.get(0);
     }
 
     /**
      * Breaks current line of points
      */
-    public void breakLine(){
+    public void breakLine() {
 
     }
 
@@ -127,6 +148,12 @@ public class LineRenderSystem extends ImmediateRenderSystem {
     }
 
     public void addLinePostproc(double x0, double y0, double z0, double x1, double y1, double z1, double r, double g, double b, double a) {
+        // Check if 3 more indices fit
+        if (curr.numVertices + 2 >= curr.capacity) {
+            // Create new mesh data
+            initVertices(meshIdx++);
+        }
+
         color(r, g, b, a);
         vertex((float) x0, (float) y0, (float) z0);
         color(r, g, b, a);

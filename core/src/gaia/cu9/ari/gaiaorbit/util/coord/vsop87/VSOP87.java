@@ -1,14 +1,18 @@
-package gaia.cu9.ari.gaiaorbit.util.coord.vsop87;
+/*
+ * This file is part of Gaia Sky, which is released under the Mozilla Public License 2.0.
+ * See the file LICENSE.md in the project root for full license details.
+ */
 
-import java.util.HashMap;
-import java.util.Map;
+package gaia.cu9.ari.gaiaorbit.util.coord.vsop87;
 
 import com.badlogic.gdx.utils.reflect.ClassReflection;
 import com.badlogic.gdx.utils.reflect.ReflectionException;
-
-import gaia.cu9.ari.gaiaorbit.util.TextUtils;
 import gaia.cu9.ari.gaiaorbit.util.Logger;
 import gaia.cu9.ari.gaiaorbit.util.Logger.Log;
+import gaia.cu9.ari.gaiaorbit.util.TextUtils;
+
+import java.util.HashMap;
+import java.util.Map;
 
 public class VSOP87 {
     private static final Log logger = Logger.getLogger(VSOP87.class);

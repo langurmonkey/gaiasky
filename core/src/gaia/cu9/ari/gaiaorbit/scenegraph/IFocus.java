@@ -1,16 +1,21 @@
+/*
+ * This file is part of Gaia Sky, which is released under the Mozilla Public License 2.0.
+ * See the file LICENSE.md in the project root for full license details.
+ */
+
 package gaia.cu9.ari.gaiaorbit.scenegraph;
 
-import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
-
 import gaia.cu9.ari.gaiaorbit.scenegraph.camera.ICamera;
 import gaia.cu9.ari.gaiaorbit.scenegraph.camera.NaturalCamera;
 import gaia.cu9.ari.gaiaorbit.scenegraph.component.RotationComponent;
-import gaia.cu9.ari.gaiaorbit.util.ComponentTypes;
+import gaia.cu9.ari.gaiaorbit.render.ComponentTypes;
 import gaia.cu9.ari.gaiaorbit.util.math.Matrix4d;
 import gaia.cu9.ari.gaiaorbit.util.math.Quaterniond;
+import gaia.cu9.ari.gaiaorbit.util.math.Vector2d;
 import gaia.cu9.ari.gaiaorbit.util.math.Vector3d;
 import gaia.cu9.ari.gaiaorbit.util.time.ITimeFrameProvider;
+import gaia.cu9.ari.gaiaorbit.util.tree.OctreeNode;
 
 /**
  * Contract that all focus objects must implement
@@ -112,7 +117,7 @@ public interface IFocus {
      * 
      * @return The position in alpha, delta
      */
-    Vector2 getPosSph();
+    Vector2d getPosSph();
 
     /**
      * Gets the predicted position of this entity in the next time step in the
@@ -286,6 +291,13 @@ public interface IFocus {
      * @return The depth of the scene graph
      */
     int getSceneGraphDepth();
+
+    /**
+     * Gets the octant this focus belongs to, if any. This will return null
+     * if this focus is not part of an octree
+     * @return The octant this focus belongs to. Null if it is not part of an octree
+     */
+    OctreeNode getOctant();
 
     /**
      * Whether this is a copy or not

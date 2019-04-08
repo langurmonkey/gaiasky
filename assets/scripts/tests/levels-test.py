@@ -1,9 +1,10 @@
 # Test script. Tests brightness and contrast commands.
 # Created by Toni Sagrista
 
-from gaia.cu9.ari.gaiaorbit.script import EventScriptingInterface
+from py4j.java_gateway import JavaGateway, GatewayParameters
 
-gs = EventScriptingInterface.instance()
+gateway = JavaGateway(gateway_parameters=GatewayParameters(auto_convert=True))
+gs = gateway.entry_point
 
 gs.disableInput()
 gs.cameraStop()
@@ -74,3 +75,5 @@ gs.sleep(1)
 gs.setContrastLevel(1.0)
 
 gs.enableInput()
+
+gateway.close()

@@ -1,4 +1,13 @@
+/*
+ * This file is part of Gaia Sky, which is released under the Mozilla Public License 2.0.
+ * See the file LICENSE.md in the project root for full license details.
+ */
+
 package gaia.cu9.ari.gaiaorbit.util.g3d;
+
+import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.math.Vector3;
+import com.badlogic.gdx.utils.IntArray;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -8,10 +17,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
-import com.badlogic.gdx.math.Vector2;
-import com.badlogic.gdx.math.Vector3;
-import com.badlogic.gdx.utils.IntArray;
 
 /**
  * Helper generic class to create icospheres.
@@ -134,11 +139,6 @@ public class IcoSphereCreator extends ModelCreator {
         return indices;
     }
 
-    private void repairTextureWrapSeam() {
-        IntArray indices = detectWrappedUVCoordinates();
-
-    }
-
     public IcoSphereCreator() {
         super();
         this.name = "Icosphere";
@@ -178,12 +178,11 @@ public class IcoSphereCreator extends ModelCreator {
      * @return This creator
      */
     public IcoSphereCreator create(float radius, int divisions, boolean flipNormals, boolean hardEdges) {
-        assert divisions >= 1 : "Recursion level must be greater than 0";
         if (divisions < 1)
             throw new AssertionError("Recursion level must be greater than 0");
         this.flipNormals = flipNormals;
         this.hardEdges = hardEdges;
-        this.middlePointIndexCache = new HashMap<Long, Integer>();
+        this.middlePointIndexCache = new HashMap<>();
 
         // create 12 vertices of a icosahedron
         float t = (float) ((1.0 + Math.sqrt(5.0)) / 2.0);
@@ -204,7 +203,7 @@ public class IcoSphereCreator extends ModelCreator {
         addVertex(new Vector3(-t, 0, 1), radius);
 
         // create 20 triangles of the icosahedron
-        List<IFace> faces = new ArrayList<IFace>();
+        List<IFace> faces = new ArrayList<>();
 
         // 5 faces around point 0
         addFace(faces, flipNormals, 1, 12, 6);
@@ -236,7 +235,7 @@ public class IcoSphereCreator extends ModelCreator {
 
         // refine triangles
         for (int i = 1; i < divisions; i++) {
-            List<IFace> faces2 = new ArrayList<IFace>();
+            List<IFace> faces2 = new ArrayList<>();
             for (IFace tri : faces) {
                 // replace triangle by 4 triangles
                 int a = getMiddlePoint(tri.v()[0], tri.v()[1], radius);

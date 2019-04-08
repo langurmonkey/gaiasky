@@ -1,3 +1,8 @@
+/*
+ * This file is part of Gaia Sky, which is released under the Mozilla Public License 2.0.
+ * See the file LICENSE.md in the project root for full license details.
+ */
+
 package gaia.cu9.ari.gaiaorbit.render.system;
 
 import com.badlogic.gdx.Gdx;
@@ -9,7 +14,6 @@ import com.badlogic.gdx.graphics.glutils.ShaderProgram;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer.ShapeType;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.Array;
-
 import gaia.cu9.ari.gaiaorbit.GaiaSky;
 import gaia.cu9.ari.gaiaorbit.event.EventManager;
 import gaia.cu9.ari.gaiaorbit.event.Events;
@@ -26,36 +30,38 @@ import gaia.cu9.ari.gaiaorbit.util.GlobalConf;
 import gaia.cu9.ari.gaiaorbit.util.Nature;
 import gaia.cu9.ari.gaiaorbit.util.comp.DistToCameraComparator;
 import gaia.cu9.ari.gaiaorbit.util.coord.AstroUtils;
+import gaia.cu9.ari.gaiaorbit.util.math.Vector3d;
+
+import java.util.Comparator;
 
 public class StarGroupRenderSystem extends ImmediateRenderSystem implements IObserver {
     private final double BRIGHTNESS_FACTOR;
-    /**
-     * Hopefully we won't have more than 50000 star groups at once
-     **/
-    private final int N_MESHES = 50000;
 
     private Vector3 aux1;
     private int sizeOffset, pmOffset;
-    private float[] pointAlpha, alphaSizeFovBr;
+    private float[] pointAlpha, alphaSizeFovBr, pointAlphaHl;
+    private ICamera cam;
 
     public StarGroupRenderSystem(RenderGroup rg, float[] alphas, ShaderProgram[] shaders) {
-        super(rg, alphas, shaders, 1500000);
+        super(rg, alphas, shaders);
         BRIGHTNESS_FACTOR = 10;
-        this.comp = new DistToCameraComparator<IRenderable>();
+        this.comp = new DistToCameraComparator<>();
         this.alphaSizeFovBr = new float[4];
-        aux1 = new Vector3();
+        this.pointAlphaHl = new float[]{2, 4};
+        this.aux1 = new Vector3();
+
         EventManager.instance.subscribe(this, Events.STAR_MIN_OPACITY_CMD, Events.DISPOSE_STAR_GROUP_GPU_MESH);
     }
 
     @Override
     protected void initShaderProgram() {
-        pointAlpha = new float[]{GlobalConf.scene.POINT_ALPHA_MIN, GlobalConf.scene.POINT_ALPHA_MIN + GlobalConf.scene.POINT_ALPHA_MAX};
+        pointAlpha = new float[] { GlobalConf.scene.POINT_ALPHA_MIN, GlobalConf.scene.POINT_ALPHA_MIN + GlobalConf.scene.POINT_ALPHA_MAX };
     }
 
     @Override
     protected void initVertices() {
         /** STARS **/
-        meshes = new MeshData[N_MESHES];
+        meshes = new Array<>();
     }
 
     /**
@@ -65,50 +71,17 @@ public class StarGroupRenderSystem extends ImmediateRenderSystem implements IObs
      * @return The index of the new mesh data
      */
     private int addMeshData(int nVertices) {
-        // look for index
-        int mdi;
-        for (mdi = 0; mdi < N_MESHES; mdi++) {
-            if (meshes[mdi] == null) {
-                break;
-            }
-        }
-
-        if (mdi >= N_MESHES) {
-            logger.error("No more free meshes!");
-            return -1;
-        }
-
-        curr = new MeshData();
-        meshes[mdi] = curr;
-
-        maxVertices = nVertices;
+        int mdi = createMeshData();
+        curr = meshes.get(mdi);
 
         VertexAttribute[] attribs = buildVertexAttributes();
-        curr.mesh = new Mesh(false, maxVertices, 0, attribs);
+        curr.mesh = new Mesh(false, nVertices, 0, attribs);
 
         curr.vertexSize = curr.mesh.getVertexAttributes().vertexSize / 4;
         curr.colorOffset = curr.mesh.getVertexAttribute(Usage.ColorPacked) != null ? curr.mesh.getVertexAttribute(Usage.ColorPacked).offset / 4 : 0;
         pmOffset = curr.mesh.getVertexAttribute(Usage.Tangent) != null ? curr.mesh.getVertexAttribute(Usage.Tangent).offset / 4 : 0;
         sizeOffset = curr.mesh.getVertexAttribute(Usage.Generic) != null ? curr.mesh.getVertexAttribute(Usage.Generic).offset / 4 : 0;
         return mdi;
-    }
-
-    /**
-     * Clears the mesh data at the index i
-     *
-     * @param i The index
-     */
-    public void clearMeshData(int i) {
-        assert i >= 0 && i < meshes.length : "Mesh data index out of bounds: " + i + " (n meshes = " + N_MESHES + ")";
-
-        MeshData md = meshes[i];
-
-        if (md != null && md.mesh != null) {
-            md.mesh.dispose();
-            md.vertices = null;
-            md.indices = null;
-            meshes[i] = null;
-        }
     }
 
     @Override
@@ -118,44 +91,44 @@ public class StarGroupRenderSystem extends ImmediateRenderSystem implements IObs
         // Enable point sizes
         Gdx.gl20.glEnable(0x8642);
 
-        // renderables.sort(comp);
+        this.cam = camera;
+        //renderables.sort(comp);
         if (renderables.size > 0) {
+
             for (IRenderable renderable : renderables) {
                 StarGroup starGroup = (StarGroup) renderable;
                 synchronized (starGroup) {
                     if (!starGroup.disposed) {
-                        curr = meshes[starGroup.offset];
                         /**
                          * ADD PARTICLES
                          */
                         if (!starGroup.inGpu) {
-                            starGroup.offset = addMeshData(starGroup.size());
-
-                            checkRequiredVerticesSize(starGroup.size() * curr.vertexSize);
-                            curr.vertices = vertices;
-
-                            for (StarBean p : starGroup.data()) {
+                            int n = starGroup.size();
+                            starGroup.offset = addMeshData(n);
+                            curr = meshes.get(starGroup.offset);
+                            ensureTempVertsSize(n * curr.vertexSize);
+                            for (int i = 0; i < n; i++) {
+                                StarBean p = starGroup.data().get(i);
                                 // COLOR
-                                curr.vertices[curr.vertexIdx + curr.colorOffset] = (float) p.col();
+                                tempVerts[curr.vertexIdx + curr.colorOffset] = starGroup.getColor(i);
 
                                 // SIZE
-                                curr.vertices[curr.vertexIdx + sizeOffset] = (float) (p.size() * Constants.STAR_SIZE_FACTOR);
+                                tempVerts[curr.vertexIdx + sizeOffset] = (float) (p.size() * Constants.STAR_SIZE_FACTOR) * starGroup.highlightedSizeFactor();
 
                                 // POSITION [u]
-                                curr.vertices[curr.vertexIdx] = (float) p.x();
-                                curr.vertices[curr.vertexIdx + 1] = (float) p.y();
-                                curr.vertices[curr.vertexIdx + 2] = (float) p.z();
+                                tempVerts[curr.vertexIdx] = (float) p.x();
+                                tempVerts[curr.vertexIdx + 1] = (float) p.y();
+                                tempVerts[curr.vertexIdx + 2] = (float) p.z();
 
                                 // PROPER MOTION [u/yr]
-                                curr.vertices[curr.vertexIdx + pmOffset] = (float) p.pmx();
-                                curr.vertices[curr.vertexIdx + pmOffset + 1] = (float) p.pmy();
-                                curr.vertices[curr.vertexIdx + pmOffset + 2] = (float) p.pmz();
+                                tempVerts[curr.vertexIdx + pmOffset] = (float) p.pmx();
+                                tempVerts[curr.vertexIdx + pmOffset + 1] = (float) p.pmy();
+                                tempVerts[curr.vertexIdx + pmOffset + 2] = (float) p.pmz();
 
                                 curr.vertexIdx += curr.vertexSize;
                             }
                             starGroup.count = starGroup.size() * curr.vertexSize;
-                            curr.mesh.setVertices(curr.vertices, 0, starGroup.count);
-                            curr.vertices = null;
+                            curr.mesh.setVertices(tempVerts, 0, starGroup.count);
 
                             starGroup.inGpu = true;
 
@@ -164,13 +137,14 @@ public class StarGroupRenderSystem extends ImmediateRenderSystem implements IObs
                         /**
                          * RENDER
                          */
+                        curr = meshes.get(starGroup.offset);
                         if (curr != null) {
                             int fovmode = camera.getMode().getGaiaFovMode();
 
                             ShaderProgram shaderProgram = getShaderProgram();
 
                             shaderProgram.begin();
-                            shaderProgram.setUniform2fv("u_pointAlpha", pointAlpha, 0, 2);
+                            shaderProgram.setUniform2fv("u_pointAlpha", starGroup.isHighlighted() ? pointAlphaHl : pointAlpha, 0, 2);
                             shaderProgram.setUniformMatrix("u_projModelView", camera.getCamera().combined);
                             shaderProgram.setUniformf("u_camPos", camera.getCurrent().getPos().put(aux1));
                             shaderProgram.setUniformf("u_camDir", camera.getCurrent().getCamera().direction);
@@ -181,7 +155,7 @@ public class StarGroupRenderSystem extends ImmediateRenderSystem implements IObs
                             addEffectsUniforms(shaderProgram, camera);
 
                             alphaSizeFovBr[0] = starGroup.opacity * alphas[starGroup.ct.getFirstOrdinal()];
-                            alphaSizeFovBr[1] = fovmode == 0 ? (GlobalConf.scene.STAR_POINT_SIZE * rc.scaleFactor * (GlobalConf.program.isStereoFullWidth() ? 1 : 2)) : (GlobalConf.scene.STAR_POINT_SIZE * rc.scaleFactor * 10);
+                            alphaSizeFovBr[1] = (fovmode == 0 ? (GlobalConf.scene.STAR_POINT_SIZE * rc.scaleFactor * (GlobalConf.program.isStereoFullWidth() ? 1 : 2)) : (GlobalConf.scene.STAR_POINT_SIZE * rc.scaleFactor * 10)) * starGroup.highlightedSizeFactor();
                             alphaSizeFovBr[2] = camera.getFovFactor();
                             alphaSizeFovBr[3] = (float) (GlobalConf.scene.STAR_BRIGHTNESS * BRIGHTNESS_FACTOR);
                             shaderProgram.setUniform4fv("u_alphaSizeFovBr", alphaSizeFovBr, 0, 4);
@@ -213,7 +187,7 @@ public class StarGroupRenderSystem extends ImmediateRenderSystem implements IObs
     }
 
     protected VertexAttribute[] buildVertexAttributes() {
-        Array<VertexAttribute> attribs = new Array<VertexAttribute>();
+        Array<VertexAttribute> attribs = new Array<>();
         attribs.add(new VertexAttribute(Usage.Position, 3, ShaderProgram.POSITION_ATTRIBUTE));
         attribs.add(new VertexAttribute(Usage.Tangent, 3, "a_pm"));
         attribs.add(new VertexAttribute(Usage.ColorPacked, 4, ShaderProgram.COLOR_ATTRIBUTE));
@@ -228,28 +202,52 @@ public class StarGroupRenderSystem extends ImmediateRenderSystem implements IObs
     @Override
     public void notify(Events event, Object... data) {
         switch (event) {
-            case STAR_MIN_OPACITY_CMD:
-                pointAlpha[0] = (float) data[0];
-                pointAlpha[1] = (float) data[0] + GlobalConf.scene.POINT_ALPHA_MAX;
-                for (ShaderProgram p : programs) {
-                    if (p != null && p.isCompiled()) {
-                        Gdx.app.postRunnable(new Runnable() {
-                            @Override
-                            public void run() {
-                                p.begin();
-                                p.setUniform2fv("u_pointAlpha", pointAlpha, 0, 2);
-                                p.end();
-                            }
-                        });
-                    }
+        case STAR_MIN_OPACITY_CMD:
+            pointAlpha[0] = (float) data[0];
+            pointAlpha[1] = (float) data[0] + GlobalConf.scene.POINT_ALPHA_MAX;
+            for (ShaderProgram p : programs) {
+                if (p != null && p.isCompiled()) {
+                    Gdx.app.postRunnable(() -> {
+                        p.begin();
+                        p.setUniform2fv("u_pointAlpha", pointAlpha, 0, 2);
+                        p.end();
+                    });
                 }
-                break;
-            case DISPOSE_STAR_GROUP_GPU_MESH:
-                Integer meshIdx = (Integer) data[0];
-                clearMeshData(meshIdx);
-                break;
-            default:
-                break;
+            }
+            break;
+        case DISPOSE_STAR_GROUP_GPU_MESH:
+            Integer meshIdx = (Integer) data[0];
+            clearMeshData(meshIdx);
+            break;
+        default:
+            break;
+        }
+    }
+
+    /**
+     * Compares highlighted star groups and sorts them according to their geometric
+     * centres. Non-highlighted star groups are rendered last in an undetermined
+     * order.
+     */
+    private class StarGroupGeometricCentreComparator implements Comparator<IRenderable>{
+
+        @Override
+        public int compare(IRenderable ir1, IRenderable ir2) {
+            StarGroup s1 = (StarGroup) ir1;
+            StarGroup s2 = (StarGroup) ir2;
+
+            if(s1.isHighlighted() && !s2.isHighlighted()){
+                return -1;
+            } else if(!s1.isHighlighted() && s2.isHighlighted()){
+                return 1;
+            } else if(!s1.isHighlighted() && !s2.isHighlighted()){
+                return 1;
+            } else {
+                // Both are highlighted, use distances to centres
+                Vector3d s1c = s1.computeGeomCentre();
+                Vector3d s2c = s2.computeGeomCentre();
+                return Double.compare(cam.getPos().dst(s1c), cam.getPos().dst(s2c));
+            }
         }
     }
 

@@ -1,3 +1,8 @@
+/*
+ * This file is part of Gaia Sky, which is released under the Mozilla Public License 2.0.
+ * See the file LICENSE.md in the project root for full license details.
+ */
+
 package gaia.cu9.ari.gaiaorbit.scenegraph.camera;
 
 import com.badlogic.gdx.Gdx;
@@ -5,7 +10,6 @@ import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.graphics.PerspectiveCamera;
 import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Vector3;
-
 import gaia.cu9.ari.gaiaorbit.data.StreamingOctreeLoader;
 import gaia.cu9.ari.gaiaorbit.event.EventManager;
 import gaia.cu9.ari.gaiaorbit.event.Events;
@@ -157,7 +161,7 @@ public class CameraManager implements ICamera, IObserver {
         CameraMode previousMode = this.mode;
         naturalCamera = new NaturalCamera(manager, this);
         fovCamera = new FovCamera(manager, this);
-        spacecraftCamera = new SpacecraftCamera(manager, this);
+        spacecraftCamera = new SpacecraftCamera(this);
         relativisticCamera = new RelativisticCamera(manager, this);
 
         cameras = new ICamera[] { naturalCamera, fovCamera, spacecraftCamera };
