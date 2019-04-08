@@ -29,7 +29,10 @@ import org.apache.commons.compress.utils.IOUtils;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.filefilter.WildcardFileFilter;
 
-import java.io.*;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.RandomAccessFile;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.file.Files;
@@ -91,8 +94,8 @@ public class DownloadDataWindow extends GenericDialog {
         super(I18n.txt("gui.download.title"), skin, stage);
         this.nf = NumberFormatFactory.getFormatter("##0.0");
         this.reader = new JsonReader();
-        this.choiceList = new LinkedList<Trio<JsonValue, OwnCheckBox, OwnLabel>>();
-        this.rubbishes = new Array<OwnImageButton>();
+        this.choiceList = new LinkedList<>();
+        this.rubbishes = new Array<>();
 
         this.dataLocation = dataLocation;
 
@@ -286,8 +289,10 @@ public class DownloadDataWindow extends GenericDialog {
                     // Link
                     if (dataset.has("link")) {
                         String link = dataset.getString("link");
-                        LinkButton imgLink = new LinkButton(link, skin);
-                        descGroup.addActor(imgLink);
+                        if (!link.isEmpty()) {
+                            LinkButton imgLink = new LinkButton(link, skin);
+                            descGroup.addActor(imgLink);
+                        }
                     }
 
                     // Version
@@ -311,7 +316,7 @@ public class DownloadDataWindow extends GenericDialog {
                     typeImage.addListener(new OwnTextTooltip(dataset.getString("type"), skin, 10));
 
                     // Size
-                    String size = "";
+                    String size;
                     try {
                         long bytes = dataset.getLong("size");
                         size = GlobalResources.humanReadableByteCount(bytes, true);
@@ -664,13 +669,13 @@ public class DownloadDataWindow extends GenericDialog {
             // Every 250 ms we update the view
             long current = System.currentTimeMillis();
             long elapsed = current - last;
-            if(elapsed > 250){
-               Gdx.app.postRunnable(()->{
-                   float val = (float) ((fin.getBytesRead() / 1000d) / sizeKb);
-                   b.setText(I18n.txt("gui.download.extracting", nf.format(fin.getBytesRead() / 1000d) + "/" + sizeKbStr + " Kb"));
-                   p.setValue(val * 100);
-               });
-               last = current;
+            if (elapsed > 250) {
+                Gdx.app.postRunnable(() -> {
+                    float val = (float) ((fin.getBytesRead() / 1000d) / sizeKb);
+                    b.setText(I18n.txt("gui.download.extracting", nf.format(fin.getBytesRead() / 1000d) + "/" + sizeKbStr + " Kb"));
+                    p.setValue(val * 100);
+                });
+                last = current;
             }
 
         }
@@ -709,7 +714,7 @@ public class DownloadDataWindow extends GenericDialog {
         Path tempDownload = Paths.get(GlobalConf.data.DATA_LOCATION, "temp.tar.gz");
         if (Files.exists(tempDownload)) {
             //try {
-                //Files.delete(tempDownload);
+            //Files.delete(tempDownload);
             //} catch (IOException e) {
             //    logger.error(e, "Failed cleaning up file: " + tempDownload.toString());
             //}
