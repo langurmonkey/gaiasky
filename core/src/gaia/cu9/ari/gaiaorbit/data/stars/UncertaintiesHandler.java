@@ -1,17 +1,12 @@
-package gaia.cu9.ari.gaiaorbit.data.stars;
+/*
+ * This file is part of Gaia Sky, which is released under the Mozilla Public License 2.0.
+ * See the file LICENSE.md in the project root for full license details.
+ */
 
-import java.io.IOException;
-import java.nio.file.DirectoryStream;
-import java.nio.file.Files;
-import java.nio.file.NoSuchFileException;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.HashSet;
-import java.util.Set;
+package gaia.cu9.ari.gaiaorbit.data.stars;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.utils.Array;
-
 import gaia.cu9.ari.gaiaorbit.GaiaSky;
 import gaia.cu9.ari.gaiaorbit.event.EventManager;
 import gaia.cu9.ari.gaiaorbit.event.Events;
@@ -19,6 +14,11 @@ import gaia.cu9.ari.gaiaorbit.event.IObserver;
 import gaia.cu9.ari.gaiaorbit.scenegraph.IStarFocus;
 import gaia.cu9.ari.gaiaorbit.scenegraph.ParticleGroup;
 import gaia.cu9.ari.gaiaorbit.util.Logger;
+
+import java.io.IOException;
+import java.nio.file.*;
+import java.util.HashSet;
+import java.util.Set;
 
 public class UncertaintiesHandler implements IObserver {
     private static final boolean PRELOAD = true;

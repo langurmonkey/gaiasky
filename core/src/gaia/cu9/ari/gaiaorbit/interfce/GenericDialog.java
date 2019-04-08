@@ -1,3 +1,8 @@
+/*
+ * This file is part of Gaia Sky, which is released under the Mozilla Public License 2.0.
+ * See the file LICENSE.md in the project root for full license details.
+ */
+
 package gaia.cu9.ari.gaiaorbit.interfce;
 
 import com.badlogic.gdx.Input.Keys;
@@ -16,7 +21,6 @@ import com.badlogic.gdx.utils.Array;
 import gaia.cu9.ari.gaiaorbit.event.EventManager;
 import gaia.cu9.ari.gaiaorbit.event.Events;
 import gaia.cu9.ari.gaiaorbit.util.GlobalConf;
-import gaia.cu9.ari.gaiaorbit.util.I18n;
 import gaia.cu9.ari.gaiaorbit.util.scene2d.CollapsibleWindow;
 import gaia.cu9.ari.gaiaorbit.util.scene2d.OwnScrollPane;
 import gaia.cu9.ari.gaiaorbit.util.scene2d.OwnTextButton;
@@ -70,10 +74,18 @@ public abstract class GenericDialog extends CollapsibleWindow {
 
     protected void setAcceptText(String acceptText) {
         this.acceptText = acceptText;
+        if(acceptButton != null) {
+            acceptButton.setText(acceptText);
+            recalculateButtonSize();
+        }
     }
 
     protected void setCancelText(String cancelText) {
         this.cancelText = cancelText;
+        if(cancelButton != null) {
+            cancelButton.setText(cancelText);
+            recalculateButtonSize();
+        }
     }
 
     public void setModal(boolean modal) {
@@ -354,14 +366,6 @@ public abstract class GenericDialog extends CollapsibleWindow {
             if (c != null)
                 c.setDisabled(!enabled);
         }
-    }
-
-    protected static String txt(String key) {
-        return I18n.bundle.get(key);
-    }
-
-    protected static String txt(String key, Object... args) {
-        return I18n.bundle.format(key, args);
     }
 
 }

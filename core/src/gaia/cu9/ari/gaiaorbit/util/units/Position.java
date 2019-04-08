@@ -1,3 +1,8 @@
+/*
+ * This file is part of Gaia Sky, which is released under the Mozilla Public License 2.0.
+ * See the file LICENSE.md in the project root for full license details.
+ */
+
 package gaia.cu9.ari.gaiaorbit.util.units;
 
 import gaia.cu9.ari.gaiaorbit.util.coord.Coordinates;
@@ -48,8 +53,9 @@ public class Position {
      * @param c
      * @param unitC
      * @param type
+     * @throws RuntimeException On negative distance or parallax
      */
-    public Position(double a, String unitA, double b, String unitB, double c, String unitC, PositionType type) {
+    public Position(double a, String unitA, double b, String unitB, double c, String unitC, PositionType type) throws RuntimeException {
         if (Double.isNaN(c)) {
             // Parallax not available
             c = 0.04;
@@ -64,6 +70,10 @@ public class Position {
             Angle lat = new Angle(b, unitB);
             Length dist = new Length(c, unitC);
 
+            if(dist.value_m <= 0){
+                throw new RuntimeException("Negative distance found: " + dist.value_m + " m");
+            }
+
             Coordinates.sphericalToCartesian(lon.get(AngleUnit.RAD), lat.get(AngleUnit.RAD), dist.get(LengthUnit.PC), gsposition);
 
             break;
@@ -72,6 +82,10 @@ public class Position {
             lon = new Angle(a, unitA);
             lat = new Angle(b, unitB);
             dist = new Angle(c, unitC).getParallaxDistance();
+
+            if(dist.value_m <= 0){
+                throw new RuntimeException("Negative parallax found: " + dist.value_m + " m");
+            }
 
             Coordinates.sphericalToCartesian(lon.get(AngleUnit.RAD), lat.get(AngleUnit.RAD), dist.get(LengthUnit.PC), gsposition);
 
@@ -82,6 +96,10 @@ public class Position {
             lat = new Angle(b, unitB);
             dist = new Length(c, unitC);
 
+            if(dist.value_m <= 0){
+                throw new RuntimeException("Negative distance found: " + dist.value_m + " m");
+            }
+
             Coordinates.sphericalToCartesian(lon.get(AngleUnit.RAD), lat.get(AngleUnit.RAD), dist.get(LengthUnit.PC), gsposition);
             gsposition.mul(Coordinates.galToEq());
             break;
@@ -90,6 +108,10 @@ public class Position {
             lon = new Angle(a, unitA);
             lat = new Angle(b, unitB);
             dist = new Angle(c, unitC).getParallaxDistance();
+
+            if(dist.value_m <= 0){
+                throw new RuntimeException("Negative parallax found: " + dist.value_m + " m");
+            }
 
             Coordinates.sphericalToCartesian(lon.get(AngleUnit.RAD), lat.get(AngleUnit.RAD), dist.get(LengthUnit.PC), gsposition);
             gsposition.mul(Coordinates.galToEq());
@@ -100,6 +122,10 @@ public class Position {
             lat = new Angle(b, unitB);
             dist = new Length(c, unitC);
 
+            if(dist.value_m <= 0){
+                throw new RuntimeException("Negative distance found: " + dist.value_m + " m");
+            }
+
             Coordinates.sphericalToCartesian(lon.get(AngleUnit.RAD), lat.get(AngleUnit.RAD), dist.get(LengthUnit.PC), gsposition);
             gsposition.mul(Coordinates.eclToEq());
             break;
@@ -108,6 +134,10 @@ public class Position {
             lon = new Angle(a, unitA);
             lat = new Angle(b, unitB);
             dist = new Angle(c, unitC).getParallaxDistance();
+
+            if(dist.value_m <= 0){
+                throw new RuntimeException("Negative parallax found: " + dist.value_m + " m");
+            }
 
             Coordinates.sphericalToCartesian(lon.get(AngleUnit.RAD), lat.get(AngleUnit.RAD), dist.get(LengthUnit.PC), gsposition);
             gsposition.mul(Coordinates.eclToEq());

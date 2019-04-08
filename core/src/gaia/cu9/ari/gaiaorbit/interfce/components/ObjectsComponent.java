@@ -1,3 +1,8 @@
+/*
+ * This file is part of Gaia Sky, which is released under the Mozilla Public License 2.0.
+ * See the file LICENSE.md in the project root for full license details.
+ */
+
 package gaia.cu9.ari.gaiaorbit.interfce.components;
 
 import com.badlogic.gdx.Gdx;
@@ -58,7 +63,7 @@ public class ObjectsComponent extends GuiComponent implements IObserver {
         searchBox = new OwnTextField("", skin);
         searchBox.setName("search box");
         searchBox.setWidth(componentWidth);
-        searchBox.setMessageText(txt("gui.objects.search"));
+        searchBox.setMessageText(I18n.txt("gui.objects.search"));
         searchBox.addListener(event -> {
             if (event instanceof InputEvent) {
                 InputEvent ie = (InputEvent) event;
@@ -94,13 +99,13 @@ public class ObjectsComponent extends GuiComponent implements IObserver {
             return false;
         });
 
-        /**
+        /*
          * OBJECTS
          */
 
-        treeToModel = new TwoWayHashmap<SceneGraphNode, Node>();
+        treeToModel = new TwoWayHashmap<>();
 
-        logger.info(txt("notif.sgtree.init"));
+        logger.info(I18n.txt("notif.sgtree.init"));
 
         if (tree) {
             final Tree objectsTree = new Tree(skin, "bright");
@@ -154,7 +159,7 @@ public class ObjectsComponent extends GuiComponent implements IObserver {
 
             SceneGraphNode sol = sg.getNode("Sol");
             if (sol != null) {
-                Array<IFocus> solChildren = new Array<IFocus>();
+                Array<IFocus> solChildren = new Array<>();
                 sol.addFocusableObjects(solChildren);
                 solChildren.sort(new CelestialBodyComparator());
                 for (IFocus cb : solChildren)
@@ -186,7 +191,7 @@ public class ObjectsComponent extends GuiComponent implements IObserver {
             });
             objectsList = focusList;
         }
-        logger.info(txt("notif.sgtree.initialised"));
+        logger.info(I18n.txt("notif.sgtree.initialised"));
 
         if (tree || list) {
             focusListScrollPane = new OwnScrollPane(objectsList, skin, "minimalist");
@@ -199,17 +204,17 @@ public class ObjectsComponent extends GuiComponent implements IObserver {
             focusListScrollPane.setWidth(componentWidth);
         }
 
-        /**
+        /*
          * MESHES
          */
-        Group meshesGroup = visibilitySwitcher(MeshObject.class, txt("gui.meshes"), "meshes");
+        Group meshesGroup = visibilitySwitcher(MeshObject.class, I18n.txt("gui.meshes"), "meshes");
 
-        /**
+        /*
          * CONSTELLATIONS
          */
-        Group constelGroup = visibilitySwitcher(Constellation.class, txt("element.constellations"), "constellation");
+        Group constelGroup = visibilitySwitcher(Constellation.class, I18n.txt("element.constellations"), "constellation");
 
-        /**
+        /*
          * ADD TO CONTENT
          */
 
@@ -234,15 +239,16 @@ public class ObjectsComponent extends GuiComponent implements IObserver {
     private Group visibilitySwitcher(Class<? extends FadeNode> clazz, String title, String id) {
         float componentWidth = 160 * GlobalConf.SCALE_FACTOR;
         float sp4 = 4 * GlobalConf.SCALE_FACTOR;
+        float sp8 = 8 * GlobalConf.SCALE_FACTOR;
         VerticalGroup objectsVgroup = new VerticalGroup();
         objectsVgroup.space(sp4);
         objectsVgroup.left();
         objectsVgroup.columnLeft();
-        Array<SceneGraphNode> objects = new Array<SceneGraphNode>();
-        List<OwnCheckBox> cbs = new ArrayList<OwnCheckBox>();
+        Array<SceneGraphNode> objects = new Array<>();
+        List<OwnCheckBox> cbs = new ArrayList<>();
         sg.getRoot().getChildrenByType(clazz, objects);
-        Array<String> names = new Array<String>(objects.size);
-        Map<String, IVisibilitySwitch> cmap = new HashMap<String, IVisibilitySwitch>();
+        Array<String> names = new Array<>(objects.size);
+        Map<String, IVisibilitySwitch> cmap = new HashMap<>();
 
         for (SceneGraphNode object : objects) {
             // Omit stars with no proper names
@@ -296,7 +302,8 @@ public class ObjectsComponent extends GuiComponent implements IObserver {
 
         HorizontalGroup buttons = new HorizontalGroup();
         buttons.space(sp4);
-        OwnTextButton selAll = new OwnTextButton(txt("gui.select.all"), skin);
+        OwnTextButton selAll = new OwnTextButton(I18n.txt("gui.select.all"), skin);
+        selAll.pad(0, sp8, 0, sp8);
         selAll.addListener((event) -> {
             if (event instanceof ChangeEvent) {
                 Gdx.app.postRunnable(() -> {
@@ -306,7 +313,8 @@ public class ObjectsComponent extends GuiComponent implements IObserver {
             }
             return false;
         });
-        OwnTextButton selNone = new OwnTextButton(txt("gui.select.none"), skin);
+        OwnTextButton selNone = new OwnTextButton(I18n.txt("gui.select.none"), skin);
+        selNone.pad(0, sp8, 0, sp8);
         selNone.addListener((event) -> {
             if (event instanceof ChangeEvent) {
                 Gdx.app.postRunnable(() -> {
@@ -328,7 +336,7 @@ public class ObjectsComponent extends GuiComponent implements IObserver {
         group.addActor(scrollPane);
         group.addActor(buttons);
 
-        return objects == null || objects.size == 0 ? null : group;
+        return objects.size == 0 ? null : group;
     }
 
     private Array<Node> createTree(Array<SceneGraphNode> nodes) {

@@ -1,3 +1,8 @@
+/*
+ * This file is part of Gaia Sky, which is released under the Mozilla Public License 2.0.
+ * See the file LICENSE.md in the project root for full license details.
+ */
+
 /*******************************************************************************
  * Copyright 2012 tsagrista
  * 
@@ -18,7 +23,6 @@ package gaia.cu9.ari.gaiaorbit.util.postprocessing.effects;
 
 import com.badlogic.gdx.graphics.glutils.FrameBuffer;
 import com.bitfire.postprocessing.PostProcessorEffect;
-
 import gaia.cu9.ari.gaiaorbit.util.postprocessing.filters.FuzzyFilter;
 
 /** 

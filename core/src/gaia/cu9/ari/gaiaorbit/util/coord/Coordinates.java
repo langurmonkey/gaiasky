@@ -1,13 +1,17 @@
+/*
+ * This file is part of Gaia Sky, which is released under the Mozilla Public License 2.0.
+ * See the file LICENSE.md in the project root for full license details.
+ */
+
 package gaia.cu9.ari.gaiaorbit.util.coord;
 
-import java.util.HashMap;
-import java.util.Map;
-
 import com.badlogic.gdx.math.Matrix4;
-
 import gaia.cu9.ari.gaiaorbit.util.math.Matrix4d;
 import gaia.cu9.ari.gaiaorbit.util.math.Vector2d;
 import gaia.cu9.ari.gaiaorbit.util.math.Vector3d;
+
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Provides utility coordinate conversions between some astronomical coordinate

@@ -1,3 +1,8 @@
+/*
+ * This file is part of Gaia Sky, which is released under the Mozilla Public License 2.0.
+ * See the file LICENSE.md in the project root for full license details.
+ */
+
 package gaia.cu9.ari.gaiaorbit.scenegraph;
 
 import com.badlogic.gdx.Gdx;
@@ -115,8 +120,7 @@ public class CosmicRuler extends AbstractPositionEntity implements I3DTextRender
     @Override
     public void updateLocalValues(ITimeFrameProvider time, ICamera camera) {
         // Update positions
-        rulerOk = true;
-        rulerOk = rulerOk && (sg.getObjectPosition(name0, pos0) != null);
+        rulerOk = (sg.getObjectPosition(name0, pos0) != null);
         rulerOk = rulerOk && (sg.getObjectPosition(name1, pos1) != null);
 
         if (rulerOk) {
@@ -255,4 +259,8 @@ public class CosmicRuler extends AbstractPositionEntity implements I3DTextRender
         }
     }
 
+    @Override
+    public int getGlType() {
+        return GL20.GL_LINES;
+    }
 }

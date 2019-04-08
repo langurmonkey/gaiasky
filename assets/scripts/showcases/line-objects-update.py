@@ -7,63 +7,70 @@
 
 # Created by Toni Sagrista
 
-from gaia.cu9.ari.gaiaorbit.script import EventScriptingInterface
-from gaia.cu9.ari.gaiaorbit.scenegraph import Polyline
-from java.lang import Runnable
+from py4j.java_gateway import JavaGateway, GatewayParameters, CallbackServerParameters
 
-
-
-class LineUpdaterRunnable(Runnable):
+class LineUpdaterRunnable(object):
     def __init__(self, polyline):
         self.polyline = polyline
-        
+
     def run(self):
         earthp = gs.getObjectPosition("Earth")
         moonp = gs.getObjectPosition("Moon")
-        pl = self.polyline.getPolyline()
-            
-        pl.x.set(0, earthp[0])
-        pl.y.set(0, earthp[1])
-        pl.z.set(0, earthp[2])
-        pl.x.set(1, moonp[0])
-        pl.y.set(1, moonp[1])
-        pl.z.set(1, moonp[2])
-        
+        pl = self.polyline.getPointCloud()
+
+        pl.setX(0, earthp[0])
+        pl.setY(0, earthp[1])
+        pl.setZ(0, earthp[2])
+        pl.setX(1, moonp[0])
+        pl.setY(1, moonp[1])
+        pl.setZ(1, moonp[2])
+
         self.polyline.markForUpdate()
 
-gs = EventScriptingInterface.instance()
+    def toString():
+        return "line-update-runnable"
+
+    class Java:
+        implements = ["java.lang.Runnable"]
+
+gateway = JavaGateway(gateway_parameters=GatewayParameters(auto_convert=True),
+                      callback_server_parameters=CallbackServerParameters())
+gs = gateway.entry_point
 
 gs.cameraStop()
 
 gs.stopSimulationTime()
+gs.setVisibility("element.orbits", True)
+gs.setCameraLock(True)
 
 gs.setFov(49)
 
 gs.goToObject("Earth", 91.38e-2)
 
-gs.print("We will now add a line between the Earth and Moon")
-
-gs.sleep(2)
+print("We will now add a line between the Earth and Moon")
 
 earthp = gs.getObjectPosition("Earth")
 moonp = gs.getObjectPosition("Moon")
 
-gs.addPolyline("line-em", earthp + moonp, [ 1., .2, .2, .8 ], 1 )
+gs.addPolyline("line-em", [earthp[0], earthp[1], earthp[2], moonp[0], moonp[1], moonp[2]], [ 1., .2, .2, .8 ], 1 )
 
-gs.sleep(1.0)
+gs.sleep(0.5)
 
+# create line
 line_em = gs.getObject("line-em")
 
+# park the line updater
 gs.parkRunnable("line-updater", LineUpdaterRunnable(line_em))
 
-gs.setSimulationPace(65536.0)
+gs.setSimulationPace(1e5)
 gs.startSimulationTime()
 
-gs.sleep(30)
+gs.sleep(20)
 
 gs.stopSimulationTime()
 
-gs.print("Cleaning up and ending")
+# clean up and finish
+print("Cleaning up and ending")
 
 gs.unparkRunnable("line-updater")
 gs.removeModelObject("line-em")
@@ -71,3 +78,7 @@ gs.cameraStop()
 
 gs.maximizeInterfaceWindow()
 gs.enableInput()
+
+# close connection
+gateway.close()
+

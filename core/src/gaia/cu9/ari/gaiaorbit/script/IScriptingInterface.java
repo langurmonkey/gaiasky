@@ -1,7 +1,14 @@
+/*
+ * This file is part of Gaia Sky, which is released under the Mozilla Public License 2.0.
+ * See the file LICENSE.md in the project root for full license details.
+ */
+
 package gaia.cu9.ari.gaiaorbit.script;
 
 import gaia.cu9.ari.gaiaorbit.scenegraph.IFocus;
 import gaia.cu9.ari.gaiaorbit.scenegraph.SceneGraphNode;
+
+import java.util.List;
 
 /**
  * Scripting interface. Provides an interface to the Gaia Sandbox core and
@@ -15,11 +22,19 @@ public interface IScriptingInterface {
 
     /**
      * Pre-loads the given images as textures for later use. They will be cached
-     * so that they do not need to be loaded in the next use.
+     * for the subsequent uses.
      *
      * @param paths The texture paths.
      */
-    void preloadTextures(String... paths);
+    void preloadTextures(String[] paths);
+
+    /**
+     * Pre-loads the given image as a texture for later use. The texture will
+     * be cached for later use.
+     *
+     * @param path
+     */
+    void preloadTexture(String path);
 
     /**
      * Sets the current time frame to <b>real time</b>. All the commands
@@ -468,7 +483,6 @@ public interface IScriptingInterface {
      */
     void setFov(float newFov);
 
-
     /**
      * Sets the camera state (position, direction and up vector).
      *
@@ -493,7 +507,7 @@ public interface IScriptingInterface {
      * Sets the component described by the given name visible or invisible.
      *
      * @param key     The key of the component, see
-     *                {@link gaia.cu9.ari.gaiaorbit.render.ComponentType}. Usually
+     *                {@link gaia.cu9.ari.gaiaorbit.render.ComponentTypes.ComponentType}. Usually
      *                'element.stars', 'element.moons', 'element.atmospheres', etc.
      *                Proper motion vectors are a special case not listed in component
      *                types. Use the key 'element.propermotions' to that end.
@@ -504,16 +518,43 @@ public interface IScriptingInterface {
     /**
      * Sets the number factor of proper motion vectors that are visible. In [1..100].
      *
-     * @param factor
+     * @param factor Factor in [1..100]
      */
     void setProperMotionsNumberFactor(float factor);
 
     /**
      * Sets the length of the proper motion vectors, in [500..30000].
      *
-     * @param factor
+     * @param factor Factor in [500.30000]
      */
     void setProperMotionsLengthFactor(float factor);
+
+    /**
+     * Sets the color mode of proper motion vectors.
+     * @param mode The color mode:
+     *             <ul>
+     *             <li>0 - direction: the normalised cartesian velocity components XYZ are mapped to the color channels RGB</li>
+     *             <li>1 - magnitude (speed): the magnitude of the velocity vector is mapped using a rainbow scheme (blue-green-yellow-red) with the color map limit at 100 Km/s</li>
+     *             <li>2 - has radial velocity: blue for stars with radial velocity, red for stars without</li>
+     *             <li>3 - redshift from Sun: blue stars have negative radial velocity (from the Sun), red stars have positive radial velocity (from the Sun). Blue is mapped to -100 Km/s, red is mapped to 100 Km/s</li>
+     *             <li>4 - redshift from camera: blue stars have negative radial velocity (from the camera), red stars have positive radial velocity (from the camera). Blue is mapped to -100 Km/s, red is mapped to 100 Km/s</li>
+     *             <li>5 - single color: same color for all velocity vectors</li>
+     *             </ul>
+     */
+    void setProperMotionsColorMode(int mode);
+
+    /**
+     * Overrides the maximum number of proper motion vectors that the program
+     * is allowed to show.
+     * @param maxNumber The maximum number of proper motion vectors. Negative to use default
+     */
+    void setProperMotionsMaxNumber(long maxNumber);
+
+    /**
+     * Returns the current maximum number of proper motion vectors allowed.
+     * @return Max number of pm vectors
+     */
+    long getProperMotionsMaxNumber();
 
     /**
      * Sets the visibility of the crosshair in focus and free modes.
@@ -738,15 +779,26 @@ public interface IScriptingInterface {
     void setFrameOutput(boolean active);
 
     /**
-     * Gets an object by <code>name</code> or id (HIP, TYC, sourceId).
+     * Gets an object from the scene graph by <code>name</code> or id (HIP, TYC, Gaia SourceId).
      *
-     * @param name The name or id (HIP, TYC, sourceId) of the object.
+     * @param name The name or id (HIP, TYC, Gaia SourceId) of the object.
      * @return The object as a
      * {@link gaia.cu9.ari.gaiaorbit.scenegraph.SceneGraphNode}, or null
      * if it does not exist.
      */
     SceneGraphNode getObject(String name);
 
+    /**
+     * Gets an object by <code>name</code> or id (HIP, TYC, Gaia SourceID), optionally waiting
+     * until the object is available, with a timeout.
+     *
+     * @param name The name or id (HIP, TYC, Gaia SourceId) of the object
+     * @param timeOutSeconds The timeout in seconds to wait until returning.
+     *                       If negative, it waits indefinitely.
+     * @return The object if it exists, or null if it does not and block is false, or if block is true and
+     * the timeout has passed.
+     */
+    SceneGraphNode getObject(String name, double timeOutSeconds);
     /**
      * Sets the given size scaling factor to the object identified by
      * <code>name</code>. This method will only work with model objects such as
@@ -1066,9 +1118,9 @@ public interface IScriptingInterface {
      * This function will put the camera in free mode, so make sure to change it afterwards if you need to. Also,
      * this only works with the natural camera.
      *
-     * @param camPos The target camera position in the internal reference system.
-     * @param camDir The target camera direction in the internal reference system.
-     * @param camUp The target camera up in the internal reference system.
+     * @param camPos  The target camera position in the internal reference system.
+     * @param camDir  The target camera direction in the internal reference system.
+     * @param camUp   The target camera up in the internal reference system.
      * @param seconds The duration of the transition in seconds.
      */
     void cameraTransition(double[] camPos, double[] camDir, double[] camUp, double seconds);
@@ -1080,11 +1132,11 @@ public interface IScriptingInterface {
      * This function will put the camera in free mode, so make sure to change it afterwards if you need to. Also,
      * this only works with the natural camera.
      *
-     * @param camPos The target camera position in the internal reference system.
-     * @param camDir The target camera direction in the internal reference system.
-     * @param camUp The target camera up in the internal reference system.
+     * @param camPos  The target camera position in the internal reference system.
+     * @param camDir  The target camera direction in the internal reference system.
+     * @param camUp   The target camera up in the internal reference system.
      * @param seconds The duration of the transition in seconds.
-     * @param sync If true, the call waits for the transition to finish before returning, otherwise it returns immediately
+     * @param sync    If true, the call waits for the transition to finish before returning, otherwise it returns immediately
      */
     void cameraTransition(double[] camPos, double[] camDir, double[] camUp, double seconds, boolean sync);
 
@@ -1103,7 +1155,7 @@ public interface IScriptingInterface {
      *
      * @param frames The number of frames to wait.
      */
-    void sleepFrames(int frames);
+    void sleepFrames(long frames);
 
     /**
      * Expands the component with the given name.
@@ -1329,6 +1381,63 @@ public interface IScriptingInterface {
     void setSmoothLodTransitions(boolean value);
 
     /**
+     * Gets the absolute path of the default directory where the still frames are saved
+     *
+     * @return Absolute path of directory where still frames are saved
+     */
+    String getDefaultFramesDir();
+
+    /**
+     * Gets the absolute path of the default directory where the screenshots are saved
+     *
+     * @return Absolute path of directory where screenshots are saved
+     */
+    String getDefaultScreenshotsDir();
+
+    /**
+     * Gets the absolute path of the default directory where the camera files are saved
+     *
+     * @return Absolute path of directory where camera files are saved
+     */
+    String getDefaultCameraDir();
+
+    /**
+     * Gets the absolute path to the location of the music files
+     *
+     * @return Absolute path to the location of the music files
+     */
+    String getDefaultMusicDir();
+
+    /**
+     * Gets the absolute path to the location of the controller mappings
+     *
+     * @return Absolute path to the location of the controller mappings
+     */
+    String getDefaultMappingsDir();
+
+    /**
+     * Gets the absolute path of the local data directory, configured in your global.properties file
+     *
+     * @return Absolute path to the location of the data files
+     */
+    String getDataDir();
+
+    /**
+     * Gets the absolute path to the location of the configuration directory
+     *
+     * @return Absolute path of config directory
+     */
+    String getConfigDir();
+
+    /**
+     * Returns the default data directory. That is ~/.gaiasky/ in Windows and macOS, and ~/.local/share/gaiasky
+     * in Linux.
+     *
+     * @return Absolute path of data directory
+     */
+    String getLocalDataDir();
+
+    /**
      * Posts a {@link Runnable} to the main loop thread. The runnable runs only once.
      * This will execute the runnable right after the current update-render cycle has finished.
      *
@@ -1354,6 +1463,116 @@ public interface IScriptingInterface {
      * @param id The id of the runnable to remove
      */
     void unparkRunnable(String id);
+
+    /**
+     * Loads a VOTable file (<code>.vot</code>) with a given name.
+     * In this version, the loading happens synchronously, so the catalog is available to Gaia Sky immediately after
+     * this call returns.
+     * The actual loading process is carried out
+     * making educated guesses about semantics using UCDs and column names.
+     * Please check <a href="http://gaia.ari.uni-heidelberg.de/gaiasky/docs/html/latest/SAMP.html#stil-data-provider">the
+     * official documentation</a> for a complete reference on what can and what can't be loaded.
+     *
+     * @param dsName       The name of the dataset, used to identify the subsequent operations on the
+     *                     dataset
+     * @param absolutePath Absolute path to the <code>.vot</code> file to load
+     *
+     * @return False if the dataset could not be loaded, true otherwise
+     */
+    boolean loadDataset(String dsName, String absolutePath);
+
+    /**
+     * Loads a VOTable file (<code>.vot</code>) with a given name.
+     * The call can be made synchronous or asynchronous.<br/>
+     * If <code>sync</code> is true, the call acts exactly like
+     * {@link IScriptingInterface#loadDataset(String, String)}.<br/>
+     * If <code>sync</code> is false, the loading happens
+     * in a new thread and the call returns immediately. In this case, you can use {@link IScriptingInterface#hasDataset(String)}
+     * to check whether the dataset is already loaded and available.
+     * The actual loading process is carried out making educated guesses about semantics using UCDs and column names.
+     * Please check <a href="http://gaia.ari.uni-heidelberg.de/gaiasky/docs/html/latest/SAMP.html#stil-data-provider">the
+     * official documentation</a> for a complete reference on what can and what can't be loaded.
+     *
+     * @param dsName       The name of the dataset, used to identify the subsequent operations on the
+     *                     dataset
+     * @param absolutePath Absolute path to the <code>.vot</code> file to load
+     * @param sync        Whether the load must happen synchronously or asynchronously
+     *
+     * @return False if the dataset could not be loaded (sync mode). True if it could not be loaded (sync mode), or <code>sync</code> is false
+     */
+    boolean loadDataset(String dsName, String absolutePath, boolean sync);
+
+    /**
+     * Removes the dataset identified by the given name, if it exists
+     *
+     * @param dsName The name of the dataset to remove
+     *
+     * @return False if the dataset could not be found
+     */
+    boolean removeDataset(String dsName);
+
+    /**
+     * Hides the dataset identified by the given name, if it exists and is not hidden
+     *
+     * @param dsName The name of the dataset to hide
+     *
+     * @return False if the dataset could not be found
+     */
+    boolean hideDataset(String dsName);
+
+    /**
+     * Returns the names of all datasets currently loaded
+     * @return A list with all the names of the loaded datasets
+     */
+    List<String> listDatasets();
+
+    /**
+     * Checks whether the dataset identified by the given name is loaded
+     * @param dsName The name of the dataset to query
+     * @return True if the dataset is loaded, false otherwise
+     */
+    boolean hasDataset(String dsName);
+
+    /**
+     * Shows (un-hides) the dataset identified by the given name, if it exists and is hidden
+     *
+     * @param dsName The name of the dataset to show
+     *
+     * @return False if the dataset could not be found
+     */
+    boolean showDataset(String dsName);
+
+    /**
+     * Enables or disables the dataset highlight, using a cyclic color which changes every call
+     * @param dsName The dataset name
+     * @param highlight State
+     * @return False if the dataset could not be found
+     */
+    boolean highlightDataset(String dsName, boolean highlight);
+
+    /**
+     * Enables or disables the dataset highlight, using a given color index:
+     * <ul>
+     *     <li>0 - red</li>
+     *     <li>1 - green</li>
+     *     <li>2 - blue</li>
+     *     <li>3 - cyan</li>
+     *     <li>4 - magenta</li>
+     *     <li>5 - yellow</li>
+     * </ul>
+     * @param dsName The dataset name
+     * @param colorIndex Color index in [0..5]
+     * @param highlight State
+     * @return False if the dataset could not be found
+     */
+    boolean highlightDataset(String dsName, int colorIndex, boolean highlight);
+
+    /**
+     * Gets the current frame number. The number begins at 0 for the first frame produced
+     * when Gaia Sky is started and increases continuously.
+     * @return The current frame number
+     */
+    long getFrameNumber();
 
     /**
      * Rotates a 3D vector around the given axis by the specified angle in degrees.
@@ -1395,18 +1614,21 @@ public interface IScriptingInterface {
 
     /**
      * Print text using the internal logging system
+     *
      * @param message The message
      */
     void print(String message);
 
     /**
      * Print text using the internal logging system
+     *
      * @param message The message
      */
     void log(String message);
 
     /**
      * Log an error using the internal logging system
+     *
      * @param message The error message
      */
     void error(String message);

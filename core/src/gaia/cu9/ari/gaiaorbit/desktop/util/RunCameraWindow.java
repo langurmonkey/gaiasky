@@ -1,3 +1,8 @@
+/*
+ * This file is part of Gaia Sky, which is released under the Mozilla Public License 2.0.
+ * See the file LICENSE.md in the project root for full license details.
+ */
+
 package gaia.cu9.ari.gaiaorbit.desktop.util;
 
 import com.badlogic.gdx.Gdx;
@@ -13,6 +18,7 @@ import gaia.cu9.ari.gaiaorbit.event.Events;
 import gaia.cu9.ari.gaiaorbit.interfce.GenericDialog;
 import gaia.cu9.ari.gaiaorbit.util.GlobalConf;
 import gaia.cu9.ari.gaiaorbit.util.GlobalResources;
+import gaia.cu9.ari.gaiaorbit.util.I18n;
 import gaia.cu9.ari.gaiaorbit.util.scene2d.OwnImageButton;
 import gaia.cu9.ari.gaiaorbit.util.scene2d.OwnLabel;
 import gaia.cu9.ari.gaiaorbit.util.scene2d.OwnScrollPane;
@@ -38,10 +44,10 @@ public class RunCameraWindow extends GenericDialog {
     private float pad;
 
     public RunCameraWindow(Stage stg, Skin skin) {
-        super(txt("gui.camera.title"), skin, stg);
+        super(I18n.txt("gui.camera.title"), skin, stg);
 
-        setAcceptText(txt("gui.camera.run"));
-        setCancelText(txt("gui.cancel"));
+        setAcceptText(I18n.txt("gui.camera.run"));
+        setCancelText(I18n.txt("gui.cancel"));
 
         buildSuper();
     }
@@ -53,8 +59,8 @@ public class RunCameraWindow extends GenericDialog {
         HorizontalGroup titlegroup = new HorizontalGroup();
         titlegroup.space(pad);
         ImageButton tooltip = new OwnImageButton(skin, "tooltip");
-        tooltip.addListener(new TextTooltip(txt("gui.tooltip.camera", SysUtils.getDefaultCameraDir()), skin));
-        Label choosetitle = new OwnLabel(txt("gui.camera.choose"), skin, "help-title");
+        tooltip.addListener(new TextTooltip(I18n.txt("gui.tooltip.camera", SysUtils.getDefaultCameraDir()), skin));
+        Label choosetitle = new OwnLabel(I18n.txt("gui.camera.choose"), skin, "help-title");
         titlegroup.addActor(choosetitle);
         titlegroup.addActor(tooltip);
         content.add(titlegroup).align(Align.left).padTop(pad * 2);
@@ -73,7 +79,7 @@ public class RunCameraWindow extends GenericDialog {
 
         Button reload = new OwnTextIconButton("", skin, "reload");
         reload.setName("reload camera files");
-        reload.addListener(new TextTooltip(txt("gui.camera.reload"), skin));
+        reload.addListener(new TextTooltip(I18n.txt("gui.camera.reload"), skin));
         reload.addListener((event) -> {
             if (event instanceof ChangeEvent) {
                 scroll.setActor(generateFileList());
@@ -161,12 +167,12 @@ public class RunCameraWindow extends GenericDialog {
             }
             if (selectedScript != null) {
                 try {
-                    outConsole.setText(txt("gui.camera.ready"));
+                    outConsole.setText(I18n.txt("gui.camera.ready"));
                     outConsole.setColor(0, 1, 0, 1);
                     this.acceptButton.setDisabled(false);
                     me.pack();
                 } catch (Exception e) {
-                    outConsole.setText(txt("gui.camera.error2", e.getMessage()));
+                    outConsole.setText(I18n.txt("gui.camera.error2", e.getMessage()));
                     outConsole.setColor(1, 0, 0, 1);
                     this.acceptButton.setDisabled(true);
                     me.pack();

@@ -1,6 +1,12 @@
+/*
+ * This file is part of Gaia Sky, which is released under the Mozilla Public License 2.0.
+ * See the file LICENSE.md in the project root for full license details.
+ */
+
 package gaia.cu9.ari.gaiaorbit.util.math;
 
 import com.badlogic.gdx.math.*;
+import com.badlogic.gdx.utils.NumberUtils;
 import net.jafama.FastMath;
 
 import java.io.Serializable;
@@ -75,6 +81,17 @@ public class Vector3d implements Serializable, Vectord<Vector3d> {
 		this.set(values[0], values[1], values[2]);
 	}
 
+	public double x(){
+		return x;
+	}
+
+	public double y(){
+		return y;
+	}
+
+	public double z(){
+		return z;
+	}
 	/**
 	 * Sets the vector to the given components
 	 *
@@ -108,10 +125,6 @@ public class Vector3d implements Serializable, Vectord<Vector3d> {
 
 	public Vector3d put(final Vector3d vector) {
 		return vector.set(this.x, this.y, this.z);
-	}
-
-	public Vector3d setZero() {
-		return this.set(0, 0, 0);
 	}
 
 	/**
@@ -715,11 +728,6 @@ public class Vector3d implements Serializable, Vectord<Vector3d> {
 
 
 	@Override
-	public boolean epsilonEquals(Vector3d other, double epsilon) {
-		return false;
-	}
-
-	@Override
 	public Vector3d lerp (final Vector3d target, double alpha) {
 		x += alpha * (target.x - x);
 		y += alpha * (target.y - y);
@@ -878,21 +886,73 @@ public class Vector3d implements Serializable, Vectord<Vector3d> {
 	}
 
 	@Override
-	public boolean equals(Object obj) {
-		if (this == obj)
-			return true;
-		if (obj == null)
-			return false;
-		if (getClass() != obj.getClass())
-			return false;
-		Vector3d other = (Vector3d) obj;
-		if (Double.doubleToLongBits(x) != Double.doubleToLongBits(other.x))
-			return false;
-		if (Double.doubleToLongBits(y) != Double.doubleToLongBits(other.y))
-			return false;
-		if (Double.doubleToLongBits(z) != Double.doubleToLongBits(other.z))
-			return false;
+	public int hashCode () {
+		final long prime = 31;
+		long result = 1;
+		result = prime * result + NumberUtils.doubleToLongBits(x);
+		result = prime * result + NumberUtils.doubleToLongBits(y);
+		result = prime * result + NumberUtils.doubleToLongBits(z);
+		return (int) result;
+	}
+
+	@Override
+	public boolean equals (Object obj) {
+		if (this == obj) return true;
+		if (obj == null) return false;
+		if (getClass() != obj.getClass()) return false;
+		Vector3 other = (Vector3)obj;
+		if (NumberUtils.doubleToLongBits(x) != NumberUtils.doubleToLongBits(other.x)) return false;
+		if (NumberUtils.doubleToLongBits(y) != NumberUtils.doubleToLongBits(other.y)) return false;
+		if (NumberUtils.doubleToLongBits(z) != NumberUtils.doubleToLongBits(other.z)) return false;
 		return true;
+	}
+
+	@Override
+	public boolean epsilonEquals (final Vector3d other, double epsilon) {
+		if (other == null) return false;
+		if (Math.abs(other.x - x) > epsilon) return false;
+		if (Math.abs(other.y - y) > epsilon) return false;
+		if (Math.abs(other.z - z) > epsilon) return false;
+		return true;
+	}
+
+	/** Compares this vector with the other vector, using the supplied epsilon for fuzzy equality testing.
+	 * @return whether the vectors are the same. */
+	public boolean epsilonEquals (float x, float y, float z, float epsilon) {
+		if (Math.abs(x - this.x) > epsilon) return false;
+		if (Math.abs(y - this.y) > epsilon) return false;
+		if (Math.abs(z - this.z) > epsilon) return false;
+		return true;
+	}
+
+	/**
+	 * Compares this vector with the other vector using MathUtils.FLOAT_ROUNDING_ERROR for fuzzy equality testing
+	 *
+	 * @param other other vector to compare
+	 * @return true if vector are equal, otherwise false
+	 */
+	public boolean epsilonEquals (final Vector3d other) {
+		return epsilonEquals(other, MathUtils.FLOAT_ROUNDING_ERROR);
+	}
+
+	/**
+	 * Compares this vector with the other vector using MathUtils.FLOAT_ROUNDING_ERROR for fuzzy equality testing
+	 *
+	 * @param x x component of the other vector to compare
+	 * @param y y component of the other vector to compare
+	 * @param z z component of the other vector to compare
+	 * @return true if vector are equal, otherwise false
+	 */
+	public boolean epsilonEquals (float x, float y, float z) {
+		return epsilonEquals(x, y, z, MathUtils.FLOAT_ROUNDING_ERROR);
+	}
+
+	@Override
+	public Vector3d setZero () {
+		this.x = 0;
+		this.y = 0;
+		this.z = 0;
+		return this;
 	}
 
 }

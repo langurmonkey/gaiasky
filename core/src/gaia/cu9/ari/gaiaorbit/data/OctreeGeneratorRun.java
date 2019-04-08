@@ -1,3 +1,8 @@
+/*
+ * This file is part of Gaia Sky, which is released under the Mozilla Public License 2.0.
+ * See the file LICENSE.md in the project root for full license details.
+ */
+
 package gaia.cu9.ari.gaiaorbit.data;
 
 import com.badlogic.gdx.Gdx;
@@ -7,6 +12,7 @@ import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.TimeUtils;
 import com.beust.jcommander.JCommander;
 import com.beust.jcommander.Parameter;
+import gaia.cu9.ari.gaiaorbit.data.group.AbstractStarGroupDataProvider;
 import gaia.cu9.ari.gaiaorbit.data.group.IStarGroupDataProvider;
 import gaia.cu9.ari.gaiaorbit.data.group.STILDataProvider;
 import gaia.cu9.ari.gaiaorbit.data.octreegen.IStarGroupIO;
@@ -25,6 +31,7 @@ import gaia.cu9.ari.gaiaorbit.interfce.NotificationsInterface;
 import gaia.cu9.ari.gaiaorbit.scenegraph.StarGroup.StarBean;
 import gaia.cu9.ari.gaiaorbit.util.*;
 import gaia.cu9.ari.gaiaorbit.util.Logger.Log;
+import gaia.cu9.ari.gaiaorbit.util.coord.Coordinates;
 import gaia.cu9.ari.gaiaorbit.util.format.DateFormatFactory;
 import gaia.cu9.ari.gaiaorbit.util.format.NumberFormatFactory;
 import gaia.cu9.ari.gaiaorbit.util.math.Vector3d;
@@ -32,9 +39,13 @@ import gaia.cu9.ari.gaiaorbit.util.parse.Parser;
 import gaia.cu9.ari.gaiaorbit.util.tree.OctreeNode;
 
 import java.io.*;
+import java.lang.reflect.InvocationTargetException;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
-import java.util.*;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * Generates an octree of star groups. Each octant should have only one object,
@@ -61,10 +72,10 @@ public class OctreeGeneratorRun {
         }
     }
 
-    @Parameter(names = {"-l", "--loader"}, description = "Name of the star group loader class", required = true)
+    @Parameter(names = {"-l", "--loader"}, description = "Name of the star group loader class")
     private String loaderClass = null;
 
-    @Parameter(names = {"-i", "--input"}, description = "Location of the input catalog", required = true)
+    @Parameter(names = {"-i", "--input"}, description = "Location of the input catalog")
     private String input = null;
 
     @Parameter(names = {"-o", "--output"}, description = "Output folder. Defaults to system temp")
@@ -136,13 +147,13 @@ public class OctreeGeneratorRun {
 
             if (outFolder == null) {
                 outFolder = System.getProperty("java.io.tmpdir");
-            } else {
-                if (!outFolder.endsWith("/"))
-                    outFolder += "/";
-
-                File outfolderFile = new File(outFolder);
-                outfolderFile.mkdirs();
             }
+            if (!outFolder.endsWith("/"))
+                outFolder += "/";
+
+            File outfolderFile = new File(outFolder);
+            outfolderFile.mkdirs();
+
 
             // Assets location
             String ASSETS_LOC = GlobalConf.ASSETS_LOC;
@@ -163,24 +174,26 @@ public class OctreeGeneratorRun {
 
             // Initialize configuration
             File dummyv = new File(ASSETS_LOC + "data/dummyversion");
-            if(!dummyv.exists()){
+            if (!dummyv.exists()) {
                 dummyv = new File(ASSETS_LOC + "dummyversion");
             }
             ConfInit.initialize(new DesktopConfInit(new FileInputStream(new File(ASSETS_LOC + "conf/global.properties")), new FileInputStream(dummyv)));
 
-            generateOctree();
+            OctreeNode root = generateOctree();
 
-            // Save arguments and structure
-            StringBuffer argstr = new StringBuffer();
-            for (int i = 0; i < arguments.length; i++) {
-                argstr.append(arguments[i]).append(" ");
-            }
-            try (PrintStream out = new PrintStream(new FileOutputStream(outFolder + "log"))) {
-                out.print(argstr);
-                out.println();
-                out.println();
-                for (MessageBean msg : NotificationsInterface.getHistorical()) {
-                    out.println(msg.toString());
+            if (root != null) {
+                // Save arguments and structure
+                StringBuffer argstr = new StringBuffer();
+                for (int i = 0; i < arguments.length; i++) {
+                    argstr.append(arguments[i]).append(" ");
+                }
+                try (PrintStream out = new PrintStream(new FileOutputStream(outFolder + "log"))) {
+                    out.print(argstr);
+                    out.println();
+                    out.println();
+                    for (MessageBean msg : NotificationsInterface.getHistorical()) {
+                        out.println(msg.toString());
+                    }
                 }
             }
         } catch (Exception e) {
@@ -190,50 +203,57 @@ public class OctreeGeneratorRun {
         }
     }
 
-    private OctreeNode generateOctree() throws IOException, InstantiationException, IllegalAccessException, ClassNotFoundException {
+    private OctreeNode generateOctree() throws IOException, InstantiationException, IllegalAccessException, ClassNotFoundException, NoSuchMethodException, InvocationTargetException {
         long startMs = TimeUtils.millis();
 
         OctreeGeneratorParams ogp = new OctreeGeneratorParams(maxPart, sunCentre, postprocess, childCount, parentCount);
         //IOctreeGenerator og = new OctreeGeneratorPart(ogp);
         IOctreeGenerator og = new OctreeGeneratorMag(ogp);
 
-        /* CATALOG */
-        String fullLoaderClass = "gaia.cu9.ari.gaiaorbit.data.group." + loaderClass;
-        IStarGroupDataProvider loader = (IStarGroupDataProvider) Class.forName(fullLoaderClass).newInstance();
-        loader.setParallaxErrorFactorFaint(pllxerrfaint);
-        loader.setParallaxErrorFactorBright(pllxerrbright);
-        loader.setParallaxZeroPoint(pllxzeropoint);
-        loader.setFileNumberCap(fileNumCap);
-        loader.setMagCorrections(magCorrections);
-        loader.setDistanceCap(distcap);
-        loader.setGeoDistancesFile(geodistFile);
-        loader.setRUWEFile(ruweFile);
-        loader.setRUWECap(ruwe);
-        long[] cpm = loader.getCountsPerMag();
-
+        Array<StarBean> listLoader = null, list = null;
         Map<Long, Integer> xmatchTable = null;
-        if (addHip && xmatchFile != null && !xmatchFile.isEmpty()) {
-            // Load xmatchTable
-            xmatchTable = readXmatchTable(xmatchFile);
-            if (!xmatchTable.isEmpty()) {
-                // IDs which must be loaded regardless (we need them to update x-matched HIP stars)
-                loader.setMustLoadIds(new HashSet<>(xmatchTable.keySet()));
-            }
-        }
+        long[] cpm = null;
 
-        /* LOAD CATALOG */
-        @SuppressWarnings("unchecked")
-        Array<StarBean> listGaia = (Array<StarBean>) loader.loadData(input);
-        Array<StarBean> list;
+        if (loaderClass != null) {
+            /* CATALOG */
+            String fullLoaderClass = "gaia.cu9.ari.gaiaorbit.data.group." + loaderClass;
+            IStarGroupDataProvider loader = (IStarGroupDataProvider) Class.forName(fullLoaderClass).getDeclaredConstructor().newInstance();
+            loader.setParallaxErrorFactorFaint(pllxerrfaint);
+            loader.setParallaxErrorFactorBright(pllxerrbright);
+            loader.setParallaxZeroPoint(pllxzeropoint);
+            loader.setFileNumberCap(fileNumCap);
+            loader.setMagCorrections(magCorrections);
+            loader.setDistanceCap(distcap);
+            loader.setGeoDistancesFile(geodistFile);
+            loader.setRUWEFile(ruweFile);
+            loader.setRUWECap(ruwe);
+            cpm = loader.getCountsPerMag();
+
+            if (addHip && xmatchFile != null && !xmatchFile.isEmpty()) {
+                // Load xmatchTable
+                xmatchTable = readXmatchTable(xmatchFile);
+                if (!xmatchTable.isEmpty()) {
+                    // IDs which must be loaded regardless (we need them to update x-matched HIP stars)
+                    loader.setMustLoadIds(new HashSet<>(xmatchTable.keySet()));
+                }
+            }
+
+            /* LOAD CATALOG */
+            listLoader = (Array<StarBean>) loader.loadData(input);
+        }
 
         if (addHip) {
             /* HIPPARCOS */
             STILDataProvider stil = new STILDataProvider();
 
             // All hip stars for which we have a Gaia star, bypass plx >= 0 condition in STILDataProvider
-            Set<Long> mustLoad = new HashSet<>();
-            xmatchTable.values().stream().forEach(hip -> mustLoad.add(new Long(hip)));
-            stil.setMustLoadIds(mustLoad);
+            if (xmatchTable != null) {
+                Set<Long> mustLoad = new HashSet<>();
+                for (int hip : xmatchTable.values()) {
+                    mustLoad.add(Long.valueOf(hip));
+                }
+                stil.setMustLoadIds(mustLoad);
+            }
 
             Array<StarBean> listHip = (Array<StarBean>) stil.loadData("data/catalog/hipparcos/hip.vot");
             long[] cpmhip = stil.getCountsPerMag();
@@ -247,45 +267,80 @@ public class OctreeGeneratorRun {
             int hipnum = listHip.size;
             int starhits = 0;
             int notFoundHipStars = 0;
-            for (StarBean gaiaStar : listGaia) {
-                // Check if star is also in HYG catalog
-                if (xmatchTable == null || !xmatchTable.containsKey(gaiaStar.id)) {
-                    // No hit, add to main list
-                    listHip.add(gaiaStar);
-                } else {
-                    // Update hipStar using gaiaStar data
-                    int hipId = xmatchTable.get(gaiaStar.id);
-                    if (hipMap.containsKey(hipId)) {
-                        StarBean hipStar = hipMap.get(hipId);
-                        hipStar.id = gaiaStar.id;
-                        hipStar.data[StarBean.I_X] = gaiaStar.x();
-                        hipStar.data[StarBean.I_Y] = gaiaStar.y();
-                        hipStar.data[StarBean.I_Z] = gaiaStar.z();
-                        hipStar.data[StarBean.I_PMX] = gaiaStar.pmx();
-                        hipStar.data[StarBean.I_PMY] = gaiaStar.pmy();
-                        hipStar.data[StarBean.I_PMZ] = gaiaStar.pmz();
-                        hipStar.data[StarBean.I_MUALPHA] = gaiaStar.mualpha();
-                        hipStar.data[StarBean.I_MUDELTA] = gaiaStar.mudelta();
-                        hipStar.data[StarBean.I_RADVEL] = gaiaStar.radvel();
-                        hipStar.data[StarBean.I_APPMAG] = gaiaStar.appmag();
-                        hipStar.data[StarBean.I_ABSMAG] = gaiaStar.absmag();
-                        hipStar.data[StarBean.I_COL] = gaiaStar.col();
-                        hipStar.data[StarBean.I_SIZE] = gaiaStar.size();
-                        starhits++;
+
+            Vector3d aux1 = new Vector3d();
+            Vector3d aux2 = new Vector3d();
+            if (listLoader != null) {
+                for (StarBean gaiaStar : listLoader) {
+                    // Check if star is also in HYG catalog
+                    if (xmatchTable == null || !xmatchTable.containsKey(gaiaStar.id)) {
+                        // No hit, add to main list
+                        listHip.add(gaiaStar);
                     } else {
-                        notFoundHipStars++;
+                        // Update hipStar using gaiaStar data
+                        int hipId = xmatchTable.get(gaiaStar.id);
+                        if (hipMap.containsKey(hipId)) {
+                            StarBean hipStar = hipMap.get(hipId);
+
+                            // POSITION
+                            double x = gaiaStar.x(), y = gaiaStar.y(), z = gaiaStar.z();
+                            aux1.set(x, y, z);
+                            if (Math.abs(aux1.len() - AbstractStarGroupDataProvider.NEGATIVE_DIST) < 1e-10) {
+                                // Negative distance in Gaia star!
+                                // Use Gaia position, HIP distance
+
+                                // Fetch Gaia RA/DEC
+                                Coordinates.cartesianToSpherical(aux1, aux2);
+                                double gaiaRA = aux2.x;
+                                double gaiaDEC = aux2.y;
+
+                                // Fetch HIP distance
+                                aux1.set(hipStar.x(), hipStar.y(), hipStar.z());
+                                Coordinates.cartesianToSpherical(aux1, aux2);
+                                double hipDIST = aux2.z;
+
+                                // Compute new cartesian position
+                                aux1.set(gaiaRA, gaiaDEC, hipDIST);
+                                Coordinates.sphericalToCartesian(aux1, aux2);
+                                x = aux2.x;
+                                y = aux2.y;
+                                z = aux2.z;
+                            }
+
+                            hipStar.id = gaiaStar.id;
+                            hipStar.data[StarBean.I_X] = x;
+                            hipStar.data[StarBean.I_Y] = y;
+                            hipStar.data[StarBean.I_Z] = z;
+                            hipStar.data[StarBean.I_PMX] = gaiaStar.pmx();
+                            hipStar.data[StarBean.I_PMY] = gaiaStar.pmy();
+                            hipStar.data[StarBean.I_PMZ] = gaiaStar.pmz();
+                            hipStar.data[StarBean.I_MUALPHA] = gaiaStar.mualpha();
+                            hipStar.data[StarBean.I_MUDELTA] = gaiaStar.mudelta();
+                            hipStar.data[StarBean.I_RADVEL] = gaiaStar.radvel();
+                            hipStar.data[StarBean.I_APPMAG] = gaiaStar.appmag();
+                            hipStar.data[StarBean.I_ABSMAG] = gaiaStar.absmag();
+                            hipStar.data[StarBean.I_COL] = gaiaStar.col();
+                            hipStar.data[StarBean.I_SIZE] = gaiaStar.size();
+                            starhits++;
+                        } else {
+                            notFoundHipStars++;
+                        }
                     }
                 }
+                logger.info(starhits + " of " + hipnum + " HIP stars' data updated due to being matched to a Gaia star (" + notFoundHipStars + " not found - negative parallax?)");
+                // Free up some memory
+                listLoader.clear();
             }
-            logger.info(starhits + " of " + hipnum + " HIP stars' data updated due to being matched to a Gaia star (" + notFoundHipStars + " not found - negative parallax?)");
-
             // Main list is listHip
             list = listHip;
 
-            // Free some memory
-            listGaia.clear();
         } else {
-            list = listGaia;
+            list = listLoader;
+        }
+
+        if (list == null || list.isEmpty()) {
+            logger.info("No stars were loaded, please check out the parameters");
+            return null;
         }
 
         long loadingMs = TimeUtils.millis();

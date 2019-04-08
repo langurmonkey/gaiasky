@@ -1,3 +1,8 @@
+/*
+ * This file is part of Gaia Sky, which is released under the Mozilla Public License 2.0.
+ * See the file LICENSE.md in the project root for full license details.
+ */
+
 package gaia.cu9.ari.gaiaorbit.interfce;
 
 import com.badlogic.gdx.Gdx;
@@ -17,10 +22,10 @@ import com.badlogic.gdx.utils.reflect.ReflectionException;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import gaia.cu9.ari.gaiaorbit.desktop.util.MemInfoWindow;
 import gaia.cu9.ari.gaiaorbit.desktop.util.RunCameraWindow;
-import gaia.cu9.ari.gaiaorbit.desktop.util.RunScriptWindow;
 import gaia.cu9.ari.gaiaorbit.event.EventManager;
 import gaia.cu9.ari.gaiaorbit.event.Events;
-import gaia.cu9.ari.gaiaorbit.render.ComponentType;
+import gaia.cu9.ari.gaiaorbit.render.ComponentTypes;
+import gaia.cu9.ari.gaiaorbit.render.ComponentTypes.ComponentType;
 import gaia.cu9.ari.gaiaorbit.scenegraph.CelestialBody;
 import gaia.cu9.ari.gaiaorbit.scenegraph.IFocus;
 import gaia.cu9.ari.gaiaorbit.scenegraph.ISceneGraph;
@@ -54,7 +59,6 @@ public class FullGui extends AbstractGui {
     protected RunStateInterface runStateInterface;
 
     protected SearchDialog searchDialog;
-    protected RunScriptWindow runscriptWindow;
     protected RunCameraWindow runcameraWindow;
     protected MemInfoWindow memInfoWindow;
     protected LogWindow logWindow;
@@ -80,7 +84,7 @@ public class FullGui extends AbstractGui {
 
     @Override
     public void doneLoading(AssetManager assetManager) {
-        logger.info(txt("notif.gui.init"));
+        logger.info(I18n.txt("notif.gui.init"));
 
         skin = GlobalResources.skin;
         interfaces = new Array<IGuiInterface>();
@@ -88,7 +92,7 @@ public class FullGui extends AbstractGui {
         buildGui();
 
         // We must subscribe to the desired events
-        EventManager.instance.subscribe(this, Events.FOV_CHANGED_CMD, Events.SHOW_TUTORIAL_ACTION, Events.SHOW_SEARCH_ACTION, Events.SHOW_RUNSCRIPT_ACTION, Events.SHOW_PLAYCAMERA_ACTION, Events.DISPLAY_MEM_INFO_WINDOW, Events.REMOVE_KEYBOARD_FOCUS, Events.REMOVE_GUI_COMPONENT, Events.ADD_GUI_COMPONENT, Events.SHOW_LOG_ACTION, Events.RA_DEC_UPDATED, Events.LON_LAT_UPDATED, Events.POPUP_MENU_FOCUS, Events.SHOW_LAND_AT_LOCATION_ACTION, Events.DISPLAY_POINTER_COORDS_CMD, Events.TOGGLE_MINIMAP);
+        EventManager.instance.subscribe(this, Events.FOV_CHANGED_CMD, Events.SHOW_TUTORIAL_ACTION, Events.SHOW_SEARCH_ACTION, Events.SHOW_PLAYCAMERA_ACTION, Events.DISPLAY_MEM_INFO_WINDOW, Events.REMOVE_KEYBOARD_FOCUS, Events.REMOVE_GUI_COMPONENT, Events.ADD_GUI_COMPONENT, Events.SHOW_LOG_ACTION, Events.RA_DEC_UPDATED, Events.LON_LAT_UPDATED, Events.POPUP_MENU_FOCUS, Events.SHOW_LAND_AT_LOCATION_ACTION, Events.DISPLAY_POINTER_COORDS_CMD, Events.TOGGLE_MINIMAP);
     }
 
     protected void buildGui() {
@@ -182,13 +186,13 @@ public class FullGui extends AbstractGui {
                             ui.addActor(newVersion);
                         } else {
                             // No new version
-                            logger.info(txt("gui.newversion.nonew", GlobalConf.program.getLastCheckedString()));
+                            logger.info(I18n.txt("gui.newversion.nonew", GlobalConf.program.getLastCheckedString()));
                         }
 
                     } else {
                         // Handle failed case
                         // Do nothing
-                        logger.info(txt("gui.newversion.fail"));
+                        logger.info(I18n.txt("gui.newversion.fail"));
                     }
                 }
                 return false;
@@ -199,7 +203,7 @@ public class FullGui extends AbstractGui {
             Timer.Task t = new Timer.Task() {
                 @Override
                 public void run() {
-                    logger.info(txt("gui.newversion.checking"));
+                    logger.info(I18n.txt("gui.newversion.checking"));
                     vct.start();
                 }
             };
@@ -216,7 +220,7 @@ public class FullGui extends AbstractGui {
 
         if (ui != null) {
             ui.clear();
-            boolean collapsed = false;
+            boolean collapsed;
             if (controlsWindow != null) {
                 collapsed = controlsWindow.isCollapsed();
                 recalculateOptionsSize();
@@ -326,13 +330,6 @@ public class FullGui extends AbstractGui {
             CelestialBody target = (CelestialBody) data[0];
             LandAtWindow landAtLocation = new LandAtWindow(target, ui, skin);
             landAtLocation.show(ui);
-            break;
-        case SHOW_RUNSCRIPT_ACTION:
-            if (runscriptWindow != null)
-                runscriptWindow.remove();
-
-            runscriptWindow = new RunScriptWindow(ui, skin);
-            runscriptWindow.show(ui);
             break;
         case SHOW_PLAYCAMERA_ACTION:
             if (runcameraWindow != null)
@@ -453,7 +450,7 @@ public class FullGui extends AbstractGui {
     }
 
     public void addControlsWindow() {
-        controlsWindow = new ControlsWindow(txt("gui.controlpanel"), skin, ui);
+        controlsWindow = new ControlsWindow(I18n.txt("gui.controlpanel"), skin, ui);
         controlsWindow.setSceneGraph(sg);
         controlsWindow.setVisibilityToggles(visibilityEntities, visible);
         controlsWindow.initialize();

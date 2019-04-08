@@ -1,3 +1,8 @@
+/*
+ * This file is part of Gaia Sky, which is released under the Mozilla Public License 2.0.
+ * See the file LICENSE.md in the project root for full license details.
+ */
+
 package gaia.cu9.ari.gaiaorbit.interfce;
 
 import com.badlogic.gdx.Gdx;
@@ -5,7 +10,6 @@ import com.badlogic.gdx.controllers.Controller;
 import com.badlogic.gdx.controllers.ControllerListener;
 import com.badlogic.gdx.controllers.PovDirection;
 import com.badlogic.gdx.math.Vector3;
-
 import gaia.cu9.ari.gaiaorbit.desktop.util.SysUtils;
 import gaia.cu9.ari.gaiaorbit.event.EventManager;
 import gaia.cu9.ari.gaiaorbit.event.Events;
@@ -31,9 +35,9 @@ public class NaturalControllerListener implements ControllerListener, IObserver 
     public boolean updateControllerMappings(String mappingsFile) {
         // We look for OS-specific mappings for the given controller. If not found, it defaults to the base
         String os = SysUtils.getOSFamily();
-        int extensionstart = mappingsFile.lastIndexOf('.');
-        String pre = mappingsFile.substring(0, extensionstart);
-        String post = mappingsFile.substring(extensionstart + 1, mappingsFile.length());
+        int extensionStart = mappingsFile.lastIndexOf('.');
+        String pre = mappingsFile.substring(0, extensionStart); //-V6009
+        String post = mappingsFile.substring(extensionStart + 1);
 
         String osMappingsFile = pre + "." + os + "." + post;
         if (Gdx.files.absolute(osMappingsFile).exists()) {

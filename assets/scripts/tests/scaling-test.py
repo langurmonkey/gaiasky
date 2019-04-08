@@ -1,14 +1,14 @@
 # Test script. Tests the scaling commands.
 # Created by Toni Sagrista
 
-from gaia.cu9.ari.gaiaorbit.script import EventScriptingInterface
-from datetime import datetime
 import time
+from py4j.java_gateway import JavaGateway, GatewayParameters
 
 def current_time_ms():
     return int(round(time.time() * 1000))
 
-gs = EventScriptingInterface.instance()
+gateway = JavaGateway(gateway_parameters=GatewayParameters(auto_convert=True))
+gs = gateway.entry_point
 
 gs.disableInput()
 gs.minimizeInterfaceWindow()
@@ -89,3 +89,5 @@ gs.setVisibility("element.labels", False)
 # Restore
 gs.enableInput()
 gs.maximizeInterfaceWindow()
+
+gateway.close()

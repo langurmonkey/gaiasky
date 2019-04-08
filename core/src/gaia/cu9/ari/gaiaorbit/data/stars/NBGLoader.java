@@ -1,3 +1,8 @@
+/*
+ * This file is part of Gaia Sky, which is released under the Mozilla Public License 2.0.
+ * See the file LICENSE.md in the project root for full license details.
+ */
+
 package gaia.cu9.ari.gaiaorbit.data.stars;
 
 import com.badlogic.gdx.files.FileHandle;
@@ -47,8 +52,8 @@ public class NBGLoader extends AbstractCatalogLoader implements ISceneGraphLoade
     boolean active = true;
 
     @Override
-    public Array<CelestialBody> loadData() throws FileNotFoundException {
-	Array<CelestialBody> galaxies = new Array<CelestialBody>(900);
+    public Array<CelestialBody> loadData() {
+	Array<CelestialBody> galaxies = new Array<>(900);
 	long baseid = 5000;
 	long offset = 0;
 	if (active)

@@ -1,9 +1,14 @@
-package gaia.cu9.ari.gaiaorbit.scenegraph;
+/*
+ * This file is part of Gaia Sky, which is released under the Mozilla Public License 2.0.
+ * See the file LICENSE.md in the project root for full license details.
+ */
 
-import java.time.Instant;
+package gaia.cu9.ari.gaiaorbit.scenegraph;
 
 import gaia.cu9.ari.gaiaorbit.util.coord.AstroUtils;
 import gaia.cu9.ari.gaiaorbit.util.coord.Coordinates;
+
+import java.time.Instant;
 
 /**
  * Heliotropic orbits must be corrected using the Sun longitude. They are by

@@ -1,6 +1,9 @@
-package gaia.cu9.ari.gaiaorbit.util.coord.vsop87;
+/*
+ * This file is part of Gaia Sky, which is released under the Mozilla Public License 2.0.
+ * See the file LICENSE.md in the project root for full license details.
+ */
 
-import java.time.Instant;
+package gaia.cu9.ari.gaiaorbit.util.coord.vsop87;
 
 import gaia.cu9.ari.gaiaorbit.util.Constants;
 import gaia.cu9.ari.gaiaorbit.util.Nature;
@@ -8,6 +11,8 @@ import gaia.cu9.ari.gaiaorbit.util.coord.AbstractOrbitCoordinates;
 import gaia.cu9.ari.gaiaorbit.util.coord.AstroUtils;
 import gaia.cu9.ari.gaiaorbit.util.coord.Coordinates;
 import gaia.cu9.ari.gaiaorbit.util.math.Vector3d;
+
+import java.time.Instant;
 
 public abstract class AbstractVSOP87 extends AbstractOrbitCoordinates implements iVSOP87 {
 

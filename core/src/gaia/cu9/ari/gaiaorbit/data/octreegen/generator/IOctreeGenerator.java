@@ -1,3 +1,8 @@
+/*
+ * This file is part of Gaia Sky, which is released under the Mozilla Public License 2.0.
+ * See the file LICENSE.md in the project root for full license details.
+ */
+
 package gaia.cu9.ari.gaiaorbit.data.octreegen.generator;
 
 import com.badlogic.gdx.utils.Array;
@@ -6,26 +11,19 @@ import gaia.cu9.ari.gaiaorbit.util.Constants;
 import gaia.cu9.ari.gaiaorbit.util.Logger;
 import gaia.cu9.ari.gaiaorbit.util.Logger.Log;
 import gaia.cu9.ari.gaiaorbit.util.math.BoundingBoxd;
-import gaia.cu9.ari.gaiaorbit.util.math.Longref;
 import gaia.cu9.ari.gaiaorbit.util.math.Vector3d;
 import gaia.cu9.ari.gaiaorbit.util.tree.OctreeNode;
 
 import java.util.Iterator;
 
 public interface IOctreeGenerator {
-    public static final Log logger = Logger.getLogger(IOctreeGenerator.class);
+    Log logger = Logger.getLogger(IOctreeGenerator.class);
 
-    public OctreeNode generateOctree(Array<StarBean> catalog);
+    OctreeNode generateOctree(Array<StarBean> catalog);
 
-    public int getDiscarded();
+    int getDiscarded();
 
-    static Longref pageid = new Longref(0l);
-
-    static long nextPageId() {
-        return pageid.num++;
-    }
-
-    static OctreeNode startGeneration(Array<StarBean> catalog, Class<?> clazz, OctreeGeneratorParams params) {
+    static OctreeNode startGeneration(Array<StarBean> catalog, OctreeGeneratorParams params) {
         
         logger.info("Starting generation of octree");
 

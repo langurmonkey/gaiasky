@@ -1,18 +1,15 @@
+/*
+ * This file is part of Gaia Sky, which is released under the Mozilla Public License 2.0.
+ * See the file LICENSE.md in the project root for full license details.
+ */
+
 package gaia.cu9.ari.gaiaorbit.render;
 
 import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.graphics.glutils.FrameBuffer;
 import com.badlogic.gdx.utils.Disposable;
 import com.bitfire.postprocessing.PostProcessor;
-import com.bitfire.postprocessing.effects.Antialiasing;
-import com.bitfire.postprocessing.effects.Bloom;
-import com.bitfire.postprocessing.effects.Curvature;
-import com.bitfire.postprocessing.effects.Fisheye;
-import com.bitfire.postprocessing.effects.LensFlare2;
-import com.bitfire.postprocessing.effects.Levels;
-import com.bitfire.postprocessing.effects.LightGlow;
-import com.bitfire.postprocessing.effects.LightScattering;
-import com.bitfire.postprocessing.effects.MotionBlur;
+import com.bitfire.postprocessing.effects.*;
 
 public interface IPostProcessor extends Disposable {
     class PostProcessBean {

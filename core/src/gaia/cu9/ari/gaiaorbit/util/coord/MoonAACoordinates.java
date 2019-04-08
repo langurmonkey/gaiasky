@@ -1,9 +1,14 @@
-package gaia.cu9.ari.gaiaorbit.util.coord;
+/*
+ * This file is part of Gaia Sky, which is released under the Mozilla Public License 2.0.
+ * See the file LICENSE.md in the project root for full license details.
+ */
 
-import java.time.Instant;
+package gaia.cu9.ari.gaiaorbit.util.coord;
 
 import gaia.cu9.ari.gaiaorbit.util.Constants;
 import gaia.cu9.ari.gaiaorbit.util.math.Vector3d;
+
+import java.time.Instant;
 
 /**
  * Coordinates of the Moon given by the algorithm in Jean Meeus' Astronomical

@@ -1,3 +1,8 @@
+/*
+ * This file is part of Gaia Sky, which is released under the Mozilla Public License 2.0.
+ * See the file LICENSE.md in the project root for full license details.
+ */
+
 package gaia.cu9.ari.gaiaorbit.util;
 
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
@@ -36,10 +41,18 @@ public class TextUtils {
     }
 
     public static String capString(String in, int targetLength){
+        return capString(in, targetLength, false);
+    }
+
+    public static String capString(String in, int targetLength, boolean fromStart){
         if(in.length() <= targetLength){
             return in;
         }else{
-            return in.substring(0, targetLength - 3) + "...";
+            if(fromStart){
+                return "..." + in.substring(in.length() - (targetLength - 3));
+            }else {
+                return in.substring(0, targetLength - 3) + "...";
+            }
         }
     }
 

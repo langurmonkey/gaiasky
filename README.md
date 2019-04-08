@@ -1,5 +1,4 @@
-![Gaia Sky](https://zah.uni-heidelberg.de/fileadmin/user_upload/gaia/gaiasky/img/GaiaSkyBanner.jpg)
---------------------------
+# Gaia Sky
 
 [![Build status](https://gitlab.com/langurmonkey/gaiasky/badges/master/pipeline.svg)](https://gitlab.com/langurmonkey/gaiasky/commits/master)
 [![License: MPL 2.0](https://img.shields.io/badge/License-MPL%202.0-brightgreen.svg)](https://opensource.org/licenses/MPL-2.0)
@@ -7,9 +6,12 @@
 [![GitHub forks](https://img.shields.io/github/forks/langurmonkey/gaiasky.svg)](https://github.com/langurmonkey/gaiasky/network)
 [![GitHub tag](https://img.shields.io/github/tag/langurmonkey/gaiasky.svg)](https://github.com/langurmonkey/gaiasky/tags/)
 
-[**Gaia Sky**](https://zah.uni-heidelberg.de/gaia/outreach/gaiasky) is a real-time, 3D, astronomy visualisation software that
-runs on Windows, Linux and macOS. It is developed in the framework of
+[**Gaia Sky**](https://zah.uni-heidelberg.de/gaia/outreach/gaiasky) is a real-time 3D Universe application that
+runs on Linux, Windows and macOS. It is developed in the framework of
 [ESA](http://www.esa.int/ESA)'s [Gaia mission](http://sci.esa.int/gaia) to chart about 1 billion stars of our Galaxy.
+
+<img src="header.jpg" alt="Gaia Sky header" style="max-height: 20em;" />
+
 To get the latest up-to-date and most complete information,
 
 *  Visit our [**home page**](https://zah.uni-heidelberg.de/gaia/outreach/gaiasky)
@@ -31,12 +33,12 @@ This file contains the following sections:
 
 ### 1.1 Requirements
 
-| **Operating system**  | Linux / Windows 7+ / macOS |
-| :---: | :--- |
-| **CPU** | Intel Core i5 3rd Generation or similar  |
-| **GPU** | Intel HD 4000, Nvidia GeForce 9800 GT, Radeon HD 5670 / 1 GB VRAM / OpenGL 3.0 |
-| **Memory** | 4+ GB RAM |
-| **Hard drive**  | 1 GB of free disk space  |
+| **Operating system**  | Linux / Windows 7+ / macOS                                                     |
+| :-------------------: | :----------------------------------------------------------------------------- |
+| **CPU**               | Intel Core i5 3rd Generation or similar                                        |
+| **GPU**               | Intel HD 4000, Nvidia GeForce 9800 GT, Radeon HD 5670 / 1 GB VRAM / OpenGL 3.0 |
+| **Memory**            | 4+ GB RAM                                                                      |
+| **Hard drive**        | 1 GB of free disk space                                                        |
 
 ### 1.2 Installation and uninstallation
 
@@ -169,19 +171,13 @@ First, clone the [GitLab](https://gitlab.com/langurmonkey/gaiasky) repository:
 $  git clone https://gitlab.com/langurmonkey/gaiasky.git
 ```
 
-**Tip**: Gaia Sky will check that you are using Java 1.8 when running the build. You can still use a newer JDK version (e.g. JDK 10) by setting the following environment variable to `false` in the context of gradle:
-
-```
-$  export GS_JAVA_VERSION_CHECK=false
-```
-
 
 #### 2.2.2 Running
 
-Finally, run Gaia Sky (Linux, macOS) with:
+Finally, run Gaia Sky (Linux, macOS) with the provided script:
 
 ```
-$  gradlew core:run
+$  gaiasky
 ```
 
 On Windows, do:

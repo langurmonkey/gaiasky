@@ -1,3 +1,8 @@
+/*
+ * This file is part of Gaia Sky, which is released under the Mozilla Public License 2.0.
+ * See the file LICENSE.md in the project root for full license details.
+ */
+
 package gaia.cu9.ari.gaiaorbit.data.group;
 
 import com.badlogic.gdx.graphics.Color;
@@ -18,20 +23,23 @@ import gaia.cu9.ari.gaiaorbit.util.units.Position;
 import gaia.cu9.ari.gaiaorbit.util.units.Position.PositionType;
 import gaia.cu9.ari.gaiaorbit.util.units.Quantity.Angle;
 import gaia.cu9.ari.gaiaorbit.util.units.Quantity.Angle.AngleUnit;
+import uk.ac.starlink.table.RowSequence;
 import uk.ac.starlink.table.StarTable;
 import uk.ac.starlink.table.StarTableFactory;
-import uk.ac.starlink.table.TableSequence;
+import uk.ac.starlink.table.formats.AsciiTableBuilder;
+import uk.ac.starlink.table.formats.CsvTableBuilder;
 import uk.ac.starlink.util.DataSource;
 import uk.ac.starlink.util.FileDataSource;
 
 import java.io.InputStream;
-import java.util.LinkedList;
 import java.util.List;
-import java.util.Set;
 import java.util.logging.Level;
 
 /**
- * Loads VOTables, FITS, etc.
+ * Loads VOTables, FITS, etc. This data provider makes educated guesses using UCDs and column names to
+ * match columns to attributes.
+ *
+ * More information on this can be found <a href="http://gaia.ari.uni-heidelberg.de/gaiasky/docs/html/latest/SAMP.html#stil-data-provider">here</a>.
  *
  * @author tsagrista
  */
@@ -59,20 +67,26 @@ public class STILDataProvider extends AbstractStarGroupDataProvider {
         logger.info(I18n.bundle.format("notif.datafile", file));
         try {
             loadData(new FileDataSource(GlobalConf.data.dataFile(file)), factor);
-        } catch (Exception e) {
-            logger.error(e);
+        } catch (Exception e1) {
+            try{
+                logger.info("File " + file + " not found in data folder, trying relative path");
+                loadData(new FileDataSource(file), factor);
+            }catch (Exception e2) {
+                logger.error(e1);
+                logger.error(e2);
+            }
         }
         logger.info(I18n.bundle.format("notif.nodeloader", list.size, file));
         return list;
     }
 
-    /*
+    /**
      * Gets the first ucd that can be translated to a double from the set.
-     * @param ucds
-     * @param row
-     * @return
+     * @param ucds The array of UCDs. The UCDs which coincide with the names should be first.
+     * @param row The row objects
+     * @return Pair of <UCD,Double>
      */
-    private Pair<UCD, Double> getDoubleUcd(Set<UCD> ucds, Object[] row) {
+    private Pair<UCD, Double> getDoubleUcd(Array<UCD> ucds, Object[] row) {
         for (UCD ucd : ucds) {
             try {
                 double num = ((Number) row[ucd.index]).doubleValue();
@@ -87,14 +101,15 @@ public class STILDataProvider extends AbstractStarGroupDataProvider {
         return null;
     }
 
+
     /**
      * Gets the first ucd as a string from the set.
      *
-     * @param ucds
-     * @param row
+     * @param ucds The set of UCD objects
+     * @param row The row
      * @return
      */
-    private Pair<UCD, String> getStringUcd(Set<UCD> ucds, Object[] row) {
+    private Pair<UCD, String> getStringUcd(Array<UCD> ucds, Object[] row) {
         for (UCD ucd : ucds) {
             try {
                 String str = row[ucd.index].toString();
@@ -109,18 +124,13 @@ public class STILDataProvider extends AbstractStarGroupDataProvider {
     public Array<? extends ParticleBean> loadData(DataSource ds, double factor) {
 
         try {
-            TableSequence ts = factory.makeStarTables(ds);
-            // Find table
-            List<StarTable> tables = new LinkedList<StarTable>();
-            StarTable table = null;
-            long maxElems = 0;
-            for (StarTable t; (t = ts.nextTable()) != null; ) {
-                tables.add(t);
-                if (t.getRowCount() > maxElems) {
-                    maxElems = t.getRowCount();
-                    table = t;
-                }
-            }
+            // Add extra builders
+            List builders = factory.getDefaultBuilders();
+            builders.add(new CsvTableBuilder());
+            builders.add(new AsciiTableBuilder());
+
+            // Try to load
+            StarTable table = factory.makeStarTable(ds);
 
             initLists((int) table.getRowCount());
 
@@ -128,12 +138,13 @@ public class STILDataProvider extends AbstractStarGroupDataProvider {
             ucdp.parse(table);
 
             if (ucdp.haspos) {
-                long rowcount = table.getRowCount();
-                for (long i = 0; i < rowcount; i++) {
-                    Object[] row = table.getRow(i);
+                int i = 0;
+                RowSequence rs = table.getRowSequence();
+                while(rs.next()){
+                    Object[] row = rs.getRow();
                     boolean skip = false;
                     try {
-                        /** POSITION **/
+                        /* POSITION */
                         Pair<UCD, Double> a = getDoubleUcd(ucdp.POS1, row);
                         Pair<UCD, Double> b = getDoubleUcd(ucdp.POS2, row);
                         Pair<UCD, Double> c;
@@ -163,7 +174,7 @@ public class STILDataProvider extends AbstractStarGroupDataProvider {
                         Vector3d sph = new Vector3d();
                         Coordinates.cartesianToSpherical(p.gsposition, sph);
 
-                        /** PROPER MOTION **/
+                        /* PROPER MOTION */
                         Vector3d pm;
                         double mualphastar = 0, mudelta = 0, radvel = 0;
                         // Only supported if position is equatorial spherical coordinates (ra/dec)
@@ -183,11 +194,11 @@ public class STILDataProvider extends AbstractStarGroupDataProvider {
                             pm = new Vector3d(Vector3d.Zero);
                         }
 
-                        /** MAGNITUDE **/
+                        /* MAGNITUDE */
                         double appmag;
                         if (!ucdp.MAG.isEmpty()) {
-                            Pair<UCD, Double> appmagpair = getDoubleUcd(ucdp.MAG, row);
-                            appmag = appmagpair.getSecond();
+                            Pair<UCD, Double> appmagPair = getDoubleUcd(ucdp.MAG, row);
+                            appmag = appmagPair.getSecond();
                         } else {
                             // Default magnitude
                             appmag = 15;
@@ -196,14 +207,14 @@ public class STILDataProvider extends AbstractStarGroupDataProvider {
                         double flux = Math.pow(10, -absmag / 2.5);
                         double size = Math.min((Math.pow(flux, 0.5) * Constants.PC_TO_U * 0.16), 1e9) / 1.5;
 
-                        /** COLOR **/
+                        /* COLOR */
                         float color;
                         if (!ucdp.COL.isEmpty()) {
-                            Pair<UCD, Double> colpair = getDoubleUcd(ucdp.COL, row);
-                            if (colpair == null) {
+                            Pair<UCD, Double> colPair = getDoubleUcd(ucdp.COL, row);
+                            if (colPair == null) {
                                 color = 0.656f;
                             } else {
-                                color = colpair.getSecond().floatValue();
+                                color = colPair.getSecond().floatValue();
                             }
                         } else {
                             // Default color
@@ -212,7 +223,7 @@ public class STILDataProvider extends AbstractStarGroupDataProvider {
                         float[] rgb = ColourUtils.BVtoRGB(color);
                         double col = Color.toFloatBits(rgb[0], rgb[1], rgb[2], 1.0f);
 
-                        /** IDENTIFIER AND NAME **/
+                        /* IDENTIFIER AND NAME */
                         String name;
                         Long id;
                         int hip = -1;
@@ -220,11 +231,11 @@ public class STILDataProvider extends AbstractStarGroupDataProvider {
                             // Empty name
                             if (!ucdp.ID.isEmpty()) {
                                 // We have ID
-                                Pair<UCD, String> namepair = getStringUcd(ucdp.ID, row);
-                                name = namepair.getSecond();
-                                if (namepair.getFirst().colname.equalsIgnoreCase("hip")) {
-                                    hip = Integer.valueOf(namepair.getSecond());
-                                    id = new Long(hip);
+                                Pair<UCD, String> namePair = getStringUcd(ucdp.ID, row);
+                                name = namePair.getSecond();
+                                if (namePair.getFirst().colname.equalsIgnoreCase("hip")) {
+                                    hip = Integer.valueOf(namePair.getSecond());
+                                    id = (long) hip;
                                 } else {
                                     id = ++starid;
                                 }
@@ -235,14 +246,14 @@ public class STILDataProvider extends AbstractStarGroupDataProvider {
                             }
                         } else {
                             // We have name
-                            Pair<UCD, String> namepair = getStringUcd(ucdp.NAME, row);
-                            name = namepair.getSecond();
+                            Pair<UCD, String> namePair = getStringUcd(ucdp.NAME, row);
+                            name = namePair.getSecond();
                             // Take care of HIP stars
                             if (!ucdp.ID.isEmpty()) {
                                 Pair<UCD, String> idpair = getStringUcd(ucdp.ID, row);
                                 if (idpair.getFirst().colname.equalsIgnoreCase("hip")) {
                                     hip = Integer.valueOf(idpair.getSecond());
-                                    id = new Long(hip);
+                                    id = (long) hip;
                                 } else {
                                     id = ++starid;
                                 }
@@ -266,11 +277,11 @@ public class STILDataProvider extends AbstractStarGroupDataProvider {
                         colors.put(id, rgb);
                         sphericalPositions.put(id, new double[]{sph.x, sph.y, sph.z});
 
-                        double[] point = new double[StarBean.SIZE];
+                        double[] point = new double[StarBean.SIZE + 3];
                         point[StarBean.I_HIP] = hip;
-                        point[StarBean.I_TYC1] = -1;
-                        point[StarBean.I_TYC2] = -1;
-                        point[StarBean.I_TYC3] = -1;
+                        //point[StarBean.I_TYC1] = -1;
+                        //point[StarBean.I_TYC2] = -1;
+                        //point[StarBean.I_TYC3] = -1;
                         point[StarBean.I_X] = p.gsposition.x;
                         point[StarBean.I_Y] = p.gsposition.y;
                         point[StarBean.I_Z] = p.gsposition.z;
@@ -290,12 +301,12 @@ public class STILDataProvider extends AbstractStarGroupDataProvider {
                         list.add(new StarBean(point, id, name));
 
                         int appclmp = (int) MathUtilsd.clamp(appmag, 0, 21);
-                        countsPerMag[(int) appclmp] += 1;
+                        countsPerMag[appclmp] += 1;
                     } catch (Exception e) {
                         logger.debug(e);
                         logger.debug("Exception parsing row " + i + ": skipping");
                     }
-
+                    i++;
                 }
             } else {
                 logger.error("Table not loaded: Position not found");

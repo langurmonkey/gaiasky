@@ -1,14 +1,18 @@
-package gaia.cu9.ari.gaiaorbit.data.octreegen.generator;
+/*
+ * This file is part of Gaia Sky, which is released under the Mozilla Public License 2.0.
+ * See the file LICENSE.md in the project root for full license details.
+ */
 
-import java.util.Comparator;
+package gaia.cu9.ari.gaiaorbit.data.octreegen.generator;
 
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.utils.Array;
-
 import gaia.cu9.ari.gaiaorbit.data.octreegen.StarBrightnessComparator;
 import gaia.cu9.ari.gaiaorbit.scenegraph.StarGroup;
 import gaia.cu9.ari.gaiaorbit.scenegraph.StarGroup.StarBean;
 import gaia.cu9.ari.gaiaorbit.util.tree.OctreeNode;
+
+import java.util.Comparator;
 
 public class BrightestStars implements IAggregationAlgorithm {
     /** Maximum depth of the octree **/

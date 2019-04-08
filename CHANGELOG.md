@@ -1,12 +1,21 @@
 <a name="unreleased"></a>
-## [Unreleased](https://github.com/langurmonkey/gaiasky/tree/master)
-[Full changelog](https://github.com/langurmonkey/gaiasky/compare/2.1.7...HEAD)
+## [Unreleased](https://gitlab.com/langurmonkey/gaiasky/tree/master)
+[Full changelog](https://gitlab.com/langurmonkey/gaiasky/compare/2.1.7...HEAD)
 
 ### Bug Fixes
+- [#281](https://gitlab.com/langurmonkey/gaiasky/issues/281) non-ASCII characters in windows username
+- [#285](https://gitlab.com/langurmonkey/gaiasky/issues/285) export log fails in windows
+- shader compilation in intel GPUs (line)
+- octree generator works with latest jcommander
+- keyframes window inline editing
 - hot-switching themes no longer uses previous skin in some dialogs
 - keyboard focus lost when clicking outside input fields
 
+### Build System
+- update to gradle 5.1.1
+
 ### Code Refactoring
+- remove unused code in generic dialog
 - various code refactors and cleanups
 - i18n files synced with en_GB
 - general code and keys refactor
@@ -15,12 +24,17 @@
 - visibility switch lists are unified under a same interface and code
 
 ### Features
+- use XDG base directory structure in Linux
+- update catalog descriptors
+- add id list of 'must load' stars
+- keyframe highlighting
+- allow resizable generic dialogs
 - update link cursor size when theme changes
 - generate man page automatically
 - add CLI arguments -p and -a
 - add man file and utils to generate
 - add h2m help2man file
-- info on gs\_java\_version\_check when run on java other than 1.8
+- info on gs_java_version_check when run on java other than 1.8
 - new cameraTransition() API call
 - sync and async camera file playback API calls
 - add sync and async camera path running funcs
@@ -30,12 +44,13 @@
 - list multiple connected controllers instead of just one
 
 ### Style
+- tweaked and fixed some old java
 - variable name changes
 
 
 <a name="2.1.7"></a>
-## [2.1.7](https://github.com/langurmonkey/gaiasky/tree/2.1.6) (2019-01-11)
-[Full changelog](https://github.com/langurmonkey/gaiasky/compare/2.1.6...2.1.7)
+## [2.1.7](https://gitlab.com/langurmonkey/gaiasky/tree/2.1.6) (2019-01-11)
+[Full changelog](https://gitlab.com/langurmonkey/gaiasky/compare/2.1.6...2.1.7)
 
 ### Bug Fixes
 
@@ -61,8 +76,8 @@
 - add RUWE to octree generator 
 
 <a name="2.1.6"></a>
-## [2.1.6](https://github.com/langurmonkey/gaiasky/tree/2.1.5) (2018-12-18)
-[Full changelog](https://github.com/langurmonkey/gaiasky/compare/2.1.5...2.1.6)
+## [2.1.6](https://gitlab.com/langurmonkey/gaiasky/tree/2.1.5) (2018-12-18)
+[Full changelog](https://gitlab.com/langurmonkey/gaiasky/compare/2.1.5...2.1.6)
 
 ### Bug Fixes
 
@@ -109,12 +124,12 @@
 - nbg loader to manage distances better 
 
 <a name="2.1.5"></a>
-## [2.1.5](https://github.com/langurmonkey/gaiasky/tree/2.1.4) (2018-12-03)
-[Full changelog](https://github.com/langurmonkey/gaiasky/compare/2.1.4...2.1.5)
+## [2.1.5](https://gitlab.com/langurmonkey/gaiasky/tree/2.1.4) (2018-12-03)
+[Full changelog](https://gitlab.com/langurmonkey/gaiasky/compare/2.1.4...2.1.5)
 
 ### Bug Fixes
 
-- null pointer when unloading stars [#322](https://github.com/langurmonkey/gaiasky/issues/322) 
+- null pointer when unloading stars [#322](https://gitlab.com/langurmonkey/gaiasky/issues/322) 
 ### Build System
 
 - remove rpm deps as they depend on distro 
@@ -128,14 +143,14 @@
 ### Documentation
 
 - update changelog 
-- update rpm install command [#317](https://github.com/langurmonkey/gaiasky/issues/317) 
+- update rpm install command [#317](https://gitlab.com/langurmonkey/gaiasky/issues/317) 
 ### Features
 
 - LMC, SMC, datasets can require min gs version 
 - add support for nebulae 
 - non-jsonloader autoload files 
 - billboard galaxies 
-- passive update notifier [#321](https://github.com/langurmonkey/gaiasky/issues/321) 
+- passive update notifier [#321](https://gitlab.com/langurmonkey/gaiasky/issues/321) 
 - add download speed and progress in downloaded/total to download manager 
 - add progress MB data to downloader 
 ### Style
@@ -143,18 +158,18 @@
 - fix info message 
 
 <a name="2.1.4"></a>
-## [2.1.4](https://github.com/langurmonkey/gaiasky/tree/2.1.3) (2018-11-23)
-[Full changelog](https://github.com/langurmonkey/gaiasky/compare/2.1.3...2.1.4)
+## [2.1.4](https://gitlab.com/langurmonkey/gaiasky/tree/2.1.3) (2018-11-23)
+[Full changelog](https://gitlab.com/langurmonkey/gaiasky/compare/2.1.3...2.1.4)
 
 ### Bug Fixes
 
 - locale index overflow 
-- german translation and locale initialisation [#320](https://github.com/langurmonkey/gaiasky/issues/320) 
+- german translation and locale initialisation [#320](https://gitlab.com/langurmonkey/gaiasky/issues/320) 
 - do not preselect default dataset, only base data 
 - sizing of download manager window 
 - data download url log message 
 - null pointer when updating scroll focus, slash at end 
-- multiple scroll focus objects [#319](https://github.com/langurmonkey/gaiasky/issues/319) 
+- multiple scroll focus objects [#319](https://gitlab.com/langurmonkey/gaiasky/issues/319) 
 - octree generator 
 - emission shader code 
 ### Build System
@@ -164,7 +179,7 @@
 
 - improve usability of download manager 
 - ensure correct java version before building 
-- dataset versioning [#318](https://github.com/langurmonkey/gaiasky/issues/318) [#316](https://github.com/langurmonkey/gaiasky/issues/316) 
+- dataset versioning [#318](https://gitlab.com/langurmonkey/gaiasky/issues/318) [#316](https://gitlab.com/langurmonkey/gaiasky/issues/316) 
 - STIL provider adds HIP indices 
 - name support and more for STIL loader 
 - script to query HIP names in simbad 
@@ -175,15 +190,15 @@
 - wee reformatting 
 
 <a name="2.1.3"></a>
-## [2.1.3](https://github.com/langurmonkey/gaiasky/tree/2.1.2-vr) (2018-10-31)
-[Full changelog](https://github.com/langurmonkey/gaiasky/compare/2.1.2-vr...2.1.3)
+## [2.1.3](https://gitlab.com/langurmonkey/gaiasky/tree/2.1.2-vr) (2018-10-31)
+[Full changelog](https://gitlab.com/langurmonkey/gaiasky/compare/2.1.2-vr...2.1.3)
 
 ### Bug Fixes
 
 - octree rendering muted 
 - minimap window 
-- accents and umlauts in user folder path (win) [#314](https://github.com/langurmonkey/gaiasky/issues/314) 
-- start button status update [#313](https://github.com/langurmonkey/gaiasky/issues/313) 
+- accents and umlauts in user folder path (win) [#314](https://gitlab.com/langurmonkey/gaiasky/issues/314) 
+- start button status update [#313](https://gitlab.com/langurmonkey/gaiasky/issues/313) 
 ### Code Refactoring
 
 - startup log 
@@ -196,15 +211,15 @@
 - new shader init & various improvements 
 - add proper motions to stil data provider 
 - initial support for proper motions over SAMP 
-- individual constellation selectors [#275](https://github.com/langurmonkey/gaiasky/issues/275) 
+- individual constellation selectors [#275](https://gitlab.com/langurmonkey/gaiasky/issues/275) 
 ### Style
 
 - GaiaSky.java to use LF instead of CRLF 
 - remove leftover variables in full gui 
 
 <a name="2.1.2-vr"></a>
-## [2.1.2-vr](https://github.com/langurmonkey/gaiasky/tree/2.1.2) (2018-09-28)
-[Full changelog](https://github.com/langurmonkey/gaiasky/compare/2.1.2...2.1.2-vr)
+## [2.1.2-vr](https://gitlab.com/langurmonkey/gaiasky/tree/2.1.2) (2018-09-28)
+[Full changelog](https://gitlab.com/langurmonkey/gaiasky/compare/2.1.2...2.1.2-vr)
 
 ### Bug Fixes
 
@@ -213,8 +228,8 @@
 - heap sizes in build script 
 - macOS -XstartOnFirstThread flag 
 - macos builds tweaks 
-- global key bindings affect invisible GUIs [#311](https://github.com/langurmonkey/gaiasky/issues/311) 
-- fix `p` double-mapping [#310](https://github.com/langurmonkey/gaiasky/issues/310) 
+- global key bindings affect invisible GUIs [#311](https://gitlab.com/langurmonkey/gaiasky/issues/311) 
+- fix `p` double-mapping [#310](https://gitlab.com/langurmonkey/gaiasky/issues/310) 
 ### Build System
 
 - installer detects and removes previous versions 
@@ -234,8 +249,8 @@
 ### Features
 
 - update to lwjgl3 backend 
-- cosmic ruler [#296](https://github.com/langurmonkey/gaiasky/issues/296) 
-- API calls to disable and enable the GUI [#312](https://github.com/langurmonkey/gaiasky/issues/312) 
+- cosmic ruler [#296](https://gitlab.com/langurmonkey/gaiasky/issues/296) 
+- API calls to disable and enable the GUI [#312](https://gitlab.com/langurmonkey/gaiasky/issues/312) 
 ### Style
 
 - fix issues with merge to bring it back to a working state 
@@ -244,12 +259,12 @@
 - minor style issues 
 
 <a name="2.1.2"></a>
-## [2.1.2](https://github.com/langurmonkey/gaiasky/tree/2.1.1) (2018-09-18)
-[Full changelog](https://github.com/langurmonkey/gaiasky/compare/2.1.1...2.1.2)
+## [2.1.2](https://gitlab.com/langurmonkey/gaiasky/tree/2.1.1) (2018-09-18)
+[Full changelog](https://gitlab.com/langurmonkey/gaiasky/compare/2.1.1...2.1.2)
 
 ### Bug Fixes
 
-- fix for windows paths [#309](https://github.com/langurmonkey/gaiasky/issues/309) 
+- fix for windows paths [#309](https://gitlab.com/langurmonkey/gaiasky/issues/309) 
 - fix run script and play camera windows 
 - update changelog 
 ### Features
@@ -258,12 +273,12 @@
 - add new key bindings for simple actions 
 
 <a name="2.1.1"></a>
-## [2.1.1](https://github.com/langurmonkey/gaiasky/tree/2.1.0) (2018-09-14)
-[Full changelog](https://github.com/langurmonkey/gaiasky/compare/2.1.0...2.1.1)
+## [2.1.1](https://gitlab.com/langurmonkey/gaiasky/tree/2.1.0) (2018-09-14)
+[Full changelog](https://gitlab.com/langurmonkey/gaiasky/compare/2.1.0...2.1.1)
 
 ### Bug Fixes
 
-- crash if no internet connection present [#308](https://github.com/langurmonkey/gaiasky/issues/308) 
+- crash if no internet connection present [#308](https://gitlab.com/langurmonkey/gaiasky/issues/308) 
 - fix description of very large catalog 
 ### Documentation
 
@@ -271,13 +286,13 @@
 - mended submodule init and update 
 
 <a name="2.1.0"></a>
-## [2.1.0](https://github.com/langurmonkey/gaiasky/tree/2.0.3) (2018-09-11)
-[Full changelog](https://github.com/langurmonkey/gaiasky/compare/2.0.3...2.1.0)
+## [2.1.0](https://gitlab.com/langurmonkey/gaiasky/tree/2.0.3) (2018-09-11)
+[Full changelog](https://gitlab.com/langurmonkey/gaiasky/compare/2.0.3...2.1.0)
 
 ### Bug Fixes
 
-- fix previous fix of search dialog [#307](https://github.com/langurmonkey/gaiasky/issues/307) 
-- search dialog crash if starts with number [#307](https://github.com/langurmonkey/gaiasky/issues/307) 
+- fix previous fix of search dialog [#307](https://gitlab.com/langurmonkey/gaiasky/issues/307) 
+- search dialog crash if starts with number [#307](https://gitlab.com/langurmonkey/gaiasky/issues/307) 
 - fix error loading lens dirt hi res texture 
 ### Build System
 
@@ -291,7 +306,7 @@
 - Fix download helper docs 
 ### Features
 
-- add download manager and infrastructure [#291](https://github.com/langurmonkey/gaiasky/issues/291) [#303](https://github.com/langurmonkey/gaiasky/issues/303) 
+- add download manager and infrastructure [#291](https://gitlab.com/langurmonkey/gaiasky/issues/291) [#303](https://gitlab.com/langurmonkey/gaiasky/issues/303) 
 ### Style
 
 - fix style of contributing once and for all 

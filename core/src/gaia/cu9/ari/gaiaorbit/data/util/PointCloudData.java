@@ -1,3 +1,8 @@
+/*
+ * This file is part of Gaia Sky, which is released under the Mozilla Public License 2.0.
+ * See the file LICENSE.md in the project root for full license details.
+ */
+
 package gaia.cu9.ari.gaiaorbit.data.util;
 
 import com.badlogic.gdx.math.Vector3;
@@ -89,12 +94,24 @@ public class PointCloudData {
         return x.get(index);
     }
 
+    public void setX(int index, double value){
+        x.set(index, value);
+    }
+
     public double getY(int index) {
         return y.get(index);
     }
 
+    public void setY(int index, double value){
+        y.set(index, value);
+    }
+
     public double getZ(int index) {
         return z.get(index);
+    }
+
+    public void setZ(int index, double value){
+        z.set(index, value);
     }
 
     public Instant getDate(int index) {

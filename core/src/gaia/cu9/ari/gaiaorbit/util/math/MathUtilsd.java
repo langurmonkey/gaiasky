@@ -1,3 +1,8 @@
+/*
+ * This file is part of Gaia Sky, which is released under the Mozilla Public License 2.0.
+ * See the file LICENSE.md in the project root for full license details.
+ */
+
 package gaia.cu9.ari.gaiaorbit.util.math;
 
 import com.badlogic.gdx.math.MathUtils;
@@ -151,7 +156,7 @@ public final class MathUtilsd {
      * <p>
      * This is an optimized version of {@link #randomTriangular(double, double, double) randomTriangular(-1, 1, 0)} */
     public static double randomTriangular () {
-        return random.nextDouble() - random.nextDouble();
+        return random.nextDouble() - random.nextDouble(); //-V6001
     }
 
     /** Returns a triangularly distributed random number between {@code -max} (exclusive) and {@code max} (exclusive), where values
@@ -160,7 +165,7 @@ public final class MathUtilsd {
      * This is an optimized version of {@link #randomTriangular(double, double, double) randomTriangular(-max, max, 0)}
      * @param max the upper limit */
     public static double randomTriangular (double max) {
-        return (random.nextDouble() - random.nextDouble()) * max;
+        return (random.nextDouble() - random.nextDouble()) * max; //-V6001
     }
 
     /** Returns a triangularly distributed random number between {@code min} (inclusive) and {@code max} (exclusive), where the
@@ -275,6 +280,35 @@ public final class MathUtilsd {
     static public double sqrt(double value) {
         double sqrt = Double.longBitsToDouble(((Double.doubleToLongBits(value) - (1l << 52)) >> 1) + (1l << 61));
         return (sqrt + value / sqrt) / 2.0;
+    }
+
+    /**
+     * Does an exponential interpolation:
+     * y = y0 + (y1-y0) * 10 ^ (exp * (x-x0)/(x1-x0))
+     * @param x
+     * @param x0
+     * @param x1
+     * @param y0
+     * @param y1
+     * @param exp
+     * @return
+     */
+    public static double eint(double x, double x0, double x1, double y0, double y1, double exp){
+        double rx0 = x0;
+        double rx1 = x1;
+        if (x0 > x1) {
+            rx0 = x1;
+            rx1 = x0;
+        }
+
+        if (x < rx0) {
+            return y0;
+        }
+        if (x > rx1) {
+            return y1;
+        }
+
+        return y0 + (y1 - y0) * Math.pow(10, exp * (x - rx0) / (rx1 - rx0));
     }
 
     /**

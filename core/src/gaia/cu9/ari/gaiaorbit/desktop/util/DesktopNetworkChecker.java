@@ -1,3 +1,8 @@
+/*
+ * This file is part of Gaia Sky, which is released under the Mozilla Public License 2.0.
+ * See the file LICENSE.md in the project root for full license details.
+ */
+
 package gaia.cu9.ari.gaiaorbit.desktop.util;
 
 import com.badlogic.gdx.Gdx;
@@ -16,8 +21,8 @@ import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener.ChangeEvent;
 import com.badlogic.gdx.utils.Align;
-
 import gaia.cu9.ari.gaiaorbit.GaiaSky;
+import gaia.cu9.ari.gaiaorbit.interfce.ArchiveViewWindow;
 import gaia.cu9.ari.gaiaorbit.interfce.INetworkChecker;
 import gaia.cu9.ari.gaiaorbit.scenegraph.IFocus;
 import gaia.cu9.ari.gaiaorbit.scenegraph.IStarFocus;
@@ -106,7 +111,7 @@ public class DesktopNetworkChecker extends Thread implements INetworkChecker {
         @Override
         public boolean handle(Event event) {
             if (event instanceof ChangeEvent) {
-                GaiaCatalogWindow gaiaWindow = new GaiaCatalogWindow(GaiaSky.instance.mainGui.getGuiStage(), skin);
+                ArchiveViewWindow gaiaWindow = new ArchiveViewWindow(GaiaSky.instance.mainGui.getGuiStage(), skin);
                 gaiaWindow.initialize(focus);
                 gaiaWindow.display();
                 return true;
@@ -198,8 +203,6 @@ public class DesktopNetworkChecker extends Thread implements INetworkChecker {
             IStarFocus st = (IStarFocus) focus;
             if (st.getHip() > 0) {
                 listener.ok(url + "HIP+" + st.getHip());
-            } else if (st.getTycho() != null) {
-                listener.ok(url + "TYC+" + st.getTycho());
             } else {
                 listener.ko(null);
             }

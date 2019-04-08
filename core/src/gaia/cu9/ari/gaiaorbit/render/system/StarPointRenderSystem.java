@@ -1,3 +1,8 @@
+/*
+ * This file is part of Gaia Sky, which is released under the Mozilla Public License 2.0.
+ * See the file LICENSE.md in the project root for full license details.
+ */
+
 package gaia.cu9.ari.gaiaorbit.render.system;
 
 import com.badlogic.gdx.Application.ApplicationType;
@@ -11,12 +16,11 @@ import com.badlogic.gdx.graphics.glutils.ShaderProgram;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer.ShapeType;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.Array;
-
 import gaia.cu9.ari.gaiaorbit.GaiaSky;
 import gaia.cu9.ari.gaiaorbit.event.EventManager;
 import gaia.cu9.ari.gaiaorbit.event.Events;
 import gaia.cu9.ari.gaiaorbit.event.IObserver;
-import gaia.cu9.ari.gaiaorbit.render.ComponentType;
+import gaia.cu9.ari.gaiaorbit.render.ComponentTypes.ComponentType;
 import gaia.cu9.ari.gaiaorbit.render.IRenderable;
 import gaia.cu9.ari.gaiaorbit.scenegraph.CelestialBody;
 import gaia.cu9.ari.gaiaorbit.scenegraph.SceneGraphNode.RenderGroup;
@@ -33,10 +37,10 @@ public class StarPointRenderSystem extends ImmediateRenderSystem implements IObs
     ComponentType ct;
     float[] pointAlpha, alphaSizeFovBr;
 
-    boolean initializing = false;
+    boolean initializing;
 
     public StarPointRenderSystem(RenderGroup rg, float[] alphas, ShaderProgram[] shaders, ComponentType ct) {
-        super(rg, alphas, shaders, 10000);
+        super(rg, alphas, shaders);
         EventManager.instance.subscribe(this, Events.TRANSIT_COLOUR_CMD, Events.ONLY_OBSERVED_STARS_CMD, Events.STAR_MIN_OPACITY_CMD);
         BRIGHTNESS_FACTOR = 10;
         this.ct = ct;
@@ -60,17 +64,17 @@ public class StarPointRenderSystem extends ImmediateRenderSystem implements IObs
 
     @Override
     protected void initVertices() {
-        meshes = new MeshData[1];
+        meshes = new Array<>();
         curr = new MeshData();
-        meshes[0] = curr;
+        meshes.add(curr);
 
         aux = new Vector3();
 
         /** Init renderer **/
-        maxVertices = 3000;
+        int nVertices = 30;
 
         VertexAttribute[] attribs = buildVertexAttributes();
-        curr.mesh = new Mesh(false, maxVertices, 0, attribs);
+        curr.mesh = new Mesh(false, nVertices, 0, attribs);
 
         curr.vertexSize = curr.mesh.getVertexAttributes().vertexSize / 4;
         curr.colorOffset = curr.mesh.getVertexAttribute(Usage.ColorPacked) != null ? curr.mesh.getVertexAttribute(Usage.ColorPacked).offset / 4 : 0;
@@ -97,32 +101,30 @@ public class StarPointRenderSystem extends ImmediateRenderSystem implements IObs
             // Reset variables
             curr.clear();
             
-            checkRequiredVerticesSize(renderables.size * curr.vertexSize);
-            curr.vertices = vertices;
-
             int size = renderables.size;
+            ensureTempVertsSize(size * curr.vertexSize);
             for (int i = 0; i < size; i++) {
                 // 2 FPS gain
                 CelestialBody cb = (CelestialBody) renderables.get(i);
                 float[] col = starColorTransit ? cb.ccTransit : cb.cc;
 
                 // COLOR
-                curr.vertices[curr.vertexIdx + curr.colorOffset] = Color.toFloatBits(col[0], col[1], col[2], cb.opacity);
+                tempVerts[curr.vertexIdx + curr.colorOffset] = Color.toFloatBits(col[0], col[1], col[2], cb.opacity);
 
                 // SIZE
-                curr.vertices[curr.vertexIdx + sizeOffset] = (float) cb.getRadius();
+                tempVerts[curr.vertexIdx + sizeOffset] = (float) cb.getRadius();
 
                 // POSITION
                 aux.set((float) cb.pos.x, (float) cb.pos.y, (float) cb.pos.z);
                 final int idx = curr.vertexIdx;
-                curr.vertices[idx] = aux.x;
-                curr.vertices[idx + 1] = aux.y;
-                curr.vertices[idx + 2] = aux.z;
+                tempVerts[idx] = aux.x;
+                tempVerts[idx + 1] = aux.y;
+                tempVerts[idx + 2] = aux.z;
 
                 // PROPER MOTION
-                curr.vertices[curr.vertexIdx + pmOffset] = (float) cb.getPmX() * 0f;
-                curr.vertices[curr.vertexIdx + pmOffset + 1] = (float) cb.getPmY() * 0f;
-                curr.vertices[curr.vertexIdx + pmOffset + 2] = (float) cb.getPmZ() * 0f;
+                tempVerts[curr.vertexIdx + pmOffset] = (float) cb.getPmX() * 0f;
+                tempVerts[curr.vertexIdx + pmOffset + 1] = (float) cb.getPmY() * 0f;
+                tempVerts[curr.vertexIdx + pmOffset + 2] = (float) cb.getPmZ() * 0f;
 
                 curr.vertexIdx += curr.vertexSize;
             }
@@ -160,7 +162,7 @@ public class StarPointRenderSystem extends ImmediateRenderSystem implements IObs
             // Relativistic effects
             addEffectsUniforms(shaderProgram, camera);
 
-            curr.mesh.setVertices(curr.vertices, 0, curr.vertexIdx);
+            curr.mesh.setVertices(tempVerts, 0, curr.vertexIdx);
             curr.mesh.render(shaderProgram, ShapeType.Point.getGlType());
             shaderProgram.end();
 

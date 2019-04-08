@@ -1,20 +1,18 @@
+/*
+ * This file is part of Gaia Sky, which is released under the Mozilla Public License 2.0.
+ * See the file LICENSE.md in the project root for full license details.
+ */
+
 package gaia.cu9.ari.gaiaorbit.util;
 
-import com.badlogic.gdx.utils.Array;
-
-import gaia.cu9.ari.gaiaorbit.event.EventManager;
-import gaia.cu9.ari.gaiaorbit.event.Events;
 import gaia.cu9.ari.gaiaorbit.scenegraph.FadeNode;
 import gaia.cu9.ari.gaiaorbit.util.Logger.Log;
 
 public class CatalogInfo {
     private static final Log logger =Logger.getLogger(CatalogInfo.class);
 
-    public static Array<CatalogInfo> catalogs = new Array<CatalogInfo>(20);
-    private static Object lock = new Object();
-
     public enum CatalogInfoType {
-        INTERNAL, LOD, SAMP
+        INTERNAL, LOD, SAMP, SCRIPT, UI
     }
 
     public String name;
@@ -23,6 +21,7 @@ public class CatalogInfo {
     public CatalogInfoType type;
 
     public FadeNode object;
+    public boolean highlighted;
 
     public CatalogInfo(String name, String description, String source, CatalogInfoType type, FadeNode object) {
         super();
@@ -33,14 +32,6 @@ public class CatalogInfo {
         this.type = type;
         this.object = object;
         this.object.setCatalogInfo(this);
-
-        // Add to index
-        synchronized (lock) {
-            catalogs.add(this);
-        }
-
-        // Post event
-        EventManager.instance.post(Events.ADD_CATALOG_INFO, this);
     }
 
     public void setVisibility(boolean visibility) {
@@ -57,5 +48,15 @@ public class CatalogInfo {
             logger.info("Removing dataset " + name);
             this.object.dispose();
         }
+    }
+
+    public void highlight(boolean hl){
+        this.highlighted = hl;
+        object.highlight(hl);
+    }
+
+    public void highlight(boolean hl, int colorIndex){
+        this.highlighted = hl;
+        object.highlight(hl, colorIndex);
     }
 }

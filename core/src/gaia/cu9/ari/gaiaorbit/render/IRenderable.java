@@ -1,6 +1,9 @@
-package gaia.cu9.ari.gaiaorbit.render;
+/*
+ * This file is part of Gaia Sky, which is released under the Mozilla Public License 2.0.
+ * See the file LICENSE.md in the project root for full license details.
+ */
 
-import gaia.cu9.ari.gaiaorbit.util.ComponentTypes;
+package gaia.cu9.ari.gaiaorbit.render;
 
 /**
  * A top-level renderable interface that all renderable objects must extend
