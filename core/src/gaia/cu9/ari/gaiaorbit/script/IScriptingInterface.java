@@ -509,8 +509,6 @@ public interface IScriptingInterface {
      * @param key     The key of the component, see
      *                {@link gaia.cu9.ari.gaiaorbit.render.ComponentTypes.ComponentType}. Usually
      *                'element.stars', 'element.moons', 'element.atmospheres', etc.
-     *                Proper motion vectors are a special case not listed in component
-     *                types. Use the key 'element.propermotions' to that end.
      * @param visible The visible value.
      */
     void setVisibility(String key, boolean visible);
@@ -542,6 +540,12 @@ public interface IScriptingInterface {
      *             </ul>
      */
     void setProperMotionsColorMode(int mode);
+
+    /**
+     * Sets whether to show arrowheads or not for the velocity vectors.
+     * @param arrowheadsEnabled Whether to show the velocity vectors with arrowheads.
+     */
+    void setProperMotionsArrowheads(boolean arrowheadsEnabled);
 
     /**
      * Overrides the maximum number of proper motion vectors that the program

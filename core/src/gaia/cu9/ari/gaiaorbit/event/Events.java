@@ -14,6 +14,19 @@ public enum Events {
     /**
      * Event names
      */
+
+    /**
+     * Expands a GUI pane. Contains its name
+     */
+    EXPAND_PANE_CMD,
+    /**
+     * Collapses a GUI pane. Contains its name
+     */
+    COLLAPSE_PANE_CMD,
+    /**
+     * Toggles the collapsed state of a GUI pane. Contains its name
+     */
+    TOGGLE_EXPANDCOLLAPSE_PANE_CMD,
     /**
      * Notifies of a change in the time, contains the Date object
      **/
@@ -211,11 +224,6 @@ public enum Events {
      * boolean indicating if this comes from the interface.
      */
     ORIENTATION_LOCK_CMD,
-    /**
-     * Contains the name, the boolean value and a boolean indicating if this
-     * comes from the interface
-     **/
-    PROPER_MOTIONS_CMD,
     /**
      * Contains a float with the intensity of the light between 0 and 1
      **/
@@ -685,6 +693,10 @@ public enum Events {
      * 5 - unique color
      */
     PM_COLOR_MODE_CMD,
+    /**
+     * Show or hide arrow caps. Contains boolean with state and another if it comes from UI
+     */
+    PM_ARROWHEADS_CMD,
     /**
      * Updates the screen mode according to whats in the
      * {@link gaia.cu9.ari.gaiaorbit.util.GlobalConf#screen} bean.

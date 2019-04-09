@@ -66,6 +66,12 @@ import java.util.Map;
  */
 public class SceneGraphRenderer extends AbstractRenderer implements IProcessRenderer, IObserver {
     private static final Log logger = Logger.getLogger(SceneGraphRenderer.class);
+    public static SceneGraphRenderer instance;
+
+    public static void initialise(AssetManager manager){
+        instance = new SceneGraphRenderer();
+        instance.initialize(manager);
+    }
 
     /** Contains the flags representing each type's visibility **/
     public static ComponentTypes visible;
@@ -132,7 +138,7 @@ public class SceneGraphRenderer extends AbstractRenderer implements IProcessRend
             spp.vertexFile = vfile;
             spp.fragmentFile = ffile;
             manager.load(names[i], ShaderProgram.class, spp);
-            AssetDescriptor<ShaderProgram> desc = new AssetDescriptor<ShaderProgram>(names[i], ShaderProgram.class, spp);
+            AssetDescriptor<ShaderProgram> desc = new AssetDescriptor<>(names[i], ShaderProgram.class, spp);
             result[i] = desc;
 
             i++;

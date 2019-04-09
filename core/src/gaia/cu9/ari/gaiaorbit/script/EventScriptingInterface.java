@@ -20,7 +20,6 @@ import gaia.cu9.ari.gaiaorbit.event.EventManager;
 import gaia.cu9.ari.gaiaorbit.event.EventManager.TimeFrame;
 import gaia.cu9.ari.gaiaorbit.event.Events;
 import gaia.cu9.ari.gaiaorbit.event.IObserver;
-import gaia.cu9.ari.gaiaorbit.interfce.ControlsWindow;
 import gaia.cu9.ari.gaiaorbit.interfce.IGui;
 import gaia.cu9.ari.gaiaorbit.scenegraph.*;
 import gaia.cu9.ari.gaiaorbit.scenegraph.StarGroup.StarBean;
@@ -511,13 +510,7 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
 
     @Override
     public void setVisibility(final String key, final boolean visible) {
-        Gdx.app.postRunnable(() -> {
-            if (key.equals("element.propermotions")) {
-                EventManager.instance.post(Events.PROPER_MOTIONS_CMD, key, visible);
-            } else {
-                em.post(Events.TOGGLE_VISIBILITY_CMD, key, false, visible);
-            }
-        });
+        Gdx.app.postRunnable(() -> em.post(Events.TOGGLE_VISIBILITY_CMD, key, false, visible));
     }
 
     @Override
@@ -526,15 +519,20 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
     }
 
     @Override
-    public void setProperMotionsColorMode(int mode){
-        Gdx.app.postRunnable(() -> EventManager.instance.post(Events.PM_COLOR_MODE_CMD, mode % 5, false));
+    public void setProperMotionsColorMode(int mode) {
+        Gdx.app.postRunnable(() -> EventManager.instance.post(Events.PM_COLOR_MODE_CMD, mode % 6, false));
+    }
+
+    @Override
+    public void setProperMotionsArrowheads(boolean arrowheadsEnabled) {
+        Gdx.app.postRunnable(() -> EventManager.instance.post(Events.PM_ARROWHEADS_CMD, arrowheadsEnabled, false));
     }
 
     public void setProperMotionsNumberFactor(int factor) {
         setProperMotionsNumberFactor((float) factor);
     }
 
-    public void setUnfilteredProperMotionsNumberFactor(float factor){
+    public void setUnfilteredProperMotionsNumberFactor(float factor) {
         GlobalConf.scene.PM_NUM_FACTOR = factor;
     }
 
@@ -1371,16 +1369,12 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
 
     @Override
     public void expandGuiComponent(String name) {
-        IGui gui = GaiaSky.instance.mainGui;
-        ControlsWindow controls = gui.getGuiStage().getRoot().findActor(I18n.bundle.get("gui.controlpanel"));
-        controls.getCollapsiblePane(name).expandPane();
+        em.post(Events.EXPAND_PANE_CMD, name);
     }
 
     @Override
     public void collapseGuiComponent(String name) {
-        IGui gui = GaiaSky.instance.mainGui;
-        ControlsWindow controls = gui.getGuiStage().getRoot().findActor(I18n.bundle.get("gui.controlpanel"));
-        controls.getCollapsiblePane(name).collapsePane();
+        em.post(Events.COLLAPSE_PANE_CMD, name);
     }
 
     @Override
