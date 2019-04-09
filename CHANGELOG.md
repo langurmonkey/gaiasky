@@ -47,6 +47,10 @@
 - update changelog, changelog config
 
 ### Features
+- add 'y' and 'n' key bindings to dialogs
+- add shortcuts to expand/collapse panes
+- velocity vectors are regular component types
+- add optional arrowheads to velocity vectors
 - line renderers allocate memory in chunks
 - add redshift from camera velocity vector coloring fix: fix blue-white-red color map
 - add redshift and single coloring to velocity vectors
