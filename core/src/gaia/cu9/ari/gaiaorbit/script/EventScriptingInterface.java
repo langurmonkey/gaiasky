@@ -530,6 +530,11 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
         Gdx.app.postRunnable(() -> EventManager.instance.post(Events.PM_COLOR_MODE_CMD, mode % 6, false));
     }
 
+    @Override
+    public void setProperMotionsArrowheads(boolean arrowheadsEnabled){
+        Gdx.app.postRunnable(() ->  EventManager.instance.post(Events.PM_ARROWHEADS_CMD, arrowheadsEnabled, false));
+    }
+
     public void setProperMotionsNumberFactor(int factor) {
         setProperMotionsNumberFactor((float) factor);
     }

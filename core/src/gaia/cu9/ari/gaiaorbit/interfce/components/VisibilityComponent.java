@@ -19,10 +19,7 @@ import gaia.cu9.ari.gaiaorbit.util.GlobalConf;
 import gaia.cu9.ari.gaiaorbit.util.I18n;
 import gaia.cu9.ari.gaiaorbit.util.TextUtils;
 import gaia.cu9.ari.gaiaorbit.util.math.MathUtilsd;
-import gaia.cu9.ari.gaiaorbit.util.scene2d.OwnLabel;
-import gaia.cu9.ari.gaiaorbit.util.scene2d.OwnSelectBox;
-import gaia.cu9.ari.gaiaorbit.util.scene2d.OwnTextButton;
-import gaia.cu9.ari.gaiaorbit.util.scene2d.OwnTextIconButton;
+import gaia.cu9.ari.gaiaorbit.util.scene2d.*;
 
 import java.util.HashMap;
 import java.util.HashSet;
@@ -36,7 +33,7 @@ public class VisibilityComponent extends GuiComponent implements IObserver {
      */
     private ComponentType[] visibilityEntities;
     private boolean[] visible;
-    private CheckBox properMotions;
+    private CheckBox properMotions, pmArrowheads;
     private Slider pmNumFactorSlider, pmLenFactorSlider;
     private SelectBox<ComboBoxBean> pmColorMode;
     private Label pmNumFactor, pmLenFactor, pmNumFactorLabel, pmLenFactorLabel, pmColorModeLabel;
@@ -46,7 +43,7 @@ public class VisibilityComponent extends GuiComponent implements IObserver {
 
     public VisibilityComponent(Skin skin, Stage stage) {
         super(skin, stage);
-        EventManager.instance.subscribe(this, Events.TOGGLE_VISIBILITY_CMD, Events.PROPER_MOTIONS_CMD, Events.PM_LEN_FACTOR_CMD, Events.PM_NUM_FACTOR_CMD, Events.PM_COLOR_MODE_CMD);
+        EventManager.instance.subscribe(this, Events.TOGGLE_VISIBILITY_CMD, Events.PROPER_MOTIONS_CMD, Events.PM_LEN_FACTOR_CMD, Events.PM_NUM_FACTOR_CMD, Events.PM_COLOR_MODE_CMD, Events.PM_ARROWHEADS_CMD);
     }
 
     public void setVisibilityEntitites(ComponentType[] ve, boolean[] v) {
@@ -102,6 +99,20 @@ public class VisibilityComponent extends GuiComponent implements IObserver {
         }
 
         /** Proper motions **/
+
+        // ARROWHEADS
+        pmArrowheads = new OwnCheckBox(I18n.txt("gui.pm.arrowheads"), skin, space2);
+        pmArrowheads.setName("pm arrow caps");
+        pmArrowheads.setChecked(GlobalConf.scene.PM_ARROWHEADS);
+        pmArrowheads.addListener(event -> {
+            if (event instanceof ChangeEvent) {
+                if (sendEvents)
+                    EventManager.instance.post(Events.PM_ARROWHEADS_CMD, pmArrowheads.isChecked(), true);
+                return true;
+            }
+            return false;
+        });
+
 
         // NUM FACTOR
         pmNumFactorLabel = new Label(I18n.txt("gui.pmnumfactor"), skin, "default");
@@ -192,7 +203,7 @@ public class VisibilityComponent extends GuiComponent implements IObserver {
         // PM CHECKBOX
         pmGroup = new VerticalGroup().align(Align.left).columnAlign(Align.left);
         pmGroup.space(space4);
-        properMotions = new CheckBox(" " + I18n.txt("gui.checkbox.propermotionvectors"), skin);
+        properMotions = new OwnCheckBox(I18n.txt("gui.checkbox.propermotionvectors"), skin, space2);
         properMotions.setName("pm vectors");
         properMotions.addListener(event -> {
             if (event instanceof ChangeEvent) {
@@ -200,10 +211,12 @@ public class VisibilityComponent extends GuiComponent implements IObserver {
                     EventManager.instance.post(Events.PROPER_MOTIONS_CMD, "Proper motions", properMotions.isChecked());
                 if (pmGroup != null) {
                     if (properMotions.isChecked()) {
+                        pmGroup.addActor(pmArrowheads);
                         pmGroup.addActor(pmNumFactorGroup);
                         pmGroup.addActor(pmLenFactorGroup);
                         pmGroup.addActor(pmColorModeGroup);
                     } else {
+                        pmGroup.removeActor(pmArrowheads);
                         pmGroup.removeActor(pmNumFactorGroup);
                         pmGroup.removeActor(pmLenFactorGroup);
                         pmGroup.removeActor(pmColorModeGroup);
@@ -283,6 +296,15 @@ public class VisibilityComponent extends GuiComponent implements IObserver {
                 pmColorMode.setSelectedIndex((Integer) data[0]);
                 sendEvents = true;
             }
+            break;
+        case PM_ARROWHEADS_CMD:
+            interf = (Boolean) data[1];
+            if (!interf) {
+                sendEvents = false;
+                pmArrowheads.setChecked((boolean) data[0]);
+                sendEvents = true;
+            }
+
             break;
         default:
             break;

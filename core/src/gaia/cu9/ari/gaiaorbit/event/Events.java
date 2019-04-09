@@ -686,6 +686,10 @@ public enum Events {
      */
     PM_COLOR_MODE_CMD,
     /**
+     * Show or hide arrow caps. Contains boolean with state and another if it comes from UI
+     */
+    PM_ARROWHEADS_CMD,
+    /**
      * Updates the screen mode according to whats in the
      * {@link gaia.cu9.ari.gaiaorbit.util.GlobalConf#screen} bean.
      **/

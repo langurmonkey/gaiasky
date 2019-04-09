@@ -658,6 +658,7 @@ public class StarGroup extends ParticleGroup implements ILineRenderable, IStarFo
 
                     Vector3d p1 = aux3d1.get().set(star.x() + pm.x, star.y() + pm.y, star.z() + pm.z).sub(camera.getPos());
                     Vector3d ppm = aux3d2.get().set(star.pmx(), star.pmy(), star.pmz()).scl(GlobalConf.scene.PM_LEN_FACTOR);
+                    double p1p2len = ppm.len();
                     Vector3d p2 = aux3d3.get().set(ppm).add(p1);
 
                     // Max speed in km/s, to normalize
@@ -737,6 +738,15 @@ public class StarGroup extends ParticleGroup implements ILineRenderable, IStarFo
                     }
 
                     renderer.addLine(this, p1.x, p1.y, p1.z, p2.x, p2.y, p2.z, r, g, b, alpha * this.opacity);
+                    if(GlobalConf.scene.PM_ARROWHEADS) {
+                        // Add Arrow cap
+                        Vector3d p3 = aux3d2.get().set(ppm).nor().scl(p1p2len * .86).add(p1);
+                        p3.rotate(p2, 30);
+                        renderer.addLine(this, p3.x, p3.y, p3.z, p2.x, p2.y, p2.z, r, g, b, alpha * this.opacity);
+                        p3.rotate(p2, -60);
+                        renderer.addLine(this, p3.x, p3.y, p3.z, p2.x, p2.y, p2.z, r, g, b, alpha * this.opacity);
+                    }
+
                 }
             }
         }
@@ -746,7 +756,7 @@ public class StarGroup extends ParticleGroup implements ILineRenderable, IStarFo
 
     @Override
     public float getLineWidth() {
-        return 2.0f;
+        return 1.0f;
     }
 
     @Override

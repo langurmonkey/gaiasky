@@ -544,6 +544,12 @@ public interface IScriptingInterface {
     void setProperMotionsColorMode(int mode);
 
     /**
+     * Sets whether to show arrowheads or not for the velocity vectors.
+     * @param arrowheadsEnabled Whether to show the velocity vectors with arrowheads.
+     */
+    void setProperMotionsArrowheads(boolean arrowheadsEnabled);
+
+    /**
      * Overrides the maximum number of proper motion vectors that the program
      * is allowed to show.
      * @param maxNumber The maximum number of proper motion vectors. Negative to use default
