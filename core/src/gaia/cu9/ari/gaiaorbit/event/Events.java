@@ -14,6 +14,19 @@ public enum Events {
     /**
      * Event names
      */
+
+    /**
+     * Expands a GUI pane. Contains its name
+     */
+    EXPAND_PANE_CMD,
+    /**
+     * Collapses a GUI pane. Contains its name
+     */
+    COLLAPSE_PANE_CMD,
+    /**
+     * Toggles the collapsed state of a GUI pane. Contains its name
+     */
+    TOGGLE_EXPANDCOLLAPSE_PANE_CMD,
     /**
      * Notifies of a change in the time, contains the Date object
      **/

@@ -67,7 +67,7 @@ public class ControlsWindow extends CollapsibleWindow implements IObserver {
         septexreg.getTexture().setWrap(TextureWrap.Repeat, TextureWrap.ClampToEdge);
         this.separator = new TiledDrawable(septexreg);
 
-        EventManager.instance.subscribe(this, Events.TOGGLE_TIME_CMD, Events.GUI_SCROLL_POSITION_CMD, Events.GUI_FOLD_CMD, Events.GUI_MOVE_CMD, Events.RECALCULATE_OPTIONS_SIZE);
+        EventManager.instance.subscribe(this, Events.TOGGLE_TIME_CMD, Events.GUI_SCROLL_POSITION_CMD, Events.GUI_FOLD_CMD, Events.GUI_MOVE_CMD, Events.RECALCULATE_OPTIONS_SIZE, Events.EXPAND_PANE_CMD, Events.COLLAPSE_PANE_CMD, Events.TOGGLE_EXPANDCOLLAPSE_PANE_CMD);
     }
 
     public void initialize() {
@@ -75,8 +75,8 @@ public class ControlsWindow extends CollapsibleWindow implements IObserver {
         guiLayout = new Table();
         guiLayout.align(Align.left);
 
-        List<Actor> mainActors = new ArrayList<Actor>();
-        panes = new HashMap<String, CollapsiblePane>();
+        List<Actor> mainActors = new ArrayList<>();
+        panes = new HashMap<>();
 
         /** ----TIME GROUP---- **/
         playstop = new OwnImageButton(skin, "playstop");
@@ -94,7 +94,7 @@ public class ControlsWindow extends CollapsibleWindow implements IObserver {
         TimeComponent timeComponent = new TimeComponent(skin, ui);
         timeComponent.initialize();
 
-        CollapsiblePane time = new CollapsiblePane(ui, I18n.txt("gui.time"), timeComponent.getActor(), skin, true, playstop);
+        CollapsiblePane time = new CollapsiblePane(ui, I18n.txt("gui.time"), timeComponent.getActor(), skin, true, "Alt+T", playstop);
         time.align(Align.left);
         mainActors.add(time);
         panes.put(timeComponent.getClass().getSimpleName(), time);
@@ -143,7 +143,7 @@ public class ControlsWindow extends CollapsibleWindow implements IObserver {
         CameraComponent cameraComponent = new CameraComponent(skin, ui);
         cameraComponent.initialize();
 
-        CollapsiblePane camera = new CollapsiblePane(ui, I18n.txt("gui.camera"), cameraComponent.getActor(), skin, false, recCamera, recKeyframeCamera, playCamera);
+        CollapsiblePane camera = new CollapsiblePane(ui, I18n.txt("gui.camera"), cameraComponent.getActor(), skin, false, "Alt+C", recCamera, recKeyframeCamera, playCamera);
         camera.align(Align.left);
         mainActors.add(camera);
         panes.put(cameraComponent.getClass().getSimpleName(), camera);
@@ -153,7 +153,7 @@ public class ControlsWindow extends CollapsibleWindow implements IObserver {
         visibilityComponent.setVisibilityEntitites(visibilityEntities, visible);
         visibilityComponent.initialize();
 
-        CollapsiblePane visibility = new CollapsiblePane(ui, I18n.txt("gui.visibility"), visibilityComponent.getActor(), skin, false);
+        CollapsiblePane visibility = new CollapsiblePane(ui, I18n.txt("gui.visibility"), visibilityComponent.getActor(), skin, false, "Alt+V");
         visibility.align(Align.left);
         mainActors.add(visibility);
         panes.put(visibilityComponent.getClass().getSimpleName(), visibility);
@@ -162,7 +162,7 @@ public class ControlsWindow extends CollapsibleWindow implements IObserver {
         VisualEffectsComponent visualEffectsComponent = new VisualEffectsComponent(skin, ui);
         visualEffectsComponent.initialize();
 
-        CollapsiblePane visualEffects = new CollapsiblePane(ui, I18n.txt("gui.lighting"), visualEffectsComponent.getActor(), skin, false);
+        CollapsiblePane visualEffects = new CollapsiblePane(ui, I18n.txt("gui.lighting"), visualEffectsComponent.getActor(), skin, false, "Alt+L");
         visualEffects.align(Align.left);
         mainActors.add(visualEffects);
         panes.put(visualEffectsComponent.getClass().getSimpleName(), visualEffects);
@@ -171,7 +171,7 @@ public class ControlsWindow extends CollapsibleWindow implements IObserver {
         DatasetsComponent datasetsComponent = new DatasetsComponent(skin, ui);
         datasetsComponent.initialize();
 
-        CollapsiblePane datasets = new CollapsiblePane(ui, I18n.txt("gui.dataset.title"), datasetsComponent.getActor(), skin, false);
+        CollapsiblePane datasets = new CollapsiblePane(ui, I18n.txt("gui.dataset.title"), datasetsComponent.getActor(), skin, false, "Alt+D");
         datasets.align(Align.left);
         mainActors.add(datasets);
         panes.put(datasetsComponent.getClass().getSimpleName(), datasets);
@@ -181,7 +181,7 @@ public class ControlsWindow extends CollapsibleWindow implements IObserver {
         objectsComponent.setSceneGraph(sg);
         objectsComponent.initialize();
 
-        CollapsiblePane objects = new CollapsiblePane(ui, I18n.txt("gui.objects"), objectsComponent.getActor(), skin, false);
+        CollapsiblePane objects = new CollapsiblePane(ui, I18n.txt("gui.objects"), objectsComponent.getActor(), skin, false, "Alt+O");
         objects.align(Align.left);
         mainActors.add(objects);
         panes.put(objectsComponent.getClass().getSimpleName(), objects);
@@ -201,7 +201,7 @@ public class ControlsWindow extends CollapsibleWindow implements IObserver {
 
         Actor[] musicActors = MusicActorsManager.getMusicActors() != null ? MusicActorsManager.getMusicActors().getActors(skin) : null;
 
-        CollapsiblePane music = new CollapsiblePane(ui, I18n.txt("gui.music"), musicComponent.getActor(), skin, false, musicActors);
+        CollapsiblePane music = new CollapsiblePane(ui, I18n.txt("gui.music"), musicComponent.getActor(), skin, false, "Alt+M", musicActors);
         music.align(Align.left);
         mainActors.add(music);
         panes.put(musicComponent.getClass().getSimpleName(), music);
@@ -380,6 +380,21 @@ public class ControlsWindow extends CollapsibleWindow implements IObserver {
             break;
         case RECALCULATE_OPTIONS_SIZE:
             recalculateSize();
+            break;
+        case EXPAND_PANE_CMD:
+            String paneName = (String)data[0];
+            CollapsiblePane pane = panes.get(paneName);
+            pane.expandPane();
+            break;
+        case COLLAPSE_PANE_CMD:
+            paneName = (String)data[0];
+            pane = panes.get(paneName);
+            pane.collapsePane();
+            break;
+        case TOGGLE_EXPANDCOLLAPSE_PANE_CMD:
+            paneName = (String)data[0];
+            pane = panes.get(paneName);
+            pane.togglePane();
             break;
         default:
             break;

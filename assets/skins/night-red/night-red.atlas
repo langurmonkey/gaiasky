@@ -893,7 +893,7 @@ rec-icon-red
   orig: 16, 16
   offset: 0, 0
   index: -1
-rec-key-icon-grey
+rec-key-icon-gray
   rotate: false
   xy: 169, 57
   size: 16, 16
