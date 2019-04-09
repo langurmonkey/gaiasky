@@ -16,9 +16,7 @@ import gaia.cu9.ari.gaiaorbit.util.GlobalResources;
 import gaia.cu9.ari.gaiaorbit.util.I18n;
 
 import java.time.Instant;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.TreeSet;
+import java.util.*;
 
 /**
  * Contains the key mappings and the actions. This should be persisted somehow
@@ -71,6 +69,50 @@ public class KeyBindings {
             keys.add(key);
         }
         mappings.put(keys, action);
+    }
+
+    /**
+     * Finds an action given its name
+     * @param name The name
+     * @return The action if it exists
+     */
+    public ProgramAction findAction(String name){
+        Collection<ProgramAction> actions = mappings.values();
+        for(ProgramAction action : actions){
+            if(action.actionName.equals(name))
+                return action;
+        }
+        return null;
+    }
+
+    /**
+     * Gets the keys that trigger the action identified by the given name
+     * @param actionName The action name
+     * @return The keys
+     */
+    public TreeSet<Integer> getKeys(String actionName){
+        ProgramAction action = findAction(actionName);
+        if(action != null){
+            Set<Map.Entry<TreeSet<Integer>, ProgramAction>> entries = mappings.entrySet();
+            for(Map.Entry<TreeSet<Integer>, ProgramAction> entry : entries){
+                if(entry.getValue().equals(action)){
+                    return entry.getKey();
+                }
+            }
+        }
+        return null;
+    }
+
+    public String getStringKeys(String actionName){
+        TreeSet<Integer> keys = getKeys(actionName);
+        StringBuilder sb = new StringBuilder();
+        Iterator<Integer> it = keys.descendingIterator();
+        while(it.hasNext()){
+            sb.append(Keys.toString(it.next()));
+            if(it.hasNext())
+                sb.append("+");
+        }
+        return sb.toString();
     }
 
     /**
