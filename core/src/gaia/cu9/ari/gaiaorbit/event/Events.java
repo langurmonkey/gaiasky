@@ -212,11 +212,6 @@ public enum Events {
      */
     ORIENTATION_LOCK_CMD,
     /**
-     * Contains the name, the boolean value and a boolean indicating if this
-     * comes from the interface
-     **/
-    PROPER_MOTIONS_CMD,
-    /**
      * Contains a float with the intensity of the light between 0 and 1
      **/
     AMBIENT_LIGHT_CMD,

@@ -101,8 +101,7 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
     private String dataLoadString;
 
     public ISceneGraph sg;
-    // TODO make this private again
-    public SceneGraphRenderer sgr;
+    private SceneGraphRenderer sgr;
     private IPostProcessor pp;
 
     // Start time
@@ -280,8 +279,8 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
         pp = PostProcessorFactory.instance.getPostProcessor();
 
         // Scene graph renderer
-        sgr = new SceneGraphRenderer();
-        sgr.initialize(manager);
+        SceneGraphRenderer.initialise(manager);
+        sgr = SceneGraphRenderer.instance;
 
         // Initialise scripting gateway server
         ScriptingServer.initialize();

@@ -31,10 +31,7 @@ import gaia.cu9.ari.gaiaorbit.data.group.IStarGroupDataProvider;
 import gaia.cu9.ari.gaiaorbit.event.EventManager;
 import gaia.cu9.ari.gaiaorbit.event.Events;
 import gaia.cu9.ari.gaiaorbit.event.IObserver;
-import gaia.cu9.ari.gaiaorbit.render.ILineRenderable;
-import gaia.cu9.ari.gaiaorbit.render.IModelRenderable;
-import gaia.cu9.ari.gaiaorbit.render.IQuadRenderable;
-import gaia.cu9.ari.gaiaorbit.render.RenderingContext;
+import gaia.cu9.ari.gaiaorbit.render.*;
 import gaia.cu9.ari.gaiaorbit.render.system.FontRenderSystem;
 import gaia.cu9.ari.gaiaorbit.render.system.LineRenderSystem;
 import gaia.cu9.ari.gaiaorbit.scenegraph.camera.CameraManager.CameraMode;
@@ -528,7 +525,7 @@ public class StarGroup extends ParticleGroup implements ILineRenderable, IStarFo
         addToRender(this, RenderGroup.STAR_GROUP);
         addToRender(this, RenderGroup.BILLBOARD_STAR);
         addToRender(this, RenderGroup.MODEL_STAR);
-        if (GlobalConf.scene.PROPER_MOTION_VECTORS) {
+        if (SceneGraphRenderer.instance.isOn(ComponentTypes.ComponentType.VelocityVectors)) {
             addToRender(this, RenderGroup.LINE);
             addToRender(this, RenderGroup.LINE);
         }
@@ -641,7 +638,8 @@ public class StarGroup extends ParticleGroup implements ILineRenderable, IStarFo
      */
     @Override
     public void render(LineRenderSystem renderer, ICamera camera, float alpha) {
-        float thPointTimesFovfactor = (float) GlobalConf.scene.STAR_THRESHOLD_POINT * camera.getFovFactor();
+        alpha *= SceneGraphRenderer.instance.alphas[ComponentTypes.ComponentType.VelocityVectors.ordinal()];
+        float thPointTimesFovFactor = (float) GlobalConf.scene.STAR_THRESHOLD_POINT * camera.getFovFactor();
         int n = (int) Math.min(getMaxProperMotionLines(), pointData.size);
         for (int i = n - 1; i >= 0; i--) {
             StarBean star = (StarBean) pointData.get(active[i]);
@@ -654,7 +652,7 @@ public class StarGroup extends ParticleGroup implements ILineRenderable, IStarFo
                 // Rest of attributes
                 float distToCamera = (float) lpos.len();
                 float viewAngle = (float) (((radius / distToCamera) / camera.getFovFactor()) * GlobalConf.scene.STAR_BRIGHTNESS);
-                if (viewAngle >= thPointTimesFovfactor / GlobalConf.scene.PM_NUM_FACTOR && (star.pmx() != 0 || star.pmy() != 0 || star.pmz() != 0)) {
+                if (viewAngle >= thPointTimesFovFactor / GlobalConf.scene.PM_NUM_FACTOR && (star.pmx() != 0 || star.pmy() != 0 || star.pmz() != 0)) {
 
                     Vector3d p1 = aux3d1.get().set(star.x() + pm.x, star.y() + pm.y, star.z() + pm.z).sub(camera.getPos());
                     Vector3d ppm = aux3d2.get().set(star.pmx(), star.pmy(), star.pmz()).scl(GlobalConf.scene.PM_LEN_FACTOR);
@@ -668,10 +666,11 @@ public class StarGroup extends ParticleGroup implements ILineRenderable, IStarFo
                     case 0:
                     default:
                         // DIRECTION
+                        // Normalize, each component is in [-1:1], map to [0:1] and to a color channel
                         ppm.nor();
-                        r = (float) ppm.x;
-                        g = (float) ppm.y;
-                        b = (float) ppm.z;
+                        r = (float) (ppm.x + 1d) / 2f;
+                        g = (float) (ppm.y + 1d) / 2f;
+                        b = (float) (ppm.z + 1d) / 2f;
                         break;
                     case 1:
                         // LENGTH

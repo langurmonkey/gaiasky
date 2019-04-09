@@ -26,11 +26,11 @@ public class BillboardSpriteRenderSystem extends AbstractRenderSystem {
 
     private Mesh mesh;
     private Quaternion quaternion;
-    private int ctindex = -1;
+    private final int ctIndex;
 
-    public BillboardSpriteRenderSystem(RenderGroup rg, float[] alphas, ShaderProgram[] programs, int ctindex, float w, float h) {
+    public BillboardSpriteRenderSystem(RenderGroup rg, float[] alphas, ShaderProgram[] programs, int ctIndex, float w, float h) {
         super(rg, alphas, programs);
-        this.ctindex = ctindex;
+        this.ctIndex = ctIndex;
         init(w, h);
     }
 
@@ -43,11 +43,11 @@ public class BillboardSpriteRenderSystem extends AbstractRenderSystem {
      *            The alphas list
      * @param programs
      *            The shader programs to render the quad with
-     * @param ctindex
+     * @param ctIndex
      *            The component type index
      */
-    public BillboardSpriteRenderSystem(RenderGroup rg, float[] alphas, ShaderProgram[] programs, int ctindex) {
-        this(rg, alphas, programs, ctindex, 2, 2);
+    public BillboardSpriteRenderSystem(RenderGroup rg, float[] alphas, ShaderProgram[] programs, int ctIndex) {
+        this(rg, alphas, programs, ctIndex, 2, 2);
     }
 
     private void init(float w, float h) {
@@ -115,7 +115,7 @@ public class BillboardSpriteRenderSystem extends AbstractRenderSystem {
 
     @Override
     public void renderStud(Array<IRenderable> renderables, ICamera camera, double t) {
-        if ((ctindex >= 0 ? alphas[ctindex] != 0 : true)) {
+        if ((ctIndex >= 0 ? alphas[ctIndex] != 0 : true)) {
             renderables.sort(comp);
 
             // Calculate billobard rotation quaternion ONCE

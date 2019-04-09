@@ -352,7 +352,7 @@ public abstract class ModelBody extends CelestialBody {
     protected void prepareShadowEnvironment() {
         if (GlobalConf.scene.SHADOW_MAPPING) {
             Environment env = mc.env;
-            SceneGraphRenderer sgr = GaiaSky.instance.sgr;
+            SceneGraphRenderer sgr = SceneGraphRenderer.instance;
             if (shadow > 0 && sgr.smTexMap.containsKey(this)) {
                 Matrix4 combined = sgr.smCombinedMap.get(this);
                 Texture tex = sgr.smTexMap.get(this);

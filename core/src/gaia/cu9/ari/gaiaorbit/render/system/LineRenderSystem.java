@@ -14,12 +14,13 @@ import com.badlogic.gdx.graphics.VertexAttributes.Usage;
 import com.badlogic.gdx.graphics.glutils.ShaderProgram;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.Array;
+import gaia.cu9.ari.gaiaorbit.render.ComponentTypes;
 import gaia.cu9.ari.gaiaorbit.render.ILineRenderable;
 import gaia.cu9.ari.gaiaorbit.render.IRenderable;
+import gaia.cu9.ari.gaiaorbit.render.SceneGraphRenderer;
 import gaia.cu9.ari.gaiaorbit.scenegraph.Particle;
 import gaia.cu9.ari.gaiaorbit.scenegraph.SceneGraphNode.RenderGroup;
 import gaia.cu9.ari.gaiaorbit.scenegraph.camera.ICamera;
-import gaia.cu9.ari.gaiaorbit.util.GlobalConf;
 import org.lwjgl.opengl.GL11;
 
 import java.util.Comparator;
@@ -104,7 +105,7 @@ public class LineRenderSystem extends ImmediateRenderSystem {
             ILineRenderable renderable = (ILineRenderable) renderables.get(i);
             boolean rend = true;
             // TODO ugly hack
-            if (renderable instanceof Particle && !GlobalConf.scene.PROPER_MOTION_VECTORS)
+            if (renderable instanceof Particle && !SceneGraphRenderer.instance.isOn(ComponentTypes.ComponentType.VelocityVectors))
                 rend = false;
             if (rend) {
                 renderable.render(this, camera, getAlpha(renderable));

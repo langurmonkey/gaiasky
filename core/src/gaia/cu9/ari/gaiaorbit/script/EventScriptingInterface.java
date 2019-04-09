@@ -511,13 +511,7 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
 
     @Override
     public void setVisibility(final String key, final boolean visible) {
-        Gdx.app.postRunnable(() -> {
-            if (key.equals("element.propermotions")) {
-                EventManager.instance.post(Events.PROPER_MOTIONS_CMD, key, visible);
-            } else {
-                em.post(Events.TOGGLE_VISIBILITY_CMD, key, false, visible);
-            }
-        });
+        Gdx.app.postRunnable(() -> em.post(Events.TOGGLE_VISIBILITY_CMD, key, false, visible));
     }
 
     @Override
@@ -526,20 +520,20 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
     }
 
     @Override
-    public void setProperMotionsColorMode(int mode){
+    public void setProperMotionsColorMode(int mode) {
         Gdx.app.postRunnable(() -> EventManager.instance.post(Events.PM_COLOR_MODE_CMD, mode % 6, false));
     }
 
     @Override
-    public void setProperMotionsArrowheads(boolean arrowheadsEnabled){
-        Gdx.app.postRunnable(() ->  EventManager.instance.post(Events.PM_ARROWHEADS_CMD, arrowheadsEnabled, false));
+    public void setProperMotionsArrowheads(boolean arrowheadsEnabled) {
+        Gdx.app.postRunnable(() -> EventManager.instance.post(Events.PM_ARROWHEADS_CMD, arrowheadsEnabled, false));
     }
 
     public void setProperMotionsNumberFactor(int factor) {
         setProperMotionsNumberFactor((float) factor);
     }
 
-    public void setUnfilteredProperMotionsNumberFactor(float factor){
+    public void setUnfilteredProperMotionsNumberFactor(float factor) {
         GlobalConf.scene.PM_NUM_FACTOR = factor;
     }
 
