@@ -7,6 +7,7 @@ package gaia.cu9.ari.gaiaorbit.render.system;
 
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
+import com.badlogic.gdx.graphics.Mesh;
 import com.badlogic.gdx.graphics.VertexAttribute;
 import com.badlogic.gdx.graphics.VertexAttributes.Usage;
 import com.badlogic.gdx.graphics.glutils.ShaderProgram;
@@ -44,14 +45,29 @@ public class PointRenderSystem extends ImmediateRenderSystem {
         meshes = new Array<>();
 
         // ORIGINAL POINTS
-        int idx = createMeshData();
-        curr = meshes.get(idx);
+        meshes.add(newMeshData());
+        curr = meshes.get(0);
 
         meshIdx = 0;
     }
 
+    private MeshData newMeshData() {
+
+        MeshData md = new MeshData();
+
+        VertexAttribute[] attribs = buildVertexAttributes();
+        md.mesh = new Mesh(false, 10000, 0, attribs);
+
+        md.vertices = new float[10000 * (md.mesh.getVertexAttributes().vertexSize / 4)];
+        md.vertexSize = md.mesh.getVertexAttributes().vertexSize / 4;
+        md.colorOffset = md.mesh.getVertexAttribute(Usage.ColorPacked) != null ? md.mesh.getVertexAttribute(Usage.ColorPacked).offset / 4 : 0;
+        sizeOffset = md.mesh.getVertexAttribute(Usage.Generic).offset / 4;
+        return md;
+
+    }
+
     protected VertexAttribute[] buildVertexAttributes() {
-        Array<VertexAttribute> attribs = new Array<VertexAttribute>();
+        Array<VertexAttribute> attribs = new Array<>();
         attribs.add(new VertexAttribute(Usage.Position, 3, ShaderProgram.POSITION_ATTRIBUTE));
         attribs.add(new VertexAttribute(Usage.ColorPacked, 4, ShaderProgram.COLOR_ATTRIBUTE));
         attribs.add(new VertexAttribute(Usage.Generic, 1, "a_size"));
