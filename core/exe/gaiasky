@@ -21,10 +21,10 @@ LIB_PATH="$GSDIR/lib/*"
 #
 if [[ "$OSTYPE" == "darwin"* ]]; then
     # macOS, use bundled JRE
-    if [ -f "$GSDIR/../../PlugIns/jre.bundle/Contents/Home/jre/bin/java"]; then
+    if [[ -f "$GSDIR/../../PlugIns/jre.bundle/Contents/Home/jre/bin/java" ]]; then
         JAVA="$GSDIR/../../PlugIns/jre.bundle/Contents/Home/jre/bin/java"
     else
-        JAVA="$GSDIR/../../PlugIns/jre.bundle/Contents/jre/bin/java"
+        JAVA="$GSDIR/../../PlugIns/jre.bundle/Contents/Home/bin/java"
     fi
 elif [[ "$JAVA_HOME" != "" ]]; then
     # Use $JAVA_HOME
