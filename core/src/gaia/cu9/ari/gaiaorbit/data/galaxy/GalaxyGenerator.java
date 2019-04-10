@@ -6,7 +6,7 @@
 package gaia.cu9.ari.gaiaorbit.data.galaxy;
 
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.backends.lwjgl.LwjglFiles;
+import com.badlogic.gdx.backends.lwjgl3.Lwjgl3Files;
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.math.Vector3;
 import gaia.cu9.ari.gaiaorbit.desktop.format.DesktopDateFormatFactory;
@@ -60,7 +60,7 @@ public class GalaxyGenerator {
 
     public static void main(String[] args) {
         try {
-            Gdx.files = new LwjglFiles();
+            Gdx.files = new Lwjgl3Files();
 
             // Initialize number format
             NumberFormatFactory.initialize(new DesktopNumberFormatFactory());

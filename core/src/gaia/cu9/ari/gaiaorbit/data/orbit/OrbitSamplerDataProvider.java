@@ -6,7 +6,7 @@
 package gaia.cu9.ari.gaiaorbit.data.orbit;
 
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.backends.lwjgl.LwjglFiles;
+import com.badlogic.gdx.backends.lwjgl3.Lwjgl3Files;
 import com.badlogic.gdx.files.FileHandle;
 import gaia.cu9.ari.gaiaorbit.assets.OrbitDataLoader.OrbitDataLoaderParameter;
 import gaia.cu9.ari.gaiaorbit.data.util.PointCloudData;
@@ -50,7 +50,7 @@ public class OrbitSamplerDataProvider implements IOrbitDataProvider {
             // Logger
             new ConsoleLogger();
 
-            Gdx.files = new LwjglFiles();
+            Gdx.files = new Lwjgl3Files();
 
             // Initialize number format
             NumberFormatFactory.initialize(new DesktopNumberFormatFactory());

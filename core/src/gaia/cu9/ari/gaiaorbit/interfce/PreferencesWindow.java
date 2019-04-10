@@ -54,7 +54,6 @@ import java.util.*;
  * @author tsagrista
  */
 public class PreferencesWindow extends GenericDialog {
-
     private Array<Actor> contents;
     private Array<OwnLabel> labels;
 
@@ -1314,9 +1313,6 @@ public class PreferencesWindow extends GenericDialog {
             return false;
         });
 
-        report = new OwnCheckBox(I18n.txt("gui.system.allowreporting"), skin, pad5);
-        report.setChecked(GlobalConf.program.ANALYTICS_ENABLED);
-
         // RELOAD DEFAULTS
         OwnTextButton reloadDefaults = new OwnTextButton(I18n.txt("gui.system.reloaddefaults"), skin);
         reloadDefaults.addListener(event -> {
@@ -1654,7 +1650,6 @@ public class PreferencesWindow extends GenericDialog {
         GlobalConf.data.REAL_GAIA_ATTITUDE = real.isChecked();
 
         // System
-        GlobalConf.program.ANALYTICS_ENABLED = report.isChecked();
         if (GlobalConf.program.SHOW_DEBUG_INFO != debugInfoBak) {
             EventManager.instance.post(Events.SHOW_DEBUG_CMD, !debugInfoBak);
         }

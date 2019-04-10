@@ -68,6 +68,42 @@
         <file path="@gs-git-folder@/assets/icon/gs_128.png" />
       </iconImageFiles>
     </launcher>
+    <launcher name="gaiasky macos" id="573" customizedId="" external="false" excludeFromMenu="false" unixMode="755" unixAutoStart="true" menuName="${compiler:sys.fullName}" icnsFile="" customMacBundleIdentifier="false" macBundleIdentifier="" swtApp="false" fileset="" macBundleBinary="JavaApplicationStub" addMacEntitlements="false" macEntitlementsFile="" useCustomMacosExecutableName="false" customMacosExecutableName="" useJavaMinVersionOverride="false" javaMinVersionOverride="" useJavaMaxVersionOverride="false" javaMaxVersionOverride="" checkUpdater="false" updateExecutionMode="unattendedProgress" unattendedUpdateTitle="${i18n:updater.WindowTitle(&quot;${compiler:sys.fullName}&quot;)}">
+      <executable name="${compiler:sys.shortName}" type="1" iconSet="true" iconFile="@gs-git-folder@/assets/icon/ic_launcher.ico" executableDir="" redirectStderr="true" stderrFile="error.log" stderrMode="overwrite" redirectStdout="true" stdoutFile="output.log" stdoutMode="overwrite" failOnStderrOutput="true" executableMode="1" changeWorkingDirectory="true" workingDirectory="." singleInstance="true" serviceStartType="2" serviceDependencies="" serviceDescription="" jreLocation="" executionLevel="asInvoker" checkConsoleParameter="false" globalSingleInstance="false" singleInstanceActivate="true" dpiAware="false">
+        <versionInfo include="true" fileVersion="" fileDescription="Real-time, cross-platform, 3D Universe application which supports more than a billion stars" legalCopyright="MPL" internalName="GaiaSky" productName="${compiler:sys.fullName}" />
+      </executable>
+      <splashScreen show="false" width="0" height="0" bitmapFile="" textOverlay="false">
+        <text>
+          <statusLine x="20" y="20" text="" fontSize="8" fontColor="0,0,0" bold="false" />
+          <versionLine x="20" y="40" text="version ${compiler:sys.version}" fontSize="8" fontColor="0,0,0" bold="false" />
+        </text>
+      </splashScreen>
+      <java mainClass="gaia.cu9.ari.gaiaorbit.desktop.GaiaSkyDesktop" mainMode="1" vmParameters="-Xms2g -Xmx3g -XX:+UseG1GC -Dpython.console.encoding=UTF-8 -Dassets.location=./ -XstartOnFirstThread" arguments="" allowVMPassthroughParameters="true" preferredVM="" bundleRuntime="true">
+        <classPath>
+          <scanDirectory location="lib" failOnError="false" />
+        </classPath>
+        <modulePath />
+        <nativeLibraryDirectories />
+        <vmOptions />
+      </java>
+      <includedFiles />
+      <unextractableFiles />
+      <vmOptionsFile mode="template" overwriteMode="0" fileMode="644">
+        <content />
+      </vmOptionsFile>
+      <customScript mode="1" file="">
+        <content />
+      </customScript>
+      <infoPlist mode="1" file="">
+        <content />
+      </infoPlist>
+      <iconImageFiles>
+        <file path="@gs-git-folder@/assets/icon/gs_016.png" />
+        <file path="@gs-git-folder@/assets/icon/gs_032.png" />
+        <file path="@gs-git-folder@/assets/icon/gs_064.png" />
+        <file path="@gs-git-folder@/assets/icon/gs_128.png" />
+      </iconImageFiles>
+    </launcher>
   </launchers>
   <installerGui installerType="1" addOnAppId="" suggestPreviousLocations="true" autoUpdateDescriptorUrl="" useAutoUpdateBaseUrl="false" autoUpdateBaseUrl="">
     <staticMembers script="" />
@@ -1361,7 +1397,9 @@ return console.askYesNo(message, true);
     <windows name="Windows 64" id="25" customizedId="" mediaFileName="" installDir="${compiler:sys.fullName}" overridePrincipalLanguage="false" jreBitType="64" runPostProcessor="false" postProcessor="" failOnPostProcessorError="false" useLegacyMediaFileIds="false" legacyMediaFileIds="" downloadURL="" includeAllDownloadableComponents="false" includedJRE="windows-amd64-11.0.2" manualJREEntry="false" bundleType="1" jreURL="" jreShared="false" directDownload="false" installOnlyIfNecessary="false" customInstallBaseDir="" contentFilesType="1" verifyIntegrity="true">
       <excludedComponents />
       <includedDownloadableComponents />
-      <excludedLaunchers />
+      <excludedLaunchers>
+        <launcher id="573" />
+      </excludedLaunchers>
       <excludedBeans />
       <overriddenPrincipalLanguage id="en" customLocalizationFile="" />
       <exclude>
@@ -1377,7 +1415,7 @@ return console.askYesNo(message, true);
         <customAttributes />
       </autoUpdate>
     </windows>
-    <macos name="macOS Single Bundle" id="221" customizedId="" mediaFileName="" installDir="${compiler:sys.fullName}" overridePrincipalLanguage="false" jreBitType="all" runPostProcessor="false" postProcessor="" failOnPostProcessorError="false" useLegacyMediaFileIds="false" legacyMediaFileIds="" downloadURL="" includeAllDownloadableComponents="false" includedJRE="macosx-amd64-11.0.2" manualJREEntry="false" bundleType="1" jreURL="" jreShared="false" directDownload="false" installOnlyIfNecessary="false" requiredVmIdPrefix="" customInstallBaseDir="" contentFilesType="1" installerName="${i18n:InstallerName(${compiler:sys.fullName})}" volumeName="${compiler:sys.shortName}" compressDmg="false" launcherId="22">
+    <macos name="macOS Single Bundle" id="221" customizedId="" mediaFileName="" installDir="${compiler:sys.fullName}" overridePrincipalLanguage="false" jreBitType="all" runPostProcessor="false" postProcessor="" failOnPostProcessorError="false" useLegacyMediaFileIds="false" legacyMediaFileIds="" downloadURL="" includeAllDownloadableComponents="false" includedJRE="macosx-amd64-11.0.2" manualJREEntry="false" bundleType="1" jreURL="" jreShared="false" directDownload="false" installOnlyIfNecessary="false" requiredVmIdPrefix="" customInstallBaseDir="" contentFilesType="1" installerName="${i18n:InstallerName(${compiler:sys.fullName})}" volumeName="${compiler:sys.shortName}" compressDmg="false" launcherId="573">
       <excludedComponents />
       <includedDownloadableComponents />
       <excludedBeans />
@@ -1398,7 +1436,9 @@ return console.askYesNo(message, true);
     <unixInstaller name="Unix Installer" id="28" customizedId="" mediaFileName="" installDir="${compiler:sys.shortName}" overridePrincipalLanguage="false" jreBitType="all" runPostProcessor="false" postProcessor="" failOnPostProcessorError="false" useLegacyMediaFileIds="false" legacyMediaFileIds="" downloadURL="" includeAllDownloadableComponents="false" includedJRE="" manualJREEntry="false" bundleType="1" jreURL="" jreShared="false" directDownload="false" installOnlyIfNecessary="false" customInstallBaseDir="" contentFilesType="1">
       <excludedComponents />
       <includedDownloadableComponents />
-      <excludedLaunchers />
+      <excludedLaunchers>
+        <launcher id="573" />
+      </excludedLaunchers>
       <excludedBeans />
       <overriddenPrincipalLanguage id="en" customLocalizationFile="" />
       <exclude>
@@ -1418,7 +1458,9 @@ return console.askYesNo(message, true);
     <linuxDeb name="Linux Deb Archive" id="30" customizedId="" mediaFileName="" installDir="/opt/${compiler:sys.shortName}" overridePrincipalLanguage="false" jreBitType="all" runPostProcessor="false" postProcessor="" failOnPostProcessorError="false" useLegacyMediaFileIds="false" legacyMediaFileIds="" downloadURL="" includeAllDownloadableComponents="true" includedJRE="" manualJREEntry="false" overwriteNeverAsConfigFiles="false" dependencies="default-jre" bzip="false" description="Real-time, cross-platform, 3D Universe application which supports more than a billion stars" maintainerEmail="tsagrista@ari.uni-heidelberg.de" architectureSet="false" architecture="">
       <excludedComponents />
       <includedDownloadableComponents />
-      <excludedLaunchers />
+      <excludedLaunchers>
+        <launcher id="573" />
+      </excludedLaunchers>
       <excludedBeans />
       <overriddenPrincipalLanguage id="en" customLocalizationFile="" />
       <exclude>
@@ -1447,7 +1489,9 @@ return console.askYesNo(message, true);
     <linuxRPM name="Linux RPM" id="77" customizedId="" mediaFileName="" installDir="/opt/${compiler:sys.shortName}" overridePrincipalLanguage="false" jreBitType="all" runPostProcessor="false" postProcessor="" failOnPostProcessorError="false" useLegacyMediaFileIds="false" legacyMediaFileIds="" downloadURL="" includeAllDownloadableComponents="true" includedJRE="" manualJREEntry="false" overwriteNeverAsConfigFiles="false" dependencies="" os="linux" arch="x86_64">
       <excludedComponents />
       <includedDownloadableComponents />
-      <excludedLaunchers />
+      <excludedLaunchers>
+        <launcher id="573" />
+      </excludedLaunchers>
       <excludedBeans />
       <overriddenPrincipalLanguage id="en" customLocalizationFile="" />
       <exclude>

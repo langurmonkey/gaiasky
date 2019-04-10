@@ -60,10 +60,10 @@ OPTS="$OPTS -XX:+UseG1GC"
 # Even more JIT compiler debugging - This produces a huge XML log file (for JITWatch)
 #OPTS="$OPTS -XX:+UnlockDiagnosticVMOptions -XX:+TraceClassLoading -XX:+LogCompilation -XX:+PrintAssembly"
 
-# macOS hack - needs a couple of args to be happy (lwjgl3 only)
-#if [[ "$OSTYPE" == "darwin"* ]]; then
-#	OPTS="$OPTS -XstartOnFirstThread -Djava.awt.headless=true"
-#fi
+# macOS hack - needs a couple of args to be happy
+if [[ "$OSTYPE" == "darwin"* ]]; then
+	OPTS="$OPTS -XstartOnFirstThread -Djava.awt.headless=true"
+fi
 
 # Assets location
 OPTS="$OPTS -Dassets.location=\"$GSDIR/\""
