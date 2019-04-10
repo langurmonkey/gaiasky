@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<install4j version="7.0.8" transformSequenceNumber="7">
+<install4j version="7.0.10" transformSequenceNumber="7">
   <directoryPresets config="./" />
   <application name="GaiaSky" distributionSourceDir="" applicationId="8310-5272-6362-8592" mediaDir="./" mediaFilePattern="${compiler:sys.shortName}_${compiler:sys.platform}_${compiler:sys.version}" compression="9" lzmaCompression="false" pack200Compression="false" excludeSignedFromPacking="true" commonExternalFiles="false" createMd5Sums="true" shrinkRuntime="true" shortName="gaiasky" publisher="ARI - ZAH - Universität Heidelberg" publisherWeb="http://www.zah.uni-heidelberg.de/gaia/outreach/gaiasky" version="@version-tag@" allPathsRelative="true" backupOnSave="false" autoSave="false" convertDotsToUnderscores="true" macSignature="????" macVolumeId="c3380c949a34b4f7" javaMinVersion="1.8" javaMaxVersion="" allowBetaVM="false" jdkMode="runtimeJre" jdkName="">
     <languages skipLanguageSelection="false" languageSelectionInPrincipalLanguage="false">
@@ -42,7 +42,7 @@
           <versionLine x="20" y="40" text="version ${compiler:sys.version}" fontSize="8" fontColor="0,0,0" bold="false" />
         </text>
       </splashScreen>
-      <java mainClass="gaia.cu9.ari.gaiaorbit.desktop.GaiaSkyDesktop" mainMode="1" vmParameters="-Xms2g -Xmx4g -XX:+UseG1GC -Dpython.console.encoding=UTF-8 -Dassets.location=./ -XstartOnFirstThread" arguments="" allowVMPassthroughParameters="true" preferredVM="" bundleRuntime="true">
+      <java mainClass="gaia.cu9.ari.gaiaorbit.desktop.GaiaSkyDesktop" mainMode="1" vmParameters="-Xms2g -Xmx4g -XX:+UseG1GC -Dpython.console.encoding=UTF-8 -Dassets.location=./" arguments="" allowVMPassthroughParameters="true" preferredVM="" bundleRuntime="true">
         <classPath>
           <scanDirectory location="lib" failOnError="false" />
         </classPath>
@@ -68,7 +68,7 @@
         <file path="@gs-git-folder@/assets/icon/gs_128.png" />
       </iconImageFiles>
     </launcher>
-    <launcher name="gaiasky32" id="227" customizedId="" external="false" excludeFromMenu="false" unixMode="755" unixAutoStart="true" menuName="${compiler:sys.fullName}" icnsFile="" customMacBundleIdentifier="false" macBundleIdentifier="" swtApp="false" fileset="" macBundleBinary="JavaApplicationStub" addMacEntitlements="false" macEntitlementsFile="" useCustomMacosExecutableName="false" customMacosExecutableName="" useJavaMinVersionOverride="false" javaMinVersionOverride="" useJavaMaxVersionOverride="false" javaMaxVersionOverride="">
+    <launcher name="gaiasky macos" id="573" customizedId="" external="false" excludeFromMenu="false" unixMode="755" unixAutoStart="true" menuName="${compiler:sys.fullName}" icnsFile="" customMacBundleIdentifier="false" macBundleIdentifier="" swtApp="false" fileset="" macBundleBinary="JavaApplicationStub" addMacEntitlements="false" macEntitlementsFile="" useCustomMacosExecutableName="false" customMacosExecutableName="" useJavaMinVersionOverride="false" javaMinVersionOverride="" useJavaMaxVersionOverride="false" javaMaxVersionOverride="" checkUpdater="false" updateExecutionMode="unattendedProgress" unattendedUpdateTitle="${i18n:updater.WindowTitle(&quot;${compiler:sys.fullName}&quot;)}">
       <executable name="${compiler:sys.shortName}" type="1" iconSet="true" iconFile="@gs-git-folder@/assets/icon/ic_launcher.ico" executableDir="" redirectStderr="true" stderrFile="error.log" stderrMode="overwrite" redirectStdout="true" stdoutFile="output.log" stdoutMode="overwrite" failOnStderrOutput="true" executableMode="1" changeWorkingDirectory="true" workingDirectory="." singleInstance="true" serviceStartType="2" serviceDependencies="" serviceDescription="" jreLocation="" executionLevel="asInvoker" checkConsoleParameter="false" globalSingleInstance="false" singleInstanceActivate="true" dpiAware="false">
         <versionInfo include="true" fileVersion="" fileDescription="Real-time, cross-platform, 3D Universe application which supports more than a billion stars" legalCopyright="MPL" internalName="GaiaSky" productName="${compiler:sys.fullName}" />
       </executable>
@@ -78,7 +78,7 @@
           <versionLine x="20" y="40" text="version ${compiler:sys.version}" fontSize="8" fontColor="0,0,0" bold="false" />
         </text>
       </splashScreen>
-      <java mainClass="gaia.cu9.ari.gaiaorbit.desktop.GaiaSkyDesktop" mainMode="1" vmParameters="-Xms512m -Xmx1500m -XX:+UseG1GC -Dpython.console.encoding=UTF-8 -Dassets.location=./" arguments="" allowVMPassthroughParameters="true" preferredVM="" bundleRuntime="true">
+      <java mainClass="gaia.cu9.ari.gaiaorbit.desktop.GaiaSkyDesktop" mainMode="1" vmParameters="-Xms2g -Xmx3g -XX:+UseG1GC -Dpython.console.encoding=UTF-8 -Dassets.location=./ -XstartOnFirstThread" arguments="" allowVMPassthroughParameters="true" preferredVM="" bundleRuntime="true">
         <classPath>
           <scanDirectory location="lib" failOnError="false" />
         </classPath>
@@ -113,7 +113,7 @@
       <customAttributes />
     </autoUpdate>
     <applications>
-      <application name="" id="installer" customizedId="" beanClass="com.install4j.runtime.beans.applications.InstallerApplication" enabled="true" commentSet="false" comment="" actionElevationType="none" fileset="" customIcnsFile="" customIcoFile="@gs-git-folder@/assets/icon/ic_launcher.ico" macEntitlementsFile="" automaticLauncherIntegration="false" launchMode="startupFirstWindow" launchInNewProcess="false" launchSchedule="updateSchedule" allLaunchers="true">
+      <application name="" id="installer" customizedId="" beanClass="com.install4j.runtime.beans.applications.InstallerApplication" enabled="true" commentSet="false" comment="" actionElevationType="none" styleId="" fileset="" customIcnsFile="" customIcoFile="@gs-git-folder@/assets/icon/ic_launcher.ico" macEntitlementsFile="" automaticLauncherIntegration="false" launchMode="startupFirstWindow" launchInNewProcess="false" launchSchedule="updateSchedule" allLaunchers="true">
         <serializedBean>
           <java class="java.beans.XMLDecoder">
             <object class="com.install4j.runtime.beans.applications.InstallerApplication" id="InstallerApplication0">
@@ -208,7 +208,7 @@
             <preActivation />
             <postActivation />
             <actions>
-              <action name="" id="13" customizedId="" beanClass="com.install4j.runtime.beans.actions.misc.RequestPrivilegesAction" enabled="true" commentSet="false" comment="" actionElevationType="none" rollbackBarrier="false" multiExec="false" failureStrategy="1" errorMessage="">
+              <action name="" id="13" customizedId="" beanClass="com.install4j.runtime.beans.actions.misc.RequestPrivilegesAction" enabled="true" commentSet="false" comment="" actionElevationType="none" rollbackBarrier="false" rollbackBarrierExitCode="1" multiExec="false" failureStrategy="1" errorMessage="">
                 <serializedBean>
                   <java class="java.beans.XMLDecoder">
                     <object class="com.install4j.runtime.beans.actions.misc.RequestPrivilegesAction" />
@@ -1104,7 +1104,7 @@ return console.askYesNo(message, true);
               <group name="" id="468" customizedId="" beanClass="com.install4j.runtime.beans.groups.VerticalFormComponentGroup" enabled="true" commentSet="false" comment="" actionElevationType="inherit" useExternalParametrization="true" externalParametrizationName="Customize title bar" externalParametrizationMode="include">
                 <serializedBean>
                   <java class="java.beans.XMLDecoder">
-                    <object class="com.install4j.runtime.beans.groups.VerticalFormComponentGroup">
+                    <object class="com.install4j.runtime.beans.groups.VerticalFormComponentGroup" id="VerticalFormComponentGroup0">
                       <void property="backgroundColor">
                         <object class="java.awt.Color">
                           <int>255</int>
@@ -1134,19 +1134,21 @@ return console.askYesNo(message, true);
                           <string>icon:${installer:sys.installerApplicationMode}_header.png</string>
                         </object>
                       </void>
+                      <void id="Integer0" property="cellSpacing" />
+                      <void id="Integer1" property="borderWidth" />
                       <void property="imageInsets">
                         <object class="java.awt.Insets">
-                          <int>0</int>
+                          <object idref="Integer0" />
                           <int>5</int>
-                          <int>1</int>
-                          <int>1</int>
+                          <object idref="Integer1" />
+                          <object idref="Integer1" />
                         </object>
                       </void>
                       <void property="insets">
                         <object class="java.awt.Insets">
-                          <int>0</int>
+                          <object idref="Integer0" />
                           <int>20</int>
-                          <int>0</int>
+                          <object idref="Integer0" />
                           <int>10</int>
                         </object>
                       </void>
@@ -1228,16 +1230,17 @@ return console.askYesNo(message, true);
               <group name="" id="472" customizedId="" beanClass="com.install4j.runtime.beans.groups.HorizontalFormComponentGroup" enabled="true" commentSet="false" comment="" actionElevationType="inherit" useExternalParametrization="false" externalParametrizationName="" externalParametrizationMode="all">
                 <serializedBean>
                   <java class="java.beans.XMLDecoder">
-                    <object class="com.install4j.runtime.beans.groups.HorizontalFormComponentGroup">
+                    <object class="com.install4j.runtime.beans.groups.HorizontalFormComponentGroup" id="HorizontalFormComponentGroup0">
                       <void property="alignFirstLabel">
                         <boolean>false</boolean>
                       </void>
+                      <void id="Integer0" property="cellSpacing" />
                       <void property="insets">
                         <object class="java.awt.Insets">
                           <int>3</int>
-                          <int>5</int>
+                          <object idref="Integer0" />
                           <int>8</int>
-                          <int>5</int>
+                          <object idref="Integer0" />
                         </object>
                       </void>
                     </object>
@@ -1328,18 +1331,16 @@ return console.askYesNo(message, true);
       <excludedComponents />
       <includedDownloadableComponents />
       <excludedLaunchers>
-        <launcher id="227" />
+        <launcher id="573" />
       </excludedLaunchers>
       <excludedBeans />
       <overriddenPrincipalLanguage id="en" customLocalizationFile="" />
       <exclude>
-        <entry location="ic_launcher.png" fileType="regular" />
-        <entry location="gaiasky" fileType="regular" />
-        <entry location="data/dummyversion" fileType="regular" />
-        <entry location="ic_launcher.svg" fileType="regular" />
-        <entry location="gs.desktop" fileType="regular" />
         <entry location="rest-static" fileType="regular" />
+        <entry location="ic_launcher.svg" fileType="regular" />
         <entry location="gaiasky.6.gz" fileType="regular" />
+        <entry location="gaiasky" fileType="regular" />
+        <entry location="ic_launcher.png" fileType="regular" />
       </exclude>
       <variables />
       <autoUpdate useMinUpdatableVersion="false" minUpdatableVersion="" useMaxUpdatableVersion="false" maxUpdatableVersion="">
@@ -1347,17 +1348,16 @@ return console.askYesNo(message, true);
         <customAttributes />
       </autoUpdate>
     </windows>
-    <macos name="macOS Single Bundle" id="221" customizedId="" mediaFileName="" installDir="${compiler:sys.fullName}" overridePrincipalLanguage="false" jreBitType="all" runPostProcessor="false" postProcessor="" failOnPostProcessorError="false" useLegacyMediaFileIds="false" legacyMediaFileIds="" downloadURL="" includeAllDownloadableComponents="false" includedJRE="macosx-amd64-11.0.2" manualJREEntry="false" bundleType="1" jreURL="" jreShared="false" directDownload="false" installOnlyIfNecessary="false" requiredVmIdPrefix="" customInstallBaseDir="" contentFilesType="1" installerName="${i18n:InstallerName(${compiler:sys.fullName})}" volumeName="${compiler:sys.shortName}" compressDmg="false" launcherId="22">
+    <macos name="macOS Single Bundle" id="221" customizedId="" mediaFileName="" installDir="${compiler:sys.fullName}" overridePrincipalLanguage="false" jreBitType="all" runPostProcessor="false" postProcessor="" failOnPostProcessorError="false" useLegacyMediaFileIds="false" legacyMediaFileIds="" downloadURL="" includeAllDownloadableComponents="false" includedJRE="macosx-amd64-11.0.2" manualJREEntry="false" bundleType="1" jreURL="" jreShared="false" directDownload="false" installOnlyIfNecessary="false" requiredVmIdPrefix="" customInstallBaseDir="" contentFilesType="1" installerName="${i18n:InstallerName(${compiler:sys.fullName})}" volumeName="${compiler:sys.shortName}" compressDmg="false" launcherId="573">
       <excludedComponents />
       <includedDownloadableComponents />
       <excludedBeans />
       <overriddenPrincipalLanguage id="en" customLocalizationFile="" />
       <exclude>
-        <entry location="gs.desktop" fileType="regular" />
-        <entry location="gaiasky.cmd" fileType="regular" />
-        <entry location="data/dummyversion" fileType="regular" />
         <entry location="rest-static" fileType="regular" />
+        <entry location="gaiasky.desktop" fileType="regular" />
         <entry location="gaiasky.6.gz" fileType="regular" />
+        <entry location="gaiasky.cmd" fileType="regular" />
       </exclude>
       <variables />
       <autoUpdate useMinUpdatableVersion="false" minUpdatableVersion="" useMaxUpdatableVersion="false" maxUpdatableVersion="">
@@ -1370,14 +1370,13 @@ return console.askYesNo(message, true);
       <excludedComponents />
       <includedDownloadableComponents />
       <excludedLaunchers>
-        <launcher id="227" />
+        <launcher id="573" />
       </excludedLaunchers>
       <excludedBeans />
       <overriddenPrincipalLanguage id="en" customLocalizationFile="" />
       <exclude>
         <entry location="ic_launcher.ico" fileType="regular" />
         <entry location="gaiasky.cmd" fileType="regular" />
-        <entry location="data/dummyversion" fileType="regular" />
         <entry location="rest-static" fileType="regular" />
       </exclude>
       <variables />
@@ -1393,14 +1392,13 @@ return console.askYesNo(message, true);
       <excludedComponents />
       <includedDownloadableComponents />
       <excludedLaunchers>
-        <launcher id="227" />
+        <launcher id="573" />
       </excludedLaunchers>
       <excludedBeans />
       <overriddenPrincipalLanguage id="en" customLocalizationFile="" />
       <exclude>
         <entry location="ic_launcher.ico" fileType="regular" />
         <entry location="gaiasky.cmd" fileType="regular" />
-        <entry location="data/dummyversion" fileType="regular" />
         <entry location="rest-static" fileType="regular" />
       </exclude>
       <variables />
@@ -1425,14 +1423,13 @@ return console.askYesNo(message, true);
       <excludedComponents />
       <includedDownloadableComponents />
       <excludedLaunchers>
-        <launcher id="227" />
+        <launcher id="573" />
       </excludedLaunchers>
       <excludedBeans />
       <overriddenPrincipalLanguage id="en" customLocalizationFile="" />
       <exclude>
         <entry location="ic_launcher.ico" fileType="regular" />
         <entry location="gaiasky.cmd" fileType="regular" />
-        <entry location="data/dummyversion" fileType="regular" />
         <entry location="rest-static" fileType="regular" />
       </exclude>
       <variables />
