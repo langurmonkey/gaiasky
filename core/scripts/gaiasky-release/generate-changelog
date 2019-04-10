@@ -4,7 +4,7 @@
 
 # Utils dir, with a relative path core/utils/ to the root gaiasky directory
 UTILSDIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null && pwd )"
-GSDIR=`realpath $UTILSDIR/../../`
+GSDIR=`realpath $UTILSDIR/../../../`
 
 git-chglog -c $GSDIR/.chglog/config.yml -o $GSDIR/temp.md 2.1.7..
 cat $GSDIR/temp.md $UTILSDIR/CHANGELOG-to-216.md > $GSDIR/CHANGELOG.md
