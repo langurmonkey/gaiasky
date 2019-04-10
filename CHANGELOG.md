@@ -1,100 +1,174 @@
 <a name="unreleased"></a>
 ## [Unreleased](https://gitlab.com/langurmonkey/gaiasky/tree/master)
-[Full changelog](https://gitlab.com/langurmonkey/gaiasky/compare/2.1.7...HEAD)
-
-### Bug Fixes
-- datsets component width screws with controls window layout
-- conversion from proper motion + rv to velocity vector
-- normalise direction and up vectors in set events
-- octree generator works with no loaders
-- thicker velocity vectors for stars with radial velocity
-- use bundled java in macOS when launched from source
-- 'home' button changes mode if needed
-- switch to free camera when focus made invisible
-- adjust line width in quad method
-- line rendering and octree generator
-- octree generator to use HIP dist if Gaia dist < 0
-- crash when loading csv files
-- startup crash if planets disabled
-- [#281](https://gitlab.com/langurmonkey/gaiasky/issues/281) non-ASCII characters in windows username
-- [#285](https://gitlab.com/langurmonkey/gaiasky/issues/285) export log fails in windows
-- shader compilation in intel GPUs (line)
-- octree generator works with latest jcommander
-- keyframes window inline editing
-- hot-switching themes no longer uses previous skin in some dialogs
-- keyboard focus lost when clicking outside input fields
-
-### Build System
-- add license statement to source files
-- remove jython dependency
-- update to gradle 5.1.1
+[Full changelog](https://gitlab.com/langurmonkey/gaiasky/compare/2.2.0-RC2...HEAD)
 
 ### Code Refactoring
-- big refactor in immediate rendererer to reduce memory usage
-- remove gwt build file
-- adjust label scales for better appearance
-- remove unused classes, pvs analysis
-- remove unused code in generic dialog
-- various code refactors and cleanups
-- i18n files synced with en_GB
-- general code and keys refactor
-- rearrange and clean up i18n files
-- text icon button styles in skin
-- visibility switch lists are unified under a same interface and code
+- cleanup scripts folder
 
+
+<a name="2.2.0-RC2"></a>
+## [2.2.0-RC2](https://gitlab.com/langurmonkey/gaiasky/tree/2.2.0-RC2-lwjgl3) (2019-04-10)
+[Full changelog](https://gitlab.com/langurmonkey/gaiasky/compare/2.2.0-RC2-lwjgl3...2.2.0-RC2)
+
+
+<a name="2.2.0-RC2-lwjgl3"></a>
+## [2.2.0-RC2-lwjgl3](https://gitlab.com/langurmonkey/gaiasky/tree/2.2.0-RC1-lwjgl3) (2019-04-10)
+[Full changelog](https://gitlab.com/langurmonkey/gaiasky/compare/2.2.0-RC1-lwjgl3...2.2.0-RC2-lwjgl3)
+
+### Bug Fixes
+
+- macos script fix 
+
+<a name="2.2.0-RC1-lwjgl3"></a>
+## [2.2.0-RC1-lwjgl3](https://gitlab.com/langurmonkey/gaiasky/tree/2.2.0-RC1) (2019-04-09)
+[Full changelog](https://gitlab.com/langurmonkey/gaiasky/compare/2.2.0-RC1...2.2.0-RC1-lwjgl3)
+
+### Bug Fixes
+
+- octree rendering muted 
+- remove version from window title 
+- assets location in install4j template 
+- heap sizes in build script 
+- macOS -XstartOnFirstThread flag 
+- macos builds tweaks 
+- heap sizes in build script 
+- macOS -XstartOnFirstThread flag 
+- assets location in install4j template 
+- macos builds tweaks 
+- heap sizes in build script 
+- macOS -XstartOnFirstThread flag 
+- macos builds tweaks 
+- macos builds tweaks 
+- heap sizes in build script 
+- macOS -XstartOnFirstThread flag 
+### Build System
+
+- new gradle 5 compile dep format 
+- update to lwjgl 3.2.3 
+- update to lwjgl 3.2.3 
+- new gradle 5 compile dep format 
+- update to lwjgl 3.2.3 
+- update to lwjgl 3.2.3 
+- new gradle 5 compile dep format 
+- update to lwjgl 3.2.3 
+- new gradle 5 compile dep format 
+- update to lwjgl 3.2.3 
+- update to lwjgl 3.2.3 
 ### Documentation
-- new docs reference
-- update changelog, changelog config
 
+- update docs reference 
 ### Features
-- add 'y' and 'n' key bindings to dialogs
-- add shortcuts to expand/collapse panes
-- velocity vectors are regular component types
-- add optional arrowheads to velocity vectors
-- line renderers allocate memory in chunks
-- add redshift from camera velocity vector coloring fix: fix blue-white-red color map
-- add redshift and single coloring to velocity vectors
-- add velocity vectors color mode
-- ucds are more carefully assessed to extract meaning in the STIL loader
-- hip stars can be looked up as 'HIP xxxx' or 'xxxx'
-- constellations fade when exiting milky way
-- archive view window to generic dialog
-- discard tycho identifiers to save up 3 double-precision floating point numbers per star (192 bits)
-- double click in file chooser opens file
-- add max proper motion vectors number to properties
-- add getFrameNumber() API call
-- dataset highlight
-- proper synchonization of scripting with main loop
-- simple helper script to run gaiasky directly from source
-- further improvements to file chooser
-- load button to load .vot and .csv files
-- add info text to datasets selection
-- API calls to load and manipulate datasets
-- jython to py4j works fully with all tests
-- use XDG base directory structure in Linux
-- update catalog descriptors
-- add id list of 'must load' stars
-- keyframe highlighting
-- allow resizable generic dialogs
-- update link cursor size when theme changes
-- generate man page automatically
-- add CLI arguments -p and -a
-- add man file and utils to generate
-- add h2m help2man file
-- info on gs_java_version_check when run on java other than 1.8
-- new cameraTransition() API call
-- sync and async camera file playback API calls
-- sync and async camera file playback API calls
-- add sync and async camera path running funcs
-- improve minimap
-- implement controller blacklist
-- add controllers blacklist to properties
-- list multiple connected controllers instead of just one
 
+- migrate to Java 11 
+- update to lwjgl3 backend 
+- update to lwjgl3 backend 
+- update to lwjgl3 backend 
+- update to lwjgl3 backend 
+- update to lwjgl3 backend 
+- update to lwjgl3 backend 
+- update to lwjgl3 backend 
+- update to lwjgl3 backend 
+- update to lwjgl3 backend 
+- update to lwjgl3 backend 
+- update to lwjgl3 backend 
+
+<a name="2.2.0-RC1"></a>
+## [2.2.0-RC1](https://gitlab.com/langurmonkey/gaiasky/tree/2.1.7) (2019-04-09)
+[Full changelog](https://gitlab.com/langurmonkey/gaiasky/compare/2.1.7...2.2.0-RC1)
+
+### Bug Fixes
+
+- datsets component width screws with controls window layout 
+- conversion from proper motion + rv to velocity vector 
+- normalise direction and up vectors in set events 
+- octree generator works with no loaders 
+- thicker velocity vectors for stars with radial velocity 
+- use bundled java in macOS when launched from source 
+- 'home' button changes mode if needed 
+- switch to free camera when focus made invisible 
+- adjust line width in quad method 
+- line rendering and octree generator 
+- octree generator to use HIP dist if Gaia dist < 0 
+- crash when loading csv files 
+- startup crash if planets disabled 
+- [#281](https://gitlab.com/langurmonkey/gaiasky/issues/281) non-ASCII characters in windows username [#281](https://gitlab.com/langurmonkey/gaiasky/issues/281) 
+- [#285](https://gitlab.com/langurmonkey/gaiasky/issues/285) export log fails in windows 
+- shader compilation in intel GPUs (line) 
+- octree generator works with latest jcommander 
+- keyframes window inline editing 
+- hot-switching themes no longer uses previous skin in some dialogs 
+- keyboard focus lost when clicking outside input fields 
+### Build System
+
+- add license statement to source files 
+- remove jython dependency 
+- update to gradle 5.1.1 
+### Code Refactoring
+
+- big refactor in immediate rendererer to reduce memory usage 
+- remove gwt build file 
+- adjust label scales for better appearance 
+- remove unused classes, pvs analysis 
+- remove unused code in generic dialog 
+- various code refactors and cleanups 
+- i18n files synced with en_GB 
+- general code and keys refactor 
+- rearrange and clean up i18n files 
+- text icon button styles in skin 
+- visibility switch lists are unified under a same interface and code 
+### Documentation
+
+- new docs reference 
+- update changelog, changelog config 
+### Features
+
+- add 'y' and 'n' key bindings to dialogs 
+- add shortcuts to expand/collapse panes 
+- velocity vectors are regular component types 
+- add optional arrowheads to velocity vectors 
+- line renderers allocate memory in chunks 
+- add redshift from camera velocity vector coloring fix: fix blue-white-red color map 
+- add redshift and single coloring to velocity vectors 
+- add velocity vectors color mode 
+- ucds are more carefully assessed to extract meaning in the STIL loader 
+- hip stars can be looked up as 'HIP xxxx' or 'xxxx' 
+- constellations fade when exiting milky way 
+- archive view window to generic dialog 
+- discard tycho identifiers to save up 3 double-precision floating point numbers per star (192 bits) 
+- double click in file chooser opens file 
+- add max proper motion vectors number to properties 
+- add getFrameNumber() API call 
+- dataset highlight 
+- proper synchonization of scripting with main loop 
+- simple helper script to run gaiasky directly from source 
+- further improvements to file chooser 
+- load button to load .vot and .csv files 
+- add info text to datasets selection 
+- API calls to load and manipulate datasets 
+- jython to py4j works fully with all tests [#286](https://gitlab.com/langurmonkey/gaiasky/issues/286) 
+- use XDG base directory structure in Linux 
+- update catalog descriptors 
+- add id list of 'must load' stars 
+- keyframe highlighting 
+- allow resizable generic dialogs 
+- update link cursor size when theme changes 
+- generate man page automatically 
+- add CLI arguments -p and -a 
+- add man file and utils to generate 
+- add h2m help2man file 
+- info on gs_java_version_check when run on java other than 1.8 
+- new cameraTransition() API call 
+- sync and async camera file playback API calls 
+- sync and async camera file playback API calls 
+- add sync and async camera path running funcs 
+- improve minimap 
+- implement controller blacklist 
+- add controllers blacklist to properties 
+- list multiple connected controllers instead of just one 
 ### Style
-- tweaked and fixed some old java
-- variable name changes
 
+- tweaked and fixed some old java 
+- variable name changes 
 
 <a name="2.1.7"></a>
 ## [2.1.7](https://gitlab.com/langurmonkey/gaiasky/tree/2.1.6) (2019-01-11)
