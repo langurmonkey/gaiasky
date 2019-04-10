@@ -1,4 +1,4 @@
-#!/bin/bash
+#/bin/bash
 
 if [[ $# -eq 0 ]] ; then
     echo "No arguments supplied:"
@@ -38,7 +38,7 @@ git -C $SRCDIR checkout $CO
 # Generate javadoc
 mkdir -p /tmp/javadoc/$VERSION
 
-javadoc -d /tmp/javadoc/$VERSION -sourcepath $SRCDIR -subpackages gaia
+$JAVA_HOME/bin/javadoc -d /tmp/javadoc/$VERSION -sourcepath $SRCDIR -subpackages gaia
 
 # Copy to server
 echo "Copying directory /tmp/javadoc/$VERSION to tsagrista@mintaka:/dataB/gaiasky/docs/javadoc/$VERSION"
