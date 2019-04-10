@@ -34,7 +34,7 @@
   <launchers>
     <launcher name="gaiasky" id="22" customizedId="" external="false" excludeFromMenu="false" unixMode="755" unixAutoStart="true" menuName="${compiler:sys.fullName}" icnsFile="" customMacBundleIdentifier="false" macBundleIdentifier="" swtApp="false" fileset="" macBundleBinary="JavaApplicationStub" addMacEntitlements="false" macEntitlementsFile="" useCustomMacosExecutableName="false" customMacosExecutableName="" useJavaMinVersionOverride="false" javaMinVersionOverride="" useJavaMaxVersionOverride="false" javaMaxVersionOverride="" checkUpdater="false" updateExecutionMode="unattendedProgress" unattendedUpdateTitle="${i18n:updater.WindowTitle(&quot;${compiler:sys.fullName}&quot;)}">
       <executable name="${compiler:sys.shortName}" type="1" iconSet="true" iconFile="@gs-git-folder@/assets/icon/ic_launcher.ico" executableDir="" redirectStderr="true" stderrFile="error.log" stderrMode="overwrite" redirectStdout="true" stdoutFile="output.log" stdoutMode="overwrite" failOnStderrOutput="true" executableMode="1" changeWorkingDirectory="true" workingDirectory="." singleInstance="true" serviceStartType="2" serviceDependencies="" serviceDescription="" jreLocation="" executionLevel="asInvoker" checkConsoleParameter="false" globalSingleInstance="false" singleInstanceActivate="true" dpiAware="false">
-        <versionInfo include="true" fileVersion="" fileDescription="3D Universe application focused on ESA's Gaia mission" legalCopyright="MPL" internalName="GaiaSky" productName="${compiler:sys.fullName}" />
+        <versionInfo include="true" fileVersion="" fileDescription="Real-time, cross-platform, 3D Universe application which supports more than a billion stars" legalCopyright="MPL" internalName="GaiaSky" productName="${compiler:sys.fullName}" />
       </executable>
       <splashScreen show="false" width="0" height="0" bitmapFile="" textOverlay="false">
         <text>
@@ -70,7 +70,7 @@
     </launcher>
     <launcher name="gaiasky32" id="227" customizedId="" external="false" excludeFromMenu="false" unixMode="755" unixAutoStart="true" menuName="${compiler:sys.fullName}" icnsFile="" customMacBundleIdentifier="false" macBundleIdentifier="" swtApp="false" fileset="" macBundleBinary="JavaApplicationStub" addMacEntitlements="false" macEntitlementsFile="" useCustomMacosExecutableName="false" customMacosExecutableName="" useJavaMinVersionOverride="false" javaMinVersionOverride="" useJavaMaxVersionOverride="false" javaMaxVersionOverride="">
       <executable name="${compiler:sys.shortName}" type="1" iconSet="true" iconFile="@gs-git-folder@/assets/icon/ic_launcher.ico" executableDir="" redirectStderr="true" stderrFile="error.log" stderrMode="overwrite" redirectStdout="true" stdoutFile="output.log" stdoutMode="overwrite" failOnStderrOutput="true" executableMode="1" changeWorkingDirectory="true" workingDirectory="." singleInstance="true" serviceStartType="2" serviceDependencies="" serviceDescription="" jreLocation="" executionLevel="asInvoker" checkConsoleParameter="false" globalSingleInstance="false" singleInstanceActivate="true" dpiAware="false">
-        <versionInfo include="true" fileVersion="" fileDescription="3D Universe application focused on ESA's Gaia mission" legalCopyright="MPL" internalName="GaiaSky" productName="${compiler:sys.fullName}" />
+        <versionInfo include="true" fileVersion="" fileDescription="Real-time, cross-platform, 3D Universe application which supports more than a billion stars" legalCopyright="MPL" internalName="GaiaSky" productName="${compiler:sys.fullName}" />
       </executable>
       <splashScreen show="false" width="0" height="0" bitmapFile="" textOverlay="false">
         <text>
@@ -1388,7 +1388,7 @@ return console.askYesNo(message, true);
         <content />
       </installerScript>
     </unixInstaller>
-    <linuxDeb name="Linux Deb Archive" id="30" customizedId="" mediaFileName="" installDir="/opt/${compiler:sys.shortName}" overridePrincipalLanguage="false" jreBitType="all" runPostProcessor="false" postProcessor="" failOnPostProcessorError="false" useLegacyMediaFileIds="false" legacyMediaFileIds="" downloadURL="" includeAllDownloadableComponents="true" includedJRE="" manualJREEntry="false" overwriteNeverAsConfigFiles="false" dependencies="default-jre" bzip="false" description="Interactive 3D Universe software focused on ESA's Gaia mission" maintainerEmail="tsagrista@ari.uni-heidelberg.de" architectureSet="false" architecture="">
+    <linuxDeb name="Linux Deb Archive" id="30" customizedId="" mediaFileName="" installDir="/opt/${compiler:sys.shortName}" overridePrincipalLanguage="false" jreBitType="all" runPostProcessor="false" postProcessor="" failOnPostProcessorError="false" useLegacyMediaFileIds="false" legacyMediaFileIds="" downloadURL="" includeAllDownloadableComponents="true" includedJRE="" manualJREEntry="false" overwriteNeverAsConfigFiles="false" dependencies="default-jre" bzip="false" description="Real-time, cross-platform, 3D Universe application which supports more than a billion stars" maintainerEmail="tsagrista@ari.uni-heidelberg.de" architectureSet="false" architecture="">
       <excludedComponents />
       <includedDownloadableComponents />
       <excludedLaunchers>
