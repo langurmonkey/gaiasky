@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <install4j version="7.0.10" transformSequenceNumber="7">
-  <directoryPresets config="./" />
+  <directoryPresets config="@gs-git-folder@/assets/img" />
   <application name="GaiaSky" distributionSourceDir="" applicationId="8310-5272-6362-8592" mediaDir="./" mediaFilePattern="${compiler:sys.shortName}_${compiler:sys.platform}_${compiler:sys.version}" compression="9" lzmaCompression="false" pack200Compression="false" excludeSignedFromPacking="true" commonExternalFiles="false" createMd5Sums="true" shrinkRuntime="true" shortName="gaiasky" publisher="ARI - ZAH - Universität Heidelberg" publisherWeb="http://www.zah.uni-heidelberg.de/gaia/outreach/gaiasky" version="@version-tag@" allPathsRelative="true" backupOnSave="false" autoSave="false" convertDotsToUnderscores="true" macSignature="????" macVolumeId="c3380c949a34b4f7" javaMinVersion="1.8" javaMaxVersion="" allowBetaVM="false" jdkMode="runtimeJre" jdkName="">
     <languages skipLanguageSelection="false" languageSelectionInPrincipalLanguage="false">
       <principalLanguage id="en" customLocalizationFile="" />
@@ -103,8 +103,13 @@
                   </object>
                 </void>
               </void>
+              <void id="Boolean0" method="isCustomizeVersionInfo" />
+              <void property="resizable">
+                <object idref="Boolean0" />
+              </void>
+              <void id="Boolean1" method="isAllowConsole" />
               <void property="useCustomIcon">
-                <boolean>true</boolean>
+                <object idref="Boolean1" />
               </void>
             </object>
           </java>
@@ -153,6 +158,62 @@
               <externalParametrizationPropertyNames />
             </formComponent>
           </styleOverride>
+          <styleOverride name="Customize banner image" enabled="true">
+            <group name="" id="573" customizedId="" beanClass="com.install4j.runtime.beans.groups.VerticalFormComponentGroup" enabled="true" commentSet="false" comment="" actionElevationType="inherit" useExternalParametrization="true" externalParametrizationName="Customize banner image" externalParametrizationMode="include">
+              <serializedBean>
+                <java class="java.beans.XMLDecoder">
+                  <object class="com.install4j.runtime.beans.groups.VerticalFormComponentGroup" id="VerticalFormComponentGroup0">
+                    <void property="backgroundColor">
+                      <object class="java.awt.Color">
+                        <int>255</int>
+                        <int>255</int>
+                        <int>255</int>
+                        <int>255</int>
+                      </object>
+                    </void>
+                    <void property="borderSides">
+                      <object class="com.install4j.runtime.beans.formcomponents.BorderSides">
+                        <void property="bottom">
+                          <boolean>true</boolean>
+                        </void>
+                      </object>
+                    </void>
+                    <void id="Integer0" property="cellSpacing" />
+                    <void property="imageEdgeBackgroundColor">
+                      <object class="java.awt.Color">
+                        <object idref="Integer0" />
+                        <object idref="Integer0" />
+                        <object idref="Integer0" />
+                        <int>255</int>
+                      </object>
+                    </void>
+                    <void property="imageEdgeBorder">
+                      <boolean>true</boolean>
+                    </void>
+                    <void property="imageFile">
+                      <object class="com.install4j.api.beans.ExternalFile">
+                        <string>@gs-git-folder@/assets/img/installer-img.png</string>
+                      </object>
+                    </void>
+                    <void property="insets">
+                      <object class="java.awt.Insets">
+                        <int>5</int>
+                        <int>10</int>
+                        <int>10</int>
+                        <int>10</int>
+                      </object>
+                    </void>
+                  </object>
+                </java>
+              </serializedBean>
+              <beans />
+              <externalParametrizationPropertyNames>
+                <propertyName>imageAnchor</propertyName>
+                <propertyName>imageEdgeBackgroundColor</propertyName>
+                <propertyName>imageFile</propertyName>
+              </externalParametrizationPropertyNames>
+            </group>
+          </styleOverride>
         </styleOverrides>
         <customScript mode="1" file="">
           <content />
@@ -196,12 +257,13 @@
                 <group name="" id="461" customizedId="" beanClass="com.install4j.runtime.beans.groups.VerticalFormComponentGroup" enabled="true" commentSet="false" comment="" actionElevationType="inherit" useExternalParametrization="false" externalParametrizationName="" externalParametrizationMode="all">
                   <serializedBean>
                     <java class="java.beans.XMLDecoder">
-                      <object class="com.install4j.runtime.beans.groups.VerticalFormComponentGroup">
+                      <object class="com.install4j.runtime.beans.groups.VerticalFormComponentGroup" id="VerticalFormComponentGroup0">
+                        <void id="Integer0" property="cellSpacing" />
                         <void property="imageEdgeBackgroundColor">
                           <object class="java.awt.Color">
-                            <int>25</int>
-                            <int>143</int>
-                            <int>220</int>
+                            <object idref="Integer0" />
+                            <object idref="Integer0" />
+                            <object idref="Integer0" />
                             <int>255</int>
                           </object>
                         </void>
@@ -350,9 +412,10 @@ return console.askOkCancel(message, true);
               <formComponent name="" id="245" customizedId="" beanClass="com.install4j.runtime.beans.formcomponents.InstallationDirectoryChooserComponent" enabled="true" commentSet="false" comment="" insetTop="" insetLeft="" insetBottom="" insetRight="" resetInitOnPrevious="false" useExternalParametrization="true" externalParametrizationName="Installation Directory Chooser" externalParametrizationMode="include">
                 <serializedBean>
                   <java class="java.beans.XMLDecoder">
-                    <object class="com.install4j.runtime.beans.formcomponents.InstallationDirectoryChooserComponent">
+                    <object class="com.install4j.runtime.beans.formcomponents.InstallationDirectoryChooserComponent" id="InstallationDirectoryChooserComponent0">
+                      <void id="Boolean0" method="isCheckFreeSpace" />
                       <void property="requestFocus">
-                        <boolean>true</boolean>
+                        <object idref="Boolean0" />
                       </void>
                     </object>
                   </java>
@@ -405,9 +468,10 @@ return console.askOkCancel(message, true);
               <formComponent name="" id="249" customizedId="" beanClass="com.install4j.runtime.beans.formcomponents.ComponentSelectorComponent" enabled="true" commentSet="false" comment="" insetTop="" insetLeft="" insetBottom="" insetRight="" resetInitOnPrevious="false" useExternalParametrization="true" externalParametrizationName="Installation Components" externalParametrizationMode="include">
                 <serializedBean>
                   <java class="java.beans.XMLDecoder">
-                    <object class="com.install4j.runtime.beans.formcomponents.ComponentSelectorComponent">
+                    <object class="com.install4j.runtime.beans.formcomponents.ComponentSelectorComponent" id="ComponentSelectorComponent0">
+                      <void id="Boolean0" method="isBoldDescription" />
                       <void property="fillVertical">
-                        <boolean>true</boolean>
+                        <object idref="Boolean0" />
                       </void>
                     </object>
                   </java>
@@ -469,9 +533,10 @@ return console.askOkCancel(message, true);
               <action name="" id="10" customizedId="" beanClass="com.install4j.runtime.beans.actions.desktop.CreateProgramGroupAction" enabled="true" commentSet="false" comment="" actionElevationType="elevated" rollbackBarrier="false" rollbackBarrierExitCode="1" multiExec="false" failureStrategy="1" errorMessage="">
                 <serializedBean>
                   <java class="java.beans.XMLDecoder">
-                    <object class="com.install4j.runtime.beans.actions.desktop.CreateProgramGroupAction">
+                    <object class="com.install4j.runtime.beans.actions.desktop.CreateProgramGroupAction" id="CreateProgramGroupAction0">
+                      <void id="Boolean0" method="isAddDefaultLauncherLinks" />
                       <void property="addUninstaller">
-                        <boolean>true</boolean>
+                        <object idref="Boolean0" />
                       </void>
                       <void property="uninstallerMenuName">
                         <string>${i18n:UninstallerMenuEntry(${compiler:sys.fullName})}</string>
@@ -522,12 +587,13 @@ return console.askOkCancel(message, true);
                 <group name="" id="461" customizedId="" beanClass="com.install4j.runtime.beans.groups.VerticalFormComponentGroup" enabled="true" commentSet="false" comment="" actionElevationType="inherit" useExternalParametrization="false" externalParametrizationName="" externalParametrizationMode="all">
                   <serializedBean>
                     <java class="java.beans.XMLDecoder">
-                      <object class="com.install4j.runtime.beans.groups.VerticalFormComponentGroup">
+                      <object class="com.install4j.runtime.beans.groups.VerticalFormComponentGroup" id="VerticalFormComponentGroup0">
+                        <void id="Integer0" property="cellSpacing" />
                         <void property="imageEdgeBackgroundColor">
                           <object class="java.awt.Color">
-                            <int>25</int>
-                            <int>143</int>
-                            <int>220</int>
+                            <object idref="Integer0" />
+                            <object idref="Integer0" />
+                            <object idref="Integer0" />
                             <int>255</int>
                           </object>
                         </void>
@@ -571,12 +637,17 @@ return console.askOkCancel(message, true);
       <application name="" id="uninstaller" customizedId="" beanClass="com.install4j.runtime.beans.applications.UninstallerApplication" enabled="true" commentSet="false" comment="" actionElevationType="none" styleId="454" fileset="" customIcnsFile="" customIcoFile="" macEntitlementsFile="" automaticLauncherIntegration="false" launchMode="startupFirstWindow" launchInNewProcess="false" launchSchedule="updateSchedule" allLaunchers="true">
         <serializedBean>
           <java class="java.beans.XMLDecoder">
-            <object class="com.install4j.runtime.beans.applications.UninstallerApplication">
+            <object class="com.install4j.runtime.beans.applications.UninstallerApplication" id="UninstallerApplication0">
               <void property="customMacosExecutableName">
                 <string>${i18n:UninstallerMenuEntry(${compiler:sys.fullName})}</string>
               </void>
+              <void id="Boolean0" method="isCustomizeVersionInfo" />
+              <void property="resizable">
+                <object idref="Boolean0" />
+              </void>
+              <void id="Boolean1" method="isAllowConsole" />
               <void property="useCustomMacosExecutableName">
-                <boolean>true</boolean>
+                <object idref="Boolean1" />
               </void>
             </object>
           </java>
@@ -589,21 +660,15 @@ return console.askOkCancel(message, true);
                   <object class="com.install4j.runtime.beans.groups.VerticalFormComponentGroup">
                     <void property="backgroundColor">
                       <object class="java.awt.Color">
+                        <int>0</int>
+                        <int>0</int>
+                        <int>0</int>
                         <int>255</int>
-                        <int>255</int>
-                        <int>255</int>
-                        <int>255</int>
-                      </object>
-                    </void>
-                    <void property="imageAnchor">
-                      <object class="java.lang.Enum" method="valueOf">
-                        <class>com.install4j.api.beans.Anchor</class>
-                        <string>NORTHEAST</string>
                       </object>
                     </void>
                     <void property="imageFile">
                       <object class="com.install4j.api.beans.ExternalFile">
-                        <string>@gs-git-folder@/assets/icon/gs_064.png</string>
+                        <string>@gs-git-folder@/assets/img/installer-img.png</string>
                       </object>
                     </void>
                   </object>
@@ -664,12 +729,13 @@ return console.askOkCancel(message, true);
                 <group name="" id="461" customizedId="" beanClass="com.install4j.runtime.beans.groups.VerticalFormComponentGroup" enabled="true" commentSet="false" comment="" actionElevationType="inherit" useExternalParametrization="false" externalParametrizationName="" externalParametrizationMode="all">
                   <serializedBean>
                     <java class="java.beans.XMLDecoder">
-                      <object class="com.install4j.runtime.beans.groups.VerticalFormComponentGroup">
+                      <object class="com.install4j.runtime.beans.groups.VerticalFormComponentGroup" id="VerticalFormComponentGroup0">
+                        <void id="Integer0" property="cellSpacing" />
                         <void property="imageEdgeBackgroundColor">
                           <object class="java.awt.Color">
-                            <int>25</int>
-                            <int>143</int>
-                            <int>220</int>
+                            <object idref="Integer0" />
+                            <object idref="Integer0" />
+                            <object idref="Integer0" />
                             <int>255</int>
                           </object>
                         </void>
@@ -791,12 +857,13 @@ return console.askYesNo(message, true);
                 <group name="" id="461" customizedId="" beanClass="com.install4j.runtime.beans.groups.VerticalFormComponentGroup" enabled="true" commentSet="false" comment="" actionElevationType="inherit" useExternalParametrization="false" externalParametrizationName="" externalParametrizationMode="all">
                   <serializedBean>
                     <java class="java.beans.XMLDecoder">
-                      <object class="com.install4j.runtime.beans.groups.VerticalFormComponentGroup">
+                      <object class="com.install4j.runtime.beans.groups.VerticalFormComponentGroup" id="VerticalFormComponentGroup0">
+                        <void id="Integer0" property="cellSpacing" />
                         <void property="imageEdgeBackgroundColor">
                           <object class="java.awt.Color">
-                            <int>25</int>
-                            <int>143</int>
-                            <int>220</int>
+                            <object idref="Integer0" />
+                            <object idref="Integer0" />
+                            <object idref="Integer0" />
                             <int>255</int>
                           </object>
                         </void>
@@ -1294,8 +1361,7 @@ return console.askYesNo(message, true);
     <windows name="Windows 64" id="25" customizedId="" mediaFileName="" installDir="${compiler:sys.fullName}" overridePrincipalLanguage="false" jreBitType="64" runPostProcessor="false" postProcessor="" failOnPostProcessorError="false" useLegacyMediaFileIds="false" legacyMediaFileIds="" downloadURL="" includeAllDownloadableComponents="false" includedJRE="windows-amd64-11.0.2" manualJREEntry="false" bundleType="1" jreURL="" jreShared="false" directDownload="false" installOnlyIfNecessary="false" customInstallBaseDir="" contentFilesType="1" verifyIntegrity="true">
       <excludedComponents />
       <includedDownloadableComponents />
-      <excludedLaunchers>
-      </excludedLaunchers>
+      <excludedLaunchers />
       <excludedBeans />
       <overriddenPrincipalLanguage id="en" customLocalizationFile="" />
       <exclude>
@@ -1332,8 +1398,7 @@ return console.askYesNo(message, true);
     <unixInstaller name="Unix Installer" id="28" customizedId="" mediaFileName="" installDir="${compiler:sys.shortName}" overridePrincipalLanguage="false" jreBitType="all" runPostProcessor="false" postProcessor="" failOnPostProcessorError="false" useLegacyMediaFileIds="false" legacyMediaFileIds="" downloadURL="" includeAllDownloadableComponents="false" includedJRE="" manualJREEntry="false" bundleType="1" jreURL="" jreShared="false" directDownload="false" installOnlyIfNecessary="false" customInstallBaseDir="" contentFilesType="1">
       <excludedComponents />
       <includedDownloadableComponents />
-      <excludedLaunchers>
-      </excludedLaunchers>
+      <excludedLaunchers />
       <excludedBeans />
       <overriddenPrincipalLanguage id="en" customLocalizationFile="" />
       <exclude>
@@ -1353,8 +1418,7 @@ return console.askYesNo(message, true);
     <linuxDeb name="Linux Deb Archive" id="30" customizedId="" mediaFileName="" installDir="/opt/${compiler:sys.shortName}" overridePrincipalLanguage="false" jreBitType="all" runPostProcessor="false" postProcessor="" failOnPostProcessorError="false" useLegacyMediaFileIds="false" legacyMediaFileIds="" downloadURL="" includeAllDownloadableComponents="true" includedJRE="" manualJREEntry="false" overwriteNeverAsConfigFiles="false" dependencies="default-jre" bzip="false" description="Real-time, cross-platform, 3D Universe application which supports more than a billion stars" maintainerEmail="tsagrista@ari.uni-heidelberg.de" architectureSet="false" architecture="">
       <excludedComponents />
       <includedDownloadableComponents />
-      <excludedLaunchers>
-      </excludedLaunchers>
+      <excludedLaunchers />
       <excludedBeans />
       <overriddenPrincipalLanguage id="en" customLocalizationFile="" />
       <exclude>
@@ -1383,8 +1447,7 @@ return console.askYesNo(message, true);
     <linuxRPM name="Linux RPM" id="77" customizedId="" mediaFileName="" installDir="/opt/${compiler:sys.shortName}" overridePrincipalLanguage="false" jreBitType="all" runPostProcessor="false" postProcessor="" failOnPostProcessorError="false" useLegacyMediaFileIds="false" legacyMediaFileIds="" downloadURL="" includeAllDownloadableComponents="true" includedJRE="" manualJREEntry="false" overwriteNeverAsConfigFiles="false" dependencies="" os="linux" arch="x86_64">
       <excludedComponents />
       <includedDownloadableComponents />
-      <excludedLaunchers>
-      </excludedLaunchers>
+      <excludedLaunchers />
       <excludedBeans />
       <overriddenPrincipalLanguage id="en" customLocalizationFile="" />
       <exclude>
