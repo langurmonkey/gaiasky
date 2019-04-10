@@ -36,21 +36,21 @@ fi
 git -C $SRCDIR checkout $CO
 
 # Generate javadoc
-mkdir -p /tmp/javadoc/$VERSION
+mkdir -p "/tmp/javadoc/$VERSION"
 
-$JAVA_HOME/bin/javadoc -d /tmp/javadoc/$VERSION -sourcepath $SRCDIR -subpackages gaia
+/usr/lib/jvm/java-8-openjdk-amd64/bin/javadoc -d "/tmp/javadoc/$VERSION" -sourcepath "$SRCDIR" -subpackages gaia
 
 # Copy to server
 echo "Copying directory /tmp/javadoc/$VERSION to tsagrista@mintaka:/dataB/gaiasky/docs/javadoc/$VERSION"
     
 ssh tsagrista@mintaka "mkdir -p /dataB/gaiasky/docs/javadoc/$VERSION"
-( cd /tmp/javadoc/$VERSION ; rsync -r * tsagrista@mintaka:/dataB/gaiasky/docs/javadoc/$VERSION )
+( cd "/tmp/javadoc/$VERSION" ; rsync -r * "tsagrista@mintaka:/dataB/gaiasky/docs/javadoc/$VERSION" )
 
 # Clean up
 rm -rf /tmp/javadoc
 
 
 # Restore
-git -C $SRCDIR checkout master
+git -C "$SRCDIR" checkout master
 
 
