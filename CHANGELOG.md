@@ -32,30 +32,12 @@
 - macOS -XstartOnFirstThread flag
 - macos builds tweaks
 - heap sizes in build script
-- macOS -XstartOnFirstThread flag
-- assets location in install4j template
-- macos builds tweaks
-- heap sizes in build script
-- macOS -XstartOnFirstThread flag
-- macos builds tweaks
-- macos builds tweaks
-- heap sizes in build script
-- macOS -XstartOnFirstThread flag
 
 ### Build System
 - add license statement to source files
 - remove jython dependency
 - update to gradle 5.1.1
 - new gradle 5 compile dep format
-- update to lwjgl 3.2.3
-- update to lwjgl 3.2.3
-- new gradle 5 compile dep format
-- update to lwjgl 3.2.3
-- update to lwjgl 3.2.3
-- new gradle 5 compile dep format
-- update to lwjgl 3.2.3
-- new gradle 5 compile dep format
-- update to lwjgl 3.2.3
 - update to lwjgl 3.2.3
 
 ### Code Refactoring
@@ -117,22 +99,11 @@
 - info on gs_java_version_check when run on java other than 1.8
 - new cameraTransition() API call
 - sync and async camera file playback API calls
-- sync and async camera file playback API calls
 - add sync and async camera path running funcs
 - improve minimap
 - implement controller blacklist
 - add controllers blacklist to properties
 - list multiple connected controllers instead of just one
-- update to lwjgl3 backend
-- update to lwjgl3 backend
-- update to lwjgl3 backend
-- update to lwjgl3 backend
-- update to lwjgl3 backend
-- update to lwjgl3 backend
-- update to lwjgl3 backend
-- update to lwjgl3 backend
-- update to lwjgl3 backend
-- update to lwjgl3 backend
 - update to lwjgl3 backend
 
 ### Style
