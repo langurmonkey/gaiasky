@@ -229,11 +229,11 @@ public class GaiaSkyDesktop implements IObserver {
 
     }
 
-    private ConsoleLogger clogger;
+    private ConsoleLogger consoleLogger;
 
     public GaiaSkyDesktop() {
         super();
-        clogger = new ConsoleLogger();
+        consoleLogger = new ConsoleLogger();
         EventManager.instance.subscribe(this, Events.SCENE_GRAPH_LOADED, Events.DISPOSE);
     }
 
@@ -269,9 +269,9 @@ public class GaiaSkyDesktop implements IObserver {
         // Disable logical DPI modes (macOS, Windows)
         cfg.setHdpiMode(Lwjgl3ApplicationConfiguration.HdpiMode.Pixels);
 
-        if (clogger != null) {
-            clogger.unsubscribe();
-            clogger = null;
+        if (consoleLogger != null) {
+            consoleLogger.unsubscribe();
+            consoleLogger = null;
         }
 
         // Launch app
