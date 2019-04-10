@@ -14,10 +14,7 @@ import com.badlogic.gdx.backends.lwjgl3.Lwjgl3ApplicationConfiguration;
 import com.badlogic.gdx.backends.lwjgl3.Lwjgl3Files;
 import com.beust.jcommander.JCommander;
 import com.beust.jcommander.Parameter;
-import com.brsanthu.googleanalytics.GoogleAnalyticsResponse;
 import gaia.cu9.ari.gaiaorbit.GaiaSky;
-import gaia.cu9.ari.gaiaorbit.analytics.AnalyticsPermission;
-import gaia.cu9.ari.gaiaorbit.analytics.AnalyticsReporting;
 import gaia.cu9.ari.gaiaorbit.data.DesktopSceneGraphImplementationProvider;
 import gaia.cu9.ari.gaiaorbit.data.SceneGraphImplementationProvider;
 import gaia.cu9.ari.gaiaorbit.desktop.format.DesktopDateFormatFactory;
@@ -52,8 +49,6 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.nio.channels.FileChannel;
 import java.util.Properties;
-import java.util.concurrent.Future;
-import java.util.concurrent.TimeUnit;
 
 /**
  * Main class for the desktop launcher
@@ -224,10 +219,6 @@ public class GaiaSkyDesktop implements IObserver {
             // Network checker
             NetworkCheckerManager.initialize(new DesktopNetworkChecker());
 
-            // Analytics
-            AnalyticsReporting.initialize(new AnalyticsPermission());
-            AnalyticsReporting.getInstance().sendStartAppReport();
-
             // Math
             MathManager.initialize();
 
@@ -275,6 +266,8 @@ public class GaiaSkyDesktop implements IObserver {
         cfg.useVsync(GlobalConf.screen.VSYNC);
         cfg.setWindowIcon(Files.FileType.Internal, "icon/ic_launcher.png");
         cfg.useOpenGL3(false, 3, 2);
+        // Disable logical DPI modes (macOS, Windows)
+        cfg.setHdpiMode(Lwjgl3ApplicationConfiguration.HdpiMode.Pixels);
 
         if (clogger != null) {
             clogger.unsubscribe();
@@ -459,17 +452,6 @@ public class GaiaSkyDesktop implements IObserver {
         @Override
         public void dispose() {
             // Terminate here
-
-            // Analytics stop event
-            Future<GoogleAnalyticsResponse> f1 = AnalyticsReporting.getInstance().sendTimingAppReport();
-
-            if (f1 != null)
-                try {
-                    f1.get(2000, TimeUnit.MILLISECONDS);
-                } catch (Exception e) {
-                    logger.error(e);
-                }
-
         }
     }
 }

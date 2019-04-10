@@ -745,7 +745,6 @@ public class GlobalConf {
          * This controls the side of the images in the stereoscopic mode
          **/
         public StereoProfile STEREO_PROFILE = StereoProfile.VR_HEADSET;
-        public boolean ANALYTICS_ENABLED;
         /**
          * Whether to display the dataset dialog at startup or not
          **/
@@ -755,7 +754,7 @@ public class GlobalConf {
             EventManager.instance.subscribe(this, Events.STEREOSCOPIC_CMD, Events.STEREO_PROFILE_CMD, Events.CUBEMAP360_CMD, Events.CUBEMAP_PROJECTION_CMD);
         }
 
-        public void initialize(boolean dISPLAY_TUTORIAL, String tUTORIAL_POINTER_SCRIPT_LOCATION, String tUTORIAL_SCRIPT_LOCATION, boolean sHOW_DEBUG_INFO, Instant lAST_CHECKED, String lAST_VERSION, String vERSION_CHECK_URL, String dATA_DESCRIPTOR_URL, String uI_THEME, String sCRIPT_LOCATION, int rEST_PORT, String lOCALE, boolean sTEREOSCOPIC_MODE, StereoProfile sTEREO_PROFILE, boolean cUBEMAP360_MODE, boolean aNALYTICS_ENABLED, boolean dISPLAY_HUD, boolean dISPLAY_POINTER_COORDS,
+        public void initialize(boolean dISPLAY_TUTORIAL, String tUTORIAL_POINTER_SCRIPT_LOCATION, String tUTORIAL_SCRIPT_LOCATION, boolean sHOW_DEBUG_INFO, Instant lAST_CHECKED, String lAST_VERSION, String vERSION_CHECK_URL, String dATA_DESCRIPTOR_URL, String uI_THEME, String sCRIPT_LOCATION, int rEST_PORT, String lOCALE, boolean sTEREOSCOPIC_MODE, StereoProfile sTEREO_PROFILE, boolean cUBEMAP360_MODE, boolean dISPLAY_HUD, boolean dISPLAY_POINTER_COORDS,
                 boolean dISPLAY_DATASET_DIALOG, boolean nET_MASTER, boolean nET_SLAVE, List<String> nET_MASTER_SLAVES) {
             DISPLAY_TUTORIAL = dISPLAY_TUTORIAL;
             TUTORIAL_POINTER_SCRIPT_LOCATION = tUTORIAL_POINTER_SCRIPT_LOCATION;
@@ -772,7 +771,6 @@ public class GlobalConf {
             STEREOSCOPIC_MODE = sTEREOSCOPIC_MODE;
             STEREO_PROFILE = sTEREO_PROFILE;
             CUBEMAP360_MODE = cUBEMAP360_MODE;
-            ANALYTICS_ENABLED = aNALYTICS_ENABLED;
             DISPLAY_HUD = dISPLAY_HUD;
             DISPLAY_POINTER_COORDS = dISPLAY_POINTER_COORDS;
             DISPLAY_DATASET_DIALOG = dISPLAY_DATASET_DIALOG;
