@@ -272,6 +272,22 @@
       "file": "http://gaia.ari.uni-heidelberg.de/gaiasky/files/autodownload/galaxies/002_20181213/nbg-galaxies.tar.gz"
     },
     {
+      "name": "catalog-nbg",
+      "type": "catalog",
+      "version": 3,
+      "mingsversion": 260,
+      "size": 15786547,
+      "check": "autoload-nbg.json",
+      "data": [
+        "autoload-nbg.json",
+        "nbg",
+        "tex/extragal"
+      ],
+      "description": "NBG catalog - Nearby Galaxies Catalog, contains M87 black hole - 870 galaxies",
+      "md5": "b919f0edcd4ffc35ae548007609cd084",
+      "file": "http://gaia.ari.uni-heidelberg.de/gaiasky/files/autodownload/galaxies/003_20190411/nbg-galaxies.tar.gz"
+    },
+    {
       "name": "catalog-sdss-12",
       "type": "catalog",
       "version": 0,
