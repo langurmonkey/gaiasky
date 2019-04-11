@@ -136,6 +136,12 @@ public class LineRenderSystem extends ImmediateRenderSystem {
     }
 
     public void addPoint(ILineRenderable lr, double x, double y, double z, float r, float g, float b, float a) {
+        // Check if 3 more indices fit
+        if (curr.numVertices + 1 >= curr.capacity) {
+            // Create new mesh data
+            initVertices(meshIdx++);
+        }
+
         color(r, g, b, a);
         vertex((float) x, (float) y, (float) z);
     }
