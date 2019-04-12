@@ -116,9 +116,10 @@ public class AboutWindow extends GenericDialog {
 
         // Readme
         Label readmetitle = new OwnLabel(I18n.txt("gui.help.readme"), skin);
-        FileHandle readmefile = Gdx.files.internal("README.md");
+        FileHandle readmefile = new FileHandle("README.md");
         if (!readmefile.exists()) {
-            readmefile = Gdx.files.internal("../README.md");
+            // Running from source when the working directory is core/
+            readmefile = new FileHandle("../README.md");
         }
         String readmestr = readmefile.readString();
         int lines = GlobalResources.countOccurrences(readmestr, '\n');

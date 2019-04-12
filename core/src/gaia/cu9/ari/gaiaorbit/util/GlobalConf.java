@@ -51,7 +51,7 @@ public class GlobalConf {
     public static final String AUTHOR_AFFILIATION = "Heidelberg University, Zentrum fuer Astronomie, Astronomisches Rechen-Institut";
 
     // Assets location for this instance of Gaia Sky
-    public static final String ASSETS_LOC = System.getProperty("assets.location") != null ? System.getProperty("assets.location") : "";
+    public static final String ASSETS_LOC = System.getProperty("assets.location") != null ? System.getProperty("assets.location") : ".";
 
     // Scale factor
     public static float SCALE_FACTOR = -1.0f;
