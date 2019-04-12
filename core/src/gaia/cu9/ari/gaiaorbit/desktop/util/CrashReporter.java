@@ -85,17 +85,6 @@ public class CrashReporter {
             } catch (Exception e) {
             }
         }
-
-        // Email reporting
-        String subject = "Gaia Sky crash report " + now;
-        String message = arrayToStr(crashInfo, "\n");
-        PlainTextEmailSender mailer = new PlainTextEmailSender();
-        try {
-            mailer.sendPlainTextEmail("client@gaiasky.gs", GlobalConf.AUTHOR_EMAIL, subject, message);
-            print(logger, "Crash report sent successfully");
-        } catch (Exception ex) {
-            print(logger, "Failed to send crash report");
-        }
     }
 
     private static void print(Logger.Log logger, String str) {
@@ -185,11 +174,4 @@ public class CrashReporter {
         return buff;
     }
 
-    private static String arrayToStr(Array<String> arr, String sep) {
-        String buff = new String();
-        for (int i = 0; i < arr.size; i++) {
-            buff += arr.get(i) + sep;
-        }
-        return buff;
-    }
 }

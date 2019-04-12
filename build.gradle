@@ -152,9 +152,6 @@ project(":core") {
         compile "net.jafama:jafama:$jafamaVersion"
         
         compile group: "net.sf.py4j", name: "py4j", version: "$py4jVersion"
-        compile group: "com.sun.mail", name: "javax.mail", version: "$mailVersion"
-
-
 
 
         // ****************
