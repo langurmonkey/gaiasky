@@ -127,6 +127,7 @@ public class SysUtils {
     private static final String MAPPINGS_DIR_NAME = "mappings";
     private static final String DATA_DIR_NAME = "data";
     private static final String TMP_DIR_NAME = "tmp";
+    private static final String CRASHREPORTS_DIR_NAME = "crashreports";
 
     /**
      * Gets a file pointer to the camera directory.
@@ -187,6 +188,19 @@ public class SysUtils {
             return new File(getDataDir(), DATA_DIR_NAME);
         } else {
             return new File(System.getProperty("user.home") + File.separator + GAIASKY_DIR_NAME + File.separator + DATA_DIR_NAME + File.separator);
+        }
+    }
+
+    /**
+     * Gets a file pointer to the crash reports directory, where crash reports are stored.
+     *
+     * @return A pointer to the crash reports directory
+     */
+    public static File getCrashReportsDir() {
+        if (isLinux()) {
+            return new File(getDataDir(), CRASHREPORTS_DIR_NAME);
+        } else {
+            return new File(System.getProperty("user.home") + File.separator + GAIASKY_DIR_NAME + File.separator + CRASHREPORTS_DIR_NAME + File.separator);
         }
     }
 

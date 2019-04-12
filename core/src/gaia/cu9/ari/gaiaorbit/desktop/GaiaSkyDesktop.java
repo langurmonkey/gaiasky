@@ -21,10 +21,7 @@ import gaia.cu9.ari.gaiaorbit.desktop.format.DesktopDateFormatFactory;
 import gaia.cu9.ari.gaiaorbit.desktop.format.DesktopNumberFormatFactory;
 import gaia.cu9.ari.gaiaorbit.desktop.render.DesktopPostProcessorFactory;
 import gaia.cu9.ari.gaiaorbit.desktop.render.ScreenModeCmd;
-import gaia.cu9.ari.gaiaorbit.desktop.util.DesktopConfInit;
-import gaia.cu9.ari.gaiaorbit.desktop.util.DesktopMusicActors;
-import gaia.cu9.ari.gaiaorbit.desktop.util.DesktopNetworkChecker;
-import gaia.cu9.ari.gaiaorbit.desktop.util.SysUtils;
+import gaia.cu9.ari.gaiaorbit.desktop.util.*;
 import gaia.cu9.ari.gaiaorbit.desktop.util.camera.CamRecorder;
 import gaia.cu9.ari.gaiaorbit.event.EventManager;
 import gaia.cu9.ari.gaiaorbit.event.Events;
@@ -224,7 +221,7 @@ public class GaiaSkyDesktop implements IObserver {
 
             gsd.init();
         } catch (Exception e) {
-            e.printStackTrace(System.err);
+            CrashReporter.reportCrash(e, logger);
         }
 
     }

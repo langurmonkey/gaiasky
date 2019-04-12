@@ -34,6 +34,7 @@ import gaia.cu9.ari.gaiaorbit.event.IObserver;
 import gaia.cu9.ari.gaiaorbit.render.*;
 import gaia.cu9.ari.gaiaorbit.render.system.FontRenderSystem;
 import gaia.cu9.ari.gaiaorbit.render.system.LineRenderSystem;
+import gaia.cu9.ari.gaiaorbit.scenegraph.camera.CameraManager;
 import gaia.cu9.ari.gaiaorbit.scenegraph.camera.CameraManager.CameraMode;
 import gaia.cu9.ari.gaiaorbit.scenegraph.camera.FovCamera;
 import gaia.cu9.ari.gaiaorbit.scenegraph.camera.ICamera;
@@ -1109,7 +1110,8 @@ public class StarGroup extends ParticleGroup implements ILineRenderable, IStarFo
         // Data to be gc'd
         this.pointData = null;
         // Remove focus if needed
-        if (GaiaSky.instance.getCameraManager().getFocus() != null && GaiaSky.instance.getCameraManager().getFocus() == this) {
+        CameraManager cam = GaiaSky.instance.getCameraManager();
+        if (cam != null && cam.getFocus() != null && cam.getFocus() == this) {
             this.setFocusIndex(-1);
             EventManager.instance.post(Events.CAMERA_MODE_CMD, CameraMode.Free_Camera);
         }

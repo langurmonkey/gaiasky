@@ -29,6 +29,7 @@ import gaia.cu9.ari.gaiaorbit.assets.SGLoader.SGLoaderParameter;
 import gaia.cu9.ari.gaiaorbit.data.AssetBean;
 import gaia.cu9.ari.gaiaorbit.data.StreamingOctreeLoader;
 import gaia.cu9.ari.gaiaorbit.data.util.PointCloudData;
+import gaia.cu9.ari.gaiaorbit.desktop.util.CrashReporter;
 import gaia.cu9.ari.gaiaorbit.event.EventManager;
 import gaia.cu9.ari.gaiaorbit.event.Events;
 import gaia.cu9.ari.gaiaorbit.event.IObserver;
@@ -396,7 +397,6 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
         // Initialise frames
         frames = 0;
 
-
         // Debug info scheduler
         Task debugTask1 = new Task() {
             @Override
@@ -437,7 +437,7 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
     /**
      * Moves the camera home. That is either the Earth, if it exists, or somewhere close to the Sun
      */
-    private void goHome(){
+    private void goHome() {
         if (sg.containsNode("Earth") && !GlobalConf.program.NET_SLAVE && isOn(ComponentType.Planets.ordinal())) {
             // Set focus to Earth
             EventManager.instance.post(Events.CAMERA_MODE_CMD, CameraMode.Focus);
@@ -625,9 +625,7 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
         try {
             renderProcess.run();
         } catch (Throwable t) {
-            logger.error(t);
-            // TODO implement error reporting?
-
+            CrashReporter.reportCrash(t, logger);
             // Quit
             Gdx.app.exit();
         }
