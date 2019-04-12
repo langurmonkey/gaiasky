@@ -51,7 +51,8 @@ public class GlobalConf {
     public static final String AUTHOR_AFFILIATION = "Heidelberg University, Zentrum fuer Astronomie, Astronomisches Rechen-Institut";
 
     // Assets location for this instance of Gaia Sky
-    public static final String ASSETS_LOC = System.getProperty("assets.location") != null ? System.getProperty("assets.location") : ".";
+    // macOS needs fully qualified paths when run as an app (GaiaSky.app), that's why we use the getAbsolutePath() part
+    public static final String ASSETS_LOC = (new File(System.getProperty("assets.location") != null ? System.getProperty("assets.location") : ".")).getAbsolutePath();
 
     // Scale factor
     public static float SCALE_FACTOR = -1.0f;
@@ -61,7 +62,7 @@ public class GlobalConf {
         logger.debug("GUI scale factor set to " + GlobalConf.SCALE_FACTOR);
     }
 
-    public static interface IConf {
+    public interface IConf {
     }
 
     public enum ScreenshotMode {

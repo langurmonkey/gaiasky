@@ -58,7 +58,7 @@ public class DesktopConfInit extends ConfInit {
             InputStream vis = GaiaSkyDesktop.class.getResourceAsStream("/version");
             if (vis == null) {
                 // In case of running in 'developer' mode
-                vis = new FileInputStream(GlobalConf.ASSETS_LOC + "dummyversion");
+                vis = new FileInputStream(GlobalConf.ASSETS_LOC + File.separator + "dummyversion");
             }
             vp = new Properties();
             vp.load(vis);

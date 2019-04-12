@@ -32,7 +32,9 @@ import gaia.cu9.ari.gaiaorbit.util.scene2d.*;
 import gaia.cu9.ari.gaiaorbit.util.update.VersionCheckEvent;
 import gaia.cu9.ari.gaiaorbit.util.update.VersionChecker;
 
+import java.io.File;
 import java.nio.IntBuffer;
+import java.nio.file.Files;
 import java.time.Instant;
 import java.util.Date;
 
@@ -116,12 +118,17 @@ public class AboutWindow extends GenericDialog {
 
         // Readme
         Label readmetitle = new OwnLabel(I18n.txt("gui.help.readme"), skin);
-        FileHandle readmefile = new FileHandle("README.md");
-        if (!readmefile.exists()) {
-            // Running from source when the working directory is core/
-            readmefile = new FileHandle("../README.md");
+        File readmefile = new File(GlobalConf.ASSETS_LOC + File.separator + "README.md");
+        if(!readmefile.exists()){
+            // In production assetsloc = working dir, in development working dir = assets/../
+            readmefile = new File(GlobalConf.ASSETS_LOC + File.separator + "../README.md");
         }
-        String readmestr = readmefile.readString();
+        String readmestr;
+        try {
+            readmestr =  new String(Files.readAllBytes(readmefile.toPath()));
+        }catch(Exception e){
+            readmestr = "Could not read README.md file";
+        }
         int lines = GlobalResources.countOccurrences(readmestr, '\n');
         OwnTextArea readme = new OwnTextArea(readmestr, skin, "no-disabled");
         readme.setDisabled(true);
@@ -464,6 +471,15 @@ public class AboutWindow extends GenericDialog {
         tabs.add(tabSystem);
         tabs.add(tabUpdates);
 
+    }
+
+    private boolean exists(FileHandle fh){
+        try{
+            fh.read().close();
+            return true;
+        }catch(Exception e){
+            return false;
+        }
     }
 
     private String arrayToStr(String[] arr) {
