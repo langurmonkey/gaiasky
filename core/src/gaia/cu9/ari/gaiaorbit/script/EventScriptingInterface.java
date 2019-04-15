@@ -182,13 +182,15 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
 
     @Override
     public void setCameraFocus(final String focusName, final float waitTimeSeconds) {
-        assert focusName != null : "Focus name can't be null";
-
-        SceneGraphNode sgn = getObject(focusName);
-        if (sgn != null && sgn instanceof IFocus) {
-            IFocus focus = (IFocus) sgn;
-            NaturalCamera cam = GaiaSky.instance.cam.naturalCamera;
-            changeFocus(focus, cam, waitTimeSeconds);
+        if (checkString(focusName, "focusName")) {
+            SceneGraphNode sgn = getObject(focusName);
+            if (sgn != null && sgn instanceof IFocus) {
+                IFocus focus = (IFocus) sgn;
+                NaturalCamera cam = GaiaSky.instance.cam.naturalCamera;
+                changeFocus(focus, cam, waitTimeSeconds);
+            } else {
+                logger.error("Focus object does not exist: " + focusName);
+            }
         }
     }
 
@@ -198,33 +200,35 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
 
     @Override
     public void setCameraFocusInstant(final String focusName) {
-        assert focusName != null : "Focus name can't be null";
+        if (checkString(focusName, "focusName")) {
+            SceneGraphNode sgn = getObject(focusName);
+            if (sgn != null && sgn instanceof IFocus) {
+                IFocus focus = (IFocus) sgn;
+                em.post(Events.CAMERA_MODE_CMD, CameraMode.Focus);
+                em.post(Events.FOCUS_CHANGE_CMD, focus);
 
-        SceneGraphNode sgn = getObject(focusName);
-        if (sgn != null && sgn instanceof IFocus) {
-            IFocus focus = (IFocus) sgn;
-            em.post(Events.CAMERA_MODE_CMD, CameraMode.Focus);
-            em.post(Events.FOCUS_CHANGE_CMD, focus);
+                Gdx.app.postRunnable(() -> {
+                    // Instantly set the camera direction to look towards the focus
+                    double[] campos = GaiaSky.instance.cam.getPos().values();
+                    Vector3d dir = new Vector3d();
+                    focus.getAbsolutePosition(dir).sub(campos[0], campos[1], campos[2]);
+                    double[] d = dir.nor().values();
+                    em.post(Events.CAMERA_DIR_CMD, d);
 
-            Gdx.app.postRunnable(() -> {
-                // Instantly set the camera direction to look towards the focus
-                double[] campos = GaiaSky.instance.cam.getPos().values();
-                Vector3d dir = new Vector3d();
-                focus.getAbsolutePosition(dir).sub(campos[0], campos[1], campos[2]);
-                double[] d = dir.nor().values();
-                em.post(Events.CAMERA_DIR_CMD, d);
-
-            });
+                });
+            } else {
+                logger.error("Focus object does not exist: " + focusName);
+            }
         }
     }
 
     @Override
     public void setCameraFocusInstantAndGo(final String focusName) {
-        assert focusName != null : "Focus name can't be null";
-
-        em.post(Events.CAMERA_MODE_CMD, CameraMode.Focus);
-        em.post(Events.FOCUS_CHANGE_CMD, focusName, true);
-        em.post(Events.GO_TO_OBJECT_CMD);
+        if (checkString(focusName, "focusName")) {
+            em.post(Events.CAMERA_MODE_CMD, CameraMode.Focus);
+            em.post(Events.FOCUS_CHANGE_CMD, focusName, true);
+            em.post(Events.GO_TO_OBJECT_CMD);
+        }
     }
 
     @Override
@@ -315,17 +319,16 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
 
     @Override
     public void setCameraPositionAndFocus(String focus, String other, double rotation, double viewAngle) {
-        assert viewAngle > 0 : "View angle must be larger than zero";
-        assert focus != null : "Focus can't be null";
-        assert other != null : "Other can't be null";
+        if (checkNum(viewAngle, 1e-50d, Double.MAX_VALUE, "viewAngle") && checkNotNull(focus, "focus") && checkNotNull(other, "other")) {
 
-        String focuslc = focus.toLowerCase();
-        String otherlc = other.toLowerCase();
-        ISceneGraph sg = GaiaSky.instance.sg;
-        if (sg.containsNode(focuslc) && sg.containsNode(otherlc)) {
-            IFocus focusObj = sg.findFocus(focuslc);
-            IFocus otherObj = sg.findFocus(otherlc);
-            setCameraPositionAndFocus(focusObj, otherObj, rotation, viewAngle);
+            String focuslc = focus.toLowerCase();
+            String otherlc = other.toLowerCase();
+            ISceneGraph sg = GaiaSky.instance.sg;
+            if (sg.containsNode(focuslc) && sg.containsNode(otherlc)) {
+                IFocus focusObj = sg.findFocus(focuslc);
+                IFocus otherObj = sg.findFocus(otherlc);
+                setCameraPositionAndFocus(focusObj, otherObj, rotation, viewAngle);
+            }
         }
     }
 
@@ -343,47 +346,45 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
     }
 
     private void setCameraPositionAndFocus(IFocus focus, IFocus other, double rotation, double viewAngle) {
-        assert viewAngle > 0 : "View angle must be larger than zero";
-        assert focus != null : "Focus can't be null";
-        assert other != null : "Other can't be null";
+        if (checkNum(viewAngle, 1e-50d, Double.MAX_VALUE, "viewAngle") && checkNotNull(focus, "focus") && checkNotNull(other, "other")) {
 
-        em.post(Events.CAMERA_MODE_CMD, CameraMode.Focus);
-        em.post(Events.FOCUS_CHANGE_CMD, focus);
+            em.post(Events.CAMERA_MODE_CMD, CameraMode.Focus);
+            em.post(Events.FOCUS_CHANGE_CMD, focus);
 
-        double radius = focus.getRadius();
-        double dist = radius / Math.tan(Math.toRadians(viewAngle / 2)) + radius;
+            double radius = focus.getRadius();
+            double dist = radius / Math.tan(Math.toRadians(viewAngle / 2)) + radius;
 
-        // Up to ecliptic north pole
-        Vector3d up = new Vector3d(0, 1, 0).mul(Coordinates.eclToEq());
+            // Up to ecliptic north pole
+            Vector3d up = new Vector3d(0, 1, 0).mul(Coordinates.eclToEq());
 
-        Vector3d focusPos = aux3d1;
-        focus.getAbsolutePosition(focusPos);
-        Vector3d otherPos = aux3d2;
-        other.getAbsolutePosition(otherPos);
+            Vector3d focusPos = aux3d1;
+            focus.getAbsolutePosition(focusPos);
+            Vector3d otherPos = aux3d2;
+            other.getAbsolutePosition(otherPos);
 
-        Vector3d otherToFocus = aux3d3;
-        otherToFocus.set(focusPos).sub(otherPos).nor();
-        Vector3d focusToOther = aux3d4.set(otherToFocus);
-        focusToOther.scl(-dist).rotate(up, rotation);
+            Vector3d otherToFocus = aux3d3;
+            otherToFocus.set(focusPos).sub(otherPos).nor();
+            Vector3d focusToOther = aux3d4.set(otherToFocus);
+            focusToOther.scl(-dist).rotate(up, rotation);
 
-        // New camera position
-        Vector3d newCamPos = aux3d5.set(focusToOther).add(focusPos).scl(Constants.U_TO_KM);
+            // New camera position
+            Vector3d newCamPos = aux3d5.set(focusToOther).add(focusPos).scl(Constants.U_TO_KM);
 
-        // New camera direction
-        Vector3d newCamDir = aux3d6.set(focusToOther);
-        newCamDir.scl(-1).nor();
+            // New camera direction
+            Vector3d newCamDir = aux3d6.set(focusToOther);
+            newCamDir.scl(-1).nor();
 
-        // Finally, set values
-        setCameraPosition(newCamPos.values());
-        setCameraDirection(newCamDir.values());
-        setCameraUp(up.values());
-
+            // Finally, set values
+            setCameraPosition(newCamPos.values());
+            setCameraDirection(newCamDir.values());
+            setCameraUp(up.values());
+        }
     }
 
     @Override
     public void setCameraSpeed(final float speed) {
-        assert speed >= Constants.MIN_SLIDER && speed <= Constants.MAX_SLIDER : "Speed must be between " + Constants.MIN_SLIDER + " and " + Constants.MAX_SLIDER;
-        Gdx.app.postRunnable(() -> em.post(Events.CAMERA_SPEED_CMD, speed / 10f, false));
+        if (checkNum(speed, Constants.MIN_SLIDER, Constants.MAX_SLIDER, "speed"))
+            Gdx.app.postRunnable(() -> em.post(Events.CAMERA_SPEED_CMD, speed / 10f, false));
     }
 
     public void setCameraSpeed(final int speed) {
@@ -397,8 +398,8 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
 
     @Override
     public void setRotationCameraSpeed(final float speed) {
-        assert speed >= Constants.MIN_SLIDER && speed <= Constants.MAX_SLIDER : "Speed must be between " + Constants.MIN_SLIDER + " and " + Constants.MAX_SLIDER;
-        Gdx.app.postRunnable(() -> em.post(Events.ROTATION_SPEED_CMD, MathUtilsd.lint(speed, Constants.MIN_SLIDER, Constants.MAX_SLIDER, Constants.MIN_ROT_SPEED, Constants.MAX_ROT_SPEED), false));
+        if (checkNum(speed, Constants.MIN_SLIDER, Constants.MAX_SLIDER, "speed"))
+            Gdx.app.postRunnable(() -> em.post(Events.ROTATION_SPEED_CMD, MathUtilsd.lint(speed, Constants.MIN_SLIDER, Constants.MAX_SLIDER, Constants.MIN_ROT_SPEED, Constants.MAX_ROT_SPEED), false));
     }
 
     public void setRotationCameraSpeed(final int speed) {
@@ -407,8 +408,8 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
 
     @Override
     public void setTurningCameraSpeed(final float speed) {
-        assert speed >= Constants.MIN_SLIDER && speed <= Constants.MAX_SLIDER : "Speed must be between " + Constants.MIN_SLIDER + " and " + Constants.MAX_SLIDER;
-        Gdx.app.postRunnable(() -> em.post(Events.TURNING_SPEED_CMD, MathUtilsd.lint(speed, Constants.MIN_SLIDER, Constants.MAX_SLIDER, Constants.MIN_TURN_SPEED, Constants.MAX_TURN_SPEED), false));
+        if (checkNum(speed, Constants.MIN_SLIDER, Constants.MAX_SLIDER, "speed"))
+            Gdx.app.postRunnable(() -> em.post(Events.TURNING_SPEED_CMD, MathUtilsd.lint(speed, Constants.MIN_SLIDER, Constants.MAX_SLIDER, Constants.MIN_TURN_SPEED, Constants.MAX_TURN_SPEED), false));
 
     }
 
@@ -418,8 +419,8 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
 
     @Override
     public void setCameraSpeedLimit(int index) {
-        assert index >= 0 && index <= 18 : "Speed limit index must be in [0..18]";
-        Gdx.app.postRunnable(() -> em.post(Events.SPEED_LIMIT_CMD, index, false));
+        if (checkNum(index, 0, 18, "index"))
+            Gdx.app.postRunnable(() -> em.post(Events.SPEED_LIMIT_CMD, index, false));
     }
 
     @Override
@@ -428,9 +429,9 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
     }
 
     @Override
-    public void cameraForward(final double value) {
-        assert value >= -1d && value <= 1d : "Value must be between -1 and 1";
-        Gdx.app.postRunnable(() -> em.post(Events.CAMERA_FWD, value));
+    public void cameraForward(final double cameraForward) {
+        if (checkNum(cameraForward, -1d, 1d, "cameraForward"))
+            Gdx.app.postRunnable(() -> em.post(Events.CAMERA_FWD, cameraForward));
     }
 
     public void cameraForward(final long value) {
@@ -439,8 +440,8 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
 
     @Override
     public void cameraRotate(final double deltaX, final double deltaY) {
-        assert deltaX >= 0d && deltaX <= 1d && deltaY >= 0d && deltaY <= 1d : "DeltaX and deltaY must be between 0 and 1";
-        Gdx.app.postRunnable(() -> em.post(Events.CAMERA_ROTATE, deltaX, deltaY));
+        if (checkNum(deltaX, 0d, 1d, "deltaX") && checkNum(deltaY, 0d, 1d, "deltaY"))
+            Gdx.app.postRunnable(() -> em.post(Events.CAMERA_ROTATE, deltaX, deltaY));
     }
 
     public void cameraRotate(final double deltaX, final long deltaY) {
@@ -457,8 +458,8 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
 
     @Override
     public void cameraRoll(final double roll) {
-        assert roll >= 0d && roll <= 1d : "Roll must be between 0 and 1";
-        Gdx.app.postRunnable(() -> em.post(Events.CAMERA_ROLL, roll));
+        if (checkNum(roll, 0d, 1d, "roll"))
+            Gdx.app.postRunnable(() -> em.post(Events.CAMERA_ROLL, roll));
     }
 
     public void cameraRoll(final long roll) {
@@ -467,8 +468,9 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
 
     @Override
     public void cameraTurn(final double deltaX, final double deltaY) {
-        assert deltaX >= 0d && deltaX <= 1d && deltaY >= 0d && deltaY <= 1d : "DeltaX and deltaY must be between 0 and 1";
-        Gdx.app.postRunnable(() -> em.post(Events.CAMERA_TURN, deltaX, deltaY));
+        if (checkNum(deltaX, 0d, 1d, "deltaX") && checkNum(deltaY, 0d, 1d, "deltaY")) {
+            Gdx.app.postRunnable(() -> em.post(Events.CAMERA_TURN, deltaX, deltaY));
+        }
     }
 
     public void cameraTurn(final double deltaX, final long deltaY) {
@@ -501,8 +503,8 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
 
     @Override
     public void setFov(final float newFov) {
-        assert newFov >= Constants.MIN_FOV && newFov <= Constants.MAX_FOV : "Fov value must be between " + Constants.MIN_FOV + " and " + Constants.MAX_FOV;
-        Gdx.app.postRunnable(() -> em.post(Events.FOV_CHANGED_CMD, newFov));
+        if (checkNum(newFov, Constants.MIN_FOV, Constants.MAX_FOV, "newFov"))
+            Gdx.app.postRunnable(() -> em.post(Events.FOV_CHANGED_CMD, newFov));
     }
 
     public void setFov(final int newFov) {
@@ -521,7 +523,7 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
         }
     }
 
-    private boolean checkComponentTypeKey(String key){
+    private boolean checkComponentTypeKey(String key) {
         ComponentTypes.ComponentType[] cts = ComponentTypes.ComponentType.values();
         boolean keyFound = false;
         for (ComponentTypes.ComponentType ct : cts)
@@ -578,9 +580,9 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
     }
 
     @Override
-    public void setAmbientLight(final float value) {
-        assert value >= Constants.MIN_SLIDER && value <= Constants.MAX_SLIDER : "Value must be between 0 and 100";
-        Gdx.app.postRunnable(() -> em.post(Events.AMBIENT_LIGHT_CMD, value / 100f));
+    public void setAmbientLight(final float ambientLight) {
+        if (checkNum(ambientLight, Constants.MIN_SLIDER, Constants.MAX_SLIDER, "ambientLight"))
+            Gdx.app.postRunnable(() -> em.post(Events.AMBIENT_LIGHT_CMD, ambientLight / 100f));
     }
 
     public void setAmbientLight(final int value) {
@@ -595,8 +597,8 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
 
     @Override
     public void setSimulationTime(final long time) {
-        assert time > 0 : "Time can not be negative";
-        em.post(Events.TIME_CHANGE_CMD, Instant.ofEpochMilli(time));
+        if (checkNum(time, 1, Long.MAX_VALUE, "time"))
+            em.post(Events.TIME_CHANGE_CMD, Instant.ofEpochMilli(time));
     }
 
     @Override
@@ -662,8 +664,8 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
 
     @Override
     public void setStarBrightness(final float brightness) {
-        assert brightness >= Constants.MIN_SLIDER && brightness <= Constants.MAX_SLIDER : "Brightness value must be between 0 and 100";
-        Gdx.app.postRunnable(() -> em.post(Events.STAR_BRIGHTNESS_CMD, MathUtilsd.lint(brightness, Constants.MIN_SLIDER, Constants.MAX_SLIDER, Constants.MIN_STAR_BRIGHT, Constants.MAX_STAR_BRIGHT), false));
+        if (checkNum(brightness, Constants.MIN_SLIDER, Constants.MAX_SLIDER, "brightness"))
+            Gdx.app.postRunnable(() -> em.post(Events.STAR_BRIGHTNESS_CMD, MathUtilsd.lint(brightness, Constants.MIN_SLIDER, Constants.MAX_SLIDER, Constants.MIN_STAR_BRIGHT, Constants.MAX_STAR_BRIGHT), false));
     }
 
     public void setStarBrightness(final int brightness) {
@@ -677,8 +679,8 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
 
     @Override
     public void setStarSize(final float size) {
-        assert size >= Constants.MIN_SLIDER && size <= Constants.MAX_SLIDER : "Size value must be between 0 and 100";
-        Gdx.app.postRunnable(() -> em.post(Events.STAR_POINT_SIZE_CMD, MathUtilsd.lint(size, Constants.MIN_SLIDER, Constants.MAX_SLIDER, Constants.MIN_STAR_POINT_SIZE, Constants.MAX_STAR_POINT_SIZE), false));
+        if (checkNum(size, Constants.MIN_SLIDER, Constants.MAX_SLIDER, "size"))
+            Gdx.app.postRunnable(() -> em.post(Events.STAR_POINT_SIZE_CMD, MathUtilsd.lint(size, Constants.MIN_SLIDER, Constants.MAX_SLIDER, Constants.MIN_STAR_POINT_SIZE, Constants.MAX_STAR_POINT_SIZE), false));
     }
 
     public void setStarSize(final int size) {
@@ -697,8 +699,8 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
 
     @Override
     public void setMinStarOpacity(float opacity) {
-        assert opacity >= Constants.MIN_SLIDER && opacity <= Constants.MAX_SLIDER : "Opacity value must be between 0 and 100";
-        Gdx.app.postRunnable(() -> EventManager.instance.post(Events.STAR_MIN_OPACITY_CMD, MathUtilsd.lint(opacity, Constants.MIN_SLIDER, Constants.MAX_SLIDER, Constants.MIN_STAR_MIN_OPACITY, Constants.MAX_STAR_MIN_OPACITY), false));
+        if (checkNum(opacity, Constants.MIN_SLIDER, Constants.MAX_SLIDER, "opacity"))
+            Gdx.app.postRunnable(() -> EventManager.instance.post(Events.STAR_MIN_OPACITY_CMD, MathUtilsd.lint(opacity, Constants.MIN_SLIDER, Constants.MAX_SLIDER, Constants.MIN_STAR_MIN_OPACITY, Constants.MAX_STAR_MIN_OPACITY), false));
     }
 
     public void setMinStarOpacity(int opacity) {
@@ -707,16 +709,21 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
 
     @Override
     public void configureFrameOutput(int width, int height, int fps, String folder, String namePrefix) {
-        assert width > 0 : "Width must be positive";
-        assert height > 0 : "Height must be positive";
-        assert fps > 0 : "FPS must be positive";
-        assert folder != null && namePrefix != null : "Folder and file name prefix must not be null";
-        em.post(Events.CONFIG_FRAME_OUTPUT, width, height, fps, folder, namePrefix);
+        if (checkNum(width, 1, Integer.MAX_VALUE, "width") && checkNum(height, 1, Integer.MAX_VALUE, "height") && checkNum(fps, 1, Integer.MAX_VALUE, "FPS") && checkString(folder, "folder") && checkString(namePrefix, "namePrefix")) {
+            em.post(Events.FRAME_OUTPUT_CMD, GlobalConf.ScreenshotMode.redraw);
+            em.post(Events.CONFIG_FRAME_OUTPUT_CMD, width, height, fps, folder, namePrefix);
+        }
     }
 
     @Override
     public void configureRenderOutput(int width, int height, int fps, String folder, String namePrefix) {
         configureFrameOutput(width, height, fps, folder, namePrefix);
+    }
+
+    @Override
+    public void setFrameOutputMode(String screenshotMode) {
+        if (checkString(screenshotMode, new String[] { GlobalConf.ScreenshotMode.redraw.toString(), GlobalConf.ScreenshotMode.simple.toString() }, "screenshotMode"))
+            em.post(Events.FRAME_OUTPUT_CMD, screenshotMode);
     }
 
     @Override
@@ -834,13 +841,15 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
     }
 
     private void goToObject(String name, double viewAngle, float waitTimeSeconds, AtomicBoolean stop) {
-        assert name != null : "Name can't be null";
-
-        String namelc = name.toLowerCase();
-        ISceneGraph sg = GaiaSky.instance.sg;
-        if (sg.containsNode(namelc)) {
-            IFocus focus = sg.findFocus(namelc);
-            goToObject(focus, viewAngle, waitTimeSeconds, stop);
+        if (checkString(name, "name")) {
+            String namelc = name.toLowerCase();
+            ISceneGraph sg = GaiaSky.instance.sg;
+            if (sg.containsNode(namelc)) {
+                IFocus focus = sg.findFocus(namelc);
+                goToObject(focus, viewAngle, waitTimeSeconds, stop);
+            } else {
+                logger.info("Focus object does not exist: " + name);
+            }
         }
     }
 
@@ -849,52 +858,52 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
     }
 
     void goToObject(IFocus object, double viewAngle, float waitTimeSeconds, AtomicBoolean stop) {
-        assert object != null : "Object can't be null";
-        assert viewAngle > 0 : "Angle must be larger than zero";
+        if (checkNotNull(object, "object") && checkNum(viewAngle, 0, Double.MAX_VALUE, "viewAngle")) {
 
-        stops.add(stop);
-        NaturalCamera cam = GaiaSky.instance.cam.naturalCamera;
+            stops.add(stop);
+            NaturalCamera cam = GaiaSky.instance.cam.naturalCamera;
 
-        changeFocus(object, cam, waitTimeSeconds);
+            changeFocus(object, cam, waitTimeSeconds);
 
-        /* target angle */
-        double target = Math.toRadians(viewAngle);
-        if (target < 0)
-            target = Math.toRadians(20d);
+            /* target angle */
+            double target = Math.toRadians(viewAngle);
+            if (target < 0)
+                target = Math.toRadians(20d);
 
-        long prevtime = TimeUtils.millis();
-        if (object.getViewAngleApparent() < target) {
-            // Add forward movement while distance > target distance
-            while (object.getViewAngleApparent() < target && (stop == null || !stop.get())) {
-                // dt in ms
-                long dt = TimeUtils.timeSinceMillis(prevtime);
-                prevtime = TimeUtils.millis();
+            long prevtime = TimeUtils.millis();
+            if (object.getViewAngleApparent() < target) {
+                // Add forward movement while distance > target distance
+                while (object.getViewAngleApparent() < target && (stop == null || !stop.get())) {
+                    // dt in ms
+                    long dt = TimeUtils.timeSinceMillis(prevtime);
+                    prevtime = TimeUtils.millis();
 
-                em.post(Events.CAMERA_FWD, 1d * dt);
-                try {
-                    sleepFrames(1);
-                } catch (Exception e) {
-                    logger.error(e);
+                    em.post(Events.CAMERA_FWD, 1d * dt);
+                    try {
+                        sleepFrames(1);
+                    } catch (Exception e) {
+                        logger.error(e);
+                    }
+                }
+            } else {
+                // Add backward movement while distance > target distance
+                while (object.getViewAngleApparent() > target && (stop == null || !stop.get())) {
+                    // dt in ms
+                    long dt = TimeUtils.timeSinceMillis(prevtime);
+                    prevtime = TimeUtils.millis();
+
+                    em.post(Events.CAMERA_FWD, -1d * dt);
+                    try {
+                        sleepFrames(1);
+                    } catch (Exception e) {
+                        logger.error(e);
+                    }
                 }
             }
-        } else {
-            // Add backward movement while distance > target distance
-            while (object.getViewAngleApparent() > target && (stop == null || !stop.get())) {
-                // dt in ms
-                long dt = TimeUtils.timeSinceMillis(prevtime);
-                prevtime = TimeUtils.millis();
 
-                em.post(Events.CAMERA_FWD, -1d * dt);
-                try {
-                    sleepFrames(1);
-                } catch (Exception e) {
-                    logger.error(e);
-                }
-            }
+            // We can stop now
+            em.post(Events.CAMERA_STOP);
         }
-
-        // We can stop now
-        em.post(Events.CAMERA_STOP);
     }
 
     void goToObject(IFocus object, double viewAngle, int waitTimeSeconds, AtomicBoolean stop) {
@@ -912,126 +921,125 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
     }
 
     private void landOnObject(String name, AtomicBoolean stop) {
-        assert name != null : "Name can't be null";
-
-        SceneGraphNode sgn = getObject(name);
-        if (sgn != null && sgn instanceof IFocus)
-            landOnObject((IFocus) sgn, stop);
-
+        if (checkString(name, "name")) {
+            SceneGraphNode sgn = getObject(name);
+            if (sgn != null && sgn instanceof IFocus)
+                landOnObject((IFocus) sgn, stop);
+        }
     }
 
     void landOnObject(IFocus object, AtomicBoolean stop) {
-        assert object != null : "Object can't be null";
+        if (checkNotNull(object, "object")) {
 
-        stops.add(stop);
-        if (object instanceof Planet) {
-            NaturalCamera cam = GaiaSky.instance.cam.naturalCamera;
-            // Focus wait - 2 seconds
-            float waitTimeSeconds = -1;
+            stops.add(stop);
+            if (object instanceof Planet) {
+                NaturalCamera cam = GaiaSky.instance.cam.naturalCamera;
+                // Focus wait - 2 seconds
+                float waitTimeSeconds = -1;
 
-            /**
-             * SAVE
-             */
+                /**
+                 * SAVE
+                 */
 
-            // Save speed, set it to 50
-            double speed = GlobalConf.scene.CAMERA_SPEED;
-            em.post(Events.CAMERA_SPEED_CMD, 25f / 10f, false);
+                // Save speed, set it to 50
+                double speed = GlobalConf.scene.CAMERA_SPEED;
+                em.post(Events.CAMERA_SPEED_CMD, 25f / 10f, false);
 
-            // Save turn speed, set it to 50
-            double turnSpeedBak = GlobalConf.scene.TURNING_SPEED;
-            em.post(Events.TURNING_SPEED_CMD, (float) MathUtilsd.lint(20d, Constants.MIN_SLIDER, Constants.MAX_SLIDER, Constants.MIN_TURN_SPEED, Constants.MAX_TURN_SPEED), false);
+                // Save turn speed, set it to 50
+                double turnSpeedBak = GlobalConf.scene.TURNING_SPEED;
+                em.post(Events.TURNING_SPEED_CMD, (float) MathUtilsd.lint(20d, Constants.MIN_SLIDER, Constants.MAX_SLIDER, Constants.MIN_TURN_SPEED, Constants.MAX_TURN_SPEED), false);
 
-            // Save cinematic
-            boolean cinematic = GlobalConf.scene.CINEMATIC_CAMERA;
-            GlobalConf.scene.CINEMATIC_CAMERA = true;
+                // Save cinematic
+                boolean cinematic = GlobalConf.scene.CINEMATIC_CAMERA;
+                GlobalConf.scene.CINEMATIC_CAMERA = true;
 
-            /**
-             * FOCUS
-             */
+                /**
+                 * FOCUS
+                 */
 
-            changeFocus(object, cam, waitTimeSeconds);
+                changeFocus(object, cam, waitTimeSeconds);
 
-            /* target distance */
-            double target = 100 * Constants.M_TO_U;
+                /* target distance */
+                double target = 100 * Constants.M_TO_U;
 
-            object.getAbsolutePosition(aux3d1).add(cam.posinv).nor();
-            Vector3d dir = cam.direction;
+                object.getAbsolutePosition(aux3d1).add(cam.posinv).nor();
+                Vector3d dir = cam.direction;
 
-            // Add forward movement while distance > target distance
-            boolean distanceNotMet = (object.getDistToCamera() - object.getRadius()) > target;
-            boolean viewNotMet = Math.abs(dir.angle(aux3d1)) < 90;
+                // Add forward movement while distance > target distance
+                boolean distanceNotMet = (object.getDistToCamera() - object.getRadius()) > target;
+                boolean viewNotMet = Math.abs(dir.angle(aux3d1)) < 90;
 
-            long prevtime = TimeUtils.millis();
-            while ((distanceNotMet || viewNotMet) && (stop == null || !stop.get())) {
-                // dt in ms
-                long dt = TimeUtils.timeSinceMillis(prevtime);
-                prevtime = TimeUtils.millis();
+                long prevtime = TimeUtils.millis();
+                while ((distanceNotMet || viewNotMet) && (stop == null || !stop.get())) {
+                    // dt in ms
+                    long dt = TimeUtils.timeSinceMillis(prevtime);
+                    prevtime = TimeUtils.millis();
 
-                if (distanceNotMet)
-                    em.post(Events.CAMERA_FWD, 0.1d * dt);
-                else
-                    cam.stopForwardMovement();
+                    if (distanceNotMet)
+                        em.post(Events.CAMERA_FWD, 0.1d * dt);
+                    else
+                        cam.stopForwardMovement();
 
-                if (viewNotMet) {
-                    if (object.getDistToCamera() - object.getRadius() < object.getRadius() * 5)
-                        // Start turning where we are at n times the radius
-                        em.post(Events.CAMERA_TURN, 0d, dt / 500d);
-                } else {
-                    cam.stopRotateMovement();
+                    if (viewNotMet) {
+                        if (object.getDistToCamera() - object.getRadius() < object.getRadius() * 5)
+                            // Start turning where we are at n times the radius
+                            em.post(Events.CAMERA_TURN, 0d, dt / 500d);
+                    } else {
+                        cam.stopRotateMovement();
+                    }
+
+                    try {
+                        sleepFrames(1);
+                    } catch (Exception e) {
+                        logger.error(e);
+                    }
+
+                    // focus.transform.getTranslation(aux);
+                    viewNotMet = Math.abs(dir.angle(aux3d1)) < 90;
+                    distanceNotMet = (object.getDistToCamera() - object.getRadius()) > target;
                 }
 
-                try {
-                    sleepFrames(1);
-                } catch (Exception e) {
-                    logger.error(e);
+                // STOP
+                em.post(Events.CAMERA_STOP);
+
+                // Roll till done
+                Vector3d up = cam.up;
+                // aux1 <- camera-object
+                object.getAbsolutePosition(aux3d1).sub(cam.pos);
+                double ang1 = up.angle(aux3d1);
+                double ang2 = up.cpy().rotate(cam.direction, 1).angle(aux3d1);
+                double rollsign = ang1 < ang2 ? -1d : 1d;
+
+                if (ang1 < 170) {
+
+                    rollAndWait(rollsign * 0.02d, 170d, 50L, cam, aux3d1, stop);
+                    // STOP
+                    cam.stopMovement();
+
+                    rollAndWait(rollsign * 0.006d, 176d, 50L, cam, aux3d1, stop);
+                    // STOP
+                    cam.stopMovement();
+
+                    rollAndWait(rollsign * 0.003d, 178d, 50L, cam, aux3d1, stop);
                 }
+                /*
+                 * RESTORE
+                 */
 
-                // focus.transform.getTranslation(aux);
-                viewNotMet = Math.abs(dir.angle(aux3d1)) < 90;
-                distanceNotMet = (object.getDistToCamera() - object.getRadius()) > target;
+                // We can stop now
+                em.post(Events.CAMERA_STOP);
+
+                // Restore cinematic
+                GlobalConf.scene.CINEMATIC_CAMERA = cinematic;
+
+                // Restore speed
+                em.post(Events.CAMERA_SPEED_CMD, (float) speed, false);
+
+                // Restore turning speed
+                em.post(Events.TURNING_SPEED_CMD, (float) turnSpeedBak, false);
+
             }
-
-            // STOP
-            em.post(Events.CAMERA_STOP);
-
-            // Roll till done
-            Vector3d up = cam.up;
-            // aux1 <- camera-object
-            object.getAbsolutePosition(aux3d1).sub(cam.pos);
-            double ang1 = up.angle(aux3d1);
-            double ang2 = up.cpy().rotate(cam.direction, 1).angle(aux3d1);
-            double rollsign = ang1 < ang2 ? -1d : 1d;
-
-            if (ang1 < 170) {
-
-                rollAndWait(rollsign * 0.02d, 170d, 50L, cam, aux3d1, stop);
-                // STOP
-                cam.stopMovement();
-
-                rollAndWait(rollsign * 0.006d, 176d, 50L, cam, aux3d1, stop);
-                // STOP
-                cam.stopMovement();
-
-                rollAndWait(rollsign * 0.003d, 178d, 50L, cam, aux3d1, stop);
-            }
-            /*
-             * RESTORE
-             */
-
-            // We can stop now
-            em.post(Events.CAMERA_STOP);
-
-            // Restore cinematic
-            GlobalConf.scene.CINEMATIC_CAMERA = cinematic;
-
-            // Restore speed
-            em.post(Events.CAMERA_SPEED_CMD, (float) speed, false);
-
-            // Restore turning speed
-            em.post(Events.TURNING_SPEED_CMD, (float) turnSpeedBak, false);
-
         }
-
     }
 
     @Override
@@ -1040,28 +1048,28 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
     }
 
     private void landOnObjectLocation(String name, String locationName, AtomicBoolean stop) {
-        assert name != null : "Name can't be null";
-
-        stops.add(stop);
-        SceneGraphNode sgn = getObject(name);
-        if (sgn != null && sgn instanceof IFocus)
-            landOnObjectLocation((IFocus) sgn, locationName, stop);
+        if (checkString(name, "name")) {
+            stops.add(stop);
+            SceneGraphNode sgn = getObject(name);
+            if (sgn != null && sgn instanceof IFocus)
+                landOnObjectLocation((IFocus) sgn, locationName, stop);
+        }
     }
 
     void landOnObjectLocation(IFocus object, String locationName, AtomicBoolean stop) {
-        assert object != null : "Name can't be null";
-        assert locationName != null : "locationName can't be null";
+        if (checkNotNull(object, "object") && checkString(locationName, "locationName")) {
 
-        stops.add(stop);
-        if (object instanceof Planet) {
-            Planet planet = (Planet) object;
-            SceneGraphNode sgn = planet.getChildByNameAndType(locationName, Loc.class);
-            if (sgn != null) {
-                Loc location = (Loc) sgn;
-                landOnObjectLocation(object, location.getLocation().x, location.getLocation().y, stop);
-                return;
+            stops.add(stop);
+            if (object instanceof Planet) {
+                Planet planet = (Planet) object;
+                SceneGraphNode sgn = planet.getChildByNameAndType(locationName, Loc.class);
+                if (sgn != null) {
+                    Loc location = (Loc) sgn;
+                    landOnObjectLocation(object, location.getLocation().x, location.getLocation().y, stop);
+                    return;
+                }
+                logger.info("Location '" + locationName + "' not found on object '" + object.getCandidateName() + "'");
             }
-            logger.info("Location '" + locationName + "' not found on object '" + object.getCandidateName() + "'");
         }
     }
 
@@ -1071,116 +1079,114 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
     }
 
     private void landOnObjectLocation(String name, double longitude, double latitude, AtomicBoolean stop) {
-        assert name != null : "Name can't be null";
-
-        String namelc = name.toLowerCase();
-        SceneGraphNode sgn = getObject(name);
-        if (sgn != null && sgn instanceof IFocus)
-            landOnObjectLocation((IFocus) sgn, longitude, latitude, stop);
+        if (checkString(name, "name")) {
+            SceneGraphNode sgn = getObject(name);
+            if (sgn != null && sgn instanceof IFocus)
+                landOnObjectLocation((IFocus) sgn, longitude, latitude, stop);
+        }
     }
 
     void landOnObjectLocation(IFocus object, double longitude, double latitude, AtomicBoolean stop) {
-        assert object != null : "Object can't be null";
-        assert latitude >= -90 && latitude <= 90 && longitude >= 0 && longitude <= 360 : "Latitude must be in [-90..90] and longitude must be in [0..360]";
+        if (checkNotNull(object, "object") && checkNum(latitude, -90d, 90d, "latitude") && checkNum(longitude, 0d, 360d, "longitude")) {
+            stops.add(stop);
+            ISceneGraph sg = GaiaSky.instance.sg;
+            String nameStub = object.getCandidateName() + " ";
 
-        stops.add(stop);
-        ISceneGraph sg = GaiaSky.instance.sg;
-        String nameStub = object.getCandidateName() + " ";
+            if (!sg.containsNode(nameStub)) {
+                Invisible invisible = new Invisible(nameStub);
+                EventManager.instance.post(Events.SCENE_GRAPH_ADD_OBJECT_CMD, invisible, true);
+            }
+            Invisible invisible = (Invisible) getObject(nameStub, 5);
 
-        if (!sg.containsNode(nameStub)) {
-            Invisible invisible = new Invisible(nameStub);
-            EventManager.instance.post(Events.SCENE_GRAPH_ADD_OBJECT_CMD, invisible, true);
-        }
-        Invisible invisible = (Invisible) getObject(nameStub, 5);
+            if (object instanceof Planet) {
+                Planet planet = (Planet) object;
+                NaturalCamera cam = GaiaSky.instance.cam.naturalCamera;
 
-        if (object instanceof Planet) {
-            Planet planet = (Planet) object;
-            NaturalCamera cam = GaiaSky.instance.cam.naturalCamera;
-
-            double targetAngle = 35 * MathUtilsd.degRad;
-            if (planet.viewAngle > targetAngle) {
-                // Zoom out
-                while (planet.viewAngle > targetAngle && (stop == null || !stop.get())) {
-                    cam.addForwardForce(-5d);
-                    sleepFrames(1);
+                double targetAngle = 35 * MathUtilsd.degRad;
+                if (planet.viewAngle > targetAngle) {
+                    // Zoom out
+                    while (planet.viewAngle > targetAngle && (stop == null || !stop.get())) {
+                        cam.addForwardForce(-5d);
+                        sleepFrames(1);
+                    }
+                    // STOP
+                    cam.stopMovement();
                 }
-                // STOP
-                cam.stopMovement();
+
+                // Go to object
+                goToObject(object, 20, -1, stop);
+
+                // Save speed, set it to 50
+                double speed = GlobalConf.scene.CAMERA_SPEED;
+                em.post(Events.CAMERA_SPEED_CMD, 25f / 10f, false);
+
+                // Save turn speed, set it to 50
+                double turnSpeedBak = GlobalConf.scene.TURNING_SPEED;
+                em.post(Events.TURNING_SPEED_CMD, (float) MathUtilsd.lint(50d, Constants.MIN_SLIDER, Constants.MAX_SLIDER, Constants.MIN_TURN_SPEED, Constants.MAX_TURN_SPEED), false);
+
+                // Save rotation speed, set it to 20
+                double rotationSpeedBak = GlobalConf.scene.ROTATION_SPEED;
+                em.post(Events.ROTATION_SPEED_CMD, (float) MathUtilsd.lint(20d, Constants.MIN_SLIDER, Constants.MAX_SLIDER, Constants.MIN_ROT_SPEED, Constants.MAX_ROT_SPEED), false);
+
+                // Save cinematic
+                boolean cinematic = GlobalConf.scene.CINEMATIC_CAMERA;
+                GlobalConf.scene.CINEMATIC_CAMERA = true;
+
+                // Save crosshair
+                boolean crosshair = GlobalConf.scene.CROSSHAIR;
+                GlobalConf.scene.CROSSHAIR = false;
+
+                // Get target position
+                Vector3d target = aux3d1;
+                planet.getPositionAboveSurface(longitude, latitude, 50, target);
+
+                // Get object position
+                Vector3d objectPosition = planet.getAbsolutePosition(aux3d2);
+
+                // Check intersection with object
+                boolean intersects = Intersectord.checkIntersectSegmentSphere(cam.pos, target, objectPosition, planet.getRadius());
+
+                if (intersects) {
+                    cameraRotate(5, 5);
+                }
+
+                while (intersects && (stop == null || !stop.get())) {
+                    sleep(0.1f);
+
+                    objectPosition = planet.getAbsolutePosition(aux3d2);
+                    intersects = Intersectord.checkIntersectSegmentSphere(cam.pos, target, objectPosition, planet.getRadius());
+                }
+
+                cameraStop();
+
+                invisible.ct = planet.ct;
+                invisible.pos.set(target);
+
+                // Go to object
+                goToObject(nameStub, 20, 0, stop);
+
+                // Restore cinematic
+                GlobalConf.scene.CINEMATIC_CAMERA = cinematic;
+
+                // Restore speed
+                em.post(Events.CAMERA_SPEED_CMD, (float) speed, false);
+
+                // Restore turning speed
+                em.post(Events.TURNING_SPEED_CMD, (float) turnSpeedBak, false);
+
+                // Restore rotation speed
+                em.post(Events.ROTATION_SPEED_CMD, (float) rotationSpeedBak, false);
+
+                // Restore crosshair
+                GlobalConf.scene.CROSSHAIR = crosshair;
+
+                // Land
+                landOnObject(object, stop);
+
             }
 
-            // Go to object
-            goToObject(object, 20, -1, stop);
-
-            // Save speed, set it to 50
-            double speed = GlobalConf.scene.CAMERA_SPEED;
-            em.post(Events.CAMERA_SPEED_CMD, 25f / 10f, false);
-
-            // Save turn speed, set it to 50
-            double turnSpeedBak = GlobalConf.scene.TURNING_SPEED;
-            em.post(Events.TURNING_SPEED_CMD, (float) MathUtilsd.lint(50d, Constants.MIN_SLIDER, Constants.MAX_SLIDER, Constants.MIN_TURN_SPEED, Constants.MAX_TURN_SPEED), false);
-
-            // Save rotation speed, set it to 20
-            double rotationSpeedBak = GlobalConf.scene.ROTATION_SPEED;
-            em.post(Events.ROTATION_SPEED_CMD, (float) MathUtilsd.lint(20d, Constants.MIN_SLIDER, Constants.MAX_SLIDER, Constants.MIN_ROT_SPEED, Constants.MAX_ROT_SPEED), false);
-
-            // Save cinematic
-            boolean cinematic = GlobalConf.scene.CINEMATIC_CAMERA;
-            GlobalConf.scene.CINEMATIC_CAMERA = true;
-
-            // Save crosshair
-            boolean crosshair = GlobalConf.scene.CROSSHAIR;
-            GlobalConf.scene.CROSSHAIR = false;
-
-            // Get target position
-            Vector3d target = aux3d1;
-            planet.getPositionAboveSurface(longitude, latitude, 50, target);
-
-            // Get object position
-            Vector3d objectPosition = planet.getAbsolutePosition(aux3d2);
-
-            // Check intersection with object
-            boolean intersects = Intersectord.checkIntersectSegmentSphere(cam.pos, target, objectPosition, planet.getRadius());
-
-            if (intersects) {
-                cameraRotate(5, 5);
-            }
-
-            while (intersects && (stop == null || !stop.get())) {
-                sleep(0.1f);
-
-                objectPosition = planet.getAbsolutePosition(aux3d2);
-                intersects = Intersectord.checkIntersectSegmentSphere(cam.pos, target, objectPosition, planet.getRadius());
-            }
-
-            cameraStop();
-
-            invisible.ct = planet.ct;
-            invisible.pos.set(target);
-
-            // Go to object
-            goToObject(nameStub, 20, 0, stop);
-
-            // Restore cinematic
-            GlobalConf.scene.CINEMATIC_CAMERA = cinematic;
-
-            // Restore speed
-            em.post(Events.CAMERA_SPEED_CMD, (float) speed, false);
-
-            // Restore turning speed
-            em.post(Events.TURNING_SPEED_CMD, (float) turnSpeedBak, false);
-
-            // Restore rotation speed
-            em.post(Events.ROTATION_SPEED_CMD, (float) rotationSpeedBak, false);
-
-            // Restore crosshair
-            GlobalConf.scene.CROSSHAIR = crosshair;
-
-            // Land
-            landOnObject(object, stop);
-
+            sg.remove(invisible, true);
         }
-
-        sg.remove(invisible, true);
     }
 
     private void rollAndWait(double roll, double target, long sleep, NaturalCamera cam, Vector3d camobj, AtomicBoolean stop) {
@@ -1751,8 +1757,8 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
 
     @Override
     public void setBrightnessLevel(double level) {
-        assert level >= -1d && level <= 1d : "Brightness level value must be in [-1..1]: " + level;
-        Gdx.app.postRunnable(() -> em.post(Events.BRIGHTNESS_CMD, (float) level, false));
+        if (checkNum(level, -1d, 1d, "brightness"))
+            Gdx.app.postRunnable(() -> em.post(Events.BRIGHTNESS_CMD, (float) level, false));
     }
 
     public void setBrightnessLevel(long level) {
@@ -1761,8 +1767,8 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
 
     @Override
     public void setContrastLevel(double level) {
-        assert level >= 0d && level <= 2d : "Contrast level value must be in [0..2]: " + level;
-        Gdx.app.postRunnable(() -> em.post(Events.CONTRAST_CMD, (float) level, false));
+        if (checkNum(level, 0d, 2d, "contrast"))
+            Gdx.app.postRunnable(() -> em.post(Events.CONTRAST_CMD, (float) level, false));
     }
 
     public void setContrastLevel(long level) {
@@ -1771,8 +1777,8 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
 
     @Override
     public void setHueLevel(double level) {
-        assert level >= 0d && level <= 2d : "Hue level value must be in [0..2]: " + level;
-        Gdx.app.postRunnable(() -> em.post(Events.HUE_CMD, (float) level, false));
+        if (checkNum(level, 0d, 2d, "hue"))
+            Gdx.app.postRunnable(() -> em.post(Events.HUE_CMD, (float) level, false));
     }
 
     public void setHueLevel(long level) {
@@ -1781,8 +1787,8 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
 
     @Override
     public void setSaturationLevel(double level) {
-        assert level >= 0d && level <= 2d : "Saturation level value must be in [0..2]: " + level;
-        Gdx.app.postRunnable(() -> em.post(Events.SATURATION_CMD, (float) level, false));
+        if (checkNum(level, 0d, 2d, "saturation"))
+            Gdx.app.postRunnable(() -> em.post(Events.SATURATION_CMD, (float) level, false));
     }
 
     public void setSaturationLevel(long level) {
@@ -2190,4 +2196,70 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
 
     }
 
+    private boolean checkNum(int value, int min, int max, String name) {
+        if (value < min || value > max) {
+            logger.error(name + " must be between " + min + " and " + max + ": " + value);
+            return false;
+        }
+        return true;
+    }
+
+    private boolean checkNum(long value, long min, long max, String name) {
+        if (value < min || value > max) {
+            logger.error(name + " must be between " + min + " and " + max + ": " + value);
+            return false;
+        }
+        return true;
+    }
+
+    private boolean checkNum(float value, float min, float max, String name) {
+        if (value < min || value > max) {
+            logger.error(name + " must be between " + min + " and " + max + ": " + value);
+            return false;
+        }
+        return true;
+    }
+
+    private boolean checkNum(double value, double min, double max, String name) {
+        if (value < min || value > max) {
+            logger.error(name + " must be between " + min + " and " + max + ": " + value);
+            return false;
+        }
+        return true;
+    }
+
+    private boolean checkString(String value, String name) {
+        if (value == null || value.isEmpty()) {
+            logger.error(name + " can't be null nor empty");
+            return false;
+        }
+        return true;
+    }
+
+    private boolean checkString(String value, String[] possibleValues, String name) {
+        if (checkString(value, name)) {
+            for (String v : possibleValues) {
+                if (value.equals(v))
+                    return true;
+            }
+            logPossibleValues(value, possibleValues, name);
+            return false;
+        }
+        logPossibleValues(value, possibleValues, name);
+        return false;
+    }
+
+    private void logPossibleValues(String value, String[] possibleValues, String name) {
+        logger.error(name + " value not valid: " + value + ". Possible values are:");
+        for (String v : possibleValues)
+            logger.error(v);
+    }
+
+    private boolean checkNotNull(Object o, String name) {
+        if (o == null) {
+            logger.error(name + " can't be null");
+            return false;
+        }
+        return true;
+    }
 }

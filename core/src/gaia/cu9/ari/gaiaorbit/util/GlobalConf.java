@@ -487,7 +487,7 @@ public class GlobalConf {
         public CameraKeyframeManager.PathType KF_PATH_TYPE_ORIENTATION;
 
         public FrameConf() {
-            EventManager.instance.subscribe(this, Events.CONFIG_FRAME_OUTPUT, Events.FRAME_OUTPUT_CMD);
+            EventManager.instance.subscribe(this, Events.CONFIG_FRAME_OUTPUT_CMD, Events.FRAME_OUTPUT_CMD);
         }
 
         public boolean isSimpleMode() {
@@ -518,7 +518,7 @@ public class GlobalConf {
         @Override
         public void notify(Events event, Object... data) {
             switch (event) {
-            case CONFIG_FRAME_OUTPUT:
+            case CONFIG_FRAME_OUTPUT_CMD:
                 boolean updateFrameSize = RENDER_WIDTH != (int) data[0] || RENDER_HEIGHT != (int) data[1];
                 RENDER_WIDTH = (int) data[0];
                 RENDER_HEIGHT = (int) data[1];
@@ -528,6 +528,22 @@ public class GlobalConf {
 
                 if (updateFrameSize) {
                     EventManager.instance.post(Events.FRAME_SIZE_UDPATE, RENDER_WIDTH, RENDER_HEIGHT);
+                }
+                break;
+            case FRAME_OUTPUT_MODE_CMD:
+                Object newMode = data[0];
+                ScreenshotMode mode = null;
+                if(newMode instanceof String){
+                    try {
+                        mode = ScreenshotMode.valueOf((String) newMode);
+                    }catch(IllegalArgumentException e){
+                        logger.error("Given value is not a representation of ScreenshotMode (simple|redraw): '" + newMode + "'");
+                    }
+                } else {
+                    mode = (ScreenshotMode) newMode;
+                }
+                if(mode != null){
+                    FRAME_MODE = mode;
                 }
                 break;
             case FRAME_OUTPUT_CMD:
