@@ -147,7 +147,6 @@ public class DownloadDataWindow extends GenericDialog {
             catalogsLoc.addListener((event) -> {
                 if (event instanceof ChangeEvent) {
                     FileChooser fc = new FileChooser(I18n.txt("gui.download.pickloc"), skin, stage, Gdx.files.absolute(GlobalConf.data.DATA_LOCATION), FileChooser.FileChooserTarget.DIRECTORIES);
-                    fc.setFileBrowsingEnabled(false);
                     fc.setResultListener((success, result) -> {
                         if (success) {
                             if (result.file().canRead() && result.file().canWrite()) {

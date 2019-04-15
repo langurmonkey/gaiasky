@@ -882,7 +882,6 @@ public class PreferencesWindow extends GenericDialog {
         screenshotsLocation.addListener(event -> {
             if (event instanceof ChangeEvent) {
                 FileChooser fc = new FileChooser(I18n.txt("gui.screenshots.directory.choose"), skin, stage, Gdx.files.absolute(GlobalConf.screenshot.SCREENSHOT_FOLDER), FileChooser.FileChooserTarget.DIRECTORIES);
-                fc.setFileBrowsingEnabled(false);
                 fc.setResultListener((success, result) -> {
                     if (success) {
                         // do stuff with result
@@ -988,7 +987,6 @@ public class PreferencesWindow extends GenericDialog {
         frameoutputLocation.addListener(event -> {
             if (event instanceof ChangeEvent) {
                 FileChooser fc = new FileChooser(I18n.txt("gui.frameoutput.directory.choose"), skin, stage, Gdx.files.absolute(GlobalConf.frame.RENDER_FOLDER), FileChooser.FileChooserTarget.DIRECTORIES);
-                fc.setFileBrowsingEnabled(false);
                 fc.setResultListener((success, result) -> {
                     if (success) {
                         // do stuff with result
