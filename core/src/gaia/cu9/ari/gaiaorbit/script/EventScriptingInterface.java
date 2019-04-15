@@ -21,6 +21,7 @@ import gaia.cu9.ari.gaiaorbit.event.EventManager.TimeFrame;
 import gaia.cu9.ari.gaiaorbit.event.Events;
 import gaia.cu9.ari.gaiaorbit.event.IObserver;
 import gaia.cu9.ari.gaiaorbit.interfce.IGui;
+import gaia.cu9.ari.gaiaorbit.render.ComponentTypes;
 import gaia.cu9.ari.gaiaorbit.scenegraph.*;
 import gaia.cu9.ari.gaiaorbit.scenegraph.StarGroup.StarBean;
 import gaia.cu9.ari.gaiaorbit.scenegraph.camera.CameraManager.CameraMode;
@@ -510,7 +511,23 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
 
     @Override
     public void setVisibility(final String key, final boolean visible) {
-        Gdx.app.postRunnable(() -> em.post(Events.TOGGLE_VISIBILITY_CMD, key, false, visible));
+        if (!checkComponentTypeKey(key)) {
+            logger.error("Element '" + key + "' does not exist. Possible values are:");
+            ComponentTypes.ComponentType[] cts = ComponentTypes.ComponentType.values();
+            for (ComponentTypes.ComponentType ct : cts)
+                logger.error(ct.key);
+        } else {
+            Gdx.app.postRunnable(() -> em.post(Events.TOGGLE_VISIBILITY_CMD, key, false, visible));
+        }
+    }
+
+    private boolean checkComponentTypeKey(String key){
+        ComponentTypes.ComponentType[] cts = ComponentTypes.ComponentType.values();
+        boolean keyFound = false;
+        for (ComponentTypes.ComponentType ct : cts)
+            keyFound = keyFound || key.equals(ct.key);
+
+        return keyFound;
     }
 
     @Override

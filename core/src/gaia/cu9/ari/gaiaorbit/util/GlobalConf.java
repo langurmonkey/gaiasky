@@ -1180,7 +1180,9 @@ public class GlobalConf {
                     state = (Boolean) data[2];
                 }
                 ComponentType ct = ComponentType.getFromKey(key);
-                VISIBILITY[ct.ordinal()] = (state != null ? state : !VISIBILITY[ct.ordinal()]);
+                if(ct != null) {
+                    VISIBILITY[ct.ordinal()] = (state != null ? state : !VISIBILITY[ct.ordinal()]);
+                }
                 break;
             case TRANSIT_COLOUR_CMD:
                 STAR_COLOR_TRANSIT = (boolean) data[1];

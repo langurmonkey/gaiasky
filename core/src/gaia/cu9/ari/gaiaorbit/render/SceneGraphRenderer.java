@@ -68,7 +68,7 @@ public class SceneGraphRenderer extends AbstractRenderer implements IProcessRend
     private static final Log logger = Logger.getLogger(SceneGraphRenderer.class);
     public static SceneGraphRenderer instance;
 
-    public static void initialise(AssetManager manager){
+    public static void initialise(AssetManager manager) {
         instance = new SceneGraphRenderer();
         instance.initialize(manager);
     }
@@ -953,23 +953,25 @@ public class SceneGraphRenderer extends AbstractRenderer implements IProcessRend
         switch (event) {
         case TOGGLE_VISIBILITY_CMD:
             ComponentType ct = ComponentType.getFromKey((String) data[0]);
-            int idx = ct.ordinal();
-            if (data.length == 3) {
-                // We have the boolean
-                boolean currvis = visible.get(ct.ordinal());
-                boolean newvis = (boolean) data[2];
-                if (currvis != newvis) {
-                    // Only update if visibility different
-                    if (newvis)
-                        visible.set(ct.ordinal());
-                    else
-                        visible.clear(ct.ordinal());
+            if (ct != null) {
+                int idx = ct.ordinal();
+                if (data.length == 3) {
+                    // We have the boolean
+                    boolean currvis = visible.get(ct.ordinal());
+                    boolean newvis = (boolean) data[2];
+                    if (currvis != newvis) {
+                        // Only update if visibility different
+                        if (newvis)
+                            visible.set(ct.ordinal());
+                        else
+                            visible.clear(ct.ordinal());
+                        times[idx] = (long) (GaiaSky.instance.getT() * 1000f);
+                    }
+                } else {
+                    // Only toggle
+                    visible.flip(ct.ordinal());
                     times[idx] = (long) (GaiaSky.instance.getT() * 1000f);
                 }
-            } else {
-                // Only toggle
-                visible.flip(ct.ordinal());
-                times[idx] = (long) (GaiaSky.instance.getT() * 1000f);
             }
             break;
 
