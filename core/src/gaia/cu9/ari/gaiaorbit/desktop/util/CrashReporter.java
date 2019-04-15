@@ -52,14 +52,14 @@ public class CrashReporter {
         BufferedWriter writer = null;
         try {
             writer = new BufferedWriter(new FileWriter(crashReportFile));
-            for(String str : crashInfo) {
+            for (String str : crashInfo) {
                 writer.write(str);
                 writer.newLine();
             }
         } catch (Exception e) {
-            if(logger != null) {
+            if (logger != null) {
                 logger.error("Writing crash report crashed... Inception level 1 achieved! :_D", e);
-            }else{
+            } else {
                 System.err.println("Writing crash report crashed... Inception level 1 achieved! :_D");
                 e.printStackTrace(System.err);
             }
@@ -97,13 +97,15 @@ public class CrashReporter {
 
     private static void appendSystemInfo(Array<String> strArray) {
         /* Gaia Sky info */
-        strArray.add("");
-        strArray.add("## GAIA SKY INFORMATION");
-        strArray.add("Version: " + GlobalConf.version.version);
-        strArray.add("Build: " + GlobalConf.version.build);
-        strArray.add("Builder: " + GlobalConf.version.builder);
-        strArray.add("System: " + GlobalConf.version.system);
-        strArray.add("Build time: " + GlobalConf.version.buildtime);
+        if (GlobalConf.version != null) {
+            strArray.add("");
+            strArray.add("## GAIA SKY INFORMATION");
+            strArray.add("Version: " + GlobalConf.version.version);
+            strArray.add("Build: " + GlobalConf.version.build);
+            strArray.add("Builder: " + GlobalConf.version.builder);
+            strArray.add("System: " + GlobalConf.version.system);
+            strArray.add("Build time: " + GlobalConf.version.buildtime);
+        }
 
         /* Java info */
         strArray.add("");
