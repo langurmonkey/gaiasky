@@ -50,6 +50,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
  *
  * @author Toni Sagrista
  */
+@SuppressWarnings({ "unused", "WeakerAccess", "SwitchStatementWithTooFewBranches", "SingleStatementInBlock", "SameParameterValue" })
 public class EventScriptingInterface implements IScriptingInterface, IObserver {
     private static final Log logger = Logger.getLogger(EventScriptingInterface.class);
 
@@ -74,7 +75,7 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
     /**
      * Used to wait for new frames
      */
-    private Object frameMonitor;
+    private final Object frameMonitor;
 
     /**
      * Contains the current frame number. Available right after
@@ -184,7 +185,7 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
     public void setCameraFocus(final String focusName, final float waitTimeSeconds) {
         if (checkString(focusName, "focusName")) {
             SceneGraphNode sgn = getObject(focusName);
-            if (sgn != null && sgn instanceof IFocus) {
+            if (sgn instanceof IFocus) {
                 IFocus focus = (IFocus) sgn;
                 NaturalCamera cam = GaiaSky.instance.cam.naturalCamera;
                 changeFocus(focus, cam, waitTimeSeconds);
@@ -202,7 +203,7 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
     public void setCameraFocusInstant(final String focusName) {
         if (checkString(focusName, "focusName")) {
             SceneGraphNode sgn = getObject(focusName);
-            if (sgn != null && sgn instanceof IFocus) {
+            if (sgn instanceof IFocus) {
                 IFocus focus = (IFocus) sgn;
                 em.post(Events.CAMERA_MODE_CMD, CameraMode.Focus);
                 em.post(Events.FOCUS_CHANGE_CMD, focus);
@@ -213,7 +214,7 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
                     Vector3d dir = new Vector3d();
                     focus.getAbsolutePosition(dir).sub(campos[0], campos[1], campos[2]);
                     double[] d = dir.nor().values();
-                    em.post(Events.CAMERA_DIR_CMD, d);
+                    em.post(Events.CAMERA_DIR_CMD, (Object) d);
 
                 });
             } else {
@@ -272,7 +273,7 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
             vec[1] = vec[1] * Constants.KM_TO_U;
             vec[2] = vec[2] * Constants.KM_TO_U;
             // Send event
-            em.post(Events.CAMERA_POS_CMD, vec);
+            em.post(Events.CAMERA_POS_CMD, (Object) vec);
         });
     }
 
@@ -288,7 +289,7 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
 
     @Override
     public void setCameraDirection(final double[] dir) {
-        Gdx.app.postRunnable(() -> em.post(Events.CAMERA_DIR_CMD, dir));
+        Gdx.app.postRunnable(() -> em.post(Events.CAMERA_DIR_CMD, (Object) dir));
     }
 
     public void setCameraDirection(final List dir) {
@@ -303,7 +304,7 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
 
     @Override
     public void setCameraUp(final double[] up) {
-        Gdx.app.postRunnable(() -> em.post(Events.CAMERA_UP_CMD, up));
+        Gdx.app.postRunnable(() -> em.post(Events.CAMERA_UP_CMD, (Object) up));
 
     }
 
@@ -450,10 +451,6 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
 
     public void cameraRotate(final long deltaX, final double deltaY) {
         cameraRotate((double) deltaX, deltaY);
-    }
-
-    public void cameraRotate(final long deltaX, final long deltaY) {
-        cameraRotate((double) deltaX, (double) deltaY);
     }
 
     @Override
@@ -853,7 +850,7 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
         }
     }
 
-    private void goToObject(String name, double viewAngle, int waitTimeSeconds, AtomicBoolean stop) {
+    public void goToObject(String name, double viewAngle, int waitTimeSeconds, AtomicBoolean stop) {
         goToObject(name, viewAngle, (float) waitTimeSeconds, stop);
     }
 
@@ -906,7 +903,7 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
         }
     }
 
-    void goToObject(IFocus object, double viewAngle, int waitTimeSeconds, AtomicBoolean stop) {
+    public void goToObject(IFocus object, double viewAngle, int waitTimeSeconds, AtomicBoolean stop) {
         goToObject(object, viewAngle, (float) waitTimeSeconds, stop);
     }
 
@@ -917,14 +914,10 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
 
     @Override
     public void landOnObject(String name) {
-        landOnObject(name, null);
-    }
-
-    private void landOnObject(String name, AtomicBoolean stop) {
         if (checkString(name, "name")) {
             SceneGraphNode sgn = getObject(name);
-            if (sgn != null && sgn instanceof IFocus)
-                landOnObject((IFocus) sgn, stop);
+            if (sgn instanceof IFocus)
+                landOnObject((IFocus) sgn, null);
         }
     }
 
@@ -937,7 +930,7 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
                 // Focus wait - 2 seconds
                 float waitTimeSeconds = -1;
 
-                /**
+                /*
                  * SAVE
                  */
 
@@ -953,7 +946,7 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
                 boolean cinematic = GlobalConf.scene.CINEMATIC_CAMERA;
                 GlobalConf.scene.CINEMATIC_CAMERA = true;
 
-                /**
+                /*
                  * FOCUS
                  */
 
@@ -1047,16 +1040,16 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
         landOnObjectLocation(name, locationName, null);
     }
 
-    private void landOnObjectLocation(String name, String locationName, AtomicBoolean stop) {
+    public void landOnObjectLocation(String name, String locationName, AtomicBoolean stop) {
         if (checkString(name, "name")) {
             stops.add(stop);
             SceneGraphNode sgn = getObject(name);
-            if (sgn != null && sgn instanceof IFocus)
+            if (sgn instanceof IFocus)
                 landOnObjectLocation((IFocus) sgn, locationName, stop);
         }
     }
 
-    void landOnObjectLocation(IFocus object, String locationName, AtomicBoolean stop) {
+    public void landOnObjectLocation(IFocus object, String locationName, AtomicBoolean stop) {
         if (checkNotNull(object, "object") && checkString(locationName, "locationName")) {
 
             stops.add(stop);
@@ -1075,14 +1068,10 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
 
     @Override
     public void landOnObjectLocation(String name, double longitude, double latitude) {
-        landOnObjectLocation(name, longitude, latitude, null);
-    }
-
-    private void landOnObjectLocation(String name, double longitude, double latitude, AtomicBoolean stop) {
         if (checkString(name, "name")) {
             SceneGraphNode sgn = getObject(name);
-            if (sgn != null && sgn instanceof IFocus)
-                landOnObjectLocation((IFocus) sgn, longitude, latitude, stop);
+            if (sgn instanceof IFocus)
+                landOnObjectLocation((IFocus) sgn, longitude, latitude, null);
         }
     }
 
@@ -1147,7 +1136,7 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
                 boolean intersects = Intersectord.checkIntersectSegmentSphere(cam.pos, target, objectPosition, planet.getRadius());
 
                 if (intersects) {
-                    cameraRotate(5, 5);
+                    cameraRotate(5d, 5d);
                 }
 
                 while (intersects && (stop == null || !stop.get())) {
@@ -1209,7 +1198,7 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
     @Override
     public double getDistanceTo(String name) {
         SceneGraphNode sgn = getObject(name);
-        if (sgn != null && sgn instanceof IFocus) {
+        if (sgn instanceof IFocus) {
             IFocus obj = (IFocus) sgn;
             return (obj.getDistToCamera() - obj.getRadius()) * Constants.U_TO_KM;
         }
@@ -1220,7 +1209,7 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
     @Override
     public double[] getObjectPosition(String name) {
         SceneGraphNode sgn = getObject(name);
-        if (sgn != null && sgn instanceof IFocus) {
+        if (sgn instanceof IFocus) {
             IFocus obj = (IFocus) sgn;
             obj.getAbsolutePosition(name.toLowerCase(), aux3d1);
             return new double[] { aux3d1.x, aux3d1.y, aux3d1.z };
@@ -1289,12 +1278,12 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
 
     @Override
     public void removeObject(final int id) {
-        Gdx.app.postRunnable(() -> em.post(Events.REMOVE_OBJECTS, new int[] { id }));
+        Gdx.app.postRunnable(() -> em.post(Events.REMOVE_OBJECTS, (Object) new int[] { id }));
     }
 
     @Override
     public void removeObjects(final int[] ids) {
-        Gdx.app.postRunnable(() -> em.post(Events.REMOVE_OBJECTS, ids));
+        Gdx.app.postRunnable(() -> em.post(Events.REMOVE_OBJECTS, (Object) ids));
     }
 
     public void removeObjects(final List ids) {
@@ -1356,7 +1345,7 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
         inputCode = -1;
     }
 
-    int inputCode = -1;
+    private int inputCode = -1;
 
     @Override
     public int getScreenWidth() {
@@ -1802,10 +1791,8 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
 
     @Override
     public void setCubemapResolution(int resolution) {
-        if (resolution > 19 && resolution < 15000) {
+        if (checkNum(resolution, 20, 15000, "resolution")) {
             Gdx.app.postRunnable(() -> em.post(Events.CUBEMAP_RESOLUTION_CMD, resolution));
-        } else {
-            logger.error("Cubemap resolution must be 20 <= resolution <= 15000");
         }
     }
 
@@ -1847,7 +1834,8 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
 
     @Override
     public void setBloom(float value) {
-        Gdx.app.postRunnable(() -> em.post(Events.BLOOM_CMD, value, false));
+        if (checkNum(value, 0f, 1f, "bloom"))
+            Gdx.app.postRunnable(() -> em.post(Events.BLOOM_CMD, value, false));
     }
 
     public void setBloom(int level) {
@@ -1925,16 +1913,18 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
 
     @Override
     public void addPolyline(String name, double[] points, double[] color, float lineWidth) {
-        Polyline pl = new Polyline();
-        pl.setCt("Others");
-        pl.setColor(color);
-        pl.setName(name);
-        pl.setPoints(points);
-        pl.setPrimitiveSize(lineWidth);
-        pl.setParent("Universe");
-        pl.initialize();
+        if (checkString(name, "name") && checkNum(lineWidth, 0.1f, 50f, "lineWidth")) {
+            Polyline pl = new Polyline();
+            pl.setCt("Others");
+            pl.setColor(color);
+            pl.setName(name);
+            pl.setPoints(points);
+            pl.setPrimitiveSize(lineWidth);
+            pl.setParent("Universe");
+            pl.initialize();
 
-        em.post(Events.SCENE_GRAPH_ADD_OBJECT_CMD, pl, true);
+            em.post(Events.SCENE_GRAPH_ADD_OBJECT_CMD, pl, true);
+        }
     }
 
     public void addPolyline(String name, double[] points, double[] color, int lineWidth) {
@@ -1951,7 +1941,8 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
 
     @Override
     public void removeModelObject(String name) {
-        em.post(Events.SCENE_GRAPH_REMOVE_OBJECT_CMD, name, true);
+        if (checkString(name, "name"))
+            em.post(Events.SCENE_GRAPH_REMOVE_OBJECT_CMD, name, true);
     }
 
     @Override
@@ -1961,20 +1952,22 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
 
     @Override
     public void parkRunnable(String id, Runnable runnable) {
-        em.post(Events.POST_RUNNABLE, id, runnable);
+        if (checkString(id, "id"))
+            em.post(Events.POST_RUNNABLE, id, runnable);
     }
 
     @Override
     public void unparkRunnable(String id) {
-        em.post(Events.UNPOST_RUNNABLE, id);
+        if (checkString(id, "id"))
+            em.post(Events.UNPOST_RUNNABLE, id);
     }
 
     @Override
     public void setCameraState(double[] pos, double[] dir, double[] up) {
         Gdx.app.postRunnable(() -> {
-            em.post(Events.CAMERA_POS_CMD, pos);
-            em.post(Events.CAMERA_DIR_CMD, dir);
-            em.post(Events.CAMERA_UP_CMD, up);
+            em.post(Events.CAMERA_POS_CMD, (Object) pos);
+            em.post(Events.CAMERA_DIR_CMD, (Object) dir);
+            em.post(Events.CAMERA_UP_CMD, (Object) up);
         });
     }
 
@@ -1985,9 +1978,9 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
     @Override
     public void setCameraStateAndTime(double[] pos, double[] dir, double[] up, long time) {
         Gdx.app.postRunnable(() -> {
-            em.post(Events.CAMERA_POS_CMD, pos);
-            em.post(Events.CAMERA_DIR_CMD, dir);
-            em.post(Events.CAMERA_UP_CMD, up);
+            em.post(Events.CAMERA_POS_CMD, (Object) pos);
+            em.post(Events.CAMERA_DIR_CMD, (Object) dir);
+            em.post(Events.CAMERA_UP_CMD, (Object) up);
             em.post(Events.TIME_CHANGE_CMD, Instant.ofEpochMilli(time));
         });
     }
@@ -2008,15 +2001,15 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
 
     public boolean loadDataset(String dsName, String absolutePath, CatalogInfo.CatalogInfoType type, boolean sync) {
         if (sync) {
-            return loadDatasetPriv(dsName, absolutePath, type, true);
+            return loadDatasetPrivate(dsName, absolutePath, type, true);
         } else {
-            Thread t = new Thread(() -> loadDatasetPriv(dsName, absolutePath, type, false));
+            Thread t = new Thread(() -> loadDatasetPrivate(dsName, absolutePath, type, false));
             t.start();
             return true;
         }
     }
 
-    private boolean loadDatasetPriv(String dsName, String absolutePath, CatalogInfo.CatalogInfoType type, boolean sync) {
+    private boolean loadDatasetPrivate(String dsName, String absolutePath, CatalogInfo.CatalogInfoType type, boolean sync) {
         try {
             logger.info(I18n.txt("notif.catalog.loading", absolutePath));
             File f = new File(absolutePath);
@@ -2026,7 +2019,7 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
                 @SuppressWarnings("unchecked") Array<StarBean> data = (Array<StarBean>) provider.loadData(ds, 1.0f);
 
                 // Create star group
-                if (data != null && data.size > 0) {
+                if (data != null && data.size > 0 && checkString(dsName, "datasetName")) {
                     Gdx.app.postRunnable(() -> {
                         StarGroup sg = StarGroup.getDefaultStarGroup(dsName, data);
 
@@ -2057,48 +2050,65 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
 
     @Override
     public boolean hasDataset(String dsName) {
-        return CatalogManager.instance().contains(dsName);
+        if(checkString(dsName, "datasetName")) {
+            return CatalogManager.instance().contains(dsName);
+        }
+        return false;
     }
 
     @Override
     public boolean removeDataset(String dsName) {
-        boolean exists = CatalogManager.instance().contains(dsName);
-        if (exists)
-            Gdx.app.postRunnable(() -> EventManager.instance.post(Events.CATALOG_REMOVE, dsName));
-
-        return exists;
+        if(checkString(dsName, "datasetName")) {
+            boolean exists = CatalogManager.instance().contains(dsName);
+            if (exists)
+                Gdx.app.postRunnable(() -> EventManager.instance.post(Events.CATALOG_REMOVE, dsName));
+            return exists;
+        }
+        return false;
     }
 
     @Override
     public boolean hideDataset(String dsName) {
-        boolean exists = CatalogManager.instance().contains(dsName);
-        if (exists)
-            EventManager.instance.post(Events.CATALOG_VISIBLE, dsName, false);
-        return exists;
+        if(checkString(dsName, "datasetName")) {
+            boolean exists = CatalogManager.instance().contains(dsName);
+            if (exists)
+                EventManager.instance.post(Events.CATALOG_VISIBLE, dsName, false);
+            return exists;
+        }
+        return false;
     }
 
     @Override
     public boolean showDataset(String dsName) {
-        boolean exists = CatalogManager.instance().contains(dsName);
-        if (exists)
-            EventManager.instance.post(Events.CATALOG_VISIBLE, dsName, true);
-        return exists;
+        if(checkString(dsName, "datasetName")) {
+            boolean exists = CatalogManager.instance().contains(dsName);
+            if (exists)
+                EventManager.instance.post(Events.CATALOG_VISIBLE, dsName, true);
+            return exists;
+        }
+        return false;
     }
 
     @Override
     public boolean highlightDataset(String dsName, boolean highlight) {
-        boolean exists = CatalogManager.instance().contains(dsName);
-        if (exists)
-            EventManager.instance.post(Events.CATALOG_HIGHLIGHT, dsName, highlight, -1, false);
-        return exists;
+        if(checkString(dsName, "datasetName")) {
+            boolean exists = CatalogManager.instance().contains(dsName);
+            if (exists)
+                EventManager.instance.post(Events.CATALOG_HIGHLIGHT, dsName, highlight, -1, false);
+            return exists;
+        }
+        return false;
     }
 
     @Override
     public boolean highlightDataset(String dsName, int colorIndex, boolean highlight) {
-        boolean exists = CatalogManager.instance().contains(dsName);
-        if (exists)
-            EventManager.instance.post(Events.CATALOG_HIGHLIGHT, dsName, highlight, colorIndex, false);
-        return exists;
+        if(checkString(dsName, "datasetName")) {
+            boolean exists = CatalogManager.instance().contains(dsName);
+            if (exists)
+                EventManager.instance.post(Events.CATALOG_HIGHLIGHT, dsName, highlight, colorIndex, false);
+            return exists;
+        }
+        return false;
     }
 
     @Override

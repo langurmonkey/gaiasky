@@ -184,7 +184,7 @@ public class DownloadDataWindow extends GenericDialog {
         Map<String, JsonValue> bestDs = new HashMap<>();
         Map<String, List<JsonValue>> typeMap = new HashMap<>();
         // We don't want repeated elements but want to keep insertion order
-        Set<String> types = new LinkedHashSet<String>();
+        Set<String> types = new LinkedHashSet<>();
 
         JsonValue dst = dataDesc.child().child();
         while (dst != null) {

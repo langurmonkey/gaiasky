@@ -18,6 +18,7 @@ import java.util.List;
  *
  * @author Toni Sagrista
  */
+@SuppressWarnings("unused")
 public interface IScriptingInterface {
 
     /**
@@ -32,7 +33,7 @@ public interface IScriptingInterface {
      * Pre-loads the given image as a texture for later use. The texture will
      * be cached for later use.
      *
-     * @param path
+     * @param path The path of the image file to preload
      */
     void preloadTexture(String path);
 
