@@ -119,14 +119,14 @@ public class AboutWindow extends GenericDialog {
         // Readme
         Label readmetitle = new OwnLabel(I18n.txt("gui.help.readme"), skin);
         File readmefile = new File(GlobalConf.ASSETS_LOC + File.separator + "README.md");
-        if(!readmefile.exists()){
+        if (!readmefile.exists()) {
             // In production assetsloc = working dir, in development working dir = assets/../
             readmefile = new File(GlobalConf.ASSETS_LOC + File.separator + "../README.md");
         }
         String readmestr;
         try {
-            readmestr =  new String(Files.readAllBytes(readmefile.toPath()));
-        }catch(Exception e){
+            readmestr = new String(Files.readAllBytes(readmefile.toPath()));
+        } catch (Exception e) {
             readmestr = "Could not read README.md file";
         }
         int lines = GlobalResources.countOccurrences(readmestr, '\n');
@@ -405,16 +405,16 @@ public class AboutWindow extends GenericDialog {
 
         contentSystem.add(glinfo).colspan(2).align(Align.left).padTop(pad).padBottom(pad);
         contentSystem.row();
-        contentSystem.add(glversiontitle).align(Align.topLeft).padRight(pad );
+        contentSystem.add(glversiontitle).align(Align.topLeft).padRight(pad);
         contentSystem.add(glversion).align(Align.left);
         contentSystem.row();
-        contentSystem.add(glvendortitle).align(Align.topLeft).padRight(pad );
+        contentSystem.add(glvendortitle).align(Align.topLeft).padRight(pad);
         contentSystem.add(glvendor).align(Align.left);
         contentSystem.row();
-        contentSystem.add(glslversiontitle).align(Align.topLeft).padRight(pad );
+        contentSystem.add(glslversiontitle).align(Align.topLeft).padRight(pad);
         contentSystem.add(glslversion).align(Align.left);
         contentSystem.row();
-        contentSystem.add(glextensionstitle).align(Align.topLeft).padRight(pad );
+        contentSystem.add(glextensionstitle).align(Align.topLeft).padRight(pad);
         contentSystem.add(glextensionsscroll).align(Align.left);
 
         /** CONTENT 4 - UPDATES **/
@@ -433,7 +433,6 @@ public class AboutWindow extends GenericDialog {
         } else {
             // Inform latest
             newVersionCheck(GlobalConf.version.version, GlobalConf.version.buildtime);
-
         }
 
         contentUpdates.add(checkTable).left().top().padTop(pad * 1.5f);
@@ -473,11 +472,11 @@ public class AboutWindow extends GenericDialog {
 
     }
 
-    private boolean exists(FileHandle fh){
-        try{
+    private boolean exists(FileHandle fh) {
+        try {
             fh.read().close();
             return true;
-        }catch(Exception e){
+        } catch (Exception e) {
             return false;
         }
     }
@@ -522,16 +521,16 @@ public class AboutWindow extends GenericDialog {
             checkLabel.setText(I18n.txt("gui.newversion.available", GlobalConf.version, tagVersion));
             final String uri = GlobalConf.WEBPAGE_DOWNLOADS;
 
-            OwnTextButton button = new OwnTextButton(I18n.txt("gui.newversion.getit"), skin);
-            button.pad(pad);
-            button.addListener(event -> {
+            OwnTextButton getNewVersion = new OwnTextButton(I18n.txt("gui.newversion.getit"), skin);
+            getNewVersion.pad(pad5, pad, pad5, pad);
+            getNewVersion.addListener(event -> {
                 if (event instanceof ChangeEvent) {
                     Gdx.net.openURI(GlobalConf.WEBPAGE_DOWNLOADS);
                     return true;
                 }
                 return false;
             });
-            checkTable.add(button).center().padBottom(pad5).row();
+            checkTable.add(getNewVersion).center().padBottom(pad5).row();
 
             Link link = new Link(uri, linkStyle, uri);
             checkTable.add(link).center();
@@ -539,15 +538,16 @@ public class AboutWindow extends GenericDialog {
         } else {
             checkLabel.setText(I18n.txt("gui.newversion.nonew", GlobalConf.program.getLastCheckedString()));
             // Add check now button
-            OwnTextButton button = new OwnTextButton(I18n.txt("gui.newversion.checknow"), skin);
-            button.addListener(event -> {
+            OwnTextButton checkNewVersion = new OwnTextButton(I18n.txt("gui.newversion.checknow"), skin);
+            checkNewVersion.pad(pad5, pad, pad5, pad);
+            checkNewVersion.addListener(event -> {
                 if (event instanceof ChangeEvent) {
                     getCheckVersionThread().start();
                     return true;
                 }
                 return false;
             });
-            checkTable.add(button).center();
+            checkTable.add(checkNewVersion).center();
         }
     }
 
