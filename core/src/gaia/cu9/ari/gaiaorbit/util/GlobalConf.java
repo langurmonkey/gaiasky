@@ -24,6 +24,7 @@ import gaia.cu9.ari.gaiaorbit.util.format.DateFormatFactory;
 import gaia.cu9.ari.gaiaorbit.util.format.DateFormatFactory.DateType;
 import gaia.cu9.ari.gaiaorbit.util.format.IDateFormat;
 import gaia.cu9.ari.gaiaorbit.util.math.MathUtilsd;
+import gaia.cu9.ari.gaiaorbit.util.update.VersionChecker;
 
 import java.io.File;
 import java.nio.file.Path;
@@ -806,7 +807,7 @@ public class GlobalConf {
         }
 
         public String getLastCheckedString() {
-            IDateFormat df = DateFormatFactory.getFormatter(I18n.locale, DateType.DATE);
+            IDateFormat df = DateFormatFactory.getFormatter(I18n.locale, DateType.DATETIME);
             return df.format(VERSION_LAST_TIME);
         }
 
@@ -891,6 +892,7 @@ public class GlobalConf {
 
     public static class VersionConf implements IConf {
         public String version;
+        public int versionNumber;
         public Instant buildtime;
         public String builder;
         public String system;
@@ -898,6 +900,7 @@ public class GlobalConf {
 
         public void initialize(String version, Instant buildtime, String builder, String system, String build) {
             this.version = version;
+            this.versionNumber = VersionChecker.stringToVersionNumber(version);
             this.buildtime = buildtime;
             this.builder = builder;
             this.system = system;

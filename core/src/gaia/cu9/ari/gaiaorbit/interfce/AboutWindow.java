@@ -28,6 +28,9 @@ import gaia.cu9.ari.gaiaorbit.event.Events;
 import gaia.cu9.ari.gaiaorbit.util.GlobalConf;
 import gaia.cu9.ari.gaiaorbit.util.GlobalResources;
 import gaia.cu9.ari.gaiaorbit.util.I18n;
+import gaia.cu9.ari.gaiaorbit.util.Logger;
+import gaia.cu9.ari.gaiaorbit.util.format.DateFormatFactory;
+import gaia.cu9.ari.gaiaorbit.util.format.IDateFormat;
 import gaia.cu9.ari.gaiaorbit.util.scene2d.*;
 import gaia.cu9.ari.gaiaorbit.util.update.VersionCheckEvent;
 import gaia.cu9.ari.gaiaorbit.util.update.VersionChecker;
@@ -44,6 +47,7 @@ import java.util.Date;
  * @author tsagrista
  */
 public class AboutWindow extends GenericDialog {
+    private static final Logger.Log logger = Logger.getLogger(AboutWindow.class);
 
     private LabelStyle linkStyle;
     private Table checkTable;
@@ -432,7 +436,7 @@ public class AboutWindow extends GenericDialog {
             getCheckVersionThread().start();
         } else {
             // Inform latest
-            newVersionCheck(GlobalConf.version.version, GlobalConf.version.buildtime);
+            newVersionCheck(GlobalConf.version.version, GlobalConf.version.versionNumber, GlobalConf.version.buildtime, false);
         }
 
         contentUpdates.add(checkTable).left().top().padTop(pad * 1.5f);
@@ -462,7 +466,7 @@ public class AboutWindow extends GenericDialog {
         tabUpdates.addListener(tabListener);
 
         // Let only one tab button be checked at a time
-        ButtonGroup<Button> tabs = new ButtonGroup<Button>();
+        ButtonGroup<Button> tabs = new ButtonGroup<>();
         tabs.setMinCheckCount(1);
         tabs.setMaxCheckCount(1);
         tabs.add(tabHelp);
@@ -511,14 +515,19 @@ public class AboutWindow extends GenericDialog {
      * button if the given version is older.</li>
      * </ul>
      *
-     * @param tagVersion The version to check.
-     * @param tagDate    The date
+     * @param tagVersion    The version to check
+     * @param versionNumber The version number
+     * @param tagDate       The date
      */
-    private void newVersionCheck(String tagVersion, Instant tagDate) {
+    private void newVersionCheck(String tagVersion, Integer versionNumber, Instant tagDate, boolean log) {
         GlobalConf.program.VERSION_LAST_TIME = Instant.now();
-        if (tagDate.isAfter(GlobalConf.version.buildtime)) {
+        if (versionNumber > GlobalConf.version.versionNumber) {
+            IDateFormat df = DateFormatFactory.getFormatter(I18n.locale, DateFormatFactory.DateType.DATETIME);
+            if (log) {
+                logger.info(I18n.txt("gui.newversion.available", GlobalConf.version.version, tagVersion + " [" + df.format(tagDate) + "]"));
+            }
             // There's a new version!
-            checkLabel.setText(I18n.txt("gui.newversion.available", GlobalConf.version, tagVersion));
+            checkLabel.setText(I18n.txt("gui.newversion.available", GlobalConf.version, tagVersion + " [" + df.format(tagDate) + "]"));
             final String uri = GlobalConf.WEBPAGE_DOWNLOADS;
 
             OwnTextButton getNewVersion = new OwnTextButton(I18n.txt("gui.newversion.getit"), skin);
@@ -530,24 +539,28 @@ public class AboutWindow extends GenericDialog {
                 }
                 return false;
             });
-            checkTable.add(getNewVersion).center().padBottom(pad5).row();
+            checkTable.add(getNewVersion).center().padTop(pad).padBottom(pad5).row();
 
             Link link = new Link(uri, linkStyle, uri);
             checkTable.add(link).center();
 
         } else {
+            if (log)
+                logger.info(I18n.txt("gui.newversion.nonew", GlobalConf.program.getLastCheckedString()));
             checkLabel.setText(I18n.txt("gui.newversion.nonew", GlobalConf.program.getLastCheckedString()));
             // Add check now button
             OwnTextButton checkNewVersion = new OwnTextButton(I18n.txt("gui.newversion.checknow"), skin);
             checkNewVersion.pad(pad5, pad, pad5, pad);
             checkNewVersion.addListener(event -> {
                 if (event instanceof ChangeEvent) {
+                    checkLabel.setText(I18n.txt("gui.newversion.checking"));
+                    logger.info(I18n.txt("gui.newversion.checking"));
                     getCheckVersionThread().start();
                     return true;
                 }
                 return false;
             });
-            checkTable.add(checkNewVersion).center();
+            checkTable.add(checkNewVersion).center().padTop(pad);
         }
     }
 
@@ -561,10 +574,11 @@ public class AboutWindow extends GenericDialog {
                     checkTable.clear();
                     checkTable.add(checkLabel).top().left().padBottom(pad5).row();
                     // All is fine
-                    newVersionCheck(vce.getTag(), vce.getTagTime());
+                    newVersionCheck(vce.getTag(), vce.getVersionNumber(), vce.getTagTime(), true);
 
                 } else {
                     // Handle failed case
+                    logger.info(I18n.txt("gui.newversion.fail"));
                     checkLabel.setText(I18n.txt("notif.error", "Could not get last version"));
                     checkLabel.setColor(Color.RED);
                 }

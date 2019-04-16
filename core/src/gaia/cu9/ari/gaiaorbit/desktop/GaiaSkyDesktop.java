@@ -55,8 +55,15 @@ import java.util.Properties;
 public class GaiaSkyDesktop implements IObserver {
     private static final Log logger = Logger.getLogger(GaiaSkyDesktop.class);
 
-    /* Configuration file version of the source code */
-    public static int SOURCE_CONF_VERSION = 260;
+    /*
+    * Configuration file version of the source code
+    * This is usually tag where each chunk takes 2 spaces.
+    * Version = major.minor.rev -> 1.2.5 major=1; minor=2; rev=5
+    * Version = major * 10000 + minor * 100 + rev
+    * So 1.2.5 -> 010205
+    *    2.1.7 -> 020107
+    */
+    public static int SOURCE_CONF_VERSION = 020200;
     private static GaiaSkyDesktop gsd;
     private static boolean REST_ENABLED = false;
     private static Class<?> REST_SERVER_CLASS = null;
