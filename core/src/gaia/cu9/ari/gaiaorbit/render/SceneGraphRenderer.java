@@ -14,9 +14,6 @@ import com.badlogic.gdx.graphics.Pixmap.Format;
 import com.badlogic.gdx.graphics.Texture.TextureFilter;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
-import com.badlogic.gdx.graphics.g3d.ModelBatch;
-import com.badlogic.gdx.graphics.g3d.utils.RenderableSorter;
-import com.badlogic.gdx.graphics.g3d.utils.ShaderProvider;
 import com.badlogic.gdx.graphics.glutils.FrameBuffer;
 import com.badlogic.gdx.graphics.glutils.ShaderProgram;
 import com.badlogic.gdx.math.MathUtils;
@@ -46,13 +43,16 @@ import gaia.cu9.ari.gaiaorbit.util.GlobalConf;
 import gaia.cu9.ari.gaiaorbit.util.GlobalResources;
 import gaia.cu9.ari.gaiaorbit.util.Logger;
 import gaia.cu9.ari.gaiaorbit.util.Logger.Log;
+import gaia.cu9.ari.gaiaorbit.util.gdx.IntModelBatch;
+import gaia.cu9.ari.gaiaorbit.util.gdx.IntRenderableSorter;
+import gaia.cu9.ari.gaiaorbit.util.gdx.shader.AtmosphereShaderProvider;
+import gaia.cu9.ari.gaiaorbit.util.gdx.shader.GroundShaderProvider;
+import gaia.cu9.ari.gaiaorbit.util.gdx.shader.RelativisticShaderProvider;
+import gaia.cu9.ari.gaiaorbit.util.gdx.shader.ShaderProgramProvider.ShaderProgramParameter;
+import gaia.cu9.ari.gaiaorbit.util.gdx.shader.provider.IntShaderProvider;
 import gaia.cu9.ari.gaiaorbit.util.gravwaves.RelativisticEffectsManager;
 import gaia.cu9.ari.gaiaorbit.util.math.MathUtilsd;
 import gaia.cu9.ari.gaiaorbit.util.math.Vector3d;
-import gaia.cu9.ari.gaiaorbit.util.override.AtmosphereShaderProvider;
-import gaia.cu9.ari.gaiaorbit.util.override.GroundShaderProvider;
-import gaia.cu9.ari.gaiaorbit.util.override.RelativisticShaderProvider;
-import gaia.cu9.ari.gaiaorbit.util.override.ShaderProgramProvider.ShaderProgramParameter;
 
 import java.nio.IntBuffer;
 import java.util.Comparator;
@@ -109,12 +109,12 @@ public class SceneGraphRenderer extends AbstractRenderer implements IProcessRend
     private Matrix4[] shadowMapCombined;
     public Map<ModelBody, Texture> smTexMap;
     public Map<ModelBody, Matrix4> smCombinedMap;
-    private ModelBatch modelBatchDepth;
+    private IntModelBatch modelBatchDepth;
 
     // Light glow pre-render
     private FrameBuffer glowFb;
     private Texture glowTex;
-    private ModelBatch modelBatchOpaque;
+    private IntModelBatch modelBatchOpaque;
 
     private Vector3 aux1;
     private Vector3d aux1d;
@@ -339,33 +339,33 @@ public class SceneGraphRenderer extends AbstractRenderer implements IProcessRend
             render_lists.add(new Array<>(40000));
         }
 
-        ShaderProvider sp = manager.get("atmgrounddefault");
-        ShaderProvider spadditive = manager.get("additive");
-        ShaderProvider spgrids = manager.get("grids");
-        ShaderProvider spnormal = manager.get("atmground");
-        ShaderProvider spatm = manager.get("atm");
-        ShaderProvider spcloud = manager.get("cloud");
-        ShaderProvider spsurface = manager.get("spsurface");
-        ShaderProvider spbeam = manager.get("spbeam");
-        ShaderProvider spdepth = manager.get("spdepth");
-        ShaderProvider spopaque = manager.get("spopaque");
+        IntShaderProvider sp = manager.get("atmgrounddefault");
+        IntShaderProvider spadditive = manager.get("additive");
+        IntShaderProvider spgrids = manager.get("grids");
+        IntShaderProvider spnormal = manager.get("atmground");
+        IntShaderProvider spatm = manager.get("atm");
+        IntShaderProvider spcloud = manager.get("cloud");
+        IntShaderProvider spsurface = manager.get("spsurface");
+        IntShaderProvider spbeam = manager.get("spbeam");
+        IntShaderProvider spdepth = manager.get("spdepth");
+        IntShaderProvider spopaque = manager.get("spopaque");
 
-        RenderableSorter noSorter = (camera, renderables) -> {
+        IntRenderableSorter noSorter = (camera, renderables) -> {
             // Does nothing
         };
 
-        ModelBatch modelBatchDefault = new ModelBatch(sp, noSorter);
-        ModelBatch modelBatchMesh = new ModelBatch(spadditive, noSorter);
+        IntModelBatch modelBatchDefault = new IntModelBatch(sp, noSorter);
+        IntModelBatch modelBatchMesh = new IntModelBatch(spadditive, noSorter);
         modelBatchMesh.getRenderContext().setBlending(true, GL30.GL_ONE, GL30.GL_ONE);
         modelBatchMesh.getRenderContext().setDepthTest(GL30.GL_LEQUAL, 1e11f, 1e13f);
-        ModelBatch modelBatchGrids = new ModelBatch(spgrids, noSorter);
-        ModelBatch modelBatchNormal = new ModelBatch(spnormal, noSorter);
-        ModelBatch modelBatchAtmosphere = new ModelBatch(spatm, noSorter);
-        ModelBatch modelBatchCloud = new ModelBatch(spcloud, noSorter);
-        ModelBatch modelBatchStar = new ModelBatch(spsurface, noSorter);
-        ModelBatch modelBatchBeam = new ModelBatch(spbeam, noSorter);
-        modelBatchDepth = new ModelBatch(spdepth, noSorter);
-        modelBatchOpaque = new ModelBatch(spopaque, noSorter);
+        IntModelBatch modelBatchGrids = new IntModelBatch(spgrids, noSorter);
+        IntModelBatch modelBatchNormal = new IntModelBatch(spnormal, noSorter);
+        IntModelBatch modelBatchAtmosphere = new IntModelBatch(spatm, noSorter);
+        IntModelBatch modelBatchCloud = new IntModelBatch(spcloud, noSorter);
+        IntModelBatch modelBatchStar = new IntModelBatch(spsurface, noSorter);
+        IntModelBatch modelBatchBeam = new IntModelBatch(spbeam, noSorter);
+        modelBatchDepth = new IntModelBatch(spdepth, noSorter);
+        modelBatchOpaque = new IntModelBatch(spopaque, noSorter);
 
         // Fonts - all of these are distance field fonts
         BitmapFont font3d = manager.get("font/main-font.fnt");

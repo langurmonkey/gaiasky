@@ -9,7 +9,6 @@ import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.PerspectiveCamera;
 import com.badlogic.gdx.graphics.Texture;
-import com.badlogic.gdx.graphics.g3d.ModelBatch;
 import com.badlogic.gdx.math.Vector3;
 import gaia.cu9.ari.gaiaorbit.GaiaSky;
 import gaia.cu9.ari.gaiaorbit.render.ComponentTypes.ComponentType;
@@ -25,6 +24,7 @@ import gaia.cu9.ari.gaiaorbit.util.GlobalConf;
 import gaia.cu9.ari.gaiaorbit.util.Nature;
 import gaia.cu9.ari.gaiaorbit.util.camera.CameraUtils;
 import gaia.cu9.ari.gaiaorbit.util.coord.Coordinates;
+import gaia.cu9.ari.gaiaorbit.util.gdx.IntModelBatch;
 import gaia.cu9.ari.gaiaorbit.util.math.MathUtilsd;
 import gaia.cu9.ari.gaiaorbit.util.math.Vector3d;
 import gaia.cu9.ari.gaiaorbit.util.time.ITimeFrameProvider;
@@ -145,7 +145,7 @@ public class Planet extends ModelBody implements IAtmosphereRenderable, ICloudRe
      * Renders model
      */
     @Override
-    public void render(ModelBatch modelBatch, float alpha, double t) {
+    public void render(IntModelBatch modelBatch, float alpha, double t) {
         // Regular planet, render model normally
         compalpha = alpha;
         if (ac != null) {
@@ -170,7 +170,7 @@ public class Planet extends ModelBody implements IAtmosphereRenderable, ICloudRe
      * Renders the atmosphere
      */
     @Override
-    public void renderAtmosphere(ModelBatch modelBatch, float alpha, double t) {
+    public void renderAtmosphere(IntModelBatch modelBatch, float alpha, double t) {
         // Atmosphere fades in between 1 and 2 degrees of view angle apparent
         ICamera cam = GaiaSky.instance.getICamera();
         // We are an atmosphere :_D
@@ -191,7 +191,7 @@ public class Planet extends ModelBody implements IAtmosphereRenderable, ICloudRe
      * Renders the clouds
      */
     @Override
-    public void renderClouds(ModelBatch modelBatch, float alpha, double t) {
+    public void renderClouds(IntModelBatch modelBatch, float alpha, double t) {
         clc.touch();
         ICamera cam = GaiaSky.instance.getICamera();
         clc.mc.updateRelativisticEffects(cam);

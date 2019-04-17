@@ -8,7 +8,6 @@ package gaia.cu9.ari.gaiaorbit.render.system;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
-import com.badlogic.gdx.graphics.Mesh;
 import com.badlogic.gdx.graphics.VertexAttribute;
 import com.badlogic.gdx.graphics.VertexAttributes.Usage;
 import com.badlogic.gdx.graphics.glutils.ShaderProgram;
@@ -21,6 +20,7 @@ import gaia.cu9.ari.gaiaorbit.render.SceneGraphRenderer;
 import gaia.cu9.ari.gaiaorbit.scenegraph.Particle;
 import gaia.cu9.ari.gaiaorbit.scenegraph.SceneGraphNode.RenderGroup;
 import gaia.cu9.ari.gaiaorbit.scenegraph.camera.ICamera;
+import gaia.cu9.ari.gaiaorbit.util.gdx.mesh.IntMesh;
 import org.lwjgl.opengl.GL11;
 
 import java.util.Comparator;
@@ -59,7 +59,7 @@ public class LineRenderSystem extends ImmediateRenderSystem {
             curr.capacity = 10000;
 
             VertexAttribute[] attribs = buildVertexAttributes();
-            curr.mesh = new Mesh(false, curr.capacity, 0, attribs);
+            curr.mesh = new IntMesh(false, curr.capacity, 0, attribs);
 
             curr.vertexSize = curr.mesh.getVertexAttributes().vertexSize / 4;
             curr.vertices = new float[curr.capacity * curr.vertexSize];

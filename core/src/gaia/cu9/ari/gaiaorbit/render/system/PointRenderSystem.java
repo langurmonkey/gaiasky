@@ -6,7 +6,6 @@
 package gaia.cu9.ari.gaiaorbit.render.system;
 
 import com.badlogic.gdx.graphics.GL20;
-import com.badlogic.gdx.graphics.Mesh;
 import com.badlogic.gdx.graphics.VertexAttribute;
 import com.badlogic.gdx.graphics.VertexAttributes.Usage;
 import com.badlogic.gdx.graphics.glutils.ShaderProgram;
@@ -16,6 +15,7 @@ import gaia.cu9.ari.gaiaorbit.render.IPointRenderable;
 import gaia.cu9.ari.gaiaorbit.render.IRenderable;
 import gaia.cu9.ari.gaiaorbit.scenegraph.SceneGraphNode.RenderGroup;
 import gaia.cu9.ari.gaiaorbit.scenegraph.camera.ICamera;
+import gaia.cu9.ari.gaiaorbit.util.gdx.mesh.IntMesh;
 
 public class PointRenderSystem extends ImmediateRenderSystem {
     protected ICamera camera;
@@ -53,7 +53,7 @@ public class PointRenderSystem extends ImmediateRenderSystem {
             curr.capacity = 1000;
 
             VertexAttribute[] attribs = buildVertexAttributes();
-            curr.mesh = new Mesh(false, curr.capacity, 0, attribs);
+            curr.mesh = new IntMesh(false, curr.capacity, 0, attribs);
 
             curr.vertexSize = curr.mesh.getVertexAttributes().vertexSize / 4;
             curr.vertices = new float[curr.capacity * curr.vertexSize];

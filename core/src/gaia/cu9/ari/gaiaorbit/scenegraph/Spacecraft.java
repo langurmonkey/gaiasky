@@ -9,7 +9,6 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.graphics.GL20;
-import com.badlogic.gdx.graphics.g3d.ModelBatch;
 import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Quaternion;
 import com.badlogic.gdx.math.Vector3;
@@ -30,6 +29,7 @@ import gaia.cu9.ari.gaiaorbit.util.GlobalConf;
 import gaia.cu9.ari.gaiaorbit.util.Logger;
 import gaia.cu9.ari.gaiaorbit.util.Logger.Log;
 import gaia.cu9.ari.gaiaorbit.util.Pair;
+import gaia.cu9.ari.gaiaorbit.util.gdx.IntModelBatch;
 import gaia.cu9.ari.gaiaorbit.util.math.Intersectord;
 import gaia.cu9.ari.gaiaorbit.util.math.MathUtilsd;
 import gaia.cu9.ari.gaiaorbit.util.math.Vector3d;
@@ -569,7 +569,7 @@ public class Spacecraft extends GenericSpacecraft implements ILineRenderable, IO
 
     /** Model rendering. Spacecraft in spacecraft mode is not affected by the relativistic aberration **/
     @Override
-    public void render(ModelBatch modelBatch, float alpha, double t) {
+    public void render(IntModelBatch modelBatch, float alpha, double t) {
         ICamera cam = GaiaSky.instance.getICamera();
         prepareShadowEnvironment();
         mc.touch();
@@ -584,7 +584,7 @@ public class Spacecraft extends GenericSpacecraft implements ILineRenderable, IO
 
     /** Model opaque rendering for light glow pass. Do not render shadows **/
     @Override
-    public void renderOpaque(ModelBatch modelBatch, float alpha, double t) {
+    public void renderOpaque(IntModelBatch modelBatch, float alpha, double t) {
         ICamera cam = GaiaSky.instance.getICamera();
         mc.touch();
         mc.setTransparency(alpha * fadeOpacity);

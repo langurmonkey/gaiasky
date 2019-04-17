@@ -10,7 +10,6 @@ import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Mesh;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g3d.Environment;
-import com.badlogic.gdx.graphics.g3d.ModelBatch;
 import com.badlogic.gdx.graphics.glutils.ShaderProgram;
 import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Vector3;
@@ -26,6 +25,7 @@ import gaia.cu9.ari.gaiaorbit.scenegraph.component.ModelComponent;
 import gaia.cu9.ari.gaiaorbit.util.Constants;
 import gaia.cu9.ari.gaiaorbit.util.GlobalConf;
 import gaia.cu9.ari.gaiaorbit.util.coord.Coordinates;
+import gaia.cu9.ari.gaiaorbit.util.gdx.IntModelBatch;
 import gaia.cu9.ari.gaiaorbit.util.math.Intersectord;
 import gaia.cu9.ari.gaiaorbit.util.math.MathUtilsd;
 import gaia.cu9.ari.gaiaorbit.util.math.Matrix4d;
@@ -231,7 +231,7 @@ public abstract class ModelBody extends CelestialBody {
 
     /** Model rendering **/
     @Override
-    public void render(ModelBatch modelBatch, float alpha, double t) {
+    public void render(IntModelBatch modelBatch, float alpha, double t) {
         prepareShadowEnvironment();
         mc.touch();
         mc.setTransparency(alpha * fadeOpacity);
@@ -240,7 +240,7 @@ public abstract class ModelBody extends CelestialBody {
     }
 
     /** Model opaque rendering. Disable shadow mapping **/
-    public void renderOpaque(ModelBatch modelBatch, float alpha, double t) {
+    public void renderOpaque(IntModelBatch modelBatch, float alpha, double t) {
         mc.touch();
         mc.setTransparency(alpha * fadeOpacity);
         mc.updateRelativisticEffects(GaiaSky.instance.getICamera());

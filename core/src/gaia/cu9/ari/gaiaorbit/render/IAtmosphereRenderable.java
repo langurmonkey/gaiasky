@@ -5,7 +5,7 @@
 
 package gaia.cu9.ari.gaiaorbit.render;
 
-import com.badlogic.gdx.graphics.g3d.ModelBatch;
+import gaia.cu9.ari.gaiaorbit.util.gdx.IntModelBatch;
 
 /**
  * To be implemented by all entities wanting to render an atmosphere.
@@ -21,5 +21,5 @@ public interface IAtmosphereRenderable extends IRenderable {
      * @param alpha      The opacity.
      * @param t          The time in seconds since the start.
      */
-    void renderAtmosphere(ModelBatch modelBatch, float alpha, double t);
+    void renderAtmosphere(IntModelBatch modelBatch, float alpha, double t);
 }
