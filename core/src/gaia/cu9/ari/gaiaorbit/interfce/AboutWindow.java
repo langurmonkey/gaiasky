@@ -35,9 +35,7 @@ import gaia.cu9.ari.gaiaorbit.util.scene2d.*;
 import gaia.cu9.ari.gaiaorbit.util.update.VersionCheckEvent;
 import gaia.cu9.ari.gaiaorbit.util.update.VersionChecker;
 
-import java.io.File;
 import java.nio.IntBuffer;
-import java.nio.file.Files;
 import java.time.Instant;
 import java.util.Date;
 
@@ -66,11 +64,10 @@ public class AboutWindow extends GenericDialog {
 
     @Override
     protected void build() {
-        float tawidth = 440 * GlobalConf.SCALE_FACTOR;
-        float tawidth2 = 800 * GlobalConf.SCALE_FACTOR;
-        float taheight = 250 * GlobalConf.SCALE_FACTOR;
-        float taheight_s = 60 * GlobalConf.SCALE_FACTOR;
-        float tabwidth = 110 * GlobalConf.SCALE_FACTOR;
+        float taWidth = GlobalConf.SCALE_FACTOR > 1.5f ? 700 : 440;
+        float taWidth2 = 800 * GlobalConf.SCALE_FACTOR;
+        float taHeight = 100 * GlobalConf.SCALE_FACTOR;
+        float tabWidth = 110 * GlobalConf.SCALE_FACTOR;
 
         // Create the tab buttons
         HorizontalGroup group = new HorizontalGroup();
@@ -78,16 +75,16 @@ public class AboutWindow extends GenericDialog {
 
         final Button tabHelp = new OwnTextButton(I18n.txt("gui.help.help"), skin, "toggle-big");
         tabHelp.pad(pad5);
-        tabHelp.setWidth(tabwidth);
+        tabHelp.setWidth(tabWidth);
         final Button tabAbout = new OwnTextButton(I18n.txt("gui.help.about"), skin, "toggle-big");
         tabAbout.pad(pad5);
-        tabAbout.setWidth(tabwidth);
+        tabAbout.setWidth(tabWidth);
         final Button tabSystem = new OwnTextButton(I18n.txt("gui.help.system"), skin, "toggle-big");
         tabSystem.pad(pad5);
-        tabSystem.setWidth(tabwidth);
+        tabSystem.setWidth(tabWidth);
         final Button tabUpdates = new OwnTextButton(I18n.txt("gui.newversion"), skin, "toggle-big");
         tabUpdates.pad(pad5);
-        tabUpdates.setWidth(tabwidth);
+        tabUpdates.setWidth(tabWidth);
 
         group.addActor(tabHelp);
         group.addActor(tabAbout);
@@ -100,9 +97,9 @@ public class AboutWindow extends GenericDialog {
         // Create the tab content. Just using images here for simplicity.
         Stack tabContent = new Stack();
 
-        /** CONTENT 1 - HELP **/
+        /* CONTENT 1 - HELP */
         final Table contentHelp = new Table(skin);
-        contentHelp.align(Align.top | Align.left);
+        contentHelp.align(Align.top);
 
         FileHandle gslogo = Gdx.files.internal(GlobalConf.SCALE_FACTOR > 1.5f ? "img/gaiasky-logo.png" : "img/gaiasky-logo-s.png");
         Texture logotex = new Texture(gslogo);
@@ -111,75 +108,48 @@ public class AboutWindow extends GenericDialog {
         gaiasky.setOrigin(Align.center);
 
         // User manual
-        Label usermantitle = new OwnLabel(I18n.txt("gui.help.usermanual"), skin);
-        Label usermantxt = new OwnLabel(I18n.txt("gui.help.help1"), skin);
-        Link usermanlink = new Link(GlobalConf.WEBPAGE, linkStyle, GlobalConf.WEBPAGE);
+        Label homepageTitle = new OwnLabel(I18n.txt("gui.help.homepage"), skin);
+        Label homepageTxt = new OwnLabel(I18n.txt("gui.help.help1"), skin);
+        Link homepageLink = new Link(GlobalConf.WEBPAGE, linkStyle, GlobalConf.WEBPAGE);
 
         // Wiki
-        Label wikititle = new OwnLabel("Docs", skin);
-        Label wikitxt = new OwnLabel(I18n.txt("gui.help.help2"), skin);
-        Link wikilink = new Link(GlobalConf.DOCUMENTATION, linkStyle, GlobalConf.DOCUMENTATION);
+        Label docsTitle = new OwnLabel("Docs", skin);
+        Label docsTxt = new OwnLabel(I18n.txt("gui.help.help2"), skin);
+        Link docsLink = new Link(GlobalConf.DOCUMENTATION, linkStyle, GlobalConf.DOCUMENTATION);
 
-        // Readme
-        Label readmetitle = new OwnLabel(I18n.txt("gui.help.readme"), skin);
-        File readmefile = new File(GlobalConf.ASSETS_LOC + File.separator + "README.md");
-        if (!readmefile.exists()) {
-            // In production assetsloc = working dir, in development working dir = assets/../
-            readmefile = new File(GlobalConf.ASSETS_LOC + File.separator + "../README.md");
-        }
-        String readmestr;
-        try {
-            readmestr = new String(Files.readAllBytes(readmefile.toPath()));
-        } catch (Exception e) {
-            readmestr = "Could not read README.md file";
-        }
-        int lines = GlobalResources.countOccurrences(readmestr, '\n');
-        OwnTextArea readme = new OwnTextArea(readmestr, skin, "no-disabled");
-        readme.setDisabled(true);
-        readme.setPrefRows(lines);
-        readme.clearListeners();
-        if (GlobalConf.SCALE_FACTOR < 1.5f)
-            readme.setWidth(tawidth * 1.3f);
-
-        OwnScrollPane readmescroll = new OwnScrollPane(readme, skin, "minimalist-nobg");
-        readmescroll.setWidth(tawidth);
-        readmescroll.setHeight(taheight);
-        readmescroll.setForceScroll(false, true);
-        readmescroll.setSmoothScrolling(true);
-        readmescroll.setFadeScrollBars(false);
-        if (GlobalConf.SCALE_FACTOR < 1.5f)
-            readmescroll.setWidth(tawidth * 1.35f);
-
-        scrolls.add(readmescroll);
+        // Icon
+        FileHandle gsIcon = Gdx.files.internal("icon/ic_launcher.png");
+        Texture iconTex = new Texture(gsIcon);
+        iconTex.setFilter(TextureFilter.Linear, TextureFilter.Linear);
+        Image gaiaskyIcon = new Image(iconTex);
+        gaiaskyIcon.setOrigin(Align.center);
 
         // Add all to content
         contentHelp.add(gaiasky).pad(pad * 2).colspan(2);
         contentHelp.row();
-        contentHelp.add(usermantitle).align(Align.left).padRight(pad);
-        contentHelp.add(usermantxt).align(Align.left);
+        contentHelp.add(homepageTitle).align(Align.left).padRight(pad);
+        contentHelp.add(homepageTxt).align(Align.left);
         contentHelp.row();
         contentHelp.add(new OwnLabel("", skin));
-        contentHelp.add(usermanlink).align(Align.left);
+        contentHelp.add(homepageLink).align(Align.left).padBottom(pad);
         contentHelp.row();
-        contentHelp.add(wikititle).align(Align.left).padRight(pad);
-        contentHelp.add(wikitxt).align(Align.left);
+        contentHelp.add(docsTitle).align(Align.left).padRight(pad).padBottom(pad);
+        contentHelp.add(docsTxt).align(Align.left);
         contentHelp.row();
         contentHelp.add(new OwnLabel("", skin));
-        contentHelp.add(wikilink).align(Align.left);
+        contentHelp.add(docsLink).align(Align.left).padBottom(pad * 4f);
         contentHelp.row();
-        contentHelp.add(readmetitle).colspan(2).align(Align.left);
-        contentHelp.row();
-        contentHelp.add(readmescroll).colspan(2).expand().pad(pad, 0, pad, 0).align(Align.center);
+        contentHelp.add(gaiaskyIcon).colspan(2).align(Align.center);
 
-        /** CONTENT 2 - ABOUT **/
+        /* CONTENT 2 - ABOUT */
         final Table contentAbout = new Table(skin);
-        contentAbout.align(Align.top);
+        contentAbout.top().left();
 
         // Intro
         TextArea intro = new OwnTextArea(I18n.txt("gui.help.gscredits", GlobalConf.version.version), skin.get("regular", TextFieldStyle.class));
         intro.setDisabled(true);
         intro.setPrefRows(3);
-        intro.setWidth(tawidth);
+        intro.setWidth(taWidth + 100 * GlobalConf.SCALE_FACTOR);
 
         // Home page
         Label homepagetitle = new OwnLabel(I18n.txt("gui.help.homepage"), skin);
@@ -209,13 +179,13 @@ public class AboutWindow extends GenericDialog {
 
         // License
         HorizontalGroup licenseh = new HorizontalGroup();
-        licenseh.space(pad * 2);
+        licenseh.space(pad * 2f);
 
         VerticalGroup licensev = new VerticalGroup();
         TextArea licensetext = new OwnTextArea(I18n.txt("gui.help.license"), skin.get("regular", TextFieldStyle.class));
         licensetext.setDisabled(true);
         licensetext.setPrefRows(3);
-        licensetext.setWidth(tawidth2 / 2f);
+        licensetext.setWidth(taWidth2 / 2f);
         Link licenselink = new Link("https://opensource.org/licenses/MPL-2.0", linkStyle, "https://opensource.org/licenses/MPL-2.0");
 
         licensev.addActor(licensetext);
@@ -224,10 +194,9 @@ public class AboutWindow extends GenericDialog {
         licenseh.addActor(licensev);
 
         // Thanks
-
         HorizontalGroup thanks = new HorizontalGroup();
-        thanks.space(pad * 2);
-        Container<Actor> thanksc = new Container<Actor>(thanks);
+        thanks.space(pad * 2f).pad(pad);
+        Container<Actor> thanksc = new Container<>(thanks);
         thanksc.setBackground(skin.getDrawable("bg-clear"));
 
         Image zah = new Image(getSpriteDrawable(Gdx.files.internal("img/zah.png")));
@@ -240,24 +209,24 @@ public class AboutWindow extends GenericDialog {
         thanks.addActor(bwt);
         thanks.addActor(dpac);
 
-        contentAbout.add(intro).colspan(2).align(Align.left).padTop(pad);
+        contentAbout.add(intro).colspan(2).align(Align.left).padTop(pad * 2f);
         contentAbout.row();
-        contentAbout.add(homepagetitle).align(Align.topLeft).padRight(pad);
-        contentAbout.add(homepage).align(Align.left);
+        contentAbout.add(homepagetitle).align(Align.topLeft).padRight(pad * 2f).padTop(pad * 2f);
+        contentAbout.add(homepage).align(Align.left).padTop(pad * 2f);
         contentAbout.row();
-        contentAbout.add(authortitle).align(Align.topLeft).padRight(pad).padTop(pad5);
-        contentAbout.add(author).align(Align.left).padTop(pad5);
+        contentAbout.add(authortitle).align(Align.topLeft).padRight(pad).padTop(pad * 2f);
+        contentAbout.add(author).align(Align.left).padTop(pad5).padTop(pad * 2f);
         contentAbout.row();
-        contentAbout.add(contribtitle).align(Align.topLeft).padRight(pad).padTop(pad5);
-        contentAbout.add(contrib).align(Align.left).padTop(pad5);
+        contentAbout.add(contribtitle).align(Align.topLeft).padRight(pad).padTop(pad * 2f);
+        contentAbout.add(contrib).align(Align.left).padTop(pad * 2f);
         contentAbout.row();
-        contentAbout.add(licenseh).colspan(2).align(Align.center).padTop(pad * 2);
+        contentAbout.add(licenseh).colspan(2).align(Align.center).padTop(pad * 2f);
         contentAbout.row();
-        contentAbout.add(thanksc).colspan(2).align(Align.center).padTop(pad * 4);
+        contentAbout.add(thanksc).colspan(2).align(Align.center).padTop(pad * 4f);
 
-        /** CONTENT 3 - SYSTEM **/
+        /* CONTENT 3 - SYSTEM */
         final Table contentSystem = new Table(skin);
-        contentSystem.align(Align.top | Align.left);
+        contentSystem.top().left();
 
         // Build info
         Label buildinfo = new OwnLabel(I18n.txt("gui.help.buildinfo"), skin, "help-title");
@@ -275,7 +244,7 @@ public class AboutWindow extends GenericDialog {
         TextArea system = new OwnTextArea(GlobalConf.version.system, skin.get("regular", TextFieldStyle.class));
         system.setDisabled(true);
         system.setPrefRows(3);
-        system.setWidth(tawidth * 2f / 3f);
+        system.setWidth(taWidth * 2f / 3f);
 
         Label buildertitle = new OwnLabel(I18n.txt("gui.help.builder"), skin);
         Label builder = new OwnLabel(GlobalConf.version.builder, skin);
@@ -300,7 +269,7 @@ public class AboutWindow extends GenericDialog {
 
         TextButton memoryinfobutton = new OwnTextButton(I18n.txt("gui.help.meminfo"), skin, "default");
         memoryinfobutton.setName("memoryinfo");
-        memoryinfobutton.setSize(150 * GlobalConf.SCALE_FACTOR, 20 * GlobalConf.SCALE_FACTOR);
+        memoryinfobutton.setSize(150f * GlobalConf.SCALE_FACTOR, 20f * GlobalConf.SCALE_FACTOR);
         memoryinfobutton.addListener(event -> {
             if (event instanceof ChangeEvent) {
                 EventManager.instance.post(Events.DISPLAY_MEM_INFO_WINDOW);
@@ -346,36 +315,36 @@ public class AboutWindow extends GenericDialog {
         }
         Gdx.gl.glGetIntegerv(GL20.GL_MAX_TEXTURE_SIZE, buf);
         int maxSize = buf.get(0);
-        lines = GlobalResources.countOccurrences(extensions, '\n');
+        int lines = GlobalResources.countOccurrences(extensions, '\n');
         OwnTextArea glextensions = new OwnTextArea("Max texture size: " + maxSize + '\n' + extensions, skin, "no-disabled");
         glextensions.setDisabled(true);
         glextensions.setPrefRows(lines);
         glextensions.clearListeners();
 
         OwnScrollPane glextensionsscroll = new OwnScrollPane(glextensions, skin, "minimalist-nobg");
-        glextensionsscroll.setWidth(tawidth / 1.7f);
-        glextensionsscroll.setHeight(taheight_s);
+        glextensionsscroll.setWidth(taWidth);
+        glextensionsscroll.setHeight(taHeight);
         glextensionsscroll.setForceScroll(false, true);
         glextensionsscroll.setSmoothScrolling(true);
         glextensionsscroll.setFadeScrollBars(false);
         scrolls.add(glextensionsscroll);
 
-        contentSystem.add(buildinfo).colspan(2).align(Align.left).padTop(pad * 1.5f).padBottom(pad);
+        contentSystem.add(buildinfo).colspan(2).align(Align.left).padTop(pad * 2f).padBottom(pad);
         contentSystem.row();
         contentSystem.add(versiontitle).align(Align.topLeft).padRight(pad);
         contentSystem.add(version).align(Align.left);
         contentSystem.row();
-        contentSystem.add(revisiontitle).align(Align.topLeft).padRight(pad);
-        contentSystem.add(revision).align(Align.left);
+        contentSystem.add(revisiontitle).align(Align.topLeft).padRight(pad).padTop(pad5);
+        contentSystem.add(revision).align(Align.left).padTop(pad5);
         contentSystem.row();
-        contentSystem.add(timetitle).align(Align.topLeft).padRight(pad);
-        contentSystem.add(time).align(Align.left);
+        contentSystem.add(timetitle).align(Align.topLeft).padRight(pad).padTop(pad5);
+        contentSystem.add(time).align(Align.left).padTop(pad5);
         contentSystem.row();
-        contentSystem.add(buildertitle).align(Align.topLeft).padRight(pad);
-        contentSystem.add(builder).align(Align.left).padBottom(pad * 1.5f);
+        contentSystem.add(buildertitle).align(Align.topLeft).padRight(pad).padTop(pad5);
+        contentSystem.add(builder).align(Align.left).padTop(pad5);
         contentSystem.row();
-        contentSystem.add(systemtitle).align(Align.topLeft).padRight(pad);
-        contentSystem.add(system).align(Align.left);
+        contentSystem.add(systemtitle).align(Align.topLeft).padRight(pad).padTop(pad5);
+        contentSystem.add(system).align(Align.left).padTop(pad5);
         contentSystem.row();
 
         contentSystem.add(javainfo).colspan(2).align(Align.left).padTop(pad).padBottom(pad);
@@ -383,19 +352,19 @@ public class AboutWindow extends GenericDialog {
         contentSystem.add(javaversiontitle).align(Align.topLeft).padRight(pad);
         contentSystem.add(javaversion).align(Align.left);
         contentSystem.row();
-        contentSystem.add(javaruntimetitle).align(Align.topLeft).padRight(pad);
-        contentSystem.add(javaruntime).align(Align.left);
+        contentSystem.add(javaruntimetitle).align(Align.topLeft).padRight(pad).padTop(pad5);
+        contentSystem.add(javaruntime).align(Align.left).padTop(pad5);
         contentSystem.row();
-        contentSystem.add(javavmnametitle).align(Align.topLeft).padRight(pad);
-        contentSystem.add(javavmname).align(Align.left);
+        contentSystem.add(javavmnametitle).align(Align.topLeft).padRight(pad).padTop(pad5);
+        contentSystem.add(javavmname).align(Align.left).padTop(pad5);
         contentSystem.row();
-        contentSystem.add(javavmversiontitle).align(Align.topLeft).padRight(pad);
-        contentSystem.add(javavmversion).align(Align.left);
+        contentSystem.add(javavmversiontitle).align(Align.topLeft).padRight(pad).padTop(pad5);
+        contentSystem.add(javavmversion).align(Align.left).padTop(pad5);
         contentSystem.row();
-        contentSystem.add(javavmvendortitle).align(Align.topLeft).padRight(pad);
-        contentSystem.add(javavmvendor).align(Align.left).padBottom(pad);
+        contentSystem.add(javavmvendortitle).align(Align.topLeft).padRight(pad).padTop(pad5);
+        contentSystem.add(javavmvendor).align(Align.left).padTop(pad5);
         contentSystem.row();
-        contentSystem.add(memoryinfobutton).colspan(2).align(Align.left);
+        contentSystem.add(memoryinfobutton).colspan(2).align(Align.left).padTop(pad);
         contentSystem.row();
 
         contentSystem.add(sysinfo).colspan(2).align(Align.left).padTop(pad).padBottom(pad);
@@ -403,8 +372,8 @@ public class AboutWindow extends GenericDialog {
         contentSystem.add(sysostitle).align(Align.topLeft).padRight(pad);
         contentSystem.add(sysos).align(Align.left);
         contentSystem.row();
-        contentSystem.add(glrenderertitle).align(Align.topLeft).padRight(pad);
-        contentSystem.add(glrenderer).align(Align.left);
+        contentSystem.add(glrenderertitle).align(Align.topLeft).padRight(pad).padTop(pad5);
+        contentSystem.add(glrenderer).align(Align.left).padTop(pad5);
         contentSystem.row();
 
         contentSystem.add(glinfo).colspan(2).align(Align.left).padTop(pad).padBottom(pad);
@@ -412,16 +381,16 @@ public class AboutWindow extends GenericDialog {
         contentSystem.add(glversiontitle).align(Align.topLeft).padRight(pad);
         contentSystem.add(glversion).align(Align.left);
         contentSystem.row();
-        contentSystem.add(glvendortitle).align(Align.topLeft).padRight(pad);
-        contentSystem.add(glvendor).align(Align.left);
+        contentSystem.add(glvendortitle).align(Align.topLeft).padRight(pad).padTop(pad5);
+        contentSystem.add(glvendor).align(Align.left).padTop(pad5);
         contentSystem.row();
-        contentSystem.add(glslversiontitle).align(Align.topLeft).padRight(pad);
-        contentSystem.add(glslversion).align(Align.left);
+        contentSystem.add(glslversiontitle).align(Align.topLeft).padRight(pad).padTop(pad5);
+        contentSystem.add(glslversion).align(Align.left).padTop(pad5);
         contentSystem.row();
-        contentSystem.add(glextensionstitle).align(Align.topLeft).padRight(pad);
-        contentSystem.add(glextensionsscroll).align(Align.left);
+        contentSystem.add(glextensionstitle).align(Align.topLeft).padRight(pad).padTop(pad5);
+        contentSystem.add(glextensionsscroll).align(Align.left).padTop(pad5);
 
-        /** CONTENT 4 - UPDATES **/
+        /* CONTENT 4 - UPDATES */
         final Table contentUpdates = new Table(skin);
         contentUpdates.align(Align.top);
 
@@ -439,7 +408,7 @@ public class AboutWindow extends GenericDialog {
             newVersionCheck(GlobalConf.version.version, GlobalConf.version.versionNumber, GlobalConf.version.buildtime, false);
         }
 
-        contentUpdates.add(checkTable).left().top().padTop(pad * 1.5f);
+        contentUpdates.add(checkTable).left().top().padTop(pad * 2f);
 
         /** ADD ALL CONTENT **/
         tabContent.addActor(contentHelp);
