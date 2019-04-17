@@ -1,7 +1,7 @@
 # Gaia Sky
 
 [![License: MPL 2.0](https://img.shields.io/badge/License-MPL%202.0-brightgreen.svg)](https://opensource.org/licenses/MPL-2.0)
-[![Docs badge](http://gaia-sky.readthedocs.io/en/latest/?badge=latest)](http://gaia.ari.uni-heidelberg.de/gaiasky/docs/html/latest)
+[![Documentation Status](https://readthedocs.org/projects/gaia-sky/badge/?version=latest)](http://gaia.ari.uni-heidelberg.de/gaiasky/docs/html/latest)
 [![Issues](https://img.shields.io/badge/issues-open-bbbb00.svg)](https://gitlab.com/langurmonkey/gaiasky/issues)
 
 [**Gaia Sky**](https://zah.uni-heidelberg.de/gaia/outreach/gaiasky) is a real-time 3D Universe application that

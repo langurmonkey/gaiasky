@@ -265,7 +265,7 @@ public class GaiaSkyDesktop implements IObserver {
         cfg.setIdleFPS(0);
         cfg.useVsync(GlobalConf.screen.VSYNC);
         cfg.setWindowIcon(Files.FileType.Internal, "icon/ic_launcher.png");
-        cfg.useOpenGL3(false, 3, 2);
+        cfg.useOpenGL3(true, 3, 2);
         // Disable logical DPI modes (macOS, Windows)
         cfg.setHdpiMode(Lwjgl3ApplicationConfiguration.HdpiMode.Pixels);
 
