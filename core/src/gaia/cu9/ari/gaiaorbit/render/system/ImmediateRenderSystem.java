@@ -36,7 +36,7 @@ public abstract class ImmediateRenderSystem extends AbstractRenderSystem {
         protected float[] vertices;
 
         protected int indexIdx;
-        protected short indexVert;
+        protected int indexVert;
         protected int[] indices;
         protected int numVertices;
         protected int capacity;

@@ -21,16 +21,15 @@
 
 package gaia.cu9.ari.gaiaorbit.util.gdx;
 
-import com.badlogic.gdx.graphics.g3d.ModelBatch;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Pool;
 
-/** Returns a list of {@link IntRenderable} instances to be rendered by a {@link ModelBatch}.
+/** Returns a list of {@link IntRenderable} instances to be rendered by a {@link IntModelBatch}.
  * @author badlogic */
 public interface IntRenderableProvider {
 	/** Returns {@link IntRenderable} instances. Renderables are obtained from the provided {@link Pool} and added to the provided
 	 * array. The IntRenderables obtained using {@link Pool#obtain()} will later be put back into the pool, do not store them
-	 * internally. The resulting array can be rendered via a {@link ModelBatch}.
+	 * internally. The resulting array can be rendered via a {@link IntModelBatch}.
 	 * @param renderables the output array
 	 * @param pool the pool to obtain IntRenderables from */
 	void getRenderables(Array<IntRenderable> renderables, Pool<IntRenderable> pool);

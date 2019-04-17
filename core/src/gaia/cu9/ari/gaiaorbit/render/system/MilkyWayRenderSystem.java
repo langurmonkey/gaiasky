@@ -264,11 +264,11 @@ public class MilkyWayRenderSystem extends ImmediateRenderSystem implements IObse
 
                         // Indices
                         quad.indices[quad.indexIdx] = quad.indexVert;
-                        quad.indices[quad.indexIdx + 1] = (short) (quad.indexVert + 1);
-                        quad.indices[quad.indexIdx + 2] = (short) (quad.indexVert + 2);
-                        quad.indices[quad.indexIdx + 3] = (short) (quad.indexVert + 2);
-                        quad.indices[quad.indexIdx + 4] = (short) (quad.indexVert + 3);
-                        quad.indices[quad.indexIdx + 5] = (short) (quad.indexVert + 0);
+                        quad.indices[quad.indexIdx + 1] = quad.indexVert + 1;
+                        quad.indices[quad.indexIdx + 2] = quad.indexVert + 2;
+                        quad.indices[quad.indexIdx + 3] = quad.indexVert + 2;
+                        quad.indices[quad.indexIdx + 4] = quad.indexVert + 3;
+                        quad.indices[quad.indexIdx + 5] = quad.indexVert + 0;
                         quad.indexIdx += 6;
                         quad.indexVert += 4;
 

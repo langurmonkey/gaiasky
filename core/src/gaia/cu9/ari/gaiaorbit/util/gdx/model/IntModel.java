@@ -27,12 +27,14 @@ import com.badlogic.gdx.graphics.Mesh;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.VertexAttributes;
 import com.badlogic.gdx.graphics.g3d.Material;
-import com.badlogic.gdx.graphics.g3d.ModelInstance;
 import com.badlogic.gdx.graphics.g3d.attributes.BlendingAttribute;
 import com.badlogic.gdx.graphics.g3d.attributes.ColorAttribute;
 import com.badlogic.gdx.graphics.g3d.attributes.FloatAttribute;
 import com.badlogic.gdx.graphics.g3d.attributes.TextureAttribute;
-import com.badlogic.gdx.graphics.g3d.model.*;
+import com.badlogic.gdx.graphics.g3d.model.Animation;
+import com.badlogic.gdx.graphics.g3d.model.MeshPart;
+import com.badlogic.gdx.graphics.g3d.model.Node;
+import com.badlogic.gdx.graphics.g3d.model.NodeKeyframe;
 import com.badlogic.gdx.graphics.g3d.model.data.*;
 import com.badlogic.gdx.graphics.g3d.utils.TextureDescriptor;
 import com.badlogic.gdx.graphics.g3d.utils.TextureProvider;
@@ -42,6 +44,7 @@ import com.badlogic.gdx.math.Quaternion;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.math.collision.BoundingBox;
 import com.badlogic.gdx.utils.*;
+import gaia.cu9.ari.gaiaorbit.util.gdx.loader.IntModelLoader;
 import gaia.cu9.ari.gaiaorbit.util.gdx.mesh.IntMesh;
 import gaia.cu9.ari.gaiaorbit.util.gdx.model.data.IntModelData;
 import gaia.cu9.ari.gaiaorbit.util.gdx.model.data.IntModelMesh;
@@ -55,12 +58,12 @@ import gaia.cu9.ari.gaiaorbit.util.gdx.model.data.IntModelNode;
  * of a {@link IntMeshPart} and {@link Material}. Mesh parts reference subsets of vertices in one of the meshes of the model.
  * Animations can be applied to nodes, to modify their transform (translation, rotation, scale) over time.</p>
  * 
- * A model can be rendered by creating a {@link ModelInstance} from it. That instance has an additional transform to position the
+ * A model can be rendered by creating a {@link IntModelInstance} from it. That instance has an additional transform to position the
  * model in the world, and allows modification of materials and nodes without destroying the original model. The original model is
  * the owner of any meshes and textures, all instances created from the model share these resources. Disposing the model will
  * automatically make all instances invalid!</p>
  * 
- * A model is created from {@link ModelData}, which in turn is loaded by a {@link ModelLoader}.
+ * A model is created from {@link IntModelData}, which in turn is loaded by a {@link IntModelLoader}.
  * 
  * @author badlogic, xoppa */
 public class IntModel implements Disposable {
@@ -326,7 +329,7 @@ public class IntModel implements Disposable {
 	}
 
 	/** Adds a {@link Disposable} to be managed and disposed by this Model. Can be used to keep track of manually loaded textures
-	 * for {@link ModelInstance}.
+	 * for {@link IntModelInstance}.
 	 * @param disposable the Disposable */
 	public void manageDisposable (Disposable disposable) {
 		if (!disposables.contains(disposable, true)) disposables.add(disposable);

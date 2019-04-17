@@ -512,7 +512,7 @@ public class IntMesh implements Disposable {
 						+ count + ", offset: " + offset + ", max: " + indices.getNumMaxIndices() + ")");
 				}
 				
-				Gdx.gl20.glDrawElements(primitiveType, count, GL20.GL_UNSIGNED_INT, offset * 2);
+				Gdx.gl20.glDrawElements(primitiveType, count, GL20.GL_UNSIGNED_INT, offset * 4);
 			} else {
 				Gdx.gl20.glDrawArrays(primitiveType, offset, count);
 			}

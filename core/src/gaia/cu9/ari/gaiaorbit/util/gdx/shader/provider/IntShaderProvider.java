@@ -21,7 +21,6 @@
 
 package gaia.cu9.ari.gaiaorbit.util.gdx.shader.provider;
 
-import com.badlogic.gdx.graphics.g3d.Shader;
 import com.badlogic.gdx.graphics.glutils.ShaderProgram;
 import gaia.cu9.ari.gaiaorbit.util.gdx.IntRenderable;
 import gaia.cu9.ari.gaiaorbit.util.gdx.shader.IntShader;
@@ -30,7 +29,7 @@ import gaia.cu9.ari.gaiaorbit.util.gdx.shader.IntShader;
  * {@link ShaderProgram} instances on a call to {@link #dispose()}.
  * @author badlogic */
 public interface IntShaderProvider {
-	/** Returns a {@link Shader} for the given {@link IntRenderable}. The RenderInstance may already contain a IntShader, in which case
+	/** Returns a {@link IntShader} for the given {@link IntRenderable}. The RenderInstance may already contain a IntShader, in which case
 	 * the provider may decide to return that.
 	 * @param renderable the Renderable
 	 * @return the IntShader to be used for the RenderInstance */

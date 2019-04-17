@@ -21,16 +21,18 @@
 
 package gaia.cu9.ari.gaiaorbit.util.gdx;
 
-import com.badlogic.gdx.graphics.Mesh;
 import com.badlogic.gdx.graphics.VertexAttributes;
-import com.badlogic.gdx.graphics.g3d.*;
-import com.badlogic.gdx.graphics.g3d.model.MeshPart;
-import com.badlogic.gdx.graphics.g3d.utils.ShaderProvider;
+import com.badlogic.gdx.graphics.g3d.Attribute;
+import com.badlogic.gdx.graphics.g3d.Environment;
+import com.badlogic.gdx.graphics.g3d.Material;
 import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Pool;
+import gaia.cu9.ari.gaiaorbit.util.gdx.mesh.IntMesh;
 import gaia.cu9.ari.gaiaorbit.util.gdx.model.IntMeshPart;
+import gaia.cu9.ari.gaiaorbit.util.gdx.model.IntModelInstance;
 import gaia.cu9.ari.gaiaorbit.util.gdx.shader.IntShader;
+import gaia.cu9.ari.gaiaorbit.util.gdx.shader.provider.IntShaderProvider;
 
 /** A Renderable contains all information about a single render instruction (typically a draw call).</p>
  * 
@@ -38,41 +40,41 @@ import gaia.cu9.ari.gaiaorbit.util.gdx.shader.IntShader;
  * 
  * The shape is defined using the mesh, meshPartOffset, meshPartSize and primitiveType members. This matches the members of the
  * {@link IntMeshPart} class. The meshPartOffset is used to specify the offset within the mesh and the meshPartSize is used to
- * specify the part (in total number of vertices) to render. If the mesh is indexed (which is when {@link Mesh#getNumIndices()} >
+ * specify the part (in total number of vertices) to render. If the mesh is indexed (which is when {@link IntMesh#getNumIndices()} >
  * 0) then both values are in number of indices within the indices array of the mesh, otherwise they are in number of vertices
- * within the vertices array of the mesh. Note that some classes might require the mesh to be indexed.</p>
+ * within the vertices array of the mesh. Note that some classes might require the mesh to be indexed.
  * 
  * The {@link #material} and (optional) {@link #environment} values are combined to specify how the shape should look like.
  * Typically these are used to specify uniform values or other OpenGL state changes. When a value is present in both the
- * {@link #material} and {@link #environment}, then the value of the {@link #material} will be used.</p>
+ * {@link #material} and {@link #environment}, then the value of the {@link #material} will be used.
  * 
- * Renderables can be rendered directly using a {@link Shader} (in which case the {@link #shader} member is ignored). Though more
- * typically Renderables are rendered via a {@link ModelBatch}, either directly, or by passing a {@link IntRenderableProvider} like
- * {@link ModelInstance} to the RenderBatch.</p>
+ * Renderables can be rendered directly using a {@link IntShader} (in which case the {@link #shader} member is ignored). Though more
+ * typically Renderables are rendered via a {@link IntModelBatch}, either directly, or by passing a {@link IntRenderableProvider} like
+ * {@link IntModelInstance} to the RenderBatch.
  * 
- * A ModelInstance returns all Renderables via its {@link ModelInstance#getRenderables(Array, Pool)} method. In which case the
- * value of {@link ModelInstance#userData} will be set to the {@link #userData} member. The {@link #userData} member can be used
+ * A ModelInstance returns all Renderables via its {@link IntModelInstance#getRenderables(Array, Pool)} method. In which case the
+ * value of {@link IntModelInstance#userData} will be set to the {@link #userData} member. The {@link #userData} member can be used
  * to pass additional data to the shader. However, in most scenario's it is advised to use the {@link #material} or
- * {@link #environment} member with custom {@link Attribute}s to pass data to the shader.</p>
+ * {@link #environment} member with custom {@link Attribute}s to pass data to the shader.
  * 
  * In some cases, (for example for non-hierarchical basic game objects requiring only a single draw call) it is possible to extend
  * the Renderable class and add additional fields to pass to the shader. While extending the Renderable class can be useful, the
  * shader should not rely on it. Similar to the {@link #userData} member it is advised to use the {@link #material} and
- * {@link #environment} members to pass data to the shader.</p>
+ * {@link #environment} members to pass data to the shader.
  * 
  * When using a ModelBatch to render a Renderable, The Renderable and all its values must not be changed in between the call to
- * {@link ModelBatch#begin(com.badlogic.gdx.graphics.Camera)} and {@link ModelBatch#end()}. Therefor Renderable instances cannot
- * be reused for multiple render calls.</p>
+ * {@link IntModelBatch#begin(com.badlogic.gdx.graphics.Camera)} and {@link IntModelBatch#end()}. Therefor Renderable instances cannot
+ * be reused for multiple render calls.
  * 
- * When the {@link #shader} member of the Renderable is set, the {@link ShaderProvider} of the {@link ModelBatch} may decide to
+ * When the {@link #shader} member of the Renderable is set, the {@link IntShaderProvider} of the {@link IntModelBatch} may decide to
  * use that shader instead of the default shader. Therefor, to assure the default shader is used, the {@link #shader} member must
- * be set to null.</p>
+ * be set to null.
  * @author badlogic, xoppa */
 public class IntRenderable {
 	/** Used to specify the transformations (like translation, scale and rotation) to apply to the shape. In other words: it is used
 	 * to transform the vertices from model space into world space. **/
 	public final Matrix4 worldTransform = new Matrix4();
-	/** The {@link MeshPart} that contains the shape to render **/
+	/** The {@link IntMeshPart} that contains the shape to render **/
 	public final IntMeshPart meshPart = new IntMeshPart();
 	/** The {@link Material} to be applied to the shape (part of the mesh), must not be null.
 	 * @see #environment **/
@@ -87,8 +89,8 @@ public class IntRenderable {
 	 * combine multiple bones into a single transformation matrix, which is used to transform the vertex to model space. In other
 	 * words: the bone transformation is applied prior to the {@link #worldTransform}. */
 	public Matrix4 bones[];
-	/** The {@link Shader} to be used to render this Renderable using a {@link ModelBatch}, may be null. It is not guaranteed that
-	 * the shader will be used, the used {@link ShaderProvider} is responsible for actually choosing the correct shader to use. **/
+	/** The {@link IntShader} to be used to render this Renderable using a {@link IntModelBatch}, may be null. It is not guaranteed that
+	 * the shader will be used, the used {@link IntShaderProvider} is responsible for actually choosing the correct shader to use. **/
 	public IntShader shader;
 	/** User definable value, may be null. */
 	public Object userData;

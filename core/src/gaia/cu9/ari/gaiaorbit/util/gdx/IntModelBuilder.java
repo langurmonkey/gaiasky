@@ -532,7 +532,7 @@ public class IntModelBuilder {
     }
 
     /**
-     * Resets the references to {@link Material}s, {@link Mesh}es and
+     * Resets the references to {@link Material}s, {@link IntMesh}es and
      * {@link IntMeshPart}s within the model to the ones used within it's nodes.
      * This will make the model responsible for disposing all referenced meshes.
      */

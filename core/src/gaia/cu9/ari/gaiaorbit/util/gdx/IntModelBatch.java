@@ -24,12 +24,11 @@ package gaia.cu9.ari.gaiaorbit.util.gdx;
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.Camera;
 import com.badlogic.gdx.graphics.g3d.Environment;
-import com.badlogic.gdx.graphics.g3d.Renderable;
 import com.badlogic.gdx.graphics.g3d.RenderableProvider;
-import com.badlogic.gdx.graphics.g3d.shaders.DefaultShader;
 import com.badlogic.gdx.graphics.g3d.utils.*;
 import com.badlogic.gdx.utils.*;
 import gaia.cu9.ari.gaiaorbit.util.gdx.model.IntModelInstance;
+import gaia.cu9.ari.gaiaorbit.util.gdx.shader.DefaultIntShader;
 import gaia.cu9.ari.gaiaorbit.util.gdx.shader.IntShader;
 import gaia.cu9.ari.gaiaorbit.util.gdx.shader.provider.DefaultIntShaderProvider;
 import gaia.cu9.ari.gaiaorbit.util.gdx.shader.provider.IntShaderProvider;
@@ -124,7 +123,7 @@ public class IntModelBatch implements Disposable {
 		this(null, shaderProvider, null);
 	}
 
-	/** Construct a ModelBatch with the default implementation and the specified ubershader. See {@link DefaultShader} for more
+	/** Construct a ModelBatch with the default implementation and the specified ubershader. See {@link DefaultIntShader} for more
 	 * information about using a custom ubershader. Requires OpenGL ES 2.0.
 	 * @param vertexShader The {@link FileHandle} of the vertex shader to use.
 	 * @param fragmentShader The {@link FileHandle} of the fragment shader to use. */
@@ -132,7 +131,7 @@ public class IntModelBatch implements Disposable {
 		this(null, new DefaultIntShaderProvider(vertexShader, fragmentShader), null);
 	}
 
-	/** Construct a ModelBatch with the default implementation and the specified ubershader. See {@link DefaultShader} for more
+	/** Construct a ModelBatch with the default implementation and the specified ubershader. See {@link DefaultIntShader} for more
 	 * information about using a custom ubershader. Requires OpenGL ES 2.0.
 	 * @param vertexShader The vertex shader to use.
 	 * @param fragmentShader The fragment shader to use. */
@@ -145,7 +144,7 @@ public class IntModelBatch implements Disposable {
 		this(null, null, null);
 	}
 
-	/** Start rendering one or more {@link Renderable}s. Use one of the render() methods to provide the renderables. Must be
+	/** Start rendering one or more {@link IntRenderable}s. Use one of the render() methods to provide the renderables. Must be
 	 * followed by a call to {@link #end()}. The OpenGL context must not be altered between {@link #begin(Camera)} and
 	 * {@link #end()}.
 	 * @param cam The {@link Camera} to be used when rendering and sorting. */
@@ -213,7 +212,7 @@ public class IntModelBatch implements Disposable {
 		renderables.clear();
 	}
 
-	/** End rendering one or more {@link Renderable}s. Must be called after a call to {@link #begin(Camera)}. This will flush the
+	/** End rendering one or more {@link IntRenderable}s. Must be called after a call to {@link #begin(Camera)}. This will flush the
 	 * batch, causing any renderables provided using one of the render() methods to be rendered. After a call to this method the
 	 * OpenGL context can be altered again. */
 	public void end () {
@@ -276,7 +275,7 @@ public class IntModelBatch implements Disposable {
 			render(renderableProvider, environment);
 	}
 
-	/** Calls {@link RenderableProvider#getRenderables(Array, Pool)} and adds all returned {@link Renderable} instances to the
+	/** Calls {@link RenderableProvider#getRenderables(Array, Pool)} and adds all returned {@link IntRenderable} instances to the
 	 * current batch to be rendered. Any shaders set on the returned renderables will be replaced with the given {@link IntShader}.
 	 * Can only be called after a call to {@link #begin(Camera)} and before a call to {@link #end()}.
 	 * @param renderableProvider the renderable provider

@@ -21,10 +21,12 @@
 
 package gaia.cu9.ari.gaiaorbit.util.gdx;
 
-import com.badlogic.gdx.graphics.*;
+import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.graphics.GL20;
+import com.badlogic.gdx.graphics.VertexAttribute;
+import com.badlogic.gdx.graphics.VertexAttributes;
 import com.badlogic.gdx.graphics.VertexAttributes.Usage;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
-import com.badlogic.gdx.graphics.g3d.model.MeshPart;
 import com.badlogic.gdx.graphics.glutils.ShaderProgram;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Matrix4;
@@ -122,14 +124,14 @@ public class IntIntMeshBuilder implements IntMeshPartBuilder {
         return new VertexAttributes(attributes);
     }
 
-    /** Begin building a mesh. Call {@link #part(String, int)} to start a {@link MeshPart}.
+    /** Begin building a mesh. Call {@link #part(String, int)} to start a {@link IntMeshPart}.
      * @param attributes bitwise mask of the {@link com.badlogic.gdx.graphics.VertexAttributes.Usage}, only Position, Color, Normal
      *           and TextureCoordinates is supported. */
     public void begin(final long attributes) {
         begin(createAttributes(attributes), 0);
     }
 
-    /** Begin building a mesh. Call {@link #part(String, int)} to start a {@link MeshPart}. */
+    /** Begin building a mesh. Call {@link #part(String, int)} to start a {@link IntMeshPart}. */
     public void begin(final VertexAttributes attributes) {
         begin(attributes, 0);
     }

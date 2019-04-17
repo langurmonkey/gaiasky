@@ -230,13 +230,13 @@ public class LineQuadRenderSystem extends LineRenderSystem {
 
             // Indices
             if (i > 1) {
-                index((short) (currext.numVertices - 4));
-                index((short) (currext.numVertices - 2));
-                index((short) (currext.numVertices - 3));
+                index((currext.numVertices - 4));
+                index((currext.numVertices - 2));
+                index((currext.numVertices - 3));
 
-                index((short) (currext.numVertices - 2));
-                index((short) (currext.numVertices - 1));
-                index((short) (currext.numVertices - 3));
+                index((currext.numVertices - 2));
+                index((currext.numVertices - 1));
+                index((currext.numVertices - 3));
             }
         }
     }
@@ -289,17 +289,17 @@ public class LineQuadRenderSystem extends LineRenderSystem {
         vertex((float) point.x, (float) point.y, (float) point.z);
 
         // Add indexes
-        index((short) (currext.numVertices - 4));
-        index((short) (currext.numVertices - 2));
-        index((short) (currext.numVertices - 3));
+        index(currext.numVertices - 4);
+        index(currext.numVertices - 2);
+        index(currext.numVertices - 3);
 
-        index((short) (currext.numVertices - 2));
-        index((short) (currext.numVertices - 1));
-        index((short) (currext.numVertices - 3));
+        index(currext.numVertices - 2);
+        index(currext.numVertices - 1);
+        index(currext.numVertices - 3);
 
     }
 
-    private void index(short idx) {
+    private void index(int idx) {
         currext.indices[currext.indexIdx] = idx;
         currext.indexIdx++;
     }

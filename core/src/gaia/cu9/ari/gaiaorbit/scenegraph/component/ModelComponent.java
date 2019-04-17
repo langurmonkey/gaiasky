@@ -326,7 +326,7 @@ public class ModelComponent implements Disposable, IObserver {
             int n = instance.materials.size;
             for (int i = 0; i < n; i++) {
                 Material mat = instance.materials.get(i);
-                BlendingAttribute ba = null;
+                BlendingAttribute ba;
                 if (mat.has(BlendingAttribute.Type)) {
                     ba = (BlendingAttribute) mat.get(BlendingAttribute.Type);
                     ba.destFunction = dst;

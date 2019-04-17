@@ -134,10 +134,10 @@ public class IntMeshPart {
 		radius = halfExtents.len();
 	}
 
-	/** Compares this MeshPart to the specified MeshPart and returns true if they both reference the same {@link Mesh} and the
+	/** Compares this MeshPart to the specified MeshPart and returns true if they both reference the same {@link IntMesh} and the
 	 * {@link #offset}, {@link #size} and {@link #primitiveType} members are equal. The {@link #id} member is ignored.
-	 * @param other The other MeshPart to compare this MeshPart to.
-	 * @return True when this MeshPart equals the other MeshPart (ignoring the {@link #id} member), false otherwise. */
+	 * @param other The other IntMeshPart to compare this IntMeshPart to.
+	 * @return True when this IntMeshPart equals the other IntMeshPart (ignoring the {@link #id} member), false otherwise. */
 	public boolean equals (final IntMeshPart other) {
 		return other == this
 			|| (other != null && other.mesh == mesh && other.primitiveType == primitiveType && other.offset == offset && other.size == size);

@@ -22,8 +22,6 @@
 package gaia.cu9.ari.gaiaorbit.util.gdx.model;
 
 import com.badlogic.gdx.graphics.g3d.Material;
-import com.badlogic.gdx.graphics.g3d.ModelBatch;
-import com.badlogic.gdx.graphics.g3d.Shader;
 import com.badlogic.gdx.graphics.g3d.model.NodeKeyframe;
 import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Quaternion;
@@ -32,8 +30,10 @@ import com.badlogic.gdx.math.collision.BoundingBox;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.ArrayMap;
 import com.badlogic.gdx.utils.Pool;
+import gaia.cu9.ari.gaiaorbit.util.gdx.IntModelBatch;
 import gaia.cu9.ari.gaiaorbit.util.gdx.IntRenderable;
 import gaia.cu9.ari.gaiaorbit.util.gdx.IntRenderableProvider;
+import gaia.cu9.ari.gaiaorbit.util.gdx.shader.IntShader;
 
 /** An instance of a {@link IntModel}, allows to specify global transform and modify the materials, as it has a copy of the model's
  * materials. Multiple instances can be created from the same IntModel, all sharing the meshes and textures of the IntModel. The IntModel
@@ -58,7 +58,7 @@ public class IntModelInstance implements IntRenderableProvider {
 	public final IntModel model;
 	/** the world transform **/
 	public Matrix4 transform;
-	/** user definable value, which is passed to the {@link Shader}. */
+	/** user definable value, which is passed to the {@link IntShader}. */
 	public Object userData;
 
 	/** Constructs a new IntModelInstance with all nodes and materials of the given model.
@@ -328,7 +328,7 @@ public class IntModelInstance implements IntRenderableProvider {
 	}
 
 	/** Traverses the IntNode hierarchy and collects {@link IntRenderable} instances for every node with a graphical representation.
-	 * IntRenderables are obtained from the provided pool. The resulting array can be rendered via a {@link ModelBatch}.
+	 * IntRenderables are obtained from the provided pool. The resulting array can be rendered via a {@link IntModelBatch}.
 	 * 
 	 * @param renderables the output array
 	 * @param pool the pool to obtain IntRenderables from */
