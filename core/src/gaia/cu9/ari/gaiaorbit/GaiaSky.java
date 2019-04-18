@@ -52,6 +52,8 @@ import gaia.cu9.ari.gaiaorbit.util.Logger.Log;
 import gaia.cu9.ari.gaiaorbit.util.gaia.GaiaAttitudeServer;
 import gaia.cu9.ari.gaiaorbit.util.gdx.loader.G3dModelLoader;
 import gaia.cu9.ari.gaiaorbit.util.gdx.loader.ObjLoader;
+import gaia.cu9.ari.gaiaorbit.util.gdx.loader.is.GzipInputStreamProvider;
+import gaia.cu9.ari.gaiaorbit.util.gdx.loader.is.RegularInputStreamProvider;
 import gaia.cu9.ari.gaiaorbit.util.gdx.model.IntModel;
 import gaia.cu9.ari.gaiaorbit.util.gdx.shader.AtmosphereShaderProvider;
 import gaia.cu9.ari.gaiaorbit.util.gdx.shader.GroundShaderProvider;
@@ -243,7 +245,8 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
         manager.setLoader(AtmosphereShaderProvider.class, new AtmosphereShaderProviderLoader<>(internalResolver));
         manager.setLoader(GroundShaderProvider.class, new GroundShaderProviderLoader<>(internalResolver));
         manager.setLoader(RelativisticShaderProvider.class, new RelativisticShaderProviderLoader<>(internalResolver));
-        manager.setLoader(IntModel.class, ".obj", new ObjLoader(internalResolver));
+        manager.setLoader(IntModel.class, ".obj", new ObjLoader(new RegularInputStreamProvider(), internalResolver));
+        manager.setLoader(IntModel.class, ".obj.gz", new ObjLoader(new GzipInputStreamProvider(), internalResolver));
         manager.setLoader(IntModel.class, ".g3dj", new G3dModelLoader(new JsonReader(), internalResolver));
         manager.setLoader(IntModel.class, ".g3db", new G3dModelLoader(new UBJsonReader(), internalResolver));
         // Remove Model loaders

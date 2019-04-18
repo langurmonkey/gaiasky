@@ -40,6 +40,8 @@ import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.FloatArray;
 import com.badlogic.gdx.utils.IntArray;
+import gaia.cu9.ari.gaiaorbit.util.gdx.loader.is.InputStreamProvider;
+import gaia.cu9.ari.gaiaorbit.util.gdx.loader.is.RegularInputStreamProvider;
 import gaia.cu9.ari.gaiaorbit.util.gdx.model.IntModel;
 import gaia.cu9.ari.gaiaorbit.util.gdx.model.data.IntModelData;
 import gaia.cu9.ari.gaiaorbit.util.gdx.model.data.IntModelMesh;
@@ -106,12 +108,15 @@ public class ObjLoader extends IntModelLoader<ObjLoader.ObjLoaderParameters> {
     final FloatArray uvs = new FloatArray(200);
     final Array<Group> groups = new Array<>(10);
 
+    final InputStreamProvider isp;
+
     public ObjLoader() {
-        this(null);
+        this(new RegularInputStreamProvider(), null);
     }
 
-    public ObjLoader(FileHandleResolver resolver) {
+    public ObjLoader(InputStreamProvider isp, FileHandleResolver resolver) {
         super(resolver);
+        this.isp = isp;
     }
 
     /**
@@ -140,9 +145,9 @@ public class ObjLoader extends IntModelLoader<ObjLoader.ObjLoaderParameters> {
         Group activeGroup = new Group("default");
         groups.add(activeGroup);
 
-        BufferedReader reader = new BufferedReader(new InputStreamReader(file.read()), 4096);
         int id = 0;
         try {
+            BufferedReader reader = new BufferedReader(new InputStreamReader(isp.getInputStream(file)), 4096);
             while ((line = reader.readLine()) != null) {
 
                 tokens = line.split("\\s+");
