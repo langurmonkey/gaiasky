@@ -20,6 +20,9 @@ uniform int u_cubemap;
 uniform vec2 u_pointAlpha;
 uniform float u_thAnglePoint;
 
+// VARYINGS
+varying float v_depth;
+
 #ifdef relativisticEffects
     uniform vec3 u_velDir; // Velocity vector
     uniform float u_vc; // Fraction of the speed of light, v/c
@@ -48,6 +51,13 @@ varying vec4 v_col;
 #define len1 len0 * 100.0
 #define day_to_year 1.0 / 365.25
 
+
+#define z_near 1e9
+#define z_far 1e24
+#define z_onear 1.0 / z_near
+#define z_ofar 1.0 / z_far
+#define C 1.0
+
 void main() {
     vec3 pos = a_position - u_camPos;
     // Proper motion
@@ -55,7 +65,14 @@ void main() {
     
     // Distance to star
     float dist = length(pos);
-    
+
+    // Regular depth buffer
+    //v_depth = clamp((1.0 / dist - z_onear) / (z_ofar - z_onear), 0.0, 1.0);
+    //zp = z*(n+f)/(n-f) + 2fn/(n-f)
+    //v_depth = dist * (z_near + z_far)/(z_near - z_far) + (2.0 * z_near * z_far) / (z_near - z_far);
+    // Logarithmic depth buffer
+    v_depth = log(C * dist + 1.0) / log(C * z_far + 1.0);
+
     float sizefactor = 1.0;
     if(u_cubemap == 1) {
         // Cosine of angle between star position and camera direction

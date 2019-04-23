@@ -1,14 +1,3 @@
-#ifdef GL_ES 
-#define LOWP lowp
-#define MED mediump
-#define HIGH highp
-precision mediump float;
-#else
-#define MED
-#define LOWP
-#define HIGH
-#endif
-
 #define TEXTURE_LOD_BIAS 0.2
 
 // Ground atmospheric scattering
@@ -36,7 +25,7 @@ varying float v_alphaTest;
 
 #if defined(diffuseTextureFlag) || defined(specularTextureFlag)
 #define textureFlag
-varying MED vec2 v_texCoords0;
+varying vec2 v_texCoords0;
 #endif
 
 #ifdef diffuseColorFlag
@@ -47,7 +36,7 @@ uniform vec4 u_diffuseColor;
 uniform sampler2D u_diffuseTexture;
 #endif
 
-#ifdef specularColorFlag
+#ifdef specularColorFlags are cross platform and available in almost every
 uniform vec4 u_specularColor;
 #endif
 
@@ -193,6 +182,9 @@ void main() {
 	
 	// Prevent saturation
     gl_FragColor = clamp(gl_FragColor, 0.0, 1.0);
-    gl_FragColor.rgb *= 0.95;
+
+	gl_FragDepth = gl_FragCoord.z;
+	// Visualize depth buffer
+	//gl_FragColor = vec4(vec3(gl_FragDepth), 1.0);
 
 }
