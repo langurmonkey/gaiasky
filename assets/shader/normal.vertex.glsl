@@ -21,21 +21,6 @@ varying vec4 v_position;
 #define passPosition() passPositionValue(g_position)
 #define pushPosition() pushPositionValue(g_position)
 
-////////////////////////////////////////////////////////////////////////////////////
-////////// COLOR ATTRIBUTE - VERTEX
-///////////////////////////////////////////////////////////////////////////////////
-#ifdef colorFlag
-    attribute vec4 a_color;
-#endif //colorFlag
-
-varying vec4 v_color;
-#define pushColor(value) v_color = value
-
-#if defined(colorFlag)
-    vec4 g_color = a_color;
-#else
-    vec4 g_color = vec4(1.0, 1.0, 1.0, 1.0);
-#endif // colorFlag
 
 ////////////////////////////////////////////////////////////////////////////////////
 ////////// NORMAL ATTRIBUTE - VERTEX
@@ -335,6 +320,26 @@ varying float v_alphaTest;
     #define calculateTangentVectors() nop()
 #endif
 
+////////////////////////////////////////////////////////////////////////////////////
+////////// COLOR ATTRIBUTE - VERTEX
+///////////////////////////////////////////////////////////////////////////////////
+#ifdef colorFlag
+attribute vec4 a_color;
+#endif //colorFlag
+
+varying vec4 v_color;
+#define pushColor(value) v_color = value
+
+#if defined(colorFlag)
+vec4 g_color = a_color;
+#else
+#if defined(diffuseColorFlag)
+vec4 g_color = u_diffuseColor;
+#else
+vec4 g_color = vec4(1.0, 1.0, 1.0, 1.0);
+#endif
+#endif // colorFlag
+
 //////////////////////////////////////////////////////
 ////// AMBIENT LIGHT
 //////////////////////////////////////////////////////
@@ -396,6 +401,10 @@ varying vec3 v_viewDir;
 varying vec3 v_reflect;
 #endif
 
+varying float v_depth;
+#define C 1.0
+#define z_far 1e24
+
 void main() {
     calculateAtmosphereGroundColor();
     v_opacity = u_opacity;
@@ -418,6 +427,8 @@ void main() {
     #endif // gravitationalWaves
     
     gl_Position = u_projViewTrans * pos;
+
+    v_depth = log(C * length(pos) + 1.0) / log(C * z_far + 1.0);
 
     #ifdef shadowMapFlag
 	vec4 spos = u_shadowMapProjViewTrans * pos;

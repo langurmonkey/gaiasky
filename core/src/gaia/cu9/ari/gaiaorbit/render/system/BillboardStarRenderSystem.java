@@ -124,11 +124,14 @@ public class BillboardStarRenderSystem extends AbstractRenderSystem {
         if ((ctindex >= 0 ? alphas[ctindex] != 0 : true)) {
             renderables.sort(comp);
 
+
             // Calculate billobard rotation quaternion ONCE
             DecalUtils.setBillboardRotation(quaternion, camera.getCamera().direction, camera.getCamera().up);
 
             // Additive blending
-            Gdx.gl20.glBlendFunc(GL20.GL_ONE, GL20.GL_ONE);
+            Gdx.gl20.glEnable(GL20.GL_DEPTH_TEST);
+            Gdx.gl20.glDepthFunc(GL20.GL_LESS);
+            Gdx.gl20.glBlendFunc(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA);
 
             ShaderProgram shaderProgram = getShaderProgram();
 

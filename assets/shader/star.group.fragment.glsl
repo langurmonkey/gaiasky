@@ -1,14 +1,11 @@
 #version 120
 
-/**
- * UNIFORMS
- */
+// UNIFORMS
 uniform float u_ar;
 
-/**
- * VARYINGS
- */
+// VARYINGS
 varying vec4 v_col;
+varying float v_depth;
 
 float programmatic(vec2 uv) {
     float dist_center = 1.0 - clamp(distance(vec2(0.5, 0.5), uv) * 2.0, 0.0, 1.0);
@@ -21,4 +18,8 @@ void main() {
     uv.y = uv.y / u_ar;
     gl_FragColor = v_col * v_col.a * programmatic(uv);
     //gl_FragColor *= 0.95;
+
+    gl_FragDepth = v_depth;
+    // Visualize depth buffer
+    //gl_FragColor = vec4(vec3(gl_FragDepth), 1.0f);
 }
