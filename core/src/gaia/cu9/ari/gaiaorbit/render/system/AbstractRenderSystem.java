@@ -33,7 +33,7 @@ public abstract class AbstractRenderSystem implements IRenderSystem {
     public RenderingContext rc;
     protected Vector3 aux;
 
-    protected RenderSystemRunnable preRunnable, postRunnable;
+    protected Array<RenderSystemRunnable> preRunnables, postRunnables;
 
     protected AbstractRenderSystem(RenderGroup rg, float[] alphas, ShaderProgram[] programs) {
         super();
@@ -41,6 +41,8 @@ public abstract class AbstractRenderSystem implements IRenderSystem {
         this.alphas = alphas;
         this.programs = programs;
         this.aux = new Vector3();
+        this.preRunnables = new Array<>(3);
+        this.postRunnables = new Array<>(3);
     }
 
     @Override
@@ -48,41 +50,40 @@ public abstract class AbstractRenderSystem implements IRenderSystem {
         return group;
     }
 
-
     @Override
     public void render(Array<IRenderable> renderables, ICamera camera, double t, RenderingContext rc) {
         if (renderables != null && renderables.size != 0) {
             this.rc = rc;
-            run(preRunnable, renderables, camera);
+            run(preRunnables, renderables, camera);
             renderStud(renderables, camera, t);
-            run(postRunnable, renderables, camera);
+            run(postRunnables, renderables, camera);
         }
     }
 
     public abstract void renderStud(Array<IRenderable> renderables, ICamera camera, double t);
 
-    public void setPreRunnable(RenderSystemRunnable r) {
-        preRunnable = r;
+    public void addPreRunnables(RenderSystemRunnable... r) {
+        preRunnables.addAll(r);
     }
 
-    public void setPostRunnable(RenderSystemRunnable r) {
-        postRunnable = r;
+    public void addPostRunnables(RenderSystemRunnable... r) {
+        postRunnables.addAll(r);
     }
 
-    protected void run(RenderSystemRunnable runnable, Array<IRenderable> renderables, ICamera camera) {
-        if (runnable != null) {
-            runnable.run(this, renderables, camera);
+    protected void run(Array<RenderSystemRunnable> runnables, Array<IRenderable> renderables, ICamera camera) {
+        if (runnables != null) {
+            for (RenderSystemRunnable runnable : runnables)
+                runnable.run(this, renderables, camera);
         }
     }
 
     /**
      * Computes the alpha opacity value of a given renderable using its
      * component types
-     * 
-     * @param renderable
-     *            The renderable
+     *
+     * @param renderable The renderable
      * @return The alpha value as the product of all the alphas of its component
-     *         types.
+     * types.
      */
     public float getAlpha(IRenderable renderable) {
         return getAlpha(renderable.getComponentType());
@@ -96,7 +97,6 @@ public abstract class AbstractRenderSystem implements IRenderSystem {
         }
         return alpha;
     }
-
 
     @Override
     public void resize(int w, int h) {

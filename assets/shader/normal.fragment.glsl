@@ -245,6 +245,8 @@ uniform vec4 u_reflectionColor;
 
 #define PI 3.1415926535
 
+varying float v_depth;
+
 void main() {
     vec2 g_texCoord0 = v_texCoord0;
 
@@ -304,7 +306,9 @@ void main() {
     if(gl_FragColor.a == 0.0){
         discard;
     }
-    
+
+    // Logarithmic depth buffer
+    gl_FragDepth = v_depth;
 
 
     // Debug! - vectors

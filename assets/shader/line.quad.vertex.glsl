@@ -1,9 +1,6 @@
 #version 120
 
-#ifdef GL_ES
-precision mediump float;
-precision mediump int;
-#endif
+#include shader/lib_logdepthbuff.glsl
 
 attribute vec4 a_position;
 attribute vec4 a_color;
@@ -14,6 +11,8 @@ uniform vec2 u_viewport;
 
 varying vec4 v_col;
 varying vec2 v_uv;
+// Logarithmic depth buffer
+varying float v_depth;
 
 #ifdef relativisticEffects
     uniform vec3 u_velDir; // Velocity vector
@@ -44,6 +43,10 @@ void main() {
     #endif // gravitationalWaves
     
     gl_Position = u_projModelView * pos;
+
+    // Logarithmic depth buffer
+    v_depth = getDepthValue(length(pos.xyz));
+
     v_col = a_color;
     v_uv = a_uv;
 }

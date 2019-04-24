@@ -20,7 +20,10 @@ uniform int u_cubemap;
 uniform vec2 u_pointAlpha;
 uniform float u_thAnglePoint;
 
-// VARYINGS
+//////////////////////////////////////////////
+// LOGARITHMIC DEPTH BUFFER
+//////////////////////////////////////////////
+#include shader/lib_logdepthbuff.glsl
 varying float v_depth;
 
 #ifdef relativisticEffects
@@ -66,12 +69,8 @@ void main() {
     // Distance to star
     float dist = length(pos);
 
-    // Regular depth buffer
-    //v_depth = clamp((1.0 / dist - z_onear) / (z_ofar - z_onear), 0.0, 1.0);
-    //zp = z*(n+f)/(n-f) + 2fn/(n-f)
-    //v_depth = dist * (z_near + z_far)/(z_near - z_far) + (2.0 * z_near * z_far) / (z_near - z_far);
     // Logarithmic depth buffer
-    v_depth = log(C * dist + 1.0) / log(C * z_far + 1.0);
+    v_depth = getDepthValue(dist);
 
     float sizefactor = 1.0;
     if(u_cubemap == 1) {

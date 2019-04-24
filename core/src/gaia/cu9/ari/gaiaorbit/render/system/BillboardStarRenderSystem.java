@@ -5,9 +5,10 @@
 
 package gaia.cu9.ari.gaiaorbit.render.system;
 
-import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.graphics.*;
+import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.Texture.TextureFilter;
+import com.badlogic.gdx.graphics.VertexAttribute;
 import com.badlogic.gdx.graphics.VertexAttributes.Usage;
 import com.badlogic.gdx.graphics.glutils.ShaderProgram;
 import com.badlogic.gdx.math.Quaternion;
@@ -124,14 +125,8 @@ public class BillboardStarRenderSystem extends AbstractRenderSystem {
         if ((ctindex >= 0 ? alphas[ctindex] != 0 : true)) {
             renderables.sort(comp);
 
-
             // Calculate billobard rotation quaternion ONCE
             DecalUtils.setBillboardRotation(quaternion, camera.getCamera().direction, camera.getCamera().up);
-
-            // Additive blending
-            Gdx.gl20.glEnable(GL20.GL_DEPTH_TEST);
-            Gdx.gl20.glDepthFunc(GL20.GL_LESS);
-            Gdx.gl20.glBlendFunc(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA);
 
             ShaderProgram shaderProgram = getShaderProgram();
 
@@ -158,9 +153,6 @@ public class BillboardStarRenderSystem extends AbstractRenderSystem {
                 s.render(shaderProgram, getAlpha(s), mesh, camera);
             }
             shaderProgram.end();
-
-            // Restore
-            Gdx.gl.glBlendFunc(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA);
         }
 
     }

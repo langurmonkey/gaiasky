@@ -1,12 +1,8 @@
 #version 120
 
-#ifdef GL_ES
-precision mediump float;
-precision mediump int;
-#endif
-
 #include shader/lib_math.glsl
 #include shader/lib_geometry.glsl
+#include shader/lib_logdepthbuff.glsl
 
 // Attributes
 attribute vec4 a_position;
@@ -41,6 +37,8 @@ uniform float u_th_angle_point;
 // Varyings
 varying vec4 v_color;
 varying vec2 v_texCoords;
+// Logarithmic depth buffer
+varying float v_depth;
 
 void main()
 {
@@ -52,7 +50,10 @@ void main()
    mat4 transform = u_projTrans;
    
    vec3 pos = u_pos;
-   
+
+   // Logarithmic depth buffer
+   v_depth = getDepthValue(length(pos));
+
    #ifdef relativisticEffects
        pos = computeRelativisticAberration(pos, length(pos), u_velDir, u_vc);
    #endif // relativisticEffects

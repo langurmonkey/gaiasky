@@ -224,6 +224,14 @@ varying vec3 v_atmosphereColor;
     #include shader/lib_gravwaves.glsl
 #endif // gravitationalWaves
 
+
+//////////////////////////////////////////////
+// LOGARITHMIC DEPTH BUFFER
+//////////////////////////////////////////////
+#include shader/lib_logdepthbuff.glsl
+varying float v_depth;
+
+
 void main() {
 	v_atmosphereColor = calculateAtmosphereGroundColor();
 	v_time = u_shininess;
@@ -253,6 +261,9 @@ void main() {
 
 
 	gl_Position = u_projViewTrans * pos;
+
+	// Logarithmic depth buffer
+	v_depth = getDepthValue(length(pos.xyz));
 
 	#ifdef shadowMapFlag
 		vec4 spos = u_shadowMapProjViewTrans * pos;

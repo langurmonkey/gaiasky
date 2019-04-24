@@ -7,7 +7,6 @@ package gaia.cu9.ari.gaiaorbit.render.system;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.GL20;
-import com.badlogic.gdx.graphics.GL30;
 import com.badlogic.gdx.graphics.PerspectiveCamera;
 import com.badlogic.gdx.graphics.VertexAttribute;
 import com.badlogic.gdx.graphics.VertexAttributes.Usage;
@@ -144,13 +143,6 @@ public class StarGroupRenderSystem extends ImmediateRenderSystem implements IObs
                             int fovmode = camera.getMode().getGaiaFovMode();
 
                             ShaderProgram shaderProgram = getShaderProgram();
-
-
-                            Gdx.gl.glEnable(GL30.GL_DEPTH_TEST);
-                            Gdx.gl.glDepthFunc(GL20.GL_LESS);
-                            Gdx.gl.glEnable(GL30.GL_BLEND);
-                            Gdx.gl.glBlendFunc(GL30.GL_ONE, GL30.GL_ONE);
-                            Gdx.gl.glDepthMask(true);
 
                             shaderProgram.begin();
                             shaderProgram.setUniform2fv("u_pointAlpha", starGroup.isHighlighted() ? pointAlphaHl : pointAlpha, 0, 2);

@@ -175,9 +175,9 @@ public class ParticleEffectsRenderSystem extends ImmediateRenderSystem {
     @Override
     public void render(Array<IRenderable> renderables, ICamera camera, double t, RenderingContext rc) {
         this.rc = rc;
-        run(preRunnable, renderables, camera);
+        run(preRunnables, renderables, camera);
         renderStud(renderables, camera, t);
-        run(postRunnable, renderables, camera);
+        run(postRunnables, renderables, camera);
     }
 
     @Override

@@ -19,10 +19,12 @@ import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.FrameBuffer;
 import com.badlogic.gdx.graphics.glutils.ShaderProgram;
+import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.BufferUtils;
+import com.bitfire.postprocessing.filters.Glow;
 import com.bitfire.utils.ShaderLoader;
 import gaia.cu9.ari.gaiaorbit.GaiaSky;
 import gaia.cu9.ari.gaiaorbit.assets.AtmosphereShaderProviderLoader.AtmosphereShaderProviderParameter;
@@ -36,11 +38,8 @@ import gaia.cu9.ari.gaiaorbit.render.IPostProcessor.PostProcessBean;
 import gaia.cu9.ari.gaiaorbit.render.system.*;
 import gaia.cu9.ari.gaiaorbit.render.system.AbstractRenderSystem.RenderSystemRunnable;
 import gaia.cu9.ari.gaiaorbit.render.system.ModelBatchRenderSystem.ModelRenderType;
-import gaia.cu9.ari.gaiaorbit.scenegraph.AbstractPositionEntity;
-import gaia.cu9.ari.gaiaorbit.scenegraph.MilkyWay;
-import gaia.cu9.ari.gaiaorbit.scenegraph.ModelBody;
+import gaia.cu9.ari.gaiaorbit.scenegraph.*;
 import gaia.cu9.ari.gaiaorbit.scenegraph.SceneGraphNode.RenderGroup;
-import gaia.cu9.ari.gaiaorbit.scenegraph.Star;
 import gaia.cu9.ari.gaiaorbit.scenegraph.camera.CameraManager.CameraMode;
 import gaia.cu9.ari.gaiaorbit.scenegraph.camera.ICamera;
 import gaia.cu9.ari.gaiaorbit.util.GlobalConf;
@@ -54,6 +53,7 @@ import gaia.cu9.ari.gaiaorbit.util.gdx.shader.GroundShaderProvider;
 import gaia.cu9.ari.gaiaorbit.util.gdx.shader.RelativisticShaderProvider;
 import gaia.cu9.ari.gaiaorbit.util.gdx.shader.ShaderProgramProvider.ShaderProgramParameter;
 import gaia.cu9.ari.gaiaorbit.util.gdx.shader.provider.IntShaderProvider;
+import gaia.cu9.ari.gaiaorbit.util.gravwaves.RelativisticEffectsManager;
 import gaia.cu9.ari.gaiaorbit.util.math.MathUtilsd;
 import gaia.cu9.ari.gaiaorbit.util.math.Vector3d;
 
@@ -94,7 +94,7 @@ public class SceneGraphRenderer extends AbstractRenderer implements IProcessRend
 
     private Array<IRenderSystem> renderProcesses;
 
-    private RenderSystemRunnable blendNoDepthRunnable, blendDepthRunnable, additiveBlendDepthRunnable, restoreRegularBlend;
+    private RenderSystemRunnable depthTestR, additiveBlendR, noBlendR, noDepthTestR, regularBlendR;
 
     /** The particular current scene graph renderer **/
     private ISGR sgr;
@@ -200,23 +200,25 @@ public class SceneGraphRenderer extends AbstractRenderer implements IProcessRend
 
         renderProcesses = new Array<>();
 
-        blendNoDepthRunnable = (renderSystem, renderables, camera) -> {
-            Gdx.gl.glEnable(GL20.GL_BLEND);
+        noDepthTestR = (renderSystem, renderables, camera) -> {
             Gdx.gl.glDisable(GL20.GL_DEPTH_TEST);
             Gdx.gl.glDepthMask(false);
         };
-        blendDepthRunnable = (renderSystem, renderables, camera) -> {
-            Gdx.gl.glEnable(GL20.GL_BLEND);
+        depthTestR = (renderSystem, renderables, camera) -> {
             Gdx.gl.glEnable(GL20.GL_DEPTH_TEST);
             Gdx.gl.glDepthMask(true);
         };
-        additiveBlendDepthRunnable = (renderSystem, renderables, camera) -> {
+        additiveBlendR = (renderSystem, renderables, camera) -> {
             Gdx.gl.glEnable(GL20.GL_BLEND);
-            Gdx.gl.glEnable(GL20.GL_DEPTH_TEST);
             Gdx.gl.glBlendFunc(GL20.GL_ONE, GL20.GL_ONE);
-            Gdx.gl.glDepthMask(true);
         };
-        restoreRegularBlend = (renderSystem, renderables, camera) -> Gdx.gl.glBlendFunc(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA);
+        regularBlendR = (renderSystem, renderables, camera) -> {
+            Gdx.gl.glEnable(GL20.GL_BLEND);
+            Gdx.gl.glBlendFunc(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA);
+        };
+        noBlendR = (renderSystem, renderables, camera) -> {
+            Gdx.gl.glDisable(GL20.GL_BLEND);
+        };
 
         if (GlobalConf.scene.SHADOW_MAPPING) {
             // Shadow map camera
@@ -242,7 +244,7 @@ public class SceneGraphRenderer extends AbstractRenderer implements IProcessRend
         for (int i = 0; i < n; i++) {
             shaders[i] = manager.get(descriptors[i]);
             if (!shaders[i].isCompiled()) {
-                logger.error(new RuntimeException(), names[i] + " shader compilation failed:\n" + shaders[i].getLog());
+                logger.error(names[i] + " shader compilation failed:\n" + shaders[i].getLog());
             }
         }
         return shaders;
@@ -340,7 +342,7 @@ public class SceneGraphRenderer extends AbstractRenderer implements IProcessRend
         RenderGroup[] renderGroups = RenderGroup.values();
         render_lists = new Array<>(renderGroups.length);
         for (int i = 0; i < renderGroups.length; i++) {
-            render_lists.add(new Array<>(40000));
+            render_lists.add(new Array<>(100));
         }
 
         IntShaderProvider sp = manager.get("atmgrounddefault");
@@ -419,20 +421,231 @@ public class SceneGraphRenderer extends AbstractRenderer implements IProcessRend
          *
          */
 
+        // POINTS
+        AbstractRenderSystem pixelStarProc = new StarPointRenderSystem(RenderGroup.POINT_STAR, alphas, starPointShaders, ComponentType.Stars);
+        pixelStarProc.addPreRunnables(regularBlendR, noDepthTestR);
+
+        // MODEL FRONT-BACK - NO CULL FACE
+        AbstractRenderSystem modelFrontBackProc = new ModelBatchRenderSystem(RenderGroup.MODEL_DEFAULT, alphas, modelBatchDefault, ModelRenderType.NORMAL);
+        modelFrontBackProc.addPreRunnables(regularBlendR, depthTestR);
+        modelFrontBackProc.addPostRunnables((renderSystem, renderables, camera) -> {
+            // This always goes at the back, clear depth buffer
+            Gdx.gl.glClear(GL20.GL_DEPTH_BUFFER_BIT);
+        });
+
+        // MODEL GRID
+        AbstractRenderSystem modelGridsProc = new ModelBatchRenderSystem(RenderGroup.MODEL_GRIDS, alphas, modelBatchGrids, ModelRenderType.NORMAL);
+        modelGridsProc.addPreRunnables(regularBlendR, depthTestR);
+        modelGridsProc.addPostRunnables((renderSystem, renderables, camera) -> {
+            // This always goes at the back, clear depth buffer
+            Gdx.gl.glClear(GL20.GL_DEPTH_BUFFER_BIT);
+        });
+
+        // VOLUMETRIC CLOUDS
+        //        AbstractRenderSystem cloudsProc = new VolumeCloudsRenderSystem(alphas);
+        //        cloudsProc.addPreRunnables(blendNoDepthRunnable);
+
+        // ANNOTATIONS
+        AbstractRenderSystem annotationsProc = new FontRenderSystem(RenderGroup.FONT_ANNOTATION, alphas, spriteBatch, null);
+        annotationsProc.addPreRunnables(regularBlendR, noDepthTestR);
+        annotationsProc.addPostRunnables((renderSystem, renderables, camera) -> {
+            // This always goes at the back, clear depth buffer
+            Gdx.gl.glClear(GL20.GL_DEPTH_BUFFER_BIT);
+        });
+
+        // BILLBOARD STARS
+        billboardStarsProc = new BillboardStarRenderSystem(RenderGroup.BILLBOARD_STAR, alphas, starBillboardShaders, "data/tex/base/star_glow_s.png", ComponentType.Stars.ordinal());
+        billboardStarsProc.addPreRunnables(additiveBlendR, noDepthTestR);
+        billboardStarsProc.addPostRunnables(new RenderSystemRunnable() {
+
+            private float[] positions = new float[Glow.N * 2];
+            private float[] viewAngles = new float[Glow.N];
+            private float[] colors = new float[Glow.N * 3];
+            private Vector3 auxv = new Vector3();
+            private Vector3d auxd = new Vector3d();
+
+            @Override
+            public void run(AbstractRenderSystem renderSystem, Array<IRenderable> renderables, ICamera camera) {
+                int size = renderables.size;
+                if (PostProcessorFactory.instance.getPostProcessor().isLightScatterEnabled() && Particle.renderOn) {
+                    // Compute light positions for light scattering or light
+                    // glow
+                    int lightIndex = 0;
+                    float angleEdgeDeg = camera.getAngleEdge() * MathUtils.radDeg;
+                    for (int i = size - 1; i >= 0; i--) {
+                        IRenderable s = renderables.get(i);
+                        if (s instanceof Particle) {
+                            Particle p = (Particle) s;
+                            if (lightIndex < Glow.N && (GlobalConf.program.CUBEMAP360_MODE || GaiaSky.instance.cam.getDirection().angle(p.translation) < angleEdgeDeg)) {
+                                Vector3d pos3d = p.translation.put(auxd);
+
+                                // Aberration
+                                GlobalResources.applyRelativisticAberration(pos3d, camera);
+                                // GravWaves
+                                RelativisticEffectsManager.getInstance().gravitationalWavePos(pos3d);
+                                Vector3 pos3 = pos3d.put(auxv);
+
+                                camera.getCamera().project(pos3);
+                                // Here we **need** to use
+                                // Gdx.graphics.getWidth/Height() because we use
+                                // camera.project() which uses screen
+                                // coordinates only
+                                positions[lightIndex * 2] = auxv.x / Gdx.graphics.getWidth();
+                                positions[lightIndex * 2 + 1] = auxv.y / Gdx.graphics.getHeight();
+                                viewAngles[lightIndex] = (float) p.viewAngleApparent;
+                                colors[lightIndex * 3] = p.cc[0];
+                                colors[lightIndex * 3 + 1] = p.cc[1];
+                                colors[lightIndex * 3 + 2] = p.cc[2];
+                                lightIndex++;
+                            }
+                        }
+                    }
+                    EventManager.instance.post(Events.LIGHT_POS_2D_UPDATED, lightIndex, positions, viewAngles, colors, glowTex);
+                } else {
+                    EventManager.instance.post(Events.LIGHT_POS_2D_UPDATED, 0, positions, viewAngles, colors, glowTex);
+                }
+            }
+
+        });
+
+        // BILLBOARD GALAXIES
+        AbstractRenderSystem billboardGalaxiesProc = new BillboardStarRenderSystem(RenderGroup.BILLBOARD_GAL, alphas, galShaders, "data/tex/base/static.jpg", ComponentType.Galaxies.ordinal());
+        billboardGalaxiesProc.addPreRunnables(regularBlendR, noDepthTestR);
+
+        // BILLBOARD SPRITES
+        AbstractRenderSystem billboardSpritesProc = new BillboardSpriteRenderSystem(RenderGroup.BILLBOARD_SPRITE, alphas, spriteShaders, ComponentType.Clusters.ordinal());
+        billboardSpritesProc.addPreRunnables(regularBlendR, noDepthTestR);
+
+        // LINES CPU
+        AbstractRenderSystem lineProc = getLineRenderSystem();
+
+        // LINES GPU
+        AbstractRenderSystem lineGpuProc = new VertGPURenderSystem(RenderGroup.LINE_GPU, alphas, lineGpuShaders, GL20.GL_LINE_STRIP);
+        lineGpuProc.addPreRunnables(regularBlendR, depthTestR);
+
+        // POINTS CPU
+        AbstractRenderSystem pointProc = new PointRenderSystem(RenderGroup.POINT, alphas, pointShaders);
+
+        // POINTS GPU
+        AbstractRenderSystem pointGpuProc = new VertGPURenderSystem(RenderGroup.POINT_GPU, alphas, lineGpuShaders, GL20.GL_POINTS);
+        pointGpuProc.addPreRunnables(regularBlendR, depthTestR);
 
         // MODEL MESH
         AbstractRenderSystem modelMeshProc = new ModelBatchRenderSystem(RenderGroup.MODEL_MESH, alphas, modelBatchDust, ModelRenderType.NORMAL, false);
-        //modelMeshProc.setPreRunnable(blendDepthRunnable);
+        //modelMeshProc.addPreRunnables(blendDepthRunnable);
 
+        // MODEL FRONT
+        AbstractRenderSystem modelFrontProc = new ModelBatchRenderSystem(RenderGroup.MODEL_NORMAL, alphas, modelBatchNormal, ModelRenderType.NORMAL);
+        modelFrontProc.addPreRunnables(regularBlendR, depthTestR);
+
+        // MODEL BEAM
+        AbstractRenderSystem modelBeamProc = new ModelBatchRenderSystem(RenderGroup.MODEL_BEAM, alphas, modelBatchBeam, ModelRenderType.NORMAL, false);
+        modelBeamProc.addPreRunnables(regularBlendR, depthTestR);
+
+        // GALAXY
+        //mwrs = new MWModelRenderSystem(RenderGroup.GALAXY, alphas, MWModelRenderSystem.oit ? mwOitShaders : mwPointShaders);
+        //AbstractRenderSystem galaxyProc = mwrs;
+        AbstractRenderSystem galaxyProc = new MilkyWayRenderSystem(RenderGroup.GALAXY, alphas, modelBatchDefault, mwPointShaders, mwNebulaShaders);
+        galaxyProc.addPreRunnables(regularBlendR, noDepthTestR);
+
+        // PARTICLE EFFECTS
+        AbstractRenderSystem particleEffectsProc = new ParticleEffectsRenderSystem(null, alphas, particleEffectShaders);
+        particleEffectsProc.addPreRunnables(regularBlendR, noDepthTestR);
+
+        // PARTICLE GROUP
+        AbstractRenderSystem particleGroupProc = new ParticleGroupRenderSystem(RenderGroup.PARTICLE_GROUP, alphas, particleGroupShaders);
+        particleGroupProc.addPreRunnables(regularBlendR, noDepthTestR);
 
         // STAR GROUP
         AbstractRenderSystem starGroupProc = new StarGroupRenderSystem(RenderGroup.STAR_GROUP, alphas, starGroupShaders);
-        //starGroupProc.setPreRunnable(additiveBlendDepthRunnable);
-        //starGroupProc.setPostRunnable(restoreRegularBlend);
+        starGroupProc.addPreRunnables(additiveBlendR, depthTestR);
 
+        // ORBITAL ELEMENTS PARTICLES
+        AbstractRenderSystem orbitElemProc = new OrbitalElementsParticlesRenderSystem(RenderGroup.PARTICLE_ORBIT_ELEMENTS, alphas, orbitElemShaders);
+        orbitElemProc.addPreRunnables(regularBlendR, noDepthTestR);
 
+        // MODEL STARS
+        AbstractRenderSystem modelStarsProc = new ModelBatchRenderSystem(RenderGroup.MODEL_STAR, alphas, modelBatchStar, ModelRenderType.NORMAL);
+        modelStarsProc.addPreRunnables(regularBlendR, depthTestR);
+
+        // LABELS
+        AbstractRenderSystem labelsProc = new FontRenderSystem(RenderGroup.FONT_LABEL, alphas, fontBatch, distanceFieldFontShader, font3d, font2d, fontTitles);
+        labelsProc.addPreRunnables(regularBlendR, noDepthTestR);
+
+        // BILLBOARD SSO
+        AbstractRenderSystem billboardSSOProc = new BillboardStarRenderSystem(RenderGroup.BILLBOARD_SSO, alphas, starBillboardShaders, "data/tex/base/sso.png", -1);
+        billboardSSOProc.addPreRunnables(additiveBlendR, depthTestR);
+
+        // MODEL ATMOSPHERE
+        AbstractRenderSystem modelAtmProc = new ModelBatchRenderSystem(RenderGroup.MODEL_ATM, alphas, modelBatchAtmosphere, ModelRenderType.ATMOSPHERE) {
+            @Override
+            public float getAlpha(IRenderable s) {
+                return alphas[ComponentType.Atmospheres.ordinal()] * (float) Math.pow(alphas[s.getComponentType().getFirstOrdinal()], 2);
+            }
+
+            @Override
+            protected boolean mustRender() {
+                return alphas[ComponentType.Atmospheres.ordinal()] * alphas[ComponentType.Planets.ordinal()] > 0;
+            }
+        };
+        modelAtmProc.addPreRunnables(regularBlendR, depthTestR);
+        modelAtmProc.addPostRunnables((renderSystem, renderables, camera) -> {
+            // Clear depth buffer before rendering things up close
+            //Gdx.gl.glClear(GL20.GL_DEPTH_BUFFER_BIT);
+        });
+
+        // MODEL CLOUDS
+        AbstractRenderSystem modelCloudProc = new ModelBatchRenderSystem(RenderGroup.MODEL_CLOUD, alphas, modelBatchCloud, ModelRenderType.CLOUD);
+
+        // SHAPES
+        AbstractRenderSystem shapeProc = new ShapeRenderSystem(RenderGroup.SHAPE, alphas);
+        shapeProc.addPreRunnables(regularBlendR, depthTestR);
+
+        // MODEL CLOSE UP
+        //        AbstractRenderSystem modelCloseUpProc = new ModelBatchRenderSystem(RenderGroup.MODEL_CLOSEUP,  alphas, modelBatchCloseUp, false);
+        //        modelCloseUpProc.addPreRunnables(blendDepthRunnable);
+
+        // Add components to set
+        renderProcesses.add(modelFrontBackProc);
+        renderProcesses.add(modelGridsProc);
+        renderProcesses.add(pixelStarProc);
+        renderProcesses.add(orbitElemProc);
+        renderProcesses.add(annotationsProc);
+
+        // Billboards for galaxies and stars
+        renderProcesses.add(billboardGalaxiesProc);
+        renderProcesses.add(galaxyProc);
+        renderProcesses.add(billboardStarsProc);
+
+        // Billboard for sprites
+        renderProcesses.add(billboardSpritesProc);
+
+        // Models
+        renderProcesses.add(modelFrontProc);
+        renderProcesses.add(modelBeamProc);
         renderProcesses.add(modelMeshProc);
+
+        // Stars, particles
+        renderProcesses.add(particleGroupProc);
         renderProcesses.add(starGroupProc);
+
+        // Labels
+        renderProcesses.add(labelsProc);
+
+        // Primitives
+        renderProcesses.add(lineProc);
+        renderProcesses.add(lineGpuProc);
+        renderProcesses.add(pointProc);
+        renderProcesses.add(pointGpuProc);
+
+        // Billboards SSO
+        renderProcesses.add(billboardSSOProc);
+
+        renderProcesses.add(modelStarsProc);
+        renderProcesses.add(modelAtmProc);
+        renderProcesses.add(modelCloudProc);
+        renderProcesses.add(shapeProc);
+        renderProcesses.add(particleEffectsProc);
 
         EventManager.instance.subscribe(this, Events.TOGGLE_VISIBILITY_CMD, Events.PIXEL_RENDERER_UPDATE, Events.LINE_RENDERER_UPDATE, Events.STEREOSCOPIC_CMD, Events.CAMERA_MODE_CMD, Events.CUBEMAP360_CMD, Events.REBUILD_SHADOW_MAP_DATA_CMD, Events.LIGHT_SCATTERING_CMD);
 
@@ -912,7 +1125,6 @@ public class SceneGraphRenderer extends AbstractRenderer implements IProcessRend
         if ((current instanceof LineQuadRenderSystem && GlobalConf.scene.isNormalLineRenderer()) || (!(current instanceof LineQuadRenderSystem) && !GlobalConf.scene.isNormalLineRenderer())) {
             renderProcesses.removeIndex(idx);
             AbstractRenderSystem lineSys = getLineRenderSystem();
-            lineSys.setPreRunnable(blendDepthRunnable);
             renderProcesses.insert(idx, lineSys);
             current.dispose();
         }
@@ -923,11 +1135,11 @@ public class SceneGraphRenderer extends AbstractRenderer implements IProcessRend
         if (GlobalConf.scene.isNormalLineRenderer()) {
             // Normal
             sys = new LineRenderSystem(RenderGroup.LINE, alphas, lineShaders);
-            sys.setPreRunnable(blendDepthRunnable);
+            sys.addPreRunnables(additiveBlendR, depthTestR);
         } else {
             // Quad
             sys = new LineQuadRenderSystem(RenderGroup.LINE, alphas, lineQuadShaders);
-            sys.setPreRunnable(blendDepthRunnable);
+            sys.addPreRunnables(additiveBlendR, depthTestR);
         }
         return sys;
     }

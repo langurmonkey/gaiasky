@@ -70,7 +70,7 @@ public class VolumeCloudsRenderSystem extends AbstractRenderSystem {
     @Override
     public void render(Array<IRenderable> renderables, ICamera camera, double t, RenderingContext rc) {
         this.rc = rc;
-        run(preRunnable, renderables, camera);
+        run(preRunnables, renderables, camera);
 
         shaderProgram.begin();
         staticTex.bind(0);
@@ -96,7 +96,7 @@ public class VolumeCloudsRenderSystem extends AbstractRenderSystem {
         quad.render(shaderProgram);
         shaderProgram.end();
 
-        run(postRunnable, renderables, camera);
+        run(postRunnables, renderables, camera);
     }
 
     public void renderStud(Array<IRenderable> renderables, ICamera camera, double t) {
