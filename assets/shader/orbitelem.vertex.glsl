@@ -1,10 +1,5 @@
 #version 120
 
-#ifdef GL_ES
-precision mediump float;
-precision mediump int;
-#endif
-
 #include shader/lib_geometry.glsl
 
 attribute vec4 a_orbitelems01;

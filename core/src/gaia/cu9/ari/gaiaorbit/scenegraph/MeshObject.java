@@ -148,7 +148,6 @@ public class MeshObject extends FadeNode implements IModelRenderable, I3DTextRen
         if (mc != null) {
             mc.touch(localTransform);
             if (mc.instance != null) {
-                Gdx.gl.glEnable(GL20.GL_DEPTH_TEST);
                 mc.setTransparency(alpha * opacity, GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA);
                 mc.updateRelativisticEffects(GaiaSky.instance.getICamera());
                 modelBatch.render(mc.instance, mc.env);

@@ -539,7 +539,7 @@ public class StarGroup extends ParticleGroup implements ILineRenderable, IStarFo
     }
 
     /**
-     * Quad rendering
+     * Billboard rendering
      */
     @Override
     public void render(ShaderProgram shader, float alpha, IntMesh mesh, ICamera camera) {

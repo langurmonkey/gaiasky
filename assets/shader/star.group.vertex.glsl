@@ -54,13 +54,6 @@ varying vec4 v_col;
 #define len1 len0 * 100.0
 #define day_to_year 1.0 / 365.25
 
-
-#define z_near 1e9
-#define z_far 1e24
-#define z_onear 1.0 / z_near
-#define z_ofar 1.0 / z_far
-#define C 1.0
-
 void main() {
     vec3 pos = a_position - u_camPos;
     // Proper motion

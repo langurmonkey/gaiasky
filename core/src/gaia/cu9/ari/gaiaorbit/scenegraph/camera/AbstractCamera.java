@@ -27,7 +27,7 @@ public abstract class AbstractCamera implements ICamera {
     /** Camera far value **/
     public static final double CAM_FAR = 1e24;
     /** Camera near values **/
-    public static final double CAM_NEAR = 1e9 * Constants.KM_TO_U;
+    public static final double CAM_NEAR = 1 * Constants.M_TO_U;
 
     private static Matrix4d invProjectionView = new Matrix4d();
 

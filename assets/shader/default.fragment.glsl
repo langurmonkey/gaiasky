@@ -1,14 +1,3 @@
-#ifdef GL_ES 
-#define LOWP lowp
-#define MED mediump
-#define HIGH highp
-precision mediump float;
-#else
-#define MED
-#define LOWP
-#define HIGH
-#endif
-
 #define TEXTURE_LOD_BIAS 0.2
 
 // Ground atmospheric scattering

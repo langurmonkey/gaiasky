@@ -229,6 +229,8 @@ varying vec3 v_ambientLight;
 varying vec3 v_lightDir;
 varying vec3 v_lightCol;
 varying vec3 v_viewDir;
+varying float v_depth;
+
 #ifdef environmentCubemapFlag
 varying vec3 v_reflect;
 #endif
@@ -245,7 +247,6 @@ uniform vec4 u_reflectionColor;
 
 #define PI 3.1415926535
 
-varying float v_depth;
 
 void main() {
     vec2 g_texCoord0 = v_texCoord0;

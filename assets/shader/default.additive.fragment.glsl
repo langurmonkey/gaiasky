@@ -96,6 +96,8 @@ uniform vec4 u_fogColor;
 varying float v_fog;
 #endif // fogFlag
 
+varying float v_depth;
+
 
 void main() {
 
@@ -183,7 +185,7 @@ void main() {
 	// Prevent saturation
     gl_FragColor = clamp(gl_FragColor, 0.0, 1.0);
 
-	gl_FragDepth = gl_FragCoord.z;
+	gl_FragDepth = v_depth;
 	// Visualize depth buffer
 	//gl_FragColor = vec4(vec3(gl_FragDepth), 1.0);
 

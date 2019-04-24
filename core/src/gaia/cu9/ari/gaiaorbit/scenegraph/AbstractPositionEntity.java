@@ -429,6 +429,8 @@ public abstract class AbstractPositionEntity extends SceneGraphNode {
             rot = GlobalResources.angle2d(v1, v2) + (rc.cubemapSide == CubemapSide.SIDE_UP ? 90 : -90);
         }
 
+        shader.setUniformf("u_pos", pos.put(aux3f1.get()));
+
         DecalUtils.drawFont3D(font, batch, label, (float) pos.x, (float) pos.y, (float) pos.z, size, rot, camera.getCamera(), true);
     }
 

@@ -135,8 +135,11 @@ varying vec3 v_ambientLight;
     uniform mat3 u_gwmat3; // Rotation matrix so that u_gw = u_gw_mat * (0 0 1)^T
     uniform float u_ts; // Time in seconds since start
     uniform float u_omgw; // Wave frequency
-    #include shader/lib_gravwaves.glsl>
+    #include shader/lib_gravwaves.glsl
 #endif // gravitationalWaves
+
+#include shader/lib_logdepthbuff.glsl
+varying float v_depth;
 
 void main() {
 	v_time = u_shininess;
@@ -166,6 +169,9 @@ void main() {
     #endif // gravitationalWaves
 
 	gl_Position = u_projViewTrans * pos;
+
+	// Logarithmic depth buffer
+	v_depth = getDepthValue(length(pos.xyz));
 
 	#ifdef shadowMapFlag
 		vec4 spos = u_shadowMapProjViewTrans * pos;
