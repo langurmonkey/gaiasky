@@ -32,11 +32,11 @@ import gaia.cu9.ari.gaiaorbit.util.math.Vector3d;
 public class LineQuadRenderSystem extends LineRenderSystem {
     protected static final int INI_DPOOL_SIZE = 1000;
     protected static final int MAX_DPOOL_SIZE = 10000;
-    private MeshDataExt currext;
+    private MeshDataExt currExt;
     private Array<double[]> provisionalLines;
     private Array<Line> provLines;
     private LineArraySorter sorter;
-    private Pool<double[]> dpool;
+    private Pool<double[]> doublePool;
 
     private class MeshDataExt extends MeshData {
         int uvOffset;
@@ -63,7 +63,7 @@ public class LineQuadRenderSystem extends LineRenderSystem {
 
     public LineQuadRenderSystem(RenderGroup rg, float[] alphas, ShaderProgram[] shaders) {
         super(rg, alphas, shaders);
-        dpool = new DPool(INI_DPOOL_SIZE, MAX_DPOOL_SIZE, 14);
+        doublePool = new DPool(INI_DPOOL_SIZE, MAX_DPOOL_SIZE, 14);
         provisionalLines = new Array<>();
         provLines = new Array<>();
         sorter = new LineArraySorter(12);
@@ -88,25 +88,25 @@ public class LineQuadRenderSystem extends LineRenderSystem {
         if(meshes.get(index) == null) {
             if (index > 0)
                 logger.info("Capacity too small, creating new meshdata: " + curr.capacity);
-            currext = new MeshDataExt();
-            meshes.set(index, currext);
-            curr = currext;
+            currExt = new MeshDataExt();
+            meshes.set(index, currExt);
+            curr = currExt;
 
             curr.capacity = 10000;
-            currext.maxIndices = curr.capacity + curr.capacity / 2;
+            currExt.maxIndices = curr.capacity + curr.capacity / 2;
 
             VertexAttribute[] attribs = buildVertexAttributes();
-            currext.mesh = new IntMesh(false, curr.capacity, currext.maxIndices, attribs);
+            currExt.mesh = new IntMesh(false, curr.capacity, currExt.maxIndices, attribs);
 
-            currext.indices = new int[currext.maxIndices];
-            currext.vertexSize = currext.mesh.getVertexAttributes().vertexSize / 4;
-            currext.vertices = new float[curr.capacity * currext.vertexSize];
+            currExt.indices = new int[currExt.maxIndices];
+            currExt.vertexSize = currExt.mesh.getVertexAttributes().vertexSize / 4;
+            currExt.vertices = new float[curr.capacity * currExt.vertexSize];
 
-            currext.colorOffset = currext.mesh.getVertexAttribute(Usage.ColorPacked) != null ? currext.mesh.getVertexAttribute(Usage.ColorPacked).offset / 4 : 0;
-            currext.uvOffset = currext.mesh.getVertexAttribute(Usage.TextureCoordinates) != null ? currext.mesh.getVertexAttribute(Usage.TextureCoordinates).offset / 4 : 0;
+            currExt.colorOffset = currExt.mesh.getVertexAttribute(Usage.ColorPacked) != null ? currExt.mesh.getVertexAttribute(Usage.ColorPacked).offset / 4 : 0;
+            currExt.uvOffset = currExt.mesh.getVertexAttribute(Usage.TextureCoordinates) != null ? currExt.mesh.getVertexAttribute(Usage.TextureCoordinates).offset / 4 : 0;
         } else {
-            currext = (MeshDataExt) meshes.get(index);
-            curr = currext;
+            currExt = (MeshDataExt) meshes.get(index);
+            curr = currExt;
         }
     }
 
@@ -123,8 +123,8 @@ public class LineQuadRenderSystem extends LineRenderSystem {
     }
 
     public void uv(float u, float v) {
-        currext.vertices[currext.vertexIdx + currext.uvOffset] = u;
-        currext.vertices[currext.vertexIdx + currext.uvOffset + 1] = v;
+        currExt.vertices[currExt.vertexIdx + currExt.uvOffset] = u;
+        currExt.vertices[currExt.vertexIdx + currExt.uvOffset + 1] = v;
     }
 
     private boolean two = false;
@@ -175,7 +175,7 @@ public class LineQuadRenderSystem extends LineRenderSystem {
         } else {
             // Add line to list
             // x0 y0 z0 x1 y1 z1 r g b a dist0 dist1 distMean
-            double[] l = dpool.obtain();
+            double[] l = doublePool.obtain();
             l[0] = x0;
             l[1] = y0;
             l[2] = z0;
@@ -197,7 +197,7 @@ public class LineQuadRenderSystem extends LineRenderSystem {
     public void addLinePostproc(Line l) {
         int npoints = l.points.length;
         // Check if npoints more indices fit
-        if (currext.numVertices + npoints * 2 - 2 > curr.capacity) {
+        if (currExt.numVertices + npoints * 2 - 2 > curr.capacity) {
             initVertices(meshIdx++);
         }
 
@@ -230,13 +230,13 @@ public class LineQuadRenderSystem extends LineRenderSystem {
 
             // Indices
             if (i > 1) {
-                index((currext.numVertices - 4));
-                index((currext.numVertices - 2));
-                index((currext.numVertices - 3));
+                index((currExt.numVertices - 4));
+                index((currExt.numVertices - 2));
+                index((currExt.numVertices - 3));
 
-                index((currext.numVertices - 2));
-                index((currext.numVertices - 1));
-                index((currext.numVertices - 3));
+                index((currExt.numVertices - 2));
+                index((currExt.numVertices - 1));
+                index((currExt.numVertices - 3));
             }
         }
     }
@@ -244,7 +244,7 @@ public class LineQuadRenderSystem extends LineRenderSystem {
     public void addLinePostproc(double x0, double y0, double z0, double x1, double y1, double z1, double r, double g, double b, double a, double dist0, double dist1, double widthTan) {
 
         // Check if 4 more indices fit
-        if (currext.numVertices + 4 >= curr.capacity) {
+        if (currExt.numVertices + 4 >= curr.capacity) {
             // We need to open a new MeshDataExt!
             initVertices(meshIdx++);
         }
@@ -289,19 +289,19 @@ public class LineQuadRenderSystem extends LineRenderSystem {
         vertex((float) point.x, (float) point.y, (float) point.z);
 
         // Add indexes
-        index(currext.numVertices - 4);
-        index(currext.numVertices - 2);
-        index(currext.numVertices - 3);
+        index(currExt.numVertices - 4);
+        index(currExt.numVertices - 2);
+        index(currExt.numVertices - 3);
 
-        index(currext.numVertices - 2);
-        index(currext.numVertices - 1);
-        index(currext.numVertices - 3);
+        index(currExt.numVertices - 2);
+        index(currExt.numVertices - 1);
+        index(currExt.numVertices - 3);
 
     }
 
     private void index(int idx) {
-        currext.indices[currext.indexIdx] = idx;
-        currext.indexIdx++;
+        currExt.indices[currExt.indexIdx] = idx;
+        currExt.indexIdx++;
     }
 
     @Override
@@ -310,8 +310,8 @@ public class LineQuadRenderSystem extends LineRenderSystem {
 
         // Reset
         meshIdx = 1;
-        currext = (MeshDataExt) meshes.get(0);
-        curr = currext;
+        currExt = (MeshDataExt) meshes.get(0);
+        curr = currExt;
 
         int size = renderables.size;
         for (int i = 0; i < size; i++) {
@@ -354,7 +354,7 @@ public class LineQuadRenderSystem extends LineRenderSystem {
         // Reset mesh index and current
         int n = provisionalLines.size;
         for (int i = 0; i < n; i++)
-            dpool.free(provisionalLines.get(i));
+            doublePool.free(provisionalLines.get(i));
 
         provisionalLines.clear();
         provLines.clear();
@@ -378,7 +378,7 @@ public class LineQuadRenderSystem extends LineRenderSystem {
 
     public void dispose(){
         super.dispose();
-        currext = null;
+        currExt = null;
         provisionalLines.clear();
         provLines.clear();
         provisionalLines = null;

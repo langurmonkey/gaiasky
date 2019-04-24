@@ -1,7 +1,3 @@
-#ifdef GL_ES
-precision mediump float;
-precision mediump int;
-#endif
 
 // UNIFORMS
 
@@ -24,6 +20,8 @@ varying vec2 v_texCoords0;
 varying float v_opacity;
 // View vector
 varying vec3 v_viewVec;
+
+varying float v_depth;
 
 
 #define time v_time * 0.003
@@ -163,4 +161,6 @@ void main() {
 	
 	vec3 color = vec3(total, total, total);
     gl_FragColor = vec4(min(vec3(0.9), color * 6.0 * v_lightDiffuse * percolor), v_opacity);
+
+    gl_FragDepth = v_depth;
 }

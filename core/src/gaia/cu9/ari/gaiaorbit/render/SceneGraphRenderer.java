@@ -94,7 +94,7 @@ public class SceneGraphRenderer extends AbstractRenderer implements IProcessRend
 
     private Array<IRenderSystem> renderProcesses;
 
-    private RenderSystemRunnable depthTestR, additiveBlendR, noBlendR, noDepthTestR, regularBlendR;
+    private RenderSystemRunnable depthTestR, additiveBlendR, noBlendR, noDepthTestR, depthTestAlwaysR, regularBlendR;
 
     /** The particular current scene graph renderer **/
     private ISGR sgr;
@@ -208,6 +208,11 @@ public class SceneGraphRenderer extends AbstractRenderer implements IProcessRend
             Gdx.gl.glEnable(GL20.GL_DEPTH_TEST);
             Gdx.gl.glDepthMask(true);
         };
+        depthTestAlwaysR = (renderSystem, renderables, camera) -> {
+            Gdx.gl.glEnable(GL20.GL_DEPTH_TEST);
+            Gdx.gl.glDepthMask(true);
+            Gdx.gl.glDepthFunc(GL20.GL_ALWAYS);
+        };
         additiveBlendR = (renderSystem, renderables, camera) -> {
             Gdx.gl.glEnable(GL20.GL_BLEND);
             Gdx.gl.glBlendFunc(GL20.GL_ONE, GL20.GL_ONE);
@@ -271,7 +276,7 @@ public class SceneGraphRenderer extends AbstractRenderer implements IProcessRend
          */
         ShaderProgram distanceFieldFontShader = manager.get("shader/font.vertex.glsl");
         if (!distanceFieldFontShader.isCompiled()) {
-            logger.error(new RuntimeException(), "Distance field font shader compilation failed:\n" + distanceFieldFontShader.getLog());
+            logger.error("Distance field font shader compilation failed:\n" + distanceFieldFontShader.getLog());
         }
 
         /*
@@ -570,7 +575,7 @@ public class SceneGraphRenderer extends AbstractRenderer implements IProcessRend
 
         // LABELS
         AbstractRenderSystem labelsProc = new FontRenderSystem(RenderGroup.FONT_LABEL, alphas, fontBatch, distanceFieldFontShader, font3d, font2d, fontTitles);
-        labelsProc.addPreRunnables(regularBlendR, noDepthTestR);
+        labelsProc.addPreRunnables(regularBlendR, depthTestR);
 
         // BILLBOARD SSO
         AbstractRenderSystem billboardSSOProc = new BillboardStarRenderSystem(RenderGroup.BILLBOARD_SSO, alphas, starBillboardShaders, "data/tex/base/sso.png", -1);
@@ -615,32 +620,39 @@ public class SceneGraphRenderer extends AbstractRenderer implements IProcessRend
         // Billboards for galaxies and stars
         renderProcesses.add(billboardGalaxiesProc);
         renderProcesses.add(galaxyProc);
-        renderProcesses.add(billboardStarsProc);
 
         // Billboard for sprites
         renderProcesses.add(billboardSpritesProc);
 
+        // Meshes
+        renderProcesses.add(modelMeshProc);
+
+        // Billboards
+        renderProcesses.add(billboardStarsProc);
+
         // Models
         renderProcesses.add(modelFrontProc);
         renderProcesses.add(modelBeamProc);
-        renderProcesses.add(modelMeshProc);
+
+        // Labels
+        renderProcesses.add(labelsProc);
 
         // Stars, particles
         renderProcesses.add(particleGroupProc);
         renderProcesses.add(starGroupProc);
 
-        // Labels
-        renderProcesses.add(labelsProc);
-
         // Primitives
-        renderProcesses.add(lineProc);
-        renderProcesses.add(lineGpuProc);
         renderProcesses.add(pointProc);
         renderProcesses.add(pointGpuProc);
+
+        // Lines
+        renderProcesses.add(lineProc);
+        renderProcesses.add(lineGpuProc);
 
         // Billboards SSO
         renderProcesses.add(billboardSSOProc);
 
+        // Models
         renderProcesses.add(modelStarsProc);
         renderProcesses.add(modelAtmProc);
         renderProcesses.add(modelCloudProc);
@@ -1135,7 +1147,7 @@ public class SceneGraphRenderer extends AbstractRenderer implements IProcessRend
         if (GlobalConf.scene.isNormalLineRenderer()) {
             // Normal
             sys = new LineRenderSystem(RenderGroup.LINE, alphas, lineShaders);
-            sys.addPreRunnables(additiveBlendR, depthTestR);
+            sys.addPreRunnables(regularBlendR, depthTestR);
         } else {
             // Quad
             sys = new LineQuadRenderSystem(RenderGroup.LINE, alphas, lineQuadShaders);

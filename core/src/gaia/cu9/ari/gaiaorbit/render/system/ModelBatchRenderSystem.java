@@ -67,7 +67,6 @@ public class ModelBatchRenderSystem extends AbstractRenderSystem {
         Gdx.gl.glLineWidth(1.2f * GlobalConf.SCALE_FACTOR);
         if (mustRender()) {
             batch.begin(camera.getCamera());
-
             int size = renderables.size;
             for (int i = 0; i < size; i++) {
                 IModelRenderable s = (IModelRenderable) renderables.get(i);

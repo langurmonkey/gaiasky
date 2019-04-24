@@ -1,10 +1,5 @@
 #version 120
 
-#ifdef GL_ES
-precision mediump float;
-precision mediump int;
-#endif
-
 uniform float u_ar;
 varying vec4 v_col;
 

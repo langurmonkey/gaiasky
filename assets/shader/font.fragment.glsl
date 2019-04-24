@@ -1,11 +1,8 @@
-#ifdef GL_ES
-precision mediump float;
-precision mediump int;
-#endif
 
 varying vec4 v_color;
 varying vec2 v_texCoords;
 varying float v_opacity;
+varying float v_depth;
 
 uniform sampler2D u_texture;
 uniform float u_scale;
@@ -22,4 +19,9 @@ void main(void){
 	    discard;
 	    
     gl_FragColor = vec4(v_color.rgb, aa * v_color.a);
+
+    // Normal depth buffer
+    // gl_FragDepth = gl_FragCoord.z;
+    // Logarithmic depth buffer
+    gl_FragDepth = v_depth;
 }

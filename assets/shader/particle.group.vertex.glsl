@@ -1,6 +1,7 @@
 #version 120
 
 #include shader/lib_geometry.glsl
+#include shader/lib_logdepthbuff.glsl
 
 attribute vec4 a_position;
 attribute vec4 a_color;
@@ -32,6 +33,7 @@ uniform int u_cubemap;
 #endif // gravitationalWaves
     
 varying vec4 v_col;
+varying float v_depth;
 
 void main() {
     vec3 pos = a_position.xyz - u_camPos;
@@ -59,4 +61,7 @@ void main() {
 
     gl_Position = u_projModelView * vec4(pos, 0.0);
     gl_PointSize = a_size * u_sizeFactor * cubemapSizeFactor;
+
+    // Logarithmic depth buffer
+    v_depth = getDepthValue(length(pos));
 }
