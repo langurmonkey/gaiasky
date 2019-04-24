@@ -1,8 +1,7 @@
-#version 120
-
 // v_texCoords are UV coordinates in [0..1]
 varying vec2 v_texCoords;
 varying vec4 v_color;
+varying float v_depth;
 
 uniform sampler2D u_texture0;
 uniform float u_radius;
@@ -15,7 +14,6 @@ uniform float u_distance;
 // Whether light scattering is enabled or not
 uniform int u_lightScattering;
 
-
 // Time multiplier
 #define time u_time * 0.02
 
@@ -26,8 +24,6 @@ uniform int u_lightScattering;
 // Decays
 #define corona_decay 0.2
 #define light_decay 0.05
-
-
 
 float core(float distance_center, float inner_rad){
     if(inner_rad == 0.0){
@@ -83,7 +79,7 @@ vec4 draw() {
     } else {
         // We are close to the star
         level = min(level, 1.0);
-        float level_corona = u_lightScattering * level;
+        float level_corona = float(u_lightScattering) * level;
 
         float corona = startex(v_texCoords);
         float light = light(dist, light_decay * 2.0);
@@ -96,6 +92,8 @@ vec4 draw() {
 void main() {
     gl_FragColor = draw();
 
-    // Visualize depth buffer
-    gl_FragColor = vec4(vec3(gl_FragCoord.z), 1.0f);
+    // Normal depth buffer
+    // gl_FragDepth = gl_FragCoord.z;
+    // Logarithmic depth buffer
+    gl_FragDepth = v_depth;
 }

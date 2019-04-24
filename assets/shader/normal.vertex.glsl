@@ -401,9 +401,11 @@ varying vec3 v_viewDir;
 varying vec3 v_reflect;
 #endif
 
+//////////////////////////////////////////////
+// LOGARITHMIC DEPTH BUFFER
+//////////////////////////////////////////////
+#include shader/lib_logdepthbuff.glsl
 varying float v_depth;
-#define C 1.0
-#define z_far 1e24
 
 void main() {
     calculateAtmosphereGroundColor();
@@ -428,7 +430,8 @@ void main() {
     
     gl_Position = u_projViewTrans * pos;
 
-    v_depth = log(C * length(pos) + 1.0) / log(C * z_far + 1.0);
+    // Logarithmic depth buffer
+    v_depth = getDepthValue(length(pos.xyz));
 
     #ifdef shadowMapFlag
 	vec4 spos = u_shadowMapProjViewTrans * pos;

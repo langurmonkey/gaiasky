@@ -1,4 +1,4 @@
-#version 120
+#include shader/lib_logdepthbuff.glsl
 
 attribute vec3 a_position;
 uniform mat4 u_projViewTrans;
@@ -28,6 +28,7 @@ uniform float fSamples;
 varying vec3 v3Direction;
 varying vec4 frontColor;
 varying vec3 frontSecondaryColor;
+varying float v_depth;
 
 ////////////////////////////////////////////////////////////////////////////////////
 //////////RELATIVISTIC EFFECTS - VERTEX
@@ -138,7 +139,10 @@ void main(void) {
     #endif // gravitationalWaves
     
     gl_Position = u_projViewTrans * pos;
-    
+
+    // Logarithmic depth buffer
+    v_depth = getDepthValue(length(pos.xyz));
+
     // Direction from the vertex to the camera 
     v3Direction = v3CameraPos - v3Pos;
 

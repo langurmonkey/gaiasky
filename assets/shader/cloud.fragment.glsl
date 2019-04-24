@@ -1,7 +1,4 @@
-#version 120
-
 #define TEXTURE_LOD_BIAS 0.2
-
 
 ////////////////////////////////////////////////////////////////////////////////////
 ////////// POSITION ATTRIBUTE - FRAGMENT
@@ -165,6 +162,8 @@ varying vec3 v_reflect;
 
 #define PI 3.1415926535
 
+varying float v_depth;
+
 void main() {
     vec2 g_texCoord0 = v_texCoord0;
 
@@ -197,15 +196,9 @@ void main() {
     // Prevent saturation
     gl_FragColor = clamp(gl_FragColor, 0.0, 1.0);
     gl_FragColor.rgb *= 0.95;
-    
 
-
-    // Debug! - vectors
-    //float theta = acos(L.z); // in [0..Pi]
-    //float phi = atan(L.y/L.x); // in [0..2Pi]
-    //vec4 debugcol = vec4(0.0, L.y, 0.0, 1.0);
-    //gl_FragColor = debugcol;
-
-    // Debug! - visualise depth buffer
-    //gl_FragColor = vec4(vec3(gl_FragCoord.z), 1.0f);
+    // Normal depth buffer
+    // gl_FragDepth = gl_FragCoord.z;
+    // Logarithmic depth buffer
+    gl_FragDepth = v_depth;
 }

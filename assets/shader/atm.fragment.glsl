@@ -9,6 +9,8 @@ varying vec3 v3Direction;
 // Calculated colors
 varying vec4 frontColor;
 varying vec3 frontSecondaryColor;
+// Depth buffer value
+varying float v_depth;
 
 void main(void) {
     float fCos = dot (v3LightPos, v3Direction) / length (v3Direction);
@@ -22,4 +24,9 @@ void main(void) {
 
     // Prevent saturation
     gl_FragColor.rgb = clamp(gl_FragColor.rgb, 0.0, 0.95);
+
+    // Normal depth buffer
+    // gl_FragDepth = gl_FragCoord.z;
+    // Logarithmic depth buffer
+    gl_FragDepth = v_depth;
 }

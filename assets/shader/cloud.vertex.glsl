@@ -1,4 +1,4 @@
-#version 120
+#include shader/lib_logdepthbuff.glsl
 
 #define nop() {}
 
@@ -268,6 +268,9 @@ varying vec3 v_lightDir;
 varying vec3 v_lightCol;
 varying vec3 v_viewDir;
 
+// Depth buffer value
+varying float v_depth;
+
 void main() {
     v_opacity = u_opacity;
     v_alphaTest = u_alphaTest;
@@ -289,6 +292,9 @@ void main() {
     #endif // gravitationalWaves
     
     gl_Position = u_projViewTrans * pos;
+
+    // Logarithmic depth buffer
+    v_depth = getDepthValue(length(pos.xyz));
 
     #ifdef shadowMapFlag
 	vec4 spos = u_shadowMapProjViewTrans * pos;
