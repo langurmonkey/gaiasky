@@ -1,6 +1,7 @@
 #version 120
 
 #include shader/lib_geometry.glsl
+#include shader/lib_logdepthbuff.glsl
 
 attribute vec4 a_orbitelems01;
 attribute vec4 a_orbitelems02;
@@ -35,6 +36,7 @@ uniform float u_dt_s;
 #endif // gravitationalWaves
     
 varying vec4 v_col;
+varying float v_depth;
 
 #define M_TO_U 1e-9
 
@@ -113,6 +115,9 @@ void main() {
         cubemapSizeFactor = 1.0 - cosphi * 0.65;
     }
 
+    // Logarithmic depth buffer
+    v_depth = getDepthValue(dist);
+
     #ifdef relativisticEffects
         pos = computeRelativisticAberration(pos, dist, u_velDir, u_vc);
     #endif // relativisticEffects
@@ -126,4 +131,5 @@ void main() {
     gl_Position = u_projModelView * vec4(pos, 0.0);
     float distNorm = dist / 300.0;
     gl_PointSize = clamp(u_size / distNorm, 1.5, 3.5) * u_scaleFactor * cubemapSizeFactor;
+
 }
