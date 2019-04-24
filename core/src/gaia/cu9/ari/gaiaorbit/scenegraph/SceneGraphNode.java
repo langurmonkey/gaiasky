@@ -120,6 +120,8 @@ public class SceneGraphNode implements IStarContainer, IPosition {
         POINT(25),
         /** Point GPU **/
         POINT_GPU(26),
+        /** Dust mesh **/
+        MODEL_DUST(27),
 
 
         /** None **/

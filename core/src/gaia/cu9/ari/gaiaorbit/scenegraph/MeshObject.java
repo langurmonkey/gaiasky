@@ -37,13 +37,14 @@ public class MeshObject extends FadeNode implements IModelRenderable, I3DTextRen
     private Matrix4 coordinateSystem;
     private Vector3 scale, axis, translate;
     private float degrees;
+    private boolean dust;
 
     /** MODEL **/
     public ModelComponent mc;
 
     /** TRANSFORMATIONS - are applied each cycle **/
     public ITransform[] transformations;
-    
+
     // Aux array
     private float[] auxArray;
 
@@ -134,7 +135,11 @@ public class MeshObject extends FadeNode implements IModelRenderable, I3DTextRen
     @Override
     protected void addToRenderLists(ICamera camera) {
         if (GaiaSky.instance.isInitialised() && GaiaSky.instance.isOn(ct) & opacity > 0) {
-            addToRender(this, RenderGroup.MODEL_MESH);
+            if (dust)
+                addToRender(this, RenderGroup.MODEL_DUST);
+            else
+                addToRender(this, RenderGroup.MODEL_MESH);
+
             addToRender(this, RenderGroup.FONT_LABEL);
         }
 
@@ -182,6 +187,10 @@ public class MeshObject extends FadeNode implements IModelRenderable, I3DTextRen
 
     public void setScale(double[] sc) {
         scale = new Vector3((float) sc[0], (float) sc[1], (float) sc[2]);
+    }
+
+    public void setDust(Boolean dust) {
+        this.dust = dust;
     }
 
     @Override
@@ -248,7 +257,7 @@ public class MeshObject extends FadeNode implements IModelRenderable, I3DTextRen
     }
 
     @Override
-    public float getTextOpacity(){
+    public float getTextOpacity() {
         return getOpacity();
     }
 

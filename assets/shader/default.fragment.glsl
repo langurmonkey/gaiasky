@@ -25,7 +25,7 @@ varying float v_alphaTest;
 
 #if defined(diffuseTextureFlag) || defined(specularTextureFlag)
 #define textureFlag
-varying MED vec2 v_texCoords0;
+varying vec2 v_texCoords0;
 #endif
 
 #ifdef diffuseColorFlag

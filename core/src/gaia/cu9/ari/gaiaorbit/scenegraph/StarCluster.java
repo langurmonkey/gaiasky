@@ -132,7 +132,7 @@ public class StarCluster extends AbstractPositionEntity implements IFocus, IProp
         mc.env = new Environment();
         mc.env.add(mc.dlight);
         mc.env.set(new ColorAttribute(ColorAttribute.AmbientLight, 0.4f, 0.4f, 0.4f, 1f));
-        mc.env.set(new FloatAttribute(FloatAttribute.Shininess, 0.2f));
+        mc.env.set(new FloatAttribute(FloatAttribute.Shininess, 0.4f));
         mc.instance = new IntModelInstance(model, modelTransform);
 
         // Relativistic effects
@@ -190,12 +190,12 @@ public class StarCluster extends AbstractPositionEntity implements IFocus, IProp
     @Override
     protected void addToRenderLists(ICamera camera) {
         if (this.opacity > 0) {
-            if (this.viewAngleApparent > TH_ANGLE) {
+            if (this.viewAngleApparent >= TH_ANGLE) {
                 addToRender(this, RenderGroup.MODEL_MESH);
                 addToRender(this, RenderGroup.FONT_LABEL);
             }
 
-            if (this.viewAngleApparent < TH_ANGLE_OVERLAP) {
+            if (this.viewAngleApparent < TH_ANGLE) {
                 addToRender(this, RenderGroup.BILLBOARD_SPRITE);
             }
         }
@@ -220,7 +220,7 @@ public class StarCluster extends AbstractPositionEntity implements IFocus, IProp
     @Override
     public void render(IntModelBatch modelBatch, float alpha, double t) {
         mc.touch();
-        mc.setTransparency(alpha * opacity * fadeAlpha, GL20.GL_ONE, GL20.GL_ONE);
+        mc.setTransparency(alpha * opacity, GL20.GL_ONE, GL20.GL_ONE);
         mc.instance.transform.set(this.localTransform);
         mc.updateRelativisticEffects(GaiaSky.instance.getICamera());
         modelBatch.render(mc.instance, mc.env);
@@ -238,7 +238,7 @@ public class StarCluster extends AbstractPositionEntity implements IFocus, IProp
             shader.setUniformi("u_texture0", 0);
         }
 
-        float fa = 1 - fadeAlpha;
+        float fa = 1;
 
         Vector3 aux = aux3f1.get();
         shader.setUniformf("u_pos", translation.put(aux));

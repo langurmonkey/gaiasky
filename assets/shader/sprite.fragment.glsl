@@ -3,6 +3,7 @@
 // v_texCoords are UV coordinates in [0..1]
 varying vec2 v_texCoords;
 varying vec4 v_color;
+varying float v_depth;
 
 uniform sampler2D u_texture0;
 
@@ -13,6 +14,7 @@ vec4 draw() {
 
 void main() {
     gl_FragColor = draw();
-    // Debug! - visualise depth buffer
-    //gl_FragColor = vec4(vec3(gl_FragCoord.z), 1.0f);
+
+    // Logarithmic depth buffer
+    gl_FragDepth = v_depth;
 }
