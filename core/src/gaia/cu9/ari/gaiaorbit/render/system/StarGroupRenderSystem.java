@@ -6,7 +6,6 @@
 package gaia.cu9.ari.gaiaorbit.render.system;
 
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.PerspectiveCamera;
 import com.badlogic.gdx.graphics.VertexAttribute;
 import com.badlogic.gdx.graphics.VertexAttributes.Usage;
@@ -174,7 +173,6 @@ public class StarGroupRenderSystem extends ImmediateRenderSystem implements IObs
                                 shaderProgram.setUniformMatrix("u_projModelView", cams[cam.dirindex].combined);
                             }
                             try {
-                                Gdx.gl.glEnable(GL20.GL_DEPTH_TEST);
                                 curr.mesh.render(shaderProgram, ShapeType.Point.getGlType());
                             } catch (IllegalArgumentException e) {
                                 logger.error("Render exception");

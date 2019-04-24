@@ -43,7 +43,7 @@ public class BillboardGalaxy extends Billboard {
         ModelComponent mc = new ModelComponent(true);
         mc.setType("twofacedbillboard");
         mc.setStaticlight(1.0);
-        Map<String, Object> params = new HashMap<String, Object>();
+        Map<String, Object> params = new HashMap<>();
         params.put("diameter", 1.0);
         mc.setParams(params);
         TextureComponent tc = new TextureComponent();

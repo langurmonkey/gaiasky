@@ -94,7 +94,7 @@ public class SceneGraphRenderer extends AbstractRenderer implements IProcessRend
 
     private Array<IRenderSystem> renderProcesses;
 
-    private RenderSystemRunnable depthTestR, additiveBlendR, noBlendR, noDepthTestR, depthTestAlwaysR, regularBlendR;
+    private RenderSystemRunnable depthTestR, additiveBlendR, noBlendR, noDepthTestR, depthTestAlwaysR, regularBlendR, noDepthWritesR;
 
     /** The particular current scene graph renderer **/
     private ISGR sgr;
@@ -212,6 +212,9 @@ public class SceneGraphRenderer extends AbstractRenderer implements IProcessRend
             Gdx.gl.glEnable(GL20.GL_DEPTH_TEST);
             Gdx.gl.glDepthMask(true);
             Gdx.gl.glDepthFunc(GL20.GL_ALWAYS);
+        };
+        noDepthWritesR = (renderSystem, renderables, camera) -> {
+            Gdx.gl.glDepthMask(false);
         };
         additiveBlendR = (renderSystem, renderables, camera) -> {
             Gdx.gl.glEnable(GL20.GL_BLEND);
@@ -446,10 +449,6 @@ public class SceneGraphRenderer extends AbstractRenderer implements IProcessRend
             Gdx.gl.glClear(GL20.GL_DEPTH_BUFFER_BIT);
         });
 
-        // VOLUMETRIC CLOUDS
-        //        AbstractRenderSystem cloudsProc = new VolumeCloudsRenderSystem(alphas);
-        //        cloudsProc.addPreRunnables(blendNoDepthRunnable);
-
         // ANNOTATIONS
         AbstractRenderSystem annotationsProc = new FontRenderSystem(RenderGroup.FONT_ANNOTATION, alphas, spriteBatch, null);
         annotationsProc.addPreRunnables(regularBlendR, noDepthTestR);
@@ -515,11 +514,11 @@ public class SceneGraphRenderer extends AbstractRenderer implements IProcessRend
 
         // BILLBOARD GALAXIES
         AbstractRenderSystem billboardGalaxiesProc = new BillboardStarRenderSystem(RenderGroup.BILLBOARD_GAL, alphas, galShaders, "data/tex/base/static.jpg", ComponentType.Galaxies.ordinal());
-        billboardGalaxiesProc.addPreRunnables(regularBlendR, depthTestR);
+        billboardGalaxiesProc.addPreRunnables(regularBlendR, noDepthTestR);
 
         // BILLBOARD SPRITES
         AbstractRenderSystem billboardSpritesProc = new BillboardSpriteRenderSystem(RenderGroup.BILLBOARD_SPRITE, alphas, spriteShaders, ComponentType.Clusters.ordinal());
-        billboardSpritesProc.addPreRunnables(regularBlendR, depthTestR);
+        billboardSpritesProc.addPreRunnables(regularBlendR, depthTestR, noDepthWritesR);
 
         // LINES CPU
         AbstractRenderSystem lineProc = getLineRenderSystem();
@@ -536,8 +535,8 @@ public class SceneGraphRenderer extends AbstractRenderer implements IProcessRend
         pointGpuProc.addPreRunnables(regularBlendR, depthTestR);
 
         // MODELS DUST AND MESH
-        AbstractRenderSystem modelDustProc = new ModelBatchRenderSystem(RenderGroup.MODEL_DUST, alphas, modelBatchDust, ModelRenderType.NORMAL, false);
-        AbstractRenderSystem modelMeshProc = new ModelBatchRenderSystem(RenderGroup.MODEL_MESH, alphas, modelBatchMesh, ModelRenderType.NORMAL, false);
+        AbstractRenderSystem modelMeshOpaqueProc = new ModelBatchRenderSystem(RenderGroup.MODEL_MESH_OPAQUE, alphas, modelBatchDust, ModelRenderType.NORMAL, false);
+        AbstractRenderSystem modelMeshAdditiveProc = new ModelBatchRenderSystem(RenderGroup.MODEL_MESH_ADDITIVE, alphas, modelBatchMesh, ModelRenderType.NORMAL, false);
 
         // MODEL FRONT
         AbstractRenderSystem modelFrontProc = new ModelBatchRenderSystem(RenderGroup.MODEL_NORMAL, alphas, modelBatchNormal, ModelRenderType.NORMAL);
@@ -559,15 +558,15 @@ public class SceneGraphRenderer extends AbstractRenderer implements IProcessRend
 
         // PARTICLE GROUP
         AbstractRenderSystem particleGroupProc = new ParticleGroupRenderSystem(RenderGroup.PARTICLE_GROUP, alphas, particleGroupShaders);
-        particleGroupProc.addPreRunnables(regularBlendR, noDepthTestR);
+        particleGroupProc.addPreRunnables(additiveBlendR, depthTestR, noDepthWritesR);
 
         // STAR GROUP
         AbstractRenderSystem starGroupProc = new StarGroupRenderSystem(RenderGroup.STAR_GROUP, alphas, starGroupShaders);
-        starGroupProc.addPreRunnables(additiveBlendR, depthTestR);
+        starGroupProc.addPreRunnables(additiveBlendR, depthTestR, noDepthWritesR);
 
         // ORBITAL ELEMENTS PARTICLES
         AbstractRenderSystem orbitElemProc = new OrbitalElementsParticlesRenderSystem(RenderGroup.PARTICLE_ORBIT_ELEMENTS, alphas, orbitElemShaders);
-        orbitElemProc.addPreRunnables(regularBlendR, noDepthTestR);
+        orbitElemProc.addPreRunnables(additiveBlendR, depthTestR, noDepthWritesR);
 
         // MODEL STARS
         AbstractRenderSystem modelStarsProc = new ModelBatchRenderSystem(RenderGroup.MODEL_STAR, alphas, modelBatchStar, ModelRenderType.NORMAL);
@@ -594,10 +593,6 @@ public class SceneGraphRenderer extends AbstractRenderer implements IProcessRend
             }
         };
         modelAtmProc.addPreRunnables(regularBlendR, depthTestR);
-        modelAtmProc.addPostRunnables((renderSystem, renderables, camera) -> {
-            // Clear depth buffer before rendering things up close
-            //Gdx.gl.glClear(GL20.GL_DEPTH_BUFFER_BIT);
-        });
 
         // MODEL CLOUDS
         AbstractRenderSystem modelCloudProc = new ModelBatchRenderSystem(RenderGroup.MODEL_CLOUD, alphas, modelBatchCloud, ModelRenderType.CLOUD);
@@ -606,20 +601,14 @@ public class SceneGraphRenderer extends AbstractRenderer implements IProcessRend
         AbstractRenderSystem shapeProc = new ShapeRenderSystem(RenderGroup.SHAPE, alphas);
         shapeProc.addPreRunnables(regularBlendR, depthTestR);
 
-        // MODEL CLOSE UP
-        //        AbstractRenderSystem modelCloseUpProc = new ModelBatchRenderSystem(RenderGroup.MODEL_CLOSEUP,  alphas, modelBatchCloseUp, false);
-        //        modelCloseUpProc.addPreRunnables(blendDepthRunnable);
-
         // Add components to set
         renderProcesses.add(modelFrontBackProc);
         renderProcesses.add(modelGridsProc);
         renderProcesses.add(pixelStarProc);
-        renderProcesses.add(orbitElemProc);
         renderProcesses.add(annotationsProc);
 
-        // Dust
-        renderProcesses.add(modelDustProc);
-        renderProcesses.add(modelMeshProc);
+        // Opaque meshes
+        renderProcesses.add(modelMeshOpaqueProc);
 
         // Billboards
         renderProcesses.add(billboardStarsProc);
@@ -631,14 +620,18 @@ public class SceneGraphRenderer extends AbstractRenderer implements IProcessRend
         // Labels
         renderProcesses.add(labelsProc);
 
-        // Galaxy and nebulae billboards
-        renderProcesses.add(billboardGalaxiesProc);
-        renderProcesses.add(billboardSpritesProc);
-        renderProcesses.add(galaxyProc);
-
         // Stars, particles
         renderProcesses.add(particleGroupProc);
         renderProcesses.add(starGroupProc);
+        renderProcesses.add(orbitElemProc);
+
+        // Additive meshes
+        renderProcesses.add(modelMeshAdditiveProc);
+
+        // Galaxy and nebulae billboards
+        renderProcesses.add(billboardSpritesProc);
+        renderProcesses.add(galaxyProc);
+        renderProcesses.add(billboardGalaxiesProc);
 
         // Primitives
         renderProcesses.add(pointProc);

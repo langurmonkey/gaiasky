@@ -191,7 +191,7 @@ public class StarCluster extends AbstractPositionEntity implements IFocus, IProp
     protected void addToRenderLists(ICamera camera) {
         if (this.opacity > 0) {
             if (this.viewAngleApparent >= TH_ANGLE) {
-                addToRender(this, RenderGroup.MODEL_MESH);
+                addToRender(this, RenderGroup.MODEL_MESH_ADDITIVE);
                 addToRender(this, RenderGroup.FONT_LABEL);
             }
 

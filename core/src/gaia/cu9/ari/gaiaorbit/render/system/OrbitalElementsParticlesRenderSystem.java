@@ -6,7 +6,6 @@
 package gaia.cu9.ari.gaiaorbit.render.system;
 
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.VertexAttribute;
 import com.badlogic.gdx.graphics.VertexAttributes.Usage;
 import com.badlogic.gdx.graphics.glutils.ShaderProgram;
@@ -110,28 +109,25 @@ public class OrbitalElementsParticlesRenderSystem extends ImmediateRenderSystem 
                 // Enable point sizes
                 Gdx.gl20.glEnable(0x8642);
 
-                // Additive blending
-                Gdx.gl20.glBlendFunc(GL20.GL_ONE, GL20.GL_ONE);
-
                 ShaderProgram shaderProgram = getShaderProgram();
 
-                boolean stereohw = GlobalConf.program.isStereoHalfWidth();
+                boolean stereoHw = GlobalConf.program.isStereoHalfWidth();
 
                 shaderProgram.begin();
                 shaderProgram.setUniformMatrix("u_projModelView", camera.getCamera().combined);
                 shaderProgram.setUniformf("u_alpha", alphas[first.ct.getFirstOrdinal()] * first.getOpacity());
-                shaderProgram.setUniformf("u_ar", stereohw ? 0.5f : 1f);
+                shaderProgram.setUniformf("u_ar", stereoHw ? 0.5f : 1f);
                 shaderProgram.setUniformf("u_profileDecay", 0.1f);
-                shaderProgram.setUniformf("u_scaleFactor", 2 * (stereohw ? 2 : 1));
+                shaderProgram.setUniformf("u_scaleFactor", 2 * (stereoHw ? 2 : 1));
                 shaderProgram.setUniformf("u_camPos", camera.getCurrent().getPos().put(aux1));
                 shaderProgram.setUniformf("u_camDir", camera.getCurrent().getCamera().direction);
                 shaderProgram.setUniformi("u_cubemap", GlobalConf.program.CUBEMAP360_MODE ? 1 : 0);
 
                 shaderProgram.setUniformf("u_size", rc.scaleFactor);
-                double currt = AstroUtils.getJulianDate(GaiaSky.instance.time.getTime());
-                shaderProgram.setUniformf("u_t", (float) currt);
+                double curRt = AstroUtils.getJulianDate(GaiaSky.instance.time.getTime());
+                shaderProgram.setUniformf("u_t", (float) curRt);
                 // dt in seconds
-                shaderProgram.setUniformf("u_dt_s", (float) (86400d * (currt - ((Orbit) renderables.first()).oc.epoch)));
+                shaderProgram.setUniformf("u_dt_s", (float) (86400d * (curRt - ((Orbit) renderables.first()).oc.epoch)));
                 shaderProgram.setUniformMatrix("u_eclToEq", maux.setToRotation(0, 1, 0, -90).mul(Coordinates.equatorialToEclipticF()));
 
                 // Relativistic effects
@@ -139,9 +135,6 @@ public class OrbitalElementsParticlesRenderSystem extends ImmediateRenderSystem 
 
                 curr.mesh.render(shaderProgram, ShapeType.Point.getGlType());
                 shaderProgram.end();
-
-                // Restore
-                Gdx.gl.glBlendFunc(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA);
             }
         }
     }
