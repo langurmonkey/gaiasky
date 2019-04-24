@@ -322,11 +322,11 @@ public class FullGui extends AbstractGui {
             break;
         case SHOW_SEARCH_ACTION:
             if (searchDialog == null) {
-                searchDialog = new SearchDialog(this, skin, sg);
+                searchDialog = new SearchDialog(skin, ui, sg);
             } else {
                 searchDialog.clearText();
             }
-            searchDialog.display();
+            searchDialog.show(ui);
             break;
         case SHOW_LAND_AT_LOCATION_ACTION:
             CelestialBody target = (CelestialBody) data[0];
