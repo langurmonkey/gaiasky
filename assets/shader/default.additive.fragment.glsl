@@ -36,7 +36,7 @@ uniform vec4 u_diffuseColor;
 uniform sampler2D u_diffuseTexture;
 #endif
 
-#ifdef specularColorFlags are cross platform and available in almost every
+#ifdef specularColorFlag
 uniform vec4 u_specularColor;
 #endif
 

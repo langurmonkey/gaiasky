@@ -40,8 +40,8 @@ public class MWSCLoader extends AbstractCatalogLoader implements ISceneGraphLoad
     boolean active = true;
 
     @Override
-    public Array<StarCluster> loadData() throws FileNotFoundException {
-        Array<StarCluster> clusters = new Array<StarCluster>(3006);
+    public Array<StarCluster> loadData() {
+        Array<StarCluster> clusters = new Array<>(3006);
 
         if (active)
             for (String file : files) {
@@ -51,9 +51,9 @@ public class MWSCLoader extends AbstractCatalogLoader implements ISceneGraphLoad
 
                 try {
                     String line;
-                    int linenum = 0;
+                    int lineNum = 0;
                     while ((line = br.readLine()) != null) {
-                        if (linenum > 0) {
+                        if (lineNum > 0) {
                             // Add galaxy
                             String[] tokens = line.split(",");
                             String name = tokens[0];
@@ -77,7 +77,7 @@ public class MWSCLoader extends AbstractCatalogLoader implements ISceneGraphLoad
 
                             clusters.add(c);
                         }
-                        linenum++;
+                        lineNum++;
                     }
 
                     for (StarCluster c : clusters) {

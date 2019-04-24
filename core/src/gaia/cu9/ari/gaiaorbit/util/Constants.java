@@ -166,11 +166,11 @@ public class Constants {
     public static final float MAX_LOD_TRANS_ANGLE_DEG = 120f;
 
     /** Minimum star pixel size **/
-    public static final float MIN_STAR_POINT_SIZE = 0.5f;
+    public static final float MIN_STAR_POINT_SIZE = 0.8f;
     /** Maximum star pixel size **/
-    public static final float MAX_STAR_POINT_SIZE = 35;
+    public static final float MAX_STAR_POINT_SIZE = 4f;
     /** Step to increase/decrease **/
-    public static final float STEP_STAR_POINT_SIZE = 0.5f;
+    public static final float STEP_STAR_POINT_SIZE = 0.1f;
 
     /** Minimum spacecraft responsiveness **/
     public static final float MIN_SC_RESPONSIVENESS = .5e6f;

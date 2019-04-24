@@ -183,12 +183,12 @@ public class OctreeGeneratorRun {
 
             if (root != null) {
                 // Save arguments and structure
-                StringBuffer argstr = new StringBuffer();
+                StringBuffer argStr = new StringBuffer();
                 for (int i = 0; i < arguments.length; i++) {
-                    argstr.append(arguments[i]).append(" ");
+                    argStr.append(arguments[i]).append(" ");
                 }
                 try (PrintStream out = new PrintStream(new FileOutputStream(outFolder + "log"))) {
-                    out.print(argstr);
+                    out.print(argStr);
                     out.println();
                     out.println();
                     for (MessageBean msg : NotificationsInterface.getHistorical()) {

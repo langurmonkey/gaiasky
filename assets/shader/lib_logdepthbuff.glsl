@@ -11,6 +11,10 @@ float getDepthValue(float z) {
     return log(K * z + 1.0) / log(K_far + 1.0);
 }
 
+// Visualize both functions:
+// http://fooplot.com/#W3sidHlwZSI6MCwiZXEiOiIoKDEveCktKDEvMSkpLygoMS8xMDApLSgxLzEpKSIsImNvbG9yIjoiIzNFOEExNyJ9LHsidHlwZSI6MCwiZXEiOiJsb2coMS4wKngrMS4wKS9sb2coMS4wKjEwMCsxLjApOyIsImNvbG9yIjoiI0YyMUYxRiJ9LHsidHlwZSI6MTAwMCwid2luZG93IjpbIjEiLCIxMDAiLCIwIiwiMSJdLCJzaXplIjpbNjQ4LDM5OF19XQ--
+
+
 float defaultDepth(float z) {
     return ((1.0 / z) - one_over_near) / (one_over_far - one_over_near);
 }
