@@ -21,7 +21,6 @@ import gaia.cu9.ari.gaiaorbit.scenegraph.MilkyWay;
 import gaia.cu9.ari.gaiaorbit.scenegraph.ParticleGroup.ParticleBean;
 import gaia.cu9.ari.gaiaorbit.scenegraph.SceneGraphNode.RenderGroup;
 import gaia.cu9.ari.gaiaorbit.scenegraph.camera.ICamera;
-import gaia.cu9.ari.gaiaorbit.util.Constants;
 import gaia.cu9.ari.gaiaorbit.util.GlobalConf;
 import gaia.cu9.ari.gaiaorbit.util.GlobalConf.ProgramConf.StereoProfile;
 import gaia.cu9.ari.gaiaorbit.util.gdx.mesh.IntMesh;
@@ -81,128 +80,61 @@ public class MWModelRenderSystem extends ImmediateRenderSystem implements IObser
         return c;
     }
 
-    private float[] genStarColor() {
-        float r = (float) rand.nextGaussian() * 0.15f;
-        if (rand.nextInt(2) == 0) {
-            // Blue/white star
-            return new float[] { 0.95f - r, 0.8f - r, 0.6f};
-        } else {
-            // Red/white star
-            return new float[] { 0.95f, 0.8f - r, 0.6f - r };
-        }
+    private MeshData getMeshData(Array<? extends ParticleBean> data) {
+        return getMeshData(data, null);
     }
 
-    private MeshData getMeshData(MilkyWay mw, Array<? extends ParticleBean> data, int nFactor) {
-        return getMeshData(mw, data, nFactor, 100, 1, 0.5f);
-    }
-    private MeshData getMeshData(MilkyWay mw, Array<? extends ParticleBean> data, int nFactor, float maxDisplacementPc, float starSizeFactor, float intensity) {
-        Vector3 center = mw.getPosition().toVector3();
+    private MeshData getMeshData(Array<? extends ParticleBean> data, ColorGenerator cg) {
         float hiDpiScaleFactor = GlobalConf.SCALE_FACTOR;
 
-        // A few parsecs of displacement
-        float maxDisplacement = (float) (maxDisplacementPc * Constants.PC_TO_U);
-        if(nFactor <= 1)
-            maxDisplacement = 0;
-
         MeshData md = new MeshData();
-        initMesh(md, data.size * nFactor);
+        initMesh(md, data.size);
 
-        ensureTempVertsSize(data.size * nFactor * md.vertexSize);
+        ensureTempVertsSize(data.size * md.vertexSize);
         for (ParticleBean star : data) {
-            for (int i = 0; i < nFactor; i++) {
-                // VERTEX
-                float offsetX = (float) rand.nextGaussian() * maxDisplacement;
-                float offsetY = (float) rand.nextGaussian() * maxDisplacement;
-                float offsetZ = (float) rand.nextGaussian() * maxDisplacement;
-                aux3f1.set((float) star.data[0] + offsetX, (float) star.data[1] + offsetY, (float) star.data[2] + offsetZ);
-                double distanceCenter = aux3f1.sub(center).len() / (mw.getRadius() * 2f);
+            // COLOR
+            float[] col = star.data.length >= 7 ? new float[] { (float) star.data[4], (float) star.data[5], (float) star.data[6] } : cg.generateColor();
+            col[0] = MathUtilsd.clamp(col[0], 0f, 1f);
+            col[1] = MathUtilsd.clamp(col[1], 0f, 1f);
+            col[2] = MathUtilsd.clamp(col[2], 0f, 1f);
+            tempVerts[md.vertexIdx + md.colorOffset] = Color.toFloatBits(col[0], col[1], col[2], 1f);
 
-                float[] col = star.data.length >= 7 ? new float[]{(float) star.data[4], (float) star.data[5], (float) star.data[6]} :genStarColor();
+            // SIZE
+            double starSize = star.data[3];
+            tempVerts[md.vertexIdx + additionalOffset] = (float) (starSize * hiDpiScaleFactor);
+            tempVerts[md.vertexIdx + additionalOffset + 1] = 0;
 
-                if (distanceCenter < 0.5f) {
-                    float add = (float) MathUtilsd.clamp(0.5f - distanceCenter, 0f, 1f) * 0.5f;
-                    col[0] = col[0] + add;
-                    col[1] = col[1] + add;
-                    col[2] = col[2] + add;
-                }
+            // POSITION
+            aux3f1.set((float) star.data[0], (float) star.data[1], (float) star.data[2]);
+            final int idx = md.vertexIdx;
+            tempVerts[idx] = aux3f1.x;
+            tempVerts[idx + 1] = aux3f1.y;
+            tempVerts[idx + 2] = aux3f1.z;
 
-                col[0] = MathUtilsd.clamp(col[0], 0f, 1f);
-                col[1] = MathUtilsd.clamp(col[1], 0f, 1f);
-                col[2] = MathUtilsd.clamp(col[2], 0f, 1f);
+            md.vertexIdx += md.vertexSize;
 
-                // COLOR
-                tempVerts[md.vertexIdx + md.colorOffset] = Color.toFloatBits(col[0], col[1], col[2], intensity);
-
-                // SIZE
-                double starSize = star.data[3] * starSizeFactor;
-                tempVerts[md.vertexIdx + additionalOffset] = (float) (starSize * hiDpiScaleFactor);
-                tempVerts[md.vertexIdx + additionalOffset + 1] = 0;
-
-                // cb.transform.getTranslationf(aux);
-                // POSITION
-                aux3f1.set((float) star.data[0] + offsetX, (float) star.data[1] + offsetY, (float) star.data[2] + offsetZ);
-                final int idx = md.vertexIdx;
-                tempVerts[idx] = aux3f1.x;
-                tempVerts[idx + 1] = aux3f1.y;
-                tempVerts[idx + 2] = aux3f1.z;
-
-                md.vertexIdx += md.vertexSize;
-            }
         }
         md.mesh.setVertices(tempVerts, 0, md.vertexIdx);
         return md;
     }
 
     private void streamToGpu(MilkyWay mw) {
+        StarColorGenerator scg = new StarColorGenerator();
+
         /* BULGE */
-        bulge = getMeshData(mw, mw.bulgeData, 1, 100, 1f, 1f);
+        bulge = getMeshData(mw.bulgeData, scg);
 
         /* STARS */
-        stars = getMeshData(mw, mw.starData, 1, 100, 1, 1f);
+        stars = getMeshData(mw.starData, scg);
 
         /* HII */
-        hii = getMeshData(mw, mw.hiiData, 1, 100, 1f, 1f);
+        hii = getMeshData(mw.hiiData);
 
         /* GAS */
-        gas = getMeshData(mw, mw.gasData, 1, 100, 1f, 1f);
+        gas = getMeshData(mw.gasData);
 
         /* DUST */
-        // This factor increases the number of particles
-        int nFactor = 1;
-        float maxDisplacement = (float) (50d * Constants.PC_TO_U);
-        if(nFactor <= 1)
-            maxDisplacement = 0;
-
-        dust = new MeshData();
-        initMesh(dust, mw.dustData.size * nFactor);
-        ensureTempVertsSize(mw.dustData.size * nFactor * dust.vertexSize);
-        for (ParticleBean p : mw.dustData) {
-            for (int i = 0; i < nFactor; i++) {
-                // COLOR
-                float r = (float) Math.abs(StdRandom.uniform() * 0.1);
-
-                tempVerts[dust.vertexIdx + dust.colorOffset] = Color.toFloatBits(r, r, r, 1);
-
-                // SIZE
-                double starSize = p.data[3] * 1.5 + Math.abs(rand.nextGaussian());
-                tempVerts[dust.vertexIdx + additionalOffset] = (float) (starSize * GlobalConf.SCALE_FACTOR);
-                tempVerts[dust.vertexIdx + additionalOffset + 1] = 1;
-
-                // POSITION
-                double offsetX = (rand.nextGaussian() * maxDisplacement);
-                double offsetY = (rand.nextGaussian() * maxDisplacement);
-                double offsetZ = (rand.nextGaussian() * maxDisplacement);
-                aux3f1.set((float) (p.data[0] + offsetX), (float) (p.data[1] + offsetY), (float) (p.data[2] + offsetZ));
-                final int idx = dust.vertexIdx;
-                tempVerts[idx] = aux3f1.x;
-                tempVerts[idx + 1] = aux3f1.y;
-                tempVerts[idx + 2] = aux3f1.z;
-
-                dust.vertexIdx += dust.vertexSize;
-            }
-
-        }
-        dust.mesh.setVertices(tempVerts, 0, dust.vertexIdx);
+        dust = getMeshData(mw.dustData, new DustColorGenerator());
     }
 
     @Override
@@ -253,7 +185,7 @@ public class MWModelRenderSystem extends ImmediateRenderSystem implements IObser
                 Gdx.gl20.glBlendFunc(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA);
                 Gdx.gl20.glDepthMask(true);
 
-                shaderProgram.setUniformf("u_sizeFactor", 0.8f);
+                shaderProgram.setUniformf("u_sizeFactor", 3f);
                 shaderProgram.setUniformf("u_intensity", 1f);
                 dust.mesh.render(shaderProgram, ShapeType.Point.getGlType());
                 shaderProgram.end();
@@ -264,23 +196,23 @@ public class MWModelRenderSystem extends ImmediateRenderSystem implements IObser
                 Gdx.gl20.glDepthMask(false);
 
                 // Bulge
-                shaderProgram.setUniformf("u_sizeFactor", 1.3f);
-                shaderProgram.setUniformf("u_intensity", 0.1f);
+                shaderProgram.setUniformf("u_sizeFactor", 2f);
+                shaderProgram.setUniformf("u_intensity", 0.2f);
                 bulge.mesh.render(shaderProgram, ShapeType.Point.getGlType());
 
                 // Stars
-                shaderProgram.setUniformf("u_sizeFactor", 0.5f);
-                shaderProgram.setUniformf("u_intensity", 0.3f);
+                shaderProgram.setUniformf("u_sizeFactor", 0.8f);
+                shaderProgram.setUniformf("u_intensity", 0.2f);
                 stars.mesh.render(shaderProgram, ShapeType.Point.getGlType());
 
                 // HII
-                shaderProgram.setUniformf("u_sizeFactor", 1f);
-                shaderProgram.setUniformf("u_intensity", 0.1f);
+                shaderProgram.setUniformf("u_sizeFactor", 0.8f);
+                shaderProgram.setUniformf("u_intensity", 0.8f);
                 hii.mesh.render(shaderProgram, ShapeType.Point.getGlType());
 
                 // Gas
-                shaderProgram.setUniformf("u_sizeFactor", 1.8f);
-                shaderProgram.setUniformf("u_intensity", 0.3f);
+                shaderProgram.setUniformf("u_sizeFactor", 1.4f);
+                shaderProgram.setUniformf("u_intensity", 0.25f);
                 gas.mesh.render(shaderProgram, ShapeType.Point.getGlType());
                 shaderProgram.end();
             }
@@ -304,4 +236,28 @@ public class MWModelRenderSystem extends ImmediateRenderSystem implements IObser
     public void notify(Events event, Object... data) {
     }
 
+    private interface ColorGenerator {
+        float[] generateColor();
+    }
+
+    private class StarColorGenerator implements ColorGenerator{
+        public float[] generateColor() {
+            float r = (float) StdRandom.gaussian() * 0.15f;
+            if (StdRandom.uniform(2) == 0) {
+                // Blue/white star
+                return new float[] { 0.95f - r, 0.8f - r, 0.6f };
+            } else {
+                // Red/white star
+                return new float[] { 0.95f, 0.8f - r, 0.6f - r };
+            }
+        }
+    }
+
+    private class DustColorGenerator implements ColorGenerator {
+        @Override
+        public float[] generateColor() {
+            float r = (float) Math.abs(StdRandom.uniform() * 0.1);
+            return new float[]{r, r, r};
+        }
+    }
 }

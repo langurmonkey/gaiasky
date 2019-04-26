@@ -40,7 +40,7 @@ public class GalaxyGenerator {
     private static String PARTICLE_TYPE = "gas";
 
     /** Number of particles **/
-    private static int N = 400;
+    private static int N = 4000;
 
     /** Number of spiral arms **/
     private static int Narms = 8;
@@ -143,7 +143,7 @@ public class GalaxyGenerator {
         case "hii":
             return new double[] { 0.78, 0.31, 0.55 };
         case "gas":
-            return new double[] { 0.1, 0.1, 0.4 };
+            return new double[] { 0.13, 0.09, 0.3 };
         default:
             return null;
         }
