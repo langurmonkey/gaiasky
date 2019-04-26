@@ -20,7 +20,6 @@ import gaia.cu9.ari.gaiaorbit.scenegraph.camera.ICamera;
 import gaia.cu9.ari.gaiaorbit.scenegraph.octreewrapper.AbstractOctreeWrapper;
 import gaia.cu9.ari.gaiaorbit.util.I18n;
 import gaia.cu9.ari.gaiaorbit.util.math.Matrix4d;
-import gaia.cu9.ari.gaiaorbit.util.math.Vector2d;
 import gaia.cu9.ari.gaiaorbit.util.math.Vector3d;
 import gaia.cu9.ari.gaiaorbit.util.time.ITimeFrameProvider;
 import gaia.cu9.ari.gaiaorbit.util.tree.IPosition;
@@ -51,13 +50,6 @@ public class SceneGraphNode implements IStarContainer, IPosition {
         }
     }
 
-    protected static class TLV2D extends ThreadLocal<Vector2d> {
-        @Override
-        protected Vector2d initialValue() {
-            return new Vector2d();
-        }
-    }
-
     protected static TLV3D aux3d1 = new TLV3D(), aux3d2 = new TLV3D(), aux3d3 = new TLV3D(), aux3d4 = new TLV3D();
     protected static TLV3 aux3f1 = new TLV3(), aux3f2 = new TLV3(), aux3f3 = new TLV3(), aux3f4 = new TLV3();
 
@@ -65,11 +57,11 @@ public class SceneGraphNode implements IStarContainer, IPosition {
      * Describes to which render group this node belongs at a particular time
      * step.
      */
-    public static enum RenderGroup {
+    public enum RenderGroup {
         /** Using normal shader for per-pixel lighting **/
         MODEL_NORMAL(0),
         /** Using default shader, no normal map **/
-        MODEL_DEFAULT(1),
+        MODEL_BACKGROUND(1),
         /** IntShader - stars **/
         BILLBOARD_STAR(2),
         /** IntShader - galaxies **/
@@ -111,7 +103,7 @@ public class SceneGraphNode implements IStarContainer, IPosition {
         /** Transparent additive-blended meshes **/
         MODEL_MESH_ADDITIVE(21),
         /** Grids shader **/
-        MODEL_GRIDS(22),
+        MODEL_GRID(22),
         /** Clouds **/
         MODEL_CLOUD(23),
         /** Using normal shader for per-pixel lighting, with additive blending **/

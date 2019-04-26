@@ -5,6 +5,7 @@ uniform float u_alpha;
 uniform int u_blending = 1;
 
 varying vec4 v_col;
+varying float v_depth;
 
 void main() {
     vec2 uv = vec2(gl_PointCoord.s, gl_PointCoord.t);
@@ -21,4 +22,7 @@ void main() {
         // Additive blending
         gl_FragColor = v_col * u_alpha * profile;
     }
+
+    // Logarithmic depth buffer
+    gl_FragDepth = v_depth;
 }

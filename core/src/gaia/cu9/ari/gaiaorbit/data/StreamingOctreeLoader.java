@@ -23,7 +23,6 @@ import gaia.cu9.ari.gaiaorbit.util.Logger.Log;
 import gaia.cu9.ari.gaiaorbit.util.tree.LoadStatus;
 import gaia.cu9.ari.gaiaorbit.util.tree.OctreeNode;
 
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.Comparator;
 import java.util.Queue;
@@ -106,9 +105,9 @@ public abstract class StreamingOctreeLoader implements IObserver, ISceneGraphLoa
         maxLoadedStars = GlobalConf.scene.MAX_LOADED_STARS;
         logger.info(this.getClass().getSimpleName(), "Maximum loaded stars setting: " + maxLoadedStars);
 
-        Comparator<OctreeNode> depthComparator = (OctreeNode o1, OctreeNode o2) -> Integer.compare(o1.depth, o2.depth);
-        toLoadQueue = new PriorityBlockingQueue<OctreeNode>(LOAD_QUEUE_MAX_SIZE, depthComparator);
-        toUnloadQueue = new ArrayBlockingQueue<OctreeNode>(LOAD_QUEUE_MAX_SIZE);
+        Comparator<OctreeNode> depthComparator = Comparator.comparingInt((OctreeNode o) -> o.depth);
+        toLoadQueue = new PriorityBlockingQueue<>(LOAD_QUEUE_MAX_SIZE, depthComparator);
+        toUnloadQueue = new ArrayBlockingQueue<>(LOAD_QUEUE_MAX_SIZE);
 
         maxLoadedIds = 50;
         idxLoadedIds = 0;
@@ -127,7 +126,7 @@ public abstract class StreamingOctreeLoader implements IObserver, ISceneGraphLoa
     }
 
     @Override
-    public Array<? extends SceneGraphNode> loadData() throws FileNotFoundException {
+    public Array<? extends SceneGraphNode> loadData() {
         AbstractOctreeWrapper octreeWrapper = loadOctreeData();
 
         if (octreeWrapper != null) {
@@ -153,14 +152,14 @@ public abstract class StreamingOctreeLoader implements IObserver, ISceneGraphLoa
             }, 1000, 1000);
 
             // Add octreeWrapper to result list and return
-            Array<SceneGraphNode> result = new Array<SceneGraphNode>(1);
+            Array<SceneGraphNode> result = new Array<>(1);
             result.add(octreeWrapper);
 
             logger.info(I18n.bundle.format("notif.catalog.init", octreeWrapper.root.countObjects()));
 
             return result;
         } else {
-            return new Array<SceneGraphNode>(1);
+            return new Array<>(1);
         }
     }
 

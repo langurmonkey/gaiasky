@@ -83,7 +83,7 @@ public class SceneGraphRenderer extends AbstractRenderer implements IProcessRend
     /** Alpha values for each type **/
     public static float[] alphas;
 
-    private ShaderProgram[] starGroupShaders, particleGroupShaders, particleEffectShaders, orbitElemShaders, pointShaders, lineShaders, lineQuadShaders, lineGpuShaders, mwPointShaders, mwOitShaders, mwNebulaShaders, starPointShaders, galShaders, spriteShaders, starBillboardShaders;
+    private ShaderProgram[] starGroupShaders, particleGroupShaders, particleEffectShaders, orbitElemShaders, pointShaders, lineShaders, lineQuadShaders, lineGpuShaders, mwPointShaders, mwNebulaShaders, starPointShaders, galShaders, spriteShaders, starBillboardShaders;
     private AssetDescriptor<ShaderProgram>[] starGroupDesc, particleGroupDesc, particleEffectDesc, orbitElemDesc, pointDesc, lineDesc, lineQuadDesc, lineGpuDesc, mwPointDesc, mwOitDesc, mwNebulaDesc, starPointDesc, galDesc, spriteDesc, starBillboardDesc;
 
     /** Render lists for all render groups **/
@@ -310,12 +310,7 @@ public class SceneGraphRenderer extends AbstractRenderer implements IProcessRend
         /*
          * MW POINTS
          */
-        mwPointShaders = fetchShaderProgram(manager, mwPointDesc, genShaderFullNames("mw-point"));
-
-        /*
-         * MW Order-Independent Transparency
-         */
-        mwOitShaders = fetchShaderProgram(manager, mwOitDesc, genShaderFullNames("gal-oit"));
+        mwPointShaders = fetchShaderProgram(manager, mwOitDesc, genShaderFullNames("mw-point"));
 
         /*
          * MW NEBULAE
@@ -431,25 +426,25 @@ public class SceneGraphRenderer extends AbstractRenderer implements IProcessRend
 
         // POINTS
         AbstractRenderSystem pixelStarProc = new StarPointRenderSystem(RenderGroup.POINT_STAR, alphas, starPointShaders, ComponentType.Stars);
-        pixelStarProc.addPreRunnables(regularBlendR, noDepthTestR);
+        pixelStarProc.addPreRunnables(additiveBlendR, noDepthTestR);
 
-        // MODEL FRONT-BACK - NO CULL FACE
-        AbstractRenderSystem modelFrontBackProc = new ModelBatchRenderSystem(RenderGroup.MODEL_DEFAULT, alphas, modelBatchDefault, ModelRenderType.NORMAL);
-        modelFrontBackProc.addPreRunnables(regularBlendR, depthTestR);
-        modelFrontBackProc.addPostRunnables((renderSystem, renderables, camera) -> {
+        // MODEL BACKGROUND - (MW panorama, CMWB)
+        AbstractRenderSystem modelBackgroundProc = new ModelBatchRenderSystem(RenderGroup.MODEL_BACKGROUND, alphas, modelBatchDefault, ModelRenderType.NORMAL);
+        modelBackgroundProc.addPreRunnables(regularBlendR, depthTestR);
+        modelBackgroundProc.addPostRunnables((renderSystem, renderables, camera) -> {
             // This always goes at the back, clear depth buffer
             Gdx.gl.glClear(GL20.GL_DEPTH_BUFFER_BIT);
         });
 
-        // MODEL GRID
-        AbstractRenderSystem modelGridsProc = new ModelBatchRenderSystem(RenderGroup.MODEL_GRIDS, alphas, modelBatchGrids, ModelRenderType.NORMAL);
+        // MODEL GRID - (Ecl, Eq, Gal grids)
+        AbstractRenderSystem modelGridsProc = new ModelBatchRenderSystem(RenderGroup.MODEL_GRID, alphas, modelBatchGrids, ModelRenderType.NORMAL);
         modelGridsProc.addPreRunnables(regularBlendR, depthTestR);
         modelGridsProc.addPostRunnables((renderSystem, renderables, camera) -> {
             // This always goes at the back, clear depth buffer
             Gdx.gl.glClear(GL20.GL_DEPTH_BUFFER_BIT);
         });
 
-        // ANNOTATIONS
+        // ANNOTATIONS - (grids)
         AbstractRenderSystem annotationsProc = new FontRenderSystem(RenderGroup.FONT_ANNOTATION, alphas, spriteBatch, null);
         annotationsProc.addPreRunnables(regularBlendR, noDepthTestR);
         annotationsProc.addPostRunnables((renderSystem, renderables, camera) -> {
@@ -518,7 +513,7 @@ public class SceneGraphRenderer extends AbstractRenderer implements IProcessRend
 
         // BILLBOARD SPRITES
         AbstractRenderSystem billboardSpritesProc = new BillboardSpriteRenderSystem(RenderGroup.BILLBOARD_SPRITE, alphas, spriteShaders, ComponentType.Clusters.ordinal());
-        billboardSpritesProc.addPreRunnables(regularBlendR, depthTestR, noDepthWritesR);
+        billboardSpritesProc.addPreRunnables(additiveBlendR, depthTestR, noDepthWritesR);
 
         // LINES CPU
         AbstractRenderSystem lineProc = getLineRenderSystem();
@@ -547,10 +542,10 @@ public class SceneGraphRenderer extends AbstractRenderer implements IProcessRend
         modelBeamProc.addPreRunnables(regularBlendR, depthTestR);
 
         // GALAXY
-        //mwrs = new MWModelRenderSystem(RenderGroup.GALAXY, alphas, MWModelRenderSystem.oit ? mwOitShaders : mwPointShaders);
-        //AbstractRenderSystem galaxyProc = mwrs;
-        AbstractRenderSystem galaxyProc = new MilkyWayRenderSystem(RenderGroup.GALAXY, alphas, modelBatchDefault, mwPointShaders, mwNebulaShaders);
-        galaxyProc.addPreRunnables(regularBlendR, noDepthTestR);
+        mwrs = new MWModelRenderSystem(RenderGroup.GALAXY, alphas, mwPointShaders);
+        AbstractRenderSystem milkyWayProc = mwrs;
+        //AbstractRenderSystem milkyWayProc = new MilkyWayRenderSystem(RenderGroup.GALAXY, alphas, modelBatchDefault, mwPointShaders, mwNebulaShaders);
+        //milkyWayProc.addPreRunnables(additiveBlendR, depthTestR, noDepthWritesR);
 
         // PARTICLE EFFECTS
         AbstractRenderSystem particleEffectsProc = new ParticleEffectsRenderSystem(null, alphas, particleEffectShaders);
@@ -574,7 +569,7 @@ public class SceneGraphRenderer extends AbstractRenderer implements IProcessRend
 
         // LABELS
         AbstractRenderSystem labelsProc = new FontRenderSystem(RenderGroup.FONT_LABEL, alphas, fontBatch, distanceFieldFontShader, font3d, font2d, fontTitles);
-        labelsProc.addPreRunnables(regularBlendR, depthTestR);
+        labelsProc.addPreRunnables(regularBlendR, depthTestR, noDepthWritesR);
 
         // BILLBOARD SSO
         AbstractRenderSystem billboardSSOProc = new BillboardStarRenderSystem(RenderGroup.BILLBOARD_SSO, alphas, starBillboardShaders, "data/tex/base/sso.png", -1);
@@ -602,13 +597,16 @@ public class SceneGraphRenderer extends AbstractRenderer implements IProcessRend
         shapeProc.addPreRunnables(regularBlendR, depthTestR);
 
         // Add components to set
-        renderProcesses.add(modelFrontBackProc);
+        renderProcesses.add(modelBackgroundProc);
         renderProcesses.add(modelGridsProc);
         renderProcesses.add(pixelStarProc);
         renderProcesses.add(annotationsProc);
 
         // Opaque meshes
         renderProcesses.add(modelMeshOpaqueProc);
+
+        // Milky way
+        renderProcesses.add(milkyWayProc);
 
         // Billboards
         renderProcesses.add(billboardStarsProc);
@@ -617,20 +615,19 @@ public class SceneGraphRenderer extends AbstractRenderer implements IProcessRend
         renderProcesses.add(modelFrontProc);
         renderProcesses.add(modelBeamProc);
 
-        // Labels
-        renderProcesses.add(labelsProc);
-
         // Stars, particles
         renderProcesses.add(particleGroupProc);
         renderProcesses.add(starGroupProc);
         renderProcesses.add(orbitElemProc);
+
+        // Labels
+        renderProcesses.add(labelsProc);
 
         // Additive meshes
         renderProcesses.add(modelMeshAdditiveProc);
 
         // Galaxy and nebulae billboards
         renderProcesses.add(billboardSpritesProc);
-        renderProcesses.add(galaxyProc);
         renderProcesses.add(billboardGalaxiesProc);
 
         // Primitives
@@ -816,14 +813,6 @@ public class SceneGraphRenderer extends AbstractRenderer implements IProcessRend
         }
     }
 
-    private void renderMWPrePass(ICamera camera) {
-        if (mwrs != null) {
-            Array<IRenderable> arr = render_lists.get(RenderGroup.GALAXY.ordinal());
-            if (arr != null && arr.size > 0)
-                mwrs.renderPrePasses((MilkyWay) arr.get(0), camera);
-        }
-    }
-
     @Override
     public void render(ICamera camera, double t, int rw, int rh, FrameBuffer fb, PostProcessBean ppb) {
         if (sgr == null)
@@ -836,15 +825,7 @@ public class SceneGraphRenderer extends AbstractRenderer implements IProcessRend
         if (!GlobalConf.program.STEREOSCOPIC_MODE && !GlobalConf.program.CUBEMAP360_MODE)
             renderGlowPass(camera);
 
-        renderMWPrePass(camera);
-
         sgr.render(this, camera, t, rw, rh, fb, ppb);
-
-        if (mwrs != null && MWModelRenderSystem.oit) {
-            spriteBatch.begin();
-            spriteBatch.draw(mwrs.oitFb.getTextureAttachments().get(0), 0, 0, 756, 504);
-            spriteBatch.end();
-        }
 
     }
 

@@ -141,7 +141,7 @@ public class MilkyWayRenderSystem extends ImmediateRenderSystem implements IObse
                     col[2] = MathUtilsd.clamp(col[2], 0f, 1f);
 
                     // COLOR
-                    curr.vertices[curr.vertexIdx + curr.colorOffset] = Color.toFloatBits(col[0], col[1], col[2], col[3] * 0.8f);
+                    curr.vertices[curr.vertexIdx + curr.colorOffset] = Color.toFloatBits(col[0], col[1], col[2], col[3]);
 
                     // SIZE
                     double starSize = 0;
@@ -299,7 +299,7 @@ public class MilkyWayRenderSystem extends ImmediateRenderSystem implements IObse
                     // General uniforms
                     nebulaProgram.setUniformMatrix("u_projModelView", camera.getCamera().combined);
                     nebulaProgram.setUniformf("u_camPos", camera.getCurrent().getPos().put(aux1));
-                    nebulaProgram.setUniformf("u_alpha", 0.015f * mw.opacity * alpha);
+                    nebulaProgram.setUniformf("u_alpha", 0.035f * mw.opacity * alpha);
 
                     for (int i = 0; i < 4; i++) {
                         nebulatextures[i].bind(i);
@@ -322,8 +322,6 @@ public class MilkyWayRenderSystem extends ImmediateRenderSystem implements IObse
                         // Enable point sizes
                         Gdx.gl20.glEnable(0x8642);
                     }
-                    // Additive blending
-                    Gdx.gl20.glBlendFunc(GL20.GL_ONE, GL20.GL_ONE);
 
                     ShaderProgram shaderProgram = getShaderProgram();
 
@@ -340,20 +338,18 @@ public class MilkyWayRenderSystem extends ImmediateRenderSystem implements IObse
                     curr.mesh.render(shaderProgram, ShapeType.Point.getGlType());
                     shaderProgram.end();
 
-                    // Restore
-                    Gdx.gl.glBlendFunc(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA);
                 }
 
                 /**
                  * IMAGE RENDERER
                  */
-                mw.mc.touch();
-                mw.mc.setTransparency(mw.opacity * alpha * (GlobalConf.scene.GALAXY_3D ? 0.6f : 0.8f));
-                mw.mc.updateRelativisticEffects(camera);
+                //mw.mc.touch();
+                //mw.mc.setTransparency(mw.opacity * alpha * (GlobalConf.scene.GALAXY_3D ? 0.6f : 0.8f));
+                //mw.mc.updateRelativisticEffects(camera);
 
-                modelBatch.begin(camera.getCamera());
-                modelBatch.render(mw.mc.instance, mw.mc.env);
-                modelBatch.end();
+                //modelBatch.begin(camera.getCamera());
+                //modelBatch.render(mw.mc.instance, mw.mc.env);
+                //modelBatch.end();
 
             }
         }
@@ -361,7 +357,7 @@ public class MilkyWayRenderSystem extends ImmediateRenderSystem implements IObse
     }
 
     protected VertexAttribute[] buildVertexAttributes() {
-        Array<VertexAttribute> attribs = new Array<VertexAttribute>();
+        Array<VertexAttribute> attribs = new Array<>();
         attribs.add(new VertexAttribute(Usage.Position, 3, ShaderProgram.POSITION_ATTRIBUTE));
         attribs.add(new VertexAttribute(Usage.ColorPacked, 4, ShaderProgram.COLOR_ATTRIBUTE));
         attribs.add(new VertexAttribute(Usage.Generic, 4, "a_additional"));

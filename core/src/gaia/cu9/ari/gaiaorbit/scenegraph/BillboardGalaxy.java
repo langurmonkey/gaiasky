@@ -20,6 +20,9 @@ import gaia.cu9.ari.gaiaorbit.util.time.ITimeFrameProvider;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * Renders billboard galaxies with no texture, just blobs
+ */
 public class BillboardGalaxy extends Billboard {
 
     protected static final double TH_ANGLE_POINT_M = Math.toRadians(0.9);

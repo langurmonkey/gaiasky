@@ -2,6 +2,7 @@
 
 #include shader/lib_math.glsl
 #include shader/lib_geometry.glsl
+#include shader/lib_logdepthbuff.glsl
 
 attribute vec4 a_position;
 attribute vec4 a_color;
@@ -31,11 +32,15 @@ uniform vec3 u_camPos;
 #endif // gravitationalWaves
 
 varying vec4 v_col;
+varying float v_depth;
 
 void main() {
     vec3 pos = a_position.xyz - u_camPos;
     float dist = length(pos);
-    
+
+    // Logarithmic depth buffer
+    v_depth = getDepthValue(dist);
+
     #ifdef relativisticEffects
         pos = computeRelativisticAberration(pos, dist, u_velDir, u_vc);
     #endif // relativisticEffects
@@ -44,7 +49,7 @@ void main() {
         pos = computeGravitationalWaves(pos, u_gw, u_gwmat3, u_ts, u_omgw, u_hterms);
     #endif // gravitationalWaves
     
-    float distNorm = dist / 800000000000.0;
+    float distNorm = dist / 8.0e11;
 
     v_col = a_color;
 

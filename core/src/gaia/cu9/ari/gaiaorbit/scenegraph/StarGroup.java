@@ -746,7 +746,7 @@ public class StarGroup extends ParticleGroup implements ILineRenderable, IStarFo
                     b = MathUtilsd.clamp(b, 0, 1);
 
                     renderer.addLine(this, p1.x, p1.y, p1.z, p2.x, p2.y, p2.z, r, g, b, alpha * this.opacity);
-                    if(GlobalConf.scene.PM_ARROWHEADS) {
+                    if (GlobalConf.scene.PM_ARROWHEADS) {
                         // Add Arrow cap
                         Vector3d p3 = aux3d2.get().set(ppm).nor().scl(p1p2len * .86).add(p1);
                         p3.rotate(p2, 30);
@@ -1132,22 +1132,35 @@ public class StarGroup extends ParticleGroup implements ILineRenderable, IStarFo
     /**
      * Creates a default star group with some sane parameters, given the name and the data
      *
-     * @param name The name of the star group
+     * @param name The name of the star group. Any occurrence of '%%SGID%%' in name will be replaced with the id of the star group
      * @param data The data of the star group
      * @return A new star group with sane parameters
      */
     public static StarGroup getDefaultStarGroup(String name, Array<StarBean> data) {
+        return getDefaultStarGroup(name, data, true);
+    }
+
+    /**
+     * Creates a default star group with some sane parameters, given the name and the data
+     *
+     * @param name The name of the star group. Any occurrence of '%%SGID%%' in name will be replaced with the id of the star group
+     * @param data The data of the star group
+     * @param fullInit Initializes the group right away
+     * @return A new star group with sane parameters
+     */
+    public static StarGroup getDefaultStarGroup(String name, Array<StarBean> data, boolean fullInit) {
         StarGroup sg = new StarGroup();
-        sg.setName(name);
+        sg.setName(name.replace("%%SGID%%", Long.toString(sg.id)));
         sg.setParent("Universe");
-        sg.setFadeout(new double[] { 21e2, 1e5 });
+        sg.setFadeout(new double[] { 2e3, 1e5 });
         sg.setLabelcolor(new double[] { 1.0, 1.0, 1.0, 1.0 });
         sg.setColor(new double[] { 1.0, 1.0, 1.0, 0.25 });
         sg.setSize(6.0);
         sg.setLabelposition(new double[] { 0.0, -5.0e7, -4e8 });
         sg.setCt("Stars");
         sg.setData(data);
-        sg.doneLoading(null);
+        if (fullInit)
+            sg.doneLoading(null);
         return sg;
     }
 }
