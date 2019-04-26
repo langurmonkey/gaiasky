@@ -7,7 +7,6 @@ package gaia.cu9.ari.gaiaorbit.render.system;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.VertexAttribute;
 import com.badlogic.gdx.graphics.VertexAttributes.Usage;
 import com.badlogic.gdx.graphics.glutils.ShaderProgram;
@@ -74,6 +73,8 @@ public class ParticleGroupRenderSystem extends ImmediateRenderSystem implements 
     @Override
     public void renderStud(Array<IRenderable> renderables, ICamera camera, double t) {
         if (renderables.size > 0) {
+            ShaderProgram shaderProgram = getShaderProgram();
+            shaderProgram.begin();
             for (IRenderable renderable : renderables) {
                 ParticleGroup particleGroup = (ParticleGroup) renderable;
                 /**
@@ -93,7 +94,6 @@ public class ParticleGroupRenderSystem extends ImmediateRenderSystem implements 
                         // SIZE
                         tempVerts[curr.vertexIdx + additionalOffset] = (particleGroup.size + (float) (rand.nextGaussian() * particleGroup.size / 4d)) * particleGroup.highlightedSizeFactor();
 
-                        // cb.transform.getTranslationf(aux);
                         // POSITION
                         final int idx = curr.vertexIdx;
                         tempVerts[idx] = (float) p[0];
@@ -116,19 +116,13 @@ public class ParticleGroupRenderSystem extends ImmediateRenderSystem implements 
                     // Enable point sizes
                     Gdx.gl20.glEnable(0x8642);
 
-                    // Additive blending
-                    Gdx.gl20.glBlendFunc(GL20.GL_ONE, GL20.GL_ONE);
+                    boolean stereoHalfWidth = GlobalConf.program.isStereoHalfWidth();
 
-                    ShaderProgram shaderProgram = getShaderProgram();
-
-                    boolean stereohw = GlobalConf.program.isStereoHalfWidth();
-
-                    shaderProgram.begin();
                     shaderProgram.setUniformMatrix("u_projModelView", camera.getCamera().combined);
                     shaderProgram.setUniformf("u_alpha", alphas[particleGroup.ct.getFirstOrdinal()] * particleGroup.getOpacity());
-                    shaderProgram.setUniformf("u_ar", stereohw ? 0.5f : 1f);
+                    shaderProgram.setUniformf("u_ar", stereoHalfWidth ? 0.5f : 1f);
                     shaderProgram.setUniformf("u_profileDecay", particleGroup.profileDecay);
-                    shaderProgram.setUniformf("u_sizeFactor", (((stereohw ? 2f : 1f) * rc.scaleFactor * GlobalConf.scene.STAR_POINT_SIZE / 5f)) * particleGroup.highlightedSizeFactor());
+                    shaderProgram.setUniformf("u_sizeFactor", (((stereoHalfWidth ? 2f : 1f) * rc.scaleFactor * GlobalConf.scene.STAR_POINT_SIZE / 5f)) * particleGroup.highlightedSizeFactor());
                     shaderProgram.setUniformf("u_camPos", camera.getCurrent().getPos().put(aux1));
                     shaderProgram.setUniformf("u_camDir", camera.getCurrent().getCamera().direction);
                     shaderProgram.setUniformi("u_cubemap", GlobalConf.program.CUBEMAP360_MODE ? 1 : 0);
@@ -137,17 +131,15 @@ public class ParticleGroupRenderSystem extends ImmediateRenderSystem implements 
                     addEffectsUniforms(shaderProgram, camera);
 
                     curr.mesh.render(shaderProgram, ShapeType.Point.getGlType());
-                    shaderProgram.end();
 
-                    // Restore
-                    Gdx.gl.glBlendFunc(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA);
                 }
             }
+            shaderProgram.end();
         }
     }
 
     protected VertexAttribute[] buildVertexAttributes() {
-        Array<VertexAttribute> attribs = new Array<VertexAttribute>();
+        Array<VertexAttribute> attribs = new Array<>();
         attribs.add(new VertexAttribute(Usage.Position, 3, ShaderProgram.POSITION_ATTRIBUTE));
         attribs.add(new VertexAttribute(Usage.ColorPacked, 4, ShaderProgram.COLOR_ATTRIBUTE));
         attribs.add(new VertexAttribute(Usage.Generic, 1, "a_size"));
