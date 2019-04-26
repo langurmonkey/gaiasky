@@ -256,7 +256,7 @@ public class MWModelRenderSystem extends ImmediateRenderSystem implements IObser
     private class DustColorGenerator implements ColorGenerator {
         @Override
         public float[] generateColor() {
-            float r = (float) Math.abs(StdRandom.uniform() * 0.1);
+            float r = (float) Math.abs(StdRandom.uniform() * 0.15);
             return new float[]{r, r, r};
         }
     }
