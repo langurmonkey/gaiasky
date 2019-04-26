@@ -167,17 +167,18 @@ public class MWModelRenderSystem extends ImmediateRenderSystem implements IObser
                 ShaderProgram shaderProgram = getShaderProgram();
 
                 shaderProgram.begin();
-                shaderProgram.setUniformMatrix("u_projModelView", camera.getCamera().combined);
 
+                shaderProgram.setUniformMatrix("u_projModelView", camera.getCamera().combined);
                 shaderProgram.setUniformf("u_camPos", camera.getCurrent().getPos().put(aux3f1));
                 shaderProgram.setUniformf("u_alpha", mw.opacity * alpha);
                 shaderProgram.setUniformf("u_ar", GlobalConf.program.STEREOSCOPIC_MODE && (GlobalConf.program.STEREO_PROFILE != StereoProfile.HD_3DTV_HORIZONTAL && GlobalConf.program.STEREO_PROFILE != StereoProfile.ANAGLYPHIC) ? 0.5f : 1f);
                 // Relativistic effects
                 addEffectsUniforms(shaderProgram, camera);
 
-                // Additive blending
+                // General settings for all
                 Gdx.gl20.glEnable(GL20.GL_DEPTH_TEST);
                 Gdx.gl20.glEnable(GL20.GL_BLEND);
+
 
                 // PART 1: DUST - depth enabled - depth writes
                 Gdx.gl20.glBlendFunc(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA);
@@ -212,6 +213,7 @@ public class MWModelRenderSystem extends ImmediateRenderSystem implements IObser
                 shaderProgram.setUniformf("u_sizeFactor", 1.4f);
                 shaderProgram.setUniformf("u_intensity", 0.25f);
                 gas.mesh.render(shaderProgram, ShapeType.Point.getGlType());
+
                 shaderProgram.end();
             }
         }
