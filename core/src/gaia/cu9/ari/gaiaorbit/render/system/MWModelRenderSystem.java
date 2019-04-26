@@ -168,8 +168,6 @@ public class MWModelRenderSystem extends ImmediateRenderSystem implements IObser
 
                 shaderProgram.begin();
                 shaderProgram.setUniformMatrix("u_projModelView", camera.getCamera().combined);
-                shaderProgram.setUniformMatrix("u_view", camera.getCamera().view);
-                shaderProgram.setUniformMatrix("u_projection", camera.getCamera().projection);
 
                 shaderProgram.setUniformf("u_camPos", camera.getCurrent().getPos().put(aux3f1));
                 shaderProgram.setUniformf("u_alpha", mw.opacity * alpha);
@@ -181,18 +179,18 @@ public class MWModelRenderSystem extends ImmediateRenderSystem implements IObser
                 Gdx.gl20.glEnable(GL20.GL_DEPTH_TEST);
                 Gdx.gl20.glEnable(GL20.GL_BLEND);
 
-                // DUST - depth enabled - depth writes
+                // PART 1: DUST - depth enabled - depth writes
                 Gdx.gl20.glBlendFunc(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA);
                 Gdx.gl20.glDepthMask(true);
 
+                //  Dust
                 shaderProgram.setUniformf("u_sizeFactor", 3f);
                 shaderProgram.setUniformf("u_intensity", 1f);
                 dust.mesh.render(shaderProgram, ShapeType.Point.getGlType());
-                shaderProgram.end();
 
-                // BULGE + STARS + HII + GAS - depth enabled - no depth writes
+
+                // PART2: BULGE + STARS + HII + GAS - depth enabled - no depth writes
                 Gdx.gl20.glBlendFunc(GL20.GL_ONE, GL20.GL_ONE);
-                shaderProgram.begin();
                 Gdx.gl20.glDepthMask(false);
 
                 // Bulge
