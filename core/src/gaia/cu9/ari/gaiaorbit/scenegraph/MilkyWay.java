@@ -42,7 +42,7 @@ public class MilkyWay extends AbstractPositionEntity implements I3DTextRenderabl
     String model, transformName;
     Matrix4 coordinateSystem;
 
-    public Array<? extends ParticleBean> starData, bulgeData, dustData, hiiData;
+    public Array<? extends ParticleBean> starData, bulgeData, dustData, hiiData, gasData;
     protected String provider;
     public GalaxydataComponent gc;
 
@@ -80,6 +80,8 @@ public class MilkyWay extends AbstractPositionEntity implements I3DTextRenderabl
                 dustData = provider.loadData(gc.dustsource);
             if (gc.hiisource != null)
                 hiiData = provider.loadData(gc.hiisource);
+            if (gc.gassource != null)
+                gasData = provider.loadData(gc.gassource);
 
         } catch (Exception e) {
             Logger.getLogger(this.getClass()).error(e);
@@ -114,7 +116,7 @@ public class MilkyWay extends AbstractPositionEntity implements I3DTextRenderabl
         Vector3 aux = new Vector3();
         Vector3 pos3 = pos.toVector3();
 
-        Array<? extends ParticleBean>[] all = new Array[]{starData, hiiData, dustData, bulgeData};
+        Array<? extends ParticleBean>[] all = new Array[]{starData, hiiData, dustData, bulgeData, gasData};
 
         // Transform all
         for(Array<? extends ParticleBean> a : all){

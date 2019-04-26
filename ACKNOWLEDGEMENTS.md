@@ -7,7 +7,7 @@
 ## Data
 
 -  Dr. Martin Altmann for providing the Gaia orbit data
--  [HYG catalog](https://github.com/astronexus/HYG-Database)
+-  [Stefan Payne-Wardenaar](http://twitter.com/StefanPWinc) for the data used in the Milky Way model
 -  [DPAC](https://www.cosmos.esa.int/web/gaia/dpac/consortium) and the Gaia Collaboration
 
 ## Libraries and code

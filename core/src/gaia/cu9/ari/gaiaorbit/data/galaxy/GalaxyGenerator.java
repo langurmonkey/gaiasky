@@ -34,10 +34,13 @@ public class GalaxyGenerator {
     private static final boolean writeFile = true;
 
     /** spiral | milkyway | uniform | bulge **/
-    private static String GALAXY_TYPE = "bulge";
+    private static String GALAXY_TYPE = "uniform";
 
-    /** star | dust | hii | bulge **/
-    private static String PARTICLE_TYPE = "bulge";
+    /** star | dust | hii | bulge | gas **/
+    private static String PARTICLE_TYPE = "gas";
+
+    /** Number of particles **/
+    private static int N = 400;
 
     /** Number of spiral arms **/
     private static int Narms = 8;
@@ -51,9 +54,6 @@ public class GalaxyGenerator {
     /** Radius of the galaxy **/
     private static double radius = 2.5;
 
-    /** Number of particles **/
-    private static int N = 5000;
-
     /** Ratio radius/armWidth **/
     private static double armWidthRatio = 0.04;
 
@@ -62,7 +62,6 @@ public class GalaxyGenerator {
 
     /** Maximum spiral rotation (end of arm) in degrees **/
     private static double maxRotation = 100;
-
 
     private static boolean radialDensity = true;
 
@@ -83,21 +82,23 @@ public class GalaxyGenerator {
             // Add notif watch
             new ConsoleLogger();
 
+            // Seed RNG
+            StdRandom.setSeed(System.currentTimeMillis());
+
             List<double[]> gal;
 
             if (GALAXY_TYPE.equals("spiral")) {
                 gal = generateGalaxySpiral();
             } else if (GALAXY_TYPE.equals("milkyway")) {
                 gal = generateMilkyWay();
-            } else if(GALAXY_TYPE.equals("uniform")){
+            } else if (GALAXY_TYPE.equals("uniform")) {
                 gal = generateUniform();
-            } else if(GALAXY_TYPE.equals("bulge")){
+            } else if (GALAXY_TYPE.equals("bulge")) {
                 gal = generateBulge();
-            } else{
+            } else {
                 System.out.println("Wrong galaxy type: " + GALAXY_TYPE);
                 return;
             }
-
 
             if (writeFile) {
                 writeToDisk(gal, "/home/tsagrista/.local/share/gaiasky/data/galaxy/");
@@ -117,6 +118,8 @@ public class GalaxyGenerator {
             return Math.abs(StdRandom.uniform() * 40.0 + StdRandom.uniform() * 6.0);
         case "hii":
             return Math.abs(StdRandom.uniform() * 70.0 + StdRandom.uniform() * 30.0);
+        case "gas":
+            return Math.abs(StdRandom.uniform() * 100.0 + StdRandom.uniform() * 50.0);
         default:
             return 1;
         }
@@ -139,6 +142,8 @@ public class GalaxyGenerator {
             return null;
         case "hii":
             return new double[] { 0.78, 0.31, 0.55 };
+        case "gas":
+            return new double[] { 0.1, 0.1, 0.4 };
         default:
             return null;
         }
@@ -156,24 +161,22 @@ public class GalaxyGenerator {
     }
 
     private static List<double[]> generateUniform() {
-        return generateUniformBlob(0.6, 0.6, 1.0/40.0);
+        return generateUniformBlob(1.0 / 7.0, 1.0 / 7.0, 1.0 / 40.0);
     }
 
     private static List<double[]> generateBulge() {
-        return generateUniformBlob(0.15, 0.15, 1.0/20.0);
+        return generateUniformBlob(0.15, 0.15, 1.0 / 20.0);
     }
 
     private static List<double[]> generateUniformBlob(double xExtent, double yExtent, double zExtent) {
-        StdRandom.setSeed(100l);
-
         Vector3d aux = new Vector3d();
         // x, y, z, size
         List<double[]> particles = new ArrayList<>(N);
 
         for (int i = 0; i < N; i++) {
-            double x = StdRandom.gaussian() * xExtent;
-            double y = StdRandom.gaussian() * yExtent;
-            double z = StdRandom.gaussian(0, zExtent);
+            double x = StdRandom.gaussian(0, 5) * xExtent;
+            double y = StdRandom.gaussian(0, 5) * yExtent;
+            double z = StdRandom.gaussian() * zExtent;
 
             addMWParticle(x, y, z, aux, particles);
         }
@@ -189,8 +192,6 @@ public class GalaxyGenerator {
      * @throws RuntimeException
      */
     private static List<double[]> generateMilkyWay() {
-        StdRandom.setSeed(100l);
-
         Vector3d aux = new Vector3d();
         // x, y, z, size
         List<double[]> particles = new ArrayList<>(N);
@@ -245,8 +246,6 @@ public class GalaxyGenerator {
      * galactic plane is XZ and Y points to the galactic north pole.
      */
     private static List<double[]> generateGalaxySpiral() throws RuntimeException {
-        StdRandom.setSeed(100l);
-
         if (bar && Narms % 2 == 1) {
             throw new RuntimeException("Galaxies with bars can only have an even number of arms");
         }
@@ -334,14 +333,14 @@ public class GalaxyGenerator {
         f.createNewFile();
 
         BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(new GZIPOutputStream(new FileOutputStream(filePath))));
-        bw.write("X" + separator + "Y" + separator + "Z" + separator + "size" + separator + "r" + separator + "g" + separator +"b");
+        bw.write("X" + separator + "Y" + separator + "Z" + separator + "size" + separator + "r" + separator + "g" + separator + "b");
         bw.newLine();
 
         for (int i = 0; i < gal.size(); i++) {
             double[] star = gal.get(i);
             StringBuilder sb = new StringBuilder();
             sb.append(star[0]);
-            for(int j = 1; j < star.length; j++) {
+            for (int j = 1; j < star.length; j++) {
                 sb.append(separator);
                 sb.append(star[j]);
             }

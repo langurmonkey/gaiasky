@@ -18,6 +18,9 @@ public class GalaxydataComponent {
     /** HII positions/sizes **/
     public String hiisource;
 
+    /** Gas positions/sizes **/
+    public String gassource;
+
     /** Nebulae - deprecated **/
     public String nebulasource;
 
@@ -43,5 +46,9 @@ public class GalaxydataComponent {
 
     public void setBulgesource(String bulgesource) {
         this.bulgesource = bulgesource;
+    }
+
+    public void setGassource(String gassource) {
+        this.gassource = gassource;
     }
 }
