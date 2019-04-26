@@ -14,6 +14,8 @@ uniform float u_pointAlphaMax;
 uniform float u_starBrightness;
 uniform mat4 u_projModelView;
 uniform vec3 u_camPos;
+uniform float u_sizeFactor;
+uniform float u_intensity;
 
 uniform mat4 u_view;
 
@@ -57,11 +59,11 @@ void main() {
         pos = computeGravitationalWaves(pos, u_gw, u_gwmat3, u_ts, u_omgw, u_hterms);
     #endif // gravitationalWaves
     
-    v_col = vec4(a_color.rgb, a_color.a);
+    v_col = vec4(a_color.rgb, a_color.a * u_intensity);
     v_dust = a_additional.y;
 
     gl_Position = u_projModelView * vec4(pos, 1.0);
-    gl_PointSize = a_additional.x;
+    gl_PointSize = a_additional.x * u_sizeFactor;
 
     v_dscale = smoothstep(edge_far, edge_near, dist);
     v_dscale = pow(v_dscale, 6.0);

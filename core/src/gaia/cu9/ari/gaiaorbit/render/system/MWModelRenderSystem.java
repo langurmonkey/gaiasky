@@ -38,7 +38,7 @@ public class MWModelRenderSystem extends ImmediateRenderSystem implements IObser
     private Vector3 aux3f1;
     private int additionalOffset;
 
-    private MeshData dust, bulge, stars, hii;
+    private MeshData dust, bulge, stars, hii, gas;
 
     private Random rand = new Random(24601);
 
@@ -155,13 +155,16 @@ public class MWModelRenderSystem extends ImmediateRenderSystem implements IObser
 
     private void streamToGpu(MilkyWay mw) {
         /* BULGE */
-        bulge = getMeshData(mw, mw.bulgeData, 1, 100, 1.5f, 0.3f);
+        bulge = getMeshData(mw, mw.bulgeData, 1, 100, 1f, 1f);
 
         /* STARS */
-        stars = getMeshData(mw, mw.starData, 1, 100, 1, 0.2f);
+        stars = getMeshData(mw, mw.starData, 1, 100, 1, 1f);
 
         /* HII */
-        hii = getMeshData(mw, mw.hiiData, 1, 100, 1f, 0.3f);
+        hii = getMeshData(mw, mw.hiiData, 1, 100, 1f, 1f);
+
+        /* GAS */
+        gas = getMeshData(mw, mw.gasData, 1, 100, 1f, 1f);
 
         /* DUST */
         // This factor increases the number of particles
@@ -176,10 +179,9 @@ public class MWModelRenderSystem extends ImmediateRenderSystem implements IObser
         for (ParticleBean p : mw.dustData) {
             for (int i = 0; i < nFactor; i++) {
                 // COLOR
-                float r = (float) Math.abs(StdRandom.uniform() * 0.15);
-                float[] col = new float[] { r, r, r, 1.0f };
+                float r = (float) Math.abs(StdRandom.uniform() * 0.1);
 
-                tempVerts[dust.vertexIdx + dust.colorOffset] = Color.toFloatBits(col[0], col[1], col[2], col[3]);
+                tempVerts[dust.vertexIdx + dust.colorOffset] = Color.toFloatBits(r, r, r, 1);
 
                 // SIZE
                 double starSize = p.data[3] * 1.5 + Math.abs(rand.nextGaussian());
@@ -247,19 +249,39 @@ public class MWModelRenderSystem extends ImmediateRenderSystem implements IObser
                 Gdx.gl20.glEnable(GL20.GL_DEPTH_TEST);
                 Gdx.gl20.glEnable(GL20.GL_BLEND);
 
-                // DUST - depth enabled - no depth writes
+                // DUST - depth enabled - depth writes
                 Gdx.gl20.glBlendFunc(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA);
                 Gdx.gl20.glDepthMask(true);
+
+                shaderProgram.setUniformf("u_sizeFactor", 0.8f);
+                shaderProgram.setUniformf("u_intensity", 1f);
                 dust.mesh.render(shaderProgram, ShapeType.Point.getGlType());
                 shaderProgram.end();
 
-                // BULGE + STARS + HII - depth enabled - depth writes
+                // BULGE + STARS + HII + GAS - depth enabled - no depth writes
                 Gdx.gl20.glBlendFunc(GL20.GL_ONE, GL20.GL_ONE);
                 shaderProgram.begin();
                 Gdx.gl20.glDepthMask(false);
+
+                // Bulge
+                shaderProgram.setUniformf("u_sizeFactor", 1.3f);
+                shaderProgram.setUniformf("u_intensity", 0.1f);
                 bulge.mesh.render(shaderProgram, ShapeType.Point.getGlType());
+
+                // Stars
+                shaderProgram.setUniformf("u_sizeFactor", 0.5f);
+                shaderProgram.setUniformf("u_intensity", 0.3f);
                 stars.mesh.render(shaderProgram, ShapeType.Point.getGlType());
+
+                // HII
+                shaderProgram.setUniformf("u_sizeFactor", 1f);
+                shaderProgram.setUniformf("u_intensity", 0.1f);
                 hii.mesh.render(shaderProgram, ShapeType.Point.getGlType());
+
+                // Gas
+                shaderProgram.setUniformf("u_sizeFactor", 1.8f);
+                shaderProgram.setUniformf("u_intensity", 0.3f);
+                gas.mesh.render(shaderProgram, ShapeType.Point.getGlType());
                 shaderProgram.end();
             }
         }
