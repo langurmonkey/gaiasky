@@ -95,6 +95,9 @@ public class StarGroupRenderSystem extends ImmediateRenderSystem implements IObs
         //renderables.sort(comp);
         if (renderables.size > 0) {
 
+            ShaderProgram shaderProgram = getShaderProgram();
+
+            shaderProgram.begin();
             for (IRenderable renderable : renderables) {
                 StarGroup starGroup = (StarGroup) renderable;
                 synchronized (starGroup) {
@@ -141,9 +144,6 @@ public class StarGroupRenderSystem extends ImmediateRenderSystem implements IObs
                         if (curr != null) {
                             int fovmode = camera.getMode().getGaiaFovMode();
 
-                            ShaderProgram shaderProgram = getShaderProgram();
-
-                            shaderProgram.begin();
                             shaderProgram.setUniform2fv("u_pointAlpha", starGroup.isHighlighted() ? pointAlphaHl : pointAlpha, 0, 2);
                             shaderProgram.setUniformMatrix("u_projModelView", camera.getCamera().combined);
                             shaderProgram.setUniformf("u_camPos", camera.getCurrent().getPos().put(aux1));
@@ -177,11 +177,11 @@ public class StarGroupRenderSystem extends ImmediateRenderSystem implements IObs
                             } catch (IllegalArgumentException e) {
                                 logger.error("Render exception");
                             }
-                            shaderProgram.end();
                         }
                     }
                 }
             }
+            shaderProgram.end();
         }
     }
 
