@@ -98,24 +98,14 @@ public class OctreeGroupLoader extends StreamingOctreeLoader {
         }
     }
 
-    public boolean loadOctant(final OctreeNode octant, final AbstractOctreeWrapper octreeWrapper, boolean fullinit) throws IOException {
+    public boolean loadOctant(final OctreeNode octant, final AbstractOctreeWrapper octreeWrapper, boolean fullInit) throws IOException {
         FileHandle octantFile = GlobalConf.data.dataFileHandle(particles + "particles_" + String.format("%06d", octant.pageId) + ".bin");
         if (!octantFile.exists() || octantFile.isDirectory()) {
             return false;
         }
         @SuppressWarnings("unchecked")
         Array<StarBean> data = (Array<StarBean>) particleReader.loadDataMapped(octantFile.path(), 1.0);
-        StarGroup sg = new StarGroup();
-        sg.setName("stargroup-" + sg.id);
-        sg.setFadeout(new double[] { 21e5, .5e9 });
-        sg.setLabelcolor(new double[] { 1.0, 1.0, 1.0, 1.0 });
-        sg.setColor(new double[] { 1.0, 1.0, 1.0, 0.25 });
-        sg.setSize(6.0);
-        sg.setLabelposition(new double[] { 0.0, -5.0e7, -4e8 });
-        sg.setCt("Stars");
-        sg.setData(data);
-        if (fullinit)
-            sg.doneLoading(null);
+        StarGroup sg = StarGroup.getDefaultStarGroup("stargroup-%%SGID%%", data, fullInit);
 
         synchronized (octant) {
             sg.octant = octant;

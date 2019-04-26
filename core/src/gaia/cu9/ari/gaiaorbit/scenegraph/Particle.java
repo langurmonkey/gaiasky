@@ -34,15 +34,15 @@ import net.jafama.FastMath;
 import java.util.Random;
 
 /**
- * A point particle which may represent a star, a galaxy, etc.
- * 
+ * A single point particle.
+ *
+ * @deprecated Only the Sun uses this via the Star subclass. Move to star group.
  * @author Toni Sagrista
  *
  */
 public class Particle extends CelestialBody implements IStarFocus, ILineRenderable {
 
     private static final float DISC_FACTOR = 1.5f;
-    private static final float LABEL_FACTOR = 1f;
 
     private static Random rnd = new Random();
 

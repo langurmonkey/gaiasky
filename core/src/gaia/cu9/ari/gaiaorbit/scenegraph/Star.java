@@ -39,9 +39,9 @@ import java.util.Map;
 import java.util.TreeMap;
 
 /**
- * Represents a star. The Gaia sourceid is put in the id attribute. Otherwise,
- * the id is fabricated.
- * 
+ * Represents a single star. Currently only the Sun uses this class.
+ *
+ * @deprecated Move Sun to star group
  * @author tsagrista
  *
  */
@@ -342,10 +342,6 @@ public class Star extends Particle {
             String hipid = "hip " + hip;
             map.put(hipid, this);
         }
-        // Tycho
-        if (tycho != null && !tycho.isEmpty()) {
-            map.put(tycho, this);
-        }
     }
 
     @Override
@@ -354,10 +350,6 @@ public class Star extends Particle {
         if (hip > 0) {
             String hipid = "hip " + hip;
             map.remove(hipid);
-        }
-        // Tycho
-        if (tycho != null && !tycho.isEmpty()) {
-            map.remove(tycho);
         }
     }
 

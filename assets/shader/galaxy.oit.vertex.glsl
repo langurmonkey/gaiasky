@@ -2,10 +2,11 @@
 
 #include shader/lib_math.glsl
 #include shader/lib_geometry.glsl
+#include shader/lib_logdepthbuff.glsl
 
 attribute vec4 a_position;
 attribute vec4 a_color;
-// x - size, y - th_angle_point
+// x - size, y - 0: star, 1: dust
 attribute vec4 a_additional;
 
 uniform float u_pointAlphaMin;
@@ -34,14 +35,20 @@ uniform mat4 u_view;
 
 varying vec4 v_col;
 varying float v_depth;
-varying float v_pass;
+varying float v_dscale;
+varying float v_dust;
 
-#define u_to_kpc 3.24e-11
+#define pc_to_u 3.085e7
+#define edge_far 1.0e6 * pc_to_u
+#define edge_near 10 * pc_to_u
 
 void main() {
     vec3 pos = a_position.xyz - u_camPos;
     float dist = length(pos);
-    
+
+    // Logarithmic depth buffer
+    v_depth = getDepthValue(dist);
+
     #ifdef relativisticEffects
         pos = computeRelativisticAberration(pos, dist, u_velDir, u_vc);
     #endif // relativisticEffects
@@ -50,11 +57,12 @@ void main() {
         pos = computeGravitationalWaves(pos, u_gw, u_gwmat3, u_ts, u_omgw, u_hterms);
     #endif // gravitationalWaves
     
-    float distNorm = dist / 800000000000.0;
-
     v_col = vec4(a_color.rgb, a_color.a);
-    v_depth = -dist * u_to_kpc;
+    v_dust = a_additional.y;
 
     gl_Position = u_projModelView * vec4(pos, 1.0);
-    gl_PointSize = a_additional.x / distNorm;
+    gl_PointSize = a_additional.x;
+
+    v_dscale = smoothstep(edge_far, edge_near, dist);
+    v_dscale = pow(v_dscale, 6.0);
 }

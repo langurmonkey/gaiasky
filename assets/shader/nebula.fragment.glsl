@@ -1,12 +1,9 @@
-#ifdef GL_ES
-precision mediump float;
-precision mediump int;
-#endif
 
 // v_texCoords are UV coordinates in [0..1]
 varying vec2 v_texCoords;
 varying float v_alpha;
 varying float v_textureNumber;
+varying float v_depth;
 
 uniform sampler2D u_nebulaTexture0;
 uniform sampler2D u_nebulaTexture1;
@@ -28,5 +25,8 @@ vec4 getSample(){
 
 void main() {
     vec4 texColor = getSample();
-    gl_FragColor = vec4(texColor.rgb, texColor.a * v_alpha);
+    gl_FragColor = vec4(texColor.rgb, 1.0) * texColor.a * v_alpha;
+
+	// Logarithmic depth buffer
+	gl_FragDepth = v_depth;
 }

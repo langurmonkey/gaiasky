@@ -5,9 +5,7 @@
 
 package gaia.cu9.ari.gaiaorbit.render.system;
 
-import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.VertexAttribute;
 import com.badlogic.gdx.graphics.VertexAttributes.Usage;
 import com.badlogic.gdx.graphics.glutils.ShaderProgram;
@@ -52,7 +50,7 @@ public class BillboardSpriteRenderSystem extends AbstractRenderSystem {
 
     private void init(float w, float h) {
         // Init comparator
-        comp = new DistToCameraComparator<IRenderable>();
+        comp = new DistToCameraComparator<>();
         // Init vertices
         float[] vertices = new float[20];
         fillVertices(vertices, w, h);
@@ -121,9 +119,6 @@ public class BillboardSpriteRenderSystem extends AbstractRenderSystem {
             // Calculate billobard rotation quaternion ONCE
             DecalUtils.setBillboardRotation(quaternion, camera.getCamera().direction, camera.getCamera().up);
 
-            // Additive blending
-            Gdx.gl20.glBlendFunc(GL20.GL_ONE, GL20.GL_ONE);
-
             ShaderProgram shaderProgram = getShaderProgram();
 
             shaderProgram.begin();
@@ -144,9 +139,6 @@ public class BillboardSpriteRenderSystem extends AbstractRenderSystem {
                 s.render(shaderProgram, getAlpha(s), mesh, camera);
             }
             shaderProgram.end();
-
-            // Restore
-            Gdx.gl.glBlendFunc(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA);
         }
 
     }

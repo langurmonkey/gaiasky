@@ -20,8 +20,6 @@ void main(void){
 	    
     gl_FragColor = vec4(v_color.rgb, aa * v_color.a);
 
-    // Normal depth buffer
-    // gl_FragDepth = gl_FragCoord.z;
     // Logarithmic depth buffer
     gl_FragDepth = v_depth;
 }

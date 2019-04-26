@@ -32,7 +32,7 @@ import gaia.cu9.ari.gaiaorbit.util.time.ITimeFrameProvider;
 
 /**
  * A model which renders as a background, unaffected by the camera. It should
- * usually be a flipped sphere or cubemap.
+ * usually be a flipped sphere or cube map.
  * 
  * @author tsagrista
  *
@@ -42,7 +42,7 @@ public class BackgroundModel extends FadeNode implements IModelRenderable, I3DTe
     public ModelComponent mc;
     private boolean label, label2d;
 
-    private RenderGroup renderGroupModel = RenderGroup.MODEL_DEFAULT;
+    private RenderGroup renderGroupModel = RenderGroup.MODEL_BACKGROUND;
 
     public BackgroundModel() {
         super();

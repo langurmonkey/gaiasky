@@ -5,7 +5,6 @@
 
 package gaia.cu9.ari.gaiaorbit.data.group;
 
-import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.utils.Array;
 import gaia.cu9.ari.gaiaorbit.scenegraph.ParticleGroup.ParticleBean;
 import gaia.cu9.ari.gaiaorbit.util.GlobalConf;
@@ -14,12 +13,13 @@ import gaia.cu9.ari.gaiaorbit.util.Logger;
 import gaia.cu9.ari.gaiaorbit.util.Logger.Log;
 
 import java.io.BufferedReader;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.util.zip.GZIPInputStream;
 
 /**
- * This provider loads point data in the internal reference system format from text
- * files with a series of [x, y, z]
+ * This provider loads point data into particle beans
  * 
  * @author tsagrista
  *
@@ -32,9 +32,18 @@ public class PointDataProvider implements IParticleGroupDataProvider {
     }
 
     public Array<? extends ParticleBean> loadData(String file, double factor) {
-        FileHandle f = GlobalConf.data.dataFileHandle(file);
+        InputStream is = GlobalConf.data.dataFileHandle(file).read();
+
+        if(file.endsWith(".gz")){
+            try {
+                is = new GZIPInputStream(GlobalConf.data.dataFileHandle(file).read());
+            }catch(IOException e){
+                logger.error("File ends with '.gz' (" + file +") but is not a Gzipped file!", e);
+            }
+        }
+
         @SuppressWarnings("unchecked")
-        Array<ParticleBean> pointData = (Array<ParticleBean>) loadData(f.read(), factor);
+        Array<ParticleBean> pointData = (Array<ParticleBean>) loadData(is, factor);
 
         if (pointData != null)
             logger.info(I18n.bundle.format("notif.nodeloader", pointData.size, file));
@@ -44,30 +53,41 @@ public class PointDataProvider implements IParticleGroupDataProvider {
 
     @Override
     public Array<? extends ParticleBean> loadData(InputStream is, double factor) {
-        Array<ParticleBean> pointData = new Array<ParticleBean>();
+        Array<ParticleBean> pointData = new Array<>();
         try {
             int tokenslen;
             BufferedReader br = new BufferedReader(new InputStreamReader(is));
             String line;
             while ((line = br.readLine()) != null) {
                 if (!line.isEmpty() && !line.startsWith("#")) {
-                    // Read line
-                    String[] tokens = line.split("\\s+");
-                    tokenslen = tokens.length;
-                    double[] point = new double[tokenslen];
-                    for (int j = 0; j < tokenslen; j++) {
-                        // We use regular parser because of scientific notation
-                        point[j] = Double.parseDouble(tokens[j]) * factor;
+                    try {
+                        // Read line
+                        String[] tokens = line.split("\\s+");
+                        tokenslen = tokens.length;
+                        double[] point = new double[tokenslen];
+                        for (int j = 0; j < tokenslen; j++) {
+                            // We use regular parser because of scientific notation
+                            point[j] = Double.parseDouble(tokens[j]) * factor;
+                        }
+                        pointData.add(new ParticleBean(point));
+                    }catch(NumberFormatException e){
+                        // Skip line
                     }
-                    pointData.add(new ParticleBean(point));
                 }
             }
 
             br.close();
 
+
         } catch (Exception e) {
             logger.error(e);
             return null;
+        }finally{
+            try {
+                is.close();
+            }catch(Exception e){
+                // Nothing
+            }
         }
 
         return pointData;

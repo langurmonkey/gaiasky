@@ -42,7 +42,7 @@ public class SDSSDataProvider implements IParticleGroupDataProvider {
 
     @Override
     public Array<? extends ParticleBean> loadData(InputStream is, double factor) {
-        Array<ParticleBean> pointData = new Array<ParticleBean>();
+        Array<ParticleBean> pointData = new Array<>();
 
         try {
             BufferedReader br = new BufferedReader(new InputStreamReader(is));

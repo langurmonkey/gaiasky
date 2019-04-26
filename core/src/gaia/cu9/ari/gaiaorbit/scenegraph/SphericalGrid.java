@@ -24,6 +24,9 @@ import gaia.cu9.ari.gaiaorbit.util.gravwaves.RelativisticEffectsManager;
 import gaia.cu9.ari.gaiaorbit.util.math.Matrix4d;
 import gaia.cu9.ari.gaiaorbit.util.math.Vector3d;
 
+/**
+ * A spherical grid
+ */
 public class SphericalGrid extends BackgroundModel implements IAnnotationsRenderable {
     private static final float ANNOTATIONS_ALPHA = 0.8f;
 
@@ -71,7 +74,7 @@ public class SphericalGrid extends BackgroundModel implements IAnnotationsRender
     protected void addToRenderLists(ICamera camera) {
         // Render group never changes
         // Add to toRender list
-        addToRender(this, RenderGroup.MODEL_GRIDS);
+        addToRender(this, RenderGroup.MODEL_GRID);
         addToRender(this, RenderGroup.FONT_ANNOTATION);
     }
 
