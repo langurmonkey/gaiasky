@@ -38,7 +38,7 @@ public class MeshObject extends FadeNode implements IModelRenderable, I3DTextRen
     private Vector3 scale, axis, translate;
     private float degrees;
     // Mode: opaque or additive
-    private boolean opaque;
+    private boolean opaque = false;
 
     /** MODEL **/
     public ModelComponent mc;

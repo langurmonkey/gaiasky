@@ -54,7 +54,7 @@ public class DownloadDataWindow extends GenericDialog {
     private static final Map<String, String> iconMap;
 
     static {
-        iconMap = new HashMap<String, String>();
+        iconMap = new HashMap<>();
         iconMap.put("other", "icon-elem-others");
         iconMap.put("data-pack", "icon-elem-others");
         iconMap.put("catalog-lod", "icon-elem-stars");
@@ -110,10 +110,10 @@ public class DownloadDataWindow extends GenericDialog {
     protected void build() {
         me.acceptButton.setDisabled(false);
         float pad = 2f * GlobalConf.SCALE_FACTOR;
-        float padl = 9f * GlobalConf.SCALE_FACTOR;
-        float minw = GlobalConf.SCALE_FACTOR == 1 ? 550f : 650f;
+        float padLarge = 9f * GlobalConf.SCALE_FACTOR;
+        float minW = GlobalConf.SCALE_FACTOR == 1 ? 550f : 650f;
 
-        float buttonpad = 1f * GlobalConf.SCALE_FACTOR;
+        float buttonPad = 1f * GlobalConf.SCALE_FACTOR;
 
         Cell<Actor> topCell = content.add((Actor) null);
         topCell.row();
@@ -130,18 +130,18 @@ public class DownloadDataWindow extends GenericDialog {
         hg.addActor(system);
         hg.addActor(downloadInfo);
 
-        downloadTable.add(hg).left().colspan(2).padBottom(padl).row();
+        downloadTable.add(hg).left().colspan(2).padBottom(padLarge).row();
 
         SysUtils.getLocalDataDir().mkdirs();
         String catLoc = GlobalConf.data.DATA_LOCATION;
 
         if (dataLocation) {
             OwnTextButton catalogsLoc = new OwnTextButton(catLoc, skin);
-            catalogsLoc.pad(buttonpad * 4f);
-            catalogsLoc.setMinWidth(minw);
-            downloadTable.add(catalogsLocLabel).left().padBottom(padl);
-            downloadTable.add(catalogsLoc).left().padLeft(pad).padBottom(padl).row();
-            Cell<Actor> notice = downloadTable.add((Actor) null).colspan(2).padBottom(padl);
+            catalogsLoc.pad(buttonPad * 4f);
+            catalogsLoc.setMinWidth(minW);
+            downloadTable.add(catalogsLocLabel).left().padBottom(padLarge);
+            downloadTable.add(catalogsLoc).left().padLeft(pad).padBottom(padLarge).row();
+            Cell<Actor> notice = downloadTable.add((Actor) null).colspan(2).padBottom(padLarge);
             notice.row();
 
             catalogsLoc.addListener((event) -> {
@@ -191,7 +191,7 @@ public class DownloadDataWindow extends GenericDialog {
             boolean hasMinGsVersion = dst.has("mingsversion");
             int minGsVersion = dst.getInt("mingsversion", 0);
             int thisVersion = dst.getInt("version", 0);
-            if (!hasMinGsVersion || minGsVersion <= GaiaSkyDesktop.SOURCE_CONF_VERSION) {
+            if (!hasMinGsVersion || GaiaSkyDesktop.SOURCE_CONF_VERSION >= minGsVersion) {
                 // Dataset type
                 String type = dst.getString("type");
 
@@ -234,7 +234,7 @@ public class DownloadDataWindow extends GenericDialog {
         for (String typeStr : types) {
             List<JsonValue> datasets = typeMap.get(typeStr);
 
-            datasetsTable.add(new OwnLabel(I18n.txt("gui.download.type." + typeStr), skin, "hud-header")).colspan(6).left().padBottom(pad * 3f).padTop(padl * 2f).row();
+            datasetsTable.add(new OwnLabel(I18n.txt("gui.download.type." + typeStr), skin, "hud-header")).colspan(6).left().padBottom(pad * 3f).padTop(padLarge * 2f).row();
 
             for (JsonValue dataset : datasets) {
                 // Check if dataset requires a minimum version of Gaia Sky
@@ -272,7 +272,7 @@ public class DownloadDataWindow extends GenericDialog {
                 String description = dataset.getString("description");
                 String shortDescription;
                 HorizontalGroup descGroup = new HorizontalGroup();
-                descGroup.space(padl);
+                descGroup.space(padLarge);
                 if (description.contains("-")) {
                     shortDescription = description.substring(0, description.indexOf("-"));
                 } else {
@@ -378,14 +378,14 @@ public class DownloadDataWindow extends GenericDialog {
                     rubbishes.add(rubbish);
                 }
 
-                datasetsTable.add(cb).left().padRight(padl).padBottom(pad);
-                datasetsTable.add(descGroup).left().padRight(padl).padBottom(pad);
-                datasetsTable.add(vers).center().padRight(padl).padBottom(pad);
-                datasetsTable.add(typeImage).center().padRight(padl).padBottom(pad);
-                datasetsTable.add(size).left().padRight(padl).padBottom(pad);
+                datasetsTable.add(cb).left().padRight(padLarge).padBottom(pad);
+                datasetsTable.add(descGroup).left().padRight(padLarge).padBottom(pad);
+                datasetsTable.add(vers).center().padRight(padLarge).padBottom(pad);
+                datasetsTable.add(typeImage).center().padRight(padLarge).padBottom(pad);
+                datasetsTable.add(size).left().padRight(padLarge).padBottom(pad);
                 datasetsTable.add(haveit).center().padBottom(pad);
                 if (exists) {
-                    datasetsTable.add(rubbish).center().padLeft(padl * 2.5f);
+                    datasetsTable.add(rubbish).center().padLeft(padLarge * 2.5f);
                 }
                 datasetsTable.row();
 
@@ -402,16 +402,16 @@ public class DownloadDataWindow extends GenericDialog {
         datasetsScroll.setHeight(Math.min(Gdx.graphics.getHeight() * 0.45f, 750f * GlobalConf.SCALE_FACTOR));
         datasetsScroll.setWidth(Math.min(Gdx.graphics.getWidth() * 0.9f, GlobalConf.SCALE_FACTOR > 1.4f ? 600f * GlobalConf.SCALE_FACTOR : 750f * GlobalConf.SCALE_FACTOR));
 
-        downloadTable.add(datasetsScroll).center().padBottom(padl).colspan(2).row();
+        downloadTable.add(datasetsScroll).center().padBottom(padLarge).colspan(2).row();
 
         // Current dataset info
         currentDownloadFile = new OwnLabel(I18n.txt("gui.download.idle"), skin);
-        downloadTable.add(currentDownloadFile).center().colspan(2).padBottom(padl).row();
+        downloadTable.add(currentDownloadFile).center().colspan(2).padBottom(padLarge).row();
 
         // Download button
         downloadButton = new OwnTextButton(I18n.txt("gui.download.download"), skin, "download");
-        downloadButton.pad(buttonpad * 4f);
-        downloadButton.setMinWidth(minw);
+        downloadButton.pad(buttonPad * 4f);
+        downloadButton.setMinWidth(minW);
         downloadButton.setMinHeight(50f * GlobalConf.SCALE_FACTOR);
         downloadTable.add(downloadButton).center().colspan(2).padBottom(0f).row();
 
@@ -419,13 +419,13 @@ public class DownloadDataWindow extends GenericDialog {
         downloadProgress = new OwnProgressBar(0, 100, 0.1f, false, skin, "default-horizontal");
         downloadProgress.setValue(0);
         downloadProgress.setVisible(false);
-        downloadProgress.setPrefWidth(minw);
-        downloadTable.add(downloadProgress).center().colspan(2).padBottom(padl).row();
+        downloadProgress.setPrefWidth(minW);
+        downloadTable.add(downloadProgress).center().colspan(2).padBottom(padLarge).row();
 
         // Download info
         downloadSpeed = new OwnLabel("", skin);
         downloadSpeed.setVisible(false);
-        downloadTable.add(downloadSpeed).center().colspan(2).padBottom(padl).row();
+        downloadTable.add(downloadSpeed).center().colspan(2).padBottom(padLarge).row();
 
         downloadButton.addListener((event) -> {
             if (event instanceof ChangeEvent) {

@@ -62,8 +62,10 @@ public class GaiaSkyDesktop implements IObserver {
     * Version = major * 10000 + minor * 100 + rev
     * So 1.2.5 -> 010205
     *    2.1.7 -> 020107
+    *
+    * Leading zeroes are omitted, otherwise octal is used.
     */
-    public static int SOURCE_CONF_VERSION = 020200;
+    public static int SOURCE_CONF_VERSION = 20200;
     private static GaiaSkyDesktop gsd;
     private static boolean REST_ENABLED = false;
     private static Class<?> REST_SERVER_CLASS = null;

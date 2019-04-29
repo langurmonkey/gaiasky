@@ -404,7 +404,7 @@ public class SceneGraphRenderer extends AbstractRenderer implements IProcessRend
         times = new long[comps.length];
         alphas = new float[comps.length];
         for (int i = 0; i < comps.length; i++) {
-            times[i] = -20000l;
+            times[i] = -20000L;
             alphas[i] = 0f;
         }
 
@@ -460,8 +460,8 @@ public class SceneGraphRenderer extends AbstractRenderer implements IProcessRend
             private float[] positions = new float[Glow.N * 2];
             private float[] viewAngles = new float[Glow.N];
             private float[] colors = new float[Glow.N * 3];
-            private Vector3 auxv = new Vector3();
-            private Vector3d auxd = new Vector3d();
+            private Vector3 auxV = new Vector3();
+            private Vector3d auxD = new Vector3d();
 
             @Override
             public void run(AbstractRenderSystem renderSystem, Array<IRenderable> renderables, ICamera camera) {
@@ -476,21 +476,21 @@ public class SceneGraphRenderer extends AbstractRenderer implements IProcessRend
                         if (s instanceof Particle) {
                             Particle p = (Particle) s;
                             if (lightIndex < Glow.N && (GlobalConf.program.CUBEMAP360_MODE || GaiaSky.instance.cam.getDirection().angle(p.translation) < angleEdgeDeg)) {
-                                Vector3d pos3d = p.translation.put(auxd);
+                                Vector3d pos3d = p.translation.put(auxD);
 
                                 // Aberration
                                 GlobalResources.applyRelativisticAberration(pos3d, camera);
                                 // GravWaves
                                 RelativisticEffectsManager.getInstance().gravitationalWavePos(pos3d);
-                                Vector3 pos3 = pos3d.put(auxv);
+                                Vector3 pos3 = pos3d.put(auxV);
 
                                 camera.getCamera().project(pos3);
                                 // Here we **need** to use
                                 // Gdx.graphics.getWidth/Height() because we use
                                 // camera.project() which uses screen
                                 // coordinates only
-                                positions[lightIndex * 2] = auxv.x / Gdx.graphics.getWidth();
-                                positions[lightIndex * 2 + 1] = auxv.y / Gdx.graphics.getHeight();
+                                positions[lightIndex * 2] = auxV.x / Gdx.graphics.getWidth();
+                                positions[lightIndex * 2 + 1] = auxV.y / Gdx.graphics.getHeight();
                                 viewAngles[lightIndex] = (float) p.viewAngleApparent;
                                 colors[lightIndex * 3] = p.cc[0];
                                 colors[lightIndex * 3 + 1] = p.cc[1];
@@ -679,10 +679,10 @@ public class SceneGraphRenderer extends AbstractRenderer implements IProcessRend
     public void renderGlowPass(ICamera camera) {
         if (GlobalConf.postprocess.POSTPROCESS_LIGHT_SCATTERING && glowFb != null) {
             // Get all billboard stars
-            Array<IRenderable> bbstars = render_lists.get(RenderGroup.BILLBOARD_STAR.ordinal());
+            Array<IRenderable> bbStars = render_lists.get(RenderGroup.BILLBOARD_STAR.ordinal());
 
             stars.clear();
-            for (IRenderable st : bbstars) {
+            for (IRenderable st : bbStars) {
                 if (st instanceof Star) {
                     stars.add(st);
                     break;
