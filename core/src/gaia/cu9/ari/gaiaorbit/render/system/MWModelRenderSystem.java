@@ -195,13 +195,13 @@ public class MWModelRenderSystem extends ImmediateRenderSystem implements IObser
                 Gdx.gl20.glDepthMask(false);
 
                 // Bulge
-                shaderProgram.setUniformf("u_sizeFactor", 2f);
-                shaderProgram.setUniformf("u_intensity", 0.2f);
+                shaderProgram.setUniformf("u_sizeFactor", 2.2f);
+                shaderProgram.setUniformf("u_intensity", 0.3f);
                 bulge.mesh.render(shaderProgram, ShapeType.Point.getGlType());
 
                 // Stars
-                shaderProgram.setUniformf("u_sizeFactor", 0.8f);
-                shaderProgram.setUniformf("u_intensity", 0.2f);
+                shaderProgram.setUniformf("u_sizeFactor", 0.5f);
+                shaderProgram.setUniformf("u_intensity", 0.6f);
                 stars.mesh.render(shaderProgram, ShapeType.Point.getGlType());
 
                 // HII
@@ -210,8 +210,8 @@ public class MWModelRenderSystem extends ImmediateRenderSystem implements IObser
                 hii.mesh.render(shaderProgram, ShapeType.Point.getGlType());
 
                 // Gas
-                shaderProgram.setUniformf("u_sizeFactor", 1.4f);
-                shaderProgram.setUniformf("u_intensity", 0.25f);
+                shaderProgram.setUniformf("u_sizeFactor", 1.2f);
+                shaderProgram.setUniformf("u_intensity", 0.6f);
                 gas.mesh.render(shaderProgram, ShapeType.Point.getGlType());
 
                 shaderProgram.end();
@@ -224,7 +224,7 @@ public class MWModelRenderSystem extends ImmediateRenderSystem implements IObser
         Array<VertexAttribute> attribs = new Array<>();
         attribs.add(new VertexAttribute(Usage.Position, 3, ShaderProgram.POSITION_ATTRIBUTE));
         attribs.add(new VertexAttribute(Usage.ColorPacked, 4, ShaderProgram.COLOR_ATTRIBUTE));
-        attribs.add(new VertexAttribute(Usage.Generic, 4, "a_additional"));
+        attribs.add(new VertexAttribute(Usage.Generic, 2, "a_additional"));
 
         VertexAttribute[] array = new VertexAttribute[attribs.size];
         for (int i = 0; i < attribs.size; i++)

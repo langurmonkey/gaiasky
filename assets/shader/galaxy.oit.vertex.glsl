@@ -7,7 +7,7 @@
 attribute vec4 a_position;
 attribute vec4 a_color;
 // x - size, y - 0: star, 1: dust
-attribute vec4 a_additional;
+attribute vec2 a_additional;
 
 uniform float u_pointAlphaMin;
 uniform float u_pointAlphaMax;
@@ -41,6 +41,7 @@ varying float v_dscale;
 varying float v_dust;
 
 #define pc_to_u 3.085e7
+#define u_to_pc 1.0 / pc_to_u
 #define edge_far 1.0e6 * pc_to_u
 #define edge_near 10 * pc_to_u
 
@@ -62,9 +63,11 @@ void main() {
     v_col = vec4(a_color.rgb, a_color.a * u_intensity);
     v_dust = a_additional.y;
 
+    float sizeCorrection = clamp((dist * u_to_pc) / 4000.0, 0.1, 6.0);
+
     gl_Position = u_projModelView * vec4(pos, 1.0);
     gl_PointSize = a_additional.x * u_sizeFactor;
 
     v_dscale = smoothstep(edge_far, edge_near, dist);
-    v_dscale = pow(v_dscale, 6.0);
+    v_dscale = pow(v_dscale, 25.0);
 }
