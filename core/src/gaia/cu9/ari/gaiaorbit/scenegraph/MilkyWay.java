@@ -36,6 +36,7 @@ import gaia.cu9.ari.gaiaorbit.util.math.MathUtilsd;
 import gaia.cu9.ari.gaiaorbit.util.math.Matrix4d;
 import gaia.cu9.ari.gaiaorbit.util.math.Vector3d;
 import gaia.cu9.ari.gaiaorbit.util.time.ITimeFrameProvider;
+import gaia.cu9.ari.gaiaorbit.util.tree.LoadStatus;
 
 public class MilkyWay extends AbstractPositionEntity implements I3DTextRenderable {
     float[] labelColour = new float[] { 1f, 1f, 1f, 1f };
@@ -45,6 +46,9 @@ public class MilkyWay extends AbstractPositionEntity implements I3DTextRenderabl
     public Array<? extends ParticleBean> starData, bulgeData, dustData, hiiData, gasData;
     protected String provider;
     public GalaxydataComponent gc;
+
+    /** Status of data in the GPU **/
+    public LoadStatus status = LoadStatus.NOT_LOADED;
 
     private Vector3d labelPosition;
 

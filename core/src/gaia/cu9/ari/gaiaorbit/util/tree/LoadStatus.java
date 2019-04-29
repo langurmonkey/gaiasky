@@ -10,5 +10,6 @@ public enum LoadStatus {
     QUEUED,
     LOADING,
     LOADING_FAILED,
+    READY,
     LOADED
 }
