@@ -18,7 +18,7 @@ public class ModelComparator<T> implements Comparator<T> {
 
     @Override
     public int compare(T o1, T o2) {
-        return Double.compare(((AbstractPositionEntity) o1).distToCamera, ((AbstractPositionEntity) o2).distToCamera);
+        return Double.compare(((AbstractPositionEntity) o2).distToCamera, ((AbstractPositionEntity) o1).distToCamera);
     }
 
 }

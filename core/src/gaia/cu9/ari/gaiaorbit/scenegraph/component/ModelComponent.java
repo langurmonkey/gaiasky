@@ -35,7 +35,7 @@ import java.util.Map;
 public class ModelComponent implements Disposable, IObserver {
     private static final Log logger = Logger.getLogger(ModelComponent.class);
 
-    public boolean forceinit = false;
+    public boolean forceInit = false;
     private static ColorAttribute ambient;
     /**
      * Light never changes; set fixed ambient light for this model
@@ -124,7 +124,7 @@ public class ModelComponent implements Disposable, IObserver {
             }
         }
 
-        if ((forceinit || !GlobalConf.scene.LAZY_TEXTURE_INIT) && tc != null) {
+        if ((forceInit || !GlobalConf.scene.LAZY_TEXTURE_INIT) && tc != null) {
             tc.initialize();
         }
 
@@ -161,7 +161,7 @@ public class ModelComponent implements Disposable, IObserver {
         }
 
         // INITIALIZE MATERIAL
-        if ((forceinit || !GlobalConf.scene.LAZY_TEXTURE_INIT) && tc != null) {
+        if ((forceInit || !GlobalConf.scene.LAZY_TEXTURE_INIT) && tc != null) {
             tc.initMaterial(manager, materials, cc, culling);
         }
 

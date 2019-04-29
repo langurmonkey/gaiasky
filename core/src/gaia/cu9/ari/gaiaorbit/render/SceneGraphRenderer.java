@@ -531,7 +531,7 @@ public class SceneGraphRenderer extends AbstractRenderer implements IProcessRend
 
         // MODELS DUST AND MESH
         AbstractRenderSystem modelMeshOpaqueProc = new ModelBatchRenderSystem(RenderGroup.MODEL_MESH_OPAQUE, alphas, modelBatchDust, ModelRenderType.NORMAL, false);
-        AbstractRenderSystem modelMeshAdditiveProc = new ModelBatchRenderSystem(RenderGroup.MODEL_MESH_ADDITIVE, alphas, modelBatchMesh, ModelRenderType.NORMAL, false);
+        AbstractRenderSystem modelMeshAdditiveProc = new ModelBatchRenderSystem(RenderGroup.MODEL_ADDITIVE, alphas, modelBatchMesh, ModelRenderType.NORMAL, true);
 
         // MODEL FRONT
         AbstractRenderSystem modelFrontProc = new ModelBatchRenderSystem(RenderGroup.MODEL_NORMAL, alphas, modelBatchNormal, ModelRenderType.NORMAL);
@@ -611,14 +611,14 @@ public class SceneGraphRenderer extends AbstractRenderer implements IProcessRend
         // Billboards
         renderProcesses.add(billboardStarsProc);
 
-        // Models
-        renderProcesses.add(modelFrontProc);
-        renderProcesses.add(modelBeamProc);
-
         // Stars, particles
         renderProcesses.add(particleGroupProc);
         renderProcesses.add(starGroupProc);
         renderProcesses.add(orbitElemProc);
+
+        // Models
+        renderProcesses.add(modelFrontProc);
+        renderProcesses.add(modelBeamProc);
 
         // Labels
         renderProcesses.add(labelsProc);

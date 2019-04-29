@@ -52,7 +52,7 @@ public class BackgroundModel extends FadeNode implements IModelRenderable, I3DTe
     @Override
     public void initialize() {
         // Force texture loading
-        mc.forceinit = true;
+        mc.forceInit = true;
         mc.initialize();
         mc.env.set(new ColorAttribute(ColorAttribute.AmbientLight, cc[0], cc[1], cc[2], 1));
     }

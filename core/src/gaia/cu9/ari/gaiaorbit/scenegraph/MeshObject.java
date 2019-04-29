@@ -139,7 +139,7 @@ public class MeshObject extends FadeNode implements IModelRenderable, I3DTextRen
             if (opaque)
                 addToRender(this, RenderGroup.MODEL_MESH_OPAQUE);
             else
-                addToRender(this, RenderGroup.MODEL_MESH_ADDITIVE);
+                addToRender(this, RenderGroup.MODEL_ADDITIVE);
 
             addToRender(this, RenderGroup.FONT_LABEL);
         }

@@ -79,11 +79,9 @@ public class SearchDialog extends GenericDialog {
 
     @Override
     public void accept(){
-
     }
     @Override
     public void cancel(){
-
     }
 
     public boolean checkString(String text, ISceneGraph sg) {

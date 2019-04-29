@@ -101,19 +101,17 @@ public class SceneGraphNode implements IStarContainer, IPosition {
         /** Particle positions from orbital elements **/
         PARTICLE_ORBIT_ELEMENTS(20),
         /** Transparent additive-blended meshes **/
-        MODEL_MESH_ADDITIVE(21),
+        MODEL_ADDITIVE(21),
         /** Grids shader **/
         MODEL_GRID(22),
         /** Clouds **/
         MODEL_CLOUD(23),
-        /** Using normal shader for per-pixel lighting, with additive blending **/
-        MODEL_NORMAL_ADDITIVE(24),
         /** Point **/
-        POINT(25),
+        POINT(24),
         /** Point GPU **/
-        POINT_GPU(26),
+        POINT_GPU(25),
         /** Opaque meshes (dust, etc.) **/
-        MODEL_MESH_OPAQUE(27),
+        MODEL_MESH_OPAQUE(26),
 
 
         /** None **/

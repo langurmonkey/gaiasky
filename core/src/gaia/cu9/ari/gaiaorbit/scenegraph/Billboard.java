@@ -106,7 +106,7 @@ public class Billboard extends ModelBody {
     protected void addToRenderLists(ICamera camera) {
         if (GaiaSky.instance.isOn(ct)) {
             if (viewAngleApparent >= TH_ANGLE_NONE) {
-                addToRender(this, RenderGroup.MODEL_NORMAL);
+                addToRender(this, RenderGroup.MODEL_ADDITIVE);
                 if (renderText()) {
                     addToRender(this, RenderGroup.FONT_LABEL);
                 }
