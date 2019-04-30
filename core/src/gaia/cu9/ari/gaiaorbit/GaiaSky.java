@@ -723,7 +723,7 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
 
     @Override
     public void resize(final int width, final int height) {
-        Gdx.app.postRunnable(() -> resizeImmediate(width, height, true, true, true));
+        resizeImmediate(width, height, true, true, true);
     }
 
     public void resizeImmediate(final int width, final int height, boolean resizePostProcessors, boolean resizeRenderSys, boolean resizeGuis) {

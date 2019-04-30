@@ -20,7 +20,6 @@ public interface IPostProcessor extends Disposable {
         public Curvature curvature;
         public Fisheye fisheye;
         public LightGlow lglow;
-        public LightScattering lscatter;
         public MotionBlur motionblur;
         public Levels levels;
         //public HDR hdr;
@@ -46,8 +45,17 @@ public interface IPostProcessor extends Disposable {
         }
 
         public void dispose() {
-            if (pp != null)
-                pp.dispose(false);
+            if (pp != null) {
+                pp.dispose(true);
+                bloom.dispose();
+                antialiasing.dispose();
+                lens.dispose();
+                curvature.dispose();
+                fisheye.dispose();
+                lglow.dispose();
+                motionblur.dispose();
+                levels.dispose();
+            }
         }
 
     }

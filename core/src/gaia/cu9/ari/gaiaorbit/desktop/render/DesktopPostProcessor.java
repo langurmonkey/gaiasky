@@ -38,9 +38,9 @@ public class DesktopPostProcessor implements IPostProcessor, IObserver {
     // Intensity of flare
     float flareIntensity = 0.4f;
     // Number of flares
-    int nghosts = 6;
+    int nGhosts = 6;
     // Number of samples for the light glow
-    int lglowNSamples = 1;
+    int lgLowNSamples = 1;
 
     Vector3d auxd, prevCampos;
     Vector3 auxf;
@@ -118,19 +118,19 @@ public class DesktopPostProcessor implements IPostProcessor, IObserver {
         Texture glow;
         // TODO Listen to GRAPHICS_QUALITY_CHANGED and apply new settings on the fly
         if (GlobalConf.scene.isHighQuality()) {
-            lglowNSamples = 12;
+            lgLowNSamples = 12;
             lgw = 1280;
             lgh = Math.round(lgw / ar);
             glow = manager.get(GlobalConf.data.dataFile("tex/base/star_glow.png"));
             Glow.N = 30;
         } else if (GlobalConf.scene.isNormalQuality()) {
-            lglowNSamples = 8;
+            lgLowNSamples = 8;
             lgw = 1000;
             lgh = Math.round(lgw / ar);
             glow = manager.get(GlobalConf.data.dataFile("tex/base/star_glow_s.png"));
             Glow.N = 20;
         } else {
-            lglowNSamples = 4;
+            lgLowNSamples = 4;
             lgw = 1000;
             lgh = Math.round(lgw / ar);
             glow = manager.get(GlobalConf.data.dataFile("tex/base/star_glow_s.png"));
@@ -140,7 +140,7 @@ public class DesktopPostProcessor implements IPostProcessor, IObserver {
 
         ppb.lglow = new LightGlow(lgw, lgh);
         ppb.lglow.setLightGlowTexture(glow);
-        ppb.lglow.setNSamples(lglowNSamples);
+        ppb.lglow.setNSamples(lgLowNSamples);
         ppb.lglow.setTextureScale(0.9f / GaiaSky.instance.cam.getFovFactor());
         ppb.lglow.setEnabled(GlobalConf.postprocess.POSTPROCESS_LIGHT_SCATTERING);
         ppb.pp.addEffect(ppb.lglow);
@@ -154,7 +154,7 @@ public class DesktopPostProcessor implements IPostProcessor, IObserver {
         Texture lburst = manager.get(GlobalConf.data.dataFile("tex/base/lensstarburst.jpg"));
         lburst.setFilter(TextureFilter.Linear, TextureFilter.Linear);
         ppb.lens = new LensFlare2((int) (width * lensFboScale), (int) (height * lensFboScale));
-        ppb.lens.setGhosts(nghosts);
+        ppb.lens.setGhosts(nGhosts);
         ppb.lens.setHaloWidth(0.5f);
         ppb.lens.setLensColorTexture(lcol);
         ppb.lens.setLensDirtTexture(ldirt);
@@ -274,7 +274,7 @@ public class DesktopPostProcessor implements IPostProcessor, IObserver {
                 for (int i = 0; i < RenderType.values().length; i++) {
                     if (pps[i] != null) {
                         PostProcessBean ppb = pps[i];
-                        ppb.lglow.setNSamples(newfov > 65 ? 1 : lglowNSamples);
+                        ppb.lglow.setNSamples(newfov > 65 ? 1 : lgLowNSamples);
                     }
                 }
             });
@@ -323,7 +323,7 @@ public class DesktopPostProcessor implements IPostProcessor, IObserver {
             break;
         case LENS_FLARE_CMD:
             boolean active = (Boolean) data[0];
-            int nnghosts = active ? nghosts : 0;
+            int nnghosts = active ? nGhosts : 0;
             float intensity = active ? flareIntensity : 0;
             for (int i = 0; i < RenderType.values().length; i++) {
                 if (pps[i] != null) {
@@ -349,7 +349,7 @@ public class DesktopPostProcessor implements IPostProcessor, IObserver {
                 if (pps[i] != null) {
                     PostProcessBean ppb = pps[i];
                     ppb.fisheye.setEnabled(active);
-                    ppb.lglow.setNSamples(active ? 1 : lglowNSamples);
+                    ppb.lglow.setNSamples(active ? 1 : lgLowNSamples);
                 }
             }
             break;
@@ -392,7 +392,7 @@ public class DesktopPostProcessor implements IPostProcessor, IObserver {
                     PostProcessBean ppb = pps[i];
                     ppb.motionblur.setBlurOpacity(!enabled ? 0 : GlobalConf.postprocess.POSTPROCESS_MOTION_BLUR);
                     ppb.motionblur.setEnabled(enabled);
-                    ppb.lglow.setNSamples(enabled ? 1 : lglowNSamples);
+                    ppb.lglow.setNSamples(enabled ? 1 : lgLowNSamples);
                 }
             }
 

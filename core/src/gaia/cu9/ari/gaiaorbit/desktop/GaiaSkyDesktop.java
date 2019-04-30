@@ -63,14 +63,14 @@ public class GaiaSkyDesktop implements IObserver {
     * So 1.2.5 -> 010205
     *    2.1.7 -> 020107
     *
-    * Leading zeroes are omitted, otherwise octal is used.
+    * Leading zeroes are omitted to avoid octal literal interpretation.
     */
     public static int SOURCE_CONF_VERSION = 20200;
     private static GaiaSkyDesktop gsd;
     private static boolean REST_ENABLED = false;
     private static Class<?> REST_SERVER_CLASS = null;
 
-    private static GaiaSkyArgs gsargs;
+    private static GaiaSkyArgs gsArgs;
 
     /**
      * Program arguments
@@ -121,13 +121,13 @@ public class GaiaSkyDesktop implements IObserver {
      * @param args Arguments
      */
     public static void main(String[] args) {
-        gsargs = new GaiaSkyArgs();
-        JCommander jc = JCommander.newBuilder().addObject(gsargs).build();
+        gsArgs = new GaiaSkyArgs();
+        JCommander jc = JCommander.newBuilder().addObject(gsArgs).build();
         jc.setProgramName("gaiasky");
         try {
             jc.parse(args);
 
-            if (gsargs.help) {
+            if (gsArgs.help) {
                 printUsage(jc);
                 return;
             }
@@ -141,13 +141,13 @@ public class GaiaSkyDesktop implements IObserver {
             javaVersionCheck();
 
             // Set properties file from arguments to VM params if needed
-            if (gsargs.propertiesFile != null && !gsargs.propertiesFile.isEmpty()) {
-                System.setProperty("properties.file", gsargs.propertiesFile);
+            if (gsArgs.propertiesFile != null && !gsArgs.propertiesFile.isEmpty()) {
+                System.setProperty("properties.file", gsArgs.propertiesFile);
             }
 
             // Set assets location to VM params if needed
-            if (gsargs.assetsLocation != null && !gsargs.assetsLocation.isEmpty()) {
-                System.setProperty("assets.location", gsargs.assetsLocation);
+            if (gsArgs.assetsLocation != null && !gsArgs.assetsLocation.isEmpty()) {
+                System.setProperty("assets.location", gsArgs.assetsLocation);
             }
 
             gsd = new GaiaSkyDesktop();
@@ -178,7 +178,7 @@ public class GaiaSkyDesktop implements IObserver {
             // Reinitialize with user-defined locale
             I18n.initialize(Gdx.files.absolute(GlobalConf.ASSETS_LOC + File.separator + "i18n/gsbundle"));
 
-            if (gsargs.version) {
+            if (gsArgs.version) {
                 System.out.println(GlobalConf.getShortApplicationName());
                 System.out.println("License MPL 2.0: Mozilla Public License 2.0 <https://www.mozilla.org/en-US/MPL/2.0/>");
                 System.out.println();
@@ -277,7 +277,7 @@ public class GaiaSkyDesktop implements IObserver {
         }
 
         // Launch app
-        Lwjgl3Application app = new Lwjgl3Application(new GaiaSky(gsargs.download, gsargs.catalogChooser), cfg);
+        Lwjgl3Application app = new Lwjgl3Application(new GaiaSky(gsArgs.download, gsArgs.catalogChooser), cfg);
         app.addLifecycleListener(new GaiaSkyWindowListener());
     }
 
