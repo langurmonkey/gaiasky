@@ -18,11 +18,10 @@
  * limitations under the License.
  ******************************************************************************/
 
-package gaia.cu9.ari.gaiaorbit.util.postprocessing.filters;
+package gaia.cu9.ari.gaiaorbit.util.gdx.contrib.postprocess.filters;
 
 import com.badlogic.gdx.math.Vector2;
-import com.bitfire.postprocessing.filters.Filter;
-import com.bitfire.utils.ShaderLoader;
+import gaia.cu9.ari.gaiaorbit.util.gdx.contrib.utils.ShaderLoader;
 
 /** Fast approximate anti-aliasing filter.
  * @author Toni Sagrista */

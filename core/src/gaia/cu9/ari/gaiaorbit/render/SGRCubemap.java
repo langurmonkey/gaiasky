@@ -13,8 +13,6 @@ import com.badlogic.gdx.graphics.glutils.FrameBuffer;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.viewport.StretchViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
-import com.bitfire.postprocessing.effects.CubemapProjections;
-import com.bitfire.postprocessing.effects.CubemapProjections.CubemapProjection;
 import gaia.cu9.ari.gaiaorbit.event.EventManager;
 import gaia.cu9.ari.gaiaorbit.event.Events;
 import gaia.cu9.ari.gaiaorbit.event.IObserver;
@@ -22,6 +20,7 @@ import gaia.cu9.ari.gaiaorbit.render.IPostProcessor.PostProcessBean;
 import gaia.cu9.ari.gaiaorbit.render.RenderingContext.CubemapSide;
 import gaia.cu9.ari.gaiaorbit.scenegraph.camera.ICamera;
 import gaia.cu9.ari.gaiaorbit.util.GlobalConf;
+import gaia.cu9.ari.gaiaorbit.util.gdx.contrib.postprocess.effects.CubemapProjections;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -229,7 +228,7 @@ public class SGRCubemap extends SGRAbstract implements ISGR, IObserver {
             }
             break;
         case CUBEMAP_PROJECTION_CMD:
-            CubemapProjection p = (CubemapProjection) data[0];
+            CubemapProjections.CubemapProjection p = (CubemapProjections.CubemapProjection) data[0];
             Gdx.app.postRunnable(() -> {
                 cubemapEffect.setProjection(p);
             });

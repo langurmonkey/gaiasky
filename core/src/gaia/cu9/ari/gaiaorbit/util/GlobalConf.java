@@ -11,7 +11,6 @@ import com.badlogic.gdx.controllers.Controllers;
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.utils.Array;
-import com.bitfire.postprocessing.effects.CubemapProjections.CubemapProjection;
 import gaia.cu9.ari.gaiaorbit.GaiaSky;
 import gaia.cu9.ari.gaiaorbit.desktop.util.camera.CameraKeyframeManager;
 import gaia.cu9.ari.gaiaorbit.event.EventManager;
@@ -23,6 +22,7 @@ import gaia.cu9.ari.gaiaorbit.util.Logger.Log;
 import gaia.cu9.ari.gaiaorbit.util.format.DateFormatFactory;
 import gaia.cu9.ari.gaiaorbit.util.format.DateFormatFactory.DateType;
 import gaia.cu9.ari.gaiaorbit.util.format.IDateFormat;
+import gaia.cu9.ari.gaiaorbit.util.gdx.contrib.postprocess.effects.CubemapProjections;
 import gaia.cu9.ari.gaiaorbit.util.math.MathUtilsd;
 import gaia.cu9.ari.gaiaorbit.util.update.VersionChecker;
 
@@ -753,7 +753,7 @@ public class GlobalConf {
         /**
          * Cubemap projection
          **/
-        public CubemapProjection CUBEMAP_PROJECTION = CubemapProjection.EQUIRECTANGULAR;
+        public CubemapProjections.CubemapProjection CUBEMAP_PROJECTION = CubemapProjections.CubemapProjection.EQUIRECTANGULAR;
         public boolean STEREOSCOPIC_MODE;
         /**
          * Eye separation in stereoscopic mode in meters
@@ -866,7 +866,7 @@ public class GlobalConf {
                 logger.info("Switch between cubemap projections using <CTRL+SHIFT+K>");
                 break;
             case CUBEMAP_PROJECTION_CMD:
-                CUBEMAP_PROJECTION = (CubemapProjection) data[0];
+                CUBEMAP_PROJECTION = (CubemapProjections.CubemapProjection) data[0];
                 logger.info("Cubemap projection set to " + CUBEMAP_PROJECTION.toString());
                 break;
             default:

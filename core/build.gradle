@@ -195,7 +195,6 @@ task copyToLib (dependsOn: createDistDir, description: "Copies the runtime depen
         delete project.distLib + '/shader'
         delete project.distLib + '/shaders'
         delete project.distLib + '/skins'
-        delete project.distLib + '/postprocessing-sources.jar'
     }
 }
 

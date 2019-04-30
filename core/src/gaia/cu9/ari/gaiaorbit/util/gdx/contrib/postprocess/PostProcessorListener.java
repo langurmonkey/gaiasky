@@ -1,3 +1,8 @@
+/*
+ * This file is part of Gaia Sky, which is released under the Mozilla Public License 2.0.
+ * See the file LICENSE.md in the project root for full license details.
+ */
+
 /*******************************************************************************
  * Copyright 2012 bmanuel
  * 
@@ -14,12 +19,8 @@
  * limitations under the License.
  ******************************************************************************/
 
-attribute vec4 a_position;
-attribute vec2 a_texCoord0;
-varying vec2 v_texCoords;
+package gaia.cu9.ari.gaiaorbit.util.gdx.contrib.postprocess;
 
-void main()
-{
-	v_texCoords = a_texCoord0;
-	gl_Position = a_position;
+public interface PostProcessorListener {
+	void beforeRenderToScreen();
 }

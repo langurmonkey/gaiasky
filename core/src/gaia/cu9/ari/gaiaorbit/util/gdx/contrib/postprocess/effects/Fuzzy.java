@@ -19,11 +19,11 @@
  * limitations under the License.
  ******************************************************************************/
 
-package gaia.cu9.ari.gaiaorbit.util.postprocessing.effects;
+package gaia.cu9.ari.gaiaorbit.util.gdx.contrib.postprocess.effects;
 
 import com.badlogic.gdx.graphics.glutils.FrameBuffer;
-import com.bitfire.postprocessing.PostProcessorEffect;
-import gaia.cu9.ari.gaiaorbit.util.postprocessing.filters.FuzzyFilter;
+import gaia.cu9.ari.gaiaorbit.util.gdx.contrib.postprocess.PostProcessorEffect;
+import gaia.cu9.ari.gaiaorbit.util.gdx.contrib.postprocess.filters.FuzzyFilter;
 
 /** 
  * This is just a test for now

@@ -8,8 +8,8 @@ package gaia.cu9.ari.gaiaorbit.render;
 import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.graphics.glutils.FrameBuffer;
 import com.badlogic.gdx.utils.Disposable;
-import com.bitfire.postprocessing.PostProcessor;
-import com.bitfire.postprocessing.effects.*;
+import gaia.cu9.ari.gaiaorbit.util.gdx.contrib.postprocess.PostProcessor;
+import gaia.cu9.ari.gaiaorbit.util.gdx.contrib.postprocess.effects.*;
 
 public interface IPostProcessor extends Disposable {
     class PostProcessBean {
@@ -19,7 +19,7 @@ public interface IPostProcessor extends Disposable {
         public LensFlare2 lens;
         public Curvature curvature;
         public Fisheye fisheye;
-        public LightGlow lglow;
+        public LightGlow lightglow;
         public MotionBlur motionblur;
         public Levels levels;
         //public HDR hdr;
@@ -52,7 +52,7 @@ public interface IPostProcessor extends Disposable {
                 lens.dispose();
                 curvature.dispose();
                 fisheye.dispose();
-                lglow.dispose();
+                lightglow.dispose();
                 motionblur.dispose();
                 levels.dispose();
             }

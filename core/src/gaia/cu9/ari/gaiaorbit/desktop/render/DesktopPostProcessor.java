@@ -13,10 +13,6 @@ import com.badlogic.gdx.graphics.Texture.TextureFilter;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Vector3;
-import com.bitfire.postprocessing.PostProcessor;
-import com.bitfire.postprocessing.effects.*;
-import com.bitfire.postprocessing.filters.Glow;
-import com.bitfire.utils.ShaderLoader;
 import gaia.cu9.ari.gaiaorbit.GaiaSky;
 import gaia.cu9.ari.gaiaorbit.event.EventManager;
 import gaia.cu9.ari.gaiaorbit.event.Events;
@@ -27,6 +23,10 @@ import gaia.cu9.ari.gaiaorbit.util.GlobalConf.PostprocessConf.Antialias;
 import gaia.cu9.ari.gaiaorbit.util.GlobalConf.ProgramConf.StereoProfile;
 import gaia.cu9.ari.gaiaorbit.util.I18n;
 import gaia.cu9.ari.gaiaorbit.util.Logger;
+import gaia.cu9.ari.gaiaorbit.util.gdx.contrib.postprocess.PostProcessor;
+import gaia.cu9.ari.gaiaorbit.util.gdx.contrib.postprocess.effects.*;
+import gaia.cu9.ari.gaiaorbit.util.gdx.contrib.postprocess.filters.Glow;
+import gaia.cu9.ari.gaiaorbit.util.gdx.contrib.utils.ShaderLoader;
 import gaia.cu9.ari.gaiaorbit.util.math.Vector3d;
 
 public class DesktopPostProcessor implements IPostProcessor, IObserver {
@@ -137,13 +137,12 @@ public class DesktopPostProcessor implements IPostProcessor, IObserver {
             Glow.N = 10;
         }
         glow.setFilter(TextureFilter.Linear, TextureFilter.Linear);
-
-        ppb.lglow = new LightGlow(lgw, lgh);
-        ppb.lglow.setLightGlowTexture(glow);
-        ppb.lglow.setNSamples(lgLowNSamples);
-        ppb.lglow.setTextureScale(0.9f / GaiaSky.instance.cam.getFovFactor());
-        ppb.lglow.setEnabled(GlobalConf.postprocess.POSTPROCESS_LIGHT_SCATTERING);
-        ppb.pp.addEffect(ppb.lglow);
+        ppb.lightglow = new LightGlow(lgw, lgh);
+        ppb.lightglow.setLightGlowTexture(glow);
+        ppb.lightglow.setNSamples(lgLowNSamples);
+        ppb.lightglow.setTextureScale(0.9f / GaiaSky.instance.cam.getFovFactor());
+        ppb.lightglow.setEnabled(GlobalConf.postprocess.POSTPROCESS_LIGHT_SCATTERING);
+        ppb.pp.addEffect(ppb.lightglow);
 
         // LENS FLARE
         float lensFboScale = 0.2f;
@@ -166,12 +165,6 @@ public class DesktopPostProcessor implements IPostProcessor, IObserver {
         ppb.lens.setBlurPasses(35);
         ppb.lens.setEnabled(true);
         ppb.pp.addEffect(ppb.lens);
-
-        // HDR
-        //        ppb.hdr = new HDR();
-        //        ppb.hdr.setExposure(1.0f);
-        //        ppb.hdr.setGamma(2.2f);
-        //        ppb.pp.addEffect(ppb.hdr);
 
         // BLOOM
         ppb.bloom = new Bloom((int) (width * bloomFboScale), (int) (height * bloomFboScale));
@@ -269,12 +262,12 @@ public class DesktopPostProcessor implements IPostProcessor, IObserver {
     public void notify(Events event, final Object... data) {
         switch (event) {
         case FOV_CHANGE_NOTIFICATION:
-            float newfov = (Float) data[0];
+            float newFov = (Float) data[0];
             Gdx.app.postRunnable(() -> {
                 for (int i = 0; i < RenderType.values().length; i++) {
                     if (pps[i] != null) {
                         PostProcessBean ppb = pps[i];
-                        ppb.lglow.setNSamples(newfov > 65 ? 1 : lgLowNSamples);
+                        ppb.lightglow.setNSamples(newFov > 65 ? 1 : lgLowNSamples);
                     }
                 }
             });
@@ -339,7 +332,7 @@ public class DesktopPostProcessor implements IPostProcessor, IObserver {
             for (int i = 0; i < RenderType.values().length; i++) {
                 if (pps[i] != null) {
                     PostProcessBean ppb = pps[i];
-                    ppb.lglow.setEnabled(active);
+                    ppb.lightglow.setEnabled(active);
                 }
             }
             break;
@@ -349,7 +342,7 @@ public class DesktopPostProcessor implements IPostProcessor, IObserver {
                 if (pps[i] != null) {
                     PostProcessBean ppb = pps[i];
                     ppb.fisheye.setEnabled(active);
-                    ppb.lglow.setNSamples(active ? 1 : lgLowNSamples);
+                    ppb.lightglow.setNSamples(active ? 1 : lgLowNSamples);
                 }
             }
             break;
@@ -392,7 +385,7 @@ public class DesktopPostProcessor implements IPostProcessor, IObserver {
                     PostProcessBean ppb = pps[i];
                     ppb.motionblur.setBlurOpacity(!enabled ? 0 : GlobalConf.postprocess.POSTPROCESS_MOTION_BLUR);
                     ppb.motionblur.setEnabled(enabled);
-                    ppb.lglow.setNSamples(enabled ? 1 : lgLowNSamples);
+                    ppb.lightglow.setNSamples(enabled ? 1 : lgLowNSamples);
                 }
             }
 
@@ -408,12 +401,12 @@ public class DesktopPostProcessor implements IPostProcessor, IObserver {
             for (int i = 0; i < RenderType.values().length; i++) {
                 if (pps[i] != null) {
                     PostProcessBean ppb = pps[i];
-                    ppb.lglow.setLightPositions(nLights, lightpos);
-                    ppb.lglow.setLightViewAngles(angles);
-                    ppb.lglow.setLightColors(colors);
-                    ppb.lglow.setTextureScale(0.9f / GaiaSky.instance.cam.getFovFactor());
+                    ppb.lightglow.setLightPositions(nLights, lightpos);
+                    ppb.lightglow.setLightViewAngles(angles);
+                    ppb.lightglow.setLightColors(colors);
+                    ppb.lightglow.setTextureScale(0.9f / GaiaSky.instance.cam.getFovFactor());
                     if (prePass != null)
-                        ppb.lglow.setPrePassTexture(prePass);
+                        ppb.lightglow.setPrePassTexture(prePass);
                 }
             }
             break;
@@ -540,7 +533,7 @@ public class DesktopPostProcessor implements IPostProcessor, IObserver {
 
     @Override
     public boolean isLightScatterEnabled() {
-        return pps[RenderType.screen.index].lglow.isEnabled();
+        return pps[RenderType.screen.index].lightglow.isEnabled();
     }
 
     private void updateStereo(boolean stereo, StereoProfile profile) {
@@ -553,7 +546,7 @@ public class DesktopPostProcessor implements IPostProcessor, IObserver {
                 ppb.curvature.setEnabled(curvatureEnabled);
 
                 RenderType currentRenderType = RenderType.values()[i];
-                ppb.lglow.setViewportSize(getWidth(currentRenderType) / (viewportHalved ? 2 : 1), getHeight(currentRenderType));
+                ppb.lightglow.setViewportSize(getWidth(currentRenderType) / (viewportHalved ? 2 : 1), getHeight(currentRenderType));
             }
         }
     }

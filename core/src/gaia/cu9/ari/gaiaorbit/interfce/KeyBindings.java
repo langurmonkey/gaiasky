@@ -6,7 +6,6 @@
 package gaia.cu9.ari.gaiaorbit.interfce;
 
 import com.badlogic.gdx.Input.Keys;
-import com.bitfire.postprocessing.effects.CubemapProjections.CubemapProjection;
 import gaia.cu9.ari.gaiaorbit.event.EventManager;
 import gaia.cu9.ari.gaiaorbit.event.Events;
 import gaia.cu9.ari.gaiaorbit.scenegraph.camera.CameraManager.CameraMode;
@@ -14,6 +13,7 @@ import gaia.cu9.ari.gaiaorbit.util.GlobalConf;
 import gaia.cu9.ari.gaiaorbit.util.GlobalConf.ProgramConf.StereoProfile;
 import gaia.cu9.ari.gaiaorbit.util.GlobalResources;
 import gaia.cu9.ari.gaiaorbit.util.I18n;
+import gaia.cu9.ari.gaiaorbit.util.gdx.contrib.postprocess.effects.CubemapProjections;
 
 import java.time.Instant;
 import java.util.*;
@@ -258,8 +258,8 @@ public class KeyBindings {
 
         // CTRL+SHIFT+K -> toggle cubemap projection
         addMapping(new ProgramAction(I18n.txt("action.toggle", I18n.txt("element.projection")), () -> {
-            int newprojidx = (GlobalConf.program.CUBEMAP_PROJECTION.ordinal() + 1) % CubemapProjection.values().length;
-            EventManager.instance.post(Events.CUBEMAP_PROJECTION_CMD, CubemapProjection.values()[newprojidx]);
+            int newprojidx = (GlobalConf.program.CUBEMAP_PROJECTION.ordinal() + 1) % CubemapProjections.CubemapProjection.values().length;
+            EventManager.instance.post(Events.CUBEMAP_PROJECTION_CMD, CubemapProjections.CubemapProjection.values()[newprojidx]);
         }), SPECIAL1, SPECIAL2, Keys.K);
 
         // CTRL + SHIFT + UP -> increase star point size by 0.5

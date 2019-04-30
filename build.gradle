@@ -167,10 +167,9 @@ project(":core") {
         // *************
         // INTERNAL DEPS
         // *************
-        compile files("lib/postprocessing.jar",
-                "lib/stil.jar",
-                "lib/jsamp-1.3.5.jar",
-                "../assets")
+        compile files("lib/stil.jar",
+                        "lib/jsamp-1.3.5.jar",
+                        "../assets")
     }
 
     jar {

@@ -24,8 +24,6 @@ import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.BufferUtils;
-import com.bitfire.postprocessing.filters.Glow;
-import com.bitfire.utils.ShaderLoader;
 import gaia.cu9.ari.gaiaorbit.GaiaSky;
 import gaia.cu9.ari.gaiaorbit.assets.AtmosphereShaderProviderLoader.AtmosphereShaderProviderParameter;
 import gaia.cu9.ari.gaiaorbit.assets.GroundShaderProviderLoader.GroundShaderProviderParameter;
@@ -38,8 +36,11 @@ import gaia.cu9.ari.gaiaorbit.render.IPostProcessor.PostProcessBean;
 import gaia.cu9.ari.gaiaorbit.render.system.*;
 import gaia.cu9.ari.gaiaorbit.render.system.AbstractRenderSystem.RenderSystemRunnable;
 import gaia.cu9.ari.gaiaorbit.render.system.ModelBatchRenderSystem.ModelRenderType;
-import gaia.cu9.ari.gaiaorbit.scenegraph.*;
+import gaia.cu9.ari.gaiaorbit.scenegraph.AbstractPositionEntity;
+import gaia.cu9.ari.gaiaorbit.scenegraph.ModelBody;
+import gaia.cu9.ari.gaiaorbit.scenegraph.Particle;
 import gaia.cu9.ari.gaiaorbit.scenegraph.SceneGraphNode.RenderGroup;
+import gaia.cu9.ari.gaiaorbit.scenegraph.Star;
 import gaia.cu9.ari.gaiaorbit.scenegraph.camera.CameraManager.CameraMode;
 import gaia.cu9.ari.gaiaorbit.scenegraph.camera.ICamera;
 import gaia.cu9.ari.gaiaorbit.util.GlobalConf;
@@ -48,6 +49,8 @@ import gaia.cu9.ari.gaiaorbit.util.Logger;
 import gaia.cu9.ari.gaiaorbit.util.Logger.Log;
 import gaia.cu9.ari.gaiaorbit.util.gdx.IntModelBatch;
 import gaia.cu9.ari.gaiaorbit.util.gdx.IntRenderableSorter;
+import gaia.cu9.ari.gaiaorbit.util.gdx.contrib.postprocess.filters.Glow;
+import gaia.cu9.ari.gaiaorbit.util.gdx.contrib.utils.ShaderLoader;
 import gaia.cu9.ari.gaiaorbit.util.gdx.shader.AtmosphereShaderProvider;
 import gaia.cu9.ari.gaiaorbit.util.gdx.shader.GroundShaderProvider;
 import gaia.cu9.ari.gaiaorbit.util.gdx.shader.RelativisticShaderProvider;
@@ -854,6 +857,7 @@ public class SceneGraphRenderer extends AbstractRenderer implements IProcessRend
                 process.render(null, camera, t, rc);
             }
         }
+        rc.ppb.pp.getCombinedBuffer().getResultBuffer().getDepthBufferHandle();
 
     }
 
