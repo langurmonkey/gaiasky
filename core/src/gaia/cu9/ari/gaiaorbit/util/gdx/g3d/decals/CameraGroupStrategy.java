@@ -205,7 +205,7 @@ public class CameraGroupStrategy implements GroupStrategy, Disposable {
                 + "out vec4 color;\n" //
                 + "void main()\n"//
                 + "{\n" //
-                + "  color = v_color * texture2D(u_texture, v_texCoords);\n" //
+                + "  color = v_color * texture(u_texture, v_texCoords);\n" //
                 + "}";
 
         shader = new ShaderProgram(vertexShader, fragmentShader);
