@@ -1,5 +1,4 @@
 #version 330 core
-#extension GL_NV_shadow_samplers_cube : enable
 
 uniform sampler2D u_texture0;
 uniform samplerCube u_cubemap;
@@ -22,7 +21,7 @@ vec4 cubeToProjection(samplerCube cubemap, vec2 tc){
 	cubemaptc.x = -sin(lon) * sin(lat); 
 	cubemaptc.y = cos(lat); 
 	cubemaptc.z = -cos(lon) * sin(lat); 
-	return textureCube(cubemap, cubemaptc); 
+	return texture(cubemap, cubemaptc);
 }
 #endif //equirectangular
 
@@ -36,7 +35,7 @@ vec4 cubeToProjection(samplerCube cubemap, vec2 tc){
 	cubemaptc.x = -sin(lon) * sin(lat); 
 	cubemaptc.y = cos(lat); 
 	cubemaptc.z = -cos(lon) * sin(lat); 
-	return textureCube(cubemap, cubemaptc);
+	return texture(cubemap, cubemaptc);
 }
 #endif //cylindrical
 
@@ -68,7 +67,7 @@ vec4 cubeToProjection(samplerCube cubemap, vec2 tc) {
     cubemaptc.x = -sin(lon) * sin(lat); 
     cubemaptc.y = cos(lat); 
     cubemaptc.z = -cos(lon) * sin(lat); 
-    return textureCube(cubemap, cubemaptc);
+    return texture(cubemap, cubemaptc);
 }
 #endif //hammer
 
