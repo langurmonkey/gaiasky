@@ -1,13 +1,13 @@
-#version 120
+#version 330
 
 #include shader/lib_math.glsl
 #include shader/lib_geometry.glsl
 
 // ATTRIBUTES
-attribute vec4 a_position;
-attribute vec4 a_pm;
-attribute vec4 a_color;
-attribute float a_size;
+in vec4 a_position;
+in vec4 a_pm;
+in vec4 a_color;
+in float a_size;
 
 
 // UNIFORMS
@@ -23,7 +23,7 @@ uniform float u_thAnglePoint;
 uniform vec4 u_alphaSizeFovBr;
 
 // VARYINGs
-varying vec4 v_col;
+out vec4 v_col;
 
 #ifdef relativisticEffects
     uniform vec3 u_velDir; // Velocity vector

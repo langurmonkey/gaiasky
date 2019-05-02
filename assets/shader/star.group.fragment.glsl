@@ -9,7 +9,6 @@ in float v_depth;
 
 // OUTPUT
 layout (location = 0) out vec4 fragColor;
-out float gl_FragDepth;
 
 
 float programmatic(vec2 uv) {

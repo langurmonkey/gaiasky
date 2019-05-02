@@ -166,7 +166,7 @@ public class SceneGraphRenderer extends AbstractRenderer implements IProcessRend
         starBillboardDesc = loadShader(manager, "shader/star.billboard.vertex.glsl", "shader/star.billboard.fragment.glsl", genShaderNames("star.billboard"), defines);
         spriteDesc = loadShader(manager, "shader/sprite.vertex.glsl", "shader/sprite.fragment.glsl", genShaderNames("sprite"), defines);
         starPointDesc = loadShader(manager, "shader/star.point.vertex.glsl", "shader/star.point.fragment.glsl", genShaderNames("star.point"), defines);
-        galaxyPointDesc = loadShader(manager, "shader/galaxy.vertex.glsl", "shader/galaxy.fragment.glsl", genShaderNames("galaxy.point"), defines);
+        galaxyPointDesc = loadShader(manager, "shader/galaxy.vertex.glsl", "shader/galaxy.fragment.glsl", genShaderNames("galaxy"), defines);
         pointDesc = loadShader(manager, "shader/point.cpu.vertex.glsl", "shader/point.cpu.fragment.glsl", genShaderNames("point.cpu"), defines);
         lineDesc = loadShader(manager, "shader/line.cpu.vertex.glsl", "shader/line.cpu.fragment.glsl", genShaderNames("line.cpu"), defines);
         lineQuadDesc = loadShader(manager, "shader/line.quad.vertex.glsl", "shader/line.quad.fragment.glsl", genShaderNames("line.quad"), defines);
@@ -267,12 +267,12 @@ public class SceneGraphRenderer extends AbstractRenderer implements IProcessRend
         /*
           STAR BILLBOARD SHADER
          */
-        starBillboardShaders = fetchShaderProgram(manager, starBillboardDesc, genShaderFullNames("star-billboard"));
+        starBillboardShaders = fetchShaderProgram(manager, starBillboardDesc, genShaderFullNames("star.billboard"));
 
         /*
          * GALAXY SHADER
          */
-        galShaders = fetchShaderProgram(manager, galDesc, genShaderFullNames("galaxy"));
+        galShaders = fetchShaderProgram(manager, galDesc, genShaderFullNames("gal"));
 
         /*
          * FONT SHADER
@@ -290,52 +290,52 @@ public class SceneGraphRenderer extends AbstractRenderer implements IProcessRend
         /*
          * POINT CPU
          */
-        pointShaders = fetchShaderProgram(manager, pointDesc, genShaderFullNames("point-cpu"));
+        pointShaders = fetchShaderProgram(manager, pointDesc, genShaderFullNames("point.cpu"));
 
         /*
          * LINE CPU
          */
-        lineShaders = fetchShaderProgram(manager, lineDesc, genShaderFullNames("line-cpu"));
+        lineShaders = fetchShaderProgram(manager, lineDesc, genShaderFullNames("line.cpu"));
 
         /*
          * LINE QUAD
          */
-        lineQuadShaders = fetchShaderProgram(manager, lineQuadDesc, genShaderFullNames("line-quad"));
+        lineQuadShaders = fetchShaderProgram(manager, lineQuadDesc, genShaderFullNames("line.quad"));
 
         /*
          * LINE GPU
          */
-        lineGpuShaders = fetchShaderProgram(manager, lineGpuDesc, genShaderFullNames("line-gpu"));
+        lineGpuShaders = fetchShaderProgram(manager, lineGpuDesc, genShaderFullNames("line.gpu"));
 
         /*
          * GALAXY POINTS
          */
-        galaxyPointShaders = fetchShaderProgram(manager, galaxyPointDesc, genShaderFullNames("galaxy-point"));
+        galaxyPointShaders = fetchShaderProgram(manager, galaxyPointDesc, genShaderFullNames("galaxy"));
 
         /*
          * PARTICLE EFFECT - default and relativistic
          */
-        particleEffectShaders = fetchShaderProgram(manager, particleEffectDesc, genShaderFullNames("particle-effects"));
+        particleEffectShaders = fetchShaderProgram(manager, particleEffectDesc, genShaderFullNames("particle.effect"));
 
         /*
          * PARTICLE GROUP - default and relativistic
          */
-        particleGroupShaders = fetchShaderProgram(manager, particleGroupDesc, genShaderFullNames("particle-group"));
+        particleGroupShaders = fetchShaderProgram(manager, particleGroupDesc, genShaderFullNames("particle.group"));
 
         /*
          * STAR GROUP - default and relativistic
          */
-        starGroupShaders = fetchShaderProgram(manager, starGroupDesc, genShaderFullNames("star-group"));
+        starGroupShaders = fetchShaderProgram(manager, starGroupDesc, genShaderFullNames("star.group"));
 
         /*
          * STAR POINT
          */
-        starPointShaders = fetchShaderProgram(manager, starPointDesc, genShaderFullNames("star-point"));
+        starPointShaders = fetchShaderProgram(manager, starPointDesc, genShaderFullNames("star.point"));
 
         /*
          * ORBITAL ELEMENTS PARTICLES - default and relativistic
          */
-        orbitElemShaders = fetchShaderProgram(manager, orbitElemDesc, genShaderFullNames("orbital-elements-particles"));
+        orbitElemShaders = fetchShaderProgram(manager, orbitElemDesc, genShaderFullNames("orbitelem"));
 
         RenderGroup[] renderGroups = RenderGroup.values();
         render_lists = new Array<>(renderGroups.length);
