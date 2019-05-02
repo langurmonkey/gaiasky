@@ -1,14 +1,16 @@
-#version 120
+#version 330 core
 
 #include shader/lib_math.glsl
 
 uniform float u_ar;
 uniform float u_alpha;
 
-varying vec4 v_col;
-varying float v_depth;
-varying float v_dscale;
-varying float v_dust;
+in vec4 v_col;
+in float v_depth;
+in float v_dscale;
+in float v_dust;
+
+out vec4 fragColor;
 
 float programmatic(vec2 uv, float dist) {
     float dist_center = 1.0 - dist;
@@ -33,9 +35,9 @@ void main() {
 
     if (v_dust > 0.5){
         // down
-        gl_FragColor = colorDust(u_alpha);
+        fragColor = colorDust(u_alpha);
     } else {
-        gl_FragColor = colorStar(u_alpha, dist, uv);
+        fragColor = colorStar(u_alpha, dist, uv);
     }
 
     // Logarithmic depth buffer

@@ -1,13 +1,9 @@
-#version 120
+#version 330 core
 
 #include shader/lib_math.glsl
 #include shader/lib_geometry.glsl
 #include shader/lib_logdepthbuff.glsl
 
-attribute vec4 a_position;
-attribute vec4 a_color;
-// x - size, y - 0: star, 1: dust
-attribute vec2 a_additional;
 
 uniform float u_pointAlphaMin;
 uniform float u_pointAlphaMax;
@@ -35,10 +31,15 @@ uniform mat4 u_view;
     #include shader/lib_gravwaves.glsl
 #endif // gravitationalWaves
 
-varying vec4 v_col;
-varying float v_depth;
-varying float v_dscale;
-varying float v_dust;
+in vec4 a_position;
+in vec4 a_color;
+// x - size, y - 0: star, 1: dust
+in vec2 a_additional;
+
+out vec4 v_col;
+out float v_depth;
+out float v_dscale;
+out float v_dust;
 
 #define pc_to_u 3.085e7
 #define u_to_pc 1.0 / pc_to_u

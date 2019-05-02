@@ -1,4 +1,4 @@
-#version 330
+#version 330 core
 
 uniform sampler2D u_texture;
 uniform float u_scale;
@@ -11,8 +11,7 @@ in float v_opacity;
 in float v_depth;
 
 // OUTPUT
-layout (location = 0) out vec4 color;
-out float gl_FragDepth;
+layout (location = 0) out vec4 fragColor;
 
 
 void main(void){
@@ -25,7 +24,7 @@ void main(void){
 	if (aa < 0.001)
 	    discard;
 	    
-    color = vec4(v_color.rgb, aa * v_color.a);
+    fragColor = vec4(v_color.rgb, aa * v_color.a);
 
     gl_FragDepth = v_depth;
 }
