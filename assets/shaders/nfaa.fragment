@@ -3,12 +3,14 @@
 // and http://www.gamedev.net/topic/580517-nfaa---a-post-process-anti-aliasing-filter-results-implementation-details/
 // Copyright Styves, Martinsh
 // Modified by Sagrista, Toni
+#version 330 core
 
 uniform sampler2D u_texture0;
 // The inverse of the viewport dimensions along X and Y
 uniform vec2 u_viewportInverse;
 
-varying vec2 v_texCoords;
+in vec2 v_texCoords;
+out vec4 fragColor;
 
 float lumRGB(vec3 v)
     {
@@ -22,14 +24,14 @@ vec4 nfaa(sampler2D texture, vec2 texCoords, vec2 viewportInverse){
     vec2 upOffset = vec2(0.0, viewportInverse.y) * fScale;
     vec2 rightOffset = vec2(viewportInverse.x, 0.0) * fScale;
     
-    float topHeight = lumRGB(texture2D(texture, texCoords.xy + upOffset).rgb);
-    float bottomHeight = lumRGB(texture2D(texture, texCoords.xy - upOffset).rgb);
-    float rightHeight = lumRGB(texture2D(texture, texCoords.xy + rightOffset).rgb);
-    float leftHeight = lumRGB(texture2D(texture, texCoords.xy - rightOffset).rgb);
-    float leftTopHeight = lumRGB(texture2D(texture, texCoords.xy - rightOffset + upOffset).rgb);
-    float leftBottomHeight = lumRGB(texture2D(texture, texCoords.xy - rightOffset - upOffset).rgb);
-    float rightBottomHeight = lumRGB(texture2D(texture, texCoords.xy + rightOffset + upOffset).rgb);
-    float rightTopHeight = lumRGB(texture2D(texture, texCoords.xy + rightOffset - upOffset).rgb);
+    float topHeight = lumRGB(texture(texture, texCoords.xy + upOffset).rgb);
+    float bottomHeight = lumRGB(texture(texture, texCoords.xy - upOffset).rgb);
+    float rightHeight = lumRGB(texture(texture, texCoords.xy + rightOffset).rgb);
+    float leftHeight = lumRGB(texture(texture, texCoords.xy - rightOffset).rgb);
+    float leftTopHeight = lumRGB(texture(texture, texCoords.xy - rightOffset + upOffset).rgb);
+    float leftBottomHeight = lumRGB(texture(texture, texCoords.xy - rightOffset - upOffset).rgb);
+    float rightBottomHeight = lumRGB(texture(texture, texCoords.xy + rightOffset + upOffset).rgb);
+    float rightTopHeight = lumRGB(texture(texture, texCoords.xy + rightOffset - upOffset).rgb);
     
     // Normal map creation
     float sum0 = rightTopHeight + topHeight + rightBottomHeight;
@@ -43,11 +45,11 @@ vec4 nfaa(sampler2D texture, vec2 texCoords, vec2 viewportInverse){
     vec2 Normal = vec2(vect1, vect2) * viewportInverse * fScale;
     
     // Color
-    vec4 Scene0 = texture2D(texture, texCoords.xy);
-    vec4 Scene1 = texture2D(texture, texCoords.xy + Normal.xy);
-    vec4 Scene2 = texture2D(texture, texCoords.xy - Normal.xy);
-    vec4 Scene3 = texture2D(texture, texCoords.xy + vec2(Normal.x, -Normal.y) * 0.5);
-    vec4 Scene4 = texture2D(texture, texCoords.xy - vec2(Normal.x, -Normal.y) * 0.5);
+    vec4 Scene0 = texture(texture, texCoords.xy);
+    vec4 Scene1 = texture(texture, texCoords.xy + Normal.xy);
+    vec4 Scene2 = texture(texture, texCoords.xy - Normal.xy);
+    vec4 Scene3 = texture(texture, texCoords.xy + vec2(Normal.x, -Normal.y) * 0.5);
+    vec4 Scene4 = texture(texture, texCoords.xy - vec2(Normal.x, -Normal.y) * 0.5);
     
     // Final color
     return vec4((Scene0.rgb + Scene1.rgb + Scene2.rgb + Scene3.rgb + Scene4.rgb) * 0.2, 1.0);
@@ -62,5 +64,5 @@ float GetColorLuminance(vec3 i_vColor){
 }
 
 void main(){  
-    gl_FragColor = nfaa(u_texture0, v_texCoords, u_viewportInverse);
+    fragColor = nfaa(u_texture0, v_texCoords, u_viewportInverse);
 }

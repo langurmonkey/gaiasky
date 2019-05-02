@@ -13,10 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  ******************************************************************************/
+#version 330 core
 
-attribute vec4 a_position;
-attribute vec2 a_texCoord0;
-varying vec2 v_texCoords;
+in vec4 a_position;
+in vec2 a_texCoord0;
+
+out vec2 v_texCoords;
 
 void main()
 {

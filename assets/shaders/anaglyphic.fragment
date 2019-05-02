@@ -1,10 +1,11 @@
 // Anaglyphic 3D red-cyan implementation by Toni Sagrista
+#version 330 core
 
 uniform sampler2D u_texture0;
 uniform sampler2D u_texture1;
 
-varying vec2 v_texCoords;
-
+in vec2 v_texCoords;
+out vec4 fragColor;
 
 void main() {
     vec2 texcoord = v_texCoords;
@@ -16,5 +17,5 @@ void main() {
 	leftFrag = vec4(leftFrag.r, 1.0, 1.0, 1.0); // Left eye (red filter) is full green and blue and actual red
  
 	// Multiply left and right components for final output colour
-	gl_FragColor = vec4(leftFrag.rgb * rightFrag.rgb, 1.0); 
+	fragColor = vec4(leftFrag.rgb * rightFrag.rgb, 1.0);
 }

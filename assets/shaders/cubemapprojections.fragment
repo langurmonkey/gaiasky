@@ -1,6 +1,11 @@
+#version 330 core
+#extension GL_NV_shadow_samplers_cube : enable
+
 uniform sampler2D u_texture0;
 uniform samplerCube u_cubemap;
-varying vec2 v_texCoords;
+
+in vec2 v_texCoords;
+out vec4 fragColor;
 
 #define PI 3.141592653589793238462643383
 #define TWOPI PI * 2.0
@@ -68,5 +73,5 @@ vec4 cubeToProjection(samplerCube cubemap, vec2 tc) {
 #endif //hammer
 
 void main( void ){
-	gl_FragColor = cubeToProjection(u_cubemap, v_texCoords); 
+	fragColor = cubeToProjection(u_cubemap, v_texCoords);
 }

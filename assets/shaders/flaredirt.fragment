@@ -1,3 +1,4 @@
+#version 330 core
 // Lens flare implementation by Toni Sagrista
 // From John Chapman's article http://john-chapman-graphics.blogspot.co.uk/2013/02/pseudo-lens-flare.html
 
@@ -8,18 +9,16 @@ uniform sampler2D u_texture1;
 // Lens starburst
 uniform sampler2D u_texture2;
 
-
-varying vec2 v_texCoords;
-
-
+in vec2 v_texCoords;
+out vec4 fragColor;
 
 /*----------------------------------------------------------------------------*/
 void main() {
     vec2 texcoord = -v_texCoords + vec2(1.0);
     
-    vec4 lensflare = texture2D(u_texture0, texcoord);
-    vec4 dirt = texture2D(u_texture1, texcoord);
-    vec4 starburst = texture2D(u_texture2, texcoord);
+    vec4 lensflare = texture(u_texture0, texcoord);
+    vec4 dirt = texture(u_texture1, texcoord);
+    vec4 starburst = texture(u_texture2, texcoord);
     
-    gl_FragColor = lensflare * dirt * starburst;
+    fragColor = lensflare * dirt * starburst;
 }

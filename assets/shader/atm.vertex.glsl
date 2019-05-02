@@ -1,6 +1,7 @@
+#version 330 core
+
 #include shader/lib_logdepthbuff.glsl
 
-attribute vec3 a_position;
 uniform mat4 u_projViewTrans;
 uniform mat4 u_worldTrans;
 uniform vec3 v3PlanetPos; /* The position of the planet */
@@ -25,10 +26,12 @@ uniform float fAlpha; /* Atmosphere effect opacity */
 uniform int nSamples;
 uniform float fSamples;
 
-varying vec3 v3Direction;
-varying vec4 frontColor;
-varying vec3 frontSecondaryColor;
-varying float v_depth;
+in vec3 a_position;
+
+out vec3 v_direction;
+out vec4 v_frontColor;
+out vec3 v_frontSecondaryColor;
+out float v_depth;
 
 ////////////////////////////////////////////////////////////////////////////////////
 //////////RELATIVISTIC EFFECTS - VERTEX
@@ -123,9 +126,9 @@ void main(void) {
     }
 
     // Finally, scale the Mie and Rayleigh colors and set up the varying variables for the pixel shader
-    frontColor.rgb = v3FrontColor * (v3InvWavelength * fKrESun);
-    frontColor.a = fAlpha;
-    frontSecondaryColor.rgb = v3FrontColor * fKmESun;
+    v_frontColor.rgb = v3FrontColor * (v3InvWavelength * fKrESun);
+    v_frontColor.a = fAlpha;
+    v_frontSecondaryColor.rgb = v3FrontColor * fKmESun;
 
     vec4 g_position = vec4(a_position, 1.0);
     vec4 pos = u_worldTrans * g_position;
@@ -144,6 +147,6 @@ void main(void) {
     v_depth = getDepthValue(length(pos.xyz));
 
     // Direction from the vertex to the camera 
-    v3Direction = v3CameraPos - v3Pos;
+    v_direction = v3CameraPos - v3Pos;
 
 }

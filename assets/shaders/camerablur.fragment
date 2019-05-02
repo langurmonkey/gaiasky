@@ -13,6 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  ******************************************************************************/
+#version 330 core
 
 uniform sampler2D u_texture0;	// scene
 uniform sampler2D u_texture1;	// depthmap
@@ -24,7 +25,8 @@ uniform float blur_scale;
 uniform float depth_scale;
 uniform int blur_passes;
 
-varying vec2 v_texCoords;
+in vec2 v_texCoords;
+out vec4 fragColor;
 
 vec3 get_eye_normal(){
 	vec2 frag_coord = gl_FragCoord.xy/viewport;
@@ -48,7 +50,7 @@ float decode_depth(vec2 src){
 
 void main() {
 	vec3 eye_ray = get_eye_normal();
-	vec4 eye_data = texture2D(u_texture1, v_texCoords);
+	vec4 eye_data = texture(u_texture1, v_texCoords);
 	vec3 eye_normal = decode_normal(eye_data.xy);
 	float eye_depth = decode_depth(eye_data.zw);
 
@@ -79,5 +81,5 @@ void main() {
 		//result += texture2D(u_texture0, texCoord);
 	//}
 
-	gl_FragColor = result * oneOnNumPasses;
+	fragColor = result * oneOnNumPasses;
 }

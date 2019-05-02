@@ -21,6 +21,7 @@
 
 package gaia.cu9.ari.gaiaorbit.util.gdx.contrib.postprocess.utils;
 
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Pixmap.Format;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.glutils.GLFrameBuffer.FrameBufferBuilder;
@@ -72,10 +73,16 @@ public final class PingPongBuffer {
         // 1 DEPTH TEXTURE ATTACHMENT
         FrameBufferBuilder frameBufferBuilder = new FrameBufferBuilder(width, height);
         frameBufferBuilder.addBasicColorTextureAttachment(frameBufferFormat);
-        //frameBufferBuilder.addFloatAttachment(GL30.GL_RGBA32F, GL30.GL_RGBA, GL30.GL_FLOAT, true);
+        //if (Gdx.graphics.isGL30Available()) {
+        //    frameBufferBuilder.addFloatAttachment(GL30.GL_RGBA32F, GL30.GL_RGBA, GL30.GL_FLOAT, true);
+        //}
         if (hasDepth) {
-            // 32 bit depth buffer texture
-            frameBufferBuilder.addDepthTextureAttachment(GL20.GL_DEPTH_COMPONENT32, GL20.GL_FLOAT);
+            if (Gdx.graphics.isGL30Available()) {
+                // 32 bit depth buffer texture
+                frameBufferBuilder.addDepthTextureAttachment(GL20.GL_DEPTH_COMPONENT32, GL20.GL_FLOAT);
+            } else {
+                frameBufferBuilder.addBasicDepthRenderBuffer();
+            }
         }
         ownedMain = new GaiaSkyFrameBuffer(frameBufferBuilder);
 

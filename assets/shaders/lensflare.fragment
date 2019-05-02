@@ -1,3 +1,4 @@
+#version 330 core
 // Simple lens flare implementation by Toni Sagrista
 
 uniform sampler2D u_texture0;
@@ -8,7 +9,8 @@ uniform float u_intensity;
 uniform vec2 u_lightPosition;
 uniform vec3 u_color;
 
-varying vec2 v_texCoords;
+in vec2 v_texCoords;
+out vec4 fragColor;
 
 vec3 lensflare(vec2 uv,vec2 pos)
 {
@@ -64,9 +66,9 @@ void main(void)
 	    vec2 lpos = u_lightPosition;
 	    lpos.x *= u_viewport.x / u_viewport.y;
 	    vec3 color = u_color * lensflare(uv, lpos);
-	    color = cc(color,.5,.1) + texture2D(u_texture0, v_texCoords).rgb;
-	    gl_FragColor = vec4(color, 1.0);
+	    color = cc(color,.5,.1) + texture(u_texture0, v_texCoords).rgb;
+	    fragColor = vec4(color, 1.0);
 	}else{
-	    gl_FragColor = texture2D(u_texture0, v_texCoords);
+	    fragColor = texture(u_texture0, v_texCoords);
 	}
 }

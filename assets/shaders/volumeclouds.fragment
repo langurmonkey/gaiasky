@@ -1,4 +1,4 @@
-#version 120
+#version 330 core
 /**
  GLSL implementation of volumetric cloud rendering as
  described in http://www.blog.sirenix.net/blog/realtime-volumetric-clouds-in-unity
@@ -24,7 +24,8 @@ uniform vec3 u_camPos;
 uniform vec3 u_camUp;
 uniform vec3 u_camDir;
 
-varying vec2 v_texCoords;
+in vec2 v_texCoords;
+out vec4 fragColor;
 
 float noise(vec3 x)
 {
@@ -104,5 +105,5 @@ void main()
 
 	vec4 col = frag(uv);
 	float level = luma(col);
-    gl_FragColor = col;
+    fragColor = col;
 }

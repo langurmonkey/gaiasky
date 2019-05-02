@@ -13,6 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  ******************************************************************************/
+#version 330 core
 
 uniform sampler2D u_texture0;
 uniform float VignetteIntensity;
@@ -21,8 +22,8 @@ uniform float VignetteY;
 uniform float CenterX;
 uniform float CenterY;
 
-varying vec2 v_texCoords;
-
+in vec2 v_texCoords;
+out vec4 fragColor;
 
 #ifdef CONTROL_SATURATION
 	uniform float Saturation;
@@ -94,5 +95,5 @@ void main() {
 	}
 #endif
 
-	gl_FragColor = vec4(rgb,1);
+	fragColor = vec4(rgb,1);
 }

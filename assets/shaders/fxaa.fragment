@@ -2,6 +2,7 @@
 // http://horde3d.org/wiki/index.php5?title=Shading_Technique_-_FXAA
 // Whitepaper describing the technique:
 // http://developer.download.nvidia.com/assets/gamedev/files/sdk/11/FXAA_WhitePaper.pdf
+#version 330 core
 
 uniform sampler2D u_texture0;
 
@@ -11,18 +12,19 @@ uniform float FXAA_REDUCE_MIN;
 uniform float FXAA_REDUCE_MUL;
 uniform float FXAA_SPAN_MAX;
 
-varying vec2 v_texCoords;
+in vec2 v_texCoords;
+out vec4 fragColor;
 
 vec4 fxaa(sampler2D texture, vec2 texCoords, vec2 viewportInv) {
-	vec3 rgbNW = texture2D(texture, texCoords.xy + (vec2(-1.0, -1.0) * viewportInv)).xyz;
-	vec3 rgbNE = texture2D(texture, texCoords.xy + (vec2(+1.0, -1.0) * viewportInv)).xyz;
-	vec3 rgbSW = texture2D(texture, texCoords.xy + (vec2(-1.0, +1.0) * viewportInv)).xyz;
-	vec3 rgbSE = texture2D(texture,	texCoords.xy + (vec2(+1.0, +1.0) * viewportInv)).xyz;
-	vec3 rgbN = texture2D(texture, texCoords.xy + (vec2(0.0, -1.0) * viewportInv)).xyz;
-	vec3 rgbS = texture2D(texture, texCoords.xy + (vec2(0.0, 1.0) * viewportInv)).xyz;
-	vec3 rgbE= texture2D(texture, texCoords.xy + (vec2(1.0, 0.0) * viewportInv)).xyz;
-	vec3 rgbW= texture2D(texture, texCoords.xy + (vec2(-1.0, 0.0) * viewportInv)).xyz;
-	vec3 rgbM = texture2D(texture, texCoords.xy).xyz;
+	vec3 rgbNW = texture(texture, texCoords.xy + (vec2(-1.0, -1.0) * viewportInv)).xyz;
+	vec3 rgbNE = texture(texture, texCoords.xy + (vec2(+1.0, -1.0) * viewportInv)).xyz;
+	vec3 rgbSW = texture(texture, texCoords.xy + (vec2(-1.0, +1.0) * viewportInv)).xyz;
+	vec3 rgbSE = texture(texture,	texCoords.xy + (vec2(+1.0, +1.0) * viewportInv)).xyz;
+	vec3 rgbN = texture(texture, texCoords.xy + (vec2(0.0, -1.0) * viewportInv)).xyz;
+	vec3 rgbS = texture(texture, texCoords.xy + (vec2(0.0, 1.0) * viewportInv)).xyz;
+	vec3 rgbE= texture(texture, texCoords.xy + (vec2(1.0, 0.0) * viewportInv)).xyz;
+	vec3 rgbW= texture(texture, texCoords.xy + (vec2(-1.0, 0.0) * viewportInv)).xyz;
+	vec3 rgbM = texture(texture, texCoords.xy).xyz;
 
 	vec3 luma = vec3(0.299, 0.587, 0.114);
 	float lumaNW = dot(rgbNW, luma);
@@ -56,10 +58,10 @@ vec4 fxaa(sampler2D texture, vec2 texCoords, vec2 viewportInv) {
 			max(vec2(-FXAA_SPAN_MAX, -FXAA_SPAN_MAX), dir * rcpDirMin))
 			* viewportInv;
 
-	vec3 rgbA =	0.5	* (texture2D(texture, texCoords.xy + dir * (1.0 / 3.0 - 0.5)).xyz +
-					   texture2D(texture, texCoords.xy + dir * (2.0 / 3.0 - 0.5)).xyz);
-	vec3 rgbB =	rgbA * 0.5 + 0.25 * (texture2D(texture, texCoords.xy + dir * (0.0 / 3.0 - 0.5)).xyz +
-									 texture2D(texture, texCoords.xy + dir * (3.0 / 3.0 - 0.5)).xyz);
+	vec3 rgbA =	0.5	* (texture(texture, texCoords.xy + dir * (1.0 / 3.0 - 0.5)).xyz +
+					   texture(texture, texCoords.xy + dir * (2.0 / 3.0 - 0.5)).xyz);
+	vec3 rgbB =	rgbA * 0.5 + 0.25 * (texture(texture, texCoords.xy + dir * (0.0 / 3.0 - 0.5)).xyz +
+									 texture(texture, texCoords.xy + dir * (3.0 / 3.0 - 0.5)).xyz);
 	float lumaB = dot(rgbB, luma);
 
 	vec4 color = vec4(0.0);
@@ -74,5 +76,5 @@ vec4 fxaa(sampler2D texture, vec2 texCoords, vec2 viewportInv) {
 }
 
 void main() {
-	gl_FragColor = fxaa(u_texture0, v_texCoords, u_viewportInverse);
+	fragColor = fxaa(u_texture0, v_texCoords, u_viewportInverse);
 }

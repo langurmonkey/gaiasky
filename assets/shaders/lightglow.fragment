@@ -1,4 +1,4 @@
-#version 120
+#version 330 core
 // Light scattering implementation by Toni Sagrista
 
 #define N 30
@@ -13,14 +13,13 @@ uniform sampler2D u_texture2;
 uniform vec2 u_viewport;
 uniform int u_nSamples;
 uniform float u_textureScale;
-
-varying vec2 v_texCoords;
-
 uniform vec2 u_lightPositions[N];
 uniform float u_lightViewAngles[N];
 uniform vec3 u_lightColors[N];
-
 uniform int u_nLights;
+
+in vec2 v_texCoords;
+out vec4 fragColor;
 
 float len(vec2 vect, float ar){
 	return sqrt(vect.x * vect.x * ar * ar + vect.y * vect.y);
@@ -46,7 +45,7 @@ float fy(float t, float a){
 void main()
 {
 	 float ar = u_viewport.x / u_viewport.y;
-	 gl_FragColor = vec4(0.0);
+	 fragColor = vec4(0.0);
 	 
 	 for (int li = 0; li < u_nLights; li++){
 	 	 float viewAngle = min(0.0001, u_lightViewAngles[li]);
@@ -79,10 +78,7 @@ void main()
 		 
 		 float color_glow = clamp(average(texture2D(u_texture1, glow_tc)), 0.0, 1.0);
 		 float core_inc = (0.1 - min(0.1, dist_center)) * color_glow;
-		 gl_FragColor += vec4(color_glow * lightColor.r + core_inc, color_glow * lightColor.g + core_inc, color_glow * lightColor.b + core_inc, 1.0);
+		 fragColor += vec4(color_glow * lightColor.r + core_inc, color_glow * lightColor.g + core_inc, color_glow * lightColor.b + core_inc, 1.0);
 	 }
-	 gl_FragColor += texture2D(u_texture0, v_texCoords);
-	 //gl_FragColor *= 0.00001;
-	 //gl_FragColor += texture2D(u_texture2, v_texCoords);
-
+	 fragColor += texture2D(u_texture0, v_texCoords);
 }

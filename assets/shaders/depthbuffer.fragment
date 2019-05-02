@@ -1,5 +1,5 @@
 // Visualize the contents of the depth texture attachment
-#version 130
+#version 330 core
 
 // Color buffer texture
 uniform sampler2D u_texture0;
@@ -7,17 +7,16 @@ uniform sampler2D u_texture0;
 uniform sampler2D u_texture1;
 
 in vec2 v_texCoords;
-
-out vec4 color;
+out vec4 fragColor;
 
 void main() {
     vec4 col = texture2D(u_texture0, v_texCoords);
     vec4 depth = texture2D(u_texture1, v_texCoords);
 
     if(v_texCoords.x < 0.5){
-        color = col;
+        fragColor = col;
     } else {
         float v = depth.x;
-        color = vec4(v, v, v, 1.0);
+        fragColor = vec4(v, v, v, 1.0);
     }
 }

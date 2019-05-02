@@ -183,13 +183,13 @@ public class CameraGroupStrategy implements GroupStrategy, Disposable {
     }
 
     private void createDefaultShader () {
-        String vertexShader = "#version 120\n" //
-                + "attribute vec4 " + ShaderProgram.POSITION_ATTRIBUTE + ";\n" //
-                + "attribute vec4 " + ShaderProgram.COLOR_ATTRIBUTE + ";\n" //
-                + "attribute vec2 " + ShaderProgram.TEXCOORD_ATTRIBUTE + "0;\n" //
+        String vertexShader = "#version 330\n" //
                 + "uniform mat4 u_projectionViewMatrix;\n" //
-                + "varying vec4 v_color;\n" //
-                + "varying vec2 v_texCoords;\n" //
+                + "in vec4 " + ShaderProgram.POSITION_ATTRIBUTE + ";\n" //
+                + "in vec4 " + ShaderProgram.COLOR_ATTRIBUTE + ";\n" //
+                + "in vec2 " + ShaderProgram.TEXCOORD_ATTRIBUTE + "0;\n" //
+                + "out vec4 v_color;\n" //
+                + "out vec2 v_texCoords;\n" //
                 + "\n" //
                 + "void main()\n" //
                 + "{\n" //
@@ -198,13 +198,14 @@ public class CameraGroupStrategy implements GroupStrategy, Disposable {
                 + "   v_texCoords = " + ShaderProgram.TEXCOORD_ATTRIBUTE + "0;\n" //
                 + "   gl_Position =  u_projectionViewMatrix * " + ShaderProgram.POSITION_ATTRIBUTE + ";\n" //
                 + "}\n";
-        String fragmentShader = "#version 120\n" //
-                + "varying vec4 v_color;\n" //
-                + "varying vec2 v_texCoords;\n" //
+        String fragmentShader = "#version 330\n" //
                 + "uniform sampler2D u_texture;\n" //
+                + "in vec4 v_color;\n" //
+                + "in vec2 v_texCoords;\n" //
+                + "out vec4 color;\n" //
                 + "void main()\n"//
                 + "{\n" //
-                + "  gl_FragColor = v_color * texture2D(u_texture, v_texCoords);\n" //
+                + "  color = v_color * texture2D(u_texture, v_texCoords);\n" //
                 + "}";
 
         shader = new ShaderProgram(vertexShader, fragmentShader);

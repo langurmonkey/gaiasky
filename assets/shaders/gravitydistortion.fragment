@@ -1,8 +1,11 @@
-varying vec2 v_texCoords;
+#version 330 core
 
 uniform vec2 u_viewport;
 uniform sampler2D u_texture0;
 uniform vec2 u_massPosition;
+
+in vec2 v_texCoords;
+out vec4 fragColor;
 
 float massRadius = 20.0;
 float distortionRadius = 40.0;
@@ -28,13 +31,13 @@ vec4 distort(sampler2D texture, vec2 texCoords, vec2 viewport) {
         float newlen = lint(currlen, 0.0, distortionRadius, 0.0, lim);
         vec2 newTexCoord = normalize(massToCoord) * newlen + pxMass;
 
-        return texture2D(texture, newTexCoord / viewport);
+        return texture(texture, newTexCoord / viewport);
     }else{
-        return texture2D(texture, texCoords.xy);
+        return texture(texture, texCoords.xy);
     }
 
 }
 
 void main() {
-	gl_FragColor = distort(u_texture0, v_texCoords, u_viewport);
+	fragColor = distort(u_texture0, v_texCoords, u_viewport);
 }

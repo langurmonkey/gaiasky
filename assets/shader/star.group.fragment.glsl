@@ -1,4 +1,4 @@
-#version 330
+#version 330 core
 
 // UNIFORMS
 uniform float u_ar;
@@ -8,7 +8,7 @@ in vec4 v_col;
 in float v_depth;
 
 // OUTPUT
-layout (location = 0) out vec4 color;
+layout (location = 0) out vec4 fragColor;
 out float gl_FragDepth;
 
 
@@ -25,7 +25,7 @@ void main() {
         discard;
     }
 
-    color = v_col * alpha;
+    fragColor = v_col * alpha;
 
     gl_FragDepth = v_depth;
 }

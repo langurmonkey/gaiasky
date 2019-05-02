@@ -13,18 +13,19 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  ******************************************************************************/
-
-attribute vec4 a_position;
-attribute vec2 a_texCoord0;
+#version 330 core
 
 uniform float offset_x;
 uniform float offset_y;
 uniform float zoom;
 
-varying vec2 v_texCoord0;
+in vec4 a_position;
+in vec2 a_texCoord0;
+
+out vec2 v_texCoords;
 
 void main()
 {
-	v_texCoord0 = (a_texCoord0 - vec2(offset_x, offset_y)) * zoom;
+	v_texCoords = (a_texCoord0 - vec2(offset_x, offset_y)) * zoom;
 	gl_Position = a_position;
 }

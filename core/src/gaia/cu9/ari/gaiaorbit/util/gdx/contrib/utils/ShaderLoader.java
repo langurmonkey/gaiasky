@@ -53,7 +53,7 @@ public final class ShaderLoader {
 
     public static ShaderProgram fromString(String vertex, String fragment, String vertexName, String fragmentName, String defines) {
         ShaderProgram.pedantic = ShaderLoader.Pedantic;
-        ShaderProgram shader = new ShaderProgram(defines + "\n" + vertex, defines + "\n" + fragment);
+        ShaderProgram shader = new ShaderProgram(insertDefines(vertex, defines), insertDefines(fragment, defines));
 
         if (!shader.isCompiled()) {
             Gdx.app.error("ShaderLoader", "Compile error: " + vertexName + "/" + fragmentName);
@@ -62,6 +62,23 @@ public final class ShaderLoader {
         }
 
         return shader;
+    }
+
+    private static String insertDefines(String shader, String defines) {
+        // Insert defines after #version directive, if exists
+        if (shader.contains("#version ")) {
+            String[] lines = shader.split("\n");
+            StringBuilder sb = new StringBuilder();
+            for (String line : lines) {
+                sb.append(line).append("\n");
+                if(line.trim().startsWith("#version ")){
+                    sb.append(defines).append("\n");
+                }
+            }
+            return sb.toString();
+        } else {
+            return defines + "\n" + shader;
+        }
     }
 
     private ShaderLoader() {
