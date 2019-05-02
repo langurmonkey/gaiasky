@@ -17,7 +17,7 @@ layout (location = 0) out vec4 fragColor;
 void main(void){
     // Smoothing is adapted arbitrarily to produce crisp borders at all sizes
     float smoothing = 1.0 / (16.0 * u_scale);
-    float dist = texture2D(u_texture, v_texCoords).a;
+    float dist = texture(u_texture, v_texCoords).a;
     float alpha = smoothstep(0.6 - smoothing, 0.6 + smoothing, dist);
     float aa = alpha * v_opacity * u_opacity;
 	

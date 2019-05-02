@@ -1,11 +1,11 @@
-#version 120
+#version 330
 
 #include shader/lib_math.glsl
 #include shader/lib_geometry.glsl
 #include shader/lib_logdepthbuff.glsl
 
-attribute vec4 a_position;
-attribute vec2 a_texCoord0;
+in vec4 a_position;
+in vec2 a_texCoord0;
 
 uniform mat4 u_projTrans;
 uniform vec4 u_color;
@@ -30,9 +30,9 @@ uniform float u_omgw;// Wave frequency
 #include shader/lib_gravwaves.glsl
 #endif// gravitationalWaves
 
-varying vec4 v_color;
-varying vec2 v_texCoords;
-varying float v_depth;
+out vec4 v_color;
+out vec2 v_texCoords;
+out float v_depth;
 
 void main()
 {

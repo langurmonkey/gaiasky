@@ -4,7 +4,6 @@
 #include shader/lib_geometry.glsl
 #include shader/lib_logdepthbuff.glsl
 
-
 uniform float u_pointAlphaMin;
 uniform float u_pointAlphaMax;
 uniform float u_starBrightness;
