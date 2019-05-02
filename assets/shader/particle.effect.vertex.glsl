@@ -1,13 +1,13 @@
-#version 120
+#version 330 core
 
 #include shader/lib_geometry.glsl
 
-attribute vec4 a_position;
-attribute vec4 a_color;
+in vec4 a_position;
+in vec4 a_color;
 // size
-attribute float a_size;
+in float a_size;
 // creation time
-attribute float a_t;
+in float a_t;
 
 uniform float u_alpha;
 
@@ -32,8 +32,7 @@ uniform float u_t; // time in seconds
     #include shader/lib_gravwaves.glsl
 #endif // gravitationalWaves
     
-varying vec4 v_col;
-
+out vec4 v_col;
 
 #include shader/lib_math.glsl
 // Time to live in seconds

@@ -1,5 +1,8 @@
+#version 330 core
 
-varying vec4 v_col;
+in vec4 v_col;
+out vec4 fragColor;
+
 void main() {
-    gl_FragColor = v_col;
+    fragColor = v_col;
 }

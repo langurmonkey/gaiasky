@@ -1,14 +1,14 @@
-#version 120
+#version 330 core
 
 #include shader/lib_logdepthbuff.glsl
 
-attribute vec4 a_position;
-attribute vec4 a_color;
+in vec4 a_position;
+in vec4 a_color;
 
 uniform mat4 u_projModelView;
 
-varying vec4 v_col;
-varying float v_depth;
+out vec4 v_col;
+out float v_depth;
 
 #ifdef relativisticEffects
     uniform vec3 u_velDir; // Velocity vector

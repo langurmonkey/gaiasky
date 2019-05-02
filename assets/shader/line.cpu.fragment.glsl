@@ -1,8 +1,11 @@
-varying float v_depth;
-varying vec4 v_col;
+#version 330 core
+
+in float v_depth;
+in vec4 v_col;
+out vec4 fragColor;
 
 void main() {
-    gl_FragColor = v_col;
+    fragColor = v_col;
 
     // Normal depth buffer
     // gl_FragDepth = gl_FragCoord.z;

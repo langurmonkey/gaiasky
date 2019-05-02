@@ -1,12 +1,12 @@
-#version 120
+#version 330 core
 
 #include shader/lib_geometry.glsl
 #include shader/lib_logdepthbuff.glsl
 
-attribute vec4 a_position;
-attribute vec4 a_color;
+in vec4 a_position;
+in vec4 a_color;
 // size
-attribute float a_size;
+in float a_size;
 
 uniform float u_alpha;
 
@@ -32,8 +32,8 @@ uniform int u_cubemap;
     #include shader/lib_gravwaves.glsl
 #endif // gravitationalWaves
     
-varying vec4 v_col;
-varying float v_depth;
+out vec4 v_col;
+out float v_depth;
 
 void main() {
     vec3 pos = a_position.xyz - u_camPos;

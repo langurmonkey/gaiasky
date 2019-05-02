@@ -86,8 +86,8 @@ public class SceneGraphRenderer extends AbstractRenderer implements IProcessRend
     /** Alpha values for each type **/
     public static float[] alphas;
 
-    private ShaderProgram[] starGroupShaders, particleGroupShaders, particleEffectShaders, orbitElemShaders, pointShaders, lineShaders, lineQuadShaders, lineGpuShaders, galaxyShaders, starPointShaders, galShaders, spriteShaders, starBillboardShaders;
-    private AssetDescriptor<ShaderProgram>[] starGroupDesc, particleGroupDesc, particleEffectDesc, orbitElemDesc, pointDesc, lineDesc, lineQuadDesc, lineGpuDesc, galaxyDesc,starPointDesc, galDesc, spriteDesc, starBillboardDesc;
+    private ShaderProgram[] starGroupShaders, particleGroupShaders, particleEffectShaders, orbitElemShaders, pointShaders, lineShaders, lineQuadShaders, lineGpuShaders, galaxyPointShaders, starPointShaders, galShaders, spriteShaders, starBillboardShaders;
+    private AssetDescriptor<ShaderProgram>[] starGroupDesc, particleGroupDesc, particleEffectDesc, orbitElemDesc, pointDesc, lineDesc, lineQuadDesc, lineGpuDesc, galaxyPointDesc,starPointDesc, galDesc, spriteDesc, starBillboardDesc;
 
     /** Render lists for all render groups **/
     public static Array<Array<IRenderable>> render_lists;
@@ -166,7 +166,7 @@ public class SceneGraphRenderer extends AbstractRenderer implements IProcessRend
         starBillboardDesc = loadShader(manager, "shader/star.billboard.vertex.glsl", "shader/star.billboard.fragment.glsl", genShaderNames("star.billboard"), defines);
         spriteDesc = loadShader(manager, "shader/sprite.vertex.glsl", "shader/sprite.fragment.glsl", genShaderNames("sprite"), defines);
         starPointDesc = loadShader(manager, "shader/star.point.vertex.glsl", "shader/star.point.fragment.glsl", genShaderNames("star.point"), defines);
-        galaxyDesc = loadShader(manager, "shader/galaxy.vertex.glsl", "shader/galaxy.fragment.glsl", genShaderNames("galaxy"), defines);
+        galaxyPointDesc = loadShader(manager, "shader/galaxy.vertex.glsl", "shader/galaxy.fragment.glsl", genShaderNames("galaxy.point"), defines);
         pointDesc = loadShader(manager, "shader/point.cpu.vertex.glsl", "shader/point.cpu.fragment.glsl", genShaderNames("point.cpu"), defines);
         lineDesc = loadShader(manager, "shader/line.cpu.vertex.glsl", "shader/line.cpu.fragment.glsl", genShaderNames("line.cpu"), defines);
         lineQuadDesc = loadShader(manager, "shader/line.quad.vertex.glsl", "shader/line.quad.fragment.glsl", genShaderNames("line.quad"), defines);
@@ -310,7 +310,7 @@ public class SceneGraphRenderer extends AbstractRenderer implements IProcessRend
         /*
          * GALAXY POINTS
          */
-        galaxyShaders = fetchShaderProgram(manager, galaxyDesc, genShaderFullNames("mw-point"));
+        galaxyPointShaders = fetchShaderProgram(manager, galaxyPointDesc, genShaderFullNames("galaxy-point"));
 
         /*
          * PARTICLE EFFECT - default and relativistic
@@ -537,9 +537,9 @@ public class SceneGraphRenderer extends AbstractRenderer implements IProcessRend
         modelBeamProc.addPreRunnables(regularBlendR, depthTestR);
 
         // GALAXY
-        mwrs = new MWModelRenderSystem(RenderGroup.GALAXY, alphas, galaxyShaders);
+        mwrs = new MWModelRenderSystem(RenderGroup.GALAXY, alphas, galaxyPointShaders);
         AbstractRenderSystem milkyWayProc = mwrs;
-        //AbstractRenderSystem milkyWayProc = new MilkyWayRenderSystem(RenderGroup.GALAXY, alphas, modelBatchDefault, galaxyShaders, mwNebulaShaders);
+        //AbstractRenderSystem milkyWayProc = new MilkyWayRenderSystem(RenderGroup.GALAXY, alphas, modelBatchDefault, galaxyPointShaders, mwNebulaShaders);
         //milkyWayProc.addPreRunnables(additiveBlendR, depthTestR, noDepthWritesR);
 
         // PARTICLE EFFECTS

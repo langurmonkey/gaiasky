@@ -1,10 +1,10 @@
-#version 120
+#version 330 core
 
 #include shader/lib_math.glsl
 #include shader/lib_geometry.glsl
 
-attribute vec4 a_position;
-attribute vec2 a_texCoord0;
+in vec4 a_position;
+in vec2 a_texCoord0;
 
 uniform mat4 u_projTrans;
 uniform vec4 u_color;
@@ -33,8 +33,8 @@ uniform vec3 u_camShift;
     #include shader/lib_gravwaves.glsl
 #endif // gravitationalWaves
 
-varying vec4 v_color;
-varying vec2 v_texCoords;
+out vec4 v_color;
+out vec2 v_texCoords;
 
 #define distfac 3.24e-8 / 60000.0
 #define distfacinv 60000.0 / 3.23e-8

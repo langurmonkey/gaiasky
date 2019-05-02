@@ -1,12 +1,12 @@
-#version 120
-
-attribute vec4 a_position;
-attribute vec4 a_color;
-attribute float a_size;
+#version 330 core
 
 uniform mat4 u_projModelView;
 
-varying vec4 v_col;
+in vec4 a_position;
+in vec4 a_color;
+in float a_size;
+
+out vec4 v_col;
 
 #ifdef relativisticEffects
     uniform vec3 u_velDir; // Velocity vector

@@ -1,10 +1,10 @@
-#version 120
+#version 330 core
 
 #include shader/lib_geometry.glsl
 #include shader/lib_logdepthbuff.glsl
 
-attribute vec4 a_orbitelems01;
-attribute vec4 a_orbitelems02;
+in vec4 a_orbitelems01;
+in vec4 a_orbitelems02;
 
 uniform mat4 u_projModelView;
 uniform mat4 u_eclToEq;
@@ -35,8 +35,8 @@ uniform float u_dt_s;
     #include shader/lib_gravwaves.glsl
 #endif // gravitationalWaves
     
-varying vec4 v_col;
-varying float v_depth;
+out vec4 v_col;
+out float v_depth;
 
 #define M_TO_U 1e-9
 

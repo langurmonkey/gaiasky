@@ -1,8 +1,4 @@
-#version 120
-
-// v_texCoords are UV coordinates in [0..1]
-varying vec2 v_texCoords;
-varying vec4 v_color;
+#version 330
 
 uniform sampler2D u_texture0;
 // Distance in u to the star
@@ -11,8 +7,13 @@ uniform float u_distance;
 uniform float u_apparent_angle;
 // Component alpha (galaxies)
 uniform float u_alpha;
-
 uniform float u_time;
+
+// v_texCoords are UV coordinates in [0..1]
+in vec2 v_texCoords;
+in vec4 v_color;
+
+out vec4 fragColor;
 
 
 #define distfac 3.24e-8 / 60000.0
@@ -21,7 +22,7 @@ uniform float u_time;
 
 
 vec4 galaxyTexture(vec2 tc){
-	return texture2D(u_texture0, tc);
+	return texture(u_texture0, tc);
 }
 
 float light(float distance_center, float decay) {
@@ -38,7 +39,7 @@ vec4 drawSimple(vec2 tc) {
 void main() {
 
 	// float factor = smoothstep(distfacinv/8.0, distfacinv, u_distance);
-	gl_FragColor = drawSimple(v_texCoords) * u_alpha;
+	fragColor = drawSimple(v_texCoords) * u_alpha;
 
     // Debug! - visualise depth buffer
     //gl_FragColor = vec4(vec3(gl_FragCoord.z), 1.0f);

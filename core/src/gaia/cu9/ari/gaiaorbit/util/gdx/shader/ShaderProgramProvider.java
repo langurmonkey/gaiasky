@@ -45,8 +45,8 @@ import gaia.cu9.ari.gaiaorbit.assets.ShaderTemplatingLoader;
  * @author cypherdare */
 public class ShaderProgramProvider extends AsynchronousAssetLoader<ShaderProgram, ShaderProgramProvider.ShaderProgramParameter> {
 
-    private String vertexFileSuffix = ".vert";
-    private String fragmentFileSuffix = ".frag";
+    private String vertexFileSuffix = ".vertex.glsl";
+    private String fragmentFileSuffix = ".fragment.glsl";
 
     public ShaderProgramProvider(FileHandleResolver resolver) {
         super(resolver);
