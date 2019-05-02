@@ -5,7 +5,7 @@
 
 /**
  * Fisheye distortion filter
- * 
+ *
  * @author tsagrista
  */
 

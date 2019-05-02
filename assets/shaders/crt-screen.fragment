@@ -26,13 +26,6 @@
  * Android device, equipped with a Tegra2 GPU (Asus TF101).
  */
 
-#ifdef GL_ES
-	#define PRECISION mediump
-	precision PRECISION float;
-#else
-	#define PRECISION
-#endif
-
 uniform vec3 tint;
 uniform float time;
 uniform sampler2D u_texture0;

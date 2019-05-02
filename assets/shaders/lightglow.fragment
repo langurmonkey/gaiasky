@@ -1,11 +1,5 @@
-
 #version 120
 // Light scattering implementation by Toni Sagrista
-
-#ifdef GL_ES
-precision mediump float;
-precision mediump int;
-#endif
 
 #define N 30
 

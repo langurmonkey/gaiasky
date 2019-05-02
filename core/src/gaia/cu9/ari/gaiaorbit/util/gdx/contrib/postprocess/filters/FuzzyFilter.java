@@ -4,13 +4,13 @@
  */
 
 /*******************************************************************************
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *   http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -23,15 +23,20 @@ package gaia.cu9.ari.gaiaorbit.util.gdx.contrib.postprocess.filters;
 import com.badlogic.gdx.math.Vector2;
 import gaia.cu9.ari.gaiaorbit.util.gdx.contrib.utils.ShaderLoader;
 
-/** Fast approximate anti-aliasing filter.
- * @author Toni Sagrista */
+/**
+ * Fast approximate anti-aliasing filter.
+ *
+ * @author Toni Sagrista
+ */
 public final class FuzzyFilter extends Filter<FuzzyFilter> {
     private Vector2 viewportInverse;
     private float fade;
 
     public enum Param implements Parameter {
         // @formatter:off
-        Texture("u_texture0", 0), ViewportInverse("u_viewportInverse", 2), Fade("u_fade", 0);
+        Texture("u_texture0", 0),
+        ViewportInverse("u_viewportInverse", 2),
+        Fade("u_fade", 0);
         // @formatter:on
 
         private String mnemonic;
@@ -81,6 +86,7 @@ public final class FuzzyFilter extends Filter<FuzzyFilter> {
     /**
      * The fade value. The bigger this is, the faster star light
      * fades.
+     *
      * @param fade
      */
     public void setFade(float fade) {

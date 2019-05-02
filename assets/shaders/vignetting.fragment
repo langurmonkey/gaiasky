@@ -14,14 +14,7 @@
  * limitations under the License.
  ******************************************************************************/
 
-#ifdef GL_ES
-	#define PRECISION mediump
-	precision PRECISION float;
-#else
-	#define PRECISION
-#endif
-
-uniform PRECISION sampler2D u_texture0;
+uniform sampler2D u_texture0;
 uniform float VignetteIntensity;
 uniform float VignetteX;
 uniform float VignetteY;
@@ -52,7 +45,7 @@ varying vec2 v_texCoords;
 
 
 #ifdef ENABLE_GRADIENT_MAPPING
-	uniform PRECISION sampler2D u_texture1;
+	uniform sampler2D u_texture1;
 	uniform float LutIntensity;
 
 	uniform int LutIndex;

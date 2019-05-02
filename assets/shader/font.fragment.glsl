@@ -1,12 +1,19 @@
-
-varying vec4 v_color;
-varying vec2 v_texCoords;
-varying float v_opacity;
-varying float v_depth;
+#version 330
 
 uniform sampler2D u_texture;
 uniform float u_scale;
 uniform float u_opacity;
+
+// INPUT
+in vec4 v_color;
+in vec2 v_texCoords;
+in float v_opacity;
+in float v_depth;
+
+// OUTPUT
+layout (location = 0) out vec4 color;
+out float gl_FragDepth;
+
 
 void main(void){
     // Smoothing is adapted arbitrarily to produce crisp borders at all sizes
@@ -18,8 +25,7 @@ void main(void){
 	if (aa < 0.001)
 	    discard;
 	    
-    gl_FragColor = vec4(v_color.rgb, aa * v_color.a);
+    color = vec4(v_color.rgb, aa * v_color.a);
 
-    // Logarithmic depth buffer
     gl_FragDepth = v_depth;
 }

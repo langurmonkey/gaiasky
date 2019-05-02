@@ -4,13 +4,13 @@
  */
 
 /*******************************************************************************
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *   http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -23,8 +23,11 @@ package gaia.cu9.ari.gaiaorbit.util.gdx.contrib.postprocess.filters;
 import com.badlogic.gdx.math.Vector2;
 import gaia.cu9.ari.gaiaorbit.util.gdx.contrib.utils.ShaderLoader;
 
-/** Fast approximate anti-aliasing filter.
- * @author Toni Sagrista */
+/**
+ * Fast approximate anti-aliasing filter.
+ *
+ * @author Toni Sagrista
+ */
 public final class FxaaFilter extends Filter<FxaaFilter> {
     private Vector2 viewportInverse;
     private float FXAA_REDUCE_MIN;
@@ -33,7 +36,11 @@ public final class FxaaFilter extends Filter<FxaaFilter> {
 
     public enum Param implements Parameter {
         // @formatter:off
-        Texture("u_texture0", 0), ViewportInverse("u_viewportInverse", 2), FxaaReduceMin("FXAA_REDUCE_MIN", 0), FxaaReduceMul("FXAA_REDUCE_MUL", 0), FxaaSpanMax("FXAA_SPAN_MAX", 0);
+        Texture("u_texture0", 0),
+        ViewportInverse("u_viewportInverse", 2),
+        FxaaReduceMin("FXAA_REDUCE_MIN", 0),
+        FxaaReduceMul("FXAA_REDUCE_MUL", 0),
+        FxaaSpanMax("FXAA_SPAN_MAX", 0);
         // @formatter:on
 
         private String mnemonic;
@@ -80,22 +87,31 @@ public final class FxaaFilter extends Filter<FxaaFilter> {
         setParam(Param.ViewportInverse, this.viewportInverse);
     }
 
-    /** Sets the parameter. The default value is 1/128.
-    	 * @param value */
+    /**
+     * Sets the parameter. The default value is 1/128.
+     *
+     * @param value
+     */
     public void setFxaaReduceMin(float value) {
         this.FXAA_REDUCE_MIN = value;
         setParam(Param.FxaaReduceMin, this.FXAA_REDUCE_MIN);
     }
 
-    /** Sets the parameter. The default value is 1/8.
-    	 * @param value */
+    /**
+     * Sets the parameter. The default value is 1/8.
+     *
+     * @param value
+     */
     public void setFxaaReduceMul(float value) {
         this.FXAA_REDUCE_MUL = value;
         setParam(Param.FxaaReduceMul, this.FXAA_REDUCE_MUL);
     }
 
-    /** Sets the parameter. The default value is 8;
-    	 * @param value */
+    /**
+     * Sets the parameter. The default value is 8;
+     *
+     * @param value
+     */
     public void setFxaaSpanMax(float value) {
         this.FXAA_SPAN_MAX = value;
         setParam(Param.FxaaSpanMax, this.FXAA_SPAN_MAX);

@@ -24,10 +24,11 @@ package gaia.cu9.ari.gaiaorbit.util.gdx.contrib.postprocess.effects;
 import com.badlogic.gdx.graphics.glutils.FrameBuffer;
 import gaia.cu9.ari.gaiaorbit.util.gdx.contrib.postprocess.PostProcessorEffect;
 import gaia.cu9.ari.gaiaorbit.util.gdx.contrib.postprocess.filters.HDRFilter;
+import gaia.cu9.ari.gaiaorbit.util.gdx.contrib.utils.GaiaSkyFrameBuffer;
 
 /**
  * Light scattering implementation.
- * 
+ *
  * @author Toni Sagrista
  */
 public final class HDR extends PostProcessorEffect {
@@ -45,9 +46,8 @@ public final class HDR extends PostProcessorEffect {
 
     /**
      * Set the exposure
-     * 
-     * @param value
-     *            The exposure
+     *
+     * @param value The exposure
      */
     public void setExposure(float value) {
         filter.setExposure(value);
@@ -55,9 +55,8 @@ public final class HDR extends PostProcessorEffect {
 
     /**
      * Set the gamma
-     * 
-     * @param value
-     *            The gamma
+     *
+     * @param value The gamma
      */
     public void setGamma(float value) {
         filter.setGamma(value);
@@ -77,7 +76,7 @@ public final class HDR extends PostProcessorEffect {
     }
 
     @Override
-    public void render(FrameBuffer src, FrameBuffer dest) {
+    public void render(FrameBuffer src, FrameBuffer dest, GaiaSkyFrameBuffer main) {
         restoreViewport(dest);
         filter.setInput(src).setOutput(dest).render();
     }

@@ -30,9 +30,6 @@ import gaia.cu9.ari.gaiaorbit.util.Nature;
 import gaia.cu9.ari.gaiaorbit.util.comp.DistToCameraComparator;
 import gaia.cu9.ari.gaiaorbit.util.coord.AstroUtils;
 import gaia.cu9.ari.gaiaorbit.util.gdx.mesh.IntMesh;
-import gaia.cu9.ari.gaiaorbit.util.math.Vector3d;
-
-import java.util.Comparator;
 
 public class StarGroupRenderSystem extends ImmediateRenderSystem implements IObserver {
     private final double BRIGHTNESS_FACTOR;
@@ -40,7 +37,6 @@ public class StarGroupRenderSystem extends ImmediateRenderSystem implements IObs
     private Vector3 aux1;
     private int sizeOffset, pmOffset;
     private float[] pointAlpha, alphaSizeFovBr, pointAlphaHl;
-    private ICamera cam;
 
     public StarGroupRenderSystem(RenderGroup rg, float[] alphas, ShaderProgram[] shaders) {
         super(rg, alphas, shaders);
@@ -74,8 +70,8 @@ public class StarGroupRenderSystem extends ImmediateRenderSystem implements IObs
         int mdi = createMeshData();
         curr = meshes.get(mdi);
 
-        VertexAttribute[] attribs = buildVertexAttributes();
-        curr.mesh = new IntMesh(false, nVertices, 0, attribs);
+        VertexAttribute[] attributes = buildVertexAttributes();
+        curr.mesh = new IntMesh(false, nVertices, 0, attributes);
 
         curr.vertexSize = curr.mesh.getVertexAttributes().vertexSize / 4;
         curr.colorOffset = curr.mesh.getVertexAttribute(Usage.ColorPacked) != null ? curr.mesh.getVertexAttribute(Usage.ColorPacked).offset / 4 : 0;
@@ -91,7 +87,6 @@ public class StarGroupRenderSystem extends ImmediateRenderSystem implements IObs
         // Enable point sizes
         Gdx.gl20.glEnable(0x8642);
 
-        this.cam = camera;
         //renderables.sort(comp);
         if (renderables.size > 0) {
 
@@ -102,7 +97,7 @@ public class StarGroupRenderSystem extends ImmediateRenderSystem implements IObs
                 StarGroup starGroup = (StarGroup) renderable;
                 synchronized (starGroup) {
                     if (!starGroup.disposed) {
-                        /**
+                        /*
                          * ADD PARTICLES
                          */
                         if (!starGroup.inGpu) {
@@ -137,12 +132,12 @@ public class StarGroupRenderSystem extends ImmediateRenderSystem implements IObs
 
                         }
 
-                        /**
+                        /*
                          * RENDER
                          */
                         curr = meshes.get(starGroup.offset);
                         if (curr != null) {
-                            int fovmode = camera.getMode().getGaiaFovMode();
+                            int fovMode = camera.getMode().getGaiaFovMode();
 
                             shaderProgram.setUniform2fv("u_pointAlpha", starGroup.isHighlighted() ? pointAlphaHl : pointAlpha, 0, 2);
                             shaderProgram.setUniformMatrix("u_projModelView", camera.getCamera().combined);
@@ -154,7 +149,7 @@ public class StarGroupRenderSystem extends ImmediateRenderSystem implements IObs
                             addEffectsUniforms(shaderProgram, camera);
 
                             alphaSizeFovBr[0] = starGroup.opacity * alphas[starGroup.ct.getFirstOrdinal()];
-                            alphaSizeFovBr[1] = (fovmode == 0 ? (GlobalConf.scene.STAR_POINT_SIZE * rc.scaleFactor * (GlobalConf.program.isStereoFullWidth() ? 1 : 2)) : (GlobalConf.scene.STAR_POINT_SIZE * rc.scaleFactor * 10)) * starGroup.highlightedSizeFactor();
+                            alphaSizeFovBr[1] = (fovMode == 0 ? (GlobalConf.scene.STAR_POINT_SIZE * rc.scaleFactor * (GlobalConf.program.isStereoFullWidth() ? 1 : 2)) : (GlobalConf.scene.STAR_POINT_SIZE * rc.scaleFactor * 10)) * starGroup.highlightedSizeFactor();
                             alphaSizeFovBr[2] = camera.getFovFactor();
                             alphaSizeFovBr[3] = (float) (GlobalConf.scene.STAR_BRIGHTNESS * BRIGHTNESS_FACTOR);
                             shaderProgram.setUniform4fv("u_alphaSizeFovBr", alphaSizeFovBr, 0, 4);
@@ -165,7 +160,7 @@ public class StarGroupRenderSystem extends ImmediateRenderSystem implements IObs
                             shaderProgram.setUniformf("u_thAnglePoint", (float) 1e-8);
 
                             // Update projection if fovmode is 3
-                            if (fovmode == 3) {
+                            if (fovMode == 3) {
                                 // Cam is Fov1 & Fov2
                                 FovCamera cam = ((CameraManager) camera).fovCamera;
                                 // Update combined
@@ -186,15 +181,15 @@ public class StarGroupRenderSystem extends ImmediateRenderSystem implements IObs
     }
 
     protected VertexAttribute[] buildVertexAttributes() {
-        Array<VertexAttribute> attribs = new Array<>();
-        attribs.add(new VertexAttribute(Usage.Position, 3, ShaderProgram.POSITION_ATTRIBUTE));
-        attribs.add(new VertexAttribute(Usage.Tangent, 3, "a_pm"));
-        attribs.add(new VertexAttribute(Usage.ColorPacked, 4, ShaderProgram.COLOR_ATTRIBUTE));
-        attribs.add(new VertexAttribute(Usage.Generic, 1, "a_size"));
+        Array<VertexAttribute> attributes = new Array<>();
+        attributes.add(new VertexAttribute(Usage.Position, 3, ShaderProgram.POSITION_ATTRIBUTE));
+        attributes.add(new VertexAttribute(Usage.Tangent, 3, "a_pm"));
+        attributes.add(new VertexAttribute(Usage.ColorPacked, 4, ShaderProgram.COLOR_ATTRIBUTE));
+        attributes.add(new VertexAttribute(Usage.Generic, 1, "a_size"));
 
-        VertexAttribute[] array = new VertexAttribute[attribs.size];
-        for (int i = 0; i < attribs.size; i++)
-            array[i] = attribs.get(i);
+        VertexAttribute[] array = new VertexAttribute[attributes.size];
+        for (int i = 0; i < attributes.size; i++)
+            array[i] = attributes.get(i);
         return array;
     }
 
@@ -220,33 +215,6 @@ public class StarGroupRenderSystem extends ImmediateRenderSystem implements IObs
             break;
         default:
             break;
-        }
-    }
-
-    /**
-     * Compares highlighted star groups and sorts them according to their geometric
-     * centres. Non-highlighted star groups are rendered last in an undetermined
-     * order.
-     */
-    private class StarGroupGeometricCentreComparator implements Comparator<IRenderable>{
-
-        @Override
-        public int compare(IRenderable ir1, IRenderable ir2) {
-            StarGroup s1 = (StarGroup) ir1;
-            StarGroup s2 = (StarGroup) ir2;
-
-            if(s1.isHighlighted() && !s2.isHighlighted()){
-                return -1;
-            } else if(!s1.isHighlighted() && s2.isHighlighted()){
-                return 1;
-            } else if(!s1.isHighlighted() && !s2.isHighlighted()){
-                return 1;
-            } else {
-                // Both are highlighted, use distances to centres
-                Vector3d s1c = s1.computeGeomCentre();
-                Vector3d s2c = s2.computeGeomCentre();
-                return Double.compare(cam.getPos().dst(s1c), cam.getPos().dst(s2c));
-            }
         }
     }
 

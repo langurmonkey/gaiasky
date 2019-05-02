@@ -14,21 +14,14 @@
  * limitations under the License.
  ******************************************************************************/
 
-#ifdef GL_ES
-	#define PRECISION mediump
-	precision PRECISION float;
-#else
-	#define PRECISION
-#endif
-
 #ifndef LENGTH
 #error Please define a LENGTH
 #endif
 
 varying vec2 v_texCoords;
-uniform PRECISION sampler2D u_texture0;
-uniform PRECISION vec2 SampleOffsets[LENGTH];
-uniform PRECISION float SampleWeights[LENGTH];
+uniform sampler2D u_texture0;
+uniform vec2 SampleOffsets[LENGTH];
+uniform float SampleWeights[LENGTH];
 
 void main()
 {

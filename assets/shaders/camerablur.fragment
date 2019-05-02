@@ -14,18 +14,10 @@
  * limitations under the License.
  ******************************************************************************/
 
-#ifdef GL_ES
-	#define PRECISION mediump
-	precision PRECISION float;
-#else
-	#define PRECISION
-#endif
-
-
-uniform PRECISION sampler2D u_texture0;	// scene
-uniform PRECISION sampler2D u_texture1;	// depthmap
-uniform PRECISION mat4 ctp;
-uniform PRECISION float near, far;
+uniform sampler2D u_texture0;	// scene
+uniform sampler2D u_texture1;	// depthmap
+uniform mat4 ctp;
+uniform float near, far;
 uniform vec2 viewport;
 uniform mat4 inv_proj;
 uniform float blur_scale;

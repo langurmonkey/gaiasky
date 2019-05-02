@@ -3,11 +3,6 @@
 // Whitepaper describing the technique:
 // http://developer.download.nvidia.com/assets/gamedev/files/sdk/11/FXAA_WhitePaper.pdf
 
-#ifdef GL_ES
-precision mediump float;
-precision mediump int;
-#endif
-
 uniform sampler2D u_texture0;
 
 // The inverse of the viewport dimensions along X and Y

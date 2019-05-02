@@ -25,10 +25,11 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.glutils.FrameBuffer;
 import gaia.cu9.ari.gaiaorbit.util.gdx.contrib.postprocess.PostProcessorEffect;
 import gaia.cu9.ari.gaiaorbit.util.gdx.contrib.postprocess.filters.Glow;
+import gaia.cu9.ari.gaiaorbit.util.gdx.contrib.utils.GaiaSkyFrameBuffer;
 
 /**
  * Light scattering implementation.
- * 
+ *
  * @author Toni Sagrista
  */
 public final class LightGlow extends PostProcessorEffect {
@@ -130,7 +131,7 @@ public final class LightGlow extends PostProcessorEffect {
     }
 
     @Override
-    public void render(final FrameBuffer src, final FrameBuffer dest) {
+    public void render(final FrameBuffer src, final FrameBuffer dest, GaiaSkyFrameBuffer main) {
         restoreViewport(dest);
         glow.setInput(src).setOutput(dest).render();
     }

@@ -11,11 +11,12 @@ import com.badlogic.gdx.graphics.glutils.FrameBuffer;
 import gaia.cu9.ari.gaiaorbit.util.gdx.contrib.postprocess.PostProcessorEffect;
 import gaia.cu9.ari.gaiaorbit.util.gdx.contrib.postprocess.filters.Copy;
 import gaia.cu9.ari.gaiaorbit.util.gdx.contrib.postprocess.filters.MotionFilter;
+import gaia.cu9.ari.gaiaorbit.util.gdx.contrib.utils.GaiaSkyFrameBuffer;
 
 /**
  * A motion blur effect which draws the last frame with a lower opacity. The
  * result is then stored as the next last frame to create the trail effect.
- * 
+ *
  * @author Toni Sagrista
  */
 public class MotionBlur extends PostProcessorEffect {
@@ -55,7 +56,7 @@ public class MotionBlur extends PostProcessorEffect {
     }
 
     @Override
-    public void render(FrameBuffer src, FrameBuffer dest) {
+    public void render(FrameBuffer src, FrameBuffer dest, GaiaSkyFrameBuffer main) {
         if (fbo == null) {
             // Init frame buffer
             fbo = new FrameBuffer(Format.RGBA8888, src.getWidth(), src.getHeight(), false);

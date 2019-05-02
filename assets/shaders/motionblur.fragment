@@ -1,9 +1,5 @@
 // Simple motion blur implementation by Toni Sagrista
 #version 120
-#ifdef GL_ES
-precision mediump float;
-precision mediump int;
-#endif
 
 // Unprocessed image
 uniform sampler2D u_texture0;
@@ -53,9 +49,9 @@ vec4 blur(vec2 dir, sampler2D tex, vec2 tc, float radius, float resolution){
 
 void main() {
 	// Horizontal blur
-	vec4 sample = blur(vec2(1.0, 0.0), u_texture1, v_texCoords, u_blurRadius, u_resolution.x) * 0.5;
+	vec4 sampl = blur(vec2(1.0, 0.0), u_texture1, v_texCoords, u_blurRadius, u_resolution.x) * 0.5;
 	// Vertical blur
-	sample += blur(vec2(0.0, 1.0), u_texture1, v_texCoords, u_blurRadius, u_resolution.y) * 0.5;
+	sampl += blur(vec2(0.0, 1.0), u_texture1, v_texCoords, u_blurRadius, u_resolution.y) * 0.5;
 	
-    gl_FragColor = max(texture2D(u_texture0, v_texCoords), sample * u_blurOpacity);
+    gl_FragColor = max(texture2D(u_texture0, v_texCoords), sampl * u_blurOpacity);
 }

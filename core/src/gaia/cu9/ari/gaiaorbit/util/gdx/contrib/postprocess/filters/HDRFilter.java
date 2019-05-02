@@ -4,13 +4,13 @@
  */
 
 /*******************************************************************************
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not
  * use this file except in compliance with the License. You may obtain a copy of
  * the License at
- * 
+ *
  * http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
  * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
@@ -24,7 +24,7 @@ import gaia.cu9.ari.gaiaorbit.util.gdx.contrib.utils.ShaderLoader;
 
 /**
  * HDR filter.
- * 
+ *
  * @author Toni Sagrista
  */
 public final class HDRFilter extends Filter<HDRFilter> {
@@ -33,7 +33,9 @@ public final class HDRFilter extends Filter<HDRFilter> {
 
     public enum Param implements Parameter {
         // @formatter:off
-        Texture("u_texture0", 0), Exposure("u_exposure", 0), Gamma("u_gamma", 0);
+        Texture("u_texture0", 0),
+        Exposure("u_exposure", 0),
+        Gamma("u_gamma", 0);
         // @formatter:on
 
         private String mnemonic;

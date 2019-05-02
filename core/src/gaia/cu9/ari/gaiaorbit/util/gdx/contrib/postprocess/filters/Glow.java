@@ -4,13 +4,13 @@
  */
 
 /*******************************************************************************
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *   http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -24,10 +24,13 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.math.Vector2;
 import gaia.cu9.ari.gaiaorbit.util.gdx.contrib.utils.ShaderLoader;
 
-/** Scattering Light effect.
+/**
+ * Scattering Light effect.
+ *
+ * @author Toni Sagrista
  * @see <a href="https://medium.com/community-play-3d/god-rays-whats-that-5a67f26aeac2">https://medium.com/community-play-3d/god-
- *      rays-whats-that-5a67f26aeac2</a>
- * @author Toni Sagrista **/
+ * rays-whats-that-5a67f26aeac2</a>
+ **/
 public final class Glow extends Filter<Glow> {
     // Number of light supported
     public static int N = 30;
@@ -46,9 +49,16 @@ public final class Glow extends Filter<Glow> {
 
     public enum Param implements Parameter {
         // @formatter:off
-        Texture("u_texture0", 0), LightGlowTexture("u_texture1", 0), PrePassTexture("u_texture2", 0), LightPositions("u_lightPositions", 2), LightViewAngles(
-                "u_lightViewAngles", 1), LightColors("u_lightColors",
-                        3), Viewport("u_viewport", 2), NLights("u_nLights", 0), NSamples("u_nSamples", 0), TextureScale("u_textureScale", 0);
+        Texture("u_texture0", 0),
+        LightGlowTexture("u_texture1", 0),
+        PrePassTexture("u_texture2", 0),
+        LightPositions("u_lightPositions", 2),
+        LightViewAngles("u_lightViewAngles", 1),
+        LightColors("u_lightColors", 3),
+        Viewport("u_viewport", 2),
+        NLights("u_nLights", 0),
+        NSamples("u_nSamples", 0),
+        TextureScale("u_textureScale", 0);
         // @formatter:on
 
         private String mnemonic;

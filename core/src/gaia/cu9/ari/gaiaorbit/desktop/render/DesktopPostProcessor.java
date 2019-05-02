@@ -113,6 +113,10 @@ public class DesktopPostProcessor implements IPostProcessor, IObserver {
 
         ppb.pp = new PostProcessor(width, height, true, false, true);
 
+        // DEPTH BUFFER
+        //ppb.depthBuffer = new DepthBuffer();
+        //ppb.pp.addEffect(ppb.depthBuffer);
+
         // LIGHT GLOW
         int lgw, lgh;
         Texture glow;
@@ -163,7 +167,6 @@ public class DesktopPostProcessor implements IPostProcessor, IObserver {
         ppb.lens.setBaseIntesity(1f);
         ppb.lens.setBias(-0.98f);
         ppb.lens.setBlurPasses(35);
-        ppb.lens.setEnabled(true);
         ppb.pp.addEffect(ppb.lens);
 
         // BLOOM
@@ -193,6 +196,7 @@ public class DesktopPostProcessor implements IPostProcessor, IObserver {
 
         // MOTION BLUR
         initMotionBlur(width, height, ppb);
+
 
         return ppb;
     }
@@ -358,7 +362,6 @@ public class DesktopPostProcessor implements IPostProcessor, IObserver {
                         // Motion blur
                         ppb.motionblur.setEnabled(GlobalConf.postprocess.POSTPROCESS_MOTION_BLUR != 0);
                         ppb.motionblur.setBlurOpacity(0.94f);
-
                     }
                 }
                 prevCombined.set(cam.combined);

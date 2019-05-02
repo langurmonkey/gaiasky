@@ -174,7 +174,7 @@ public class SGRStereoscopic extends SGRAbstract implements ISGR, IObserver {
             anaglyphic.setTextureRight(texRight);
 
             // Render 
-            anaglyphic.render(fbmain, fb);
+            anaglyphic.render(fbmain, fb, null);
 
             if (fb != null)
                 fb.end();

@@ -30,12 +30,13 @@ import gaia.cu9.ari.gaiaorbit.util.gdx.contrib.postprocess.PostProcessorEffect;
 import gaia.cu9.ari.gaiaorbit.util.gdx.contrib.postprocess.filters.*;
 import gaia.cu9.ari.gaiaorbit.util.gdx.contrib.postprocess.filters.Blur.BlurType;
 import gaia.cu9.ari.gaiaorbit.util.gdx.contrib.postprocess.utils.PingPongBuffer;
+import gaia.cu9.ari.gaiaorbit.util.gdx.contrib.utils.GaiaSkyFrameBuffer;
 
 /**
  * Pseudo lens flare implementation. This is a post-processing effect entirely,
  * no need for light positions or anything. It includes ghost generation, halos,
  * chromatic distortion and blur.
- * 
+ *
  * @author Toni Sagrista
  */
 public final class LensFlare2 extends PostProcessorEffect {
@@ -262,7 +263,7 @@ public final class LensFlare2 extends PostProcessorEffect {
     }
 
     @Override
-    public void render(final FrameBuffer src, final FrameBuffer dest) {
+    public void render(final FrameBuffer src, final FrameBuffer dest, GaiaSkyFrameBuffer main) {
         Texture texsrc = src.getColorBufferTexture();
 
         boolean blendingWasEnabled = PostProcessor.isStateEnabled(GL20.GL_BLEND);

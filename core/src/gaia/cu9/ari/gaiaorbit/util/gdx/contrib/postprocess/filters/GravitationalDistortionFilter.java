@@ -4,13 +4,13 @@
  */
 
 /*******************************************************************************
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *   http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -23,15 +23,20 @@ package gaia.cu9.ari.gaiaorbit.util.gdx.contrib.postprocess.filters;
 import com.badlogic.gdx.math.Vector2;
 import gaia.cu9.ari.gaiaorbit.util.gdx.contrib.utils.ShaderLoader;
 
-/** Fast approximate anti-aliasing filter.
- * @author Toni Sagrista */
+/**
+ * Fast approximate anti-aliasing filter.
+ *
+ * @author Toni Sagrista
+ */
 public final class GravitationalDistortionFilter extends Filter<GravitationalDistortionFilter> {
     private Vector2 viewport;
     private Vector2 massPosition;
 
     public enum Param implements Parameter {
         // @formatter:off
-        Texture("u_texture0", 0), Viewport("u_viewport", 2), MassPosition("u_massPosition", 2);
+        Texture("u_texture0", 0),
+        Viewport("u_viewport", 2),
+        MassPosition("u_massPosition", 2);
         // @formatter:on
 
         private String mnemonic;
@@ -67,7 +72,6 @@ public final class GravitationalDistortionFilter extends Filter<GravitationalDis
         this(new Vector2(viewportWidth, viewportHeight));
     }
 
-
     public void setViewportSize(float width, float height) {
         this.viewport.set(width, height);
         setParam(Param.Viewport, this.viewport);
@@ -75,6 +79,7 @@ public final class GravitationalDistortionFilter extends Filter<GravitationalDis
 
     /**
      * The position of the mass that causes the distortion in pixels.
+     *
      * @param x
      * @param y
      */

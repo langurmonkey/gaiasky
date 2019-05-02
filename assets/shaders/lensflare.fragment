@@ -1,10 +1,5 @@
 // Simple lens flare implementation by Toni Sagrista
 
-#ifdef GL_ES
-precision mediump float;
-precision mediump int;
-#endif
-
 uniform sampler2D u_texture0;
 
 // Viewport dimensions along X and Y

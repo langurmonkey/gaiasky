@@ -5,7 +5,7 @@
 
 /**
  * Anaglyphic 3D red-cyan filter
- * 
+ *
  * @author tsagrista
  */
 
@@ -20,7 +20,8 @@ public final class AnaglyphicFilter extends Filter<AnaglyphicFilter> {
 
     public enum Param implements Parameter {
         // @formatter:off
-        TextureLeft("u_texture0", 0), TextureRight("u_texture1", 0);
+        TextureLeft("u_texture0", 0),
+        TextureRight("u_texture1", 0);
         // @formatter:on
 
         private final String mnemonic;

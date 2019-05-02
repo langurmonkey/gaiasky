@@ -4,13 +4,13 @@
  */
 
 /*******************************************************************************
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not
  * use this file except in compliance with the License. You may obtain a copy of
  * the License at
- * 
+ *
  * http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
  * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
@@ -28,10 +28,10 @@ import gaia.cu9.ari.gaiaorbit.util.gdx.contrib.utils.ShaderLoader;
  * Lens flare effect as described in John Chapman's article (without lens dirt
  * or diffraction starburst). Lens color image (lenscolor.png) is located in
  * src/main/resources/ folder.
- * 
- * @see <a href=
- *      "http://john-chapman-graphics.blogspot.co.uk/2013/02/pseudo-lens-flare.html">http://john-chapman-graphics.blogspot.co.uk/2013/02/pseudo-lens-flare.html</a>
+ *
  * @author Toni Sagrista
+ * @see <a href=
+ * "http://john-chapman-graphics.blogspot.co.uk/2013/02/pseudo-lens-flare.html">http://john-chapman-graphics.blogspot.co.uk/2013/02/pseudo-lens-flare.html</a>
  **/
 public final class Flare extends Filter<Flare> {
     private Vector2 viewportInverse;
@@ -41,7 +41,11 @@ public final class Flare extends Filter<Flare> {
 
     public enum Param implements Parameter {
         // @formatter:off
-        Texture("u_texture0", 0), LensColor("u_texture1", 0), ViewportInverse("u_viewportInverse", 2), Ghosts("u_ghosts", 0), HaloWidth("u_haloWidth", 0);
+        Texture("u_texture0", 0),
+        LensColor("u_texture1", 0),
+        ViewportInverse("u_viewportInverse", 2),
+        Ghosts("u_ghosts", 0),
+        HaloWidth("u_haloWidth", 0);
         // @formatter:on
 
         private String mnemonic;

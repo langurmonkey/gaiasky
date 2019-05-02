@@ -22,6 +22,7 @@ public interface IPostProcessor extends Disposable {
         public LightGlow lightglow;
         public MotionBlur motionblur;
         public Levels levels;
+        public DepthBuffer depthBuffer;
         //public HDR hdr;
 
         public boolean capture() {
@@ -55,6 +56,7 @@ public interface IPostProcessor extends Disposable {
                 lightglow.dispose();
                 motionblur.dispose();
                 levels.dispose();
+                depthBuffer.dispose();
             }
         }
 

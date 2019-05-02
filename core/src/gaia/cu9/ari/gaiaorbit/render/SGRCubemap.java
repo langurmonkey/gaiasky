@@ -157,7 +157,7 @@ public class SGRCubemap extends SGRAbstract implements ISGR, IObserver {
 
         // Effect
         cubemapEffect.setSides(xposfb, xnegfb, yposfb, ynegfb, zposfb, znegfb);
-        cubemapEffect.render(mainfb, fb);
+        cubemapEffect.render(mainfb, fb, null);
 
         if (fb != null)
             fb.end();

@@ -1,10 +1,5 @@
 #version 120
 
-#ifdef GL_ES
-precision mediump float;
-precision mediump int;
-#endif
-
 uniform sampler2D u_texture0;
 
 uniform float u_brightness = 0.0;
@@ -40,15 +35,15 @@ void main() {
 
   // Apply contrast
   pixelColor.rgb = ((pixelColor.rgb - 0.5) * max(u_contrast, 0.0)) + 0.5;
-  
+
   vec3 hsv = rgb2hsv(pixelColor.rgb);
   // Apply saturation
   hsv.y *= u_saturation;
   // Apply hue
   hsv.x *= u_hue;
-  
+
   pixelColor.rgb = hsv2rgb(hsv);
- 
+
   // Apply brightness
   pixelColor.rgb += u_brightness;
 
@@ -56,7 +51,7 @@ void main() {
   pixelColor.rgb *= pixelColor.a;
 
   gl_FragColor = pixelColor;
-  
+
   // Gamma correction
   gl_FragColor.rgb = pow(gl_FragColor.rgb, vec3(1.0 / u_gamma));
 

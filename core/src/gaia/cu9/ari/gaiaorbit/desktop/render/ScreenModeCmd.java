@@ -16,6 +16,9 @@ import gaia.cu9.ari.gaiaorbit.util.I18n;
 import gaia.cu9.ari.gaiaorbit.util.Logger;
 import gaia.cu9.ari.gaiaorbit.util.Logger.Log;
 
+/**
+ * Manages screen mode changes (fullscreen, windowed)
+ */
 public class ScreenModeCmd implements IObserver {
     private static final Log logger = Logger.getLogger(ScreenModeCmd.class);
     

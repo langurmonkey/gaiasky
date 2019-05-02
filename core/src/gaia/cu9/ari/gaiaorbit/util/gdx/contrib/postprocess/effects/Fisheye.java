@@ -5,7 +5,7 @@
 
 /**
  * Fisheye effect
- * 
+ *
  * @author tsagrista
  */
 
@@ -14,6 +14,7 @@ package gaia.cu9.ari.gaiaorbit.util.gdx.contrib.postprocess.effects;
 import com.badlogic.gdx.graphics.glutils.FrameBuffer;
 import gaia.cu9.ari.gaiaorbit.util.gdx.contrib.postprocess.PostProcessorEffect;
 import gaia.cu9.ari.gaiaorbit.util.gdx.contrib.postprocess.filters.FisheyeDistortion;
+import gaia.cu9.ari.gaiaorbit.util.gdx.contrib.utils.GaiaSkyFrameBuffer;
 
 public final class Fisheye extends PostProcessorEffect {
     private FisheyeDistortion distort;
@@ -33,9 +34,11 @@ public final class Fisheye extends PostProcessorEffect {
     }
 
     @Override
-    public void render(FrameBuffer src, FrameBuffer dest) {
+    public void render(FrameBuffer src, FrameBuffer dest, GaiaSkyFrameBuffer main) {
         restoreViewport(dest);
         distort.setInput(src).setOutput(dest).render();
-    };
+    }
+
+    ;
 
 }

@@ -23,51 +23,41 @@ package gaia.cu9.ari.gaiaorbit.util.gdx.contrib.postprocess.effects;
 
 import com.badlogic.gdx.graphics.glutils.FrameBuffer;
 import gaia.cu9.ari.gaiaorbit.util.gdx.contrib.postprocess.PostProcessorEffect;
-import gaia.cu9.ari.gaiaorbit.util.gdx.contrib.postprocess.filters.GravitationalDistortionFilter;
+import gaia.cu9.ari.gaiaorbit.util.gdx.contrib.postprocess.filters.DepthBufferFilter;
 import gaia.cu9.ari.gaiaorbit.util.gdx.contrib.utils.GaiaSkyFrameBuffer;
 
 /**
- * This is just a test for now
+ * Debug effect. Renders the contents of the depth texture attachment.
  *
- * @author Toni Sagrista
- **/
-public final class GravitationalDistortion extends PostProcessorEffect {
-    private GravitationalDistortionFilter gravFilter = null;
+ * @author tsagrista
+ */
+public final class DepthBuffer extends PostProcessorEffect {
+    private DepthBufferFilter filter;
 
-    public GravitationalDistortion(int viewportWidth, int viewportHeight) {
-        setup(viewportWidth, viewportHeight);
-    }
-
-    private void setup(int viewportWidth, int viewportHeight) {
-        gravFilter = new GravitationalDistortionFilter(viewportWidth, viewportHeight);
-    }
-
-    /**
-     * Sets the position of the mass in pixels.
-     *
-     * @param x
-     * @param y
-     */
-    public void setMassPosition(float x, float y) {
-        gravFilter.setMassPosition(x, y);
+    /** Creates the effect */
+    public DepthBuffer() {
+        filter = new DepthBufferFilter();
     }
 
     @Override
     public void dispose() {
-        if (gravFilter != null) {
-            gravFilter.dispose();
-            gravFilter = null;
+        if (filter != null) {
+            filter.dispose();
+            filter = null;
         }
     }
 
     @Override
     public void rebind() {
-        gravFilter.rebind();
+        filter.rebind();
     }
 
     @Override
     public void render(FrameBuffer src, FrameBuffer dest, GaiaSkyFrameBuffer main) {
         restoreViewport(dest);
-        gravFilter.setInput(src).setOutput(dest).render();
+        // Get depth buffer texture from main frame buffer
+        filter.setDepthTexture(main.getDepthBufferTexture());
+        // Set input, output and render
+        filter.setInput(src).setOutput(dest).render();
     }
 }

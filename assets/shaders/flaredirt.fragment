@@ -1,11 +1,6 @@
 // Lens flare implementation by Toni Sagrista
 // From John Chapman's article http://john-chapman-graphics.blogspot.co.uk/2013/02/pseudo-lens-flare.html
 
-#ifdef GL_ES
-precision mediump float;
-precision mediump int;
-#endif
-
 // Scene
 uniform sampler2D u_texture0;
 // Lens dirt

@@ -5,13 +5,13 @@
 
 /*******************************************************************************
  * Copyright 2012 bmanuel
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not
  * use this file except in compliance with the License. You may obtain a copy of
  * the License at
- * 
+ *
  * http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
  * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
@@ -51,7 +51,7 @@ public abstract class Filter<T> {
     protected Texture inputTexture = null;
     protected FrameBuffer inputBuffer = null;
     protected FrameBuffer outputBuffer = null;
-    protected ShaderProgram program = null;
+    protected ShaderProgram program;
     private boolean programBegan = false;
 
     public Filter(ShaderProgram program) {
@@ -83,7 +83,7 @@ public abstract class Filter<T> {
     /*
      * Sets the parameter to the specified value for this filter. This is for
      * one-off operations since the shader is being bound and unbound once per
-     * call: for a batch-ready version of this fuction see and use setParams
+     * call: for a batch-ready version of this function see and use setParams
      * instead.
      */
 

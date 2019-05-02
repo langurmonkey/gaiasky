@@ -5,13 +5,13 @@
 
 /*******************************************************************************
  * Copyright 2012 bmanuel
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not
  * use this file except in compliance with the License. You may obtain a copy of
  * the License at
- * 
+ *
  * http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
  * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
@@ -23,55 +23,77 @@ package gaia.cu9.ari.gaiaorbit.util.gdx.contrib.postprocess.utils;
 
 import com.badlogic.gdx.graphics.Pixmap.Format;
 import com.badlogic.gdx.graphics.Texture;
-import com.badlogic.gdx.graphics.glutils.FrameBuffer;
+import com.badlogic.gdx.graphics.glutils.GLFrameBuffer.FrameBufferBuilder;
+import gaia.cu9.ari.gaiaorbit.util.gdx.contrib.utils.GaiaSkyFrameBuffer;
+import org.lwjgl.opengl.GL20;
 
 /**
  * Encapsulates a framebuffer with the ability to ping-pong between two buffers.
- * 
+ * <p>
  * Upon {@link #begin()} the buffer is reset to a known initial state, this is
  * usually done just before the first usage of the buffer.
- * 
+ * <p>
  * Subsequent {@link #capture()} calls will initiate writing to the next
  * available buffer, returning the previously used one, effectively ping-ponging
  * between the two. Until {@link #end()} is called, chained rendering will be
  * possible by retrieving the necessary buffers via {@link PingPongBuffer#getSouceTexture()},
  * {@link #getSourceBuffer()}, {@link #getResultTexture()} or
  * {@link #getResultBuffer}.
- * 
+ * <p>
  * When finished, {@link #end()} should be called to stop capturing. When the
  * OpenGL context is lost, {@link #rebind()} should be called.
- * 
+ *
  * @author bmanuel
  */
 public final class PingPongBuffer {
-    public FrameBuffer buffer1, buffer2;
-    public Texture texture1, texture2;
+    public GaiaSkyFrameBuffer buffer1, buffer2;
+    public Texture texture1, texture2, textureDepth;
     public int width, height;
     public final boolean ownResources;
 
     // internal state
     private Texture texResult, texSrc;
-    private FrameBuffer bufResult, bufSrc;
+    private GaiaSkyFrameBuffer bufResult, bufSrc;
     private boolean writeState, pending1, pending2;
 
     // save/restore state
-    private final FrameBuffer owned1, owned2;
-    private FrameBuffer ownedResult, ownedSource;
+    private final GaiaSkyFrameBuffer ownedMain, ownedExtra;
+    private GaiaSkyFrameBuffer ownedResult, ownedSource;
     private int ownedW, ownedH;
 
     /** Creates a new ping-pong buffer and owns the resources. */
     public PingPongBuffer(int width, int height, Format frameBufferFormat, boolean hasDepth) {
         ownResources = true;
-        owned1 = new FrameBuffer(frameBufferFormat, width, height, hasDepth);
-        owned2 = new FrameBuffer(frameBufferFormat, width, height, hasDepth);
-        set(owned1, owned2);
+
+        // BUFFER USED FOR THE ACTUAL RENDERING:
+        // 2 RENDER TARGETS:
+        //      0: COLOR TEXTURE ATTACHMENT (RGBA)
+        //      1: FLOAT TEXTURE ATTACHMENT (DEPTH EXTRA)
+        // 1 DEPTH TEXTURE ATTACHMENT
+        FrameBufferBuilder frameBufferBuilder = new FrameBufferBuilder(width, height);
+        frameBufferBuilder.addBasicColorTextureAttachment(frameBufferFormat);
+        //frameBufferBuilder.addFloatAttachment(GL30.GL_RGBA32F, GL30.GL_RGBA, GL30.GL_FLOAT, true);
+        if (hasDepth) {
+            // 32 bit depth buffer texture
+            frameBufferBuilder.addDepthTextureAttachment(GL20.GL_DEPTH_COMPONENT32, GL20.GL_FLOAT);
+        }
+        ownedMain = new GaiaSkyFrameBuffer(frameBufferBuilder);
+
+        // EXTRA BUFFER:
+        // SINGLE RENDER TARGET WITH A COLOR TEXTURE ATTACHMENT
+        frameBufferBuilder = new FrameBufferBuilder(width, height);
+        frameBufferBuilder.addBasicColorTextureAttachment(frameBufferFormat);
+        ownedExtra = new GaiaSkyFrameBuffer(frameBufferBuilder);
+
+        // Buffer the scene is rendered to is actually the second
+        set(ownedExtra, ownedMain);
     }
 
     /** Creates a new ping-pong buffer with the given buffers. */
-    public PingPongBuffer(FrameBuffer buffer1, FrameBuffer buffer2) {
+    public PingPongBuffer(GaiaSkyFrameBuffer buffer1, GaiaSkyFrameBuffer buffer2) {
         ownResources = false;
-        owned1 = null;
-        owned2 = null;
+        ownedMain = null;
+        ownedExtra = null;
         set(buffer1, buffer2);
     }
 
@@ -79,16 +101,14 @@ public final class PingPongBuffer {
      * An instance of this object can also be used to manipulate some other
      * externally-allocated buffers, applying just the same ping-ponging
      * behavior.
-     * 
+     * <p>
      * If this instance of the object was owning the resources, they will be
      * preserved and will be restored by a {@link #reset()} call.
-     * 
-     * @param buffer1
-     *            the first buffer
-     * @param buffer2
-     *            the second buffer
+     *
+     * @param buffer1 the first buffer
+     * @param buffer2 the second buffer
      */
-    public void set(FrameBuffer buffer1, FrameBuffer buffer2) {
+    public void set(GaiaSkyFrameBuffer buffer1, GaiaSkyFrameBuffer buffer2) {
         if (ownResources) {
             ownedResult = bufResult;
             ownedSource = bufSrc;
@@ -106,8 +126,8 @@ public final class PingPongBuffer {
     /** Restore the previous buffers if the instance was owning resources. */
     public void reset() {
         if (ownResources) {
-            buffer1 = owned1;
-            buffer2 = owned2;
+            buffer1 = ownedMain;
+            buffer2 = ownedExtra;
             width = ownedW;
             height = ownedH;
             bufResult = ownedResult;
@@ -120,8 +140,8 @@ public final class PingPongBuffer {
         if (ownResources) {
             // make sure we delete what we own
             // if the caller didn't call {@link #reset()}
-            owned1.dispose();
-            owned2.dispose();
+            ownedMain.dispose();
+            ownedExtra.dispose();
         }
     }
 
@@ -132,6 +152,7 @@ public final class PingPongBuffer {
     public void rebind() {
         texture1 = buffer1.getColorBufferTexture();
         texture2 = buffer2.getColorBufferTexture();
+        textureDepth = buffer1.getDepthBufferTexture();
     }
 
     /**
@@ -153,7 +174,7 @@ public final class PingPongBuffer {
      * Starts and/or continue ping-ponging, begin capturing on the next
      * available buffer, returns the result of the previous {@link #capture()}
      * call.
-     * 
+     *
      * @return the Texture containing the result.
      */
     public Texture capture() {
@@ -200,7 +221,7 @@ public final class PingPongBuffer {
     }
 
     /** @return the source buffer of the current ping-pong chain. */
-    public FrameBuffer getSourceBuffer() {
+    public GaiaSkyFrameBuffer getSourceBuffer() {
         return bufSrc;
     }
 
@@ -210,8 +231,17 @@ public final class PingPongBuffer {
     }
 
     /** @return Returns the result's buffer of the latest {@link #capture()}. */
-    public FrameBuffer getResultBuffer() {
+    public GaiaSkyFrameBuffer getResultBuffer() {
         return bufResult;
+    }
+
+    public GaiaSkyFrameBuffer getMainBuffer() {
+        return ownedMain;
+    }
+
+    /** @return the depth texture attachment containing the depth buffer */
+    public Texture getDepthTexture() {
+        return textureDepth;
     }
 
     // internal use

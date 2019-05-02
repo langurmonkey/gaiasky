@@ -39,7 +39,9 @@ public final class CrtScreen extends Filter<CrtScreen> {
     private RgbMode mode;
 
     public enum RgbMode {
-        None(0), RgbShift(1), ChromaticAberrations(2);
+        None(0),
+        RgbShift(1),
+        ChromaticAberrations(2);
 
         public int v;
 
@@ -49,7 +51,13 @@ public final class CrtScreen extends Filter<CrtScreen> {
     }
 
     public enum Effect {
-        None(0), TweakContrast(1), Vignette(2), Tint(4), Scanlines(8), PhosphorVibrance(16), ScanDistortion(32);
+        None(0),
+        TweakContrast(1),
+        Vignette(2),
+        Tint(4),
+        Scanlines(8),
+        PhosphorVibrance(16),
+        ScanDistortion(32);
 
         public int v;
 
@@ -60,7 +68,13 @@ public final class CrtScreen extends Filter<CrtScreen> {
 
     public enum Param implements Parameter {
         // @off
-        Texture0("u_texture0", 0), Time("time", 0), Tint("tint", 3), ColorOffset("offset", 0), ChromaticDispersion("chromaticDispersion", 2), Distortion("Distortion", 0), Zoom("zoom", 0);
+        Texture0("u_texture0", 0),
+        Time("time", 0),
+        Tint("tint", 3),
+        ColorOffset("offset", 0),
+        ChromaticDispersion("chromaticDispersion", 2),
+        Distortion("Distortion", 0),
+        Zoom("zoom", 0);
         // @on
 
         private final String mnemonic;
@@ -88,8 +102,9 @@ public final class CrtScreen extends Filter<CrtScreen> {
 
     public CrtScreen(boolean barrelDistortion, RgbMode mode, int effectsSupport) {
         // @off
-        super(ShaderLoader.fromFile("screenspace", "crt-screen", (barrelDistortion ? "#define ENABLE_BARREL_DISTORTION\n" : "") + (mode == RgbMode.RgbShift ? "#define ENABLE_RGB_SHIFT\n" : "") + (mode == RgbMode.ChromaticAberrations ? "#define ENABLE_CHROMATIC_ABERRATIONS\n" : "") + (isSet(Effect.TweakContrast.v, effectsSupport) ? "#define ENABLE_TWEAK_CONTRAST\n" : "") + (isSet(Effect.Vignette.v, effectsSupport) ? "#define ENABLE_VIGNETTE\n" : "")
-                + (isSet(Effect.Tint.v, effectsSupport) ? "#define ENABLE_TINT\n" : "") + (isSet(Effect.Scanlines.v, effectsSupport) ? "#define ENABLE_SCANLINES\n" : "") + (isSet(Effect.PhosphorVibrance.v, effectsSupport) ? "#define ENABLE_PHOSPHOR_VIBRANCE\n" : "") + (isSet(Effect.ScanDistortion.v, effectsSupport) ? "#define ENABLE_SCAN_DISTORTION\n" : "")));
+        super(ShaderLoader.fromFile("screenspace", "crt-screen",
+                (barrelDistortion ? "#define ENABLE_BARREL_DISTORTION\n" : "") + (mode == RgbMode.RgbShift ? "#define ENABLE_RGB_SHIFT\n" : "") + (mode == RgbMode.ChromaticAberrations ? "#define ENABLE_CHROMATIC_ABERRATIONS\n" : "") + (isSet(Effect.TweakContrast.v, effectsSupport) ? "#define ENABLE_TWEAK_CONTRAST\n" : "") + (isSet(Effect.Vignette.v, effectsSupport) ? "#define ENABLE_VIGNETTE\n" : "") + (isSet(Effect.Tint.v, effectsSupport) ? "#define ENABLE_TINT\n" : "")
+                        + (isSet(Effect.Scanlines.v, effectsSupport) ? "#define ENABLE_SCANLINES\n" : "") + (isSet(Effect.PhosphorVibrance.v, effectsSupport) ? "#define ENABLE_PHOSPHOR_VIBRANCE\n" : "") + (isSet(Effect.ScanDistortion.v, effectsSupport) ? "#define ENABLE_SCAN_DISTORTION\n" : "")));
         // @on
 
         dodistortion = barrelDistortion;

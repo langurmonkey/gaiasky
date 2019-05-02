@@ -4,11 +4,6 @@
 // Copyright Styves, Martinsh
 // Modified by Sagrista, Toni
 
-#ifdef GL_ES
-precision mediump float;
-precision mediump int;
-#endif
-
 uniform sampler2D u_texture0;
 // The inverse of the viewport dimensions along X and Y
 uniform vec2 u_viewportInverse;

@@ -4,13 +4,13 @@
  */
 
 /*******************************************************************************
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not
  * use this file except in compliance with the License. You may obtain a copy of
  * the License at
- * 
+ *
  * http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
  * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
@@ -25,10 +25,10 @@ import gaia.cu9.ari.gaiaorbit.util.gdx.contrib.utils.ShaderLoader;
 
 /**
  * This adds the lens dirt and starburst effects to the lens flare.
- * 
- * @see <a href=
- *      "http://john-chapman-graphics.blogspot.co.uk/2013/02/pseudo-lens-flare.html">http://john-chapman-graphics.blogspot.co.uk/2013/02/pseudo-lens-flare.html</a>
+ *
  * @author Toni Sagrista
+ * @see <a href=
+ * "http://john-chapman-graphics.blogspot.co.uk/2013/02/pseudo-lens-flare.html">http://john-chapman-graphics.blogspot.co.uk/2013/02/pseudo-lens-flare.html</a>
  **/
 public final class FlareDirt extends Filter<FlareDirt> {
     private Texture lensDirtTexture;
@@ -36,7 +36,9 @@ public final class FlareDirt extends Filter<FlareDirt> {
 
     public enum Param implements Parameter {
         // @formatter:off
-        Texture("u_texture0", 0), LensDirt("u_texture1", 0), LensStarburst("u_texture2", 0);
+        Texture("u_texture0", 0),
+        LensDirt("u_texture1", 0),
+        LensStarburst("u_texture2", 0);
         // @formatter:on
 
         private String mnemonic;

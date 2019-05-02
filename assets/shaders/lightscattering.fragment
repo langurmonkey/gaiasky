@@ -1,11 +1,5 @@
-
 #version 120
 // Light scattering implementation by Toni Sagrista
-
-#ifdef GL_ES
-precision mediump float;
-precision mediump int;
-#endif
 
 uniform sampler2D u_texture0;
 uniform vec2 u_viewport;
@@ -47,13 +41,13 @@ void main()
 		 tc += deltaTexCoord * fract( sin(dot(v_texCoords.xy + fract(12.33), vec2(12.9898, 78.233)))* 43758.5453 );
 		 for(int i = 0; i < u_numSamples; i++){
 		    tc -= deltaTexCoord;
-		    vec4 sample = texture2D(u_texture0, tc);
+		    vec4 sampl = texture2D(u_texture0, tc);
 		    if(len(tc - u_lightPositions[clpos], ar) > viewAngle){
-		    	sample = vec4(0.0, 0.0, 0.0, 0.0);
+		    	sampl = vec4(0.0, 0.0, 0.0, 0.0);
 		    }
 		    
-		    sample *= illuminationDecay * u_weight;
-		    color += sample;
+		    sampl *= illuminationDecay * u_weight;
+		    color += sampl;
 		    illuminationDecay *= u_decay;
 		 }
 		 gl_FragColor += clamp(color * exposure, 0.0, 1.0);

@@ -14,11 +14,6 @@
  * limitations under the License.
  ******************************************************************************/
 
-#ifdef GL_ES
-precision mediump float;
-precision mediump int;
-#endif
-
 uniform sampler2D u_texture0;
 uniform float u_bias;
 varying vec2 v_texCoords;

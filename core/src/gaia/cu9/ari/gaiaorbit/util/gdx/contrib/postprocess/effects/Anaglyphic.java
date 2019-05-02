@@ -25,10 +25,11 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.glutils.FrameBuffer;
 import gaia.cu9.ari.gaiaorbit.util.gdx.contrib.postprocess.PostProcessorEffect;
 import gaia.cu9.ari.gaiaorbit.util.gdx.contrib.postprocess.filters.AnaglyphicFilter;
+import gaia.cu9.ari.gaiaorbit.util.gdx.contrib.utils.GaiaSkyFrameBuffer;
 
 /**
  * Anaglyphic 3D red-cyan effect
- * 
+ *
  * @author Toni Sagrista
  */
 public final class Anaglyphic extends PostProcessorEffect {
@@ -57,8 +58,10 @@ public final class Anaglyphic extends PostProcessorEffect {
     }
 
     @Override
-    public void render(FrameBuffer src, FrameBuffer dest) {
+    public void render(FrameBuffer src, FrameBuffer dest, GaiaSkyFrameBuffer main) {
         restoreViewport(dest);
         anaglyphic.setInput(src).setOutput(dest).render();
-    };
+    }
+
+    ;
 }
