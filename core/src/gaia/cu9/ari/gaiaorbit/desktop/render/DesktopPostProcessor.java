@@ -30,6 +30,7 @@ import gaia.cu9.ari.gaiaorbit.util.gdx.contrib.utils.ShaderLoader;
 import gaia.cu9.ari.gaiaorbit.util.math.Vector3d;
 
 public class DesktopPostProcessor implements IPostProcessor, IObserver {
+    private Logger.Log logger = Logger.getLogger(this.getClass().getSimpleName());
     private AssetManager manager;
     private PostProcessBean[] pps;
 
@@ -47,7 +48,7 @@ public class DesktopPostProcessor implements IPostProcessor, IObserver {
     Matrix4 prevViewProj, prevCombined;
 
     public DesktopPostProcessor() {
-        ShaderLoader.BasePath = "shaders/";
+        ShaderLoader.BasePath = "shader/postprocess/";
 
         auxd = new Vector3d();
         auxf = new Vector3();
@@ -71,6 +72,8 @@ public class DesktopPostProcessor implements IPostProcessor, IObserver {
     }
 
     public void doneLoading(AssetManager manager) {
+        logger.info("Initializing post-processor");
+
         pps = new PostProcessBean[RenderType.values().length];
 
         pps[RenderType.screen.index] = newPostProcessor(getWidth(RenderType.screen), getHeight(RenderType.screen), manager);

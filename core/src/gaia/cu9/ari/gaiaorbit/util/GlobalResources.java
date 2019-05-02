@@ -80,7 +80,10 @@ public class GlobalResources {
 
     public static void initialize(AssetManager manager) {
         // Sprite shader
-        spriteShader = new ShaderProgram(Gdx.files.internal("shader/spritebatch.vertex.glsl"), Gdx.files.internal("shader/spritebatch.fragment.glsl"));
+        spriteShader = new ShaderProgram(Gdx.files.internal("shader/2d/spritebatch.vertex.glsl"), Gdx.files.internal("shader/2d/spritebatch.fragment.glsl"));
+        if(!spriteShader.isCompiled()){
+            logger.info("SpriteBatch shader compilation failed: " + spriteShader.getLog());
+        }
         // Sprite batch
         spriteBatch = new SpriteBatch(1000, spriteShader);
 

@@ -183,7 +183,7 @@ public class CameraGroupStrategy implements GroupStrategy, Disposable {
     }
 
     private void createDefaultShader () {
-        String vertexShader = "#version 330\n" //
+        String vertexShader = "#version 330 core\n" //
                 + "uniform mat4 u_projectionViewMatrix;\n" //
                 + "in vec4 " + ShaderProgram.POSITION_ATTRIBUTE + ";\n" //
                 + "in vec4 " + ShaderProgram.COLOR_ATTRIBUTE + ";\n" //
@@ -198,7 +198,7 @@ public class CameraGroupStrategy implements GroupStrategy, Disposable {
                 + "   v_texCoords = " + ShaderProgram.TEXCOORD_ATTRIBUTE + "0;\n" //
                 + "   gl_Position =  u_projectionViewMatrix * " + ShaderProgram.POSITION_ATTRIBUTE + ";\n" //
                 + "}\n";
-        String fragmentShader = "#version 330\n" //
+        String fragmentShader = "#version 330 core\n" //
                 + "uniform sampler2D u_texture;\n" //
                 + "in vec4 v_color;\n" //
                 + "in vec2 v_texCoords;\n" //
