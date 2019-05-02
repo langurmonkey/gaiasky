@@ -1,3 +1,5 @@
+#version 330 core
+
 #define TEXTURE_LOD_BIAS 0.2
 
 ////////////////////////////////////////////////////////////////////////////////////
@@ -5,28 +7,28 @@
 ////////////////////////////////////////////////////////////////////////////////////
 #define nop() {}
 
-varying vec4 v_position;
+in vec4 v_position;
 #define pullPosition() { return v_position;}
 
 
 ////////////////////////////////////////////////////////////////////////////////////
 ////////// NORMAL ATTRIBUTE - FRAGMENT
 ///////////////////////////////////////////////////////////////////////////////////
-varying vec3 v_normal;
+in vec3 v_normal;
 vec3 g_normal = vec3(0.0, 0.0, 1.0);
 #define pullNormal() g_normal = v_normal
 
 ////////////////////////////////////////////////////////////////////////////////////
 ////////// BINORMAL ATTRIBUTE - FRAGMENT
 ///////////////////////////////////////////////////////////////////////////////////
-varying vec3 v_binormal;
+in vec3 v_binormal;
 vec3 g_binormal = vec3(0.0, 0.0, 1.0);
 #define pullBinormal() g_binormal = v_binormal
 
 ////////////////////////////////////////////////////////////////////////////////////
 ////////// TANGENT ATTRIBUTE - FRAGMENT
 ///////////////////////////////////////////////////////////////////////////////////
-varying vec3 v_tangent;
+in vec3 v_tangent;
 vec3 g_tangent = vec3(1.0, 0.0, 0.0);
 #define pullTangent() g_tangent = v_tangent
 
@@ -35,7 +37,7 @@ vec3 g_tangent = vec3(1.0, 0.0, 0.0);
 ///////////////////////////////////////////////////////////////////////////////////
 #define exposure 4.0
 
-varying vec2 v_texCoord0;
+in vec2 v_texCoord0;
 
 // Uniforms which are always available
 uniform mat4 u_projViewTrans;
@@ -47,8 +49,8 @@ uniform vec4 u_cameraPosition;
 uniform mat3 u_normalMatrix;
 
 // Varyings computed in the vertex shader
-varying float v_opacity;
-varying float v_alphaTest;
+in float v_opacity;
+in float v_alphaTest;
 
 // Other uniforms
 #ifdef shininessFlag
@@ -73,7 +75,7 @@ uniform sampler2D u_normalTexture;
 #define bias 0.006
 uniform sampler2D u_shadowTexture;
 uniform float u_shadowPCFOffset;
-varying vec3 v_shadowMapUv;
+in vec3 v_shadowMapUv;
 
 float getShadowness(vec2 uv, vec2 offset, float compare){
     const vec4 bitShifts = vec4(1.0, 1.0 / 255.0, 1.0 / 65025.0, 1.0 / 160581375.0);
@@ -127,7 +129,7 @@ float getShadow()
 
 
 // AMBIENT LIGHT
-varying vec3 v_ambientLight;
+in vec3 v_ambientLight;
 
 // CLOUD TEXTURE
 #if defined(diffuseTextureFlag) && defined(normalTextureFlag)
@@ -151,18 +153,19 @@ varying vec3 v_ambientLight;
     }
 #endif // diffuseTextureFlag && diffuseColorFlag
 
-varying vec3 v_lightDir;
-varying vec3 v_lightCol;
-varying vec3 v_viewDir;
+in vec3 v_lightDir;
+in vec3 v_lightCol;
+in vec3 v_viewDir;
 #ifdef environmentCubemapFlag
-varying vec3 v_reflect;
+in vec3 v_reflect;
 #endif
 
 #define saturate(x) clamp(x, 0.0, 1.0)
 
 #define PI 3.1415926535
 
-varying float v_depth;
+in float v_depth;
+out vec4 fragColor;
 
 void main() {
     vec2 g_texCoord0 = v_texCoord0;
@@ -185,17 +188,17 @@ void main() {
     #ifdef shadowMapFlag
     	float shdw = clamp(getShadow(), 0.05, 1.0);
         vec3 cloudColor = (v_lightCol * cloud.rgb) * shdw;
-        gl_FragColor = vec4(cloudColor, cloud.a * v_opacity * clamp(NL + ambient_val, 0.0, 1.0));
+        fragColor = vec4(cloudColor, cloud.a * v_opacity * clamp(NL + ambient_val, 0.0, 1.0));
     #else
         vec3 cloudColor = (v_lightCol * cloud.rgb);
-        gl_FragColor = vec4(cloudColor, cloud.a *  v_opacity * clamp(NL + ambient_val, 0.0, 1.0));
+        fragColor = vec4(cloudColor, cloud.a *  v_opacity * clamp(NL + ambient_val, 0.0, 1.0));
     #endif // shadowMapFlag
 
     //gl_FragColor.rgb += selfShadow;
     
     // Prevent saturation
-    gl_FragColor = clamp(gl_FragColor, 0.0, 1.0);
-    gl_FragColor.rgb *= 0.95;
+    fragColor = clamp(fragColor, 0.0, 1.0);
+    fragColor.rgb *= 0.95;
 
     // Normal depth buffer
     // gl_FragDepth = gl_FragCoord.z;

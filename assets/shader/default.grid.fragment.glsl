@@ -1,4 +1,4 @@
-// UNIFORMS
+#version 330 core
 
 // Diffuse color
 uniform vec4 u_diffuseColor;
@@ -6,11 +6,13 @@ uniform vec4 u_diffuseColor;
 // VARYINGS
 
 // Coordinate of the texture
-varying vec2 v_texCoords0;
+in vec2 v_texCoords0;
 // Opacity
-varying float v_opacity;
+in float v_opacity;
 // Color
-varying vec4 v_color;
+in vec4 v_color;
+
+out vec4 fragColor;
 
 #define PI 3.141592
 #define N 10.0
@@ -53,5 +55,5 @@ vec4 square(vec2 tc) {
 }
 
 void main() {
-    gl_FragColor = square(v_texCoords0);
+    fragColor = square(v_texCoords0);
 }

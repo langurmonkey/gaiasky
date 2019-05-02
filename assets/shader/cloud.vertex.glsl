@@ -1,3 +1,5 @@
+#version 330 core
+
 #include shader/lib_logdepthbuff.glsl
 
 #define nop() {}
@@ -6,10 +8,10 @@
 ////////// POSITION ATTRIBUTE - VERTEX
 ////////////////////////////////////////////////////////////////////////////////////
 #ifdef positionFlag
-    attribute vec3 a_position;
+    in vec3 a_position;
 #endif //positionFlag
 
-varying vec4 v_position;
+out vec4 v_position;
 #define pushPositionValue(value) v_position = value
 #if defined(positionFlag)
     vec4 g_position = vec4(a_position, 1.0);
@@ -26,10 +28,10 @@ varying vec4 v_position;
 ////////// NORMAL ATTRIBUTE - VERTEX
 ///////////////////////////////////////////////////////////////////////////////////
 #ifdef normalFlag
-    attribute vec3 a_normal;
+    in vec3 a_normal;
 #endif //normalFlag
 
-varying vec3 v_normal;
+out vec3 v_normal;
 #define pushNormalValue(value) v_normal = (value)
 #if defined(normalFlag)
     vec3 g_normal = a_normal;
@@ -45,10 +47,10 @@ varying vec3 v_normal;
 ////////// BINORMAL ATTRIBUTE - VERTEX
 ///////////////////////////////////////////////////////////////////////////////////
 #ifdef binormalFlag
-    attribute vec3 a_binormal;
+    in vec3 a_binormal;
 #endif //binormalFlag
 
-varying vec3 v_binormal;
+out vec3 v_binormal;
 #define pushBinormalValue(value) v_binormal = (value)
 #if defined(binormalFlag)
     vec3 g_binormal = a_binormal;
@@ -64,10 +66,10 @@ varying vec3 v_binormal;
 ////////// TANGENT ATTRIBUTE - VERTEX
 ///////////////////////////////////////////////////////////////////////////////////
 #ifdef tangentFlag
-    attribute vec3 a_tangent;
+    in vec3 a_tangent;
 #endif //tangentFlagvec3
 
-varying vec3 v_tangent;
+out vec3 v_tangent;
 #define pushTangentValue(value) v_tangent = (value)
 #if defined(tangentFlag)
     vec3 g_tangent = a_tangent;
@@ -86,10 +88,10 @@ varying vec3 v_tangent;
     #ifndef texCoordsFlag
 	#define texCoordsFlag
     #endif
-    attribute vec2 a_texCoord0;
+    in vec2 a_texCoord0;
 #endif
 
-varying vec2 v_texCoord0;
+out vec2 v_texCoord0;
 #define pushTexCoord0(value) v_texCoord0 = value
 
 #if defined(texCoord0Flag)
@@ -107,7 +109,7 @@ uniform sampler2D u_shadowTexture;
 uniform float u_shadowPCFOffset;
 uniform mat4 u_shadowMapProjViewTrans;
 
-varying vec3 v_shadowMapUv;
+out vec3 v_shadowMapUv;
 #endif //shadowMapFlag
 
 
@@ -142,14 +144,14 @@ uniform vec4 u_cameraPosition;
 uniform mat3 u_normalMatrix;
 
 // Other uniforms
-varying float v_opacity;
+out float v_opacity;
 #ifdef blendedFlag
     uniform float u_opacity;
 #else
     const float u_opacity = 1.0;
 #endif
 
-varying float v_alphaTest;
+out float v_alphaTest;
 #ifdef alphaTestFlag
     uniform float u_alphaTest;
 #else
@@ -214,7 +216,7 @@ varying float v_alphaTest;
 //////////////////////////////////////////////////////
 ////// AMBIENT LIGHT
 //////////////////////////////////////////////////////
-varying vec3 v_ambientLight;
+out vec3 v_ambientLight;
 
 #ifdef ambientLightFlag
     #ifndef ambientFlag
@@ -264,12 +266,12 @@ struct DirectionalLight
 uniform DirectionalLight u_dirLights[numDirectionalLights];
 #endif
 
-varying vec3 v_lightDir;
-varying vec3 v_lightCol;
-varying vec3 v_viewDir;
+out vec3 v_lightDir;
+out vec3 v_lightCol;
+out vec3 v_viewDir;
 
 // Depth buffer value
-varying float v_depth;
+out float v_depth;
 
 void main() {
     v_opacity = u_opacity;

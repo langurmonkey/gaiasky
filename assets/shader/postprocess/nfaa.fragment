@@ -19,19 +19,19 @@ float lumRGB(vec3 v)
 
 const float fScale = 1.0;
 
-vec4 nfaa(sampler2D texture, vec2 texCoords, vec2 viewportInverse){
+vec4 nfaa(sampler2D tex, vec2 texCoords, vec2 viewportInverse){
     // Offset coordinates
     vec2 upOffset = vec2(0.0, viewportInverse.y) * fScale;
     vec2 rightOffset = vec2(viewportInverse.x, 0.0) * fScale;
     
-    float topHeight = lumRGB(texture(texture, texCoords.xy + upOffset).rgb);
-    float bottomHeight = lumRGB(texture(texture, texCoords.xy - upOffset).rgb);
-    float rightHeight = lumRGB(texture(texture, texCoords.xy + rightOffset).rgb);
-    float leftHeight = lumRGB(texture(texture, texCoords.xy - rightOffset).rgb);
-    float leftTopHeight = lumRGB(texture(texture, texCoords.xy - rightOffset + upOffset).rgb);
-    float leftBottomHeight = lumRGB(texture(texture, texCoords.xy - rightOffset - upOffset).rgb);
-    float rightBottomHeight = lumRGB(texture(texture, texCoords.xy + rightOffset + upOffset).rgb);
-    float rightTopHeight = lumRGB(texture(texture, texCoords.xy + rightOffset - upOffset).rgb);
+    float topHeight = lumRGB(texture(tex, texCoords.xy + upOffset).rgb);
+    float bottomHeight = lumRGB(texture(tex, texCoords.xy - upOffset).rgb);
+    float rightHeight = lumRGB(texture(tex, texCoords.xy + rightOffset).rgb);
+    float leftHeight = lumRGB(texture(tex, texCoords.xy - rightOffset).rgb);
+    float leftTopHeight = lumRGB(texture(tex, texCoords.xy - rightOffset + upOffset).rgb);
+    float leftBottomHeight = lumRGB(texture(tex, texCoords.xy - rightOffset - upOffset).rgb);
+    float rightBottomHeight = lumRGB(texture(tex, texCoords.xy + rightOffset + upOffset).rgb);
+    float rightTopHeight = lumRGB(texture(tex, texCoords.xy + rightOffset - upOffset).rgb);
     
     // Normal map creation
     float sum0 = rightTopHeight + topHeight + rightBottomHeight;
@@ -45,11 +45,11 @@ vec4 nfaa(sampler2D texture, vec2 texCoords, vec2 viewportInverse){
     vec2 Normal = vec2(vect1, vect2) * viewportInverse * fScale;
     
     // Color
-    vec4 Scene0 = texture(texture, texCoords.xy);
-    vec4 Scene1 = texture(texture, texCoords.xy + Normal.xy);
-    vec4 Scene2 = texture(texture, texCoords.xy - Normal.xy);
-    vec4 Scene3 = texture(texture, texCoords.xy + vec2(Normal.x, -Normal.y) * 0.5);
-    vec4 Scene4 = texture(texture, texCoords.xy - vec2(Normal.x, -Normal.y) * 0.5);
+    vec4 Scene0 = texture(tex, texCoords.xy);
+    vec4 Scene1 = texture(tex, texCoords.xy + Normal.xy);
+    vec4 Scene2 = texture(tex, texCoords.xy - Normal.xy);
+    vec4 Scene3 = texture(tex, texCoords.xy + vec2(Normal.x, -Normal.y) * 0.5);
+    vec4 Scene4 = texture(tex, texCoords.xy - vec2(Normal.x, -Normal.y) * 0.5);
     
     // Final color
     return vec4((Scene0.rgb + Scene1.rgb + Scene2.rgb + Scene3.rgb + Scene4.rgb) * 0.2, 1.0);

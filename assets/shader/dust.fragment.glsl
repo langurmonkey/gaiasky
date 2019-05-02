@@ -1,36 +1,36 @@
-#version 120
+#version 330 core
 
 ////////////////////////////////////////////////////////////////////////////////////
 ////////// POSITION ATTRIBUTE - FRAGMENT
 ////////////////////////////////////////////////////////////////////////////////////
 #define nop() {}
 
-varying vec4 v_position;
+in vec4 v_position;
 #define pullPosition() { return v_position;}
 
 ////////////////////////////////////////////////////////////////////////////////////
 ////////// COLOR ATTRIBUTE - FRAGMENT
 ///////////////////////////////////////////////////////////////////////////////////
-varying vec4 v_color;
+in vec4 v_color;
 
 ////////////////////////////////////////////////////////////////////////////////////
 ////////// NORMAL ATTRIBUTE - FRAGMENT
 ///////////////////////////////////////////////////////////////////////////////////
-varying vec3 v_normal;
+in vec3 v_normal;
 vec3 g_normal = vec3(0.0, 0.0, 1.0);
 #define pullNormal() g_normal = v_normal
 
 ////////////////////////////////////////////////////////////////////////////////////
 ////////// BINORMAL ATTRIBUTE - FRAGMENT
 ///////////////////////////////////////////////////////////////////////////////////
-varying vec3 v_binormal;
+in vec3 v_binormal;
 vec3 g_binormal = vec3(0.0, 0.0, 1.0);
 #define pullBinormal() g_binormal = v_binormal
 
 ////////////////////////////////////////////////////////////////////////////////////
 ////////// TANGENT ATTRIBUTE - FRAGMENT
 ///////////////////////////////////////////////////////////////////////////////////
-varying vec3 v_tangent;
+in vec3 v_tangent;
 vec3 g_tangent = vec3(1.0, 0.0, 0.0);
 #define pullTangent() g_tangent = v_tangent
 
@@ -39,7 +39,7 @@ vec3 g_tangent = vec3(1.0, 0.0, 0.0);
 ///////////////////////////////////////////////////////////////////////////////////
 #define exposure 4.0
 
-varying vec2 v_texCoord0;
+in vec2 v_texCoord0;
 
 // Uniforms which are always available
 uniform mat4 u_projViewTrans;
@@ -51,8 +51,8 @@ uniform vec4 u_cameraPosition;
 uniform mat3 u_normalMatrix;
 
 // Varyings computed in the vertex shader
-varying float v_opacity;
-varying float v_alphaTest;
+in float v_opacity;
+in float v_alphaTest;
 
 // Other uniforms
 #ifdef shininessFlag
@@ -69,14 +69,15 @@ uniform vec4 u_diffuseColor;
 #define cameraPositionFlag
 #endif
 
-varying vec3 v_lightCol;
-varying vec3 v_viewDir;
+in vec3 v_lightCol;
+in vec3 v_viewDir;
 
 #define saturate(x) clamp(x, 0.0, 1.0)
 
 #define PI 3.1415926535
 
-varying float v_depth;
+in float v_depth;
+out vec4 fragColor;
 
 void main() {
     vec2 g_texCoord0 = v_texCoord0;
@@ -92,13 +93,13 @@ void main() {
     vec3 baseColor = diffuse.rgb;
     float edge = pow(max(0.0, dot(N, V)), 3.0);
 
-    gl_FragColor = vec4(baseColor * edge, 1.0) * v_opacity;
+    fragColor = vec4(baseColor * edge, 1.0) * v_opacity;
 
     // Prevent saturation
-    gl_FragColor = clamp(gl_FragColor, 0.0, 1.0);
-    gl_FragColor.rgb *= 0.95;
+    fragColor = clamp(fragColor, 0.0, 1.0);
+    fragColor.rgb *= 0.95;
 
-    if(gl_FragColor.a == 0.0){
+    if(fragColor.a == 0.0){
         discard;
     }
 
