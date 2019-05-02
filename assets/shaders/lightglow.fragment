@@ -60,11 +60,11 @@ void main()
 		 float lum = 0.0;
 		 for(int idx = 1; idx < u_nSamples; idx++){
 			vec2 curr_coord = u_lightPositions[li] + vec2(fx(t, a) / ar, fy(t, a));
-		 	lum += (texture2D(u_texture2, curr_coord)).r;
+		 	lum += (texture(u_texture2, curr_coord)).r;
 		 	t += dt;
 		 }
 		 
-		 vec4 star_color = texture2D(u_texture2, u_lightPositions[li] + vec2(fx(t, a) / ar, fy(t, a) * ar));
+		 vec4 star_color = texture(u_texture2, u_lightPositions[li] + vec2(fx(t, a) / ar, fy(t, a) * ar));
 		 lum += star_color.r;
 		 lum /= u_nSamples;
 
@@ -76,9 +76,9 @@ void main()
 		 glow_tc /= size;
 		 glow_tc += 0.5;
 		 
-		 float color_glow = clamp(average(texture2D(u_texture1, glow_tc)), 0.0, 1.0);
+		 float color_glow = clamp(average(texture(u_texture1, glow_tc)), 0.0, 1.0);
 		 float core_inc = (0.1 - min(0.1, dist_center)) * color_glow;
 		 fragColor += vec4(color_glow * lightColor.r + core_inc, color_glow * lightColor.g + core_inc, color_glow * lightColor.b + core_inc, 1.0);
 	 }
-	 fragColor += texture2D(u_texture0, v_texCoords);
+	 fragColor += texture(u_texture0, v_texCoords);
 }

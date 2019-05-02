@@ -35,7 +35,7 @@ void main()
 	// Combine a number of weighted image filter taps.
 	for (int i = 0; i < KERNEL_SIZE; i++)
 	{
-		c += texture2D(u_texture0, v_texCoords + SampleOffsets[i]) * SampleWeights[i];
+		c += texture(u_texture0, v_texCoords + SampleOffsets[i]) * SampleWeights[i];
 	}
 
 	fragColor = c;

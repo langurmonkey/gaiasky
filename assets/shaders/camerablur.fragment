@@ -69,17 +69,8 @@ void main() {
 		// make offset in [-0.5, 0.5] range
 		float scale = (float(i) * oneOnNumPasses) - 0.5;
 		vec2 offset = scale * velocity;
-		result += texture2D(u_texture0, v_texCoords + offset);
+		result += texture(u_texture0, v_texCoords + offset);
 	}
-
-	//// Get the initial color at this pixel.
-	//result = texture2D(u_texture0, v_texCoords);
-	//vec2 texCoord = v_texCoords + velocity;
-	//for(int i = 1; i < blur_passes; ++i, texCoord += velocity)
-	//{
-		//// Add the current color to our color sum.
-		//result += texture2D(u_texture0, texCoord);
-	//}
 
 	fragColor = result * oneOnNumPasses;
 }

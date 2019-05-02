@@ -13,7 +13,7 @@ out vec4 fragColor;
 
 void main()
 {             
-    vec3 hdrColor = texture2D(u_texture0, v_texCoords).rgb;
+    vec3 hdrColor = texture(u_texture0, v_texCoords).rgb;
   
     // Exposure tone mapping
     vec3 mapped = vec3(1.0) - exp(-hdrColor * u_exposure);

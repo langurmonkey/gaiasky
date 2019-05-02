@@ -63,20 +63,20 @@ out vec4 fragColor;
 		float idxA = float(LutIndex) * LutStep + LutStepOffset;
 		float idxB = float(LutIndex2) * LutStep + LutStepOffset;
 
-		curveColorA.r = texture2D( u_texture1, vec2(color.r, idxA ) ).r;
-		curveColorA.g = texture2D( u_texture1, vec2(color.g, idxA ) ).g;
-		curveColorA.b = texture2D( u_texture1, vec2(color.b, idxA ) ).b;
+		curveColorA.r = texture( u_texture1, vec2(color.r, idxA ) ).r;
+		curveColorA.g = texture( u_texture1, vec2(color.g, idxA ) ).g;
+		curveColorA.b = texture( u_texture1, vec2(color.b, idxA ) ).b;
 
-		curveColorB.r = texture2D( u_texture1, vec2(color.r, idxB ) ).r;
-		curveColorB.g = texture2D( u_texture1, vec2(color.g, idxB ) ).g;
-		curveColorB.b = texture2D( u_texture1, vec2(color.b, idxB ) ).b;
+		curveColorB.r = texture( u_texture1, vec2(color.r, idxB ) ).r;
+		curveColorB.g = texture( u_texture1, vec2(color.g, idxB ) ).g;
+		curveColorB.b = texture( u_texture1, vec2(color.b, idxB ) ).b;
 
 		return mix(color,mix(curveColorA,curveColorB,LutIndexOffset),LutIntensity);
 	}
 #endif
 
 void main() {
-	vec3 rgb = texture2D(u_texture0, v_texCoords).xyz;
+	vec3 rgb = texture(u_texture0, v_texCoords).xyz;
 	float d = distance(v_texCoords, vec2(CenterX, CenterY));
 	float factor = smoothstep(VignetteX, VignetteY, d);
 	rgb = rgb*factor + rgb*(1.0-factor) * (1.0-VignetteIntensity);

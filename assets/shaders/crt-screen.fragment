@@ -77,7 +77,7 @@ vec3 colorAberrate(sampler2D tex, vec2 coord)
     if (chromaticDispersion.x == 0.0 && chromaticDispersion.y == 0.0) {
         float x = (coord.x-0.5)+0.5;
         float y = (coord.y-0.5)+0.5;
-        frag = texture2D(tex, vec2(x, y)).rgb;
+        frag = texture(tex, vec2(x, y)).rgb;
     } else {
         vec2 rCoords = (eta.r*eta2.r)*(coord.xy-0.5)+0.5;
         vec2 gCoords = (eta.g*eta2.g)*(coord.xy-0.5)+0.5;
@@ -92,10 +92,10 @@ vec3 colorAberrate(sampler2D tex, vec2 coord)
         }
 
         frag = vec3(
-        texture2D(tex, rCoords).r,
-        texture2D(tex, gCoords).g,
-        texture2D(tex, bCoords).b
-        //,texture2D(tex,vec2(x,y)).a
+        texture(tex, rCoords).r,
+        texture(tex, gCoords).g,
+        texture(tex, bCoords).b
+        //,texture(tex,vec2(x,y)).a
         );
     }
 
@@ -111,7 +111,6 @@ vec2 scandistort(vec2 uv) {
     float scan2 = clamp(cos(uv.y * 2.0 + time + 4.0) * amplitude, 0.0, 1.0);
     float amount = scan1 * scan2 * uv.x;
 
-    //uv.x -= 0.05 * mix(texture2D(iChannel1, vec2(uv.x, amount)).r * amount, amount, 0.9);
     uv.x -= 0.05 * amount;
 
     return uv;
@@ -139,13 +138,13 @@ void main(void)
 
     vec2 flipped_uv = vec2(uv.x, 1.0-uv.y);
 
-    float org_alpha = texture2D(u_texture0, flipped_uv).a;
+    float org_alpha = texture(u_texture0, flipped_uv).a;
     vec3 col;
 
     #ifdef ENABLE_RGB_SHIFT
-    col.r = texture2D(u_texture0, fract(vec2(uv.x+offset, -uv.y))).r;
-    col.g = texture2D(u_texture0, fract(vec2(uv.x+0.000, -uv.y))).g;
-    col.b = texture2D(u_texture0, fract(vec2(uv.x-offset, -uv.y))).b;
+    col.r = texture(u_texture0, fract(vec2(uv.x+offset, -uv.y))).r;
+    col.g = texture(u_texture0, fract(vec2(uv.x+0.000, -uv.y))).g;
+    col.b = texture(u_texture0, fract(vec2(uv.x-offset, -uv.y))).b;
     #endif
 
     #ifdef ENABLE_CHROMATIC_ABERRATIONS

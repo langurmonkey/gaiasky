@@ -42,7 +42,7 @@ void main()
 		 tc += deltaTexCoord * fract( sin(dot(v_texCoords.xy + fract(12.33), vec2(12.9898, 78.233)))* 43758.5453 );
 		 for(int i = 0; i < u_numSamples; i++){
 		    tc -= deltaTexCoord;
-		    vec4 sampl = texture2D(u_texture0, tc);
+		    vec4 sampl = texture(u_texture0, tc);
 		    if(len(tc - u_lightPositions[clpos], ar) > viewAngle){
 		    	sampl = vec4(0.0, 0.0, 0.0, 0.0);
 		    }

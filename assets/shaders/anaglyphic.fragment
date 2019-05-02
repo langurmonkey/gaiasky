@@ -10,10 +10,10 @@ out vec4 fragColor;
 void main() {
     vec2 texcoord = v_texCoords;
     
-    vec4 rightFrag = texture2D(u_texture1, texcoord);
+    vec4 rightFrag = texture(u_texture1, texcoord);
 	rightFrag = vec4(1.0, rightFrag.g, rightFrag.b, 1.0); // Right eye (cyan filter) is full red and actual green and blue
 	
-	vec4 leftFrag = texture2D(u_texture0, texcoord);
+	vec4 leftFrag = texture(u_texture0, texcoord);
 	leftFrag = vec4(leftFrag.r, 1.0, 1.0, 1.0); // Left eye (red filter) is full green and blue and actual red
  
 	// Multiply left and right components for final output colour

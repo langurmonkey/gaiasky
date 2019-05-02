@@ -10,8 +10,8 @@ in vec2 v_texCoords;
 out vec4 fragColor;
 
 void main() {
-    vec4 col = texture2D(u_texture0, v_texCoords);
-    vec4 depth = texture2D(u_texture1, v_texCoords);
+    vec4 col = texture(u_texture0, v_texCoords);
+    vec4 depth = texture(u_texture1, v_texCoords);
 
     if(v_texCoords.x < 0.5){
         fragColor = col;
