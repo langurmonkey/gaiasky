@@ -1,16 +1,14 @@
-#version 120
+#version 330
 
 #include shader/lib_math.glsl
 #include shader/lib_geometry.glsl
+#include shader/lib_logdepthbuff.glsl
 
-// ATTRIBUTES
-attribute vec3 a_position;
-attribute vec3 a_pm;
-attribute vec4 a_color;
-attribute float a_size;
+in vec3 a_position;
+in vec3 a_pm;
+in vec4 a_color;
+in float a_size;
 
-
-// UNIFORMS
 uniform int u_t; // time in days since epoch
 uniform mat4 u_projModelView;
 uniform vec3 u_camPos;
@@ -19,12 +17,6 @@ uniform int u_cubemap;
 
 uniform vec2 u_pointAlpha;
 uniform float u_thAnglePoint;
-
-//////////////////////////////////////////////
-// LOGARITHMIC DEPTH BUFFER
-//////////////////////////////////////////////
-#include shader/lib_logdepthbuff.glsl
-varying float v_depth;
 
 #ifdef relativisticEffects
     uniform vec3 u_velDir; // Velocity vector
@@ -47,8 +39,9 @@ varying float v_depth;
 // 3 - star brightness
 uniform vec4 u_alphaSizeFovBr;
 
-// VARYINGS
-varying vec4 v_col;
+out vec4 v_col;
+out float v_depth;
+
 
 #define len0 170000.0
 #define len1 len0 * 100.0
