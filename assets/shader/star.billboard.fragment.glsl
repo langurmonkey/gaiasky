@@ -1,7 +1,4 @@
-// v_texCoords are UV coordinates in [0..1]
-varying vec2 v_texCoords;
-varying vec4 v_color;
-varying float v_depth;
+#version 330 core
 
 uniform sampler2D u_texture0;
 uniform float u_radius;
@@ -13,6 +10,13 @@ uniform float u_thpoint;
 uniform float u_distance;
 // Whether light scattering is enabled or not
 uniform int u_lightScattering;
+
+// v_texCoords are UV coordinates in [0..1]
+in vec2 v_texCoords;
+in vec4 v_color;
+in float v_depth;
+out vec4 fragColor;
+
 
 // Time multiplier
 #define time u_time * 0.02
@@ -45,7 +49,7 @@ float average(vec4 color){
 }
 
 float startex(vec2 tc){
-    return clamp(average(texture2D(u_texture0, tc)), 0.0, 1.0);
+    return clamp(average(texture(u_texture0, tc)), 0.0, 1.0);
 }
 
 
@@ -90,7 +94,7 @@ vec4 draw() {
 }
 
 void main() {
-    gl_FragColor = draw();
+    fragColor = draw();
 
     // Normal depth buffer
     // gl_FragDepth = gl_FragCoord.z;

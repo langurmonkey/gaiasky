@@ -1,12 +1,12 @@
-#version 120
+#version 330 core
 
 #include shader/lib_math.glsl
 #include shader/lib_geometry.glsl
 #include shader/lib_logdepthbuff.glsl
 
 // Attributes
-attribute vec4 a_position;
-attribute vec2 a_texCoord0;
+in vec4 a_position;
+in vec2 a_texCoord0;
 
 // Uniforms
 uniform mat4 u_projTrans;
@@ -35,10 +35,10 @@ uniform float u_th_angle_point;
 
 
 // Varyings
-varying vec4 v_color;
-varying vec2 v_texCoords;
+out vec4 v_color;
+out vec2 v_texCoords;
 // Logarithmic depth buffer
-varying float v_depth;
+out float v_depth;
 
 void main()
 {
