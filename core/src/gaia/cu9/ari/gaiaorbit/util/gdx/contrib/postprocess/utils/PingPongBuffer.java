@@ -27,6 +27,7 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.glutils.GLFrameBuffer.FrameBufferBuilder;
 import gaia.cu9.ari.gaiaorbit.util.gdx.contrib.utils.GaiaSkyFrameBuffer;
 import org.lwjgl.opengl.GL20;
+import org.lwjgl.opengl.GL30;
 
 /**
  * Encapsulates a framebuffer with the ability to ping-pong between two buffers.
@@ -47,7 +48,7 @@ import org.lwjgl.opengl.GL20;
  * @author bmanuel
  */
 public final class PingPongBuffer {
-    public GaiaSkyFrameBuffer buffer1, buffer2;
+    private GaiaSkyFrameBuffer buffer1, buffer2;
     public Texture texture1, texture2, textureDepth;
     public int width, height;
     public final boolean ownResources;
@@ -62,34 +63,33 @@ public final class PingPongBuffer {
     private GaiaSkyFrameBuffer ownedResult, ownedSource;
     private int ownedW, ownedH;
 
-    /** Creates a new ping-pong buffer and owns the resources. */
+    private boolean forceRGBABuffer = false;
+
     public PingPongBuffer(int width, int height, Format frameBufferFormat, boolean hasDepth) {
+        this(width, height, frameBufferFormat, hasDepth, false);
+    }
+
+    /** Creates a new ping-pong buffer and owns the resources. */
+    public PingPongBuffer(int width, int height, Format frameBufferFormat, boolean hasDepth, boolean forceRGBABuffer) {
         ownResources = true;
+        this.forceRGBABuffer = forceRGBABuffer;
 
         // BUFFER USED FOR THE ACTUAL RENDERING:
         // 2 RENDER TARGETS:
-        //      0: COLOR TEXTURE ATTACHMENT (RGBA)
+        //      0: FLOAT TEXTURE ATTACHMENT (allow values outside of [0,1])
         //      1: FLOAT TEXTURE ATTACHMENT (DEPTH EXTRA)
         // 1 DEPTH TEXTURE ATTACHMENT
         FrameBufferBuilder frameBufferBuilder = new FrameBufferBuilder(width, height);
-        frameBufferBuilder.addBasicColorTextureAttachment(frameBufferFormat);
-        //if (Gdx.graphics.isGL30Available()) {
-        //    frameBufferBuilder.addFloatAttachment(GL30.GL_RGBA32F, GL30.GL_RGBA, GL30.GL_FLOAT, true);
-        //}
+        addColorRenderTarget(frameBufferBuilder, frameBufferFormat);
         if (hasDepth) {
-            if (Gdx.graphics.isGL30Available()) {
-                // 32 bit depth buffer texture
-                frameBufferBuilder.addDepthTextureAttachment(GL20.GL_DEPTH_COMPONENT32, GL20.GL_FLOAT);
-            } else {
-                frameBufferBuilder.addBasicDepthRenderBuffer();
-            }
+            addDepthRenderTarget(frameBufferBuilder);
         }
         ownedMain = new GaiaSkyFrameBuffer(frameBufferBuilder);
 
         // EXTRA BUFFER:
         // SINGLE RENDER TARGET WITH A COLOR TEXTURE ATTACHMENT
         frameBufferBuilder = new FrameBufferBuilder(width, height);
-        frameBufferBuilder.addBasicColorTextureAttachment(frameBufferFormat);
+        addColorRenderTarget(frameBufferBuilder, frameBufferFormat);
         ownedExtra = new GaiaSkyFrameBuffer(frameBufferBuilder);
 
         // Buffer the scene is rendered to is actually the second
@@ -102,6 +102,24 @@ public final class PingPongBuffer {
         ownedMain = null;
         ownedExtra = null;
         set(buffer1, buffer2);
+    }
+
+    private void addColorRenderTarget(FrameBufferBuilder fbb, Format fbf) {
+        if (Gdx.graphics.isGL30Available() && !forceRGBABuffer) {
+            //fbb.addBasicColorTextureAttachment(fbf);
+            fbb.addFloatAttachment(GL30.GL_RGBA16F, GL30.GL_RGBA, GL30.GL_FLOAT, true);
+        } else {
+            fbb.addBasicColorTextureAttachment(fbf);
+        }
+    }
+
+    private void addDepthRenderTarget(FrameBufferBuilder fbb) {
+        if (Gdx.graphics.isGL30Available()) {
+            // 32 bit depth buffer texture
+            fbb.addDepthTextureAttachment(GL20.GL_DEPTH_COMPONENT32, GL20.GL_FLOAT);
+        } else {
+            fbb.addBasicDepthRenderBuffer();
+        }
     }
 
     /**

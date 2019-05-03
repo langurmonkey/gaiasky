@@ -18,6 +18,7 @@ import com.badlogic.gdx.graphics.Texture.TextureFilter;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.FrameBuffer;
+import com.badlogic.gdx.graphics.glutils.GLFrameBuffer.FrameBufferBuilder;
 import com.badlogic.gdx.graphics.glutils.ShaderProgram;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Matrix4;
@@ -50,6 +51,7 @@ import gaia.cu9.ari.gaiaorbit.util.Logger.Log;
 import gaia.cu9.ari.gaiaorbit.util.gdx.IntModelBatch;
 import gaia.cu9.ari.gaiaorbit.util.gdx.IntRenderableSorter;
 import gaia.cu9.ari.gaiaorbit.util.gdx.contrib.postprocess.filters.Glow;
+import gaia.cu9.ari.gaiaorbit.util.gdx.contrib.utils.GaiaSkyFrameBuffer;
 import gaia.cu9.ari.gaiaorbit.util.gdx.contrib.utils.ShaderLoader;
 import gaia.cu9.ari.gaiaorbit.util.gdx.shader.AtmosphereShaderProvider;
 import gaia.cu9.ari.gaiaorbit.util.gdx.shader.GroundShaderProvider;
@@ -59,6 +61,7 @@ import gaia.cu9.ari.gaiaorbit.util.gdx.shader.provider.IntShaderProvider;
 import gaia.cu9.ari.gaiaorbit.util.gravwaves.RelativisticEffectsManager;
 import gaia.cu9.ari.gaiaorbit.util.math.MathUtilsd;
 import gaia.cu9.ari.gaiaorbit.util.math.Vector3d;
+import org.lwjgl.opengl.GL30;
 
 import java.nio.IntBuffer;
 import java.util.Comparator;
@@ -687,12 +690,14 @@ public class SceneGraphRenderer extends AbstractRenderer implements IProcessRend
             Array<IRenderable> models = render_lists.get(RenderGroup.MODEL_NORMAL.ordinal());
 
             glowFb.begin();
-            Gdx.gl.glClearColor(0, 0, 0, 0);
+            Gdx.gl.glEnable(GL30.GL_DEPTH);
+            Gdx.gl.glClearColor(0, 0, 0, 1);
             Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT | GL20.GL_DEPTH_BUFFER_BIT);
+            Gdx.gl.glClearDepthf(1);
 
             if (!GlobalConf.program.CUBEMAP360_MODE) {
                 // Render billboard stars
-                billboardStarsProc.renderStud(stars, camera, 0);
+                billboardStarsProc.render(stars, camera, 0, null);
 
                 // Render models
                 modelBatchOpaque.begin(camera.getCamera());
@@ -1090,8 +1095,17 @@ public class SceneGraphRenderer extends AbstractRenderer implements IProcessRend
     }
 
     private void buildGlowData() {
-        if (glowFb == null)
-            glowFb = new FrameBuffer(Format.RGBA8888, 1080, 720, false);
+        if (glowFb == null) {
+            FrameBufferBuilder fbb = new FrameBufferBuilder(1080, 720);
+            if (Gdx.graphics.isGL30Available()) {
+                //fbb.addBasicColorTextureAttachment(fbf);
+                fbb.addFloatAttachment(GL30.GL_RGBA16F, GL30.GL_RGBA, GL30.GL_FLOAT, true);
+            } else {
+                fbb.addBasicColorTextureAttachment(Format.RGBA8888);
+            }
+            fbb.addBasicDepthRenderBuffer();
+            glowFb = new GaiaSkyFrameBuffer(fbb);
+        }
     }
 
     public void updateLineRenderSystem() {

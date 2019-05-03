@@ -136,7 +136,16 @@ public final class PostProcessor implements Disposable {
      * This is a drop-in replacement for the same-signature PingPongBuffer's constructor.
      */
     public static PingPongBuffer newPingPongBuffer(int width, int height, Format frameBufferFormat, boolean hasDepth) {
-        PingPongBuffer buffer = new PingPongBuffer(width, height, frameBufferFormat, hasDepth);
+        return newPingPongBuffer(width, height, frameBufferFormat, hasDepth, false);
+    }
+    /**
+     * Creates and returns a managed PingPongBuffer buffer, just create and forget. If rebind() is called on context loss, managed
+     * PingPongBuffers will be rebound for you.
+     * <p>
+     * This is a drop-in replacement for the same-signature PingPongBuffer's constructor.
+     */
+    public static PingPongBuffer newPingPongBuffer(int width, int height, Format frameBufferFormat, boolean hasDepth, boolean forceRGBABuffer) {
+        PingPongBuffer buffer = new PingPongBuffer(width, height, frameBufferFormat, hasDepth, forceRGBABuffer);
         buffers.add(buffer);
         return buffer;
     }

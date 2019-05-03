@@ -16,16 +16,14 @@
 #version 330 core
 
 uniform sampler2D u_texture0;
-uniform float treshold;
-uniform float tresholdInvTx;
+uniform float u_threshold;
 
 in vec2 v_texCoords;
 out vec4 fragColor;
 
 void main()
 {
-	vec4 tex = texture(u_texture0, v_texCoords);
-
-	// alpha threshold
-	fragColor = (tex-treshold) * tresholdInvTx;
+    vec3 tex = texture(u_texture0, v_texCoords).rgb;
+    float brightness = dot(tex, vec3(0.2126, 0.7152, 0.0722));
+    fragColor = vec4(tex.rgb * step(u_threshold, brightness), 1.0);
 }

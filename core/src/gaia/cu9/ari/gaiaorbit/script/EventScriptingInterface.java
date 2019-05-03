@@ -1785,6 +1785,26 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
     }
 
     @Override
+    public void setGammaCorrectionLevel(double level) {
+        if (checkNum(level, 0d, 3d, "gamma correction"))
+            Gdx.app.postRunnable(() -> em.post(Events.GAMMA_CMD, (float) level, false));
+    }
+
+    public void setGammaCorrectionLevel(long level) {
+        setGammaCorrectionLevel((double) level);
+    }
+
+    @Override
+    public void setExposureToneMappingLevel(double level) {
+        if (checkNum(level, 0d, 20d, "exposure"))
+            Gdx.app.postRunnable(() -> em.post(Events.EXPOSURE_CMD, (float) level, false));
+    }
+
+    public void setExposureToneMappingLevel(long level) {
+        setExposureToneMappingLevel((double) level);
+    }
+
+    @Override
     public void set360Mode(boolean state) {
         Gdx.app.postRunnable(() -> em.post(Events.CUBEMAP360_CMD, state, false));
     }

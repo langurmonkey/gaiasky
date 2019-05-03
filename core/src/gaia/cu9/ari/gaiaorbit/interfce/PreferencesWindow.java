@@ -73,7 +73,7 @@ public class PreferencesWindow extends GenericDialog {
     private DatasetsWidget dw;
 
     // Backup values
-    private float brightnessBak, contrastBak, hueBak, saturationBak, gammaBak, motionblurBak, bloomBak;
+    private float brightnessBak, contrastBak, hueBak, saturationBak, gammaBak, exposureBak, motionblurBak, bloomBak;
     private boolean lensflareBak, lightglowBak, debugInfoBak;
 
     public PreferencesWindow(Stage stage, Skin skin) {
@@ -312,7 +312,7 @@ public class PreferencesWindow extends GenericDialog {
         bloomBak = GlobalConf.postprocess.POSTPROCESS_BLOOM_INTENSITY;
         OwnLabel bloomLabel = new OwnLabel(I18n.txt("gui.bloom"), skin, "default");
         OwnLabel bloom = new OwnLabel(Integer.toString((int) (GlobalConf.postprocess.POSTPROCESS_BLOOM_INTENSITY * 10)), skin);
-        Slider bloomEffect = new OwnSlider(Constants.MIN_SLIDER, Constants.MAX_SLIDER, 1, false, skin);
+        Slider bloomEffect = new OwnSlider(Constants.MIN_SLIDER, Constants.MAX_SLIDER * 0.2f, 1, false, skin);
         bloomEffect.setName("bloom effect");
         bloomEffect.setWidth(sliderWidth);
         bloomEffect.setValue(GlobalConf.postprocess.POSTPROCESS_BLOOM_INTENSITY * 10f);
@@ -551,6 +551,27 @@ public class PreferencesWindow extends GenericDialog {
         display.add(gammal).left().padRight(pad5 * 4).padBottom(pad5);
         display.add(gamma).left().padRight(pad5 * 2).padBottom(pad5);
         display.add(gammaLabel).row();
+
+        /* Exposure */
+        OwnLabel exposurel = new OwnLabel(I18n.txt("gui.exposure"), skin, "default");
+        Label exposureLabel = new OwnLabel(nf1.format(GlobalConf.postprocess.POSTPROCESS_EXPOSURE), skin);
+        Slider exposure = new OwnSlider(Constants.MIN_EXPOSURE, Constants.MAX_EXPOSURE, 0.1f, false, skin);
+        exposure.setName("exposure");
+        exposure.setWidth(sliderWidth);
+        exposure.setValue(GlobalConf.postprocess.POSTPROCESS_EXPOSURE);
+        exposureLabel.setText(nf1.format(exposure.getValue()));
+        exposure.addListener(event -> {
+            if (event instanceof ChangeEvent) {
+                EventManager.instance.post(Events.EXPOSURE_CMD, exposure.getValue(), true);
+                exposureLabel.setText(nf1.format(exposure.getValue()));
+                return true;
+            }
+            return false;
+        });
+
+        display.add(exposurel).left().padRight(pad5 * 4).padBottom(pad5);
+        display.add(exposure).left().padRight(pad5 * 2).padBottom(pad5);
+        display.add(exposureLabel).row();
 
         // LABELS
         labels.addAll(brightnessl, contrastl, huel, saturationl, gammal);

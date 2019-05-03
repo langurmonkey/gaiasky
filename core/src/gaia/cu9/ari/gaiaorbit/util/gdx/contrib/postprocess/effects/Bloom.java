@@ -92,7 +92,7 @@ public final class Bloom extends PostProcessorEffect {
     private int sfactor, dfactor;
 
     public Bloom(int fboWidth, int fboHeight) {
-        pingPongBuffer = PostProcessor.newPingPongBuffer(fboWidth, fboHeight, PostProcessor.getFramebufferFormat(), false);
+        pingPongBuffer = PostProcessor.newPingPongBuffer(fboWidth, fboHeight, PostProcessor.getFramebufferFormat(), false, false);
 
         blur = new Blur(fboWidth, fboHeight);
         threshold = new Threshold();
@@ -125,8 +125,8 @@ public final class Bloom extends PostProcessorEffect {
         combine.setSource2Saturation(saturation);
     }
 
-    public void setThreshold(float gamma) {
-        threshold.setTreshold(gamma);
+    public void setThreshold(float threshold) {
+        this.threshold.setThreshold(threshold);
     }
 
     public void enableBlending(int sfactor, int dfactor) {
@@ -173,34 +173,6 @@ public final class Bloom extends PostProcessorEffect {
         return threshold.getThreshold();
     }
 
-    public float getBaseIntensity() {
-        return combine.getSource1Intensity();
-    }
-
-    public float getBaseSaturation() {
-        return combine.getSource1Saturation();
-    }
-
-    public float getBloomIntensity() {
-        return combine.getSource2Intensity();
-    }
-
-    public float getBloomSaturation() {
-        return combine.getSource2Saturation();
-    }
-
-    public boolean isBlendingEnabled() {
-        return blending;
-    }
-
-    public int getBlendingSourceFactor() {
-        return sfactor;
-    }
-
-    public int getBlendingDestFactor() {
-        return dfactor;
-    }
-
     public BlurType getBlurType() {
         return blur.getType();
     }
@@ -226,7 +198,7 @@ public final class Bloom extends PostProcessorEffect {
 
         pingPongBuffer.begin();
         {
-            // threshold / high-pass filter
+            // threshold / high-pass filterp
             // only areas with pixels >= threshold are blit to smaller fbo
             threshold.setInput(texsrc).setOutput(pingPongBuffer.getSourceBuffer()).render();
 
@@ -241,6 +213,7 @@ public final class Bloom extends PostProcessorEffect {
 
         if (blending) {
             // TODO support for Gdx.gl.glBlendFuncSeparate(sfactor, dfactor, GL20.GL_ONE, GL20.GL_ONE );
+            //Gdx.gl.glBlendFuncSeparate(sfactor, dfactor, GL30.GL_ONE, GL30.GL_ONE);
             Gdx.gl.glBlendFunc(sfactor, dfactor);
         }
 
@@ -249,6 +222,8 @@ public final class Bloom extends PostProcessorEffect {
         // mix original scene and blurred threshold, modulate via
         // set(Base|Bloom)(Saturation|Intensity)
         combine.setOutput(dest).setInput(texsrc, pingPongBuffer.getResultTexture()).render();
+        //copy.setInput(pingPongBuffer.getResultTexture()).setOutput(dest).render();
+
     }
 
     @Override

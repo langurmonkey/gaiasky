@@ -1305,6 +1305,20 @@ public interface IScriptingInterface {
     void setSaturationLevel(double level);
 
     /**
+     * Sets the gamma correction level.
+     *
+     * @param level The gamma correction level in [0..3] as a floating point number.
+     *              The neutral value is 1.2.
+     */
+    void setGammaCorrectionLevel(double level);
+
+    /**
+     * Sets the exposure level.
+     * @param level The exposure level in [0..n]. Set to 0 to disable exposure tone mapping.
+     */
+    void setExposureToneMappingLevel(double level);
+
+    /**
      * Enables and disables the planetarium mode.
      *
      * @param state The boolean sate. True to activate, false to deactivate.

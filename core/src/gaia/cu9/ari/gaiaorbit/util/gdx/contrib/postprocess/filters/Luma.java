@@ -21,21 +21,22 @@
 
 package gaia.cu9.ari.gaiaorbit.util.gdx.contrib.postprocess.filters;
 
+import com.badlogic.gdx.math.Vector2;
 import gaia.cu9.ari.gaiaorbit.util.gdx.contrib.utils.ShaderLoader;
 
-public final class Threshold extends Filter<Threshold> {
-
+public class Luma extends Filter<Luma> {
     public enum Param implements Parameter {
         // @formatter:off
-        Texture("u_texture0", 0),
-        Threshold("u_threshold", 0);
+        Texture0("u_texture0", 0),
+        ImageSize("u_imageSize", 2),
+        TexelSize("u_texelSize", 2);
         // @formatter:on
 
-        private String mnemonic;
+        private final String mnemonic;
         private int elementSize;
 
-        private Param(String mnemonic, int elementSize) {
-            this.mnemonic = mnemonic;
+        private Param(String m, int elementSize) {
+            this.mnemonic = m;
             this.elementSize = elementSize;
         }
 
@@ -50,31 +51,33 @@ public final class Threshold extends Filter<Threshold> {
         }
     }
 
-    public Threshold() {
-        super(ShaderLoader.fromFile("screenspace", "threshold"));
-        rebind();
+    private Vector2 texelSize, imageSize;
+
+    public Luma() {
+        super(ShaderLoader.fromFile("screenspace", "luma"));
+        texelSize = new Vector2();
+        imageSize = new Vector2();
     }
 
-    private float threshold = 0;
-
-    public void setThreshold(float threshold) {
-        this.threshold = threshold;
-        setParam(Param.Threshold, threshold);
+    public void setImageSize(float w, float h){
+        imageSize.set(w, h);
+        setParam(Param.ImageSize, texelSize);
+    }
+    public void setTexelSize(float u, float v){
+        texelSize.set(u, v);
+        setParam(Param.TexelSize, texelSize);
     }
 
-    public float getThreshold() {
-        return threshold;
+    @Override
+    public void rebind() {
+        setParams(Param.Texture0, u_texture0);
+        setParams(Param.TexelSize, texelSize);
+        setParams(Param.ImageSize, texelSize);
+        endParams();
     }
 
     @Override
     protected void onBeforeRender() {
         inputTexture.bind(u_texture0);
-    }
-
-    @Override
-    public void rebind() {
-        setParams(Param.Texture, u_texture0);
-        setParam(Param.Threshold, threshold);
-        endParams();
     }
 }

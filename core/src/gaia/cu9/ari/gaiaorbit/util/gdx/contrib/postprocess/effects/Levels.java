@@ -22,21 +22,48 @@
 package gaia.cu9.ari.gaiaorbit.util.gdx.contrib.postprocess.effects;
 
 import com.badlogic.gdx.graphics.glutils.FrameBuffer;
+import com.badlogic.gdx.graphics.glutils.GLFrameBuffer;
 import gaia.cu9.ari.gaiaorbit.util.gdx.contrib.postprocess.PostProcessorEffect;
+import gaia.cu9.ari.gaiaorbit.util.gdx.contrib.postprocess.filters.Copy;
 import gaia.cu9.ari.gaiaorbit.util.gdx.contrib.postprocess.filters.LevelsFilter;
+import gaia.cu9.ari.gaiaorbit.util.gdx.contrib.postprocess.filters.Luma;
 import gaia.cu9.ari.gaiaorbit.util.gdx.contrib.utils.GaiaSkyFrameBuffer;
+import org.lwjgl.opengl.GL30;
 
 /**
- * Implements brightness, contrast, hue and saturation levels
+ * Implements brightness, contrast, hue and saturation levels, plus
+ * auto-tone mapping HDR and gamma correction.
  *
  * @author tsagrista
  */
 public final class Levels extends PostProcessorEffect {
-    private LevelsFilter filter;
+    private static final int LUMA_SIZE = 400;
+    private LevelsFilter levels;
+    private Luma luma;
+    Copy copy;
+    private GaiaSkyFrameBuffer lumaBuffer;
 
     /** Creates the effect */
     public Levels() {
-        filter = new LevelsFilter();
+        levels = new LevelsFilter();
+        luma = new Luma();
+        copy = new Copy();
+
+        GLFrameBuffer.FrameBufferBuilder fbb = new GLFrameBuffer.FrameBufferBuilder(LUMA_SIZE, LUMA_SIZE);
+        fbb.addColorTextureAttachment(GL30.GL_RGBA16F, GL30.GL_RGBA, GL30.GL_FLOAT);
+        lumaBuffer = new GaiaSkyFrameBuffer(fbb);
+        //lumaBuffer.getColorBufferTexture().setFilter(Texture.TextureFilter.MipMapLinearLinear, Texture.TextureFilter.MipMapLinearLinear);
+
+        luma.setImageSize(LUMA_SIZE, LUMA_SIZE);
+        luma.setTexelSize(1f / LUMA_SIZE, 1f / LUMA_SIZE);
+    }
+
+    public Luma getLuma(){
+        return luma;
+    }
+
+    public GaiaSkyFrameBuffer getLumaBuffer(){
+        return lumaBuffer;
     }
 
     /**
@@ -45,7 +72,7 @@ public final class Levels extends PostProcessorEffect {
      * @param value The brightness value in [-1..1]
      */
     public void setBrightness(float value) {
-        filter.setBrightness(value);
+        levels.setBrightness(value);
     }
 
     /**
@@ -54,7 +81,7 @@ public final class Levels extends PostProcessorEffect {
      * @param value The saturation value in [0..2]
      */
     public void setSaturation(float value) {
-        filter.setSaturation(value);
+        levels.setSaturation(value);
     }
 
     /**
@@ -63,7 +90,7 @@ public final class Levels extends PostProcessorEffect {
      * @param value The hue value in [0..2]
      */
     public void setHue(float value) {
-        filter.setHue(value);
+        levels.setHue(value);
     }
 
     /**
@@ -72,7 +99,7 @@ public final class Levels extends PostProcessorEffect {
      * @param value The contrast value in [0..2]
      */
     public void setContrast(float value) {
-        filter.setContrast(value);
+        levels.setContrast(value);
     }
 
     /**
@@ -81,25 +108,40 @@ public final class Levels extends PostProcessorEffect {
      * @param value The gamma value in [0..3]
      */
     public void setGamma(float value) {
-        filter.setGamma(value);
+        levels.setGamma(value);
+    }
+
+    /**
+     * Sets the exposure tone mapping value
+     *
+     * @param value The exposure value in [0..n]
+     */
+    public void setExposure(float value) {
+        levels.setExposure(value);
     }
 
     @Override
     public void dispose() {
-        if (filter != null) {
-            filter.dispose();
-            filter = null;
+        if (levels != null) {
+            levels.dispose();
+            levels = null;
         }
     }
 
     @Override
     public void rebind() {
-        filter.rebind();
+        levels.rebind();
     }
+
 
     @Override
     public void render(FrameBuffer src, FrameBuffer dest, GaiaSkyFrameBuffer main) {
         restoreViewport(dest);
-        filter.setInput(src).setOutput(dest).render();
+        // Luminance
+        //luma.setInput(src).setOutput(lumaBuffer).render();
+
+        // Actual levels
+        levels.setInput(src).setOutput(dest).render();
+        //copy.setInput(lumaBuffer).setOutput(dest).render();
     }
 }

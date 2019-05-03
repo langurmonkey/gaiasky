@@ -33,10 +33,10 @@ public final class Combine extends Filter<Combine> {
         // @formatter:off
         Texture0("u_texture0", 0),
         Texture1("u_texture1", 0),
-        Source1Intensity("Src1Intensity", 0),
-        Source1Saturation("Src1Saturation", 0),
-        Source2Intensity("Src2Intensity", 0),
-        Source2Saturation("Src2Saturation", 0);
+        Source1Intensity("u_src1Intensity", 0),
+        Source1Saturation("u_src1Saturation", 0),
+        Source2Intensity("u_src2Intensity", 0),
+        Source2Saturation("u_src2Saturation", 0);
         // @formatter:on
 
         private final String mnemonic;

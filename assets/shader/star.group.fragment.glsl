@@ -12,8 +12,8 @@ layout (location = 0) out vec4 fragColor;
 
 
 float programmatic(vec2 uv) {
-    float dist_center = 1.0 - clamp(distance(vec2(0.5, 0.5), uv) * 2.0, 0.0, 1.0);
-    return pow(dist_center, 3.0) * 0.3 + dist_center * 0.05;
+    float falloff_center = 1.0 - clamp(distance(vec2(0.5, 0.5), uv) * 2.0, 0.0, 1.0);
+    return pow(falloff_center, 4.0) + step(0.9, falloff_center) * 0.2;
 }
 
 void main() {

@@ -40,7 +40,7 @@ float core(float distance_center, float inner_rad){
 
 float light(float distance_center, float decay) {
     float light = 1.0 - pow(distance_center, decay);
-    return clamp(light, 0.0, 0.97);
+    return light;
 }
 
 
@@ -49,7 +49,7 @@ float average(vec4 color){
 }
 
 float startex(vec2 tc){
-    return clamp(average(texture(u_texture0, tc)), 0.0, 1.0);
+    return average(texture(u_texture0, tc));
 }
 
 
@@ -94,10 +94,6 @@ vec4 draw() {
 }
 
 void main() {
-    fragColor = draw();
-
-    // Normal depth buffer
-    // gl_FragDepth = gl_FragCoord.z;
-    // Logarithmic depth buffer
+    fragColor = clamp(draw(), 0.0, 0.999);
     gl_FragDepth = v_depth;
 }

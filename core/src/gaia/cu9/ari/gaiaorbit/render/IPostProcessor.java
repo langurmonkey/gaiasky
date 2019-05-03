@@ -48,22 +48,33 @@ public interface IPostProcessor extends Disposable {
         public void dispose() {
             if (pp != null) {
                 pp.dispose(true);
-                bloom.dispose();
-                antialiasing.dispose();
-                lens.dispose();
-                curvature.dispose();
-                fisheye.dispose();
-                lightglow.dispose();
-                motionblur.dispose();
-                levels.dispose();
-                depthBuffer.dispose();
+                if (bloom != null)
+                    bloom.dispose();
+                if (antialiasing != null)
+                    antialiasing.dispose();
+                if (lens != null)
+                    lens.dispose();
+                if (curvature != null)
+                    curvature.dispose();
+                if (fisheye != null)
+                    fisheye.dispose();
+                if (lightglow != null)
+                    lightglow.dispose();
+                if (motionblur != null)
+                    motionblur.dispose();
+                if (levels != null)
+                    levels.dispose();
+                if (depthBuffer != null)
+                    depthBuffer.dispose();
             }
         }
 
     }
 
     enum RenderType {
-        screen(0), screenshot(1), frame(2);
+        screen(0),
+        screenshot(1),
+        frame(2);
 
         public int index;
 

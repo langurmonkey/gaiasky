@@ -1,5 +1,10 @@
 #version 330 core
 
+/*
+ * This shader contains levels for brightness, contrast, saturation, hue.
+ * Additionally, it provides gamma correction and HDR tone mapping
+ */
+
 uniform sampler2D u_texture0;
 
 uniform float u_brightness = 0.0;
@@ -7,9 +12,14 @@ uniform float u_contrast = 1.0;
 uniform float u_saturation = 1.0;
 uniform float u_hue = 1.0;
 uniform float u_gamma = 2.2;
+uniform float u_exposure = 2.5;
 
 in vec2 v_texCoords;
 out vec4 fragColor;
+
+float luminance(vec3 color){
+    return dot(color, vec3(0.2126, 0.7152, 0.0722));
+}
 
 vec3 rgb2hsv(vec3 c)
 {
@@ -30,29 +40,36 @@ vec3 hsv2rgb(vec3 c)
 }
 
 void main() {
-   vec4 pixelColor = texture(u_texture0, v_texCoords);
-   pixelColor.rgb /= pixelColor.a;
+    vec3 pixelColor = texture(u_texture0, v_texCoords).rgb;
 
-  // Apply contrast
-  pixelColor.rgb = ((pixelColor.rgb - 0.5) * max(u_contrast, 0.0)) + 0.5;
+    float luma = luminance(pixelColor);
 
-  vec3 hsv = rgb2hsv(pixelColor.rgb);
-  // Apply saturation
-  hsv.y *= u_saturation;
-  // Apply hue
-  hsv.x *= u_hue;
+    // Apply contrast
+    pixelColor = ((pixelColor - 0.5) * max(u_contrast, 0.0)) + 0.5;
 
-  pixelColor.rgb = hsv2rgb(hsv);
+    vec3 hsv = rgb2hsv(pixelColor);
+    // Apply saturation
+    hsv.y *= u_saturation;
+    // Apply hue
+    hsv.x *= u_hue;
 
-  // Apply brightness
-  pixelColor.rgb += u_brightness;
+    pixelColor = hsv2rgb(hsv);
 
-  // Return final pixel color
-  pixelColor.rgb *= pixelColor.a;
+    // Apply brightness
+    pixelColor += u_brightness;
 
-  fragColor = pixelColor;
+    // HDR tone mapping
+    if(u_exposure > 0.0)
+        pixelColor = 1.0 - exp2(-pixelColor * u_exposure);
 
-  // Gamma correction
-  fragColor.rgb = pow(fragColor.rgb, vec3(1.0 / u_gamma));
+    // Gamma correction
+    pixelColor = pow(pixelColor, vec3(1.0 / u_gamma));
 
+    // Final color
+    fragColor = vec4(pixelColor, 1.0);
+
+    // Saturation in red
+    //if(brightness(fragColor) > 1.0){
+    //    fragColor = vec4(1, 0, 0, 1);
+    //}
 }

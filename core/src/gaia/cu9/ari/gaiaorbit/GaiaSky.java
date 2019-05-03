@@ -67,6 +67,7 @@ import gaia.cu9.ari.gaiaorbit.util.time.RealTimeClock;
 import gaia.cu9.ari.gaiaorbit.util.tree.OctreeNode;
 
 import java.io.File;
+import java.nio.FloatBuffer;
 import java.time.Instant;
 import java.util.*;
 
@@ -561,6 +562,7 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
         MusicManager.dispose();
     }
 
+    FloatBuffer buff = FloatBuffer.allocate(400*400);
     /**
      * Renders the scene
      **/
@@ -597,7 +599,6 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
                     // Render the GUI, setting the viewport
                     GuiRegistry.render(Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
                 }
-
             }
             // Clean lists
             sgr.clearLists();

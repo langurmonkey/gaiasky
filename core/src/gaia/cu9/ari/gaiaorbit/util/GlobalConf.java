@@ -198,11 +198,17 @@ public class GlobalConf {
          **/
         public float POSTPROCESS_GAMMA;
 
+        /**
+         * Exposure tone mapping value in [0..n]. 0 is disabled.
+         */
+        public float POSTPROCESS_EXPOSURE;
+
+
         public PostprocessConf() {
-            EventManager.instance.subscribe(this, Events.BLOOM_CMD, Events.LENS_FLARE_CMD, Events.MOTION_BLUR_CMD, Events.LIGHT_SCATTERING_CMD, Events.FISHEYE_CMD, Events.BRIGHTNESS_CMD, Events.CONTRAST_CMD, Events.HUE_CMD, Events.SATURATION_CMD, Events.GAMMA_CMD);
+            EventManager.instance.subscribe(this, Events.BLOOM_CMD, Events.LENS_FLARE_CMD, Events.MOTION_BLUR_CMD, Events.LIGHT_SCATTERING_CMD, Events.FISHEYE_CMD, Events.BRIGHTNESS_CMD, Events.CONTRAST_CMD, Events.HUE_CMD, Events.SATURATION_CMD, Events.GAMMA_CMD, Events.EXPOSURE_CMD);
         }
 
-        public void initialize(Antialias POSTPROCESS_ANTIALIAS, float POSTPROCESS_BLOOM_INTENSITY, float POSTPROCESS_MOTION_BLUR, boolean POSTPROCESS_LENS_FLARE, boolean POSTPROCESS_LIGHT_SCATTERING, boolean POSTPROCESS_FISHEYE, float POSTPROCESS_BRIGHTNESS, float POSTPROCESS_CONTRAST, float POSTPROCESS_HUE, float POSTPROCESS_SATURATION, float POSTPROCESS_GAMMA) {
+        public void initialize(Antialias POSTPROCESS_ANTIALIAS, float POSTPROCESS_BLOOM_INTENSITY, float POSTPROCESS_MOTION_BLUR, boolean POSTPROCESS_LENS_FLARE, boolean POSTPROCESS_LIGHT_SCATTERING, boolean POSTPROCESS_FISHEYE, float POSTPROCESS_BRIGHTNESS, float POSTPROCESS_CONTRAST, float POSTPROCESS_HUE, float POSTPROCESS_SATURATION, float POSTPROCESS_GAMMA, float POSTPROCESS_EXPOSURE) {
             this.POSTPROCESS_ANTIALIAS = POSTPROCESS_ANTIALIAS;
             this.POSTPROCESS_BLOOM_INTENSITY = POSTPROCESS_BLOOM_INTENSITY;
             this.POSTPROCESS_MOTION_BLUR = POSTPROCESS_MOTION_BLUR;
@@ -214,6 +220,7 @@ public class GlobalConf {
             this.POSTPROCESS_HUE = POSTPROCESS_HUE;
             this.POSTPROCESS_SATURATION = POSTPROCESS_SATURATION;
             this.POSTPROCESS_GAMMA = POSTPROCESS_GAMMA;
+            this.POSTPROCESS_EXPOSURE = POSTPROCESS_EXPOSURE;
         }
 
         @Override
@@ -249,6 +256,8 @@ public class GlobalConf {
             case GAMMA_CMD:
                 POSTPROCESS_GAMMA = MathUtils.clamp((float) data[0], Constants.MIN_GAMMA, Constants.MAX_GAMMA);
                 break;
+            case EXPOSURE_CMD:
+                POSTPROCESS_EXPOSURE = MathUtilsd.clamp((float) data[0], Constants.MIN_EXPOSURE, Constants.MAX_EXPOSURE);
             default:
                 break;
             }

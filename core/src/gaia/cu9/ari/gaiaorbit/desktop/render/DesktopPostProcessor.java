@@ -7,7 +7,6 @@ package gaia.cu9.ari.gaiaorbit.desktop.render;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.assets.AssetManager;
-import com.badlogic.gdx.graphics.PerspectiveCamera;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.Texture.TextureFilter;
 import com.badlogic.gdx.math.MathUtils;
@@ -82,7 +81,7 @@ public class DesktopPostProcessor implements IPostProcessor, IObserver {
         if (GlobalConf.frame.isRedrawMode())
             pps[RenderType.frame.index] = newPostProcessor(getWidth(RenderType.frame), getHeight(RenderType.frame), manager);
 
-        EventManager.instance.subscribe(this, Events.SCREENSHOT_SIZE_UDPATE, Events.FRAME_SIZE_UDPATE, Events.BLOOM_CMD, Events.LENS_FLARE_CMD, Events.MOTION_BLUR_CMD, Events.LIGHT_POS_2D_UPDATED, Events.LIGHT_SCATTERING_CMD, Events.FISHEYE_CMD, Events.CAMERA_MOTION_UPDATED, Events.CUBEMAP360_CMD, Events.ANTIALIASING_CMD, Events.BRIGHTNESS_CMD, Events.CONTRAST_CMD, Events.HUE_CMD, Events.SATURATION_CMD, Events.GAMMA_CMD, Events.STEREO_PROFILE_CMD, Events.STEREOSCOPIC_CMD, Events.FPS_INFO, Events.FOV_CHANGE_NOTIFICATION);
+        EventManager.instance.subscribe(this, Events.SCREENSHOT_SIZE_UDPATE, Events.FRAME_SIZE_UDPATE, Events.BLOOM_CMD, Events.LENS_FLARE_CMD, Events.MOTION_BLUR_CMD, Events.LIGHT_POS_2D_UPDATED, Events.LIGHT_SCATTERING_CMD, Events.FISHEYE_CMD, Events.CUBEMAP360_CMD, Events.ANTIALIASING_CMD, Events.BRIGHTNESS_CMD, Events.CONTRAST_CMD, Events.HUE_CMD, Events.SATURATION_CMD, Events.GAMMA_CMD, Events.EXPOSURE_CMD, Events.STEREO_PROFILE_CMD, Events.STEREOSCOPIC_CMD, Events.FPS_INFO, Events.FOV_CHANGE_NOTIFICATION);
     }
 
     private int getWidth(RenderType type) {
@@ -175,7 +174,9 @@ public class DesktopPostProcessor implements IPostProcessor, IObserver {
         // BLOOM
         ppb.bloom = new Bloom((int) (width * bloomFboScale), (int) (height * bloomFboScale));
         ppb.bloom.setBloomIntesity(GlobalConf.postprocess.POSTPROCESS_BLOOM_INTENSITY);
-        ppb.bloom.setThreshold(0.3f);
+        ppb.bloom.setThreshold(0.5f);
+        ppb.bloom.setBlurPasses(10);
+        ppb.bloom.setBlurAmount(20f);
         ppb.bloom.setEnabled(GlobalConf.postprocess.POSTPROCESS_BLOOM_INTENSITY > 0);
         ppb.pp.addEffect(ppb.bloom);
 
@@ -194,7 +195,7 @@ public class DesktopPostProcessor implements IPostProcessor, IObserver {
         // ANTIALIAS
         initAntiAliasing(GlobalConf.postprocess.POSTPROCESS_ANTIALIAS, width, height, ppb);
 
-        // LEVELS - BRIGHTNESS & CONTRAST
+        // LEVELS - BRIGHTNESS, CONTRAST, HUE, SATURATION, GAMMA CORRECTION and HDR TONE MAPPING
         initLevels(ppb);
 
         // MOTION BLUR
@@ -211,6 +212,7 @@ public class DesktopPostProcessor implements IPostProcessor, IObserver {
         ppb.levels.setHue(GlobalConf.postprocess.POSTPROCESS_HUE);
         ppb.levels.setSaturation(GlobalConf.postprocess.POSTPROCESS_SATURATION);
         ppb.levels.setGamma(GlobalConf.postprocess.POSTPROCESS_GAMMA);
+        ppb.levels.setExposure(GlobalConf.postprocess.POSTPROCESS_EXPOSURE);
         ppb.pp.addEffect(ppb.levels);
     }
 
@@ -353,24 +355,6 @@ public class DesktopPostProcessor implements IPostProcessor, IObserver {
                 }
             }
             break;
-        case CAMERA_MOTION_UPDATED:
-            Gdx.app.postRunnable(() -> {
-                Vector3d campos = (Vector3d) data[0];
-                PerspectiveCamera cam = (PerspectiveCamera) data[3];
-
-                for (int i = 0; i < RenderType.values().length; i++) {
-                    if (pps[i] != null) {
-                        PostProcessBean ppb = pps[i];
-
-                        // Motion blur
-                        ppb.motionblur.setEnabled(GlobalConf.postprocess.POSTPROCESS_MOTION_BLUR != 0);
-                        ppb.motionblur.setBlurOpacity(0.94f);
-                    }
-                }
-                prevCombined.set(cam.combined);
-                prevCampos.set(campos);
-            });
-            break;
         case MOTION_BLUR_CMD:
             Gdx.app.postRunnable(() -> {
                 float opacity = (float) data[0];
@@ -497,7 +481,15 @@ public class DesktopPostProcessor implements IPostProcessor, IObserver {
                 if (pps[i] != null) {
                     PostProcessBean ppb = pps[i];
                     ppb.levels.setGamma(gamma);
-                    ;
+                }
+            }
+            break;
+        case EXPOSURE_CMD:
+            float exposure = (Float) data[0];
+            for (int i = 0; i < RenderType.values().length; i++) {
+                if (pps[i] != null) {
+                    PostProcessBean ppb = pps[i];
+                    ppb.levels.setExposure(exposure);
                 }
             }
             break;

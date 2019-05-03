@@ -298,6 +298,12 @@ public enum Events {
     GAMMA_CMD,
 
     /**
+     * Contains the exposure tone mapping level (float) in [0..n] (0 for disabled) and an optional boolean
+     * indicating whether this comes from the interface
+     */
+    EXPOSURE_CMD,
+
+    /**
      * Contains the saturation level (float) in [0..2] and an optional boolean
      * indicating whether this comes from the interface
      **/

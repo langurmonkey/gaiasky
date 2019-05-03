@@ -135,7 +135,8 @@ public class DesktopConfInit extends ConfInit {
         float POSTPROCESS_HUE = Float.parseFloat(p.getProperty("postprocess.hue", "1"));
         float POSTPROCESS_SATURATION = Float.parseFloat(p.getProperty("postprocess.saturation", "1"));
         float POSTPROCESS_GAMMA = Float.parseFloat(p.getProperty("postprocess.gamma", "1"));
-        ppc.initialize(POSTPROCESS_ANTIALIAS, POSTPROCESS_BLOOM_INTENSITY, POSTPROCESS_MOTION_BLUR, POSTPROCESS_LENS_FLARE, POSTPROCESS_LIGHT_SCATTERING, POSTPROCESS_FISHEYE, POSTPROCESS_BRIGHTNESS, POSTPROCESS_CONTRAST, POSTPROCESS_HUE, POSTPROCESS_SATURATION, POSTPROCESS_GAMMA);
+        float POSTPROCESS_EXPOSURE = Float.parseFloat(p.getProperty("postprocess.exposure", "0"));
+        ppc.initialize(POSTPROCESS_ANTIALIAS, POSTPROCESS_BLOOM_INTENSITY, POSTPROCESS_MOTION_BLUR, POSTPROCESS_LENS_FLARE, POSTPROCESS_LIGHT_SCATTERING, POSTPROCESS_FISHEYE, POSTPROCESS_BRIGHTNESS, POSTPROCESS_CONTRAST, POSTPROCESS_HUE, POSTPROCESS_SATURATION, POSTPROCESS_GAMMA, POSTPROCESS_EXPOSURE);
 
         /** RUNTIME CONF **/
         RuntimeConf rc = new RuntimeConf();
@@ -377,6 +378,7 @@ public class DesktopConfInit extends ConfInit {
         p.setProperty("postprocess.hue", Float.toString(GlobalConf.postprocess.POSTPROCESS_HUE));
         p.setProperty("postprocess.saturation", Float.toString(GlobalConf.postprocess.POSTPROCESS_SATURATION));
         p.setProperty("postprocess.gamma", Float.toString(GlobalConf.postprocess.POSTPROCESS_GAMMA));
+        p.setProperty("postprocess.exposure", Float.toString(GlobalConf.postprocess.POSTPROCESS_EXPOSURE));
 
         /** FRAME CONF **/
         p.setProperty("graphics.render.folder", GlobalConf.frame.RENDER_FOLDER);
