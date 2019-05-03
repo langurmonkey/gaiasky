@@ -21,14 +21,23 @@
 
 package gaia.cu9.ari.gaiaorbit.util.gdx.contrib.postprocess.effects;
 
+import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.graphics.GL20;
+import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.glutils.FloatFrameBuffer;
+import com.badlogic.gdx.graphics.glutils.FloatTextureData;
 import com.badlogic.gdx.graphics.glutils.FrameBuffer;
 import com.badlogic.gdx.graphics.glutils.GLFrameBuffer;
+import gaia.cu9.ari.gaiaorbit.screenshot.ImageRenderer;
 import gaia.cu9.ari.gaiaorbit.util.gdx.contrib.postprocess.PostProcessorEffect;
 import gaia.cu9.ari.gaiaorbit.util.gdx.contrib.postprocess.filters.Copy;
 import gaia.cu9.ari.gaiaorbit.util.gdx.contrib.postprocess.filters.LevelsFilter;
 import gaia.cu9.ari.gaiaorbit.util.gdx.contrib.postprocess.filters.Luma;
 import gaia.cu9.ari.gaiaorbit.util.gdx.contrib.utils.GaiaSkyFrameBuffer;
 import org.lwjgl.opengl.GL30;
+
+import java.nio.ByteBuffer;
+import java.nio.FloatBuffer;
 
 /**
  * Implements brightness, contrast, hue and saturation levels, plus
@@ -41,9 +50,11 @@ public final class Levels extends PostProcessorEffect {
     private LevelsFilter levels;
     private Luma luma;
     Copy copy;
-    private GaiaSkyFrameBuffer lumaBuffer;
+    private FrameBuffer lumaBuffer;
 
-    /** Creates the effect */
+    /**
+     * Creates the effect
+     */
     public Levels() {
         levels = new LevelsFilter();
         luma = new Luma();
@@ -52,17 +63,18 @@ public final class Levels extends PostProcessorEffect {
         GLFrameBuffer.FrameBufferBuilder fbb = new GLFrameBuffer.FrameBufferBuilder(LUMA_SIZE, LUMA_SIZE);
         fbb.addColorTextureAttachment(GL30.GL_RGBA16F, GL30.GL_RGBA, GL30.GL_FLOAT);
         lumaBuffer = new GaiaSkyFrameBuffer(fbb);
-        //lumaBuffer.getColorBufferTexture().setFilter(Texture.TextureFilter.MipMapLinearLinear, Texture.TextureFilter.MipMapLinearLinear);
+        lumaBuffer.getColorBufferTexture().setFilter(Texture.TextureFilter.MipMapLinearLinear, Texture.TextureFilter.MipMapLinearLinear);
+        //lumaBuffer = new FloatFrameBuffer(LUMA_SIZE, LUMA_SIZE, false);
 
         luma.setImageSize(LUMA_SIZE, LUMA_SIZE);
         luma.setTexelSize(1f / LUMA_SIZE, 1f / LUMA_SIZE);
     }
 
-    public Luma getLuma(){
+    public Luma getLuma() {
         return luma;
     }
 
-    public GaiaSkyFrameBuffer getLumaBuffer(){
+    public FrameBuffer getLumaBuffer() {
         return lumaBuffer;
     }
 
@@ -133,15 +145,35 @@ public final class Levels extends PostProcessorEffect {
         levels.rebind();
     }
 
+    //float[] pxls = new float[LUMA_SIZE * LUMA_SIZE * 4];
+    //ByteBuffer pixels = ByteBuffer.allocateDirect(LUMA_SIZE * LUMA_SIZE * 4 * 4);
+    //FloatBuffer pixelsf = FloatBuffer.allocate(LUMA_SIZE * LUMA_SIZE * 4);
 
+    boolean out = true;
     @Override
     public void render(FrameBuffer src, FrameBuffer dest, GaiaSkyFrameBuffer main) {
         restoreViewport(dest);
         // Luminance
-        //luma.setInput(src).setOutput(lumaBuffer).render();
+        luma.setInput(src).setOutput(lumaBuffer).render();
 
         // Actual levels
         levels.setInput(src).setOutput(dest).render();
         //copy.setInput(lumaBuffer).setOutput(dest).render();
+
+        // Read out data
+       // if(true) {
+       //     Gdx.app.postRunnable(() -> {
+       //         if(out) {
+       //             lumaBuffer.begin();
+       //             //ImageRenderer.renderToImageGl20("/tmp/", "img.jpg", 400, 400);
+       //             Gdx.gl.glPixelStorei(GL20.GL_PACK_ALIGNMENT, 1);
+       //             Gdx.gl.glReadPixels(1, 1, 400, 400, GL30.GL_RGBA, GL20.GL_UNSIGNED_BYTE, pixels);
+       //             lumaBuffer.end();
+
+       //             System.out.println(pixels.get(100));
+       //         }
+       //     });
+       // }
+
     }
 }

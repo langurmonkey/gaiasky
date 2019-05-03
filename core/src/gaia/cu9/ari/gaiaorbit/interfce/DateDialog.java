@@ -47,15 +47,12 @@ public class DateDialog extends CollapsibleWindow {
 
         /** SET NOW **/
         setNow = new OwnTextButton("Set current time (UTC)", skin);
-        setNow.addListener(new EventListener() {
-            @Override
-            public boolean handle(Event event) {
-                if (event instanceof ChangeEvent) {
-                    updateTime(Instant.now(), ZoneOffset.UTC);
-                    return true;
-                }
-                return false;
+        setNow.addListener(event -> {
+            if (event instanceof ChangeEvent) {
+                updateTime(Instant.now(), ZoneOffset.UTC);
+                return true;
             }
+            return false;
         });
         setNow.setSize(150 * GlobalConf.SCALE_FACTOR, 20 * GlobalConf.SCALE_FACTOR);
         add(setNow).center().colspan(2).padTop(pad);
@@ -66,19 +63,15 @@ public class DateDialog extends CollapsibleWindow {
         day = new OwnTextField("", skin);
         day.setMaxLength(2);
         day.setWidth(40 * GlobalConf.SCALE_FACTOR);
-        day.addListener(new EventListener() {
-            @Override
-            public boolean handle(Event event) {
-                if (event instanceof InputEvent) {
-                    InputEvent ie = (InputEvent) event;
-                    if (ie.getType() == Type.keyTyped) {
-                        checkField(day, 1, 31);
-                        return true;
-                    }
+        day.addListener(event -> {
+            if (event instanceof InputEvent) {
+                InputEvent ie = (InputEvent) event;
+                if (ie.getType() == Type.keyTyped) {
+                    checkField(day, 1, 31);
+                    return true;
                 }
-                return false;
             }
-
+            return false;
         });
 
         month = new SelectBox<String>(skin);
@@ -88,19 +81,15 @@ public class DateDialog extends CollapsibleWindow {
         year = new OwnTextField("", skin);
         year.setMaxLength(5);
         year.setWidth(40 * GlobalConf.SCALE_FACTOR);
-        year.addListener(new EventListener() {
-            @Override
-            public boolean handle(Event event) {
-                if (event instanceof InputEvent) {
-                    InputEvent ie = (InputEvent) event;
-                    if (ie.getType() == Type.keyTyped) {
-                        checkField(year, -20000, 20000);
-                        return true;
-                    }
+        year.addListener(event -> {
+            if (event instanceof InputEvent) {
+                InputEvent ie = (InputEvent) event;
+                if (ie.getType() == Type.keyTyped) {
+                    checkField(year, -20000, 20000);
+                    return true;
                 }
-                return false;
             }
-
+            return false;
         });
 
         dayGroup.addActor(day);
@@ -118,55 +107,43 @@ public class DateDialog extends CollapsibleWindow {
         hour = new OwnTextField("", skin);
         hour.setMaxLength(2);
         hour.setWidth(40 * GlobalConf.SCALE_FACTOR);
-        hour.addListener(new EventListener() {
-            @Override
-            public boolean handle(Event event) {
-                if (event instanceof InputEvent) {
-                    InputEvent ie = (InputEvent) event;
-                    if (ie.getType() == Type.keyTyped) {
-                        checkField(hour, 0, 23);
-                        return true;
-                    }
+        hour.addListener(event -> {
+            if (event instanceof InputEvent) {
+                InputEvent ie = (InputEvent) event;
+                if (ie.getType() == Type.keyTyped) {
+                    checkField(hour, 0, 23);
+                    return true;
                 }
-                return false;
             }
-
+            return false;
         });
 
         min = new OwnTextField("", skin);
         min.setMaxLength(2);
         min.setWidth(40 * GlobalConf.SCALE_FACTOR);
-        min.addListener(new EventListener() {
-            @Override
-            public boolean handle(Event event) {
-                if (event instanceof InputEvent) {
-                    InputEvent ie = (InputEvent) event;
-                    if (ie.getType() == Type.keyTyped) {
-                        checkField(min, 0, 59);
-                        return true;
-                    }
+        min.addListener(event -> {
+            if (event instanceof InputEvent) {
+                InputEvent ie = (InputEvent) event;
+                if (ie.getType() == Type.keyTyped) {
+                    checkField(min, 0, 59);
+                    return true;
                 }
-                return false;
             }
-
+            return false;
         });
 
         sec = new OwnTextField("", skin);
         sec.setMaxLength(2);
         sec.setWidth(40 * GlobalConf.SCALE_FACTOR);
-        sec.addListener(new EventListener() {
-            @Override
-            public boolean handle(Event event) {
-                if (event instanceof InputEvent) {
-                    InputEvent ie = (InputEvent) event;
-                    if (ie.getType() == Type.keyTyped) {
-                        checkField(sec, 0, 59);
-                        return true;
-                    }
+        sec.addListener(event -> {
+            if (event instanceof InputEvent) {
+                InputEvent ie = (InputEvent) event;
+                if (ie.getType() == Type.keyTyped) {
+                    checkField(sec, 0, 59);
+                    return true;
                 }
-                return false;
             }
-
+            return false;
         });
 
         hourGroup.addActor(hour);
@@ -185,47 +162,39 @@ public class DateDialog extends CollapsibleWindow {
         buttonGroup.space(pad);
         TextButton ok = new OwnTextButton(I18n.bundle.get("gui.ok"), skin, "default");
         ok.setName("close");
-        ok.addListener(new EventListener() {
-            @Override
-            public boolean handle(Event event) {
-                if (event instanceof ChangeEvent) {
+        ok.addListener(event -> {
+            if (event instanceof ChangeEvent) {
 
-                    boolean cool = checkField(day, 1, 31);
-                    cool = checkField(year, -20000, 20000) && cool;
-                    cool = checkField(hour, 0, 23) && cool;
-                    cool = checkField(min, 0, 59) && cool;
-                    cool = checkField(sec, 0, 59) && cool;
+                boolean cool = checkField(day, 1, 31);
+                cool = checkField(year, -20000, 20000) && cool;
+                cool = checkField(hour, 0, 23) && cool;
+                cool = checkField(min, 0, 59) && cool;
+                cool = checkField(sec, 0, 59) && cool;
 
-                    if (cool) {
-                        // Set the date
-                        LocalDateTime date = LocalDateTime.of(Integer.parseInt(year.getText()), month.getSelectedIndex() + 1, Integer.parseInt(day.getText()), Integer.parseInt(hour.getText()), Integer.parseInt(min.getText()), Integer.parseInt(sec.getText()));
+                if (cool) {
+                    // Set the date
+                    LocalDateTime date = LocalDateTime.of(Integer.parseInt(year.getText()), month.getSelectedIndex() + 1, Integer.parseInt(day.getText()), Integer.parseInt(hour.getText()), Integer.parseInt(min.getText()), Integer.parseInt(sec.getText()));
 
-                        // Send time change command
-                        EventManager.instance.post(Events.TIME_CHANGE_CMD, date.toInstant(ZoneOffset.UTC));
+                    // Send time change command
+                    EventManager.instance.post(Events.TIME_CHANGE_CMD, date.toInstant(ZoneOffset.UTC));
 
-                        me.remove();
-                    }
-
-                    return true;
+                    me.remove();
                 }
 
-                return false;
+                return true;
             }
 
+            return false;
         });
         TextButton cancel = new OwnTextButton(I18n.bundle.get("gui.cancel"), skin, "default");
         cancel.setName("close");
-        cancel.addListener(new EventListener() {
-            @Override
-            public boolean handle(Event event) {
-                if (event instanceof ChangeEvent) {
-                    me.remove();
-                    return true;
-                }
-
-                return false;
+        cancel.addListener(event -> {
+            if (event instanceof ChangeEvent) {
+                me.remove();
+                return true;
             }
 
+            return false;
         });
         buttonGroup.addActor(ok);
         ok.setSize(70 * GlobalConf.SCALE_FACTOR, 20 * GlobalConf.SCALE_FACTOR);
