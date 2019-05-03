@@ -24,6 +24,7 @@ import gaia.cu9.ari.gaiaorbit.scenegraph.camera.ICamera;
 import gaia.cu9.ari.gaiaorbit.util.GlobalConf;
 import gaia.cu9.ari.gaiaorbit.util.comp.DistToCameraComparator;
 import gaia.cu9.ari.gaiaorbit.util.gdx.mesh.IntMesh;
+import org.lwjgl.opengl.GL30;
 
 import java.util.Random;
 
@@ -42,6 +43,8 @@ public class ParticleGroupRenderSystem extends ImmediateRenderSystem implements 
 
     @Override
     protected void initShaderProgram() {
+        Gdx.gl.glEnable(GL30.GL_POINT_SPRITE);
+        Gdx.gl.glEnable(GL30.GL_VERTEX_PROGRAM_POINT_SIZE);
     }
 
     @Override
@@ -111,11 +114,6 @@ public class ParticleGroupRenderSystem extends ImmediateRenderSystem implements 
 
                 curr = meshes.get(particleGroup.offset);
                 if (curr != null) {
-                    // Enable gl_PointCoord
-                    Gdx.gl20.glEnable(34913);
-                    // Enable point sizes
-                    Gdx.gl20.glEnable(0x8642);
-
                     boolean stereoHalfWidth = GlobalConf.program.isStereoHalfWidth();
 
                     shaderProgram.setUniformMatrix("u_projModelView", camera.getCamera().combined);

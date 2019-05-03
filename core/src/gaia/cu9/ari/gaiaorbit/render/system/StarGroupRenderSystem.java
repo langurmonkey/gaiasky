@@ -30,6 +30,7 @@ import gaia.cu9.ari.gaiaorbit.util.Nature;
 import gaia.cu9.ari.gaiaorbit.util.comp.DistToCameraComparator;
 import gaia.cu9.ari.gaiaorbit.util.coord.AstroUtils;
 import gaia.cu9.ari.gaiaorbit.util.gdx.mesh.IntMesh;
+import org.lwjgl.opengl.GL30;
 
 public class StarGroupRenderSystem extends ImmediateRenderSystem implements IObserver {
     private final double BRIGHTNESS_FACTOR;
@@ -51,6 +52,9 @@ public class StarGroupRenderSystem extends ImmediateRenderSystem implements IObs
 
     @Override
     protected void initShaderProgram() {
+        Gdx.gl.glEnable(GL30.GL_POINT_SPRITE);
+        Gdx.gl.glEnable(GL30.GL_VERTEX_PROGRAM_POINT_SIZE);
+
         pointAlpha = new float[] { GlobalConf.scene.POINT_ALPHA_MIN, GlobalConf.scene.POINT_ALPHA_MIN + GlobalConf.scene.POINT_ALPHA_MAX };
     }
 
@@ -82,11 +86,6 @@ public class StarGroupRenderSystem extends ImmediateRenderSystem implements IObs
 
     @Override
     public void renderStud(Array<IRenderable> renderables, ICamera camera, double t) {
-        // Enable gl_PointCoord
-        Gdx.gl20.glEnable(34913);
-        // Enable point sizes
-        Gdx.gl20.glEnable(0x8642);
-
         //renderables.sort(comp);
         if (renderables.size > 0) {
 

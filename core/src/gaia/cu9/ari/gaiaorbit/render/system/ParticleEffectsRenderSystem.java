@@ -25,6 +25,7 @@ import gaia.cu9.ari.gaiaorbit.util.GlobalConf.ProgramConf.StereoProfile;
 import gaia.cu9.ari.gaiaorbit.util.gdx.mesh.IntMesh;
 import gaia.cu9.ari.gaiaorbit.util.math.MathUtilsd;
 import gaia.cu9.ari.gaiaorbit.util.math.Vector3d;
+import org.lwjgl.opengl.GL30;
 
 import java.util.Random;
 
@@ -74,6 +75,9 @@ public class ParticleEffectsRenderSystem extends ImmediateRenderSystem {
 
     @Override
     protected void initShaderProgram() {
+        Gdx.gl.glEnable(GL30.GL_LINE_SMOOTH);
+        Gdx.gl.glEnable(GL30.GL_LINE_WIDTH);
+        Gdx.gl.glHint(GL30.GL_NICEST, GL30.GL_LINE_SMOOTH_HINT);
     }
 
     private double getFactor(double cspeed) {
@@ -186,12 +190,6 @@ public class ParticleEffectsRenderSystem extends ImmediateRenderSystem {
         if (alpha > 0) {
             updatePositions(camera);
 
-            // Enable GL_LINE_SMOOTH
-            Gdx.gl20.glEnable(0xB20);
-            // Enable GL_LINE_WIDTH
-            Gdx.gl20.glEnable(0xB21);
-            // Additive blending
-            Gdx.gl20.glBlendFunc(GL20.GL_ONE, GL20.GL_ONE);
             // Regular
             Gdx.gl.glLineWidth(1f * GlobalConf.SCALE_FACTOR);
 
@@ -232,9 +230,6 @@ public class ParticleEffectsRenderSystem extends ImmediateRenderSystem {
                 curr.mesh.setVertices(curr.vertices, 0, N_PARTICLES * 2 * curr.vertexSize);
                 curr.mesh.render(shaderProgram, GL20.GL_LINES);
                 shaderProgram.end();
-
-                // Restore
-                Gdx.gl.glBlendFunc(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA);
             }
         }
 

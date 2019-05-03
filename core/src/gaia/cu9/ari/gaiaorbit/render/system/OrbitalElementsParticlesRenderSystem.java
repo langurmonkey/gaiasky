@@ -26,6 +26,7 @@ import gaia.cu9.ari.gaiaorbit.util.coord.AstroUtils;
 import gaia.cu9.ari.gaiaorbit.util.coord.Coordinates;
 import gaia.cu9.ari.gaiaorbit.util.gdx.mesh.IntMesh;
 import gaia.cu9.ari.gaiaorbit.util.math.MathUtilsd;
+import org.lwjgl.opengl.GL30;
 
 public class OrbitalElementsParticlesRenderSystem extends ImmediateRenderSystem implements IObserver {
     private Vector3 aux1;
@@ -40,6 +41,8 @@ public class OrbitalElementsParticlesRenderSystem extends ImmediateRenderSystem 
 
     @Override
     protected void initShaderProgram() {
+        Gdx.gl.glEnable(GL30.GL_POINT_SPRITE);
+        Gdx.gl.glEnable(GL30.GL_VERTEX_PROGRAM_POINT_SIZE);
     }
 
     @Override
@@ -104,11 +107,6 @@ public class OrbitalElementsParticlesRenderSystem extends ImmediateRenderSystem 
             }
 
             if (curr != null) {
-                // Enable gl_PointCoord
-                Gdx.gl20.glEnable(34913);
-                // Enable point sizes
-                Gdx.gl20.glEnable(0x8642);
-
                 ShaderProgram shaderProgram = getShaderProgram();
 
                 boolean stereoHw = GlobalConf.program.isStereoHalfWidth();

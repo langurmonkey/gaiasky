@@ -7,7 +7,6 @@ package gaia.cu9.ari.gaiaorbit.render.system;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.VertexAttribute;
 import com.badlogic.gdx.graphics.VertexAttributes.Usage;
 import com.badlogic.gdx.graphics.glutils.ShaderProgram;
@@ -21,7 +20,7 @@ import gaia.cu9.ari.gaiaorbit.scenegraph.Particle;
 import gaia.cu9.ari.gaiaorbit.scenegraph.SceneGraphNode.RenderGroup;
 import gaia.cu9.ari.gaiaorbit.scenegraph.camera.ICamera;
 import gaia.cu9.ari.gaiaorbit.util.gdx.mesh.IntMesh;
-import org.lwjgl.opengl.GL11;
+import org.lwjgl.opengl.GL30;
 
 import java.util.Comparator;
 
@@ -38,6 +37,9 @@ public class LineRenderSystem extends ImmediateRenderSystem {
 
     @Override
     protected void initShaderProgram() {
+        Gdx.gl.glEnable(GL30.GL_LINE_SMOOTH);
+        Gdx.gl.glEnable(GL30.GL_LINE_WIDTH);
+        Gdx.gl.glHint(GL30.GL_NICEST, GL30.GL_LINE_SMOOTH_HINT);
     }
 
     @Override
@@ -82,11 +84,6 @@ public class LineRenderSystem extends ImmediateRenderSystem {
 
     @Override
     public void renderStud(Array<IRenderable> renderables, ICamera camera, double t) {
-        // Enable GL_LINE_SMOOTH
-        Gdx.gl20.glEnable(GL11.GL_LINE_SMOOTH);
-        Gdx.gl.glHint(GL20.GL_NICEST, GL11.GL_LINE_SMOOTH_HINT);
-        // Enable GL_LINE_WIDTH
-        Gdx.gl20.glEnable(GL20.GL_LINE_WIDTH);
 
         shaderProgram = getShaderProgram();
 

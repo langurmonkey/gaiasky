@@ -21,6 +21,7 @@ import gaia.cu9.ari.gaiaorbit.util.GlobalConf;
 import gaia.cu9.ari.gaiaorbit.util.gdx.mesh.IntMesh;
 import gaia.cu9.ari.gaiaorbit.util.math.Vector3d;
 import org.lwjgl.opengl.GL11;
+import org.lwjgl.opengl.GL30;
 
 /**
  * Renders vertices using a VBO.
@@ -46,6 +47,14 @@ public class VertGPURenderSystem<T extends IGPUVertsRenderable> extends Immediat
 
     @Override
     protected void initShaderProgram() {
+        if(isLine()){
+            Gdx.gl.glEnable(GL30.GL_LINE_SMOOTH);
+            Gdx.gl.glEnable(GL30.GL_LINE_WIDTH);
+            Gdx.gl.glHint(GL30.GL_NICEST, GL30.GL_LINE_SMOOTH_HINT);
+        }else if(isPoint()){
+            Gdx.gl.glEnable(GL30.GL_POINT_SPRITE);
+            Gdx.gl.glEnable(GL30.GL_VERTEX_PROGRAM_POINT_SIZE);
+        }
     }
 
     @Override

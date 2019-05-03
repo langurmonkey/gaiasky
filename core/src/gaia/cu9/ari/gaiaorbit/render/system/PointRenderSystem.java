@@ -5,6 +5,7 @@
 
 package gaia.cu9.ari.gaiaorbit.render.system;
 
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.VertexAttribute;
 import com.badlogic.gdx.graphics.VertexAttributes.Usage;
@@ -16,6 +17,7 @@ import gaia.cu9.ari.gaiaorbit.render.IRenderable;
 import gaia.cu9.ari.gaiaorbit.scenegraph.SceneGraphNode.RenderGroup;
 import gaia.cu9.ari.gaiaorbit.scenegraph.camera.ICamera;
 import gaia.cu9.ari.gaiaorbit.util.gdx.mesh.IntMesh;
+import org.lwjgl.opengl.GL30;
 
 public class PointRenderSystem extends ImmediateRenderSystem {
     protected ICamera camera;
@@ -32,6 +34,8 @@ public class PointRenderSystem extends ImmediateRenderSystem {
 
     @Override
     protected void initShaderProgram() {
+        Gdx.gl.glEnable(GL30.GL_POINT_SPRITE);
+        Gdx.gl.glEnable(GL30.GL_VERTEX_PROGRAM_POINT_SIZE);
     }
 
     @Override

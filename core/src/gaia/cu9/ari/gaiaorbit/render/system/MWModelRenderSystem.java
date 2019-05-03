@@ -27,6 +27,7 @@ import gaia.cu9.ari.gaiaorbit.util.gdx.mesh.IntMesh;
 import gaia.cu9.ari.gaiaorbit.util.math.MathUtilsd;
 import gaia.cu9.ari.gaiaorbit.util.math.StdRandom;
 import gaia.cu9.ari.gaiaorbit.util.tree.LoadStatus;
+import org.lwjgl.opengl.GL30;
 
 public class MWModelRenderSystem extends ImmediateRenderSystem implements IObserver {
     private Vector3 aux3f1;
@@ -41,6 +42,9 @@ public class MWModelRenderSystem extends ImmediateRenderSystem implements IObser
 
     @Override
     protected void initShaderProgram() {
+        Gdx.gl.glEnable(GL30.GL_POINT_SPRITE);
+        Gdx.gl.glEnable(GL30.GL_VERTEX_PROGRAM_POINT_SIZE);
+
         for (ShaderProgram shaderProgram : programs) {
             shaderProgram.begin();
             shaderProgram.setUniformf("u_pointAlphaMin", 0.1f);
@@ -157,11 +161,6 @@ public class MWModelRenderSystem extends ImmediateRenderSystem implements IObser
                 // RENDER
                 float alpha = getAlpha(mw);
                 if (alpha > 0) {
-                    // Enable gl_PointCoord
-                    Gdx.gl20.glEnable(34913);
-                    // Enable point sizes
-                    Gdx.gl20.glEnable(0x8642);
-
                     ShaderProgram shaderProgram = getShaderProgram();
 
                     shaderProgram.begin();

@@ -539,12 +539,11 @@ public class SceneGraphRenderer extends AbstractRenderer implements IProcessRend
         // GALAXY
         mwrs = new MWModelRenderSystem(RenderGroup.GALAXY, alphas, galaxyPointShaders);
         AbstractRenderSystem milkyWayProc = mwrs;
-        //AbstractRenderSystem milkyWayProc = new MilkyWayRenderSystem(RenderGroup.GALAXY, alphas, modelBatchDefault, galaxyPointShaders, mwNebulaShaders);
-        //milkyWayProc.addPreRunnables(additiveBlendR, depthTestR, noDepthWritesR);
 
         // PARTICLE EFFECTS
         AbstractRenderSystem particleEffectsProc = new ParticleEffectsRenderSystem(null, alphas, particleEffectShaders);
-        particleEffectsProc.addPreRunnables(regularBlendR, noDepthTestR);
+        particleEffectsProc.addPreRunnables(additiveBlendR, noDepthTestR);
+        particleEffectsProc.addPostRunnables(regularBlendR);
 
         // PARTICLE GROUP
         AbstractRenderSystem particleGroupProc = new ParticleGroupRenderSystem(RenderGroup.PARTICLE_GROUP, alphas, particleGroupShaders);

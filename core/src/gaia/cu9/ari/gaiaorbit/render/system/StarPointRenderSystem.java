@@ -5,10 +5,8 @@
 
 package gaia.cu9.ari.gaiaorbit.render.system;
 
-import com.badlogic.gdx.Application.ApplicationType;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.VertexAttribute;
 import com.badlogic.gdx.graphics.VertexAttributes.Usage;
 import com.badlogic.gdx.graphics.glutils.ShaderProgram;
@@ -27,6 +25,7 @@ import gaia.cu9.ari.gaiaorbit.scenegraph.camera.ICamera;
 import gaia.cu9.ari.gaiaorbit.util.GlobalConf;
 import gaia.cu9.ari.gaiaorbit.util.coord.AstroUtils;
 import gaia.cu9.ari.gaiaorbit.util.gdx.mesh.IntMesh;
+import org.lwjgl.opengl.GL30;
 
 public class StarPointRenderSystem extends ImmediateRenderSystem implements IObserver {
     private final double BRIGHTNESS_FACTOR;
@@ -50,6 +49,9 @@ public class StarPointRenderSystem extends ImmediateRenderSystem implements IObs
 
     @Override
     protected void initShaderProgram() {
+        Gdx.gl.glEnable(GL30.GL_POINT_SPRITE);
+        Gdx.gl.glEnable(GL30.GL_VERTEX_PROGRAM_POINT_SIZE);
+
         pointAlpha = new float[] { GlobalConf.scene.POINT_ALPHA_MIN, GlobalConf.scene.POINT_ALPHA_MIN + GlobalConf.scene.POINT_ALPHA_MAX };
 
         for (ShaderProgram p : programs) {
@@ -132,15 +134,6 @@ public class StarPointRenderSystem extends ImmediateRenderSystem implements IObs
             POINT_UPDATE_FLAG = false;
         }
         if (!camera.getMode().isGaiaFov()) {
-            if (Gdx.app.getType() == ApplicationType.Desktop) {
-                // Enable gl_PointCoord
-                Gdx.gl20.glEnable(34913);
-                // Enable point sizes
-                Gdx.gl20.glEnable(0x8642);
-            }
-
-            // Additive blending
-            Gdx.gl20.glBlendFunc(GL20.GL_ONE, GL20.GL_ONE);
             int fovmode = camera.getMode().getGaiaFovMode();
 
             ShaderProgram shaderProgram = getShaderProgram();
@@ -165,9 +158,6 @@ public class StarPointRenderSystem extends ImmediateRenderSystem implements IObs
             curr.mesh.setVertices(tempVerts, 0, curr.vertexIdx);
             curr.mesh.render(shaderProgram, ShapeType.Point.getGlType());
             shaderProgram.end();
-
-            // Restore
-            Gdx.gl.glBlendFunc(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA);
         }
 
     }
