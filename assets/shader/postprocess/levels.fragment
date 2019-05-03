@@ -13,6 +13,7 @@ uniform float u_saturation = 1.0;
 uniform float u_hue = 1.0;
 uniform float u_gamma = 2.2;
 uniform float u_exposure = 2.5;
+uniform float u_avgLuma, u_maxLuma;
 
 in vec2 v_texCoords;
 out vec4 fragColor;
@@ -39,10 +40,42 @@ vec3 hsv2rgb(vec3 c)
     return c.z * mix(K.xxx, clamp(p - K.xxx, 0.0, 1.0), c.y);
 }
 
+/// <summary>
+/// Convert an sRGB pixel into a CIE xyY (xy = chroma, Y = luminance).
+/// <summary>
+vec3 RGB2xyY (vec3 rgb)
+{
+    const mat3 RGB2XYZ = mat3(0.4124, 0.3576, 0.1805,
+    0.2126, 0.7152, 0.0722,
+    0.0193, 0.1192, 0.9505);
+    vec3 XYZ = RGB2XYZ * rgb;
+
+    // XYZ to xyY
+    return vec3(XYZ.x / (XYZ.x + XYZ.y + XYZ.z),
+    XYZ.y / (XYZ.x + XYZ.y + XYZ.z),
+    XYZ.y);
+}
+
+/// <summary>
+/// Convert a CIE xyY value into sRGB.
+/// <summary>
+vec3 xyY2RGB (vec3 xyY)
+{
+    // xyY to XYZ
+    vec3 XYZ = vec3((xyY.z / xyY.y) * xyY.x,
+    xyY.z,
+    (xyY.z / xyY.y) * (1.0 - xyY.x - xyY.y));
+
+    const mat3 XYZ2RGB = mat3(3.2406, -1.5372, -0.4986,
+    -0.9689, 1.8758, 0.0415,
+    0.0557, -0.2040, 1.0570);
+
+    return XYZ2RGB * XYZ;
+}
+
+
 void main() {
     vec3 pixelColor = texture(u_texture0, v_texCoords).rgb;
-
-    float luma = luminance(pixelColor);
 
     // Apply contrast
     pixelColor = ((pixelColor - 0.5) * max(u_contrast, 0.0)) + 0.5;
@@ -59,8 +92,24 @@ void main() {
     pixelColor += u_brightness;
 
     // HDR tone mapping
-    if(u_exposure > 0.0)
-        pixelColor = 1.0 - exp2(-pixelColor * u_exposure);
+    if(u_exposure > 0.0){
+        float scale = 0.4;
+        float lwhite = u_maxLuma * u_maxLuma;
+        float luma = luminance(pixelColor);
+
+        float L = (scale / u_avgLuma) * luma;
+        float Ld = (L * (1.0 + L / u_maxLuma)) / (1.0 + L);
+
+        // Ld is in luminance space, so apply the scale factor to the xyY converted
+        // values from RGB space, then convert back from xyY to RGB.
+        vec3 xyY = RGB2xyY(pixelColor);
+        xyY.z *= Ld;
+        pixelColor = xyY2RGB(xyY);
+
+        //pixelColor = (pixelColor / luma) * Ld;
+
+        //pixelColor = 1.0 - exp2(-pixelColor * u_exposure);
+    }
 
     // Gamma correction
     pixelColor = pow(pixelColor, vec3(1.0 / u_gamma));

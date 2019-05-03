@@ -22,7 +22,6 @@
 package gaia.cu9.ari.gaiaorbit.util.gdx.contrib.postprocess.effects;
 
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.glutils.FloatFrameBuffer;
 import com.badlogic.gdx.graphics.glutils.FloatTextureData;
@@ -34,7 +33,10 @@ import gaia.cu9.ari.gaiaorbit.util.gdx.contrib.postprocess.filters.Copy;
 import gaia.cu9.ari.gaiaorbit.util.gdx.contrib.postprocess.filters.LevelsFilter;
 import gaia.cu9.ari.gaiaorbit.util.gdx.contrib.postprocess.filters.Luma;
 import gaia.cu9.ari.gaiaorbit.util.gdx.contrib.utils.GaiaSkyFrameBuffer;
+import org.lwjgl.BufferUtils;
+import org.lwjgl.opengl.GL20;
 import org.lwjgl.opengl.GL30;
+import org.lwjgl.opengl.GL32;
 
 import java.nio.ByteBuffer;
 import java.nio.FloatBuffer;
@@ -46,9 +48,13 @@ import java.nio.FloatBuffer;
  * @author tsagrista
  */
 public final class Levels extends PostProcessorEffect {
-    private static final int LUMA_SIZE = 400;
+    private static final int LUMA_SIZE = 300;
     private LevelsFilter levels;
     private Luma luma;
+    private float lumaMax = 0.5f, lumaAvg = 0.5f;
+    private float currLumaMax = 0.5f, currLumaAvg = 0.5f;
+    // Delta lumas per second
+    private float dLuma = 1f;
     Copy copy;
     private FrameBuffer lumaBuffer;
 
@@ -61,7 +67,7 @@ public final class Levels extends PostProcessorEffect {
         copy = new Copy();
 
         GLFrameBuffer.FrameBufferBuilder fbb = new GLFrameBuffer.FrameBufferBuilder(LUMA_SIZE, LUMA_SIZE);
-        fbb.addColorTextureAttachment(GL30.GL_RGBA16F, GL30.GL_RGBA, GL30.GL_FLOAT);
+        fbb.addColorTextureAttachment(GL30.GL_RGBA32F, GL30.GL_RGBA, GL30.GL_FLOAT);
         lumaBuffer = new GaiaSkyFrameBuffer(fbb);
         lumaBuffer.getColorBufferTexture().setFilter(Texture.TextureFilter.MipMapLinearLinear, Texture.TextureFilter.MipMapLinearLinear);
         //lumaBuffer = new FloatFrameBuffer(LUMA_SIZE, LUMA_SIZE, false);
@@ -145,11 +151,8 @@ public final class Levels extends PostProcessorEffect {
         levels.rebind();
     }
 
-    //float[] pxls = new float[LUMA_SIZE * LUMA_SIZE * 4];
-    //ByteBuffer pixels = ByteBuffer.allocateDirect(LUMA_SIZE * LUMA_SIZE * 4 * 4);
-    //FloatBuffer pixelsf = FloatBuffer.allocate(LUMA_SIZE * LUMA_SIZE * 4);
+    FloatBuffer pixels = BufferUtils.createFloatBuffer(LUMA_SIZE * LUMA_SIZE * 4);
 
-    boolean out = true;
     @Override
     public void render(FrameBuffer src, FrameBuffer dest, GaiaSkyFrameBuffer main) {
         restoreViewport(dest);
@@ -158,22 +161,53 @@ public final class Levels extends PostProcessorEffect {
 
         // Actual levels
         levels.setInput(src).setOutput(dest).render();
-        //copy.setInput(lumaBuffer).setOutput(dest).render();
 
         // Read out data
-       // if(true) {
-       //     Gdx.app.postRunnable(() -> {
-       //         if(out) {
-       //             lumaBuffer.begin();
-       //             //ImageRenderer.renderToImageGl20("/tmp/", "img.jpg", 400, 400);
-       //             Gdx.gl.glPixelStorei(GL20.GL_PACK_ALIGNMENT, 1);
-       //             Gdx.gl.glReadPixels(1, 1, 400, 400, GL30.GL_RGBA, GL20.GL_UNSIGNED_BYTE, pixels);
-       //             lumaBuffer.end();
+        Gdx.app.postRunnable(() -> {
+            lumaBuffer.begin();
+            GL30.glReadPixels(0, 0, LUMA_SIZE, LUMA_SIZE, GL30.GL_RGBA, GL30.GL_FLOAT, pixels);
+            lumaBuffer.end();
 
-       //             System.out.println(pixels.get(100));
-       //         }
-       //     });
-       // }
+            computeMaxAvg(pixels);
 
+            // Slowly move towards target luma values
+            float dl = dLuma * Gdx.graphics.getDeltaTime();
+            currLumaAvg = applyDelta(dl * 0.4f, currLumaAvg, lumaAvg);
+            currLumaMax = applyDelta(dl * 15f, currLumaMax, lumaMax);
+            levels.setAvgMaxLuma(currLumaAvg, currLumaMax);
+        });
+    }
+
+    private float applyDelta(float delta, float current, float target){
+        if(current > target){
+            return current - Math.min(delta, current - target);
+        } else {
+            return current + Math.min(delta, target - current);
+        }
+    }
+
+    private void computeMaxAvg(FloatBuffer buff) {
+        buff.rewind();
+        double avg = 0;
+        double max = -Double.MIN_VALUE;
+        int i = 1;
+        while(buff.hasRemaining()) {
+            double v = (double) buff.get();
+
+            // Skip g, b, a
+            buff.get();
+            buff.get();
+            buff.get();
+
+            if(!Double.isNaN(v)) {
+                avg = avg + (v - avg) / (i + 1);
+                max = v > max ? v : max;
+                i++;
+            }
+        }
+
+        lumaMax = (float) max;
+        lumaAvg = (float) avg;
+        buff.clear();
     }
 }

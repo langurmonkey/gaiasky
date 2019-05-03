@@ -34,6 +34,7 @@ public final class LevelsFilter extends Filter<LevelsFilter> {
     private float hue = 1.0f;
     private float gamma = 1.0f;
     private float exposure = 1.0f;
+    private float avgLuma, maxLuma;
 
     public enum Param implements Parameter {
         // @formatter:off
@@ -43,6 +44,8 @@ public final class LevelsFilter extends Filter<LevelsFilter> {
         Saturation("u_saturation", 0),
         Hue("u_hue", 0),
         Exposure("u_exposure", 0),
+        AvgLuma("u_avgLuma", 0),
+        MaxLuma("u_maxLuma", 0),
         Gamma("u_gamma", 0);
         // @formatter:on
 
@@ -130,6 +133,13 @@ public final class LevelsFilter extends Filter<LevelsFilter> {
         setParam(Param.Exposure, this.exposure);
     }
 
+    public void setAvgMaxLuma(float avgLuma, float maxLuma){
+        this.avgLuma = avgLuma;
+        this.maxLuma = maxLuma;
+        setParam(Param.AvgLuma, this.avgLuma);
+        setParam(Param.MaxLuma, this.maxLuma);
+    }
+
     @Override
     public void rebind() {
         // reimplement super to batch every parameter
@@ -140,6 +150,8 @@ public final class LevelsFilter extends Filter<LevelsFilter> {
         setParams(Param.Hue, hue);
         setParams(Param.Gamma, gamma);
         setParams(Param.Exposure, exposure);
+        setParams(Param.AvgLuma, this.avgLuma);
+        setParams(Param.MaxLuma, this.maxLuma);
         endParams();
     }
 
