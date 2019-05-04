@@ -51,11 +51,8 @@ public final class Levels extends PostProcessorEffect {
     private static final int LUMA_SIZE = 300;
     private LevelsFilter levels;
     private Luma luma;
-    private float lumaMax = 0.5f, lumaAvg = 0.5f;
-    private float currLumaMax = 0.5f, currLumaAvg = 0.5f;
-    // Delta lumas per second
-    private float dLuma = 1f;
-    Copy copy;
+    private float lumaMax = 0.9f, lumaAvg = 0.5f;
+    private float currLumaMax = -1f, currLumaAvg = -1f;
     private FrameBuffer lumaBuffer;
 
     /**
@@ -64,13 +61,11 @@ public final class Levels extends PostProcessorEffect {
     public Levels() {
         levels = new LevelsFilter();
         luma = new Luma();
-        copy = new Copy();
 
         GLFrameBuffer.FrameBufferBuilder fbb = new GLFrameBuffer.FrameBufferBuilder(LUMA_SIZE, LUMA_SIZE);
         fbb.addColorTextureAttachment(GL30.GL_RGBA32F, GL30.GL_RGBA, GL30.GL_FLOAT);
         lumaBuffer = new GaiaSkyFrameBuffer(fbb);
         lumaBuffer.getColorBufferTexture().setFilter(Texture.TextureFilter.MipMapLinearLinear, Texture.TextureFilter.MipMapLinearLinear);
-        //lumaBuffer = new FloatFrameBuffer(LUMA_SIZE, LUMA_SIZE, false);
 
         luma.setImageSize(LUMA_SIZE, LUMA_SIZE);
         luma.setTexelSize(1f / LUMA_SIZE, 1f / LUMA_SIZE);
@@ -171,19 +166,18 @@ public final class Levels extends PostProcessorEffect {
             computeMaxAvg(pixels);
 
             // Slowly move towards target luma values
-            float dl = dLuma * Gdx.graphics.getDeltaTime();
-            currLumaAvg = applyDelta(dl * 0.4f, currLumaAvg, lumaAvg);
-            currLumaMax = applyDelta(dl * 15f, currLumaMax, lumaMax);
-            levels.setAvgMaxLuma(currLumaAvg, currLumaMax);
+            if (currLumaAvg < 0) {
+                currLumaAvg = lumaAvg;
+                currLumaMax = lumaMax;
+            } else {
+                float dt = Gdx.graphics.getDeltaTime();
+                // Low pass filter
+                float smoothing = 0.5f;
+                currLumaAvg += dt * (lumaAvg - currLumaAvg) / smoothing;
+                currLumaMax += dt * (lumaMax - currLumaMax) / smoothing;
+                levels.setAvgMaxLuma(currLumaAvg, currLumaMax);
+            }
         });
-    }
-
-    private float applyDelta(float delta, float current, float target){
-        if(current > target){
-            return current - Math.min(delta, current - target);
-        } else {
-            return current + Math.min(delta, target - current);
-        }
     }
 
     private void computeMaxAvg(FloatBuffer buff) {
@@ -191,7 +185,7 @@ public final class Levels extends PostProcessorEffect {
         double avg = 0;
         double max = -Double.MIN_VALUE;
         int i = 1;
-        while(buff.hasRemaining()) {
+        while (buff.hasRemaining()) {
             double v = (double) buff.get();
 
             // Skip g, b, a
@@ -199,7 +193,7 @@ public final class Levels extends PostProcessorEffect {
             buff.get();
             buff.get();
 
-            if(!Double.isNaN(v)) {
+            if (!Double.isNaN(v)) {
                 avg = avg + (v - avg) / (i + 1);
                 max = v > max ? v : max;
                 i++;

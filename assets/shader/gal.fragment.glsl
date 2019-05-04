@@ -18,7 +18,7 @@ out vec4 fragColor;
 
 #define distfac 3.24e-8 / 60000.0
 #define distfacinv 60000.0 / 3.23e-8
-#define light_decay 0.5
+#define light_decay 5.0
 
 
 vec4 galaxyTexture(vec2 tc){
@@ -26,21 +26,19 @@ vec4 galaxyTexture(vec2 tc){
 }
 
 float light(float distance_center, float decay) {
-    return 1.0 - pow(distance_center, decay);
+    return pow(distance_center, decay);
 }
 
 vec4 drawSimple(vec2 tc) {
-	float dist = distance (vec2 (0.5), tc) * 2.0;
-	float light = light(dist, light_decay);
+	float dist = distance(vec2(0.5), tc) * 2.0;
+	if(dist > 0.9){
+		discard;
+	}
+	float light = light(1.0 - dist, light_decay);
 	return vec4(v_color.rgb, v_color.a) * light;
 }
 
 
 void main() {
-
-	// float factor = smoothstep(distfacinv/8.0, distfacinv, u_distance);
 	fragColor = drawSimple(v_texCoords) * u_alpha;
-
-    // Debug! - visualise depth buffer
-    //gl_FragColor = vec4(vec3(gl_FragCoord.z), 1.0f);
 }
