@@ -142,7 +142,7 @@ in all systems but you need to unpack it yourself and create the desired
 shortcuts.
 
 In **Windows**, use an archiver software (7zip, iZArc, etc.) to unpack it.
-When using the `tgz` package, uou need to install the [JRE8](http://www.oracle.com/technetwork/java/javase/downloads/jre8-downloads-2133155.html) yourself.
+When using the `tgz` package, uou need to install the [JRE11](https://jdk.java.net/java-se-ri/11) yourself.
 
 In **Linux** and **macOS**, you can use:
 
@@ -162,7 +162,7 @@ provided in your operating system or use the CLI command `gaiasky`.
 
 In order to compile and run Gaia Sky from source, you need the following installed in your system:
 
-- `JDK8`
+- `JDK11`
 - `git`
 
 First, clone the [GitLab](https://gitlab.com/langurmonkey/gaiasky) repository:
@@ -220,9 +220,9 @@ The documentation project will be checked out in the `docs/` folder.
 ##  4. Copyright and licensing information
 
 This software is published and distributed under the MPL 2.0
-(Mozilla Public License 2.0). You can find the full license
-text here https://gitlab.com/langurmonkey/gaiasky/blob/master/LICENSE.md
-or visiting https://opensource.org/licenses/MPL-2.0
+(Mozilla Public License 2.0). You can find the [full license
+text here](/LICENSE.md)
+or visiting https://opensource.org/licenses/MPL-2.0.
 
 ##  5. Contact information
 
