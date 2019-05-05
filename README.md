@@ -40,11 +40,11 @@ This file contains the following sections:
 | **Memory**            | 4+ GB RAM                                                                      |
 | **Hard drive**        | 1 GB of free disk space                                                        |
 
-### 1.2 Installation and uninstallation
+### 1.2 Download and install
 
 Depending on your system and your personal preferences the installation
 procedure may vary. Below is a description of the various installation methods
-available. You can download the packages [here](https://zah.uni-heidelberg.de/gaia/outreach/gaiasky/downloads/).
+available. You can **download Gaia Sky** [here](https://zah.uni-heidelberg.de/gaia/outreach/gaiasky/downloads/).
 
 #### 1.2.1 Linux
 
@@ -133,7 +133,7 @@ you can use the provided uninstaller in the Gaia Sky folder.
 #### 1.2.3 macOS
 
 For macOS we provide a `gaiasky_macos_<version>.dmg` file
-which is installed by double-clicking on it and following the on-screen instructions. Get it [here](https://zah.uni-heidelberg.de/gaia/outreach/gaiasky/downloads/). Once unpacked, you can run it by clicking on it.
+which is installed by double-clicking on it and following the on-screen instructions. Get it [here](https://zah.uni-heidelberg.de/gaia/outreach/gaiasky/downloads/). Once unpacked, you can run it by clicking on the `GaiaSky` icon in your `/Applications` folder.
 
 #### 1.2.4 Compressed (TGZ) package
 
@@ -152,13 +152,12 @@ $  tar -zxvf gaiasky-<version>.tgz
 
 ##  2. Running instructions
 
-### 2.1 Running Gaia Sky
-
 In order to run the program just click on the shortcut
 provided in your operating system or use the CLI command `gaiasky`.
+If you want to build the sources and run the repository version, keep reading.
 
 
-### 2.2 Running from source
+### 2.1 Running from source
 
 In order to compile and run Gaia Sky from source, you need the following installed in your system:
 
@@ -171,13 +170,11 @@ First, clone the [GitLab](https://gitlab.com/langurmonkey/gaiasky) repository:
 $  git clone https://gitlab.com/langurmonkey/gaiasky.git
 ```
 
-
-#### 2.2.2 Running
-
-Finally, run Gaia Sky (Linux, macOS) with the provided script:
+Then, run Gaia Sky (Linux, macOS) with the provided script:
 
 ```
-$  gaiasky
+$  cd gaiasky
+$  ./gaiasky
 ```
 
 On Windows, do:
@@ -189,11 +186,11 @@ On Windows, do:
 Et voilà ! The bleeding edge Gaia Sky is running in your machine.
 
 
-### 2.4 CLI arguments
+### 2.2 CLI arguments
 
 Run `gaiasky -h` or `man gaiasky` to find out about how to launch Gaia Sky and what arguments are accepted.
 
-### 2.5 Getting the data
+### 2.3 Getting the data
 
 As of version `2.1.0`, Gaia Sky offers an automated way to download all data packs and catalogs from within the application. When Gaia Sky starts, if no base data or catalogs are found, the downloader window will prompt automatically. Otherwise, you can force the download window at startup with the `-d` argument. Just select the data packs and catalogs that you want to download, press `Download now` and wait for the process to finish.
 
@@ -232,7 +229,7 @@ the latest versions and the latest information on Gaia Sky.
 
 ##  6. Acknowledgements
 
-The latest acknowledgements are always in the [ACKNOWLEDGEMENTS.md](https://gitlab.com/langurmonkey/gaiasky/blob/master/ACKNOWLEDGEMENTS.md) file.
+The latest acknowledgements are always in the [ACKNOWLEDGEMENTS.md](/ACKNOWLEDGEMENTS.md) file.
 
 ##  7. Gaia Sky VR
 
