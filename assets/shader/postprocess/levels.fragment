@@ -19,31 +19,9 @@ uniform float u_exposure = 2.5;
 
 #ifdef toneMappingAuto
 uniform float u_avgLuma, u_maxLuma;
-#endif //toneMappingAuto
-
-in vec2 v_texCoords;
-out vec4 fragColor;
 
 float luminance(vec3 color){
     return dot(color, vec3(0.2126, 0.7152, 0.0722));
-}
-
-vec3 rgb2hsv(vec3 c)
-{
-    vec4 K = vec4(0.0, -1.0 / 3.0, 2.0 / 3.0, -1.0);
-    vec4 p = mix(vec4(c.bg, K.wz), vec4(c.gb, K.xy), step(c.b, c.g));
-    vec4 q = mix(vec4(p.xyw, c.r), vec4(c.r, p.yzx), step(p.x, c.r));
-
-    float d = q.x - min(q.w, q.y);
-    float e = 1.0e-10;
-    return vec3(abs(q.z + (q.w - q.y) / (6.0 * d + e)), d / (q.x + e), q.x);
-}
-
-vec3 hsv2rgb(vec3 c)
-{
-    vec4 K = vec4(1.0, 2.0 / 3.0, 1.0 / 3.0, 3.0);
-    vec3 p = abs(fract(c.xxx + K.xyz) * 6.0 - K.www);
-    return c.z * mix(K.xxx, clamp(p - K.xxx, 0.0, 1.0), c.y);
 }
 
 /// <summary>
@@ -79,6 +57,50 @@ vec3 xyY2RGB (vec3 xyY)
     return XYZ2RGB * XYZ;
 }
 
+// Reinhard tone mapping using average and maximum luminosity of previous frame
+vec3 reinhardToneMapping(vec3 pixelColor, float scale){
+    float lwhite = u_maxLuma * u_maxLuma;
+    float luma = luminance(pixelColor);
+
+    float L = (scale / u_avgLuma) * luma;
+    float Ld = (L * (1.0 + L / lwhite)) / (1.0 + L);
+
+    // Ld is in luminance space, so apply the scale factor to the xyY converted
+    // values from RGB space, then convert back from xyY to RGB.
+    vec3 xyY = RGB2xyY(pixelColor);
+    xyY.z *= Ld;
+    return xyY2RGB(xyY);
+}
+
+// Automatic exposure compensation
+vec3 autoExposureToneMapping(vec3 pixelColor){
+    float exposure = clamp(0.4 / u_avgLuma, 0.1, 1000.0);
+    return vec3(1.0 - exp2(-pixelColor * exposure));
+}
+#endif //toneMappingAuto
+
+in vec2 v_texCoords;
+out vec4 fragColor;
+
+
+vec3 rgb2hsv(vec3 c)
+{
+    vec4 K = vec4(0.0, -1.0 / 3.0, 2.0 / 3.0, -1.0);
+    vec4 p = mix(vec4(c.bg, K.wz), vec4(c.gb, K.xy), step(c.b, c.g));
+    vec4 q = mix(vec4(p.xyw, c.r), vec4(c.r, p.yzx), step(p.x, c.r));
+
+    float d = q.x - min(q.w, q.y);
+    float e = 1.0e-10;
+    return vec3(abs(q.z + (q.w - q.y) / (6.0 * d + e)), d / (q.x + e), q.x);
+}
+
+vec3 hsv2rgb(vec3 c)
+{
+    vec4 K = vec4(1.0, 2.0 / 3.0, 1.0 / 3.0, 3.0);
+    vec3 p = abs(fract(c.xxx + K.xyz) * 6.0 - K.www);
+    return c.z * mix(K.xxx, clamp(p - K.xxx, 0.0, 1.0), c.y);
+}
+
 
 void main() {
     vec3 pixelColor = texture(u_texture0, v_texCoords).rgb;
@@ -99,20 +121,8 @@ void main() {
 
     // HDR tone mapping
     #ifdef toneMappingAuto
-    float scale = 0.2;
-    float lwhite = u_maxLuma * u_maxLuma;
-    float luma = luminance(pixelColor);
-
-    float L = (scale / u_avgLuma) * luma;
-    float Ld = (L * (1.0 + L / u_maxLuma)) / (1.0 + L);
-
-    // Ld is in luminance space, so apply the scale factor to the xyY converted
-    // values from RGB space, then convert back from xyY to RGB.
-    vec3 xyY = RGB2xyY(pixelColor);
-    xyY.z *= Ld;
-    pixelColor = xyY2RGB(xyY);
-
-    //pixelColor = (pixelColor / luma) * Ld;
+    //pixelColor = reinhardToneMapping(pixelColor, 0.2);
+    pixelColor = autoExposureToneMapping(pixelColor);
     #endif //toneMappingAuto
 
     #ifdef toneMappingExposure

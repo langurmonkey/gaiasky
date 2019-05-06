@@ -9,18 +9,19 @@
 -  Dr. Martin Altmann for providing the Gaia orbit data
 -  [Stefan Payne-Wardenaar](http://twitter.com/StefanPWinc) for the data used in the Milky Way model
 -  [DPAC](https://www.cosmos.esa.int/web/gaia/dpac/consortium) and the Gaia Collaboration
+-  The available catalogs and datasets have their own acknowledgements in the form of links to the original source and/or papers
 
 ## Libraries and code
 
 -  [Libgdx](libgdx.badlogicgames.com)
 -  [libgdx-contribs-postprocessing](https://github.com/manuelbua/libgdx-contribs/tree/master/postprocessing)
 -  [VisUI](https://github.com/kotcrab/vis-editor/wiki/VisUI) for some widgets (licensed under the Apache license)
--  [PgsLookAndFeel](http://www.pagosoft.com/projects/pgslookandfeel/)
 -  [VSOP87 code generator tool](http://neoprogrammics.com/vsop87/source_code_generator_tool/) for the base VSOP87 java code
 -  Mark Taylor's [STIL](http://www.star.bristol.ac.uk/~mbt/stil/) library
 -  The [Jython Project](http://www.jython.org/)
--  [ernieyu](https://github.com/ernieyu/) for the Java Swing [range slider](https://github.com/ernieyu/Swing-range-slider)
 -  Sergei Klioner and Robin Geyer (TU Dresden) for the idea and octave implementation of the gravitational waves effect
+-  [Py4J](https://www.py4j.org)
+
 
 ## Textures, models, music and other assets
 

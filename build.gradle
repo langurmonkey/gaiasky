@@ -34,7 +34,6 @@ allprojects {
         aiVersion = "1.5.0"
         lwjglVersion = "3.2.1"
         jcommanderVersion = '1.72'
-        googleanalyticsjavaVersion = "1.1.2"
         slf4jVersion = "1.7.25"
         sparkjavaVersion = "2.7.2"
         gsonVersion = "2.8.0"
@@ -42,7 +41,6 @@ allprojects {
         compressVersion = "1.18"
         commonsioVersion = '2.6'
         py4jVersion = '0.10.8.1'
-        mailVersion = '1.6.2'
     }
 
     repositories {
@@ -148,7 +146,6 @@ project(":core") {
         compile group: "commons-io", name: "commons-io", version: "$commonsioVersion"
         compile "org.apache.commons:commons-compress:$compressVersion"
         compile "com.beust:jcommander:$jcommanderVersion"
-        compile "com.brsanthu:google-analytics-java:$googleanalyticsjavaVersion"
         compile "net.jafama:jafama:$jafamaVersion"
         
         compile group: "net.sf.py4j", name: "py4j", version: "$py4jVersion"

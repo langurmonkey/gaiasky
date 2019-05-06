@@ -2,6 +2,8 @@
 
 // UNIFORMS
 uniform float u_ar;
+uniform float u_falloff1;
+uniform float u_falloffFactor;
 
 // INPUT
 in vec4 v_col;
@@ -13,7 +15,7 @@ layout (location = 0) out vec4 fragColor;
 
 float programmatic(vec2 uv) {
     float falloff_center = 1.0 - clamp(distance(vec2(0.5, 0.5), uv) * 2.0, 0.0, 1.0);
-    return pow(falloff_center, 3.0) * 0.3 + falloff_center * 0.05;
+    return pow(falloff_center, u_falloff1) * u_falloffFactor;
 }
 
 void main() {

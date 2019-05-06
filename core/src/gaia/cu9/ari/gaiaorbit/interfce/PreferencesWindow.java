@@ -73,6 +73,7 @@ public class PreferencesWindow extends GenericDialog {
     private DatasetsWidget dw;
 
     // Backup values
+    private GlobalConf.PostprocessConf.ToneMapping toneMappingBak;
     private float brightnessBak, contrastBak, hueBak, saturationBak, gammaBak, exposureBak, motionblurBak, bloomBak;
     private boolean lensflareBak, lightglowBak, debugInfoBak;
 
@@ -99,7 +100,7 @@ public class PreferencesWindow extends GenericDialog {
         final float tawidth = 400 * GlobalConf.SCALE_FACTOR;
         float tabwidth = (GlobalConf.SCALE_FACTOR > 1.5 ? 180 : 220) * GlobalConf.SCALE_FACTOR;
         float textwidth = 65 * GlobalConf.SCALE_FACTOR;
-        float scrollh = 330 * GlobalConf.SCALE_FACTOR;
+        float scrollh = 400 * GlobalConf.SCALE_FACTOR;
         float controlsscrollw = 450 * GlobalConf.SCALE_FACTOR;
         float controllsscrollh = 250 * GlobalConf.SCALE_FACTOR;
         float sliderWidth = textwidth * 3;
@@ -175,7 +176,7 @@ public class PreferencesWindow extends GenericDialog {
         Table mode = new Table();
 
         // Full screen mode resolutions
-        Array<DisplayMode> modes = new Array<DisplayMode>(Gdx.graphics.getDisplayModes());
+        Array<DisplayMode> modes = new Array<>(Gdx.graphics.getDisplayModes());
         modes.sort((o1, o2) -> Integer.compare(o2.height * o2.width, o1.height * o1.width));
         fullscreenResolutions = new OwnSelectBox<>(skin);
         fullscreenResolutions.setWidth(textwidth * 3.3f);
@@ -446,6 +447,8 @@ public class PreferencesWindow extends GenericDialog {
         hueBak = GlobalConf.postprocess.POSTPROCESS_HUE;
         saturationBak = GlobalConf.postprocess.POSTPROCESS_SATURATION;
         gammaBak = GlobalConf.postprocess.POSTPROCESS_GAMMA;
+        toneMappingBak = GlobalConf.postprocess.POSTPROCESS_TONEMAPPING_TYPE;
+        exposureBak = GlobalConf.postprocess.POSTPROCESS_EXPOSURE;
 
         /* Brightness */
         OwnLabel brightnessl = new OwnLabel(I18n.txt("gui.brightness"), skin, "default");
@@ -565,7 +568,8 @@ public class PreferencesWindow extends GenericDialog {
         /* Exposure */
         OwnLabel exposurel = new OwnLabel(I18n.txt("gui.exposure"), skin, "default");
         exposurel.setDisabled(GlobalConf.postprocess.POSTPROCESS_TONEMAPPING_TYPE != GlobalConf.PostprocessConf.ToneMapping.EXPOSURE);
-        Label exposureLabel = new OwnLabel(nf1.format(GlobalConf.postprocess.POSTPROCESS_EXPOSURE), skin);
+        OwnLabel exposureLabel = new OwnLabel(nf1.format(GlobalConf.postprocess.POSTPROCESS_EXPOSURE), skin);
+        exposureLabel.setDisabled(GlobalConf.postprocess.POSTPROCESS_TONEMAPPING_TYPE != GlobalConf.PostprocessConf.ToneMapping.EXPOSURE);
         Slider exposure = new OwnSlider(Constants.MIN_EXPOSURE, Constants.MAX_EXPOSURE, 0.1f, false, skin);
         exposure.setName("exposure");
         exposure.setWidth(sliderWidth);
@@ -584,8 +588,10 @@ public class PreferencesWindow extends GenericDialog {
             if (event instanceof ChangeEvent) {
                 GlobalConf.PostprocessConf.ToneMapping newTM = GlobalConf.PostprocessConf.ToneMapping.values()[toneMappingSelect.getSelectedIndex()];
                 EventManager.instance.post(Events.TONEMAPPING_TYPE_CMD, newTM, true);
-                exposurel.setDisabled(newTM != GlobalConf.PostprocessConf.ToneMapping.EXPOSURE);
-                exposure.setDisabled(newTM != GlobalConf.PostprocessConf.ToneMapping.EXPOSURE);
+                boolean disabled = newTM != GlobalConf.PostprocessConf.ToneMapping.EXPOSURE;
+                exposurel.setDisabled(disabled);
+                exposureLabel.setDisabled(disabled);
+                exposure.setDisabled(disabled);
                 return true;
             }
             return false;
@@ -1300,7 +1306,7 @@ public class PreferencesWindow extends GenericDialog {
         nsl = new OwnCheckBox(I18n.txt("gui.gaia.nsl"), skin, "radio", pad5);
         nsl.setChecked(!GlobalConf.data.REAL_GAIA_ATTITUDE);
 
-        new ButtonGroup<CheckBox>(real, nsl);
+        new ButtonGroup<>(real, nsl);
 
         // Add to table
         attitude.add(nsl).left().padBottom(pad5).row();
@@ -1741,6 +1747,8 @@ public class PreferencesWindow extends GenericDialog {
         EventManager.instance.post(Events.LENS_FLARE_CMD, lensflareBak, true);
         EventManager.instance.post(Events.LIGHT_SCATTERING_CMD, lightglowBak, true);
         EventManager.instance.post(Events.BLOOM_CMD, bloomBak, true);
+        EventManager.instance.post(Events.EXPOSURE_CMD, exposureBak, true);
+        EventManager.instance.post(Events.TONEMAPPING_TYPE_CMD, toneMappingBak, true);
         EventManager.instance.post(Events.SHOW_DEBUG_CMD, debugInfoBak);
     }
 

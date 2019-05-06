@@ -62,7 +62,7 @@ public class Star extends Particle {
             Texture lut = new Texture(GlobalConf.data.dataFile("tex/base/lut.jpg"));
             tex.setFilter(TextureFilter.Linear, TextureFilter.Linear);
 
-            Map<String, Object> params = new TreeMap<String, Object>();
+            Map<String, Object> params = new TreeMap<>();
             params.put("quality", 120l);
             params.put("diameter", 1d);
             params.put("flip", false);

@@ -21,6 +21,7 @@
 
 package gaia.cu9.ari.gaiaorbit.util.gdx.contrib.postprocess.filters;
 
+import com.badlogic.gdx.graphics.glutils.ShaderProgram;
 import com.badlogic.gdx.math.Vector2;
 import gaia.cu9.ari.gaiaorbit.util.gdx.contrib.utils.ShaderLoader;
 
@@ -29,7 +30,8 @@ public class Luma extends Filter<Luma> {
         // @formatter:off
         Texture0("u_texture0", 0),
         ImageSize("u_imageSize", 2),
-        TexelSize("u_texelSize", 2);
+        TexelSize("u_texelSize", 2),
+        LodLevel("u_lodLevel", 0);
         // @formatter:on
 
         private final String mnemonic;
@@ -52,11 +54,32 @@ public class Luma extends Filter<Luma> {
     }
 
     private Vector2 texelSize, imageSize;
+    private float lodLevel = 0;
+    private ShaderProgram programLuma, programAvg, programMax;
 
     public Luma() {
-        super(ShaderLoader.fromFile("screenspace", "luma"));
+        super(ShaderLoader.fromFile("screenspace", "luma", "#define LUMA"));
+        programLuma = program;
+        programAvg = ShaderLoader.fromFile("screenspace", "luma", "#define AVERAGE");
+        programMax = ShaderLoader.fromFile("screenspace", "luma", "#define MAX");
+
         texelSize = new Vector2();
         imageSize = new Vector2();
+    }
+
+    public void enableProgramLuma(){
+        this.program = programLuma;
+        rebind();
+    }
+
+    public void enableProgramAvg(){
+        this.program = programAvg;
+        rebind();
+    }
+
+    public void enableProgramMax(){
+        this.program = programMax;
+        rebind();
     }
 
     public void setImageSize(float w, float h){
@@ -68,11 +91,17 @@ public class Luma extends Filter<Luma> {
         setParam(Param.TexelSize, texelSize);
     }
 
+    public void setLodLevel(float lodLevel){
+        this.lodLevel = lodLevel;
+        setParam(Param.LodLevel, lodLevel);
+    }
+
     @Override
     public void rebind() {
         setParams(Param.Texture0, u_texture0);
         setParams(Param.TexelSize, texelSize);
         setParams(Param.ImageSize, texelSize);
+        setParams(Param.LodLevel, lodLevel);
         endParams();
     }
 

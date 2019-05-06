@@ -25,7 +25,9 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.glutils.FrameBuffer;
 import com.badlogic.gdx.graphics.glutils.GLFrameBuffer;
+import gaia.cu9.ari.gaiaorbit.GaiaSky;
 import gaia.cu9.ari.gaiaorbit.util.gdx.contrib.postprocess.PostProcessorEffect;
+import gaia.cu9.ari.gaiaorbit.util.gdx.contrib.postprocess.filters.Copy;
 import gaia.cu9.ari.gaiaorbit.util.gdx.contrib.postprocess.filters.LevelsFilter;
 import gaia.cu9.ari.gaiaorbit.util.gdx.contrib.postprocess.filters.Luma;
 import gaia.cu9.ari.gaiaorbit.util.gdx.contrib.utils.GaiaSkyFrameBuffer;
@@ -41,9 +43,12 @@ import java.nio.FloatBuffer;
  * @author tsagrista
  */
 public final class Levels extends PostProcessorEffect {
-    private static final int LUMA_SIZE = 300;
+    private static final int LUMA_SIZE = 500;
+    private int lumaLodLevels;
     private LevelsFilter levels;
     private Luma luma;
+    private Copy copy;
+
     private float lumaMax = 0.9f, lumaAvg = 0.5f;
     private float currLumaMax = -1f, currLumaAvg = -1f;
     private FrameBuffer lumaBuffer;
@@ -54,9 +59,18 @@ public final class Levels extends PostProcessorEffect {
     public Levels() {
         levels = new LevelsFilter();
         luma = new Luma();
+        copy = new Copy();
+
+        // Compute number of lod levels based on LUMA_SIZE
+        int size = LUMA_SIZE;
+        lumaLodLevels = 1;
+        while(size > 1){
+            size = (int) Math.floor(size / 2f);
+            lumaLodLevels++;
+        }
 
         GLFrameBuffer.FrameBufferBuilder fbb = new GLFrameBuffer.FrameBufferBuilder(LUMA_SIZE, LUMA_SIZE);
-        fbb.addColorTextureAttachment(GL30.GL_RGBA32F, GL30.GL_RGBA, GL30.GL_FLOAT);
+        fbb.addColorTextureAttachment(GL30.GL_RGB32F, GL30.GL_RGB, GL30.GL_FLOAT);
         lumaBuffer = new GaiaSkyFrameBuffer(fbb);
         lumaBuffer.getColorBufferTexture().setFilter(Texture.TextureFilter.MipMapLinearLinear, Texture.TextureFilter.MipMapLinearLinear);
 
@@ -151,7 +165,7 @@ public final class Levels extends PostProcessorEffect {
         levels.rebind();
     }
 
-    FloatBuffer pixels = BufferUtils.createFloatBuffer(LUMA_SIZE * LUMA_SIZE * 4);
+    FloatBuffer pixels = BufferUtils.createFloatBuffer(LUMA_SIZE * LUMA_SIZE * 3);
 
     @Override
     public void render(FrameBuffer src, FrameBuffer dest, GaiaSkyFrameBuffer main) {
@@ -159,32 +173,49 @@ public final class Levels extends PostProcessorEffect {
 
         if (levels.isToneMappingAuto()) {
             // Compute luminance texture and use it to work out max and avg luminance
-            luma.setInput(src).setOutput(lumaBuffer).render();
-            Gdx.app.postRunnable(() -> {
-                lumaBuffer.begin();
-                GL30.glReadPixels(0, 0, LUMA_SIZE, LUMA_SIZE, GL30.GL_RGBA, GL30.GL_FLOAT, pixels);
-                lumaBuffer.end();
-
-                computeMaxAvg(pixels);
-
-                // Slowly move towards target luma values
-                if (currLumaAvg < 0) {
-                    currLumaAvg = lumaAvg;
-                    currLumaMax = lumaMax;
-                } else {
-                    float dt = Gdx.graphics.getDeltaTime();
-                    // Low pass filter
-                    float smoothing = 0.5f;
-                    currLumaAvg += dt * (lumaAvg - currLumaAvg) / smoothing;
-                    currLumaMax += dt * (lumaMax - currLumaMax) / smoothing;
-                    levels.setAvgMaxLuma(currLumaAvg, currLumaMax);
-                }
-            });
+            computeLumaValuesCPU(src);
+            //copy.setInput(lumaBuffer).setOutput(dest).render();
         }
-
         // Actual levels
         levels.setInput(src).setOutput(dest).render();
 
+    }
+
+    private void lowPassFilter() {
+        // Slowly move towards target luma values
+        if (currLumaAvg < 0) {
+            currLumaAvg = lumaAvg;
+            currLumaMax = lumaMax;
+        } else {
+            float dt = Gdx.graphics.getDeltaTime();
+            // Low pass filter
+            float smoothing = 0.1f;
+            currLumaAvg += dt * (lumaAvg - currLumaAvg) / smoothing;
+            currLumaMax += dt * (lumaMax - currLumaMax) / smoothing;
+            levels.setAvgMaxLuma(currLumaAvg, currLumaMax);
+        }
+    }
+
+    private void computeLumaValuesCPU(FrameBuffer src) {
+        // Every 4th frame
+        if(GaiaSky.instance.frames % 4 == 0) {
+            // Render as is
+            luma.enableProgramLuma();
+            luma.setInput(src).setOutput(lumaBuffer).render();
+
+            lumaBuffer.getColorBufferTexture().bind();
+
+            // Get texture as is and compute avg/max in CPU - use with reinhardToneMapping()
+            //GL30.glGetTexImage(lumaBuffer.getColorBufferTexture().glTarget, 0, GL30.GL_RGB, GL30.GL_FLOAT, pixels);
+            //computeMaxAvg(pixels);
+
+            // Generate mipmap to get average - use with autoExposureToneMapping()
+            GL30.glGenerateMipmap(lumaBuffer.getColorBufferTexture().glTarget);
+            GL30.glGetTexImage(lumaBuffer.getColorBufferTexture().glTarget, lumaLodLevels - 1, GL30.GL_RGB, GL30.GL_FLOAT, pixels);
+            lumaAvg = pixels.get(0);
+
+            lowPassFilter();
+        }
     }
 
     private void computeMaxAvg(FloatBuffer buff) {
@@ -198,7 +229,6 @@ public final class Levels extends PostProcessorEffect {
             // Skip g, b, a
             buff.get();
             buff.get();
-            buff.get();
 
             if (!Double.isNaN(v)) {
                 avg = avg + (v - avg) / (i + 1);
@@ -207,8 +237,51 @@ public final class Levels extends PostProcessorEffect {
             }
         }
 
+        // Avoid very bright images by setting a minimum maximum luminosity
         lumaMax = (float) max;
         lumaAvg = (float) avg;
         buff.clear();
     }
+
+    private void computeLumaValuesMipMap(FrameBuffer src) {
+        // Average using mipmap
+        luma.enableProgramAvg();
+        lumaAvg = renderLumaMipMap(src);
+
+        // Max using mipmap
+        luma.enableProgramMax();
+        lumaMax = renderLumaMipMap(src);
+
+        lowPassFilter();
+    }
+
+    private float renderLumaMipMap(FrameBuffer src) {
+        int mipLevel = 1;
+        float lodLevel = 0;
+        int size = (int) Math.floor(LUMA_SIZE / 2f);
+        while (size >= 1f) {
+            luma.setImageSize(size, size);
+            luma.setTexelSize(1f / size, 1f / size);
+            luma.setLodLevel(lodLevel);
+
+            // Draw to lumaBuffer, copy texture to mipmap level later
+            luma.setInput(src).setOutput(lumaBuffer).render();
+
+            // Copy framebuffer to specified mipmap level in texture
+            GL30.glCopyTexImage2D(GL30.GL_TEXTURE_2D, mipLevel, GL30.GL_RGBA, 0, 0, size, size, 0);
+
+            mipLevel++;
+            lodLevel++;
+            size = (int) Math.floor(size / 2f);
+        }
+
+        // For HDR, we need the max and average luminance. At this point, a 1x1 rendering was made to the frame buffer.
+        lumaBuffer.begin();
+        GL30.glReadPixels(0, 0, 1, 1, GL30.GL_RGBA, GL30.GL_FLOAT, pixels);
+        lumaBuffer.end();
+
+        pixels.rewind();
+        return pixels.get();
+    }
+
 }
