@@ -1313,6 +1313,17 @@ public interface IScriptingInterface {
     void setGammaCorrectionLevel(double level);
 
     /**
+     * Sets the high dynamic range tone mapping algorithm type. The types can be:
+     * <ul>
+     *     <li>"auto" - performs an automatic HDR tone mapping based on the current luminosity of the scene</li>
+     *     <li>"exposure" - performs an exposure-based HDR tone mapping. The exposure value must be set with {@link #setExposureToneMappingLevel(double)}</li>
+     *     <li>"none" - no HDR tone mapping</li>
+     * </ul>
+     * @param type The HDR tone mapping type. One of ["auto"|"exposure"|"none"].
+     */
+    void setHDRToneMappingType(String type);
+
+    /**
      * Sets the exposure level.
      * @param level The exposure level in [0..n]. Set to 0 to disable exposure tone mapping.
      */

@@ -1795,6 +1795,12 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
     }
 
     @Override
+    public void setHDRToneMappingType(String type) {
+        if (checkString(type, new String[] { "auto", "AUTO", "exposure", "EXPOSURE", "none", "NONE" }, "tone mapping type"))
+            Gdx.app.postRunnable(() -> em.post(Events.TONEMAPPING_TYPE_CMD, GlobalConf.PostprocessConf.ToneMapping.valueOf(type), false));
+    }
+
+    @Override
     public void setExposureToneMappingLevel(double level) {
         if (checkNum(level, 0d, 20d, "exposure"))
             Gdx.app.postRunnable(() -> em.post(Events.EXPOSURE_CMD, (float) level, false));
@@ -2070,7 +2076,7 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
 
     @Override
     public boolean hasDataset(String dsName) {
-        if(checkString(dsName, "datasetName")) {
+        if (checkString(dsName, "datasetName")) {
             return CatalogManager.instance().contains(dsName);
         }
         return false;
@@ -2078,7 +2084,7 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
 
     @Override
     public boolean removeDataset(String dsName) {
-        if(checkString(dsName, "datasetName")) {
+        if (checkString(dsName, "datasetName")) {
             boolean exists = CatalogManager.instance().contains(dsName);
             if (exists)
                 Gdx.app.postRunnable(() -> EventManager.instance.post(Events.CATALOG_REMOVE, dsName));
@@ -2089,7 +2095,7 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
 
     @Override
     public boolean hideDataset(String dsName) {
-        if(checkString(dsName, "datasetName")) {
+        if (checkString(dsName, "datasetName")) {
             boolean exists = CatalogManager.instance().contains(dsName);
             if (exists)
                 EventManager.instance.post(Events.CATALOG_VISIBLE, dsName, false);
@@ -2100,7 +2106,7 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
 
     @Override
     public boolean showDataset(String dsName) {
-        if(checkString(dsName, "datasetName")) {
+        if (checkString(dsName, "datasetName")) {
             boolean exists = CatalogManager.instance().contains(dsName);
             if (exists)
                 EventManager.instance.post(Events.CATALOG_VISIBLE, dsName, true);
@@ -2111,7 +2117,7 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
 
     @Override
     public boolean highlightDataset(String dsName, boolean highlight) {
-        if(checkString(dsName, "datasetName")) {
+        if (checkString(dsName, "datasetName")) {
             boolean exists = CatalogManager.instance().contains(dsName);
             if (exists)
                 EventManager.instance.post(Events.CATALOG_HIGHLIGHT, dsName, highlight, -1, false);
@@ -2122,7 +2128,7 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
 
     @Override
     public boolean highlightDataset(String dsName, int colorIndex, boolean highlight) {
-        if(checkString(dsName, "datasetName")) {
+        if (checkString(dsName, "datasetName")) {
             boolean exists = CatalogManager.instance().contains(dsName);
             if (exists)
                 EventManager.instance.post(Events.CATALOG_HIGHLIGHT, dsName, highlight, colorIndex, false);
