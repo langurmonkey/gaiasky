@@ -9,10 +9,15 @@ public class ComboBoxBean {
     public String name;
     public int value;
 
-    public ComboBoxBean(String name, int samples) {
+    public ComboBoxBean(String name){
         super();
         this.name = name;
-        this.value = samples;
+    }
+
+    public ComboBoxBean(String name, int value) {
+        super();
+        this.name = name;
+        this.value = value;
     }
 
     @Override

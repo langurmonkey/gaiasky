@@ -81,7 +81,7 @@ public class DesktopPostProcessor implements IPostProcessor, IObserver {
         if (GlobalConf.frame.isRedrawMode())
             pps[RenderType.frame.index] = newPostProcessor(getWidth(RenderType.frame), getHeight(RenderType.frame), manager);
 
-        EventManager.instance.subscribe(this, Events.SCREENSHOT_SIZE_UDPATE, Events.FRAME_SIZE_UDPATE, Events.BLOOM_CMD, Events.LENS_FLARE_CMD, Events.MOTION_BLUR_CMD, Events.LIGHT_POS_2D_UPDATED, Events.LIGHT_SCATTERING_CMD, Events.FISHEYE_CMD, Events.CUBEMAP360_CMD, Events.ANTIALIASING_CMD, Events.BRIGHTNESS_CMD, Events.CONTRAST_CMD, Events.HUE_CMD, Events.SATURATION_CMD, Events.GAMMA_CMD, Events.EXPOSURE_CMD, Events.STEREO_PROFILE_CMD, Events.STEREOSCOPIC_CMD, Events.FPS_INFO, Events.FOV_CHANGE_NOTIFICATION);
+        EventManager.instance.subscribe(this, Events.SCREENSHOT_SIZE_UDPATE, Events.FRAME_SIZE_UDPATE, Events.BLOOM_CMD, Events.LENS_FLARE_CMD, Events.MOTION_BLUR_CMD, Events.LIGHT_POS_2D_UPDATED, Events.LIGHT_SCATTERING_CMD, Events.FISHEYE_CMD, Events.CUBEMAP360_CMD, Events.ANTIALIASING_CMD, Events.BRIGHTNESS_CMD, Events.CONTRAST_CMD, Events.HUE_CMD, Events.SATURATION_CMD, Events.GAMMA_CMD, Events.TONEMAPPING_TYPE_CMD, Events.EXPOSURE_CMD, Events.STEREO_PROFILE_CMD, Events.STEREOSCOPIC_CMD, Events.FPS_INFO, Events.FOV_CHANGE_NOTIFICATION);
     }
 
     private int getWidth(RenderType type) {
@@ -201,7 +201,6 @@ public class DesktopPostProcessor implements IPostProcessor, IObserver {
         // MOTION BLUR
         initMotionBlur(width, height, ppb);
 
-
         return ppb;
     }
 
@@ -212,7 +211,20 @@ public class DesktopPostProcessor implements IPostProcessor, IObserver {
         ppb.levels.setHue(GlobalConf.postprocess.POSTPROCESS_HUE);
         ppb.levels.setSaturation(GlobalConf.postprocess.POSTPROCESS_SATURATION);
         ppb.levels.setGamma(GlobalConf.postprocess.POSTPROCESS_GAMMA);
-        ppb.levels.setExposure(GlobalConf.postprocess.POSTPROCESS_EXPOSURE);
+
+        switch (GlobalConf.postprocess.POSTPROCESS_TONEMAPPING_TYPE) {
+        case AUTO:
+            ppb.levels.enableToneMappingAuto();
+            break;
+        case EXPOSURE:
+            ppb.levels.enableToneMappingExposure();
+            ppb.levels.setExposure(GlobalConf.postprocess.POSTPROCESS_EXPOSURE);
+            break;
+        case NONE:
+            ppb.levels.disableToneMapping();
+            break;
+        }
+
         ppb.pp.addEffect(ppb.levels);
     }
 
@@ -484,6 +496,30 @@ public class DesktopPostProcessor implements IPostProcessor, IObserver {
                 }
             }
             break;
+        case TONEMAPPING_TYPE_CMD:
+            GlobalConf.PostprocessConf.ToneMapping tm;
+            if (data[0] instanceof String) {
+                tm = GlobalConf.PostprocessConf.ToneMapping.valueOf((String) data[0]);
+            } else {
+                tm = (GlobalConf.PostprocessConf.ToneMapping) data[0];
+            }
+            for (int i = 0; i < RenderType.values().length; i++) {
+                if (pps[i] != null) {
+                    PostProcessBean ppb = pps[i];
+                    switch (tm) {
+                    case AUTO:
+                        ppb.levels.enableToneMappingAuto();
+                        break;
+                    case EXPOSURE:
+                        ppb.levels.enableToneMappingExposure();
+                        break;
+                    case NONE:
+                        ppb.levels.disableToneMapping();
+                        break;
+                    }
+                }
+            }
+            break;
         case EXPOSURE_CMD:
             float exposure = (Float) data[0];
             for (int i = 0; i < RenderType.values().length; i++) {
@@ -511,12 +547,11 @@ public class DesktopPostProcessor implements IPostProcessor, IObserver {
     /**
      * Reloads the postprocessor at the given index with the given width and
      * height.new Runnable() {
-     * 
-     * @Override public void run()
-     * 
+     *
      * @param index
      * @param width
      * @param height
+     * @Override public void run()
      */
     private void replace(int index, final int width, final int height) {
         // Dispose of old post processor

@@ -23,22 +23,15 @@ package gaia.cu9.ari.gaiaorbit.util.gdx.contrib.postprocess.effects;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Texture;
-import com.badlogic.gdx.graphics.glutils.FloatFrameBuffer;
-import com.badlogic.gdx.graphics.glutils.FloatTextureData;
 import com.badlogic.gdx.graphics.glutils.FrameBuffer;
 import com.badlogic.gdx.graphics.glutils.GLFrameBuffer;
-import gaia.cu9.ari.gaiaorbit.screenshot.ImageRenderer;
 import gaia.cu9.ari.gaiaorbit.util.gdx.contrib.postprocess.PostProcessorEffect;
-import gaia.cu9.ari.gaiaorbit.util.gdx.contrib.postprocess.filters.Copy;
 import gaia.cu9.ari.gaiaorbit.util.gdx.contrib.postprocess.filters.LevelsFilter;
 import gaia.cu9.ari.gaiaorbit.util.gdx.contrib.postprocess.filters.Luma;
 import gaia.cu9.ari.gaiaorbit.util.gdx.contrib.utils.GaiaSkyFrameBuffer;
 import org.lwjgl.BufferUtils;
-import org.lwjgl.opengl.GL20;
 import org.lwjgl.opengl.GL30;
-import org.lwjgl.opengl.GL32;
 
-import java.nio.ByteBuffer;
 import java.nio.FloatBuffer;
 
 /**
@@ -133,6 +126,18 @@ public final class Levels extends PostProcessorEffect {
         levels.setExposure(value);
     }
 
+    public void enableToneMappingExposure() {
+        levels.enableToneMappingExposure();
+    }
+
+    public void enableToneMappingAuto() {
+        levels.enableToneMappingAuto();
+    }
+
+    public void disableToneMapping() {
+        levels.disableToneMapping();
+    }
+
     @Override
     public void dispose() {
         if (levels != null) {
@@ -151,33 +156,35 @@ public final class Levels extends PostProcessorEffect {
     @Override
     public void render(FrameBuffer src, FrameBuffer dest, GaiaSkyFrameBuffer main) {
         restoreViewport(dest);
-        // Luminance
-        luma.setInput(src).setOutput(lumaBuffer).render();
+
+        if (levels.isToneMappingAuto()) {
+            // Compute luminance texture and use it to work out max and avg luminance
+            luma.setInput(src).setOutput(lumaBuffer).render();
+            Gdx.app.postRunnable(() -> {
+                lumaBuffer.begin();
+                GL30.glReadPixels(0, 0, LUMA_SIZE, LUMA_SIZE, GL30.GL_RGBA, GL30.GL_FLOAT, pixels);
+                lumaBuffer.end();
+
+                computeMaxAvg(pixels);
+
+                // Slowly move towards target luma values
+                if (currLumaAvg < 0) {
+                    currLumaAvg = lumaAvg;
+                    currLumaMax = lumaMax;
+                } else {
+                    float dt = Gdx.graphics.getDeltaTime();
+                    // Low pass filter
+                    float smoothing = 0.5f;
+                    currLumaAvg += dt * (lumaAvg - currLumaAvg) / smoothing;
+                    currLumaMax += dt * (lumaMax - currLumaMax) / smoothing;
+                    levels.setAvgMaxLuma(currLumaAvg, currLumaMax);
+                }
+            });
+        }
 
         // Actual levels
         levels.setInput(src).setOutput(dest).render();
 
-        // Read out data
-        Gdx.app.postRunnable(() -> {
-            lumaBuffer.begin();
-            GL30.glReadPixels(0, 0, LUMA_SIZE, LUMA_SIZE, GL30.GL_RGBA, GL30.GL_FLOAT, pixels);
-            lumaBuffer.end();
-
-            computeMaxAvg(pixels);
-
-            // Slowly move towards target luma values
-            if (currLumaAvg < 0) {
-                currLumaAvg = lumaAvg;
-                currLumaMax = lumaMax;
-            } else {
-                float dt = Gdx.graphics.getDeltaTime();
-                // Low pass filter
-                float smoothing = 0.5f;
-                currLumaAvg += dt * (lumaAvg - currLumaAvg) / smoothing;
-                currLumaMax += dt * (lumaMax - currLumaMax) / smoothing;
-                levels.setAvgMaxLuma(currLumaAvg, currLumaMax);
-            }
-        });
     }
 
     private void computeMaxAvg(FloatBuffer buff) {

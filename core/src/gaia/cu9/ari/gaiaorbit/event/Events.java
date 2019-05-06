@@ -298,6 +298,12 @@ public enum Events {
     GAMMA_CMD,
 
     /**
+     * Contains the tone mapping type as an {@link gaia.cu9.ari.gaiaorbit.util.GlobalConf.PostprocessConf.ToneMapping} or a
+     * string in [AUTO|EXPOSURE|NONE].
+     */
+    TONEMAPPING_TYPE_CMD,
+
+    /**
      * Contains the exposure tone mapping level (float) in [0..n] (0 for disabled) and an optional boolean
      * indicating whether this comes from the interface
      */

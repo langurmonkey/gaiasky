@@ -20,6 +20,7 @@
 
 package gaia.cu9.ari.gaiaorbit.util.gdx.contrib.postprocess.filters;
 
+import com.badlogic.gdx.graphics.glutils.ShaderProgram;
 import gaia.cu9.ari.gaiaorbit.util.gdx.contrib.utils.ShaderLoader;
 
 /**
@@ -35,6 +36,8 @@ public final class LevelsFilter extends Filter<LevelsFilter> {
     private float gamma = 1.0f;
     private float exposure = 1.0f;
     private float avgLuma, maxLuma;
+
+    private ShaderProgram programRegular, programToneMappingExposure, programToneMappingAuto;
 
     public enum Param implements Parameter {
         // @formatter:off
@@ -70,6 +73,9 @@ public final class LevelsFilter extends Filter<LevelsFilter> {
 
     public LevelsFilter() {
         super(ShaderLoader.fromFile("screenspace", "levels"));
+        programRegular = program;
+        programToneMappingExposure = ShaderLoader.fromFile("screenspace", "levels", "#define toneMappingExposure");
+        programToneMappingAuto = ShaderLoader.fromFile("screenspace", "levels", "#define toneMappingAuto");
         rebind();
     }
 
@@ -133,11 +139,34 @@ public final class LevelsFilter extends Filter<LevelsFilter> {
         setParam(Param.Exposure, this.exposure);
     }
 
-    public void setAvgMaxLuma(float avgLuma, float maxLuma){
+    public void setAvgMaxLuma(float avgLuma, float maxLuma) {
         this.avgLuma = avgLuma;
         this.maxLuma = maxLuma;
         setParam(Param.AvgLuma, this.avgLuma);
         setParam(Param.MaxLuma, this.maxLuma);
+    }
+
+    public boolean isToneMappingExposure(){
+        return this.program == programToneMappingExposure;
+    }
+
+    public void enableToneMappingExposure() {
+        this.program = programToneMappingExposure;
+        rebind();
+    }
+
+    public void enableToneMappingAuto() {
+        this.program = programToneMappingAuto;
+        rebind();
+    }
+
+    public boolean isToneMappingAuto(){
+        return this.program == programToneMappingAuto;
+    }
+
+    public void disableToneMapping(){
+        this.program = programRegular;
+        rebind();
     }
 
     @Override
@@ -149,9 +178,13 @@ public final class LevelsFilter extends Filter<LevelsFilter> {
         setParams(Param.Saturation, saturation);
         setParams(Param.Hue, hue);
         setParams(Param.Gamma, gamma);
-        setParams(Param.Exposure, exposure);
-        setParams(Param.AvgLuma, this.avgLuma);
-        setParams(Param.MaxLuma, this.maxLuma);
+        if (programToneMappingExposure != null && program == programToneMappingExposure) {
+            setParams(Param.Exposure, exposure);
+        }
+        if (programToneMappingAuto != null && program == programToneMappingAuto) {
+            setParams(Param.AvgLuma, this.avgLuma);
+            setParams(Param.MaxLuma, this.maxLuma);
+        }
         endParams();
     }
 

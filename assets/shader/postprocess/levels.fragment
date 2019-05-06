@@ -12,8 +12,14 @@ uniform float u_contrast = 1.0;
 uniform float u_saturation = 1.0;
 uniform float u_hue = 1.0;
 uniform float u_gamma = 2.2;
+
+#ifdef toneMappingExposure
 uniform float u_exposure = 2.5;
+#endif //toneMappingExposure
+
+#ifdef toneMappingAuto
 uniform float u_avgLuma, u_maxLuma;
+#endif //toneMappingAuto
 
 in vec2 v_texCoords;
 out vec4 fragColor;
@@ -92,24 +98,26 @@ void main() {
     pixelColor += u_brightness;
 
     // HDR tone mapping
-    if(u_exposure > 0.0){
-        float scale = 0.4;
-        float lwhite = u_maxLuma * u_maxLuma;
-        float luma = luminance(pixelColor);
+    #ifdef toneMappingAuto
+    float scale = 0.2;
+    float lwhite = u_maxLuma * u_maxLuma;
+    float luma = luminance(pixelColor);
 
-        float L = (scale / u_avgLuma) * luma;
-        float Ld = (L * (1.0 + L / u_maxLuma)) / (1.0 + L);
+    float L = (scale / u_avgLuma) * luma;
+    float Ld = (L * (1.0 + L / u_maxLuma)) / (1.0 + L);
 
-        // Ld is in luminance space, so apply the scale factor to the xyY converted
-        // values from RGB space, then convert back from xyY to RGB.
-        vec3 xyY = RGB2xyY(pixelColor);
-        xyY.z *= Ld;
-        pixelColor = xyY2RGB(xyY);
+    // Ld is in luminance space, so apply the scale factor to the xyY converted
+    // values from RGB space, then convert back from xyY to RGB.
+    vec3 xyY = RGB2xyY(pixelColor);
+    xyY.z *= Ld;
+    pixelColor = xyY2RGB(xyY);
 
-        //pixelColor = (pixelColor / luma) * Ld;
+    //pixelColor = (pixelColor / luma) * Ld;
+    #endif //toneMappingAuto
 
-        //pixelColor = 1.0 - exp2(-pixelColor * u_exposure);
-    }
+    #ifdef toneMappingExposure
+    pixelColor = 1.0 - exp2(-pixelColor * u_exposure);
+    #endif //toneMappingExposure
 
     // Gamma correction
     pixelColor = pow(pixelColor, vec3(1.0 / u_gamma));

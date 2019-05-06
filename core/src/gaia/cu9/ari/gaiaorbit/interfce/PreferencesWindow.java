@@ -552,18 +552,40 @@ public class PreferencesWindow extends GenericDialog {
         display.add(gamma).left().padRight(pad5 * 2).padBottom(pad5);
         display.add(gammaLabel).row();
 
+        /* Tone Mapping */
+        OwnLabel toneMappingl = new OwnLabel(I18n.txt("gui.tonemapping.type"), skin, "default");
+        ComboBoxBean[] toneMappingTypes = new ComboBoxBean[] { new ComboBoxBean(I18n.txt("gui.tonemapping.auto"), GlobalConf.PostprocessConf.ToneMapping.AUTO.ordinal()), new ComboBoxBean(I18n.txt("gui.tonemapping.exposure"), GlobalConf.PostprocessConf.ToneMapping.EXPOSURE.ordinal()), new ComboBoxBean(I18n.txt("gui.tonemapping.none"), GlobalConf.PostprocessConf.ToneMapping.NONE.ordinal()) };
+        OwnSelectBox<ComboBoxBean> toneMappingSelect = new OwnSelectBox<>(skin);
+        toneMappingSelect.setItems(toneMappingTypes);
+        toneMappingSelect.setWidth(textwidth * 3f);
+        toneMappingSelect.setSelectedIndex(GlobalConf.postprocess.POSTPROCESS_TONEMAPPING_TYPE.ordinal());
+        display.add(toneMappingl).left().padRight(pad5 * 4).padBottom(pad5);
+        display.add(toneMappingSelect).left().padBottom(pad5).row();
+
         /* Exposure */
         OwnLabel exposurel = new OwnLabel(I18n.txt("gui.exposure"), skin, "default");
+        exposurel.setDisabled(GlobalConf.postprocess.POSTPROCESS_TONEMAPPING_TYPE != GlobalConf.PostprocessConf.ToneMapping.EXPOSURE);
         Label exposureLabel = new OwnLabel(nf1.format(GlobalConf.postprocess.POSTPROCESS_EXPOSURE), skin);
         Slider exposure = new OwnSlider(Constants.MIN_EXPOSURE, Constants.MAX_EXPOSURE, 0.1f, false, skin);
         exposure.setName("exposure");
         exposure.setWidth(sliderWidth);
         exposure.setValue(GlobalConf.postprocess.POSTPROCESS_EXPOSURE);
+        exposure.setDisabled(GlobalConf.postprocess.POSTPROCESS_TONEMAPPING_TYPE != GlobalConf.PostprocessConf.ToneMapping.EXPOSURE);
         exposureLabel.setText(nf1.format(exposure.getValue()));
         exposure.addListener(event -> {
             if (event instanceof ChangeEvent) {
                 EventManager.instance.post(Events.EXPOSURE_CMD, exposure.getValue(), true);
                 exposureLabel.setText(nf1.format(exposure.getValue()));
+                return true;
+            }
+            return false;
+        });
+        toneMappingSelect.addListener((event) -> {
+            if (event instanceof ChangeEvent) {
+                GlobalConf.PostprocessConf.ToneMapping newTM = GlobalConf.PostprocessConf.ToneMapping.values()[toneMappingSelect.getSelectedIndex()];
+                EventManager.instance.post(Events.TONEMAPPING_TYPE_CMD, newTM, true);
+                exposurel.setDisabled(newTM != GlobalConf.PostprocessConf.ToneMapping.EXPOSURE);
+                exposure.setDisabled(newTM != GlobalConf.PostprocessConf.ToneMapping.EXPOSURE);
                 return true;
             }
             return false;
@@ -1116,7 +1138,6 @@ public class PreferencesWindow extends GenericDialog {
         camrecFps = new OwnTextField(Integer.toString(GlobalConf.frame.CAMERA_REC_TARGET_FPS), skin, new IntValidator(1, 200));
         camrecFps.setWidth(textwidth * 3f);
 
-
         // Keyframe preferences
         Button keyframePrefs = new OwnTextIconButton(I18n.txt("gui.keyframes.preferences"), skin, "preferences");
         keyframePrefs.setName("keyframe preferences");
@@ -1125,8 +1146,8 @@ public class PreferencesWindow extends GenericDialog {
         keyframePrefs.addListener((event) -> {
             if (event instanceof ChangeListener.ChangeEvent) {
                 KeyframePreferencesWindow kpw = new KeyframePreferencesWindow(stage, skin);
-                kpw.setAcceptRunnable(()->{
-                    if(kpw.camrecFps != null && kpw.camrecFps.isValid()) {
+                kpw.setAcceptRunnable(() -> {
+                    if (kpw.camrecFps != null && kpw.camrecFps.isValid()) {
                         camrecFps.setText(kpw.camrecFps.getText());
                     }
                 });
@@ -1658,7 +1679,7 @@ public class PreferencesWindow extends GenericDialog {
             EventManager.instance.post(Events.CUBEMAP_RESOLUTION_CMD, newres);
 
         // Controllers
-        if(controllerMappings.getSelected() != null) {
+        if (controllerMappings.getSelected() != null) {
             String mappingsFile = controllerMappings.getSelected().file;
             if (!mappingsFile.equals(GlobalConf.controls.CONTROLLER_MAPPINGS_FILE)) {
                 GlobalConf.controls.CONTROLLER_MAPPINGS_FILE = mappingsFile;
