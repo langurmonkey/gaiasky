@@ -31,6 +31,10 @@ in vec3 a_position;
 out vec3 v_direction;
 out vec4 v_frontColor;
 out vec3 v_frontSecondaryColor;
+// 0 in the boundary of space, 1 on the ground
+out float v_heightNormalized;
+// Fade factor between hieght-driven opacity and luminosity-driven opacity
+out float v_fadeFactor;
 out float v_depth;
 
 ////////////////////////////////////////////////////////////////////////////////////
@@ -95,8 +99,7 @@ void main(void) {
 		float fHeight = length (v3Start);
 		fStartAngle = dot (v3Ray, v3Start) / fHeight;
 		fStartDepth = exp (fScaleOverScaleDepth * (fInnerRadius - fCameraHeight));
-    }
-    else {
+    } else {
 		v3Start = v3CameraPos + v3Ray * fNear;
 		fFar -= fNear;
 		fStartAngle = dot (v3Ray, v3Start) / fOuterRadius;
@@ -129,6 +132,11 @@ void main(void) {
     v_frontColor.rgb = v3FrontColor * (v3InvWavelength * fKrESun);
     v_frontColor.a = fAlpha;
     v_frontSecondaryColor.rgb = v3FrontColor * fKmESun;
+
+    // Height normalized to control the opacity
+    // Normalized in [1,0], for [ground,space]
+    v_heightNormalized = 1.0 - clamp(((fCameraHeight - fInnerRadius) / (fOuterRadius - fInnerRadius)), 0.0, 1.0);
+    v_fadeFactor = smoothstep(0.5, 1.0, 1.0 - v_heightNormalized);
 
     vec4 g_position = vec4(a_position, 1.0);
     vec4 pos = u_worldTrans * g_position;

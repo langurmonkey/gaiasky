@@ -49,7 +49,7 @@ public final class Levels extends PostProcessorEffect {
     private Luma luma;
     private Copy copy;
 
-    private float lumaMax = 0.9f, lumaAvg = 0.5f;
+    private float lumaMax = 0.9f, lumaAvg = 0.09f;
     private float currLumaMax = -1f, currLumaAvg = -1f;
     private FrameBuffer lumaBuffer;
 

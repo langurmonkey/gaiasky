@@ -1,6 +1,6 @@
 #version 330 core
 
-#define exposure 0.5
+#define exposure 0.65
 
 uniform vec3 v3LightPos;
 uniform float g;
@@ -13,8 +13,16 @@ in vec4 v_frontColor;
 in vec3 v_frontSecondaryColor;
 // Depth buffer value
 in float v_depth;
+// Height normalized
+in float v_heightNormalized;
+// Fade factor between hieght-driven opacity and luminosity-driven opacity
+in float v_fadeFactor;
 
 out vec4 fragColor;
+
+float luminance(vec3 color){
+    return dot(color, vec3(0.2126, 0.7152, 0.0722));
+}
 
 void main(void) {
     float fCos = dot (v3LightPos, v_direction) / length (v_direction);
@@ -24,10 +32,10 @@ void main(void) {
 
     fragColor.rgb = (fRayleighPhase * v_frontColor.rgb + fMiePhase * v_frontSecondaryColor.rgb);
     fragColor.rgb = vec3(1.0) - exp(-exposure * fragColor.rgb);
-    fragColor.a = v_frontColor.a * length(fragColor.rgb);
+    fragColor.a = v_heightNormalized * (1.0 - v_fadeFactor) + luminance(fragColor.rgb) * v_fadeFactor;
 
     // Prevent saturation
-    fragColor.rgb = clamp(fragColor.rgb, 0.0, 0.95);
+    fragColor.rgb = fragColor.rgb;
 
     // Normal depth buffer
     // gl_FragDepth = gl_FragCoord.z;
