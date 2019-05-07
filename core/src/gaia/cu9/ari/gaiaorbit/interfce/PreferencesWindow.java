@@ -32,6 +32,7 @@ import gaia.cu9.ari.gaiaorbit.interfce.beans.LangComboBoxBean;
 import gaia.cu9.ari.gaiaorbit.scenegraph.camera.CameraManager;
 import gaia.cu9.ari.gaiaorbit.util.*;
 import gaia.cu9.ari.gaiaorbit.util.GlobalConf.PostprocessConf.Antialias;
+import gaia.cu9.ari.gaiaorbit.util.GlobalConf.PostprocessConf.ToneMapping;
 import gaia.cu9.ari.gaiaorbit.util.GlobalConf.ScreenshotMode;
 import gaia.cu9.ari.gaiaorbit.util.format.INumberFormat;
 import gaia.cu9.ari.gaiaorbit.util.format.NumberFormatFactory;
@@ -73,7 +74,7 @@ public class PreferencesWindow extends GenericDialog {
     private DatasetsWidget dw;
 
     // Backup values
-    private GlobalConf.PostprocessConf.ToneMapping toneMappingBak;
+    private ToneMapping toneMappingBak;
     private float brightnessBak, contrastBak, hueBak, saturationBak, gammaBak, exposureBak, motionblurBak, bloomBak;
     private boolean lensflareBak, lightglowBak, debugInfoBak;
 
@@ -557,7 +558,7 @@ public class PreferencesWindow extends GenericDialog {
 
         /* Tone Mapping */
         OwnLabel toneMappingl = new OwnLabel(I18n.txt("gui.tonemapping.type"), skin, "default");
-        ComboBoxBean[] toneMappingTypes = new ComboBoxBean[] { new ComboBoxBean(I18n.txt("gui.tonemapping.auto"), GlobalConf.PostprocessConf.ToneMapping.AUTO.ordinal()), new ComboBoxBean(I18n.txt("gui.tonemapping.exposure"), GlobalConf.PostprocessConf.ToneMapping.EXPOSURE.ordinal()), new ComboBoxBean(I18n.txt("gui.tonemapping.none"), GlobalConf.PostprocessConf.ToneMapping.NONE.ordinal()) };
+        ComboBoxBean[] toneMappingTypes = new ComboBoxBean[] { new ComboBoxBean(I18n.txt("gui.tonemapping.auto"), ToneMapping.AUTO.ordinal()), new ComboBoxBean(I18n.txt("gui.tonemapping.exposure"), ToneMapping.EXPOSURE.ordinal()), new ComboBoxBean("ACES", ToneMapping.ACES.ordinal()), new ComboBoxBean(I18n.txt("gui.tonemapping.none"), ToneMapping.NONE.ordinal()) };
         OwnSelectBox<ComboBoxBean> toneMappingSelect = new OwnSelectBox<>(skin);
         toneMappingSelect.setItems(toneMappingTypes);
         toneMappingSelect.setWidth(textwidth * 3f);
@@ -567,14 +568,14 @@ public class PreferencesWindow extends GenericDialog {
 
         /* Exposure */
         OwnLabel exposurel = new OwnLabel(I18n.txt("gui.exposure"), skin, "default");
-        exposurel.setDisabled(GlobalConf.postprocess.POSTPROCESS_TONEMAPPING_TYPE != GlobalConf.PostprocessConf.ToneMapping.EXPOSURE);
+        exposurel.setDisabled(GlobalConf.postprocess.POSTPROCESS_TONEMAPPING_TYPE != ToneMapping.EXPOSURE);
         OwnLabel exposureLabel = new OwnLabel(nf1.format(GlobalConf.postprocess.POSTPROCESS_EXPOSURE), skin);
-        exposureLabel.setDisabled(GlobalConf.postprocess.POSTPROCESS_TONEMAPPING_TYPE != GlobalConf.PostprocessConf.ToneMapping.EXPOSURE);
+        exposureLabel.setDisabled(GlobalConf.postprocess.POSTPROCESS_TONEMAPPING_TYPE != ToneMapping.EXPOSURE);
         Slider exposure = new OwnSlider(Constants.MIN_EXPOSURE, Constants.MAX_EXPOSURE, 0.1f, false, skin);
         exposure.setName("exposure");
         exposure.setWidth(sliderWidth);
         exposure.setValue(GlobalConf.postprocess.POSTPROCESS_EXPOSURE);
-        exposure.setDisabled(GlobalConf.postprocess.POSTPROCESS_TONEMAPPING_TYPE != GlobalConf.PostprocessConf.ToneMapping.EXPOSURE);
+        exposure.setDisabled(GlobalConf.postprocess.POSTPROCESS_TONEMAPPING_TYPE != ToneMapping.EXPOSURE);
         exposureLabel.setText(nf1.format(exposure.getValue()));
         exposure.addListener(event -> {
             if (event instanceof ChangeEvent) {
@@ -586,9 +587,9 @@ public class PreferencesWindow extends GenericDialog {
         });
         toneMappingSelect.addListener((event) -> {
             if (event instanceof ChangeEvent) {
-                GlobalConf.PostprocessConf.ToneMapping newTM = GlobalConf.PostprocessConf.ToneMapping.values()[toneMappingSelect.getSelectedIndex()];
+                ToneMapping newTM = ToneMapping.values()[toneMappingSelect.getSelectedIndex()];
                 EventManager.instance.post(Events.TONEMAPPING_TYPE_CMD, newTM, true);
-                boolean disabled = newTM != GlobalConf.PostprocessConf.ToneMapping.EXPOSURE;
+                boolean disabled = newTM != ToneMapping.EXPOSURE;
                 exposurel.setDisabled(disabled);
                 exposureLabel.setDisabled(disabled);
                 exposure.setDisabled(disabled);

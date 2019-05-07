@@ -77,7 +77,19 @@ vec3 autoExposureToneMapping(vec3 pixelColor){
     float exposure = clamp(0.4 / u_avgLuma, 0.1, 1000.0);
     return vec3(1.0 - exp2(-pixelColor * exposure));
 }
+
 #endif //toneMappingAuto
+
+#ifdef toneMappingACES
+vec3 ACESToneMapping(vec3 pixelColor){
+    float a = 2.51f;
+    float b = 0.03f;
+    float c = 2.43f;
+    float d = 0.59f;
+    float e = 0.14f;
+    return clamp((pixelColor * (a * pixelColor + b))/(pixelColor * (c * pixelColor + d) + e), 0.0, 1.0);
+}
+#endif //toneMappingACES
 
 in vec2 v_texCoords;
 out vec4 fragColor;
@@ -128,6 +140,10 @@ void main() {
     #ifdef toneMappingExposure
     pixelColor = 1.0 - exp2(-pixelColor * u_exposure);
     #endif //toneMappingExposure
+
+    #ifdef toneMappingACES
+    pixelColor = ACESToneMapping(pixelColor);
+    #endif //toneMappingACES
 
     // Gamma correction
     pixelColor = pow(pixelColor, vec3(1.0 / u_gamma));

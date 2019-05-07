@@ -149,6 +149,10 @@ public final class Levels extends PostProcessorEffect {
         levels.enableToneMappingAuto();
     }
 
+    public void enableToneMappingACES(){
+        levels.enableToneMappingACES();
+    }
+
     public void disableToneMapping() {
         levels.disableToneMapping();
     }

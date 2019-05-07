@@ -37,7 +37,7 @@ public final class LevelsFilter extends Filter<LevelsFilter> {
     private float exposure = 1.0f;
     private float avgLuma, maxLuma;
 
-    private ShaderProgram programRegular, programToneMappingExposure, programToneMappingAuto;
+    private ShaderProgram programRegular, programToneMappingExposure, programToneMappingAuto, programToneMappingACES;
 
     public enum Param implements Parameter {
         // @formatter:off
@@ -76,6 +76,7 @@ public final class LevelsFilter extends Filter<LevelsFilter> {
         programRegular = program;
         programToneMappingExposure = ShaderLoader.fromFile("screenspace", "levels", "#define toneMappingExposure");
         programToneMappingAuto = ShaderLoader.fromFile("screenspace", "levels", "#define toneMappingAuto");
+        programToneMappingACES = ShaderLoader.fromFile("screenspace", "levels", "#define toneMappingACES");
         rebind();
     }
 
@@ -146,10 +147,6 @@ public final class LevelsFilter extends Filter<LevelsFilter> {
         setParam(Param.MaxLuma, this.maxLuma);
     }
 
-    public boolean isToneMappingExposure(){
-        return this.program == programToneMappingExposure;
-    }
-
     public void enableToneMappingExposure() {
         this.program = programToneMappingExposure;
         rebind();
@@ -157,6 +154,11 @@ public final class LevelsFilter extends Filter<LevelsFilter> {
 
     public void enableToneMappingAuto() {
         this.program = programToneMappingAuto;
+        rebind();
+    }
+
+    public void enableToneMappingACES() {
+        this.program = programToneMappingACES;
         rebind();
     }
 
