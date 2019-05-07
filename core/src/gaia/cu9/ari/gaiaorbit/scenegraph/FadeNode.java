@@ -72,9 +72,9 @@ public class FadeNode extends AbstractPositionEntity {
     private boolean visible = true;
 
     /**
-     * Elapsed milliseconds since this node visibility was last changed.
+     * Time of last visibility change in milliseconds
      */
-    private long msSinceStateChange = Long.MAX_VALUE;
+    private long lastStateChangeTimeMs = 0;
 
     /**
      * Information on the catalog this fade node represents (particle group, octree, etc.)
@@ -116,7 +116,8 @@ public class FadeNode extends AbstractPositionEntity {
         super(name, parent);
     }
 
-    @Override public void doneLoading(AssetManager manager) {
+    @Override
+    public void doneLoading(AssetManager manager) {
         super.doneLoading(manager);
         if (positionObjectName != null) {
             this.position = (AbstractPositionEntity) sg.getNode(positionObjectName);
@@ -145,7 +146,8 @@ public class FadeNode extends AbstractPositionEntity {
         }
     }
 
-    @Override public void updateLocal(ITimeFrameProvider time, ICamera camera) {
+    @Override
+    public void updateLocal(ITimeFrameProvider time, ICamera camera) {
         this.distToCamera = this.position == null ? (float) pos.dst(camera.getPos()) : this.position.distToCamera;
 
         // Update alpha
@@ -156,8 +158,7 @@ public class FadeNode extends AbstractPositionEntity {
             this.opacity *= MathUtilsd.lint((float) this.currentDistance, fadeOut.x, fadeOut.y, 1, 0);
 
         // Visibility
-        this.msSinceStateChange += GaiaSky.instance.getT() * 1000;
-        float visop = MathUtilsd.lint(this.msSinceStateChange, 0, GlobalConf.scene.OBJECT_FADE_MS, 0, 1);
+        float visop = MathUtilsd.lint(msSinceStateChange(), 0, GlobalConf.scene.OBJECT_FADE_MS, 0, 1);
         if (!this.visible) {
             visop = 1 - visop;
         }
@@ -173,10 +174,12 @@ public class FadeNode extends AbstractPositionEntity {
         return 1;
     }
 
-    @Override protected void addToRenderLists(ICamera camera) {
+    @Override
+    protected void addToRenderLists(ICamera camera) {
     }
 
-    @Override public void updateLocalValues(ITimeFrameProvider time, ICamera camera) {
+    @Override
+    public void updateLocalValues(ITimeFrameProvider time, ICamera camera) {
     }
 
     public void setFadein(double[] fadein) {
@@ -216,11 +219,15 @@ public class FadeNode extends AbstractPositionEntity {
 
     public void setVisible(boolean visible) {
         this.visible = visible;
-        this.msSinceStateChange = 0;
+        this.lastStateChangeTimeMs = (long) (GaiaSky.instance.getT() * 1000f);
     }
 
     public boolean isVisible() {
-        return this.visible || this.msSinceStateChange <= GlobalConf.scene.OBJECT_FADE_MS;
+        return this.visible || msSinceStateChange() <= GlobalConf.scene.OBJECT_FADE_MS;
+    }
+
+    private long msSinceStateChange(){
+        return (long) (GaiaSky.instance.getT() * 1000f) - this.lastStateChangeTimeMs;
     }
 
     public void setCatalogInfo(CatalogInfo info) {
