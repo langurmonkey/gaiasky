@@ -36,7 +36,7 @@ uniform vec3 u_camShift;
 out vec4 v_color;
 out vec2 v_texCoords;
 
-#define distfac 3.24e-8 / 60000.0
+#define distfac 6.24e-8 / 60000.0
 #define distfacinv 60000.0 / 3.23e-8
 
 void main()

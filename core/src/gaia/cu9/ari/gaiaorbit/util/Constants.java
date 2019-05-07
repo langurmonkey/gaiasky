@@ -146,9 +146,9 @@ public class Constants {
     public static final float MIN_TURN_SPEED = 2e2f;
 
     /** Minimum star brightness **/
-    public static final float MIN_STAR_BRIGHT = 0.2f;
+    public static final float MIN_STAR_BRIGHT = 0.1f;
     /** Maximum star brightness **/
-    public static final float MAX_STAR_BRIGHT = 25f;
+    public static final float MAX_STAR_BRIGHT = 10f;
 
     /** Minimum number factor for proper motion vectors **/
     public static final float MIN_PM_NUM_FACTOR = 1f;

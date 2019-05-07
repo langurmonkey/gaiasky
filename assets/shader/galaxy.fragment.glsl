@@ -14,7 +14,7 @@ out vec4 fragColor;
 
 float programmatic(vec2 uv, float dist) {
     float dist_center = 1.0 - dist;
-    return clamp(pow(dist_center, 3.0) * 0.3 + smoothstep(0.8, 1.0, dist_center), 0.0, 1.0);
+    return pow(dist_center, 3.0) * 0.3 + smoothstep(0.8, 1.0, dist_center);
 }
 
 vec4 colorDust(float alpha) {

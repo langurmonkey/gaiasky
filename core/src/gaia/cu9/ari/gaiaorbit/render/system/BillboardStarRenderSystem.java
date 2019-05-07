@@ -28,11 +28,11 @@ public class BillboardStarRenderSystem extends AbstractRenderSystem {
     private IntMesh mesh;
     private Quaternion quaternion;
     private Texture texture0;
-    private int ctindex = -1;
+    private int ctIndex;
 
-    public BillboardStarRenderSystem(RenderGroup rg, float[] alphas, ShaderProgram[] programs, String tex0, int ctindex, float w, float h) {
+    public BillboardStarRenderSystem(RenderGroup rg, float[] alphas, ShaderProgram[] programs, String tex0, int ctIndex, float w, float h) {
         super(rg, alphas, programs);
-        this.ctindex = ctindex;
+        this.ctIndex = ctIndex;
         init(tex0, w, h);
     }
 
@@ -46,8 +46,8 @@ public class BillboardStarRenderSystem extends AbstractRenderSystem {
      * @param shaderPrograms
      *            The shader programs to render the quad with.
      */
-    public BillboardStarRenderSystem(RenderGroup rg, float[] alphas, ShaderProgram[] shaderPrograms, String tex0, int ctindex) {
-        this(rg, alphas, shaderPrograms, tex0, ctindex, 2, 2);
+    public BillboardStarRenderSystem(RenderGroup rg, float[] alphas, ShaderProgram[] shaderPrograms, String tex0, int ctIndex) {
+        this(rg, alphas, shaderPrograms, tex0, ctIndex, 2, 2);
     }
 
     private void init(String tex0, float w, float h) {
@@ -122,7 +122,7 @@ public class BillboardStarRenderSystem extends AbstractRenderSystem {
 
     @Override
     public void renderStud(Array<IRenderable> renderables, ICamera camera, double t) {
-        if ((ctindex >= 0 ? alphas[ctindex] != 0 : true)) {
+        if ((ctIndex >= 0 ? alphas[ctIndex] != 0 : true)) {
             renderables.sort(comp);
 
             // Calculate billobard rotation quaternion ONCE
