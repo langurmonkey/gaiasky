@@ -26,6 +26,7 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.glutils.FrameBuffer;
 import com.badlogic.gdx.graphics.glutils.GLFrameBuffer;
 import gaia.cu9.ari.gaiaorbit.GaiaSky;
+import gaia.cu9.ari.gaiaorbit.util.Constants;
 import gaia.cu9.ari.gaiaorbit.util.gdx.contrib.postprocess.PostProcessorEffect;
 import gaia.cu9.ari.gaiaorbit.util.gdx.contrib.postprocess.filters.Copy;
 import gaia.cu9.ari.gaiaorbit.util.gdx.contrib.postprocess.filters.LevelsFilter;
@@ -189,10 +190,11 @@ public final class Levels extends PostProcessorEffect {
         } else {
             float dt = Gdx.graphics.getDeltaTime();
             // Low pass filter
-            float smoothing = 0.1f;
-            currLumaAvg += dt * (lumaAvg - currLumaAvg) / smoothing;
-            currLumaMax += dt * (lumaMax - currLumaMax) / smoothing;
-            levels.setAvgMaxLuma(currLumaAvg, currLumaMax);
+            float smoothingAvg = .1f;
+            float smoothingMax = .1f;
+            currLumaAvg += dt * (lumaAvg - currLumaAvg) / smoothingAvg;
+            currLumaMax += dt * (lumaMax - currLumaMax) / smoothingMax;
+            levels.setAvgMaxLuma(currLumaAvg, Math.min(currLumaMax, 1.5f));
         }
     }
 
@@ -213,6 +215,8 @@ public final class Levels extends PostProcessorEffect {
             GL30.glGenerateMipmap(lumaBuffer.getColorBufferTexture().glTarget);
             GL30.glGetTexImage(lumaBuffer.getColorBufferTexture().glTarget, lumaLodLevels - 1, GL30.GL_RGB, GL30.GL_FLOAT, pixels);
             lumaAvg = pixels.get(0);
+            // Ugly hack, but works
+            lumaMax = GaiaSky.instance.getICamera().getPos().len() * Constants.U_TO_PC > 10000 ? lumaAvg * 5000f : lumaAvg * 30f;
 
             lowPassFilter();
         }

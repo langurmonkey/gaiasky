@@ -134,7 +134,7 @@ public class NBGalaxy extends Particle {
     public void render(ShaderProgram shader, float alpha, IntMesh mesh, ICamera camera) {
         compalpha = alpha;
 
-        float size = getFuzzyRenderSize(camera) * GlobalConf.scene.STAR_POINT_SIZE;
+        float size = getFuzzyRenderSize(camera) * GlobalConf.scene.STAR_POINT_SIZE * 0.5f;
 
         Vector3 aux = aux3f1.get();
         shader.setUniformf("u_pos", translation.put(aux));
@@ -147,10 +147,6 @@ public class NBGalaxy extends Particle {
         shader.setUniformf("u_time", (float) GaiaSky.instance.getT() / 5f);
 
         shader.setUniformf("u_sliders", (tt + 3.4f) / 14f, 0.1f, 0f, i / 180f);
-        // Vector3d sph = aux3d1.get();
-        // Coordinates.cartesianToSpherical(camera.getDirection(), sph);
-        // shader.setUniformf("u_ro", (float) sph.x);
-        // shader.setUniformf("u_ta", (float) sph.y);
 
         shader.setUniformf("u_radius", (float) getRadius());
 

@@ -121,8 +121,8 @@ void main() {
 
     // HDR tone mapping
     #ifdef toneMappingAuto
-    //pixelColor = reinhardToneMapping(pixelColor, 0.2);
-    pixelColor = autoExposureToneMapping(pixelColor);
+    pixelColor = reinhardToneMapping(pixelColor, 0.2);
+    //pixelColor = autoExposureToneMapping(pixelColor);
     #endif //toneMappingAuto
 
     #ifdef toneMappingExposure
