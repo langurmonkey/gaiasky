@@ -34,11 +34,6 @@ void main(void) {
     fragColor.rgb = vec3(1.0) - exp(-exposure * fragColor.rgb);
     fragColor.a = v_heightNormalized * (1.0 - v_fadeFactor) + luminance(fragColor.rgb) * v_fadeFactor;
 
-    // Prevent saturation
     fragColor.rgb = fragColor.rgb;
-
-    // Normal depth buffer
-    // gl_FragDepth = gl_FragCoord.z;
-    // Logarithmic depth buffer
     gl_FragDepth = v_depth;
 }
