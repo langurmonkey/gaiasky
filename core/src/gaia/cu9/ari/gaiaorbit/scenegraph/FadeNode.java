@@ -72,6 +72,11 @@ public class FadeNode extends AbstractPositionEntity {
     private boolean visible = true;
 
     /**
+     * Is the node already in the scene graph?
+     */
+    public boolean inSceneGraph = false;
+
+    /**
      * Time of last visibility change in milliseconds
      */
     private long lastStateChangeTimeMs = 0;
@@ -264,4 +269,9 @@ public class FadeNode extends AbstractPositionEntity {
         return highlighted;
     }
 
+    @Override
+    public void setUp() {
+        super.setUp();
+        inSceneGraph = true;
+    }
 }

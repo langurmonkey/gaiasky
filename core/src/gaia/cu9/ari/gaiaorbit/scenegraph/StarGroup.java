@@ -1147,6 +1147,7 @@ public class StarGroup extends ParticleGroup implements ILineRenderable, IStarFo
         sg.setLabelposition(new double[] { 0.0, -5.0e7, -4e8 });
         sg.setCt("Stars");
         sg.setData(data);
+        sg.setVisible(true);
         sg.doneLoading(null);
         return sg;
     }

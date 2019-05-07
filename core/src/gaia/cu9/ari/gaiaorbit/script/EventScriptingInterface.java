@@ -42,6 +42,7 @@ import java.time.ZoneOffset;
 import java.time.temporal.ChronoField;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicReference;
 
 /**
  * Implementation of the scripting interface using the event system.
@@ -2026,19 +2027,21 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
 
                 // Create star group
                 if (data != null && data.size > 0 && checkString(dsName, "datasetName")) {
+                    AtomicReference<StarGroup> starGroup = new AtomicReference<>();
                     Gdx.app.postRunnable(() -> {
-                        StarGroup sg = StarGroup.getDefaultStarGroup(dsName, data);
+                        starGroup.set(StarGroup.getDefaultStarGroup(dsName, data));
 
                         // Catalog info
-                        CatalogInfo ci = new CatalogInfo(dsName, absolutePath, null, type, sg);
+                        CatalogInfo ci = new CatalogInfo(dsName, absolutePath, null, type, starGroup.get());
                         EventManager.instance.post(Events.CATALOG_ADD, ci, true);
 
                         logger.info(data.size + " objects loaded");
                     });
-                    // Sync waiting
-                    while (sync && !CatalogManager.instance().contains(dsName)) {
+                    // Sync waiting until the node is in the scene graph
+                    while (sync && (starGroup.get() == null || !starGroup.get().inSceneGraph)) {
                         sleepFrames(1);
                     }
+                    sleepFrames(1);
                     return true;
                 } else {
                     // No data has been loaded
