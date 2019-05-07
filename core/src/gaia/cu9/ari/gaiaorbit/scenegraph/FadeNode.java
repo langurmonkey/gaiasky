@@ -5,7 +5,6 @@
 
 package gaia.cu9.ari.gaiaorbit.scenegraph;
 
-import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.math.Vector2;
@@ -157,7 +156,7 @@ public class FadeNode extends AbstractPositionEntity {
             this.opacity *= MathUtilsd.lint((float) this.currentDistance, fadeOut.x, fadeOut.y, 1, 0);
 
         // Visibility
-        this.msSinceStateChange += Gdx.graphics.getDeltaTime() * 1000;
+        this.msSinceStateChange += GaiaSky.instance.getT() * 1000;
         float visop = MathUtilsd.lint(this.msSinceStateChange, 0, GlobalConf.scene.OBJECT_FADE_MS, 0, 1);
         if (!this.visible) {
             visop = 1 - visop;

@@ -13,6 +13,7 @@ import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Group;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.TimeUtils;
+import com.bitfire.postprocessing.effects.CubemapProjections;
 import gaia.cu9.ari.gaiaorbit.GaiaSky;
 import gaia.cu9.ari.gaiaorbit.data.group.STILDataProvider;
 import gaia.cu9.ari.gaiaorbit.desktop.util.SysUtils;
@@ -39,10 +40,7 @@ import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.time.temporal.ChronoField;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
@@ -719,7 +717,7 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
 
     @Override
     public void setFrameOutputMode(String screenshotMode) {
-        if (checkString(screenshotMode, new String[] { GlobalConf.ScreenshotMode.redraw.toString(), GlobalConf.ScreenshotMode.simple.toString() }, "screenshotMode"))
+        if (checkStringEnum(screenshotMode, GlobalConf.ScreenshotMode.class, "screenshotMode"))
             em.post(Events.FRAME_OUTPUT_MODE_CMD, screenshotMode);
     }
 
@@ -1527,7 +1525,7 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
         @Override
         public void run() {
             // Update elapsed time
-            elapsed += Gdx.graphics.getDeltaTime();
+            elapsed += GaiaSky.instance.getT();
 
             // Interpolation variable
             double alpha = MathUtilsd.clamp(elapsed / seconds, 0.0, 0.99999999999999);
@@ -1797,6 +1795,14 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
     }
 
     @Override
+    public void setCubemapProjection(String projection) {
+        if (checkStringEnum(projection, CubemapProjections.CubemapProjection.class, "projection")) {
+            CubemapProjections.CubemapProjection newProj = CubemapProjections.CubemapProjection.valueOf(projection.toUpperCase());
+            em.post(Events.CUBEMAP_PROJECTION_CMD, newProj);
+        }
+    }
+
+    @Override
     public void setStereoscopicMode(boolean state) {
         Gdx.app.postRunnable(() -> em.post(Events.STEREOSCOPIC_CMD, state, false));
     }
@@ -2050,7 +2056,7 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
 
     @Override
     public boolean hasDataset(String dsName) {
-        if(checkString(dsName, "datasetName")) {
+        if (checkString(dsName, "datasetName")) {
             return CatalogManager.instance().contains(dsName);
         }
         return false;
@@ -2058,7 +2064,7 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
 
     @Override
     public boolean removeDataset(String dsName) {
-        if(checkString(dsName, "datasetName")) {
+        if (checkString(dsName, "datasetName")) {
             boolean exists = CatalogManager.instance().contains(dsName);
             if (exists)
                 Gdx.app.postRunnable(() -> EventManager.instance.post(Events.CATALOG_REMOVE, dsName));
@@ -2069,7 +2075,7 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
 
     @Override
     public boolean hideDataset(String dsName) {
-        if(checkString(dsName, "datasetName")) {
+        if (checkString(dsName, "datasetName")) {
             boolean exists = CatalogManager.instance().contains(dsName);
             if (exists)
                 EventManager.instance.post(Events.CATALOG_VISIBLE, dsName, false);
@@ -2080,7 +2086,7 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
 
     @Override
     public boolean showDataset(String dsName) {
-        if(checkString(dsName, "datasetName")) {
+        if (checkString(dsName, "datasetName")) {
             boolean exists = CatalogManager.instance().contains(dsName);
             if (exists)
                 EventManager.instance.post(Events.CATALOG_VISIBLE, dsName, true);
@@ -2091,7 +2097,7 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
 
     @Override
     public boolean highlightDataset(String dsName, boolean highlight) {
-        if(checkString(dsName, "datasetName")) {
+        if (checkString(dsName, "datasetName")) {
             boolean exists = CatalogManager.instance().contains(dsName);
             if (exists)
                 EventManager.instance.post(Events.CATALOG_HIGHLIGHT, dsName, highlight, -1, false);
@@ -2102,7 +2108,7 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
 
     @Override
     public boolean highlightDataset(String dsName, int colorIndex, boolean highlight) {
-        if(checkString(dsName, "datasetName")) {
+        if (checkString(dsName, "datasetName")) {
             boolean exists = CatalogManager.instance().contains(dsName);
             if (exists)
                 EventManager.instance.post(Events.CATALOG_HIGHLIGHT, dsName, highlight, colorIndex, false);
@@ -2263,6 +2269,23 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
         logger.error(name + " value not valid: " + value + ". Possible values are:");
         for (String v : possibleValues)
             logger.error(v);
+    }
+
+    private <T extends Enum<T>> boolean checkStringEnum(String value, Class<T> clazz, String name) {
+        if (checkString(value, name)) {
+            for (Enum en : EnumSet.allOf(clazz)) {
+                if (value.equalsIgnoreCase(en.toString())) {
+                    return true;
+                }
+            }
+            logger.error(name + " value not valid: " + value + ". Must be a value in the enum " + clazz.getSimpleName() + ":");
+            for (Enum en : EnumSet.allOf(clazz)) {
+                logger.error(en.toString());
+            }
+            return false;
+        } else {
+            return false;
+        }
     }
 
     private boolean checkNotNull(Object o, String name) {

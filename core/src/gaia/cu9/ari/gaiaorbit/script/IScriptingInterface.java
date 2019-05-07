@@ -1331,6 +1331,15 @@ public interface IScriptingInterface {
     void setCubemapResolution(int resolution);
 
     /**
+     * Sets the cubemap projection to use.
+     * Accepted values are "EQUIRECTANGULAR", "CYLINDRICAL" and "HAMMER".
+     * See {@link com.bitfire.postprocessing.effects.CubemapProjections.CubemapProjection} for possible
+     * values.
+     * @param projection
+     */
+    void setCubemapProjection(String projection);
+
+    /**
      * Enables and disables the stereoscopic mode.
      *
      * @param state The boolean sate. True to activate, false to deactivate.

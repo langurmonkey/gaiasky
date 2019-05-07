@@ -41,6 +41,7 @@ import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.GdxRuntimeException;
+import gaia.cu9.ari.gaiaorbit.GaiaSky;
 import gaia.cu9.ari.gaiaorbit.util.gdx.IntRenderable;
 
 public class DefaultIntShader extends BaseIntShader {
@@ -751,7 +752,7 @@ public class DefaultIntShader extends BaseIntShader {
 			spotLight.set(0, 0, 0, 0, 0, 0, 0, -1, 0, 0, 1, 0);
 		lightsSet = false;
 
-		if (has(u_time)) set(u_time, time += Gdx.graphics.getDeltaTime());
+		if (has(u_time)) set(u_time, time += GaiaSky.instance.getT());
 	}
 
 	@Override
