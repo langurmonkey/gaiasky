@@ -90,7 +90,7 @@ public class SceneGraphRenderer extends AbstractRenderer implements IProcessRend
     public static float[] alphas;
 
     private ShaderProgram[] starGroupShaders, particleGroupShaders, particleEffectShaders, orbitElemShaders, pointShaders, lineShaders, lineQuadShaders, lineGpuShaders, galaxyPointShaders, starPointShaders, galShaders, spriteShaders, starBillboardShaders;
-    private AssetDescriptor<ShaderProgram>[] starGroupDesc, particleGroupDesc, particleEffectDesc, orbitElemDesc, pointDesc, lineDesc, lineQuadDesc, lineGpuDesc, galaxyPointDesc,starPointDesc, galDesc, spriteDesc, starBillboardDesc;
+    private AssetDescriptor<ShaderProgram>[] starGroupDesc, particleGroupDesc, particleEffectDesc, orbitElemDesc, pointDesc, lineDesc, lineQuadDesc, lineGpuDesc, galaxyPointDesc, starPointDesc, galDesc, spriteDesc, starBillboardDesc;
 
     /** Render lists for all render groups **/
     public static Array<Array<IRenderable>> render_lists;
@@ -1101,13 +1101,8 @@ public class SceneGraphRenderer extends AbstractRenderer implements IProcessRend
 
     private void buildGlowData() {
         if (glowFb == null) {
-            FrameBufferBuilder fbb = new FrameBufferBuilder(1080, 720);
-            if (Gdx.graphics.isGL30Available()) {
-                //fbb.addBasicColorTextureAttachment(fbf);
-                fbb.addFloatAttachment(GL30.GL_RGBA16F, GL30.GL_RGBA, GL30.GL_FLOAT, true);
-            } else {
-                fbb.addBasicColorTextureAttachment(Format.RGBA8888);
-            }
+            FrameBufferBuilder fbb = new FrameBufferBuilder(1920, 1080);
+            fbb.addBasicColorTextureAttachment(Format.RGBA8888);
             fbb.addBasicDepthRenderBuffer();
             glowFb = new GaiaSkyFrameBuffer(fbb);
         }

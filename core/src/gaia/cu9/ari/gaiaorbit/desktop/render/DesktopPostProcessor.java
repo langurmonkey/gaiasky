@@ -40,7 +40,7 @@ public class DesktopPostProcessor implements IPostProcessor, IObserver {
     // Number of flares
     int nGhosts = 6;
     // Number of samples for the light glow
-    int lgLowNSamples = 1;
+    int lightGlowNSamples = 1;
 
     Vector3d auxd, prevCampos;
     Vector3 auxf;
@@ -81,7 +81,7 @@ public class DesktopPostProcessor implements IPostProcessor, IObserver {
         if (GlobalConf.frame.isRedrawMode())
             pps[RenderType.frame.index] = newPostProcessor(getWidth(RenderType.frame), getHeight(RenderType.frame), manager);
 
-        EventManager.instance.subscribe(this, Events.SCREENSHOT_SIZE_UDPATE, Events.FRAME_SIZE_UDPATE, Events.BLOOM_CMD, Events.LENS_FLARE_CMD, Events.MOTION_BLUR_CMD, Events.LIGHT_POS_2D_UPDATED, Events.LIGHT_SCATTERING_CMD, Events.FISHEYE_CMD, Events.CUBEMAP360_CMD, Events.ANTIALIASING_CMD, Events.BRIGHTNESS_CMD, Events.CONTRAST_CMD, Events.HUE_CMD, Events.SATURATION_CMD, Events.GAMMA_CMD, Events.TONEMAPPING_TYPE_CMD, Events.EXPOSURE_CMD, Events.STEREO_PROFILE_CMD, Events.STEREOSCOPIC_CMD, Events.FPS_INFO, Events.FOV_CHANGE_NOTIFICATION);
+        EventManager.instance.subscribe(this, Events.SCREENSHOT_SIZE_UDPATE, Events.FRAME_SIZE_UDPATE, Events.BLOOM_CMD, Events.LENS_FLARE_CMD, Events.MOTION_BLUR_CMD, Events.LIGHT_POS_2D_UPDATED, Events.LIGHT_SCATTERING_CMD, Events.FISHEYE_CMD, Events.CUBEMAP360_CMD, Events.ANTIALIASING_CMD, Events.BRIGHTNESS_CMD, Events.CONTRAST_CMD, Events.HUE_CMD, Events.SATURATION_CMD, Events.GAMMA_CMD, Events.TONEMAPPING_TYPE_CMD, Events.EXPOSURE_CMD, Events.STEREO_PROFILE_CMD, Events.STEREOSCOPIC_CMD, Events.FPS_INFO, Events.FOV_CHANGE_NOTIFICATION, Events.STAR_BRIGHTNESS_CMD, Events.STAR_POINT_SIZE_CMD);
     }
 
     private int getWidth(RenderType type) {
@@ -124,19 +124,19 @@ public class DesktopPostProcessor implements IPostProcessor, IObserver {
         Texture glow;
         // TODO Listen to GRAPHICS_QUALITY_CHANGED and apply new settings on the fly
         if (GlobalConf.scene.isHighQuality()) {
-            lgLowNSamples = 12;
+            lightGlowNSamples = 12;
             lgw = 1280;
             lgh = Math.round(lgw / ar);
             glow = manager.get(GlobalConf.data.dataFile("tex/base/star_glow.png"));
             Glow.N = 30;
         } else if (GlobalConf.scene.isNormalQuality()) {
-            lgLowNSamples = 8;
+            lightGlowNSamples = 8;
             lgw = 1000;
             lgh = Math.round(lgw / ar);
             glow = manager.get(GlobalConf.data.dataFile("tex/base/star_glow_s.png"));
             Glow.N = 20;
         } else {
-            lgLowNSamples = 4;
+            lightGlowNSamples = 4;
             lgw = 1000;
             lgh = Math.round(lgw / ar);
             glow = manager.get(GlobalConf.data.dataFile("tex/base/star_glow_s.png"));
@@ -145,8 +145,9 @@ public class DesktopPostProcessor implements IPostProcessor, IObserver {
         glow.setFilter(TextureFilter.Linear, TextureFilter.Linear);
         ppb.lightglow = new LightGlow(lgw, lgh);
         ppb.lightglow.setLightGlowTexture(glow);
-        ppb.lightglow.setNSamples(lgLowNSamples);
-        ppb.lightglow.setTextureScale(0.9f / GaiaSky.instance.cam.getFovFactor());
+        ppb.lightglow.setNSamples(lightGlowNSamples);
+        ppb.lightglow.setTextureScale(getGlowTextureScale(GlobalConf.scene.STAR_BRIGHTNESS, GlobalConf.scene.STAR_POINT_SIZE, GaiaSky.instance.cam.getFovFactor()));
+        ppb.lightglow.setSpiralScale(getGlowSpiralScale(GlobalConf.scene.STAR_BRIGHTNESS, GlobalConf.scene.STAR_POINT_SIZE, GaiaSky.instance.cam.getFovFactor()));
         ppb.lightglow.setEnabled(GlobalConf.postprocess.POSTPROCESS_LIGHT_SCATTERING);
         ppb.pp.addEffect(ppb.lightglow);
 
@@ -279,16 +280,67 @@ public class DesktopPostProcessor implements IPostProcessor, IObserver {
             }
     }
 
+    private float getGlowTextureScale(double starBrightness, float starSize, float fovFactor) {
+        float ts = (float) starBrightness * starSize * 9e-2f / fovFactor;
+        return ts;
+    }
+
+    private float getGlowSpiralScale(double starBrightness, float starSize, float fovFactor) {
+        float ss = (float) starBrightness * starSize * 1e-4f / fovFactor;
+        return ss;
+    }
+
     @Override
     public void notify(Events event, final Object... data) {
         switch (event) {
-        case FOV_CHANGE_NOTIFICATION:
-            float newFov = (Float) data[0];
+        case STAR_BRIGHTNESS_CMD:
+            float brightness = (Float) data[0];
             Gdx.app.postRunnable(() -> {
                 for (int i = 0; i < RenderType.values().length; i++) {
                     if (pps[i] != null) {
                         PostProcessBean ppb = pps[i];
-                        ppb.lightglow.setNSamples(newFov > 65 ? 1 : lgLowNSamples);
+                        ppb.lightglow.setTextureScale(getGlowTextureScale(brightness, GlobalConf.scene.STAR_POINT_SIZE, GaiaSky.instance.cam.getFovFactor()));
+                        ppb.lightglow.setSpiralScale(getGlowSpiralScale(brightness, GlobalConf.scene.STAR_POINT_SIZE, GaiaSky.instance.cam.getFovFactor()));
+                    }
+                }
+            });
+            break;
+        case STAR_POINT_SIZE_CMD:
+            float size = (Float) data[0];
+            Gdx.app.postRunnable(() -> {
+                for (int i = 0; i < RenderType.values().length; i++) {
+                    if (pps[i] != null) {
+                        PostProcessBean ppb = pps[i];
+                        ppb.lightglow.setTextureScale(getGlowTextureScale(GlobalConf.scene.STAR_BRIGHTNESS, size, GaiaSky.instance.cam.getFovFactor()));
+                        ppb.lightglow.setSpiralScale(getGlowSpiralScale(GlobalConf.scene.STAR_BRIGHTNESS, size, GaiaSky.instance.cam.getFovFactor()));
+                    }
+                }
+            });
+            break;
+        case LIGHT_POS_2D_UPDATED:
+            Integer nLights = (Integer) data[0];
+            float[] lightPos = (float[]) data[1];
+            float[] angles = (float[]) data[2];
+            float[] colors = (float[]) data[3];
+            Texture prePass = (Texture) data[4];
+            for (int i = 0; i < RenderType.values().length; i++) {
+                if (pps[i] != null) {
+                    PostProcessBean ppb = pps[i];
+                    ppb.lightglow.setLightPositions(nLights, lightPos);
+                    ppb.lightglow.setLightViewAngles(angles);
+                    ppb.lightglow.setLightColors(colors);
+                    if (prePass != null)
+                        ppb.lightglow.setPrePassTexture(prePass);
+                }
+            }
+            break;
+        case FOV_CHANGE_NOTIFICATION:
+            Gdx.app.postRunnable(() -> {
+                for (int i = 0; i < RenderType.values().length; i++) {
+                    if (pps[i] != null) {
+                        PostProcessBean ppb = pps[i];
+                        ppb.lightglow.setTextureScale(getGlowTextureScale(GlobalConf.scene.STAR_BRIGHTNESS, GlobalConf.scene.STAR_POINT_SIZE, GaiaSky.instance.cam.getFovFactor()));
+                        ppb.lightglow.setSpiralScale(getGlowSpiralScale(GlobalConf.scene.STAR_BRIGHTNESS, GlobalConf.scene.STAR_POINT_SIZE, GaiaSky.instance.cam.getFovFactor()));
                     }
                 }
             });
@@ -299,9 +351,7 @@ public class DesktopPostProcessor implements IPostProcessor, IObserver {
                 int newh = (Integer) data[1];
                 if (pps[RenderType.screenshot.index] != null) {
                     if (changed(pps[RenderType.screenshot.index].pp, neww, newh)) {
-                        Gdx.app.postRunnable(() -> {
-                            replace(RenderType.screenshot.index, neww, newh);
-                        });
+                        Gdx.app.postRunnable(() -> replace(RenderType.screenshot.index, neww, newh));
                     }
                 } else {
                     pps[RenderType.screenshot.index] = newPostProcessor(neww, newh, manager);
@@ -363,7 +413,7 @@ public class DesktopPostProcessor implements IPostProcessor, IObserver {
                 if (pps[i] != null) {
                     PostProcessBean ppb = pps[i];
                     ppb.fisheye.setEnabled(active);
-                    ppb.lightglow.setNSamples(active ? 1 : lgLowNSamples);
+                    ppb.lightglow.setNSamples(active ? 1 : lightGlowNSamples);
                 }
             }
             break;
@@ -387,30 +437,10 @@ public class DesktopPostProcessor implements IPostProcessor, IObserver {
                     PostProcessBean ppb = pps[i];
                     ppb.motionblur.setBlurOpacity(!enabled ? 0 : GlobalConf.postprocess.POSTPROCESS_MOTION_BLUR);
                     ppb.motionblur.setEnabled(enabled);
-                    ppb.lightglow.setNSamples(enabled ? 1 : lgLowNSamples);
+                    ppb.lightglow.setNSamples(enabled ? 1 : lightGlowNSamples);
                 }
             }
 
-            break;
-
-        case LIGHT_POS_2D_UPDATED:
-            Integer nLights = (Integer) data[0];
-            float[] lightpos = (float[]) data[1];
-            float[] angles = (float[]) data[2];
-            float[] colors = (float[]) data[3];
-            Texture prePass = (Texture) data[4];
-
-            for (int i = 0; i < RenderType.values().length; i++) {
-                if (pps[i] != null) {
-                    PostProcessBean ppb = pps[i];
-                    ppb.lightglow.setLightPositions(nLights, lightpos);
-                    ppb.lightglow.setLightViewAngles(angles);
-                    ppb.lightglow.setLightColors(colors);
-                    ppb.lightglow.setTextureScale(0.9f / GaiaSky.instance.cam.getFovFactor());
-                    if (prePass != null)
-                        ppb.lightglow.setPrePassTexture(prePass);
-                }
-            }
             break;
         case STEREOSCOPIC_CMD:
             updateStereo((boolean) data[0], GlobalConf.program.STEREO_PROFILE);

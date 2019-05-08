@@ -100,12 +100,12 @@ public class DefaultIntShader extends BaseIntShader {
 		public final static Uniform emissiveTexture = new Uniform("u_emissiveTexture", TextureAttribute.Emissive);
 		public final static Uniform emissiveUVTransform = new Uniform("u_emissiveUVTransform", TextureAttribute.Emissive);
 		public final static Uniform reflectionColor = new Uniform("u_reflectionColor", ColorAttribute.Reflection);
-		public final static Uniform reflectionTexture = new Uniform("u_reflectionTexture", TextureAttribute.Reflection);
-		public final static Uniform reflectionUVTransform = new Uniform("u_reflectionUVTransform", TextureAttribute.Reflection);
 		public final static Uniform normalTexture = new Uniform("u_normalTexture", TextureAttribute.Normal);
 		public final static Uniform normalUVTransform = new Uniform("u_normalUVTransform", TextureAttribute.Normal);
 		public final static Uniform ambientTexture = new Uniform("u_ambientTexture", TextureAttribute.Ambient);
 		public final static Uniform ambientUVTransform = new Uniform("u_ambientUVTransform", TextureAttribute.Ambient);
+		public final static Uniform heightTexture = new Uniform("u_reflectionTexture", TextureAttribute.Reflection);
+		public final static Uniform heightUVTransform = new Uniform("u_reflectionUVTransform", TextureAttribute.Ambient);
 		public final static Uniform alphaTest = new Uniform("u_alphaTest");
 
 		public final static Uniform ambientCube = new Uniform("u_ambientCubemap");
@@ -284,21 +284,6 @@ public class DefaultIntShader extends BaseIntShader {
 				shader.set(inputID, ((ColorAttribute)(combinedAttributes.get(ColorAttribute.Reflection))).color);
 			}
 		};
-		public final static Setter reflectionTexture = new LocalSetter() {
-			@Override
-			public void set (BaseIntShader shader, int inputID, IntRenderable renderable, Attributes combinedAttributes) {
-				final int unit = shader.context.textureBinder.bind(((TextureAttribute)(combinedAttributes
-					.get(TextureAttribute.Reflection))).textureDescription);
-				shader.set(inputID, unit);
-			}
-		};
-		public final static Setter reflectionUVTransform = new LocalSetter() {
-			@Override
-			public void set (BaseIntShader shader, int inputID, IntRenderable renderable, Attributes combinedAttributes) {
-				final TextureAttribute ta = (TextureAttribute)(combinedAttributes.get(TextureAttribute.Reflection));
-				shader.set(inputID, ta.offsetU, ta.offsetV, ta.scaleU, ta.scaleV);
-			}
-		};
 		public final static Setter normalTexture = new LocalSetter() {
 			@Override
 			public void set (BaseIntShader shader, int inputID, IntRenderable renderable, Attributes combinedAttributes) {
@@ -326,6 +311,21 @@ public class DefaultIntShader extends BaseIntShader {
 			@Override
 			public void set (BaseIntShader shader, int inputID, IntRenderable renderable, Attributes combinedAttributes) {
 				final TextureAttribute ta = (TextureAttribute)(combinedAttributes.get(TextureAttribute.Ambient));
+				shader.set(inputID, ta.offsetU, ta.offsetV, ta.scaleU, ta.scaleV);
+			}
+		};
+		public final static Setter heightTexture = new LocalSetter() {
+			@Override
+			public void set (BaseIntShader shader, int inputID, IntRenderable renderable, Attributes combinedAttributes) {
+				final int unit = shader.context.textureBinder.bind(((TextureAttribute)(combinedAttributes
+						.get(TextureAttribute.Reflection))).textureDescription);
+				shader.set(inputID, unit);
+			}
+		};
+		public final static Setter heightUVTransform = new LocalSetter() {
+			@Override
+			public void set (BaseIntShader shader, int inputID, IntRenderable renderable, Attributes combinedAttributes) {
+				final TextureAttribute ta = (TextureAttribute)(combinedAttributes.get(TextureAttribute.Reflection));
 				shader.set(inputID, ta.offsetU, ta.offsetV, ta.scaleU, ta.scaleV);
 			}
 		};
@@ -433,12 +433,12 @@ public class DefaultIntShader extends BaseIntShader {
 	public final int u_emissiveTexture;
 	public final int u_emissiveUVTransform;
 	public final int u_reflectionColor;
-	public final int u_reflectionTexture;
-	public final int u_reflectionUVTransform;
 	public final int u_normalTexture;
 	public final int u_normalUVTransform;
 	public final int u_ambientTexture;
 	public final int u_ambientUVTransform;
+	public final int u_heightTexture;
+	public final int u_heightUVTransform;
 	public final int u_alphaTest;
 	// Lighting uniforms
 	protected final int u_ambientCubemap;
@@ -570,12 +570,12 @@ public class DefaultIntShader extends BaseIntShader {
 		u_emissiveTexture = register(Inputs.emissiveTexture, Setters.emissiveTexture);
 		u_emissiveUVTransform = register(Inputs.emissiveUVTransform, Setters.emissiveUVTransform);
 		u_reflectionColor = register(Inputs.reflectionColor, Setters.reflectionColor);
-		u_reflectionTexture = register(Inputs.reflectionTexture, Setters.reflectionTexture);
-		u_reflectionUVTransform = register(Inputs.reflectionUVTransform, Setters.reflectionUVTransform);
 		u_normalTexture = register(Inputs.normalTexture, Setters.normalTexture);
 		u_normalUVTransform = register(Inputs.normalUVTransform, Setters.normalUVTransform);
 		u_ambientTexture = register(Inputs.ambientTexture, Setters.ambientTexture);
 		u_ambientUVTransform = register(Inputs.ambientUVTransform, Setters.ambientUVTransform);
+		u_heightTexture = register(Inputs.heightTexture, Setters.heightTexture);
+		u_heightUVTransform = register(Inputs.heightUVTransform, Setters.heightUVTransform);
 		u_alphaTest = register(Inputs.alphaTest);
 
 		u_ambientCubemap = lighting ? register(Inputs.ambientCube, new Setters.ACubemap(config.numDirectionalLights,

@@ -6,7 +6,7 @@
 ////////// POSITION ATTRIBUTE - VERTEX
 ////////////////////////////////////////////////////////////////////////////////////
 #ifdef positionFlag
-    attribute vec3 a_position;
+    in vec3 a_position;
 #endif //positionFlag
 
 out vec4 v_position;
@@ -26,7 +26,7 @@ out vec4 v_position;
 ////////// NORMAL ATTRIBUTE - VERTEX
 ///////////////////////////////////////////////////////////////////////////////////
 #ifdef normalFlag
-    attribute vec3 a_normal;
+    in vec3 a_normal;
 #endif //normalFlag
 
 out vec3 v_normal;
@@ -45,7 +45,7 @@ out vec3 v_normal;
 ////////// BINORMAL ATTRIBUTE - VERTEX
 ///////////////////////////////////////////////////////////////////////////////////
 #ifdef binormalFlag
-    attribute vec3 a_binormal;
+    in vec3 a_binormal;
 #endif //binormalFlag
 
 out vec3 v_binormal;
@@ -64,7 +64,7 @@ out vec3 v_binormal;
 ////////// TANGENT ATTRIBUTE - VERTEX
 ///////////////////////////////////////////////////////////////////////////////////
 #ifdef tangentFlag
-    attribute vec3 a_tangent;
+    in vec3 a_tangent;
 #endif //tangentFlagvec3
 
 out vec3 v_tangent;
@@ -86,7 +86,7 @@ out vec3 v_tangent;
     #ifndef texCoordsFlag
 	#define texCoordsFlag
     #endif
-    attribute vec2 a_texCoord0;
+    in vec2 a_texCoord0;
 #endif
 
 out vec2 v_texCoord0;
@@ -324,7 +324,7 @@ out float v_alphaTest;
 ////////// COLOR ATTRIBUTE - VERTEX
 ///////////////////////////////////////////////////////////////////////////////////
 #ifdef colorFlag
-attribute vec4 a_color;
+in vec4 a_color;
 #endif //colorFlag
 
 out vec4 v_color;
@@ -440,11 +440,7 @@ void main() {
 	//v_shadowMapUv.z = min(spos.z * 0.5 + 0.5, 0.998);
     #endif //shadowMapFlag
     
-
-    mat3 worldToTangent;
-    worldToTangent[0] = g_tangent;
-    worldToTangent[1] = g_binormal;
-    worldToTangent[2] = g_normal;
+    mat3 worldToTangent = mat3(g_tangent, g_binormal, g_normal);
 
     #ifdef ambientLightFlag
 	v_ambientLight = u_ambientLight;
@@ -467,9 +463,12 @@ void main() {
         v_lightDir = vec3(0.0, 0.0, 0.0);
         v_lightCol = vec3(0.0);
     #endif // directionalLightsFlag
+
+    v_tangent = pos.xyz * worldToTangent;
     
     vec3 viewDir = (u_cameraPosition.xyz - pos.xyz);
-    v_viewDir = normalize(viewDir * worldToTangent);
+    v_viewDir = viewDir * worldToTangent;
+
     #ifdef environmentCubemapFlag
 	v_reflect = reflect(-viewDir, g_normal);
     #endif // environmentCubemapFlag

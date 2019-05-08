@@ -37,8 +37,8 @@ public class TextureComponent {
         textureParams.minFilter = TextureFilter.MipMapLinearNearest;
     }
 
-    public String base, specular, normal, night, ring;
-    public String baseT, specularT, normalT, nightT, ringT;
+    public String base, specular, normal, night, ring, height;
+    public String baseT, specularT, normalT, nightT, ringT, heightT;
     public Texture baseTex;
     /** Add also color even if texture is present **/
     public boolean coloriftex = false;
@@ -54,6 +54,7 @@ public class TextureComponent {
         specularT = addToLoad(specular, manager);
         nightT = addToLoad(night, manager);
         ringT = addToLoad(ring, manager);
+        heightT = addToLoad(height, manager);
     }
 
     public void initialize() {
@@ -63,10 +64,11 @@ public class TextureComponent {
         specularT = addToLoad(specular);
         nightT = addToLoad(night);
         ringT = addToLoad(ring);
+        heightT = addToLoad(height);
     }
 
     public boolean isFinishedLoading(AssetManager manager) {
-        return isFL(baseT, manager) && isFL(normalT, manager) && isFL(specularT, manager) && isFL(nightT, manager) && isFL(ringT, manager);
+        return isFL(baseT, manager) && isFL(normalT, manager) && isFL(specularT, manager) && isFL(nightT, manager) && isFL(ringT, manager) && isFL(heightT, manager);
     }
 
     public boolean isFL(String tex, AssetManager manager) {
@@ -161,6 +163,10 @@ public class TextureComponent {
             Texture tex = manager.get(nightT, Texture.class);
             material.set(new TextureAttribute(TextureAttribute.Emissive, tex));
         }
+        if(height != null) {
+            Texture tex = manager.get(heightT, Texture.class);
+            material.set(new TextureAttribute(TextureAttribute.Reflection, tex));
+        }
         if (instance.materials.size > 1) {
             // Ring material
             Material ringMat = instance.materials.get(1);
@@ -212,6 +218,10 @@ public class TextureComponent {
             Texture tex = manager.get(nightT, Texture.class);
             material.set(new TextureAttribute(TextureAttribute.Emissive, tex));
         }
+        if(height != null) {
+            Texture tex = manager.get(heightT, Texture.class);
+            material.set(new TextureAttribute(TextureAttribute.Reflection, tex));
+        }
         if (materials.containsKey("ring")) {
             // Ring material
             Material ringMat = materials.get("ring");
@@ -245,6 +255,9 @@ public class TextureComponent {
     public void setRing(String ring) {
         this.ring = GlobalConf.data.dataFile(ring);
     }
+    public void setHeight(String height){
+        this.height = GlobalConf.data.dataFile(height);
+    }
 
     public void setColoriftex(Boolean coloriftex) {
         this.coloriftex = coloriftex;
@@ -272,6 +285,10 @@ public class TextureComponent {
         if (ring != null && manager.containsAsset(ringT)) {
             manager.unload(ringT);
             ringT = null;
+        }
+        if (height != null && manager.containsAsset(heightT)) {
+            manager.unload(heightT);
+            heightT = null;
         }
     }
 }

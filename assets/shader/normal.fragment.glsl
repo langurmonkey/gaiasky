@@ -96,6 +96,10 @@ uniform vec4 u_emissiveColor;
 uniform sampler2D u_emissiveTexture;
 #endif
 
+#ifdef reflectionTextureFlag
+uniform sampler2D u_reflectionTexture;
+#endif
+
 #if defined(diffuseTextureFlag) || defined(specularTextureFlag)
 #define textureFlag
 #endif
@@ -253,6 +257,36 @@ out vec4 fragColor;
 void main() {
     vec2 g_texCoord0 = v_texCoord0;
 
+    // Parallax occlusion mapping
+    #ifdef reflectionTextureFlag
+    const float height_scale = 0.01;
+    // number of depth layers
+    const float numLayers = 10;
+    // calculate the size of each layer
+    float layerDepth = 1.0 / numLayers;
+    // depth of current layer
+    float currentLayerDepth = 0.0;
+    // the amount to shift the texture coordinates per layer (from vector P)
+    vec3 viewDir = normalize(v_viewDir - v_tangent);
+    vec2 P = viewDir.xy * height_scale;
+    vec2 deltaTexCoords = P / numLayers;
+    // get initial values
+    vec2  currentTexCoords     = g_texCoord0;
+    float currentDepthMapValue = texture(u_reflectionTexture, currentTexCoords).r;
+
+    while(currentLayerDepth < currentDepthMapValue)
+    {
+        // shift texture coordinates along direction of P
+        currentTexCoords -= deltaTexCoords;
+        // get depthmap value at current texture coordinates
+        currentDepthMapValue = texture(u_reflectionTexture, currentTexCoords).r;
+        // get depth of next layer
+        currentLayerDepth += layerDepth;
+    }
+
+    g_texCoord0 = currentTexCoords;
+    #endif // reflectionTextureFlag
+
     vec4 diffuse = fetchColorDiffuse(v_color, u_diffuseTexture, g_texCoord0, vec4(1.0, 1.0, 1.0, 1.0));
     vec4 emissive = fetchColorEmissive(u_emissiveTexture, g_texCoord0);
     vec3 specular = fetchColorSpecular(g_texCoord0, vec3(0.0, 0.0, 0.0));
@@ -304,7 +338,8 @@ void main() {
     
     // Prevent saturation
     fragColor = clamp(fragColor, 0.0, 1.0);
-    fragColor.rgb *= 0.95;
+
+
 
     if(fragColor.a == 0.0){
         discard;
