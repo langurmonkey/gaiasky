@@ -18,6 +18,7 @@ import com.badlogic.gdx.graphics.g3d.attributes.TextureAttribute;
 import gaia.cu9.ari.gaiaorbit.data.AssetBean;
 import gaia.cu9.ari.gaiaorbit.util.GlobalConf;
 import gaia.cu9.ari.gaiaorbit.util.gdx.model.IntModelInstance;
+import gaia.cu9.ari.gaiaorbit.util.gdx.shader.TextureExtAttribute;
 
 import java.util.Map;
 
@@ -165,7 +166,7 @@ public class TextureComponent {
         }
         if(height != null) {
             Texture tex = manager.get(heightT, Texture.class);
-            material.set(new TextureAttribute(TextureAttribute.Reflection, tex));
+            material.set(new TextureExtAttribute(TextureExtAttribute.Height, tex));
         }
         if (instance.materials.size > 1) {
             // Ring material

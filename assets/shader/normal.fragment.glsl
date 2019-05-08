@@ -50,11 +50,7 @@ in vec2 v_texCoord0;
 
 // Uniforms which are always available
 uniform mat4 u_projViewTrans;
-
 uniform mat4 u_worldTrans;
-
-uniform vec4 u_cameraPosition;
-
 uniform mat3 u_normalMatrix;
 
 // Varyings computed in the vertex shader
@@ -100,6 +96,10 @@ uniform sampler2D u_emissiveTexture;
 uniform sampler2D u_reflectionTexture;
 #endif
 
+#ifdef heightTextureFlag
+uniform sampler2D u_heightTexture;
+#endif
+
 #if defined(diffuseTextureFlag) || defined(specularTextureFlag)
 #define textureFlag
 #endif
@@ -119,6 +119,10 @@ uniform sampler2D u_reflectionTexture;
 #if	defined(ambientLightFlag) || defined(ambientCubemapFlag) || defined(sphericalHarmonicsFlag)
 #define ambientFlag
 #endif //ambientFlag
+
+#if defined(heightTextureFlag)
+#define heightFlag
+#endif //heightFlag
 
 
 //////////////////////////////////////////////////////
@@ -235,6 +239,14 @@ in vec3 v_lightCol;
 in vec3 v_viewDir;
 in float v_depth;
 
+////////////////////////////////
+//  PARALLAX MAPPING
+////////////////////////////////
+#ifdef heightFlag
+in vec3 v_tangentFragPos;
+in vec3 v_tangentViewPos;
+#endif // heightFlag
+
 #ifdef environmentCubemapFlag
 in vec3 v_reflect;
 #endif
@@ -253,47 +265,76 @@ out vec4 fragColor;
 
 #define PI 3.1415926535
 
-
-void main() {
-    vec2 g_texCoord0 = v_texCoord0;
-
-    // Parallax occlusion mapping
-    #ifdef reflectionTextureFlag
-    const float height_scale = 0.01;
+#ifdef heightFlag
+#define HEIGHT_SCALE 0.02
+vec2 parallaxMapping(vec2 texCoords, vec3 viewDir){
     // number of depth layers
-    const float numLayers = 10;
+    const float minLayers = 8;
+    const float maxLayers = 32;
+    float numLayers = mix(maxLayers, minLayers, abs(dot(vec3(0.0, 0.0, 1.0), viewDir)));
     // calculate the size of each layer
     float layerDepth = 1.0 / numLayers;
     // depth of current layer
     float currentLayerDepth = 0.0;
-    // the amount to shift the texture coordinates per layer (from vector P)
-    vec3 viewDir = normalize(v_viewDir - v_tangent);
-    vec2 P = viewDir.xy * height_scale;
-    vec2 deltaTexCoords = P / numLayers;
-    // get initial values
-    vec2  currentTexCoords     = g_texCoord0;
-    float currentDepthMapValue = texture(u_reflectionTexture, currentTexCoords).r;
 
-    while(currentLayerDepth < currentDepthMapValue)
-    {
+    // the amount to shift the texture coordinates per layer (from vector P)
+    vec2 P = viewDir.xy / viewDir.z * HEIGHT_SCALE;
+    vec2 deltaTexCoords = P / numLayers;
+
+    // get initial values
+    vec2  currentTexCoords     = texCoords;
+    float currentDepthMapValue = texture(u_heightTexture, currentTexCoords, TEXTURE_LOD_BIAS).r;
+
+    while(currentLayerDepth < currentDepthMapValue){
         // shift texture coordinates along direction of P
         currentTexCoords -= deltaTexCoords;
         // get depthmap value at current texture coordinates
-        currentDepthMapValue = texture(u_reflectionTexture, currentTexCoords).r;
+        currentDepthMapValue = texture(u_heightTexture, currentTexCoords, TEXTURE_LOD_BIAS).r;
         // get depth of next layer
         currentLayerDepth += layerDepth;
     }
 
-    g_texCoord0 = currentTexCoords;
-    #endif // reflectionTextureFlag
+    // get texture coordinates before collision (reverse operations)
+    vec2 prevTexCoords = currentTexCoords + deltaTexCoords;
 
-    vec4 diffuse = fetchColorDiffuse(v_color, u_diffuseTexture, g_texCoord0, vec4(1.0, 1.0, 1.0, 1.0));
-    vec4 emissive = fetchColorEmissive(u_emissiveTexture, g_texCoord0);
-    vec3 specular = fetchColorSpecular(g_texCoord0, vec3(0.0, 0.0, 0.0));
+    // get depth after and before collision for linear interpolation
+    float afterDepth  = currentDepthMapValue - currentLayerDepth;
+    float beforeDepth = texture(u_heightTexture, prevTexCoords, TEXTURE_LOD_BIAS).r - currentLayerDepth + layerDepth;
+
+    // interpolation of texture coordinates
+    float weight = afterDepth / (afterDepth - beforeDepth);
+    vec2 finalTexCoords = prevTexCoords * weight + currentTexCoords * (1.0 - weight);
+
+    return finalTexCoords;
+}
+
+vec2 parallaxMappingSimple(vec2 texCoords, vec3 viewDir){
+    float height = texture(u_heightTexture, texCoords).r;
+    vec3 displacement = viewDir * (height * HEIGHT_SCALE);
+    vec2 p = displacement.xy;
+    return texCoords - p;
+}
+#endif // heightFlag
+
+
+void main() {
+    vec2 texCoords = v_texCoord0;
+
+    // Parallax occlusion mapping
+    #ifdef heightFlag
+    vec3 tfp = v_tangentFragPos;
+    vec3 tvp = v_tangentViewPos;
+    vec3 viewDir = normalize(tvp - tfp);
+    texCoords = parallaxMappingSimple(texCoords, viewDir);
+    #endif // heightFlag
+
+    vec4 diffuse = fetchColorDiffuse(v_color, u_diffuseTexture, texCoords, vec4(1.0, 1.0, 1.0, 1.0));
+    vec4 emissive = fetchColorEmissive(u_emissiveTexture, texCoords);
+    vec3 specular = fetchColorSpecular(texCoords, vec3(0.0, 0.0, 0.0));
     vec3 ambient = v_ambientLight;
 
     #ifdef normalTextureFlag
-		vec3 N = normalize(vec3(texture(u_normalTexture, g_texCoord0, TEXTURE_LOD_BIAS).xyz * 2.0 - 1.0));
+		vec3 N = normalize(vec3(texture(u_normalTexture, texCoords, TEXTURE_LOD_BIAS).xyz * 2.0 - 1.0));
 		#ifdef environmentCubemapFlag
 			vec3 reflectDir = normalize(v_reflect + (vec3(0.0, 0.0, 1.0) - N.xyz));
 		#endif // environmentCubemapFlag
@@ -338,8 +379,6 @@ void main() {
     
     // Prevent saturation
     fragColor = clamp(fragColor, 0.0, 1.0);
-
-
 
     if(fragColor.a == 0.0){
         discard;

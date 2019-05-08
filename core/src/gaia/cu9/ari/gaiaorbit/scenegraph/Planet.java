@@ -137,7 +137,8 @@ public class Planet extends ModelBody implements IAtmosphereRenderable, ICloudRe
             Coordinates.cartesianToSpherical(pos, aux3);
             posSph.set((float) (Nature.TO_DEG * aux3.x), (float) (Nature.TO_DEG * aux3.y));
             // Update angle
-            rc.update(time);
+            if (rc != null)
+                rc.update(time);
         }
     }
 

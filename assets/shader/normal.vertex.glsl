@@ -21,6 +21,21 @@ out vec4 v_position;
 #define passPosition() passPositionValue(g_position)
 #define pushPosition() pushPositionValue(g_position)
 
+////////////////////////////////////////////////////////////////////////////////////
+////////// COLOR ATTRIBUTE - VERTEX
+///////////////////////////////////////////////////////////////////////////////////
+#ifdef colorFlag
+    in vec4 a_color;
+#endif //colorFlag
+
+out vec4 v_color;
+#define pushColor(value) v_color = value
+
+#if defined(colorFlag)
+    vec4 g_color = a_color;
+#else
+    vec4 g_color = vec4(1.0, 1.0, 1.0, 1.0);
+#endif // colorFlag
 
 ////////////////////////////////////////////////////////////////////////////////////
 ////////// NORMAL ATTRIBUTE - VERTEX
@@ -229,7 +244,6 @@ out vec4 v_atmosphereColor;
 // Uniforms which are always available
 uniform mat4 u_projViewTrans;
 uniform mat4 u_worldTrans;
-uniform vec4 u_cameraPosition;
 uniform mat3 u_normalMatrix;
 
 // Other uniforms
@@ -286,6 +300,10 @@ out float v_alphaTest;
     #define specularFlag
 #endif
 
+#if defined(heightTextureFlag)
+    #define heightFlag
+#endif //heightFlag
+
 #if defined(specularFlag) || defined(fogFlag)
     #define cameraPositionFlag
 #endif
@@ -304,7 +322,7 @@ out float v_alphaTest;
         void calculateTangentVectors() {
             g_binormal = vec3(0, g_normal.z, -g_normal.y);
             g_tangent = normalize(cross(g_normal, g_binormal));
-        }
+}
     #elif defined(binormalFlag)
         void calculateTangentVectors() {
             g_tangent = vec3(-g_binormal.z, 0, g_binormal.x);
@@ -320,25 +338,7 @@ out float v_alphaTest;
     #define calculateTangentVectors() nop()
 #endif
 
-////////////////////////////////////////////////////////////////////////////////////
-////////// COLOR ATTRIBUTE - VERTEX
-///////////////////////////////////////////////////////////////////////////////////
-#ifdef colorFlag
-in vec4 a_color;
-#endif //colorFlag
 
-out vec4 v_color;
-#define pushColor(value) v_color = value
-
-#if defined(colorFlag)
-vec4 g_color = a_color;
-#else
-#if defined(diffuseColorFlag)
-vec4 g_color = u_diffuseColor;
-#else
-vec4 g_color = vec4(1.0, 1.0, 1.0, 1.0);
-#endif
-#endif // colorFlag
 
 //////////////////////////////////////////////////////
 ////// AMBIENT LIGHT
@@ -397,6 +397,11 @@ out vec3 v_lightDir;
 out vec3 v_lightCol;
 out vec3 v_viewDir;
 
+#ifdef heightFlag
+out vec3 v_tangentViewPos;
+out vec3 v_tangentFragPos;
+#endif
+
 #ifdef environmentCubemapFlag
 out vec3 v_reflect;
 #endif
@@ -412,12 +417,7 @@ void main() {
     v_opacity = u_opacity;
     v_alphaTest = u_alphaTest;
 
-    calculateTangentVectors();
-
-    g_normal = normalize(u_normalMatrix * g_normal);
-    g_binormal = normalize(u_normalMatrix * g_binormal);
-    g_tangent = normalize(u_normalMatrix * g_tangent);
-
+    // Location in world coordinates (world origin is at the camera)
     vec4 pos = u_worldTrans * g_position;
     
     #ifdef relativisticEffects
@@ -439,8 +439,13 @@ void main() {
 	v_shadowMapUv.xyz = (spos.xyz / spos.w) * 0.5 + 0.5;
 	//v_shadowMapUv.z = min(spos.z * 0.5 + 0.5, 0.998);
     #endif //shadowMapFlag
-    
-    mat3 worldToTangent = mat3(g_tangent, g_binormal, g_normal);
+
+    // Tangent space transform
+    calculateTangentVectors();
+    g_normal = normalize(u_normalMatrix * g_normal);
+    g_binormal = normalize(u_normalMatrix * g_binormal);
+    g_tangent = normalize(u_normalMatrix * g_tangent);
+    mat3 TBN = transpose(mat3(g_tangent, g_binormal, g_normal));
 
     #ifdef ambientLightFlag
 	v_ambientLight = u_ambientLight;
@@ -457,17 +462,22 @@ void main() {
     #endif // ambientCubemapFlag
 
     #ifdef directionalLightsFlag
-        v_lightDir = normalize(-u_dirLights[0].direction * worldToTangent);
+        v_lightDir = normalize(TBN * -u_dirLights[0].direction);
         v_lightCol = u_dirLights[0].color;
     #else
         v_lightDir = vec3(0.0, 0.0, 0.0);
         v_lightCol = vec3(0.0);
     #endif // directionalLightsFlag
 
-    v_tangent = pos.xyz * worldToTangent;
-    
-    vec3 viewDir = (u_cameraPosition.xyz - pos.xyz);
-    v_viewDir = viewDir * worldToTangent;
+    vec3 viewDir = -pos.xyz;
+    v_viewDir = TBN * viewDir;
+
+    #ifdef heightFlag
+    // Fragment position in tangent space
+    v_tangentFragPos = TBN * pos.xyz;
+    // View position in tangent space
+    v_tangentViewPos = v_viewDir;
+    #endif //heighFlag
 
     #ifdef environmentCubemapFlag
 	v_reflect = reflect(-viewDir, g_normal);

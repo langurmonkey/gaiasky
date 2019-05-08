@@ -144,9 +144,13 @@ public abstract class ModelBody extends CelestialBody {
 
     public void setToLocalTransform(float size, float sizeFactor, Matrix4 localTransform, boolean forceUpdate) {
         if (sizeFactor != 1 || forceUpdate) {
-            // NEW
-            translation.getMatrix(localTransform).scl(size * sizeFactor).mul(Coordinates.getTransformF(refPlaneTransform)).rotate(0, 1, 0, (float) rc.ascendingNode).rotate(0, 0, 1, (float) (rc.inclination + rc.axialTilt)).rotate(0, 1, 0, (float) rc.angle);
-            orientation.idt().mul(Coordinates.getTransformD(refPlaneTransform)).rotate(0, 0, 1, (float) (rc.inclination + rc.axialTilt)).rotate(0, 1, 0, (float) rc.ascendingNode);
+            if(rc != null) {
+                translation.getMatrix(localTransform).scl(size * sizeFactor).mul(Coordinates.getTransformF(refPlaneTransform)).rotate(0, 1, 0, (float) rc.ascendingNode).rotate(0, 0, 1, (float) (rc.inclination + rc.axialTilt)).rotate(0, 1, 0, (float) rc.angle);
+                orientation.idt().mul(Coordinates.getTransformD(refPlaneTransform)).rotate(0, 0, 1, (float) (rc.inclination + rc.axialTilt)).rotate(0, 1, 0, (float) rc.ascendingNode);
+            }else{
+                translation.getMatrix(localTransform).scl(size * sizeFactor).mul(Coordinates.getTransformF(refPlaneTransform));
+                orientation.idt().mul(Coordinates.getTransformD(refPlaneTransform));
+            }
         } else {
             localTransform.set(this.localTransform);
         }
