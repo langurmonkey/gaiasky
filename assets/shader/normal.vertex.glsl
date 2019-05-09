@@ -301,6 +301,8 @@ out float v_alphaTest;
 #endif
 
 #if defined(heightTextureFlag)
+    uniform sampler2D u_heightTexture;
+    uniform float u_heightScale;
     #define heightFlag
 #endif //heightFlag
 
@@ -414,6 +416,13 @@ void main() {
     calculateAtmosphereGroundColor();
     v_opacity = u_opacity;
     v_alphaTest = u_alphaTest;
+
+    //#ifdef heightFlag
+    // Use height texture to move vertex along normal
+    //float h = 1.0 - texture(u_heightTexture, a_texCoord0).r;
+    //vec3 dh = normalize(a_normal) * h * (u_heightScale / 4.0);
+    //g_position += vec4(dh, 0.0);
+    //#endif //heightFlag
 
     // Location in world coordinates (world origin is at the camera)
     vec4 pos = u_worldTrans * g_position;
