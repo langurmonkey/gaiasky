@@ -18,7 +18,8 @@ out vec4 fragColor;
 
 #define distfac 3.24e-8 / 60000.0
 #define distfacinv 60000.0 / 3.23e-8
-#define light_decay 3.0
+#define light_decay 0.3
+#define PI 3.1415927
 
 
 vec4 galaxyTexture(vec2 tc){
@@ -26,9 +27,7 @@ vec4 galaxyTexture(vec2 tc){
 }
 
 float light(float distance_center, float decay) {
-	float core = pow(smoothstep(0.4, 0.05, distance_center), decay);
-	float glow = smoothstep(1.0, 0.3, distance_center) * 0.7;
-    return max(core, glow);
+	return 1.0 - pow(abs(sin(PI * distance_center / 2.0)), decay);
 }
 
 vec4 drawSimple(vec2 tc) {

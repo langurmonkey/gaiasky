@@ -12,9 +12,11 @@ in float v_dust;
 
 out vec4 fragColor;
 
+#define decay 0.2
+#define PI 3.1415927
+
 float programmatic(vec2 uv, float dist) {
-    float dist_center = 1.0 - dist;
-    return pow(dist_center, 3.0) * 0.3 + smoothstep(0.8, 1.0, dist_center);
+    return 1.0 - pow(abs(sin(PI * dist / 2.0)), decay);
 }
 
 vec4 colorDust(float alpha) {
