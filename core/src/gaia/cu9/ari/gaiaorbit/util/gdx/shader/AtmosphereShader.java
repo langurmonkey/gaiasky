@@ -491,8 +491,8 @@ public class AtmosphereShader extends BaseIntShader {
 
             @Override
             public void set(BaseIntShader shader, int inputID, IntRenderable renderable, Attributes combinedAttributes) {
-                if (combinedAttributes.has(RelativisticEffectFloatAttribute.Vc))
-                    shader.set(inputID, ((RelativisticEffectFloatAttribute) (combinedAttributes.get(RelativisticEffectFloatAttribute.Vc))).value);
+                if (combinedAttributes.has(FloatExtAttribute.Vc))
+                    shader.set(inputID, ((FloatExtAttribute) (combinedAttributes.get(FloatExtAttribute.Vc))).value);
             }
         };
 
@@ -558,8 +558,8 @@ public class AtmosphereShader extends BaseIntShader {
 
             @Override
             public void set(BaseIntShader shader, int inputID, IntRenderable renderable, Attributes combinedAttributes) {
-                if (combinedAttributes.has(RelativisticEffectFloatAttribute.Ts))
-                    shader.set(inputID, ((RelativisticEffectFloatAttribute) (combinedAttributes.get(RelativisticEffectFloatAttribute.Ts))).value);
+                if (combinedAttributes.has(FloatExtAttribute.Ts))
+                    shader.set(inputID, ((FloatExtAttribute) (combinedAttributes.get(FloatExtAttribute.Ts))).value);
             }
         };
 
@@ -571,8 +571,8 @@ public class AtmosphereShader extends BaseIntShader {
 
             @Override
             public void set(BaseIntShader shader, int inputID, IntRenderable renderable, Attributes combinedAttributes) {
-                if (combinedAttributes.has(RelativisticEffectFloatAttribute.Omgw))
-                    shader.set(inputID, ((RelativisticEffectFloatAttribute) (combinedAttributes.get(RelativisticEffectFloatAttribute.Omgw))).value);
+                if (combinedAttributes.has(FloatExtAttribute.Omgw))
+                    shader.set(inputID, ((FloatExtAttribute) (combinedAttributes.get(FloatExtAttribute.Omgw))).value);
             }
         };
 
@@ -769,10 +769,10 @@ public class AtmosphereShader extends BaseIntShader {
         String prefix = "";
         final long attributesMask = attributes.getMask();
         // Atmosphere ground only if camera height is set
-        if ((attributesMask & RelativisticEffectFloatAttribute.Vc) == RelativisticEffectFloatAttribute.Vc)
+        if ((attributesMask & FloatExtAttribute.Vc) == FloatExtAttribute.Vc)
             prefix += "#define relativisticEffects\n";
         // Gravitational waves
-        if ((attributesMask & RelativisticEffectFloatAttribute.Omgw) == RelativisticEffectFloatAttribute.Omgw)
+        if ((attributesMask & FloatExtAttribute.Omgw) == FloatExtAttribute.Omgw)
             prefix += "#define gravitationalWaves\n";
         return prefix;
     }

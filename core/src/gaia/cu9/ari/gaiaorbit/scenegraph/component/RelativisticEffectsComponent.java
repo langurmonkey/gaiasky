@@ -12,7 +12,7 @@ import com.badlogic.gdx.utils.Array;
 import gaia.cu9.ari.gaiaorbit.scenegraph.camera.ICamera;
 import gaia.cu9.ari.gaiaorbit.util.gravwaves.RelativisticEffectsManager;
 import gaia.cu9.ari.gaiaorbit.util.gdx.shader.Matrix3Attribute;
-import gaia.cu9.ari.gaiaorbit.util.gdx.shader.RelativisticEffectFloatAttribute;
+import gaia.cu9.ari.gaiaorbit.util.gdx.shader.FloatExtAttribute;
 import gaia.cu9.ari.gaiaorbit.util.gdx.shader.Vector3Attribute;
 import gaia.cu9.ari.gaiaorbit.util.gdx.shader.Vector4Attribute;
 
@@ -46,7 +46,7 @@ public class RelativisticEffectsComponent {
     }
 
     public void setUpRelativisticEffectsMaterial(Material mat) {
-        mat.set(new RelativisticEffectFloatAttribute(RelativisticEffectFloatAttribute.Vc, 0f));
+        mat.set(new FloatExtAttribute(FloatExtAttribute.Vc, 0f));
         mat.set(new Vector3Attribute(Vector3Attribute.VelDir, new Vector3()));
     }
 
@@ -57,7 +57,7 @@ public class RelativisticEffectsComponent {
     }
 
     public void removeRelativisticEffectsMaterial(Material mat) {
-        mat.remove(RelativisticEffectFloatAttribute.Vc);
+        mat.remove(FloatExtAttribute.Vc);
         mat.remove(Vector3Attribute.VelDir);
     }
 
@@ -71,8 +71,8 @@ public class RelativisticEffectsComponent {
         mat.set(new Vector4Attribute(Vector4Attribute.Hterms, new float[4]));
         mat.set(new Vector3Attribute(Vector3Attribute.Gw, new Vector3()));
         mat.set(new Matrix3Attribute(Matrix3Attribute.Gwmat3, new Matrix3()));
-        mat.set(new RelativisticEffectFloatAttribute(RelativisticEffectFloatAttribute.Ts, 0f));
-        mat.set(new RelativisticEffectFloatAttribute(RelativisticEffectFloatAttribute.Omgw, 0f));
+        mat.set(new FloatExtAttribute(FloatExtAttribute.Ts, 0f));
+        mat.set(new FloatExtAttribute(FloatExtAttribute.Omgw, 0f));
     }
 
     public void removeGravitationalWavesMaterial(Array<Material> materials) {
@@ -85,8 +85,8 @@ public class RelativisticEffectsComponent {
         mat.remove(Vector4Attribute.Hterms);
         mat.remove(Vector3Attribute.Gw);
         mat.remove(Matrix3Attribute.Gwmat3);
-        mat.remove(RelativisticEffectFloatAttribute.Ts);
-        mat.remove(RelativisticEffectFloatAttribute.Omgw);
+        mat.remove(FloatExtAttribute.Ts);
+        mat.remove(FloatExtAttribute.Omgw);
     }
 
     public void updateRelativisticEffectsMaterial(Material material, ICamera camera) {
@@ -94,17 +94,17 @@ public class RelativisticEffectsComponent {
     }
 
     public void updateRelativisticEffectsMaterial(Material material, ICamera camera, float vc) {
-        if (material.get(RelativisticEffectFloatAttribute.Vc) == null) {
+        if (material.get(FloatExtAttribute.Vc) == null) {
             setUpRelativisticEffectsMaterial(material);
         }
         RelativisticEffectsManager rem = RelativisticEffectsManager.getInstance();
         if (vc != -1) {
             // v/c
-            ((RelativisticEffectFloatAttribute) material.get(RelativisticEffectFloatAttribute.Vc)).value = vc;
+            ((FloatExtAttribute) material.get(FloatExtAttribute.Vc)).value = vc;
         } else {
 
             // v/c
-            ((RelativisticEffectFloatAttribute) material.get(RelativisticEffectFloatAttribute.Vc)).value = rem.vc;
+            ((FloatExtAttribute) material.get(FloatExtAttribute.Vc)).value = rem.vc;
         }
         // Velocity direction
         ((Vector3Attribute) material.get(Vector3Attribute.VelDir)).value.set(rem.velDir);
@@ -125,10 +125,10 @@ public class RelativisticEffectsComponent {
         ((Matrix3Attribute) material.get(Matrix3Attribute.Gwmat3)).value.set(rem.gwmat3);
 
         // ts
-        ((RelativisticEffectFloatAttribute) material.get(RelativisticEffectFloatAttribute.Ts)).value = rem.gwtime;
+        ((FloatExtAttribute) material.get(FloatExtAttribute.Ts)).value = rem.gwtime;
 
         // omgw
-        ((RelativisticEffectFloatAttribute) material.get(RelativisticEffectFloatAttribute.Omgw)).value = rem.omgw;
+        ((FloatExtAttribute) material.get(FloatExtAttribute.Omgw)).value = rem.omgw;
     }
 
     public boolean hasGravitationalWaves(Material mat) {

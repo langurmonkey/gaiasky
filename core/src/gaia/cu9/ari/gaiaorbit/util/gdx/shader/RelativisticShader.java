@@ -33,8 +33,8 @@ public class RelativisticShader extends DefaultIntShader {
 
             @Override
             public void set(BaseIntShader shader, int inputID, IntRenderable renderable, Attributes combinedAttributes) {
-                if (combinedAttributes.has(RelativisticEffectFloatAttribute.Vc))
-                    shader.set(inputID, ((RelativisticEffectFloatAttribute) (combinedAttributes.get(RelativisticEffectFloatAttribute.Vc))).value);
+                if (combinedAttributes.has(FloatExtAttribute.Vc))
+                    shader.set(inputID, ((FloatExtAttribute) (combinedAttributes.get(FloatExtAttribute.Vc))).value);
             }
         };
 
@@ -100,8 +100,8 @@ public class RelativisticShader extends DefaultIntShader {
 
             @Override
             public void set(BaseIntShader shader, int inputID, IntRenderable renderable, Attributes combinedAttributes) {
-                if (combinedAttributes.has(RelativisticEffectFloatAttribute.Ts))
-                    shader.set(inputID, ((RelativisticEffectFloatAttribute) (combinedAttributes.get(RelativisticEffectFloatAttribute.Ts))).value);
+                if (combinedAttributes.has(FloatExtAttribute.Ts))
+                    shader.set(inputID, ((FloatExtAttribute) (combinedAttributes.get(FloatExtAttribute.Ts))).value);
             }
         };
 
@@ -113,8 +113,8 @@ public class RelativisticShader extends DefaultIntShader {
 
             @Override
             public void set(BaseIntShader shader, int inputID, IntRenderable renderable, Attributes combinedAttributes) {
-                if (combinedAttributes.has(RelativisticEffectFloatAttribute.Omgw))
-                    shader.set(inputID, ((RelativisticEffectFloatAttribute) (combinedAttributes.get(RelativisticEffectFloatAttribute.Omgw))).value);
+                if (combinedAttributes.has(FloatExtAttribute.Omgw))
+                    shader.set(inputID, ((FloatExtAttribute) (combinedAttributes.get(FloatExtAttribute.Omgw))).value);
             }
         };
 
@@ -164,10 +164,10 @@ public class RelativisticShader extends DefaultIntShader {
         String prefix = DefaultIntShader.createPrefix(renderable, config);
         final long mask = renderable.material.getMask();
         // Special relativity
-        if ((mask & RelativisticEffectFloatAttribute.Vc) == RelativisticEffectFloatAttribute.Vc)
+        if ((mask & FloatExtAttribute.Vc) == FloatExtAttribute.Vc)
             prefix += "#define relativisticEffects\n";
         // Gravitational waves
-        if ((mask & RelativisticEffectFloatAttribute.Omgw) == RelativisticEffectFloatAttribute.Omgw)
+        if ((mask & FloatExtAttribute.Omgw) == FloatExtAttribute.Omgw)
             prefix += "#define gravitationalWaves\n";
         return prefix;
     }

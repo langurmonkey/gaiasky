@@ -631,4 +631,30 @@ public class GlobalResources {
         return sb.toString().trim();
     }
 
+    public static String unpackTexName(String tex) {
+        if (tex.contains("*")) {
+            // Try to figure out which is it
+            String suffix = getQualitySuffix();
+            String texSuffix = tex.replace("*", suffix);
+            if (GlobalConf.data.dataFileHandle(texSuffix).exists()) {
+                tex = texSuffix;
+            } else {
+                tex = tex.replace("*", "");
+            }
+        }
+        return tex;
+    }
+
+    private static String getQualitySuffix() {
+        switch (GlobalConf.scene.GRAPHICS_QUALITY) {
+        case 0:
+            return "-high";
+        case 1:
+            return "-med";
+        case 2:
+            return "-low";
+        default:
+            return "";
+        }
+    }
 }

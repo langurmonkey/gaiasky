@@ -88,6 +88,7 @@ public class CloudComponent {
     private void addToLoad(String tex) {
         if (tex == null)
             return;
+        tex = GlobalResources.unpackTexName(tex);
         AssetBean.addAsset(tex, Texture.class, textureParams);
     }
 

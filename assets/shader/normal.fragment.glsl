@@ -233,19 +233,14 @@ in vec3 v_ambientLight;
     #define fetchColorSpecular(texCoord, defaultValue) defaultValue
 #endif // specular
 
-
+// Light direction in world space
 in vec3 v_lightDir;
-in vec3 v_lightCol;
+// View direction in world space
 in vec3 v_viewDir;
+// Light color
+in vec3 v_lightCol;
+// Logarithmic depth
 in float v_depth;
-
-////////////////////////////////
-//  PARALLAX MAPPING
-////////////////////////////////
-#ifdef heightFlag
-in vec3 v_tangentFragPos;
-in vec3 v_tangentViewPos;
-#endif // heightFlag
 
 #ifdef environmentCubemapFlag
 in vec3 v_reflect;
@@ -266,7 +261,8 @@ out vec4 fragColor;
 #define PI 3.1415926535
 
 #ifdef heightFlag
-#define HEIGHT_SCALE 0.02
+uniform float u_heightScale;
+
 vec2 parallaxMapping(vec2 texCoords, vec3 viewDir){
     // number of depth layers
     const float minLayers = 8;
@@ -278,7 +274,7 @@ vec2 parallaxMapping(vec2 texCoords, vec3 viewDir){
     float currentLayerDepth = 0.0;
 
     // the amount to shift the texture coordinates per layer (from vector P)
-    vec2 P = viewDir.xy / viewDir.z * HEIGHT_SCALE;
+    vec2 P = viewDir.xy / viewDir.z * u_heightScale;
     vec2 deltaTexCoords = P / numLayers;
 
     // get initial values
@@ -310,22 +306,49 @@ vec2 parallaxMapping(vec2 texCoords, vec3 viewDir){
 
 vec2 parallaxMappingSimple(vec2 texCoords, vec3 viewDir){
     float height = texture(u_heightTexture, texCoords).r;
-    vec3 displacement = viewDir * (height * HEIGHT_SCALE);
+    vec3 displacement = viewDir * (height * u_heightScale);
     vec2 p = displacement.xy;
     return texCoords - p;
 }
 #endif // heightFlag
 
+// http://www.thetenthplanet.de/archives/1180
+mat3 cotangentFrame(vec3 N, vec3 p, vec2 uv){
+    // get edge vectors of the pixel triangle
+    vec3 dp1 = dFdx( p );
+    vec3 dp2 = dFdy( p );
+    vec2 duv1 = dFdx( uv );
+    vec2 duv2 = dFdy( uv );
+
+    // solve the linear system
+    vec3 dp2perp = cross( dp2, N );
+    vec3 dp1perp = cross( N, dp1 );
+    vec3 T = dp2perp * duv1.x + dp1perp * duv2.x;
+    vec3 B = dp2perp * duv1.y + dp1perp * duv2.y;
+
+    // construct a scale-invariant frame
+    float invmax = inversesqrt( max( dot(T,T), dot(B,B) ) );
+    return mat3( T * invmax, B * invmax, N );
+}
+
+vec3 perturbNormal(sampler2D normalTexture, vec2 texCoords, mat3 TBN){
+    vec3 normalMap = normalize(texture(normalTexture, texCoords, TEXTURE_LOD_BIAS).xyz * 2.0 - 1.0);
+    return normalize(TBN * normalMap);
+}
+
 
 void main() {
     vec2 texCoords = v_texCoord0;
 
+    // Compute tangent space
+    pullNormal();
+    mat3 TBN = cotangentFrame(g_normal, -v_viewDir, texCoords);
+    vec3 viewDirTangent = normalize(v_viewDir * TBN);
+    vec3 lightDirTangent = normalize(v_lightDir * TBN);
+
     // Parallax occlusion mapping
     #ifdef heightFlag
-    vec3 tfp = v_tangentFragPos;
-    vec3 tvp = v_tangentViewPos;
-    vec3 viewDir = normalize(tvp - tfp);
-    texCoords = parallaxMappingSimple(texCoords, viewDir);
+    texCoords = parallaxMapping(texCoords, viewDirTangent);
     #endif // heightFlag
 
     vec4 diffuse = fetchColorDiffuse(v_color, u_diffuseTexture, texCoords, vec4(1.0, 1.0, 1.0, 1.0));
@@ -347,8 +370,8 @@ void main() {
     #endif // normalTextureFlag
 
     // see http://http.developer.nvidia.com/CgTutorial/cg_tutorial_chapter05.html
-    vec3 L = normalize(v_lightDir);
-    vec3 V = normalize(v_viewDir);
+    vec3 L = lightDirTangent;
+    vec3 V = viewDirTangent;
     vec3 H = normalize(L + V);
     float NL = max(0.0, dot(N, L));
     float NH = max(0.0, dot(N, H));

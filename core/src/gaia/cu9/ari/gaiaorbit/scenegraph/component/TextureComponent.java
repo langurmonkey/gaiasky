@@ -17,7 +17,9 @@ import com.badlogic.gdx.graphics.g3d.attributes.IntAttribute;
 import com.badlogic.gdx.graphics.g3d.attributes.TextureAttribute;
 import gaia.cu9.ari.gaiaorbit.data.AssetBean;
 import gaia.cu9.ari.gaiaorbit.util.GlobalConf;
+import gaia.cu9.ari.gaiaorbit.util.GlobalResources;
 import gaia.cu9.ari.gaiaorbit.util.gdx.model.IntModelInstance;
+import gaia.cu9.ari.gaiaorbit.util.gdx.shader.FloatExtAttribute;
 import gaia.cu9.ari.gaiaorbit.util.gdx.shader.TextureExtAttribute;
 
 import java.util.Map;
@@ -41,6 +43,9 @@ public class TextureComponent {
     public String base, specular, normal, night, ring, height;
     public String baseT, specularT, normalT, nightT, ringT, heightT;
     public Texture baseTex;
+    // Height scale in internal units
+    public Float heightScale = 0.005f;
+
     /** Add also color even if texture is present **/
     public boolean coloriftex = false;
 
@@ -89,7 +94,7 @@ public class TextureComponent {
         if (tex == null)
             return null;
 
-        tex = unpackTexName(tex);
+        tex = GlobalResources.unpackTexName(tex);
         manager.load(tex, Texture.class, textureParams);
 
         return tex;
@@ -106,38 +111,12 @@ public class TextureComponent {
         if (tex == null)
             return null;
 
-        tex = unpackTexName(tex);
+        tex = GlobalResources.unpackTexName(tex);
         AssetBean.addAsset(tex, Texture.class, textureParams);
 
         return tex;
     }
 
-    private String unpackTexName(String tex) {
-        if (tex.contains("*")) {
-            // Try to figure out which is it
-            String suffix = getQualitySuffix();
-            String texSuffix = tex.replace("*", suffix);
-            if (GlobalConf.data.dataFileHandle(texSuffix).exists()) {
-                tex = texSuffix;
-            } else {
-                tex = tex.replace("*", "");
-            }
-        }
-        return tex;
-    }
-
-    private String getQualitySuffix() {
-        switch (GlobalConf.scene.GRAPHICS_QUALITY) {
-        case 0:
-            return "-high";
-        case 1:
-            return "-med";
-        case 2:
-            return "-low";
-        default:
-            return "";
-        }
-    }
 
     public Material initMaterial(AssetManager manager, IntModelInstance instance, float[] cc, boolean culling) {
         Material material = instance.materials.get(0);
@@ -167,6 +146,7 @@ public class TextureComponent {
         if(height != null) {
             Texture tex = manager.get(heightT, Texture.class);
             material.set(new TextureExtAttribute(TextureExtAttribute.Height, tex));
+            material.set(new FloatExtAttribute(FloatExtAttribute.HeightScale, heightScale));
         }
         if (instance.materials.size > 1) {
             // Ring material
@@ -221,7 +201,8 @@ public class TextureComponent {
         }
         if(height != null) {
             Texture tex = manager.get(heightT, Texture.class);
-            material.set(new TextureAttribute(TextureAttribute.Reflection, tex));
+            material.set(new TextureAttribute(TextureExtAttribute.Height, tex));
+            material.set(new FloatExtAttribute(FloatExtAttribute.HeightScale, heightScale));
         }
         if (materials.containsKey("ring")) {
             // Ring material
@@ -258,6 +239,10 @@ public class TextureComponent {
     }
     public void setHeight(String height){
         this.height = GlobalConf.data.dataFile(height);
+    }
+
+    public void setHeightScale(Double heightScale){
+        this.heightScale = heightScale.floatValue();
     }
 
     public void setColoriftex(Boolean coloriftex) {

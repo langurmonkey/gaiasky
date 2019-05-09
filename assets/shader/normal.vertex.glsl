@@ -393,14 +393,12 @@ struct DirectionalLight
 uniform DirectionalLight u_dirLights[numDirectionalLights];
 #endif
 
+// Light direction in world space
 out vec3 v_lightDir;
-out vec3 v_lightCol;
+// View direction in world space
 out vec3 v_viewDir;
-
-#ifdef heightFlag
-out vec3 v_tangentViewPos;
-out vec3 v_tangentFragPos;
-#endif
+// Light color
+out vec3 v_lightCol;
 
 #ifdef environmentCubemapFlag
 out vec3 v_reflect;
@@ -443,9 +441,6 @@ void main() {
     // Tangent space transform
     calculateTangentVectors();
     g_normal = normalize(u_normalMatrix * g_normal);
-    g_binormal = normalize(u_normalMatrix * g_binormal);
-    g_tangent = normalize(u_normalMatrix * g_tangent);
-    mat3 TBN = transpose(mat3(g_tangent, g_binormal, g_normal));
 
     #ifdef ambientLightFlag
 	v_ambientLight = u_ambientLight;
@@ -462,25 +457,19 @@ void main() {
     #endif // ambientCubemapFlag
 
     #ifdef directionalLightsFlag
-        v_lightDir = normalize(TBN * -u_dirLights[0].direction);
+        v_lightDir = normalize(-u_dirLights[0].direction);
         v_lightCol = u_dirLights[0].color;
     #else
         v_lightDir = vec3(0.0, 0.0, 0.0);
         v_lightCol = vec3(0.0);
     #endif // directionalLightsFlag
 
-    vec3 viewDir = -pos.xyz;
-    v_viewDir = TBN * viewDir;
-
-    #ifdef heightFlag
-    // Fragment position in tangent space
-    v_tangentFragPos = TBN * pos.xyz;
-    // View position in tangent space
-    v_tangentViewPos = v_viewDir;
-    #endif //heighFlag
+    // Camera is at origin, view direction is inverse of vertex position
+    pushNormal();
+    v_viewDir = -pos.xyz;
 
     #ifdef environmentCubemapFlag
-	v_reflect = reflect(-viewDir, g_normal);
+	v_reflect = reflect(-v_viewDir, g_normal);
     #endif // environmentCubemapFlag
 
     pushColor(g_color);

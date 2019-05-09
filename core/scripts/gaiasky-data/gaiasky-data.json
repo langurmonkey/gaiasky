@@ -214,7 +214,7 @@
         "catalog/dr2-ratherlarge"
       ],
       "description": "Gaia DR2 rather large - 50% parallax relative error - 400 million stars",
-      "md5": "bb1028b95e3b26c31c4c96e9872720e4",
+      "md5": "81246e4a611ccd5f322ad8e5b72db09b",
       "file": "http://gaia.ari.uni-heidelberg.de/gaiasky/files/autodownload/dr2/004_20190402/catalog-dr2-ratherlarge.tar.gz"
     },
     {
@@ -245,7 +245,7 @@
       ],
       "description": "Gaia DR2 complete - Based on bayesian geometric distances of Bayler-Jones et al. - 1.33 billion stars",
       "link": "https://arxiv.org/abs/1804.10121",
-      "md5": "3e952b84886bea5bd99c85d4ccbb5588",
+      "md5": "9a549bf60806ee246bb53a9ed38cbb50",
       "file": "http://gaia.ari.uni-heidelberg.de/gaiasky/files/autodownload/dr2/004_20190402/catalog-dr2-extralarge.tar.gz"
     },
     {
@@ -254,14 +254,14 @@
       "version": 4,
       "size": 9228674422,
       "nobjects": 92082186,
-      "check": "catalog-dr2-extralarge.json",
+      "check": "catalog-dr2-ruwe.json",
       "data": [
-        "catalog-dr2-extralarge.json",
-        "catalog/dr2-extralarge"
+        "catalog-dr2-ruwe.json",
+        "catalog/dr2-ruwe"
       ],
       "description": "Gaia DR2 ruwe - Based on Re-normalised Unit Weight Errors, where RUWE < 1.4. - 92 million stars",
       "link": "https://www.cosmos.esa.int/web/gaia/dr2-known-issues#Astrometry2vs5p",
-      "md5": "7bbedbfb428703bcb104458904caf054",
+      "md5": "2e05905158be6b51302a5f727c013601",
       "file": "http://gaia.ari.uni-heidelberg.de/gaiasky/files/autodownload/dr2/004_20190402/catalog-dr2-ruwe.tar.gz"
     },
     {

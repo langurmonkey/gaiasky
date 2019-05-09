@@ -8,13 +8,13 @@ package gaia.cu9.ari.gaiaorbit.util.gdx.shader;
 import com.badlogic.gdx.graphics.g3d.Attribute;
 import com.badlogic.gdx.graphics.g3d.attributes.FloatAttribute;
 
-public class RelativisticEffectFloatAttribute extends FloatAttribute {
+public class FloatExtAttribute extends FloatAttribute {
 
-    public RelativisticEffectFloatAttribute(long type) {
+    public FloatExtAttribute(long type) {
         super(type);
     }
 
-    public RelativisticEffectFloatAttribute(long type, float value) {
+    public FloatExtAttribute(long type, float value) {
         super(type, value);
     }
 
@@ -27,10 +27,12 @@ public class RelativisticEffectFloatAttribute extends FloatAttribute {
     public static final String OmgwAlias = "omgw";
     public static final long Omgw = register(OmgwAlias);
 
+    public static final String HeightScaleAlias = "heightScale";
+    public static final long HeightScale = register(HeightScaleAlias);
+
     @Override
     public Attribute copy() {
-        return new RelativisticEffectFloatAttribute(type, value);
+        return new FloatExtAttribute(type, value);
     }
-
 
 }
