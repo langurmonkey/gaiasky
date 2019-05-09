@@ -24,6 +24,7 @@ import gaia.cu9.ari.gaiaorbit.scenegraph.camera.ICamera;
 import gaia.cu9.ari.gaiaorbit.util.GlobalConf;
 import gaia.cu9.ari.gaiaorbit.util.comp.DistToCameraComparator;
 import gaia.cu9.ari.gaiaorbit.util.gdx.mesh.IntMesh;
+import gaia.cu9.ari.gaiaorbit.util.math.StdRandom;
 import org.lwjgl.opengl.GL30;
 
 import java.util.Random;
@@ -87,12 +88,19 @@ public class ParticleGroupRenderSystem extends ImmediateRenderSystem implements 
                     particleGroup.offset = addMeshData(particleGroup.size());
                     curr = meshes.get(particleGroup.offset);
 
+                    float[] c = particleGroup.getColor();
                     ensureTempVertsSize(particleGroup.size() * curr.vertexSize);
                     for (ParticleBean pb : particleGroup.data()) {
                         double[] p = pb.data;
                         // COLOR
-                        float[] c = particleGroup.getColor();
-                        tempVerts[curr.vertexIdx + curr.colorOffset] = Color.toFloatBits(c[0], c[1], c[2], c[3]);
+                        float r = 0, g = 0, b = 0;
+                        if(particleGroup.colorNoise != 0){
+                            r = (float)((StdRandom.uniform() - 0.5) * 2.0 * particleGroup.colorNoise);
+                            g = (float)((StdRandom.uniform() - 0.5) * 2.0 * particleGroup.colorNoise);
+                            b = (float)((StdRandom.uniform() - 0.5) * 2.0 * particleGroup.colorNoise);
+                        }
+                        tempVerts[curr.vertexIdx + curr.colorOffset] = Color.toFloatBits(c[0] + r, c[1] + g, c[2] + b, c[3]);
+
 
                         // SIZE
                         tempVerts[curr.vertexIdx + additionalOffset] = (particleGroup.size + (float) (rand.nextGaussian() * particleGroup.size / 4d)) * particleGroup.highlightedSizeFactor();

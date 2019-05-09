@@ -105,6 +105,11 @@ public class ParticleGroup extends FadeNode implements I3DTextRenderable, IFocus
     public float profileDecay = 4.0f;
 
     /**
+     * Noise factor for the color in [0,1]
+     */
+    public float colorNoise = 0;
+
+    /**
      * Are the data of this group in the GPU memory?
      */
     public boolean inGpu;
@@ -375,6 +380,10 @@ public class ParticleGroup extends FadeNode implements I3DTextRenderable, IFocus
 
     public void setProfiledecay(Double profiledecay) {
         this.profileDecay = profiledecay.floatValue();
+    }
+
+    public void setColornoise(Double colorNoise){
+        this.colorNoise = colorNoise.floatValue();
     }
 
     /**
