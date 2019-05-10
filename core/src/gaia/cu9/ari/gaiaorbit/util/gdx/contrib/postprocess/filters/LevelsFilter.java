@@ -37,7 +37,7 @@ public final class LevelsFilter extends Filter<LevelsFilter> {
     private float exposure = 1.0f;
     private float avgLuma, maxLuma;
 
-    private ShaderProgram programRegular, programToneMappingExposure, programToneMappingAuto, programToneMappingACES;
+    private ShaderProgram programRegular, programToneMappingExposure, programToneMappingAuto, programToneMappingACES, programToneMappingUncharted, programToneMappingFilmic;
 
     public enum Param implements Parameter {
         // @formatter:off
@@ -77,6 +77,8 @@ public final class LevelsFilter extends Filter<LevelsFilter> {
         programToneMappingExposure = ShaderLoader.fromFile("screenspace", "levels", "#define toneMappingExposure");
         programToneMappingAuto = ShaderLoader.fromFile("screenspace", "levels", "#define toneMappingAuto");
         programToneMappingACES = ShaderLoader.fromFile("screenspace", "levels", "#define toneMappingACES");
+        programToneMappingUncharted = ShaderLoader.fromFile("screenspace", "levels", "#define toneMappingUncharted");
+        programToneMappingFilmic = ShaderLoader.fromFile("screenspace", "levels", "#define toneMappingFilmic");
         rebind();
     }
 
@@ -159,6 +161,16 @@ public final class LevelsFilter extends Filter<LevelsFilter> {
 
     public void enableToneMappingACES() {
         this.program = programToneMappingACES;
+        rebind();
+    }
+
+    public void enableToneMappingUncharted() {
+        this.program = programToneMappingUncharted;
+        rebind();
+    }
+
+    public void enableToneMappingFilmic() {
+        this.program = programToneMappingFilmic;
         rebind();
     }
 

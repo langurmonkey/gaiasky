@@ -153,6 +153,14 @@ public final class Levels extends PostProcessorEffect {
         levels.enableToneMappingACES();
     }
 
+    public void enableToneMappingUncharted(){
+        levels.enableToneMappingUncharted();
+    }
+
+    public void enableToneMappingFilmic(){
+        levels.enableToneMappingFilmic();
+    }
+
     public void disableToneMapping() {
         levels.disableToneMapping();
     }

@@ -558,7 +558,7 @@ public class PreferencesWindow extends GenericDialog {
 
         /* Tone Mapping */
         OwnLabel toneMappingl = new OwnLabel(I18n.txt("gui.tonemapping.type"), skin, "default");
-        ComboBoxBean[] toneMappingTypes = new ComboBoxBean[] { new ComboBoxBean(I18n.txt("gui.tonemapping.auto"), ToneMapping.AUTO.ordinal()), new ComboBoxBean(I18n.txt("gui.tonemapping.exposure"), ToneMapping.EXPOSURE.ordinal()), new ComboBoxBean("ACES", ToneMapping.ACES.ordinal()), new ComboBoxBean(I18n.txt("gui.tonemapping.none"), ToneMapping.NONE.ordinal()) };
+        ComboBoxBean[] toneMappingTypes = new ComboBoxBean[] { new ComboBoxBean(I18n.txt("gui.tonemapping.auto"), ToneMapping.AUTO.ordinal()), new ComboBoxBean(I18n.txt("gui.tonemapping.exposure"), ToneMapping.EXPOSURE.ordinal()), new ComboBoxBean("Filmic", ToneMapping.FILMIC.ordinal()), new ComboBoxBean("Uncharted", ToneMapping.UNCHARTED.ordinal()), new ComboBoxBean("ACES", ToneMapping.ACES.ordinal()), new ComboBoxBean(I18n.txt("gui.tonemapping.none"), ToneMapping.NONE.ordinal()) };
         OwnSelectBox<ComboBoxBean> toneMappingSelect = new OwnSelectBox<>(skin);
         toneMappingSelect.setItems(toneMappingTypes);
         toneMappingSelect.setWidth(textwidth * 3f);

@@ -82,14 +82,34 @@ vec3 autoExposureToneMapping(vec3 pixelColor){
 
 #ifdef toneMappingACES
 vec3 ACESToneMapping(vec3 pixelColor){
-    float a = 2.51f;
-    float b = 0.03f;
-    float c = 2.43f;
-    float d = 0.59f;
-    float e = 0.14f;
+    const float a = 2.51f;
+    const float b = 0.03f;
+    const float c = 2.43f;
+    const float d = 0.59f;
+    const float e = 0.14f;
     return clamp((pixelColor * (a * pixelColor + b))/(pixelColor * (c * pixelColor + d) + e), 0.0, 1.0);
 }
 #endif //toneMappingACES
+
+#ifdef toneMappingFilmic
+vec3 filmicToneMapping(vec3 pixelColor){
+    pixelColor = max(vec3(0.0f), pixelColor - vec3(0.004f));
+    return (pixelColor * (6.2f * pixelColor + 0.5f)) / (pixelColor * (6.2f * pixelColor + 1.7f) + 0.06f);
+}
+#endif //toneMappingFilmic
+
+#ifdef toneMappingUncharted
+vec3 unchartedToneMapping(vec3 pixelColor){
+    const float A = 0.15f;
+    const float B = 0.50f;
+    const float C = 0.10f;
+    const float D = 0.20f;
+    const float E = 0.02f;
+    const float F = 0.30f;
+    const float W = 11.2f;
+    return ((pixelColor * (A * pixelColor + C * B) + D * E) / (pixelColor * ( A * pixelColor + B) + D * F)) - E / F;
+}
+#endif //toneMappingUncharted
 
 in vec2 v_texCoords;
 out vec4 fragColor;
@@ -144,6 +164,14 @@ void main() {
     #ifdef toneMappingACES
     pixelColor = ACESToneMapping(pixelColor);
     #endif //toneMappingACES
+
+    #ifdef toneMappingFilmic
+    pixelColor = filmicToneMapping(pixelColor);
+    #endif //toneMappingFilmic
+
+    #ifdef toneMappingUncharted
+    pixelColor = unchartedToneMapping(pixelColor);
+    #endif //toneMappingUncharted
 
     // Gamma correction
     pixelColor = pow(pixelColor, vec3(1.0 / u_gamma));

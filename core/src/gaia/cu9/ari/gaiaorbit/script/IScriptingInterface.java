@@ -1317,9 +1317,12 @@ public interface IScriptingInterface {
      * <ul>
      *     <li>"auto" - performs an automatic HDR tone mapping based on the current luminosity of the scene</li>
      *     <li>"exposure" - performs an exposure-based HDR tone mapping. The exposure value must be set with {@link #setExposureToneMappingLevel(double)}</li>
+     *     <li>"aces" - performs the ACES tone mapping</li>
+     *     <li>"uncharted" - performs the tone mapping implemented in Uncharted</li>
+     *     <li>"filmic" - performs a filmic tone mapping</li>
      *     <li>"none" - no HDR tone mapping</li>
      * </ul>
-     * @param type The HDR tone mapping type. One of ["auto"|"exposure"|"none"].
+     * @param type The HDR tone mapping type. One of ["auto"|"exposure"|"aces"|"uncharted"|"filmic"|"none"].
      */
     void setHDRToneMappingType(String type);
 

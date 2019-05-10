@@ -546,6 +546,12 @@ public class DesktopPostProcessor implements IPostProcessor, IObserver {
                     case ACES:
                         ppb.levels.enableToneMappingACES();
                         break;
+                    case UNCHARTED:
+                        ppb.levels.enableToneMappingUncharted();
+                        break;
+                    case FILMIC:
+                        ppb.levels.enableToneMappingFilmic();
+                        break;
                     case NONE:
                         ppb.levels.disableToneMapping();
                         break;

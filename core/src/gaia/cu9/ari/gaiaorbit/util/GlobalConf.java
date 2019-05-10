@@ -199,10 +199,10 @@ public class GlobalConf {
         public float POSTPROCESS_GAMMA;
 
         public enum ToneMapping{
-            AUTO, EXPOSURE, ACES, NONE
+            AUTO, EXPOSURE, ACES, UNCHARTED, FILMIC, NONE
         }
         /**
-         * Tone mapping type: automatic, exposure, aces, none
+         * Tone mapping type: automatic, exposure, aces, uncharted, filmic, none
          */
         public ToneMapping POSTPROCESS_TONEMAPPING_TYPE;
         /**
