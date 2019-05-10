@@ -27,18 +27,21 @@ vec4 fxaa(sampler2D tex, vec2 texCoords, vec2 viewportInv) {
     vec3 rgbM = texture(tex, texCoords.xy).xyz;
 
     vec3 luma = vec3(0.299, 0.587, 0.114);
+
     float lumaNW = dot(rgbNW, luma);
     float lumaNE = dot(rgbNE, luma);
     float lumaSW = dot(rgbSW, luma);
     float lumaSE = dot(rgbSE, luma);
+
     float lumaN = dot(rgbN, luma);
     float lumaS = dot(rgbS, luma);
     float lumaE = dot(rgbE, luma);
     float lumaW = dot(rgbW, luma);
+
     float lumaM = dot(rgbM, luma);
 
-    float lumaMin = min(lumaM, min(min(lumaNW, lumaNE), min(lumaSW, min(lumaSE, min(lumaN, min(lumaS, min(lumaE, lumaW)))))));
-    float lumaMax = max(lumaM, max(max(lumaNW, lumaNE), max(lumaSW, max(lumaSE, max(lumaN, max(lumaS, max(lumaE, lumaW)))))));
+    float lumaMin = min(min(lumaNW, lumaNE), min(lumaSW, min(lumaSE, min(lumaN, min(lumaS, min(lumaE, lumaW))))));
+    float lumaMax = max(max(lumaNW, lumaNE), max(lumaSW, max(lumaSE, max(lumaN, max(lumaS, max(lumaE, lumaW))))));
 
     vec2 dir;
     dir.x = abs(lumaN + lumaS - 2.0 * lumaM) * 2.0 +
