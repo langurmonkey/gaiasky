@@ -9,7 +9,6 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.VertexAttribute;
 import com.badlogic.gdx.graphics.VertexAttributes.Usage;
-import com.badlogic.gdx.graphics.glutils.ShaderProgram;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.Array;
 import gaia.cu9.ari.gaiaorbit.render.IPointRenderable;
@@ -17,6 +16,7 @@ import gaia.cu9.ari.gaiaorbit.render.IRenderable;
 import gaia.cu9.ari.gaiaorbit.scenegraph.SceneGraphNode.RenderGroup;
 import gaia.cu9.ari.gaiaorbit.scenegraph.camera.ICamera;
 import gaia.cu9.ari.gaiaorbit.util.gdx.mesh.IntMesh;
+import gaia.cu9.ari.gaiaorbit.util.gdx.shader.ExtShaderProgram;
 import org.lwjgl.opengl.GL30;
 
 public class PointRenderSystem extends ImmediateRenderSystem {
@@ -26,7 +26,7 @@ public class PointRenderSystem extends ImmediateRenderSystem {
 
     protected Vector3 aux2;
 
-    public PointRenderSystem(RenderGroup rg, float[] alphas, ShaderProgram[] shaders) {
+    public PointRenderSystem(RenderGroup rg, float[] alphas, ExtShaderProgram[] shaders) {
         super(rg, alphas, shaders, -1);
         glType = GL20.GL_POINTS;
         aux2 = new Vector3();
@@ -71,8 +71,8 @@ public class PointRenderSystem extends ImmediateRenderSystem {
 
     protected VertexAttribute[] buildVertexAttributes() {
         Array<VertexAttribute> attribs = new Array<>();
-        attribs.add(new VertexAttribute(Usage.Position, 3, ShaderProgram.POSITION_ATTRIBUTE));
-        attribs.add(new VertexAttribute(Usage.ColorPacked, 4, ShaderProgram.COLOR_ATTRIBUTE));
+        attribs.add(new VertexAttribute(Usage.Position, 3, ExtShaderProgram.POSITION_ATTRIBUTE));
+        attribs.add(new VertexAttribute(Usage.ColorPacked, 4, ExtShaderProgram.COLOR_ATTRIBUTE));
         attribs.add(new VertexAttribute(Usage.Generic, 1, "a_size"));
 
         VertexAttribute[] array = new VertexAttribute[attribs.size];
@@ -86,7 +86,7 @@ public class PointRenderSystem extends ImmediateRenderSystem {
         this.camera = camera;
         int size = renderables.size;
 
-        ShaderProgram shaderProgram = getShaderProgram();
+        ExtShaderProgram shaderProgram = getShaderProgram();
         shaderProgram.begin();
         shaderProgram.setUniformMatrix("u_projModelView", camera.getCamera().combined);
         addEffectsUniforms(shaderProgram, camera);

@@ -25,7 +25,6 @@ import com.badlogic.gdx.graphics.*;
 import com.badlogic.gdx.graphics.g3d.Attributes;
 import com.badlogic.gdx.graphics.g3d.utils.RenderContext;
 import com.badlogic.gdx.graphics.g3d.utils.TextureDescriptor;
-import com.badlogic.gdx.graphics.glutils.ShaderProgram;
 import com.badlogic.gdx.math.Matrix3;
 import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Vector2;
@@ -37,8 +36,8 @@ import com.badlogic.gdx.utils.IntIntMap;
 import gaia.cu9.ari.gaiaorbit.util.gdx.IntRenderable;
 import gaia.cu9.ari.gaiaorbit.util.gdx.mesh.IntMesh;
 
-/** @author Xoppa A BaseIntShader is a wrapper around a ShaderProgram that keeps track of the uniform and attribute locations. It does
- *         not manage the ShaderPogram, you are still responsible for disposing the ShaderProgram. */
+/** @author Xoppa A BaseIntShader is a wrapper around a ExtShaderProgram that keeps track of the uniform and attribute locations. It does
+ *         not manage the ShaderPogram, you are still responsible for disposing the ExtShaderProgram. */
 public abstract class BaseIntShader implements IntShader {
 	public interface Validator {
 		/** @return True if the input is valid for the renderable, false otherwise. */
@@ -107,7 +106,7 @@ public abstract class BaseIntShader implements IntShader {
 	private final IntArray localUniforms = new IntArray();
 	private final IntIntMap attributes = new IntIntMap();
 
-	public ShaderProgram program;
+	public ExtShaderProgram program;
 	public RenderContext context;
 	public Camera camera;
 	private IntMesh currentMesh;
@@ -162,7 +161,7 @@ public abstract class BaseIntShader implements IntShader {
 	}
 
 	/** Initialize this shader, causing all registered uniforms/attributes to be fetched. */
-	public void init (final ShaderProgram program, final IntRenderable renderable) {
+	public void init (final ExtShaderProgram program, final IntRenderable renderable) {
 		if (locations != null) throw new GdxRuntimeException("Already initialized");
 		if (!program.isCompiled()) throw new GdxRuntimeException(program.getLog());
 		this.program = program;

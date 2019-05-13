@@ -6,18 +6,18 @@
 package gaia.cu9.ari.gaiaorbit.util;
 
 import com.badlogic.gdx.graphics.Camera;
-import com.badlogic.gdx.graphics.g2d.BitmapFont;
-import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Quaternion;
 import com.badlogic.gdx.math.Vector3;
 import gaia.cu9.ari.gaiaorbit.render.RenderingContext;
+import gaia.cu9.ari.gaiaorbit.util.gdx.g2d.BitmapFont;
+import gaia.cu9.ari.gaiaorbit.util.gdx.g2d.ExtSpriteBatch;
 import gaia.cu9.ari.gaiaorbit.util.math.Vector3d;
 
 /**
  * This class provides utils to use Sprites and Fonts as if they were Decals,
  * this is, flat textures in the 3D space.
- * 
+ *
  * @author Toni Sagrista
  *
  */
@@ -36,10 +36,10 @@ public class DecalUtils {
     /**
      * Draws the given text using the given font in the given 3D position using
      * the 3D coordinate space. If faceCamera is true, the text is rendered
-     * always facing the camera. It assumes that {@link SpriteBatch#begin()} has
+     * always facing the camera. It assumes that {@link ExtSpriteBatch#begin()} has
      * been called. This enables 3D techniques such as z-buffering to be applied
      * to the text textures.
-     * 
+     *
      * @param font
      *            The font.
      * @param batch
@@ -51,17 +51,17 @@ public class DecalUtils {
      * @param camera
      *            The camera.
      */
-    public static void drawFont3D(BitmapFont font, SpriteBatch batch, String text, Vector3 position, Camera camera, boolean faceCamera) {
+    public static void drawFont3D(BitmapFont font, ExtSpriteBatch batch, String text, Vector3 position, Camera camera, boolean faceCamera) {
         drawFont3D(font, batch, text, position, 1f, camera, faceCamera);
     }
 
     /**
      * Draws the given text using the given font in the given 3D position using
      * the 3D coordinate space. If faceCamera is true, the text is rendered
-     * always facing the camera. It assumes that {@link SpriteBatch#begin()} has
+     * always facing the camera. It assumes that {@link ExtSpriteBatch#begin()} has
      * been called. This enables 3D techniques such as z-buffering to be applied
      * to the text textures.
-     * 
+     *
      * @param font
      *            The font.
      * @param batch
@@ -83,7 +83,7 @@ public class DecalUtils {
      * @param faceCamera
      *            Whether to apply bill-boarding.
      */
-    public static void drawFont3D(BitmapFont font, SpriteBatch batch, String text, float x, float y, float z, float scale, float rotationCenter, Camera camera, boolean faceCamera) {
+    public static void drawFont3D(BitmapFont font, ExtSpriteBatch batch, String text, float x, float y, float z, float scale, float rotationCenter, Camera camera, boolean faceCamera) {
         // Store batch matrices
         aux1.set(batch.getTransformMatrix());
         aux2.set(batch.getProjectionMatrix());
@@ -104,7 +104,7 @@ public class DecalUtils {
     /**
      * Draws the given text using the given font in the given 3D position using
      * the 3D coordinate space. If faceCamera is true, the text is rendered
-     * always facing the camera. It assumes that {@link SpriteBatch#begin()} has
+     * always facing the camera. It assumes that {@link ExtSpriteBatch#begin()} has
      * been called. This enables 3D techniques such as z-buffering to be applied
      * to the text textures.
      * 
@@ -121,23 +121,23 @@ public class DecalUtils {
      * @param scale
      *            The scale of the font.
      */
-    public static void drawFont3D(BitmapFont font, SpriteBatch batch, String text, Vector3 position, float scale, Camera camera, boolean faceCamera) {
+    public static void drawFont3D(BitmapFont font, ExtSpriteBatch batch, String text, Vector3 position, float scale, Camera camera, boolean faceCamera) {
         drawFont3D(font, batch, text, position.x, position.y, position.z, scale, 0, camera, faceCamera);
     }
 
-    public static void drawFont2D(BitmapFont font, SpriteBatch batch, String text, Vector3 position) {
+    public static void drawFont2D(BitmapFont font, ExtSpriteBatch batch, String text, Vector3 position) {
         font.draw(batch, text, position.x, position.y);
     }
 
-    public static void drawFont2D(BitmapFont font, SpriteBatch batch, String text, float x, float y) {
+    public static void drawFont2D(BitmapFont font, ExtSpriteBatch batch, String text, float x, float y) {
         font.draw(batch, text, x, y);
     }
 
-    public static void drawFont2D(BitmapFont font, SpriteBatch batch, RenderingContext rc, String text, float x, float y, float scale, float width) {
+    public static void drawFont2D(BitmapFont font, ExtSpriteBatch batch, RenderingContext rc, String text, float x, float y, float scale, float width) {
         drawFont2D(font, batch, rc, text, x, y, scale, -1);
     }
 
-    public static void drawFont2D(BitmapFont font, SpriteBatch batch, RenderingContext rc, String text, float x, float y, float scale, int align) {
+    public static void drawFont2D(BitmapFont font, ExtSpriteBatch batch, RenderingContext rc, String text, float x, float y, float scale, int align) {
         // Save
         float scalex = font.getData().scaleX;
         float scaley = font.getData().scaleY;

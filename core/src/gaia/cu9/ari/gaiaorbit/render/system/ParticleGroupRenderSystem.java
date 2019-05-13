@@ -9,7 +9,6 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.VertexAttribute;
 import com.badlogic.gdx.graphics.VertexAttributes.Usage;
-import com.badlogic.gdx.graphics.glutils.ShaderProgram;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer.ShapeType;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.Array;
@@ -24,6 +23,7 @@ import gaia.cu9.ari.gaiaorbit.scenegraph.camera.ICamera;
 import gaia.cu9.ari.gaiaorbit.util.GlobalConf;
 import gaia.cu9.ari.gaiaorbit.util.comp.DistToCameraComparator;
 import gaia.cu9.ari.gaiaorbit.util.gdx.mesh.IntMesh;
+import gaia.cu9.ari.gaiaorbit.util.gdx.shader.ExtShaderProgram;
 import gaia.cu9.ari.gaiaorbit.util.math.StdRandom;
 import org.lwjgl.opengl.GL30;
 
@@ -34,7 +34,7 @@ public class ParticleGroupRenderSystem extends ImmediateRenderSystem implements 
     int additionalOffset, pmOffset;
     Random rand;
 
-    public ParticleGroupRenderSystem(RenderGroup rg, float[] alphas, ShaderProgram[] shaders) {
+    public ParticleGroupRenderSystem(RenderGroup rg, float[] alphas, ExtShaderProgram[] shaders) {
         super(rg, alphas, shaders);
         comp = new DistToCameraComparator<>();
         rand = new Random(123);
@@ -77,7 +77,7 @@ public class ParticleGroupRenderSystem extends ImmediateRenderSystem implements 
     @Override
     public void renderStud(Array<IRenderable> renderables, ICamera camera, double t) {
         if (renderables.size > 0) {
-            ShaderProgram shaderProgram = getShaderProgram();
+            ExtShaderProgram shaderProgram = getShaderProgram();
             shaderProgram.begin();
             for (IRenderable renderable : renderables) {
                 ParticleGroup particleGroup = (ParticleGroup) renderable;
@@ -146,8 +146,8 @@ public class ParticleGroupRenderSystem extends ImmediateRenderSystem implements 
 
     protected VertexAttribute[] buildVertexAttributes() {
         Array<VertexAttribute> attribs = new Array<>();
-        attribs.add(new VertexAttribute(Usage.Position, 3, ShaderProgram.POSITION_ATTRIBUTE));
-        attribs.add(new VertexAttribute(Usage.ColorPacked, 4, ShaderProgram.COLOR_ATTRIBUTE));
+        attribs.add(new VertexAttribute(Usage.Position, 3, ExtShaderProgram.POSITION_ATTRIBUTE));
+        attribs.add(new VertexAttribute(Usage.ColorPacked, 4, ExtShaderProgram.COLOR_ATTRIBUTE));
         attribs.add(new VertexAttribute(Usage.Generic, 1, "a_size"));
 
         VertexAttribute[] array = new VertexAttribute[attribs.size];

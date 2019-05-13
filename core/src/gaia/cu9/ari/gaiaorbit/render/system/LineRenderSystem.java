@@ -9,7 +9,6 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.VertexAttribute;
 import com.badlogic.gdx.graphics.VertexAttributes.Usage;
-import com.badlogic.gdx.graphics.glutils.ShaderProgram;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.Array;
 import gaia.cu9.ari.gaiaorbit.render.ComponentTypes;
@@ -20,6 +19,7 @@ import gaia.cu9.ari.gaiaorbit.scenegraph.Particle;
 import gaia.cu9.ari.gaiaorbit.scenegraph.SceneGraphNode.RenderGroup;
 import gaia.cu9.ari.gaiaorbit.scenegraph.camera.ICamera;
 import gaia.cu9.ari.gaiaorbit.util.gdx.mesh.IntMesh;
+import gaia.cu9.ari.gaiaorbit.util.gdx.shader.ExtShaderProgram;
 import org.lwjgl.opengl.GL30;
 
 import java.util.Comparator;
@@ -28,9 +28,9 @@ public class LineRenderSystem extends ImmediateRenderSystem {
     protected ICamera camera;
     protected Vector3 aux2;
 
-    private ShaderProgram shaderProgram;
+    private ExtShaderProgram shaderProgram;
 
-    public LineRenderSystem(RenderGroup rg, float[] alphas, ShaderProgram[] shaders) {
+    public LineRenderSystem(RenderGroup rg, float[] alphas, ExtShaderProgram[] shaders) {
         super(rg, alphas, shaders, -1);
         aux2 = new Vector3();
     }
@@ -73,8 +73,8 @@ public class LineRenderSystem extends ImmediateRenderSystem {
 
     protected VertexAttribute[] buildVertexAttributes() {
         Array<VertexAttribute> attribs = new Array<>();
-        attribs.add(new VertexAttribute(Usage.Position, 3, ShaderProgram.POSITION_ATTRIBUTE));
-        attribs.add(new VertexAttribute(Usage.ColorPacked, 4, ShaderProgram.COLOR_ATTRIBUTE));
+        attribs.add(new VertexAttribute(Usage.Position, 3, ExtShaderProgram.POSITION_ATTRIBUTE));
+        attribs.add(new VertexAttribute(Usage.ColorPacked, 4, ExtShaderProgram.COLOR_ATTRIBUTE));
 
         VertexAttribute[] array = new VertexAttribute[attribs.size];
         for (int i = 0; i < attribs.size; i++)

@@ -8,18 +8,15 @@ package gaia.cu9.ari.gaiaorbit.render;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.assets.AssetDescriptor;
 import com.badlogic.gdx.assets.AssetManager;
-import com.badlogic.gdx.assets.loaders.BitmapFontLoader.BitmapFontParameter;
+import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.Camera;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.PerspectiveCamera;
 import com.badlogic.gdx.graphics.Pixmap.Format;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.Texture.TextureFilter;
-import com.badlogic.gdx.graphics.g2d.BitmapFont;
-import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.FrameBuffer;
 import com.badlogic.gdx.graphics.glutils.GLFrameBuffer.FrameBufferBuilder;
-import com.badlogic.gdx.graphics.glutils.ShaderProgram;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Vector3;
@@ -53,9 +50,10 @@ import gaia.cu9.ari.gaiaorbit.util.gdx.IntRenderableSorter;
 import gaia.cu9.ari.gaiaorbit.util.gdx.contrib.postprocess.filters.Glow;
 import gaia.cu9.ari.gaiaorbit.util.gdx.contrib.utils.GaiaSkyFrameBuffer;
 import gaia.cu9.ari.gaiaorbit.util.gdx.contrib.utils.ShaderLoader;
-import gaia.cu9.ari.gaiaorbit.util.gdx.shader.AtmosphereShaderProvider;
-import gaia.cu9.ari.gaiaorbit.util.gdx.shader.GroundShaderProvider;
-import gaia.cu9.ari.gaiaorbit.util.gdx.shader.RelativisticShaderProvider;
+import gaia.cu9.ari.gaiaorbit.util.gdx.g2d.BitmapFont;
+import gaia.cu9.ari.gaiaorbit.util.gdx.g2d.ExtSpriteBatch;
+import gaia.cu9.ari.gaiaorbit.util.gdx.loader.BitmapFontLoader.BitmapFontParameter;
+import gaia.cu9.ari.gaiaorbit.util.gdx.shader.*;
 import gaia.cu9.ari.gaiaorbit.util.gdx.shader.ShaderProgramProvider.ShaderProgramParameter;
 import gaia.cu9.ari.gaiaorbit.util.gdx.shader.provider.IntShaderProvider;
 import gaia.cu9.ari.gaiaorbit.util.gravwaves.RelativisticEffectsManager;
@@ -89,14 +87,14 @@ public class SceneGraphRenderer extends AbstractRenderer implements IProcessRend
     /** Alpha values for each type **/
     public static float[] alphas;
 
-    private ShaderProgram[] starGroupShaders, particleGroupShaders, particleEffectShaders, orbitElemShaders, pointShaders, lineShaders, lineQuadShaders, lineGpuShaders, galaxyPointShaders, starPointShaders, galShaders, spriteShaders, starBillboardShaders;
-    private AssetDescriptor<ShaderProgram>[] starGroupDesc, particleGroupDesc, particleEffectDesc, orbitElemDesc, pointDesc, lineDesc, lineQuadDesc, lineGpuDesc, galaxyPointDesc, starPointDesc, galDesc, spriteDesc, starBillboardDesc;
+    private ExtShaderProgram[] starGroupShaders, particleGroupShaders, particleEffectShaders, orbitElemShaders, pointShaders, lineShaders, lineQuadShaders, lineGpuShaders, galaxyPointShaders, starPointShaders, galShaders, spriteShaders, starBillboardShaders;
+    private AssetDescriptor<ExtShaderProgram>[] starGroupDesc, particleGroupDesc, particleEffectDesc, orbitElemDesc, pointDesc, lineDesc, lineQuadDesc, lineGpuDesc, galaxyPointDesc, starPointDesc, galDesc, spriteDesc, starBillboardDesc;
 
     /** Render lists for all render groups **/
     public static Array<Array<IRenderable>> render_lists;
 
     // Two model batches, for front (models), back and atmospheres
-    private SpriteBatch spriteBatch, fontBatch;
+    private ExtSpriteBatch fontBatch, spriteBatch;
 
     private Array<IRenderSystem> renderProcesses;
 
@@ -137,8 +135,8 @@ public class SceneGraphRenderer extends AbstractRenderer implements IProcessRend
         super();
     }
 
-    private AssetDescriptor<ShaderProgram>[] loadShader(AssetManager manager, String vfile, String ffile, String[] names, String[] prependVertex) {
-        @SuppressWarnings("unchecked") AssetDescriptor<ShaderProgram>[] result = new AssetDescriptor[prependVertex.length];
+    private AssetDescriptor<ExtShaderProgram>[] loadShader(AssetManager manager, String vfile, String ffile, String[] names, String[] prependVertex) {
+        @SuppressWarnings("unchecked") AssetDescriptor<ExtShaderProgram>[] result = new AssetDescriptor[prependVertex.length];
 
         int i = 0;
         for (String prep : prependVertex) {
@@ -146,8 +144,8 @@ public class SceneGraphRenderer extends AbstractRenderer implements IProcessRend
             spp.prependVertexCode = prep;
             spp.vertexFile = vfile;
             spp.fragmentFile = ffile;
-            manager.load(names[i], ShaderProgram.class, spp);
-            AssetDescriptor<ShaderProgram> desc = new AssetDescriptor<>(names[i], ShaderProgram.class, spp);
+            manager.load(names[i], ExtShaderProgram.class, spp);
+            AssetDescriptor<ExtShaderProgram> desc = new AssetDescriptor<>(names[i], ExtShaderProgram.class, spp);
             result[i] = desc;
 
             i++;
@@ -159,10 +157,10 @@ public class SceneGraphRenderer extends AbstractRenderer implements IProcessRend
     @Override
     public void initialize(AssetManager manager) {
         ShaderLoader.Pedantic = false;
-        ShaderProgram.pedantic = false;
+        ExtShaderProgram.pedantic = false;
 
         /** LOAD SHADER PROGRAMS WITH ASSET MANAGER **/
-        manager.load("shader/font.vertex.glsl", ShaderProgram.class);
+        manager.load("shader/font.vertex.glsl", ExtShaderProgram.class);
 
         String[] defines = new String[] { "", "#define relativisticEffects\n", "#define gravitationalWaves\n", "#define relativisticEffects\n#define gravitationalWaves\n" };
 
@@ -248,9 +246,9 @@ public class SceneGraphRenderer extends AbstractRenderer implements IProcessRend
         }
     }
 
-    private ShaderProgram[] fetchShaderProgram(AssetManager manager, AssetDescriptor<ShaderProgram>[] descriptors, String... names) {
+    private ExtShaderProgram[] fetchShaderProgram(AssetManager manager, AssetDescriptor<ExtShaderProgram>[] descriptors, String... names) {
         int n = descriptors.length;
-        ShaderProgram[] shaders = new ShaderProgram[n];
+        ExtShaderProgram[] shaders = new ExtShaderProgram[n];
 
         for (int i = 0; i < n; i++) {
             shaders[i] = manager.get(descriptors[i]);
@@ -280,7 +278,7 @@ public class SceneGraphRenderer extends AbstractRenderer implements IProcessRend
         /*
          * FONT SHADER
          */
-        ShaderProgram distanceFieldFontShader = manager.get("shader/font.vertex.glsl");
+        ExtShaderProgram distanceFieldFontShader = manager.get("shader/font.vertex.glsl");
         if (!distanceFieldFontShader.isCompiled()) {
             logger.error("Distance field font shader compilation failed:\n" + distanceFieldFontShader.getLog());
         }
@@ -346,6 +344,18 @@ public class SceneGraphRenderer extends AbstractRenderer implements IProcessRend
             render_lists.add(new Array<>(100));
         }
 
+        // Tessellation test
+        FileHandle vs = Gdx.files.internal("shader/tessellation/tess.vertex.glsl");
+        FileHandle tcs = Gdx.files.internal("shader/tessellation/tess.control.glsl");
+        FileHandle tes = Gdx.files.internal("shader/tessellation/tess.eval.glsl");
+        FileHandle fs = Gdx.files.internal("shader/tessellation/tess.fragment.glsl");
+        TessellationShaderProgram tsp = new TessellationShaderProgram(vs.readString(), tcs.readString(), tes.readString(), fs.readString());
+        if(!tsp.isCompiled()){
+            logger.error(tsp.getLog());
+        }
+
+
+
         IntShaderProvider sp = manager.get("atmgrounddefault");
         IntShaderProvider spadditive = manager.get("additive");
         IntShaderProvider spdust = manager.get("dust");
@@ -380,11 +390,11 @@ public class SceneGraphRenderer extends AbstractRenderer implements IProcessRend
         BitmapFont fontTitles = manager.get("font/font-titles.fnt");
 
         // Sprites
-        spriteBatch = GlobalResources.spriteBatch;
+        spriteBatch = GlobalResources.extSpriteBatch;
         spriteBatch.enableBlending();
 
         // Font batch
-        fontBatch = new SpriteBatch(2000, distanceFieldFontShader);
+        fontBatch = new ExtSpriteBatch(2000, distanceFieldFontShader);
         fontBatch.enableBlending();
 
         ComponentType[] comps = ComponentType.values();
@@ -443,7 +453,7 @@ public class SceneGraphRenderer extends AbstractRenderer implements IProcessRend
         });
 
         // ANNOTATIONS - (grids)
-        AbstractRenderSystem annotationsProc = new FontRenderSystem(RenderGroup.FONT_ANNOTATION, alphas, spriteBatch, null);
+        AbstractRenderSystem annotationsProc = new FontRenderSystem(RenderGroup.FONT_ANNOTATION, alphas, spriteBatch, null, null, font2d, null);
         annotationsProc.addPreRunnables(regularBlendR, noDepthTestR);
         annotationsProc.addPostRunnables((renderSystem, renderables, camera) -> {
             // This always goes at the back, clear depth buffer

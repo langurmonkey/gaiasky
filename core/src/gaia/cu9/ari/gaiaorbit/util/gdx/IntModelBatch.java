@@ -21,7 +21,6 @@
 
 package gaia.cu9.ari.gaiaorbit.util.gdx;
 
-import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.Camera;
 import com.badlogic.gdx.graphics.g3d.Environment;
 import com.badlogic.gdx.graphics.g3d.RenderableProvider;
@@ -109,26 +108,6 @@ public class IntModelBatch implements Disposable {
 	 * @param sorter The {@link IntRenderableSorter} to use. */
 	public IntModelBatch(final IntShaderProvider shaderProvider, final IntRenderableSorter sorter) {
 		this(null, shaderProvider, sorter);
-	}
-
-	/** Construct a ModelBatch
-	 * @param sorter The {@link IntRenderableSorter} to use. */
-	public IntModelBatch(final IntRenderableSorter sorter) {
-		this(null, null, sorter);
-	}
-
-	/** Construct a ModelBatch
-	 * @param shaderProvider The {@link IntShaderProvider} to use, will be disposed when this ModelBatch is disposed. */
-	public IntModelBatch(final IntShaderProvider shaderProvider) {
-		this(null, shaderProvider, null);
-	}
-
-	/** Construct a ModelBatch with the default implementation and the specified ubershader. See {@link DefaultIntShader} for more
-	 * information about using a custom ubershader. Requires OpenGL ES 2.0.
-	 * @param vertexShader The {@link FileHandle} of the vertex shader to use.
-	 * @param fragmentShader The {@link FileHandle} of the fragment shader to use. */
-	public IntModelBatch(final FileHandle vertexShader, final FileHandle fragmentShader) {
-		this(null, new DefaultIntShaderProvider(vertexShader, fragmentShader), null);
 	}
 
 	/** Construct a ModelBatch with the default implementation and the specified ubershader. See {@link DefaultIntShader} for more

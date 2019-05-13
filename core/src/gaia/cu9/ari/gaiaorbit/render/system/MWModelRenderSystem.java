@@ -10,7 +10,6 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.VertexAttribute;
 import com.badlogic.gdx.graphics.VertexAttributes.Usage;
-import com.badlogic.gdx.graphics.glutils.ShaderProgram;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer.ShapeType;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.Array;
@@ -24,6 +23,7 @@ import gaia.cu9.ari.gaiaorbit.scenegraph.camera.ICamera;
 import gaia.cu9.ari.gaiaorbit.util.GlobalConf;
 import gaia.cu9.ari.gaiaorbit.util.GlobalConf.ProgramConf.StereoProfile;
 import gaia.cu9.ari.gaiaorbit.util.gdx.mesh.IntMesh;
+import gaia.cu9.ari.gaiaorbit.util.gdx.shader.ExtShaderProgram;
 import gaia.cu9.ari.gaiaorbit.util.math.MathUtilsd;
 import gaia.cu9.ari.gaiaorbit.util.math.StdRandom;
 import gaia.cu9.ari.gaiaorbit.util.tree.LoadStatus;
@@ -35,7 +35,7 @@ public class MWModelRenderSystem extends ImmediateRenderSystem implements IObser
     private MeshData dust, bulge, stars, hii, gas;
     private GpuData dustA, bulgeA, starsA, hiiA, gasA;
 
-    public MWModelRenderSystem(RenderGroup rg, float[] alphas, ShaderProgram[] starShaders) {
+    public MWModelRenderSystem(RenderGroup rg, float[] alphas, ExtShaderProgram[] starShaders) {
         super(rg, alphas, starShaders);
         aux3f1 = new Vector3();
     }
@@ -45,7 +45,7 @@ public class MWModelRenderSystem extends ImmediateRenderSystem implements IObser
         Gdx.gl.glEnable(GL30.GL_POINT_SPRITE);
         Gdx.gl.glEnable(GL30.GL_VERTEX_PROGRAM_POINT_SIZE);
 
-        for (ShaderProgram shaderProgram : programs) {
+        for (ExtShaderProgram shaderProgram : programs) {
             shaderProgram.begin();
             shaderProgram.setUniformf("u_pointAlphaMin", 0.1f);
             shaderProgram.setUniformf("u_pointAlphaMax", 1.0f);
@@ -161,7 +161,7 @@ public class MWModelRenderSystem extends ImmediateRenderSystem implements IObser
                 // RENDER
                 float alpha = getAlpha(mw);
                 if (alpha > 0) {
-                    ShaderProgram shaderProgram = getShaderProgram();
+                    ExtShaderProgram shaderProgram = getShaderProgram();
 
                     shaderProgram.begin();
 
@@ -219,8 +219,8 @@ public class MWModelRenderSystem extends ImmediateRenderSystem implements IObser
 
     protected VertexAttribute[] buildVertexAttributes() {
         Array<VertexAttribute> attribs = new Array<>();
-        attribs.add(new VertexAttribute(Usage.Position, 3, ShaderProgram.POSITION_ATTRIBUTE));
-        attribs.add(new VertexAttribute(Usage.ColorPacked, 4, ShaderProgram.COLOR_ATTRIBUTE));
+        attribs.add(new VertexAttribute(Usage.Position, 3, ExtShaderProgram.POSITION_ATTRIBUTE));
+        attribs.add(new VertexAttribute(Usage.ColorPacked, 4, ExtShaderProgram.COLOR_ATTRIBUTE));
         attribs.add(new VertexAttribute(Usage.Generic, 2, "a_additional"));
 
         VertexAttribute[] array = new VertexAttribute[attribs.size];

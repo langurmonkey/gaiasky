@@ -10,7 +10,6 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.Texture.TextureFilter;
 import com.badlogic.gdx.graphics.VertexAttribute;
 import com.badlogic.gdx.graphics.VertexAttributes.Usage;
-import com.badlogic.gdx.graphics.glutils.ShaderProgram;
 import com.badlogic.gdx.math.Quaternion;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.Array;
@@ -22,6 +21,7 @@ import gaia.cu9.ari.gaiaorbit.util.DecalUtils;
 import gaia.cu9.ari.gaiaorbit.util.GlobalConf;
 import gaia.cu9.ari.gaiaorbit.util.comp.DistToCameraComparator;
 import gaia.cu9.ari.gaiaorbit.util.gdx.mesh.IntMesh;
+import gaia.cu9.ari.gaiaorbit.util.gdx.shader.ExtShaderProgram;
 
 public class BillboardStarRenderSystem extends AbstractRenderSystem {
 
@@ -30,7 +30,7 @@ public class BillboardStarRenderSystem extends AbstractRenderSystem {
     private Texture texture0;
     private int ctIndex;
 
-    public BillboardStarRenderSystem(RenderGroup rg, float[] alphas, ShaderProgram[] programs, String tex0, int ctIndex, float w, float h) {
+    public BillboardStarRenderSystem(RenderGroup rg, float[] alphas, ExtShaderProgram[] programs, String tex0, int ctIndex, float w, float h) {
         super(rg, alphas, programs);
         this.ctIndex = ctIndex;
         init(tex0, w, h);
@@ -46,7 +46,7 @@ public class BillboardStarRenderSystem extends AbstractRenderSystem {
      * @param shaderPrograms
      *            The shader programs to render the quad with.
      */
-    public BillboardStarRenderSystem(RenderGroup rg, float[] alphas, ShaderProgram[] shaderPrograms, String tex0, int ctIndex) {
+    public BillboardStarRenderSystem(RenderGroup rg, float[] alphas, ExtShaderProgram[] shaderPrograms, String tex0, int ctIndex) {
         this(rg, alphas, shaderPrograms, tex0, ctIndex, 2, 2);
     }
 
@@ -61,7 +61,7 @@ public class BillboardStarRenderSystem extends AbstractRenderSystem {
 
         // We wont need indices if we use GL_TRIANGLE_FAN to draw our quad
         // TRIANGLE_FAN will draw the verts in this order: 0, 1, 2; 0, 2, 3
-        mesh = new IntMesh(true, 4, 6, new VertexAttribute(Usage.Position, 2, ShaderProgram.POSITION_ATTRIBUTE), new VertexAttribute(Usage.ColorPacked, 4, ShaderProgram.COLOR_ATTRIBUTE), new VertexAttribute(Usage.TextureCoordinates, 2, ShaderProgram.TEXCOORD_ATTRIBUTE + "0"));
+        mesh = new IntMesh(true, 4, 6, new VertexAttribute(Usage.Position, 2, ExtShaderProgram.POSITION_ATTRIBUTE), new VertexAttribute(Usage.ColorPacked, 4, ExtShaderProgram.COLOR_ATTRIBUTE), new VertexAttribute(Usage.TextureCoordinates, 2, ExtShaderProgram.TEXCOORD_ATTRIBUTE + "0"));
 
         mesh.setVertices(vertices, 0, vertices.length);
         mesh.getIndicesBuffer().position(0);
@@ -128,7 +128,7 @@ public class BillboardStarRenderSystem extends AbstractRenderSystem {
             // Calculate billobard rotation quaternion ONCE
             DecalUtils.setBillboardRotation(quaternion, camera.getCamera().direction, camera.getCamera().up);
 
-            ShaderProgram shaderProgram = getShaderProgram();
+            ExtShaderProgram shaderProgram = getShaderProgram();
 
             shaderProgram.begin();
 

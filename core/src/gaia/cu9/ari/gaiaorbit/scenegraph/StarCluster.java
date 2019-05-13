@@ -12,14 +12,12 @@ import com.badlogic.gdx.graphics.PerspectiveCamera;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.Texture.TextureFilter;
 import com.badlogic.gdx.graphics.VertexAttributes.Usage;
-import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g3d.Environment;
 import com.badlogic.gdx.graphics.g3d.Material;
 import com.badlogic.gdx.graphics.g3d.attributes.BlendingAttribute;
 import com.badlogic.gdx.graphics.g3d.attributes.ColorAttribute;
 import com.badlogic.gdx.graphics.g3d.attributes.FloatAttribute;
 import com.badlogic.gdx.graphics.g3d.environment.DirectionalLight;
-import com.badlogic.gdx.graphics.glutils.ShaderProgram;
 import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.Array;
@@ -39,9 +37,11 @@ import gaia.cu9.ari.gaiaorbit.util.coord.AstroUtils;
 import gaia.cu9.ari.gaiaorbit.util.gdx.IntMeshPartBuilder;
 import gaia.cu9.ari.gaiaorbit.util.gdx.IntModelBatch;
 import gaia.cu9.ari.gaiaorbit.util.gdx.IntModelBuilder;
+import gaia.cu9.ari.gaiaorbit.util.gdx.g2d.ExtSpriteBatch;
 import gaia.cu9.ari.gaiaorbit.util.gdx.mesh.IntMesh;
 import gaia.cu9.ari.gaiaorbit.util.gdx.model.IntModel;
 import gaia.cu9.ari.gaiaorbit.util.gdx.model.IntModelInstance;
+import gaia.cu9.ari.gaiaorbit.util.gdx.shader.ExtShaderProgram;
 import gaia.cu9.ari.gaiaorbit.util.gravwaves.RelativisticEffectsManager;
 import gaia.cu9.ari.gaiaorbit.util.math.MathUtilsd;
 import gaia.cu9.ari.gaiaorbit.util.math.Quaterniond;
@@ -231,7 +231,7 @@ public class StarCluster extends AbstractPositionEntity implements IFocus, IProp
      * Billboard quad rendering
      */
     @Override
-    public void render(ShaderProgram shader, float alpha, IntMesh mesh, ICamera camera) {
+    public void render(ExtShaderProgram shader, float alpha, IntMesh mesh, ICamera camera) {
         // Bind texture
         if (clusterTex != null) {
             clusterTex.bind(0);
@@ -252,7 +252,7 @@ public class StarCluster extends AbstractPositionEntity implements IFocus, IProp
      * Label rendering
      */
     @Override
-    public void render(SpriteBatch batch, ShaderProgram shader, FontRenderSystem sys, RenderingContext rc, ICamera camera) {
+    public void render(ExtSpriteBatch batch, ExtShaderProgram shader, FontRenderSystem sys, RenderingContext rc, ICamera camera) {
         Vector3d pos = aux3d1.get();
         textPosition(camera, pos);
         shader.setUniformf("u_viewAngle", (float) this.viewAngle * 500f);

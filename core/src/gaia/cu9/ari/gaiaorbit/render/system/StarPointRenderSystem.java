@@ -9,7 +9,6 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.VertexAttribute;
 import com.badlogic.gdx.graphics.VertexAttributes.Usage;
-import com.badlogic.gdx.graphics.glutils.ShaderProgram;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer.ShapeType;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.Array;
@@ -25,6 +24,7 @@ import gaia.cu9.ari.gaiaorbit.scenegraph.camera.ICamera;
 import gaia.cu9.ari.gaiaorbit.util.GlobalConf;
 import gaia.cu9.ari.gaiaorbit.util.coord.AstroUtils;
 import gaia.cu9.ari.gaiaorbit.util.gdx.mesh.IntMesh;
+import gaia.cu9.ari.gaiaorbit.util.gdx.shader.ExtShaderProgram;
 import org.lwjgl.opengl.GL30;
 
 public class StarPointRenderSystem extends ImmediateRenderSystem implements IObserver {
@@ -38,7 +38,7 @@ public class StarPointRenderSystem extends ImmediateRenderSystem implements IObs
 
     boolean initializing;
 
-    public StarPointRenderSystem(RenderGroup rg, float[] alphas, ShaderProgram[] shaders, ComponentType ct) {
+    public StarPointRenderSystem(RenderGroup rg, float[] alphas, ExtShaderProgram[] shaders, ComponentType ct) {
         super(rg, alphas, shaders);
         EventManager.instance.subscribe(this, Events.TRANSIT_COLOUR_CMD, Events.ONLY_OBSERVED_STARS_CMD, Events.STAR_MIN_OPACITY_CMD);
         BRIGHTNESS_FACTOR = 10;
@@ -54,7 +54,7 @@ public class StarPointRenderSystem extends ImmediateRenderSystem implements IObs
 
         pointAlpha = new float[] { GlobalConf.scene.POINT_ALPHA_MIN, GlobalConf.scene.POINT_ALPHA_MIN + GlobalConf.scene.POINT_ALPHA_MAX };
 
-        for (ShaderProgram p : programs) {
+        for (ExtShaderProgram p : programs) {
             if (p != null) {
                 p.begin();
                 p.setUniform2fv("u_pointAlpha", pointAlpha, 0, 2);
@@ -86,9 +86,9 @@ public class StarPointRenderSystem extends ImmediateRenderSystem implements IObs
 
     protected VertexAttribute[] buildVertexAttributes() {
         Array<VertexAttribute> attribs = new Array<>();
-        attribs.add(new VertexAttribute(Usage.Position, 3, ShaderProgram.POSITION_ATTRIBUTE));
+        attribs.add(new VertexAttribute(Usage.Position, 3, ExtShaderProgram.POSITION_ATTRIBUTE));
         attribs.add(new VertexAttribute(Usage.Tangent, 3, "a_pm"));
-        attribs.add(new VertexAttribute(Usage.ColorPacked, 4, ShaderProgram.COLOR_ATTRIBUTE));
+        attribs.add(new VertexAttribute(Usage.ColorPacked, 4, ExtShaderProgram.COLOR_ATTRIBUTE));
         attribs.add(new VertexAttribute(Usage.Generic, 1, "a_size"));
 
         VertexAttribute[] array = new VertexAttribute[attribs.size];
@@ -136,7 +136,7 @@ public class StarPointRenderSystem extends ImmediateRenderSystem implements IObs
         if (!camera.getMode().isGaiaFov()) {
             int fovmode = camera.getMode().getGaiaFovMode();
 
-            ShaderProgram shaderProgram = getShaderProgram();
+            ExtShaderProgram shaderProgram = getShaderProgram();
 
             shaderProgram.begin();
             shaderProgram.setUniformMatrix("u_projModelView", camera.getCamera().combined);
@@ -174,7 +174,7 @@ public class StarPointRenderSystem extends ImmediateRenderSystem implements IObs
             POINT_UPDATE_FLAG = true;
             break;
         case STAR_MIN_OPACITY_CMD:
-            for (ShaderProgram p : programs) {
+            for (ExtShaderProgram p : programs) {
                 if (p != null && p.isCompiled()) {
                     pointAlpha[0] = (float) data[0];
                     Gdx.app.postRunnable(new Runnable() {

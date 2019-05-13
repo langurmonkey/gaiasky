@@ -9,7 +9,6 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.VertexAttribute;
 import com.badlogic.gdx.graphics.VertexAttributes.Usage;
-import com.badlogic.gdx.graphics.glutils.ShaderProgram;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Pool;
 import gaia.cu9.ari.gaiaorbit.render.ComponentTypes;
@@ -20,6 +19,7 @@ import gaia.cu9.ari.gaiaorbit.scenegraph.Particle;
 import gaia.cu9.ari.gaiaorbit.scenegraph.SceneGraphNode.RenderGroup;
 import gaia.cu9.ari.gaiaorbit.scenegraph.camera.ICamera;
 import gaia.cu9.ari.gaiaorbit.util.gdx.mesh.IntMesh;
+import gaia.cu9.ari.gaiaorbit.util.gdx.shader.ExtShaderProgram;
 import gaia.cu9.ari.gaiaorbit.util.math.MathUtilsd;
 import gaia.cu9.ari.gaiaorbit.util.math.Vector3d;
 
@@ -61,7 +61,7 @@ public class LineQuadRenderSystem extends LineRenderSystem {
     final static double baseWidthAngle = Math.toRadians(.13);
     final static double baseWidthAngleTan = Math.tan(baseWidthAngle);
 
-    public LineQuadRenderSystem(RenderGroup rg, float[] alphas, ShaderProgram[] shaders) {
+    public LineQuadRenderSystem(RenderGroup rg, float[] alphas, ExtShaderProgram[] shaders) {
         super(rg, alphas, shaders);
         doublePool = new DPool(INI_DPOOL_SIZE, MAX_DPOOL_SIZE, 14);
         provisionalLines = new Array<>();
@@ -112,8 +112,8 @@ public class LineQuadRenderSystem extends LineRenderSystem {
 
     protected VertexAttribute[] buildVertexAttributes() {
         Array<VertexAttribute> attribs = new Array<>();
-        attribs.add(new VertexAttribute(Usage.Position, 3, ShaderProgram.POSITION_ATTRIBUTE));
-        attribs.add(new VertexAttribute(Usage.ColorPacked, 4, ShaderProgram.COLOR_ATTRIBUTE));
+        attribs.add(new VertexAttribute(Usage.Position, 3, ExtShaderProgram.POSITION_ATTRIBUTE));
+        attribs.add(new VertexAttribute(Usage.ColorPacked, 4, ExtShaderProgram.COLOR_ATTRIBUTE));
         attribs.add(new VertexAttribute(Usage.TextureCoordinates, 2, "a_uv"));
 
         VertexAttribute[] array = new VertexAttribute[attribs.size];
@@ -332,7 +332,7 @@ public class LineQuadRenderSystem extends LineRenderSystem {
         for (Line l : provLines)
             addLinePostproc(l);
 
-        ShaderProgram shaderProgram = getShaderProgram();
+        ExtShaderProgram shaderProgram = getShaderProgram();
 
         shaderProgram.begin();
         shaderProgram.setUniformMatrix("u_projModelView", camera.getCamera().combined);

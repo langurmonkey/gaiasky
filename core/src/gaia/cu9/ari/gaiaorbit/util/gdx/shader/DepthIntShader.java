@@ -31,7 +31,6 @@ import com.badlogic.gdx.graphics.g3d.attributes.BlendingAttribute;
 import com.badlogic.gdx.graphics.g3d.attributes.FloatAttribute;
 import com.badlogic.gdx.graphics.g3d.attributes.TextureAttribute;
 import com.badlogic.gdx.graphics.g3d.utils.RenderContext;
-import com.badlogic.gdx.graphics.glutils.ShaderProgram;
 import gaia.cu9.ari.gaiaorbit.util.gdx.IntRenderable;
 
 public class DepthIntShader extends DefaultIntShader {
@@ -90,10 +89,10 @@ public class DepthIntShader extends DefaultIntShader {
 
 	public DepthIntShader(final IntRenderable renderable, final Config config, final String prefix, final String vertexShader,
 		final String fragmentShader) {
-		this(renderable, config, new ShaderProgram(prefix + vertexShader, prefix + fragmentShader));
+		this(renderable, config, new ExtShaderProgram(prefix + vertexShader, prefix + fragmentShader));
 	}
 
-	public DepthIntShader(final IntRenderable renderable, final Config config, final ShaderProgram shaderProgram) {
+	public DepthIntShader(final IntRenderable renderable, final Config config, final ExtShaderProgram shaderProgram) {
 		super(renderable, config, shaderProgram);
 		final Attributes attributes = combineAttributes(renderable);
 		this.numBones = renderable.bones == null ? 0 : config.numBones;

@@ -6,8 +6,6 @@
 package gaia.cu9.ari.gaiaorbit.scenegraph;
 
 import com.badlogic.gdx.assets.AssetManager;
-import com.badlogic.gdx.graphics.g2d.BitmapFont;
-import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.reflect.ClassReflection;
@@ -20,6 +18,8 @@ import gaia.cu9.ari.gaiaorbit.util.GlobalConf;
 import gaia.cu9.ari.gaiaorbit.util.GlobalResources;
 import gaia.cu9.ari.gaiaorbit.util.Logger;
 import gaia.cu9.ari.gaiaorbit.util.coord.Coordinates;
+import gaia.cu9.ari.gaiaorbit.util.gdx.g2d.BitmapFont;
+import gaia.cu9.ari.gaiaorbit.util.gdx.g2d.ExtSpriteBatch;
 import gaia.cu9.ari.gaiaorbit.util.gravwaves.RelativisticEffectsManager;
 import gaia.cu9.ari.gaiaorbit.util.math.Matrix4d;
 import gaia.cu9.ari.gaiaorbit.util.math.Vector3d;
@@ -33,7 +33,6 @@ public class SphericalGrid extends BackgroundModel implements IAnnotationsRender
     private static final int divisionsU = 36;
     private static final int divisionsV = 18;
 
-    private BitmapFont font;
     public ModelComponent mc;
     private Vector3 auxf;
     private Vector3d auxd;
@@ -66,7 +65,6 @@ public class SphericalGrid extends BackgroundModel implements IAnnotationsRender
         } else {
             // Equatorial, nothing
         }
-        font = GlobalResources.skin.getFont("grid-annotation");
 
     }
 
@@ -83,7 +81,7 @@ public class SphericalGrid extends BackgroundModel implements IAnnotationsRender
      * Annotation rendering
      */
     @Override
-    public void render(SpriteBatch spriteBatch, ICamera camera, float alpha) {
+    public void render(ExtSpriteBatch spriteBatch, ICamera camera, BitmapFont font, float alpha) {
 
         // Horizon
         float stepAngle = 360 / divisionsU;

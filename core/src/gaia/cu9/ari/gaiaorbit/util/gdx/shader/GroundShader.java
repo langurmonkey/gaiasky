@@ -6,7 +6,6 @@
 package gaia.cu9.ari.gaiaorbit.util.gdx.shader;
 
 import com.badlogic.gdx.graphics.g3d.Attributes;
-import com.badlogic.gdx.graphics.glutils.ShaderProgram;
 import gaia.cu9.ari.gaiaorbit.util.gdx.IntRenderable;
 
 public class GroundShader extends RelativisticShader {
@@ -362,10 +361,10 @@ public class GroundShader extends RelativisticShader {
     }
 
     public GroundShader(final IntRenderable renderable, final Config config, final String prefix, final String vertexShader, final String fragmentShader) {
-        this(renderable, config, new ShaderProgram(ShaderProgramProvider.getShaderCode(prefix, vertexShader), ShaderProgramProvider.getShaderCode(prefix, fragmentShader)));
+        this(renderable, config, new ExtShaderProgram(ShaderProgramProvider.getShaderCode(prefix, vertexShader), ShaderProgramProvider.getShaderCode(prefix, fragmentShader)));
     }
 
-    public GroundShader(final IntRenderable renderable, final Config config, final ShaderProgram shaderProgram) {
+    public GroundShader(final IntRenderable renderable, final Config config, final ExtShaderProgram shaderProgram) {
         super(renderable, config, shaderProgram);
 
         fAlpha = register(Inputs.alpha, Setters.alpha);

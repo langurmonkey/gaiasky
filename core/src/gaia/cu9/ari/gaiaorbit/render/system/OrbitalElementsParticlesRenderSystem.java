@@ -8,7 +8,6 @@ package gaia.cu9.ari.gaiaorbit.render.system;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.VertexAttribute;
 import com.badlogic.gdx.graphics.VertexAttributes.Usage;
-import com.badlogic.gdx.graphics.glutils.ShaderProgram;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer.ShapeType;
 import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Vector3;
@@ -25,6 +24,7 @@ import gaia.cu9.ari.gaiaorbit.util.GlobalConf;
 import gaia.cu9.ari.gaiaorbit.util.coord.AstroUtils;
 import gaia.cu9.ari.gaiaorbit.util.coord.Coordinates;
 import gaia.cu9.ari.gaiaorbit.util.gdx.mesh.IntMesh;
+import gaia.cu9.ari.gaiaorbit.util.gdx.shader.ExtShaderProgram;
 import gaia.cu9.ari.gaiaorbit.util.math.MathUtilsd;
 import org.lwjgl.opengl.GL30;
 
@@ -33,7 +33,7 @@ public class OrbitalElementsParticlesRenderSystem extends ImmediateRenderSystem 
     private Matrix4 maux;
     private int elems01Offset, elems02Offset, count;
 
-    public OrbitalElementsParticlesRenderSystem(RenderGroup rg, float[] alphas, ShaderProgram[] shaders) {
+    public OrbitalElementsParticlesRenderSystem(RenderGroup rg, float[] alphas, ExtShaderProgram[] shaders) {
         super(rg, alphas, shaders);
         aux1 = new Vector3();
         maux = new Matrix4();
@@ -107,7 +107,7 @@ public class OrbitalElementsParticlesRenderSystem extends ImmediateRenderSystem 
             }
 
             if (curr != null) {
-                ShaderProgram shaderProgram = getShaderProgram();
+                ExtShaderProgram shaderProgram = getShaderProgram();
 
                 boolean stereoHw = GlobalConf.program.isStereoHalfWidth();
 

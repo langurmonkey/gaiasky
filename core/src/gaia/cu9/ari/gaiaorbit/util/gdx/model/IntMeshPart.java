@@ -23,10 +23,10 @@ package gaia.cu9.ari.gaiaorbit.util.gdx.model;
 
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Mesh;
-import com.badlogic.gdx.graphics.glutils.ShaderProgram;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.math.collision.BoundingBox;
 import gaia.cu9.ari.gaiaorbit.util.gdx.mesh.IntMesh;
+import gaia.cu9.ari.gaiaorbit.util.gdx.shader.ExtShaderProgram;
 
 /**
  * A libgdx MeshPart which uses {@link IntMesh} (for integer indices) instead of a regular {@link Mesh}
@@ -151,18 +151,18 @@ public class IntMeshPart {
 		return equals((IntMeshPart)arg0);
 	}
 
-	/** Renders the mesh part using the specified shader, must be called in between {@link ShaderProgram#begin()} and
-	 * {@link ShaderProgram#end()}.
+	/** Renders the mesh part using the specified shader, must be called in between {@link ExtShaderProgram#begin()} and
+	 * {@link ExtShaderProgram#end()}.
 	 * @param shader the shader to be used
 	 * @param autoBind overrides the autoBind member of the Mesh */
-	public void render (ShaderProgram shader, boolean autoBind) {
+	public void render (ExtShaderProgram shader, boolean autoBind) {
 		mesh.render(shader, primitiveType, offset, size, autoBind);
 	}
 
-	/** Renders the mesh part using the specified shader, must be called in between {@link ShaderProgram#begin()} and
-	 * {@link ShaderProgram#end()}.
+	/** Renders the mesh part using the specified shader, must be called in between {@link ExtShaderProgram#begin()} and
+	 * {@link ExtShaderProgram#end()}.
 	 * @param shader the shader to be used */
-	public void render (ShaderProgram shader) {
+	public void render (ExtShaderProgram shader) {
 		mesh.render(shader, primitiveType, offset, size);
 	}
 }

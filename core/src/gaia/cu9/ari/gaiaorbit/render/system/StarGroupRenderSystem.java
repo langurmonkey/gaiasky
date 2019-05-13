@@ -9,7 +9,6 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.PerspectiveCamera;
 import com.badlogic.gdx.graphics.VertexAttribute;
 import com.badlogic.gdx.graphics.VertexAttributes.Usage;
-import com.badlogic.gdx.graphics.glutils.ShaderProgram;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer.ShapeType;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.Array;
@@ -30,6 +29,7 @@ import gaia.cu9.ari.gaiaorbit.util.Nature;
 import gaia.cu9.ari.gaiaorbit.util.comp.DistToCameraComparator;
 import gaia.cu9.ari.gaiaorbit.util.coord.AstroUtils;
 import gaia.cu9.ari.gaiaorbit.util.gdx.mesh.IntMesh;
+import gaia.cu9.ari.gaiaorbit.util.gdx.shader.ExtShaderProgram;
 import org.lwjgl.opengl.GL30;
 
 public class StarGroupRenderSystem extends ImmediateRenderSystem implements IObserver {
@@ -39,7 +39,7 @@ public class StarGroupRenderSystem extends ImmediateRenderSystem implements IObs
     private int sizeOffset, pmOffset;
     private float[] pointAlpha, alphaSizeFovBr, pointAlphaHl;
 
-    public StarGroupRenderSystem(RenderGroup rg, float[] alphas, ShaderProgram[] shaders) {
+    public StarGroupRenderSystem(RenderGroup rg, float[] alphas, ExtShaderProgram[] shaders) {
         super(rg, alphas, shaders);
         BRIGHTNESS_FACTOR = 10;
         this.comp = new DistToCameraComparator<>();
@@ -89,7 +89,7 @@ public class StarGroupRenderSystem extends ImmediateRenderSystem implements IObs
         //renderables.sort(comp);
         if (renderables.size > 0) {
 
-            ShaderProgram shaderProgram = getShaderProgram();
+            ExtShaderProgram shaderProgram = getShaderProgram();
 
             shaderProgram.begin();
             for (IRenderable renderable : renderables) {
@@ -181,9 +181,9 @@ public class StarGroupRenderSystem extends ImmediateRenderSystem implements IObs
 
     protected VertexAttribute[] buildVertexAttributes() {
         Array<VertexAttribute> attributes = new Array<>();
-        attributes.add(new VertexAttribute(Usage.Position, 3, ShaderProgram.POSITION_ATTRIBUTE));
+        attributes.add(new VertexAttribute(Usage.Position, 3, ExtShaderProgram.POSITION_ATTRIBUTE));
         attributes.add(new VertexAttribute(Usage.Tangent, 3, "a_pm"));
-        attributes.add(new VertexAttribute(Usage.ColorPacked, 4, ShaderProgram.COLOR_ATTRIBUTE));
+        attributes.add(new VertexAttribute(Usage.ColorPacked, 4, ExtShaderProgram.COLOR_ATTRIBUTE));
         attributes.add(new VertexAttribute(Usage.Generic, 1, "a_size"));
 
         VertexAttribute[] array = new VertexAttribute[attributes.size];
@@ -198,7 +198,7 @@ public class StarGroupRenderSystem extends ImmediateRenderSystem implements IObs
         case STAR_MIN_OPACITY_CMD:
             pointAlpha[0] = (float) data[0];
             pointAlpha[1] = (float) data[0] + GlobalConf.scene.POINT_ALPHA_MAX;
-            for (ShaderProgram p : programs) {
+            for (ExtShaderProgram p : programs) {
                 if (p != null && p.isCompiled()) {
                     Gdx.app.postRunnable(() -> {
                         p.begin();

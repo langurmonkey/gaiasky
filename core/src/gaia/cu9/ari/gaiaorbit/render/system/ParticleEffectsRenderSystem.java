@@ -10,7 +10,6 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.VertexAttribute;
 import com.badlogic.gdx.graphics.VertexAttributes.Usage;
-import com.badlogic.gdx.graphics.glutils.ShaderProgram;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.Array;
 import gaia.cu9.ari.gaiaorbit.render.ComponentTypes;
@@ -23,6 +22,7 @@ import gaia.cu9.ari.gaiaorbit.util.Constants;
 import gaia.cu9.ari.gaiaorbit.util.GlobalConf;
 import gaia.cu9.ari.gaiaorbit.util.GlobalConf.ProgramConf.StereoProfile;
 import gaia.cu9.ari.gaiaorbit.util.gdx.mesh.IntMesh;
+import gaia.cu9.ari.gaiaorbit.util.gdx.shader.ExtShaderProgram;
 import gaia.cu9.ari.gaiaorbit.util.math.MathUtilsd;
 import gaia.cu9.ari.gaiaorbit.util.math.Vector3d;
 import org.lwjgl.opengl.GL30;
@@ -41,7 +41,7 @@ public class ParticleEffectsRenderSystem extends ImmediateRenderSystem {
     private Vector3d[] campositions;
     private long baset;
 
-    public ParticleEffectsRenderSystem(RenderGroup rg, float[] alphas, ShaderProgram[] programs) {
+    public ParticleEffectsRenderSystem(RenderGroup rg, float[] alphas, ExtShaderProgram[] programs) {
         super(rg, alphas, programs);
         aux1f = new Vector3();
         aux1 = new Vector3d();
@@ -165,8 +165,8 @@ public class ParticleEffectsRenderSystem extends ImmediateRenderSystem {
 
     protected VertexAttribute[] buildVertexAttributes() {
         Array<VertexAttribute> attribs = new Array<VertexAttribute>();
-        attribs.add(new VertexAttribute(Usage.Position, 3, ShaderProgram.POSITION_ATTRIBUTE));
-        attribs.add(new VertexAttribute(Usage.ColorPacked, 4, ShaderProgram.COLOR_ATTRIBUTE));
+        attribs.add(new VertexAttribute(Usage.Position, 3, ExtShaderProgram.POSITION_ATTRIBUTE));
+        attribs.add(new VertexAttribute(Usage.ColorPacked, 4, ExtShaderProgram.COLOR_ATTRIBUTE));
         attribs.add(new VertexAttribute(Usage.Generic, 1, "a_size"));
         attribs.add(new VertexAttribute(Usage.Tangent, 1, "a_t"));
 
@@ -214,7 +214,7 @@ public class ParticleEffectsRenderSystem extends ImmediateRenderSystem {
                 /**
                  * RENDER
                  */
-                ShaderProgram shaderProgram = getShaderProgram();
+                ExtShaderProgram shaderProgram = getShaderProgram();
 
                 shaderProgram.begin();
                 shaderProgram.setUniformMatrix("u_projModelView", camera.getCamera().combined);

@@ -35,7 +35,6 @@ import com.badlogic.gdx.graphics.g3d.environment.DirectionalLight;
 import com.badlogic.gdx.graphics.g3d.environment.PointLight;
 import com.badlogic.gdx.graphics.g3d.environment.SpotLight;
 import com.badlogic.gdx.graphics.g3d.utils.RenderContext;
-import com.badlogic.gdx.graphics.glutils.ShaderProgram;
 import com.badlogic.gdx.math.Matrix3;
 import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Vector3;
@@ -541,10 +540,10 @@ public class DefaultIntShader extends BaseIntShader {
 
 	public DefaultIntShader(final IntRenderable renderable, final Config config, final String prefix, final String vertexShader,
 		final String fragmentShader) {
-		this(renderable, config, new ShaderProgram(prefix + vertexShader, prefix + fragmentShader));
+		this(renderable, config, new ExtShaderProgram(prefix + vertexShader, prefix + fragmentShader));
 	}
 
-	public DefaultIntShader(final IntRenderable renderable, final Config config, final ShaderProgram shaderProgram) {
+	public DefaultIntShader(final IntRenderable renderable, final Config config, final ExtShaderProgram shaderProgram) {
 		final Attributes attributes = combineAttributes(renderable);
 		this.config = config;
 		this.program = shaderProgram;
@@ -616,7 +615,7 @@ public class DefaultIntShader extends BaseIntShader {
 
 	@Override
 	public void init () {
-		final ShaderProgram program = this.program;
+		final ExtShaderProgram program = this.program;
 		this.program = null;
 		init(program, renderable);
 		renderable = null;

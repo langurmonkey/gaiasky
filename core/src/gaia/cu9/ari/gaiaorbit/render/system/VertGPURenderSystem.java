@@ -9,7 +9,6 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.VertexAttribute;
 import com.badlogic.gdx.graphics.VertexAttributes.Usage;
-import com.badlogic.gdx.graphics.glutils.ShaderProgram;
 import com.badlogic.gdx.utils.Array;
 import gaia.cu9.ari.gaiaorbit.data.util.PointCloudData;
 import gaia.cu9.ari.gaiaorbit.render.IGPUVertsRenderable;
@@ -19,6 +18,7 @@ import gaia.cu9.ari.gaiaorbit.scenegraph.SceneGraphNode.RenderGroup;
 import gaia.cu9.ari.gaiaorbit.scenegraph.camera.ICamera;
 import gaia.cu9.ari.gaiaorbit.util.GlobalConf;
 import gaia.cu9.ari.gaiaorbit.util.gdx.mesh.IntMesh;
+import gaia.cu9.ari.gaiaorbit.util.gdx.shader.ExtShaderProgram;
 import gaia.cu9.ari.gaiaorbit.util.math.Vector3d;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL30;
@@ -32,7 +32,7 @@ public class VertGPURenderSystem<T extends IGPUVertsRenderable> extends Immediat
     protected ICamera camera;
     protected int glType;
 
-    public VertGPURenderSystem(RenderGroup rg, float[] alphas, ShaderProgram[] shaders, int glType) {
+    public VertGPURenderSystem(RenderGroup rg, float[] alphas, ExtShaderProgram[] shaders, int glType) {
         super(rg, alphas, shaders);
         this.glType = glType;
     }
@@ -150,7 +150,7 @@ public class VertGPURenderSystem<T extends IGPUVertsRenderable> extends Immediat
             /*
              * RENDER
              */
-            ShaderProgram shaderProgram = getShaderProgram();
+            ExtShaderProgram shaderProgram = getShaderProgram();
 
             shaderProgram.begin();
 
@@ -184,8 +184,8 @@ public class VertGPURenderSystem<T extends IGPUVertsRenderable> extends Immediat
 
     protected VertexAttribute[] buildVertexAttributes() {
         Array<VertexAttribute> attribs = new Array<>();
-        attribs.add(new VertexAttribute(Usage.Position, 3, ShaderProgram.POSITION_ATTRIBUTE));
-        attribs.add(new VertexAttribute(Usage.ColorPacked, 4, ShaderProgram.COLOR_ATTRIBUTE));
+        attribs.add(new VertexAttribute(Usage.Position, 3, ExtShaderProgram.POSITION_ATTRIBUTE));
+        attribs.add(new VertexAttribute(Usage.ColorPacked, 4, ExtShaderProgram.COLOR_ATTRIBUTE));
 
         VertexAttribute[] array = new VertexAttribute[attribs.size];
         for (int i = 0; i < attribs.size; i++)

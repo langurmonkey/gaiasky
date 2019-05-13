@@ -19,6 +19,7 @@ import gaia.cu9.ari.gaiaorbit.scenegraph.camera.ICamera;
 import gaia.cu9.ari.gaiaorbit.util.DecalUtils;
 import gaia.cu9.ari.gaiaorbit.util.comp.DistToCameraComparator;
 import gaia.cu9.ari.gaiaorbit.util.gdx.mesh.IntMesh;
+import gaia.cu9.ari.gaiaorbit.util.gdx.shader.ExtShaderProgram;
 
 public class BillboardSpriteRenderSystem extends AbstractRenderSystem {
 
@@ -26,7 +27,7 @@ public class BillboardSpriteRenderSystem extends AbstractRenderSystem {
     private Quaternion quaternion;
     private final int ctIndex;
 
-    public BillboardSpriteRenderSystem(RenderGroup rg, float[] alphas, ShaderProgram[] programs, int ctIndex, float w, float h) {
+    public BillboardSpriteRenderSystem(RenderGroup rg, float[] alphas, ExtShaderProgram[] programs, int ctIndex, float w, float h) {
         super(rg, alphas, programs);
         this.ctIndex = ctIndex;
         init(w, h);
@@ -44,7 +45,7 @@ public class BillboardSpriteRenderSystem extends AbstractRenderSystem {
      * @param ctIndex
      *            The component type index
      */
-    public BillboardSpriteRenderSystem(RenderGroup rg, float[] alphas, ShaderProgram[] programs, int ctIndex) {
+    public BillboardSpriteRenderSystem(RenderGroup rg, float[] alphas, ExtShaderProgram[] programs, int ctIndex) {
         this(rg, alphas, programs, ctIndex, 2, 2);
     }
 
@@ -119,7 +120,7 @@ public class BillboardSpriteRenderSystem extends AbstractRenderSystem {
             // Calculate billobard rotation quaternion ONCE
             DecalUtils.setBillboardRotation(quaternion, camera.getCamera().direction, camera.getCamera().up);
 
-            ShaderProgram shaderProgram = getShaderProgram();
+            ExtShaderProgram shaderProgram = getShaderProgram();
 
             shaderProgram.begin();
 

@@ -6,12 +6,12 @@
 package gaia.cu9.ari.gaiaorbit.render.system;
 
 import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.graphics.glutils.ShaderProgram;
 import com.badlogic.gdx.utils.Array;
 import gaia.cu9.ari.gaiaorbit.scenegraph.SceneGraphNode.RenderGroup;
 import gaia.cu9.ari.gaiaorbit.util.Logger;
 import gaia.cu9.ari.gaiaorbit.util.Logger.Log;
 import gaia.cu9.ari.gaiaorbit.util.gdx.mesh.IntMesh;
+import gaia.cu9.ari.gaiaorbit.util.gdx.shader.ExtShaderProgram;
 
 public abstract class ImmediateRenderSystem extends AbstractRenderSystem {
     protected static final Log logger = Logger.getLogger(ImmediateRenderSystem.class);
@@ -95,11 +95,11 @@ public abstract class ImmediateRenderSystem extends AbstractRenderSystem {
         }
     }
 
-    protected ImmediateRenderSystem(RenderGroup rg, float[] alphas, ShaderProgram[] programs) {
+    protected ImmediateRenderSystem(RenderGroup rg, float[] alphas, ExtShaderProgram[] programs) {
         this(rg, alphas, programs, -1);
     }
 
-    protected ImmediateRenderSystem(RenderGroup rg, float[] alphas, ShaderProgram[] programs, int tempVertsSize) {
+    protected ImmediateRenderSystem(RenderGroup rg, float[] alphas, ExtShaderProgram[] programs, int tempVertsSize) {
         super(rg, alphas, programs);
         initShaderProgram();
         initVertices();

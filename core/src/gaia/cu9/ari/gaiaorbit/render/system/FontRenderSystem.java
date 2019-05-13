@@ -5,9 +5,6 @@
 
 package gaia.cu9.ari.gaiaorbit.render.system;
 
-import com.badlogic.gdx.graphics.g2d.BitmapFont;
-import com.badlogic.gdx.graphics.g2d.SpriteBatch;
-import com.badlogic.gdx.graphics.glutils.ShaderProgram;
 import com.badlogic.gdx.utils.Array;
 import gaia.cu9.ari.gaiaorbit.render.ComponentTypes.ComponentType;
 import gaia.cu9.ari.gaiaorbit.render.I3DTextRenderable;
@@ -17,25 +14,28 @@ import gaia.cu9.ari.gaiaorbit.scenegraph.SceneGraphNode.RenderGroup;
 import gaia.cu9.ari.gaiaorbit.scenegraph.camera.ICamera;
 import gaia.cu9.ari.gaiaorbit.util.GlobalConf;
 import gaia.cu9.ari.gaiaorbit.util.comp.DistToCameraComparator;
+import gaia.cu9.ari.gaiaorbit.util.gdx.g2d.BitmapFont;
+import gaia.cu9.ari.gaiaorbit.util.gdx.g2d.ExtSpriteBatch;
+import gaia.cu9.ari.gaiaorbit.util.gdx.shader.ExtShaderProgram;
 
 import java.util.Comparator;
 
 public class FontRenderSystem extends AbstractRenderSystem {
 
-    private SpriteBatch batch;
+    private ExtSpriteBatch batch;
     public BitmapFont fontDistanceField, font2d, fontTitles;
     private Comparator<IRenderable> comp;
     private float[] red;
 
-    public FontRenderSystem(RenderGroup rg, float[] alphas, SpriteBatch batch, ShaderProgram program) {
-        super(rg, alphas, new ShaderProgram[] { program });
+    public FontRenderSystem(RenderGroup rg, float[] alphas, ExtSpriteBatch batch, ExtShaderProgram program) {
+        super(rg, alphas, new ExtShaderProgram[] { program });
         this.batch = batch;
         // Init comparator
         comp = new DistToCameraComparator<>();
         red = new float[] { 1f, 0f, 0f, 1f };
     }
 
-    public FontRenderSystem(RenderGroup rg, float[] alphas, SpriteBatch batch, ShaderProgram program, BitmapFont fontDistanceField, BitmapFont font2d, BitmapFont fontTitles) {
+    public FontRenderSystem(RenderGroup rg, float[] alphas, ExtSpriteBatch batch, ExtShaderProgram program, BitmapFont fontDistanceField, BitmapFont font2d, BitmapFont fontTitles) {
         this(rg, alphas, batch, program);
 
         this.fontDistanceField = fontDistanceField;
@@ -50,12 +50,12 @@ public class FontRenderSystem extends AbstractRenderSystem {
         batch.begin();
 
         int size = renderables.size;
-        ShaderProgram program = programs[0];
+        ExtShaderProgram program = programs[0];
         if (program == null) {
             for (int i = 0; i < size; i++) {
                 IAnnotationsRenderable s = (IAnnotationsRenderable) renderables.get(i);
                 // Render sprite
-                s.render(batch, camera, getAlpha(s));
+                s.render(batch, camera, font2d, getAlpha(s));
             }
         } else {
             float lalpha = alphas[ComponentType.Labels.ordinal()];

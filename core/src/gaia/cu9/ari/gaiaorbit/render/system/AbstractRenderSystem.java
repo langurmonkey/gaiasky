@@ -5,7 +5,6 @@
 
 package gaia.cu9.ari.gaiaorbit.render.system;
 
-import com.badlogic.gdx.graphics.glutils.ShaderProgram;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.Array;
 import gaia.cu9.ari.gaiaorbit.render.ComponentTypes;
@@ -14,6 +13,7 @@ import gaia.cu9.ari.gaiaorbit.render.RenderingContext;
 import gaia.cu9.ari.gaiaorbit.scenegraph.SceneGraphNode.RenderGroup;
 import gaia.cu9.ari.gaiaorbit.scenegraph.camera.ICamera;
 import gaia.cu9.ari.gaiaorbit.util.GlobalConf;
+import gaia.cu9.ari.gaiaorbit.util.gdx.shader.ExtShaderProgram;
 import gaia.cu9.ari.gaiaorbit.util.gravwaves.RelativisticEffectsManager;
 
 import java.util.Comparator;
@@ -25,7 +25,7 @@ public abstract class AbstractRenderSystem implements IRenderSystem {
      **/
     public static boolean POINT_UPDATE_FLAG = true;
 
-    protected ShaderProgram[] programs;
+    protected ExtShaderProgram[] programs;
     private RenderGroup group;
     protected float[] alphas;
     /** Comparator of renderables, in case of need **/
@@ -35,7 +35,7 @@ public abstract class AbstractRenderSystem implements IRenderSystem {
 
     protected Array<RenderSystemRunnable> preRunnables, postRunnables;
 
-    protected AbstractRenderSystem(RenderGroup rg, float[] alphas, ShaderProgram[] programs) {
+    protected AbstractRenderSystem(RenderGroup rg, float[] alphas, ExtShaderProgram[] programs) {
         super();
         this.group = rg;
         this.alphas = alphas;
@@ -112,12 +112,12 @@ public abstract class AbstractRenderSystem implements IRenderSystem {
         void run(AbstractRenderSystem renderSystem, Array<IRenderable> renderables, ICamera camera);
     }
 
-    protected void addEffectsUniforms(ShaderProgram shaderProgram, ICamera camera) {
+    protected void addEffectsUniforms(ExtShaderProgram shaderProgram, ICamera camera) {
         addRelativisticUniforms(shaderProgram, camera);
         addGravWaveUniforms(shaderProgram);
     }
 
-    protected void addRelativisticUniforms(ShaderProgram shaderProgram, ICamera camera) {
+    protected void addRelativisticUniforms(ExtShaderProgram shaderProgram, ICamera camera) {
         if (GlobalConf.runtime.RELATIVISTIC_ABERRATION) {
             RelativisticEffectsManager rem = RelativisticEffectsManager.getInstance();
             shaderProgram.setUniformf("u_velDir", rem.velDir);
@@ -125,7 +125,7 @@ public abstract class AbstractRenderSystem implements IRenderSystem {
         }
     }
 
-    protected void addGravWaveUniforms(ShaderProgram shaderProgram) {
+    protected void addGravWaveUniforms(ExtShaderProgram shaderProgram) {
         if (GlobalConf.runtime.GRAVITATIONAL_WAVES) {
             RelativisticEffectsManager rem = RelativisticEffectsManager.getInstance();
             // Time in seconds - use simulation time
@@ -141,7 +141,7 @@ public abstract class AbstractRenderSystem implements IRenderSystem {
         }
     }
 
-    protected ShaderProgram getShaderProgram() {
+    protected ExtShaderProgram getShaderProgram() {
         try {
             if (GlobalConf.runtime.RELATIVISTIC_ABERRATION && GlobalConf.runtime.GRAVITATIONAL_WAVES)
                 return programs[3];

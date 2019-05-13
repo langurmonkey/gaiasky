@@ -22,6 +22,8 @@ import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.ScreenUtils;
 import gaia.cu9.ari.gaiaorbit.scenegraph.camera.ICamera;
 import gaia.cu9.ari.gaiaorbit.util.Logger.Log;
+import gaia.cu9.ari.gaiaorbit.util.gdx.g2d.ExtSpriteBatch;
+import gaia.cu9.ari.gaiaorbit.util.gdx.shader.ExtShaderProgram;
 import gaia.cu9.ari.gaiaorbit.util.math.MathUtilsd;
 import gaia.cu9.ari.gaiaorbit.util.math.Vector3d;
 import net.jafama.FastMath;
@@ -52,6 +54,10 @@ public class GlobalResources {
     public static ShaderProgram spriteShader;
     /** Global all-purpose sprite batch **/
     public static SpriteBatch spriteBatch;
+
+    public static ExtShaderProgram extSpriteShader;
+    /** Sprite batch using int indices **/
+    public static ExtSpriteBatch extSpriteBatch;
     /** Cursors **/
     public static Cursor linkCursor, resizeXCursor, resizeYCursor;
     /** The global skin **/
@@ -86,6 +92,15 @@ public class GlobalResources {
         }
         // Sprite batch
         spriteBatch = new SpriteBatch(1000, spriteShader);
+
+
+        // ExtSprite shader
+        extSpriteShader = new ExtShaderProgram(Gdx.files.internal("shader/2d/spritebatch.vertex.glsl"), Gdx.files.internal("shader/2d/spritebatch.fragment.glsl"));
+        if(!extSpriteShader.isCompiled()){
+            logger.info("ExtSpriteBatch shader compilation failed: " + spriteShader.getLog());
+        }
+        // Sprite batch
+        extSpriteBatch = new ExtSpriteBatch(1000, extSpriteShader);
 
         updateSkin();
 

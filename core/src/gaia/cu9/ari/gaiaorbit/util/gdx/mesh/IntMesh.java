@@ -27,7 +27,6 @@ import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.VertexAttribute;
 import com.badlogic.gdx.graphics.VertexAttributes;
 import com.badlogic.gdx.graphics.VertexAttributes.Usage;
-import com.badlogic.gdx.graphics.glutils.*;
 import com.badlogic.gdx.math.Matrix3;
 import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Vector2;
@@ -36,6 +35,7 @@ import com.badlogic.gdx.math.collision.BoundingBox;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Disposable;
 import com.badlogic.gdx.utils.GdxRuntimeException;
+import gaia.cu9.ari.gaiaorbit.util.gdx.shader.ExtShaderProgram;
 
 import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
@@ -75,12 +75,12 @@ public class IntMesh implements Disposable {
 	/** list of all meshes **/
 	static final Map<Application, Array<IntMesh>> meshes = new HashMap<Application, Array<IntMesh>>();
 
-	final VertexData vertices;
+	final IntVertexData vertices;
 	final IntIndexData indices;
 	boolean autoBind = true;
 	final boolean isVertexArray;
 
-	protected IntMesh(VertexData vertices, IntIndexData indices, boolean isVertexArray) {
+	protected IntMesh(IntVertexData vertices, IntIndexData indices, boolean isVertexArray) {
 		this.vertices = vertices;
 		this.indices = indices;
 		this.isVertexArray = isVertexArray;
@@ -136,7 +136,7 @@ public class IntMesh implements Disposable {
 		addManagedMesh(Gdx.app, this);
 	}
 
-	private VertexData makeVertexBuffer (boolean isStatic, int maxVertices, VertexAttributes vertexAttributes) {
+	private IntVertexData makeVertexBuffer (boolean isStatic, int maxVertices, VertexAttributes vertexAttributes) {
 		if (Gdx.gl30 != null) {
 			return new VertexBufferObjectWithVAO(isStatic, maxVertices, vertexAttributes);
 		} else {
@@ -381,7 +381,7 @@ public class IntMesh implements Disposable {
 	 * ES 2.0 and when auto-bind is disabled.
 	 * 
 	 * @param shader the shader (does not bind the shader) */
-	public void bind (final ShaderProgram shader) {
+	public void bind (final ExtShaderProgram shader) {
 		bind(shader, null);
 	}
 
@@ -390,7 +390,7 @@ public class IntMesh implements Disposable {
 	 * 
 	 * @param shader the shader (does not bind the shader)
 	 * @param locations array containing the attribute locations. */
-	public void bind (final ShaderProgram shader, final int[] locations) {
+	public void bind (final ExtShaderProgram shader, final int[] locations) {
 		vertices.bind(shader, locations);
 		if (indices.getNumIndices() > 0) indices.bind();
 	}
@@ -399,7 +399,7 @@ public class IntMesh implements Disposable {
 	 * ES 1.x and when auto-bind is disabled.
 	 * 
 	 * @param shader the shader (does not unbind the shader) */
-	public void unbind (final ShaderProgram shader) {
+	public void unbind (final ExtShaderProgram shader) {
 		unbind(shader, null);
 	}
 
@@ -408,7 +408,7 @@ public class IntMesh implements Disposable {
 	 * 
 	 * @param shader the shader (does not unbind the shader)
 	 * @param locations array containing the attribute locations. */
-	public void unbind (final ShaderProgram shader, final int[] locations) {
+	public void unbind (final ExtShaderProgram shader, final int[] locations) {
 		vertices.unbind(shader, locations);
 		if (indices.getNumIndices() > 0) indices.unbind();
 	}
@@ -424,7 +424,7 @@ public class IntMesh implements Disposable {
 	 * </p>
 	 * 
 	 * <p>
-	 * This method must only be called after the {@link ShaderProgram#begin()} method has been called!
+	 * This method must only be called after the {@link ExtShaderProgram#begin()} method has been called!
 	 * </p>
 	 * 
 	 * <p>
@@ -432,7 +432,7 @@ public class IntMesh implements Disposable {
 	 * </p>
 	 * 
 	 * @param primitiveType the primitive type */
-	public void render (ShaderProgram shader, int primitiveType) {
+	public void render (ExtShaderProgram shader, int primitiveType) {
 		render(shader, primitiveType, 0, indices.getNumMaxIndices() > 0 ? getNumIndices() : getNumVertices(), autoBind);
 	}
 
@@ -448,7 +448,7 @@ public class IntMesh implements Disposable {
 	 * </p>
 	 * 
 	 * <p>
-	 * This method must only be called after the {@link ShaderProgram#begin()} method has been called!
+	 * This method must only be called after the {@link ExtShaderProgram#begin()} method has been called!
 	 * </p>
 	 * 
 	 * <p>
@@ -459,7 +459,7 @@ public class IntMesh implements Disposable {
 	 * @param primitiveType the primitive type
 	 * @param offset the offset into the vertex or index buffer
 	 * @param count number of vertices or indices to use */
-	public void render (ShaderProgram shader, int primitiveType, int offset, int count) {
+	public void render (ExtShaderProgram shader, int primitiveType, int offset, int count) {
 		render(shader, primitiveType, offset, count, autoBind);
 	}
 
@@ -475,7 +475,7 @@ public class IntMesh implements Disposable {
 	 * </p>
 	 * 
 	 * <p>
-	 * This method must only be called after the {@link ShaderProgram#begin()} method has been called!
+	 * This method must only be called after the {@link ExtShaderProgram#begin()} method has been called!
 	 * </p>
 	 * 
 	 * <p>
@@ -487,7 +487,7 @@ public class IntMesh implements Disposable {
 	 * @param offset the offset into the vertex or index buffer
 	 * @param count number of vertices or indices to use
 	 * @param autoBind overrides the autoBind member of this Mesh */
-	public void render (ShaderProgram shader, int primitiveType, int offset, int count, boolean autoBind) {
+	public void render (ExtShaderProgram shader, int primitiveType, int offset, int count, boolean autoBind) {
 		if (count == 0) return;
 
 		if (autoBind) bind(shader);

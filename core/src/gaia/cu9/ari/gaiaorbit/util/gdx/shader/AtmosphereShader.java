@@ -29,7 +29,6 @@ import com.badlogic.gdx.graphics.g3d.Attributes;
 import com.badlogic.gdx.graphics.g3d.Material;
 import com.badlogic.gdx.graphics.g3d.attributes.*;
 import com.badlogic.gdx.graphics.g3d.utils.RenderContext;
-import com.badlogic.gdx.graphics.glutils.ShaderProgram;
 import com.badlogic.gdx.math.Matrix3;
 import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.utils.GdxRuntimeException;
@@ -670,10 +669,10 @@ public class AtmosphereShader extends BaseIntShader {
     }
 
     public AtmosphereShader(final IntRenderable renderable, final Config config, final String prefix, final String vertexShader, final String fragmentShader) {
-        this(renderable, config, new ShaderProgram(ShaderProgramProvider.getShaderCode(prefix, vertexShader), ShaderProgramProvider.getShaderCode(prefix, fragmentShader)));
+        this(renderable, config, new ExtShaderProgram(ShaderProgramProvider.getShaderCode(prefix, vertexShader), ShaderProgramProvider.getShaderCode(prefix, fragmentShader)));
     }
 
-    public AtmosphereShader(final IntRenderable renderable, final Config config, final ShaderProgram shaderProgram) {
+    public AtmosphereShader(final IntRenderable renderable, final Config config, final ExtShaderProgram shaderProgram) {
         final Attributes attributes = combineAttributes(renderable);
         this.config = config;
         this.program = shaderProgram;
@@ -736,7 +735,7 @@ public class AtmosphereShader extends BaseIntShader {
 
     @Override
     public void init() {
-        final ShaderProgram program = this.program;
+        final ExtShaderProgram program = this.program;
         this.program = null;
         init(program, renderable);
         renderable = null;
