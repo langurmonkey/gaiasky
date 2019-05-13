@@ -86,7 +86,7 @@ public class LightBeam extends ModelBody {
 
     @Override
     protected void addToRenderLists(ICamera camera) {
-        addToRender(this, RenderGroup.MODEL_BEAM);
+        addToRender(this, RenderGroup.MODEL_VERT_BEAM);
     }
 
     @Override

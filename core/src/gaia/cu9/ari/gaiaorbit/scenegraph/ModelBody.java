@@ -179,11 +179,11 @@ public abstract class ModelBody extends CelestialBody {
                     if (viewAngleApparent < thQuad1) {
                         addToRender(this, RenderGroup.BILLBOARD_SSO);
                     } else if (viewAngleApparent > thQuad2) {
-                        addToRender(this, RenderGroup.MODEL_NORMAL);
+                        addToRender(this, RenderGroup.MODEL_PIX);
                     } else {
                         // Both
                         addToRender(this, RenderGroup.BILLBOARD_SSO);
-                        addToRender(this, RenderGroup.MODEL_NORMAL);
+                        addToRender(this, RenderGroup.MODEL_PIX);
                     }
 
                     if (renderText()) {

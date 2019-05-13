@@ -204,11 +204,11 @@ public class Planet extends ModelBody implements IAtmosphereRenderable, ICloudRe
     protected void addToRenderLists(ICamera camera) {
         super.addToRenderLists(camera);
         // Add atmosphere to default render group if necessary
-        if (ac != null && isInRender(this, RenderGroup.MODEL_NORMAL) && !coordinatesTimeOverflow) {
+        if (ac != null && isInRender(this, RenderGroup.MODEL_PIX) && !coordinatesTimeOverflow) {
             addToRender(this, RenderGroup.MODEL_ATM);
         }
         // Cloud
-        if (clc != null && isInRender(this, RenderGroup.MODEL_NORMAL) && !coordinatesTimeOverflow) {
+        if (clc != null && isInRender(this, RenderGroup.MODEL_PIX) && !coordinatesTimeOverflow) {
             addToRender(this, RenderGroup.MODEL_CLOUD);
         }
     }

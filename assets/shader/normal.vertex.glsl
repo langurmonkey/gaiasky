@@ -395,12 +395,9 @@ struct DirectionalLight
 uniform DirectionalLight u_dirLights[numDirectionalLights];
 #endif
 
-// Light direction in world space
 out vec3 v_lightDir;
-// View direction in world space
-out vec3 v_viewDir;
-// Light color
 out vec3 v_lightCol;
+out vec3 v_viewDir;
 
 #ifdef environmentCubemapFlag
 out vec3 v_reflect;
@@ -446,6 +443,7 @@ void main() {
 	v_shadowMapUv.xyz = (spos.xyz / spos.w) * 0.5 + 0.5;
 	//v_shadowMapUv.z = min(spos.z * 0.5 + 0.5, 0.998);
     #endif //shadowMapFlag
+
 
     // Tangent space transform
     calculateTangentVectors();

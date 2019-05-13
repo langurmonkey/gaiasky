@@ -190,28 +190,27 @@ out float v_alphaTest;
 #elif defined(binormalFlag) && defined(tangentFlag)
     #define calculateTangentVectors() g_normal = cross(g_binormal, g_tangent)
 #elif defined(normalFlag) || defined(binormalFlag) || defined(tangentFlag)
-#if defined(normalFlag)
-    void calculateTangentVectors()
-    {
-		g_binormal = vec3(0, g_normal.z, -g_normal.y);
-		g_tangent = normalize(cross(g_normal, g_binormal));
-    }
-#elif defined(binormalFlag)
-    void calculateTangentVectors()
-    {
-		g_tangent = vec3(-g_binormal.z, 0, g_binormal.x);
-		g_normal = normalize(cross(g_binormal, g_tangent));
-    }
-#elif defined(tangentFlag)
-    void calculateTangentVectors()
-    {
-		g_binormal = vec3(-g_tangent.z, 0, g_tangent.x);
-		g_normal = normalize(cross(g_tangent, g_binormal));
-    }
-#endif
+    #if defined(normalFlag)
+        void calculateTangentVectors() {
+            g_binormal = vec3(0, g_normal.z, -g_normal.y);
+            g_tangent = normalize(cross(g_normal, g_binormal));
+}
+    #elif defined(binormalFlag)
+        void calculateTangentVectors() {
+            g_tangent = vec3(-g_binormal.z, 0, g_binormal.x);
+            g_normal = normalize(cross(g_binormal, g_tangent));
+        }
+    #elif defined(tangentFlag)
+        void calculateTangentVectors() {
+            g_binormal = vec3(-g_tangent.z, 0, g_tangent.x);
+            g_normal = normalize(cross(g_tangent, g_binormal));
+        }
+    #endif
 #else
     #define calculateTangentVectors() nop()
 #endif
+
+
 
 //////////////////////////////////////////////////////
 ////// AMBIENT LIGHT

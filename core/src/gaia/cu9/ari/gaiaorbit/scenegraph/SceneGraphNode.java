@@ -59,9 +59,9 @@ public class SceneGraphNode implements IStarContainer, IPosition {
      */
     public enum RenderGroup {
         /** Using normal shader for per-pixel lighting **/
-        MODEL_NORMAL(0),
+        MODEL_PIX(0),
         /** Using default shader, no normal map **/
-        MODEL_BACKGROUND(1),
+        MODEL_VERT(1),
         /** IntShader - stars **/
         BILLBOARD_STAR(2),
         /** IntShader - galaxies **/
@@ -81,13 +81,13 @@ public class SceneGraphNode implements IStarContainer, IPosition {
         /** Label **/
         FONT_LABEL(10),
         /** Model star **/
-        MODEL_STAR(11),
+        MODEL_VERT_STAR(11),
         /** Galaxy as a whole **/
         GALAXY(12),
         /** Model close up **/
         MODEL_CLOSEUP(13),
         /** Beams **/
-        MODEL_BEAM(14),
+        MODEL_VERT_BEAM(14),
         /** Particle grup **/
         PARTICLE_GROUP(15),
         /** Star grup **/
@@ -101,9 +101,9 @@ public class SceneGraphNode implements IStarContainer, IPosition {
         /** Particle positions from orbital elements **/
         PARTICLE_ORBIT_ELEMENTS(20),
         /** Transparent additive-blended meshes **/
-        MODEL_ADDITIVE(21),
+        MODEL_VERT_ADDITIVE(21),
         /** Grids shader **/
-        MODEL_GRID(22),
+        MODEL_VERT_GRID(22),
         /** Clouds **/
         MODEL_CLOUD(23),
         /** Point **/
@@ -111,7 +111,9 @@ public class SceneGraphNode implements IStarContainer, IPosition {
         /** Point GPU **/
         POINT_GPU(25),
         /** Opaque meshes (dust, etc.) **/
-        MODEL_MESH_OPAQUE(26),
+        MODEL_PIX_DUST(26),
+        /** Tessellated model **/
+        MODEL_PIX_TESS(27),
 
 
         /** None **/
