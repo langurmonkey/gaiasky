@@ -570,22 +570,14 @@ public class Spacecraft extends GenericSpacecraft implements ILineRenderable, IO
     /** Model rendering. Spacecraft in spacecraft mode is not affected by the relativistic aberration **/
     @Override
     public void render(IntModelBatch modelBatch, float alpha, double t) {
-        ICamera cam = GaiaSky.instance.getICamera();
-        prepareShadowEnvironment();
-        mc.touch();
-        mc.setTransparency(alpha * fadeOpacity);
-        if (cam.getMode().isSpacecraft())
-            // In Spacecraft mode, we are not affected by relativistic aberration or Doppler shift
-            mc.updateRelativisticEffects(cam, 0);
-        else
-            mc.updateRelativisticEffects(cam);
-        modelBatch.render(mc.instance, mc.env);
+        render(modelBatch,alpha, t, true);
     }
 
     /** Model opaque rendering for light glow pass. Do not render shadows **/
-    @Override
-    public void renderOpaque(IntModelBatch modelBatch, float alpha, double t) {
+    public void render(IntModelBatch modelBatch, float alpha, double t, boolean shadowEnv) {
         ICamera cam = GaiaSky.instance.getICamera();
+        if(shadowEnv)
+            prepareShadowEnvironment();
         mc.touch();
         mc.setTransparency(alpha * fadeOpacity);
         if (cam.getMode().isSpacecraft())

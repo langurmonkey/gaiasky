@@ -8,14 +8,6 @@
 in vec4 v_atmosphereColor;
 
 ////////////////////////////////////////////////////////////////////////////////////
-////////// POSITION ATTRIBUTE - FRAGMENT
-////////////////////////////////////////////////////////////////////////////////////
-#define nop() {}
-
-in vec4 v_position;
-#define pullPosition() { return v_position;}
-
-////////////////////////////////////////////////////////////////////////////////////
 ////////// COLOR ATTRIBUTE - FRAGMENT
 ///////////////////////////////////////////////////////////////////////////////////
 in vec4 v_color;
@@ -55,7 +47,6 @@ uniform mat3 u_normalMatrix;
 
 // Varyings computed in the vertex shader
 in float v_opacity;
-in float v_alphaTest;
 
 // Other uniforms
 #ifdef shininessFlag
@@ -263,6 +254,9 @@ out vec4 fragColor;
 #ifdef heightFlag
 uniform float u_heightScale;
 
+#define KM_TO_U 1.0E-6
+#define HIEIGHT_FACTOR 0.001 * KM_TO_U
+
 vec2 parallaxMapping(vec2 texCoords, vec3 viewDir){
     // number of depth layers
     const float minLayers = 8;
@@ -274,7 +268,7 @@ vec2 parallaxMapping(vec2 texCoords, vec3 viewDir){
     float currentLayerDepth = 0.0;
 
     // the amount to shift the texture coordinates per layer (from vector P)
-    vec2 P = viewDir.xy / viewDir.z * u_heightScale;
+    vec2 P = viewDir.xy / viewDir.z * u_heightScale * HEIGHT_FACTOR;
     vec2 deltaTexCoords = P / numLayers;
 
     // get initial values
@@ -306,7 +300,7 @@ vec2 parallaxMapping(vec2 texCoords, vec3 viewDir){
 
 vec2 parallaxMappingSimple(vec2 texCoords, vec3 viewDir){
     float height = texture(u_heightTexture, texCoords).r;
-    vec3 displacement = viewDir * (height * u_heightScale);
+    vec3 displacement = viewDir * (height * u_heightScale * HEIGHT_FACTOR);
     vec2 p = displacement.xy;
     return texCoords - p;
 }

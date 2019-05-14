@@ -5,13 +5,11 @@
 
 package gaia.cu9.ari.gaiaorbit.render.system;
 
-import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.utils.Array;
 import gaia.cu9.ari.gaiaorbit.render.*;
 import gaia.cu9.ari.gaiaorbit.render.ComponentTypes.ComponentType;
 import gaia.cu9.ari.gaiaorbit.scenegraph.SceneGraphNode.RenderGroup;
 import gaia.cu9.ari.gaiaorbit.scenegraph.camera.ICamera;
-import gaia.cu9.ari.gaiaorbit.util.GlobalConf;
 import gaia.cu9.ari.gaiaorbit.util.comp.ModelComparator;
 import gaia.cu9.ari.gaiaorbit.util.gdx.IntModelBatch;
 
@@ -30,7 +28,6 @@ public class ModelBatchRenderSystem extends AbstractRenderSystem {
     private ComponentTypes ctAtm, ctClouds;
 
     private IntModelBatch batch;
-    private boolean sort = true;
     private ModelRenderType type;
 
     /**
@@ -55,16 +52,8 @@ public class ModelBatchRenderSystem extends AbstractRenderSystem {
         this.ctClouds = new ComponentTypes(ComponentType.Clouds);
     }
 
-    public ModelBatchRenderSystem(RenderGroup rg, float[] alphas, IntModelBatch batch, ModelRenderType type, boolean sort) {
-        this(rg, alphas, batch, type);
-        this.sort = sort;
-    }
-
     @Override
     public void renderStud(Array<IRenderable> renderables, ICamera camera, double t) {
-        if (sort)
-            renderables.sort(comp);
-        Gdx.gl.glLineWidth(1.2f * GlobalConf.SCALE_FACTOR);
         if (mustRender()) {
             batch.begin(camera.getCamera());
             int size = renderables.size;

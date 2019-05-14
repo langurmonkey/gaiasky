@@ -44,6 +44,6 @@ public class TessellationShaderProvider extends DefaultIntShaderProvider {
 
     @Override
     protected IntShader createShader(final IntRenderable renderable) {
-        return new GroundShader(renderable, config);
+        return new TessellationShader(renderable, config);
     }
 }

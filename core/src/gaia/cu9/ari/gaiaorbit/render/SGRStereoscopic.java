@@ -141,7 +141,7 @@ public class SGRStereoscopic extends SGRAbstract implements ISGR, IObserver {
             }
             camera.setCameraStereoLeft(cam);
 
-            sgr.renderGlowPass(camera);
+            sgr.renderGlowPass(camera, null);
 
             FrameBuffer fb1 = getFrameBuffer(rw, rh, 1);
             boolean postproc = postprocessCapture(ppb, fb1, rw, rh);
@@ -159,7 +159,7 @@ public class SGRStereoscopic extends SGRAbstract implements ISGR, IObserver {
             }
             camera.setCameraStereoRight(cam);
 
-            sgr.renderGlowPass(camera);
+            sgr.renderGlowPass(camera, null);
 
             FrameBuffer fb2 = getFrameBuffer(rw, rh, 2);
             postproc = postprocessCapture(ppb, fb2, rw, rh);
@@ -229,7 +229,7 @@ public class SGRStereoscopic extends SGRAbstract implements ISGR, IObserver {
             }
             camera.setCameraStereoLeft(cam);
 
-            sgr.renderGlowPass(camera);
+            sgr.renderGlowPass(camera, null);
 
             FrameBuffer fb3d = getFrameBuffer(boundsw, boundsh);
             boolean postproc = postprocessCapture(ppb, fb3d, boundsw, boundsh);
@@ -263,7 +263,7 @@ public class SGRStereoscopic extends SGRAbstract implements ISGR, IObserver {
             }
             camera.setCameraStereoRight(cam);
 
-            sgr.renderGlowPass(camera);
+            sgr.renderGlowPass(camera, null);
 
             postproc = postprocessCapture(ppb, fb3d, boundsw, boundsh);
             sgr.renderScene(camera, t, rc);

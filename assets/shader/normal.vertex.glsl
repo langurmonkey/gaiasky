@@ -9,17 +9,11 @@
     in vec3 a_position;
 #endif //positionFlag
 
-out vec4 v_position;
-#define pushPositionValue(value) v_position = value
 #if defined(positionFlag)
     vec4 g_position = vec4(a_position, 1.0);
-    #define passPositionValue(value) pushPositionValue(value)
 #else
     vec4 g_position = vec4(0.0, 0.0, 0.0, 1.0);
-    #define passPositionValue(value) nop()
 #endif
-#define passPosition() passPositionValue(g_position)
-#define pushPosition() pushPositionValue(g_position)
 
 ////////////////////////////////////////////////////////////////////////////////////
 ////////// COLOR ATTRIBUTE - VERTEX
@@ -254,13 +248,6 @@ out float v_opacity;
     const float u_opacity = 1.0;
 #endif
 
-out float v_alphaTest;
-#ifdef alphaTestFlag
-    uniform float u_alphaTest;
-#else
-    const float u_alphaTest = 0.0;
-#endif
-
 #ifdef shininessFlag
     uniform float u_shininess;
 #else
@@ -304,6 +291,8 @@ out float v_alphaTest;
     uniform sampler2D u_heightTexture;
     uniform float u_heightScale;
     #define heightFlag
+    #define KM_TO_U 1.0E-6
+    #define HIEIGHT_FACTOR 0.001 * KM_TO_U
 #endif //heightFlag
 
 #if defined(specularFlag) || defined(fogFlag)
@@ -412,12 +401,11 @@ out float v_depth;
 void main() {
     calculateAtmosphereGroundColor();
     v_opacity = u_opacity;
-    v_alphaTest = u_alphaTest;
 
     //#ifdef heightFlag
     // Use height texture to move vertex along normal
     //float h = 1.0 - texture(u_heightTexture, a_texCoord0).r;
-    //vec3 dh = normalize(a_normal) * h * (u_heightScale / 4.0);
+    //vec3 dh = normalize(a_normal) * h * (u_heightScale * HEIGHT_FACTOR);
     //g_position += vec4(dh, 0.0);
     //#endif //heightFlag
 

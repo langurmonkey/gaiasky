@@ -116,12 +116,11 @@ public class SceneGraphRenderer extends AbstractRenderer implements IProcessRend
     private Matrix4[] shadowMapCombined;
     public Map<ModelBody, Texture> smTexMap;
     public Map<ModelBody, Matrix4> smCombinedMap;
-    private IntModelBatch mbPixelLightingDepth;
 
     // Light glow pre-render
     private FrameBuffer glowFb;
     private Texture glowTex;
-    private IntModelBatch mbPixelLightingOpaque;
+    private IntModelBatch mbPixelLightingDepth, mbPixelLightingOpaque, mbPixelLightingTessellationOpaque;
 
     private Vector3 aux1;
     private Vector3d aux1d;
@@ -188,7 +187,8 @@ public class SceneGraphRenderer extends AbstractRenderer implements IProcessRend
         manager.load("per-pixel-lighting-dust", GroundShaderProvider.class, new GroundShaderProviderParameter("shader/normal.vertex.glsl", "shader/dust.fragment.glsl"));
         manager.load("per-pixel-lighting-depth", RelativisticShaderProvider.class, new RelativisticShaderProviderParameter("shader/normal.vertex.glsl", "shader/depth.fragment.glsl"));
         manager.load("per-pixel-lighting-opaque", RelativisticShaderProvider.class, new RelativisticShaderProviderParameter("shader/normal.vertex.glsl", "shader/opaque.fragment.glsl"));
-        manager.load("per-pixel-lighting-tessellation", TessellationShaderProvider.class, new TessellationShaderProviderLoader.TessellationShaderProviderParameter("shader/tessellation/tess.vertex.glsl", "shader/tessellation/tess.control.glsl", "shader/tessellation/tess.eval.glsl", "shader/tessellation/tess.fragment.glsl"));
+        manager.load("per-pixel-lighting-tessellation", TessellationShaderProvider.class, new TessellationShaderProviderLoader.TessellationShaderProviderParameter("shader/tessellation/tess.normal.vertex.glsl", "shader/tessellation/tess.normal.control.glsl", "shader/tessellation/tess.normal.eval.glsl", "shader/tessellation/tess.normal.fragment.glsl"));
+        manager.load("per-pixel-lighting-tessellation-opaque", TessellationShaderProvider.class, new TessellationShaderProviderLoader.TessellationShaderProviderParameter("shader/tessellation/tess.opaque.vertex.glsl", "shader/tessellation/tess.opaque.control.glsl", "shader/tessellation/tess.opaque.eval.glsl", "shader/tessellation/tess.opaque.fragment.glsl"));
 
         manager.load("atmosphere", AtmosphereShaderProvider.class, new AtmosphereShaderProviderParameter("shader/atm.vertex.glsl", "shader/atm.fragment.glsl"));
         manager.load("cloud", GroundShaderProvider.class, new GroundShaderProviderParameter("shader/cloud.vertex.glsl", "shader/cloud.fragment.glsl"));
@@ -362,6 +362,7 @@ public class SceneGraphRenderer extends AbstractRenderer implements IProcessRend
         IntShaderProvider perPixelLightingDepth = manager.get("per-pixel-lighting-depth");
         IntShaderProvider perPixelLightingOpaque = manager.get("per-pixel-lighting-opaque");
         TessellationShaderProvider perPixelLightingTessellation = manager.get("per-pixel-lighting-tessellation");
+        TessellationShaderProvider perPixelLightingTessellationOpaque = manager.get("per-pixel-lighting-tessellation-opaque");
 
         // Others
         IntShaderProvider atmosphere = manager.get("atmosphere");
@@ -384,6 +385,7 @@ public class SceneGraphRenderer extends AbstractRenderer implements IProcessRend
         mbPixelLightingDepth = new IntModelBatch(perPixelLightingDepth, noSorter);
         mbPixelLightingOpaque = new IntModelBatch(perPixelLightingOpaque, noSorter);
         IntModelBatch mbPixelLightingTessellation = new IntModelBatch(perPixelLightingTessellation, noSorter);
+        mbPixelLightingTessellationOpaque = new IntModelBatch(perPixelLightingTessellationOpaque, noSorter);
 
         IntModelBatch mbAtmosphere = new IntModelBatch(atmosphere, noSorter);
         IntModelBatch mbCloud = new IntModelBatch(cloud, noSorter);
@@ -542,19 +544,19 @@ public class SceneGraphRenderer extends AbstractRenderer implements IProcessRend
         pointGpuProc.addPreRunnables(regularBlendR, depthTestR);
 
         // MODELS DUST AND MESH
-        AbstractRenderSystem modelMeshOpaqueProc = new ModelBatchRenderSystem(RenderGroup.MODEL_PIX_DUST, alphas, mbPixelLightingDust, ModelRenderType.NORMAL, false);
-        AbstractRenderSystem modelMeshAdditiveProc = new ModelBatchRenderSystem(RenderGroup.MODEL_VERT_ADDITIVE, alphas, mbVertexLightingAdditive, ModelRenderType.NORMAL, true);
+        AbstractRenderSystem modelMeshOpaqueProc = new ModelBatchRenderSystem(RenderGroup.MODEL_PIX_DUST, alphas, mbPixelLightingDust, ModelRenderType.NORMAL);
+        AbstractRenderSystem modelMeshAdditiveProc = new ModelBatchRenderSystem(RenderGroup.MODEL_VERT_ADDITIVE, alphas, mbVertexLightingAdditive, ModelRenderType.NORMAL);
 
         // MODEL PER-PIXEL-LIGHTING
         AbstractRenderSystem modelPerPixelLighting = new ModelBatchRenderSystem(RenderGroup.MODEL_PIX, alphas, mbPixelLighting, ModelRenderType.NORMAL);
         modelPerPixelLighting.addPreRunnables(regularBlendR, depthTestR);
 
         // MODEL PER-PIXEL-LIGHTING-TESSELLATION
-        AbstractRenderSystem modelPerPixelLightingTess = new ModelBatchRenderSystem(RenderGroup.MODEL_PIX_TESS, alphas, mbPixelLightingTessellation, ModelRenderType.NORMAL);
+        AbstractRenderSystem modelPerPixelLightingTess = new ModelBatchTessellationRenderSystem(RenderGroup.MODEL_PIX_TESS, alphas, mbPixelLightingTessellation);
         modelPerPixelLightingTess.addPreRunnables(regularBlendR, depthTestR);
 
         // MODEL BEAM
-        AbstractRenderSystem modelBeamProc = new ModelBatchRenderSystem(RenderGroup.MODEL_VERT_BEAM, alphas, mbVertexLightingBeam, ModelRenderType.NORMAL, false);
+        AbstractRenderSystem modelBeamProc = new ModelBatchRenderSystem(RenderGroup.MODEL_VERT_BEAM, alphas, mbVertexLightingBeam, ModelRenderType.NORMAL);
         modelBeamProc.addPreRunnables(regularBlendR, depthTestR);
 
         // GALAXY
@@ -697,8 +699,10 @@ public class SceneGraphRenderer extends AbstractRenderer implements IProcessRend
         }
     }
 
-    public void renderGlowPass(ICamera camera) {
-        if (GlobalConf.postprocess.POSTPROCESS_LIGHT_SCATTERING && glowFb != null) {
+    public void renderGlowPass(ICamera camera, FrameBuffer fb) {
+        if (fb == null)
+            fb = glowFb;
+        if (GlobalConf.postprocess.POSTPROCESS_LIGHT_SCATTERING && fb != null) {
             // Get all billboard stars
             Array<IRenderable> bbStars = render_lists.get(RenderGroup.BILLBOARD_STAR.ordinal());
 
@@ -712,8 +716,9 @@ public class SceneGraphRenderer extends AbstractRenderer implements IProcessRend
 
             // Get all models
             Array<IRenderable> models = render_lists.get(RenderGroup.MODEL_PIX.ordinal());
+            Array<IRenderable> modelsTess = render_lists.get(RenderGroup.MODEL_PIX_TESS.ordinal());
 
-            glowFb.begin();
+            fb.begin();
             Gdx.gl.glEnable(GL30.GL_DEPTH);
             Gdx.gl.glClearColor(0, 0, 0, 1);
             Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT | GL20.GL_DEPTH_BUFFER_BIT);
@@ -721,23 +726,38 @@ public class SceneGraphRenderer extends AbstractRenderer implements IProcessRend
 
             if (!GlobalConf.program.CUBEMAP360_MODE) {
                 // Render billboard stars
-                billboardStarsProc.render(stars, camera, 0, null);
+                if (stars.size > 0)
+                    billboardStarsProc.render(stars, camera, 0, null);
 
                 // Render models
-                mbPixelLightingOpaque.begin(camera.getCamera());
-                for (IRenderable model : models) {
-                    if (model instanceof ModelBody) {
-                        ModelBody mb = (ModelBody) model;
-                        mb.renderOpaque(mbPixelLightingOpaque, 1, 0);
+                if (models.size > 0) {
+                    mbPixelLightingOpaque.begin(camera.getCamera());
+                    for (IRenderable model : models) {
+                        if (model instanceof ModelBody) {
+                            ModelBody mb = (ModelBody) model;
+                            mb.render(mbPixelLightingOpaque, 1, 0, false);
+                        }
                     }
+                    mbPixelLightingOpaque.end();
                 }
-                mbPixelLightingOpaque.end();
+
+                // Render tessellated models
+                if (modelsTess.size > 0) {
+                    mbPixelLightingTessellationOpaque.begin(camera.getCamera());
+                    for (IRenderable model : modelsTess) {
+                        if (model instanceof ModelBody) {
+                            ModelBody mb = (ModelBody) model;
+                            mb.render(mbPixelLightingTessellationOpaque, 1, 0, false);
+                        }
+                    }
+                    mbPixelLightingTessellationOpaque.end();
+                }
             }
 
             // Save to texture for later use
-            glowTex = glowFb.getColorBufferTexture();
+            glowTex = fb.getColorBufferTexture();
 
-            glowFb.end();
+            fb.end();
 
         }
 
@@ -761,6 +781,7 @@ public class SceneGraphRenderer extends AbstractRenderer implements IProcessRend
              * </ul>
              */
             Array<IRenderable> models = render_lists.get(RenderGroup.MODEL_PIX.ordinal());
+            Array<IRenderable> modelsTess = render_lists.get(RenderGroup.MODEL_PIX_TESS.ordinal());
             models.sort(Comparator.comparingDouble(a -> ((AbstractPositionEntity) a).getDistToCamera()));
 
             int shadowNRender = GlobalConf.program.STEREOSCOPIC_MODE ? 2 : GlobalConf.program.CUBEMAP360_MODE ? 6 : 1;
@@ -845,11 +866,14 @@ public class SceneGraphRenderer extends AbstractRenderer implements IProcessRend
         renderShadowMap(camera);
 
         // In stereo and cubemap modes, the glow pass is rendered in the SGR itself
-        if (!GlobalConf.program.STEREOSCOPIC_MODE && !GlobalConf.program.CUBEMAP360_MODE)
-            renderGlowPass(camera);
-
+        if (!GlobalConf.program.STEREOSCOPIC_MODE && !GlobalConf.program.CUBEMAP360_MODE) {
+            renderGlowPass(camera, glowFb);
+        }
         sgr.render(this, camera, t, rw, rh, fb, ppb);
+    }
 
+    public FrameBuffer getGlowFb() {
+        return glowFb;
     }
 
     /**

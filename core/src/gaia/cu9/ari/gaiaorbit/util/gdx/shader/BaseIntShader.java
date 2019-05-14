@@ -35,6 +35,7 @@ import com.badlogic.gdx.utils.IntArray;
 import com.badlogic.gdx.utils.IntIntMap;
 import gaia.cu9.ari.gaiaorbit.util.gdx.IntRenderable;
 import gaia.cu9.ari.gaiaorbit.util.gdx.mesh.IntMesh;
+import gaia.cu9.ari.gaiaorbit.util.gdx.model.IntMeshPart;
 
 /** @author Xoppa A BaseIntShader is a wrapper around a ExtShaderProgram that keeps track of the uniform and attribute locations. It does
  *         not manage the ShaderPogram, you are still responsible for disposing the ExtShaderProgram. */
@@ -240,7 +241,16 @@ public abstract class BaseIntShader implements IntShader {
 			currentMesh = renderable.meshPart.mesh;
 			currentMesh.bind(program, getAttributeLocations(renderable.meshPart.mesh.getVertexAttributes()));
 		}
-		renderable.meshPart.render(program, false);
+		renderMesh(program, renderable.meshPart);
+	}
+
+	/**
+	 * If necessary, override
+	 * @param program
+	 * @param meshPart
+	 */
+	public void renderMesh(ExtShaderProgram program, IntMeshPart meshPart){
+		meshPart.mesh.render(program, meshPart.primitiveType, meshPart.offset, meshPart.size, false);
 	}
 
 	@Override

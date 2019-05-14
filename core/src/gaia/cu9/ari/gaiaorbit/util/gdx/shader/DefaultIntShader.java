@@ -108,6 +108,7 @@ public class DefaultIntShader extends BaseIntShader {
 		public final static Uniform heightTexture = new Uniform("u_heightTexture", TextureExtAttribute.Height);
 		public final static Uniform heightUVTransform = new Uniform("u_heightUVTransform", TextureExtAttribute.Height);
 		public final static Uniform heightScale = new Uniform("u_heightScale", FloatExtAttribute.HeightScale);
+		public final static Uniform heightSize = new Uniform("u_heightSize", Vector2Attribute.HeightSize);
 		public final static Uniform alphaTest = new Uniform("u_alphaTest");
 
 		public final static Uniform ambientCube = new Uniform("u_ambientCubemap");
@@ -353,6 +354,13 @@ public class DefaultIntShader extends BaseIntShader {
 					shader.set(inputID, ((FloatExtAttribute) (combinedAttributes.get(FloatExtAttribute.HeightScale))).value);
 			}
 		};
+		public final static Setter heightSize = new LocalSetter() {
+			@Override
+			public void set (BaseIntShader shader, int inputID, IntRenderable renderable, Attributes combinedAttributes) {
+				if (combinedAttributes.has(Vector2Attribute.HeightSize))
+					shader.set(inputID, ((Vector2Attribute) (combinedAttributes.get(Vector2Attribute.HeightSize))).value);
+			}
+		};
 
 		public static class ACubemap extends LocalSetter {
 			private final static float ones[] = {1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1};
@@ -466,6 +474,7 @@ public class DefaultIntShader extends BaseIntShader {
 	public final int u_heightTexture;
 	public final int u_heightUVTransform;
 	public final int u_heightScale;
+	public final int u_heightSize;
 	public final int u_alphaTest;
 	// Lighting uniforms
 	protected final int u_ambientCubemap;
@@ -606,6 +615,7 @@ public class DefaultIntShader extends BaseIntShader {
 		u_heightTexture = register(Inputs.heightTexture, Setters.heightTexture);
 		u_heightUVTransform = register(Inputs.heightUVTransform, Setters.heightUVTransform);
 		u_heightScale = register(Inputs.heightScale, Setters.heightScale);
+		u_heightSize = register(Inputs.heightSize, Setters.heightSize);
 		u_alphaTest = register(Inputs.alphaTest);
 
 		u_ambientCubemap = lighting ? register(Inputs.ambientCube, new Setters.ACubemap(config.numDirectionalLights,
@@ -831,8 +841,6 @@ public class DefaultIntShader extends BaseIntShader {
 		context.setDepthTest(depthFunc, depthRangeNear, depthRangeFar);
 		context.setDepthMask(depthMask);
 	}
-
-	private final Vector3 tmpV1 = new Vector3();
 
 	protected void bindLights (final IntRenderable renderable, final Attributes attributes) {
 		final Environment lights = renderable.environment;

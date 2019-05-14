@@ -15,12 +15,15 @@ import com.badlogic.gdx.graphics.g3d.attributes.BlendingAttribute;
 import com.badlogic.gdx.graphics.g3d.attributes.ColorAttribute;
 import com.badlogic.gdx.graphics.g3d.attributes.IntAttribute;
 import com.badlogic.gdx.graphics.g3d.attributes.TextureAttribute;
+import com.badlogic.gdx.math.Vector2;
 import gaia.cu9.ari.gaiaorbit.data.AssetBean;
+import gaia.cu9.ari.gaiaorbit.util.Constants;
 import gaia.cu9.ari.gaiaorbit.util.GlobalConf;
 import gaia.cu9.ari.gaiaorbit.util.GlobalResources;
 import gaia.cu9.ari.gaiaorbit.util.gdx.model.IntModelInstance;
 import gaia.cu9.ari.gaiaorbit.util.gdx.shader.FloatExtAttribute;
 import gaia.cu9.ari.gaiaorbit.util.gdx.shader.TextureExtAttribute;
+import gaia.cu9.ari.gaiaorbit.util.gdx.shader.Vector2Attribute;
 
 import java.util.Map;
 
@@ -37,7 +40,7 @@ public class TextureComponent {
         textureParams = new TextureParameter();
         textureParams.genMipMaps = true;
         textureParams.magFilter = TextureFilter.Linear;
-        textureParams.minFilter = TextureFilter.MipMapLinearNearest;
+        textureParams.minFilter = TextureFilter.MipMapLinearLinear;
     }
 
     public String base, specular, normal, night, ring, height;
@@ -45,6 +48,7 @@ public class TextureComponent {
     public Texture baseTex;
     // Height scale in internal units
     public Float heightScale = 0.005f;
+    public Vector2 heightSize = new Vector2();
 
     /** Add also color even if texture is present **/
     public boolean coloriftex = false;
@@ -145,8 +149,10 @@ public class TextureComponent {
         }
         if(height != null) {
             Texture tex = manager.get(heightT, Texture.class);
+            heightSize.set(tex.getWidth(), tex.getHeight());
             material.set(new TextureExtAttribute(TextureExtAttribute.Height, tex));
             material.set(new FloatExtAttribute(FloatExtAttribute.HeightScale, heightScale));
+            material.set(new Vector2Attribute(Vector2Attribute.HeightSize, heightSize));
         }
         if (instance.materials.size > 1) {
             // Ring material
@@ -242,11 +248,17 @@ public class TextureComponent {
     }
 
     public void setHeightScale(Double heightScale){
-        this.heightScale = heightScale.floatValue();
+        this.heightScale = (float)(heightScale * Constants.KM_TO_U);
     }
+
+
 
     public void setColoriftex(Boolean coloriftex) {
         this.coloriftex = coloriftex;
+    }
+
+    public boolean hasHeight(){
+        return this.height != null && !this.height.isEmpty();
     }
 
 

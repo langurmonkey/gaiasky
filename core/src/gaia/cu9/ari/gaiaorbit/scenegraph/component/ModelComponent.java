@@ -447,6 +447,10 @@ public class ModelComponent implements Disposable, IObserver {
         }
     }
 
+    public boolean hasHeight(){
+        return tc != null && tc.hasHeight();
+    }
+
     @Override
     public void notify(Events event, Object... data) {
         switch (event) {

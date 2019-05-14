@@ -733,6 +733,13 @@ public class SceneGraphNode implements IStarContainer, IPosition {
         return SceneGraphRenderer.render_lists.get(rg.ordinal()).contains(renderable, true);
     }
 
+    protected boolean isInRender(IRenderable renderable, RenderGroup... rgs) {
+        boolean is = false;
+        for(RenderGroup rg : rgs)
+            is = is || SceneGraphRenderer.render_lists.get(rg.ordinal()).contains(renderable, true);
+        return is;
+    }
+
     /**
      * Gets the first ancestor of this node that is of type {@link Star}
      * 

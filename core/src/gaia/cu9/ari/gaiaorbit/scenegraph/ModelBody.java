@@ -179,11 +179,19 @@ public abstract class ModelBody extends CelestialBody {
                     if (viewAngleApparent < thQuad1) {
                         addToRender(this, RenderGroup.BILLBOARD_SSO);
                     } else if (viewAngleApparent > thQuad2) {
-                        addToRender(this, RenderGroup.MODEL_PIX);
+                        if(renderTessellated()){
+                            addToRender(this, RenderGroup.MODEL_PIX_TESS);
+                        } else {
+                            addToRender(this, RenderGroup.MODEL_PIX);
+                        }
                     } else {
                         // Both
                         addToRender(this, RenderGroup.BILLBOARD_SSO);
-                        addToRender(this, RenderGroup.MODEL_PIX);
+                        if(renderTessellated()){
+                            addToRender(this, RenderGroup.MODEL_PIX_TESS);
+                        } else {
+                            addToRender(this, RenderGroup.MODEL_PIX);
+                        }
                     }
 
                     if (renderText()) {
@@ -192,6 +200,10 @@ public abstract class ModelBody extends CelestialBody {
                 }
             }
         }
+    }
+
+    public boolean renderTessellated(){
+        return mc.hasHeight();
     }
 
     @Override
@@ -236,15 +248,13 @@ public abstract class ModelBody extends CelestialBody {
     /** Model rendering **/
     @Override
     public void render(IntModelBatch modelBatch, float alpha, double t) {
-        prepareShadowEnvironment();
-        mc.touch();
-        mc.setTransparency(alpha * fadeOpacity);
-        mc.updateRelativisticEffects(GaiaSky.instance.getICamera());
-        modelBatch.render(mc.instance, mc.env);
+        render(modelBatch, alpha, t, true);
     }
 
     /** Model opaque rendering. Disable shadow mapping **/
-    public void renderOpaque(IntModelBatch modelBatch, float alpha, double t) {
+    public void render(IntModelBatch modelBatch, float alpha, double t, boolean shadowEnv) {
+        if(shadowEnv)
+            prepareShadowEnvironment();
         mc.touch();
         mc.setTransparency(alpha * fadeOpacity);
         mc.updateRelativisticEffects(GaiaSky.instance.getICamera());

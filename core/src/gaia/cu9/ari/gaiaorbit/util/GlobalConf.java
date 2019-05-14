@@ -939,7 +939,31 @@ public class GlobalConf {
         }
     }
 
+    /**
+     * Contains preferences and attributes which define the scene
+     */
     public static class SceneConf implements IConf, IObserver {
+
+        /**
+         * The type of height representation if height textures
+         * are present
+         */
+        public enum HeightType{
+            TESSELLATION, PARALLAX_MAPPING, NONE;
+
+            public boolean isTessellation(){
+                return this.equals(TESSELLATION);
+            }
+
+            public boolean isParallaxMapping(){
+                return this.equals(PARALLAX_MAPPING);
+            }
+
+            public boolean isNone(){
+                return this.equals(NONE);
+            }
+        }
+
         public long OBJECT_FADE_MS;
         public double STAR_BRIGHTNESS;
         public double AMBIENT_LIGHT;
@@ -1041,6 +1065,17 @@ public class GlobalConf {
          * Initializes meshes lazily
          **/
         public boolean LAZY_MESH_INIT = true;
+
+        /**
+         * How to represent height, if height textures present:
+         * <ul>
+         *     <li>Tessellation</li>
+         *     <li>Parallax mapping</li>
+         *     <li>None</li>
+         * </ul>
+         *
+         */
+        public HeightType HEIGHT_TYPE;
 
         /**
          * Whether to show crosshair in focus mode
