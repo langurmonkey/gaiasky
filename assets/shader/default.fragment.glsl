@@ -1,6 +1,6 @@
 #version 330 core
 
-#define TEXTURE_LOD_BIAS 0.2
+#define TEXTURE_LOD_BIAS 0.0
 
 // Ground atmospheric scattering
 in vec3 v_atmosphereColor;
@@ -54,6 +54,10 @@ uniform sampler2D u_normalTexture;
 uniform sampler2D u_emissiveTexture;
 #endif
 
+#ifdef nightTextureFlag
+uniform sampler2D u_nightTexture;
+#endif
+
 #ifdef lightingFlag
 in vec3 v_lightDiffuse;
 
@@ -99,12 +103,11 @@ in float v_fog;
 #endif // fogFlag
 
 // COLOR NIGHT
-
-#if defined(emissiveTextureFlag)
-	#define fetchColorNight(texCoord) texture(u_emissiveTexture, texCoord, TEXTURE_LOD_BIAS)
+#if defined(nightTextureFlag)
+	#define fetchColorNight(texCoord) texture(u_nightTexture, texCoord, TEXTURE_LOD_BIAS)
 #else
 	#define fetchColorNight(texCoord) vec4(0.0, 0.0, 0.0, 0.0)
-#endif // emissiveTextureFlag
+#endif // nightTextureFlag
 
 in float v_depth;
 out vec4 fragColor;

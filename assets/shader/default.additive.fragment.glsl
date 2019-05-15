@@ -1,6 +1,6 @@
 #version 330 core
 
-#define TEXTURE_LOD_BIAS 0.2
+#define TEXTURE_LOD_BIAS 0.0
 
 // Ground atmospheric scattering
 in vec3 v_atmosphereColor;

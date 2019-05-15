@@ -329,8 +329,6 @@ out float v_opacity;
     #define calculateTangentVectors() nop()
 #endif
 
-
-
 //////////////////////////////////////////////////////
 ////// AMBIENT LIGHT
 //////////////////////////////////////////////////////
@@ -436,6 +434,15 @@ void main() {
     // Tangent space transform
     calculateTangentVectors();
     g_normal = normalize(u_normalMatrix * g_normal);
+    g_binormal = normalize(u_normalMatrix * g_binormal);
+    g_tangent = normalize(u_normalMatrix * g_tangent);
+
+    #ifndef heightFlag
+    mat3 TBN;
+    TBN[0] = g_tangent;
+    TBN[1] = g_binormal;
+    TBN[2] = g_normal;
+    #endif
 
     #ifdef ambientLightFlag
 	v_ambientLight = u_ambientLight;
@@ -452,7 +459,11 @@ void main() {
     #endif // ambientCubemapFlag
 
     #ifdef directionalLightsFlag
+        #ifdef heightFlag
         v_lightDir = normalize(-u_dirLights[0].direction);
+        #else
+        v_lightDir = normalize(-u_dirLights[0].direction * TBN);
+        #endif
         v_lightCol = u_dirLights[0].color;
     #else
         v_lightDir = vec3(0.0, 0.0, 0.0);
@@ -461,7 +472,11 @@ void main() {
 
     // Camera is at origin, view direction is inverse of vertex position
     pushNormal();
-    v_viewDir = -pos.xyz;
+    #ifdef heightFlag
+    v_viewDir = normalize(-pos.xyz);
+    #else
+    v_viewDir = normalize(-pos.xyz * TBN);
+    #endif
 
     #ifdef environmentCubemapFlag
 	v_reflect = reflect(-v_viewDir, g_normal);

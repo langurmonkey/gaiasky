@@ -1,6 +1,6 @@
 #version 330 core
 
-#define TEXTURE_LOD_BIAS 0.2
+#define TEXTURE_LOD_BIAS 0.0
 
 ////////////////////////////////////////////////////////////////////////////////////
 ////////// GROUND ATMOSPHERIC SCATTERING - FRAGMENT
@@ -36,7 +36,6 @@ vec3 g_tangent = vec3(1.0, 0.0, 0.0);
 ////////////////////////////////////////////////////////////////////////////////////
 ////////// TEXCOORD0 ATTRIBUTE - FRAGMENT
 ///////////////////////////////////////////////////////////////////////////////////
-#define exposure 4.0
 
 in vec2 v_texCoord0;
 
@@ -81,6 +80,10 @@ uniform vec4 u_emissiveColor;
 
 #ifdef emissiveTextureFlag
 uniform sampler2D u_emissiveTexture;
+#endif
+
+#ifdef nightTextureFlag
+uniform sampler2D u_nightTexture;
 #endif
 
 #ifdef reflectionTextureFlag
@@ -146,17 +149,7 @@ float textureShadowLerp(vec2 size, vec2 uv, float compare){
     return c;
 }
 
-float getShadow()
-{
-      // Only PCF
-//    float pcf = u_shadowPCFOffset / 2.0;
-//    
-//    return (//getShadowness(vec2(0,0)) + 
-//	getShadowness(v_shadowMapUv.xy, vec2(pcf, pcf), v_shadowMapUv.z) +
-//	getShadowness(v_shadowMapUv.xy, vec2(-pcf, pcf), v_shadowMapUv.z) +
-//	getShadowness(v_shadowMapUv.xy, vec2(pcf, -pcf), v_shadowMapUv.z) +
-//	getShadowness(v_shadowMapUv.xy, vec2(-pcf, -pcf), v_shadowMapUv.z)) * 0.25;
-    
+float getShadow(){
     // Complex lookup: PCF + interpolation (see http://codeflow.org/entries/2013/feb/15/soft-shadow-mapping/)
     vec2 size = vec2(1.0 / (2.0 * u_shadowPCFOffset));
     float result = 0.0;
@@ -172,7 +165,10 @@ float getShadow()
     // Simple lookup
     //return getShadowness(v_shadowMapUv.xy, vec2(0.0), v_shadowMapUv.z);
 }
-
+#else
+float getShadow(){
+    return 1.0;
+}
 #endif //shadowMapFlag
 
 
@@ -197,7 +193,6 @@ in vec3 v_ambientLight;
 #endif // diffuseTextureFlag || diffuseColorFlag
 
 // COLOR EMISSIVE
-
 #if defined(emissiveTextureFlag) && defined(emissiveColorFlag)
     #define fetchColorEmissiveTD(tex, texCoord) texture(tex, texCoord, TEXTURE_LOD_BIAS) * u_emissiveColor * 2.0
 #elif defined(emissiveTextureFlag)
@@ -213,7 +208,6 @@ in vec3 v_ambientLight;
 #endif // emissiveTextureFlag || emissiveColorFlag
 
 // COLOR SPECULAR
-
 #if defined(specularTextureFlag) && defined(specularColorFlag)
     #define fetchColorSpecular(texCoord, defaultValue) texture(u_specularTexture, texCoord, TEXTURE_LOD_BIAS).rgb * u_specularColor.rgb
 #elif defined(specularTextureFlag)
@@ -223,6 +217,13 @@ in vec3 v_ambientLight;
 #else
     #define fetchColorSpecular(texCoord, defaultValue) defaultValue
 #endif // specular
+
+// COLOR NIGHT
+#if defined(nightTextureFlag)
+    #define fetchColorNight(texCoord) texture(u_nightTexture, texCoord, TEXTURE_LOD_BIAS).rgb
+#else
+    #define fetchColorNight(texCoord) vec3(0.0)
+#endif // nightTextureFlag
 
 // Light direction in world space
 in vec3 v_lightDir;
@@ -334,19 +335,24 @@ vec3 perturbNormal(sampler2D normalTexture, vec2 texCoords, mat3 TBN){
 void main() {
     vec2 texCoords = v_texCoord0;
 
+    vec3 lightDir, viewDir;
+    #ifdef heightFlag
     // Compute tangent space
     pullNormal();
     mat3 TBN = cotangentFrame(g_normal, -v_viewDir, texCoords);
-    vec3 viewDirTangent = normalize(v_viewDir * TBN);
-    vec3 lightDirTangent = normalize(v_lightDir * TBN);
+    viewDir = normalize(v_viewDir * TBN);
+    lightDir = normalize(v_lightDir * TBN);
 
     // Parallax occlusion mapping
-    #ifdef heightFlag
-    texCoords = parallaxMapping(texCoords, viewDirTangent);
+    texCoords = parallaxMapping(texCoords, viewDir);
+    #else
+    lightDir = v_lightDir;
+    viewDir = v_viewDir;
     #endif // heightFlag
 
     vec4 diffuse = fetchColorDiffuse(v_color, u_diffuseTexture, texCoords, vec4(1.0, 1.0, 1.0, 1.0));
     vec4 emissive = fetchColorEmissive(u_emissiveTexture, texCoords);
+    vec3 night = fetchColorNight(texCoords);
     vec3 specular = fetchColorSpecular(texCoords, vec3(0.0, 0.0, 0.0));
     vec3 ambient = v_ambientLight;
 
@@ -364,36 +370,33 @@ void main() {
     #endif // normalTextureFlag
 
     // see http://http.developer.nvidia.com/CgTutorial/cg_tutorial_chapter05.html
-    vec3 L = lightDirTangent;
-    vec3 V = viewDirTangent;
+    vec3 L = lightDir;
+    vec3 V = viewDir;
     vec3 H = normalize(L + V);
     float NL = max(0.0, dot(N, L));
     float NH = max(0.0, dot(N, H));
 
-    float specOpacity = 1.0; //(1.0 - diffuse.w);
-    float spec = min(1.0, pow(NH, 40.0) * specOpacity);
+    specular *= min(1.0, pow(NH, 40.0));
     float selfShadow = saturate(4.0 * NL);
 
     #ifdef environmentCubemapFlag
-		vec3 environment = texture(u_environmentCubemap, reflectDir).rgb;
-		specular *= environment;
-		#ifdef reflectionColorFlag
-			diffuse.rgb = saturate(vec3(1.0) - u_reflectionColor.rgb) * diffuse.rgb + environment * u_reflectionColor.rgb;
-		#endif // reflectionColorFlag
+    vec3 environment = texture(u_environmentCubemap, reflectDir).rgb;
+    specular *= environment;
+    #ifdef reflectionColorFlag
+    diffuse.rgb = saturate(vec3(1.0) - u_reflectionColor.rgb) * diffuse.rgb + environment * u_reflectionColor.rgb;
+    #endif // reflectionColorFlag
     #endif // environmentCubemapFlag
 
-    #ifdef shadowMapFlag
-    	float shdw = clamp(getShadow(), 0.05, 1.0);
-        vec3 dayColor = (v_lightCol * diffuse.rgb) * NL * shdw + (ambient * diffuse.rgb) * (1.0 - NL);
-        fragColor = vec4(dayColor + emissive.rgb, diffuse.a * v_opacity);
-    #else
-        vec3 dayColor = (v_lightCol * diffuse.rgb) * NL + (ambient * diffuse.rgb) * (1.0 - NL);
-        fragColor = vec4(dayColor + emissive.rgb, diffuse.a * v_opacity);
-    #endif // shadowMapFlag
+    float shdw = clamp(getShadow(), 0.0, 1.0);
+    vec3 nightColor = v_lightCol * night * max(0.0, 0.6 - NL) * shdw;
+    vec3 dayColor = (v_lightCol * diffuse.rgb) * NL * shdw + (ambient * diffuse.rgb) * (1.0 - NL);
+    fragColor = vec4(dayColor + nightColor + emissive.rgb, diffuse.a * v_opacity);
 
-    fragColor.rgb += selfShadow * spec * specular;
+    fragColor.rgb += selfShadow * specular;
+
+    #define exposure 4.0
     fragColor.rgb += (vec3(1.0) - exp(v_atmosphereColor.rgb * -exposure)) * v_atmosphereColor.a;
-    
+
     // Prevent saturation
     fragColor = clamp(fragColor, 0.0, 1.0);
 

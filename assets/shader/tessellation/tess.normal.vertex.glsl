@@ -113,6 +113,10 @@ vec2 g_texCoord0 = a_texCoord0;
 vec2 g_texCoord0 = vec2(0.0, 0.0);
 #endif // texCoord0Flag
 
+// Uniforms which are always available
+uniform mat4 u_projViewTrans;
+uniform mat4 u_worldTrans;
+uniform mat3 u_normalMatrix;
 
 //////////////////////////////////////////////////////
 ////// SHADOW MAPPING
@@ -169,10 +173,11 @@ float getNearIntersection(vec3 pos, vec3 ray, float distance2, float radius2) {
 
 void calculateAtmosphereGroundColor() {
     // Get the ray from the camera to the vertex and its length (which is the far point of the ray passing through the atmosphere)
-    vec3 v3Pos = (a_position) * fOuterRadius;
+    vec3 v3Pos = a_position * fOuterRadius;
     vec3 v3Ray = v3Pos - v3CameraPos;
     float fFar = length(v3Ray);
     v3Ray /= fFar;
+
 
     // Calculate the closest intersection of the ray with the outer atmosphere (which is the near point of the ray passing through the atmosphere)
     float fNear = getNearIntersection (v3CameraPos, v3Ray, fCameraHeight2, fOuterRadius2);
@@ -208,6 +213,7 @@ void calculateAtmosphereGroundColor() {
         v3FrontColor += v3Attenuate * (fDepth * fScaledLength);
         v3SamplePoint += v3SampleRay;
     }
+
     v_atmosphereColor = vec4(v3FrontColor * (v3InvWavelength * fKrESun + fKmESun), fAlpha);
 }
     #else
@@ -218,10 +224,6 @@ void calculateAtmosphereGroundColor() {
 
 
 
-// Uniforms which are always available
-uniform mat4 u_projViewTrans;
-uniform mat4 u_worldTrans;
-uniform mat3 u_normalMatrix;
 
 // Other uniforms
 out float v_opacity;
@@ -231,15 +233,8 @@ uniform float u_opacity;
 const float u_opacity = 1.0;
 #endif
 
-out float v_alphaTest;
-#ifdef alphaTestFlag
-uniform float u_alphaTest;
-#else
-const float u_alphaTest = 0.0;
-#endif
-
 #ifdef shininessFlag
-uniform float u_shininess;
+ uniform float u_shininess;
 #else
 const float u_shininess = 20.0;
 #endif
@@ -383,7 +378,6 @@ out vec3 v_reflect;
 void main() {
     calculateAtmosphereGroundColor();
     v_opacity = u_opacity;
-    v_alphaTest = u_alphaTest;
 
     //#ifdef heightFlag
     // Use height texture to move vertex along normal
@@ -410,6 +404,13 @@ void main() {
     // Tangent space transform
     calculateTangentVectors();
     g_normal = normalize(u_normalMatrix * g_normal);
+    g_binormal = normalize(u_normalMatrix * g_binormal);
+    g_tangent = normalize(u_normalMatrix * g_tangent);
+
+    mat3 TBN;
+    TBN[0] = g_tangent;
+    TBN[1] = g_binormal;
+    TBN[2] = g_normal;
 
     #ifdef ambientLightFlag
     v_ambientLight = u_ambientLight;
@@ -426,7 +427,7 @@ void main() {
     #endif // ambientCubemapFlag
 
     #ifdef directionalLightsFlag
-    v_lightDir = normalize(-u_dirLights[0].direction);
+    v_lightDir = normalize(-u_dirLights[0].direction * TBN);
     v_lightCol = u_dirLights[0].color;
     #else
     v_lightDir = vec3(0.0, 0.0, 0.0);
@@ -435,7 +436,7 @@ void main() {
 
     // Camera is at origin, view direction is inverse of vertex position
     pushNormal();
-    v_viewDir = -pos.xyz;
+    v_viewDir = normalize(-pos.xyz * TBN);
 
     #ifdef environmentCubemapFlag
     v_reflect = reflect(-v_viewDir, g_normal);

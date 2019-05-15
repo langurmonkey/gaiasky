@@ -111,8 +111,8 @@ public class SceneGraphRenderer extends AbstractRenderer implements IProcessRend
 
     // Camera at light position, with same direction. For shadow mapping
     private Camera cameraLight;
-    private Array<ModelBody> candidates;
-    private FrameBuffer[] shadowMapFb;
+    private Array<ModelBody> shadowCandidates;
+    public FrameBuffer[] shadowMapFb;
     private Matrix4[] shadowMapCombined;
     public Map<ModelBody, Texture> smTexMap;
     public Map<ModelBody, Matrix4> smCombinedMap;
@@ -120,7 +120,7 @@ public class SceneGraphRenderer extends AbstractRenderer implements IProcessRend
     // Light glow pre-render
     private FrameBuffer glowFb;
     private Texture glowTex;
-    private IntModelBatch mbPixelLightingDepth, mbPixelLightingOpaque, mbPixelLightingTessellationOpaque;
+    private IntModelBatch mbPixelLightingDepth, mbPixelLightingOpaque, mbPixelLightingOpaqueTessellation, mbPixelLightingDepthTessellation;
 
     private Vector3 aux1;
     private Vector3d aux1d;
@@ -184,11 +184,12 @@ public class SceneGraphRenderer extends AbstractRenderer implements IProcessRend
         manager.load("per-vertex-lighting-beam", RelativisticShaderProvider.class, new RelativisticShaderProviderParameter("shader/default.vertex.glsl", "shader/beam.fragment.glsl"));
 
         manager.load("per-pixel-lighting", GroundShaderProvider.class, new GroundShaderProviderParameter("shader/normal.vertex.glsl", "shader/normal.fragment.glsl"));
+        manager.load("per-pixel-lighting-tessellation", TessellationShaderProvider.class, new TessellationShaderProviderLoader.TessellationShaderProviderParameter("shader/tessellation/tess.normal.vertex.glsl", "shader/tessellation/tess.normal.control.glsl", "shader/tessellation/tess.normal.eval.glsl", "shader/tessellation/tess.normal.fragment.glsl"));
         manager.load("per-pixel-lighting-dust", GroundShaderProvider.class, new GroundShaderProviderParameter("shader/normal.vertex.glsl", "shader/dust.fragment.glsl"));
         manager.load("per-pixel-lighting-depth", RelativisticShaderProvider.class, new RelativisticShaderProviderParameter("shader/normal.vertex.glsl", "shader/depth.fragment.glsl"));
+        manager.load("per-pixel-lighting-depth-tessellation", TessellationShaderProvider.class, new TessellationShaderProviderLoader.TessellationShaderProviderParameter("shader/tessellation/tess.simple.vertex.glsl", "shader/tessellation/tess.simple.control.glsl", "shader/tessellation/tess.simple.eval.glsl", "shader/tessellation/tess.depth.fragment.glsl"));
         manager.load("per-pixel-lighting-opaque", RelativisticShaderProvider.class, new RelativisticShaderProviderParameter("shader/normal.vertex.glsl", "shader/opaque.fragment.glsl"));
-        manager.load("per-pixel-lighting-tessellation", TessellationShaderProvider.class, new TessellationShaderProviderLoader.TessellationShaderProviderParameter("shader/tessellation/tess.normal.vertex.glsl", "shader/tessellation/tess.normal.control.glsl", "shader/tessellation/tess.normal.eval.glsl", "shader/tessellation/tess.normal.fragment.glsl"));
-        manager.load("per-pixel-lighting-tessellation-opaque", TessellationShaderProvider.class, new TessellationShaderProviderLoader.TessellationShaderProviderParameter("shader/tessellation/tess.opaque.vertex.glsl", "shader/tessellation/tess.opaque.control.glsl", "shader/tessellation/tess.opaque.eval.glsl", "shader/tessellation/tess.opaque.fragment.glsl"));
+        manager.load("per-pixel-lighting-opaque-tessellation", TessellationShaderProvider.class, new TessellationShaderProviderLoader.TessellationShaderProviderParameter("shader/tessellation/tess.simple.vertex.glsl", "shader/tessellation/tess.simple.control.glsl", "shader/tessellation/tess.simple.eval.glsl", "shader/tessellation/tess.opaque.fragment.glsl"));
 
         manager.load("atmosphere", AtmosphereShaderProvider.class, new AtmosphereShaderProviderParameter("shader/atm.vertex.glsl", "shader/atm.fragment.glsl"));
         manager.load("cloud", GroundShaderProvider.class, new GroundShaderProviderParameter("shader/cloud.vertex.glsl", "shader/cloud.fragment.glsl"));
@@ -358,11 +359,12 @@ public class SceneGraphRenderer extends AbstractRenderer implements IProcessRend
 
         // Per-pixel lighting shaders
         IntShaderProvider perPixelLighting = manager.get("per-pixel-lighting");
+        TessellationShaderProvider perPixelLightingTessellation = manager.get("per-pixel-lighting-tessellation");
         IntShaderProvider perPixelLightingDust = manager.get("per-pixel-lighting-dust");
         IntShaderProvider perPixelLightingDepth = manager.get("per-pixel-lighting-depth");
+        IntShaderProvider perPixelLightingDepthTessellation = manager.get("per-pixel-lighting-depth-tessellation");
         IntShaderProvider perPixelLightingOpaque = manager.get("per-pixel-lighting-opaque");
-        TessellationShaderProvider perPixelLightingTessellation = manager.get("per-pixel-lighting-tessellation");
-        TessellationShaderProvider perPixelLightingTessellationOpaque = manager.get("per-pixel-lighting-tessellation-opaque");
+        TessellationShaderProvider perPixelLightingOpaqueTessellation = manager.get("per-pixel-lighting-opaque-tessellation");
 
         // Others
         IntShaderProvider atmosphere = manager.get("atmosphere");
@@ -385,7 +387,8 @@ public class SceneGraphRenderer extends AbstractRenderer implements IProcessRend
         mbPixelLightingDepth = new IntModelBatch(perPixelLightingDepth, noSorter);
         mbPixelLightingOpaque = new IntModelBatch(perPixelLightingOpaque, noSorter);
         IntModelBatch mbPixelLightingTessellation = new IntModelBatch(perPixelLightingTessellation, noSorter);
-        mbPixelLightingTessellationOpaque = new IntModelBatch(perPixelLightingTessellationOpaque, noSorter);
+        mbPixelLightingOpaqueTessellation = new IntModelBatch(perPixelLightingOpaqueTessellation, noSorter);
+        mbPixelLightingDepthTessellation = new IntModelBatch(perPixelLightingDepthTessellation, noSorter);
 
         IntModelBatch mbAtmosphere = new IntModelBatch(atmosphere, noSorter);
         IntModelBatch mbCloud = new IntModelBatch(cloud, noSorter);
@@ -743,14 +746,14 @@ public class SceneGraphRenderer extends AbstractRenderer implements IProcessRend
 
                 // Render tessellated models
                 if (modelsTess.size > 0) {
-                    mbPixelLightingTessellationOpaque.begin(camera.getCamera());
+                    mbPixelLightingOpaqueTessellation.begin(camera.getCamera());
                     for (IRenderable model : modelsTess) {
                         if (model instanceof ModelBody) {
                             ModelBody mb = (ModelBody) model;
-                            mb.render(mbPixelLightingTessellationOpaque, 1, 0, false);
+                            mb.render(mbPixelLightingOpaqueTessellation, 1, 0, false);
                         }
                     }
-                    mbPixelLightingTessellationOpaque.end();
+                    mbPixelLightingOpaqueTessellation.end();
                 }
             }
 
@@ -761,6 +764,26 @@ public class SceneGraphRenderer extends AbstractRenderer implements IProcessRend
 
         }
 
+    }
+
+    private void addCandidates(Array<IRenderable> models, Array<ModelBody> candidates, boolean clear){
+        if(candidates != null) {
+            if(clear)
+            candidates.clear();
+            int num = 0;
+            for (int i = 0; i < models.size; i++) {
+                if (models.get(i) instanceof ModelBody) {
+                    ModelBody mr = (ModelBody) models.get(i);
+                    if (mr.isShadow()) {
+                        candidates.insert(num, mr);
+                        mr.shadow = 0;
+                        num++;
+                        if (num == GlobalConf.scene.SHADOW_MAPPING_N_SHADOWS)
+                            break;
+                    }
+                }
+            }
+        }
     }
 
     private void renderShadowMap(ICamera camera) {
@@ -786,27 +809,15 @@ public class SceneGraphRenderer extends AbstractRenderer implements IProcessRend
 
             int shadowNRender = GlobalConf.program.STEREOSCOPIC_MODE ? 2 : GlobalConf.program.CUBEMAP360_MODE ? 6 : 1;
 
-            if (candidates != null && shadowMapFb != null && smCombinedMap != null) {
-                candidates.clear();
-                int num = 0;
-                for (int i = 0; i < models.size; i++) {
-                    if (models.get(i) instanceof ModelBody) {
-                        ModelBody mr = (ModelBody) models.get(i);
-                        if (mr.isShadow()) {
-                            candidates.insert(num, mr);
-                            mr.shadow = 0;
-                            num++;
-                            if (num == GlobalConf.scene.SHADOW_MAPPING_N_SHADOWS)
-                                break;
-                        }
-                    }
-                }
+            if (shadowMapFb != null && smCombinedMap != null) {
+                addCandidates(models, shadowCandidates, true);
+                addCandidates(modelsTess, shadowCandidates, false);
 
                 // Clear maps
                 smTexMap.clear();
                 smCombinedMap.clear();
                 int i = 0;
-                for (ModelBody candidate : candidates) {
+                for (ModelBody candidate : shadowCandidates) {
                     // Yes!
                     candidate.shadow = shadowNRender;
 
@@ -840,9 +851,17 @@ public class SceneGraphRenderer extends AbstractRenderer implements IProcessRend
                     shadowMapFb[i].begin();
                     Gdx.gl.glClearColor(0, 0, 0, 0);
                     Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT | GL20.GL_DEPTH_BUFFER_BIT);
-                    mbPixelLightingDepth.begin(cameraLight);
-                    candidate.render(mbPixelLightingDepth, 1, 0);
-                    mbPixelLightingDepth.end();
+                    if(candidate.renderTessellated()){
+                        // Tessellation
+                        mbPixelLightingDepthTessellation.begin(cameraLight);
+                        candidate.render(mbPixelLightingDepthTessellation, 1, 0);
+                        mbPixelLightingDepthTessellation.end();
+                    } else {
+                        // No tessellation
+                        mbPixelLightingDepth.begin(cameraLight);
+                        candidate.render(mbPixelLightingDepth, 1, 0);
+                        mbPixelLightingDepth.end();
+                    }
 
                     // Save frame buffer and combined matrix
                     candidate.shadow = shadowNRender;
@@ -1137,9 +1156,10 @@ public class SceneGraphRenderer extends AbstractRenderer implements IProcessRend
             smCombinedMap = new HashMap<>();
         smCombinedMap.clear();
 
-        if (candidates == null)
-            candidates = new Array<>(GlobalConf.scene.SHADOW_MAPPING_N_SHADOWS);
-        candidates.clear();
+        if (shadowCandidates == null) {
+            shadowCandidates = new Array<>(GlobalConf.scene.SHADOW_MAPPING_N_SHADOWS);
+        }
+        shadowCandidates.clear();
     }
 
     private void buildGlowData() {

@@ -145,7 +145,7 @@ public class TextureComponent {
         }
         if (night != null) {
             Texture tex = manager.get(nightT, Texture.class);
-            material.set(new TextureAttribute(TextureAttribute.Emissive, tex));
+            material.set(new TextureExtAttribute(TextureExtAttribute.Night, tex));
         }
         if(height != null) {
             Texture tex = manager.get(heightT, Texture.class);
@@ -203,7 +203,7 @@ public class TextureComponent {
         }
         if (night != null) {
             Texture tex = manager.get(nightT, Texture.class);
-            material.set(new TextureAttribute(TextureAttribute.Emissive, tex));
+            material.set(new TextureExtAttribute(TextureExtAttribute.Night, tex));
         }
         if(height != null) {
             Texture tex = manager.get(heightT, Texture.class);
