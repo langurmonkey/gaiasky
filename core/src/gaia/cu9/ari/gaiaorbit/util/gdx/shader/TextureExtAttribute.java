@@ -15,8 +15,11 @@ public class TextureExtAttribute extends TextureAttribute {
     public final static String HeightAlias = "heightTexture";
     public final static long Height = register(HeightAlias);
 
+    public final static String NightAlias = "nightTexture";
+    public final static long Night = register(NightAlias);
+
     static {
-        TextureAttribute.Mask |= Height;
+        TextureAttribute.Mask |= Height | Night;
     }
 
     public static TextureAttribute createHeight (final Texture texture) {
@@ -26,6 +29,16 @@ public class TextureExtAttribute extends TextureAttribute {
     public static TextureAttribute createHeight (final TextureRegion region) {
         return new TextureAttribute(Height, region);
     }
+
+
+    public static TextureAttribute createNight (final Texture texture) {
+        return new TextureAttribute(Night, texture);
+    }
+
+    public static TextureAttribute createNight (final TextureRegion region) {
+        return new TextureAttribute(Night, region);
+    }
+
     public TextureExtAttribute (final long type) {
         super(type);
     }

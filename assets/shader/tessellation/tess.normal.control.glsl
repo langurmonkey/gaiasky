@@ -31,6 +31,11 @@ out vec4 l_atmosphereColor[N_VERTICES];
 in vec4 v_color[gl_MaxPatchVertices];
 out vec4 l_color[N_VERTICES];
 
+#ifdef shadowMapFlag
+in vec3 v_shadowMapUv[gl_MaxPatchVertices];
+out vec3 l_shadowMapUv[N_VERTICES];
+#endif
+
 #define U_TO_KM 1.0E6
 
 vec3 center(vec3 p1, vec3 p2){
@@ -76,4 +81,8 @@ void main(){
     l_opacity[id] = v_opacity[id];
     l_atmosphereColor[id] = v_atmosphereColor[id];
     l_color[id] = v_color[id];
+
+    #ifdef shadowMapFlag
+    l_shadowMapUv[id] = v_shadowMapUv[id];
+    #endif
 }

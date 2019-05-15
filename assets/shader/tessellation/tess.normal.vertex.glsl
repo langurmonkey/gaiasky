@@ -231,13 +231,6 @@ uniform float u_opacity;
 const float u_opacity = 1.0;
 #endif
 
-out float v_alphaTest;
-#ifdef alphaTestFlag
-uniform float u_alphaTest;
-#else
-const float u_alphaTest = 0.0;
-#endif
-
 #ifdef shininessFlag
 uniform float u_shininess;
 #else
@@ -383,7 +376,6 @@ out vec3 v_reflect;
 void main() {
     calculateAtmosphereGroundColor();
     v_opacity = u_opacity;
-    v_alphaTest = u_alphaTest;
 
     //#ifdef heightFlag
     // Use height texture to move vertex along normal
@@ -410,6 +402,13 @@ void main() {
     // Tangent space transform
     calculateTangentVectors();
     g_normal = normalize(u_normalMatrix * g_normal);
+    g_binormal = normalize(u_normalMatrix * g_binormal);
+    g_tangent = normalize(u_normalMatrix * g_tangent);
+
+    mat3 TBN;
+    TBN[0] = g_tangent;
+    TBN[1] = g_binormal;
+    TBN[2] = g_normal;
 
     #ifdef ambientLightFlag
     v_ambientLight = u_ambientLight;
@@ -426,7 +425,7 @@ void main() {
     #endif // ambientCubemapFlag
 
     #ifdef directionalLightsFlag
-    v_lightDir = normalize(-u_dirLights[0].direction);
+    v_lightDir = normalize(-u_dirLights[0].direction * TBN);
     v_lightCol = u_dirLights[0].color;
     #else
     v_lightDir = vec3(0.0, 0.0, 0.0);
@@ -435,7 +434,7 @@ void main() {
 
     // Camera is at origin, view direction is inverse of vertex position
     pushNormal();
-    v_viewDir = -pos.xyz;
+    v_viewDir = normalize(-pos.xyz * TBN);
 
     #ifdef environmentCubemapFlag
     v_reflect = reflect(-v_viewDir, g_normal);
