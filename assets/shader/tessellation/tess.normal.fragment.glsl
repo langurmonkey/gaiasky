@@ -1,7 +1,5 @@
 #version 410 core
 
-#define TEXTURE_LOD_BIAS 0.2
-
 ////////////////////////////////////////////////////////////////////////////////////
 ////////// GROUND ATMOSPHERIC SCATTERING - FRAGMENT
 ////////////////////////////////////////////////////////////////////////////////////
@@ -106,7 +104,7 @@ in vec3 v_shadowMapUv;
 
 float getShadowness(vec2 uv, vec2 offset, float compare){
     const vec4 bitShifts = vec4(1.0, 1.0 / 255.0, 1.0 / 65025.0, 1.0 / 160581375.0);
-    return step(compare - bias, dot(texture(u_shadowTexture, uv + offset, TEXTURE_LOD_BIAS), bitShifts)); //+(1.0/255.0));
+    return step(compare - bias, dot(texture(u_shadowTexture, uv + offset), bitShifts)); //+(1.0/255.0));
 }
 
 
@@ -147,9 +145,9 @@ in vec3 o_ambientLight;
 
 // COLOR DIFFUSE
 #if defined(diffuseTextureFlag) && defined(diffuseColorFlag)
-#define fetchColorDiffuseTD(tex, texCoord, defaultValue) texture(tex, texCoord, TEXTURE_LOD_BIAS) * u_diffuseColor
+#define fetchColorDiffuseTD(tex, texCoord, defaultValue) texture(tex, texCoord) * u_diffuseColor
 #elif defined(diffuseTextureFlag)
-#define fetchColorDiffuseTD(tex, texCoord, defaultValue) texture(tex, texCoord, TEXTURE_LOD_BIAS)
+#define fetchColorDiffuseTD(tex, texCoord, defaultValue) texture(tex, texCoord)
 #elif defined(diffuseColorFlag)
 #define fetchColorDiffuseTD(tex, texCoord, defaultValue) u_diffuseColor
 #else
@@ -165,9 +163,9 @@ in vec3 o_ambientLight;
 // COLOR EMISSIVE
 
 #if defined(emissiveTextureFlag) && defined(emissiveColorFlag)
-#define fetchColorEmissiveTD(tex, texCoord) texture(tex, texCoord, TEXTURE_LOD_BIAS) * u_emissiveColor * 2.0
+#define fetchColorEmissiveTD(tex, texCoord) texture(tex, texCoord) * u_emissiveColor * 2.0
 #elif defined(emissiveTextureFlag)
-#define fetchColorEmissiveTD(tex, texCoord) texture(tex, texCoord, TEXTURE_LOD_BIAS)
+#define fetchColorEmissiveTD(tex, texCoord) texture(tex, texCoord)
 #elif defined(emissiveColorFlag)
 #define fetchColorEmissiveTD(tex, texCoord) u_emissiveColor * 2.0
 #endif // emissiveTextureFlag && emissiveColorFlag
@@ -181,9 +179,9 @@ in vec3 o_ambientLight;
 // COLOR SPECULAR
 
 #if defined(specularTextureFlag) && defined(specularColorFlag)
-#define fetchColorSpecular(texCoord, defaultValue) texture(u_specularTexture, texCoord, TEXTURE_LOD_BIAS).rgb * u_specularColor.rgb
+#define fetchColorSpecular(texCoord, defaultValue) texture(u_specularTexture, texCoord).rgb * u_specularColor.rgb
 #elif defined(specularTextureFlag)
-#define fetchColorSpecular(texCoord, defaultValue) texture(u_specularTexture, texCoord, TEXTURE_LOD_BIAS).rgb
+#define fetchColorSpecular(texCoord, defaultValue) texture(u_specularTexture, texCoord).rgb
 #elif defined(specularColorFlag)
 #define fetchColorSpecular(texCoord, defaultValue) u_specularColor.rgb
 #else
@@ -237,7 +235,7 @@ mat3 cotangentFrame(vec3 N, vec3 p, vec2 uv){
 }
 
 vec3 perturbNormal(sampler2D normalTexture, vec2 texCoords, mat3 TBN){
-    vec3 normalMap = normalize(texture(normalTexture, texCoords, TEXTURE_LOD_BIAS).xyz * 2.0 - 1.0);
+    vec3 normalMap = normalize(texture(normalTexture, texCoords).xyz * 2.0 - 1.0);
     return normalize(TBN * normalMap);
 }
 

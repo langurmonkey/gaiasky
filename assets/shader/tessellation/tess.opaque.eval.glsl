@@ -2,8 +2,6 @@
 
 layout (triangles) in;
 
-#define TEXTURE_LOD_BIAS 0.2
-
 ////////////////////////////////////////////////////////////////////////////////////
 //////////RELATIVISTIC EFFECTS - VERTEX
 ////////////////////////////////////////////////////////////////////////////////////
@@ -55,7 +53,7 @@ void main(void){
     vec3 v_normal = normalize(gl_TessCoord.x * l_normal[0] + gl_TessCoord.y * l_normal[1] + gl_TessCoord.z * l_normal[2]);
 
     // Use height texture to move vertex along normal
-    float h = 1.0 - texture(u_heightTexture, v_texCoords, TEXTURE_LOD_BIAS).r;
+    float h = 1.0 - texture(u_heightTexture, v_texCoords).r;
     vec3 dh = v_normal * h * u_heightScale;
     pos += vec4(dh, 0.0);
 

@@ -2,8 +2,6 @@
 
 layout (triangles) in;
 
-#define TEXTURE_LOD_BIAS 0.2
-
 ////////////////////////////////////////////////////////////////////////////////////
 //////////RELATIVISTIC EFFECTS - VERTEX
 ////////////////////////////////////////////////////////////////////////////////////
@@ -64,10 +62,10 @@ out vec4 o_color;
 vec3 calcNormal(vec2 p, vec2 dp){
     vec4 h;
     const vec2 size = vec2(2.0, 0.0);
-    h.x = texture(u_heightTexture, vec2(p.x-dp.x, p.y), TEXTURE_LOD_BIAS).r;
-    h.y = texture(u_heightTexture, vec2(p.x+dp.x, p.y), TEXTURE_LOD_BIAS).r;
-    h.z = texture(u_heightTexture, vec2(p.x, p.y-dp.y), TEXTURE_LOD_BIAS).r;
-    h.w = texture(u_heightTexture, vec2(p.x, p.y+dp.y), TEXTURE_LOD_BIAS).r;
+    h.x = texture(u_heightTexture, vec2(p.x-dp.x, p.y)).r;
+    h.y = texture(u_heightTexture, vec2(p.x+dp.x, p.y)).r;
+    h.z = texture(u_heightTexture, vec2(p.x, p.y-dp.y)).r;
+    h.w = texture(u_heightTexture, vec2(p.x, p.y+dp.y)).r;
     vec3 va = normalize(vec3(size.xy, h.x - h.y));
     vec3 vb = normalize(vec3(size.yx, h.z - h.w));
     vec3 n = cross(va,vb);
@@ -86,7 +84,7 @@ void main(void){
     o_normal = normalize(gl_TessCoord.x * l_normal[0] + gl_TessCoord.y * l_normal[1] + gl_TessCoord.z * l_normal[2]);
 
     // Use height texture to move vertex along normal
-    float h = 1.0 - texture(u_heightTexture, o_texCoords, TEXTURE_LOD_BIAS).r;
+    float h = 1.0 - texture(u_heightTexture, o_texCoords).r;
     vec3 dh = o_normal * h * u_heightScale;
     pos += vec4(dh, 0.0);
 

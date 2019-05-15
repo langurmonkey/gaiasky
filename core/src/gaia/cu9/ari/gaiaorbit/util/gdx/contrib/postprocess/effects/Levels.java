@@ -71,7 +71,7 @@ public final class Levels extends PostProcessorEffect {
         }
 
         GLFrameBuffer.FrameBufferBuilder fbb = new GLFrameBuffer.FrameBufferBuilder(LUMA_SIZE, LUMA_SIZE);
-        fbb.addColorTextureAttachment(GL30.GL_RGB32F, GL30.GL_RGB, GL30.GL_FLOAT);
+        fbb.addColorTextureAttachment(GL30.GL_RGB16F, GL30.GL_RGB, GL30.GL_FLOAT);
         lumaBuffer = new GaiaSkyFrameBuffer(fbb);
         lumaBuffer.getColorBufferTexture().setFilter(Texture.TextureFilter.MipMapLinearLinear, Texture.TextureFilter.MipMapLinearLinear);
 
