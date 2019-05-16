@@ -198,8 +198,6 @@ in vec3 o_viewDir;
 in vec3 o_lightCol;
 // Logarithmic depth
 in float o_depth;
-// Fragment position in world
-in vec3 o_position;
 
 #ifdef environmentCubemapFlag
 in vec3 v_reflect;
@@ -217,8 +215,9 @@ out vec4 fragColor;
 
 #define saturate(x) clamp(x, 0.0, 1.0)
 
-#define PI 3.1415926535
+#include shader/lib_atmfog.glsl
 
+// MAIN
 void main() {
     vec2 texCoords = o_texCoords;
 
@@ -261,11 +260,9 @@ void main() {
     fragColor.rgb += selfShadow * specular;
 
     #ifdef atmosphereGround
-    float distToFragKm = length(o_position) * 1.0E6;
-    float fog = smoothstep(50.0, 800.0, distToFragKm) * 1.5 + 0.5;
-    vec3 atm = o_atmosphereColor.rgb * fog;
     #define exposure 5.0
-    fragColor.rgb += (vec3(1.0) - exp(atm.rgb * -exposure)) * o_atmosphereColor.a;
+    fragColor.rgb += (vec3(1.0) - exp(o_atmosphereColor.rgb * -exposure)) * o_atmosphereColor.a;
+    fragColor.rgb = applyFog(fragColor.rgb, NL);
     #endif
 
 

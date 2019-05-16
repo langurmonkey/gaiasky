@@ -37,7 +37,8 @@ uniform sampler2D u_heightTexture;
 #include shader/lib_logdepthbuff.glsl
 out float o_depth;
 out vec3 o_normalTan;
-out vec3 o_position;
+out vec3 o_fragPosition;
+out float o_fragHeight;
 
 in float l_opacity[gl_MaxPatchVertices];
 out float o_opacity;
@@ -105,7 +106,8 @@ void main(void){
 
     // Use height texture to move vertex along normal
     float h = 1.0 - texture(u_heightTexture, o_texCoords).r;
-    vec3 dh = o_normal * h * u_heightScale;
+    o_fragHeight = h * u_heightScale;
+    vec3 dh = o_normal * o_fragHeight;
     pos += vec4(dh, 0.0);
 
     #ifdef relativisticEffects
@@ -121,7 +123,7 @@ void main(void){
 
     // Plumbing
     //o_normalTan = calcNormal(o_texCoords);
-    o_position = pos.xyz;
+    o_fragPosition = pos.xyz;
     o_normalTan = calcNormal(o_texCoords, vec2(1.0 / u_heightSize.x, 1.0 / u_heightSize.y));
     o_depth = getDepthValue(length(pos.xyz));
     o_opacity = l_opacity[0];

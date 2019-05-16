@@ -29,6 +29,8 @@ public class GroundShader extends RelativisticShader {
         public final static Uniform fSamples = new Uniform("fSamples");
         public final static Uniform g = new Uniform("g");
         public final static Uniform g2 = new Uniform("g2");
+        public final static Uniform fogDensity = new Uniform("u_fogDensity");
+        public final static Uniform fogColor = new Uniform("u_fogCol");
 
         public final static Uniform planetPos = new Uniform("v3PlanetPos");
         public final static Uniform lightPos = new Uniform("v3LightPos");
@@ -245,6 +247,31 @@ public class GroundShader extends RelativisticShader {
             }
         };
 
+        public final static Setter fogDensity = new Setter() {
+            @Override
+            public boolean isGlobal(BaseIntShader shader, int inputID) {
+                return false;
+            }
+
+            @Override
+            public void set(BaseIntShader shader, int inputID, IntRenderable renderable, Attributes combinedAttributes) {
+                if (combinedAttributes.has(AtmosphereAttribute.FogDensity))
+                    shader.set(inputID, ((AtmosphereAttribute) (combinedAttributes.get(AtmosphereAttribute.FogDensity))).value);
+            }
+        };
+        public final static Setter fogColor = new Setter() {
+            @Override
+            public boolean isGlobal(BaseIntShader shader, int inputID) {
+                return false;
+            }
+
+            @Override
+            public void set(BaseIntShader shader, int inputID, IntRenderable renderable, Attributes combinedAttributes) {
+                if (combinedAttributes.has(Vector3Attribute.FogColor))
+                    shader.set(inputID, ((Vector3Attribute) (combinedAttributes.get(Vector3Attribute.FogColor))).value);
+            }
+        };
+
         public final static Setter g = new Setter() {
             @Override
             public boolean isGlobal(BaseIntShader shader, int inputID) {
@@ -339,6 +366,8 @@ public class GroundShader extends RelativisticShader {
 
     public final int nSamples;
     public final int fSamples;
+    public final int fogDensity;
+    public final int fogColor;
 
     public final int g;
     public final int g2;
@@ -383,6 +412,8 @@ public class GroundShader extends RelativisticShader {
         fScaleOverScaleDepth = register(Inputs.scaleOverScaleDepth, Setters.scaleOverScaleDepth);
         nSamples = register(Inputs.nSamples, Setters.nSamples);
         fSamples = register(Inputs.fSamples, Setters.fSamples);
+        fogDensity = register(Inputs.fogDensity, Setters.fogDensity);
+        fogColor = register(Inputs.fogColor, Setters.fogColor);
 
         g = register(Inputs.g, Setters.g);
         g2 = register(Inputs.g2, Setters.g2);

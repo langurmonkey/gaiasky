@@ -134,7 +134,7 @@ public class Area extends AbstractPositionEntity implements ILineRenderable {
     }
 
     private Vector3 toCartesian(float lon, float lat, Vector3 res, Matrix4 localTransform) {
-        res.set(0, 0, -0.501f);
+        res.set(0, 0, -0.5015f);
         // Latitude [-90..90]
         res.rotate(lat, 1, 0, 0);
         // Longitude [0..360]

@@ -37,6 +37,9 @@ public class AtmosphereComponent {
     public float m_fOuterRadius;
     public float m_fAtmosphereHeight;
     public float m_Kr, m_Km;
+    public float fogDensity = 1.0f;
+    public Vector3 fogColor;
+
     public boolean correctGround;
 
     // Model parameters
@@ -51,6 +54,7 @@ public class AtmosphereComponent {
         mc.initialize();
         aux = new Vector3();
         aux3 = new Vector3d();
+        fogColor = new Vector3();
     }
 
     public void doneLoading(Material planetMat, float planetSize) {
@@ -123,6 +127,9 @@ public class AtmosphereComponent {
 
         mat.set(new AtmosphereAttribute(AtmosphereAttribute.nSamples, m_nSamples));
         mat.set(new AtmosphereAttribute(AtmosphereAttribute.fSamples, (float) m_nSamples));
+
+        mat.set(new AtmosphereAttribute(AtmosphereAttribute.FogDensity, fogDensity));
+        mat.set(new Vector3Attribute(Vector3Attribute.FogColor, fogColor));
 
         mat.set(new AtmosphereAttribute(AtmosphereAttribute.G, m_g));
         mat.set(new AtmosphereAttribute(AtmosphereAttribute.G2, m_g * m_g));
@@ -226,6 +233,14 @@ public class AtmosphereComponent {
 
     public void setWavelengths(double[] wavelengths) {
         this.wavelengths = wavelengths;
+    }
+
+    public void setFogcolor(double[] fogColor){
+        this.fogColor.set((float) fogColor[0], (float) fogColor[1], (float) fogColor[2]);
+    }
+
+    public void setFogdensity(Double fogDensity){
+        this.fogDensity = fogDensity.floatValue();
     }
 
     public void setM_Kr(Double m_Kr) {

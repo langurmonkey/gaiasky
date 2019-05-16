@@ -326,11 +326,7 @@ mat3 cotangentFrame(vec3 N, vec3 p, vec2 uv){
     return mat3( T * invmax, B * invmax, N );
 }
 
-vec3 perturbNormal(sampler2D normalTexture, vec2 texCoords, mat3 TBN){
-    vec3 normalMap = normalize(texture(normalTexture, texCoords, TEXTURE_LOD_BIAS).xyz * 2.0 - 1.0);
-    return normalize(TBN * normalMap);
-}
-
+#include shader/lib_atmfog.glsl
 
 void main() {
     vec2 texCoords = v_texCoord0;
@@ -394,8 +390,11 @@ void main() {
 
     fragColor.rgb += selfShadow * specular;
 
+    #ifdef atmosphereGround
     #define exposure 4.0
     fragColor.rgb += (vec3(1.0) - exp(v_atmosphereColor.rgb * -exposure)) * v_atmosphereColor.a;
+    fragColor.rgb = applyFog(fragColor.rgb, NL);
+    #endif
 
     // Prevent saturation
     fragColor = clamp(fragColor, 0.0, 1.0);

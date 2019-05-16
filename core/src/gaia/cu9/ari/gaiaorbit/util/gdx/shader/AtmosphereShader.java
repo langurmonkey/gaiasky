@@ -746,7 +746,7 @@ public class AtmosphereShader extends BaseIntShader {
 
     // TODO: Perhaps move responsibility for combining attributes to IntRenderableProvider?
     private static final Attributes combineAttributes(final IntRenderable renderable) {
-        tmpAttributes.clear();
+        tmpAttributes.clear();//
         if (renderable.environment != null)
             tmpAttributes.set(renderable.environment);
         if (renderable.material != null)
@@ -767,6 +767,8 @@ public class AtmosphereShader extends BaseIntShader {
         final Attributes attributes = combineAttributes(renderable);
         String prefix = "";
         final long attributesMask = attributes.getMask();
+        if ((attributesMask & AtmosphereAttribute.KmESun) == AtmosphereAttribute.KmESun)
+            prefix += "#define atmosphericScattering\n";
         // Atmosphere ground only if camera height is set
         if ((attributesMask & FloatExtAttribute.Vc) == FloatExtAttribute.Vc)
             prefix += "#define relativisticEffects\n";

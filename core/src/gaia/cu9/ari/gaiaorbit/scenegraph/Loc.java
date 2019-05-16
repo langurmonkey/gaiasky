@@ -39,7 +39,6 @@ public class Loc extends AbstractPositionEntity implements I3DTextRenderable {
      * objects
      **/
     float distFactor = 1f;
-    float threshold;
 
     public Loc() {
         cc = new float[] { 1f, 1f, 1f, 1f };

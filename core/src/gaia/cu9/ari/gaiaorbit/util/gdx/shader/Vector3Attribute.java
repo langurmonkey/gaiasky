@@ -45,6 +45,9 @@ public class Vector3Attribute extends Attribute {
     public static final String GwAlias = "gw";
     public static final long Gw = register(GwAlias);
 
+    public static final String FogColorAlias = "fogCol";
+    public static final long FogColor = register(FogColorAlias);
+
     @Override
     public Attribute copy() {
         return new Vector3Attribute(type, value);

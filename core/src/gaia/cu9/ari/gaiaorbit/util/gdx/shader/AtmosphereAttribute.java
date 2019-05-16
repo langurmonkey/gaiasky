@@ -68,6 +68,10 @@ public class AtmosphereAttribute extends FloatAttribute {
     public static final String FSamplesAlias = "fSamples";
     public static final long fSamples = register(FSamplesAlias);
 
+    public static final String FogDensityAlias = "fogDensity";
+    public static final long FogDensity = register(FogDensityAlias);
+
+
     public static final String GAlias = "g";
     public static final long G = register(GAlias);
 
