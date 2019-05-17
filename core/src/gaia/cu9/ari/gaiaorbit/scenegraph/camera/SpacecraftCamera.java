@@ -54,7 +54,7 @@ public class SpacecraftCamera extends AbstractCamera implements IObserver {
     private PerspectiveCamera guiCam;
 
     /**
-     * The input controller attached to this camera
+     * The input inputListener attached to this camera
      **/
     private SpacecraftInputController inputController;
 
@@ -290,10 +290,10 @@ public class SpacecraftCamera extends AbstractCamera implements IObserver {
         InputMultiplexer im = (InputMultiplexer) Gdx.input.getInputProcessor();
         if (mode == CameraMode.Spacecraft && sc != null) {
             Gdx.app.postRunnable(() -> {
-                // Register input controller
+                // Register input inputListener
                 if (!im.getProcessors().contains(inputController, true))
                     im.addProcessor(im.size(), inputController);
-                // Register controller listener
+                // Register inputListener listener
                 Controllers.clearListeners();
                 GlobalConf.controls.addControllerListener(controllerListener);
                 sc.stopAllMovement();
@@ -310,9 +310,9 @@ public class SpacecraftCamera extends AbstractCamera implements IObserver {
         } else {
             if (sc != null)
                 Gdx.app.postRunnable(() -> {
-                    // Unregister input controller
+                    // Unregister input inputListener
                     im.removeProcessor(inputController);
-                    // Unregister controller listener
+                    // Unregister inputListener listener
                     GlobalConf.controls.removeControllerListener(controllerListener);
                     sc.stopAllMovement();
                 });
@@ -364,7 +364,7 @@ public class SpacecraftCamera extends AbstractCamera implements IObserver {
     }
 
     /**
-     * Input controller for the spacecraft camera
+     * Input inputListener for the spacecraft camera
      *
      * @author tsagrista
      */

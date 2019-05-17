@@ -667,6 +667,13 @@ public enum Events {
      * </ol>
      */
     ADD_CUSTOM_IMAGE,
+
+    /**
+     * Adds a screen notification which lasts for a little while.
+     * It contains a title string, an array of string messages and a
+     * float with the time in seconds.
+     */
+    SCREEN_NOTIFICATION_CMD,
     /**
      * Removes a previously added message or image. Contains the id.
      **/
@@ -773,7 +780,7 @@ public enum Events {
      **/
     FLUSH_FRAMES,
     /**
-     * Reloads the controller mappings. Contains the path to the new mappings
+     * Reloads the inputListener mappings. Contains the path to the new mappings
      * file.
      **/
     RELOAD_CONTROLLER_MAPPINGS,
@@ -1105,6 +1112,21 @@ public enum Events {
      * Runs the 'Go home' action
      */
     HOME_CMD,
+
+    /**
+     * True to capture the mouse, false to uncapture
+     */
+    MOUSE_CAPTURE_CMD,
+
+    /**
+     * Toggle mouse capture
+     */
+    MOUSE_CAPTURE_TOGGLE,
+
+    /**
+     * Toggles game-type controls (WASD+Mouse)
+     */
+    GAME_MODE_TOGGLE,
 
     /**
      * Dispose all resources, app is shutting down

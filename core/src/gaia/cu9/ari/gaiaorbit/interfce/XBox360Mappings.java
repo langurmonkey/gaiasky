@@ -6,7 +6,7 @@
 package gaia.cu9.ari.gaiaorbit.interfce;
 
 /**
- * XBox 360 controller mappings
+ * XBox 360 inputListener mappings
  * 
  * @author tsagrista
  *

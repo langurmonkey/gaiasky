@@ -18,12 +18,13 @@ import com.badlogic.gdx.scenes.scene2d.ui.Tree.Node;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener.ChangeEvent;
 import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.Array;
+import gaia.cu9.ari.gaiaorbit.GaiaSky;
 import gaia.cu9.ari.gaiaorbit.event.EventManager;
 import gaia.cu9.ari.gaiaorbit.event.Events;
 import gaia.cu9.ari.gaiaorbit.event.IObserver;
-import gaia.cu9.ari.gaiaorbit.interfce.NaturalInputListener;
 import gaia.cu9.ari.gaiaorbit.scenegraph.*;
 import gaia.cu9.ari.gaiaorbit.scenegraph.camera.CameraManager.CameraMode;
+import gaia.cu9.ari.gaiaorbit.scenegraph.camera.NaturalCamera;
 import gaia.cu9.ari.gaiaorbit.util.*;
 import gaia.cu9.ari.gaiaorbit.util.Logger.Log;
 import gaia.cu9.ari.gaiaorbit.util.comp.CelestialBodyComparator;
@@ -82,7 +83,8 @@ public class ObjectsComponent extends GuiComponent implements IObserver {
 
                         }
                     }
-                    NaturalInputListener.pressedKeys.remove(ie.getKeyCode());
+                    if(GaiaSky.instance.getICamera() instanceof NaturalCamera)
+                        ((NaturalCamera)GaiaSky.instance.getICamera()).getCurrentMouseKbdListener().removePressedKey(ie.getKeyCode());
 
                     if (ie.getKeyCode() == Keys.ESCAPE) {
                         // Lose focus

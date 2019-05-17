@@ -5,7 +5,9 @@
 
 package gaia.cu9.ari.gaiaorbit.interfce;
 
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input.Keys;
+import com.badlogic.gdx.backends.lwjgl3.Lwjgl3Graphics;
 import gaia.cu9.ari.gaiaorbit.event.EventManager;
 import gaia.cu9.ari.gaiaorbit.event.Events;
 import gaia.cu9.ari.gaiaorbit.scenegraph.camera.CameraManager.CameraMode;
@@ -14,6 +16,7 @@ import gaia.cu9.ari.gaiaorbit.util.GlobalConf.ProgramConf.StereoProfile;
 import gaia.cu9.ari.gaiaorbit.util.GlobalResources;
 import gaia.cu9.ari.gaiaorbit.util.I18n;
 import gaia.cu9.ari.gaiaorbit.util.gdx.contrib.postprocess.effects.CubemapProjections;
+import org.lwjgl.glfw.GLFW;
 
 import java.time.Instant;
 import java.util.*;
@@ -134,13 +137,21 @@ public class KeyBindings {
         addMapping(new ProgramAction(I18n.txt("action.help"), runnableAbout), Keys.H);
 
         // Show quit
-        final Runnable runnableQuit = () -> EventManager.instance.post(Events.SHOW_QUIT_ACTION);
+        final Runnable runnableQuit = () -> {
+            if(GLFW.glfwGetInputMode(((Lwjgl3Graphics) Gdx.graphics).getWindow().getWindowHandle(), GLFW.GLFW_CURSOR) == GLFW.GLFW_CURSOR_DISABLED) {
+                // Release mouse if captured
+                GLFW.glfwSetInputMode(((Lwjgl3Graphics) Gdx.graphics).getWindow().getWindowHandle(), GLFW.GLFW_CURSOR, GLFW.GLFW_CURSOR_NORMAL);
+            }else {
+                // Quit action
+                EventManager.instance.post(Events.SHOW_QUIT_ACTION);
+            }
+        };
 
         // ESCAPE -> Exit
         addMapping(new ProgramAction(I18n.txt("action.exit"), runnableQuit), Keys.ESCAPE);
 
-        // q -> Exit
-        addMapping(new ProgramAction(I18n.txt("action.exit"), runnableQuit), Keys.Q);
+        // CTRL+Q -> Exit
+        addMapping(new ProgramAction(I18n.txt("action.exit"), runnableQuit), SPECIAL1, Keys.Q);
 
         // p -> Show preferences dialog
         addMapping(new ProgramAction(I18n.txt("action.preferences"), () ->
@@ -390,6 +401,14 @@ public class KeyBindings {
         // ALT_L + M -> Expand/collapse music pane
         addMapping(new ProgramAction(I18n.txt("action.expandcollapse.pane", I18n.txt("gui.music")), () ->
                 EventManager.instance.post(Events.TOGGLE_EXPANDCOLLAPSE_PANE_CMD, "MusicComponent")), SPECIAL3, Keys.M);
+
+        // CTRL+SHIFT+L -> Toggle mouse capture
+        addMapping(new ProgramAction("Toggle mouse capture", () ->
+                EventManager.instance.post(Events.MOUSE_CAPTURE_TOGGLE)), SPECIAL1, SPECIAL2, Keys.L);
+
+        // ALT+G -> Toggle game mode
+        addMapping(new ProgramAction("Toggle game mode", () ->
+                EventManager.instance.post(Events.GAME_MODE_TOGGLE)), SPECIAL3, Keys.G);
     }
 
     /**

@@ -9,7 +9,6 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.Input.Buttons;
 import com.badlogic.gdx.Input.Keys;
-import com.badlogic.gdx.input.GestureDetector;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
@@ -27,16 +26,14 @@ import gaia.cu9.ari.gaiaorbit.util.GlobalConf;
 import gaia.cu9.ari.gaiaorbit.util.comp.ViewAngleComparator;
 
 import java.util.Comparator;
-import java.util.HashSet;
 import java.util.Iterator;
-import java.util.Set;
 
 /**
  * Input listener for the natural camera.
  *
  * @author tsagrista
  */
-public class NaturalInputListener extends GestureDetector implements IObserver {
+public class NaturalInputListener extends MouseKbdListener implements IObserver {
 
     /**
      * The button for rotating the camera either around its center or around the
@@ -56,13 +53,8 @@ public class NaturalInputListener extends GestureDetector implements IObserver {
     public float scrollFactor = -0.1f;
     /** The key for rolling the camera **/
     public int rollKey = Keys.SHIFT_LEFT;
-    /** The natural camera */
-    public NaturalCamera camera;
     /** Focus comparator **/
     private Comparator<IFocus> comp;
-
-    /** Holds the pressed keys at any moment **/
-    public static Set<Integer> pressedKeys;
 
     /** The current (first) button being pressed. */
     protected int button = -1;
@@ -94,7 +86,7 @@ public class NaturalInputListener extends GestureDetector implements IObserver {
     private boolean keyframeBeingDragged = false;
 
     protected static class GaiaGestureListener extends GestureAdapter {
-        public NaturalInputListener controller;
+        public NaturalInputListener inputListener;
         private float previousZoom;
 
         @Override
@@ -129,7 +121,7 @@ public class NaturalInputListener extends GestureDetector implements IObserver {
             float amount = newZoom - previousZoom;
             previousZoom = newZoom;
             float w = Gdx.graphics.getWidth(), h = Gdx.graphics.getHeight();
-            return controller.zoom(amount / ((w > h) ? h : w));
+            return inputListener.zoom(amount / ((w > h) ? h : w));
         }
 
         @Override
@@ -143,9 +135,9 @@ public class NaturalInputListener extends GestureDetector implements IObserver {
     public final GaiaGestureListener gestureListener;
 
     protected NaturalInputListener(final GaiaGestureListener gestureListener, NaturalCamera camera) {
-        super(gestureListener);
+        super(gestureListener, camera);
         this.gestureListener = gestureListener;
-        this.gestureListener.controller = this;
+        this.gestureListener.inputListener = this;
         this.camera = camera;
         this.comp = new ViewAngleComparator<>();
         // 1% of width
@@ -159,8 +151,6 @@ public class NaturalInputListener extends GestureDetector implements IObserver {
 
         this.currentDrag = new Vector2();
         this.lastDrag = new Vector2();
-
-        pressedKeys = new HashSet<>();
     }
 
     public NaturalInputListener(final NaturalCamera camera) {
@@ -403,24 +393,7 @@ public class NaturalInputListener extends GestureDetector implements IObserver {
     }
 
     @Override
-    public boolean keyDown(int keycode) {
-        if (GlobalConf.runtime.INPUT_ENABLED) {
-            pressedKeys.add(keycode);
-            camera.setInputByController(false);
-        }
-        return false;
-
-    }
-
-    @Override
-    public boolean keyUp(int keycode) {
-        pressedKeys.remove(keycode);
-        camera.setInputByController(false);
-        return false;
-
-    }
-
-    public void updateKeys() {
+    public void update() {
         if (isKeyPressed(Keys.UP)) {
             camera.addForwardForce(1.0f);
         }
@@ -441,36 +414,15 @@ public class NaturalInputListener extends GestureDetector implements IObserver {
         }
     }
 
-    public boolean isKeyPressed(int keycode) {
-        return pressedKeys.contains(keycode);
+
+    @Override
+    public void activate() {
+
     }
 
-    /**
-     * Returns true if all keys are pressed
-     *
-     * @param keys The keys to test
-     * @return True if all are pressed
-     */
-    public boolean allPressed(int... keys) {
-        for (int k : keys) {
-            if (!pressedKeys.contains(k))
-                return false;
-        }
-        return true;
-    }
+    @Override
+    public void deactivate() {
 
-    /**
-     * Returns true if any of the keys are pressed
-     *
-     * @param keys The keys to test
-     * @return True if any is pressed
-     */
-    public boolean anyPressed(int... keys) {
-        for (int k : keys) {
-            if (pressedKeys.contains(k))
-                return true;
-        }
-        return false;
     }
 
     @Override

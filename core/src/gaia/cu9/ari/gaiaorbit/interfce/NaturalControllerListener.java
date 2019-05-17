@@ -33,7 +33,7 @@ public class NaturalControllerListener implements ControllerListener, IObserver 
     }
 
     public boolean updateControllerMappings(String mappingsFile) {
-        // We look for OS-specific mappings for the given controller. If not found, it defaults to the base
+        // We look for OS-specific mappings for the given inputListener. If not found, it defaults to the base
         String os = SysUtils.getOSFamily();
         int extensionStart = mappingsFile.lastIndexOf('.');
         String pre = mappingsFile.substring(0, extensionStart); //-V6009
@@ -67,7 +67,7 @@ public class NaturalControllerListener implements ControllerListener, IObserver 
     @Override
     public boolean buttonDown(Controller controller, int buttonCode) {
         if (GlobalConf.controls.DEBUG_MODE) {
-            logger.info("button down [controller/code]: " + controller.getName() + " / " + buttonCode);
+            logger.info("button down [inputListener/code]: " + controller.getName() + " / " + buttonCode);
         }
 
         if (buttonCode == mappings.getButtonVelocityMultiplierHalf()) {
@@ -87,7 +87,7 @@ public class NaturalControllerListener implements ControllerListener, IObserver 
     @Override
     public boolean buttonUp(Controller controller, int buttonCode) {
         if (GlobalConf.controls.DEBUG_MODE) {
-            logger.info("button up [controller/code]: " + controller.getName() + " / " + buttonCode);
+            logger.info("button up [inputListener/code]: " + controller.getName() + " / " + buttonCode);
         }
 
         if (buttonCode == mappings.getButtonVelocityMultiplierHalf()) {
@@ -108,7 +108,7 @@ public class NaturalControllerListener implements ControllerListener, IObserver 
     public boolean axisMoved(Controller controller, int axisCode, float value) {
         if (GlobalConf.controls.DEBUG_MODE) {
             if (Math.abs(value) > 0.1)
-                logger.info("axis moved [controller/code/value]: " + controller.getName() + " / " + axisCode + " / " + value);
+                logger.info("axis moved [inputListener/code/value]: " + controller.getName() + " / " + axisCode + " / " + value);
         }
 
         boolean treated = false;

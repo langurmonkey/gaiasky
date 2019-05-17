@@ -12,7 +12,7 @@ import java.io.InputStream;
 import java.util.Properties;
 
 /**
- * Reads controller mappings from a file
+ * Reads inputListener mappings from a file
  * 
  * @author tsagrista
  *
@@ -52,7 +52,7 @@ public class ControllerMappings implements IControllerMappings {
             BUTTON_VEL_MULT_HALF = Integer.parseInt(mappings.getProperty("button.velocityhalf"));
 
         } catch (Exception e) {
-            Logger.getLogger(this.getClass()).error(e, "Error reading controller mappings");
+            Logger.getLogger(this.getClass()).error(e, "Error reading inputListener mappings");
         }
     }
 

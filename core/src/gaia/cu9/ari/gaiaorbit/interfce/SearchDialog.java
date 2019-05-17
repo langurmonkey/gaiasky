@@ -20,6 +20,7 @@ import gaia.cu9.ari.gaiaorbit.scenegraph.IFocus;
 import gaia.cu9.ari.gaiaorbit.scenegraph.ISceneGraph;
 import gaia.cu9.ari.gaiaorbit.scenegraph.SceneGraphNode;
 import gaia.cu9.ari.gaiaorbit.scenegraph.camera.CameraManager.CameraMode;
+import gaia.cu9.ari.gaiaorbit.scenegraph.camera.NaturalCamera;
 import gaia.cu9.ari.gaiaorbit.util.GlobalConf;
 import gaia.cu9.ari.gaiaorbit.util.I18n;
 import gaia.cu9.ari.gaiaorbit.util.scene2d.OwnTextField;
@@ -68,7 +69,8 @@ public class SearchDialog extends GenericDialog {
                         }
                     }
 
-                    NaturalInputListener.pressedKeys.remove(ie.getKeyCode());
+                    if(GaiaSky.instance.getICamera() instanceof NaturalCamera)
+                        ((NaturalCamera)GaiaSky.instance.getICamera()).getCurrentMouseKbdListener().removePressedKey(ie.getKeyCode());
                 }
             }
             return false;

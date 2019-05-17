@@ -31,6 +31,7 @@ public class StereoGui extends AbstractGui {
     private Skin skin;
 
     protected NotificationsInterface notificationsOne, notificationsTwo;
+    protected CustomInterface customInterface;
 
     protected INumberFormat nf;
 
@@ -49,7 +50,7 @@ public class StereoGui extends AbstractGui {
     public void doneLoading(AssetManager assetManager) {
         Logger.getLogger(this.getClass()).info(I18n.txt("notif.gui.init"));
 
-        interfaces = new Array<IGuiInterface>();
+        interfaces = new Array<>();
 
         skin = GlobalResources.skin;
 
@@ -81,6 +82,11 @@ public class StereoGui extends AbstractGui {
         notificationsTwo.setX(Gdx.graphics.getWidth() / 2);
         notificationsTwo.pad(0, 5, 5, 0);
         interfaces.add(notificationsTwo);
+
+
+        // CUSTOM MESSAGES
+        customInterface = new CustomInterface(ui, skin, lock);
+        interfaces.add(customInterface);
 
         /** ADD TO UI **/
         rebuildGui();

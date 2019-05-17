@@ -17,7 +17,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 /**
- * This input controller connects the input events with the key binding actions
+ * This input inputListener connects the input events with the key binding actions
  * 
  * @author tsagrista
  *

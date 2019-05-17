@@ -31,7 +31,6 @@ import java.util.*;
  *
  */
 public class CustomInterface implements IObserver, IGuiInterface {
-    boolean displaying = false;
     /** Lock object for synchronization **/
     private Object lock;
     private Skin skin;
@@ -43,7 +42,7 @@ public class CustomInterface implements IObserver, IGuiInterface {
     public CustomInterface(Stage ui, Skin skin, Object lock) {
         this.skin = skin;
         this.ui = ui;
-        customElements = new HashMap<Integer, Widget>();
+        customElements = new HashMap<>();
 
         initSizes(skin);
 
@@ -92,7 +91,7 @@ public class CustomInterface implements IObserver, IGuiInterface {
                 float x = MathUtilsd.lint((Float) data[2], 0, 1, 0, width);
                 float y = MathUtilsd.lint((Float) data[3], 0, 1, 0, height);
 
-                Image img = null;
+                Image img;
                 boolean add = false;
                 if (customElements.containsKey(id)) {
                     if (customElements.get(id) instanceof Image) {
@@ -141,7 +140,7 @@ public class CustomInterface implements IObserver, IGuiInterface {
                 float scalefactor = (float) size / (float) csize;
                 String style = "msg-" + csize;
 
-                OwnLabel customMsg = null;
+                OwnLabel customMsg;
                 add = false;
                 if (customElements.containsKey(id)) {
                     if (customElements.get(id) instanceof OwnLabel) {

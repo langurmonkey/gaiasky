@@ -824,8 +824,8 @@ public class PreferencesWindow extends GenericDialog {
         FileHandle externalfolder = new FileHandle(GlobalConf.ASSETS_LOC + File.separator + "mappings");
         FileHandle homefolder = Gdx.files.absolute(SysUtils.getDefaultMappingsDir().getPath());
         Array<FileHandle> mappingFiles = new Array<>();
-        GlobalResources.listRec(externalfolder, mappingFiles, ".controller");
-        GlobalResources.listRec(homefolder, mappingFiles, ".controller");
+        GlobalResources.listRec(externalfolder, mappingFiles, ".inputListener");
+        GlobalResources.listRec(homefolder, mappingFiles, ".inputListener");
         FileComboBoxBean selected = null;
         for (FileHandle fh : mappingFiles) {
             FileComboBoxBean fcbb = new FileComboBoxBean(fh);

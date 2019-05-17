@@ -198,9 +198,15 @@ public class GlobalConf {
          **/
         public float POSTPROCESS_GAMMA;
 
-        public enum ToneMapping{
-            AUTO, EXPOSURE, ACES, UNCHARTED, FILMIC, NONE
+        public enum ToneMapping {
+            AUTO,
+            EXPOSURE,
+            ACES,
+            UNCHARTED,
+            FILMIC,
+            NONE
         }
+
         /**
          * Tone mapping type: automatic, exposure, aces, uncharted, filmic, none
          */
@@ -209,7 +215,6 @@ public class GlobalConf {
          * Exposure tone mapping value in [0..n]. 0 is disabled.
          */
         public float POSTPROCESS_EXPOSURE;
-
 
         public PostprocessConf() {
             EventManager.instance.subscribe(this, Events.BLOOM_CMD, Events.LENS_FLARE_CMD, Events.MOTION_BLUR_CMD, Events.LIGHT_SCATTERING_CMD, Events.FISHEYE_CMD, Events.BRIGHTNESS_CMD, Events.CONTRAST_CMD, Events.HUE_CMD, Events.SATURATION_CMD, Events.GAMMA_CMD, Events.TONEMAPPING_TYPE_CMD, Events.EXPOSURE_CMD);
@@ -266,8 +271,8 @@ public class GlobalConf {
                 break;
             case TONEMAPPING_TYPE_CMD:
                 ToneMapping newTM;
-                if(data[0] instanceof String){
-                    newTM = ToneMapping.valueOf(((String)data[0]).toUpperCase());
+                if (data[0] instanceof String) {
+                    newTM = ToneMapping.valueOf(((String) data[0]).toUpperCase());
                 } else {
                     newTM = (ToneMapping) data[0];
                 }
@@ -560,16 +565,16 @@ public class GlobalConf {
             case FRAME_OUTPUT_MODE_CMD:
                 Object newMode = data[0];
                 ScreenshotMode mode = null;
-                if(newMode instanceof String){
+                if (newMode instanceof String) {
                     try {
                         mode = ScreenshotMode.valueOf((String) newMode);
-                    }catch(IllegalArgumentException e){
+                    } catch (IllegalArgumentException e) {
                         logger.error("Given value is not a representation of ScreenshotMode (simple|redraw): '" + newMode + "'");
                     }
                 } else {
                     mode = (ScreenshotMode) newMode;
                 }
-                if(mode != null){
+                if (mode != null) {
                     FRAME_MODE = mode;
                 }
                 break;
@@ -798,8 +803,8 @@ public class GlobalConf {
             EventManager.instance.subscribe(this, Events.STEREOSCOPIC_CMD, Events.STEREO_PROFILE_CMD, Events.CUBEMAP360_CMD, Events.CUBEMAP_PROJECTION_CMD);
         }
 
-        public void initialize(boolean dISPLAY_TUTORIAL, String tUTORIAL_POINTER_SCRIPT_LOCATION, String tUTORIAL_SCRIPT_LOCATION, boolean sHOW_DEBUG_INFO, Instant lAST_CHECKED, String lAST_VERSION, String vERSION_CHECK_URL, String dATA_DESCRIPTOR_URL, String uI_THEME, String sCRIPT_LOCATION, int rEST_PORT, String lOCALE, boolean sTEREOSCOPIC_MODE, StereoProfile sTEREO_PROFILE, boolean cUBEMAP360_MODE, boolean dISPLAY_HUD, boolean dISPLAY_POINTER_COORDS,
-                boolean dISPLAY_DATASET_DIALOG, boolean nET_MASTER, boolean nET_SLAVE, List<String> nET_MASTER_SLAVES) {
+        public void initialize(boolean dISPLAY_TUTORIAL, String tUTORIAL_POINTER_SCRIPT_LOCATION, String tUTORIAL_SCRIPT_LOCATION, boolean sHOW_DEBUG_INFO, Instant lAST_CHECKED, String lAST_VERSION, String vERSION_CHECK_URL, String dATA_DESCRIPTOR_URL, String uI_THEME, String sCRIPT_LOCATION, int rEST_PORT, String lOCALE, boolean sTEREOSCOPIC_MODE, StereoProfile sTEREO_PROFILE, boolean cUBEMAP360_MODE, boolean dISPLAY_HUD, boolean dISPLAY_POINTER_COORDS, boolean dISPLAY_DATASET_DIALOG,
+                boolean nET_MASTER, boolean nET_SLAVE, List<String> nET_MASTER_SLAVES) {
             DISPLAY_TUTORIAL = dISPLAY_TUTORIAL;
             TUTORIAL_POINTER_SCRIPT_LOCATION = tUTORIAL_POINTER_SCRIPT_LOCATION;
             TUTORIAL_SCRIPT_LOCATION = tUTORIAL_SCRIPT_LOCATION;
@@ -878,8 +883,13 @@ public class GlobalConf {
                         EventManager.instance.post(Events.DISPLAY_GUI_CMD, I18n.bundle.get("notif.cleanmode"), true);
                     }
 
-                    logger.info("You have entered 3D mode. Go back to normal mode using <CTRL+S>");
-                    logger.info("Switch between stereoscopic modes using <CTRL+SHIFT+S>");
+                    // Post a message to the screen
+                    if (stereomode)
+                        EventManager.instance.post(Events.SCREEN_NOTIFICATION_CMD,
+                                "Stereoscopic mode activated!",
+                                new String[] { "<CTRL+S>   back to normal mode",
+                                        "<CTRL+SHIFT+S>  switch stereoscopic profile" },
+                                10f);
                 }
                 break;
             case STEREO_PROFILE_CMD:
@@ -888,8 +898,13 @@ public class GlobalConf {
             case CUBEMAP360_CMD:
                 CUBEMAP360_MODE = (Boolean) data[0];
 
-                logger.info("You have entered the 360 mode.  Go back to normal mode using <CTRL+K>");
-                logger.info("Switch between cubemap projections using <CTRL+SHIFT+K>");
+                // Post a message to the screen
+                if (CUBEMAP360_MODE)
+                    EventManager.instance.post(Events.SCREEN_NOTIFICATION_CMD,
+                            "360 mode activated!",
+                            new String[] { "<CTRL+K>   back to normal mode",
+                                    "<CTRL+SHIFT+K>  switch projection type" },
+                            10f);
                 break;
             case CUBEMAP_PROJECTION_CMD:
                 CUBEMAP_PROJECTION = (CubemapProjections.CubemapProjection) data[0];
@@ -948,18 +963,20 @@ public class GlobalConf {
          * The type of height representation if height textures
          * are present
          */
-        public enum HeightType{
-            TESSELLATION, PARALLAX_MAPPING, NONE;
+        public enum HeightType {
+            TESSELLATION,
+            PARALLAX_MAPPING,
+            NONE;
 
-            public boolean isTessellation(){
+            public boolean isTessellation() {
                 return this.equals(TESSELLATION);
             }
 
-            public boolean isParallaxMapping(){
+            public boolean isParallaxMapping() {
                 return this.equals(PARALLAX_MAPPING);
             }
 
-            public boolean isNone(){
+            public boolean isNone() {
                 return this.equals(NONE);
             }
         }
@@ -1069,11 +1086,10 @@ public class GlobalConf {
         /**
          * How to represent height, if height textures present:
          * <ul>
-         *     <li>Tessellation</li>
-         *     <li>Parallax mapping</li>
-         *     <li>None</li>
+         * <li>Tessellation</li>
+         * <li>Parallax mapping</li>
+         * <li>None</li>
          * </ul>
-         *
          */
         public HeightType HEIGHT_TYPE;
 
@@ -1260,7 +1276,7 @@ public class GlobalConf {
                     state = (Boolean) data[2];
                 }
                 ComponentType ct = ComponentType.getFromKey(key);
-                if(ct != null) {
+                if (ct != null) {
                     VISIBILITY[ct.ordinal()] = (state != null ? state : !VISIBILITY[ct.ordinal()]);
                 }
                 break;

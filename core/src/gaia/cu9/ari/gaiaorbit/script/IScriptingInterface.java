@@ -1452,9 +1452,9 @@ public interface IScriptingInterface {
     String getDefaultMusicDir();
 
     /**
-     * Gets the absolute path to the location of the controller mappings
+     * Gets the absolute path to the location of the inputListener mappings
      *
-     * @return Absolute path to the location of the controller mappings
+     * @return Absolute path to the location of the inputListener mappings
      */
     String getDefaultMappingsDir();
 

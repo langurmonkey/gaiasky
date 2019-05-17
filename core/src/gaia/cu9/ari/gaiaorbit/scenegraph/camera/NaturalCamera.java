@@ -22,6 +22,8 @@ import gaia.cu9.ari.gaiaorbit.GaiaSky;
 import gaia.cu9.ari.gaiaorbit.event.EventManager;
 import gaia.cu9.ari.gaiaorbit.event.Events;
 import gaia.cu9.ari.gaiaorbit.event.IObserver;
+import gaia.cu9.ari.gaiaorbit.interfce.GameInputListener;
+import gaia.cu9.ari.gaiaorbit.interfce.MouseKbdListener;
 import gaia.cu9.ari.gaiaorbit.interfce.NaturalControllerListener;
 import gaia.cu9.ari.gaiaorbit.interfce.NaturalInputListener;
 import gaia.cu9.ari.gaiaorbit.render.ComponentTypes.ComponentType;
@@ -150,8 +152,8 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
     private double gamepadMultiplier = 1;
 
     /**
-     * Holds whether the last input was issued by a controller. Useful to keep
-     * things rolling even if controller sticks do not move
+     * Holds whether the last input was issued by currentMouseKbdListener. Useful to keep
+     * things rolling even if currentMouseKbdListener sticks do not move
      **/
     boolean inputByController = false;
 
@@ -167,12 +169,20 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
     private static double HUD_SCALE_MAX = 3.0f;
 
     /**
-     * The input controller attached to this camera
+     * The current listener
+     */
+    private MouseKbdListener currentMouseKbdListener;
+    /**
+     * Implements the regular mouse+kbd camera input
      **/
-    private NaturalInputListener inputController;
+    private NaturalInputListener naturalMouseKbdListener;
+    /**
+     * Implements WASD movement + mouse look camera input
+     */
+    private GameInputListener gameMouseKbdListener;
 
     /**
-     * Controller listener
+     * Implements gamepad camera input
      **/
     private NaturalControllerListener controllerListener;
 
@@ -226,7 +236,12 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
 
         dx = new Vector3d();
 
-        inputController = new NaturalInputListener(this);
+        // Mouse and keyboard listeners
+        naturalMouseKbdListener = new NaturalInputListener(this);
+        gameMouseKbdListener = new GameInputListener(this);
+        currentMouseKbdListener = naturalMouseKbdListener;
+        currentMouseKbdListener.activate();
+        // Controller listeners
         controllerListener = new NaturalControllerListener(this, GlobalConf.controls.CONTROLLER_MAPPINGS_FILE);
 
         // Init sprite batch for crosshair
@@ -268,7 +283,7 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
         }
 
         // Focus is changed from GUI
-        EventManager.instance.subscribe(this, Events.FOCUS_CHANGE_CMD, Events.FOV_CHANGED_CMD, Events.ORIENTATION_LOCK_CMD, Events.CAMERA_POS_CMD, Events.CAMERA_DIR_CMD, Events.CAMERA_UP_CMD, Events.CAMERA_FWD, Events.CAMERA_ROTATE, Events.CAMERA_PAN, Events.CAMERA_ROLL, Events.CAMERA_TURN, Events.CAMERA_STOP, Events.CAMERA_CENTER, Events.GO_TO_OBJECT_CMD, Events.PLANETARIUM_FOCUS_ANGLE_CMD, Events.PLANETARIUM_CMD, Events.FREE_MODE_COORD_CMD, Events.CATALOG_VISIBLE, Events.CATALOG_REMOVE, Events.FOCUS_NOT_AVAILABLE, Events.TOGGLE_VISIBILITY_CMD);
+        EventManager.instance.subscribe(this, Events.FOCUS_CHANGE_CMD, Events.FOV_CHANGED_CMD, Events.ORIENTATION_LOCK_CMD, Events.CAMERA_POS_CMD, Events.CAMERA_DIR_CMD, Events.CAMERA_UP_CMD, Events.CAMERA_FWD, Events.CAMERA_ROTATE, Events.CAMERA_PAN, Events.CAMERA_ROLL, Events.CAMERA_TURN, Events.CAMERA_STOP, Events.CAMERA_CENTER, Events.GO_TO_OBJECT_CMD, Events.PLANETARIUM_FOCUS_ANGLE_CMD, Events.PLANETARIUM_CMD, Events.FREE_MODE_COORD_CMD, Events.CATALOG_VISIBLE, Events.CATALOG_REMOVE, Events.FOCUS_NOT_AVAILABLE, Events.TOGGLE_VISIBILITY_CMD, Events.GAME_MODE_TOGGLE);
     }
 
     public void update(double dt, ITimeFrameProvider time) {
@@ -280,7 +295,7 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
     }
 
     private void camUpdate(double dt, ITimeFrameProvider time) {
-        inputController.updateKeys();
+        currentMouseKbdListener.update();
 
         // The whole update thread must lock the value of direction and up
         distance = pos.len();
@@ -540,9 +555,25 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
      */
     public void addPanMovement(double deltaX, double deltaY) {
         double tu = getTranslateUnits();
-        desired.set(direction).crs(up).nor().scl(-deltaX * tu);
+        desired.set(direction).crs(up).nor().scl(-deltaX * tu * 100);
         desired.add(aux1.set(up).nor().scl(-deltaY * tu));
         force.add(desired);
+        // We reset the time counter
+        lastFwdTime = 0;
+    }
+
+    public void forward(double amount){
+        double tu = getTranslateUnits();
+        desired.set(direction).nor().scl(amount * tu);
+        vel.add(desired).clamp(0, 1e10);
+        lastFwdTime = 0;
+    }
+
+    public void strafe(double amount){
+        double tu = getTranslateUnits();
+        desired.set(direction).crs(up).nor().scl(amount * tu);
+        vel.add(desired).clamp(0, 1e10);
+        lastFwdTime = 0;
     }
 
     /**
@@ -752,7 +783,7 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
 
         force.add(friction);
 
-        if (lastFwdTime > (cinematic ? 250 : 0.25) && velocityGamepad == 0 && fullStop || lastFwdAmount > 0 && transUnits == 0) {
+        if (lastFwdTime > (cinematic ? 250 : currentMouseKbdListener.getResponseTime()) && velocityGamepad == 0 && fullStop || lastFwdAmount > 0 && transUnits == 0) {
             stopForwardMovement();
         }
 
@@ -927,6 +958,28 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
         }
     }
 
+    private void setMouseKbdListener(MouseKbdListener newListener) {
+        if (currentMouseKbdListener != newListener) {
+            InputMultiplexer im = (InputMultiplexer) Gdx.input.getInputProcessor();
+
+            // Remove from input processors
+            if (currentMouseKbdListener != null)
+                im.removeProcessor(currentMouseKbdListener);
+
+            // Deactivate
+            currentMouseKbdListener.deactivate();
+
+            // Update reference
+            currentMouseKbdListener = newListener;
+
+            // Add to input processors
+            im.addProcessor(currentMouseKbdListener);
+
+            // Activate
+            currentMouseKbdListener.activate();
+        }
+    }
+
     /**
      * Updates the camera mode
      */
@@ -941,9 +994,8 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
         case Gaia_Scene:
             Gdx.app.postRunnable(() -> {
                 // Register input controllers
-                if (!im.getProcessors().contains(inputController, true))
-                    im.addProcessor(im.size(), inputController);
-                // Register controller listener
+                if (!im.getProcessors().contains(currentMouseKbdListener, true))
+                    im.addProcessor(im.size(), currentMouseKbdListener);
                 Controllers.clearListeners();
                 GlobalConf.controls.addControllerListener(controllerListener);
             });
@@ -951,8 +1003,7 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
         default:
             Gdx.app.postRunnable(() -> {
                 // Unregister input controllers
-                im.removeProcessor(inputController);
-                // Unregister controller listener
+                im.removeProcessor(currentMouseKbdListener);
                 GlobalConf.controls.removeControllerListener(controllerListener);
             });
             break;
@@ -1145,13 +1196,17 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
             }
             break;
         case TOGGLE_VISIBILITY_CMD:
-            if(getMode().isFocus()){
+            if (getMode().isFocus()) {
                 ComponentType ct = ComponentType.getFromKey((String) data[0]);
-                if(this.focus != null && ct != null && this.focus.getCt().isEnabled(ct)){
+                if (this.focus != null && ct != null && this.focus.getCt().isEnabled(ct)) {
                     // Set camera  free
                     EventManager.instance.post(Events.CAMERA_MODE_CMD, CameraMode.Free_Camera);
                 }
             }
+            break;
+        case GAME_MODE_TOGGLE:
+            MouseKbdListener newListener = currentMouseKbdListener == gameMouseKbdListener ? naturalMouseKbdListener : gameMouseKbdListener;
+            setMouseKbdListener(newListener);
             break;
         default:
             break;
@@ -1522,4 +1577,11 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
         return vel;
     }
 
+    public void setDiverted(boolean diverted){
+        this.diverted = diverted;
+    }
+
+    public MouseKbdListener getCurrentMouseKbdListener(){
+        return currentMouseKbdListener;
+    }
 }
