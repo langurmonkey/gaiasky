@@ -202,7 +202,7 @@ public class ModelComponent implements Disposable, IObserver {
                         materials.put("base" + i, model.materials.get(i));
                     }
                 else
-                    materials.put("base0", model.materials.first());
+                    materials.put("base", model.materials.first());
             }
 
         } else if (type != null) {
@@ -226,7 +226,7 @@ public class ModelComponent implements Disposable, IObserver {
     }
 
     /**
-     * Initialises the texture if it is not initialised yet
+     * Initialises the model or texture if LAZY_X_INIT is on
      */
     public void touch(Matrix4 localTransform) {
         if (GlobalConf.scene.LAZY_TEXTURE_INIT && !texInitialised) {

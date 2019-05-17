@@ -118,25 +118,25 @@ public class MtlLoader {
         if (texDiffuseFilename != null) {
             ModelTexture tex = new ModelTexture();
             tex.usage = ModelTexture.USAGE_DIFFUSE;
-            tex.fileName = new String(texDiffuseFilename);
+            tex.fileName = texDiffuseFilename;
             if (mat.textures == null)
-                mat.textures = new Array<ModelTexture>(1);
+                mat.textures = new Array<>(1);
             mat.textures.add(tex);
         }
         if (texEmissiveFilename != null) {
             ModelTexture tex = new ModelTexture();
             tex.usage = ModelTexture.USAGE_EMISSIVE;
-            tex.fileName = new String(texEmissiveFilename);
+            tex.fileName = texEmissiveFilename;
             if (mat.textures == null)
-                mat.textures = new Array<ModelTexture>(1);
+                mat.textures = new Array<>(1);
             mat.textures.add(tex);
         }
         if (texNormalFilename != null) {
             ModelTexture tex = new ModelTexture();
             tex.usage = ModelTexture.USAGE_NORMAL;
-            tex.fileName = new String(texNormalFilename);
+            tex.fileName = texNormalFilename;
             if (mat.textures == null)
-                mat.textures = new Array<ModelTexture>(1);
+                mat.textures = new Array<>(1);
             mat.textures.add(tex);
         }
         materials.add(mat);
