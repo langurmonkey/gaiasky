@@ -399,8 +399,8 @@ public class PreferencesWindow extends GenericDialog {
         // SHADOW MAP RESOLUTION
         OwnLabel smResolutionLabel = new OwnLabel(I18n.txt("gui.graphics.shadows.resolution"), skin);
         smResolutionLabel.setDisabled(!GlobalConf.scene.SHADOW_MAPPING);
-        IntValidator smResValidator = new IntValidator(128, 2048);
-        smResolution = new OwnTextField(Integer.toString(MathUtils.clamp(GlobalConf.scene.SHADOW_MAPPING_RESOLUTION, 128, 2048)), skin, smResValidator);
+        IntValidator smResValidator = new IntValidator(128, 4096);
+        smResolution = new OwnTextField(Integer.toString(MathUtils.clamp(GlobalConf.scene.SHADOW_MAPPING_RESOLUTION, 128, 4096)), skin, smResValidator);
         smResolution.setWidth(textwidth * 3f);
         smResolution.setDisabled(!GlobalConf.scene.SHADOW_MAPPING);
 
@@ -408,7 +408,7 @@ public class PreferencesWindow extends GenericDialog {
         OwnLabel nShadowsLabel = new OwnLabel("#" + I18n.txt("gui.graphics.shadows"), skin);
         nShadowsLabel.setDisabled(!GlobalConf.scene.SHADOW_MAPPING);
         ComboBoxBean[] nsh = new ComboBoxBean[] { new ComboBoxBean("1", 1), new ComboBoxBean("2", 2), new ComboBoxBean("3", 3), new ComboBoxBean("4", 4) };
-        nshadows = new OwnSelectBox<ComboBoxBean>(skin);
+        nshadows = new OwnSelectBox<>(skin);
         nshadows.setItems(nsh);
         nshadows.setWidth(textwidth * 3f);
         nshadows.setSelected(nsh[GlobalConf.scene.SHADOW_MAPPING_N_SHADOWS - 1]);

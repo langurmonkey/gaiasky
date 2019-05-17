@@ -22,6 +22,11 @@ uniform float fAlpha; /* Atmosphere effect opacity */
 uniform int nSamples;
 uniform float fSamples;
 
+// 0 in the boundary of space, 1 on the ground
+out float v_heightNormalized;
+// Fade factor between hieght-driven opacity and luminosity-driven opacity
+out float v_fadeFactor;
+
 
 float scale(float fCos) {
     float x = 1.0 - fCos;
@@ -89,6 +94,9 @@ void computeAtmosphericScatteringGround() {
         v3SamplePoint += v3SampleRay;
     }
 
+    v_heightNormalized = 1.0 - clamp(((fCameraHeight - fInnerRadius) / (fOuterRadius - fInnerRadius)), 0.0, 1.0);
+    v_fadeFactor = smoothstep(0.5, 1.0, 1.0 - v_heightNormalized);
+
     v_atmosphereColor = vec4(v3FrontColor * (v3InvWavelength * fKrESun + fKmESun), fAlpha);
 }
 #else
@@ -100,10 +108,6 @@ void computeAtmosphericScatteringGround(){}
 
 out vec4 v_frontColor;
 out vec3 v_frontSecondaryColor;
-// 0 in the boundary of space, 1 on the ground
-out float v_heightNormalized;
-// Fade factor between hieght-driven opacity and luminosity-driven opacity
-out float v_fadeFactor;
 out vec3 v_direction;
 
 void computeAtmosphericScattering() {

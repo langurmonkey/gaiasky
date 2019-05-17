@@ -92,7 +92,7 @@ uniform sampler2D u_reflectionTexture;
 ////// SHADOW MAPPING
 //////////////////////////////////////////////////////
 #ifdef shadowMapFlag
-#define bias 0.006
+#define bias 0.020
 uniform sampler2D u_shadowTexture;
 uniform float u_shadowPCFOffset;
 in vec3 o_shadowMapUv;
@@ -199,6 +199,8 @@ in vec3 o_lightCol;
 // Logarithmic depth
 in float o_depth;
 
+in float o_fadeFactor;
+
 #ifdef environmentCubemapFlag
 in vec3 v_reflect;
 #endif
@@ -250,7 +252,7 @@ void main() {
     #endif // reflectionColorFlag
     #endif // environmentCubemapFlag
 
-    float shdw = clamp(getShadow(), 0.0, 1.0);
+    float shdw = clamp(getShadow(), 0.2, 1.0);
     vec3 nightColor = o_lightCol * night * max(0.0, 0.6 - NL) * shdw;
     vec3 dayColor = (o_lightCol * diffuse.rgb) * NL * shdw + (ambient * diffuse.rgb) * (1.0 - NL);
     fragColor = vec4(dayColor + nightColor + emissive.rgb, diffuse.a * o_opacity);
@@ -261,7 +263,7 @@ void main() {
 
     #ifdef atmosphereGround
     #define exposure 5.0
-    fragColor.rgb += (vec3(1.0) - exp(o_atmosphereColor.rgb * -exposure)) * o_atmosphereColor.a;
+    fragColor.rgb += (vec3(1.0) - exp(o_atmosphereColor.rgb * -exposure)) * o_atmosphereColor.a * shdw * o_fadeFactor;
     fragColor.rgb = applyFog(fragColor.rgb, NL);
     #endif
 

@@ -31,6 +31,9 @@ out vec4 l_atmosphereColor[N_VERTICES];
 in vec4 v_color[gl_MaxPatchVertices];
 out vec4 l_color[N_VERTICES];
 
+in float v_fadeFactor[gl_MaxPatchVertices];
+out float l_fadeFactor[N_VERTICES];
+
 #ifdef shadowMapFlag
 in vec3 v_shadowMapUv[gl_MaxPatchVertices];
 out vec3 l_shadowMapUv[N_VERTICES];
@@ -81,6 +84,7 @@ void main(){
     l_opacity[id] = v_opacity[id];
     l_atmosphereColor[id] = v_atmosphereColor[id];
     l_color[id] = v_color[id];
+    l_fadeFactor[id] = v_fadeFactor[id];
 
     #ifdef shadowMapFlag
     l_shadowMapUv[id] = v_shadowMapUv[id];

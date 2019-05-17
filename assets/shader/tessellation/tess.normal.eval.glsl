@@ -67,6 +67,9 @@ out vec4 o_atmosphereColor;
 in vec4 l_color[gl_MaxPatchVertices];
 out vec4 o_color;
 
+in float l_fadeFactor[gl_MaxPatchVertices];
+out float o_fadeFactor;
+
 #ifdef shadowMapFlag
 in vec3 l_shadowMapUv[gl_MaxPatchVertices];
 out vec3 o_shadowMapUv;
@@ -76,7 +79,7 @@ out vec3 o_shadowMapUv;
 // Use normal map
 uniform sampler2D u_normalTexture;
 vec3 calcNormal(vec2 p, vec2 dp){
-    return normalize(texture(u_normalTexture, p, TEXTURE_LOD_BIAS).rgb * 2.0 - 1.0);
+    return normalize(texture(u_normalTexture, p).rgb * 2.0 - 1.0);
 }
 #else
 // Use height texture for normals
@@ -133,6 +136,7 @@ void main(void){
     o_lightDir = (gl_TessCoord.x * l_lightDir[0] + gl_TessCoord.y * l_lightDir[1] + gl_TessCoord.z * l_lightDir[2]);
     o_ambientLight = (gl_TessCoord.x * l_ambientLight[0] + gl_TessCoord.y * l_ambientLight[1] + gl_TessCoord.z * l_ambientLight[2]);
     o_atmosphereColor = (gl_TessCoord.x * l_atmosphereColor[0] + gl_TessCoord.y * l_atmosphereColor[1] + gl_TessCoord.z * l_atmosphereColor[2]);
+    o_fadeFactor = (gl_TessCoord.x * l_fadeFactor[0] + gl_TessCoord.y * l_fadeFactor[1] + gl_TessCoord.z * l_fadeFactor[2]);
     #ifdef shadowMapFlag
     o_shadowMapUv = (gl_TessCoord.x * l_shadowMapUv[0] + gl_TessCoord.y * l_shadowMapUv[1] + gl_TessCoord.z * l_shadowMapUv[2]);
     #endif
