@@ -56,10 +56,10 @@ public class GameInputListener extends MouseKbdListener implements IObserver {
             camera.strafe(-0.1f * keySensitivity);
         }
         if (isKeyPressed(Keys.Q)) {
-            camera.addRoll(1.0f * keySensitivity, true);
+            camera.addRoll(0.8f * keySensitivity, true);
         }
         if (isKeyPressed(Keys.E)) {
-            camera.addRoll(-1.0f * keySensitivity, true);
+            camera.addRoll(-0.8f * keySensitivity, true);
         }
     }
 

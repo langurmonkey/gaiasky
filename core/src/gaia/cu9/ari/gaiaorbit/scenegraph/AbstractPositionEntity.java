@@ -140,7 +140,30 @@ public abstract class AbstractPositionEntity extends SceneGraphNode {
     }
 
     /**
-     * Gets the predicted position of this entity in the next time step in the
+     * Gets a copy of this entity which mimics its state in the next time step with position,
+     * orientation, etc.
+     * @return A copy of this entity in the next time step
+     */
+    public IFocus getNext(ITimeFrameProvider  time, ICamera camera, boolean force){
+        if (!mustUpdatePosition(time) && !force) {
+            return (IFocus) this;
+        } else {
+            // Get copy of focus and update it to know where it will be in the
+            // next step
+            AbstractPositionEntity fc = this;
+            AbstractPositionEntity fccopy = fc.getLineCopy();
+            SceneGraphNode root = fccopy.getRoot();
+            root.translation.set(camera.getInversePos());
+            root.update(time, root.translation, camera);
+
+            return (IFocus) fccopy;
+        }
+    }
+
+
+
+    /**
+     * Gets the position of this entity in the next time step in the
      * internal reference system using the given time provider and the given
      * camera.
      * 
@@ -266,6 +289,14 @@ public abstract class AbstractPositionEntity extends SceneGraphNode {
      */
     public double getRadius() {
         return size / 2d;
+    }
+
+    public double getHeight(Vector3d camPos) {
+        return getRadius();
+    }
+
+    public double getHeightScale() {
+        return 0;
     }
 
     /**

@@ -7,8 +7,8 @@ package gaia.cu9.ari.gaiaorbit.scenegraph.component;
 
 import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.assets.loaders.TextureLoader.TextureParameter;
-import com.badlogic.gdx.graphics.GL20;
-import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.files.FileHandle;
+import com.badlogic.gdx.graphics.*;
 import com.badlogic.gdx.graphics.Texture.TextureFilter;
 import com.badlogic.gdx.graphics.g3d.Material;
 import com.badlogic.gdx.graphics.g3d.attributes.BlendingAttribute;
@@ -49,6 +49,7 @@ public class TextureComponent {
     // Height scale in internal units
     public Float heightScale = 0.005f;
     public Vector2 heightSize = new Vector2();
+    public float[][] heightMap;
 
     /** Add also color even if texture is present **/
     public boolean coloriftex = false;
@@ -149,6 +150,15 @@ public class TextureComponent {
         }
         if(height != null) {
             Texture tex = manager.get(heightT, Texture.class);
+            // Get height data for CPU (camera) use
+            Pixmap heightPixmap = new Pixmap(new FileHandle(height));
+            heightMap = new float[heightPixmap.getWidth()][heightPixmap.getHeight()];
+            for(int i = 0; i < heightPixmap.getWidth(); i ++){
+                for(int j = 0; j < heightPixmap.getHeight(); j++){
+                    Color col = new Color(heightPixmap.getPixel(i, j));
+                    heightMap[i][j] = (1f - col.r) * heightScale;
+                }
+            }
             heightSize.set(tex.getWidth(), tex.getHeight());
             material.set(new TextureExtAttribute(TextureExtAttribute.Height, tex));
             material.set(new FloatExtAttribute(FloatExtAttribute.HeightScale, heightScale));

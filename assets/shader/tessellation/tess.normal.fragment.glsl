@@ -92,7 +92,7 @@ uniform sampler2D u_reflectionTexture;
 ////// SHADOW MAPPING
 //////////////////////////////////////////////////////
 #ifdef shadowMapFlag
-#define bias 0.020
+#define bias 0.030
 uniform sampler2D u_shadowTexture;
 uniform float u_shadowPCFOffset;
 in vec3 o_shadowMapUv;

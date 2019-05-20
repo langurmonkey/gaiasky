@@ -22,6 +22,7 @@ import gaia.cu9.ari.gaiaorbit.scenegraph.component.ITransform;
 import gaia.cu9.ari.gaiaorbit.scenegraph.component.ModelComponent;
 import gaia.cu9.ari.gaiaorbit.util.Constants;
 import gaia.cu9.ari.gaiaorbit.util.GlobalConf;
+import gaia.cu9.ari.gaiaorbit.util.Nature;
 import gaia.cu9.ari.gaiaorbit.util.coord.Coordinates;
 import gaia.cu9.ari.gaiaorbit.util.gdx.IntModelBatch;
 import gaia.cu9.ari.gaiaorbit.util.gdx.mesh.IntMesh;
@@ -35,9 +36,8 @@ import gaia.cu9.ari.gaiaorbit.util.time.ITimeFrameProvider;
 /**
  * Abstract class with the basic functionality of bodies represented by a 3D
  * model.
- * 
- * @author Toni Sagrista
  *
+ * @author Toni Sagrista
  */
 public abstract class ModelBody extends CelestialBody {
     protected static final double TH_ANGLE_POINT = Math.toRadians(0.30);
@@ -144,10 +144,10 @@ public abstract class ModelBody extends CelestialBody {
 
     public void setToLocalTransform(float size, float sizeFactor, Matrix4 localTransform, boolean forceUpdate) {
         if (sizeFactor != 1 || forceUpdate) {
-            if(rc != null) {
+            if (rc != null) {
                 translation.getMatrix(localTransform).scl(size * sizeFactor).mul(Coordinates.getTransformF(refPlaneTransform)).rotate(0, 1, 0, (float) rc.ascendingNode).rotate(0, 0, 1, (float) (rc.inclination + rc.axialTilt)).rotate(0, 1, 0, (float) rc.angle);
                 orientation.idt().mul(Coordinates.getTransformD(refPlaneTransform)).rotate(0, 0, 1, (float) (rc.inclination + rc.axialTilt)).rotate(0, 1, 0, (float) rc.ascendingNode);
-            }else{
+            } else {
                 translation.getMatrix(localTransform).scl(size * sizeFactor).mul(Coordinates.getTransformF(refPlaneTransform));
                 orientation.idt().mul(Coordinates.getTransformD(refPlaneTransform));
             }
@@ -179,7 +179,7 @@ public abstract class ModelBody extends CelestialBody {
                     if (viewAngleApparent < thQuad1) {
                         addToRender(this, RenderGroup.BILLBOARD_SSO);
                     } else if (viewAngleApparent > thQuad2) {
-                        if(renderTessellated()){
+                        if (renderTessellated()) {
                             addToRender(this, RenderGroup.MODEL_PIX_TESS);
                         } else {
                             addToRender(this, RenderGroup.MODEL_PIX);
@@ -187,7 +187,7 @@ public abstract class ModelBody extends CelestialBody {
                     } else {
                         // Both
                         addToRender(this, RenderGroup.BILLBOARD_SSO);
-                        if(renderTessellated()){
+                        if (renderTessellated()) {
                             addToRender(this, RenderGroup.MODEL_PIX_TESS);
                         } else {
                             addToRender(this, RenderGroup.MODEL_PIX);
@@ -202,7 +202,7 @@ public abstract class ModelBody extends CelestialBody {
         }
     }
 
-    public boolean renderTessellated(){
+    public boolean renderTessellated() {
         return mc.hasHeight();
     }
 
@@ -253,7 +253,7 @@ public abstract class ModelBody extends CelestialBody {
 
     /** Model opaque rendering. Disable shadow mapping **/
     public void render(IntModelBatch modelBatch, float alpha, double t, boolean shadowEnv) {
-        if(shadowEnv)
+        if (shadowEnv)
             prepareShadowEnvironment();
         mc.touch();
         mc.setTransparency(alpha * fadeOpacity);
@@ -329,15 +329,11 @@ public abstract class ModelBody extends CelestialBody {
     /**
      * Returns the cartesian position in the internal reference system above the
      * surface at the given longitude and latitude and distance.
-     * 
-     * @param longitude
-     *            The longitude in deg
-     * @param latitude
-     *            The latitude in deg
-     * @param distance
-     *            The distance in km
-     * @param out
-     *            The vector to store the result
+     *
+     * @param longitude The longitude in deg
+     * @param latitude  The latitude in deg
+     * @param distance  The distance in km
+     * @param out       The vector to store the result
      * @return The cartesian position above the surface of this body
      */
     public Vector3d getPositionAboveSurface(double longitude, double latitude, double distance, Vector3d out) {
@@ -353,11 +349,80 @@ public abstract class ModelBody extends CelestialBody {
         aux2.set(aux1.z, aux1.y, aux1.x).scl(1, -1, -1).scl(-(getRadius() + distance * Constants.KM_TO_U));
         //aux2.rotate(rc.angle, 0, 1, 0);
         Matrix4d ori = new Matrix4d(orientation);
-        ori.rotate(0, 1, 0, (float) rc.angle);
+        ori.rotate(0, 1, 0, rc.angle);
         aux2.mul(ori);
 
         getAbsolutePosition(out).add(aux2);
         return out;
+    }
+
+    Matrix4 mataux = new Matrix4();
+    Matrix4d matauxd = new Matrix4d();
+
+    @Override
+    public double getHeight(Vector3d camPos) {
+        double height = 0;
+        // Only when we have height map and we are below the highest point in the surface
+        if (mc != null && mc.tc != null && mc.tc.heightMap != null && distToCamera < getRadius() + mc.tc.heightScale * 12) {
+            float[][] m = mc.tc.heightMap;
+            int W = mc.tc.heightMap.length;
+            int H = mc.tc.heightMap[0].length;
+            // Object-camera normalised vector
+            Vector3d cart = getAbsolutePosition(aux3d1.get()).scl(-1).add(camPos).nor();
+
+
+            setToLocalTransform(1, mataux, false);
+            mataux.inv();
+            matauxd.set(mataux.getValues());
+            cart.mul(matauxd);
+
+            //mataux.set(orientation);
+            //cart.traMul(mataux);
+
+            Vector3d sph = aux3d2.get();
+            Coordinates.cartesianToSpherical(cart, sph);
+
+            double u = (((sph.x * Nature.TO_DEG) + 270.0) % 360.0) / 360.0;
+            double v = 1d - (sph.y * Nature.TO_DEG + 90.0) / 180.0;
+
+            double U = Math.floor(W * u);
+            double V = Math.floor(H * v);
+
+            // Bilinear interpolation
+            int i1 = (int)(W * u);
+            int i2 = (i1 + 1) % W;
+            int j1 = (int)(H * v);
+            int j2 = (j1 + 1) % H;
+
+            double dx = 1.0 / W;
+            double dy = 1.0 / H;
+            double x1 = (double) i1 / (double) W;
+            double x2 = (x1 + dx) % 1.0;
+            double y1 = (double) j1 / (double) H;
+            double y2 = (y1 + dy) % 1.0;
+            double x = u;
+            double y = v;
+
+
+            double f11 = m[i1][j1];
+            double f21 = m[i2][j1];
+            double f12 = m[i1][j2];
+            double f22 = m[i2][j2];
+
+            double denom = (x2 - x1) * (y2 - y1);
+            height = (((x2 - x) * (y2 - y)) / denom) * f11 +
+                    ((x-x1)*(y2-y)/denom) * f21 +
+                    ((x2-x)*(y-y1)/denom) * f12 +
+                    ((x-x1)*(y-y1)/denom) * f22;
+        }
+        return getRadius() + height;
+    }
+
+    public double getHeightScale(){
+        if (mc != null && mc.tc != null && mc.tc.heightMap != null){
+            return mc.tc.heightScale;
+        }
+        return 0;
     }
 
     /**
@@ -438,7 +503,7 @@ public abstract class ModelBody extends CelestialBody {
 
     /**
      * Whether shadows should be rendered for this object
-     * 
+     *
      * @return Whether shadows should be rendered for this object
      */
     public boolean isShadow() {
@@ -447,9 +512,8 @@ public abstract class ModelBody extends CelestialBody {
 
     /**
      * Sets the shadow mapping values for this object
-     * 
-     * @param shadowMapValues
-     *            The values
+     *
+     * @param shadowMapValues The values
      */
     public void setShadowvalues(double[] shadowMapValues) {
         this.shadowMapValues = shadowMapValues;

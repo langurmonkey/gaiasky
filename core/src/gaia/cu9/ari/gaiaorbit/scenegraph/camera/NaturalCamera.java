@@ -440,6 +440,8 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
         lastFwdTime += dt;
         lastMode = m;
 
+        posDistanceCheck();
+
         if (pos.hasNaN()) {
             pos.set(posbak);
         } else {
@@ -827,6 +829,24 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
         posinv.set(pos).scl(-1);
     }
 
+
+    long jumps = 0;
+    private void posDistanceCheck(){
+        // Check terrain collision
+        if(closest != null){
+            double h = closest.getHeight(pos);
+            double hs = closest.getHeightScale();
+            double minDist = h + hs / 10d;
+            double newDist = closest.getAbsolutePosition(aux5).scl(-1).add(pos).len();
+            if(newDist < minDist){
+                aux5.nor().scl(minDist - newDist);
+                pos.add(aux5);
+                posinv.set(pos).scl(-1);
+                jumps++;
+            }
+        }
+    }
+
     /**
      * Updates the rotation for the free camera.
      *
@@ -1021,21 +1041,25 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
         }
     }
 
+    public double getTranslateUnits(double min){
+        double dist;
+        if (parent.mode == CameraMode.Focus && focus != null) {
+            dist = focus.getDistToCamera() - (focus.getHeight(pos) + MIN_DIST);
+        } else if (parent.mode == CameraMode.Free_Camera && closest != null) {
+            dist = closest.getDistToCamera() - (closest.getHeight(pos) + MIN_DIST);
+        } else {
+            dist = distance;
+        };
+        return dist > 0 ? Math.max(dist, min) * GlobalConf.scene.CAMERA_SPEED : 0;
+    }
+
     /**
      * This depends on the distance from the focus.
      *
      * @return The translate units
      */
     public double getTranslateUnits() {
-        double dist;
-        if (parent.mode == CameraMode.Focus && focus != null) {
-            dist = focus.getDistToCamera() - (focus.getRadius() + MIN_DIST);
-        } else if (parent.mode == CameraMode.Free_Camera && closest != null) {
-            dist = closest.getDistToCamera() - (closest.getRadius() + MIN_DIST);
-        } else {
-            dist = distance;
-        }
-        return dist > 0 ? dist * GlobalConf.scene.CAMERA_SPEED : 0;
+        return getTranslateUnits(0);
     }
 
     /**
@@ -1230,6 +1254,7 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
         aux3.set(pos).sub(rotationCenter);
         aux3.rotate(rotationAxis, angle);
         pos.set(aux3).add(rotationCenter);
+        posDistanceCheck();
     }
 
     public void rotate(Vector3d axis, double angle) {
@@ -1246,6 +1271,7 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
      */
     public void translate(double x, double y, double z) {
         pos.add(x, y, z);
+        posDistanceCheck();
     }
 
     /**
@@ -1255,6 +1281,7 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
      */
     public void translate(Vector3d vec) {
         pos.add(vec);
+        posDistanceCheck();
     }
 
     /**
@@ -1326,6 +1353,7 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
     public IFocus getFocus() {
         return getMode().equals(CameraMode.Focus) ? this.focus : null;
     }
+
 
     /**
      * Checks the position of the camera does not collide with the focus object.

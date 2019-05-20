@@ -85,7 +85,7 @@ vec3 calcNormal(vec2 p, vec2 dp){
 // Use height texture for normals
 vec3 calcNormal(vec2 p, vec2 dp){
     vec4 h;
-    const vec2 size = vec2(2.0, 0.0);
+    const vec2 size = vec2(1.4, 0.0);
     h.x = texture(u_heightTexture, vec2(p.x-dp.x, p.y)).r;
     h.y = texture(u_heightTexture, vec2(p.x+dp.x, p.y)).r;
     h.z = texture(u_heightTexture, vec2(p.x, p.y-dp.y)).r;

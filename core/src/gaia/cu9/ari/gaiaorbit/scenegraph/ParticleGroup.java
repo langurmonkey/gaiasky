@@ -517,6 +517,7 @@ public class ParticleGroup extends FadeNode implements I3DTextRenderable, IFocus
         return getSize() / 2d;
     }
 
+
     @Override
     public boolean withinMagLimit() {
         return true;

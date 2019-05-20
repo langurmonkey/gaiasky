@@ -119,8 +119,10 @@ public interface IFocus {
      */
     Vector2d getPosSph();
 
+    IFocus getNext(ITimeFrameProvider time, ICamera camera, boolean force);
+
     /**
-     * Gets the predicted position of this entity in the next time step in the
+     * Gets the position of this entity in the next time step in the
      * internal reference system using the given time provider and the given
      * camera
      * 
@@ -193,6 +195,21 @@ public interface IFocus {
      * @return The radius of the focus, in internal units
      */
     double getRadius();
+
+    /**
+     * Returns the height of the projected position of the current camera
+     * on this focus object, which is usually the radius plus a value lookup
+     * in the height texture (if exists)
+     * @param camPos The camera position
+     * @return The height of the projected position of the current camera
+     */
+    double getHeight(Vector3d camPos);
+
+    /**
+     * Returns the height scale of this focus, or 0 if it has no height info
+     * @return The height scale in internal units
+     */
+    double getHeightScale();
 
     /**
      * Gets the apparent magnitude

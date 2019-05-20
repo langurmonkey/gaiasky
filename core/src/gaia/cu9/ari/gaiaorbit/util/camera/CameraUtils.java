@@ -12,6 +12,7 @@ import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.math.collision.Ray;
 import gaia.cu9.ari.gaiaorbit.scenegraph.Planet;
 import gaia.cu9.ari.gaiaorbit.scenegraph.camera.ICamera;
+import gaia.cu9.ari.gaiaorbit.util.Nature;
 import gaia.cu9.ari.gaiaorbit.util.coord.Coordinates;
 import gaia.cu9.ari.gaiaorbit.util.math.Vector3d;
 
@@ -75,8 +76,8 @@ public class CameraUtils {
             in.set(intersection);
             Coordinates.cartesianToSpherical(in, out);
 
-            lonlat[0] = (Math.toDegrees(out.x) + 90) % 360;
-            lonlat[1] = Math.toDegrees(out.y);
+            lonlat[0] = (Nature.TO_DEG * out.x + 90) % 360;
+            lonlat[1] = Nature.TO_DEG * out.y;
             return true;
         } else {
             return false;

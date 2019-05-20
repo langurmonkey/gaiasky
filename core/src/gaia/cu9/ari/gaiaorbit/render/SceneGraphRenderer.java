@@ -41,6 +41,7 @@ import gaia.cu9.ari.gaiaorbit.scenegraph.SceneGraphNode.RenderGroup;
 import gaia.cu9.ari.gaiaorbit.scenegraph.Star;
 import gaia.cu9.ari.gaiaorbit.scenegraph.camera.CameraManager.CameraMode;
 import gaia.cu9.ari.gaiaorbit.scenegraph.camera.ICamera;
+import gaia.cu9.ari.gaiaorbit.util.Constants;
 import gaia.cu9.ari.gaiaorbit.util.GlobalConf;
 import gaia.cu9.ari.gaiaorbit.util.GlobalResources;
 import gaia.cu9.ari.gaiaorbit.util.Logger;
@@ -57,6 +58,7 @@ import gaia.cu9.ari.gaiaorbit.util.gdx.shader.*;
 import gaia.cu9.ari.gaiaorbit.util.gdx.shader.ShaderProgramProvider.ShaderProgramParameter;
 import gaia.cu9.ari.gaiaorbit.util.gdx.shader.provider.IntShaderProvider;
 import gaia.cu9.ari.gaiaorbit.util.gravwaves.RelativisticEffectsManager;
+import gaia.cu9.ari.gaiaorbit.util.math.Intersectord;
 import gaia.cu9.ari.gaiaorbit.util.math.MathUtilsd;
 import gaia.cu9.ari.gaiaorbit.util.math.Vector3d;
 import org.lwjgl.opengl.GL30;
@@ -111,7 +113,7 @@ public class SceneGraphRenderer extends AbstractRenderer implements IProcessRend
 
     // Camera at light position, with same direction. For shadow mapping
     private Camera cameraLight;
-    private Array<ModelBody> shadowCandidates;
+    private Array<ModelBody> shadowCandidates, shadowCandidatesTess;
     public FrameBuffer[] shadowMapFb;
     private Matrix4[] shadowMapCombined;
     public Map<ModelBody, Texture> smTexMap;
@@ -123,7 +125,7 @@ public class SceneGraphRenderer extends AbstractRenderer implements IProcessRend
     private IntModelBatch mbPixelLightingDepth, mbPixelLightingOpaque, mbPixelLightingOpaqueTessellation, mbPixelLightingDepthTessellation;
 
     private Vector3 aux1;
-    private Vector3d aux1d;
+    private Vector3d aux1d, aux2d, aux3d, aux4d;
 
     private Array<IRenderable> stars;
 
@@ -242,6 +244,9 @@ public class SceneGraphRenderer extends AbstractRenderer implements IProcessRend
             // Aux vectors
             aux1 = new Vector3();
             aux1d = new Vector3d();
+            aux2d = new Vector3d();
+            aux3d = new Vector3d();
+            aux4d = new Vector3d();
 
             // Build frame buffers and arrays
             buildShadowMapData();
@@ -766,10 +771,10 @@ public class SceneGraphRenderer extends AbstractRenderer implements IProcessRend
 
     }
 
-    private void addCandidates(Array<IRenderable> models, Array<ModelBody> candidates, boolean clear){
-        if(candidates != null) {
-            if(clear)
-            candidates.clear();
+    private void addCandidates(Array<IRenderable> models, Array<ModelBody> candidates, boolean clear) {
+        if (candidates != null) {
+            if (clear)
+                candidates.clear();
             int num = 0;
             for (int i = 0; i < models.size; i++) {
                 if (models.get(i) instanceof ModelBody) {
@@ -784,6 +789,134 @@ public class SceneGraphRenderer extends AbstractRenderer implements IProcessRend
                 }
             }
         }
+    }
+
+    private void renderShadowMapCandidates(Array<ModelBody> candidates, int shadowNRender, ICamera camera) {
+        int i = 0;
+        // Normal bodies
+        for (ModelBody candidate : candidates) {
+            // Yes!
+            candidate.shadow = shadowNRender;
+
+            Vector3 camDir = aux1.set(candidate.mc.dlight.direction);
+            // Direction is that of the light
+            cameraLight.direction.set(camDir);
+
+            double radius = candidate.getRadius();
+            // Distance from camera to object, radius * sv[0]
+            double distance = radius * candidate.shadowMapValues[0];
+            // Position, factor of radius
+            candidate.getAbsolutePosition(aux1d);
+            aux1d.sub(camera.getPos()).sub(camDir.nor().scl((float) distance));
+            aux1d.put(cameraLight.position);
+            // Up is perpendicular to dir
+            if (cameraLight.direction.y != 0 || cameraLight.direction.z != 0)
+                aux1.set(1, 0, 0);
+            else
+                aux1.set(0, 1, 0);
+            cameraLight.up.set(cameraLight.direction).crs(aux1);
+
+            // Near is sv[1]*radius before the object
+            cameraLight.near = (float) (distance - radius * candidate.shadowMapValues[1]);
+            // Far is sv[2]*radius after the object
+            cameraLight.far = (float) (distance + radius * candidate.shadowMapValues[2]);
+
+            // Update cam
+            cameraLight.update(false);
+
+            // Render model depth map to frame buffer
+            shadowMapFb[i].begin();
+            Gdx.gl.glClearColor(0, 0, 0, 0);
+            Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT | GL20.GL_DEPTH_BUFFER_BIT);
+
+            // No tessellation
+            mbPixelLightingDepth.begin(cameraLight);
+            candidate.render(mbPixelLightingDepth, 1, 0);
+            mbPixelLightingDepth.end();
+
+            // Save frame buffer and combined matrix
+            candidate.shadow = shadowNRender;
+            shadowMapCombined[i].set(cameraLight.combined);
+            smCombinedMap.put(candidate, shadowMapCombined[i]);
+            smTexMap.put(candidate, shadowMapFb[i].getColorBufferTexture());
+
+            shadowMapFb[i].end();
+            i++;
+        }
+    }
+
+    private void renderShadowMapCandidatesTess(Array<ModelBody> candidates, int shadowNRender, ICamera camera) {
+        int i = 0;
+        // Normal bodies
+        for (ModelBody candidate : candidates) {
+            double radius = candidate.getRadius();
+            // Only render when camera very close to surface
+            if (candidate.distToCamera < radius * 1.1) {
+                candidate.shadow = shadowNRender;
+
+                Vector3 shadowCameraDir = aux1.set(candidate.mc.dlight.direction);
+
+                // Shadow camera direction is that of the light
+                cameraLight.direction.set(shadowCameraDir);
+
+                Vector3 shadowCamDir = aux1.set(candidate.mc.dlight.direction);
+                // Direction is that of the light
+                cameraLight.direction.set(shadowCamDir);
+
+                // Distance from camera to object, radius * sv[0]
+                float distance = (float) (radius * candidate.shadowMapValues[0] * 0.01);
+                // Position, factor of radius
+                Vector3d objPos = candidate.getAbsolutePosition(aux1d);
+                Vector3d camPos = camera.getPos();
+                Vector3d camDir = aux3d.set(camera.getDirection()).nor().scl(100 * Constants.KM_TO_U);
+                boolean intersect = Intersectord.checkIntersectSegmentSphere(camPos, aux3d.set(camPos).add(camDir), objPos, radius);
+                if(intersect){
+                    // Use height
+                    camDir.nor().scl(candidate.distToCamera - radius);
+                }
+                Vector3d objCam = aux2d.set(camPos).sub(objPos).nor().scl(-(candidate.distToCamera - radius)).add(camDir);
+
+                objCam.add(shadowCamDir.nor().scl(-distance));
+                objCam.put(cameraLight.position);
+
+                // Shadow camera up is perpendicular to dir
+                if (cameraLight.direction.y != 0 || cameraLight.direction.z != 0)
+                    aux1.set(1, 0, 0);
+                else
+                    aux1.set(0, 1, 0);
+                cameraLight.up.set(cameraLight.direction).crs(aux1);
+
+                // Near is sv[1]*radius before the object
+                cameraLight.near = distance * 0.98f;
+                // Far is sv[2]*radius after the object
+                cameraLight.far = distance * 1.02f;
+
+                // Update cam
+                cameraLight.update(false);
+
+                // Render model depth map to frame buffer
+                shadowMapFb[i].begin();
+                Gdx.gl.glClearColor(0, 0, 0, 0);
+                Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT | GL20.GL_DEPTH_BUFFER_BIT);
+
+                // Tessellation
+                mbPixelLightingDepthTessellation.begin(cameraLight);
+                candidate.render(mbPixelLightingDepthTessellation, 1, 0);
+                mbPixelLightingDepthTessellation.end();
+
+                // Save frame buffer and combined matrix
+                candidate.shadow = shadowNRender;
+                shadowMapCombined[i].set(cameraLight.combined);
+                smCombinedMap.put(candidate, shadowMapCombined[i]);
+                smTexMap.put(candidate, shadowMapFb[i].getColorBufferTexture());
+
+                shadowMapFb[i].end();
+                i++;
+            } else {
+                candidate.shadow = -1;
+            }
+        }
+
     }
 
     private void renderShadowMap(ICamera camera) {
@@ -811,67 +944,14 @@ public class SceneGraphRenderer extends AbstractRenderer implements IProcessRend
 
             if (shadowMapFb != null && smCombinedMap != null) {
                 addCandidates(models, shadowCandidates, true);
-                addCandidates(modelsTess, shadowCandidates, false);
+                addCandidates(modelsTess, shadowCandidatesTess, true);
 
                 // Clear maps
                 smTexMap.clear();
                 smCombinedMap.clear();
-                int i = 0;
-                for (ModelBody candidate : shadowCandidates) {
-                    // Yes!
-                    candidate.shadow = shadowNRender;
 
-                    Vector3 camDir = aux1.set(candidate.mc.dlight.direction);
-                    // Direction is that of the light
-                    cameraLight.direction.set(camDir);
-
-                    double radius = candidate.getRadius();
-                    // Distance from camera to object, radius * sv[0]
-                    double distance = radius * candidate.shadowMapValues[0];
-                    // Position, factor of radius
-                    candidate.getAbsolutePosition(aux1d);
-                    aux1d.sub(camera.getPos()).sub(camDir.nor().scl((float) distance));
-                    aux1d.put(cameraLight.position);
-                    // Up is perpendicular to dir
-                    if (cameraLight.direction.y != 0 || cameraLight.direction.z != 0)
-                        aux1.set(1, 0, 0);
-                    else
-                        aux1.set(0, 1, 0);
-                    cameraLight.up.set(cameraLight.direction).crs(aux1);
-
-                    // Near is sv[1]*radius before the object
-                    cameraLight.near = (float) (distance - radius * candidate.shadowMapValues[1]);
-                    // Far is sv[2]*radius after the object
-                    cameraLight.far = (float) (distance + radius * candidate.shadowMapValues[2]);
-
-                    // Update cam
-                    cameraLight.update(false);
-
-                    // Render model depth map to frame buffer
-                    shadowMapFb[i].begin();
-                    Gdx.gl.glClearColor(0, 0, 0, 0);
-                    Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT | GL20.GL_DEPTH_BUFFER_BIT);
-                    if(candidate.renderTessellated()){
-                        // Tessellation
-                        mbPixelLightingDepthTessellation.begin(cameraLight);
-                        candidate.render(mbPixelLightingDepthTessellation, 1, 0);
-                        mbPixelLightingDepthTessellation.end();
-                    } else {
-                        // No tessellation
-                        mbPixelLightingDepth.begin(cameraLight);
-                        candidate.render(mbPixelLightingDepth, 1, 0);
-                        mbPixelLightingDepth.end();
-                    }
-
-                    // Save frame buffer and combined matrix
-                    candidate.shadow = shadowNRender;
-                    shadowMapCombined[i].set(cameraLight.combined);
-                    smCombinedMap.put(candidate, shadowMapCombined[i]);
-                    smTexMap.put(candidate, shadowMapFb[i].getColorBufferTexture());
-
-                    shadowMapFb[i].end();
-                    i++;
-                }
+                renderShadowMapCandidates(shadowCandidates, shadowNRender, camera);
+                //renderShadowMapCandidatesTess(shadowCandidatesTess, shadowNRender, camera);
             }
         }
     }
@@ -1158,8 +1238,10 @@ public class SceneGraphRenderer extends AbstractRenderer implements IProcessRend
 
         if (shadowCandidates == null) {
             shadowCandidates = new Array<>(GlobalConf.scene.SHADOW_MAPPING_N_SHADOWS);
+            shadowCandidatesTess = new Array<>(GlobalConf.scene.SHADOW_MAPPING_N_SHADOWS);
         }
         shadowCandidates.clear();
+        shadowCandidatesTess.clear();
     }
 
     private void buildGlowData() {
