@@ -19,11 +19,13 @@ import gaia.cu9.ari.gaiaorbit.render.SceneGraphRenderer;
 import gaia.cu9.ari.gaiaorbit.scenegraph.camera.ICamera;
 import gaia.cu9.ari.gaiaorbit.scenegraph.octreewrapper.AbstractOctreeWrapper;
 import gaia.cu9.ari.gaiaorbit.util.I18n;
+import gaia.cu9.ari.gaiaorbit.util.Logger;
 import gaia.cu9.ari.gaiaorbit.util.math.Matrix4d;
 import gaia.cu9.ari.gaiaorbit.util.math.Vector3d;
 import gaia.cu9.ari.gaiaorbit.util.time.ITimeFrameProvider;
 import gaia.cu9.ari.gaiaorbit.util.tree.IPosition;
 
+import java.lang.reflect.InvocationTargetException;
 import java.util.Iterator;
 import java.util.List;
 
@@ -644,9 +646,9 @@ public class SceneGraphNode implements IStarContainer, IPosition {
     public <T extends SceneGraphNode> T getSimpleCopy() {
         T copy = null;
         try {
-            copy = (T) this.getClass().newInstance();
-        } catch (InstantiationException e) {
-        } catch (IllegalAccessException e) {
+            copy = (T) this.getClass().getConstructor().newInstance();
+        } catch (InstantiationException | IllegalAccessException | NoSuchMethodException | InvocationTargetException e) {
+            Logger.getLogger(this.getClass()).error(e);
         }
         copy.name = this.name;
         copy.parentName = this.parentName;

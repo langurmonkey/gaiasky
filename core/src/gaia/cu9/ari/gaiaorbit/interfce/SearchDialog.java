@@ -93,7 +93,7 @@ public class SearchDialog extends GenericDialog {
                 IFocus focus = ((IFocus) node).getFocus(text);
                 if (focus != null && !focus.isCoordinatesTimeOverflow() && GaiaSky.instance.isOn(focus.getCt())) {
                     Gdx.app.postRunnable(() -> {
-                        EventManager.instance.post(Events.CAMERA_MODE_CMD, CameraMode.Focus, true);
+                        EventManager.instance.post(Events.CAMERA_MODE_CMD, CameraMode.FOCUS_MODE, true);
                         EventManager.instance.post(Events.FOCUS_CHANGE_CMD, focus, true);
                     });
                     return true;
@@ -110,7 +110,7 @@ public class SearchDialog extends GenericDialog {
     @Override
     public GenericDialog show(Stage stage, Action action) {
         GenericDialog gd = super.show(stage, action);
-        // Focus to input
+        // FOCUS_MODE to input
         stage.setKeyboardFocus(searchInput);
         return gd;
     }

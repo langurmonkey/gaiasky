@@ -253,13 +253,13 @@ public class FovCamera extends AbstractCamera implements IObserver {
     @Override
     public PerspectiveCamera[] getFrontCameras() {
         switch (parent.mode) {
-        case Gaia_FOV1:
+        case GAIA_FOV1_MODE:
         default:
             return new PerspectiveCamera[] { camera };
-        case Gaia_FOV2:
+        case GAIA_FOV2_MODE:
 
             return new PerspectiveCamera[] { camera2 };
-        case Gaia_FOV1and2:
+        case GAIA_FOVS_MODE:
             return new PerspectiveCamera[] { camera, camera2 };
         }
     }
@@ -267,9 +267,9 @@ public class FovCamera extends AbstractCamera implements IObserver {
     @Override
     public PerspectiveCamera getCamera() {
         switch (parent.mode) {
-        case Gaia_FOV1:
+        case GAIA_FOV1_MODE:
             return camera;
-        case Gaia_FOV2:
+        case GAIA_FOV2_MODE:
             return camera2;
         default:
             return camera;
@@ -283,14 +283,14 @@ public class FovCamera extends AbstractCamera implements IObserver {
 
     @Override
     public Vector3d getDirection() {
-        int idx = parent.mode.ordinal() - CameraMode.Gaia_FOV1.ordinal();
+        int idx = parent.mode.ordinal() - CameraMode.GAIA_FOV1_MODE.ordinal();
         idx = Math.max(Math.min(idx, 1), 0);
         return directions[idx];
     }
 
     @Override
     public void setDirection(Vector3d dir) {
-        int idx = parent.mode.ordinal() - CameraMode.Gaia_FOV1.ordinal();
+        int idx = parent.mode.ordinal() - CameraMode.GAIA_FOV1_MODE.ordinal();
         idx = Math.max(Math.min(idx, 1), 0);
         directions[idx].set(dir);
     }
@@ -328,10 +328,10 @@ public class FovCamera extends AbstractCamera implements IObserver {
     @Override
     public int getNCameras() {
         switch (parent.mode) {
-        case Gaia_FOV1:
-        case Gaia_FOV2:
+        case GAIA_FOV1_MODE:
+        case GAIA_FOV2_MODE:
             return 1;
-        case Gaia_FOV1and2:
+        case GAIA_FOVS_MODE:
             return 2;
         default:
             return 0;
@@ -356,7 +356,7 @@ public class FovCamera extends AbstractCamera implements IObserver {
     @Override
     public void render(int rw, int rh) {
         // Renders the focal plane CCDs
-        fpstages[parent.mode.ordinal() - CameraMode.Gaia_FOV1.ordinal()].draw();
+        fpstages[parent.mode.ordinal() - CameraMode.GAIA_FOV1_MODE.ordinal()].draw();
     }
 
     @Override
@@ -382,10 +382,10 @@ public class FovCamera extends AbstractCamera implements IObserver {
     @Override
     public boolean isVisible(ITimeFrameProvider time, CelestialBody cb) {
         switch (parent.mode) {
-        case Gaia_FOV1:
-        case Gaia_FOV2:
+        case GAIA_FOV1_MODE:
+        case GAIA_FOV2_MODE:
             return super.isVisible(time, cb);
-        case Gaia_FOV1and2:
+        case GAIA_FOVS_MODE:
             return computeVisibleFovs(cb, this);
         default:
             return false;

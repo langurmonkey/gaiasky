@@ -36,43 +36,47 @@ public class CameraManager implements ICamera, IObserver {
      */
     public enum CameraMode {
         /** Free navigation **/
-        Free_Camera,
-        /** Focus **/
-        Focus,
+        FREE_MODE,
+        /** FOCUS_MODE **/
+        FOCUS_MODE,
+        /** GAME_MODE mode **/
+        GAME_MODE,
         /** Relativistic camera **/
         //Relativistic,
         /** Gaia Scene **/
-        Gaia_Scene,
-        /** Spacecraft **/
-        Spacecraft,
+        GAIA_SCENE_MODE,
+        /** SPACECRAFT_MODE **/
+        SPACECRAFT_MODE,
         /** FOV1 **/
-        Gaia_FOV1,
+        GAIA_FOV1_MODE,
         /** FOV2 **/
-        Gaia_FOV2,
+        GAIA_FOV2_MODE,
         /** Both fields of view **/
-        Gaia_FOV1and2;
+        GAIA_FOVS_MODE;
 
         static TwoWayHashmap<String, CameraMode> equivalences;
 
         static {
-            String fc = "Free camera";
-            String foc = "Focus object";
+            String fc = "Free mode";
+            String foc = "Focus mode";
+            String ga = "Game mode";
             //String rel = "Relativistic camera";
-            String gs = "Gaia scene";
-            String sc = "Spacecraft";
-            String f1 = "Gaia FoV 1";
-            String f2 = "Gaia FoV 2";
-            String f12 = "Gaia FoV1 and FoV2";
+            String gs = "Gaia scene mode";
+            String sc = "Spacecraft mode";
+            String f1 = "Gaia FOV 1 mode";
+            String f2 = "Gaia FOV 2 mode";
+            String f12 = "Gaia FOVs mode";
 
-            equivalences = new TwoWayHashmap<String, CameraMode>();
-            equivalences.add(fc, Free_Camera);
-            equivalences.add(foc, Focus);
+            equivalences = new TwoWayHashmap<>();
+            equivalences.add(fc, FREE_MODE);
+            equivalences.add(foc, FOCUS_MODE);
+            equivalences.add(ga, GAME_MODE);
             //equivalences.add(rel, Relativistic);
-            equivalences.add(gs, Gaia_Scene);
-            equivalences.add(sc, Spacecraft);
-            equivalences.add(f1, Gaia_FOV1);
-            equivalences.add(f2, Gaia_FOV2);
-            equivalences.add(f12, Gaia_FOV1and2);
+            equivalences.add(gs, GAIA_SCENE_MODE);
+            equivalences.add(sc, SPACECRAFT_MODE);
+            equivalences.add(f1, GAIA_FOV1_MODE);
+            equivalences.add(f2, GAIA_FOV2_MODE);
+            equivalences.add(f12, GAIA_FOVS_MODE);
 
         }
 
@@ -94,19 +98,31 @@ public class CameraManager implements ICamera, IObserver {
         }
 
         public boolean isGaiaFov() {
-            return this.equals(CameraMode.Gaia_FOV1) || this.equals(CameraMode.Gaia_FOV2) || this.equals(CameraMode.Gaia_FOV1and2);
+            return this.equals(CameraMode.GAIA_FOV1_MODE) || this.equals(CameraMode.GAIA_FOV2_MODE) || this.equals(CameraMode.GAIA_FOVS_MODE);
         }
 
         public boolean isSpacecraft() {
-            return this.equals(CameraMode.Spacecraft);
+            return this.equals(CameraMode.SPACECRAFT_MODE);
         }
 
         public boolean isFocus() {
-            return this.equals(CameraMode.Focus);
+            return this.equals(CameraMode.FOCUS_MODE);
         }
 
         public boolean isFree() {
-            return this.equals(CameraMode.Free_Camera);
+            return this.equals(CameraMode.FREE_MODE);
+        }
+
+        public boolean isGame() {
+            return this.equals(CameraMode.GAME_MODE);
+        }
+
+        public boolean useFocus(){
+            return isFocus();
+        }
+
+        public boolean useClosest(){
+            return isFree() || isGame();
         }
 
         /**
@@ -122,11 +138,11 @@ public class CameraManager implements ICamera, IObserver {
          */
         public int getGaiaFovMode() {
             switch (this) {
-            case Gaia_FOV1:
+            case GAIA_FOV1_MODE:
                 return 1;
-            case Gaia_FOV2:
+            case GAIA_FOV2_MODE:
                 return 2;
-            case Gaia_FOV1and2:
+            case GAIA_FOVS_MODE:
                 return 3;
             default:
                 return 0;
@@ -199,9 +215,10 @@ public class CameraManager implements ICamera, IObserver {
         AbstractCamera aux = null;
         // Update
         switch (mode) {
-        case Free_Camera:
-        case Focus:
-        case Gaia_Scene:
+        case FREE_MODE:
+        case FOCUS_MODE:
+        case GAME_MODE:
+        case GAIA_SCENE_MODE:
             aux = backupCam(current);
             current = naturalCamera;
             restoreCam(naturalCamera, aux);
@@ -210,14 +227,14 @@ public class CameraManager implements ICamera, IObserver {
         //     aux = backupCam(current);
         //     current = relativisticCamera;
         //     restoreCam(relativisticCamera, aux);
-        case Spacecraft:
+        case SPACECRAFT_MODE:
             aux = backupCam(current);
             current = spacecraftCamera;
             restoreCam(spacecraftCamera, aux);
             break;
-        case Gaia_FOV1:
-        case Gaia_FOV2:
-        case Gaia_FOV1and2:
+        case GAIA_FOV1_MODE:
+        case GAIA_FOV2_MODE:
+        case GAIA_FOVS_MODE:
             current = fovCamera;
             break;
         default:
@@ -355,8 +372,6 @@ public class CameraManager implements ICamera, IObserver {
 
         }
     }
-
-    int pxRendererBackup = -1;
 
     /**
      * Sets the new camera mode and updates the frustum

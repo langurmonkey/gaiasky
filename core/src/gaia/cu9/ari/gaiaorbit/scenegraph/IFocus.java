@@ -206,6 +206,25 @@ public interface IFocus {
     double getHeight(Vector3d camPos);
 
     /**
+     * Same as {@link #getHeight(Vector3d)} but with the option to use the
+     * future position of the body instead of the current one.
+     * @param camPos The camera position
+     * @param useFuturePosition Whether to use the future position or the current one
+     * @return The height of the projected position of the current camera on the surface
+     */
+    double getHeight(Vector3d camPos, boolean useFuturePosition);
+
+    /**
+     * Same as {@link #getHeight(Vector3d)} but with the option to use the
+     * given future position of the body instead of the current one.
+     * @param camPos The camera position
+     * @param nextPos The future position of this body to use
+     * @return The height of the projected position of the current camera on the surface
+     */
+    double getHeight(Vector3d camPos, Vector3d nextPos);
+
+
+    /**
      * Returns the height scale of this focus, or 0 if it has no height info
      * @return The height scale in internal units
      */

@@ -295,6 +295,14 @@ public abstract class AbstractPositionEntity extends SceneGraphNode {
         return getRadius();
     }
 
+    public double getHeight(Vector3d camPos, boolean useFuturePosition) {
+        return getRadius();
+    }
+
+    public double getHeight(Vector3d camPos, Vector3d nextPos) {
+        return getRadius();
+    }
+
     public double getHeightScale() {
         return 0;
     }

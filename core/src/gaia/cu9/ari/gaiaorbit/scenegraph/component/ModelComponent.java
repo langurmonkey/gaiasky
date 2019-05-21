@@ -70,7 +70,7 @@ public class ModelComponent implements Disposable, IObserver {
     public IntModelInstance instance;
     public Environment env;
     /** Directional light **/
-    public DirectionalLight dlight;
+    public DirectionalLight dLight;
 
     public Map<String, Object> params;
 
@@ -102,9 +102,9 @@ public class ModelComponent implements Disposable, IObserver {
             env = new Environment();
             env.set(ambient);
             // Direction from Sun to Earth
-            dlight = new DirectionalLight();
-            dlight.color.set(1f, 0f, 0f, 1f);
-            env.add(dlight);
+            dLight = new DirectionalLight();
+            dLight.color.set(1f, 0f, 0f, 1f);
+            env.add(dLight);
         }
     }
 
@@ -144,7 +144,7 @@ public class ModelComponent implements Disposable, IObserver {
 
         if (staticLight) {
             // Remove dir and global ambient. Add ambient
-            //env.remove(dlight);
+            //env.remove(dLight);
             // Ambient
 
             // If lazy texture init, we turn off the lights until the texture is loaded
@@ -260,7 +260,7 @@ public class ModelComponent implements Disposable, IObserver {
 
         if (localTransform != null && GlobalConf.scene.LAZY_MESH_INIT && !modelInitialised) {
             if (!modelLoading) {
-                logger.info(I18n.bundle.format("notif.loading", modelFile));
+                logger.info(I18n.txt("notif.loading", modelFile));
                 AssetBean.addAsset(GlobalConf.data.dataFile(modelFile), IntModel.class);
                 modelLoading = true;
             } else if (manager.isLoaded(GlobalConf.data.dataFile(modelFile))) {

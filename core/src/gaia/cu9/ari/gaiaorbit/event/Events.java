@@ -145,7 +145,7 @@ public enum Events {
     CAMERA_CENTER,
 
     /**
-     * Focus change command.
+     * FOCUS_MODE change command.
      * <ul>
      * <li>[0] - The new focus object OR its name.</li>
      * </ul>
@@ -1122,11 +1122,6 @@ public enum Events {
      * Toggle mouse capture
      */
     MOUSE_CAPTURE_TOGGLE,
-
-    /**
-     * Toggles game-type controls (WASD+Mouse)
-     */
-    GAME_MODE_TOGGLE,
 
     /**
      * Dispose all resources, app is shutting down

@@ -228,7 +228,7 @@ public class NotificationsInterface extends Table implements IObserver, IGuiInte
                 break;
             case CAMERA_MODE_CMD:
                 CameraMode cm = (CameraMode) data[0];
-                if (cm != CameraMode.Focus)
+                if (cm != CameraMode.FOCUS_MODE)
                     addMessage(I18n.bundle.format("notif.cameramode.change", (CameraMode) data[0]));
                 break;
             case PACE_CHANGED_INFO:

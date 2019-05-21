@@ -12,14 +12,13 @@ import com.badlogic.gdx.backends.lwjgl3.Lwjgl3Graphics;
 import gaia.cu9.ari.gaiaorbit.event.EventManager;
 import gaia.cu9.ari.gaiaorbit.event.Events;
 import gaia.cu9.ari.gaiaorbit.event.IObserver;
-import gaia.cu9.ari.gaiaorbit.scenegraph.camera.CameraManager;
 import gaia.cu9.ari.gaiaorbit.scenegraph.camera.NaturalCamera;
 import gaia.cu9.ari.gaiaorbit.util.Logger;
 import gaia.cu9.ari.gaiaorbit.util.Logger.Log;
 import org.lwjgl.glfw.GLFW;
 
-public class GameInputListener extends MouseKbdListener implements IObserver {
-    private static Log logger = Logger.getLogger(GameInputListener.class);
+public class GameMouseKbdListener extends MouseKbdListener implements IObserver {
+    private static Log logger = Logger.getLogger(GameMouseKbdListener.class);
 
     private int prevX = Integer.MIN_VALUE, prevY = Integer.MIN_VALUE;
     private float dx = 0, dy = 0;
@@ -29,12 +28,12 @@ public class GameInputListener extends MouseKbdListener implements IObserver {
         }
     }
 
-    public GameInputListener(GameGestureListener l, NaturalCamera naturalCamera) {
+    public GameMouseKbdListener(GameGestureListener l, NaturalCamera naturalCamera) {
         super(l, naturalCamera);
         EventManager.instance.subscribe(this, Events.MOUSE_CAPTURE_CMD, Events.MOUSE_CAPTURE_TOGGLE);
     }
 
-    public GameInputListener(NaturalCamera naturalCamera) {
+    public GameMouseKbdListener(NaturalCamera naturalCamera) {
         this(new GameGestureListener(), naturalCamera);
     }
 
@@ -61,6 +60,12 @@ public class GameInputListener extends MouseKbdListener implements IObserver {
         if (isKeyPressed(Keys.E)) {
             camera.addRoll(-0.8f * keySensitivity, true);
         }
+        if(isKeyPressed(Keys.SPACE)) {
+            camera.vertical(0.1f * keySensitivity);
+        }
+        if(isKeyPressed(Keys.C)) {
+            camera.vertical(-0.1f * keySensitivity);
+        }
     }
 
     @Override
@@ -70,17 +75,18 @@ public class GameInputListener extends MouseKbdListener implements IObserver {
 
     @Override
     public void activate() {
-        EventManager.instance.post(Events.CAMERA_MODE_CMD, CameraManager.CameraMode.Free_Camera);
-
         camera.setDiverted(true);
         // Capture mouse
         setMouseCapture(true);
 
-        String title = "Game mode activated!";
+        String title = "GAME_MODE mode activated!";
         String[] msgs = new String[]{
-                "<WASD>  move",
+                "<W,A,S,D>  move",
+                "<Q,E>  roll",
+                "<SPACE,C>  up and down",
                 "<Mouse>  look around",
-                "<ALT+G>  go back to normal mode"
+                "<SHIFT+CTRL+L>  toggle capture mouse",
+                "<1>  go back to normal mode"
         };
         EventManager.instance.post(Events.SCREEN_NOTIFICATION_CMD, title, msgs, 10f);
 

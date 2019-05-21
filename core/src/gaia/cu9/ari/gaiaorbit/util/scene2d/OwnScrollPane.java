@@ -49,7 +49,7 @@ public class OwnScrollPane extends ScrollPane {
             }
         }
 
-        // Focus listener
+        // FOCUS_MODE listener
         addListener((e) -> {
             if (e instanceof InputEvent) {
                 InputEvent ie = (InputEvent) e;

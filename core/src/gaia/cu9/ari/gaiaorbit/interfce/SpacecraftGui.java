@@ -244,7 +244,7 @@ public class SpacecraftGui extends AbstractGui {
             @Override
             public boolean handle(Event event) {
                 if (event instanceof ChangeEvent) {
-                    EventManager.instance.post(Events.CAMERA_MODE_CMD, CameraMode.Focus);
+                    EventManager.instance.post(Events.CAMERA_MODE_CMD, CameraMode.FOCUS_MODE);
                     return true;
                 }
                 return false;

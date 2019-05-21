@@ -114,16 +114,16 @@ public abstract class ModelBody extends CelestialBody {
         super.updateLocal(time, camera);
         // Update light with global position
         if (mc != null) {
-            translation.put(mc.dlight.direction);
+            translation.put(mc.dLight.direction);
             IStarFocus sf = camera.getClosestStar();
             if (sf != null) {
                 float[] col = sf.getClosestCol();
-                mc.dlight.direction.sub(sf.getClosestPos(aux3d1.get()).put(aux3f1.get()));
-                mc.dlight.color.set(col[0], col[1], col[2], 1.0f);
+                mc.dLight.direction.sub(sf.getClosestPos(aux3d1.get()).put(aux3f1.get()));
+                mc.dLight.color.set(col[0], col[1], col[2], 1.0f);
             } else {
                 Vector3d campos = camera.getPos();
-                mc.dlight.direction.add((float) campos.x, (float) campos.y, (float) campos.z);
-                mc.dlight.color.set(1f, 1f, 1f, 1f);
+                mc.dLight.direction.add((float) campos.x, (float) campos.y, (float) campos.z);
+                mc.dLight.color.set(1f, 1f, 1f, 1f);
             }
         }
         updateLocalTransform();
@@ -361,59 +361,77 @@ public abstract class ModelBody extends CelestialBody {
 
     @Override
     public double getHeight(Vector3d camPos) {
+        return getHeight(camPos, false);
+    }
+
+    @Override
+    public double getHeight(Vector3d camPos, boolean useFuturePosition) {
+        if(useFuturePosition){
+            Vector3d nextPos = getPredictedPosition(aux3d1.get(), GaiaSky.instance.time, GaiaSky.instance.getICamera(), false);
+            return getHeight(camPos, nextPos);
+        }else{
+            return getHeight(camPos, null);
+        }
+
+    }
+
+    @Override
+    public double getHeight(Vector3d camPos, Vector3d nextPos) {
         double height = 0;
-        // Only when we have height map and we are below the highest point in the surface
-        if (mc != null && mc.tc != null && mc.tc.heightMap != null && distToCamera < getRadius() + mc.tc.heightScale * 12) {
-            float[][] m = mc.tc.heightMap;
-            int W = mc.tc.heightMap.length;
-            int H = mc.tc.heightMap[0].length;
-            // Object-camera normalised vector
-            Vector3d cart = getAbsolutePosition(aux3d1.get()).scl(-1).add(camPos).nor();
+        if(mc != null && mc.tc != null && mc.tc.heightMap != null) {
+            double dCam;
+            Vector3d cart = aux3d1.get();
+            if (nextPos != null) {
+                cart.set(nextPos);
+                getPredictedPosition(cart, GaiaSky.instance.time, GaiaSky.instance.getICamera(), false);
+                dCam = aux3d2.get().set(camPos).sub(cart).len();
+            } else {
+                getAbsolutePosition(cart);
+                dCam = distToCamera;
+            }
+            // Only when we have height map and we are below the highest point in the surface
+            if (dCam < getRadius() + mc.tc.heightScale * 12) {
+                float[][] m = mc.tc.heightMap;
+                int W = mc.tc.heightMap.length;
+                int H = mc.tc.heightMap[0].length;
 
+                // Object-camera normalised vector
+                cart.scl(-1).add(camPos).nor();
 
-            setToLocalTransform(1, mataux, false);
-            mataux.inv();
-            matauxd.set(mataux.getValues());
-            cart.mul(matauxd);
+                setToLocalTransform(1, mataux, false);
+                mataux.inv();
+                matauxd.set(mataux.getValues());
+                cart.mul(matauxd);
 
-            //mataux.set(orientation);
-            //cart.traMul(mataux);
+                Vector3d sph = aux3d2.get();
+                Coordinates.cartesianToSpherical(cart, sph);
 
-            Vector3d sph = aux3d2.get();
-            Coordinates.cartesianToSpherical(cart, sph);
+                double u = (((sph.x * Nature.TO_DEG) + 270.0) % 360.0) / 360.0;
+                double v = 1d - (sph.y * Nature.TO_DEG + 90.0) / 180.0;
 
-            double u = (((sph.x * Nature.TO_DEG) + 270.0) % 360.0) / 360.0;
-            double v = 1d - (sph.y * Nature.TO_DEG + 90.0) / 180.0;
+                // Bilinear interpolation
+                int i1 = (int) (W * u);
+                int i2 = (i1 + 1) % W;
+                int j1 = (int) (H * v);
+                int j2 = (j1 + 1) % H;
 
-            double U = Math.floor(W * u);
-            double V = Math.floor(H * v);
+                double dx = 1.0 / W;
+                double dy = 1.0 / H;
+                double x1 = (double) i1 / (double) W;
+                double x2 = (x1 + dx) % 1.0;
+                double y1 = (double) j1 / (double) H;
+                double y2 = (y1 + dy) % 1.0;
+                double x = u;
+                double y = v;
 
-            // Bilinear interpolation
-            int i1 = (int)(W * u);
-            int i2 = (i1 + 1) % W;
-            int j1 = (int)(H * v);
-            int j2 = (j1 + 1) % H;
+                double f11 = m[i1][j1];
+                double f21 = m[i2][j1];
+                double f12 = m[i1][j2];
+                double f22 = m[i2][j2];
 
-            double dx = 1.0 / W;
-            double dy = 1.0 / H;
-            double x1 = (double) i1 / (double) W;
-            double x2 = (x1 + dx) % 1.0;
-            double y1 = (double) j1 / (double) H;
-            double y2 = (y1 + dy) % 1.0;
-            double x = u;
-            double y = v;
-
-
-            double f11 = m[i1][j1];
-            double f21 = m[i2][j1];
-            double f12 = m[i1][j2];
-            double f22 = m[i2][j2];
-
-            double denom = (x2 - x1) * (y2 - y1);
-            height = (((x2 - x) * (y2 - y)) / denom) * f11 +
-                    ((x-x1)*(y2-y)/denom) * f21 +
-                    ((x2-x)*(y-y1)/denom) * f12 +
-                    ((x-x1)*(y-y1)/denom) * f22;
+                double denom = (x2 - x1) * (y2 - y1);
+                height = (((x2 - x) * (y2 - y)) / denom) * f11 + ((x - x1) * (y2 - y) / denom) * f21 + ((x2 - x) * (y - y1) / denom) * f12 + ((x - x1) * (y - y1) / denom) * f22;
+            }
         }
         return getRadius() + height;
     }

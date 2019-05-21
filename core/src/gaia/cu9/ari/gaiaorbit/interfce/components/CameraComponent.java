@@ -74,7 +74,7 @@ public class CameraComponent extends GuiComponent implements IObserver {
                     mode = CameraMode.fromString(selection);
                 } catch (IllegalArgumentException e) {
                     // Foucs to one of our models
-                    mode = CameraMode.Focus;
+                    mode = CameraMode.FOCUS_MODE;
                     EventManager.instance.post(Events.FOCUS_CHANGE_CMD, selection, true);
                 }
 
@@ -226,7 +226,7 @@ public class CameraComponent extends GuiComponent implements IObserver {
 
         turn = new OwnLabel(Integer.toString((int) MathUtilsd.lint(GlobalConf.scene.TURNING_SPEED, Constants.MIN_TURN_SPEED, Constants.MAX_TURN_SPEED, Constants.MIN_SLIDER, Constants.MAX_SLIDER)), skin, "default");
 
-        /** Focus lock **/
+        /** FOCUS_MODE lock **/
         focusLock = new CheckBox(" " + I18n.txt("gui.camera.lock"), skin);
         focusLock.setName("focus lock");
         focusLock.setChecked(GlobalConf.scene.FOCUS_LOCK);
@@ -239,7 +239,7 @@ public class CameraComponent extends GuiComponent implements IObserver {
             return false;
         });
 
-        /** Focus orientation lock **/
+        /** FOCUS_MODE orientation lock **/
         orientationLock = new CheckBox(" " + I18n.txt("gui.camera.lock.orientation"), skin);
         orientationLock.setName("orientation lock");
         orientationLock.setChecked(GlobalConf.scene.FOCUS_LOCK_ORIENTATION);

@@ -266,7 +266,7 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
         Timer.instance();
 
         // Initialise Cameras
-        cam = new CameraManager(manager, CameraMode.Focus);
+        cam = new CameraManager(manager, CameraMode.FOCUS_MODE);
 
         // Set asset manager to asset bean
         AssetBean.setAssetManager(manager);
@@ -450,12 +450,12 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
     private void goHome() {
         if (sg.containsNode("Earth") && !GlobalConf.program.NET_SLAVE && isOn(ComponentType.Planets.ordinal())) {
             // Set focus to Earth
-            EventManager.instance.post(Events.CAMERA_MODE_CMD, CameraMode.Focus);
+            EventManager.instance.post(Events.CAMERA_MODE_CMD, CameraMode.FOCUS_MODE);
             EventManager.instance.post(Events.FOCUS_CHANGE_CMD, sg.getNode("Earth"), true);
             EventManager.instance.post(Events.GO_TO_OBJECT_CMD);
         } else {
             // At 5 AU in Y looking towards origin (top-down look)
-            EventManager.instance.post(Events.CAMERA_MODE_CMD, CameraMode.Free_Camera);
+            EventManager.instance.post(Events.CAMERA_MODE_CMD, CameraMode.FREE_MODE);
             EventManager.instance.post(Events.CAMERA_POS_CMD, (Object) new double[] { 0, 5 * Constants.AU_TO_U, 0 });
             EventManager.instance.post(Events.CAMERA_DIR_CMD, (Object) new double[] { 0, -1, 0 });
             EventManager.instance.post(Events.CAMERA_UP_CMD, (Object) new double[] { 0, 0, 1 });
@@ -849,7 +849,7 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
             CameraMode mode = (CameraMode) data[0];
             if (GlobalConf.program.isStereoHalfViewport()) {
                 GuiRegistry.change(stereoGui);
-            } else if (mode == CameraMode.Spacecraft) {
+            } else if (mode == CameraMode.SPACECRAFT_MODE) {
                 GuiRegistry.change(spacecraftGui);
             } else {
                 GuiRegistry.change(mainGui);

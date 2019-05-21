@@ -77,7 +77,7 @@ public class FocusInfoInterface extends Table implements IObserver, IGuiInterfac
         rulerInfo = new Table();
         rulerInfo.pad(pad5);
 
-        // Focus
+        // FOCUS_MODE
         focusName = new OwnLabel("", skin, "hud-header");
         focusType = new OwnLabel("", skin, "hud-subheader");
         focusId = new OwnLabel("", skin, "hud");
@@ -426,7 +426,7 @@ public class FocusInfoInterface extends Table implements IObserver, IGuiInterfac
         case CAMERA_MODE_CMD:
             // Update camera mode selection
             CameraMode mode = (CameraMode) data[0];
-            if (mode.equals(CameraMode.Focus)) {
+            if (mode.equals(CameraMode.FOCUS_MODE)) {
                 displayInfo(focusInfoCell, focusInfo);
             } else {
                 hideInfo(focusInfoCell);

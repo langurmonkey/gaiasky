@@ -33,7 +33,7 @@ import java.util.Iterator;
  *
  * @author tsagrista
  */
-public class NaturalInputListener extends MouseKbdListener implements IObserver {
+public class NaturalMouseKbdListener extends MouseKbdListener implements IObserver {
 
     /**
      * The button for rotating the camera either around its center or around the
@@ -53,7 +53,7 @@ public class NaturalInputListener extends MouseKbdListener implements IObserver 
     public float scrollFactor = -0.1f;
     /** The key for rolling the camera **/
     public int rollKey = Keys.SHIFT_LEFT;
-    /** Focus comparator **/
+    /** FOCUS_MODE comparator **/
     private Comparator<IFocus> comp;
 
     /** The current (first) button being pressed. */
@@ -86,7 +86,7 @@ public class NaturalInputListener extends MouseKbdListener implements IObserver 
     private boolean keyframeBeingDragged = false;
 
     protected static class GaiaGestureListener extends GestureAdapter {
-        public NaturalInputListener inputListener;
+        public NaturalMouseKbdListener inputListener;
         private float previousZoom;
 
         @Override
@@ -134,7 +134,7 @@ public class NaturalInputListener extends MouseKbdListener implements IObserver 
 
     public final GaiaGestureListener gestureListener;
 
-    protected NaturalInputListener(final GaiaGestureListener gestureListener, NaturalCamera camera) {
+    protected NaturalMouseKbdListener(final GaiaGestureListener gestureListener, NaturalCamera camera) {
         super(gestureListener, camera);
         this.gestureListener = gestureListener;
         this.gestureListener.inputListener = this;
@@ -153,7 +153,7 @@ public class NaturalInputListener extends MouseKbdListener implements IObserver 
         this.lastDrag = new Vector2();
     }
 
-    public NaturalInputListener(final NaturalCamera camera) {
+    public NaturalMouseKbdListener(final NaturalCamera camera) {
         this(new GaiaGestureListener(), camera);
         EventManager.instance.subscribe(this, Events.TOUCH_DOWN, Events.TOUCH_UP, Events.TOUCH_DRAGGED, Events.SCROLLED, Events.KEY_DOWN, Events.KEY_UP);
     }
@@ -241,9 +241,9 @@ public class NaturalInputListener extends MouseKbdListener implements IObserver 
                     IFocus hit;
                     keyframeBeingDragged = ((hit = getKeyframeCollision(screenX, screenY)) != null);
                     if(keyframeBeingDragged){
-                        // Focus, do not center
+                        // FOCUS_MODE, do not center
                         EventManager.instance.post(Events.FOCUS_CHANGE_CMD, hit, false);
-                        EventManager.instance.post(Events.CAMERA_MODE_CMD, CameraMode.Focus, false);
+                        EventManager.instance.post(Events.CAMERA_MODE_CMD, CameraMode.FOCUS_MODE, false);
                     }
                 }
             }
@@ -276,7 +276,7 @@ public class NaturalInputListener extends MouseKbdListener implements IObserver 
                             IFocus hit = getBestHit(screenX, screenY);
                             if (hit != null) {
                                 EventManager.instance.post(Events.FOCUS_CHANGE_CMD, hit);
-                                EventManager.instance.post(Events.CAMERA_MODE_CMD, CameraMode.Focus);
+                                EventManager.instance.post(Events.CAMERA_MODE_CMD, CameraMode.FOCUS_MODE);
                             }
                         }
                     }
@@ -288,7 +288,7 @@ public class NaturalInputListener extends MouseKbdListener implements IObserver 
                 if (keyframeBeingDragged) {
                     keyframeBeingDragged = false;
                 } else if (gesture.dst(screenX, screenY) < MOVE_PX_DIST &&  getKeyframesPathObject() != null && getKeyframesPathObject().isSelected() && !anyPressed(Keys.CONTROL_LEFT, Keys.SHIFT_LEFT, Keys.ALT_LEFT)) {
-                    EventManager.instance.post(Events.CAMERA_MODE_CMD, CameraMode.Free_Camera);
+                    EventManager.instance.post(Events.CAMERA_MODE_CMD, CameraMode.FREE_MODE);
                     getKeyframesPathObject().unselect();
                 } else {
                     // Ensure Octants observed property is computed

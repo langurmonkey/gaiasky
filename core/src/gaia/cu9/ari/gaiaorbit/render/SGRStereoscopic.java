@@ -83,7 +83,7 @@ public class SGRStereoscopic extends SGRAbstract implements ISGR, IObserver {
 
     @Override
     public void render(SceneGraphRenderer sgr, ICamera camera, double t, int rw, int rh, FrameBuffer fb, PostProcessBean ppb) {
-        boolean movecam = camera.getMode() == CameraMode.Free_Camera || camera.getMode() == CameraMode.Focus || camera.getMode() == CameraMode.Spacecraft;
+        boolean movecam = camera.getMode() == CameraMode.FREE_MODE || camera.getMode() == CameraMode.FOCUS_MODE || camera.getMode() == CameraMode.SPACECRAFT_MODE;
 
         PerspectiveCamera cam = camera.getCamera();
         // Vector of 1 meter length pointing to the side of the camera
@@ -92,7 +92,7 @@ public class SGRStereoscopic extends SGRAbstract implements ISGR, IObserver {
         double dirangleDeg = 0;
 
         IFocus currentFocus = null;
-        if (camera.getMode() == CameraMode.Focus) {
+        if (camera.getMode() == CameraMode.FOCUS_MODE) {
             currentFocus = camera.getFocus();
         } else if (camera.getCurrent().getClosest() != null) {
             currentFocus = camera.getCurrent().getClosest();
@@ -101,7 +101,7 @@ public class SGRStereoscopic extends SGRAbstract implements ISGR, IObserver {
             // If we have focus, we adapt the eye separation
             double distToFocus = currentFocus.getDistToCamera() - currentFocus.getRadius();
             // Lets calculate the separation
-            if (camera.getMode() == CameraMode.Spacecraft) {
+            if (camera.getMode() == CameraMode.SPACECRAFT_MODE) {
                 // In spacecraft mode, the separation is extremely small, otherwise we see no spacecraft
                 separation = (5000 * Constants.M_TO_U);
             } else {

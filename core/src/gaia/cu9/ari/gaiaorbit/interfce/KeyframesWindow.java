@@ -750,7 +750,7 @@ public class KeyframesWindow extends GenericDialog implements IObserver {
         goTo.addListener((event) -> {
             if (event instanceof ChangeListener.ChangeEvent) {
                 // Go to keyframe
-                EventManager.instance.post(Events.CAMERA_MODE_CMD, CameraManager.CameraMode.Free_Camera);
+                EventManager.instance.post(Events.CAMERA_MODE_CMD, CameraManager.CameraMode.FREE_MODE);
                 Gdx.app.postRunnable(() -> {
                     EventManager.instance.post(Events.CAMERA_POS_CMD, kf.pos.values());
                     EventManager.instance.post(Events.CAMERA_DIR_CMD, kf.dir.values());

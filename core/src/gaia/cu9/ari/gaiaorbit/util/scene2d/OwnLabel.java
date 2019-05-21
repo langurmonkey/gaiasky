@@ -42,7 +42,7 @@ public class OwnLabel extends Label implements Disableable {
     }
 
     public void receiveScrollEvents(){
-            // Focus listener
+            // FOCUS_MODE listener
             addListener((e) -> {
                 if (e instanceof InputEvent) {
                     InputEvent ie = (InputEvent) e;

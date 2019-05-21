@@ -66,7 +66,7 @@ public class GaiaSkyContextMenu extends ContextMenu {
             MenuItem select = new MenuItem(I18n.txt("context.select", cname), skin, "default");
             select.addListener(event -> {
                 if (event instanceof ChangeEvent) {
-                    EventManager.instance.post(Events.CAMERA_MODE_CMD, CameraMode.Focus);
+                    EventManager.instance.post(Events.CAMERA_MODE_CMD, CameraMode.FOCUS_MODE);
                     EventManager.instance.post(Events.FOCUS_CHANGE_CMD, candidate);
                 }
                 return false;

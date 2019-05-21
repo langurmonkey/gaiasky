@@ -76,7 +76,7 @@ public class ObjectsComponent extends GuiComponent implements IObserver {
                             IFocus focus = (IFocus) node;
                             if (!focus.isCoordinatesTimeOverflow()) {
                                 Gdx.app.postRunnable(() -> {
-                                    EventManager.instance.post(Events.CAMERA_MODE_CMD, CameraMode.Focus, true);
+                                    EventManager.instance.post(Events.CAMERA_MODE_CMD, CameraMode.FOCUS_MODE, true);
                                     EventManager.instance.post(Events.FOCUS_CHANGE_CMD, focus, true);
                                 });
                             }
@@ -130,7 +130,7 @@ public class ObjectsComponent extends GuiComponent implements IObserver {
                                 IFocus focus = (IFocus) node;
                                 if (!focus.isCoordinatesTimeOverflow()) {
                                     Gdx.app.postRunnable(() -> {
-                                        EventManager.instance.post(Events.CAMERA_MODE_CMD, CameraMode.Focus, true);
+                                        EventManager.instance.post(Events.CAMERA_MODE_CMD, CameraMode.FOCUS_MODE, true);
                                         EventManager.instance.post(Events.FOCUS_CHANGE_CMD, focus, true);
                                     });
                                 }
@@ -181,7 +181,7 @@ public class ObjectsComponent extends GuiComponent implements IObserver {
                             IFocus focus = (IFocus) node;
                             if (!focus.isCoordinatesTimeOverflow()) {
                                 Gdx.app.postRunnable(() -> {
-                                    EventManager.instance.post(Events.CAMERA_MODE_CMD, CameraMode.Focus, true);
+                                    EventManager.instance.post(Events.CAMERA_MODE_CMD, CameraMode.FOCUS_MODE, true);
                                     EventManager.instance.post(Events.FOCUS_CHANGE_CMD, focus, true);
                                 });
                             }

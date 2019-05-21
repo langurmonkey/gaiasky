@@ -798,7 +798,7 @@ public class SceneGraphRenderer extends AbstractRenderer implements IProcessRend
             // Yes!
             candidate.shadow = shadowNRender;
 
-            Vector3 camDir = aux1.set(candidate.mc.dlight.direction);
+            Vector3 camDir = aux1.set(candidate.mc.dLight.direction);
             // Direction is that of the light
             cameraLight.direction.set(camDir);
 
@@ -854,12 +854,12 @@ public class SceneGraphRenderer extends AbstractRenderer implements IProcessRend
             if (candidate.distToCamera < radius * 1.1) {
                 candidate.shadow = shadowNRender;
 
-                Vector3 shadowCameraDir = aux1.set(candidate.mc.dlight.direction);
+                Vector3 shadowCameraDir = aux1.set(candidate.mc.dLight.direction);
 
                 // Shadow camera direction is that of the light
                 cameraLight.direction.set(shadowCameraDir);
 
-                Vector3 shadowCamDir = aux1.set(candidate.mc.dlight.direction);
+                Vector3 shadowCamDir = aux1.set(candidate.mc.dLight.direction);
                 // Direction is that of the light
                 cameraLight.direction.set(shadowCamDir);
 

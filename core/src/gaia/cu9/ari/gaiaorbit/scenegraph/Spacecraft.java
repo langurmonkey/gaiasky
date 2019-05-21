@@ -163,7 +163,7 @@ public class Spacecraft extends GenericSpacecraft implements ILineRenderable, IO
         switch (event) {
         case CAMERA_MODE_CMD:
             CameraMode mode = (CameraMode) data[0];
-            if (mode == CameraMode.Spacecraft) {
+            if (mode == CameraMode.SPACECRAFT_MODE) {
                 render = true;
             } else {
                 render = false;
@@ -567,7 +567,7 @@ public class Spacecraft extends GenericSpacecraft implements ILineRenderable, IO
         super.dispose();
     }
 
-    /** Model rendering. Spacecraft in spacecraft mode is not affected by the relativistic aberration **/
+    /** Model rendering. SPACECRAFT_MODE in spacecraft mode is not affected by the relativistic aberration **/
     @Override
     public void render(IntModelBatch modelBatch, float alpha, double t) {
         render(modelBatch,alpha, t, true);
@@ -581,7 +581,7 @@ public class Spacecraft extends GenericSpacecraft implements ILineRenderable, IO
         mc.touch();
         mc.setTransparency(alpha * fadeOpacity);
         if (cam.getMode().isSpacecraft())
-            // In Spacecraft mode, we are not affected by relativistic aberration or Doppler shift
+            // In SPACECRAFT_MODE mode, we are not affected by relativistic aberration or Doppler shift
             mc.updateRelativisticEffects(cam, 0);
         else
             mc.updateRelativisticEffects(cam);

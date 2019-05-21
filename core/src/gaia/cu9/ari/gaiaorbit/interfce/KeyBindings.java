@@ -8,6 +8,8 @@ package gaia.cu9.ari.gaiaorbit.interfce;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.backends.lwjgl3.Lwjgl3Graphics;
+import com.badlogic.gdx.utils.Array;
+import gaia.cu9.ari.gaiaorbit.GaiaSky;
 import gaia.cu9.ari.gaiaorbit.event.EventManager;
 import gaia.cu9.ari.gaiaorbit.event.Events;
 import gaia.cu9.ari.gaiaorbit.scenegraph.camera.CameraManager.CameraMode;
@@ -29,6 +31,7 @@ import java.util.*;
  */
 public class KeyBindings {
     private Map<TreeSet<Integer>, ProgramAction> mappings;
+    private Map<ProgramAction, Array<TreeSet<Integer>>> mappingsInv;
 
     public static KeyBindings instance;
 
@@ -50,6 +53,7 @@ public class KeyBindings {
      */
     private KeyBindings() {
         mappings = new HashMap<>();
+        mappingsInv = new TreeMap<>();
         // Init special keys
         SPECIAL1 = Keys.CONTROL_LEFT;
         SPECIAL2 = Keys.SHIFT_LEFT;
@@ -62,8 +66,16 @@ public class KeyBindings {
         return mappings;
     }
 
-    Map<TreeSet<Integer>, ProgramAction> getSortedMappings() {
+    public Map<ProgramAction, Array<TreeSet<Integer>>> getMappingsInv(){
+        return mappingsInv;
+    }
+
+    public Map<TreeSet<Integer>, ProgramAction> getSortedMappings() {
         return GlobalResources.sortByValue(mappings);
+    }
+
+    public Map<ProgramAction, Array<TreeSet<Integer>>> getSortedMappingsInv(){
+        return mappingsInv;
     }
 
     private void addMapping(ProgramAction action, int... keyCodes) {
@@ -72,6 +84,14 @@ public class KeyBindings {
             keys.add(key);
         }
         mappings.put(keys, action);
+
+        if(mappingsInv.containsKey(action)){
+            mappingsInv.get(action).add(keys);
+        } else {
+            Array<TreeSet<Integer>> a = new Array<>();
+            a.add(keys);
+            mappingsInv.put(action, a);
+        }
     }
 
     /**
@@ -80,7 +100,7 @@ public class KeyBindings {
      * @return The action if it exists
      */
     public ProgramAction findAction(String name){
-        Collection<ProgramAction> actions = mappings.values();
+        Set<ProgramAction> actions = mappingsInv.keySet();
         for(ProgramAction action : actions){
             if(action.actionName.equals(name))
                 return action;
@@ -151,15 +171,15 @@ public class KeyBindings {
         addMapping(new ProgramAction(I18n.txt("action.exit"), runnableQuit), Keys.ESCAPE);
 
         // CTRL+Q -> Exit
-        addMapping(new ProgramAction(I18n.txt("action.exit"), runnableQuit), SPECIAL1, Keys.Q);
+        //addMapping(new ProgramAction(I18n.txt("action.exit"), runnableQuit), SPECIAL1, Keys.Q);
 
-        // p -> Show preferences dialog
+        // P -> Show preferences dialog
         addMapping(new ProgramAction(I18n.txt("action.preferences"), () ->
                 EventManager.instance.post(Events.SHOW_PREFERENCES_ACTION)), Keys.P);
 
         // c -> Show play camera dialog
-        addMapping(new ProgramAction(I18n.txt("action.playcamera"), () ->
-                EventManager.instance.post(Events.SHOW_PLAYCAMERA_ACTION), fullGuiCondition), Keys.C);
+        //addMapping(new ProgramAction(I18n.txt("action.playcamera"), () ->
+        //        EventManager.instance.post(Events.SHOW_PLAYCAMERA_ACTION), fullGuiCondition), Keys.C);
 
         // SHIFT+O -> Toggle orbits
         addMapping(new ProgramAction(I18n.txt("action.toggle", I18n.txt("element.orbits")), () ->
@@ -209,11 +229,11 @@ public class KeyBindings {
         addMapping(new ProgramAction(I18n.txt("action.toggle", I18n.txt("element.galactic")), () ->
                 EventManager.instance.post(Events.TOGGLE_VISIBILITY_CMD, "element.galactic", false)), SPECIAL2, Keys.G);
 
-        //SHIFT+H -> Toggle meshes
+        // SHIFT+H -> Toggle meshes
         addMapping(new ProgramAction(I18n.txt("action.toggle", I18n.txt("element.meshes")), () ->
                 EventManager.instance.post(Events.TOGGLE_VISIBILITY_CMD, "element.meshes", false)), SPECIAL2, Keys.H);
 
-        //SHIFT+V -> Toggle clusters
+        // SHIFT+V -> Toggle clusters
         addMapping(new ProgramAction(I18n.txt("action.toggle", I18n.txt("element.clusters")), () ->
                 EventManager.instance.post(Events.TOGGLE_VISIBILITY_CMD, "element.clusters", false)), SPECIAL2, Keys.V);
 
@@ -226,8 +246,11 @@ public class KeyBindings {
                 EventManager.instance.post(Events.TIME_WARP_INCREASE_CMD)), Keys.PERIOD);
 
         // SPACE -> toggle time
-        addMapping(new ProgramAction(I18n.txt("action.pauseresume"), () ->
-                EventManager.instance.post(Events.TOGGLE_TIME_CMD, null, false)), Keys.SPACE);
+        addMapping(new ProgramAction(I18n.txt("action.pauseresume"), () -> {
+                // Game mode has space bound to 'up'
+                if(!GaiaSky.instance.cam.mode.isGame())
+                    EventManager.instance.post(Events.TOGGLE_TIME_CMD, null, false);
+        }), Keys.SPACE);
 
         // Plus -> increase limit magnitude
         addMapping(new ProgramAction(I18n.txt("action.incmag"), () ->
@@ -295,7 +318,7 @@ public class KeyBindings {
             int m = i - 7;
             final CameraMode mode = CameraMode.getMode(m);
             if (mode != null) {
-                addMapping(new ProgramAction(mode.name(), () ->
+                addMapping(new ProgramAction(mode.toString(), () ->
                         EventManager.instance.post(Events.CAMERA_MODE_CMD, mode)), i);
             }
         }
@@ -306,7 +329,7 @@ public class KeyBindings {
             int m = i - 144;
             final CameraMode mode = CameraMode.getMode(m);
             if (mode != null) {
-                addMapping(new ProgramAction(mode.name(), () ->
+                addMapping(new ProgramAction(mode.toString(), () ->
                         EventManager.instance.post(Events.CAMERA_MODE_CMD, mode)), i);
             }
         }
@@ -317,10 +340,8 @@ public class KeyBindings {
         }), SPECIAL1, Keys.D);
 
         // CTRL + F -> Search dialog
-        final Runnable runnableSearch = () -> {
+        final Runnable runnableSearch = () ->
             EventManager.instance.post(Events.SHOW_SEARCH_ACTION);
-        };
-
         addMapping(new ProgramAction(I18n.txt("action.search"), runnableSearch, fullGuiCondition), SPECIAL1, Keys.F);
 
         // f -> Search dialog
@@ -406,9 +427,6 @@ public class KeyBindings {
         addMapping(new ProgramAction("Toggle mouse capture", () ->
                 EventManager.instance.post(Events.MOUSE_CAPTURE_TOGGLE)), SPECIAL1, SPECIAL2, Keys.L);
 
-        // ALT+G -> Toggle game mode
-        addMapping(new ProgramAction("Toggle game mode", () ->
-                EventManager.instance.post(Events.GAME_MODE_TOGGLE)), SPECIAL3, Keys.G);
     }
 
     /**

@@ -163,7 +163,7 @@ public class SAMPClient implements IObserver {
                 float dec = Float.parseFloat((String) msg.getParam("dec"));
                 logger.info("Point to coordinate (ra,dec): (" + ra + ", " + dec + ")");
 
-                EventManager.instance.post(Events.CAMERA_MODE_CMD, CameraMode.Free_Camera);
+                EventManager.instance.post(Events.CAMERA_MODE_CMD, CameraMode.FREE_MODE);
                 EventManager.instance.post(Events.FREE_MODE_COORD_CMD, ra, dec);
 
                 return null;

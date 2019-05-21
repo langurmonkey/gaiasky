@@ -190,7 +190,7 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
                 NaturalCamera cam = GaiaSky.instance.cam.naturalCamera;
                 changeFocus(focus, cam, waitTimeSeconds);
             } else {
-                logger.error("Focus object does not exist: " + focusName);
+                logger.error("FOCUS_MODE object does not exist: " + focusName);
             }
         }
     }
@@ -205,7 +205,7 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
             SceneGraphNode sgn = getObject(focusName);
             if (sgn instanceof IFocus) {
                 IFocus focus = (IFocus) sgn;
-                em.post(Events.CAMERA_MODE_CMD, CameraMode.Focus);
+                em.post(Events.CAMERA_MODE_CMD, CameraMode.FOCUS_MODE);
                 em.post(Events.FOCUS_CHANGE_CMD, focus);
 
                 Gdx.app.postRunnable(() -> {
@@ -218,7 +218,7 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
 
                 });
             } else {
-                logger.error("Focus object does not exist: " + focusName);
+                logger.error("FOCUS_MODE object does not exist: " + focusName);
             }
         }
     }
@@ -226,7 +226,7 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
     @Override
     public void setCameraFocusInstantAndGo(final String focusName) {
         if (checkString(focusName, "focusName")) {
-            em.post(Events.CAMERA_MODE_CMD, CameraMode.Focus);
+            em.post(Events.CAMERA_MODE_CMD, CameraMode.FOCUS_MODE);
             em.post(Events.FOCUS_CHANGE_CMD, focusName, true);
             em.post(Events.GO_TO_OBJECT_CMD);
         }
@@ -240,22 +240,22 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
 
     @Override
     public void setCameraFree() {
-        Gdx.app.postRunnable(() -> em.post(Events.CAMERA_MODE_CMD, CameraMode.Free_Camera));
+        Gdx.app.postRunnable(() -> em.post(Events.CAMERA_MODE_CMD, CameraMode.FREE_MODE));
     }
 
     @Override
     public void setCameraFov1() {
-        Gdx.app.postRunnable(() -> em.post(Events.CAMERA_MODE_CMD, CameraMode.Gaia_FOV1));
+        Gdx.app.postRunnable(() -> em.post(Events.CAMERA_MODE_CMD, CameraMode.GAIA_FOV1_MODE));
     }
 
     @Override
     public void setCameraFov2() {
-        Gdx.app.postRunnable(() -> em.post(Events.CAMERA_MODE_CMD, CameraMode.Gaia_FOV2));
+        Gdx.app.postRunnable(() -> em.post(Events.CAMERA_MODE_CMD, CameraMode.GAIA_FOV2_MODE));
     }
 
     @Override
     public void setCameraFov1and2() {
-        Gdx.app.postRunnable(() -> em.post(Events.CAMERA_MODE_CMD, CameraMode.Gaia_FOV1and2));
+        Gdx.app.postRunnable(() -> em.post(Events.CAMERA_MODE_CMD, CameraMode.GAIA_FOVS_MODE));
     }
 
     @Override
@@ -338,7 +338,7 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
     }
 
     public void pointAtSkyCoordinate(double ra, double dec) {
-        em.post(Events.CAMERA_MODE_CMD, CameraMode.Free_Camera);
+        em.post(Events.CAMERA_MODE_CMD, CameraMode.FREE_MODE);
         em.post(Events.FREE_MODE_COORD_CMD, (float) ra, (float) dec);
     }
 
@@ -349,7 +349,7 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
     private void setCameraPositionAndFocus(IFocus focus, IFocus other, double rotation, double viewAngle) {
         if (checkNum(viewAngle, 1e-50d, Double.MAX_VALUE, "viewAngle") && checkNotNull(focus, "focus") && checkNotNull(other, "other")) {
 
-            em.post(Events.CAMERA_MODE_CMD, CameraMode.Focus);
+            em.post(Events.CAMERA_MODE_CMD, CameraMode.FOCUS_MODE);
             em.post(Events.FOCUS_CHANGE_CMD, focus);
 
             double radius = focus.getRadius();
@@ -845,7 +845,7 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
                 IFocus focus = sg.findFocus(namelc);
                 goToObject(focus, viewAngle, waitTimeSeconds, stop);
             } else {
-                logger.info("Focus object does not exist: " + name);
+                logger.info("FOCUS_MODE object does not exist: " + name);
             }
         }
     }
@@ -927,7 +927,7 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
             stops.add(stop);
             if (object instanceof Planet) {
                 NaturalCamera cam = GaiaSky.instance.cam.naturalCamera;
-                // Focus wait - 2 seconds
+                // FOCUS_MODE wait - 2 seconds
                 float waitTimeSeconds = -1;
 
                 /*
@@ -1575,7 +1575,7 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
         NaturalCamera cam = GaiaSky.instance.cam.naturalCamera;
 
         // Put in focus mode
-        em.post(Events.CAMERA_MODE_CMD, CameraMode.Free_Camera);
+        em.post(Events.CAMERA_MODE_CMD, CameraMode.FREE_MODE);
 
         // Set up final actions
         String name = "cameraTransition" + (cTransSeq++);
@@ -1656,7 +1656,7 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
         // Post focus change and wait, if needed
         IFocus currentFocus = cam.getFocus();
         if (currentFocus != object) {
-            em.post(Events.CAMERA_MODE_CMD, CameraMode.Focus);
+            em.post(Events.CAMERA_MODE_CMD, CameraMode.FOCUS_MODE);
             em.post(Events.FOCUS_CHANGE_CMD, object);
 
             // Wait til camera is facing focus or

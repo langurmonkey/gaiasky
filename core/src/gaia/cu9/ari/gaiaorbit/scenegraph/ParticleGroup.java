@@ -149,7 +149,7 @@ public class ParticleGroup extends FadeNode implements I3DTextRenderable, IFocus
     Vector2d focusPositionSph;
 
     /**
-     * Focus attributes
+     * FOCUS_MODE attributes
      */
     double focusDistToCamera, focusViewAngle, focusViewAngleApparent, focusSize;
 
@@ -469,22 +469,22 @@ public class ParticleGroup extends FadeNode implements I3DTextRenderable, IFocus
         return focusPositionSph;
     }
 
-    // Focus dist to camera
+    // FOCUS_MODE dist to camera
     public double getDistToCamera() {
         return focusDistToCamera;
     }
 
-    // Focus view angle
+    // FOCUS_MODE view angle
     public double getViewAngle() {
         return focusViewAngle;
     }
 
-    // Focus apparent view angle
+    // FOCUS_MODE apparent view angle
     public double getViewAngleApparent() {
         return focusViewAngleApparent;
     }
 
-    // Focus size
+    // FOCUS_MODE size
     public double getSize() {
         return focusSize;
     }
@@ -741,7 +741,7 @@ public class ParticleGroup extends FadeNode implements I3DTextRenderable, IFocus
         CameraManager cam = GaiaSky.instance.getCameraManager();
         if (cam != null && cam.getFocus() != null && cam.getFocus() == this) {
             this.setFocusIndex(-1);
-            EventManager.instance.post(Events.CAMERA_MODE_CMD, CameraMode.Free_Camera);
+            EventManager.instance.post(Events.CAMERA_MODE_CMD, CameraMode.FREE_MODE);
         }
     }
 

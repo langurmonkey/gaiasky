@@ -130,7 +130,7 @@ public class SpacecraftCamera extends AbstractCamera implements IObserver {
         chw2 = crosshairTex.getWidth() / 2f;
         chh2 = crosshairTex.getHeight() / 2f;
 
-        // Focus is changed from GUI
+        // FOCUS_MODE is changed from GUI
         EventManager.instance.subscribe(this, Events.FOV_CHANGED_CMD, Events.SPACECRAFT_LOADED);
     }
 
@@ -288,7 +288,7 @@ public class SpacecraftCamera extends AbstractCamera implements IObserver {
     @Override
     public void updateMode(CameraMode mode, boolean centerFocus, boolean postEvent) {
         InputMultiplexer im = (InputMultiplexer) Gdx.input.getInputProcessor();
-        if (mode == CameraMode.Spacecraft && sc != null) {
+        if (mode == CameraMode.SPACECRAFT_MODE && sc != null) {
             Gdx.app.postRunnable(() -> {
                 // Register input inputListener
                 if (!im.getProcessors().contains(inputController, true))

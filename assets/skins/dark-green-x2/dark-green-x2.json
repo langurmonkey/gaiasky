@@ -148,6 +148,12 @@
       "g": 0,
       "r": 1
     },
+    "pink": {
+      "a": 1,
+      "b": 0.6,
+      "g": 0.6,
+      "r": 1.0
+    },
     "black": {
       "a": 1,
       "b": 0,
@@ -566,6 +572,10 @@
     "default-red": {
       "font": "ui-18",
       "fontColor": "red"
+    },
+    "default-pink": {
+      "font": "ui-18",
+      "fontColor": "pink"
     },
     "default-inv": {
       "font": "ui-18",

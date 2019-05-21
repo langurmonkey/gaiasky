@@ -846,15 +846,20 @@ public class PreferencesWindow extends GenericDialog {
         // KEY BINDINGS
         OwnLabel titleKeybindings = new OwnLabel(I18n.txt("gui.keymappings"), skin, "help-title");
 
-        Map<TreeSet<Integer>, ProgramAction> keyboardMappings = KeyBindings.instance.getSortedMappings();
-        Set<TreeSet<Integer>> keymaps = keyboardMappings.keySet();
-        String[][] data = new String[keyboardMappings.size()][2];
+        Map<ProgramAction, Array<TreeSet<Integer>>> keyboardMappings = KeyBindings.instance.getSortedMappingsInv();
+        String[][] data = new String[keyboardMappings.size()][];
 
         i = 0;
-        for (TreeSet<Integer> keys : keymaps) {
-            ProgramAction action = keyboardMappings.get(keys);
-            data[i][0] = action.actionName;
-            data[i][1] = keysToString(keys);
+        for (ProgramAction action : keyboardMappings.keySet()) {
+            Array<TreeSet<Integer>> keys = keyboardMappings.get(action);
+
+            String[] act = new String[1 + keys.size];
+            act[0] = action.actionName;
+            for(int j = 0; j < keys.size; j++){
+                act[j+1] = keysToString(keys.get(j));
+            }
+
+            data[i] = act;
             i++;
         }
 
@@ -864,19 +869,26 @@ public class PreferencesWindow extends GenericDialog {
         controls.add(new OwnLabel(I18n.txt("gui.keymappings.action"), skin, "header")).left();
         controls.add(new OwnLabel(I18n.txt("gui.keymappings.keys"), skin, "header")).left().row();
 
-        controls.add(new OwnLabel(I18n.txt("action.forward"), skin)).left();
-        controls.add(new OwnLabel(Keys.toString(Keys.UP).toUpperCase(), skin)).left().row();
-        controls.add(new OwnLabel(I18n.txt("action.backward"), skin)).left();
-        controls.add(new OwnLabel(Keys.toString(Keys.DOWN).toUpperCase(), skin)).left().row();
-        controls.add(new OwnLabel(I18n.txt("action.left"), skin)).left();
-        controls.add(new OwnLabel(Keys.toString(Keys.LEFT).toUpperCase(), skin)).left().row();
-        controls.add(new OwnLabel(I18n.txt("action.right"), skin)).left();
-        controls.add(new OwnLabel(Keys.toString(Keys.RIGHT).toUpperCase(), skin)).left().row();
+        controls.add(new OwnLabel(I18n.txt("action.forward"), skin)).left().padRight(pad);
+        controls.add(new OwnLabel(Keys.toString(Keys.UP).toUpperCase(), skin, "default-pink")).left().row();
+        controls.add(new OwnLabel(I18n.txt("action.backward"), skin)).left().padRight(pad);
+        controls.add(new OwnLabel(Keys.toString(Keys.DOWN).toUpperCase(), skin, "default-pink")).left().row();
+        controls.add(new OwnLabel(I18n.txt("action.left"), skin)).left().padRight(pad);
+        controls.add(new OwnLabel(Keys.toString(Keys.LEFT).toUpperCase(), skin, "default-pink")).left().row();
+        controls.add(new OwnLabel(I18n.txt("action.right"), skin)).left().padRight(pad);
+        controls.add(new OwnLabel(Keys.toString(Keys.RIGHT).toUpperCase(), skin, "default-pink")).left().row();
 
         // Controls
-        for (String[] pair : data) {
-            controls.add(new OwnLabel(pair[0], skin)).left();
-            controls.add(new OwnLabel(pair[1], skin)).left().row();
+        for (String[] action : data) {
+            HorizontalGroup keysGroup = new HorizontalGroup();
+            keysGroup.space(pad5);
+            for(int j = 1; j < action.length; j++){
+                keysGroup.addActor(new OwnLabel(action[j], skin, "default-pink"));
+                if(j < action.length - 1)
+                    keysGroup.addActor(new OwnLabel("/", skin));
+            }
+            controls.add(new OwnLabel(action[0], skin)).left().padRight(pad);
+            controls.add(keysGroup).left().row();
         }
 
         OwnScrollPane controlsScroll = new OwnScrollPane(controls, skin, "minimalist-nobg");
@@ -1760,11 +1772,11 @@ public class PreferencesWindow extends GenericDialog {
             GlobalResources.updateSkin();
             GenericDialog.updatePads();
             GaiaSky.instance.reinitialiseGUI1();
-            EventManager.instance.post(Events.SPACECRAFT_LOADED, GaiaSky.instance.sg.getNode("Spacecraft"));
+            EventManager.instance.post(Events.SPACECRAFT_LOADED, GaiaSky.instance.sg.getNode("SPACECRAFT_MODE"));
             GaiaSky.instance.reinitialiseGUI2();
             // Time init
             EventManager.instance.post(Events.TIME_CHANGE_INFO, GaiaSky.instance.time.getTime());
-            if (GaiaSky.instance.cam.mode == CameraManager.CameraMode.Focus)
+            if (GaiaSky.instance.cam.mode == CameraManager.CameraMode.FOCUS_MODE)
                 // Refocus
                 EventManager.instance.post(Events.FOCUS_CHANGE_CMD, GaiaSky.instance.cam.getFocus());
             // Update names with new language
@@ -1815,9 +1827,9 @@ public class PreferencesWindow extends GenericDialog {
         int i = 0;
         int n = keys.size();
         for (Integer key : keys) {
-            s += Keys.toString(key).toUpperCase();
+            s += Keys.toString(key).toUpperCase().replace(' ', '_');
             if (i < n - 1) {
-                s += " + ";
+                s += "+";
             }
 
             i++;

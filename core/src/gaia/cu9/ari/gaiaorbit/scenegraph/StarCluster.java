@@ -127,10 +127,10 @@ public class StarCluster extends AbstractPositionEntity implements IFocus, IProp
 
         mc = new ModelComponent(false);
         mc.initialize();
-        mc.dlight = new DirectionalLight();
-        mc.dlight.set(1, 1, 1, 1, 1, 1);
+        mc.dLight = new DirectionalLight();
+        mc.dLight.set(1, 1, 1, 1, 1, 1);
         mc.env = new Environment();
-        mc.env.add(mc.dlight);
+        mc.env.add(mc.dLight);
         mc.env.set(new ColorAttribute(ColorAttribute.AmbientLight, 0.4f, 0.4f, 0.4f, 1f));
         mc.env.set(new FloatAttribute(FloatAttribute.Shininess, 0.4f));
         mc.instance = new IntModelInstance(model, modelTransform);
