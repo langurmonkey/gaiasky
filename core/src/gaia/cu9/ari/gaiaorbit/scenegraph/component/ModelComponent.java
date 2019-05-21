@@ -456,12 +456,12 @@ public class ModelComponent implements Disposable, IObserver {
         switch (event) {
         case GRAPHICS_QUALITY_UPDATED:
             if (texInitialised) {
-                // Remove current textures
-                // TODO
-                texInitialised = false;
-                if (tc != null)
-                    tc.disposeTextures(this.manager);
-
+                Gdx.app.postRunnable(()-> {
+                    texInitialised = false;
+                    // Remove current textures
+                    if (tc != null)
+                        tc.disposeTextures(this.manager);
+                });
             }
             break;
         default:

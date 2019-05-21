@@ -101,16 +101,14 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
      **/
     float fovBackup;
 
+    /** Gravity in game mode **/
+    boolean gravity = false;
+
     /**
      * Thrust which keeps the camera going. Mainly for game pads
      **/
     private double thrust = 0;
     private int thrustDirection = 0;
-
-    /**
-     * Info about whether the previous state is saved
-     **/
-    protected boolean stateSaved = false;
 
     /**
      * Whether the camera stops after a few seconds or keeps going
@@ -403,8 +401,22 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
                 EventManager.instance.post(Events.CAMERA_MODE_CMD, CameraMode.FREE_MODE);
             }
             break;
-        case FREE_MODE:
         case GAME_MODE:
+            if(gravity && closest != null){
+                // Add gravity to force, pulling to closest body
+                Vector3d camObj = closest.getAbsolutePosition(aux1).sub(pos);
+                double dist = camObj.len();
+                // Gravity adds only at twice the radius
+                if(dist < closest.getRadius() * 2){
+                    force.add(camObj.nor().scl(0.002));
+                    fullStop = false;
+                } else {
+                    fullStop = true;
+                }
+            } else {
+                fullStop = true;
+            }
+        case FREE_MODE:
             updatePosition(dt, translateUnits, GlobalConf.scene.FREE_CAMERA_TARGET_MODE_ON ? realTransUnits : 1);
 
             // If target is present, update direction
@@ -856,7 +868,7 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
 
             double h = closest.getHeight(pos, aux5);
             double hs = closest.getHeightScale();
-            double minDist = h + hs / 20;
+            double minDist = h + hs / 6;
             double newDist = aux5.scl(-1).add(pos).len();
             if (newDist < minDist) {
                 aux5.nor().scl(minDist - newDist);

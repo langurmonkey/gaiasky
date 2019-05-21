@@ -366,7 +366,21 @@ public class StarGroup extends ParticleGroup implements ILineRenderable, IStarFo
     }
 
     private int getNCloseupStars() {
-        return Math.min(GlobalConf.scene.isHighQuality() ? 80 : (GlobalConf.scene.isNormalQuality() ? 60 : 40), pointData.size);
+        int n;
+        switch(GlobalConf.scene.GRAPHICS_QUALITY){
+        case ULTRA:
+        case HIGH:
+            n = 80;
+            break;
+        case NORMAL:
+            n = 60;
+            break;
+        case LOW:
+        default:
+            n = 40;
+            break;
+        }
+        return Math.min(n ,pointData.size);
     }
 
     public void regenerateIndex() {

@@ -30,7 +30,7 @@ import org.lwjgl.opengl.GL30;
 import java.util.Random;
 
 public class ParticleEffectsRenderSystem extends ImmediateRenderSystem {
-    private static int N_PARTICLES = GlobalConf.scene.isHighQuality() ? 300 : (GlobalConf.scene.isNormalQuality() ? 200 : 100);
+    private static int N_PARTICLES = (GlobalConf.scene.GRAPHICS_QUALITY.ordinal() + 1) * 100;
 
     private Random rand;
     private Vector3 aux1f;

@@ -587,7 +587,7 @@ public enum Events {
      **/
     UPDATEPAUSE_CHANGED,
     /**
-     * Graphics quality updated
+     * Graphics quality updated, contains the new {@link gaia.cu9.ari.gaiaorbit.util.GlobalConf.SceneConf.GraphicsQuality} object.
      **/
     GRAPHICS_QUALITY_UPDATED,
     /**

@@ -13,6 +13,7 @@ import gaia.cu9.ari.gaiaorbit.util.*;
 import gaia.cu9.ari.gaiaorbit.util.GlobalConf.*;
 import gaia.cu9.ari.gaiaorbit.util.GlobalConf.PostprocessConf.Antialias;
 import gaia.cu9.ari.gaiaorbit.util.GlobalConf.ProgramConf.StereoProfile;
+import gaia.cu9.ari.gaiaorbit.util.GlobalConf.SceneConf.GraphicsQuality;
 import gaia.cu9.ari.gaiaorbit.util.Logger.Log;
 import gaia.cu9.ari.gaiaorbit.util.format.DateFormatFactory;
 import gaia.cu9.ari.gaiaorbit.util.format.IDateFormat;
@@ -209,7 +210,7 @@ public class DesktopConfInit extends ConfInit {
         prc.initialize(DISPLAY_TUTORIAL, TUTORIAL_POINTER_SCRIPT_LOCATION, TUTORIAL_SCRIPT_LOCATION, SHOW_DEBUG_INFO, LAST_CHECKED, LAST_VERSION, VERSION_CHECK_URL, DATA_DESCRIPTOR_URL, UI_THEME, SCRIPT_LOCATION, REST_PORT, LOCALE, STEREOSCOPIC_MODE, STEREO_PROFILE, CUBEMAPE360_MODE, DISPLAY_HUD, DISPLAY_POINTER_COORDS, DISPLAY_DATASET_DIALOG, NET_MASTER, NET_SLAVE, NET_MASTER_SLAVES);
 
         /** SCENE CONF **/
-        int GRAPHICS_QUALITY = Integer.parseInt(p.getProperty("scene.graphics.quality"));
+        GraphicsQuality GRAPHICS_QUALITY = GraphicsQuality.valueOf(p.getProperty("scene.graphics.quality").toUpperCase());
         long OBJECT_FADE_MS = Long.parseLong(p.getProperty("scene.object.fadems"));
         float STAR_BRIGHTNESS = Float.parseFloat(p.getProperty("scene.star.brightness"));
         float AMBIENT_LIGHT = Float.parseFloat(p.getProperty("scene.ambient"));
@@ -444,7 +445,7 @@ public class DesktopConfInit extends ConfInit {
         p.setProperty("program.net.slave", Boolean.toString(GlobalConf.program.NET_SLAVE));
 
         /** SCENE **/
-        p.setProperty("scene.graphics.quality", Integer.toString(GlobalConf.scene.GRAPHICS_QUALITY));
+        p.setProperty("scene.graphics.quality", GlobalConf.scene.GRAPHICS_QUALITY.toString().toLowerCase());
         p.setProperty("scene.object.fadems", Long.toString(GlobalConf.scene.OBJECT_FADE_MS));
         p.setProperty("scene.star.brightness", Double.toString(GlobalConf.scene.STAR_BRIGHTNESS));
         p.setProperty("scene.ambient", Double.toString(GlobalConf.scene.AMBIENT_LIGHT));

@@ -21,6 +21,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.ScreenUtils;
 import gaia.cu9.ari.gaiaorbit.scenegraph.camera.ICamera;
+import gaia.cu9.ari.gaiaorbit.util.GlobalConf.SceneConf.GraphicsQuality;
 import gaia.cu9.ari.gaiaorbit.util.Logger.Log;
 import gaia.cu9.ari.gaiaorbit.util.gdx.g2d.ExtSpriteBatch;
 import gaia.cu9.ari.gaiaorbit.util.gdx.shader.ExtShaderProgram;
@@ -68,35 +69,34 @@ public class GlobalResources {
     /** GOOGLE COLORS **/
 
     public static float[] gGreen = new float[] { 0f / 255f, 135f / 255f, 68f / 255f, 1f };
-    public static Color gGreenC =getCol(gGreen);
+    public static Color gGreenC = getCol(gGreen);
     public static float[] gBlue = new float[] { 0f / 255f, 87f / 255f, 231f / 255f, 1f };
-    public static Color gBlueC =getCol(gBlue);
+    public static Color gBlueC = getCol(gBlue);
     public static float[] gRed = new float[] { 214f / 255f, 45f / 255f, 32f / 255f, 1f };
-    public static Color gRedC =getCol(gRed);
+    public static Color gRedC = getCol(gRed);
     public static float[] gYellow = new float[] { 255f / 255f, 167f / 255f, 0f / 255f, 1f };
-    public static Color gYellowC =getCol(gYellow);
+    public static Color gYellowC = getCol(gYellow);
     public static float[] gWhite = new float[] { 255f / 255f, 255f / 255f, 255f / 255f, 1f };
-    public static Color gWhiteC =getCol(gWhite);
+    public static Color gWhiteC = getCol(gWhite);
     public static float[] gPink = new float[] { 255f / 255f, 102f / 255f, 255f / 255f, 1f };
-    public static Color gPinkC =getCol(gPink);
+    public static Color gPinkC = getCol(gPink);
 
-    private static Color getCol(float[] c){
+    private static Color getCol(float[] c) {
         return new Color(c[0], c[1], c[2], c[3]);
     }
 
     public static void initialize(AssetManager manager) {
         // Sprite shader
         spriteShader = new ShaderProgram(Gdx.files.internal("shader/2d/spritebatch.vertex.glsl"), Gdx.files.internal("shader/2d/spritebatch.fragment.glsl"));
-        if(!spriteShader.isCompiled()){
+        if (!spriteShader.isCompiled()) {
             logger.info("SpriteBatch shader compilation failed: " + spriteShader.getLog());
         }
         // Sprite batch
         spriteBatch = new SpriteBatch(1000, spriteShader);
 
-
         // ExtSprite shader
         extSpriteShader = new ExtShaderProgram(Gdx.files.internal("shader/2d/spritebatch.vertex.glsl"), Gdx.files.internal("shader/2d/spritebatch.fragment.glsl"));
-        if(!extSpriteShader.isCompiled()){
+        if (!extSpriteShader.isCompiled()) {
             logger.info("ExtSpriteBatch shader compilation failed: " + spriteShader.getLog());
         }
         // Sprite batch
@@ -112,7 +112,7 @@ public class GlobalResources {
         skin = new Skin(fh);
     }
 
-    private static void initCursors(){
+    private static void initCursors() {
         // Create skin right now, it is needed.
         if (GlobalConf.program.UI_THEME.endsWith("-x2")) {
             GlobalConf.updateScaleFactor(2.0f);
@@ -324,9 +324,9 @@ public class GlobalResources {
         return l;
     }
 
-    private static boolean endsWithAny(String str, String... extensions){
-        for(String ext: extensions){
-            if(str.endsWith(ext))
+    private static boolean endsWithAny(String str, String... extensions) {
+        for (String ext : extensions) {
+            if (str.endsWith(ext))
                 return true;
         }
         return false;
@@ -352,6 +352,7 @@ public class GlobalResources {
 
     /**
      * Recursively count files in a directory
+     *
      * @param dir The directory
      * @return The number of files
      * @throws IOException
@@ -362,29 +363,28 @@ public class GlobalResources {
 
     /**
      * Count files matching a certain ending in a directory, recursively
+     *
      * @param dir The directory
      * @return The number of files
      * @throws IOException
      */
     public static long fileCount(Path dir, String[] extensions) throws IOException {
-        return Files.walk(dir)
-                .parallel()
-                .filter(p -> (!p.toFile().isDirectory() && endsWith(p.toFile().getName(), extensions)))
-                .count();
+        return Files.walk(dir).parallel().filter(p -> (!p.toFile().isDirectory() && endsWith(p.toFile().getName(), extensions))).count();
     }
 
     /**
      * Returns true if the string ends with any of the endings
-     * @param s The string
+     *
+     * @param s       The string
      * @param endings The endings
      * @return True if the string ends with any of the endings
      */
-    public static boolean endsWith(String s, String[] endings){
-        if(endings == null){
+    public static boolean endsWith(String s, String[] endings) {
+        if (endings == null) {
             return true;
         }
-        for(String ending : endings){
-            if(s.endsWith(ending))
+        for (String ending : endings) {
+            if (s.endsWith(ending))
                 return true;
         }
         return false;
@@ -600,11 +600,12 @@ public class GlobalResources {
      * Parses the string and creates a string array. The string is a list of whitespace-separated
      * tokens, each surrounded by double qutotes '"':
      * str = '"a" "bc" "d" "efghi"'
+     *
      * @param str The string
      * @return The resulting array
      */
     public static String[] parseWhitespaceSeparatedList(String str) {
-        if(str == null || str.isEmpty())
+        if (str == null || str.isEmpty())
             return null;
 
         List<String> l = new ArrayList<String>();
@@ -613,8 +614,8 @@ public class GlobalResources {
         boolean inString = false;
         for (int i = 0; i < n; i++) {
             char c = str.charAt(i);
-            if(c == '"'){
-                if(inString){
+            if (c == '"') {
+                if (inString) {
                     l.add(current.toString());
                     current = new StringBuilder();
                     inString = false;
@@ -622,7 +623,7 @@ public class GlobalResources {
                     inString = true;
                 }
             } else {
-                if(inString)
+                if (inString)
                     current.append(c);
             }
         }
@@ -632,15 +633,16 @@ public class GlobalResources {
     /**
      * Converts the string array into a whitespace-separated string
      * where each element is double quoted.
+     *
      * @param l The string array
      * @return The resulting string
      */
-    public static String toWhitespaceSeparatedList(String[] l){
-        if(l == null || l.length == 0)
+    public static String toWhitespaceSeparatedList(String[] l) {
+        if (l == null || l.length == 0)
             return null;
 
         StringBuilder sb = new StringBuilder();
-        for(String s : l){
+        for (String s : l) {
             sb.append("\"").append(s).append("\" ");
         }
         return sb.toString().trim();
@@ -649,27 +651,20 @@ public class GlobalResources {
     public static String unpackTexName(String tex) {
         if (tex.contains("*")) {
             // Try to figure out which is it
-            String suffix = getQualitySuffix();
-            String texSuffix = tex.replace("*", suffix);
-            if (GlobalConf.data.dataFileHandle(texSuffix).exists()) {
-                tex = texSuffix;
-            } else {
-                tex = tex.replace("*", "");
-            }
-        }
-        return tex;
-    }
+            GraphicsQuality gq = GlobalConf.scene.GRAPHICS_QUALITY;
+            for (int i = gq.ordinal(); i >= 0; i--) {
+                GraphicsQuality quality = GraphicsQuality.values()[i];
+                String suffix = quality.suffix;
 
-    private static String getQualitySuffix() {
-        switch (GlobalConf.scene.GRAPHICS_QUALITY) {
-        case 0:
-            return "-high";
-        case 1:
-            return "-med";
-        case 2:
-            return "-low";
-        default:
-            return "";
+                String texSuffix = tex.replace("*", suffix);
+                if (GlobalConf.data.dataFileHandle(texSuffix).exists()) {
+                    return texSuffix;
+                }
+            }
+
+            return tex.replace("*", "");
+        } else {
+            return tex;
         }
     }
 }

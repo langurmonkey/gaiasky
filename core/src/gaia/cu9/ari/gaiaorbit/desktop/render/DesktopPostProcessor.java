@@ -20,6 +20,7 @@ import gaia.cu9.ari.gaiaorbit.render.IPostProcessor;
 import gaia.cu9.ari.gaiaorbit.util.GlobalConf;
 import gaia.cu9.ari.gaiaorbit.util.GlobalConf.PostprocessConf.Antialias;
 import gaia.cu9.ari.gaiaorbit.util.GlobalConf.ProgramConf.StereoProfile;
+import gaia.cu9.ari.gaiaorbit.util.GlobalConf.SceneConf.GraphicsQuality;
 import gaia.cu9.ari.gaiaorbit.util.I18n;
 import gaia.cu9.ari.gaiaorbit.util.Logger;
 import gaia.cu9.ari.gaiaorbit.util.gdx.contrib.postprocess.PostProcessor;
@@ -60,7 +61,7 @@ public class DesktopPostProcessor implements IPostProcessor, IObserver {
     public void initialize(AssetManager manager) {
         this.manager = manager;
         manager.load(GlobalConf.data.dataFile("tex/base/lenscolor.png"), Texture.class);
-        if (GlobalConf.scene.isHighQuality()) {
+        if (GlobalConf.scene.GRAPHICS_QUALITY.isAtLeast(GraphicsQuality.HIGH)) {
             manager.load(GlobalConf.data.dataFile("tex/base/lensdirt.jpg"), Texture.class);
             manager.load(GlobalConf.data.dataFile("tex/base/star_glow.png"), Texture.class);
         } else {
@@ -123,13 +124,13 @@ public class DesktopPostProcessor implements IPostProcessor, IObserver {
         int lgw, lgh;
         Texture glow;
         // TODO Listen to GRAPHICS_QUALITY_CHANGED and apply new settings on the fly
-        if (GlobalConf.scene.isHighQuality()) {
+        if (GlobalConf.scene.GRAPHICS_QUALITY.isAtLeast(GraphicsQuality.HIGH)) {
             lightGlowNSamples = 12;
             lgw = 1280;
             lgh = Math.round(lgw / ar);
             glow = manager.get(GlobalConf.data.dataFile("tex/base/star_glow.png"));
             Glow.N = 30;
-        } else if (GlobalConf.scene.isNormalQuality()) {
+        } else if (GlobalConf.scene.GRAPHICS_QUALITY.isNormal()) {
             lightGlowNSamples = 8;
             lgw = 1000;
             lgh = Math.round(lgw / ar);
@@ -155,7 +156,7 @@ public class DesktopPostProcessor implements IPostProcessor, IObserver {
         float lensFboScale = 0.2f;
         Texture lcol = manager.get(GlobalConf.data.dataFile("tex/base/lenscolor.png"));
         lcol.setFilter(TextureFilter.Linear, TextureFilter.Linear);
-        Texture ldirt = GlobalConf.scene.isHighQuality() ? manager.get(GlobalConf.data.dataFile("data/tex/base/lensdirt.jpg")) : manager.get(GlobalConf.data.dataFile("tex/base/lensdirt_s.jpg"));
+        Texture ldirt = GlobalConf.scene.GRAPHICS_QUALITY.isAtLeast(GraphicsQuality.HIGH) ? manager.get(GlobalConf.data.dataFile("data/tex/base/lensdirt.jpg")) : manager.get(GlobalConf.data.dataFile("tex/base/lensdirt_s.jpg"));
         ldirt.setFilter(TextureFilter.Linear, TextureFilter.Linear);
         Texture lburst = manager.get(GlobalConf.data.dataFile("tex/base/lensstarburst.jpg"));
         lburst.setFilter(TextureFilter.Linear, TextureFilter.Linear);

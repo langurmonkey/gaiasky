@@ -33,6 +33,7 @@ import gaia.cu9.ari.gaiaorbit.scenegraph.camera.CameraManager;
 import gaia.cu9.ari.gaiaorbit.util.*;
 import gaia.cu9.ari.gaiaorbit.util.GlobalConf.PostprocessConf.Antialias;
 import gaia.cu9.ari.gaiaorbit.util.GlobalConf.PostprocessConf.ToneMapping;
+import gaia.cu9.ari.gaiaorbit.util.GlobalConf.SceneConf.GraphicsQuality;
 import gaia.cu9.ari.gaiaorbit.util.GlobalConf.ScreenshotMode;
 import gaia.cu9.ari.gaiaorbit.util.format.INumberFormat;
 import gaia.cu9.ari.gaiaorbit.util.format.NumberFormatFactory;
@@ -272,11 +273,16 @@ public class PreferencesWindow extends GenericDialog {
         OwnLabel gqualityLabel = new OwnLabel(I18n.txt("gui.gquality"), skin);
         gqualityLabel.addListener(new TextTooltip(I18n.txt("gui.gquality.info"), skin));
 
-        ComboBoxBean[] gqs = new ComboBoxBean[] { new ComboBoxBean(I18n.txt("gui.gquality.high"), 0), new ComboBoxBean(I18n.txt("gui.gquality.normal"), 1), new ComboBoxBean(I18n.txt("gui.gquality.low"), 2) };
+        ComboBoxBean[] gqs = new ComboBoxBean[GraphicsQuality.values().length];
+        int i = 0;
+        for(GraphicsQuality q : GraphicsQuality.values()){
+            gqs[i] = new ComboBoxBean(I18n.txt(q.key), q.ordinal());
+            i++;
+        }
         gquality = new OwnSelectBox<>(skin);
         gquality.setItems(gqs);
         gquality.setWidth(textwidth * 3f);
-        gquality.setSelected(gqs[GlobalConf.scene.GRAPHICS_QUALITY]);
+        gquality.setSelected(gqs[GlobalConf.scene.GRAPHICS_QUALITY.ordinal()]);
 
         OwnImageButton gqualityTooltip = new OwnImageButton(skin, "tooltip");
         gqualityTooltip.addListener(new TextTooltip(I18n.txt("gui.gquality.info"), skin));
@@ -625,7 +631,7 @@ public class PreferencesWindow extends GenericDialog {
         String i18nname = "gsbundle";
         String[] files = i18nfolder.list();
         LangComboBoxBean[] langs = new LangComboBoxBean[files.length];
-        int i = 0;
+        i = 0;
         for (String file : files) {
             if (file.startsWith("gsbundle") && file.endsWith(".properties")) {
                 String locale = file.substring(i18nname.length(), file.length() - ".properties".length());
@@ -1568,9 +1574,9 @@ public class PreferencesWindow extends GenericDialog {
 
         // Graphics
         ComboBoxBean bean = gquality.getSelected();
-        if (GlobalConf.scene.GRAPHICS_QUALITY != bean.value) {
-            GlobalConf.scene.GRAPHICS_QUALITY = bean.value;
-            EventManager.instance.post(Events.GRAPHICS_QUALITY_UPDATED, bean.value);
+        if (GlobalConf.scene.GRAPHICS_QUALITY.ordinal() != bean.value) {
+            GlobalConf.scene.GRAPHICS_QUALITY = GraphicsQuality.values()[bean.value];
+            EventManager.instance.post(Events.GRAPHICS_QUALITY_UPDATED, GlobalConf.scene.GRAPHICS_QUALITY);
         }
 
         bean = aa.getSelected();

@@ -151,7 +151,7 @@ public class TextureComponent {
         if(height != null) {
             Texture tex = manager.get(heightT, Texture.class);
             // Get height data for CPU (camera) use
-            Pixmap heightPixmap = new Pixmap(new FileHandle(height));
+            Pixmap heightPixmap = new Pixmap(new FileHandle(GlobalResources.unpackTexName(height)));
             heightMap = new float[heightPixmap.getWidth()][heightPixmap.getHeight()];
             for(int i = 0; i < heightPixmap.getWidth(); i ++){
                 for(int j = 0; j < heightPixmap.getHeight(); j++){
