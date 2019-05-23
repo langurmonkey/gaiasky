@@ -2,10 +2,6 @@
 
 #define TEXTURE_LOD_BIAS 0.0
 
-// Ground atmospheric scattering
-in vec3 v_atmosphereColor;
-#define exposure 5.0
-
 #if defined(specularTextureFlag) || defined(specularColorFlag)
 #define specularFlag
 #endif
@@ -193,9 +189,6 @@ void main() {
 		fragColor.a = 1.0;
 	#endif
 		
-	// Ground atmospheric scattering
-	fragColor.rgb += (vec3(1.0) - exp(v_atmosphereColor.rgb * -exposure));
-	
 	// Prevent saturation
     fragColor = clamp(fragColor, 0.0, 1.0);
     fragColor.rgb *= 0.95;

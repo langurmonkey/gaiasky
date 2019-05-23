@@ -61,14 +61,16 @@ out vec3 o_lightDir;
 in vec3 l_ambientLight[gl_MaxPatchVertices];
 out vec3 o_ambientLight;
 
-in vec4 l_atmosphereColor[gl_MaxPatchVertices];
-out vec4 o_atmosphereColor;
-
 in vec4 l_color[gl_MaxPatchVertices];
 out vec4 o_color;
 
+#ifdef atmosphereGround
+in vec4 l_atmosphereColor[gl_MaxPatchVertices];
+out vec4 o_atmosphereColor;
+
 in float l_fadeFactor[gl_MaxPatchVertices];
 out float o_fadeFactor;
+#endif
 
 #ifdef shadowMapFlag
 in vec3 l_shadowMapUv[gl_MaxPatchVertices];
@@ -135,8 +137,12 @@ void main(void){
     o_lightCol = (gl_TessCoord.x * l_lightCol[0] + gl_TessCoord.y * l_lightCol[1] + gl_TessCoord.z * l_lightCol[2]);
     o_lightDir = (gl_TessCoord.x * l_lightDir[0] + gl_TessCoord.y * l_lightDir[1] + gl_TessCoord.z * l_lightDir[2]);
     o_ambientLight = (gl_TessCoord.x * l_ambientLight[0] + gl_TessCoord.y * l_ambientLight[1] + gl_TessCoord.z * l_ambientLight[2]);
+
+    #ifdef atmosphereGround
     o_atmosphereColor = (gl_TessCoord.x * l_atmosphereColor[0] + gl_TessCoord.y * l_atmosphereColor[1] + gl_TessCoord.z * l_atmosphereColor[2]);
     o_fadeFactor = (gl_TessCoord.x * l_fadeFactor[0] + gl_TessCoord.y * l_fadeFactor[1] + gl_TessCoord.z * l_fadeFactor[2]);
+    #endif
+
     #ifdef shadowMapFlag
     o_shadowMapUv = (gl_TessCoord.x * l_shadowMapUv[0] + gl_TessCoord.y * l_shadowMapUv[1] + gl_TessCoord.z * l_shadowMapUv[2]);
     #endif
