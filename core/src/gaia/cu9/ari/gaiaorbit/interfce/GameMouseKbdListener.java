@@ -39,7 +39,7 @@ public class GameMouseKbdListener extends MouseKbdListener implements IObserver 
 
     @Override
     public void update() {
-        float keySensitivity = 5f;
+        float keySensitivity = 15f;
         // Run mode
         float multiplier = isKeyPressed(Keys.SHIFT_LEFT) ? 3f : 1f;
         if (isKeyPressed(Keys.W)) {
@@ -49,10 +49,10 @@ public class GameMouseKbdListener extends MouseKbdListener implements IObserver 
             camera.forward(-0.1f * keySensitivity * multiplier);
         }
         if (isKeyPressed(Keys.D)) {
-            camera.strafe(0.1f * keySensitivity);
+            camera.strafe(0.1f * keySensitivity * multiplier);
         }
         if (isKeyPressed(Keys.A)) {
-            camera.strafe(-0.1f * keySensitivity);
+            camera.strafe(-0.1f * keySensitivity * multiplier);
         }
         if (isKeyPressed(Keys.Q)) {
             camera.addRoll(0.8f * keySensitivity, true);
@@ -61,10 +61,10 @@ public class GameMouseKbdListener extends MouseKbdListener implements IObserver 
             camera.addRoll(-0.8f * keySensitivity, true);
         }
         if(isKeyPressed(Keys.SPACE)) {
-            camera.vertical(0.1f * keySensitivity);
+            camera.vertical(0.1f * keySensitivity * multiplier);
         }
         if(isKeyPressed(Keys.C)) {
-            camera.vertical(-0.1f * keySensitivity);
+            camera.vertical(-0.1f * keySensitivity * multiplier);
         }
     }
 

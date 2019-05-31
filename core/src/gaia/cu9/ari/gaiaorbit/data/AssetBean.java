@@ -28,7 +28,7 @@ public class AssetBean {
     private AssetLoaderParameters assetParams = null;
 
     static {
-        assetDescriptors = new HashSet<AssetBean>();
+        assetDescriptors = new HashSet<>();
     }
 
     public static void addAsset(String assetName, Class assetClass) {
@@ -53,6 +53,10 @@ public class AssetBean {
 
     public static void setAssetManager(AssetManager manager) {
         AssetBean.assetManager = manager;
+    }
+
+    public static AssetManager manager(){
+        return assetManager;
     }
 
     private AssetBean(String assetName, Class assetClass) {

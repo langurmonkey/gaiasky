@@ -6,6 +6,7 @@
 package gaia.cu9.ari.gaiaorbit.scenegraph.camera;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.Input;
 import com.badlogic.gdx.InputMultiplexer;
 import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.controllers.Controllers;
@@ -102,7 +103,7 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
     float fovBackup;
 
     /** Gravity in game mode **/
-    boolean gravity = false;
+    boolean gravity = true;
 
     /**
      * Thrust which keeps the camera going. Mainly for game pads
@@ -402,7 +403,7 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
             }
             break;
         case GAME_MODE:
-            if(gravity && closest != null){
+            if(gravity && (closest != null) && !currentMouseKbdListener.isKeyPressed(Input.Keys.SPACE)){
                 // Add gravity to force, pulling to closest body
                 Vector3d camObj = closest.getAbsolutePosition(aux1).sub(pos);
                 double dist = camObj.len();
@@ -868,7 +869,7 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
 
             double h = closest.getHeight(pos, aux5);
             double hs = closest.getHeightScale();
-            double minDist = h + hs / 6;
+            double minDist = h + hs / 26.0;
             double newDist = aux5.scl(-1).add(pos).len();
             if (newDist < minDist) {
                 aux5.nor().scl(minDist - newDist);
@@ -1091,7 +1092,7 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
      * @return The translate units
      */
     public double getTranslateUnits() {
-        return getTranslateUnits(0);
+        return getTranslateUnits(0.5e-5);
     }
 
     /**

@@ -44,7 +44,7 @@ public class TextureComponent {
     }
 
     public String base, specular, normal, night, ring, height;
-    public String baseT, specularT, normalT, nightT, ringT, heightT;
+    public String baseUnpacked, specularUnpacked, normalUnpacked, nightUnpacked, ringUnpacked, heightUnpacked;
     public Texture baseTex;
     // Height scale in internal units
     public Float heightScale = 0.005f;
@@ -60,26 +60,26 @@ public class TextureComponent {
 
     public void initialize(AssetManager manager) {
         // Add textures to load
-        baseT = addToLoad(base, manager);
-        normalT = addToLoad(normal, manager);
-        specularT = addToLoad(specular, manager);
-        nightT = addToLoad(night, manager);
-        ringT = addToLoad(ring, manager);
-        heightT = addToLoad(height, manager);
+        baseUnpacked = addToLoad(base, manager);
+        normalUnpacked = addToLoad(normal, manager);
+        specularUnpacked = addToLoad(specular, manager);
+        nightUnpacked = addToLoad(night, manager);
+        ringUnpacked = addToLoad(ring, manager);
+        heightUnpacked = addToLoad(height, manager);
     }
 
     public void initialize() {
         // Add textures to load
-        baseT = addToLoad(base);
-        normalT = addToLoad(normal);
-        specularT = addToLoad(specular);
-        nightT = addToLoad(night);
-        ringT = addToLoad(ring);
-        heightT = addToLoad(height);
+        baseUnpacked = addToLoad(base);
+        normalUnpacked = addToLoad(normal);
+        specularUnpacked = addToLoad(specular);
+        nightUnpacked = addToLoad(night);
+        ringUnpacked = addToLoad(ring);
+        heightUnpacked = addToLoad(height);
     }
 
     public boolean isFinishedLoading(AssetManager manager) {
-        return isFL(baseT, manager) && isFL(normalT, manager) && isFL(specularT, manager) && isFL(nightT, manager) && isFL(ringT, manager) && isFL(heightT, manager);
+        return isFL(baseUnpacked, manager) && isFL(normalUnpacked, manager) && isFL(specularUnpacked, manager) && isFL(nightUnpacked, manager) && isFL(ringUnpacked, manager) && isFL(heightUnpacked, manager);
     }
 
     public boolean isFL(String tex, AssetManager manager) {
@@ -126,7 +126,7 @@ public class TextureComponent {
     public Material initMaterial(AssetManager manager, IntModelInstance instance, float[] cc, boolean culling) {
         Material material = instance.materials.get(0);
         if (base != null) {
-            baseTex = manager.get(baseT, Texture.class);
+            baseTex = manager.get(baseUnpacked, Texture.class);
             material.set(new TextureAttribute(TextureAttribute.Diffuse, baseTex));
         }
         if (cc != null && (coloriftex || base == null)) {
@@ -135,21 +135,21 @@ public class TextureComponent {
         }
 
         if (normal != null) {
-            Texture tex = manager.get(normalT, Texture.class);
+            Texture tex = manager.get(normalUnpacked, Texture.class);
             material.set(new TextureAttribute(TextureAttribute.Normal, tex));
         }
         if (specular != null) {
-            Texture tex = manager.get(specularT, Texture.class);
+            Texture tex = manager.get(specularUnpacked, Texture.class);
             material.set(new TextureAttribute(TextureAttribute.Specular, tex));
             // Control amount of specularity
             material.set(new ColorAttribute(ColorAttribute.Specular, 0.5f, 0.5f, 0.5f, 1f));
         }
         if (night != null) {
-            Texture tex = manager.get(nightT, Texture.class);
+            Texture tex = manager.get(nightUnpacked, Texture.class);
             material.set(new TextureExtAttribute(TextureExtAttribute.Night, tex));
         }
         if(height != null) {
-            Texture tex = manager.get(heightT, Texture.class);
+            Texture tex = manager.get(heightUnpacked, Texture.class);
             // Get height data for CPU (camera) use
             Pixmap heightPixmap = new Pixmap(new FileHandle(GlobalResources.unpackTexName(height)));
             heightMap = new float[heightPixmap.getWidth()][heightPixmap.getHeight()];
@@ -167,7 +167,7 @@ public class TextureComponent {
         if (instance.materials.size > 1) {
             // Ring material
             Material ringMat = instance.materials.get(1);
-            Texture tex = manager.get(ringT, Texture.class);
+            Texture tex = manager.get(ringUnpacked, Texture.class);
             ringMat.set(new TextureAttribute(TextureAttribute.Diffuse, tex));
             ringMat.set(new BlendingAttribute(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA));
             if (!culling)
@@ -193,7 +193,7 @@ public class TextureComponent {
     public void initMaterial(AssetManager manager, Map<String, Material> materials, float[] cc, boolean culling) {
         Material material = materials.get("base");
         if (base != null) {
-            baseTex = manager.get(baseT, Texture.class);
+            baseTex = manager.get(baseUnpacked, Texture.class);
             material.set(new TextureAttribute(TextureAttribute.Diffuse, baseTex));
         }
         if (cc != null && (coloriftex || base == null)) {
@@ -202,28 +202,28 @@ public class TextureComponent {
         }
 
         if (normal != null) {
-            Texture tex = manager.get(normalT, Texture.class);
+            Texture tex = manager.get(normalUnpacked, Texture.class);
             material.set(new TextureAttribute(TextureAttribute.Normal, tex));
         }
         if (specular != null) {
-            Texture tex = manager.get(specularT, Texture.class);
+            Texture tex = manager.get(specularUnpacked, Texture.class);
             material.set(new TextureAttribute(TextureAttribute.Specular, tex));
             // Control amount of specularity
             material.set(new ColorAttribute(ColorAttribute.Specular, 0.5f, 0.5f, 0.5f, 1f));
         }
         if (night != null) {
-            Texture tex = manager.get(nightT, Texture.class);
+            Texture tex = manager.get(nightUnpacked, Texture.class);
             material.set(new TextureExtAttribute(TextureExtAttribute.Night, tex));
         }
         if(height != null) {
-            Texture tex = manager.get(heightT, Texture.class);
+            Texture tex = manager.get(heightUnpacked, Texture.class);
             material.set(new TextureAttribute(TextureExtAttribute.Height, tex));
             material.set(new FloatExtAttribute(FloatExtAttribute.HeightScale, heightScale));
         }
         if (materials.containsKey("ring")) {
             // Ring material
             Material ringMat = materials.get("ring");
-            Texture tex = manager.get(ringT, Texture.class);
+            Texture tex = manager.get(ringUnpacked, Texture.class);
             ringMat.set(new TextureAttribute(TextureAttribute.Diffuse, tex));
             ringMat.set(new BlendingAttribute(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA));
             if (!culling)
@@ -274,29 +274,29 @@ public class TextureComponent {
 
     /** Disposes all currently loaded textures **/
     public void disposeTextures(AssetManager manager) {
-        if (base != null && manager.containsAsset(baseT)) {
-            manager.unload(baseT);
-            baseT = null;
+        if (base != null && manager.containsAsset(baseUnpacked)) {
+            manager.unload(baseUnpacked);
+            baseUnpacked = null;
         }
-        if (normal != null && manager.containsAsset(normalT)) {
-            manager.unload(normalT);
-            normalT = null;
+        if (normal != null && manager.containsAsset(normalUnpacked)) {
+            manager.unload(normalUnpacked);
+            normalUnpacked = null;
         }
-        if (specular != null && manager.containsAsset(specularT)) {
-            manager.unload(specularT);
-            specularT = null;
+        if (specular != null && manager.containsAsset(specularUnpacked)) {
+            manager.unload(specularUnpacked);
+            specularUnpacked = null;
         }
-        if (night != null && manager.containsAsset(nightT)) {
-            manager.unload(nightT);
-            nightT = null;
+        if (night != null && manager.containsAsset(nightUnpacked)) {
+            manager.unload(nightUnpacked);
+            nightUnpacked = null;
         }
-        if (ring != null && manager.containsAsset(ringT)) {
-            manager.unload(ringT);
-            ringT = null;
+        if (ring != null && manager.containsAsset(ringUnpacked)) {
+            manager.unload(ringUnpacked);
+            ringUnpacked = null;
         }
-        if (height != null && manager.containsAsset(heightT)) {
-            manager.unload(heightT);
-            heightT = null;
+        if (height != null && manager.containsAsset(heightUnpacked)) {
+            manager.unload(heightUnpacked);
+            heightUnpacked = null;
         }
     }
 }

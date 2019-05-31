@@ -43,7 +43,7 @@ public class CloudComponent {
     public ModelComponent mc;
     public Matrix4 localTransform;
 
-    public String cloud, cloudtrans;
+    public String cloud, cloudtrans, cloudUnpacked, cloudtransUnpacked;
 
     private boolean texInitialised, texLoading;
     // Model parameters
@@ -63,13 +63,13 @@ public class CloudComponent {
     public void initialize(boolean force) {
         if (!GlobalConf.scene.LAZY_TEXTURE_INIT || force) {
             // Add textures to load
-            addToLoad(cloud);
-            addToLoad(cloudtrans);
+            cloudUnpacked = addToLoad(cloud);
+            cloudtransUnpacked = addToLoad(cloudtrans);
         }
     }
 
     public boolean isFinishedLoading(AssetManager manager) {
-        return isFL(cloud, manager) && isFL(cloudtrans, manager);
+        return isFL(cloudUnpacked, manager) && isFL(cloudtransUnpacked, manager);
     }
 
     public boolean isFL(String tex, AssetManager manager) {
@@ -85,11 +85,12 @@ public class CloudComponent {
      * 
      * @param tex
      */
-    private void addToLoad(String tex) {
+    private String addToLoad(String tex) {
         if (tex == null)
-            return;
+            return null;
         tex = GlobalResources.unpackTexName(tex);
         AssetBean.addAsset(tex, Texture.class, textureParams);
+        return tex;
     }
 
     public void doneLoading(AssetManager manager) {
@@ -123,9 +124,7 @@ public class CloudComponent {
                 // Set to loading
                 texLoading = true;
             } else if (isFinishedLoading(manager)) {
-                Gdx.app.postRunnable(() -> {
-                    initMaterial();
-                });
+                Gdx.app.postRunnable(() -> initMaterial());
 
                 // Set to initialised
                 texInitialised = true;
@@ -141,12 +140,12 @@ public class CloudComponent {
 
     public void initMaterial() {
         Material material = mc.instance.materials.first();
-        if (cloud != null && manager.isLoaded(cloud)) {
-            Texture tex = manager.get(cloud, Texture.class);
+        if (cloud != null && manager.isLoaded(cloudUnpacked)) {
+            Texture tex = manager.get(cloudUnpacked, Texture.class);
             material.set(new TextureAttribute(TextureAttribute.Diffuse, tex));
         }
-        if (cloudtrans != null && manager.isLoaded(cloudtrans)) {
-            Texture tex = manager.get(cloudtrans, Texture.class);
+        if (cloudtrans != null && manager.isLoaded(cloudtransUnpacked)) {
+            Texture tex = manager.get(cloudtransUnpacked, Texture.class);
             material.set(new TextureAttribute(TextureAttribute.Normal, tex));
         }
         material.set(new BlendingAttribute(1.0f));
