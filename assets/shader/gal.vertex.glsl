@@ -1,11 +1,5 @@
 #version 120
 
-#ifdef GL_ES
-precision mediump float;
-precision mediump int;
-#endif
-
-
 #include shader/lib_math.glsl
 #include shader/lib_geometry.glsl
 
@@ -48,7 +42,7 @@ varying vec2 v_texCoords;
 void main()
 {
 
-   v_color = vec4(u_color.rgb, u_color.a);
+   v_color = u_color;
    v_texCoords = a_texCoord0;
    
    mat4 transform = u_projTrans;

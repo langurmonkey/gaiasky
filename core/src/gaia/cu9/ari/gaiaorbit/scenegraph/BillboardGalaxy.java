@@ -61,11 +61,11 @@ public class BillboardGalaxy extends Billboard {
     protected void addToRenderLists(ICamera camera) {
         if (GaiaSky.instance.isOn(ct)) {
             double thPoint = (TH_ANGLE_POINT_M * camera.getFovFactor()) / sizeScaleFactor;
-            if (viewAngleApparent >= thPoint) {
-                addToRender(this, RenderGroup.MODEL_NORMAL);
-            } else if (opacity > 0) {
+            //if (viewAngleApparent >= thPoint) {
+            //    addToRender(this, RenderGroup.MODEL_NORMAL);
+            //} else if (opacity > 0) {
                 addToRender(this, RenderGroup.BILLBOARD_GAL);
-            }
+            //}
 
             if (renderText()) {
                 addToRender(this, RenderGroup.FONT_LABEL);
@@ -78,7 +78,7 @@ public class BillboardGalaxy extends Billboard {
     public void render(ShaderProgram shader, float alpha, Mesh mesh, ICamera camera) {
         compalpha = alpha;
 
-        float size = getFuzzyRenderSize(camera);
+        float size = getFuzzyRenderSize(camera) * 1e-4f;
 
         Vector3 aux = aux3f1.get();
         shader.setUniformf("u_pos", translation.put(aux));

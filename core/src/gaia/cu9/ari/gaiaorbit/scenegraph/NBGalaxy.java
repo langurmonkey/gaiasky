@@ -134,7 +134,7 @@ public class NBGalaxy extends Particle {
     public void render(ShaderProgram shader, float alpha, Mesh mesh, ICamera camera) {
         compalpha = alpha;
 
-        float size = getFuzzyRenderSize(camera);
+        float size = getFuzzyRenderSize(camera) / 1e2f;
 
         Vector3 aux = aux3f1.get();
         shader.setUniformf("u_pos", translation.put(aux));
@@ -151,8 +151,6 @@ public class NBGalaxy extends Particle {
         // Coordinates.cartesianToSpherical(camera.getDirection(), sph);
         // shader.setUniformf("u_ro", (float) sph.x);
         // shader.setUniformf("u_ta", (float) sph.y);
-
-        shader.setUniformf("u_radius", (float) getRadius());
 
         // Sprite.render
         mesh.render(shader, GL20.GL_TRIANGLES, 0, 6);

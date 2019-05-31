@@ -10,7 +10,7 @@ public class Constants {
     /**
      * Spatial unit scaling in VR
      */
-    public static final double VR_SCALE = 1000d;
+    public static final double VR_SCALE = 100000d;
 
     /**
      * Metre to local unit conversion. Multiply this by all values in m.
