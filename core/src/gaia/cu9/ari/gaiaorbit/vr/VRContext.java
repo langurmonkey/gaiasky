@@ -64,31 +64,16 @@ public class VRContext implements Disposable {
 
     /**
      * Space in which matrices and vectors are returned in by {@link VRDevice}
-     * methods taking a {@link Space}. In case {@link Space#World} is specified,
-     * all values are transformed by the {@link Matrix4} set via
-     * {@link VRContext#setTrackerSpaceOriginToWorldSpaceTransform(Matrix4)}.
+     * methods taking a {@link Space}.
      */
-    public static enum Space {
+    public enum Space {
         Tracker, World
-    }
-
-    /**
-     * Used to select for which eye a specific property should be accessed.
-     */
-    public static enum Eye {
-        Left(0), Right(1);
-
-        final int index;
-
-        Eye(int index) {
-            this.index = index;
-        }
     }
 
     /**
      * Type of a {@link VRDevice}
      */
-    public static enum VRDeviceType {
+    public enum VRDeviceType {
         /** the head mounted display **/
         HeadMountedDisplay,
         /** a controller like Oculus touch or HTC Vice controller **/
