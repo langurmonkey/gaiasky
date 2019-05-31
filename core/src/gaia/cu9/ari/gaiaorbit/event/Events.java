@@ -5,6 +5,8 @@
 
 package gaia.cu9.ari.gaiaorbit.event;
 
+import gaia.cu9.ari.gaiaorbit.util.GlobalConf;
+
 /**
  * Contains all the events
  *
@@ -828,7 +830,11 @@ public enum Events {
      * Configures the render system. Contains width, height, FPS, folder and
      * file
      **/
-    CONFIG_FRAME_OUTPUT,
+    CONFIG_FRAME_OUTPUT_CMD,
+    /**
+     * Sets the frame output mode, either simple or redraw. Gets a string or a {@link GlobalConf.ScreenshotMode} object.
+     */
+    FRAME_OUTPUT_MODE_CMD,
     /**
      * Forces recalculation of main GUI window size
      **/

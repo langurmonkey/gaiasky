@@ -24,6 +24,7 @@ import gaia.cu9.ari.gaiaorbit.util.format.DateFormatFactory;
 import gaia.cu9.ari.gaiaorbit.util.format.DateFormatFactory.DateType;
 import gaia.cu9.ari.gaiaorbit.util.format.IDateFormat;
 import gaia.cu9.ari.gaiaorbit.util.math.MathUtilsd;
+import gaia.cu9.ari.gaiaorbit.util.update.VersionChecker;
 
 import java.io.File;
 import java.nio.file.Path;
@@ -51,7 +52,8 @@ public class GlobalConf {
     public static final String AUTHOR_AFFILIATION = "Heidelberg University, Zentrum fuer Astronomie, Astronomisches Rechen-Institut";
 
     // Assets location for this instance of Gaia Sky
-    public static final String ASSETS_LOC = System.getProperty("assets.location") != null ? System.getProperty("assets.location") : "";
+    // macOS needs fully qualified paths when run as an app (GaiaSky.app), that's why we use the getAbsolutePath() part
+    public static final String ASSETS_LOC = (new File(System.getProperty("assets.location") != null ? System.getProperty("assets.location") : ".")).getAbsolutePath();
 
     // Scale factor
     public static float SCALE_FACTOR = -1.0f;
@@ -61,7 +63,7 @@ public class GlobalConf {
         logger.debug("GUI scale factor set to " + GlobalConf.SCALE_FACTOR);
     }
 
-    public static interface IConf {
+    public interface IConf {
     }
 
     public enum ScreenshotMode {
@@ -486,7 +488,7 @@ public class GlobalConf {
         public CameraKeyframeManager.PathType KF_PATH_TYPE_ORIENTATION;
 
         public FrameConf() {
-            EventManager.instance.subscribe(this, Events.CONFIG_FRAME_OUTPUT, Events.FRAME_OUTPUT_CMD);
+            EventManager.instance.subscribe(this, Events.CONFIG_FRAME_OUTPUT_CMD, Events.FRAME_OUTPUT_CMD);
         }
 
         public boolean isSimpleMode() {
@@ -517,7 +519,7 @@ public class GlobalConf {
         @Override
         public void notify(Events event, Object... data) {
             switch (event) {
-            case CONFIG_FRAME_OUTPUT:
+            case CONFIG_FRAME_OUTPUT_CMD:
                 boolean updateFrameSize = RENDER_WIDTH != (int) data[0] || RENDER_HEIGHT != (int) data[1];
                 RENDER_WIDTH = (int) data[0];
                 RENDER_HEIGHT = (int) data[1];
@@ -527,6 +529,22 @@ public class GlobalConf {
 
                 if (updateFrameSize) {
                     EventManager.instance.post(Events.FRAME_SIZE_UDPATE, RENDER_WIDTH, RENDER_HEIGHT);
+                }
+                break;
+            case FRAME_OUTPUT_MODE_CMD:
+                Object newMode = data[0];
+                ScreenshotMode mode = null;
+                if(newMode instanceof String){
+                    try {
+                        mode = ScreenshotMode.valueOf((String) newMode);
+                    }catch(IllegalArgumentException e){
+                        logger.error("Given value is not a representation of ScreenshotMode (simple|redraw): '" + newMode + "'");
+                    }
+                } else {
+                    mode = (ScreenshotMode) newMode;
+                }
+                if(mode != null){
+                    FRAME_MODE = mode;
                 }
                 break;
             case FRAME_OUTPUT_CMD:
@@ -789,7 +807,7 @@ public class GlobalConf {
         }
 
         public String getLastCheckedString() {
-            IDateFormat df = DateFormatFactory.getFormatter(I18n.locale, DateType.DATE);
+            IDateFormat df = DateFormatFactory.getFormatter(I18n.locale, DateType.DATETIME);
             return df.format(VERSION_LAST_TIME);
         }
 
@@ -874,6 +892,7 @@ public class GlobalConf {
 
     public static class VersionConf implements IConf {
         public String version;
+        public int versionNumber;
         public Instant buildtime;
         public String builder;
         public String system;
@@ -881,6 +900,7 @@ public class GlobalConf {
 
         public void initialize(String version, Instant buildtime, String builder, String system, String build) {
             this.version = version;
+            this.versionNumber = VersionChecker.stringToVersionNumber(version);
             this.buildtime = buildtime;
             this.builder = builder;
             this.system = system;
@@ -1179,7 +1199,9 @@ public class GlobalConf {
                     state = (Boolean) data[2];
                 }
                 ComponentType ct = ComponentType.getFromKey(key);
-                VISIBILITY[ct.ordinal()] = (state != null ? state : !VISIBILITY[ct.ordinal()]);
+                if(ct != null) {
+                    VISIBILITY[ct.ordinal()] = (state != null ? state : !VISIBILITY[ct.ordinal()]);
+                }
                 break;
             case TRANSIT_COLOUR_CMD:
                 STAR_COLOR_TRANSIT = (boolean) data[1];

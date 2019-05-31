@@ -9,7 +9,6 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
-import com.badlogic.gdx.graphics.g3d.ModelBatch;
 import com.badlogic.gdx.graphics.glutils.ShaderProgram;
 import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Vector3;
@@ -27,6 +26,7 @@ import gaia.cu9.ari.gaiaorbit.scenegraph.component.ITransform;
 import gaia.cu9.ari.gaiaorbit.scenegraph.component.ModelComponent;
 import gaia.cu9.ari.gaiaorbit.util.Logger;
 import gaia.cu9.ari.gaiaorbit.util.coord.Coordinates;
+import gaia.cu9.ari.gaiaorbit.util.gdx.IntModelBatch;
 import gaia.cu9.ari.gaiaorbit.util.math.Vector3d;
 import gaia.cu9.ari.gaiaorbit.util.time.ITimeFrameProvider;
 
@@ -45,12 +45,12 @@ public class MeshObject extends FadeNode implements IModelRenderable, I3DTextRen
     public ITransform[] transformations;
     
     // Aux array
-    private float[] valuesf;
+    private float[] auxArray;
 
     public MeshObject() {
         super();
         localTransform = new Matrix4();
-        valuesf = new float[3];
+        auxArray = new float[3];
     }
 
     public void initialize() {
@@ -119,8 +119,8 @@ public class MeshObject extends FadeNode implements IModelRenderable, I3DTextRen
 
     public void setToLocalTransform(Matrix4 localTransform, boolean forceUpdate) {
         if (forceUpdate) {
-            float[] trnsltn = translation.valuesf(valuesf);
-            localTransform.idt().translate(trnsltn[0], trnsltn[1], trnsltn[2]).scl((float) size).mul(coordinateSystem);
+            float[] trn = translation.valuesf(auxArray);
+            localTransform.idt().translate(trn[0], trn[1], trn[2]).scl(size).mul(coordinateSystem);
         } else {
             localTransform.set(this.localTransform);
         }
@@ -144,7 +144,7 @@ public class MeshObject extends FadeNode implements IModelRenderable, I3DTextRen
      * Model rendering
      */
     @Override
-    public void render(ModelBatch modelBatch, float alpha, double t) {
+    public void render(IntModelBatch modelBatch, float alpha, double t) {
         if (mc != null) {
             mc.touch(localTransform);
             if (mc.instance != null) {

@@ -52,14 +52,14 @@ public class CrashReporter {
         BufferedWriter writer = null;
         try {
             writer = new BufferedWriter(new FileWriter(crashReportFile));
-            for(String str : crashInfo) {
+            for (String str : crashInfo) {
                 writer.write(str);
                 writer.newLine();
             }
         } catch (Exception e) {
-            if(logger != null) {
+            if (logger != null) {
                 logger.error("Writing crash report crashed... Inception level 1 achieved! :_D", e);
-            }else{
+            } else {
                 System.err.println("Writing crash report crashed... Inception level 1 achieved! :_D");
                 e.printStackTrace(System.err);
             }
@@ -85,17 +85,6 @@ public class CrashReporter {
             } catch (Exception e) {
             }
         }
-
-        // Email reporting
-        String subject = "Gaia Sky crash report " + now;
-        String message = arrayToStr(crashInfo, "\n");
-        PlainTextEmailSender mailer = new PlainTextEmailSender();
-        try {
-            mailer.sendPlainTextEmail("client@gaiasky.gs", GlobalConf.AUTHOR_EMAIL, subject, message);
-            print(logger, "Crash report sent successfully");
-        } catch (Exception ex) {
-            print(logger, "Failed to send crash report");
-        }
     }
 
     private static void print(Logger.Log logger, String str) {
@@ -108,13 +97,15 @@ public class CrashReporter {
 
     private static void appendSystemInfo(Array<String> strArray) {
         /* Gaia Sky info */
-        strArray.add("");
-        strArray.add("## GAIA SKY INFORMATION");
-        strArray.add("Version: " + GlobalConf.version.version);
-        strArray.add("Build: " + GlobalConf.version.build);
-        strArray.add("Builder: " + GlobalConf.version.builder);
-        strArray.add("System: " + GlobalConf.version.system);
-        strArray.add("Build time: " + GlobalConf.version.buildtime);
+        if (GlobalConf.version != null) {
+            strArray.add("");
+            strArray.add("## GAIA SKY INFORMATION");
+            strArray.add("Version: " + GlobalConf.version.version);
+            strArray.add("Build: " + GlobalConf.version.build);
+            strArray.add("Builder: " + GlobalConf.version.builder);
+            strArray.add("System: " + GlobalConf.version.system);
+            strArray.add("Build time: " + GlobalConf.version.buildtime);
+        }
 
         /* Java info */
         strArray.add("");
@@ -185,11 +176,4 @@ public class CrashReporter {
         return buff;
     }
 
-    private static String arrayToStr(Array<String> arr, String sep) {
-        String buff = new String();
-        for (int i = 0; i < arr.size; i++) {
-            buff += arr.get(i) + sep;
-        }
-        return buff;
-    }
 }
