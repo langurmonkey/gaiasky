@@ -1,3 +1,8 @@
+/*
+ * This file is part of Gaia Sky, which is released under the Mozilla Public License 2.0.
+ * See the file LICENSE.md in the project root for full license details.
+ */
+
 package gaia.cu9.ari.gaiaorbit.scenegraph;
 
 import com.badlogic.gdx.graphics.GL20;
@@ -63,7 +68,7 @@ public class NBGalaxy extends Particle {
 
     @Override
     public double THRESHOLD_POINT() {
-        return (float) 4E-10;
+        return (float) 1E-9;
     }
 
     @Override
@@ -166,6 +171,11 @@ public class NBGalaxy extends Particle {
     @Override
     protected float labelMax() {
         return 0.00004f;
+    }
+
+    @Override
+    public float textScale() {
+        return 0.15f;
     }
 
 }

@@ -1,8 +1,3 @@
-#ifdef GL_ES
-precision mediump float;
-precision mediump int;
-#endif
-
 #define exposure 0.5
 
 uniform vec3 v3LightPos;
@@ -24,7 +19,7 @@ void main(void) {
     gl_FragColor.rgb = (fRayleighPhase * frontColor.rgb + fMiePhase * frontSecondaryColor.rgb);
     gl_FragColor.rgb = vec3(1.0) - exp(-exposure * gl_FragColor.rgb);
     gl_FragColor.a = frontColor.a * length(gl_FragColor.rgb);
-    
+
     // Prevent saturation
     gl_FragColor.rgb = clamp(gl_FragColor.rgb, 0.0, 0.95);
 }

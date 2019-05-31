@@ -1,16 +1,12 @@
-package gaia.cu9.ari.gaiaorbit.data.octreegen;
+/*
+ * This file is part of Gaia Sky, which is released under the Mozilla Public License 2.0.
+ * See the file LICENSE.md in the project root for full license details.
+ */
 
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
-import java.io.EOFException;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
+package gaia.cu9.ari.gaiaorbit.data.octreegen;
 
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.Array;
-
 import gaia.cu9.ari.gaiaorbit.scenegraph.AbstractPositionEntity;
 import gaia.cu9.ari.gaiaorbit.scenegraph.Particle;
 import gaia.cu9.ari.gaiaorbit.scenegraph.Star;
@@ -18,6 +14,8 @@ import gaia.cu9.ari.gaiaorbit.util.GlobalConf;
 import gaia.cu9.ari.gaiaorbit.util.Logger;
 import gaia.cu9.ari.gaiaorbit.util.Logger.Log;
 import gaia.cu9.ari.gaiaorbit.util.math.Vector3d;
+
+import java.io.*;
 
 /**
  * Loads and writes particle data to/from our own binary format. The format is

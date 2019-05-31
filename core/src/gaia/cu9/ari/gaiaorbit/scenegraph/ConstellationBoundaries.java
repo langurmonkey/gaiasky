@@ -1,15 +1,22 @@
+/*
+ * This file is part of Gaia Sky, which is released under the Mozilla Public License 2.0.
+ * See the file LICENSE.md in the project root for full license details.
+ */
+
 package gaia.cu9.ari.gaiaorbit.scenegraph;
 
-import java.util.List;
-
+import com.badlogic.gdx.graphics.GL20;
+import gaia.cu9.ari.gaiaorbit.render.ILineRenderable;
 import gaia.cu9.ari.gaiaorbit.render.system.LineRenderSystem;
 import gaia.cu9.ari.gaiaorbit.scenegraph.camera.ICamera;
 import gaia.cu9.ari.gaiaorbit.util.math.Vector3d;
 import gaia.cu9.ari.gaiaorbit.util.time.ITimeFrameProvider;
 
-public class ConstellationBoundaries extends LineObject {
-    float alpha = .8f;
-    List<List<Vector3d>> boundaries;
+import java.util.List;
+
+public class ConstellationBoundaries extends AbstractPositionEntity implements ILineRenderable {
+    private float alpha = .8f;
+    private List<List<Vector3d>> boundaries;
 
     public ConstellationBoundaries() {
         super();
@@ -58,4 +65,8 @@ public class ConstellationBoundaries extends LineObject {
         return 1;
     }
 
+    @Override
+    public int getGlType() {
+        return GL20.GL_LINES;
+    }
 }

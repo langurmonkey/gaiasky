@@ -1,8 +1,12 @@
+/*
+ * This file is part of Gaia Sky, which is released under the Mozilla Public License 2.0.
+ * See the file LICENSE.md in the project root for full license details.
+ */
+
 package gaia.cu9.ari.gaiaorbit.util;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.audio.Music;
-import com.badlogic.gdx.audio.Music.OnCompletionListener;
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.utils.Array;
 import gaia.cu9.ari.gaiaorbit.event.EventManager;
@@ -42,14 +46,14 @@ public class MusicManager implements IObserver {
 
     private void initFiles(FileHandle[] folders) {
         if (folders != null) {
-            musicFiles = new Array<FileHandle>();
+            musicFiles = new Array<>();
 
             for (FileHandle folder : folders) {
                 GlobalResources.listRec(folder, musicFiles, new MusicFileFilter());
             }
             logger.debug(I18n.bundle.format("gui.music.load", musicFiles.size));
         } else {
-            musicFiles = new Array<FileHandle>();
+            musicFiles = new Array<>();
         }
         i = 0;
     }
@@ -86,12 +90,7 @@ public class MusicManager implements IObserver {
         try {
             currentMusic = Gdx.audio.newMusic(f);
             currentMusic.setVolume(volume);
-            currentMusic.setOnCompletionListener(new OnCompletionListener() {
-                @Override
-                public void onCompletion(Music music) {
-                    playNextMusic();
-                }
-            });
+            currentMusic.setOnCompletionListener(music -> playNextMusic());
 
             currentMusic.play();
             EventManager.instance.post(Events.MUSIC_TRACK_INFO, musicFiles.get(i).name());

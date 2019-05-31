@@ -1,3 +1,8 @@
+/*
+ * This file is part of Gaia Sky, which is released under the Mozilla Public License 2.0.
+ * See the file LICENSE.md in the project root for full license details.
+ */
+
 package gaia.cu9.ari.gaiaorbit.interfce;
 
 import com.badlogic.gdx.Gdx;
@@ -63,13 +68,11 @@ public class DatasetsWidget {
 
     public Actor buildDatasetsWidget(Array<FileHandle> catalogFiles, boolean scrollOn) {
         float pad = 3 * GlobalConf.SCALE_FACTOR;
-        float taWidth = 300 * GlobalConf.SCALE_FACTOR;
-        float taHeight = GlobalConf.SCALE_FACTOR > 1 ? 70 : 55;
 
         JsonReader reader = new JsonReader();
 
         // Sort by name
-        Comparator<FileHandle> byName = (FileHandle a, FileHandle b) -> a.name().compareTo(b.name());
+        Comparator<FileHandle> byName = Comparator.comparing(FileHandle::name);
         catalogFiles.sort(byName);
 
         // Containers

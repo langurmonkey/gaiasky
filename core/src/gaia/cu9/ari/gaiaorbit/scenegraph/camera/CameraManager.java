@@ -1,3 +1,8 @@
+/*
+ * This file is part of Gaia Sky, which is released under the Mozilla Public License 2.0.
+ * See the file LICENSE.md in the project root for full license details.
+ */
+
 package gaia.cu9.ari.gaiaorbit.scenegraph.camera;
 
 import com.badlogic.gdx.Gdx;
@@ -5,7 +10,6 @@ import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.graphics.PerspectiveCamera;
 import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Vector3;
-
 import gaia.cu9.ari.gaiaorbit.data.StreamingOctreeLoader;
 import gaia.cu9.ari.gaiaorbit.event.EventManager;
 import gaia.cu9.ari.gaiaorbit.event.Events;
@@ -157,7 +161,7 @@ public class CameraManager implements ICamera, IObserver {
         CameraMode previousMode = this.mode;
         naturalCamera = new NaturalCamera(manager, this);
         fovCamera = new FovCamera(manager, this);
-        spacecraftCamera = new SpacecraftCamera(manager, this);
+        spacecraftCamera = new SpacecraftCamera(this);
         relativisticCamera = new RelativisticCamera(manager, this);
 
         cameras = new ICamera[] { naturalCamera, fovCamera, spacecraftCamera };
@@ -359,12 +363,12 @@ public class CameraManager implements ICamera, IObserver {
      * 
      * @param mode
      */
-    public void updateMode(CameraMode mode, boolean postEvent) {
+    public void updateMode(CameraMode mode, boolean centerFocus, boolean postEvent) {
         CameraMode previousMode = this.mode;
         this.mode = mode;
         updateCurrentCamera(previousMode);
         for (ICamera cam : cameras) {
-            cam.updateMode(mode, postEvent);
+            cam.updateMode(mode, centerFocus, postEvent);
         }
 
         if (postEvent) {
@@ -377,7 +381,10 @@ public class CameraManager implements ICamera, IObserver {
         switch (event) {
         case CAMERA_MODE_CMD:
             CameraMode cm = (CameraMode) data[0];
-            updateMode(cm, true);
+            boolean centerFocus = true;
+            if(data.length > 1)
+                centerFocus = (Boolean)data[1];
+            updateMode(cm, centerFocus, true);
             break;
         case FOV_CHANGE_NOTIFICATION:
             updateAngleEdge(Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
@@ -445,8 +452,8 @@ public class CameraManager implements ICamera, IObserver {
     }
 
     @Override
-    public void checkClosest(CelestialBody cb) {
-        current.checkClosest(cb);
+    public void checkClosest(IFocus focus) {
+        current.checkClosest(focus);
     }
 
     @Override
@@ -499,12 +506,12 @@ public class CameraManager implements ICamera, IObserver {
     }
 
     @Override
-    public CelestialBody getClosest() {
+    public IFocus getClosest() {
         return current.getClosest();
     }
 
     @Override
-    public CelestialBody getClosest2() {
+    public IFocus getClosest2() {
         return current.getClosest2();
     }
 

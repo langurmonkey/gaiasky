@@ -1,19 +1,23 @@
+/*
+ * This file is part of Gaia Sky, which is released under the Mozilla Public License 2.0.
+ * See the file LICENSE.md in the project root for full license details.
+ */
+
 package gaia.cu9.ari.gaiaorbit.data;
+
+import com.badlogic.gdx.utils.Array;
+import gaia.cu9.ari.gaiaorbit.scenegraph.SceneGraphNode;
 
 import java.io.FileNotFoundException;
 
-import com.badlogic.gdx.utils.Array;
-
-import gaia.cu9.ari.gaiaorbit.scenegraph.SceneGraphNode;
-
 public interface ISceneGraphLoader {
 
-    public Array<? extends SceneGraphNode> loadData() throws FileNotFoundException;
+    Array<? extends SceneGraphNode> loadData() throws FileNotFoundException;
 
-    public void setName(String name);
+    void setName(String name);
 
-    public void setDescription(String description);
+    void setDescription(String description);
 
-    public void initialize(String[] files) throws RuntimeException;
+    void initialize(String[] files) throws RuntimeException;
 
 }

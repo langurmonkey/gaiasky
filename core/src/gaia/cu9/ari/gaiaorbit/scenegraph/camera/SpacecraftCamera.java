@@ -1,9 +1,13 @@
+/*
+ * This file is part of Gaia Sky, which is released under the Mozilla Public License 2.0.
+ * See the file LICENSE.md in the project root for full license details.
+ */
+
 package gaia.cu9.ari.gaiaorbit.scenegraph.camera;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.InputMultiplexer;
-import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.controllers.Controller;
 import com.badlogic.gdx.controllers.ControllerListener;
 import com.badlogic.gdx.controllers.Controllers;
@@ -19,7 +23,6 @@ import gaia.cu9.ari.gaiaorbit.event.EventManager;
 import gaia.cu9.ari.gaiaorbit.event.Events;
 import gaia.cu9.ari.gaiaorbit.event.IObserver;
 import gaia.cu9.ari.gaiaorbit.interfce.XBox360Mappings;
-import gaia.cu9.ari.gaiaorbit.scenegraph.CelestialBody;
 import gaia.cu9.ari.gaiaorbit.scenegraph.IFocus;
 import gaia.cu9.ari.gaiaorbit.scenegraph.Spacecraft;
 import gaia.cu9.ari.gaiaorbit.scenegraph.camera.CameraManager.CameraMode;
@@ -33,33 +36,44 @@ import gaia.cu9.ari.gaiaorbit.util.time.ITimeFrameProvider;
 /**
  * Implements a spacecraft-like movement. The spacecraft is modeled as a rigid
  * solid and it has a mass and an engine model. The rest is physics.
- * 
- * @author tsagrista
  *
+ * @author tsagrista
  */
 public class SpacecraftCamera extends AbstractCamera implements IObserver {
 
-    /** Direction and up vectors **/
+    /**
+     * Direction and up vectors
+     **/
     public Vector3d direction, up, relpos;
 
     private Spacecraft sc;
 
-    /** Camera to render the attitude indicator system **/
+    /**
+     * Camera to render the attitude indicator system
+     **/
     private PerspectiveCamera guiCam;
 
-    /** The input controller attached to this camera **/
+    /**
+     * The input controller attached to this camera
+     **/
     private SpacecraftInputController inputController;
 
-    /** Controller listener **/
+    /**
+     * Controller listener
+     **/
     private SpacecraftControllerListener controllerListener;
 
-    /** Crosshair **/
+    /**
+     * Crosshair
+     **/
     private SpriteBatch spriteBatch;
     private Texture crosshairTex;
     private float chw2, chh2;
 
-    /** Closest body apart from the spacecraft **/
-    private CelestialBody closest2;
+    /**
+     * Closest body apart from the spacecraft
+     **/
+    private IFocus closest2;
 
     private Vector3d aux1, aux2, todesired, desired, scthrust, scforce, scaccel, scvel, scpos, scdir, scup;
     private Pair<Vector3d, Vector3d> dirup;
@@ -67,7 +81,7 @@ public class SpacecraftCamera extends AbstractCamera implements IObserver {
     private double targetDistance;
     private boolean firstTime = true;
 
-    public SpacecraftCamera(AssetManager assetManager, CameraManager parent) {
+    public SpacecraftCamera(CameraManager parent) {
         super(parent);
 
         // Vectors
@@ -86,7 +100,7 @@ public class SpacecraftCamera extends AbstractCamera implements IObserver {
         scdir = new Vector3d();
         scup = new Vector3d();
 
-        dirup = new Pair<Vector3d, Vector3d>(scdir, scup);
+        dirup = new Pair<>(scdir, scup);
 
         // init camera
         camera = new PerspectiveCamera(20, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
@@ -94,7 +108,7 @@ public class SpacecraftCamera extends AbstractCamera implements IObserver {
         camera.far = (float) CAM_FAR;
 
         // init cameras vector
-        cameras = new PerspectiveCamera[] { camera, camLeft, camRight };
+        cameras = new PerspectiveCamera[]{camera, camLeft, camRight};
 
         // init gui camera
         guiCam = new PerspectiveCamera(30, 300, 300);
@@ -132,7 +146,7 @@ public class SpacecraftCamera extends AbstractCamera implements IObserver {
 
     @Override
     public PerspectiveCamera[] getFrontCameras() {
-        return new PerspectiveCamera[] { camera };
+        return new PerspectiveCamera[]{camera};
     }
 
     @Override
@@ -152,7 +166,7 @@ public class SpacecraftCamera extends AbstractCamera implements IObserver {
 
     @Override
     public Vector3d[] getDirections() {
-        return new Vector3d[] { direction };
+        return new Vector3d[]{direction};
     }
 
     @Override
@@ -163,7 +177,7 @@ public class SpacecraftCamera extends AbstractCamera implements IObserver {
     double lastangle = 0;
 
     public void update(double dt, ITimeFrameProvider time) {
-        /** FUTURE POS OF SC **/
+        /* FUTURE POS OF SC */
 
         // We use the simulation time for the integration
         //double sdt = time.getDt() * Constants.H_TO_S;
@@ -179,11 +193,11 @@ public class SpacecraftCamera extends AbstractCamera implements IObserver {
         scup.set(sc.up);
         sc.computeDirectionUp(sdt, dirup);
 
-        /** ACTUAL UPDATE **/
+        /* ACTUAL UPDATE */
 
         updateHard(dt, time);
 
-        /** POST **/
+        /* POST */
         distance = pos.len();
 
         // Update camera
@@ -196,9 +210,9 @@ public class SpacecraftCamera extends AbstractCamera implements IObserver {
             double closestStarDist = closestStar.getClosestDist();
             String closestStarName = closestStar.getClosestName();
             if (closest2 != null) {
-                if (closest2.distToCamera < closestStarDist) {
-                    clname = closest2.name;
-                    cldist = closest2.distToCamera;
+                if (closest2.getDistToCamera() < closestStarDist) {
+                    clname = closest2.getName();
+                    cldist = closest2.getDistToCamera();
                 } else {
                     clname = closestStarName;
                     cldist = closestStarDist;
@@ -214,6 +228,7 @@ public class SpacecraftCamera extends AbstractCamera implements IObserver {
 
     /**
      * Updates the position and direction of the camera using a hard analytical algorithm.
+     *
      * @param dt
      * @param time
      */
@@ -258,7 +273,7 @@ public class SpacecraftCamera extends AbstractCamera implements IObserver {
         fovFactor = camera.fieldOfView / 40f;
         camera.near = (float) (targetDistance * 0.6);
         if (closest != null) {
-            camera.near = Math.min(camera.near, ((float) closest.pos.dst(pos) - (float) closest.getRadius()) * (float) sc.sizeFactor / 2.5f) * (float) sc.sizeFactor;
+            camera.near = Math.min(camera.near, ((float) closest.getPos().dst(pos) - (float) closest.getRadius()) * (float) sc.sizeFactor / 2.5f) * (float) sc.sizeFactor;
         }
         camera.position.set(0, 0, 0);
         direction.put(camera.direction);
@@ -271,7 +286,7 @@ public class SpacecraftCamera extends AbstractCamera implements IObserver {
     }
 
     @Override
-    public void updateMode(CameraMode mode, boolean postEvent) {
+    public void updateMode(CameraMode mode, boolean centerFocus, boolean postEvent) {
         InputMultiplexer im = (InputMultiplexer) Gdx.input.getInputProcessor();
         if (mode == CameraMode.Spacecraft && sc != null) {
             Gdx.app.postRunnable(() -> {
@@ -280,7 +295,7 @@ public class SpacecraftCamera extends AbstractCamera implements IObserver {
                     im.addProcessor(im.size(), inputController);
                 // Register controller listener
                 Controllers.clearListeners();
-                Controllers.addListener(controllerListener);
+                GlobalConf.controls.addControllerListener(controllerListener);
                 sc.stopAllMovement();
                 if (firstTime) {
                     // Put spacecraft close to earth
@@ -298,7 +313,7 @@ public class SpacecraftCamera extends AbstractCamera implements IObserver {
                     // Unregister input controller
                     im.removeProcessor(inputController);
                     // Unregister controller listener
-                    Controllers.removeListener(controllerListener);
+                    GlobalConf.controls.removeControllerListener(controllerListener);
                     sc.stopAllMovement();
                 });
         }
@@ -327,13 +342,13 @@ public class SpacecraftCamera extends AbstractCamera implements IObserver {
     @Override
     public void notify(Events event, Object... data) {
         switch (event) {
-        case SPACECRAFT_LOADED:
-            this.sc = (Spacecraft) data[0];
-            this.targetDistance = sc.size * 3.5;
-            this.relpos.set(targetDistance, targetDistance / 2, 0);
-            break;
-        default:
-            break;
+            case SPACECRAFT_LOADED:
+                this.sc = (Spacecraft) data[0];
+                this.targetDistance = sc.size * 3.5;
+                this.relpos.set(targetDistance, targetDistance / 2, 0);
+                break;
+            default:
+                break;
         }
 
     }
@@ -350,9 +365,8 @@ public class SpacecraftCamera extends AbstractCamera implements IObserver {
 
     /**
      * Input controller for the spacecraft camera
-     * 
-     * @author tsagrista
      *
+     * @author tsagrista
      */
     private class SpacecraftInputController extends GestureDetector {
 
@@ -365,48 +379,48 @@ public class SpacecraftCamera extends AbstractCamera implements IObserver {
             if (sc != null && GlobalConf.runtime.INPUT_ENABLED) {
                 double step = 0.01;
                 switch (keycode) {
-                case Keys.W:
-                    // power 1
-                    sc.setEnginePower(sc.enginePower + step);
-                    EventManager.instance.post(Events.SPACECRAFT_STOP_CMD, false);
-                    break;
-                case Keys.S:
-                    // power -1
-                    sc.setEnginePower(sc.enginePower - step);
-                    EventManager.instance.post(Events.SPACECRAFT_STOP_CMD, false);
-                    break;
-                case Keys.A:
-                    // roll 1
-                    sc.setRollPower(sc.rollp + step);
-                    EventManager.instance.post(Events.SPACECRAFT_STOP_CMD, false);
-                    break;
-                case Keys.D:
-                    // roll -1
-                    sc.setRollPower(sc.rollp - step);
-                    EventManager.instance.post(Events.SPACECRAFT_STABILISE_CMD, false);
-                    break;
-                case Keys.DOWN:
-                    // pitch 1
-                    sc.setPitchPower(sc.pitchp + step);
-                    EventManager.instance.post(Events.SPACECRAFT_STABILISE_CMD, false);
-                    break;
-                case Keys.UP:
-                    // pitch -1
-                    sc.setPitchPower(sc.pitchp - step);
-                    EventManager.instance.post(Events.SPACECRAFT_STABILISE_CMD, false);
-                    break;
-                case Keys.LEFT:
-                    // yaw 1
-                    sc.setYawPower(sc.yawp + step);
-                    EventManager.instance.post(Events.SPACECRAFT_STABILISE_CMD, false);
-                    break;
-                case Keys.RIGHT:
-                    // yaw -1
-                    sc.setYawPower(sc.yawp - step);
-                    EventManager.instance.post(Events.SPACECRAFT_STABILISE_CMD, false);
-                    break;
-                default:
-                    break;
+                    case Keys.W:
+                        // power 1
+                        sc.setEnginePower(sc.enginePower + step);
+                        EventManager.instance.post(Events.SPACECRAFT_STOP_CMD, false);
+                        break;
+                    case Keys.S:
+                        // power -1
+                        sc.setEnginePower(sc.enginePower - step);
+                        EventManager.instance.post(Events.SPACECRAFT_STOP_CMD, false);
+                        break;
+                    case Keys.A:
+                        // roll 1
+                        sc.setRollPower(sc.rollp + step);
+                        EventManager.instance.post(Events.SPACECRAFT_STOP_CMD, false);
+                        break;
+                    case Keys.D:
+                        // roll -1
+                        sc.setRollPower(sc.rollp - step);
+                        EventManager.instance.post(Events.SPACECRAFT_STABILISE_CMD, false);
+                        break;
+                    case Keys.DOWN:
+                        // pitch 1
+                        sc.setPitchPower(sc.pitchp + step);
+                        EventManager.instance.post(Events.SPACECRAFT_STABILISE_CMD, false);
+                        break;
+                    case Keys.UP:
+                        // pitch -1
+                        sc.setPitchPower(sc.pitchp - step);
+                        EventManager.instance.post(Events.SPACECRAFT_STABILISE_CMD, false);
+                        break;
+                    case Keys.LEFT:
+                        // yaw 1
+                        sc.setYawPower(sc.yawp + step);
+                        EventManager.instance.post(Events.SPACECRAFT_STABILISE_CMD, false);
+                        break;
+                    case Keys.RIGHT:
+                        // yaw -1
+                        sc.setYawPower(sc.yawp - step);
+                        EventManager.instance.post(Events.SPACECRAFT_STABILISE_CMD, false);
+                        break;
+                    default:
+                        break;
                 }
             }
             return false;
@@ -417,44 +431,44 @@ public class SpacecraftCamera extends AbstractCamera implements IObserver {
         public boolean keyUp(int keycode) {
             if (sc != null && GlobalConf.runtime.INPUT_ENABLED) {
                 switch (keycode) {
-                case Keys.W:
-                case Keys.S:
-                    // power 0
-                    sc.setEnginePower(0);
-                    break;
-                case Keys.D:
-                case Keys.A:
-                    // roll 0
-                    sc.setRollPower(0);
-                    break;
-                case Keys.UP:
-                case Keys.DOWN:
-                    // pitch 0
-                    sc.setPitchPower(0);
-                    break;
-                case Keys.RIGHT:
-                case Keys.LEFT:
-                    // yaw 0
-                    sc.setYawPower(0);
-                    break;
-                case Keys.L:
-                    // level spaceship
-                    EventManager.instance.post(Events.SPACECRAFT_STABILISE_CMD, true);
-                    break;
-                case Keys.K:
-                    // stop spaceship
-                    EventManager.instance.post(Events.SPACECRAFT_STOP_CMD, true);
-                    break;
-                case Keys.PAGE_UP:
-                    // Increase thrust factor
-                    sc.increaseThrustFactorIndex(true);
-                    break;
-                case Keys.PAGE_DOWN:
-                    // Decrease thrust length
-                    sc.decreaseThrustFactorIndex(true);
-                    break;
-                default:
-                    break;
+                    case Keys.W:
+                    case Keys.S:
+                        // power 0
+                        sc.setEnginePower(0);
+                        break;
+                    case Keys.D:
+                    case Keys.A:
+                        // roll 0
+                        sc.setRollPower(0);
+                        break;
+                    case Keys.UP:
+                    case Keys.DOWN:
+                        // pitch 0
+                        sc.setPitchPower(0);
+                        break;
+                    case Keys.RIGHT:
+                    case Keys.LEFT:
+                        // yaw 0
+                        sc.setYawPower(0);
+                        break;
+                    case Keys.L:
+                        // level spaceship
+                        EventManager.instance.post(Events.SPACECRAFT_STABILISE_CMD, true);
+                        break;
+                    case Keys.K:
+                        // stop spaceship
+                        EventManager.instance.post(Events.SPACECRAFT_STOP_CMD, true);
+                        break;
+                    case Keys.PAGE_UP:
+                        // Increase thrust factor
+                        sc.increaseThrustFactorIndex(true);
+                        break;
+                    case Keys.PAGE_DOWN:
+                        // Decrease thrust length
+                        sc.decreaseThrustFactorIndex(true);
+                        break;
+                    default:
+                        break;
                 }
             }
             return false;
@@ -482,18 +496,18 @@ public class SpacecraftCamera extends AbstractCamera implements IObserver {
         @Override
         public boolean buttonDown(Controller controller, int buttonCode) {
             switch (buttonCode) {
-            case XBox360Mappings.BUTTON_A:
-                sc.decreaseThrustFactorIndex(true);
-                break;
-            case XBox360Mappings.BUTTON_X:
-                sc.increaseThrustFactorIndex(true);
-                break;
-            case XBox360Mappings.BUTTON_LB:
-                EventManager.instance.post(Events.SPACECRAFT_STABILISE_CMD, true);
-                break;
-            case XBox360Mappings.BUTTON_RB:
-                EventManager.instance.post(Events.SPACECRAFT_STOP_CMD, true);
-                break;
+                case XBox360Mappings.BUTTON_A:
+                    sc.decreaseThrustFactorIndex(true);
+                    break;
+                case XBox360Mappings.BUTTON_X:
+                    sc.increaseThrustFactorIndex(true);
+                    break;
+                case XBox360Mappings.BUTTON_LB:
+                    EventManager.instance.post(Events.SPACECRAFT_STABILISE_CMD, true);
+                    break;
+                case XBox360Mappings.BUTTON_RB:
+                    EventManager.instance.post(Events.SPACECRAFT_STOP_CMD, true);
+                    break;
             }
             return true;
         }
@@ -511,39 +525,39 @@ public class SpacecraftCamera extends AbstractCamera implements IObserver {
             value = Math.signum(value) * value * value * value * value;
             if (sc != null)
                 switch (axisCode) {
-                case XBox360Mappings.AXIS_JOY2HOR:
-                    sc.setRollPower(-value);
-                    if (Math.abs(value) > 0.3)
-                        EventManager.instance.post(Events.SPACECRAFT_STABILISE_CMD, false);
-                    treated = true;
-                    break;
-                case XBox360Mappings.AXIS_JOY1VERT:
-                    sc.setPitchPower(value);
-                    if (Math.abs(value) > 0.3)
-                        EventManager.instance.post(Events.SPACECRAFT_STABILISE_CMD, false);
-                    treated = true;
-                    break;
-                case XBox360Mappings.AXIS_JOY1HOR:
-                    sc.setYawPower(-value);
-                    if (Math.abs(value) > 0.3)
-                        EventManager.instance.post(Events.SPACECRAFT_STABILISE_CMD, false);
-                    treated = true;
-                    break;
-                case XBox360Mappings.AXIS_JOY2VERT:
-                    treated = true;
-                    break;
-                case XBox360Mappings.AXIS_RT:
-                    sc.setEnginePower((value + 1) / 2);
-                    if (Math.abs(value) > 0.3)
-                        EventManager.instance.post(Events.SPACECRAFT_STOP_CMD, false);
-                    treated = true;
-                    break;
-                case XBox360Mappings.AXIS_LT:
-                    sc.setEnginePower(-(value + 1) / 2);
-                    if (Math.abs(value) > 0.3)
-                        EventManager.instance.post(Events.SPACECRAFT_STOP_CMD, false);
-                    treated = true;
-                    break;
+                    case XBox360Mappings.AXIS_JOY2HOR:
+                        sc.setRollPower(-value);
+                        if (Math.abs(value) > 0.3)
+                            EventManager.instance.post(Events.SPACECRAFT_STABILISE_CMD, false);
+                        treated = true;
+                        break;
+                    case XBox360Mappings.AXIS_JOY1VERT:
+                        sc.setPitchPower(value);
+                        if (Math.abs(value) > 0.3)
+                            EventManager.instance.post(Events.SPACECRAFT_STABILISE_CMD, false);
+                        treated = true;
+                        break;
+                    case XBox360Mappings.AXIS_JOY1HOR:
+                        sc.setYawPower(-value);
+                        if (Math.abs(value) > 0.3)
+                            EventManager.instance.post(Events.SPACECRAFT_STABILISE_CMD, false);
+                        treated = true;
+                        break;
+                    case XBox360Mappings.AXIS_JOY2VERT:
+                        treated = true;
+                        break;
+                    case XBox360Mappings.AXIS_RT:
+                        sc.setEnginePower((value + 1) / 2);
+                        if (Math.abs(value) > 0.3)
+                            EventManager.instance.post(Events.SPACECRAFT_STOP_CMD, false);
+                        treated = true;
+                        break;
+                    case XBox360Mappings.AXIS_LT:
+                        sc.setEnginePower(-(value + 1) / 2);
+                        if (Math.abs(value) > 0.3)
+                            EventManager.instance.post(Events.SPACECRAFT_STOP_CMD, false);
+                        treated = true;
+                        break;
 
                 }
             return treated;
@@ -572,15 +586,15 @@ public class SpacecraftCamera extends AbstractCamera implements IObserver {
     }
 
     @Override
-    public void checkClosest(CelestialBody cb) {
+    public void checkClosest(IFocus cb) {
         super.checkClosest(cb);
         if (sc != null)
-            if (closest2 == null || (closest2 != null && cb != sc && cb.distToCamera < closest2.distToCamera))
+            if (closest2 == null || (cb != sc && cb.getDistToCamera() < closest2.getDistToCamera())) //-V6007
                 closest2 = cb;
     }
 
     @Override
-    public CelestialBody getClosest2() {
+    public IFocus getClosest2() {
         return closest2;
     }
 

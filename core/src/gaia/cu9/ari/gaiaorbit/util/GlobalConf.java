@@ -1,13 +1,23 @@
+/*
+ * This file is part of Gaia Sky, which is released under the Mozilla Public License 2.0.
+ * See the file LICENSE.md in the project root for full license details.
+ */
+
 package gaia.cu9.ari.gaiaorbit.util;
 
+import com.badlogic.gdx.controllers.Controller;
+import com.badlogic.gdx.controllers.ControllerListener;
+import com.badlogic.gdx.controllers.Controllers;
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.math.MathUtils;
+import com.badlogic.gdx.utils.Array;
 import com.bitfire.postprocessing.effects.CubemapProjections.CubemapProjection;
 import gaia.cu9.ari.gaiaorbit.GaiaSky;
+import gaia.cu9.ari.gaiaorbit.desktop.util.camera.CameraKeyframeManager;
 import gaia.cu9.ari.gaiaorbit.event.EventManager;
 import gaia.cu9.ari.gaiaorbit.event.Events;
 import gaia.cu9.ari.gaiaorbit.event.IObserver;
-import gaia.cu9.ari.gaiaorbit.render.ComponentType;
+import gaia.cu9.ari.gaiaorbit.render.ComponentTypes.ComponentType;
 import gaia.cu9.ari.gaiaorbit.render.system.AbstractRenderSystem;
 import gaia.cu9.ari.gaiaorbit.util.Logger.Log;
 import gaia.cu9.ari.gaiaorbit.util.format.DateFormatFactory;
@@ -26,15 +36,15 @@ import java.util.List;
  * Holds the global configuration options
  *
  * @author Toni Sagrista
- *
  */
 public class GlobalConf {
     private static final Log logger = Logger.getLogger(GlobalConf.class);
 
     public static final String APPLICATION_NAME = "Gaia Sky VR";
+    public static final String APPLICATION_SHORT_NAME = "gaiasky";
     public static final String WEBPAGE = "https://www.zah.uni-heidelberg.de/gaia/outreach/gaiasky";
     public static final String WEBPAGE_DOWNLOADS = "https://www.zah.uni-heidelberg.de/gaia/outreach/gaiasky/downloads";
-    public static final String DOCUMENTATION = "http://gaia-sky.rtfd.io";
+    public static final String DOCUMENTATION = "http://gaia.ari.uni-heidelberg.de/gaiasky/docs/html/latest";
     public static final String ICON_URL = "https://github.com/langurmonkey/gaiasky/blob/master/assets/icon/gs_064.png?raw=true";
     public static final String AUTHOR_NAME = "Toni Sagrista Selles";
     public static final String AUTHOR_EMAIL = "tsagrista@ari.uni-heidelberg.de";
@@ -55,11 +65,13 @@ public class GlobalConf {
     }
 
     public enum ScreenshotMode {
-        simple, redraw
+        simple,
+        redraw
     }
 
     public static enum ImageFormat {
-        PNG, JPG
+        PNG,
+        JPG
     }
 
     public static class ScreenshotConf implements IConf {
@@ -122,7 +134,10 @@ public class GlobalConf {
     public static class PostprocessConf implements IConf, IObserver {
 
         public enum Antialias {
-            NONE(0), FXAA(-1), NFAA(-2), SSAA(1);
+            NONE(0),
+            FXAA(-1),
+            NFAA(-2),
+            SSAA(1);
 
             int aacode;
 
@@ -160,15 +175,25 @@ public class GlobalConf {
         public boolean POSTPROCESS_LENS_FLARE;
         public boolean POSTPROCESS_LIGHT_SCATTERING;
         public boolean POSTPROCESS_FISHEYE;
-        /** Brightness level in [-1..1]. Default is 0. **/
+        /**
+         * Brightness level in [-1..1]. Default is 0.
+         **/
         public float POSTPROCESS_BRIGHTNESS;
-        /** Contrast level in [0..2]. Default is 1. **/
+        /**
+         * Contrast level in [0..2]. Default is 1.
+         **/
         public float POSTPROCESS_CONTRAST;
-        /** Hue level in [0..2]. Default is 1. **/
+        /**
+         * Hue level in [0..2]. Default is 1.
+         **/
         public float POSTPROCESS_HUE;
-        /** Saturation level in [0..2]. Default is 1. **/
+        /**
+         * Saturation level in [0..2]. Default is 1.
+         **/
         public float POSTPROCESS_SATURATION;
-        /** Gamma correction value in [0.1..3] **/
+        /**
+         * Gamma correction value in [0.1..3]
+         **/
         public float POSTPROCESS_GAMMA;
 
         public PostprocessConf() {
@@ -233,15 +258,51 @@ public class GlobalConf {
         public String CONTROLLER_MAPPINGS_FILE;
         public boolean INVERT_LOOK_Y_AXIS;
         public boolean DEBUG_MODE;
+        /**
+         * Controller name blacklist. Check out names in the preferences window.
+         **/
+        public String[] CONTROLLER_BLACKLIST;
 
         public ControlsConf() {
 
         }
 
-        public void initialize(String cONTROLLER_MAPPINGS_FILE, boolean iNVERT_LOOK_Y_AXIS, boolean dEBUG_MODE) {
+        public void initialize(String cONTROLLER_MAPPINGS_FILE, boolean iNVERT_LOOK_Y_AXIS, boolean dEBUG_MODE, String[] cONTROLLER_BLACKLIST) {
             CONTROLLER_MAPPINGS_FILE = cONTROLLER_MAPPINGS_FILE;
             INVERT_LOOK_Y_AXIS = iNVERT_LOOK_Y_AXIS;
             DEBUG_MODE = dEBUG_MODE;
+            CONTROLLER_BLACKLIST = cONTROLLER_BLACKLIST;
+
+        }
+
+        public boolean isControllerBlacklisted(String controllerName) {
+            if (CONTROLLER_BLACKLIST == null || CONTROLLER_BLACKLIST.length == 0) {
+                return false;
+            } else {
+                for (String cn : CONTROLLER_BLACKLIST) {
+                    if (controllerName.equalsIgnoreCase(cn))
+                        return true;
+                }
+            }
+            return false;
+        }
+
+        public void addControllerListener(ControllerListener listener) {
+            Array<Controller> controllers = Controllers.getControllers();
+            for (Controller controller : controllers) {
+                if (!isControllerBlacklisted(controller.getName())) {
+                    controller.addListener(listener);
+                }
+            }
+        }
+
+        public void removeControllerListener(ControllerListener listener) {
+            Array<Controller> controllers = Controllers.getControllers();
+            for (Controller controller : controllers) {
+                if (!isControllerBlacklisted(controller.getName())) {
+                    controller.removeListener(listener);
+                }
+            }
         }
     }
 
@@ -249,7 +310,6 @@ public class GlobalConf {
      * Runtime configuration values, which are never persisted.
      *
      * @author Toni Sagrista
-     *
      */
     public static class RuntimeConf implements IConf, IObserver {
         // These are hacks, to be initialized in GaiaSky if VR context is detected
@@ -258,13 +318,18 @@ public class GlobalConf {
         public boolean DISPLAY_GUI;
         public boolean UPDATE_PAUSE;
         public boolean TIME_ON;
-        /** Whether we use the RealTimeClock or the GlobalClock **/
+        /**
+         * Whether we use the RealTimeClock or the GlobalClock
+         **/
         public boolean REAL_TIME;
         public boolean INPUT_ENABLED;
         public boolean RECORD_CAMERA;
+        public boolean RECORD_KEYFRAME_CAMERA;
         public float LIMIT_MAG_RUNTIME;
         public boolean STRIPPED_FOV_MODE = false;
-        /** Whether octree drawing is active or not **/
+        /**
+         * Whether octree drawing is active or not
+         **/
         public boolean DRAW_OCTREE;
         public boolean RELATIVISTIC_ABERRATION = false;
         public boolean GRAVITATIONAL_WAVES = false;
@@ -307,15 +372,6 @@ public class GlobalConf {
                 } else {
                     // Toggle
                     DISPLAY_GUI = !DISPLAY_GUI;
-                }
-                break;
-            case DISPLAY_VR_GUI_CMD:
-                if (data.length > 1) {
-                    // Value
-                    DISPLAY_VR_GUI = (Boolean) data[1];
-                } else {
-                    // Toggle
-                    DISPLAY_VR_GUI = !DISPLAY_VR_GUI;
                 }
                 break;
             case TOGGLE_UPDATEPAUSE:
@@ -370,38 +426,68 @@ public class GlobalConf {
      * recording.
      *
      * @author Toni Sagrista
-     *
      */
     public static class FrameConf implements IConf, IObserver {
         public static final int MIN_FRAME_SIZE = 50;
         public static final int MAX_FRAME_SIZE = 25000;
 
-        /** The width of the image frames **/
+        /**
+         * The width of the image frames
+         **/
         public int RENDER_WIDTH;
-        /** The height of the image frames **/
+        /**
+         * The height of the image frames
+         **/
         public int RENDER_HEIGHT;
-        /** The number of images per second to produce **/
+        /**
+         * The number of images per second to produce
+         **/
         public int RENDER_TARGET_FPS;
-        /** The target FPS when recording the camera **/
+        /**
+         * The target FPS when recording the camera
+         **/
         public int CAMERA_REC_TARGET_FPS;
         /**
          * Automatically activate frame output system when playing camera file
          **/
         public boolean AUTO_FRAME_OUTPUT_CAMERA_PLAY;
-        /** The output folder **/
+        /**
+         * The output folder
+         **/
         public String RENDER_FOLDER;
-        /** The prefix for the image files **/
+        /**
+         * The prefix for the image files
+         **/
         public String RENDER_FILE_NAME;
-        /** Should we write the simulation time to the images? **/
+        /**
+         * Should we write the simulation time to the images?
+         **/
         public boolean RENDER_SCREENSHOT_TIME;
-        /** Whether the frame system is activated or not **/
+        /**
+         * Whether the frame system is activated or not
+         **/
         public boolean RENDER_OUTPUT = false;
-        /** The frame output screenshot mode **/
+        /**
+         * The frame output screenshot mode
+         **/
         public ScreenshotMode FRAME_MODE;
-        /** Format **/
+        /**
+         * Format
+         **/
         public ImageFormat FRAME_FORMAT;
-        /** Quality, in case format is JPG **/
+        /**
+         * Quality, in case format is JPG
+         **/
         public float FRAME_QUALITY;
+
+        /**
+         * Path type of camera position
+         **/
+        public CameraKeyframeManager.PathType KF_PATH_TYPE_POSITION;
+        /**
+         * Path type of camera orientation
+         **/
+        public CameraKeyframeManager.PathType KF_PATH_TYPE_ORIENTATION;
 
         public FrameConf() {
             EventManager.instance.subscribe(this, Events.CONFIG_FRAME_OUTPUT, Events.FRAME_OUTPUT_CMD);
@@ -415,7 +501,7 @@ public class GlobalConf {
             return FRAME_MODE.equals(ScreenshotMode.redraw);
         }
 
-        public void initialize(int rENDER_WIDTH, int rENDER_HEIGHT, int rENDER_TARGET_FPS, int cAMERA_REC_TARGET_FPS, boolean aUTO_FRAME_OUTPUT_CAMERA_PLAY, String rENDER_FOLDER, String rENDER_FILE_NAME, boolean rENDER_SCREENSHOT_TIME, boolean rENDER_OUTPUT, ScreenshotMode fRAME_MODE, ImageFormat fRAME_FORMAT, float fRAME_QUALITY) {
+        public void initialize(int rENDER_WIDTH, int rENDER_HEIGHT, int rENDER_TARGET_FPS, int cAMERA_REC_TARGET_FPS, boolean aUTO_FRAME_OUTPUT_CAMERA_PLAY, String rENDER_FOLDER, String rENDER_FILE_NAME, boolean rENDER_SCREENSHOT_TIME, boolean rENDER_OUTPUT, ScreenshotMode fRAME_MODE, ImageFormat fRAME_FORMAT, float fRAME_QUALITY, CameraKeyframeManager.PathType kF_PATH_TYPE_POSITION, CameraKeyframeManager.PathType kF_PATH_TYPE_ORIENTATION) {
             RENDER_WIDTH = rENDER_WIDTH;
             RENDER_HEIGHT = rENDER_HEIGHT;
             RENDER_TARGET_FPS = rENDER_TARGET_FPS;
@@ -428,6 +514,8 @@ public class GlobalConf {
             FRAME_MODE = fRAME_MODE;
             FRAME_FORMAT = fRAME_FORMAT;
             FRAME_QUALITY = fRAME_QUALITY;
+            KF_PATH_TYPE_ORIENTATION = kF_PATH_TYPE_ORIENTATION;
+            KF_PATH_TYPE_POSITION = kF_PATH_TYPE_POSITION;
         }
 
         @Override
@@ -462,17 +550,23 @@ public class GlobalConf {
      * Holds all configuration values related to data.
      *
      * @author Toni Sagrista
-     *
      */
     public static class DataConf implements IConf {
 
-        /** Location of the data folder. Usually within the '.gaiasky' folder in the user's home directory **/
+        /**
+         * Location of the data folder. Usually within the '.gaiasky' folder in the user's home directory in Windows
+         * and macOS, or in ~/.local/share/gaiasky in Linux
+         **/
         public String DATA_LOCATION;
 
-        /** The json data file in case of local data source **/
+        /**
+         * The json data file in case of local data source
+         **/
         public String OBJECTS_JSON_FILES;
 
-        /** The json file with the catalogue(s) to load **/
+        /**
+         * The json file with the catalogue(s) to load
+         **/
         public String CATALOG_JSON_FILES;
 
         /**
@@ -570,17 +664,29 @@ public class GlobalConf {
     public static class ProgramConf implements IConf, IObserver {
 
         public static enum StereoProfile {
-            /** Left image -> left eye, distortion **/
+            /**
+             * Left image -> left eye, distortion
+             **/
             VR_HEADSET,
-            /** Left image -> left eye, distortion **/
+            /**
+             * Left image -> left eye, distortion
+             **/
             HD_3DTV_HORIZONTAL,
-            /** Top-bottom **/
+            /**
+             * Top-bottom
+             **/
             HD_3DTV_VERTICAL,
-            /** Left image -> right eye, no distortion **/
+            /**
+             * Left image -> right eye, no distortion
+             **/
             CROSSEYE,
-            /** Left image -> left eye, no distortion **/
+            /**
+             * Left image -> left eye, no distortion
+             **/
             PARALLEL_VIEW,
-            /** Red-cyan anaglyphic 3D mode **/
+            /**
+             * Red-cyan anaglyphic 3D mode
+             **/
             ANAGLYPHIC;
 
             public boolean isHorizontal() {
@@ -596,7 +702,7 @@ public class GlobalConf {
             }
         }
 
-        /** 
+        /**
          * In a client-server configuration, this instance of Gaia Sky acts as a slave and
          * receives the state over the network if this is set to true
          */
@@ -630,7 +736,9 @@ public class GlobalConf {
         public boolean DISPLAY_HUD;
         public boolean DISPLAY_POINTER_COORDS;
         public boolean CUBEMAP360_MODE;
-        /** Cubemap projection **/
+        /**
+         * Cubemap projection
+         **/
         public CubemapProjection CUBEMAP_PROJECTION = CubemapProjection.EQUIRECTANGULAR;
         public boolean STEREOSCOPIC_MODE;
         /** Eye separation in stereoscopic mode in meters **/
@@ -638,7 +746,9 @@ public class GlobalConf {
         /** This controls the side of the images in the stereoscopic mode **/
         public StereoProfile STEREO_PROFILE = StereoProfile.VR_HEADSET;
         public boolean ANALYTICS_ENABLED;
-        /** Whether to display the dataset dialog at startup or not **/
+        /**
+         * Whether to display the dataset dialog at startup or not
+         **/
         public boolean DISPLAY_DATASET_DIALOG;
 
         public ProgramConf() {
@@ -699,6 +809,7 @@ public class GlobalConf {
 
         /**
          * Returns whether the UI theme is in night mode
+         *
          * @return
          */
         public boolean isUINightMode() {
@@ -778,33 +889,6 @@ public class GlobalConf {
             this.build = build;
         }
 
-        public static int[] getMajorMinorRevFromString(String version) {
-            String majorS = version.substring(0, version.indexOf("."));
-            String minorS, revS;
-            int dots = GlobalResources.countOccurrences(version, '.');
-            int idx0 = GlobalResources.nthIndexOf(version, '.', 1);
-            if (dots == 1) {
-                minorS = version.substring(version.indexOf(".", idx0) + 1, version.length());
-                revS = null;
-            } else if (dots > 1) {
-                int idx1 = GlobalResources.nthIndexOf(version, '.', 2);
-                minorS = version.substring(version.indexOf(".", idx0) + 1, version.indexOf(".", idx1));
-                revS = version.substring(version.indexOf(".", idx1) + 1, version.length());
-            } else {
-                return null;
-            }
-            if (majorS.matches("^\\D{1}\\d+$")) {
-                majorS = majorS.substring(1, majorS.length());
-            }
-            if (minorS.matches("^\\d+\\D{1}$")) {
-                minorS = minorS.substring(0, minorS.length() - 1);
-            }
-            if (revS != null && revS.matches("^\\d+\\D{1}$")) {
-                revS = revS.substring(0, revS.length() - 1);
-            }
-            return new int[] { Integer.parseInt(majorS), Integer.parseInt(minorS), revS != null ? Integer.parseInt(revS) : 0 };
-        }
-
         @Override
         public String toString() {
             return version;
@@ -827,25 +911,59 @@ public class GlobalConf {
         public boolean CINEMATIC_CAMERA;
         public float LABEL_SIZE_FACTOR;
         public float LABEL_NUMBER_FACTOR;
-        /** Visibility of component types **/
+        /**
+         * Visibility of component types
+         **/
         public boolean[] VISIBILITY;
 
-        /** Display galaxy as 3D object or as a 2D texture **/
+        /**
+         * Display galaxy as 3D object or as a 2D texture
+         **/
         public boolean GALAXY_3D;
 
-        /** Shadows enabled or disabled **/
+        /**
+         * Shadows enabled or disabled
+         **/
         public boolean SHADOW_MAPPING;
-        /** Max number of objects with shadows **/
+        /**
+         * Max number of objects with shadows
+         **/
         public int SHADOW_MAPPING_N_SHADOWS;
-        /** Resolution of the shadow map **/
+        /**
+         * Resolution of the shadow map
+         **/
         public int SHADOW_MAPPING_RESOLUTION;
 
-        /** Whether to display proper motion vectors **/
+        /**
+         * Whether to display proper motion vectors
+         **/
         public boolean PROPER_MOTION_VECTORS;
-        /** Factor to apply to the length of the proper motion vectors **/
+        /**
+         * Factor to apply to the length of the proper motion vectors
+         **/
         public float PM_LEN_FACTOR;
-        /** This governs the number of proper motion vectors to display **/
+        /**
+         * This governs the number of proper motion vectors to display
+         **/
         public float PM_NUM_FACTOR;
+
+        /**
+         * Overrides the maximum number of proper motion vectors that are allowed to show
+         */
+        public long N_PM_STARS;
+
+        /**
+         * Color mode for velocity vectors
+         * <ul>
+         * <li>0 - direction</li>
+         * <li>1 - length</li>
+         * <li>2 - has radial velocity</li>
+         * <li>3 - redshift (sun)</li>
+         * <li>4 - redshift (camera)</li>
+         * <li>5 - single color</li>
+         * </ul>
+         */
+        public int PM_COLOR_MODE;
 
         public boolean STAR_COLOR_TRANSIT;
         public boolean ONLY_OBSERVED_STARS;
@@ -860,18 +978,28 @@ public class GlobalConf {
          * </ul>
          */
         public int ORBIT_RENDERER;
-        /** The line render system: 0 - normal, 1 - shader **/
+        /**
+         * The line render system: 0 - normal, 1 - shader
+         **/
         public int LINE_RENDERER;
-        /** The graphics quality mode: 0 - high, 1 - normal, 2 - low **/
+        /**
+         * The graphics quality mode: 0 - high, 1 - normal, 2 - low
+         **/
         public int GRAPHICS_QUALITY;
 
-        /** Lazy texture initialisation - textures are loaded only if needed **/
+        /**
+         * Lazy texture initialisation - textures are loaded only if needed
+         **/
         public boolean LAZY_TEXTURE_INIT;
 
-        /** Initializes meshes lazily **/
+        /**
+         * Initializes meshes lazily
+         **/
         public boolean LAZY_MESH_INIT = true;
 
-        /** Whether to show crosshair in focus mode **/
+        /**
+         * Whether to show crosshair in focus mode
+         **/
         public boolean CROSSHAIR;
 
         /**
@@ -887,9 +1015,13 @@ public class GlobalConf {
         public float POINT_ALPHA_MIN;
         public float POINT_ALPHA_MAX;
 
-        /** Size of stars rendered as point primitives **/
+        /**
+         * Size of stars rendered as point primitives
+         **/
         public float STAR_POINT_SIZE;
-        /** Fallback value **/
+        /**
+         * Fallback value
+         **/
         public float STAR_POINT_SIZE_BAK;
 
         /**
@@ -910,8 +1042,8 @@ public class GlobalConf {
         public float OCTANT_THRESHOLD_1;
 
         /**
-         * In the case of multifile LOD datasets (such as DR2+), this setting contains 
-         * the maximum number of stars loaded at a time. If the number of loaded stars 
+         * In the case of multifile LOD datasets (such as DR2+), this setting contains
+         * the maximum number of stars loaded at a time. If the number of loaded stars
          * surpasses this setting, the system will start looking for the best candidates
          * to be unloaded and start unloading data. Should not be set too low, and this should
          * be balanced with the dataset and the draw distance.
@@ -919,11 +1051,12 @@ public class GlobalConf {
         public long MAX_LOADED_STARS;
 
         public SceneConf() {
-            EventManager.instance.subscribe(this, Events.TOGGLE_VISIBILITY_CMD, Events.FOCUS_LOCK_CMD, Events.ORIENTATION_LOCK_CMD, Events.PROPER_MOTIONS_CMD, Events.STAR_BRIGHTNESS_CMD, Events.PM_LEN_FACTOR_CMD, Events.PM_NUM_FACTOR_CMD, Events.FOV_CHANGED_CMD, Events.CAMERA_SPEED_CMD, Events.ROTATION_SPEED_CMD, Events.TURNING_SPEED_CMD, Events.SPEED_LIMIT_CMD, Events.TRANSIT_COLOUR_CMD, Events.ONLY_OBSERVED_STARS_CMD, Events.COMPUTE_GAIA_SCAN_CMD, Events.OCTREE_PARTICLE_FADE_CMD, Events.STAR_POINT_SIZE_CMD, Events.STAR_POINT_SIZE_INCREASE_CMD, Events.STAR_POINT_SIZE_DECREASE_CMD, Events.STAR_POINT_SIZE_RESET_CMD, Events.STAR_MIN_OPACITY_CMD, Events.AMBIENT_LIGHT_CMD, Events.GALAXY_3D_CMD, Events.CROSSHAIR_CMD, Events.CAMERA_CINEMATIC_CMD, Events.CUBEMAP_RESOLUTION_CMD, Events.LABEL_SIZE_CMD);
+            EventManager.instance.subscribe(this, Events.TOGGLE_VISIBILITY_CMD, Events.FOCUS_LOCK_CMD, Events.ORIENTATION_LOCK_CMD, Events.PROPER_MOTIONS_CMD, Events.STAR_BRIGHTNESS_CMD, Events.PM_LEN_FACTOR_CMD, Events.PM_NUM_FACTOR_CMD, Events.PM_COLOR_MODE_CMD, Events.FOV_CHANGED_CMD, Events.CAMERA_SPEED_CMD, Events.ROTATION_SPEED_CMD, Events.TURNING_SPEED_CMD, Events.SPEED_LIMIT_CMD, Events.TRANSIT_COLOUR_CMD, Events.ONLY_OBSERVED_STARS_CMD, Events.COMPUTE_GAIA_SCAN_CMD, Events.OCTREE_PARTICLE_FADE_CMD, Events.STAR_POINT_SIZE_CMD, Events.STAR_POINT_SIZE_INCREASE_CMD, Events.STAR_POINT_SIZE_DECREASE_CMD, Events.STAR_POINT_SIZE_RESET_CMD, Events.STAR_MIN_OPACITY_CMD, Events.AMBIENT_LIGHT_CMD, Events.GALAXY_3D_CMD, Events.CROSSHAIR_CMD, Events.CAMERA_CINEMATIC_CMD, Events.CUBEMAP_RESOLUTION_CMD, Events.LABEL_SIZE_CMD);
         }
 
         public void initialize(int gRAPHICS_QUALITY, long oBJECT_FADE_MS, float sTAR_BRIGHTNESS, float aMBIENT_LIGHT, int cAMERA_FOV, float cAMERA_SPEED, float tURNING_SPEED, float rOTATION_SPEED, int cAMERA_SPEED_LIMIT_IDX, boolean fOCUS_LOCK, boolean fOCUS_LOCK_ORIENTATION, float lABEL_SIZE_FACTOR, float lABEL_NUMBER_FACTOR, boolean[] vISIBILITY, int oRBIT_RENDERER, int lINE_RENDERER, double sTAR_TH_ANGLE_NONE, double sTAR_TH_ANGLE_POINT, double sTAR_TH_ANGLE_QUAD, float pOINT_ALPHA_MIN,
-                float pOINT_ALPHA_MAX, boolean oCTREE_PARTICLE_FADE, float oCTANT_TH_ANGLE_0, float oCTANT_TH_ANGLE_1, boolean pROPER_MOTION_VECTORS, float pM_NUM_FACTOR, float pM_LEN_FACTOR, float sTAR_POINT_SIZE, boolean gALAXY_3D, int cUBEMAP_FACE_RESOLUTION, boolean cROSSHAIR, boolean cINEMATIC_CAMERA, boolean lAZY_TEXTURE_INIT, boolean fREE_CAMERA_TARGET_MODE_ON, boolean sHADOW_MAPPING, int sHADOW_MAPPING_N_SHADOWS, int sHADOW_MAPPING_RESOLUTION, long mAX_LOADED_STARS) {
+                float pOINT_ALPHA_MAX, boolean oCTREE_PARTICLE_FADE, float oCTANT_TH_ANGLE_0, float oCTANT_TH_ANGLE_1, boolean pROPER_MOTION_VECTORS, float pM_NUM_FACTOR, float pM_LEN_FACTOR, long n_PM_STARS, int pM_COLOR_MODE, float sTAR_POINT_SIZE, boolean gALAXY_3D, int cUBEMAP_FACE_RESOLUTION, boolean cROSSHAIR, boolean cINEMATIC_CAMERA, boolean lAZY_TEXTURE_INIT, boolean fREE_CAMERA_TARGET_MODE_ON, boolean sHADOW_MAPPING, int sHADOW_MAPPING_N_SHADOWS, int sHADOW_MAPPING_RESOLUTION,
+                long mAX_LOADED_STARS) {
             GRAPHICS_QUALITY = gRAPHICS_QUALITY;
             OBJECT_FADE_MS = oBJECT_FADE_MS;
             STAR_BRIGHTNESS = sTAR_BRIGHTNESS;
@@ -953,6 +1086,8 @@ public class GlobalConf {
             PROPER_MOTION_VECTORS = pROPER_MOTION_VECTORS;
             PM_NUM_FACTOR = pM_NUM_FACTOR;
             PM_LEN_FACTOR = pM_LEN_FACTOR;
+            N_PM_STARS = n_PM_STARS;
+            PM_COLOR_MODE = pM_COLOR_MODE;
             STAR_POINT_SIZE = sTAR_POINT_SIZE;
             STAR_POINT_SIZE_BAK = STAR_POINT_SIZE;
             GALAXY_3D = gALAXY_3D;
@@ -1073,10 +1208,13 @@ public class GlobalConf {
                 CAMERA_FOV = MathUtilsd.clamp(((Float) data[0]).intValue(), Constants.MIN_FOV, Constants.MAX_FOV);
                 break;
             case PM_NUM_FACTOR_CMD:
-                PM_NUM_FACTOR = Math.min(Constants.MAX_PM_NUM_FACTOR, Math.max(Constants.MIN_PM_NUM_FACTOR, (float) data[0]));
+                PM_NUM_FACTOR = MathUtilsd.clamp((float) data[0], Constants.MIN_PM_NUM_FACTOR, Constants.MAX_PM_NUM_FACTOR);
                 break;
             case PM_LEN_FACTOR_CMD:
-                PM_LEN_FACTOR = Math.min(Constants.MAX_PM_LEN_FACTOR, Math.max(Constants.MIN_PM_LEN_FACTOR, (float) data[0]));
+                PM_LEN_FACTOR = MathUtilsd.clamp((float) data[0], Constants.MIN_PM_LEN_FACTOR, Constants.MAX_PM_LEN_FACTOR);
+                break;
+            case PM_COLOR_MODE_CMD:
+                PM_COLOR_MODE = MathUtilsd.clamp((int) data[0], 0, 5);
                 break;
 
             case CAMERA_SPEED_CMD:
@@ -1222,8 +1360,8 @@ public class GlobalConf {
 
     }
 
-    public static String getFullApplicationName() {
-        return APPLICATION_NAME + program.getNetName() + " - " + version.version;
+    public static String getShortApplicationName() {
+        return APPLICATION_SHORT_NAME + program.getNetName() + " " + version.version + " (" + version.build + ")";
     }
 
 }

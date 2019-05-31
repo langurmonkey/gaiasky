@@ -1,7 +1,11 @@
+/*
+ * This file is part of Gaia Sky, which is released under the Mozilla Public License 2.0.
+ * See the file LICENSE.md in the project root for full license details.
+ */
+
 package gaia.cu9.ari.gaiaorbit.render.system;
 
 import com.badlogic.gdx.utils.Array;
-
 import gaia.cu9.ari.gaiaorbit.render.IRenderable;
 import gaia.cu9.ari.gaiaorbit.render.RenderingContext;
 import gaia.cu9.ari.gaiaorbit.scenegraph.SceneGraphNode.RenderGroup;
@@ -9,18 +13,17 @@ import gaia.cu9.ari.gaiaorbit.scenegraph.camera.ICamera;
 
 /**
  * A component that renders a type of objects.
- * 
- * @author Toni Sagrista
  *
+ * @author Toni Sagrista
  */
 public interface IRenderSystem {
 
-    public RenderGroup getRenderGroup();
+    RenderGroup getRenderGroup();
 
-    public void render(Array<IRenderable> renderables, ICamera camera, double t, RenderingContext rc);
+    void render(Array<IRenderable> renderables, ICamera camera, double t, RenderingContext rc);
 
-    public void resize(int w, int h);
+    void resize(int w, int h);
 
-    public void updateBatchSize(int w, int h);
+    void updateBatchSize(int w, int h);
 
 }

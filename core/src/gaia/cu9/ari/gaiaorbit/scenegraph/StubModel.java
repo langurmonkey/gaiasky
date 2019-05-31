@@ -8,13 +8,12 @@ import com.badlogic.gdx.graphics.g3d.ModelInstance;
 import com.badlogic.gdx.graphics.g3d.attributes.BlendingAttribute;
 import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Vector3;
-
+import gaia.cu9.ari.gaiaorbit.render.ComponentTypes;
 import gaia.cu9.ari.gaiaorbit.render.ILineRenderable;
 import gaia.cu9.ari.gaiaorbit.render.IModelRenderable;
 import gaia.cu9.ari.gaiaorbit.render.RenderingContext;
 import gaia.cu9.ari.gaiaorbit.render.system.LineRenderSystem;
 import gaia.cu9.ari.gaiaorbit.scenegraph.camera.ICamera;
-import gaia.cu9.ari.gaiaorbit.util.ComponentTypes;
 import gaia.cu9.ari.gaiaorbit.util.time.ITimeFrameProvider;
 import gaia.cu9.ari.gaiaorbit.vr.VRContext.VRDevice;
 
@@ -83,6 +82,11 @@ public class StubModel extends AbstractPositionEntity implements IModelRenderabl
         beamP0.set(0, -0.1f, 0).mul(transform);
         beamP1.set(0, -.8e15f, -1e15f).mul(transform);
         renderer.addLine(this, beamP0.x, beamP0.y, beamP0.z, beamP1.x, beamP1.y - 0.1f, beamP1.z, 1f, 0.0f, 0.0f, 0.5f);
+    }
+
+    @Override
+    public int getGlType() {
+        return GL20.GL_LINES;
     }
 
     public void setTransparency(float alpha) {

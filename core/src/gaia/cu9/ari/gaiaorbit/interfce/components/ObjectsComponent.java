@@ -1,9 +1,15 @@
+/*
+ * This file is part of Gaia Sky, which is released under the Mozilla Public License 2.0.
+ * See the file LICENSE.md in the project root for full license details.
+ */
+
 package gaia.cu9.ari.gaiaorbit.interfce.components;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.scenes.scene2d.Actor;
+import com.badlogic.gdx.scenes.scene2d.Group;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.InputEvent.Type;
 import com.badlogic.gdx.scenes.scene2d.Stage;
@@ -57,7 +63,7 @@ public class ObjectsComponent extends GuiComponent implements IObserver {
         searchBox = new OwnTextField("", skin);
         searchBox.setName("search box");
         searchBox.setWidth(componentWidth);
-        searchBox.setMessageText(txt("gui.objects.search"));
+        searchBox.setMessageText(I18n.txt("gui.objects.search"));
         searchBox.addListener(event -> {
             if (event instanceof InputEvent) {
                 InputEvent ie = (InputEvent) event;
@@ -93,13 +99,13 @@ public class ObjectsComponent extends GuiComponent implements IObserver {
             return false;
         });
 
-        /**
+        /*
          * OBJECTS
          */
 
-        treeToModel = new TwoWayHashmap<SceneGraphNode, Node>();
+        treeToModel = new TwoWayHashmap<>();
 
-        logger.info(txt("notif.sgtree.init"));
+        logger.info(I18n.txt("notif.sgtree.init"));
 
         if (tree) {
             final Tree objectsTree = new Tree(skin, "bright");
@@ -153,7 +159,7 @@ public class ObjectsComponent extends GuiComponent implements IObserver {
 
             SceneGraphNode sol = sg.getNode("Sol");
             if (sol != null) {
-                Array<IFocus> solChildren = new Array<IFocus>();
+                Array<IFocus> solChildren = new Array<>();
                 sol.addFocusableObjects(solChildren);
                 solChildren.sort(new CelestialBodyComparator());
                 for (IFocus cb : solChildren)
@@ -166,8 +172,7 @@ public class ObjectsComponent extends GuiComponent implements IObserver {
                 if (event instanceof ChangeEvent) {
                     ChangeEvent ce = (ChangeEvent) event;
                     Actor actor = ce.getTarget();
-                    @SuppressWarnings("unchecked")
-                    final String name = ((com.badlogic.gdx.scenes.scene2d.ui.List<String>) actor).getSelected();
+                    @SuppressWarnings("unchecked") final String name = ((com.badlogic.gdx.scenes.scene2d.ui.List<String>) actor).getSelected();
                     if (sg.containsNode(name)) {
                         SceneGraphNode node = sg.getNode(name);
                         if (node instanceof IFocus) {
@@ -186,7 +191,7 @@ public class ObjectsComponent extends GuiComponent implements IObserver {
             });
             objectsList = focusList;
         }
-        logger.info(txt("notif.sgtree.initialised"));
+        logger.info(I18n.txt("notif.sgtree.initialised"));
 
         if (tree || list) {
             focusListScrollPane = new OwnScrollPane(objectsList, skin, "minimalist");
@@ -199,150 +204,17 @@ public class ObjectsComponent extends GuiComponent implements IObserver {
             focusListScrollPane.setWidth(componentWidth);
         }
 
-        /**
+        /*
          * MESHES
          */
+        Group meshesGroup = visibilitySwitcher(MeshObject.class, I18n.txt("gui.meshes"), "meshes");
 
-        // Get meshes
-        Array<SceneGraphNode> meshes = new Array<SceneGraphNode>();
-        sg.getRoot().getChildrenByType(MeshObject.class, meshes);
-
-        // Add if any
-        VerticalGroup meshesGroup = null;
-        if (meshes.size > 0) {
-            meshesGroup = new VerticalGroup();
-            meshesGroup.left();
-            meshesGroup.columnLeft();
-            meshesGroup.space(sp4);
-
-            Label meshesLabel = new Label(txt("gui.meshes"), skin, "header");
-            meshesGroup.addActor(meshesLabel);
-
-            VerticalGroup meshesVertical = new VerticalGroup();
-            meshesVertical.left();
-            meshesVertical.columnLeft();
-            meshesVertical.space(sp4);
-            OwnScrollPane meshesScroll = new OwnScrollPane(meshesVertical, skin, "minimalist-nobg");
-            meshesScroll.setScrollingDisabled(false, true);
-            meshesScroll.setForceScroll(true, false);
-            meshesScroll.setFadeScrollBars(true);
-            meshesScroll.setOverscroll(false, false);
-            meshesScroll.setSmoothScrolling(true);
-            meshesScroll.setWidth(componentWidth + 12 * GlobalConf.SCALE_FACTOR);
-
-            for (SceneGraphNode node : meshes) {
-                MeshObject mesh = (MeshObject) node;
-                HorizontalGroup meshGroup = new HorizontalGroup();
-                meshGroup.space(sp4);
-                meshGroup.left();
-                OwnCheckBox meshCb = new OwnCheckBox(mesh.name, skin, sp4);
-                meshCb.setChecked(true);
-                meshCb.addListener((event) -> {
-                    if (event instanceof ChangeEvent) {
-                        Gdx.app.postRunnable(() -> {
-                            mesh.setVisible(meshCb.isChecked());
-                        });
-                    }
-                    return false;
-                });
-                // Tooltips
-
-                ImageButton meshDescTooltip = new OwnImageButton(skin, "tooltip");
-                meshDescTooltip.addListener(new TextTooltip((mesh.getDescription() == null || mesh.getDescription().isEmpty() ? "No description" : mesh.getDescription()), skin));
-
-                meshGroup.addActor(meshCb);
-                meshGroup.addActor(meshDescTooltip);
-                meshesVertical.addActor(meshGroup);
-            }
-            meshesGroup.addActor(meshesScroll);
-        }
-
-        /**
+        /*
          * CONSTELLATIONS
          */
+        Group constelGroup = visibilitySwitcher(Constellation.class, I18n.txt("element.constellations"), "constellation");
 
-        VerticalGroup constelList = new VerticalGroup();
-        constelList.space(sp4);
-        constelList.left();
-        constelList.columnLeft();
-        Array<SceneGraphNode> constelObjects = new Array<SceneGraphNode>();
-        List<OwnCheckBox> constelCbs = new ArrayList<OwnCheckBox>();
-        sg.getRoot().getChildrenByType(Constellation.class, constelObjects);
-        Array<String> constelNames = new Array<String>(constelObjects.size);
-        Map<String, Constellation> cmap = new HashMap<String, Constellation>();
-
-        for (SceneGraphNode constel : constelObjects) {
-            // Omit stars with no proper names
-            if (constel.getName() != null && !GlobalResources.isNumeric(constel.getName())) {
-                constelNames.add(constel.getName());
-                cmap.put(constel.getName(), (Constellation) constel);
-            }
-        }
-        constelNames.sort();
-
-        for (String name : constelNames) {
-            OwnCheckBox constelCb = new OwnCheckBox(name, skin, sp4);
-            constelCb.setChecked(cmap.get(name).isVisible());
-
-            constelCb.addListener((event) -> {
-                if (event instanceof ChangeEvent && cmap.containsKey(name)) {
-                    Gdx.app.postRunnable(() -> {
-                        cmap.get(name).setVisible(constelCb.isChecked());
-                    });
-                    return true;
-                }
-                return false;
-            });
-
-            constelList.addActor(constelCb);
-            constelCbs.add(constelCb);
-        }
-
-        constelList.pack();
-        OwnScrollPane constelScrollPane = new OwnScrollPane(constelList, skin, "minimalist-nobg");
-        constelScrollPane.setName("constellations scroll");
-
-        constelScrollPane.setFadeScrollBars(false);
-        constelScrollPane.setScrollingDisabled(true, false);
-
-        constelScrollPane.setHeight(100 * GlobalConf.SCALE_FACTOR);
-        constelScrollPane.setWidth(componentWidth);
-
-        HorizontalGroup constelButtons = new HorizontalGroup();
-        constelButtons.space(sp4);
-        OwnTextButton selAll = new OwnTextButton(txt("gui.select.all"), skin);
-        selAll.addListener((event) -> {
-            if (event instanceof ChangeEvent) {
-                Gdx.app.postRunnable(()->{
-                   constelCbs.stream().forEach((i) -> i.setChecked(true));
-                });
-                return true;
-            }
-            return false;
-        });
-        OwnTextButton selNone = new OwnTextButton(txt("gui.select.none"), skin);
-        selNone.addListener((event) -> {
-            if (event instanceof ChangeEvent) {
-                Gdx.app.postRunnable(()->{
-                   constelCbs.stream().forEach((i) -> i.setChecked(false));
-                });
-                return true;
-            }
-            return false;
-        });
-        constelButtons.addActor(selAll);
-        constelButtons.addActor(selNone);
-        
-        VerticalGroup constelGroup = new VerticalGroup();
-        constelGroup.left();
-        constelGroup.columnLeft();
-        constelGroup.space(sp4);
-
-        constelGroup.addActor(new OwnLabel(TextUtils.trueCapitalise(txt("element.constellations")), skin, "header"));
-        constelGroup.addActor(constelScrollPane);
-        constelGroup.addActor(constelButtons);
-
-        /**
+        /*
          * ADD TO CONTENT
          */
 
@@ -356,12 +228,115 @@ public class ObjectsComponent extends GuiComponent implements IObserver {
             objectsGroup.addActor(meshesGroup);
         }
 
-        if (constelList != null) {
+        if (constelGroup != null) {
             objectsGroup.addActor(constelGroup);
         }
 
         component = objectsGroup;
 
+    }
+
+    private Group visibilitySwitcher(Class<? extends FadeNode> clazz, String title, String id) {
+        float componentWidth = 160 * GlobalConf.SCALE_FACTOR;
+        float sp4 = 4 * GlobalConf.SCALE_FACTOR;
+        float sp8 = 8 * GlobalConf.SCALE_FACTOR;
+        VerticalGroup objectsVgroup = new VerticalGroup();
+        objectsVgroup.space(sp4);
+        objectsVgroup.left();
+        objectsVgroup.columnLeft();
+        Array<SceneGraphNode> objects = new Array<>();
+        List<OwnCheckBox> cbs = new ArrayList<>();
+        sg.getRoot().getChildrenByType(clazz, objects);
+        Array<String> names = new Array<>(objects.size);
+        Map<String, IVisibilitySwitch> cmap = new HashMap<>();
+
+        for (SceneGraphNode object : objects) {
+            // Omit stars with no proper names
+            if (object.getName() != null && !GlobalResources.isNumeric(object.getName())) {
+                names.add(object.getName());
+                cmap.put(object.getName(), (IVisibilitySwitch) object);
+            }
+        }
+        names.sort();
+
+        for (String name : names) {
+            HorizontalGroup objectHgroup = new HorizontalGroup();
+            objectHgroup.space(sp4);
+            objectHgroup.left();
+            OwnCheckBox cb = new OwnCheckBox(name, skin, sp4);
+            IVisibilitySwitch obj = cmap.get(name);
+            cb.setChecked(obj.isVisible());
+
+            cb.addListener((event) -> {
+                if (event instanceof ChangeEvent && cmap.containsKey(name)) {
+                    Gdx.app.postRunnable(() -> {
+                        obj.setVisible(cb.isChecked());
+                    });
+                    return true;
+                }
+                return false;
+            });
+
+            objectHgroup.addActor(cb);
+            // Tooltips
+            if(obj.getDescription() != null) {
+                ImageButton meshDescTooltip = new OwnImageButton(skin, "tooltip");
+                meshDescTooltip.addListener(new TextTooltip((obj.getDescription() == null || obj.getDescription().isEmpty() ? "No description" : obj.getDescription()), skin));
+                objectHgroup.addActor(meshDescTooltip);
+            }
+
+
+            objectsVgroup.addActor(objectHgroup);
+            cbs.add(cb);
+        }
+
+        objectsVgroup.pack();
+        OwnScrollPane scrollPane = new OwnScrollPane(objectsVgroup, skin, "minimalist-nobg");
+        scrollPane.setName(id + " scroll");
+
+        scrollPane.setFadeScrollBars(false);
+        scrollPane.setScrollingDisabled(true, false);
+
+        scrollPane.setHeight(Math.min(100 * GlobalConf.SCALE_FACTOR, objectsVgroup.getHeight()));
+        scrollPane.setWidth(componentWidth);
+
+        HorizontalGroup buttons = new HorizontalGroup();
+        buttons.space(sp4);
+        OwnTextButton selAll = new OwnTextButton(I18n.txt("gui.select.all"), skin);
+        selAll.pad(0, sp8, 0, sp8);
+        selAll.addListener((event) -> {
+            if (event instanceof ChangeEvent) {
+                Gdx.app.postRunnable(() -> {
+                    cbs.stream().forEach((i) -> i.setChecked(true));
+                });
+                return true;
+            }
+            return false;
+        });
+        OwnTextButton selNone = new OwnTextButton(I18n.txt("gui.select.none"), skin);
+        selNone.pad(0, sp8, 0, sp8);
+        selNone.addListener((event) -> {
+            if (event instanceof ChangeEvent) {
+                Gdx.app.postRunnable(() -> {
+                    cbs.stream().forEach((i) -> i.setChecked(false));
+                });
+                return true;
+            }
+            return false;
+        });
+        buttons.addActor(selAll);
+        buttons.addActor(selNone);
+
+        VerticalGroup group = new VerticalGroup();
+        group.left();
+        group.columnLeft();
+        group.space(sp4);
+
+        group.addActor(new OwnLabel(TextUtils.trueCapitalise(title), skin, "header"));
+        group.addActor(scrollPane);
+        group.addActor(buttons);
+
+        return objects.size == 0 ? null : group;
     }
 
     private Array<Node> createTree(Array<SceneGraphNode> nodes) {
@@ -408,8 +383,7 @@ public class ObjectsComponent extends GuiComponent implements IObserver {
                     focusListScrollPane.setScrollY(focusListScrollPane.getMaxY() - node.getActor().getY());
                 } else if (list) {
                     // Update focus selection in focus list
-                    @SuppressWarnings("unchecked")
-                    com.badlogic.gdx.scenes.scene2d.ui.List<String> objList = (com.badlogic.gdx.scenes.scene2d.ui.List<String>) objectsList;
+                    @SuppressWarnings("unchecked") com.badlogic.gdx.scenes.scene2d.ui.List<String> objList = (com.badlogic.gdx.scenes.scene2d.ui.List<String>) objectsList;
                     Array<String> items = objList.getItems();
                     SceneGraphNode node = (SceneGraphNode) data[0];
 

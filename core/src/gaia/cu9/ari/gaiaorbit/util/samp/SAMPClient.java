@@ -1,8 +1,11 @@
+/*
+ * This file is part of Gaia Sky, which is released under the Mozilla Public License 2.0.
+ * See the file LICENSE.md in the project root for full license details.
+ */
+
 package gaia.cu9.ari.gaiaorbit.util.samp;
 
-import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.utils.Array;
-import gaia.cu9.ari.gaiaorbit.GaiaSky;
 import gaia.cu9.ari.gaiaorbit.data.group.STILDataProvider;
 import gaia.cu9.ari.gaiaorbit.event.EventManager;
 import gaia.cu9.ari.gaiaorbit.event.Events;
@@ -58,8 +61,8 @@ public class SAMPClient implements IObserver {
         provider = new STILDataProvider();
 
         // Init map
-        mapIdSg = new HashMap<String, StarGroup>();
-        mapIdUrl = new HashMap<String, String>();
+        mapIdSg = new HashMap<>();
+        mapIdUrl = new HashMap<>();
 
         ClientProfile cp = DefaultClientProfile.getProfile();
         conn = new GaiaSkyHubConnector(cp);
@@ -173,9 +176,6 @@ public class SAMPClient implements IObserver {
         // Keep a look out for hubs if initial one shuts down
         conn.setAutoconnect(10);
 
-        // Broadcast a message
-        //conn.getConnection().notifyAll(new Message("stuff.event.doing"));
-
     }
 
     public String getStatus() {
@@ -210,28 +210,17 @@ public class SAMPClient implements IObserver {
             @SuppressWarnings("unchecked") Array<StarBean> data = (Array<StarBean>) provider.loadData(ds, 1.0f);
 
             if (data != null && data.size > 0) {
-                StarGroup sg = new StarGroup();
-                sg.setName(id);
-                sg.setParent("Universe");
-                sg.setFadeout(new double[] { 21e2, 1e5 });
-                sg.setLabelcolor(new double[] { 1.0, 1.0, 1.0, 1.0 });
-                sg.setColor(new double[] { 1.0, 1.0, 1.0, 0.25 });
-                sg.setSize(6.0);
-                sg.setLabelposition(new double[] { 0.0, -5.0e7, -4e8 });
-                sg.setCt("Stars");
-                sg.setData(data);
+                StarGroup sg = StarGroup.getDefaultStarGroup(id, data);
 
                 // Catalog info
-                new CatalogInfo(name, url, null, CatalogInfoType.SAMP, sg);
+                CatalogInfo ci = new CatalogInfo(name, url, null, CatalogInfoType.SAMP, sg);
 
                 mapIdSg.put(id, sg);
                 mapIdUrl.put(id, url);
 
                 // Insert
-                Gdx.app.postRunnable(() -> {
-                    sg.doneLoading(null);
-                    GaiaSky.instance.sg.insert(sg, true);
-                });
+                EventManager.instance.post(Events.CATALOG_ADD, ci, true);
+
                 logger.info(data.size + " objects loaded via SAMP");
                 return true;
             } else {
@@ -252,7 +241,6 @@ public class SAMPClient implements IObserver {
                 StarGroup sg = (StarGroup) data[0];
                 if (conn != null && conn.isConnected() && mapIdSg.containsValue(sg)) {
                     String id = sg.name;
-                    String name = id;
                     String url = mapIdUrl.get(id);
                     int row = sg.getCandidateIndex();
 

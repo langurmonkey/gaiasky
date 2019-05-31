@@ -1,8 +1,13 @@
+/*
+ * This file is part of Gaia Sky, which is released under the Mozilla Public License 2.0.
+ * See the file LICENSE.md in the project root for full license details.
+ */
+
 package gaia.cu9.ari.gaiaorbit.interfce;
 
 import com.badlogic.gdx.Gdx;
 import gaia.cu9.ari.gaiaorbit.GaiaSky;
-import gaia.cu9.ari.gaiaorbit.data.orbit.PolylineData;
+import gaia.cu9.ari.gaiaorbit.data.util.PointCloudData;
 import gaia.cu9.ari.gaiaorbit.desktop.format.DesktopDateFormat;
 import gaia.cu9.ari.gaiaorbit.event.EventManager;
 import gaia.cu9.ari.gaiaorbit.event.Events;
@@ -172,7 +177,7 @@ public class ConsoleLogger implements IObserver {
             }
             break;
         case ORBIT_DATA_LOADED:
-            addMessage(I18n.bundle.format("notif.orbitdata.loaded", data[1], ((PolylineData) data[0]).getNumPoints()), true);
+            addMessage(I18n.bundle.format("notif.orbitdata.loaded", data[1], ((PointCloudData) data[0]).getNumPoints()), true);
             break;
         case SCREENSHOT_INFO:
             addMessage(I18n.bundle.format("notif.screenshot", data[0]));

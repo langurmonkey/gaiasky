@@ -1,11 +1,12 @@
-package gaia.cu9.ari.gaiaorbit.screenshot;
+/*
+ * This file is part of Gaia Sky, which is released under the Mozilla Public License 2.0.
+ * See the file LICENSE.md in the project root for full license details.
+ */
 
-import java.text.SimpleDateFormat;
-import java.util.Date;
+package gaia.cu9.ari.gaiaorbit.screenshot;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.glutils.FrameBuffer;
-
 import gaia.cu9.ari.gaiaorbit.GaiaSky;
 import gaia.cu9.ari.gaiaorbit.event.EventManager;
 import gaia.cu9.ari.gaiaorbit.event.Events;
@@ -18,6 +19,9 @@ import gaia.cu9.ari.gaiaorbit.render.IPostProcessor.RenderType;
 import gaia.cu9.ari.gaiaorbit.scenegraph.camera.ICamera;
 import gaia.cu9.ari.gaiaorbit.util.GlobalConf;
 import gaia.cu9.ari.gaiaorbit.util.GlobalConf.ImageFormat;
+
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 public class ScreenshotsManager implements IObserver {
     public static ScreenshotsManager system;

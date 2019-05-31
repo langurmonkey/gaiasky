@@ -1,29 +1,26 @@
 # This script tests the planetarium, 360 and stereo mode commands
 # Created by Toni Sagrista
 
-from gaia.cu9.ari.gaiaorbit.script import EventScriptingInterface
+from py4j.java_gateway import JavaGateway, GatewayParameters
 
-from gaia.cu9.ari.gaiaorbit.event import EventManager
-from gaia.cu9.ari.gaiaorbit.event import Events
-
-
-gs = EventScriptingInterface.instance()
+gateway = JavaGateway(gateway_parameters=GatewayParameters(auto_convert=True))
+gs = gateway.entry_point
 
 gs.sleep(3)
 
-print("360 mode")
+gs.print("360 mode")
 gs.set360Mode(True)
 gs.sleep(3)
 gs.set360Mode(False)
 gs.sleep(3)
 
-print("Planetarium mode")
+gs.print("Planetarium mode")
 gs.setPlanetariumMode(True)
 gs.sleep(3)
 gs.setPlanetariumMode(False)
 gs.sleep(3)
 
-print("Stereoscopic mode and profiles")
+gs.print("Stereoscopic mode and profiles")
 gs.setStereoscopicMode(True)
 gs.sleep(3)
 
@@ -32,3 +29,5 @@ for i in range(5):
     gs.sleep(3)
 
 gs.setStereoscopicMode(False)
+
+gateway.close()

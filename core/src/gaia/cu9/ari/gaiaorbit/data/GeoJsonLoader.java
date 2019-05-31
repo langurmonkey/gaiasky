@@ -1,3 +1,8 @@
+/*
+ * This file is part of Gaia Sky, which is released under the Mozilla Public License 2.0.
+ * See the file LICENSE.md in the project root for full license details.
+ */
+
 package gaia.cu9.ari.gaiaorbit.data;
 
 import com.badlogic.gdx.files.FileHandle;
@@ -5,7 +10,6 @@ import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.JsonReader;
 import com.badlogic.gdx.utils.JsonValue;
 import com.badlogic.gdx.utils.reflect.ReflectionException;
-
 import gaia.cu9.ari.gaiaorbit.scenegraph.Area;
 import gaia.cu9.ari.gaiaorbit.scenegraph.SceneGraphNode;
 import gaia.cu9.ari.gaiaorbit.util.GlobalConf;

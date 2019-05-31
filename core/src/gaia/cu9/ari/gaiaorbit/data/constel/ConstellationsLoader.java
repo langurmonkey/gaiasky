@@ -1,22 +1,26 @@
+/*
+ * This file is part of Gaia Sky, which is released under the Mozilla Public License 2.0.
+ * See the file LICENSE.md in the project root for full license details.
+ */
+
 package gaia.cu9.ari.gaiaorbit.data.constel;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-
-import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.utils.Array;
-
 import gaia.cu9.ari.gaiaorbit.data.ISceneGraphLoader;
-import gaia.cu9.ari.gaiaorbit.render.ComponentType;
+import gaia.cu9.ari.gaiaorbit.render.ComponentTypes;
+import gaia.cu9.ari.gaiaorbit.render.ComponentTypes.ComponentType;
 import gaia.cu9.ari.gaiaorbit.scenegraph.Constellation;
+import gaia.cu9.ari.gaiaorbit.scenegraph.FadeNode;
 import gaia.cu9.ari.gaiaorbit.scenegraph.SceneGraphNode;
-import gaia.cu9.ari.gaiaorbit.util.ComponentTypes;
 import gaia.cu9.ari.gaiaorbit.util.GlobalConf;
 import gaia.cu9.ari.gaiaorbit.util.I18n;
 import gaia.cu9.ari.gaiaorbit.util.Logger;
 import gaia.cu9.ari.gaiaorbit.util.parse.Parser;
+
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
 
 public class ConstellationsLoader<T extends SceneGraphNode> implements ISceneGraphLoader {
     private static final String separator = "\\t|,";
@@ -28,10 +32,19 @@ public class ConstellationsLoader<T extends SceneGraphNode> implements ISceneGra
 
     @Override
     public Array<? extends SceneGraphNode> loadData() {
-        Array<Constellation> constellations = new Array<Constellation>();
+        Array<SceneGraphNode> constellations = new Array<>();
 
         for (String f : files) {
             try {
+                // Add fade node
+                FadeNode constellationsFadeNode = new FadeNode();
+                constellationsFadeNode.setPosition(new double[] { 0, 0, 0 });
+                constellationsFadeNode.setCt(new String[] { "Constellations" });
+                constellationsFadeNode.setFadeout(new double[] { 1.0e2, 2.0e4 });
+                constellationsFadeNode.setParent(SceneGraphNode.ROOT_NAME);
+                constellationsFadeNode.setName("Constellations");
+                constellations.add(constellationsFadeNode);
+
                 // load constellations
                 FileHandle file = GlobalConf.data.dataFileHandle(f);
                 BufferedReader br = new BufferedReader(new InputStreamReader(file.read()));
@@ -52,7 +65,7 @@ public class ConstellationsLoader<T extends SceneGraphNode> implements ISceneGra
 
                             if (!lastName.isEmpty() && !name.equals("JUMP") && !name.equals(lastName)) {
                                 // We finished a constellation object
-                                Constellation cons = new Constellation(lastName, SceneGraphNode.ROOT_NAME);
+                                Constellation cons = new Constellation(lastName, "Constellations");
                                 cons.ct = ct;
                                 cons.ids = partial;
                                 constellations.add(cons);
@@ -61,7 +74,7 @@ public class ConstellationsLoader<T extends SceneGraphNode> implements ISceneGra
                             }
 
                             if (partial == null) {
-                                partial = new Array<int[]>();
+                                partial = new Array<>();
                             }
 
                             // Break point sequence
@@ -82,12 +95,10 @@ public class ConstellationsLoader<T extends SceneGraphNode> implements ISceneGra
                     // Add last
                     if (!lastName.isEmpty() && !name.equals("JUMP")) {
                         // We finished a constellation object
-                        Constellation cons = new Constellation(lastName, SceneGraphNode.ROOT_NAME);
+                        Constellation cons = new Constellation(lastName, "Constellations");
                         cons.ct = ct;
                         cons.ids = partial;
                         constellations.add(cons);
-                        partial = null;
-                        lastid = -1;
                     }
                 } catch (IOException e) {
                     Logger.getLogger(this.getClass()).error(e);

@@ -1,7 +1,11 @@
+/*
+ * This file is part of Gaia Sky, which is released under the Mozilla Public License 2.0.
+ * See the file LICENSE.md in the project root for full license details.
+ */
+
 package gaia.cu9.ari.gaiaorbit.scenegraph.camera;
 
 import com.badlogic.gdx.graphics.PerspectiveCamera;
-
 import gaia.cu9.ari.gaiaorbit.scenegraph.CelestialBody;
 import gaia.cu9.ari.gaiaorbit.scenegraph.IFocus;
 import gaia.cu9.ari.gaiaorbit.scenegraph.IStarFocus;
@@ -73,7 +77,7 @@ public interface ICamera {
      */
     public void update(double dt, ITimeFrameProvider time);
 
-    public void updateMode(CameraMode mode, boolean postEvent);
+    public void updateMode(CameraMode mode, boolean centerFocus, boolean postEvent);
 
     public CameraMode getMode();
 
@@ -128,14 +132,14 @@ public interface ICamera {
      * Called after updating the body's distance to the cam, it updates the
      * closest body in the camera to figure out the camera near
      * 
-     * @param cb
+     * @param  focus
      *            The body to check
      */
-    public void checkClosest(CelestialBody cb);
+    public void checkClosest(IFocus focus);
 
-    public CelestialBody getClosest();
+    public IFocus getClosest();
 
-    public CelestialBody getClosest2();
+    public IFocus getClosest2();
 
     public boolean isVisible(ITimeFrameProvider time, CelestialBody cb);
 

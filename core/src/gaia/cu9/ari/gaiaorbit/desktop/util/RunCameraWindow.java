@@ -1,34 +1,30 @@
-package gaia.cu9.ari.gaiaorbit.desktop.util;
+/*
+ * This file is part of Gaia Sky, which is released under the Mozilla Public License 2.0.
+ * See the file LICENSE.md in the project root for full license details.
+ */
 
-import java.util.Comparator;
+package gaia.cu9.ari.gaiaorbit.desktop.util;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.scenes.scene2d.Actor;
-import com.badlogic.gdx.scenes.scene2d.Event;
-import com.badlogic.gdx.scenes.scene2d.EventListener;
 import com.badlogic.gdx.scenes.scene2d.Stage;
-import com.badlogic.gdx.scenes.scene2d.ui.Button;
-import com.badlogic.gdx.scenes.scene2d.ui.HorizontalGroup;
-import com.badlogic.gdx.scenes.scene2d.ui.Image;
-import com.badlogic.gdx.scenes.scene2d.ui.ImageButton;
-import com.badlogic.gdx.scenes.scene2d.ui.Label;
-import com.badlogic.gdx.scenes.scene2d.ui.ScrollPane;
-import com.badlogic.gdx.scenes.scene2d.ui.Skin;
-import com.badlogic.gdx.scenes.scene2d.ui.TextTooltip;
+import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener.ChangeEvent;
 import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.Array;
-
 import gaia.cu9.ari.gaiaorbit.event.EventManager;
 import gaia.cu9.ari.gaiaorbit.event.Events;
 import gaia.cu9.ari.gaiaorbit.interfce.GenericDialog;
 import gaia.cu9.ari.gaiaorbit.util.GlobalConf;
 import gaia.cu9.ari.gaiaorbit.util.GlobalResources;
+import gaia.cu9.ari.gaiaorbit.util.I18n;
 import gaia.cu9.ari.gaiaorbit.util.scene2d.OwnImageButton;
 import gaia.cu9.ari.gaiaorbit.util.scene2d.OwnLabel;
 import gaia.cu9.ari.gaiaorbit.util.scene2d.OwnScrollPane;
 import gaia.cu9.ari.gaiaorbit.util.scene2d.OwnTextIconButton;
+
+import java.util.Comparator;
 
 /**
  * The run camera path file window, which allows the user to choose a script to
@@ -48,10 +44,10 @@ public class RunCameraWindow extends GenericDialog {
     private float pad;
 
     public RunCameraWindow(Stage stg, Skin skin) {
-        super(txt("gui.camera.title"), skin, stg);
+        super(I18n.txt("gui.camera.title"), skin, stg);
 
-        setAcceptText(txt("gui.camera.run"));
-        setCancelText(txt("gui.cancel"));
+        setAcceptText(I18n.txt("gui.camera.run"));
+        setCancelText(I18n.txt("gui.cancel"));
 
         buildSuper();
     }
@@ -63,31 +59,30 @@ public class RunCameraWindow extends GenericDialog {
         HorizontalGroup titlegroup = new HorizontalGroup();
         titlegroup.space(pad);
         ImageButton tooltip = new OwnImageButton(skin, "tooltip");
-        tooltip.addListener(new TextTooltip(txt("gui.tooltip.camera", SysUtils.getDefaultCameraDir()), skin));
-        Label choosetitle = new OwnLabel(txt("gui.camera.choose"), skin, "help-title");
+        tooltip.addListener(new TextTooltip(I18n.txt("gui.tooltip.camera", SysUtils.getDefaultCameraDir()), skin));
+        Label choosetitle = new OwnLabel(I18n.txt("gui.camera.choose"), skin, "help-title");
         titlegroup.addActor(choosetitle);
         titlegroup.addActor(tooltip);
         content.add(titlegroup).align(Align.left).padTop(pad * 2);
         content.row();
 
-        ScrollPane scriptsScroll = new OwnScrollPane(generateFileList(), skin, "minimalist");
-        scriptsScroll.setName("camera path files list scroll");
-        scriptsScroll.setFadeScrollBars(false);
-        scriptsScroll.setScrollingDisabled(true, false);
+        ScrollPane scroll = new OwnScrollPane(generateFileList(), skin, "minimalist");
+        scroll.setName("camera path files list scroll");
+        scroll.setFadeScrollBars(false);
+        scroll.setScrollingDisabled(true, false);
 
-        scriptsScroll.setHeight(200 * GlobalConf.SCALE_FACTOR);
-        scriptsScroll.setWidth(300 * GlobalConf.SCALE_FACTOR);
+        scroll.setHeight(200 * GlobalConf.SCALE_FACTOR);
+        scroll.setWidth(300 * GlobalConf.SCALE_FACTOR);
 
-        content.add(scriptsScroll).align(Align.center).pad(pad);
+        content.add(scroll).align(Align.center).pad(pad);
         content.row();
 
-        Image reloadImg = new Image(skin.getDrawable("reload"));
-        Button reload = new OwnTextIconButton("", reloadImg, skin);
+        Button reload = new OwnTextIconButton("", skin, "reload");
         reload.setName("reload camera files");
-        reload.addListener(new TextTooltip(txt("gui.camera.reload"), skin));
+        reload.addListener(new TextTooltip(I18n.txt("gui.camera.reload"), skin));
         reload.addListener((event) -> {
             if (event instanceof ChangeEvent) {
-                scriptsScroll.setActor(generateFileList());
+                scroll.setActor(generateFileList());
             }
             return false;
         });
@@ -118,12 +113,12 @@ public class RunCameraWindow extends GenericDialog {
         // Init files
         FileHandle scriptFolder = Gdx.files.absolute(SysUtils.getDefaultCameraDir().getPath());
         if (scripts == null)
-            scripts = new Array<FileHandle>();
+            scripts = new Array<>();
         else
             scripts.clear();
         
         if (scriptFolder.exists())
-            scripts = GlobalResources.listRec(scriptFolder, scripts, ".dat");
+            scripts = GlobalResources.listRec(scriptFolder, scripts, ".dat", ".gsc");
         scripts.sort(new FileHandleComparator());
         
         final com.badlogic.gdx.scenes.scene2d.ui.List<FileHandle> scriptsList = new com.badlogic.gdx.scenes.scene2d.ui.List<FileHandle>(skin, "normal");
@@ -135,19 +130,16 @@ public class RunCameraWindow extends GenericDialog {
 
         scriptsList.setItems(names);
         scriptsList.pack();//
-        scriptsList.addListener(new EventListener() {
-            @Override
-            public boolean handle(Event event) {
-                if (event instanceof ChangeEvent) {
-                    ChangeEvent ce = (ChangeEvent) event;
-                    Actor actor = ce.getTarget();
-                    @SuppressWarnings("unchecked")
-                    final String name = ((com.badlogic.gdx.scenes.scene2d.ui.List<String>) actor).getSelected();
-                    select(name);
-                    return true;
-                }
-                return false;
+        scriptsList.addListener(event -> {
+            if (event instanceof ChangeEvent) {
+                ChangeEvent ce = (ChangeEvent) event;
+                Actor actor = ce.getTarget();
+                @SuppressWarnings("unchecked")
+                final String name = ((List<String>) actor).getSelected();
+                select(name);
+                return true;
             }
+            return false;
         });
         // Select first
         Gdx.app.postRunnable(new Runnable() {
@@ -175,12 +167,12 @@ public class RunCameraWindow extends GenericDialog {
             }
             if (selectedScript != null) {
                 try {
-                    outConsole.setText(txt("gui.camera.ready"));
+                    outConsole.setText(I18n.txt("gui.camera.ready"));
                     outConsole.setColor(0, 1, 0, 1);
                     this.acceptButton.setDisabled(false);
                     me.pack();
                 } catch (Exception e) {
-                    outConsole.setText(txt("gui.camera.error2", e.getMessage()));
+                    outConsole.setText(I18n.txt("gui.camera.error2", e.getMessage()));
                     outConsole.setColor(1, 0, 0, 1);
                     this.acceptButton.setDisabled(true);
                     me.pack();

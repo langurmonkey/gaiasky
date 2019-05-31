@@ -1,12 +1,17 @@
-package gaia.cu9.ari.gaiaorbit.scenegraph;
+/*
+ * This file is part of Gaia Sky, which is released under the Mozilla Public License 2.0.
+ * See the file LICENSE.md in the project root for full license details.
+ */
 
-import java.util.Map;
+package gaia.cu9.ari.gaiaorbit.scenegraph;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.assets.AssetManager;
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.math.Vector2;
-
 import gaia.cu9.ari.gaiaorbit.GaiaSky;
+import gaia.cu9.ari.gaiaorbit.event.EventManager;
+import gaia.cu9.ari.gaiaorbit.event.Events;
 import gaia.cu9.ari.gaiaorbit.scenegraph.camera.ICamera;
 import gaia.cu9.ari.gaiaorbit.util.CatalogInfo;
 import gaia.cu9.ari.gaiaorbit.util.CatalogInfo.CatalogInfoType;
@@ -16,6 +21,8 @@ import gaia.cu9.ari.gaiaorbit.util.GlobalResources;
 import gaia.cu9.ari.gaiaorbit.util.math.MathUtilsd;
 import gaia.cu9.ari.gaiaorbit.util.math.Vector3d;
 import gaia.cu9.ari.gaiaorbit.util.time.ITimeFrameProvider;
+
+import java.util.Map;
 
 /**
  * Node that offers fade-in and fade-out capabilities.
@@ -50,15 +57,15 @@ public class FadeNode extends AbstractPositionEntity {
     private double currentDistance;
 
     /**
-     * If set, the fade distance will be computed against this object.
-     * Otherwise, we use the static position in {@link SceneGraphNode.pos}
+     * If set, the fade distance is the distance between the current fade node and this object.
+     * Otherwise, it is the length of the current object's position.
      */
     private AbstractPositionEntity position;
 
     /**
      * The name of the position object
      */
-    private String positionobjectname;
+    private String positionObjectName;
 
     /**
      * Is this fade node visible?
@@ -75,6 +82,33 @@ public class FadeNode extends AbstractPositionEntity {
      */
     protected CatalogInfo catalogInfo = null;
 
+    /** General track of highlight index **/
+    protected static int hli = 0;
+    /**
+     * Is it highlighted?
+     */
+    protected boolean highlighted = false;
+    /** Highlight color index **/
+    protected int hlci;
+
+    /** Highlight color **/
+    protected static float[][] hlColor = new float[][]{
+            {1f, 0f, 0f, 1f},
+            {0f, 1f, 0f, 1f},
+            {0f, 0f, 1f, 1f},
+            {0f, 1f, 1f, 1f},
+            {1f, 0f, 1f, 1f},
+            {1f, 1f, 0f, 1f}
+    };
+    protected static float[] hlColorFloat = new float[] {
+            Color.toFloatBits(hlColor[0][0], hlColor[0][1], hlColor[0][2], hlColor[0][3]),
+            Color.toFloatBits(hlColor[1][0], hlColor[1][1], hlColor[1][2], hlColor[1][3]),
+            Color.toFloatBits(hlColor[2][0], hlColor[2][1], hlColor[2][2], hlColor[2][3]),
+            Color.toFloatBits(hlColor[3][0], hlColor[3][1], hlColor[3][2], hlColor[3][3]),
+            Color.toFloatBits(hlColor[4][0], hlColor[4][1], hlColor[4][2], hlColor[4][3]),
+            Color.toFloatBits(hlColor[5][0], hlColor[5][1], hlColor[5][2], hlColor[5][3])
+    };
+
     public FadeNode() {
         super();
     }
@@ -85,13 +119,13 @@ public class FadeNode extends AbstractPositionEntity {
 
     @Override public void doneLoading(AssetManager manager) {
         super.doneLoading(manager);
-        if (positionobjectname != null) {
-            this.position = (AbstractPositionEntity) sg.getNode(positionobjectname);
+        if (positionObjectName != null) {
+            this.position = (AbstractPositionEntity) sg.getNode(positionObjectName);
         }
     }
 
     public void update(ITimeFrameProvider time, final Vector3d parentTransform, ICamera camera, float opacity) {
-        this.opacity = opacity * this.opacity;
+        this.opacity = opacity;
         translation.set(parentTransform);
         Vector3d aux = aux3d1.get();
 
@@ -116,7 +150,7 @@ public class FadeNode extends AbstractPositionEntity {
         this.distToCamera = this.position == null ? (float) pos.dst(camera.getPos()) : this.position.distToCamera;
 
         // Update alpha
-        this.opacity = getBaseOpacity();
+        //this.opacity = getBaseOpacity();
         if (fadeIn != null)
             this.opacity *= MathUtilsd.lint((float) this.currentDistance, fadeIn.x, fadeIn.y, 0, 1);
         if (fadeOut != null)
@@ -178,7 +212,7 @@ public class FadeNode extends AbstractPositionEntity {
     }
 
     public void setPositionobjectname(String po) {
-        this.positionobjectname = po;
+        this.positionObjectName = po;
     }
 
     public void setVisible(boolean visible) {
@@ -201,6 +235,27 @@ public class FadeNode extends AbstractPositionEntity {
 
     public void setCataloginfo(Map<String, String> map) {
         this.catalogInfo = new CatalogInfo(map.get("name"), map.get("description"), map.get("source"), CatalogInfoType.valueOf(map.get("type")), this);
+        EventManager.instance.post(Events.CATALOG_ADD, this.catalogInfo, false);
+    }
+
+    public static int nextHightlightColorIndex(){
+        hli = (hli + 1) % hlColor.length;
+        return hli;
+    }
+
+    public void highlight(boolean hl){
+        highlight(hl, nextHightlightColorIndex());
+    }
+
+    public void highlight(boolean hl, int colorIndex){
+        this.highlighted = hl;
+        if(hl) {
+            this.hlci = colorIndex;
+        }
+    }
+
+    public boolean isHighlighted(){
+        return highlighted;
     }
 
 }

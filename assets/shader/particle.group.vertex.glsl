@@ -1,10 +1,5 @@
 #version 120
 
-#ifdef GL_ES
-precision mediump float;
-precision mediump int;
-#endif
-
 #include shader/lib_geometry.glsl
 
 attribute vec4 a_position;
@@ -53,7 +48,7 @@ void main() {
     }
 
     #ifdef relativisticEffects
-        pos = computeRelativisticAberration(pos, length(pos), u_velDir, u_vc);
+        pos = computeRelativisticAberration(pos, dist, u_velDir, u_vc);
     #endif // relativisticEffects
     
     #ifdef gravitationalWaves

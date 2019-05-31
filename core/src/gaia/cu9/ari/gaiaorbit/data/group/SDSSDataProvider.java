@@ -1,21 +1,11 @@
+/*
+ * This file is part of Gaia Sky, which is released under the Mozilla Public License 2.0.
+ * See the file LICENSE.md in the project root for full license details.
+ */
+
 package gaia.cu9.ari.gaiaorbit.data.group;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.RandomAccessFile;
-import java.io.StringReader;
-import java.nio.CharBuffer;
-import java.nio.MappedByteBuffer;
-import java.nio.channels.FileChannel;
-import java.nio.charset.Charset;
-
-import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.utils.Array;
-
-import gaia.cu9.ari.gaiaorbit.desktop.util.SysUtils;
 import gaia.cu9.ari.gaiaorbit.scenegraph.ParticleGroup.ParticleBean;
 import gaia.cu9.ari.gaiaorbit.util.Constants;
 import gaia.cu9.ari.gaiaorbit.util.GlobalConf;
@@ -26,6 +16,15 @@ import gaia.cu9.ari.gaiaorbit.util.parse.Parser;
 import gaia.cu9.ari.gaiaorbit.util.units.Position;
 import gaia.cu9.ari.gaiaorbit.util.units.Position.PositionType;
 
+import java.io.*;
+import java.nio.CharBuffer;
+import java.nio.MappedByteBuffer;
+import java.nio.channels.FileChannel;
+import java.nio.charset.Charset;
+
+/**
+ * Loads SDSS data from a text file with a series of [ra, dec, z]
+ */
 public class SDSSDataProvider implements IParticleGroupDataProvider {
     private static final Log logger = Logger.getLogger(SDSSDataProvider.class);
 
@@ -34,10 +33,6 @@ public class SDSSDataProvider implements IParticleGroupDataProvider {
     }
 
     public Array<ParticleBean> loadData(String file, double factor) {
-        FileHandle f = GlobalConf.data.dataFileHandle(file);
-
-        @SuppressWarnings("unchecked")
-        //Array<ParticleBean> pointData = (Array<ParticleBean>) loadData(f.read(), factor);
         Array<ParticleBean> pointData = (Array<ParticleBean>) loadDataMapped(GlobalConf.data.dataFile(file), factor);
         if (pointData != null)
             logger.info(I18n.bundle.format("notif.nodeloader", pointData.size, file));

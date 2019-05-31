@@ -1,3 +1,8 @@
+/*
+ * This file is part of Gaia Sky, which is released under the Mozilla Public License 2.0.
+ * See the file LICENSE.md in the project root for full license details.
+ */
+
 package gaia.cu9.ari.gaiaorbit.desktop.render;
 
 import com.badlogic.gdx.Gdx;
@@ -9,18 +14,9 @@ import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Vector3;
 import com.bitfire.postprocessing.PostProcessor;
-import com.bitfire.postprocessing.effects.Bloom;
-import com.bitfire.postprocessing.effects.Curvature;
-import com.bitfire.postprocessing.effects.Fisheye;
-import com.bitfire.postprocessing.effects.Fxaa;
-import com.bitfire.postprocessing.effects.LensFlare2;
-import com.bitfire.postprocessing.effects.Levels;
-import com.bitfire.postprocessing.effects.LightGlow;
-import com.bitfire.postprocessing.effects.MotionBlur;
-import com.bitfire.postprocessing.effects.Nfaa;
+import com.bitfire.postprocessing.effects.*;
 import com.bitfire.postprocessing.filters.Glow;
 import com.bitfire.utils.ShaderLoader;
-
 import gaia.cu9.ari.gaiaorbit.GaiaSky;
 import gaia.cu9.ari.gaiaorbit.event.EventManager;
 import gaia.cu9.ari.gaiaorbit.event.Events;
@@ -232,10 +228,10 @@ public class DesktopPostProcessor implements IPostProcessor, IObserver {
             ((Fxaa) ppb.antialiasing).setSpanMax(8f);
             ((Fxaa) ppb.antialiasing).setReduceMin(1f / 8f);
             ((Fxaa) ppb.antialiasing).setReduceMul(1f / 4f);
-            Logger.getLogger(this.getClass()).info(I18n.bundle.format("notif.selected", "FXAA"));
+            Logger.getLogger(this.getClass()).debug(I18n.bundle.format("notif.selected", "FXAA"));
         } else if (aavalue.equals(Antialias.NFAA)) {
             ppb.antialiasing = new Nfaa(width, height);
-            Logger.getLogger(this.getClass()).info(I18n.bundle.format("notif.selected", "NFAA"));
+            Logger.getLogger(this.getClass()).debug(I18n.bundle.format("notif.selected", "NFAA"));
         }
         if (ppb.antialiasing != null) {
             ppb.antialiasing.setEnabled(GlobalConf.postprocess.POSTPROCESS_ANTIALIAS.isPostProcessAntialias());

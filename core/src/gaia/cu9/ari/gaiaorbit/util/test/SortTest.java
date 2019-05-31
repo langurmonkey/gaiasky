@@ -1,14 +1,15 @@
+/*
+ * This file is part of Gaia Sky, which is released under the Mozilla Public License 2.0.
+ * See the file LICENSE.md in the project root for full license details.
+ */
+
 package gaia.cu9.ari.gaiaorbit.util.test;
+
+import com.badlogic.gdx.utils.Array;
 
 import java.lang.management.ManagementFactory;
 import java.lang.management.ThreadMXBean;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Random;
-
-import com.badlogic.gdx.utils.Array;
+import java.util.*;
 
 /**
  * Compares performances of different lists such as {@link java.util.ArrayList}

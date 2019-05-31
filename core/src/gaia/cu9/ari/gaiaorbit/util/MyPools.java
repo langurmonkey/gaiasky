@@ -1,3 +1,8 @@
+/*
+ * This file is part of Gaia Sky, which is released under the Mozilla Public License 2.0.
+ * See the file LICENSE.md in the project root for full license details.
+ */
+
 package gaia.cu9.ari.gaiaorbit.util;
 
 import com.badlogic.gdx.utils.Array;
@@ -33,9 +38,9 @@ public class MyPools {
 
     /** Obtains an object from the {@link #get(Class) pool}. */
     static public <T> T obtain(Class<T> type) {
-        T obj = null;
+        T obj;
         synchronized (lock) {
-            obj = (T) get(type).obtain();
+            obj = get(type).obtain();
         }
         return obj;
     }

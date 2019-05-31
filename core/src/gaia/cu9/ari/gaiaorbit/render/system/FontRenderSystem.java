@@ -1,15 +1,19 @@
+/*
+ * This file is part of Gaia Sky, which is released under the Mozilla Public License 2.0.
+ * See the file LICENSE.md in the project root for full license details.
+ */
+
 package gaia.cu9.ari.gaiaorbit.render.system;
 
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShaderProgram;
 import com.badlogic.gdx.utils.Array;
-import gaia.cu9.ari.gaiaorbit.render.ComponentType;
+import gaia.cu9.ari.gaiaorbit.render.ComponentTypes.ComponentType;
 import gaia.cu9.ari.gaiaorbit.render.I3DTextRenderable;
 import gaia.cu9.ari.gaiaorbit.render.IAnnotationsRenderable;
 import gaia.cu9.ari.gaiaorbit.render.IRenderable;
 import gaia.cu9.ari.gaiaorbit.scenegraph.SceneGraphNode.RenderGroup;
-import gaia.cu9.ari.gaiaorbit.scenegraph.Text2D;
 import gaia.cu9.ari.gaiaorbit.scenegraph.camera.ICamera;
 import gaia.cu9.ari.gaiaorbit.util.GlobalConf;
 import gaia.cu9.ari.gaiaorbit.util.comp.DistToCameraComparator;
@@ -27,7 +31,7 @@ public class FontRenderSystem extends AbstractRenderSystem {
         super(rg, alphas, new ShaderProgram[] { program });
         this.batch = batch;
         // Init comparator
-        comp = new DistToCameraComparator<IRenderable>();
+        comp = new DistToCameraComparator<>();
         red = new float[] { 1f, 0f, 0f, 1f };
     }
 
@@ -57,18 +61,16 @@ public class FontRenderSystem extends AbstractRenderSystem {
             float lalpha = alphas[ComponentType.Labels.ordinal()];
             fontDistanceField.getData().setScale(0.6f);
             for (int i = 0; i < size; i++) {
-                I3DTextRenderable s = (I3DTextRenderable) renderables.get(i);
+                I3DTextRenderable lr = (I3DTextRenderable) renderables.get(i);
 
-                // Regular mode, we use 3D distance field font
-                I3DTextRenderable lr = (I3DTextRenderable) s;
                 // Label color
                 program.setUniform4fv("u_color", GlobalConf.program.isUINightMode() ? red : lr.textColour(), 0, 4);
                 // Component alpha
-                program.setUniformf("u_componentAlpha", getAlpha(s) * (s instanceof Text2D ? 1 : lalpha));
+                program.setUniformf("u_componentAlpha", getAlpha(lr) * (!lr.isLabel() ? 1 : lalpha));
                 // Font opacity multiplier, take into account element opacity
                 program.setUniformf("u_opacity", 0.75f * lr.getTextOpacity());
 
-                s.render(batch, program, this, rc, camera);
+                lr.render(batch, program, this, rc, camera);
             }
         }
         batch.end();

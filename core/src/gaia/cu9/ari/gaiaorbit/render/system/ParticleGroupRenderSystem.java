@@ -1,3 +1,8 @@
+/*
+ * This file is part of Gaia Sky, which is released under the Mozilla Public License 2.0.
+ * See the file LICENSE.md in the project root for full license details.
+ */
+
 package gaia.cu9.ari.gaiaorbit.render.system;
 
 import com.badlogic.gdx.Gdx;
@@ -19,20 +24,18 @@ import gaia.cu9.ari.gaiaorbit.scenegraph.ParticleGroup.ParticleBean;
 import gaia.cu9.ari.gaiaorbit.scenegraph.SceneGraphNode.RenderGroup;
 import gaia.cu9.ari.gaiaorbit.scenegraph.camera.ICamera;
 import gaia.cu9.ari.gaiaorbit.util.GlobalConf;
-import gaia.cu9.ari.gaiaorbit.util.GlobalConf.ProgramConf.StereoProfile;
 import gaia.cu9.ari.gaiaorbit.util.comp.DistToCameraComparator;
 
 import java.util.Random;
 
 public class ParticleGroupRenderSystem extends ImmediateRenderSystem implements IObserver {
-    private final int N_MESHES = 50;
     Vector3 aux1;
     int additionalOffset, pmOffset;
     Random rand;
 
     public ParticleGroupRenderSystem(RenderGroup rg, float[] alphas, ShaderProgram[] shaders) {
-        super(rg, alphas, shaders, 1500000);
-        comp = new DistToCameraComparator<IRenderable>();
+        super(rg, alphas, shaders);
+        comp = new DistToCameraComparator<>();
         rand = new Random(123);
         aux1 = new Vector3();
         EventManager.instance.subscribe(this, Events.DISPOSE_PARTICLE_GROUP_GPU_MESH);
@@ -45,36 +48,21 @@ public class ParticleGroupRenderSystem extends ImmediateRenderSystem implements 
     @Override
     protected void initVertices() {
         /** STARS **/
-        meshes = new MeshData[N_MESHES];
+        meshes = new Array<>();
     }
 
     /**
-    	 * Adds a new mesh data to the meshes list and increases the mesh data index
-    	 *
-    	 * @param nVertices The max number of vertices this mesh data can hold
-    	 * @return The index of the new mesh data
-    	 */
+     * Adds a new mesh data to the meshes list and increases the mesh data index
+     *
+     * @param nVertices The max number of vertices this mesh data can hold
+     * @return The index of the new mesh data
+     */
     private int addMeshData(int nVertices) {
-        // look for index
-        int mdi;
-        for (mdi = 0; mdi < N_MESHES; mdi++) {
-            if (meshes[mdi] == null) {
-                break;
-            }
-        }
-
-        if (mdi >= N_MESHES) {
-            logger.error("No more free meshes!");
-            return -1;
-        }
-
-        curr = new MeshData();
-        meshes[mdi] = curr;
-
-        maxVertices = nVertices;
+        int mdi = createMeshData();
+        curr = meshes.get(mdi);
 
         VertexAttribute[] attribs = buildVertexAttributes();
-        curr.mesh = new Mesh(false, maxVertices, 0, attribs);
+        curr.mesh = new Mesh(false, nVertices, 0, attribs);
 
         curr.vertexSize = curr.mesh.getVertexAttributes().vertexSize / 4;
         curr.colorOffset = curr.mesh.getVertexAttribute(Usage.ColorPacked) != null ? curr.mesh.getVertexAttribute(Usage.ColorPacked).offset / 4 : 0;
@@ -83,69 +71,46 @@ public class ParticleGroupRenderSystem extends ImmediateRenderSystem implements 
         return mdi;
     }
 
-    /**
-    	 * Clears the mesh data at the index i
-    	 *
-    	 * @param i The index
-    	 */
-    public void clearMeshData(int i) {
-        assert i >= 0 && i < meshes.length : "Mesh data index out of bounds: " + i + " (n meshes = " + N_MESHES + ")";
-
-        MeshData md = meshes[i];
-
-        if (md != null && md.mesh != null) {
-            md.mesh.dispose();
-            md.vertices = null;
-            md.indices = null;
-            meshes[i] = null;
-        }
-    }
-
     @Override
     public void renderStud(Array<IRenderable> renderables, ICamera camera, double t) {
         if (renderables.size > 0) {
             for (IRenderable renderable : renderables) {
                 ParticleGroup particleGroup = (ParticleGroup) renderable;
-                curr = meshes[particleGroup.offset];
                 /**
-                				 * GROUP RENDER
-                				 */
+                 * GROUP RENDER
+                 */
                 if (!particleGroup.inGpu) {
                     particleGroup.offset = addMeshData(particleGroup.size());
+                    curr = meshes.get(particleGroup.offset);
 
-                    checkRequiredVerticesSize(particleGroup.size() * curr.vertexSize);
-                    curr.vertices = vertices;
-
+                    ensureTempVertsSize(particleGroup.size() * curr.vertexSize);
                     for (ParticleBean pb : particleGroup.data()) {
                         double[] p = pb.data;
                         // COLOR
-                        float[] c = particleGroup.cc;
-                        curr.vertices[curr.vertexIdx + curr.colorOffset] = Color.toFloatBits(c[0], c[1], c[2], c[3]);
+                        float[] c = particleGroup.getColor();
+                        tempVerts[curr.vertexIdx + curr.colorOffset] = Color.toFloatBits(c[0], c[1], c[2], c[3]);
 
                         // SIZE
-                        curr.vertices[curr.vertexIdx + additionalOffset] = particleGroup.size + (float) (rand.nextGaussian() * particleGroup.size / 4d);
+                        tempVerts[curr.vertexIdx + additionalOffset] = (particleGroup.size + (float) (rand.nextGaussian() * particleGroup.size / 4d)) * particleGroup.highlightedSizeFactor();
 
                         // cb.transform.getTranslationf(aux);
                         // POSITION
                         final int idx = curr.vertexIdx;
-                        curr.vertices[idx] = (float) p[0];
-                        curr.vertices[idx + 1] = (float) p[1];
-                        curr.vertices[idx + 2] = (float) p[2];
+                        tempVerts[idx] = (float) p[0];
+                        tempVerts[idx + 1] = (float) p[1];
+                        tempVerts[idx + 2] = (float) p[2];
 
                         curr.vertexIdx += curr.vertexSize;
                     }
                     particleGroup.count = particleGroup.size() * curr.vertexSize;
-                    curr.mesh.setVertices(curr.vertices, 0, particleGroup.count);
-                    curr.vertices = null;
+                    curr.mesh.setVertices(tempVerts, 0, particleGroup.count);
 
                     particleGroup.inGpu = true;
 
                 }
 
+                curr = meshes.get(particleGroup.offset);
                 if (curr != null) {
-                    /**
-                    					 * PARTICLE RENDERER
-                    					 */
                     // Enable gl_PointCoord
                     Gdx.gl20.glEnable(34913);
                     // Enable point sizes
@@ -156,12 +121,14 @@ public class ParticleGroupRenderSystem extends ImmediateRenderSystem implements 
 
                     ShaderProgram shaderProgram = getShaderProgram();
 
+                    boolean stereohw = GlobalConf.program.isStereoHalfWidth();
+
                     shaderProgram.begin();
                     shaderProgram.setUniformMatrix("u_projModelView", camera.getCamera().combined);
-                    shaderProgram.setUniformf("u_alpha", particleGroup.opacity * alphas[particleGroup.ct.getFirstOrdinal()]);
-                    shaderProgram.setUniformf("u_ar", GlobalConf.program.STEREOSCOPIC_MODE && (GlobalConf.program.STEREO_PROFILE != StereoProfile.HD_3DTV_HORIZONTAL && GlobalConf.program.STEREO_PROFILE != StereoProfile.ANAGLYPHIC) ? 0.5f : 1f);
+                    shaderProgram.setUniformf("u_alpha", alphas[particleGroup.ct.getFirstOrdinal()] * particleGroup.getOpacity());
+                    shaderProgram.setUniformf("u_ar", stereohw ? 0.5f : 1f);
                     shaderProgram.setUniformf("u_profileDecay", particleGroup.profileDecay);
-                    shaderProgram.setUniformf("u_sizeFactor", rc.scaleFactor * GlobalConf.scene.STAR_POINT_SIZE / 5f);
+                    shaderProgram.setUniformf("u_sizeFactor", (((stereohw ? 2f : 1f) * rc.scaleFactor * GlobalConf.scene.STAR_POINT_SIZE / 5f)) * particleGroup.highlightedSizeFactor());
                     shaderProgram.setUniformf("u_camPos", camera.getCurrent().getPos().put(aux1));
                     shaderProgram.setUniformf("u_camDir", camera.getCurrent().getCamera().direction);
                     shaderProgram.setUniformi("u_cubemap", GlobalConf.program.CUBEMAP360_MODE ? 1 : 0);
@@ -177,7 +144,6 @@ public class ParticleGroupRenderSystem extends ImmediateRenderSystem implements 
                 }
             }
         }
-
     }
 
     protected VertexAttribute[] buildVertexAttributes() {

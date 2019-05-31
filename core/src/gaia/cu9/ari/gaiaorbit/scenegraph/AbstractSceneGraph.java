@@ -1,9 +1,17 @@
+/*
+ * This file is part of Gaia Sky, which is released under the Mozilla Public License 2.0.
+ * See the file LICENSE.md in the project root for full license details.
+ */
+
 package gaia.cu9.ari.gaiaorbit.scenegraph;
 
-import com.badlogic.gdx.utils.*;
+import com.badlogic.gdx.utils.Array;
+import com.badlogic.gdx.utils.IntMap;
+import com.badlogic.gdx.utils.ObjectMap;
 import com.badlogic.gdx.utils.ObjectMap.Keys;
+import com.badlogic.gdx.utils.ObjectSet;
 import gaia.cu9.ari.gaiaorbit.GaiaSky;
-import gaia.cu9.ari.gaiaorbit.render.system.PixelRenderSystem;
+import gaia.cu9.ari.gaiaorbit.render.system.StarPointRenderSystem;
 import gaia.cu9.ari.gaiaorbit.scenegraph.StarGroup.StarBean;
 import gaia.cu9.ari.gaiaorbit.scenegraph.camera.ICamera;
 import gaia.cu9.ari.gaiaorbit.scenegraph.octreewrapper.AbstractOctreeWrapper;
@@ -25,7 +33,7 @@ public abstract class AbstractSceneGraph implements ISceneGraph {
     /** Quick lookup map. Name to node. **/
     ObjectMap<String, SceneGraphNode> stringToNode;
     /**
-     * Map from integer to position with all hipparcos stars, for the
+     * Map from integer to position with all Hipparcos stars, for the
      * constellations
      **/
     IntMap<IPosition> hipMap;
@@ -74,9 +82,9 @@ public abstract class AbstractSceneGraph implements ISceneGraph {
         this.hasStarGroup = hasStarGroup;
 
         // Initialize stringToNode and starMap maps
-        stringToNode = new ObjectMap<String, SceneGraphNode>(nodes.size * 2);
+        stringToNode = new ObjectMap<>(nodes.size * 2);
         stringToNode.put(root.name, root);
-        hipMap = new IntMap<IPosition>();
+        hipMap = new IntMap<>();
         for (SceneGraphNode node : nodes) {
             addToIndex(node, stringToNode);
 
@@ -140,7 +148,7 @@ public abstract class AbstractSceneGraph implements ISceneGraph {
                     if (hipMap.containsKey(((Star) s).hip)) {
                         logger.debug("Duplicated HIP id: " + ((Star) s).hip);
                     } else {
-                        hipMap.put(((Star) s).hip, (Star) s);
+                        hipMap.put(((Star) s).hip, s);
                     }
                 }
             } else if (node instanceof StarGroup) {
@@ -225,7 +233,7 @@ public abstract class AbstractSceneGraph implements ISceneGraph {
 
     public synchronized void removeFromStringToNode(SceneGraphNode node) {
         Keys<String> keys = stringToNode.keys();
-        ObjectSet<String> hits = new ObjectSet<String>();
+        ObjectSet<String> hits = new ObjectSet<>();
         for (String key : keys) {
             if (stringToNode.get(key) == node)
                 hits.add(key);
@@ -238,7 +246,7 @@ public abstract class AbstractSceneGraph implements ISceneGraph {
     public void update(ITimeFrameProvider time, ICamera camera) {
         // Check if we need to update the points
         if (GlobalConf.scene.COMPUTE_GAIA_SCAN && time.getDt() != 0) {
-            PixelRenderSystem.POINT_UPDATE_FLAG = true;
+            StarPointRenderSystem.POINT_UPDATE_FLAG = true;
         }
     }
 
@@ -273,16 +281,17 @@ public abstract class AbstractSceneGraph implements ISceneGraph {
     }
 
     public Array<SceneGraphNode> getNodes() {
-        Array<SceneGraphNode> objects = new Array<SceneGraphNode>();
+        Array<SceneGraphNode> objects = new Array<>();
         root.addNodes(objects);
         return objects;
     }
 
     public Array<IFocus> getFocusableObjects() {
-        Array<IFocus> objects = new Array<IFocus>();
+        Array<IFocus> objects = new Array<>();
         root.addFocusableObjects(objects);
         return objects;
     }
+
 
     public IFocus findFocus(String name) {
         SceneGraphNode node = getNode(name);
@@ -318,7 +327,7 @@ public abstract class AbstractSceneGraph implements ISceneGraph {
             // This assumes the star group is in the first level of the scene graph, right below universe
             for (SceneGraphNode sgn : root.children) {
                 if (sgn instanceof StarGroup)
-                    n += ((StarGroup) sgn).getStarCount();
+                    n += sgn.getStarCount();
             }
             return n;
         }

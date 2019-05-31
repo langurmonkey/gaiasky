@@ -1,17 +1,19 @@
-package gaia.cu9.ari.gaiaorbit.scenegraph;
+/*
+ * This file is part of Gaia Sky, which is released under the Mozilla Public License 2.0.
+ * See the file LICENSE.md in the project root for full license details.
+ */
 
-import java.time.Instant;
+package gaia.cu9.ari.gaiaorbit.scenegraph;
 
 import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.utils.reflect.ClassReflection;
 import com.badlogic.gdx.utils.reflect.Method;
 import com.badlogic.gdx.utils.reflect.ReflectionException;
-
 import gaia.cu9.ari.gaiaorbit.GaiaSky;
 import gaia.cu9.ari.gaiaorbit.assets.OrbitDataLoader;
 import gaia.cu9.ari.gaiaorbit.data.orbit.IOrbitDataProvider;
-import gaia.cu9.ari.gaiaorbit.render.ComponentType;
+import gaia.cu9.ari.gaiaorbit.render.ComponentTypes.ComponentType;
 import gaia.cu9.ari.gaiaorbit.render.system.LineRenderSystem;
 import gaia.cu9.ari.gaiaorbit.scenegraph.camera.ICamera;
 import gaia.cu9.ari.gaiaorbit.scenegraph.component.OrbitComponent;
@@ -24,6 +26,8 @@ import gaia.cu9.ari.gaiaorbit.util.math.MathUtilsd;
 import gaia.cu9.ari.gaiaorbit.util.math.Matrix4d;
 import gaia.cu9.ari.gaiaorbit.util.math.Vector3d;
 import gaia.cu9.ari.gaiaorbit.util.time.ITimeFrameProvider;
+
+import java.time.Instant;
 
 public class Orbit extends Polyline {
     private static final Log logger = Logger.getLogger(Orbit.class);
@@ -72,7 +76,7 @@ public class Orbit extends Polyline {
                 try {
                     provider = ClassReflection.newInstance(providerClass);
                     provider.load(oc.source, new OrbitDataLoader.OrbitDataLoaderParameter(name, providerClass, oc, multiplier, 100), newmethod);
-                    polylineData = provider.getData();
+                    pointCloudData = provider.getData();
                 } catch (Exception e) {
                     logger.error(e);
                 }
@@ -85,8 +89,8 @@ public class Orbit extends Polyline {
     public void doneLoading(AssetManager manager) {
         alpha = cc[3];
         if (!onlybody) {
-            int last = polylineData.getNumPoints() - 1;
-            Vector3d v = new Vector3d(polylineData.x.get(last), polylineData.y.get(last), polylineData.z.get(last));
+            int last = pointCloudData.getNumPoints() - 1;
+            Vector3d v = new Vector3d(pointCloudData.x.get(last), pointCloudData.y.get(last), pointCloudData.z.get(last));
             this.size = (float) v.len() * 5;
         } else {
 
@@ -143,7 +147,7 @@ public class Orbit extends Polyline {
                 if (body == null) {
                     // No body, always render
                     addToRender(this, rg);
-                } else if (body != null && body.distToCamera > distDown) {
+                } else if (body.distToCamera > distDown) {
                     // Body, disappear slowly
                     if (body.distToCamera < distUp)
                         this.alpha *= MathUtilsd.lint(body.distToCamera, distDown, distUp, 0, 1);
@@ -170,9 +174,9 @@ public class Orbit extends Polyline {
             }
 
             // This is so that the shape renderer does not mess up the z-buffer
-            for (int i = 1; i < polylineData.getNumPoints(); i++) {
-                polylineData.loadPoint(prev, i - 1);
-                polylineData.loadPoint(curr, i);
+            for (int i = 1; i < pointCloudData.getNumPoints(); i++) {
+                pointCloudData.loadPoint(prev, i - 1);
+                pointCloudData.loadPoint(curr, i);
 
                 if (parentPos != null) {
                     prev.sub(parentPos);

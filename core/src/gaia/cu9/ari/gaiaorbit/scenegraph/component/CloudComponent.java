@@ -1,6 +1,9 @@
-package gaia.cu9.ari.gaiaorbit.scenegraph.component;
+/*
+ * This file is part of Gaia Sky, which is released under the Mozilla Public License 2.0.
+ * See the file LICENSE.md in the project root for full license details.
+ */
 
-import java.util.Map;
+package gaia.cu9.ari.gaiaorbit.scenegraph.component;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.assets.AssetManager;
@@ -15,17 +18,13 @@ import com.badlogic.gdx.graphics.g3d.attributes.BlendingAttribute;
 import com.badlogic.gdx.graphics.g3d.attributes.TextureAttribute;
 import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Vector3;
-
 import gaia.cu9.ari.gaiaorbit.data.AssetBean;
-import gaia.cu9.ari.gaiaorbit.util.Constants;
-import gaia.cu9.ari.gaiaorbit.util.GlobalConf;
-import gaia.cu9.ari.gaiaorbit.util.I18n;
-import gaia.cu9.ari.gaiaorbit.util.Logger;
+import gaia.cu9.ari.gaiaorbit.util.*;
 import gaia.cu9.ari.gaiaorbit.util.Logger.Log;
-import gaia.cu9.ari.gaiaorbit.util.ModelCache;
-import gaia.cu9.ari.gaiaorbit.util.Pair;
 import gaia.cu9.ari.gaiaorbit.util.math.Vector3d;
 import gaia.cu9.ari.gaiaorbit.util.override.AtmosphereAttribute;
+
+import java.util.Map;
 
 public class CloudComponent {
     private static final Log logger = Logger.getLogger(CloudComponent.class);

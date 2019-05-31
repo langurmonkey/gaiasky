@@ -1,48 +1,35 @@
-package gaia.cu9.ari.gaiaorbit.interfce;
+/*
+ * This file is part of Gaia Sky, which is released under the Mozilla Public License 2.0.
+ * See the file LICENSE.md in the project root for full license details.
+ */
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+package gaia.cu9.ari.gaiaorbit.interfce;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Texture.TextureWrap;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.scenes.scene2d.Actor;
-import com.badlogic.gdx.scenes.scene2d.Event;
-import com.badlogic.gdx.scenes.scene2d.EventListener;
 import com.badlogic.gdx.scenes.scene2d.Stage;
-import com.badlogic.gdx.scenes.scene2d.ui.Button;
-import com.badlogic.gdx.scenes.scene2d.ui.Image;
-import com.badlogic.gdx.scenes.scene2d.ui.Skin;
-import com.badlogic.gdx.scenes.scene2d.ui.Table;
-import com.badlogic.gdx.scenes.scene2d.ui.TextTooltip;
-import com.badlogic.gdx.scenes.scene2d.ui.VerticalGroup;
+import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener.ChangeEvent;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.badlogic.gdx.scenes.scene2d.utils.TiledDrawable;
 import com.badlogic.gdx.utils.Align;
-
 import gaia.cu9.ari.gaiaorbit.event.EventManager;
 import gaia.cu9.ari.gaiaorbit.event.Events;
 import gaia.cu9.ari.gaiaorbit.event.IObserver;
-import gaia.cu9.ari.gaiaorbit.interfce.components.CameraComponent;
-import gaia.cu9.ari.gaiaorbit.interfce.components.DatasetsComponent;
-import gaia.cu9.ari.gaiaorbit.interfce.components.MusicComponent;
-import gaia.cu9.ari.gaiaorbit.interfce.components.ObjectsComponent;
-import gaia.cu9.ari.gaiaorbit.interfce.components.TimeComponent;
-import gaia.cu9.ari.gaiaorbit.interfce.components.VisibilityComponent;
-import gaia.cu9.ari.gaiaorbit.interfce.components.VisualEffectsComponent;
-import gaia.cu9.ari.gaiaorbit.render.ComponentType;
+import gaia.cu9.ari.gaiaorbit.interfce.components.*;
+import gaia.cu9.ari.gaiaorbit.render.ComponentTypes.ComponentType;
 import gaia.cu9.ari.gaiaorbit.scenegraph.ISceneGraph;
 import gaia.cu9.ari.gaiaorbit.util.GlobalConf;
 import gaia.cu9.ari.gaiaorbit.util.I18n;
 import gaia.cu9.ari.gaiaorbit.util.math.MathUtilsd;
-import gaia.cu9.ari.gaiaorbit.util.scene2d.CollapsiblePane;
-import gaia.cu9.ari.gaiaorbit.util.scene2d.CollapsibleWindow;
-import gaia.cu9.ari.gaiaorbit.util.scene2d.OwnImageButton;
-import gaia.cu9.ari.gaiaorbit.util.scene2d.OwnScrollPane;
-import gaia.cu9.ari.gaiaorbit.util.scene2d.OwnTextIconButton;
+import gaia.cu9.ari.gaiaorbit.util.scene2d.*;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public class ControlsWindow extends CollapsibleWindow implements IObserver {
     /**
@@ -53,7 +40,7 @@ public class ControlsWindow extends CollapsibleWindow implements IObserver {
     protected VerticalGroup mainVertical;
     protected OwnScrollPane windowScroll;
     protected Table guiLayout;
-    protected OwnImageButton recCamera = null, playCamera = null, playstop = null;
+    protected OwnImageButton recCamera = null, recKeyframeCamera = null, playCamera = null, playstop = null;
     protected TiledDrawable separator;
     /**
      * The scene graph
@@ -102,12 +89,12 @@ public class ControlsWindow extends CollapsibleWindow implements IObserver {
             }
             return false;
         });
-        playstop.addListener(new TextTooltip(txt("gui.tooltip.playstop"), skin));
+        playstop.addListener(new TextTooltip(I18n.txt("gui.tooltip.playstop"), skin));
 
         TimeComponent timeComponent = new TimeComponent(skin, ui);
         timeComponent.initialize();
 
-        CollapsiblePane time = new CollapsiblePane(ui, txt("gui.time"), timeComponent.getActor(), skin, true, playstop);
+        CollapsiblePane time = new CollapsiblePane(ui, I18n.txt("gui.time"), timeComponent.getActor(), skin, true, playstop);
         time.align(Align.left);
         mainActors.add(time);
         panes.put(timeComponent.getClass().getSimpleName(), time);
@@ -124,7 +111,20 @@ public class ControlsWindow extends CollapsibleWindow implements IObserver {
             }
             return false;
         });
-        recCamera.addListener(new TextTooltip(txt("gui.tooltip.reccamera"), skin));
+        recCamera.addListener(new TextTooltip(I18n.txt("gui.tooltip.reccamera"), skin));
+
+        // Record camera (keyframes)
+        recKeyframeCamera = new OwnImageButton(skin, "rec-key");
+        recKeyframeCamera.setName("recKeyframeCamera");
+        recKeyframeCamera.setChecked(GlobalConf.runtime.RECORD_KEYFRAME_CAMERA);
+        recKeyframeCamera.addListener(event -> {
+            if(event instanceof ChangeEvent){
+                EventManager.instance.post(Events.SHOW_KEYFRAMES_WINDOW_ACTION);
+                return true;
+            }
+           return false;
+        });
+        recKeyframeCamera.addListener(new TextTooltip(I18n.txt("gui.tooltip.reccamerakeyframe"), skin));
 
         // Play camera button
         playCamera = new OwnImageButton(skin, "play");
@@ -138,12 +138,12 @@ public class ControlsWindow extends CollapsibleWindow implements IObserver {
             return false;
         });
 
-        playCamera.addListener(new TextTooltip(txt("gui.tooltip.playcamera"), skin));
+        playCamera.addListener(new TextTooltip(I18n.txt("gui.tooltip.playcamera"), skin));
 
         CameraComponent cameraComponent = new CameraComponent(skin, ui);
         cameraComponent.initialize();
 
-        CollapsiblePane camera = new CollapsiblePane(ui, txt("gui.camera"), cameraComponent.getActor(), skin, false, recCamera, playCamera);
+        CollapsiblePane camera = new CollapsiblePane(ui, I18n.txt("gui.camera"), cameraComponent.getActor(), skin, false, recCamera, recKeyframeCamera, playCamera);
         camera.align(Align.left);
         mainActors.add(camera);
         panes.put(cameraComponent.getClass().getSimpleName(), camera);
@@ -153,7 +153,7 @@ public class ControlsWindow extends CollapsibleWindow implements IObserver {
         visibilityComponent.setVisibilityEntitites(visibilityEntities, visible);
         visibilityComponent.initialize();
 
-        CollapsiblePane visibility = new CollapsiblePane(ui, txt("gui.visibility"), visibilityComponent.getActor(), skin, false);
+        CollapsiblePane visibility = new CollapsiblePane(ui, I18n.txt("gui.visibility"), visibilityComponent.getActor(), skin, false);
         visibility.align(Align.left);
         mainActors.add(visibility);
         panes.put(visibilityComponent.getClass().getSimpleName(), visibility);
@@ -162,7 +162,7 @@ public class ControlsWindow extends CollapsibleWindow implements IObserver {
         VisualEffectsComponent visualEffectsComponent = new VisualEffectsComponent(skin, ui);
         visualEffectsComponent.initialize();
 
-        CollapsiblePane visualEffects = new CollapsiblePane(ui, txt("gui.lighting"), visualEffectsComponent.getActor(), skin, false);
+        CollapsiblePane visualEffects = new CollapsiblePane(ui, I18n.txt("gui.lighting"), visualEffectsComponent.getActor(), skin, false);
         visualEffects.align(Align.left);
         mainActors.add(visualEffects);
         panes.put(visualEffectsComponent.getClass().getSimpleName(), visualEffects);
@@ -171,7 +171,7 @@ public class ControlsWindow extends CollapsibleWindow implements IObserver {
         DatasetsComponent datasetsComponent = new DatasetsComponent(skin, ui);
         datasetsComponent.initialize();
 
-        CollapsiblePane datasets = new CollapsiblePane(ui, txt("gui.dataset.title"), datasetsComponent.getActor(), skin, false);
+        CollapsiblePane datasets = new CollapsiblePane(ui, I18n.txt("gui.dataset.title"), datasetsComponent.getActor(), skin, false);
         datasets.align(Align.left);
         mainActors.add(datasets);
         panes.put(datasetsComponent.getClass().getSimpleName(), datasets);
@@ -181,7 +181,7 @@ public class ControlsWindow extends CollapsibleWindow implements IObserver {
         objectsComponent.setSceneGraph(sg);
         objectsComponent.initialize();
 
-        CollapsiblePane objects = new CollapsiblePane(ui, txt("gui.objects"), objectsComponent.getActor(), skin, false);
+        CollapsiblePane objects = new CollapsiblePane(ui, I18n.txt("gui.objects"), objectsComponent.getActor(), skin, false);
         objects.align(Align.left);
         mainActors.add(objects);
         panes.put(objectsComponent.getClass().getSimpleName(), objects);
@@ -190,7 +190,7 @@ public class ControlsWindow extends CollapsibleWindow implements IObserver {
         //	GaiaComponent gaiaComponent = new GaiaComponent(skin, ui);
         //	gaiaComponent.initialize();
         //
-        //	CollapsiblePane gaia = new CollapsiblePane(ui, txt("gui.gaiascan"), gaiaComponent.getActor(), skin, false);
+        //	CollapsiblePane gaia = new CollapsiblePane(ui, I18n.txt("gui.gaiascan"), gaiaComponent.getActor(), skin, false);
         //	gaia.align(Align.left);
         //	mainActors.add(gaia);
         //	panes.put(gaiaComponent.getClass().getSimpleName(), gaia);
@@ -201,69 +201,43 @@ public class ControlsWindow extends CollapsibleWindow implements IObserver {
 
         Actor[] musicActors = MusicActorsManager.getMusicActors() != null ? MusicActorsManager.getMusicActors().getActors(skin) : null;
 
-        CollapsiblePane music = new CollapsiblePane(ui, txt("gui.music"), musicComponent.getActor(), skin, false, musicActors);
+        CollapsiblePane music = new CollapsiblePane(ui, I18n.txt("gui.music"), musicComponent.getActor(), skin, false, musicActors);
         music.align(Align.left);
         mainActors.add(music);
         panes.put(musicComponent.getClass().getSimpleName(), music);
 
-        Table buttonsTable = null;
+        Table buttonsTable;
         /** BUTTONS **/
-        Image prefsImg = new Image(skin.getDrawable("prefs-icon"));
-        Button preferences = new OwnTextIconButton("", prefsImg, skin);
+        Button preferences = new OwnTextIconButton("", skin, "preferences");
         preferences.setName("preferences");
-        preferences.addListener(new TextTooltip(txt("gui.preferences"), skin));
-        preferences.addListener(new EventListener() {
-            @Override
-            public boolean handle(Event event) {
-                if (event instanceof ChangeEvent) {
-                    EventManager.instance.post(Events.SHOW_PREFERENCES_ACTION);
-                }
-                return false;
+        preferences.addListener(new TextTooltip(I18n.txt("gui.preferences"), skin));
+        preferences.addListener(event -> {
+            if (event instanceof ChangeEvent) {
+                EventManager.instance.post(Events.SHOW_PREFERENCES_ACTION);
             }
+            return false;
         });
-        Image tutImg = new Image(skin.getDrawable("tutorial-icon"));
-        Button tutorial = new OwnTextIconButton("", tutImg, skin);
-        tutorial.setName("tutorial");
-        tutorial.addListener(new TextTooltip(txt("gui.tutorial"), skin));
-        tutorial.addListener(new EventListener() {
-            @Override
-            public boolean handle(Event event) {
-                if (event instanceof ChangeEvent) {
-                    EventManager.instance.post(Events.SHOW_TUTORIAL_ACTION);
-                }
-                return false;
+        Button load = new OwnTextIconButton("", skin, "load");
+        load.setName("loadcatalog");
+        load.addListener(new TextTooltip(I18n.txt("gui.loadcatalog"), skin));
+        load.addListener(event -> {
+            if (event instanceof ChangeEvent) {
+                EventManager.instance.post(Events.SHOW_LOAD_CATALOG_ACTION);
             }
+            return false;
         });
-        Image helpImg = new Image(skin.getDrawable("help-icon"));
-        Button about = new OwnTextIconButton("", helpImg, skin);
+        Button about = new OwnTextIconButton("", skin,"help");
         about.setName("about");
-        about.addListener(new TextTooltip(txt("gui.help"), skin));
-        about.addListener(new EventListener() {
-            @Override
-            public boolean handle(Event event) {
-                if (event instanceof ChangeEvent) {
-                    EventManager.instance.post(Events.SHOW_ABOUT_ACTION);
-                }
-                return false;
+        about.addListener(new TextTooltip(I18n.txt("gui.help"), skin));
+        about.addListener(event -> {
+            if (event instanceof ChangeEvent) {
+                EventManager.instance.post(Events.SHOW_ABOUT_ACTION);
             }
+            return false;
         });
-        Image carImg = new Image(skin.getDrawable("car-icon"));
-        Button runScript = new OwnTextIconButton("", carImg, skin);
-        runScript.setName("run script");
-        runScript.addListener(new TextTooltip(txt("gui.script.runscript"), skin));
-        runScript.addListener(new EventListener() {
-            @Override
-            public boolean handle(Event event) {
-                if (event instanceof ChangeEvent) {
-                    EventManager.instance.post(Events.SHOW_RUNSCRIPT_ACTION);
-                }
-                return false;
-            }
-        });
-        Image logImg = new Image(skin.getDrawable("log-icon"));
-        Button showLog = new OwnTextIconButton("", logImg, skin);
+        Button showLog = new OwnTextIconButton("", skin, "log");
         showLog.setName("show log");
-        showLog.addListener(new TextTooltip(txt("gui.log.tooltip"), skin));
+        showLog.addListener(new TextTooltip(I18n.txt("gui.tooltip.log"), skin));
         showLog.addListener((event) -> {
             if (event instanceof ChangeEvent) {
                 EventManager.instance.post(Events.SHOW_LOG_ACTION);
@@ -272,10 +246,10 @@ public class ControlsWindow extends CollapsibleWindow implements IObserver {
         });
 
         buttonsTable = new Table(skin);
+        buttonsTable.add(load).pad(1).top().left();
         buttonsTable.add(preferences).pad(1).top().left();
-        buttonsTable.add(runScript).pad(1).top().left();
-        buttonsTable.add(about).pad(1).top().left();
         buttonsTable.add(showLog).pad(1).top().left();
+        buttonsTable.add(about).pad(1).top().left();
 
         buttonsTable.pack();
 
@@ -355,10 +329,6 @@ public class ControlsWindow extends CollapsibleWindow implements IObserver {
     public void setVisibilityToggles(ComponentType[] entities, boolean[] visible) {
         this.visibilityEntities = entities;
         this.visible = visible;
-    }
-
-    private String txt(String key) {
-        return I18n.bundle.get(key);
     }
 
     @Override

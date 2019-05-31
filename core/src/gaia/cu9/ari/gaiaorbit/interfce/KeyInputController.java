@@ -1,16 +1,20 @@
-package gaia.cu9.ari.gaiaorbit.interfce;
+/*
+ * This file is part of Gaia Sky, which is released under the Mozilla Public License 2.0.
+ * See the file LICENSE.md in the project root for full license details.
+ */
 
-import java.util.HashSet;
-import java.util.Set;
+package gaia.cu9.ari.gaiaorbit.interfce;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.InputAdapter;
-
 import gaia.cu9.ari.gaiaorbit.event.EventManager;
 import gaia.cu9.ari.gaiaorbit.event.Events;
 import gaia.cu9.ari.gaiaorbit.interfce.KeyBindings.ProgramAction;
 import gaia.cu9.ari.gaiaorbit.util.GlobalConf;
+
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * This input controller connects the input events with the key binding actions

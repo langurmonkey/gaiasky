@@ -1,27 +1,22 @@
+/*
+ * This file is part of Gaia Sky, which is released under the Mozilla Public License 2.0.
+ * See the file LICENSE.md in the project root for full license details.
+ */
+
 package gaia.cu9.ari.gaiaorbit.data.cluster;
 
-import java.io.BufferedReader;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-
-import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.Array;
-
 import gaia.cu9.ari.gaiaorbit.data.ISceneGraphLoader;
 import gaia.cu9.ari.gaiaorbit.data.stars.AbstractCatalogLoader;
 import gaia.cu9.ari.gaiaorbit.scenegraph.StarCluster;
-import gaia.cu9.ari.gaiaorbit.util.Constants;
-import gaia.cu9.ari.gaiaorbit.util.GlobalConf;
-import gaia.cu9.ari.gaiaorbit.util.I18n;
-import gaia.cu9.ari.gaiaorbit.util.Logger;
-import gaia.cu9.ari.gaiaorbit.util.Nature;
+import gaia.cu9.ari.gaiaorbit.util.*;
 import gaia.cu9.ari.gaiaorbit.util.coord.Coordinates;
 import gaia.cu9.ari.gaiaorbit.util.math.Vector3d;
 import gaia.cu9.ari.gaiaorbit.util.parse.Parser;
+
+import java.io.*;
 
 /**
  * Loads the MWSC catalog in CSV format.

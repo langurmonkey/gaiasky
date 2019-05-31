@@ -1,13 +1,15 @@
+/*
+ * This file is part of Gaia Sky, which is released under the Mozilla Public License 2.0.
+ * See the file LICENSE.md in the project root for full license details.
+ */
+
 package gaia.cu9.ari.gaiaorbit.util.math;
 
-import java.io.Serializable;
-
-import com.badlogic.gdx.math.Matrix3;
-import com.badlogic.gdx.math.Matrix4;
-import com.badlogic.gdx.math.Quaternion;
-import com.badlogic.gdx.math.Vector3;
-
+import com.badlogic.gdx.math.*;
+import com.badlogic.gdx.utils.NumberUtils;
 import net.jafama.FastMath;
+
+import java.io.Serializable;
 
 /**
  * Copy of libgdx's Vector3d class using doubles for some precision
@@ -16,7 +18,7 @@ import net.jafama.FastMath;
  * @author Toni Sagrista
  *
  */
-public class Vector3d implements Serializable {
+public class Vector3d implements Serializable, Vectord<Vector3d> {
 	private static final long serialVersionUID = 3840054589595372522L;
 
 	/** the x-component of this vector **/
@@ -79,6 +81,17 @@ public class Vector3d implements Serializable {
 		this.set(values[0], values[1], values[2]);
 	}
 
+	public double x(){
+		return x;
+	}
+
+	public double y(){
+		return y;
+	}
+
+	public double z(){
+		return z;
+	}
 	/**
 	 * Sets the vector to the given components
 	 *
@@ -114,10 +127,6 @@ public class Vector3d implements Serializable {
 		return vector.set(this.x, this.y, this.z);
 	}
 
-	public Vector3d setZero() {
-		return this.set(0, 0, 0);
-	}
-
 	/**
 	 * Sets the components from the array. The array must have at least 3 elements
 	 *
@@ -136,6 +145,31 @@ public class Vector3d implements Serializable {
 	 */
 	public Vector3d set(final float[] values) {
 		return this.set(values[0], values[1], values[2]);
+	}
+
+	/** Sets the components from the given spherical coordinate
+	 * @param azimuthalAngle The angle between x-axis in radians [0, 2pi]
+	 * @param polarAngle The angle between z-axis in radians [0, pi]
+	 * @return This vector for chaining */
+	public Vector3d setFromSpherical (double azimuthalAngle,double polarAngle) {
+		double cosPolar = MathUtilsd.cos(polarAngle);
+		double sinPolar = MathUtilsd.sin(polarAngle);
+
+		double cosAzim = MathUtilsd.cos(azimuthalAngle);
+		double sinAzim = MathUtilsd.sin(azimuthalAngle);
+
+		return this.set(cosAzim * sinPolar, sinAzim * sinPolar, cosPolar);
+	}
+
+	@Override
+	public Vector3d setToRandomDirection () {
+		double u = MathUtilsd.random();
+		double v = MathUtilsd.random();
+
+		double theta = MathUtilsd.PI2 * u; // azimuthal angle
+		double phi = Math.acos(2f * v - 1f); // polar angle
+
+		return this.setFromSpherical(theta, phi);
 	}
 
 	public Vector3d cpy() {
@@ -641,18 +675,69 @@ public class Vector3d implements Serializable {
 		return len2() < margin;
 	}
 
-	public boolean hasSameDirection(Vector3d vector) {
+	@Override
+	public boolean isOnLine(Vector3d other, double epsilon) {
+		return len2(y * other.z - z * other.y, z * other.x - x * other.z, x * other.y - y * other.x) <= epsilon;
+	}
+
+	@Override
+	public boolean isOnLine(Vector3d other) {
+		return len2(y * other.z - z * other.y, z * other.x - x * other.z, x * other.y - y * other.x) <= MathUtils.FLOAT_ROUNDING_ERROR;
+	}
+
+
+	@Override
+	public boolean isCollinear (Vector3d other, double epsilon) {
+		return isOnLine(other, epsilon) && hasSameDirection(other);
+	}
+
+	@Override
+	public boolean isCollinear (Vector3d other) {
+		return isOnLine(other) && hasSameDirection(other);
+	}
+
+	@Override
+	public boolean isCollinearOpposite (Vector3d other, double epsilon) {
+		return isOnLine(other, epsilon) && hasOppositeDirection(other);
+	}
+
+	@Override
+	public boolean isCollinearOpposite (Vector3d other) {
+		return isOnLine(other) && hasOppositeDirection(other);
+	}
+
+	@Override
+	public boolean isPerpendicular (Vector3d vector) {
+		return MathUtilsd.isZero(dot(vector));
+	}
+
+
+	public boolean isPerpendicular (Vector3d vector, double epsilon) {
+		return MathUtilsd.isZero(dot(vector), epsilon);
+	}
+
+	@Override
+	public boolean hasSameDirection (Vector3d vector) {
 		return dot(vector) > 0;
 	}
 
-	public boolean hasOppositeDirection(Vector3d vector) {
+	@Override
+	public boolean hasOppositeDirection (Vector3d vector) {
 		return dot(vector) < 0;
 	}
 
-	public Vector3d lerp(final Vector3d target, double alpha) {
-		scl(1.0f - alpha);
-		add(target.x * alpha, target.y * alpha, target.z * alpha);
+
+	@Override
+	public Vector3d lerp (final Vector3d target, double alpha) {
+		x += alpha * (target.x - x);
+		y += alpha * (target.y - y);
+		z += alpha * (target.z - z);
 		return this;
+	}
+
+	@Override
+	public Vector3d interpolate(Vector3d target, double alpha, Interpolationd interpolator) {
+		return lerp(target, interpolator.apply(0, 1, alpha));
 	}
 
 	/**
@@ -679,7 +764,7 @@ public class Vector3d implements Serializable {
 		final double ty = target.y - y * dot;
 		final double tz = target.z - z * dot;
 		final double l2 = tx * tx + ty * ty + tz * tz;
-		final double dl = st * ((l2 < 0.0001f) ? 1f : 1f / Math.sqrt(l2));
+		final double dl = st * ((l2 < 0.0001) ? 1d : 1d / Math.sqrt(l2));
 
 		return scl(Math.cos(theta)).add(tx * dl, ty * dl, tz * dl).nor();
 	}
@@ -801,21 +886,73 @@ public class Vector3d implements Serializable {
 	}
 
 	@Override
-	public boolean equals(Object obj) {
-		if (this == obj)
-			return true;
-		if (obj == null)
-			return false;
-		if (getClass() != obj.getClass())
-			return false;
-		Vector3d other = (Vector3d) obj;
-		if (Double.doubleToLongBits(x) != Double.doubleToLongBits(other.x))
-			return false;
-		if (Double.doubleToLongBits(y) != Double.doubleToLongBits(other.y))
-			return false;
-		if (Double.doubleToLongBits(z) != Double.doubleToLongBits(other.z))
-			return false;
+	public int hashCode () {
+		final long prime = 31;
+		long result = 1;
+		result = prime * result + NumberUtils.doubleToLongBits(x);
+		result = prime * result + NumberUtils.doubleToLongBits(y);
+		result = prime * result + NumberUtils.doubleToLongBits(z);
+		return (int) result;
+	}
+
+	@Override
+	public boolean equals (Object obj) {
+		if (this == obj) return true;
+		if (obj == null) return false;
+		if (getClass() != obj.getClass()) return false;
+		Vector3 other = (Vector3)obj;
+		if (NumberUtils.doubleToLongBits(x) != NumberUtils.doubleToLongBits(other.x)) return false;
+		if (NumberUtils.doubleToLongBits(y) != NumberUtils.doubleToLongBits(other.y)) return false;
+		if (NumberUtils.doubleToLongBits(z) != NumberUtils.doubleToLongBits(other.z)) return false;
 		return true;
+	}
+
+	@Override
+	public boolean epsilonEquals (final Vector3d other, double epsilon) {
+		if (other == null) return false;
+		if (Math.abs(other.x - x) > epsilon) return false;
+		if (Math.abs(other.y - y) > epsilon) return false;
+		if (Math.abs(other.z - z) > epsilon) return false;
+		return true;
+	}
+
+	/** Compares this vector with the other vector, using the supplied epsilon for fuzzy equality testing.
+	 * @return whether the vectors are the same. */
+	public boolean epsilonEquals (float x, float y, float z, float epsilon) {
+		if (Math.abs(x - this.x) > epsilon) return false;
+		if (Math.abs(y - this.y) > epsilon) return false;
+		if (Math.abs(z - this.z) > epsilon) return false;
+		return true;
+	}
+
+	/**
+	 * Compares this vector with the other vector using MathUtils.FLOAT_ROUNDING_ERROR for fuzzy equality testing
+	 *
+	 * @param other other vector to compare
+	 * @return true if vector are equal, otherwise false
+	 */
+	public boolean epsilonEquals (final Vector3d other) {
+		return epsilonEquals(other, MathUtils.FLOAT_ROUNDING_ERROR);
+	}
+
+	/**
+	 * Compares this vector with the other vector using MathUtils.FLOAT_ROUNDING_ERROR for fuzzy equality testing
+	 *
+	 * @param x x component of the other vector to compare
+	 * @param y y component of the other vector to compare
+	 * @param z z component of the other vector to compare
+	 * @return true if vector are equal, otherwise false
+	 */
+	public boolean epsilonEquals (float x, float y, float z) {
+		return epsilonEquals(x, y, z, MathUtils.FLOAT_ROUNDING_ERROR);
+	}
+
+	@Override
+	public Vector3d setZero () {
+		this.x = 0;
+		this.y = 0;
+		this.z = 0;
+		return this;
 	}
 
 }

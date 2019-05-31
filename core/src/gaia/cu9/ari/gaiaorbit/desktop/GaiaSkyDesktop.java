@@ -1,3 +1,8 @@
+/*
+ * This file is part of Gaia Sky, which is released under the Mozilla Public License 2.0.
+ * See the file LICENSE.md in the project root for full license details.
+ */
+
 package gaia.cu9.ari.gaiaorbit.desktop;
 
 import com.badlogic.gdx.Gdx;
@@ -17,7 +22,11 @@ import gaia.cu9.ari.gaiaorbit.desktop.format.DesktopDateFormatFactory;
 import gaia.cu9.ari.gaiaorbit.desktop.format.DesktopNumberFormatFactory;
 import gaia.cu9.ari.gaiaorbit.desktop.render.DesktopPostProcessorFactory;
 import gaia.cu9.ari.gaiaorbit.desktop.render.ScreenModeCmd;
-import gaia.cu9.ari.gaiaorbit.desktop.util.*;
+import gaia.cu9.ari.gaiaorbit.desktop.util.DesktopConfInit;
+import gaia.cu9.ari.gaiaorbit.desktop.util.DesktopMusicActors;
+import gaia.cu9.ari.gaiaorbit.desktop.util.DesktopNetworkChecker;
+import gaia.cu9.ari.gaiaorbit.desktop.util.SysUtils;
+import gaia.cu9.ari.gaiaorbit.desktop.util.camera.CamRecorder;
 import gaia.cu9.ari.gaiaorbit.event.EventManager;
 import gaia.cu9.ari.gaiaorbit.event.Events;
 import gaia.cu9.ari.gaiaorbit.event.IObserver;
@@ -27,8 +36,6 @@ import gaia.cu9.ari.gaiaorbit.interfce.MusicActorsManager;
 import gaia.cu9.ari.gaiaorbit.interfce.NetworkCheckerManager;
 import gaia.cu9.ari.gaiaorbit.render.PostProcessorFactory;
 import gaia.cu9.ari.gaiaorbit.screenshot.ScreenshotsManager;
-import gaia.cu9.ari.gaiaorbit.script.JythonFactory;
-import gaia.cu9.ari.gaiaorbit.script.ScriptingFactory;
 import gaia.cu9.ari.gaiaorbit.util.*;
 import gaia.cu9.ari.gaiaorbit.util.Logger.Log;
 import gaia.cu9.ari.gaiaorbit.util.format.DateFormatFactory;
@@ -68,31 +75,81 @@ public class GaiaSkyDesktop implements IObserver {
      * @author Toni Sagrista
      */
     private static class GaiaSkyArgs {
-        @Parameter(names = { "-h", "--help" }, help = true) private boolean help = false;
+        @Parameter(names = {"-h", "--help"}, description = "Show program options and usage information", help = true, order = 0)
+        private boolean help = false;
 
-        @Parameter(names = { "-v", "--version" }, description = "Lists version and build inforamtion") private boolean version = false;
+        @Parameter(names = {"-v", "--version"}, description = "List Gaia Sky version and relevant information.", order = 1)
+        private boolean version = false;
 
-        @Parameter(names = { "-d", "--ds-download" }, description = "Displays the download dialog at startup") private boolean download = false;
+        @Parameter(names = {"-d", "--ds-download"}, description = "Display the data download dialog at startup. If no data is found, the download dialog is shown automatically.", order = 2)
+        private boolean download = false;
 
-        @Parameter(names = { "-c", "--cat-chooser" }, description = "Displays the catalog chooser dialog at startup") private boolean catalogchooser = false;
+        @Parameter(names = {"-c", "--cat-chooser"}, description = "Display the catalog chooser dialog at startup. This enables the selection of different available catalogs when Gaia Sky starts.", order = 3)
+        private boolean catalogChooser = false;
+
+        @Parameter(names = {"-p", "--properties"}, description = "Specify the location of the properties file.", order = 4)
+        private String propertiesFile = null;
+
+        @Parameter(names = {"-a", "--assets"}, description = "Specify the location of the assets folder. If not present, the default assets location is used.", order = 5)
+        private String assetsLocation = null;
     }
 
+    /**
+     * Formats the regular usage so that it removes the left padding characters.
+     * This is necessary so that help2man recognizes the OPTIONS block.
+     * @param jc The JCommander object
+     */
+    private static void printUsage(JCommander jc){
+        StringBuilder sb = new StringBuilder();
+        jc.usage(sb, "");
+        String usage = sb.toString();
+
+        sb = new StringBuilder();
+        String[] lines = usage.split("\n");
+        for(int i =0; i < lines.length; i++){
+            if(i==0){
+                // Add extra line between usage and options
+                sb.append(lines[i] + "\n\n");
+            } else {
+                sb.append(lines[i].substring(2) + '\n');
+            }
+        }
+        System.out.println(sb.toString());
+    }
+
+    /**
+     * Main method
+     * @param args Arguments
+     */
     public static void main(String[] args) {
         gsargs = new GaiaSkyArgs();
+        JCommander jc = JCommander.newBuilder().addObject(gsargs).build();
+        jc.setProgramName("gaiasky");
         try {
-            JCommander jc = new JCommander(gsargs, args);
-            jc.setProgramName("gaiasky");
+            jc.parse(args);
+
             if (gsargs.help) {
-                jc.usage();
+                printUsage(jc);
                 return;
             }
         } catch (Exception e) {
-            System.out.println("Bad program arguments");
+            System.out.print("gaiasky: bad program arguments\n\n");
+            printUsage(jc);
             return;
         }
         try {
             // Check java version
             javaVersionCheck();
+
+            // Set properties file from arguments to VM params if needed
+            if (gsargs.propertiesFile != null && !gsargs.propertiesFile.isEmpty()) {
+                System.setProperty("properties.file", gsargs.propertiesFile);
+            }
+
+            // Set assets location to VM params if needed
+            if (gsargs.assetsLocation != null && !gsargs.assetsLocation.isEmpty()) {
+                System.setProperty("assets.location", gsargs.assetsLocation);
+            }
 
             gsd = new GaiaSkyDesktop();
             
@@ -104,13 +161,13 @@ public class GaiaSkyDesktop implements IObserver {
             // Initialize date format
             DateFormatFactory.initialize(new DesktopDateFormatFactory());
 
-            // Init .gaiasky folder in user's home folder
-            initUserDirectory();
+            // Init gaiasky directories
+            SysUtils.mkdirs();
 
             // Init properties file
             String props = System.getProperty("properties.file");
             if (props == null || props.isEmpty()) {
-                props = initConfigFile(false);
+                initConfigFile(false);
             }
 
             // Initialize i18n (only for global config logging)
@@ -125,17 +182,12 @@ public class GaiaSkyDesktop implements IObserver {
             I18n.initialize(Gdx.files.absolute(GlobalConf.ASSETS_LOC + "i18n/gsbundle"));
 
             if (gsargs.version) {
-                System.out.println(GlobalConf.getFullApplicationName());
-                System.out.println("   version       : " + GlobalConf.version.version);
-                System.out.println("   build         : " + GlobalConf.version.build);
-                System.out.println("   build time    : " + GlobalConf.version.buildtime);
-                System.out.println("   build system  : " + GlobalConf.version.system);
-                System.out.println("   builder       : " + GlobalConf.version.builder);
+                System.out.println(GlobalConf.getShortApplicationName());
+                System.out.println("License MPL 2.0: Mozilla Public License 2.0 <https://www.mozilla.org/en-US/MPL/2.0/>");
+                System.out.println();
+                System.out.println("Written by Toni Sagrista Selles <tsagrista@ari.uni-heidelberg.de>");
                 return;
             }
-
-            // Jython
-            ScriptingFactory.initialize(JythonFactory.getInstance());
 
             // REST API server
             REST_ENABLED = GlobalConf.program.REST_PORT >= 0 && checkRestDepsInClasspath();
@@ -198,10 +250,6 @@ public class GaiaSkyDesktop implements IObserver {
         launchMainApp();
     }
 
-    public void terminate() {
-        System.exit(0);
-    }
-
     public void launchMainApp() {
         Lwjgl3ApplicationConfiguration cfg = new Lwjgl3ApplicationConfiguration();
         cfg.setTitle(GlobalConf.APPLICATION_NAME);
@@ -216,51 +264,43 @@ public class GaiaSkyDesktop implements IObserver {
         }
 
         // Launch app
-        Lwjgl3Application app = new Lwjgl3Application(new GaiaSky(gsargs.download, gsargs.catalogchooser), cfg);
+        Lwjgl3Application app = new Lwjgl3Application(new GaiaSky(gsargs.download, gsargs.catalogChooser), cfg);
         app.addLifecycleListener(new GaiaSkyWindowListener());
     }
 
-    @Override public void notify(Events event, final Object... data) {
+    @Override
+    public void notify(Events event, final Object... data) {
         switch (event) {
-        case SCENE_GRAPH_LOADED:
-            if (REST_ENABLED) {
-                /*
-                 * Notify REST server that GUI is loaded and everything should be in a
-                 * well-defined state
-                 */
-                Method activate;
-                try {
-                    activate = REST_SERVER_CLASS.getMethod("activate");
-                    activate.invoke(null, new Object[0]);
-                } catch (NoSuchMethodException | SecurityException | IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
-                    logger.error(e);
+            case SCENE_GRAPH_LOADED:
+                if (REST_ENABLED) {
+                    /*
+                     * Notify REST server that GUI is loaded and everything should be in a
+                     * well-defined state
+                     */
+                    Method activate;
+                    try {
+                        activate = REST_SERVER_CLASS.getMethod("activate");
+                        activate.invoke(null, new Object[0]);
+                    } catch (NoSuchMethodException | SecurityException | IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
+                        logger.error(e);
+                    }
                 }
-            }
-            break;
-        case DISPOSE:
-            if (REST_ENABLED) {
-                /* Shutdown REST server thread on termination */
-                try {
-                    Method stop = REST_SERVER_CLASS.getMethod("stop");
-                    stop.invoke(null, new Object[0]);
-                } catch (NoSuchMethodException | SecurityException | IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
-                    logger.error(e);
+                break;
+            case DISPOSE:
+                if (REST_ENABLED) {
+                    /* Shutdown REST server thread on termination */
+                    try {
+                        Method stop = REST_SERVER_CLASS.getMethod("stop");
+                        stop.invoke(null, new Object[0]);
+                    } catch (NoSuchMethodException | SecurityException | IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
+                        logger.error(e);
+                    }
                 }
-            }
-            break;
-        default:
-            break;
+                break;
+            default:
+                break;
         }
 
-    }
-
-    private static void initUserDirectory() {
-        SysUtils.getGSHomeDir().mkdirs();
-        SysUtils.getDefaultFramesDir().mkdirs();
-        SysUtils.getDefaultScreenshotsDir().mkdirs();
-        SysUtils.getDefaultMusicDir().mkdirs();
-        SysUtils.getDefaultScriptDir().mkdirs();
-        SysUtils.getDefaultCameraDir().mkdirs();
     }
 
     /**
@@ -276,9 +316,7 @@ public class GaiaSkyDesktop implements IObserver {
      */
     private static String initConfigFile(boolean ow) throws IOException {
         // Use user folder
-        File userFolder = SysUtils.getGSHomeDir();
-        userFolder.mkdirs();
-        File userFolderConfFile = new File(userFolder, "global.vr.properties");
+        File userFolderConfFile = new File(SysUtils.getConfigDir(), "global.vr.properties");
 
         // Internal config
         File confFolder = new File("conf" + File.separator);
@@ -296,7 +334,7 @@ public class GaiaSkyDesktop implements IObserver {
             }
 
             // Check latest version
-            if (!userprops.containsKey("properties.version") || (userprops.containsKey("properties.version") && Integer.parseInt(userprops.getProperty("properties.version")) < internalversion)) {
+            if (!userprops.containsKey("properties.version") || Integer.parseInt(userprops.getProperty("properties.version")) < internalversion) {
                 System.out.println("Properties file version mismatch, overwriting with new version: found " + Integer.parseInt(userprops.getProperty("properties.version")) + ", required " + internalversion);
                 overwrite = true;
             }
@@ -337,7 +375,8 @@ public class GaiaSkyDesktop implements IObserver {
         }
     }
 
-    @SuppressWarnings("resource") private static void copyFile(File sourceFile, File destFile, boolean ow) throws IOException {
+    @SuppressWarnings("resource")
+    private static void copyFile(File sourceFile, File destFile, boolean ow) throws IOException {
         if (destFile.exists()) {
             if (ow) {
                 // Overwrite, delete file
@@ -384,20 +423,23 @@ public class GaiaSkyDesktop implements IObserver {
         String version = System.getProperty("java.version");
         int pos = version.indexOf('.');
         pos = version.indexOf('.', pos + 1);
-        return Double.parseDouble(version.substring(0, pos));
+        return Double.parseDouble(version.substring(0, pos)); //-V6009
     }
 
     private class GaiaSkyWindowListener implements LifecycleListener {
 
-        @Override public void pause() {
+        @Override
+        public void pause() {
 
         }
 
-        @Override public void resume() {
+        @Override
+        public void resume() {
 
         }
 
-        @Override public void dispose() {
+        @Override
+        public void dispose() {
             // Terminate here
 
             // Analytics stop event

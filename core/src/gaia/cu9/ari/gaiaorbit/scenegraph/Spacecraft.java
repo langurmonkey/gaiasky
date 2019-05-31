@@ -1,26 +1,31 @@
+/*
+ * This file is part of Gaia Sky, which is released under the Mozilla Public License 2.0.
+ * See the file LICENSE.md in the project root for full license details.
+ */
+
 package gaia.cu9.ari.gaiaorbit.scenegraph;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.assets.AssetManager;
+import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.g3d.ModelBatch;
 import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Quaternion;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.Array;
-
 import gaia.cu9.ari.gaiaorbit.GaiaSky;
 import gaia.cu9.ari.gaiaorbit.event.EventManager;
 import gaia.cu9.ari.gaiaorbit.event.Events;
 import gaia.cu9.ari.gaiaorbit.event.IObserver;
-import gaia.cu9.ari.gaiaorbit.render.ComponentType;
+import gaia.cu9.ari.gaiaorbit.render.ComponentTypes;
+import gaia.cu9.ari.gaiaorbit.render.ComponentTypes.ComponentType;
 import gaia.cu9.ari.gaiaorbit.render.ILineRenderable;
 import gaia.cu9.ari.gaiaorbit.render.RenderingContext;
 import gaia.cu9.ari.gaiaorbit.render.system.LineRenderSystem;
 import gaia.cu9.ari.gaiaorbit.scenegraph.camera.CameraManager.CameraMode;
 import gaia.cu9.ari.gaiaorbit.scenegraph.camera.ICamera;
 import gaia.cu9.ari.gaiaorbit.scenegraph.component.ModelComponent;
-import gaia.cu9.ari.gaiaorbit.util.ComponentTypes;
 import gaia.cu9.ari.gaiaorbit.util.Constants;
 import gaia.cu9.ari.gaiaorbit.util.GlobalConf;
 import gaia.cu9.ari.gaiaorbit.util.Logger;
@@ -212,7 +217,7 @@ public class Spacecraft extends GenericSpacecraft implements ILineRenderable, IO
 
     }
 
-    public Vector3d computePosition(double dt, CelestialBody closest, double enginePower, Vector3d thrust, Vector3d direction, Vector3d force, Vector3d accel, Vector3d vel, Vector3d pos) {
+    public Vector3d computePosition(double dt, IFocus closest, double enginePower, Vector3d thrust, Vector3d direction, Vector3d force, Vector3d accel, Vector3d vel, Vector3d pos) {
         enginePower = Math.signum(enginePower);
         // Compute force from thrust
         thrust.set(direction).scl(thrustLength * thrustFactor[thrustFactorIndex] * enginePower);
@@ -266,18 +271,18 @@ public class Spacecraft extends GenericSpacecraft implements ILineRenderable, IO
         if (closest != null && closest != this && !this.copy) {
             double twoRadiuses = closest.getRadius() + this.getRadius();
             // d1 is the new distance to the centre of the object
-            if (!vel.isZero() && Intersectord.distanceSegmentPoint(pos, position, closest.pos) < twoRadiuses) {
-                logger.info( "Crashed against " + closest.name + "!");
+            if (!vel.isZero() && Intersectord.distanceSegmentPoint(pos, position, closest.getPos()) < twoRadiuses) {
+                logger.info( "Crashed against " + closest.getName() + "!");
 
-                Array<Vector3d> intersections = Intersectord.intersectRaySphere(pos, position, closest.pos, twoRadiuses);
+                Array<Vector3d> intersections = Intersectord.intersectRaySphere(pos, position, closest.getPos(), twoRadiuses);
 
                 if (intersections.size >= 1) {
                     pos.set(intersections.get(0));
                 }
 
                 stopAllMovement();
-            } else if (pos.dst(closest.pos) < twoRadiuses) {
-                Vector3d newpos = aux3d1.get().set(pos).sub(closest.pos).nor().scl(pos.dst(closest.pos));
+            } else if (pos.dst(closest.getPos()) < twoRadiuses) {
+                Vector3d newpos = aux3d1.get().set(pos).sub(closest.getPos()).nor().scl(pos.dst(closest.getPos()));
                 pos.set(newpos);
             } else {
                 pos.set(position);
@@ -666,6 +671,11 @@ public class Spacecraft extends GenericSpacecraft implements ILineRenderable, IO
     @Override
     public float getLineWidth() {
         return 1;
+    }
+
+    @Override
+    public int getGlType() {
+        return GL20.GL_LINES;
     }
 
 }

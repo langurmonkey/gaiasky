@@ -1,12 +1,14 @@
+/*
+ * This file is part of Gaia Sky, which is released under the Mozilla Public License 2.0.
+ * See the file LICENSE.md in the project root for full license details.
+ */
+
 package gaia.cu9.ari.gaiaorbit.util.samp;
 
-import org.astrogrid.samp.client.ClientProfile;
-import org.astrogrid.samp.client.HubConnector;
-
-import gaia.cu9.ari.gaiaorbit.event.EventManager;
-import gaia.cu9.ari.gaiaorbit.event.Events;
 import gaia.cu9.ari.gaiaorbit.util.Logger;
 import gaia.cu9.ari.gaiaorbit.util.Logger.Log;
+import org.astrogrid.samp.client.ClientProfile;
+import org.astrogrid.samp.client.HubConnector;
 
 /**
  * Extends hub connector to provide some very basic logging using

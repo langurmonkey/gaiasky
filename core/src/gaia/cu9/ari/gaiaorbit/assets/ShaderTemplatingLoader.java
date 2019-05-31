@@ -1,9 +1,14 @@
-package gaia.cu9.ari.gaiaorbit.assets;
+/*
+ * This file is part of Gaia Sky, which is released under the Mozilla Public License 2.0.
+ * See the file LICENSE.md in the project root for full license details.
+ */
 
-import java.util.Scanner;
+package gaia.cu9.ari.gaiaorbit.assets;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.files.FileHandle;
+
+import java.util.Scanner;
 
 /**
  * Loads shaders with extra functionality to add code from other shaders.

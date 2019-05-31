@@ -1,20 +1,20 @@
+/*
+ * This file is part of Gaia Sky, which is released under the Mozilla Public License 2.0.
+ * See the file LICENSE.md in the project root for full license details.
+ */
+
 package gaia.cu9.ari.gaiaorbit.data.orbit;
 
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileWriter;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.sql.Timestamp;
-import java.time.Instant;
-import java.util.Calendar;
-
+import gaia.cu9.ari.gaiaorbit.data.util.PointCloudData;
 import gaia.cu9.ari.gaiaorbit.util.Constants;
 import gaia.cu9.ari.gaiaorbit.util.coord.AstroUtils;
 import gaia.cu9.ari.gaiaorbit.util.coord.Coordinates;
 import gaia.cu9.ari.gaiaorbit.util.math.Vector3d;
+
+import java.io.*;
+import java.sql.Timestamp;
+import java.time.Instant;
+import java.util.Calendar;
 
 public class OriginalDataLoader {
     int count = 0;
@@ -22,7 +22,7 @@ public class OriginalDataLoader {
     public static void main(String[] args) {
         OriginalDataLoader l = new OriginalDataLoader();
         try {
-            PolylineData od = l.load(new FileInputStream("/home/tsagrista/Workspaces/workspace-luna/GaiaSandbox-android/assets-bak/data/ORB1_20131127_000001.topcat"));
+            PointCloudData od = l.load(new FileInputStream("/home/tsagrista/Workspaces/workspace-luna/GaiaSandbox-android/assets-bak/data/ORB1_20131127_000001.topcat"));
             OrbitDataWriter.writeOrbitData("/home/tsagrista/Workspaces/workspace-luna/GaiaSandbox-android/assets/data/android/orb.GAIA.dat", od);
         } catch (Exception e) {
             System.out.println(e);
@@ -58,8 +58,8 @@ public class OriginalDataLoader {
      *            The input stream with the data to load
      * @throws Exception
      */
-    public PolylineData load(InputStream data) throws Exception {
-        PolylineData orbitData = new PolylineData();
+    public PointCloudData load(InputStream data) throws Exception {
+        PointCloudData orbitData = new PointCloudData();
 
         BufferedReader br = new BufferedReader(new InputStreamReader(data));
         String line;
@@ -166,7 +166,7 @@ public class OriginalDataLoader {
     /**
      * Writes a file under the given path with the distance data
      */
-    public void writeDistVsTimeData(String filePath, PolylineData data) throws Exception {
+    public void writeDistVsTimeData(String filePath, PointCloudData data) throws Exception {
         File file = new File(filePath);
         if (file.exists()) {
             file.delete();

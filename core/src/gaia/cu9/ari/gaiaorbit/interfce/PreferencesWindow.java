@@ -1,3 +1,8 @@
+/*
+ * This file is part of Gaia Sky, which is released under the Mozilla Public License 2.0.
+ * See the file LICENSE.md in the project root for full license details.
+ */
+
 package gaia.cu9.ari.gaiaorbit.interfce;
 
 import com.badlogic.gdx.Gdx;
@@ -8,7 +13,6 @@ import com.badlogic.gdx.controllers.Controllers;
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.scenes.scene2d.Actor;
-import com.badlogic.gdx.scenes.scene2d.Event;
 import com.badlogic.gdx.scenes.scene2d.EventListener;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Stack;
@@ -33,20 +37,21 @@ import gaia.cu9.ari.gaiaorbit.util.format.INumberFormat;
 import gaia.cu9.ari.gaiaorbit.util.format.NumberFormatFactory;
 import gaia.cu9.ari.gaiaorbit.util.math.MathUtilsd;
 import gaia.cu9.ari.gaiaorbit.util.scene2d.*;
-import gaia.cu9.ari.gaiaorbit.util.scene2d.FileChooser.ResultListener;
 import gaia.cu9.ari.gaiaorbit.util.validator.IValidator;
 import gaia.cu9.ari.gaiaorbit.util.validator.IntValidator;
 import gaia.cu9.ari.gaiaorbit.util.validator.RegexpValidator;
 
-import java.io.*;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.nio.channels.FileChannel;
 import java.util.*;
 
 /**
  * The default preferences window.
- * 
- * @author tsagrista
  *
+ * @author tsagrista
  */
 public class PreferencesWindow extends GenericDialog {
     private Array<Actor> contents;
@@ -72,16 +77,16 @@ public class PreferencesWindow extends GenericDialog {
     private boolean lensflareBak, lightglowBak, debugInfoBak;
 
     public PreferencesWindow(Stage stage, Skin skin) {
-        super(txt("gui.settings") + " - " + GlobalConf.version.version + " - " + txt("gui.build", GlobalConf.version.build), skin, stage);
+        super(I18n.txt("gui.settings") + " - " + GlobalConf.version.version + " - " + I18n.txt("gui.build", GlobalConf.version.build), skin, stage);
 
-        this.contents = new Array<Actor>();
-        this.labels = new Array<OwnLabel>();
+        this.contents = new Array<>();
+        this.labels = new Array<>();
 
         this.nf1 = NumberFormatFactory.getFormatter("0.0");
         this.nf3 = NumberFormatFactory.getFormatter("0.000");
 
-        setAcceptText(txt("gui.saveprefs"));
-        setCancelText(txt("gui.cancel"));
+        setAcceptText(I18n.txt("gui.saveprefs"));
+        setCancelText(I18n.txt("gui.cancel"));
 
         // Build UI
         buildSuper();
@@ -103,38 +108,38 @@ public class PreferencesWindow extends GenericDialog {
         VerticalGroup group = new VerticalGroup();
         group.align(Align.left | Align.top);
 
-        final Button tabGraphics = new OwnTextIconButton(txt("gui.graphicssettings"), new Image(skin.getDrawable("icon-p-graphics")), skin, "toggle-big");
-        tabGraphics.pad(pad);
+        final Button tabGraphics = new OwnTextIconButton(I18n.txt("gui.graphicssettings"), new Image(skin.getDrawable("icon-p-graphics")), skin, "toggle-big");
+        tabGraphics.pad(pad5);
         tabGraphics.setWidth(tabwidth);
-        final Button tabUI = new OwnTextIconButton(txt("gui.ui.interfacesettings"), new Image(skin.getDrawable("icon-p-interface")), skin, "toggle-big");
-        tabUI.pad(pad);
+        final Button tabUI = new OwnTextIconButton(I18n.txt("gui.ui.interfacesettings"), new Image(skin.getDrawable("icon-p-interface")), skin, "toggle-big");
+        tabUI.pad(pad5);
         tabUI.setWidth(tabwidth);
-        final Button tabPerformance = new OwnTextIconButton(txt("gui.performance"), new Image(skin.getDrawable("icon-p-performance")), skin, "toggle-big");
-        tabPerformance.pad(pad);
+        final Button tabPerformance = new OwnTextIconButton(I18n.txt("gui.performance"), new Image(skin.getDrawable("icon-p-performance")), skin, "toggle-big");
+        tabPerformance.pad(pad5);
         tabPerformance.setWidth(tabwidth);
-        final Button tabControls = new OwnTextIconButton(txt("gui.controls"), new Image(skin.getDrawable("icon-p-controls")), skin, "toggle-big");
-        tabControls.pad(pad);
+        final Button tabControls = new OwnTextIconButton(I18n.txt("gui.controls"), new Image(skin.getDrawable("icon-p-controls")), skin, "toggle-big");
+        tabControls.pad(pad5);
         tabControls.setWidth(tabwidth);
-        final Button tabScreenshots = new OwnTextIconButton(txt("gui.screenshots"), new Image(skin.getDrawable("icon-p-screenshots")), skin, "toggle-big");
-        tabScreenshots.pad(pad);
+        final Button tabScreenshots = new OwnTextIconButton(I18n.txt("gui.screenshots"), new Image(skin.getDrawable("icon-p-screenshots")), skin, "toggle-big");
+        tabScreenshots.pad(pad5);
         tabScreenshots.setWidth(tabwidth);
-        final Button tabFrames = new OwnTextIconButton(txt("gui.frameoutput.title"), new Image(skin.getDrawable("icon-p-frameoutput")), skin, "toggle-big");
-        tabFrames.pad(pad);
+        final Button tabFrames = new OwnTextIconButton(I18n.txt("gui.frameoutput.title"), new Image(skin.getDrawable("icon-p-frameoutput")), skin, "toggle-big");
+        tabFrames.pad(pad5);
         tabFrames.setWidth(tabwidth);
-        final Button tabCamera = new OwnTextIconButton(txt("gui.camerarec.title"), new Image(skin.getDrawable("icon-p-camera")), skin, "toggle-big");
-        tabCamera.pad(pad);
+        final Button tabCamera = new OwnTextIconButton(I18n.txt("gui.camerarec.title"), new Image(skin.getDrawable("icon-p-camera")), skin, "toggle-big");
+        tabCamera.pad(pad5);
         tabCamera.setWidth(tabwidth);
-        final Button tab360 = new OwnTextIconButton(txt("gui.360.title"), new Image(skin.getDrawable("icon-p-360")), skin, "toggle-big");
-        tab360.pad(pad);
+        final Button tab360 = new OwnTextIconButton(I18n.txt("gui.360.title"), new Image(skin.getDrawable("icon-p-360")), skin, "toggle-big");
+        tab360.pad(pad5);
         tab360.setWidth(tabwidth);
-        final Button tabData = new OwnTextIconButton(txt("gui.data"), new Image(skin.getDrawable("icon-p-data")), skin, "toggle-big");
-        tabData.pad(pad);
+        final Button tabData = new OwnTextIconButton(I18n.txt("gui.data"), new Image(skin.getDrawable("icon-p-data")), skin, "toggle-big");
+        tabData.pad(pad5);
         tabData.setWidth(tabwidth);
-        final Button tabGaia = new OwnTextIconButton(txt("gui.gaia"), new Image(skin.getDrawable("icon-p-gaia")), skin, "toggle-big");
-        tabGaia.pad(pad);
+        final Button tabGaia = new OwnTextIconButton(I18n.txt("gui.gaia"), new Image(skin.getDrawable("icon-p-gaia")), skin, "toggle-big");
+        tabGaia.pad(pad5);
         tabGaia.setWidth(tabwidth);
-        final Button tabSystem = new OwnTextIconButton(txt("gui.system"), new Image(skin.getDrawable("icon-p-system")), skin, "toggle-big");
-        tabSystem.pad(pad);
+        final Button tabSystem = new OwnTextIconButton(I18n.txt("gui.system"), new Image(skin.getDrawable("icon-p-system")), skin, "toggle-big");
+        tabSystem.pad(pad5);
         tabSystem.setWidth(tabwidth);
 
         group.addActor(tabGraphics);
@@ -148,15 +153,15 @@ public class PreferencesWindow extends GenericDialog {
         group.addActor(tabData);
         group.addActor(tabGaia);
         group.addActor(tabSystem);
-        content.add(group).align(Align.left | Align.top).padLeft(pad);
+        content.add(group).align(Align.left | Align.top).padLeft(pad5);
 
         // Create the tab content. Just using images here for simplicity.
         Stack tabContent = new Stack();
         tabContent.setSize(contentw, contenth);
 
-        /**
+        /*
          * ==== GRAPHICS ====
-         **/
+         */
         final Table contentGraphicsTable = new Table(skin);
         final OwnScrollPane contentGraphics = new OwnScrollPane(contentGraphicsTable, skin, "minimalist-nobg");
         contentGraphics.setHeight(scrollh);
@@ -166,19 +171,13 @@ public class PreferencesWindow extends GenericDialog {
         contentGraphicsTable.align(Align.top | Align.left);
 
         // RESOLUTION/MODE
-        Label titleResolution = new OwnLabel(txt("gui.resolutionmode"), skin, "help-title");
+        Label titleResolution = new OwnLabel(I18n.txt("gui.resolutionmode"), skin, "help-title");
         Table mode = new Table();
 
         // Full screen mode resolutions
         Array<DisplayMode> modes = new Array<DisplayMode>(Gdx.graphics.getDisplayModes());
-        modes.sort(new Comparator<DisplayMode>() {
-
-            @Override
-            public int compare(DisplayMode o1, DisplayMode o2) {
-                return Integer.compare(o2.height * o2.width, o1.height * o1.width);
-            }
-        });
-        fullscreenResolutions = new OwnSelectBox<DisplayMode>(skin);
+        modes.sort((o1, o2) -> Integer.compare(o2.height * o2.width, o1.height * o1.width));
+        fullscreenResolutions = new OwnSelectBox<>(skin);
         fullscreenResolutions.setWidth(textwidth * 3.3f);
         fullscreenResolutions.setItems(modes);
 
@@ -201,46 +200,40 @@ public class PreferencesWindow extends GenericDialog {
         heightValidator = new IntValidator(100, nativeMode.height);
         heightField = new OwnTextField(Integer.toString(MathUtils.clamp(GlobalConf.screen.SCREEN_HEIGHT, 100, nativeMode.height)), skin, heightValidator);
         heightField.setWidth(textwidth);
-        final OwnLabel widthLabel = new OwnLabel(txt("gui.width") + ":", skin);
-        final OwnLabel heightLabel = new OwnLabel(txt("gui.height") + ":", skin);
+        final OwnLabel widthLabel = new OwnLabel(I18n.txt("gui.width") + ":", skin);
+        final OwnLabel heightLabel = new OwnLabel(I18n.txt("gui.height") + ":", skin);
 
-        windowedResolutions.add(widthLabel).left().padRight(pad);
-        windowedResolutions.add(widthField).left().padRight(pad);
-        windowedResolutions.add(heightLabel).left().padRight(pad);
+        windowedResolutions.add(widthLabel).left().padRight(pad5);
+        windowedResolutions.add(widthField).left().padRight(pad5);
+        windowedResolutions.add(heightLabel).left().padRight(pad5);
         windowedResolutions.add(heightField).left().row();
 
         // Radio buttons
-        fullscreen = new OwnCheckBox(txt("gui.fullscreen"), skin, "radio", pad);
-        fullscreen.addListener(new EventListener() {
-            @Override
-            public boolean handle(Event event) {
-                if (event instanceof ChangeEvent) {
-                    selectFullscreen(fullscreen.isChecked(), widthField, heightField, fullscreenResolutions, widthLabel, heightLabel);
-                    return true;
-                }
-                return false;
+        fullscreen = new OwnCheckBox(I18n.txt("gui.fullscreen"), skin, "radio", pad5);
+        fullscreen.addListener(event -> {
+            if (event instanceof ChangeEvent) {
+                selectFullscreen(fullscreen.isChecked(), widthField, heightField, fullscreenResolutions, widthLabel, heightLabel);
+                return true;
             }
+            return false;
         });
         fullscreen.setChecked(GlobalConf.screen.FULLSCREEN);
 
-        windowed = new OwnCheckBox(txt("gui.windowed"), skin, "radio", pad);
-        windowed.addListener(new EventListener() {
-            @Override
-            public boolean handle(Event event) {
-                if (event instanceof ChangeEvent) {
-                    selectFullscreen(!windowed.isChecked(), widthField, heightField, fullscreenResolutions, widthLabel, heightLabel);
-                    return true;
-                }
-                return false;
+        windowed = new OwnCheckBox(I18n.txt("gui.windowed"), skin, "radio", pad5);
+        windowed.addListener(event -> {
+            if (event instanceof ChangeEvent) {
+                selectFullscreen(!windowed.isChecked(), widthField, heightField, fullscreenResolutions, widthLabel, heightLabel);
+                return true;
             }
+            return false;
         });
         windowed.setChecked(!GlobalConf.screen.FULLSCREEN);
         selectFullscreen(GlobalConf.screen.FULLSCREEN, widthField, heightField, fullscreenResolutions, widthLabel, heightLabel);
 
-        new ButtonGroup<CheckBox>(fullscreen, windowed);
+        new ButtonGroup<>(fullscreen, windowed);
 
         // VSYNC
-        vsync = new OwnCheckBox(txt("gui.vsync"), skin, "default", pad);
+        vsync = new OwnCheckBox(I18n.txt("gui.vsync"), skin, "default", pad5);
         vsync.setChecked(GlobalConf.screen.VSYNC);
 
         // LIMIT FPS
@@ -248,7 +241,7 @@ public class PreferencesWindow extends GenericDialog {
         limitFps = new OwnTextField(Integer.toString(MathUtils.clamp(GlobalConf.screen.LIMIT_FPS, 1, 1000)), skin, limitfpsValidator);
         limitFps.setDisabled(GlobalConf.screen.LIMIT_FPS == 0);
 
-        limitfpsCb = new OwnCheckBox(txt("gui.limitfps"), skin, "default", pad);
+        limitfpsCb = new OwnCheckBox(I18n.txt("gui.limitfps"), skin, "default", pad5);
         limitfpsCb.setChecked(GlobalConf.screen.LIMIT_FPS > 0);
         limitfpsCb.addListener((event) -> {
             if (event instanceof ChangeEvent) {
@@ -258,66 +251,66 @@ public class PreferencesWindow extends GenericDialog {
             return false;
         });
 
-        mode.add(fullscreen).left().padRight(pad * 2);
+        mode.add(fullscreen).left().padRight(pad5 * 2);
         mode.add(fullscreenResolutions).left().row();
-        mode.add(windowed).left().padRight(pad * 2).padTop(pad * 2);
-        mode.add(windowedResolutions).left().padTop(pad * 2).row();
-        mode.add(vsync).left().padTop(pad * 2).colspan(2).row();
-        mode.add(limitfpsCb).left().padRight(pad * 2);
+        mode.add(windowed).left().padRight(pad5 * 2).padTop(pad5 * 2);
+        mode.add(windowedResolutions).left().padTop(pad5 * 2).row();
+        mode.add(vsync).left().padTop(pad5 * 2).colspan(2).row();
+        mode.add(limitfpsCb).left().padRight(pad5 * 2);
         mode.add(limitFps).left();
 
         // Add to content
-        contentGraphicsTable.add(titleResolution).left().padBottom(pad * 2).row();
-        contentGraphicsTable.add(mode).left().padBottom(pad * 4).row();
+        contentGraphicsTable.add(titleResolution).left().padBottom(pad5 * 2).row();
+        contentGraphicsTable.add(mode).left().padBottom(pad5 * 4).row();
 
         // GRAPHICS SETTINGS
-        Label titleGraphics = new OwnLabel(txt("gui.graphicssettings"), skin, "help-title");
+        Label titleGraphics = new OwnLabel(I18n.txt("gui.graphicssettings"), skin, "help-title");
         Table graphics = new Table();
 
-        OwnLabel gqualityLabel = new OwnLabel(txt("gui.gquality"), skin);
-        gqualityLabel.addListener(new TextTooltip(txt("gui.gquality.info"), skin));
+        OwnLabel gqualityLabel = new OwnLabel(I18n.txt("gui.gquality"), skin);
+        gqualityLabel.addListener(new TextTooltip(I18n.txt("gui.gquality.info"), skin));
 
-        ComboBoxBean[] gqs = new ComboBoxBean[] { new ComboBoxBean(txt("gui.gquality.high"), 0), new ComboBoxBean(txt("gui.gquality.normal"), 1), new ComboBoxBean(txt("gui.gquality.low"), 2) };
-        gquality = new OwnSelectBox<ComboBoxBean>(skin);
+        ComboBoxBean[] gqs = new ComboBoxBean[] { new ComboBoxBean(I18n.txt("gui.gquality.high"), 0), new ComboBoxBean(I18n.txt("gui.gquality.normal"), 1), new ComboBoxBean(I18n.txt("gui.gquality.low"), 2) };
+        gquality = new OwnSelectBox<>(skin);
         gquality.setItems(gqs);
         gquality.setWidth(textwidth * 3f);
         gquality.setSelected(gqs[GlobalConf.scene.GRAPHICS_QUALITY]);
 
         OwnImageButton gqualityTooltip = new OwnImageButton(skin, "tooltip");
-        gqualityTooltip.addListener(new TextTooltip(txt("gui.gquality.info"), skin));
+        gqualityTooltip.addListener(new TextTooltip(I18n.txt("gui.gquality.info"), skin));
 
         // AA
-        OwnLabel aaLabel = new OwnLabel(txt("gui.aa"), skin);
-        aaLabel.addListener(new TextTooltip(txt("gui.aa.info"), skin));
+        OwnLabel aaLabel = new OwnLabel(I18n.txt("gui.aa"), skin);
+        aaLabel.addListener(new TextTooltip(I18n.txt("gui.aa.info"), skin));
 
-        ComboBoxBean[] aas = new ComboBoxBean[] { new ComboBoxBean(txt("gui.aa.no"), 0), new ComboBoxBean(txt("gui.aa.fxaa"), -1), new ComboBoxBean(txt("gui.aa.nfaa"), -2) };
-        aa = new OwnSelectBox<ComboBoxBean>(skin);
+        ComboBoxBean[] aas = new ComboBoxBean[] { new ComboBoxBean(I18n.txt("gui.aa.no"), 0), new ComboBoxBean(I18n.txt("gui.aa.fxaa"), -1), new ComboBoxBean(I18n.txt("gui.aa.nfaa"), -2) };
+        aa = new OwnSelectBox<>(skin);
         aa.setItems(aas);
         aa.setWidth(textwidth * 3f);
         aa.setSelected(aas[idxAa(2, GlobalConf.postprocess.POSTPROCESS_ANTIALIAS)]);
 
         OwnImageButton aaTooltip = new OwnImageButton(skin, "tooltip");
-        aaTooltip.addListener(new TextTooltip(txt("gui.aa.info"), skin));
+        aaTooltip.addListener(new TextTooltip(I18n.txt("gui.aa.info"), skin));
 
         // ORBITS
-        OwnLabel orbitsLabel = new OwnLabel(txt("gui.orbitrenderer"), skin);
-        ComboBoxBean[] orbitItems = new ComboBoxBean[] { new ComboBoxBean(txt("gui.orbitrenderer.line"), 0), new ComboBoxBean(txt("gui.orbitrenderer.gpu"), 1) };
-        orbitRenderer = new OwnSelectBox<ComboBoxBean>(skin);
+        OwnLabel orbitsLabel = new OwnLabel(I18n.txt("gui.orbitrenderer"), skin);
+        ComboBoxBean[] orbitItems = new ComboBoxBean[] { new ComboBoxBean(I18n.txt("gui.orbitrenderer.line"), 0), new ComboBoxBean(I18n.txt("gui.orbitrenderer.gpu"), 1) };
+        orbitRenderer = new OwnSelectBox<>(skin);
         orbitRenderer.setItems(orbitItems);
         orbitRenderer.setWidth(textwidth * 3f);
         orbitRenderer.setSelected(orbitItems[GlobalConf.scene.ORBIT_RENDERER]);
 
         // LINE RENDERER
-        OwnLabel lrLabel = new OwnLabel(txt("gui.linerenderer"), skin);
-        ComboBoxBean[] lineRenderers = new ComboBoxBean[] { new ComboBoxBean(txt("gui.linerenderer.normal"), 0), new ComboBoxBean(txt("gui.linerenderer.quad"), 1) };
-        lineRenderer = new OwnSelectBox<ComboBoxBean>(skin);
+        OwnLabel lrLabel = new OwnLabel(I18n.txt("gui.linerenderer"), skin);
+        ComboBoxBean[] lineRenderers = new ComboBoxBean[] { new ComboBoxBean(I18n.txt("gui.linerenderer.normal"), 0), new ComboBoxBean(I18n.txt("gui.linerenderer.quad"), 1) };
+        lineRenderer = new OwnSelectBox<>(skin);
         lineRenderer.setItems(lineRenderers);
         lineRenderer.setWidth(textwidth * 3f);
         lineRenderer.setSelected(lineRenderers[GlobalConf.scene.LINE_RENDERER]);
 
         // BLOOM
         bloomBak = GlobalConf.postprocess.POSTPROCESS_BLOOM_INTENSITY;
-        OwnLabel bloomLabel = new OwnLabel(txt("gui.bloom"), skin, "default");
+        OwnLabel bloomLabel = new OwnLabel(I18n.txt("gui.bloom"), skin, "default");
         OwnLabel bloom = new OwnLabel(Integer.toString((int) (GlobalConf.postprocess.POSTPROCESS_BLOOM_INTENSITY * 10)), skin);
         Slider bloomEffect = new OwnSlider(Constants.MIN_SLIDER, Constants.MAX_SLIDER, 1, false, skin);
         bloomEffect.setName("bloom effect");
@@ -337,7 +330,7 @@ public class PreferencesWindow extends GenericDialog {
 
         // LENS FLARE
         lensflareBak = GlobalConf.postprocess.POSTPROCESS_LENS_FLARE;
-        CheckBox lensFlare = new CheckBox(" " + txt("gui.lensflare"), skin);
+        CheckBox lensFlare = new CheckBox(" " + I18n.txt("gui.lensflare"), skin);
         lensFlare.setName("lens flare");
         lensFlare.addListener(event -> {
             if (event instanceof ChangeEvent) {
@@ -350,7 +343,7 @@ public class PreferencesWindow extends GenericDialog {
 
         // LIGHT GLOW
         lightglowBak = GlobalConf.postprocess.POSTPROCESS_LIGHT_SCATTERING;
-        CheckBox lightGlow = new CheckBox(" " + txt("gui.lightscattering"), skin);
+        CheckBox lightGlow = new CheckBox(" " + I18n.txt("gui.lightscattering"), skin);
         lightGlow.setName("light scattering");
         lightGlow.setChecked(GlobalConf.postprocess.POSTPROCESS_LIGHT_SCATTERING);
         lightGlow.addListener(event -> {
@@ -363,7 +356,7 @@ public class PreferencesWindow extends GenericDialog {
 
         // MOTION BLUR
         motionblurBak = GlobalConf.postprocess.POSTPROCESS_MOTION_BLUR;
-        CheckBox motionBlur = new CheckBox(" " + txt("gui.motionblur"), skin);
+        CheckBox motionBlur = new CheckBox(" " + I18n.txt("gui.motionblur"), skin);
         motionBlur.setName("motion blur");
         motionBlur.setChecked(GlobalConf.postprocess.POSTPROCESS_MOTION_BLUR != 0);
         motionBlur.addListener(event -> {
@@ -374,35 +367,35 @@ public class PreferencesWindow extends GenericDialog {
             return false;
         });
 
-        graphics.add(gqualityLabel).left().padRight(pad * 4).padBottom(pad);
-        graphics.add(gquality).left().padRight(pad * 2).padBottom(pad);
-        graphics.add(gqualityTooltip).left().padBottom(pad).row();
+        graphics.add(gqualityLabel).left().padRight(pad5 * 4).padBottom(pad5);
+        graphics.add(gquality).left().padRight(pad5 * 2).padBottom(pad5);
+        graphics.add(gqualityTooltip).left().padBottom(pad5).row();
         final Cell<Actor> noticeGraphicsCell = graphics.add((Actor) null);
         noticeGraphicsCell.colspan(3).left().row();
-        graphics.add(aaLabel).left().padRight(pad * 4).padBottom(pad);
-        graphics.add(aa).left().padRight(pad * 2).padBottom(pad);
-        graphics.add(aaTooltip).left().padBottom(pad).row();
-        graphics.add(orbitsLabel).left().padRight(pad * 4).padBottom(pad);
-        graphics.add(orbitRenderer).colspan(2).left().padBottom(pad).row();
-        graphics.add(lrLabel).left().padRight(pad * 4).padBottom(pad);
-        graphics.add(lineRenderer).colspan(2).left().padBottom(pad).row();
-        graphics.add(bloomLabel).left().padRight(pad * 4).padBottom(pad);
-        graphics.add(bloomEffect).left().padBottom(pad);
-        graphics.add(bloom).left().padBottom(pad).row();
-        graphics.add(lensFlare).colspan(3).left().padBottom(pad).row();
-        graphics.add(lightGlow).colspan(3).left().padBottom(pad).row();
-        graphics.add(motionBlur).colspan(3).left().padBottom(pad).row();
+        graphics.add(aaLabel).left().padRight(pad5 * 4).padBottom(pad5);
+        graphics.add(aa).left().padRight(pad5 * 2).padBottom(pad5);
+        graphics.add(aaTooltip).left().padBottom(pad5).row();
+        graphics.add(orbitsLabel).left().padRight(pad5 * 4).padBottom(pad5);
+        graphics.add(orbitRenderer).colspan(2).left().padBottom(pad5).row();
+        graphics.add(lrLabel).left().padRight(pad5 * 4).padBottom(pad5);
+        graphics.add(lineRenderer).colspan(2).left().padBottom(pad5).row();
+        graphics.add(bloomLabel).left().padRight(pad5 * 4).padBottom(pad5);
+        graphics.add(bloomEffect).left().padBottom(pad5);
+        graphics.add(bloom).left().padBottom(pad5).row();
+        graphics.add(lensFlare).colspan(3).left().padBottom(pad5).row();
+        graphics.add(lightGlow).colspan(3).left().padBottom(pad5).row();
+        graphics.add(motionBlur).colspan(3).left().padBottom(pad5).row();
 
         // Add to content
-        contentGraphicsTable.add(titleGraphics).left().padBottom(pad * 2).row();
-        contentGraphicsTable.add(graphics).left().padBottom(pad * 4).row();
+        contentGraphicsTable.add(titleGraphics).left().padBottom(pad5 * 2).row();
+        contentGraphicsTable.add(graphics).left().padBottom(pad5 * 4).row();
 
         // SHADOWS
-        Label titleShadows = new OwnLabel(txt("gui.graphics.shadows"), skin, "help-title");
+        Label titleShadows = new OwnLabel(I18n.txt("gui.graphics.shadows"), skin, "help-title");
         Table shadows = new Table();
 
         // SHADOW MAP RESOLUTION
-        OwnLabel smResolutionLabel = new OwnLabel(txt("gui.graphics.shadows.resolution"), skin);
+        OwnLabel smResolutionLabel = new OwnLabel(I18n.txt("gui.graphics.shadows.resolution"), skin);
         smResolutionLabel.setDisabled(!GlobalConf.scene.SHADOW_MAPPING);
         IntValidator smResValidator = new IntValidator(128, 2048);
         smResolution = new OwnTextField(Integer.toString(MathUtils.clamp(GlobalConf.scene.SHADOW_MAPPING_RESOLUTION, 128, 2048)), skin, smResValidator);
@@ -410,7 +403,7 @@ public class PreferencesWindow extends GenericDialog {
         smResolution.setDisabled(!GlobalConf.scene.SHADOW_MAPPING);
 
         // N SHADOWS
-        OwnLabel nShadowsLabel = new OwnLabel("#" + txt("gui.graphics.shadows"), skin);
+        OwnLabel nShadowsLabel = new OwnLabel("#" + I18n.txt("gui.graphics.shadows"), skin);
         nShadowsLabel.setDisabled(!GlobalConf.scene.SHADOW_MAPPING);
         ComboBoxBean[] nsh = new ComboBoxBean[] { new ComboBoxBean("1", 1), new ComboBoxBean("2", 2), new ComboBoxBean("3", 3), new ComboBoxBean("4", 4) };
         nshadows = new OwnSelectBox<ComboBoxBean>(skin);
@@ -420,7 +413,7 @@ public class PreferencesWindow extends GenericDialog {
         nshadows.setDisabled(!GlobalConf.scene.SHADOW_MAPPING);
 
         // ENABLE SHADOWS
-        shadowsCb = new OwnCheckBox(txt("gui.graphics.shadows.enable"), skin, "default", pad);
+        shadowsCb = new OwnCheckBox(I18n.txt("gui.graphics.shadows.enable"), skin, "default", pad5);
         shadowsCb.setChecked(GlobalConf.scene.SHADOW_MAPPING);
         shadowsCb.addListener((event) -> {
             if (event instanceof ChangeEvent) {
@@ -434,18 +427,18 @@ public class PreferencesWindow extends GenericDialog {
         // LABELS
         labels.add(smResolutionLabel);
 
-        shadows.add(shadowsCb).left().padRight(pad * 2).padBottom(pad).row();
-        shadows.add(smResolutionLabel).left().padRight(pad * 4).padBottom(pad);
-        shadows.add(smResolution).left().padRight(pad * 2).padBottom(pad).row();
-        shadows.add(nShadowsLabel).left().padRight(pad * 4).padBottom(pad);
-        shadows.add(nshadows).left().padRight(pad * 2).padBottom(pad);
+        shadows.add(shadowsCb).left().padRight(pad5 * 2).padBottom(pad5).row();
+        shadows.add(smResolutionLabel).left().padRight(pad5 * 4).padBottom(pad5);
+        shadows.add(smResolution).left().padRight(pad5 * 2).padBottom(pad5).row();
+        shadows.add(nShadowsLabel).left().padRight(pad5 * 4).padBottom(pad5);
+        shadows.add(nshadows).left().padRight(pad5 * 2).padBottom(pad5);
 
         // Add to content
-        contentGraphicsTable.add(titleShadows).left().padBottom(pad * 2).row();
-        contentGraphicsTable.add(shadows).left().padBottom(pad * 4).row();
+        contentGraphicsTable.add(titleShadows).left().padBottom(pad5 * 2).row();
+        contentGraphicsTable.add(shadows).left().padBottom(pad5 * 4).row();
 
         // DISPLAY SETTINGS
-        Label titleDisplay = new OwnLabel(txt("gui.graphics.imglevels"), skin, "help-title");
+        Label titleDisplay = new OwnLabel(I18n.txt("gui.graphics.imglevels"), skin, "help-title");
         Table display = new Table();
 
         brightnessBak = GlobalConf.postprocess.POSTPROCESS_BRIGHTNESS;
@@ -454,8 +447,8 @@ public class PreferencesWindow extends GenericDialog {
         saturationBak = GlobalConf.postprocess.POSTPROCESS_SATURATION;
         gammaBak = GlobalConf.postprocess.POSTPROCESS_GAMMA;
 
-        /** Brightness **/
-        OwnLabel brightnessl = new OwnLabel(txt("gui.brightness"), skin, "default");
+        /* Brightness */
+        OwnLabel brightnessl = new OwnLabel(I18n.txt("gui.brightness"), skin, "default");
         Label brightnessLabel = new OwnLabel(Integer.toString((int) MathUtilsd.lint(GlobalConf.postprocess.POSTPROCESS_BRIGHTNESS, Constants.MIN_BRIGHTNESS, Constants.MAX_BRIGHTNESS, Constants.MIN_SLIDER, Constants.MAX_SLIDER)), skin);
         Slider brightness = new OwnSlider(Constants.MIN_SLIDER, Constants.MAX_SLIDER, 1, false, skin);
         brightness.setName("brightness");
@@ -471,12 +464,12 @@ public class PreferencesWindow extends GenericDialog {
             return false;
         });
 
-        display.add(brightnessl).left().padRight(pad * 4).padBottom(pad);
-        display.add(brightness).left().padRight(pad * 2).padBottom(pad);
+        display.add(brightnessl).left().padRight(pad5 * 4).padBottom(pad5);
+        display.add(brightness).left().padRight(pad5 * 2).padBottom(pad5);
         display.add(brightnessLabel).row();
 
-        /** Contrast **/
-        OwnLabel contrastl = new OwnLabel(txt("gui.contrast"), skin, "default");
+        /* Contrast */
+        OwnLabel contrastl = new OwnLabel(I18n.txt("gui.contrast"), skin, "default");
         Label contrastLabel = new OwnLabel(Integer.toString((int) MathUtilsd.lint(GlobalConf.postprocess.POSTPROCESS_CONTRAST, Constants.MIN_CONTRAST, Constants.MAX_CONTRAST, Constants.MIN_SLIDER, Constants.MAX_SLIDER)), skin);
         Slider contrast = new OwnSlider(Constants.MIN_SLIDER, Constants.MAX_SLIDER, 1, false, skin);
         contrast.setName("contrast");
@@ -492,12 +485,12 @@ public class PreferencesWindow extends GenericDialog {
             return false;
         });
 
-        display.add(contrastl).left().padRight(pad * 4).padBottom(pad);
-        display.add(contrast).left().padRight(pad * 2).padBottom(pad);
+        display.add(contrastl).left().padRight(pad5 * 4).padBottom(pad5);
+        display.add(contrast).left().padRight(pad5 * 2).padBottom(pad5);
         display.add(contrastLabel).row();
 
-        /** Hue **/
-        OwnLabel huel = new OwnLabel(txt("gui.hue"), skin, "default");
+        /* Hue */
+        OwnLabel huel = new OwnLabel(I18n.txt("gui.hue"), skin, "default");
         Label hueLabel = new OwnLabel(Integer.toString((int) MathUtilsd.lint(GlobalConf.postprocess.POSTPROCESS_HUE, Constants.MIN_HUE, Constants.MAX_HUE, Constants.MIN_SLIDER, Constants.MAX_SLIDER)), skin);
         Slider hue = new OwnSlider(Constants.MIN_SLIDER, Constants.MAX_SLIDER, 1, false, skin);
         hue.setName("hue");
@@ -513,12 +506,12 @@ public class PreferencesWindow extends GenericDialog {
             return false;
         });
 
-        display.add(huel).left().padRight(pad * 4).padBottom(pad);
-        display.add(hue).left().padRight(pad * 2).padBottom(pad);
+        display.add(huel).left().padRight(pad5 * 4).padBottom(pad5);
+        display.add(hue).left().padRight(pad5 * 2).padBottom(pad5);
         display.add(hueLabel).row();
 
-        /** Saturation **/
-        OwnLabel saturationl = new OwnLabel(txt("gui.saturation"), skin, "default");
+        /* Saturation */
+        OwnLabel saturationl = new OwnLabel(I18n.txt("gui.saturation"), skin, "default");
         Label saturationLabel = new OwnLabel(Integer.toString((int) MathUtilsd.lint(GlobalConf.postprocess.POSTPROCESS_SATURATION, Constants.MIN_SATURATION, Constants.MAX_SATURATION, Constants.MIN_SLIDER, Constants.MAX_SLIDER)), skin);
         Slider saturation = new OwnSlider(Constants.MIN_SLIDER, Constants.MAX_SLIDER, 1, false, skin);
         saturation.setName("saturation");
@@ -534,12 +527,12 @@ public class PreferencesWindow extends GenericDialog {
             return false;
         });
 
-        display.add(saturationl).left().padRight(pad * 4).padBottom(pad);
-        display.add(saturation).left().padRight(pad * 2).padBottom(pad);
+        display.add(saturationl).left().padRight(pad5 * 4).padBottom(pad5);
+        display.add(saturation).left().padRight(pad5 * 2).padBottom(pad5);
         display.add(saturationLabel).row();
 
-        /** Gamma **/
-        OwnLabel gammal = new OwnLabel(txt("gui.gamma"), skin, "default");
+        /* Gamma */
+        OwnLabel gammal = new OwnLabel(I18n.txt("gui.gamma"), skin, "default");
         Label gammaLabel = new OwnLabel(nf1.format(GlobalConf.postprocess.POSTPROCESS_GAMMA), skin);
         Slider gamma = new OwnSlider(Constants.MIN_GAMMA, Constants.MAX_GAMMA, 0.1f, false, skin);
         gamma.setName("gamma");
@@ -555,29 +548,29 @@ public class PreferencesWindow extends GenericDialog {
             return false;
         });
 
-        display.add(gammal).left().padRight(pad * 4).padBottom(pad);
-        display.add(gamma).left().padRight(pad * 2).padBottom(pad);
+        display.add(gammal).left().padRight(pad5 * 4).padBottom(pad5);
+        display.add(gamma).left().padRight(pad5 * 2).padBottom(pad5);
         display.add(gammaLabel).row();
 
         // LABELS
         labels.addAll(brightnessl, contrastl, huel, saturationl, gammal);
 
         // Add to content
-        contentGraphicsTable.add(titleDisplay).left().padBottom(pad * 2).row();
+        contentGraphicsTable.add(titleDisplay).left().padBottom(pad5 * 2).row();
         contentGraphicsTable.add(display).left();
-        /**
+        /*
          * ==== UI ====
-         **/
+         */
         final Table contentUI = new Table(skin);
         contents.add(contentUI);
         contentUI.align(Align.top | Align.left);
 
-        OwnLabel titleUI = new OwnLabel(txt("gui.ui.interfacesettings"), skin, "help-title");
+        OwnLabel titleUI = new OwnLabel(I18n.txt("gui.ui.interfacesettings"), skin, "help-title");
 
         Table ui = new Table();
 
         // LANGUAGE
-        OwnLabel langLabel = new OwnLabel(txt("gui.ui.language"), skin);
+        OwnLabel langLabel = new OwnLabel(I18n.txt("gui.ui.language"), skin);
         File i18nfolder = new File(GlobalConf.ASSETS_LOC + "/i18n/");
         String i18nname = "gsbundle";
         String[] files = i18nfolder.list();
@@ -587,32 +580,29 @@ public class PreferencesWindow extends GenericDialog {
             if (file.startsWith("gsbundle") && file.endsWith(".properties")) {
                 String locale = file.substring(i18nname.length(), file.length() - ".properties".length());
                 // Default locale
-                if (locale == null || locale.isEmpty())
+                if (locale.isEmpty())
                     locale = "-en-GB";
-                if (locale.length() != 0) {
-                    // Remove underscore _
-                    locale = locale.substring(1).replace("_", "-");
-                    Locale loc = Locale.forLanguageTag(locale);
-                    langs[i] = new LangComboBoxBean(loc);
-                } else {
-                    langs[i] = new LangComboBoxBean(I18n.bundle.getLocale());
-                }
+
+                // Remove underscore _
+                locale = locale.substring(1).replace("_", "-");
+                Locale loc = Locale.forLanguageTag(locale);
+                langs[i] = new LangComboBoxBean(loc);
             }
             i++;
         }
         Arrays.sort(langs);
 
-        lang = new OwnSelectBox<LangComboBoxBean>(skin);
+        lang = new OwnSelectBox<>(skin);
         lang.setWidth(textwidth * 3f);
         lang.setItems(langs);
-        if(!GlobalConf.program.LOCALE.isEmpty()) {
+        if (!GlobalConf.program.LOCALE.isEmpty()) {
             lang.setSelected(langs[idxLang(GlobalConf.program.LOCALE, langs)]);
         } else {
             // Empty locale
             int lidx = idxLang(null, langs);
-            if(lidx < 0 || lidx >= langs.length){
+            if (lidx < 0 || lidx >= langs.length) {
                 lidx = idxLang(Locale.getDefault().toLanguageTag(), langs);
-                if(lidx < 0 || lidx >= langs.length){
+                if (lidx < 0 || lidx >= langs.length) {
                     // Default is en_GB
                     lidx = 2;
                 }
@@ -621,163 +611,166 @@ public class PreferencesWindow extends GenericDialog {
         }
 
         // THEME
-        OwnLabel themeLabel = new OwnLabel(txt("gui.ui.theme"), skin);
+        OwnLabel themeLabel = new OwnLabel(I18n.txt("gui.ui.theme"), skin);
         String[] themes = new String[] { "dark-green", "dark-green-x2", "dark-blue", "dark-blue-x2", "dark-orange", "dark-orange-x2", "bright-green", "bright-green-x2", "night-red", "night-red-x2" };
-        theme = new OwnSelectBox<String>(skin);
+        theme = new OwnSelectBox<>(skin);
         theme.setWidth(textwidth * 3f);
         theme.setItems(themes);
         theme.setSelected(GlobalConf.program.UI_THEME);
 
         // POINTER COORDINATES
-        pointerCoords = new OwnCheckBox(txt("gui.ui.pointercoordinates"), skin, "default", pad);
+        pointerCoords = new OwnCheckBox(I18n.txt("gui.ui.pointercoordinates"), skin, "default", pad5);
         pointerCoords.setChecked(GlobalConf.program.DISPLAY_POINTER_COORDS);
 
         // LABELS
         labels.addAll(langLabel, themeLabel);
 
         // Add to table
-        ui.add(langLabel).left().padRight(pad * 4).padBottom(pad);
-        ui.add(lang).left().padBottom(pad).row();
-        ui.add(themeLabel).left().padRight(pad * 4).padBottom(pad);
-        ui.add(theme).left().padBottom(pad).row();
-        ui.add(pointerCoords).left().padRight(pad * 2).padBottom(pad).row();
+        ui.add(langLabel).left().padRight(pad5 * 4).padBottom(pad5);
+        ui.add(lang).left().padBottom(pad5).row();
+        ui.add(themeLabel).left().padRight(pad5 * 4).padBottom(pad5);
+        ui.add(theme).left().padBottom(pad5).row();
+        ui.add(pointerCoords).left().padRight(pad5 * 2).padBottom(pad5).row();
 
         // Add to content
-        contentUI.add(titleUI).left().padBottom(pad * 2).row();
+        contentUI.add(titleUI).left().padBottom(pad5 * 2).row();
         contentUI.add(ui).left();
 
-        /**
+        /*
          * ==== PERFORMANCE ====
-         **/
+         */
         final Table contentPerformance = new Table(skin);
         contents.add(contentPerformance);
         contentPerformance.align(Align.top | Align.left);
 
         // MULTITHREADING
-        OwnLabel titleMultithread = new OwnLabel(txt("gui.multithreading"), skin, "help-title");
+        OwnLabel titleMultithread = new OwnLabel(I18n.txt("gui.multithreading"), skin, "help-title");
 
         Table multithread = new Table(skin);
 
-        OwnLabel numThreadsLabel = new OwnLabel(txt("gui.thread.number"), skin);
+        OwnLabel numThreadsLabel = new OwnLabel(I18n.txt("gui.thread.number"), skin);
         int maxthreads = Runtime.getRuntime().availableProcessors();
         ComboBoxBean[] cbs = new ComboBoxBean[maxthreads + 1];
-        cbs[0] = new ComboBoxBean(txt("gui.letdecide"), 0);
+        cbs[0] = new ComboBoxBean(I18n.txt("gui.letdecide"), 0);
         for (i = 1; i <= maxthreads; i++) {
-            cbs[i] = new ComboBoxBean(txt("gui.thread", i), i);
+            cbs[i] = new ComboBoxBean(I18n.txt("gui.thread", i), i);
         }
-        numThreads = new OwnSelectBox<ComboBoxBean>(skin);
+        numThreads = new OwnSelectBox<>(skin);
         numThreads.setWidth(textwidth * 3f);
         numThreads.setItems(cbs);
         numThreads.setSelectedIndex(GlobalConf.performance.NUMBER_THREADS);
 
-        multithreadCb = new OwnCheckBox(txt("gui.thread.enable"), skin, "default", pad);
-        multithreadCb.addListener(new EventListener() {
-            @Override
-            public boolean handle(Event event) {
-                if (event instanceof ChangeEvent) {
-                    numThreads.setDisabled(!multithreadCb.isChecked());
-                    // Add notice
-                    return true;
-                }
-                return false;
+        multithreadCb = new OwnCheckBox(I18n.txt("gui.thread.enable"), skin, "default", pad5);
+        multithreadCb.addListener(event -> {
+            if (event instanceof ChangeEvent) {
+                numThreads.setDisabled(!multithreadCb.isChecked());
+                // Add notice
+                return true;
             }
+            return false;
         });
         multithreadCb.setChecked(GlobalConf.performance.MULTITHREADING);
         numThreads.setDisabled(!multithreadCb.isChecked());
 
         // Add to table
-        multithread.add(multithreadCb).colspan(2).left().padBottom(pad).row();
-        multithread.add(numThreadsLabel).left().padRight(pad * 4).padBottom(pad);
-        multithread.add(numThreads).left().padBottom(pad).row();
+        multithread.add(multithreadCb).colspan(2).left().padBottom(pad5).row();
+        multithread.add(numThreadsLabel).left().padRight(pad5 * 4).padBottom(pad5);
+        multithread.add(numThreads).left().padBottom(pad5).row();
         final Cell<Actor> noticeMulithreadCell = multithread.add((Actor) null);
         noticeMulithreadCell.colspan(2).left();
 
-        multithreadCb.addListener(new EventListener() {
-            @Override
-            public boolean handle(Event event) {
-                if (event instanceof ChangeEvent) {
-                    if (noticeMulithreadCell.getActor() == null) {
-                        String nextinfostr = txt("gui.ui.info") + '\n';
-                        int lines = GlobalResources.countOccurrences(nextinfostr, '\n');
-                        TextArea nextTimeInfo = new OwnTextArea(nextinfostr, skin, "info");
-                        nextTimeInfo.setDisabled(true);
-                        nextTimeInfo.setPrefRows(lines + 1);
-                        nextTimeInfo.setWidth(tawidth);
-                        nextTimeInfo.clearListeners();
-                        noticeMulithreadCell.setActor(nextTimeInfo);
-                    }
-                    return true;
+        multithreadCb.addListener(event -> {
+            if (event instanceof ChangeEvent) {
+                if (noticeMulithreadCell.getActor() == null) {
+                    String nextinfostr = I18n.txt("gui.ui.info") + '\n';
+                    int lines = GlobalResources.countOccurrences(nextinfostr, '\n');
+                    TextArea nextTimeInfo = new OwnTextArea(nextinfostr, skin, "info");
+                    nextTimeInfo.setDisabled(true);
+                    nextTimeInfo.setPrefRows(lines + 1);
+                    nextTimeInfo.setWidth(tawidth);
+                    nextTimeInfo.clearListeners();
+                    noticeMulithreadCell.setActor(nextTimeInfo);
                 }
-                return false;
+                return true;
             }
+            return false;
         });
 
         // Add to content
-        contentPerformance.add(titleMultithread).left().padBottom(pad * 2).row();
-        contentPerformance.add(multithread).left().padBottom(pad * 4).row();
+        contentPerformance.add(titleMultithread).left().padBottom(pad5 * 2).row();
+        contentPerformance.add(multithread).left().padBottom(pad5 * 4).row();
 
         // DRAW DISTANCE
-        OwnLabel titleLod = new OwnLabel(txt("gui.lod"), skin, "help-title");
+        OwnLabel titleLod = new OwnLabel(I18n.txt("gui.lod"), skin, "help-title");
 
         Table lod = new Table(skin);
 
         // Smooth transitions
-        lodFadeCb = new OwnCheckBox(txt("gui.lod.fade"), skin, "default", pad);
+        lodFadeCb = new OwnCheckBox(I18n.txt("gui.lod.fade"), skin, "default", pad5);
         lodFadeCb.setChecked(GlobalConf.scene.OCTREE_PARTICLE_FADE);
 
         // Draw distance
-        OwnLabel ddLabel = new OwnLabel(txt("gui.lod.thresholds"), skin);
+        OwnLabel ddLabel = new OwnLabel(I18n.txt("gui.lod.thresholds"), skin);
         lodTransitions = new OwnSlider(Constants.MIN_SLIDER, Constants.MAX_SLIDER, 0.1f, false, skin);
         lodTransitions.setValue(Math.round(MathUtilsd.lint(GlobalConf.scene.OCTANT_THRESHOLD_0 * MathUtilsd.radDeg, Constants.MIN_LOD_TRANS_ANGLE_DEG, Constants.MAX_LOD_TRANS_ANGLE_DEG, Constants.MIN_SLIDER, Constants.MAX_SLIDER)));
 
         final OwnLabel lodValueLabel = new OwnLabel(nf3.format(GlobalConf.scene.OCTANT_THRESHOLD_0 * MathUtilsd.radDeg), skin);
 
-        lodTransitions.addListener(new EventListener() {
-            @Override
-            public boolean handle(Event event) {
-                if (event instanceof ChangeEvent) {
-                    OwnSlider slider = (OwnSlider) event.getListenerActor();
-                    lodValueLabel.setText(nf3.format(MathUtilsd.lint(slider.getValue(), Constants.MIN_SLIDER, Constants.MAX_SLIDER, Constants.MIN_LOD_TRANS_ANGLE_DEG, Constants.MAX_LOD_TRANS_ANGLE_DEG)));
-                    return true;
-                }
-                return false;
+        lodTransitions.addListener(event -> {
+            if (event instanceof ChangeEvent) {
+                OwnSlider slider = (OwnSlider) event.getListenerActor();
+                lodValueLabel.setText(nf3.format(MathUtilsd.lint(slider.getValue(), Constants.MIN_SLIDER, Constants.MAX_SLIDER, Constants.MIN_LOD_TRANS_ANGLE_DEG, Constants.MAX_LOD_TRANS_ANGLE_DEG)));
+                return true;
             }
+            return false;
         });
 
         OwnImageButton lodTooltip = new OwnImageButton(skin, "tooltip");
-        lodTooltip.addListener(new TextTooltip(txt("gui.lod.thresholds.info"), skin));
+        lodTooltip.addListener(new TextTooltip(I18n.txt("gui.lod.thresholds.info"), skin));
 
         // LABELS
         labels.addAll(numThreadsLabel, ddLabel);
 
         // Add to table
-        lod.add(lodFadeCb).colspan(4).left().padBottom(pad).row();
-        lod.add(ddLabel).left().padRight(pad * 4).padBottom(pad);
-        lod.add(lodTransitions).left().padRight(pad * 4).padBottom(pad);
-        lod.add(lodValueLabel).left().padRight(pad * 4).padBottom(pad);
-        lod.add(lodTooltip).left().padBottom(pad);
+        lod.add(lodFadeCb).colspan(4).left().padBottom(pad5).row();
+        lod.add(ddLabel).left().padRight(pad5 * 4).padBottom(pad5);
+        lod.add(lodTransitions).left().padRight(pad5 * 4).padBottom(pad5);
+        lod.add(lodValueLabel).left().padRight(pad5 * 4).padBottom(pad5);
+        lod.add(lodTooltip).left().padBottom(pad5);
 
         // Add to content
-        contentPerformance.add(titleLod).left().padBottom(pad * 2).row();
+        contentPerformance.add(titleLod).left().padBottom(pad5 * 2).row();
         contentPerformance.add(lod).left();
 
-        /**
+        /*
          * ==== CONTROLS ====
-         **/
+         */
         final Table contentControls = new Table(skin);
         contents.add(contentControls);
         contentControls.align(Align.top | Align.left);
 
-        OwnLabel titleController = new OwnLabel(txt("gui.controller"), skin, "help-title");
+        OwnLabel titleController = new OwnLabel(I18n.txt("gui.controller"), skin, "help-title");
 
-        // DETECTED CONTROLLER
-        OwnLabel detectedLabel = new OwnLabel(txt("gui.controller.detected"), skin);
+        // DETECTED CONTROLLER NAMES
+        OwnLabel detectedLabel = new OwnLabel(I18n.txt("gui.controller.detected"), skin);
         Array<Controller> controllers = Controllers.getControllers();
-        OwnLabel controllerName = new OwnLabel(controllers.size == 0 ? txt("gui.controller.nocontrollers") : controllers.get(0).getName(), skin);
+
+        Array<OwnLabel> controllerNames = new Array<>();
+        for (Controller c : controllers) {
+            OwnLabel cl = new OwnLabel(c.getName(), skin);
+            if (GlobalConf.controls.isControllerBlacklisted(c.getName())) {
+                cl.setText(cl.getText() + " [*]");
+                cl.setColor(1, 0, 0, 1);
+                cl.addListener(new TextTooltip(I18n.txt("gui.tooltip.controller.blacklist"), skin));
+            }
+            controllerNames.add(cl);
+        }
+        if (controllerNames.isEmpty())
+            controllerNames.add(new OwnLabel(I18n.txt("gui.controller.nocontrollers"), skin));
 
         // CONTROLLER MAPPINGS
-        OwnLabel mappingsLabel = new OwnLabel(txt("gui.controller.mappingsfile"), skin);
-        Array<FileComboBoxBean> controllerMappingsFiles = new Array<FileComboBoxBean>();
+        OwnLabel mappingsLabel = new OwnLabel(I18n.txt("gui.controller.mappingsfile"), skin);
+        Array<FileComboBoxBean> controllerMappingsFiles = new Array<>();
         FileHandle externalfolder = Gdx.files.absolute(GlobalConf.ASSETS_LOC + "./mappings/");
         FileHandle homefolder = Gdx.files.absolute(SysUtils.getDefaultMappingsDir().getPath());
         Array<FileHandle> mappingFiles = new Array<FileHandle>();
@@ -792,16 +785,16 @@ public class PreferencesWindow extends GenericDialog {
             }
         }
 
-        controllerMappings = new OwnSelectBox<FileComboBoxBean>(skin);
+        controllerMappings = new OwnSelectBox<>(skin);
         controllerMappings.setItems(controllerMappingsFiles);
         controllerMappings.setSelected(selected);
 
         // INVERT Y
-        inverty = new OwnCheckBox("Invert look y axis", skin, "default", pad);
+        inverty = new OwnCheckBox("Invert look y axis", skin, "default", pad5);
         inverty.setChecked(GlobalConf.controls.INVERT_LOOK_Y_AXIS);
 
         // KEY BINDINGS
-        OwnLabel titleKeybindings = new OwnLabel(txt("gui.keymappings"), skin, "help-title");
+        OwnLabel titleKeybindings = new OwnLabel(I18n.txt("gui.keymappings"), skin, "help-title");
 
         Map<TreeSet<Integer>, ProgramAction> keyboardMappings = KeyBindings.instance.getSortedMappings();
         Set<TreeSet<Integer>> keymaps = keyboardMappings.keySet();
@@ -818,16 +811,16 @@ public class PreferencesWindow extends GenericDialog {
         Table controls = new Table(skin);
         controls.align(Align.left | Align.top);
         // Header
-        controls.add(new OwnLabel(txt("gui.keymappings.action"), skin, "header")).left();
-        controls.add(new OwnLabel(txt("gui.keymappings.keys"), skin, "header")).left().row();
+        controls.add(new OwnLabel(I18n.txt("gui.keymappings.action"), skin, "header")).left();
+        controls.add(new OwnLabel(I18n.txt("gui.keymappings.keys"), skin, "header")).left().row();
 
-        controls.add(new OwnLabel(txt("action.forward"), skin)).left();
+        controls.add(new OwnLabel(I18n.txt("action.forward"), skin)).left();
         controls.add(new OwnLabel(Keys.toString(Keys.UP).toUpperCase(), skin)).left().row();
-        controls.add(new OwnLabel(txt("action.backward"), skin)).left();
+        controls.add(new OwnLabel(I18n.txt("action.backward"), skin)).left();
         controls.add(new OwnLabel(Keys.toString(Keys.DOWN).toUpperCase(), skin)).left().row();
-        controls.add(new OwnLabel(txt("action.left"), skin)).left();
+        controls.add(new OwnLabel(I18n.txt("action.left"), skin)).left();
         controls.add(new OwnLabel(Keys.toString(Keys.LEFT).toUpperCase(), skin)).left().row();
-        controls.add(new OwnLabel(txt("action.right"), skin)).left();
+        controls.add(new OwnLabel(I18n.txt("action.right"), skin)).left();
         controls.add(new OwnLabel(Keys.toString(Keys.RIGHT).toUpperCase(), skin)).left().row();
 
         // Controls
@@ -845,72 +838,67 @@ public class PreferencesWindow extends GenericDialog {
         scrolls.add(controlsScroll);
 
         // Add to content
-        contentControls.add(titleController).colspan(2).left().padBottom(pad * 2).row();
-        contentControls.add(detectedLabel).left().padBottom(pad * 2);
-        contentControls.add(controllerName).left().padBottom(pad * 2).row();
-        contentControls.add(mappingsLabel).left().padBottom(pad * 2);
-        contentControls.add(controllerMappings).left().padBottom(pad * 2).row();
-        contentControls.add(inverty).left().colspan(2).padBottom(pad * 2).row();
-        contentControls.add(titleKeybindings).colspan(2).left().padBottom(pad * 2).row();
+        contentControls.add(titleController).colspan(2).left().padBottom(pad5 * 2).row();
+        contentControls.add(detectedLabel).left().padBottom(pad5 * 2).padRight(pad5);
+        int ci = 0;
+        for (OwnLabel cn : controllerNames) {
+            if (ci > 0)
+                contentControls.add();
+            contentControls.add(cn).left().padBottom(pad5 * 2).row();
+            ci++;
+        }
+        contentControls.add(mappingsLabel).left().padBottom(pad5 * 2).padRight(pad5);
+        contentControls.add(controllerMappings).left().padBottom(pad5 * 2).row();
+        contentControls.add(inverty).left().colspan(2).padBottom(pad5 * 2).row();
+        contentControls.add(titleKeybindings).colspan(2).left().padBottom(pad5 * 2).row();
         contentControls.add(controlsScroll).colspan(2).left();
 
-        /**
+        /*
          * ==== SCREENSHOTS ====
-         **/
+         */
         final Table contentScreenshots = new Table(skin);
         contents.add(contentScreenshots);
         contentScreenshots.align(Align.top | Align.left);
 
         // SCREEN CAPTURE
-        OwnLabel titleScreenshots = new OwnLabel(txt("gui.screencapture"), skin, "help-title");
+        OwnLabel titleScreenshots = new OwnLabel(I18n.txt("gui.screencapture"), skin, "help-title");
 
         Table screenshots = new Table(skin);
 
         // Info
-        String ssinfostr = txt("gui.screencapture.info") + '\n';
-        int lines = GlobalResources.countOccurrences(ssinfostr, '\n');
-        TextArea screenshotsInfo = new OwnTextArea(ssinfostr, skin, "info");
+        String ssInfoStr = I18n.txt("gui.screencapture.info") + '\n';
+        int ssLines = GlobalResources.countOccurrences(ssInfoStr, '\n');
+        TextArea screenshotsInfo = new OwnTextArea(ssInfoStr, skin, "info");
         screenshotsInfo.setDisabled(true);
-        screenshotsInfo.setPrefRows(lines + 1);
+        screenshotsInfo.setPrefRows(ssLines + 1);
         screenshotsInfo.setWidth(tawidth);
         screenshotsInfo.clearListeners();
 
         // Save location
-        OwnLabel screenshotsLocationLabel = new OwnLabel(txt("gui.screenshots.save"), skin);
+        OwnLabel screenshotsLocationLabel = new OwnLabel(I18n.txt("gui.screenshots.save"), skin);
         screenshotsLocationLabel.pack();
         screenshotsLocation = new OwnTextButton(GlobalConf.screenshot.SCREENSHOT_FOLDER, skin);
-        screenshotsLocation.pad(pad);
-        screenshotsLocation.addListener(new EventListener() {
-            @Override
-            public boolean handle(Event event) {
-                if (event instanceof ChangeEvent) {
-                    FileChooser fc = FileChooser.createPickDialog(txt("gui.screenshots.directory.choose"), skin, Gdx.files.absolute(GlobalConf.screenshot.SCREENSHOT_FOLDER));
-                    fc.setResultListener(new ResultListener() {
-                        @Override
-                        public boolean result(boolean success, FileHandle result) {
-                            if (success) {
-                                // do stuff with result
-                                screenshotsLocation.setText(result.path());
-                            }
-                            return true;
-                        }
-                    });
-                    fc.setFilter(new FileFilter() {
-                        @Override
-                        public boolean accept(File pathname) {
-                            return pathname.isDirectory();
-                        }
-                    });
-                    fc.show(stage);
-
+        screenshotsLocation.pad(pad5);
+        screenshotsLocation.addListener(event -> {
+            if (event instanceof ChangeEvent) {
+                FileChooser fc = new FileChooser(I18n.txt("gui.screenshots.directory.choose"), skin, stage, Gdx.files.absolute(GlobalConf.screenshot.SCREENSHOT_FOLDER), FileChooser.FileChooserTarget.DIRECTORIES);
+                fc.setFileBrowsingEnabled(false);
+                fc.setResultListener((success, result) -> {
+                    if (success) {
+                        // do stuff with result
+                        screenshotsLocation.setText(result.path());
+                    }
                     return true;
-                }
-                return false;
+                });
+                fc.show(stage);
+
+                return true;
             }
+            return false;
         });
 
         // Size
-        final OwnLabel screenshotsSizeLabel = new OwnLabel(txt("gui.screenshots.size"), skin);
+        final OwnLabel screenshotsSizeLabel = new OwnLabel(I18n.txt("gui.screenshots.size"), skin);
         screenshotsSizeLabel.setDisabled(GlobalConf.screenshot.isSimpleMode());
         final OwnLabel xLabel = new OwnLabel("x", skin);
         screenshotsSizeValidator = new IntValidator(GlobalConf.ScreenshotConf.MIN_SCREENSHOT_SIZE, GlobalConf.ScreenshotConf.MAX_SCREENSHOT_SIZE);
@@ -921,41 +909,38 @@ public class PreferencesWindow extends GenericDialog {
         ssheightField.setWidth(textwidth);
         ssheightField.setDisabled(GlobalConf.screenshot.isSimpleMode());
         HorizontalGroup ssSizeGroup = new HorizontalGroup();
-        ssSizeGroup.space(pad * 2);
+        ssSizeGroup.space(pad5 * 2);
         ssSizeGroup.addActor(sswidthField);
         ssSizeGroup.addActor(xLabel);
         ssSizeGroup.addActor(ssheightField);
 
         // Mode
-        OwnLabel ssModeLabel = new OwnLabel(txt("gui.screenshots.mode"), skin);
-        ComboBoxBean[] screenshotModes = new ComboBoxBean[] { new ComboBoxBean(txt("gui.screenshots.mode.simple"), 0), new ComboBoxBean(txt("gui.screenshots.mode.redraw"), 1) };
-        screenshotMode = new OwnSelectBox<ComboBoxBean>(skin);
+        OwnLabel ssModeLabel = new OwnLabel(I18n.txt("gui.screenshots.mode"), skin);
+        ComboBoxBean[] screenshotModes = new ComboBoxBean[] { new ComboBoxBean(I18n.txt("gui.screenshots.mode.simple"), 0), new ComboBoxBean(I18n.txt("gui.screenshots.mode.redraw"), 1) };
+        screenshotMode = new OwnSelectBox<>(skin);
         screenshotMode.setItems(screenshotModes);
         screenshotMode.setWidth(textwidth * 3f);
-        screenshotMode.addListener(new EventListener() {
-            @Override
-            public boolean handle(Event event) {
-                if (event instanceof ChangeEvent) {
-                    if (screenshotMode.getSelected().value == 0) {
-                        // Simple
-                        enableComponents(false, sswidthField, ssheightField, screenshotsSizeLabel, xLabel);
-                    } else {
-                        // Redraw
-                        enableComponents(true, sswidthField, ssheightField, screenshotsSizeLabel, xLabel);
-                    }
-                    return true;
+        screenshotMode.addListener(event -> {
+            if (event instanceof ChangeEvent) {
+                if (screenshotMode.getSelected().value == 0) {
+                    // Simple
+                    enableComponents(false, sswidthField, ssheightField, screenshotsSizeLabel, xLabel);
+                } else {
+                    // Redraw
+                    enableComponents(true, sswidthField, ssheightField, screenshotsSizeLabel, xLabel);
                 }
-                return false;
+                return true;
             }
+            return false;
         });
         screenshotMode.setSelected(screenshotModes[GlobalConf.screenshot.SCREENSHOT_MODE.ordinal()]);
-        screenshotMode.addListener(new TextTooltip(txt("gui.tooltip.screenshotmode"), skin));
+        screenshotMode.addListener(new TextTooltip(I18n.txt("gui.tooltip.screenshotmode"), skin));
 
         OwnImageButton screenshotsModeTooltip = new OwnImageButton(skin, "tooltip");
-        screenshotsModeTooltip.addListener(new TextTooltip(txt("gui.tooltip.screenshotmode"), skin));
+        screenshotsModeTooltip.addListener(new TextTooltip(I18n.txt("gui.tooltip.screenshotmode"), skin));
 
         HorizontalGroup ssModeGroup = new HorizontalGroup();
-        ssModeGroup.space(pad);
+        ssModeGroup.space(pad5);
         ssModeGroup.addActor(screenshotMode);
         ssModeGroup.addActor(screenshotsModeTooltip);
 
@@ -963,84 +948,73 @@ public class PreferencesWindow extends GenericDialog {
         labels.addAll(screenshotsLocationLabel, ssModeLabel, screenshotsSizeLabel);
 
         // Add to table
-        screenshots.add(screenshotsInfo).colspan(2).left().padBottom(pad).row();
-        screenshots.add(screenshotsLocationLabel).left().padRight(pad * 4).padBottom(pad);
-        screenshots.add(screenshotsLocation).left().expandX().padBottom(pad).row();
-        screenshots.add(ssModeLabel).left().padRight(pad * 4).padBottom(pad);
-        screenshots.add(ssModeGroup).left().expandX().padBottom(pad).row();
-        screenshots.add(screenshotsSizeLabel).left().padRight(pad * 4).padBottom(pad);
-        screenshots.add(ssSizeGroup).left().expandX().padBottom(pad).row();
+        screenshots.add(screenshotsInfo).colspan(2).left().padBottom(pad5).row();
+        screenshots.add(screenshotsLocationLabel).left().padRight(pad5 * 4).padBottom(pad5);
+        screenshots.add(screenshotsLocation).left().expandX().padBottom(pad5).row();
+        screenshots.add(ssModeLabel).left().padRight(pad5 * 4).padBottom(pad5);
+        screenshots.add(ssModeGroup).left().expandX().padBottom(pad5).row();
+        screenshots.add(screenshotsSizeLabel).left().padRight(pad5 * 4).padBottom(pad5);
+        screenshots.add(ssSizeGroup).left().expandX().padBottom(pad5).row();
 
         // Add to content
-        contentScreenshots.add(titleScreenshots).left().padBottom(pad * 2).row();
+        contentScreenshots.add(titleScreenshots).left().padBottom(pad5 * 2).row();
         contentScreenshots.add(screenshots).left();
 
-        /**
+        /*
          * ==== FRAME OUTPUT ====
-         **/
+         */
         final Table contentFrames = new Table(skin);
         contents.add(contentFrames);
         contentFrames.align(Align.top | Align.left);
 
         // FRAME OUTPUT CONFIG
-        OwnLabel titleFrameoutput = new OwnLabel(txt("gui.frameoutput"), skin, "help-title");
+        OwnLabel titleFrameoutput = new OwnLabel(I18n.txt("gui.frameoutput"), skin, "help-title");
 
         Table frameoutput = new Table(skin);
 
         // Info
-        String foinfostr = txt("gui.frameoutput.info") + '\n';
-        lines = GlobalResources.countOccurrences(foinfostr, '\n');
+        String foinfostr = I18n.txt("gui.frameoutput.info") + '\n';
+        ssLines = GlobalResources.countOccurrences(foinfostr, '\n');
         TextArea frameoutputInfo = new OwnTextArea(foinfostr, skin, "info");
         frameoutputInfo.setDisabled(true);
-        frameoutputInfo.setPrefRows(lines + 1);
+        frameoutputInfo.setPrefRows(ssLines + 1);
         frameoutputInfo.setWidth(tawidth);
         frameoutputInfo.clearListeners();
 
         // Save location
-        OwnLabel frameoutputLocationLabel = new OwnLabel(txt("gui.frameoutput.location"), skin);
+        OwnLabel frameoutputLocationLabel = new OwnLabel(I18n.txt("gui.frameoutput.location"), skin);
         frameoutputLocation = new OwnTextButton(GlobalConf.frame.RENDER_FOLDER, skin);
-        frameoutputLocation.pad(pad);
-        frameoutputLocation.addListener(new EventListener() {
-            @Override
-            public boolean handle(Event event) {
-                if (event instanceof ChangeEvent) {
-                    FileChooser fc = FileChooser.createPickDialog(txt("gui.frameoutput.directory.choose"), skin, Gdx.files.absolute(GlobalConf.frame.RENDER_FOLDER));
-                    fc.setResultListener(new ResultListener() {
-                        @Override
-                        public boolean result(boolean success, FileHandle result) {
-                            if (success) {
-                                // do stuff with result
-                                frameoutputLocation.setText(result.path());
-                            }
-                            return true;
-                        }
-                    });
-                    fc.setFilter(new FileFilter() {
-                        @Override
-                        public boolean accept(File pathname) {
-                            return pathname.isDirectory();
-                        }
-                    });
-                    fc.show(stage);
-
+        frameoutputLocation.pad(pad5);
+        frameoutputLocation.addListener(event -> {
+            if (event instanceof ChangeEvent) {
+                FileChooser fc = new FileChooser(I18n.txt("gui.frameoutput.directory.choose"), skin, stage, Gdx.files.absolute(GlobalConf.frame.RENDER_FOLDER), FileChooser.FileChooserTarget.DIRECTORIES);
+                fc.setFileBrowsingEnabled(false);
+                fc.setResultListener((success, result) -> {
+                    if (success) {
+                        // do stuff with result
+                        frameoutputLocation.setText(result.path());
+                    }
                     return true;
-                }
-                return false;
+                });
+                fc.show(stage);
+
+                return true;
             }
+            return false;
         });
 
         // Prefix
-        OwnLabel prefixLabel = new OwnLabel(txt("gui.frameoutput.prefix"), skin);
+        OwnLabel prefixLabel = new OwnLabel(I18n.txt("gui.frameoutput.prefix"), skin);
         frameoutputPrefix = new OwnTextField(GlobalConf.frame.RENDER_FILE_NAME, skin, new RegexpValidator("^\\w+$"));
         frameoutputPrefix.setWidth(textwidth * 3f);
 
         // FPS
-        OwnLabel fpsLabel = new OwnLabel(txt("gui.frameoutput.fps"), skin);
+        OwnLabel fpsLabel = new OwnLabel(I18n.txt("gui.target.fps"), skin);
         frameoutputFps = new OwnTextField(Integer.toString(GlobalConf.frame.RENDER_TARGET_FPS), skin, new IntValidator(1, 200));
         frameoutputFps.setWidth(textwidth * 3f);
 
         // Size
-        final OwnLabel frameoutputSizeLabel = new OwnLabel(txt("gui.frameoutput.size"), skin);
+        final OwnLabel frameoutputSizeLabel = new OwnLabel(I18n.txt("gui.frameoutput.size"), skin);
         frameoutputSizeLabel.setDisabled(GlobalConf.frame.isSimpleMode());
         final OwnLabel xLabelfo = new OwnLabel("x", skin);
         frameoutputSizeValidator = new IntValidator(GlobalConf.FrameConf.MIN_FRAME_SIZE, GlobalConf.FrameConf.MAX_FRAME_SIZE);
@@ -1051,41 +1025,38 @@ public class PreferencesWindow extends GenericDialog {
         foheightField.setWidth(textwidth);
         foheightField.setDisabled(GlobalConf.frame.isSimpleMode());
         HorizontalGroup foSizeGroup = new HorizontalGroup();
-        foSizeGroup.space(pad * 2);
+        foSizeGroup.space(pad5 * 2);
         foSizeGroup.addActor(fowidthField);
         foSizeGroup.addActor(xLabelfo);
         foSizeGroup.addActor(foheightField);
 
         // Mode
-        OwnLabel fomodeLabel = new OwnLabel(txt("gui.screenshots.mode"), skin);
-        ComboBoxBean[] frameoutputModes = new ComboBoxBean[] { new ComboBoxBean(txt("gui.screenshots.mode.simple"), 0), new ComboBoxBean(txt("gui.screenshots.mode.redraw"), 1) };
-        frameoutputMode = new OwnSelectBox<ComboBoxBean>(skin);
+        OwnLabel fomodeLabel = new OwnLabel(I18n.txt("gui.screenshots.mode"), skin);
+        ComboBoxBean[] frameoutputModes = new ComboBoxBean[] { new ComboBoxBean(I18n.txt("gui.screenshots.mode.simple"), 0), new ComboBoxBean(I18n.txt("gui.screenshots.mode.redraw"), 1) };
+        frameoutputMode = new OwnSelectBox<>(skin);
         frameoutputMode.setItems(frameoutputModes);
         frameoutputMode.setWidth(textwidth * 3f);
-        frameoutputMode.addListener(new EventListener() {
-            @Override
-            public boolean handle(Event event) {
-                if (event instanceof ChangeEvent) {
-                    if (frameoutputMode.getSelected().value == 0) {
-                        // Simple
-                        enableComponents(false, fowidthField, foheightField, frameoutputSizeLabel, xLabelfo);
-                    } else {
-                        // Redraw
-                        enableComponents(true, fowidthField, foheightField, frameoutputSizeLabel, xLabelfo);
-                    }
-                    return true;
+        frameoutputMode.addListener(event -> {
+            if (event instanceof ChangeEvent) {
+                if (frameoutputMode.getSelected().value == 0) {
+                    // Simple
+                    enableComponents(false, fowidthField, foheightField, frameoutputSizeLabel, xLabelfo);
+                } else {
+                    // Redraw
+                    enableComponents(true, fowidthField, foheightField, frameoutputSizeLabel, xLabelfo);
                 }
-                return false;
+                return true;
             }
+            return false;
         });
         frameoutputMode.setSelected(frameoutputModes[GlobalConf.frame.FRAME_MODE.ordinal()]);
-        frameoutputMode.addListener(new TextTooltip(txt("gui.tooltip.screenshotmode"), skin));
+        frameoutputMode.addListener(new TextTooltip(I18n.txt("gui.tooltip.screenshotmode"), skin));
 
         OwnImageButton frameoutputModeTooltip = new OwnImageButton(skin, "tooltip");
-        frameoutputModeTooltip.addListener(new TextTooltip(txt("gui.tooltip.screenshotmode"), skin));
+        frameoutputModeTooltip.addListener(new TextTooltip(I18n.txt("gui.tooltip.screenshotmode"), skin));
 
         HorizontalGroup foModeGroup = new HorizontalGroup();
-        foModeGroup.space(pad);
+        foModeGroup.space(pad5);
         foModeGroup.addActor(frameoutputMode);
         foModeGroup.addActor(frameoutputModeTooltip);
 
@@ -1093,25 +1064,25 @@ public class PreferencesWindow extends GenericDialog {
         labels.addAll(frameoutputLocationLabel, prefixLabel, fpsLabel, fomodeLabel, frameoutputSizeLabel);
 
         // Add to table
-        frameoutput.add(frameoutputInfo).colspan(2).left().padBottom(pad).row();
-        frameoutput.add(frameoutputLocationLabel).left().padRight(pad * 4).padBottom(pad);
-        frameoutput.add(frameoutputLocation).left().expandX().padBottom(pad).row();
-        frameoutput.add(prefixLabel).left().padRight(pad * 4).padBottom(pad);
-        frameoutput.add(frameoutputPrefix).left().padBottom(pad).row();
-        frameoutput.add(fpsLabel).left().padRight(pad * 4).padBottom(pad);
-        frameoutput.add(frameoutputFps).left().padBottom(pad).row();
-        frameoutput.add(fomodeLabel).left().padRight(pad * 4).padBottom(pad);
-        frameoutput.add(foModeGroup).left().expandX().padBottom(pad).row();
-        frameoutput.add(frameoutputSizeLabel).left().padRight(pad * 4).padBottom(pad);
-        frameoutput.add(foSizeGroup).left().expandX().padBottom(pad).row();
+        frameoutput.add(frameoutputInfo).colspan(2).left().padBottom(pad5).row();
+        frameoutput.add(frameoutputLocationLabel).left().padRight(pad5 * 4).padBottom(pad5);
+        frameoutput.add(frameoutputLocation).left().expandX().padBottom(pad5).row();
+        frameoutput.add(prefixLabel).left().padRight(pad5 * 4).padBottom(pad5);
+        frameoutput.add(frameoutputPrefix).left().padBottom(pad5).row();
+        frameoutput.add(fpsLabel).left().padRight(pad5 * 4).padBottom(pad5);
+        frameoutput.add(frameoutputFps).left().padBottom(pad5).row();
+        frameoutput.add(fomodeLabel).left().padRight(pad5 * 4).padBottom(pad5);
+        frameoutput.add(foModeGroup).left().expandX().padBottom(pad5).row();
+        frameoutput.add(frameoutputSizeLabel).left().padRight(pad5 * 4).padBottom(pad5);
+        frameoutput.add(foSizeGroup).left().expandX().padBottom(pad5).row();
 
         // Add to content
-        contentFrames.add(titleFrameoutput).left().padBottom(pad * 2).row();
+        contentFrames.add(titleFrameoutput).left().padBottom(pad5 * 2).row();
         contentFrames.add(frameoutput).left();
 
-        /**
+        /*
          * ==== CAMERA ====
-         **/
+         */
         final Table contentCamera = new Table(skin);
         contents.add(contentCamera);
         contentCamera.align(Align.top | Align.left);
@@ -1119,22 +1090,42 @@ public class PreferencesWindow extends GenericDialog {
         // CAMERA RECORDING
         Table camrec = new Table(skin);
 
-        OwnLabel titleCamrec = new OwnLabel(txt("gui.camerarec.title"), skin, "help-title");
+        OwnLabel titleCamrec = new OwnLabel(I18n.txt("gui.camerarec.title"), skin, "help-title");
 
         // fps
-        OwnLabel camfpsLabel = new OwnLabel(txt("gui.camerarec.fps"), skin);
+        OwnLabel camfpsLabel = new OwnLabel(I18n.txt("gui.target.fps"), skin);
         camrecFps = new OwnTextField(Integer.toString(GlobalConf.frame.CAMERA_REC_TARGET_FPS), skin, new IntValidator(1, 200));
         camrecFps.setWidth(textwidth * 3f);
 
+
+        // Keyframe preferences
+        Button keyframePrefs = new OwnTextIconButton(I18n.txt("gui.keyframes.preferences"), skin, "preferences");
+        keyframePrefs.setName("keyframe preferences");
+        keyframePrefs.pad(pad5);
+        keyframePrefs.addListener(new TextTooltip(I18n.txt("gui.tooltip.kf.editprefs"), skin));
+        keyframePrefs.addListener((event) -> {
+            if (event instanceof ChangeListener.ChangeEvent) {
+                KeyframePreferencesWindow kpw = new KeyframePreferencesWindow(stage, skin);
+                kpw.setAcceptRunnable(()->{
+                    if(kpw.camrecFps != null && kpw.camrecFps.isValid()) {
+                        camrecFps.setText(kpw.camrecFps.getText());
+                    }
+                });
+                kpw.show(stage);
+                return true;
+            }
+            return false;
+        });
+
         // Activate automatically
-        cbAutoCamrec = new OwnCheckBox(txt("gui.camerarec.frameoutput"), skin, "default", pad);
+        cbAutoCamrec = new OwnCheckBox(I18n.txt("gui.camerarec.frameoutput"), skin, "default", pad5);
         cbAutoCamrec.setChecked(GlobalConf.frame.AUTO_FRAME_OUTPUT_CAMERA_PLAY);
-        cbAutoCamrec.addListener(new TextTooltip(txt("gui.tooltip.playcamera.frameoutput"), skin));
+        cbAutoCamrec.addListener(new TextTooltip(I18n.txt("gui.tooltip.playcamera.frameoutput"), skin));
         OwnImageButton camrecTooltip = new OwnImageButton(skin, "tooltip");
-        camrecTooltip.addListener(new TextTooltip(txt("gui.tooltip.playcamera.frameoutput"), skin));
+        camrecTooltip.addListener(new TextTooltip(I18n.txt("gui.tooltip.playcamera.frameoutput"), skin));
 
         HorizontalGroup cbGroup = new HorizontalGroup();
-        cbGroup.space(pad);
+        cbGroup.space(pad5);
         cbGroup.addActor(cbAutoCamrec);
         cbGroup.addActor(camrecTooltip);
 
@@ -1142,36 +1133,37 @@ public class PreferencesWindow extends GenericDialog {
         labels.add(camfpsLabel);
 
         // Add to table
-        camrec.add(camfpsLabel).left().padRight(pad * 4).padBottom(pad);
-        camrec.add(camrecFps).left().expandX().padBottom(pad).row();
-        camrec.add(cbGroup).colspan(2).left().padBottom(pad).row();
+        camrec.add(camfpsLabel).left().padRight(pad5 * 4).padBottom(pad5);
+        camrec.add(camrecFps).left().expandX().padBottom(pad5).row();
+        camrec.add(cbGroup).colspan(2).left().padBottom(pad5 * 2).row();
+        camrec.add(keyframePrefs).colspan(2).left().row();
 
         // Add to content
-        contentCamera.add(titleCamrec).left().padBottom(pad * 2).row();
+        contentCamera.add(titleCamrec).left().padBottom(pad5 * 2).row();
         contentCamera.add(camrec).left();
 
-        /**
+        /*
          * ==== 360 ====
-         **/
+         */
         final Table content360 = new Table(skin);
         contents.add(content360);
         content360.align(Align.top | Align.left);
 
         // CUBEMAP
-        OwnLabel titleCubemap = new OwnLabel(txt("gui.360"), skin, "help-title");
+        OwnLabel titleCubemap = new OwnLabel(I18n.txt("gui.360"), skin, "help-title");
         Table cubemap = new Table(skin);
 
         // Info
-        String cminfostr = txt("gui.360.info") + '\n';
-        lines = GlobalResources.countOccurrences(cminfostr, '\n');
+        String cminfostr = I18n.txt("gui.360.info") + '\n';
+        ssLines = GlobalResources.countOccurrences(cminfostr, '\n');
         TextArea cmInfo = new OwnTextArea(cminfostr, skin, "info");
         cmInfo.setDisabled(true);
-        cmInfo.setPrefRows(lines + 1);
+        cmInfo.setPrefRows(ssLines + 1);
         cmInfo.setWidth(tawidth);
         cmInfo.clearListeners();
 
         // Resolution
-        OwnLabel cmResolutionLabel = new OwnLabel(txt("gui.360.resolution"), skin);
+        OwnLabel cmResolutionLabel = new OwnLabel(I18n.txt("gui.360.resolution"), skin);
         cmResolution = new OwnTextField(Integer.toString(GlobalConf.scene.CUBEMAP_FACE_RESOLUTION), skin, new IntValidator(20, 15000));
         cmResolution.setWidth(textwidth * 3f);
 
@@ -1179,17 +1171,17 @@ public class PreferencesWindow extends GenericDialog {
         labels.add(cmResolutionLabel);
 
         // Add to table
-        cubemap.add(cmInfo).colspan(2).left().padBottom(pad).row();
-        cubemap.add(cmResolutionLabel).left().padRight(pad * 4).padBottom(pad);
-        cubemap.add(cmResolution).left().expandX().padBottom(pad).row();
+        cubemap.add(cmInfo).colspan(2).left().padBottom(pad5).row();
+        cubemap.add(cmResolutionLabel).left().padRight(pad5 * 4).padBottom(pad5);
+        cubemap.add(cmResolution).left().expandX().padBottom(pad5).row();
 
         // Add to content
-        content360.add(titleCubemap).left().padBottom(pad * 2).row();
+        content360.add(titleCubemap).left().padBottom(pad5 * 2).row();
         content360.add(cubemap).left();
 
-        /**
+        /*
          * ==== DATA ====
-         **/
+         */
         final Table contentDataTable = new Table(skin);
         contentDataTable.align(Align.top | Align.left);
         final OwnScrollPane contentData = new OwnScrollPane(contentDataTable, skin, "minimalist-nobg");
@@ -1199,34 +1191,43 @@ public class PreferencesWindow extends GenericDialog {
         contents.add(contentData);
 
         // GENERAL OPTIONS
-        OwnLabel titleGeneralData = new OwnLabel(txt("gui.data.options"), skin, "help-title");
-        highAccuracyPositions = new OwnCheckBox(txt("gui.data.highaccuracy"), skin, pad);
+        OwnLabel titleGeneralData = new OwnLabel(I18n.txt("gui.data.options"), skin, "help-title");
+        highAccuracyPositions = new OwnCheckBox(I18n.txt("gui.data.highaccuracy"), skin, pad5);
         highAccuracyPositions.setChecked(GlobalConf.data.HIGH_ACCURACY_POSITIONS);
-        highAccuracyPositions.addListener(new TextTooltip(txt("gui.data.highaccuracy.tooltip"), skin));
+        highAccuracyPositions.addListener(new TextTooltip(I18n.txt("gui.tooltip.data.highaccuracy"), skin));
         OwnImageButton highAccTooltip = new OwnImageButton(skin, "tooltip");
-        highAccTooltip.addListener(new TextTooltip(txt("gui.data.highaccuracy.tooltip"), skin));
+        highAccTooltip.addListener(new TextTooltip(I18n.txt("gui.tooltip.data.highaccuracy"), skin));
 
         HorizontalGroup haGroup = new HorizontalGroup();
-        haGroup.space(pad);
+        haGroup.space(pad5);
         haGroup.addActor(highAccuracyPositions);
         haGroup.addActor(highAccTooltip);
 
         // DATA SOURCE
-        OwnLabel titleData = new OwnLabel(txt("gui.data.source"), skin, "help-title");
+        OwnLabel titleData = new OwnLabel(I18n.txt("gui.data.source"), skin, "help-title");
+
+        // Info
+        String dsInfoStr = I18n.txt("gui.data.source.info") + '\n';
+        int dsLines = GlobalResources.countOccurrences(dsInfoStr, '\n');
+        TextArea dataSourceInfo = new OwnTextArea(dsInfoStr, skin, "info");
+        dataSourceInfo.setDisabled(true);
+        dataSourceInfo.setPrefRows(dsLines + 1);
+        dataSourceInfo.setWidth(tawidth);
+        dataSourceInfo.clearListeners();
 
         String assetsLoc = GlobalConf.ASSETS_LOC;
         dw = new DatasetsWidget(skin, assetsLoc);
         Array<FileHandle> catalogFiles = dw.buildCatalogFiles();
-        Actor datasource = dw.buildDatasetsWidget(catalogFiles, false);
+        Actor dataSource = dw.buildDatasetsWidget(catalogFiles, false);
 
-        datasetChooser = new OwnCheckBox(txt("gui.data.dschooser"), skin, pad);
+        datasetChooser = new OwnCheckBox(I18n.txt("gui.data.dschooser"), skin, pad5);
         datasetChooser.setChecked(GlobalConf.program.DISPLAY_DATASET_DIALOG);
 
-        OwnTextButton dataDownload = new OwnTextButton(txt("gui.download.title"), skin);
-        dataDownload.setSize(300, 50);
+        OwnTextButton dataDownload = new OwnTextButton(I18n.txt("gui.download.title"), skin);
+        dataDownload.setSize(150 * GlobalConf.SCALE_FACTOR, 25 * GlobalConf.SCALE_FACTOR);
         dataDownload.addListener((event) -> {
             if (event instanceof ChangeEvent) {
-                DownloadDataWindow ddw = new DownloadDataWindow(stage, skin, false, txt("gui.close"), null);
+                DownloadDataWindow ddw = new DownloadDataWindow(stage, skin, false, I18n.txt("gui.close"), null);
                 ddw.setModal(true);
                 ddw.show(stage);
                 return true;
@@ -1235,76 +1236,74 @@ public class PreferencesWindow extends GenericDialog {
         });
 
         // Add to content
-        contentDataTable.add(titleGeneralData).left().padBottom(pad * 2).row();
-        contentDataTable.add(haGroup).left().padBottom(pad * 2).row();
-        contentDataTable.add(titleData).left().padBottom(pad * 2).row();
-        contentDataTable.add(datasource).left().padBottom(pad * 2).row();
-        contentDataTable.add(datasetChooser).left().padBottom(pad * 2).row();
+        contentDataTable.add(titleGeneralData).left().padBottom(pad5 * 2).row();
+        contentDataTable.add(haGroup).left().padBottom(pad5 * 2).row();
+        contentDataTable.add(titleData).left().padBottom(pad5 * 2).row();
+        contentDataTable.add(dataSourceInfo).left().padBottom(pad5).row();
+        contentDataTable.add(dataSource).left().padBottom(pad5 * 2).row();
+        contentDataTable.add(datasetChooser).left().padBottom(pad5 * 2).row();
         contentDataTable.add(dataDownload).left();
 
-        /**
+        /*
          * ==== GAIA ====
-         **/
+         */
         final Table contentGaia = new Table(skin);
         contents.add(contentGaia);
         contentGaia.align(Align.top | Align.left);
 
         // ATTITUDE
-        OwnLabel titleAttitude = new OwnLabel(txt("gui.gaia.attitude"), skin, "help-title");
+        OwnLabel titleAttitude = new OwnLabel(I18n.txt("gui.gaia.attitude"), skin, "help-title");
         Table attitude = new Table(skin);
 
-        real = new OwnCheckBox(txt("gui.gaia.real"), skin, "radio", pad);
+        real = new OwnCheckBox(I18n.txt("gui.gaia.real"), skin, "radio", pad5);
         real.setChecked(GlobalConf.data.REAL_GAIA_ATTITUDE);
-        nsl = new OwnCheckBox(txt("gui.gaia.nsl"), skin, "radio", pad);
+        nsl = new OwnCheckBox(I18n.txt("gui.gaia.nsl"), skin, "radio", pad5);
         nsl.setChecked(!GlobalConf.data.REAL_GAIA_ATTITUDE);
 
         new ButtonGroup<CheckBox>(real, nsl);
 
         // Add to table
-        attitude.add(nsl).left().padBottom(pad).row();
-        attitude.add(real).left().padBottom(pad).row();
+        attitude.add(nsl).left().padBottom(pad5).row();
+        attitude.add(real).left().padBottom(pad5).row();
         final Cell<Actor> noticeAttCell = attitude.add((Actor) null);
         noticeAttCell.colspan(2).left();
 
-        EventListener attNoticeListener = new EventListener() {
-            @Override
-            public boolean handle(Event event) {
-                if (event instanceof ChangeEvent) {
-                    if (noticeAttCell.getActor() == null) {
-                        String nextinfostr = txt("gui.ui.info") + '\n';
-                        int lines = GlobalResources.countOccurrences(nextinfostr, '\n');
-                        TextArea nextTimeInfo = new OwnTextArea(nextinfostr, skin, "info");
-                        nextTimeInfo.setDisabled(true);
-                        nextTimeInfo.setPrefRows(lines + 1);
-                        nextTimeInfo.setWidth(tawidth);
-                        nextTimeInfo.clearListeners();
-                        noticeAttCell.setActor(nextTimeInfo);
-                    }
-                    return true;
+        EventListener attNoticeListener = event -> {
+            if (event instanceof ChangeEvent) {
+                if (noticeAttCell.getActor() == null) {
+                    String nextinfostr = I18n.txt("gui.ui.info") + '\n';
+                    int lines1 = GlobalResources.countOccurrences(nextinfostr, '\n');
+                    TextArea nextTimeInfo = new OwnTextArea(nextinfostr, skin, "info");
+                    nextTimeInfo.setDisabled(true);
+                    nextTimeInfo.setPrefRows(lines1 + 1);
+                    nextTimeInfo.setWidth(tawidth);
+                    nextTimeInfo.clearListeners();
+                    noticeAttCell.setActor(nextTimeInfo);
                 }
-                return false;
+                return true;
             }
+            return false;
         };
         real.addListener(attNoticeListener);
         nsl.addListener(attNoticeListener);
 
         // Add to content
-        contentGaia.add(titleAttitude).left().padBottom(pad * 2).row();
+        contentGaia.add(titleAttitude).left().padBottom(pad5 * 2).row();
         contentGaia.add(attitude).left();
 
-        /**
+        /*
          * ==== SYSTEM ====
-         **/
+         */
         final Table contentSystem = new Table(skin);
         contents.add(contentSystem);
         contentSystem.align(Align.top | Align.left);
 
         // STATS
-        OwnLabel titleStats = new OwnLabel(txt("gui.system.reporting"), skin, "help-title");
+        OwnLabel titleStats = new OwnLabel(I18n.txt("gui.system.reporting"), skin, "help-title");
         Table stats = new Table(skin);
 
         debugInfoBak = GlobalConf.program.SHOW_DEBUG_INFO;
-        debugInfo = new OwnCheckBox(txt("gui.system.debuginfo"), skin, pad);
+        debugInfo = new OwnCheckBox(I18n.txt("gui.system.debuginfo"), skin, pad5);
         debugInfo.setChecked(GlobalConf.program.SHOW_DEBUG_INFO);
         debugInfo.addListener((event) -> {
             if (event instanceof ChangeEvent) {
@@ -1314,42 +1313,38 @@ public class PreferencesWindow extends GenericDialog {
             return false;
         });
 
-        report = new OwnCheckBox(txt("gui.system.allowreporting"), skin, pad);
+        report = new OwnCheckBox(I18n.txt("gui.system.allowreporting"), skin, pad5);
         report.setChecked(GlobalConf.program.ANALYTICS_ENABLED);
 
         // RELOAD DEFAULTS
-        OwnTextButton reloadDefaults = new OwnTextButton(txt("gui.system.reloaddefaults"), skin);
-        reloadDefaults.addListener(new EventListener() {
-            @Override
-            public boolean handle(Event event) {
-                if (event instanceof ChangeEvent) {
-                    reloadDefaultPreferences();
-                    me.hide();
-                    // Prevent saving current state
-                    GaiaSky.instance.savestate = false;
-                    Gdx.app.exit();
-                    return true;
-                }
-
-                return false;
+        OwnTextButton reloadDefaults = new OwnTextButton(I18n.txt("gui.system.reloaddefaults"), skin);
+        reloadDefaults.addListener(event -> {
+            if (event instanceof ChangeEvent) {
+                reloadDefaultPreferences();
+                me.hide();
+                // Prevent saving current state
+                GaiaSky.instance.saveState = false;
+                Gdx.app.exit();
+                return true;
             }
 
+            return false;
         });
         reloadDefaults.setWidth(180 * GlobalConf.SCALE_FACTOR);
 
-        OwnLabel warningLabel = new OwnLabel(txt("gui.system.reloaddefaults.warn"), skin, "default-red");
+        OwnLabel warningLabel = new OwnLabel(I18n.txt("gui.system.reloaddefaults.warn"), skin, "default-red");
 
         // Add to table
-        stats.add(debugInfo).left().padBottom(pad).row();
-        stats.add(report).left().padBottom(pad * 5).row();
-        stats.add(warningLabel).left().padBottom(pad).row();
+        stats.add(debugInfo).left().padBottom(pad5).row();
+        stats.add(report).left().padBottom(pad5 * 5).row();
+        stats.add(warningLabel).left().padBottom(pad5).row();
         stats.add(reloadDefaults).left();
 
         // Add to content
-        contentSystem.add(titleStats).left().padBottom(pad * 2).row();
+        contentSystem.add(titleStats).left().padBottom(pad5 * 2).row();
         contentSystem.add(stats).left();
 
-        /** COMPUTE LABEL WIDTH **/
+        /* COMPUTE LABEL WIDTH */
         float maxLabelWidth = 0;
         for (OwnLabel l : labels) {
             l.pack();
@@ -1360,7 +1355,7 @@ public class PreferencesWindow extends GenericDialog {
         for (OwnLabel l : labels)
             l.setWidth(maxLabelWidth);
 
-        /** ADD ALL CONTENT **/
+        /* ADD ALL CONTENT */
         tabContent.addActor(contentGraphics);
         tabContent.addActor(contentUI);
         tabContent.addActor(contentPerformance);
@@ -1373,7 +1368,7 @@ public class PreferencesWindow extends GenericDialog {
         tabContent.addActor(contentGaia);
         tabContent.addActor(contentSystem);
 
-        /** ADD TO MAIN TABLE **/
+        /* ADD TO MAIN TABLE */
         content.add(tabContent).left().padLeft(10).expand().fill();
 
         // Listen to changes in the tab button checked states
@@ -1436,7 +1431,7 @@ public class PreferencesWindow extends GenericDialog {
 
     private void reloadDefaultPreferences() {
         // User config file
-        File userFolder = SysUtils.getGSHomeDir();
+        File userFolder = SysUtils.getConfigDir();
         File userFolderConfFile = new File(userFolder, "global.properties");
 
         // Internal config
@@ -1559,9 +1554,9 @@ public class PreferencesWindow extends GenericDialog {
 
         // Interface
         LangComboBoxBean lbean = lang.getSelected();
-        boolean reloadUI = GlobalConf.program.UI_THEME != theme.getSelected() || !lbean.locale.toLanguageTag().equals(GlobalConf.program.LOCALE);
+        boolean reloadUI = !GlobalConf.program.UI_THEME.equals(theme.getSelected()) || !lbean.locale.toLanguageTag().equals(GlobalConf.program.LOCALE);
         GlobalConf.program.LOCALE = lbean.locale.toLanguageTag();
-        I18n.forceinit(Gdx.files.internal("i18n/gsbundle"));
+        I18n.forceInit(Gdx.files.internal("i18n/gsbundle"));
         GlobalConf.program.UI_THEME = theme.getSelected();
         boolean previousPointerCoords = GlobalConf.program.DISPLAY_POINTER_COORDS;
         GlobalConf.program.DISPLAY_POINTER_COORDS = pointerCoords.isChecked();
@@ -1648,7 +1643,7 @@ public class PreferencesWindow extends GenericDialog {
 
         // Controllers
         String mappingsFile = controllerMappings.getSelected().file;
-        if (mappingsFile != GlobalConf.controls.CONTROLLER_MAPPINGS_FILE) {
+        if (!mappingsFile.equals(GlobalConf.controls.CONTROLLER_MAPPINGS_FILE)) {
             GlobalConf.controls.CONTROLLER_MAPPINGS_FILE = mappingsFile;
             EventManager.instance.post(Events.RELOAD_CONTROLLER_MAPPINGS, mappingsFile);
         }
@@ -1716,6 +1711,7 @@ public class PreferencesWindow extends GenericDialog {
         Gdx.app.postRunnable(() -> {
             // Reinitialise GUI system
             GlobalResources.updateSkin();
+            GenericDialog.updatePads();
             GaiaSky.instance.reinitialiseGUI1();
             EventManager.instance.post(Events.SPACECRAFT_LOADED, GaiaSky.instance.sg.getNode("Spacecraft"));
             GaiaSky.instance.reinitialiseGUI2();
@@ -1751,7 +1747,7 @@ public class PreferencesWindow extends GenericDialog {
             return 2;
         if (x.getAACode() == 0)
             return 0;
-        return (int) (Math.log(x.getAACode()) / Math.log(2) + 1e-10) + 2;
+        return (int) (Math.log(x.getAACode()) / Math.log(base) + 1e-10) + 2;
     }
 
     private int idxLang(String code, LangComboBoxBean[] langs) {

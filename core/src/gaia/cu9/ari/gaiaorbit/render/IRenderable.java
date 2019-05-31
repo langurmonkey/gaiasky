@@ -1,34 +1,36 @@
-package gaia.cu9.ari.gaiaorbit.render;
+/*
+ * This file is part of Gaia Sky, which is released under the Mozilla Public License 2.0.
+ * See the file LICENSE.md in the project root for full license details.
+ */
 
-import gaia.cu9.ari.gaiaorbit.util.ComponentTypes;
+package gaia.cu9.ari.gaiaorbit.render;
 
 /**
  * A top-level renderable interface that all renderable objects must extend
- * 
- * @author Toni Sagrista
  *
+ * @author Toni Sagrista
  */
 public interface IRenderable {
 
     /**
      * Gets the component types of this entity
-     * 
+     *
      * @return The component types
      */
-    public ComponentTypes getComponentType();
+    ComponentTypes getComponentType();
 
     /**
      * Gets the last distance to the camera calculated for this entity
-     * 
+     *
      * @return The distance
      */
-    public double getDistToCamera();
+    double getDistToCamera();
 
     /**
      * Returns the opacity of this renderable
-     * 
+     *
      * @return The opacity
      */
-    public float getOpacity();
+    float getOpacity();
 
 }

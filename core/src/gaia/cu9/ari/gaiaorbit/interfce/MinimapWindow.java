@@ -1,3 +1,8 @@
+/*
+ * This file is part of Gaia Sky, which is released under the Mozilla Public License 2.0.
+ * See the file LICENSE.md in the project root for full license details.
+ */
+
 package gaia.cu9.ari.gaiaorbit.interfce;
 
 import com.badlogic.gdx.graphics.OrthographicCamera;
@@ -10,10 +15,10 @@ import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Container;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.utils.Array;
-
 import gaia.cu9.ari.gaiaorbit.GaiaSky;
 import gaia.cu9.ari.gaiaorbit.util.GlobalConf;
 import gaia.cu9.ari.gaiaorbit.util.GlobalResources;
+import gaia.cu9.ari.gaiaorbit.util.I18n;
 import gaia.cu9.ari.gaiaorbit.util.scene2d.OwnLabel;
 import gaia.cu9.ari.gaiaorbit.util.scene2d.TextureWidget;
 
@@ -26,11 +31,13 @@ public class MinimapWindow extends GenericDialog {
     private Array<IMinimapScale> scales;
 
     public MinimapWindow(Stage stage, Skin skin) {
-        super(txt("gui.minimap.title"), skin, stage);
+        super(I18n.txt("gui.minimap.title"), skin, stage);
         side = (int) (GlobalConf.SCALE_FACTOR * 225);
         side2 = side / 2;
         sideshort = (int) (GlobalConf.SCALE_FACTOR * 112.5);
         sideshort2 = sideshort / 2;
+
+        setModal(false);
 
         OrthographicCamera ortho = new OrthographicCamera();
 
@@ -47,7 +54,7 @@ public class MinimapWindow extends GenericDialog {
         topProjection = new TextureWidget(tfb);
         sideProjection = new TextureWidget(sfb);
 
-        setCancelText(txt("gui.close"));
+        setCancelText(I18n.txt("gui.close"));
 
         // Init scales
         scales = new Array<IMinimapScale>();
@@ -63,16 +70,15 @@ public class MinimapWindow extends GenericDialog {
         // Pack
         pack();
 
-        setModal(false);
     }
 
     @Override
     protected void build() {
         float pb = 10 * GlobalConf.SCALE_FACTOR;
-        OwnLabel headerSide = new OwnLabel(txt("gui.minimap.side"), skin, "header");
+        OwnLabel headerSide = new OwnLabel(I18n.txt("gui.minimap.side"), skin, "header");
         Container<TextureWidget> mapSide = new Container<TextureWidget>();
         mapSide.setActor(sideProjection);
-        OwnLabel headerTop = new OwnLabel(txt("gui.minimap.top"), skin, "header");
+        OwnLabel headerTop = new OwnLabel(I18n.txt("gui.minimap.top"), skin, "header");
         Container<TextureWidget> mapTop = new Container<TextureWidget>();
         mapTop.setActor(topProjection);
 

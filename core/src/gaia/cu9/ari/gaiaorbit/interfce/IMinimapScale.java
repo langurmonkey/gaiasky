@@ -1,3 +1,8 @@
+/*
+ * This file is part of Gaia Sky, which is released under the Mozilla Public License 2.0.
+ * See the file LICENSE.md in the project root for full license details.
+ */
+
 package gaia.cu9.ari.gaiaorbit.interfce;
 
 import com.badlogic.gdx.graphics.OrthographicCamera;
@@ -5,15 +10,14 @@ import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.FrameBuffer;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
-
 import gaia.cu9.ari.gaiaorbit.util.math.Vector3d;
 
 public interface IMinimapScale {
-    public boolean isActive(Vector3d campos);
+    boolean isActive(Vector3d campos);
 
-    public void initialize(OrthographicCamera ortho, SpriteBatch sb, ShapeRenderer sr, BitmapFont font, int side, int sideshort);
+    void initialize(OrthographicCamera ortho, SpriteBatch sb, ShapeRenderer sr, BitmapFont font, int side, int sideshort);
 
-    public void renderSideProjection(FrameBuffer fb);
+    void renderSideProjection(FrameBuffer fb);
 
-    public void renderTopProjection(FrameBuffer fb);
+    void renderTopProjection(FrameBuffer fb);
 }

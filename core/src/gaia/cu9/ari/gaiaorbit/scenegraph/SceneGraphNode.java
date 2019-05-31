@@ -1,3 +1,8 @@
+/*
+ * This file is part of Gaia Sky, which is released under the Mozilla Public License 2.0.
+ * See the file LICENSE.md in the project root for full license details.
+ */
+
 package gaia.cu9.ari.gaiaorbit.scenegraph;
 
 import com.badlogic.gdx.assets.AssetManager;
@@ -7,12 +12,12 @@ import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Bits;
 import com.badlogic.gdx.utils.ObjectMap;
 import gaia.cu9.ari.gaiaorbit.GaiaSky;
-import gaia.cu9.ari.gaiaorbit.render.ComponentType;
+import gaia.cu9.ari.gaiaorbit.render.ComponentTypes;
+import gaia.cu9.ari.gaiaorbit.render.ComponentTypes.ComponentType;
 import gaia.cu9.ari.gaiaorbit.render.IRenderable;
 import gaia.cu9.ari.gaiaorbit.render.SceneGraphRenderer;
 import gaia.cu9.ari.gaiaorbit.scenegraph.camera.ICamera;
 import gaia.cu9.ari.gaiaorbit.scenegraph.octreewrapper.AbstractOctreeWrapper;
-import gaia.cu9.ari.gaiaorbit.util.ComponentTypes;
 import gaia.cu9.ari.gaiaorbit.util.I18n;
 import gaia.cu9.ari.gaiaorbit.util.math.Matrix4d;
 import gaia.cu9.ari.gaiaorbit.util.math.Vector2d;
@@ -53,9 +58,8 @@ public class SceneGraphNode implements IStarContainer, IPosition {
         }
     }
 
-    protected static TLV3D aux3d1 = new TLV3D(), aux3d2 = new TLV3D(), aux3d3 = new TLV3D();
+    protected static TLV3D aux3d1 = new TLV3D(), aux3d2 = new TLV3D(), aux3d3 = new TLV3D(), aux3d4 = new TLV3D();
     protected static TLV3 aux3f1 = new TLV3(), aux3f2 = new TLV3(), aux3f3 = new TLV3(), aux3f4 = new TLV3();
-    protected static TLV2D aux2d1 = new TLV2D(), aux2d2 = new TLV2D(), aux2d3 = new TLV2D();
 
     /**
      * Describes to which render group this node belongs at a particular time
@@ -112,8 +116,13 @@ public class SceneGraphNode implements IStarContainer, IPosition {
         MODEL_CLOUD(23),
         /** Using normal shader for per-pixel lighting, with additive blending **/
         MODEL_NORMAL_ADDITIVE(24),
+        /** Point **/
+        POINT(25),
+        /** Point GPU **/
+        POINT_GPU(26),
+
         /** Line VR **/
-        LINE_VR(25),
+        LINE_VR(50),
 
 
         /** None **/
@@ -121,7 +130,7 @@ public class SceneGraphNode implements IStarContainer, IPosition {
 
         private int index;
 
-        private RenderGroup(int index) {
+        RenderGroup(int index) {
             this.index = index;
         }
 
@@ -709,7 +718,7 @@ public class SceneGraphNode implements IStarContainer, IPosition {
      */
     protected boolean addToRender(IRenderable renderable, RenderGroup rg) {
         boolean on = ct.intersects(SceneGraphRenderer.visible);
-        if (on || (!on && SceneGraphRenderer.alphas[ct.getFirstOrdinal()] > 0)) {
+        if (on || SceneGraphRenderer.alphas[ct.getFirstOrdinal()] > 0) {
             SceneGraphRenderer.render_lists.get(rg.ordinal()).add(renderable);
             return true;
         }

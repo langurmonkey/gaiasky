@@ -1,10 +1,11 @@
 # This script tests the displaying of custom messages and images.
 # Created by Toni Sagrista
 
-from gaia.cu9.ari.gaiaorbit.script import EventScriptingInterface
+import os
+from py4j.java_gateway import JavaGateway, GatewayParameters
 
-
-gs = EventScriptingInterface.instance()
+gateway = JavaGateway(gateway_parameters=GatewayParameters(auto_convert=True))
+gs = gateway.entry_point
 
 # Minimize interface, disable input, stop camera
 gs.disableInput()
@@ -18,8 +19,13 @@ gs.displayMessageObject(1, "This is the first message", 0.2, 0.2, 0.3, 0.4, 0.6,
 gs.sleep(1.5)
 gs.displayMessageObject(2, "This is the second message", 0.3, 0.1, 0.0, 1.0, 0.0, 1.0, 11)
 gs.sleep(1.5)
-gs.preloadTextures("scripts/tests/profile.png")
-gs.displayImageObject(10, "scripts/tests/profile.png", 0.1, 0.7)
+
+# Image
+profileimg = os.path.abspath("./profile.png")
+gs.preloadTexture(profileimg)
+gs.displayImageObject(10, profileimg, 0.1, 0.7)
+
+# More messages
 gs.displayMessageObject(3, "Monkey!", 0.7, 0.62, 0.9, 0.0, 1.0, 0.5, 18)
 gs.sleep(1.5)
 gs.displayMessageObject(4, "This is the fourth message", 0.4, 0.6, 1.0, 1.0, 0.0, 0.5, 17)
@@ -44,3 +50,5 @@ gs.sleep(1.5)
 # Maximize interface and enable input
 gs.maximizeInterfaceWindow()
 gs.enableInput()
+
+gateway.close()

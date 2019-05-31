@@ -1,14 +1,5 @@
 package gaia.cu9.ari.gaiaorbit.render;
 
-import java.util.Map;
-
-import org.lwjgl.openvr.HmdMatrix34;
-import org.lwjgl.openvr.HmdMatrix44;
-import org.lwjgl.openvr.Texture;
-import org.lwjgl.openvr.VR;
-import org.lwjgl.openvr.VRCompositor;
-import org.lwjgl.openvr.VRSystem;
-
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.PerspectiveCamera;
@@ -22,7 +13,6 @@ import com.badlogic.gdx.graphics.glutils.FrameBuffer;
 import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.Array;
-
 import gaia.cu9.ari.gaiaorbit.GaiaSky;
 import gaia.cu9.ari.gaiaorbit.event.EventManager;
 import gaia.cu9.ari.gaiaorbit.event.Events;
@@ -42,6 +32,9 @@ import gaia.cu9.ari.gaiaorbit.vr.VRContext;
 import gaia.cu9.ari.gaiaorbit.vr.VRContext.Space;
 import gaia.cu9.ari.gaiaorbit.vr.VRContext.VRDevice;
 import gaia.cu9.ari.gaiaorbit.vr.VRContext.VRDeviceType;
+import org.lwjgl.openvr.*;
+
+import java.util.Map;
 
 /**
  * Renders to OpenVR. Renders basically two scenes, one for each eye, using the
@@ -150,7 +143,7 @@ public class SGROpenVR extends SGRAbstract implements ISGR, IObserver {
 
             // Add controllers
             float camnearbak = camera.getCamera().near;
-            double closestDist = camera.getClosest().distToCamera;
+            double closestDist = camera.getClosest().getDistToCamera();
             boolean r = false;
             for (StubModel controller : controllerObjects) {
                 Vector3 devicepos = controller.getDevice().getPosition(Space.Tracker);

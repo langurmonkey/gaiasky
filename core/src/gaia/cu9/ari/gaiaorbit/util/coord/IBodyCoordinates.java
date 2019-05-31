@@ -1,69 +1,67 @@
-package gaia.cu9.ari.gaiaorbit.util.coord;
+/*
+ * This file is part of Gaia Sky, which is released under the Mozilla Public License 2.0.
+ * See the file LICENSE.md in the project root for full license details.
+ */
 
-import java.time.Instant;
+package gaia.cu9.ari.gaiaorbit.util.coord;
 
 import gaia.cu9.ari.gaiaorbit.scenegraph.Orbit;
 import gaia.cu9.ari.gaiaorbit.util.math.Vector3d;
 
+import java.time.Instant;
+
 /**
  * Defines the interface to get the coordinates of a body
- * 
- * @author Toni Sagrista
  *
+ * @author Toni Sagrista
  */
 public interface IBodyCoordinates {
 
     /**
      * Initializes the coordinates object
-     * 
+     *
      * @param params
      */
-    public void doneLoading(Object... params);
+    void doneLoading(Object... params);
 
     /**
      * Returns the ecliptic coordinates of the body in the out vector for the
      * given date.
-     * 
-     * @param instant
-     *            The instant.
-     * @param out
-     *            The out vector with the ecliptic coordinates in internal
-     *            units.
+     *
+     * @param instant The instant.
+     * @param out     The out vector with the ecliptic coordinates in internal
+     *                units.
      * @return The out vector for chaining.
      */
-    public Vector3d getEclipticSphericalCoordinates(Instant instant, Vector3d out);
+    Vector3d getEclipticSphericalCoordinates(Instant instant, Vector3d out);
 
     /**
      * Gets ecliptic cartesian coordinates for the given date.
-     * 
-     * @param instant
-     *            The instant.
-     * @param out
-     *            The out vector where the ecliptic cartesian coordinates will
-     *            be.
+     *
+     * @param instant The instant.
+     * @param out     The out vector where the ecliptic cartesian coordinates will
+     *                be.
      * @return The out vector for chaining, or null if the date is out of range,
-     *         in case of non elliptical orbits such as Gaia.
+     * in case of non elliptical orbits such as Gaia.
      */
-    public Vector3d getEclipticCartesianCoordinates(Instant instant, Vector3d out);
+    Vector3d getEclipticCartesianCoordinates(Instant instant, Vector3d out);
 
     /**
      * Gets equatorial cartesian coordinates for the given date.
-     * 
-     * @param instant
-     *            The instant.
-     * @param out
-     *            The out vector where the equatorial cartesian coordinates will
-     *            be.
+     *
+     * @param instant The instant.
+     * @param out     The out vector where the equatorial cartesian coordinates will
+     *                be.
      * @return The out vector for chaining, or null if the date is out of range,
-     *         in case of non elliptical orbits such as Gaia.
+     * in case of non elliptical orbits such as Gaia.
      */
-    public Vector3d getEquatorialCartesianCoordinates(Instant instant, Vector3d out);
+    Vector3d getEquatorialCartesianCoordinates(Instant instant, Vector3d out);
 
     /**
      * Gets the orbit object of these coordinates, if any.
-     * 
+     *
      * @return
      */
-    public Orbit getOrbitObject();
+    Orbit getOrbitObject();
 
 }

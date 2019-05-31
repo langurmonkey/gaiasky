@@ -1,3 +1,8 @@
+/*
+ * This file is part of Gaia Sky, which is released under the Mozilla Public License 2.0.
+ * See the file LICENSE.md in the project root for full license details.
+ */
+
 package gaia.cu9.ari.gaiaorbit.util;
 
 import com.badlogic.gdx.Gdx;
@@ -24,15 +29,15 @@ public class I18n {
      */
     public static void initialize() {
         if (bundle == null) {
-            forceinit(Gdx.files.internal("i18n/gsbundle"));
+            forceInit(Gdx.files.internal("i18n/gsbundle"));
         }
     }
 
     public static void initialize(FileHandle fh) {
-        forceinit(fh);
+        forceInit(fh);
     }
 
-    public static boolean forceinit(FileHandle baseFileHandle) {
+    public static boolean forceInit(FileHandle baseFileHandle) {
         if (GlobalConf.program == null || GlobalConf.program.LOCALE.isEmpty()) {
             // Use system default
             locale = Locale.getDefault();
@@ -58,13 +63,21 @@ public class I18n {
 
     }
 
-    public static Locale forLanguageTag(String languageTag) {
+    private static Locale forLanguageTag(String languageTag) {
         String[] tags = languageTag.split("-");
         if (tags.length > 1) {
             return new Locale(tags[0], tags[1]);
         } else {
             return new Locale(languageTag);
         }
+    }
+
+    public static String txt(String key){
+        return bundle.get(key);
+    }
+
+    public static String txt(String key, Object... params) {
+        return I18n.bundle.format(key, params);
     }
 
 }

@@ -1,3 +1,8 @@
+/*
+ * This file is part of Gaia Sky, which is released under the Mozilla Public License 2.0.
+ * See the file LICENSE.md in the project root for full license details.
+ */
+
 package gaia.cu9.ari.gaiaorbit.util.units;
 
 import gaia.cu9.ari.gaiaorbit.util.coord.Coordinates;
@@ -28,7 +33,11 @@ public class Position {
 
         EQ_XYZ,
         ECL_XYZ,
-        GAL_XYZ
+        GAL_XYZ;
+
+        public boolean isParallax(){
+            return this.equals(EQ_SPH_PLX) || this.equals(ECL_SPH_PLX) || this.equals(GAL_SPH_PLX);
+        }
     }
 
     public final Vector3d gsposition;
@@ -44,9 +53,11 @@ public class Position {
      * @param c
      * @param unitC
      * @param type
+     * @throws RuntimeException On negative distance or parallax
      */
-    public Position(double a, String unitA, double b, String unitB, double c, String unitC, PositionType type) {
+    public Position(double a, String unitA, double b, String unitB, double c, String unitC, PositionType type) throws RuntimeException {
         if (Double.isNaN(c)) {
+            // Parallax not available
             c = 0.04;
             unitC = "mas";
         }
@@ -59,6 +70,10 @@ public class Position {
             Angle lat = new Angle(b, unitB);
             Length dist = new Length(c, unitC);
 
+            if(dist.value_m <= 0){
+                throw new RuntimeException("Negative distance found: " + dist.value_m + " m");
+            }
+
             Coordinates.sphericalToCartesian(lon.get(AngleUnit.RAD), lat.get(AngleUnit.RAD), dist.get(LengthUnit.PC), gsposition);
 
             break;
@@ -68,42 +83,67 @@ public class Position {
             lat = new Angle(b, unitB);
             dist = new Angle(c, unitC).getParallaxDistance();
 
+            if(dist.value_m <= 0){
+                throw new RuntimeException("Negative parallax found: " + dist.value_m + " m");
+            }
+
             Coordinates.sphericalToCartesian(lon.get(AngleUnit.RAD), lat.get(AngleUnit.RAD), dist.get(LengthUnit.PC), gsposition);
 
             break;
         case GAL_SPH_DIST:
+
             lon = new Angle(a, unitA);
             lat = new Angle(b, unitB);
             dist = new Length(c, unitC);
+
+            if(dist.value_m <= 0){
+                throw new RuntimeException("Negative distance found: " + dist.value_m + " m");
+            }
 
             Coordinates.sphericalToCartesian(lon.get(AngleUnit.RAD), lat.get(AngleUnit.RAD), dist.get(LengthUnit.PC), gsposition);
             gsposition.mul(Coordinates.galToEq());
             break;
         case GAL_SPH_PLX:
+
             lon = new Angle(a, unitA);
             lat = new Angle(b, unitB);
             dist = new Angle(c, unitC).getParallaxDistance();
+
+            if(dist.value_m <= 0){
+                throw new RuntimeException("Negative parallax found: " + dist.value_m + " m");
+            }
 
             Coordinates.sphericalToCartesian(lon.get(AngleUnit.RAD), lat.get(AngleUnit.RAD), dist.get(LengthUnit.PC), gsposition);
             gsposition.mul(Coordinates.galToEq());
             break;
         case ECL_SPH_DIST:
+
             lon = new Angle(a, unitA);
             lat = new Angle(b, unitB);
             dist = new Length(c, unitC);
+
+            if(dist.value_m <= 0){
+                throw new RuntimeException("Negative distance found: " + dist.value_m + " m");
+            }
 
             Coordinates.sphericalToCartesian(lon.get(AngleUnit.RAD), lat.get(AngleUnit.RAD), dist.get(LengthUnit.PC), gsposition);
             gsposition.mul(Coordinates.eclToEq());
             break;
         case ECL_SPH_PLX:
+
             lon = new Angle(a, unitA);
             lat = new Angle(b, unitB);
             dist = new Angle(c, unitC).getParallaxDistance();
+
+            if(dist.value_m <= 0){
+                throw new RuntimeException("Negative parallax found: " + dist.value_m + " m");
+            }
 
             Coordinates.sphericalToCartesian(lon.get(AngleUnit.RAD), lat.get(AngleUnit.RAD), dist.get(LengthUnit.PC), gsposition);
             gsposition.mul(Coordinates.eclToEq());
             break;
         case EQ_XYZ:
+
             Length x = new Length(a, unitA);
             Length y = new Length(b, unitB);
             Length z = new Length(c, unitC);
@@ -112,6 +152,7 @@ public class Position {
 
             break;
         case GAL_XYZ:
+
             x = new Length(a, unitA);
             y = new Length(b, unitB);
             z = new Length(c, unitC);
@@ -120,6 +161,7 @@ public class Position {
             gsposition.mul(Coordinates.galToEq());
             break;
         case ECL_XYZ:
+
             x = new Length(a, unitA);
             y = new Length(b, unitB);
             z = new Length(c, unitC);

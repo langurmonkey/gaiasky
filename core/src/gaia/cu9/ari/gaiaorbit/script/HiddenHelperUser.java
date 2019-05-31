@@ -1,16 +1,20 @@
-package gaia.cu9.ari.gaiaorbit.script;
+/*
+ * This file is part of Gaia Sky, which is released under the Mozilla Public License 2.0.
+ * See the file LICENSE.md in the project root for full license details.
+ */
 
-import java.util.concurrent.atomic.AtomicBoolean;
+package gaia.cu9.ari.gaiaorbit.script;
 
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.TimeUtils;
-
 import gaia.cu9.ari.gaiaorbit.GaiaSky;
 import gaia.cu9.ari.gaiaorbit.event.EventManager;
 import gaia.cu9.ari.gaiaorbit.event.Events;
 import gaia.cu9.ari.gaiaorbit.event.IObserver;
 import gaia.cu9.ari.gaiaorbit.scenegraph.CelestialBody;
 import gaia.cu9.ari.gaiaorbit.scenegraph.IFocus;
+
+import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
  * This guy implements high level operations which run concurrently to the main
@@ -39,7 +43,7 @@ public class HiddenHelperUser implements IObserver {
 
     private HiddenHelperUser() {
         super();
-        currentTasks = new Array<HelperTask>(5);
+        currentTasks = new Array<>(5);
         lastCommandTime = -1;
         EventManager.instance.subscribe(this, Events.NAVIGATE_TO_OBJECT, Events.LAND_ON_OBJECT, Events.LAND_AT_LOCATION_OF_OBJECT, Events.INPUT_EVENT);
     }
@@ -53,8 +57,6 @@ public class HiddenHelperUser implements IObserver {
                 body = GaiaSky.instance.sg.findFocus((String) data[0]);
             else
                 body = ((IFocus) data[0]);
-
-            // final double angle = body.getRadius() * 10 * Constants.U_TO_KM;
 
             GoToObjectTask gotoTask = new GoToObjectTask(body, currentTasks);
             Thread gotoT = new Thread(gotoTask);
@@ -81,7 +83,7 @@ public class HiddenHelperUser implements IObserver {
             else
                 body = ((CelestialBody) data[0]);
 
-            HelperTask landAtTask = null;
+            HelperTask landAtTask;
             if (data[1] instanceof String) {
                 String locname = (String) data[1];
                 landAtTask = new LandOnLocationTask(body, locname, currentTasks);
@@ -116,9 +118,9 @@ public class HiddenHelperUser implements IObserver {
 
     private abstract class HelperTask implements Runnable {
         protected AtomicBoolean stop;
-        protected Array<HelperTask> currentTasks;
+        Array<HelperTask> currentTasks;
 
-        protected HelperTask(Array<HelperTask> currentTasks) {
+        HelperTask(Array<HelperTask> currentTasks) {
             this.stop = new AtomicBoolean(false);
             this.currentTasks = currentTasks;
         }
@@ -131,7 +133,7 @@ public class HiddenHelperUser implements IObserver {
     private class GoToObjectTask extends HelperTask {
         IFocus body;
 
-        public GoToObjectTask(IFocus body, Array<HelperTask> currentTasks) {
+        GoToObjectTask(IFocus body, Array<HelperTask> currentTasks) {
             super(currentTasks);
             this.body = body;
 
@@ -148,7 +150,7 @@ public class HiddenHelperUser implements IObserver {
     private class LandOnObjectTask extends HelperTask {
         IFocus body;
 
-        public LandOnObjectTask(IFocus body, Array<HelperTask> currentTasks) {
+        LandOnObjectTask(IFocus body, Array<HelperTask> currentTasks) {
             super(currentTasks);
             this.body = body;
         }
@@ -166,13 +168,13 @@ public class HiddenHelperUser implements IObserver {
         String locName;
         Double lon, lat;
 
-        public LandOnLocationTask(IFocus body, String locName, Array<HelperTask> currentTasks) {
+        LandOnLocationTask(IFocus body, String locName, Array<HelperTask> currentTasks) {
             super(currentTasks);
             this.body = body;
             this.locName = locName;
         }
 
-        public LandOnLocationTask(IFocus body, double lon, double lat, Array<HelperTask> currentTasks) {
+        LandOnLocationTask(IFocus body, double lon, double lat, Array<HelperTask> currentTasks) {
             super(currentTasks);
             this.body = body;
             this.lon = lon;

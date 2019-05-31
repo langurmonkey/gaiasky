@@ -69,10 +69,10 @@ task run(dependsOn: jar, type: JavaExec, description: "Runs Gaia Sky") {
     //jvmArgs = ['-server', '-XX:+UseConcMarkSweepGC', '-XX:+UseParNewGC', '-XX:MaxGCPauseMillis=5', '-XX:+CMSParallelRemarkEnabled', '-XX:CMSInitiatingOccupancyFraction=60', '-XX:MaxTenuringThreshold=4', '-XX:MaxNewSize=384m', '-XX:NewSize=384m', '-XX:SurvivorRatio=12']
     // G1 GC
     jvmArgs = [ '-XX:+UseG1GC' ]
-    if (System.getProperty("os.name").toLowerCase().contains("mac")) {
-         // Required to run lwjgl java apps on macOS
-         jvmArgs += " -XstartOnFirstThread"
-    }
+    //if (System.getProperty("os.name").toLowerCase().contains("mac")) {
+    // Required to run lwjgl3 java apps on macOS
+    //     jvmArgs += " -XstartOnFirstThread"
+    //}
     // Verbose GC
     // jvmArgs = ['-verbose:gc']
     classpath = sourceSets.main.runtimeClasspath
@@ -121,37 +121,14 @@ task runCatalogFilter(dependsOn: jar, type: JavaExec, description: "Runs the cat
     ignoreExitValue = true
 }
 
-
-task runOctreeGeneratorParticles(dependsOn: jar, type: JavaExec, description: "Runs the octree generator with single particles to create the lod structure from a base catalog") {
-    main = 'gaia.cu9.ari.gaiaorbit.data.OctreeGeneratorTest'
-    systemProperties['properties.file'] = '../assets/conf/global.properties'
-    args = [
-        "--input",
-        "/media/tsagrista/Daten/Gaia/GDR2/earlydr2/data/",
-        "--output",
-        "/media/tsagrista/Daten/Gaia/GDR2/earlydr2/out/"
-    ]
-
-    minHeapSize = "10g"
-    maxHeapSize = "20g"
-
-    jvmArgs = [ '-server', ]
-
-    classpath = sourceSets.main.runtimeClasspath
-    classpath += files(project.assetsDir)
-    standardInput = System.in
-    workingDir = project.workDir
-    ignoreExitValue = true
-}
-
 task runOctreeGenerator(dependsOn: jar, type: JavaExec, description: "Runs the octree generator with star groups to create the lod structure from a base catalog") {
     main = 'gaia.cu9.ari.gaiaorbit.data.OctreeGeneratorRun'
     systemProperties['properties.file'] = '../..//assets/conf/global.properties'
     args = [
         "--input",
-        "/media/tsagrista/Daten/Gaia/GDR2/earlydr2/data/",
+        "/media/tsagrista/Daten/Gaia/data/GDR2/dr2/csv/",
         "--output",
-        "/media/tsagrista/Daten/Gaia/GDR2/earlydr2/out/"
+        "/media/tsagrista/Daten/Gaia/data/GDR2/dr2/out/"
     ]
 
     minHeapSize = "10g"
@@ -233,20 +210,21 @@ task gaiaskyJar (dependsOn: [compileJava, jar, copyToLib],  description: "Create
 }
 
 task dist (dependsOn: gaiaskyJar, description: "Compiles the project, creates the jar and moves it all to releases/gaiasky-\$tag-\$rev") {
-    // Version check
-    String vsc = "${System.env.GS_JAVA_VERSION_CHECK}"
-    boolean javaVersionOk = JavaVersion.current() == JavaVersion.VERSION_1_8
-    if(vsc.equalsIgnoreCase("false")){
-        if(!javaVersionOk){
-            println("WARNING: Gaia Sky must be built with Java  " + JavaVersion.VERSION_1_8 + ", you are using " + JavaVersion.current())
-        }
-    } else {
-        if(!javaVersionOk){
-            throw new GradleException("This built must be run with java " + JavaVersion.VERSION_1_8 + ", you are using " + JavaVersion.current())
-        }
-    }
-
     doLast {
+        // Version check
+        String vsc = "${System.env.GS_JAVA_VERSION_CHECK}"
+        boolean javaVersionOk = JavaVersion.current() == JavaVersion.VERSION_1_8
+        if(vsc.equalsIgnoreCase("false")){
+            if(!javaVersionOk){
+                println("WARNING: Gaia Sky must be built with Java  " + JavaVersion.VERSION_1_8 + ", you are using " + JavaVersion.current())
+            }
+        } else {
+            if(!javaVersionOk){
+                print("FAILURE: Do 'export GS_JAVA_VERSION_CHECK=false' to skip this check")
+                throw new GradleException("This built must be run with java " + JavaVersion.VERSION_1_8 + ", you are using " + JavaVersion.current())
+            }
+        }
+
         // Copy conf
         mkdir "$distDir/conf"
         copy {
@@ -293,7 +271,6 @@ task dist (dependsOn: gaiaskyJar, description: "Compiles the project, creates th
         copy {
             from "exe"
             into "$distDir"
-            exclude "*.sh"
             exclude "octreegen"
         }
         copy {
@@ -311,16 +288,22 @@ task dist (dependsOn: gaiaskyJar, description: "Compiles the project, creates th
             include "ic_launcher.svg"
         }
 
-        // Make gaiasky script executable
-        def cmd = "chmod u+x $distDir/gaiasky"
-        cmd.execute()
-
         // Replace version in readme file
         project.ext.versionFile = file("build/classes/java/main/version").text
         ant.replace(file: "$distDir/README.md", token: "--------------------------", value: "$versionFile")
+
+        // Generate man
+        println("Generate man: $distDir/gaiasky.6.gz")
+        exec {
+            commandLine "help2man", "-N", "--section=6", "--include", "$baseDir/core/man/gaiasky.h2m", "--output=$distDir/gaiasky.6", "$distDir/gaiasky"
+        }
+        exec {
+            commandLine "gzip", "$distDir/gaiasky.6"
+        }
     }
 }
 dist.dependsOn classes
+
 
 task createTar(dependsOn: dist, description: "Creates application tar package") {
     doLast {

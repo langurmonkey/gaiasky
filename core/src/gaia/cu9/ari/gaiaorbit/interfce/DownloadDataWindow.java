@@ -1,3 +1,8 @@
+/*
+ * This file is part of Gaia Sky, which is released under the Mozilla Public License 2.0.
+ * See the file LICENSE.md in the project root for full license details.
+ */
+
 package gaia.cu9.ari.gaiaorbit.interfce;
 
 import com.badlogic.gdx.Gdx;
@@ -17,15 +22,17 @@ import gaia.cu9.ari.gaiaorbit.util.format.INumberFormat;
 import gaia.cu9.ari.gaiaorbit.util.format.NumberFormatFactory;
 import gaia.cu9.ari.gaiaorbit.util.io.FileInfoInputStream;
 import gaia.cu9.ari.gaiaorbit.util.scene2d.*;
-import gaia.cu9.ari.gaiaorbit.util.scene2d.FileChooser.ResultListener;
+import org.apache.commons.compress.archivers.tar.TarArchiveEntry;
+import org.apache.commons.compress.archivers.tar.TarArchiveInputStream;
+import org.apache.commons.compress.compressors.gzip.GzipCompressorInputStream;
+import org.apache.commons.compress.utils.IOUtils;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.filefilter.WildcardFileFilter;
-import org.python.apache.commons.compress.archivers.tar.TarArchiveEntry;
-import org.python.apache.commons.compress.archivers.tar.TarArchiveInputStream;
-import org.python.apache.commons.compress.compressors.gzip.GzipCompressorInputStream;
-import org.python.apache.commons.compress.utils.IOUtils;
 
-import java.io.*;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.RandomAccessFile;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.file.Files;
@@ -80,15 +87,15 @@ public class DownloadDataWindow extends GenericDialog {
     private int current = -1;
 
     public DownloadDataWindow(Stage stage, Skin skin) {
-        this(stage, skin, true, txt("gui.start"), txt("gui.exit"));
+        this(stage, skin, true, I18n.txt("gui.start"), I18n.txt("gui.exit"));
     }
 
     public DownloadDataWindow(Stage stage, Skin skin, boolean dataLocation, String acceptText, String cancelText) {
-        super(txt("gui.download.title"), skin, stage);
+        super(I18n.txt("gui.download.title"), skin, stage);
         this.nf = NumberFormatFactory.getFormatter("##0.0");
         this.reader = new JsonReader();
-        this.choiceList = new LinkedList<Trio<JsonValue, OwnCheckBox, OwnLabel>>();
-        this.rubbishes = new Array<OwnImageButton>();
+        this.choiceList = new LinkedList<>();
+        this.rubbishes = new Array<>();
 
         this.dataLocation = dataLocation;
 
@@ -114,18 +121,18 @@ public class DownloadDataWindow extends GenericDialog {
         // Offer downloads
         Table downloadTable = new Table(skin);
 
-        OwnLabel catalogsLocLabel = new OwnLabel(txt("gui.download.location") + ":", skin);
+        OwnLabel catalogsLocLabel = new OwnLabel(I18n.txt("gui.download.location") + ":", skin);
 
         HorizontalGroup hg = new HorizontalGroup();
         hg.space(15f * GlobalConf.SCALE_FACTOR);
         Image system = new Image(skin.getDrawable("tooltip-icon"));
-        OwnLabel downloadInfo = new OwnLabel(txt("gui.download.info"), skin);
+        OwnLabel downloadInfo = new OwnLabel(I18n.txt("gui.download.info"), skin);
         hg.addActor(system);
         hg.addActor(downloadInfo);
 
         downloadTable.add(hg).left().colspan(2).padBottom(padl).row();
 
-        SysUtils.getDefaultDataDir().mkdirs();
+        SysUtils.getLocalDataDir().mkdirs();
         String catLoc = GlobalConf.data.DATA_LOCATION;
 
         if (dataLocation) {
@@ -139,38 +146,30 @@ public class DownloadDataWindow extends GenericDialog {
 
             catalogsLoc.addListener((event) -> {
                 if (event instanceof ChangeEvent) {
-                    FileChooser fc = FileChooser.createPickDialog(txt("gui.download.pickloc"), skin, Gdx.files.absolute(GlobalConf.data.DATA_LOCATION));
-                    fc.setResultListener(new ResultListener() {
-                        @Override
-                        public boolean result(boolean success, FileHandle result) {
-                            if (success) {
-                                if (result.file().canRead() && result.file().canWrite()) {
-                                    // do stuff with result
-                                    catalogsLoc.setText(result.path());
-                                    GlobalConf.data.DATA_LOCATION = result.path();
-                                    me.pack();
-                                    Gdx.app.postRunnable(() -> {
-                                        me.content.clear();
-                                        me.build();
-                                        // Reset datasets
-                                        GlobalConf.data.CATALOG_JSON_FILES = "";
-                                    });
-                                } else {
-                                    Label warn = new OwnLabel(txt("gui.download.pickloc.permissions"), skin);
-                                    warn.setColor(1f, .4f, .4f, 1f);
-                                    notice.setActor(warn);
-                                    return false;
-                                }
+                    FileChooser fc = new FileChooser(I18n.txt("gui.download.pickloc"), skin, stage, Gdx.files.absolute(GlobalConf.data.DATA_LOCATION), FileChooser.FileChooserTarget.DIRECTORIES);
+                    fc.setFileBrowsingEnabled(false);
+                    fc.setResultListener((success, result) -> {
+                        if (success) {
+                            if (result.file().canRead() && result.file().canWrite()) {
+                                // do stuff with result
+                                catalogsLoc.setText(result.path());
+                                GlobalConf.data.DATA_LOCATION = result.path();
+                                me.pack();
+                                Gdx.app.postRunnable(() -> {
+                                    me.content.clear();
+                                    me.build();
+                                    // Reset datasets
+                                    GlobalConf.data.CATALOG_JSON_FILES = "";
+                                });
+                            } else {
+                                Label warn = new OwnLabel(I18n.txt("gui.download.pickloc.permissions"), skin);
+                                warn.setColor(1f, .4f, .4f, 1f);
+                                notice.setActor(warn);
+                                return false;
                             }
-                            notice.clearActor();
-                            return true;
                         }
-                    });
-                    fc.setFilter(new FileFilter() {
-                        @Override
-                        public boolean accept(File pathname) {
-                            return pathname.isDirectory();
-                        }
+                        notice.clearActor();
+                        return true;
                     });
                     fc.show(stage);
 
@@ -183,8 +182,8 @@ public class DownloadDataWindow extends GenericDialog {
         // Parse available files
         JsonValue dataDesc = reader.parse(Gdx.files.absolute(SysUtils.getDefaultTmpDir() + "/gaiasky-data.json"));
 
-        Map<String, JsonValue> bestDs = new HashMap<String, JsonValue>();
-        Map<String, List<JsonValue>> typeMap = new HashMap<String, List<JsonValue>>();
+        Map<String, JsonValue> bestDs = new HashMap<>();
+        Map<String, List<JsonValue>> typeMap = new HashMap<>();
         // We don't want repeated elements but want to keep insertion order
         Set<String> types = new LinkedHashSet<String>();
 
@@ -192,7 +191,7 @@ public class DownloadDataWindow extends GenericDialog {
         while (dst != null) {
             boolean hasVersion = dst.has("mingsversion");
             int thisVersion = dst.getInt("mingsversion", 0);
-            if (!hasVersion || hasVersion && thisVersion <= GaiaSkyDesktop.SOURCE_CONF_VERSION) {
+            if (!hasVersion || thisVersion <= GaiaSkyDesktop.SOURCE_CONF_VERSION) {
                 // Dataset type
                 String type = dst.getString("type");
 
@@ -205,7 +204,7 @@ public class DownloadDataWindow extends GenericDialog {
                         // Ignore this version
                         dst = dst.next();
                         continue;
-                    } else if (thisVersion > otherVersion) {
+                    } else {
                         // Remove other version, use this
                         typeMap.get(type).remove(other);
                         bestDs.remove(dsName);
@@ -216,7 +215,7 @@ public class DownloadDataWindow extends GenericDialog {
                 if (typeMap.containsKey(type)) {
                     typeMap.get(type).add(dst);
                 } else {
-                    List<JsonValue> aux = new ArrayList<JsonValue>();
+                    List<JsonValue> aux = new ArrayList<>();
                     aux.add(dst);
                     typeMap.put(type, aux);
                 }
@@ -235,12 +234,12 @@ public class DownloadDataWindow extends GenericDialog {
         for (String typeStr : types) {
             List<JsonValue> datasets = typeMap.get(typeStr);
 
-            datasetsTable.add(new OwnLabel(txt("gui.download.type." + typeStr), skin, "hud-header")).colspan(6).left().padBottom(pad * 3f).padTop(padl * 2f).row();
+            datasetsTable.add(new OwnLabel(I18n.txt("gui.download.type." + typeStr), skin, "hud-header")).colspan(6).left().padBottom(pad * 3f).padTop(padl * 2f).row();
 
             for (JsonValue dataset : datasets) {
                 // Check if dataset requires a minimum version of Gaia Sky
                 boolean hasVersion = dataset.has("mingsversion");
-                if (!hasVersion || hasVersion && dataset.getInt("mingsversion", 0) <= GaiaSkyDesktop.SOURCE_CONF_VERSION) {
+                if (!hasVersion || dataset.getInt("mingsversion", 0) <= GaiaSkyDesktop.SOURCE_CONF_VERSION) {
 
                     // Check if we have it
                     final Path check = Paths.get(GlobalConf.data.DATA_LOCATION, dataset.getString("check"));
@@ -253,8 +252,7 @@ public class DownloadDataWindow extends GenericDialog {
                     // Add dataset to desc table
                     OwnCheckBox cb = new OwnCheckBox(name, skin, "title", pad * 2f);
                     boolean baseData = name.equals("default-data");
-                    boolean defaultDataset = name.contains("default");
-                    cb.setChecked((!exists || (exists && outdated)) && baseData);
+                    cb.setChecked((!exists || outdated) && baseData);
                     cb.setDisabled(baseData || (exists && !outdated));
                     OwnLabel haveit = new OwnLabel("", skin);
                     if (exists) {
@@ -291,20 +289,22 @@ public class DownloadDataWindow extends GenericDialog {
                     // Link
                     if (dataset.has("link")) {
                         String link = dataset.getString("link");
-                        LinkButton imgLink = new LinkButton(link, skin);
-                        descGroup.addActor(imgLink);
+                        if (!link.isEmpty()) {
+                            LinkButton imgLink = new LinkButton(link, skin);
+                            descGroup.addActor(imgLink);
+                        }
                     }
 
                     // Version
-                    OwnLabel vers = new OwnLabel(exists && outdated ? Integer.toString(myVersion) + " -> v-" + Integer.toString(serverVersion) : "v-" + Integer.toString(serverVersion), skin);
+                    OwnLabel vers = new OwnLabel(exists && outdated ? myVersion + " -> v-" + serverVersion : "v-" + myVersion, skin);
                     if (!exists) {
-                        vers.addListener(new OwnTextTooltip(txt("gui.download.version.server", Integer.toString(serverVersion)), skin, 10));
+                        vers.addListener(new OwnTextTooltip(I18n.txt("gui.download.version.server", Integer.toString(serverVersion)), skin, 10));
                     } else if (outdated) {
                         // New version!
                         vers.setColor(1, 1, 0, 1);
-                        vers.addListener(new OwnTextTooltip(txt("gui.download.version.new", Integer.toString(serverVersion), Integer.toString(myVersion)), skin, 10));
+                        vers.addListener(new OwnTextTooltip(I18n.txt("gui.download.version.new", Integer.toString(serverVersion), Integer.toString(myVersion)), skin, 10));
                     } else {
-                        vers.addListener(new OwnTextTooltip(txt("gui.download.version.ok"), skin, 10));
+                        vers.addListener(new OwnTextTooltip(I18n.txt("gui.download.version.ok"), skin, 10));
                     }
 
                     // Type icon
@@ -316,7 +316,7 @@ public class DownloadDataWindow extends GenericDialog {
                     typeImage.addListener(new OwnTextTooltip(dataset.getString("type"), skin, 10));
 
                     // Size
-                    String size = "";
+                    String size;
                     try {
                         long bytes = dataset.getLong("size");
                         size = GlobalResources.humanReadableByteCount(bytes, true);
@@ -329,7 +329,7 @@ public class DownloadDataWindow extends GenericDialog {
                     OwnImageButton rubbish = null;
                     if (exists) {
                         rubbish = new OwnImageButton(skin, "rubbish-bin");
-                        rubbish.addListener(new TextTooltip(txt("gui.dataset.tooltip.remove"), skin));
+                        rubbish.addListener(new TextTooltip(I18n.txt("gui.tooltip.dataset.remove"), skin));
                         rubbish.addListener((event) -> {
                             if (event instanceof ChangeEvent) {
                                 // Remove dataset
@@ -346,7 +346,7 @@ public class DownloadDataWindow extends GenericDialog {
                                             String baseName = fileToDelete;
                                             if (fileToDelete.contains("/")) {
                                                 basePath = fileToDelete.substring(0, fileToDelete.lastIndexOf('/'));
-                                                baseName = fileToDelete.substring(fileToDelete.lastIndexOf('/') + 1, fileToDelete.length());
+                                                baseName = fileToDelete.substring(fileToDelete.lastIndexOf('/') + 1);
                                             }
                                             File dataLoc = new File(GlobalConf.data.DATA_LOCATION);
                                             File directory = new File(dataLoc, basePath);
@@ -391,7 +391,7 @@ public class DownloadDataWindow extends GenericDialog {
                     }
                     datasetsTable.row();
 
-                    choiceList.add(new Trio<JsonValue, OwnCheckBox, OwnLabel>(dataset, cb, haveit));
+                    choiceList.add(new Trio<>(dataset, cb, haveit));
                 }
             }
 
@@ -408,11 +408,11 @@ public class DownloadDataWindow extends GenericDialog {
         downloadTable.add(datasetsScroll).center().padBottom(padl).colspan(2).row();
 
         // Current dataset info
-        currentDownloadFile = new OwnLabel(txt("gui.download.idle"), skin);
+        currentDownloadFile = new OwnLabel(I18n.txt("gui.download.idle"), skin);
         downloadTable.add(currentDownloadFile).center().colspan(2).padBottom(padl).row();
 
         // Download button
-        downloadButton = new OwnTextButton(txt("gui.download.download"), skin, "download");
+        downloadButton = new OwnTextButton(I18n.txt("gui.download.download"), skin, "download");
         downloadButton.pad(buttonpad * 4f);
         downloadButton.setMinWidth(minw);
         downloadButton.setMinHeight(50f * GlobalConf.SCALE_FACTOR);
@@ -448,7 +448,7 @@ public class DownloadDataWindow extends GenericDialog {
     }
 
     private synchronized void downloadAndExtractFiles(List<Trio<JsonValue, OwnCheckBox, OwnLabel>> choices) {
-        toDownload = new Array<Trio<JsonValue, OwnCheckBox, OwnLabel>>();
+        toDownload = new Array<>();
 
         for (Trio<JsonValue, OwnCheckBox, OwnLabel> entry : choices) {
             if (entry.getSecond().isChecked())
@@ -486,7 +486,7 @@ public class DownloadDataWindow extends GenericDialog {
             ProgressRunnable pr = (read, total, progress, speed) -> {
                 double readMb = (double) read / 1e6d;
                 double totalMb = (double) total / 1e6d;
-                final String progressString = progress >= 100 ? txt("gui.done") : txt("gui.download.downloading", nf.format(progress));
+                final String progressString = progress >= 100 ? I18n.txt("gui.done") : I18n.txt("gui.download.downloading", nf.format(progress));
                 double mbPerSecond = speed / 1000d;
                 final String speedString = nf.format(readMb) + "/" + nf.format(totalMb) + " MB   -   " + nf.format(mbPerSecond) + " MB/s";
                 // Since we are downloading on a background thread, post a runnable to touch UI
@@ -534,7 +534,7 @@ public class DownloadDataWindow extends GenericDialog {
 
                 // Done
                 Gdx.app.postRunnable(() -> {
-                    downloadButton.setText(txt("gui.download.download"));
+                    downloadButton.setText(I18n.txt("gui.download.download"));
                     downloadProgress.setValue(0);
                     downloadProgress.setVisible(false);
                     downloadSpeed.setText("");
@@ -554,7 +554,7 @@ public class DownloadDataWindow extends GenericDialog {
                         GlobalConf.data.CATALOG_JSON_FILES = descFile.path();
                     }
 
-                    setMessageOk(txt("gui.download.idle"));
+                    setMessageOk(I18n.txt("gui.download.idle"));
                     setStatusFound(trio.getThird());
 
                     Gdx.app.postRunnable(() -> {
@@ -563,7 +563,7 @@ public class DownloadDataWindow extends GenericDialog {
                 } else {
                     logger.info("Error getting dataset: " + name);
                     setStatusError(trio.getThird());
-                    setMessageError(txt("gui.download.failed", name));
+                    setMessageError(I18n.txt("gui.download.failed", name));
                 }
 
             };
@@ -571,25 +571,21 @@ public class DownloadDataWindow extends GenericDialog {
             Runnable fail = () -> {
                 logger.error("Download failed: " + name);
                 setStatusError(trio.getThird());
-                setMessageError(txt("gui.download.failed", name));
+                setMessageError(I18n.txt("gui.download.failed", name));
                 me.acceptButton.setDisabled(false);
                 downloadProgress.setVisible(false);
                 downloadSpeed.setVisible(false);
-                Gdx.app.postRunnable(() -> {
-                    downloadNext();
-                });
+                Gdx.app.postRunnable(() -> downloadNext());
             };
 
             Runnable cancel = () -> {
                 logger.error("Download cancelled: " + name);
                 setStatusCancelled(trio.getThird());
-                setMessageError(txt("gui.download.failed", name));
+                setMessageError(I18n.txt("gui.download.failed", name));
                 me.acceptButton.setDisabled(false);
                 downloadProgress.setVisible(false);
                 downloadSpeed.setVisible(false);
-                Gdx.app.postRunnable(() -> {
-                    downloadNext();
-                });
+                Gdx.app.postRunnable(() -> downloadNext());
             };
 
             // Download
@@ -598,14 +594,12 @@ public class DownloadDataWindow extends GenericDialog {
             downloadProgress.setVisible(true);
             downloadSpeed.setVisible(true);
             setStatusProgress(trio.getThird());
-            setMessageOk(txt("gui.download.downloading.info", (current + 1), toDownload.size, currentJson.getString("name")));
+            setMessageOk(I18n.txt("gui.download.downloading.info", (current + 1), toDownload.size, currentJson.getString("name")));
             DownloadHelper.downloadFile(url, tempDownload, pr, finish, fail, cancel);
         } else {
             // Finished all downloads!
             // RELOAD DATASETS VIEW
-            Gdx.app.postRunnable(() -> {
-                reloadAll();
-            });
+            Gdx.app.postRunnable(() -> reloadAll());
         }
 
     }
@@ -623,7 +617,7 @@ public class DownloadDataWindow extends GenericDialog {
             File file = path.toFile();
             if (file.exists() && file.canRead() && file.isFile()) {
                 String fname = file.getName();
-                String extension = fname.substring(fname.lastIndexOf(".") + 1, fname.length());
+                String extension = fname.substring(fname.lastIndexOf(".") + 1);
                 if (extension.equalsIgnoreCase("json")) {
                     JsonValue jf = reader.parse(Gdx.files.absolute(file.getAbsolutePath()));
                     return jf.getInt("version", 0);
@@ -647,7 +641,7 @@ public class DownloadDataWindow extends GenericDialog {
             if (!disabled)
                 t.getSecond().setChecked(false);
             // Only enable datasets which we don't have
-            if (disabled || (!t.getThird().getText().toString().equals(txt("gui.download.status.found"))))
+            if (disabled || (!t.getThird().getText().toString().equals(I18n.txt("gui.download.status.found"))))
                 t.getSecond().setDisabled(disabled);
         }
     }
@@ -675,13 +669,13 @@ public class DownloadDataWindow extends GenericDialog {
             // Every 250 ms we update the view
             long current = System.currentTimeMillis();
             long elapsed = current - last;
-            if(elapsed > 250){
-               Gdx.app.postRunnable(()->{
-                   float val = (float) ((fin.getBytesRead() / 1000d) / sizeKb);
-                   b.setText(txt("gui.download.extracting", nf.format(fin.getBytesRead() / 1000d) + "/" + sizeKbStr + " Kb"));
-                   p.setValue(val * 100);
-               });
-               last = current;
+            if (elapsed > 250) {
+                Gdx.app.postRunnable(() -> {
+                    float val = (float) ((fin.getBytesRead() / 1000d) / sizeKb);
+                    b.setText(I18n.txt("gui.download.extracting", nf.format(fin.getBytesRead() / 1000d) + "/" + sizeKbStr + " Kb"));
+                    p.setValue(val * 100);
+                });
+                last = current;
             }
 
         }
@@ -692,9 +686,8 @@ public class DownloadDataWindow extends GenericDialog {
      *
      * @param inputFilePath A file
      * @return The size in bytes
-     * @throws Exception
      */
-    private long fileSize(String inputFilePath) throws Exception {
+    private long fileSize(String inputFilePath) {
         return new File(inputFilePath).length();
     }
 
@@ -721,7 +714,7 @@ public class DownloadDataWindow extends GenericDialog {
         Path tempDownload = Paths.get(GlobalConf.data.DATA_LOCATION, "temp.tar.gz");
         if (Files.exists(tempDownload)) {
             //try {
-                //Files.delete(tempDownload);
+            //Files.delete(tempDownload);
             //} catch (IOException e) {
             //    logger.error(e, "Failed cleaning up file: " + tempDownload.toString());
             //}
@@ -729,33 +722,33 @@ public class DownloadDataWindow extends GenericDialog {
     }
 
     private void setStatusOutdated(OwnLabel label) {
-        label.setText(txt("gui.download.status.outdated"));
+        label.setText(I18n.txt("gui.download.status.outdated"));
         label.setColor(1, 1, 0, 1);
     }
 
     private void setStatusFound(OwnLabel label) {
-        label.setText(txt("gui.download.status.found"));
+        label.setText(I18n.txt("gui.download.status.found"));
         label.setColor(0, 1, 0, 1);
     }
 
     private void setStatusNotFound(OwnLabel label) {
-        label.setText(txt("gui.download.status.notfound"));
+        label.setText(I18n.txt("gui.download.status.notfound"));
         label.setColor(1, 0.3f, 0, 1);
     }
 
     private void setStatusError(OwnLabel label) {
         label.setText("Failed");
-        label.setText(txt("gui.download.status.failed"));
+        label.setText(I18n.txt("gui.download.status.failed"));
         label.setColor(1, 0, 0, 1);
     }
 
     private void setStatusCancelled(OwnLabel label) {
-        label.setText(txt("gui.download.status.cancelled"));
+        label.setText(I18n.txt("gui.download.status.cancelled"));
         label.setColor(1, 0, 0, 1);
     }
 
     private void setStatusProgress(OwnLabel label) {
-        label.setText(txt("gui.download.status.working"));
+        label.setText(I18n.txt("gui.download.status.working"));
         label.setColor(.3f, .3f, 1, 1);
     }
 

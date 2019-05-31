@@ -1,3 +1,8 @@
+/*
+ * This file is part of Gaia Sky, which is released under the Mozilla Public License 2.0.
+ * See the file LICENSE.md in the project root for full license details.
+ */
+
 package gaia.cu9.ari.gaiaorbit.scenegraph;
 
 import com.badlogic.gdx.Gdx;
@@ -6,12 +11,12 @@ import com.badlogic.gdx.graphics.Mesh;
 import com.badlogic.gdx.graphics.PerspectiveCamera;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShaderProgram;
-import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.ObjectMap;
 import gaia.cu9.ari.gaiaorbit.GaiaSky;
 import gaia.cu9.ari.gaiaorbit.render.*;
+import gaia.cu9.ari.gaiaorbit.render.ComponentTypes.ComponentType;
 import gaia.cu9.ari.gaiaorbit.render.system.FontRenderSystem;
 import gaia.cu9.ari.gaiaorbit.scenegraph.camera.FovCamera;
 import gaia.cu9.ari.gaiaorbit.scenegraph.camera.ICamera;
@@ -226,10 +231,6 @@ public abstract class CelestialBody extends AbstractPositionEntity implements I3
         this.appmag = appmag.floatValue();
     }
 
-    public Vector2 getPositionSph() {
-        return posSph;
-    }
-
     public float getAppmag() {
         return appmag;
     }
@@ -284,7 +285,7 @@ public abstract class CelestialBody extends AbstractPositionEntity implements I3
 
     @Override
     public <T extends SceneGraphNode> T getSimpleCopy() {
-        CelestialBody copy = (CelestialBody) super.getSimpleCopy();
+        CelestialBody copy = super.getSimpleCopy();
         copy.absmag = this.absmag;
         copy.appmag = this.appmag;
         copy.colorbv = this.colorbv;
@@ -363,7 +364,7 @@ public abstract class CelestialBody extends AbstractPositionEntity implements I3
 
         aux.crs(out).nor();
 
-        float dist = (float) (MathUtilsd.lint(viewAngleApparent, 1e-8, 0.5, -0.005, -0.06) * out.len());
+        float dist = -0.02f * cam.getFovFactor() * (float) out.len();
 
         aux.add(cam.getUp()).nor().scl(dist);
 

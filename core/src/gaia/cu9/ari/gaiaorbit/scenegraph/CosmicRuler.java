@@ -1,3 +1,8 @@
+/*
+ * This file is part of Gaia Sky, which is released under the Mozilla Public License 2.0.
+ * See the file LICENSE.md in the project root for full license details.
+ */
+
 package gaia.cu9.ari.gaiaorbit.scenegraph;
 
 import com.badlogic.gdx.Gdx;
@@ -10,6 +15,7 @@ import gaia.cu9.ari.gaiaorbit.event.EventManager;
 import gaia.cu9.ari.gaiaorbit.event.Events;
 import gaia.cu9.ari.gaiaorbit.event.IObserver;
 import gaia.cu9.ari.gaiaorbit.render.I3DTextRenderable;
+import gaia.cu9.ari.gaiaorbit.render.ILineRenderable;
 import gaia.cu9.ari.gaiaorbit.render.RenderingContext;
 import gaia.cu9.ari.gaiaorbit.render.system.FontRenderSystem;
 import gaia.cu9.ari.gaiaorbit.render.system.LineRenderSystem;
@@ -26,7 +32,7 @@ import net.jafama.FastMath;
  * @author tsagrista
  *
  */
-public class CosmicRuler extends LineObject implements I3DTextRenderable, IObserver {
+public class CosmicRuler extends AbstractPositionEntity implements I3DTextRenderable, ILineRenderable, IObserver {
     private String name0, name1;
     private double[] pos0, pos1;
     private Vector3d p0, p1, m;
@@ -114,8 +120,7 @@ public class CosmicRuler extends LineObject implements I3DTextRenderable, IObser
     @Override
     public void updateLocalValues(ITimeFrameProvider time, ICamera camera) {
         // Update positions
-        rulerOk = true;
-        rulerOk = rulerOk && (sg.getObjectPosition(name0, pos0) != null);
+        rulerOk = (sg.getObjectPosition(name0, pos0) != null);
         rulerOk = rulerOk && (sg.getObjectPosition(name1, pos1) != null);
 
         if (rulerOk) {
@@ -254,4 +259,8 @@ public class CosmicRuler extends LineObject implements I3DTextRenderable, IObser
         }
     }
 
+    @Override
+    public int getGlType() {
+        return GL20.GL_LINES;
+    }
 }

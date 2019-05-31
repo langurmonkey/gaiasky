@@ -1,16 +1,21 @@
+/*
+ * This file is part of Gaia Sky, which is released under the Mozilla Public License 2.0.
+ * See the file LICENSE.md in the project root for full license details.
+ */
+
 package gaia.cu9.ari.gaiaorbit.util;
 
 import com.badlogic.gdx.utils.LongMap;
 
 public class LargeLongMap<T> {
 
-    private int N = 1;
+    private int N;
     private LongMap<T>[] maps;
     private boolean empty = true;
 
     /**
      * Creates a LargeLongMap with the given number of backend maps
-     * @param N
+     * @param N Number of maps to back this long map
      */
     public LargeLongMap(int N) {
         this.N = N;

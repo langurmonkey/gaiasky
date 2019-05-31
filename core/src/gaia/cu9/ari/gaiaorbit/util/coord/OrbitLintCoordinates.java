@@ -1,17 +1,21 @@
+/*
+ * This file is part of Gaia Sky, which is released under the Mozilla Public License 2.0.
+ * See the file LICENSE.md in the project root for full license details.
+ */
+
 package gaia.cu9.ari.gaiaorbit.util.coord;
 
-import java.time.Instant;
-
-import gaia.cu9.ari.gaiaorbit.data.orbit.PolylineData;
+import gaia.cu9.ari.gaiaorbit.data.util.PointCloudData;
 import gaia.cu9.ari.gaiaorbit.scenegraph.CelestialBody;
 import gaia.cu9.ari.gaiaorbit.scenegraph.component.OrbitComponent;
-import gaia.cu9.ari.gaiaorbit.util.Logger;
 import gaia.cu9.ari.gaiaorbit.util.math.Matrix4d;
 import gaia.cu9.ari.gaiaorbit.util.math.Vector3d;
 
+import java.time.Instant;
+
 public class OrbitLintCoordinates extends AbstractOrbitCoordinates {
     OrbitComponent orbitalParams;
-    PolylineData data;
+    PointCloudData data;
     Matrix4d transf;
     Vector3d aux = new Vector3d();
 
@@ -23,7 +27,7 @@ public class OrbitLintCoordinates extends AbstractOrbitCoordinates {
             super.doneLoading(params);
             transf = new Matrix4d();
             orbitalParams = orbit.oc;
-            data = orbit.getPolyline();
+            data = orbit.getPointCloud();
         }
     }
 

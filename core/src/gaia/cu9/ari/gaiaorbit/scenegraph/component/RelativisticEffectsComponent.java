@@ -1,19 +1,23 @@
-package gaia.cu9.ari.gaiaorbit.scenegraph.component;
+/*
+ * This file is part of Gaia Sky, which is released under the Mozilla Public License 2.0.
+ * See the file LICENSE.md in the project root for full license details.
+ */
 
-import java.util.Map;
-import java.util.Set;
+package gaia.cu9.ari.gaiaorbit.scenegraph.component;
 
 import com.badlogic.gdx.graphics.g3d.Material;
 import com.badlogic.gdx.math.Matrix3;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.Array;
-
 import gaia.cu9.ari.gaiaorbit.scenegraph.camera.ICamera;
 import gaia.cu9.ari.gaiaorbit.util.gravwaves.RelativisticEffectsManager;
 import gaia.cu9.ari.gaiaorbit.util.override.Matrix3Attribute;
 import gaia.cu9.ari.gaiaorbit.util.override.RelativisticEffectFloatAttribute;
 import gaia.cu9.ari.gaiaorbit.util.override.Vector3Attribute;
 import gaia.cu9.ari.gaiaorbit.util.override.Vector4Attribute;
+
+import java.util.Map;
+import java.util.Set;
 
 public class RelativisticEffectsComponent {
 

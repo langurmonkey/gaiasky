@@ -1,9 +1,13 @@
+/*
+ * This file is part of Gaia Sky, which is released under the Mozilla Public License 2.0.
+ * See the file LICENSE.md in the project root for full license details.
+ */
+
 package gaia.cu9.ari.gaiaorbit.scenegraph.camera;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.graphics.PerspectiveCamera;
-
 import gaia.cu9.ari.gaiaorbit.scenegraph.IFocus;
 import gaia.cu9.ari.gaiaorbit.scenegraph.camera.CameraManager.CameraMode;
 import gaia.cu9.ari.gaiaorbit.util.GlobalConf;
@@ -96,7 +100,7 @@ public class RelativisticCamera extends AbstractCamera {
     }
 
     @Override
-    public void updateMode(CameraMode mode, boolean postEvent) {
+    public void updateMode(CameraMode mode, boolean centerFocus, boolean postEvent) {
         // TODO Auto-generated method stub
 
     }

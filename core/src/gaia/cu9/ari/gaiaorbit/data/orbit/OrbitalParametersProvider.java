@@ -1,8 +1,12 @@
+/*
+ * This file is part of Gaia Sky, which is released under the Mozilla Public License 2.0.
+ * See the file LICENSE.md in the project root for full license details.
+ */
+
 package gaia.cu9.ari.gaiaorbit.data.orbit;
 
-import java.time.Instant;
-
 import gaia.cu9.ari.gaiaorbit.assets.OrbitDataLoader.OrbitDataLoaderParameter;
+import gaia.cu9.ari.gaiaorbit.data.util.PointCloudData;
 import gaia.cu9.ari.gaiaorbit.event.EventManager;
 import gaia.cu9.ari.gaiaorbit.event.Events;
 import gaia.cu9.ari.gaiaorbit.scenegraph.component.OrbitComponent;
@@ -14,13 +18,15 @@ import gaia.cu9.ari.gaiaorbit.util.math.MathUtilsd;
 import gaia.cu9.ari.gaiaorbit.util.math.Matrix4d;
 import gaia.cu9.ari.gaiaorbit.util.math.Vector3d;
 
+import java.time.Instant;
+
 /**
  * Reads an orbit file into an OrbitData object.
  * @author Toni Sagrista
  *
  */
 public class OrbitalParametersProvider implements IOrbitDataProvider {
-    PolylineData data;
+    PointCloudData data;
 
     @Override
     public void load(String file, OrbitDataLoaderParameter parameter) {
@@ -43,7 +49,7 @@ public class OrbitalParametersProvider implements IOrbitDataProvider {
                 double M0 = params.meananomaly * MathUtilsd.degRad;
                 double mu = params.mu;
 
-                data = new PolylineData();
+                data = new PointCloudData();
 
                 // Step time in days, a full period over number of samples starting at epoch
                 double t_step = period / parameter.numSamples;
@@ -128,7 +134,7 @@ public class OrbitalParametersProvider implements IOrbitDataProvider {
 
             Matrix4d transform = new Matrix4d();
             transform.scl(Constants.KM_TO_U);
-            data = new PolylineData();
+            data = new PointCloudData();
             for (Vector3d point : samples) {
                 point.mul(transform);
                 data.x.add(point.x);
@@ -142,7 +148,7 @@ public class OrbitalParametersProvider implements IOrbitDataProvider {
         }
     }
 
-    public PolylineData getData() {
+    public PointCloudData getData() {
         return data;
     }
 

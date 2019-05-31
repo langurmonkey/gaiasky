@@ -1,11 +1,15 @@
+/*
+ * This file is part of Gaia Sky, which is released under the Mozilla Public License 2.0.
+ * See the file LICENSE.md in the project root for full license details.
+ */
+
 package gaia.cu9.ari.gaiaorbit.interfce;
+
+import com.badlogic.gdx.files.FileHandle;
+import gaia.cu9.ari.gaiaorbit.util.Logger;
 
 import java.io.InputStream;
 import java.util.Properties;
-
-import com.badlogic.gdx.files.FileHandle;
-
-import gaia.cu9.ari.gaiaorbit.util.Logger;
 
 /**
  * Reads controller mappings from a file

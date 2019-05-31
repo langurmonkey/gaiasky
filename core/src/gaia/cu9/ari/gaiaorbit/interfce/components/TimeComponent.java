@@ -1,20 +1,15 @@
-package gaia.cu9.ari.gaiaorbit.interfce.components;
+/*
+ * This file is part of Gaia Sky, which is released under the Mozilla Public License 2.0.
+ * See the file LICENSE.md in the project root for full license details.
+ */
 
-import java.time.Instant;
-import java.time.ZoneOffset;
+package gaia.cu9.ari.gaiaorbit.interfce.components;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.scenes.scene2d.Stage;
-import com.badlogic.gdx.scenes.scene2d.ui.Container;
-import com.badlogic.gdx.scenes.scene2d.ui.HorizontalGroup;
-import com.badlogic.gdx.scenes.scene2d.ui.ImageButton;
-import com.badlogic.gdx.scenes.scene2d.ui.Label;
-import com.badlogic.gdx.scenes.scene2d.ui.Skin;
-import com.badlogic.gdx.scenes.scene2d.ui.TextTooltip;
-import com.badlogic.gdx.scenes.scene2d.ui.VerticalGroup;
+import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener.ChangeEvent;
 import com.badlogic.gdx.utils.Align;
-
 import gaia.cu9.ari.gaiaorbit.GaiaSky;
 import gaia.cu9.ari.gaiaorbit.event.EventManager;
 import gaia.cu9.ari.gaiaorbit.event.Events;
@@ -29,6 +24,9 @@ import gaia.cu9.ari.gaiaorbit.util.format.INumberFormat;
 import gaia.cu9.ari.gaiaorbit.util.format.NumberFormatFactory;
 import gaia.cu9.ari.gaiaorbit.util.scene2d.OwnImageButton;
 import gaia.cu9.ari.gaiaorbit.util.scene2d.OwnLabel;
+
+import java.time.Instant;
+import java.time.ZoneOffset;
 
 public class TimeComponent extends GuiComponent implements IObserver {
 
@@ -77,10 +75,10 @@ public class TimeComponent extends GuiComponent implements IObserver {
             }
             return false;
         });
-        dateEdit.addListener(new TextTooltip(txt("gui.tooltip.dateedit"), skin));
+        dateEdit.addListener(new TextTooltip(I18n.txt("gui.tooltip.dateedit"), skin));
 
         // Pace
-        Label paceLabel = new Label(txt("gui.pace") + " ", skin);
+        Label paceLabel = new Label(I18n.txt("gui.pace") + " ", skin);
         plus = new OwnImageButton(skin, "plus");
         plus.setName("plus");
         plus.addListener(event -> {
@@ -92,7 +90,7 @@ public class TimeComponent extends GuiComponent implements IObserver {
             }
             return false;
         });
-        plus.addListener(new TextTooltip(txt("gui.tooltip.timewarpplus"), skin));
+        plus.addListener(new TextTooltip(I18n.txt("gui.tooltip.timewarpplus"), skin));
 
         minus = new OwnImageButton(skin, "minus");
         minus.setName("minus");
@@ -104,7 +102,7 @@ public class TimeComponent extends GuiComponent implements IObserver {
             }
             return false;
         });
-        minus.addListener(new TextTooltip(txt("gui.tooltip.timewarpminus"), skin));
+        minus.addListener(new TextTooltip(I18n.txt("gui.tooltip.timewarpminus"), skin));
 
         timeWarp = new OwnLabel(getFormattedTimeWrap(), skin, "warp");
         timeWarp.setName("time warp");

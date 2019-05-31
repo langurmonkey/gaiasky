@@ -1,6 +1,9 @@
-package gaia.cu9.ari.gaiaorbit.util.gaia;
+/*
+ * This file is part of Gaia Sky, which is released under the Mozilla Public License 2.0.
+ * See the file LICENSE.md in the project root for full license details.
+ */
 
-import java.util.Date;
+package gaia.cu9.ari.gaiaorbit.util.gaia;
 
 import gaia.cu9.ari.gaiaorbit.util.BinarySearchTree;
 import gaia.cu9.ari.gaiaorbit.util.GlobalConf;
@@ -8,6 +11,8 @@ import gaia.cu9.ari.gaiaorbit.util.I18n;
 import gaia.cu9.ari.gaiaorbit.util.Logger;
 import gaia.cu9.ari.gaiaorbit.util.Logger.Log;
 import gaia.cu9.ari.gaiaorbit.util.math.Quaterniond;
+
+import java.util.Date;
 
 /**
  * Provides caching of the last Nsl37 attitude requested. This allows for

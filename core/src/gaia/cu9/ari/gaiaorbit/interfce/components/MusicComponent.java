@@ -1,3 +1,8 @@
+/*
+ * This file is part of Gaia Sky, which is released under the Mozilla Public License 2.0.
+ * See the file LICENSE.md in the project root for full license details.
+ */
+
 package gaia.cu9.ari.gaiaorbit.interfce.components;
 
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
@@ -11,6 +16,7 @@ import gaia.cu9.ari.gaiaorbit.event.EventManager;
 import gaia.cu9.ari.gaiaorbit.event.Events;
 import gaia.cu9.ari.gaiaorbit.event.IObserver;
 import gaia.cu9.ari.gaiaorbit.util.GlobalConf;
+import gaia.cu9.ari.gaiaorbit.util.I18n;
 import gaia.cu9.ari.gaiaorbit.util.MusicManager;
 import gaia.cu9.ari.gaiaorbit.util.format.INumberFormat;
 import gaia.cu9.ari.gaiaorbit.util.format.NumberFormatFactory;
@@ -49,7 +55,7 @@ public class MusicComponent extends GuiComponent implements IObserver {
             }
             return false;
         });
-        prev.addListener(new TextTooltip(txt("gui.music.previous"), skin));
+        prev.addListener(new TextTooltip(I18n.txt("gui.music.previous"), skin));
 
         /** Play/pause **/
         play = new OwnImageButton(skin, "audio-playpause");
@@ -61,7 +67,7 @@ public class MusicComponent extends GuiComponent implements IObserver {
             }
             return false;
         });
-        play.addListener(new TextTooltip(txt("gui.music.playpause"), skin));
+        play.addListener(new TextTooltip(I18n.txt("gui.music.playpause"), skin));
 
         /** Next track **/
         next = new OwnImageButton(skin, "audio-fwd");
@@ -72,7 +78,7 @@ public class MusicComponent extends GuiComponent implements IObserver {
             }
             return false;
         });
-        next.addListener(new TextTooltip(txt("gui.music.next"), skin));
+        next.addListener(new TextTooltip(I18n.txt("gui.music.next"), skin));
 
         /** Volume **/
         vol = new OwnLabel("VOL: " + nf.format(getVolumePercentage()) + "%", skin, "mono");

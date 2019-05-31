@@ -1,8 +1,9 @@
-package gaia.cu9.ari.gaiaorbit.scenegraph.camera;
+/*
+ * This file is part of Gaia Sky, which is released under the Mozilla Public License 2.0.
+ * See the file LICENSE.md in the project root for full license details.
+ */
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
+package gaia.cu9.ari.gaiaorbit.scenegraph.camera;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.assets.AssetManager;
@@ -19,20 +20,14 @@ import com.badlogic.gdx.utils.Scaling;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.utils.viewport.ScalingViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
-
 import gaia.cu9.ari.gaiaorbit.event.EventManager;
 import gaia.cu9.ari.gaiaorbit.event.Events;
 import gaia.cu9.ari.gaiaorbit.event.IObserver;
-import gaia.cu9.ari.gaiaorbit.scenegraph.AbstractPositionEntity;
-import gaia.cu9.ari.gaiaorbit.scenegraph.CelestialBody;
-import gaia.cu9.ari.gaiaorbit.scenegraph.Gaia;
-import gaia.cu9.ari.gaiaorbit.scenegraph.IFocus;
-import gaia.cu9.ari.gaiaorbit.scenegraph.SceneGraphNode;
+import gaia.cu9.ari.gaiaorbit.scenegraph.*;
 import gaia.cu9.ari.gaiaorbit.scenegraph.camera.CameraManager.CameraMode;
 import gaia.cu9.ari.gaiaorbit.util.GlobalConf;
 import gaia.cu9.ari.gaiaorbit.util.GlobalResources;
 import gaia.cu9.ari.gaiaorbit.util.I18n;
-import gaia.cu9.ari.gaiaorbit.util.Logger;
 import gaia.cu9.ari.gaiaorbit.util.gaia.GaiaAttitudeServer;
 import gaia.cu9.ari.gaiaorbit.util.gaia.Satellite;
 import gaia.cu9.ari.gaiaorbit.util.math.Frustumd;
@@ -41,6 +36,10 @@ import gaia.cu9.ari.gaiaorbit.util.math.Quaterniond;
 import gaia.cu9.ari.gaiaorbit.util.math.Vector3d;
 import gaia.cu9.ari.gaiaorbit.util.time.GlobalClock;
 import gaia.cu9.ari.gaiaorbit.util.time.ITimeFrameProvider;
+
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
 
 /**
  * The field of view cameras.
@@ -323,7 +322,7 @@ public class FovCamera extends AbstractCamera implements IObserver {
     }
 
     @Override
-    public void updateMode(CameraMode mode, boolean postEvent) {
+    public void updateMode(CameraMode mode, boolean centerFocus, boolean postEvent) {
     }
 
     @Override

@@ -1,14 +1,20 @@
+/*
+ * This file is part of Gaia Sky, which is released under the Mozilla Public License 2.0.
+ * See the file LICENSE.md in the project root for full license details.
+ */
+
 package gaia.cu9.ari.gaiaorbit.data.orbit;
+
+import gaia.cu9.ari.gaiaorbit.data.util.PointCloudData;
+import gaia.cu9.ari.gaiaorbit.util.Constants;
+import gaia.cu9.ari.gaiaorbit.util.math.Matrix4d;
+import gaia.cu9.ari.gaiaorbit.util.math.Vector3d;
+import gaia.cu9.ari.gaiaorbit.util.parse.Parser;
 
 import java.io.BufferedReader;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.sql.Timestamp;
-
-import gaia.cu9.ari.gaiaorbit.util.Constants;
-import gaia.cu9.ari.gaiaorbit.util.math.Matrix4d;
-import gaia.cu9.ari.gaiaorbit.util.math.Vector3d;
-import gaia.cu9.ari.gaiaorbit.util.parse.Parser;
 
 public class FileDataLoader {
     int count = 0;
@@ -22,8 +28,8 @@ public class FileDataLoader {
      * @param data
      * @throws Exception
      */
-    public PolylineData load(InputStream data) throws Exception {
-        PolylineData orbitData = new PolylineData();
+    public PointCloudData load(InputStream data) throws Exception {
+        PointCloudData orbitData = new PointCloudData();
 
         BufferedReader br = new BufferedReader(new InputStreamReader(data));
         String line;

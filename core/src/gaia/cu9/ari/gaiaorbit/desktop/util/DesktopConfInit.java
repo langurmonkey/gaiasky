@@ -1,8 +1,14 @@
+/*
+ * This file is part of Gaia Sky, which is released under the Mozilla Public License 2.0.
+ * See the file LICENSE.md in the project root for full license details.
+ */
+
 package gaia.cu9.ari.gaiaorbit.desktop.util;
 
 import com.badlogic.gdx.Gdx;
 import gaia.cu9.ari.gaiaorbit.desktop.GaiaSkyDesktop;
-import gaia.cu9.ari.gaiaorbit.render.ComponentType;
+import gaia.cu9.ari.gaiaorbit.desktop.util.camera.CameraKeyframeManager;
+import gaia.cu9.ari.gaiaorbit.render.ComponentTypes.ComponentType;
 import gaia.cu9.ari.gaiaorbit.util.*;
 import gaia.cu9.ari.gaiaorbit.util.GlobalConf.*;
 import gaia.cu9.ari.gaiaorbit.util.GlobalConf.PostprocessConf.Antialias;
@@ -25,10 +31,15 @@ import java.util.Properties;
 
 /**
  * Desktop GlobalConf initialiser, where the configuration comes from a
+<<<<<<< HEAD
  * global.vr.properties file.
  * 
  * @author tsagrista
+=======
+ * global.properties file.
+>>>>>>> lwjgl3
  *
+ * @author tsagrista
  */
 public class DesktopConfInit extends ConfInit {
     private static final Log logger = Logger.getLogger("GaiaSky");
@@ -141,7 +152,7 @@ public class DesktopConfInit extends ConfInit {
 
         String DATA_LOCATION = p.getProperty("data.location");
         if (DATA_LOCATION == null || DATA_LOCATION.isEmpty())
-            DATA_LOCATION = SysUtils.getDefaultDataDir().getAbsolutePath();
+            DATA_LOCATION = SysUtils.getLocalDataDir().getAbsolutePath();
 
         String CATALOG_JSON_FILE = p.getProperty("data.json.catalog", "");
 
@@ -235,6 +246,8 @@ public class DesktopConfInit extends ConfInit {
         boolean PROPER_MOTION_VECTORS = Boolean.parseBoolean(p.getProperty("scene.propermotion.vectors", "true"));
         float PM_NUM_FACTOR = Float.parseFloat(p.getProperty("scene.propermotion.numfactor", "20f"));
         float PM_LEN_FACTOR = Float.parseFloat(p.getProperty("scene.propermotion.lenfactor", "1E1f"));
+        long N_PM_STARS = Long.parseLong(p.getProperty("scene.propermotion.maxnumber", "-1"));
+        int PM_COLOR_MODE = Integer.parseInt(p.getProperty("scene.propermotion.colormode", "0"));
         boolean GALAXY_3D = Boolean.parseBoolean(p.getProperty("scene.galaxy.3d", "true"));
         boolean CROSSHAIR = Boolean.parseBoolean(p.getProperty("scene.crosshair", "true"));
         boolean CINEMATIC_CAMERA = Boolean.parseBoolean(p.getProperty("scene.camera.cinematic", "false"));
@@ -261,7 +274,7 @@ public class DesktopConfInit extends ConfInit {
         float STAR_POINT_SIZE = Float.parseFloat(p.getProperty("scene.star.point.size", "-1"));
         boolean LAZY_TEXTURE_INIT = true;
         SceneConf sc = new SceneConf();
-        sc.initialize(GRAPHICS_QUALITY, OBJECT_FADE_MS, STAR_BRIGHTNESS, AMBIENT_LIGHT, CAMERA_FOV, CAMERA_SPEED, TURNING_SPEED, ROTATION_SPEED, CAMERA_SPEED_LIMIT_IDX, FOCUS_LOCK, FOCUS_LOCK_ORIENTATION, LABEL_SIZE_FACTOR, LABEL_NUMBER_FACTOR, VISIBILITY, ORBIT_RENDERER, LINE_RENDERER, STAR_TH_ANGLE_NONE, STAR_TH_ANGLE_POINT, STAR_TH_ANGLE_QUAD, POINT_ALPHA_MIN, POINT_ALPHA_MAX, OCTREE_PARTICLE_FADE, OCTANT_THRESHOLD_0, OCTANT_THRESHOLD_1, PROPER_MOTION_VECTORS, PM_NUM_FACTOR, PM_LEN_FACTOR, STAR_POINT_SIZE, GALAXY_3D, CUBEMAP_FACE_RESOLUTION, CROSSHAIR, CINEMATIC_CAMERA, LAZY_TEXTURE_INIT, FREE_CAMERA_TARGET_MODE_ON, SHADOW_MAPPING, SHADOW_MAPPING_N_SHADOWS, SHADOW_MAPPING_RESOLUTION, MAX_LOADED_STARS);
+        sc.initialize(GRAPHICS_QUALITY, OBJECT_FADE_MS, STAR_BRIGHTNESS, AMBIENT_LIGHT, CAMERA_FOV, CAMERA_SPEED, TURNING_SPEED, ROTATION_SPEED, CAMERA_SPEED_LIMIT_IDX, FOCUS_LOCK, FOCUS_LOCK_ORIENTATION, LABEL_SIZE_FACTOR, LABEL_NUMBER_FACTOR, VISIBILITY, ORBIT_RENDERER, LINE_RENDERER, STAR_TH_ANGLE_NONE, STAR_TH_ANGLE_POINT, STAR_TH_ANGLE_QUAD, POINT_ALPHA_MIN, POINT_ALPHA_MAX, OCTREE_PARTICLE_FADE, OCTANT_THRESHOLD_0, OCTANT_THRESHOLD_1, PROPER_MOTION_VECTORS, PM_NUM_FACTOR, PM_LEN_FACTOR, N_PM_STARS, PM_COLOR_MODE, STAR_POINT_SIZE, GALAXY_3D, CUBEMAP_FACE_RESOLUTION, CROSSHAIR, CINEMATIC_CAMERA, LAZY_TEXTURE_INIT, FREE_CAMERA_TARGET_MODE_ON, SHADOW_MAPPING, SHADOW_MAPPING_N_SHADOWS, SHADOW_MAPPING_RESOLUTION, MAX_LOADED_STARS);
 
         /** FRAME CONF **/
         String renderFolder = null;
@@ -284,8 +297,12 @@ public class DesktopConfInit extends ConfInit {
         ScreenshotMode FRAME_MODE = ScreenshotMode.valueOf(p.getProperty("graphics.render.mode"));
         ImageFormat FRAME_FORMAT = ImageFormat.valueOf(p.getProperty("graphics.render.format", "jpg").toUpperCase());
         float FRAME_QUALITY = Float.parseFloat(p.getProperty("graphics.render.quality", "0.93"));
+
+        CameraKeyframeManager.PathType KF_POS = CameraKeyframeManager.PathType.valueOf(p.getProperty("graphics.camera.keyframe.path.position", CameraKeyframeManager.PathType.SPLINE.toString()));
+        CameraKeyframeManager.PathType KF_ORI = CameraKeyframeManager.PathType.valueOf(p.getProperty("graphics.camera.keyframe.path.orientation", CameraKeyframeManager.PathType.SPLINE.toString()));
+
         FrameConf fc = new FrameConf();
-        fc.initialize(RENDER_WIDTH, RENDER_HEIGHT, RENDER_TARGET_FPS, CAMERA_REC_TARGET_FPS, AUTO_FRAME_OUTPUT_CAMERA_PLAY, RENDER_FOLDER, RENDER_FILE_NAME, RENDER_SCREENSHOT_TIME, RENDER_SCREENSHOT_TIME, FRAME_MODE, FRAME_FORMAT, FRAME_QUALITY);
+        fc.initialize(RENDER_WIDTH, RENDER_HEIGHT, RENDER_TARGET_FPS, CAMERA_REC_TARGET_FPS, AUTO_FRAME_OUTPUT_CAMERA_PLAY, RENDER_FOLDER, RENDER_FILE_NAME, RENDER_SCREENSHOT_TIME, RENDER_SCREENSHOT_TIME, FRAME_MODE, FRAME_FORMAT, FRAME_QUALITY, KF_POS, KF_ORI);
 
         /** SCREEN CONF **/
         int SCREEN_WIDTH = Integer.parseInt(p.getProperty("graphics.screen.width"));
@@ -323,8 +340,9 @@ public class DesktopConfInit extends ConfInit {
         String CONTROLLER_MAPPINGS_FILE = p.getProperty("controls.mappings.file", "mappings/xbox360.controller");
         boolean INVERT_LOOK_Y_AXIS = Boolean.parseBoolean(p.getProperty("controls.invert.y", "true"));
         boolean DEBUG_MODE = Boolean.parseBoolean(p.getProperty("controls.debugmode", "false"));
+        String[] CONTROLLER_BLACKLIST = GlobalResources.parseWhitespaceSeparatedList(p.getProperty("controls.blacklist"));
 
-        cc.initialize(CONTROLLER_MAPPINGS_FILE, INVERT_LOOK_Y_AXIS, DEBUG_MODE);
+        cc.initialize(CONTROLLER_MAPPINGS_FILE, INVERT_LOOK_Y_AXIS, DEBUG_MODE, CONTROLLER_BLACKLIST);
 
         /** SPACECRAFT CONF **/
         SpacecraftConf scc = new SpacecraftConf();
@@ -375,6 +393,8 @@ public class DesktopConfInit extends ConfInit {
         p.setProperty("graphics.render.targetfps", Integer.toString(GlobalConf.frame.RENDER_TARGET_FPS));
         p.setProperty("graphics.camera.recording.targetfps", Integer.toString(GlobalConf.frame.CAMERA_REC_TARGET_FPS));
         p.setProperty("graphics.camera.recording.frameoutputauto", Boolean.toString(GlobalConf.frame.AUTO_FRAME_OUTPUT_CAMERA_PLAY));
+        p.setProperty("graphics.camera.keyframe.path.position", GlobalConf.frame.KF_PATH_TYPE_POSITION.toString());
+        p.setProperty("graphics.camera.keyframe.path.orientation", GlobalConf.frame.KF_PATH_TYPE_ORIENTATION.toString());
         p.setProperty("graphics.render.time", Boolean.toString(GlobalConf.frame.RENDER_SCREENSHOT_TIME));
         p.setProperty("graphics.render.mode", GlobalConf.frame.FRAME_MODE.toString());
         p.setProperty("graphics.render.format", GlobalConf.frame.FRAME_FORMAT.toString().toLowerCase());
@@ -455,6 +475,8 @@ public class DesktopConfInit extends ConfInit {
         p.setProperty("scene.propermotion.vectors", Boolean.toString(GlobalConf.scene.PROPER_MOTION_VECTORS));
         p.setProperty("scene.propermotion.numfactor", Float.toString(GlobalConf.scene.PM_NUM_FACTOR));
         p.setProperty("scene.propermotion.lenfactor", Float.toString(GlobalConf.scene.PM_LEN_FACTOR));
+        p.setProperty("scene.propermotion.maxnumber", Long.toString(GlobalConf.scene.N_PM_STARS));
+        p.setProperty("scene.propermotion.colormode", Integer.toString(GlobalConf.scene.PM_COLOR_MODE));
         p.setProperty("scene.galaxy.3d", Boolean.toString(GlobalConf.scene.GALAXY_3D));
         p.setProperty("scene.cubemapface.resolution", Integer.toString(GlobalConf.scene.CUBEMAP_FACE_RESOLUTION));
         p.setProperty("scene.crosshair", Boolean.toString(GlobalConf.scene.CROSSHAIR));
@@ -478,6 +500,8 @@ public class DesktopConfInit extends ConfInit {
         p.setProperty("controls.mappings.file", GlobalConf.controls.CONTROLLER_MAPPINGS_FILE);
         p.setProperty("controls.invert.y", Boolean.toString(GlobalConf.controls.INVERT_LOOK_Y_AXIS));
         p.setProperty("controls.debugmode", Boolean.toString(GlobalConf.controls.DEBUG_MODE));
+        if (GlobalConf.controls.CONTROLLER_BLACKLIST != null)
+            p.setProperty("controls.blacklist", GlobalResources.toWhitespaceSeparatedList(GlobalConf.controls.CONTROLLER_BLACKLIST));
 
         /** SPACECRAFT **/
         p.setProperty("spacecraft.responsiveness", Float.toString(MathUtilsd.lint(GlobalConf.spacecraft.SC_RESPONSIVENESS, Constants.MIN_SC_RESPONSIVENESS, Constants.MAX_SC_RESPONSIVENESS, 0, 1)));
@@ -498,8 +522,7 @@ public class DesktopConfInit extends ConfInit {
 
     private String initConfigFile(boolean ow) throws IOException {
         // Use user folder
-        File userFolder = SysUtils.getGSHomeDir();
-        userFolder.mkdirs();
+        File userFolder = SysUtils.getConfigDir();
         File userFolderConfFile = new File(userFolder, "global.vr.properties");
 
         if (ow || !userFolderConfFile.exists()) {

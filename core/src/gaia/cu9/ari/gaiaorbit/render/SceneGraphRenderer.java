@@ -1,3 +1,8 @@
+/*
+ * This file is part of Gaia Sky, which is released under the Mozilla Public License 2.0.
+ * See the file LICENSE.md in the project root for full license details.
+ */
+
 package gaia.cu9.ari.gaiaorbit.render;
 
 import com.badlogic.gdx.Gdx;
@@ -10,7 +15,6 @@ import com.badlogic.gdx.graphics.Texture.TextureFilter;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g3d.ModelBatch;
-import com.badlogic.gdx.graphics.g3d.Renderable;
 import com.badlogic.gdx.graphics.g3d.utils.RenderableSorter;
 import com.badlogic.gdx.graphics.g3d.utils.ShaderProvider;
 import com.badlogic.gdx.graphics.glutils.FrameBuffer;
@@ -29,6 +33,7 @@ import gaia.cu9.ari.gaiaorbit.assets.RelativisticShaderProviderLoader.Relativist
 import gaia.cu9.ari.gaiaorbit.event.EventManager;
 import gaia.cu9.ari.gaiaorbit.event.Events;
 import gaia.cu9.ari.gaiaorbit.event.IObserver;
+import gaia.cu9.ari.gaiaorbit.render.ComponentTypes.ComponentType;
 import gaia.cu9.ari.gaiaorbit.render.IPostProcessor.PostProcessBean;
 import gaia.cu9.ari.gaiaorbit.render.system.*;
 import gaia.cu9.ari.gaiaorbit.render.system.AbstractRenderSystem.RenderSystemRunnable;
@@ -38,7 +43,6 @@ import gaia.cu9.ari.gaiaorbit.scenegraph.SceneGraphNode.RenderGroup;
 import gaia.cu9.ari.gaiaorbit.scenegraph.StubModel;
 import gaia.cu9.ari.gaiaorbit.scenegraph.camera.CameraManager.CameraMode;
 import gaia.cu9.ari.gaiaorbit.scenegraph.camera.ICamera;
-import gaia.cu9.ari.gaiaorbit.util.ComponentTypes;
 import gaia.cu9.ari.gaiaorbit.util.GlobalConf;
 import gaia.cu9.ari.gaiaorbit.util.GlobalResources;
 import gaia.cu9.ari.gaiaorbit.util.Logger;
@@ -53,14 +57,14 @@ import gaia.cu9.ari.gaiaorbit.util.override.ShaderProgramProvider.ShaderProgramP
 import gaia.cu9.ari.gaiaorbit.vr.VRContext;
 
 import java.nio.IntBuffer;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Map;
 
 /**
  * Renders a scenegraph.
- * 
- * @author Toni Sagrista
  *
+ * @author Toni Sagrista
  */
 public class SceneGraphRenderer extends AbstractRenderer implements IProcessRenderer, IObserver {
     private static final Log logger = Logger.getLogger(SceneGraphRenderer.class);
@@ -72,16 +76,8 @@ public class SceneGraphRenderer extends AbstractRenderer implements IProcessRend
     /** Alpha values for each type **/
     public static float[] alphas;
 
-    public AbstractRenderSystem[] pixelRenderSystems;
-
-    private BitmapFont font3d, font2d, fontTitles;
-
-    private ShaderProgram distanceFieldFontShader;
-
-    private ShaderProgram[] starGroupShaders, particleGroupShaders, particleEffectShaders, orbitElemShaders, lineShaders, lineQuadShaders, lineGpuShaders, mwPointShaders, mwOitShaders, mwNebulaShaders, pixelShaders, galShaders, spriteShaders, starShaders;
-    private AssetDescriptor<ShaderProgram>[] starGroupDesc, particleGroupDesc, particleEffectDesc, orbitElemDesc, lineDesc, lineQuadDesc, lineGpuDesc, mwPointDesc, mwOitDesc, mwNebulaDesc, pixelDesc, galDesc, spriteDesc, starDesc;
-
-    private int maxTexSize;
+    private ShaderProgram[] starGroupShaders, particleGroupShaders, particleEffectShaders, orbitElemShaders, pointShaders, lineShaders, lineQuadShaders, lineGpuShaders, mwPointShaders, mwOitShaders, mwNebulaShaders, starPointShaders, galShaders, spriteShaders, starBillboardShaders;
+    private AssetDescriptor<ShaderProgram>[] starGroupDesc, particleGroupDesc, particleEffectDesc, orbitElemDesc, pointDesc, lineDesc, lineQuadDesc, lineGpuDesc, mwPointDesc, mwOitDesc, mwNebulaDesc, starPointDesc, galDesc, spriteDesc, starBillboardDesc;
 
     /** Render lists for all render groups **/
     public static Array<Array<IRenderable>> render_lists;
@@ -91,7 +87,7 @@ public class SceneGraphRenderer extends AbstractRenderer implements IProcessRend
 
     private Array<IRenderSystem> renderProcesses;
 
-    RenderSystemRunnable blendNoDepthRunnable, blendDepthRunnable, additiveBlendDepthRunnable, restoreRegularBlend;
+    private RenderSystemRunnable blendNoDepthRunnable, blendDepthRunnable, additiveBlendDepthRunnable, restoreRegularBlend;
 
     /** The particular current scene graph renderer **/
     private ISGR sgr;
@@ -100,21 +96,21 @@ public class SceneGraphRenderer extends AbstractRenderer implements IProcessRend
      **/
     private ISGR[] sgrs;
     // Indexes
-    final int SGR_DEFAULT_IDX = 0, SGR_STEREO_IDX = 1, SGR_FOV_IDX = 2, SGR_CUBEMAP_IDX = 3, SGR_OPENVR_IDX = 4;
+    private final int SGR_DEFAULT_IDX = 0, SGR_STEREO_IDX = 1, SGR_FOV_IDX = 2, SGR_CUBEMAP_IDX = 3, SGR_OPENVR_IDX = 4;
 
     // Camera at light position, with same direction. For shadow mapping
     private Camera cameraLight;
     private Array<ModelBody> candidates;
-    public FrameBuffer[] shadowMapFb;
-    public Matrix4[] shadowMapCombined;
+    private FrameBuffer[] shadowMapFb;
+    private Matrix4[] shadowMapCombined;
     public Map<ModelBody, Texture> smTexMap;
     public Map<ModelBody, Matrix4> smCombinedMap;
-    public ModelBatch modelBatchDepth;
+    private ModelBatch modelBatchDepth;
 
     // Light glow pre-render
-    public FrameBuffer glowFb;
-    public Texture glowTex;
-    public ModelBatch modelBatchOpaque;
+    private FrameBuffer glowFb;
+    private Texture glowTex;
+    private ModelBatch modelBatchOpaque;
 
     private Vector3 aux1;
     private Vector3d aux1d;
@@ -122,10 +118,10 @@ public class SceneGraphRenderer extends AbstractRenderer implements IProcessRend
     // VRContext, may be null
     private VRContext vrContext;
     
-    Array<IRenderable> stars;
+    private Array<IRenderable> stars;
 
-    AbstractRenderSystem billboardStarsProc;
-    MWModelRenderSystem mwrs;
+    private AbstractRenderSystem billboardStarsProc;
+    private MWModelRenderSystem mwrs;
 
     public SceneGraphRenderer(VRContext vrContext) {
         super();
@@ -133,8 +129,7 @@ public class SceneGraphRenderer extends AbstractRenderer implements IProcessRend
     }
 
     private AssetDescriptor<ShaderProgram>[] loadShader(AssetManager manager, String vfile, String ffile, String[] names, String[] prependVertex) {
-        @SuppressWarnings("unchecked")
-        AssetDescriptor<ShaderProgram>[] result = new AssetDescriptor[prependVertex.length];
+        @SuppressWarnings("unchecked") AssetDescriptor<ShaderProgram>[] result = new AssetDescriptor[prependVertex.length];
 
         int i = 0;
         for (String prep : prependVertex) {
@@ -160,16 +155,17 @@ public class SceneGraphRenderer extends AbstractRenderer implements IProcessRend
         /** LOAD SHADER PROGRAMS WITH ASSET MANAGER **/
         manager.load("shader/font.vertex.glsl", ShaderProgram.class);
 
-        String[] defines = new String[]{ "", "#define relativisticEffects\n", "#define gravitationalWaves\n", "#define relativisticEffects\n#define gravitationalWaves\n" };
+        String[] defines = new String[] { "", "#define relativisticEffects\n", "#define gravitationalWaves\n", "#define relativisticEffects\n#define gravitationalWaves\n" };
 
-        starDesc = loadShader(manager, "shader/star.vertex.glsl", "shader/star.fragment.glsl", genShaderNames("star"), defines);
+        starBillboardDesc = loadShader(manager, "shader/star.billboard.vertex.glsl", "shader/star.billboard.fragment.glsl", genShaderNames("starBillboard"), defines);
         spriteDesc = loadShader(manager, "shader/sprite.vertex.glsl", "shader/sprite.fragment.glsl", genShaderNames("sprite"), defines);
-        pixelDesc = loadShader(manager, "shader/point.vertex.glsl", "shader/point.fragment.glsl", genShaderNames("pixel"), defines);
-        mwPointDesc = loadShader(manager, "shader/point.galaxy.vertex.glsl", "shader/point.galaxy.fragment.glsl", genShaderNames("pointGal"), defines);
+        starPointDesc = loadShader(manager, "shader/star.point.vertex.glsl", "shader/star.point.fragment.glsl", genShaderNames("starPoint"), defines);
+        mwPointDesc = loadShader(manager, "shader/point.galaxy.vertex.glsl", "shader/point.galaxy.fragment.glsl", genShaderNames("mwPoint"), defines);
         mwOitDesc = loadShader(manager, "shader/galaxy.oit.vertex.glsl", "shader/galaxy.oit.fragment.glsl", genShaderNames("galOit"), defines);
 
         mwNebulaDesc = loadShader(manager, "shader/nebula.vertex.glsl", "shader/nebula.fragment.glsl", genShaderNames("nebula"), defines);
-        lineDesc = loadShader(manager, "shader/line.vertex.glsl", "shader/line.fragment.glsl", genShaderNames("line"), defines);
+        pointDesc = loadShader(manager, "shader/point.cpu.vertex.glsl", "shader/point.cpu.fragment.glsl", genShaderNames("pointCpu"), defines);
+        lineDesc = loadShader(manager, "shader/line.cpu.vertex.glsl", "shader/line.cpu.fragment.glsl", genShaderNames("lineCpu"), defines);
         lineQuadDesc = loadShader(manager, "shader/line.quad.vertex.glsl", "shader/line.quad.fragment.glsl", genShaderNames("lineQuad"), defines);
         lineGpuDesc = loadShader(manager, "shader/line.gpu.vertex.glsl", "shader/line.gpu.fragment.glsl", genShaderNames("lineGpu"), defines);
         galDesc = loadShader(manager, "shader/gal.vertex.glsl", "shader/gal.fragment.glsl", genShaderNames("gal"), defines);
@@ -196,43 +192,27 @@ public class SceneGraphRenderer extends AbstractRenderer implements IProcessRend
         manager.load("font/font2d.fnt", BitmapFont.class, bfp);
         manager.load("font/font-titles.fnt", BitmapFont.class, bfp);
 
-        stars = new Array<IRenderable>();
+        stars = new Array<>();
 
-        pixelRenderSystems = new AbstractRenderSystem[3];
+        renderProcesses = new Array<>();
 
-        renderProcesses = new Array<IRenderSystem>();
-
-        blendNoDepthRunnable = new RenderSystemRunnable() {
-            @Override
-            public void run(AbstractRenderSystem renderSystem, Array<IRenderable> renderables, ICamera camera) {
-                Gdx.gl.glEnable(GL20.GL_BLEND);
-                Gdx.gl.glDisable(GL20.GL_DEPTH_TEST);
-                Gdx.gl.glDepthMask(false);
-            }
+        blendNoDepthRunnable = (renderSystem, renderables, camera) -> {
+            Gdx.gl.glEnable(GL20.GL_BLEND);
+            Gdx.gl.glDisable(GL20.GL_DEPTH_TEST);
+            Gdx.gl.glDepthMask(false);
         };
-        blendDepthRunnable = new RenderSystemRunnable() {
-            @Override
-            public void run(AbstractRenderSystem renderSystem, Array<IRenderable> renderables, ICamera camera) {
-                Gdx.gl.glEnable(GL20.GL_BLEND);
-                Gdx.gl.glEnable(GL20.GL_DEPTH_TEST);
-                Gdx.gl.glDepthMask(true);
-            }
+        blendDepthRunnable = (renderSystem, renderables, camera) -> {
+            Gdx.gl.glEnable(GL20.GL_BLEND);
+            Gdx.gl.glEnable(GL20.GL_DEPTH_TEST);
+            Gdx.gl.glDepthMask(true);
         };
-        additiveBlendDepthRunnable = new RenderSystemRunnable() {
-            @Override
-            public void run(AbstractRenderSystem renderSystem, Array<IRenderable> renderables, ICamera camera) {
-                Gdx.gl.glEnable(GL20.GL_BLEND);
-                Gdx.gl.glEnable(GL20.GL_DEPTH_TEST);
-                Gdx.gl.glBlendFunc(GL20.GL_ONE, GL20.GL_ONE);
-                Gdx.gl.glDepthMask(true);
-            }
+        additiveBlendDepthRunnable = (renderSystem, renderables, camera) -> {
+            Gdx.gl.glEnable(GL20.GL_BLEND);
+            Gdx.gl.glEnable(GL20.GL_DEPTH_TEST);
+            Gdx.gl.glBlendFunc(GL20.GL_ONE, GL20.GL_ONE);
+            Gdx.gl.glDepthMask(true);
         };
-        restoreRegularBlend = new RenderSystemRunnable() {
-            @Override
-            public void run(AbstractRenderSystem renderSystem, Array<IRenderable> renderables, ICamera camera) {
-                Gdx.gl.glBlendFunc(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA);
-            }
-        };
+        restoreRegularBlend = (renderSystem, renderables, camera) -> Gdx.gl.glBlendFunc(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA);
 
         if (GlobalConf.scene.SHADOW_MAPPING) {
             // Shadow map camera
@@ -267,91 +247,96 @@ public class SceneGraphRenderer extends AbstractRenderer implements IProcessRend
     public void doneLoading(AssetManager manager) {
         IntBuffer intBuffer = BufferUtils.newIntBuffer(16);
         Gdx.gl20.glGetIntegerv(GL20.GL_MAX_TEXTURE_SIZE, intBuffer);
-        maxTexSize = intBuffer.get();
+        int maxTexSize = intBuffer.get();
         logger.info("Max texture size: " + maxTexSize + "^2 pixels");
 
-        /**
-         * STAR SHADER
+        /*
+          STAR BILLBOARD SHADER
          */
-        starShaders = fetchShaderProgram(manager, starDesc, genShaderFullNames("star"));
+        starBillboardShaders = fetchShaderProgram(manager, starBillboardDesc, genShaderFullNames("star-billboard"));
 
-        /**
+        /*
          * GALAXY SHADER
          */
-        galShaders = fetchShaderProgram(manager, galDesc, genShaderFullNames( "galaxy"));
+        galShaders = fetchShaderProgram(manager, galDesc, genShaderFullNames("galaxy"));
 
-        /**
+        /*
          * FONT SHADER
          */
-        distanceFieldFontShader = manager.get("shader/font.vertex.glsl");
+        ShaderProgram distanceFieldFontShader = manager.get("shader/font.vertex.glsl");
         if (!distanceFieldFontShader.isCompiled()) {
             logger.error(new RuntimeException(), "Distance field font shader compilation failed:\n" + distanceFieldFontShader.getLog());
         }
 
-        /**
+        /*
          * SPRITE SHADER
          */
         spriteShaders = fetchShaderProgram(manager, spriteDesc, genShaderFullNames("sprite"));
 
-        /**
-         * LINE
+        /*
+         * POINT CPU
          */
-        lineShaders = fetchShaderProgram(manager, lineDesc, genShaderFullNames("line"));
+        pointShaders = fetchShaderProgram(manager, pointDesc, genShaderFullNames("point-cpu"));
 
-        /**
+        /*
+         * LINE CPU
+         */
+        lineShaders = fetchShaderProgram(manager, lineDesc, genShaderFullNames("line-cpu"));
+
+        /*
          * LINE QUAD
          */
         lineQuadShaders = fetchShaderProgram(manager, lineQuadDesc, genShaderFullNames("line-quad"));
 
-        /**
+        /*
          * LINE GPU
          */
         lineGpuShaders = fetchShaderProgram(manager, lineGpuDesc, genShaderFullNames("line-gpu"));
 
-        /**
+        /*
          * MW POINTS
          */
         mwPointShaders = fetchShaderProgram(manager, mwPointDesc, genShaderFullNames("mw-point"));
 
-        /**
+        /*
          * MW Order-Independent Transparency
          */
         mwOitShaders = fetchShaderProgram(manager, mwOitDesc, genShaderFullNames("gal-oit"));
 
-        /**
+        /*
          * MW NEBULAE
          */
         mwNebulaShaders = fetchShaderProgram(manager, mwNebulaDesc, genShaderFullNames("mw-nebula"));
 
-        /**
+        /*
          * PARTICLE EFFECT - default and relativistic
          */
         particleEffectShaders = fetchShaderProgram(manager, particleEffectDesc, genShaderFullNames("particle-effects"));
 
-        /**
+        /*
          * PARTICLE GROUP - default and relativistic
          */
         particleGroupShaders = fetchShaderProgram(manager, particleGroupDesc, genShaderFullNames("particle-group"));
 
-        /**
+        /*
          * STAR GROUP - default and relativistic
          */
         starGroupShaders = fetchShaderProgram(manager, starGroupDesc, genShaderFullNames("star-group"));
 
-        /**
-         * PIXEL
+        /*
+         * STAR POINT
          */
-        pixelShaders = fetchShaderProgram(manager, pixelDesc, genShaderFullNames("pixel"));
+        starPointShaders = fetchShaderProgram(manager, starPointDesc, genShaderFullNames("star-point"));
 
-        /**
+        /*
          * ORBITAL ELEMENTS PARTICLES - default and relativistic
          */
         orbitElemShaders = fetchShaderProgram(manager, orbitElemDesc, genShaderFullNames("orbital-elements-particles"));
 
         RenderGroup[] renderGroups = RenderGroup.values();
-        render_lists = new Array<Array<IRenderable>>(renderGroups.length);
+        render_lists = new Array<>(renderGroups.length);
         for (int i = 0; i < renderGroups.length; i++) {
-            render_lists.add(new Array<IRenderable>(40000));
+            render_lists.add(new Array<>(40000));
         }
 
         ShaderProvider sp = manager.get("atmgrounddefault");
@@ -365,11 +350,8 @@ public class SceneGraphRenderer extends AbstractRenderer implements IProcessRend
         ShaderProvider spdepth = manager.get("spdepth");
         ShaderProvider spopaque = manager.get("spopaque");
 
-        RenderableSorter noSorter = new RenderableSorter() {
-            @Override
-            public void sort(Camera camera, Array<Renderable> renderables) {
-                // Does nothing
-            }
+        RenderableSorter noSorter = (camera, renderables) -> {
+            // Does nothing
         };
 
         ModelBatch modelBatchDefault = new ModelBatch(sp, noSorter);
@@ -386,9 +368,9 @@ public class SceneGraphRenderer extends AbstractRenderer implements IProcessRend
         modelBatchOpaque = new ModelBatch(spopaque, noSorter);
 
         // Fonts - all of these are distance field fonts
-        font3d = manager.get("font/main-font.fnt");
-        font2d = manager.get("font/font2d.fnt");
-        fontTitles = manager.get("font/font-titles.fnt");
+        BitmapFont font3d = manager.get("font/main-font.fnt");
+        BitmapFont font2d = manager.get("font/font2d.fnt");
+        BitmapFont fontTitles = manager.get("font/font-titles.fnt");
 
         // Sprites
         spriteBatch = GlobalResources.spriteBatch;
@@ -406,8 +388,9 @@ public class SceneGraphRenderer extends AbstractRenderer implements IProcessRend
             if (GlobalConf.scene.VISIBILITY[i]) {
                 visible.set(ComponentType.values()[i].ordinal());
             }
-
         }
+        // Invisible are always visible :_D
+        visible.set(ComponentType.Invisible.ordinal());
 
         times = new long[comps.length];
         alphas = new float[comps.length];
@@ -416,7 +399,7 @@ public class SceneGraphRenderer extends AbstractRenderer implements IProcessRend
             alphas[i] = 0f;
         }
 
-        /**
+        /*
          * INITIALIZE SGRs
          */
         sgrs = new ISGR[5];
@@ -427,36 +410,30 @@ public class SceneGraphRenderer extends AbstractRenderer implements IProcessRend
         sgrs[SGR_OPENVR_IDX] = new SGROpenVR(vrContext, modelBatchNormal);
         sgr = null;
 
-        /**
+        /*
          *
          * ======= INITIALIZE RENDER COMPONENTS =======
          *
-         **/
+         */
 
         // POINTS
-        AbstractRenderSystem pixelStarProc = new PixelRenderSystem(RenderGroup.POINT_STAR, alphas, pixelShaders, ComponentType.Stars);
+        AbstractRenderSystem pixelStarProc = new StarPointRenderSystem(RenderGroup.POINT_STAR, alphas, starPointShaders, ComponentType.Stars);
         pixelStarProc.setPreRunnable(blendNoDepthRunnable);
 
         // MODEL FRONT-BACK - NO CULL FACE
         AbstractRenderSystem modelFrontBackProc = new ModelBatchRenderSystem(RenderGroup.MODEL_DEFAULT, alphas, modelBatchDefault, ModelRenderType.NORMAL);
         modelFrontBackProc.setPreRunnable(blendDepthRunnable);
-        modelFrontBackProc.setPostRunnable(new RenderSystemRunnable() {
-            @Override
-            public void run(AbstractRenderSystem renderSystem, Array<IRenderable> renderables, ICamera camera) {
-                // This always goes at the back, clear depth buffer
-                Gdx.gl.glClear(GL20.GL_DEPTH_BUFFER_BIT);
-            }
+        modelFrontBackProc.setPostRunnable((renderSystem, renderables, camera) -> {
+            // This always goes at the back, clear depth buffer
+            Gdx.gl.glClear(GL20.GL_DEPTH_BUFFER_BIT);
         });
 
         // MODEL GRID
         AbstractRenderSystem modelGridsProc = new ModelBatchRenderSystem(RenderGroup.MODEL_GRIDS, alphas, modelBatchGrids, ModelRenderType.NORMAL);
         modelGridsProc.setPreRunnable(blendDepthRunnable);
-        modelGridsProc.setPostRunnable(new RenderSystemRunnable() {
-            @Override
-            public void run(AbstractRenderSystem renderSystem, Array<IRenderable> renderables, ICamera camera) {
-                // This always goes at the back, clear depth buffer
-                Gdx.gl.glClear(GL20.GL_DEPTH_BUFFER_BIT);
-            }
+        modelGridsProc.setPostRunnable((renderSystem, renderables, camera) -> {
+            // This always goes at the back, clear depth buffer
+            Gdx.gl.glClear(GL20.GL_DEPTH_BUFFER_BIT);
         });
 
         // VOLUMETRIC CLOUDS
@@ -466,16 +443,13 @@ public class SceneGraphRenderer extends AbstractRenderer implements IProcessRend
         // ANNOTATIONS
         AbstractRenderSystem annotationsProc = new FontRenderSystem(RenderGroup.FONT_ANNOTATION, alphas, spriteBatch, null);
         annotationsProc.setPreRunnable(blendNoDepthRunnable);
-        annotationsProc.setPostRunnable(new RenderSystemRunnable() {
-            @Override
-            public void run(AbstractRenderSystem renderSystem, Array<IRenderable> renderables, ICamera camera) {
-                // This always goes at the back, clear depth buffer
-                Gdx.gl.glClear(GL20.GL_DEPTH_BUFFER_BIT);
-            }
+        annotationsProc.setPostRunnable((renderSystem, renderables, camera) -> {
+            // This always goes at the back, clear depth buffer
+            Gdx.gl.glClear(GL20.GL_DEPTH_BUFFER_BIT);
         });
 
         // BILLBOARD STARS
-        billboardStarsProc = new BillboardStarRenderSystem(RenderGroup.BILLBOARD_STAR, alphas, starShaders, "data/tex/base/star_glow_s.png", ComponentType.Stars.ordinal());
+        billboardStarsProc = new BillboardStarRenderSystem(RenderGroup.BILLBOARD_STAR, alphas, starBillboardShaders, "data/tex/base/star_glow_s.png", ComponentType.Stars.ordinal());
         billboardStarsProc.setPreRunnable(blendNoDepthRunnable);
         billboardStarsProc.setPostRunnable(new RenderSystemRunnable() {
 
@@ -541,8 +515,15 @@ public class SceneGraphRenderer extends AbstractRenderer implements IProcessRend
         AbstractRenderSystem lineProc = getLineRenderSystem();
 
         // LINES GPU
-        AbstractRenderSystem lineGpuProc = new LineGPURenderSystem(RenderGroup.LINE_GPU, alphas, lineGpuShaders);
+        AbstractRenderSystem lineGpuProc = new VertGPURenderSystem(RenderGroup.LINE_GPU, alphas, lineGpuShaders, GL20.GL_LINE_STRIP);
         lineGpuProc.setPreRunnable(blendDepthRunnable);
+
+        // POINTS CPU
+        AbstractRenderSystem pointProc = new PointRenderSystem(RenderGroup.POINT, alphas, pointShaders);
+
+        // POINTS GPU
+        AbstractRenderSystem pointGpuProc = new VertGPURenderSystem(RenderGroup.POINT_GPU, alphas, lineGpuShaders, GL20.GL_POINTS);
+        pointGpuProc.setPreRunnable(blendDepthRunnable);
 
         // MODEL MESH
         AbstractRenderSystem modelMeshProc = new ModelBatchRenderSystem(RenderGroup.MODEL_MESH, alphas, modelBatchMesh, ModelRenderType.NORMAL, false);
@@ -592,7 +573,7 @@ public class SceneGraphRenderer extends AbstractRenderer implements IProcessRend
         labelsProc.setPreRunnable(blendNoDepthRunnable);
 
         // BILLBOARD SSO
-        AbstractRenderSystem billboardSSOProc = new BillboardStarRenderSystem(RenderGroup.BILLBOARD_SSO, alphas, starShaders, "data/tex/base/sso.png", -1);
+        AbstractRenderSystem billboardSSOProc = new BillboardStarRenderSystem(RenderGroup.BILLBOARD_SSO, alphas, starBillboardShaders, "data/tex/base/sso.png", -1);
         billboardSSOProc.setPreRunnable(additiveBlendDepthRunnable);
         billboardSSOProc.setPostRunnable(restoreRegularBlend);
 
@@ -609,12 +590,9 @@ public class SceneGraphRenderer extends AbstractRenderer implements IProcessRend
             }
         };
         modelAtmProc.setPreRunnable(blendDepthRunnable);
-        modelAtmProc.setPostRunnable(new RenderSystemRunnable() {
-            @Override
-            public void run(AbstractRenderSystem renderSystem, Array<IRenderable> renderables, ICamera camera) {
-                // Clear depth buffer before rendering things up close
-                //Gdx.gl.glClear(GL20.GL_DEPTH_BUFFER_BIT);
-            }
+        modelAtmProc.setPostRunnable((renderSystem, renderables, camera) -> {
+            // Clear depth buffer before rendering things up close
+            //Gdx.gl.glClear(GL20.GL_DEPTH_BUFFER_BIT);
         });
 
         // MODEL CLOUDS
@@ -645,14 +623,22 @@ public class SceneGraphRenderer extends AbstractRenderer implements IProcessRend
         // Billboard for sprites
         renderProcesses.add(billboardSpritesProc);
 
+        // Models
         renderProcesses.add(modelFrontProc);
         renderProcesses.add(modelBeamProc);
         renderProcesses.add(modelMeshProc);
 
+        // Labels
         renderProcesses.add(labelsProc);
+
+        // Primitives
         renderProcesses.add(lineProc);
         renderProcesses.add(lineGpuProc);
         renderProcesses.add(lineVRProc);
+        renderProcesses.add(pointProc);
+        renderProcesses.add(pointGpuProc);
+
+        // Billboards SSO
         renderProcesses.add(billboardSSOProc);
 
         renderProcesses.add(modelStarsProc);
@@ -671,12 +657,12 @@ public class SceneGraphRenderer extends AbstractRenderer implements IProcessRend
 
     }
 
-    private String[] genShaderNames(String baseName){
-        return new String[]{ baseName, baseName + "Rel", baseName + "Grav", baseName + "RelGrav"};
+    private String[] genShaderNames(String baseName) {
+        return new String[] { baseName, baseName + "Rel", baseName + "Grav", baseName + "RelGrav" };
     }
 
-    private String[] genShaderFullNames(String baseName){
-        return new String[]{ baseName, baseName + " (rel)", baseName + " (grav)", baseName + " (rel+grav)"};
+    private String[] genShaderFullNames(String baseName) {
+        return new String[] { baseName, baseName + " (rel)", baseName + " (grav)", baseName + " (rel+grav)" };
     }
 
     private void initSGR(ICamera camera) {
@@ -778,7 +764,7 @@ public class SceneGraphRenderer extends AbstractRenderer implements IProcessRend
 
     private void renderShadowMap(ICamera camera) {
         if (GlobalConf.scene.SHADOW_MAPPING) {
-            /**
+            /*
              * Shadow mapping here?
              * <ul>
              * <li>Extract model bodies (front)</li>
@@ -794,9 +780,7 @@ public class SceneGraphRenderer extends AbstractRenderer implements IProcessRend
              * </ul>
              */
             Array<IRenderable> models = render_lists.get(RenderGroup.MODEL_NORMAL.ordinal());
-            models.sort((a, b) -> {
-                return Double.compare(((AbstractPositionEntity) a).getDistToCamera(), ((AbstractPositionEntity) b).getDistToCamera());
-            });
+            models.sort(Comparator.comparingDouble(a -> ((AbstractPositionEntity) a).getDistToCamera()));
 
             int shadowNRender = (GlobalConf.program.STEREOSCOPIC_MODE || GlobalConf.runtime.OPENVR) ? 2 : GlobalConf.program.CUBEMAP360_MODE ? 6 : 1;
 
@@ -905,13 +889,10 @@ public class SceneGraphRenderer extends AbstractRenderer implements IProcessRend
 
     /**
      * Renders the scene
-     * 
-     * @param camera
-     *            The camera to use
-     * @param t
-     *            The time in seconds since the start
-     * @param rc
-     *            The render context
+     *
+     * @param camera The camera to use
+     * @param t      The time in seconds since the start
+     * @param rc     The render context
      */
     public void renderScene(ICamera camera, double t, RenderingContext rc) {
         // Update time difference since last update
@@ -936,15 +917,11 @@ public class SceneGraphRenderer extends AbstractRenderer implements IProcessRend
 
     /**
      * Renders all the systems which are the same type of the given class
-     * 
-     * @param camera
-     *            The camera to use
-     * @param t
-     *            The time in seconds since the start
-     * @param rc
-     *            The render contex
-     * @param clazz
-     *            The class
+     *
+     * @param camera The camera to use
+     * @param t      The time in seconds since the start
+     * @param rc     The render contex
+     * @param clazz  The class
      */
     public void renderSystem(ICamera camera, double t, RenderingContext rc, Class<? extends IRenderSystem> clazz) {
         // Update time difference since last update
@@ -978,21 +955,10 @@ public class SceneGraphRenderer extends AbstractRenderer implements IProcessRend
         }
     }
 
-    public String[] getRenderComponents() {
-        ComponentType[] comps = ComponentType.values();
-        String[] res = new String[comps.length];
-        int i = 0;
-        for (ComponentType comp : comps) {
-            res[i++] = comp.getName();
-        }
-        return res;
-    }
-
     /**
      * Checks if a given component type is on
-     * 
-     * @param comp
-     *            The component
+     *
+     * @param comp The component
      * @return Whether the component is on
      */
     public boolean isOn(ComponentType comp) {
@@ -1001,9 +967,8 @@ public class SceneGraphRenderer extends AbstractRenderer implements IProcessRend
 
     /**
      * Checks if the component types are all on
-     * 
-     * @param comp
-     *            The components
+     *
+     * @param comp The components
      * @return Whether the components are all on
      */
     public boolean isOn(ComponentTypes comp) {
@@ -1052,25 +1017,13 @@ public class SceneGraphRenderer extends AbstractRenderer implements IProcessRend
             break;
 
         case PIXEL_RENDERER_UPDATE:
-            Gdx.app.postRunnable(new Runnable() {
-
-                @Override
-                public void run() {
-                    AbstractRenderSystem.POINT_UPDATE_FLAG = true;
-                    // updatePixelRenderSystem();
-                }
-
+            Gdx.app.postRunnable(() -> {
+                AbstractRenderSystem.POINT_UPDATE_FLAG = true;
+                // updatePixelRenderSystem();
             });
             break;
         case LINE_RENDERER_UPDATE:
-            Gdx.app.postRunnable(new Runnable() {
-
-                @Override
-                public void run() {
-                    updateLineRenderSystem();
-                }
-
-            });
+            Gdx.app.postRunnable(() -> updateLineRenderSystem());
             break;
         case STEREOSCOPIC_CMD:
             boolean stereo = (Boolean) data[0];
@@ -1126,11 +1079,9 @@ public class SceneGraphRenderer extends AbstractRenderer implements IProcessRend
 
     /**
      * Computes the alpha for the given component type.
-     * 
-     * @param type
-     *            The component type.
-     * @param t
-     *            The current time in seconds.
+     *
+     * @param type The component type.
+     * @param t    The current time in seconds.
      * @return The alpha value.
      */
     private float calculateAlpha(ComponentType type, double t) {
@@ -1205,15 +1156,15 @@ public class SceneGraphRenderer extends AbstractRenderer implements IProcessRend
             shadowMapCombined[i] = new Matrix4();
         }
         if (smTexMap == null)
-            smTexMap = new HashMap<ModelBody, Texture>();
+            smTexMap = new HashMap<>();
         smTexMap.clear();
 
         if (smCombinedMap == null)
-            smCombinedMap = new HashMap<ModelBody, Matrix4>();
+            smCombinedMap = new HashMap<>();
         smCombinedMap.clear();
 
         if (candidates == null)
-            candidates = new Array<ModelBody>(GlobalConf.scene.SHADOW_MAPPING_N_SHADOWS);
+            candidates = new Array<>(GlobalConf.scene.SHADOW_MAPPING_N_SHADOWS);
         candidates.clear();
     }
 
@@ -1235,11 +1186,12 @@ public class SceneGraphRenderer extends AbstractRenderer implements IProcessRend
             AbstractRenderSystem lineSys = getLineRenderSystem();
             lineSys.setPreRunnable(blendDepthRunnable);
             renderProcesses.insert(idx, lineSys);
+            current.dispose();
         }
     }
 
     private AbstractRenderSystem getLineRenderSystem() {
-        AbstractRenderSystem sys = null;
+        AbstractRenderSystem sys;
         if (GlobalConf.scene.isNormalLineRenderer()) {
             // Normal
             sys = new LineRenderSystem(RenderGroup.LINE, alphas, lineShaders);

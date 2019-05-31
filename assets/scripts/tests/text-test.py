@@ -1,10 +1,10 @@
 # This script tests the displaying of custom messages and images.
 # Created by Toni Sagrista
 
-from gaia.cu9.ari.gaiaorbit.script import EventScriptingInterface
+from py4j.java_gateway import JavaGateway, GatewayParameters
 
-
-gs = EventScriptingInterface.instance()
+gateway = JavaGateway(gateway_parameters=GatewayParameters(auto_convert=True))
+gs = gateway.entry_point
 
 
 """
@@ -34,7 +34,7 @@ def typewriter(id, text, x, y, width, height, r, g, b, a, delay):
 
 
 # Minimize interface, disable input, stop camera
-gs.disableInput()
+gs.enableInput()
 gs.cameraStop()
 gs.minimizeInterfaceWindow()
 gs.setVisibility("element.labels", False)
@@ -46,12 +46,13 @@ gs.displayMessageObject(3, "2 - Text size 38, scaling up from 33", 0.1, 0.3, 1.0
 gs.displayMessageObject(4, "3 - Text size 32, scaling down from 33", 0.5, 0.5, 1.0, 1.0, 1.0, 1.0, 32)
 
 
-wait_input(0, [1, 2, 3, 4])
+wait_input(0.0, [1, 2, 3, 4])
 text = "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aenean sollicitudin felis et metus cursus, ac placerat nisi laoreet. Aenean porttitor elit velit. Curabitur cursus diam non bibendum tincidunt. Maecenas laoreet pellentesque nunc, a sollicitudin ligula lacinia vitae. Quisque eu risus est. Nulla ut risus volutpat, fermentum risus sit amet, blandit nulla. Curabitur venenatis risus sed blandit euismod. Quisque suscipit, felis quis egestas malesuada, enim orci mattis erat, a luctus felis massa eu tellus. Sed interdum pharetra gravida. Nulla lacinia malesuada neque ut cursus.";
 gs.displayMessageObject(1, "Typewriter test", 0.1, 0.9, 1.0, 0.7, 0.0, 1.0, 22)
 typewriter(2, text, 0.1, 0.4, 0.8, 0.25, 1.0, 1.0, 1.0, 1.0, 0.01)
 
-wait_input(0, [1, 2])
+wait_input(0.0, [1, 2])
 
-gs.enableInput()
 gs.maximizeInterfaceWindow()
+
+gateway.close()

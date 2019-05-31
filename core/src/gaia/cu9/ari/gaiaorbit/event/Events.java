@@ -1,16 +1,22 @@
+/*
+ * This file is part of Gaia Sky, which is released under the Mozilla Public License 2.0.
+ * See the file LICENSE.md in the project root for full license details.
+ */
+
 package gaia.cu9.ari.gaiaorbit.event;
 
 /**
  * Contains all the events
- * 
- * @author Toni Sagrista
  *
+ * @author Toni Sagrista
  */
 public enum Events {
     /**
      * Event names
      */
-    /** Notifies of a change in the time, contains the Date object **/
+    /**
+     * Notifies of a change in the time, contains the Date object
+     **/
     TIME_CHANGE_INFO,
     /**
      * Issues a change time command, contains the Instant object with the new time
@@ -19,21 +25,35 @@ public enum Events {
 
     GAIA_POSITION,
 
-    /** Dataset has been choosen, loading can start **/
+    /**
+     * Dataset has been choosen, loading can start
+     **/
     LOAD_DATA_CMD,
 
     // CAMERA
-    /** Contains the new CameraMode object **/
+    /**
+     * Contains the new CameraMode object
+     **/
     CAMERA_MODE_CMD,
-    /** Contains a double[] with the new position **/
+    /**
+     * Contains a double[] with the new position
+     **/
     CAMERA_POS_CMD,
-    /** Contains a double[] with the new direction **/
+    /**
+     * Contains a double[] with the new direction
+     **/
     CAMERA_DIR_CMD,
-    /** Contains a double[] with the new up vector **/
+    /**
+     * Contains a double[] with the new up vector
+     **/
     CAMERA_UP_CMD,
-    /** Contains the a float with the new fov value **/
+    /**
+     * Contains the a float with the new fov value
+     **/
     FOV_CHANGED_CMD,
-    /** Contains the new camera speed **/
+    /**
+     * Contains the new camera speed
+     **/
     CAMERA_SPEED_CMD,
 
     /**
@@ -47,17 +67,19 @@ public enum Events {
      * comes from the interface
      **/
     ROTATION_SPEED_CMD,
-    /** Contains the new turning speed **/
+    /**
+     * Contains the new turning speed
+     **/
     TURNING_SPEED_CMD,
     /**
-     * Contains the speed limit index as in: 
-     * 0 - 100 km/h 
+     * Contains the speed limit index as in:
+     * 0 - 100 km/h
      * 1 - 0.5 * c
      * 2 - 0.8 * c
      * 3 - 0.9 * c
      * 4 - 0.99 * c
      * 5 - 0.99999 * c
-     * 6 - c (3e8 m/s) 
+     * 6 - c (3e8 m/s)
      * 7 - 2*c
      * 8 - 10*c
      * 9 - 1000*c
@@ -74,11 +96,17 @@ public enum Events {
      * the interface.
      **/
     SPEED_LIMIT_CMD,
-    /** Contains the value between 0 and 1 **/
+    /**
+     * Contains the value between 0 and 1
+     **/
     CAMERA_FWD,
-    /** Contains the deltaX and deltaY between 0 and 1 **/
+    /**
+     * Contains the deltaX and deltaY between 0 and 1
+     **/
     CAMERA_ROTATE,
-    /** Stops the camera motion **/
+    /**
+     * Stops the camera motion
+     **/
     CAMERA_STOP,
 
     /**
@@ -88,11 +116,17 @@ public enum Events {
     CAMERA_PLAY_INFO,
 
     CAMERA_PAN,
-    /** Contains the roll value between 0 and 1 **/
+    /**
+     * Contains the roll value between 0 and 1
+     **/
     CAMERA_ROLL,
-    /** Contains the deltaX and deltaY between 0 and 1 **/
+    /**
+     * Contains the deltaX and deltaY between 0 and 1
+     **/
     CAMERA_TURN,
-    /** Removes the turn of the camera in focus mode **/
+    /**
+     * Removes the turn of the camera in focus mode
+     **/
     CAMERA_CENTER,
 
     /**
@@ -106,6 +140,7 @@ public enum Events {
      * Informs that the focus has somehow changed and the GUI must be updated.
      * <ul>
      * <li>[0] - The new focus object OR its name.</li>
+     * <li>[1] - Center focus (bool). If true, the focus is centered on the view.</li>
      * </ul>
      **/
     FOCUS_CHANGED,
@@ -114,7 +149,11 @@ public enum Events {
      * ascension in deg [2], declination in deg [3] and the distance to Sol [4]
      **/
     FOCUS_INFO_UPDATED,
-    /** 
+    /**
+     * Informs that the given focus is not available anymore (not visible or unloaded)
+     */
+    FOCUS_NOT_AVAILABLE,
+    /**
      * Posts the coordinates of the free mode focus.
      * <ul>
      * <li>[0] - ra  [deg]</li>
@@ -128,7 +167,9 @@ public enum Events {
      **/
     POPUP_MENU_FOCUS,
 
-    /** Contains two Double values, the longitude and latitude in degrees **/
+    /**
+     * Contains two Double values, the longitude and latitude in degrees
+     **/
     LON_LAT_UPDATED,
 
     /**
@@ -175,9 +216,13 @@ public enum Events {
      * comes from the interface
      **/
     PROPER_MOTIONS_CMD,
-    /** Contains a float with the intensity of the light between 0 and 1 **/
+    /**
+     * Contains a float with the intensity of the light between 0 and 1
+     **/
     AMBIENT_LIGHT_CMD,
-    /** Contains the name of the check box and a boolean **/
+    /**
+     * Contains the name of the check box and a boolean
+     **/
     TOGGLE_AMBIENT_LIGHT,
     /**
      * Contains the name, the boolean value, and a boolean indicating if this
@@ -204,7 +249,9 @@ public enum Events {
      * a boolean for whether it comes from the interface
      **/
     LIGHT_SCATTERING_CMD,
-    /** Fisheye effect toggle. Contains boolean **/
+    /**
+     * Fisheye effect toggle. Contains boolean
+     **/
     FISHEYE_CMD,
     /**
      * Contains the intensity value between 0 and 1 and a boolean for whether it
@@ -246,13 +293,21 @@ public enum Events {
      **/
     SATURATION_CMD,
 
-    /** Contains a float with the pace **/
+    /**
+     * Contains a float with the pace
+     **/
     PACE_CHANGE_CMD,
-    /** Double the pace **/
+    /**
+     * Double the pace
+     **/
     TIME_WARP_INCREASE_CMD,
-    /** Divide the pace by 2 **/
+    /**
+     * Divide the pace by 2
+     **/
     TIME_WARP_DECREASE_CMD,
-    /** Contains the new pace **/
+    /**
+     * Contains the new pace
+     **/
     PACE_CHANGED_INFO,
     /**
      * Sets and unsets the target time. Contains a time (set), or nothing
@@ -266,10 +321,14 @@ public enum Events {
      **/
     RECORD_CAMERA_CMD,
 
-    /** Issues the play command. Contains the path to the file to play **/
+    /**
+     * Issues the play command. Contains the path to the file to play
+     **/
     PLAY_CAMERA_CMD,
 
-    /** Stops the current camera playing operation, if any **/
+    /**
+     * Stops the current camera playing operation, if any
+     **/
     STOP_CAMERA_PLAY,
 
     /**
@@ -277,6 +336,36 @@ public enum Events {
      * direction (vector3d) and up (vector3d)
      **/
     UPDATE_CAM_RECORDER,
+
+    /**
+     * Saves the given array of keyframes to a keyframes file
+     */
+    KEYFRAMES_FILE_SAVE,
+
+    /**
+     * Exports the given array of keyframes to a camera path file
+     */
+    KEYFRAMES_EXPORT,
+
+    /**
+     * Refreshes the keyframes from the model
+     **/
+    KEYFRAMES_REFRESH,
+
+    /**
+     * The given keyframe has been selected
+     **/
+    KEYFRAME_SELECT,
+
+    /**
+     * The given keyframe is no longer selected
+     **/
+    KEYFRAME_UNSELECT,
+
+    /**
+     * Add new keyframe at the end with the current camera settings
+     **/
+    KEYFRAME_ADD,
 
     /**
      * Issues the command to change the high accuracy setting. Contains a
@@ -301,18 +390,26 @@ public enum Events {
      * font in the center of the screen
      **/
     POST_HEADLINE_MESSAGE,
-    /** Clears the headline message **/
+    /**
+     * Clears the headline message
+     **/
     CLEAR_HEADLINE_MESSAGE,
     /**
      * Contains a string with the subhead message, will be displayed in a small
      * font below the headline message
      **/
     POST_SUBHEAD_MESSAGE,
-    /** Clears the subhead message **/
+    /**
+     * Clears the subhead message
+     **/
     CLEAR_SUBHEAD_MESSAGE,
-    /** Clears all messages in the message interface **/
+    /**
+     * Clears all messages in the message interface
+     **/
     CLEAR_MESSAGES,
-    /** Contains the new time frame object **/
+    /**
+     * Contains the new time frame object
+     **/
     EVENT_TIME_FRAME_CMD,
     /**
      * Notifies a fov update in the camera. Contains the new fov value (float)
@@ -339,13 +436,21 @@ public enum Events {
      * the 10 closest stars in screen coordinates in [0..1]
      **/
     LIGHT_POS_2D_UPDATED,
-    /** Executes the command to position the camera near the object in focus **/
+    /**
+     * Executes the command to position the camera near the object in focus
+     **/
     GO_TO_OBJECT_CMD,
-    /** Navigates smoothly to the given object **/
+    /**
+     * Navigates smoothly to the given object
+     **/
     NAVIGATE_TO_OBJECT,
-    /** Lands on a planet object **/
+    /**
+     * Lands on a planet object
+     **/
     LAND_ON_OBJECT,
-    /** Lands at a certain location on a planet object **/
+    /**
+     * Lands at a certain location on a planet object
+     **/
     LAND_AT_LOCATION_OF_OBJECT,
     /**
      * Contains an optional boolean indicating whether debug info should be
@@ -355,16 +460,19 @@ public enum Events {
     SHOW_ABOUT_ACTION,
     SHOW_LOG_ACTION,
     SHOW_TUTORIAL_ACTION,
+    SHOW_LOAD_CATALOG_ACTION,
     SHOW_PREFERENCES_ACTION,
-    SHOW_RUNSCRIPT_ACTION,
     SHOW_LAND_AT_LOCATION_ACTION,
+    /**
+     * Quit action, can contain optional Runnable to run on accept()
+     **/
     SHOW_QUIT_ACTION,
-    /** Shows the camera path file selector, contains the stage and the skin **/
+    SHOW_KEYFRAMES_WINDOW_ACTION,
+    SHOW_MINIMAP_WINDOW_ACTION,
+    /**
+     * Shows the camera path file selector, contains the stage and the skin
+     **/
     SHOW_PLAYCAMERA_ACTION,
-    /** Informs about the number of running scripts **/
-    NUM_RUNNING_SCRIPTS,
-    /** Cancels the next script **/
-    CANCEL_SCRIPT_CMD,
     SHOW_SEARCH_ACTION,
     /**
      * This event is issued when the screen has been resized. It contains the
@@ -391,7 +499,9 @@ public enum Events {
      * {@link gaia.cu9.ari.gaiaorbit.util.Constants#STEP_STAR_POINT_SIZE}
      **/
     STAR_POINT_SIZE_DECREASE_CMD,
-    /** Reset star point size to original value **/
+    /**
+     * Reset star point size to original value
+     **/
     STAR_POINT_SIZE_RESET_CMD,
 
     /**
@@ -410,7 +520,9 @@ public enum Events {
      * and another boolean indicating whether it comes from the interface.
      **/
     STEREOSCOPIC_CMD,
-    /** Switches stereoscopic profile, contains the index of the new profile **/
+    /**
+     * Switches stereoscopic profile, contains the index of the new profile
+     **/
     STEREO_PROFILE_CMD,
     /**
      * Sets the 360 mode. Contains a boolean with the new state and an optional
@@ -431,7 +543,9 @@ public enum Events {
      * state and another boolean indicating whether it comes from the interface.
      */
     PLANETARIUM_CMD,
-    /** Anti aliasing changed, contains the new value for aa **/
+    /**
+     * Anti aliasing changed, contains the new value for aa
+     **/
     ANTIALIASING_CMD,
     /**
      * Toggles whole GUI display. Contains the localised name and an optional
@@ -452,11 +566,17 @@ public enum Events {
      * Toggles the pause of the update process. Contains the localised name.
      **/
     TOGGLE_UPDATEPAUSE,
-    /** Contains the new value **/
+    /**
+     * Contains the new value
+     **/
     UPDATEPAUSE_CHANGED,
-    /** Graphics quality updated **/
+    /**
+     * Graphics quality updated
+     **/
     GRAPHICS_QUALITY_UPDATED,
-    /** Toggles minimap visibility **/
+    /**
+     * Toggles minimap visibility
+     **/
     TOGGLE_MINIMAP,
     /**
      * Sets the vertical scroll position. Contains the scroll position in pixels
@@ -531,45 +651,96 @@ public enum Events {
      * </ol>
      */
     ADD_CUSTOM_IMAGE,
-    /** Removes a previously added message or image. Contains the id. **/
+    /**
+     * Removes a previously added message or image. Contains the id.
+     **/
     REMOVE_OBJECTS,
-    /** Removes all the custom objects **/
+    /**
+     * Removes all the custom objects
+     **/
     REMOVE_ALL_OBJECTS,
     /**
      * Contains the star brightness multiplier and an optional boolean saying if
      * it comes from the interface
      **/
     STAR_BRIGHTNESS_CMD,
-    /** Frames per second info **/
+    /**
+     * Frames per second info
+     **/
     FPS_INFO,
-    /** SAMP information **/
+    /**
+     * SAMP information
+     **/
     SAMP_INFO,
-    /** Contains the number factor for pm vectors and a boolean indicating if this comes from the interface **/
+    /**
+     * Contains the number factor for pm vectors and a boolean indicating if this comes from the interface
+     **/
     PM_NUM_FACTOR_CMD,
-    /** Contains the length factor for pm vectors and a boolean indicating if this comes from the interface **/
+    /**
+     * Contains the length factor for pm vectors and a boolean indicating if this comes from the interface
+     **/
     PM_LEN_FACTOR_CMD,
+    /**
+     * Contains the mode and a boolean indicating if it comes from the interface.
+     * Modes:
+     * 0 - direction
+     * 1 - length
+     * 2 - has radial velocity: blue=stars with RV, red=stars without RV
+     * 3 - redshift (sun): blue=-50 Km/s, red=50 Km/s
+     * 4 - redshift (camera): blue=-50 Km/s, red=50 Km/s
+     * 5 - unique color
+     */
+    PM_COLOR_MODE_CMD,
     /**
      * Updates the screen mode according to whats in the
      * {@link gaia.cu9.ari.gaiaorbit.util.GlobalConf#screen} bean.
      **/
     SCREEN_MODE_CMD,
-    /** Informs the scene graph has been loaded. Program can start **/
+    /**
+     * Informs the scene graph has been loaded. Program can start
+     **/
     SCENE_GRAPH_LOADED,
+    /**
+     * Sends an object to be added to the scene graph. Contains the object and an optional Boolean indicating
+     * whether to add the object to the scene graph index. Defaults to true.
+     **/
+    SCENE_GRAPH_ADD_OBJECT_CMD,
+
+    /**
+     * Sends an object to be added to a scene graph, without using a post runnable. Contains the object and an optional
+     * Boolean indicating whether to add the object to the scene graph index. Defaults to true.
+     */
+    SCENE_GRAPH_ADD_OBJECT_NO_POST_CMD,
+    /**
+     * Removes an object from the scene graph. Contains the name of the object or the object itself plus and optional
+     * Boolean indicating whether to remove it from the index. Defaults to true.
+     */
+    SCENE_GRAPH_REMOVE_OBJECT_CMD,
     /**
      * Contains the width, height (integers) and the folder name and filename
      * (strings)
      **/
     SCREENSHOT_CMD,
-    /** Contains the path where the screenshot has been saved */
+    /**
+     * Contains the path where the screenshot has been saved
+     */
     SCREENSHOT_INFO,
-    /** Informs of the new size of the screenshot system **/
+    /**
+     * Informs of the new size of the screenshot system
+     **/
     SCREENSHOT_SIZE_UDPATE,
-    /** Informs of the new size of the frame output system **/
+    /**
+     * Informs of the new size of the frame output system
+     **/
     FRAME_SIZE_UDPATE,
 
-    /** Issues the command to render a screenshot **/
+    /**
+     * Issues the command to render a screenshot
+     **/
     RENDER_SCREENSHOT,
-    /** Issues the command to render a frame **/
+    /**
+     * Issues the command to render a frame
+     **/
     RENDER_FRAME,
     /**
      * Issues the command to render the current frame buffer with a given
@@ -577,7 +748,9 @@ public enum Events {
      **/
     RENDER_FRAME_BUFFER,
 
-    /** Issues the command to flush the frame system **/
+    /**
+     * Issues the command to flush the frame system
+     **/
     FLUSH_FRAMES,
     /**
      * Reloads the controller mappings. Contains the path to the new mappings
@@ -590,14 +763,20 @@ public enum Events {
      * in the same order returned by ComponentType.values()
      **/
     VISIBILITY_OF_COMPONENTS,
-    /** Sets the limit magnitude. Contains a double with the new magnitude **/
+    /**
+     * Sets the limit magnitude. Contains a double with the new magnitude
+     **/
     LIMIT_MAG_CMD,
-    /** Debug info **/
+    /**
+     * Debug info
+     **/
     DEBUG1,
     DEBUG2,
     DEBUG3,
     DEBUG4,
-    /** Frame buffers info **/
+    /**
+     * Frame buffers info
+     **/
     DEBUG_BUFFERS,
     /**
      * Notifies from a java exception, it sends the Throwable and an optional
@@ -634,7 +813,9 @@ public enum Events {
      **/
     RUN_SCRIPT_PYCODE,
 
-    /** Passes the OrbitData and the file name **/
+    /**
+     * Passes the OrbitData and the file name
+     **/
     ORBIT_DATA_LOADED,
 
     /**
@@ -642,7 +823,9 @@ public enum Events {
      * file
      **/
     CONFIG_FRAME_OUTPUT,
-    /** Forces recalculation of main GUI window size **/
+    /**
+     * Forces recalculation of main GUI window size
+     **/
     RECALCULATE_OPTIONS_SIZE,
 
     /**
@@ -657,10 +840,14 @@ public enum Events {
      **/
     PLANETARIUM_FOCUS_ANGLE_CMD,
 
-    /** Contains the x and the y in pixels of the position of the mass **/
+    /**
+     * Contains the x and the y in pixels of the position of the mass
+     **/
     GRAVITATIONAL_LENSING_PARAMS,
 
-    /** Contains the Gaia object [0] **/
+    /**
+     * Contains the Gaia object [0]
+     **/
     GAIA_LOADED,
     /**
      * Issues the command to update the pixel render system. Contains no
@@ -672,52 +859,92 @@ public enum Events {
      * parameters.
      **/
     LINE_RENDERER_UPDATE,
-    /** Removes the keyboard focus in the GUI **/
+    /**
+     * Removes the keyboard focus in the GUI
+     **/
     REMOVE_KEYBOARD_FOCUS,
-    /** Removes the gui component identified by the given name **/
+    /**
+     * Removes the gui component identified by the given name
+     **/
     REMOVE_GUI_COMPONENT,
-    /** Adds the gui component identified by the given name **/
+    /**
+     * Adds the gui component identified by the given name
+     **/
     ADD_GUI_COMPONENT,
 
     DISPLAY_MEM_INFO_WINDOW,
 
-    /** Volume of music, contains the volume (float in [0..1]) **/
+    /**
+     * Volume of music, contains the volume (float in [0..1])
+     **/
     MUSIC_VOLUME_CMD,
-    /** Toggles the play **/
+    /**
+     * Toggles the play
+     **/
     MUSIC_PLAYPAUSE_CMD,
-    /** Plays previous music **/
+    /**
+     * Plays previous music
+     **/
     MUSIC_PREVIOUS_CMD,
-    /** Plays next music **/
+    /**
+     * Plays next music
+     **/
     MUSIC_NEXT_CMD,
-    /** Reload music files **/
+    /**
+     * Reload music files
+     **/
     MUSIC_RELOAD_CMD,
-    /** Info about current track **/
+    /**
+     * Info about current track
+     **/
     MUSIC_TRACK_INFO,
-    
-    
-    /** Attach object to first end of ruler. Contains object name **/
+
+
+    /**
+     * Attach object to first end of ruler. Contains object name
+     **/
     RULER_ATTACH_0,
-    /** Attach object to second end of ruler. Contains object name **/
+    /**
+     * Attach object to second end of ruler. Contains object name
+     **/
     RULER_ATTACH_1,
-    /** Clear all objects from ruler **/
+    /**
+     * Clear all objects from ruler
+     **/
     RULER_CLEAR,
-    /** Notifies new distances for the ruler. Contains a double with the distance in internal units and a formatted string **/
+    /**
+     * Notifies new distances for the ruler. Contains a double with the distance in internal units and a formatted string
+     **/
     RULER_DIST,
 
-    /** Contains the spacecraft object after it has been loaded **/
+    /**
+     * Contains the spacecraft object after it has been loaded
+     **/
     SPACECRAFT_LOADED,
-    /** Level spacecraft command, contains boolean with state **/
+    /**
+     * Level spacecraft command, contains boolean with state
+     **/
     SPACECRAFT_STABILISE_CMD,
-    /** Stop spacecraft, contains boolean with state **/
+    /**
+     * Stop spacecraft, contains boolean with state
+     **/
     SPACECRAFT_STOP_CMD,
 
-    /** Increases thrust **/
+    /**
+     * Increases thrust
+     **/
     SPACECRAFT_THRUST_INCREASE_CMD,
-    /** Decreases thrust **/
+    /**
+     * Decreases thrust
+     **/
     SPACECRAFT_THRUST_DECREASE_CMD,
-    /** Contains the integer index of the new thrust **/
+    /**
+     * Contains the integer index of the new thrust
+     **/
     SPACECRAFT_THRUST_SET_CMD,
-    /** Broadcasts the new thrust index **/
+    /**
+     * Broadcasts the new thrust index
+     **/
     SPACECRAFT_THRUST_INFO,
 
     /**
@@ -766,7 +993,9 @@ public enum Events {
      */
     HIDE_UNCERTAINTIES,
 
-    /** Pauses background data loading thread, if any **/
+    /**
+     * Pauses background data loading thread, if any
+     **/
     PAUSE_BACKGROUND_LOADING,
 
     /**
@@ -774,34 +1003,70 @@ public enum Events {
      **/
     RESUME_BACKGROUND_LOADING,
 
-    /** Empty event which informs that background loading is active **/
+    /**
+     * Empty event which informs that background loading is active
+     **/
     BACKGROUND_LOADING_INFO,
 
-    /** Informs the octree has been disposed **/
+    /**
+     * Informs the octree has been disposed
+     **/
     OCTREE_DISPOSED,
 
-    /** Update external GUIs signal. Contains the dt in seconds. **/
+    /**
+     * Update external GUIs signal. Contains the dt in seconds.
+     **/
     UPDATE_GUI,
 
-    /** Contains an the index of the star group mesh to be cleared **/
+    /**
+     * Contains an the index of the star group mesh to be cleared
+     **/
     DISPOSE_STAR_GROUP_GPU_MESH,
 
-    /** Contains an index to the particle group mesh to be cleared **/
+    /**
+     * Contains an index to the particle group mesh to be cleared
+     **/
     DISPOSE_PARTICLE_GROUP_GPU_MESH,
 
-    /** Start gravitational wave. Contains on-screen position (x,y) of source as two integer parameters **/
+    /**
+     * Start gravitational wave. Contains on-screen position (x,y) of source as two integer parameters
+     **/
     GRAV_WAVE_START,
 
-    /** Stops gravitational wave **/
+    /**
+     * Stops gravitational wave
+     **/
     GRAV_WAVE_STOP,
 
-    /** A new catalog has been loaded. Contains the new catalog info object **/
-    ADD_CATALOG_INFO,
+    /**
+     * A new catalog has been loaded. Contains the new catalog info object
+     **/
+    CATALOG_ADD,
 
-    /** Posts a recurrent runnable. Contains an identifier (String) and the runnable object **/
+    /**
+     * Removes the catalog identified by the given string name
+     */
+    CATALOG_REMOVE,
+
+    /**
+     * Sets the visibilty of a catalog given its name and an optional boolean if it comes from the UI
+     */
+    CATALOG_VISIBLE,
+
+    /**
+     * Highlight the catalog. Contains the dataset name, the highlight status (bool), the color index (negative for automatic) and an optional boolean if it comes from the UI
+     */
+    CATALOG_HIGHLIGHT,
+
+
+    /**
+     * Posts a recurrent runnable. Contains an identifier (String) and the runnable object
+     **/
     POST_RUNNABLE,
 
-    /** Unposts a runnable. Contains the identifier (String) **/
+    /**
+     * Unposts a runnable. Contains the identifier (String)
+     **/
     UNPOST_RUNNABLE,
 
     /** New VR device connected. Contains the VRDevice object. **/
@@ -812,8 +1077,20 @@ public enum Events {
 
     // INPUT LISTENER EVENTS
     TOUCH_DOWN, TOUCH_UP, TOUCH_DRAGGED, SCROLLED, KEY_DOWN, KEY_UP,
-    
-    /** Dispose all resources, app is shutting down **/
+
+    /**
+     * Event sent before the start of every frame. Contains a long with the frame number
+     */
+    FRAME_TICK,
+
+    /**
+     * Runs the 'Go home' action
+     */
+    HOME_CMD,
+
+    /**
+     * Dispose all resources, app is shutting down
+     **/
     DISPOSE;
 
 }

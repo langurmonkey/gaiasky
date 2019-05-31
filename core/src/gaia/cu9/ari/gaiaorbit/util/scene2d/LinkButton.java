@@ -1,3 +1,8 @@
+/*
+ * This file is part of Gaia Sky, which is released under the Mozilla Public License 2.0.
+ * See the file LICENSE.md in the project root for full license details.
+ */
+
 package gaia.cu9.ari.gaiaorbit.util.scene2d;
 
 import com.badlogic.gdx.Gdx;
@@ -25,7 +30,7 @@ public class LinkButton  extends OwnImageButton {
                 if (type == InputEvent.Type.touchUp && ((InputEvent) event).getButton() == Input.Buttons.LEFT) {
                     Gdx.net.openURI(linkURL);
                 } else if (type == InputEvent.Type.enter) {
-                    Gdx.graphics.setCursor(Gdx.graphics.newCursor(GlobalResources.linkCursor, 4, 0));
+                    Gdx.graphics.setCursor(GlobalResources.linkCursor);
                 } else if (type == InputEvent.Type.exit) {
                     Gdx.graphics.setSystemCursor(Cursor.SystemCursor.Arrow);
                 }

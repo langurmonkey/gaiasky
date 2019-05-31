@@ -1,17 +1,18 @@
+/*
+ * This file is part of Gaia Sky, which is released under the Mozilla Public License 2.0.
+ * See the file LICENSE.md in the project root for full license details.
+ */
+
 package gaia.cu9.ari.gaiaorbit.render.system;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.g3d.ModelBatch;
 import com.badlogic.gdx.utils.Array;
-
-import gaia.cu9.ari.gaiaorbit.render.ComponentType;
-import gaia.cu9.ari.gaiaorbit.render.IAtmosphereRenderable;
-import gaia.cu9.ari.gaiaorbit.render.ICloudRenderable;
-import gaia.cu9.ari.gaiaorbit.render.IModelRenderable;
-import gaia.cu9.ari.gaiaorbit.render.IRenderable;
+import gaia.cu9.ari.gaiaorbit.render.*;
+import gaia.cu9.ari.gaiaorbit.render.ComponentTypes.ComponentType;
 import gaia.cu9.ari.gaiaorbit.scenegraph.SceneGraphNode.RenderGroup;
 import gaia.cu9.ari.gaiaorbit.scenegraph.camera.ICamera;
-import gaia.cu9.ari.gaiaorbit.util.ComponentTypes;
+import gaia.cu9.ari.gaiaorbit.render.ComponentTypes;
 import gaia.cu9.ari.gaiaorbit.util.GlobalConf;
 import gaia.cu9.ari.gaiaorbit.util.comp.ModelComparator;
 
@@ -49,7 +50,7 @@ public class ModelBatchRenderSystem extends AbstractRenderSystem {
         super(rg, alphas, null);
         this.batch = batch;
         this.type = type;
-        comp = new ModelComparator<IRenderable>();
+        comp = new ModelComparator<>();
 
         this.ctAtm = new ComponentTypes(ComponentType.Atmospheres);
         this.ctClouds = new ComponentTypes(ComponentType.Clouds);

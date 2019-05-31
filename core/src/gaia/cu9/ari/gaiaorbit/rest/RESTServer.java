@@ -1,28 +1,23 @@
+/*
+ * This file is part of Gaia Sky, which is released under the Mozilla Public License 2.0.
+ * See the file LICENSE.md in the project root for full license details.
+ */
+
 package gaia.cu9.ari.gaiaorbit.rest;
-
-import static spark.Spark.get;
-import static spark.Spark.port;
-import static spark.Spark.post;
-import static spark.Spark.staticFiles;
-
-import java.lang.reflect.Method;
-import java.lang.reflect.Parameter;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-
 import gaia.cu9.ari.gaiaorbit.script.EventScriptingInterface;
 import gaia.cu9.ari.gaiaorbit.script.IScriptingInterface;
 import gaia.cu9.ari.gaiaorbit.util.GlobalConf;
 import gaia.cu9.ari.gaiaorbit.util.Logger;
 import gaia.cu9.ari.gaiaorbit.util.Logger.Log;
+
+import java.lang.reflect.Method;
+import java.lang.reflect.Parameter;
+import java.util.*;
+
+import static spark.Spark.*;
 
 /**
  * REST API for remote procedure calls
@@ -521,13 +516,9 @@ public class RESTServer {
 				return response;
 			});
 
-			get("/api/:cmd", (request, response) -> {
-				return handleApiCall(request, response);
-			});
+			get("/api/:cmd", (request, response) -> handleApiCall(request, response));
 
-			post("/api/:cmd", (request, response) -> {
-				return handleApiCall(request, response);
-			});
+			post("/api/:cmd", RESTServer::handleApiCall);
 
 			logger.info("Startup finished.");
 

@@ -3,10 +3,8 @@ package gaia.cu9.ari.gaiaorbit.interfce;
 import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Stage;
-
-import gaia.cu9.ari.gaiaorbit.render.ComponentType;
+import gaia.cu9.ari.gaiaorbit.render.ComponentTypes;
 import gaia.cu9.ari.gaiaorbit.scenegraph.ISceneGraph;
-import gaia.cu9.ari.gaiaorbit.util.ComponentTypes;
 import gaia.cu9.ari.gaiaorbit.util.Logger;
 
 public class VRGui implements IGui {
@@ -91,7 +89,7 @@ public class VRGui implements IGui {
     }
 
     @Override
-    public void setVisibilityToggles(ComponentType[] entities, ComponentTypes visible) {
+    public void setVisibilityToggles(ComponentTypes.ComponentType[] entities, ComponentTypes visible) {
     }
 
     @Override

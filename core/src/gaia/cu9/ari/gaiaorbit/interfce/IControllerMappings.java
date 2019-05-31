@@ -1,3 +1,8 @@
+/*
+ * This file is part of Gaia Sky, which is released under the Mozilla Public License 2.0.
+ * See the file LICENSE.md in the project root for full license details.
+ */
+
 package gaia.cu9.ari.gaiaorbit.interfce;
 
 public interface IControllerMappings {
@@ -11,7 +16,7 @@ public interface IControllerMappings {
      * 
      * @return The axis code, negative if not mapped
      */
-    public int getAxisRoll();
+     int getAxisRoll();
 
     /**
      * Returns the code of the axis that produces:
@@ -22,7 +27,7 @@ public interface IControllerMappings {
      * 
      * @return The axis code, negative if not mapped
      */
-    public int getAxisPitch();
+     int getAxisPitch();
 
     /**
      * Returns the code of the axis that produces:
@@ -33,7 +38,7 @@ public interface IControllerMappings {
      * 
      * @return The axis code, negative if not mapped
      */
-    public int getAxisYaw();
+     int getAxisYaw();
 
     /**
      * Returns the code of the axis that controls the forward and backward
@@ -41,7 +46,7 @@ public interface IControllerMappings {
      * 
      * @return The axis code, negative if not mapped
      */
-    public int getAxisMove();
+     int getAxisMove();
 
     /**
      * Returns the code of the axis used to increase the velocity. All the range
@@ -49,7 +54,7 @@ public interface IControllerMappings {
      * 
      * @return The axis code, negative if not mapped
      */
-    public int getAxisVelocityUp();
+     int getAxisVelocityUp();
 
     /**
      * Returns the code of the axis used to decrease the velocity. All the range
@@ -57,7 +62,7 @@ public interface IControllerMappings {
      * 
      * @return The axis code, negative if not mapped
      */
-    public int getAxisVelocityDown();
+     int getAxisVelocityDown();
 
     /**
      * Returns the code of the button that, when pressed, multiplies the
@@ -65,7 +70,7 @@ public interface IControllerMappings {
      * 
      * @return The button code, negative if not mapped
      */
-    public int getButtonVelocityMultiplierTenth();
+     int getButtonVelocityMultiplierTenth();
 
     /**
      * Returns the code of the button that, when pressed, multiplies the
@@ -73,20 +78,20 @@ public interface IControllerMappings {
      * 
      * @return The button code, negative if not mapped
      */
-    public int getButtonVelocityMultiplierHalf();
+     int getButtonVelocityMultiplierHalf();
 
     /**
      * Returns the code of the button used to increase the velocity.
      * 
      * @return The button code, negative if not mapped
      */
-    public int getButtonVelocityUp();
+     int getButtonVelocityUp();
 
     /**
      * Returns the code of the button used to decrease the velocity.
      * 
      * @return The button code, negative if not mapped
      */
-    public int getButtonVelocityDown();
+     int getButtonVelocityDown();
 
 }

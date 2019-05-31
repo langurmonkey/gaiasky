@@ -1,10 +1,14 @@
+/*
+ * This file is part of Gaia Sky, which is released under the Mozilla Public License 2.0.
+ * See the file LICENSE.md in the project root for full license details.
+ */
+
 package gaia.cu9.ari.gaiaorbit.interfce;
 
 import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
-
 import gaia.cu9.ari.gaiaorbit.util.GlobalResources;
 
 /**
@@ -27,7 +31,7 @@ public class DebugGui extends AbstractGui {
 
     @Override
     public void doneLoading(AssetManager assetManager) {
-        interfaces = new Array<IGuiInterface>();
+        interfaces = new Array<>();
         skin = GlobalResources.skin;
 
         // DEBUG INFO - TOP RIGHT

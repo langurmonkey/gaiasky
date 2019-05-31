@@ -1,5 +1,4 @@
-![Gaia Sky](https://zah.uni-heidelberg.de/fileadmin/user_upload/gaia/gaiasky/img/GaiaSkyBanner-vr.jpg)
---------------------------
+# Gaia Sky VR
 
 [![Documentation Status](https://readthedocs.org/projects/gaia-sky/badge/?version=latest)](http://gaia-sky.readthedocs.io/en/latest/?badge=latest)
 [![Build status](https://gitlab.com/langurmonkey/gaiasky/badges/master/pipeline.svg)](https://gitlab.com/langurmonkey/gaiasky/commits/master)
@@ -8,8 +7,11 @@
 [![GitHub forks](https://img.shields.io/github/forks/langurmonkey/gaiasky.svg)](https://github.com/langurmonkey/gaiasky/network)
 [![GitHub tag](https://img.shields.io/github/tag/langurmonkey/gaiasky.svg)](https://github.com/langurmonkey/gaiasky/tags/)
 
-[**Gaia Sky VR**](https://zah.uni-heidelberg.de/gaia/outreach/gaiasky) is a real-time, 3D, astronomy VR software that
+[**Gaia Sky VR**](https://zah.uni-heidelberg.de/gaia/outreach/gaiasky) is a real-time, 3D Universe VR application that
 runs on multiple headsets and operating systems thanks to Valve's [OpenVR](https://github.com/ValveSoftware/openvr). It is developed in the framework of [ESA](http://www.esa.int/ESA)'s [Gaia mission](http://sci.esa.int/gaia) to chart about 1 billion stars of our Galaxy.
+
+<img src="header.jpg" alt="Gaia Sky header" style="max-height: 20em;" />
+
 To get the latest up-to-date and most complete information,
 
 *  Visit our [**home page**](https://zah.uni-heidelberg.de/gaia/outreach/gaiasky)
@@ -64,32 +66,10 @@ To run Gaia Sky VR, make sure that both the Oculus runtime and Steam VR are runn
 $  gradlew.bat core:run
 ```
 
-**Tip**: Gaia Sky will check that you are using Java 1.8 when running the build. You can still use a newer JDK version (e.g. JDK 10) by setting the following environment variable to `false` in the context of gradle:
-
-```
-$  export GS_JAVA_VERSION_CHECK=false
-```
-
 
 ### 1.5 CLI arguments
 
-Gaia Sky accepts a few command-line arguments:
-
-```
-Usage: gaiasky [options]
- Options:
-    -c, --cat-chooser
-      Displays the catalog chooser dialog at startup
-      Default: false
-    -d, --ds-download
-      Displays the download dialog at startup
-      Default: false
-    -h, --help
-      Shows help
-    -v, --version
-      Lists version and build inforamtion
-      Default: false
-```
+Run `gaiasky -h` or `man gaiasky` to find out about how to launch Gaia Sky and what arguments are accepted.
 
 ### 2.5 Getting the data
 

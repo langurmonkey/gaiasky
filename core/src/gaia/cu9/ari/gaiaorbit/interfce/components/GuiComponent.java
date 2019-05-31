@@ -1,14 +1,13 @@
-package gaia.cu9.ari.gaiaorbit.interfce.components;
+/*
+ * This file is part of Gaia Sky, which is released under the Mozilla Public License 2.0.
+ * See the file LICENSE.md in the project root for full license details.
+ */
 
-import java.util.ArrayList;
-import java.util.List;
+package gaia.cu9.ari.gaiaorbit.interfce.components;
 
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
-
-import gaia.cu9.ari.gaiaorbit.util.GlobalConf;
-import gaia.cu9.ari.gaiaorbit.util.I18n;
 
 /** 
  * A GUI component
@@ -17,8 +16,6 @@ import gaia.cu9.ari.gaiaorbit.util.I18n;
  */
 public abstract class GuiComponent {
 
-    protected static List<Actor> tooltips = new ArrayList<Actor>(30);
-    protected static final int HPADDING = 10 * Math.round(GlobalConf.SCALE_FACTOR);
     protected Actor component;
     protected Skin skin;
     protected Stage stage;
@@ -35,14 +32,6 @@ public abstract class GuiComponent {
 
     public Actor getActor() {
         return component;
-    }
-
-    protected String txt(String key) {
-        return I18n.bundle.get(key);
-    }
-
-    protected String txt(String key, Object... params) {
-        return I18n.bundle.format(key, params);
     }
 
     /**

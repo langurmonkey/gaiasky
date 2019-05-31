@@ -1,26 +1,42 @@
+/*
+ * This file is part of Gaia Sky, which is released under the Mozilla Public License 2.0.
+ * See the file LICENSE.md in the project root for full license details.
+ */
+
 package gaia.cu9.ari.gaiaorbit.interfce;
 
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.InputMultiplexer;
+import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.utils.Array;
-
+import gaia.cu9.ari.gaiaorbit.desktop.util.SysUtils;
 import gaia.cu9.ari.gaiaorbit.event.EventManager;
 import gaia.cu9.ari.gaiaorbit.event.Events;
 import gaia.cu9.ari.gaiaorbit.event.IObserver;
+import gaia.cu9.ari.gaiaorbit.script.EventScriptingInterface;
+import gaia.cu9.ari.gaiaorbit.util.CatalogInfo;
+import gaia.cu9.ari.gaiaorbit.util.I18n;
+import gaia.cu9.ari.gaiaorbit.util.Logger;
+import gaia.cu9.ari.gaiaorbit.util.scene2d.FileChooser;
+
+import java.io.File;
 
 /**
  * Manages the Graphical User Interfaces of Gaia Sky
- * @author tsagrista
  *
+ * @author tsagrista
  */
 public class GuiRegistry implements IObserver {
-
-    /** Registered GUI array **/
+    private static final Logger.Log logger = Logger.getLogger(GuiRegistry.class);
+    /**
+     * Registered GUI array
+     **/
     private static Array<IGui> guis;
 
     static {
-        guis = new Array<IGui>(true, 2);
+        guis = new Array<>(true, 2);
     }
 
     /**
@@ -28,12 +44,18 @@ public class GuiRegistry implements IObserver {
      */
     public static Object guirenderlock = new Object();
 
-    /** Current GUI object **/
+    /**
+     * Current GUI object
+     **/
     public static IGui current;
-    /** Previous GUI object, if any **/
+    /**
+     * Previous GUI object, if any
+     **/
     public static IGui previous;
 
-    /** Global input multiplexer **/
+    /**
+     * Global input multiplexer
+     **/
     private static InputMultiplexer im = null;
 
     public static void setInputMultiplexer(InputMultiplexer im) {
@@ -43,7 +65,8 @@ public class GuiRegistry implements IObserver {
     /**
      * Switches the current GUI with the given one, updating the processors.
      * It also sets the previous GUI to the given value.
-     * @param gui The new GUI
+     *
+     * @param gui      The new GUI
      * @param previous The new previous GUI
      */
     public static void change(IGui gui, IGui previous) {
@@ -55,6 +78,7 @@ public class GuiRegistry implements IObserver {
 
     /**
      * Switches the current GUI with the given one, updating the processors
+     *
      * @param gui The new gui
      */
     public static void change(IGui gui) {
@@ -73,6 +97,7 @@ public class GuiRegistry implements IObserver {
 
     /**
      * Unsets the given GUI and sets it as previous
+     *
      * @param gui The GUI
      */
     public static void unset(IGui gui) {
@@ -85,6 +110,7 @@ public class GuiRegistry implements IObserver {
 
     /**
      * Sets the given GUI as current
+     *
      * @param gui The new GUI
      */
     public static void set(IGui gui) {
@@ -97,6 +123,7 @@ public class GuiRegistry implements IObserver {
 
     /**
      * Sets the given GUI as previous
+     *
      * @param gui The new previous GUI
      */
     public static void setPrevious(IGui gui) {
@@ -105,6 +132,7 @@ public class GuiRegistry implements IObserver {
 
     /**
      * Registers a new GUI
+     *
      * @param gui The GUI to register
      */
     public static void registerGui(IGui gui) {
@@ -114,6 +142,7 @@ public class GuiRegistry implements IObserver {
 
     /**
      * Unregisters a GUI
+     *
      * @param gui The GUI to unregister
      * @return True if the GUI was unregistered
      */
@@ -123,6 +152,7 @@ public class GuiRegistry implements IObserver {
 
     /**
      * Unregisters all GUIs
+     *
      * @return True if operation succeeded
      */
     public static boolean unregisterAll() {
@@ -132,6 +162,7 @@ public class GuiRegistry implements IObserver {
 
     /**
      * Renders the registered GUIs
+     *
      * @param rw The render width
      * @param rh The render height
      */
@@ -146,6 +177,7 @@ public class GuiRegistry implements IObserver {
 
     /**
      * Updates the registered GUIs
+     *
      * @param dt The delta time in seconds
      */
     public static void update(double dt) {
@@ -156,13 +188,32 @@ public class GuiRegistry implements IObserver {
     private Skin skin;
 
     /**
+     * Keyframes window
+     **/
+    private KeyframesWindow keyframesWindow;
+
+    /**
+     * Minimap window
+     **/
+    private MinimapWindow minimapWindow;
+
+    /**
+     * Last open location
+     */
+    private File lastOpenLocation;
+
+    /**
      * One object to handle observer pattern
      */
     public GuiRegistry(Skin skin) {
         super();
         this.skin = skin;
         // Windows which are visible from any GUI
-        EventManager.instance.subscribe(this, Events.SHOW_QUIT_ACTION, Events.SHOW_ABOUT_ACTION, Events.SHOW_PREFERENCES_ACTION);
+        EventManager.instance.subscribe(this, Events.SHOW_QUIT_ACTION, Events.SHOW_ABOUT_ACTION, Events.SHOW_LOAD_CATALOG_ACTION, Events.SHOW_PREFERENCES_ACTION, Events.SHOW_KEYFRAMES_WINDOW_ACTION, Events.UI_THEME_RELOAD_INFO, Events.TOGGLE_MINIMAP);
+    }
+
+    public void dispose() {
+        EventManager.instance.removeAllSubscriptions(this);
     }
 
     @Override
@@ -172,13 +223,85 @@ public class GuiRegistry implements IObserver {
             // Treats windows that can appear in any GUI
             switch (event) {
             case SHOW_QUIT_ACTION:
-                (new QuitWindow(ui, skin)).show(ui);
+                QuitWindow quit = new QuitWindow(ui, skin);
+                if (data.length > 0) {
+                    quit.setAcceptRunnable((Runnable) data[0]);
+                }
+                quit.show(ui);
                 break;
             case SHOW_ABOUT_ACTION:
                 (new AboutWindow(ui, skin)).show(ui);
                 break;
             case SHOW_PREFERENCES_ACTION:
                 (new PreferencesWindow(ui, skin)).show(ui);
+                break;
+            case SHOW_LOAD_CATALOG_ACTION:
+                if (lastOpenLocation == null) {
+                    lastOpenLocation = SysUtils.getHomeDir();
+                } else if(!lastOpenLocation.exists() || !lastOpenLocation.isDirectory()) {
+                    lastOpenLocation = SysUtils.getHomeDir();
+                }
+
+                FileChooser fc = new FileChooser(I18n.txt("gui.loadcatalog"), skin, ui, new FileHandle(lastOpenLocation), FileChooser.FileChooserTarget.FILES);
+                fc.setAcceptText(I18n.txt("gui.loadcatalog"));
+                fc.setFileFilter(pathname -> pathname.getName().endsWith(".vot") || pathname.getName().endsWith(".csv"));
+                fc.setAcceptedFiles("*.vot, *.csv");
+                fc.setResultListener((success, result) -> {
+                    if (success) {
+                        if (result.file().exists() && result.file().isFile()) {
+                            // Load selected file
+                            try {
+                                Runnable loader = () -> {
+                                    try {
+                                        EventScriptingInterface.instance().loadDataset(result.file().getName(), result.file().getAbsolutePath(), CatalogInfo.CatalogInfoType.UI, true);
+                                        // Open UI datasets
+                                        EventScriptingInterface.instance().maximizeInterfaceWindow();
+                                        EventScriptingInterface.instance().expandGuiComponent("DatasetsComponent");
+                                    }catch (Exception e){
+                                        logger.error(I18n.txt("notif.error", result.file().getName()), e);
+                                    }
+                                };
+                                // Load in new thread
+                                Thread t = new Thread(loader);
+                                t.start();
+
+                                lastOpenLocation = result.file().getParentFile();
+                                return true;
+                            } catch (Exception e) {
+                                logger.error(I18n.txt("notif.error", result.file().getName()), e);
+                                return false;
+                            }
+
+                        } else {
+                            logger.error("Selection must be a file: " + result.file().getAbsolutePath());
+                            return false;
+                        }
+                    }
+                    return false;
+                });
+                fc.show(ui);
+                break;
+            case TOGGLE_MINIMAP:
+                if (minimapWindow == null)
+                    minimapWindow = new MinimapWindow(ui, skin);
+                if (!minimapWindow.isVisible() || !minimapWindow.hasParent())
+                    minimapWindow.show(ui, Gdx.graphics.getWidth() - minimapWindow.getWidth(), Gdx.graphics.getHeight() - minimapWindow.getHeight());
+                else
+                    minimapWindow.hide();
+                break;
+            case SHOW_KEYFRAMES_WINDOW_ACTION:
+                if (keyframesWindow == null) {
+                    keyframesWindow = new KeyframesWindow(ui, skin);
+                }
+                if (!keyframesWindow.isVisible() || !keyframesWindow.hasParent())
+                    keyframesWindow.show(ui, 0, 0);
+                break;
+            case UI_THEME_RELOAD_INFO:
+                if (keyframesWindow != null) {
+                    keyframesWindow.dispose();
+                    keyframesWindow = null;
+                }
+                this.skin = (Skin) data[0];
                 break;
             default:
                 break;

@@ -1,154 +1,61 @@
+/*
+ * This file is part of Gaia Sky, which is released under the Mozilla Public License 2.0.
+ * See the file LICENSE.md in the project root for full license details.
+ */
+
 package gaia.cu9.ari.gaiaorbit.scenegraph;
 
-import com.badlogic.gdx.math.Matrix4;
-import com.badlogic.gdx.utils.Array;
-
-import gaia.cu9.ari.gaiaorbit.data.orbit.PolylineData;
-import gaia.cu9.ari.gaiaorbit.render.IGPULineRenderable;
+import com.badlogic.gdx.graphics.GL20;
+import gaia.cu9.ari.gaiaorbit.render.ILineRenderable;
 import gaia.cu9.ari.gaiaorbit.render.system.LineRenderSystem;
 import gaia.cu9.ari.gaiaorbit.scenegraph.camera.ICamera;
-import gaia.cu9.ari.gaiaorbit.util.time.ITimeFrameProvider;
+import gaia.cu9.ari.gaiaorbit.util.math.Vector3d;
 
 /**
- * Represents a polyline which is sent to the GPU
- * @author tsagrista
+ * Represents a polyline. Can use GPU or CPU method.
  *
+ * @author tsagrista
  */
-public class Polyline extends LineObject implements IGPULineRenderable {
-
-    /** GPU rendering attributes **/
-    protected boolean inGpu = false;
-    /**
-     * Whether the meshdata has been created or not
-     */
-    protected boolean hasMeshData = false;
-    protected int offset;
-    protected int count;
-
-    // Line width
-    protected float lineWidth = 1f;
-
-    protected PolylineData polylineData;
+public class Polyline extends VertsObject implements ILineRenderable {
 
     public Polyline() {
-        super();
-        this.localTransform = new Matrix4();
+        super(RenderGroup.LINE_GPU);
+    }
+
+    public Polyline(RenderGroup rg) {
+        super(rg);
     }
 
     @Override
     public void render(LineRenderSystem renderer, ICamera camera, float alpha) {
+        // Render line CPU
+        if (pointCloudData != null && pointCloudData.getNumPoints() > 1) {
+            Vector3d prev = aux3d1.get();
+
+            for (int i = 0; i < pointCloudData.getNumPoints(); i++) {
+                pointCloudData.loadPoint(prev, i);
+                prev.add(translation);
+                renderer.addPoint(this, (float) prev.x, (float) prev.y, (float) prev.z, cc[0], cc[1], cc[2], (alpha) * cc[3]);
+            }
+            renderer.breakLine();
+        }
     }
 
     @Override
     protected void addToRenderLists(ICamera camera) {
-        addToRender(this, RenderGroup.LINE_GPU);
-    }
-
-    @Override
-    public void updateLocalValues(ITimeFrameProvider time, ICamera camera) {
-        translation.getMatrix(localTransform);
-    }
-
-    /**
-     * Sets the 3D points of the line in the internal reference system.
-     * @param points Vector with the points. If length is not multiple of 3, some points are discarded.
-     */
-    public void setPoints(double[] points) {
-        int n = points.length;
-        if (n % 3 != 0) {
-            n = n - n % 3;
-        }
-        int npoints = n / 3;
-        polylineData = new PolylineData(npoints);
-        Array<Double> x = polylineData.x;
-        Array<Double> y = polylineData.y;
-        Array<Double> z = polylineData.z;
-        for (int i = 0; i < npoints; i++) {
-            x.add(points[i * 3]);
-            y.add(points[i * 3 + 1]);
-            z.add(points[i * 3 + 2]);
-        }
-    }
-
-    @Override
-    public boolean inGpu() {
-        return inGpu;
-    }
-
-    @Override
-    public int getOffset() {
-        return offset;
-    }
-
-    @Override
-    public int getCount() {
-        return count;
-    }
-
-    @Override
-    public PolylineData getPolyline() {
-        return polylineData;
-    }
-
-    @Override
-    public float[] getColor() {
-        return cc;
-    }
-
-    @Override
-    public double getAlpha() {
-        return cc[3];
-    }
-
-    @Override
-    public Matrix4 getLocalTransform() {
-        return localTransform;
-    }
-
-    @Override
-    public SceneGraphNode getParent() {
-        return parent;
-    }
-
-    @Override
-    public void setInGpu(boolean inGpu) {
-        this.inGpu = inGpu;
-    }
-
-    @Override
-    public void setOffset(int offset) {
-        this.offset = offset;
-        this.hasMeshData = true;
-    }
-
-    @Override
-    public void setCount(int count) {
-        this.count = count;
-    }
-
-    public void setLineWidth(Double lineWidth) {
-        this.lineWidth = lineWidth.floatValue();
-    }
-
-    @Override
-    public void setLineWidth(float lineWidth) {
-        this.lineWidth = lineWidth;
+        // Lines only make sense with 2 or more points
+        if (pointCloudData != null && pointCloudData.getNumPoints() > 1)
+            addToRender(this, renderGroup);
     }
 
     @Override
     public float getLineWidth() {
-        return lineWidth;
+        return getPrimitiveSize();
     }
 
     @Override
-    public void markForUpdate() {
-        this.inGpu = false;
+    public int getGlType() {
+        return GL20.GL_LINE_STRIP;
     }
-
-    @Override
-    public boolean hasMeshData() {
-        return this.hasMeshData;
-    }
-
 
 }

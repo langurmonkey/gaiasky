@@ -1,3 +1,8 @@
+/*
+ * This file is part of Gaia Sky, which is released under the Mozilla Public License 2.0.
+ * See the file LICENSE.md in the project root for full license details.
+ */
+
 package gaia.cu9.ari.gaiaorbit.data;
 
 import com.badlogic.gdx.Gdx;
@@ -31,9 +36,8 @@ import java.util.concurrent.atomic.AtomicBoolean;
 /**
  * Contains the infrastructure common to all multifile octree loaders which
  * streams data on-demand from disk and unloads unused data.
- * 
- * @author tsagrista
  *
+ * @author tsagrista
  */
 public abstract class StreamingOctreeLoader implements IObserver, ISceneGraphLoader {
     private static final Log logger = Logger.getLogger(StreamingOctreeLoader.class);
@@ -71,7 +75,7 @@ public abstract class StreamingOctreeLoader implements IObserver, ISceneGraphLoa
 
     /** Last time of a queue clear event went through **/
     protected long lastQueueClearMs = 0;
-    
+
     // Dataset name and description
     protected String name, description;
 
@@ -181,14 +185,14 @@ public abstract class StreamingOctreeLoader implements IObserver, ISceneGraphLoa
 
     /**
      * Loads the nodes and the octree
-     * 
+     *
      * @return
      */
     protected abstract AbstractOctreeWrapper loadOctreeData();
 
     /**
      * Adds the octant to the load queue
-     * 
+     *
      * @param octant
      */
     public static void queue(OctreeNode octant) {
@@ -228,7 +232,7 @@ public abstract class StreamingOctreeLoader implements IObserver, ISceneGraphLoa
 
     /**
      * Moves the octant to the end of the unload queue
-     * 
+     *
      * @param octant
      */
     public static void touch(OctreeNode octant) {
@@ -295,7 +299,7 @@ public abstract class StreamingOctreeLoader implements IObserver, ISceneGraphLoa
     }
 
     /**
-     * Tells the daemon to immediately stop the loading of 
+     * Tells the daemon to immediately stop the loading of
      * octants and wait for new data
      */
     public void abortCurrentLoading() {
@@ -304,11 +308,9 @@ public abstract class StreamingOctreeLoader implements IObserver, ISceneGraphLoa
 
     /**
      * Loads all the levels of detail until the given one.
-     * 
-     * @param lod
-     *            The level of detail to load.
-     * @param octreeWrapper
-     *            The octree wrapper.
+     *
+     * @param lod           The level of detail to load.
+     * @param octreeWrapper The octree wrapper.
      * @throws IOException
      */
     public void loadLod(final Integer lod, final AbstractOctreeWrapper octreeWrapper) throws IOException {
@@ -318,13 +320,10 @@ public abstract class StreamingOctreeLoader implements IObserver, ISceneGraphLoa
     /**
      * Loads the data of the given octant and its children down to the given
      * level
-     * 
-     * @param octant
-     *            The octant to load.
-     * @param octreeWrapper
-     *            The octree wrapper.
-     * @param level
-     *            The depth to load
+     *
+     * @param octant        The octant to load.
+     * @param octreeWrapper The octree wrapper.
+     * @param level         The depth to load
      * @throws IOException
      */
     public void loadOctant(final OctreeNode octant, final AbstractOctreeWrapper octreeWrapper, Integer level) throws IOException {
@@ -341,13 +340,10 @@ public abstract class StreamingOctreeLoader implements IObserver, ISceneGraphLoa
 
     /**
      * Loads the objects of the given octants
-     * 
-     * @param octants
-     *            The list holding the octants to load.
-     * @param octreeWrapper
-     *            The octree wrapper.
-     * @param abort
-     *            State variable that will be set to true if an abort is called.
+     *
+     * @param octants       The list holding the octants to load.
+     * @param octreeWrapper The octree wrapper.
+     * @param abort         State variable that will be set to true if an abort is called.
      * @return The actual number of loaded octants
      * @throws IOException
      */
@@ -376,7 +372,7 @@ public abstract class StreamingOctreeLoader implements IObserver, ISceneGraphLoa
 
     /**
      * Unloads the given octant
-     * 
+     *
      * @param octant
      * @param octreeWrapper
      */
@@ -406,14 +402,11 @@ public abstract class StreamingOctreeLoader implements IObserver, ISceneGraphLoa
 
     /**
      * Loads the data of the given octant
-     * 
-     * @param octant
-     *            The octant to load.
-     * @param octreeWrapper
-     *            The octree wrapper.
-     * @param fullinit
-     *            Whether to fully initialise the objects (on-demand load) or
-     *            not (startup)
+     *
+     * @param octant        The octant to load.
+     * @param octreeWrapper The octree wrapper.
+     * @param fullinit      Whether to fully initialise the objects (on-demand load) or
+     *                      not (startup)
      * @return True if the octant was loaded, false otherwise
      * @throws IOException
      */
@@ -421,9 +414,8 @@ public abstract class StreamingOctreeLoader implements IObserver, ISceneGraphLoa
 
     /**
      * The daemon loader thread.
-     * 
-     * @author Toni Sagrista
      *
+     * @author Toni Sagrista
      */
     protected static class DaemonLoader extends Thread {
         private boolean awake;
@@ -440,7 +432,7 @@ public abstract class StreamingOctreeLoader implements IObserver, ISceneGraphLoa
             this.abort = new AtomicBoolean(false);
             this.loader = loader;
             this.octreeWrapper = aow;
-            this.toLoad = new Array<OctreeNode>();
+            this.toLoad = new Array<>();
         }
 
         /**
@@ -465,7 +457,7 @@ public abstract class StreamingOctreeLoader implements IObserver, ISceneGraphLoa
                     toLoad.clear();
                     int i = 0;
                     while (instance.toLoadQueue.peek() != null && i <= MAX_LOAD_CHUNK) {
-                        OctreeNode octant = (OctreeNode) instance.toLoadQueue.poll();
+                        OctreeNode octant = instance.toLoadQueue.poll();
                         toLoad.add(octant);
                         i++;
                     }
@@ -485,9 +477,9 @@ public abstract class StreamingOctreeLoader implements IObserver, ISceneGraphLoa
                     // Release resources if needed
                     int nUnloaded = 0;
                     int nStars = loader.nLoadedStars;
-                    if (running && nStars >= loader.maxLoadedStars)
+                    if (running && nStars >= loader.maxLoadedStars) //-V6007
                         while (true) {
-                            // Get first in queue (unaccessed for the longest time)
+                            // Get first in queue (non-accessed for the longest time)
                             // and release it
                             OctreeNode octant = loader.toUnloadQueue.poll();
                             if (octant != null && octant.getStatus() == LoadStatus.LOADED) {
@@ -504,7 +496,8 @@ public abstract class StreamingOctreeLoader implements IObserver, ISceneGraphLoa
 
                     Gdx.app.postRunnable(() -> {
                         // Update octree numbers
-                        octreeWrapper.root.updateNumbers();
+                        if (octreeWrapper != null && octreeWrapper.root != null)
+                            octreeWrapper.root.updateNumbers();
                         // Update constellations :S
                         Constellation.updateConstellations();
                     });

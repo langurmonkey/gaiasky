@@ -1,24 +1,15 @@
-package gaia.cu9.ari.gaiaorbit.interfce;
+/*
+ * This file is part of Gaia Sky, which is released under the Mozilla Public License 2.0.
+ * See the file LICENSE.md in the project root for full license details.
+ */
 
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileWriter;
-import java.time.Instant;
-import java.util.List;
+package gaia.cu9.ari.gaiaorbit.interfce;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.scenes.scene2d.Stage;
-import com.badlogic.gdx.scenes.scene2d.ui.Button;
-import com.badlogic.gdx.scenes.scene2d.ui.HorizontalGroup;
-import com.badlogic.gdx.scenes.scene2d.ui.Image;
-import com.badlogic.gdx.scenes.scene2d.ui.Label;
-import com.badlogic.gdx.scenes.scene2d.ui.ScrollPane;
-import com.badlogic.gdx.scenes.scene2d.ui.Skin;
-import com.badlogic.gdx.scenes.scene2d.ui.Table;
-import com.badlogic.gdx.scenes.scene2d.ui.TextTooltip;
+import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener.ChangeEvent;
 import com.badlogic.gdx.utils.Align;
-
 import gaia.cu9.ari.gaiaorbit.desktop.util.SysUtils;
 import gaia.cu9.ari.gaiaorbit.util.GlobalConf;
 import gaia.cu9.ari.gaiaorbit.util.I18n;
@@ -30,6 +21,12 @@ import gaia.cu9.ari.gaiaorbit.util.scene2d.OwnLabel;
 import gaia.cu9.ari.gaiaorbit.util.scene2d.OwnScrollPane;
 import gaia.cu9.ari.gaiaorbit.util.scene2d.OwnTextButton;
 import gaia.cu9.ari.gaiaorbit.util.scene2d.OwnTextIconButton;
+
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
+import java.time.Instant;
+import java.util.List;
 
 public class LogWindow extends GenericDialog {
 
@@ -43,11 +40,11 @@ public class LogWindow extends GenericDialog {
     private float w, h, pad;
 
     public LogWindow(Stage stage, Skin skin) {
-        super(txt("gui.log.title"), skin, stage);
+        super(I18n.txt("gui.log.title"), skin, stage);
 
         this.format = DateFormatFactory.getFormatter(I18n.locale, DateType.DATETIME);
         this.setResizable(true);
-        setCancelText(txt("gui.close"));
+        setCancelText(I18n.txt("gui.close"));
 
         // Build
         buildSuper();
@@ -79,10 +76,10 @@ public class LogWindow extends GenericDialog {
         buttons.pad(pad);
         buttons.space(pad);
 
-        Image reloadImg = new Image(skin.getDrawable("reload"));
-        Button reload = new OwnTextIconButton("", reloadImg, skin);
+        Button reload = new OwnTextIconButton("", skin, "reload");
         reload.setName("update log");
-        reload.addListener(new TextTooltip(txt("gui.log.update"), skin));
+        reload.pad(pad5);
+        reload.addListener(new TextTooltip(I18n.txt("gui.log.update"), skin));
         reload.addListener((event) -> {
             if (event instanceof ChangeEvent) {
                 update();
@@ -91,8 +88,9 @@ public class LogWindow extends GenericDialog {
         });
         buttons.addActor(reload);
 
-        Button export = new OwnTextButton(txt("gui.log.export"), skin);
+        Button export = new OwnTextButton(I18n.txt("gui.log.export"), skin);
         export.setName("export log");
+        export.pad(pad5);
         export.addListener((event) -> {
             if (event instanceof ChangeEvent) {
                 export();
@@ -119,7 +117,8 @@ public class LogWindow extends GenericDialog {
 
     public void export() {
         String filename = Instant.now().toString() + "_gaiasky.log";
-        File gshome = SysUtils.getGSHomeDir();
+        filename = filename.replace(":", "-");
+        File gshome = SysUtils.getDataDir();
         File log = new File(gshome, filename);
 
         try {

@@ -1,29 +1,28 @@
+/*
+ * This file is part of Gaia Sky, which is released under the Mozilla Public License 2.0.
+ * See the file LICENSE.md in the project root for full license details.
+ */
+
 package gaia.cu9.ari.gaiaorbit.util.scene2d;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Cursor.SystemCursor;
-import com.badlogic.gdx.graphics.Pixmap;
-import com.badlogic.gdx.scenes.scene2d.Event;
-import com.badlogic.gdx.scenes.scene2d.EventListener;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.InputEvent.Type;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
-
 import gaia.cu9.ari.gaiaorbit.util.GlobalResources;
 
 /**
  * TextButton in which the cursor changes when the mouse rolls over. It also
  * fixes the size issue.
- * 
- * @author Toni Sagrista
  *
+ * @author Toni Sagrista
  */
 public class OwnTextButton extends TextButton {
 
     private float ownwidth = 0f, ownheight = 0f;
     OwnTextButton me;
-    Pixmap cursor;
 
     public OwnTextButton(String text, Skin skin) {
         super(text, skin);
@@ -44,23 +43,20 @@ public class OwnTextButton extends TextButton {
     }
 
     private void initialize() {
-        this.addListener(new EventListener() {
-            @Override
-            public boolean handle(Event event) {
-                if (event instanceof InputEvent) {
-                    Type type = ((InputEvent) event).getType();
-                    if (type == Type.enter) {
-                        if (!me.isDisabled())
-                            Gdx.graphics.setCursor(Gdx.graphics.newCursor(cursor != null ? cursor : GlobalResources.linkCursor, 4, 0));
-                        return true;
-                    } else if (type == Type.exit) {
-                        Gdx.graphics.setSystemCursor(SystemCursor.Arrow);
-                        return true;
-                    }
-
+        this.addListener((event) -> {
+            if (event instanceof InputEvent) {
+                Type type = ((InputEvent) event).getType();
+                if (type == Type.enter) {
+                    if (!me.isDisabled())
+                        Gdx.graphics.setCursor(GlobalResources.linkCursor);
+                    return true;
+                } else if (type == Type.exit) {
+                    Gdx.graphics.setSystemCursor(SystemCursor.Arrow);
+                    return true;
                 }
-                return false;
+
             }
+            return false;
         });
     }
 
@@ -69,7 +65,7 @@ public class OwnTextButton extends TextButton {
         ownwidth = width;
         super.setWidth(width);
     }
-    
+
     public void setMinWidth(float width) {
         this.setWidth(Math.max(width, getWidth()));
     }
@@ -107,10 +103,6 @@ public class OwnTextButton extends TextButton {
         } else {
             return super.getPrefHeight();
         }
-    }
-
-    public void setCursor(Pixmap cursor) {
-        this.cursor = cursor;
     }
 
 }
