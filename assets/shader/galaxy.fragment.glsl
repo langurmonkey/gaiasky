@@ -1,6 +1,7 @@
 #version 330 core
 
 #include shader/lib_math.glsl
+#include shader/lib_dither8x8.glsl
 
 uniform float u_ar;
 uniform float u_alpha;
@@ -27,6 +28,7 @@ vec4 colorStar(float alpha, float dist, vec2 uv) {
     return v_col * v_col.a * programmatic(uv, dist) * v_dscale * alpha;
 }
 
+
 void main() {
     vec2 uv = vec2(gl_PointCoord.s, gl_PointCoord.t);
     uv.y = uv.y / u_ar;
@@ -36,11 +38,15 @@ void main() {
     }
 
     if (v_dust > 0.5){
-        // down
         fragColor = colorDust(u_alpha);
+        if(u_alpha < 1.0){
+            if(dither(gl_FragCoord.xy, u_alpha) < 0.5)
+                discard;
+        }
     } else {
         fragColor = colorStar(u_alpha, dist, uv);
     }
+
 
     // Logarithmic depth buffer
     gl_FragDepth = v_depth;

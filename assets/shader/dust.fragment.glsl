@@ -1,5 +1,7 @@
 #version 330 core
 
+#include shader/lib_dither8x8.glsl
+
 ////////////////////////////////////////////////////////////////////////////////////
 ////////// POSITION ATTRIBUTE - FRAGMENT
 ////////////////////////////////////////////////////////////////////////////////////
@@ -30,12 +32,13 @@ void main() {
     vec3 baseColor = diffuse.rgb;
     float edge = pow(max(0.0, dot(N, V)), 3.0);
 
-    fragColor = vec4(baseColor * edge, 1.0) * v_opacity;
+    fragColor = vec4(baseColor.rgb * edge, 1.0) * v_opacity;
+
 
     // Prevent saturation
     fragColor = clamp(fragColor, 0.0, 1.0);
 
-    if(fragColor.a == 0.0){
+    if(fragColor.a == 0.0 || dither(gl_FragCoord.xy, fragColor.a) < 0.5){
         discard;
     }
     gl_FragDepth = v_depth;

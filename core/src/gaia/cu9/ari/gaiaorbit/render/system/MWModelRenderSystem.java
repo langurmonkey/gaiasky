@@ -73,7 +73,7 @@ public class MWModelRenderSystem extends ImmediateRenderSystem implements IObser
         return null;
     }
 
-    private GpuData convertDataToGpu(Array<? extends ParticleBean> data, ColorGenerator cg) {
+    private GpuData convertDataToGpu(Array<? extends ParticleBean> data, ColorGenerator cg, boolean dust) {
         float hiDpiScaleFactor = GlobalConf.SCALE_FACTOR;
 
         GpuData ad = new GpuData();
@@ -94,7 +94,7 @@ public class MWModelRenderSystem extends ImmediateRenderSystem implements IObser
             // SIZE
             double starSize = star.data[3];
             ad.vertices[ad.vertexIdx + additionalOffset] = (float) (starSize * hiDpiScaleFactor);
-            ad.vertices[ad.vertexIdx + additionalOffset + 1] = 0;
+            ad.vertices[ad.vertexIdx + additionalOffset + 1] = dust? 1 : 0;
 
             // POSITION
             aux3f1.set((float) star.data[0], (float) star.data[1], (float) star.data[2]);
@@ -112,11 +112,11 @@ public class MWModelRenderSystem extends ImmediateRenderSystem implements IObser
     private void convertDataToGpuFormat(MilkyWay mw) {
         logger.info("Converting galaxy data to VRAM format");
         StarColorGenerator scg = new StarColorGenerator();
-        bulgeA = convertDataToGpu(mw.bulgeData, scg);
-        starsA = convertDataToGpu(mw.starData, scg);
-        hiiA = convertDataToGpu(mw.hiiData, scg);
-        gasA = convertDataToGpu(mw.gasData, scg);
-        dustA = convertDataToGpu(mw.dustData, new DustColorGenerator());
+        bulgeA = convertDataToGpu(mw.bulgeData, scg, false);
+        starsA = convertDataToGpu(mw.starData, scg, false);
+        hiiA = convertDataToGpu(mw.hiiData, scg, false);
+        gasA = convertDataToGpu(mw.gasData, scg, false);
+        dustA = convertDataToGpu(mw.dustData, new DustColorGenerator(), true);
     }
 
     private void streamToGpu() {
