@@ -230,6 +230,9 @@ public final class Levels extends PostProcessorEffect {
             // Ugly hack, but works
             lumaMax = GaiaSky.instance.getICamera().getPos().len() * Constants.U_TO_PC > 10000 ? lumaAvg * 5000f : lumaAvg * 30f;
 
+
+            System.out.println(lumaAvg + " / " + lumaMax);
+
             lowPassFilter();
         }
     }

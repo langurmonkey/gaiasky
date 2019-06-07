@@ -324,6 +324,9 @@ public class GlobalConf {
             Array<Controller> controllers = Controllers.getControllers();
             for (Controller controller : controllers) {
                 if (!isControllerBlacklisted(controller.getName())) {
+                    // Prevent duplicates
+                    controller.removeListener(listener);
+                    // Add
                     controller.addListener(listener);
                 }
             }
@@ -885,11 +888,7 @@ public class GlobalConf {
 
                     // Post a message to the screen
                     if (stereomode)
-                        EventManager.instance.post(Events.SCREEN_NOTIFICATION_CMD,
-                                "Stereoscopic mode activated!",
-                                new String[] { "<CTRL+S>   back to normal mode",
-                                        "<CTRL+SHIFT+S>  switch stereoscopic profile" },
-                                10f);
+                        EventManager.instance.post(Events.SCREEN_NOTIFICATION_CMD, "Stereoscopic mode activated!", new String[] { "<CTRL+S>   back to normal mode", "<CTRL+SHIFT+S>  switch stereoscopic profile" }, 10f);
                 }
                 break;
             case STEREO_PROFILE_CMD:
@@ -900,11 +899,7 @@ public class GlobalConf {
 
                 // Post a message to the screen
                 if (CUBEMAP360_MODE)
-                    EventManager.instance.post(Events.SCREEN_NOTIFICATION_CMD,
-                            "360 mode activated!",
-                            new String[] { "<CTRL+K>   back to normal mode",
-                                    "<CTRL+SHIFT+K>  switch projection type" },
-                            10f);
+                    EventManager.instance.post(Events.SCREEN_NOTIFICATION_CMD, "360 mode activated!", new String[] { "<CTRL+K>   back to normal mode", "<CTRL+SHIFT+K>  switch projection type" }, 10f);
                 break;
             case CUBEMAP_PROJECTION_CMD:
                 CUBEMAP_PROJECTION = (CubemapProjections.CubemapProjection) data[0];
@@ -992,29 +987,33 @@ public class GlobalConf {
 
             public String key;
             public String suffix;
-            GraphicsQuality(String key, String suffix){
+
+            GraphicsQuality(String key, String suffix) {
                 this.key = key;
                 this.suffix = suffix;
             }
 
-            public boolean isAtLeast(GraphicsQuality gq){
+            public boolean isAtLeast(GraphicsQuality gq) {
                 return this.ordinal() >= gq.ordinal();
             }
 
-            public boolean isAtMost(GraphicsQuality gq){
+            public boolean isAtMost(GraphicsQuality gq) {
                 return this.ordinal() <= gq.ordinal();
             }
 
-            public boolean isLow(){
+            public boolean isLow() {
                 return this.equals(LOW);
             }
-            public boolean isNormal(){
+
+            public boolean isNormal() {
                 return this.equals(NORMAL);
             }
-            public boolean isHigh(){
+
+            public boolean isHigh() {
                 return this.equals(HIGH);
             }
-            public boolean isUltra(){
+
+            public boolean isUltra() {
                 return this.equals(ULTRA);
             }
         }
@@ -1188,9 +1187,9 @@ public class GlobalConf {
             EventManager.instance.subscribe(this, Events.TOGGLE_VISIBILITY_CMD, Events.FOCUS_LOCK_CMD, Events.ORIENTATION_LOCK_CMD, Events.STAR_BRIGHTNESS_CMD, Events.PM_LEN_FACTOR_CMD, Events.PM_NUM_FACTOR_CMD, Events.PM_COLOR_MODE_CMD, Events.PM_ARROWHEADS_CMD, Events.FOV_CHANGED_CMD, Events.CAMERA_SPEED_CMD, Events.ROTATION_SPEED_CMD, Events.TURNING_SPEED_CMD, Events.SPEED_LIMIT_CMD, Events.TRANSIT_COLOUR_CMD, Events.ONLY_OBSERVED_STARS_CMD, Events.COMPUTE_GAIA_SCAN_CMD, Events.OCTREE_PARTICLE_FADE_CMD, Events.STAR_POINT_SIZE_CMD, Events.STAR_POINT_SIZE_INCREASE_CMD, Events.STAR_POINT_SIZE_DECREASE_CMD, Events.STAR_POINT_SIZE_RESET_CMD, Events.STAR_MIN_OPACITY_CMD, Events.AMBIENT_LIGHT_CMD, Events.GALAXY_3D_CMD, Events.CROSSHAIR_CMD, Events.CAMERA_CINEMATIC_CMD, Events.CUBEMAP_RESOLUTION_CMD, Events.LABEL_SIZE_CMD);
         }
 
-        public void initialize(GraphicsQuality gRAPHICS_QUALITY, long oBJECT_FADE_MS, float sTAR_BRIGHTNESS, float aMBIENT_LIGHT, int cAMERA_FOV, float cAMERA_SPEED, float tURNING_SPEED, float rOTATION_SPEED, int cAMERA_SPEED_LIMIT_IDX, boolean fOCUS_LOCK, boolean fOCUS_LOCK_ORIENTATION, float lABEL_SIZE_FACTOR, float lABEL_NUMBER_FACTOR, boolean[] vISIBILITY, int oRBIT_RENDERER, int lINE_RENDERER, double sTAR_TH_ANGLE_NONE, double sTAR_TH_ANGLE_POINT, double sTAR_TH_ANGLE_QUAD, float pOINT_ALPHA_MIN,
-                float pOINT_ALPHA_MAX, boolean oCTREE_PARTICLE_FADE, float oCTANT_TH_ANGLE_0, float oCTANT_TH_ANGLE_1, float pM_NUM_FACTOR, float pM_LEN_FACTOR, long n_PM_STARS, int pM_COLOR_MODE, boolean pM_ARROWHEADS, float sTAR_POINT_SIZE, boolean gALAXY_3D, int cUBEMAP_FACE_RESOLUTION, boolean cROSSHAIR, boolean cINEMATIC_CAMERA, boolean lAZY_TEXTURE_INIT, boolean fREE_CAMERA_TARGET_MODE_ON, boolean sHADOW_MAPPING, int sHADOW_MAPPING_N_SHADOWS, int sHADOW_MAPPING_RESOLUTION,
-                long mAX_LOADED_STARS) {
+        public void initialize(GraphicsQuality gRAPHICS_QUALITY, long oBJECT_FADE_MS, float sTAR_BRIGHTNESS, float aMBIENT_LIGHT, int cAMERA_FOV, float cAMERA_SPEED, float tURNING_SPEED, float rOTATION_SPEED, int cAMERA_SPEED_LIMIT_IDX, boolean fOCUS_LOCK, boolean fOCUS_LOCK_ORIENTATION, float lABEL_SIZE_FACTOR, float lABEL_NUMBER_FACTOR, boolean[] vISIBILITY, int oRBIT_RENDERER, int lINE_RENDERER, double sTAR_TH_ANGLE_NONE, double sTAR_TH_ANGLE_POINT, double sTAR_TH_ANGLE_QUAD,
+                float pOINT_ALPHA_MIN, float pOINT_ALPHA_MAX, boolean oCTREE_PARTICLE_FADE, float oCTANT_TH_ANGLE_0, float oCTANT_TH_ANGLE_1, float pM_NUM_FACTOR, float pM_LEN_FACTOR, long n_PM_STARS, int pM_COLOR_MODE, boolean pM_ARROWHEADS, float sTAR_POINT_SIZE, boolean gALAXY_3D, int cUBEMAP_FACE_RESOLUTION, boolean cROSSHAIR, boolean cINEMATIC_CAMERA, boolean lAZY_TEXTURE_INIT, boolean fREE_CAMERA_TARGET_MODE_ON, boolean sHADOW_MAPPING, int sHADOW_MAPPING_N_SHADOWS,
+                int sHADOW_MAPPING_RESOLUTION, long mAX_LOADED_STARS) {
             GRAPHICS_QUALITY = gRAPHICS_QUALITY;
             OBJECT_FADE_MS = oBJECT_FADE_MS;
             STAR_BRIGHTNESS = sTAR_BRIGHTNESS;

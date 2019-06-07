@@ -1,14 +1,12 @@
 # AXES
-
-axis.roll=2
-axis.pitch=1
-axis.yaw=0
-axis.move=3
+axis.roll=0
+axis.pitch=3
+axis.yaw=2
+axis.move=1
 axis.velocityup=13
 axis.velocitydown=12
 
 # BUTTONS
-
 button.velocityup=15
 button.velocitydown=14
 button.velocitytenth=11

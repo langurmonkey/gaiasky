@@ -309,6 +309,7 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
 
     private void camUpdate(double dt, ITimeFrameProvider time) {
         currentMouseKbdListener.update();
+        controllerListener.update();
 
         // Next focus and closest positions
         computeNextPositions(time);
@@ -582,9 +583,9 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
      */
     public void addPanMovement(double deltaX, double deltaY) {
         double tu = getTranslateUnits();
-        desired.set(direction).crs(up).nor().scl(-deltaX * tu * 100);
+        desired.set(direction).crs(up).nor().scl(-deltaX * tu);
         desired.add(aux1.set(up).nor().scl(-deltaY * tu));
-        force.add(desired);
+        force.set(desired);
         // We reset the time counter
         lastFwdTime = 0;
     }
@@ -635,8 +636,8 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
             } else {
                 // This factor slows the rotation as the focus gets closer and closer
                 double factor = vadeg > th ? Math.pow(th / vadeg, 3) : 1.0;
-                addHorizontalRotation(deltaX * factor, acceleration);
-                addVerticalRotation(deltaY * factor, acceleration);
+                addHorizontal(deltaX * factor, acceleration);
+                addVertical(deltaY * factor, acceleration);
             }
         }
     }
@@ -690,26 +691,26 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
 
     /**
      * Adds the given amount to camera horizontal rotation around the focus
-     * acceleration
+     * acceleration, or pan in free mode
      **/
-    public void addHorizontalRotation(double amount, boolean acceleration) {
+    public void addHorizontal(double amount, boolean acceleration) {
         addAmount(horizontal, amount, acceleration);
     }
 
-    public void setHorizontalRotation(double amount) {
+    public void setHorizontal(double amount) {
         horizontal.x = 0;
         horizontal.y = amount;
     }
 
     /**
      * Adds the given amount to camera vertical rotation around the focus
-     * acceleration
+     * acceleration, or pan in free mode
      **/
-    public void addVerticalRotation(double amount, boolean acceleration) {
+    public void addVertical(double amount, boolean acceleration) {
         addAmount(vertical, amount, acceleration);
     }
 
-    public void setVerticalRotation(double amount) {
+    public void setVertical(double amount) {
         vertical.x = 0;
         vertical.y = amount;
     }
@@ -941,7 +942,9 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
     private void updateLateral(double dt, double translateUnits) {
         // Pan with hor
         aux1.set(direction).crs(up).nor();
-        aux1.scl(horizontal.y * dt * translateUnits);
+        aux1.scl(horizontal.y * gamepadMultiplier * dt * translateUnits);
+        aux2.set(up).nor().scl(vertical.y * gamepadMultiplier * dt * translateUnits);
+        aux1.add(aux2);
         translate(aux1);
 
     }

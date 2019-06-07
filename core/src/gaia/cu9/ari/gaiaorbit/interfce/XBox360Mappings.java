@@ -11,77 +11,21 @@ package gaia.cu9.ari.gaiaorbit.interfce;
  * @author tsagrista
  *
  */
-public class XBox360Mappings implements IControllerMappings {
+public class XBox360Mappings extends AbstractControllerMappings {
 
-    public static final int AXIS_JOY1VERT = 1;
-    public static final int AXIS_JOY2VERT = 4;
+    public XBox360Mappings(){
+        AXIS_ROLL = 0;
+        AXIS_PITCH = 4;
+        AXIS_YAW = 3;
+        AXIS_MOVE = 1;
+        AXIS_VEL_UP = 5;
+        AXIS_VEL_DOWN = 2;
 
-    public static final int AXIS_JOY1HOR = 0;
-    public static final int AXIS_JOY2HOR = 3;
-
-    public static final int AXIS_LT = 2;
-    public static final int AXIS_RT = 5;
-
-    public static final int BUTTON_A = 0;
-    public static final int BUTTON_B = 1;
-    public static final int BUTTON_X = 2;
-    public static final int BUTTON_Y = 3;
-    public static final int BUTTON_LB = 4;
-    public static final int BUTTON_RB = 5;
-    public static final int BUTTON_BACK = 6;
-    public static final int BUTTON_START = 7;
-    public static final int BUTTON_XBOX_CROSS = 8;
-    public static final int BUTTON_JOY1 = 9;
-    public static final int BUTTON_JOY2 = 10;
-
-    @Override
-    public int getAxisRoll() {
-        return AXIS_JOY2HOR;
+        BUTTON_VEL_UP = 0;
+        BUTTON_VEL_DOWN = 1;
+        BUTTON_VEL_MULT_TENTH = 5;
+        BUTTON_VEL_MULT_HALF = 4;
+        BUTTON_UP = 3;
+        BUTTON_DOWN = 2;
     }
-
-    @Override
-    public int getAxisPitch() {
-        return AXIS_JOY1VERT;
-    }
-
-    @Override
-    public int getAxisYaw() {
-        return AXIS_JOY1HOR;
-    }
-
-    @Override
-    public int getAxisMove() {
-        return AXIS_JOY2VERT;
-    }
-
-    @Override
-    public int getAxisVelocityUp() {
-        return AXIS_RT;
-    }
-
-    @Override
-    public int getAxisVelocityDown() {
-        return AXIS_LT;
-    }
-
-    @Override
-    public int getButtonVelocityMultiplierTenth() {
-        return BUTTON_RB;
-    }
-
-    @Override
-    public int getButtonVelocityMultiplierHalf() {
-        return BUTTON_LB;
-    }
-
-    @Override
-    public int getButtonVelocityUp() {
-        return BUTTON_X;
-    }
-
-    @Override
-    public int getButtonVelocityDown() {
-        return BUTTON_A;
-    }
-
 }

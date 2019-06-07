@@ -94,4 +94,24 @@ public interface IControllerMappings {
      */
      int getButtonVelocityDown();
 
+    /**
+     * Returns the code of the button used to go up.
+     *
+     * @return The button code, negative if not mapped
+     */
+    int getButtonUp();
+
+    /**
+     * Returns the code of the button used to go down.
+     *
+     * @return The button code, negative if not mapped
+     */
+    int getButtonDown();
+
+    /**
+     * Returns the code of the button used to toggle between free and focus mode.
+     * @return The button code, negative if not mapped
+     */
+    int getButtonModeToggle();
+
 }

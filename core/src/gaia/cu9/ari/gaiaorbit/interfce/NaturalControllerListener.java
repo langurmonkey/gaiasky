@@ -10,26 +10,71 @@ import com.badlogic.gdx.controllers.Controller;
 import com.badlogic.gdx.controllers.ControllerListener;
 import com.badlogic.gdx.controllers.PovDirection;
 import com.badlogic.gdx.math.Vector3;
+import com.badlogic.gdx.utils.IntSet;
 import gaia.cu9.ari.gaiaorbit.desktop.util.SysUtils;
 import gaia.cu9.ari.gaiaorbit.event.EventManager;
 import gaia.cu9.ari.gaiaorbit.event.Events;
 import gaia.cu9.ari.gaiaorbit.event.IObserver;
-import gaia.cu9.ari.gaiaorbit.scenegraph.camera.CameraManager.CameraMode;
+import gaia.cu9.ari.gaiaorbit.scenegraph.camera.CameraManager;
 import gaia.cu9.ari.gaiaorbit.scenegraph.camera.NaturalCamera;
 import gaia.cu9.ari.gaiaorbit.util.GlobalConf;
 import gaia.cu9.ari.gaiaorbit.util.Logger;
 import gaia.cu9.ari.gaiaorbit.util.Logger.Log;
 
-public class NaturalControllerListener implements ControllerListener, IObserver {
+public class NaturalControllerListener implements ControllerListener, IObserver, IInputListener {
     private static final Log logger = Logger.getLogger(NaturalControllerListener.class);
 
     NaturalCamera cam;
     IControllerMappings mappings;
 
+    IntSet pressedKeys;
+
     public NaturalControllerListener(NaturalCamera cam, String mappingsFile) {
         this.cam = cam;
+        this.pressedKeys = new IntSet();
         updateControllerMappings(mappingsFile);
+
         EventManager.instance.subscribe(this, Events.RELOAD_CONTROLLER_MAPPINGS);
+    }
+
+    public void addPressedKey(int keycode) {
+        pressedKeys.add(keycode);
+    }
+
+    public void removePressedKey(int keycode) {
+        pressedKeys.remove(keycode);
+    }
+
+    public boolean isKeyPressed(int keycode) {
+        return pressedKeys.contains(keycode);
+    }
+
+    /**
+     * Returns true if all keys are pressed
+     *
+     * @param keys The keys to test
+     * @return True if all are pressed
+     */
+    public boolean allPressed(int... keys) {
+        for (int k : keys) {
+            if (!pressedKeys.contains(k))
+                return false;
+        }
+        return true;
+    }
+
+    /**
+     * Returns true if any of the keys are pressed
+     *
+     * @param keys The keys to test
+     * @return True if any is pressed
+     */
+    public boolean anyPressed(int... keys) {
+        for (int k : keys) {
+            if (pressedKeys.contains(k))
+                return true;
+        }
+        return false;
     }
 
     public boolean updateControllerMappings(String mappingsFile) {
@@ -78,8 +123,14 @@ public class NaturalControllerListener implements ControllerListener, IObserver 
             cam.setVelocity(1);
         } else if (buttonCode == mappings.getButtonVelocityDown()) {
             cam.setVelocity(-1);
+        } else if (buttonCode == mappings.getButtonUp()){
+            cam.setVertical(1);
+        } else if (buttonCode == mappings.getButtonDown()){
+            cam.setVertical(-1);
         }
         cam.setInputByController(true);
+
+        addPressedKey(buttonCode);
 
         return true;
     }
@@ -98,8 +149,22 @@ public class NaturalControllerListener implements ControllerListener, IObserver 
             cam.setVelocity(0);
         } else if (buttonCode == mappings.getButtonVelocityDown()) {
             cam.setVelocity(0);
+        } else if (buttonCode == mappings.getButtonUp()){
+            cam.setVertical(0);
+        } else if (buttonCode == mappings.getButtonDown()){
+            cam.setVertical(0);
+        } else if (buttonCode == mappings.getButtonModeToggle()){
+            if(cam.getMode().isFocus()){
+                // Set free
+                EventManager.instance.post(Events.CAMERA_MODE_CMD, CameraManager.CameraMode.FREE_MODE);
+            } else {
+                // Set focus
+                EventManager.instance.post(Events.CAMERA_MODE_CMD, CameraManager.CameraMode.FOCUS_MODE);
+            }
         }
         cam.setInputByController(true);
+
+        removePressedKey(buttonCode);
 
         return true;
     }
@@ -118,23 +183,23 @@ public class NaturalControllerListener implements ControllerListener, IObserver 
         value = Math.signum(value) * value * value * value * value;
 
         if (axisCode == mappings.getAxisRoll()) {
-            if (cam.getMode().equals(CameraMode.FOCUS_MODE)) {
+            if (cam.getMode().isFocus()) {
                 cam.setRoll(value * 1e-2f);
             } else {
                 // Use this for lateral movement
-                cam.setHorizontalRotation(value);
+                cam.setHorizontal(value);
             }
             treated = true;
         } else if (axisCode == mappings.getAxisPitch()) {
-            if (cam.getMode().equals(CameraMode.FOCUS_MODE)) {
-                cam.setVerticalRotation(value * 0.1);
+            if (cam.getMode().isFocus()) {
+                cam.setVertical(value * 0.1);
             } else {
                 cam.setPitch((GlobalConf.controls.INVERT_LOOK_Y_AXIS ? 1 : -1) * value * 3e-2f);
             }
             treated = true;
         } else if (axisCode == mappings.getAxisYaw()) {
-            if (cam.getMode().equals(CameraMode.FOCUS_MODE)) {
-                cam.setHorizontalRotation(value * 0.1);
+            if (cam.getMode().isFocus()) {
+                cam.setHorizontal(value * 0.1);
             } else {
                 cam.setYaw(value * 3e-2f);
             }
@@ -190,4 +255,17 @@ public class NaturalControllerListener implements ControllerListener, IObserver 
 
     }
 
+    @Override
+    public void update() {
+    }
+
+    @Override
+    public void activate() {
+
+    }
+
+    @Override
+    public void deactivate() {
+
+    }
 }

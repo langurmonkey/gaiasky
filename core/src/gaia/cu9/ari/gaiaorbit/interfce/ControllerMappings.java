@@ -17,19 +17,7 @@ import java.util.Properties;
  * @author tsagrista
  *
  */
-public class ControllerMappings implements IControllerMappings {
-
-    private int AXIS_ROLL;
-    private int AXIS_PITCH;
-    private int AXIS_YAW;
-    private int AXIS_MOVE;
-    private int AXIS_VEL_UP;
-    private int AXIS_VEL_DOWN;
-
-    private int BUTTON_VEL_UP;
-    private int BUTTON_VEL_DOWN;
-    private int BUTTON_VEL_MULT_TENTH;
-    private int BUTTON_VEL_MULT_HALF;
+public class ControllerMappings extends AbstractControllerMappings {
 
     public ControllerMappings(FileHandle mappingsFile) {
         super();
@@ -39,71 +27,25 @@ public class ControllerMappings implements IControllerMappings {
             mappings.load(is);
             is.close();
 
-            AXIS_ROLL = Integer.parseInt(mappings.getProperty("axis.roll"));
-            AXIS_PITCH = Integer.parseInt(mappings.getProperty("axis.pitch"));
-            AXIS_YAW = Integer.parseInt(mappings.getProperty("axis.yaw"));
-            AXIS_MOVE = Integer.parseInt(mappings.getProperty("axis.move"));
-            AXIS_VEL_UP = Integer.parseInt(mappings.getProperty("axis.velocityup"));
-            AXIS_VEL_DOWN = Integer.parseInt(mappings.getProperty("axis.velocitydown"));
+            AXIS_ROLL = Integer.parseInt(mappings.getProperty("axis.roll", "-1"));
+            AXIS_PITCH = Integer.parseInt(mappings.getProperty("axis.pitch", "-1"));
+            AXIS_YAW = Integer.parseInt(mappings.getProperty("axis.yaw", "-1"));
+            AXIS_MOVE = Integer.parseInt(mappings.getProperty("axis.move", "-1"));
+            AXIS_VEL_UP = Integer.parseInt(mappings.getProperty("axis.velocityup", "-1"));
+            AXIS_VEL_DOWN = Integer.parseInt(mappings.getProperty("axis.velocitydown", "-1"));
 
-            BUTTON_VEL_UP = Integer.parseInt(mappings.getProperty("button.velocityup"));
-            BUTTON_VEL_DOWN = Integer.parseInt(mappings.getProperty("button.velocitydown"));
-            BUTTON_VEL_MULT_TENTH = Integer.parseInt(mappings.getProperty("button.velocitytenth"));
-            BUTTON_VEL_MULT_HALF = Integer.parseInt(mappings.getProperty("button.velocityhalf"));
+            BUTTON_VEL_UP = Integer.parseInt(mappings.getProperty("button.velocityup", "-1"));
+            BUTTON_VEL_DOWN = Integer.parseInt(mappings.getProperty("button.velocitydown", "-1"));
+            BUTTON_VEL_MULT_TENTH = Integer.parseInt(mappings.getProperty("button.velocitytenth", "-1"));
+            BUTTON_VEL_MULT_HALF = Integer.parseInt(mappings.getProperty("button.velocityhalf", "-1"));
+            BUTTON_UP = Integer.parseInt(mappings.getProperty("button.up", "-1"));
+            BUTTON_DOWN = Integer.parseInt(mappings.getProperty("button.down", "-1"));
+            BUTTON_MODE_TOGGLE = Integer.parseInt(mappings.getProperty("button.mode.toggle", "-1"));
 
         } catch (Exception e) {
             Logger.getLogger(this.getClass()).error(e, "Error reading inputListener mappings");
         }
     }
 
-    @Override
-    public int getAxisRoll() {
-        return AXIS_ROLL;
-    }
-
-    @Override
-    public int getAxisPitch() {
-        return AXIS_PITCH;
-    }
-
-    @Override
-    public int getAxisYaw() {
-        return AXIS_YAW;
-    }
-
-    @Override
-    public int getAxisMove() {
-        return AXIS_MOVE;
-    }
-
-    @Override
-    public int getAxisVelocityUp() {
-        return AXIS_VEL_UP;
-    }
-
-    @Override
-    public int getAxisVelocityDown() {
-        return AXIS_VEL_DOWN;
-    }
-
-    @Override
-    public int getButtonVelocityMultiplierTenth() {
-        return BUTTON_VEL_MULT_HALF;
-    }
-
-    @Override
-    public int getButtonVelocityMultiplierHalf() {
-        return BUTTON_VEL_MULT_TENTH;
-    }
-
-    @Override
-    public int getButtonVelocityUp() {
-        return BUTTON_VEL_UP;
-    }
-
-    @Override
-    public int getButtonVelocityDown() {
-        return BUTTON_VEL_DOWN;
-    }
 
 }

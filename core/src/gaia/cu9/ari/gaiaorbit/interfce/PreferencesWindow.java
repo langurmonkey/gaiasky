@@ -15,7 +15,6 @@ import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.EventListener;
 import com.badlogic.gdx.scenes.scene2d.Stage;
-import com.badlogic.gdx.scenes.scene2d.ui.Stack;
 import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener.ChangeEvent;
@@ -29,6 +28,7 @@ import gaia.cu9.ari.gaiaorbit.interfce.KeyBindings.ProgramAction;
 import gaia.cu9.ari.gaiaorbit.interfce.beans.ComboBoxBean;
 import gaia.cu9.ari.gaiaorbit.interfce.beans.FileComboBoxBean;
 import gaia.cu9.ari.gaiaorbit.interfce.beans.LangComboBoxBean;
+import gaia.cu9.ari.gaiaorbit.interfce.beans.MappingFileComboBoxBean;
 import gaia.cu9.ari.gaiaorbit.scenegraph.camera.CameraManager;
 import gaia.cu9.ari.gaiaorbit.util.*;
 import gaia.cu9.ari.gaiaorbit.util.GlobalConf.PostprocessConf.Antialias;
@@ -48,7 +48,10 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.channels.FileChannel;
-import java.util.*;
+import java.util.Arrays;
+import java.util.Locale;
+import java.util.Map;
+import java.util.TreeSet;
 
 /**
  * The default preferences window.
@@ -827,14 +830,14 @@ public class PreferencesWindow extends GenericDialog {
         // CONTROLLER MAPPINGS
         OwnLabel mappingsLabel = new OwnLabel(I18n.txt("gui.controller.mappingsfile"), skin);
         Array<FileComboBoxBean> controllerMappingsFiles = new Array<>();
-        FileHandle externalfolder = new FileHandle(GlobalConf.ASSETS_LOC + File.separator + "mappings");
-        FileHandle homefolder = Gdx.files.absolute(SysUtils.getDefaultMappingsDir().getPath());
+        FileHandle mappingsAssets = new FileHandle(GlobalConf.ASSETS_LOC + File.separator + "mappings");
+        FileHandle mappingsData = Gdx.files.absolute(SysUtils.getDefaultMappingsDir().getPath());
         Array<FileHandle> mappingFiles = new Array<>();
-        GlobalResources.listRec(externalfolder, mappingFiles, ".inputListener");
-        GlobalResources.listRec(homefolder, mappingFiles, ".inputListener");
+        GlobalResources.listRec(mappingsAssets, mappingFiles, ".inputListener", ".controller");
+        GlobalResources.listRec(mappingsData, mappingFiles, ".inputListener", ".controller");
         FileComboBoxBean selected = null;
         for (FileHandle fh : mappingFiles) {
-            FileComboBoxBean fcbb = new FileComboBoxBean(fh);
+            FileComboBoxBean fcbb = new MappingFileComboBoxBean(fh);
             controllerMappingsFiles.add(fcbb);
             if (GlobalConf.controls.CONTROLLER_MAPPINGS_FILE.endsWith(fh.name())) {
                 selected = fcbb;

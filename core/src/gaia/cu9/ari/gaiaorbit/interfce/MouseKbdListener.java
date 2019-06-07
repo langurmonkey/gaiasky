@@ -10,7 +10,7 @@ import com.badlogic.gdx.utils.IntSet;
 import gaia.cu9.ari.gaiaorbit.scenegraph.camera.NaturalCamera;
 import gaia.cu9.ari.gaiaorbit.util.GlobalConf;
 
-public abstract class MouseKbdListener extends GestureDetector {
+public abstract class MouseKbdListener extends GestureDetector implements IInputListener {
 
     protected NaturalCamera camera;
     /** Holds the pressed keys at any moment **/
@@ -84,8 +84,4 @@ public abstract class MouseKbdListener extends GestureDetector {
     public float getResponseTime(){
         return 0.25f;
     }
-
-    public abstract void update();
-    public abstract void activate();
-    public abstract void deactivate();
 }

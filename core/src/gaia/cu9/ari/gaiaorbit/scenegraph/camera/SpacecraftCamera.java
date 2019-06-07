@@ -8,21 +8,16 @@ package gaia.cu9.ari.gaiaorbit.scenegraph.camera;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.InputMultiplexer;
-import com.badlogic.gdx.controllers.Controller;
-import com.badlogic.gdx.controllers.ControllerListener;
 import com.badlogic.gdx.controllers.Controllers;
-import com.badlogic.gdx.controllers.PovDirection;
 import com.badlogic.gdx.graphics.PerspectiveCamera;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.input.GestureDetector;
 import com.badlogic.gdx.input.GestureDetector.GestureAdapter;
-import com.badlogic.gdx.math.Vector3;
 import gaia.cu9.ari.gaiaorbit.GaiaSky;
 import gaia.cu9.ari.gaiaorbit.event.EventManager;
 import gaia.cu9.ari.gaiaorbit.event.Events;
 import gaia.cu9.ari.gaiaorbit.event.IObserver;
-import gaia.cu9.ari.gaiaorbit.interfce.XBox360Mappings;
 import gaia.cu9.ari.gaiaorbit.scenegraph.IFocus;
 import gaia.cu9.ari.gaiaorbit.scenegraph.Spacecraft;
 import gaia.cu9.ari.gaiaorbit.scenegraph.camera.CameraManager.CameraMode;
@@ -61,7 +56,7 @@ public class SpacecraftCamera extends AbstractCamera implements IObserver {
     /**
      * Controller listener
      **/
-    private SpacecraftControllerListener controllerListener;
+    //private SpacecraftControllerListener controllerListener;
 
     /**
      * Crosshair
@@ -122,7 +117,7 @@ public class SpacecraftCamera extends AbstractCamera implements IObserver {
         fovFactor = camera.fieldOfView / 40f;
 
         inputController = new SpacecraftInputController(new GestureAdapter());
-        controllerListener = new SpacecraftControllerListener();
+        //controllerListener = new SpacecraftControllerListener();
 
         // Init sprite batch for crosshair and cockpit
         spriteBatch = new SpriteBatch(1000, GlobalResources.spriteShader);
@@ -295,7 +290,7 @@ public class SpacecraftCamera extends AbstractCamera implements IObserver {
                     im.addProcessor(im.size(), inputController);
                 // Register inputListener listener
                 Controllers.clearListeners();
-                GlobalConf.controls.addControllerListener(controllerListener);
+                //GlobalConf.controls.addControllerListener(controllerListener);
                 sc.stopAllMovement();
                 if (firstTime) {
                     // Put spacecraft close to earth
@@ -313,7 +308,7 @@ public class SpacecraftCamera extends AbstractCamera implements IObserver {
                     // Unregister input inputListener
                     im.removeProcessor(inputController);
                     // Unregister inputListener listener
-                    GlobalConf.controls.removeControllerListener(controllerListener);
+                    //GlobalConf.controls.removeControllerListener(controllerListener);
                     sc.stopAllMovement();
                 });
         }
@@ -477,113 +472,6 @@ public class SpacecraftCamera extends AbstractCamera implements IObserver {
 
     }
 
-    private class SpacecraftControllerListener implements ControllerListener {
-
-        public SpacecraftControllerListener() {
-            super();
-        }
-
-        @Override
-        public void connected(Controller controller) {
-            logger.info("Controller connected: " + controller.getName());
-        }
-
-        @Override
-        public void disconnected(Controller controller) {
-            logger.info("Controller disconnected: " + controller.getName());
-        }
-
-        @Override
-        public boolean buttonDown(Controller controller, int buttonCode) {
-            switch (buttonCode) {
-                case XBox360Mappings.BUTTON_A:
-                    sc.decreaseThrustFactorIndex(true);
-                    break;
-                case XBox360Mappings.BUTTON_X:
-                    sc.increaseThrustFactorIndex(true);
-                    break;
-                case XBox360Mappings.BUTTON_LB:
-                    EventManager.instance.post(Events.SPACECRAFT_STABILISE_CMD, true);
-                    break;
-                case XBox360Mappings.BUTTON_RB:
-                    EventManager.instance.post(Events.SPACECRAFT_STOP_CMD, true);
-                    break;
-            }
-            return true;
-        }
-
-        @Override
-        public boolean buttonUp(Controller controller, int buttonCode) {
-            return false;
-        }
-
-        @Override
-        public boolean axisMoved(Controller controller, int axisCode, float value) {
-            boolean treated = false;
-            // y = x^4
-            // http://www.wolframalpha.com/input/?i=y+%3D+sign%28x%29+*+x%5E2+%28x+from+-1+to+1%29}
-            value = Math.signum(value) * value * value * value * value;
-            if (sc != null)
-                switch (axisCode) {
-                    case XBox360Mappings.AXIS_JOY2HOR:
-                        sc.setRollPower(-value);
-                        if (Math.abs(value) > 0.3)
-                            EventManager.instance.post(Events.SPACECRAFT_STABILISE_CMD, false);
-                        treated = true;
-                        break;
-                    case XBox360Mappings.AXIS_JOY1VERT:
-                        sc.setPitchPower(value);
-                        if (Math.abs(value) > 0.3)
-                            EventManager.instance.post(Events.SPACECRAFT_STABILISE_CMD, false);
-                        treated = true;
-                        break;
-                    case XBox360Mappings.AXIS_JOY1HOR:
-                        sc.setYawPower(-value);
-                        if (Math.abs(value) > 0.3)
-                            EventManager.instance.post(Events.SPACECRAFT_STABILISE_CMD, false);
-                        treated = true;
-                        break;
-                    case XBox360Mappings.AXIS_JOY2VERT:
-                        treated = true;
-                        break;
-                    case XBox360Mappings.AXIS_RT:
-                        sc.setEnginePower((value + 1) / 2);
-                        if (Math.abs(value) > 0.3)
-                            EventManager.instance.post(Events.SPACECRAFT_STOP_CMD, false);
-                        treated = true;
-                        break;
-                    case XBox360Mappings.AXIS_LT:
-                        sc.setEnginePower(-(value + 1) / 2);
-                        if (Math.abs(value) > 0.3)
-                            EventManager.instance.post(Events.SPACECRAFT_STOP_CMD, false);
-                        treated = true;
-                        break;
-
-                }
-            return treated;
-        }
-
-        @Override
-        public boolean povMoved(Controller controller, int povCode, PovDirection value) {
-            return false;
-        }
-
-        @Override
-        public boolean xSliderMoved(Controller controller, int sliderCode, boolean value) {
-            return false;
-        }
-
-        @Override
-        public boolean ySliderMoved(Controller controller, int sliderCode, boolean value) {
-            return false;
-        }
-
-        @Override
-        public boolean accelerometerMoved(Controller controller, int accelerometerCode, Vector3 value) {
-            return false;
-        }
-
-    }
 
     @Override
     public void checkClosest(IFocus cb) {

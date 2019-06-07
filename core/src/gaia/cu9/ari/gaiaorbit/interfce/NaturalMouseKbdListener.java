@@ -6,7 +6,6 @@
 package gaia.cu9.ari.gaiaorbit.interfce;
 
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.Input;
 import com.badlogic.gdx.Input.Buttons;
 import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.math.MathUtils;
@@ -259,7 +258,7 @@ public class NaturalMouseKbdListener extends MouseKbdListener implements IObserv
         if (GlobalConf.runtime.INPUT_ENABLED) {
             touched &= -1 ^ (1 << pointer);
             multiTouch = !MathUtils.isPowerOfTwo(touched);
-            if (button == this.button && button == Input.Buttons.LEFT) {
+            if (button == this.button && button == leftMouseButton) {
                 final long currentTime = TimeUtils.millis();
                 final long lastLeftTime = lastClickTime;
 
@@ -284,7 +283,7 @@ public class NaturalMouseKbdListener extends MouseKbdListener implements IObserv
                 dragDx = 0;
                 dragDy = 0;
                 lastClickTime = currentTime;
-            } else if (button == this.button && button == Input.Buttons.RIGHT) {
+            } else if (button == this.button && button == rightMouseButton) {
                 if (keyframeBeingDragged) {
                     keyframeBeingDragged = false;
                 } else if (gesture.dst(screenX, screenY) < MOVE_PX_DIST &&  getKeyframesPathObject() != null && getKeyframesPathObject().isSelected() && !anyPressed(Keys.CONTROL_LEFT, Keys.SHIFT_LEFT, Keys.ALT_LEFT)) {
@@ -304,6 +303,8 @@ public class NaturalMouseKbdListener extends MouseKbdListener implements IObserv
                             EventManager.instance.post(Events.POPUP_MENU_FOCUS, hit, screenX, screenY);
                         }
                     });
+                    camera.setHorizontal(0);
+                    camera.setVertical(0);
                 }
             }
 
@@ -348,7 +349,14 @@ public class NaturalMouseKbdListener extends MouseKbdListener implements IObserv
                 // Drag keyframe
                 dragKeyframe(screenX, screenY, dragDx, dragDy);
             } else {
-                camera.addRotateMovement(dragDx, dragDy, true, accel);
+                if(camera.getMode().isFree()){
+                    // Strafe (pan)
+                    camera.setHorizontal(-dragDx * 5f);
+                    camera.setVertical(-dragDy * 5f);
+                } else {
+                    // Look around
+                    camera.addRotateMovement(dragDx, dragDy, true, accel);
+                }
             }
         } else if (button == middleMouseButton) {
             if (dragDx != 0)
@@ -402,13 +410,13 @@ public class NaturalMouseKbdListener extends MouseKbdListener implements IObserv
         }
         if (isKeyPressed(Keys.RIGHT)) {
             if (camera.getMode().isFocus())
-                camera.addHorizontalRotation(-1.0f, true);
+                camera.addHorizontal(-1.0f, true);
             else
                 camera.addYaw(1.0f, true);
         }
         if (isKeyPressed(Keys.LEFT)) {
             if (camera.getMode().isFocus())
-                camera.addHorizontalRotation(1.0f, true);
+                camera.addHorizontal(1.0f, true);
             else
                 camera.addYaw(-1.0f, true);
         }
