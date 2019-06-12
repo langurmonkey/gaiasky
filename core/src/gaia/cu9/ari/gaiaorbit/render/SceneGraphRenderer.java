@@ -100,7 +100,7 @@ public class SceneGraphRenderer extends AbstractRenderer implements IProcessRend
 
     private Array<IRenderSystem> renderProcesses;
 
-    private RenderSystemRunnable depthTestR, additiveBlendR, noBlendR, noDepthTestR, depthTestAlwaysR, regularBlendR, noDepthWritesR;
+    private RenderSystemRunnable depthTestR, additiveBlendR, noDepthTestR, regularBlendR, noDepthWritesR, depthWritesR, clearDepthR;
 
     /** The particular current scene graph renderer **/
     private ISGR sgr;
@@ -217,13 +217,11 @@ public class SceneGraphRenderer extends AbstractRenderer implements IProcessRend
             Gdx.gl.glEnable(GL20.GL_DEPTH_TEST);
             Gdx.gl.glDepthMask(true);
         };
-        depthTestAlwaysR = (renderSystem, renderables, camera) -> {
-            Gdx.gl.glEnable(GL20.GL_DEPTH_TEST);
-            Gdx.gl.glDepthMask(true);
-            Gdx.gl.glDepthFunc(GL20.GL_ALWAYS);
-        };
         noDepthWritesR = (renderSystem, renderables, camera) -> {
             Gdx.gl.glDepthMask(false);
+        };
+        depthWritesR = (renderSystem, renderables, camera) -> {
+            Gdx.gl.glDepthMask(true);
         };
         additiveBlendR = (renderSystem, renderables, camera) -> {
             Gdx.gl.glEnable(GL20.GL_BLEND);
@@ -233,8 +231,8 @@ public class SceneGraphRenderer extends AbstractRenderer implements IProcessRend
             Gdx.gl.glEnable(GL20.GL_BLEND);
             Gdx.gl.glBlendFunc(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA);
         };
-        noBlendR = (renderSystem, renderables, camera) -> {
-            Gdx.gl.glDisable(GL20.GL_BLEND);
+        clearDepthR = (renderSystem, renderables, camera) -> {
+            Gdx.gl.glClear(GL20.GL_DEPTH_BUFFER_BIT);
         };
 
         if (GlobalConf.scene.SHADOW_MAPPING) {
@@ -452,27 +450,16 @@ public class SceneGraphRenderer extends AbstractRenderer implements IProcessRend
 
         // MODEL BACKGROUND - (MW panorama, CMWB)
         AbstractRenderSystem modelBackgroundProc = new ModelBatchRenderSystem(RenderGroup.MODEL_VERT, alphas, mbVertexLighting, ModelRenderType.NORMAL);
-        modelBackgroundProc.addPreRunnables(regularBlendR, depthTestR);
-        modelBackgroundProc.addPostRunnables((renderSystem, renderables, camera) -> {
-            // This always goes at the back, clear depth buffer
-            Gdx.gl.glClear(GL20.GL_DEPTH_BUFFER_BIT);
-        });
+        modelBackgroundProc.addPostRunnables(clearDepthR);
 
         // MODEL GRID - (Ecl, Eq, Gal grids)
         AbstractRenderSystem modelGridsProc = new ModelBatchRenderSystem(RenderGroup.MODEL_VERT_GRID, alphas, mbVertexLightingGrid, ModelRenderType.NORMAL);
-        modelGridsProc.addPreRunnables(regularBlendR, depthTestR);
-        modelGridsProc.addPostRunnables((renderSystem, renderables, camera) -> {
-            // This always goes at the back, clear depth buffer
-            Gdx.gl.glClear(GL20.GL_DEPTH_BUFFER_BIT);
-        });
+        modelGridsProc.addPostRunnables(clearDepthR);
 
         // ANNOTATIONS - (grids)
         AbstractRenderSystem annotationsProc = new FontRenderSystem(RenderGroup.FONT_ANNOTATION, alphas, spriteBatch, null, null, font2d, null);
         annotationsProc.addPreRunnables(regularBlendR, noDepthTestR);
-        annotationsProc.addPostRunnables((renderSystem, renderables, camera) -> {
-            // This always goes at the back, clear depth buffer
-            Gdx.gl.glClear(GL20.GL_DEPTH_BUFFER_BIT);
-        });
+        annotationsProc.addPostRunnables(clearDepthR);
 
         // BILLBOARD STARS
         billboardStarsProc = new BillboardStarRenderSystem(RenderGroup.BILLBOARD_STAR, alphas, starBillboardShaders, "data/tex/base/star_glow_s.png", ComponentType.Stars.ordinal());
@@ -557,7 +544,6 @@ public class SceneGraphRenderer extends AbstractRenderer implements IProcessRend
 
         // MODEL PER-PIXEL-LIGHTING
         AbstractRenderSystem modelPerPixelLighting = new ModelBatchRenderSystem(RenderGroup.MODEL_PIX, alphas, mbPixelLighting, ModelRenderType.NORMAL);
-        modelPerPixelLighting.addPreRunnables(regularBlendR, depthTestR);
 
         // MODEL PER-PIXEL-LIGHTING-TESSELLATION
         AbstractRenderSystem modelPerPixelLightingTess = new ModelBatchTessellationRenderSystem(RenderGroup.MODEL_PIX_TESS, alphas, mbPixelLightingTessellation);
@@ -565,7 +551,6 @@ public class SceneGraphRenderer extends AbstractRenderer implements IProcessRend
 
         // MODEL BEAM
         AbstractRenderSystem modelBeamProc = new ModelBatchRenderSystem(RenderGroup.MODEL_VERT_BEAM, alphas, mbVertexLightingBeam, ModelRenderType.NORMAL);
-        modelBeamProc.addPreRunnables(regularBlendR, depthTestR);
 
         // GALAXY
         mwrs = new MWModelRenderSystem(RenderGroup.GALAXY, alphas, galaxyPointShaders);
@@ -579,18 +564,20 @@ public class SceneGraphRenderer extends AbstractRenderer implements IProcessRend
         // PARTICLE GROUP
         AbstractRenderSystem particleGroupProc = new ParticleGroupRenderSystem(RenderGroup.PARTICLE_GROUP, alphas, particleGroupShaders);
         particleGroupProc.addPreRunnables(additiveBlendR, depthTestR, noDepthWritesR);
+        particleGroupProc.addPostRunnables(regularBlendR, depthWritesR);
 
         // STAR GROUP
         AbstractRenderSystem starGroupProc = new StarGroupRenderSystem(RenderGroup.STAR_GROUP, alphas, starGroupShaders);
         starGroupProc.addPreRunnables(additiveBlendR, depthTestR, noDepthWritesR);
+        starGroupProc.addPostRunnables(regularBlendR, depthWritesR);
 
         // ORBITAL ELEMENTS PARTICLES
         AbstractRenderSystem orbitElemProc = new OrbitalElementsParticlesRenderSystem(RenderGroup.PARTICLE_ORBIT_ELEMENTS, alphas, orbitElemShaders);
         orbitElemProc.addPreRunnables(additiveBlendR, depthTestR, noDepthWritesR);
+        orbitElemProc.addPostRunnables(regularBlendR, depthWritesR);
 
         // MODEL STARS
         AbstractRenderSystem modelStarsProc = new ModelBatchRenderSystem(RenderGroup.MODEL_VERT_STAR, alphas, mbVertexLightingStarsurface, ModelRenderType.NORMAL);
-        modelStarsProc.addPreRunnables(regularBlendR, depthTestR);
 
         // LABELS
         AbstractRenderSystem labelsProc = new FontRenderSystem(RenderGroup.FONT_LABEL, alphas, fontBatch, distanceFieldFontShader, font3d, font2d, fontTitles);
@@ -612,7 +599,6 @@ public class SceneGraphRenderer extends AbstractRenderer implements IProcessRend
                 return alphas[ComponentType.Atmospheres.ordinal()] * alphas[ComponentType.Planets.ordinal()] > 0;
             }
         };
-        modelAtmProc.addPreRunnables(regularBlendR, depthTestR);
 
         // MODEL CLOUDS
         AbstractRenderSystem modelCloudProc = new ModelBatchRenderSystem(RenderGroup.MODEL_CLOUD, alphas, mbCloud, ModelRenderType.CLOUD);
@@ -727,7 +713,7 @@ public class SceneGraphRenderer extends AbstractRenderer implements IProcessRend
             Array<IRenderable> modelsTess = render_lists.get(RenderGroup.MODEL_PIX_TESS.ordinal());
 
             fb.begin();
-            Gdx.gl.glEnable(GL30.GL_DEPTH);
+            Gdx.gl.glEnable(GL30.GL_DEPTH_TEST);
             Gdx.gl.glClearColor(0, 0, 0, 1);
             Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT | GL20.GL_DEPTH_BUFFER_BIT);
             Gdx.gl.glClearDepthf(1);
@@ -968,6 +954,7 @@ public class SceneGraphRenderer extends AbstractRenderer implements IProcessRend
         if (!GlobalConf.program.STEREOSCOPIC_MODE && !GlobalConf.program.CUBEMAP360_MODE) {
             renderGlowPass(camera, glowFb);
         }
+
         sgr.render(this, camera, t, rw, rh, fb, ppb);
     }
 

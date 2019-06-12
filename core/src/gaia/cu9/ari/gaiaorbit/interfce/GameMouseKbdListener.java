@@ -9,6 +9,7 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.backends.lwjgl3.Lwjgl3Graphics;
+import gaia.cu9.ari.gaiaorbit.GaiaSky;
 import gaia.cu9.ari.gaiaorbit.event.EventManager;
 import gaia.cu9.ari.gaiaorbit.event.Events;
 import gaia.cu9.ari.gaiaorbit.event.IObserver;
@@ -20,7 +21,7 @@ import org.lwjgl.glfw.GLFW;
 public class GameMouseKbdListener extends MouseKbdListener implements IObserver {
     private static Log logger = Logger.getLogger(GameMouseKbdListener.class);
 
-    private int prevX = Integer.MIN_VALUE, prevY = Integer.MIN_VALUE;
+    private float prevX = Float.MIN_VALUE, prevY = Float.MIN_VALUE;
     private float dx = 0, dy = 0;
 
     private static class GameGestureListener extends GestureAdapter {
@@ -55,10 +56,10 @@ public class GameMouseKbdListener extends MouseKbdListener implements IObserver 
             camera.strafe(-0.1f * keySensitivity * multiplier);
         }
         if (isKeyPressed(Keys.Q)) {
-            camera.addRoll(0.8f * keySensitivity, true);
+            camera.addRoll(0.1f * keySensitivity, true);
         }
         if (isKeyPressed(Keys.E)) {
-            camera.addRoll(-0.8f * keySensitivity, true);
+            camera.addRoll(-0.1f * keySensitivity, true);
         }
         if(isKeyPressed(Keys.SPACE)) {
             camera.vertical(0.1f * keySensitivity * multiplier);
@@ -78,6 +79,8 @@ public class GameMouseKbdListener extends MouseKbdListener implements IObserver 
         camera.setDiverted(true);
         // Capture mouse
         setMouseCapture(true);
+        // Unfocus
+        GaiaSky.instance.mainGui.getGuiStage().unfocusAll();
 
         String title = "GAME_MODE mode activated!";
         String[] msgs = new String[]{
@@ -108,7 +111,7 @@ public class GameMouseKbdListener extends MouseKbdListener implements IObserver 
         return super.keyUp(keycode);
     }
 
-    private void updatePreviousMousePosition(int x, int y) {
+    private void updatePreviousMousePosition(float x, float y) {
         prevX = x;
         prevY = y;
     }
@@ -120,17 +123,19 @@ public class GameMouseKbdListener extends MouseKbdListener implements IObserver 
 
     @Override
     public boolean mouseMoved(int screenX, int screenY) {
+        float x = screenX / 2f;
+        float y = screenY / 2f;
         float mouseXSensitivity = 2f;
         float mouseYSensitivity = -2f;
         if (prevX == Integer.MIN_VALUE) {
-            updatePreviousMousePosition(screenX, screenY);
+            updatePreviousMousePosition(x, y);
         }
-        dx = lowPass(mouseXSensitivity * (screenX - prevX), dx, 5f);
-        dy = lowPass(mouseYSensitivity * (screenY - prevY), dy, 5f);
+        dx = lowPass(mouseXSensitivity * (x - prevX), dx, 15f);
+        dy = lowPass(mouseYSensitivity * (y - prevY), dy, 15f);
         camera.addYaw(dx, true);
         camera.addPitch(dy, true);
 
-        updatePreviousMousePosition(screenX, screenY);
+        updatePreviousMousePosition(x, y);
         return true;
     }
 

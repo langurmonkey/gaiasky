@@ -25,7 +25,7 @@ public abstract class AbstractCamera implements ICamera {
     protected static final Log logger = Logger.getLogger(AbstractCamera.class);
 
     /** Camera far value **/
-    public static final double CAM_FAR = 1e24;
+    public static final double CAM_FAR = 1e25;
     /** Camera near values **/
     public static final double CAM_NEAR = 1 * Constants.M_TO_U;
 

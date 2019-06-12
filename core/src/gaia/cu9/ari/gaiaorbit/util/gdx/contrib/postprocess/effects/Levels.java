@@ -65,7 +65,7 @@ public final class Levels extends PostProcessorEffect {
         // Compute number of lod levels based on LUMA_SIZE
         int size = LUMA_SIZE;
         lumaLodLevels = 1;
-        while(size > 1){
+        while (size > 1) {
             size = (int) Math.floor(size / 2f);
             lumaLodLevels++;
         }
@@ -149,15 +149,15 @@ public final class Levels extends PostProcessorEffect {
         levels.enableToneMappingAuto();
     }
 
-    public void enableToneMappingACES(){
+    public void enableToneMappingACES() {
         levels.enableToneMappingACES();
     }
 
-    public void enableToneMappingUncharted(){
+    public void enableToneMappingUncharted() {
         levels.enableToneMappingUncharted();
     }
 
-    public void enableToneMappingFilmic(){
+    public void enableToneMappingFilmic() {
         levels.enableToneMappingFilmic();
     }
 
@@ -206,13 +206,13 @@ public final class Levels extends PostProcessorEffect {
             float smoothingMax = .1f;
             currLumaAvg += dt * (lumaAvg - currLumaAvg) / smoothingAvg;
             currLumaMax += dt * (lumaMax - currLumaMax) / smoothingMax;
-            levels.setAvgMaxLuma(currLumaAvg, Math.min(currLumaMax, 1.5f));
+            levels.setAvgMaxLuma(Math.max(currLumaAvg, 0.08f), Math.min(currLumaMax, 1.0f));
         }
     }
 
     private void computeLumaValuesCPU(FrameBuffer src) {
         // Every 4th frame
-        if(GaiaSky.instance.frames % 4 == 0) {
+        if (GaiaSky.instance.frames % 4 == 0) {
             // Render as is
             luma.enableProgramLuma();
             luma.setInput(src).setOutput(lumaBuffer).render();
@@ -230,10 +230,9 @@ public final class Levels extends PostProcessorEffect {
             // Ugly hack, but works
             lumaMax = GaiaSky.instance.getICamera().getPos().len() * Constants.U_TO_PC > 10000 ? lumaAvg * 5000f : lumaAvg * 30f;
 
-
-            System.out.println(lumaAvg + " / " + lumaMax);
-
-            lowPassFilter();
+            if (!Double.isNaN(lumaAvg) && !Double.isNaN(lumaMax)) {
+                lowPassFilter();
+            }
         }
     }
 

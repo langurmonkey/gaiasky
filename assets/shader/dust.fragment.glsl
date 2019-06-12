@@ -30,9 +30,9 @@ void main() {
     vec3 V = normalize(v_viewDir);
 
     vec3 baseColor = diffuse.rgb;
-    float edge = pow(max(0.0, dot(N, V)), 3.0);
+    float edge = min(1.0, pow(max(0.0, dot(N, V)), 1.0) * 1.5);
 
-    fragColor = vec4(baseColor.rgb * edge, 1.0) * v_opacity;
+    fragColor = vec4(baseColor.rgb, edge) * v_opacity;
 
 
     // Prevent saturation

@@ -81,9 +81,11 @@ public class SearchDialog extends GenericDialog {
 
     @Override
     public void accept(){
+        stage.unfocusAll();
     }
     @Override
     public void cancel(){
+        stage.unfocusAll();
     }
 
     public boolean checkString(String text, ISceneGraph sg) {

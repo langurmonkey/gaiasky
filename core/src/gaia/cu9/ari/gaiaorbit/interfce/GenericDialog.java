@@ -198,7 +198,6 @@ public abstract class GenericDialog extends CollapsibleWindow {
                             stage.setScrollFocus(scroll);
                         }
                     }
-                    return true;
                 }
             }
             return false;

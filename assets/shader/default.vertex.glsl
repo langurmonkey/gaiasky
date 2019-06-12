@@ -12,21 +12,21 @@
 #define cameraPositionFlag
 #endif
 
-attribute vec3 a_position;
+in vec3 a_position;
 uniform mat4 u_projViewTrans;
 
 #if defined(colorFlag)
 out vec4 v_color;
-attribute vec4 a_color;
+in vec4 a_color;
 #endif // colorFlag
 
 #ifdef normalFlag
-attribute vec3 a_normal;
+in vec3 a_normal;
 uniform mat3 u_normalMatrix;
 out vec3 v_normal;
 #endif // normalFlag
 
-attribute vec2 a_texCoord0;
+in vec2 a_texCoord0;
 out vec2 v_texCoords0;
 
 uniform mat4 u_worldTrans;
