@@ -23,7 +23,7 @@ out vec4 fragColor;
 
 void main()
 {
-    vec3 tex = texture(u_texture0, v_texCoords).rgb;
+    vec3 tex = clamp(texture(u_texture0, v_texCoords).rgb, 0.0, 10.0);
     float brightness = dot(tex, vec3(0.2126, 0.7152, 0.0722));
     fragColor = vec4(tex.rgb * step(u_threshold, brightness), 1.0);
 }

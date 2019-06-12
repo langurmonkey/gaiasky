@@ -176,7 +176,7 @@ public class DesktopPostProcessor implements IPostProcessor, IObserver {
         // BLOOM
         ppb.bloom = new Bloom((int) (width * bloomFboScale), (int) (height * bloomFboScale));
         ppb.bloom.setBloomIntesity(GlobalConf.postprocess.POSTPROCESS_BLOOM_INTENSITY);
-        ppb.bloom.setThreshold(0.5f);
+        ppb.bloom.setThreshold(0.3f);
         ppb.bloom.setBlurPasses(10);
         ppb.bloom.setBlurAmount(20f);
         ppb.bloom.setEnabled(GlobalConf.postprocess.POSTPROCESS_BLOOM_INTENSITY > 0);
