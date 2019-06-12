@@ -18,6 +18,7 @@ import gaia.cu9.ari.gaiaorbit.util.Logger.Log;
 import gaia.cu9.ari.gaiaorbit.util.format.DateFormatFactory;
 import gaia.cu9.ari.gaiaorbit.util.format.IDateFormat;
 import gaia.cu9.ari.gaiaorbit.util.math.MathUtilsd;
+import gaia.cu9.ari.gaiaorbit.util.parse.Parser;
 
 import java.io.*;
 import java.nio.channels.FileChannel;
@@ -210,7 +211,16 @@ public class DesktopConfInit extends ConfInit {
         prc.initialize(DISPLAY_TUTORIAL, TUTORIAL_POINTER_SCRIPT_LOCATION, TUTORIAL_SCRIPT_LOCATION, SHOW_DEBUG_INFO, LAST_CHECKED, LAST_VERSION, VERSION_CHECK_URL, DATA_DESCRIPTOR_URL, UI_THEME, SCRIPT_LOCATION, REST_PORT, LOCALE, STEREOSCOPIC_MODE, STEREO_PROFILE, CUBEMAPE360_MODE, DISPLAY_HUD, DISPLAY_POINTER_COORDS, DISPLAY_DATASET_DIALOG, NET_MASTER, NET_SLAVE, NET_MASTER_SLAVES);
 
         /** SCENE CONF **/
-        GraphicsQuality GRAPHICS_QUALITY = GraphicsQuality.valueOf(p.getProperty("scene.graphics.quality").toUpperCase());
+        String gc = p.getProperty("scene.graphics.quality");
+        GraphicsQuality GRAPHICS_QUALITY;
+        try {
+            // Use ordinal integer
+            int quality = Parser.parseIntException(gc);
+            GRAPHICS_QUALITY = GraphicsQuality.values()[quality % GraphicsQuality.values().length];
+        }catch(NumberFormatException e){
+            // Use string
+            GRAPHICS_QUALITY = GraphicsQuality.valueOf(gc.toUpperCase());
+        }
         long OBJECT_FADE_MS = Long.parseLong(p.getProperty("scene.object.fadems"));
         float STAR_BRIGHTNESS = Float.parseFloat(p.getProperty("scene.star.brightness"));
         float AMBIENT_LIGHT = Float.parseFloat(p.getProperty("scene.ambient"));
