@@ -720,20 +720,17 @@ public class SceneGraphRenderer extends AbstractRenderer implements IProcessRend
 
             if (!GlobalConf.program.CUBEMAP360_MODE) {
                 // Render billboard stars
-                if (stars.size > 0)
-                    billboardStarsProc.render(stars, camera, 0, null);
+                billboardStarsProc.render(stars, camera, 0, null);
 
                 // Render models
-                if (models.size > 0) {
-                    mbPixelLightingOpaque.begin(camera.getCamera());
-                    for (IRenderable model : models) {
-                        if (model instanceof ModelBody) {
-                            ModelBody mb = (ModelBody) model;
-                            mb.render(mbPixelLightingOpaque, 1, 0, false);
-                        }
+                mbPixelLightingOpaque.begin(camera.getCamera());
+                for (IRenderable model : models) {
+                    if (model instanceof ModelBody) {
+                        ModelBody mb = (ModelBody) model;
+                        mb.render(mbPixelLightingOpaque, 1, 0, false);
                     }
-                    mbPixelLightingOpaque.end();
                 }
+                mbPixelLightingOpaque.end();
 
                 // Render tessellated models
                 if (modelsTess.size > 0) {
@@ -856,7 +853,7 @@ public class SceneGraphRenderer extends AbstractRenderer implements IProcessRend
                 Vector3d camPos = camera.getPos();
                 Vector3d camDir = aux3d.set(camera.getDirection()).nor().scl(100 * Constants.KM_TO_U);
                 boolean intersect = Intersectord.checkIntersectSegmentSphere(camPos, aux3d.set(camPos).add(camDir), objPos, radius);
-                if(intersect){
+                if (intersect) {
                     // Use height
                     camDir.nor().scl(candidate.distToCamera - radius);
                 }

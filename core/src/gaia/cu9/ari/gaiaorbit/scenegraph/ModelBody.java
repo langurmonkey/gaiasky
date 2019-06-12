@@ -76,9 +76,6 @@ public abstract class ModelBody extends CelestialBody {
     /** State flag; whether to render the shadow (number of times left) **/
     public int shadow;
 
-    /** Should we cull this using the solid angle? **/
-    private boolean cull = true;
-
     /** Name of the reference plane for this object. Defaults to equator **/
     public String refPlane;
     /** Name of the transformation to the reference plane **/
@@ -189,11 +186,6 @@ public abstract class ModelBody extends CelestialBody {
                         addToRenderModel();
                     }
 
-                    if(!cull) {
-                        // Model, if not added
-                        addToRenderModel(true);
-                    }
-
                     if (renderText()) {
                         addToRender(this, RenderGroup.FONT_LABEL);
                     }
@@ -203,14 +195,8 @@ public abstract class ModelBody extends CelestialBody {
     }
 
     private void addToRenderModel(){
-        addToRenderModel(false);
-    }
-
-    private void addToRenderModel(boolean checkExists){
         RenderGroup rg = renderTessellated() ? RenderGroup.MODEL_PIX_TESS : RenderGroup.MODEL_PIX;
-        if(!checkExists || !SceneGraphRenderer.render_lists.get(rg.ordinal()).contains(this, true)){
-            addToRender(this, rg);
-        }
+        addToRender(this, rg);
     }
 
     public boolean renderTessellated() {
@@ -556,10 +542,6 @@ public abstract class ModelBody extends CelestialBody {
         this.refPlane = refplane;
         this.refPlaneTransform = refplane + "toequatorial";
         this.inverseRefPlaneTransform = "equatorialto" + refplane;
-    }
-
-    public void setCull(Boolean cull){
-        this.cull = cull;
     }
 
 }
