@@ -287,10 +287,10 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
     }
 
     private void computeNextPositions(ITimeFrameProvider time) {
-        if (focus != null) {
+        if (getMode().isFocus() && focus != null) {
             focus.getPredictedPosition(nextFocusPosition, time, this, false);
         }
-        if (closest != null) {
+        if (!getMode().isFocus() && closest != null) {
             if (closest != focus)
                 closest.getPredictedPosition(nextClosestPosition, time, this, false);
             else
@@ -593,21 +593,21 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
     public void forward(double amount) {
         double tu = getTranslateUnits();
         desired.set(direction).nor().scl(amount * tu);
-        vel.add(desired).clamp(0, 1e10);
+        vel.add(desired).clamp(0, 5e12);
         lastFwdTime = 0;
     }
 
     public void strafe(double amount) {
         double tu = getTranslateUnits();
         desired.set(direction).crs(up).nor().scl(amount * tu);
-        vel.add(desired).clamp(0, 1e10);
+        vel.add(desired).clamp(0, 5e12);
         lastFwdTime = 0;
     }
 
     public void vertical(double amount) {
         double tu = getTranslateUnits();
         desired.set(up).nor().scl(amount * tu);
-        vel.add(desired).clamp(0, 1e10);
+        vel.add(desired).clamp(0, 5e12);
         lastFwdTime = 0;
     }
 
@@ -1439,11 +1439,11 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
 
             // FOCUS_MODE crosshair only in focus mode
             IFocus chFocus = null;
-            if (getMode().equals(CameraMode.FOCUS_MODE)) {
+            if (getMode().isFocus()) {
                 // Green
                 spriteBatch.setColor(0, 1, 0, 1);
                 chFocus = focus;
-            } else if (getMode().equals(CameraMode.FREE_MODE) && closest != null) {
+            } else if ((getMode().isFree() || getMode().isGame())  && closest != null) {
                 // Orange
                 spriteBatch.setColor(1f, .7f, .2f, 1f);
                 chFocus = closest;

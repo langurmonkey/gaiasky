@@ -21,8 +21,9 @@ import org.lwjgl.glfw.GLFW;
 public class GameMouseKbdListener extends MouseKbdListener implements IObserver {
     private static Log logger = Logger.getLogger(GameMouseKbdListener.class);
 
-    private float prevX = Float.MIN_VALUE, prevY = Float.MIN_VALUE;
+    private float prevX = 0, prevY = 0;
     private float dx = 0, dy = 0;
+    private boolean prevValid = false;
 
     private static class GameGestureListener extends GestureAdapter {
         private GameGestureListener() {
@@ -40,32 +41,36 @@ public class GameMouseKbdListener extends MouseKbdListener implements IObserver 
 
     @Override
     public void update() {
-        float keySensitivity = 15f;
+        float keySensitivity = 3e-1f;
         // Run mode
         float multiplier = isKeyPressed(Keys.SHIFT_LEFT) ? 3f : 1f;
+
+        if(anyPressed(Keys.W, Keys.A, Keys.S, Keys.D)){
+            camera.vel.setZero();
+        }
+
         if (isKeyPressed(Keys.W)) {
-            camera.forward(0.1f * keySensitivity * multiplier);
+            camera.forward(1f * keySensitivity * multiplier);
+        } else if (isKeyPressed(Keys.S)) {
+            camera.forward(-1f * keySensitivity * multiplier);
         }
-        if (isKeyPressed(Keys.S)) {
-            camera.forward(-0.1f * keySensitivity * multiplier);
-        }
+
         if (isKeyPressed(Keys.D)) {
-            camera.strafe(0.1f * keySensitivity * multiplier);
+            camera.strafe(1f * keySensitivity * multiplier);
+        } else if (isKeyPressed(Keys.A)) {
+            camera.strafe(-1f * keySensitivity * multiplier);
         }
-        if (isKeyPressed(Keys.A)) {
-            camera.strafe(-0.1f * keySensitivity * multiplier);
-        }
+
         if (isKeyPressed(Keys.Q)) {
-            camera.addRoll(0.1f * keySensitivity, true);
+            camera.addRoll(1f * keySensitivity, true);
+        } else if (isKeyPressed(Keys.E)) {
+            camera.addRoll(-1f * keySensitivity, true);
         }
-        if (isKeyPressed(Keys.E)) {
-            camera.addRoll(-0.1f * keySensitivity, true);
-        }
+
         if(isKeyPressed(Keys.SPACE)) {
-            camera.vertical(0.1f * keySensitivity * multiplier);
-        }
-        if(isKeyPressed(Keys.C)) {
-            camera.vertical(-0.1f * keySensitivity * multiplier);
+            camera.vertical(1f * keySensitivity * multiplier);
+        } else if(isKeyPressed(Keys.C)) {
+            camera.vertical(-1f * keySensitivity * multiplier);
         }
     }
 
@@ -99,6 +104,7 @@ public class GameMouseKbdListener extends MouseKbdListener implements IObserver 
     public void deactivate() {
         // Release mouse
         setMouseCapture(false);
+        prevValid = false;
     }
 
     @Override
@@ -127,8 +133,9 @@ public class GameMouseKbdListener extends MouseKbdListener implements IObserver 
         float y = screenY / 2f;
         float mouseXSensitivity = 2f;
         float mouseYSensitivity = -2f;
-        if (prevX == Integer.MIN_VALUE) {
+        if (!prevValid) {
             updatePreviousMousePosition(x, y);
+            prevValid = true;
         }
         dx = lowPass(mouseXSensitivity * (x - prevX), dx, 15f);
         dy = lowPass(mouseYSensitivity * (y - prevY), dy, 15f);

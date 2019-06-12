@@ -30,4 +30,8 @@ public class GenericSpacecraft extends Satellite {
         this.renderQuad = Boolean.valueOf(renderQuad);
     }
 
+    public void setRenderquad(Boolean renderQuad) {
+        this.renderQuad = renderQuad;
+    }
+
 }

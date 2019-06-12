@@ -419,6 +419,13 @@ public class ModelComponent implements Disposable, IObserver {
         }
     }
 
+    public void setUsecolor(Boolean usecolor) {
+        try {
+            this.useColor = usecolor;
+        } catch (Exception e) {
+        }
+    }
+
     public void updateRelativisticEffects(ICamera camera) {
         updateRelativisticEffects(camera, -1);
     }
