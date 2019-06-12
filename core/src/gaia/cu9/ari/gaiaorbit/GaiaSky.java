@@ -66,7 +66,6 @@ import gaia.cu9.ari.gaiaorbit.util.tree.OctreeNode;
 import org.lwjgl.opengl.GL30;
 
 import java.io.File;
-import java.nio.FloatBuffer;
 import java.time.Instant;
 import java.util.*;
 
@@ -563,7 +562,6 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
         MusicManager.dispose();
     }
 
-    FloatBuffer buff = FloatBuffer.allocate(400*400);
     /**
      * Renders the scene
      **/
