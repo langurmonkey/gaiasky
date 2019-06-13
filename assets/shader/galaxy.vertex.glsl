@@ -42,7 +42,7 @@ out float v_dust;
 
 #define pc_to_u 3.085e7
 #define u_to_pc 1.0 / pc_to_u
-#define edge_far 1.0e6 * pc_to_u
+#define edge_far 2e6 * pc_to_u
 #define edge_near 10 * pc_to_u
 
 void main() {
