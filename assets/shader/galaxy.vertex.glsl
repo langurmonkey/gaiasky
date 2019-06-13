@@ -11,6 +11,7 @@ uniform mat4 u_projModelView;
 uniform vec3 u_camPos;
 uniform float u_sizeFactor;
 uniform float u_intensity;
+uniform float u_ar;
 
 uniform mat4 u_view;
 
@@ -37,7 +38,6 @@ in vec2 a_additional;
 
 out vec4 v_col;
 out float v_depth;
-out float v_dscale;
 out float v_dust;
 
 #define pc_to_u 3.085e7
@@ -65,9 +65,10 @@ void main() {
 
     float sizeCorrection = clamp((dist * u_to_pc) / 4000.0, 0.1, 6.0);
 
-    gl_Position = u_projModelView * vec4(pos, 1.0);
-    gl_PointSize = a_additional.x * u_sizeFactor;
+    float dscale = smoothstep(edge_far, edge_near, dist);
+    dscale = pow(dscale, 25.0) * 1.5;
 
-    v_dscale = smoothstep(edge_far, edge_near, dist);
-    v_dscale = pow(v_dscale, 25.0);
+    gl_Position = u_projModelView * vec4(pos, 1.0);
+    gl_PointSize = a_additional.x * u_sizeFactor * u_ar * dscale;
+
 }

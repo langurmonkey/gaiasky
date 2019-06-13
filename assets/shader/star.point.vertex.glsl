@@ -1,4 +1,4 @@
-#version 330
+#version 330 core
 
 #include shader/lib_math.glsl
 #include shader/lib_geometry.glsl

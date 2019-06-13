@@ -1,4 +1,4 @@
-#version 120
+#version 330 core
 
 #if defined(diffuseTextureFlag) || defined(specularTextureFlag)
 #define textureFlag
@@ -12,23 +12,23 @@
 #define cameraPositionFlag
 #endif
 
-attribute vec3 a_position;
+in vec3 a_position;
 uniform mat4 u_projViewTrans;
 
 #if defined(colorFlag)
-varying vec4 v_color;
-attribute vec4 a_color;
+out vec4 v_color;
+in vec4 a_color;
 #endif // colorFlag
 
 #ifdef normalFlag
-attribute vec3 a_normal;
+in vec3 a_normal;
 uniform mat3 u_normalMatrix;
-varying vec3 v_normal;
+out vec3 v_normal;
 #endif // normalFlag
 
 #ifdef textureFlag
-attribute vec2 a_texCoord0;
-varying vec2 v_texCoords0;
+in vec2 a_texCoord0;
+out vec2 v_texCoords0;
 #endif // textureFlag
 
 
@@ -39,20 +39,20 @@ uniform float u_shininess;
 #else
 const float u_shininess = 20.0;
 #endif // shininessFlag
-varying float v_time;
+out float v_time;
 
 #ifdef blendedFlag
 uniform float u_opacity;
-varying float v_opacity;
+out float v_opacity;
 
 #ifdef alphaTestFlag
 uniform float u_alphaTest;
-varying float v_alphaTest;
+out float v_alphaTest;
 #endif //alphaTestFlag
 #endif // blendedFlag
 
 #ifdef lightingFlag
-varying vec3 v_lightDiffuse;
+out vec3 v_lightDiffuse;
 
 #ifdef ambientLightFlag
 uniform vec3 u_ambientLight;
@@ -67,7 +67,7 @@ uniform vec3 u_sphericalHarmonics[9];
 #endif //sphericalHarmonicsFlag
 
 #ifdef specularFlag
-varying vec3 v_lightSpecular;
+out vec3 v_lightSpecular;
 #endif // specularFlag
 
 #ifdef cameraPositionFlag
@@ -75,10 +75,10 @@ uniform vec4 u_cameraPosition;
 #endif // cameraPositionFlag
 
 #ifdef fogFlag
-varying float v_fog;
+out float v_fog;
 #endif // fogFlag
 
-varying vec3 v_viewVec;
+out vec3 v_viewVec;
 
 #if defined(numDirectionalLights) && (numDirectionalLights > 0)
 struct DirectionalLight
@@ -104,12 +104,12 @@ uniform PointLight u_pointLights[numPointLights];
 
 #ifdef shadowMapFlag
 uniform mat4 u_shadowMapProjViewTrans;
-varying vec3 v_shadowMapUv;
+out vec3 v_shadowMapUv;
 #define separateAmbientFlag
 #endif //shadowMapFlag
 
 #if defined(ambientFlag) && defined(separateAmbientFlag)
-varying vec3 v_ambientLight;
+out vec3 v_ambientLight;
 #endif //separateAmbientFlag
 
 #endif // lightingFlag
@@ -139,7 +139,7 @@ varying vec3 v_ambientLight;
 #endif // gravitationalWaves
 
 #include shader/lib_logdepthbuff.glsl
-varying float v_depth;
+out float v_depth;
 
 void main() {
 	v_time = u_shininess;

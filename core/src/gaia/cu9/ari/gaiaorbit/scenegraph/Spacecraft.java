@@ -340,7 +340,6 @@ public class Spacecraft extends GenericSpacecraft implements ILineRenderable, IO
     public void updateLocalValues(ITimeFrameProvider time, ICamera camera) {
         if (yawv != 0 || pitchv != 0 || rollv != 0 || vel.len2() != 0 || render) {
             // We use the simulation time for the integration
-            //double dt = time.getDt() * Constants.H_TO_S;
             double dt = Gdx.graphics.getDeltaTime();
             // Poll keys
             pollKeys(Gdx.graphics.getDeltaTime());

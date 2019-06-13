@@ -1,4 +1,4 @@
-
+#version 330 core
 // UNIFORMS
 
 // Diffuse base texture
@@ -9,24 +9,21 @@ uniform sampler2D u_normalTexture;
 // VARYINGS
 
 // Time in seconds
-varying float v_time;
+in float v_time;
 // Ambient color (star color in this case)
-varying vec3 v_lightDiffuse;
+in vec3 v_lightDiffuse;
 // The normal
-varying vec3 v_normal;
+in vec3 v_normal;
 // Coordinate of the texture
-varying vec2 v_texCoords0;
+in vec2 v_texCoords0;
 // Opacity
-varying float v_opacity;
+in float v_opacity;
 // View vector
-varying vec3 v_viewVec;
+in vec3 v_viewVec;
 
-varying float v_depth;
-
+in float v_depth;
 
 #define time v_time * 0.003
-
-
 
 vec3 mod289(vec3 x) {
   return x - floor(x * (1.0 / 289.0)) * 289.0;

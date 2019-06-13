@@ -711,7 +711,7 @@ public class GlobalConf {
 
     public static class ProgramConf implements IConf, IObserver {
 
-        public static enum StereoProfile {
+        public enum StereoProfile {
             /**
              * Left image -> left eye, distortion
              **/
@@ -747,6 +747,10 @@ public class GlobalConf {
 
             public boolean isAnaglyphic() {
                 return this.equals(ANAGLYPHIC);
+            }
+
+            public boolean correctAspect() {
+                return !this.equals(HD_3DTV_HORIZONTAL) && !this.equals(ANAGLYPHIC);
             }
         }
 
@@ -846,7 +850,7 @@ public class GlobalConf {
         }
 
         public boolean isStereoHalfWidth() {
-            return STEREOSCOPIC_MODE && (STEREO_PROFILE != StereoProfile.HD_3DTV_HORIZONTAL && STEREO_PROFILE != StereoProfile.ANAGLYPHIC);
+            return STEREOSCOPIC_MODE && STEREO_PROFILE.correctAspect();
         }
 
         public boolean isStereoFullWidth() {

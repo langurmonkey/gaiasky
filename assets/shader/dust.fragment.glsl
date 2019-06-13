@@ -30,7 +30,7 @@ void main() {
     vec3 V = normalize(v_viewDir);
 
     vec3 baseColor = diffuse.rgb;
-    float edge = min(1.0, pow(max(0.0, dot(N, V)), 1.0) * 1.5);
+    float edge = min(1.0, pow(max(0.0, abs(dot(N, V))), 1.0) * 1.2);
 
     fragColor = vec4(baseColor.rgb, edge) * v_opacity;
 
@@ -40,6 +40,7 @@ void main() {
 
     if(fragColor.a == 0.0 || dither(gl_FragCoord.xy, fragColor.a) < 0.5){
         discard;
+    } else {
+        gl_FragDepth = v_depth;
     }
-    gl_FragDepth = v_depth;
 }

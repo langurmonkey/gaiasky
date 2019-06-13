@@ -129,16 +129,16 @@ public class GameMouseKbdListener extends MouseKbdListener implements IObserver 
 
     @Override
     public boolean mouseMoved(int screenX, int screenY) {
-        float x = screenX / 2f;
-        float y = screenY / 2f;
+        float x = screenX;
+        float y = screenY;
         float mouseXSensitivity = 2f;
         float mouseYSensitivity = -2f;
         if (!prevValid) {
             updatePreviousMousePosition(x, y);
             prevValid = true;
         }
-        dx = lowPass(mouseXSensitivity * (x - prevX), dx, 15f);
-        dy = lowPass(mouseYSensitivity * (y - prevY), dy, 15f);
+        dx = lowPass(mouseXSensitivity * (x - prevX), dx, 5f);
+        dy = lowPass(mouseYSensitivity * (y - prevY), dy, 5f);
         camera.addYaw(dx, true);
         camera.addPitch(dy, true);
 

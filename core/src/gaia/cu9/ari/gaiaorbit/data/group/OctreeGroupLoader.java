@@ -98,7 +98,7 @@ public class OctreeGroupLoader extends StreamingOctreeLoader {
         }
     }
 
-    public boolean loadOctant(final OctreeNode octant, final AbstractOctreeWrapper octreeWrapper, boolean fullInit) throws IOException {
+    public boolean loadOctant(final OctreeNode octant, final AbstractOctreeWrapper octreeWrapper, boolean fullInit) {
         FileHandle octantFile = GlobalConf.data.dataFileHandle(particles + "particles_" + String.format("%06d", octant.pageId) + ".bin");
         if (!octantFile.exists() || octantFile.isDirectory()) {
             return false;

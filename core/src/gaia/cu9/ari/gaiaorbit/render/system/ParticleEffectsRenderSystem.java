@@ -20,7 +20,6 @@ import gaia.cu9.ari.gaiaorbit.scenegraph.SceneGraphNode.RenderGroup;
 import gaia.cu9.ari.gaiaorbit.scenegraph.camera.ICamera;
 import gaia.cu9.ari.gaiaorbit.util.Constants;
 import gaia.cu9.ari.gaiaorbit.util.GlobalConf;
-import gaia.cu9.ari.gaiaorbit.util.GlobalConf.ProgramConf.StereoProfile;
 import gaia.cu9.ari.gaiaorbit.util.gdx.mesh.IntMesh;
 import gaia.cu9.ari.gaiaorbit.util.gdx.shader.ExtShaderProgram;
 import gaia.cu9.ari.gaiaorbit.util.math.MathUtilsd;
@@ -220,7 +219,6 @@ public class ParticleEffectsRenderSystem extends ImmediateRenderSystem {
                 shaderProgram.setUniformMatrix("u_projModelView", camera.getCamera().combined);
                 shaderProgram.setUniformf("u_camPos", camera.getCurrent().getPos().put(aux1f));
                 shaderProgram.setUniformf("u_alpha", alpha * 0.6f);
-                shaderProgram.setUniformf("u_ar", GlobalConf.program.STEREOSCOPIC_MODE && (GlobalConf.program.STEREO_PROFILE != StereoProfile.HD_3DTV_HORIZONTAL && GlobalConf.program.STEREO_PROFILE != StereoProfile.ANAGLYPHIC) ? 0.5f : 1f);
                 shaderProgram.setUniformf("u_sizeFactor", rc.scaleFactor);
                 shaderProgram.setUniformf("u_t", getT());
 

@@ -67,7 +67,7 @@ public abstract class StreamingOctreeLoader implements IObserver, ISceneGraphLoa
     protected final long maxLoadedStars;
 
     /** The octant loading queue **/
-    protected Queue<OctreeNode> toLoadQueue = null;
+    protected Queue<OctreeNode> toLoadQueue;
 
     /** Whether loading is paused or not **/
     protected boolean loadingPaused = false;

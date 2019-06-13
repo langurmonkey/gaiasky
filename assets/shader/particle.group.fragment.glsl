@@ -10,15 +10,18 @@ out vec4 fragColor;
 
 #define PI 3.1415927
 
-float programmatic(vec2 uv) {
-    float dist = distance(vec2(0.5), uv) * 2.0;
+float programmatic(float dist) {
     return 1.0 - pow(abs(sin(PI * dist / 2.0)), u_falloff);
 }
 
 void main() {
-    vec2 uv = vec2(gl_PointCoord.s, gl_PointCoord.t);
-    uv.y = uv.y / u_ar;
-    fragColor = vec4(v_col.rgb * programmatic(uv), 1.0) * v_col.a;
+    vec2 uv = vec2(gl_PointCoord.x, gl_PointCoord.y);
+    uv.y = uv.y * u_ar;
+    float dist = distance(vec2(0.5, 0.5 * u_ar), uv) * 2.0;
+    if(dist > 1.0)
+        discard;
+
+    fragColor = vec4(v_col.rgb * programmatic(dist), 1.0) * v_col.a;
 
     // Logarithmic depth buffer
     gl_FragDepth = v_depth;

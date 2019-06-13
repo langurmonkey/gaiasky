@@ -11,7 +11,6 @@ import gaia.cu9.ari.gaiaorbit.scenegraph.AbstractPositionEntity;
 import gaia.cu9.ari.gaiaorbit.scenegraph.StarGroup;
 import gaia.cu9.ari.gaiaorbit.scenegraph.StarGroup.StarBean;
 
-import java.io.FileNotFoundException;
 import java.io.InputStream;
 import java.io.OutputStream;
 
@@ -52,13 +51,13 @@ public class StarGroupBinaryIO implements IStarGroupIO {
      *            The input stream to read the star group from
      * @return A list with a single star group object
      */
-    public Array<AbstractPositionEntity> readParticles(InputStream in) throws FileNotFoundException {
+    public Array<AbstractPositionEntity> readParticles(InputStream in) {
         @SuppressWarnings("unchecked")
         Array<StarBean> data = (Array<StarBean>) provider.loadData(in, 1.0);
         StarGroup sg = new StarGroup();
         sg.setData(data);
 
-        Array<AbstractPositionEntity> l = new Array<AbstractPositionEntity>(1);
+        Array<AbstractPositionEntity> l = new Array<>(1);
         l.add(sg);
         return l;
     }

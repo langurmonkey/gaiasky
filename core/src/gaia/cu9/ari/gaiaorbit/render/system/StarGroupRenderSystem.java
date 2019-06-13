@@ -155,7 +155,7 @@ public class StarGroupRenderSystem extends ImmediateRenderSystem implements IObs
 
                             // Days since epoch
                             shaderProgram.setUniformi("u_t", (int) (AstroUtils.getMsSince(GaiaSky.instance.time.getTime(), starGroup.getEpoch()) * Nature.MS_TO_D));
-                            shaderProgram.setUniformf("u_ar", GlobalConf.program.isStereoHalfWidth() ? 0.5f : 1f);
+                            shaderProgram.setUniformf("u_ar", GlobalConf.program.isStereoHalfWidth() ? 2f : 1f);
                             shaderProgram.setUniformf("u_thAnglePoint", (float) 1e-8);
 
                             // Update projection if fovmode is 3
