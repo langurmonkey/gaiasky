@@ -126,18 +126,13 @@ public class Billboard extends ModelBody {
 
     @Override
     public float getTextOpacity() {
-        return Math.max(getOpacity(), fadeOpacity);
+        return Math.min(getOpacity(), fadeOpacity);
     }
 
 
     @Override
     public float labelSizeConcrete() {
         return size * .5e-2f;
-    }
-
-    @Override
-    protected float labelMax() {
-        return super.labelMax() * 2;
     }
 
     protected float getViewAnglePow() {

@@ -341,7 +341,7 @@ public abstract class CelestialBody extends AbstractPositionEntity implements I3
 
     @Override
     public float textSize() {
-        return (float) (Math.min(labelSizeConcrete() / FastMath.powQuick(distToCamera, 1.05f), labelMax()) * distToCamera * labelFactor());
+        return (float) (labelMax() * distToCamera * labelFactor());
     }
 
     protected float labelSizeConcrete() {

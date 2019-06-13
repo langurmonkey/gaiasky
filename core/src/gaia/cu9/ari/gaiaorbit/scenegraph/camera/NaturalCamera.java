@@ -317,7 +317,7 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
         // The whole update thread must lock the value of direction and up
         distance = pos.len();
         CameraMode m = (parent.current == this ? parent.mode : lastMode);
-        double realTransUnits = getTranslateUnits();
+        double realTransUnits = m.isGame() ? getTranslateUnits(1e-5) : getTranslateUnits();
         double translateUnits = Math.max(10d * Constants.M_TO_U, realTransUnits);
         switch (m) {
         case FOCUS_MODE:
@@ -590,22 +590,35 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
         lastFwdTime = 0;
     }
 
-    public void forward(double amount) {
-        double tu = getTranslateUnits();
+    public void forward(double amount){
+        forward(amount, 0);
+    }
+
+    public void forward(double amount, double minTu) {
+        double tu = getTranslateUnits(minTu);
         desired.set(direction).nor().scl(amount * tu);
         vel.add(desired).clamp(0, 5e12);
         lastFwdTime = 0;
     }
 
-    public void strafe(double amount) {
-        double tu = getTranslateUnits();
+
+    public void strafe(double amount){
+        strafe(amount, 0);
+    }
+
+    public void strafe(double amount, double minTu) {
+        double tu = getTranslateUnits(minTu);
         desired.set(direction).crs(up).nor().scl(amount * tu);
         vel.add(desired).clamp(0, 5e12);
         lastFwdTime = 0;
     }
 
     public void vertical(double amount) {
-        double tu = getTranslateUnits();
+        vertical(amount, 0);
+    }
+
+    public void vertical(double amount, double minTu) {
+        double tu = getTranslateUnits(minTu);
         desired.set(up).nor().scl(amount * tu);
         vel.add(desired).clamp(0, 5e12);
         lastFwdTime = 0;
@@ -1095,7 +1108,7 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
      * @return The translate units
      */
     public double getTranslateUnits() {
-        return getTranslateUnits(0.5e-5);
+        return getTranslateUnits(0.5e-8);
     }
 
     /**

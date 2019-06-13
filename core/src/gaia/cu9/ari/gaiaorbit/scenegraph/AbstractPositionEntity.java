@@ -29,9 +29,8 @@ import net.jafama.FastMath;
 
 /**
  * A base abstract graphical entity with the basics.
- * 
- * @author Toni Sagrista
  *
+ * @author Toni Sagrista
  */
 public abstract class AbstractPositionEntity extends SceneGraphNode {
     /**
@@ -111,7 +110,6 @@ public abstract class AbstractPositionEntity extends SceneGraphNode {
         super(name);
     }
 
-
     @Override
     public void doneLoading(AssetManager manager) {
         super.doneLoading(manager);
@@ -120,19 +118,18 @@ public abstract class AbstractPositionEntity extends SceneGraphNode {
             coordinates.doneLoading(sg, this);
     }
 
-    public Vector3d getPos(){
+    public Vector3d getPos() {
         return pos;
     }
 
-    public boolean isCopy(){
+    public boolean isCopy() {
         return copy;
     }
 
     /**
      * Returns the position of this entity in the internal reference system.
-     * 
-     * @param aux
-     *            The vector where the result will be put
+     *
+     * @param aux The vector where the result will be put
      * @return The aux vector with the position
      */
     public Vector3d getPosition(Vector3d aux) {
@@ -142,9 +139,10 @@ public abstract class AbstractPositionEntity extends SceneGraphNode {
     /**
      * Gets a copy of this entity which mimics its state in the next time step with position,
      * orientation, etc.
+     *
      * @return A copy of this entity in the next time step
      */
-    public IFocus getNext(ITimeFrameProvider  time, ICamera camera, boolean force){
+    public IFocus getNext(ITimeFrameProvider time, ICamera camera, boolean force) {
         if (!mustUpdatePosition(time) && !force) {
             return (IFocus) this;
         } else {
@@ -160,21 +158,15 @@ public abstract class AbstractPositionEntity extends SceneGraphNode {
         }
     }
 
-
-
     /**
      * Gets the position of this entity in the next time step in the
      * internal reference system using the given time provider and the given
      * camera.
-     * 
-     * @param aux
-     *            The out vector where the result will be stored.
-     * @param time
-     *            The time frame provider.
-     * @param camera
-     *            The camera.
-     * @param force
-     *            Whether to force the computation if time is off.
+     *
+     * @param aux    The out vector where the result will be stored.
+     * @param time   The time frame provider.
+     * @param camera The camera.
+     * @param force  Whether to force the computation if time is off.
      * @return The aux vector for chaining.
      */
     public Vector3d getPredictedPosition(Vector3d aux, ITimeFrameProvider time, ICamera camera, boolean force) {
@@ -205,9 +197,8 @@ public abstract class AbstractPositionEntity extends SceneGraphNode {
     /**
      * Whether position must be recomputed for this entity. By default, only
      * when time is on
-     * 
-     * @param time
-     *            The current time
+     *
+     * @param time The current time
      * @return True if position should be recomputed for this entity
      */
     protected boolean mustUpdatePosition(ITimeFrameProvider time) {
@@ -217,9 +208,8 @@ public abstract class AbstractPositionEntity extends SceneGraphNode {
     /**
      * Returns the absolute position of this entity in the native coordinates
      * (equatorial system)
-     * 
-     * @param aux
-     *            Auxiliary vector to put the result in
+     *
+     * @param aux Auxiliary vector to put the result in
      * @return The vector with the position
      */
     public Vector3d getAbsolutePosition(Vector3d aux) {
@@ -249,7 +239,7 @@ public abstract class AbstractPositionEntity extends SceneGraphNode {
 
     /**
      * Updates the local transform matrix.
-     * 
+     *
      * @param time
      */
     @Override
@@ -276,7 +266,7 @@ public abstract class AbstractPositionEntity extends SceneGraphNode {
     /**
      * This function updates all the local values before the localTransform is
      * updated. Position, rotations and scale must be updated in here.
-     * 
+     *
      * @param time
      * @param camera
      */
@@ -284,7 +274,7 @@ public abstract class AbstractPositionEntity extends SceneGraphNode {
 
     /**
      * Returns the radius in internal units
-     * 
+     *
      * @return The radius of the object, in internal units
      */
     public double getRadius() {
@@ -309,7 +299,7 @@ public abstract class AbstractPositionEntity extends SceneGraphNode {
 
     /**
      * Returns the size (diameter) of this entity in internal units.
-     * 
+     *
      * @return The size in internal units.
      */
     public double getSize() {
@@ -318,9 +308,8 @@ public abstract class AbstractPositionEntity extends SceneGraphNode {
 
     /**
      * Sets the absolute size (diameter) of this entity
-     * 
-     * @param size
-     *            The diameter in internal units
+     *
+     * @param size The diameter in internal units
      */
     public void setSize(Double size) {
         this.size = size.floatValue();
@@ -328,9 +317,8 @@ public abstract class AbstractPositionEntity extends SceneGraphNode {
 
     /**
      * Sets the absolute size (diameter) of this entity
-     * 
-     * @param size
-     *            The diameter in internal units
+     *
+     * @param size The diameter in internal units
      */
     public void setSize(Long size) {
         this.size = (float) size;
@@ -356,7 +344,7 @@ public abstract class AbstractPositionEntity extends SceneGraphNode {
         this.cc = color;
     }
 
-    public OctreeNode getOctant(){
+    public OctreeNode getOctant() {
         return octant;
     }
 
@@ -366,7 +354,7 @@ public abstract class AbstractPositionEntity extends SceneGraphNode {
 
     /**
      * Gets a copy of this object but does not copy its parent or children
-     * 
+     *
      * @return The copied object
      */
     @Override
@@ -395,7 +383,7 @@ public abstract class AbstractPositionEntity extends SceneGraphNode {
 
     /**
      * Returns the current distance to the camera in internal units.
-     * 
+     *
      * @return The current distance to the camera, in internal units.
      */
     public double getDistToCamera() {
@@ -404,7 +392,7 @@ public abstract class AbstractPositionEntity extends SceneGraphNode {
 
     /**
      * Returns the current view angle of this entity, in radians.
-     * 
+     *
      * @return The view angle in radians.
      */
     public double getViewAngle() {
@@ -414,7 +402,7 @@ public abstract class AbstractPositionEntity extends SceneGraphNode {
     /**
      * Returns the current apparent view angle (view angle corrected with the
      * field of view) of this entity, in radians.
-     * 
+     *
      * @return The apparent view angle in radians.
      */
     public double getViewAngleApparent() {
@@ -450,27 +438,27 @@ public abstract class AbstractPositionEntity extends SceneGraphNode {
         // The smoothing scale must be set according to the distance
         shader.setUniformf("u_scale", GlobalConf.scene.LABEL_SIZE_FACTOR * scale / camera.getFovFactor());
 
-        size *= GlobalConf.scene.LABEL_SIZE_FACTOR;
+        if (distToCamera > getRadius() * 2) {
 
-        double len = pos.len();
-        pos.clamp(0, len - size);
+            size *= GlobalConf.scene.LABEL_SIZE_FACTOR;
 
-        // Enable or disable blending
-        ((I3DTextRenderable) this).textDepthBuffer();
+            // Enable or disable blending
+            ((I3DTextRenderable) this).textDepthBuffer();
 
-        float rot = 0;
-        if (rc.cubemapSide == CubemapSide.SIDE_UP || rc.cubemapSide == CubemapSide.SIDE_DOWN) {
-            Vector3 v1 = aux3f1.get();
-            Vector3 v2 = aux3f2.get();
-            camera.getCamera().project(v1.set((float) pos.x, (float) pos.y, (float) pos.z));
-            v1.z = 0;
-            v2.set(Gdx.graphics.getWidth() / 2, Gdx.graphics.getHeight() / 2, 0);
-            rot = GlobalResources.angle2d(v1, v2) + (rc.cubemapSide == CubemapSide.SIDE_UP ? 90 : -90);
+            float rot = 0;
+            if (rc.cubemapSide == CubemapSide.SIDE_UP || rc.cubemapSide == CubemapSide.SIDE_DOWN) {
+                Vector3 v1 = aux3f1.get();
+                Vector3 v2 = aux3f2.get();
+                camera.getCamera().project(v1.set((float) pos.x, (float) pos.y, (float) pos.z));
+                v1.z = 0;
+                v2.set(Gdx.graphics.getWidth() / 2, Gdx.graphics.getHeight() / 2, 0);
+                rot = GlobalResources.angle2d(v1, v2) + (rc.cubemapSide == CubemapSide.SIDE_UP ? 90 : -90);
+            }
+
+            shader.setUniformf("u_pos", pos.put(aux3f1.get()));
+
+            DecalUtils.drawFont3D(font, batch, label, (float) pos.x, (float) pos.y, (float) pos.z, size, rot, camera.getCamera(), true);
         }
-
-        shader.setUniformf("u_pos", pos.put(aux3f1.get()));
-
-        DecalUtils.drawFont3D(font, batch, label, (float) pos.x, (float) pos.y, (float) pos.z, size, rot, camera.getCamera(), true);
     }
 
     public void setCoordinates(IBodyCoordinates coord) {

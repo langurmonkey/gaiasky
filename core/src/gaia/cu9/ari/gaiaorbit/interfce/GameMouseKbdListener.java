@@ -44,33 +44,33 @@ public class GameMouseKbdListener extends MouseKbdListener implements IObserver 
         float keySensitivity = 3e-1f;
         // Run mode
         float multiplier = isKeyPressed(Keys.SHIFT_LEFT) ? 3f : 1f;
-
+        double minTranslateUnits = 1e-5;
         if(anyPressed(Keys.W, Keys.A, Keys.S, Keys.D)){
             camera.vel.setZero();
         }
 
         if (isKeyPressed(Keys.W)) {
-            camera.forward(1f * keySensitivity * multiplier);
+            camera.forward(1f * keySensitivity * multiplier, minTranslateUnits);
         } else if (isKeyPressed(Keys.S)) {
-            camera.forward(-1f * keySensitivity * multiplier);
+            camera.forward(-1f * keySensitivity * multiplier, minTranslateUnits);
         }
 
         if (isKeyPressed(Keys.D)) {
-            camera.strafe(1f * keySensitivity * multiplier);
+            camera.strafe(1f * keySensitivity * multiplier, minTranslateUnits);
         } else if (isKeyPressed(Keys.A)) {
-            camera.strafe(-1f * keySensitivity * multiplier);
+            camera.strafe(-1f * keySensitivity * multiplier, minTranslateUnits);
         }
 
         if (isKeyPressed(Keys.Q)) {
-            camera.addRoll(1f * keySensitivity, true);
+            camera.addRoll(8f * keySensitivity, true);
         } else if (isKeyPressed(Keys.E)) {
-            camera.addRoll(-1f * keySensitivity, true);
+            camera.addRoll(-8f * keySensitivity, true);
         }
 
         if(isKeyPressed(Keys.SPACE)) {
-            camera.vertical(1f * keySensitivity * multiplier);
+            camera.vertical(1f * keySensitivity * multiplier, minTranslateUnits);
         } else if(isKeyPressed(Keys.C)) {
-            camera.vertical(-1f * keySensitivity * multiplier);
+            camera.vertical(-1f * keySensitivity * multiplier, minTranslateUnits);
         }
     }
 

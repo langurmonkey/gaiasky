@@ -814,7 +814,7 @@ public class StarGroup extends ParticleGroup implements ILineRenderable, IStarFo
                 float radius = (float) getRadius(active[i]);
                 float viewAngle = (float) (((radius / distToCamera) / camera.getFovFactor()) * GlobalConf.scene.STAR_BRIGHTNESS);
 
-                if (viewAngle >= thOverFactor && camera.isVisible(GaiaSky.instance.time, viewAngle, lpos, distToCamera)) {
+                if (viewAngle >= thOverFactor && camera.isVisible(GaiaSky.instance.time, viewAngle, lpos, distToCamera) && distToCamera > radius * 100) {
                     textPosition(camera, lpos, distToCamera, radius);
 
                     shader.setUniformf("u_viewAngle", viewAngle);
