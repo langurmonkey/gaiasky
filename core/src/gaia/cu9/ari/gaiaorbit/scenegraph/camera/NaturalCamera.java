@@ -883,7 +883,7 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
 
             double h = closest.getHeight(pos, aux5);
             double hs = closest.getHeightScale();
-            double minDist = h + hs / 26.0;
+            double minDist = h + hs / 10.0;
             double newDist = aux5.scl(-1).add(pos).len();
             if (newDist < minDist) {
                 aux5.nor().scl(minDist - newDist);

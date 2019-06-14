@@ -212,12 +212,13 @@ public class CameraManager implements ICamera, IObserver {
     }
 
     public void updateCurrentCamera(CameraMode previousMode) {
-        AbstractCamera aux = null;
+        AbstractCamera aux;
         // Update
         switch (mode) {
         case FREE_MODE:
         case FOCUS_MODE:
         case GAME_MODE:
+            EventManager.instance.post(Events.CAMERA_CINEMATIC_CMD, false, false);
         case GAIA_SCENE_MODE:
             aux = backupCam(current);
             current = naturalCamera;

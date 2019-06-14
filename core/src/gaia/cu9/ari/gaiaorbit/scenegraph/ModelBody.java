@@ -389,7 +389,7 @@ public abstract class ModelBody extends CelestialBody {
                 dCam = distToCamera;
             }
             // Only when we have height map and we are below the highest point in the surface
-            if (dCam < getRadius() + mc.tc.heightScale * 12) {
+            if (dCam < getRadius() + mc.tc.heightScale * 4) {
                 float[][] m = mc.tc.heightMap;
                 int W = mc.tc.heightMap.length;
                 int H = mc.tc.heightMap[0].length;

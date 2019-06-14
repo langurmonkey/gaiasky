@@ -13,6 +13,7 @@ import com.badlogic.gdx.graphics.Texture.TextureFilter;
 import com.badlogic.gdx.graphics.VertexAttributes.Usage;
 import com.badlogic.gdx.graphics.g3d.Material;
 import com.badlogic.gdx.graphics.g3d.attributes.BlendingAttribute;
+import com.badlogic.gdx.graphics.g3d.attributes.IntAttribute;
 import com.badlogic.gdx.graphics.g3d.attributes.TextureAttribute;
 import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Vector3;
@@ -149,6 +150,8 @@ public class CloudComponent {
             material.set(new TextureAttribute(TextureAttribute.Normal, tex));
         }
         material.set(new BlendingAttribute(1.0f));
+        // Do not cull
+        material.set(new IntAttribute(IntAttribute.CullFace, 0));
     }
 
     public void removeAtmosphericScattering(Material mat) {

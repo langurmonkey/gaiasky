@@ -131,8 +131,8 @@ public class GameMouseKbdListener extends MouseKbdListener implements IObserver 
     public boolean mouseMoved(int screenX, int screenY) {
         float x = screenX;
         float y = screenY;
-        float mouseXSensitivity = 2f;
-        float mouseYSensitivity = -2f;
+        float mouseXSensitivity = 0.2f;
+        float mouseYSensitivity = -0.2f;
         if (!prevValid) {
             updatePreviousMousePosition(x, y);
             prevValid = true;
