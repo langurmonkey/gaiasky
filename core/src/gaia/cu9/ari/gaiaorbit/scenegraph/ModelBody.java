@@ -205,8 +205,7 @@ public abstract class ModelBody extends CelestialBody {
 
     @Override
     public float getInnerRad() {
-        return .5f;
-        // return .02f;
+        return .2f;
     }
 
     public void dispose() {
@@ -223,8 +222,11 @@ public abstract class ModelBody extends CelestialBody {
 
         float size = getFuzzyRenderSize(camera);
 
-        Vector3 aux = aux3f1.get();
-        shader.setUniformf("u_pos", translation.put(aux));
+        Vector3 bbPos = translation.put(aux3f1.get());
+        // Get it a tad closer to the camera to prevent occlusion with orbit
+        float l = bbPos.len();
+        bbPos.nor().scl(l * 0.99f);
+        shader.setUniformf("u_pos", bbPos);
         shader.setUniformf("u_size", size);
 
         shader.setUniformf("u_color", cc[0], cc[1], cc[2], alpha * (1 - fadeOpacity));
