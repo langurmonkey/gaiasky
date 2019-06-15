@@ -90,15 +90,54 @@
       "name": "default-data",
       "type": "data-pack",
       "version": 2,
+      "mingsversion": 260,
+      "size": 45673365,
+      "check": "data-main.json",
+      "data": [
+        "data-main.json",
+        "asteroids-dr2.json",
+        "asteroids.json",
+        "attitudexml",
+        "constellations",
+        "countries",
+        "extra.json",
+        "galaxy",
+        "locations-earth.json",
+        "locations.json",
+        "locations-moon.json",
+        "meshes/dr2/meshes_dust",
+        "meshes/dr2/meshes_hii",
+        "meshes-dr2-dust.json",
+        "meshes-dr2-hii.json",
+        "models",
+        "moons.json",
+        "mwsc",
+        "oort",
+        "orbit",
+        "orbits-asteroid.json",
+        "orbits-asteroids-dr2.json",
+        "orbits-moon.json",
+        "orbits-planet.json",
+        "orbits-satellite.json",
+        "planets.json",
+        "satellites.json",
+        "tex/base"
+      ],
+      "md5": "4bb17a415ffe456f027e8373bf2c6321",
+      "description": "Default data pack for Gaia Sky - For Gaia Sky 2.1.5 and above. Contains the Solar System, constellations, meshes and more",
+      "file": "http://gaia.ari.uni-heidelberg.de/gaiasky/files/autodownload/basedata/002_20190611/gaiasky_data.tar.gz"
+    },
+    {
+      "name": "default-data",
+      "type": "data-pack",
+      "version": 3,
       "mingsversion": 20200,
-      "size": 119707072,
+      "size": 81309807,
       "check": "data-main.json",
       "data": [
         "asteroids-dr2.json",
         "asteroids.json",
         "attitudexml",
-        "autoload-meshes-dr2-dust.json",
-        "autoload-meshes-dr2-hii.json",
         "constellations",
         "countries",
         "data-main.json",
@@ -123,9 +162,9 @@
         "satellites.json",
         "tex/base"
       ],
-      "md5": "a80267dd5a09ff0ec94e039b6cfb9009",
+      "md5": "f08965bf81deb707777a41a1174b5b19",
       "description": "Default data pack for Gaia Sky - For Gaia Sky 2.2.0 and above. Contains the Solar System, constellations, meshes and more",
-      "file": "http://gaia.ari.uni-heidelberg.de/gaiasky/files/autodownload/basedata/002_20190429_v020222/gaiasky_data.tar.gz"
+      "file": "http://gaia.ari.uni-heidelberg.de/gaiasky/files/autodownload/basedata/004_20190614_v020200/gaiasky_data.tar.gz"
     },
     {
       "name": "catalog-dr2-verysmall",
@@ -325,7 +364,7 @@
         "tex/extragal"
       ],
       "description": "NBG catalog - Nearby Galaxies Catalog, contains M87 black hole - 870 galaxies",
-      "md5": "b919f0edcd4ffc35ae548007609cd084",
+      "md5": "85981154b6bdb8a8d6ab1128e17a3295",
       "file": "http://gaia.ari.uni-heidelberg.de/gaiasky/files/autodownload/galaxies/003_20190411/nbg-galaxies.tar.gz"
     },
     {
@@ -452,6 +491,22 @@
       "description": "High resolution textures - High resolution texture pack including some 4K and 8K textures for planet surfaces and asteroids.",
       "md5": "7e480c26e0126336b5776d2c26be466d",
       "file": "http://gaia.ari.uni-heidelberg.de/gaiasky/files/autodownload/tex/001_20181129/hi-res-texture-pack.tar.gz"
+    },
+    {
+      "name": "hi-res-textures",
+      "type": "texture-pack",
+      "version": 2,
+      "mingsversion": 20200,
+      "size": 110403470,
+      "check": "hi-res-tex-desc.json",
+      "data": [
+        "hi-res-tex-desc.json",
+        "tex/base/*-high.jpg",
+        "tex/base/*-ultra.jpg"
+      ],
+      "description": "High resolution textures - High resolution texture pack including some 4K and 8K textures for planet surfaces and asteroids.",
+      "md5": "3f4f78ce158445ba657d437508cbcd76",
+      "file": "http://gaia.ari.uni-heidelberg.de/gaiasky/files/autodownload/tex/002_20190614_v020200/hi-res-texture-pack.tar.gz"
     }
   ]
 }
