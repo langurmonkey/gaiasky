@@ -6,6 +6,7 @@
 package gaia.cu9.ari.gaiaorbit.render.system;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.VertexAttribute;
 import com.badlogic.gdx.graphics.VertexAttributes.Usage;
@@ -31,7 +32,7 @@ import gaia.cu9.ari.gaiaorbit.util.math.MathUtilsd;
 public class OrbitalElementsParticlesRenderSystem extends ImmediateRenderSystem implements IObserver {
     private Vector3 aux1;
     private Matrix4 maux;
-    private int elems01Offset, elems02Offset, count;
+    private int elems01Offset, elems02Offset, sizeOffset, count;
 
     public OrbitalElementsParticlesRenderSystem(RenderGroup rg, float[] alphas, ShaderProgram[] shaders) {
         super(rg, alphas, shaders);
@@ -65,6 +66,7 @@ public class OrbitalElementsParticlesRenderSystem extends ImmediateRenderSystem 
         curr.colorOffset = curr.mesh.getVertexAttribute(Usage.ColorPacked) != null ? curr.mesh.getVertexAttribute(Usage.ColorPacked).offset / 4 : 0;
         elems01Offset = curr.mesh.getVertexAttribute(Usage.Tangent) != null ? curr.mesh.getVertexAttribute(Usage.Tangent).offset / 4 : 0;
         elems02Offset = curr.mesh.getVertexAttribute(Usage.Generic) != null ? curr.mesh.getVertexAttribute(Usage.Generic).offset / 4 : 0;
+        sizeOffset = curr.mesh.getVertexAttribute(Usage.Normal) != null ? curr.mesh.getVertexAttribute(Usage.Normal).offset / 4 : 0;
         return mdi;
     }
 
@@ -82,6 +84,10 @@ public class OrbitalElementsParticlesRenderSystem extends ImmediateRenderSystem 
                     if (!orbitElems.elemsInGpu) {
 
                         OrbitComponent oc = orbitElems.oc;
+
+                        // COLOR
+                        tempVerts[curr.vertexIdx + curr.colorOffset] = Color.toFloatBits(orbitElems.pointColor[0], orbitElems.pointColor[1], orbitElems.pointColor[2], orbitElems.pointColor[3]);
+
                         // ORBIT ELEMS 01
                         tempVerts[curr.vertexIdx + elems01Offset + 0] = (float) Math.sqrt(AstroUtils.MU_SOL / Math.pow(oc.semimajoraxis * 1000d, 3d));
                         tempVerts[curr.vertexIdx + elems01Offset + 1] = (float) oc.epoch;
@@ -93,6 +99,9 @@ public class OrbitalElementsParticlesRenderSystem extends ImmediateRenderSystem 
                         tempVerts[curr.vertexIdx + elems02Offset + 1] = (float) (oc.ascendingnode * MathUtilsd.degRad);
                         tempVerts[curr.vertexIdx + elems02Offset + 2] = (float) (oc.argofpericenter * MathUtilsd.degRad);
                         tempVerts[curr.vertexIdx + elems02Offset + 3] = (float) (oc.meananomaly * MathUtilsd.degRad);
+
+                        // SIZE and FALLOFF
+                        tempVerts[curr.vertexIdx + sizeOffset] = orbitElems.pointSize;
 
                         curr.vertexIdx += curr.vertexSize;
 
@@ -147,9 +156,11 @@ public class OrbitalElementsParticlesRenderSystem extends ImmediateRenderSystem 
     }
 
     protected VertexAttribute[] buildVertexAttributes() {
-        Array<VertexAttribute> attribs = new Array<VertexAttribute>();
+        Array<VertexAttribute> attribs = new Array<>();
+        attribs.add(new VertexAttribute(Usage.ColorPacked, 4, ShaderProgram.COLOR_ATTRIBUTE));
         attribs.add(new VertexAttribute(Usage.Tangent, 4, "a_orbitelems01"));
         attribs.add(new VertexAttribute(Usage.Generic, 4, "a_orbitelems02"));
+        attribs.add(new VertexAttribute(Usage.Normal, 1, "a_size"));
 
         VertexAttribute[] array = new VertexAttribute[attribs.size];
         for (int i = 0; i < attribs.size; i++)

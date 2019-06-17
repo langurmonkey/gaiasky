@@ -7,8 +7,10 @@ precision mediump int;
 
 #include shader/lib_geometry.glsl
 
+attribute vec4 a_color;
 attribute vec4 a_orbitelems01;
 attribute vec4 a_orbitelems02;
+attribute float a_size;
 
 uniform mat4 u_projModelView;
 uniform mat4 u_eclToEq;
@@ -126,9 +128,9 @@ void main() {
         pos = computeGravitationalWaves(pos, u_gw, u_gwmat3, u_ts, u_omgw, u_hterms);
     #endif // gravitationalWaves
     
-    v_col = vec4(0.8, 0.8, 0.8, 1.0) * u_alpha;
+    v_col = a_color * u_alpha;
 
     gl_Position = u_projModelView * vec4(pos, 0.0);
     float distNorm = dist / 300.0;
-    gl_PointSize = clamp(u_size / distNorm, 1.5, 3.5) * u_scaleFactor * cubemapSizeFactor;
+    gl_PointSize = clamp(u_size / distNorm, 1.5, 3.5) * u_scaleFactor * cubemapSizeFactor * a_size;
 }

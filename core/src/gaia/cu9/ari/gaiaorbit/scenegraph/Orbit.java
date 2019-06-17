@@ -19,6 +19,7 @@ import gaia.cu9.ari.gaiaorbit.scenegraph.camera.ICamera;
 import gaia.cu9.ari.gaiaorbit.scenegraph.component.OrbitComponent;
 import gaia.cu9.ari.gaiaorbit.util.Constants;
 import gaia.cu9.ari.gaiaorbit.util.GlobalConf;
+import gaia.cu9.ari.gaiaorbit.util.GlobalResources;
 import gaia.cu9.ari.gaiaorbit.util.Logger;
 import gaia.cu9.ari.gaiaorbit.util.Logger.Log;
 import gaia.cu9.ari.gaiaorbit.util.coord.Coordinates;
@@ -55,10 +56,17 @@ public class Orbit extends Polyline {
     /** Orbital elements in gpu, in case there is no body **/
     public boolean elemsInGpu = false;
 
+    /** Point color **/
+    public float[] pointColor;
+
+    /** Point size **/
+    public float pointSize = 1f;
+
     private float distUp, distDown;
 
     public Orbit() {
         super();
+        pointColor = new float[]{0.8f, 0.8f, 0.8f, 1f};
         localTransform = new Matrix4();
         localTransformD = new Matrix4d();
         prev = new Vector3d();
@@ -199,6 +207,22 @@ public class Orbit extends Polyline {
      */
     public void setSize(Float size) {
         this.size = size * (float) Constants.KM_TO_U;
+    }
+
+    public void setPointsize(Long pointsize){
+        this.pointSize = pointsize;
+    }
+
+    public void setPointsize(Double pointsize){
+        this.pointSize = pointsize.floatValue();
+    }
+
+    public void setPointcolor(double[] color) {
+        float[] f = GlobalResources.toFloatArray(color);
+        pointColor[0] = f[0];
+        pointColor[1] = f[1];
+        pointColor[2] = f[2];
+        pointColor[3] = f[3];
     }
 
     public String getProvider() {
