@@ -181,7 +181,7 @@ public class MWModelRenderSystem extends ImmediateRenderSystem implements IObser
                     Gdx.gl20.glDepthMask(true);
 
                     //  Dust
-                    shaderProgram.setUniformf("u_sizeFactor", 3f);
+                    shaderProgram.setUniformf("u_sizeFactor", 5f);
                     shaderProgram.setUniformf("u_intensity", 1f);
                     dust.mesh.render(shaderProgram, ShapeType.Point.getGlType());
 
@@ -196,7 +196,7 @@ public class MWModelRenderSystem extends ImmediateRenderSystem implements IObser
 
                     // Gas
                     shaderProgram.setUniformf("u_sizeFactor", 1.0f);
-                    shaderProgram.setUniformf("u_intensity", 0.8f);
+                    shaderProgram.setUniformf("u_intensity", 0.6f);
                     gas.mesh.render(shaderProgram, ShapeType.Point.getGlType());
 
                     // Bulge

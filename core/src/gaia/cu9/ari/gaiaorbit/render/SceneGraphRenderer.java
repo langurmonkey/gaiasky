@@ -627,6 +627,9 @@ public class SceneGraphRenderer extends AbstractRenderer implements IProcessRend
         renderProcesses.add(starGroupProc);
         renderProcesses.add(orbitElemProc);
 
+        // Additive meshes
+        renderProcesses.add(modelMeshAdditiveProc);
+
         // Models
         renderProcesses.add(modelPerPixelLighting);
         renderProcesses.add(modelPerPixelLightingTess);
@@ -634,9 +637,6 @@ public class SceneGraphRenderer extends AbstractRenderer implements IProcessRend
 
         // Labels
         renderProcesses.add(labelsProc);
-
-        // Additive meshes
-        renderProcesses.add(modelMeshAdditiveProc);
 
         // Galaxy and nebulae billboards
         renderProcesses.add(billboardSpritesProc);

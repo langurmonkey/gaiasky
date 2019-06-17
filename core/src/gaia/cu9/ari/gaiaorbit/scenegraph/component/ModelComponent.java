@@ -12,10 +12,7 @@ import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.VertexAttributes.Usage;
 import com.badlogic.gdx.graphics.g3d.Environment;
 import com.badlogic.gdx.graphics.g3d.Material;
-import com.badlogic.gdx.graphics.g3d.attributes.BlendingAttribute;
-import com.badlogic.gdx.graphics.g3d.attributes.ColorAttribute;
-import com.badlogic.gdx.graphics.g3d.attributes.IntAttribute;
-import com.badlogic.gdx.graphics.g3d.attributes.TextureAttribute;
+import com.badlogic.gdx.graphics.g3d.attributes.*;
 import com.badlogic.gdx.graphics.g3d.environment.DirectionalLight;
 import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.utils.Disposable;
@@ -336,6 +333,24 @@ public class ModelComponent implements Disposable, IObserver {
                     mat.set(ba);
                 }
                 ba.opacity = alpha;
+            }
+        }
+    }
+
+    public void setDepthTest(int func, boolean mask){
+        if (instance != null) {
+            int n = instance.materials.size;
+            for (int i = 0; i < n; i++) {
+                Material mat = instance.materials.get(i);
+                DepthTestAttribute dta;
+                if(mat.has(DepthTestAttribute.Type)){
+                    dta = (DepthTestAttribute) mat.get(DepthTestAttribute.Type);
+                }else{
+                    dta = new DepthTestAttribute();
+                    mat.set(dta);
+                }
+                dta.depthFunc = func;
+                dta.depthMask = mask;
             }
         }
     }
