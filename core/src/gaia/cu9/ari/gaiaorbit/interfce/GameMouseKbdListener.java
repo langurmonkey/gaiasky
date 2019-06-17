@@ -45,7 +45,7 @@ public class GameMouseKbdListener extends MouseKbdListener implements IObserver 
         // Run mode
         float multiplier = isKeyPressed(Keys.SHIFT_LEFT) ? 3f : 1f;
         double minTranslateUnits = 1e-5;
-        if(anyPressed(Keys.W, Keys.A, Keys.S, Keys.D)){
+        if (anyPressed(Keys.W, Keys.A, Keys.S, Keys.D)) {
             camera.vel.setZero();
         }
 
@@ -67,9 +67,9 @@ public class GameMouseKbdListener extends MouseKbdListener implements IObserver 
             camera.addRoll(-8f * keySensitivity, true);
         }
 
-        if(isKeyPressed(Keys.SPACE)) {
+        if (isKeyPressed(Keys.SPACE)) {
             camera.vertical(1f * keySensitivity * multiplier, minTranslateUnits);
-        } else if(isKeyPressed(Keys.C)) {
+        } else if (isKeyPressed(Keys.C)) {
             camera.vertical(-1f * keySensitivity * multiplier, minTranslateUnits);
         }
     }
@@ -88,14 +88,7 @@ public class GameMouseKbdListener extends MouseKbdListener implements IObserver 
         GaiaSky.instance.mainGui.getGuiStage().unfocusAll();
 
         String title = "GAME_MODE mode activated!";
-        String[] msgs = new String[]{
-                "<W,A,S,D>  move",
-                "<Q,E>  roll",
-                "<SPACE,C>  up and down",
-                "<Mouse>  look around",
-                "<SHIFT+CTRL+L>  toggle capture mouse",
-                "<1>  go back to normal mode"
-        };
+        String[] msgs = new String[] { "<W,A,S,D>  move", "<Q,E>  roll", "<SPACE,C>  up and down", "<Mouse>  look around", "<SHIFT+CTRL+L>  toggle capture mouse", "<1>  go back to normal mode" };
         EventManager.instance.post(Events.SCREEN_NOTIFICATION_CMD, title, msgs, 10f);
 
     }
@@ -123,22 +116,27 @@ public class GameMouseKbdListener extends MouseKbdListener implements IObserver 
     }
 
     private float lowPass(float newValue, float smoothedValue, float smoothing) {
-        smoothedValue += (newValue - smoothedValue) / smoothing;
-        return smoothedValue;
+        if (smoothing > 0) {
+            smoothedValue += (newValue - smoothedValue) / smoothing;
+            return smoothedValue;
+        } else {
+            return newValue;
+        }
     }
 
     @Override
     public boolean mouseMoved(int screenX, int screenY) {
+        float dt = Gdx.graphics.getDeltaTime() * 1e2f;
         float x = screenX;
         float y = screenY;
-        float mouseXSensitivity = 0.2f;
-        float mouseYSensitivity = -0.2f;
+        float mouseXSensitivity = 1f / dt;
+        float mouseYSensitivity = -1f / dt;
         if (!prevValid) {
             updatePreviousMousePosition(x, y);
             prevValid = true;
         }
-        dx = lowPass(mouseXSensitivity * (x - prevX), dx, 5f);
-        dy = lowPass(mouseYSensitivity * (y - prevY), dy, 5f);
+        dx = lowPass(mouseXSensitivity * (x - prevX), dx, 2f);
+        dy = lowPass(mouseYSensitivity * (y - prevY), dy, 2f);
         camera.addYaw(dx, true);
         camera.addPitch(dy, true);
 

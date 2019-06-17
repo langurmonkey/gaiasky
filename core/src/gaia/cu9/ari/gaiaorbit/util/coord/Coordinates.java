@@ -79,8 +79,8 @@ public class Coordinates {
         mat4fidt = new Matrix4();
 
         // Init maps
-        mapd = new HashMap<String, Matrix4d>();
-        mapf = new HashMap<String, Matrix4>();
+        mapd = new HashMap<>();
+        mapf = new HashMap<>();
 
         mapd.put("equatorialtoecliptic", equatorialToEcliptic);
         mapd.put("eqtoecl", equatorialToEcliptic);
