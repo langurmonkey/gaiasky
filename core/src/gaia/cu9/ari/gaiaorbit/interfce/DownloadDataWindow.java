@@ -709,13 +709,21 @@ public class DownloadDataWindow extends GenericDialog {
 
     private void cleanupTempFiles() {
         Path tempDownload = Paths.get(GlobalConf.data.DATA_LOCATION, "temp.tar.gz");
-        if (Files.exists(tempDownload)) {
-            //try {
-            //Files.delete(tempDownload);
-            //} catch (IOException e) {
-            //    logger.error(e, "Failed cleaning up file: " + tempDownload.toString());
-            //}
+        Path gsDownload = Paths.get(GlobalConf.data.DATA_LOCATION, "gaiasky_data.tar.gz");
+
+        deleteFile(tempDownload);
+        deleteFile(gsDownload);
+    }
+
+    private void deleteFile(Path p) {
+        if (Files.exists(p)) {
+            try {
+                Files.delete(p);
+            } catch (IOException e) {
+                logger.error(e, "Failed cleaning up file: " + p.toString());
+            }
         }
+
     }
 
     private void setStatusOutdated(OwnLabel label) {

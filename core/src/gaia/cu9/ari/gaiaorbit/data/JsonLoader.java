@@ -207,7 +207,7 @@ public class JsonLoader<T extends SceneGraphNode> implements ISceneGraphLoader {
                 if (m != null)
                     m.invoke(instance, value);
                 else
-                    throw new ReflectionException("No method " + methodName + "(" + valueClass.getName() + ") in class " + clazz + " or its superclass/interfaces.");
+                    logger.error("ERROR: No method " + methodName + "(" + valueClass.getName() + ") in class " + clazz + " or its superclass/interfaces.");
             }
             attribute = attribute.next;
         }

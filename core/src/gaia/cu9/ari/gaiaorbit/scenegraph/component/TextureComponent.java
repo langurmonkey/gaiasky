@@ -189,6 +189,8 @@ public class TextureComponent {
      *            A map with at least one material under the key "base".
      * @param cc
      *            Plain color used if there is no texture.
+     * @param culling
+     *            Whether to cull the back-facing faces or not.
      */
     public void initMaterial(AssetManager manager, Map<String, Material> materials, float[] cc, boolean culling) {
         Material material = materials.get("base");
