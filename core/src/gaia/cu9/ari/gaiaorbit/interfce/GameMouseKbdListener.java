@@ -47,6 +47,9 @@ public class GameMouseKbdListener extends MouseKbdListener implements IObserver 
         double minTranslateUnits = 1e-5;
         if (anyPressed(Keys.W, Keys.A, Keys.S, Keys.D)) {
             camera.vel.setZero();
+            if(anyPressed(Keys.Q, Keys.E, Keys.SPACE, Keys.C)) {
+                camera.setInputByController(false);
+            }
         }
 
         if (isKeyPressed(Keys.W)) {
@@ -72,6 +75,8 @@ public class GameMouseKbdListener extends MouseKbdListener implements IObserver 
         } else if (isKeyPressed(Keys.C)) {
             camera.vertical(-1f * keySensitivity * multiplier, minTranslateUnits);
         }
+
+
     }
 
     @Override
@@ -126,7 +131,7 @@ public class GameMouseKbdListener extends MouseKbdListener implements IObserver 
 
     @Override
     public boolean mouseMoved(int screenX, int screenY) {
-        float dt = Gdx.graphics.getDeltaTime() * 1e2f;
+        float dt = Gdx.graphics.getDeltaTime() * 2e2f;
         float x = screenX;
         float y = screenY;
         float mouseXSensitivity = 1f / dt;
@@ -141,6 +146,7 @@ public class GameMouseKbdListener extends MouseKbdListener implements IObserver 
         camera.addPitch(dy, true);
 
         updatePreviousMousePosition(x, y);
+        camera.setInputByController(false);
         return true;
     }
 
