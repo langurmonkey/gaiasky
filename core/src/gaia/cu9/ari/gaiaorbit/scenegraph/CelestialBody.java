@@ -452,7 +452,6 @@ public abstract class CelestialBody extends AbstractPositionEntity implements I3
                 }
             }
         }
-
     }
 
     protected boolean checkClickDistance(int screenX, int screenY, Vector3 pos, NaturalCamera camera, PerspectiveCamera pcamera, double pixelSize) {

@@ -5,8 +5,10 @@
 
 package gaia.cu9.ari.gaiaorbit.scenegraph;
 
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.graphics.GL20;
+import com.badlogic.gdx.graphics.PerspectiveCamera;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.Texture.TextureFilter;
 import com.badlogic.gdx.graphics.VertexAttributes.Usage;
@@ -18,12 +20,14 @@ import com.badlogic.gdx.graphics.g3d.attributes.FloatAttribute;
 import com.badlogic.gdx.graphics.g3d.attributes.TextureAttribute;
 import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Vector3;
+import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.ObjectMap;
 import gaia.cu9.ari.gaiaorbit.GaiaSky;
 import gaia.cu9.ari.gaiaorbit.render.ComponentTypes;
 import gaia.cu9.ari.gaiaorbit.render.ComponentTypes.ComponentType;
 import gaia.cu9.ari.gaiaorbit.scenegraph.camera.FovCamera;
 import gaia.cu9.ari.gaiaorbit.scenegraph.camera.ICamera;
+import gaia.cu9.ari.gaiaorbit.scenegraph.camera.NaturalCamera;
 import gaia.cu9.ari.gaiaorbit.scenegraph.component.ModelComponent;
 import gaia.cu9.ari.gaiaorbit.util.Constants;
 import gaia.cu9.ari.gaiaorbit.util.GlobalConf;
@@ -296,6 +300,46 @@ public class Star extends Particle {
         translation.getMatrix(mc.instance.transform).scl((float) (getRadius() * 2d));
         mc.updateRelativisticEffects(GaiaSky.instance.getICamera());
         modelBatch.render(mc.instance, mc.env);
+    }
+
+    public void addHit(int screenX, int screenY, int w, int h, int minPixDist, NaturalCamera camera, Array<IFocus> hits) {
+        if (withinMagLimit() && checkHitCondition()) {
+            Vector3 pos = aux3f1.get();
+            Vector3d aux = aux3d1.get();
+            Vector3d posd = getAbsolutePosition(aux).add(camera.getInversePos());
+            pos.set(posd.valuesf());
+
+            if (camera.direction.dot(posd) > 0) {
+                // The object is in front of us
+                double angle = computeViewAngle(camera.getFovFactor()) * GlobalConf.scene.STAR_BRIGHTNESS * 1.5e3f;
+
+                PerspectiveCamera pcamera;
+                if (GlobalConf.program.STEREOSCOPIC_MODE) {
+                    if (screenX < Gdx.graphics.getWidth() / 2f) {
+                        pcamera = camera.getCameraStereoLeft();
+                        pcamera.update();
+                    } else {
+                        pcamera = camera.getCameraStereoRight();
+                        pcamera.update();
+                    }
+                } else {
+                    pcamera = camera.camera;
+                }
+
+                angle = (float) Math.toDegrees(angle * camera.getFovFactor()) * (40f / pcamera.fieldOfView);
+                double pixelSize = Math.max(minPixDist, ((angle * pcamera.viewportHeight) / pcamera.fieldOfView) / 2);
+                pcamera.project(pos);
+                pos.y = pcamera.viewportHeight - pos.y;
+                if (GlobalConf.program.STEREOSCOPIC_MODE) {
+                    pos.x /= 2;
+                }
+                // Check click distance
+                if (checkClickDistance(screenX, screenY, pos, camera, pcamera, pixelSize)) {
+                    //Hit
+                    hits.add(this);
+                }
+            }
+        }
     }
 
     @Override
