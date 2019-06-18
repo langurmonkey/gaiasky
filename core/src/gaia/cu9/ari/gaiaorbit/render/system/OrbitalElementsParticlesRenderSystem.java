@@ -131,7 +131,7 @@ public class OrbitalElementsParticlesRenderSystem extends ImmediateRenderSystem 
                 shaderProgram.setUniformf("u_alpha", alphas[first.ct.getFirstOrdinal()] * first.getOpacity());
                 shaderProgram.setUniformf("u_ar", stereohw ? 0.5f : 1f);
                 shaderProgram.setUniformf("u_profileDecay", 1.3f);
-                shaderProgram.setUniformf("u_scaleFactor", rc.scaleFactor * 0.8f * (stereohw ? 2f : 1f));
+                shaderProgram.setUniformf("u_scaleFactor", rc.scaleFactor * 2.0f * (stereohw ? 2f : 1f));
                 shaderProgram.setUniformf("u_camPos", camera.getCurrent().getPos().put(aux1));
                 shaderProgram.setUniformf("u_camDir", camera.getCurrent().getCamera().direction);
                 shaderProgram.setUniformi("u_cubemap", GlobalConf.program.CUBEMAP360_MODE ? 1 : 0);
