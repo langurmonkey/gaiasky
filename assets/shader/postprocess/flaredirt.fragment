@@ -9,16 +9,26 @@ uniform sampler2D u_texture1;
 // Lens starburst
 uniform sampler2D u_texture2;
 
+// Starburst offset
+uniform float u_starburstOffset;
+
 in vec2 v_texCoords;
 out vec4 fragColor;
 
 /*----------------------------------------------------------------------------*/
 void main() {
-    vec2 texcoord = -v_texCoords + vec2(1.0);
+    vec2 texCoords = v_texCoords;
     
-    vec4 lensflare = texture(u_texture0, texcoord);
-    vec4 dirt = texture(u_texture1, texcoord);
-    vec4 starburst = texture(u_texture2, texcoord);
-    
-    fragColor = lensflare * dirt * starburst;
+    vec4 base = texture(u_texture0, texCoords);
+    vec4 dirt = texture(u_texture1, texCoords);
+
+    vec2 centerVec = v_texCoords - 0.5;
+    float d = length(centerVec);
+    float radial = centerVec.x / d;
+    float starburst = texture(u_texture2, vec2(mod(abs(radial - u_starburstOffset), 1.0), 0.0)).r
+               * texture(u_texture2, vec2(mod(abs(-radial + u_starburstOffset), 1.0), 0.0)).r;
+
+    starburst = clamp(starburst + (1.0 - smoothstep(0.0, 0.4, d)), 0.0, 1.0);
+
+    fragColor = base * (dirt + starburst);
 }

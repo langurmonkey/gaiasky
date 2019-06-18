@@ -242,6 +242,7 @@ public class CameraManager implements ICamera, IObserver {
             break;
         }
 
+
     }
 
     public boolean isNatural() {

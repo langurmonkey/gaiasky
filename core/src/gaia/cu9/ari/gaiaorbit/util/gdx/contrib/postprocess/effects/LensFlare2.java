@@ -168,6 +168,10 @@ public final class LensFlare2 extends PostProcessorEffect {
         lensAfter.setLensStarburstTexture(tex);
     }
 
+    public void setStarburstOffset(float offset){
+        lensAfter.setStarburstOffset(offset);
+    }
+
     public void enableBlending(int sfactor, int dfactor) {
         this.blending = true;
         this.sfactor = sfactor;

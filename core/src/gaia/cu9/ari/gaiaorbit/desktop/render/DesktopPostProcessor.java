@@ -7,6 +7,7 @@ package gaia.cu9.ari.gaiaorbit.desktop.render;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.assets.AssetManager;
+import com.badlogic.gdx.graphics.PerspectiveCamera;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.Texture.TextureFilter;
 import com.badlogic.gdx.math.MathUtils;
@@ -82,7 +83,7 @@ public class DesktopPostProcessor implements IPostProcessor, IObserver {
         if (GlobalConf.frame.isRedrawMode())
             pps[RenderType.frame.index] = newPostProcessor(getWidth(RenderType.frame), getHeight(RenderType.frame), manager);
 
-        EventManager.instance.subscribe(this, Events.SCREENSHOT_SIZE_UDPATE, Events.FRAME_SIZE_UDPATE, Events.BLOOM_CMD, Events.LENS_FLARE_CMD, Events.MOTION_BLUR_CMD, Events.LIGHT_POS_2D_UPDATED, Events.LIGHT_SCATTERING_CMD, Events.FISHEYE_CMD, Events.CUBEMAP360_CMD, Events.ANTIALIASING_CMD, Events.BRIGHTNESS_CMD, Events.CONTRAST_CMD, Events.HUE_CMD, Events.SATURATION_CMD, Events.GAMMA_CMD, Events.TONEMAPPING_TYPE_CMD, Events.EXPOSURE_CMD, Events.STEREO_PROFILE_CMD, Events.STEREOSCOPIC_CMD, Events.FPS_INFO, Events.FOV_CHANGE_NOTIFICATION, Events.STAR_BRIGHTNESS_CMD, Events.STAR_POINT_SIZE_CMD);
+        EventManager.instance.subscribe(this, Events.SCREENSHOT_SIZE_UDPATE, Events.FRAME_SIZE_UDPATE, Events.BLOOM_CMD, Events.LENS_FLARE_CMD, Events.MOTION_BLUR_CMD, Events.LIGHT_POS_2D_UPDATED, Events.LIGHT_SCATTERING_CMD, Events.FISHEYE_CMD, Events.CUBEMAP360_CMD, Events.ANTIALIASING_CMD, Events.BRIGHTNESS_CMD, Events.CONTRAST_CMD, Events.HUE_CMD, Events.SATURATION_CMD, Events.GAMMA_CMD, Events.TONEMAPPING_TYPE_CMD, Events.EXPOSURE_CMD, Events.STEREO_PROFILE_CMD, Events.STEREOSCOPIC_CMD, Events.FPS_INFO, Events.FOV_CHANGE_NOTIFICATION, Events.STAR_BRIGHTNESS_CMD, Events.STAR_POINT_SIZE_CMD, Events.CAMERA_MOTION_UPDATED);
     }
 
     private int getWidth(RenderType type) {
@@ -395,7 +396,16 @@ public class DesktopPostProcessor implements IPostProcessor, IObserver {
                     PostProcessBean ppb = pps[i];
                     ppb.lens.setGhosts(nnghosts);
                     ppb.lens.setFlareIntesity(intensity);
-                    // ppb.lens.setEnabled(active);
+                }
+            }
+            break;
+        case CAMERA_MOTION_UPDATED:
+            PerspectiveCamera cam = (PerspectiveCamera) data[3];
+            float cameraOffset = (cam.direction.x + cam.direction.y + cam.direction.z);
+            for (int i = 0; i < RenderType.values().length; i++) {
+                if (pps[i] != null) {
+                    PostProcessBean ppb = pps[i];
+                    ppb.lens.setStarburstOffset(cameraOffset);
                 }
             }
             break;

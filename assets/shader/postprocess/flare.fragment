@@ -4,10 +4,8 @@
 
 // Scene
 uniform sampler2D u_texture0;
-// Lens color
+// Lens dirt
 uniform sampler2D u_texture1;
-
-
 
 uniform vec2 u_viewportInverse;
 uniform int u_ghosts; // number of ghost samples
@@ -19,12 +17,7 @@ in vec2 v_texCoords;
 out vec4 fragColor;
 
 /*----------------------------------------------------------------------------*/
-vec4 textureDistorted(
-	sampler2D tex, 
-	vec2 texcoord, 
-	vec2 direction,
-	vec3 distortion 
-) {
+vec4 textureDistorted(sampler2D tex, vec2 texcoord, vec2 direction,	vec3 distortion) {
 	return vec4(
 		texture(tex, texcoord + direction * distortion.r).r,
 		texture(tex, texcoord + direction * distortion.g).g,
@@ -60,7 +53,7 @@ void main() {
     }
     result *= texture(u_texture1, vec2(length(vec2(0.5) - texcoord) / length(vec2(0.5))));
   
-    //	sample halo:
+    // sample halo
     float weight = length(vec2(0.5) - fract(texcoord + haloVec)) / length(vec2(0.5));
     weight = pow(1.0 - weight, 3.0);
     result += textureDistorted(
@@ -69,7 +62,7 @@ void main() {
 	    normalize(ghostVec),
 	    distortion
     ) * weight;
-    
+
     // Hack to prevent too strong halo
-    fragColor = min(vec4(0.4), result);
+    fragColor = min(vec4(0.7), result);
 }

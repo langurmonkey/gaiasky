@@ -33,12 +33,14 @@ import gaia.cu9.ari.gaiaorbit.util.gdx.contrib.utils.ShaderLoader;
 public final class FlareDirt extends Filter<FlareDirt> {
     private Texture lensDirtTexture;
     private Texture lensStarburstTexture;
+    private float starburstOffset;
 
     public enum Param implements Parameter {
         // @formatter:off
         Texture("u_texture0", 0),
         LensDirt("u_texture1", 0),
-        LensStarburst("u_texture2", 0);
+        LensStarburst("u_texture2", 0),
+        StarburstOffset("u_starburstOffset", 0);
         // @formatter:on
 
         private String mnemonic;
@@ -75,12 +77,18 @@ public final class FlareDirt extends Filter<FlareDirt> {
         setParam(Param.LensStarburst, u_texture2);
     }
 
+    public void setStarburstOffset(float offset){
+        this.starburstOffset = offset;
+        setParam(Param.StarburstOffset, offset);
+    }
+
     @Override
     public void rebind() {
         // Re-implement super to batch every parameter
         setParams(Param.Texture, u_texture0);
         setParams(Param.LensDirt, u_texture1);
         setParams(Param.LensStarburst, u_texture2);
+        setParams(Param.StarburstOffset, starburstOffset);
         endParams();
     }
 
