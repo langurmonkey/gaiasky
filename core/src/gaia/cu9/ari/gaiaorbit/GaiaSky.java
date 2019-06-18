@@ -661,6 +661,8 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
      * @param deltat Delta time in seconds.
      */
     public void update(double deltat) {
+        updateResize();
+
         Timer.instance();
         // The current actual dt in seconds
         double dt;
@@ -722,9 +724,22 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
         sgr.render(camera, t, width, height, frameBuffer, ppb);
     }
 
+
+    private long lastResizeTime = Long.MAX_VALUE;
+    private int resizeWidth, resizeHeight;
     @Override
     public void resize(final int width, final int height) {
-        Gdx.app.postRunnable(() -> resizeImmediate(width, height, true, true, true));
+        resizeWidth = width;
+        resizeHeight = height;
+        lastResizeTime = System.currentTimeMillis();
+    }
+
+    private void updateResize(){
+        long currResizeTime = System.currentTimeMillis();
+        if(currResizeTime - lastResizeTime > 300l) {
+            resizeImmediate(resizeWidth, resizeHeight, true, true, true);
+            lastResizeTime = Long.MAX_VALUE;
+        }
     }
 
     public void resizeImmediate(final int width, final int height, boolean resizePostProcessors, boolean resizeRenderSys, boolean resizeGuis) {

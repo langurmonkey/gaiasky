@@ -15,7 +15,8 @@ import gaia.cu9.ari.gaiaorbit.render.IPostProcessor.PostProcessBean;
  *
  */
 public class RenderingContext {
-    private static final float HD_DIAG = (float) Math.sqrt(1280 * 1280 + 720 * 720);
+    // Reference screen area to compare to
+    private static final float HD_AREA = 1280f * 720f;
 
     /** The post process bean. It may have no effects enabled. **/
     public PostProcessBean ppb;
@@ -70,7 +71,7 @@ public class RenderingContext {
      */
     public void set(int w, int h) {
         if (w != this.w || h != this.h) {
-            this.scaleFactor = (float) Math.sqrt(h * h + w * w) / HD_DIAG;
+            this.scaleFactor = (float) (h * w) / HD_AREA;
         }
         this.w = w;
         this.h = h;
