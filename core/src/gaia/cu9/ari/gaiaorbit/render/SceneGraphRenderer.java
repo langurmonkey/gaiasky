@@ -1258,11 +1258,11 @@ public class SceneGraphRenderer extends AbstractRenderer implements IProcessRend
         if (GlobalConf.scene.isNormalLineRenderer()) {
             // Normal
             sys = new LineRenderSystem(RenderGroup.LINE, alphas, lineShaders);
-            sys.addPreRunnables(regularBlendR, depthTestR);
+            sys.addPreRunnables(regularBlendR, depthTestR, noDepthWritesR);
         } else {
             // Quad
             sys = new LineQuadRenderSystem(RenderGroup.LINE, alphas, lineQuadShaders);
-            sys.addPreRunnables(additiveBlendR, depthTestR);
+            sys.addPreRunnables(additiveBlendR, depthTestR, noDepthWritesR);
         }
         return sys;
     }

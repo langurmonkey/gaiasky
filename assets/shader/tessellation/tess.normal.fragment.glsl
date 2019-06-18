@@ -269,6 +269,8 @@ void main() {
     fragColor.rgb = applyFog(fragColor.rgb, NL);
     #endif
 
+    // Prevent saturation
+    fragColor.rgb = clamp(fragColor.rgb, 0.0, 0.98);
 
     if(fragColor.a == 0.0){
         discard;
