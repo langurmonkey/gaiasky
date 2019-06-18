@@ -7,6 +7,7 @@ package gaia.cu9.ari.gaiaorbit.interfce;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.GL20;
+import com.badlogic.gdx.scenes.scene2d.ui.HorizontalGroup;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import gaia.cu9.ari.gaiaorbit.event.EventManager;
@@ -16,9 +17,12 @@ import gaia.cu9.ari.gaiaorbit.util.GlobalConf;
 import gaia.cu9.ari.gaiaorbit.util.format.INumberFormat;
 import gaia.cu9.ari.gaiaorbit.util.format.NumberFormatFactory;
 import gaia.cu9.ari.gaiaorbit.util.scene2d.OwnLabel;
+import gaia.cu9.ari.gaiaorbit.util.scene2d.OwnSlider;
 
 public class DebugInterface extends Table implements IObserver, IGuiInterface {
     private OwnLabel debug1, debug2, debug3, debug4, debugBuffers, debugSamp, fps, spf, device;
+    private OwnSlider queueStatus;
+    private int previousQueueSize = 0, currentQueueMax = 0;
     /** Lock object for synchronization **/
     private Object lock;
 
@@ -26,7 +30,8 @@ public class DebugInterface extends Table implements IObserver, IGuiInterface {
 
     public DebugInterface(Skin skin, Object lock) {
         super(skin);
-        float spacing = 10 * GlobalConf.SCALE_FACTOR;
+        float pad = 10 * GlobalConf.SCALE_FACTOR;
+        float pad5 = 5 * GlobalConf.SCALE_FACTOR;
 
         // Formatters
         fpsFormatter = NumberFormatFactory.getFormatter("#.00");
@@ -35,40 +40,49 @@ public class DebugInterface extends Table implements IObserver, IGuiInterface {
         timeFormatter = NumberFormatFactory.getFormatter("00");
 
         fps = new OwnLabel("", skin, "hud-big");
-        add(fps).right();
+        add(fps).right().padBottom(pad5);
         row();
 
         spf = new OwnLabel("", skin, "hud-med");
-        add(spf).right();
+        add(spf).right().padBottom(pad);
         row();
 
         device = new OwnLabel(Gdx.gl.glGetString(GL20.GL_RENDERER), skin, "hud-big");
-        add(device).right().padTop(spacing);
+        add(device).right().padBottom(pad);
         row();
 
         debug1 = new OwnLabel("", skin, "hud");
-        add(debug1).right().padTop(spacing);
+        add(debug1).right().padBottom(pad5);
         row();
 
         debug2 = new OwnLabel("", skin, "hud");
-        add(debug2).right();
+        add(debug2).right().padBottom(pad5);
         row();
 
         debug3 = new OwnLabel("", skin, "hud");
-        add(debug3).right();
+        add(debug3).right().padBottom(pad5);
         row();
 
+        HorizontalGroup dbg4 = new HorizontalGroup();
+        dbg4.space(pad5);
         debug4 = new OwnLabel("", skin, "hud");
-        add(debug4).right();
+        queueStatus = new OwnSlider(0, 100, 1, false, skin, "default-horizontal");
+        queueStatus.setWidth(100f * GlobalConf.SCALE_FACTOR);
+        queueStatus.setValue(0);
+        dbg4.addActor(debug4);
+        dbg4.addActor(queueStatus);
+        add(dbg4).right().padBottom(pad5);
         row();
 
         debugBuffers = new OwnLabel("", skin, "hud");
-        add(debugBuffers).right();
+        add(debugBuffers).right().padBottom(pad5);
         row();
 
         debugSamp = new OwnLabel("", skin, "hud");
-        add(debugSamp).right().padTop(spacing);
+        add(debugSamp).right();
         row();
+
+        pack();
 
         this.setVisible(GlobalConf.program.SHOW_DEBUG_INFO);
         this.lock = lock;
@@ -107,8 +121,18 @@ public class DebugInterface extends Table implements IObserver, IGuiInterface {
                     debug3.setText((String) data[0]);
                 break;
             case DEBUG4:
-                if (GlobalConf.program.SHOW_DEBUG_INFO && data.length > 0 && data[0] != null)
+                if (GlobalConf.program.SHOW_DEBUG_INFO && data.length > 0 && data[0] != null) {
                     debug4.setText((String) data[0]);
+                    int queueSize = (Integer) data[1];
+
+                    if (previousQueueSize < queueSize) {
+                        // Reset status
+                        currentQueueMax = queueSize;
+                    }
+
+                    queueStatus.setValue(queueSize * 100f / currentQueueMax);
+                    previousQueueSize = queueSize;
+                }
                 break;
             case DEBUG_BUFFERS:
                 if (GlobalConf.program.SHOW_DEBUG_INFO && data.length > 0 && data[0] != null)
