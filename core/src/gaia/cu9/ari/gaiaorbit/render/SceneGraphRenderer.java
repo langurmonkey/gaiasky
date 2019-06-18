@@ -91,7 +91,7 @@ public class SceneGraphRenderer extends AbstractRenderer implements IProcessRend
 
     private Array<IRenderSystem> renderProcesses;
 
-    private RenderSystemRunnable blendNoDepthRunnable, blendDepthRunnable, additiveBlendDepthRunnable, restoreRegularBlend;
+    private RenderSystemRunnable blendNoDepthRunnable, blendDepthRunnable, additiveBlendDepthRunnable, restoreRegularBlend, blendDepthRunnableNoWrites;
 
     /** The particular current scene graph renderer **/
     private ISGR sgr;
@@ -205,6 +205,11 @@ public class SceneGraphRenderer extends AbstractRenderer implements IProcessRend
             Gdx.gl.glEnable(GL20.GL_BLEND);
             Gdx.gl.glEnable(GL20.GL_DEPTH_TEST);
             Gdx.gl.glDepthMask(true);
+        };
+        blendDepthRunnableNoWrites = (renderSystem, renderables, camera) -> {
+            Gdx.gl.glEnable(GL20.GL_BLEND);
+            Gdx.gl.glEnable(GL20.GL_DEPTH_TEST);
+            Gdx.gl.glDepthMask(false);
         };
         additiveBlendDepthRunnable = (renderSystem, renderables, camera) -> {
             Gdx.gl.glEnable(GL20.GL_BLEND);
@@ -1136,11 +1141,11 @@ public class SceneGraphRenderer extends AbstractRenderer implements IProcessRend
         if (GlobalConf.scene.isNormalLineRenderer()) {
             // Normal
             sys = new LineRenderSystem(RenderGroup.LINE, alphas, lineShaders);
-            sys.setPreRunnable(blendDepthRunnable);
+            sys.setPreRunnable(blendDepthRunnableNoWrites);
         } else {
             // Quad
             sys = new LineQuadRenderSystem(RenderGroup.LINE, alphas, lineQuadShaders);
-            sys.setPreRunnable(blendDepthRunnable);
+            sys.setPreRunnable(blendDepthRunnableNoWrites);
         }
         return sys;
     }
