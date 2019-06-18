@@ -870,6 +870,23 @@ public class GlobalConf {
             return UI_THEME.contains("night");
         }
 
+        /**
+         * Gets the name of the UI theme without the "-x2" suffix
+         *
+         * @return The base UI theme name
+         */
+        public String getUIThemeBase() {
+            if (UI_THEME.endsWith("-x2")) {
+                return UI_THEME.substring(0, UI_THEME.length() - 3);
+            } else {
+                return UI_THEME;
+            }
+        }
+
+        public boolean isHiDPITheme(){
+            return UI_THEME.endsWith("-x2");
+        }
+
         public String getNetName() {
             if (NET_MASTER)
                 return " MASTER";

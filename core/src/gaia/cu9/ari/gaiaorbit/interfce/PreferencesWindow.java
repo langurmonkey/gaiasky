@@ -66,7 +66,7 @@ public class PreferencesWindow extends GenericDialog {
 
     private INumberFormat nf3, nf1;
 
-    private CheckBox fullscreen, windowed, vsync, limitfpsCb, multithreadCb, lodFadeCb, cbAutoCamrec, real, nsl, report, inverty, highAccuracyPositions, shadowsCb, pointerCoords, datasetChooser, debugInfo;
+    private CheckBox fullscreen, windowed, vsync, limitfpsCb, multithreadCb, lodFadeCb, cbAutoCamrec, real, nsl, report, inverty, highAccuracyPositions, shadowsCb, hidpiCb, pointerCoords, datasetChooser, debugInfo;
     private OwnSelectBox<DisplayMode> fullscreenResolutions;
     private OwnSelectBox<ComboBoxBean> gquality, aa, orbitRenderer, lineRenderer, numThreads, screenshotMode, frameoutputMode, nshadows;
     private OwnSelectBox<LangComboBoxBean> lang;
@@ -671,11 +671,15 @@ public class PreferencesWindow extends GenericDialog {
 
         // THEME
         OwnLabel themeLabel = new OwnLabel(I18n.txt("gui.ui.theme"), skin);
-        String[] themes = new String[] { "dark-green", "dark-green-x2", "dark-blue", "dark-blue-x2", "dark-orange", "dark-orange-x2", "bright-green", "bright-green-x2", "night-red", "night-red-x2" };
+        String[] themes = new String[] { "dark-green", "dark-blue", "dark-orange", "bright-green", "night-red" };
         theme = new OwnSelectBox<>(skin);
         theme.setWidth(textwidth * 3f);
         theme.setItems(themes);
-        theme.setSelected(GlobalConf.program.UI_THEME);
+        theme.setSelected(GlobalConf.program.getUIThemeBase());
+
+        // HiDPI
+        hidpiCb = new OwnCheckBox(I18n.txt("gui.ui.theme.hidpi"), skin, "default", pad5);
+        hidpiCb.setChecked(GlobalConf.program.isHiDPITheme());
 
         // POINTER COORDINATES
         pointerCoords = new OwnCheckBox(I18n.txt("gui.ui.pointercoordinates"), skin, "default", pad5);
@@ -686,9 +690,10 @@ public class PreferencesWindow extends GenericDialog {
 
         // Add to table
         ui.add(langLabel).left().padRight(pad5 * 4).padBottom(pad5);
-        ui.add(lang).left().padBottom(pad5).row();
+        ui.add(lang).left().padBottom(pad).row();
         ui.add(themeLabel).left().padRight(pad5 * 4).padBottom(pad5);
         ui.add(theme).left().padBottom(pad5).row();
+        ui.add(hidpiCb).left().padBottom(pad).row();
         ui.add(pointerCoords).left().padRight(pad5 * 2).padBottom(pad5).row();
 
         // Add to content
@@ -1619,10 +1624,14 @@ public class PreferencesWindow extends GenericDialog {
 
         // Interface
         LangComboBoxBean lbean = lang.getSelected();
-        boolean reloadUI = !GlobalConf.program.UI_THEME.equals(theme.getSelected()) || !lbean.locale.toLanguageTag().equals(GlobalConf.program.LOCALE);
+        String newTheme = theme.getSelected();
+        if(hidpiCb.isChecked()){
+            newTheme += "-x2";
+        }
+        boolean reloadUI = !GlobalConf.program.UI_THEME.equals(newTheme) || !lbean.locale.toLanguageTag().equals(GlobalConf.program.LOCALE);
         GlobalConf.program.LOCALE = lbean.locale.toLanguageTag();
         I18n.forceInit(new FileHandle(GlobalConf.ASSETS_LOC + File.separator + "i18n/gsbundle"));
-        GlobalConf.program.UI_THEME = theme.getSelected();
+        GlobalConf.program.UI_THEME = newTheme;
         boolean previousPointerCoords = GlobalConf.program.DISPLAY_POINTER_COORDS;
         GlobalConf.program.DISPLAY_POINTER_COORDS = pointerCoords.isChecked();
         if (previousPointerCoords != GlobalConf.program.DISPLAY_POINTER_COORDS) {
@@ -1781,7 +1790,7 @@ public class PreferencesWindow extends GenericDialog {
             GlobalResources.updateSkin();
             GenericDialog.updatePads();
             GaiaSky.instance.reinitialiseGUI1();
-            EventManager.instance.post(Events.SPACECRAFT_LOADED, GaiaSky.instance.sg.getNode("SPACECRAFT_MODE"));
+            EventManager.instance.post(Events.SPACECRAFT_LOADED, GaiaSky.instance.sg.getNode("Spacecraft"));
             GaiaSky.instance.reinitialiseGUI2();
             // Time init
             EventManager.instance.post(Events.TIME_CHANGE_INFO, GaiaSky.instance.time.getTime());
