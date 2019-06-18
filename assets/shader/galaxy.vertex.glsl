@@ -42,7 +42,7 @@ out float v_dust;
 
 #define pc_to_u 3.085e7
 #define u_to_pc 1.0 / pc_to_u
-#define edge_far 2e6 * pc_to_u
+#define edge_far 1.5e6 * pc_to_u
 #define edge_near 10 * pc_to_u
 
 void main() {
@@ -66,7 +66,7 @@ void main() {
     float sizeCorrection = clamp((dist * u_to_pc) / 4000.0, 0.1, 6.0);
 
     float dscale = smoothstep(edge_far, edge_near, dist);
-    dscale = pow(dscale, 25.0) * 1.5;
+    dscale = pow(dscale, 10.0) * 1.5;
 
     gl_Position = u_projModelView * vec4(pos, 1.0);
     gl_PointSize = a_additional.x * u_sizeFactor * u_ar * dscale;

@@ -38,9 +38,9 @@ public class DesktopPostProcessor implements IPostProcessor, IObserver {
     float bloomFboScale = 0.5f;
 
     // Intensity of flare
-    float flareIntensity = 0.4f;
+    float flareIntensity = 0.25f;
     // Number of flares
-    int nGhosts = 6;
+    int nGhosts = 8;
     // Number of samples for the light glow
     int lightGlowNSamples = 1;
 

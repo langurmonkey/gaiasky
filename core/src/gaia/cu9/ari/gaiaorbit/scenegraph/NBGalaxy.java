@@ -134,7 +134,7 @@ public class NBGalaxy extends Particle {
     public void render(ExtShaderProgram shader, float alpha, IntMesh mesh, ICamera camera) {
         compalpha = alpha;
 
-        float size = getFuzzyRenderSize(camera) * GlobalConf.scene.STAR_POINT_SIZE * 0.5f;
+        float size = getFuzzyRenderSize(camera) * GlobalConf.scene.STAR_POINT_SIZE * 1.5f;
 
         Vector3 aux = aux3f1.get();
         shader.setUniformf("u_pos", translation.put(aux));
