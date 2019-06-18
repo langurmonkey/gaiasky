@@ -28,10 +28,6 @@ import java.util.Arrays;
 public class ImageRenderer {
     private static int sequenceNumber = 0;
 
-    public static String renderToImageGl20(String absoluteLocation, String baseFileName, int w, int h) {
-        return renderToImageGl20(absoluteLocation, baseFileName, w, h, ImageFormat.JPG, 0.93f);
-    }
-
     /**
      * Saves the current screen as an image to the given directory using the
      * given file name. The sequence number is added automatically to the file

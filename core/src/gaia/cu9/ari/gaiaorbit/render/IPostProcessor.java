@@ -44,9 +44,9 @@ public interface IPostProcessor extends Disposable {
             pp.render(dest);
         }
 
-        public void dispose() {
+        public void dispose(boolean cleanAllBuffers){
             if (pp != null) {
-                pp.dispose(true);
+                pp.dispose(cleanAllBuffers);
                 if (bloom != null)
                     bloom.dispose();
                 if (antialiasing != null)
@@ -66,6 +66,10 @@ public interface IPostProcessor extends Disposable {
                 if (depthBuffer != null)
                     depthBuffer.dispose();
             }
+        }
+
+        public void dispose() {
+            dispose(true);
         }
 
     }

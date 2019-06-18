@@ -63,33 +63,26 @@ public final class PingPongBuffer {
     private GaiaSkyFrameBuffer ownedResult, ownedSource;
     private int ownedW, ownedH;
 
-    private boolean forceRGBABuffer = false;
 
     public PingPongBuffer(int width, int height, Format frameBufferFormat, boolean hasDepth) {
         this(width, height, frameBufferFormat, hasDepth, false);
     }
 
     /** Creates a new ping-pong buffer and owns the resources. */
-    public PingPongBuffer(int width, int height, Format frameBufferFormat, boolean hasDepth, boolean forceRGBABuffer) {
+    public PingPongBuffer(int width, int height, Format frameBufferFormat, boolean hasDepth, boolean preventFloatBuffer) {
         ownResources = true;
-        this.forceRGBABuffer = forceRGBABuffer;
 
         // BUFFER USED FOR THE ACTUAL RENDERING:
         // 2 RENDER TARGETS:
         //      0: FLOAT TEXTURE ATTACHMENT (allow values outside of [0,1])
         //      1: FLOAT TEXTURE ATTACHMENT (DEPTH EXTRA)
         // 1 DEPTH TEXTURE ATTACHMENT
-        FrameBufferBuilder frameBufferBuilder = new FrameBufferBuilder(width, height);
-        addColorRenderTarget(frameBufferBuilder, frameBufferFormat);
-        if (hasDepth) {
-            addDepthRenderTarget(frameBufferBuilder);
-        }
-        ownedMain = new GaiaSkyFrameBuffer(frameBufferBuilder);
+        ownedMain = createMainFrameBuffer(width, height, hasDepth, frameBufferFormat, preventFloatBuffer);
 
         // EXTRA BUFFER:
         // SINGLE RENDER TARGET WITH A COLOR TEXTURE ATTACHMENT
-        frameBufferBuilder = new FrameBufferBuilder(width, height);
-        addColorRenderTarget(frameBufferBuilder, frameBufferFormat);
+        FrameBufferBuilder frameBufferBuilder = new FrameBufferBuilder(width, height);
+        addColorRenderTarget(frameBufferBuilder, frameBufferFormat, preventFloatBuffer);
         ownedExtra = new GaiaSkyFrameBuffer(frameBufferBuilder);
 
         // Buffer the scene is rendered to is actually the second
@@ -104,17 +97,27 @@ public final class PingPongBuffer {
         set(buffer1, buffer2);
     }
 
-    private void addColorRenderTarget(FrameBufferBuilder fbb, Format fbf) {
-        if (Gdx.graphics.isGL30Available() && !forceRGBABuffer) {
-            //fbb.addBasicColorTextureAttachment(fbf);
+
+    public static GaiaSkyFrameBuffer createMainFrameBuffer(int width, int height, boolean hasDepth, Format frameBufferFormat, boolean preventFloatBuffer){
+        FrameBufferBuilder frameBufferBuilder = new FrameBufferBuilder(width, height);
+        addColorRenderTarget(frameBufferBuilder, frameBufferFormat, preventFloatBuffer);
+        if (hasDepth) {
+            addDepthRenderTarget(frameBufferBuilder, preventFloatBuffer);
+        }
+        return new GaiaSkyFrameBuffer(frameBufferBuilder);
+
+    }
+
+    private static void addColorRenderTarget(FrameBufferBuilder fbb, Format fbf, boolean preventFloatBuffer) {
+        if (Gdx.graphics.isGL30Available() && !preventFloatBuffer) {
             fbb.addFloatAttachment(GL30.GL_RGBA16F, GL30.GL_RGBA, GL30.GL_FLOAT, true);
         } else {
             fbb.addBasicColorTextureAttachment(fbf);
         }
     }
 
-    private void addDepthRenderTarget(FrameBufferBuilder fbb) {
-        if (Gdx.graphics.isGL30Available()) {
+    private static void addDepthRenderTarget(FrameBufferBuilder fbb, boolean preventFloatBuffer) {
+        if (Gdx.graphics.isGL30Available() && !preventFloatBuffer) {
             // 32 bit depth buffer texture
             fbb.addDepthTextureAttachment(GL20.GL_DEPTH_COMPONENT32, GL20.GL_FLOAT);
         } else {

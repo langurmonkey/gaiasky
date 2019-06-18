@@ -49,6 +49,7 @@ import gaia.cu9.ari.gaiaorbit.util.Logger;
 import gaia.cu9.ari.gaiaorbit.util.*;
 import gaia.cu9.ari.gaiaorbit.util.Logger.Log;
 import gaia.cu9.ari.gaiaorbit.util.gaia.GaiaAttitudeServer;
+import gaia.cu9.ari.gaiaorbit.util.gdx.contrib.postprocess.utils.PingPongBuffer;
 import gaia.cu9.ari.gaiaorbit.util.gdx.g2d.BitmapFont;
 import gaia.cu9.ari.gaiaorbit.util.gdx.loader.BitmapFontLoader;
 import gaia.cu9.ari.gaiaorbit.util.gdx.loader.G3dModelLoader;
@@ -307,6 +308,9 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
         initialGui.initialize(manager);
         Gdx.input.setInputProcessor(initialGui.getGuiStage());
 
+        // GL clear state
+        Gdx.gl.glClearColor(0,0,0,0);
+        Gdx.gl.glClearDepthf(1);
     }
 
     /**
@@ -717,8 +721,6 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
     }
 
     public void preRenderScene() {
-        Gdx.gl.glClearColor(0,0,0,0);
-        Gdx.gl.glClearDepthf(1);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT | GL20.GL_DEPTH_BUFFER_BIT);
     }
 
@@ -731,9 +733,13 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
     private int resizeWidth, resizeHeight;
     @Override
     public void resize(final int width, final int height) {
-        resizeWidth = width;
-        resizeHeight = height;
-        lastResizeTime = System.currentTimeMillis();
+        if(!initialized){
+            resizeImmediate(width, height, true, true, true);
+        }else {
+            resizeWidth = width;
+            resizeHeight = height;
+            lastResizeTime = System.currentTimeMillis();
+        }
     }
 
     private void updateResize(){
@@ -763,8 +769,6 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
 
         cam.updateAngleEdge(width, height);
         cam.resize(width, height);
-
-        EventManager.instance.post(Events.SCREEN_RESIZE, width, height);
     }
 
     /**
@@ -787,7 +791,7 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
     public FrameBuffer getFrameBuffer(int w, int h) {
         String key = getKey(w, h);
         if (!fbmap.containsKey(key)) {
-            FrameBuffer fb = new FrameBuffer(Format.RGB888, w, h, true);
+            FrameBuffer fb = PingPongBuffer.createMainFrameBuffer(w, h, true, Format.RGB888, true);
             fbmap.put(key, fb);
         }
         return fbmap.get(key);
@@ -883,9 +887,9 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
             break;
         case SCREENSHOT_SIZE_UDPATE:
         case FRAME_SIZE_UDPATE:
-            Gdx.app.postRunnable(() -> {
+            //Gdx.app.postRunnable(() -> {
                 //clearFrameBufferMap();
-            });
+            //});
             break;
         case SCENE_GRAPH_ADD_OBJECT_CMD:
             final SceneGraphNode nodeToAdd = (SceneGraphNode) data[0];

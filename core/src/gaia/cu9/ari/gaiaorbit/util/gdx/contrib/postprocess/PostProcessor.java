@@ -30,6 +30,7 @@ import com.badlogic.gdx.graphics.glutils.FrameBuffer;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Disposable;
+import gaia.cu9.ari.gaiaorbit.render.IPostProcessor.RenderType;
 import gaia.cu9.ari.gaiaorbit.util.gdx.contrib.postprocess.utils.PingPongBuffer;
 import gaia.cu9.ari.gaiaorbit.util.gdx.contrib.utils.GaiaSkyFrameBuffer;
 import gaia.cu9.ari.gaiaorbit.util.gdx.contrib.utils.ItemsManager;
@@ -52,7 +53,7 @@ public final class PostProcessor implements Disposable {
     private TextureWrap compositeWrapU;
     private TextureWrap compositeWrapV;
     private final ItemsManager<PostProcessorEffect> effectsManager = new ItemsManager<>();
-    private static final Array<PingPongBuffer> buffers = new Array<>(5);
+    private static final Array<PingPongBuffer> buffers = new Array<>(2);
     private final Color clearColor = Color.CLEAR;
     private int clearBits = GL20.GL_COLOR_BUFFER_BIT;
     private float clearDepth = 1f;
@@ -70,35 +71,35 @@ public final class PostProcessor implements Disposable {
     private Array<PostProcessorEffect> enabledEffects = new Array<>(5);
 
     /** Construct a new PostProcessor with FBO dimensions set to the size of the screen */
-    public PostProcessor(boolean useDepth, boolean useAlphaChannel, boolean use32Bits) {
-        this(Gdx.graphics.getWidth(), Gdx.graphics.getHeight(), useDepth, useAlphaChannel, use32Bits);
+    public PostProcessor(RenderType rt, boolean useDepth, boolean useAlphaChannel, boolean use32Bits) {
+        this(rt, Gdx.graphics.getWidth(), Gdx.graphics.getHeight(), useDepth, useAlphaChannel, use32Bits);
     }
 
     /**
      * Construct a new PostProcessor with the given parameters, defaulting to <em>TextureWrap.ClampToEdge</em> as texture wrap
      * mode
      */
-    public PostProcessor(int fboWidth, int fboHeight, boolean useDepth, boolean useAlphaChannel, boolean use32Bits) {
-        this(fboWidth, fboHeight, useDepth, useAlphaChannel, use32Bits, TextureWrap.ClampToEdge, TextureWrap.ClampToEdge);
+    public PostProcessor(RenderType rt, int fboWidth, int fboHeight, boolean useDepth, boolean useAlphaChannel, boolean use32Bits) {
+        this(rt, fboWidth, fboHeight, useDepth, useAlphaChannel, use32Bits, TextureWrap.ClampToEdge, TextureWrap.ClampToEdge);
     }
 
     /**
      * Construct a new PostProcessor with the given parameters and viewport, defaulting to <em>TextureWrap.ClampToEdge</em> as
      * texture wrap mode
      */
-    public PostProcessor(Rectangle viewport, boolean useDepth, boolean useAlphaChannel, boolean use32Bits) {
-        this((int) viewport.width, (int) viewport.height, useDepth, useAlphaChannel, use32Bits, TextureWrap.ClampToEdge, TextureWrap.ClampToEdge);
+    public PostProcessor(RenderType rt, Rectangle viewport, boolean useDepth, boolean useAlphaChannel, boolean use32Bits) {
+        this(rt, (int) viewport.width, (int) viewport.height, useDepth, useAlphaChannel, use32Bits, TextureWrap.ClampToEdge, TextureWrap.ClampToEdge);
         setViewport(viewport);
     }
 
     /** Construct a new PostProcessor with the given parameters, viewport and the specified texture wrap mode */
-    public PostProcessor(Rectangle viewport, boolean useDepth, boolean useAlphaChannel, boolean use32Bits, TextureWrap u, TextureWrap v) {
-        this((int) viewport.width, (int) viewport.height, useDepth, useAlphaChannel, use32Bits, u, v);
+    public PostProcessor(RenderType rt, Rectangle viewport, boolean useDepth, boolean useAlphaChannel, boolean use32Bits, TextureWrap u, TextureWrap v) {
+        this(rt, (int) viewport.width, (int) viewport.height, useDepth, useAlphaChannel, use32Bits, u, v);
         setViewport(viewport);
     }
 
     /** Construct a new PostProcessor with the given parameters and the specified texture wrap mode */
-    public PostProcessor(int fboWidth, int fboHeight, boolean useDepth, boolean useAlphaChannel, boolean use32Bits, TextureWrap u, TextureWrap v) {
+    public PostProcessor(RenderType rt, int fboWidth, int fboHeight, boolean useDepth, boolean useAlphaChannel, boolean use32Bits, TextureWrap u, TextureWrap v) {
         if (use32Bits) {
             if (useAlphaChannel) {
                 fbFormat = Format.RGBA8888;
@@ -113,7 +114,7 @@ public final class PostProcessor implements Disposable {
             }
         }
 
-        composite = newPingPongBuffer(fboWidth, fboHeight, fbFormat, useDepth);
+        composite = newPingPongBuffer(fboWidth, fboHeight, fbFormat, useDepth, false);
         setBufferTextureWrap(u, v);
 
         pipelineState = new PipelineState();
@@ -136,7 +137,7 @@ public final class PostProcessor implements Disposable {
      * This is a drop-in replacement for the same-signature PingPongBuffer's constructor.
      */
     public static PingPongBuffer newPingPongBuffer(int width, int height, Format frameBufferFormat, boolean hasDepth) {
-        return newPingPongBuffer(width, height, frameBufferFormat, hasDepth, false);
+        return newPingPongBuffer(width, height, frameBufferFormat, hasDepth, true);
     }
     /**
      * Creates and returns a managed PingPongBuffer buffer, just create and forget. If rebind() is called on context loss, managed
@@ -144,8 +145,8 @@ public final class PostProcessor implements Disposable {
      * <p>
      * This is a drop-in replacement for the same-signature PingPongBuffer's constructor.
      */
-    public static PingPongBuffer newPingPongBuffer(int width, int height, Format frameBufferFormat, boolean hasDepth, boolean forceRGBABuffer) {
-        PingPongBuffer buffer = new PingPongBuffer(width, height, frameBufferFormat, hasDepth, forceRGBABuffer);
+    public static PingPongBuffer newPingPongBuffer(int width, int height, Format frameBufferFormat, boolean hasDepth, boolean preventFloatBuffer) {
+        PingPongBuffer buffer = new PingPongBuffer(width, height, frameBufferFormat, hasDepth, preventFloatBuffer);
         buffers.add(buffer);
         return buffer;
     }
@@ -180,10 +181,10 @@ public final class PostProcessor implements Disposable {
         dispose(true);
     }
 
-    public void dispose(boolean totalClean) {
+    public void dispose(boolean cleanAllBuffers) {
         effectsManager.dispose();
 
-        if (totalClean) {
+        if (cleanAllBuffers) {
             // cleanup managed buffers, if any
             for (int i = 0; i < buffers.size; i++) {
                 buffers.get(i).dispose();
@@ -198,7 +199,7 @@ public final class PostProcessor implements Disposable {
             enabledEffects.clear();
         }
 
-        if (totalClean) {
+        if (cleanAllBuffers) {
             pipelineState.dispose();
         }
     }
@@ -438,7 +439,7 @@ public final class PostProcessor implements Disposable {
         render(null);
     }
 
-    private int buildEnabledEffectsList() {
+    public int buildEnabledEffectsList() {
         enabledEffects.clear();
         for (PostProcessorEffect e : effectsManager) {
             if (e.isEnabled()) {

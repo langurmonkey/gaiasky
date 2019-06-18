@@ -127,8 +127,7 @@ public class ScreenshotsManager implements IObserver {
         FrameBuffer frameBuffer = mr.getFrameBuffer(width, height);
         // TODO That's a dirty trick, we should find a better way (i.e. making
         // buildEnabledEffectsList() method public)
-        boolean postprocessing = ppb.pp.captureNoClear();
-        ppb.pp.captureEnd();
+        boolean postprocessing = ppb.pp.buildEnabledEffectsList() > 0;
         if (!postprocessing) {
             // If post processing is not active, we must start the buffer now.
             // Otherwise, it is used in the render method to write the results
@@ -143,8 +142,8 @@ public class ScreenshotsManager implements IObserver {
         mr.renderSgr(camera, dt, width, height, frameBuffer, ppb);
 
         if (postprocessing) {
-            // If post processing is active, we have to start now again because
-            // the renderScene() has closed it.
+            // If post processing is active, we have to begin the buffer now again because
+            // the renderSgr() has closed it.
             frameBuffer.begin();
         }
         if (GlobalConf.frame.RENDER_SCREENSHOT_TIME) {
@@ -153,6 +152,8 @@ public class ScreenshotsManager implements IObserver {
             renderGui().render(width, height);
         }
 
+
+        frameBuffer.getColorBufferTexture().getTextureData().getFormat();
         String res = renderer.saveScreenshot(folder, filename, width, height, false, type, quality);
 
         frameBuffer.end();

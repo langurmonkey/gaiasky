@@ -384,9 +384,7 @@ public class SGRStereoscopic extends SGRAbstract implements ISGR, IObserver {
         switch (event) {
         case SCREENSHOT_SIZE_UDPATE:
         case FRAME_SIZE_UDPATE:
-            Gdx.app.postRunnable(() -> {
-                clearFrameBufferMap();
-            });
+            Gdx.app.postRunnable(() -> clearFrameBufferMap());
             break;
         default:
             break;

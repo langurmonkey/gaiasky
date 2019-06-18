@@ -77,11 +77,11 @@ public class DesktopPostProcessor implements IPostProcessor, IObserver {
 
         pps = new PostProcessBean[RenderType.values().length];
 
-        pps[RenderType.screen.index] = newPostProcessor(getWidth(RenderType.screen), getHeight(RenderType.screen), manager);
+        pps[RenderType.screen.index] = newPostProcessor(RenderType.screen, getWidth(RenderType.screen), getHeight(RenderType.screen), manager);
         if (GlobalConf.screenshot.isRedrawMode())
-            pps[RenderType.screenshot.index] = newPostProcessor(getWidth(RenderType.screenshot), getHeight(RenderType.screenshot), manager);
+            pps[RenderType.screenshot.index] = newPostProcessor(RenderType.screenshot, getWidth(RenderType.screenshot), getHeight(RenderType.screenshot), manager);
         if (GlobalConf.frame.isRedrawMode())
-            pps[RenderType.frame.index] = newPostProcessor(getWidth(RenderType.frame), getHeight(RenderType.frame), manager);
+            pps[RenderType.frame.index] = newPostProcessor(RenderType.frame, getWidth(RenderType.frame), getHeight(RenderType.frame), manager);
 
         EventManager.instance.subscribe(this, Events.SCREENSHOT_SIZE_UDPATE, Events.FRAME_SIZE_UDPATE, Events.BLOOM_CMD, Events.LENS_FLARE_CMD, Events.MOTION_BLUR_CMD, Events.LIGHT_POS_2D_UPDATED, Events.LIGHT_SCATTERING_CMD, Events.FISHEYE_CMD, Events.CUBEMAP360_CMD, Events.ANTIALIASING_CMD, Events.BRIGHTNESS_CMD, Events.CONTRAST_CMD, Events.HUE_CMD, Events.SATURATION_CMD, Events.GAMMA_CMD, Events.TONEMAPPING_TYPE_CMD, Events.EXPOSURE_CMD, Events.STEREO_PROFILE_CMD, Events.STEREOSCOPIC_CMD, Events.FPS_INFO, Events.FOV_CHANGE_NOTIFICATION, Events.STAR_BRIGHTNESS_CMD, Events.STAR_POINT_SIZE_CMD, Events.CAMERA_MOTION_UPDATED);
     }
@@ -110,12 +110,12 @@ public class DesktopPostProcessor implements IPostProcessor, IObserver {
         return 0;
     }
 
-    private PostProcessBean newPostProcessor(int width, int height, AssetManager manager) {
+    private PostProcessBean newPostProcessor(RenderType rt, int width, int height, AssetManager manager) {
         PostProcessBean ppb = new PostProcessBean();
 
         float ar = (float) width / (float) height;
 
-        ppb.pp = new PostProcessor(width, height, true, false, true);
+        ppb.pp = new PostProcessor(rt, width, height, true, false, true);
 
         // DEPTH BUFFER
         //ppb.depthBuffer = new DepthBuffer();
@@ -263,12 +263,12 @@ public class DesktopPostProcessor implements IPostProcessor, IObserver {
 
     @Override
     public void resize(final int width, final int height) {
-        Gdx.app.postRunnable(() -> replace(RenderType.screen.index, width, height));
+        Gdx.app.postRunnable(() -> replace(RenderType.screen, width, height));
     }
 
     @Override
     public void resizeImmediate(final int width, final int height) {
-        replace(RenderType.screen.index, width, height);
+        replace(RenderType.screen, width, height);
     }
 
     @Override
@@ -353,10 +353,10 @@ public class DesktopPostProcessor implements IPostProcessor, IObserver {
                 int newh = (Integer) data[1];
                 if (pps[RenderType.screenshot.index] != null) {
                     if (changed(pps[RenderType.screenshot.index].pp, neww, newh)) {
-                        Gdx.app.postRunnable(() -> replace(RenderType.screenshot.index, neww, newh));
+                        Gdx.app.postRunnable(() -> replace(RenderType.screenshot, neww, newh));
                     }
                 } else {
-                    pps[RenderType.screenshot.index] = newPostProcessor(neww, newh, manager);
+                    pps[RenderType.screenshot.index] = newPostProcessor(RenderType.screenshot, neww, newh, manager);
                 }
             }
             break;
@@ -367,11 +367,11 @@ public class DesktopPostProcessor implements IPostProcessor, IObserver {
                 if (pps[RenderType.frame.index] != null) {
                     if (changed(pps[RenderType.frame.index].pp, neww, newh)) {
                         Gdx.app.postRunnable(() -> {
-                            replace(RenderType.frame.index, neww, newh);
+                            replace(RenderType.frame, neww, newh);
                         });
                     }
                 } else {
-                    pps[RenderType.frame.index] = newPostProcessor(neww, newh, manager);
+                    pps[RenderType.frame.index] = newPostProcessor(RenderType.frame, neww, newh, manager);
                 }
             }
             break;
@@ -598,16 +598,16 @@ public class DesktopPostProcessor implements IPostProcessor, IObserver {
      * Reloads the postprocessor at the given index with the given width and
      * height.new Runnable() {
      *
-     * @param index
+     * @param rt
      * @param width
      * @param height
      * @Override public void run()
      */
-    private void replace(int index, final int width, final int height) {
+    private void replace(RenderType rt, final int width, final int height) {
         // Dispose of old post processor
-        pps[index].dispose();
+        pps[rt.index].dispose(false);
         // Create new
-        pps[index] = newPostProcessor(width, height, manager);
+        pps[rt.index] = newPostProcessor(rt, width, height, manager);
     }
 
     private boolean changed(PostProcessor postProcess, int width, int height) {

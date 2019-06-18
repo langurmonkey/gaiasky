@@ -148,7 +148,7 @@ public class StarGroupRenderSystem extends ImmediateRenderSystem implements IObs
                             addEffectsUniforms(shaderProgram, camera);
 
                             alphaSizeFovBr[0] = starGroup.opacity * alphas[starGroup.ct.getFirstOrdinal()];
-                            alphaSizeFovBr[1] = (fovMode == 0 ? (GlobalConf.scene.STAR_POINT_SIZE * rc.scaleFactor * (GlobalConf.program.isStereoFullWidth() ? 1 : 2)) : (GlobalConf.scene.STAR_POINT_SIZE * rc.scaleFactor * 10)) * starGroup.highlightedSizeFactor();
+                            alphaSizeFovBr[1] = (fovMode == 0 ? (GlobalConf.program.isStereoFullWidth() ? 1f : 2f) : 10f) * GlobalConf.scene.STAR_POINT_SIZE * rc.scaleFactor * starGroup.highlightedSizeFactor();
                             alphaSizeFovBr[2] = camera.getFovFactor();
                             alphaSizeFovBr[3] = (float) (GlobalConf.scene.STAR_BRIGHTNESS * BRIGHTNESS_FACTOR);
                             shaderProgram.setUniform4fv("u_alphaSizeFovBr", alphaSizeFovBr, 0, 4);

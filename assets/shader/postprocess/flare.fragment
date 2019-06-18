@@ -42,7 +42,7 @@ void main() {
 		vec2 offset = fract(texcoord + ghostVec * float(i));
 		
 		float weight = length(vec2(0.5) - offset) / length(vec2(0.5));
-		weight = pow(1.0 - weight, 3.0);
+		weight = pow(1.0 - weight, 2.0);
 		
 		result += textureDistorted(
 					u_texture0,
