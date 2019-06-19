@@ -87,6 +87,10 @@ public final class LightGlow extends PostProcessorEffect {
         glow.setSpiralScale(scl);
     }
 
+    public void setOrientation(float o){
+        glow.setOrientation(o);
+    }
+
     public void enableBlending(int sfactor, int dfactor) {
         this.blending = true;
         this.sfactor = sfactor;

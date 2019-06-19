@@ -14,22 +14,33 @@ uniform vec2 u_lightPositions[N];
 uniform float u_lightViewAngles[N];
 uniform vec3 u_lightColors[N];
 uniform int u_nLights;
+uniform float u_orientation;
 
 in float v_lums[N];
 in vec2 v_texCoords;
 
 out vec4 fragColor;
 
-float len(vec2 vect, float ar){
+float len(vec2 vect, float ar) {
     return sqrt(vect.x * vect.x * ar * ar + vect.y * vect.y);
 }
 
-float brightness(vec4 color){
+float brightness(vec4 color) {
     return dot(color.rgb, vec3(0.2126, 0.7152, 0.0722));
 }
 
-void main()
-{
+vec4 starImage(vec2 tc) {
+    //float cos_factor = cos(u_orientation);
+    //float sin_factor = sin(u_orientation);
+    // Rotate (around center)
+    //tc -= 0.5;
+    //tc *= mat2(cos_factor, sin_factor, -sin_factor, cos_factor);
+    //tc += 0.5;
+    return texture(u_texture1, tc);
+}
+
+
+void main() {
     float ar = u_viewport.x / u_viewport.y;
     fragColor = vec4(0.0, 0.0, 0.0, 1.0);
 
@@ -47,7 +58,7 @@ void main()
         glow_tc /= size;
         glow_tc += 0.5;
 
-        float color_glow = brightness(texture(u_texture1, glow_tc)) * 1.2;
+        float color_glow = brightness(starImage(glow_tc)) * 1.2;
         float core_inc = (0.1 - min(0.1, dist_center)) * color_glow;
         fragColor += vec4(color_glow * lightColor.r + core_inc, color_glow * lightColor.g + core_inc, color_glow * lightColor.b + core_inc, 1.0);
     }

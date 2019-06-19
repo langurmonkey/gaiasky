@@ -43,6 +43,7 @@ public final class Glow extends Filter<Glow> {
     private int nSamples = 30;
     private float textureScale = 1f;
     private float spiralScale = 1f;
+    private float orientation = 0f;
 
     // Contians a pre pass texture which is used to compute occlusion
     private Texture prePassTexture;
@@ -59,6 +60,7 @@ public final class Glow extends Filter<Glow> {
         Viewport("u_viewport", 2),
         NLights("u_nLights", 0),
         NSamples("u_nSamples", 0),
+        Orientation("u_orientation", 0),
         SpiralScale("u_spiralScale", 0),
         TextureScale("u_textureScale", 0);
         // @formatter:on
@@ -146,6 +148,11 @@ public final class Glow extends Filter<Glow> {
         return prePassTexture;
     }
 
+    public void setOrientation(float o){
+        orientation = o;
+        setParam(Param.Orientation, o);
+    }
+
     @Override
     public void rebind() {
         // Re-implement super to batch every parameter
@@ -156,6 +163,7 @@ public final class Glow extends Filter<Glow> {
         setParams(Param.NSamples, nSamples);
         setParams(Param.TextureScale, textureScale);
         setParams(Param.SpiralScale, spiralScale);
+        setParams(Param.Orientation, orientation);
         setParams(Param.Viewport, viewport);
         setParamsv(Param.LightPositions, lightPositions, 0, N * 2);
         setParamsv(Param.LightViewAngles, lightViewAngles, 0, N);

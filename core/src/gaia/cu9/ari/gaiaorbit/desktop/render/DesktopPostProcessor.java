@@ -405,6 +405,7 @@ public class DesktopPostProcessor implements IPostProcessor, IObserver {
                 if (pps[i] != null) {
                     PostProcessBean ppb = pps[i];
                     ppb.lens.setStarburstOffset(cameraOffset);
+                    ppb.lightglow.setOrientation(cameraOffset * 50f);
                 }
             }
             break;
