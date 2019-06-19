@@ -268,7 +268,7 @@ public class GaiaSkyContextMenu extends ContextMenu {
         MenuItem quit = new MenuItem(I18n.txt("context.quit"), skin, "default");
         quit.addListener((event) -> {
             if (event instanceof ChangeEvent) {
-                EventManager.instance.post(Events.SHOW_QUIT_ACTION);
+                EventManager.instance.post(Events.QUIT_ACTION);
                 return true;
             }
             return false;

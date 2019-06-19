@@ -64,7 +64,7 @@ public class KeyInputController extends InputAdapter {
             }
         } else if (keycode == Keys.ESCAPE) {
             // If input is not enabled, only escape works
-            EventManager.instance.post(Events.SHOW_QUIT_ACTION);
+            EventManager.instance.post(Events.QUIT_ACTION);
         }
         pressedKeys.remove(keycode);
         return false;

@@ -462,7 +462,7 @@ public class SceneGraphRenderer extends AbstractRenderer implements IProcessRend
         annotationsProc.addPostRunnables(clearDepthR);
 
         // BILLBOARD STARS
-        billboardStarsProc = new BillboardStarRenderSystem(RenderGroup.BILLBOARD_STAR, alphas, starBillboardShaders, "data/tex/base/star_glow_s.png", ComponentType.Stars.ordinal());
+        billboardStarsProc = new BillboardStarRenderSystem(RenderGroup.BILLBOARD_STAR, alphas, starBillboardShaders, GlobalResources.unpackTexName("data/tex/base/star-tex-02*.png"), ComponentType.Stars.ordinal());
         billboardStarsProc.addPreRunnables(additiveBlendR, noDepthTestR);
         billboardStarsProc.addPostRunnables(new RenderSystemRunnable() {
 

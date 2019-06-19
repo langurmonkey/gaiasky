@@ -5,9 +5,7 @@
 
 package gaia.cu9.ari.gaiaorbit.interfce;
 
-import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input.Keys;
-import com.badlogic.gdx.backends.lwjgl3.Lwjgl3Graphics;
 import com.badlogic.gdx.utils.Array;
 import gaia.cu9.ari.gaiaorbit.GaiaSky;
 import gaia.cu9.ari.gaiaorbit.event.EventManager;
@@ -18,7 +16,6 @@ import gaia.cu9.ari.gaiaorbit.util.GlobalConf.ProgramConf.StereoProfile;
 import gaia.cu9.ari.gaiaorbit.util.GlobalResources;
 import gaia.cu9.ari.gaiaorbit.util.I18n;
 import gaia.cu9.ari.gaiaorbit.util.gdx.contrib.postprocess.effects.CubemapProjections;
-import org.lwjgl.glfw.GLFW;
 
 import java.time.Instant;
 import java.util.*;
@@ -158,16 +155,11 @@ public class KeyBindings {
 
         // Show quit
         final Runnable runnableQuit = () -> {
-            if(GLFW.glfwGetInputMode(((Lwjgl3Graphics) Gdx.graphics).getWindow().getWindowHandle(), GLFW.GLFW_CURSOR) == GLFW.GLFW_CURSOR_DISABLED) {
-                // Release mouse if captured
-                GLFW.glfwSetInputMode(((Lwjgl3Graphics) Gdx.graphics).getWindow().getWindowHandle(), GLFW.GLFW_CURSOR, GLFW.GLFW_CURSOR_NORMAL);
-            }else {
-                // Quit action
-                EventManager.instance.post(Events.SHOW_QUIT_ACTION);
-            }
+            // Quit action
+            EventManager.instance.post(Events.QUIT_ACTION);
         };
 
-        // ESCAPE -> Exit
+        // ESCAPE -> Run quit action
         addMapping(new ProgramAction(I18n.txt("action.exit"), runnableQuit), Keys.ESCAPE);
 
         // CTRL+Q -> Exit

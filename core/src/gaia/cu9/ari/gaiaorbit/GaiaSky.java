@@ -884,6 +884,17 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
                 GuiRegistry.change(GuiRegistry.previous, prev);
             }
 
+            // Post a message to the screen
+            if (stereoMode){
+                ModePopupInfo mpi = new ModePopupInfo();
+                mpi.title = "Stereoscopic mode";
+                mpi.header = "You have entered Stereoscopic mode!";
+                mpi.addMapping("Back to normal mode", "CTRL", "S");
+                mpi.addMapping("Switch stereo profile", "CTRL", "SHIFT", "S");
+
+                EventManager.instance.post(Events.MODE_POPUP_CMD, mpi, 120f);
+            }
+
             break;
         case SCREENSHOT_SIZE_UDPATE:
         case FRAME_SIZE_UDPATE:

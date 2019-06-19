@@ -9,10 +9,7 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.scenes.scene2d.*;
 import com.badlogic.gdx.scenes.scene2d.InputEvent.Type;
-import com.badlogic.gdx.scenes.scene2d.ui.Container;
-import com.badlogic.gdx.scenes.scene2d.ui.Label;
-import com.badlogic.gdx.scenes.scene2d.ui.ScrollPane;
-import com.badlogic.gdx.scenes.scene2d.ui.TextField;
+import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Timer;
@@ -62,6 +59,7 @@ public class FullGui extends AbstractGui {
     protected RunCameraWindow runcameraWindow;
     protected MemInfoWindow memInfoWindow;
     protected LogWindow logWindow;
+    protected Table modeChangeTable;
 
     protected INumberFormat nf;
     protected Label pointerXCoord, pointerYCoord;
@@ -92,7 +90,7 @@ public class FullGui extends AbstractGui {
         buildGui();
 
         // We must subscribe to the desired events
-        EventManager.instance.subscribe(this, Events.FOV_CHANGED_CMD, Events.SHOW_TUTORIAL_ACTION, Events.SHOW_SEARCH_ACTION, Events.SHOW_PLAYCAMERA_ACTION, Events.DISPLAY_MEM_INFO_WINDOW, Events.REMOVE_KEYBOARD_FOCUS, Events.REMOVE_GUI_COMPONENT, Events.ADD_GUI_COMPONENT, Events.SHOW_LOG_ACTION, Events.RA_DEC_UPDATED, Events.LON_LAT_UPDATED, Events.POPUP_MENU_FOCUS, Events.SHOW_LAND_AT_LOCATION_ACTION, Events.DISPLAY_POINTER_COORDS_CMD, Events.TOGGLE_MINIMAP);
+        EventManager.instance.subscribe(this, Events.FOV_CHANGED_CMD, Events.SHOW_TUTORIAL_ACTION, Events.SHOW_SEARCH_ACTION, Events.SHOW_PLAYCAMERA_ACTION, Events.DISPLAY_MEM_INFO_WINDOW, Events.REMOVE_KEYBOARD_FOCUS, Events.REMOVE_GUI_COMPONENT, Events.ADD_GUI_COMPONENT, Events.SHOW_LOG_ACTION, Events.RA_DEC_UPDATED, Events.LON_LAT_UPDATED, Events.POPUP_MENU_FOCUS, Events.SHOW_LAND_AT_LOCATION_ACTION, Events.DISPLAY_POINTER_COORDS_CMD);
     }
 
     protected void buildGui() {
@@ -284,7 +282,7 @@ public class FullGui extends AbstractGui {
             ui.addListener((event) -> {
                 if (event instanceof InputEvent) {
                     InputEvent ie = (InputEvent) event;
-                    if(ie.getType() == Type.touchDown && !ie.isHandled()){
+                    if (ie.getType() == Type.touchDown && !ie.isHandled()) {
                         ui.setKeyboardFocus(null);
                     }
                 }
@@ -427,7 +425,6 @@ public class FullGui extends AbstractGui {
         default:
             break;
         }
-
     }
 
     @Override

@@ -67,8 +67,21 @@ public class CollapsibleWindow extends Window {
         this(title, skin, 2000);
     }
 
+    public CollapsibleWindow(String title, Skin skin, String styleName) {
+        this(title, skin, styleName, 2000);
+    }
+
     public CollapsibleWindow(String title, Skin skin, float collapseSpeed) {
         super(title, skin);
+        initWindow(skin, collapseSpeed);
+    }
+
+    public CollapsibleWindow(String title, Skin skin, String styleName, float collapseSpeed) {
+        super(title, skin, styleName);
+        initWindow(skin, collapseSpeed);
+    }
+
+    private void initWindow(Skin skin, float collapseSpeed){
         this.me = this;
         this.skin = skin;
         this.collapseSpeed = collapseSpeed;
@@ -139,7 +152,6 @@ public class CollapsibleWindow extends Window {
             return false;
         });
         getTitleTable().addListener(new TextTooltip(I18n.bundle.get("gui.tooltip.expandcollapse"), skin));
-
     }
 
     protected void drawBackground(Batch batch, float parentAlpha, float x, float y) {

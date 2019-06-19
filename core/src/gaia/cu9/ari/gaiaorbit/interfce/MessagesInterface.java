@@ -33,7 +33,7 @@ public class MessagesInterface extends Table implements IObserver, IGuiInterface
 
     public MessagesInterface(Skin skin, Object lock) {
         super(skin);
-        customElements = new HashMap<Integer, Widget>();
+        customElements = new HashMap<>();
 
         headline = new OwnLabel("", skin, "headline");
         headline.setColor(1, 1, 0, 1);

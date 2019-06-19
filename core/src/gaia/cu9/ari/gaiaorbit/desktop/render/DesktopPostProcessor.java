@@ -22,6 +22,7 @@ import gaia.cu9.ari.gaiaorbit.util.GlobalConf;
 import gaia.cu9.ari.gaiaorbit.util.GlobalConf.PostprocessConf.Antialias;
 import gaia.cu9.ari.gaiaorbit.util.GlobalConf.ProgramConf.StereoProfile;
 import gaia.cu9.ari.gaiaorbit.util.GlobalConf.SceneConf.GraphicsQuality;
+import gaia.cu9.ari.gaiaorbit.util.GlobalResources;
 import gaia.cu9.ari.gaiaorbit.util.I18n;
 import gaia.cu9.ari.gaiaorbit.util.Logger;
 import gaia.cu9.ari.gaiaorbit.util.gdx.contrib.postprocess.PostProcessor;
@@ -48,6 +49,8 @@ public class DesktopPostProcessor implements IPostProcessor, IObserver {
     Vector3 auxf;
     Matrix4 prevViewProj, prevCombined;
 
+    private String starTextureName, lensDirtName, lensColorName, lensStarburstName;
+
     public DesktopPostProcessor() {
         ShaderLoader.BasePath = "shader/postprocess/";
 
@@ -61,15 +64,14 @@ public class DesktopPostProcessor implements IPostProcessor, IObserver {
 
     public void initialize(AssetManager manager) {
         this.manager = manager;
-        manager.load(GlobalConf.data.dataFile("tex/base/lenscolor.png"), Texture.class);
-        if (GlobalConf.scene.GRAPHICS_QUALITY.isAtLeast(GraphicsQuality.HIGH)) {
-            manager.load(GlobalConf.data.dataFile("tex/base/lensdirt.jpg"), Texture.class);
-            manager.load(GlobalConf.data.dataFile("tex/base/star_glow.png"), Texture.class);
-        } else {
-            manager.load(GlobalConf.data.dataFile("tex/base/lensdirt_s.jpg"), Texture.class);
-            manager.load(GlobalConf.data.dataFile("tex/base/star_glow_s.png"), Texture.class);
-        }
-        manager.load(GlobalConf.data.dataFile("tex/base/lensstarburst.jpg"), Texture.class);
+        starTextureName = GlobalConf.data.dataFile(GlobalResources.unpackTexName("data/tex/base/star-tex-02*.png"));
+        lensDirtName = GlobalConf.data.dataFile(GlobalResources.unpackTexName("data/tex/base/lensdirt*.jpg"));
+        lensColorName = GlobalConf.data.dataFile("data/tex/base/lenscolor.png");
+        lensStarburstName = GlobalConf.data.dataFile("data/tex/base/lensstarburst.jpg");
+        manager.load(starTextureName, Texture.class);
+        manager.load(lensDirtName, Texture.class);
+        manager.load(lensColorName, Texture.class);
+        manager.load(lensStarburstName, Texture.class);
     }
 
     public void doneLoading(AssetManager manager) {
@@ -123,25 +125,22 @@ public class DesktopPostProcessor implements IPostProcessor, IObserver {
 
         // LIGHT GLOW
         int lgw, lgh;
-        Texture glow;
+        Texture glow = manager.get(starTextureName);
         // TODO Listen to GRAPHICS_QUALITY_CHANGED and apply new settings on the fly
         if (GlobalConf.scene.GRAPHICS_QUALITY.isAtLeast(GraphicsQuality.HIGH)) {
             lightGlowNSamples = 12;
             lgw = 1280;
             lgh = Math.round(lgw / ar);
-            glow = manager.get(GlobalConf.data.dataFile("tex/base/star_glow.png"));
             Glow.N = 30;
         } else if (GlobalConf.scene.GRAPHICS_QUALITY.isNormal()) {
             lightGlowNSamples = 8;
             lgw = 1000;
             lgh = Math.round(lgw / ar);
-            glow = manager.get(GlobalConf.data.dataFile("tex/base/star_glow_s.png"));
             Glow.N = 20;
         } else {
             lightGlowNSamples = 4;
             lgw = 1000;
             lgh = Math.round(lgw / ar);
-            glow = manager.get(GlobalConf.data.dataFile("tex/base/star_glow_s.png"));
             Glow.N = 10;
         }
         glow.setFilter(TextureFilter.Linear, TextureFilter.Linear);
@@ -155,11 +154,11 @@ public class DesktopPostProcessor implements IPostProcessor, IObserver {
 
         // LENS FLARE
         float lensFboScale = 0.2f;
-        Texture lcol = manager.get(GlobalConf.data.dataFile("tex/base/lenscolor.png"));
+        Texture lcol = manager.get(lensColorName);
         lcol.setFilter(TextureFilter.Linear, TextureFilter.Linear);
-        Texture ldirt = GlobalConf.scene.GRAPHICS_QUALITY.isAtLeast(GraphicsQuality.HIGH) ? manager.get(GlobalConf.data.dataFile("data/tex/base/lensdirt.jpg")) : manager.get(GlobalConf.data.dataFile("tex/base/lensdirt_s.jpg"));
+        Texture ldirt = manager.get(lensDirtName);
         ldirt.setFilter(TextureFilter.Linear, TextureFilter.Linear);
-        Texture lburst = manager.get(GlobalConf.data.dataFile("tex/base/lensstarburst.jpg"));
+        Texture lburst = manager.get(lensStarburstName);
         lburst.setFilter(TextureFilter.Linear, TextureFilter.Linear);
         ppb.lens = new LensFlare2((int) (width * lensFboScale), (int) (height * lensFboScale));
         ppb.lens.setGhosts(nGhosts);

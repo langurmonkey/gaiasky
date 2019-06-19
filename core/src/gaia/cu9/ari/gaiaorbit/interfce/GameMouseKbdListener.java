@@ -92,9 +92,22 @@ public class GameMouseKbdListener extends MouseKbdListener implements IObserver 
         // Unfocus
         GaiaSky.instance.mainGui.getGuiStage().unfocusAll();
 
-        String title = "GAME_MODE mode activated!";
-        String[] msgs = new String[] { "<W,A,S,D>  move", "<Q,E>  roll", "<SPACE,C>  up and down", "<Mouse>  look around", "<SHIFT+CTRL+L>  toggle capture mouse", "<1>  go back to normal mode" };
-        EventManager.instance.post(Events.SCREEN_NOTIFICATION_CMD, title, msgs, 10f);
+        ModePopupInfo mpi = new ModePopupInfo();
+        mpi.title = "Game mode";
+        mpi.header = "You have entered Game mode!";
+        mpi.addMapping("Move forward", "W");
+        mpi.addMapping("Move backward", "S");
+        mpi.addMapping("Strafe left", "A");
+        mpi.addMapping("Strafe right", "D");
+        mpi.addMapping("Roll left", "Q");
+        mpi.addMapping("Roll right", "E");
+        mpi.addMapping("Move up", "Space");
+        mpi.addMapping("Move down", "C");
+        mpi.addMapping("Look around", "Mouse");
+        mpi.addMapping("Toggle mouse capture", "SHIFT", "CTRL", "L");
+        mpi.addMapping("Go back to focus mode", "1");
+
+        EventManager.instance.post(Events.MODE_POPUP_CMD, mpi, 120f);
 
     }
 

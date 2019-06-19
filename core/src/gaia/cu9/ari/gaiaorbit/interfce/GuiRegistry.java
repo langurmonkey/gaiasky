@@ -7,19 +7,21 @@ package gaia.cu9.ari.gaiaorbit.interfce;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.InputMultiplexer;
+import com.badlogic.gdx.backends.lwjgl3.Lwjgl3Graphics;
 import com.badlogic.gdx.files.FileHandle;
+import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Stage;
-import com.badlogic.gdx.scenes.scene2d.ui.Skin;
+import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.utils.Array;
 import gaia.cu9.ari.gaiaorbit.desktop.util.SysUtils;
 import gaia.cu9.ari.gaiaorbit.event.EventManager;
 import gaia.cu9.ari.gaiaorbit.event.Events;
 import gaia.cu9.ari.gaiaorbit.event.IObserver;
 import gaia.cu9.ari.gaiaorbit.script.EventScriptingInterface;
-import gaia.cu9.ari.gaiaorbit.util.CatalogInfo;
-import gaia.cu9.ari.gaiaorbit.util.I18n;
-import gaia.cu9.ari.gaiaorbit.util.Logger;
+import gaia.cu9.ari.gaiaorbit.util.*;
 import gaia.cu9.ari.gaiaorbit.util.scene2d.FileChooser;
+import gaia.cu9.ari.gaiaorbit.util.scene2d.OwnLabel;
+import org.lwjgl.glfw.GLFW;
 
 import java.io.File;
 
@@ -57,6 +59,7 @@ public class GuiRegistry implements IObserver {
      * Global input multiplexer
      **/
     private static InputMultiplexer im = null;
+
 
     public static void setInputMultiplexer(InputMultiplexer im) {
         GuiRegistry.im = im;
@@ -198,6 +201,13 @@ public class GuiRegistry implements IObserver {
     private MinimapWindow minimapWindow;
 
     /**
+     * Mode change info popup
+     */
+    public Table modeChangeTable;
+
+    private RemoveActorThread removeActorThread;
+
+    /**
      * Last open location
      */
     private File lastOpenLocation;
@@ -209,7 +219,7 @@ public class GuiRegistry implements IObserver {
         super();
         this.skin = skin;
         // Windows which are visible from any GUI
-        EventManager.instance.subscribe(this, Events.SHOW_QUIT_ACTION, Events.SHOW_ABOUT_ACTION, Events.SHOW_LOAD_CATALOG_ACTION, Events.SHOW_PREFERENCES_ACTION, Events.SHOW_KEYFRAMES_WINDOW_ACTION, Events.UI_THEME_RELOAD_INFO, Events.TOGGLE_MINIMAP);
+        EventManager.instance.subscribe(this, Events.QUIT_ACTION, Events.SHOW_ABOUT_ACTION, Events.SHOW_LOAD_CATALOG_ACTION, Events.SHOW_PREFERENCES_ACTION, Events.SHOW_KEYFRAMES_WINDOW_ACTION, Events.UI_THEME_RELOAD_INFO, Events.TOGGLE_MINIMAP, Events.MODE_POPUP_CMD);
     }
 
     public void dispose() {
@@ -222,12 +232,19 @@ public class GuiRegistry implements IObserver {
             Stage ui = current.getGuiStage();
             // Treats windows that can appear in any GUI
             switch (event) {
-            case SHOW_QUIT_ACTION:
-                QuitWindow quit = new QuitWindow(ui, skin);
-                if (data.length > 0) {
-                    quit.setAcceptRunnable((Runnable) data[0]);
+            case QUIT_ACTION:
+                if(!removeModeChangePopup()) {
+                    if(GLFW.glfwGetInputMode(((Lwjgl3Graphics) Gdx.graphics).getWindow().getWindowHandle(), GLFW.GLFW_CURSOR) == GLFW.GLFW_CURSOR_DISABLED) {
+                        // Release mouse if captured
+                        GLFW.glfwSetInputMode(((Lwjgl3Graphics) Gdx.graphics).getWindow().getWindowHandle(), GLFW.GLFW_CURSOR, GLFW.GLFW_CURSOR_NORMAL);
+                    }else {
+                        QuitWindow quit = new QuitWindow(ui, skin);
+                        if (data.length > 0) {
+                            quit.setAcceptRunnable((Runnable) data[0]);
+                        }
+                        quit.show(ui);
+                    }
                 }
-                quit.show(ui);
                 break;
             case SHOW_ABOUT_ACTION:
                 (new AboutWindow(ui, skin)).show(ui);
@@ -303,10 +320,84 @@ public class GuiRegistry implements IObserver {
                 }
                 this.skin = (Skin) data[0];
                 break;
+            case MODE_POPUP_CMD:
+                ModePopupInfo mpi = (ModePopupInfo) data[0];
+                Float seconds = (Float) data[1];
+                float pad10 = 10f * GlobalConf.SCALE_FACTOR;
+                float pad5 = 5f * GlobalConf.SCALE_FACTOR;
+                float pad3 = 3f * GlobalConf.SCALE_FACTOR;
+                if (modeChangeTable != null) {
+                    modeChangeTable.remove();
+                }
+                modeChangeTable = new Table(skin);
+                modeChangeTable.setBackground("table-bg");
+                modeChangeTable.pad(pad10);
+
+
+
+                // Fill up table
+                OwnLabel ttl = new OwnLabel(mpi.title, skin, "hud-header");
+                modeChangeTable.add(ttl).left().padBottom(pad10).row();
+
+                OwnLabel dsc = new OwnLabel(mpi.header, skin);
+                modeChangeTable.add(dsc).left().padBottom(pad5 * 3f).row();
+
+                Table keysTable = new Table(skin);
+                for(Pair<String[], String> m : mpi.mappings){
+                    HorizontalGroup keysGroup = new HorizontalGroup();
+                    keysGroup.space(pad3);
+                    String[] keys = m.getFirst();
+                    String action = m.getSecond();
+                    for(int i = 0; i < keys.length; i++){
+                        TextButton key = new TextButton(keys[i], skin, "key");
+                        key.pad(pad5);
+                        keysGroup.addActor(key);
+                        if(i < keys.length - 1){
+                            keysGroup.addActor(new OwnLabel("+", skin));
+                        }
+                    }
+                    keysTable.add(keysGroup).right().padBottom(pad5).padRight(pad10 * 2f);
+                    keysTable.add(new OwnLabel(action, skin)).left().padBottom(pad5).row();
+                }
+                modeChangeTable.add(keysTable).center().row();
+                modeChangeTable.add(new OwnLabel("ESC - close this", skin, "mono")).right().padTop(pad10 * 2f);
+
+
+                modeChangeTable.pack();
+
+                // Add table to UI
+                Container mct = new Container<>(modeChangeTable);
+                mct.setFillParent(true);
+                mct.top();
+                mct.pad(pad10 * 2, 0, 0, 0);
+                ui.addActor(mct);
+
+
+                startModePopupInfoThread(modeChangeTable, seconds);
+                break;
             default:
                 break;
             }
         }
+    }
+
+    public boolean removeModeChangePopup(){
+        boolean removed = false;
+        if(modeChangeTable != null){
+            removed = modeChangeTable.remove();
+            // Kill thread
+            if(removeActorThread != null && removeActorThread.isAlive()){
+                removeActorThread.interrupt();
+                removeActorThread = null;
+            }
+        }
+
+        return removed;
+    }
+
+    private void startModePopupInfoThread(Actor actor, float seconds) {
+        removeActorThread = new RemoveActorThread(actor, seconds);
+        removeActorThread.start();
     }
 
 }

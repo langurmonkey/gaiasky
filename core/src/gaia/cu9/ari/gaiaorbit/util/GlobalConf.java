@@ -16,6 +16,7 @@ import gaia.cu9.ari.gaiaorbit.desktop.util.camera.CameraKeyframeManager;
 import gaia.cu9.ari.gaiaorbit.event.EventManager;
 import gaia.cu9.ari.gaiaorbit.event.Events;
 import gaia.cu9.ari.gaiaorbit.event.IObserver;
+import gaia.cu9.ari.gaiaorbit.interfce.ModePopupInfo;
 import gaia.cu9.ari.gaiaorbit.render.ComponentTypes.ComponentType;
 import gaia.cu9.ari.gaiaorbit.render.system.AbstractRenderSystem;
 import gaia.cu9.ari.gaiaorbit.util.Logger.Log;
@@ -906,10 +907,6 @@ public class GlobalConf {
                         CUBEMAP360_MODE = false;
                         EventManager.instance.post(Events.DISPLAY_GUI_CMD, I18n.bundle.get("notif.cleanmode"), true);
                     }
-
-                    // Post a message to the screen
-                    if (stereomode)
-                        EventManager.instance.post(Events.SCREEN_NOTIFICATION_CMD, "Stereoscopic mode activated!", new String[] { "<CTRL+S>   back to normal mode", "<CTRL+SHIFT+S>  switch stereoscopic profile" }, 10f);
                 }
                 break;
             case STEREO_PROFILE_CMD:
@@ -919,8 +916,15 @@ public class GlobalConf {
                 CUBEMAP360_MODE = (Boolean) data[0];
 
                 // Post a message to the screen
-                if (CUBEMAP360_MODE)
-                    EventManager.instance.post(Events.SCREEN_NOTIFICATION_CMD, "360 mode activated!", new String[] { "<CTRL+K>   back to normal mode", "<CTRL+SHIFT+K>  switch projection type" }, 10f);
+                if (CUBEMAP360_MODE){
+                    ModePopupInfo mpi = new ModePopupInfo();
+                    mpi.title = "Panorama mode";
+                    mpi.header = "You have entered Panorama mode!";
+                    mpi.addMapping("Back to normal mode", "CTRL", "K");
+                    mpi.addMapping("Switch projection type", "CTRL", "SHIFT", "K");
+
+                    EventManager.instance.post(Events.MODE_POPUP_CMD, mpi, 120f);
+                }
                 break;
             case CUBEMAP_PROJECTION_CMD:
                 CUBEMAP_PROJECTION = (CubemapProjections.CubemapProjection) data[0];

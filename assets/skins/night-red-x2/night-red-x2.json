@@ -258,6 +258,11 @@
       "fontColor": "red",
       "downFontColor": "red"
     },
+    "key": {
+      "up": "key",
+      "font": "ui-18",
+      "fontColor": "black"
+    },
     "link": {
       "font": "ui-18",
       "fontColor": "blue",
@@ -522,6 +527,11 @@
     "default": {
       "titleFont": "ui-23-bold",
       "background": "default-window",
+      "titleFontColor": "red"
+    },
+    "info": {
+      "titleFont": "ui-23-bold",
+      "background": "info-window",
       "titleFontColor": "red"
     },
     "dialog": {

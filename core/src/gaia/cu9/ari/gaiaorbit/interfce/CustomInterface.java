@@ -55,7 +55,7 @@ public class CustomInterface implements IObserver, IGuiInterface {
     }
 
     private void initSizes(Skin skin) {
-        sizes = new ArrayList<Integer>();
+        sizes = new ArrayList<>();
         ObjectMap<String, LabelStyle> ls = skin.getAll(LabelStyle.class);
         Keys<String> keys = ls.keys();
         for (String key : keys) {

@@ -488,7 +488,7 @@ public enum Events {
     /**
      * Quit action, can contain optional Runnable to run on accept()
      **/
-    SHOW_QUIT_ACTION,
+    QUIT_ACTION,
     SHOW_KEYFRAMES_WINDOW_ACTION,
     SHOW_MINIMAP_WINDOW_ACTION,
     /**
@@ -669,6 +669,10 @@ public enum Events {
      * float with the time in seconds.
      */
     SCREEN_NOTIFICATION_CMD,
+    /**
+     * Opens a new popup window with information on the new mode. Contains a ModePopupInfo object.
+     */
+    MODE_POPUP_CMD,
     /**
      * Removes a previously added message or image. Contains the id.
      **/

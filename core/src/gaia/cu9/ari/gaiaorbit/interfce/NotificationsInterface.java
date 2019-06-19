@@ -9,7 +9,6 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
-import com.badlogic.gdx.utils.Array;
 import gaia.cu9.ari.gaiaorbit.GaiaSky;
 import gaia.cu9.ari.gaiaorbit.data.util.PointCloudData;
 import gaia.cu9.ari.gaiaorbit.event.EventManager;
@@ -17,10 +16,9 @@ import gaia.cu9.ari.gaiaorbit.event.Events;
 import gaia.cu9.ari.gaiaorbit.event.IObserver;
 import gaia.cu9.ari.gaiaorbit.scenegraph.IFocus;
 import gaia.cu9.ari.gaiaorbit.scenegraph.camera.CameraManager.CameraMode;
-import gaia.cu9.ari.gaiaorbit.script.EventScriptingInterface;
-import gaia.cu9.ari.gaiaorbit.util.GlobalConf;
 import gaia.cu9.ari.gaiaorbit.util.GlobalConf.ProgramConf.StereoProfile;
 import gaia.cu9.ari.gaiaorbit.util.I18n;
+import gaia.cu9.ari.gaiaorbit.util.Pair;
 import gaia.cu9.ari.gaiaorbit.util.format.DateFormatFactory;
 import gaia.cu9.ari.gaiaorbit.util.format.IDateFormat;
 import gaia.cu9.ari.gaiaorbit.util.scene2d.OwnLabel;
@@ -123,7 +121,7 @@ public class NotificationsInterface extends Table implements IObserver, IGuiInte
         this.add(message1).left();
 
         this.df = DateFormatFactory.getFormatter("uuuu-MM-dd HH:mm:ss");
-        EventManager.instance.subscribe(this, Events.POST_NOTIFICATION, Events.FOCUS_CHANGED, Events.TOGGLE_TIME_CMD, Events.TOGGLE_VISIBILITY_CMD, Events.CAMERA_MODE_CMD, Events.PACE_CHANGED_INFO, Events.FOCUS_LOCK_CMD, Events.TOGGLE_AMBIENT_LIGHT, Events.FOV_CHANGE_NOTIFICATION, Events.JAVA_EXCEPTION, Events.ORBIT_DATA_LOADED, Events.SCREENSHOT_INFO, Events.COMPUTE_GAIA_SCAN_CMD, Events.ONLY_OBSERVED_STARS_CMD, Events.TRANSIT_COLOUR_CMD, Events.LIMIT_MAG_CMD, Events.STEREOSCOPIC_CMD, Events.DISPLAY_GUI_CMD, Events.FRAME_OUTPUT_CMD, Events.STEREO_PROFILE_CMD, Events.OCTREE_PARTICLE_FADE_CMD, Events.SCREEN_NOTIFICATION_CMD);
+        EventManager.instance.subscribe(this, Events.POST_NOTIFICATION, Events.FOCUS_CHANGED, Events.TOGGLE_TIME_CMD, Events.TOGGLE_VISIBILITY_CMD, Events.CAMERA_MODE_CMD, Events.PACE_CHANGED_INFO, Events.FOCUS_LOCK_CMD, Events.TOGGLE_AMBIENT_LIGHT, Events.FOV_CHANGE_NOTIFICATION, Events.JAVA_EXCEPTION, Events.ORBIT_DATA_LOADED, Events.SCREENSHOT_INFO, Events.COMPUTE_GAIA_SCAN_CMD, Events.ONLY_OBSERVED_STARS_CMD, Events.TRANSIT_COLOUR_CMD, Events.LIMIT_MAG_CMD, Events.STEREOSCOPIC_CMD, Events.DISPLAY_GUI_CMD, Events.FRAME_OUTPUT_CMD, Events.STEREO_PROFILE_CMD, Events.OCTREE_PARTICLE_FADE_CMD, Events.SCREEN_NOTIFICATION_CMD, Events.MODE_POPUP_CMD);
     }
 
     public void unsubscribe() {
@@ -291,8 +289,25 @@ public class NotificationsInterface extends Table implements IObserver, IGuiInte
                 for (String msg : msgs)
                     addMessage(msg);
 
-                // Start thread
-                startNotificationsThread(title, msgs, time);
+                break;
+            case MODE_POPUP_CMD:
+                ModePopupInfo mpi = (ModePopupInfo) data[0];
+                addMessage(mpi.title);
+                addMessage(mpi.header);
+                for(Pair<String[], String> p : mpi.mappings){
+                    String[] keys = p.getFirst();
+                    String action = p.getSecond();
+                    StringBuilder msg = new StringBuilder();
+                    msg.append("<");
+                    for(int i =0; i < keys.length; i++){
+                        msg.append(keys[i].toUpperCase());
+                        if(i < keys.length - 1){
+                            msg.append("+");
+                        }
+                    }
+                    msg.append("> " + action);
+                    addMessage(msg.toString());
+                }
                 break;
             default:
                 break;
@@ -300,10 +315,6 @@ public class NotificationsInterface extends Table implements IObserver, IGuiInte
         }
     }
 
-    private void startNotificationsThread(String title, String[] messages, float seconds) {
-        Thread t = new NotificationThread(title, messages, seconds);
-        t.start();
-    }
 
     public static int getNumberMessages() {
         return historical.size();
@@ -329,52 +340,5 @@ public class NotificationsInterface extends Table implements IObserver, IGuiInte
         return Math.max(getMessage1Width(), getMessage2Width());
     }
 
-    private class NotificationThread extends Thread {
-        private String title;
-        private Array<String> messages;
-        private float timeSeconds;
-
-        public NotificationThread(String title, String[] messages, float seconds) {
-            this.title = title;
-            this.messages = new Array<>(messages);
-            this.timeSeconds = seconds;
-        }
-
-        public void setTitle(String title) {
-            this.title = title;
-        }
-
-        public void setMessages(String... messages) {
-            this.messages.clear();
-            this.messages.addAll(messages);
-        }
-
-        public void setTimeSeconds(float secs) {
-            this.timeSeconds = secs;
-        }
-
-        public void run() {
-            EventScriptingInterface scr = EventScriptingInterface.instance();
-            int id = 10;
-            if (title != null && !title.isEmpty()) {
-                scr.displayMessageObject(id++, title, 0.3f, 0.8f, 1f, 1f, 1f, 1f, 16f * GlobalConf.SCALE_FACTOR);
-            }
-            if (messages != null && messages.size > 0) {
-                float pos = 0.77f;
-                for (String msg : messages) {
-                    if (msg != null && !msg.isEmpty()) {
-                        scr.displayMessageObject(id++, msg, 0.31f, pos, 1f, 1f, 1f, 0.7f, 14f * GlobalConf.SCALE_FACTOR);
-                        pos -= 0.03f;
-                    }
-                }
-            }
-            scr.sleep(timeSeconds);
-
-            // Cleanup
-            for (int i = 10; i < id; i++) {
-                scr.removeObject(i);
-            }
-        }
-    }
 
 }
