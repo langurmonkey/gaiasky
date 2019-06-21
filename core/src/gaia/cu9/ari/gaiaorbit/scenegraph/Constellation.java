@@ -44,7 +44,7 @@ public class Constellation extends FadeNode implements ILineRenderable, I3DTextR
         }
     }
 
-    float alpha = .5f;
+    float alpha = .2f;
     float constalpha;
     boolean allLoaded = false;
 

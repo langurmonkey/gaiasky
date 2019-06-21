@@ -131,6 +131,10 @@ public class VertsObject extends AbstractPositionEntity implements IGPUVertsRend
         return count;
     }
 
+    public void setPointCloudData(PointCloudData pcd){
+        this.pointCloudData = pcd;
+    }
+
     @Override
     public PointCloudData getPointCloud() {
         return pointCloudData;

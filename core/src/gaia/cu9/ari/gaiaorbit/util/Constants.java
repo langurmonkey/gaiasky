@@ -212,7 +212,7 @@ public class Constants {
     public static final long MIN_TIME_MS = -MAX_TIME_MS;
 
     // Max time for VSOP87 algorithms
-    public static final long MAX_VSOP_TIME_MS = 50000l * (long) Nature.Y_TO_MS;
+    public static final long MAX_VSOP_TIME_MS = 20000l * (long) Nature.Y_TO_MS;
 
     // Min time for VSOP87 algorithms
     public static final long MIN_VSOP_TIME_MS = -MAX_VSOP_TIME_MS;

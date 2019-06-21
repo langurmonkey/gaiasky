@@ -15,6 +15,7 @@ import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.reflect.ClassReflection;
 import gaia.cu9.ari.gaiaorbit.data.orbit.IOrbitDataProvider;
 import gaia.cu9.ari.gaiaorbit.data.util.PointCloudData;
+import gaia.cu9.ari.gaiaorbit.scenegraph.Orbit;
 import gaia.cu9.ari.gaiaorbit.scenegraph.component.OrbitComponent;
 import gaia.cu9.ari.gaiaorbit.util.Logger;
 
@@ -65,14 +66,22 @@ public class OrbitDataLoader extends AsynchronousAssetLoader<PointCloudData, Orb
         Class<? extends IOrbitDataProvider> providerClass;
         public Date ini;
         public boolean forward;
-        public float orbitalPeriod;
+        public double orbitalPeriod;
         public double multiplier;
         public int numSamples;
         public String name;
         public OrbitComponent orbitalParamaters;
+        public Orbit orbit;
 
         public OrbitDataLoaderParameter(Class<? extends IOrbitDataProvider> providerClass) {
             this.providerClass = providerClass;
+        }
+
+        public OrbitDataLoaderParameter(String name, Class<? extends IOrbitDataProvider> providerClass, double orbitalPeriod, int numSamples) {
+            this(providerClass);
+            this.name = name;
+            this.orbitalPeriod = orbitalPeriod;
+            this.numSamples = numSamples;
         }
 
         public OrbitDataLoaderParameter(String name, Class<? extends IOrbitDataProvider> providerClass, OrbitComponent orbitalParameters, double multiplier) {
@@ -90,7 +99,7 @@ public class OrbitDataLoader extends AsynchronousAssetLoader<PointCloudData, Orb
             this.numSamples = numSamples;
         }
 
-        public OrbitDataLoaderParameter(Class<? extends IOrbitDataProvider> providerClass, String name, Date ini, boolean forward, float orbitalPeriod, int numSamples) {
+        public OrbitDataLoaderParameter(Class<? extends IOrbitDataProvider> providerClass, String name, Date ini, boolean forward, double orbitalPeriod, int numSamples) {
             this(providerClass);
             this.name = name;
             this.ini = ini;
@@ -99,7 +108,7 @@ public class OrbitDataLoader extends AsynchronousAssetLoader<PointCloudData, Orb
             this.numSamples = numSamples;
         }
 
-        public OrbitDataLoaderParameter(Class<? extends IOrbitDataProvider> providerClass, String name, Date ini, boolean forward, float orbitalPeriod) {
+        public OrbitDataLoaderParameter(Class<? extends IOrbitDataProvider> providerClass, String name, Date ini, boolean forward, double orbitalPeriod) {
             this(providerClass, name, ini, forward, orbitalPeriod, -1);
         }
 
@@ -111,7 +120,7 @@ public class OrbitDataLoader extends AsynchronousAssetLoader<PointCloudData, Orb
             this.forward = fwd;
         }
 
-        public void setOrbitalPeriod(float period) {
+        public void setOrbitalPeriod(double period) {
             this.orbitalPeriod = period;
         }
     }

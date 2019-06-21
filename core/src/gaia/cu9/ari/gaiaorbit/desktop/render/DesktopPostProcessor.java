@@ -282,7 +282,7 @@ public class DesktopPostProcessor implements IPostProcessor, IObserver {
     }
 
     private float getGlowTextureScale(double starBrightness, float starSize, float fovFactor) {
-        float ts = (float) starBrightness * starSize * 9e-2f / fovFactor;
+        float ts = (float) starBrightness * starSize * 7e-2f / fovFactor;
         return ts;
     }
 

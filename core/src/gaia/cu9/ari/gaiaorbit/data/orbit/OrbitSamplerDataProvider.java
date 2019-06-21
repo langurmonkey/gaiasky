@@ -38,7 +38,7 @@ import java.util.Date;
  * @author Toni Sagrista
  */
 public class OrbitSamplerDataProvider implements IOrbitDataProvider {
-    private static boolean writeData = false;
+    private static boolean writeData = true;
     private static final String writeDataPath = "/tmp/";
     PointCloudData data;
 
@@ -58,9 +58,9 @@ public class OrbitSamplerDataProvider implements IOrbitDataProvider {
             // Initialize date format
             DateFormatFactory.initialize(new DesktopDateFormatFactory());
 
-            ConfInit.initialize(new DesktopConfInit(new FileInputStream(new File(ASSETS_LOC + "conf/global.properties")), new FileInputStream(new File(ASSETS_LOC + "data/dummyversion"))));
+            ConfInit.initialize(new DesktopConfInit(new FileInputStream(new File(ASSETS_LOC + "/conf/global.properties")), new FileInputStream(new File(ASSETS_LOC + "/dummyversion"))));
 
-            I18n.initialize(new FileHandle(ASSETS_LOC + "i18n/gsbundle"));
+            I18n.initialize(new FileHandle(ASSETS_LOC + "/i18n/gsbundle"));
 
             // Initialize math manager
             MathManager.initialize();
@@ -70,11 +70,10 @@ public class OrbitSamplerDataProvider implements IOrbitDataProvider {
 
             Date now = new Date();
             String[] bodies = new String[] { "Mercury", "Venus", "Earth", "Mars", "Jupiter", "Saturn", "Uranus", "Neptune", "Moon", "Pluto" };
-            float[] periods = new float[] { 87.9691f, 224.701f, 365.256363f, 686.971f, 4332.59f, 10759.22f, 30799.095f, 60190.03f, 27.321682f, 90560f };
+            double[] periods = new double[] { 87.9691, 224.701, 365.256363004, 686.971, 4332.59, 10759.22, 30799.095, 60190.03, 27.321682, 90560.0 };
             for (int i = 0; i < bodies.length; i++) {
-
                 String b = bodies[i];
-                float period = periods[i];
+                double period = periods[i];
                 OrbitDataLoaderParameter param = new OrbitDataLoaderParameter(me.getClass(), b, now, true, period, 500);
                 me.load(null, param);
 
@@ -94,7 +93,7 @@ public class OrbitSamplerDataProvider implements IOrbitDataProvider {
     public void load(String file, OrbitDataLoaderParameter parameter) {
         // Sample using VSOP
         // If num samples is not defined, we use 300 samples per year of period
-        int numSamples = parameter.numSamples > 0 ? parameter.numSamples : (int) (300 * parameter.orbitalPeriod / 365);
+        int numSamples = parameter.numSamples > 0 ? parameter.numSamples : (int) (300.0 * parameter.orbitalPeriod / 365.0);
         numSamples = Math.max(100, Math.min(2000, numSamples));
         data = new PointCloudData();
         String bodyDesc = parameter.name;
@@ -103,8 +102,8 @@ public class OrbitSamplerDataProvider implements IOrbitDataProvider {
         Vector3d ecl = new Vector3d();
 
         // Milliseconds of this orbit in one revolution
-        long orbitalMs = (long) parameter.orbitalPeriod * 24 * 60 * 60 * 1000;
-        long stepMs = orbitalMs / numSamples;
+        double orbitalMs = parameter.orbitalPeriod * 86400000.0;
+        double stepMs = orbitalMs / (double) numSamples;
 
         // Load vsop orbit data
         for (int i = 0; i <= numSamples; i++) {
@@ -117,7 +116,7 @@ public class OrbitSamplerDataProvider implements IOrbitDataProvider {
             accum += Math.toDegrees(ecl.x) - last;
             last = Math.toDegrees(ecl.x);
 
-            if (accum > 355) {
+            if (accum > 360) {
                 break;
             }
 
@@ -126,20 +125,21 @@ public class OrbitSamplerDataProvider implements IOrbitDataProvider {
             data.x.add(ecl.x);
             data.y.add(ecl.y);
             data.z.add(ecl.z);
-            d = Instant.ofEpochMilli(d.toEpochMilli() + stepMs);
-            data.time.add(Instant.ofEpochMilli(d.toEpochMilli()));
+            data.time.add(d);
+
+            d = Instant.ofEpochMilli(d.toEpochMilli() + (long) stepMs);
         }
 
         // Close the circle
         data.x.add(data.x.get(0));
         data.y.add(data.y.get(0));
         data.z.add(data.z.get(0));
-        d = Instant.ofEpochMilli(d.toEpochMilli() + stepMs);
+        d = Instant.ofEpochMilli(d.toEpochMilli() + (long) stepMs);
         data.time.add(Instant.ofEpochMilli(d.toEpochMilli()));
 
         if (writeData) {
             try {
-                OrbitDataWriter.writeOrbitData(writeDataPath + "orb." + bodyDesc.toString().toUpperCase() + ".dat", data);
+                OrbitDataWriter.writeOrbitData(writeDataPath + "orb." + bodyDesc.toUpperCase() + ".dat", data);
             } catch (IOException e) {
                 Logger.getLogger(this.getClass()).error(e);
             }

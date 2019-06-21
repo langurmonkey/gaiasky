@@ -247,6 +247,8 @@ public class AstroUtils {
      * @return Ecliptic coordinates of Pluto at the given julian date
      */
     public static Vector3d plutoEclipticCoordinates(Instant date, Vector3d out) {
+        if(!Constants.withinVSOPTime(date.toEpochMilli()))
+            return null;
         return plutoEclipticCoordinates(getDaysSinceJ2000(date), out);
     }
 
@@ -439,8 +441,7 @@ public class AstroUtils {
     /**
      * Gets the Julian Date for the given date. It uses a cache.
      * 
-     * @param date
-     *            The date.
+     * @param date The date.
      * @return The Julian Date.
      */
     public static synchronized double getJulianDateCache(Instant instant) {

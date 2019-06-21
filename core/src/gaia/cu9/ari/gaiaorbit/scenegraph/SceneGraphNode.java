@@ -813,4 +813,13 @@ public class SceneGraphNode implements IStarContainer, IPosition {
     public boolean mustAddToIndex() {
         return true;
     }
+
+    /**
+     * Returns whether the current position is valid (usually, when there is no
+     * coordinates overflow)
+     * @return
+     */
+    public boolean isValidPosition(){
+        return true;
+    }
 }

@@ -523,4 +523,8 @@ public abstract class CelestialBody extends AbstractPositionEntity implements I3
         return null;
     }
 
+    @Override
+    public boolean isValidPosition() {
+        return !coordinatesTimeOverflow;
+    }
 }

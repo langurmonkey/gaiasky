@@ -17,6 +17,7 @@ public class PointCloudData {
     public Array<Instant> time;
 
     private Vector3d v0, v1;
+    private Instant start, end;
 
     public PointCloudData() {
         this(16);
@@ -86,6 +87,10 @@ public class PointCloudData {
         v.set(x.get(index), y.get(index), z.get(index));
     }
 
+    public Instant loadTime(int index){
+        return time.get(index);
+    }
+
     public int getNumPoints() {
         return x.size;
     }
@@ -117,6 +122,32 @@ public class PointCloudData {
     public Instant getDate(int index) {
         return time.get(index);
     }
+
+    public Instant getStart(){
+        if(start == null){
+            start = time.get(0);
+        }
+        return start;
+    }
+
+    public long getStartMs(){
+        return getStart().toEpochMilli();
+    }
+
+
+    public Instant getEnd(){
+        if(end == null){
+            end = time.get(time.size - 1);
+        }
+        return end;
+    }
+
+    public long getEndMs(){
+        return getEnd().toEpochMilli();
+    }
+
+
+
 
     /**
      * Loads the data point at the index in the vector in the world reference
@@ -161,8 +192,28 @@ public class PointCloudData {
         return true;
     }
 
+    /**
+     * Gets the bounding indices for the given date. If the date is out of range, it wraps.
+     * @param instant The date
+     * @return The two indices
+     */
+    public int getIndex(Instant instant){
+        long c = instant.toEpochMilli();
+        long s = getStartMs();
+        long e = getEndMs();
+
+        long ep = e - s;
+        long cp = c - s;
+        long wrapCurrentTime = ((cp % ep) + ep) % ep;
+
+        return binarySearch(time, wrapCurrentTime + s);
+    }
+
     private int binarySearch(Array<Instant> times, Instant elem) {
-        long time = elem.toEpochMilli();
+        return binarySearch(times, elem.toEpochMilli());
+    }
+
+    private int binarySearch(Array<Instant> times, long time){
         if (time >= times.get(0).toEpochMilli() && time <= times.get(times.size - 1).toEpochMilli()) {
             return binarySearch(times, time, 0, times.size - 1);
         } else {

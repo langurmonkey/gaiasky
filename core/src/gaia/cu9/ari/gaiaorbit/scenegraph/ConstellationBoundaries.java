@@ -15,7 +15,7 @@ import gaia.cu9.ari.gaiaorbit.util.time.ITimeFrameProvider;
 import java.util.List;
 
 public class ConstellationBoundaries extends AbstractPositionEntity implements ILineRenderable {
-    private float alpha = .8f;
+    private float alpha = .2f;
     private List<List<Vector3d>> boundaries;
 
     public ConstellationBoundaries() {

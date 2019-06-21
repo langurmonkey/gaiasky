@@ -11,8 +11,10 @@ import com.badlogic.gdx.utils.reflect.ClassReflection;
 import com.badlogic.gdx.utils.reflect.Method;
 import com.badlogic.gdx.utils.reflect.ReflectionException;
 import gaia.cu9.ari.gaiaorbit.GaiaSky;
-import gaia.cu9.ari.gaiaorbit.assets.OrbitDataLoader;
+import gaia.cu9.ari.gaiaorbit.assets.OrbitDataLoader.OrbitDataLoaderParameter;
+import gaia.cu9.ari.gaiaorbit.data.OrbitRefresher;
 import gaia.cu9.ari.gaiaorbit.data.orbit.IOrbitDataProvider;
+import gaia.cu9.ari.gaiaorbit.data.orbit.OrbitFileDataProvider;
 import gaia.cu9.ari.gaiaorbit.render.ComponentTypes.ComponentType;
 import gaia.cu9.ari.gaiaorbit.render.system.LineRenderSystem;
 import gaia.cu9.ari.gaiaorbit.scenegraph.camera.ICamera;
@@ -28,9 +30,18 @@ import gaia.cu9.ari.gaiaorbit.util.math.Vector3d;
 import gaia.cu9.ari.gaiaorbit.util.time.ITimeFrameProvider;
 
 import java.time.Instant;
+import java.util.Date;
 
 public class Orbit extends Polyline {
     private static final Log logger = Logger.getLogger(Orbit.class);
+
+    private static OrbitRefresher orbitRefresher;
+
+    private static void initRefresher() {
+        if (orbitRefresher == null) {
+            orbitRefresher = new OrbitRefresher();
+        }
+    }
 
     /** Threshold angle **/
     protected static final float ANGLE_LIMIT = (float) Math.toRadians(1.5);
@@ -51,6 +62,24 @@ public class Orbit extends Polyline {
     protected boolean onlybody = false;
     // Use new method for orbital elements
     public boolean newmethod = false;
+
+    /**
+     * Refreshing state
+     */
+    public boolean refreshing = false;
+
+    /**
+     * Is the 'default' orbit loaded? (time out of bounds)
+     */
+    public boolean orbitDefault = false;
+
+    private long orbitStartMs, orbitEndMs;
+
+    /**
+     * Whether the orbit must be refreshed when out of bounds
+     */
+    private boolean mustRefresh;
+    private OrbitDataLoaderParameter params;
 
     /** Orbital elements in gpu, in case there is no body **/
     public boolean elemsInGpu = false;
@@ -75,7 +104,7 @@ public class Orbit extends Polyline {
                 IOrbitDataProvider provider;
                 try {
                     provider = ClassReflection.newInstance(providerClass);
-                    provider.load(oc.source, new OrbitDataLoader.OrbitDataLoaderParameter(name, providerClass, oc, multiplier, 100), newmethod);
+                    provider.load(oc.source, new OrbitDataLoaderParameter(name, providerClass, oc, multiplier, 100), newmethod);
                     pointCloudData = provider.getData();
                 } catch (Exception e) {
                     logger.error(e);
@@ -83,18 +112,33 @@ public class Orbit extends Polyline {
             } catch (ReflectionException e) {
                 logger.error(e);
             }
+
+        initRefresher();
     }
 
     @Override
     public void doneLoading(AssetManager manager) {
         alpha = cc[3];
-        if (!onlybody) {
-            int last = pointCloudData.getNumPoints() - 1;
-            Vector3d v = new Vector3d(pointCloudData.x.get(last), pointCloudData.y.get(last), pointCloudData.z.get(last));
-            this.size = (float) v.len() * 5;
-        } else {
+        initOrbitMetadata();
+        primitiveSize = 1.3f;
 
+        if (body != null) {
+            params = new OrbitDataLoaderParameter(body.name, null, oc.period, 500);
+            params.orbit = this;
         }
+    }
+
+    public void initOrbitMetadata() {
+        if (pointCloudData != null) {
+            orbitStartMs = pointCloudData.getDate(0).toEpochMilli();
+            orbitEndMs = pointCloudData.getDate(pointCloudData.getNumPoints() - 1).toEpochMilli();
+            if (!onlybody) {
+                int last = pointCloudData.getNumPoints() - 1;
+                Vector3d v = new Vector3d(pointCloudData.x.get(last), pointCloudData.y.get(last), pointCloudData.z.get(last));
+                this.size = (float) v.len() * 5;
+            }
+        }
+        mustRefresh = providerClass != null && providerClass.equals(OrbitFileDataProvider.class) && body != null && body instanceof Planet && oc.period > 0;
     }
 
     @Override
@@ -102,6 +146,9 @@ public class Orbit extends Polyline {
         super.updateLocal(time, camera);
         if (!onlybody)
             updateLocalTransform(time.getTime());
+
+        // Check updater
+        refreshOrbit();
     }
 
     protected void updateLocalTransform(Instant date) {
@@ -133,6 +180,10 @@ public class Orbit extends Polyline {
     @Override
     protected void addToRenderLists(ICamera camera) {
         if (!onlybody && GaiaSky.instance.isOn(ct)) {
+            // If overflow, return
+            if (body != null && body.coordinatesTimeOverflow)
+                return;
+
             float angleLimit = ANGLE_LIMIT * camera.getFovFactor();
             if (viewAngle > angleLimit) {
                 if (viewAngle < angleLimit * SHADER_MODEL_OVERLAP_FACTOR) {
@@ -167,15 +218,39 @@ public class Orbit extends Polyline {
         if (!onlybody) {
             alpha *= this.alpha;
 
-            // Make origin Gaia
+            // Make origin Gaia (hack)
             Vector3d parentPos = null;
             if (parent instanceof Gaia) {
                 parentPos = ((Gaia) parent).unrotatedPos;
             }
 
+            float dAlpha = 0f;
+            int stIdx = 0;
+            int nPoints = pointCloudData.getNumPoints();
+
+            boolean reverse = GaiaSky.instance.time.getWarpFactor() < 0;
+            if (mustRefresh) {
+                float top = alpha * 1f;
+                float bottom = alpha * 0.1f;
+                dAlpha = (top - bottom) / nPoints;
+                Instant currentTime = GaiaSky.instance.time.getTime();
+                stIdx = pointCloudData.getIndex(currentTime);
+
+                if (!reverse) {
+                    alpha = bottom;
+                    dAlpha = -dAlpha;
+                }
+
+            }
+
             // This is so that the shape renderer does not mess up the z-buffer
-            for (int i = 1; i < pointCloudData.getNumPoints(); i++) {
-                pointCloudData.loadPoint(prev, i - 1);
+            int n = 0;
+            int i = wrap(stIdx + 1, nPoints);
+            while (n < nPoints - 1) {
+                // i minus one
+                int im = wrap(i - 1, nPoints);
+
+                pointCloudData.loadPoint(prev, im);
                 pointCloudData.loadPoint(curr, i);
 
                 if (parentPos != null) {
@@ -186,15 +261,58 @@ public class Orbit extends Polyline {
                 prev.mul(localTransformD);
                 curr.mul(localTransformD);
 
-                renderer.addLine(this, (float) prev.x, (float) prev.y, (float) prev.z, (float) curr.x, (float) curr.y, (float) curr.z, cc[0], cc[1], cc[2], alpha * cc[3]);
+                if (mustRefresh && !reverse && n == nPoints - 2) {
+                    Vector3d aux = aux3d1.get();
+                    aux.set(body.translation);
+                    renderer.addLine(this, (float) prev.x, (float) prev.y, (float) prev.z, (float) aux.x, (float) aux.y, (float) aux.z, cc[0], cc[1], cc[2], alpha * cc[3]);
+                } else if (mustRefresh && reverse && n == 0) {
+                    Vector3d aux = aux3d1.get();
+                    aux.set(body.translation);
+                    renderer.addLine(this, (float) curr.x, (float) curr.y, (float) curr.z, (float) aux.x, (float) aux.y, (float) aux.z, cc[0], cc[1], cc[2], alpha * cc[3]);
+                } else {
+                    renderer.addLine(this, (float) prev.x, (float) prev.y, (float) prev.z, (float) curr.x, (float) curr.y, (float) curr.z, cc[0], cc[1], cc[2], alpha * cc[3]);
+                }
 
+                alpha -= dAlpha;
+
+                // advance
+                i = wrap(i + 1, nPoints);
+                n++;
+            }
+        }
+    }
+
+    private int wrap(int idx, int n) {
+        return (((idx % n) + n) % n);
+    }
+
+    private void refreshOrbit() {
+        if (mustRefresh && !body.coordinatesTimeOverflow) {
+            Instant currentTime = GaiaSky.instance.time.getTime();
+            long currentMs = currentTime.toEpochMilli();
+            if (pointCloudData == null || currentMs < orbitStartMs || currentMs > orbitEndMs) {
+                // Schedule for refresh
+
+                // Work out sample initial date
+                Date iniTime;
+                if (GaiaSky.instance.time.getWarpFactor() >= 0) {
+                    // From now forward
+                    iniTime = Date.from(currentTime);
+                } else {
+                    // From (now - period) forward (reverse)
+                    iniTime = Date.from(Instant.from(currentTime).minusMillis((long) (oc.period * 8640000l)));
+                }
+                params.setIni(iniTime);
+                // Add to queue
+                orbitRefresher.queue(params);
+                orbitDefault = false;
             }
         }
     }
 
     /**
      * Sets the absolute size of this entity
-     * 
+     *
      * @param size
      */
     public void setSize(Float size) {
@@ -247,6 +365,5 @@ public class Orbit extends Polyline {
     public double getAlpha() {
         return alpha;
     }
-
 
 }

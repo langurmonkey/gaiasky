@@ -6,8 +6,6 @@
 package gaia.cu9.ari.gaiaorbit.interfce;
 
 import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.scenes.scene2d.Event;
-import com.badlogic.gdx.scenes.scene2d.EventListener;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.InputEvent.Type;
 import com.badlogic.gdx.scenes.scene2d.Stage;
@@ -85,7 +83,7 @@ public class DateDialog extends CollapsibleWindow {
             if (event instanceof InputEvent) {
                 InputEvent ie = (InputEvent) event;
                 if (ie.getType() == Type.keyTyped) {
-                    checkField(year, -20000, 20000);
+                    checkField(year, -100000, 100000);
                     return true;
                 }
             }
@@ -166,7 +164,7 @@ public class DateDialog extends CollapsibleWindow {
             if (event instanceof ChangeEvent) {
 
                 boolean cool = checkField(day, 1, 31);
-                cool = checkField(year, -20000, 20000) && cool;
+                cool = checkField(year, -100000, 100000) && cool;
                 cool = checkField(hour, 0, 23) && cool;
                 cool = checkField(min, 0, 59) && cool;
                 cool = checkField(sec, 0, 59) && cool;

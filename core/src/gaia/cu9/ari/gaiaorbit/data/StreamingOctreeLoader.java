@@ -89,9 +89,6 @@ public abstract class StreamingOctreeLoader implements IObserver, ISceneGraphLoa
     protected int loadedObjects;
     protected int maxLoadedIds, idxLoadedIds;
 
-    /** Load status of the different levels of detail **/
-    protected LoadStatus[] lodStatus = new LoadStatus[50];
-
     protected String metadata, particles;
 
     /** Daemon thread that gets the data loading requests and serves them **/
@@ -130,7 +127,7 @@ public abstract class StreamingOctreeLoader implements IObserver, ISceneGraphLoa
         AbstractOctreeWrapper octreeWrapper = loadOctreeData();
 
         if (octreeWrapper != null) {
-            /**
+            /*
              * INITIALIZE DAEMON LOADER THREAD
              */
             daemon = new DaemonLoader(octreeWrapper, this);
@@ -139,7 +136,7 @@ public abstract class StreamingOctreeLoader implements IObserver, ISceneGraphLoa
             daemon.setPriority(Thread.MIN_PRIORITY);
             daemon.start();
 
-            /**
+            /*
              * INITIALIZE TIMER TO FLUSH THE QUEUE AT REGULAR INTERVALS
              */
             Timer timer = new Timer();
@@ -508,7 +505,7 @@ public abstract class StreamingOctreeLoader implements IObserver, ISceneGraphLoa
 
                 }
 
-                /** ----------- SLEEP UNTIL INTERRUPTED ----------- **/
+                /* ----------- SLEEP UNTIL INTERRUPTED ----------- */
                 try {
                     awake = false;
                     abort.set(false);
