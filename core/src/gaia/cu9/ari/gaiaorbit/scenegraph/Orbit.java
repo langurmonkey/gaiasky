@@ -43,7 +43,9 @@ public class Orbit extends Polyline {
         }
     }
 
-    /** Threshold angle **/
+    /**
+     * Threshold angle
+     **/
     protected static final float ANGLE_LIMIT = (float) Math.toRadians(1.5);
     /**
      * Special overlap factor
@@ -68,11 +70,6 @@ public class Orbit extends Polyline {
      */
     public boolean refreshing = false;
 
-    /**
-     * Is the 'default' orbit loaded? (time out of bounds)
-     */
-    public boolean orbitDefault = false;
-
     private long orbitStartMs, orbitEndMs;
 
     /**
@@ -81,7 +78,9 @@ public class Orbit extends Polyline {
     private boolean mustRefresh;
     private OrbitDataLoaderParameter params;
 
-    /** Orbital elements in gpu, in case there is no body **/
+    /**
+     * Orbital elements in gpu, in case there is no body
+     **/
     public boolean elemsInGpu = false;
 
     private float distUp, distDown;
@@ -303,9 +302,11 @@ public class Orbit extends Polyline {
                     iniTime = Date.from(Instant.from(currentTime).minusMillis((long) (oc.period * 8640000l)));
                 }
                 params.setIni(iniTime);
+
                 // Add to queue
-                orbitRefresher.queue(params);
-                orbitDefault = false;
+                if (!refreshing) {
+                    orbitRefresher.queue(params);
+                }
             }
         }
     }

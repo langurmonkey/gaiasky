@@ -65,7 +65,7 @@ public class OrbitRefresher {
         daemon.start();
     }
 
-    public void queue(OrbitDataLoaderParameter param){
+    public void queue(OrbitDataLoaderParameter param) {
         if (!loadingPaused && toLoadQueue.size() < LOAD_QUEUE_MAX_SIZE - 1) {
             toLoadQueue.remove(param);
             toLoadQueue.add(param);
@@ -80,10 +80,10 @@ public class OrbitRefresher {
      */
     public void flushLoadQueue() {
         if (!daemon.awake && !toLoadQueue.isEmpty() && !loadingPaused) {
-            EventManager.instance.post(Events.BACKGROUND_LOADING_INFO);
             daemon.interrupt();
         }
     }
+
     /**
      * The daemon refresher thread.
      *
@@ -135,25 +135,25 @@ public class OrbitRefresher {
                     // Generate orbits if any
                     if (toLoad.size > 0) {
                         try {
-                           for(OrbitDataLoaderParameter param : toLoad){
-                               Orbit orbit = param.orbit;
-                               if(orbit != null){
-                                   // Generate data
-                                   provider.load(null, param);
-                                   final PointCloudData pcd = provider.getData();
-                                   // Post new data to object
-                                   Gdx.app.postRunnable(()->{
-                                       // Update orbit object
-                                       orbit.setPointCloudData(pcd);
-                                       orbit.initOrbitMetadata();
+                            for (OrbitDataLoaderParameter param : toLoad) {
+                                Orbit orbit = param.orbit;
+                                if (orbit != null) {
+                                    // Generate data
+                                    provider.load(null, param);
+                                    final PointCloudData pcd = provider.getData();
+                                    // Post new data to object
+                                    Gdx.app.postRunnable(() -> {
+                                        // Update orbit object
+                                        orbit.setPointCloudData(pcd);
+                                        orbit.initOrbitMetadata();
 
-                                       orbit.refreshing = false;
-                                   });
+                                        orbit.refreshing = false;
+                                    });
 
-                               } else {
-                                   // Error, need orbit
-                               }
-                           }
+                                } else {
+                                    // Error, need orbit
+                                }
+                            }
                         } catch (Exception e) {
                             // This will happen when the queue has been cleared during processing
                             logger.debug("Refreshing orbits operation failed");
