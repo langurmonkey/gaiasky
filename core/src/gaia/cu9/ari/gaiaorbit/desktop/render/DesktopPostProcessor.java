@@ -39,7 +39,7 @@ public class DesktopPostProcessor implements IPostProcessor, IObserver {
     float bloomFboScale = 0.5f;
 
     // Intensity of flare
-    float flareIntensity = 0.25f;
+    float flareIntensity = 0.15f;
     // Number of flares
     int nGhosts = 8;
     // Number of samples for the light glow
@@ -167,7 +167,7 @@ public class DesktopPostProcessor implements IPostProcessor, IObserver {
         ppb.lens.setLensDirtTexture(ldirt);
         ppb.lens.setLensStarburstTexture(lburst);
         ppb.lens.setFlareIntesity(GlobalConf.postprocess.POSTPROCESS_LENS_FLARE ? flareIntensity : 0f);
-        ppb.lens.setFlareSaturation(0.6f);
+        ppb.lens.setFlareSaturation(0.8f);
         ppb.lens.setBaseIntesity(1f);
         ppb.lens.setBias(-0.98f);
         ppb.lens.setBlurPasses(35);

@@ -89,6 +89,8 @@ public class OrbitSamplerDataProvider implements IOrbitDataProvider {
 
     }
 
+    private Vector3d ecl = new Vector3d();
+
     @Override
     public void load(String file, OrbitDataLoaderParameter parameter) {
         // Sample using VSOP
@@ -99,13 +101,12 @@ public class OrbitSamplerDataProvider implements IOrbitDataProvider {
         String bodyDesc = parameter.name;
         Instant d = Instant.ofEpochMilli(parameter.ini.getTime());
         double last = 0, accum = 0;
-        Vector3d ecl = new Vector3d();
 
         // Milliseconds of this orbit in one revolution
         double orbitalMs = parameter.orbitalPeriod * 86400000.0;
         double stepMs = orbitalMs / (double) numSamples;
 
-        // Load vsop orbit data
+        // Load orbit data
         for (int i = 0; i <= numSamples; i++) {
             AstroUtils.getEclipticCoordinates(bodyDesc, d, ecl, true);
 

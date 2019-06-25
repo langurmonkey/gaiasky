@@ -30,7 +30,7 @@ public class AttitudeIntervalBean implements Comparable<AttitudeIntervalBean> {
         this.activationTime = activationTime;
         this.attitude = attitude;
 
-        cache = new LruCache<Long, Attitude>(10);
+        cache = new LruCache<>(10);
     }
 
     public synchronized Attitude get(Date date) {
@@ -43,7 +43,7 @@ public class AttitudeIntervalBean implements Comparable<AttitudeIntervalBean> {
         } else {
             hits++;
         }
-        return (Attitude) cache.get(time);
+        return cache.get(time);
     }
 
     @Override

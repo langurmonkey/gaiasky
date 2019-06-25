@@ -6,6 +6,7 @@
 package gaia.cu9.ari.gaiaorbit.scenegraph;
 
 import com.badlogic.gdx.assets.AssetManager;
+import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.utils.reflect.ClassReflection;
 import com.badlogic.gdx.utils.reflect.Method;
@@ -15,12 +16,14 @@ import gaia.cu9.ari.gaiaorbit.assets.OrbitDataLoader.OrbitDataLoaderParameter;
 import gaia.cu9.ari.gaiaorbit.data.OrbitRefresher;
 import gaia.cu9.ari.gaiaorbit.data.orbit.IOrbitDataProvider;
 import gaia.cu9.ari.gaiaorbit.data.orbit.OrbitFileDataProvider;
+import gaia.cu9.ari.gaiaorbit.data.orbit.OrbitalParametersProvider;
 import gaia.cu9.ari.gaiaorbit.render.ComponentTypes.ComponentType;
 import gaia.cu9.ari.gaiaorbit.render.system.LineRenderSystem;
 import gaia.cu9.ari.gaiaorbit.scenegraph.camera.ICamera;
 import gaia.cu9.ari.gaiaorbit.scenegraph.component.OrbitComponent;
 import gaia.cu9.ari.gaiaorbit.util.Constants;
 import gaia.cu9.ari.gaiaorbit.util.GlobalConf;
+import gaia.cu9.ari.gaiaorbit.util.GlobalResources;
 import gaia.cu9.ari.gaiaorbit.util.Logger;
 import gaia.cu9.ari.gaiaorbit.util.Logger.Log;
 import gaia.cu9.ari.gaiaorbit.util.coord.Coordinates;
@@ -76,6 +79,10 @@ public class Orbit extends Polyline {
      * Whether the orbit must be refreshed when out of bounds
      */
     private boolean mustRefresh;
+    /**
+     * Whether to show the orbit as a trail or not
+     */
+    private boolean orbitTrail;
     private OrbitDataLoaderParameter params;
 
     /**
@@ -83,10 +90,17 @@ public class Orbit extends Polyline {
      **/
     public boolean elemsInGpu = false;
 
+    /** Point color **/
+    public float[] pointColor;
+
+    /** Point size **/
+    public float pointSize = 1f;
+
     private float distUp, distDown;
 
     public Orbit() {
         super();
+        pointColor = new float[] { 0.8f, 0.8f, 0.8f, 1f };
         localTransform = new Matrix4();
         localTransformD = new Matrix4d();
         prev = new Vector3d();
@@ -119,7 +133,7 @@ public class Orbit extends Polyline {
     public void doneLoading(AssetManager manager) {
         alpha = cc[3];
         initOrbitMetadata();
-        primitiveSize = 1.3f;
+        primitiveSize = 1.1f;
 
         if (body != null) {
             params = new OrbitDataLoaderParameter(body.name, null, oc.period, 500);
@@ -138,6 +152,7 @@ public class Orbit extends Polyline {
             }
         }
         mustRefresh = providerClass != null && providerClass.equals(OrbitFileDataProvider.class) && body != null && body instanceof Planet && oc.period > 0;
+        orbitTrail = mustRefresh | (providerClass != null && providerClass.equals(OrbitalParametersProvider.class));
     }
 
     @Override
@@ -146,8 +161,6 @@ public class Orbit extends Polyline {
         if (!onlybody)
             updateLocalTransform(time.getTime());
 
-        // Check updater
-        refreshOrbit();
     }
 
     protected void updateLocalTransform(Instant date) {
@@ -183,6 +196,7 @@ public class Orbit extends Polyline {
             if (body != null && body.coordinatesTimeOverflow)
                 return;
 
+            boolean added = false;
             float angleLimit = ANGLE_LIMIT * camera.getFovFactor();
             if (viewAngle > angleLimit) {
                 if (viewAngle < angleLimit * SHADER_MODEL_OVERLAP_FACTOR) {
@@ -197,12 +211,18 @@ public class Orbit extends Polyline {
                 if (body == null) {
                     // No body, always render
                     addToRender(this, rg);
+                    added = true;
                 } else if (body.distToCamera > distDown) {
                     // Body, disappear slowly
                     if (body.distToCamera < distUp)
-                        this.alpha *= MathUtilsd.lint(body.distToCamera, distDown, distUp, 0, 1);
+                        this.alpha *= MathUtilsd.lint(body.distToCamera, distDown / camera.getFovFactor(), distUp / camera.getFovFactor(), 0, 1);
                     addToRender(this, rg);
+                    added = true;
                 }
+            }
+
+            if (pointCloudData == null || added) {
+                refreshOrbit();
             }
         }
         // Orbital elements renderer
@@ -214,7 +234,9 @@ public class Orbit extends Polyline {
 
     @Override
     public void render(LineRenderSystem renderer, ICamera camera, float alpha) {
+
         if (!onlybody) {
+
             alpha *= this.alpha;
 
             // Make origin Gaia (hack)
@@ -228,12 +250,22 @@ public class Orbit extends Polyline {
             int nPoints = pointCloudData.getNumPoints();
 
             boolean reverse = GaiaSky.instance.time.getWarpFactor() < 0;
-            if (mustRefresh) {
+
+            Vector3d bodyPos = aux3d1.get().setZero();
+            if (orbitTrail) {
                 float top = alpha * 1f;
-                float bottom = alpha * 0.1f;
+                float bottom = 0f;
                 dAlpha = (top - bottom) / nPoints;
                 Instant currentTime = GaiaSky.instance.time.getTime();
-                stIdx = pointCloudData.getIndex(currentTime);
+                long wrapTime = pointCloudData.getWrapTimeMs(currentTime);
+                stIdx = pointCloudData.getIndex(wrapTime);
+
+                if (body != null) {
+                    bodyPos.set(body.translation);
+                } else if(oc != null) {
+                    oc.loadDataPoint(bodyPos, currentTime);
+                    bodyPos.mul(localTransformD);
+                }
 
                 if (!reverse) {
                     alpha = bottom;
@@ -244,7 +276,7 @@ public class Orbit extends Polyline {
 
             // This is so that the shape renderer does not mess up the z-buffer
             int n = 0;
-            int i = wrap(stIdx + 1, nPoints);
+            int i = wrap(stIdx + 2, nPoints);
             while (n < nPoints - 1) {
                 // i minus one
                 int im = wrap(i - 1, nPoints);
@@ -260,19 +292,15 @@ public class Orbit extends Polyline {
                 prev.mul(localTransformD);
                 curr.mul(localTransformD);
 
-                if (mustRefresh && !reverse && n == nPoints - 2) {
-                    Vector3d aux = aux3d1.get();
-                    aux.set(body.translation);
-                    renderer.addLine(this, (float) prev.x, (float) prev.y, (float) prev.z, (float) aux.x, (float) aux.y, (float) aux.z, cc[0], cc[1], cc[2], alpha * cc[3]);
-                } else if (mustRefresh && reverse && n == 0) {
-                    Vector3d aux = aux3d1.get();
-                    aux.set(body.translation);
-                    renderer.addLine(this, (float) curr.x, (float) curr.y, (float) curr.z, (float) aux.x, (float) aux.y, (float) aux.z, cc[0], cc[1], cc[2], alpha * cc[3]);
+                if (orbitTrail && !reverse && n == nPoints - 2) {
+                    renderer.addLine(this, (float) curr.x, (float) curr.y, (float) curr.z, (float) bodyPos.x, (float) bodyPos.y, (float) bodyPos.z, cc[0], cc[1], cc[2], alpha * cc[3]);
+                } else if (orbitTrail && reverse && n == 0) {
+                    renderer.addLine(this, (float) curr.x, (float) curr.y, (float) curr.z, (float) bodyPos.x, (float) bodyPos.y, (float) bodyPos.z, cc[0], cc[1], cc[2], alpha * cc[3]);
                 } else {
-                    renderer.addLine(this, (float) prev.x, (float) prev.y, (float) prev.z, (float) curr.x, (float) curr.y, (float) curr.z, cc[0], cc[1], cc[2], alpha * cc[3]);
                 }
+                renderer.addLine(this, (float) prev.x, (float) prev.y, (float) prev.z, (float) curr.x, (float) curr.y, (float) curr.z, cc[0], cc[1], cc[2], alpha * cc[3]);
 
-                alpha -= dAlpha;
+                alpha = MathUtils.clamp(alpha - dAlpha, 0f, 1f);
 
                 // advance
                 i = wrap(i + 1, nPoints);
@@ -295,11 +323,11 @@ public class Orbit extends Polyline {
                 // Work out sample initial date
                 Date iniTime;
                 if (GaiaSky.instance.time.getWarpFactor() >= 0) {
-                    // From now forward
-                    iniTime = Date.from(currentTime);
-                } else {
                     // From (now - period) forward (reverse)
                     iniTime = Date.from(Instant.from(currentTime).minusMillis((long) (oc.period * 8640000l)));
+                } else {
+                    // From now forward
+                    iniTime = Date.from(currentTime);
                 }
                 params.setIni(iniTime);
 
@@ -318,6 +346,22 @@ public class Orbit extends Polyline {
      */
     public void setSize(Float size) {
         this.size = size * (float) Constants.KM_TO_U;
+    }
+
+    public void setPointsize(Long pointsize) {
+        this.pointSize = pointsize;
+    }
+
+    public void setPointsize(Double pointsize) {
+        this.pointSize = pointsize.floatValue();
+    }
+
+    public void setPointcolor(double[] color) {
+        float[] f = GlobalResources.toFloatArray(color);
+        pointColor[0] = f[0];
+        pointColor[1] = f[1];
+        pointColor[2] = f[2];
+        pointColor[3] = f[3];
     }
 
     public String getProvider() {
@@ -350,8 +394,8 @@ public class Orbit extends Polyline {
 
     public void setBody(CelestialBody body) {
         this.body = body;
-        this.distUp = (float) Math.max(this.body.getRadius() * 200, 1000 * Constants.KM_TO_U);
-        this.distDown = (float) Math.max(this.body.getRadius() * 50, 100 * Constants.KM_TO_U);
+        this.distUp = (float) Math.max(this.body.getRadius() * 200, 500 * Constants.KM_TO_U);
+        this.distDown = (float) Math.max(this.body.getRadius() * 20, 50 * Constants.KM_TO_U);
     }
 
     public void setOnlybody(Boolean onlybody) {

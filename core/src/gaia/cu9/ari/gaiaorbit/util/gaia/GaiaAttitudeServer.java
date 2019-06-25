@@ -66,18 +66,27 @@ public class GaiaAttitudeServer {
             if (date.before(initialDate)) {
                 result = dummyAttitude;
             } else {
-                current.activationTime = date;
-                AttitudeIntervalBean att = (AttitudeIntervalBean) attitudes.findIntervalStart(current);
+                try {
+                    current.activationTime = date;
+                    AttitudeIntervalBean att = (AttitudeIntervalBean) attitudes.findIntervalStart(current);
 
-                if (prevAttitude != null && !att.equals(prevAttitude)) {
-                    // Change!
-                    logger.info(I18n.bundle.format("notif.attitude.changed", att.toString(), att.activationTime));
+                    if (prevAttitude != null && !att.equals(prevAttitude)) {
+                        // Change!
+                        logger.info(I18n.bundle.format("notif.attitude.changed", att.toString(), att.activationTime));
+                    }
+
+                    prevAttitude = att;
+
+                    // Get actual attitude
+                    result = att.get(date);
+                }catch(Exception e){
+                    logger.error(e);
+                    // Fallback solution
+                    if(nsl == null){
+                        nsl = new Nsl37();
+                    }
+                    result = nsl.getAttitude(date);
                 }
-
-                prevAttitude = att;
-
-                // Get actual attitude
-                result = att.get(date);
             }
         } else {
             result = nsl.getAttitude(date);

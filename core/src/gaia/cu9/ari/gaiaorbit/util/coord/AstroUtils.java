@@ -441,7 +441,7 @@ public class AstroUtils {
     /**
      * Gets the Julian Date for the given date. It uses a cache.
      * 
-     * @param date The date.
+     * @param instant The date.
      * @return The Julian Date.
      */
     public static synchronized double getJulianDateCache(Instant instant) {

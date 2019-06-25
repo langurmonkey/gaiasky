@@ -15,6 +15,8 @@ public class PointCloudData {
     // Values of x, y, z in world coordinates
     public Array<Double> x, y, z;
     public Array<Instant> time;
+    // Period in days
+    public double period = -1;
 
     private Vector3d v0, v1;
     private Instant start, end;
@@ -162,22 +164,34 @@ public class PointCloudData {
 
     /**
      * Returns a vector with the data point at the given time. It uses linear
-     * interpolation
+     * interpolation. The time instant must be within the bounds of this point cloud's times
      *
      * @param v       The vector
-     * @param instant The date
+     * @param instant The time as an instant
      * @return Whether the operation completes successfully
      */
     public boolean loadPoint(Vector3d v, Instant instant) {
+        return loadPoint(v, instant.toEpochMilli());
+    }
+
+    /**
+     * Returns a vector with the data point at the given time. It uses linear
+     * interpolation. The time instant must be within the bounds of this point cloud's times
+     *
+     * @param v       The vector
+     * @param timeMs  The time in milliseconds
+     * @return Whether the operation completes successfully
+     */
+    public boolean loadPoint(Vector3d v, long timeMs){
         // Data is sorted
-        int idx = binarySearch(time, instant);
+        int idx = binarySearch(time, timeMs);
 
         if (idx < 0 || idx >= time.size) {
             // No data for this time
             return false;
         }
 
-        if (time.get(idx).equals(instant)) {
+        if (time.get(idx).toEpochMilli() == timeMs) {
             v.set(x.get(idx), y.get(idx), z.get(idx));
         } else {
             // Interpolate
@@ -186,10 +200,26 @@ public class PointCloudData {
             Instant t0 = time.get(idx);
             Instant t1 = time.get(idx + 1);
 
-            double scl = (double) (instant.toEpochMilli() - t0.toEpochMilli()) / (t1.toEpochMilli() - t0.toEpochMilli());
+            double scl = (double) (timeMs - t0.toEpochMilli()) / (t1.toEpochMilli() - t0.toEpochMilli());
             v.set(v1.sub(v0).scl(scl).add(v0));
         }
         return true;
+
+    }
+
+    public Instant getWrapTime(Instant instant){
+        return Instant.ofEpochMilli(getWrapTimeMs(instant));
+    }
+
+    public long getWrapTimeMs(Instant instant){
+        long c = instant.toEpochMilli();
+        long s = getStartMs();
+        long e = getEndMs();
+
+        long ep = e - s;
+        long cp = c - s;
+        long wrapCurrentTime = ((cp % ep) + ep) % ep;
+        return wrapCurrentTime + s;
     }
 
     /**
@@ -198,15 +228,11 @@ public class PointCloudData {
      * @return The two indices
      */
     public int getIndex(Instant instant){
-        long c = instant.toEpochMilli();
-        long s = getStartMs();
-        long e = getEndMs();
+        return binarySearch(time, getWrapTimeMs(instant));
+    }
 
-        long ep = e - s;
-        long cp = c - s;
-        long wrapCurrentTime = ((cp % ep) + ep) % ep;
-
-        return binarySearch(time, wrapCurrentTime + s);
+    public int getIndex(long wrappedTimeMs){
+        return binarySearch(time, wrappedTimeMs);
     }
 
     private int binarySearch(Array<Instant> times, Instant elem) {

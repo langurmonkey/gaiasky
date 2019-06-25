@@ -52,7 +52,7 @@ public class DateDialog extends CollapsibleWindow {
             }
             return false;
         });
-        setNow.setSize(150 * GlobalConf.SCALE_FACTOR, 20 * GlobalConf.SCALE_FACTOR);
+        setNow.setSize(180 * GlobalConf.SCALE_FACTOR, 25 * GlobalConf.SCALE_FACTOR);
         add(setNow).center().colspan(2).padTop(pad);
         row();
 

@@ -3,8 +3,10 @@
 #include shader/lib_geometry.glsl
 #include shader/lib_logdepthbuff.glsl
 
-in vec4 a_orbitelems01;
-in vec4 a_orbitelems02;
+attribute vec4 a_color;
+attribute vec4 a_orbitelems01;
+attribute vec4 a_orbitelems02;
+attribute float a_size;
 
 uniform mat4 u_projModelView;
 uniform mat4 u_eclToEq;
@@ -58,7 +60,7 @@ vec4 keplerToCartesian() {
     float M0 = a_orbitelems02.w;
     
     // 1
-    float deltat = u_dt_s; 
+    float deltat = u_dt_s;
     float M = M0 + deltat * musola3;
     
     // 2
@@ -78,7 +80,6 @@ vec4 keplerToCartesian() {
     float ox = rc_t * cos(nu_t);
     float oy = rc_t * sin(nu_t);
 
-   
     // 6
     float sinomega = sin(omega_ap);
     float cosomega = cos(omega_ap);
@@ -126,10 +127,9 @@ void main() {
         pos = computeGravitationalWaves(pos, u_gw, u_gwmat3, u_ts, u_omgw, u_hterms);
     #endif // gravitationalWaves
     
-    v_col = vec4(0.8, 0.8, 0.8, 1.0) * u_alpha;
+    v_col = a_color * u_alpha;
 
     gl_Position = u_projModelView * vec4(pos, 0.0);
     float distNorm = dist / 300.0;
-    gl_PointSize = clamp(u_size / distNorm, 1.5, 3.5) * u_scaleFactor * cubemapSizeFactor;
-
+    gl_PointSize = clamp(u_size / distNorm, 1.5, 3.5) * u_scaleFactor * cubemapSizeFactor * a_size;
 }

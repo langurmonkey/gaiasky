@@ -52,16 +52,11 @@ public class OrbitLintCoordinates extends AbstractOrbitCoordinates {
     public Vector3d getEquatorialCartesianCoordinates(Instant date, Vector3d out) {
         // Find out index
 
-        // Number of periods occurred
-        double numPeriods = (AstroUtils.getJulianDateCache(date) - orbitalParams.epoch) / orbitalParams.period;
-        // Current angle in degrees
-        double angle = (orbitalParams.meananomaly + (numPeriods - Math.floor(numPeriods)) * 360d) % 360d;
-        // Fraction in [0..numPoints]
-        double fraction = (angle / 360d) * data.getNumPoints();
+        long dateWrap = data.getWrapTimeMs(date);
+        int basei = data.getIndex(dateWrap);
 
-        int basei = (int) Math.floor(fraction);
         int nexti = (basei + 1) % data.getNumPoints();
-        double percent = fraction - basei;
+        double percent = (double) Math.abs(dateWrap - data.getDate(basei).toEpochMilli()) / (double) Math.abs(data.getDate(nexti).toEpochMilli() - data.getDate(basei).toEpochMilli());
 
         data.loadPoint(out, basei);
         data.loadPoint(aux, nexti);

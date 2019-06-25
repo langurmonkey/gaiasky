@@ -58,7 +58,7 @@ public class StarCluster extends AbstractPositionEntity implements IFocus, IProp
     private static Texture clusterTex;
 
     // Label and model colors
-    private static float[] col = new float[] { 0.9f, 0.9f, 0.2f, 0.6f };
+    private static float[] col = new float[] { 0.9f, 0.9f, 0.2f, 1.0f };
 
     private ModelComponent mc;
 
@@ -105,7 +105,7 @@ public class StarCluster extends AbstractPositionEntity implements IFocus, IProp
         this.dist = posSph.z;
         this.raddeg = raddeg;
         this.nstars = nstars;
-        this.labelcolor = new float[] { col[0], col[1], col[2], 8.0f };
+        this.labelcolor = new float[] { col[0], col[1], col[2], 1.0f };
     }
 
     public void initModel() {
@@ -131,7 +131,7 @@ public class StarCluster extends AbstractPositionEntity implements IFocus, IProp
         mc.dLight.set(1, 1, 1, 1, 1, 1);
         mc.env = new Environment();
         mc.env.add(mc.dLight);
-        mc.env.set(new ColorAttribute(ColorAttribute.AmbientLight, 0.4f, 0.4f, 0.4f, 1f));
+        mc.env.set(new ColorAttribute(ColorAttribute.AmbientLight, 1.0f, 1.0f, 1.0f, 1f));
         mc.env.set(new FloatAttribute(FloatAttribute.Shininess, 0.4f));
         mc.instance = new IntModelInstance(model, modelTransform);
 
@@ -243,7 +243,7 @@ public class StarCluster extends AbstractPositionEntity implements IFocus, IProp
         Vector3 aux = aux3f1.get();
         shader.setUniformf("u_pos", translation.put(aux));
         shader.setUniformf("u_size", size);
-        shader.setUniformf("u_color", col[0] * fa, col[1] * fa, col[2] * fa, col[3] * alpha * opacity * 8f);
+        shader.setUniformf("u_color", col[0] * fa, col[1] * fa, col[2] * fa, col[3] * alpha * opacity * 3.5f);
         // Sprite.render
         mesh.render(shader, GL20.GL_TRIANGLES, 0, 6);
     }

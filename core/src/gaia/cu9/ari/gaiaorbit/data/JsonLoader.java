@@ -32,13 +32,13 @@ import java.util.TreeMap;
 /**
  * Implements the loading of scene graph nodes using libgdx's json library.
  * It loads entities in the JSON format described in <a href="https://github.com/ari-zah/gaiasandbox/wiki/Non-particle-data-loading">this link</a>.
- * @author Toni Sagrista
  *
  * @param <T>
+ * @author Toni Sagrista
  */
 public class JsonLoader<T extends SceneGraphNode> implements ISceneGraphLoader {
     private static final Log logger = Logger.getLogger(JsonLoader.class);
-    
+
     private static final String COMPONENTS_PACKAGE = "gaia.cu9.ari.gaiaorbit.scenegraph.component.";
     /** Params to skip in the normal processing **/
     private static final List<String> PARAM_SKIP = Arrays.asList("args", "impl", "comment", "comments");
@@ -54,26 +54,26 @@ public class JsonLoader<T extends SceneGraphNode> implements ISceneGraphLoader {
     @Override
     public Array<? extends SceneGraphNode> loadData() {
         Array<T> bodies = new Array<T>();
-        
+
         // Add autoload files to the mix
         Array<String> filePaths = new Array<String>(this.filePaths);
         Path dataFolder = Paths.get(GlobalConf.data.DATA_LOCATION);
         File[] autoloadFiles = dataFolder.toFile().listFiles((dir, name) -> {
             return name != null && name.startsWith("autoload-") && name.endsWith(".json");
         });
-        for(File autoloadFile : autoloadFiles) {
+        for (File autoloadFile : autoloadFiles) {
             filePaths.add(autoloadFile.getAbsolutePath());
         }
-        
+
         // Actually load the files
-        try {
-            JsonReader json = new JsonReader();
-            for (String filePath : filePaths) {
+        JsonReader json = new JsonReader();
+        for (String filePath : filePaths) {
+            try {
                 FileHandle file = GlobalConf.data.dataFileHandle(filePath);
                 JsonValue model = json.parse(file.read());
 
                 // Must have an 'objects' element
-                if(model.has("objects")) {
+                if (model.has("objects")) {
                     JsonValue child = model.get("objects").child;
                     int size = 0;
                     while (child != null) {
@@ -91,10 +91,9 @@ public class JsonLoader<T extends SceneGraphNode> implements ISceneGraphLoader {
                     }
                     logger.info(I18n.bundle.format("notif.nodeloader", size, filePath));
                 }
+            } catch (Exception e) {
+                logger.error(e);
             }
-
-        } catch (Exception e) {
-            logger.error(e);
         }
 
         return bodies;
@@ -102,16 +101,17 @@ public class JsonLoader<T extends SceneGraphNode> implements ISceneGraphLoader {
 
     /**
      * Converts the given {@link JsonValue} to a java object of the given {@link Class}.
-     * @param json The {@link JsonValue} for the object to convert.
+     *
+     * @param json  The {@link JsonValue} for the object to convert.
      * @param clazz The class of the object.
      * @return The java object of the given class.
-     * @throws ReflectionException 
-     * @throws SecurityException 
-     * @throws NoSuchMethodException 
-     * @throws IllegalArgumentException 
-     * @throws IllegalAccessException 
-     * @throws ClassNotFoundException 
-     * @throws InstantiationException 
+     * @throws ReflectionException
+     * @throws SecurityException
+     * @throws NoSuchMethodException
+     * @throws IllegalArgumentException
+     * @throws IllegalAccessException
+     * @throws ClassNotFoundException
+     * @throws InstantiationException
      */
     private Object convertJsonToObject(JsonValue json, Class<?> clazz) throws ReflectionException {
         Object instance;
@@ -170,8 +170,7 @@ public class JsonLoader<T extends SceneGraphNode> implements ISceneGraphLoader {
                         int i = 0;
                         while (vectorattrib != null) {
                             String clazzName = vectorattrib.getString("impl");
-                            @SuppressWarnings("unchecked")
-                            Class<Object> childclazz = (Class<Object>) ClassReflection.forName(clazzName);
+                            @SuppressWarnings("unchecked") Class<Object> childclazz = (Class<Object>) ClassReflection.forName(clazzName);
                             ((Object[]) value)[i] = convertJsonToObject(vectorattrib, childclazz);
                             i++;
                             vectorattrib = vectorattrib.next;
@@ -258,6 +257,7 @@ public class JsonLoader<T extends SceneGraphNode> implements ISceneGraphLoader {
     /**
      * Searches for the given method with the given class. If none is found, it looks for fitting methods
      * with the classe's interfaces and superclasses recursively.
+     *
      * @param methodName
      * @param clazz
      * @return

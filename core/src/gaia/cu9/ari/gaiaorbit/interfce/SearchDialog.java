@@ -23,9 +23,13 @@ import gaia.cu9.ari.gaiaorbit.scenegraph.camera.CameraManager.CameraMode;
 import gaia.cu9.ari.gaiaorbit.scenegraph.camera.NaturalCamera;
 import gaia.cu9.ari.gaiaorbit.util.GlobalConf;
 import gaia.cu9.ari.gaiaorbit.util.I18n;
+import gaia.cu9.ari.gaiaorbit.util.Logger;
+import gaia.cu9.ari.gaiaorbit.util.Logger.Log;
 import gaia.cu9.ari.gaiaorbit.util.scene2d.OwnTextField;
 
 public class SearchDialog extends GenericDialog {
+    private static final Log logger = Logger.getLogger(SearchDialog.class);
+
     private TextField searchInput;
     private String currentInputText = "";
     private ISceneGraph sg;
@@ -89,18 +93,22 @@ public class SearchDialog extends GenericDialog {
     }
 
     public boolean checkString(String text, ISceneGraph sg) {
-        if (sg.containsNode(text)) {
-            SceneGraphNode node = sg.getNode(text);
-            if (node instanceof IFocus) {
-                IFocus focus = ((IFocus) node).getFocus(text);
-                if (focus != null && !focus.isCoordinatesTimeOverflow() && GaiaSky.instance.isOn(focus.getCt())) {
-                    Gdx.app.postRunnable(() -> {
-                        EventManager.instance.post(Events.CAMERA_MODE_CMD, CameraMode.FOCUS_MODE, true);
-                        EventManager.instance.post(Events.FOCUS_CHANGE_CMD, focus, true);
-                    });
-                    return true;
+        try {
+            if (sg.containsNode(text)) {
+                SceneGraphNode node = sg.getNode(text);
+                if (node instanceof IFocus) {
+                    IFocus focus = ((IFocus) node).getFocus(text);
+                    if (focus != null && !focus.isCoordinatesTimeOverflow() && GaiaSky.instance.isOn(focus.getCt())) {
+                        Gdx.app.postRunnable(() -> {
+                            EventManager.instance.post(Events.CAMERA_MODE_CMD, CameraMode.FOCUS_MODE, true);
+                            EventManager.instance.post(Events.FOCUS_CHANGE_CMD, focus, true);
+                        });
+                        return true;
+                    }
                 }
             }
+        }catch(Exception e){
+            logger.error(e.getLocalizedMessage());
         }
         return false;
     }

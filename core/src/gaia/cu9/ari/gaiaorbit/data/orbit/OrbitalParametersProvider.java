@@ -22,11 +22,15 @@ import java.time.Instant;
 
 /**
  * Reads an orbit file into an OrbitData object.
- * @author Toni Sagrista
  *
+ * @author Toni Sagrista
  */
 public class OrbitalParametersProvider implements IOrbitDataProvider {
     PointCloudData data;
+
+    public OrbitalParametersProvider() {
+        super();
+    }
 
     @Override
     public void load(String file, OrbitDataLoaderParameter parameter) {
@@ -40,6 +44,7 @@ public class OrbitalParametersProvider implements IOrbitDataProvider {
             try {
                 // See https://downloads.rene-schwarz.com/download/M001-Keplerian_Orbit_Elements_to_Cartesian_State_Vectors.pdf
                 double period = params.period; // in days
+                params.epoch = 2458200.5;
                 double epoch = params.epoch; // in days
                 double a = params.semimajoraxis * 1000d; // km to m
                 double e = params.e;
@@ -50,10 +55,13 @@ public class OrbitalParametersProvider implements IOrbitDataProvider {
                 double mu = params.mu;
 
                 data = new PointCloudData();
+                data.period = period;
 
                 // Step time in days, a full period over number of samples starting at epoch
-                double t_step = period / parameter.numSamples;
-                for (double t = 0; t <= period; t += t_step) {
+                double t_step = period / (parameter.numSamples - 1);
+                double t = 0;
+
+                for (int n = 0; n < parameter.numSamples; n++) {
                     // 1
                     double deltat = t * Nature.D_TO_S;
                     double M = M0 + deltat * Math.sqrt(mu / Math.pow(a, 3d));
@@ -92,15 +100,24 @@ public class OrbitalParametersProvider implements IOrbitDataProvider {
                     y *= Constants.M_TO_U;
                     z *= Constants.M_TO_U;
 
-                    data.x.add(y);
-                    data.y.add(z);
-                    data.z.add(x);
+                    if (n == parameter.numSamples - 1) {
+                        // Close orbit
+                        double sx = data.getX(0);
+                        double sy = data.getY(0);
+                        double sz = data.getZ(0);
+                        data.x.add(sx);
+                        data.y.add(sy);
+                        data.z.add(sz);
+                    } else {
+                        // Add point
+                        data.x.add(y);
+                        data.y.add(z);
+                        data.z.add(x);
+                    }
                     data.time.add(AstroUtils.julianDateToInstant(epoch + t));
+
+                    t += t_step;
                 }
-                data.x.add(data.getX(0));
-                data.y.add(data.getY(0));
-                data.z.add(data.getZ(0));
-                data.time.add(data.getDate(0));
 
                 EventManager.instance.post(Events.ORBIT_DATA_LOADED, data, parameter.name);
             } catch (Exception e) {

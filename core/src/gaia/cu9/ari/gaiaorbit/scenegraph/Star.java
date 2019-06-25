@@ -311,7 +311,7 @@ public class Star extends Particle {
 
             if (camera.direction.dot(posd) > 0) {
                 // The object is in front of us
-                double angle = computeViewAngle(camera.getFovFactor()) * GlobalConf.scene.STAR_BRIGHTNESS * 1.5e3f;
+                double angle = computeViewAngle(camera.getFovFactor()) * GlobalConf.scene.STAR_BRIGHTNESS * 1e3f;
 
                 PerspectiveCamera pcamera;
                 if (GlobalConf.program.STEREOSCOPIC_MODE) {
