@@ -44,7 +44,6 @@ public class OrbitalParametersProvider implements IOrbitDataProvider {
             try {
                 // See https://downloads.rene-schwarz.com/download/M001-Keplerian_Orbit_Elements_to_Cartesian_State_Vectors.pdf
                 double period = params.period; // in days
-                params.epoch = 2458200.5;
                 double epoch = params.epoch; // in days
                 double a = params.semimajoraxis * 1000d; // km to m
                 double e = params.e;

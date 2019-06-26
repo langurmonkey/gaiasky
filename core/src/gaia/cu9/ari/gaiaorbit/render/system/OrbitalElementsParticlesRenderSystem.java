@@ -23,7 +23,6 @@ import gaia.cu9.ari.gaiaorbit.scenegraph.SceneGraphNode.RenderGroup;
 import gaia.cu9.ari.gaiaorbit.scenegraph.camera.ICamera;
 import gaia.cu9.ari.gaiaorbit.scenegraph.component.OrbitComponent;
 import gaia.cu9.ari.gaiaorbit.util.GlobalConf;
-import gaia.cu9.ari.gaiaorbit.util.Nature;
 import gaia.cu9.ari.gaiaorbit.util.coord.AstroUtils;
 import gaia.cu9.ari.gaiaorbit.util.coord.Coordinates;
 import gaia.cu9.ari.gaiaorbit.util.gdx.mesh.IntMesh;
@@ -134,9 +133,9 @@ public class OrbitalElementsParticlesRenderSystem extends ImmediateRenderSystem 
 
                 shaderProgram.setUniformf("u_size", rc.scaleFactor);
                 double curRt = AstroUtils.getJulianDate(GaiaSky.instance.time.getTime());
-                shaderProgram.setUniformf("u_t", (float) curRt);
-                // dt in seconds
-                shaderProgram.setUniformf("u_dt_s", (float) ((curRt - 2458200.5) * Nature.D_TO_S));
+                float curRt1 = (float) curRt;
+                float curRt2 = (float) (curRt - (double) curRt1);
+                shaderProgram.setUniformf("u_t", curRt1, curRt2);
                 shaderProgram.setUniformMatrix("u_eclToEq", maux.setToRotation(0, 1, 0, -90).mul(Coordinates.equatorialToEclipticF()));
 
                 // Relativistic effects

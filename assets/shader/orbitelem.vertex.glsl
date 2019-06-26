@@ -2,6 +2,7 @@
 
 #include shader/lib_geometry.glsl
 #include shader/lib_logdepthbuff.glsl
+#include shader/lib_doublefloat.glsl
 
 attribute vec4 a_color;
 attribute vec4 a_orbitelems01;
@@ -16,10 +17,8 @@ uniform float u_alpha;
 uniform float u_size;
 uniform float u_scaleFactor;
 uniform int u_cubemap;
-// Current julian date, in days
-uniform float u_t;
-// dt in seconds since epoch (assumes all objects have the same epoch!)
-uniform float u_dt_s;
+// Current julian date, in days, emulates a double in vec2
+uniform vec2 u_t;
 
 #ifdef relativisticEffects
     uniform vec3 u_velDir; // Velocity vector
@@ -60,7 +59,9 @@ vec4 keplerToCartesian() {
     float M0 = a_orbitelems02.w;
     
     // 1
-    float deltat = u_dt_s;
+    vec2 epoch_d = ds_set(epoch);
+    vec2 deltat_d = ds_mul(ds_add(u_t, -epoch_d), ds_set(86400.0));
+    float deltat = deltat_d.x;
     float M = M0 + deltat * musola3;
     
     // 2
