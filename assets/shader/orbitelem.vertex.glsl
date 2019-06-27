@@ -4,10 +4,10 @@
 #include shader/lib_logdepthbuff.glsl
 #include shader/lib_doublefloat.glsl
 
-attribute vec4 a_color;
-attribute vec4 a_orbitelems01;
-attribute vec4 a_orbitelems02;
-attribute float a_size;
+in vec4 a_color;
+in vec4 a_orbitelems01;
+in vec4 a_orbitelems02;
+in float a_size;
 
 uniform mat4 u_projModelView;
 uniform mat4 u_eclToEq;
@@ -40,6 +40,7 @@ out vec4 v_col;
 out float v_depth;
 
 #define M_TO_U 1e-9
+#define D_TO_S 86400.0
 
 // see https://downloads.rene-schwarz.com/download/M001-Keplerian_Orbit_Elements_to_Cartesian_State_Vectors.pdf
 vec4 keplerToCartesian() {
@@ -60,8 +61,9 @@ vec4 keplerToCartesian() {
     
     // 1
     vec2 epoch_d = ds_set(epoch);
-    vec2 deltat_d = ds_mul(ds_add(u_t, -epoch_d), ds_set(86400.0));
+    vec2 deltat_d = ds_mul(ds_add(u_t, -epoch_d), ds_set(D_TO_S));
     float deltat = deltat_d.x;
+
     float M = M0 + deltat * musola3;
     
     // 2

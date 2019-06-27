@@ -132,6 +132,8 @@ public class OrbitalElementsParticlesRenderSystem extends ImmediateRenderSystem 
                 shaderProgram.setUniformi("u_cubemap", GlobalConf.program.CUBEMAP360_MODE ? 1 : 0);
 
                 shaderProgram.setUniformf("u_size", rc.scaleFactor);
+
+                // Emulate double, for compatibility
                 double curRt = AstroUtils.getJulianDate(GaiaSky.instance.time.getTime());
                 float curRt1 = (float) curRt;
                 float curRt2 = (float) (curRt - (double) curRt1);
