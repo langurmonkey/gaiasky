@@ -494,28 +494,28 @@ public class DownloadDataWindow extends GenericDialog {
                 });
             };
 
-            ChecksumRunnable finish = (md5sum) -> {
+            ChecksumRunnable finish = (digest) -> {
                 // Unpack
                 int errors = 0;
                 logger.info("Extracting: " + tempDownload.path());
                 String dataLocation = GlobalConf.data.DATA_LOCATION + File.separatorChar;
                 // Checksum
-                if (md5sum != null && currentJson.has("md5")) {
-                    String serverMd5 = currentJson.getString("md5");
+                if (digest != null && currentJson.has("sha256")) {
+                    String serverDigest = currentJson.getString("sha256");
                     try {
-                        boolean ok = serverMd5.equals(md5sum);
+                        boolean ok = serverDigest.equals(digest);
                         if (ok) {
-                            logger.info("MD5 checksum ok: " + name);
+                            logger.info("SHA256 ok: " + name);
                         } else {
-                            logger.error("MD5 checkum failed: " + name);
+                            logger.error("SHA256 check failed: " + name);
                             errors++;
                         }
                     } catch (Exception e) {
-                        logger.info("Error checking MD5: " + name);
+                        logger.info("Error checking SHA256: " + name);
                         errors++;
                     }
                 } else {
-                    logger.info("No checksum found for dataset: " + name);
+                    logger.info("No digest found for dataset: " + name);
                 }
 
                 if (errors == 0)

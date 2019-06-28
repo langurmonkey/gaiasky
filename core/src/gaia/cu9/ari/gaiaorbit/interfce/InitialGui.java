@@ -32,7 +32,7 @@ import java.nio.file.Paths;
 public class InitialGui extends AbstractGui {
     private static final Log logger = Logger.getLogger(InitialGui.class);
 
-    private boolean dsdownload, catchooser;
+    private boolean datasetsDownload, catalogChooser;
 
     protected DownloadDataWindow ddw;
     protected ChooseCatalogWindow cdw;
@@ -42,13 +42,13 @@ public class InitialGui extends AbstractGui {
     /**
      * Creates an initial GUI
      *
-     * @param dsdownload Forces dataset download window
-     * @param catchooser Forces catalog chooser window
+     * @param datasetsDownload Forces dataset download window
+     * @param catalogChooser Forces catalog chooser window
      */
-    public InitialGui(boolean dsdownload, boolean catchooser) {
+    public InitialGui(boolean datasetsDownload, boolean catalogChooser) {
         lock = new Object();
-        this.catchooser = catchooser;
-        this.dsdownload = dsdownload;
+        this.catalogChooser = catalogChooser;
+        this.datasetsDownload = datasetsDownload;
     }
 
     @Override
@@ -64,7 +64,7 @@ public class InitialGui extends AbstractGui {
         clearGui();
 
         FileHandle dataDescriptor = Gdx.files.absolute(SysUtils.getDefaultTmpDir() + "/gaiasky-data.json");
-        DownloadHelper.downloadFile(GlobalConf.program.DATA_DESCRIPTOR_URL, dataDescriptor, null, (md5sum) -> {
+        DownloadHelper.downloadFile(GlobalConf.program.DATA_DESCRIPTOR_URL, dataDescriptor, null, (digest) -> {
             Gdx.app.postRunnable(() -> {
                 /**
                  * Display download manager if:
@@ -72,7 +72,7 @@ public class InitialGui extends AbstractGui {
                  * - base data not found, or
                  * - no catalogs found in data folder
                  */
-                if (dsdownload || !basicDataPresent() || catalogFiles.size == 0) {
+                if (datasetsDownload || !basicDataPresent() || catalogFiles.size == 0) {
                     // No catalog files, display downloader
                     addDownloaderWindow();
                 } else {
@@ -81,7 +81,7 @@ public class InitialGui extends AbstractGui {
             });
         }, () -> {
             // Fail?
-            logger.error("No internet connection! We will attempt to continue");
+            logger.error("No internet connection or server is down! We will attempt to continue");
             if (basicDataPresent()) {
                 // Go on all in
                 Gdx.app.postRunnable(() -> {
@@ -112,7 +112,7 @@ public class InitialGui extends AbstractGui {
          * - force display (conf), or
          * - catalogs available and yet no catalog is selected
          */
-        if (catchooser || GlobalConf.program.DISPLAY_DATASET_DIALOG || (catalogFiles.size > 0 && !isCatalogSelected())) {
+        if (catalogChooser || GlobalConf.program.DISPLAY_DATASET_DIALOG || (catalogFiles.size > 0 && !isCatalogSelected())) {
             String noticeKey = "gui.dschooser.nocatselected";
             addDatasetChooser(noticeKey);
         } else {

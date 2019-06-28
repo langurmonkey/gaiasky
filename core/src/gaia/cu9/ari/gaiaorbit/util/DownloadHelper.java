@@ -58,8 +58,8 @@ public class DownloadHelper {
                     long lastRead = 0;
                     double bytesPerMs = 0;
                     try {
-                        logger.info("Downloading: " + url);
-                        MessageDigest md = MessageDigest.getInstance("MD5");
+                        logger.info(I18n.txt("gui.download.starting", url));
+                        MessageDigest md = MessageDigest.getInstance("SHA-256");
                         DigestInputStream dis = new DigestInputStream(is, md);
                         // Keep reading bytes and storing them until there are no more.
                         while ((count = dis.read(bytes, 0, bytes.length)) != -1) {
@@ -95,17 +95,17 @@ public class DownloadHelper {
 
                         // Run finish runnable
                         if (finish != null) {
-                            byte[] digest = md.digest();
-                            StringBuffer md5 = new StringBuffer();
-                            for (int i = 0; i < digest.length; i++) {
-                                if ((0xff & digest[i]) < 0x10) {
-                                    md5.append("0" + Integer.toHexString((0xFF & digest[i])));
+                            byte[] digestBytes = md.digest();
+                            StringBuffer digestString = new StringBuffer();
+                            for (int i = 0; i < digestBytes.length; i++) {
+                                if ((0xff & digestBytes[i]) < 0x10) {
+                                    digestString.append("0" + Integer.toHexString((0xFF & digestBytes[i])));
                                 } else {
-                                    md5.append(Integer.toHexString(0xFF & digest[i]));
+                                    digestString.append(Integer.toHexString(0xFF & digestBytes[i]));
                                 }
                             }
-                            String md5sum = md5.toString();
-                            finish.run(md5sum);
+                            String digest = digestString.toString();
+                            finish.run(digest);
                         }
                     } catch (Exception e) {
                         logger.error(e);
@@ -113,7 +113,7 @@ public class DownloadHelper {
                             fail.run();
                     }
                 } else {
-                    logger.error("HTTP Error : Status Code : " + status);
+                    logger.error(I18n.txt("gui.download.error.httpstatus", status));
                     if(fail != null)
                         fail.run();
                 }
@@ -121,14 +121,14 @@ public class DownloadHelper {
 
             @Override
             public void failed(Throwable t) {
-                System.out.println(I18n.txt("gui.download.fail"));
+                logger.error(I18n.txt("gui.download.fail"));
                 if (fail != null)
                     fail.run();
             }
 
             @Override
             public void cancelled() {
-                logger.error("Download cancelled: " + url);
+                logger.error(I18n.txt("gui.download.cancelled", url));
                 if (cancel != null)
                     cancel.run();
             }
