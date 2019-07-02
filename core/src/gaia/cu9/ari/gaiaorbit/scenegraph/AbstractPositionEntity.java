@@ -438,7 +438,7 @@ public abstract class AbstractPositionEntity extends SceneGraphNode {
         // The smoothing scale must be set according to the distance
         shader.setUniformf("u_scale", GlobalConf.scene.LABEL_SIZE_FACTOR * scale / camera.getFovFactor());
 
-        if (distToCamera > getRadius() * 2) {
+        if (getRadius() == 0 || distToCamera > getRadius() * 2) {
 
             size *= GlobalConf.scene.LABEL_SIZE_FACTOR;
 

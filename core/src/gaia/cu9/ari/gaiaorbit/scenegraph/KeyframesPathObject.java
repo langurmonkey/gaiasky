@@ -107,7 +107,7 @@ public class KeyframesPathObject extends VertsObject implements I3DTextRenderabl
         path.ct = this.ct;
         path.setColor(GlobalResources.gGreen);
         path.setClosedLoop(false);
-        path.setPrimitiveSize(1.5f * ss);
+        path.setPrimitiveSize(0.5f * ss);
         path.initialize();
 
         segments = new Polyline(RenderGroup.LINE);
@@ -115,7 +115,7 @@ public class KeyframesPathObject extends VertsObject implements I3DTextRenderabl
         segments.ct = this.ct;
         segments.setColor(GlobalResources.gYellow);
         segments.setClosedLoop(false);
-        segments.setPrimitiveSize(1f * ss);
+        segments.setPrimitiveSize(0.6f * ss);
         segments.initialize();
 
         knots = new Points(RenderGroup.POINT);
@@ -123,7 +123,7 @@ public class KeyframesPathObject extends VertsObject implements I3DTextRenderabl
         knots.ct = this.ct;
         knots.setColor(GlobalResources.gWhite);
         knots.setClosedLoop(false);
-        knots.setPrimitiveSize(4f * ss);
+        knots.setPrimitiveSize(8f * ss);
         knots.initialize();
 
         knotsSeam = new Points(RenderGroup.POINT);
@@ -131,7 +131,7 @@ public class KeyframesPathObject extends VertsObject implements I3DTextRenderabl
         knotsSeam.ct = this.ct;
         knotsSeam.setColor(GlobalResources.gRed);
         knotsSeam.setClosedLoop(false);
-        knotsSeam.setPrimitiveSize(4f * ss);
+        knotsSeam.setPrimitiveSize(8f * ss);
         knotsSeam.initialize();
 
         selectedKnot = new Points(RenderGroup.POINT);
@@ -139,7 +139,7 @@ public class KeyframesPathObject extends VertsObject implements I3DTextRenderabl
         selectedKnot.ct = this.ct;
         selectedKnot.setColor(GlobalResources.gPink);
         selectedKnot.setClosedLoop(false);
-        selectedKnot.setPrimitiveSize(8f * ss);
+        selectedKnot.setPrimitiveSize(12f * ss);
         selectedKnot.setDepth(false);
         selectedKnot.initialize();
 
@@ -148,7 +148,7 @@ public class KeyframesPathObject extends VertsObject implements I3DTextRenderabl
         highlightedKnot.ct = this.ct;
         highlightedKnot.setColor(GlobalResources.gYellow);
         highlightedKnot.setClosedLoop(false);
-        highlightedKnot.setPrimitiveSize(8f * ss);
+        highlightedKnot.setPrimitiveSize(12f * ss);
         highlightedKnot.setDepth(false);
         highlightedKnot.initialize();
 
@@ -345,7 +345,7 @@ public class KeyframesPathObject extends VertsObject implements I3DTextRenderabl
         dir.ct = this.ct;
         dir.setColor(GlobalResources.gRed);
         dir.setClosedLoop(false);
-        dir.setPrimitiveSize(1f * ss);
+        dir.setPrimitiveSize(0.6f * ss);
         dir.initialize();
 
         VertsObject up = new Polyline(RenderGroup.LINE);
@@ -353,7 +353,7 @@ public class KeyframesPathObject extends VertsObject implements I3DTextRenderabl
         up.ct = this.ct;
         up.setColor(GlobalResources.gBlue);
         up.setClosedLoop(false);
-        up.setPrimitiveSize(1f * ss);
+        up.setPrimitiveSize(0.6f * ss);
         up.initialize();
 
         dir.setPoints(new double[]{px, py, pz, px + dx, py + dy, pz + dz});
@@ -475,8 +475,8 @@ public class KeyframesPathObject extends VertsObject implements I3DTextRenderabl
             VertsObject dir = orientations.get(i);
             VertsObject up = orientations.get(i + 1);
 
-            dir.setPrimitiveSize(2f * ss);
-            up.setPrimitiveSize(2f * ss);
+            dir.setPrimitiveSize(0.8f * ss);
+            up.setPrimitiveSize(0.8f * ss);
         }
         EventManager.instance.post(Events.KEYFRAME_SELECT, kf);
     }
@@ -495,8 +495,8 @@ public class KeyframesPathObject extends VertsObject implements I3DTextRenderabl
                 VertsObject dir = orientations.get(i);
                 VertsObject up = orientations.get(i + 1);
 
-                dir.setPrimitiveSize(1f * ss);
-                up.setPrimitiveSize(1f * ss);
+                dir.setPrimitiveSize(0.6f * ss);
+                up.setPrimitiveSize(0.6f * ss);
             }
             initFocus();
             focus.name = "";

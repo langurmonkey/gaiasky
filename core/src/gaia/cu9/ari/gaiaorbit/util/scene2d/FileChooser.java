@@ -249,7 +249,7 @@ public class FileChooser extends GenericDialog {
     }
 
     private void changeDirectory(FileHandle directory) {
-        FileHandle lastDir = currentDir;
+        FileHandle lastDir = directory != currentDir ? currentDir : null;
         currentDir = directory;
         String path = currentDir.path();
 
@@ -265,8 +265,10 @@ public class FileChooser extends GenericDialog {
         for (final FileHandle handle : list) {
             // Only list hidden if user chose it
             if (showHidden || !handle.name().startsWith(".")) {
-                FileListItem fli = new FileListItem(handle);
-                items.add(fli);
+                if(pathnameFilter != null && pathnameFilter.accept(handle.file()) || handle.isDirectory() && directoryBrowsingEnabled) {
+                    FileListItem fli = new FileListItem(handle);
+                    items.add(fli);
+                }
             }
         }
 
@@ -370,6 +372,7 @@ public class FileChooser extends GenericDialog {
      */
     public FileChooser setFileFilter(PathnameFilter f) {
         this.pathnameFilter = f;
+        changeDirectory(currentDir);
         return this;
     }
 

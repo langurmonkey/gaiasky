@@ -18,7 +18,7 @@ public class Keyframe {
     /**
      * Is it a seam? (breaks splines)
      **/
-    public boolean seam = false;
+    public boolean seam;
 
     public Keyframe(String name, Vector3d pos, Vector3d dir, Vector3d up, long time, double secs, boolean seam) {
         this.name = name;
