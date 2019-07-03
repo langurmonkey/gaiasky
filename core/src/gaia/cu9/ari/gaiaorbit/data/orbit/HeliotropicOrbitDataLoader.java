@@ -5,10 +5,21 @@
 
 package gaia.cu9.ari.gaiaorbit.data.orbit;
 
+import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.backends.lwjgl3.Lwjgl3Files;
+import com.badlogic.gdx.files.FileHandle;
 import gaia.cu9.ari.gaiaorbit.data.util.PointCloudData;
-import gaia.cu9.ari.gaiaorbit.util.Constants;
+import gaia.cu9.ari.gaiaorbit.desktop.format.DesktopDateFormatFactory;
+import gaia.cu9.ari.gaiaorbit.desktop.format.DesktopNumberFormatFactory;
+import gaia.cu9.ari.gaiaorbit.desktop.util.DesktopConfInit;
+import gaia.cu9.ari.gaiaorbit.interfce.ConsoleLogger;
+import gaia.cu9.ari.gaiaorbit.util.*;
+import gaia.cu9.ari.gaiaorbit.util.Logger.Log;
 import gaia.cu9.ari.gaiaorbit.util.coord.AstroUtils;
 import gaia.cu9.ari.gaiaorbit.util.coord.Coordinates;
+import gaia.cu9.ari.gaiaorbit.util.format.DateFormatFactory;
+import gaia.cu9.ari.gaiaorbit.util.format.NumberFormatFactory;
+import gaia.cu9.ari.gaiaorbit.util.math.MathManager;
 import gaia.cu9.ari.gaiaorbit.util.math.Vector3d;
 
 import java.io.*;
@@ -16,21 +27,53 @@ import java.sql.Timestamp;
 import java.time.Instant;
 import java.util.Calendar;
 
-public class OriginalDataLoader {
-    int count = 0;
-
+public class HeliotropicOrbitDataLoader {
+    static Log logger = Logger.getLogger(HeliotropicOrbitDataLoader.class);
     public static void main(String[] args) {
-        OriginalDataLoader l = new OriginalDataLoader();
+        HeliotropicOrbitDataLoader l = new HeliotropicOrbitDataLoader();
         try {
-            PointCloudData od = l.load(new FileInputStream("/home/tsagrista/Workspaces/workspace-luna/GaiaSandbox-android/assets-bak/data/ORB1_20131127_000001.topcat"));
-            OrbitDataWriter.writeOrbitData("/home/tsagrista/Workspaces/workspace-luna/GaiaSandbox-android/assets/data/android/orb.GAIA.dat", od);
+            // Assets location
+            String ASSETS_LOC = GlobalConf.ASSETS_LOC;
+
+            // Logger
+            new ConsoleLogger();
+
+            Gdx.files = new Lwjgl3Files();
+
+            // Initialize number format
+            NumberFormatFactory.initialize(new DesktopNumberFormatFactory());
+
+            // Initialize date format
+            DateFormatFactory.initialize(new DesktopDateFormatFactory());
+
+            ConfInit.initialize(new DesktopConfInit(new FileInputStream(new File(ASSETS_LOC + "/conf/global.properties")), new FileInputStream(new File(ASSETS_LOC + "/dummyversion"))));
+
+            I18n.initialize(new FileHandle(ASSETS_LOC + "/i18n/gsbundle"));
+
+            // Initialize math manager
+            MathManager.initialize();
+
+            String inputFile = "/media/tsagrista/NeuDaten/Gaia/gaiasky/data-rc/orbit/ORB1_20190625_000001.txt";
+            String outputFile ="/media/tsagrista/NeuDaten/Gaia/gaiasky/data-rc/orbit/orb.GAIA.new.dat";
+
+            PointCloudData od = l.load(new FileInputStream(inputFile));
+            logger.info("Loaded and converted " + od.getNumPoints() + " orbit data points: " + inputFile);
+
+            OrbitDataWriter.writeOrbitData(outputFile, od);
+            logger.info("Results written successfully: " + outputFile);
+
         } catch (Exception e) {
-            System.out.println(e);
+            logger.error(e);
         }
     }
 
-    public OriginalDataLoader() {
+    int count = 0;
+    // Maximum time between accepted samples
+    long maxMsSep = (long) (12d * Nature.H_TO_MS);
+
+    public HeliotropicOrbitDataLoader() {
         super();
+
     }
 
     /**
@@ -64,33 +107,42 @@ public class OriginalDataLoader {
         BufferedReader br = new BufferedReader(new InputStreamReader(data));
         String line;
 
+        Timestamp previousAddedTime = null;
+
         while ((line = br.readLine()) != null) {
             if (!line.isEmpty() && !line.startsWith("#")) {
                 // Read line
                 String[] tokens = line.split("\\s+");
                 if (tokens.length == 10) {
-                    // Valid data line
-                    Timestamp t = Timestamp.valueOf(tokens[0].replace('T', ' '));
+                    try {
+                        // Valid data line
+                        Timestamp t = Timestamp.valueOf(tokens[0].replace('T', ' '));
 
-                    /*
-                     * From Data coordinates to OpenGL world coordinates Z -> -X
-                     * X -> Y Y -> Z
-                     */
-                    Vector3d pos = new Vector3d(parsed(tokens[2]), parsed(tokens[3]), -parsed(tokens[1]));
+                        /*
+                         * From Data coordinates to OpenGL world coordinates Z -> -X
+                         * X -> Y Y -> Z
+                         */
+                        Vector3d pos = new Vector3d(parsed(tokens[2]), parsed(tokens[3]), -parsed(tokens[1]));
 
-                    // Transform to heliotropic using the Sun's ecliptic longitude
-                    Vector3d posHel = correctSunLongitude(pos, t.toInstant(), 0);
+                        // Transform to heliotropic using the Sun's ecliptic longitude
+                        Vector3d posHel = correctSunLongitude(pos, t.toInstant(), 0);
 
-                    // To ecliptic again
-                    pos.mul(Coordinates.eqToEcl());
-                    posHel.mul(Coordinates.eqToEcl());
+                        // To ecliptic again
+                        pos.mul(Coordinates.eqToEcl());
+                        posHel.mul(Coordinates.eqToEcl());
 
-                    if (count++ % 7 == 0) {
-                        orbitData.time.add(t.toInstant());
-                        orbitData.x.add(posHel.x * Constants.KM_TO_U);
-                        orbitData.y.add(posHel.y * Constants.KM_TO_U);
-                        orbitData.z.add(posHel.z * Constants.KM_TO_U);
+                        boolean add = count == 0 || previousAddedTime == null || (t.getTime() - previousAddedTime.getTime() >= maxMsSep);
 
+                        if (add) {
+                            orbitData.time.add(t.toInstant());
+                            orbitData.x.add(posHel.x * Constants.KM_TO_U);
+                            orbitData.y.add(posHel.y * Constants.KM_TO_U);
+                            orbitData.z.add(posHel.z * Constants.KM_TO_U);
+                            previousAddedTime = t;
+                        }
+                        count++;
+                    }catch(Exception e){
+                        logger.error("Error loading line: " + count);
                     }
 
                 }

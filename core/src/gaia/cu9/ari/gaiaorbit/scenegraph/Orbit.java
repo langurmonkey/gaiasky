@@ -239,10 +239,12 @@ public class Orbit extends Polyline {
 
             alpha *= this.alpha;
 
+            int last = 1;
             // Make origin Gaia (hack)
             Vector3d parentPos = null;
             if (parent instanceof Gaia) {
                 parentPos = ((Gaia) parent).unrotatedPos;
+                last = 2;
             }
 
             float dAlpha = 0f;
@@ -277,7 +279,7 @@ public class Orbit extends Polyline {
             // This is so that the shape renderer does not mess up the z-buffer
             int n = 0;
             int i = wrap(stIdx + 2, nPoints);
-            while (n < nPoints - 1) {
+            while (n < nPoints - last) {
                 // i minus one
                 int im = wrap(i - 1, nPoints);
 
