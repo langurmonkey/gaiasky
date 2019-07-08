@@ -50,7 +50,6 @@ public class SearchDialog extends GenericDialog {
         pack();
     }
     public void build() {
-
         // Info message
         searchInput = new OwnTextField("", skin);
         searchInput.setWidth(300 * GlobalConf.SCALE_FACTOR);

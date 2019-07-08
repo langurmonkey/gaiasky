@@ -38,7 +38,7 @@ import java.util.Date;
  * @author Toni Sagrista
  */
 public class OrbitSamplerDataProvider implements IOrbitDataProvider {
-    private static boolean writeData = true;
+    private static boolean writeData = false;
     private static final String writeDataPath = "/tmp/";
     PointCloudData data;
 
