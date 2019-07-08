@@ -173,6 +173,7 @@ public class ComponentTypes extends BitSet {
                 break; // or (i+1) would overflow
             }
         }
+        sb.replace(sb.length() - 1, sb.length(), "");
         return sb.toString();
     }
 

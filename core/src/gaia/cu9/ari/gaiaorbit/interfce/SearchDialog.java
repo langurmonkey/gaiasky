@@ -11,8 +11,8 @@ import com.badlogic.gdx.scenes.scene2d.Action;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.InputEvent.Type;
 import com.badlogic.gdx.scenes.scene2d.Stage;
+import com.badlogic.gdx.scenes.scene2d.ui.Cell;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
-import com.badlogic.gdx.scenes.scene2d.ui.TextField;
 import gaia.cu9.ari.gaiaorbit.GaiaSky;
 import gaia.cu9.ari.gaiaorbit.event.EventManager;
 import gaia.cu9.ari.gaiaorbit.event.Events;
@@ -25,13 +25,16 @@ import gaia.cu9.ari.gaiaorbit.util.GlobalConf;
 import gaia.cu9.ari.gaiaorbit.util.I18n;
 import gaia.cu9.ari.gaiaorbit.util.Logger;
 import gaia.cu9.ari.gaiaorbit.util.Logger.Log;
+import gaia.cu9.ari.gaiaorbit.util.scene2d.OwnLabel;
 import gaia.cu9.ari.gaiaorbit.util.scene2d.OwnTextField;
 
 public class SearchDialog extends GenericDialog {
     private static final Log logger = Logger.getLogger(SearchDialog.class);
 
-    private TextField searchInput;
+    private OwnTextField searchInput;
     private String currentInputText = "";
+    private Cell<OwnLabel> infoCell;
+    private OwnLabel infoMessage;
     private ISceneGraph sg;
 
     public SearchDialog(Skin skin, Stage ui,  final ISceneGraph sg) {
@@ -48,8 +51,9 @@ public class SearchDialog extends GenericDialog {
     }
     public void build() {
 
+        // Info message
         searchInput = new OwnTextField("", skin);
-        searchInput.setWidth(250 * GlobalConf.SCALE_FACTOR);
+        searchInput.setWidth(300 * GlobalConf.SCALE_FACTOR);
         searchInput.setMessageText(I18n.bundle.get("gui.objects.search"));
         searchInput.addListener(event -> {
             if (event instanceof InputEvent) {
@@ -80,16 +84,23 @@ public class SearchDialog extends GenericDialog {
             return false;
         });
 
+        // Info message
+        infoMessage = new OwnLabel("", skin, "default-blue");
+
         content.add(searchInput).top().left().expand().row();
+        infoCell = content.add();
+        infoCell.top().left().padTop(pad5).expand().row();
     }
 
     @Override
     public void accept(){
         stage.unfocusAll();
+        info(null);
     }
     @Override
     public void cancel(){
         stage.unfocusAll();
+        info(null);
     }
 
     public boolean checkString(String text, ISceneGraph sg) {
@@ -98,19 +109,49 @@ public class SearchDialog extends GenericDialog {
                 SceneGraphNode node = sg.getNode(text);
                 if (node instanceof IFocus) {
                     IFocus focus = ((IFocus) node).getFocus(text);
-                    if (focus != null && !focus.isCoordinatesTimeOverflow() && GaiaSky.instance.isOn(focus.getCt())) {
+                    boolean timeOverflow = focus.isCoordinatesTimeOverflow();
+                    boolean ctOn = GaiaSky.instance.isOn(focus.getCt());
+                    if (focus != null && !timeOverflow && ctOn) {
                         Gdx.app.postRunnable(() -> {
                             EventManager.instance.post(Events.CAMERA_MODE_CMD, CameraMode.FOCUS_MODE, true);
                             EventManager.instance.post(Events.FOCUS_CHANGE_CMD, focus, true);
                         });
+                        info(null);
                         return true;
+                    } else if (timeOverflow){
+                        info("Object '" + text + "' exists but is out of time range");
+                    } else if(!ctOn){
+                        info("Object '" + text + "' exists but visibility of " + focus.getCt().toString() + " is disabled");
+                    } else {
+                        info(null);
                     }
                 }
+            } else {
+                info(null);
             }
         }catch(Exception e){
             logger.error(e.getLocalizedMessage());
         }
         return false;
+    }
+
+    private void info(String info){
+        if(info == null){
+            infoMessage.setText("");
+            info(false);
+        } else {
+            infoMessage.setText(info);
+            info(true);
+        }
+    }
+
+    private void info(boolean visible){
+        if(visible){
+            infoCell.setActor(infoMessage);
+        } else {
+            infoCell.setActor(null);
+        }
+        pack();
     }
 
     public void clearText() {

@@ -18,126 +18,120 @@ import gaia.cu9.ari.gaiaorbit.util.gaia.time.Secs;
 import gaia.cu9.ari.gaiaorbit.util.units.Quantity;
 
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.util.*;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * Parses the XML files with the attitudes and their activaton times into a binary search tree.
+ *
  * @author Toni Sagrista
  */
 public class AttitudeXmlParser {
     private static final Log logger = Logger.getLogger(AttitudeXmlParser.class);
-    
+
     private static Instant endOfMission;
-    private static IDateFormat format;
+    private static IDateFormat format, formatWithMs;
 
     static {
         format = DateFormatFactory.getFormatter("yyyy-MM-dd HH:mm:ss");
-        endOfMission = getDate("2019-06-20 06:13:26");
+        formatWithMs = DateFormatFactory.getFormatter("yyyy-MM-dd HH:mm:ss.SS");
+        endOfMission = getDate("2026-09-14 17:44:20");
     }
 
     public static BinarySearchTree parseFolder(String folder, boolean oneDayDuration, String... files) {
         final FileHandle[] list;
-        if (files == null || files.length == 0) {
-            list = new FileHandle[15];
-            list[0] = GlobalConf.data.dataFileHandle(folder + "OPS_RSLS_0021791_rsls_launch_minus_5_weeks_epsl_comm_following.xml");
-            list[1] = GlobalConf.data.dataFileHandle(folder + "OPS_RSLS_0021791_rsls_launch_minus_5_weeks_epsl_comm_following_TUNED2014-07-03.xml");
-            list[2] = GlobalConf.data.dataFileHandle(folder + "OPS_RSLS_0022916_rsls_nsl_gareq1_afterFirstSpinPhaseOptimization.2.xml");
-            list[3] = GlobalConf.data.dataFileHandle(folder + "OPS_RSLS_0023024_rsls_tsl_ecliptic_pole_scanning.xml");
-            list[4] = GlobalConf.data.dataFileHandle(folder + "OPS_RSLS_0023165_rsls_nls_comm_gps_may2014.xml");
-            list[5] = GlobalConf.data.dataFileHandle(folder + "OPS_RSLS_0023768_sa42deg_corrn.xml");
-            list[6] = GlobalConf.data.dataFileHandle(folder + "OPS_RSLS_0024158.xml");
-            list[7] = GlobalConf.data.dataFileHandle(folder + "OPS_RSLS_0026136_NSL_TUNEDfor2014-05-01.xml");
-            list[8] = GlobalConf.data.dataFileHandle(folder + "OPS_RSLS_0026139_EPSL-P_TUNEDfor2014-03-12.xml");
-            list[9] = GlobalConf.data.dataFileHandle(folder + "OPS_RSLS_0026141_EPSL-P_TUNEDfor2014-03-12.xml");
-            list[10] = GlobalConf.data.dataFileHandle(folder + "OPS_RSLS_0026624_EPSL-P_TUNEDfor2014-05-09.xml");
-            list[11] = GlobalConf.data.dataFileHandle(folder + "OPS_RSLS_0026767_EPSL-P_TUNEDfor2014-06-02.xml");
-            list[12] = GlobalConf.data.dataFileHandle(folder + "OPS_RSLS_0026877_EPSL-F_TUNEDfor2014-06-06.xml");
-            list[13] = GlobalConf.data.dataFileHandle(folder + "OPS_RSLS_0028463_epsl_following_FIXED_20140909.xml");
-            list[14] = GlobalConf.data.dataFileHandle(folder + "OPS_RSLS_0028750_rsls_epsl_comm_leading_nsl_cont_corrected.xml");
-        } else {
-            list = new FileHandle[files.length];
+        try (Stream<Path> paths = Files.walk(Paths.get(GlobalConf.data.dataFile(folder)))) {
+            List<Path> ps = paths.filter(Files::isRegularFile).collect(Collectors.toList());
+            list = new FileHandle[ps.size()];
             int i = 0;
-            for (String file : files) {
-                list[i] = GlobalConf.data.dataFileHandle(folder + file);
+            for (Path p : ps) {
+                list[i] = new FileHandle(p.toFile());
                 i++;
             }
-        }
 
-        BinarySearchTree bst = new BinarySearchTree();
+            BinarySearchTree bst = new BinarySearchTree();
 
-        final long overlapMs = 10 * 60 * 1000;
-        final long threeHoursSec = 10800;
-        // GENERATE LIST OF DURATIONS
-        SortedMap<Instant, FileHandle> datesMap = new TreeMap<Instant, FileHandle>();
-        for (FileHandle fh : list) {
-            try {
-                if (oneDayDuration) {
-                    /** 
-                     * Hack to get the stripped FOV mode to load fast.
-                     * We set the activation time to ten minutes before today starts. 
-                     */
+            final long overlapMs = 10 * 60 * 1000;
+            final long threeHoursSec = 10800;
+            // GENERATE LIST OF DURATIONS
+            SortedMap<Instant, FileHandle> datesMap = new TreeMap<>();
+            for (FileHandle fh : list) {
+                try {
+                    if (oneDayDuration) {
+                        /**
+                         * Hack to get the stripped FOV mode to load fast.
+                         * We set the activation time to ten minutes before today starts.
+                         */
 
-                    LocalDateTime ldt = LocalDateTime.now();
-                    ldt = ldt.withMinute(0).withSecond(0);
-                    Instant date = ldt.toInstant(ZoneOffset.UTC);
-                    // Date is the start of today. Lets subtract 10 minutes
-                    date.minusMillis(overlapMs);
-                    datesMap.put(date, fh);
-                } else {
-                    Instant date = parseActivationTime(fh);
-                    datesMap.put(date, fh);
-                }
-            } catch (IOException e) {
-                logger.error(e, I18n.bundle.format("error.file.parse", fh.name()));
-            }
-        }
-        Map<FileHandle, Duration> durationMap = new HashMap<FileHandle, Duration>();
-        Set<Instant> dates = datesMap.keySet();
-        FileHandle lastFH = null;
-        Instant lastDate = null;
-        for (Instant date : dates) {
-            if (lastDate != null && lastFH != null) {
-                if (oneDayDuration) {
-                    Duration d = new Secs(threeHoursSec + overlapMs * 2 / 1000);
-                    durationMap.put(lastFH, d);
-                } else {
-                    long elapsed = date.toEpochMilli() - lastDate.toEpochMilli();
-
-                    Duration d = new Hours(elapsed * Nature.MS_TO_H);
-                    durationMap.put(lastFH, d);
+                        LocalDateTime ldt = LocalDateTime.now();
+                        ldt = ldt.withMinute(0).withSecond(0);
+                        Instant date = ldt.toInstant(ZoneOffset.UTC);
+                        // Date is the start of today. Lets subtract 10 minutes
+                        date.minusMillis(overlapMs);
+                        datesMap.put(date, fh);
+                    } else {
+                        Instant date = parseActivationTime(fh);
+                        datesMap.put(date, fh);
+                    }
+                } catch (IOException e) {
+                    logger.error(e, I18n.bundle.format("error.file.parse", fh.name()));
                 }
             }
-            lastDate = date;
-            lastFH = datesMap.get(date);
-        }
-        // Last element
-        if (oneDayDuration) {
-            Duration d = new Secs(threeHoursSec + overlapMs * 2 / 1000);
-            durationMap.put(lastFH, d);
-        } else {
-            long elapsed = endOfMission.toEpochMilli() - lastDate.toEpochMilli();
-            Duration d = new Hours(elapsed * Nature.MS_TO_H);
-            durationMap.put(lastFH, d);
-        }
+            Map<FileHandle, Duration> durationMap = new HashMap<>();
+            Set<Instant> dates = datesMap.keySet();
+            FileHandle lastFH = null;
+            Instant lastDate = null;
+            for (Instant date : dates) {
+                if (lastDate != null && lastFH != null) {
+                    if (oneDayDuration) {
+                        Duration d = new Secs(threeHoursSec + overlapMs * 2 / 1000);
+                        durationMap.put(lastFH, d);
+                    } else {
+                        long elapsed = date.toEpochMilli() - lastDate.toEpochMilli();
 
-        // PARSE ATTITUDES
-        for (FileHandle fh : list) {
-            logger.info(I18n.bundle.format("notif.attitude.loadingfile", fh.name()));
-            try {
-                AttitudeIntervalBean att = parseFile(fh, durationMap.get(fh), findActivationDate(fh, datesMap));
-                bst.insert(att);
-            } catch (IOException e) {
-                logger.error(e, I18n.bundle.format("error.file.parse", fh.name()));
-            } catch (Exception e) {
-                logger.error(e, I18n.bundle.format("notif.error", e.getMessage()));
+                        Duration d = new Hours(elapsed * Nature.MS_TO_H);
+                        durationMap.put(lastFH, d);
+                    }
+                }
+                lastDate = date;
+                lastFH = datesMap.get(date);
             }
-        }
+            // Last element
+            if (oneDayDuration) {
+                Duration d = new Secs(threeHoursSec + overlapMs * 2 / 1000);
+                durationMap.put(lastFH, d);
+            } else {
+                long elapsed = endOfMission.toEpochMilli() - lastDate.toEpochMilli();
+                Duration d = new Hours(elapsed * Nature.MS_TO_H);
+                durationMap.put(lastFH, d);
+            }
 
-        logger.info(I18n.bundle.format("notif.attitude.initialized", list.length));
-        return bst;
+            // PARSE ATTITUDES
+            for (FileHandle fh : list) {
+                logger.info(I18n.bundle.format("notif.attitude.loadingfile", fh.name()));
+                try {
+                    AttitudeIntervalBean att = parseFile(fh, durationMap.get(fh), findActivationDate(fh, datesMap));
+                    bst.insert(att);
+                } catch (IOException e) {
+                    logger.error(e, I18n.bundle.format("error.file.parse", fh.name()));
+                } catch (Exception e) {
+                    logger.error(e, I18n.bundle.format("notif.error", e.getMessage()));
+                }
+            }
+
+            logger.info(I18n.bundle.format("notif.attitude.initialized", list.length));
+            return bst;
+        } catch (Exception e) {
+            logger.error("Error loading attitude files");
+        }
+        return null;
     }
 
     private static Instant findActivationDate(FileHandle fh, SortedMap<Instant, FileHandle> datesMap) {
@@ -245,8 +239,11 @@ public class AttitudeXmlParser {
     }
 
     private static Instant getDate(String date) {
-        Instant d = format.parse(date);
-        return d;
+        try {
+            return format.parse(date);
+        }catch(Exception e){
+            return formatWithMs.parse(date);
+        }
     }
 
     private static Double getDouble(XmlReader.Element e, String property) {

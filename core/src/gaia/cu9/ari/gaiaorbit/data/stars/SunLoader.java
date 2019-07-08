@@ -24,7 +24,7 @@ public class SunLoader extends AbstractCatalogLoader implements ISceneGraphLoade
     public Array<? extends CelestialBody> loadData() {
         Array<Star> result = new Array<>(1);
         /** ADD SUN MANUALLY **/
-        Star sun = new Star(new Vector3d(0, 0, 0), -26.73f, 4.85f, 0.656f, "Sol", TimeUtils.millis());
+        Star sun = new Star(new Vector3d(0, 0, 0), -26.73f, 4.85f, 0.656f, "Sun", TimeUtils.millis());
         if (runFiltersAnd(sun)) {
             sun.initialize();
             result.add(sun);
