@@ -119,9 +119,9 @@ public class SearchDialog extends GenericDialog {
                         info(null);
                         return true;
                     } else if (timeOverflow){
-                        info("Object '" + text + "' exists but is out of time range");
+                        info(I18n.txt("gui.objects.search.timerange", text));
                     } else if(!ctOn){
-                        info("Object '" + text + "' exists but visibility of " + focus.getCt().toString() + " is disabled");
+                        info(I18n.txt("gui.objects.search.invisible", text, focus.getCt().toString()));
                     } else {
                         info(null);
                     }
