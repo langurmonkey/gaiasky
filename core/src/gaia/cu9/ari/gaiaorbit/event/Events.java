@@ -30,7 +30,7 @@ public enum Events {
      */
     TOGGLE_EXPANDCOLLAPSE_PANE_CMD,
     /**
-     * Notifies of a change in the time, contains the Date object
+     * Notifies of a change in the time, contains the Instant object
      **/
     TIME_CHANGE_INFO,
     /**
