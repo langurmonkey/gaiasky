@@ -39,11 +39,11 @@ public class KeyBindings {
     }
 
     /** CONTROL **/
-    public static int SPECIAL1;
+    public static int CTRL_L;
     /** SHIFT **/
-    public static int SPECIAL2;
+    public static int SHIFT_L;
     /** ALT **/
-    public static int SPECIAL3;
+    public static int ALT_L;
 
     /**
      * Creates a key mappings instance.
@@ -52,9 +52,9 @@ public class KeyBindings {
         mappings = new HashMap<>();
         mappingsInv = new TreeMap<>();
         // Init special keys
-        SPECIAL1 = Keys.CONTROL_LEFT;
-        SPECIAL2 = Keys.SHIFT_LEFT;
-        SPECIAL3 = Keys.ALT_LEFT;
+        CTRL_L = Keys.CONTROL_LEFT;
+        SHIFT_L = Keys.SHIFT_LEFT;
+        ALT_L = Keys.ALT_LEFT;
         // For now this will do
         initDefault();
     }
@@ -148,10 +148,10 @@ public class KeyBindings {
         final Runnable runnableAbout = () -> EventManager.instance.post(Events.SHOW_ABOUT_ACTION);
 
         // F1 -> Help dialog
-        addMapping(new ProgramAction(I18n.txt("action.help"), runnableAbout), Keys.F1);
+        addMapping(new ProgramAction("action.help", runnableAbout), Keys.F1);
 
         // h -> Help dialog
-        addMapping(new ProgramAction(I18n.txt("action.help"), runnableAbout), Keys.H);
+        addMapping(new ProgramAction("action.help", runnableAbout), Keys.H);
 
         // Show quit
         final Runnable runnableQuit = () -> {
@@ -160,149 +160,149 @@ public class KeyBindings {
         };
 
         // ESCAPE -> Run quit action
-        addMapping(new ProgramAction(I18n.txt("action.exit"), runnableQuit), Keys.ESCAPE);
+        addMapping(new ProgramAction("action.exit", runnableQuit), Keys.ESCAPE);
 
         // CTRL+Q -> Exit
-        //addMapping(new ProgramAction(I18n.txt("action.exit"), runnableQuit), SPECIAL1, Keys.Q);
+        //addMapping(new ProgramAction("action.exit", runnableQuit), CTRL_L, Keys.Q);
 
         // P -> Show preferences dialog
-        addMapping(new ProgramAction(I18n.txt("action.preferences"), () ->
+        addMapping(new ProgramAction("action.preferences", () ->
                 EventManager.instance.post(Events.SHOW_PREFERENCES_ACTION)), Keys.P);
 
         // c -> Show play camera dialog
-        //addMapping(new ProgramAction(I18n.txt("action.playcamera"), () ->
+        //addMapping(new ProgramAction("action.playcamera", () ->
         //        EventManager.instance.post(Events.SHOW_PLAYCAMERA_ACTION), fullGuiCondition), Keys.C);
 
         // SHIFT+O -> Toggle orbits
-        addMapping(new ProgramAction(I18n.txt("action.toggle", I18n.txt("element.orbits")), () ->
-                EventManager.instance.post(Events.TOGGLE_VISIBILITY_CMD, "element.orbits", false)), SPECIAL2, Keys.O);
+        addMapping(new ProgramAction("action.toggle/element.orbits", () ->
+                EventManager.instance.post(Events.TOGGLE_VISIBILITY_CMD, "element.orbits", false)), SHIFT_L, Keys.O);
 
         // SHIFT+P -> Toggle planets
-        addMapping(new ProgramAction(I18n.txt("action.toggle", I18n.txt("element.planets")), () ->
-                EventManager.instance.post(Events.TOGGLE_VISIBILITY_CMD, "element.planets", false)), SPECIAL2, Keys.P);
+        addMapping(new ProgramAction("action.toggle/element.planets", () ->
+                EventManager.instance.post(Events.TOGGLE_VISIBILITY_CMD, "element.planets", false)), SHIFT_L, Keys.P);
 
         // SHIFT+M -> Toggle moons
-        addMapping(new ProgramAction(I18n.txt("action.toggle", I18n.txt("element.moons")), () ->
-                EventManager.instance.post(Events.TOGGLE_VISIBILITY_CMD, "element.moons", false)), SPECIAL2, Keys.M);
+        addMapping(new ProgramAction("action.toggle/element.moons", () ->
+                EventManager.instance.post(Events.TOGGLE_VISIBILITY_CMD, "element.moons", false)), SHIFT_L, Keys.M);
 
         // SHIFT+S -> Toggle stars
-        addMapping(new ProgramAction(I18n.txt("action.toggle", I18n.txt("element.stars")), () ->
-                EventManager.instance.post(Events.TOGGLE_VISIBILITY_CMD, "element.stars", false)), SPECIAL2, Keys.S);
+        addMapping(new ProgramAction("action.toggle/element.stars", () ->
+                EventManager.instance.post(Events.TOGGLE_VISIBILITY_CMD, "element.stars", false)), SHIFT_L, Keys.S);
 
         // SHIFT+T -> Toggle satellites
-        addMapping(new ProgramAction(I18n.txt("action.toggle", I18n.txt("element.satellites")), () ->
-                EventManager.instance.post(Events.TOGGLE_VISIBILITY_CMD, "element.satellites", false)), SPECIAL2, Keys.T);
+        addMapping(new ProgramAction("action.toggle/element.satellites", () ->
+                EventManager.instance.post(Events.TOGGLE_VISIBILITY_CMD, "element.satellites", false)), SHIFT_L, Keys.T);
 
         // SHIFT+A -> Toggle asteroids
-        addMapping(new ProgramAction(I18n.txt("action.toggle", I18n.txt("element.asteroids")), () ->
-                EventManager.instance.post(Events.TOGGLE_VISIBILITY_CMD, "element.asteroids", false)), SPECIAL2, Keys.A);
+        addMapping(new ProgramAction("action.toggle/element.asteroids", () ->
+                EventManager.instance.post(Events.TOGGLE_VISIBILITY_CMD, "element.asteroids", false)), SHIFT_L, Keys.A);
 
         // SHIFT+L -> Toggle labels
-        addMapping(new ProgramAction(I18n.txt("action.toggle", I18n.txt("element.labels")), () ->
-                EventManager.instance.post(Events.TOGGLE_VISIBILITY_CMD, "element.labels", false)), SPECIAL2, Keys.L);
+        addMapping(new ProgramAction("action.toggle/element.labels", () ->
+                EventManager.instance.post(Events.TOGGLE_VISIBILITY_CMD, "element.labels", false)), SHIFT_L, Keys.L);
 
         // SHIFT+C -> Toggle constellations
-        addMapping(new ProgramAction(I18n.txt("action.toggle", I18n.txt("element.constellations")), () ->
-                EventManager.instance.post(Events.TOGGLE_VISIBILITY_CMD, "element.constellations", false)), SPECIAL2, Keys.C);
+        addMapping(new ProgramAction("action.toggle/element.constellations", () ->
+                EventManager.instance.post(Events.TOGGLE_VISIBILITY_CMD, "element.constellations", false)), SHIFT_L, Keys.C);
 
         // SHIFT+B -> Toggle boundaries
-        addMapping(new ProgramAction(I18n.txt("action.toggle", I18n.txt("element.boundaries")), () ->
-                EventManager.instance.post(Events.TOGGLE_VISIBILITY_CMD, "element.boundaries", false)), SPECIAL2, Keys.B);
+        addMapping(new ProgramAction("action.toggle/element.boundaries", () ->
+                EventManager.instance.post(Events.TOGGLE_VISIBILITY_CMD, "element.boundaries", false)), SHIFT_L, Keys.B);
 
         // SHIFT+Q -> Toggle equatorial
-        addMapping(new ProgramAction(I18n.txt("action.toggle", I18n.txt("element.equatorial")), () ->
-                EventManager.instance.post(Events.TOGGLE_VISIBILITY_CMD, "element.equatorial", false)), SPECIAL2, Keys.Q);
+        addMapping(new ProgramAction("action.toggle/element.equatorial", () ->
+                EventManager.instance.post(Events.TOGGLE_VISIBILITY_CMD, "element.equatorial", false)), SHIFT_L, Keys.Q);
 
         // SHIFT+E -> Toggle ecliptic
-        addMapping(new ProgramAction(I18n.txt("action.toggle", I18n.txt("element.ecliptic")), () ->
-                EventManager.instance.post(Events.TOGGLE_VISIBILITY_CMD, "element.ecliptic", false)), SPECIAL2, Keys.E);
+        addMapping(new ProgramAction("action.toggle/element.ecliptic", () ->
+                EventManager.instance.post(Events.TOGGLE_VISIBILITY_CMD, "element.ecliptic", false)), SHIFT_L, Keys.E);
 
         // SHIFT+G -> Toggle galactic
-        addMapping(new ProgramAction(I18n.txt("action.toggle", I18n.txt("element.galactic")), () ->
-                EventManager.instance.post(Events.TOGGLE_VISIBILITY_CMD, "element.galactic", false)), SPECIAL2, Keys.G);
+        addMapping(new ProgramAction("action.toggle/element.galactic", () ->
+                EventManager.instance.post(Events.TOGGLE_VISIBILITY_CMD, "element.galactic", false)), SHIFT_L, Keys.G);
 
         // SHIFT+H -> Toggle meshes
-        addMapping(new ProgramAction(I18n.txt("action.toggle", I18n.txt("element.meshes")), () ->
-                EventManager.instance.post(Events.TOGGLE_VISIBILITY_CMD, "element.meshes", false)), SPECIAL2, Keys.H);
+        addMapping(new ProgramAction("action.toggle/element.meshes", () ->
+                EventManager.instance.post(Events.TOGGLE_VISIBILITY_CMD, "element.meshes", false)), SHIFT_L, Keys.H);
 
         // SHIFT+V -> Toggle clusters
-        addMapping(new ProgramAction(I18n.txt("action.toggle", I18n.txt("element.clusters")), () ->
-                EventManager.instance.post(Events.TOGGLE_VISIBILITY_CMD, "element.clusters", false)), SPECIAL2, Keys.V);
+        addMapping(new ProgramAction("action.toggle/element.clusters", () ->
+                EventManager.instance.post(Events.TOGGLE_VISIBILITY_CMD, "element.clusters", false)), SHIFT_L, Keys.V);
 
         // Left bracket -> divide speed
-        addMapping(new ProgramAction(I18n.txt("action.dividetime"), () ->
+        addMapping(new ProgramAction("action.dividetime", () ->
                 EventManager.instance.post(Events.TIME_WARP_DECREASE_CMD)), Keys.COMMA);
 
         // Right bracket -> double speed
-        addMapping(new ProgramAction(I18n.txt("action.doubletime"), () ->
+        addMapping(new ProgramAction("action.doubletime", () ->
                 EventManager.instance.post(Events.TIME_WARP_INCREASE_CMD)), Keys.PERIOD);
 
         // SPACE -> toggle time
-        addMapping(new ProgramAction(I18n.txt("action.pauseresume"), () -> {
+        addMapping(new ProgramAction("action.pauseresume", () -> {
                 // Game mode has space bound to 'up'
                 if(!GaiaSky.instance.cam.mode.isGame())
                     EventManager.instance.post(Events.TOGGLE_TIME_CMD, null, false);
         }), Keys.SPACE);
 
         // Plus -> increase limit magnitude
-        addMapping(new ProgramAction(I18n.txt("action.incmag"), () ->
+        addMapping(new ProgramAction("action.incmag", () ->
                 EventManager.instance.post(Events.LIMIT_MAG_CMD, GlobalConf.runtime.LIMIT_MAG_RUNTIME + 0.1f)), Keys.PLUS);
 
         // Minus -> decrease limit magnitude
-        addMapping(new ProgramAction(I18n.txt("action.decmag"), () ->
+        addMapping(new ProgramAction("action.decmag", () ->
                 EventManager.instance.post(Events.LIMIT_MAG_CMD, GlobalConf.runtime.LIMIT_MAG_RUNTIME - 0.1f)), Keys.MINUS);
 
         // Star -> reset limit mag
-        addMapping(new ProgramAction(I18n.txt("action.resetmag"), () ->
+        addMapping(new ProgramAction("action.resetmag", () ->
                 EventManager.instance.post(Events.LIMIT_MAG_CMD, GlobalConf.data.LIMIT_MAG_LOAD)), Keys.STAR);
 
         // F11 -> fullscreen
-        addMapping(new ProgramAction(I18n.txt("action.togglefs"), () -> {
+        addMapping(new ProgramAction("action.togglefs", () -> {
             GlobalConf.screen.FULLSCREEN = !GlobalConf.screen.FULLSCREEN;
             EventManager.instance.post(Events.SCREEN_MODE_CMD);
         }), Keys.F11);
 
         // F4 -> toggle fisheye effect
-        addMapping(new ProgramAction(I18n.txt("action.fisheye"), () ->
+        addMapping(new ProgramAction("action.fisheye", () ->
                 EventManager.instance.post(Events.FISHEYE_CMD, !GlobalConf.postprocess.POSTPROCESS_FISHEYE)), Keys.F4);
 
         // F5 -> take screenshot
-        addMapping(new ProgramAction(I18n.txt("action.screenshot"), () ->
+        addMapping(new ProgramAction("action.screenshot", () ->
                 EventManager.instance.post(Events.SCREENSHOT_CMD, GlobalConf.screenshot.SCREENSHOT_WIDTH, GlobalConf.screenshot.SCREENSHOT_HEIGHT, GlobalConf.screenshot.SCREENSHOT_FOLDER)), Keys.F5);
 
         // F6 -> toggle frame output
-        addMapping(new ProgramAction(I18n.txt("action.toggle", I18n.txt("element.frameoutput")), () ->
+        addMapping(new ProgramAction("action.toggle/element.frameoutput", () ->
                 EventManager.instance.post(Events.FRAME_OUTPUT_CMD, !GlobalConf.frame.RENDER_OUTPUT)), Keys.F6);
 
         // U -> toggle UI collapse/expand
-        addMapping(new ProgramAction(I18n.txt("action.toggle", I18n.txt("element.controls")), () ->
+        addMapping(new ProgramAction("action.toggle/element.controls", () ->
                 EventManager.instance.post(Events.GUI_FOLD_CMD), fullGuiCondition), Keys.U);
 
         // CTRL+K -> toggle cubemap mode
-        addMapping(new ProgramAction(I18n.txt("action.toggle", I18n.txt("element.360")), () ->
-                EventManager.instance.post(Events.CUBEMAP360_CMD, !GlobalConf.program.CUBEMAP360_MODE, false)), SPECIAL1, Keys.K);
+        addMapping(new ProgramAction("action.toggle/element.360", () ->
+                EventManager.instance.post(Events.CUBEMAP360_CMD, !GlobalConf.program.CUBEMAP360_MODE, false)), CTRL_L, Keys.K);
 
         // CTRL+SHIFT+K -> toggle cubemap projection
-        addMapping(new ProgramAction(I18n.txt("action.toggle", I18n.txt("element.projection")), () -> {
+        addMapping(new ProgramAction("action.toggle/element.projection", () -> {
             int newprojidx = (GlobalConf.program.CUBEMAP_PROJECTION.ordinal() + 1) % CubemapProjections.CubemapProjection.values().length;
             EventManager.instance.post(Events.CUBEMAP_PROJECTION_CMD, CubemapProjections.CubemapProjection.values()[newprojidx]);
-        }), SPECIAL1, SPECIAL2, Keys.K);
+        }), CTRL_L, SHIFT_L, Keys.K);
 
         // CTRL + SHIFT + UP -> increase star point size by 0.5
-        addMapping(new ProgramAction(I18n.txt("action.starpointsize.inc"), () ->
-                EventManager.instance.post(Events.STAR_POINT_SIZE_INCREASE_CMD)), SPECIAL1, SPECIAL2, Keys.UP);
+        addMapping(new ProgramAction("action.starpointsize.inc", () ->
+                EventManager.instance.post(Events.STAR_POINT_SIZE_INCREASE_CMD)), CTRL_L, SHIFT_L, Keys.UP);
 
         // CTRL + SHIFT + DOWN -> decrease star point size by 0.5
-        addMapping(new ProgramAction(I18n.txt("action.starpointsize.dec"), () ->
-                EventManager.instance.post(Events.STAR_POINT_SIZE_DECREASE_CMD)), SPECIAL1, SPECIAL2, Keys.DOWN);
+        addMapping(new ProgramAction("action.starpointsize.dec", () ->
+                EventManager.instance.post(Events.STAR_POINT_SIZE_DECREASE_CMD)), CTRL_L, SHIFT_L, Keys.DOWN);
 
         // CTRL + SHIFT + R -> reset star point size
-        addMapping(new ProgramAction(I18n.txt("action.starpointsize.reset"), () ->
-                EventManager.instance.post(Events.STAR_POINT_SIZE_RESET_CMD)), SPECIAL1, SPECIAL2, Keys.R);
+        addMapping(new ProgramAction("action.starpointsize.reset", () ->
+                EventManager.instance.post(Events.STAR_POINT_SIZE_RESET_CMD)), CTRL_L, SHIFT_L, Keys.R);
 
         // CTRL + W -> new keyframe
-        addMapping(new ProgramAction(I18n.txt("action.keyframe"), () ->
-                EventManager.instance.post(Events.KEYFRAME_ADD)), SPECIAL1, Keys.W);
+        addMapping(new ProgramAction("action.keyframe", () ->
+                EventManager.instance.post(Events.KEYFRAME_ADD)), CTRL_L, Keys.W);
 
         // Camera modes (NUMBERS)
         for (int i = 7; i <= 16; i++) {
@@ -327,97 +327,97 @@ public class KeyBindings {
         }
 
         // CTRL + D -> Toggle debug information
-        addMapping(new ProgramAction(I18n.txt("action.toggle", I18n.txt("element.debugmode")), () -> {
+        addMapping(new ProgramAction("action.toggle/element.debugmode", () -> {
             EventManager.instance.post(Events.SHOW_DEBUG_CMD);
-        }), SPECIAL1, Keys.D);
+        }), CTRL_L, Keys.D);
 
         // CTRL + F -> Search dialog
         final Runnable runnableSearch = () ->
             EventManager.instance.post(Events.SHOW_SEARCH_ACTION);
-        addMapping(new ProgramAction(I18n.txt("action.search"), runnableSearch, fullGuiCondition), SPECIAL1, Keys.F);
+        addMapping(new ProgramAction("action.search", runnableSearch, fullGuiCondition), CTRL_L, Keys.F);
 
         // f -> Search dialog
-        addMapping(new ProgramAction(I18n.txt("action.search"), runnableSearch, fullGuiCondition), Keys.F);
+        addMapping(new ProgramAction("action.search", runnableSearch, fullGuiCondition), Keys.F);
 
         // / -> Search dialog
-        addMapping(new ProgramAction(I18n.txt("action.search"), runnableSearch, fullGuiCondition), Keys.SLASH);
+        addMapping(new ProgramAction("action.search", runnableSearch, fullGuiCondition), Keys.SLASH);
 
         // CTRL + SHIFT + O -> Toggle particle fade
-        addMapping(new ProgramAction(I18n.txt("action.toggle", I18n.txt("element.octreeparticlefade")), () ->
-                EventManager.instance.post(Events.OCTREE_PARTICLE_FADE_CMD, I18n.txt("element.octreeparticlefade"), !GlobalConf.scene.OCTREE_PARTICLE_FADE)), SPECIAL1, SPECIAL2, Keys.O);
+        addMapping(new ProgramAction("action.toggle/element.octreeparticlefade", () ->
+                EventManager.instance.post(Events.OCTREE_PARTICLE_FADE_CMD, I18n.txt("element.octreeparticlefade"), !GlobalConf.scene.OCTREE_PARTICLE_FADE)), CTRL_L, SHIFT_L, Keys.O);
 
         // CTRL + S -> Toggle stereoscopic mode
-        addMapping(new ProgramAction(I18n.txt("action.toggle", I18n.txt("element.stereomode")), () ->
-                EventManager.instance.post(Events.STEREOSCOPIC_CMD, !GlobalConf.program.STEREOSCOPIC_MODE, false)), SPECIAL1, Keys.S);
+        addMapping(new ProgramAction("action.toggle/element.stereomode", () ->
+                EventManager.instance.post(Events.STEREOSCOPIC_CMD, !GlobalConf.program.STEREOSCOPIC_MODE, false)), CTRL_L, Keys.S);
 
         // CTRL + SHIFT + S -> Switch stereoscopic profile
-        addMapping(new ProgramAction(I18n.txt("action.switchstereoprofile"), () -> {
+        addMapping(new ProgramAction("action.switchstereoprofile", () -> {
             int newidx = GlobalConf.program.STEREO_PROFILE.ordinal();
             newidx = (newidx + 1) % StereoProfile.values().length;
             EventManager.instance.post(Events.STEREO_PROFILE_CMD, newidx);
-        }), SPECIAL1, SPECIAL2, Keys.S);
+        }), CTRL_L, SHIFT_L, Keys.S);
 
         // CTRL + P -> Toggle planetarium mode
-        addMapping(new ProgramAction(I18n.txt("action.toggle", I18n.txt("element.planetarium")), () ->
-                EventManager.instance.post(Events.PLANETARIUM_CMD, !GlobalConf.postprocess.POSTPROCESS_FISHEYE, false)), SPECIAL1, Keys.P);
+        addMapping(new ProgramAction("action.toggle/element.planetarium", () ->
+                EventManager.instance.post(Events.PLANETARIUM_CMD, !GlobalConf.postprocess.POSTPROCESS_FISHEYE, false)), CTRL_L, Keys.P);
 
         // CTRL + U -> Toggle clean (no GUI) mode
-        addMapping(new ProgramAction(I18n.txt("action.toggle", I18n.txt("element.cleanmode")), () ->
-                EventManager.instance.post(Events.DISPLAY_GUI_CMD, I18n.txt("notif.cleanmode"))), SPECIAL1, Keys.U);
+        addMapping(new ProgramAction("action.toggle/element.cleanmode", () ->
+                EventManager.instance.post(Events.DISPLAY_GUI_CMD, I18n.txt("notif.cleanmode"))), CTRL_L, Keys.U);
 
         // CTRL + G -> Travel to focus object
-        addMapping(new ProgramAction(I18n.txt("action.gotoobject"), () ->
-                EventManager.instance.post(Events.GO_TO_OBJECT_CMD)), SPECIAL1, Keys.G);
+        addMapping(new ProgramAction("action.gotoobject", () ->
+                EventManager.instance.post(Events.GO_TO_OBJECT_CMD)), CTRL_L, Keys.G);
 
         // CTRL + R -> Reset time to current system time
-        addMapping(new ProgramAction(I18n.txt("action.resettime"), () ->
-                EventManager.instance.post(Events.TIME_CHANGE_CMD, Instant.now())), SPECIAL1, Keys.R);
+        addMapping(new ProgramAction("action.resettime", () ->
+                EventManager.instance.post(Events.TIME_CHANGE_CMD, Instant.now())), CTRL_L, Keys.R);
 
         // CTRL + SHIFT + G -> Galaxy 2D - 3D
-        addMapping(new ProgramAction(I18n.txt("action.toggle", I18n.txt("element.galaxy3d")), () ->
-                EventManager.instance.post(Events.GALAXY_3D_CMD, !GlobalConf.scene.GALAXY_3D)), SPECIAL1, SPECIAL2, Keys.G);
+        addMapping(new ProgramAction("action.toggle-element.galaxy3d", () ->
+                EventManager.instance.post(Events.GALAXY_3D_CMD, !GlobalConf.scene.GALAXY_3D)), CTRL_L, SHIFT_L, Keys.G);
 
         // HOME -> Back home
-        addMapping(new ProgramAction(I18n.txt("action.home"), () -> {
+        addMapping(new ProgramAction("action.home", () -> {
             EventManager.instance.post(Events.HOME_CMD);
         }), Keys.HOME);
 
         // TAB -> Minimap toggle
-        addMapping(new ProgramAction(I18n.txt("action.toggle", I18n.txt("gui.minimap.title")), () ->
+        addMapping(new ProgramAction("action.toggle/gui.minimap.title", () ->
                 EventManager.instance.post(Events.TOGGLE_MINIMAP)), Keys.TAB);
 
 
         // ALT_L + T -> Expand/collapse time pane
-        addMapping(new ProgramAction(I18n.txt("action.expandcollapse.pane", I18n.txt("gui.time")), () ->
-                EventManager.instance.post(Events.TOGGLE_EXPANDCOLLAPSE_PANE_CMD, "TimeComponent")), SPECIAL3, Keys.T);
+        addMapping(new ProgramAction("action.expandcollapse.pane/gui.time", () ->
+                EventManager.instance.post(Events.TOGGLE_EXPANDCOLLAPSE_PANE_CMD, "TimeComponent")), ALT_L, Keys.T);
 
         // ALT_L + C -> Expand/collapse camera pane
-        addMapping(new ProgramAction(I18n.txt("action.expandcollapse.pane", I18n.txt("gui.camera")), () ->
-            EventManager.instance.post(Events.TOGGLE_EXPANDCOLLAPSE_PANE_CMD, "CameraComponent")), SPECIAL3, Keys.C);
+        addMapping(new ProgramAction("action.expandcollapse.pane/gui.camera", () ->
+            EventManager.instance.post(Events.TOGGLE_EXPANDCOLLAPSE_PANE_CMD, "CameraComponent")), ALT_L, Keys.C);
 
         // ALT_L + V -> Expand/collapse visibility pane
-        addMapping(new ProgramAction(I18n.txt("action.expandcollapse.pane", I18n.txt("gui.visibility")), () ->
-                EventManager.instance.post(Events.TOGGLE_EXPANDCOLLAPSE_PANE_CMD, "VisibilityComponent")), SPECIAL3, Keys.V);
+        addMapping(new ProgramAction("action.expandcollapse.pane/gui.visibility", () ->
+                EventManager.instance.post(Events.TOGGLE_EXPANDCOLLAPSE_PANE_CMD, "VisibilityComponent")), ALT_L, Keys.V);
 
         // ALT_L + L -> Expand/collapse visual effects pane
-        addMapping(new ProgramAction(I18n.txt("action.expandcollapse.pane", I18n.txt("gui.lighting")), () ->
-                EventManager.instance.post(Events.TOGGLE_EXPANDCOLLAPSE_PANE_CMD, "VisualEffectsComponent")), SPECIAL3, Keys.L);
+        addMapping(new ProgramAction("action.expandcollapse.pane/gui.lighting", () ->
+                EventManager.instance.post(Events.TOGGLE_EXPANDCOLLAPSE_PANE_CMD, "VisualEffectsComponent")), ALT_L, Keys.L);
 
         // ALT_L + D -> Expand/collapse datasets pane
-        addMapping(new ProgramAction(I18n.txt("action.expandcollapse.pane", I18n.txt("gui.dataset.title")), () ->
-                EventManager.instance.post(Events.TOGGLE_EXPANDCOLLAPSE_PANE_CMD, "DatasetsComponent")), SPECIAL3, Keys.D);
+        addMapping(new ProgramAction("action.expandcollapse.pane/gui.dataset.title", () ->
+                EventManager.instance.post(Events.TOGGLE_EXPANDCOLLAPSE_PANE_CMD, "DatasetsComponent")), ALT_L, Keys.D);
 
         // ALT_L + O -> Expand/collapse objects pane
-        addMapping(new ProgramAction(I18n.txt("action.expandcollapse.pane", I18n.txt("gui.objects")), () ->
-                EventManager.instance.post(Events.TOGGLE_EXPANDCOLLAPSE_PANE_CMD, "ObjectsComponent")), SPECIAL3, Keys.O);
+        addMapping(new ProgramAction("action.expandcollapse.pane/gui.objects", () ->
+                EventManager.instance.post(Events.TOGGLE_EXPANDCOLLAPSE_PANE_CMD, "ObjectsComponent")), ALT_L, Keys.O);
 
         // ALT_L + M -> Expand/collapse music pane
-        addMapping(new ProgramAction(I18n.txt("action.expandcollapse.pane", I18n.txt("gui.music")), () ->
-                EventManager.instance.post(Events.TOGGLE_EXPANDCOLLAPSE_PANE_CMD, "MusicComponent")), SPECIAL3, Keys.M);
+        addMapping(new ProgramAction("action.expandcollapse.pane/gui.music", () ->
+                EventManager.instance.post(Events.TOGGLE_EXPANDCOLLAPSE_PANE_CMD, "MusicComponent")), ALT_L, Keys.M);
 
         // CTRL+SHIFT+L -> Toggle mouse capture
-        addMapping(new ProgramAction("Toggle mouse capture", () ->
-                EventManager.instance.post(Events.MOUSE_CAPTURE_TOGGLE)), SPECIAL1, SPECIAL2, Keys.L);
+        addMapping(new ProgramAction("action.toggle/gui.mousecapture", () ->
+                EventManager.instance.post(Events.MOUSE_CAPTURE_TOGGLE)), CTRL_L, SHIFT_L, Keys.L);
 
     }
 
@@ -428,6 +428,7 @@ public class KeyBindings {
      * @author Toni Sagrista
      */
     public class ProgramAction implements Runnable, Comparable<ProgramAction> {
+        final String actionId;
         final String actionName;
         /**
          * Action to run
@@ -439,7 +440,20 @@ public class KeyBindings {
          **/
         private final BooleanRunnable condition;
 
-        ProgramAction(String actionName, Runnable action, BooleanRunnable condition) {
+        ProgramAction(String actionId, Runnable action, BooleanRunnable condition) {
+            this.actionId = actionId;
+            // Set action name
+            String actionName;
+            try {
+                if (actionId.contains("/")) {
+                    String[] actions = actionId.split("/");
+                    actionName = I18n.txt(actions[0], I18n.txt(actions[1]));
+                } else {
+                    actionName = I18n.txt(actionId);
+                }
+            }catch(MissingResourceException e){
+                actionName = actionId;
+            }
             this.actionName = actionName;
             this.action = action;
             this.condition = condition;
