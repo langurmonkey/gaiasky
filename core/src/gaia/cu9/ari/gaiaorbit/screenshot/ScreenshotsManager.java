@@ -66,7 +66,6 @@ public class ScreenshotsManager implements IObserver {
 
     public void renderFrame(IMainRenderer mr) {
         if (GlobalConf.frame.RENDER_OUTPUT) {
-
             switch (GlobalConf.frame.FRAME_MODE) {
             case simple:
                 frameRenderer.saveScreenshot(GlobalConf.frame.RENDER_FOLDER, GlobalConf.frame.RENDER_FILE_NAME, Gdx.graphics.getWidth(), Gdx.graphics.getHeight(), true, GlobalConf.frame.FRAME_FORMAT, GlobalConf.frame.FRAME_QUALITY);

@@ -29,6 +29,7 @@ import gaia.cu9.ari.gaiaorbit.scenegraph.camera.NaturalCamera;
 import gaia.cu9.ari.gaiaorbit.util.*;
 import gaia.cu9.ari.gaiaorbit.util.Logger.Log;
 import gaia.cu9.ari.gaiaorbit.util.coord.Coordinates;
+import gaia.cu9.ari.gaiaorbit.util.gdx.contrib.postprocess.effects.CubemapProjections;
 import gaia.cu9.ari.gaiaorbit.util.math.*;
 import gaia.cu9.ari.gaiaorbit.util.time.ITimeFrameProvider;
 import uk.ac.starlink.util.DataSource;
@@ -39,11 +40,9 @@ import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.time.temporal.ChronoField;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicReference;
 
 /**
  * Implementation of the scripting interface using the event system.
@@ -719,7 +718,7 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
 
     @Override
     public void setFrameOutputMode(String screenshotMode) {
-        if (checkString(screenshotMode, new String[] { GlobalConf.ScreenshotMode.redraw.toString(), GlobalConf.ScreenshotMode.simple.toString() }, "screenshotMode"))
+        if (checkStringEnum(screenshotMode, GlobalConf.ScreenshotMode.class, "screenshotMode"))
             em.post(Events.FRAME_OUTPUT_MODE_CMD, screenshotMode);
     }
 
@@ -1527,7 +1526,7 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
         @Override
         public void run() {
             // Update elapsed time
-            elapsed += Gdx.graphics.getDeltaTime();
+            elapsed += GaiaSky.instance.getT();
 
             // Interpolation variable
             double alpha = MathUtilsd.clamp(elapsed / seconds, 0.0, 0.99999999999999);
@@ -1823,6 +1822,14 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
     }
 
     @Override
+    public void setCubemapProjection(String projection) {
+        if (checkStringEnum(projection, CubemapProjections.CubemapProjection.class, "projection")) {
+            CubemapProjections.CubemapProjection newProj = CubemapProjections.CubemapProjection.valueOf(projection.toUpperCase());
+            em.post(Events.CUBEMAP_PROJECTION_CMD, newProj);
+        }
+    }
+
+    @Override
     public void setStereoscopicMode(boolean state) {
         Gdx.app.postRunnable(() -> em.post(Events.STEREOSCOPIC_CMD, state, false));
     }
@@ -2046,19 +2053,21 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
 
                 // Create star vgroup
                 if (data != null && data.size > 0 && checkString(dsName, "datasetName")) {
+                    AtomicReference<StarGroup> starGroup = new AtomicReference<>();
                     Gdx.app.postRunnable(() -> {
-                        StarGroup sg = StarGroup.getDefaultStarGroup(dsName, data);
+                        starGroup.set(StarGroup.getDefaultStarGroup(dsName, data));
 
                         // Catalog info
-                        CatalogInfo ci = new CatalogInfo(dsName, absolutePath, null, type, sg);
+                        CatalogInfo ci = new CatalogInfo(dsName, absolutePath, null, type, starGroup.get());
                         EventManager.instance.post(Events.CATALOG_ADD, ci, true);
 
                         logger.info(data.size + " objects loaded");
                     });
-                    // Sync waiting
-                    while (sync && !CatalogManager.instance().contains(dsName)) {
+                    // Sync waiting until the node is in the scene graph
+                    while (sync && (starGroup.get() == null || !starGroup.get().inSceneGraph)) {
                         sleepFrames(1);
                     }
+                    sleepFrames(1);
                     return true;
                 } else {
                     // No data has been loaded
@@ -2289,6 +2298,23 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
         logger.error(name + " value not valid: " + value + ". Possible values are:");
         for (String v : possibleValues)
             logger.error(v);
+    }
+
+    private <T extends Enum<T>> boolean checkStringEnum(String value, Class<T> clazz, String name) {
+        if (checkString(value, name)) {
+            for (Enum en : EnumSet.allOf(clazz)) {
+                if (value.equalsIgnoreCase(en.toString())) {
+                    return true;
+                }
+            }
+            logger.error(name + " value not valid: " + value + ". Must be a value in the enum " + clazz.getSimpleName() + ":");
+            for (Enum en : EnumSet.allOf(clazz)) {
+                logger.error(en.toString());
+            }
+            return false;
+        } else {
+            return false;
+        }
     }
 
     private boolean checkNotNull(Object o, String name) {
