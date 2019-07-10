@@ -7,7 +7,7 @@
 in vec3 a_position;
 in vec3 a_pm;
 in vec4 a_color;
-in float a_size;
+in vec2 a_sizeMag;
 
 uniform int u_t; // time in days since epoch
 uniform mat4 u_projModelView;
@@ -17,6 +17,8 @@ uniform int u_cubemap;
 
 uniform vec2 u_pointAlpha;
 uniform float u_thAnglePoint;
+
+uniform float u_magLimit = 22.0;
 
 #ifdef relativisticEffects
     uniform vec3 u_velDir; // Velocity vector
@@ -55,6 +57,13 @@ void main() {
     // Distance to star
     float dist = length(pos);
 
+    // Discard vertex if too close or mag out of bounds
+    float v_discard = 1.0;
+    if(dist < len0 || a_sizeMag.y > u_magLimit) {
+        v_discard = 0.0;
+        v_col *= 0.0;
+    }
+
     // Logarithmic depth buffer
     v_depth = getDepthValue(dist);
 
@@ -73,19 +82,12 @@ void main() {
     #ifdef gravitationalWaves
         pos = computeGravitationalWaves(pos, u_gw, u_gwmat3, u_ts, u_omgw, u_hterms);
     #endif // gravitationalWaves
-    
-    float viewAngleApparent = atan((a_size * u_alphaSizeFovBr.w) / dist) / u_alphaSizeFovBr.z;
+
+    float viewAngleApparent = atan((a_sizeMag.x * u_alphaSizeFovBr.w) / dist) / u_alphaSizeFovBr.z;
     float opacity = pow(lint2(viewAngleApparent, 0.0, u_thAnglePoint, u_pointAlpha.x, u_pointAlpha.y), 1.2);
 
     float fadeout = smoothstep(dist, len0, len1);
     v_col = vec4(a_color.rgb, opacity * u_alphaSizeFovBr.x * fadeout);
-
-	// Discard vertex if too close or Gaia Fov1or2 and not observed
-    float v_discard = 1.0;
-    if(dist < len0) {
-        v_discard = 0.0;
-        v_col *= 0.0;
-    }
 
     gl_Position = u_projModelView * vec4(pos, 0.0) * v_discard;
     gl_PointSize = u_alphaSizeFovBr.y * sizefactor;

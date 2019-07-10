@@ -94,7 +94,7 @@ public class ControlsWindow extends CollapsibleWindow implements IObserver {
         TimeComponent timeComponent = new TimeComponent(skin, ui);
         timeComponent.initialize();
 
-        String shortcut = KeyBindings.instance.getStringKeys(I18n.txt("action.expandcollapse.pane", I18n.txt("gui.time")));
+        String shortcut = KeyBindings.instance.getStringKeys("action.expandcollapse.pane/gui.time");
 
         CollapsiblePane time = new CollapsiblePane(ui, I18n.txt("gui.time"), timeComponent.getActor(), skin, true, shortcut, playstop);
         time.align(Align.left);
@@ -145,7 +145,7 @@ public class ControlsWindow extends CollapsibleWindow implements IObserver {
         CameraComponent cameraComponent = new CameraComponent(skin, ui);
         cameraComponent.initialize();
 
-        shortcut = KeyBindings.instance.getStringKeys(I18n.txt("action.expandcollapse.pane", I18n.txt("gui.camera")));
+        shortcut = KeyBindings.instance.getStringKeys("action.expandcollapse.pane/gui.camera");
 
         CollapsiblePane camera = new CollapsiblePane(ui, I18n.txt("gui.camera"), cameraComponent.getActor(), skin, false, shortcut, recCamera, recKeyframeCamera, playCamera);
         camera.align(Align.left);
@@ -157,7 +157,7 @@ public class ControlsWindow extends CollapsibleWindow implements IObserver {
         visibilityComponent.setVisibilityEntitites(visibilityEntities, visible);
         visibilityComponent.initialize();
 
-        shortcut = KeyBindings.instance.getStringKeys(I18n.txt("action.expandcollapse.pane", I18n.txt("gui.visibility")));
+        shortcut = KeyBindings.instance.getStringKeys("action.expandcollapse.pane/gui.visibility");
 
         CollapsiblePane visibility = new CollapsiblePane(ui, I18n.txt("gui.visibility"), visibilityComponent.getActor(), skin, false, shortcut);
         visibility.align(Align.left);
@@ -168,7 +168,7 @@ public class ControlsWindow extends CollapsibleWindow implements IObserver {
         VisualEffectsComponent visualEffectsComponent = new VisualEffectsComponent(skin, ui);
         visualEffectsComponent.initialize();
 
-        shortcut = KeyBindings.instance.getStringKeys(I18n.txt("action.expandcollapse.pane", I18n.txt("gui.lighting")));
+        shortcut = KeyBindings.instance.getStringKeys("action.expandcollapse.pane/gui.lighting");
 
         CollapsiblePane visualEffects = new CollapsiblePane(ui, I18n.txt("gui.lighting"), visualEffectsComponent.getActor(), skin, false, shortcut);
         visualEffects.align(Align.left);
@@ -179,7 +179,7 @@ public class ControlsWindow extends CollapsibleWindow implements IObserver {
         DatasetsComponent datasetsComponent = new DatasetsComponent(skin, ui);
         datasetsComponent.initialize();
 
-        shortcut = KeyBindings.instance.getStringKeys(I18n.txt("action.expandcollapse.pane", I18n.txt("gui.dataset.title")));
+        shortcut = KeyBindings.instance.getStringKeys("action.expandcollapse.pane/gui.dataset.title");
 
         CollapsiblePane datasets = new CollapsiblePane(ui, I18n.txt("gui.dataset.title"), datasetsComponent.getActor(), skin, false, shortcut);
         datasets.align(Align.left);
@@ -191,7 +191,7 @@ public class ControlsWindow extends CollapsibleWindow implements IObserver {
         objectsComponent.setSceneGraph(sg);
         objectsComponent.initialize();
 
-        shortcut = KeyBindings.instance.getStringKeys(I18n.txt("action.expandcollapse.pane", I18n.txt("gui.objects")));
+        shortcut = KeyBindings.instance.getStringKeys("action.expandcollapse.pane/gui.objects");
 
         CollapsiblePane objects = new CollapsiblePane(ui, I18n.txt("gui.objects"), objectsComponent.getActor(), skin, false, shortcut);
         objects.align(Align.left);
@@ -213,7 +213,7 @@ public class ControlsWindow extends CollapsibleWindow implements IObserver {
 
         Actor[] musicActors = MusicActorsManager.getMusicActors() != null ? MusicActorsManager.getMusicActors().getActors(skin) : null;
 
-        shortcut = KeyBindings.instance.getStringKeys(I18n.txt("action.expandcollapse.pane", I18n.txt("gui.music")));
+        shortcut = KeyBindings.instance.getStringKeys("action.expandcollapse.pane/gui.music");
 
         CollapsiblePane music = new CollapsiblePane(ui, I18n.txt("gui.music"), musicComponent.getActor(), skin, false, shortcut, musicActors);
         music.align(Align.left);

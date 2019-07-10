@@ -18,10 +18,7 @@ import gaia.cu9.ari.gaiaorbit.scenegraph.CelestialBody;
 import gaia.cu9.ari.gaiaorbit.scenegraph.IFocus;
 import gaia.cu9.ari.gaiaorbit.scenegraph.IStarFocus;
 import gaia.cu9.ari.gaiaorbit.scenegraph.Planet;
-import gaia.cu9.ari.gaiaorbit.util.Constants;
-import gaia.cu9.ari.gaiaorbit.util.GlobalConf;
-import gaia.cu9.ari.gaiaorbit.util.Nature;
-import gaia.cu9.ari.gaiaorbit.util.TwoWayHashmap;
+import gaia.cu9.ari.gaiaorbit.util.*;
 import gaia.cu9.ari.gaiaorbit.util.camera.CameraUtils;
 import gaia.cu9.ari.gaiaorbit.util.coord.Coordinates;
 import gaia.cu9.ari.gaiaorbit.util.math.Vector3d;
@@ -56,30 +53,6 @@ public class CameraManager implements ICamera, IObserver {
 
         static TwoWayHashmap<String, CameraMode> equivalences;
 
-        static {
-            String fc = "Free mode";
-            String foc = "Focus mode";
-            String ga = "Game mode";
-            //String rel = "Relativistic camera";
-            String gs = "Gaia scene mode";
-            String sc = "Spacecraft mode";
-            String f1 = "Gaia FOV 1 mode";
-            String f2 = "Gaia FOV 2 mode";
-            String f12 = "Gaia FOVs mode";
-
-            equivalences = new TwoWayHashmap<>();
-            equivalences.add(fc, FREE_MODE);
-            equivalences.add(foc, FOCUS_MODE);
-            equivalences.add(ga, GAME_MODE);
-            //equivalences.add(rel, Relativistic);
-            equivalences.add(gs, GAIA_SCENE_MODE);
-            equivalences.add(sc, SPACECRAFT_MODE);
-            equivalences.add(f1, GAIA_FOV1_MODE);
-            equivalences.add(f2, GAIA_FOV2_MODE);
-            equivalences.add(f12, GAIA_FOVS_MODE);
-
-        }
-
         public static CameraMode getMode(int idx) {
             if (idx >= 0 && idx < CameraMode.values().length) {
                 return CameraMode.values()[idx];
@@ -88,13 +61,12 @@ public class CameraManager implements ICamera, IObserver {
             }
         }
 
-        @Override
-        public String toString() {
-            return equivalences.getBackward(this);
+        public String getKey(){
+            return "camera." + toString();
         }
 
-        public static CameraMode fromString(String str) {
-            return equivalences.getForward(str);
+        public String toStringI18n(){
+            return I18n.txt(getKey());
         }
 
         public boolean isGaiaFov() {

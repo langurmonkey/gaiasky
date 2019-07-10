@@ -174,6 +174,10 @@ public class SysUtils {
         return new File(getDataDir(), MAPPINGS_DIR_NAME);
     }
 
+    public static String getMappingsDirName(){
+        return MAPPINGS_DIR_NAME;
+    }
+
     /**
      * Gets a file pointer to the local data directory where the data files are downloaded and stored.
      *

@@ -835,7 +835,7 @@ public class PreferencesWindow extends GenericDialog {
         // CONTROLLER MAPPINGS
         OwnLabel mappingsLabel = new OwnLabel(I18n.txt("gui.controller.mappingsfile"), skin);
         Array<FileComboBoxBean> controllerMappingsFiles = new Array<>();
-        FileHandle mappingsAssets = new FileHandle(GlobalConf.ASSETS_LOC + File.separator + "mappings");
+        FileHandle mappingsAssets = new FileHandle(GlobalConf.ASSETS_LOC + File.separator + SysUtils.getMappingsDirName());
         FileHandle mappingsData = Gdx.files.absolute(SysUtils.getDefaultMappingsDir().getPath());
         Array<FileHandle> mappingFiles = new Array<>();
         GlobalResources.listRec(mappingsAssets, mappingFiles, ".inputListener", ".controller");

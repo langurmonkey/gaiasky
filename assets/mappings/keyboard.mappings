@@ -1,0 +1,107 @@
+# This file contains the key mappings for Gaia Sky.
+
+# Each line contains an action=keys pair, where action is the
+# action id and keys is a list of keys to map to the action.
+# If you need to map more than one key combination to the same
+# action, just repeat the same action more than once.
+
+# Blank lines and lines starting with '#' are ignored.
+
+# Help
+action.help                                 = F1
+action.help                                 = H
+
+# Exit
+action.exit                                 = ESC
+
+action.preferences                          = P
+
+#action.playcamera                          = C
+
+# Visibility toggles
+action.toggle/element.orbits                = SHIFT_L O
+action.toggle/element.planets               = SHIFT_L P
+action.toggle/element.moons                 = SHIFT_L M
+action.toggle/element.stars                 = SHIFT_L S
+action.toggle/element.satellites            = SHIFT_L T
+action.toggle/element.asteroids             = SHIFT_L A
+action.toggle/element.labels                = SHIFT_L L
+action.toggle/element.constellations        = SHIFT_L C
+action.toggle/element.boundaries            = SHIFT_L B
+action.toggle/element.equatorial            = SHIFT_L Q
+action.toggle/element.ecliptic              = SHIFT_L E
+action.toggle/element.galactic              = SHIFT_L G
+action.toggle/element.meshes                = SHIFT_L H
+action.toggle/element.clusters              = SHIFT_L V
+
+# Time
+action.dividetime                           = COMMA
+action.doubletime                           = PERIOD
+action.pauseresume                          = SPACE
+
+# Magnitudes
+action.incmag                               = EQUALS
+action.decmag                               = MINUS
+action.resetmag                             = STAR
+
+# Screen modes and effects
+action.togglefs                             = F11
+action.fisheye                              = F4
+action.screenshot                           = F5
+action.toggle/element.frameoutput           = F6
+action.toggle/element.controls              = U
+action.toggle/element.360                   = CTRL_L K
+action.toggle/element.projection            = CTRL_L SHIFT_L K
+action.toggle/element.stereomode            = CTRL_L S
+action.switchstereoprofile                  = CTRL_L SHIFT_L S
+action.toggle/element.planetarium           = CTRL_L P
+action.toggle/element.cleanmode             = CTRL_L U
+action.toggle/gui.mousecapture              = CTRL_L SHIFT_L L
+
+# Keyframes
+action.keyframe                             = CTRL_L W
+
+# Camera modes
+camera.full/camera.FREE_MODE                = NUM_0
+camera.full/camera.FOCUS_MODE               = NUM_1
+camera.full/camera.GAME_MODE                = NUM_2
+camera.full/camera.GAIA_SCENE_MODE          = NUM_3
+camera.full/camera.SPACECRAFT_MODE          = NUM_4
+camera.full/camera.GAIA_FOV1_MODE           = NUM_5
+camera.full/camera.GAIA_FOV2_MODE           = NUM_6
+camera.full/camera.GAIA_FOVS_MODE           = NUM_7
+
+camera.full/camera.FREE_MODE                = NUMPAD_0
+camera.full/camera.FOCUS_MODE               = NUMPAD_1
+camera.full/camera.GAME_MODE                = NUMPAD_2
+camera.full/camera.GAIA_SCENE_MODE          = NUMPAD_3
+camera.full/camera.SPACECRAFT_MODE          = NUMPAD_4
+camera.full/camera.GAIA_FOV1_MODE           = NUMPAD_5
+camera.full/camera.GAIA_FOV2_MODE           = NUMPAD_6
+camera.full/camera.GAIA_FOVS_MODE           = NUMPAD_7
+
+# Debug info
+action.toggle/element.debugmode             = CTRL_L D
+
+# Search
+action.search                               = CTRL_L F
+action.search                               = F
+action.search                               = SLASH
+
+# Stars and particles
+action.toggle/element.octreeparticlefade    = CTRL_L SHIFT_L O
+action.starpointsize.reset                  = CTRL_L SHIFT_L R
+
+# General actions
+action.gotoobject                           = CTRL_L G
+action.resettime                            = CTRL_L R
+action.toggle/gui.minimap.title             = TAB
+
+# GUI elements
+action.expandcollapse.pane/gui.time         = ALT_L T
+action.expandcollapse.pane/gui.camera       = ALT_L C
+action.expandcollapse.pane/gui.visibility   = ALT_L V
+action.expandcollapse.pane/gui.lighting     = ALT_L L
+action.expandcollapse.pane/gui.dataset.title= ALT_L D
+action.expandcollapse.pane/gui.objects      = ALT_L O
+action.expandcollapse.pane/gui.music        = ALT_L M

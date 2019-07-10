@@ -9,9 +9,11 @@ import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener.ChangeEvent;
 import com.badlogic.gdx.utils.Align;
+import com.badlogic.gdx.utils.Array;
 import gaia.cu9.ari.gaiaorbit.event.EventManager;
 import gaia.cu9.ari.gaiaorbit.event.Events;
 import gaia.cu9.ari.gaiaorbit.event.IObserver;
+import gaia.cu9.ari.gaiaorbit.interfce.beans.CameraComboBoxBean;
 import gaia.cu9.ari.gaiaorbit.scenegraph.camera.CameraManager.CameraMode;
 import gaia.cu9.ari.gaiaorbit.util.Constants;
 import gaia.cu9.ari.gaiaorbit.util.GlobalConf;
@@ -26,7 +28,8 @@ import java.util.List;
 public class CameraComponent extends GuiComponent implements IObserver {
 
     protected OwnLabel fov, speed, turn, rotate, date;
-    protected SelectBox<String> cameraMode, cameraSpeedLimit;
+    protected SelectBox<String> cameraSpeedLimit;
+    protected SelectBox<CameraComboBoxBean> cameraMode;
     protected Slider fieldOfView, cameraSpeed, turnSpeed, rotateSpeed;
     protected CheckBox focusLock, orientationLock, crosshair, cinematic;
     protected OwnTextIconButton button3d, buttonDome, buttonCubemap, buttonAnaglyph, button3dtv, buttonVR, buttonCrosseye;
@@ -58,9 +61,9 @@ public class CameraComponent extends GuiComponent implements IObserver {
 
         Label modeLabel = new Label(I18n.txt("gui.camera.mode"), skin, "default");
         int cameraModes = CameraMode.values().length;
-        String[] cameraOptions = new String[cameraModes];
+        CameraComboBoxBean[] cameraOptions = new CameraComboBoxBean[cameraModes];
         for (int i = 0; i < cameraModes; i++) {
-            cameraOptions[i] = CameraMode.getMode(i).toString();
+            cameraOptions[i] = new CameraComboBoxBean(CameraMode.getMode(i).toStringI18n(), CameraMode.getMode(i));
         }
         cameraMode = new OwnSelectBox<>(skin);
         cameraMode.setName("camera mode");
@@ -68,15 +71,8 @@ public class CameraComponent extends GuiComponent implements IObserver {
         cameraMode.setItems(cameraOptions);
         cameraMode.addListener(event -> {
             if (event instanceof ChangeEvent) {
-                String selection = cameraMode.getSelected();
-                CameraMode mode;
-                try {
-                    mode = CameraMode.fromString(selection);
-                } catch (IllegalArgumentException e) {
-                    // Foucs to one of our models
-                    mode = CameraMode.FOCUS_MODE;
-                    EventManager.instance.post(Events.FOCUS_CHANGE_CMD, selection, true);
-                }
+                CameraComboBoxBean selection = cameraMode.getSelected();
+                CameraMode mode = selection.mode;
 
                 EventManager.instance.post(Events.CAMERA_MODE_CMD, mode);
                 return true;
@@ -164,7 +160,7 @@ public class CameraComponent extends GuiComponent implements IObserver {
         speedLimits[17] = I18n.txt("gui.camera.speedlimit.pcs", 1000);
         speedLimits[18] = I18n.txt("gui.camera.speedlimit.nolimit");
 
-        cameraSpeedLimit = new OwnSelectBox<String>(skin);
+        cameraSpeedLimit = new OwnSelectBox<>(skin);
         cameraSpeedLimit.setName("camera speed limit");
         cameraSpeedLimit.setWidth(width);
         cameraSpeedLimit.setItems(speedLimits);
@@ -333,9 +329,21 @@ public class CameraComponent extends GuiComponent implements IObserver {
         case CAMERA_MODE_CMD:
             // Update camera mode selection
             CameraMode mode = (CameraMode) data[0];
-            cameraMode.getSelection().setProgrammaticChangeEvents(false);
-            cameraMode.setSelected(mode.toString());
-            cameraMode.getSelection().setProgrammaticChangeEvents(true);
+            Array<CameraComboBoxBean> cModes = cameraMode.getItems();
+            CameraComboBoxBean selected = null;
+            for(CameraComboBoxBean ccbb : cModes){
+                if(ccbb.mode == mode){
+                    selected = ccbb;
+                    break;
+                }
+            }
+            if(selected != null) {
+                cameraMode.getSelection().setProgrammaticChangeEvents(false);
+                cameraMode.setSelected(selected);
+                cameraMode.getSelection().setProgrammaticChangeEvents(true);
+            } else {
+                // Error?
+            }
             break;
         case ROTATION_SPEED_CMD:
             Boolean interf = (Boolean) data[1];
