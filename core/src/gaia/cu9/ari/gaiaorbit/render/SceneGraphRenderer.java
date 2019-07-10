@@ -174,8 +174,8 @@ public class SceneGraphRenderer extends AbstractRenderer implements IProcessRend
         lineGpuDesc = loadShader(manager, "shader/line.gpu.vertex.glsl", "shader/line.gpu.fragment.glsl", genShaderNames("line.gpu"), defines);
         galDesc = loadShader(manager, "shader/gal.vertex.glsl", "shader/gal.fragment.glsl", genShaderNames("gal"), defines);
         particleEffectDesc = loadShader(manager, "shader/particle.effect.vertex.glsl", "shader/particle.effect.fragment.glsl", genShaderNames("particle.effect"), defines);
-        particleGroupDesc = loadShader(manager, "shader/particle.group.vertex.glsl", "shader/particle.group.fragment.glsl", genShaderNames("particle.group"), defines);
-        starGroupDesc = loadShader(manager, "shader/star.group.vertex.glsl", "shader/star.group.fragment.glsl", genShaderNames("star.group"), defines);
+        particleGroupDesc = loadShader(manager, "shader/particle.group.vertex.glsl", "shader/particle.group.fragment.glsl", genShaderNames("particle.vgroup"), defines);
+        starGroupDesc = loadShader(manager, "shader/star.group.vertex.glsl", "shader/star.group.fragment.glsl", genShaderNames("star.vgroup"), defines);
         orbitElemDesc = loadShader(manager, "shader/orbitelem.vertex.glsl", "shader/particle.group.fragment.glsl", genShaderNames("orbitelem"), defines);
 
         // Add shaders to load (with providers)
@@ -330,12 +330,12 @@ public class SceneGraphRenderer extends AbstractRenderer implements IProcessRend
         /*
          * PARTICLE GROUP - default and relativistic
          */
-        particleGroupShaders = fetchShaderProgram(manager, particleGroupDesc, genShaderFullNames("particle.group"));
+        particleGroupShaders = fetchShaderProgram(manager, particleGroupDesc, genShaderFullNames("particle.vgroup"));
 
         /*
          * STAR GROUP - default and relativistic
          */
-        starGroupShaders = fetchShaderProgram(manager, starGroupDesc, genShaderFullNames("star.group"));
+        starGroupShaders = fetchShaderProgram(manager, starGroupDesc, genShaderFullNames("star.vgroup"));
 
         /*
          * STAR POINT
@@ -975,7 +975,7 @@ public class SceneGraphRenderer extends AbstractRenderer implements IProcessRend
         int size = renderProcesses.size;
         for (int i = 0; i < size; i++) {
             IRenderSystem process = renderProcesses.get(i);
-            // If we have no render group, this means all the info is already in
+            // If we have no render vgroup, this means all the info is already in
             // the render system. No lists needed
             if (process.getRenderGroup() != null) {
                 Array<IRenderable> l = render_lists.get(process.getRenderGroup().ordinal());
@@ -1006,7 +1006,7 @@ public class SceneGraphRenderer extends AbstractRenderer implements IProcessRend
         for (int i = 0; i < size; i++) {
             IRenderSystem process = renderProcesses.get(i);
             if (clazz.isInstance(process)) {
-                // If we have no render group, this means all the info is already in
+                // If we have no render vgroup, this means all the info is already in
                 // the render system. No lists needed
                 if (process.getRenderGroup() != null) {
                     Array<IRenderable> l = render_lists.get(process.getRenderGroup().ordinal());

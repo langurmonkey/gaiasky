@@ -56,7 +56,7 @@ public class SceneGraphNode implements IStarContainer, IPosition {
     protected static TLV3 aux3f1 = new TLV3(), aux3f2 = new TLV3(), aux3f3 = new TLV3(), aux3f4 = new TLV3();
 
     /**
-     * Describes to which render group this node belongs at a particular time
+     * Describes to which render vgroup this node belongs at a particular time
      * step.
      */
     public enum RenderGroup {
@@ -701,12 +701,12 @@ public class SceneGraphNode implements IStarContainer, IPosition {
     }
 
     /**
-     * Adds the given renderable to the given render group list
+     * Adds the given renderable to the given render vgroup list
      * 
      * @param renderable
      *            The renderable to add
      * @param rg
-     *            The render group that identifies the renderable list
+     *            The render vgroup that identifies the renderable list
      * @return True if added, false otherwise
      */
     protected boolean addToRender(IRenderable renderable, RenderGroup rg) {
@@ -719,12 +719,12 @@ public class SceneGraphNode implements IStarContainer, IPosition {
     }
 
     /**
-     * Removes the given renderable from the given render group list.
+     * Removes the given renderable from the given render vgroup list.
      * 
      * @param renderable
      *            The renderable to remove
      * @param rg
-     *            The render group to remove from
+     *            The render vgroup to remove from
      * @return True if removed, false otherwise
      */
     protected boolean removeFromRender(IRenderable renderable, RenderGroup rg) {

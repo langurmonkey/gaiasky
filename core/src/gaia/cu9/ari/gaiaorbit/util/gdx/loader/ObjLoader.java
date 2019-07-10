@@ -140,7 +140,7 @@ public class ObjLoader extends IntModelLoader<ObjLoader.ObjLoaderParameters> {
         char firstChar;
         MtlLoader mtl = new MtlLoader();
 
-        // Create a "default" Group and set it as the active group, in case
+        // Create a "default" Group and set it as the active vgroup, in case
         // there are no groups or objects defined in the OBJ file.
         Group activeGroup = new Group("default");
         groups.add(activeGroup);
@@ -202,9 +202,9 @@ public class ObjLoader extends IntModelLoader<ObjLoader.ObjLoaderParameters> {
                         activeGroup.numFaces++;
                     }
                 } else if (firstChar == 'o' || firstChar == 'g') {
-                    // This implementation only supports single object or group
+                    // This implementation only supports single object or vgroup
                     // definitions. i.e. "o group_a group_b" will set group_a
-                    // as the active group, while group_b will simply be
+                    // as the active vgroup, while group_b will simply be
                     // ignored.
                     if (tokens.length > 1)
                         activeGroup = setActiveGroup(tokens[1]);
@@ -224,7 +224,7 @@ public class ObjLoader extends IntModelLoader<ObjLoader.ObjLoaderParameters> {
             return null;
         }
 
-        // If the "default" group or any others were not used, get rid of them
+        // If the "default" vgroup or any others were not used, get rid of them
         for (int i = 0; i < groups.size; i++) {
             if (groups.get(i).numFaces < 1) {
                 groups.removeIndex(i);

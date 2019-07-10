@@ -15,7 +15,7 @@ import gaia.cu9.ari.gaiaorbit.util.math.Vector3d;
 import gaia.cu9.ari.gaiaorbit.util.time.ITimeFrameProvider;
 
 /**
- * Represents a group of vertices which are sent to the GPU in a VBO
+ * Represents a vgroup of vertices which are sent to the GPU in a VBO
  *
  * @author tsagrista
  */
@@ -29,7 +29,7 @@ public class VertsObject extends AbstractPositionEntity implements IGPUVertsRend
 
     protected boolean blend = true, depth = true;
 
-    /** The render group **/
+    /** The render vgroup **/
     protected RenderGroup renderGroup;
 
     /** Whether to close the polyline (connect end point to start point) or not **/

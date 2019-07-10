@@ -12,7 +12,7 @@ import gaia.cu9.ari.gaiaorbit.util.GlobalConf;
 import gaia.cu9.ari.gaiaorbit.util.math.Vector3d;
 
 /**
- * A group of points
+ * A vgroup of points
  */
 public class Points extends VertsObject implements IPointRenderable {
 

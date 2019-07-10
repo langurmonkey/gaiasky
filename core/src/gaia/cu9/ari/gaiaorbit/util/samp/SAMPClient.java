@@ -195,7 +195,7 @@ public class SAMPClient implements IObserver {
     }
 
     /**
-     * Loads a VOTable into a star group
+     * Loads a VOTable into a star vgroup
      *
      * @param url  The URL to fetch the table
      * @param id   The table id

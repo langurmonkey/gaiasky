@@ -14,16 +14,12 @@ import gaia.cu9.ari.gaiaorbit.desktop.util.SysUtils;
 import gaia.cu9.ari.gaiaorbit.event.EventManager;
 import gaia.cu9.ari.gaiaorbit.event.Events;
 import gaia.cu9.ari.gaiaorbit.scenegraph.camera.CameraManager.CameraMode;
-import gaia.cu9.ari.gaiaorbit.util.GlobalConf;
+import gaia.cu9.ari.gaiaorbit.util.*;
 import gaia.cu9.ari.gaiaorbit.util.GlobalConf.ProgramConf.StereoProfile;
-import gaia.cu9.ari.gaiaorbit.util.GlobalResources;
-import gaia.cu9.ari.gaiaorbit.util.I18n;
-import gaia.cu9.ari.gaiaorbit.util.Logger;
 import gaia.cu9.ari.gaiaorbit.util.Logger.Log;
 import gaia.cu9.ari.gaiaorbit.util.gdx.contrib.postprocess.effects.CubemapProjections;
 
-import java.io.File;
-import java.io.InputStream;
+import java.io.*;
 import java.time.Instant;
 import java.util.*;
 
@@ -389,20 +385,16 @@ public class KeyBindings {
         }
         logger.info("Using keyboard mappings file: " + mappingsFile);
 
-        Properties p = new Properties();
         try {
-            InputStream is = mappingsFile.read();
-            p.load(is);
-            is.close();
+            Array<Pair<String, String>> mappings = readMappingsFile(mappingsFile);
 
-            Set<Object> keys = p.keySet();
-            for(Object k : keys){
-                String key = (String) k;
+            for(Pair<String, String> mapping : mappings){
+                String key = mapping.getFirst();
 
                 ProgramAction action = actions.get(key);
                 if(action != null){
                     // Parse keys
-                    String keyMappings[] = p.getProperty(key).trim().split("\\s+");
+                    String keyMappings[] = mapping.getSecond().trim().split("\\s+");
                     int[] keyCodes = new int[keyMappings.length];
                     for(int i =0; i < keyMappings.length; i++){
                         keyCodes[i] = GSKeys.valueOf(keyMappings[i]);
@@ -418,6 +410,22 @@ public class KeyBindings {
             logger.error(e, "Error loading keyboard mappings: " + mappingsFile.path());
         }
 
+    }
+
+    private Array<Pair<String,String>> readMappingsFile(FileHandle file) throws IOException {
+        Array<Pair<String, String>> result = new Array<>();
+        InputStream is = file.read();
+        BufferedReader br = new BufferedReader(new InputStreamReader(is));
+
+        String line;
+        while((line = br.readLine()) != null){
+            line = line.trim();
+            if(!line.isEmpty() && !line.startsWith("#")){
+                String[] strPair = line.split("=");
+                result.add(new Pair<String, String>(strPair[0].trim(), strPair[1].trim()));
+            }
+        }
+        return result;
     }
 
     /**

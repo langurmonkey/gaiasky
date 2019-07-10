@@ -69,7 +69,7 @@ public class OctreeGroupLoader extends StreamingOctreeLoader {
             logger.info(I18n.bundle.format("notif.loading", particles));
 
             /**
-             * CREATE OCTREE WRAPPER WITH ROOT NODE - particle group is by default
+             * CREATE OCTREE WRAPPER WITH ROOT NODE - particle vgroup is by default
              * parallel, so we never use OctreeWrapperConcurrent
              */
             AbstractOctreeWrapper octreeWrapper = new OctreeWrapper("Universe", root);

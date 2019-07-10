@@ -2044,7 +2044,7 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
                 DataSource ds = new FileDataSource(f);
                 @SuppressWarnings("unchecked") Array<StarBean> data = (Array<StarBean>) provider.loadData(ds, 1.0f);
 
-                // Create star group
+                // Create star vgroup
                 if (data != null && data.size > 0 && checkString(dsName, "datasetName")) {
                     Gdx.app.postRunnable(() -> {
                         StarGroup sg = StarGroup.getDefaultStarGroup(dsName, data);

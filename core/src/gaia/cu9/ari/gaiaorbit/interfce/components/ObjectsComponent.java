@@ -46,6 +46,10 @@ public class ObjectsComponent extends GuiComponent implements IObserver {
     protected TextField searchBox;
     protected OwnScrollPane focusListScrollPane;
 
+    protected Table infoTable;
+    protected Cell infoCell1, infoCell2;
+    protected OwnLabel infoMessage1, infoMessage2;
+
     /**
      * Tree to model equivalences
      */
@@ -58,8 +62,6 @@ public class ObjectsComponent extends GuiComponent implements IObserver {
 
     @Override
     public void initialize() {
-        float sp1 = 1 * GlobalConf.SCALE_FACTOR;
-        float sp4 = 4 * GlobalConf.SCALE_FACTOR;
         float componentWidth = 160 * GlobalConf.SCALE_FACTOR;
         searchBox = new OwnTextField("", skin);
         searchBox.setName("search box");
@@ -69,22 +71,29 @@ public class ObjectsComponent extends GuiComponent implements IObserver {
             if (event instanceof InputEvent) {
                 InputEvent ie = (InputEvent) event;
                 if (ie.getType() == Type.keyUp && !searchBox.getText().isEmpty()) {
-                    String text = searchBox.getText();
-                    if (sg.containsNode(text.toLowerCase())) {
-                        final SceneGraphNode node = sg.getNode(text.toLowerCase());
+                    String text = searchBox.getText().toLowerCase().trim();
+                    if (sg.containsNode(text)) {
+                        SceneGraphNode node = sg.getNode(text);
                         if (node instanceof IFocus) {
                             IFocus focus = (IFocus) node;
-                            if (!focus.isCoordinatesTimeOverflow()) {
+                            boolean timeOverflow = focus.isCoordinatesTimeOverflow();
+                            boolean ctOn = GaiaSky.instance.isOn(focus.getCt());
+                            if (!timeOverflow && ctOn) {
                                 Gdx.app.postRunnable(() -> {
                                     EventManager.instance.post(Events.CAMERA_MODE_CMD, CameraMode.FOCUS_MODE, true);
                                     EventManager.instance.post(Events.FOCUS_CHANGE_CMD, focus, true);
                                 });
+                            } else if (timeOverflow) {
+                                info(I18n.txt("gui.objects.search.timerange.1", text), I18n.txt("gui.objects.search.timerange.2"));
+                            } else {
+                                info(I18n.txt("gui.objects.search.invisible.1", text), I18n.txt("gui.objects.search.invisible.2", focus.getCt().toString()));
                             }
-
                         }
+                    } else {
+                        info(null, null);
                     }
-                    if(GaiaSky.instance.getICamera() instanceof NaturalCamera)
-                        ((NaturalCamera)GaiaSky.instance.getICamera()).getCurrentMouseKbdListener().removePressedKey(ie.getKeyCode());
+                    if (GaiaSky.instance.getICamera() instanceof NaturalCamera)
+                        ((NaturalCamera) GaiaSky.instance.getICamera()).getCurrentMouseKbdListener().removePressedKey(ie.getKeyCode());
 
                     if (ie.getKeyCode() == Keys.ESCAPE) {
                         // Lose focus
@@ -101,6 +110,15 @@ public class ObjectsComponent extends GuiComponent implements IObserver {
             return false;
         });
 
+        // Info message
+        infoTable = new Table(skin);
+        infoCell1 = infoTable.add();
+        infoTable.row();
+        infoCell2 = infoTable.add();
+
+        infoMessage1 = new OwnLabel("", skin, "default-blue");
+        infoMessage2 = new OwnLabel("", skin, "default-blue");
+
         /*
          * OBJECTS
          */
@@ -110,10 +128,10 @@ public class ObjectsComponent extends GuiComponent implements IObserver {
         logger.info(I18n.txt("notif.sgtree.init"));
 
         if (tree) {
-            final Tree objectsTree = new Tree(skin, "bright");
+            final Tree objectsTree = new Tree(skin);
             objectsTree.setName("objects list");
-            objectsTree.setPadding(sp1);
-            objectsTree.setIconSpacing(sp1, sp1);
+            objectsTree.setPadding(space2);
+            objectsTree.setIconSpacing(space2, space2);
             objectsTree.setYSpacing(0);
             Array<Node> nodes = createTree(sg.getRoot().children);
             for (Node node : nodes) {
@@ -146,10 +164,10 @@ public class ObjectsComponent extends GuiComponent implements IObserver {
             });
             objectsList = objectsTree;
         } else if (list) {
-            final com.badlogic.gdx.scenes.scene2d.ui.List<String> focusList = new com.badlogic.gdx.scenes.scene2d.ui.List<String>(skin, "light");
+            final com.badlogic.gdx.scenes.scene2d.ui.List<String> focusList = new com.badlogic.gdx.scenes.scene2d.ui.List<>(skin);
             focusList.setName("objects list");
             Array<IFocus> focusableObjects = sg.getFocusableObjects();
-            Array<String> names = new Array<String>(focusableObjects.size);
+            Array<String> names = new Array<>(focusableObjects.size);
 
             for (IFocus focus : focusableObjects) {
                 // Omit stars with no proper names
@@ -174,18 +192,26 @@ public class ObjectsComponent extends GuiComponent implements IObserver {
                 if (event instanceof ChangeEvent) {
                     ChangeEvent ce = (ChangeEvent) event;
                     Actor actor = ce.getTarget();
-                    @SuppressWarnings("unchecked") final String name = ((com.badlogic.gdx.scenes.scene2d.ui.List<String>) actor).getSelected();
-                    if (sg.containsNode(name)) {
-                        SceneGraphNode node = sg.getNode(name);
+                    @SuppressWarnings("unchecked") final String text = ((com.badlogic.gdx.scenes.scene2d.ui.List<String>) actor).getSelected().toLowerCase().trim();
+                    if (sg.containsNode(text)) {
+                        SceneGraphNode node = sg.getNode(text);
                         if (node instanceof IFocus) {
                             IFocus focus = (IFocus) node;
-                            if (!focus.isCoordinatesTimeOverflow()) {
+                            boolean timeOverflow = focus.isCoordinatesTimeOverflow();
+                            boolean ctOn = GaiaSky.instance.isOn(focus.getCt());
+                            if (!timeOverflow && ctOn) {
                                 Gdx.app.postRunnable(() -> {
                                     EventManager.instance.post(Events.CAMERA_MODE_CMD, CameraMode.FOCUS_MODE, true);
                                     EventManager.instance.post(Events.FOCUS_CHANGE_CMD, focus, true);
                                 });
+                            } else if (timeOverflow) {
+                                info(I18n.txt("gui.objects.search.timerange.1", text), I18n.txt("gui.objects.search.timerange.2"));
+                            } else {
+                                info(I18n.txt("gui.objects.search.invisible.1", text), I18n.txt("gui.objects.search.invisible.2", focus.getCt().toString()));
                             }
                         }
+                    } else {
+                        info(null, null);
                     }
                     return true;
                 }
@@ -196,7 +222,7 @@ public class ObjectsComponent extends GuiComponent implements IObserver {
         logger.info(I18n.txt("notif.sgtree.initialised"));
 
         if (tree || list) {
-            focusListScrollPane = new OwnScrollPane(objectsList, skin, "minimalist");
+            focusListScrollPane = new OwnScrollPane(objectsList, skin, "minimalist-nobg");
             focusListScrollPane.setName("objects list scroll");
 
             focusListScrollPane.setFadeScrollBars(false);
@@ -220,11 +246,12 @@ public class ObjectsComponent extends GuiComponent implements IObserver {
          * ADD TO CONTENT
          */
 
-        VerticalGroup objectsGroup = new VerticalGroup().align(Align.left).columnAlign(Align.left).space(sp4);
+        VerticalGroup objectsGroup = new VerticalGroup().align(Align.left).columnAlign(Align.left).space(space8);
         objectsGroup.addActor(searchBox);
         if (focusListScrollPane != null) {
             objectsGroup.addActor(focusListScrollPane);
         }
+        objectsGroup.addActor(infoTable);
 
         if (meshesGroup != null) {
             objectsGroup.addActor(meshesGroup);
@@ -240,10 +267,8 @@ public class ObjectsComponent extends GuiComponent implements IObserver {
 
     private Group visibilitySwitcher(Class<? extends FadeNode> clazz, String title, String id) {
         float componentWidth = 160 * GlobalConf.SCALE_FACTOR;
-        float sp4 = 4 * GlobalConf.SCALE_FACTOR;
-        float sp8 = 8 * GlobalConf.SCALE_FACTOR;
         VerticalGroup objectsVgroup = new VerticalGroup();
-        objectsVgroup.space(sp4);
+        objectsVgroup.space(space4);
         objectsVgroup.left();
         objectsVgroup.columnLeft();
         Array<SceneGraphNode> objects = new Array<>();
@@ -263,17 +288,15 @@ public class ObjectsComponent extends GuiComponent implements IObserver {
 
         for (String name : names) {
             HorizontalGroup objectHgroup = new HorizontalGroup();
-            objectHgroup.space(sp4);
+            objectHgroup.space(space4);
             objectHgroup.left();
-            OwnCheckBox cb = new OwnCheckBox(name, skin, sp4);
+            OwnCheckBox cb = new OwnCheckBox(name, skin, space4);
             IVisibilitySwitch obj = cmap.get(name);
             cb.setChecked(obj.isVisible());
 
             cb.addListener((event) -> {
                 if (event instanceof ChangeEvent && cmap.containsKey(name)) {
-                    Gdx.app.postRunnable(() -> {
-                        obj.setVisible(cb.isChecked());
-                    });
+                    Gdx.app.postRunnable(() -> obj.setVisible(cb.isChecked()));
                     return true;
                 }
                 return false;
@@ -281,12 +304,11 @@ public class ObjectsComponent extends GuiComponent implements IObserver {
 
             objectHgroup.addActor(cb);
             // Tooltips
-            if(obj.getDescription() != null) {
+            if (obj.getDescription() != null) {
                 ImageButton meshDescTooltip = new OwnImageButton(skin, "tooltip");
                 meshDescTooltip.addListener(new TextTooltip((obj.getDescription() == null || obj.getDescription().isEmpty() ? "No description" : obj.getDescription()), skin));
                 objectHgroup.addActor(meshDescTooltip);
             }
-
 
             objectsVgroup.addActor(objectHgroup);
             cbs.add(cb);
@@ -303,25 +325,23 @@ public class ObjectsComponent extends GuiComponent implements IObserver {
         scrollPane.setWidth(componentWidth);
 
         HorizontalGroup buttons = new HorizontalGroup();
-        buttons.space(sp4);
+        buttons.space(space4);
         OwnTextButton selAll = new OwnTextButton(I18n.txt("gui.select.all"), skin);
-        selAll.pad(0, sp8, 0, sp8);
+        selAll.pad(space2, space8, space2, space8);
+        selAll.setHeight(18 * GlobalConf.SCALE_FACTOR);
         selAll.addListener((event) -> {
             if (event instanceof ChangeEvent) {
-                Gdx.app.postRunnable(() -> {
-                    cbs.stream().forEach((i) -> i.setChecked(true));
-                });
+                Gdx.app.postRunnable(() -> cbs.stream().forEach((i) -> i.setChecked(true)));
                 return true;
             }
             return false;
         });
         OwnTextButton selNone = new OwnTextButton(I18n.txt("gui.select.none"), skin);
-        selNone.pad(0, sp8, 0, sp8);
+        selNone.pad(space2, space8, space2, space8);
+        selNone.setHeight(18 * GlobalConf.SCALE_FACTOR);
         selNone.addListener((event) -> {
             if (event instanceof ChangeEvent) {
-                Gdx.app.postRunnable(() -> {
-                    cbs.stream().forEach((i) -> i.setChecked(false));
-                });
+                Gdx.app.postRunnable(() -> cbs.stream().forEach((i) -> i.setChecked(false)));
                 return true;
             }
             return false;
@@ -332,7 +352,7 @@ public class ObjectsComponent extends GuiComponent implements IObserver {
         VerticalGroup group = new VerticalGroup();
         group.left();
         group.columnLeft();
-        group.space(sp4);
+        group.space(space4);
 
         group.addActor(new OwnLabel(TextUtils.trueCapitalise(title), skin, "header"));
         group.addActor(scrollPane);
@@ -361,6 +381,29 @@ public class ObjectsComponent extends GuiComponent implements IObserver {
 
     public void setSceneGraph(ISceneGraph sg) {
         this.sg = sg;
+    }
+
+    private void info(String info1, String info2) {
+        if (info1 == null) {
+            infoMessage1.setText("");
+            infoMessage2.setText("");
+            info(false);
+        } else {
+            infoMessage1.setText(info1);
+            infoMessage2.setText(info2);
+            info(true);
+        }
+    }
+
+    private void info(boolean visible) {
+        if (visible) {
+            infoCell1.setActor(infoMessage1);
+            infoCell2.setActor(infoMessage2);
+        } else {
+            infoCell1.setActor(null);
+            infoCell2.setActor(null);
+        }
+        infoTable.pack();
     }
 
     @Override

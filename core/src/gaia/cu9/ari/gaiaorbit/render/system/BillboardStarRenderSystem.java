@@ -40,7 +40,7 @@ public class BillboardStarRenderSystem extends AbstractRenderSystem {
      * Creates a new billboard quad render component.
      * 
      * @param rg
-     *            The render group.
+     *            The render vgroup.
      * @param alphas
      *            The alphas list.
      * @param shaderPrograms

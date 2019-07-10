@@ -36,7 +36,7 @@ import java.util.Random;
 /**
  * A single point particle.
  *
- * @deprecated Only the Sun uses this via the Star subclass. Move to star group.
+ * @deprecated Only the Sun uses this via the Star subclass. Move to star vgroup.
  * @author Toni Sagrista
  *
  */

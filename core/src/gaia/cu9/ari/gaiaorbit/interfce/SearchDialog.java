@@ -110,7 +110,7 @@ public class SearchDialog extends GenericDialog {
                     IFocus focus = ((IFocus) node).getFocus(text);
                     boolean timeOverflow = focus.isCoordinatesTimeOverflow();
                     boolean ctOn = GaiaSky.instance.isOn(focus.getCt());
-                    if (focus != null && !timeOverflow && ctOn) {
+                    if (!timeOverflow && ctOn) {
                         Gdx.app.postRunnable(() -> {
                             EventManager.instance.post(Events.CAMERA_MODE_CMD, CameraMode.FOCUS_MODE, true);
                             EventManager.instance.post(Events.FOCUS_CHANGE_CMD, focus, true);
@@ -119,10 +119,8 @@ public class SearchDialog extends GenericDialog {
                         return true;
                     } else if (timeOverflow){
                         info(I18n.txt("gui.objects.search.timerange", text));
-                    } else if(!ctOn){
-                        info(I18n.txt("gui.objects.search.invisible", text, focus.getCt().toString()));
                     } else {
-                        info(null);
+                        info(I18n.txt("gui.objects.search.invisible", text, focus.getCt().toString()));
                     }
                 }
             } else {

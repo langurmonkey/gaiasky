@@ -78,7 +78,7 @@ public class FadeNode extends AbstractPositionEntity {
     private long msSinceStateChange = Long.MAX_VALUE;
 
     /**
-     * Information on the catalog this fade node represents (particle group, octree, etc.)
+     * Information on the catalog this fade node represents (particle vgroup, octree, etc.)
      */
     protected CatalogInfo catalogInfo = null;
 

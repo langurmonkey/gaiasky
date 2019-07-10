@@ -5,7 +5,6 @@
 
 package gaia.cu9.ari.gaiaorbit.interfce.components;
 
-import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener.ChangeEvent;
@@ -34,8 +33,6 @@ public class VisualEffectsComponent extends GuiComponent implements IObserver {
     }
 
     public void initialize() {
-        float space4 = 4 * GlobalConf.SCALE_FACTOR;
-        float space2 = 2 * GlobalConf.SCALE_FACTOR;
         float sliderWidth = 140 * GlobalConf.SCALE_FACTOR;
         /** Star brightness **/
         Label sbrightnessLabel = new Label(I18n.txt("gui.starbrightness"), skin, "default");
@@ -140,23 +137,15 @@ public class VisualEffectsComponent extends GuiComponent implements IObserver {
 
         VerticalGroup lightingGroup = new VerticalGroup().align(Align.left).columnAlign(Align.left);
         lightingGroup.space(space4);
-        lightingGroup.addActor(group(sbrightnessLabel, sbrightnessGroup, space2));
-        lightingGroup.addActor(group(sizeLabel, sizeGroup, space2));
-        lightingGroup.addActor(group(opacityLabel, opacityGroup, space2));
-        lightingGroup.addActor(group(ambientLightLabel, ambientGroup, space2));
-        lightingGroup.addActor(group(labelSizeLabel, labelSizeGroup, space2));
+        lightingGroup.addActor(vgroup(sbrightnessLabel, sbrightnessGroup, space2));
+        lightingGroup.addActor(vgroup(sizeLabel, sizeGroup, space2));
+        lightingGroup.addActor(vgroup(opacityLabel, opacityGroup, space2));
+        lightingGroup.addActor(vgroup(ambientLightLabel, ambientGroup, space2));
+        lightingGroup.addActor(vgroup(labelSizeLabel, labelSizeGroup, space2));
 
         component = lightingGroup;
 
         EventManager.instance.subscribe(this, Events.STAR_POINT_SIZE_CMD, Events.STAR_BRIGHTNESS_CMD, Events.LIGHT_SCATTERING_CMD, Events.STAR_MIN_OPACITY_CMD);
-    }
-
-    private VerticalGroup group(Actor ac1, Actor ac2, float sp){
-        VerticalGroup vg = new VerticalGroup().align(Align.left).columnAlign(Align.left);
-        vg.space(sp);
-        vg.addActor(ac1);
-        vg.addActor(ac2);
-        return vg;
     }
 
     @Override

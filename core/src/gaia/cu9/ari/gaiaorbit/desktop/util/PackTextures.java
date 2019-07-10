@@ -6,7 +6,7 @@
 package gaia.cu9.ari.gaiaorbit.desktop.util;
 
 public class PackTextures {
-    public static void main(String[] args) throws Exception {
+    public static void main(String[] args) {
         //TexturePacker.Settings x1settings = new TexturePacker.Settings();
         //TexturePacker.Settings x2settings = new TexturePacker.Settings();
         //x2settings.scale[0] = 2;

@@ -1174,7 +1174,7 @@ public class PreferencesWindow extends GenericDialog {
         // Keyframe preferences
         Button keyframePrefs = new OwnTextIconButton(I18n.txt("gui.keyframes.preferences"), skin, "preferences");
         keyframePrefs.setName("keyframe preferences");
-        keyframePrefs.pad(pad5);
+        keyframePrefs.pad(pad);
         keyframePrefs.addListener(new TextTooltip(I18n.txt("gui.tooltip.kf.editprefs"), skin));
         keyframePrefs.addListener((event) -> {
             if (event instanceof ChangeListener.ChangeEvent) {
@@ -1400,7 +1400,7 @@ public class PreferencesWindow extends GenericDialog {
 
             return false;
         });
-        reloadDefaults.setWidth(180 * GlobalConf.SCALE_FACTOR);
+        reloadDefaults.setSize(180 * GlobalConf.SCALE_FACTOR, 25 * GlobalConf.SCALE_FACTOR);
 
         OwnLabel warningLabel = new OwnLabel(I18n.txt("gui.system.reloaddefaults.warn"), skin, "default-red");
 

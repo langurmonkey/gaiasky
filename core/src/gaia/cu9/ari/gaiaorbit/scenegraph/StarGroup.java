@@ -60,7 +60,7 @@ import java.util.TreeMap;
 import java.util.concurrent.*;
 
 /**
- * A particle group which additionally to the xyz position, supports color and
+ * A particle vgroup which additionally to the xyz position, supports color and
  * magnitude. id x y z pmx pmy pmz appmag absmag col size additional
  *
  * @author tsagrista
@@ -389,7 +389,7 @@ public class StarGroup extends ParticleGroup implements ILineRenderable, IStarFo
 
     /**
      * Generates the index (maps star name and id to array index)
-     * and computes the geometric center of this star group
+     * and computes the geometric center of this star vgroup
      *
      * @param pointData The star data
      * @return An map{string,int} mapping names/ids to indexes
@@ -455,7 +455,7 @@ public class StarGroup extends ParticleGroup implements ILineRenderable, IStarFo
     }
 
     /**
-     * Updates the parameters of the focus, if the focus is active in this group
+     * Updates the parameters of the focus, if the focus is active in this vgroup
      *
      * @param time   The time frame provider
      * @param camera The current camera
@@ -1074,7 +1074,7 @@ public class StarGroup extends ParticleGroup implements ILineRenderable, IStarFo
     }
 
     /**
-     * Sets the epoch to use for the stars in this group
+     * Sets the epoch to use for the stars in this vgroup
      *
      * @param epochJd The epoch in julian days (days since January 1, 4713 BCE)
      */
@@ -1083,7 +1083,7 @@ public class StarGroup extends ParticleGroup implements ILineRenderable, IStarFo
     }
 
     /**
-     * Returns the epoch in Julian Days used for the stars in this group
+     * Returns the epoch in Julian Days used for the stars in this vgroup
      *
      * @return The epoch in julian days
      */
@@ -1144,23 +1144,23 @@ public class StarGroup extends ParticleGroup implements ILineRenderable, IStarFo
     }
 
     /**
-     * Creates a default star group with some sane parameters, given the name and the data
+     * Creates a default star vgroup with some sane parameters, given the name and the data
      *
-     * @param name The name of the star group. Any occurrence of '%%SGID%%' in name will be replaced with the id of the star group
-     * @param data The data of the star group
-     * @return A new star group with sane parameters
+     * @param name The name of the star vgroup. Any occurrence of '%%SGID%%' in name will be replaced with the id of the star vgroup
+     * @param data The data of the star vgroup
+     * @return A new star vgroup with sane parameters
      */
     public static StarGroup getDefaultStarGroup(String name, Array<StarBean> data) {
         return getDefaultStarGroup(name, data, true);
     }
 
     /**
-     * Creates a default star group with some sane parameters, given the name and the data
+     * Creates a default star vgroup with some sane parameters, given the name and the data
      *
-     * @param name The name of the star group. Any occurrence of '%%SGID%%' in name will be replaced with the id of the star group
-     * @param data The data of the star group
-     * @param fullInit Initializes the group right away
-     * @return A new star group with sane parameters
+     * @param name The name of the star vgroup. Any occurrence of '%%SGID%%' in name will be replaced with the id of the star vgroup
+     * @param data The data of the star vgroup
+     * @param fullInit Initializes the vgroup right away
+     * @return A new star vgroup with sane parameters
      */
     public static StarGroup getDefaultStarGroup(String name, Array<StarBean> data, boolean fullInit) {
         StarGroup sg = new StarGroup();

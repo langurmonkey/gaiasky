@@ -20,7 +20,7 @@ public class ModelBatchTessellationRenderSystem extends AbstractRenderSystem {
     /**
      * Creates a new model batch render component.
      *
-     * @param rg     The render group.
+     * @param rg     The render vgroup.
      * @param alphas The alphas list.
      * @param batch  The model batch.
      */

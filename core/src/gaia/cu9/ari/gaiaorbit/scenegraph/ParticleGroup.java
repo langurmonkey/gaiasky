@@ -42,8 +42,8 @@ import gaia.cu9.ari.gaiaorbit.util.time.ITimeFrameProvider;
 import java.io.Serializable;
 
 /**
- * This class represents a group of non-focusable particles, all with the same
- * luminosity. The contents of this group will be sent once to GPU memory and
+ * This class represents a vgroup of non-focusable particles, all with the same
+ * luminosity. The contents of this vgroup will be sent once to GPU memory and
  * stay there, so all particles get rendered directly in the GPU from the GPU
  * with no CPU intervention. This allows for much faster rendering. Use this for
  * large groups of particles.
@@ -110,11 +110,11 @@ public class ParticleGroup extends FadeNode implements I3DTextRenderable, IFocus
     public float colorNoise = 0;
 
     /**
-     * Are the data of this group in the GPU memory?
+     * Are the data of this vgroup in the GPU memory?
      */
     public boolean inGpu;
 
-    // Offset and count for this group
+    // Offset and count for this vgroup
     public int offset, count;
 
     /**
@@ -246,7 +246,7 @@ public class ParticleGroup extends FadeNode implements I3DTextRenderable, IFocus
     }
 
     /**
-     * Number of objects of this group
+     * Number of objects of this vgroup
      *
      * @return The number of objects
      */
@@ -271,7 +271,7 @@ public class ParticleGroup extends FadeNode implements I3DTextRenderable, IFocus
     }
 
     /**
-     * Updates the parameters of the focus, if the focus is active in this group
+     * Updates the parameters of the focus, if the focus is active in this vgroup
      *
      * @param time   The time frame provider
      * @param camera The current camera
@@ -286,7 +286,7 @@ public class ParticleGroup extends FadeNode implements I3DTextRenderable, IFocus
     }
 
     public void updateSorter(ITimeFrameProvider time, ICamera camera) {
-        // Simple particle group does not sort
+        // Simple particle vgroup does not sort
         lastSortTime = TimeUtils.millis();
     }
 

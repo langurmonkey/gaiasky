@@ -10,7 +10,7 @@ import com.badlogic.gdx.utils.LongMap;
 import java.util.Set;
 
 /**
- * Data provider for a star group, which contains an index map with the names
+ * Data provider for a star vgroup, which contains an index map with the names
  * and indices of the stars.
  *
  * @author tsagrista

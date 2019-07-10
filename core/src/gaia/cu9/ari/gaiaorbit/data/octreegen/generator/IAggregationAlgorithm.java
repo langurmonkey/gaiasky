@@ -10,7 +10,7 @@ import gaia.cu9.ari.gaiaorbit.scenegraph.StarGroup.StarBean;
 import gaia.cu9.ari.gaiaorbit.util.tree.OctreeNode;
 
 /**
- * Interface to be implemented by all algorithms that create a group of virtual
+ * Interface to be implemented by all algorithms that create a vgroup of virtual
  * particles for an octant.
  * 
  * @author Toni Sagrista

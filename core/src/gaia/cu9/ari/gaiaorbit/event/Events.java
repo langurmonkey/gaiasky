@@ -1049,12 +1049,12 @@ public enum Events {
     UPDATE_GUI,
 
     /**
-     * Contains an the index of the star group mesh to be cleared
+     * Contains an the index of the star vgroup mesh to be cleared
      **/
     DISPOSE_STAR_GROUP_GPU_MESH,
 
     /**
-     * Contains an index to the particle group mesh to be cleared
+     * Contains an index to the particle vgroup mesh to be cleared
      **/
     DISPOSE_PARTICLE_GROUP_GPU_MESH,
 

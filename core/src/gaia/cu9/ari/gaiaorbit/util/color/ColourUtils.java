@@ -56,7 +56,7 @@ public class ColourUtils {
      */
     public static void short_rainbow(float value, float[] rgba) {
         /* plot short rainbow RGB */
-        float a = (1 - value) / 0.25f; //invert and group
+        float a = (1 - value) / 0.25f; //invert and vgroup
         final int X = (int) Math.floor(a); //this is the integer part
         float Y = (a - X); //fractional part from 0 to 1
 
@@ -102,7 +102,7 @@ public class ColourUtils {
         if (rgba == null)
             return;
         /* plot long rainbow RGB */
-        float a = (1 - value) / 0.2f; //invert and group
+        float a = (1 - value) / 0.2f; //invert and vgroup
         final int X = (int) Math.floor(a); //this is the integer part
         float Y = (a - X); //fractional part from 0 to 1
 

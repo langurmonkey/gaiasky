@@ -11,7 +11,7 @@ import gaia.cu9.ari.gaiaorbit.scenegraph.ParticleGroup.ParticleBean;
 import java.io.InputStream;
 
 /**
- * Data provider for a particle group.
+ * Data provider for a particle vgroup.
  *
  * @author tsagrista
  */

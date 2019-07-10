@@ -41,7 +41,7 @@ public abstract class AbstractSceneGraph implements ISceneGraph {
     protected int[] objectsPerThread;
     /** Does it contain an octree **/
     protected boolean hasOctree;
-    /** Does it contain a star group **/
+    /** Does it contain a star vgroup **/
     protected boolean hasStarGroup;
 
     private Vector3d aux3d1;
@@ -67,7 +67,7 @@ public abstract class AbstractSceneGraph implements ISceneGraph {
      * @param hasOctree
      *            Whether the list of nodes contains an octree
      * @param hasStarGroup
-     *            Whether the list contains a star group
+     *            Whether the list contains a star vgroup
      */
     @Override
     public void initialize(Array<SceneGraphNode> nodes, ITimeFrameProvider time, boolean hasOctree, boolean hasStarGroup) {
@@ -78,7 +78,7 @@ public abstract class AbstractSceneGraph implements ISceneGraph {
 
         // Octree
         this.hasOctree = hasOctree;
-        // Star group
+        // Star vgroup
         this.hasStarGroup = hasStarGroup;
 
         // Initialize stringToNode and starMap maps
@@ -324,7 +324,7 @@ public abstract class AbstractSceneGraph implements ISceneGraph {
             return root.numChildren;
         } else {
             int n = root.numChildren - 1;
-            // This assumes the star group is in the first level of the scene graph, right below universe
+            // This assumes the star vgroup is in the first level of the scene graph, right below universe
             for (SceneGraphNode sgn : root.children) {
                 if (sgn instanceof StarGroup)
                     n += sgn.getStarCount();

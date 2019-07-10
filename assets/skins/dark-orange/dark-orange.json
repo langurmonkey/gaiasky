@@ -502,7 +502,7 @@
   "com.badlogic.gdx.scenes.scene2d.ui.SelectBox$SelectBoxStyle": {
     "default": {
       "font": "ui-11",
-      "fontColor": "black",
+      "fontColor": "white",
       "disabledFontColor": "grey",
       "background": "default-select",
       "backgroundDisabled": "default-select-disabled",
@@ -510,8 +510,9 @@
       "listStyle": {
         "font": "ui-11",
         "fontColorSelected": "white",
-        "fontColorUnselected": "black",
-        "selection": "default-select-selection"
+        "fontColorUnselected": "white",
+        "selection": "default-select-selection",
+        "background" : "dark-grey"
       }
     }
   },
@@ -738,7 +739,7 @@
       "background": "textfield",
       "disabledBackground": "textfield-disabled",
       "font": "ui-11",
-      "fontColor": "black",
+      "fontColor": "white",
       "disabledFontColor": "grey",
       "messageFontColor": "dark-gray",
       "cursor": "cursor"
@@ -747,7 +748,7 @@
       "selection": "selection",
       "background": "textfield",
       "font": "ui-11",
-      "fontColor": "black",
+      "fontColor": "white",
       "messageFontColor": "dark-gray",
       "cursor": "cursor"
     },
@@ -860,10 +861,11 @@
   },
   "com.badlogic.gdx.scenes.scene2d.ui.List$ListStyle": {
     "default": {
-      "fontColorUnselected": "black",
+      "fontColorUnselected": "white",
       "selection": "selection",
-      "fontColorSelected": "black",
-      "font": "ui-11"
+      "fontColorSelected": "white",
+      "font": "ui-11",
+      "background" : "dark-grey"
     },
     "light": {
       "fontColorUnselected": "black",
@@ -873,11 +875,11 @@
       "background": "light-grey"
     },
     "normal": {
-      "fontColorUnselected": "black",
+      "fontColorUnselected": "white",
       "selection": "selection",
-      "fontColorSelected": "black",
+      "fontColorSelected": "white",
       "font": "ui-12",
-      "background": "light-grey"
+      "background": "dark-grey"
     }
   },
   "com.badlogic.gdx.scenes.scene2d.ui.Touchpad$TouchpadStyle": {

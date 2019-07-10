@@ -43,9 +43,6 @@ public class CameraComponent extends GuiComponent implements IObserver {
 
     @Override
     public void initialize() {
-        float pad = 5 * GlobalConf.SCALE_FACTOR;
-        float space3 = 3 * GlobalConf.SCALE_FACTOR;
-        float space2 = 2 * GlobalConf.SCALE_FACTOR;
         float width = 140 * GlobalConf.SCALE_FACTOR;
 
         cinematic = new OwnCheckBox(I18n.txt("gui.camera.cinematic"), skin, pad);
@@ -130,13 +127,13 @@ public class CameraComponent extends GuiComponent implements IObserver {
             if (fovFlag && event instanceof ChangeEvent) {
                 float value = MathUtilsd.clamp(fieldOfView.getValue(), Constants.MIN_FOV, Constants.MAX_FOV);
                 EventManager.instance.post(Events.FOV_CHANGED_CMD, value);
-                fov.setText(Integer.toString((int) value) + "°");
+                fov.setText((int) value + "°");
                 return true;
             }
             return false;
         });
 
-        fov = new OwnLabel(Integer.toString((int) GlobalConf.scene.CAMERA_FOV) + "°", skin, "default");
+        fov = new OwnLabel((int) GlobalConf.scene.CAMERA_FOV + "°", skin, "default");
 
         /** CAMERA SPEED LIMIT **/
         String[] speedLimits = new String[19];
@@ -260,8 +257,6 @@ public class CameraComponent extends GuiComponent implements IObserver {
             return false;
         });
 
-        VerticalGroup cameraGroup = new VerticalGroup().align(Align.left).columnAlign(Align.left);
-        cameraGroup.space(space2);
 
         HorizontalGroup buttonGroup = new HorizontalGroup();
         buttonGroup.space(space3);
@@ -289,24 +284,20 @@ public class CameraComponent extends GuiComponent implements IObserver {
         turnGroup.addActor(turnSpeed);
         turnGroup.addActor(turn);
 
-        cameraGroup.addActor(modeLabel);
-        cameraGroup.addActor(cameraMode);
-        cameraGroup.addActor(new Label(I18n.txt("gui.camera.speedlimit"), skin, "default"));
-        cameraGroup.addActor(cameraSpeedLimit);
-        cameraGroup.addActor(fovLabel);
-        cameraGroup.addActor(fovGroup);
-        cameraGroup.addActor(new Label(I18n.txt("gui.camera.speed"), skin, "default"));
-        cameraGroup.addActor(speedGroup);
-        cameraGroup.addActor(new Label(I18n.txt("gui.rotation.speed"), skin, "default"));
-        cameraGroup.addActor(rotateGroup);
-        cameraGroup.addActor(new Label(I18n.txt("gui.turn.speed"), skin, "default"));
-        cameraGroup.addActor(turnGroup);
+        VerticalGroup cameraGroup = new VerticalGroup().align(Align.left).columnAlign(Align.left);
+        cameraGroup.space(space4);
+
+        cameraGroup.addActor(vgroup(modeLabel, cameraMode, space2));
+        cameraGroup.addActor(vgroup(new Label(I18n.txt("gui.camera.speedlimit"), skin, "default"), cameraSpeedLimit, space2));
+        cameraGroup.addActor(vgroup(fovLabel, fovGroup, space2));
+        cameraGroup.addActor(vgroup(new Label(I18n.txt("gui.camera.speed"), skin, "default"), speedGroup, space2));
+        cameraGroup.addActor(vgroup(new Label(I18n.txt("gui.rotation.speed"), skin, "default"), rotateGroup, space2));
+        cameraGroup.addActor(vgroup(new Label(I18n.txt("gui.turn.speed"), skin, "default"), turnGroup, space2));
         cameraGroup.addActor(cinematic);
         cameraGroup.addActor(focusLock);
         cameraGroup.addActor(orientationLock);
         cameraGroup.addActor(crosshair);
-        cameraGroup.addActor(new Label("", skin));
-        cameraGroup.addActor(buttonGroup);
+        cameraGroup.addActor(vgroup(new Label("", skin), buttonGroup, space2));
 
         component = cameraGroup;
 
