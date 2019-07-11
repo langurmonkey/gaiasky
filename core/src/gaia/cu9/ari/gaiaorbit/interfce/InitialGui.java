@@ -17,6 +17,8 @@ import gaia.cu9.ari.gaiaorbit.event.EventManager;
 import gaia.cu9.ari.gaiaorbit.event.Events;
 import gaia.cu9.ari.gaiaorbit.util.*;
 import gaia.cu9.ari.gaiaorbit.util.Logger.Log;
+import gaia.cu9.ari.gaiaorbit.util.datadesc.DataDescriptor;
+import gaia.cu9.ari.gaiaorbit.util.datadesc.DataDescriptorUtils;
 import gaia.cu9.ari.gaiaorbit.util.scene2d.Link;
 import gaia.cu9.ari.gaiaorbit.util.scene2d.OwnLabel;
 
@@ -70,11 +72,14 @@ public class InitialGui extends AbstractGui {
                  * Display download manager if:
                  * - force display (args), or
                  * - base data not found, or
-                 * - no catalogs found in data folder
+                 * - no catalogs found in data folder, or
+                 * - new versions of current datasets found
                  */
-                if (datasetsDownload || !basicDataPresent() || catalogFiles.size == 0) {
+
+                DataDescriptor dd = DataDescriptorUtils.instance().buildDatasetsDescriptor(dataDescriptor);
+                if (datasetsDownload || !basicDataPresent() || catalogFiles.size == 0 || dd.updatesAvailable) {
                     // No catalog files, display downloader
-                    addDownloaderWindow();
+                    addDownloaderWindow(dd);
                 } else {
                     displayChooser();
                 }
@@ -131,7 +136,7 @@ public class InitialGui extends AbstractGui {
     private boolean basicDataPresent() {
         Path dataPath = Paths.get(GlobalConf.data.DATA_LOCATION).normalize();
         // Add all paths to check in this list
-        Array<Path> required = new Array<Path>();
+        Array<Path> required = new Array<>();
         required.add(dataPath.resolve("data-main.json"));
         required.add(dataPath.resolve("asteroids.json"));
         required.add(dataPath.resolve("planets.json"));
@@ -182,16 +187,14 @@ public class InitialGui extends AbstractGui {
         exitw.show(ui);
     }
 
-    private void addDownloaderWindow() {
+    private void addDownloaderWindow(DataDescriptor dd) {
         if (ddw == null) {
-            ddw = new DownloadDataWindow(ui, skin);
+            ddw = new DownloadDataWindow(ui, skin, dd);
             ddw.setAcceptRunnable(() -> {
                 Gdx.graphics.setSystemCursor(SystemCursor.Arrow);
                 displayChooser();
             });
-            ddw.setCancelRunnable(() -> {
-                Gdx.app.exit();
-            });
+            ddw.setCancelRunnable(() -> Gdx.app.exit());
         }
         ddw.show(ui);
     }

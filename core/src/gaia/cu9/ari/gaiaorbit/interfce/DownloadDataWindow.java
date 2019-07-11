@@ -7,17 +7,19 @@ package gaia.cu9.ari.gaiaorbit.interfce;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.files.FileHandle;
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener.ChangeEvent;
 import com.badlogic.gdx.utils.Array;
-import com.badlogic.gdx.utils.JsonReader;
-import com.badlogic.gdx.utils.JsonValue;
-import gaia.cu9.ari.gaiaorbit.desktop.GaiaSkyDesktop;
 import gaia.cu9.ari.gaiaorbit.desktop.util.SysUtils;
 import gaia.cu9.ari.gaiaorbit.util.*;
 import gaia.cu9.ari.gaiaorbit.util.Logger.Log;
+import gaia.cu9.ari.gaiaorbit.util.datadesc.DataDescriptor;
+import gaia.cu9.ari.gaiaorbit.util.datadesc.DataDescriptorUtils;
+import gaia.cu9.ari.gaiaorbit.util.datadesc.DatasetDesc;
+import gaia.cu9.ari.gaiaorbit.util.datadesc.DatasetType;
 import gaia.cu9.ari.gaiaorbit.util.format.INumberFormat;
 import gaia.cu9.ari.gaiaorbit.util.format.NumberFormatFactory;
 import gaia.cu9.ari.gaiaorbit.util.io.FileInfoInputStream;
@@ -70,32 +72,35 @@ public class DownloadDataWindow extends GenericDialog {
         return "icon-elements-other";
     }
 
+    private DataDescriptor dd;
     private OwnTextButton downloadButton;
     private OwnProgressBar downloadProgress;
     private OwnLabel currentDownloadFile, downloadSpeed;
     private OwnScrollPane datasetsScroll;
     private float scrollX = 0, scrollY = 0;
 
+    private Color highlight;
+
     // Whether to show the data location chooser
     private boolean dataLocation;
 
     private INumberFormat nf;
-    private JsonReader reader;
-    private List<Trio<JsonValue, OwnCheckBox, OwnLabel>> choiceList;
-    private Array<Trio<JsonValue, OwnCheckBox, OwnLabel>> toDownload;
+    private List<Trio<DatasetDesc, OwnCheckBox, OwnLabel>> choiceList;
+    private Array<Trio<DatasetDesc, OwnCheckBox, OwnLabel>> toDownload;
     private Array<OwnImageButton> rubbishes;
     private int current = -1;
 
-    public DownloadDataWindow(Stage stage, Skin skin) {
-        this(stage, skin, true, I18n.txt("gui.start"), I18n.txt("gui.exit"));
+    public DownloadDataWindow(Stage stage, Skin skin, DataDescriptor dd) {
+        this(stage, skin, dd, true, I18n.txt("gui.start"), I18n.txt("gui.exit"));
     }
 
-    public DownloadDataWindow(Stage stage, Skin skin, boolean dataLocation, String acceptText, String cancelText) {
-        super(I18n.txt("gui.download.title"), skin, stage);
+    public DownloadDataWindow(Stage stage, Skin skin, DataDescriptor dd, boolean dataLocation, String acceptText, String cancelText) {
+        super(I18n.txt("gui.download.title") + (dd.updatesAvailable ? " - " + I18n.txt("gui.download.updates", dd.numUpdates) : ""), skin, stage);
         this.nf = NumberFormatFactory.getFormatter("##0.0");
-        this.reader = new JsonReader();
+        this.dd = dd;
         this.choiceList = new LinkedList<>();
         this.rubbishes = new Array<>();
+        this.highlight = skin.getColor("highlight");
 
         this.dataLocation = dataLocation;
 
@@ -178,83 +183,31 @@ public class DownloadDataWindow extends GenericDialog {
             });
         }
 
-        // Parse available files
-        JsonValue dataDesc = reader.parse(Gdx.files.absolute(SysUtils.getDefaultTmpDir() + "/gaiasky-data.json"));
-
-        Map<String, JsonValue> bestDs = new HashMap<>();
-        Map<String, List<JsonValue>> typeMap = new HashMap<>();
-        // We don't want repeated elements but want to keep insertion order
-        Set<String> types = new LinkedHashSet<>();
-
-        JsonValue dst = dataDesc.child().child();
-        while (dst != null) {
-            boolean hasMinGsVersion = dst.has("mingsversion");
-            int minGsVersion = dst.getInt("mingsversion", 0);
-            int thisVersion = dst.getInt("version", 0);
-            if (!hasMinGsVersion || GaiaSkyDesktop.SOURCE_CONF_VERSION >= minGsVersion) {
-                // Dataset type
-                String type = dst.getString("type");
-
-                // Check if better option already exists
-                String dsName = dst.getString("name");
-                if (bestDs.containsKey(dsName)) {
-                    JsonValue other = bestDs.get(dsName);
-                    int otherVersion = other.getInt("version", 0);
-                    if (otherVersion >= thisVersion) {
-                        // Ignore this version
-                        dst = dst.next();
-                        continue;
-                    } else {
-                        // Remove other version, use this
-                        typeMap.get(type).remove(other);
-                        bestDs.remove(dsName);
-                    }
-                }
-
-                // Add to map
-                if (typeMap.containsKey(type)) {
-                    typeMap.get(type).add(dst);
-                } else {
-                    List<JsonValue> aux = new ArrayList<>();
-                    aux.add(dst);
-                    typeMap.put(type, aux);
-                }
-
-                // Add to set
-                types.add(type);
-                // Add to bestDs
-                bestDs.put(dsName, dst);
-            }
-            // Next
-            dst = dst.next();
+        // Uploads available?
+        if(dd.updatesAvailable){
+            OwnLabel updates = new OwnLabel(I18n.txt("gui.download.updates", dd.numUpdates), skin, "headline");
+            updates.setColor(highlight);
+            downloadTable.add(updates).colspan(2).center().padBottom(padLarge).row();
         }
 
+        // Build datasets table
         Table datasetsTable = new Table(skin);
 
-        for (String typeStr : types) {
-            List<JsonValue> datasets = typeMap.get(typeStr);
+        for (DatasetType type : dd.types) {
+            List<DatasetDesc> datasets = type.datasets;
 
-            datasetsTable.add(new OwnLabel(I18n.txt("gui.download.type." + typeStr), skin, "hud-header")).colspan(6).left().padBottom(pad * 3f).padTop(padLarge * 2f).row();
+            datasetsTable.add(new OwnLabel(I18n.txt("gui.download.type." + type.typeStr), skin, "hud-header")).colspan(6).left().padBottom(pad * 3f).padTop(padLarge * 2f).row();
 
-            for (JsonValue dataset : datasets) {
+            for (DatasetDesc dataset : datasets) {
                 // Check if dataset requires a minimum version of Gaia Sky
 
-                // Check if we have it
-                final Path check = Paths.get(GlobalConf.data.DATA_LOCATION, dataset.getString("check"));
-                boolean exists = Files.exists(check) && Files.isReadable(check);
-                int myVersion = checkJsonVersion(check);
-                int serverVersion = dataset.getInt("version", 0);
-                boolean outdated = serverVersion > myVersion;
-
-                String name = dataset.getString("name");
                 // Add dataset to desc table
-                OwnCheckBox cb = new OwnCheckBox(name, skin, "title", pad * 2f);
-                boolean baseData = name.equals("default-data");
-                cb.setChecked((!exists || outdated) && baseData);
-                cb.setDisabled(baseData || (exists && !outdated));
+                OwnCheckBox cb = new OwnCheckBox(dataset.name, skin, "title", pad * 2f);
+                cb.setChecked(dataset.mustDownload);
+                cb.setDisabled(dataset.cbDisabled);
                 OwnLabel haveit = new OwnLabel("", skin);
-                if (exists) {
-                    if (outdated) {
+                if (dataset.exists) {
+                    if (dataset.outdated) {
                         setStatusOutdated(haveit);
                     } else {
                         setStatusFound(haveit);
@@ -264,77 +217,58 @@ public class DownloadDataWindow extends GenericDialog {
                 }
 
                 // Can't proceed without base data - force download
-                if (baseData && !exists) {
+                if (dataset.baseData && !dataset.exists) {
                     me.acceptButton.setDisabled(true);
                 }
 
                 // Description
-                String description = dataset.getString("description");
-                String shortDescription;
                 HorizontalGroup descGroup = new HorizontalGroup();
                 descGroup.space(padLarge);
-                if (description.contains("-")) {
-                    shortDescription = description.substring(0, description.indexOf("-"));
-                } else {
-                    shortDescription = description;
-                }
-                OwnLabel desc = new OwnLabel(shortDescription, skin);
+                OwnLabel desc = new OwnLabel(dataset.shortDescription, skin);
                 // Info
                 OwnImageButton imgTooltip = new OwnImageButton(skin, "tooltip");
-                imgTooltip.addListener(new OwnTextTooltip(description, skin, 10));
+                imgTooltip.addListener(new OwnTextTooltip(dataset.description, skin, 10));
                 descGroup.addActor(imgTooltip);
                 descGroup.addActor(desc);
                 // Link
-                if (dataset.has("link")) {
-                    String link = dataset.getString("link");
-                    if (!link.isEmpty()) {
-                        LinkButton imgLink = new LinkButton(link, skin);
-                        descGroup.addActor(imgLink);
-                    }
+                if (dataset.link != null) {
+                    LinkButton imgLink = new LinkButton(dataset.link, skin);
+                    descGroup.addActor(imgLink);
                 }
 
                 // Version
-                OwnLabel vers = new OwnLabel(exists && outdated ? myVersion + " -> v-" + serverVersion : "v-" + myVersion, skin);
-                if (!exists) {
-                    vers.addListener(new OwnTextTooltip(I18n.txt("gui.download.version.server", Integer.toString(serverVersion)), skin, 10));
-                } else if (outdated) {
+                OwnLabel vers = new OwnLabel(dataset.exists && dataset.outdated ? dataset.myVersion + " -> v-" + dataset.serverVersion : "v-" + dataset.myVersion, skin);
+                if (!dataset.exists) {
+                    vers.addListener(new OwnTextTooltip(I18n.txt("gui.download.version.server", Integer.toString(dataset.serverVersion)), skin, 10));
+                } else if (dataset.outdated) {
                     // New version!
-                    vers.setColor(1, 1, 0, 1);
-                    vers.addListener(new OwnTextTooltip(I18n.txt("gui.download.version.new", Integer.toString(serverVersion), Integer.toString(myVersion)), skin, 10));
+                    vers.setColor(highlight);
+                    vers.addListener(new OwnTextTooltip(I18n.txt("gui.download.version.new", Integer.toString(dataset.serverVersion), Integer.toString(dataset.myVersion)), skin, 10));
                 } else {
                     vers.addListener(new OwnTextTooltip(I18n.txt("gui.download.version.ok"), skin, 10));
                 }
 
                 // Type icon
-                Image typeImage = new OwnImage(skin.getDrawable(getIcon(dataset.getString("type"))));
+                Image typeImage = new OwnImage(skin.getDrawable(getIcon(dataset.type)));
                 float scl = 0.7f;
                 float iw = typeImage.getWidth();
                 float ih = typeImage.getHeight();
                 typeImage.setSize(iw * scl, ih * scl);
-                typeImage.addListener(new OwnTextTooltip(dataset.getString("type"), skin, 10));
+                typeImage.addListener(new OwnTextTooltip(dataset.type, skin, 10));
 
                 // Size
-                String size;
-                try {
-                    long bytes = dataset.getLong("size");
-                    size = GlobalResources.humanReadableByteCount(bytes, true);
-                } catch (IllegalArgumentException e) {
-                    size = "?";
-                }
+                OwnLabel size = new OwnLabel(dataset.size, skin);
 
                 // Delete
-                final JsonValue ds = dataset;
                 OwnImageButton rubbish = null;
-                if (exists) {
+                if (dataset.exists) {
                     rubbish = new OwnImageButton(skin, "rubbish-bin");
                     rubbish.addListener(new TextTooltip(I18n.txt("gui.tooltip.dataset.remove"), skin));
                     rubbish.addListener((event) -> {
                         if (event instanceof ChangeEvent) {
                             // Remove dataset
-                            if (ds.has("data")) {
-                                JsonValue data = ds.get("data");
-                                String[] filesToDelete = data.asStringArray();
-                                for (String fileToDelete : filesToDelete) {
+                            if (dataset.filesToDelete != null) {
+                                for (String fileToDelete : dataset.filesToDelete) {
                                     try {
                                         if (fileToDelete.endsWith("/")) {
                                             fileToDelete = fileToDelete.substring(0, fileToDelete.length() - 1);
@@ -361,7 +295,7 @@ public class DownloadDataWindow extends GenericDialog {
                             } else {
                                 // Only remove "check"
                                 try {
-                                    FileUtils.forceDelete(check.toFile());
+                                    FileUtils.forceDelete(dataset.check.toFile());
                                 } catch (IOException e) {
                                     logger.error(e);
                                 }
@@ -384,7 +318,7 @@ public class DownloadDataWindow extends GenericDialog {
                 datasetsTable.add(typeImage).center().padRight(padLarge).padBottom(pad);
                 datasetsTable.add(size).left().padRight(padLarge).padBottom(pad);
                 datasetsTable.add(haveit).center().padBottom(pad);
-                if (exists) {
+                if (dataset.exists) {
                     datasetsTable.add(rubbish).center().padLeft(padLarge * 2.5f);
                 }
                 datasetsTable.row();
@@ -444,10 +378,10 @@ public class DownloadDataWindow extends GenericDialog {
 
     }
 
-    private synchronized void downloadAndExtractFiles(List<Trio<JsonValue, OwnCheckBox, OwnLabel>> choices) {
+    private synchronized void downloadAndExtractFiles(List<Trio<DatasetDesc, OwnCheckBox, OwnLabel>> choices) {
         toDownload = new Array<>();
 
-        for (Trio<JsonValue, OwnCheckBox, OwnLabel> entry : choices) {
+        for (Trio<DatasetDesc, OwnCheckBox, OwnLabel> entry : choices) {
             if (entry.getSecond().isChecked())
                 toDownload.add(entry);
         }
@@ -472,11 +406,11 @@ public class DownloadDataWindow extends GenericDialog {
     private void downloadCurrent() {
         if (current >= 0 && current < toDownload.size) {
             // Download next
-            Trio<JsonValue, OwnCheckBox, OwnLabel> trio = toDownload.get(current);
-            JsonValue currentJson = trio.getFirst();
-            String name = currentJson.getString("name");
-            String url = currentJson.getString("file");
-            String type = currentJson.getString("type");
+            Trio<DatasetDesc, OwnCheckBox, OwnLabel> trio = toDownload.get(current);
+            DatasetDesc currentDataset = trio.getFirst();
+            String name = currentDataset.name;
+            String url = currentDataset.file;
+            String type = currentDataset.type;
 
             FileHandle tempDownload = Gdx.files.absolute(GlobalConf.data.DATA_LOCATION + "/temp.tar.gz");
 
@@ -500,8 +434,8 @@ public class DownloadDataWindow extends GenericDialog {
                 logger.info("Extracting: " + tempDownload.path());
                 String dataLocation = GlobalConf.data.DATA_LOCATION + File.separatorChar;
                 // Checksum
-                if (digest != null && currentJson.has("sha256")) {
-                    String serverDigest = currentJson.getString("sha256");
+                if (digest != null && currentDataset.sha256 != null) {
+                    String serverDigest = currentDataset.sha256;
                     try {
                         boolean ok = serverDigest.equals(digest);
                         if (ok) {
@@ -547,7 +481,7 @@ public class DownloadDataWindow extends GenericDialog {
                     // Select dataset if needed
                     if (type.startsWith("catalog-")) {
                         // Descriptor file
-                        FileHandle descFile = Gdx.files.absolute(GlobalConf.data.DATA_LOCATION + File.separator + currentJson.getString("check"));
+                        FileHandle descFile = Gdx.files.absolute(GlobalConf.data.DATA_LOCATION + File.separator + currentDataset.check);
                         GlobalConf.data.CATALOG_JSON_FILES = descFile.path();
                     }
 
@@ -591,7 +525,7 @@ public class DownloadDataWindow extends GenericDialog {
             downloadProgress.setVisible(true);
             downloadSpeed.setVisible(true);
             setStatusProgress(trio.getThird());
-            setMessageOk(I18n.txt("gui.download.downloading.info", (current + 1), toDownload.size, currentJson.getString("name")));
+            setMessageOk(I18n.txt("gui.download.downloading.info", (current + 1), toDownload.size, currentDataset.name));
             DownloadHelper.downloadFile(url, tempDownload, pr, finish, fail, cancel);
         } else {
             // Finished all downloads!
@@ -601,39 +535,13 @@ public class DownloadDataWindow extends GenericDialog {
 
     }
 
-    /**
-     * Checks the version file of the given path, if it is a correct JSON
-     * file and contains a top-level "version" attribute. Otherwise, it
-     * returns the default lowest version (0)
-     *
-     * @param path The path with the file to check
-     * @return The version, if it exists, or 0
-     */
-    private int checkJsonVersion(Path path) throws RuntimeException {
-        if (path != null) {
-            File file = path.toFile();
-            if (file.exists() && file.canRead() && file.isFile()) {
-                String fname = file.getName();
-                String extension = fname.substring(fname.lastIndexOf(".") + 1);
-                if (extension.equalsIgnoreCase("json")) {
-                    JsonValue jf = reader.parse(Gdx.files.absolute(file.getAbsolutePath()));
-                    return jf.getInt("version", 0);
-                }
-            }
-
-            return 0;
-        } else {
-            throw new RuntimeException("Path is null");
-        }
-    }
-
     private void setDisabled(Array<OwnImageButton> l, boolean disabled) {
         for (OwnImageButton b : l)
             b.setDisabled(disabled);
     }
 
-    private void setDisabled(List<Trio<JsonValue, OwnCheckBox, OwnLabel>> choices, boolean disabled) {
-        for (Trio<JsonValue, OwnCheckBox, OwnLabel> t : choices) {
+    private void setDisabled(List<Trio<DatasetDesc, OwnCheckBox, OwnLabel>> choices, boolean disabled) {
+        for (Trio<DatasetDesc, OwnCheckBox, OwnLabel> t : choices) {
             // Uncheck all if enabling again
             if (!disabled)
                 t.getSecond().setChecked(false);
@@ -798,6 +706,7 @@ public class DownloadDataWindow extends GenericDialog {
      * Drops the current view and regenerates all window content
      */
     private void reloadAll() {
+        dd = DataDescriptorUtils.instance().buildDatasetsDescriptor(null);
         backupScrollValues();
         content.clear();
         build();

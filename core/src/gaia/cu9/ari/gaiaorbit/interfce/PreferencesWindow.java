@@ -33,6 +33,7 @@ import gaia.cu9.ari.gaiaorbit.util.GlobalConf.PostprocessConf.ToneMapping;
 import gaia.cu9.ari.gaiaorbit.util.GlobalConf.SceneConf.ElevationType;
 import gaia.cu9.ari.gaiaorbit.util.GlobalConf.SceneConf.GraphicsQuality;
 import gaia.cu9.ari.gaiaorbit.util.GlobalConf.ScreenshotMode;
+import gaia.cu9.ari.gaiaorbit.util.datadesc.DataDescriptor;
 import gaia.cu9.ari.gaiaorbit.util.format.INumberFormat;
 import gaia.cu9.ari.gaiaorbit.util.format.NumberFormatFactory;
 import gaia.cu9.ari.gaiaorbit.util.math.MathUtilsd;
@@ -1323,7 +1324,8 @@ public class PreferencesWindow extends GenericDialog {
         dataDownload.setSize(150 * GlobalConf.SCALE_FACTOR, 25 * GlobalConf.SCALE_FACTOR);
         dataDownload.addListener((event) -> {
             if (event instanceof ChangeEvent) {
-                DownloadDataWindow ddw = new DownloadDataWindow(stage, skin, false, I18n.txt("gui.close"), null);
+
+                DownloadDataWindow ddw = new DownloadDataWindow(stage, skin, DataDescriptor.currentDataDescriptor, false, I18n.txt("gui.close"), null);
                 ddw.setModal(true);
                 ddw.show(stage);
                 return true;

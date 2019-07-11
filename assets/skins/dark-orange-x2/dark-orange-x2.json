@@ -195,6 +195,12 @@
       "b": 0.211,
       "g": 0.407,
       "r": 1
+    },
+    "highlight": {
+      "a": 1,
+      "b": 0,
+      "g": 1,
+      "r": 1
     }
   },
   "com.badlogic.gdx.scenes.scene2d.ui.Skin$TintedDrawable": {

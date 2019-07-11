@@ -26,7 +26,7 @@ vec3 applyFog(in vec3 fragColor, in float NL){
         // Fragment height, what?
         float fragHeight = o_fragHeight * U_TO_KM ;
         // Camera height normalized to atmosphere height
-        float camHeight = max((fCameraHeight - fInnerRadius) / (fOuterRadius - fInnerRadius), 0.5) + 0.5;
+        float camHeight = max((fCameraHeight - fInnerRadius) / (fOuterRadius - fInnerRadius), 0.5) + 1.0;
         return applyFogToColor(fragColor.rgb, distToFrag, camHeight, fragHeight, NL * 1.5);
     }
 }
