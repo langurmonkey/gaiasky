@@ -980,10 +980,10 @@ public class GlobalConf {
     public static class SceneConf implements IConf, IObserver {
 
         /**
-         * The type of height representation if height textures
+         * The type of elevation representation if elevation textures
          * are present
          */
-        public enum HeightType {
+        public enum ElevationType {
             TESSELLATION,
             PARALLAX_MAPPING,
             NONE;
@@ -1146,14 +1146,17 @@ public class GlobalConf {
         public boolean LAZY_MESH_INIT = true;
 
         /**
-         * How to represent height, if height textures present:
+         * How to represent elevation, if elevation textures present:
          * <ul>
          * <li>Tessellation</li>
          * <li>Parallax mapping</li>
          * <li>None</li>
          * </ul>
          */
-        public HeightType HEIGHT_TYPE;
+        public ElevationType ELEVATION_TYPE;
+
+        /** Elevation multiplier **/
+        public double ELEVATION_MULTIPLIER;
 
         /**
          * Whether to show crosshair in focus mode
@@ -1209,12 +1212,12 @@ public class GlobalConf {
         public long MAX_LOADED_STARS;
 
         public SceneConf() {
-            EventManager.instance.subscribe(this, Events.TOGGLE_VISIBILITY_CMD, Events.FOCUS_LOCK_CMD, Events.ORIENTATION_LOCK_CMD, Events.STAR_BRIGHTNESS_CMD, Events.PM_LEN_FACTOR_CMD, Events.PM_NUM_FACTOR_CMD, Events.PM_COLOR_MODE_CMD, Events.PM_ARROWHEADS_CMD, Events.FOV_CHANGED_CMD, Events.CAMERA_SPEED_CMD, Events.ROTATION_SPEED_CMD, Events.TURNING_SPEED_CMD, Events.SPEED_LIMIT_CMD, Events.TRANSIT_COLOUR_CMD, Events.ONLY_OBSERVED_STARS_CMD, Events.COMPUTE_GAIA_SCAN_CMD, Events.OCTREE_PARTICLE_FADE_CMD, Events.STAR_POINT_SIZE_CMD, Events.STAR_POINT_SIZE_INCREASE_CMD, Events.STAR_POINT_SIZE_DECREASE_CMD, Events.STAR_POINT_SIZE_RESET_CMD, Events.STAR_MIN_OPACITY_CMD, Events.AMBIENT_LIGHT_CMD, Events.GALAXY_3D_CMD, Events.CROSSHAIR_CMD, Events.CAMERA_CINEMATIC_CMD, Events.CUBEMAP_RESOLUTION_CMD, Events.LABEL_SIZE_CMD);
+            EventManager.instance.subscribe(this, Events.TOGGLE_VISIBILITY_CMD, Events.FOCUS_LOCK_CMD, Events.ORIENTATION_LOCK_CMD, Events.STAR_BRIGHTNESS_CMD, Events.PM_LEN_FACTOR_CMD, Events.PM_NUM_FACTOR_CMD, Events.PM_COLOR_MODE_CMD, Events.PM_ARROWHEADS_CMD, Events.FOV_CHANGED_CMD, Events.CAMERA_SPEED_CMD, Events.ROTATION_SPEED_CMD, Events.TURNING_SPEED_CMD, Events.SPEED_LIMIT_CMD, Events.TRANSIT_COLOUR_CMD, Events.ONLY_OBSERVED_STARS_CMD, Events.COMPUTE_GAIA_SCAN_CMD, Events.OCTREE_PARTICLE_FADE_CMD, Events.STAR_POINT_SIZE_CMD, Events.STAR_POINT_SIZE_INCREASE_CMD, Events.STAR_POINT_SIZE_DECREASE_CMD, Events.STAR_POINT_SIZE_RESET_CMD, Events.STAR_MIN_OPACITY_CMD, Events.AMBIENT_LIGHT_CMD, Events.GALAXY_3D_CMD, Events.CROSSHAIR_CMD, Events.CAMERA_CINEMATIC_CMD, Events.CUBEMAP_RESOLUTION_CMD, Events.LABEL_SIZE_CMD, Events.ELEVATION_MUTLIPLIER_CMD, Events.ELEVATION_TYPE_CMD);
         }
 
         public void initialize(GraphicsQuality gRAPHICS_QUALITY, long oBJECT_FADE_MS, float sTAR_BRIGHTNESS, float aMBIENT_LIGHT, int cAMERA_FOV, float cAMERA_SPEED, float tURNING_SPEED, float rOTATION_SPEED, int cAMERA_SPEED_LIMIT_IDX, boolean fOCUS_LOCK, boolean fOCUS_LOCK_ORIENTATION, float lABEL_SIZE_FACTOR, float lABEL_NUMBER_FACTOR, boolean[] vISIBILITY, int oRBIT_RENDERER, int lINE_RENDERER, double sTAR_TH_ANGLE_NONE, double sTAR_TH_ANGLE_POINT, double sTAR_TH_ANGLE_QUAD,
                 float pOINT_ALPHA_MIN, float pOINT_ALPHA_MAX, boolean oCTREE_PARTICLE_FADE, float oCTANT_TH_ANGLE_0, float oCTANT_TH_ANGLE_1, float pM_NUM_FACTOR, float pM_LEN_FACTOR, long n_PM_STARS, int pM_COLOR_MODE, boolean pM_ARROWHEADS, float sTAR_POINT_SIZE, boolean gALAXY_3D, int cUBEMAP_FACE_RESOLUTION, boolean cROSSHAIR, boolean cINEMATIC_CAMERA, boolean lAZY_TEXTURE_INIT, boolean fREE_CAMERA_TARGET_MODE_ON, boolean sHADOW_MAPPING, int sHADOW_MAPPING_N_SHADOWS,
-                int sHADOW_MAPPING_RESOLUTION, long mAX_LOADED_STARS) {
+                int sHADOW_MAPPING_RESOLUTION, long mAX_LOADED_STARS, ElevationType eLEVATION_TYPE, double eLEVATION_MULTIPLIER) {
             GRAPHICS_QUALITY = gRAPHICS_QUALITY;
             OBJECT_FADE_MS = oBJECT_FADE_MS;
             STAR_BRIGHTNESS = sTAR_BRIGHTNESS;
@@ -1257,6 +1260,8 @@ public class GlobalConf {
             SHADOW_MAPPING_N_SHADOWS = sHADOW_MAPPING_N_SHADOWS;
             SHADOW_MAPPING_RESOLUTION = sHADOW_MAPPING_RESOLUTION;
             MAX_LOADED_STARS = mAX_LOADED_STARS;
+            ELEVATION_TYPE = eLEVATION_TYPE;
+            ELEVATION_MULTIPLIER = eLEVATION_MULTIPLIER;
         }
 
         public void updateSpeedLimit() {
@@ -1428,6 +1433,11 @@ public class GlobalConf {
             case LABEL_SIZE_CMD:
                 LABEL_SIZE_FACTOR = MathUtilsd.clamp((float) data[0], Constants.MIN_LABEL_SIZE, Constants.MAX_LABEL_SIZE);
                 break;
+            case ELEVATION_MUTLIPLIER_CMD:
+                ELEVATION_MULTIPLIER = MathUtilsd.clamp((float) data[0], Constants.MIN_ELEVATION_MULT, Constants.MAX_ELEVATION_MULT);
+                break;
+            case ELEVATION_TYPE_CMD:
+                ELEVATION_TYPE = (ElevationType) data[0];
             default:
                 break;
             }

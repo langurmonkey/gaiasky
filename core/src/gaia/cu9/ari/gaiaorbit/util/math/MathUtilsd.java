@@ -558,6 +558,17 @@ public final class MathUtilsd {
         return out;
     }
 
+    /**
+     * Rounds the double value to a number of decimal places
+     * @param value The value to round
+     * @param places The number of decimal places
+     * @return The rounded value
+     */
+    public static double roundAvoid(double value, int places) {
+        double scale = Math.pow(10, places);
+        return Math.round(value * scale) / scale;
+    }
 }
+
 
 

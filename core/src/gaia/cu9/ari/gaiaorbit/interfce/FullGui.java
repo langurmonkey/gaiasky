@@ -98,11 +98,17 @@ public class FullGui extends AbstractGui {
         for (ComponentType ct : ComponentType.values()) {
             ct.getName();
         }
+        nf = NumberFormatFactory.getFormatter("##0.##");
+
+        // NOTIFICATIONS INTERFACE - BOTTOM LEFT
+        notificationsInterface = new NotificationsInterface(skin, lock, true, true, true, true);
+        notificationsInterface.setFillParent(true);
+        notificationsInterface.left().bottom();
+        notificationsInterface.pad(0, 5, 5, 0);
+        interfaces.add(notificationsInterface);
 
         // CONTROLS WINDOW
         addControlsWindow();
-
-        nf = NumberFormatFactory.getFormatter("##0.##");
 
         // FOCUS INFORMATION - BOTTOM RIGHT
         focusInterface = new FocusInfoInterface(skin);
@@ -113,12 +119,6 @@ public class FullGui extends AbstractGui {
         fi.bottom().right();
         fi.pad(0, 0, 10, 10);
 
-        // NOTIFICATIONS INTERFACE - BOTTOM LEFT
-        notificationsInterface = new NotificationsInterface(skin, lock, true, true, true, true);
-        notificationsInterface.setFillParent(true);
-        notificationsInterface.left().bottom();
-        notificationsInterface.pad(0, 5, 5, 0);
-        interfaces.add(notificationsInterface);
 
         // MESSAGES INTERFACE - LOW CENTER
         messagesInterface = new MessagesInterface(skin, lock);

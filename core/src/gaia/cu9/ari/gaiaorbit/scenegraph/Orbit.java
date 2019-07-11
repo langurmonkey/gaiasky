@@ -236,7 +236,6 @@ public class Orbit extends Polyline {
     public void render(LineRenderSystem renderer, ICamera camera, float alpha) {
 
         if (!onlybody) {
-
             alpha *= this.alpha;
 
             int last = 1;
@@ -256,7 +255,7 @@ public class Orbit extends Polyline {
             Vector3d bodyPos = aux3d1.get().setZero();
             if (orbitTrail) {
                 float top = alpha * 1f;
-                float bottom = 0f;
+                float bottom = alpha * -0f;
                 dAlpha = (top - bottom) / nPoints;
                 Instant currentTime = GaiaSky.instance.time.getTime();
                 long wrapTime = pointCloudData.getWrapTimeMs(currentTime);
@@ -294,15 +293,16 @@ public class Orbit extends Polyline {
                 prev.mul(localTransformD);
                 curr.mul(localTransformD);
 
+                float calpha = MathUtils.clamp(alpha, 0f, 1f);
                 if (orbitTrail && !reverse && n == nPoints - 2) {
-                    renderer.addLine(this, (float) curr.x, (float) curr.y, (float) curr.z, (float) bodyPos.x, (float) bodyPos.y, (float) bodyPos.z, cc[0], cc[1], cc[2], alpha * cc[3]);
+                    renderer.addLine(this, (float) curr.x, (float) curr.y, (float) curr.z, (float) bodyPos.x, (float) bodyPos.y, (float) bodyPos.z, cc[0], cc[1], cc[2], calpha * cc[3]);
                 } else if (orbitTrail && reverse && n == 0) {
-                    renderer.addLine(this, (float) curr.x, (float) curr.y, (float) curr.z, (float) bodyPos.x, (float) bodyPos.y, (float) bodyPos.z, cc[0], cc[1], cc[2], alpha * cc[3]);
-                } else {
+                    renderer.addLine(this, (float) curr.x, (float) curr.y, (float) curr.z, (float) bodyPos.x, (float) bodyPos.y, (float) bodyPos.z, cc[0], cc[1], cc[2], calpha * cc[3]);
                 }
-                renderer.addLine(this, (float) prev.x, (float) prev.y, (float) prev.z, (float) curr.x, (float) curr.y, (float) curr.z, cc[0], cc[1], cc[2], alpha * cc[3]);
+                renderer.addLine(this, (float) prev.x, (float) prev.y, (float) prev.z, (float) curr.x, (float) curr.y, (float) curr.z, cc[0], cc[1], cc[2], calpha * cc[3]);
 
-                alpha = MathUtils.clamp(alpha - dAlpha, 0f, 1f);
+
+                alpha -= dAlpha;
 
                 // advance
                 i = wrap(i + 1, nPoints);

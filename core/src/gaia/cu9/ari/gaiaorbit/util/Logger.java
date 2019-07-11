@@ -131,7 +131,7 @@ public class Logger {
     private static Map<String, Log> logObjects;
 
     static {
-        logObjects = new HashMap<String, Log>();
+        logObjects = new HashMap<>();
     }
 
     /**

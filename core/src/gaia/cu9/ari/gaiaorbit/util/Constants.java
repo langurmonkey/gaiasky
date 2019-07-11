@@ -203,8 +203,8 @@ public class Constants {
     public static final float MIN_LABEL_SIZE = 0.5f;
     public static final float MAX_LABEL_SIZE = 2.3f;
 
-    public static final float MIN_BLOOM = 0.0f;
-    public static final float MAX_BLOOM = 20.0f;
+    public final static float MIN_ELEVATION_MULT = 0f;
+    public final static float MAX_ELEVATION_MULT = 7.5f;
 
     // Max time, 5 Myr
     public static final long MAX_TIME_MS = 5000000l * (long) Nature.Y_TO_MS;

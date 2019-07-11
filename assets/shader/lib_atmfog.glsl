@@ -3,8 +3,6 @@
 uniform float fInnerRadius; /* The inner (planetary) radius*/
 uniform float fOuterRadius;
 uniform float fCameraHeight;
-uniform float u_heightScale;
-uniform vec3 v3PlanetPos; /* The position of the planet */
 uniform float u_fogDensity;
 uniform vec3 u_fogCol;
 

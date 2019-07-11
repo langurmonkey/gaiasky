@@ -882,7 +882,7 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
             closest.getPredictedPosition(aux5, GaiaSky.instance.time, this, false);
 
             double h = closest.getHeight(pos, aux5);
-            double hs = closest.getHeightScale();
+            double hs = closest.getHeightScale() * GlobalConf.scene.ELEVATION_MULTIPLIER;
             double minDist = h + hs / 10.0;
             double newDist = aux5.scl(-1).add(pos).len();
             if (newDist < minDist) {

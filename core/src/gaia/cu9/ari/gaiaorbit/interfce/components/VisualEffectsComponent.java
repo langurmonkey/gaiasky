@@ -15,14 +15,18 @@ import gaia.cu9.ari.gaiaorbit.event.IObserver;
 import gaia.cu9.ari.gaiaorbit.util.Constants;
 import gaia.cu9.ari.gaiaorbit.util.GlobalConf;
 import gaia.cu9.ari.gaiaorbit.util.I18n;
+import gaia.cu9.ari.gaiaorbit.util.format.INumberFormat;
+import gaia.cu9.ari.gaiaorbit.util.format.NumberFormatFactory;
 import gaia.cu9.ari.gaiaorbit.util.math.MathUtilsd;
 import gaia.cu9.ari.gaiaorbit.util.scene2d.OwnLabel;
 import gaia.cu9.ari.gaiaorbit.util.scene2d.OwnSlider;
 
 public class VisualEffectsComponent extends GuiComponent implements IObserver {
 
-    protected Slider starBrightness, starSize, starOpacity, ambientLight, labelSize;
-    protected OwnLabel starbrightnessl, size, opacity, ambient, bloomLabel, labels;
+    protected Slider starBrightness, starSize, starOpacity, ambientLight, labelSize, elevMult;
+    protected OwnLabel starbrightnessl, size, opacity, ambient, bloomLabel, labels, elevm;
+
+    protected INumberFormat nf;
 
     boolean flag = true;
 
@@ -30,6 +34,7 @@ public class VisualEffectsComponent extends GuiComponent implements IObserver {
 
     public VisualEffectsComponent(Skin skin, Stage stage) {
         super(skin, stage);
+        this.nf = NumberFormatFactory.getFormatter("#0.0");
     }
 
     public void initialize() {
@@ -135,6 +140,27 @@ public class VisualEffectsComponent extends GuiComponent implements IObserver {
         labelSizeGroup.addActor(labelSize);
         labelSizeGroup.addActor(labels);
 
+        /** Elevation multiplier **/
+        Label elevationMultiplierLabel = new Label(I18n.txt("gui.elevation.multiplier"), skin, "default");
+        elevm = new OwnLabel(nf.format(GlobalConf.scene.ELEVATION_MULTIPLIER), skin);
+        elevMult = new OwnSlider(Constants.MIN_ELEVATION_MULT, Constants.MAX_ELEVATION_MULT, 0.1f, false, skin);
+        elevMult.setName("elevation mult");
+        elevMult.setWidth(sliderWidth);
+        elevMult.setValue((float) MathUtilsd.roundAvoid(GlobalConf.scene.ELEVATION_MULTIPLIER, 1));
+        elevMult.addListener(event -> {
+            if (event instanceof ChangeEvent) {
+                float val = elevMult.getValue();
+                EventManager.instance.post(Events.ELEVATION_MUTLIPLIER_CMD, val, true);
+                elevm.setText(nf.format(elevMult.getValue()));
+                return true;
+            }
+            return false;
+        });
+                HorizontalGroup elevMultGroup = new HorizontalGroup();
+        elevMultGroup.space(space4);
+        elevMultGroup.addActor(elevMult);
+        elevMultGroup.addActor(elevm);
+
         VerticalGroup lightingGroup = new VerticalGroup().align(Align.left).columnAlign(Align.left);
         lightingGroup.space(space4);
         lightingGroup.addActor(vgroup(sbrightnessLabel, sbrightnessGroup, space2));
@@ -142,6 +168,7 @@ public class VisualEffectsComponent extends GuiComponent implements IObserver {
         lightingGroup.addActor(vgroup(opacityLabel, opacityGroup, space2));
         lightingGroup.addActor(vgroup(ambientLightLabel, ambientGroup, space2));
         lightingGroup.addActor(vgroup(labelSizeLabel, labelSizeGroup, space2));
+        lightingGroup.addActor(vgroup(elevationMultiplierLabel, elevMultGroup, space2));
 
         component = lightingGroup;
 

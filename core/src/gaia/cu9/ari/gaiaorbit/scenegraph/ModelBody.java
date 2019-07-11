@@ -200,7 +200,7 @@ public abstract class ModelBody extends CelestialBody {
     }
 
     public boolean renderTessellated() {
-        return mc.hasHeight();
+        return GlobalConf.scene.ELEVATION_TYPE.isTessellation() && mc.hasHeight();
     }
 
     @Override
@@ -389,7 +389,7 @@ public abstract class ModelBody extends CelestialBody {
                 dCam = distToCamera;
             }
             // Only when we have height map and we are below the highest point in the surface
-            if (dCam < getRadius() + mc.tc.heightScale * 4) {
+            if (dCam < getRadius() + mc.tc.heightScale * GlobalConf.scene.ELEVATION_MULTIPLIER * 4) {
                 float[][] m = mc.tc.heightMap;
                 int W = mc.tc.heightMap.length;
                 int H = mc.tc.heightMap[0].length;
@@ -432,7 +432,7 @@ public abstract class ModelBody extends CelestialBody {
                 height = (((x2 - x) * (y2 - y)) / denom) * f11 + ((x - x1) * (y2 - y) / denom) * f21 + ((x2 - x) * (y - y1) / denom) * f12 + ((x - x1) * (y - y1) / denom) * f22;
             }
         }
-        return getRadius() + height;
+        return getRadius() + height * GlobalConf.scene.ELEVATION_MULTIPLIER;
     }
 
     public double getHeightScale(){

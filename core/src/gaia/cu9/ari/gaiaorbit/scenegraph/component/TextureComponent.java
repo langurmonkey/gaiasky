@@ -5,10 +5,14 @@
 
 package gaia.cu9.ari.gaiaorbit.scenegraph.component;
 
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.assets.loaders.TextureLoader.TextureParameter;
 import com.badlogic.gdx.files.FileHandle;
-import com.badlogic.gdx.graphics.*;
+import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.graphics.GL20;
+import com.badlogic.gdx.graphics.Pixmap;
+import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.Texture.TextureFilter;
 import com.badlogic.gdx.graphics.g3d.Material;
 import com.badlogic.gdx.graphics.g3d.attributes.BlendingAttribute;
@@ -17,8 +21,12 @@ import com.badlogic.gdx.graphics.g3d.attributes.IntAttribute;
 import com.badlogic.gdx.graphics.g3d.attributes.TextureAttribute;
 import com.badlogic.gdx.math.Vector2;
 import gaia.cu9.ari.gaiaorbit.data.AssetBean;
+import gaia.cu9.ari.gaiaorbit.event.EventManager;
+import gaia.cu9.ari.gaiaorbit.event.Events;
+import gaia.cu9.ari.gaiaorbit.event.IObserver;
 import gaia.cu9.ari.gaiaorbit.util.Constants;
 import gaia.cu9.ari.gaiaorbit.util.GlobalConf;
+import gaia.cu9.ari.gaiaorbit.util.GlobalConf.SceneConf.ElevationType;
 import gaia.cu9.ari.gaiaorbit.util.GlobalResources;
 import gaia.cu9.ari.gaiaorbit.util.gdx.model.IntModelInstance;
 import gaia.cu9.ari.gaiaorbit.util.gdx.shader.FloatExtAttribute;
@@ -29,53 +37,61 @@ import java.util.Map;
 
 /**
  * A basic component that contains the info on the textures.
- * 
- * @author Toni Sagrista
  *
+ * @author Toni Sagrista
  */
-public class TextureComponent {
+public class TextureComponent implements IObserver {
     /** Default texture parameters **/
-    protected static final TextureParameter textureParams;
+    protected static final TextureParameter textureParamsMipMap, textureParams;
+
     static {
+        textureParamsMipMap = new TextureParameter();
+        textureParamsMipMap.genMipMaps = true;
+        textureParamsMipMap.magFilter = TextureFilter.Linear;
+        textureParamsMipMap.minFilter = TextureFilter.MipMapLinearLinear;
+
         textureParams = new TextureParameter();
-        textureParams.genMipMaps = true;
+        textureParams.genMipMaps = false;
         textureParams.magFilter = TextureFilter.Linear;
-        textureParams.minFilter = TextureFilter.MipMapLinearLinear;
+        textureParams.minFilter = TextureFilter.Linear;
     }
 
     public String base, specular, normal, night, ring, height;
     public String baseUnpacked, specularUnpacked, normalUnpacked, nightUnpacked, ringUnpacked, heightUnpacked;
-    public Texture baseTex;
+    public Texture baseTex, heightTex;
     // Height scale in internal units
     public Float heightScale = 0.005f;
     public Vector2 heightSize = new Vector2();
     public float[][] heightMap;
 
+    private Material material;
+
     /** Add also color even if texture is present **/
     public boolean coloriftex = false;
 
     public TextureComponent() {
-
+        super();
+        EventManager.instance.subscribe(this, Events.ELEVATION_TYPE_CMD, Events.ELEVATION_MUTLIPLIER_CMD);
     }
 
     public void initialize(AssetManager manager) {
         // Add textures to load
-        baseUnpacked = addToLoad(base, manager);
-        normalUnpacked = addToLoad(normal, manager);
-        specularUnpacked = addToLoad(specular, manager);
-        nightUnpacked = addToLoad(night, manager);
-        ringUnpacked = addToLoad(ring, manager);
-        heightUnpacked = addToLoad(height, manager);
+        baseUnpacked = addToLoad(base, textureParamsMipMap, manager);
+        normalUnpacked = addToLoad(normal, textureParams, manager);
+        specularUnpacked = addToLoad(specular, textureParamsMipMap, manager);
+        nightUnpacked = addToLoad(night, textureParamsMipMap, manager);
+        ringUnpacked = addToLoad(ring, textureParamsMipMap, manager);
+        heightUnpacked = addToLoad(height, textureParamsMipMap, manager);
     }
 
     public void initialize() {
         // Add textures to load
-        baseUnpacked = addToLoad(base);
-        normalUnpacked = addToLoad(normal);
-        specularUnpacked = addToLoad(specular);
-        nightUnpacked = addToLoad(night);
-        ringUnpacked = addToLoad(ring);
-        heightUnpacked = addToLoad(height);
+        baseUnpacked = addToLoad(base, textureParamsMipMap);
+        normalUnpacked = addToLoad(normal, textureParams);
+        specularUnpacked = addToLoad(specular, textureParamsMipMap);
+        nightUnpacked = addToLoad(night, textureParamsMipMap);
+        ringUnpacked = addToLoad(ring, textureParamsMipMap);
+        heightUnpacked = addToLoad(height, textureParamsMipMap);
     }
 
     public boolean isFinishedLoading(AssetManager manager) {
@@ -91,16 +107,16 @@ public class TextureComponent {
     /**
      * Adds the texture to load and unpacks any star (*) with the current
      * quality setting.
-     * 
+     *
      * @param tex
      * @return The actual loaded texture path
      */
-    private String addToLoad(String tex, AssetManager manager) {
+    private String addToLoad(String tex, TextureParameter texParams, AssetManager manager) {
         if (tex == null)
             return null;
 
         tex = GlobalResources.unpackTexName(tex);
-        manager.load(tex, Texture.class, textureParams);
+        manager.load(tex, Texture.class, texParams);
 
         return tex;
     }
@@ -108,23 +124,22 @@ public class TextureComponent {
     /**
      * Adds the texture to load and unpacks any star (*) with the current
      * quality setting.
-     * 
+     *
      * @param tex
      * @return The actual loaded texture path
      */
-    private String addToLoad(String tex) {
+    private String addToLoad(String tex, TextureParameter texParams) {
         if (tex == null)
             return null;
 
         tex = GlobalResources.unpackTexName(tex);
-        AssetBean.addAsset(tex, Texture.class, textureParams);
+        AssetBean.addAsset(tex, Texture.class, texParams);
 
         return tex;
     }
 
-
     public Material initMaterial(AssetManager manager, IntModelInstance instance, float[] cc, boolean culling) {
-        Material material = instance.materials.get(0);
+        this.material = instance.materials.get(0);
         if (base != null) {
             baseTex = manager.get(baseUnpacked, Texture.class);
             material.set(new TextureAttribute(TextureAttribute.Diffuse, baseTex));
@@ -148,21 +163,11 @@ public class TextureComponent {
             Texture tex = manager.get(nightUnpacked, Texture.class);
             material.set(new TextureExtAttribute(TextureExtAttribute.Night, tex));
         }
-        if(height != null) {
-            Texture tex = manager.get(heightUnpacked, Texture.class);
-            // Get height data for CPU (camera) use
-            Pixmap heightPixmap = new Pixmap(new FileHandle(GlobalResources.unpackTexName(height)));
-            heightMap = new float[heightPixmap.getWidth()][heightPixmap.getHeight()];
-            for(int i = 0; i < heightPixmap.getWidth(); i ++){
-                for(int j = 0; j < heightPixmap.getHeight(); j++){
-                    Color col = new Color(heightPixmap.getPixel(i, j));
-                    heightMap[i][j] = (1f - col.r) * heightScale;
-                }
+        if (height != null) {
+            heightTex = manager.get(heightUnpacked, Texture.class);
+            if (!GlobalConf.scene.ELEVATION_TYPE.isNone()) {
+                initializeElevationData();
             }
-            heightSize.set(tex.getWidth(), tex.getHeight());
-            material.set(new TextureExtAttribute(TextureExtAttribute.Height, tex));
-            material.set(new FloatExtAttribute(FloatExtAttribute.HeightScale, heightScale));
-            material.set(new Vector2Attribute(Vector2Attribute.HeightSize, heightSize));
         }
         if (instance.materials.size > 1) {
             // Ring material
@@ -180,17 +185,36 @@ public class TextureComponent {
         return material;
     }
 
+    private void initializeElevationData() {
+        // Get height data for CPU (camera) use
+        Pixmap heightPixmap = new Pixmap(new FileHandle(GlobalResources.unpackTexName(height)));
+        heightMap = new float[heightPixmap.getWidth()][heightPixmap.getHeight()];
+        for (int i = 0; i < heightPixmap.getWidth(); i++) {
+            for (int j = 0; j < heightPixmap.getHeight(); j++) {
+                Color col = new Color(heightPixmap.getPixel(i, j));
+                heightMap[i][j] = (1f - col.r) * heightScale;
+            }
+        }
+        heightSize.set(heightTex.getWidth(), heightTex.getHeight());
+        material.set(new TextureExtAttribute(TextureExtAttribute.Height, heightTex));
+        material.set(new FloatExtAttribute(FloatExtAttribute.HeightScale, heightScale * (float) GlobalConf.scene.ELEVATION_MULTIPLIER));
+        material.set(new Vector2Attribute(Vector2Attribute.HeightSize, heightSize));
+    }
+
+    private void removeElevationData() {
+        heightMap = null;
+        material.remove(TextureExtAttribute.Height);
+        material.remove(FloatExtAttribute.HeightScale);
+        material.remove(Vector2Attribute.HeightSize);
+    }
+
     /**
      * Initialises the materials by binding the necessary textures to them.
-     * 
-     * @param manager
-     *            The asset manager.
-     * @param materials
-     *            A map with at least one material under the key "base".
-     * @param cc
-     *            Plain color used if there is no texture.
-     * @param culling
-     *            Whether to cull the back-facing faces or not.
+     *
+     * @param manager   The asset manager.
+     * @param materials A map with at least one material under the key "base".
+     * @param cc        Plain color used if there is no texture.
+     * @param culling   Whether to cull the back-facing faces or not.
      */
     public void initMaterial(AssetManager manager, Map<String, Material> materials, float[] cc, boolean culling) {
         Material material = materials.get("base");
@@ -217,10 +241,11 @@ public class TextureComponent {
             Texture tex = manager.get(nightUnpacked, Texture.class);
             material.set(new TextureExtAttribute(TextureExtAttribute.Night, tex));
         }
-        if(height != null) {
-            Texture tex = manager.get(heightUnpacked, Texture.class);
-            material.set(new TextureAttribute(TextureExtAttribute.Height, tex));
-            material.set(new FloatExtAttribute(FloatExtAttribute.HeightScale, heightScale));
+        if (height != null) {
+            heightTex = manager.get(heightUnpacked, Texture.class);
+            if (!GlobalConf.scene.ELEVATION_TYPE.isNone()) {
+                initializeElevationData();
+            }
         }
         if (materials.containsKey("ring")) {
             // Ring material
@@ -255,24 +280,22 @@ public class TextureComponent {
     public void setRing(String ring) {
         this.ring = GlobalConf.data.dataFile(ring);
     }
-    public void setHeight(String height){
+
+    public void setHeight(String height) {
         this.height = GlobalConf.data.dataFile(height);
     }
 
-    public void setHeightScale(Double heightScale){
-        this.heightScale = (float)(heightScale * Constants.KM_TO_U);
+    public void setHeightScale(Double heightScale) {
+        this.heightScale = (float) (heightScale * Constants.KM_TO_U);
     }
-
-
 
     public void setColoriftex(Boolean coloriftex) {
         this.coloriftex = coloriftex;
     }
 
-    public boolean hasHeight(){
+    public boolean hasHeight() {
         return this.height != null && !this.height.isEmpty();
     }
-
 
     /** Disposes all currently loaded textures **/
     public void disposeTextures(AssetManager manager) {
@@ -299,6 +322,35 @@ public class TextureComponent {
         if (height != null && manager.containsAsset(heightUnpacked)) {
             manager.unload(heightUnpacked);
             heightUnpacked = null;
+            heightMap = null;
+        }
+    }
+
+    @Override
+    public void notify(Events event, Object... data) {
+        switch (event) {
+        case ELEVATION_TYPE_CMD:
+            if(this.hasHeight() && this.material != null) {
+                ElevationType newType = (ElevationType) data[0];
+                Gdx.app.postRunnable(() -> {
+                    if (newType.isNone()) {
+                        removeElevationData();
+                    } else {
+                        if (heightMap == null) {
+                            initializeElevationData();
+                        }
+                    }
+                });
+            }
+            break;
+        case ELEVATION_MUTLIPLIER_CMD:
+            if (this.hasHeight() && this.material != null) {
+                float newMultiplier = (Float) data[0];
+                Gdx.app.postRunnable(() -> this.material.set(new FloatExtAttribute(FloatExtAttribute.HeightScale, heightScale * newMultiplier)));
+            }
+            break;
+        default:
+            break;
         }
     }
 }

@@ -25,14 +25,12 @@ import gaia.cu9.ari.gaiaorbit.desktop.util.SysUtils;
 import gaia.cu9.ari.gaiaorbit.event.EventManager;
 import gaia.cu9.ari.gaiaorbit.event.Events;
 import gaia.cu9.ari.gaiaorbit.interfce.KeyBindings.ProgramAction;
-import gaia.cu9.ari.gaiaorbit.interfce.beans.ComboBoxBean;
-import gaia.cu9.ari.gaiaorbit.interfce.beans.FileComboBoxBean;
-import gaia.cu9.ari.gaiaorbit.interfce.beans.LangComboBoxBean;
-import gaia.cu9.ari.gaiaorbit.interfce.beans.MappingFileComboBoxBean;
+import gaia.cu9.ari.gaiaorbit.interfce.beans.*;
 import gaia.cu9.ari.gaiaorbit.scenegraph.camera.CameraManager;
 import gaia.cu9.ari.gaiaorbit.util.*;
 import gaia.cu9.ari.gaiaorbit.util.GlobalConf.PostprocessConf.Antialias;
 import gaia.cu9.ari.gaiaorbit.util.GlobalConf.PostprocessConf.ToneMapping;
+import gaia.cu9.ari.gaiaorbit.util.GlobalConf.SceneConf.ElevationType;
 import gaia.cu9.ari.gaiaorbit.util.GlobalConf.SceneConf.GraphicsQuality;
 import gaia.cu9.ari.gaiaorbit.util.GlobalConf.ScreenshotMode;
 import gaia.cu9.ari.gaiaorbit.util.format.INumberFormat;
@@ -70,6 +68,7 @@ public class PreferencesWindow extends GenericDialog {
     private OwnSelectBox<DisplayMode> fullscreenResolutions;
     private OwnSelectBox<ComboBoxBean> gquality, aa, orbitRenderer, lineRenderer, numThreads, screenshotMode, frameoutputMode, nshadows;
     private OwnSelectBox<LangComboBoxBean> lang;
+    private OwnSelectBox<ElevationComboBoxBean> elevationSb;
     private OwnSelectBox<String> theme;
     private OwnSelectBox<FileComboBoxBean> controllerMappings;
     private OwnTextField widthField, heightField, sswidthField, ssheightField, frameoutputPrefix, frameoutputFps, fowidthField, foheightField, camrecFps, cmResolution, smResolution, limitFps;
@@ -400,6 +399,30 @@ public class PreferencesWindow extends GenericDialog {
         // Add to content
         contentGraphicsTable.add(titleGraphics).left().padBottom(pad5 * 2).row();
         contentGraphicsTable.add(graphics).left().padBottom(pad5 * 4).row();
+
+        // ELEVATION
+        Label titleElevation = new OwnLabel(I18n.txt("gui.elevation.title"), skin, "help-title");
+        Table elevation = new Table();
+
+        // ELEVATION TYPE
+        OwnLabel elevationTypeLabel = new OwnLabel(I18n.txt("gui.elevation.type"), skin);
+        ElevationComboBoxBean[] ecbb = new ElevationComboBoxBean[ElevationType.values().length];
+        i = 0;
+        for(ElevationType et : ElevationType.values()){
+            ecbb[i] = new ElevationComboBoxBean(I18n.txt("gui.elevation.type." + et.toString().toLowerCase()), et);
+            i++;
+        }
+        elevationSb = new OwnSelectBox<>(skin);
+        elevationSb.setItems(ecbb);
+        elevationSb.setWidth(textwidth * 3f);
+        elevationSb.setSelectedIndex(GlobalConf.scene.ELEVATION_TYPE.ordinal());
+
+        elevation.add(elevationTypeLabel).left().padRight(pad5 * 4).padBottom(pad5);
+        elevation.add(elevationSb).left().padRight(pad5 * 2).padBottom(pad5);
+
+        // Add to content
+        contentGraphicsTable.add(titleElevation).left().padBottom(pad5 * 2).row();
+        contentGraphicsTable.add(elevation).left().padBottom(pad5 * 4).row();
 
         // SHADOWS
         Label titleShadows = new OwnLabel(I18n.txt("gui.graphics.shadows"), skin, "help-title");
@@ -1615,6 +1638,10 @@ public class PreferencesWindow extends GenericDialog {
         boolean reloadLineRenderer = GlobalConf.scene.LINE_RENDERER != lineRenderer.getSelected().value;
         bean = lineRenderer.getSelected();
         GlobalConf.scene.LINE_RENDERER = bean.value;
+
+        // Elevation representation
+        ElevationType newType = elevationSb.getSelected().type;
+        EventManager.instance.post(Events.ELEVATION_TYPE_CMD, newType);
 
         // Shadow mapping
         GlobalConf.scene.SHADOW_MAPPING = shadowsCb.isChecked();

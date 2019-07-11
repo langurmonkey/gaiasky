@@ -164,6 +164,8 @@ public class KeyBindings {
 
         // Condition which checks the current GUI is the FullGui
         BooleanRunnable fullGuiCondition = () -> GuiRegistry.current instanceof FullGui;
+        // Condition that checks the current camera is not Game
+        BooleanRunnable noGameCondition = () -> !GaiaSky.instance.getCameraManager().getMode().isGame();
 
         // about action
         final Runnable runnableAbout = () -> EventManager.instance.post(Events.SHOW_ABOUT_ACTION);
@@ -203,19 +205,19 @@ public class KeyBindings {
         addAction(new ProgramAction("action.toggle/element.moons", () -> EventManager.instance.post(Events.TOGGLE_VISIBILITY_CMD, "element.moons", false)));
 
         // Toggle stars
-        addAction(new ProgramAction("action.toggle/element.stars", () -> EventManager.instance.post(Events.TOGGLE_VISIBILITY_CMD, "element.stars", false)));
+        addAction(new ProgramAction("action.toggle/element.stars", () -> EventManager.instance.post(Events.TOGGLE_VISIBILITY_CMD, "element.stars", false), noGameCondition));
 
         // Toggle satellites
         addAction(new ProgramAction("action.toggle/element.satellites", () -> EventManager.instance.post(Events.TOGGLE_VISIBILITY_CMD, "element.satellites", false)));
 
         // Toggle asteroids
-        addAction(new ProgramAction("action.toggle/element.asteroids", () -> EventManager.instance.post(Events.TOGGLE_VISIBILITY_CMD, "element.asteroids", false)));
+        addAction(new ProgramAction("action.toggle/element.asteroids", () -> EventManager.instance.post(Events.TOGGLE_VISIBILITY_CMD, "element.asteroids", false), noGameCondition));
 
         // Toggle labels
         addAction(new ProgramAction("action.toggle/element.labels", () -> EventManager.instance.post(Events.TOGGLE_VISIBILITY_CMD, "element.labels", false)));
 
         // Toggle constellations
-        addAction(new ProgramAction("action.toggle/element.constellations", () -> EventManager.instance.post(Events.TOGGLE_VISIBILITY_CMD, "element.constellations", false)));
+        addAction(new ProgramAction("action.toggle/element.constellations", () -> EventManager.instance.post(Events.TOGGLE_VISIBILITY_CMD, "element.constellations", false), noGameCondition));
 
         // Toggle boundaries
         addAction(new ProgramAction("action.toggle/element.boundaries", () -> EventManager.instance.post(Events.TOGGLE_VISIBILITY_CMD, "element.boundaries", false)));

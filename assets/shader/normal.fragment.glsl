@@ -1,7 +1,5 @@
 #version 330 core
 
-#define TEXTURE_LOD_BIAS 0.0
-
 ////////////////////////////////////////////////////////////////////////////////////
 ////////// GROUND ATMOSPHERIC SCATTERING - FRAGMENT
 ////////////////////////////////////////////////////////////////////////////////////
@@ -132,7 +130,7 @@ in vec3 v_shadowMapUv;
 
 float getShadowness(vec2 uv, vec2 offset, float compare){
     const vec4 bitShifts = vec4(1.0, 1.0 / 255.0, 1.0 / 65025.0, 1.0 / 160581375.0);
-    return step(compare - bias, dot(texture(u_shadowTexture, uv + offset, TEXTURE_LOD_BIAS), bitShifts)); //+(1.0/255.0));
+    return step(compare - bias, dot(texture(u_shadowTexture, uv + offset), bitShifts)); //+(1.0/255.0));
 }
 
 
@@ -179,9 +177,9 @@ in vec3 v_ambientLight;
 
 // COLOR DIFFUSE
 #if defined(diffuseTextureFlag) && defined(diffuseColorFlag)
-    #define fetchColorDiffuseTD(tex, texCoord, defaultValue) texture(tex, texCoord, TEXTURE_LOD_BIAS) * u_diffuseColor
+    #define fetchColorDiffuseTD(tex, texCoord, defaultValue) texture(tex, texCoord) * u_diffuseColor
 #elif defined(diffuseTextureFlag)
-    #define fetchColorDiffuseTD(tex, texCoord, defaultValue) texture(tex, texCoord, TEXTURE_LOD_BIAS)
+    #define fetchColorDiffuseTD(tex, texCoord, defaultValue) texture(tex, texCoord)
 #elif defined(diffuseColorFlag)
     #define fetchColorDiffuseTD(tex, texCoord, defaultValue) u_diffuseColor
 #else
@@ -196,9 +194,9 @@ in vec3 v_ambientLight;
 
 // COLOR EMISSIVE
 #if defined(emissiveTextureFlag) && defined(emissiveColorFlag)
-    #define fetchColorEmissiveTD(tex, texCoord) texture(tex, texCoord, TEXTURE_LOD_BIAS) * u_emissiveColor * 2.0
+    #define fetchColorEmissiveTD(tex, texCoord) texture(tex, texCoord) * u_emissiveColor * 2.0
 #elif defined(emissiveTextureFlag)
-    #define fetchColorEmissiveTD(tex, texCoord) texture(tex, texCoord, TEXTURE_LOD_BIAS)
+    #define fetchColorEmissiveTD(tex, texCoord) texture(tex, texCoord)
 #elif defined(emissiveColorFlag)
     #define fetchColorEmissiveTD(tex, texCoord) u_emissiveColor * 2.0
 #endif // emissiveTextureFlag && emissiveColorFlag
@@ -211,9 +209,9 @@ in vec3 v_ambientLight;
 
 // COLOR SPECULAR
 #if defined(specularTextureFlag) && defined(specularColorFlag)
-    #define fetchColorSpecular(texCoord, defaultValue) texture(u_specularTexture, texCoord, TEXTURE_LOD_BIAS).rgb * u_specularColor.rgb
+    #define fetchColorSpecular(texCoord, defaultValue) texture(u_specularTexture, texCoord).rgb * u_specularColor.rgb
 #elif defined(specularTextureFlag)
-    #define fetchColorSpecular(texCoord, defaultValue) texture(u_specularTexture, texCoord, TEXTURE_LOD_BIAS).rgb
+    #define fetchColorSpecular(texCoord, defaultValue) texture(u_specularTexture, texCoord).rgb
 #elif defined(specularColorFlag)
     #define fetchColorSpecular(texCoord, defaultValue) u_specularColor.rgb
 #else
@@ -222,7 +220,7 @@ in vec3 v_ambientLight;
 
 // COLOR NIGHT
 #if defined(nightTextureFlag)
-    #define fetchColorNight(texCoord) texture(u_nightTexture, texCoord, TEXTURE_LOD_BIAS).rgb
+    #define fetchColorNight(texCoord) texture(u_nightTexture, texCoord).rgb
 #else
     #define fetchColorNight(texCoord) vec3(0.0)
 #endif // nightTextureFlag
@@ -258,7 +256,7 @@ out vec4 fragColor;
 uniform float u_heightScale;
 
 #define KM_TO_U 1.0E-6
-#define HIEIGHT_FACTOR 0.001 * KM_TO_U
+#define HEIGHT_FACTOR 70.0
 
 vec2 parallaxMapping(vec2 texCoords, vec3 viewDir){
     // number of depth layers
@@ -276,13 +274,13 @@ vec2 parallaxMapping(vec2 texCoords, vec3 viewDir){
 
     // get initial values
     vec2  currentTexCoords     = texCoords;
-    float currentDepthMapValue = texture(u_heightTexture, currentTexCoords, TEXTURE_LOD_BIAS).r;
+    float currentDepthMapValue = texture(u_heightTexture, currentTexCoords).r;
 
     while(currentLayerDepth < currentDepthMapValue){
         // shift texture coordinates along direction of P
         currentTexCoords -= deltaTexCoords;
         // get depthmap value at current texture coordinates
-        currentDepthMapValue = texture(u_heightTexture, currentTexCoords, TEXTURE_LOD_BIAS).r;
+        currentDepthMapValue = texture(u_heightTexture, currentTexCoords).r;
         // get depth of next layer
         currentLayerDepth += layerDepth;
     }
@@ -292,7 +290,7 @@ vec2 parallaxMapping(vec2 texCoords, vec3 viewDir){
 
     // get depth after and before collision for linear interpolation
     float afterDepth  = currentDepthMapValue - currentLayerDepth;
-    float beforeDepth = texture(u_heightTexture, prevTexCoords, TEXTURE_LOD_BIAS).r - currentLayerDepth + layerDepth;
+    float beforeDepth = texture(u_heightTexture, prevTexCoords).r - currentLayerDepth + layerDepth;
 
     // interpolation of texture coordinates
     float weight = afterDepth / (afterDepth - beforeDepth);
@@ -355,7 +353,7 @@ void main() {
     vec3 ambient = v_ambientLight;
 
     #ifdef normalTextureFlag
-		vec3 N = normalize(vec3(texture(u_normalTexture, texCoords, TEXTURE_LOD_BIAS).xyz * 2.0 - 1.0));
+		vec3 N = normalize(vec3(texture(u_normalTexture, texCoords).xyz * 2.0 - 1.0));
 		#ifdef environmentCubemapFlag
 			vec3 reflectDir = normalize(v_reflect + (vec3(0.0, 0.0, 1.0) - N.xyz));
 		#endif // environmentCubemapFlag
@@ -404,7 +402,6 @@ void main() {
     if(fragColor.a == 0.0){
         discard;
     }
-
     // Logarithmic depth buffer
     gl_FragDepth = v_depth;
 }

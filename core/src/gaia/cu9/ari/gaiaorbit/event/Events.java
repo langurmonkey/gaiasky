@@ -533,6 +533,15 @@ public enum Events {
     LABEL_SIZE_CMD,
 
     /**
+     * Sets the elevation type
+     */
+    ELEVATION_TYPE_CMD,
+    /**
+     * Sets the elevation multiplier. Contains the new multiplier in [{@link gaia.cu9.ari.gaiaorbit.util.Constants#MIN_ELEVATION_MULT}, {@link gaia.cu9.ari.gaiaorbit.util.Constants#MAX_ELEVATION_MULT}]
+     */
+    ELEVATION_MUTLIPLIER_CMD,
+
+    /**
      * Stereoscopic vision, side by side rendering. Contains the state boolean
      * and another boolean indicating whether it comes from the interface.
      **/
