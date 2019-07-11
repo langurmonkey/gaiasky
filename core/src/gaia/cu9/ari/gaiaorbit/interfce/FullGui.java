@@ -449,7 +449,7 @@ public class FullGui extends AbstractGui {
     }
 
     public void addControlsWindow() {
-        controlsWindow = new ControlsWindow(I18n.txt("gui.controlpanel"), skin, ui);
+        controlsWindow = new ControlsWindow(GlobalConf.getSuperShortApplicationName(), skin, ui);
         controlsWindow.setSceneGraph(sg);
         controlsWindow.setVisibilityToggles(visibilityEntities, visible);
         controlsWindow.initialize();

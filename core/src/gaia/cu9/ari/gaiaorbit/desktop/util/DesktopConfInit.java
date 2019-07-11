@@ -39,7 +39,7 @@ import java.util.Properties;
  * @author tsagrista
  */
 public class DesktopConfInit extends ConfInit {
-    private static final Log logger = Logger.getLogger("GaiaSky");
+    private static final Log logger = Logger.getLogger(DesktopConfInit.class);
 
     CommentedProperties p;
     Properties vp;

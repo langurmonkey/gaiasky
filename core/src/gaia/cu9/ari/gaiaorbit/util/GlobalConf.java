@@ -1521,4 +1521,8 @@ public class GlobalConf {
         return APPLICATION_SHORT_NAME + program.getNetName() + " " + version.version + " (" + version.build + ")";
     }
 
+    public static String getSuperShortApplicationName(){
+        return APPLICATION_NAME + " " + version.version;
+    }
+
 }

@@ -531,17 +531,17 @@
   },
   "com.badlogic.gdx.scenes.scene2d.ui.Window$WindowStyle": {
     "default": {
-      "titleFont": "ui-23-bold",
+      "titleFont": "ui-21",
       "background": "default-window",
       "titleFontColor": "black"
     },
     "info": {
-      "titleFont": "ui-23-bold",
+      "titleFont": "ui-21",
       "background": "info-window",
       "titleFontColor": "black"
     },
     "dialog": {
-      "titleFont": "ui-23-bold",
+      "titleFont": "ui-21",
       "background": "default-window",
       "titleFontColor": "black",
       "stageBackground": "dialogDim"
