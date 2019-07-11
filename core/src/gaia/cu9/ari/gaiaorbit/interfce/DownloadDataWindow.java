@@ -185,7 +185,7 @@ public class DownloadDataWindow extends GenericDialog {
 
         // Uploads available?
         if(dd.updatesAvailable){
-            OwnLabel updates = new OwnLabel(I18n.txt("gui.download.updates", dd.numUpdates), skin, "headline");
+            OwnLabel updates = new OwnLabel(I18n.txt("gui.download.updates", dd.numUpdates), skin, "hud-big");
             updates.setColor(highlight);
             downloadTable.add(updates).colspan(2).center().padBottom(padLarge).row();
         }
