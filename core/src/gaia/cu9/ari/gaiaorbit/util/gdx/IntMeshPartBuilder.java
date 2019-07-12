@@ -278,6 +278,10 @@ public interface IntMeshPartBuilder {
         public boolean hasPosition;
         public final Vector3 normal = new Vector3(0, 1, 0);
         public boolean hasNormal;
+        public final Vector3 tangent = new Vector3(1, 0, 0);
+        public boolean hasTangent;
+        public final Vector3 binormal = new Vector3(0, 0, 1);
+        public boolean hasBinormal;
         public final Color color = new Color(1, 1, 1, 1);
         public boolean hasColor;
         public final Vector2 uv = new Vector2();
@@ -287,16 +291,26 @@ public interface IntMeshPartBuilder {
         public void reset() {
             position.set(0, 0, 0);
             normal.set(0, 1, 0);
+            tangent.set(1, 0, 0);
+            binormal.set(0, 0, 1);
             color.set(1, 1, 1, 1);
             uv.set(0, 0);
         }
 
         public VertexInfo set(Vector3 pos, Vector3 nor, Color col, Vector2 uv) {
+            return set(pos, nor, null, null, col, uv);
+        }
+
+        public VertexInfo set(Vector3 pos, Vector3 nor, Vector3 tan, Vector3 bin, Color col, Vector2 uv) {
             reset();
             if ((hasPosition = pos != null) == true)
                 position.set(pos);
             if ((hasNormal = nor != null) == true)
                 normal.set(nor);
+            if ((hasTangent = tan != null) == true)
+                tangent.set(tan);
+            if ((hasBinormal = bin != null) == true)
+                tangent.set(bin);
             if ((hasColor = col != null) == true)
                 color.set(col);
             if ((hasUV = uv != null) == true)
@@ -306,11 +320,15 @@ public interface IntMeshPartBuilder {
 
         public VertexInfo set(final VertexInfo other) {
             if (other == null)
-                return set(null, null, null, null);
+                return set(null, null, null, null, null, null);
             hasPosition = other.hasPosition;
             position.set(other.position);
             hasNormal = other.hasNormal;
             normal.set(other.normal);
+            hasTangent = other.hasTangent;
+            tangent.set(other.tangent);
+            hasBinormal = other.hasBinormal;
+            binormal.set(other.binormal);
             hasColor = other.hasColor;
             color.set(other.color);
             hasUV = other.hasUV;
@@ -342,6 +360,30 @@ public interface IntMeshPartBuilder {
             return this;
         }
 
+        public VertexInfo setTan(float x, float y, float z){
+            tangent.set(x,y,z);
+            hasTangent = true;
+            return this;
+        }
+
+        public VertexInfo setTan(Vector3 tan) {
+            if ((hasTangent = tan != null) == true)
+                tangent.set(tan);
+            return this;
+        }
+
+        public VertexInfo setBin(float x, float y, float z){
+            binormal.set(x,y,z);
+            hasBinormal = true;
+            return this;
+        }
+
+        public VertexInfo setBin(Vector3 bin) {
+            if ((hasBinormal = bin != null) == true)
+                binormal.set(bin);
+            return this;
+        }
+
         public VertexInfo setCol(float r, float g, float b, float a) {
             color.set(r, g, b, a);
             hasColor = true;
@@ -370,6 +412,10 @@ public interface IntMeshPartBuilder {
             if (hasPosition && target.hasPosition)
                 position.lerp(target.position, alpha);
             if (hasNormal && target.hasNormal)
+                normal.lerp(target.normal, alpha);
+            if (hasTangent && target.hasTangent)
+                tangent.lerp(target.tangent, alpha);
+            if (hasBinormal && target.hasBinormal)
                 normal.lerp(target.normal, alpha);
             if (hasColor && target.hasColor)
                 color.lerp(target.color, alpha);

@@ -97,6 +97,20 @@ vec3 calcNormal(vec2 p, vec2 dp){
     vec3 n = cross(va, vb);
     return normalize(n);
 }
+
+vec3 calcNormal2(vec2 p, vec2 dp){
+    const vec2 size = vec2(1.0, 0.0);
+    const ivec3 off = ivec3(-1, 0, 1);
+
+    float s01 = textureOffset(u_heightTexture, p, off.xy).x;
+    float s21 = textureOffset(u_heightTexture, p, off.zy).x;
+    float s10 = textureOffset(u_heightTexture, p, off.yx).x;
+    float s12 = textureOffset(u_heightTexture, p, off.yz).x;
+    vec3 va = normalize(vec3(size.xy, s21 - s01));
+    vec3 vb = normalize(vec3(size.yx, s12 - s10));
+    vec3 res = cross(va, vb);
+    return vec3(-res.x, res.y, res.z);
+}
 #endif
 
 void main(void){
@@ -127,7 +141,6 @@ void main(void){
     gl_Position = u_projViewTrans * pos;
 
     // Plumbing
-    //o_normalTan = calcNormal(o_texCoords);
     o_fragPosition = pos.xyz;
     o_normalTan = calcNormal(o_texCoords, vec2(1.0 / u_heightSize.x, 1.0 / u_heightSize.y));
     o_depth = getDepthValue(length(pos.xyz));

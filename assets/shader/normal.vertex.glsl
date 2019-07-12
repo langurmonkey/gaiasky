@@ -345,10 +345,7 @@ void main() {
     g_tangent = normalize(u_normalMatrix * g_tangent);
 
     #ifndef heightFlag
-    mat3 TBN;
-    TBN[0] = g_tangent;
-    TBN[1] = g_binormal;
-    TBN[2] = g_normal;
+    mat3 TBN = mat3(g_tangent, g_binormal, g_normal);
     #endif
 
     #ifdef ambientLightFlag

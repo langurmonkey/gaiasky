@@ -77,6 +77,10 @@ public class IntIntMeshBuilder implements IntMeshPartBuilder {
     private int posSize;
     /** The offset within an vertex to normal, or -1 if not available */
     private int norOffset;
+    /** The offset within an vertex to tangent, or -1 if not available */
+    private int tanOffset;
+    /** The offset within an vertex to binormal, or -1 if not available */
+    private int binOffset;
     /** The offset within an vertex to color, or -1 if not available */
     private int colOffset;
     /** The size (in number of floats) of the color attribute */
@@ -107,7 +111,7 @@ public class IntIntMeshBuilder implements IntMeshPartBuilder {
     /** @param usage bitwise mask of the {@link com.badlogic.gdx.graphics.VertexAttributes.Usage}, only Position, Color, Normal and
      *           TextureCoordinates is supported. */
     public static VertexAttributes createAttributes(long usage) {
-        final Array<VertexAttribute> attrs = new Array<VertexAttribute>();
+        final Array<VertexAttribute> attrs = new Array<>();
         if ((usage & Usage.Position) == Usage.Position)
             attrs.add(new VertexAttribute(Usage.Position, 3, ShaderProgram.POSITION_ATTRIBUTE));
         if ((usage & Usage.ColorUnpacked) == Usage.ColorUnpacked)
@@ -116,6 +120,10 @@ public class IntIntMeshBuilder implements IntMeshPartBuilder {
             attrs.add(new VertexAttribute(Usage.ColorPacked, 4, ShaderProgram.COLOR_ATTRIBUTE));
         if ((usage & Usage.Normal) == Usage.Normal)
             attrs.add(new VertexAttribute(Usage.Normal, 3, ShaderProgram.NORMAL_ATTRIBUTE));
+        if ((usage & Usage.Tangent) == Usage.Tangent)
+            attrs.add(new VertexAttribute(Usage.Tangent, 3, ShaderProgram.TANGENT_ATTRIBUTE));
+        if ((usage & Usage.BiNormal) == Usage.BiNormal)
+            attrs.add(new VertexAttribute(Usage.BiNormal, 3, ShaderProgram.BINORMAL_ATTRIBUTE));
         if ((usage & Usage.TextureCoordinates) == Usage.TextureCoordinates)
             attrs.add(new VertexAttribute(Usage.TextureCoordinates, 2, ShaderProgram.TEXCOORD_ATTRIBUTE + "0"));
         final VertexAttribute attributes[] = new VertexAttribute[attrs.size];
@@ -163,6 +171,10 @@ public class IntIntMeshBuilder implements IntMeshPartBuilder {
         posSize = a.numComponents;
         a = attributes.findByUsage(Usage.Normal);
         norOffset = a == null ? -1 : a.offset / 4;
+        a = attributes.findByUsage(Usage.Tangent);
+        tanOffset = a == null ? -1 : a.offset / 4;
+        a = attributes.findByUsage(Usage.BiNormal);
+        binOffset = a == null ? -1 : a.offset / 4;
         a = attributes.findByUsage(Usage.ColorUnpacked);
         colOffset = a == null ? -1 : a.offset / 4;
         colSize = a == null ? 0 : a.numComponents;
@@ -390,6 +402,10 @@ public class IntIntMeshBuilder implements IntMeshPartBuilder {
 
     @Override
     public int vertex(Vector3 pos, Vector3 nor, Color col, Vector2 uv) {
+        return vertex(pos, nor, null, null, col, uv);
+    }
+
+    public int vertex(Vector3 pos, Vector3 nor, Vector3 tan, Vector3 bin, Color col, Vector2 uv) {
         if (vindex >= Integer.MAX_VALUE)
             throw new GdxRuntimeException("Too many vertices used");
         if (col == null && colorSet)
@@ -422,6 +438,30 @@ public class IntIntMeshBuilder implements IntMeshPartBuilder {
                 vertex[norOffset + 2] = nor.z;
             }
         }
+        if (tan != null && tanOffset >= 0) {
+            if (vertexTransformationEnabled) {
+                tempVTransformed.set(tan).mul(normalTransform).nor();
+                vertex[tanOffset] = tempVTransformed.x;
+                vertex[tanOffset + 1] = tempVTransformed.y;
+                vertex[tanOffset + 2] = tempVTransformed.z;
+            } else {
+                vertex[tanOffset] = tan.x;
+                vertex[tanOffset + 1] = tan.y;
+                vertex[tanOffset + 2] = tan.z;
+            }
+        }
+        if (bin != null && binOffset >= 0) {
+            if (vertexTransformationEnabled) {
+                tempVTransformed.set(bin).mul(normalTransform).nor();
+                vertex[binOffset] = tempVTransformed.x;
+                vertex[binOffset + 1] = tempVTransformed.y;
+                vertex[binOffset + 2] = tempVTransformed.z;
+            } else {
+                vertex[binOffset] = bin.x;
+                vertex[binOffset + 1] = bin.y;
+                vertex[binOffset + 2] = bin.z;
+            }
+        }
         if (col != null) {
             if (colOffset >= 0) {
                 vertex[colOffset] = col.r;
@@ -450,7 +490,7 @@ public class IntIntMeshBuilder implements IntMeshPartBuilder {
 
     @Override
     public int vertex(final VertexInfo info) {
-        return vertex(info.hasPosition ? info.position : null, info.hasNormal ? info.normal : null, info.hasColor ? info.color : null, info.hasUV ? info.uv : null);
+        return vertex(info.hasPosition ? info.position : null, info.hasNormal ? info.normal : null, info.hasTangent ? info.tangent : null, info.hasBinormal ? info.binormal : null, info.hasColor ? info.color : null, info.hasUV ? info.uv : null);
     }
 
     @Override
@@ -1009,7 +1049,7 @@ public class IntIntMeshBuilder implements IntMeshPartBuilder {
         float angleU = 0f;
         float angleV = 0f;
         VertexInfo curr1 = vertTmp3.set(null, null, null, null);
-        curr1.hasUV = curr1.hasPosition = curr1.hasNormal = true;
+        curr1.hasUV = curr1.hasPosition = curr1.hasNormal = curr1.hasTangent = curr1.hasBinormal = true;
 
         if (tmpIndices == null)
             tmpIndices = new IntArray(divisionsU * 2);
@@ -1031,7 +1071,12 @@ public class IntIntMeshBuilder implements IntMeshPartBuilder {
                 angleU = auo + stepU * iu;
                 u = 1f - us * iu;
                 curr1.position.set(MathUtils.cos(angleU) * hw * t, h, MathUtils.sin(angleU) * hd * t).mul(transform);
+                // Normal is just the position
                 curr1.normal.set(curr1.position).nor();
+                // Tangent
+                curr1.tangent.set(MathUtils.cos(angleU - 90f * MathUtils.degreesToRadians) * hw * t, h, MathUtils.sin(angleU - 90f * MathUtils.degreesToRadians) * hd * t).mul(transform).nor();
+                // Binormal
+                curr1.binormal.set(curr1.normal).crs(curr1.tangent).nor();
                 curr1.uv.set(u, v);
                 tmpIndices.set(tempOffset, vertex(curr1));
                 final int o = tempOffset + s;
@@ -1193,7 +1238,7 @@ public class IntIntMeshBuilder implements IntMeshPartBuilder {
         float angleU;
         float angleV;
         VertexInfo curr1 = vertTmp3.set(null, null, null, null);
-        curr1.hasUV = curr1.hasPosition = curr1.hasNormal = true;
+        curr1.hasUV = curr1.hasPosition = curr1.hasNormal = curr1.hasTangent = curr1.hasBinormal = true;
 
         if (tmpIndices == null)
             tmpIndices = new IntArray(divisionsU * 2);
@@ -1215,7 +1260,12 @@ public class IntIntMeshBuilder implements IntMeshPartBuilder {
                 angleU = auo + stepU * iu;
                 u = 1f - us * iu;
                 curr1.position.set(MathUtils.cos(angleU) * hw * t, h, MathUtils.sin(angleU) * hd * t).mul(transform);
+                // Normal is just the position
                 curr1.normal.set(curr1.position).nor();
+                // Tangent
+                curr1.tangent.set(MathUtils.cos(angleU - 90f * MathUtils.degreesToRadians) * hw * t, h, MathUtils.sin(angleU - 90f * MathUtils.degreesToRadians) * hd * t).mul(transform).nor();
+                // Binormal
+                curr1.binormal.set(curr1.normal).crs(curr1.tangent).nor();
                 curr1.uv.set(u, v);
                 tmpIndices.set(tempOffset, vertex(curr1));
                 final int o = tempOffset + s;

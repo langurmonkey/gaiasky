@@ -50,7 +50,7 @@ out vec3 v_normal;
 vec3 g_normal = a_normal;
 #define passNormalValue(value) pushNormalValue(value)
 #else
-vec3 g_normal = vec3(0.0, 0.0, 1.0);
+vec3 g_normal = vec3(0.0, 1.0, 0.0);
 #define passNormalValue(value) nop()
 #endif
 #define passNormal() passNormalValue(g_normal)
@@ -69,7 +69,7 @@ out vec3 v_binormal;
 vec3 g_binormal = a_binormal;
 #define passBinormalValue(value) pushBinormalValue(value)
 #else
-vec3 g_binormal = vec3(0.0, 1.0, 0.0);
+vec3 g_binormal = vec3(0.0, 0.0, 1.0);
 #define passBinormalValue(value) nop()
 #endif // binormalFlag
 #define passBinormal() passBinormalValue(g_binormal)
@@ -314,10 +314,7 @@ void main() {
     g_binormal = normalize(u_normalMatrix * g_binormal);
     g_tangent = normalize(u_normalMatrix * g_tangent);
 
-    mat3 TBN;
-    TBN[0] = g_tangent;
-    TBN[1] = g_binormal;
-    TBN[2] = g_normal;
+    mat3 TBN = mat3(g_tangent, g_binormal, g_normal);
 
     #ifdef ambientLightFlag
     v_ambientLight = u_ambientLight;
