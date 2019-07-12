@@ -33,7 +33,9 @@ import gaia.cu9.ari.gaiaorbit.util.GlobalConf.PostprocessConf.ToneMapping;
 import gaia.cu9.ari.gaiaorbit.util.GlobalConf.SceneConf.ElevationType;
 import gaia.cu9.ari.gaiaorbit.util.GlobalConf.SceneConf.GraphicsQuality;
 import gaia.cu9.ari.gaiaorbit.util.GlobalConf.ScreenshotMode;
+import gaia.cu9.ari.gaiaorbit.util.Logger.Log;
 import gaia.cu9.ari.gaiaorbit.util.datadesc.DataDescriptor;
+import gaia.cu9.ari.gaiaorbit.util.datadesc.DataDescriptorUtils;
 import gaia.cu9.ari.gaiaorbit.util.format.INumberFormat;
 import gaia.cu9.ari.gaiaorbit.util.format.NumberFormatFactory;
 import gaia.cu9.ari.gaiaorbit.util.math.MathUtilsd;
@@ -58,6 +60,8 @@ import java.util.TreeSet;
  * @author tsagrista
  */
 public class PreferencesWindow extends GenericDialog {
+    private static Log logger = Logger.getLogger(PreferencesWindow.class);
+
     private Array<Actor> contents;
     private Array<OwnLabel> labels;
 
@@ -278,7 +282,7 @@ public class PreferencesWindow extends GenericDialog {
 
         ComboBoxBean[] gqs = new ComboBoxBean[GraphicsQuality.values().length];
         int i = 0;
-        for(GraphicsQuality q : GraphicsQuality.values()){
+        for (GraphicsQuality q : GraphicsQuality.values()) {
             gqs[i] = new ComboBoxBean(I18n.txt(q.key), q.ordinal());
             i++;
         }
@@ -409,7 +413,7 @@ public class PreferencesWindow extends GenericDialog {
         OwnLabel elevationTypeLabel = new OwnLabel(I18n.txt("gui.elevation.type"), skin);
         ElevationComboBoxBean[] ecbb = new ElevationComboBoxBean[ElevationType.values().length];
         i = 0;
-        for(ElevationType et : ElevationType.values()){
+        for (ElevationType et : ElevationType.values()) {
             ecbb[i] = new ElevationComboBoxBean(I18n.txt("gui.elevation.type." + et.toString().toLowerCase()), et);
             i++;
         }
@@ -893,8 +897,8 @@ public class PreferencesWindow extends GenericDialog {
 
             String[] act = new String[1 + keys.size];
             act[0] = action.actionName;
-            for(int j = 0; j < keys.size; j++){
-                act[j+1] = keysToString(keys.get(j));
+            for (int j = 0; j < keys.size; j++) {
+                act[j + 1] = keysToString(keys.get(j));
             }
 
             data[i] = act;
@@ -920,9 +924,9 @@ public class PreferencesWindow extends GenericDialog {
         for (String[] action : data) {
             HorizontalGroup keysGroup = new HorizontalGroup();
             keysGroup.space(pad5);
-            for(int j = 1; j < action.length; j++){
+            for (int j = 1; j < action.length; j++) {
                 keysGroup.addActor(new OwnLabel(action[j], skin, "default-pink"));
-                if(j < action.length - 1)
+                if (j < action.length - 1)
                     keysGroup.addActor(new OwnLabel("/", skin));
             }
             controls.add(new OwnLabel(action[0], skin)).left().padRight(pad);
@@ -1324,10 +1328,24 @@ public class PreferencesWindow extends GenericDialog {
         dataDownload.setSize(150 * GlobalConf.SCALE_FACTOR, 25 * GlobalConf.SCALE_FACTOR);
         dataDownload.addListener((event) -> {
             if (event instanceof ChangeEvent) {
-
-                DownloadDataWindow ddw = new DownloadDataWindow(stage, skin, DataDescriptor.currentDataDescriptor, false, I18n.txt("gui.close"), null);
-                ddw.setModal(true);
-                ddw.show(stage);
+                if (DataDescriptor.currentDataDescriptor != null) {
+                    DownloadDataWindow ddw = new DownloadDataWindow(stage, skin, DataDescriptor.currentDataDescriptor, false, I18n.txt("gui.close"), null);
+                    ddw.setModal(true);
+                    ddw.show(stage);
+                } else {
+                    // Try again
+                    FileHandle dataDescriptor = Gdx.files.absolute(SysUtils.getDefaultTmpDir() + "/gaiasky-data.json");
+                    DownloadHelper.downloadFile(GlobalConf.program.DATA_DESCRIPTOR_URL, dataDescriptor, null, (digest) -> {
+                        DataDescriptor dd = DataDescriptorUtils.instance().buildDatasetsDescriptor(dataDescriptor);
+                        DownloadDataWindow ddw = new DownloadDataWindow(stage, skin, dd, false, I18n.txt("gui.close"), null);
+                        ddw.setModal(true);
+                        ddw.show(stage);
+                    }, () -> {
+                        // Fail?
+                        logger.error("No internet connection or server is down!");
+                        GuiUtils.addNoConnectionWindow(skin, stage);
+                    }, null);
+                }
                 return true;
             }
             return false;
@@ -1654,7 +1672,7 @@ public class PreferencesWindow extends GenericDialog {
         // Interface
         LangComboBoxBean lbean = lang.getSelected();
         String newTheme = theme.getSelected();
-        if(hidpiCb.isChecked()){
+        if (hidpiCb.isChecked()) {
             newTheme += "-x2";
         }
         boolean reloadUI = !GlobalConf.program.UI_THEME.equals(newTheme) || !lbean.locale.toLanguageTag().equals(GlobalConf.program.LOCALE);

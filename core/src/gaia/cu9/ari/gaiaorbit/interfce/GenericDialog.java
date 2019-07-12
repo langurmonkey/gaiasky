@@ -72,7 +72,7 @@ public abstract class GenericDialog extends CollapsibleWindow {
         this.scrolls = new Array<>(5);
     }
 
-    protected void setAcceptText(String acceptText) {
+    public void setAcceptText(String acceptText) {
         this.acceptText = acceptText;
         if (acceptButton != null) {
             acceptButton.setText(acceptText);
@@ -80,7 +80,7 @@ public abstract class GenericDialog extends CollapsibleWindow {
         }
     }
 
-    protected void setCancelText(String cancelText) {
+    public void setCancelText(String cancelText) {
         this.cancelText = cancelText;
         if (cancelButton != null) {
             cancelButton.setText(cancelText);

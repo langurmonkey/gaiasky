@@ -19,8 +19,6 @@ import gaia.cu9.ari.gaiaorbit.util.*;
 import gaia.cu9.ari.gaiaorbit.util.Logger.Log;
 import gaia.cu9.ari.gaiaorbit.util.datadesc.DataDescriptor;
 import gaia.cu9.ari.gaiaorbit.util.datadesc.DataDescriptorUtils;
-import gaia.cu9.ari.gaiaorbit.util.scene2d.Link;
-import gaia.cu9.ari.gaiaorbit.util.scene2d.OwnLabel;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -45,7 +43,7 @@ public class InitialGui extends AbstractGui {
      * Creates an initial GUI
      *
      * @param datasetsDownload Forces dataset download window
-     * @param catalogChooser Forces catalog chooser window
+     * @param catalogChooser   Forces catalog chooser window
      */
     public InitialGui(boolean datasetsDownload, boolean catalogChooser) {
         lock = new Object();
@@ -90,13 +88,13 @@ public class InitialGui extends AbstractGui {
             if (basicDataPresent()) {
                 // Go on all in
                 Gdx.app.postRunnable(() -> {
-                    displayChooser();
+                    GuiUtils.addNoConnectionWindow(skin, ui, () -> displayChooser());
                 });
             } else {
                 // Error and exit
                 logger.error("No base data present - need an internet connection to continue, exiting");
                 Gdx.app.postRunnable(() -> {
-                    addExitWindow();
+                    GuiUtils.addExitWindow(skin, ui);
                 });
             }
         }, null);
@@ -157,34 +155,6 @@ public class InitialGui extends AbstractGui {
 
     @Override
     public void doneLoading(AssetManager assetManager) {
-    }
-
-    private void addExitWindow() {
-        GenericDialog exitw = new GenericDialog(I18n.txt("notif.error", "No internet connection"), skin, ui) {
-
-            @Override
-            protected void build() {
-                OwnLabel info = new OwnLabel("No internet connection and no base data found.\n" + "Gaia Sky will exit now", skin);
-                Link manualDownload = new Link("Manual download", skin, "link", "http://gaia.ari.uni-heidelberg.de/gaiasky/files/autodownload");
-                content.add(info).pad(10).row();
-                content.add(manualDownload).pad(10);
-            }
-
-            @Override
-            protected void accept() {
-                Gdx.app.exit();
-            }
-
-            @Override
-            protected void cancel() {
-                Gdx.app.exit();
-            }
-
-        };
-        exitw.setAcceptText(I18n.txt("gui.exit"));
-        exitw.setCancelText(null);
-        exitw.buildSuper();
-        exitw.show(ui);
     }
 
     private void addDownloaderWindow(DataDescriptor dd) {
