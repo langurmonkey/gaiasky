@@ -5,13 +5,13 @@
 
 /*******************************************************************************
  * Copyright 2011 See AUTHORS file.
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *   http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -37,11 +37,14 @@ import gaia.cu9.ari.gaiaorbit.util.gdx.ModelCreator.IFace;
 import gaia.cu9.ari.gaiaorbit.util.gdx.mesh.IntMesh;
 import gaia.cu9.ari.gaiaorbit.util.gdx.model.IntMeshPart;
 
-/** Class to construct a mesh, optionally splitting it into one or more mesh parts. Before you can call any other method you must
+/**
+ * Class to construct a mesh, optionally splitting it into one or more mesh parts. Before you can call any other method you must
  * call {@link #begin(VertexAttributes)} or {@link #begin(VertexAttributes, int)}. To use mesh parts you must call
  * {@link #part(String, int)} before you start building the part. The MeshPart itself is only valid after the call to
  * {@link #end()}.
- * @author Xoppa */
+ *
+ * @author Xoppa
+ */
 public class IntIntMeshBuilder implements IntMeshPartBuilder {
     private final VertexInfo vertTmp1 = new VertexInfo();
     private final VertexInfo vertTmp2 = new VertexInfo();
@@ -108,8 +111,10 @@ public class IntIntMeshBuilder implements IntMeshPartBuilder {
     private final Matrix4 normalTransform = new Matrix4();
     private final Vector3 tempVTransformed = new Vector3();
 
-    /** @param usage bitwise mask of the {@link com.badlogic.gdx.graphics.VertexAttributes.Usage}, only Position, Color, Normal and
-     *           TextureCoordinates is supported. */
+    /**
+     * @param usage bitwise mask of the {@link com.badlogic.gdx.graphics.VertexAttributes.Usage}, only Position, Color, Normal and
+     *              TextureCoordinates is supported.
+     */
     public static VertexAttributes createAttributes(long usage) {
         final Array<VertexAttribute> attrs = new Array<>();
         if ((usage & Usage.Position) == Usage.Position)
@@ -132,9 +137,12 @@ public class IntIntMeshBuilder implements IntMeshPartBuilder {
         return new VertexAttributes(attributes);
     }
 
-    /** Begin building a mesh. Call {@link #part(String, int)} to start a {@link IntMeshPart}.
+    /**
+     * Begin building a mesh. Call {@link #part(String, int)} to start a {@link IntMeshPart}.
+     *
      * @param attributes bitwise mask of the {@link com.badlogic.gdx.graphics.VertexAttributes.Usage}, only Position, Color, Normal
-     *           and TextureCoordinates is supported. */
+     *                   and TextureCoordinates is supported.
+     */
     public void begin(final long attributes) {
         begin(createAttributes(attributes), 0);
     }
@@ -144,9 +152,12 @@ public class IntIntMeshBuilder implements IntMeshPartBuilder {
         begin(attributes, 0);
     }
 
-    /** Begin building a mesh.
+    /**
+     * Begin building a mesh.
+     *
      * @param attributes bitwise mask of the {@link com.badlogic.gdx.graphics.VertexAttributes.Usage}, only Position, Color, Normal
-     *           and TextureCoordinates is supported. */
+     *                   and TextureCoordinates is supported.
+     */
     public void begin(final long attributes, int primitiveType) {
         begin(createAttributes(attributes), primitiveType);
     }
@@ -307,32 +318,44 @@ public class IntIntMeshBuilder implements IntMeshPartBuilder {
         setUVRange(region.getU(), region.getV(), region.getU2(), region.getV2());
     }
 
-    /** Increases the size of the backing vertices array to accommodate the specified number of additional vertices. Useful before
+    /**
+     * Increases the size of the backing vertices array to accommodate the specified number of additional vertices. Useful before
      * adding many vertices to avoid multiple backing array resizes.
-     * @param numVertices The number of vertices you are about to add */
+     *
+     * @param numVertices The number of vertices you are about to add
+     */
     public void ensureVertices(int numVertices) {
         vertices.ensureCapacity(vertex.length * numVertices);
     }
 
-    /** Increases the size of the backing indices array to accommodate the specified number of additional indices. Useful before
+    /**
+     * Increases the size of the backing indices array to accommodate the specified number of additional indices. Useful before
      * adding many indices to avoid multiple backing array resizes.
-     * @param numIndices The number of indices you are about to add */
+     *
+     * @param numIndices The number of indices you are about to add
+     */
     public void ensureIndices(int numIndices) {
         indices.ensureCapacity(numIndices);
     }
 
-    /** Increases the size of the backing vertices and indices arrays to accommodate the specified number of additional vertices and
+    /**
+     * Increases the size of the backing vertices and indices arrays to accommodate the specified number of additional vertices and
      * indices. Useful before adding many vertices and indices to avoid multiple backing array resizes.
+     *
      * @param numVertices The number of vertices you are about to add
-     * @param numIndices The number of indices you are about to add */
+     * @param numIndices  The number of indices you are about to add
+     */
     public void ensureCapacity(int numVertices, int numIndices) {
         ensureVertices(numVertices);
         ensureIndices(numIndices);
     }
 
-    /** Increases the size of the backing indices array to accommodate the specified number of additional triangles. Useful before
+    /**
+     * Increases the size of the backing indices array to accommodate the specified number of additional triangles. Useful before
      * adding many triangles to avoid multiple backing array resizes.
-     * @param numTriangles The number of triangles you are about to add */
+     *
+     * @param numTriangles The number of triangles you are about to add
+     */
     public void ensureTriangleIndices(int numTriangles) {
         if (primitiveType == GL20.GL_LINES)
             ensureIndices(6 * numTriangles);
@@ -341,26 +364,35 @@ public class IntIntMeshBuilder implements IntMeshPartBuilder {
             ensureIndices(3 * numTriangles);
     }
 
-    /** Increases the size of the backing vertices and indices arrays to accommodate the specified number of additional vertices and
+    /**
+     * Increases the size of the backing vertices and indices arrays to accommodate the specified number of additional vertices and
      * triangles. Useful before adding many triangles to avoid multiple backing array resizes.
-     * @param numVertices The number of vertices you are about to add
-     * @param numTriangles The number of triangles you are about to add */
+     *
+     * @param numVertices  The number of vertices you are about to add
+     * @param numTriangles The number of triangles you are about to add
+     */
     public void ensureTriangles(int numVertices, int numTriangles) {
         ensureVertices(numVertices);
         ensureTriangleIndices(numTriangles);
     }
 
-    /** Increases the size of the backing vertices and indices arrays to accommodate the specified number of additional vertices and
+    /**
+     * Increases the size of the backing vertices and indices arrays to accommodate the specified number of additional vertices and
      * triangles. Useful before adding many triangles to avoid multiple backing array resizes. Assumes each triangles adds 3
      * vertices.
-     * @param numTriangles The number of triangles you are about to add */
+     *
+     * @param numTriangles The number of triangles you are about to add
+     */
     public void ensureTriangles(int numTriangles) {
         ensureTriangles(3 * numTriangles, numTriangles);
     }
 
-    /** Increases the size of the backing indices array to accommodate the specified number of additional rectangles. Useful before
+    /**
+     * Increases the size of the backing indices array to accommodate the specified number of additional rectangles. Useful before
      * adding many rectangles to avoid multiple backing array resizes.
-     * @param numRectangles The number of rectangles you are about to add */
+     *
+     * @param numRectangles The number of rectangles you are about to add
+     */
     public void ensureRectangleIndices(int numRectangles) {
         if (primitiveType == GL20.GL_POINTS)
             ensureIndices(4 * numRectangles);
@@ -371,19 +403,25 @@ public class IntIntMeshBuilder implements IntMeshPartBuilder {
             ensureIndices(6 * numRectangles);
     }
 
-    /** Increases the size of the backing vertices and indices arrays to accommodate the specified number of additional vertices and
+    /**
+     * Increases the size of the backing vertices and indices arrays to accommodate the specified number of additional vertices and
      * rectangles. Useful before adding many rectangles to avoid multiple backing array resizes.
-     * @param numVertices The number of vertices you are about to add
-     * @param numRectangles The number of rectangles you are about to add */
+     *
+     * @param numVertices   The number of vertices you are about to add
+     * @param numRectangles The number of rectangles you are about to add
+     */
     public void ensureRectangles(int numVertices, int numRectangles) {
         ensureVertices(numVertices);
         ensureRectangleIndices(numRectangles);
     }
 
-    /** Increases the size of the backing vertices and indices arrays to accommodate the specified number of additional vertices and
+    /**
+     * Increases the size of the backing vertices and indices arrays to accommodate the specified number of additional vertices and
      * rectangles. Useful before adding many rectangles to avoid multiple backing array resizes. Assumes each rectangles adds 4
      * vertices
-     * @param numRectangles The number of rectangles you are about to add */
+     *
+     * @param numRectangles The number of rectangles you are about to add
+     */
     public void ensureRectangles(int numRectangles) {
         ensureRectangles(4 * numRectangles, numRectangles);
     }
@@ -651,8 +689,7 @@ public class IntIntMeshBuilder implements IntMeshPartBuilder {
         patch(vertTmp1.set(corner00, normal, null, null).setUV(uMin, vMax), vertTmp2.set(corner10, normal, null, null).setUV(uMax, vMax), vertTmp3.set(corner11, normal, null, null).setUV(uMax, vMin), vertTmp4.set(corner01, normal, null, null).setUV(uMin, vMin), divisionsU, divisionsV);
     }
 
-    public void patch(float x00, float y00, float z00, float x10, float y10, float z10, float x11, float y11, float z11, float x01, float y01, float z01, float normalX, float normalY, float normalZ,
-            int divisionsU, int divisionsV) {
+    public void patch(float x00, float y00, float z00, float x10, float y10, float z10, float x11, float y11, float z11, float x01, float y01, float z01, float normalX, float normalY, float normalZ, int divisionsU, int divisionsV) {
         patch(vertTmp1.set(null).setPos(x00, y00, z00).setNor(normalX, normalY, normalZ).setUV(uMin, vMax), vertTmp2.set(null).setPos(x10, y10, z10).setNor(normalX, normalY, normalZ).setUV(uMax, vMax), vertTmp3.set(null).setPos(x11, y11, z11).setNor(normalX, normalY, normalZ).setUV(uMax, vMin), vertTmp4.set(null).setPos(x01, y01, z01).setNor(normalX, normalY, normalZ).setUV(uMin, vMin), divisionsU, divisionsV);
     }
 
@@ -738,8 +775,7 @@ public class IntIntMeshBuilder implements IntMeshPartBuilder {
     }
 
     @Override
-    public void circle(float radius, int divisions, float centerX, float centerY, float centerZ, float normalX, float normalY, float normalZ, float tangentX, float tangentY, float tangentZ,
-            float binormalX, float binormalY, float binormalZ) {
+    public void circle(float radius, int divisions, float centerX, float centerY, float centerZ, float normalX, float normalY, float normalZ, float tangentX, float tangentY, float tangentZ, float binormalX, float binormalY, float binormalZ) {
         circle(radius, divisions, centerX, centerY, centerZ, normalX, normalY, normalZ, tangentX, tangentY, tangentZ, binormalX, binormalY, binormalZ, 0f, 360f);
     }
 
@@ -759,8 +795,7 @@ public class IntIntMeshBuilder implements IntMeshPartBuilder {
     }
 
     @Override
-    public void circle(float radius, int divisions, float centerX, float centerY, float centerZ, float normalX, float normalY, float normalZ, float tangentX, float tangentY, float tangentZ,
-            float binormalX, float binormalY, float binormalZ, float angleFrom, float angleTo) {
+    public void circle(float radius, int divisions, float centerX, float centerY, float centerZ, float normalX, float normalY, float normalZ, float tangentX, float tangentY, float tangentZ, float binormalX, float binormalY, float binormalZ, float angleFrom, float angleTo) {
         ellipse(radius * 2, radius * 2, 0, 0, divisions, centerX, centerY, centerZ, normalX, normalY, normalZ, tangentX, tangentY, tangentZ, binormalX, binormalY, binormalZ, angleFrom, angleTo);
     }
 
@@ -780,8 +815,7 @@ public class IntIntMeshBuilder implements IntMeshPartBuilder {
     }
 
     @Override
-    public void ellipse(float width, float height, int divisions, float centerX, float centerY, float centerZ, float normalX, float normalY, float normalZ, float tangentX, float tangentY,
-            float tangentZ, float binormalX, float binormalY, float binormalZ) {
+    public void ellipse(float width, float height, int divisions, float centerX, float centerY, float centerZ, float normalX, float normalY, float normalZ, float tangentX, float tangentY, float tangentZ, float binormalX, float binormalY, float binormalZ) {
         ellipse(width, height, divisions, centerX, centerY, centerZ, normalX, normalY, normalZ, tangentX, tangentY, tangentZ, binormalX, binormalY, binormalZ, 0f, 360f);
     }
 
@@ -801,8 +835,7 @@ public class IntIntMeshBuilder implements IntMeshPartBuilder {
     }
 
     @Override
-    public void ellipse(float width, float height, int divisions, float centerX, float centerY, float centerZ, float normalX, float normalY, float normalZ, float tangentX, float tangentY,
-            float tangentZ, float binormalX, float binormalY, float binormalZ, float angleFrom, float angleTo) {
+    public void ellipse(float width, float height, int divisions, float centerX, float centerY, float centerZ, float normalX, float normalY, float normalZ, float tangentX, float tangentY, float tangentZ, float binormalX, float binormalY, float binormalZ, float angleFrom, float angleTo) {
         ellipse(width, height, 0f, 0f, divisions, centerX, centerY, centerZ, normalX, normalY, normalZ, tangentX, tangentY, tangentZ, binormalX, binormalY, binormalZ, angleFrom, angleTo);
     }
 
@@ -817,8 +850,7 @@ public class IntIntMeshBuilder implements IntMeshPartBuilder {
     }
 
     @Override
-    public void ellipse(float width, float height, float innerWidth, float innerHeight, int divisions, float centerX, float centerY, float centerZ, float normalX, float normalY, float normalZ,
-            float angleFrom, float angleTo) {
+    public void ellipse(float width, float height, float innerWidth, float innerHeight, int divisions, float centerX, float centerY, float centerZ, float normalX, float normalY, float normalZ, float angleFrom, float angleTo) {
         tempV1.set(normalX, normalY, normalZ).crs(0, 0, 1);
         tempV2.set(normalX, normalY, normalZ).crs(0, 1, 0);
         if (tempV2.len2() > tempV1.len2())
@@ -828,8 +860,7 @@ public class IntIntMeshBuilder implements IntMeshPartBuilder {
     }
 
     @Override
-    public void ellipse(float width, float height, float innerWidth, float innerHeight, int divisions, float centerX, float centerY, float centerZ, float normalX, float normalY, float normalZ,
-            float tangentX, float tangentY, float tangentZ, float binormalX, float binormalY, float binormalZ, float angleFrom, float angleTo) {
+    public void ellipse(float width, float height, float innerWidth, float innerHeight, int divisions, float centerX, float centerY, float centerZ, float normalX, float normalY, float normalZ, float tangentX, float tangentY, float tangentZ, float binormalX, float binormalY, float binormalZ, float angleFrom, float angleTo) {
         if (innerWidth <= 0 || innerHeight <= 0) {
             ensureTriangles(divisions + 2, divisions);
         } else if (innerWidth == width && innerHeight == height) {
@@ -1034,57 +1065,7 @@ public class IntIntMeshBuilder implements IntMeshPartBuilder {
 
     @Override
     public void sphere(final Matrix4 transform, float width, float height, float depth, int divisionsU, int divisionsV, float angleUFrom, float angleUTo, float angleVFrom, float angleVTo) {
-        // FIXME create better sphere method (- only one vertex for each pole, - position)
-        final float hw = width * 0.5f;
-        final float hh = height * 0.5f;
-        final float hd = depth * 0.5f;
-        final float auo = MathUtils.degreesToRadians * angleUFrom;
-        final float stepU = (MathUtils.degreesToRadians * (angleUTo - angleUFrom)) / divisionsU;
-        final float avo = MathUtils.degreesToRadians * angleVFrom;
-        final float stepV = (MathUtils.degreesToRadians * (angleVTo - angleVFrom)) / divisionsV;
-        final float us = 1f / divisionsU;
-        final float vs = 1f / divisionsV;
-        float u = 0f;
-        float v = 0f;
-        float angleU = 0f;
-        float angleV = 0f;
-        VertexInfo curr1 = vertTmp3.set(null, null, null, null);
-        curr1.hasUV = curr1.hasPosition = curr1.hasNormal = curr1.hasTangent = curr1.hasBinormal = true;
-
-        if (tmpIndices == null)
-            tmpIndices = new IntArray(divisionsU * 2);
-        final int s = divisionsU + 3;
-        tmpIndices.ensureCapacity(s);
-        while (tmpIndices.size > s)
-            tmpIndices.pop();
-        while (tmpIndices.size < s)
-            tmpIndices.add(-1);
-        int tempOffset = 0;
-
-        ensureRectangles((divisionsV + 1) * (divisionsU + 1), divisionsV * divisionsU);
-        for (int iv = 0; iv <= divisionsV; iv++) {
-            angleV = avo + stepV * iv;
-            v = vs * iv;
-            final float t = MathUtils.sin(angleV);
-            final float h = MathUtils.cos(angleV) * hh;
-            for (int iu = 0; iu <= divisionsU; iu++) {
-                angleU = auo + stepU * iu;
-                u = 1f - us * iu;
-                curr1.position.set(MathUtils.cos(angleU) * hw * t, h, MathUtils.sin(angleU) * hd * t).mul(transform);
-                // Normal is just the position
-                curr1.normal.set(curr1.position).nor();
-                // Tangent
-                curr1.tangent.set(MathUtils.cos(angleU - 90f * MathUtils.degreesToRadians) * hw * t, h, MathUtils.sin(angleU - 90f * MathUtils.degreesToRadians) * hd * t).mul(transform).nor();
-                // Binormal
-                curr1.binormal.set(curr1.normal).crs(curr1.tangent).nor();
-                curr1.uv.set(u, v);
-                tmpIndices.set(tempOffset, vertex(curr1));
-                final int o = tempOffset + s;
-                if ((iv > 0) && (iu > 0)) // FIXME don't duplicate lines and points
-                    rect(tmpIndices.get(tempOffset), tmpIndices.get((o - 1) % s), tmpIndices.get((o - (divisionsU + 2)) % s), tmpIndices.get((o - (divisionsU + 1)) % s));
-                tempOffset = (tempOffset + 1) % tmpIndices.size;
-            }
-        }
+        sphere(transform, width, height, depth, divisionsU, divisionsV, false, angleUFrom, angleUTo, angleVFrom, angleVTo);
     }
 
     @Override
@@ -1220,9 +1201,12 @@ public class IntIntMeshBuilder implements IntMeshPartBuilder {
         sphere(matTmp1.idt(), width, height, depth, divisionsU, divisionsV, flipNormals, angleUFrom, angleUTo, angleVFrom, angleVTo);
     }
 
+    private Vector3 axisY = new Vector3(), axisZ = new Vector3();
+
     @Override
-    public void sphere(final Matrix4 transform, float width, float height, float depth, int divisionsU, int divisionsV, boolean flipNormals, float angleUFrom, float angleUTo, float angleVFrom,
-            float angleVTo) {
+    public void sphere(final Matrix4 transform, float width, float height, float depth, int divisionsU, int divisionsV, boolean flipNormals, float angleUFrom, float angleUTo, float angleVFrom, float angleVTo) {
+        axisY.set(0, 1, 0);
+        axisZ.set(0, 0, 1);
         // FIXME create better sphere method (- only one vertex for each pole, - position)
         final float hw = width * 0.5f;
         final float hh = height * 0.5f;
@@ -1262,9 +1246,9 @@ public class IntIntMeshBuilder implements IntMeshPartBuilder {
                 curr1.position.set(MathUtils.cos(angleU) * hw * t, h, MathUtils.sin(angleU) * hd * t).mul(transform);
                 // Normal is just the position
                 curr1.normal.set(curr1.position).nor();
-                // Tangent
-                curr1.tangent.set(MathUtils.cos(angleU - 90f * MathUtils.degreesToRadians) * hw * t, h, MathUtils.sin(angleU - 90f * MathUtils.degreesToRadians) * hd * t).mul(transform).nor();
-                // Binormal
+                // Tangent, we use the lat,lon angles to rotate
+                curr1.tangent.set(1f, 0f, 0f).rotateRad(axisZ, -angleV).rotateRad(axisY, -angleU).nor();
+                // Binormal, just a cross product
                 curr1.binormal.set(curr1.normal).crs(curr1.tangent).nor();
                 curr1.uv.set(u, v);
                 tmpIndices.set(tempOffset, vertex(curr1));
