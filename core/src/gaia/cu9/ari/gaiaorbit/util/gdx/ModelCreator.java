@@ -18,11 +18,9 @@ import java.util.List;
 
 public abstract class ModelCreator {
     public interface IFace {
-        public int[] v();
-
-        public int[] n();
-
-        public void setNormals(int... n);
+        int[] v();
+        int[] n();
+        void setNormals(int... n);
     }
 
     /**

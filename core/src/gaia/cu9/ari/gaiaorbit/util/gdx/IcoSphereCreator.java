@@ -37,7 +37,7 @@ public class IcoSphereCreator extends ModelCreator {
      *            The radius.
      * @return
      */
-    protected int addVertex(Vector3 p, float radius) {
+    protected int vertex(Vector3 p, float radius) {
         p.nor();
 
         addUV(p);
@@ -115,7 +115,7 @@ public class IcoSphereCreator extends ModelCreator {
 
         middle.nor();
         // add vertex makes sure point is on unit sphere
-        int i = addVertex(middle, radius);
+        int i = vertex(middle, radius);
 
         // store it, return index
         this.middlePointIndexCache.put(key, i);
@@ -187,20 +187,20 @@ public class IcoSphereCreator extends ModelCreator {
         // create 12 vertices of a icosahedron
         float t = (float) ((1.0 + Math.sqrt(5.0)) / 2.0);
 
-        addVertex(new Vector3(-1, t, 0), radius);
-        addVertex(new Vector3(1, t, 0), radius);
-        addVertex(new Vector3(-1, -t, 0), radius);
-        addVertex(new Vector3(1, -t, 0), radius);
+        vertex(new Vector3(-1, t, 0), radius);
+        vertex(new Vector3(1, t, 0), radius);
+        vertex(new Vector3(-1, -t, 0), radius);
+        vertex(new Vector3(1, -t, 0), radius);
 
-        addVertex(new Vector3(0, -1, t), radius);
-        addVertex(new Vector3(0, 1, t), radius);
-        addVertex(new Vector3(0, -1, -t), radius);
-        addVertex(new Vector3(0, 1, -t), radius);
+        vertex(new Vector3(0, -1, t), radius);
+        vertex(new Vector3(0, 1, t), radius);
+        vertex(new Vector3(0, -1, -t), radius);
+        vertex(new Vector3(0, 1, -t), radius);
 
-        addVertex(new Vector3(t, 0, -1), radius);
-        addVertex(new Vector3(t, 0, 1), radius);
-        addVertex(new Vector3(-t, 0, -1), radius);
-        addVertex(new Vector3(-t, 0, 1), radius);
+        vertex(new Vector3(t, 0, -1), radius);
+        vertex(new Vector3(t, 0, 1), radius);
+        vertex(new Vector3(-t, 0, -1), radius);
+        vertex(new Vector3(-t, 0, 1), radius);
 
         // create 20 triangles of the icosahedron
         List<IFace> faces = new ArrayList<>();
