@@ -41,7 +41,7 @@ public class GaiaAttitudeServer {
 
     public GaiaAttitudeServer(String folder, String... files) {
         if (GlobalConf.data.REAL_GAIA_ATTITUDE) {
-            attitudes = AttitudeXmlParser.parseFolder(GlobalConf.data.dataFile(folder), GlobalConf.runtime.STRIPPED_FOV_MODE, files);
+            attitudes = AttitudeXmlParser.parseFolder(folder, GlobalConf.runtime.STRIPPED_FOV_MODE, files);
             initialDate = ((AttitudeIntervalBean) attitudes.findMin()).activationTime;
             current = new AttitudeIntervalBean("current", null, null, "dummy");
             // Dummy attitude
