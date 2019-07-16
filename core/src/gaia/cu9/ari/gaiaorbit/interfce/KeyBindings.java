@@ -339,9 +339,7 @@ public class KeyBindings {
         addAction(new ProgramAction("action.resettime", () -> EventManager.instance.post(Events.TIME_CHANGE_CMD, Instant.now())));
 
         // Back home
-        addAction(new ProgramAction("action.home", () -> {
-            EventManager.instance.post(Events.HOME_CMD);
-        }));
+        addAction(new ProgramAction("action.home", () -> EventManager.instance.post(Events.HOME_CMD)));
 
         // Minimap toggle
         addAction(new ProgramAction("action.toggle/gui.minimap.title", () -> EventManager.instance.post(Events.TOGGLE_MINIMAP)));
@@ -424,7 +422,7 @@ public class KeyBindings {
             line = line.trim();
             if(!line.isEmpty() && !line.startsWith("#")){
                 String[] strPair = line.split("=");
-                result.add(new Pair<String, String>(strPair[0].trim(), strPair[1].trim()));
+                result.add(new Pair<>(strPair[0].trim(), strPair[1].trim()));
             }
         }
         return result;

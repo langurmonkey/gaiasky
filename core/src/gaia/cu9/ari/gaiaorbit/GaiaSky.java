@@ -451,10 +451,10 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
      * Moves the camera home. That is either the Earth, if it exists, or somewhere close to the Sun
      */
     private void goHome() {
-        if (sg.containsNode("Earth") && !GlobalConf.program.NET_SLAVE && isOn(ComponentType.Planets.ordinal())) {
+        if (sg.containsNode("earth") && !GlobalConf.program.NET_SLAVE && isOn(ComponentType.Planets.ordinal())) {
             // Set focus to Earth
             EventManager.instance.post(Events.CAMERA_MODE_CMD, CameraMode.FOCUS_MODE);
-            EventManager.instance.post(Events.FOCUS_CHANGE_CMD, sg.getNode("Earth"), true);
+            EventManager.instance.post(Events.FOCUS_CHANGE_CMD, sg.getNode("earth"), true);
             EventManager.instance.post(Events.GO_TO_OBJECT_CMD);
         } else {
             // At 5 AU in Y looking towards origin (top-down look)

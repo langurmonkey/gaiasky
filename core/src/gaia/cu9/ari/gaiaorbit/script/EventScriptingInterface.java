@@ -755,7 +755,7 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
     @Override
     public SceneGraphNode getObject(String name, double timeOutSeconds) {
         ISceneGraph sg = GaiaSky.instance.sg;
-        String n = name.toLowerCase();
+        String n = name.toLowerCase().trim();
         SceneGraphNode obj = sg.getNode(n);
         if (obj == null) {
             if (name.matches("[0-9]+")) {
@@ -798,7 +798,7 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
     @Override
     public double getObjectRadius(String name) {
         ISceneGraph sg = GaiaSky.instance.sg;
-        IFocus obj = sg.findFocus(name.toLowerCase());
+        IFocus obj = sg.findFocus(name.toLowerCase().trim());
         if (obj == null)
             return -1;
         else if (obj instanceof IStarFocus) {
@@ -838,7 +838,7 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
 
     private void goToObject(String name, double viewAngle, float waitTimeSeconds, AtomicBoolean stop) {
         if (checkString(name, "name")) {
-            String namelc = name.toLowerCase();
+            String namelc = name.toLowerCase().trim();
             ISceneGraph sg = GaiaSky.instance.sg;
             if (sg.containsNode(namelc)) {
                 IFocus focus = sg.findFocus(namelc);
@@ -1054,7 +1054,7 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
             stops.add(stop);
             if (object instanceof Planet) {
                 Planet planet = (Planet) object;
-                SceneGraphNode sgn = planet.getChildByNameAndType(locationName, Loc.class);
+                SceneGraphNode sgn = planet.getChildByNameAndType(locationName.toLowerCase().trim(), Loc.class);
                 if (sgn != null) {
                     Loc location = (Loc) sgn;
                     landOnObjectLocation(object, location.getLocation().x, location.getLocation().y, stop);

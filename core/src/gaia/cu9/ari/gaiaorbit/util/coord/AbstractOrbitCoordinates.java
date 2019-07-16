@@ -24,7 +24,7 @@ public abstract class AbstractOrbitCoordinates implements IBodyCoordinates {
             logger.error(new RuntimeException("OrbitLintCoordinates need the scene graph"));
         } else {
             if (orbitname != null && !orbitname.isEmpty()) {
-                SceneGraphNode sgn = ((ISceneGraph) params[0]).getNode(orbitname);
+                SceneGraphNode sgn = ((ISceneGraph) params[0]).getNode(orbitname.toLowerCase().trim());
                 orbit = (Orbit) sgn;
                 if (params[1] instanceof CelestialBody)
                     orbit.setBody((CelestialBody) params[1]);

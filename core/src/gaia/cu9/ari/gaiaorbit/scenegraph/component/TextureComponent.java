@@ -56,8 +56,8 @@ public class TextureComponent implements IObserver {
         textureParams.minFilter = TextureFilter.Linear;
     }
 
-    public String base, specular, normal, night, ring, height;
-    public String baseUnpacked, specularUnpacked, normalUnpacked, nightUnpacked, ringUnpacked, heightUnpacked;
+    public String base, specular, normal, night, ring, height, ringnormal;
+    public String baseUnpacked, specularUnpacked, normalUnpacked, nightUnpacked, ringUnpacked, heightUnpacked, ringnormalUnpacked;
     public Texture baseTex, heightTex;
     // Height scale in internal units
     public Float heightScale = 0.005f;
@@ -81,6 +81,7 @@ public class TextureComponent implements IObserver {
         specularUnpacked = addToLoad(specular, textureParamsMipMap, manager);
         nightUnpacked = addToLoad(night, textureParamsMipMap, manager);
         ringUnpacked = addToLoad(ring, textureParamsMipMap, manager);
+        ringnormalUnpacked = addToLoad(ringnormal, textureParamsMipMap, manager);
         heightUnpacked = addToLoad(height, textureParamsMipMap, manager);
     }
 
@@ -91,11 +92,12 @@ public class TextureComponent implements IObserver {
         specularUnpacked = addToLoad(specular, textureParamsMipMap);
         nightUnpacked = addToLoad(night, textureParamsMipMap);
         ringUnpacked = addToLoad(ring, textureParamsMipMap);
+        ringnormalUnpacked = addToLoad(ringnormal, textureParamsMipMap);
         heightUnpacked = addToLoad(height, textureParamsMipMap);
     }
 
     public boolean isFinishedLoading(AssetManager manager) {
-        return isFL(baseUnpacked, manager) && isFL(normalUnpacked, manager) && isFL(specularUnpacked, manager) && isFL(nightUnpacked, manager) && isFL(ringUnpacked, manager) && isFL(heightUnpacked, manager);
+        return isFL(baseUnpacked, manager) && isFL(normalUnpacked, manager) && isFL(specularUnpacked, manager) && isFL(nightUnpacked, manager) && isFL(ringUnpacked, manager) && isFL(ringnormalUnpacked, manager) && isFL(heightUnpacked, manager);
     }
 
     public boolean isFL(String tex, AssetManager manager) {
@@ -172,8 +174,12 @@ public class TextureComponent implements IObserver {
         if (instance.materials.size > 1) {
             // Ring material
             Material ringMat = instance.materials.get(1);
-            Texture tex = manager.get(ringUnpacked, Texture.class);
-            ringMat.set(new TextureAttribute(TextureAttribute.Diffuse, tex));
+            if(ring != null) {
+                ringMat.set(new TextureAttribute(TextureAttribute.Diffuse, manager.get(ringUnpacked, Texture.class)));
+            }
+            if(ringnormal != null){
+                ringMat.set(new TextureAttribute(TextureAttribute.Normal, manager.get(ringnormalUnpacked, Texture.class)));
+            }
             ringMat.set(new BlendingAttribute(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA));
             if (!culling)
                 ringMat.set(new IntAttribute(IntAttribute.CullFace, GL20.GL_NONE));
@@ -281,6 +287,10 @@ public class TextureComponent implements IObserver {
         this.ring = GlobalConf.data.dataFile(ring);
     }
 
+    public void setRingnormal(String ringnormal) {
+        this.ringnormal = GlobalConf.data.dataFile(ringnormal);
+    }
+
     public void setHeight(String height) {
         this.height = GlobalConf.data.dataFile(height);
     }
@@ -318,6 +328,10 @@ public class TextureComponent implements IObserver {
         if (ring != null && manager.containsAsset(ringUnpacked)) {
             manager.unload(ringUnpacked);
             ringUnpacked = null;
+        }
+        if (ringnormal != null && manager.containsAsset(ringnormalUnpacked)) {
+            manager.unload(ringnormalUnpacked);
+            ringnormalUnpacked = null;
         }
         if (height != null && manager.containsAsset(heightUnpacked)) {
             manager.unload(heightUnpacked);

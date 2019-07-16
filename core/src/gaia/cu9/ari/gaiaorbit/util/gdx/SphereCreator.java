@@ -59,10 +59,13 @@ public class SphereCreator extends ModelCreator {
                 curr1.position.set(MathUtils.cos(angleU) * hw * t, h, MathUtils.sin(angleU) * hd * t).mul(transform);
                 // Normal is just the position
                 curr1.normal.set(curr1.position).nor();
-                // Tangent, we use the lat,lon angles to rotate
-                curr1.tangent.set(1f, 0f, 0f).rotateRad(axisZ, -angleV).rotateRad(axisY, -angleU).nor();
-                // Binormal, just a cross product
-                curr1.binormal.set(curr1.normal).crs(curr1.tangent).nor();
+
+                // ##### Due to our internal refsys, we invert binormal and tangent
+                // Binormal, aligned with V
+                curr1.binormal.set(1f, 0f, 0f).rotateRad(axisZ, -angleV).rotateRad(axisY, -angleU).nor();
+                // Tangent, aligned with U
+                curr1.tangent.set(curr1.normal).crs(curr1.binormal).nor();
+
                 curr1.uv.set(u, v);
                 tmpIndices.set(tempOffset, builder.vertex(curr1));
                 final int o = tempOffset + s;

@@ -132,7 +132,7 @@
       "type": "data-pack",
       "version": 3,
       "mingsversion": 20200,
-      "size": 51985515,
+      "size": 61300542,
       "check": "data-main.json",
       "data": [
         "asteroids-dr2.json",
@@ -165,7 +165,7 @@
         "hi-res-tex-desc.json",
         "tex/base"
       ],
-      "sha256": "257a3d521e9a4c0f16c0c913f8e5715d31689370e2ef43c133d1e2e69ddb111a",
+      "sha256": "7ce14aa3f5150a16021936243490bb9a6aacdf8198c02c841527a99a5f99dd8c",
       "description": "Default data pack for Gaia Sky - For Gaia Sky 2.2.0 and above. Contains the Solar System, constellations, meshes and more",
       "file": "http://gaia.ari.uni-heidelberg.de/gaiasky/files/autodownload/basedata/004_20190614_v020200/gaiasky_data.tar.gz"
     },
@@ -534,7 +534,7 @@
       "type": "texture-pack",
       "version": 2,
       "mingsversion": 20200,
-      "size": 112444502,
+      "size": 196352233,
       "check": "hi-res-tex-desc.json",
       "data": [
         "hi-res-tex-desc.json",
@@ -542,7 +542,7 @@
         "tex/base/*-ultra.jpg"
       ],
       "description": "High resolution textures - High resolution texture pack including some 4K and 8K textures for planet surfaces and asteroids.",
-      "sha256": "67b01b1db766c816999af957cf304a198418787aa045ec5db87220728d918658",
+      "sha256": "4ead1741426bbc16b70d95e996ccf157a380c52a041b2e011b3abfd75c64a427",
       "file": "http://gaia.ari.uni-heidelberg.de/gaiasky/files/autodownload/tex/002_20190614_v020200/hi-res-texture-pack.tar.gz"
     }
   ]

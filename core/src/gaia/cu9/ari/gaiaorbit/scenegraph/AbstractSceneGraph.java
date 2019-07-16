@@ -59,15 +59,11 @@ public abstract class AbstractSceneGraph implements ISceneGraph {
 
     /**
      * Builds the scene graph using the given nodes.
-     * 
-     * @param nodes
-     *            The list of nodes
-     * @param time
-     *            The time provider
-     * @param hasOctree
-     *            Whether the list of nodes contains an octree
-     * @param hasStarGroup
-     *            Whether the list contains a star vgroup
+     *
+     * @param nodes        The list of nodes
+     * @param time         The time provider
+     * @param hasOctree    Whether the list of nodes contains an octree
+     * @param hasStarGroup Whether the list contains a star vgroup
      */
     @Override
     public void initialize(Array<SceneGraphNode> nodes, ITimeFrameProvider time, boolean hasOctree, boolean hasStarGroup) {
@@ -82,8 +78,8 @@ public abstract class AbstractSceneGraph implements ISceneGraph {
         this.hasStarGroup = hasStarGroup;
 
         // Initialize stringToNode and starMap maps
-        stringToNode = new ObjectMap<>(nodes.size * 2);
-        stringToNode.put(root.name, root);
+        stringToNode = new ObjectMap<>(nodes.size);
+        stringToNode.put(root.name.toLowerCase().trim(), root);
         hipMap = new IntMap<>();
         for (SceneGraphNode node : nodes) {
             addToIndex(node, stringToNode);
@@ -110,7 +106,7 @@ public abstract class AbstractSceneGraph implements ISceneGraph {
     }
 
     public void insert(SceneGraphNode node, boolean addToIndex) {
-        SceneGraphNode parent = stringToNode.get(node.parentName);
+        SceneGraphNode parent = stringToNode.get(node.parentName.toLowerCase().trim());
         if (parent != null) {
             parent.addChild(node, true);
             node.setUp();
@@ -178,7 +174,7 @@ public abstract class AbstractSceneGraph implements ISceneGraph {
             } else if (node instanceof StarGroup) {
                 StarGroup sg = (StarGroup) node;
                 Array<StarBean> arr = sg.data();
-                if(arr != null) {
+                if (arr != null) {
                     for (StarBean sb : arr) {
                         if (sb != null && sb.hip() >= 0)
                             hipMap.remove(sb.hip());
@@ -192,8 +188,7 @@ public abstract class AbstractSceneGraph implements ISceneGraph {
         if (node.name != null && !node.name.isEmpty()) {
 
             if (node.mustAddToIndex()) {
-                map.put(node.name, node);
-                map.put(node.name.toLowerCase(), node);
+                map.put(node.name.toLowerCase().trim(), node);
 
                 // Id
                 if (node.id > 0) {
@@ -209,8 +204,7 @@ public abstract class AbstractSceneGraph implements ISceneGraph {
 
     private void removeFromIndex(SceneGraphNode node, ObjectMap<String, SceneGraphNode> map) {
         if (node.name != null && !node.name.isEmpty()) {
-            map.remove(node.name);
-            map.remove(node.name.toLowerCase());
+            map.remove(node.name.toLowerCase().trim());
 
             // Id
             if (node.id > 0) {
@@ -291,7 +285,6 @@ public abstract class AbstractSceneGraph implements ISceneGraph {
         root.addFocusableObjects(objects);
         return objects;
     }
-
 
     public IFocus findFocus(String name) {
         SceneGraphNode node = getNode(name);

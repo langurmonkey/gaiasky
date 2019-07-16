@@ -413,4 +413,8 @@ public class Orbit extends Polyline {
         return alpha;
     }
 
+    @Override
+    public boolean mustAddToIndex() {
+        return true;
+    }
 }
