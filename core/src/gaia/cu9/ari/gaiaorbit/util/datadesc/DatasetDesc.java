@@ -127,7 +127,13 @@ public class DatasetDesc {
                 String extension = fname.substring(fname.lastIndexOf(".") + 1);
                 if (extension.equalsIgnoreCase("json")) {
                     JsonValue jf = reader.parse(Gdx.files.absolute(file.getAbsolutePath()));
-                    return jf.getInt("version", 0);
+                    if(jf.has("version")){
+                        try {
+                            return jf.getInt("version", 0);
+                        }catch(Exception e){
+                            logger.error(e, "The 'version' attribute must be an integer: " + path);
+                        }
+                    }
                 }
             }
 
