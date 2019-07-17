@@ -5,10 +5,7 @@
 
 package gaia.cu9.ari.gaiaorbit.util.gaia;
 
-import gaia.cu9.ari.gaiaorbit.util.BinarySearchTree;
-import gaia.cu9.ari.gaiaorbit.util.GlobalConf;
-import gaia.cu9.ari.gaiaorbit.util.I18n;
-import gaia.cu9.ari.gaiaorbit.util.Logger;
+import gaia.cu9.ari.gaiaorbit.util.*;
 import gaia.cu9.ari.gaiaorbit.util.Logger.Log;
 import gaia.cu9.ari.gaiaorbit.util.math.Quaterniond;
 
@@ -41,11 +38,19 @@ public class GaiaAttitudeServer {
 
     public GaiaAttitudeServer(String folder, String... files) {
         if (GlobalConf.data.REAL_GAIA_ATTITUDE) {
-            attitudes = AttitudeXmlParser.parseFolder(folder, GlobalConf.runtime.STRIPPED_FOV_MODE, files);
-            initialDate = ((AttitudeIntervalBean) attitudes.findMin()).activationTime;
-            current = new AttitudeIntervalBean("current", null, null, "dummy");
-            // Dummy attitude
-            dummyAttitude = new ConcreteAttitude(0, new Quaterniond(), false);
+            try {
+                attitudes = AttitudeXmlParser.parseFolder(folder, GlobalConf.runtime.STRIPPED_FOV_MODE, files);
+                initialDate = ((AttitudeIntervalBean) attitudes.findMin()).activationTime;
+                current = new AttitudeIntervalBean("current", null, null, "dummy");
+                // Dummy attitude
+                dummyAttitude = new ConcreteAttitude(0, new Quaterniond(), false);
+            }catch(Exception e){
+                String fs = GlobalResources.toString(files, "", ":");
+                logger.error(e, "Error reconstructing attitude from: " + folder + (fs != null ? " /// " + fs: ""));
+                logger.error("Defaulting to NSL attitude");
+                // Use NSL instead
+                nsl = new Nsl37();
+            }
         } else {
             // Use NSL as approximation
             nsl = new Nsl37();

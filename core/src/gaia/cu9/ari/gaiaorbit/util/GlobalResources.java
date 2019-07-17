@@ -638,14 +638,32 @@ public class GlobalResources {
      * @return The resulting string
      */
     public static String toWhitespaceSeparatedList(String[] l) {
+        return toString(l, "\"", " ");
+    }
+
+    /**
+     * Converts a string array into a string, optionally quoting each entry and with
+     * a given separator.
+     * @param l The list
+     * @param quote The quote string to use
+     * @param separator The separator
+     * @return The resulting string
+     */
+    public static String toString(String[] l, String quote, String separator){
         if (l == null || l.length == 0)
             return null;
 
+        if(quote == null)
+            quote = "";
+        if(separator == null)
+            separator = "";
+
         StringBuilder sb = new StringBuilder();
         for (String s : l) {
-            sb.append("\"").append(s).append("\" ");
+            sb.append(quote).append(s).append(quote + separator);
         }
         return sb.toString().trim();
+
     }
 
     public static String unpackTexName(String tex) {
