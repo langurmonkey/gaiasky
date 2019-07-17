@@ -36,17 +36,16 @@ public class GaiaAttitudeServer {
     // The first activation date
     Date initialDate;
 
-    public GaiaAttitudeServer(String folder, String... files) {
+    public GaiaAttitudeServer(String folder) {
         if (GlobalConf.data.REAL_GAIA_ATTITUDE) {
             try {
-                attitudes = AttitudeXmlParser.parseFolder(folder, GlobalConf.runtime.STRIPPED_FOV_MODE, files);
+                attitudes = AttitudeXmlParser.parseFolder(folder, GlobalConf.runtime.STRIPPED_FOV_MODE);
                 initialDate = ((AttitudeIntervalBean) attitudes.findMin()).activationTime;
                 current = new AttitudeIntervalBean("current", null, null, "dummy");
                 // Dummy attitude
                 dummyAttitude = new ConcreteAttitude(0, new Quaterniond(), false);
             }catch(Exception e){
-                String fs = GlobalResources.toString(files, "", ":");
-                logger.error(e, "Error reconstructing attitude from: " + folder + (fs != null ? " /// " + fs: ""));
+                logger.error(e, "Error reconstructing attitude from: " + folder);
                 logger.error("Defaulting to NSL attitude");
                 // Use NSL instead
                 nsl = new Nsl37();

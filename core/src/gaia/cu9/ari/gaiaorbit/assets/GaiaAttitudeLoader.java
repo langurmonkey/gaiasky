@@ -27,7 +27,7 @@ public class GaiaAttitudeLoader extends AsynchronousAssetLoader<GaiaAttitudeServ
 
     @Override
     public void loadAsync(AssetManager manager, String fileName, FileHandle file, GaiaAttitudeLoaderParameter parameter) {
-        server = new GaiaAttitudeServer(fileName, parameter.files);
+        server = new GaiaAttitudeServer(fileName);
     }
 
     @Override
@@ -42,12 +42,5 @@ public class GaiaAttitudeLoader extends AsynchronousAssetLoader<GaiaAttitudeServ
     }
 
     static public class GaiaAttitudeLoaderParameter extends AssetLoaderParameters<GaiaAttitudeServer> {
-        String[] files;
-
-        public GaiaAttitudeLoaderParameter(String[] files) {
-            super();
-            this.files = files;
-        }
-
     }
 }

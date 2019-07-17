@@ -45,7 +45,7 @@ public class AttitudeXmlParser {
         endOfMission = getDate("2026-09-14 17:44:20");
     }
 
-    public static BinarySearchTree parseFolder(String folder, boolean oneDayDuration, String... files) {
+    public static BinarySearchTree parseFolder(String folder, boolean oneDayDuration) {
         final FileHandle[] list;
         try (Stream<Path> paths = Files.walk(Paths.get(GlobalConf.data.dataFile(folder)))) {
             List<Path> ps = paths.filter(Files::isRegularFile).collect(Collectors.toList());
@@ -69,7 +69,6 @@ public class AttitudeXmlParser {
                          * Hack to get the stripped FOV mode to load fast.
                          * We set the activation time to ten minutes before today starts.
                          */
-
                         LocalDateTime ldt = LocalDateTime.now();
                         ldt = ldt.withMinute(0).withSecond(0);
                         Instant date = ldt.toInstant(ZoneOffset.UTC);
