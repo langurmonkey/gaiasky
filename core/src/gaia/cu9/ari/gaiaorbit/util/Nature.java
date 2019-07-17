@@ -48,6 +48,8 @@ public class Nature {
     /**
      * ======= TIME UNITS =======
      */
+    /** Seconds to milliseconds **/
+    public static final double S_TO_MS = 1000;
     /** Hours to seconds **/
     public static final double H_TO_S = 3600;
     /** Seconds to hours **/
@@ -76,5 +78,7 @@ public class Nature {
     public static final double Y_TO_MS = Y_TO_S * 1000;
     /** Milliseconds to year **/
     public static final double MS_TO_Y = 1 / Y_TO_MS;
+    /** Minutes to seconds **/
+    public static final double MIN_TO_S = 60;
 
 }

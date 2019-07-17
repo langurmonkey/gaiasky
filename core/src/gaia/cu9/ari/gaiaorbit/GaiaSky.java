@@ -309,7 +309,7 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
         Gdx.input.setInputProcessor(initialGui.getGuiStage());
 
         // GL clear state
-        Gdx.gl.glClearColor(0,0,0,0);
+        Gdx.gl.glClearColor(0, 0, 0, 0);
         Gdx.gl.glClearDepthf(1);
     }
 
@@ -397,8 +397,7 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
         EventManager.instance.subscribe(this, Events.TOGGLE_AMBIENT_LIGHT, Events.AMBIENT_LIGHT_CMD, Events.RECORD_CAMERA_CMD, Events.CAMERA_MODE_CMD, Events.STEREOSCOPIC_CMD, Events.FRAME_SIZE_UDPATE, Events.SCREENSHOT_SIZE_UDPATE, Events.POST_RUNNABLE, Events.UNPOST_RUNNABLE, Events.SCENE_GRAPH_ADD_OBJECT_CMD, Events.SCENE_GRAPH_ADD_OBJECT_NO_POST_CMD, Events.SCENE_GRAPH_REMOVE_OBJECT_CMD, Events.HOME_CMD);
 
         // Re-enable input
-        if (!GlobalConf.runtime.STRIPPED_FOV_MODE)
-            EventManager.instance.post(Events.INPUT_ENABLED_CMD, true);
+        EventManager.instance.post(Events.INPUT_ENABLED_CMD, true);
 
         // Set current date
         EventManager.instance.post(Events.TIME_CHANGE_CMD, Instant.now());
@@ -728,23 +727,23 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
         sgr.render(camera, t, width, height, frameBuffer, ppb);
     }
 
-
     private long lastResizeTime = Long.MAX_VALUE;
     private int resizeWidth, resizeHeight;
+
     @Override
     public void resize(final int width, final int height) {
-        if(!initialized){
+        if (!initialized) {
             resizeImmediate(width, height, true, true, true);
-        }else {
+        } else {
             resizeWidth = width;
             resizeHeight = height;
             lastResizeTime = System.currentTimeMillis();
         }
     }
 
-    private void updateResize(){
+    private void updateResize() {
         long currResizeTime = System.currentTimeMillis();
-        if(currResizeTime - lastResizeTime > 300l) {
+        if (currResizeTime - lastResizeTime > 300l) {
             resizeImmediate(resizeWidth, resizeHeight, true, true, true);
             lastResizeTime = Long.MAX_VALUE;
         }
@@ -885,7 +884,7 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
             }
 
             // Post a message to the screen
-            if (stereoMode){
+            if (stereoMode) {
                 ModePopupInfo mpi = new ModePopupInfo();
                 mpi.title = "Stereoscopic mode";
                 mpi.header = "You have entered Stereoscopic mode!";
@@ -899,7 +898,7 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
         case SCREENSHOT_SIZE_UDPATE:
         case FRAME_SIZE_UDPATE:
             //Gdx.app.postRunnable(() -> {
-                //clearFrameBufferMap();
+            //clearFrameBufferMap();
             //});
             break;
         case SCENE_GRAPH_ADD_OBJECT_CMD:

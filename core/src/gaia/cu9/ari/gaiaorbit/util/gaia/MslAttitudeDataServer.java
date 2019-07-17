@@ -104,7 +104,8 @@ public class MslAttitudeDataServer extends HermiteInterpolatedAttitudeDataServer
         //this.nativeTimeContext = TimeContext.TCB;
 
         this.msl = msl;
-        maxStepSec = 125.0;
+        // maxStepSec = 125.0;
+        maxStepSec = 5000.0;
         initialized = false;
     }
 

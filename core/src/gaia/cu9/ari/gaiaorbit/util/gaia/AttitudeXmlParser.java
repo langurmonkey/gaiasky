@@ -15,16 +15,12 @@ import gaia.cu9.ari.gaiaorbit.util.format.DateFormatFactory;
 import gaia.cu9.ari.gaiaorbit.util.format.IDateFormat;
 import gaia.cu9.ari.gaiaorbit.util.gaia.time.Duration;
 import gaia.cu9.ari.gaiaorbit.util.gaia.time.Hours;
-import gaia.cu9.ari.gaiaorbit.util.gaia.time.Secs;
 import gaia.cu9.ari.gaiaorbit.util.units.Quantity;
 
-import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.Instant;
-import java.time.LocalDateTime;
-import java.time.ZoneOffset;
 import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -46,7 +42,7 @@ public class AttitudeXmlParser {
         endOfMission = getDate("2026-09-14 17:44:20");
     }
 
-    public static BinarySearchTree parseFolder(String folder, boolean oneDayDuration) {
+    public static BinarySearchTree parseFolder(String folder) {
         final Array<FileHandle> list;
         try (Stream<Path> paths = Files.walk(Paths.get(GlobalConf.data.dataFile(folder)))) {
             List<Path> ps = paths.filter(Files::isRegularFile).collect(Collectors.toList());
@@ -58,27 +54,12 @@ public class AttitudeXmlParser {
 
             BinarySearchTree bst = new BinarySearchTree();
 
-            final long overlapMs = 10 * 60 * 1000;
-            final long threeHoursSec = 10800;
             // GENERATE LIST OF DURATIONS
             SortedMap<Instant, FileHandle> datesMap = new TreeMap<>();
             for (FileHandle fh : list) {
                 try {
-                    if (oneDayDuration) {
-                        /**
-                         * Hack to get the stripped FOV mode to load fast.
-                         * We set the activation time to ten minutes before today starts.
-                         */
-                        LocalDateTime ldt = LocalDateTime.now();
-                        ldt = ldt.withMinute(0).withSecond(0);
-                        Instant date = ldt.toInstant(ZoneOffset.UTC);
-                        // Date is the start of today. Lets subtract 10 minutes
-                        date.minusMillis(overlapMs);
-                        datesMap.put(date, fh);
-                    } else {
-                        Instant date = parseActivationTime(fh);
-                        datesMap.put(date, fh);
-                    }
+                    Instant date = parseActivationTime(fh);
+                    datesMap.put(date, fh);
                 } catch (Exception e) {
                     logger.error(e, I18n.bundle.format("error.file.parse", fh.name()));
                 }
@@ -89,28 +70,18 @@ public class AttitudeXmlParser {
             Instant lastDate = null;
             for (Instant date : dates) {
                 if (lastDate != null && lastFH != null) {
-                    if (oneDayDuration) {
-                        Duration d = new Secs(threeHoursSec + overlapMs * 2 / 1000);
-                        durationMap.put(lastFH, d);
-                    } else {
-                        long elapsed = date.toEpochMilli() - lastDate.toEpochMilli();
+                    long elapsed = date.toEpochMilli() - lastDate.toEpochMilli();
 
-                        Duration d = new Hours(elapsed * Nature.MS_TO_H);
-                        durationMap.put(lastFH, d);
-                    }
+                    Duration d = new Hours(elapsed * Nature.MS_TO_H);
+                    durationMap.put(lastFH, d);
                 }
                 lastDate = date;
                 lastFH = datesMap.get(date);
             }
             // Last element
-            if (oneDayDuration) {
-                Duration d = new Secs(threeHoursSec + overlapMs * 2 / 1000);
-                durationMap.put(lastFH, d);
-            } else {
-                long elapsed = endOfMission.toEpochMilli() - lastDate.toEpochMilli();
-                Duration d = new Hours(elapsed * Nature.MS_TO_H);
-                durationMap.put(lastFH, d);
-            }
+            long elapsed = endOfMission.toEpochMilli() - lastDate.toEpochMilli();
+            Duration d = new Hours(elapsed * Nature.MS_TO_H);
+            durationMap.put(lastFH, d);
 
             // PARSE ATTITUDES
             for (FileHandle fh : list) {

@@ -361,7 +361,6 @@ public class GlobalConf {
         public boolean RECORD_CAMERA;
         public boolean RECORD_KEYFRAME_CAMERA;
         public float LIMIT_MAG_RUNTIME;
-        public boolean STRIPPED_FOV_MODE = false;
         /**
          * Whether octree drawing is active or not
          **/
@@ -373,14 +372,13 @@ public class GlobalConf {
             EventManager.instance.subscribe(this, Events.LIMIT_MAG_CMD, Events.INPUT_ENABLED_CMD, Events.DISPLAY_GUI_CMD, Events.TOGGLE_UPDATEPAUSE, Events.TOGGLE_TIME_CMD, Events.RECORD_CAMERA_CMD, Events.GRAV_WAVE_START, Events.GRAV_WAVE_STOP);
         }
 
-        public void initialize(boolean dISPLAY_GUI, boolean uPDATE_PAUSE, boolean sTRIPPED_FOV_MODE, boolean tIME_ON, boolean iNPUT_ENABLED, boolean rECORD_CAMERA, float lIMIT_MAG_RUNTIME, boolean rEAL_TIME, boolean dRAW_OCTREE) {
+        public void initialize(boolean dISPLAY_GUI, boolean uPDATE_PAUSE, boolean tIME_ON, boolean iNPUT_ENABLED, boolean rECORD_CAMERA, float lIMIT_MAG_RUNTIME, boolean rEAL_TIME, boolean dRAW_OCTREE) {
             DISPLAY_GUI = dISPLAY_GUI;
             UPDATE_PAUSE = uPDATE_PAUSE;
             TIME_ON = tIME_ON;
             INPUT_ENABLED = iNPUT_ENABLED;
             RECORD_CAMERA = rECORD_CAMERA;
             LIMIT_MAG_RUNTIME = lIMIT_MAG_RUNTIME;
-            STRIPPED_FOV_MODE = sTRIPPED_FOV_MODE;
             REAL_TIME = rEAL_TIME;
             DRAW_OCTREE = dRAW_OCTREE;
         }
