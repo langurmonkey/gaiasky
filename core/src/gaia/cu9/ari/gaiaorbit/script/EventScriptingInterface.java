@@ -482,6 +482,24 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
     }
 
     @Override
+    public void cameraYaw(final double amount) {
+        cameraTurn(amount, 0d);
+    }
+
+    public void cameraYaw(final long amount) {
+        cameraYaw((double) amount);
+    }
+
+    @Override
+    public void cameraPitch(final double amount) {
+        cameraTurn(0d, amount);
+    }
+
+    public void cameraPitch(final long amount){
+        cameraPitch((double) amount);
+    }
+
+    @Override
     public void cameraStop() {
         Gdx.app.postRunnable(() -> em.post(Events.CAMERA_STOP));
 

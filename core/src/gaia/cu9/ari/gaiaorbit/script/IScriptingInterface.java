@@ -430,7 +430,11 @@ public interface IScriptingInterface {
     void cameraForward(double value);
 
     /**
-     * Adds a rotation movement to the camera, or a pitch/yaw if in free mode.
+     * Adds a rotation movement to the camera around the current focus, or a pitch/yaw if in free mode.
+     *
+     * If the camera is not using the cinematic behaviour ({@link #setCinematicCamera(boolean)},
+     * the rotation movement will not be permanent. Use the cinematic behaviour to have the camera
+     * continue to rotate around the focus.
      *
      * @param deltaX The x component, between 0 and 1. Positive is right and
      *               negative is left.
@@ -447,9 +451,12 @@ public interface IScriptingInterface {
     void cameraRoll(double roll);
 
     /**
-     * Adds a turn force to the camera. If the camera is in focus mode, it
+     * Adds a turn force to the camera (yaw and/or pitch). If the camera is in focus mode, it
      * permanently deviates the line of sight from the focus until centered
      * again.
+     * If the camera is not using the cinematic behaviour ({@link #setCinematicCamera(boolean)},
+     * the turn will not be permanent. Use the cinematic behaviour to have the turn
+     * persist in time.
      *
      * @param deltaX The x component, between 0 and 1. Positive is right and
      *               negative is left.
@@ -457,6 +464,20 @@ public interface IScriptingInterface {
      *               is down.
      */
     void cameraTurn(double deltaX, double deltaY);
+
+    /**
+     * Adds a yaw to the camera. Same as {@link #cameraTurn(double, double)} with
+     * deltaY set to zero.
+     * @param amount
+     */
+    void cameraYaw(double amount);
+
+    /**
+     * Adds a pitch to the camera. Same as {@link #cameraTurn(double, double)} with
+     * deltaX set to zero.
+     * @param amount
+     */
+    void cameraPitch(double amount);
 
     /**
      * Stops all camera motion.
