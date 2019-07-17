@@ -6,6 +6,7 @@
 package gaia.cu9.ari.gaiaorbit.util.gaia;
 
 import com.badlogic.gdx.files.FileHandle;
+import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.XmlReader;
 import gaia.cu9.ari.gaiaorbit.util.*;
 import gaia.cu9.ari.gaiaorbit.util.Logger.Log;
@@ -46,14 +47,13 @@ public class AttitudeXmlParser {
     }
 
     public static BinarySearchTree parseFolder(String folder, boolean oneDayDuration) {
-        final FileHandle[] list;
+        final Array<FileHandle> list;
         try (Stream<Path> paths = Files.walk(Paths.get(GlobalConf.data.dataFile(folder)))) {
             List<Path> ps = paths.filter(Files::isRegularFile).collect(Collectors.toList());
-            list = new FileHandle[ps.size()];
-            int i = 0;
+            list = new Array<>(ps.size());
             for (Path p : ps) {
-                list[i] = new FileHandle(p.toFile());
-                i++;
+                if (p.toFile().getName().endsWith(".xml"))
+                    list.add(new FileHandle(p.toFile()));
             }
 
             BinarySearchTree bst = new BinarySearchTree();
@@ -125,7 +125,7 @@ public class AttitudeXmlParser {
                 }
             }
 
-            logger.info(I18n.bundle.format("notif.attitude.initialized", list.length));
+            logger.info(I18n.bundle.format("notif.attitude.initialized", list.size));
             return bst;
         } catch (Exception e) {
             logger.error("Error loading attitude files");
@@ -240,7 +240,7 @@ public class AttitudeXmlParser {
     private static Instant getDate(String date) {
         try {
             return format.parse(date);
-        }catch(Exception e){
+        } catch (Exception e) {
             return formatWithMs.parse(date);
         }
     }

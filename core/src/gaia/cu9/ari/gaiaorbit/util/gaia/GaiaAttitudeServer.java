@@ -5,7 +5,10 @@
 
 package gaia.cu9.ari.gaiaorbit.util.gaia;
 
-import gaia.cu9.ari.gaiaorbit.util.*;
+import gaia.cu9.ari.gaiaorbit.util.BinarySearchTree;
+import gaia.cu9.ari.gaiaorbit.util.GlobalConf;
+import gaia.cu9.ari.gaiaorbit.util.I18n;
+import gaia.cu9.ari.gaiaorbit.util.Logger;
 import gaia.cu9.ari.gaiaorbit.util.Logger.Log;
 import gaia.cu9.ari.gaiaorbit.util.math.Quaterniond;
 
@@ -15,9 +18,8 @@ import java.util.Date;
  * Provides caching of the last Nsl37 attitude requested. This allows for
  * calculating the attitude only once in each time step and using it in several
  * points in the processing.
- * 
- * @author Toni Sagrista
  *
+ * @author Toni Sagrista
  */
 public class GaiaAttitudeServer {
     private static final Log logger = Logger.getLogger(GaiaAttitudeServer.class);
@@ -38,17 +40,14 @@ public class GaiaAttitudeServer {
 
     public GaiaAttitudeServer(String folder) {
         if (GlobalConf.data.REAL_GAIA_ATTITUDE) {
-            try {
-                attitudes = AttitudeXmlParser.parseFolder(folder, GlobalConf.runtime.STRIPPED_FOV_MODE);
+            attitudes = AttitudeXmlParser.parseFolder(folder, GlobalConf.runtime.STRIPPED_FOV_MODE);
+            if(attitudes != null) {
                 initialDate = ((AttitudeIntervalBean) attitudes.findMin()).activationTime;
                 current = new AttitudeIntervalBean("current", null, null, "dummy");
                 // Dummy attitude
                 dummyAttitude = new ConcreteAttitude(0, new Quaterniond(), false);
-            }catch(Exception e){
-                logger.error(e, "Error reconstructing attitude from: " + folder);
-                logger.error("Defaulting to NSL attitude");
-                // Use NSL instead
-                nsl = new Nsl37();
+            }else{
+                logger.error("Error loading real attitude: " + folder);
             }
         } else {
             // Use NSL as approximation
@@ -58,9 +57,8 @@ public class GaiaAttitudeServer {
 
     /**
      * Returns the NSL37 attitude for the given date.
-     * 
-     * @param date
-     *            The date
+     *
+     * @param date The date
      * @return The attitude
      */
     public synchronized Attitude getAttitude(Date date) {
@@ -83,10 +81,10 @@ public class GaiaAttitudeServer {
 
                     // Get actual attitude
                     result = att.get(date);
-                }catch(Exception e){
+                } catch (Exception e) {
                     logger.error(e);
                     // Fallback solution
-                    if(nsl == null){
+                    if (nsl == null) {
                         nsl = new Nsl37();
                     }
                     result = nsl.getAttitude(date);
