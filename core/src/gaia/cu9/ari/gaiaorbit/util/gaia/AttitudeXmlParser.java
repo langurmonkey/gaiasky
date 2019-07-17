@@ -79,7 +79,7 @@ public class AttitudeXmlParser {
                         Instant date = parseActivationTime(fh);
                         datesMap.put(date, fh);
                     }
-                } catch (IOException e) {
+                } catch (Exception e) {
                     logger.error(e, I18n.bundle.format("error.file.parse", fh.name()));
                 }
             }
@@ -118,8 +118,6 @@ public class AttitudeXmlParser {
                 try {
                     AttitudeIntervalBean att = parseFile(fh, durationMap.get(fh), findActivationDate(fh, datesMap));
                     bst.insert(att);
-                } catch (IOException e) {
-                    logger.error(e, I18n.bundle.format("error.file.parse", fh.name()));
                 } catch (Exception e) {
                     logger.error(e, I18n.bundle.format("notif.error", e.getMessage()));
                 }
@@ -143,7 +141,7 @@ public class AttitudeXmlParser {
         return null;
     }
 
-    private static Instant parseActivationTime(FileHandle fh) throws IOException {
+    private static Instant parseActivationTime(FileHandle fh) {
 
         XmlReader reader = new XmlReader();
         XmlReader.Element element = reader.parse(fh);
@@ -154,7 +152,7 @@ public class AttitudeXmlParser {
         return getDate(activTime);
     }
 
-    private static AttitudeIntervalBean parseFile(FileHandle fh, Duration duration, Instant activationTime) throws IOException {
+    private static AttitudeIntervalBean parseFile(FileHandle fh, Duration duration, Instant activationTime) {
         BaseAttitudeDataServer<?> result = null;
 
         XmlReader reader = new XmlReader();
