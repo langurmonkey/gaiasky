@@ -172,9 +172,6 @@ public class DesktopConfInit extends ConfInit {
         ProgramConf prc = new ProgramConf();
         String LOCALE = p.getProperty("program.locale");
 
-        boolean DISPLAY_TUTORIAL = Boolean.parseBoolean(p.getProperty("program.tutorial"));
-        String TUTORIAL_POINTER_SCRIPT_LOCATION = p.getProperty("program.tutorial.pointer.script", "scripts/tutorial/tutorial-pointer.py");
-        String TUTORIAL_SCRIPT_LOCATION = p.getProperty("program.tutorial.script", "scripts/tutorial/tutorial.py");
         boolean SHOW_DEBUG_INFO = Boolean.parseBoolean(p.getProperty("program.debuginfo"));
         Instant LAST_CHECKED;
         try {
@@ -209,7 +206,7 @@ public class DesktopConfInit extends ConfInit {
             }
         }
 
-        prc.initialize(DISPLAY_TUTORIAL, TUTORIAL_POINTER_SCRIPT_LOCATION, TUTORIAL_SCRIPT_LOCATION, SHOW_DEBUG_INFO, LAST_CHECKED, LAST_VERSION, VERSION_CHECK_URL, DATA_DESCRIPTOR_URL, UI_THEME, SCRIPT_LOCATION, REST_PORT, LOCALE, STEREOSCOPIC_MODE, STEREO_PROFILE, CUBEMAPE360_MODE, DISPLAY_HUD, DISPLAY_POINTER_COORDS, DISPLAY_DATASET_DIALOG, NET_MASTER, NET_SLAVE, NET_MASTER_SLAVES);
+        prc.initialize(SHOW_DEBUG_INFO, LAST_CHECKED, LAST_VERSION, VERSION_CHECK_URL, DATA_DESCRIPTOR_URL, UI_THEME, SCRIPT_LOCATION, REST_PORT, LOCALE, STEREOSCOPIC_MODE, STEREO_PROFILE, CUBEMAPE360_MODE, DISPLAY_HUD, DISPLAY_POINTER_COORDS, DISPLAY_DATASET_DIALOG, NET_MASTER, NET_SLAVE, NET_MASTER_SLAVES);
 
         /** SCENE CONF **/
         String gc = p.getProperty("scene.graphics.quality");
@@ -431,9 +428,6 @@ public class DesktopConfInit extends ConfInit {
         p.setProperty("graphics.screen.screenoutput", Boolean.toString(GlobalConf.screen.SCREEN_OUTPUT));
 
         /** PROGRAM **/
-        p.setProperty("program.tutorial", Boolean.toString(GlobalConf.program.DISPLAY_TUTORIAL));
-        p.setProperty("program.tutorial.pointer.script", GlobalConf.program.TUTORIAL_POINTER_SCRIPT_LOCATION);
-        p.setProperty("program.tutorial.script", GlobalConf.program.TUTORIAL_SCRIPT_LOCATION);
         p.setProperty("program.displayhud", Boolean.toString(GlobalConf.program.DISPLAY_HUD));
         p.setProperty("program.displaypointercoords", Boolean.toString(GlobalConf.program.DISPLAY_POINTER_COORDS));
         p.setProperty("program.debuginfo", Boolean.toString(GlobalConf.program.SHOW_DEBUG_INFO));

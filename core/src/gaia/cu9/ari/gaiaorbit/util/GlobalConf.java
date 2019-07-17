@@ -770,9 +770,6 @@ public class GlobalConf {
          */
         public List<String> NET_MASTER_SLAVES;
 
-        public boolean DISPLAY_TUTORIAL;
-        public String TUTORIAL_POINTER_SCRIPT_LOCATION;
-        public String TUTORIAL_SCRIPT_LOCATION;
         public boolean SHOW_DEBUG_INFO;
 
         // Update checker
@@ -811,11 +808,8 @@ public class GlobalConf {
             EventManager.instance.subscribe(this, Events.STEREOSCOPIC_CMD, Events.STEREO_PROFILE_CMD, Events.CUBEMAP360_CMD, Events.CUBEMAP_PROJECTION_CMD);
         }
 
-        public void initialize(boolean dISPLAY_TUTORIAL, String tUTORIAL_POINTER_SCRIPT_LOCATION, String tUTORIAL_SCRIPT_LOCATION, boolean sHOW_DEBUG_INFO, Instant lAST_CHECKED, String lAST_VERSION, String vERSION_CHECK_URL, String dATA_DESCRIPTOR_URL, String uI_THEME, String sCRIPT_LOCATION, int rEST_PORT, String lOCALE, boolean sTEREOSCOPIC_MODE, StereoProfile sTEREO_PROFILE, boolean cUBEMAP360_MODE, boolean dISPLAY_HUD, boolean dISPLAY_POINTER_COORDS, boolean dISPLAY_DATASET_DIALOG,
+        public void initialize(boolean sHOW_DEBUG_INFO, Instant lAST_CHECKED, String lAST_VERSION, String vERSION_CHECK_URL, String dATA_DESCRIPTOR_URL, String uI_THEME, String sCRIPT_LOCATION, int rEST_PORT, String lOCALE, boolean sTEREOSCOPIC_MODE, StereoProfile sTEREO_PROFILE, boolean cUBEMAP360_MODE, boolean dISPLAY_HUD, boolean dISPLAY_POINTER_COORDS, boolean dISPLAY_DATASET_DIALOG,
                 boolean nET_MASTER, boolean nET_SLAVE, List<String> nET_MASTER_SLAVES) {
-            DISPLAY_TUTORIAL = dISPLAY_TUTORIAL;
-            TUTORIAL_POINTER_SCRIPT_LOCATION = tUTORIAL_POINTER_SCRIPT_LOCATION;
-            TUTORIAL_SCRIPT_LOCATION = tUTORIAL_SCRIPT_LOCATION;
             SHOW_DEBUG_INFO = sHOW_DEBUG_INFO;
             VERSION_LAST_TIME = lAST_CHECKED;
             VERSION_LAST_VERSION = lAST_VERSION;
@@ -836,8 +830,7 @@ public class GlobalConf {
             NET_MASTER_SLAVES = nET_MASTER_SLAVES;
         }
 
-        public void initialize(boolean dISPLAY_TUTORIAL, boolean sHOW_DEBUG_INFO, String uI_THEME, String lOCALE, boolean sTEREOSCOPIC_MODE, StereoProfile sTEREO_PROFILE) {
-            DISPLAY_TUTORIAL = dISPLAY_TUTORIAL;
+        public void initialize(boolean sHOW_DEBUG_INFO, String uI_THEME, String lOCALE, boolean sTEREOSCOPIC_MODE, StereoProfile sTEREO_PROFILE) {
             SHOW_DEBUG_INFO = sHOW_DEBUG_INFO;
             UI_THEME = uI_THEME;
             LOCALE = lOCALE;
