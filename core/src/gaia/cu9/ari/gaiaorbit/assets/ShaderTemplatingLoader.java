@@ -25,7 +25,10 @@ public class ShaderTemplatingLoader {
 
     public static String load(FileHandle fh) {
         String in = fh.readString();
+        return resolveIncludes(in);
+    }
 
+    public static String resolveIncludes(String in){
         StringBuffer sb = new StringBuffer();
 
         Scanner scanner = new Scanner(in);

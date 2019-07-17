@@ -23,6 +23,7 @@ package gaia.cu9.ari.gaiaorbit.util.gdx.contrib.utils;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.glutils.ShaderProgram;
+import gaia.cu9.ari.gaiaorbit.assets.ShaderTemplatingLoader;
 
 public final class ShaderLoader {
     public static String BasePath = "";
@@ -42,6 +43,10 @@ public final class ShaderLoader {
 
         String vpSrc = Gdx.files.internal(BasePath + vertexFileName + ".vertex").readString();
         String fpSrc = Gdx.files.internal(BasePath + fragmentFileName + ".fragment").readString();
+
+        // Resolve includes
+        vpSrc = ShaderTemplatingLoader.resolveIncludes(vpSrc);
+        fpSrc = ShaderTemplatingLoader.resolveIncludes(fpSrc);
 
         ShaderProgram program = ShaderLoader.fromString(vpSrc, fpSrc, vertexFileName, fragmentFileName, defines);
         return program;

@@ -5,6 +5,8 @@
 // Modified by Sagrista, Toni
 #version 330 core
 
+#include shader/lib_normal.glsl
+
 uniform sampler2D u_texture0;
 // The inverse of the viewport dimensions along X and Y
 uniform vec2 u_viewportInverse;
@@ -12,50 +14,21 @@ uniform vec2 u_viewportInverse;
 in vec2 v_texCoords;
 out vec4 fragColor;
 
-float lumRGB(vec3 v)
-    {
-    return dot(v, vec3(0.212, 0.716, 0.072));
-    }
-
-const float fScale = 1.0;
-
 vec4 nfaa(sampler2D tex, vec2 texCoords, vec2 viewportInverse){
-    // Offset coordinates
-    vec2 upOffset = vec2(0.0, viewportInverse.y) * fScale;
-    vec2 rightOffset = vec2(viewportInverse.x, 0.0) * fScale;
-    
-    float topHeight = lumRGB(texture(tex, texCoords.xy + upOffset).rgb);
-    float bottomHeight = lumRGB(texture(tex, texCoords.xy - upOffset).rgb);
-    float rightHeight = lumRGB(texture(tex, texCoords.xy + rightOffset).rgb);
-    float leftHeight = lumRGB(texture(tex, texCoords.xy - rightOffset).rgb);
-    float leftTopHeight = lumRGB(texture(tex, texCoords.xy - rightOffset + upOffset).rgb);
-    float leftBottomHeight = lumRGB(texture(tex, texCoords.xy - rightOffset - upOffset).rgb);
-    float rightBottomHeight = lumRGB(texture(tex, texCoords.xy + rightOffset + upOffset).rgb);
-    float rightTopHeight = lumRGB(texture(tex, texCoords.xy + rightOffset - upOffset).rgb);
-    
-    // Normal map creation
-    float sum0 = rightTopHeight + topHeight + rightBottomHeight;
-    float sum1 = leftTopHeight + bottomHeight + leftBottomHeight;
-    float sum2 = leftTopHeight + leftHeight + rightTopHeight;
-    float sum3 = leftBottomHeight + rightHeight + rightBottomHeight;
-    float vect1 = (sum1 - sum0);
-    float vect2 = (sum2 - sum3);
-    
-    // Put them together and scale.
-    vec2 Normal = vec2(vect1, vect2) * viewportInverse * fScale;
-    
+    vec2 normal = normalMap(tex, texCoords) * viewportInverse;
+
     // Color
-    vec4 Scene0 = texture(tex, texCoords.xy);
-    vec4 Scene1 = texture(tex, texCoords.xy + Normal.xy);
-    vec4 Scene2 = texture(tex, texCoords.xy - Normal.xy);
-    vec4 Scene3 = texture(tex, texCoords.xy + vec2(Normal.x, -Normal.y) * 0.5);
-    vec4 Scene4 = texture(tex, texCoords.xy - vec2(Normal.x, -Normal.y) * 0.5);
+    vec4 scene0 = texture(tex, texCoords.xy);
+    vec4 scene1 = texture(tex, texCoords.xy + normal.xy);
+    vec4 scene2 = texture(tex, texCoords.xy - normal.xy);
+    vec4 scene3 = texture(tex, texCoords.xy + vec2(normal.x, -normal.y) * 0.5);
+    vec4 scene4 = texture(tex, texCoords.xy - vec2(normal.x, -normal.y) * 0.5);
     
     // Final color
-    return vec4((Scene0.rgb + Scene1.rgb + Scene2.rgb + Scene3.rgb + Scene4.rgb) * 0.2, 1.0);
+    return vec4((scene0.rgb + scene1.rgb + scene2.rgb + scene3.rgb + scene4.rgb) * 0.2, 1.0);
     
     // Debug
-    //return vec4(normalize(vec3(vect1, vect2 , 1.0) * 0.5 + 0.5), 1.0);
+    //return vec4(normalize(vec3(normal.x / viewportInverse.x, normal.y / viewportInverse.y , 1.0) * 0.5 + 0.5), 1.0);
 	    
 }
 
