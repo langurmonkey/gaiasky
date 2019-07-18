@@ -160,10 +160,9 @@ public class DownloadDataWindow extends GenericDialog {
                                 GlobalConf.data.DATA_LOCATION = result.path();
                                 me.pack();
                                 Gdx.app.postRunnable(() -> {
-                                    me.content.clear();
-                                    me.build();
                                     // Reset datasets
                                     GlobalConf.data.CATALOG_JSON_FILES = "";
+                                    reloadAll();
                                 });
                             } else {
                                 Label warn = new OwnLabel(I18n.txt("gui.download.pickloc.permissions"), skin);
