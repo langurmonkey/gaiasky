@@ -19,7 +19,7 @@ public class GaiaCoordinates extends AbstractOrbitCoordinates {
     @Override
     public void doneLoading(Object... params) {
         orbitname = "Gaia orbit";
-        orbit = (HeliotropicOrbit) ((ISceneGraph) params[0]).getNode(orbitname.toLowerCase().trim());
+        orbit = (HeliotropicOrbit) ((ISceneGraph) params[0]).getNode(orbitname);
         if (params[1] instanceof CelestialBody)
             orbit.setBody((CelestialBody) params[1]);
         data = orbit.getPointCloud();

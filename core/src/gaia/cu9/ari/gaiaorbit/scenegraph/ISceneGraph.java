@@ -8,7 +8,6 @@ package gaia.cu9.ari.gaiaorbit.scenegraph;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Disposable;
 import com.badlogic.gdx.utils.IntMap;
-import com.badlogic.gdx.utils.ObjectMap;
 import gaia.cu9.ari.gaiaorbit.scenegraph.camera.ICamera;
 import gaia.cu9.ari.gaiaorbit.util.time.ITimeFrameProvider;
 import gaia.cu9.ari.gaiaorbit.util.tree.IPosition;
@@ -84,13 +83,6 @@ public interface ISceneGraph extends Disposable {
     void removeNodeAuxiliaryInfo(SceneGraphNode node);
 
     /**
-     * Gets the index from string to node
-     *
-     * @return The index
-     */
-    ObjectMap<String, SceneGraphNode> getStringToNodeMap();
-
-    /**
      * Gets a star map: HIP -&gt; IPosition It only contains the stars with HIP
      * number
      *
@@ -109,40 +101,9 @@ public interface ISceneGraph extends Disposable {
     int getSize();
 
     /**
-     * Adds the given node to the index with the given key
-     *
-     * @param key  The string key
-     * @param node The node
-     */
-    void addToStringToNode(String key, SceneGraphNode node);
-
-    /**
-     * Removes the object with the given key from the index
-     *
-     * @param key The key to remove
-     */
-    void removeFromStringToNode(String key);
-
-    /**
-     * Removes the given object from the index. This operation may take a while
-     *
-     * @param node The node to remove
-     */
-    void removeFromStringToNode(SceneGraphNode node);
-
-    /**
      * Gets the current position of the object identified by the given name.
      * The given position is in the internal reference system and corrects stars
      * for proper motions and other objects for their specific motions as well.
-     *
-     * @param name The name of the object
-     * @return The current position, if the object exists and has a position. Null otherwise.
-     */
-    double[] getObjectPosition(String name);
-
-    /**
-     * Same as {@link ISceneGraph#getObjectPosition(String)} but passing a doulbe array
-     * of at least 3 slots to store the result.
      *
      * @param name The name of the object
      * @param out  The out double array

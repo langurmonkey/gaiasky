@@ -90,9 +90,6 @@ uniform sampler2D u_nightTexture;
 uniform sampler2D u_reflectionTexture;
 #endif
 
-#ifdef heightTextureFlag
-uniform sampler2D u_heightTexture;
-#endif
 
 #if defined(diffuseTextureFlag) || defined(specularTextureFlag)
 #define textureFlag
@@ -253,10 +250,15 @@ out vec4 fragColor;
 #define PI 3.1415926535
 
 #ifdef heightFlag
+uniform sampler2D u_heightTexture;
 uniform float u_heightScale;
+uniform vec2 u_heightSize;
+uniform float u_heightNoiseSize;
 
 #define KM_TO_U 1.0E-6
 #define HEIGHT_FACTOR 70.0
+
+#include shader/tessellation/lib_sampleheight.glsl
 
 vec2 parallaxMapping(vec2 texCoords, vec3 viewDir){
     // number of depth layers
@@ -274,13 +276,13 @@ vec2 parallaxMapping(vec2 texCoords, vec3 viewDir){
 
     // get initial values
     vec2  currentTexCoords     = texCoords;
-    float currentDepthMapValue = texture(u_heightTexture, currentTexCoords).r;
+    float currentDepthMapValue = sampleHeight(u_heightTexture, currentTexCoords).r;
 
     while(currentLayerDepth < currentDepthMapValue){
         // shift texture coordinates along direction of P
         currentTexCoords -= deltaTexCoords;
         // get depthmap value at current texture coordinates
-        currentDepthMapValue = texture(u_heightTexture, currentTexCoords).r;
+        currentDepthMapValue = sampleHeight(u_heightTexture, currentTexCoords).r;
         // get depth of next layer
         currentLayerDepth += layerDepth;
     }

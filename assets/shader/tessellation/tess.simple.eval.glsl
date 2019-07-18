@@ -31,6 +31,7 @@ uniform mat4 u_worldTrans;
 uniform mat4 u_projViewTrans;
 
 uniform float u_heightScale;
+uniform float u_heightNoiseSize;
 uniform vec2 u_heightSize;
 uniform sampler2D u_heightTexture;
 uniform sampler2D u_normalTexture;
@@ -41,6 +42,8 @@ in vec3 l_normal[gl_MaxPatchVertices];
 
 #include shader/lib_logdepthbuff.glsl
 out float o_depth;
+
+#include shader/tessellation/lib_sampleheight.glsl
 
 void main(void){
     vec4 pos = (gl_TessCoord.x * gl_in[0].gl_Position +
@@ -53,7 +56,7 @@ void main(void){
     vec3 v_normal = normalize(gl_TessCoord.x * l_normal[0] + gl_TessCoord.y * l_normal[1] + gl_TessCoord.z * l_normal[2]);
 
     // Use height texture to move vertex along normal
-    float h = 1.0 - texture(u_heightTexture, v_texCoords).r;
+    float h = 1.0 - sampleHeight(u_heightTexture, v_texCoords).r;
     vec3 dh = v_normal * h * u_heightScale;
     pos += vec4(dh, 0.0);
 

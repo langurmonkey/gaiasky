@@ -8,8 +8,6 @@ package gaia.cu9.ari.gaiaorbit.scenegraph;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.IntMap;
 import com.badlogic.gdx.utils.ObjectMap;
-import com.badlogic.gdx.utils.ObjectMap.Keys;
-import com.badlogic.gdx.utils.ObjectSet;
 import gaia.cu9.ari.gaiaorbit.GaiaSky;
 import gaia.cu9.ari.gaiaorbit.render.system.StarPointRenderSystem;
 import gaia.cu9.ari.gaiaorbit.scenegraph.StarGroup.StarBean;
@@ -31,12 +29,12 @@ public abstract class AbstractSceneGraph implements ISceneGraph {
     /** The root of the tree **/
     public SceneGraphNode root;
     /** Quick lookup map. Name to node. **/
-    ObjectMap<String, SceneGraphNode> stringToNode;
+    protected ObjectMap<String, SceneGraphNode> stringToNode;
     /**
      * Map from integer to position with all Hipparcos stars, for the
      * constellations
      **/
-    IntMap<IPosition> hipMap;
+    protected IntMap<IPosition> hipMap;
     /** Number of objects per thread **/
     protected int[] objectsPerThread;
     /** Does it contain an octree **/
@@ -106,7 +104,7 @@ public abstract class AbstractSceneGraph implements ISceneGraph {
     }
 
     public void insert(SceneGraphNode node, boolean addToIndex) {
-        SceneGraphNode parent = stringToNode.get(node.parentName.toLowerCase().trim());
+        SceneGraphNode parent = getNode(node.parentName);
         if (parent != null) {
             parent.addChild(node, true);
             node.setUp();
@@ -217,35 +215,12 @@ public abstract class AbstractSceneGraph implements ISceneGraph {
         }
     }
 
-    public synchronized void addToStringToNode(String key, SceneGraphNode node) {
-        stringToNode.put(key, node);
-    }
-
-    public synchronized void removeFromStringToNode(String key) {
-        stringToNode.remove(key);
-    }
-
-    public synchronized void removeFromStringToNode(SceneGraphNode node) {
-        Keys<String> keys = stringToNode.keys();
-        ObjectSet<String> hits = new ObjectSet<>();
-        for (String key : keys) {
-            if (stringToNode.get(key) == node)
-                hits.add(key);
-        }
-        for (String key : hits)
-            stringToNode.remove(key);
-    }
-
     @Override
     public void update(ITimeFrameProvider time, ICamera camera) {
         // Check if we need to update the points
         if (GlobalConf.scene.COMPUTE_GAIA_SCAN && time.getDt() != 0) {
             StarPointRenderSystem.POINT_UPDATE_FLAG = true;
         }
-    }
-
-    public ObjectMap<String, SceneGraphNode> getStringToNodeMap() {
-        return stringToNode;
     }
 
     public synchronized void addNodeAuxiliaryInfo(SceneGraphNode node) {
@@ -263,13 +238,14 @@ public abstract class AbstractSceneGraph implements ISceneGraph {
     }
 
     public boolean containsNode(String name) {
-        return stringToNode.containsKey(name);
+        return stringToNode.containsKey(name.toLowerCase().trim());
     }
 
     public SceneGraphNode getNode(String name) {
         //return root.getNode(name);
+        name = name.toLowerCase().trim();
         SceneGraphNode node = stringToNode.get(name);
-        if (node instanceof StarGroup)
+        if (node != null && node instanceof StarGroup)
             ((StarGroup) node).getFocus(name);
         return node;
     }
@@ -327,20 +303,15 @@ public abstract class AbstractSceneGraph implements ISceneGraph {
     }
 
     @Override
-    public double[] getObjectPosition(String name) {
-        return getObjectPosition(name, new double[3]);
-    }
-
-    @Override
     public double[] getObjectPosition(String name, double[] out) {
         if (out.length >= 3 && name != null) {
-            String namelc = name.toLowerCase();
+            name = name.toLowerCase().trim();
             ISceneGraph sg = GaiaSky.instance.sg;
-            if (sg.containsNode(namelc)) {
-                SceneGraphNode object = sg.getNode(namelc);
+            if (sg.containsNode(name)) {
+                SceneGraphNode object = sg.getNode(name);
                 if (object instanceof IFocus) {
                     IFocus obj = (IFocus) object;
-                    obj.getAbsolutePosition(namelc, aux3d1);
+                    obj.getAbsolutePosition(name, aux3d1);
                     out[0] = aux3d1.x;
                     out[1] = aux3d1.y;
                     out[2] = aux3d1.z;

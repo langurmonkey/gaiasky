@@ -773,8 +773,7 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
     @Override
     public SceneGraphNode getObject(String name, double timeOutSeconds) {
         ISceneGraph sg = GaiaSky.instance.sg;
-        String n = name.toLowerCase().trim();
-        SceneGraphNode obj = sg.getNode(n);
+        SceneGraphNode obj = sg.getNode(name);
         if (obj == null) {
             if (name.matches("[0-9]+")) {
                 // Check with 'HIP '
@@ -792,7 +791,7 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
         double elapsedSeconds = 0;
         while (obj == null && elapsedSeconds < timeOutSeconds) {
             sleepFrames(1);
-            obj = sg.getNode(n);
+            obj = sg.getNode(name);
             elapsedSeconds = (System.currentTimeMillis() - startMs) / 1000d;
         }
         return obj;

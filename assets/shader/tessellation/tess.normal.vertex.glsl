@@ -178,12 +178,6 @@ uniform sampler2D u_bumpTexture;
 #define specularFlag
 #endif
 
-#if defined(heightTextureFlag)
-uniform sampler2D u_heightTexture;
-uniform float u_heightScale;
-#define heightFlag
-#endif //heightFlag
-
 #if defined(specularFlag) || defined(fogFlag)
 #define cameraPositionFlag
 #endif
@@ -285,13 +279,6 @@ void main() {
     computeAtmosphericScatteringGround();
 
     v_opacity = u_opacity;
-
-    //#ifdef heightFlag
-    // Use height texture to move vertex along normal
-    //float h = 1.0 - texture(u_heightTexture, a_texCoord0).r;
-    //vec3 dh = normalize(a_normal) * h * (u_heightScale / 4.0);
-    //g_position += vec4(dh, 0.0);
-    //#endif //heightFlag
 
     // Location in world coordinates (world origin is at the camera)
     vec4 pos = u_worldTrans * g_position;

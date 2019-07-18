@@ -10,6 +10,8 @@ import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.GL30;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.BufferUtils;
+import gaia.cu9.ari.gaiaorbit.event.EventManager;
+import gaia.cu9.ari.gaiaorbit.event.Events;
 import gaia.cu9.ari.gaiaorbit.util.GlobalConf;
 import gaia.cu9.ari.gaiaorbit.util.Logger;
 
@@ -88,7 +90,7 @@ public class CrashReporter {
     }
 
     private static void print(Logger.Log logger, String str) {
-        if (logger == null) {
+        if (logger == null || !EventManager.instance.hasSubscriptors(Events.POST_NOTIFICATION)) {
             System.err.println(str);
         } else {
             logger.error(str);

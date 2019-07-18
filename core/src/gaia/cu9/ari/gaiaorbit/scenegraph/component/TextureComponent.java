@@ -61,6 +61,7 @@ public class TextureComponent implements IObserver {
     public Texture baseTex, heightTex;
     // Height scale in internal units
     public Float heightScale = 0.005f;
+    public Float heightNoiseSize = 10f;
     public Vector2 heightSize = new Vector2();
     public float[][] heightMap;
 
@@ -82,7 +83,8 @@ public class TextureComponent implements IObserver {
         nightUnpacked = addToLoad(night, textureParamsMipMap, manager);
         ringUnpacked = addToLoad(ring, textureParamsMipMap, manager);
         ringnormalUnpacked = addToLoad(ringnormal, textureParamsMipMap, manager);
-        heightUnpacked = addToLoad(height, textureParamsMipMap, manager);
+        if (height != null && !height.endsWith("generate"))
+            heightUnpacked = addToLoad(height, textureParamsMipMap, manager);
     }
 
     public void initialize() {
@@ -93,7 +95,8 @@ public class TextureComponent implements IObserver {
         nightUnpacked = addToLoad(night, textureParamsMipMap);
         ringUnpacked = addToLoad(ring, textureParamsMipMap);
         ringnormalUnpacked = addToLoad(ringnormal, textureParamsMipMap);
-        heightUnpacked = addToLoad(height, textureParamsMipMap);
+        if (height != null && !height.endsWith("generate"))
+            heightUnpacked = addToLoad(height, textureParamsMipMap);
     }
 
     public boolean isFinishedLoading(AssetManager manager) {
@@ -166,18 +169,22 @@ public class TextureComponent implements IObserver {
             material.set(new TextureExtAttribute(TextureExtAttribute.Night, tex));
         }
         if (height != null) {
-            heightTex = manager.get(heightUnpacked, Texture.class);
-            if (!GlobalConf.scene.ELEVATION_TYPE.isNone()) {
-                initializeElevationData();
+            if (!height.endsWith("generate")) {
+                heightTex = manager.get(heightUnpacked, Texture.class);
+                if (!GlobalConf.scene.ELEVATION_TYPE.isNone()) {
+                    initializeElevationData();
+                }
+            } else {
+                initializeGenElevationData();
             }
         }
         if (instance.materials.size > 1) {
             // Ring material
             Material ringMat = instance.materials.get(1);
-            if(ring != null) {
+            if (ring != null) {
                 ringMat.set(new TextureAttribute(TextureAttribute.Diffuse, manager.get(ringUnpacked, Texture.class)));
             }
-            if(ringnormal != null){
+            if (ringnormal != null) {
                 ringMat.set(new TextureAttribute(TextureAttribute.Normal, manager.get(ringnormalUnpacked, Texture.class)));
             }
             ringMat.set(new BlendingAttribute(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA));
@@ -189,6 +196,12 @@ public class TextureComponent implements IObserver {
         }
 
         return material;
+    }
+
+    private void initializeGenElevationData() {
+        material.set(new FloatExtAttribute(FloatExtAttribute.HeightScale, heightScale * (float) GlobalConf.scene.ELEVATION_MULTIPLIER));
+        material.set(new Vector2Attribute(Vector2Attribute.HeightSize, new Vector2(-1, -1)));
+        material.set(new FloatExtAttribute(FloatExtAttribute.HeightNoiseSize, heightNoiseSize));
     }
 
     private void initializeElevationData() {
@@ -212,6 +225,7 @@ public class TextureComponent implements IObserver {
         material.remove(TextureExtAttribute.Height);
         material.remove(FloatExtAttribute.HeightScale);
         material.remove(Vector2Attribute.HeightSize);
+        material.remove(FloatExtAttribute.HeightNoiseSize);
     }
 
     /**
@@ -248,9 +262,13 @@ public class TextureComponent implements IObserver {
             material.set(new TextureExtAttribute(TextureExtAttribute.Night, tex));
         }
         if (height != null) {
-            heightTex = manager.get(heightUnpacked, Texture.class);
-            if (!GlobalConf.scene.ELEVATION_TYPE.isNone()) {
-                initializeElevationData();
+            if (!height.endsWith("generate")) {
+                heightTex = manager.get(heightUnpacked, Texture.class);
+                if (!GlobalConf.scene.ELEVATION_TYPE.isNone()) {
+                    initializeElevationData();
+                }
+            } else {
+                initializeGenElevationData();
             }
         }
         if (materials.containsKey("ring")) {
@@ -299,6 +317,14 @@ public class TextureComponent implements IObserver {
         this.heightScale = (float) (heightScale * Constants.KM_TO_U);
     }
 
+    /**
+     * Only if height is "generate"
+     * @param heightNoiseSize Size of the sampling area
+     */
+    public void setHeightNoiseSize(Double heightNoiseSize) {
+        this.heightNoiseSize = heightNoiseSize.floatValue();
+    }
+
     public void setColoriftex(Boolean coloriftex) {
         this.coloriftex = coloriftex;
     }
@@ -333,7 +359,7 @@ public class TextureComponent implements IObserver {
             manager.unload(ringnormalUnpacked);
             ringnormalUnpacked = null;
         }
-        if (height != null && manager.containsAsset(heightUnpacked)) {
+        if (height != null && heightUnpacked != null && manager.containsAsset(heightUnpacked)) {
             manager.unload(heightUnpacked);
             heightUnpacked = null;
             heightMap = null;
@@ -344,14 +370,17 @@ public class TextureComponent implements IObserver {
     public void notify(Events event, Object... data) {
         switch (event) {
         case ELEVATION_TYPE_CMD:
-            if(this.hasHeight() && this.material != null) {
+            if (this.hasHeight() && this.material != null) {
                 ElevationType newType = (ElevationType) data[0];
                 Gdx.app.postRunnable(() -> {
                     if (newType.isNone()) {
                         removeElevationData();
                     } else {
                         if (heightMap == null) {
-                            initializeElevationData();
+                            if (height.endsWith("generate"))
+                                initializeGenElevationData();
+                            else
+                                initializeElevationData();
                         }
                     }
                 });

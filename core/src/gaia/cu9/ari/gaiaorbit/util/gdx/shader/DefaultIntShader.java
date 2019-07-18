@@ -103,6 +103,7 @@ public class DefaultIntShader extends BaseIntShader {
 		public final static Uniform ambientTexture = new Uniform("u_ambientTexture", TextureAttribute.Ambient);
 		public final static Uniform heightTexture = new Uniform("u_heightTexture", TextureExtAttribute.Height);
 		public final static Uniform heightScale = new Uniform("u_heightScale", FloatExtAttribute.HeightScale);
+		public final static Uniform heightNoiseSize = new Uniform("u_heightNoiseSize", FloatExtAttribute.HeightNoiseSize);
 		public final static Uniform heightSize = new Uniform("u_heightSize", Vector2Attribute.HeightSize);
 		public final static Uniform alphaTest = new Uniform("u_alphaTest");
 
@@ -308,6 +309,13 @@ public class DefaultIntShader extends BaseIntShader {
 					shader.set(inputID, ((FloatExtAttribute) (combinedAttributes.get(FloatExtAttribute.HeightScale))).value);
 			}
 		};
+		public final static Setter heightNoiseSize = new LocalSetter() {
+			@Override
+			public void set (BaseIntShader shader, int inputID, IntRenderable renderable, Attributes combinedAttributes) {
+				if (combinedAttributes.has(FloatExtAttribute.HeightNoiseSize))
+					shader.set(inputID, ((FloatExtAttribute) (combinedAttributes.get(FloatExtAttribute.HeightNoiseSize))).value);
+			}
+		};
 		public final static Setter heightSize = new LocalSetter() {
 			@Override
 			public void set (BaseIntShader shader, int inputID, IntRenderable renderable, Attributes combinedAttributes) {
@@ -422,6 +430,7 @@ public class DefaultIntShader extends BaseIntShader {
 	public final int u_ambientTexture;
 	public final int u_heightTexture;
 	public final int u_heightScale;
+	public final int u_heightNoiseSize;
 	public final int u_heightSize;
 	public final int u_alphaTest;
 	// Lighting uniforms
@@ -557,6 +566,7 @@ public class DefaultIntShader extends BaseIntShader {
 		u_ambientTexture = register(Inputs.ambientTexture, Setters.ambientTexture);
 		u_heightTexture = register(Inputs.heightTexture, Setters.heightTexture);
 		u_heightScale = register(Inputs.heightScale, Setters.heightScale);
+		u_heightNoiseSize = register(Inputs.heightNoiseSize, Setters.heightNoiseSize);
 		u_heightSize = register(Inputs.heightSize, Setters.heightSize);
 		u_alphaTest = register(Inputs.alphaTest);
 
@@ -674,6 +684,9 @@ public class DefaultIntShader extends BaseIntShader {
 		}
 		if ((attributesMask & TextureExtAttribute.Height) == TextureExtAttribute.Height) {
 			prefix += "#define " + TextureExtAttribute.HeightAlias + "Flag\n";
+		}
+		if ((attributesMask & FloatExtAttribute.HeightNoiseSize) == FloatExtAttribute.HeightNoiseSize) {
+			prefix += "#define heightFlag\n";
 		}
 		if ((attributesMask & TextureAttribute.Ambient) == TextureAttribute.Ambient) {
 			prefix += "#define " + TextureAttribute.AmbientAlias + "Flag\n";

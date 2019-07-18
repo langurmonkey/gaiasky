@@ -6,31 +6,32 @@ layout (triangles) in;
 //////////RELATIVISTIC EFFECTS - VERTEX
 ////////////////////////////////////////////////////////////////////////////////////
 #ifdef relativisticEffects
-uniform float u_vc; // v/c
-uniform vec3 u_velDir; // Camera velocity direction
+uniform float u_vc;// v/c
+uniform vec3 u_velDir;// Camera velocity direction
 
 #include shader/lib_geometry.glsl
 #include shader/lib_relativity.glsl
-#endif // relativisticEffects
+#endif// relativisticEffects
 
 
 ////////////////////////////////////////////////////////////////////////////////////
 //////////GRAVITATIONAL WAVES - VERTEX
 ////////////////////////////////////////////////////////////////////////////////////
 #ifdef gravitationalWaves
-uniform vec4 u_hterms; // hpluscos, hplussin, htimescos, htimessin
-uniform vec3 u_gw; // Location of gravitational wave, cartesian
-uniform mat3 u_gwmat3; // Rotation matrix so that u_gw = u_gw_mat * (0 0 1)^T
-uniform float u_ts; // Time in seconds since start
-uniform float u_omgw; // Wave frequency
+uniform vec4 u_hterms;// hpluscos, hplussin, htimescos, htimessin
+uniform vec3 u_gw;// Location of gravitational wave, cartesian
+uniform mat3 u_gwmat3;// Rotation matrix so that u_gw = u_gw_mat * (0 0 1)^T
+uniform float u_ts;// Time in seconds since start
+uniform float u_omgw;// Wave frequency
 #include shader/lib_gravwaves.glsl
-#endif // gravitationalWaves
+#endif// gravitationalWaves
 
 
 uniform mat4 u_worldTrans;
 uniform mat4 u_projViewTrans;
 
 uniform float u_heightScale;
+uniform float u_heightNoiseSize;
 uniform vec2 u_heightSize;
 uniform sampler2D u_heightTexture;
 
@@ -77,46 +78,37 @@ in vec3 l_shadowMapUv[gl_MaxPatchVertices];
 out vec3 o_shadowMapUv;
 #endif
 
-#ifdef normalTextureFlag
+#include shader/tessellation/lib_sampleheight.glsl
+
+    #ifdef normalTextureFlag
 // Use normal map
 uniform sampler2D u_normalTexture;
 vec3 calcNormal(vec2 p, vec2 dp){
     return normalize(texture(u_normalTexture, p).rgb * 2.0 - 1.0);
 }
-#else
+    #else
 // Use height texture for normals
 vec3 calcNormal(vec2 p, vec2 dp){
     vec4 h;
     const vec2 size = vec2(1.0, 0.0);
-    h.x = texture(u_heightTexture, vec2(p.x - dp.x, p.y)).r;
-    h.y = texture(u_heightTexture, vec2(p.x + dp.x, p.y)).r;
-    h.z = texture(u_heightTexture, vec2(p.x, p.y - dp.y)).r;
-    h.w = texture(u_heightTexture, vec2(p.x, p.y + dp.y)).r;
+    if (dp.x < 0.0){
+        dp = vec2(1.0 / (u_heightNoiseSize * 1000.0));
+    }
+    h.x = sampleHeight(u_heightTexture, vec2(p.x - dp.x, p.y)).r;
+    h.y = sampleHeight(u_heightTexture, vec2(p.x + dp.x, p.y)).r;
+    h.z = sampleHeight(u_heightTexture, vec2(p.x, p.y - dp.y)).r;
+    h.w = sampleHeight(u_heightTexture, vec2(p.x, p.y + dp.y)).r;
     vec3 va = normalize(vec3(size.xy, h.x - h.y));
     vec3 vb = normalize(vec3(size.yx, h.z - h.w));
     vec3 n = cross(va, vb);
     return normalize(n);
 }
-
-vec3 calcNormal2(vec2 p, vec2 dp){
-    const vec2 size = vec2(1.0, 0.0);
-    const ivec3 off = ivec3(-1, 0, 1);
-
-    float s01 = textureOffset(u_heightTexture, p, off.xy).x;
-    float s21 = textureOffset(u_heightTexture, p, off.zy).x;
-    float s10 = textureOffset(u_heightTexture, p, off.yx).x;
-    float s12 = textureOffset(u_heightTexture, p, off.yz).x;
-    vec3 va = normalize(vec3(size.xy, s21 - s01));
-    vec3 vb = normalize(vec3(size.yx, s12 - s10));
-    vec3 res = cross(va, vb);
-    return vec3(-res.x, res.y, res.z);
-}
-#endif
+    #endif
 
 void main(void){
     vec4 pos = (gl_TessCoord.x * gl_in[0].gl_Position +
-                    gl_TessCoord.y * gl_in[1].gl_Position +
-                    gl_TessCoord.z * gl_in[2].gl_Position);
+    gl_TessCoord.y * gl_in[1].gl_Position +
+    gl_TessCoord.z * gl_in[2].gl_Position);
 
     o_texCoords = (gl_TessCoord.x * l_texCoords[0] + gl_TessCoord.y * l_texCoords[1] + gl_TessCoord.z * l_texCoords[2]);
 
@@ -124,18 +116,18 @@ void main(void){
     o_normal = normalize(gl_TessCoord.x * l_normal[0] + gl_TessCoord.y * l_normal[1] + gl_TessCoord.z * l_normal[2]);
 
     // Use height texture to move vertex along normal
-    float h = 1.0 - texture(u_heightTexture, o_texCoords).r;
+    float h = 1.0 - sampleHeight(u_heightTexture, o_texCoords).r;
     o_fragHeight = h * u_heightScale;
     vec3 dh = o_normal * o_fragHeight;
     pos += vec4(dh, 0.0);
 
     #ifdef relativisticEffects
     pos.xyz = computeRelativisticAberration(pos.xyz, length(pos.xyz), u_velDir, u_vc);
-    #endif // relativisticEffects
+    #endif// relativisticEffects
 
     #ifdef gravitationalWaves
     pos.xyz = computeGravitationalWaves(pos.xyz, u_gw, u_gwmat3, u_ts, u_omgw, u_hterms);
-    #endif // gravitationalWaves
+    #endif// gravitationalWaves
 
 
     gl_Position = u_projViewTrans * pos;

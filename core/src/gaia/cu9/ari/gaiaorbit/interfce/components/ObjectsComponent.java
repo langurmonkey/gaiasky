@@ -177,7 +177,7 @@ public class ObjectsComponent extends GuiComponent implements IObserver {
             }
             names.sort();
 
-            SceneGraphNode sol = sg.getNode("Sol");
+            SceneGraphNode sol = sg.getNode("Sun");
             if (sol != null) {
                 Array<IFocus> solChildren = new Array<>();
                 sol.addFocusableObjects(solChildren);
