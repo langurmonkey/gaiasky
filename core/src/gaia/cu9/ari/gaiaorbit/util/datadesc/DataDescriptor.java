@@ -30,4 +30,31 @@ public class DataDescriptor {
         }
         currentDataDescriptor = this;
     }
+
+    /**
+     * Finds the dataset with the given name in the dataset descriptor list.
+     * @param name The name of the dataset
+     * @return The dataset descriptor or null if it was not found
+     */
+    public DatasetDesc findDataset(String name){
+        for(DatasetDesc dd : datasets){
+            if(dd.name.equals(name))
+                return dd;
+        }
+        return null;
+    }
+
+    /**
+     * Checks whether the dataset with the given name is present in the
+     * data folder.
+     * @param name The dataset name
+     * @return True if the dataset is present, false otherwise
+     */
+    public boolean datasetPresent(String name){
+        DatasetDesc dd = findDataset(name);
+        if(dd != null){
+            return dd.exists;
+        }
+        return false;
+    }
 }

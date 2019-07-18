@@ -80,6 +80,7 @@ public class PreferencesWindow extends GenericDialog {
     private OwnSlider lodTransitions;
     private OwnTextButton screenshotsLocation, frameoutputLocation;
     private DatasetsWidget dw;
+    private Cell noticeHiResCell;
 
     // Backup values
     private ToneMapping toneMappingBak;
@@ -290,6 +291,33 @@ public class PreferencesWindow extends GenericDialog {
         gquality.setItems(gqs);
         gquality.setWidth(textwidth * 3f);
         gquality.setSelected(gqs[GlobalConf.scene.GRAPHICS_QUALITY.ordinal()]);
+        gquality.addListener((event) -> {
+            if (event instanceof ChangeEvent) {
+                ComboBoxBean s = gquality.getSelected();
+                GraphicsQuality gq = GraphicsQuality.values()[s.value];
+                if ((DataDescriptor.currentDataDescriptor == null || !DataDescriptor.currentDataDescriptor.datasetPresent("hi-res-textures")) && (gq.isHigh() || gq.isUltra())) {
+                    // Show notice
+                    // Hi resolution textures notice
+                    if (noticeHiResCell != null && noticeHiResCell.getActor() == null) {
+                        String infostr = I18n.txt("gui.gquality.hires.info") + "\n";
+                        int lines1 = GlobalResources.countOccurrences(infostr, '\n');
+                        OwnTextArea noticeHiRes = new OwnTextArea(infostr, skin, "info");
+                        noticeHiRes.setDisabled(true);
+                        noticeHiRes.setPrefRows(lines1 + 1);
+                        noticeHiRes.setWidth(tawidth);
+                        noticeHiRes.clearListeners();
+                        noticeHiResCell.setActor(noticeHiRes);
+                    }
+                } else {
+                    // Hide notice
+                    if (noticeHiResCell != null) {
+                        noticeHiResCell.setActor(null);
+                    }
+
+                }
+            }
+            return false;
+        });
 
         OwnImageButton gqualityTooltip = new OwnImageButton(skin, "tooltip");
         gqualityTooltip.addListener(new TextTooltip(I18n.txt("gui.gquality.info"), skin));
@@ -385,6 +413,8 @@ public class PreferencesWindow extends GenericDialog {
         graphics.add(gqualityLabel).left().padRight(pad5 * 4).padBottom(pad5);
         graphics.add(gquality).left().padRight(pad5 * 2).padBottom(pad5);
         graphics.add(gqualityTooltip).left().padBottom(pad5).row();
+        noticeHiResCell = graphics.add();
+        noticeHiResCell.colspan(3).left().row();
         final Cell<Actor> noticeGraphicsCell = graphics.add((Actor) null);
         noticeGraphicsCell.colspan(3).left().row();
         graphics.add(aaLabel).left().padRight(pad5 * 4).padBottom(pad5);
