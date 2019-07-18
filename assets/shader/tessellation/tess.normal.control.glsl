@@ -53,7 +53,7 @@ vec3 center(vec3 p1, vec3 p2, vec3 p3){
 
 float tessellationLevel(vec3 center){
     // Distance scaling variable
-    const float tessellationFactor = 300;
+    const float tessellationFactor = 500;
     const float tessellationSlope = 1.0;
 
     float d = length(center) * U_TO_KM;

@@ -41,8 +41,11 @@ import java.util.Map;
  * @author Toni Sagrista
  */
 public class TextureComponent implements IObserver {
+    /** Generated height keyword **/
+    private static final String GEN_HEIGHT_KEYWORD = "generate";
     /** Default texture parameters **/
     protected static final TextureParameter textureParamsMipMap, textureParams;
+
 
     static {
         textureParamsMipMap = new TextureParameter();
@@ -83,7 +86,7 @@ public class TextureComponent implements IObserver {
         nightUnpacked = addToLoad(night, textureParamsMipMap, manager);
         ringUnpacked = addToLoad(ring, textureParamsMipMap, manager);
         ringnormalUnpacked = addToLoad(ringnormal, textureParamsMipMap, manager);
-        if (height != null && !height.endsWith("generate"))
+        if (height != null && !height.endsWith(GEN_HEIGHT_KEYWORD))
             heightUnpacked = addToLoad(height, textureParamsMipMap, manager);
     }
 
@@ -95,7 +98,7 @@ public class TextureComponent implements IObserver {
         nightUnpacked = addToLoad(night, textureParamsMipMap);
         ringUnpacked = addToLoad(ring, textureParamsMipMap);
         ringnormalUnpacked = addToLoad(ringnormal, textureParamsMipMap);
-        if (height != null && !height.endsWith("generate"))
+        if (height != null && !height.endsWith(GEN_HEIGHT_KEYWORD))
             heightUnpacked = addToLoad(height, textureParamsMipMap);
     }
 
@@ -169,7 +172,7 @@ public class TextureComponent implements IObserver {
             material.set(new TextureExtAttribute(TextureExtAttribute.Night, tex));
         }
         if (height != null) {
-            if (!height.endsWith("generate")) {
+            if (!height.endsWith(GEN_HEIGHT_KEYWORD)) {
                 heightTex = manager.get(heightUnpacked, Texture.class);
                 if (!GlobalConf.scene.ELEVATION_TYPE.isNone()) {
                     initializeElevationData();
@@ -262,7 +265,7 @@ public class TextureComponent implements IObserver {
             material.set(new TextureExtAttribute(TextureExtAttribute.Night, tex));
         }
         if (height != null) {
-            if (!height.endsWith("generate")) {
+            if (!height.endsWith(GEN_HEIGHT_KEYWORD)) {
                 heightTex = manager.get(heightUnpacked, Texture.class);
                 if (!GlobalConf.scene.ELEVATION_TYPE.isNone()) {
                     initializeElevationData();
@@ -318,7 +321,7 @@ public class TextureComponent implements IObserver {
     }
 
     /**
-     * Only if height is "generate"
+     * Only if height is {@link #GEN_HEIGHT_KEYWORD}
      * @param heightNoiseSize Size of the sampling area
      */
     public void setHeightNoiseSize(Double heightNoiseSize) {
@@ -377,7 +380,7 @@ public class TextureComponent implements IObserver {
                         removeElevationData();
                     } else {
                         if (heightMap == null) {
-                            if (height.endsWith("generate"))
+                            if (height.endsWith(GEN_HEIGHT_KEYWORD))
                                 initializeGenElevationData();
                             else
                                 initializeElevationData();

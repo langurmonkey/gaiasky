@@ -20,7 +20,7 @@ in float v_fadeFactor;
 
 out vec4 fragColor;
 
-float luminance(vec3 color){
+float luma(vec3 color){
     return dot(color, vec3(0.2126, 0.7152, 0.0722));
 }
 
@@ -32,8 +32,11 @@ void main(void) {
 
     fragColor.rgb = (fRayleighPhase * v_frontColor.rgb + fMiePhase * v_frontSecondaryColor.rgb);
     fragColor.rgb = vec3(1.0) - exp(-exposure * fragColor.rgb);
-    fragColor.a = v_heightNormalized * (1.0 - v_fadeFactor) + luminance(fragColor.rgb) * v_fadeFactor;
 
-    fragColor.rgb = fragColor.rgb;
+    float lma = luma(fragColor.rbg);
+    float scl = smoothstep(0.05, 0.2, lma);
+    fragColor.a = (v_heightNormalized * (1.0 - v_fadeFactor) + lma * v_fadeFactor) * scl;
+
+    fragColor.rgb = fragColor.rgb * 0.95;
     gl_FragDepth = v_depth;
 }

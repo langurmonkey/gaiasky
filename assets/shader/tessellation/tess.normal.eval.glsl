@@ -92,7 +92,7 @@ vec3 calcNormal(vec2 p, vec2 dp){
     vec4 h;
     const vec2 size = vec2(1.0, 0.0);
     if (dp.x < 0.0){
-        dp = vec2(1.0 / (u_heightNoiseSize * 1000.0));
+        dp = vec2(.5e-3);
     }
     h.x = sampleHeight(u_heightTexture, vec2(p.x - dp.x, p.y)).r;
     h.y = sampleHeight(u_heightTexture, vec2(p.x + dp.x, p.y)).r;
@@ -128,7 +128,6 @@ void main(void){
     #ifdef gravitationalWaves
     pos.xyz = computeGravitationalWaves(pos.xyz, u_gw, u_gwmat3, u_ts, u_omgw, u_hterms);
     #endif// gravitationalWaves
-
 
     gl_Position = u_projViewTrans * pos;
 

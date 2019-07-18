@@ -94,7 +94,8 @@ void computeAtmosphericScatteringGround() {
         v3SamplePoint += v3SampleRay;
     }
 
-    v_heightNormalized = 1.0 - clamp(((fCameraHeight - fInnerRadius) / (fOuterRadius - fInnerRadius)), 0.0, 1.0);
+    float inner = fInnerRadius + (fOuterRadius - fInnerRadius) * 0.5;
+    v_heightNormalized = 1.0 - clamp(((fCameraHeight - inner) / (fOuterRadius - inner)), 0.0, 1.0);
     v_fadeFactor = smoothstep(0.5, 1.0, 1.0 - v_heightNormalized);
 
     v_atmosphereColor = vec4(v3FrontColor * (v3InvWavelength * fKrESun + fKmESun), fAlpha);
@@ -166,7 +167,8 @@ void computeAtmosphericScattering() {
 
     // Height normalized to control the opacity
     // Normalized in [1,0], for [ground,space]
-    v_heightNormalized = 1.0 - clamp(((fCameraHeight - fInnerRadius) / (fOuterRadius - fInnerRadius)), 0.0, 1.0);
+    float inner = fInnerRadius + (fOuterRadius - fInnerRadius) * 0.5;
+    v_heightNormalized = 1.0 - clamp(((fCameraHeight - inner) / (fOuterRadius - inner)), 0.0, 1.0);
     v_fadeFactor = smoothstep(0.5, 1.0, 1.0 - v_heightNormalized);
 
     // Direction from the vertex to the camera
