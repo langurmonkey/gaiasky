@@ -49,7 +49,7 @@ vec4 fetchCloudColor(vec2 texCoord, vec4 defaultValue) {
 #elif defined(diffuseTextureFlag)
 // Only clouds, we use value as transp
 vec4 fetchCloudColor(vec2 texCoord, vec4 defaultValue) {
-    vec4 cloud = texture2D(u_diffuseTexture, texCoord, TEXTURE_LOD_BIAS);
+    vec4 cloud = texture(u_diffuseTexture, texCoord, TEXTURE_LOD_BIAS);
     // Smooth towards the poles
     float smoothing = smoothstep(0.01, 0.07, texCoord.y);
     return vec4(2.0 * cloud.rgb, smoothing * (cloud.r + cloud.g + cloud.b) / 3.0);
