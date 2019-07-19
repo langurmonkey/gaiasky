@@ -4,6 +4,9 @@
 
 layout(vertices = N_VERTICES) out;
 
+// Tessellation quality in [1,7]
+uniform float u_tessQuality = 4.0;
+
 in vec2 v_texCoords[gl_MaxPatchVertices];
 out vec2 l_texCoords[N_VERTICES];
 
@@ -53,7 +56,7 @@ vec3 center(vec3 p1, vec3 p2, vec3 p3){
 
 float tessellationLevel(vec3 center){
     // Distance scaling variable
-    const float tessellationFactor = 500;
+    float tessellationFactor = u_tessQuality * 100.0;
     const float tessellationSlope = 1.0;
 
     float d = length(center) * U_TO_KM;

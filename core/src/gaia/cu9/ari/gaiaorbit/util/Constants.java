@@ -206,6 +206,9 @@ public class Constants {
     public final static float MIN_ELEVATION_MULT = 0f;
     public final static float MAX_ELEVATION_MULT = 7.5f;
 
+    public final static float MIN_TESS_QUALITY = 1f;
+    public final static float MAX_TESS_QUALITY = 10f;
+
     // Max time, 5 Myr
     public static final long MAX_TIME_MS = 5000000l * (long) Nature.Y_TO_MS;
     // Min time, -5 Myr

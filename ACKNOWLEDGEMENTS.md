@@ -25,10 +25,10 @@
 
 ## Textures, models, music and other assets
 
--  Nick Risinger for the artist’s conception of the Milky Way
+-  Nick Risinger for the artist’s conception of the Milky Way (not used anymore)
 -  Andreas Ressl and Georg Hammershmid for the star glow texture
--  Tom Patterson (www.shadedrelief.com) for some textures
--  [Solar System Scope](http://www.solarsystemscope.com/) for some textures (Mercury, Venus, Earth, Moon)
+-  [Tom Patterson](www.shadedrelief.com) for some textures
+-  [Solar System Scope](http://www.solarsystemscope.com/) for some of the planetary and moon textures
 -  Phil Stooke and Grant Hutchison (http://www.classe.cornell.edu/~seb/celestia/hutchison/index-125.html) for some of the textures
 -  David Navas for the [simple spaceship](http://www.blendswap.com/user/DeNapes) model
 -  Terranimperial for the [USS Enterprise NCC-1701-A](https://sketchfab.com/models/75156f5812e34342a3dd5c2ba394d4ed) model, licensed under [CC Attribution](http://creativecommons.org/licenses/by/4.0/)
@@ -37,7 +37,8 @@
 -  [DJ Masque](http://sampleswap.org/artist/djmasque) for the 'Oceanic Dawn' track
 -  [icons8.com](https://icons8.com) for some icons
 -  [Galaxy Map](http://galaxymap.org/) (Kevin Jardine, [@galaxy_map](https://twitter.com/galaxy_map)) for the isodensity meshes
--  ESA/Planck/C. North, [www.chromoscope.net/planck](http://www.chromoscope.net/planck) for the Cosmic Microwave Background images.
+-  ESA/Planck/C. North, [www.chromoscope.net/planck](http://www.chromoscope.net/planck) for the Cosmic Microwave Background images
+-  [USGS](https://astrogeology.usgs.gov) for the Moon LRO LOLA Elevation Model and the Mercury MESSENGER Global Digital Elevation Model
 
 ## Translations
 

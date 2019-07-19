@@ -541,6 +541,11 @@ public enum Events {
     ELEVATION_MUTLIPLIER_CMD,
 
     /**
+     * Sets the tessellation quality. Contains the new quality in [{@link gaia.cu9.ari.gaiaorbit.util.Constants#MIN_TESS_QUALITY}, {@link gaia.cu9.ari.gaiaorbit.util.Constants#MAX_TESS_QUALITY}]
+     */
+    TESSELLATION_QUALITY_CMD,
+
+    /**
      * Stereoscopic vision, side by side rendering. Contains the state boolean
      * and another boolean indicating whether it comes from the interface.
      **/

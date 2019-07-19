@@ -33,6 +33,9 @@ public class FloatExtAttribute extends FloatAttribute {
     public static final String HeightNoiseSizeAlias = "heightNoiseSize";
     public static final long HeightNoiseSize = register(HeightNoiseSizeAlias);
 
+    public static final String TessQualityAlias = "tessQuality";
+    public static final long TessQuality = register(TessQualityAlias);
+
     @Override
     public Attribute copy() {
         return new FloatExtAttribute(type, value);

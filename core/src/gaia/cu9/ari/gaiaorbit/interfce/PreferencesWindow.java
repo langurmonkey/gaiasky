@@ -77,9 +77,10 @@ public class PreferencesWindow extends GenericDialog {
     private OwnSelectBox<String> theme;
     private OwnSelectBox<FileComboBoxBean> controllerMappings;
     private OwnTextField widthField, heightField, sswidthField, ssheightField, frameoutputPrefix, frameoutputFps, fowidthField, foheightField, camrecFps, cmResolution, smResolution, limitFps;
-    private OwnSlider lodTransitions;
+    private OwnSlider lodTransitions, tessQuality;
     private OwnTextButton screenshotsLocation, frameoutputLocation;
     private DatasetsWidget dw;
+    private OwnLabel tessQualityLabel;
     private Cell noticeHiResCell;
 
     // Backup values
@@ -451,9 +452,39 @@ public class PreferencesWindow extends GenericDialog {
         elevationSb.setItems(ecbb);
         elevationSb.setWidth(textwidth * 3f);
         elevationSb.setSelectedIndex(GlobalConf.scene.ELEVATION_TYPE.ordinal());
+        elevationSb.addListener((event) -> {
+            if (event instanceof ChangeEvent) {
+                if (elevationSb.getSelected().type.isTessellation()) {
+                    enableComponents(true, tessQuality, tessQualityLabel);
+                } else {
+                    enableComponents(false, tessQuality, tessQualityLabel);
+                }
+            }
+            return false;
+        });
 
-        elevation.add(elevationTypeLabel).left().padRight(pad5 * 4).padBottom(pad5);
-        elevation.add(elevationSb).left().padRight(pad5 * 2).padBottom(pad5);
+        // TESSELLATION QUALITY
+        tessQualityLabel = new OwnLabel(I18n.txt("gui.elevation.tessellation.quality"), skin);
+        tessQualityLabel.setDisabled(!GlobalConf.scene.ELEVATION_TYPE.isTessellation());
+
+        final OwnLabel tessQualityValueLabel = new OwnLabel(nf1.format(GlobalConf.scene.TESSELLATION_QUALITY), skin);
+
+        tessQuality = new OwnSlider(Constants.MIN_TESS_QUALITY, Constants.MAX_TESS_QUALITY, 0.1f, false, skin);
+        tessQuality.setDisabled(!GlobalConf.scene.ELEVATION_TYPE.isTessellation());
+        tessQuality.setWidth(sliderWidth);
+        tessQuality.setValue((float) GlobalConf.scene.TESSELLATION_QUALITY);
+        tessQuality.addListener((event) -> {
+            if(event instanceof ChangeEvent){
+                tessQualityValueLabel.setText(nf1.format(tessQuality.getValue()));
+            }
+            return false;
+        });
+
+        elevation.add(elevationTypeLabel).left().padRight(pad5 * 4f).padBottom(pad5);
+        elevation.add(elevationSb).left().padRight(pad5 * 2f).padBottom(pad5).row();
+        elevation.add(tessQualityLabel).left().padRight(pad5 * 4f).padBottom(pad5);
+        elevation.add(tessQuality).left().padRight(pad5 * 2f).padBottom(pad5);
+        elevation.add(tessQualityValueLabel).left().padRight(pad5 * 2f).padBottom(pad5);
 
         // Add to content
         contentGraphicsTable.add(titleElevation).left().padBottom(pad5 * 2).row();
@@ -1692,6 +1723,9 @@ public class PreferencesWindow extends GenericDialog {
         // Elevation representation
         ElevationType newType = elevationSb.getSelected().type;
         EventManager.instance.post(Events.ELEVATION_TYPE_CMD, newType);
+
+        // Tess quality
+        EventManager.instance.post(Events.TESSELLATION_QUALITY_CMD, tessQuality.getValue());
 
         // Shadow mapping
         GlobalConf.scene.SHADOW_MAPPING = shadowsCb.isChecked();

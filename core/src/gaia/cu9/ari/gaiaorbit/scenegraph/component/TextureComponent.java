@@ -75,7 +75,7 @@ public class TextureComponent implements IObserver {
 
     public TextureComponent() {
         super();
-        EventManager.instance.subscribe(this, Events.ELEVATION_TYPE_CMD, Events.ELEVATION_MUTLIPLIER_CMD);
+        EventManager.instance.subscribe(this, Events.ELEVATION_TYPE_CMD, Events.ELEVATION_MUTLIPLIER_CMD, Events.TESSELLATION_QUALITY_CMD);
     }
 
     public void initialize(AssetManager manager) {
@@ -205,6 +205,7 @@ public class TextureComponent implements IObserver {
         material.set(new FloatExtAttribute(FloatExtAttribute.HeightScale, heightScale * (float) GlobalConf.scene.ELEVATION_MULTIPLIER));
         material.set(new Vector2Attribute(Vector2Attribute.HeightSize, new Vector2(-1, -1)));
         material.set(new FloatExtAttribute(FloatExtAttribute.HeightNoiseSize, heightNoiseSize));
+        material.set(new FloatExtAttribute(FloatExtAttribute.TessQuality, (float) GlobalConf.scene.TESSELLATION_QUALITY));
     }
 
     private void initializeElevationData() {
@@ -221,6 +222,7 @@ public class TextureComponent implements IObserver {
         material.set(new TextureExtAttribute(TextureExtAttribute.Height, heightTex));
         material.set(new FloatExtAttribute(FloatExtAttribute.HeightScale, heightScale * (float) GlobalConf.scene.ELEVATION_MULTIPLIER));
         material.set(new Vector2Attribute(Vector2Attribute.HeightSize, heightSize));
+        material.set(new FloatExtAttribute(FloatExtAttribute.TessQuality, (float) GlobalConf.scene.TESSELLATION_QUALITY));
     }
 
     private void removeElevationData() {
@@ -229,6 +231,7 @@ public class TextureComponent implements IObserver {
         material.remove(FloatExtAttribute.HeightScale);
         material.remove(Vector2Attribute.HeightSize);
         material.remove(FloatExtAttribute.HeightNoiseSize);
+        material.remove(FloatExtAttribute.TessQuality);
     }
 
     /**
@@ -393,6 +396,12 @@ public class TextureComponent implements IObserver {
             if (this.hasHeight() && this.material != null) {
                 float newMultiplier = (Float) data[0];
                 Gdx.app.postRunnable(() -> this.material.set(new FloatExtAttribute(FloatExtAttribute.HeightScale, heightScale * newMultiplier)));
+            }
+            break;
+        case TESSELLATION_QUALITY_CMD:
+            if (this.hasHeight() && this.material != null) {
+                float newQuality = (Float) data[0];
+                Gdx.app.postRunnable(() -> this.material.set(new FloatExtAttribute(FloatExtAttribute.TessQuality, newQuality)));
             }
             break;
         default:

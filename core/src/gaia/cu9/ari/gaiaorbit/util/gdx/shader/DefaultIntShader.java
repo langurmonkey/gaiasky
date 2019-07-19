@@ -105,6 +105,7 @@ public class DefaultIntShader extends BaseIntShader {
 		public final static Uniform heightScale = new Uniform("u_heightScale", FloatExtAttribute.HeightScale);
 		public final static Uniform heightNoiseSize = new Uniform("u_heightNoiseSize", FloatExtAttribute.HeightNoiseSize);
 		public final static Uniform heightSize = new Uniform("u_heightSize", Vector2Attribute.HeightSize);
+		public final static Uniform tessQuality = new Uniform("u_tessQuality", FloatExtAttribute.TessQuality);
 		public final static Uniform alphaTest = new Uniform("u_alphaTest");
 
 		public final static Uniform ambientCube = new Uniform("u_ambientCubemap");
@@ -324,6 +325,13 @@ public class DefaultIntShader extends BaseIntShader {
 			}
 		};
 
+		public final static Setter tessQuality = new LocalSetter() {
+			@Override
+			public void set (BaseIntShader shader, int inputID, IntRenderable renderable, Attributes combinedAttributes) {
+				if (combinedAttributes.has(FloatExtAttribute.TessQuality))
+					shader.set(inputID, ((FloatExtAttribute) (combinedAttributes.get(FloatExtAttribute.TessQuality))).value);
+			}
+		};
 		public static class ACubemap extends LocalSetter {
 			private final static float ones[] = {1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1};
 			private final AmbientCubemap cacheAmbientCubemap = new AmbientCubemap();
@@ -432,6 +440,7 @@ public class DefaultIntShader extends BaseIntShader {
 	public final int u_heightScale;
 	public final int u_heightNoiseSize;
 	public final int u_heightSize;
+	public final int u_tessQuality;
 	public final int u_alphaTest;
 	// Lighting uniforms
 	protected final int u_ambientCubemap;
@@ -568,6 +577,7 @@ public class DefaultIntShader extends BaseIntShader {
 		u_heightScale = register(Inputs.heightScale, Setters.heightScale);
 		u_heightNoiseSize = register(Inputs.heightNoiseSize, Setters.heightNoiseSize);
 		u_heightSize = register(Inputs.heightSize, Setters.heightSize);
+		u_tessQuality = register(Inputs.tessQuality, Setters.tessQuality);
 		u_alphaTest = register(Inputs.alphaTest);
 
 		u_ambientCubemap = lighting ? register(Inputs.ambientCube, new Setters.ACubemap(config.numDirectionalLights,

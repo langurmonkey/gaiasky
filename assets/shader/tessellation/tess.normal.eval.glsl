@@ -90,9 +90,10 @@ vec3 calcNormal(vec2 p, vec2 dp){
 // Use height texture for normals
 vec3 calcNormal(vec2 p, vec2 dp){
     vec4 h;
-    const vec2 size = vec2(1.0, 0.0);
+    const vec2 size = vec2(0.7, 0.0);
     if (dp.x < 0.0){
-        dp = vec2(.5e-3);
+        // Generated height using perlin noise
+        dp = vec2(4e-4);
     }
     h.x = sampleHeight(u_heightTexture, vec2(p.x - dp.x, p.y)).r;
     h.y = sampleHeight(u_heightTexture, vec2(p.x + dp.x, p.y)).r;
