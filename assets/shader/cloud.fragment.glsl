@@ -42,8 +42,8 @@ in vec3 v_ambientLight;
 #if defined(diffuseTextureFlag) && defined(normalTextureFlag)
 // We have clouds and transparency
 vec4 fetchCloudColor(vec2 texCoord, vec4 defaultValue) {
-    vec4 cloud = texture2D(u_diffuseTexture, texCoord, TEXTURE_LOD_BIAS);
-    vec4 trans = texture2D(u_normalTexture, texCoord, TEXTURE_LOD_BIAS);
+    vec4 cloud = texture(u_diffuseTexture, texCoord, TEXTURE_LOD_BIAS);
+    vec4 trans = texture(u_normalTexture, texCoord, TEXTURE_LOD_BIAS);
     return vec4(cloud.rgb, 1.0 - (trans.r + trans.g + trans.b) / 3.0);
 }
 #elif defined(diffuseTextureFlag)

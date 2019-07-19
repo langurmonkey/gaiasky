@@ -23,6 +23,8 @@ in vec3 v_viewVec;
 
 in float v_depth;
 
+out vec4 fragColor;
+
 #define time v_time * 0.003
 
 vec3 mod289(vec3 x) {
@@ -157,7 +159,7 @@ void main() {
 	
 	
 	vec3 color = vec3(total, total, total);
-    gl_FragColor = vec4(min(vec3(0.9), color * 6.0 * v_lightDiffuse * percolor), v_opacity);
+    fragColor = vec4(min(vec3(0.9), color * 6.0 * v_lightDiffuse * percolor), v_opacity);
 
     gl_FragDepth = v_depth;
 }
