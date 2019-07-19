@@ -714,9 +714,7 @@ public class SceneGraphRenderer extends AbstractRenderer implements IProcessRend
 
             fb.begin();
             Gdx.gl.glEnable(GL30.GL_DEPTH_TEST);
-            Gdx.gl.glClearColor(0, 0, 0, 1);
             Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT | GL20.GL_DEPTH_BUFFER_BIT);
-            Gdx.gl.glClearDepthf(1);
 
             if (!GlobalConf.program.CUBEMAP360_MODE) {
                 // Render billboard stars
