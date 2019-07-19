@@ -172,7 +172,7 @@ public class VisualEffectsComponent extends GuiComponent implements IObserver {
 
         component = lightingGroup;
 
-        EventManager.instance.subscribe(this, Events.STAR_POINT_SIZE_CMD, Events.STAR_BRIGHTNESS_CMD, Events.LIGHT_SCATTERING_CMD, Events.STAR_MIN_OPACITY_CMD);
+        EventManager.instance.subscribe(this, Events.STAR_POINT_SIZE_CMD, Events.STAR_BRIGHTNESS_CMD, Events.STAR_MIN_OPACITY_CMD);
     }
 
     @Override

@@ -281,6 +281,7 @@ public class GlobalConf {
                 break;
             case EXPOSURE_CMD:
                 POSTPROCESS_EXPOSURE = MathUtilsd.clamp((float) data[0], Constants.MIN_EXPOSURE, Constants.MAX_EXPOSURE);
+                break;
             default:
                 break;
             }
