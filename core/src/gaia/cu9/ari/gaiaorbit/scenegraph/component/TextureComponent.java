@@ -210,66 +210,80 @@ public class TextureComponent implements IObserver {
     }
 
     private void initializeGenElevationData() {
-        // Construct RAM height map from noise algorithms
-        final int N = GlobalConf.scene.GRAPHICS_QUALITY.texWidthTarget;
-        final int M = GlobalConf.scene.GRAPHICS_QUALITY.texHeightTarget;
-        logger.info("Generating procedural " + N + "x" + M + " elevation data from noise");
-        Pixmap pixmap = new Pixmap(N, M, Pixmap.Format.RGBA8888);
-        heightMap = new float[N][M];
-        float wsize = 0f / (float) N;
-        float hsize = 0f / (float) M;
-        Vector2 size = new Vector2(heightNoiseSize * 2f, heightNoiseSize);
-        Vector2 coord = new Vector2();
-        for (int i = 0; i < N; i++) {
-            float u = (i + wsize / 2f) / (float) N;
-            for (int j = 0; j < M; j++) {
-                float v = (j + hsize / 2f) / (float) M;
+        Thread t = new Thread(() -> {
+            // Construct RAM height map from noise algorithms
+            final int N = GlobalConf.scene.GRAPHICS_QUALITY.texWidthTarget;
+            final int M = GlobalConf.scene.GRAPHICS_QUALITY.texHeightTarget;
+            logger.info("Generating procedural " + N + "x" + M + " elevation data from noise");
+            Pixmap pixmap = new Pixmap(N, M, Pixmap.Format.RGBA8888);
+            float[][] partialData = new float[N][M];
+            float wsize = 0f / (float) N;
+            float hsize = 0f / (float) M;
+            Vector2 size = new Vector2(heightNoiseSize * 2f, heightNoiseSize);
+            Vector2 coord = new Vector2();
+            for (int i = 0; i < N; i++) {
+                float u = (i + wsize / 2f) / (float) N;
+                for (int j = 0; j < M; j++) {
+                    float v = (j + hsize / 2f) / (float) M;
 
-                coord.set(u * size.x, v * size.y);
-                float frequency = 6.0f;
-                float n = 0.0f;
+                    coord.set(u * size.x, v * size.y);
+                    float frequency = 6.0f;
+                    float n = 0.0f;
 
-                n += 1.0f * Math.abs(NoiseUtils.psnoise(new Vector2(coord).scl(frequency), new Vector2(size).scl(frequency)));
-                n += 0.25f * Math.abs(NoiseUtils.psnoise(new Vector2(coord).scl(frequency * 4f), new Vector2(size).scl(frequency * 4f)));
-                n += 0.125f * Math.abs(NoiseUtils.psnoise(new Vector2(coord).scl(frequency * 8f), new Vector2(size).scl(frequency * 8f)));
+                    n += 1.0f * Math.abs(NoiseUtils.psnoise(new Vector2(coord).scl(frequency), new Vector2(size).scl(frequency)));
+                    n += 0.25f * Math.abs(NoiseUtils.psnoise(new Vector2(coord).scl(frequency * 4f), new Vector2(size).scl(frequency * 4f)));
+                    n += 0.125f * Math.abs(NoiseUtils.psnoise(new Vector2(coord).scl(frequency * 8f), new Vector2(size).scl(frequency * 8f)));
 
-                n = MathUtils.clamp(n, 0f, 1f);
+                    n = MathUtils.clamp(n, 0f, 1f);
 
-                heightMap[i][j] = (1f - n) * heightScale;
+                    partialData[i][j] = (1f - n) * heightScale;
 
-                // Pixamp
-                pixmap.drawPixel(i, j, Color.rgba8888(n, n, n, 1f));
+                    // Pixamp
+                    pixmap.drawPixel(i, j, Color.rgba8888(n, n, n, 1f));
+                }
             }
-        }
-        // Construct texture
-        heightTex = new Texture(pixmap, true);
-        heightTex.setFilter(TextureFilter.MipMapLinearLinear, TextureFilter.Linear);
 
-        heightSize.set(heightTex.getWidth(), heightTex.getHeight());
-        material.set(new TextureExtAttribute(TextureExtAttribute.Height, heightTex));
-        material.set(new FloatExtAttribute(FloatExtAttribute.HeightScale, heightScale * (float) GlobalConf.scene.ELEVATION_MULTIPLIER));
-        material.set(new Vector2Attribute(Vector2Attribute.HeightSize, new Vector2(N, M)));
-        //material.set(new FloatExtAttribute(FloatExtAttribute.HeightNoiseSize, heightNoiseSize));
-        material.set(new FloatExtAttribute(FloatExtAttribute.TessQuality, (float) GlobalConf.scene.TESSELLATION_QUALITY));
+            Gdx.app.postRunnable(() -> {
+                // Create texture, populate material
+                heightMap = partialData;
+                heightTex = new Texture(pixmap, true);
+                heightTex.setFilter(TextureFilter.MipMapLinearLinear, TextureFilter.Linear);
+
+                heightSize.set(heightTex.getWidth(), heightTex.getHeight());
+                material.set(new TextureExtAttribute(TextureExtAttribute.Height, heightTex));
+                material.set(new FloatExtAttribute(FloatExtAttribute.HeightScale, heightScale * (float) GlobalConf.scene.ELEVATION_MULTIPLIER));
+                material.set(new Vector2Attribute(Vector2Attribute.HeightSize, new Vector2(N, M)));
+                //material.set(new FloatExtAttribute(FloatExtAttribute.HeightNoiseSize, heightNoiseSize));
+                material.set(new FloatExtAttribute(FloatExtAttribute.TessQuality, (float) GlobalConf.scene.TESSELLATION_QUALITY));
+            });
+        });
+        t.start();
     }
 
     private void initializeElevationData() {
-        // Construct RAM height map from texture
-        logger.info("Constructing elevation data from texture: " + height);
-        Pixmap heightPixmap = new Pixmap(new FileHandle(GlobalResources.unpackTexName(height)));
-        heightMap = new float[heightPixmap.getWidth()][heightPixmap.getHeight()];
-        for (int i = 0; i < heightPixmap.getWidth(); i++) {
-            for (int j = 0; j < heightPixmap.getHeight(); j++) {
-                Color col = new Color(heightPixmap.getPixel(i, j));
-                heightMap[i][j] = (1f - col.r) * heightScale;
+        Thread t = new Thread(() -> {
+            // Construct RAM height map from texture
+            logger.info("Constructing elevation data from texture: " + height);
+            Pixmap heightPixmap = new Pixmap(new FileHandle(GlobalResources.unpackTexName(height)));
+            float[][] partialData = new float[heightPixmap.getWidth()][heightPixmap.getHeight()];
+            for (int i = 0; i < heightPixmap.getWidth(); i++) {
+                for (int j = 0; j < heightPixmap.getHeight(); j++) {
+                    Color col = new Color(heightPixmap.getPixel(i, j));
+                    partialData[i][j] = (1f - col.r) * heightScale;
+                }
             }
-        }
 
-        heightSize.set(heightTex.getWidth(), heightTex.getHeight());
-        material.set(new TextureExtAttribute(TextureExtAttribute.Height, heightTex));
-        material.set(new FloatExtAttribute(FloatExtAttribute.HeightScale, heightScale * (float) GlobalConf.scene.ELEVATION_MULTIPLIER));
-        material.set(new Vector2Attribute(Vector2Attribute.HeightSize, heightSize));
-        material.set(new FloatExtAttribute(FloatExtAttribute.TessQuality, (float) GlobalConf.scene.TESSELLATION_QUALITY));
+            Gdx.app.postRunnable(() -> {
+                // Populate material
+                heightMap = partialData;
+                heightSize.set(heightTex.getWidth(), heightTex.getHeight());
+                material.set(new TextureExtAttribute(TextureExtAttribute.Height, heightTex));
+                material.set(new FloatExtAttribute(FloatExtAttribute.HeightScale, heightScale * (float) GlobalConf.scene.ELEVATION_MULTIPLIER));
+                material.set(new Vector2Attribute(Vector2Attribute.HeightSize, heightSize));
+                material.set(new FloatExtAttribute(FloatExtAttribute.TessQuality, (float) GlobalConf.scene.TESSELLATION_QUALITY));
+            });
+        });
+        t.start();
     }
 
     private void removeElevationData() {
