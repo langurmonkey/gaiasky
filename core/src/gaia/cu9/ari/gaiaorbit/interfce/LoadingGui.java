@@ -45,7 +45,7 @@ public class LoadingGui extends AbstractGui {
 
     @Override
     public void initialize(AssetManager assetManager) {
-        interfaces = new Array<IGuiInterface>();
+        interfaces = new Array<>();
         float pad30 = 30 * GlobalConf.SCALE_FACTOR;
         float pad10 = 10 * GlobalConf.SCALE_FACTOR;
         // User interface

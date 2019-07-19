@@ -19,6 +19,7 @@ import com.badlogic.gdx.graphics.g3d.attributes.BlendingAttribute;
 import com.badlogic.gdx.graphics.g3d.attributes.ColorAttribute;
 import com.badlogic.gdx.graphics.g3d.attributes.IntAttribute;
 import com.badlogic.gdx.graphics.g3d.attributes.TextureAttribute;
+import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
 import gaia.cu9.ari.gaiaorbit.data.AssetBean;
 import gaia.cu9.ari.gaiaorbit.event.EventManager;
@@ -28,10 +29,13 @@ import gaia.cu9.ari.gaiaorbit.util.Constants;
 import gaia.cu9.ari.gaiaorbit.util.GlobalConf;
 import gaia.cu9.ari.gaiaorbit.util.GlobalConf.SceneConf.ElevationType;
 import gaia.cu9.ari.gaiaorbit.util.GlobalResources;
+import gaia.cu9.ari.gaiaorbit.util.Logger;
+import gaia.cu9.ari.gaiaorbit.util.Logger.Log;
 import gaia.cu9.ari.gaiaorbit.util.gdx.model.IntModelInstance;
 import gaia.cu9.ari.gaiaorbit.util.gdx.shader.FloatExtAttribute;
 import gaia.cu9.ari.gaiaorbit.util.gdx.shader.TextureExtAttribute;
 import gaia.cu9.ari.gaiaorbit.util.gdx.shader.Vector2Attribute;
+import gaia.cu9.ari.gaiaorbit.util.noise.NoiseUtils;
 
 import java.util.Map;
 
@@ -41,11 +45,12 @@ import java.util.Map;
  * @author Toni Sagrista
  */
 public class TextureComponent implements IObserver {
+    private static final Log logger = Logger.getLogger(TextureComponent.class);
+
     /** Generated height keyword **/
     private static final String GEN_HEIGHT_KEYWORD = "generate";
     /** Default texture parameters **/
     protected static final TextureParameter textureParamsMipMap, textureParams;
-
 
     static {
         textureParamsMipMap = new TextureParameter();
@@ -86,8 +91,10 @@ public class TextureComponent implements IObserver {
         nightUnpacked = addToLoad(night, textureParamsMipMap, manager);
         ringUnpacked = addToLoad(ring, textureParamsMipMap, manager);
         ringnormalUnpacked = addToLoad(ringnormal, textureParamsMipMap, manager);
-        if (height != null && !height.endsWith(GEN_HEIGHT_KEYWORD))
-            heightUnpacked = addToLoad(height, textureParamsMipMap, manager);
+        if (height != null)
+            if (!height.endsWith(GEN_HEIGHT_KEYWORD))
+                heightUnpacked = addToLoad(height, textureParamsMipMap, manager);
+
     }
 
     public void initialize() {
@@ -98,8 +105,9 @@ public class TextureComponent implements IObserver {
         nightUnpacked = addToLoad(night, textureParamsMipMap);
         ringUnpacked = addToLoad(ring, textureParamsMipMap);
         ringnormalUnpacked = addToLoad(ringnormal, textureParamsMipMap);
-        if (height != null && !height.endsWith(GEN_HEIGHT_KEYWORD))
-            heightUnpacked = addToLoad(height, textureParamsMipMap);
+        if (height != null)
+            if (!height.endsWith(GEN_HEIGHT_KEYWORD))
+                heightUnpacked = addToLoad(height, textureParamsMipMap);
     }
 
     public boolean isFinishedLoading(AssetManager manager) {
@@ -202,25 +210,52 @@ public class TextureComponent implements IObserver {
     }
 
     private void initializeGenElevationData() {
-        material.set(new FloatExtAttribute(FloatExtAttribute.HeightScale, heightScale * (float) GlobalConf.scene.ELEVATION_MULTIPLIER));
-        material.set(new Vector2Attribute(Vector2Attribute.HeightSize, new Vector2(-1, -1)));
-        material.set(new FloatExtAttribute(FloatExtAttribute.HeightNoiseSize, heightNoiseSize));
-        material.set(new FloatExtAttribute(FloatExtAttribute.TessQuality, (float) GlobalConf.scene.TESSELLATION_QUALITY));
-        final int n = 2000;
-        final int m = 1000;
-        //heightMap = new float[n][m];
-        float wsize = 1f / (float) n;
-        float hsize = 1f / (float) m;
-        for (int i = 0; i < n; i++) {
-            float u = (i + wsize / 2f) / (float) n;
-            for (int j = 0; j < m; j++) {
-                float v = (j + hsize / 2f) / (float) m;
+        // Construct RAM height map from noise algorithms
+        final int N = GlobalConf.scene.GRAPHICS_QUALITY.texWidthTarget;
+        final int M = GlobalConf.scene.GRAPHICS_QUALITY.texHeightTarget;
+        logger.info("Generating procedural " + N + "x" + M + " elevation data from noise");
+        Pixmap pixmap = new Pixmap(N, M, Pixmap.Format.RGBA8888);
+        heightMap = new float[N][M];
+        float wsize = 0f / (float) N;
+        float hsize = 0f / (float) M;
+        Vector2 size = new Vector2(heightNoiseSize * 2f, heightNoiseSize);
+        Vector2 coord = new Vector2();
+        for (int i = 0; i < N; i++) {
+            float u = (i + wsize / 2f) / (float) N;
+            for (int j = 0; j < M; j++) {
+                float v = (j + hsize / 2f) / (float) M;
+
+                coord.set(u * size.x, v * size.y);
+                float frequency = 6.0f;
+                float n = 0.0f;
+
+                n += 1.0f * Math.abs(NoiseUtils.psnoise(new Vector2(coord).scl(frequency), new Vector2(size).scl(frequency)));
+                n += 0.25f * Math.abs(NoiseUtils.psnoise(new Vector2(coord).scl(frequency * 4f), new Vector2(size).scl(frequency * 4f)));
+                n += 0.125f * Math.abs(NoiseUtils.psnoise(new Vector2(coord).scl(frequency * 8f), new Vector2(size).scl(frequency * 8f)));
+
+                n = MathUtils.clamp(n, 0f, 1f);
+
+                heightMap[i][j] = (1f - n) * heightScale;
+
+                // Pixamp
+                pixmap.drawPixel(i, j, Color.rgba8888(n, n, n, 1f));
             }
         }
+        // Construct texture
+        heightTex = new Texture(pixmap, true);
+        heightTex.setFilter(TextureFilter.MipMapLinearLinear, TextureFilter.Linear);
+
+        heightSize.set(heightTex.getWidth(), heightTex.getHeight());
+        material.set(new TextureExtAttribute(TextureExtAttribute.Height, heightTex));
+        material.set(new FloatExtAttribute(FloatExtAttribute.HeightScale, heightScale * (float) GlobalConf.scene.ELEVATION_MULTIPLIER));
+        material.set(new Vector2Attribute(Vector2Attribute.HeightSize, new Vector2(N, M)));
+        //material.set(new FloatExtAttribute(FloatExtAttribute.HeightNoiseSize, heightNoiseSize));
+        material.set(new FloatExtAttribute(FloatExtAttribute.TessQuality, (float) GlobalConf.scene.TESSELLATION_QUALITY));
     }
 
     private void initializeElevationData() {
-        // Get height data for CPU (camera) use
+        // Construct RAM height map from texture
+        logger.info("Constructing elevation data from texture: " + height);
         Pixmap heightPixmap = new Pixmap(new FileHandle(GlobalResources.unpackTexName(height)));
         heightMap = new float[heightPixmap.getWidth()][heightPixmap.getHeight()];
         for (int i = 0; i < heightPixmap.getWidth(); i++) {
@@ -229,6 +264,7 @@ public class TextureComponent implements IObserver {
                 heightMap[i][j] = (1f - col.r) * heightScale;
             }
         }
+
         heightSize.set(heightTex.getWidth(), heightTex.getHeight());
         material.set(new TextureExtAttribute(TextureExtAttribute.Height, heightTex));
         material.set(new FloatExtAttribute(FloatExtAttribute.HeightScale, heightScale * (float) GlobalConf.scene.ELEVATION_MULTIPLIER));
@@ -336,6 +372,7 @@ public class TextureComponent implements IObserver {
 
     /**
      * Only if height is {@link #GEN_HEIGHT_KEYWORD}
+     *
      * @param heightNoiseSize Size of the sampling area
      */
     public void setHeightNoiseSize(Double heightNoiseSize) {

@@ -997,17 +997,20 @@ public class GlobalConf {
          * Graphics quality setting
          */
         public enum GraphicsQuality {
-            LOW("gui.gquality.low", "-low"),
-            NORMAL("gui.gquality.normal", "-med"),
-            HIGH("gui.gquality.high", "-high"),
-            ULTRA("gui.gquality.ultra", "-ultra");
+            LOW("gui.gquality.low", "-low", 1024, 512),
+            NORMAL("gui.gquality.normal", "-med", 2048, 1024),
+            HIGH("gui.gquality.high", "-high", 4096, 2048),
+            ULTRA("gui.gquality.ultra", "-ultra", 8192, 4096);
 
             public String key;
             public String suffix;
+            public int texWidthTarget, texHeightTarget;
 
-            GraphicsQuality(String key, String suffix) {
+            GraphicsQuality(String key, String suffix, int texWidthTarget, int texHeightTarget) {
                 this.key = key;
                 this.suffix = suffix;
+                this.texWidthTarget = texWidthTarget;
+                this.texHeightTarget = texHeightTarget;
             }
 
             public boolean isAtLeast(GraphicsQuality gq) {
