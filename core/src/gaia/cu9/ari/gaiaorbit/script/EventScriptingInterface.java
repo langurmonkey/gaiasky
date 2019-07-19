@@ -430,7 +430,7 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
 
     @Override
     public void cameraForward(final double cameraForward) {
-        if (checkNum(cameraForward, -1d, 1d, "cameraForward"))
+        if (checkNum(cameraForward, -100d, 100d, "cameraForward"))
             Gdx.app.postRunnable(() -> em.post(Events.CAMERA_FWD, cameraForward));
     }
 
@@ -440,7 +440,7 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
 
     @Override
     public void cameraRotate(final double deltaX, final double deltaY) {
-        if (checkNum(deltaX, 0d, 1d, "deltaX") && checkNum(deltaY, 0d, 1d, "deltaY"))
+        if (checkNum(deltaX, -100d, 100d, "deltaX") && checkNum(deltaY, -100d, 100d, "deltaY"))
             Gdx.app.postRunnable(() -> em.post(Events.CAMERA_ROTATE, deltaX, deltaY));
     }
 
@@ -454,7 +454,7 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
 
     @Override
     public void cameraRoll(final double roll) {
-        if (checkNum(roll, 0d, 1d, "roll"))
+        if (checkNum(roll, -100d, 100d, "roll"))
             Gdx.app.postRunnable(() -> em.post(Events.CAMERA_ROLL, roll));
     }
 
@@ -464,7 +464,7 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
 
     @Override
     public void cameraTurn(final double deltaX, final double deltaY) {
-        if (checkNum(deltaX, 0d, 1d, "deltaX") && checkNum(deltaY, 0d, 1d, "deltaY")) {
+        if (checkNum(deltaX, -100d, 100d, "deltaX") && checkNum(deltaY, -100d, 100d, "deltaY")) {
             Gdx.app.postRunnable(() -> em.post(Events.CAMERA_TURN, deltaX, deltaY));
         }
     }

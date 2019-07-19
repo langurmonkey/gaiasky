@@ -116,7 +116,7 @@ public enum Events {
      **/
     CAMERA_FWD,
     /**
-     * Contains the deltaX and deltaY between 0 and 1
+     * Contains the deltaX and deltaY between -1 and 1
      **/
     CAMERA_ROTATE,
     /**
@@ -132,11 +132,11 @@ public enum Events {
 
     CAMERA_PAN,
     /**
-     * Contains the roll value between 0 and 1
+     * Contains the roll value between -1 and 1
      **/
     CAMERA_ROLL,
     /**
-     * Contains the deltaX and deltaY between 0 and 1
+     * Contains the deltaX and deltaY between -1 and 1
      **/
     CAMERA_TURN,
     /**
