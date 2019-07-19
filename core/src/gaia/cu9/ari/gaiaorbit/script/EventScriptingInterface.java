@@ -1507,7 +1507,7 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
     class CameraTransitionRunnable implements Runnable {
         NaturalCamera cam;
         double seconds;
-        double elapsed;
+        double elapsed, start;
         double[] targetPos, targetDir, targetUp;
         Pathd<Vector3d> posl, dirl, upl;
 
@@ -1522,6 +1522,7 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
             this.targetDir = dir;
             this.targetUp = up;
             this.seconds = seconds;
+            this.start = GaiaSky.instance.getT();
             this.elapsed = 0;
             this.end = end;
             this.lock = new Object();
@@ -1543,7 +1544,7 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
         @Override
         public void run() {
             // Update elapsed time
-            elapsed += GaiaSky.instance.getT();
+            elapsed = GaiaSky.instance.getT() - start;
 
             // Interpolation variable
             double alpha = MathUtilsd.clamp(elapsed / seconds, 0.0, 0.99999999999999);
