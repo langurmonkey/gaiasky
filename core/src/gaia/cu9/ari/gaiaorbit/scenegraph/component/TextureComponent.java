@@ -208,7 +208,7 @@ public class TextureComponent implements IObserver {
         material.set(new FloatExtAttribute(FloatExtAttribute.TessQuality, (float) GlobalConf.scene.TESSELLATION_QUALITY));
         final int n = 2000;
         final int m = 1000;
-        heightMap = new float[n][m];
+        //heightMap = new float[n][m];
         float wsize = 1f / (float) n;
         float hsize = 1f / (float) m;
         for (int i = 0; i < n; i++) {
