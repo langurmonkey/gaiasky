@@ -1,0 +1,80 @@
+#version 330 core
+// Light scattering implementation by Toni Sagrista
+
+#define N 30
+
+// Current frame
+uniform sampler2D u_texture0;
+// Glow texture
+uniform sampler2D u_texture1;
+// Pre pass
+uniform sampler2D u_texture2;
+
+uniform vec2 u_viewport;
+uniform int u_nSamples;
+uniform float u_textureScale;
+uniform vec2 u_lightPositions[N];
+uniform float u_lightViewAngles[N];
+uniform vec3 u_lightColors[N];
+uniform int u_nLights;
+
+in vec2 v_texCoords;
+out vec4 fragColor;
+
+float len(vec2 vect, float ar){
+    return sqrt(vect.x * vect.x * ar * ar + vect.y * vect.y);
+}
+
+float brightness(vec4 color){
+    return dot(color.rgb, vec3(0.2126, 0.7152, 0.0722));
+}
+
+float fx(float t, float a){
+    return a * t * cos(t);
+}
+
+float fy(float t, float a){
+    return a * t * sin(t);
+}
+
+void main()
+{
+    float ar = u_viewport.x / u_viewport.y;
+    fragColor = vec4(0.0, 0.0, 0.0, 1.0);
+
+    for (int li = 0; li < u_nLights; li++){
+        float viewAngle = min(0.0001, u_lightViewAngles[li]);
+        vec3 lightColor = u_lightColors[li];
+        // Size of sampling spiral
+        float a = u_textureScale * viewAngle * 5.0;
+
+        // Archimedes' spiral (fx = a*t*cos(t), fy = a*t*sin(t)) sampling from 0 to 3*Pi (extends to a radius of roughly 10)
+        float t = 0;
+        float dt = 3.0 * 3.14159 / u_nSamples;
+
+        float lum = 0.0;
+        for (int idx = 1; idx < u_nSamples; idx++){
+            vec2 curr_coord = u_lightPositions[li] + vec2(fx(t, a) / ar, fy(t, a));
+            lum += (clamp(texture(u_texture2, curr_coord), 0.0, 1.0)).r;
+            t += dt;
+        }
+
+        vec4 star_color = texture(u_texture2, u_lightPositions[li] + vec2(fx(t, a) / ar, fy(t, a) * ar));
+        lum += star_color.r;
+        lum /= u_nSamples;
+
+        float size = u_textureScale * min(1.6, viewAngle * 5.0e5) * lum;
+
+        vec2 glow_tc = (v_texCoords - u_lightPositions[li]);
+        glow_tc.x *= ar;
+        float dist_center = length(glow_tc);
+        glow_tc /= size;
+        glow_tc += 0.5;
+
+        float color_glow = brightness(texture(u_texture1, glow_tc)) * 1.2;
+        float core_inc = (0.1 - min(0.1, dist_center)) * color_glow;
+        fragColor += vec4(color_glow * lightColor.r + core_inc, color_glow * lightColor.g + core_inc, color_glow * lightColor.b + core_inc, 1.0);
+    }
+    fragColor.rgb += texture(u_texture0, v_texCoords).rgb;
+    fragColor.a = 1.0;
+}

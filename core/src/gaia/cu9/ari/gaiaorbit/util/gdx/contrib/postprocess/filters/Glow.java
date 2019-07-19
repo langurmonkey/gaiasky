@@ -22,6 +22,7 @@ package gaia.cu9.ari.gaiaorbit.util.gdx.contrib.postprocess.filters;
 
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.math.Vector2;
+import gaia.cu9.ari.gaiaorbit.desktop.util.SysUtils;
 import gaia.cu9.ari.gaiaorbit.util.gdx.contrib.utils.ShaderLoader;
 
 /**
@@ -85,7 +86,7 @@ public final class Glow extends Filter<Glow> {
     }
 
     public Glow(int width, int height) {
-        super(ShaderLoader.fromFile("lightglow", "lightglow"));
+        super(SysUtils.isMac() ? ShaderLoader.fromFile("screenspace", "lightglow-mac") : ShaderLoader.fromFile("lightglow", "lightglow"));
         lightPositions = new float[N * 2];
         lightViewAngles = new float[N];
         lightColors = new float[N * 3];
