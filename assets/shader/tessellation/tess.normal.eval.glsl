@@ -78,7 +78,7 @@ in vec3 l_shadowMapUv[gl_MaxPatchVertices];
 out vec3 o_shadowMapUv;
 #endif
 
-#include shader/tessellation/lib_sampleheight.glsl
+#include shader/lib_sampleheight.glsl
 
     #ifdef normalTextureFlag
 // Use normal map
@@ -93,7 +93,7 @@ vec3 calcNormal(vec2 p, vec2 dp){
     const vec2 size = vec2(0.7, 0.0);
     if (dp.x < 0.0){
         // Generated height using perlin noise
-        dp = vec2(4e-4);
+        dp = vec2(3e-4);
     }
     h.x = sampleHeight(u_heightTexture, vec2(p.x - dp.x, p.y)).r;
     h.y = sampleHeight(u_heightTexture, vec2(p.x + dp.x, p.y)).r;

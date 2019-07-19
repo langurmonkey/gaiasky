@@ -43,7 +43,7 @@ in vec3 l_normal[gl_MaxPatchVertices];
 #include shader/lib_logdepthbuff.glsl
 out float o_depth;
 
-#include shader/tessellation/lib_sampleheight.glsl
+#include shader/lib_sampleheight.glsl
 
 void main(void){
     vec4 pos = (gl_TessCoord.x * gl_in[0].gl_Position +

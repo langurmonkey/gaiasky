@@ -132,7 +132,7 @@
       "type": "data-pack",
       "version": 3,
       "mingsversion": 20200,
-      "size": 61300542,
+      "size": 64234090,
       "check": "data-main.json",
       "data": [
         "asteroids-dr2.json",
@@ -165,9 +165,53 @@
         "hi-res-tex-desc.json",
         "tex/base"
       ],
-      "sha256": "7ce14aa3f5150a16021936243490bb9a6aacdf8198c02c841527a99a5f99dd8c",
+      "sha256": "44f5594661264560e8f5b8edc17803dacb7e0c1cc00954eb026ec797dc43396d",
       "description": "Default data pack for Gaia Sky - For Gaia Sky 2.2.0 and above. Contains the Solar System, constellations, meshes and more",
       "file": "http://gaia.ari.uni-heidelberg.de/gaiasky/files/autodownload/basedata/004_20190614_v020200/gaiasky_data.tar.gz"
+    },
+    {
+      "name": "hi-res-textures",
+      "type": "texture-pack",
+      "version": 0,
+      "size": 52583247,
+      "check": "tex/earth-day-high.jpg",
+      "data": [
+        "tex/*-high.jpg"
+      ],
+      "description": "High resolution textures - High resolution texture pack including some 4K and 8K textures for planet surfaces and asteroids.",
+      "md5sum": "4a33a91e16d799645960294dd7c4c179",
+      "file": "http://gaia.ari.uni-heidelberg.de/gaiasky/files/autodownload/tex/000_20180904/hi-res-texture-pack.tar.gz"
+    },
+    {
+      "name": "hi-res-textures",
+      "type": "texture-pack",
+      "version": 1,
+      "mingsversion": 260,
+      "size": 52583819,
+      "check": "hi-res-tex-desc.json",
+      "data": [
+        "hi-res-tex-desc.json",
+        "tex/base/*-high.jpg"
+      ],
+      "description": "High resolution textures - High resolution texture pack including some 4K and 8K textures for planet surfaces and asteroids.",
+      "md5": "7e480c26e0126336b5776d2c26be466d",
+      "file": "http://gaia.ari.uni-heidelberg.de/gaiasky/files/autodownload/tex/001_20181129/hi-res-texture-pack.tar.gz"
+    },
+    {
+      "name": "hi-res-textures",
+      "type": "texture-pack",
+      "version": 2,
+      "mingsversion": 20200,
+      "size": 231754169,
+      "check": "hi-res-tex-desc.json",
+      "data": [
+        "hi-res-tex-desc.json",
+        "tex/base/*-high.jpg",
+        "tex/base/*-ultra.jpg"
+      ],
+      "description": "High resolution textures - High resolution texture pack including some 4K and 8K textures for planet surfaces and asteroids.",
+      "sha256": "9209042316e2416e062799a3caaf1ad5686ac6717665a08297a89996aa174198",
+      "file": "http://gaia.ari.uni-heidelberg.de/gaiasky/files/autodownload/tex/002_20190614_v020200/hi-res-texture-pack.tar.gz"
     },
     {
       "name": "catalog-dr2-verysmall",
@@ -500,50 +544,6 @@
       "description": "Nonionizing star map - Isosurfaces of very ionizing hot OB stars (25 < x <= 50)",
       "sha256" : "305d748806be5b13a2abaeb1307cdda9e5ebec2f5895bc8505c55c91757b2aa8",
       "file": "http://gaia.ari.uni-heidelberg.de/gaiasky/files/autodownload/meshes/000_20180904/meshes-dr2-hot-non-medium.tar.gz"
-    },
-    {
-      "name": "hi-res-textures",
-      "type": "texture-pack",
-      "version": 0,
-      "size": 52583247,
-      "check": "tex/earth-day-high.jpg",
-      "data": [
-        "tex/*-high.jpg"
-      ],
-      "description": "High resolution textures - High resolution texture pack including some 4K and 8K textures for planet surfaces and asteroids.",
-      "md5sum": "4a33a91e16d799645960294dd7c4c179",
-      "file": "http://gaia.ari.uni-heidelberg.de/gaiasky/files/autodownload/tex/000_20180904/hi-res-texture-pack.tar.gz"
-    },
-    {
-      "name": "hi-res-textures",
-      "type": "texture-pack",
-      "version": 1,
-      "mingsversion": 260,
-      "size": 52583819,
-      "check": "hi-res-tex-desc.json",
-      "data": [
-        "hi-res-tex-desc.json",
-        "tex/base/*-high.jpg"
-      ],
-      "description": "High resolution textures - High resolution texture pack including some 4K and 8K textures for planet surfaces and asteroids.",
-      "md5": "7e480c26e0126336b5776d2c26be466d",
-      "file": "http://gaia.ari.uni-heidelberg.de/gaiasky/files/autodownload/tex/001_20181129/hi-res-texture-pack.tar.gz"
-    },
-    {
-      "name": "hi-res-textures",
-      "type": "texture-pack",
-      "version": 2,
-      "mingsversion": 20200,
-      "size": 196352233,
-      "check": "hi-res-tex-desc.json",
-      "data": [
-        "hi-res-tex-desc.json",
-        "tex/base/*-high.jpg",
-        "tex/base/*-ultra.jpg"
-      ],
-      "description": "High resolution textures - High resolution texture pack including some 4K and 8K textures for planet surfaces and asteroids.",
-      "sha256": "4ead1741426bbc16b70d95e996ccf157a380c52a041b2e011b3abfd75c64a427",
-      "file": "http://gaia.ari.uni-heidelberg.de/gaiasky/files/autodownload/tex/002_20190614_v020200/hi-res-texture-pack.tar.gz"
     }
   ]
 }

@@ -258,7 +258,7 @@ uniform float u_heightNoiseSize;
 #define KM_TO_U 1.0E-6
 #define HEIGHT_FACTOR 70.0
 
-#include shader/tessellation/lib_sampleheight.glsl
+#include shader/lib_sampleheight.glsl
 
 vec2 parallaxMapping(vec2 texCoords, vec3 viewDir){
     // number of depth layers
