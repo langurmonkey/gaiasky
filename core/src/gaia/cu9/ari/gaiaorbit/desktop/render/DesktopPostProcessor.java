@@ -13,6 +13,7 @@ import com.badlogic.gdx.graphics.Texture.TextureFilter;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Vector3;
+import com.badlogic.gdx.utils.Timer;
 import gaia.cu9.ari.gaiaorbit.GaiaSky;
 import gaia.cu9.ari.gaiaorbit.event.EventManager;
 import gaia.cu9.ari.gaiaorbit.event.Events;
@@ -130,27 +131,36 @@ public class DesktopPostProcessor implements IPostProcessor, IObserver {
         if (GlobalConf.scene.GRAPHICS_QUALITY.isAtLeast(GraphicsQuality.HIGH)) {
             lightGlowNSamples = 12;
             lgw = 1280;
-            lgh = Math.round(lgw / ar);
             Glow.N = 30;
         } else if (GlobalConf.scene.GRAPHICS_QUALITY.isNormal()) {
             lightGlowNSamples = 8;
             lgw = 1000;
-            lgh = Math.round(lgw / ar);
             Glow.N = 20;
         } else {
             lightGlowNSamples = 4;
             lgw = 1000;
-            lgh = Math.round(lgw / ar);
             Glow.N = 10;
         }
+        lgh = Math.round(lgw / ar);
         glow.setFilter(TextureFilter.Linear, TextureFilter.Linear);
         ppb.lightglow = new LightGlow(lgw, lgh);
         ppb.lightglow.setLightGlowTexture(glow);
         ppb.lightglow.setNSamples(lightGlowNSamples);
         ppb.lightglow.setTextureScale(getGlowTextureScale(GlobalConf.scene.STAR_BRIGHTNESS, GlobalConf.scene.STAR_POINT_SIZE, GaiaSky.instance.cam.getFovFactor()));
         ppb.lightglow.setSpiralScale(getGlowSpiralScale(GlobalConf.scene.STAR_BRIGHTNESS, GlobalConf.scene.STAR_POINT_SIZE, GaiaSky.instance.cam.getFovFactor()));
-        ppb.lightglow.setEnabled(GlobalConf.postprocess.POSTPROCESS_LIGHT_SCATTERING);
+        ppb.lightglow.setEnabled(false);
         ppb.pp.addEffect(ppb.lightglow);
+
+        if(GlobalConf.postprocess.POSTPROCESS_LIGHT_SCATTERING){
+            Timer.Task activate = new Timer.Task(){
+                @Override
+                public void run() {
+                    EventManager.instance.post(Events.LIGHT_SCATTERING_CMD, true, false);
+                }
+            };
+            Timer.schedule(activate, 3);
+        }
+
 
         // LENS FLARE
         float lensFboScale = 0.2f;
