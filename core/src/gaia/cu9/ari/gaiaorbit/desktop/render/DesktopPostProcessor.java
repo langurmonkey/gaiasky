@@ -13,7 +13,10 @@ import com.badlogic.gdx.graphics.Texture.TextureFilter;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Vector3;
+import com.badlogic.gdx.utils.Timer;
+import com.badlogic.gdx.utils.Timer.Task;
 import gaia.cu9.ari.gaiaorbit.GaiaSky;
+import gaia.cu9.ari.gaiaorbit.desktop.util.SysUtils;
 import gaia.cu9.ari.gaiaorbit.event.EventManager;
 import gaia.cu9.ari.gaiaorbit.event.Events;
 import gaia.cu9.ari.gaiaorbit.event.IObserver;
@@ -147,8 +150,26 @@ public class DesktopPostProcessor implements IPostProcessor, IObserver {
         ppb.lightglow.setNSamples(lightGlowNSamples);
         ppb.lightglow.setTextureScale(getGlowTextureScale(GlobalConf.scene.STAR_BRIGHTNESS, GlobalConf.scene.STAR_POINT_SIZE, GaiaSky.instance.cam.getFovFactor()));
         ppb.lightglow.setSpiralScale(getGlowSpiralScale(GlobalConf.scene.STAR_BRIGHTNESS, GlobalConf.scene.STAR_POINT_SIZE, GaiaSky.instance.cam.getFovFactor()));
-        ppb.lightglow.setEnabled(GlobalConf.postprocess.POSTPROCESS_LIGHT_SCATTERING);
+        ppb.lightglow.setEnabled(SysUtils.isMac() ? false : GlobalConf.postprocess.POSTPROCESS_LIGHT_SCATTERING);
         ppb.pp.addEffect(ppb.lightglow);
+
+        /*
+            TODO
+            This is a pretty brutal patch for macOS. For some obscure reason,
+            the sucker will welcome you with a nice cozy blank screen if
+            the activation of the light glow effect is
+            not delayed. No time to get to the bottom of this.
+         */
+        if(SysUtils.isMac() && GlobalConf.postprocess.POSTPROCESS_LIGHT_SCATTERING) {
+            Task enableLG = new Task() {
+                @Override
+                public void run() {
+                    logger.info("Enabling light glow effect...");
+                    ppb.lightglow.setEnabled(GlobalConf.postprocess.POSTPROCESS_LIGHT_SCATTERING);
+                }
+            };
+            Timer.schedule(enableLG, 5);
+        }
 
         // LENS FLARE
         float lensFboScale = 0.2f;

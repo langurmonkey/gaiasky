@@ -209,7 +209,7 @@ public final class PostProcessor implements Disposable {
         return enabled;
     }
 
-    /** If called before capturing it will indicate if the next capture call will succeeds or not. */
+    /** If called before capturing it will indicate if the next capture call will succeed or not. */
     public boolean isReady() {
         boolean hasEffects = false;
 
