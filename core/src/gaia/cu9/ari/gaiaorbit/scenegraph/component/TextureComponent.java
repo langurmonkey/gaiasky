@@ -14,6 +14,7 @@ import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.Texture.TextureFilter;
+import com.badlogic.gdx.graphics.g3d.Attribute;
 import com.badlogic.gdx.graphics.g3d.Material;
 import com.badlogic.gdx.graphics.g3d.attributes.BlendingAttribute;
 import com.badlogic.gdx.graphics.g3d.attributes.ColorAttribute;
@@ -157,6 +158,7 @@ public class TextureComponent implements IObserver {
     public Material initMaterial(AssetManager manager, IntModelInstance instance, float[] cc, boolean culling) {
         this.material = instance.materials.get(0);
         if (base != null) {
+            unload(material, TextureAttribute.Diffuse);
             baseTex = manager.get(baseUnpacked, Texture.class);
             material.set(new TextureAttribute(TextureAttribute.Diffuse, baseTex));
         }
@@ -166,20 +168,24 @@ public class TextureComponent implements IObserver {
         }
 
         if (normal != null) {
+            unload(material, TextureAttribute.Normal);
             Texture tex = manager.get(normalUnpacked, Texture.class);
             material.set(new TextureAttribute(TextureAttribute.Normal, tex));
         }
         if (specular != null) {
+            unload(material, TextureAttribute.Specular);
             Texture tex = manager.get(specularUnpacked, Texture.class);
             material.set(new TextureAttribute(TextureAttribute.Specular, tex));
             // Control amount of specularity
             material.set(new ColorAttribute(ColorAttribute.Specular, 0.5f, 0.5f, 0.5f, 1f));
         }
         if (night != null) {
+            unload(material, TextureExtAttribute.Night);
             Texture tex = manager.get(nightUnpacked, Texture.class);
             material.set(new TextureExtAttribute(TextureExtAttribute.Night, tex));
         }
         if (height != null) {
+            unload(material, TextureExtAttribute.Height);
             if (!height.endsWith(GEN_HEIGHT_KEYWORD)) {
                 heightTex = manager.get(heightUnpacked, Texture.class);
                 if (!GlobalConf.scene.ELEVATION_TYPE.isNone()) {
@@ -192,6 +198,8 @@ public class TextureComponent implements IObserver {
         if (instance.materials.size > 1) {
             // Ring material
             Material ringMat = instance.materials.get(1);
+            unload(ringMat, TextureAttribute.Diffuse);
+            unload(ringMat, TextureAttribute.Normal);
             if (ring != null) {
                 ringMat.set(new TextureAttribute(TextureAttribute.Diffuse, manager.get(ringUnpacked, Texture.class)));
             }
@@ -306,6 +314,7 @@ public class TextureComponent implements IObserver {
     public void initMaterial(AssetManager manager, Map<String, Material> materials, float[] cc, boolean culling) {
         Material material = materials.get("base");
         if (base != null) {
+            unload(material, TextureAttribute.Diffuse);
             baseTex = manager.get(baseUnpacked, Texture.class);
             material.set(new TextureAttribute(TextureAttribute.Diffuse, baseTex));
         }
@@ -315,20 +324,24 @@ public class TextureComponent implements IObserver {
         }
 
         if (normal != null) {
+            unload(material, TextureAttribute.Normal);
             Texture tex = manager.get(normalUnpacked, Texture.class);
             material.set(new TextureAttribute(TextureAttribute.Normal, tex));
         }
         if (specular != null) {
+            unload(material, TextureAttribute.Specular);
             Texture tex = manager.get(specularUnpacked, Texture.class);
             material.set(new TextureAttribute(TextureAttribute.Specular, tex));
             // Control amount of specularity
             material.set(new ColorAttribute(ColorAttribute.Specular, 0.5f, 0.5f, 0.5f, 1f));
         }
         if (night != null) {
+            unload(material, TextureExtAttribute.Night);
             Texture tex = manager.get(nightUnpacked, Texture.class);
             material.set(new TextureExtAttribute(TextureExtAttribute.Night, tex));
         }
         if (height != null) {
+            unload(material, TextureExtAttribute.Height);
             if (!height.endsWith(GEN_HEIGHT_KEYWORD)) {
                 heightTex = manager.get(heightUnpacked, Texture.class);
                 if (!GlobalConf.scene.ELEVATION_TYPE.isNone()) {
@@ -341,14 +354,31 @@ public class TextureComponent implements IObserver {
         if (materials.containsKey("ring")) {
             // Ring material
             Material ringMat = materials.get("ring");
-            Texture tex = manager.get(ringUnpacked, Texture.class);
-            ringMat.set(new TextureAttribute(TextureAttribute.Diffuse, tex));
+            unload(ringMat, TextureAttribute.Diffuse);
+            unload(ringMat, TextureAttribute.Normal);
+            if (ring != null) {
+                ringMat.set(new TextureAttribute(TextureAttribute.Diffuse, manager.get(ringUnpacked, Texture.class)));
+            }
+            if (ringnormal != null) {
+                ringMat.set(new TextureAttribute(TextureAttribute.Normal, manager.get(ringnormalUnpacked, Texture.class)));
+            }
             ringMat.set(new BlendingAttribute(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA));
             if (!culling)
                 ringMat.set(new IntAttribute(IntAttribute.CullFace, GL20.GL_NONE));
         }
         if (!culling) {
             material.set(new IntAttribute(IntAttribute.CullFace, GL20.GL_NONE));
+        }
+    }
+
+    private void unload(Material mat, long attrMask) {
+        if (mat != null) {
+            Attribute attr = mat.get(attrMask);
+            mat.remove(attrMask);
+            if(attr != null && attr instanceof TextureAttribute) {
+                Texture tex = ((TextureAttribute) attr).textureDescription.texture;
+                tex.dispose();
+            }
         }
     }
 
