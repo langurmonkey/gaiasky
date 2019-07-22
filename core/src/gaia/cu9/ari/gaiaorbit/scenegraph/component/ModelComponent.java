@@ -75,7 +75,6 @@ public class ModelComponent implements Disposable, IObserver {
 
     public double scale = 1d;
     public boolean culling = true;
-    private boolean texInitialised, texLoading;
     private boolean modelInitialised, modelLoading;
     private boolean useColor = true;
 
@@ -159,7 +158,7 @@ public class ModelComponent implements Disposable, IObserver {
 
         // INITIALIZE MATERIAL
         if ((forceInit || !GlobalConf.scene.LAZY_TEXTURE_INIT) && tc != null) {
-            tc.initMaterial(manager, materials, cc, culling);
+            tc.initMaterial(manager, materials.get("base"), materials.get("ring"), cc, culling);
         }
 
         // CREATE MAIN MODEL INSTANCE
@@ -173,10 +172,6 @@ public class ModelComponent implements Disposable, IObserver {
         }
         // Subscribe to new graphics quality setting event
         EventManager.instance.subscribe(this, Events.GRAPHICS_QUALITY_UPDATED);
-        // Initialised
-        texInitialised = !GlobalConf.scene.LAZY_TEXTURE_INIT;
-        // Loading
-        texLoading = false;
 
         modelInitialised = !GlobalConf.scene.LAZY_MESH_INIT;
         modelLoading = false;
@@ -226,31 +221,23 @@ public class ModelComponent implements Disposable, IObserver {
      * Initialises the model or texture if LAZY_X_INIT is on
      */
     public void touch(Matrix4 localTransform) {
-        if (GlobalConf.scene.LAZY_TEXTURE_INIT && !texInitialised) {
-
+        if (GlobalConf.scene.LAZY_TEXTURE_INIT && tc != null && !tc.texInitialised) {
             if (tc != null) {
-                if (!texLoading) {
-                    logger.info(I18n.bundle.format("notif.loading", tc.base));
+                if (!tc.texLoading) {
+                    logger.info(I18n.bundle.format("notif.loading", tc.getTexturesString()));
                     tc.initialize(manager);
-                    // Set to loading
-                    texLoading = true;
                 } else if (tc.isFinishedLoading(manager)) {
                     Gdx.app.postRunnable(() -> {
                         tc.initMaterial(manager, instance, cc, culling);
+                        // Set to initialised
+                        updateStaticLight();
                     });
-
-                    // Set to initialised
-                    updateStaticLight();
-                    texInitialised = true;
-                    texLoading = false;
                 }
             } else if (localTransform == null) {
                 // Use color if necessary
                 addColorToMat();
                 // Set to initialised
                 updateStaticLight();
-                texInitialised = true;
-                texLoading = false;
             }
 
         }
@@ -280,7 +267,7 @@ public class ModelComponent implements Disposable, IObserver {
     }
 
     private void updateStaticLight() {
-        Gdx.app.postRunnable(()-> {
+        Gdx.app.postRunnable(() -> {
             // Update static
             if (updateStaticLight) {
                 ColorAttribute ambient = (ColorAttribute) env.get(ColorAttribute.AmbientLight);
@@ -337,15 +324,15 @@ public class ModelComponent implements Disposable, IObserver {
         }
     }
 
-    public void setDepthTest(int func, boolean mask){
+    public void setDepthTest(int func, boolean mask) {
         if (instance != null) {
             int n = instance.materials.size;
             for (int i = 0; i < n; i++) {
                 Material mat = instance.materials.get(i);
                 DepthTestAttribute dta;
-                if(mat.has(DepthTestAttribute.Type)){
+                if (mat.has(DepthTestAttribute.Type)) {
                     dta = (DepthTestAttribute) mat.get(DepthTestAttribute.Type);
-                }else{
+                } else {
                     dta = new DepthTestAttribute();
                     mat.set(dta);
                 }
@@ -469,7 +456,7 @@ public class ModelComponent implements Disposable, IObserver {
         }
     }
 
-    public boolean hasHeight(){
+    public boolean hasHeight() {
         return tc != null && tc.hasHeight();
     }
 
@@ -477,14 +464,13 @@ public class ModelComponent implements Disposable, IObserver {
     public void notify(Events event, Object... data) {
         switch (event) {
         case GRAPHICS_QUALITY_UPDATED:
-            if (texInitialised) {
-                Gdx.app.postRunnable(()-> {
-                    texInitialised = false;
+            Gdx.app.postRunnable(() -> {
+                if (tc != null && tc.texInitialised) {
                     // Remove current textures
                     if (tc != null)
                         tc.disposeTextures(this.manager);
-                });
-            }
+                }
+            });
             break;
         default:
             break;

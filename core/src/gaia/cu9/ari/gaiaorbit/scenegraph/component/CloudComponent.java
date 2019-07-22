@@ -11,6 +11,7 @@ import com.badlogic.gdx.assets.loaders.TextureLoader.TextureParameter;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.Texture.TextureFilter;
 import com.badlogic.gdx.graphics.VertexAttributes.Usage;
+import com.badlogic.gdx.graphics.g3d.Attribute;
 import com.badlogic.gdx.graphics.g3d.Material;
 import com.badlogic.gdx.graphics.g3d.attributes.BlendingAttribute;
 import com.badlogic.gdx.graphics.g3d.attributes.IntAttribute;
@@ -29,15 +30,17 @@ import java.util.Map;
 
 public class CloudComponent {
     private static final Log logger = Logger.getLogger(CloudComponent.class);
-        
+
     /** Default texture parameters **/
     protected static final TextureParameter textureParams;
+
     static {
         textureParams = new TextureParameter();
         textureParams.genMipMaps = true;
         textureParams.magFilter = TextureFilter.Linear;
         textureParams.minFilter = TextureFilter.MipMapLinearNearest;
     }
+
     private AssetManager manager;
     public int quality;
     public float size;
@@ -45,6 +48,7 @@ public class CloudComponent {
     public Matrix4 localTransform;
 
     public String cloud, cloudtrans, cloudUnpacked, cloudtransUnpacked;
+    private Material material;
 
     private boolean texInitialised, texLoading;
     // Model parameters
@@ -79,11 +83,10 @@ public class CloudComponent {
         return manager.isLoaded(tex);
     }
 
-
     /**
      * Adds the texture to load and unpacks any star (*) with the current
      * quality setting.
-     * 
+     *
      * @param tex
      */
     private String addToLoad(String tex) {
@@ -96,7 +99,7 @@ public class CloudComponent {
 
     public void doneLoading(AssetManager manager) {
         this.manager = manager;
-        Pair<IntModel, Map<String, Material>> pair = ModelCache.cache.getModel("sphere", params, Usage.Position | Usage.Normal | Usage.TextureCoordinates);
+        Pair<IntModel, Map<String, Material>> pair = ModelCache.cache.getModel("sphere", params, Usage.Position | Usage.Normal | Usage.Tangent | Usage.BiNormal | Usage.TextureCoordinates);
         IntModel cloudModel = pair.getFirst();
         Material material = pair.getSecond().get("base");
         material.clear();
@@ -140,7 +143,7 @@ public class CloudComponent {
     }
 
     public void initMaterial() {
-        Material material = mc.instance.materials.first();
+        material = mc.instance.materials.first();
         if (cloud != null && manager.isLoaded(cloudUnpacked)) {
             Texture tex = manager.get(cloudUnpacked, Texture.class);
             material.set(new TextureAttribute(TextureAttribute.Diffuse, tex));
@@ -152,6 +155,37 @@ public class CloudComponent {
         material.set(new BlendingAttribute(1.0f));
         // Do not cull
         material.set(new IntAttribute(IntAttribute.CullFace, 0));
+    }
+
+    /**
+     * Disposes and unloads all currently loaded textures immediately
+     *
+     * @param manager The asset manager
+     **/
+    public void disposeTextures(AssetManager manager) {
+        if (cloud != null && manager.isLoaded(cloudUnpacked)) {
+            manager.unload(cloudUnpacked);
+            cloudUnpacked = null;
+            unload(material, TextureAttribute.Diffuse);
+        }
+        if (cloudtrans != null && manager.isLoaded(cloudtransUnpacked)) {
+            manager.unload(cloudtransUnpacked);
+            cloudtransUnpacked = null;
+            unload(material, TextureAttribute.Normal);
+        }
+        texLoading = false;
+        texInitialised = false;
+    }
+
+    private void unload(Material mat, long attrMask) {
+        if (mat != null) {
+            Attribute attr = mat.get(attrMask);
+            mat.remove(attrMask);
+            if (attr != null && attr instanceof TextureAttribute) {
+                Texture tex = ((TextureAttribute) attr).textureDescription.texture;
+                tex.dispose();
+            }
+        }
     }
 
     public void removeAtmosphericScattering(Material mat) {
