@@ -6,8 +6,10 @@
 package gaia.cu9.ari.gaiaorbit.interfce;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.scenes.scene2d.ui.HorizontalGroup;
+import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import gaia.cu9.ari.gaiaorbit.event.EventManager;
@@ -20,18 +22,26 @@ import gaia.cu9.ari.gaiaorbit.util.scene2d.OwnLabel;
 import gaia.cu9.ari.gaiaorbit.util.scene2d.OwnSlider;
 
 public class DebugInterface extends Table implements IObserver, IGuiInterface {
-    private OwnLabel debug1, debug2, debug3, debug4, debugBuffers, debugSamp, fps, spf, device;
+    private OwnLabel debugRuntime, debugUsed, debugFree, debugAlloc, debugMax,  debugObjectsDisplay, debugObjectsLoaded, debugOcObserved, debugOcQueue, debugSamp, fps, spf, device;
     private OwnSlider queueStatus;
     private int previousQueueSize = 0, currentQueueMax = 0;
     /** Lock object for synchronization **/
     private Object lock;
+    private Skin skin;
 
     private INumberFormat fpsFormatter, spfFormatter, memFormatter, timeFormatter;
 
     public DebugInterface(Skin skin, Object lock) {
         super(skin);
-        float pad = 10 * GlobalConf.SCALE_FACTOR;
-        float pad5 = 5 * GlobalConf.SCALE_FACTOR;
+        this.setBackground("table-bg");
+
+        this.skin = skin;
+        float pad05 = 5f * GlobalConf.SCALE_FACTOR;
+        float pad10 = 10f * GlobalConf.SCALE_FACTOR;
+        float pad20 = 20f * GlobalConf.SCALE_FACTOR;
+        float pad40 = 40f * GlobalConf.SCALE_FACTOR;
+
+        pad(pad05);
 
         // Formatters
         fpsFormatter = NumberFormatFactory.getFormatter("#.00");
@@ -39,104 +49,179 @@ public class DebugInterface extends Table implements IObserver, IGuiInterface {
         memFormatter = NumberFormatFactory.getFormatter("#000.00");
         timeFormatter = NumberFormatFactory.getFormatter("00");
 
+        /* FPS */
         fps = new OwnLabel("", skin, "hud-big");
-        add(fps).right().padBottom(pad5);
+        fps.setColor(skin.getColor("green"));
+        add(fps).colspan(2).right().padBottom(pad05);
         row();
 
+        /* SPF */
         spf = new OwnLabel("", skin, "hud-med");
-        add(spf).right().padBottom(pad);
+        add(spf).colspan(2).right().padBottom(pad10);
         row();
 
+        /* GRAPHICS DEVICE */
         device = new OwnLabel(Gdx.gl.glGetString(GL20.GL_RENDERER), skin, "hud-big");
-        add(device).right().padBottom(pad);
+        device.setColor(skin.getColor("blue"));
+        add(device).colspan(2).right().padBottom(pad40);
         row();
 
-        debug1 = new OwnLabel("", skin, "hud");
-        add(debug1).right().padBottom(pad5);
+        /* RUNNING TIME */
+        debugRuntime = new OwnLabel("", skin, "hud");
+        Label runTimeLabel = new OwnLabel("Run time", skin, "hud-big");
+        runTimeLabel.setColor(skin.getColor("highlight"));
+        add(runTimeLabel).right().padRight(pad10).padBottom(pad20);
+        add(debugRuntime).right().padBottom(pad20);
         row();
 
-        debug2 = new OwnLabel("", skin, "hud");
-        add(debug2).right().padBottom(pad5);
+        /* MEMORY */
+        debugUsed = new OwnLabel("", skin, "hud");
+        debugFree = new OwnLabel("", skin, "hud");
+        debugAlloc = new OwnLabel("", skin, "hud");
+        debugMax = new OwnLabel("", skin, "hud");
+
+        Table debugMemoryTable = new Table(skin);
+        debugMemoryTable.add(new OwnLabel("Used:", skin, "hud")).right().padRight(pad10).padBottom(pad05);
+        debugMemoryTable.add(debugUsed).right().padRight(pad10).padBottom(pad05);
+        debugMemoryTable.add(new OwnLabel("Free:", skin, "hud")).right().padRight(pad10).padBottom(pad05);
+        debugMemoryTable.add(debugFree).right().padBottom(pad05).row();
+        debugMemoryTable.add(new OwnLabel("Alloc:", skin, "hud")).right().padRight(pad10);
+        debugMemoryTable.add(debugAlloc).right().padRight(pad10);
+        debugMemoryTable.add(new OwnLabel("Max:", skin, "hud")).right().padRight(pad10);
+        debugMemoryTable.add(debugMax).right();
+
+        Label memoryLabel = new OwnLabel("RAM [MB]", skin, "hud-big");
+        memoryLabel.setColor(skin.getColor("highlight"));
+        add(memoryLabel).right().padRight(pad10).padBottom(pad20);
+        add(debugMemoryTable).right().padBottom(pad20);
         row();
 
-        debug3 = new OwnLabel("", skin, "hud");
-        add(debug3).right().padBottom(pad5);
+
+        /* OBJECTS */
+        debugObjectsDisplay = new OwnLabel("", skin, "hud");
+        debugObjectsLoaded = new OwnLabel("", skin, "hud");
+
+        Table objectsTable = new Table(skin);
+        objectsTable.add(new OwnLabel("On display:", skin, "hud")).right().padRight(pad10).padBottom(pad05);
+        objectsTable.add(debugObjectsDisplay).right().padBottom(pad05).row();
+        objectsTable.add(new OwnLabel("Loaded:", skin, "hud")).right().padRight(pad10);
+        objectsTable.add(debugObjectsLoaded).right();
+
+        Label objectsLabel = new OwnLabel("Objects", skin, "hud-big");
+        objectsLabel.setColor(skin.getColor("highlight"));
+        add(objectsLabel).right().padRight(pad10).padBottom(pad20);
+        add(objectsTable).right().padBottom(pad20);
         row();
+
+        /* OCTANTS */
+        debugOcObserved = new OwnLabel("", skin, "hud");
+        debugOcQueue = new OwnLabel("", skin, "hud");
+
+        Table octantsTable = new Table(skin);
+        octantsTable.add(new OwnLabel("Observed:", skin, "hud")).right().padRight(pad10).padBottom(pad05);
+        octantsTable.add(debugOcObserved).right().padBottom(pad05).row();
+        octantsTable.add(new OwnLabel("Queue:", skin, "hud")).right().padRight(pad10);
 
         HorizontalGroup dbg4 = new HorizontalGroup();
-        dbg4.space(pad5);
-        debug4 = new OwnLabel("", skin, "hud");
+        dbg4.space(pad05);
         queueStatus = new OwnSlider(0, 100, 1, false, skin, "default-horizontal");
-        queueStatus.setWidth(100f * GlobalConf.SCALE_FACTOR);
+        queueStatus.setWidth(70f * GlobalConf.SCALE_FACTOR);
         queueStatus.setValue(0);
-        dbg4.addActor(debug4);
+        dbg4.addActor(debugOcQueue);
         dbg4.addActor(queueStatus);
-        add(dbg4).right().padBottom(pad5);
+        octantsTable.add(dbg4).right().row();
+
+        Label lodLabel = new OwnLabel("LOD", skin, "hud-big");
+        lodLabel.setColor(skin.getColor("highlight"));
+        add(lodLabel).right().padRight(pad10).padBottom(pad20);
+        add(octantsTable).right().padBottom(pad20);
         row();
 
-        debugBuffers = new OwnLabel("", skin, "hud");
-        add(debugBuffers).right().padBottom(pad5);
-        row();
-
+        /* SAMP */
         debugSamp = new OwnLabel("", skin, "hud");
+        Label sampLabel = new OwnLabel("SAMP", skin, "hud-big");
+        sampLabel.setColor(skin.getColor("highlight"));
+        add(sampLabel).right().padRight(pad10);
         add(debugSamp).right();
         row();
 
         pack();
 
+
         this.setVisible(GlobalConf.program.SHOW_DEBUG_INFO);
         this.lock = lock;
-        EventManager.instance.subscribe(this, Events.DEBUG1, Events.DEBUG2, Events.DEBUG3, Events.DEBUG4, Events.DEBUG_BUFFERS, Events.FPS_INFO, Events.SHOW_DEBUG_CMD, Events.SAMP_INFO);
+        EventManager.instance.subscribe(this, Events.DEBUG_TIME, Events.DEBUG_RAM, Events.DEBUG_OBJECTS, Events.DEBUG_QUEUE, Events.FPS_INFO, Events.SHOW_DEBUG_CMD, Events.SAMP_INFO);
     }
 
     private void unsubscribe() {
         EventManager.instance.removeAllSubscriptions(this);
     }
 
+
+    private Color getColor(double v, double max){
+        if(v > max * 0.95){
+            return skin.getColor("red");
+        } else if( v > max * 0.9) {
+            return skin.getColor("orange");
+        } else if (v > max * 0.8) {
+            return skin.getColor("blue");
+        } else {
+            return skin.getColor("green");
+        }
+    }
+
     @Override
     public void notify(Events event, Object... data) {
         synchronized (lock) {
             switch (event) {
-            case DEBUG1:
+            case DEBUG_TIME:
                 if (GlobalConf.program.SHOW_DEBUG_INFO && data.length > 0 && data[0] != null) {
                     // Double with run time
                     Double runTime = (Double) data[0];
-                    debug1.setText("Run time: " + getRunTimeString(runTime));
+                    debugRuntime.setText(getRunTimeString(runTime));
                 }
                 break;
 
-            case DEBUG2:
+            case DEBUG_RAM:
                 if (GlobalConf.program.SHOW_DEBUG_INFO && data.length > 0 && data[0] != null) {
                     // Doubles (MB):
                     // used/free/total/max
                     Double used = (Double) data[0];
                     Double free = (Double) data[1];
-                    Double total = (Double) data[2];
+                    Double alloc = (Double) data[2];
                     Double max = (Double) data[3];
-                    debug2.setText("Mem[MB] - used: " + memFormatter.format(used) + "  free: " + memFormatter.format(free) + "  total: " + memFormatter.format(total) + "  max: " + memFormatter.format(max));
+                    debugUsed.setText(memFormatter.format(used));
+                    debugUsed.setColor(getColor(used, alloc));
+                    debugFree.setText(memFormatter.format(free));
+                    debugAlloc.setText(memFormatter.format(alloc));
+                    debugAlloc.setColor(getColor(alloc, max));
+                    debugMax.setText(memFormatter.format(max));
                 }
                 break;
-            case DEBUG3:
-                if (GlobalConf.program.SHOW_DEBUG_INFO && data.length > 0 && data[0] != null)
-                    debug3.setText((String) data[0]);
-                break;
-            case DEBUG4:
+            case DEBUG_OBJECTS:
                 if (GlobalConf.program.SHOW_DEBUG_INFO && data.length > 0 && data[0] != null) {
-                    debug4.setText((String) data[0]);
+                    Integer display = (Integer) data[0];
+                    Integer loaded = (Integer) data[1];
+                    debugObjectsDisplay.setText(display);
+                    debugObjectsLoaded.setText(loaded);
+                }
+                break;
+            case DEBUG_QUEUE:
+                if (GlobalConf.program.SHOW_DEBUG_INFO && data.length > 0 && data[0] != null) {
+                    int observed = (Integer)data[0];
                     int queueSize = (Integer) data[1];
+                    // Text
+                    debugOcObserved.setText(observed);
+                    debugOcQueue.setText(queueSize);
 
+                    // Slider
                     if (previousQueueSize < queueSize) {
                         // Reset status
                         currentQueueMax = queueSize;
                     }
-
                     queueStatus.setValue(queueSize * 100f / currentQueueMax);
                     previousQueueSize = queueSize;
                 }
-                break;
-            case DEBUG_BUFFERS:
-                if (GlobalConf.program.SHOW_DEBUG_INFO && data.length > 0 && data[0] != null)
-                    debugBuffers.setText((String) data[0]);
                 break;
             case FPS_INFO:
                 if (GlobalConf.program.SHOW_DEBUG_INFO && data.length > 0 && data[0] != null) {
@@ -148,7 +233,7 @@ public class DebugInterface extends Table implements IObserver, IGuiInterface {
                 break;
             case SAMP_INFO:
                 if (GlobalConf.program.SHOW_DEBUG_INFO && data.length > 0 && data[0] != null) {
-                    debugSamp.setText("SAMP: " + (String) data[0]);
+                    debugSamp.setText((String) data[0]);
                 }
                 break;
             case SHOW_DEBUG_CMD:

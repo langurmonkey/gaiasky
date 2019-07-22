@@ -7,8 +7,9 @@ package gaia.cu9.ari.gaiaorbit.interfce;
 
 import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.scenes.scene2d.Stage;
-import com.badlogic.gdx.utils.Array;
+import com.badlogic.gdx.scenes.scene2d.ui.Container;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
+import gaia.cu9.ari.gaiaorbit.util.GlobalConf;
 import gaia.cu9.ari.gaiaorbit.util.GlobalResources;
 
 /**
@@ -19,6 +20,7 @@ import gaia.cu9.ari.gaiaorbit.util.GlobalResources;
  */
 public class DebugGui extends AbstractGui {
     protected DebugInterface debugInterface;
+    private Container di;
 
     public DebugGui() {
         super();
@@ -31,15 +33,16 @@ public class DebugGui extends AbstractGui {
 
     @Override
     public void doneLoading(AssetManager assetManager) {
-        interfaces = new Array<>();
+        float pad = 10 * GlobalConf.SCALE_FACTOR;
         skin = GlobalResources.skin;
 
         // DEBUG INFO - TOP RIGHT
         debugInterface = new DebugInterface(skin, lock);
-        debugInterface.setFillParent(true);
         debugInterface.right().top();
-        debugInterface.pad(5, 0, 0, 5);
-        interfaces.add(debugInterface);
+        di = new Container<>(debugInterface);
+        di.setFillParent(true);
+        di.right().top();
+        di.pad(pad, 0, 0, pad);
 
         rebuildGui();
     }
@@ -48,8 +51,8 @@ public class DebugGui extends AbstractGui {
     protected void rebuildGui() {
         if (ui != null) {
             ui.clear();
-            if (debugInterface != null)
-                ui.addActor(debugInterface);
+            if (debugInterface != null && di != null)
+                ui.addActor(di);
         }
     }
 

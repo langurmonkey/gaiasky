@@ -94,6 +94,7 @@ public class FullGui extends AbstractGui {
     }
 
     protected void buildGui() {
+        float pad = 10f * GlobalConf.SCALE_FACTOR;
         // Component types name init
         for (ComponentType ct : ComponentType.values()) {
             ct.getName();
@@ -104,7 +105,7 @@ public class FullGui extends AbstractGui {
         notificationsInterface = new NotificationsInterface(skin, lock, true, true, true, true);
         notificationsInterface.setFillParent(true);
         notificationsInterface.left().bottom();
-        notificationsInterface.pad(0, 5, 5, 0);
+        notificationsInterface.pad(0, pad, pad, 0);
         interfaces.add(notificationsInterface);
 
         // CONTROLS WINDOW
@@ -112,12 +113,11 @@ public class FullGui extends AbstractGui {
 
         // FOCUS INFORMATION - BOTTOM RIGHT
         focusInterface = new FocusInfoInterface(skin);
-        // focusInterface.setFillParent(true);
         focusInterface.left().top();
         fi = new Container<>(focusInterface);
         fi.setFillParent(true);
         fi.bottom().right();
-        fi.pad(0, 0, 10, 10);
+        fi.pad(0, 0, pad, pad);
 
 
         // MESSAGES INTERFACE - LOW CENTER
@@ -132,7 +132,7 @@ public class FullGui extends AbstractGui {
         runStateInterface.setFillParent(true);
         runStateInterface.center().bottom();
         //runStateInterface.pad(GlobalConf.SCALE_FACTOR == 1 ? 135 : 200, 0, 0, 5);
-        runStateInterface.pad(0, 0, 5, 0);
+        runStateInterface.pad(0, 0, pad, 0);
         interfaces.add(runStateInterface);
 
         // CUSTOM OBJECTS INTERFACE

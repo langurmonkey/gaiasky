@@ -809,14 +809,10 @@ public enum Events {
     /**
      * Debug info
      **/
-    DEBUG1,
-    DEBUG2,
-    DEBUG3,
-    DEBUG4,
-    /**
-     * Frame buffers info
-     **/
-    DEBUG_BUFFERS,
+    DEBUG_TIME,
+    DEBUG_RAM,
+    DEBUG_OBJECTS,
+    DEBUG_QUEUE,
     /**
      * Notifies from a java exception, it sends the Throwable and an optional
      * tag.
