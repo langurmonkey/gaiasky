@@ -27,6 +27,7 @@ import gaia.cu9.ari.gaiaorbit.event.Events;
 import gaia.cu9.ari.gaiaorbit.interfce.KeyBindings.ProgramAction;
 import gaia.cu9.ari.gaiaorbit.interfce.beans.*;
 import gaia.cu9.ari.gaiaorbit.scenegraph.camera.CameraManager;
+import gaia.cu9.ari.gaiaorbit.screenshot.ImageRenderer;
 import gaia.cu9.ari.gaiaorbit.util.*;
 import gaia.cu9.ari.gaiaorbit.util.GlobalConf.PostprocessConf.Antialias;
 import gaia.cu9.ari.gaiaorbit.util.GlobalConf.PostprocessConf.ToneMapping;
@@ -1223,21 +1224,45 @@ public class PreferencesWindow extends GenericDialog {
         foModeGroup.addActor(frameoutputMode);
         foModeGroup.addActor(frameoutputModeTooltip);
 
+        // Counter
+        OwnLabel counterLabel = new OwnLabel(I18n.txt("gui.frameoutput.sequence"), skin);
+        HorizontalGroup counterGroup = new HorizontalGroup();
+        counterGroup.space(pad5);
+        OwnLabel counter = new OwnLabel(ImageRenderer.getSequenceNumber() + "", skin);
+        counter.setWidth(textwidth * 3f);
+        OwnTextButton resetCounter = new OwnTextButton(I18n.txt("gui.frameoutput.sequence.reset"), skin);
+        resetCounter.pad(pad);
+        resetCounter.addListener((event)->{
+            if(event instanceof ChangeEvent){
+                ImageRenderer.resetSequenceNumber();
+                counter.setText("0");
+            }
+            return false;
+        });
+
+        counterGroup.addActor(counter);
+        counterGroup.addActor(resetCounter);
+
+
+
+
         // LABELS
         labels.addAll(frameoutputLocationLabel, prefixLabel, fpsLabel, fomodeLabel, frameoutputSizeLabel);
 
         // Add to table
         frameoutput.add(frameoutputInfo).colspan(2).left().padBottom(pad5).row();
-        frameoutput.add(frameoutputLocationLabel).left().padRight(pad5 * 4).padBottom(pad5);
+        frameoutput.add(frameoutputLocationLabel).left().padRight(pad5 * 4f).padBottom(pad5);
         frameoutput.add(frameoutputLocation).left().expandX().padBottom(pad5).row();
-        frameoutput.add(prefixLabel).left().padRight(pad5 * 4).padBottom(pad5);
+        frameoutput.add(prefixLabel).left().padRight(pad5 * 4f).padBottom(pad5);
         frameoutput.add(frameoutputPrefix).left().padBottom(pad5).row();
-        frameoutput.add(fpsLabel).left().padRight(pad5 * 4).padBottom(pad5);
+        frameoutput.add(fpsLabel).left().padRight(pad5 * 4f).padBottom(pad5);
         frameoutput.add(frameoutputFps).left().padBottom(pad5).row();
-        frameoutput.add(fomodeLabel).left().padRight(pad5 * 4).padBottom(pad5);
+        frameoutput.add(fomodeLabel).left().padRight(pad5 * 4f).padBottom(pad5);
         frameoutput.add(foModeGroup).left().expandX().padBottom(pad5).row();
-        frameoutput.add(frameoutputSizeLabel).left().padRight(pad5 * 4).padBottom(pad5);
+        frameoutput.add(frameoutputSizeLabel).left().padRight(pad5 * 4f).padBottom(pad5);
         frameoutput.add(foSizeGroup).left().expandX().padBottom(pad5).row();
+        frameoutput.add(counterLabel).left().padRight(pad5 * 4f).padBottom(pad5);
+        frameoutput.add(counterGroup).left().expandX().padBottom(pad5);
 
         // Add to content
         contentFrames.add(titleFrameoutput).left().padBottom(pad5 * 2).row();

@@ -129,4 +129,12 @@ public class ImageRenderer {
 
         return df.format(num);
     }
+
+    public static int getSequenceNumber(){
+        return sequenceNumber;
+    }
+
+    public static void resetSequenceNumber(){
+        sequenceNumber = 0;
+    }
 }
