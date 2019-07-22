@@ -24,8 +24,12 @@ package gaia.cu9.ari.gaiaorbit.util.gdx.contrib.utils;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.glutils.ShaderProgram;
 import gaia.cu9.ari.gaiaorbit.assets.ShaderTemplatingLoader;
+import gaia.cu9.ari.gaiaorbit.util.Logger;
+import gaia.cu9.ari.gaiaorbit.util.Logger.Log;
 
 public final class ShaderLoader {
+    private static Log logger = Logger.getLogger(ShaderLoader.class);
+
     public static String BasePath = "";
     public static boolean Pedantic = true;
 
@@ -39,7 +43,7 @@ public final class ShaderLoader {
             log += " w/ (" + defines.replace("\n", ", ") + ")";
         }
         log += "...";
-        Gdx.app.debug("ShaderLoader", "Compiling " + log);
+        logger.debug("Compiling " + log);
 
         String vpSrc = Gdx.files.internal(BasePath + vertexFileName + ".vertex").readString();
         String fpSrc = Gdx.files.internal(BasePath + fragmentFileName + ".fragment").readString();
@@ -61,8 +65,8 @@ public final class ShaderLoader {
         ShaderProgram shader = new ShaderProgram(insertDefines(vertex, defines), insertDefines(fragment, defines));
 
         if (!shader.isCompiled()) {
-            Gdx.app.error("ShaderLoader", "Compile error: " + vertexName + "/" + fragmentName);
-            Gdx.app.error("ShaderLoader", shader.getLog());
+            logger.error("Compile error: " + vertexName + "/" + fragmentName);
+            logger.error(shader.getLog());
             System.exit(-1);
         }
 

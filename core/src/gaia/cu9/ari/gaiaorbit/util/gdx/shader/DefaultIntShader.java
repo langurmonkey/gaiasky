@@ -41,6 +41,7 @@ import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.GdxRuntimeException;
 import gaia.cu9.ari.gaiaorbit.GaiaSky;
+import gaia.cu9.ari.gaiaorbit.assets.ShaderTemplatingLoader;
 import gaia.cu9.ari.gaiaorbit.util.gdx.IntRenderable;
 
 public class DefaultIntShader extends BaseIntShader {
@@ -387,7 +388,7 @@ public class DefaultIntShader extends BaseIntShader {
 
 	public static String getDefaultVertexShader () {
 		if (defaultVertexShader == null)
-			defaultVertexShader = Gdx.files.classpath("com/badlogic/gdx/graphics/g3d/shaders/default.vertex.glsl").readString();
+			defaultVertexShader = ShaderTemplatingLoader.load(Gdx.files.internal("shader/normal.vertex.glsl"));
 		return defaultVertexShader;
 	}
 
@@ -395,7 +396,7 @@ public class DefaultIntShader extends BaseIntShader {
 
 	public static String getDefaultFragmentShader () {
 		if (defaultFragmentShader == null)
-			defaultFragmentShader = Gdx.files.classpath("com/badlogic/gdx/graphics/g3d/shaders/default.fragment.glsl").readString();
+			defaultFragmentShader = ShaderTemplatingLoader.load(Gdx.files.internal("shader/normal.fragment.glsl"));
 		return defaultFragmentShader;
 	}
 
@@ -515,7 +516,7 @@ public class DefaultIntShader extends BaseIntShader {
 
 	public DefaultIntShader(final IntRenderable renderable, final Config config, final String prefix, final String vertexShader,
 		final String fragmentShader) {
-		this(renderable, config, new ExtShaderProgram(prefix + vertexShader, prefix + fragmentShader));
+		this(renderable, config, new ExtShaderProgram(ShaderProgramProvider.getShaderCode(prefix, vertexShader), ShaderProgramProvider.getShaderCode(prefix, fragmentShader)));
 	}
 
 	public DefaultIntShader(final IntRenderable renderable, final Config config, final ExtShaderProgram shaderProgram) {

@@ -169,8 +169,6 @@ public class SpacecraftCamera extends AbstractCamera implements IObserver {
         return 1;
     }
 
-    double lastangle = 0;
-
     public void update(double dt, ITimeFrameProvider time) {
         /* FUTURE POS OF SC */
 
@@ -301,6 +299,7 @@ public class SpacecraftCamera extends AbstractCamera implements IObserver {
 
                     firstTime = false;
                 }
+                updateAngleEdge(Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
             });
         } else {
             if (sc != null)

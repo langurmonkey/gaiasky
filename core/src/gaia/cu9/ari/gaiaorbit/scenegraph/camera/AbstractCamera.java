@@ -89,9 +89,7 @@ public abstract class AbstractCamera implements ICamera {
     @Override
     public void updateAngleEdge(int width, int height) {
         ar = (float) width / (float) height;
-        float h = camera.fieldOfView;
-        float w = h * ar;
-        angleEdgeRad = (float) (Math.toRadians(Math.sqrt(h * h + w * w))) / 2f;
+        angleEdgeRad = getAngleEdge(width, height, camera.fieldOfView);
     }
 
     public float getAngleEdge(int width, int height, float angle) {

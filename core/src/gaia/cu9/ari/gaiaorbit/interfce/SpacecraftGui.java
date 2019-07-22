@@ -180,7 +180,7 @@ public class SpacecraftGui extends AbstractGui {
         aiAntivelDec = Decal.newDecal(new TextureRegion(aiAntivelTex));
 
         Material mat = new Material(new TextureAttribute(TextureAttribute.Diffuse, aiTexture), new ColorAttribute(ColorAttribute.Specular, 0.3f, 0.3f, 0.3f, 1f));
-        aiModel = new IntModelBuilder().createSphere(1 * GlobalConf.SCALE_FACTOR, 30, 30, false, mat, Usage.Position | Usage.Normal | Usage.TextureCoordinates);
+        aiModel = new IntModelBuilder().createSphere(1 * GlobalConf.SCALE_FACTOR, 30, 30, false, mat, Usage.Position | Usage.Normal | Usage.Tangent | Usage.BiNormal | Usage.TextureCoordinates);
         aiTransform = new Matrix4();
         aiModelInstance = new IntModelInstance(aiModel, aiTransform);
         aiViewport = new ExtendViewport(indicatorw, indicatorh, aiCam);
@@ -196,7 +196,7 @@ public class SpacecraftGui extends AbstractGui {
         float factor = GlobalConf.SCALE_FACTOR;
 
         /** BUTTONS **/
-        buttonContainer = new Container<HorizontalGroup>();
+        buttonContainer = new Container<>();
         buttonRow = new HorizontalGroup();
         buttonRow.pad(0, 70 * factor, 5 * factor, 0);
         buttonRow.space(3 * factor);
@@ -208,15 +208,12 @@ public class SpacecraftGui extends AbstractGui {
         stabilise.setName("stabilise");
         if (sc != null)
             stabilise.setChecked(sc.isStabilising());
-        stabilise.addListener(new EventListener() {
-            @Override
-            public boolean handle(Event event) {
-                if (event instanceof ChangeEvent) {
-                    EventManager.instance.post(Events.SPACECRAFT_STABILISE_CMD, stabilise.isChecked());
-                    return true;
-                }
-                return false;
+        stabilise.addListener(event -> {
+            if (event instanceof ChangeEvent) {
+                EventManager.instance.post(Events.SPACECRAFT_STABILISE_CMD, stabilise.isChecked());
+                return true;
             }
+            return false;
         });
         stabilise.addListener(new TextTooltip(I18n.txt("gui.tooltip.sc.stabilise"), skin));
 
@@ -273,29 +270,21 @@ public class SpacecraftGui extends AbstractGui {
 
         enginePlus = new OwnImageButton(skin, "sc-engine-power-up");
         enginePlus.addListener(new TextTooltip(I18n.txt("gui.tooltip.sc.powerup"), skin));
-        enginePlus.addListener(new EventListener() {
-            @Override
-            public boolean handle(Event event) {
-                if (event instanceof ChangeEvent) {
-                    EventManager.instance.post(Events.SPACECRAFT_THRUST_INCREASE_CMD);
-                    return true;
-                }
-                return false;
+        enginePlus.addListener(event -> {
+            if (event instanceof ChangeEvent) {
+                EventManager.instance.post(Events.SPACECRAFT_THRUST_INCREASE_CMD);
+                return true;
             }
-
+            return false;
         });
         engineMinus = new OwnImageButton(skin, "sc-engine-power-down");
         enginePlus.addListener(new TextTooltip(I18n.txt("gui.tooltip.sc.powerdown"), skin));
-        engineMinus.addListener(new EventListener() {
-            @Override
-            public boolean handle(Event event) {
-                if (event instanceof ChangeEvent) {
-                    EventManager.instance.post(Events.SPACECRAFT_THRUST_DECREASE_CMD);
-                    return true;
-                }
-                return false;
+        engineMinus.addListener(event -> {
+            if (event instanceof ChangeEvent) {
+                EventManager.instance.post(Events.SPACECRAFT_THRUST_DECREASE_CMD);
+                return true;
             }
-
+            return false;
         });
 
         Group engineLabelRotated = new Group();
