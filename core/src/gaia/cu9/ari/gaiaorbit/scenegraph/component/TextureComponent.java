@@ -66,7 +66,6 @@ public class TextureComponent implements IObserver {
     public boolean texInitialised, texLoading;
     public String base, specular, normal, night, ring, height, ringnormal;
     public String baseUnpacked, specularUnpacked, normalUnpacked, nightUnpacked, ringUnpacked, heightUnpacked, ringnormalUnpacked;
-    public Texture baseTex, heightTex;
     // Height scale in internal units
     public Float heightScale = 0.005f;
     public Float heightNoiseSize = 10f;
@@ -94,7 +93,6 @@ public class TextureComponent implements IObserver {
         if (height != null)
             if (!height.endsWith(GEN_HEIGHT_KEYWORD))
                 heightUnpacked = addToLoad(height, textureParamsMipMap, manager);
-        texLoading = true;
     }
 
     public void initialize() {
@@ -108,7 +106,6 @@ public class TextureComponent implements IObserver {
         if (height != null)
             if (!height.endsWith(GEN_HEIGHT_KEYWORD))
                 heightUnpacked = addToLoad(height, textureParamsMipMap);
-        texLoading = true;
     }
 
     public boolean isFinishedLoading(AssetManager manager) {
@@ -158,11 +155,12 @@ public class TextureComponent implements IObserver {
     public Material initMaterial(AssetManager manager, IntModelInstance instance, float[] cc, boolean culling) {
         return initMaterial(manager, instance.materials.get(0), instance.materials.size > 1 ? instance.materials.get(1) : null, cc, culling);
     }
+
     public Material initMaterial(AssetManager manager, Material base, Material ring, float[] cc, boolean culling) {
         this.material = base;
         if (base != null && material.get(TextureAttribute.Diffuse) == null) {
-            baseTex = manager.get(baseUnpacked, Texture.class);
-            material.set(new TextureAttribute(TextureAttribute.Diffuse, baseTex));
+            Texture tex = manager.get(baseUnpacked, Texture.class);
+            material.set(new TextureAttribute(TextureAttribute.Diffuse, tex));
         }
         if (cc != null && (coloriftex || base == null)) {
             // Add diffuse colour
@@ -185,9 +183,9 @@ public class TextureComponent implements IObserver {
         }
         if (height != null && material.get(TextureExtAttribute.Height) == null) {
             if (!height.endsWith(GEN_HEIGHT_KEYWORD)) {
-                heightTex = manager.get(heightUnpacked, Texture.class);
+                Texture tex = manager.get(heightUnpacked, Texture.class);
                 if (!GlobalConf.scene.ELEVATION_TYPE.isNone()) {
-                    initializeElevationData();
+                    initializeElevationData(tex);
                 }
             } else {
                 initializeGenElevationData();
@@ -210,8 +208,6 @@ public class TextureComponent implements IObserver {
             material.set(new IntAttribute(IntAttribute.CullFace, GL20.GL_NONE));
         }
 
-        texLoading = false;
-        texInitialised = true;
         return material;
     }
 
@@ -252,11 +248,11 @@ public class TextureComponent implements IObserver {
             Gdx.app.postRunnable(() -> {
                 // Create texture, populate material
                 heightMap = partialData;
-                heightTex = new Texture(pixmap, true);
-                heightTex.setFilter(TextureFilter.MipMapLinearLinear, TextureFilter.Linear);
+                Texture tex = new Texture(pixmap, true);
+                tex.setFilter(TextureFilter.MipMapLinearLinear, TextureFilter.Linear);
 
-                heightSize.set(heightTex.getWidth(), heightTex.getHeight());
-                material.set(new TextureExtAttribute(TextureExtAttribute.Height, heightTex));
+                heightSize.set(tex.getWidth(), tex.getHeight());
+                material.set(new TextureExtAttribute(TextureExtAttribute.Height, tex));
                 material.set(new FloatExtAttribute(FloatExtAttribute.HeightScale, heightScale * (float) GlobalConf.scene.ELEVATION_MULTIPLIER));
                 material.set(new Vector2Attribute(Vector2Attribute.HeightSize, new Vector2(N, M)));
                 //material.set(new FloatExtAttribute(FloatExtAttribute.HeightNoiseSize, heightNoiseSize));
@@ -266,7 +262,7 @@ public class TextureComponent implements IObserver {
         t.start();
     }
 
-    private void initializeElevationData() {
+    private void initializeElevationData(Texture tex) {
         Thread t = new Thread(() -> {
             // Construct RAM height map from texture
             logger.info("Constructing elevation data from texture: " + height);
@@ -282,8 +278,8 @@ public class TextureComponent implements IObserver {
             Gdx.app.postRunnable(() -> {
                 // Populate material
                 heightMap = partialData;
-                heightSize.set(heightTex.getWidth(), heightTex.getHeight());
-                material.set(new TextureExtAttribute(TextureExtAttribute.Height, heightTex));
+                heightSize.set(tex.getWidth(), tex.getHeight());
+                material.set(new TextureExtAttribute(TextureExtAttribute.Height, tex));
                 material.set(new FloatExtAttribute(FloatExtAttribute.HeightScale, heightScale * (float) GlobalConf.scene.ELEVATION_MULTIPLIER));
                 material.set(new Vector2Attribute(Vector2Attribute.HeightSize, heightSize));
                 material.set(new FloatExtAttribute(FloatExtAttribute.TessQuality, (float) GlobalConf.scene.TESSELLATION_QUALITY));
@@ -421,7 +417,7 @@ public class TextureComponent implements IObserver {
                             if (height.endsWith(GEN_HEIGHT_KEYWORD))
                                 initializeGenElevationData();
                             else
-                                initializeElevationData();
+                                initializeElevationData(((TextureAttribute) this.material.get(TextureExtAttribute.Height)).textureDescription.texture);
                         }
                     }
                 });

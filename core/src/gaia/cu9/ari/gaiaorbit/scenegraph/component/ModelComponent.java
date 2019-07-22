@@ -122,6 +122,7 @@ public class ModelComponent implements Disposable, IObserver {
 
         if ((forceInit || !GlobalConf.scene.LAZY_TEXTURE_INIT) && tc != null) {
             tc.initialize();
+            tc.texLoading = true;
         }
 
         rec = new RelativisticEffectsComponent();
@@ -159,6 +160,8 @@ public class ModelComponent implements Disposable, IObserver {
         // INITIALIZE MATERIAL
         if ((forceInit || !GlobalConf.scene.LAZY_TEXTURE_INIT) && tc != null) {
             tc.initMaterial(manager, materials.get("base"), materials.get("ring"), cc, culling);
+            tc.texLoading = false;
+            tc.texInitialised = true;
         }
 
         // CREATE MAIN MODEL INSTANCE
@@ -226,12 +229,15 @@ public class ModelComponent implements Disposable, IObserver {
                 if (!tc.texLoading) {
                     logger.info(I18n.bundle.format("notif.loading", tc.getTexturesString()));
                     tc.initialize(manager);
+                    tc.texLoading = true;
                 } else if (tc.isFinishedLoading(manager)) {
                     Gdx.app.postRunnable(() -> {
                         tc.initMaterial(manager, instance, cc, culling);
                         // Set to initialised
                         updateStaticLight();
                     });
+                    tc.texLoading = false;
+                    tc.texInitialised = true;
                 }
             } else if (localTransform == null) {
                 // Use color if necessary

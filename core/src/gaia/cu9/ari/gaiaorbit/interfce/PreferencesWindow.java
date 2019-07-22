@@ -474,7 +474,7 @@ public class PreferencesWindow extends GenericDialog {
         tessQuality.setWidth(sliderWidth);
         tessQuality.setValue((float) GlobalConf.scene.TESSELLATION_QUALITY);
         tessQuality.addListener((event) -> {
-            if(event instanceof ChangeEvent){
+            if (event instanceof ChangeEvent) {
                 tessQualityValueLabel.setText(nf1.format(tessQuality.getValue()));
             }
             return false;
@@ -1722,7 +1722,10 @@ public class PreferencesWindow extends GenericDialog {
 
         // Elevation representation
         ElevationType newType = elevationSb.getSelected().type;
-        EventManager.instance.post(Events.ELEVATION_TYPE_CMD, newType);
+        boolean reloadElevation = newType != GlobalConf.scene.ELEVATION_TYPE;
+        if( reloadElevation) {
+            EventManager.instance.post(Events.ELEVATION_TYPE_CMD, newType);
+        }
 
         // Tess quality
         EventManager.instance.post(Events.TESSELLATION_QUALITY_CMD, tessQuality.getValue());
