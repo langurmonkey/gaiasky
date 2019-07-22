@@ -33,7 +33,7 @@ public class SceneGraph extends AbstractSceneGraph {
         if (!hasOctree) {
             if (nobjects < 0)
                 nobjects = getNObjects();
-            EventManager.instance.post(Events.DEBUG_OBJECTS, "Objects: " + nobjects);
+            EventManager.instance.post(Events.DEBUG_OBJECTS, nobjects, nobjects);
         }
     }
 

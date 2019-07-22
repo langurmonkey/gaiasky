@@ -243,7 +243,7 @@ public abstract class AbstractOctreeWrapper extends FadeNode implements Iterable
         OctreeNode.maxDepth = 0;
         OctreeNode.nObjectsObserved = 0;
         OctreeNode.nOctantsObserved = 0;
-        EventManager.instance.post(Events.DEBUG_OBJECTS, "On display: " + 0 + ", Total loaded: " + 0);
+        EventManager.instance.post(Events.DEBUG_OBJECTS, 0, 0);
         EventManager.instance.post(Events.OCTREE_DISPOSED);
     }
 
