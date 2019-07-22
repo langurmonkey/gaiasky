@@ -1454,6 +1454,12 @@ public interface IScriptingInterface {
     void setSmoothLodTransitions(boolean value);
 
     /**
+     * Resets to zero the image sequence number used to generate the file names of the
+     * frame output images.
+     */
+    void resetImageSequenceNumber();
+
+    /**
      * Gets the absolute path of the default directory where the still frames are saved
      *
      * @return Absolute path of directory where still frames are saved

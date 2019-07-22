@@ -26,6 +26,7 @@ import gaia.cu9.ari.gaiaorbit.scenegraph.*;
 import gaia.cu9.ari.gaiaorbit.scenegraph.StarGroup.StarBean;
 import gaia.cu9.ari.gaiaorbit.scenegraph.camera.CameraManager.CameraMode;
 import gaia.cu9.ari.gaiaorbit.scenegraph.camera.NaturalCamera;
+import gaia.cu9.ari.gaiaorbit.screenshot.ImageRenderer;
 import gaia.cu9.ari.gaiaorbit.util.*;
 import gaia.cu9.ari.gaiaorbit.util.Logger.Log;
 import gaia.cu9.ari.gaiaorbit.util.coord.Coordinates;
@@ -2038,6 +2039,11 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
 
     public void setCameraStateAndTime(List pos, List dir, List up, long time) {
         setCameraStateAndTime(dArray(pos), dArray(dir), dArray(up), time);
+    }
+
+    @Override
+    public void resetImageSequenceNumber(){
+        ImageRenderer.resetSequenceNumber();
     }
 
     @Override
