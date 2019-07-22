@@ -8,16 +8,15 @@ package gaia.cu9.ari.gaiaorbit.interfce;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
-import com.badlogic.gdx.scenes.scene2d.ui.HorizontalGroup;
-import com.badlogic.gdx.scenes.scene2d.ui.Label;
-import com.badlogic.gdx.scenes.scene2d.ui.Skin;
-import com.badlogic.gdx.scenes.scene2d.ui.Table;
+import com.badlogic.gdx.scenes.scene2d.ui.*;
 import gaia.cu9.ari.gaiaorbit.event.EventManager;
 import gaia.cu9.ari.gaiaorbit.event.Events;
 import gaia.cu9.ari.gaiaorbit.event.IObserver;
 import gaia.cu9.ari.gaiaorbit.util.GlobalConf;
+import gaia.cu9.ari.gaiaorbit.util.TextUtils;
 import gaia.cu9.ari.gaiaorbit.util.format.INumberFormat;
 import gaia.cu9.ari.gaiaorbit.util.format.NumberFormatFactory;
+import gaia.cu9.ari.gaiaorbit.util.scene2d.OwnImageButton;
 import gaia.cu9.ari.gaiaorbit.util.scene2d.OwnLabel;
 import gaia.cu9.ari.gaiaorbit.util.scene2d.OwnSlider;
 
@@ -61,9 +60,20 @@ public class DebugInterface extends Table implements IObserver, IGuiInterface {
         row();
 
         /* GRAPHICS DEVICE */
-        device = new OwnLabel(Gdx.gl.glGetString(GL20.GL_RENDERER), skin, "hud-big");
+        HorizontalGroup deviceGroup = new HorizontalGroup();
+        deviceGroup.space(pad05);
+        String glDevice = Gdx.gl.glGetString(GL20.GL_RENDERER);
+        String glDeviceShort = TextUtils.capString(glDevice, 30);
+        device = new OwnLabel(glDeviceShort, skin, "hud-big");
         device.setColor(skin.getColor("blue"));
-        add(device).colspan(2).right().padBottom(pad40);
+        deviceGroup.addActor(device);
+        if(glDevice.length() != glDeviceShort.length()){
+            OwnImageButton deviceTooltip = new OwnImageButton(skin, "tooltip");
+            deviceTooltip.addListener(new TextTooltip(glDevice, skin));
+            device.addListener(new TextTooltip(glDevice, skin));
+            deviceGroup.addActor(deviceTooltip);
+        }
+        add(deviceGroup).colspan(2).right().padBottom(pad40);
         row();
 
         /* RUNNING TIME */
