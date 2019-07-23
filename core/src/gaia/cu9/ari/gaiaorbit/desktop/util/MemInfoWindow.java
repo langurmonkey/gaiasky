@@ -8,7 +8,6 @@ package gaia.cu9.ari.gaiaorbit.desktop.util;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.TextArea;
-import com.badlogic.gdx.utils.Align;
 import gaia.cu9.ari.gaiaorbit.interfce.GenericDialog;
 import gaia.cu9.ari.gaiaorbit.util.GlobalConf;
 import gaia.cu9.ari.gaiaorbit.util.I18n;
@@ -54,7 +53,7 @@ public class MemInfoWindow extends GenericDialog {
         meminfoscroll.setSmoothScrolling(true);
         meminfoscroll.setFadeScrollBars(false);
 
-        add(meminfoscroll).align(Align.center).pad(pad);
+        content.add(meminfoscroll).padBottom(pad).row();
 
     }
 
