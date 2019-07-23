@@ -199,7 +199,7 @@ public class DesktopConfInit extends ConfInit {
 
         LinkedList<String> NET_MASTER_SLAVES = null;
         if (NET_MASTER) {
-            NET_MASTER_SLAVES = new LinkedList<String>();
+            NET_MASTER_SLAVES = new LinkedList<>();
             String value;
             for (int i = 0; (value = p.getProperty("program.net.master.slaves." + i)) != null; i++) {
                 NET_MASTER_SLAVES.add(value);
@@ -284,7 +284,7 @@ public class DesktopConfInit extends ConfInit {
         sc.initialize(GRAPHICS_QUALITY, OBJECT_FADE_MS, STAR_BRIGHTNESS, AMBIENT_LIGHT, CAMERA_FOV, CAMERA_SPEED, TURNING_SPEED, ROTATION_SPEED, CAMERA_SPEED_LIMIT_IDX, FOCUS_LOCK, FOCUS_LOCK_ORIENTATION, LABEL_SIZE_FACTOR, LABEL_NUMBER_FACTOR, VISIBILITY, ORBIT_RENDERER, LINE_RENDERER, STAR_TH_ANGLE_NONE, STAR_TH_ANGLE_POINT, STAR_TH_ANGLE_QUAD, POINT_ALPHA_MIN, POINT_ALPHA_MAX, OCTREE_PARTICLE_FADE, OCTANT_THRESHOLD_0, OCTANT_THRESHOLD_1, PM_NUM_FACTOR, PM_LEN_FACTOR, N_PM_STARS, PM_COLOR_MODE, PM_ARROWHEADS, STAR_POINT_SIZE, GALAXY_3D, CUBEMAP_FACE_RESOLUTION, CROSSHAIR, CINEMATIC_CAMERA, LAZY_TEXTURE_INIT, FREE_CAMERA_TARGET_MODE_ON, SHADOW_MAPPING, SHADOW_MAPPING_N_SHADOWS, SHADOW_MAPPING_RESOLUTION, MAX_LOADED_STARS, ELEVATION_TYPE, ELEVATION_MULTIPLIER, TESSELLATION_QUALITY);
 
         /** FRAME CONF **/
-        String renderFolder = null;
+        String renderFolder;
         if (p.getProperty("graphics.render.folder") == null || p.getProperty("graphics.render.folder").isEmpty()) {
             File framesDir = SysUtils.getDefaultFramesDir();
             framesDir.mkdirs();

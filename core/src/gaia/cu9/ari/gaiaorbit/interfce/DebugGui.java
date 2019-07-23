@@ -22,9 +22,9 @@ public class DebugGui extends AbstractGui {
     protected DebugInterface debugInterface;
     private Container di;
 
-    public DebugGui(Stage ui) {
+    public DebugGui() {
         super();
-        this.ui = ui;
+        this.ui = new Stage(new ScreenViewport(), GlobalResources.spriteBatch);
     }
 
     @Override

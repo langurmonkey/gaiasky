@@ -67,11 +67,11 @@ public class DebugInterface extends Table implements IObserver, IGuiInterface {
         String glDeviceShort = TextUtils.capString(glDevice, 30);
         device = new OwnLabel(glDeviceShort, skin, "hud-big");
         device.setColor(skin.getColor("blue"));
+        device.addListener(new TextTooltip(glDevice, skin));
         deviceGroup.addActor(device);
         if(glDevice.length() != glDeviceShort.length()){
             OwnImageButton deviceTooltip = new OwnImageButton(skin, "tooltip");
             deviceTooltip.addListener(new TextTooltip(glDevice, skin));
-            device.addListener(new TextTooltip(glDevice, skin));
             deviceGroup.addActor(deviceTooltip);
         }
         add(deviceGroup).colspan(2).right().padBottom(pad40);

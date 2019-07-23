@@ -476,7 +476,7 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
         mainGui = new FullGui();
         mainGui.initialize(manager);
 
-        debugGui = new DebugGui(mainGui.getGuiStage());
+        debugGui = new DebugGui();
         debugGui.initialize(manager);
 
         spacecraftGui = new SpacecraftGui();
@@ -520,6 +520,7 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
             GuiRegistry.setPrevious(null);
         }
         GuiRegistry.registerGui(debugGui);
+        GuiRegistry.addProcessor(debugGui);
     }
 
     @Override

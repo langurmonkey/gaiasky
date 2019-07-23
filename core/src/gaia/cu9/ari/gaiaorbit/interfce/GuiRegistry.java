@@ -60,7 +60,6 @@ public class GuiRegistry implements IObserver {
      **/
     private static InputMultiplexer im = null;
 
-
     public static void setInputMultiplexer(InputMultiplexer im) {
         GuiRegistry.im = im;
     }
@@ -139,8 +138,9 @@ public class GuiRegistry implements IObserver {
      * @param gui The GUI to register
      */
     public static void registerGui(IGui gui) {
-        if (!guis.contains(gui, true))
+        if (!guis.contains(gui, true)) {
             guis.add(gui);
+        }
     }
 
     /**
@@ -176,6 +176,22 @@ public class GuiRegistry implements IObserver {
                 guis.get(i).render(rw, rh);
             }
         }
+    }
+
+    /**
+     * Adds the stage of the given GUI to the processors in
+     * the input multiplexer
+     *
+     * @param gui The gui
+     */
+    public static void addProcessor(IGui gui) {
+        if (im != null && gui != null)
+            im.addProcessor(gui.getGuiStage());
+    }
+
+    public static void removeProcessor(IGui gui) {
+        if (im != null && gui != null)
+            im.removeProcessor(gui.getGuiStage());
     }
 
     /**
@@ -233,11 +249,11 @@ public class GuiRegistry implements IObserver {
             // Treats windows that can appear in any GUI
             switch (event) {
             case QUIT_ACTION:
-                if(!removeModeChangePopup()) {
-                    if(GLFW.glfwGetInputMode(((Lwjgl3Graphics) Gdx.graphics).getWindow().getWindowHandle(), GLFW.GLFW_CURSOR) == GLFW.GLFW_CURSOR_DISABLED) {
+                if (!removeModeChangePopup()) {
+                    if (GLFW.glfwGetInputMode(((Lwjgl3Graphics) Gdx.graphics).getWindow().getWindowHandle(), GLFW.GLFW_CURSOR) == GLFW.GLFW_CURSOR_DISABLED) {
                         // Release mouse if captured
                         GLFW.glfwSetInputMode(((Lwjgl3Graphics) Gdx.graphics).getWindow().getWindowHandle(), GLFW.GLFW_CURSOR, GLFW.GLFW_CURSOR_NORMAL);
-                    }else {
+                    } else {
                         QuitWindow quit = new QuitWindow(ui, skin);
                         if (data.length > 0) {
                             quit.setAcceptRunnable((Runnable) data[0]);
@@ -255,7 +271,7 @@ public class GuiRegistry implements IObserver {
             case SHOW_LOAD_CATALOG_ACTION:
                 if (lastOpenLocation == null) {
                     lastOpenLocation = SysUtils.getHomeDir();
-                } else if(!lastOpenLocation.exists() || !lastOpenLocation.isDirectory()) {
+                } else if (!lastOpenLocation.exists() || !lastOpenLocation.isDirectory()) {
                     lastOpenLocation = SysUtils.getHomeDir();
                 }
 
@@ -274,7 +290,7 @@ public class GuiRegistry implements IObserver {
                                         // Open UI datasets
                                         EventScriptingInterface.instance().maximizeInterfaceWindow();
                                         EventScriptingInterface.instance().expandGuiComponent("DatasetsComponent");
-                                    }catch (Exception e){
+                                    } catch (Exception e) {
                                         logger.error(I18n.txt("notif.error", result.file().getName()), e);
                                     }
                                 };
@@ -333,8 +349,6 @@ public class GuiRegistry implements IObserver {
                 modeChangeTable.setBackground("table-bg");
                 modeChangeTable.pad(pad10);
 
-
-
                 // Fill up table
                 OwnLabel ttl = new OwnLabel(mpi.title, skin, "hud-header");
                 modeChangeTable.add(ttl).left().padBottom(pad10).row();
@@ -343,16 +357,16 @@ public class GuiRegistry implements IObserver {
                 modeChangeTable.add(dsc).left().padBottom(pad5 * 3f).row();
 
                 Table keysTable = new Table(skin);
-                for(Pair<String[], String> m : mpi.mappings){
+                for (Pair<String[], String> m : mpi.mappings) {
                     HorizontalGroup keysGroup = new HorizontalGroup();
                     keysGroup.space(pad3);
                     String[] keys = m.getFirst();
                     String action = m.getSecond();
-                    for(int i = 0; i < keys.length; i++){
+                    for (int i = 0; i < keys.length; i++) {
                         TextButton key = new TextButton(keys[i], skin, "key");
                         key.pad(pad5);
                         keysGroup.addActor(key);
-                        if(i < keys.length - 1){
+                        if (i < keys.length - 1) {
                             keysGroup.addActor(new OwnLabel("+", skin));
                         }
                     }
@@ -361,7 +375,6 @@ public class GuiRegistry implements IObserver {
                 }
                 modeChangeTable.add(keysTable).center().row();
                 modeChangeTable.add(new OwnLabel("ESC - close this", skin, "mono")).right().padTop(pad10 * 2f);
-
 
                 modeChangeTable.pack();
 
@@ -372,7 +385,6 @@ public class GuiRegistry implements IObserver {
                 mct.pad(pad10 * 2, 0, 0, 0);
                 ui.addActor(mct);
 
-
                 startModePopupInfoThread(modeChangeTable, seconds);
                 break;
             default:
@@ -381,12 +393,12 @@ public class GuiRegistry implements IObserver {
         }
     }
 
-    public boolean removeModeChangePopup(){
+    public boolean removeModeChangePopup() {
         boolean removed = false;
-        if(modeChangeTable != null){
+        if (modeChangeTable != null) {
             removed = modeChangeTable.remove();
             // Kill thread
-            if(removeActorThread != null && removeActorThread.isAlive()){
+            if (removeActorThread != null && removeActorThread.isAlive()) {
                 removeActorThread.interrupt();
                 removeActorThread = null;
             }
