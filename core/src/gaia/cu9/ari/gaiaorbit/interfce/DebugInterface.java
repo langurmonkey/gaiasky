@@ -85,7 +85,7 @@ public class DebugInterface extends Table implements IObserver, IGuiInterface {
         timeTable.add(debugRuntime);
         Label runTimeLabel = new OwnLabel(I18n.txt("gui.debug.runtime"), skin, "hud-big");
         runTimeLabel.addListener(new TextTooltip(I18n.txt("gui.debug.runtime.info"), skin));
-        runTimeLabel.setColor(skin.getColor("highlight"));
+        runTimeLabel.setColor(skin.getColor("theme"));
         add(timeTable).right().padRight(pad10).padBottom(pad20);
         add(runTimeLabel).left().padBottom(pad20);
         row();
@@ -108,7 +108,7 @@ public class DebugInterface extends Table implements IObserver, IGuiInterface {
 
         Label memoryLabel = new OwnLabel(I18n.txt("gui.debug.ram"), skin, "hud-big");
         memoryLabel.addListener(new TextTooltip(I18n.txt("gui.debug.ram.info"), skin));
-        memoryLabel.setColor(skin.getColor("highlight"));
+        memoryLabel.setColor(skin.getColor("theme"));
         add(debugRAMTable).right().padRight(pad10).padBottom(pad20);
         add(memoryLabel).left().padBottom(pad20);
         row();
@@ -126,7 +126,7 @@ public class DebugInterface extends Table implements IObserver, IGuiInterface {
 
         Label vmemoryLabel = new OwnLabel(I18n.txt("gui.debug.vram"), skin, "hud-big");
         vmemoryLabel.addListener(new TextTooltip(I18n.txt("gui.debug.vram.info"), skin));
-        vmemoryLabel.setColor(skin.getColor("highlight"));
+        vmemoryLabel.setColor(skin.getColor("theme"));
         add(debugVRAMTable).right().padRight(pad10).padBottom(pad20);
         add(vmemoryLabel).left().padBottom(pad20);
         row();
@@ -144,7 +144,7 @@ public class DebugInterface extends Table implements IObserver, IGuiInterface {
 
         Label objectsLabel = new OwnLabel(I18n.txt("gui.debug.obj"), skin, "hud-big");
         objectsLabel.addListener(new TextTooltip(I18n.txt("gui.debug.obj.info"), skin));
-        objectsLabel.setColor(skin.getColor("highlight"));
+        objectsLabel.setColor(skin.getColor("theme"));
         add(objectsTable).right().padRight(pad10).padBottom(pad20);
         add(objectsLabel).left().padBottom(pad20);
         row();
@@ -164,7 +164,7 @@ public class DebugInterface extends Table implements IObserver, IGuiInterface {
 
         Label lodLabel = new OwnLabel(I18n.txt("gui.debug.lod"), skin, "hud-big");
         lodLabel.addListener(new TextTooltip(I18n.txt("gui.debug.lod.info"), skin));
-        lodLabel.setColor(skin.getColor("highlight"));
+        lodLabel.setColor(skin.getColor("theme"));
         add(octantsTable).right().padRight(pad10).padBottom(pad20);
         add(lodLabel).left().padBottom(pad20);
         row();
@@ -175,7 +175,7 @@ public class DebugInterface extends Table implements IObserver, IGuiInterface {
         sampTable.add(debugSamp);
         Label sampLabel = new OwnLabel(I18n.txt("gui.debug.samp"), skin, "hud-big");
         sampLabel.addListener(new TextTooltip(I18n.txt("gui.debug.samp.info"), skin));
-        sampLabel.setColor(skin.getColor("highlight"));
+        sampLabel.setColor(skin.getColor("theme"));
         add(sampTable).right().padRight(pad10);
         add(sampLabel).left();
         row();
