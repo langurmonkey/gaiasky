@@ -94,8 +94,8 @@ public class DebugInterface extends Table implements IObserver, IGuiInterface {
         debugRAMTotal = new OwnLabel("", skin, "hud");
 
         Table debugRAMTable = new Table(skin);
-        debugRAMTable.add(new OwnLabel(I18n.txt("gui.debug.ram.used"), skin, "hud")).right().padRight(pad10).padBottom(pad05);
-        debugRAMTable.add(debugRAMUsed).right().padBottom(pad05).row();
+        debugRAMTable.add(new OwnLabel(I18n.txt("gui.debug.ram.used"), skin, "hud")).right().padRight(pad10);
+        debugRAMTable.add(debugRAMUsed).right().row();
         debugRAMTable.add(new OwnLabel(I18n.txt("gui.debug.ram.free"), skin, "hud")).right().padRight(pad10).padBottom(pad05);
         debugRAMTable.add(debugRAMFree).right().padBottom(pad05).row();
         debugRAMTable.add(new OwnLabel(I18n.txt("gui.debug.ram.alloc"), skin, "hud")).right().padRight(pad10);
@@ -115,10 +115,10 @@ public class DebugInterface extends Table implements IObserver, IGuiInterface {
         debugVRAMTotal = new OwnLabel("", skin, "hud");
 
         Table debugVRAMTable = new Table(skin);
-        debugVRAMTable.add(new OwnLabel(I18n.txt("gui.debug.vram.used"), skin, "hud")).right().padRight(pad10).padBottom(pad05);
-        debugVRAMTable.add(debugVRAMUsed).right().padBottom(pad05).row();
-        debugVRAMTable.add(new OwnLabel(I18n.txt("gui.debug.vram.total"), skin, "hud")).right().padRight(pad10).padBottom(pad05);
-        debugVRAMTable.add(debugVRAMTotal).right().padBottom(pad05);
+        debugVRAMTable.add(new OwnLabel(I18n.txt("gui.debug.vram.used"), skin, "hud")).right().padRight(pad10);
+        debugVRAMTable.add(debugVRAMUsed).right().row();
+        debugVRAMTable.add(new OwnLabel(I18n.txt("gui.debug.vram.total"), skin, "hud")).right().padRight(pad10);
+        debugVRAMTable.add(debugVRAMTotal).right();
 
         Label vmemoryLabel = new OwnLabel(I18n.txt("gui.debug.vram"), skin, "hud-big");
         vmemoryLabel.setColor(skin.getColor("highlight"));
@@ -132,8 +132,8 @@ public class DebugInterface extends Table implements IObserver, IGuiInterface {
         debugObjectsLoaded = new OwnLabel("", skin, "hud");
 
         Table objectsTable = new Table(skin);
-        objectsTable.add(new OwnLabel(I18n.txt("gui.debug.obj.display"), skin, "hud")).right().padRight(pad10).padBottom(pad05);
-        objectsTable.add(debugObjectsDisplay).right().padBottom(pad05).row();
+        objectsTable.add(new OwnLabel(I18n.txt("gui.debug.obj.display"), skin, "hud")).right().padRight(pad10);
+        objectsTable.add(debugObjectsDisplay).right().row();
         objectsTable.add(new OwnLabel(I18n.txt("gui.debug.obj.loaded"), skin, "hud")).right().padRight(pad10);
         objectsTable.add(debugObjectsLoaded).right();
 
@@ -150,8 +150,8 @@ public class DebugInterface extends Table implements IObserver, IGuiInterface {
         queueStatus.setValue(0);
 
         Table octantsTable = new Table(skin);
-        octantsTable.add(new OwnLabel(I18n.txt("gui.debug.lod.observed"), skin, "hud")).right().padRight(pad10).padBottom(pad05);
-        octantsTable.add(debugOcObserved).right().padBottom(pad05).row();
+        octantsTable.add(new OwnLabel(I18n.txt("gui.debug.lod.observed"), skin, "hud")).right().padRight(pad10);
+        octantsTable.add(debugOcObserved).right().row();
         octantsTable.add(new OwnLabel(I18n.txt("gui.debug.lod.queue"), skin, "hud")).right().padRight(pad10).padBottom(pad05);
         octantsTable.add(debugOcQueue).right().padBottom(pad05).row();
         octantsTable.add(queueStatus).center().colspan(2).padTop(pad05);
