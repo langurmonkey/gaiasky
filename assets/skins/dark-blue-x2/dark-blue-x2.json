@@ -201,6 +201,12 @@
       "b": 0,
       "g": 1,
       "r": 1
+    },
+    "yellow": {
+      "a": 1,
+      "b": 0,
+      "g": 1,
+      "r": 1
     }
   },
   "com.badlogic.gdx.scenes.scene2d.ui.Skin$TintedDrawable": {

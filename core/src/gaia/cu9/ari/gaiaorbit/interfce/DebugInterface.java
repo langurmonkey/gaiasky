@@ -198,8 +198,8 @@ public class DebugInterface extends Table implements IObserver, IGuiInterface {
             return skin.getColor("red");
         } else if( v > max * 0.9) {
             return skin.getColor("orange");
-        } else if (v > max * 0.8) {
-            return skin.getColor("blue");
+        } else if (v > max * 0.85) {
+            return skin.getColor("yellow");
         } else {
             return skin.getColor("green");
         }
