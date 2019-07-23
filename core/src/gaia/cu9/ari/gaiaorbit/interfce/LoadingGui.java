@@ -11,10 +11,7 @@ import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.Texture.TextureFilter;
 import com.badlogic.gdx.scenes.scene2d.Stage;
-import com.badlogic.gdx.scenes.scene2d.ui.Button;
-import com.badlogic.gdx.scenes.scene2d.ui.Container;
-import com.badlogic.gdx.scenes.scene2d.ui.Image;
-import com.badlogic.gdx.scenes.scene2d.ui.Table;
+import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener.ChangeEvent;
 import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.Array;
@@ -38,6 +35,9 @@ public class LoadingGui extends AbstractGui {
     protected Container<Button> screenMode;
 
     public NotificationsInterface notificationsInterface;
+    private OwnLabel spin;
+    private long m1, m2, i;
+    private long lastUpdateTime;
 
     public LoadingGui() {
         super();
@@ -46,8 +46,9 @@ public class LoadingGui extends AbstractGui {
     @Override
     public void initialize(AssetManager assetManager) {
         interfaces = new Array<>();
-        float pad30 = 30 * GlobalConf.SCALE_FACTOR;
-        float pad10 = 10 * GlobalConf.SCALE_FACTOR;
+        float pad30 = 30f * GlobalConf.SCALE_FACTOR;
+        float pad10 = 10f * GlobalConf.SCALE_FACTOR;
+        float pad05 = 5f * GlobalConf.SCALE_FACTOR;
         // User interface
         ui = new Stage(new ScreenViewport(), GlobalResources.spriteBatch);
         skin = GlobalResources.skin;
@@ -69,10 +70,18 @@ public class LoadingGui extends AbstractGui {
         logoimg.setScale(scl);
         logoimg.setOrigin(Align.center);
 
+        lastUpdateTime = 0;
+        i = -1;
+        m1 = 0;
+        m2 = 0;
+        OwnLabel loading = new OwnLabel(I18n.bundle.get("notif.loading.wait"), skin, "hud-header");
+        spin = new OwnLabel("0", skin, "mono");
+        spin.setColor(skin.getColor("theme"));
+
         center.add(logoimg).center();
-        center.row().padBottom(pad30);
-        center.add(new OwnLabel(I18n.bundle.get("notif.loading.wait"), skin, "hud-header"));
         center.row();
+        center.add(loading).padBottom(pad05).row();
+        center.add(spin).padBottom(pad30).row();
 
         bottom.add(new OwnLabel(GlobalConf.version.version + " - build " + GlobalConf.version.build, skin, "hud-med"));
         
@@ -100,6 +109,40 @@ public class LoadingGui extends AbstractGui {
 
         rebuildGui();
 
+    }
+
+    @Override
+    public void update(double dt) {
+        super.update(dt);
+        // Fibonacci numbers
+        long currTime = System.currentTimeMillis();
+        if(currTime - lastUpdateTime > 150){
+            i++;
+            long next;
+            if(i == 0){
+                next = 0;
+            }else if (i == 1){
+                next = 1;
+            } else {
+                next = m1 + m2;
+            }
+            spin.setText(Long.toString(next));
+            m2 = m1;
+            m1 = next;
+
+            if(next > 1e25){
+                reset();
+            }
+
+
+            lastUpdateTime = currTime;
+        }
+    }
+
+    private void reset(){
+        i = 0;
+        m1 = 0;
+        m2 = 0;
     }
 
     @Override
