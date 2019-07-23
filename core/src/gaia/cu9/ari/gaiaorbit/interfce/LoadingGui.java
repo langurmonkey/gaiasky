@@ -11,7 +11,10 @@ import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.Texture.TextureFilter;
 import com.badlogic.gdx.scenes.scene2d.Stage;
-import com.badlogic.gdx.scenes.scene2d.ui.*;
+import com.badlogic.gdx.scenes.scene2d.ui.Button;
+import com.badlogic.gdx.scenes.scene2d.ui.Container;
+import com.badlogic.gdx.scenes.scene2d.ui.Image;
+import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener.ChangeEvent;
 import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.Array;
@@ -23,6 +26,8 @@ import gaia.cu9.ari.gaiaorbit.util.GlobalResources;
 import gaia.cu9.ari.gaiaorbit.util.I18n;
 import gaia.cu9.ari.gaiaorbit.util.scene2d.OwnLabel;
 import gaia.cu9.ari.gaiaorbit.util.scene2d.OwnTextIconButton;
+
+import java.math.BigInteger;
 
 /**
  * Displays the loading screen.
@@ -36,7 +41,8 @@ public class LoadingGui extends AbstractGui {
 
     public NotificationsInterface notificationsInterface;
     private OwnLabel spin;
-    private long m1, m2, i;
+    private BigInteger m1, m2;
+    private long i;
     private long lastUpdateTime;
 
     public LoadingGui() {
@@ -72,8 +78,8 @@ public class LoadingGui extends AbstractGui {
 
         lastUpdateTime = 0;
         i = -1;
-        m1 = 0;
-        m2 = 0;
+        m1 = BigInteger.ZERO;
+        m2 = BigInteger.ZERO;
         OwnLabel loading = new OwnLabel(I18n.bundle.get("notif.loading.wait"), skin, "hud-header");
         spin = new OwnLabel("0", skin, "mono");
         spin.setColor(skin.getColor("theme"));
@@ -118,21 +124,18 @@ public class LoadingGui extends AbstractGui {
         long currTime = System.currentTimeMillis();
         if(currTime - lastUpdateTime > 100){
             i++;
-            long next;
-            if(i == 0){
-                next = 0;
-            }else if (i == 1){
-                next = 1;
+            BigInteger next;
+            if(i == 0l){
+                next = BigInteger.ZERO;
+            }else if (i == 1l){
+                next = BigInteger.ONE;
             } else {
-                next = m1 + m2;
+                next = m1.add(m2);
             }
-            spin.setText(Long.toString(next));
+            spin.setText(next.toString());
             m2 = m1;
             m1 = next;
 
-            if(next > 1e25){
-                reset();
-            }
 
 
             lastUpdateTime = currTime;
@@ -140,9 +143,9 @@ public class LoadingGui extends AbstractGui {
     }
 
     private void reset(){
-        i = 0;
-        m1 = 0;
-        m2 = 0;
+        i = 0l;
+        m1 = BigInteger.ZERO;
+        m2 = BigInteger.ZERO;
     }
 
     @Override
