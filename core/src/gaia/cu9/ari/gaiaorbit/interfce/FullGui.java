@@ -59,7 +59,6 @@ public class FullGui extends AbstractGui {
     protected RunCameraWindow runcameraWindow;
     protected MemInfoWindow memInfoWindow;
     protected LogWindow logWindow;
-    protected Table modeChangeTable;
 
     protected INumberFormat nf;
     protected Label pointerXCoord, pointerYCoord;

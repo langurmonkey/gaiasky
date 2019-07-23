@@ -476,7 +476,7 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
         mainGui = new FullGui();
         mainGui.initialize(manager);
 
-        debugGui = new DebugGui();
+        debugGui = new DebugGui(mainGui.getGuiStage());
         debugGui.initialize(manager);
 
         spacecraftGui = new SpacecraftGui();

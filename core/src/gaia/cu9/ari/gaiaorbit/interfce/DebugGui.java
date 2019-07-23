@@ -22,13 +22,13 @@ public class DebugGui extends AbstractGui {
     protected DebugInterface debugInterface;
     private Container di;
 
-    public DebugGui() {
+    public DebugGui(Stage ui) {
         super();
+        this.ui = ui;
     }
 
     @Override
     public void initialize(AssetManager assetManager) {
-        ui = new Stage(new ScreenViewport(), GlobalResources.spriteBatch);
     }
 
     @Override
@@ -54,6 +54,12 @@ public class DebugGui extends AbstractGui {
             if (debugInterface != null && di != null)
                 ui.addActor(di);
         }
+    }
+
+
+    @Override
+    public void update(double dt) {
+        ui.act((float) dt);
     }
 
     @Override
