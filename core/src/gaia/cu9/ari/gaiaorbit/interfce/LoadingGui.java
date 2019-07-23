@@ -116,7 +116,7 @@ public class LoadingGui extends AbstractGui {
         super.update(dt);
         // Fibonacci numbers
         long currTime = System.currentTimeMillis();
-        if(currTime - lastUpdateTime > 150){
+        if(currTime - lastUpdateTime > 100){
             i++;
             long next;
             if(i == 0){
