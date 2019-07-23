@@ -115,4 +115,12 @@ public class TextUtils {
         }
         return out.toString();
     }
+
+    public static String arrayToStr(String[] arr) {
+        String buff = new String();
+        for (int i = 0; i < arr.length; i++) {
+            buff += arr[i] + '\n';
+        }
+        return buff;
+    }
 }

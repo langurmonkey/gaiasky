@@ -19,6 +19,7 @@ import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.utils.Array;
+import com.badlogic.gdx.utils.BufferUtils;
 import com.badlogic.gdx.utils.ScreenUtils;
 import gaia.cu9.ari.gaiaorbit.scenegraph.camera.ICamera;
 import gaia.cu9.ari.gaiaorbit.util.GlobalConf.SceneConf.GraphicsQuality;
@@ -28,11 +29,13 @@ import gaia.cu9.ari.gaiaorbit.util.gdx.shader.ExtShaderProgram;
 import gaia.cu9.ari.gaiaorbit.util.math.MathUtilsd;
 import gaia.cu9.ari.gaiaorbit.util.math.Vector3d;
 import net.jafama.FastMath;
+import org.lwjgl.opengl.GL30;
 
 import java.io.FileInputStream;
 import java.io.FilenameFilter;
 import java.io.IOException;
 import java.nio.ByteBuffer;
+import java.nio.IntBuffer;
 import java.nio.channels.FileChannel;
 import java.nio.file.FileVisitResult;
 import java.nio.file.Files;
@@ -684,5 +687,22 @@ public class GlobalResources {
         } else {
             return tex;
         }
+    }
+
+    private static IntBuffer buf = BufferUtils.newIntBuffer(16);
+    public static synchronized String getGLExtensions(){
+        String extensions = Gdx.gl.glGetString(GL30.GL_EXTENSIONS);
+        if (extensions == null || extensions.isEmpty()) {
+            Gdx.gl.glGetIntegerv(GL30.GL_NUM_EXTENSIONS, buf);
+            int next = buf.get(0);
+            String[] extensionsstr = new String[next];
+            for (int i = 0; i < next; i++) {
+                extensionsstr[i] = Gdx.gl30.glGetStringi(GL30.GL_EXTENSIONS, i);
+            }
+            extensions = TextUtils.arrayToStr(extensionsstr);
+        } else {
+            extensions = extensions.replaceAll(" ", "\n");
+        }
+        return extensions;
     }
 }

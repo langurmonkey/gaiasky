@@ -811,6 +811,7 @@ public enum Events {
      **/
     DEBUG_TIME,
     DEBUG_RAM,
+    DEBUG_VRAM,
     DEBUG_OBJECTS,
     DEBUG_QUEUE,
     /**

@@ -8,7 +8,6 @@ package gaia.cu9.ari.gaiaorbit.interfce;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
-import com.badlogic.gdx.scenes.scene2d.ui.HorizontalGroup;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
@@ -16,13 +15,14 @@ import gaia.cu9.ari.gaiaorbit.event.EventManager;
 import gaia.cu9.ari.gaiaorbit.event.Events;
 import gaia.cu9.ari.gaiaorbit.event.IObserver;
 import gaia.cu9.ari.gaiaorbit.util.GlobalConf;
+import gaia.cu9.ari.gaiaorbit.util.I18n;
 import gaia.cu9.ari.gaiaorbit.util.format.INumberFormat;
 import gaia.cu9.ari.gaiaorbit.util.format.NumberFormatFactory;
 import gaia.cu9.ari.gaiaorbit.util.scene2d.OwnLabel;
 import gaia.cu9.ari.gaiaorbit.util.scene2d.OwnSlider;
 
 public class DebugInterface extends Table implements IObserver, IGuiInterface {
-    private OwnLabel debugRuntime, debugUsed, debugFree, debugAlloc, debugMax,  debugObjectsDisplay, debugObjectsLoaded, debugOcObserved, debugOcQueue, debugSamp, fps, spf, device;
+    private OwnLabel debugRuntime, debugRAMUsed, debugRAMFree, debugRAMAlloc, debugRAMTotal,  debugVRAMUsed, debugVRAMTotal, debugObjectsDisplay, debugObjectsLoaded, debugOcObserved, debugOcQueue, debugSamp, fps, spf, device;
     private OwnSlider queueStatus;
     private int previousQueueSize = 0, currentQueueMax = 0;
     /** Lock object for synchronization **/
@@ -36,10 +36,10 @@ public class DebugInterface extends Table implements IObserver, IGuiInterface {
         this.setBackground("table-bg");
 
         this.skin = skin;
-        float pad05 = 5f * GlobalConf.SCALE_FACTOR;
-        float pad10 = 10f * GlobalConf.SCALE_FACTOR;
-        float pad20 = 20f * GlobalConf.SCALE_FACTOR;
-        float pad40 = 40f * GlobalConf.SCALE_FACTOR;
+        float pad05 = 5f;
+        float pad10 = 10f;
+        float pad20 = 20f;
+        float pad40 = 40f;
 
         pad(pad05);
 
@@ -68,32 +68,51 @@ public class DebugInterface extends Table implements IObserver, IGuiInterface {
 
         /* RUNNING TIME */
         debugRuntime = new OwnLabel("", skin, "hud");
-        Label runTimeLabel = new OwnLabel("Run time", skin, "hud-big");
+        Table timeTable = new Table(skin);
+        timeTable.add(debugRuntime);
+        Label runTimeLabel = new OwnLabel(I18n.txt("gui.debug.runtime"), skin, "hud-big");
         runTimeLabel.setColor(skin.getColor("highlight"));
-        add(runTimeLabel).right().padRight(pad10).padBottom(pad20);
-        add(debugRuntime).right().padBottom(pad20);
+        add(timeTable).right().padRight(pad10).padBottom(pad20);
+        add(runTimeLabel).left().padBottom(pad20);
         row();
 
         /* MEMORY */
-        debugUsed = new OwnLabel("", skin, "hud");
-        debugFree = new OwnLabel("", skin, "hud");
-        debugAlloc = new OwnLabel("", skin, "hud");
-        debugMax = new OwnLabel("", skin, "hud");
+        debugRAMUsed = new OwnLabel("", skin, "hud");
+        debugRAMFree = new OwnLabel("", skin, "hud");
+        debugRAMAlloc = new OwnLabel("", skin, "hud");
+        debugRAMTotal = new OwnLabel("", skin, "hud");
 
-        Table debugMemoryTable = new Table(skin);
-        debugMemoryTable.add(new OwnLabel("Used:", skin, "hud")).right().padRight(pad10).padBottom(pad05);
-        debugMemoryTable.add(debugUsed).right().padRight(pad10).padBottom(pad05);
-        debugMemoryTable.add(new OwnLabel("Free:", skin, "hud")).right().padRight(pad10).padBottom(pad05);
-        debugMemoryTable.add(debugFree).right().padBottom(pad05).row();
-        debugMemoryTable.add(new OwnLabel("Alloc:", skin, "hud")).right().padRight(pad10);
-        debugMemoryTable.add(debugAlloc).right().padRight(pad10);
-        debugMemoryTable.add(new OwnLabel("Max:", skin, "hud")).right().padRight(pad10);
-        debugMemoryTable.add(debugMax).right();
+        Table debugRAMTable = new Table(skin);
+        debugRAMTable.add(new OwnLabel(I18n.txt("gui.debug.ram.used"), skin, "hud")).right().padRight(pad10).padBottom(pad05);
+        debugRAMTable.add(debugRAMUsed).right().padBottom(pad05).row();
+        debugRAMTable.add(new OwnLabel(I18n.txt("gui.debug.ram.free"), skin, "hud")).right().padRight(pad10).padBottom(pad05);
+        debugRAMTable.add(debugRAMFree).right().padBottom(pad05).row();
+        debugRAMTable.add(new OwnLabel(I18n.txt("gui.debug.ram.alloc"), skin, "hud")).right().padRight(pad10);
+        debugRAMTable.add(debugRAMAlloc).right().row();
+        debugRAMTable.add(new OwnLabel(I18n.txt("gui.debug.ram.total"), skin, "hud")).right().padRight(pad10);
+        debugRAMTable.add(debugRAMTotal).right();
 
-        Label memoryLabel = new OwnLabel("RAM [MB]", skin, "hud-big");
+        Label memoryLabel = new OwnLabel(I18n.txt("gui.debug.ram"), skin, "hud-big");
         memoryLabel.setColor(skin.getColor("highlight"));
-        add(memoryLabel).right().padRight(pad10).padBottom(pad20);
-        add(debugMemoryTable).right().padBottom(pad20);
+        add(debugRAMTable).right().padRight(pad10).padBottom(pad20);
+        add(memoryLabel).left().padBottom(pad20);
+        row();
+
+
+        /* VMEMORY */
+        debugVRAMUsed = new OwnLabel("", skin, "hud");
+        debugVRAMTotal = new OwnLabel("", skin, "hud");
+
+        Table debugVRAMTable = new Table(skin);
+        debugVRAMTable.add(new OwnLabel(I18n.txt("gui.debug.vram.used"), skin, "hud")).right().padRight(pad10).padBottom(pad05);
+        debugVRAMTable.add(debugVRAMUsed).right().padBottom(pad05).row();
+        debugVRAMTable.add(new OwnLabel(I18n.txt("gui.debug.vram.total"), skin, "hud")).right().padRight(pad10).padBottom(pad05);
+        debugVRAMTable.add(debugVRAMTotal).right().padBottom(pad05);
+
+        Label vmemoryLabel = new OwnLabel(I18n.txt("gui.debug.vram"), skin, "hud-big");
+        vmemoryLabel.setColor(skin.getColor("highlight"));
+        add(debugVRAMTable).right().padRight(pad10).padBottom(pad20);
+        add(vmemoryLabel).left().padBottom(pad20);
         row();
 
 
@@ -102,47 +121,44 @@ public class DebugInterface extends Table implements IObserver, IGuiInterface {
         debugObjectsLoaded = new OwnLabel("", skin, "hud");
 
         Table objectsTable = new Table(skin);
-        objectsTable.add(new OwnLabel("On display:", skin, "hud")).right().padRight(pad10).padBottom(pad05);
+        objectsTable.add(new OwnLabel(I18n.txt("gui.debug.obj.display"), skin, "hud")).right().padRight(pad10).padBottom(pad05);
         objectsTable.add(debugObjectsDisplay).right().padBottom(pad05).row();
-        objectsTable.add(new OwnLabel("Loaded:", skin, "hud")).right().padRight(pad10);
+        objectsTable.add(new OwnLabel(I18n.txt("gui.debug.obj.loaded"), skin, "hud")).right().padRight(pad10);
         objectsTable.add(debugObjectsLoaded).right();
 
-        Label objectsLabel = new OwnLabel("Objects", skin, "hud-big");
+        Label objectsLabel = new OwnLabel(I18n.txt("gui.debug.obj"), skin, "hud-big");
         objectsLabel.setColor(skin.getColor("highlight"));
-        add(objectsLabel).right().padRight(pad10).padBottom(pad20);
-        add(objectsTable).right().padBottom(pad20);
+        add(objectsTable).right().padRight(pad10).padBottom(pad20);
+        add(objectsLabel).left().padBottom(pad20);
         row();
 
         /* OCTANTS */
         debugOcObserved = new OwnLabel("", skin, "hud");
         debugOcQueue = new OwnLabel("", skin, "hud");
+        queueStatus = new OwnSlider(0, 100, 1, false, skin, "default-horizontal");
+        queueStatus.setValue(0);
 
         Table octantsTable = new Table(skin);
-        octantsTable.add(new OwnLabel("Observed:", skin, "hud")).right().padRight(pad10).padBottom(pad05);
+        octantsTable.add(new OwnLabel(I18n.txt("gui.debug.lod.observed"), skin, "hud")).right().padRight(pad10).padBottom(pad05);
         octantsTable.add(debugOcObserved).right().padBottom(pad05).row();
-        octantsTable.add(new OwnLabel("Queue:", skin, "hud")).right().padRight(pad10);
+        octantsTable.add(new OwnLabel(I18n.txt("gui.debug.lod.queue"), skin, "hud")).right().padRight(pad10).padBottom(pad05);
+        octantsTable.add(debugOcQueue).right().padBottom(pad05).row();
+        octantsTable.add(queueStatus).center().colspan(2).padTop(pad05);
 
-        HorizontalGroup dbg4 = new HorizontalGroup();
-        dbg4.space(pad05);
-        queueStatus = new OwnSlider(0, 100, 1, false, skin, "default-horizontal");
-        queueStatus.setWidth(70f * GlobalConf.SCALE_FACTOR);
-        queueStatus.setValue(0);
-        dbg4.addActor(debugOcQueue);
-        dbg4.addActor(queueStatus);
-        octantsTable.add(dbg4).right().row();
-
-        Label lodLabel = new OwnLabel("LOD", skin, "hud-big");
+        Label lodLabel = new OwnLabel(I18n.txt("gui.debug.lod"), skin, "hud-big");
         lodLabel.setColor(skin.getColor("highlight"));
-        add(lodLabel).right().padRight(pad10).padBottom(pad20);
-        add(octantsTable).right().padBottom(pad20);
+        add(octantsTable).right().padRight(pad10).padBottom(pad20);
+        add(lodLabel).left().padBottom(pad20);
         row();
 
         /* SAMP */
         debugSamp = new OwnLabel("", skin, "hud");
-        Label sampLabel = new OwnLabel("SAMP", skin, "hud-big");
+        Table sampTable = new Table(skin);
+        sampTable.add(debugSamp);
+        Label sampLabel = new OwnLabel(I18n.txt("gui.debug.samp"), skin, "hud-big");
         sampLabel.setColor(skin.getColor("highlight"));
-        add(sampLabel).right().padRight(pad10);
-        add(debugSamp).right();
+        add(sampTable).right().padRight(pad10);
+        add(sampLabel).left();
         row();
 
         pack();
@@ -150,7 +166,7 @@ public class DebugInterface extends Table implements IObserver, IGuiInterface {
 
         this.setVisible(GlobalConf.program.SHOW_DEBUG_INFO);
         this.lock = lock;
-        EventManager.instance.subscribe(this, Events.DEBUG_TIME, Events.DEBUG_RAM, Events.DEBUG_OBJECTS, Events.DEBUG_QUEUE, Events.FPS_INFO, Events.SHOW_DEBUG_CMD, Events.SAMP_INFO);
+        EventManager.instance.subscribe(this, Events.DEBUG_TIME, Events.DEBUG_RAM, Events.DEBUG_VRAM, Events.DEBUG_OBJECTS, Events.DEBUG_QUEUE, Events.FPS_INFO, Events.SHOW_DEBUG_CMD, Events.SAMP_INFO);
     }
 
     private void unsubscribe() {
@@ -175,7 +191,7 @@ public class DebugInterface extends Table implements IObserver, IGuiInterface {
         synchronized (lock) {
             switch (event) {
             case DEBUG_TIME:
-                if (GlobalConf.program.SHOW_DEBUG_INFO && data.length > 0 && data[0] != null) {
+                if (GlobalConf.program.SHOW_DEBUG_INFO && data.length > 0) {
                     // Double with run time
                     Double runTime = (Double) data[0];
                     debugRuntime.setText(getRunTimeString(runTime));
@@ -183,23 +199,39 @@ public class DebugInterface extends Table implements IObserver, IGuiInterface {
                 break;
 
             case DEBUG_RAM:
-                if (GlobalConf.program.SHOW_DEBUG_INFO && data.length > 0 && data[0] != null) {
+                if (GlobalConf.program.SHOW_DEBUG_INFO && data.length > 0) {
                     // Doubles (MB):
                     // used/free/total/max
                     Double used = (Double) data[0];
                     Double free = (Double) data[1];
                     Double alloc = (Double) data[2];
-                    Double max = (Double) data[3];
-                    debugUsed.setText(memFormatter.format(used));
-                    debugUsed.setColor(getColor(used, alloc));
-                    debugFree.setText(memFormatter.format(free));
-                    debugAlloc.setText(memFormatter.format(alloc));
-                    debugAlloc.setColor(getColor(alloc, max));
-                    debugMax.setText(memFormatter.format(max));
+                    Double total = (Double) data[3];
+                    String unit = " " + I18n.txt("gui.debug.ram.unit");
+                    debugRAMUsed.setText(memFormatter.format(used) + unit);
+                    debugRAMUsed.setColor(getColor(used, alloc));
+                    debugRAMFree.setText(memFormatter.format(free) + unit);
+                    debugRAMAlloc.setText(memFormatter.format(alloc) + unit);
+                    debugRAMAlloc.setColor(getColor(alloc, total));
+                    debugRAMTotal.setText(memFormatter.format(total) + unit);
+                }
+                break;
+            case DEBUG_VRAM:
+                if(GlobalConf.program.SHOW_DEBUG_INFO && data.length > 0){
+                    Double used = (Double) data[0];
+                    Double total = (Double) data[1];
+                    if(used <= 0 || total <= 0){
+                        debugVRAMUsed.setText(I18n.txt("gui.debug.na"));
+                        debugVRAMTotal.setText(I18n.txt("gui.debug.na"));
+                    }else {
+                        String unit = " " + I18n.txt("gui.debug.vram.unit");
+                        debugVRAMUsed.setText(memFormatter.format(used) + unit);
+                        debugVRAMUsed.setColor(getColor(used, total));
+                        debugVRAMTotal.setText(memFormatter.format(total) + unit);
+                    }
                 }
                 break;
             case DEBUG_OBJECTS:
-                if (GlobalConf.program.SHOW_DEBUG_INFO && data.length > 0 && data[0] != null) {
+                if (GlobalConf.program.SHOW_DEBUG_INFO && data.length > 0) {
                     Integer display = (Integer) data[0];
                     Integer loaded = (Integer) data[1];
                     debugObjectsDisplay.setText(display);
@@ -207,7 +239,7 @@ public class DebugInterface extends Table implements IObserver, IGuiInterface {
                 }
                 break;
             case DEBUG_QUEUE:
-                if (GlobalConf.program.SHOW_DEBUG_INFO && data.length > 0 && data[0] != null) {
+                if (GlobalConf.program.SHOW_DEBUG_INFO && data.length > 0) {
                     int observed = (Integer)data[0];
                     int queueSize = (Integer) data[1];
                     // Text
@@ -224,15 +256,15 @@ public class DebugInterface extends Table implements IObserver, IGuiInterface {
                 }
                 break;
             case FPS_INFO:
-                if (GlobalConf.program.SHOW_DEBUG_INFO && data.length > 0 && data[0] != null) {
+                if (GlobalConf.program.SHOW_DEBUG_INFO && data.length > 0) {
                     double dfps = (Float) data[0];
                     double dspf = 1000 / dfps;
-                    fps.setText(fpsFormatter.format(dfps).concat(" FPS"));
-                    spf.setText(spfFormatter.format(dspf).concat(" ms"));
+                    fps.setText(fpsFormatter.format(dfps).concat(" " + I18n.txt("gui.debug.fps")));
+                    spf.setText(spfFormatter.format(dspf).concat(" " + I18n.txt("gui.debug.ms")));
                 }
                 break;
             case SAMP_INFO:
-                if (GlobalConf.program.SHOW_DEBUG_INFO && data.length > 0 && data[0] != null) {
+                if (GlobalConf.program.SHOW_DEBUG_INFO && data.length > 0) {
                     debugSamp.setText((String) data[0]);
                 }
                 break;

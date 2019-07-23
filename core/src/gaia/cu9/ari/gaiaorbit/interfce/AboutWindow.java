@@ -9,7 +9,6 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
-import com.badlogic.gdx.graphics.GL30;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.Texture.TextureFilter;
 import com.badlogic.gdx.graphics.g2d.Sprite;
@@ -300,28 +299,18 @@ public class AboutWindow extends GenericDialog {
         Label glslversion = new OwnLabel(Gdx.gl.glGetString(GL20.GL_SHADING_LANGUAGE_VERSION), skin);
 
         Label glextensionstitle = new OwnLabel(I18n.txt("gui.help.glextensions"), skin);
-        String extensions = Gdx.gl.glGetString(GL20.GL_EXTENSIONS);
+        String extensions = GlobalResources.getGLExtensions();
+
         IntBuffer buf = BufferUtils.newIntBuffer(16);
-        if (extensions == null || extensions.isEmpty()) {
-            Gdx.gl.glGetIntegerv(GL30.GL_NUM_EXTENSIONS, buf);
-            int next = buf.get(0);
-            String[] extensionsstr = new String[next];
-            for (int i = 0; i < next; i++) {
-                extensionsstr[i] = Gdx.gl30.glGetStringi(GL30.GL_EXTENSIONS, i);
-            }
-            extensions = arrayToStr(extensionsstr);
-        } else {
-            extensions = extensions.replaceAll(" ", "\n");
-        }
         Gdx.gl.glGetIntegerv(GL20.GL_MAX_TEXTURE_SIZE, buf);
         int maxSize = buf.get(0);
         int lines = GlobalResources.countOccurrences(extensions, '\n');
-        OwnTextArea glextensions = new OwnTextArea("Max texture size: " + maxSize + '\n' + extensions, skin, "no-disabled");
-        glextensions.setDisabled(true);
-        glextensions.setPrefRows(lines);
-        glextensions.clearListeners();
+        OwnTextArea maxTexSize = new OwnTextArea("Max texture size: " + maxSize + '\n' + extensions, skin, "no-disabled");
+        maxTexSize.setDisabled(true);
+        maxTexSize.setPrefRows(lines);
+        maxTexSize.clearListeners();
 
-        OwnScrollPane glextensionsscroll = new OwnScrollPane(glextensions, skin, "minimalist-nobg");
+        OwnScrollPane glextensionsscroll = new OwnScrollPane(maxTexSize, skin, "minimalist-nobg");
         glextensionsscroll.setWidth(taWidth);
         glextensionsscroll.setHeight(taHeight);
         glextensionsscroll.setForceScroll(false, true);
@@ -454,13 +443,6 @@ public class AboutWindow extends GenericDialog {
         }
     }
 
-    private String arrayToStr(String[] arr) {
-        String buff = new String();
-        for (int i = 0; i < arr.length; i++) {
-            buff += arr[i] + '\n';
-        }
-        return buff;
-    }
 
     @Override
     protected void accept() {
