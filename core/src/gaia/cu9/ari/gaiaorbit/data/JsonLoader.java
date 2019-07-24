@@ -14,11 +14,8 @@ import com.badlogic.gdx.utils.reflect.Constructor;
 import com.badlogic.gdx.utils.reflect.Method;
 import com.badlogic.gdx.utils.reflect.ReflectionException;
 import gaia.cu9.ari.gaiaorbit.scenegraph.SceneGraphNode;
-import gaia.cu9.ari.gaiaorbit.util.GlobalConf;
-import gaia.cu9.ari.gaiaorbit.util.I18n;
-import gaia.cu9.ari.gaiaorbit.util.Logger;
+import gaia.cu9.ari.gaiaorbit.util.*;
 import gaia.cu9.ari.gaiaorbit.util.Logger.Log;
-import gaia.cu9.ari.gaiaorbit.util.TextUtils;
 import gaia.cu9.ari.gaiaorbit.util.coord.IBodyCoordinates;
 
 import java.io.File;
@@ -177,12 +174,10 @@ public class JsonLoader<T extends SceneGraphNode> implements ISceneGraphLoader {
                         }
                         break;
                     case array:
-                        // Multidim array! Only 3D double supported so far
-                        valueClass = double[][][].class;
-
-                        JsonValue child = attribute.child;
-
-                        value = convertToDoubleArray(child, attribute.size);
+                        // Multidim array
+                        Pair<Object, Class> p = toMultidimDoubleArray(attribute);
+                        value = p.getFirst();
+                        valueClass = p.getSecond();
                         break;
                     default:
                         break;
@@ -213,7 +208,51 @@ public class JsonLoader<T extends SceneGraphNode> implements ISceneGraphLoader {
         return instance;
     }
 
-    public double[][][] convertToDoubleArray(JsonValue json, int size) {
+    public int depth(JsonValue attribute){
+        int d = 1;
+        if(attribute.child != null){
+            return d + depth(attribute.child);
+        }else{
+            return d;
+        }
+    }
+
+    public Pair<Object, Class> toMultidimDoubleArray(JsonValue attribute) {
+        final int dim = depth(attribute) - 1;
+        switch(dim){
+        case 1:
+            return to1DoubleArray(attribute);
+        case 2:
+            return to2DoubleArray(attribute);
+        case 3:
+            return to3DoubleArray(attribute);
+        }
+        logger.error("Double arrays of dimension " + dim + " not supported: attribute \"" + attribute.name + "\"");
+        return null;
+    }
+
+    public Pair<Object, Class> to1DoubleArray(JsonValue attribute){
+        return new Pair<>(attribute.asDouble(), double[].class);
+    }
+
+
+    public Pair<Object, Class> to2DoubleArray(JsonValue attribute){
+        JsonValue json = attribute.child;
+        int size = attribute.size;
+        double[][] result = new double[size][];
+        int i = 0;
+        do {
+            result[i] = json.asDoubleArray();
+            json = json.next();
+            i++;
+        } while (json != null);
+
+        return new Pair<>(result, double[][].class);
+    }
+
+    public Pair<Object, Class> to3DoubleArray(JsonValue attribute){
+        JsonValue json = attribute.child;
+        int size = attribute.size;
         double[][][] result = new double[size][][];
         int i = 0;
         do {
@@ -236,7 +275,7 @@ public class JsonLoader<T extends SceneGraphNode> implements ISceneGraphLoader {
             i++;
         } while (json != null);
 
-        return result;
+        return new Pair<>(result, double[][][].class);
     }
 
     public Map<String, Object> convertJsonToMap(JsonValue json) {

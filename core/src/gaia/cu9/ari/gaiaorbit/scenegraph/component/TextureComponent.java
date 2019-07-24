@@ -71,6 +71,8 @@ public class TextureComponent implements IObserver {
     public Float heightNoiseSize = 10f;
     public Vector2 heightSize = new Vector2();
     public float[][] heightMap;
+    /* Octave frequencies and amplitudes */
+    private double[][] octaves;
 
     private Material material, ringMaterial;
 
@@ -216,7 +218,10 @@ public class TextureComponent implements IObserver {
             // Construct RAM height map from noise algorithms
             final int N = GlobalConf.scene.GRAPHICS_QUALITY.texWidthTarget;
             final int M = GlobalConf.scene.GRAPHICS_QUALITY.texHeightTarget;
-            logger.info("Generating procedural " + N + "x" + M + " elevation data from noise");
+            logger.info("Generating procedural " + N + "x" + M + " elevation data");
+            initOctaves();
+            double[] freqs = octaves[0];
+            double[] amps = octaves[1];
             Pixmap pixmap = new Pixmap(N, M, Pixmap.Format.RGBA8888);
             float[][] partialData = new float[N][M];
             float wsize = 0f / (float) N;
@@ -232,9 +237,9 @@ public class TextureComponent implements IObserver {
                     float frequency = 6.0f;
                     float n = 0.0f;
 
-                    n += 1.0f * Math.abs(NoiseUtils.psnoise(new Vector2(coord).scl(frequency), new Vector2(size).scl(frequency)));
-                    n += 0.25f * Math.abs(NoiseUtils.psnoise(new Vector2(coord).scl(frequency * 4f), new Vector2(size).scl(frequency * 4f)));
-                    n += 0.125f * Math.abs(NoiseUtils.psnoise(new Vector2(coord).scl(frequency * 8f), new Vector2(size).scl(frequency * 8f)));
+                    for(int o = 0; o < freqs.length; o++){
+                        n += amps[o] * Math.abs(NoiseUtils.psnoise(new Vector2(coord).scl(frequency * (float) freqs[o]), new Vector2(size).scl(frequency * (float) freqs[o])));
+                    }
 
                     n = MathUtils.clamp(n, 0f, 1f);
 
@@ -260,6 +265,16 @@ public class TextureComponent implements IObserver {
             });
         });
         t.start();
+    }
+
+    /**
+     * Initialize the octave frequencies and amplitudes with the default values if needed
+     */
+    private void initOctaves(){
+        if(octaves == null){
+            // Frequencies, amplitudes
+            octaves = new double[][]{{1d, 4d, 8d}, {1d, 0.25d, 0.125d}};
+        }
     }
 
     private void initializeElevationData(Texture tex) {
@@ -336,6 +351,14 @@ public class TextureComponent implements IObserver {
      */
     public void setHeightNoiseSize(Double heightNoiseSize) {
         this.heightNoiseSize = heightNoiseSize.floatValue();
+    }
+
+    /**
+     * Sets the octaves as a matrix of [frequency,amplitude]
+     * @param octaves The octaves
+     */
+    public void setOctaves(double[][] octaves){
+        this.octaves = octaves;
     }
 
     public void setColoriftex(Boolean coloriftex) {
