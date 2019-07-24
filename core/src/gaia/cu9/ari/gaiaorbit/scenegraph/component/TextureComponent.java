@@ -382,8 +382,21 @@ public class TextureComponent implements IObserver {
                         if (heightMap == null) {
                             if (height.endsWith(GEN_HEIGHT_KEYWORD))
                                 initializeGenElevationData();
-                            else
-                                initializeElevationData(((TextureAttribute) this.material.get(TextureExtAttribute.Height)).textureDescription.texture);
+                            else {
+                                if(this.material.has(TextureExtAttribute.Height)) {
+                                    initializeElevationData(((TextureAttribute) this.material.get(TextureExtAttribute.Height)).textureDescription.texture);
+                                }else if(AssetBean.manager().isLoaded(heightUnpacked)){
+                                    if (!height.endsWith(GEN_HEIGHT_KEYWORD)) {
+                                        Texture tex = AssetBean.manager().get(heightUnpacked, Texture.class);
+                                        if (!GlobalConf.scene.ELEVATION_TYPE.isNone()) {
+                                            initializeElevationData(tex);
+                                        }
+                                    } else {
+                                        initializeGenElevationData();
+                                    }
+
+                                }
+                            }
                         }
                     }
                 });

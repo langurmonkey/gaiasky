@@ -63,12 +63,12 @@ public class DatasetDesc {
             this.outdated = false;
         }
 
+        this.name = source.getString("name");
+        this.baseData = name.equals("default-data");
         this.mustDownload = (!exists || outdated) && baseData;
         this.cbDisabled = baseData || (exists && !outdated);
 
-        this.name = source.getString("name");
         this.file = source.getString("file");
-        this.baseData = name.equals("default-data");
 
         // Description
         this.description = source.getString("description");
