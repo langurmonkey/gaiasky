@@ -330,7 +330,7 @@ public class KeyBindings {
         addAction(new ProgramAction("action.toggle/element.planetarium", () -> EventManager.instance.post(Events.PLANETARIUM_CMD, !GlobalConf.postprocess.POSTPROCESS_FISHEYE, false)));
 
         // Toggle clean (no GUI) mode
-        addAction(new ProgramAction("action.toggle/element.cleanmode", () -> EventManager.instance.post(Events.DISPLAY_GUI_CMD, I18n.txt("notif.cleanmode"))));
+        addAction(new ProgramAction("action.toggle/element.cleanmode", () -> EventManager.instance.post(Events.DISPLAY_GUI_CMD, !GlobalConf.runtime.DISPLAY_GUI, I18n.txt("notif.cleanmode"))));
 
         // Travel to focus object
         addAction(new ProgramAction("action.gotoobject", () -> EventManager.instance.post(Events.GO_TO_OBJECT_CMD)));

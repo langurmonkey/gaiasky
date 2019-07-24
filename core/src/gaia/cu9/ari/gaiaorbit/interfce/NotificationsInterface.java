@@ -266,7 +266,8 @@ public class NotificationsInterface extends Table implements IObserver, IGuiInte
                 addMessage(I18n.bundle.format("notif.toggle", I18n.bundle.get("notif.stereoscopic")));
                 break;
             case DISPLAY_GUI_CMD:
-                addMessage(I18n.bundle.format("notif.toggle", data[0]));
+                boolean displayGui = (Boolean) data[0];
+                addMessage(I18n.bundle.format("notif." + (!displayGui ? "activated" : "deactivated"), data[1]));
                 break;
             case STEREO_PROFILE_CMD:
                 addMessage(I18n.bundle.format("notif.stereoscopic.profile", StereoProfile.values()[(Integer) data[0]].toString()));
@@ -294,14 +295,14 @@ public class NotificationsInterface extends Table implements IObserver, IGuiInte
                 ModePopupInfo mpi = (ModePopupInfo) data[0];
                 addMessage(mpi.title);
                 addMessage(mpi.header);
-                for(Pair<String[], String> p : mpi.mappings){
+                for (Pair<String[], String> p : mpi.mappings) {
                     String[] keys = p.getFirst();
                     String action = p.getSecond();
                     StringBuilder msg = new StringBuilder();
                     msg.append("<");
-                    for(int i =0; i < keys.length; i++){
+                    for (int i = 0; i < keys.length; i++) {
                         msg.append(keys[i].toUpperCase());
-                        if(i < keys.length - 1){
+                        if (i < keys.length - 1) {
                             msg.append("+");
                         }
                     }
@@ -314,7 +315,6 @@ public class NotificationsInterface extends Table implements IObserver, IGuiInte
             }
         }
     }
-
 
     public static int getNumberMessages() {
         return historical.size();
@@ -339,6 +339,5 @@ public class NotificationsInterface extends Table implements IObserver, IGuiInte
     public float getMessagesWidth() {
         return Math.max(getMessage1Width(), getMessage2Width());
     }
-
 
 }

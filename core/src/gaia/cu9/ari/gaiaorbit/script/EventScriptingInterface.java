@@ -496,7 +496,7 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
         cameraTurn(0d, amount);
     }
 
-    public void cameraPitch(final long amount){
+    public void cameraPitch(final long amount) {
         cameraPitch((double) amount);
     }
 
@@ -1246,12 +1246,12 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
 
     @Override
     public void enableGui() {
-        Gdx.app.postRunnable(() -> em.post(Events.DISPLAY_GUI_CMD, I18n.bundle.get("notif.cleanmode"), true));
+        Gdx.app.postRunnable(() -> em.post(Events.DISPLAY_GUI_CMD, true, I18n.bundle.get("notif.cleanmode")));
     }
 
     @Override
     public void disableGui() {
-        Gdx.app.postRunnable(() -> em.post(Events.DISPLAY_GUI_CMD, I18n.bundle.get("notif.cleanmode"), false));
+        Gdx.app.postRunnable(() -> em.post(Events.DISPLAY_GUI_CMD, false, I18n.bundle.get("notif.cleanmode")));
     }
 
     @Override
@@ -2042,7 +2042,7 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
     }
 
     @Override
-    public void resetImageSequenceNumber(){
+    public void resetImageSequenceNumber() {
         ImageRenderer.resetSequenceNumber();
     }
 

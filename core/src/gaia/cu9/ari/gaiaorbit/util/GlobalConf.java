@@ -397,14 +397,7 @@ public class GlobalConf {
                 break;
 
             case DISPLAY_GUI_CMD:
-                if (data.length > 1) {
-                    // Value
-                    Boolean val = (Boolean) data[1];
-                    DISPLAY_GUI = val;
-                } else {
-                    // Toggle
-                    DISPLAY_GUI = !DISPLAY_GUI;
-                }
+                DISPLAY_GUI = (boolean) data[0];
                 break;
             case TOGGLE_UPDATEPAUSE:
                 UPDATE_PAUSE = !UPDATE_PAUSE;
@@ -807,8 +800,7 @@ public class GlobalConf {
             EventManager.instance.subscribe(this, Events.STEREOSCOPIC_CMD, Events.STEREO_PROFILE_CMD, Events.CUBEMAP360_CMD, Events.CUBEMAP_PROJECTION_CMD);
         }
 
-        public void initialize(boolean sHOW_DEBUG_INFO, Instant lAST_CHECKED, String lAST_VERSION, String vERSION_CHECK_URL, String dATA_DESCRIPTOR_URL, String uI_THEME, String sCRIPT_LOCATION, int rEST_PORT, String lOCALE, boolean sTEREOSCOPIC_MODE, StereoProfile sTEREO_PROFILE, boolean cUBEMAP360_MODE, boolean dISPLAY_HUD, boolean dISPLAY_POINTER_COORDS, boolean dISPLAY_DATASET_DIALOG,
-                boolean nET_MASTER, boolean nET_SLAVE, List<String> nET_MASTER_SLAVES) {
+        public void initialize(boolean sHOW_DEBUG_INFO, Instant lAST_CHECKED, String lAST_VERSION, String vERSION_CHECK_URL, String dATA_DESCRIPTOR_URL, String uI_THEME, String sCRIPT_LOCATION, int rEST_PORT, String lOCALE, boolean sTEREOSCOPIC_MODE, StereoProfile sTEREO_PROFILE, boolean cUBEMAP360_MODE, boolean dISPLAY_HUD, boolean dISPLAY_POINTER_COORDS, boolean dISPLAY_DATASET_DIALOG, boolean nET_MASTER, boolean nET_SLAVE, List<String> nET_MASTER_SLAVES) {
             SHOW_DEBUG_INFO = sHOW_DEBUG_INFO;
             VERSION_LAST_TIME = lAST_CHECKED;
             VERSION_LAST_VERSION = lAST_VERSION;
@@ -876,7 +868,7 @@ public class GlobalConf {
             }
         }
 
-        public boolean isHiDPITheme(){
+        public boolean isHiDPITheme() {
             return UI_THEME.endsWith("-x2");
         }
 
@@ -897,7 +889,7 @@ public class GlobalConf {
                     STEREOSCOPIC_MODE = stereomode;
                     if (STEREOSCOPIC_MODE && CUBEMAP360_MODE) {
                         CUBEMAP360_MODE = false;
-                        EventManager.instance.post(Events.DISPLAY_GUI_CMD, I18n.bundle.get("notif.cleanmode"), true);
+                        EventManager.instance.post(Events.DISPLAY_GUI_CMD, true, I18n.bundle.get("notif.cleanmode"));
                     }
                 }
                 break;
@@ -908,7 +900,7 @@ public class GlobalConf {
                 CUBEMAP360_MODE = (Boolean) data[0];
 
                 // Post a message to the screen
-                if (CUBEMAP360_MODE){
+                if (CUBEMAP360_MODE) {
                     ModePopupInfo mpi = new ModePopupInfo();
                     mpi.title = "Panorama mode";
                     mpi.header = "You have entered Panorama mode!";
@@ -1524,7 +1516,7 @@ public class GlobalConf {
         return APPLICATION_SHORT_NAME + program.getNetName() + " " + version.version + " (" + version.build + ")";
     }
 
-    public static String getSuperShortApplicationName(){
+    public static String getSuperShortApplicationName() {
         return APPLICATION_NAME + " " + version.version;
     }
 

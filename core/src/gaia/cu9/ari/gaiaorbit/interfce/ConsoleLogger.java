@@ -171,13 +171,13 @@ public class ConsoleLogger implements IObserver {
             t.printStackTrace(pw);
             String stackTrace = sw.toString();
             if (data.length == 1) {
-                if(I18n.bundle != null)
+                if (I18n.bundle != null)
                     addMessage(I18n.bundle.format("notif.error", stackTrace));
                 else
                     addMessage("Error: " + stackTrace);
             } else {
-                if(I18n.bundle != null)
-                addMessage(I18n.bundle.format("notif.error", data[1] + TAG_SEPARATOR + stackTrace));
+                if (I18n.bundle != null)
+                    addMessage(I18n.bundle.format("notif.error", data[1] + TAG_SEPARATOR + stackTrace));
                 else
                     addMessage("Error: " + data[1] + TAG_SEPARATOR + stackTrace);
             }
@@ -192,7 +192,8 @@ public class ConsoleLogger implements IObserver {
             addMessage(I18n.bundle.format("notif.toggle", I18n.bundle.get("notif.stereoscopic")));
             break;
         case DISPLAY_GUI_CMD:
-            addMessage(I18n.bundle.format("notif.toggle", data[0]));
+            boolean displayGui = (Boolean) data[0];
+            addMessage(I18n.bundle.format("notif." + (!displayGui ? "activated" : "deactivated"), data[1]));
             break;
         case STEREO_PROFILE_CMD:
             addMessage(I18n.bundle.format("notif.stereoscopic.profile", StereoProfile.values()[(Integer) data[0]].toString()));

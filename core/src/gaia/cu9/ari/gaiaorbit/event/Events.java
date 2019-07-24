@@ -578,8 +578,8 @@ public enum Events {
      **/
     ANTIALIASING_CMD,
     /**
-     * Toggles whole GUI display. Contains the localised name and an optional
-     * boolean with the state (display/no display)
+     * Toggles whole GUI display. Contains the a boolean
+     * with the state (display/no display) and the localised name
      **/
     DISPLAY_GUI_CMD,
     /**

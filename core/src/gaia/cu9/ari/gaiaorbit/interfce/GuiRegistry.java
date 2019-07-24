@@ -390,9 +390,8 @@ public class GuiRegistry implements IObserver {
                 startModePopupInfoThread(modeChangeTable, seconds);
                 break;
             case DISPLAY_GUI_CMD:
-                boolean displayGui = GlobalConf.runtime.DISPLAY_GUI;
-                System.out.println("Disp: " + displayGui);
-                if(!displayGui){
+                boolean displayGui = (Boolean) data[0];
+                if (!displayGui) {
                     // Remove processor
                     im.removeProcessor(current.getGuiStage());
                 } else {
