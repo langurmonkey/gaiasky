@@ -597,19 +597,17 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
                 preRenderScene();
                 renderSgr(cam, t, Gdx.graphics.getWidth(), Gdx.graphics.getHeight(), null, pp.getPostProcessBean(RenderType.screen));
 
-                if (GlobalConf.runtime.DISPLAY_GUI) {
-                    // Render the GUI, setting the viewport
-                    GuiRegistry.render(Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
-                }
+                // Render the GUI, setting the viewport
+                GuiRegistry.render(Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
             }
-            // Clean lists
-            sgr.clearLists();
-            // Number of frames
-            frames++;
+        }
+        // Clean lists
+        sgr.clearLists();
+        // Number of frames
+        frames++;
 
-            if (GlobalConf.screen.LIMIT_FPS > 0) {
-                sleep(GlobalConf.screen.LIMIT_FPS);
-            }
+        if (GlobalConf.screen.LIMIT_FPS > 0) {
+            sleep(GlobalConf.screen.LIMIT_FPS);
         }
     };
 

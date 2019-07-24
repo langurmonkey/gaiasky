@@ -170,10 +170,12 @@ public class GuiRegistry implements IObserver {
      * @param rh The render height
      */
     public static void render(int rw, int rh) {
-        synchronized (guirenderlock) {
-            for (int i = 0; i < guis.size; i++) {
-                guis.get(i).getGuiStage().getViewport().apply();
-                guis.get(i).render(rw, rh);
+        if (GlobalConf.runtime.DISPLAY_GUI) {
+            synchronized (guirenderlock) {
+                for (int i = 0; i < guis.size; i++) {
+                    guis.get(i).getGuiStage().getViewport().apply();
+                    guis.get(i).render(rw, rh);
+                }
             }
         }
     }
@@ -235,7 +237,7 @@ public class GuiRegistry implements IObserver {
         super();
         this.skin = skin;
         // Windows which are visible from any GUI
-        EventManager.instance.subscribe(this, Events.QUIT_ACTION, Events.SHOW_ABOUT_ACTION, Events.SHOW_LOAD_CATALOG_ACTION, Events.SHOW_PREFERENCES_ACTION, Events.SHOW_KEYFRAMES_WINDOW_ACTION, Events.UI_THEME_RELOAD_INFO, Events.TOGGLE_MINIMAP, Events.MODE_POPUP_CMD);
+        EventManager.instance.subscribe(this, Events.QUIT_ACTION, Events.SHOW_ABOUT_ACTION, Events.SHOW_LOAD_CATALOG_ACTION, Events.SHOW_PREFERENCES_ACTION, Events.SHOW_KEYFRAMES_WINDOW_ACTION, Events.UI_THEME_RELOAD_INFO, Events.TOGGLE_MINIMAP, Events.MODE_POPUP_CMD, Events.DISPLAY_GUI_CMD);
     }
 
     public void dispose() {
@@ -386,6 +388,17 @@ public class GuiRegistry implements IObserver {
                 ui.addActor(mct);
 
                 startModePopupInfoThread(modeChangeTable, seconds);
+                break;
+            case DISPLAY_GUI_CMD:
+                boolean displayGui = GlobalConf.runtime.DISPLAY_GUI;
+                System.out.println("Disp: " + displayGui);
+                if(!displayGui){
+                    // Remove processor
+                    im.removeProcessor(current.getGuiStage());
+                } else {
+                    // Add processor
+                    im.addProcessor(0, current.getGuiStage());
+                }
                 break;
             default:
                 break;

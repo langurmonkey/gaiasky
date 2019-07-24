@@ -166,15 +166,17 @@ public class KeyBindings {
         BooleanRunnable fullGuiCondition = () -> GuiRegistry.current instanceof FullGui;
         // Condition that checks the current camera is not Game
         BooleanRunnable noGameCondition = () -> !GaiaSky.instance.getCameraManager().getMode().isGame();
+        // Condition that checks the GUI is visible (no clean mode)
+        BooleanRunnable noCleanMode = () -> GlobalConf.runtime.DISPLAY_GUI;
 
         // about action
         final Runnable runnableAbout = () -> EventManager.instance.post(Events.SHOW_ABOUT_ACTION);
 
         // help dialog
-        addAction(new ProgramAction("action.help", runnableAbout));
+        addAction(new ProgramAction("action.help", runnableAbout, noCleanMode));
 
         // help dialog
-        addAction(new ProgramAction("action.help", runnableAbout));
+        addAction(new ProgramAction("action.help", runnableAbout, noCleanMode));
 
         // show quit
         final Runnable runnableQuit = () -> {
@@ -183,13 +185,13 @@ public class KeyBindings {
         };
 
         // run quit action
-        addAction(new ProgramAction("action.exit", runnableQuit));
+        addAction(new ProgramAction("action.exit", runnableQuit, noCleanMode));
 
         // exit
         //addAction(new ProgramAction("action.exit", runnableQuit), CTRL_L, Keys.Q);
 
         // show preferences dialog
-        addAction(new ProgramAction("action.preferences", () -> EventManager.instance.post(Events.SHOW_PREFERENCES_ACTION)));
+        addAction(new ProgramAction("action.preferences", () -> EventManager.instance.post(Events.SHOW_PREFERENCES_ACTION), noCleanMode));
 
         // show play camera dialog
         //addAction(new ProgramAction("action.playcamera", () ->
@@ -275,7 +277,7 @@ public class KeyBindings {
         addAction(new ProgramAction("action.toggle/element.frameoutput", () -> EventManager.instance.post(Events.FRAME_OUTPUT_CMD, !GlobalConf.frame.RENDER_OUTPUT)));
 
         // toggle UI collapse/expand
-        addAction(new ProgramAction("action.toggle/element.controls", () -> EventManager.instance.post(Events.GUI_FOLD_CMD), fullGuiCondition));
+        addAction(new ProgramAction("action.toggle/element.controls", () -> EventManager.instance.post(Events.GUI_FOLD_CMD), fullGuiCondition, noCleanMode));
 
         // toggle cubemap mode
         addAction(new ProgramAction("action.toggle/element.360", () -> EventManager.instance.post(Events.CUBEMAP360_CMD, !GlobalConf.program.CUBEMAP360_MODE, false)));
@@ -299,19 +301,17 @@ public class KeyBindings {
         addAction(new ProgramAction("action.keyframe", () -> EventManager.instance.post(Events.KEYFRAME_ADD)));
 
         // toggle debug information
-        addAction(new ProgramAction("action.toggle/element.debugmode", () -> {
-            EventManager.instance.post(Events.SHOW_DEBUG_CMD);
-        }));
+        addAction(new ProgramAction("action.toggle/element.debugmode", () -> EventManager.instance.post(Events.SHOW_DEBUG_CMD), noCleanMode));
 
         // search dialog
         final Runnable runnableSearch = () -> EventManager.instance.post(Events.SHOW_SEARCH_ACTION);
-        addAction(new ProgramAction("action.search", runnableSearch, fullGuiCondition));
+        addAction(new ProgramAction("action.search", runnableSearch, fullGuiCondition, noCleanMode));
 
         // search dialog
-        addAction(new ProgramAction("action.search", runnableSearch, fullGuiCondition));
+        addAction(new ProgramAction("action.search", runnableSearch, fullGuiCondition, noCleanMode));
 
         // search dialog
-        addAction(new ProgramAction("action.search", runnableSearch, fullGuiCondition));
+        addAction(new ProgramAction("action.search", runnableSearch, fullGuiCondition, noCleanMode));
 
         // toggle particle fade
         addAction(new ProgramAction("action.toggle/element.octreeparticlefade", () -> EventManager.instance.post(Events.OCTREE_PARTICLE_FADE_CMD, I18n.txt("element.octreeparticlefade"), !GlobalConf.scene.OCTREE_PARTICLE_FADE)));
@@ -342,28 +342,28 @@ public class KeyBindings {
         addAction(new ProgramAction("action.home", () -> EventManager.instance.post(Events.HOME_CMD)));
 
         // Minimap toggle
-        addAction(new ProgramAction("action.toggle/gui.minimap.title", () -> EventManager.instance.post(Events.TOGGLE_MINIMAP)));
+        addAction(new ProgramAction("action.toggle/gui.minimap.title", () -> EventManager.instance.post(Events.TOGGLE_MINIMAP), noCleanMode));
 
         // Expand/collapse time pane
-        addAction(new ProgramAction("action.expandcollapse.pane/gui.time", () -> EventManager.instance.post(Events.TOGGLE_EXPANDCOLLAPSE_PANE_CMD, "TimeComponent")));
+        addAction(new ProgramAction("action.expandcollapse.pane/gui.time", () -> EventManager.instance.post(Events.TOGGLE_EXPANDCOLLAPSE_PANE_CMD, "TimeComponent"), noCleanMode));
 
         // Expand/collapse camera pane
-        addAction(new ProgramAction("action.expandcollapse.pane/gui.camera", () -> EventManager.instance.post(Events.TOGGLE_EXPANDCOLLAPSE_PANE_CMD, "CameraComponent")));
+        addAction(new ProgramAction("action.expandcollapse.pane/gui.camera", () -> EventManager.instance.post(Events.TOGGLE_EXPANDCOLLAPSE_PANE_CMD, "CameraComponent"), noCleanMode));
 
         // Expand/collapse visibility pane
-        addAction(new ProgramAction("action.expandcollapse.pane/gui.visibility", () -> EventManager.instance.post(Events.TOGGLE_EXPANDCOLLAPSE_PANE_CMD, "VisibilityComponent")));
+        addAction(new ProgramAction("action.expandcollapse.pane/gui.visibility", () -> EventManager.instance.post(Events.TOGGLE_EXPANDCOLLAPSE_PANE_CMD, "VisibilityComponent"), noCleanMode));
 
         // Expand/collapse visual effects pane
-        addAction(new ProgramAction("action.expandcollapse.pane/gui.lighting", () -> EventManager.instance.post(Events.TOGGLE_EXPANDCOLLAPSE_PANE_CMD, "VisualEffectsComponent")));
+        addAction(new ProgramAction("action.expandcollapse.pane/gui.lighting", () -> EventManager.instance.post(Events.TOGGLE_EXPANDCOLLAPSE_PANE_CMD, "VisualEffectsComponent"), noCleanMode));
 
         // Expand/collapse datasets pane
-        addAction(new ProgramAction("action.expandcollapse.pane/gui.dataset.title", () -> EventManager.instance.post(Events.TOGGLE_EXPANDCOLLAPSE_PANE_CMD, "DatasetsComponent")));
+        addAction(new ProgramAction("action.expandcollapse.pane/gui.dataset.title", () -> EventManager.instance.post(Events.TOGGLE_EXPANDCOLLAPSE_PANE_CMD, "DatasetsComponent"), noCleanMode));
 
         // Expand/collapse objects pane
-        addAction(new ProgramAction("action.expandcollapse.pane/gui.objects", () -> EventManager.instance.post(Events.TOGGLE_EXPANDCOLLAPSE_PANE_CMD, "ObjectsComponent")));
+        addAction(new ProgramAction("action.expandcollapse.pane/gui.objects", () -> EventManager.instance.post(Events.TOGGLE_EXPANDCOLLAPSE_PANE_CMD, "ObjectsComponent"), noCleanMode));
 
         // Expand/collapse music pane
-        addAction(new ProgramAction("action.expandcollapse.pane/gui.music", () -> EventManager.instance.post(Events.TOGGLE_EXPANDCOLLAPSE_PANE_CMD, "MusicComponent")));
+        addAction(new ProgramAction("action.expandcollapse.pane/gui.music", () -> EventManager.instance.post(Events.TOGGLE_EXPANDCOLLAPSE_PANE_CMD, "MusicComponent"), noCleanMode));
 
         // Toggle mouse capture
         addAction(new ProgramAction("action.toggle/gui.mousecapture", () -> EventManager.instance.post(Events.MOUSE_CAPTURE_TOGGLE)));
@@ -380,7 +380,7 @@ public class KeyBindings {
         FileHandle customMappings = Gdx.files.absolute(SysUtils.getDefaultMappingsDir().getPath() + File.separator + mappingsFileName);
         FileHandle defaultMappings = new FileHandle(GlobalConf.ASSETS_LOC + File.separator + SysUtils.getMappingsDirName() + File.separator + mappingsFileName);
         FileHandle mappingsFile = customMappings;
-        if(!customMappings.exists()){
+        if (!customMappings.exists()) {
             mappingsFile = defaultMappings;
         }
         logger.info("Using keyboard mappings file: " + mappingsFile);
@@ -388,15 +388,15 @@ public class KeyBindings {
         try {
             Array<Pair<String, String>> mappings = readMappingsFile(mappingsFile);
 
-            for(Pair<String, String> mapping : mappings){
+            for (Pair<String, String> mapping : mappings) {
                 String key = mapping.getFirst();
 
                 ProgramAction action = actions.get(key);
-                if(action != null){
+                if (action != null) {
                     // Parse keys
                     String keyMappings[] = mapping.getSecond().trim().split("\\s+");
                     int[] keyCodes = new int[keyMappings.length];
-                    for(int i =0; i < keyMappings.length; i++){
+                    for (int i = 0; i < keyMappings.length; i++) {
                         keyCodes[i] = GSKeys.valueOf(keyMappings[i]);
                     }
                     addMapping(action, keyCodes);
@@ -406,21 +406,21 @@ public class KeyBindings {
                 }
             }
 
-        }catch (Exception e){
+        } catch (Exception e) {
             logger.error(e, "Error loading keyboard mappings: " + mappingsFile.path());
         }
 
     }
 
-    private Array<Pair<String,String>> readMappingsFile(FileHandle file) throws IOException {
+    private Array<Pair<String, String>> readMappingsFile(FileHandle file) throws IOException {
         Array<Pair<String, String>> result = new Array<>();
         InputStream is = file.read();
         BufferedReader br = new BufferedReader(new InputStreamReader(is));
 
         String line;
-        while((line = br.readLine()) != null){
+        while ((line = br.readLine()) != null) {
             line = line.trim();
-            if(!line.isEmpty() && !line.startsWith("#")){
+            if (!line.isEmpty() && !line.startsWith("#")) {
                 String[] strPair = line.split("=");
                 result.add(new Pair<>(strPair[0].trim(), strPair[1].trim()));
             }
@@ -445,9 +445,9 @@ public class KeyBindings {
         /**
          * Condition that must be met
          **/
-        private final BooleanRunnable condition;
+        private final BooleanRunnable[] conditions;
 
-        ProgramAction(String actionId, Runnable action, BooleanRunnable condition) {
+        ProgramAction(String actionId, Runnable action, BooleanRunnable... conditions) {
             this.actionId = actionId;
             // Set action name
             String actionName;
@@ -463,7 +463,7 @@ public class KeyBindings {
             }
             this.actionName = actionName;
             this.action = action;
-            this.condition = condition;
+            this.conditions = conditions;
         }
 
         ProgramAction(String actionName, Runnable action) {
@@ -472,13 +472,23 @@ public class KeyBindings {
 
         @Override
         public void run() {
-            // Run if condition not set or condition is met
-            if (condition != null) {
-                if (condition.run())
-                    action.run();
-            } else {
+            if (evaluateConditions())
                 action.run();
+        }
+
+        /**
+         * Evaluates conditions with a logical AND
+         *
+         * @return The result from evaluation
+         */
+        private boolean evaluateConditions() {
+            boolean result = true;
+            if (conditions != null && conditions.length > 0) {
+                for (BooleanRunnable br : conditions) {
+                    result = result && br.run();
+                }
             }
+            return result;
         }
 
         @Override
