@@ -20,7 +20,6 @@ import com.badlogic.gdx.graphics.g3d.attributes.BlendingAttribute;
 import com.badlogic.gdx.graphics.g3d.attributes.ColorAttribute;
 import com.badlogic.gdx.graphics.g3d.attributes.IntAttribute;
 import com.badlogic.gdx.graphics.g3d.attributes.TextureAttribute;
-import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
 import gaia.cu9.ari.gaiaorbit.data.AssetBean;
 import gaia.cu9.ari.gaiaorbit.event.EventManager;
@@ -36,7 +35,8 @@ import gaia.cu9.ari.gaiaorbit.util.gdx.model.IntModelInstance;
 import gaia.cu9.ari.gaiaorbit.util.gdx.shader.FloatExtAttribute;
 import gaia.cu9.ari.gaiaorbit.util.gdx.shader.TextureExtAttribute;
 import gaia.cu9.ari.gaiaorbit.util.gdx.shader.Vector2Attribute;
-import gaia.cu9.ari.gaiaorbit.util.noise.NoiseUtils;
+import gaia.cu9.ari.gaiaorbit.util.math.MathUtilsd;
+import gaia.cu9.ari.gaiaorbit.util.noise.OpenSimplexNoise;
 
 /**
  * A basic component that contains the info on the textures.
@@ -68,11 +68,12 @@ public class TextureComponent implements IObserver {
     public String baseUnpacked, specularUnpacked, normalUnpacked, nightUnpacked, ringUnpacked, heightUnpacked, ringnormalUnpacked;
     // Height scale in internal units
     public Float heightScale = 0.005f;
-    public Float heightNoiseSize = 10f;
+    public Float noiseSize = 10f;
     public Vector2 heightSize = new Vector2();
     public float[][] heightMap;
     /* Octave frequencies and amplitudes */
-    private double[][] octaves;
+    private double[][] noiseOctaves;
+    private double noisePower = 1d;
 
     private Material material, ringMaterial;
 
@@ -219,14 +220,15 @@ public class TextureComponent implements IObserver {
             final int N = GlobalConf.scene.GRAPHICS_QUALITY.texWidthTarget;
             final int M = GlobalConf.scene.GRAPHICS_QUALITY.texHeightTarget;
             logger.info("Generating procedural " + N + "x" + M + " elevation data");
+            OpenSimplexNoise osn = new OpenSimplexNoise(12345l);
             initOctaves();
-            double[] freqs = octaves[0];
-            double[] amps = octaves[1];
+            double[] freqs = noiseOctaves[0];
+            double[] amps = noiseOctaves[1];
             Pixmap pixmap = new Pixmap(N, M, Pixmap.Format.RGBA8888);
             float[][] partialData = new float[N][M];
             float wsize = 0f / (float) N;
             float hsize = 0f / (float) M;
-            Vector2 size = new Vector2(heightNoiseSize * 2f, heightNoiseSize);
+            Vector2 size = new Vector2(noiseSize * 2f, noiseSize);
             Vector2 coord = new Vector2();
             for (int i = 0; i < N; i++) {
                 float u = (i + wsize / 2f) / (float) N;
@@ -234,19 +236,25 @@ public class TextureComponent implements IObserver {
                     float v = (j + hsize / 2f) / (float) M;
 
                     coord.set(u * size.x, v * size.y);
-                    float frequency = 6.0f;
-                    float n = 0.0f;
+                    double frequency = 6.0d;
+                    double n = 0.0f;
 
                     for(int o = 0; o < freqs.length; o++){
-                        n += amps[o] * Math.abs(NoiseUtils.psnoise(new Vector2(coord).scl(frequency * (float) freqs[o]), new Vector2(size).scl(frequency * (float) freqs[o])));
+                        float f = (float) (frequency * freqs[o]);
+                        // Open simplex noise
+                        n += amps[o] * Math.abs(osn.eval(coord.x * f, coord.y * f));
+
+                        // Perlin noise
+                        //n += amps[o] * Math.abs(NoiseUtils.psnoise(new Vector2(coord.x * f, coord.y * f), new Vector2(size.x * f, size.y * f)));
                     }
 
-                    n = MathUtils.clamp(n, 0f, 1f);
+                    n = MathUtilsd.clamp(1d - Math.pow(1d - MathUtilsd.clamp(n, 0d, 1d), noisePower), 0d, 1d);
+                    float nf = (float) n;
 
-                    partialData[i][j] = (1f - n) * heightScale;
+                    partialData[i][j] = (1.0f - nf) * heightScale;
 
                     // Pixamp
-                    pixmap.drawPixel(i, j, Color.rgba8888(n, n, n, 1f));
+                    pixmap.drawPixel(i, j, Color.rgba8888(nf, nf, nf, 1f));
                 }
             }
 
@@ -260,7 +268,7 @@ public class TextureComponent implements IObserver {
                 material.set(new TextureExtAttribute(TextureExtAttribute.Height, tex));
                 material.set(new FloatExtAttribute(FloatExtAttribute.HeightScale, heightScale * (float) GlobalConf.scene.ELEVATION_MULTIPLIER));
                 material.set(new Vector2Attribute(Vector2Attribute.HeightSize, new Vector2(N, M)));
-                //material.set(new FloatExtAttribute(FloatExtAttribute.HeightNoiseSize, heightNoiseSize));
+                //material.set(new FloatExtAttribute(FloatExtAttribute.HeightNoiseSize, noiseSize));
                 material.set(new FloatExtAttribute(FloatExtAttribute.TessQuality, (float) GlobalConf.scene.TESSELLATION_QUALITY));
             });
         });
@@ -271,9 +279,9 @@ public class TextureComponent implements IObserver {
      * Initialize the octave frequencies and amplitudes with the default values if needed
      */
     private void initOctaves(){
-        if(octaves == null){
+        if(noiseOctaves == null){
             // Frequencies, amplitudes
-            octaves = new double[][]{{1d, 4d, 8d}, {1d, 0.25d, 0.125d}};
+            noiseOctaves = new double[][]{{1d, 4d, 8d}, {1d, 0.25d, 0.125d}};
         }
     }
 
@@ -347,18 +355,22 @@ public class TextureComponent implements IObserver {
     /**
      * Only if height is {@link #GEN_HEIGHT_KEYWORD}
      *
-     * @param heightNoiseSize Size of the sampling area
+     * @param noiseSize Size of the sampling area
      */
-    public void setHeightNoiseSize(Double heightNoiseSize) {
-        this.heightNoiseSize = heightNoiseSize.floatValue();
+    public void setNoiseSize(Double noiseSize) {
+        this.noiseSize = noiseSize.floatValue();
     }
 
     /**
-     * Sets the octaves as a matrix of [frequency,amplitude]
-     * @param octaves The octaves
+     * Sets the noiseOctaves as a matrix of [frequency,amplitude]
+     * @param octaves The noiseOctaves
      */
-    public void setOctaves(double[][] octaves){
-        this.octaves = octaves;
+    public void setNoiseOctaves(double[][] octaves){
+        this.noiseOctaves = octaves;
+    }
+
+    public void setNoisePower(Double power){
+        this.noisePower = power;
     }
 
     public void setColoriftex(Boolean coloriftex) {

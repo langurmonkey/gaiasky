@@ -30,7 +30,7 @@ public class FloatExtAttribute extends FloatAttribute {
     public static final String HeightScaleAlias = "heightScale";
     public static final long HeightScale = register(HeightScaleAlias);
 
-    public static final String HeightNoiseSizeAlias = "heightNoiseSize";
+    public static final String HeightNoiseSizeAlias = "noiseSize";
     public static final long HeightNoiseSize = register(HeightNoiseSizeAlias);
 
     public static final String TessQualityAlias = "tessQuality";
