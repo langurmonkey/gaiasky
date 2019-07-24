@@ -25,18 +25,13 @@ import gaia.cu9.ari.gaiaorbit.data.AssetBean;
 import gaia.cu9.ari.gaiaorbit.event.EventManager;
 import gaia.cu9.ari.gaiaorbit.event.Events;
 import gaia.cu9.ari.gaiaorbit.event.IObserver;
-import gaia.cu9.ari.gaiaorbit.util.Constants;
-import gaia.cu9.ari.gaiaorbit.util.GlobalConf;
+import gaia.cu9.ari.gaiaorbit.util.*;
 import gaia.cu9.ari.gaiaorbit.util.GlobalConf.SceneConf.ElevationType;
-import gaia.cu9.ari.gaiaorbit.util.GlobalResources;
-import gaia.cu9.ari.gaiaorbit.util.Logger;
 import gaia.cu9.ari.gaiaorbit.util.Logger.Log;
 import gaia.cu9.ari.gaiaorbit.util.gdx.model.IntModelInstance;
 import gaia.cu9.ari.gaiaorbit.util.gdx.shader.FloatExtAttribute;
 import gaia.cu9.ari.gaiaorbit.util.gdx.shader.TextureExtAttribute;
 import gaia.cu9.ari.gaiaorbit.util.gdx.shader.Vector2Attribute;
-import gaia.cu9.ari.gaiaorbit.util.math.MathUtilsd;
-import gaia.cu9.ari.gaiaorbit.util.noise.OpenSimplexNoise;
 
 /**
  * A basic component that contains the info on the textures.
@@ -47,7 +42,7 @@ public class TextureComponent implements IObserver {
     private static final Log logger = Logger.getLogger(TextureComponent.class);
 
     /** Generated height keyword **/
-    private static final String GEN_HEIGHT_KEYWORD = "generate";
+    public static final String GEN_HEIGHT_KEYWORD = "generate";
     /** Default texture parameters **/
     protected static final TextureParameter textureParamsMipMap, textureParams;
 
@@ -68,12 +63,9 @@ public class TextureComponent implements IObserver {
     public String baseUnpacked, specularUnpacked, normalUnpacked, nightUnpacked, ringUnpacked, heightUnpacked, ringnormalUnpacked;
     // Height scale in internal units
     public Float heightScale = 0.005f;
-    public Float noiseSize = 10f;
     public Vector2 heightSize = new Vector2();
     public float[][] heightMap;
-    /* Octave frequencies and amplitudes */
-    private double[][] noiseOctaves;
-    private double noisePower = 1d;
+    public ElevationComponent ec;
 
     private Material material, ringMaterial;
 
@@ -216,51 +208,16 @@ public class TextureComponent implements IObserver {
 
     private void initializeGenElevationData() {
         Thread t = new Thread(() -> {
-            // Construct RAM height map from noise algorithms
             final int N = GlobalConf.scene.GRAPHICS_QUALITY.texWidthTarget;
             final int M = GlobalConf.scene.GRAPHICS_QUALITY.texHeightTarget;
-            logger.info("Generating procedural " + N + "x" + M + " elevation data");
-            OpenSimplexNoise osn = new OpenSimplexNoise(12345l);
-            initOctaves();
-            double[] freqs = noiseOctaves[0];
-            double[] amps = noiseOctaves[1];
-            Pixmap pixmap = new Pixmap(N, M, Pixmap.Format.RGBA8888);
-            float[][] partialData = new float[N][M];
-            float wsize = 0f / (float) N;
-            float hsize = 0f / (float) M;
-            Vector2 size = new Vector2(noiseSize * 2f, noiseSize);
-            Vector2 coord = new Vector2();
-            for (int i = 0; i < N; i++) {
-                float u = (i + wsize / 2f) / (float) N;
-                for (int j = 0; j < M; j++) {
-                    float v = (j + hsize / 2f) / (float) M;
 
-                    coord.set(u * size.x, v * size.y);
-                    double frequency = 6.0d;
-                    double n = 0.0f;
-
-                    for(int o = 0; o < freqs.length; o++){
-                        float f = (float) (frequency * freqs[o]);
-                        // Open simplex noise
-                        n += amps[o] * Math.abs(osn.eval(coord.x * f, coord.y * f));
-
-                        // Perlin noise
-                        //n += amps[o] * Math.abs(NoiseUtils.psnoise(new Vector2(coord.x * f, coord.y * f), new Vector2(size.x * f, size.y * f)));
-                    }
-
-                    n = MathUtilsd.clamp(1d - Math.pow(1d - MathUtilsd.clamp(n, 0d, 1d), noisePower), 0d, 1d);
-                    float nf = (float) n;
-
-                    partialData[i][j] = (1.0f - nf) * heightScale;
-
-                    // Pixamp
-                    pixmap.drawPixel(i, j, Color.rgba8888(nf, nf, nf, 1f));
-                }
-            }
+            Pair<float[][], Pixmap> pair = ec.generateElevation(N, M, heightScale);
+            float [][] data = pair.getFirst();
+            Pixmap pixmap = pair.getSecond();
 
             Gdx.app.postRunnable(() -> {
                 // Create texture, populate material
-                heightMap = partialData;
+                heightMap = data;
                 Texture tex = new Texture(pixmap, true);
                 tex.setFilter(TextureFilter.MipMapLinearLinear, TextureFilter.Linear);
 
@@ -273,16 +230,6 @@ public class TextureComponent implements IObserver {
             });
         });
         t.start();
-    }
-
-    /**
-     * Initialize the octave frequencies and amplitudes with the default values if needed
-     */
-    private void initOctaves(){
-        if(noiseOctaves == null){
-            // Frequencies, amplitudes
-            noiseOctaves = new double[][]{{1d, 4d, 8d}, {1d, 0.25d, 0.125d}};
-        }
     }
 
     private void initializeElevationData(Texture tex) {
@@ -352,29 +299,13 @@ public class TextureComponent implements IObserver {
         this.heightScale = (float) (heightScale * Constants.KM_TO_U);
     }
 
-    /**
-     * Only if height is {@link #GEN_HEIGHT_KEYWORD}
-     *
-     * @param noiseSize Size of the sampling area
-     */
-    public void setNoiseSize(Double noiseSize) {
-        this.noiseSize = noiseSize.floatValue();
-    }
-
-    /**
-     * Sets the noiseOctaves as a matrix of [frequency,amplitude]
-     * @param octaves The noiseOctaves
-     */
-    public void setNoiseOctaves(double[][] octaves){
-        this.noiseOctaves = octaves;
-    }
-
-    public void setNoisePower(Double power){
-        this.noisePower = power;
-    }
 
     public void setColoriftex(Boolean coloriftex) {
         this.coloriftex = coloriftex;
+    }
+
+    public void setElevation(ElevationComponent ec){
+        this.ec = ec;
     }
 
     public boolean hasHeight() {
