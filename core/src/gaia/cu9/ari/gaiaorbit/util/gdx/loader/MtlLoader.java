@@ -10,12 +10,16 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g3d.model.data.ModelMaterial;
 import com.badlogic.gdx.graphics.g3d.model.data.ModelTexture;
 import com.badlogic.gdx.utils.Array;
+import gaia.cu9.ari.gaiaorbit.util.Logger;
+import gaia.cu9.ari.gaiaorbit.util.Logger.Log;
 
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 
 public class MtlLoader {
+    private static final Log logger = Logger.getLogger(MtlLoader.class);
+
     public Array<ModelMaterial> materials = new Array<>();
 
     /** loads .mtl file */
@@ -33,8 +37,10 @@ public class MtlLoader {
         String texEmissiveFilename = null;
         String texNormalFilename = null;
 
-        if (file == null || file.exists() == false)
+        if (file == null || file.exists() == false) {
+            logger.error("ERROR: Material file not found: " + file.name());
             return;
+        }
 
         BufferedReader reader = new BufferedReader(new InputStreamReader(file.read()), 4096);
         try {
