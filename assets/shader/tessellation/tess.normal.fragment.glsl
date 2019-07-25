@@ -246,21 +246,18 @@ void main() {
     specular *= min(1.0, pow(NH, 40.0));
     float selfShadow = saturate(4.0 * NL);
 
+    vec3 env = vec3(0.0);
     #ifdef environmentCubemapFlag
-    vec3 environment = texture(u_environmentCubemap, reflectDir).rgb;
-    specular *= environment;
+    env = texture(u_environmentCubemap, reflectDir).rgb;
     #ifdef reflectionColorFlag
-    diffuse.rgb = (vec3(1.0) - u_reflectionColor.rgb) * diffuse.rgb + environment * u_reflectionColor.rgb;
+    env = saturate(env * u_reflectionColor.rgb);
     #endif // reflectionColorFlag
     #endif // environmentCubemapFlag
 
     float shdw = clamp(getShadow(), 0.2, 1.0);
     vec3 nightColor = o_lightCol * night * max(0.0, 0.6 - NL) * shdw;
     vec3 dayColor = (o_lightCol * diffuse.rgb) * NL * shdw + (ambient * diffuse.rgb) * (1.0 - NL);
-    fragColor = vec4(dayColor + nightColor + emissive.rgb, diffuse.a * o_opacity);
-
-    // Patch weird specular highlight at the north pole
-    //fragColor.rgb = clamp(fragColor.rgb, 0.0, 0.5 + smoothstep(0.07, 0.13, texCoords.y) * 0.5);
+    fragColor = vec4(dayColor + nightColor + emissive.rgb + env, diffuse.a * o_opacity);
     fragColor.rgb += selfShadow * specular;
 
     #ifdef atmosphereGround

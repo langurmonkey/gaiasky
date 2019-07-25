@@ -23,6 +23,7 @@ import gaia.cu9.ari.gaiaorbit.event.IObserver;
 import gaia.cu9.ari.gaiaorbit.scenegraph.camera.ICamera;
 import gaia.cu9.ari.gaiaorbit.util.*;
 import gaia.cu9.ari.gaiaorbit.util.Logger.Log;
+import gaia.cu9.ari.gaiaorbit.util.color.ColourUtils;
 import gaia.cu9.ari.gaiaorbit.util.gdx.model.IntModel;
 import gaia.cu9.ari.gaiaorbit.util.gdx.model.IntModelInstance;
 
@@ -126,6 +127,8 @@ public class ModelComponent implements Disposable, IObserver {
         }
 
         rec = new RelativisticEffectsComponent();
+
+        SkyboxComponent.initSkybox();
     }
 
     public void doneLoading(AssetManager manager, Matrix4 localTransform, float[] cc) {
@@ -198,6 +201,13 @@ public class ModelComponent implements Disposable, IObserver {
                     }
                 else
                     materials.put("base", model.materials.first());
+            }
+            // Add skybox to materials if reflection present
+            for (Material mat : model.materials) {
+                if (mat.has(ColorAttribute.Reflection) && !ColourUtils.isZero(((ColorAttribute) mat.get(ColorAttribute.Reflection)).color)) {
+                    SkyboxComponent.prepareSkybox();
+                    mat.set(new CubemapAttribute(CubemapAttribute.EnvironmentMap, SkyboxComponent.skybox));
+                }
             }
 
         } else if (type != null) {

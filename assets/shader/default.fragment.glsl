@@ -190,8 +190,7 @@ void main() {
 	#endif
 		
 	// Prevent saturation
-    fragColor = clamp(fragColor, 0.0, 1.0);
-    fragColor.rgb *= 0.95;
+    fragColor.rgb = clamp(fragColor.rgb, 0.0, 0.98);
 
 	gl_FragDepth = v_depth;
 }

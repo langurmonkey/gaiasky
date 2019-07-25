@@ -26,6 +26,7 @@ public class MtlLoader {
         Color difcolor = Color.WHITE;
         Color speccolor = Color.WHITE;
         Color emicolor = Color.WHITE;
+        Color reflcolor = Color.BLACK;
         float opacity = 1.f;
         float shininess = 0.f;
         String texDiffuseFilename = null;
@@ -51,7 +52,7 @@ public class MtlLoader {
                 else {
                     final String key = tokens[0].toLowerCase();
                     if (key.equals("newmtl")) {
-                        addCurrentMat(curMatName, difcolor, speccolor, emicolor, opacity, shininess, texDiffuseFilename, texEmissiveFilename, texNormalFilename, materials);
+                        addCurrentMat(curMatName, difcolor, speccolor, emicolor, reflcolor, opacity, shininess, texDiffuseFilename, texEmissiveFilename, texNormalFilename, materials);
 
                         if (tokens.length > 1) {
                             curMatName = tokens[1];
@@ -62,9 +63,10 @@ public class MtlLoader {
                         difcolor = Color.WHITE;
                         speccolor = Color.WHITE;
                         emicolor = Color.WHITE;
+                        reflcolor = Color.BLACK;
                         opacity = 1.f;
                         shininess = 0.f;
-                    } else if (key.equals("kd") || key.equals("ks") || key.equals("ke")) // diffuse, specular or emissive
+                    } else if (key.equals("kd") || key.equals("ks") || key.equals("ke") || key.equals("kr")) // diffuse, specular or emissive
                     {
                         float r = Float.parseFloat(tokens[1]);
                         float g = Float.parseFloat(tokens[2]);
@@ -82,6 +84,9 @@ public class MtlLoader {
                         } else if (tokens[0].toLowerCase().equals("ke")) {
                             emicolor = new Color();
                             emicolor.set(r, g, b, a);
+                        } else if (tokens[0].toLowerCase().equals("kr")) {
+                            reflcolor = new Color();
+                            reflcolor.set(r, g, b, a);
                         }
                     } else if (key.equals("tr") || key.equals("d")) {
                         opacity = Float.parseFloat(tokens[1]);
@@ -102,17 +107,18 @@ public class MtlLoader {
         }
 
         // last material
-        addCurrentMat(curMatName, difcolor, speccolor, emicolor, opacity, shininess, texDiffuseFilename, texEmissiveFilename, texNormalFilename, materials);
+        addCurrentMat(curMatName, difcolor, speccolor, emicolor, reflcolor, opacity, shininess, texDiffuseFilename, texEmissiveFilename, texNormalFilename, materials);
 
         return;
     }
 
-    private void addCurrentMat(String curMatName, Color difcolor, Color speccolor, Color emicolor, float opacity, float shininess, String texDiffuseFilename, String texEmissiveFilename, String texNormalFilename, Array<ModelMaterial> materials) {
+    private void addCurrentMat(String curMatName, Color difcolor, Color speccolor, Color emicolor, Color reflcolor, float opacity, float shininess, String texDiffuseFilename, String texEmissiveFilename, String texNormalFilename, Array<ModelMaterial> materials) {
         ModelMaterial mat = new ModelMaterial();
         mat.id = curMatName;
         mat.diffuse = new Color(difcolor);
         mat.specular = new Color(speccolor);
         mat.emissive = new Color(emicolor);
+        mat.reflection = new Color(reflcolor);
         mat.opacity = opacity;
         mat.shininess = shininess;
         if (texDiffuseFilename != null) {

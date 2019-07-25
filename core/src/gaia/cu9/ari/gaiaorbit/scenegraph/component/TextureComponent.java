@@ -9,17 +9,11 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.assets.loaders.TextureLoader.TextureParameter;
 import com.badlogic.gdx.files.FileHandle;
-import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.graphics.GL20;
-import com.badlogic.gdx.graphics.Pixmap;
-import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.*;
 import com.badlogic.gdx.graphics.Texture.TextureFilter;
 import com.badlogic.gdx.graphics.g3d.Attribute;
 import com.badlogic.gdx.graphics.g3d.Material;
-import com.badlogic.gdx.graphics.g3d.attributes.BlendingAttribute;
-import com.badlogic.gdx.graphics.g3d.attributes.ColorAttribute;
-import com.badlogic.gdx.graphics.g3d.attributes.IntAttribute;
-import com.badlogic.gdx.graphics.g3d.attributes.TextureAttribute;
+import com.badlogic.gdx.graphics.g3d.attributes.*;
 import com.badlogic.gdx.math.Vector2;
 import gaia.cu9.ari.gaiaorbit.data.AssetBean;
 import gaia.cu9.ari.gaiaorbit.event.EventManager;
@@ -46,6 +40,7 @@ public class TextureComponent implements IObserver {
     /** Default texture parameters **/
     protected static final TextureParameter textureParamsMipMap, textureParams;
 
+
     static {
         textureParamsMipMap = new TextureParameter();
         textureParamsMipMap.genMipMaps = true;
@@ -61,6 +56,7 @@ public class TextureComponent implements IObserver {
     public boolean texInitialised, texLoading;
     public String base, specular, normal, night, ring, height, ringnormal;
     public String baseUnpacked, specularUnpacked, normalUnpacked, nightUnpacked, ringUnpacked, heightUnpacked, ringnormalUnpacked;
+    public float[] reflection;
     // Height scale in internal units
     public Float heightScale = 0.005f;
     public Vector2 heightSize = new Vector2();
@@ -152,6 +148,7 @@ public class TextureComponent implements IObserver {
     }
 
     public Material initMaterial(AssetManager manager, Material base, Material ring, float[] cc, boolean culling) {
+        SkyboxComponent.prepareSkybox();
         this.material = base;
         if (base != null && material.get(TextureAttribute.Diffuse) == null) {
             Texture tex = manager.get(baseUnpacked, Texture.class);
@@ -202,6 +199,11 @@ public class TextureComponent implements IObserver {
         if (!culling) {
             material.set(new IntAttribute(IntAttribute.CullFace, GL20.GL_NONE));
         }
+        if (reflection != null) {
+            SkyboxComponent.prepareSkybox();
+            material.set(new CubemapAttribute(CubemapAttribute.EnvironmentMap, SkyboxComponent.skybox));
+            material.set(new ColorAttribute(ColorAttribute.Reflection, reflection[0], reflection[1], reflection[2], 1f));
+        }
 
         return material;
     }
@@ -212,7 +214,7 @@ public class TextureComponent implements IObserver {
             final int M = GlobalConf.scene.GRAPHICS_QUALITY.texHeightTarget;
 
             Pair<float[][], Pixmap> pair = ec.generateElevation(N, M, heightScale);
-            float [][] data = pair.getFirst();
+            float[][] data = pair.getFirst();
             Pixmap pixmap = pair.getSecond();
 
             Gdx.app.postRunnable(() -> {
@@ -299,13 +301,26 @@ public class TextureComponent implements IObserver {
         this.heightScale = (float) (heightScale * Constants.KM_TO_U);
     }
 
-
     public void setColoriftex(Boolean coloriftex) {
         this.coloriftex = coloriftex;
     }
 
-    public void setElevation(ElevationComponent ec){
+    public void setElevation(ElevationComponent ec) {
         this.ec = ec;
+    }
+
+    public void setReflection(Double reflection) {
+        float r = reflection.floatValue();
+        this.reflection = new float[] { r, r, r };
+    }
+
+    public void setReflection(double[] reflection) {
+        if (reflection.length > 1) {
+            this.reflection = new float[] { (float) reflection[0], (float) reflection[1], (float) reflection[2] };
+        } else {
+            float r = (float) reflection[0];
+            this.reflection = new float[] { r, r, r };
+        }
     }
 
     public boolean hasHeight() {
@@ -383,9 +398,9 @@ public class TextureComponent implements IObserver {
                             if (height.endsWith(GEN_HEIGHT_KEYWORD))
                                 initializeGenElevationData();
                             else {
-                                if(this.material.has(TextureExtAttribute.Height)) {
+                                if (this.material.has(TextureExtAttribute.Height)) {
                                     initializeElevationData(((TextureAttribute) this.material.get(TextureExtAttribute.Height)).textureDescription.texture);
-                                }else if(AssetBean.manager().isLoaded(heightUnpacked)){
+                                } else if (AssetBean.manager().isLoaded(heightUnpacked)) {
                                     if (!height.endsWith(GEN_HEIGHT_KEYWORD)) {
                                         Texture tex = AssetBean.manager().get(heightUnpacked, Texture.class);
                                         if (!GlobalConf.scene.ELEVATION_TYPE.isNone()) {

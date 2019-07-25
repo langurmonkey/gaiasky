@@ -5,6 +5,7 @@
 
 package gaia.cu9.ari.gaiaorbit.util.color;
 
+import com.badlogic.gdx.graphics.Color;
 import gaia.cu9.ari.gaiaorbit.util.math.MathUtilsd;
 
 public class ColourUtils {
@@ -420,6 +421,10 @@ public class ColourUtils {
 
     public static int getBlue(int rgb) {
         return (rgb >> 0) & 0xFF;
+    }
+
+    public static boolean isZero(Color c){
+        return c.r == 0 && c.g == 0 && c.b == 0;
     }
 
 }
