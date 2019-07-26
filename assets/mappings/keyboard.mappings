@@ -13,6 +13,7 @@ action.help                                 = H
 
 # Exit
 action.exit                                 = ESC
+action.exit                                 = CTRL_L Q
 
 # Home
 action.home                                 = HOME

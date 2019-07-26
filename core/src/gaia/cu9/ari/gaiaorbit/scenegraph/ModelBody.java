@@ -377,7 +377,7 @@ public abstract class ModelBody extends CelestialBody {
     @Override
     public double getHeight(Vector3d camPos, Vector3d nextPos) {
         double height = 0;
-        if(mc != null && mc.tc != null && mc.tc.heightMap != null) {
+        if(mc != null && mc.mtc != null && mc.mtc.heightMap != null) {
             double dCam;
             Vector3d cart = aux3d1.get();
             if (nextPos != null) {
@@ -389,10 +389,10 @@ public abstract class ModelBody extends CelestialBody {
                 dCam = distToCamera;
             }
             // Only when we have height map and we are below the highest point in the surface
-            if (dCam < getRadius() + mc.tc.heightScale * GlobalConf.scene.ELEVATION_MULTIPLIER * 4) {
-                float[][] m = mc.tc.heightMap;
-                int W = mc.tc.heightMap.length;
-                int H = mc.tc.heightMap[0].length;
+            if (dCam < getRadius() + mc.mtc.heightScale * GlobalConf.scene.ELEVATION_MULTIPLIER * 4) {
+                float[][] m = mc.mtc.heightMap;
+                int W = mc.mtc.heightMap.length;
+                int H = mc.mtc.heightMap[0].length;
 
                 // Object-camera normalised vector
                 cart.scl(-1).add(camPos).nor();
@@ -436,8 +436,8 @@ public abstract class ModelBody extends CelestialBody {
     }
 
     public double getHeightScale(){
-        if (mc != null && mc.tc != null && mc.tc.heightMap != null){
-            return mc.tc.heightScale;
+        if (mc != null && mc.mtc != null && mc.mtc.heightMap != null){
+            return mc.mtc.heightScale;
         }
         return 0;
     }

@@ -86,7 +86,7 @@ public class ModelComponent implements Disposable, IObserver {
      * COMPONENTS
      */
     // Texture
-    public TextureComponent tc;
+    public MaterialComponent mtc;
     // Relativistic effects
     public RelativisticEffectsComponent rec;
 
@@ -121,9 +121,9 @@ public class ModelComponent implements Disposable, IObserver {
             }
         }
 
-        if ((forceInit || !GlobalConf.scene.LAZY_TEXTURE_INIT) && tc != null) {
-            tc.initialize();
-            tc.texLoading = true;
+        if ((forceInit || !GlobalConf.scene.LAZY_TEXTURE_INIT) && mtc != null) {
+            mtc.initialize();
+            mtc.texLoading = true;
         }
 
         rec = new RelativisticEffectsComponent();
@@ -161,10 +161,10 @@ public class ModelComponent implements Disposable, IObserver {
         }
 
         // INITIALIZE MATERIAL
-        if ((forceInit || !GlobalConf.scene.LAZY_TEXTURE_INIT) && tc != null) {
-            tc.initMaterial(manager, materials.get("base"), materials.get("ring"), cc, culling);
-            tc.texLoading = false;
-            tc.texInitialised = true;
+        if ((forceInit || !GlobalConf.scene.LAZY_TEXTURE_INIT) && mtc != null) {
+            mtc.initMaterial(manager, materials.get("base"), materials.get("ring"), cc, culling);
+            mtc.texLoading = false;
+            mtc.texInitialised = true;
         }
 
         // CREATE MAIN MODEL INSTANCE
@@ -173,7 +173,7 @@ public class ModelComponent implements Disposable, IObserver {
         }
 
         // COLOR IF NO TEXTURE
-        if (tc == null && instance != null) {
+        if (mtc == null && instance != null) {
             addColorToMat();
         }
         // Subscribe to new graphics quality setting event
@@ -234,20 +234,20 @@ public class ModelComponent implements Disposable, IObserver {
      * Initialises the model or texture if LAZY_X_INIT is on
      */
     public void touch(Matrix4 localTransform) {
-        if (GlobalConf.scene.LAZY_TEXTURE_INIT && tc != null && !tc.texInitialised) {
-            if (tc != null) {
-                if (!tc.texLoading) {
-                    logger.info(I18n.bundle.format("notif.loading", tc.getTexturesString()));
-                    tc.initialize(manager);
-                    tc.texLoading = true;
-                } else if (tc.isFinishedLoading(manager)) {
+        if (GlobalConf.scene.LAZY_TEXTURE_INIT && mtc != null && !mtc.texInitialised) {
+            if (mtc != null) {
+                if (!mtc.texLoading) {
+                    logger.info(I18n.bundle.format("notif.loading", mtc.getTexturesString()));
+                    mtc.initialize(manager);
+                    mtc.texLoading = true;
+                } else if (mtc.isFinishedLoading(manager)) {
                     Gdx.app.postRunnable(() -> {
-                        tc.initMaterial(manager, instance, cc, culling);
+                        mtc.initMaterial(manager, instance, cc, culling);
                         // Set to initialised
                         updateStaticLight();
                     });
-                    tc.texLoading = false;
-                    tc.texInitialised = true;
+                    mtc.texLoading = false;
+                    mtc.texInitialised = true;
                 }
             } else if (localTransform == null) {
                 // Use color if necessary
@@ -272,7 +272,7 @@ public class ModelComponent implements Disposable, IObserver {
                 updateStaticLight();
 
                 // COLOR IF NO TEXTURE
-                if (tc == null && instance != null) {
+                if (mtc == null && instance != null) {
                     addColorToMat();
                 }
 
@@ -381,8 +381,8 @@ public class ModelComponent implements Disposable, IObserver {
         this.type = type;
     }
 
-    public void setTexture(TextureComponent tc) {
-        this.tc = tc;
+    public void setMaterial(MaterialComponent mtc) {
+        this.mtc = mtc;
     }
 
     /**
@@ -473,7 +473,7 @@ public class ModelComponent implements Disposable, IObserver {
     }
 
     public boolean hasHeight() {
-        return tc != null && tc.hasHeight();
+        return mtc != null && mtc.hasHeight();
     }
 
     @Override
@@ -481,10 +481,10 @@ public class ModelComponent implements Disposable, IObserver {
         switch (event) {
         case GRAPHICS_QUALITY_UPDATED:
             Gdx.app.postRunnable(() -> {
-                if (tc != null && tc.texInitialised) {
+                if (mtc != null && mtc.texInitialised) {
                     // Remove current textures
-                    if (tc != null)
-                        tc.disposeTextures(this.manager);
+                    if (mtc != null)
+                        mtc.disposeTextures(this.manager);
                 }
             });
             break;

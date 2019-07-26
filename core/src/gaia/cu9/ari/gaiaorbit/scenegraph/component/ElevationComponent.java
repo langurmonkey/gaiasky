@@ -112,7 +112,7 @@ public class ElevationComponent {
     }
 
     /**
-     * Only if height is {@link TextureComponent#GEN_HEIGHT_KEYWORD}
+     * Only if height is {@link MaterialComponent#GEN_HEIGHT_KEYWORD}
      *
      * @param noiseSize Size of the sampling area
      */

@@ -11,7 +11,7 @@ import gaia.cu9.ari.gaiaorbit.GaiaSky;
 import gaia.cu9.ari.gaiaorbit.render.ComponentTypes.ComponentType;
 import gaia.cu9.ari.gaiaorbit.scenegraph.camera.ICamera;
 import gaia.cu9.ari.gaiaorbit.scenegraph.component.ModelComponent;
-import gaia.cu9.ari.gaiaorbit.scenegraph.component.TextureComponent;
+import gaia.cu9.ari.gaiaorbit.scenegraph.component.MaterialComponent;
 import gaia.cu9.ari.gaiaorbit.util.coord.StaticCoordinates;
 import gaia.cu9.ari.gaiaorbit.util.gdx.mesh.IntMesh;
 import gaia.cu9.ari.gaiaorbit.util.gdx.shader.ExtShaderProgram;
@@ -49,9 +49,9 @@ public class BillboardGalaxy extends Billboard {
         Map<String, Object> params = new HashMap<>();
         params.put("diameter", 1.0);
         mc.setParams(params);
-        TextureComponent tc = new TextureComponent();
-        tc.setBase(tex);
-        mc.setTexture(tc);
+        MaterialComponent mtc = new MaterialComponent();
+        mtc.setBase(tex);
+        mc.setMaterial(mtc);
         setModel(mc);
     }
 

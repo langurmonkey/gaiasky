@@ -31,12 +31,12 @@ import gaia.cu9.ari.gaiaorbit.util.gdx.shader.TextureExtAttribute;
 import gaia.cu9.ari.gaiaorbit.util.gdx.shader.Vector2Attribute;
 
 /**
- * A basic component that contains the info on the textures.
+ * A basic component that contains the info on a material.
  *
  * @author Toni Sagrista
  */
-public class TextureComponent implements IObserver {
-    private static final Log logger = Logger.getLogger(TextureComponent.class);
+public class MaterialComponent implements IObserver {
+    private static final Log logger = Logger.getLogger(MaterialComponent.class);
 
     /** Generated height keyword **/
     public static final String GEN_HEIGHT_KEYWORD = "generate";
@@ -55,23 +55,28 @@ public class TextureComponent implements IObserver {
         textureParams.minFilter = TextureFilter.Linear;
     }
 
+    // TEXTURES
     public boolean texInitialised, texLoading;
     public String base, specular, normal, night, ring, height, ringnormal;
     public String baseUnpacked, specularUnpacked, normalUnpacked, nightUnpacked, ringUnpacked, heightUnpacked, ringnormalUnpacked;
+
+    // SPECULAR
     public float specularIndex = -1;
     public float[] reflection;
-    // Height scale in internal units
+
+    // HEIGHT
     public Float heightScale = 0.005f;
     public Vector2 heightSize = new Vector2();
     public float[][] heightMap;
     public ElevationComponent ec;
 
+    /** The actual material **/
     private Material material, ringMaterial;
 
     /** Add also color even if texture is present **/
     public boolean coloriftex = false;
 
-    public TextureComponent() {
+    public MaterialComponent() {
         super();
         EventManager.instance.subscribe(this, Events.ELEVATION_TYPE_CMD, Events.ELEVATION_MUTLIPLIER_CMD, Events.TESSELLATION_QUALITY_CMD);
     }

@@ -132,7 +132,7 @@
       "type": "data-pack",
       "version": 3,
       "mingsversion": 20200,
-      "size": 64482040,
+      "size": 64486802,
       "check": "data-main.json",
       "data": [
         "asteroids-dr2.json",
@@ -180,7 +180,7 @@
         "tex/base/telescopebeam.png",
         "tex/skybox/gaiasky"
       ],
-      "sha256": "92404f09e2d9149c1be6f675f3037f8751bdaf4acdc9dcb54a35c18dd2bb3fa2",
+      "sha256": "6fb0bdc2e983fb36dd6e82010fb96cee167531d3fe313349cc3b5602ba23073b",
       "description": "Default data pack for Gaia Sky - For Gaia Sky 2.2.0 and above. Contains the Solar System, constellations, meshes and more",
       "file": "http://gaia.ari.uni-heidelberg.de/gaiasky/files/autodownload/basedata/004_20190614_v020200/gaiasky_data.tar.gz"
     },
@@ -505,6 +505,21 @@
       "description": "Nebulae - A few nebulae with textures",
       "sha256": "36586bb45b2560f49ff0eb44dc0cfe9fd719e052a0411c3283d43f552c5e33d6",
       "file": "http://gaia.ari.uni-heidelberg.de/gaiasky/files/autodownload/nebulae/001_20181129/nebulae.tar.gz"
+    },
+    {
+      "name": "catalog-nebulae",
+      "type": "catalog",
+      "version": 1,
+      "mingsversion": 20200,
+      "size": 15407613,
+      "check": "autoload-nebulae.json",
+      "data": [
+        "autoload-nebulae.json",
+        "tex/nebulae"
+      ],
+      "description": "Nebulae - A few nebulae with textures",
+      "sha256": "b303f8988e5d4e5f1e5da19297b71c6f11a93fdcf6105f4a37008cdeb8b3d3f8",
+      "file": "http://gaia.ari.uni-heidelberg.de/gaiasky/files/autodownload/nebulae/002_20190726/nebulae.tar.gz"
     },
     {
       "name": "mesh-dr2-hot-very",
