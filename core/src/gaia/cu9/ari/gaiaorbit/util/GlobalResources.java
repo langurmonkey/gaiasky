@@ -647,18 +647,19 @@ public class GlobalResources {
     /**
      * Converts a string array into a string, optionally quoting each entry and with
      * a given separator.
-     * @param l The list
-     * @param quote The quote string to use
+     *
+     * @param l         The list
+     * @param quote     The quote string to use
      * @param separator The separator
      * @return The resulting string
      */
-    public static String toString(String[] l, String quote, String separator){
+    public static String toString(String[] l, String quote, String separator) {
         if (l == null || l.length == 0)
             return null;
 
-        if(quote == null)
+        if (quote == null)
             quote = "";
-        if(separator == null)
+        if (separator == null)
             separator = "";
 
         StringBuilder sb = new StringBuilder();
@@ -689,8 +690,21 @@ public class GlobalResources {
         }
     }
 
+    public static String unpackSkyboxSide(String skyboxLoc, String side) throws RuntimeException {
+        FileHandle loc = GlobalConf.data.dataFileHandle(skyboxLoc);
+        FileHandle[] files = loc.list();
+        for (FileHandle file : files) {
+            if (file.name().contains("_" + side + ".")) {
+                // Found!
+                return file.file().getAbsolutePath();
+            }
+        }
+        throw new RuntimeException("Skybox side '" + side + "' not found in folder: " + skyboxLoc);
+    }
+
     private static IntBuffer buf = BufferUtils.newIntBuffer(16);
-    public static synchronized String getGLExtensions(){
+
+    public static synchronized String getGLExtensions() {
         String extensions = Gdx.gl.glGetString(GL30.GL_EXTENSIONS);
         if (extensions == null || extensions.isEmpty()) {
             Gdx.gl.glGetIntegerv(GL30.GL_NUM_EXTENSIONS, buf);

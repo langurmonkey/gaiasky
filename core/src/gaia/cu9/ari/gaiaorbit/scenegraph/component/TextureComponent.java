@@ -9,7 +9,10 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.assets.loaders.TextureLoader.TextureParameter;
 import com.badlogic.gdx.files.FileHandle;
-import com.badlogic.gdx.graphics.*;
+import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.graphics.GL20;
+import com.badlogic.gdx.graphics.Pixmap;
+import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.Texture.TextureFilter;
 import com.badlogic.gdx.graphics.g3d.Attribute;
 import com.badlogic.gdx.graphics.g3d.Material;
@@ -40,7 +43,6 @@ public class TextureComponent implements IObserver {
     /** Default texture parameters **/
     protected static final TextureParameter textureParamsMipMap, textureParams;
 
-
     static {
         textureParamsMipMap = new TextureParameter();
         textureParamsMipMap.genMipMaps = true;
@@ -56,6 +58,7 @@ public class TextureComponent implements IObserver {
     public boolean texInitialised, texLoading;
     public String base, specular, normal, night, ring, height, ringnormal;
     public String baseUnpacked, specularUnpacked, normalUnpacked, nightUnpacked, ringUnpacked, heightUnpacked, ringnormalUnpacked;
+    public float specularIndex = -1;
     public float[] reflection;
     // Height scale in internal units
     public Float heightScale = 0.005f;
@@ -147,9 +150,9 @@ public class TextureComponent implements IObserver {
         return initMaterial(manager, instance.materials.get(0), instance.materials.size > 1 ? instance.materials.get(1) : null, cc, culling);
     }
 
-    public Material initMaterial(AssetManager manager, Material base, Material ring, float[] cc, boolean culling) {
+    public Material initMaterial(AssetManager manager, Material mat, Material ring, float[] cc, boolean culling) {
         SkyboxComponent.prepareSkybox();
-        this.material = base;
+        this.material = mat;
         if (base != null && material.get(TextureAttribute.Diffuse) == null) {
             Texture tex = manager.get(baseUnpacked, Texture.class);
             material.set(new TextureAttribute(TextureAttribute.Diffuse, tex));
@@ -166,8 +169,16 @@ public class TextureComponent implements IObserver {
         if (specular != null && material.get(TextureAttribute.Specular) == null) {
             Texture tex = manager.get(specularUnpacked, Texture.class);
             material.set(new TextureAttribute(TextureAttribute.Specular, tex));
-            // Control amount of specularity
-            material.set(new ColorAttribute(ColorAttribute.Specular, 0.5f, 0.5f, 0.5f, 1f));
+            if (specularIndex < 0)
+                material.set(new ColorAttribute(ColorAttribute.Specular, 0.5f, 0.5f, 0.5f, 1f));
+        }
+        if (material.get(ColorAttribute.Specular) == null) {
+            if (specularIndex >= 0) {
+                // Control amount of specularity with specular index
+                material.set(new ColorAttribute(ColorAttribute.Specular, specularIndex, specularIndex, specularIndex, 1f));
+            } else {
+                material.set(new ColorAttribute(ColorAttribute.Specular, 0, 0, 0, 1f));
+            }
         }
         if (night != null && material.get(TextureExtAttribute.Night) == null) {
             Texture tex = manager.get(nightUnpacked, Texture.class);
@@ -275,6 +286,10 @@ public class TextureComponent implements IObserver {
 
     public void setSpecular(String specular) {
         this.specular = GlobalConf.data.dataFile(specular);
+    }
+
+    public void setSpecular(Double specular) {
+        this.specularIndex = specular.floatValue();
     }
 
     public void setNormal(String normal) {

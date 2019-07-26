@@ -250,8 +250,9 @@ void main() {
     #ifdef environmentCubemapFlag
     env = texture(u_environmentCubemap, reflectDir).rgb;
     #ifdef reflectionColorFlag
-    env = saturate(env * u_reflectionColor.rgb);
+    env = env * u_reflectionColor.rgb;
     #endif // reflectionColorFlag
+    env = pow(env * diffuse.rgb, vec3(0.5));
     #endif // environmentCubemapFlag
 
     float shdw = clamp(getShadow(), 0.2, 1.0);

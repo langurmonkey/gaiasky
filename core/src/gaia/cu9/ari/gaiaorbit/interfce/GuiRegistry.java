@@ -237,7 +237,7 @@ public class GuiRegistry implements IObserver {
         super();
         this.skin = skin;
         // Windows which are visible from any GUI
-        EventManager.instance.subscribe(this, Events.QUIT_ACTION, Events.SHOW_ABOUT_ACTION, Events.SHOW_LOAD_CATALOG_ACTION, Events.SHOW_PREFERENCES_ACTION, Events.SHOW_KEYFRAMES_WINDOW_ACTION, Events.UI_THEME_RELOAD_INFO, Events.TOGGLE_MINIMAP, Events.MODE_POPUP_CMD, Events.DISPLAY_GUI_CMD);
+        EventManager.instance.subscribe(this, Events.QUIT_ACTION, Events.SHOW_ABOUT_ACTION, Events.SHOW_LOAD_CATALOG_ACTION, Events.SHOW_PREFERENCES_ACTION, Events.SHOW_KEYFRAMES_WINDOW_ACTION, Events.UI_THEME_RELOAD_INFO, Events.TOGGLE_MINIMAP, Events.MODE_POPUP_CMD, Events.DISPLAY_GUI_CMD, Events.CAMERA_MODE_CMD);
     }
 
     public void dispose() {
@@ -263,6 +263,9 @@ public class GuiRegistry implements IObserver {
                         quit.show(ui);
                     }
                 }
+                break;
+            case CAMERA_MODE_CMD:
+                removeModeChangePopup();
                 break;
             case SHOW_ABOUT_ACTION:
                 (new AboutWindow(ui, skin)).show(ui);

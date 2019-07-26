@@ -625,7 +625,10 @@ public class GlobalConf {
          **/
         public boolean REAL_GAIA_ATTITUDE;
 
-        public void initialize(String dATA_LOCATION, String cATALOG_JSON_FILE, String oBJECTS_JSON_FILE, float lIMIT_MAG_LOAD, boolean rEAL_GAIA_ATTITUDE, boolean hIGH_ACCURACY_POSITIONS) {
+        /** Location of the skybox within the data folder (data/tex/skybox/[...]/) **/
+        public String SKYBOX_LOCATION;
+
+        public void initialize(String dATA_LOCATION, String cATALOG_JSON_FILE, String oBJECTS_JSON_FILE, float lIMIT_MAG_LOAD, boolean rEAL_GAIA_ATTITUDE, boolean hIGH_ACCURACY_POSITIONS, String sKYBOX_LOCATION) {
 
             DATA_LOCATION = dATA_LOCATION;
             CATALOG_JSON_FILES = cATALOG_JSON_FILE;
@@ -633,6 +636,7 @@ public class GlobalConf {
             LIMIT_MAG_LOAD = lIMIT_MAG_LOAD;
             REAL_GAIA_ATTITUDE = rEAL_GAIA_ATTITUDE;
             HIGH_ACCURACY_POSITIONS = hIGH_ACCURACY_POSITIONS;
+            SKYBOX_LOCATION = sKYBOX_LOCATION;
         }
 
         public void initialize(String cATALOG_JSON_FILE, String oBJECTS_JSON_FILE, boolean dATA_SOURCE_LOCAL, float lIMIT_MAG_LOAD) {

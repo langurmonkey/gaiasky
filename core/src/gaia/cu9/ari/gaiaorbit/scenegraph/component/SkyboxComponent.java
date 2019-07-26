@@ -10,20 +10,20 @@ import com.badlogic.gdx.assets.loaders.TextureLoader.TextureParameter;
 import com.badlogic.gdx.graphics.Cubemap;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.Texture.TextureFilter;
+import com.badlogic.gdx.graphics.TextureData;
 import gaia.cu9.ari.gaiaorbit.data.AssetBean;
 import gaia.cu9.ari.gaiaorbit.util.GlobalConf;
 import gaia.cu9.ari.gaiaorbit.util.GlobalResources;
+import gaia.cu9.ari.gaiaorbit.util.I18n;
+import gaia.cu9.ari.gaiaorbit.util.Logger;
+import gaia.cu9.ari.gaiaorbit.util.Logger.Log;
 
 public class SkyboxComponent {
+    private static Log logger = Logger.getLogger(SkyboxComponent.class);
 
     public static Cubemap skybox;
     protected static boolean skyboxLoad = false;
-    protected static String skyboxBack = "data/tex/skybox/stars/stars_bk.jpg";
-    protected static String skyboxFront = "data/tex/skybox/stars/stars_ft.jpg";
-    protected static String skyboxUp = "data/tex/skybox/stars/stars_up.jpg";
-    protected static String skyboxDown = "data/tex/skybox/stars/stars_dn.jpg";
-    protected static String skyboxRight = "data/tex/skybox/stars/stars_rt.jpg";
-    protected static String skyboxLeft = "data/tex/skybox/stars/stars_lf.jpg";
+    protected static String skyboxBack, skyboxFront, skyboxUp, skyboxDown, skyboxRight, skyboxLeft;
 
     public synchronized static void initSkybox() {
         if (!skyboxLoad) {
@@ -32,25 +32,38 @@ public class SkyboxComponent {
             textureParams.magFilter = TextureFilter.Linear;
             textureParams.minFilter = TextureFilter.Linear;
             skyboxLoad = true;
-            addToLoad(skyboxBack = GlobalConf.data.dataFile(skyboxBack), textureParams);
-            addToLoad(skyboxFront = GlobalConf.data.dataFile(skyboxFront), textureParams);
-            addToLoad(skyboxUp = GlobalConf.data.dataFile(skyboxUp), textureParams);
-            addToLoad(skyboxDown = GlobalConf.data.dataFile(skyboxDown), textureParams);
-            addToLoad(skyboxRight = GlobalConf.data.dataFile(skyboxRight), textureParams);
-            addToLoad(skyboxLeft = GlobalConf.data.dataFile(skyboxLeft), textureParams);
+            try {
+                String skbLoc = GlobalConf.data.SKYBOX_LOCATION;
+                logger.info(I18n.txt("notif.loading", " skybox: " + skbLoc));
+                skyboxBack = GlobalResources.unpackSkyboxSide(skbLoc, "bk");
+                skyboxFront = GlobalResources.unpackSkyboxSide(skbLoc, "ft");
+                skyboxUp = GlobalResources.unpackSkyboxSide(skbLoc, "up");
+                skyboxDown = GlobalResources.unpackSkyboxSide(skbLoc, "dn");
+                skyboxRight = GlobalResources.unpackSkyboxSide(skbLoc, "rt");
+                skyboxLeft = GlobalResources.unpackSkyboxSide(skbLoc, "lf");
+
+                addToLoad(skyboxBack, textureParams);
+                addToLoad(skyboxFront, textureParams);
+                addToLoad(skyboxUp, textureParams);
+                addToLoad(skyboxDown, textureParams);
+                addToLoad(skyboxRight, textureParams);
+                addToLoad(skyboxLeft, textureParams);
+            }catch(RuntimeException e){
+                logger.error(e, "Error loading skybox: " + GlobalConf.data.SKYBOX_LOCATION);
+            }
         }
     }
 
     public synchronized static void prepareSkybox() {
         if (skybox == null) {
             AssetManager m = AssetBean.manager();
-            Texture bk = m.get(skyboxBack, Texture.class);
-            Texture ft = m.get(skyboxFront, Texture.class);
-            Texture up = m.get(skyboxUp, Texture.class);
-            Texture dn = m.get(skyboxDown, Texture.class);
-            Texture rt = m.get(skyboxRight, Texture.class);
-            Texture lf = m.get(skyboxLeft, Texture.class);
-            skybox = new Cubemap(bk.getTextureData(), ft.getTextureData(), up.getTextureData(), dn.getTextureData(), rt.getTextureData(), lf.getTextureData());
+            TextureData bk = m.get(skyboxBack, Texture.class).getTextureData();
+            TextureData ft = m.get(skyboxFront, Texture.class).getTextureData();
+            TextureData up = m.get(skyboxUp, Texture.class).getTextureData();
+            TextureData dn = m.get(skyboxDown, Texture.class).getTextureData();
+            TextureData rt = m.get(skyboxRight, Texture.class).getTextureData();
+            TextureData lf = m.get(skyboxLeft, Texture.class).getTextureData();
+            skybox = new Cubemap(rt, lf, up, dn, ft, bk);
         }
     }
     /**

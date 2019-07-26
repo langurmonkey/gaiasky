@@ -330,7 +330,11 @@ void main() {
     v_viewDir = normalize(-pos.xyz * TBN);
 
     #ifdef environmentCubemapFlag
-    v_reflect = reflect(-v_viewDir, g_normal);
+    #ifdef normalTextureFlag
+    v_reflect = reflect(v_viewDir, g_normal);
+    #else
+    v_reflect = reflect(-pos.xyz, g_normal);
+    #endif // normalTextureFlag
     #endif // environmentCubemapFlag
 
     pushColor(g_color);

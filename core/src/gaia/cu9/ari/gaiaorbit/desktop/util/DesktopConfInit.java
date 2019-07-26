@@ -166,7 +166,9 @@ public class DesktopConfInit extends ConfInit {
         } else {
             LIMIT_MAG_LOAD = Float.MAX_VALUE;
         }
-        dc.initialize(DATA_LOCATION, CATALOG_JSON_FILE, OBJECTS_JSON_FILE, LIMIT_MAG_LOAD, REAL_GAIA_ATTITUDE, HIGH_ACCURACY_POSITIONS);
+        String SKYBOX_LOCATION = p.getProperty("data.skybox.location", "data/tex/skybox/stars/");
+
+        dc.initialize(DATA_LOCATION, CATALOG_JSON_FILE, OBJECTS_JSON_FILE, LIMIT_MAG_LOAD, REAL_GAIA_ATTITUDE, HIGH_ACCURACY_POSITIONS, SKYBOX_LOCATION);
 
         /** PROGRAM CONF **/
         ProgramConf prc = new ProgramConf();
@@ -417,6 +419,7 @@ public class DesktopConfInit extends ConfInit {
         p.setProperty("data.limit.mag", Float.toString(GlobalConf.data.LIMIT_MAG_LOAD));
         p.setProperty("data.attitude.real", Boolean.toString(GlobalConf.data.REAL_GAIA_ATTITUDE));
         p.setProperty("data.highaccuracy.positions", Boolean.toString(GlobalConf.data.HIGH_ACCURACY_POSITIONS));
+        p.setProperty("data.skybox.location", GlobalConf.data.SKYBOX_LOCATION);
 
         /** SCREEN **/
         p.setProperty("graphics.screen.width", Integer.toString(Gdx.graphics.isFullscreen() ? GlobalConf.screen.SCREEN_WIDTH : Gdx.graphics.getWidth()));
