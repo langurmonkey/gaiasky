@@ -480,8 +480,7 @@ public class DownloadDataWindow extends GenericDialog {
                     // Select dataset if needed
                     if (type.startsWith("catalog-")) {
                         // Descriptor file
-                        FileHandle descFile = Gdx.files.absolute(GlobalConf.data.DATA_LOCATION + File.separator + currentDataset.check);
-                        GlobalConf.data.CATALOG_JSON_FILES = descFile.path();
+                        GlobalConf.data.CATALOG_JSON_FILES = currentDataset.check.toString();
                     }
 
                     setMessageOk(I18n.txt("gui.download.idle"));
