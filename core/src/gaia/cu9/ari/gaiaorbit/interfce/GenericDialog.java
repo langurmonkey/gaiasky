@@ -157,7 +157,7 @@ public abstract class GenericDialog extends CollapsibleWindow {
         me.addListener(event -> {
             if (event instanceof InputEvent) {
                 InputEvent ievent = (InputEvent) event;
-                if (ievent.getType() == Type.keyUp) {
+                if (!ievent.isHandled() && ievent.getType() == Type.keyUp) {
                     int key = ievent.getKeyCode();
                     switch (key) {
                     case Keys.ESCAPE:

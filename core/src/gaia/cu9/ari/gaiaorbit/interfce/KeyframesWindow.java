@@ -14,7 +14,7 @@ import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.*;
-import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
+import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener.ChangeEvent;
 import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.Array;
 import gaia.cu9.ari.gaiaorbit.desktop.util.SysUtils;
@@ -242,7 +242,7 @@ public class KeyframesWindow extends GenericDialog implements IObserver {
         right = new Table(skin);
         right.align(Align.top | Align.left);
 
-        /** LEFT - CONTROLS **/
+        /* LEFT - CONTROLS */
 
         // ADD
         OwnTextIconButton addKeyframe = new OwnTextIconButton(I18n.txt("gui.keyframes.add.end"), skin, "add");
@@ -250,7 +250,7 @@ public class KeyframesWindow extends GenericDialog implements IObserver {
         addKeyframe.pad(pad5);
         left.add(addKeyframe).left().colspan(2).padBottom(pad5).row();
         addKeyframe.addListener(event -> {
-            if (event instanceof ChangeListener.ChangeEvent) {
+            if (event instanceof ChangeEvent) {
                 // Add at end
                 return addKeyframe(-1);
             }
@@ -284,7 +284,7 @@ public class KeyframesWindow extends GenericDialog implements IObserver {
 
         left.pack();
 
-        /** RIGHT - KEYFRAMES **/
+        /* RIGHT - KEYFRAMES */
         OwnLabel keyframesTitle = new OwnLabel(I18n.txt("gui.keyframes.list"), skin, "hud-header");
 
         // KEYFRAMES TABLE
@@ -303,7 +303,45 @@ public class KeyframesWindow extends GenericDialog implements IObserver {
 
         right.pack();
 
-        /** ACTION BUTTONS **/
+        /* RENORMALIZE TIME */
+        OwnTextButton normalizeTime = new OwnTextButton(I18n.txt("gui.keyframes.normalize"), skin);
+        normalizeTime.addListener(new TextTooltip(I18n.txt("gui.tooltip.kf.normalize"), skin));
+        normalizeTime.pad(pad);
+        normalizeTime.addListener((event) -> {
+            if (event instanceof ChangeEvent) {
+                if (keyframes != null && keyframes.size > 2) {
+                    Vector3d aux = new Vector3d();
+                    int n = keyframes.size;
+                    double totalTime = 0;
+                    double totalDist = 0;
+                    for (int i = 1; i < n; i++) {
+                        Keyframe kf0 = keyframes.get(i - 1);
+                        Keyframe kf1 = keyframes.get(i);
+                        totalTime += kf1.seconds;
+                        totalDist += aux.set(kf1.pos).sub(kf0.pos).len();
+                    }
+                    // Loop over keyframes and assign new times
+                    for (int i = 1; i < n; i++) {
+                        Keyframe kf0 = keyframes.get(i - 1);
+                        Keyframe kf1 = keyframes.get(i);
+                        double dist = aux.set(kf1.pos).sub(kf0.pos).len();
+                        double frac = dist / totalDist;
+                        double time1 = totalTime * frac;
+                        kf1.seconds = time1;
+                    }
+                    // Reload window contents
+                    reinitialiseKeyframes(keyframes, null);
+                    keyframesPathObject.unselect();
+                    logger.info(I18n.txt("gui.keyframes.normalize.done"));
+
+                }
+                return true;
+            }
+            return false;
+        });
+
+
+        /* ACTION BUTTONS */
         HorizontalGroup buttons = new HorizontalGroup();
         buttons.space(pad);
 
@@ -312,7 +350,7 @@ public class KeyframesWindow extends GenericDialog implements IObserver {
         open.addListener(new TextTooltip(I18n.txt("gui.tooltip.kf.load"), skin));
         open.pad(pad5);
         open.addListener((event) -> {
-            if (event instanceof ChangeListener.ChangeEvent) {
+            if (event instanceof ChangeEvent) {
                 FileChooser fc = new FileChooser(I18n.txt("gui.download.pickloc"), skin, stage, new FileHandle(SysUtils.getDefaultCameraDir()), FileChooser.FileChooserTarget.FILES);
                 fc.setFileFilter(pathname -> pathname.getName().endsWith(".gkf"));
                 fc.setAcceptedFiles("*.gkf");
@@ -358,7 +396,7 @@ public class KeyframesWindow extends GenericDialog implements IObserver {
         save.addListener(new TextTooltip(I18n.txt("gui.tooltip.kf.save"), skin));
         save.pad(pad5);
         save.addListener((event) -> {
-            if (event instanceof ChangeListener.ChangeEvent) {
+            if (event instanceof ChangeEvent) {
                 String suggestedName = lastKeyframeFileName == null ? df.format(new Date()) + "_keyframes.gkf" : lastKeyframeFileName;
                 FileNameWindow fnw = new FileNameWindow(suggestedName, stage, skin);
                 OwnTextField textField = fnw.getFileNameField();
@@ -384,7 +422,7 @@ public class KeyframesWindow extends GenericDialog implements IObserver {
         export.addListener(new TextTooltip(I18n.txt("gui.tooltip.kf.export"), skin));
         export.pad(pad5);
         export.addListener((event) -> {
-            if (event instanceof ChangeListener.ChangeEvent) {
+            if (event instanceof ChangeEvent) {
                 String suggestedName = df.format(new Date()) + ".gsc";
                 FileNameWindow fnw = new FileNameWindow(suggestedName, stage, skin);
                 OwnTextField textField = fnw.getFileNameField();
@@ -407,13 +445,10 @@ public class KeyframesWindow extends GenericDialog implements IObserver {
         // Keyframe preferences
         Button preferences = new OwnTextIconButton(I18n.txt("gui.preferences"), skin, "preferences");
         preferences.setName("keyframe preferences");
-        preferences.padTop(pad5 / 2.5f);
-        preferences.padBottom(pad5 / 2.5f);
-        preferences.padRight(pad5);
-        preferences.padLeft(pad5);
+        preferences.pad(pad5);
         preferences.addListener(new TextTooltip(I18n.txt("gui.tooltip.kf.editprefs"), skin));
         preferences.addListener((event) -> {
-            if (event instanceof ChangeListener.ChangeEvent) {
+            if (event instanceof ChangeEvent) {
                 KeyframePreferencesWindow kpw = new KeyframePreferencesWindow(stage, skin);
                 kpw.setAcceptRunnable(() -> {
                     // Resample
@@ -434,16 +469,17 @@ public class KeyframesWindow extends GenericDialog implements IObserver {
 
         /** FINAL LAYOUT **/
         content.add(left).top().left().padRight(pad * 2f).padBottom(pad * 3f);
-        content.add(right).width(370 * GlobalConf.SCALE_FACTOR).top().left().padBottom(pad).row();
+        content.add(right).width(370f * GlobalConf.SCALE_FACTOR).top().left().padBottom(pad).row();
         notice = content.add();
-        notice.padBottom(pad).expandY().center().colspan(2).row();
+        notice.padBottom(pad * 2f).expandY().center().colspan(2).row();
+        content.add(normalizeTime).colspan(2).bottom().center().padBottom(pad).row();
         content.add(buttons).colspan(2).bottom().right().row();
 
         // CLEAR
         OwnTextButton clear = new OwnTextButton(I18n.txt("gui.clear"), skin);
         clear.setName("clear");
         clear.addListener((event) -> {
-            if (event instanceof ChangeListener.ChangeEvent) {
+            if (event instanceof ChangeEvent) {
                 Gdx.app.postRunnable(() -> {
                     clean();
                 });
@@ -457,14 +493,13 @@ public class KeyframesWindow extends GenericDialog implements IObserver {
         OwnTextButton hide = new OwnTextButton(I18n.txt("gui.hide"), skin);
         hide.setName("hide");
         hide.addListener((event) -> {
-            if (event instanceof ChangeListener.ChangeEvent) {
+            if (event instanceof ChangeEvent) {
                 hide();
                 return true;
             }
             return false;
         });
         buttonGroup.addActorAt(1, hide);
-
 
         recalculateButtonSize();
 
@@ -711,7 +746,6 @@ public class KeyframesWindow extends GenericDialog implements IObserver {
         return nameCell;
     }
 
-
     private void addKeyframeToTable(Keyframe kf, double prevT, int index, Table table, boolean addToModel) {
 
         // Seconds
@@ -748,7 +782,7 @@ public class KeyframesWindow extends GenericDialog implements IObserver {
         goTo.setSize(buttonSize, buttonSize);
         goTo.addListener(new TextTooltip(I18n.txt("gui.tooltip.kf.goto"), skin));
         goTo.addListener((event) -> {
-            if (event instanceof ChangeListener.ChangeEvent) {
+            if (event instanceof ChangeEvent) {
                 // Go to keyframe
                 EventManager.instance.post(Events.CAMERA_MODE_CMD, CameraManager.CameraMode.FREE_MODE);
                 Gdx.app.postRunnable(() -> {
@@ -770,7 +804,7 @@ public class KeyframesWindow extends GenericDialog implements IObserver {
         seam.setChecked(kf.seam);
         seam.addListener(new TextTooltip(I18n.txt("gui.tooltip.kf.seam"), skin));
         seam.addListener((event) -> {
-            if (event instanceof ChangeListener.ChangeEvent) {
+            if (event instanceof ChangeEvent) {
                 // Make seam
                 kf.seam = seam.isChecked();
                 Gdx.app.postRunnable(() -> {
@@ -795,7 +829,7 @@ public class KeyframesWindow extends GenericDialog implements IObserver {
         addKeyframe.setSize(buttonSizeL, buttonSize);
         addKeyframe.addListener(new TextTooltip(I18n.txt("gui.tooltip.kf.add.after"), skin));
         addKeyframe.addListener(event -> {
-            if (event instanceof ChangeListener.ChangeEvent) {
+            if (event instanceof ChangeEvent) {
                 // Work out keyframe properties
                 Keyframe k0, k1;
                 Vector3d pos, dir, up;
@@ -831,7 +865,7 @@ public class KeyframesWindow extends GenericDialog implements IObserver {
         rubbish.setSize(buttonSizeL, buttonSize);
         rubbish.addListener(new TextTooltip(I18n.txt("gui.tooltip.kf.remove"), skin));
         rubbish.addListener((event) -> {
-            if (event instanceof ChangeListener.ChangeEvent) {
+            if (event instanceof ChangeEvent) {
                 // Remove keyframe
                 Array<Keyframe> newKfs = new Array<>(keyframes.size - 1);
                 for (Keyframe k : keyframes) {
@@ -866,7 +900,7 @@ public class KeyframesWindow extends GenericDialog implements IObserver {
 
     }
 
-    private void addHighlightListener(Actor a, Keyframe kf){
+    private void addHighlightListener(Actor a, Keyframe kf) {
         a.addListener(event -> {
             if (event instanceof InputEvent) {
                 InputEvent ie = (InputEvent) event;
@@ -961,38 +995,38 @@ public class KeyframesWindow extends GenericDialog implements IObserver {
     @Override
     public void notify(Events event, Object... data) {
         switch (event) {
-            case KEYFRAME_ADD:
-                addKeyframe(-1);
-                break;
-            case UPDATE_CAM_RECORDER:
-                synchronized (lock) {
-                    t = (ITimeFrameProvider) data[0];
-                    pos = (Vector3d) data[1];
-                    dir = (Vector3d) data[2];
-                    up = (Vector3d) data[3];
-                }
-                break;
-            case KEYFRAMES_REFRESH:
-                reinitialiseKeyframes(keyframes, null);
-                break;
-            case KEYFRAME_SELECT:
-                Keyframe kf = (Keyframe) data[0];
-                OwnLabel nl = keyframeNames.get(kf);
-                if (nl != null) {
-                    colorBak = nl.getColor().cpy();
-                    nl.setColor(skin.getColor("theme"));
-                    scrollToKeyframe(kf);
-                }
-                break;
-            case KEYFRAME_UNSELECT:
-                kf = (Keyframe) data[0];
-                nl = keyframeNames.get(kf);
-                if (nl != null && colorBak != null) {
-                    nl.setColor(colorBak);
-                }
-                break;
-            default:
-                break;
+        case KEYFRAME_ADD:
+            addKeyframe(-1);
+            break;
+        case UPDATE_CAM_RECORDER:
+            synchronized (lock) {
+                t = (ITimeFrameProvider) data[0];
+                pos = (Vector3d) data[1];
+                dir = (Vector3d) data[2];
+                up = (Vector3d) data[3];
+            }
+            break;
+        case KEYFRAMES_REFRESH:
+            reinitialiseKeyframes(keyframes, null);
+            break;
+        case KEYFRAME_SELECT:
+            Keyframe kf = (Keyframe) data[0];
+            OwnLabel nl = keyframeNames.get(kf);
+            if (nl != null) {
+                colorBak = nl.getColor().cpy();
+                nl.setColor(skin.getColor("theme"));
+                scrollToKeyframe(kf);
+            }
+            break;
+        case KEYFRAME_UNSELECT:
+            kf = (Keyframe) data[0];
+            nl = keyframeNames.get(kf);
+            if (nl != null && colorBak != null) {
+                nl.setColor(colorBak);
+            }
+            break;
+        default:
+            break;
         }
     }
 
