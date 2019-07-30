@@ -443,7 +443,8 @@ public class DownloadDataWindow extends GenericDialog {
                             logger.error("SHA256 check failed: " + name);
                             errors++;
                         }
-                    } catch (Exception e) {
+                    } catch (Exception e)
+                    {
                         logger.info("Error checking SHA256: " + name);
                         errors++;
                     }

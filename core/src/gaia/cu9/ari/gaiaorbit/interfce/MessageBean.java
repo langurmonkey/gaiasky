@@ -18,6 +18,7 @@ public class MessageBean {
     String msg;
     Instant date;
 
+
     public MessageBean(Instant date, String msg) {
         this.msg = msg;
         this.date = date;
@@ -41,4 +42,5 @@ public class MessageBean {
     public String formatMessage(boolean writeDates) {
         return (writeDates ? df.format(this.date) + TAG_SEPARATOR : "") + this.msg;
     }
+
 }

@@ -93,10 +93,13 @@ public class ConsoleLogger implements IObserver {
                     Gdx.app.log(this.getClass().getSimpleName(), msg);
             }
         } else {
-            if (writeDates)
-                System.out.println("[" + date + "] " + msg);
-            else
-                System.out.println(msg);
+            if (writeDates) {
+                if (!debug)
+                    System.out.println("[" + date + "] " + msg);
+            } else {
+                if (!debug)
+                    System.out.println(msg);
+            }
         }
     }
 

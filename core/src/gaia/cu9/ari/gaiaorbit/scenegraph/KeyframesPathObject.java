@@ -379,7 +379,7 @@ public class KeyframesPathObject extends VertsObject implements I3DTextRenderabl
             p1.set(p.x.get(1), p.y.get(1), p.z.get(1));
 
             Vector3d c = aux3d3.get().set(camera.getPos());
-            double len = Math.max(0.00008, Math.atan(0.03) * c.dst(p0));
+            double len = Math.max(1e-9, Math.atan(0.03) * c.dst(p0));
 
             Vector3d v = c.set(p1).sub(p0).nor().scl(len);
             p.x.set(1, p0.x + v.x);
@@ -401,7 +401,7 @@ public class KeyframesPathObject extends VertsObject implements I3DTextRenderabl
 
             if (camera.direction.dot(posd) > 0) {
                 // The object is in front of us
-                double angle = 0.001;
+                double angle = 0.0001;
 
                 PerspectiveCamera pcamera;
                 if (GlobalConf.program.STEREOSCOPIC_MODE) {
@@ -483,7 +483,7 @@ public class KeyframesPathObject extends VertsObject implements I3DTextRenderabl
 
     private void initFocus() {
         if (focus == null || focus.parent == null) {
-            focus = new Invisible("", 5 * Constants.KM_TO_U);
+            focus = new Invisible("", 0.01 * Constants.KM_TO_U);
             EventManager.instance.post(Events.SCENE_GRAPH_ADD_OBJECT_CMD, focus, false);
         }
     }

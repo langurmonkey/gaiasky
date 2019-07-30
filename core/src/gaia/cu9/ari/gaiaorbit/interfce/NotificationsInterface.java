@@ -5,6 +5,7 @@
 
 package gaia.cu9.ari.gaiaorbit.interfce;
 
+import com.badlogic.gdx.Application;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
@@ -129,27 +130,34 @@ public class NotificationsInterface extends Table implements IObserver, IGuiInte
     }
 
     private void addMessage(String msg) {
-        addMessage(msg, false);
+        addMessage(msg, false, false);
     }
 
-    private void addMessage(String msg, boolean permanent) {
+    private void addMessage(String msg, boolean permanent, boolean debug) {
         MessageBean messageBean = new MessageBean(msg);
 
-        if (multiple && !historical.isEmpty() && !historical.getLast().finished(msTimeout)) {
-            // Move current up
-            this.message2.setText(this.message1.getText());
+        boolean add = !debug || debug && Gdx.app.getLogLevel() >= Application.LOG_DEBUG;
+
+        if (add) {
+            if (multiple && !historical.isEmpty() && !historical.getLast().finished(msTimeout)) {
+                // Move current up
+                this.message2.setText(this.message1.getText());
+            }
+            // Set 1
+            this.message1.setText(formatMessage(messageBean));
+
+            this.displaying = true;
+            this.permanent = permanent;
+
+            if (historicalLog)
+                historical.add(messageBean);
+
+            if (consoleLog && Gdx.graphics != null)
+                if (debug)
+                    Gdx.app.debug(df.format(messageBean.date), msg);
+                else
+                    Gdx.app.log(df.format(messageBean.date), msg);
         }
-        // Set 1
-        this.message1.setText(formatMessage(messageBean));
-
-        this.displaying = true;
-        this.permanent = permanent;
-
-        if (historicalLog)
-            historical.add(messageBean);
-
-        if (consoleLog && Gdx.graphics != null)
-            Gdx.app.log(df.format(messageBean.date), msg);
 
     }
 
@@ -188,7 +196,7 @@ public class NotificationsInterface extends Table implements IObserver, IGuiInte
                         }
                     }
                 }
-                addMessage(message, perm);
+                addMessage(message, perm, false);
                 break;
             case FOCUS_CHANGED:
                 if (data[0] != null) {
@@ -257,7 +265,7 @@ public class NotificationsInterface extends Table implements IObserver, IGuiInte
                 }
                 break;
             case ORBIT_DATA_LOADED:
-                addMessage(I18n.bundle.format("notif.orbitdata.loaded", data[1], ((PointCloudData) data[0]).getNumPoints()));
+                addMessage(I18n.bundle.format("notif.orbitdata.loaded", data[1], ((PointCloudData) data[0]).getNumPoints()), false, true);
                 break;
             case SCREENSHOT_INFO:
                 addMessage(I18n.bundle.format("notif.screenshot", data[0]));
