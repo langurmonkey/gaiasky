@@ -50,6 +50,8 @@ public abstract class GenericDialog extends CollapsibleWindow {
     protected HorizontalGroup buttonGroup;
     protected TextButton acceptButton, cancelButton;
 
+    protected boolean enterExit = true, escExit = true;
+
     private Runnable acceptRunnable, cancelRunnable;
 
     private Actor previousKeyboardFocus, previousScrollFocus;
@@ -153,29 +155,33 @@ public abstract class GenericDialog extends CollapsibleWindow {
 
         pack();
 
-        // Add keys for ESC, ENTER, 'y', 'n', and TAB
+        // Add keys for ESC, ENTER and TAB
         me.addListener(event -> {
             if (event instanceof InputEvent) {
                 InputEvent ievent = (InputEvent) event;
-                if (!ievent.isHandled() && ievent.getType() == Type.keyUp) {
+                if (ievent.getType() == Type.keyUp) {
                     int key = ievent.getKeyCode();
                     switch (key) {
                     case Keys.ESCAPE:
-                        // Exit
-                        cancel();
-                        if (cancelRunnable != null)
-                            cancelRunnable.run();
-                        me.hide();
+                        if(escExit) {
+                            // Exit
+                            cancel();
+                            if (cancelRunnable != null)
+                                cancelRunnable.run();
+                            me.hide();
+                        }
                         return true;
                     case Keys.ENTER:
-                        // Exit
-                        accept();
-                        if (acceptRunnable != null)
-                            acceptRunnable.run();
-                        me.hide();
+                        if(enterExit) {
+                            // Exit
+                            accept();
+                            if (acceptRunnable != null)
+                                acceptRunnable.run();
+                            me.hide();
+                        }
                         return true;
                     case Keys.TAB:
-                        // Next focus
+                        // Next focus, do nothing
 
                         return true;
                     default:

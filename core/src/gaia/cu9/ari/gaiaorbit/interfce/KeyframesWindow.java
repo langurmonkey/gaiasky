@@ -205,6 +205,7 @@ public class KeyframesWindow extends GenericDialog implements IObserver {
         buttonSize = 15 * GlobalConf.SCALE_FACTOR;
         buttonSizeL = 17 * GlobalConf.SCALE_FACTOR;
 
+        this.enterExit = false;
         this.editing = new Editing();
         this.keyframes = new Array<>();
         this.secondsCells = new HashMap<>();
@@ -663,6 +664,7 @@ public class KeyframesWindow extends GenericDialog implements IObserver {
                                             break;
                                         t += k.seconds;
                                     }
+                                    ievt.cancel();
                                     if (val > t) {
                                         kf.seconds = val - t;
                                         Gdx.app.postRunnable(() -> {
@@ -673,6 +675,8 @@ public class KeyframesWindow extends GenericDialog implements IObserver {
                                         });
                                     }
                                     editing.unset();
+                                } else if(ievt.getType() == InputEvent.Type.keyUp && (ievt.getKeyCode() == Input.Keys.ENTER || ievt.getKeyCode() == Input.Keys.ESCAPE)){
+                                    ievt.cancel();
                                 }
                             }
                             evt.setBubbles(false);
