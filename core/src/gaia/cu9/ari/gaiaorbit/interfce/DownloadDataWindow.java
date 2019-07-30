@@ -262,7 +262,7 @@ public class DownloadDataWindow extends GenericDialog {
                 OwnImageButton rubbish = null;
                 if (dataset.exists) {
                     rubbish = new OwnImageButton(skin, "rubbish-bin");
-                    rubbish.addListener(new TextTooltip(I18n.txt("gui.tooltip.dataset.remove"), skin));
+                    rubbish.addListener(new OwnTextTooltip(I18n.txt("gui.tooltip.dataset.remove"), skin));
                     rubbish.addListener((event) -> {
                         if (event instanceof ChangeEvent) {
                             // Remove dataset

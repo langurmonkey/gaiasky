@@ -40,5 +40,6 @@ public class LinkButton  extends OwnImageButton {
         });
 
         this.addListener(new OwnTextTooltip(linkURL, skin, 10));
+
     }
 }

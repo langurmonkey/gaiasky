@@ -20,6 +20,7 @@ import gaia.cu9.ari.gaiaorbit.util.format.NumberFormatFactory;
 import gaia.cu9.ari.gaiaorbit.util.scene2d.OwnImageButton;
 import gaia.cu9.ari.gaiaorbit.util.scene2d.OwnLabel;
 import gaia.cu9.ari.gaiaorbit.util.scene2d.OwnSlider;
+import gaia.cu9.ari.gaiaorbit.util.scene2d.OwnTextTooltip;
 
 public class DebugInterface extends Table implements IObserver, IGuiInterface {
     private OwnLabel debugRuntime, debugRAMUsed, debugRAMFree, debugRAMAlloc, debugRAMTotal,  debugVRAMUsed, debugVRAMTotal, debugObjectsDisplay, debugObjectsLoaded, debugOcObserved, debugOcQueue, debugSamp, fps, spf, device;
@@ -52,13 +53,13 @@ public class DebugInterface extends Table implements IObserver, IGuiInterface {
         /* FPS */
         fps = new OwnLabel("", skin, "hud-big");
         fps.setColor(skin.getColor("green"));
-        fps.addListener(new TextTooltip(I18n.txt("gui.debug.fps.info"), skin));
+        fps.addListener(new OwnTextTooltip(I18n.txt("gui.debug.fps.info"), skin));
         add(fps).colspan(2).right().padBottom(pad05);
         row();
 
         /* SPF */
         spf = new OwnLabel("", skin, "hud-med");
-        spf.addListener(new TextTooltip(I18n.txt("gui.debug.spf.info"), skin));
+        spf.addListener(new OwnTextTooltip(I18n.txt("gui.debug.spf.info"), skin));
         add(spf).colspan(2).right().padBottom(pad10);
         row();
 
@@ -69,11 +70,11 @@ public class DebugInterface extends Table implements IObserver, IGuiInterface {
         String glDeviceShort = TextUtils.capString(glDevice, 30);
         device = new OwnLabel(glDeviceShort, skin, "hud-big");
         device.setColor(skin.getColor("blue"));
-        device.addListener(new TextTooltip(glDevice, skin));
+        device.addListener(new OwnTextTooltip(glDevice, skin));
         deviceGroup.addActor(device);
         if(glDevice.length() != glDeviceShort.length()){
             OwnImageButton deviceTooltip = new OwnImageButton(skin, "tooltip");
-            deviceTooltip.addListener(new TextTooltip(glDevice, skin));
+            deviceTooltip.addListener(new OwnTextTooltip(glDevice, skin));
             deviceGroup.addActor(deviceTooltip);
         }
         add(deviceGroup).colspan(2).right().padBottom(pad40);
@@ -84,7 +85,7 @@ public class DebugInterface extends Table implements IObserver, IGuiInterface {
         Table timeTable = new Table(skin);
         timeTable.add(debugRuntime);
         Label runTimeLabel = new OwnLabel(I18n.txt("gui.debug.runtime"), skin, "hud-big");
-        runTimeLabel.addListener(new TextTooltip(I18n.txt("gui.debug.runtime.info"), skin));
+        runTimeLabel.addListener(new OwnTextTooltip(I18n.txt("gui.debug.runtime.info"), skin));
         runTimeLabel.setColor(skin.getColor("theme"));
         add(timeTable).right().padRight(pad10).padBottom(pad20);
         add(runTimeLabel).left().padBottom(pad20);
@@ -107,7 +108,7 @@ public class DebugInterface extends Table implements IObserver, IGuiInterface {
         debugRAMTable.add(debugRAMTotal).right();
 
         Label memoryLabel = new OwnLabel(I18n.txt("gui.debug.ram"), skin, "hud-big");
-        memoryLabel.addListener(new TextTooltip(I18n.txt("gui.debug.ram.info"), skin));
+        memoryLabel.addListener(new OwnTextTooltip(I18n.txt("gui.debug.ram.info"), skin));
         memoryLabel.setColor(skin.getColor("theme"));
         add(debugRAMTable).right().padRight(pad10).padBottom(pad20);
         add(memoryLabel).left().padBottom(pad20);
@@ -125,7 +126,7 @@ public class DebugInterface extends Table implements IObserver, IGuiInterface {
         debugVRAMTable.add(debugVRAMTotal).right();
 
         Label vmemoryLabel = new OwnLabel(I18n.txt("gui.debug.vram"), skin, "hud-big");
-        vmemoryLabel.addListener(new TextTooltip(I18n.txt("gui.debug.vram.info"), skin));
+        vmemoryLabel.addListener(new OwnTextTooltip(I18n.txt("gui.debug.vram.info"), skin));
         vmemoryLabel.setColor(skin.getColor("theme"));
         add(debugVRAMTable).right().padRight(pad10).padBottom(pad20);
         add(vmemoryLabel).left().padBottom(pad20);
@@ -143,7 +144,7 @@ public class DebugInterface extends Table implements IObserver, IGuiInterface {
         objectsTable.add(debugObjectsLoaded).right();
 
         Label objectsLabel = new OwnLabel(I18n.txt("gui.debug.obj"), skin, "hud-big");
-        objectsLabel.addListener(new TextTooltip(I18n.txt("gui.debug.obj.info"), skin));
+        objectsLabel.addListener(new OwnTextTooltip(I18n.txt("gui.debug.obj.info"), skin));
         objectsLabel.setColor(skin.getColor("theme"));
         add(objectsTable).right().padRight(pad10).padBottom(pad20);
         add(objectsLabel).left().padBottom(pad20);
@@ -163,7 +164,7 @@ public class DebugInterface extends Table implements IObserver, IGuiInterface {
         octantsTable.add(queueStatus).center().colspan(2).padTop(pad05);
 
         Label lodLabel = new OwnLabel(I18n.txt("gui.debug.lod"), skin, "hud-big");
-        lodLabel.addListener(new TextTooltip(I18n.txt("gui.debug.lod.info"), skin));
+        lodLabel.addListener(new OwnTextTooltip(I18n.txt("gui.debug.lod.info"), skin));
         lodLabel.setColor(skin.getColor("theme"));
         add(octantsTable).right().padRight(pad10).padBottom(pad20);
         add(lodLabel).left().padBottom(pad20);
@@ -174,7 +175,7 @@ public class DebugInterface extends Table implements IObserver, IGuiInterface {
         Table sampTable = new Table(skin);
         sampTable.add(debugSamp);
         Label sampLabel = new OwnLabel(I18n.txt("gui.debug.samp"), skin, "hud-big");
-        sampLabel.addListener(new TextTooltip(I18n.txt("gui.debug.samp.info"), skin));
+        sampLabel.addListener(new OwnTextTooltip(I18n.txt("gui.debug.samp.info"), skin));
         sampLabel.setColor(skin.getColor("theme"));
         add(sampTable).right().padRight(pad10);
         add(sampLabel).left();

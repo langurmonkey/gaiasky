@@ -89,7 +89,7 @@ public class ControlsWindow extends CollapsibleWindow implements IObserver {
             }
             return false;
         });
-        playstop.addListener(new TextTooltip(I18n.txt("gui.tooltip.playstop"), skin));
+        playstop.addListener(new OwnTextTooltip(I18n.txt("gui.tooltip.playstop"), skin));
 
         TimeComponent timeComponent = new TimeComponent(skin, ui);
         timeComponent.initialize();
@@ -113,7 +113,7 @@ public class ControlsWindow extends CollapsibleWindow implements IObserver {
             }
             return false;
         });
-        recCamera.addListener(new TextTooltip(I18n.txt("gui.tooltip.reccamera"), skin));
+        recCamera.addListener(new OwnTextTooltip(I18n.txt("gui.tooltip.reccamera"), skin));
 
         // Record camera (keyframes)
         recKeyframeCamera = new OwnImageButton(skin, "rec-key");
@@ -126,7 +126,7 @@ public class ControlsWindow extends CollapsibleWindow implements IObserver {
             }
            return false;
         });
-        recKeyframeCamera.addListener(new TextTooltip(I18n.txt("gui.tooltip.reccamerakeyframe"), skin));
+        recKeyframeCamera.addListener(new OwnTextTooltip(I18n.txt("gui.tooltip.reccamerakeyframe"), skin));
 
         // Play camera button
         playCamera = new OwnImageButton(skin, "play");
@@ -140,7 +140,7 @@ public class ControlsWindow extends CollapsibleWindow implements IObserver {
             return false;
         });
 
-        playCamera.addListener(new TextTooltip(I18n.txt("gui.tooltip.playcamera"), skin));
+        playCamera.addListener(new OwnTextTooltip(I18n.txt("gui.tooltip.playcamera"), skin));
 
         CameraComponent cameraComponent = new CameraComponent(skin, ui);
         cameraComponent.initialize();
@@ -224,7 +224,7 @@ public class ControlsWindow extends CollapsibleWindow implements IObserver {
         /** BUTTONS **/
         Button preferences = new OwnTextIconButton("", skin, "preferences");
         preferences.setName("preferences");
-        preferences.addListener(new TextTooltip(I18n.txt("gui.preferences"), skin));
+        preferences.addListener(new OwnTextTooltip(I18n.txt("gui.preferences"), skin));
         preferences.addListener(event -> {
             if (event instanceof ChangeEvent) {
                 EventManager.instance.post(Events.SHOW_PREFERENCES_ACTION);
@@ -233,7 +233,7 @@ public class ControlsWindow extends CollapsibleWindow implements IObserver {
         });
         Button load = new OwnTextIconButton("", skin, "load");
         load.setName("loadcatalog");
-        load.addListener(new TextTooltip(I18n.txt("gui.loadcatalog"), skin));
+        load.addListener(new OwnTextTooltip(I18n.txt("gui.loadcatalog"), skin));
         load.addListener(event -> {
             if (event instanceof ChangeEvent) {
                 EventManager.instance.post(Events.SHOW_LOAD_CATALOG_ACTION);
@@ -242,7 +242,7 @@ public class ControlsWindow extends CollapsibleWindow implements IObserver {
         });
         Button about = new OwnTextIconButton("", skin,"help");
         about.setName("about");
-        about.addListener(new TextTooltip(I18n.txt("gui.help"), skin));
+        about.addListener(new OwnTextTooltip(I18n.txt("gui.help"), skin));
         about.addListener(event -> {
             if (event instanceof ChangeEvent) {
                 EventManager.instance.post(Events.SHOW_ABOUT_ACTION);
@@ -251,7 +251,7 @@ public class ControlsWindow extends CollapsibleWindow implements IObserver {
         });
         Button showLog = new OwnTextIconButton("", skin, "log");
         showLog.setName("show log");
-        showLog.addListener(new TextTooltip(I18n.txt("gui.tooltip.log"), skin));
+        showLog.addListener(new OwnTextTooltip(I18n.txt("gui.tooltip.log"), skin));
         showLog.addListener((event) -> {
             if (event instanceof ChangeEvent) {
                 EventManager.instance.post(Events.SHOW_LOG_ACTION);

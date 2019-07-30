@@ -80,7 +80,7 @@ public class CameraComponent extends GuiComponent implements IObserver {
         List<Button> buttonList = new ArrayList<>();
 
         button3d = new OwnTextIconButton("", skin, "3d");
-        button3d.addListener(new TextTooltip(TextUtils.capitalise(I18n.txt("element.stereomode")), skin));
+        button3d.addListener(new OwnTextTooltip(TextUtils.capitalise(I18n.txt("element.stereomode")), skin));
         button3d.setName("3d");
         button3d.addListener(event -> {
             if (event instanceof ChangeEvent) {
@@ -91,7 +91,7 @@ public class CameraComponent extends GuiComponent implements IObserver {
         });
 
         buttonDome = new OwnTextIconButton("", skin, "dome");
-        buttonDome.addListener(new TextTooltip(TextUtils.capitalise(I18n.txt("element.planetarium")), skin));
+        buttonDome.addListener(new OwnTextTooltip(TextUtils.capitalise(I18n.txt("element.planetarium")), skin));
         buttonDome.setName("dome");
         buttonDome.addListener(event -> {
             if (event instanceof ChangeEvent) {
@@ -104,7 +104,7 @@ public class CameraComponent extends GuiComponent implements IObserver {
 
         buttonCubemap = new OwnTextIconButton("", skin, "cubemap");
         buttonCubemap.setProgrammaticChangeEvents(false);
-        buttonCubemap.addListener(new TextTooltip(TextUtils.capitalise(I18n.txt("element.360")), skin));
+        buttonCubemap.addListener(new OwnTextTooltip(TextUtils.capitalise(I18n.txt("element.360")), skin));
         buttonCubemap.setName("cubemap");
         buttonCubemap.addListener(event -> {
             if (event instanceof ChangeEvent) {

@@ -24,6 +24,7 @@ import gaia.cu9.ari.gaiaorbit.util.format.INumberFormat;
 import gaia.cu9.ari.gaiaorbit.util.format.NumberFormatFactory;
 import gaia.cu9.ari.gaiaorbit.util.scene2d.OwnImageButton;
 import gaia.cu9.ari.gaiaorbit.util.scene2d.OwnLabel;
+import gaia.cu9.ari.gaiaorbit.util.scene2d.OwnTextTooltip;
 
 import java.time.Instant;
 import java.time.ZoneOffset;
@@ -75,7 +76,7 @@ public class TimeComponent extends GuiComponent implements IObserver {
             }
             return false;
         });
-        dateEdit.addListener(new TextTooltip(I18n.txt("gui.tooltip.dateedit"), skin));
+        dateEdit.addListener(new OwnTextTooltip(I18n.txt("gui.tooltip.dateedit"), skin));
 
         // Pace
         Label paceLabel = new Label(I18n.txt("gui.pace") + " ", skin);
@@ -90,7 +91,7 @@ public class TimeComponent extends GuiComponent implements IObserver {
             }
             return false;
         });
-        plus.addListener(new TextTooltip(I18n.txt("gui.tooltip.timewarpplus"), skin));
+        plus.addListener(new OwnTextTooltip(I18n.txt("gui.tooltip.timewarpplus"), skin));
 
         minus = new OwnImageButton(skin, "minus");
         minus.setName("minus");
@@ -102,7 +103,7 @@ public class TimeComponent extends GuiComponent implements IObserver {
             }
             return false;
         });
-        minus.addListener(new TextTooltip(I18n.txt("gui.tooltip.timewarpminus"), skin));
+        minus.addListener(new OwnTextTooltip(I18n.txt("gui.tooltip.timewarpminus"), skin));
 
         timeWarp = new OwnLabel(getFormattedTimeWrap(), skin, "warp");
         timeWarp.setName("time warp");

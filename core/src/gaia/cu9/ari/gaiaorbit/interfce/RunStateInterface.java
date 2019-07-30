@@ -14,6 +14,7 @@ import gaia.cu9.ari.gaiaorbit.event.IObserver;
 import gaia.cu9.ari.gaiaorbit.util.GlobalConf;
 import gaia.cu9.ari.gaiaorbit.util.I18n;
 import gaia.cu9.ari.gaiaorbit.util.scene2d.OwnTextIconButton;
+import gaia.cu9.ari.gaiaorbit.util.scene2d.OwnTextTooltip;
 
 /**
  * Contains elements which depend on the current state of the program, such as
@@ -39,12 +40,12 @@ public class RunStateInterface extends Table implements IObserver, IGuiInterface
         float pad = 2 * GlobalConf.SCALE_FACTOR;
 
         keyboardImg = new Image(skin.getDrawable("no-input"));
-        keyboardImg.addListener(new TextTooltip(I18n.txt("gui.tooltip.noinput"), skin));
+        keyboardImg.addListener(new OwnTextTooltip(I18n.txt("gui.tooltip.noinput"), skin));
         frameoutputImg = new Image(skin.getDrawable("frameoutput"));
-        frameoutputImg.addListener(new TextTooltip(I18n.txt("gui.tooltip.frameoutputon"), skin));
+        frameoutputImg.addListener(new OwnTextTooltip(I18n.txt("gui.tooltip.frameoutputon"), skin));
 
         bgLoading = new OwnTextIconButton("", skin, "dataload-bg", "toggle");
-        TextTooltip pauseBgTT = new TextTooltip(I18n.txt("gui.tooltip.pausebg"), skin);
+        OwnTextTooltip pauseBgTT = new OwnTextTooltip(I18n.txt("gui.tooltip.pausebg"), skin);
         bgLoading.addListener(pauseBgTT);
         bgLoading.addListener((event) -> {
             if (event instanceof ChangeEvent) {
@@ -62,7 +63,7 @@ public class RunStateInterface extends Table implements IObserver, IGuiInterface
         });
 
         cancelCamera = new OwnTextIconButton("", skin, "camera-stop");
-        cancelCamera.addListener(new TextTooltip(I18n.bundle.get("gui.stop"), skin));
+        cancelCamera.addListener(new OwnTextTooltip(I18n.bundle.get("gui.stop"), skin));
         cancelCamera.addListener((event) -> {
             if (event instanceof ChangeEvent) {
                 EventManager.instance.post(Events.STOP_CAMERA_PLAY);

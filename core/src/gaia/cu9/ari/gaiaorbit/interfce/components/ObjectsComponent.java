@@ -306,7 +306,7 @@ public class ObjectsComponent extends GuiComponent implements IObserver {
             // Tooltips
             if (obj.getDescription() != null) {
                 ImageButton meshDescTooltip = new OwnImageButton(skin, "tooltip");
-                meshDescTooltip.addListener(new TextTooltip((obj.getDescription() == null || obj.getDescription().isEmpty() ? "No description" : obj.getDescription()), skin));
+                meshDescTooltip.addListener(new OwnTextTooltip((obj.getDescription() == null || obj.getDescription().isEmpty() ? "No description" : obj.getDescription()), skin));
                 objectHgroup.addActor(meshDescTooltip);
             }
 

@@ -76,7 +76,7 @@ public class CollapsiblePane extends Table {
             }
             return false;
         });
-        expandIcon.addListener(new TextTooltip(I18n.bundle.get("gui.tooltip.expandcollapse.group") + (shortcut != null ? " (" + shortcut + ")" : ""), skin));
+        expandIcon.addListener(new OwnTextTooltip(I18n.bundle.get("gui.tooltip.expandcollapse.group") + (shortcut != null ? " (" + shortcut + ")" : ""), skin));
 
         // Detach icon
         detachIcon = new OwnImageButton(skin, detachButtonStyle);
@@ -89,12 +89,12 @@ public class CollapsiblePane extends Table {
             }
             return false;
         });
-        detachIcon.addListener(new TextTooltip(I18n.bundle.get("gui.tooltip.detach.group"), skin));
+        detachIcon.addListener(new OwnTextTooltip(I18n.bundle.get("gui.tooltip.detach.group"), skin));
 
         // Question icon
         Label questionLabel = new OwnLabel("(?)", skin, "question");
         if (shortcut != null && !shortcut.isEmpty())
-            questionLabel.addListener(new TextTooltip(shortcut, skin));
+            questionLabel.addListener(new OwnTextTooltip(shortcut, skin));
 
         Table headerTable = new Table();
 

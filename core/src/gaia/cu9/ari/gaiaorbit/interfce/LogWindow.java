@@ -17,10 +17,7 @@ import gaia.cu9.ari.gaiaorbit.util.Logger;
 import gaia.cu9.ari.gaiaorbit.util.format.DateFormatFactory;
 import gaia.cu9.ari.gaiaorbit.util.format.DateFormatFactory.DateType;
 import gaia.cu9.ari.gaiaorbit.util.format.IDateFormat;
-import gaia.cu9.ari.gaiaorbit.util.scene2d.OwnLabel;
-import gaia.cu9.ari.gaiaorbit.util.scene2d.OwnScrollPane;
-import gaia.cu9.ari.gaiaorbit.util.scene2d.OwnTextButton;
-import gaia.cu9.ari.gaiaorbit.util.scene2d.OwnTextIconButton;
+import gaia.cu9.ari.gaiaorbit.util.scene2d.*;
 
 import java.io.BufferedWriter;
 import java.io.File;
@@ -79,7 +76,7 @@ public class LogWindow extends GenericDialog {
         Button reload = new OwnTextIconButton("", skin, "reload");
         reload.setName("update log");
         reload.pad(pad5);
-        reload.addListener(new TextTooltip(I18n.txt("gui.log.update"), skin));
+        reload.addListener(new OwnTextTooltip(I18n.txt("gui.log.update"), skin));
         reload.addListener((event) -> {
             if (event instanceof ChangeEvent) {
                 update();

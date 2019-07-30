@@ -7,7 +7,10 @@ package gaia.cu9.ari.gaiaorbit.interfce.components;
 
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.Stage;
-import com.badlogic.gdx.scenes.scene2d.ui.*;
+import com.badlogic.gdx.scenes.scene2d.ui.HorizontalGroup;
+import com.badlogic.gdx.scenes.scene2d.ui.ImageButton;
+import com.badlogic.gdx.scenes.scene2d.ui.Skin;
+import com.badlogic.gdx.scenes.scene2d.ui.VerticalGroup;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener.ChangeEvent;
 import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.Timer;
@@ -22,6 +25,7 @@ import gaia.cu9.ari.gaiaorbit.util.format.INumberFormat;
 import gaia.cu9.ari.gaiaorbit.util.format.NumberFormatFactory;
 import gaia.cu9.ari.gaiaorbit.util.scene2d.OwnImageButton;
 import gaia.cu9.ari.gaiaorbit.util.scene2d.OwnLabel;
+import gaia.cu9.ari.gaiaorbit.util.scene2d.OwnTextTooltip;
 
 public class MusicComponent extends GuiComponent implements IObserver {
 
@@ -55,7 +59,7 @@ public class MusicComponent extends GuiComponent implements IObserver {
             }
             return false;
         });
-        prev.addListener(new TextTooltip(I18n.txt("gui.music.previous"), skin));
+        prev.addListener(new OwnTextTooltip(I18n.txt("gui.music.previous"), skin));
 
         /** Play/pause **/
         play = new OwnImageButton(skin, "audio-playpause");
@@ -67,7 +71,7 @@ public class MusicComponent extends GuiComponent implements IObserver {
             }
             return false;
         });
-        play.addListener(new TextTooltip(I18n.txt("gui.music.playpause"), skin));
+        play.addListener(new OwnTextTooltip(I18n.txt("gui.music.playpause"), skin));
 
         /** Next track **/
         next = new OwnImageButton(skin, "audio-fwd");
@@ -78,7 +82,7 @@ public class MusicComponent extends GuiComponent implements IObserver {
             }
             return false;
         });
-        next.addListener(new TextTooltip(I18n.txt("gui.music.next"), skin));
+        next.addListener(new OwnTextTooltip(I18n.txt("gui.music.next"), skin));
 
         /** Volume **/
         vol = new OwnLabel("VOL: " + nf.format(getVolumePercentage()) + "%", skin, "mono");

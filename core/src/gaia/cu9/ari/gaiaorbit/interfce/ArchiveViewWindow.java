@@ -11,11 +11,13 @@ import com.badlogic.gdx.Net.HttpRequest;
 import com.badlogic.gdx.Net.HttpResponse;
 import com.badlogic.gdx.Net.HttpResponseListener;
 import com.badlogic.gdx.net.HttpStatus;
-import com.badlogic.gdx.scenes.scene2d.*;
-import com.badlogic.gdx.scenes.scene2d.InputEvent.Type;
-import com.badlogic.gdx.scenes.scene2d.ui.*;
+import com.badlogic.gdx.scenes.scene2d.Actor;
+import com.badlogic.gdx.scenes.scene2d.Stage;
+import com.badlogic.gdx.scenes.scene2d.ui.HorizontalGroup;
+import com.badlogic.gdx.scenes.scene2d.ui.ImageButton;
 import com.badlogic.gdx.scenes.scene2d.ui.Label.LabelStyle;
-import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener.ChangeEvent;
+import com.badlogic.gdx.scenes.scene2d.ui.Skin;
+import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.JsonReader;
 import com.badlogic.gdx.utils.JsonValue;
@@ -24,7 +26,10 @@ import gaia.cu9.ari.gaiaorbit.util.GlobalConf;
 import gaia.cu9.ari.gaiaorbit.util.I18n;
 import gaia.cu9.ari.gaiaorbit.util.Logger;
 import gaia.cu9.ari.gaiaorbit.util.Logger.Log;
-import gaia.cu9.ari.gaiaorbit.util.scene2d.*;
+import gaia.cu9.ari.gaiaorbit.util.scene2d.Link;
+import gaia.cu9.ari.gaiaorbit.util.scene2d.OwnLabel;
+import gaia.cu9.ari.gaiaorbit.util.scene2d.OwnScrollPane;
+import gaia.cu9.ari.gaiaorbit.util.scene2d.OwnTextTooltip;
 
 import java.io.*;
 
@@ -301,7 +306,7 @@ public class ArchiveViewWindow extends GenericDialog {
                         HorizontalGroup hg = new HorizontalGroup();
                         hg.space(5);
                         ImageButton tooltip = new ImageButton(skin, "tooltip");
-                        tooltip.addListener(new TextTooltip(data[2][col], skin));
+                        tooltip.addListener(new OwnTextTooltip(data[2][col], skin));
                         hg.addActor(tooltip);
                         hg.addActor(new OwnLabel(data[0][col], skin, "ui-13"));
 

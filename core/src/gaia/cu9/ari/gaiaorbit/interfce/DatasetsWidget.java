@@ -132,7 +132,7 @@ public class DatasetsWidget {
             cb.bottom().left();
 
             cb.setChecked(contains(catalogFile.path(), currentSetting));
-            cb.addListener(new TextTooltip(path, skin));
+            cb.addListener(new OwnTextTooltip(path, skin));
 
             dsTable.add(cb).left().padRight(pad * 6f).padBottom(pad);
 

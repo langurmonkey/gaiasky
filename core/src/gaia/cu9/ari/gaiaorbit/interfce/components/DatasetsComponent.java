@@ -19,6 +19,7 @@ import gaia.cu9.ari.gaiaorbit.util.I18n;
 import gaia.cu9.ari.gaiaorbit.util.scene2d.OwnImageButton;
 import gaia.cu9.ari.gaiaorbit.util.scene2d.OwnLabel;
 import gaia.cu9.ari.gaiaorbit.util.scene2d.OwnScrollPane;
+import gaia.cu9.ari.gaiaorbit.util.scene2d.OwnTextTooltip;
 
 import java.util.Collection;
 import java.util.HashMap;
@@ -83,7 +84,7 @@ public class DatasetsComponent extends GuiComponent implements IObserver {
         VerticalGroup controls = new VerticalGroup();
         controls.space(pad);
         OwnImageButton eye = new OwnImageButton(skin, "eye-toggle");
-        eye.addListener(new TextTooltip(I18n.txt("gui.tooltip.dataset.toggle"), skin));
+        eye.addListener(new OwnTextTooltip(I18n.txt("gui.tooltip.dataset.toggle"), skin));
         eye.addListener((event) -> {
             if (event instanceof ChangeEvent) {
                 // Toggle visibility
@@ -97,7 +98,7 @@ public class DatasetsComponent extends GuiComponent implements IObserver {
         });
 
         ImageButton rubbish = new OwnImageButton(skin, "rubbish-bin");
-        rubbish.addListener(new TextTooltip(I18n.txt("gui.tooltip.dataset.remove"), skin));
+        rubbish.addListener(new OwnTextTooltip(I18n.txt("gui.tooltip.dataset.remove"), skin));
         rubbish.addListener((event) -> {
             if (event instanceof ChangeEvent) {
                 // Remove dataset
@@ -108,7 +109,7 @@ public class DatasetsComponent extends GuiComponent implements IObserver {
         });
 
         OwnImageButton mark = new OwnImageButton(skin, "highlight-ds");
-        mark.addListener(new TextTooltip(I18n.txt("gui.tooltip.dataset.highlight"), skin));
+        mark.addListener(new OwnTextTooltip(I18n.txt("gui.tooltip.dataset.highlight"), skin));
         mark.addListener((event) -> {
            if(event instanceof ChangeEvent){
                EventManager.instance.post(Events.CATALOG_HIGHLIGHT, ci.name, mark.isChecked(), -1, true);

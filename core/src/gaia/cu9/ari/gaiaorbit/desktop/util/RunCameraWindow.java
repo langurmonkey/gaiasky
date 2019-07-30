@@ -19,10 +19,7 @@ import gaia.cu9.ari.gaiaorbit.interfce.GenericDialog;
 import gaia.cu9.ari.gaiaorbit.util.GlobalConf;
 import gaia.cu9.ari.gaiaorbit.util.GlobalResources;
 import gaia.cu9.ari.gaiaorbit.util.I18n;
-import gaia.cu9.ari.gaiaorbit.util.scene2d.OwnImageButton;
-import gaia.cu9.ari.gaiaorbit.util.scene2d.OwnLabel;
-import gaia.cu9.ari.gaiaorbit.util.scene2d.OwnScrollPane;
-import gaia.cu9.ari.gaiaorbit.util.scene2d.OwnTextIconButton;
+import gaia.cu9.ari.gaiaorbit.util.scene2d.*;
 
 import java.util.Comparator;
 
@@ -59,7 +56,7 @@ public class RunCameraWindow extends GenericDialog {
         HorizontalGroup titlegroup = new HorizontalGroup();
         titlegroup.space(pad);
         ImageButton tooltip = new OwnImageButton(skin, "tooltip");
-        tooltip.addListener(new TextTooltip(I18n.txt("gui.tooltip.camera", SysUtils.getDefaultCameraDir()), skin));
+        tooltip.addListener(new OwnTextTooltip(I18n.txt("gui.tooltip.camera", SysUtils.getDefaultCameraDir()), skin));
         Label choosetitle = new OwnLabel(I18n.txt("gui.camera.choose"), skin, "help-title");
         titlegroup.addActor(choosetitle);
         titlegroup.addActor(tooltip);
@@ -79,7 +76,7 @@ public class RunCameraWindow extends GenericDialog {
 
         Button reload = new OwnTextIconButton("", skin, "reload");
         reload.setName("reload camera files");
-        reload.addListener(new TextTooltip(I18n.txt("gui.camera.reload"), skin));
+        reload.addListener(new OwnTextTooltip(I18n.txt("gui.camera.reload"), skin));
         reload.addListener((event) -> {
             if (event instanceof ChangeEvent) {
                 scroll.setActor(generateFileList());

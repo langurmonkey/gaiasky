@@ -47,10 +47,7 @@ import gaia.cu9.ari.gaiaorbit.util.gdx.model.IntModel;
 import gaia.cu9.ari.gaiaorbit.util.gdx.model.IntModelInstance;
 import gaia.cu9.ari.gaiaorbit.util.math.MathUtilsd;
 import gaia.cu9.ari.gaiaorbit.util.math.Vector3d;
-import gaia.cu9.ari.gaiaorbit.util.scene2d.OwnCheckBox;
-import gaia.cu9.ari.gaiaorbit.util.scene2d.OwnImageButton;
-import gaia.cu9.ari.gaiaorbit.util.scene2d.OwnLabel;
-import gaia.cu9.ari.gaiaorbit.util.scene2d.OwnSlider;
+import gaia.cu9.ari.gaiaorbit.util.scene2d.*;
 
 public class SpacecraftGui extends AbstractGui {
 
@@ -215,7 +212,7 @@ public class SpacecraftGui extends AbstractGui {
             }
             return false;
         });
-        stabilise.addListener(new TextTooltip(I18n.txt("gui.tooltip.sc.stabilise"), skin));
+        stabilise.addListener(new OwnTextTooltip(I18n.txt("gui.tooltip.sc.stabilise"), skin));
 
         stop = new OwnImageButton(skin, "sc-stop");
         stop.setProgrammaticChangeEvents(false);
@@ -232,7 +229,7 @@ public class SpacecraftGui extends AbstractGui {
                 return false;
             }
         });
-        stop.addListener(new TextTooltip(I18n.txt("gui.tooltip.sc.stop"), skin));
+        stop.addListener(new OwnTextTooltip(I18n.txt("gui.tooltip.sc.stop"), skin));
 
         exit = new OwnImageButton(skin, "sc-exit");
         exit.setProgrammaticChangeEvents(false);
@@ -247,7 +244,7 @@ public class SpacecraftGui extends AbstractGui {
                 return false;
             }
         });
-        exit.addListener(new TextTooltip(I18n.txt("gui.tooltip.sc.exit"), skin));
+        exit.addListener(new OwnTextTooltip(I18n.txt("gui.tooltip.sc.exit"), skin));
 
         buttonRow.addActor(stabilise);
         buttonRow.addActor(stop);
@@ -269,7 +266,7 @@ public class SpacecraftGui extends AbstractGui {
         engineControls.pad(0f);
 
         enginePlus = new OwnImageButton(skin, "sc-engine-power-up");
-        enginePlus.addListener(new TextTooltip(I18n.txt("gui.tooltip.sc.powerup"), skin));
+        enginePlus.addListener(new OwnTextTooltip(I18n.txt("gui.tooltip.sc.powerup"), skin));
         enginePlus.addListener(event -> {
             if (event instanceof ChangeEvent) {
                 EventManager.instance.post(Events.SPACECRAFT_THRUST_INCREASE_CMD);
@@ -278,7 +275,7 @@ public class SpacecraftGui extends AbstractGui {
             return false;
         });
         engineMinus = new OwnImageButton(skin, "sc-engine-power-down");
-        enginePlus.addListener(new TextTooltip(I18n.txt("gui.tooltip.sc.powerdown"), skin));
+        enginePlus.addListener(new OwnTextTooltip(I18n.txt("gui.tooltip.sc.powerdown"), skin));
         engineMinus.addListener(event -> {
             if (event instanceof ChangeEvent) {
                 EventManager.instance.post(Events.SPACECRAFT_THRUST_DECREASE_CMD);

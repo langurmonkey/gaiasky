@@ -78,7 +78,7 @@ public class VisibilityComponent extends GuiComponent implements IObserver {
                     // Name is the key
                     button.setName(ct.key);
                     // Tooltip
-                    button.addListener(new TextTooltip(TextUtils.capitalise(ct.getName()), skin));
+                    button.addListener(new OwnTextTooltip(TextUtils.capitalise(ct.getName()), skin));
 
                     buttonMap.put(name, button);
                     if (!ct.key.equals(name))

@@ -25,6 +25,7 @@ import gaia.cu9.ari.gaiaorbit.util.math.Vector2d;
 import gaia.cu9.ari.gaiaorbit.util.math.Vector3d;
 import gaia.cu9.ari.gaiaorbit.util.scene2d.OwnLabel;
 import gaia.cu9.ari.gaiaorbit.util.scene2d.OwnTextIconButton;
+import gaia.cu9.ari.gaiaorbit.util.scene2d.OwnTextTooltip;
 
 /**
  * Part of the user interface which holds the information on the current focus
@@ -107,13 +108,13 @@ public class FocusInfoInterface extends Table implements IObserver, IGuiInterfac
         RADECViewLabel = new OwnLabel(I18n.txt("gui.focusinfo.alpha") + "/" + I18n.txt("gui.focusinfo.delta"), skin, "hud-big");
         Button pointerImgBtn1 = new OwnTextIconButton("", skin, "pointer");
         pointerImgBtn1.setSize(imgSize, imgSize);
-        pointerImgBtn1.addListener(new TextTooltip(I18n.txt("gui.focusinfo.pointer"), skin));
+        pointerImgBtn1.addListener(new OwnTextTooltip(I18n.txt("gui.focusinfo.pointer"), skin));
         Button pointerImgBtn2 = new OwnTextIconButton("", skin, "pointer");
         pointerImgBtn2.setSize(imgSize, imgSize);
-        pointerImgBtn2.addListener(new TextTooltip(I18n.txt("gui.focusinfo.pointer"), skin));
+        pointerImgBtn2.addListener(new OwnTextTooltip(I18n.txt("gui.focusinfo.pointer"), skin));
         Button viewImgBtn = new OwnTextIconButton("", skin, "view");
         viewImgBtn.setSize(imgSize, imgSize);
-        viewImgBtn.addListener(new TextTooltip(I18n.txt("gui.focusinfo.view"), skin));
+        viewImgBtn.addListener(new OwnTextTooltip(I18n.txt("gui.focusinfo.view"), skin));
 
         // Camera
         camName = new OwnLabel(I18n.bundle.get("gui.camera"), skin, "hud-header");
@@ -142,7 +143,7 @@ public class FocusInfoInterface extends Table implements IObserver, IGuiInterfac
                 return false;
 
         });
-        goTo.addListener(new TextTooltip(I18n.txt("gui.focusinfo.goto"), skin));
+        goTo.addListener(new OwnTextTooltip(I18n.txt("gui.focusinfo.goto"), skin));
 
         landOn = new OwnTextIconButton("", skin, "land-on");
         landOn.setSize(buttonSize, buttonSize);
@@ -154,7 +155,7 @@ public class FocusInfoInterface extends Table implements IObserver, IGuiInterfac
                 return false;
 
         });
-        landOn.addListener(new TextTooltip(I18n.txt("gui.focusinfo.landon"), skin));
+        landOn.addListener(new OwnTextTooltip(I18n.txt("gui.focusinfo.landon"), skin));
 
         landAt = new OwnTextIconButton("", skin, "land-at");
         landAt.setSize(buttonSize, buttonSize);
@@ -165,7 +166,7 @@ public class FocusInfoInterface extends Table implements IObserver, IGuiInterfac
                 }
                 return false;
         });
-        landAt.addListener(new TextTooltip(I18n.txt("gui.focusinfo.landat"), skin));
+        landAt.addListener(new OwnTextTooltip(I18n.txt("gui.focusinfo.landat"), skin));
 
         bw = Math.max(landOn.getWidth(), landAt.getWidth());
         bw += 2 * GlobalConf.SCALE_FACTOR;

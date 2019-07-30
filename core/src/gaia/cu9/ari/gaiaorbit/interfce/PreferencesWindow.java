@@ -281,7 +281,7 @@ public class PreferencesWindow extends GenericDialog {
         Table graphics = new Table();
 
         OwnLabel gqualityLabel = new OwnLabel(I18n.txt("gui.gquality"), skin);
-        gqualityLabel.addListener(new TextTooltip(I18n.txt("gui.gquality.info"), skin));
+        gqualityLabel.addListener(new OwnTextTooltip(I18n.txt("gui.gquality.info"), skin));
 
         ComboBoxBean[] gqs = new ComboBoxBean[GraphicsQuality.values().length];
         int i = 0;
@@ -322,11 +322,11 @@ public class PreferencesWindow extends GenericDialog {
         });
 
         OwnImageButton gqualityTooltip = new OwnImageButton(skin, "tooltip");
-        gqualityTooltip.addListener(new TextTooltip(I18n.txt("gui.gquality.info"), skin));
+        gqualityTooltip.addListener(new OwnTextTooltip(I18n.txt("gui.gquality.info"), skin));
 
         // AA
         OwnLabel aaLabel = new OwnLabel(I18n.txt("gui.aa"), skin);
-        aaLabel.addListener(new TextTooltip(I18n.txt("gui.aa.info"), skin));
+        aaLabel.addListener(new OwnTextTooltip(I18n.txt("gui.aa.info"), skin));
 
         ComboBoxBean[] aas = new ComboBoxBean[] { new ComboBoxBean(I18n.txt("gui.aa.no"), 0), new ComboBoxBean(I18n.txt("gui.aa.fxaa"), -1), new ComboBoxBean(I18n.txt("gui.aa.nfaa"), -2) };
         aa = new OwnSelectBox<>(skin);
@@ -335,7 +335,7 @@ public class PreferencesWindow extends GenericDialog {
         aa.setSelected(aas[idxAa(2, GlobalConf.postprocess.POSTPROCESS_ANTIALIAS)]);
 
         OwnImageButton aaTooltip = new OwnImageButton(skin, "tooltip");
-        aaTooltip.addListener(new TextTooltip(I18n.txt("gui.aa.info"), skin));
+        aaTooltip.addListener(new OwnTextTooltip(I18n.txt("gui.aa.info"), skin));
 
         // ORBITS
         OwnLabel orbitsLabel = new OwnLabel(I18n.txt("gui.orbitrenderer"), skin);
@@ -880,7 +880,7 @@ public class PreferencesWindow extends GenericDialog {
         });
 
         OwnImageButton lodTooltip = new OwnImageButton(skin, "tooltip");
-        lodTooltip.addListener(new TextTooltip(I18n.txt("gui.lod.thresholds.info"), skin));
+        lodTooltip.addListener(new OwnTextTooltip(I18n.txt("gui.lod.thresholds.info"), skin));
 
         // LABELS
         labels.addAll(numThreadsLabel, ddLabel);
@@ -915,7 +915,7 @@ public class PreferencesWindow extends GenericDialog {
             if (GlobalConf.controls.isControllerBlacklisted(c.getName())) {
                 cl.setText(cl.getText() + " [*]");
                 cl.setColor(1, 0, 0, 1);
-                cl.addListener(new TextTooltip(I18n.txt("gui.tooltip.controller.blacklist"), skin));
+                cl.addListener(new OwnTextTooltip(I18n.txt("gui.tooltip.controller.blacklist"), skin));
             }
             controllerNames.add(cl);
         }
@@ -1099,10 +1099,10 @@ public class PreferencesWindow extends GenericDialog {
             return false;
         });
         screenshotMode.setSelected(screenshotModes[GlobalConf.screenshot.SCREENSHOT_MODE.ordinal()]);
-        screenshotMode.addListener(new TextTooltip(I18n.txt("gui.tooltip.screenshotmode"), skin));
+        screenshotMode.addListener(new OwnTextTooltip(I18n.txt("gui.tooltip.screenshotmode"), skin));
 
         OwnImageButton screenshotsModeTooltip = new OwnImageButton(skin, "tooltip");
-        screenshotsModeTooltip.addListener(new TextTooltip(I18n.txt("gui.tooltip.screenshotmode"), skin));
+        screenshotsModeTooltip.addListener(new OwnTextTooltip(I18n.txt("gui.tooltip.screenshotmode"), skin));
 
         HorizontalGroup ssModeGroup = new HorizontalGroup();
         ssModeGroup.space(pad5);
@@ -1214,10 +1214,10 @@ public class PreferencesWindow extends GenericDialog {
             return false;
         });
         frameoutputMode.setSelected(frameoutputModes[GlobalConf.frame.FRAME_MODE.ordinal()]);
-        frameoutputMode.addListener(new TextTooltip(I18n.txt("gui.tooltip.screenshotmode"), skin));
+        frameoutputMode.addListener(new OwnTextTooltip(I18n.txt("gui.tooltip.screenshotmode"), skin));
 
         OwnImageButton frameoutputModeTooltip = new OwnImageButton(skin, "tooltip");
-        frameoutputModeTooltip.addListener(new TextTooltip(I18n.txt("gui.tooltip.screenshotmode"), skin));
+        frameoutputModeTooltip.addListener(new OwnTextTooltip(I18n.txt("gui.tooltip.screenshotmode"), skin));
 
         HorizontalGroup foModeGroup = new HorizontalGroup();
         foModeGroup.space(pad5);
@@ -1289,7 +1289,7 @@ public class PreferencesWindow extends GenericDialog {
         Button keyframePrefs = new OwnTextIconButton(I18n.txt("gui.keyframes.preferences"), skin, "preferences");
         keyframePrefs.setName("keyframe preferences");
         keyframePrefs.pad(pad);
-        keyframePrefs.addListener(new TextTooltip(I18n.txt("gui.tooltip.kf.editprefs"), skin));
+        keyframePrefs.addListener(new OwnTextTooltip(I18n.txt("gui.tooltip.kf.editprefs"), skin));
         keyframePrefs.addListener((event) -> {
             if (event instanceof ChangeListener.ChangeEvent) {
                 KeyframePreferencesWindow kpw = new KeyframePreferencesWindow(stage, skin);
@@ -1307,9 +1307,9 @@ public class PreferencesWindow extends GenericDialog {
         // Activate automatically
         cbAutoCamrec = new OwnCheckBox(I18n.txt("gui.camerarec.frameoutput"), skin, "default", pad5);
         cbAutoCamrec.setChecked(GlobalConf.frame.AUTO_FRAME_OUTPUT_CAMERA_PLAY);
-        cbAutoCamrec.addListener(new TextTooltip(I18n.txt("gui.tooltip.playcamera.frameoutput"), skin));
+        cbAutoCamrec.addListener(new OwnTextTooltip(I18n.txt("gui.tooltip.playcamera.frameoutput"), skin));
         OwnImageButton camrecTooltip = new OwnImageButton(skin, "tooltip");
-        camrecTooltip.addListener(new TextTooltip(I18n.txt("gui.tooltip.playcamera.frameoutput"), skin));
+        camrecTooltip.addListener(new OwnTextTooltip(I18n.txt("gui.tooltip.playcamera.frameoutput"), skin));
 
         HorizontalGroup cbGroup = new HorizontalGroup();
         cbGroup.space(pad5);
@@ -1381,9 +1381,9 @@ public class PreferencesWindow extends GenericDialog {
         OwnLabel titleGeneralData = new OwnLabel(I18n.txt("gui.data.options"), skin, "help-title");
         highAccuracyPositions = new OwnCheckBox(I18n.txt("gui.data.highaccuracy"), skin, pad5);
         highAccuracyPositions.setChecked(GlobalConf.data.HIGH_ACCURACY_POSITIONS);
-        highAccuracyPositions.addListener(new TextTooltip(I18n.txt("gui.tooltip.data.highaccuracy"), skin));
+        highAccuracyPositions.addListener(new OwnTextTooltip(I18n.txt("gui.tooltip.data.highaccuracy"), skin));
         OwnImageButton highAccTooltip = new OwnImageButton(skin, "tooltip");
-        highAccTooltip.addListener(new TextTooltip(I18n.txt("gui.tooltip.data.highaccuracy"), skin));
+        highAccTooltip.addListener(new OwnTextTooltip(I18n.txt("gui.tooltip.data.highaccuracy"), skin));
 
         HorizontalGroup haGroup = new HorizontalGroup();
         haGroup.space(pad5);
