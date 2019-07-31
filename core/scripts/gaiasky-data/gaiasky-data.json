@@ -180,7 +180,7 @@
         "tex/base/telescopebeam.png",
         "tex/skybox/gaiasky"
       ],
-      "sha256": "ddd2d6f1d47aaee3aecbc49231f333c42f1db85d4c0e615e671f678a22b9c815",
+      "sha256": "bc8ce42a31076c4962ae7cb5e5fa1e43d837367ddd9c4dd60383b52b4c734eb2",
       "description": "Default data pack for Gaia Sky - For Gaia Sky 2.2.0 and above. Contains the Solar System, constellations, meshes and more",
       "file": "http://gaia.ari.uni-heidelberg.de/gaiasky/files/autodownload/basedata/004_20190614_v020200/gaiasky_data.tar.gz"
     },
@@ -227,7 +227,7 @@
         "tex/base/*-ultra.png"
       ],
       "description": "High resolution textures - High resolution texture pack including some 4K and 8K textures for planet surfaces and asteroids.",
-      "sha256": "868deeefa0749d4236714ca2448c0a7a3c1dceeca70ad7fdd53dc5ae6ef2fa69",
+      "sha256": "e620090efc6464422d2468abf795d246ef489b46f7d97f0bc7294aad099bb93c",
       "file": "http://gaia.ari.uni-heidelberg.de/gaiasky/files/autodownload/tex/002_20190614_v020200/hi-res-texture-pack.tar.gz"
     },
     {

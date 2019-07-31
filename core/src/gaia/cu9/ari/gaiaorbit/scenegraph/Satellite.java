@@ -52,8 +52,8 @@ public abstract class Satellite extends ModelBody {
 
         if (parentOrientation) {
             this.parentrc = ((ModelBody) parent).rc;
-            this.orientationf = new Matrix4();
         }
+        this.orientationf = new Matrix4();
     }
 
     @Override
@@ -64,11 +64,9 @@ public abstract class Satellite extends ModelBody {
     /**
      * Default implementation, only sets the result of the coordinates call to
      * pos
-     * 
-     * @param time
-     *            Time to get the coordinates
-     * @param force
-     *            Whether to force the update
+     *
+     * @param time  Time to get the coordinates
+     * @param force Whether to force the update
      */
     protected void forceUpdatePosition(ITimeFrameProvider time, boolean force) {
         if (time.getDt() != 0 || force) {
@@ -77,6 +75,9 @@ public abstract class Satellite extends ModelBody {
             Vector3d aux3 = aux3d1.get();
             Coordinates.cartesianToSpherical(pos, aux3);
             posSph.set((float) (Nature.TO_DEG * aux3.x), (float) (Nature.TO_DEG * aux3.y));
+
+            if(rc != null)
+                rc.update(time);
         }
     }
 
@@ -89,17 +90,7 @@ public abstract class Satellite extends ModelBody {
      * Sets the local transform of this satellite
      */
     public void setToLocalTransform(float sizeFactor, Matrix4 localTransform, boolean forceUpdate) {
-        if (sizeFactor != 1 || forceUpdate) {
-            translation.getMatrix(localTransform).scl(size * sizeFactor);
-            if (parentOrientation && parentrc != null) {
-                this.orientation.idt().rotate(0, 1, 0, (float) parentrc.ascendingNode).rotate(0, 0, 1, (float) (parentrc.inclination + parentrc.axialTilt)).rotate(0, 1, 0, (float) parentrc.angle).rotate(1, 0, 1, 180);
-                this.orientation.putIn(orientationf);
-                localTransform.mul(orientationf);
-            }
-
-        } else {
-            localTransform.set(this.localTransform);
-        }
+        super.setToLocalTransform(sizeFactor, localTransform, forceUpdate);
 
     }
 

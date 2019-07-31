@@ -230,6 +230,8 @@ in vec3 v_viewDir;
 in vec3 v_lightCol;
 // Logarithmic depth
 in float v_depth;
+// Fragment position in world space
+in vec3 v_fragPos;
 
 #ifdef environmentCubemapFlag
 in vec3 v_reflect;
@@ -343,7 +345,7 @@ void main() {
 
     // Parallax occlusion mapping
     texCoords = parallaxMapping(texCoords, viewDir);
-    #else
+    #else // heightFlag
     lightDir = v_lightDir;
     viewDir = v_viewDir;
     #endif // heightFlag
@@ -355,12 +357,16 @@ void main() {
     vec3 ambient = v_ambientLight;
 
     #ifdef normalTextureFlag
-		vec3 N = normalize(vec3(texture(u_normalTexture, texCoords).xyz * 2.0 - 1.0));
+        // Normal in tangent space
+        vec3 N = normalize(vec3(texture(u_normalTexture, texCoords).xyz * 2.0 - 1.0));
 		#ifdef environmentCubemapFlag
-			vec3 reflectDir = normalize(v_reflect + (vec3(0.0, 0.0, 1.0) - N.xyz));
+            // Perturb the normal to get reflect direction
+            pullNormal();
+            mat3 TBN = cotangentFrame(g_normal, -v_viewDir, texCoords);
+			vec3 reflectDir = normalize(reflect(-v_fragPos, normalize(TBN * N)));
 		#endif // environmentCubemapFlag
     #else
-	    // Normal in pixel space
+	    // Normal in tangent space
 	    vec3 N = vec3(0.0, 0.0, 1.0);
 		#ifdef environmentCubemapFlag
 			vec3 reflectDir = normalize(v_reflect);

@@ -330,9 +330,8 @@ void main() {
     v_viewDir = normalize(-pos.xyz * TBN);
 
     #ifdef environmentCubemapFlag
-    #ifdef normalTextureFlag
-    v_reflect = reflect(v_viewDir, g_normal);
-    #else
+    #ifndef normalTextureFlag
+    // Only if normal map not present, otherwise we perturb the normal in the fragment shader
     v_reflect = reflect(-pos.xyz, g_normal);
     #endif // normalTextureFlag
     #endif // environmentCubemapFlag

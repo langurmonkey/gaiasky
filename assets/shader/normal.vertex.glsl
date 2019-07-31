@@ -296,6 +296,7 @@ out vec3 v_lightDir;
 out vec3 v_lightCol;
 out vec3 v_viewDir;
 out vec3 o_fragPosition;
+out vec3 v_fragPos;
 out float o_fragHeight;
 
 #ifdef environmentCubemapFlag
@@ -325,6 +326,7 @@ void main() {
     #endif // gravitationalWaves
 
     o_fragPosition = pos.xyz;
+    v_fragPos = pos.xyz;
     o_fragHeight = 0.0;
 
     gl_Position = u_projViewTrans * pos;
@@ -383,9 +385,8 @@ void main() {
     #endif
 
     #ifdef environmentCubemapFlag
-    #ifdef normalTextureFlag
-        v_reflect = reflect(v_viewDir, g_normal);
-    #else
+    #ifndef normalTextureFlag
+        // Only if normal map not present, otherwise we perturb the normal in the fragment shader
     	v_reflect = reflect(-pos.xyz, g_normal);
     #endif // normalTextureFlag
     #endif // environmentCubemapFlag
