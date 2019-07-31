@@ -116,6 +116,8 @@ public class SceneGraphNode implements IStarContainer, IPosition {
         MODEL_PIX_DUST(26),
         /** Tessellated model **/
         MODEL_PIX_TESS(27),
+        /** Only diffuse **/
+        MODEL_DIFFUSE(28),
 
 
         /** None **/

@@ -42,7 +42,7 @@ public class BackgroundModel extends FadeNode implements IModelRenderable, I3DTe
     public ModelComponent mc;
     private boolean label, label2d;
 
-    private RenderGroup renderGroupModel = RenderGroup.MODEL_VERT;
+    private RenderGroup renderGroupModel = RenderGroup.MODEL_DIFFUSE;
 
     public BackgroundModel() {
         super();

@@ -12,6 +12,7 @@ import gaia.cu9.ari.gaiaorbit.GaiaSky;
 import gaia.cu9.ari.gaiaorbit.scenegraph.camera.ICamera;
 import gaia.cu9.ari.gaiaorbit.util.*;
 import gaia.cu9.ari.gaiaorbit.util.coord.Coordinates;
+import gaia.cu9.ari.gaiaorbit.util.gdx.IntModelBatch;
 import gaia.cu9.ari.gaiaorbit.util.math.MathUtilsd;
 import gaia.cu9.ari.gaiaorbit.util.math.Vector3d;
 import gaia.cu9.ari.gaiaorbit.util.time.ITimeFrameProvider;
@@ -106,12 +107,18 @@ public class Billboard extends ModelBody {
     protected void addToRenderLists(ICamera camera) {
         if (GaiaSky.instance.isOn(ct)) {
             if (viewAngleApparent >= TH_ANGLE_NONE) {
-                addToRender(this, RenderGroup.MODEL_VERT_ADDITIVE);
+                addToRender(this, RenderGroup.MODEL_DIFFUSE);
                 if (renderText()) {
                     addToRender(this, RenderGroup.FONT_LABEL);
                 }
             }
         }
+    }
+
+    /** Model rendering **/
+    @Override
+    public void render(IntModelBatch modelBatch, float alpha, double t) {
+        render(modelBatch, alpha, t, false);
     }
 
     @Override

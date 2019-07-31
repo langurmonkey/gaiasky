@@ -181,6 +181,7 @@ public class SceneGraphRenderer extends AbstractRenderer implements IProcessRend
         // Add shaders to load (with providers)
         manager.load("per-vertex-lighting", GroundShaderProvider.class, new GroundShaderProviderParameter("shader/default.vertex.glsl", "shader/default.fragment.glsl"));
         manager.load("per-vertex-lighting-additive", RelativisticShaderProvider.class, new RelativisticShaderProviderParameter("shader/default.vertex.glsl", "shader/default.additive.fragment.glsl"));
+        manager.load("per-vertex-diffuse", RelativisticShaderProvider.class, new RelativisticShaderProviderParameter("shader/default.vertex.glsl", "shader/default.diffuse.fragment.glsl"));
         manager.load("per-vertex-lighting-grid", RelativisticShaderProvider.class, new RelativisticShaderProviderParameter("shader/default.vertex.glsl", "shader/default.grid.fragment.glsl"));
         manager.load("per-vertex-lighting-starsurface", RelativisticShaderProvider.class, new RelativisticShaderProviderParameter("shader/starsurface.vertex.glsl", "shader/starsurface.fragment.glsl"));
         manager.load("per-vertex-lighting-beam", RelativisticShaderProvider.class, new RelativisticShaderProviderParameter("shader/default.vertex.glsl", "shader/beam.fragment.glsl"));
@@ -356,6 +357,7 @@ public class SceneGraphRenderer extends AbstractRenderer implements IProcessRend
         // Per-vertex lighting shaders
         IntShaderProvider perVertexLighting = manager.get("per-vertex-lighting");
         IntShaderProvider perVertexLightingAdditive = manager.get("per-vertex-lighting-additive");
+        IntShaderProvider perVertexDiffuse = manager.get("per-vertex-diffuse");
         IntShaderProvider perVertexLightingGrid = manager.get("per-vertex-lighting-grid");
         IntShaderProvider perVertexLightingStarsurface = manager.get("per-vertex-lighting-starsurface");
         IntShaderProvider perVertexLightingBeam = manager.get("per-vertex-lighting-beam");
@@ -381,6 +383,7 @@ public class SceneGraphRenderer extends AbstractRenderer implements IProcessRend
         // Create model batches
         IntModelBatch mbVertexLighting = new IntModelBatch(perVertexLighting, noSorter);
         IntModelBatch mbVertexLightingAdditive = new IntModelBatch(perVertexLightingAdditive, noSorter);
+        IntModelBatch mbVertexDiffuse = new IntModelBatch(perVertexDiffuse, noSorter);
         IntModelBatch mbVertexLightingStarsurface = new IntModelBatch(perVertexLightingStarsurface, noSorter);
         IntModelBatch mbVertexLightingBeam = new IntModelBatch(perVertexLightingBeam, noSorter);
         IntModelBatch mbVertexLightingGrid = new IntModelBatch(perVertexLightingGrid, noSorter);
@@ -542,6 +545,9 @@ public class SceneGraphRenderer extends AbstractRenderer implements IProcessRend
         AbstractRenderSystem modelMeshOpaqueProc = new ModelBatchRenderSystem(RenderGroup.MODEL_PIX_DUST, alphas, mbPixelLightingDust, ModelRenderType.NORMAL);
         AbstractRenderSystem modelMeshAdditiveProc = new ModelBatchRenderSystem(RenderGroup.MODEL_VERT_ADDITIVE, alphas, mbVertexLightingAdditive, ModelRenderType.NORMAL);
 
+        // MODEL DIFFUSE
+        AbstractRenderSystem modelMeshDiffuse = new ModelBatchRenderSystem(RenderGroup.MODEL_DIFFUSE, alphas, mbVertexDiffuse, ModelRenderType.NORMAL);
+
         // MODEL PER-PIXEL-LIGHTING
         AbstractRenderSystem modelPerPixelLighting = new ModelBatchRenderSystem(RenderGroup.MODEL_PIX, alphas, mbPixelLighting, ModelRenderType.NORMAL);
 
@@ -629,6 +635,8 @@ public class SceneGraphRenderer extends AbstractRenderer implements IProcessRend
 
         // Additive meshes
         renderProcesses.add(modelMeshAdditiveProc);
+        // Diffuse meshes
+        renderProcesses.add(modelMeshDiffuse);
 
         // Models
         renderProcesses.add(modelPerPixelLighting);

@@ -244,7 +244,7 @@ public class ModelComponent implements Disposable, IObserver {
                     Gdx.app.postRunnable(() -> {
                         mtc.initMaterial(manager, instance, cc, culling);
                         // Set to initialised
-                        updateStaticLight();
+                        updateStaticLightImmediate();
                     });
                     mtc.texLoading = false;
                     mtc.texInitialised = true;
@@ -253,7 +253,7 @@ public class ModelComponent implements Disposable, IObserver {
                 // Use color if necessary
                 addColorToMat();
                 // Set to initialised
-                updateStaticLight();
+                updateStaticLightImmediate();
             }
 
         }
@@ -269,7 +269,7 @@ public class ModelComponent implements Disposable, IObserver {
                 model = modMat.getFirst();
                 instance = new IntModelInstance(model, localTransform);
 
-                updateStaticLight();
+                updateStaticLightImmediate();
 
                 // COLOR IF NO TEXTURE
                 if (mtc == null && instance != null) {
@@ -284,14 +284,18 @@ public class ModelComponent implements Disposable, IObserver {
 
     private void updateStaticLight() {
         Gdx.app.postRunnable(() -> {
-            // Update static
-            if (updateStaticLight) {
-                ColorAttribute ambient = (ColorAttribute) env.get(ColorAttribute.AmbientLight);
-                if (ambient != null)
-                    ambient.color.set(staticLightLevel, staticLightLevel, staticLightLevel, 1.0f);
-                updateStaticLight = false;
-            }
+            updateStaticLightImmediate();
         });
+    }
+
+    private void updateStaticLightImmediate(){
+        // Update static
+        if (updateStaticLight) {
+            ColorAttribute ambient = (ColorAttribute) env.get(ColorAttribute.AmbientLight);
+            if (ambient != null)
+                ambient.color.set(staticLightLevel, staticLightLevel, staticLightLevel, 1.0f);
+            updateStaticLight = false;
+        }
     }
 
     public void addColorToMat() {
