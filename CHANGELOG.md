@@ -1,6 +1,11 @@
-<a name="2.2.0-RC10"></a>
-## [2.2.0-RC10](https://gitlab.com/langurmonkey/gaiasky/tree/2.2.0-RC09) (2019-07-29)
-[Full changelog](https://gitlab.com/langurmonkey/gaiasky/compare/2.2.0-RC09...2.2.0-RC10)
+<a name="unreleased"></a>
+## [Unreleased](https://gitlab.com/langurmonkey/gaiasky/tree/master)
+[Full changelog](https://gitlab.com/langurmonkey/gaiasky/compare/2.2.0...HEAD)
+
+
+<a name="2.2.0"></a>
+## [2.2.0](https://gitlab.com/langurmonkey/gaiasky/tree/2.1.7-vr) (2019-08-01)
+[Full changelog](https://gitlab.com/langurmonkey/gaiasky/compare/2.1.7-vr...2.2.0)
 
 ### Bug Fixes
 
@@ -14,56 +19,13 @@
 - shader errors on macOS [#288](https://gitlab.com/langurmonkey/gaiasky/issues/288) [#288](https://gitlab.com/langurmonkey/gaiasky/issues/288) 
 - show notice with high/ultra quality 
 - tangent and binormal vectors on UV spheres 
+- ui inconsistencies 
 - line occlusion fixed with no depth writes 
+- adjust sun size and selection 
+- aspect ratio of most points 
 - synchronous catalog loading via script is really synchronous 
 - fade node visibility tied to internal frame rate, not absolute time 
 - fix dataset visibility fade time link, add cubemap projection setter in scripting API 
-
-### Code Refactoring
-
-- texture component is now material component 
-- remove unused webgl code 
-- sphere creator to own class 
-
-### Features
-
-- add reflections in shaders plus skybox 
-- add startup object to config 
-- add VRAM monitoring 
-- add reset sequence number button 
-- improve debug pane layout 
-- initialise elevation data structures asynchronously 
-- CPU generation of height data 
-- add tessellation quality control 
-- noise-based height 
-- new scripting calls: cameraYaw/Pitch 
-- handle server down event correctly 
-- data downloader checks for updates 
-- fix point scaling 
-- add point size and color attributes to asteroids 
-
-<a name="2.2.0-RC09"></a>
-## [2.2.0-RC09](https://gitlab.com/langurmonkey/gaiasky/tree/2.2.0-RC08) (2019-07-10)
-[Full changelog](https://gitlab.com/langurmonkey/gaiasky/compare/2.2.0-RC08...2.2.0-RC09)
-
-### Bug Fixes
-
-- ui inconsistencies 
-
-### Features
-
-- decouple keyboard bindings from code, i18n camera modes 
-- warnings in object search 
-- new checksum algorithm: MD5 -> SHA256 
-
-<a name="2.2.0-RC08"></a>
-## [2.2.0-RC08](https://gitlab.com/langurmonkey/gaiasky/tree/2.1.7-vr) (2019-06-27)
-[Full changelog](https://gitlab.com/langurmonkey/gaiasky/compare/2.1.7-vr...2.2.0-RC08)
-
-### Bug Fixes
-
-- adjust sun size and selection 
-- aspect ratio of most points 
 - frame buffer and effects cleanup on resize 
 - adjust motion blur, remove blur radius 
 - about window layout 
@@ -85,6 +47,9 @@
 
 ### Code Refactoring
 
+- texture component is now material component 
+- remove unused webgl code 
+- sphere creator to own class 
 - render system cleanup 
 - sprite batch shaders to version 330, moved postprocess shaders to own folder 
 - sanity checks and code cleanup in scripting API implementation 
@@ -93,11 +58,29 @@
 
 ### Features
 
+- add padding to tooltips by default 
+- add reflections in shaders plus skybox 
+- add startup object to config 
+- add VRAM monitoring 
+- add reset sequence number button 
+- improve debug pane layout 
+- initialise elevation data structures asynchronously 
+- CPU generation of height data 
+- add tessellation quality control 
+- noise-based height 
+- new scripting calls: cameraYaw/Pitch 
+- handle server down event correctly 
+- data downloader checks for updates 
+- decouple keyboard bindings from code, i18n camera modes 
+- warnings in object search 
+- new checksum algorithm: MD5 -> SHA256 
 - orbit refresh daemon plus shading 
 - comprehensive info panel on mode switch, star textures 
+- fix point scaling 
 - add starburst to lens flare 
 - add load queue progress to debug 
 - separate HiDPI theme to checkbox in preferences 
+- add point size and color attributes to asteroids 
 - add dithering glsl library to simulate transparency with opaque objects 
 - some work on controller mappings 
 - add optional gravity to game mode 
@@ -115,6 +98,7 @@
 - automatic tone mapping based on Reinhard's method 
 - move all post-processing shaders to version 330 
 - new milky way model 
+- new milky way model 
 - migrate search window to generic dialog 
 - native support for gzipped obj models (.obj.gz) 
 - implement integer indices 
@@ -126,147 +110,6 @@
 - velocity vectors are regular component types 
 - add optional arrowheads to velocity vectors 
 
-
-<a name="2.2.0-RC05"></a>
-## [2.2.0-RC05](https://gitlab.com/langurmonkey/gaiasky/tree/2.2.0-RC04) (2019-04-12)
-[Full changelog](https://gitlab.com/langurmonkey/gaiasky/compare/2.2.0-RC04...2.2.0-RC05)
-
-### Bug Fixes
-
-- bugs determining location of files 
-- macos gradle launch script 
-
-### Features
-
-- implement sane crash reporting to file 
-
-<a name="2.2.0-RC04"></a>
-## [2.2.0-RC04](https://gitlab.com/langurmonkey/gaiasky/tree/2.2.0-RC03) (2019-04-11)
-[Full changelog](https://gitlab.com/langurmonkey/gaiasky/compare/2.2.0-RC03...2.2.0-RC04)
-
-### Bug Fixes
-
-- dataset version check in download manager 
-
-<a name="2.2.0-RC03"></a>
-## [2.2.0-RC03](https://gitlab.com/langurmonkey/gaiasky/tree/2.1.7) (2019-04-10)
-[Full changelog](https://gitlab.com/langurmonkey/gaiasky/compare/2.1.7...2.2.0-RC03)
-
-### Bug Fixes
-
-- macOS retina display scaling, remove analytics 
-- macos script fix 
-- datsets component width screws with controls window layout 
-- conversion from proper motion + rv to velocity vector 
-- normalise direction and up vectors in set events 
-- octree generator works with no loaders 
-- thicker velocity vectors for stars with radial velocity 
-- use bundled java in macOS when launched from source 
-- 'home' button changes mode if needed 
-- switch to free camera when focus made invisible 
-- adjust line width in quad method 
-- line rendering and octree generator 
-- octree generator to use HIP dist if Gaia dist < 0 
-- crash when loading csv files 
-- startup crash if planets disabled 
-- [#281](https://gitlab.com/langurmonkey/gaiasky/issues/281) non-ASCII characters in windows username [#281](https://gitlab.com/langurmonkey/gaiasky/issues/281) 
-- [#285](https://gitlab.com/langurmonkey/gaiasky/issues/285) export log fails in windows 
-- shader compilation in intel GPUs (line) 
-- octree generator works with latest jcommander 
-- keyframes window inline editing 
-- hot-switching themes no longer uses previous skin in some dialogs 
-- keyboard focus lost when clicking outside input fields 
-- octree rendering muted 
-- remove version from window title 
-- assets location in install4j template 
-- heap sizes in build script 
-- macOS -XstartOnFirstThread flag 
-- macos builds tweaks 
-
-### Build System
-
-- gitlab issue templates 
-- add license statement to source files 
-- remove jython dependency 
-- update to gradle 5.1.1 
-- new gradle 5 compile dep format 
-- update to lwjgl 3.2.3 
-
-### Code Refactoring
-
-- reorganised scripts 
-- cleanup scripts folder 
-- big refactor in immediate rendererer to reduce memory usage 
-- remove gwt build file 
-- adjust label scales for better appearance 
-- remove unused classes, pvs analysis 
-- remove unused code in generic dialog 
-- various code refactors and cleanups 
-- i18n files synced with en_GB 
-- general code and keys refactor 
-- rearrange and clean up i18n files 
-- text icon button styles in skin 
-- visibility switch lists are unified under a same interface and code 
-
-### Documentation
-
-- new docs reference 
-- update changelog, changelog config 
-- update docs reference 
-
-### Features
-
-- migrate to Java 11 
-- add 'y' and 'n' key bindings to dialogs 
-- add shortcuts to expand/collapse panes 
-- velocity vectors are regular component types 
-- add optional arrowheads to velocity vectors 
-- line renderers allocate memory in chunks 
-- add redshift from camera velocity vector coloring fix: fix blue-white-red color map 
-- add redshift and single coloring to velocity vectors 
-- add velocity vectors color mode 
-- ucds are more carefully assessed to extract meaning in the STIL loader 
-- hip stars can be looked up as 'HIP xxxx' or 'xxxx' 
-- constellations fade when exiting milky way 
-- archive view window to generic dialog 
-- discard tycho identifiers to save up 3 double-precision floating point numbers per star (192 bits) 
-- double click in file chooser opens file 
-- add max proper motion vectors number to properties 
-- add getFrameNumber() API call 
-- dataset highlight 
-- proper synchonization of scripting with main loop 
-- simple helper script to run gaiasky directly from source 
-- further improvements to file chooser 
-- load button to load .vot and .csv files 
-- add info text to datasets selection 
-- API calls to load and manipulate datasets 
-- jython to py4j works fully with all tests [#286](https://gitlab.com/langurmonkey/gaiasky/issues/286) 
-- use XDG base directory structure in Linux 
-- update catalog descriptors 
-- add id list of 'must load' stars 
-- keyframe highlighting 
-- allow resizable generic dialogs 
-- update link cursor size when theme changes 
-- generate man page automatically 
-- add CLI arguments -p and -a 
-- add man file and utils to generate 
-- add h2m help2man file 
-- info on gs_java_version_check when run on java other than 1.8 
-- new cameraTransition() API call 
-- sync and async camera file playback API calls 
-- sync and async camera file playback API calls 
-- add sync and async camera path running funcs 
-- improve minimap 
-- implement controller blacklist 
-- add controllers blacklist to properties 
-- list multiple connected controllers instead of just one 
-- update to lwjgl3 backend 
-
-### Style
-
-- tweaked and fixed some old java 
-- variable name changes 
-
 <a name="2.1.7"></a>
 ## [2.1.7](https://gitlab.com/langurmonkey/gaiasky/tree/2.1.6) (2019-01-11)
 [Full changelog](https://gitlab.com/langurmonkey/gaiasky/compare/2.1.6...2.1.7)
@@ -277,21 +120,17 @@
 - wait for tasks to finish before shutting down 
 - about window layout in non-hidpi mode 
 - 'data files not found' problem 
-
 ### Build System
 
 - remove run command echo, rearrange version logging 
 - fix installer-img not found 
-
 ### Code Refactoring
 
 - topmost render method rewritten to avoid conditionals 
-
 ### Documentation
 
 - fix build system title case 
 - update changelog 
-
 ### Features
 
 - data download dialog details 
