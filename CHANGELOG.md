@@ -98,7 +98,6 @@
 - automatic tone mapping based on Reinhard's method 
 - move all post-processing shaders to version 330 
 - new milky way model 
-- new milky way model 
 - migrate search window to generic dialog 
 - native support for gzipped obj models (.obj.gz) 
 - implement integer indices 
