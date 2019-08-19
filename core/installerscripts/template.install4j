@@ -1455,7 +1455,7 @@ return console.askYesNo(message, true);
         <content />
       </installerScript>
     </unixInstaller>
-    <linuxDeb name="Linux Deb Archive" id="30" customizedId="" mediaFileName="" installDir="/opt/${compiler:sys.shortName}" overridePrincipalLanguage="false" jreBitType="all" runPostProcessor="false" postProcessor="" failOnPostProcessorError="false" useLegacyMediaFileIds="false" legacyMediaFileIds="" downloadURL="" includeAllDownloadableComponents="true" includedJRE="" manualJREEntry="false" overwriteNeverAsConfigFiles="false" dependencies="default-jre" bzip="false" description="Real-time, cross-platform, 3D Universe application which supports more than a billion stars" maintainerEmail="tsagrista@ari.uni-heidelberg.de" architectureSet="false" architecture="">
+    <linuxDeb name="Linux DEB" id="30" customizedId="" mediaFileName="" installDir="/opt/${compiler:sys.shortName}" overridePrincipalLanguage="false" jreBitType="all" runPostProcessor="false" postProcessor="" failOnPostProcessorError="false" useLegacyMediaFileIds="false" legacyMediaFileIds="" downloadURL="" includeAllDownloadableComponents="true" includedJRE="" manualJREEntry="false" overwriteNeverAsConfigFiles="false" dependencies="openjdk-11-jre" bzip="false" description="Real-time, cross-platform, 3D Universe application which supports more than a billion stars" maintainerEmail="tsagrista@ari.uni-heidelberg.de" architectureSet="false" architecture="">
       <excludedComponents />
       <includedDownloadableComponents />
       <excludedLaunchers>
