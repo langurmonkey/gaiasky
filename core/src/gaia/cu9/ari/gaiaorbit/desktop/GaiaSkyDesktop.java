@@ -60,8 +60,8 @@ public class GaiaSkyDesktop implements IObserver {
     * This is usually tag where each chunk takes 2 spaces.
     * Version = major.minor.rev -> 1.2.5 major=1; minor=2; rev=5
     * Version = major * 10000 + minor * 100 + rev
-    * So 1.2.5 -> 010205
-    *    2.1.7 -> 020107
+    * So 1.2.5 -> 10205
+    *    2.1.7 -> 20107
     *
     * Leading zeroes are omitted to avoid octal literal interpretation.
     */
@@ -421,7 +421,7 @@ public class GaiaSkyDesktop implements IObserver {
      * Checks for incompatibilities between the java version and the OS. Prints the necessary warnings for known issues.
      */
     private static void javaVersionCheck() {
-        double jv = getVersion();
+        double jv = SysUtils.getJavaVersion();
         boolean linux = SysUtils.isLinux();
         boolean gnome = SysUtils.checkGnome();
         if (jv >= 10 && linux && gnome) {
@@ -430,13 +430,6 @@ public class GaiaSkyDesktop implements IObserver {
             System.out.println("========================================================================================");
             System.out.println();
         }
-    }
-
-    private static double getVersion() {
-        String version = System.getProperty("java.version");
-        int pos = version.indexOf('.');
-        pos = version.indexOf('.', pos + 1);
-        return Double.parseDouble(version.substring(0, pos)); //-V6009
     }
 
     private class GaiaSkyWindowListener implements LifecycleListener {
