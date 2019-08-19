@@ -33,10 +33,9 @@ This file contains the following sections:
 
 ### 1.1 Requirements
 
-| **Operating system**  | Linux / Windows 7+ / macOS                                                     |
-| :-------------------: | :----------------------------------------------------------------------------- |
+| **Operating system**  | Linux / Windows 7+ / macOS, 64-bit                                             |
 | **CPU**               | Intel Core i5 3rd Generation or similar                                        |
-| **GPU**               | Intel HD 4000, Nvidia GeForce 9800 GT, Radeon HD 5670 / 1 GB VRAM / OpenGL 3.3 |
+| **GPU**               | Intel HD 4000, Nvidia GeForce 9800 GT, Radeon HD 5670 / 1 GB VRAM / OpenGL 4.x |
 | **Memory**            | 4+ GB RAM                                                                      |
 | **Hard drive**        | 1 GB of free disk space                                                        |
 
@@ -116,12 +115,8 @@ installation folder.
 
 #### 1.2.2 Windows
 
-Two windows installers are available for 32 and 64-bit systems [here](https://zah.uni-heidelberg.de/gaia/outreach/gaiasky/downloads/).
-
-- `gaiasky_windows_<version>.exe` - 32 bit installer.
-- `gaiasky_windows-x64_<version>.exe` - 64 bit installer.
-
-Both versions will automatically install the JRE if it is not present
+As of 2.2.0, only 64-bit versions of Windows are supported.
+The installer will automatically deploy the JRE if it is not present
 in the system.
 To install Gaia Sky, just double click on the installer and
 then follow the on-screen instructions. You will need to choose the
