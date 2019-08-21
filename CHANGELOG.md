@@ -16,7 +16,7 @@
 - scripting parameter check 
 - cameraTransition() 
 - more glsl leftovers 
-- shader errors on macOS [#288](https://gitlab.com/langurmonkey/gaiasky/issues/288) [#288](https://gitlab.com/langurmonkey/gaiasky/issues/288) 
+- shader errors on macOS [#288](https://gitlab.com/langurmonkey/gaiasky/issues/288) 
 - show notice with high/ultra quality 
 - tangent and binormal vectors on UV spheres 
 - ui inconsistencies 
