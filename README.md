@@ -33,6 +33,8 @@ This file contains the following sections:
 
 ### 1.1 Requirements
 
+| | |
+|-|-|
 | **Operating system**  | Linux / Windows 7+ / macOS, 64-bit                                             |
 | **CPU**               | Intel Core i5 3rd Generation or similar                                        |
 | **GPU**               | Intel HD 4000, Nvidia GeForce 9800 GT, Radeon HD 5670 / 1 GB VRAM / OpenGL 4.x |
