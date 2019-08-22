@@ -6,7 +6,7 @@ from py4j.java_gateway import JavaGateway, GatewayParameters
 gateway = JavaGateway(gateway_parameters=GatewayParameters(auto_convert=True))
 gs = gateway.entry_point
 
-gs.setCameraFocus("Sol")
+gs.setCameraFocus("Sun")
 gs.sleep(3)
 
 gs.setCinematicCamera(True)

@@ -22,7 +22,7 @@ gs.setVisibility("element.labels", False)
 eclpos = gs.eclipticToInternalCartesian(0.0, 90.0, 7.5e8)
 
 gs.setCameraPosition(eclpos)
-gs.setCameraFocus("Sol", -1)
+gs.setCameraFocus("Sun", -1)
 
 
 # Set free camera

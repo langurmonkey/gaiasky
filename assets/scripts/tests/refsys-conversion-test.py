@@ -14,7 +14,7 @@ gs.setRotationCameraSpeed(80)
 gs.setTurningCameraSpeed(100)
 gs.setCameraSpeed(30)
 
-gs.setCameraFocus("Sol")
+gs.setCameraFocus("Sun")
 
 au_to_km = 149597900.0
 text_x = 0.2
