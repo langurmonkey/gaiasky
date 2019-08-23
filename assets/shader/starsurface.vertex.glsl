@@ -138,8 +138,8 @@ out vec3 v_ambientLight;
     #include shader/lib_gravwaves.glsl
 #endif // gravitationalWaves
 
-#include shader/lib_logdepthbuff.glsl
 out float v_depth;
+out vec3 v_fragPosView;
 
 void main() {
 	v_time = u_shininess;
@@ -169,9 +169,7 @@ void main() {
     #endif // gravitationalWaves
 
 	gl_Position = u_projViewTrans * pos;
-
-	// Logarithmic depth buffer
-	v_depth = getDepthValue(length(pos.xyz));
+    v_fragPosView = gl_Position.xyz;
 
 	#ifdef shadowMapFlag
 		vec4 spos = u_shadowMapProjViewTrans * pos;

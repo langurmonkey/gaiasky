@@ -1,10 +1,12 @@
 #version 330 core
 
+#include shader/lib_logdepthbuff.glsl
+
 uniform float u_ar;
 uniform float u_falloff;
 
 in vec4 v_col;
-in float v_depth;
+in vec3 v_fragPosView;
 
 out vec4 fragColor;
 
@@ -22,7 +24,5 @@ void main() {
         discard;
 
     fragColor = vec4(v_col.rgb * programmatic(dist), 1.0) * v_col.a;
-
-    // Logarithmic depth buffer
-    gl_FragDepth = v_depth;
+    gl_FragDepth = getDepthValue(length(v_fragPosView));
 }

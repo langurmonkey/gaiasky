@@ -40,7 +40,10 @@ in vec3 v_ambientLight;
 
 #endif //lightingFlag
 
-in float v_depth;
+#include shader/lib_logdepthbuff.glsl
+
+in vec3 v_fragPosView;
+
 out vec4 fragColor;
 
 
@@ -76,5 +79,5 @@ void main() {
 	// Prevent saturation
     fragColor = clamp(fragColor, 0.0, 1.0);
 
-	gl_FragDepth = v_depth;
+	gl_FragDepth = getDepthValue(length(v_fragPosView));
 }

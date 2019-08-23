@@ -2,6 +2,8 @@
 
 #define exposure 0.65
 
+#include shader/lib_logdepthbuff.glsl
+
 uniform vec3 v3LightPos;
 uniform float g;
 uniform float g2;
@@ -11,12 +13,11 @@ in vec3 v_direction;
 // Calculated colors
 in vec4 v_frontColor;
 in vec3 v_frontSecondaryColor;
-// Depth buffer value
-in float v_depth;
 // Height normalized
 in float v_heightNormalized;
 // Fade factor between hieght-driven opacity and luminosity-driven opacity
 in float v_fadeFactor;
+in vec3 v_fragPosView;
 
 out vec4 fragColor;
 
@@ -38,5 +39,5 @@ void main(void) {
     fragColor.a = (v_heightNormalized * (1.0 - v_fadeFactor) + lma * v_fadeFactor) * scl;
 
     fragColor.rgb = fragColor.rgb * 0.95;
-    gl_FragDepth = v_depth;
+    gl_FragDepth = getDepthValue(length(v_fragPosView));
 }

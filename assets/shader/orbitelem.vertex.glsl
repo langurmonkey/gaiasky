@@ -1,7 +1,6 @@
 #version 330 core
 
 #include shader/lib_geometry.glsl
-#include shader/lib_logdepthbuff.glsl
 #include shader/lib_doublefloat.glsl
 
 in vec4 a_color;
@@ -37,7 +36,7 @@ uniform vec2 u_t;
 #endif // gravitationalWaves
     
 out vec4 v_col;
-out float v_depth;
+out vec3 v_fragPosView;
 
 #define M_TO_U 1e-9
 #define D_TO_S 86400.0
@@ -119,9 +118,6 @@ void main() {
         cubemapSizeFactor = 1.0 - cosphi * 0.65;
     }
 
-    // Logarithmic depth buffer
-    v_depth = getDepthValue(dist);
-
     #ifdef relativisticEffects
         pos = computeRelativisticAberration(pos, dist, u_velDir, u_vc);
     #endif // relativisticEffects
@@ -133,6 +129,7 @@ void main() {
     v_col = a_color * u_alpha;
 
     gl_Position = u_projModelView * vec4(pos, 0.0);
+    v_fragPosView = gl_Position.xyz;
     float distNorm = dist / 300.0;
     gl_PointSize = clamp(u_size / distNorm, 1.5, 3.5) * u_scaleFactor * cubemapSizeFactor * a_size;
 }

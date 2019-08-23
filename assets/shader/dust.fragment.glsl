@@ -1,6 +1,7 @@
 #version 330 core
 
 #include shader/lib_dither8x8.glsl
+#include shader/lib_logdepthbuff.glsl
 
 ////////////////////////////////////////////////////////////////////////////////////
 ////////// POSITION ATTRIBUTE - FRAGMENT
@@ -11,13 +12,10 @@ uniform vec4 u_diffuseColor;
 
 in vec4 v_position;
 #define pullPosition() { return v_position;}
-
-// Varyings computed in the vertex shader
 in float v_opacity;
-
 in vec3 v_viewDir;
+in vec3 v_fragPosView;
 
-in float v_depth;
 out vec4 fragColor;
 
 void main() {
@@ -41,6 +39,6 @@ void main() {
     if(fragColor.a == 0.0 || dither(gl_FragCoord.xy, fragColor.a) < 0.5){
         discard;
     } else {
-        gl_FragDepth = v_depth;
+        gl_FragDepth = getDepthValue(length(v_fragPosView));
     }
 }

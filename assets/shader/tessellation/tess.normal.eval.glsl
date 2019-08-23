@@ -35,8 +35,7 @@ uniform float u_heightNoiseSize;
 uniform vec2 u_heightSize;
 uniform sampler2D u_heightTexture;
 
-#include shader/lib_logdepthbuff.glsl
-out float o_depth;
+out vec3 o_fragPosView;
 out vec3 o_normalTan;
 out vec3 o_fragPosition;
 out float o_fragHeight;
@@ -131,11 +130,11 @@ void main(void){
     #endif// gravitationalWaves
 
     gl_Position = u_projViewTrans * pos;
+    o_fragPosView = gl_Position.xyz;
 
     // Plumbing
     o_fragPosition = pos.xyz;
     o_normalTan = calcNormal(o_texCoords, vec2(1.0 / u_heightSize.x, 1.0 / u_heightSize.y));
-    o_depth = getDepthValue(length(pos.xyz));
     o_opacity = l_opacity[0];
     o_color = l_color[0];
     o_viewDir = (gl_TessCoord.x * l_viewDir[0] + gl_TessCoord.y * l_viewDir[1] + gl_TessCoord.z * l_viewDir[2]);

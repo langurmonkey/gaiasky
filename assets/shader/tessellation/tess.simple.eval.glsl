@@ -40,8 +40,7 @@ uniform sampler2D u_normalTexture;
 in vec2 l_texCoords[gl_MaxPatchVertices];
 in vec3 l_normal[gl_MaxPatchVertices];
 
-#include shader/lib_logdepthbuff.glsl
-out float o_depth;
+out vec3 o_fragPosView;
 
 #include shader/lib_sampleheight.glsl
 
@@ -70,5 +69,5 @@ void main(void){
     #endif // gravitationalWaves
 
     gl_Position = u_projViewTrans * pos;
-    o_depth = getDepthValue(length(pos.xyz));
+    o_fragPosView = gl_Position.xyz;
 }

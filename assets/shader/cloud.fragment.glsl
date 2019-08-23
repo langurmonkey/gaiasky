@@ -63,9 +63,11 @@ vec4 fetchCloudColor(vec2 texCoord, vec4 defaultValue) {
 in vec3 v_lightDir;
 in vec3 v_lightCol;
 in vec3 v_viewDir;
+in vec3 v_fragPosView;
 
-in float v_depth;
 out vec4 fragColor;
+
+#include shader/lib_logdepthbuff.glsl
 
 void main() {
     vec2 g_texCoord0 = v_texCoord0;
@@ -84,5 +86,5 @@ void main() {
 
     fragColor = clamp(fragColor, 0.0, 1.0);
 
-    gl_FragDepth = v_depth;
+    gl_FragDepth = getDepthValue(length(v_fragPosView));
 }

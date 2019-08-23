@@ -231,7 +231,9 @@ in vec3 v_lightCol;
 // Logarithmic depth
 in float v_depth;
 // Fragment position in world space
-in vec3 v_fragPos;
+in vec3 v_fragPosWorld;
+// Fragment in view space
+in vec3 v_fragPosView;
 
 #ifdef environmentCubemapFlag
 in vec3 v_reflect;
@@ -331,6 +333,7 @@ mat3 cotangentFrame(vec3 N, vec3 p, vec2 uv){
 }
 
 #include shader/lib_atmfog.glsl
+#include shader/lib_logdepthbuff.glsl
 
 void main() {
     vec2 texCoords = v_texCoord0;
@@ -363,7 +366,7 @@ void main() {
             // Perturb the normal to get reflect direction
             pullNormal();
             mat3 TBN = cotangentFrame(g_normal, -v_viewDir, texCoords);
-			vec3 reflectDir = normalize(reflect(-v_fragPos, normalize(TBN * N)));
+			vec3 reflectDir = normalize(reflect(-v_fragPosWorld, normalize(TBN * N)));
 		#endif // environmentCubemapFlag
     #else
 	    // Normal in tangent space
@@ -411,5 +414,5 @@ void main() {
         discard;
     }
     // Logarithmic depth buffer
-    gl_FragDepth = v_depth;
+    gl_FragDepth = getDepthValue(length(v_fragPosView.xyz));
 }

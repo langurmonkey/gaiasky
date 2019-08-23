@@ -1,7 +1,5 @@
 #version 330 core
 
-#include shader/lib_logdepthbuff.glsl
-
 in vec4 a_position;
 in vec4 a_color;
 in vec2 a_uv;
@@ -11,7 +9,7 @@ uniform vec2 u_viewport;
 
 out vec4 v_col;
 out vec2 v_uv;
-out float v_depth;
+out vec3 v_fragPosView;
 
 #ifdef relativisticEffects
 uniform vec3 u_velDir;// Velocity vector
@@ -42,9 +40,7 @@ void main() {
     #endif// gravitationalWaves
 
     gl_Position = u_projModelView * pos;
-
-    // Logarithmic depth buffer
-    v_depth = getDepthValue(length(pos.xyz));
+    v_fragPosView = gl_Position.xyz;
 
     v_col = a_color;
     v_uv = a_uv;

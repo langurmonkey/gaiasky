@@ -2,7 +2,6 @@
 
 #include shader/lib_math.glsl
 #include shader/lib_geometry.glsl
-#include shader/lib_logdepthbuff.glsl
 
 in vec4 a_position;
 in vec2 a_texCoord0;
@@ -32,7 +31,7 @@ uniform float u_omgw;// Wave frequency
 
 out vec4 v_color;
 out vec2 v_texCoords;
-out float v_depth;
+out vec3 v_fragPosView;
 
 void main()
 {
@@ -42,9 +41,6 @@ void main()
     mat4 transform = u_projTrans;
 
     vec3 pos = u_pos - u_camShift;
-
-    // Logarithmic depth buffer
-    v_depth = getDepthValue(length(pos));
 
     #ifdef relativisticEffects
     pos = computeRelativisticAberration(pos, length(pos), u_velDir, u_vc);
@@ -95,4 +91,5 @@ void main()
 
     // Position
     gl_Position =  transform * a_position;
+    v_fragPosView = gl_Position.xyz;
 }

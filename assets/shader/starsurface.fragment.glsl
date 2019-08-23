@@ -21,7 +21,8 @@ in float v_opacity;
 // View vector
 in vec3 v_viewVec;
 
-in float v_depth;
+#include shader/lib_logdepthbuff.glsl
+in vec3 v_fragPosView;
 
 out vec4 fragColor;
 
@@ -161,5 +162,5 @@ void main() {
 	vec3 color = vec3(total, total, total);
     fragColor = vec4(min(vec3(0.9), color * 6.0 * v_lightDiffuse * percolor), v_opacity);
 
-    gl_FragDepth = v_depth;
+    gl_FragDepth = getDepthValue(length(v_fragPosView));
 }

@@ -167,7 +167,7 @@ public class SceneGraphRenderer extends AbstractRenderer implements IProcessRend
         starBillboardDesc = loadShader(manager, "shader/star.billboard.vertex.glsl", "shader/star.billboard.fragment.glsl", genShaderNames("star.billboard"), defines);
         spriteDesc = loadShader(manager, "shader/sprite.vertex.glsl", "shader/sprite.fragment.glsl", genShaderNames("sprite"), defines);
         starPointDesc = loadShader(manager, "shader/star.point.vertex.glsl", "shader/star.point.fragment.glsl", genShaderNames("star.point"), defines);
-        galaxyPointDesc = loadShader(manager, "shader/galaxy.vertex.glsl", "shader/galaxy.fragment.glsl", genShaderNames("galaxy"), defines);
+        galaxyPointDesc = loadShader(manager, "shader/milkyway.vertex.glsl", "shader/milkyway.fragment.glsl", genShaderNames("milkyway"), defines);
         pointDesc = loadShader(manager, "shader/point.cpu.vertex.glsl", "shader/point.cpu.fragment.glsl", genShaderNames("point.cpu"), defines);
         lineDesc = loadShader(manager, "shader/line.cpu.vertex.glsl", "shader/line.cpu.fragment.glsl", genShaderNames("line.cpu"), defines);
         lineQuadDesc = loadShader(manager, "shader/line.quad.vertex.glsl", "shader/line.quad.fragment.glsl", genShaderNames("line.quad"), defines);
@@ -321,7 +321,7 @@ public class SceneGraphRenderer extends AbstractRenderer implements IProcessRend
         /*
          * GALAXY POINTS
          */
-        galaxyPointShaders = fetchShaderProgram(manager, galaxyPointDesc, genShaderFullNames("galaxy"));
+        galaxyPointShaders = fetchShaderProgram(manager, galaxyPointDesc, genShaderFullNames("milkyway"));
 
         /*
          * PARTICLE EFFECT - default and relativistic

@@ -1,5 +1,7 @@
 #version 330 core
 
+#include shader/lib_logdepthbuff.glsl
+
 uniform sampler2D u_texture0;
 uniform float u_radius;
 uniform float u_apparent_angle;
@@ -14,7 +16,8 @@ uniform int u_lightScattering;
 // v_texCoords are UV coordinates in [0..1]
 in vec2 v_texCoords;
 in vec4 v_color;
-in float v_depth;
+in vec3 v_fragPosView;
+
 out vec4 fragColor;
 
 
@@ -95,5 +98,6 @@ vec4 draw() {
 
 void main() {
     fragColor = clamp(draw(), 0.0, 0.999);
-    gl_FragDepth = v_depth;
+    // Logarithmic depth buffer
+    gl_FragDepth = getDepthValue(length(v_fragPosView));
 }

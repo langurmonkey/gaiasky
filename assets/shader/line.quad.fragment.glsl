@@ -1,8 +1,11 @@
 #version 330 core
 
+#include shader/lib_logdepthbuff.glsl
+
 in vec4 v_col;
 in vec2 v_uv;
-in float v_depth;
+in vec3 v_fragPosView;
+
 out vec4 fragColor;
 
 #define PI 3.14159
@@ -17,5 +20,5 @@ void main() {
     float cplus = pow(core, 10.0);
 
     fragColor = vec4(v_col.rgb + cplus, 1.0) * v_col.a * alpha ;
-    gl_FragDepth = v_depth;
+    gl_FragDepth = getDepthValue(length(v_fragPosView));
 }

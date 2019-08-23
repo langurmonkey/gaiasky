@@ -200,7 +200,7 @@ in vec3 o_viewDir;
 // Light color
 in vec3 o_lightCol;
 // Logarithmic depth
-in float o_depth;
+in vec3 o_fragPosView;
 
 
 #ifdef environmentCubemapFlag
@@ -220,6 +220,7 @@ out vec4 fragColor;
 #define saturate(x) clamp(x, 0.0, 1.0)
 
 #include shader/lib_atmfog.glsl
+#include shader/lib_logdepthbuff.glsl
 
 // MAIN
 void main() {
@@ -275,6 +276,6 @@ void main() {
     }
 
     // Logarithmic depth buffer
-    gl_FragDepth = o_depth;
+    gl_FragDepth = getDepthValue(length(o_fragPosView));
 }
 

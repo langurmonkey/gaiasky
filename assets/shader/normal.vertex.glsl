@@ -295,19 +295,12 @@ uniform DirectionalLight u_dirLights[numDirectionalLights];
 out vec3 v_lightDir;
 out vec3 v_lightCol;
 out vec3 v_viewDir;
-out vec3 o_fragPosition;
-out vec3 v_fragPos;
-out float o_fragHeight;
+out vec3 v_fragPosWorld;
+out vec3 v_fragPosView;
 
 #ifdef environmentCubemapFlag
 out vec3 v_reflect;
 #endif
-
-//////////////////////////////////////////////
-// LOGARITHMIC DEPTH BUFFER
-//////////////////////////////////////////////
-#include shader/lib_logdepthbuff.glsl
-out float v_depth;
 
 void main() {
     computeAtmosphericScatteringGround();
@@ -325,14 +318,9 @@ void main() {
         pos.xyz = computeGravitationalWaves(pos.xyz, u_gw, u_gwmat3, u_ts, u_omgw, u_hterms);
     #endif // gravitationalWaves
 
-    o_fragPosition = pos.xyz;
-    v_fragPos = pos.xyz;
-    o_fragHeight = 0.0;
-
+    v_fragPosWorld = pos.xyz;
     gl_Position = u_projViewTrans * pos;
-
-    // Logarithmic depth buffer
-    v_depth = getDepthValue(length(pos.xyz));
+    v_fragPosView = gl_Position.xyz;
 
     #ifdef shadowMapFlag
 	vec4 spos = u_shadowMapProjViewTrans * pos;

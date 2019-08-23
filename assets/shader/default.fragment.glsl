@@ -105,7 +105,10 @@ in float v_fog;
 	#define fetchColorNight(texCoord) vec4(0.0, 0.0, 0.0, 0.0)
 #endif // nightTextureFlag
 
-in float v_depth;
+#include shader/lib_logdepthbuff.glsl
+
+in vec3 v_fragPosView;
+
 out vec4 fragColor;
 
 void main() {
@@ -192,5 +195,5 @@ void main() {
 	// Prevent saturation
     fragColor.rgb = clamp(fragColor.rgb, 0.0, 0.98);
 
-	gl_FragDepth = v_depth;
+	gl_FragDepth = getDepthValue(length(v_fragPosView));
 }

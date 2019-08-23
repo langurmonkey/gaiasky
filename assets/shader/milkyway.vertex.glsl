@@ -2,7 +2,6 @@
 
 #include shader/lib_math.glsl
 #include shader/lib_geometry.glsl
-#include shader/lib_logdepthbuff.glsl
 
 uniform float u_pointAlphaMin;
 uniform float u_pointAlphaMax;
@@ -37,7 +36,7 @@ in vec4 a_color;
 in vec2 a_additional;
 
 out vec4 v_col;
-out float v_depth;
+out vec3 v_fragPosView;
 out float v_dust;
 
 #define pc_to_u 3.085e7
@@ -48,9 +47,6 @@ out float v_dust;
 void main() {
     vec3 pos = a_position.xyz - u_camPos;
     float dist = length(pos);
-
-    // Logarithmic depth buffer
-    v_depth = getDepthValue(dist);
 
     #ifdef relativisticEffects
         pos = computeRelativisticAberration(pos, dist, u_velDir, u_vc);
@@ -69,6 +65,7 @@ void main() {
     dscale = pow(dscale, 10.0) * 1.5;
 
     gl_Position = u_projModelView * vec4(pos, 1.0);
+    v_fragPosView = gl_Position.xyz;
     gl_PointSize = a_additional.x * u_sizeFactor * u_ar * dscale;
 
 }

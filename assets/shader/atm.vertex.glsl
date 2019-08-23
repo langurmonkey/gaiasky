@@ -1,12 +1,12 @@
 #version 330 core
 
-#include shader/lib_logdepthbuff.glsl
 
 uniform mat4 u_projViewTrans;
 uniform mat4 u_worldTrans;
 
 in vec3 a_position;
-out float v_depth;
+
+out vec3 v_fragPosView;
 
 #include shader/lib_atmscattering.glsl
 
@@ -50,7 +50,5 @@ void main(void) {
     #endif // gravitationalWaves
     
     gl_Position = u_projViewTrans * pos;
-
-    // Logarithmic depth buffer
-    v_depth = getDepthValue(length(pos.xyz));
+    v_fragPosView = gl_Position.xyz;
 }

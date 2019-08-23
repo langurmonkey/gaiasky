@@ -2,7 +2,6 @@
 
 #include shader/lib_math.glsl
 #include shader/lib_geometry.glsl
-#include shader/lib_logdepthbuff.glsl
 
 in vec3 a_position;
 in vec3 a_pm;
@@ -42,7 +41,7 @@ uniform float u_magLimit = 22.0;
 uniform vec4 u_alphaSizeFovBr;
 
 out vec4 v_col;
-out float v_depth;
+out vec3 v_fragPosView;
 
 
 #define len0 170000.0
@@ -63,9 +62,6 @@ void main() {
         v_discard = 0.0;
         v_col *= 0.0;
     }
-
-    // Logarithmic depth buffer
-    v_depth = getDepthValue(dist);
 
     float sizefactor = 1.0;
     if(u_cubemap == 1) {
@@ -90,5 +86,6 @@ void main() {
     v_col = vec4(a_color.rgb, opacity * u_alphaSizeFovBr.x * fadeout);
 
     gl_Position = u_projModelView * vec4(pos, 0.0) * v_discard;
+    v_fragPosView = gl_Position.xyz;
     gl_PointSize = u_alphaSizeFovBr.y * sizefactor;
 }

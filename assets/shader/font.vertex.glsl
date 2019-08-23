@@ -1,7 +1,5 @@
 #version 330 core
 
-#include shader/lib_logdepthbuff.glsl
-
 in vec4 a_position;
 in vec4 a_color;
 in vec2 a_texCoord0;
@@ -18,7 +16,7 @@ uniform vec3 u_pos;
 out vec4 v_color;
 out vec2 v_texCoords;
 out float v_opacity;
-out float v_depth;
+out vec3 v_fragPosView;
 
 void main()
 {
@@ -28,7 +26,5 @@ void main()
    v_texCoords = a_texCoord0;
    
    gl_Position =  u_projTrans * a_position;
-
-   // Logarithmic depth buffer
-   v_depth = getDepthValue(length(u_pos));
+   v_fragPosView = gl_Position.xyz;
 }
