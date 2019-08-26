@@ -8,11 +8,6 @@ package gaia.cu9.ari.gaiaorbit.util;
 public class Constants {
 
     /**
-     * Scale factor that applies to all distances.
-     */
-    public static final double SCENE_SCALE_FACTOR = 5e-6;
-
-    /**
      * Metre to local unit conversion. Multiply this by all values in m.
      */
     public static final double M_TO_U = 1e-9;
@@ -95,12 +90,6 @@ public class Constants {
      * Units to solar radius
      */
     public static final double U_TO_Ro = 1 / Ro_TO_U;
-
-    /** Multiplier for all KM values in the application **/
-    public static final double KM_MULTIPLIER = Nature.KM_TO_PC * 1e9 * SCENE_SCALE_FACTOR;
-
-    /** Distance from Sun that marks the end of the solar system **/
-    public static final double SOLAR_SYSTEM_THRESHOLD = 5e9 * KM_MULTIPLIER;
 
     /**
      * Factor we need to use to get the real size of the star given its quad
