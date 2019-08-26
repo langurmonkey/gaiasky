@@ -36,10 +36,10 @@ This file contains the following sections:
 | | |
 |-|-|
 | **Operating system**  | Linux / Windows 7+ / macOS, 64-bit                                             |
-| **CPU**               | Intel Core i5 3rd Generation or similar                                        |
-| **GPU**               | Intel HD 4000, Nvidia GeForce 9800 GT, Radeon HD 5670 / 1 GB VRAM / OpenGL 4.x |
+| **CPU**               | Intel Core i5 3rd Generation or similar. 4 core or higher recommended          |
+| **GPU**               | Support for OpenGL 4.x with at least 1 GB RAM                                  |
 | **Memory**            | 4+ GB RAM                                                                      |
-| **Hard drive**        | 1 GB of free disk space                                                        |
+| **Hard drive**        | 1 GB of free disk space (depending on datasets)                                |
 
 ### 1.2 Download and install
 
