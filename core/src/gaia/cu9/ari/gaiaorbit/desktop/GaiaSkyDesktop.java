@@ -8,7 +8,6 @@ package gaia.cu9.ari.gaiaorbit.desktop;
 import com.badlogic.gdx.Files;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Graphics.DisplayMode;
-import com.badlogic.gdx.LifecycleListener;
 import com.badlogic.gdx.backends.lwjgl3.Lwjgl3Application;
 import com.badlogic.gdx.backends.lwjgl3.Lwjgl3ApplicationConfiguration;
 import com.badlogic.gdx.backends.lwjgl3.Lwjgl3Files;
@@ -33,6 +32,7 @@ import gaia.cu9.ari.gaiaorbit.interfce.NetworkCheckerManager;
 import gaia.cu9.ari.gaiaorbit.render.PostProcessorFactory;
 import gaia.cu9.ari.gaiaorbit.screenshot.ScreenshotsManager;
 import gaia.cu9.ari.gaiaorbit.util.*;
+import gaia.cu9.ari.gaiaorbit.util.GlobalConf.SceneConf.ElevationType;
 import gaia.cu9.ari.gaiaorbit.util.Logger.Log;
 import gaia.cu9.ari.gaiaorbit.util.format.DateFormatFactory;
 import gaia.cu9.ari.gaiaorbit.util.format.NumberFormatFactory;
@@ -231,11 +231,8 @@ public class GaiaSkyDesktop implements IObserver {
 
     }
 
-    private ConsoleLogger consoleLogger;
-
     public GaiaSkyDesktop() {
         super();
-        consoleLogger = new ConsoleLogger();
         EventManager.instance.subscribe(this, Events.SCENE_GRAPH_LOADED, Events.DISPOSE);
     }
 
@@ -244,6 +241,7 @@ public class GaiaSkyDesktop implements IObserver {
     }
 
     public void launchMainApp() {
+        ConsoleLogger consoleLogger = new ConsoleLogger();
         Lwjgl3ApplicationConfiguration cfg = new Lwjgl3ApplicationConfiguration();
         cfg.setTitle(GlobalConf.APPLICATION_NAME);
         if (GlobalConf.screen.FULLSCREEN) {
@@ -273,12 +271,25 @@ public class GaiaSkyDesktop implements IObserver {
 
         if (consoleLogger != null) {
             consoleLogger.unsubscribe();
-            consoleLogger = null;
         }
 
         // Launch app
-        Lwjgl3Application app = new Lwjgl3Application(new GaiaSky(gsArgs.download, gsArgs.catalogChooser), cfg);
-        app.addLifecycleListener(new GaiaSkyWindowListener());
+        try {
+            Lwjgl3Application app = new Lwjgl3Application(new GaiaSky(gsArgs.download, gsArgs.catalogChooser), cfg);
+        }catch(Exception e){
+            // Probably, OpenGL 4.x is not supported and window creation failed
+            consoleLogger.subscribe();
+            logger.error("Window creation failed (is OpenGL 4.x supported by your card?), trying with OpenGL 3.x");
+            logger.info("Disabling tessellation...");
+            consoleLogger.unsubscribe();
+            ElevationType et = GlobalConf.scene.ELEVATION_TYPE;
+            if(!et.isNone()){
+                GlobalConf.scene.ELEVATION_TYPE = ElevationType.PARALLAX_MAPPING;
+            }
+            cfg.useOpenGL3(true, 3, 2);
+
+            Lwjgl3Application app = new Lwjgl3Application(new GaiaSky(gsArgs.download, gsArgs.catalogChooser), cfg);
+        }
     }
 
     @Override
@@ -429,24 +440,6 @@ public class GaiaSkyDesktop implements IObserver {
             System.out.println("It looks like you are running Gaia Sky with java " + jv + " in Linux with Gnome.\n" + "This version may crash. If it does, comment out the property\n" + "'assistive_technologies' in the '/etc/java-[version]/accessibility.properties' file.");
             System.out.println("========================================================================================");
             System.out.println();
-        }
-    }
-
-    private class GaiaSkyWindowListener implements LifecycleListener {
-
-        @Override
-        public void pause() {
-
-        }
-
-        @Override
-        public void resume() {
-
-        }
-
-        @Override
-        public void dispose() {
-            // Terminate here
         }
     }
 }
