@@ -32,7 +32,6 @@ uniform int u_cubemap;
 #endif // gravitationalWaves
     
 out vec4 v_col;
-out vec3 v_fragPosView;
 
 void main() {
     vec3 pos = a_position.xyz - u_camPos;
@@ -59,6 +58,5 @@ void main() {
     v_col = vec4(a_color.rgb, a_color.a * u_alpha);
 
     gl_Position = u_projModelView * vec4(pos, 0.0);
-    v_fragPosView = gl_Position.xyz;
     gl_PointSize = a_size * u_sizeFactor * cubemapSizeFactor;
 }

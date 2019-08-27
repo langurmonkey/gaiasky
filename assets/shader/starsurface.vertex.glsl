@@ -139,7 +139,6 @@ out vec3 v_ambientLight;
 #endif // gravitationalWaves
 
 out float v_depth;
-out vec3 v_fragPosView;
 
 void main() {
 	v_time = u_shininess;
@@ -169,7 +168,6 @@ void main() {
     #endif // gravitationalWaves
 
 	gl_Position = u_projViewTrans * pos;
-    v_fragPosView = gl_Position.xyz;
 
 	#ifdef shadowMapFlag
 		vec4 spos = u_shadowMapProjViewTrans * pos;

@@ -6,7 +6,6 @@ in vec4 a_color;
 uniform mat4 u_projModelView;
 
 out vec4 v_col;
-out vec3 v_fragPosView;
 
 #ifdef relativisticEffects
     uniform vec3 u_velDir; // Velocity vector
@@ -37,7 +36,6 @@ void main() {
     #endif // gravitationalWaves
     
     gl_Position = u_projModelView * pos;
-    v_fragPosView = gl_Position.xyz;
 
     v_col = a_color;
 }

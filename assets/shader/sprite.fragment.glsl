@@ -7,7 +7,6 @@ uniform sampler2D u_texture0;
 // v_texCoords are UV coordinates in [0..1]
 in vec2 v_texCoords;
 in vec4 v_color;
-in vec3 v_fragPosView;
 
 out vec4 fragColor;
 
@@ -20,5 +19,5 @@ void main() {
     fragColor = draw();
 
     // Logarithmic depth buffer
-    gl_FragDepth = getDepthValue(length(v_fragPosView));
+    gl_FragDepth = getDepthValue();
 }

@@ -6,8 +6,6 @@ uniform mat4 u_worldTrans;
 
 in vec3 a_position;
 
-out vec3 v_fragPosView;
-
 #include shader/lib_atmscattering.glsl
 
 ////////////////////////////////////////////////////////////////////////////////////
@@ -50,5 +48,4 @@ void main(void) {
     #endif // gravitationalWaves
     
     gl_Position = u_projViewTrans * pos;
-    v_fragPosView = gl_Position.xyz;
 }

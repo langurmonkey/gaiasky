@@ -31,7 +31,6 @@ uniform float u_omgw;// Wave frequency
 
 out vec4 v_color;
 out vec2 v_texCoords;
-out vec3 v_fragPosView;
 
 void main()
 {
@@ -91,5 +90,4 @@ void main()
 
     // Position
     gl_Position =  transform * a_position;
-    v_fragPosView = gl_Position.xyz;
 }

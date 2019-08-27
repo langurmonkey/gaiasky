@@ -17,6 +17,7 @@ import com.badlogic.gdx.graphics.Texture.TextureFilter;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.MathUtils;
+import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
 import gaia.cu9.ari.gaiaorbit.GaiaSky;
@@ -537,9 +538,28 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
         camera.direction.set(direction.valuesf());
         camera.up.set(up.valuesf());
         camera.update();
+        //cameraUpdate(camera);
 
         posinv.set(pos).scl(-1);
+    }
 
+    /**
+     * Does the camera math in higher precision Matrix4d objects and then down-casts
+     * the results into the perspective camera
+     */
+    protected void cameraUpdate(PerspectiveCamera camera){
+        // Update in double matrices
+        super.update(camera, aux1.set(0,0,0), direction, up);
+
+        // Down-cast to perspective camera
+        projection.putIn(camera.projection);
+        view.putIn(camera.view);
+        combined.putIn(camera.combined);
+
+        // Update frustum
+        camera.invProjectionView.set(camera.combined);
+        Matrix4.inv(camera.invProjectionView.val);
+        camera.frustum.update(camera.invProjectionView);
     }
 
     /**

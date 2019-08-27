@@ -199,8 +199,6 @@ in vec3 o_lightDir;
 in vec3 o_viewDir;
 // Light color
 in vec3 o_lightCol;
-// Logarithmic depth
-in vec3 o_fragPosView;
 
 
 #ifdef environmentCubemapFlag
@@ -276,6 +274,6 @@ void main() {
     }
 
     // Logarithmic depth buffer
-    gl_FragDepth = getDepthValue(length(o_fragPosView));
+    gl_FragDepth = getDepthValue();
 }
 

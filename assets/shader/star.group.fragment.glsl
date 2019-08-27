@@ -7,7 +7,6 @@ uniform float u_ar;
 
 // INPUT
 in vec4 v_col;
-in vec3 v_fragPosView;
 
 // OUTPUT
 layout (location = 0) out vec4 fragColor;
@@ -28,5 +27,5 @@ void main() {
     }
 
     fragColor = v_col * alpha;
-    gl_FragDepth = getDepthValue(length(v_fragPosView));
+    gl_FragDepth = getDepthValue();
 }

@@ -10,7 +10,6 @@ uniform float u_opacity;
 in vec4 v_color;
 in vec2 v_texCoords;
 in float v_opacity;
-in vec3 v_fragPosView;
 
 // OUTPUT
 layout (location = 0) out vec4 fragColor;
@@ -28,5 +27,5 @@ void main(void){
 	    
     fragColor = vec4(v_color.rgb, aa * v_color.a);
 
-    gl_FragDepth = getDepthValue(length(v_fragPosView));
+    gl_FragDepth = getDepthValue();
 }

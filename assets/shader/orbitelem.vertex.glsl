@@ -36,7 +36,6 @@ uniform vec2 u_t;
 #endif // gravitationalWaves
     
 out vec4 v_col;
-out vec3 v_fragPosView;
 
 #define M_TO_U 1e-9
 #define D_TO_S 86400.0
@@ -81,6 +80,7 @@ vec4 keplerToCartesian() {
     // 5
     float ox = rc_t * cos(nu_t);
     float oy = rc_t * sin(nu_t);
+
 
     // 6
     float sinomega = sin(omega_ap);
@@ -129,7 +129,6 @@ void main() {
     v_col = a_color * u_alpha;
 
     gl_Position = u_projModelView * vec4(pos, 0.0);
-    v_fragPosView = gl_Position.xyz;
     float distNorm = dist / 300.0;
     gl_PointSize = clamp(u_size / distNorm, 1.5, 3.5) * u_scaleFactor * cubemapSizeFactor * a_size;
 }

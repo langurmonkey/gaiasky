@@ -36,7 +36,7 @@ vec4 drawSimple(vec2 tc) {
 		discard;
 	}
 	float light = light(dist, light_decay);
-	return vec4(v_color.rgb, v_color.a) * light;
+	return v_color * light;
 }
 
 

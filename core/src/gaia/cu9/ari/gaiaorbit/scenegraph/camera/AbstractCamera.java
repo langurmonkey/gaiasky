@@ -58,6 +58,7 @@ public abstract class AbstractCamera implements ICamera {
     protected PerspectiveCamera[] cameras;
 
     protected Matrix4d projection, view, combined;
+    protected Frustumd frustumd;
 
     public float fovFactor;
 
@@ -91,6 +92,7 @@ public abstract class AbstractCamera implements ICamera {
         projection = new Matrix4d();
         view = new Matrix4d();
         combined = new Matrix4d();
+        frustumd = new Frustumd();
     }
 
     @Override
@@ -259,7 +261,9 @@ public abstract class AbstractCamera implements ICamera {
     }
 
 
-    public void updateFrustum(Frustumd frustum, PerspectiveCamera cam, Vector3d position, Vector3d direction, Vector3d up) {
+
+
+    public void update(PerspectiveCamera cam, Vector3d position, Vector3d direction, Vector3d up) {
         double aspect = cam.viewportWidth / cam.viewportHeight;
         projection.setToProjection(cam.near, cam.far, cam.fieldOfView, aspect);
         view.setToLookAt(position, tmp.set(position).add(direction), up);
@@ -268,7 +272,7 @@ public abstract class AbstractCamera implements ICamera {
 
         invProjectionView.set(combined);
         Matrix4d.inv(invProjectionView.val);
-        frustum.update(invProjectionView);
+        frustumd.update(invProjectionView);
     }
 
     public IStarFocus getClosestStar() {
@@ -287,4 +291,11 @@ public abstract class AbstractCamera implements ICamera {
         return null;
     }
 
+    protected void setFrustumPlanes(PerspectiveCamera cam){
+        if(cam!= null){
+            cam.near = (float) CAM_NEAR;
+            cam.far = (float) CAM_FAR;
+            cam.update();
+        }
+    }
 }

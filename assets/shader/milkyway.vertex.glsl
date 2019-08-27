@@ -37,7 +37,6 @@ in vec4 a_color;
 in vec2 a_additional;
 
 out vec4 v_col;
-out vec3 v_fragPosView;
 out float v_dust;
 
 void main() {
@@ -59,7 +58,6 @@ void main() {
     v_dust = a_additional.y;
 
     gl_Position = u_projModelView * vec4(pos, 1.0);
-    v_fragPosView = gl_Position.xyz;
     gl_PointSize = a_additional.x * u_sizeFactor * u_ar * pow(dscale, 3.0);
 
 }

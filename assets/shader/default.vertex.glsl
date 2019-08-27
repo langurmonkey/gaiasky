@@ -137,13 +137,6 @@ out vec3 v_ambientLight;
     #include shader/lib_gravwaves.glsl
 #endif // gravitationalWaves
 
-
-//////////////////////////////////////////////
-// LOGARITHMIC DEPTH BUFFER
-//////////////////////////////////////////////
-out vec3 v_fragPosView;
-
-
 void main() {
 	computeAtmosphericScatteringGround();
 
@@ -174,7 +167,6 @@ void main() {
 
 
 	gl_Position = u_projViewTrans * pos;
-	v_fragPosView = gl_Position.xyz;
 
 	#ifdef shadowMapFlag
 		vec4 spos = u_shadowMapProjViewTrans * pos;

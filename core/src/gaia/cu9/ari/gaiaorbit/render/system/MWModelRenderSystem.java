@@ -20,6 +20,7 @@ import gaia.cu9.ari.gaiaorbit.scenegraph.MilkyWay;
 import gaia.cu9.ari.gaiaorbit.scenegraph.ParticleGroup.ParticleBean;
 import gaia.cu9.ari.gaiaorbit.scenegraph.SceneGraphNode.RenderGroup;
 import gaia.cu9.ari.gaiaorbit.scenegraph.camera.ICamera;
+import gaia.cu9.ari.gaiaorbit.util.Constants;
 import gaia.cu9.ari.gaiaorbit.util.GlobalConf;
 import gaia.cu9.ari.gaiaorbit.util.gdx.mesh.IntMesh;
 import gaia.cu9.ari.gaiaorbit.util.gdx.shader.ExtShaderProgram;
@@ -169,6 +170,9 @@ public class MWModelRenderSystem extends ImmediateRenderSystem implements IObser
                     shaderProgram.setUniformf("u_alpha", mw.opacity * alpha);
                     shaderProgram.setUniformf("u_ar", GlobalConf.program.isStereoHalfWidth() ? 2f : 1f);
                     shaderProgram.setUniformf("u_edges", mw.getFadeIn().y, mw.getFadeOut().y);
+
+                    shaderProgram.setUniformf("u_zfar", camera.getCamera().far);
+                    shaderProgram.setUniformf("u_k", Constants.getCameraK());
 
                     // Relativistic effects
                     addEffectsUniforms(shaderProgram, camera);

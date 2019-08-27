@@ -26,5 +26,4 @@ void main()
    v_texCoords = a_texCoord0;
    
    gl_Position =  u_projTrans * a_position;
-   v_fragPosView = gl_Position.xyz;
 }

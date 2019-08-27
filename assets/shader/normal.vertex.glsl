@@ -296,7 +296,6 @@ out vec3 v_lightDir;
 out vec3 v_lightCol;
 out vec3 v_viewDir;
 out vec3 v_fragPosWorld;
-out vec3 v_fragPosView;
 
 #ifdef environmentCubemapFlag
 out vec3 v_reflect;
@@ -320,7 +319,6 @@ void main() {
 
     v_fragPosWorld = pos.xyz;
     gl_Position = u_projViewTrans * pos;
-    v_fragPosView = gl_Position.xyz;
 
     #ifdef shadowMapFlag
 	vec4 spos = u_shadowMapProjViewTrans * pos;

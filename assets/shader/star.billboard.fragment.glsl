@@ -16,7 +16,6 @@ uniform int u_lightScattering;
 // v_texCoords are UV coordinates in [0..1]
 in vec2 v_texCoords;
 in vec4 v_color;
-in vec3 v_fragPosView;
 
 out vec4 fragColor;
 
@@ -99,5 +98,5 @@ vec4 draw() {
 void main() {
     fragColor = clamp(draw(), 0.0, 0.999);
     // Logarithmic depth buffer
-    gl_FragDepth = getDepthValue(length(v_fragPosView));
+    gl_FragDepth = getDepthValue();
 }

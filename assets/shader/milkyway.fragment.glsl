@@ -8,7 +8,6 @@ uniform float u_ar;
 uniform float u_alpha;
 
 in vec4 v_col;
-in vec3 v_fragPosView;
 in float v_dust;
 
 out vec4 fragColor;
@@ -48,5 +47,5 @@ void main() {
     }
 
     // Logarithmic depth buffer
-    gl_FragDepth = getDepthValue(length(v_fragPosView));
+    gl_FragDepth = getDepthValue();
 }

@@ -9,7 +9,6 @@ uniform vec3 u_parentPos;
 uniform float u_pointSize;
 
 out vec4 v_col;
-out vec3 v_fragPosView;
 
 #ifdef relativisticEffects
 uniform vec3 u_velDir;// Velocity vector
@@ -43,7 +42,6 @@ void main() {
     #endif// gravitationalWaves
 
     gl_Position = u_projModelView * pos;
-    v_fragPosView = gl_Position.xyz;
 
     gl_PointSize = u_pointSize;
     v_col = a_color;

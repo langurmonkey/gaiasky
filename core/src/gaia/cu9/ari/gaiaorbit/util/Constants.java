@@ -8,58 +8,62 @@ package gaia.cu9.ari.gaiaorbit.util;
 public class Constants {
 
     /**
+     * Distance unit scaling (mainly for VR)
+     */
+    public static double DISTANCE_SCALE_FACTOR = 1d;
+
+    /**
      * Metre to local unit conversion. Multiply this by all values in m.
      */
-    public static final double M_TO_U = 1e-9;
+    public static double M_TO_U = 1e-9 * DISTANCE_SCALE_FACTOR;
     /**
      * Local unit to m conversion.
      */
-    public static final double U_TO_M = 1 / M_TO_U;
+    public static double U_TO_M = 1 / M_TO_U;
 
     /**
      * Kilometre to local unit conversion. Multiply this by all values in Km.
      */
-    public static final double KM_TO_U = M_TO_U * 1000;
+    public static double KM_TO_U = M_TO_U * 1000;
     /**
      * Local unit to km conversion.
      */
-    public static final double U_TO_KM = 1 / KM_TO_U;
+    public static double U_TO_KM = 1 / KM_TO_U;
 
     /**
      * AU to local units conversion.
      */
-    public static final double AU_TO_U = Nature.AU_TO_KM * KM_TO_U;
+    public static double AU_TO_U = Nature.AU_TO_KM * KM_TO_U;
 
     /**
      * Local unit to AU conversion.
      */
-    public static final double U_TO_AU = 1 / AU_TO_U;
+    public static double U_TO_AU = 1 / AU_TO_U;
 
     /**
      * Parsec to local unit conversion. Multiply this by all values in pc.
      */
-    public static final double PC_TO_U = Nature.PC_TO_KM * KM_TO_U;
+    public static double PC_TO_U = Nature.PC_TO_KM * KM_TO_U;
 
     /**
      * Kiloparsec to local unit conversion. Multiply this by all values in Kpc.
      */
-    public static final double KPC_TO_U = PC_TO_U * 1000;
+    public static double KPC_TO_U = PC_TO_U * 1000;
 
     /**
      * Megaparsec to local unit conversion. Multiply this by all values in Mpc.
      */
-    public static final double MPC_TO_U = PC_TO_U * 1000000;
+    public static double MPC_TO_U = PC_TO_U * 1000000;
 
     /**
      * Local unit to pc conversion.
      */
-    public static final double U_TO_PC = 1 / PC_TO_U;
+    public static double U_TO_PC = 1 / PC_TO_U;
 
     /**
      * Local unit to Kpc conversion.
      */
-    public static final double U_TO_KPC = U_TO_PC / 1000d;
-
+    public static double U_TO_KPC = U_TO_PC / 1000d;
 
     /**
      * Speed of light in m/s
@@ -74,7 +78,7 @@ public class Constants {
     /**
      * Speed of light in internal units per second
      */
-    public static final double C_US = C * M_TO_U;
+    public static double C_US = C * M_TO_U;
 
     /**
      * Solar radius in Km
@@ -84,26 +88,53 @@ public class Constants {
     /**
      * Solar radius to local units
      */
-    public static final double Ro_TO_U = Ro_TO_KM * KM_TO_U;
+    public static double Ro_TO_U = Ro_TO_KM * KM_TO_U;
 
     /**
      * Units to solar radius
      */
-    public static final double U_TO_Ro = 1 / Ro_TO_U;
+    public static double U_TO_Ro = 1 / Ro_TO_U;
+
+    /**
+     * Logarithmic depth buffer constant. Controls the resolution close to the camera
+     */
+    public static double CAMERA_K = 1e7d / DISTANCE_SCALE_FACTOR;
+
+    public static float getCameraK(){
+        return (float) CAMERA_K;
+    }
+
+    public static void initialize(double distanceScaleFactor) {
+        DISTANCE_SCALE_FACTOR = distanceScaleFactor;
+        M_TO_U = 1e-9 * DISTANCE_SCALE_FACTOR;
+        U_TO_M = 1 / M_TO_U;
+        KM_TO_U = M_TO_U * 1000;
+        U_TO_KM = 1 / KM_TO_U;
+        AU_TO_U = Nature.AU_TO_KM * KM_TO_U;
+        U_TO_AU = 1 / AU_TO_U;
+        PC_TO_U = Nature.PC_TO_KM * KM_TO_U;
+        KPC_TO_U = PC_TO_U * 1000;
+        MPC_TO_U = PC_TO_U * 1000000;
+        U_TO_PC = 1 / PC_TO_U;
+        U_TO_KPC = U_TO_PC / 1000d;
+        C_US = C * M_TO_U;
+        Ro_TO_U = Ro_TO_KM * KM_TO_U;
+        U_TO_Ro = 1 / Ro_TO_U;
+        CAMERA_K = 1e7d / DISTANCE_SCALE_FACTOR;
+    }
 
     /**
      * Factor we need to use to get the real size of the star given its quad
      * *texture* size
      **/
     public static final double STAR_SIZE_FACTOR = 1.31526e-6;
-    public static final double STAR_SIZE_FACTOR_INV = 1d / STAR_SIZE_FACTOR;
 
     /** Threshold radius/distance where star size remains constant. **/
     public static final double THRESHOLD_DOWN = 5e-7;
     public static final double THRESHOLD_UP = 1e-2;
 
     /**
-     * 
+     *
      * MAXIMUM AND MINIMUM VALUES FOR SEVERAL PARAMETERS - THESE SHOULD BE
      * ENFORCED
      *
@@ -220,13 +251,13 @@ public class Constants {
     /** Motion blur value **/
     public static final float MOTION_BLUR_VALUE = 0.7f;
 
+
     /**
      * Checks whether the given time is within the acceptable bounds of VSOP87
      * algorithms.
-     * 
-     * @param time
-     *            The time as the number of milliseconds since January 1, 1970,
-     *            00:00:00 GMT.
+     *
+     * @param time The time as the number of milliseconds since January 1, 1970,
+     *             00:00:00 GMT.
      * @return Whether the given time is within the bounds of VSOP
      */
     public static boolean withinVSOPTime(long time) {

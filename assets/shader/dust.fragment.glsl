@@ -14,7 +14,6 @@ in vec4 v_position;
 #define pullPosition() { return v_position;}
 in float v_opacity;
 in vec3 v_viewDir;
-in vec3 v_fragPosView;
 
 out vec4 fragColor;
 
@@ -39,6 +38,6 @@ void main() {
     if(fragColor.a == 0.0 || dither(gl_FragCoord.xy, fragColor.a) < 0.5){
         discard;
     } else {
-        gl_FragDepth = getDepthValue(length(v_fragPosView));
+        gl_FragDepth = getDepthValue();
     }
 }

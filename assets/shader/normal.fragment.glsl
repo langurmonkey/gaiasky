@@ -232,8 +232,6 @@ in vec3 v_lightCol;
 in float v_depth;
 // Fragment position in world space
 in vec3 v_fragPosWorld;
-// Fragment in view space
-in vec3 v_fragPosView;
 
 #ifdef environmentCubemapFlag
 in vec3 v_reflect;
@@ -414,5 +412,5 @@ void main() {
         discard;
     }
     // Logarithmic depth buffer
-    gl_FragDepth = getDepthValue(length(v_fragPosView.xyz));
+    gl_FragDepth = getDepthValue();
 }

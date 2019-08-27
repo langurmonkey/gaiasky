@@ -107,8 +107,6 @@ in float v_fog;
 
 #include shader/lib_logdepthbuff.glsl
 
-in vec3 v_fragPosView;
-
 out vec4 fragColor;
 
 void main() {
@@ -195,5 +193,5 @@ void main() {
 	// Prevent saturation
     fragColor.rgb = clamp(fragColor.rgb, 0.0, 0.98);
 
-	gl_FragDepth = getDepthValue(length(v_fragPosView));
+	gl_FragDepth = getDepthValue();
 }

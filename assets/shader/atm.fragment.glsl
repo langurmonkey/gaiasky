@@ -17,7 +17,6 @@ in vec3 v_frontSecondaryColor;
 in float v_heightNormalized;
 // Fade factor between hieght-driven opacity and luminosity-driven opacity
 in float v_fadeFactor;
-in vec3 v_fragPosView;
 
 out vec4 fragColor;
 
@@ -39,5 +38,5 @@ void main(void) {
     fragColor.a = (v_heightNormalized * (1.0 - v_fadeFactor) + lma * v_fadeFactor) * scl;
 
     fragColor.rgb = fragColor.rgb * 0.95;
-    gl_FragDepth = getDepthValue(length(v_fragPosView));
+    gl_FragDepth = getDepthValue();
 }

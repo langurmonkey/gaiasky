@@ -42,6 +42,7 @@ import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.GdxRuntimeException;
 import gaia.cu9.ari.gaiaorbit.GaiaSky;
 import gaia.cu9.ari.gaiaorbit.assets.ShaderTemplatingLoader;
+import gaia.cu9.ari.gaiaorbit.util.Constants;
 import gaia.cu9.ari.gaiaorbit.util.gdx.IntRenderable;
 
 public class DefaultIntShader extends BaseIntShader {
@@ -82,6 +83,7 @@ public class DefaultIntShader extends BaseIntShader {
 		public final static Uniform cameraDirection = new Uniform("u_cameraDirection");
 		public final static Uniform cameraUp = new Uniform("u_cameraUp");
 		public final static Uniform cameraNearFar = new Uniform("u_cameraNearFar");
+		public final static Uniform cameraK = new Uniform("u_cameraK");
 
 		public final static Uniform worldTrans = new Uniform("u_worldTrans");
 		public final static Uniform viewWorldTrans = new Uniform("u_viewWorldTrans");
@@ -158,6 +160,12 @@ public class DefaultIntShader extends BaseIntShader {
 			@Override
 			public void set (BaseIntShader shader, int inputID, IntRenderable renderable, Attributes combinedAttributes) {
 				shader.set(inputID, shader.camera.near, shader.camera.far);
+			}
+		};
+		public final static Setter cameraK = new GlobalSetter() {
+			@Override
+			public void set (BaseIntShader shader, int inputID, IntRenderable renderable, Attributes combinedAttributes) {
+				shader.set(inputID, Constants.getCameraK());
 			}
 		};
 		public final static Setter worldTrans = new LocalSetter() {
@@ -416,6 +424,7 @@ public class DefaultIntShader extends BaseIntShader {
 	public final int u_cameraDirection;
 	public final int u_cameraUp;
 	public final int u_cameraNearFar;
+	public final int u_cameraK;
 	public final int u_time;
 	// Object uniforms
 	public final int u_worldTrans;
@@ -552,6 +561,7 @@ public class DefaultIntShader extends BaseIntShader {
 		u_cameraDirection = register(Inputs.cameraDirection, Setters.cameraDirection);
 		u_cameraUp = register(Inputs.cameraUp, Setters.cameraUp);
 		u_cameraNearFar = register(Inputs.cameraNearFar, Setters.cameraNearFar);
+		u_cameraK = register(Inputs.cameraK, Setters.cameraK);
 		u_time = register(new Uniform("u_time"));
 		// Object uniforms
 		u_worldTrans = register(Inputs.worldTrans, Setters.worldTrans);

@@ -4,7 +4,6 @@
 
 in vec4 v_col;
 in vec2 v_uv;
-in vec3 v_fragPosView;
 
 out vec4 fragColor;
 
@@ -20,5 +19,5 @@ void main() {
     float cplus = pow(core, 10.0);
 
     fragColor = vec4(v_col.rgb + cplus, 1.0) * v_col.a * alpha ;
-    gl_FragDepth = getDepthValue(length(v_fragPosView));
+    gl_FragDepth = getDepthValue();
 }

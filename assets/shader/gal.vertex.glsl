@@ -42,7 +42,7 @@ out vec2 v_texCoords;
 void main()
 {
 
-   v_color = vec4(u_color.rgb, u_color.a);
+   v_color = u_color;
    v_texCoords = a_texCoord0;
    
    mat4 transform = u_projTrans;

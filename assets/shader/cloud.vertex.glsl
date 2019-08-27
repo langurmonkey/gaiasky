@@ -266,7 +266,6 @@ uniform DirectionalLight u_dirLights[numDirectionalLights];
 out vec3 v_lightDir;
 out vec3 v_lightCol;
 out vec3 v_viewDir;
-out vec3 v_fragPosView;
 
 void main() {
     v_opacity = u_opacity;
@@ -289,7 +288,6 @@ void main() {
     #endif // gravitationalWaves
     
     gl_Position = u_projViewTrans * pos;
-    v_fragPosView = gl_Position.xyz;
 
     #ifdef shadowMapFlag
 	vec4 spos = u_shadowMapProjViewTrans * pos;

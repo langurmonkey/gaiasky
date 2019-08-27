@@ -35,7 +35,6 @@ uniform float u_heightNoiseSize;
 uniform vec2 u_heightSize;
 uniform sampler2D u_heightTexture;
 
-out vec3 o_fragPosView;
 out vec3 o_normalTan;
 out vec3 o_fragPosition;
 out float o_fragHeight;
@@ -130,7 +129,6 @@ void main(void){
     #endif// gravitationalWaves
 
     gl_Position = u_projViewTrans * pos;
-    o_fragPosView = gl_Position.xyz;
 
     // Plumbing
     o_fragPosition = pos.xyz;
