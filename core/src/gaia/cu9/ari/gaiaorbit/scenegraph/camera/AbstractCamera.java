@@ -5,7 +5,6 @@
 
 package gaia.cu9.ari.gaiaorbit.scenegraph.camera;
 
-
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.PerspectiveCamera;
 import gaia.cu9.ari.gaiaorbit.scenegraph.CelestialBody;
@@ -24,12 +23,12 @@ import gaia.cu9.ari.gaiaorbit.util.time.ITimeFrameProvider;
 public abstract class AbstractCamera implements ICamera {
     protected static final Log logger = Logger.getLogger(AbstractCamera.class);
 
-    /** Camera far value **/
-    public static final double CAM_FAR = 1e25;
-    /** Camera near values **/
-    public static final double CAM_NEAR = 1 * Constants.M_TO_U;
-
     private static Matrix4d invProjectionView = new Matrix4d();
+
+    /** Camera far value **/
+    public double CAM_FAR;
+    /** Camera near value **/
+    public double CAM_NEAR;
 
     public Vector3d pos, posinv, tmp;
     /**
@@ -67,7 +66,15 @@ public abstract class AbstractCamera implements ICamera {
      */
     protected IStarFocus closestStar;
 
+    private void initNearFar(){
+        CAM_FAR = 0.5d * Constants.MPC_TO_U;
+        /** Camera near value **/
+        CAM_NEAR = 0.5d * Constants.M_TO_U;
+    }
+
     public AbstractCamera(CameraManager parent) {
+        initNearFar();
+
         this.parent = parent;
         pos = new Vector3d();
         posinv = new Vector3d();

@@ -590,7 +590,7 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
         lastFwdTime = 0;
     }
 
-    public void forward(double amount){
+    public void forward(double amount) {
         forward(amount, 0);
     }
 
@@ -601,8 +601,7 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
         lastFwdTime = 0;
     }
 
-
-    public void strafe(double amount){
+    public void strafe(double amount) {
         strafe(amount, 0);
     }
 
@@ -1223,6 +1222,7 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
                     direction.set(0, 0, 1);
                     up.set(0, 1, 0);
                     rotate(up, 0.01);
+                    updatePerspectiveCamera();
                 });
 
             }

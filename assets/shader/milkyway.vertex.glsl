@@ -11,6 +11,7 @@ uniform vec3 u_camPos;
 uniform float u_sizeFactor;
 uniform float u_intensity;
 uniform float u_ar;
+uniform vec2 u_edges;
 
 uniform mat4 u_view;
 
@@ -39,11 +40,6 @@ out vec4 v_col;
 out vec3 v_fragPosView;
 out float v_dust;
 
-#define pc_to_u 3.085e7
-#define u_to_pc 1.0 / pc_to_u
-#define edge_far 1.5e6 * pc_to_u
-#define edge_near 10 * pc_to_u
-
 void main() {
     vec3 pos = a_position.xyz - u_camPos;
     float dist = length(pos);
@@ -56,16 +52,14 @@ void main() {
         pos = computeGravitationalWaves(pos, u_gw, u_gwmat3, u_ts, u_omgw, u_hterms);
     #endif // gravitationalWaves
     
-    v_col = vec4(a_color.rgb, a_color.a * u_intensity);
+
+    float dscale = smoothstep(u_edges.y, u_edges.x, dist);
+
+    v_col = vec4(a_color.rgb, a_color.a * u_intensity * dscale);
     v_dust = a_additional.y;
-
-    float sizeCorrection = clamp((dist * u_to_pc) / 4000.0, 0.1, 6.0);
-
-    float dscale = smoothstep(edge_far, edge_near, dist);
-    dscale = pow(dscale, 10.0) * 1.5;
 
     gl_Position = u_projModelView * vec4(pos, 1.0);
     v_fragPosView = gl_Position.xyz;
-    gl_PointSize = a_additional.x * u_sizeFactor * u_ar * dscale;
+    gl_PointSize = a_additional.x * u_sizeFactor * u_ar * pow(dscale, 3.0);
 
 }

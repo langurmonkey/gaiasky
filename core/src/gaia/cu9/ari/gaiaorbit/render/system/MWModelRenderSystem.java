@@ -168,6 +168,7 @@ public class MWModelRenderSystem extends ImmediateRenderSystem implements IObser
                     shaderProgram.setUniformf("u_camPos", camera.getCurrent().getPos().put(aux3f1));
                     shaderProgram.setUniformf("u_alpha", mw.opacity * alpha);
                     shaderProgram.setUniformf("u_ar", GlobalConf.program.isStereoHalfWidth() ? 2f : 1f);
+                    shaderProgram.setUniformf("u_edges", mw.getFadeIn().y, mw.getFadeOut().y);
 
                     // Relativistic effects
                     addEffectsUniforms(shaderProgram, camera);
@@ -196,7 +197,7 @@ public class MWModelRenderSystem extends ImmediateRenderSystem implements IObser
 
                     // Gas
                     shaderProgram.setUniformf("u_sizeFactor", 1.0f);
-                    shaderProgram.setUniformf("u_intensity", 0.3f);
+                    shaderProgram.setUniformf("u_intensity", 0.6f);
                     gas.mesh.render(shaderProgram, ShapeType.Point.getGlType());
 
                     // Bulge
@@ -206,7 +207,7 @@ public class MWModelRenderSystem extends ImmediateRenderSystem implements IObser
 
                     // Stars
                     shaderProgram.setUniformf("u_sizeFactor", 0.2f);
-                    shaderProgram.setUniformf("u_intensity", 1.4f);
+                    shaderProgram.setUniformf("u_intensity", 1.5f);
                     stars.mesh.render(shaderProgram, ShapeType.Point.getGlType());
 
                     shaderProgram.end();

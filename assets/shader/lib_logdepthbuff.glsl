@@ -1,11 +1,15 @@
-#define z_near 1e7
-#define z_far 1e24
+#define z_near 2.0E-9
+#define z_far 6.171355162982741E13
 // This constant controls the resolution close to the camera
-#define K 1e8
+#define K 1.0e7
 
 #define K_far z_far * K
 #define one_over_near 1.0 / z_near
 #define one_over_far 1.0 / z_far
+
+float getDepthValue(float z, float zfar, float k){
+    return log(k * z + 1.0) / log(zfar * k + 1.0);
+}
 
 float getDepthValue(float z) {
     return log(K * z + 1.0) / log(K_far + 1.0);
