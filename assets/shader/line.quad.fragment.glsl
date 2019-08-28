@@ -2,6 +2,9 @@
 
 #include shader/lib_logdepthbuff.glsl
 
+uniform float u_zfar;
+uniform float u_k;
+
 in vec4 v_col;
 in vec2 v_uv;
 
@@ -19,5 +22,5 @@ void main() {
     float cplus = pow(core, 10.0);
 
     fragColor = vec4(v_col.rgb + cplus, 1.0) * v_col.a * alpha ;
-    gl_FragDepth = getDepthValue();
+    gl_FragDepth = getDepthValue(u_zfar, u_k);
 }

@@ -32,6 +32,7 @@ import com.badlogic.gdx.graphics.g3d.utils.RenderContext;
 import com.badlogic.gdx.math.Matrix3;
 import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.utils.GdxRuntimeException;
+import gaia.cu9.ari.gaiaorbit.util.Constants;
 import gaia.cu9.ari.gaiaorbit.util.gdx.IntRenderable;
 
 public class AtmosphereShader extends BaseIntShader {
@@ -63,6 +64,8 @@ public class AtmosphereShader extends BaseIntShader {
         public final static Uniform cameraPosition = new Uniform("u_cameraPosition");
         public final static Uniform cameraDirection = new Uniform("u_cameraDirection");
         public final static Uniform cameraUp = new Uniform("u_cameraUp");
+        public final static Uniform cameraNearFar = new Uniform("u_cameraNearFar");
+        public final static Uniform cameraK = new Uniform("u_cameraK");
 
         public final static Uniform worldTrans = new Uniform("u_worldTrans");
         public final static Uniform viewWorldTrans = new Uniform("u_viewWorldTrans");
@@ -169,6 +172,18 @@ public class AtmosphereShader extends BaseIntShader {
             @Override
             public void set(BaseIntShader shader, int inputID, IntRenderable renderable, Attributes combinedAttributes) {
                 shader.set(inputID, shader.camera.up);
+            }
+        };
+        public final static Setter cameraNearFar = new GlobalSetter() {
+            @Override
+            public void set (BaseIntShader shader, int inputID, IntRenderable renderable, Attributes combinedAttributes) {
+                shader.set(inputID, shader.camera.near, shader.camera.far);
+            }
+        };
+        public final static Setter cameraK = new GlobalSetter() {
+            @Override
+            public void set (BaseIntShader shader, int inputID, IntRenderable renderable, Attributes combinedAttributes) {
+                shader.set(inputID, Constants.getCameraK());
             }
         };
         public final static Setter worldTrans = new Setter() {
@@ -609,6 +624,8 @@ public class AtmosphereShader extends BaseIntShader {
     public final int u_cameraPosition;
     public final int u_cameraDirection;
     public final int u_cameraUp;
+    public final int u_cameraNearFar;
+    public final int u_cameraK;
     // Object uniforms
     public final int u_worldTrans;
     public final int u_viewWorldTrans;
@@ -690,6 +707,8 @@ public class AtmosphereShader extends BaseIntShader {
         u_cameraPosition = register(Inputs.cameraPosition, Setters.cameraPosition);
         u_cameraDirection = register(Inputs.cameraDirection, Setters.cameraDirection);
         u_cameraUp = register(Inputs.cameraUp, Setters.cameraUp);
+        u_cameraNearFar = register(DefaultIntShader.Inputs.cameraNearFar, DefaultIntShader.Setters.cameraNearFar);
+        u_cameraK = register(DefaultIntShader.Inputs.cameraK, DefaultIntShader.Setters.cameraK);
 
         // Object uniforms
         u_worldTrans = register(Inputs.worldTrans, Setters.worldTrans);

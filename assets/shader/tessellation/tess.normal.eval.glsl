@@ -26,8 +26,6 @@ uniform float u_omgw;// Wave frequency
 #include shader/lib_gravwaves.glsl
 #endif// gravitationalWaves
 
-
-uniform mat4 u_worldTrans;
 uniform mat4 u_projViewTrans;
 
 uniform float u_heightScale;
