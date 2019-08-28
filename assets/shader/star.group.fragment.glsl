@@ -4,6 +4,8 @@
 
 // UNIFORMS
 uniform float u_ar;
+uniform float u_zfar;
+uniform float u_k;
 
 // INPUT
 in vec4 v_col;
@@ -27,5 +29,5 @@ void main() {
     }
 
     fragColor = v_col * alpha;
-    gl_FragDepth = getDepthValue();
+    gl_FragDepth = getDepthValue(u_zfar, u_k);
 }

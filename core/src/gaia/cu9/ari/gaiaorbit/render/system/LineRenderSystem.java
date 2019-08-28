@@ -90,7 +90,7 @@ public class LineRenderSystem extends ImmediateRenderSystem {
         shaderProgram.begin();
         shaderProgram.setUniformMatrix("u_projModelView", camera.getCamera().combined);
 
-        // Relativistic effects
+        // Rel, grav, z-buffer
         addEffectsUniforms(shaderProgram, camera);
 
         this.camera = camera;

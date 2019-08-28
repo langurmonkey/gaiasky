@@ -12,6 +12,7 @@ import gaia.cu9.ari.gaiaorbit.render.IRenderable;
 import gaia.cu9.ari.gaiaorbit.render.RenderingContext;
 import gaia.cu9.ari.gaiaorbit.scenegraph.SceneGraphNode.RenderGroup;
 import gaia.cu9.ari.gaiaorbit.scenegraph.camera.ICamera;
+import gaia.cu9.ari.gaiaorbit.util.Constants;
 import gaia.cu9.ari.gaiaorbit.util.GlobalConf;
 import gaia.cu9.ari.gaiaorbit.util.gdx.shader.ExtShaderProgram;
 import gaia.cu9.ari.gaiaorbit.util.gravwaves.RelativisticEffectsManager;
@@ -115,6 +116,7 @@ public abstract class AbstractRenderSystem implements IRenderSystem {
     protected void addEffectsUniforms(ExtShaderProgram shaderProgram, ICamera camera) {
         addRelativisticUniforms(shaderProgram, camera);
         addGravWaveUniforms(shaderProgram);
+        addDepthBufferUniforms(shaderProgram, camera);
     }
 
     protected void addRelativisticUniforms(ExtShaderProgram shaderProgram, ICamera camera) {
@@ -139,6 +141,12 @@ public abstract class AbstractRenderSystem implements IRenderSystem {
             // H terms - hpluscos, hplussin, htimescos, htimessin
             shaderProgram.setUniform4fv("u_hterms", rem.hterms, 0, 4);
         }
+    }
+
+    protected void addDepthBufferUniforms(ExtShaderProgram shaderProgram, ICamera camera){
+        // Depth buffer
+        shaderProgram.setUniformf("u_zfar", camera.getCamera().far);
+        shaderProgram.setUniformf("u_k", Constants.getCameraK());
     }
 
     protected ExtShaderProgram getShaderProgram() {

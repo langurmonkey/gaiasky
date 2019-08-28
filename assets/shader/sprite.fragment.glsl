@@ -3,6 +3,8 @@
 #include shader/lib_logdepthbuff.glsl
 
 uniform sampler2D u_texture0;
+uniform float u_zfar;
+uniform float u_k;
 
 // v_texCoords are UV coordinates in [0..1]
 in vec2 v_texCoords;
@@ -19,5 +21,5 @@ void main() {
     fragColor = draw();
 
     // Logarithmic depth buffer
-    gl_FragDepth = getDepthValue();
+    gl_FragDepth = getDepthValue(u_zfar, u_k);
 }

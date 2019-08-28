@@ -133,7 +133,7 @@ public class ParticleGroupRenderSystem extends ImmediateRenderSystem implements 
                     shaderProgram.setUniformf("u_camDir", camera.getCurrent().getCamera().direction);
                     shaderProgram.setUniformi("u_cubemap", GlobalConf.program.CUBEMAP360_MODE ? 1 : 0);
 
-                    // Relativistic effects
+                    // Rel, grav, z-buffer
                     addEffectsUniforms(shaderProgram, camera);
 
                     curr.mesh.render(shaderProgram, ShapeType.Point.getGlType());

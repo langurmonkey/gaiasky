@@ -5,6 +5,8 @@
 uniform sampler2D u_diffuseTexture;
 // Grayscale lookup table
 uniform sampler2D u_normalTexture;
+uniform vec2 u_cameraNearFar;
+uniform float u_cameraK;
 
 // VARYINGS
 
@@ -161,5 +163,5 @@ void main() {
 	vec3 color = vec3(total, total, total);
     fragColor = vec4(min(vec3(0.9), color * 6.0 * v_lightDiffuse * percolor), v_opacity);
 
-    gl_FragDepth = getDepthValue();
+    gl_FragDepth = getDepthValue(u_cameraNearFar.y, u_cameraK);
 }

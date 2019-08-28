@@ -106,6 +106,8 @@ in float v_fog;
 #endif // nightTextureFlag
 
 #include shader/lib_logdepthbuff.glsl
+uniform vec2 u_cameraNearFar;
+uniform float u_cameraK;
 
 out vec4 fragColor;
 
@@ -193,5 +195,5 @@ void main() {
 	// Prevent saturation
     fragColor.rgb = clamp(fragColor.rgb, 0.0, 0.98);
 
-	gl_FragDepth = getDepthValue();
+	gl_FragDepth = getDepthValue(u_cameraNearFar.y, u_cameraK);
 }

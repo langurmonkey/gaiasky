@@ -40,9 +40,8 @@ vec3 g_tangent = vec3(1.0, 0.0, 0.0);
 in vec2 v_texCoord0;
 
 // Uniforms which are always available
-uniform mat4 u_projViewTrans;
-uniform mat4 u_worldTrans;
-uniform mat3 u_normalMatrix;
+uniform vec2 u_cameraNearFar;
+uniform float u_cameraK;
 
 // Varyings computed in the vertex shader
 in float v_opacity;
@@ -412,5 +411,5 @@ void main() {
         discard;
     }
     // Logarithmic depth buffer
-    gl_FragDepth = getDepthValue();
+    gl_FragDepth = getDepthValue(u_cameraNearFar.y, u_cameraK);
 }

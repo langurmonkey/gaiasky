@@ -9,6 +9,8 @@
 #define nop() {}
 
 uniform vec4 u_diffuseColor;
+uniform vec2 u_cameraNearFar;
+uniform float u_cameraK;
 
 in vec4 v_position;
 #define pullPosition() { return v_position;}
@@ -38,6 +40,6 @@ void main() {
     if(fragColor.a == 0.0 || dither(gl_FragCoord.xy, fragColor.a) < 0.5){
         discard;
     } else {
-        gl_FragDepth = getDepthValue();
+        gl_FragDepth = getDepthValue(u_cameraNearFar.y, u_cameraK);
     }
 }

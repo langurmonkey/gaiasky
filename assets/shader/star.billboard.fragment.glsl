@@ -12,6 +12,8 @@ uniform float u_thpoint;
 uniform float u_distance;
 // Whether light scattering is enabled or not
 uniform int u_lightScattering;
+uniform float u_zfar;
+uniform float u_k;
 
 // v_texCoords are UV coordinates in [0..1]
 in vec2 v_texCoords;
@@ -98,5 +100,5 @@ vec4 draw() {
 void main() {
     fragColor = clamp(draw(), 0.0, 0.999);
     // Logarithmic depth buffer
-    gl_FragDepth = getDepthValue();
+    gl_FragDepth = getDepthValue(u_zfar, u_k);
 }

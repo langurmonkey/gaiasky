@@ -337,7 +337,7 @@ public class LineQuadRenderSystem extends LineRenderSystem {
         shaderProgram.begin();
         shaderProgram.setUniformMatrix("u_projModelView", camera.getCamera().combined);
 
-        // Relativistic effects
+        // Rel, grav, z-buffer
         addEffectsUniforms(shaderProgram, camera);
 
         for (int i = 0; i < meshIdx; i++) {

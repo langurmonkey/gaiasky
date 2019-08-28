@@ -16,7 +16,6 @@ uniform vec3 u_pos;
 out vec4 v_color;
 out vec2 v_texCoords;
 out float v_opacity;
-out vec3 v_fragPosView;
 
 void main()
 {

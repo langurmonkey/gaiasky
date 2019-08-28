@@ -141,7 +141,7 @@ public class BillboardStarRenderSystem extends AbstractRenderSystem {
             shaderProgram.setUniformMatrix("u_projTrans", camera.getCamera().combined);
             shaderProgram.setUniformf("u_quaternion", quaternion.x, quaternion.y, quaternion.z, quaternion.w);
 
-            // Relativistic effects
+            // Rel, grav, z-buffer
             addEffectsUniforms(shaderProgram, camera);
 
             // Global uniforms

@@ -25,6 +25,10 @@ in vec3 o_normalTan;
 
 in vec2 o_texCoords;
 
+// Uniforms which are always available
+uniform vec2 u_cameraNearFar;
+uniform float u_cameraK;
+
 // Varyings computed in the vertex shader
 in float o_opacity;
 
@@ -274,6 +278,6 @@ void main() {
     }
 
     // Logarithmic depth buffer
-    gl_FragDepth = getDepthValue();
+    gl_FragDepth = getDepthValue(u_cameraNearFar.y, u_cameraK);
 }
 

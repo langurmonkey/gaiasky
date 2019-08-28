@@ -7,6 +7,8 @@
 uniform vec3 v3LightPos;
 uniform float g;
 uniform float g2;
+uniform vec2 u_cameraNearFar;
+uniform float u_cameraK;
 
 // Direction from the vertex to the camera
 in vec3 v_direction;
@@ -38,5 +40,5 @@ void main(void) {
     fragColor.a = (v_heightNormalized * (1.0 - v_fadeFactor) + lma * v_fadeFactor) * scl;
 
     fragColor.rgb = fragColor.rgb * 0.95;
-    gl_FragDepth = getDepthValue();
+    gl_FragDepth = getDepthValue(u_cameraNearFar.y, u_cameraK);
 }

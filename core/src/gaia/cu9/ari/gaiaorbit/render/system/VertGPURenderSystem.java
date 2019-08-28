@@ -173,7 +173,7 @@ public class VertGPURenderSystem<T extends IGPUVertsRenderable> extends Immediat
                 shaderProgram.setUniformf("u_parentPos", 0, 0, 0);
             }
 
-            // Relativistic effects
+            // Rel, grav, z-buffer
             addEffectsUniforms(shaderProgram, camera);
 
             curr.mesh.render(shaderProgram, glType);
