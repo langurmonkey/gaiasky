@@ -41,6 +41,8 @@ in vec3 v_ambientLight;
 #endif //lightingFlag
 
 #include shader/lib_logdepthbuff.glsl
+uniform vec2 u_cameraNearFar;
+uniform float u_cameraK;
 
 out vec4 fragColor;
 
@@ -77,5 +79,5 @@ void main() {
 	// Prevent saturation
     fragColor = clamp(fragColor, 0.0, 1.0);
 
-	gl_FragDepth = getDepthValue();
+	gl_FragDepth = getDepthValue(u_cameraNearFar.y, u_cameraK);
 }

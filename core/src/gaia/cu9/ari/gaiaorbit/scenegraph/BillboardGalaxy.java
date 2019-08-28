@@ -10,8 +10,9 @@ import com.badlogic.gdx.math.Vector3;
 import gaia.cu9.ari.gaiaorbit.GaiaSky;
 import gaia.cu9.ari.gaiaorbit.render.ComponentTypes.ComponentType;
 import gaia.cu9.ari.gaiaorbit.scenegraph.camera.ICamera;
-import gaia.cu9.ari.gaiaorbit.scenegraph.component.ModelComponent;
 import gaia.cu9.ari.gaiaorbit.scenegraph.component.MaterialComponent;
+import gaia.cu9.ari.gaiaorbit.scenegraph.component.ModelComponent;
+import gaia.cu9.ari.gaiaorbit.util.Constants;
 import gaia.cu9.ari.gaiaorbit.util.coord.StaticCoordinates;
 import gaia.cu9.ari.gaiaorbit.util.gdx.mesh.IntMesh;
 import gaia.cu9.ari.gaiaorbit.util.gdx.shader.ExtShaderProgram;
@@ -81,7 +82,7 @@ public class BillboardGalaxy extends Billboard {
     public void render(ExtShaderProgram shader, float alpha, IntMesh mesh, ICamera camera) {
         compalpha = alpha;
 
-        float size = getFuzzyRenderSize(camera);
+        float size = (float) (getFuzzyRenderSize(camera) / Constants.DISTANCE_SCALE_FACTOR);
 
         Vector3 aux = aux3f1.get();
         shader.setUniformf("u_pos", translation.put(aux));

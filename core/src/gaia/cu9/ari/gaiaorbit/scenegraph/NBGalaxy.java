@@ -68,7 +68,7 @@ public class NBGalaxy extends Particle {
 
     @Override
     public double THRESHOLD_POINT() {
-        return (float) 1E-9;
+        return (float) 2E-10;
     }
 
     @Override
@@ -83,7 +83,7 @@ public class NBGalaxy extends Particle {
 
         // Calculate size - This contains arbitrary boundary values to make
         // things nice on the render side
-        size = (float) (Math.max((Math.pow(flux, 0.5f) * Constants.PC_TO_U * 1e-3), .6e9f) * 4.5e0d) * 2.5f;
+        size = (float) (Math.log(Math.pow(flux, 10.0)) * Constants.PC_TO_U);
         computedSize = 0;
     }
 
@@ -133,7 +133,6 @@ public class NBGalaxy extends Particle {
     @Override
     public void render(ExtShaderProgram shader, float alpha, IntMesh mesh, ICamera camera) {
         compalpha = alpha;
-
         float size = getFuzzyRenderSize(camera) * GlobalConf.scene.STAR_POINT_SIZE * 1.5f;
 
         Vector3 aux = aux3f1.get();

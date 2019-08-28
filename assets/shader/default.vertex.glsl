@@ -154,7 +154,6 @@ void main() {
 		#endif //alphaTestFlag
 	#endif // blendedFlag
 
-
 	vec4 pos = u_worldTrans * vec4(a_position, 1.0);
 
         #ifdef relativisticEffects
@@ -164,7 +163,6 @@ void main() {
         #ifdef gravitationalWaves
             pos.xyz = computeGravitationalWaves(pos.xyz, u_gw, u_gwmat3, u_ts, u_omgw, u_hterms);
         #endif // gravitationalWaves
-
 
 	gl_Position = u_projViewTrans * pos;
 

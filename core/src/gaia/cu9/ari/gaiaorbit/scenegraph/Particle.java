@@ -38,7 +38,6 @@ import java.util.Random;
  *
  * @deprecated Only the Sun uses this via the Star subclass. Move to star vgroup.
  * @author Toni Sagrista
- *
  */
 public class Particle extends CelestialBody implements IStarFocus, ILineRenderable {
 
@@ -62,17 +61,17 @@ public class Particle extends CelestialBody implements IStarFocus, ILineRenderab
         @Override
         public void notify(Events event, Object... data) {
             switch (event) {
-            case FOV_CHANGE_NOTIFICATION:
-                fovFactor = (Float) data[1];
-                thpointTimesFovfactor = (float) GlobalConf.scene.STAR_THRESHOLD_POINT * fovFactor;
-                thupOverFovfactor = (float) Constants.THRESHOLD_UP / fovFactor;
-                thdownOverFovfactor = (float) Constants.THRESHOLD_DOWN / fovFactor;
-                break;
-            case STAR_POINT_SIZE_CMD:
-                innerRad = 0.004f * DISC_FACTOR + (Float) data[0] * 0.008f;
-                break;
-            default:
-                break;
+                case FOV_CHANGE_NOTIFICATION:
+                    fovFactor = (Float) data[1];
+                    thpointTimesFovfactor = (float) GlobalConf.scene.STAR_THRESHOLD_POINT * fovFactor;
+                    thupOverFovfactor = (float) Constants.THRESHOLD_UP / fovFactor;
+                    thdownOverFovfactor = (float) Constants.THRESHOLD_DOWN / fovFactor;
+                    break;
+                case STAR_POINT_SIZE_CMD:
+                    innerRad = 0.004f * DISC_FACTOR + (Float) data[0] * 0.008f;
+                    break;
+                default:
+                    break;
             }
         }
     }
@@ -106,12 +105,18 @@ public class Particle extends CelestialBody implements IStarFocus, ILineRenderab
         return (float) GlobalConf.scene.STAR_THRESHOLD_QUAD;
     }
 
-    /** Must be updated every cycle **/
+    /**
+     * Must be updated every cycle
+     **/
     public static boolean renderOn = false;
 
-    /** Proper motion in cartesian coordinates [U/yr] **/
+    /**
+     * Proper motion in cartesian coordinates [U/yr]
+     **/
     public Vector3 pm;
-    /** MuAlpha [mas/yr], Mudelta [mas/yr], radvel [km/s] **/
+    /**
+     * MuAlpha [mas/yr], Mudelta [mas/yr], radvel [km/s]
+     **/
     public Vector3 pmSph;
 
     /**
@@ -136,20 +141,14 @@ public class Particle extends CelestialBody implements IStarFocus, ILineRenderab
 
     /**
      * Creates a new star.
-     * 
-     * @param pos
-     *            Cartesian position, in equatorial coordinates and in internal
-     *            units.
-     * @param appmag
-     *            Apparent magnitude.
-     * @param absmag
-     *            Absolute magnitude.
-     * @param colorbv
-     *            The B-V color index.
-     * @param name
-     *            The label or name.
-     * @param starid
-     *            The star unique id.
+     *
+     * @param pos     Cartesian position, in equatorial coordinates and in internal
+     *                units.
+     * @param appmag  Apparent magnitude.
+     * @param absmag  Absolute magnitude.
+     * @param colorbv The B-V color index.
+     * @param name    The label or name.
+     * @param starid  The star unique id.
      */
     public Particle(Vector3d pos, float appmag, float absmag, float colorbv, String name, long starid) {
         this();
@@ -188,7 +187,7 @@ public class Particle extends CelestialBody implements IStarFocus, ILineRenderab
         setDerivedAttributes();
         ct = new ComponentTypes(ComponentType.Galaxies);
         // Relation between our star size and actual star size (normalized for
-        // the Sun, 1391600 Km of diameter
+        // the Sun, 695700 Km of radius
         radius = size * Constants.STAR_SIZE_FACTOR;
     }
 
@@ -202,7 +201,7 @@ public class Particle extends CelestialBody implements IStarFocus, ILineRenderab
 
         // Calculate size - This contains arbitrary boundary values to make
         // things nice on the render side
-        size = (float) Math.min((Math.pow(flux, 0.5f) * Constants.PC_TO_U * 0.16f), 1e9f) / DISC_FACTOR;
+        size = (float) ((Math.min((Math.pow(flux, 0.5f) * Constants.PC_TO_U * 0.16f), 1e9f) / DISC_FACTOR) * (1e-4d * Constants.DISTANCE_SCALE_FACTOR));
         computedSize = 0;
     }
 
@@ -278,6 +277,9 @@ public class Particle extends CelestialBody implements IStarFocus, ILineRenderab
         return false;
     }
 
+    /**
+     * Model rendering
+     */
     @Override
     public void render(IntModelBatch modelBatch, float alpha, double t) {
         // Void
@@ -285,9 +287,8 @@ public class Particle extends CelestialBody implements IStarFocus, ILineRenderab
 
     /**
      * Sets the color
-     * 
-     * @param bv
-     *            B-V color index
+     *
+     * @param bv B-V color index
      */
     protected void setRGB(float bv) {
         if (cc == null)
@@ -344,10 +345,10 @@ public class Particle extends CelestialBody implements IStarFocus, ILineRenderab
             if (viewAngle > thupOverFovfactor) {
                 dist = (float) radius / Constants.THRESHOLD_UP;
             }
-            computedSize = this.size * (dist / this.radius) * Constants.THRESHOLD_DOWN;
+            computedSize *= (dist / this.radius) * Constants.THRESHOLD_DOWN;
         }
 
-        computedSize *= GlobalConf.scene.STAR_BRIGHTNESS * 0.07;
+        computedSize *= GlobalConf.scene.STAR_BRIGHTNESS * 0.07 / Constants.DISTANCE_SCALE_FACTOR;
         return (float) computedSize;
     }
 
@@ -375,7 +376,7 @@ public class Particle extends CelestialBody implements IStarFocus, ILineRenderab
 
     /**
      * Line renderer. Renders proper motion
-     * 
+     *
      * @param renderer
      * @param camera
      * @param alpha

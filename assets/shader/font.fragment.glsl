@@ -5,8 +5,8 @@
 uniform sampler2D u_texture;
 uniform float u_scale;
 uniform float u_opacity;
-uniform vec2 u_cameraNearFar;
-uniform float u_cameraK;
+uniform float u_zfar;
+uniform float u_k;
 
 // INPUT
 in vec4 v_color;
@@ -29,5 +29,5 @@ void main(void){
 	    
     fragColor = vec4(v_color.rgb, aa * v_color.a);
 
-    gl_FragDepth = getDepthValue(u_cameraNearFar.y, u_cameraK);
+    gl_FragDepth = getDepthValue(u_zfar, u_k);
 }

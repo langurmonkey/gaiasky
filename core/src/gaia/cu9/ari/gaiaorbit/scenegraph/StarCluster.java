@@ -43,6 +43,7 @@ import gaia.cu9.ari.gaiaorbit.util.gdx.model.IntModel;
 import gaia.cu9.ari.gaiaorbit.util.gdx.model.IntModelInstance;
 import gaia.cu9.ari.gaiaorbit.util.gdx.shader.ExtShaderProgram;
 import gaia.cu9.ari.gaiaorbit.util.gravwaves.RelativisticEffectsManager;
+import gaia.cu9.ari.gaiaorbit.util.math.Intersectord;
 import gaia.cu9.ari.gaiaorbit.util.math.MathUtilsd;
 import gaia.cu9.ari.gaiaorbit.util.math.Quaterniond;
 import gaia.cu9.ari.gaiaorbit.util.math.Vector3d;
@@ -191,7 +192,7 @@ public class StarCluster extends AbstractPositionEntity implements IFocus, IProp
     protected void addToRenderLists(ICamera camera) {
         if (this.opacity > 0) {
             if (this.viewAngleApparent >= TH_ANGLE) {
-                addToRender(this, RenderGroup.MODEL_DIFFUSE);
+                addToRender(this, RenderGroup.MODEL_VERT_ADDITIVE);
                 addToRender(this, RenderGroup.FONT_LABEL);
             }
 
@@ -407,7 +408,7 @@ public class StarCluster extends AbstractPositionEntity implements IFocus, IProp
                     pcamera = camera.camera;
                 }
 
-                angle = (float) Math.toDegrees(angle * camera.fovFactor) * (40f / pcamera.fieldOfView);
+                angle = (float) Math.toDegrees(angle * camera.getFovFactor()) * (40f / pcamera.fieldOfView);
                 double pixelSize = ((angle * pcamera.viewportHeight) / pcamera.fieldOfView) / 2;
                 pcamera.project(pos);
                 pos.y = pcamera.viewportHeight - pos.y;
@@ -417,6 +418,26 @@ public class StarCluster extends AbstractPositionEntity implements IFocus, IProp
                 // Check click distance
                 if (checkClickDistance(screenX, screenY, pos, camera, pcamera, pixelSize)) {
                     //Hit
+                    hits.add(this);
+                }
+            }
+        }
+    }
+
+    public void addHit(Vector3d p0, Vector3d p1, NaturalCamera camera, Array<IFocus> hits) {
+        if (withinMagLimit() && isActive()) {
+            Vector3d aux = aux3d1.get();
+            Vector3d posd = getAbsolutePosition(aux).add(camera.getInversePos());
+
+            if (camera.direction.dot(posd) > 0) {
+                // The star is in front of us
+                // Diminish the size of the star
+                // when we are close by
+                double dist = posd.len();
+                double distToLine = Intersectord.distanceLinePoint(p0, p1, posd);
+                double value = distToLine / dist;
+
+                if (value < 0.01) {
                     hits.add(this);
                 }
             }

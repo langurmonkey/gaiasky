@@ -69,6 +69,8 @@ public class FontRenderSystem extends AbstractRenderSystem {
                 program.setUniformf("u_componentAlpha", getAlpha(lr) * (!lr.isLabel() ? 1 : lalpha));
                 // Font opacity multiplier, take into account element opacity
                 program.setUniformf("u_opacity", 0.75f * lr.getTextOpacity());
+                // zfar and k
+                addDepthBufferUniforms(program, camera);
 
                 lr.render(batch, program, this, rc, camera);
             }
