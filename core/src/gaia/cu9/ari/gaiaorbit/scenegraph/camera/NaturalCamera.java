@@ -177,6 +177,7 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
     boolean inputByController = false;
 
     boolean diverted = false;
+    boolean vr = false;
 
     private float planetariumFocusAngle = 0f;
 
@@ -214,13 +215,14 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
     private Texture focusCrosshair, focusArrow, velocityCrosshair, antivelocityCrosshair, gravWaveCrosshair;
     private Sprite[] hudSprites;
 
-    public NaturalCamera(AssetManager assetManager, CameraManager parent) {
+    public NaturalCamera(AssetManager assetManager, CameraManager parent, boolean vr) {
         super(parent);
         vroffset = new Vector3d();
         vel = new Vector3d();
         accel = new Vector3d();
         force = new Vector3d();
         posbak = new Vector3d();
+        this.vr = vr;
         initialize(assetManager);
 
     }
@@ -269,7 +271,7 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
         currentMouseKbdListener = null;
         // Controller listeners
         controllerListener = new NaturalControllerListener(this, GlobalConf.controls.CONTROLLER_MAPPINGS_FILE);
-        if (GlobalConf.runtime.OPENVR)
+        if (vr)
             openVRListener = new OpenVRListener(this);
 
         // Init sprite batch for crosshair

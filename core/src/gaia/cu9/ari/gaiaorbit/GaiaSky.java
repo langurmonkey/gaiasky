@@ -294,7 +294,7 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
         Timer.instance();
 
         // Initialise Cameras
-        cam = new CameraManager(manager, CameraMode.FOCUS_MODE);
+        cam = new CameraManager(manager, CameraMode.FOCUS_MODE, vr);
 
         // Set asset manager to asset bean
         AssetBean.setAssetManager(manager);
