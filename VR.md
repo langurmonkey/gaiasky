@@ -4,22 +4,6 @@
 
 [**Gaia Sky VR**](https://zah.uni-heidelberg.de/gaia/outreach/gaiasky) is the VR version of Gaia Sky. It runs on multiple headsets and operating systems thanks to Valve's [OpenVR](https://github.com/ValveSoftware/openvr), also implemented by [OpenOVR](https://gitlab.com/znixian/OpenOVR). It is developed in the framework of [ESA](http://www.esa.int/ESA)'s [Gaia mission](http://sci.esa.int/gaia) to chart about 1 billion stars of our Galaxy.
 
-To get the latest up-to-date and most complete information,
-
-*  Visit our [**home page**](https://zah.uni-heidelberg.de/gaia/outreach/gaiasky)
-*  Read the [**Documentation**](http://gaia.ari.uni-heidelberg.de/gaiasky/docs/html/latest) for the non-VR version
-*  Submit a [**bug** or a **feature request**](https://gitlab.com/langurmonkey/gaiasky/issues)
-*  Follow development news at [@GaiaSky_Dev](https://twitter.com/GaiaSky_Dev)
-
-This file contains the following sections:
-
-1. [Running Gaia Sky VR](#1-running-gaia-sky-vr)
-2. [Documentation and help](#2-documentation-and-help)
-3. [Copyright and licensing information](#3-copyright-and-licensing-information)
-4. [Contact information](#4-contact-information)
-5. [Credits and acknowledgements](#5-acknowledgements)
-
-
 ## 1. Running Gaia Sky VR
 
 The Gaia Sky VR project is the Virtual Reality version of Gaia Sky. At the moment, only [OpenVR](https://github.com/ValveSoftware/openvr) is supported, but nothing prevents us from supporting other APIs (like the Kronos Group's [OpenXR](https://www.khronos.org/openxr)) in the future if it makes sense. Our tests have only been carried out with the Oculus Rift CV1 headset in direct mode under Windows. Supporting Linux is a top priority for us, and the HTC Vive should work well under Linux, even though the state of OpenVR in the platform is a bit rough. We have reports indicating that the HTC Vive VR controllers' mappings are not fully working.
@@ -89,37 +73,6 @@ You can also download the **data packs manually** [here](http://gaia.ari.uni-hei
 - If you are using an Optimus-powered laptop, make sure that the `java.exe` you are using to run Gaia Sky VR is [set up properly in the Nvidia Control Panel](https://www.pcgamer.com/nvidia-control-panel-a-beginners-guide/) to use the discrete GPU.
 - Make sure you are using Java 11+.
 
-##  3. Documentation and help
+##  3. More info
 
-The most up-to-date documentation of Gaia Sky is always in [gaia.ari.uni-heidelberg.de/gaiasky/docs/html/latest](http://gaia.ari.uni-heidelberg.de/gaiasky/docs/html/latest). For older versions and other formats, see [here](http://gaia.ari.uni-heidelberg.de/gaiasky/docs).
-
-We also have a mirror at [gaia-sky.rtfd.org](https://gaia-sky.readthedocs.io).
-
-### 3.1. Documentation submodule
-
-In order to add the documentation submodule to the project, do:
-
-```
-$  git submodule init
-$  git submodule update
-```
-
-The documentation project will be checked out in the `docs/` folder.
-
-##  4. Copyright and licensing information
-
-This software is published and distributed under the MPL 2.0
-(Mozilla Public License 2.0). You can find the [full license
-text here](/LICENSE.md)
-or visiting https://opensource.org/licenses/MPL-2.0.
-
-##  5. Contact information
-
-The main webpage of the project is
-**[https://www.zah.uni-heidelberg.de/gaia/outreach/gaiasky](https://www.zah.uni-heidelberg.de/gaia/outreach/gaiasky)**. There you can find
-the latest versions and the latest information on Gaia Sky.
-
-##  6. Acknowledgements
-
-The latest acknowledgements are always in the [ACKNOWLEDGEMENTS.md](/ACKNOWLEDGEMENTS.md) file.
-
+The project's main README file is [here](README.md).
