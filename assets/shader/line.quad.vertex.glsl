@@ -28,7 +28,7 @@ uniform float u_omgw;// Wave frequency
 #endif// gravitationalWaves
 
 void main() {
-    vec4 pos = vec4(a_position);
+    vec4 pos = a_position;
 
     #ifdef relativisticEffects
     pos.xyz = computeRelativisticAberration(pos.xyz, length(pos.xyz), u_velDir, u_vc);

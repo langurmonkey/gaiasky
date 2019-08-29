@@ -7,7 +7,6 @@ package gaia.cu9.ari.gaiaorbit.scenegraph;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.GL20;
-import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.IntMap;
 import gaia.cu9.ari.gaiaorbit.GaiaSky;
@@ -130,10 +129,9 @@ public class Constellation extends FadeNode implements ILineRenderable, I3DTextR
         constalpha = alpha;
         alpha *= this.alpha * opacity;
 
-        Vector3 campos = aux3f1.get();
-        Vector3 p1 = aux3f2.get();
-        Vector3 p2 = aux3f3.get();
-        camera.getPos().setVector3(campos);
+        Vector3d p1 = aux3d1.get();
+        Vector3d p2 = aux3d2.get();
+        Vector3d campos = camera.getPos();
 
         for (IPosition[] pair : lines) {
             if (pair != null) {
@@ -146,14 +144,12 @@ public class Constellation extends FadeNode implements ILineRenderable, I3DTextR
 
     }
 
-    private void getPosition(IPosition posbean, Vector3 campos, Vector3 out) {
-        Vector3d vel = aux3d1.get().setZero();
+    private void getPosition(IPosition posbean, Vector3d campos, Vector3d out) {
+        Vector3d vel = aux3d3.get().setZero();
         if (posbean.getVelocity() != null && !posbean.getVelocity().hasNaN()) {
             vel.set(posbean.getVelocity()).scl(deltaYears);
         }
-
-        Vector3d position = aux3d2.get().set(posbean.getPosition()).sub(campos).add(vel);
-        position.put(out);
+        out.set(posbean.getPosition()).sub(campos).add(vel);
     }
 
     /**

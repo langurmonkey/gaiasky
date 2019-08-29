@@ -211,4 +211,14 @@ public class BackgroundModel extends FadeNode implements IModelRenderable, I3DTe
         this.renderGroupModel = RenderGroup.valueOf(rg);
     }
 
+    @Override
+    public void setSize(Double size) {
+        this.size = (float) (size * Constants.DISTANCE_SCALE_FACTOR);
+    }
+
+    @Override
+    public void setSize(Long size) {
+        this.size = (float) (size * Constants.DISTANCE_SCALE_FACTOR);
+    }
+
 }
