@@ -46,7 +46,7 @@ The minimum system requirements for running Gaia Sky VR are as following:
 
 From now on, this guide will assume you aim at running Gaia Sky VR with the Oculus Rift in Windows, as that's the only headset we currently have access to, which is unfortunately Windows-only. You can still run it on Linux if you have a compatible headset like the HTC Vive or the Valve Index.
 
-You will need the following: 
+You will need the following:
 
 1. Download and install [Git for Windows](http://gitforwindows.org/) or [cygwin](https://www.cygwin.com/) and get used to the unix-like command line interface.
 2. Follow the provided vendor instructions and install the Oculus app with the runtime. If using a SteamVR headset, just get Steam and download SteamVR.
@@ -58,23 +58,20 @@ You will need the following:
 
 ### 1.2. Cloning the repository
 
-First, open the Git or Cygwin CLI and clone the [Gitlab](https://gitlab.com/langurmonkey/gaiasky) repository and checkout the `2.0.0-vr` tag. This should give you a working version:
+First, open the Git or Cygwin CLI and clone the [Gitlab](https://gitlab.com/langurmonkey/gaiasky) repository. Right now only the master branch contains the version which shares the codebase with the desktop application, but starting with `2.2.1`, you'll need to check out a tag to get a guaranteed working version. This should give you a working version:
 
 ```
 $  git clone https://github.com/langurmonkey/gaiasky.git
 $  cd gaiasky
-$  git checkout tags/2.0.2-vr
+$  git checkout master
 ```
-
-You can also use the `vr` branch directly (`git checkout vr`), but since it is a development branch, it is not guaranteed to work.
-
 
 ### 1.4. Running
 
 To run Gaia Sky VR, make sure that both the Oculus runtime and Steam VR are running. Then, run Gaia Sky through gradle. The first time it will pull lots of dependencies and compile the whole project, so it may take a while.
 
 ```
-$  gradlew.bat core:run
+$  gradlew.bat core:runvr
 ```
 
 

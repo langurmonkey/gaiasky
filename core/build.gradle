@@ -82,6 +82,36 @@ task run(dependsOn: jar, type: JavaExec, description: "Runs Gaia Sky") {
     ignoreExitValue = true
 }
 
+task runvr(dependsOn: jar, type: JavaExec, description: "Runs Gaia Sky VR") {
+    main = project.mainClassName
+    args = ['--vr']
+    systemProperties['properties.file'] = ''
+    systemProperties['assets.location'] = '../assets/'
+    systemProperties['org.slf4j.simpleLogger.defaultLogLevel'] = 'warn'  // logging levels (e.g. REST server warn, info, debug)
+    systemProperties['org.slf4j.simpleLogger.showThreadName'] = 'false'
+
+    minHeapSize = "3g"
+    maxHeapSize = "6g"
+
+    // Parallel GC
+    //jvmArgs = ['-XX:+UseParNewGC']
+    // CMS GC
+    //jvmArgs = ['-server', '-XX:+UseConcMarkSweepGC', '-XX:+UseParNewGC', '-XX:MaxGCPauseMillis=5', '-XX:+CMSParallelRemarkEnabled', '-XX:CMSInitiatingOccupancyFraction=60', '-XX:MaxTenuringThreshold=4', '-XX:MaxNewSize=384m', '-XX:NewSize=384m', '-XX:SurvivorRatio=12']
+    // G1 GC
+    jvmArgs "-XX:+UseG1GC"
+    if (System.getProperty("os.name").toLowerCase().contains("mac")) {
+        // Required to run lwjgl java apps on macOS
+        jvmArgs("-XstartOnFirstThread")
+    }
+    // Verbose GC
+    // jvmArgs = ['-verbose:gc']
+    classpath = sourceSets.main.runtimeClasspath
+    classpath += files(project.assetsDir)
+    standardInput = System.in
+    workingDir = project.workDir
+    ignoreExitValue = true
+}
+
 task rund(dependsOn: jar, type: JavaExec, description: "Runs Gaia Sky - forces download manager and catalog chooser") {
     main = project.mainClassName
     args = ['-d']
