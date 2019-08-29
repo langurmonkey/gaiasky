@@ -143,11 +143,11 @@ public class CameraManager implements ICamera, IObserver {
     /** Velocity vector **/
     protected Vector3d velocity, velocitynor;
 
-    public CameraManager(AssetManager manager, CameraMode mode) {
+    public CameraManager(AssetManager manager, CameraMode mode, boolean vr) {
         // Initialize
         // Initialize Cameras
         CameraMode previousMode = this.mode;
-        naturalCamera = new NaturalCamera(manager, this);
+        naturalCamera = new NaturalCamera(manager, this, vr);
         fovCamera = new FovCamera(manager, this);
         spacecraftCamera = new SpacecraftCamera(this);
         relativisticCamera = new RelativisticCamera(manager, this);

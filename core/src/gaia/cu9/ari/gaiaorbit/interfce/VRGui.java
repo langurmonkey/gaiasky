@@ -16,8 +16,12 @@ public class VRGui<T extends IGui> implements IGui {
     public VRGui(Class<T> clazz, int hoffset) {
         super();
         try {
-            right = clazz.getConstructor(Integer.class, Boolean.class).newInstance(-hoffset, true);
-            left = clazz.getConstructor(Integer.class, Boolean.class).newInstance(hoffset, true);
+            right = clazz.getDeclaredConstructor().newInstance();
+            right.setVr(true);
+            right.setHoffset(-hoffset);
+            left = clazz.getDeclaredConstructor().newInstance();
+            left.setVr(true);
+            left.setHoffset(hoffset);
         } catch (Exception e) {
             Logger.getLogger(this.getClass()).error(e);
         }
@@ -44,7 +48,7 @@ public class VRGui<T extends IGui> implements IGui {
 
     @Override
     public void update(double dt) {
-        setHoffset((int)(GlobalConf.screen.BACKBUFFER_WIDTH / 5f));
+        setHoffset((int) (GlobalConf.screen.BACKBUFFER_WIDTH / 5f));
         right.update(dt);
         left.update(dt);
     }
@@ -103,7 +107,13 @@ public class VRGui<T extends IGui> implements IGui {
     }
 
     @Override
-    public boolean mustDraw(){
+    public void setVr(boolean vr) {
+        right.setVr(vr);
+        left.setVr(vr);
+    }
+
+    @Override
+    public boolean mustDraw() {
         return right.mustDraw() || left.mustDraw();
     }
 }

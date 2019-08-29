@@ -186,6 +186,10 @@ public class HUDGui implements IGui {
     }
 
     @Override
+    public void setVr(boolean vr) {
+    }
+
+    @Override
     public boolean mustDraw() {
         return true;
     }

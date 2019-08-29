@@ -19,9 +19,8 @@ import gaia.cu9.ari.gaiaorbit.scenegraph.ISceneGraph;
 
 /**
  * Provides general methods and attributes that all GUIs should have
- * 
- * @author tsagrista
  *
+ * @author tsagrista
  */
 public abstract class AbstractGui implements IObserver, IGui {
 
@@ -142,6 +141,11 @@ public abstract class AbstractGui implements IObserver, IGui {
     @Override
     public void setHoffset(int hoffset) {
         this.hoffset = hoffset;
+    }
+
+    @Override
+    public void setVr(boolean vr) {
+        this.vr = vr;
     }
 
     @Override

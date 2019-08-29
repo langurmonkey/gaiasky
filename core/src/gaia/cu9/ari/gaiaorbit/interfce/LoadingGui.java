@@ -50,11 +50,11 @@ public class LoadingGui extends AbstractGui {
         this(0, false);
     }
 
-    public LoadingGui(boolean vr) {
+    public LoadingGui(Boolean vr) {
         this(0, vr);
     }
 
-    public LoadingGui(int hoffset, boolean vr) {
+    public LoadingGui(Integer hoffset, Boolean vr) {
         super();
         this.vr = vr;
         this.hoffset = hoffset;
