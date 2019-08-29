@@ -1,6 +1,6 @@
 # Gaia Sky VR
 
-*This info is only on Gaia Sky VR. If you want regular Gaia Sky, [check this out](README.md).*
+*This file is only concerned with Gaia Sky VR. If you are looking for the regular desktop Gaia Sky, [check this out](README.md).*
 
 [**Gaia Sky VR**](https://zah.uni-heidelberg.de/gaia/outreach/gaiasky) is the VR version of Gaia Sky. It runs on multiple headsets and operating systems thanks to Valve's [OpenVR](https://github.com/ValveSoftware/openvr), also implemented by [OpenOVR](https://gitlab.com/znixian/OpenOVR). It is developed in the framework of [ESA](http://www.esa.int/ESA)'s [Gaia mission](http://sci.esa.int/gaia) to chart about 1 billion stars of our Galaxy.
 
