@@ -47,11 +47,16 @@ public class LoadingGui extends AbstractGui {
     private long lastUpdateTime;
 
     public LoadingGui() {
-        this(0);
+        this(0, false);
     }
 
-    public LoadingGui(int hoffset) {
+    public LoadingGui(boolean vr) {
+        this(0, vr);
+    }
+
+    public LoadingGui(int hoffset, boolean vr) {
         super();
+        this.vr = vr;
         this.hoffset = hoffset;
     }
 
@@ -82,7 +87,7 @@ public class LoadingGui extends AbstractGui {
         bottom.right().bottom();
         bottom.pad(pad10);
 
-        FileHandle gslogo = Gdx.files.internal(GlobalConf.runtime.OPENVR ? "img/gaiasky-vr-logo-s.png" : "img/gaiasky-logo.png");
+        FileHandle gslogo = Gdx.files.internal(vr ? "img/gaiasky-vr-logo-s.png" : "img/gaiasky-logo.png");
         Texture logotex = new Texture(gslogo);
         logotex.setFilter(TextureFilter.Linear, TextureFilter.Linear);
         Image logoimg = new Image(logotex);

@@ -16,11 +16,8 @@ public class VRGui<T extends IGui> implements IGui {
     public VRGui(Class<T> clazz, int hoffset) {
         super();
         try {
-            right = clazz.getDeclaredConstructor().newInstance();
-            right.setHoffset(-hoffset);
-
-            left = clazz.getDeclaredConstructor().newInstance();
-            left.setHoffset(hoffset);
+            right = clazz.getConstructor(Integer.class, Boolean.class).newInstance(-hoffset, true);
+            left = clazz.getConstructor(Integer.class, Boolean.class).newInstance(hoffset, true);
         } catch (Exception e) {
             Logger.getLogger(this.getClass()).error(e);
         }

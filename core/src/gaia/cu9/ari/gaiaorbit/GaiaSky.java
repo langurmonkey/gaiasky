@@ -990,7 +990,7 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
             pp.initialize(manager);
 
             // Initialise loading screen
-            loadingGui = new LoadingGui();
+            loadingGui = new LoadingGui(vr);
             loadingGui.initialize(manager);
 
             Gdx.input.setInputProcessor(loadingGui.getGuiStage());
