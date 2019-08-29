@@ -48,7 +48,7 @@ import gaia.cu9.ari.gaiaorbit.util.tree.OctreeNode;
  */
 public class NaturalCamera extends AbstractCamera implements IObserver {
 
-    private static final double MIN_DIST = 5 * Constants.M_TO_U;
+    private static final double MIN_DIST = 1 * Constants.M_TO_U;
 
     /**
      * VR offset
