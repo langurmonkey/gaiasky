@@ -89,7 +89,7 @@ public class Constellation extends FadeNode implements ILineRenderable, I3DTextR
             }
         }
         pos.scl((1d / nstars));
-        pos.nor().scl(100 * Constants.PC_TO_U);
+        pos.nor().scl(100d * Constants.PC_TO_U);
 
         super.update(time, parentTransform, camera, opacity);
 

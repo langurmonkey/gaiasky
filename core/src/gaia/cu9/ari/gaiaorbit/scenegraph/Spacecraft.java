@@ -20,6 +20,7 @@ import gaia.cu9.ari.gaiaorbit.event.IObserver;
 import gaia.cu9.ari.gaiaorbit.render.ComponentTypes;
 import gaia.cu9.ari.gaiaorbit.render.ComponentTypes.ComponentType;
 import gaia.cu9.ari.gaiaorbit.render.ILineRenderable;
+import gaia.cu9.ari.gaiaorbit.render.RenderingContext;
 import gaia.cu9.ari.gaiaorbit.render.system.LineRenderSystem;
 import gaia.cu9.ari.gaiaorbit.scenegraph.camera.CameraManager.CameraMode;
 import gaia.cu9.ari.gaiaorbit.scenegraph.camera.ICamera;
@@ -127,6 +128,9 @@ public class Spacecraft extends GenericSpacecraft implements ILineRenderable, IO
         vel = new Vector3d();
 
         // orientation
+        if(GlobalConf.runtime.OPENVR) {
+            pos.set(1e7 * Constants.KM_TO_U, 0, 1e8 * Constants.KM_TO_U);
+        }
         direction = new Vector3d(1, 0, 0);
         up = new Vector3d(0, 1, 0);
         dirup = new Pair<Vector3d, Vector3d>(direction, up);
@@ -568,7 +572,7 @@ public class Spacecraft extends GenericSpacecraft implements ILineRenderable, IO
 
     /** Model rendering. SPACECRAFT_MODE in spacecraft mode is not affected by the relativistic aberration **/
     @Override
-    public void render(IntModelBatch modelBatch, float alpha, double t) {
+    public void render(IntModelBatch modelBatch, float alpha, double t, RenderingContext rc) {
         render(modelBatch,alpha, t, true);
     }
 

@@ -174,7 +174,7 @@ public class SGRCubemap extends SGRAbstract implements ISGR, IObserver {
     }
 
     private void renderRegularFace(FrameBuffer fb, ICamera camera, SceneGraphRenderer sgr, PostProcessBean ppb, int rw, int rh, int wh, double t) {
-        sgr.renderGlowPass(camera, null);
+        sgr.renderGlowPass(camera, null, 0);
 
         boolean postproc = postprocessCapture(ppb, fb, wh, wh);
         sgr.renderScene(camera, t, rc);

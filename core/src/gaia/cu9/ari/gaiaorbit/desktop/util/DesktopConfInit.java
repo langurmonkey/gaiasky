@@ -34,7 +34,7 @@ import java.util.Properties;
 
 /**
  * Desktop GlobalConf initialiser, where the configuration comes from a
- * global.properties file.
+ * global.properties file (global.vr.properties in case of VR).
  *
  * @author tsagrista
  */
@@ -46,12 +46,12 @@ public class DesktopConfInit extends ConfInit {
 
     IDateFormat df = DateFormatFactory.getFormatter("dd/MM/yyyy HH:mm:ss");
 
-    public DesktopConfInit() {
+    public DesktopConfInit(boolean vr) {
         super();
         try {
             String propsFileProperty = System.getProperty("properties.file");
             if (propsFileProperty == null || propsFileProperty.isEmpty()) {
-                propsFileProperty = initConfigFile(false);
+                propsFileProperty = initConfigFile(false, vr);
             }
 
             File confFile = new File(propsFileProperty);
@@ -533,14 +533,14 @@ public class DesktopConfInit extends ConfInit {
 
     }
 
-    private String initConfigFile(boolean ow) throws IOException {
+    private String initConfigFile(boolean ow, boolean vr) throws IOException {
         // Use user folder
         File userFolder = SysUtils.getConfigDir();
-        File userFolderConfFile = new File(userFolder, "global.properties");
+        File userFolderConfFile = new File(userFolder, getConfigFileName(vr));
 
         if (ow || !userFolderConfFile.exists()) {
             // Copy file
-            copyFile(new File("conf" + File.separator + "global.properties"), userFolderConfFile, ow);
+            copyFile(new File("conf" + File.separator + getConfigFileName(vr)), userFolderConfFile, ow);
         }
         String props = userFolderConfFile.getAbsolutePath();
         System.setProperty("properties.file", props);
@@ -576,6 +576,13 @@ public class DesktopConfInit extends ConfInit {
             if (destinationFis != null)
                 destinationFis.close();
         }
+    }
+
+    public static String getConfigFileName(boolean vr){
+        if(vr)
+            return "global.vr.properties";
+        else
+            return "global.properties";
     }
 
 }

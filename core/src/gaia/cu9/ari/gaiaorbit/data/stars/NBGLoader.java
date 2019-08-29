@@ -48,7 +48,7 @@ import java.io.*;
  */
 public class NBGLoader extends AbstractCatalogLoader implements ISceneGraphLoader {
     private static final Log logger = Logger.getLogger(NBGLoader.class);
-    
+
     boolean active = true;
 
     @Override

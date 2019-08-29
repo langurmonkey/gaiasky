@@ -230,4 +230,11 @@ The latest acknowledgements are always in the [ACKNOWLEDGEMENTS.md](/ACKNOWLEDGE
 
 ##  7. Gaia Sky VR
 
-There exists a development version of Gaia Sky which works with the VR headsets supporting OpenVR. More information on this is available in the [README.md file on the vr branch](https://gitlab.com/langurmonkey/gaiasky/blob/vr/README.md).
+You can run Gaia Sky in VR with Valve's OpenVR with the `--vr` flag.
+
+```
+gaiasky --vr
+```
+
+More information on how to make the VR version work properly in the [VR.md](VR.md) file.
+

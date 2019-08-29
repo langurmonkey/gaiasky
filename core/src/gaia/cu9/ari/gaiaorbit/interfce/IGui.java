@@ -105,4 +105,18 @@ public interface IGui extends Disposable {
      **/
     Actor findActor(String name);
 
+    /**
+     * Sets the horizontal offset, for VR
+     *
+     * @param hoffset
+     *            The horizontal offset in pixels
+     */
+    void setHoffset(int hoffset);
+
+    /**
+     * Returns whether this GUI must be drawn or not
+     * @return Whether this is visible
+     */
+    boolean mustDraw();
+
 }

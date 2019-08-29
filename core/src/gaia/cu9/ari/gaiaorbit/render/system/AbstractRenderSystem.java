@@ -145,7 +145,7 @@ public abstract class AbstractRenderSystem implements IRenderSystem {
 
     protected void addDepthBufferUniforms(ExtShaderProgram shaderProgram, ICamera camera){
         // Depth buffer
-        shaderProgram.setUniformf("u_zfar", camera.getCamera().far);
+        shaderProgram.setUniformf("u_zfar", (float) camera.getFar());
         shaderProgram.setUniformf("u_k", Constants.getCameraK());
     }
 

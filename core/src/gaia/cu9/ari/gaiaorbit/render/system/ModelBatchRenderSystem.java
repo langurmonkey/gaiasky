@@ -62,10 +62,10 @@ public class ModelBatchRenderSystem extends AbstractRenderSystem {
                 // Route to correct interface
                 switch (type) {
                 case NORMAL:
-                    s.render(batch, getAlpha(s), t);
+                    s.render(batch, getAlpha(s), t, rc);
                     break;
                 case ATMOSPHERE:
-                    ((IAtmosphereRenderable) s).renderAtmosphere(batch, getAlpha(ctAtm), t);
+                    ((IAtmosphereRenderable) s).renderAtmosphere(batch, getAlpha(ctAtm), t, rc.vroffset);
                     break;
                 case CLOUD:
                     ((ICloudRenderable) s).renderClouds(batch, getAlpha(ctClouds), t);

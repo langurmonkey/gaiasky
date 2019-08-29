@@ -6,9 +6,11 @@
 package gaia.cu9.ari.gaiaorbit.interfce;
 
 import com.badlogic.gdx.scenes.scene2d.Actor;
+import com.badlogic.gdx.scenes.scene2d.Group;
 import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener.ChangeEvent;
 import com.badlogic.gdx.utils.Align;
+import com.badlogic.gdx.utils.SnapshotArray;
 import gaia.cu9.ari.gaiaorbit.GaiaSky;
 import gaia.cu9.ari.gaiaorbit.event.EventManager;
 import gaia.cu9.ari.gaiaorbit.event.Events;
@@ -56,6 +58,10 @@ public class FocusInfoInterface extends Table implements IObserver, IGuiInterfac
     float pad3, pad5, pad10, bw;
 
     public FocusInfoInterface(Skin skin) {
+        this(skin, false);
+    }
+
+    public FocusInfoInterface(Skin skin, boolean vr) {
         super(skin);
         this.setBackground("table-bg");
 
@@ -203,27 +209,29 @@ public class FocusInfoInterface extends Table implements IObserver, IGuiInterfac
         focusInfo.add(new OwnLabel("ID", skin, "hud-big")).left();
         focusInfo.add(focusId).left().padLeft(pad10);
         focusInfo.row();
-        focusInfo.add(new OwnLabel(I18n.txt("gui.focusinfo.alpha"), skin, "hud-big")).left();
-        focusInfo.add(focusRA).left().padLeft(pad10);
-        focusInfo.row();
-        focusInfo.add(new OwnLabel(I18n.txt("gui.focusinfo.delta"), skin, "hud-big")).left();
-        focusInfo.add(focusDEC).left().padLeft(pad10);
-        focusInfo.row();
-        focusInfo.add(new OwnLabel(I18n.txt("gui.focusinfo.mualpha"), skin, "hud-big")).left();
-        focusInfo.add(focusMuAlpha).left().padLeft(pad10);
-        focusInfo.row();
-        focusInfo.add(new OwnLabel(I18n.txt("gui.focusinfo.mudelta"), skin, "hud-big")).left();
-        focusInfo.add(focusMuDelta).left().padLeft(pad10);
-        focusInfo.row();
-        focusInfo.add(new OwnLabel(I18n.txt("gui.focusinfo.radvel"), skin, "hud-big")).left();
-        focusInfo.add(focusRadVel).left().padLeft(pad10);
-        focusInfo.row();
-        focusInfo.add(appmagLabel).left();
-        focusInfo.add(focusAppMag).left().padLeft(pad10);
-        focusInfo.row();
-        focusInfo.add(absmagLabel).left();
-        focusInfo.add(focusAbsMag).left().padLeft(pad10);
-        focusInfo.row();
+        if (!vr) {
+            focusInfo.add(new OwnLabel(I18n.txt("gui.focusinfo.alpha"), skin, "hud-big")).left();
+            focusInfo.add(focusRA).left().padLeft(pad10);
+            focusInfo.row();
+            focusInfo.add(new OwnLabel(I18n.txt("gui.focusinfo.delta"), skin, "hud-big")).left();
+            focusInfo.add(focusDEC).left().padLeft(pad10);
+            focusInfo.row();
+            focusInfo.add(new OwnLabel(I18n.txt("gui.focusinfo.mualpha"), skin, "hud-big")).left();
+            focusInfo.add(focusMuAlpha).left().padLeft(pad10);
+            focusInfo.row();
+            focusInfo.add(new OwnLabel(I18n.txt("gui.focusinfo.mudelta"), skin, "hud-big")).left();
+            focusInfo.add(focusMuDelta).left().padLeft(pad10);
+            focusInfo.row();
+            focusInfo.add(new OwnLabel(I18n.txt("gui.focusinfo.radvel"), skin, "hud-big")).left();
+            focusInfo.add(focusRadVel).left().padLeft(pad10);
+            focusInfo.row();
+            focusInfo.add(appmagLabel).left();
+            focusInfo.add(focusAppMag).left().padLeft(pad10);
+            focusInfo.row();
+            focusInfo.add(absmagLabel).left();
+            focusInfo.add(focusAbsMag).left().padLeft(pad10);
+            focusInfo.row();
+        }
         focusInfo.add(new OwnLabel(I18n.txt("gui.focusinfo.angle"), skin, "hud-big")).left();
         focusInfo.add(focusAngle).left().padLeft(pad10);
         focusInfo.row();
@@ -239,22 +247,23 @@ public class FocusInfoInterface extends Table implements IObserver, IGuiInterfac
         focusInfo.add(moreInfo).left().colspan(2).padBottom(pad5).padTop(pad10);
 
         /** POINTER INFO **/
-        pointerInfo.add(pointerName).left().colspan(3);
-        pointerInfo.row();
-        pointerInfo.add(pointerImgBtn1).left().padRight(pad3);
-        pointerInfo.add(RADECPointerLabel).left();
-        pointerInfo.add(pointerRADEC).left().padLeft(pad10);
-        pointerInfo.row();
-        pointerInfo.add(pointerImgBtn2).left().padRight(pad3);
-        pointerInfo.add(lonLatLabel).left();
-        pointerInfo.add(pointerLonLat).left().padLeft(pad10);
-        pointerInfo.row();
-        pointerInfo.add(viewImgBtn).left().padRight(pad3);
-        pointerInfo.add(RADECViewLabel).left();
-        pointerInfo.add(viewRADEC).left().padLeft(pad10);
+        if (!vr) {
+            pointerInfo.add(pointerName).left().colspan(3);
+            pointerInfo.row();
+            pointerInfo.add(pointerImgBtn1).left().padRight(pad3);
+            pointerInfo.add(RADECPointerLabel).left();
+            pointerInfo.add(pointerRADEC).left().padLeft(pad10);
+            pointerInfo.row();
+            pointerInfo.add(pointerImgBtn2).left().padRight(pad3);
+            pointerInfo.add(lonLatLabel).left();
+            pointerInfo.add(pointerLonLat).left().padLeft(pad10);
+            pointerInfo.row();
+            pointerInfo.add(viewImgBtn).left().padRight(pad3);
+            pointerInfo.add(RADECViewLabel).left();
+            pointerInfo.add(viewRADEC).left().padLeft(pad10);
+        }
 
         /** CAMERA INFO **/
-
         cameraInfo.add(camName).left().colspan(2);
         cameraInfo.row();
         cameraInfo.add(new OwnLabel(I18n.txt("gui.camera.vel"), skin, "hud-big")).left();
@@ -279,7 +288,7 @@ public class FocusInfoInterface extends Table implements IObserver, IGuiInterfac
         pack();
         rulerCell.clearActor();
 
-        if (daemon == null) {
+        if (daemon == null && !vr) {
             daemon = NetworkCheckerManager.getNewtorkChecker();
             daemon.setParameters(moreInfo, skin, pad10);
             daemon.start();
@@ -289,6 +298,18 @@ public class FocusInfoInterface extends Table implements IObserver, IGuiInterfac
         EventManager.instance.subscribe(this, Events.FOCUS_CHANGED, Events.FOCUS_INFO_UPDATED, Events.CAMERA_MOTION_UPDATED, Events.CAMERA_MODE_CMD, Events.LON_LAT_UPDATED, Events.RA_DEC_UPDATED, Events.RULER_ATTACH_0, Events.RULER_ATTACH_1, Events.RULER_CLEAR, Events.RULER_DIST);
     }
 
+
+    private void scaleFonts(SnapshotArray<Actor> a, float scl){
+        for(Actor actor : a){
+            if(actor instanceof Group){
+                Group g = (Group) actor;
+                scaleFonts(g.getChildren(), scl);
+            } else if(actor instanceof Label){
+                Label l = (Label) actor;
+                l.setScale(scl);
+            }
+        }
+    }
     private void unsubscribe() {
         EventManager.instance.removeAllSubscriptions(this);
     }

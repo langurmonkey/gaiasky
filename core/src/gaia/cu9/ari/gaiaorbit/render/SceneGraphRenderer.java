@@ -34,11 +34,8 @@ import gaia.cu9.ari.gaiaorbit.render.IPostProcessor.PostProcessBean;
 import gaia.cu9.ari.gaiaorbit.render.system.*;
 import gaia.cu9.ari.gaiaorbit.render.system.AbstractRenderSystem.RenderSystemRunnable;
 import gaia.cu9.ari.gaiaorbit.render.system.ModelBatchRenderSystem.ModelRenderType;
-import gaia.cu9.ari.gaiaorbit.scenegraph.AbstractPositionEntity;
-import gaia.cu9.ari.gaiaorbit.scenegraph.ModelBody;
-import gaia.cu9.ari.gaiaorbit.scenegraph.Particle;
+import gaia.cu9.ari.gaiaorbit.scenegraph.*;
 import gaia.cu9.ari.gaiaorbit.scenegraph.SceneGraphNode.RenderGroup;
-import gaia.cu9.ari.gaiaorbit.scenegraph.Star;
 import gaia.cu9.ari.gaiaorbit.scenegraph.camera.CameraManager.CameraMode;
 import gaia.cu9.ari.gaiaorbit.scenegraph.camera.ICamera;
 import gaia.cu9.ari.gaiaorbit.util.Constants;
@@ -61,6 +58,7 @@ import gaia.cu9.ari.gaiaorbit.util.gravwaves.RelativisticEffectsManager;
 import gaia.cu9.ari.gaiaorbit.util.math.Intersectord;
 import gaia.cu9.ari.gaiaorbit.util.math.MathUtilsd;
 import gaia.cu9.ari.gaiaorbit.util.math.Vector3d;
+import gaia.cu9.ari.gaiaorbit.vr.openvr.VRContext;
 import org.lwjgl.opengl.GL30;
 
 import java.nio.IntBuffer;
@@ -77,8 +75,8 @@ public class SceneGraphRenderer extends AbstractRenderer implements IProcessRend
     private static final Log logger = Logger.getLogger(SceneGraphRenderer.class);
     public static SceneGraphRenderer instance;
 
-    public static void initialise(AssetManager manager) {
-        instance = new SceneGraphRenderer();
+    public static void initialise(AssetManager manager, VRContext vrContext) {
+        instance = new SceneGraphRenderer(vrContext);
         instance.initialize(manager);
     }
 
@@ -109,7 +107,7 @@ public class SceneGraphRenderer extends AbstractRenderer implements IProcessRend
      **/
     private ISGR[] sgrs;
     // Indexes
-    private final int SGR_DEFAULT_IDX = 0, SGR_STEREO_IDX = 1, SGR_FOV_IDX = 2, SGR_CUBEMAP_IDX = 3;
+    private final int SGR_DEFAULT_IDX = 0, SGR_STEREO_IDX = 1, SGR_FOV_IDX = 2, SGR_CUBEMAP_IDX = 3, SGR_OPENVR_IDX = 4;
 
     // Camera at light position, with same direction. For shadow mapping
     private Camera cameraLight;
@@ -127,13 +125,17 @@ public class SceneGraphRenderer extends AbstractRenderer implements IProcessRend
     private Vector3 aux1;
     private Vector3d aux1d, aux2d, aux3d, aux4d;
 
+    // VRContext, may be null
+    private VRContext vrContext;
+
     private Array<IRenderable> stars;
 
     private AbstractRenderSystem billboardStarsProc;
     private MWModelRenderSystem mwrs;
 
-    public SceneGraphRenderer() {
+    public SceneGraphRenderer(VRContext vrContext) {
         super();
+        this.vrContext = vrContext;
     }
 
     private AssetDescriptor<ExtShaderProgram>[] loadShader(AssetManager manager, String vfile, String ffile, String[] names, String[] prependVertex) {
@@ -434,11 +436,12 @@ public class SceneGraphRenderer extends AbstractRenderer implements IProcessRend
         /*
          * INITIALIZE SGRs
          */
-        sgrs = new ISGR[4];
+        sgrs = new ISGR[5];
         sgrs[SGR_DEFAULT_IDX] = new SGR();
         sgrs[SGR_STEREO_IDX] = new SGRStereoscopic();
         sgrs[SGR_FOV_IDX] = new SGRFov();
         sgrs[SGR_CUBEMAP_IDX] = new SGRCubemap();
+        sgrs[SGR_OPENVR_IDX] = new SGROpenVR(vrContext, mbPixelLighting);
         sgr = null;
 
         /*
@@ -487,7 +490,7 @@ public class SceneGraphRenderer extends AbstractRenderer implements IProcessRend
                         IRenderable s = renderables.get(i);
                         if (s instanceof Particle) {
                             Particle p = (Particle) s;
-                            if (lightIndex < Glow.N && (GlobalConf.program.CUBEMAP360_MODE || GaiaSky.instance.cam.getDirection().angle(p.translation) < angleEdgeDeg)) {
+                            if (lightIndex < Glow.N && (GlobalConf.program.CUBEMAP360_MODE || GlobalConf.runtime.OPENVR || GaiaSky.instance.cam.getDirection().angle(p.translation) < angleEdgeDeg)) {
                                 Vector3d pos3d = p.translation.put(auxD);
 
                                 // Aberration
@@ -686,7 +689,10 @@ public class SceneGraphRenderer extends AbstractRenderer implements IProcessRend
     }
 
     private void initSGR(ICamera camera) {
-        if (camera.getNCameras() > 1) {
+        if (GlobalConf.runtime.OPENVR) {
+            // Using Steam OpenVR renderer
+            sgr = sgrs[SGR_OPENVR_IDX];
+        } else if (camera.getNCameras() > 1) {
             // FOV mode
             sgr = sgrs[SGR_FOV_IDX];
         } else if (GlobalConf.program.STEREOSCOPIC_MODE) {
@@ -701,7 +707,22 @@ public class SceneGraphRenderer extends AbstractRenderer implements IProcessRend
         }
     }
 
-    public void renderGlowPass(ICamera camera, FrameBuffer fb) {
+    Array<StubModel> controllers = new Array<StubModel>();
+
+    private void copyCamera(PerspectiveCamera from, PerspectiveCamera to) {
+        to.combined.set(from.combined);
+        to.view.set(from.view);
+        to.invProjectionView.set(from.invProjectionView);
+        to.direction.set(from.direction);
+        to.position.set(from.position);
+        to.up.set(from.up);
+
+        to.near = from.near;
+        to.far = from.far;
+        to.fieldOfView = from.fieldOfView;
+    }
+
+    public void renderGlowPass(ICamera camera, FrameBuffer fb, int eye) {
         if (fb == null)
             fb = glowFb;
         if (GlobalConf.postprocess.POSTPROCESS_LIGHT_SCATTERING && fb != null) {
@@ -719,6 +740,17 @@ public class SceneGraphRenderer extends AbstractRenderer implements IProcessRend
             // Get all models
             Array<IRenderable> models = render_lists.get(RenderGroup.MODEL_PIX.ordinal());
             Array<IRenderable> modelsTess = render_lists.get(RenderGroup.MODEL_PIX_TESS.ordinal());
+
+            // VR controllers
+            if (GlobalConf.runtime.OPENVR) {
+                SGROpenVR sgrov = (SGROpenVR) sgrs[SGR_OPENVR_IDX];
+                if (vrContext != null) {
+                    for (StubModel m : sgrov.controllerObjects) {
+                        if (!models.contains(m, true))
+                            controllers.add(m);
+                    }
+                }
+            }
 
             fb.begin();
             Gdx.gl.glEnable(GL30.GL_DEPTH_TEST);
@@ -820,7 +852,7 @@ public class SceneGraphRenderer extends AbstractRenderer implements IProcessRend
 
             // No tessellation
             mbPixelLightingDepth.begin(cameraLight);
-            candidate.render(mbPixelLightingDepth, 1, 0);
+            candidate.render(mbPixelLightingDepth, 1, 0, null);
             mbPixelLightingDepth.end();
 
             // Save frame buffer and combined matrix
@@ -834,7 +866,7 @@ public class SceneGraphRenderer extends AbstractRenderer implements IProcessRend
         }
     }
 
-    private void renderShadowMapCandidatesTess(Array<ModelBody> candidates, int shadowNRender, ICamera camera) {
+    private void renderShadowMapCandidatesTess(Array<ModelBody> candidates, int shadowNRender, ICamera camera, RenderingContext rc) {
         int i = 0;
         // Normal bodies
         for (ModelBody candidate : candidates) {
@@ -890,7 +922,7 @@ public class SceneGraphRenderer extends AbstractRenderer implements IProcessRend
 
                 // Tessellation
                 mbPixelLightingDepthTessellation.begin(cameraLight);
-                candidate.render(mbPixelLightingDepthTessellation, 1, 0);
+                candidate.render(mbPixelLightingDepthTessellation, 1, 0, rc);
                 mbPixelLightingDepthTessellation.end();
 
                 // Save frame buffer and combined matrix
@@ -929,7 +961,7 @@ public class SceneGraphRenderer extends AbstractRenderer implements IProcessRend
             Array<IRenderable> modelsTess = render_lists.get(RenderGroup.MODEL_PIX_TESS.ordinal());
             models.sort(Comparator.comparingDouble(a -> ((AbstractPositionEntity) a).getDistToCamera()));
 
-            int shadowNRender = GlobalConf.program.STEREOSCOPIC_MODE ? 2 : GlobalConf.program.CUBEMAP360_MODE ? 6 : 1;
+            int shadowNRender = (GlobalConf.program.STEREOSCOPIC_MODE || GlobalConf.runtime.OPENVR) ? 2 : GlobalConf.program.CUBEMAP360_MODE ? 6 : 1;
 
             if (shadowMapFb != null && smCombinedMap != null) {
                 addCandidates(models, shadowCandidates, true);
@@ -954,8 +986,8 @@ public class SceneGraphRenderer extends AbstractRenderer implements IProcessRend
         renderShadowMap(camera);
 
         // In stereo and cubemap modes, the glow pass is rendered in the SGR itself
-        if (!GlobalConf.program.STEREOSCOPIC_MODE && !GlobalConf.program.CUBEMAP360_MODE) {
-            renderGlowPass(camera, glowFb);
+        if (!GlobalConf.program.STEREOSCOPIC_MODE && !GlobalConf.program.CUBEMAP360_MODE && !GlobalConf.runtime.OPENVR) {
+            renderGlowPass(camera, glowFb, 0);
         }
 
         sgr.render(this, camera, t, rw, rh, fb, ppb);
@@ -1111,22 +1143,31 @@ public class SceneGraphRenderer extends AbstractRenderer implements IProcessRend
             if (stereo)
                 sgr = sgrs[SGR_STEREO_IDX];
             else {
-                sgr = sgrs[SGR_DEFAULT_IDX];
+                if (GlobalConf.runtime.OPENVR)
+                    sgr = sgrs[SGR_OPENVR_IDX];
+                else
+                    sgr = sgrs[SGR_DEFAULT_IDX];
             }
             break;
         case CUBEMAP360_CMD:
             boolean cubemap = (Boolean) data[0];
-            if (cubemap)
+            if (cubemap) {
                 sgr = sgrs[SGR_CUBEMAP_IDX];
-            else
-                sgr = sgrs[SGR_DEFAULT_IDX];
+            } else {
+                if (GlobalConf.runtime.OPENVR)
+                    sgr = sgrs[SGR_OPENVR_IDX];
+                else
+                    sgr = sgrs[SGR_DEFAULT_IDX];
+            }
             break;
         case CAMERA_MODE_CMD:
             CameraMode cm = (CameraMode) data[0];
             if (cm.isGaiaFov())
                 sgr = sgrs[SGR_FOV_IDX];
             else {
-                if (GlobalConf.program.STEREOSCOPIC_MODE)
+                if (GlobalConf.runtime.OPENVR)
+                    sgr = sgrs[SGR_OPENVR_IDX];
+                else if (GlobalConf.program.STEREOSCOPIC_MODE)
                     sgr = sgrs[SGR_STEREO_IDX];
                 else if (GlobalConf.program.CUBEMAP360_MODE)
                     sgr = sgrs[SGR_CUBEMAP_IDX];

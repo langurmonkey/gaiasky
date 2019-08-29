@@ -22,6 +22,7 @@ import gaia.cu9.ari.gaiaorbit.scenegraph.Orbit;
 import gaia.cu9.ari.gaiaorbit.scenegraph.SceneGraphNode.RenderGroup;
 import gaia.cu9.ari.gaiaorbit.scenegraph.camera.ICamera;
 import gaia.cu9.ari.gaiaorbit.scenegraph.component.OrbitComponent;
+import gaia.cu9.ari.gaiaorbit.util.Constants;
 import gaia.cu9.ari.gaiaorbit.util.GlobalConf;
 import gaia.cu9.ari.gaiaorbit.util.coord.AstroUtils;
 import gaia.cu9.ari.gaiaorbit.util.coord.Coordinates;
@@ -132,7 +133,8 @@ public class OrbitalElementsParticlesRenderSystem extends ImmediateRenderSystem 
                 shaderProgram.setUniformi("u_cubemap", GlobalConf.program.CUBEMAP360_MODE ? 1 : 0);
 
                 shaderProgram.setUniformf("u_size", rc.scaleFactor);
-
+                // VR scale
+                shaderProgram.setUniformf("u_vrScale", (float) Constants.DISTANCE_SCALE_FACTOR);
                 // Emulate double, for compatibility
                 double curRt = AstroUtils.getJulianDate(GaiaSky.instance.time.getTime());
                 float curRt1 = (float) curRt;
@@ -165,5 +167,4 @@ public class OrbitalElementsParticlesRenderSystem extends ImmediateRenderSystem 
     @Override
     public void notify(Events event, Object... data) {
     }
-
 }

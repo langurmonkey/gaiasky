@@ -26,7 +26,7 @@ import java.util.zip.GZIPInputStream;
  */
 public class PointDataProvider implements IParticleGroupDataProvider {
     private static final Log logger = Logger.getLogger(PointDataProvider.class);
-    
+
     public Array<? extends ParticleBean> loadData(String file) {
         return loadData(file, 1d);
     }

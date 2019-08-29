@@ -24,10 +24,7 @@ import gaia.cu9.ari.gaiaorbit.GaiaSky;
 import gaia.cu9.ari.gaiaorbit.event.EventManager;
 import gaia.cu9.ari.gaiaorbit.event.Events;
 import gaia.cu9.ari.gaiaorbit.event.IObserver;
-import gaia.cu9.ari.gaiaorbit.interfce.GameMouseKbdListener;
-import gaia.cu9.ari.gaiaorbit.interfce.MouseKbdListener;
-import gaia.cu9.ari.gaiaorbit.interfce.NaturalControllerListener;
-import gaia.cu9.ari.gaiaorbit.interfce.NaturalMouseKbdListener;
+import gaia.cu9.ari.gaiaorbit.interfce.*;
 import gaia.cu9.ari.gaiaorbit.render.ComponentTypes.ComponentType;
 import gaia.cu9.ari.gaiaorbit.scenegraph.*;
 import gaia.cu9.ari.gaiaorbit.scenegraph.camera.CameraManager.CameraMode;
@@ -52,6 +49,11 @@ import gaia.cu9.ari.gaiaorbit.util.tree.OctreeNode;
 public class NaturalCamera extends AbstractCamera implements IObserver {
 
     private static final double MIN_DIST = 5 * Constants.M_TO_U;
+
+    /**
+     * VR offset
+     **/
+    public Vector3d vroffset;
 
     /**
      * Acceleration and velocity
@@ -82,8 +84,8 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
      **/
     private Vector3d pitch, yaw, roll;
     /**
-     * Acceleration, velocity and position for the horizontal and vertical rotation
-     * around the focus
+     * Acceleration, velocity and position for the horizontal and vertical
+     * rotation around the focus
      **/
     private Vector3d horizontal, vertical;
     /**
@@ -146,10 +148,27 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
     private Vector3d desired;
 
     /**
-     * Velocity module, in case it comes from a game pad
+     * VR mode stuff
+     **/
+    private boolean firstAux = true;
+    private float firstAngl = 0;
+
+    /**
+     * Velocity module, in case it comes from a game pad.
+     * Sets velocity in the direction of the direction vector
      **/
     private double velocityGamepad = 0;
     private double gamepadMultiplier = 1;
+    /**
+     * VR velocity vectors
+     **/
+    private Vector3 velocityVR0, velocityVR1;
+    /**
+     * Magnitude of velocityVR vector. Sets the velocity in the direction
+     * of the VR controller
+     **/
+    private double velocityVRX = 0;
+    private double velocityVRY = 0;
 
     /**
      * Holds whether the last input was issued by currentMouseKbdListener. Useful to keep
@@ -186,12 +205,18 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
      **/
     private NaturalControllerListener controllerListener;
 
+    /**
+     * VR listener
+     **/
+    private OpenVRListener openVRListener;
+
     private SpriteBatch spriteBatch;
     private Texture focusCrosshair, focusArrow, velocityCrosshair, antivelocityCrosshair, gravWaveCrosshair;
     private Sprite[] hudSprites;
 
     public NaturalCamera(AssetManager assetManager, CameraManager parent) {
         super(parent);
+        vroffset = new Vector3d();
         vel = new Vector3d();
         accel = new Vector3d();
         force = new Vector3d();
@@ -244,6 +269,8 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
         currentMouseKbdListener = null;
         // Controller listeners
         controllerListener = new NaturalControllerListener(this, GlobalConf.controls.CONTROLLER_MAPPINGS_FILE);
+        if (GlobalConf.runtime.OPENVR)
+            openVRListener = new OpenVRListener(this);
 
         // Init sprite batch for crosshair
         spriteBatch = new SpriteBatch(1000, GlobalResources.spriteShader);
@@ -311,6 +338,8 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
     private void camUpdate(double dt, ITimeFrameProvider time) {
         currentMouseKbdListener.update();
         controllerListener.update();
+        if (GlobalConf.runtime.OPENVR)
+            openVRListener.update();
 
         // Next focus and closest positions
         computeNextPositions(time);
@@ -377,12 +406,14 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
                 // listener
                 this.focus.getAbsolutePosition(aux4).add(dx);
 
-                if (!diverted) {
-                    directionToTarget(dt, aux4, GlobalConf.scene.TURNING_SPEED / (GlobalConf.scene.CINEMATIC_CAMERA ? 1e3f : 1e2f), planetariumFocusAngle);
-                } else {
-                    updateRotationFree(dt, GlobalConf.scene.TURNING_SPEED);
+                if (!GlobalConf.runtime.OPENVR) {
+                    if (!diverted) {
+                        directionToTarget(dt, aux4, GlobalConf.scene.TURNING_SPEED / (GlobalConf.scene.CINEMATIC_CAMERA ? 1e3f : 1e2f), planetariumFocusAngle);
+                    } else {
+                        updateRotationFree(dt, GlobalConf.scene.TURNING_SPEED);
+                    }
+                    updateRoll(dt, GlobalConf.scene.TURNING_SPEED);
                 }
-                updateRoll(dt, GlobalConf.scene.TURNING_SPEED);
 
                 updatePosition(dt, translateUnits, realTransUnits);
                 updateRotation(dt, aux4);
@@ -405,12 +436,12 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
             }
             break;
         case GAME_MODE:
-            if(gravity && (closest != null) && !currentMouseKbdListener.isKeyPressed(Input.Keys.SPACE)){
+            if (gravity && (closest != null) && !currentMouseKbdListener.isKeyPressed(Input.Keys.SPACE)) {
                 // Add gravity to force, pulling to closest body
                 Vector3d camObj = closest.getAbsolutePosition(aux1).sub(pos);
                 double dist = camObj.len();
                 // Gravity adds only at twice the radius
-                if(dist < closest.getRadius() * 2){
+                if (dist < closest.getRadius() * 2) {
                     force.add(camObj.nor().scl(0.002));
                     fullStop = false;
                 } else {
@@ -422,18 +453,21 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
         case FREE_MODE:
             updatePosition(dt, translateUnits, GlobalConf.scene.FREE_CAMERA_TARGET_MODE_ON ? realTransUnits : 1);
 
-            // If target is present, update direction
-            if (freeTargetOn) {
-                directionToTarget(dt, freeTargetPos, GlobalConf.scene.TURNING_SPEED / (GlobalConf.scene.CINEMATIC_CAMERA ? 1e3f : 1e2f), planetariumFocusAngle);
-                if (facingFocus) {
-                    freeTargetOn = false;
+            if (!GlobalConf.runtime.OPENVR) {
+                // If target is present, update direction
+                if (freeTargetOn) {
+                    directionToTarget(dt, freeTargetPos, GlobalConf.scene.TURNING_SPEED / (GlobalConf.scene.CINEMATIC_CAMERA ? 1e3f : 1e2f), planetariumFocusAngle);
+                    if (facingFocus) {
+                        freeTargetOn = false;
+                    }
                 }
-            }
 
-            // Update direction with pitch, yaw, roll
-            updateRotationFree(dt, GlobalConf.scene.TURNING_SPEED);
-            updateRoll(dt, GlobalConf.scene.TURNING_SPEED);
+                // Update direction with pitch, yaw, roll
+                updateRotationFree(dt, GlobalConf.scene.TURNING_SPEED);
+                updateRoll(dt, GlobalConf.scene.TURNING_SPEED);
+            }
             updateLateral(dt, translateUnits);
+
             break;
         case GAIA_SCENE_MODE:
             if (entity1 == null || entity2 == null) {
@@ -579,7 +613,7 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
             desired.set(direction);
         }
 
-        desired.nor().scl(amount * tu * 100);
+        desired.nor().scl(amount * tu * (GlobalConf.runtime.OPENVR ? 10 : 100));
         force.add(desired);
         // We reset the time counter
         lastFwdTime = 0;
@@ -593,6 +627,37 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
      */
     public void setVelocity(double amount) {
         velocityGamepad = amount;
+    }
+
+    /**
+     * Sets the velocity of the VR controller as a vector. The magnitude of this
+     * vector should not be larger than 1
+     *
+     * @param p0      Start point of the beam
+     * @param p1      End point of the beam
+     * @param amountX Amount in the perpendicular direction of p0-p1
+     * @param amountY Amount in the direction of p0-p1
+     */
+    public void setVelocityVR(Vector3 p0, Vector3 p1, double amountX, double amountY) {
+        if (getMode() == CameraMode.FOCUS_MODE) {
+            setVelocity(amountY);
+        } else {
+            velocityVR0 = p0;
+            velocityVR1 = p1;
+            velocityVRX = amountX;
+            velocityVRY = amountY;
+        }
+    }
+
+    /**
+     * Clears the velocityVR vector
+     */
+    public void clearVelocityVR() {
+        setVelocity(0);
+        velocityVR0 = null;
+        velocityVR1 = null;
+        velocityVRX = 0;
+        velocityVRY = 0;
     }
 
     /**
@@ -832,6 +897,15 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
         // Calculate velocity if coming from gamepad
         if (velocityGamepad != 0) {
             vel.set(direction).nor().scl(velocityGamepad * gamepadMultiplier * multiplier);
+        } else if (velocityVRX != 0 || velocityVRY != 0) {
+            aux1.set(velocityVR1).sub(velocityVR0).nor();
+
+            // p0-p1 direction (Y)
+            vel.set(aux1).scl(velocityVRY * gamepadMultiplier * multiplier);
+
+            // cross(p0,p1) direction (X)
+            aux1.crs(up).nor().scl(velocityVRX * gamepadMultiplier * multiplier);
+            vel.add(aux1);
         }
 
         double forceLen = force.len();
@@ -850,7 +924,7 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
 
         force.add(friction);
 
-        if (lastFwdTime > (cinematic ? 250 : currentMouseKbdListener.getResponseTime()) && velocityGamepad == 0 && fullStop || lastFwdAmount > 0 && transUnits == 0) {
+        if (lastFwdTime > (cinematic ? 250 : currentMouseKbdListener.getResponseTime()) && velocityGamepad == 0 && velocityVRX == 0 && velocityVRY == 0 && fullStop || lastFwdAmount > 0 && transUnits == 0) {
             stopForwardMovement();
         }
 
@@ -1085,6 +1159,8 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
 
                 Controllers.clearListeners();
                 GlobalConf.controls.addControllerListener(controllerListener);
+                if (GlobalConf.runtime.OPENVR)
+                    GaiaSky.instance.vrContext.addListener(openVRListener);
             });
             break;
         default:
@@ -1092,6 +1168,9 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
                 // Unregister input controllers
                 im.removeProcessor(currentMouseKbdListener);
                 GlobalConf.controls.removeControllerListener(controllerListener);
+                // Remove vr listener
+                if (GlobalConf.runtime.OPENVR)
+                    GaiaSky.instance.vrContext.removeListener(openVRListener);
             });
             break;
         }
@@ -1154,7 +1233,7 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
             IFocus focus = null;
 
             // Center focus or not
-            boolean centerFocus = true;
+            boolean centerFocus = !GlobalConf.runtime.OPENVR;
             if (data.length > 1)
                 centerFocus = (Boolean) data[1];
 
@@ -1248,7 +1327,7 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
             }
             break;
         case PLANETARIUM_FOCUS_ANGLE_CMD:
-            if (data.length == 0)
+            if (GlobalConf.runtime.OPENVR || data.length == 0)
                 planetariumFocusAngle = 0;
             else
                 planetariumFocusAngle = (float) data[0];
@@ -1439,6 +1518,7 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
     public void resetState() {
         pos.setZero();
         posinv.setZero();
+        vroffset.setZero();
         direction.set(0, 0, -1);
         for (PerspectiveCamera cam : cameras) {
             cam.position.setZero();
@@ -1464,6 +1544,7 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
     @Override
     public void render(int rw, int rh) {
         boolean draw = !GlobalConf.program.CUBEMAP360_MODE && !GlobalConf.program.STEREOSCOPIC_MODE && !GlobalConf.postprocess.POSTPROCESS_FISHEYE;
+        boolean vr = GlobalConf.runtime.OPENVR;
 
         spriteBatch.begin();
 
@@ -1476,30 +1557,47 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
                 // Green
                 spriteBatch.setColor(0, 1, 0, 1);
                 chFocus = focus;
-            } else if ((getMode().isFree() || getMode().isGame())  && closest != null) {
+            } else if ((getMode().isFree() || getMode().isGame()) && closest != null) {
                 // Orange
                 spriteBatch.setColor(1f, .7f, .2f, 1f);
                 chFocus = closest;
             }
 
-            if (chFocus != null) {
+            if (chFocus != null && chFocus.getDistToCamera() > chFocus.getRadius() * 2) {
                 float chw = focusCrosshair.getWidth();
                 float chh = focusCrosshair.getHeight();
                 float chw2 = chw / 2;
-                float chh2 = chh / 2;
+                float chh2 = chh / (vr ? 1 : 2);
 
                 chFocus.getAbsolutePosition(aux1).add(posinv);
 
                 GlobalResources.applyRelativisticAberration(aux1, this);
                 RelativisticEffectsManager.getInstance().gravitationalWavePos(aux1);
 
+                if (vr) {
+                    aux1.nor().scl(chFocus.getDistToCamera() - chFocus.getRadius());
+                }
                 boolean inside = projectToScreen(aux1, auxf1, rw, rh, chw, chh, chw2, chh2);
 
                 if (inside) {
                     spriteBatch.draw(focusCrosshair, auxf1.x - chw2, auxf1.y - chh2, chw, chh);
                 } else {
-                    aux2f2.set(auxf1.x - (Gdx.graphics.getWidth() / 2), auxf1.y - (Gdx.graphics.getHeight() / 2));
-                    spriteBatch.draw(focusArrow, auxf1.x - chw2, auxf1.y - chh2, chw2, chh2, chw, chh, 1f, 1f, -90 + aux2f2.angle(), 0, 0, (int) chw, (int) chh, false, false);
+                    if (vr) {
+                        float ang = firstAux ? -90 + aux2f2.angle() : firstAngl;
+                        if (firstAux) {
+                            firstAngl = ang;
+                        }
+                        firstAux = !firstAux;
+                        //                    spriteBatch.draw(focusArrow, auxf1.x - chw2, auxf1.y - chh2, chw2, chh2, chw, chh, 1f, 1f, -90 + aux2f2.angle(), 0, 0, (int) chw, (int) chh, false, false);
+                        aux2f2.set(auxf1.x - (rw / 2), auxf1.y - (rh / 2));
+                        aux2.set(up).rotate(direction, 90).add(up).scl(0.04);
+                        aux1.set(vroffset).add(aux2).scl(1 / Constants.M_TO_U).add(direction);
+                        projectToScreen(aux1, auxf1, rw, rh, chw, chh, chw2, chh2);
+                        spriteBatch.draw(focusArrow, auxf1.x, auxf1.y, chw2, chh2, chw, chh, 1f, 1f, ang, 0, 0, (int) chw, (int) chw, false, false);
+                    } else {
+                        aux2f2.set(auxf1.x - (Gdx.graphics.getWidth() / 2), auxf1.y - (Gdx.graphics.getHeight() / 2));
+                        spriteBatch.draw(focusArrow, auxf1.x - chw2, auxf1.y - chh2, chw2, chh2, chw, chh, 1f, 1f, -90 + aux2f2.angle(), 0, 0, (int) chw, (int) chh, false, false);
+                    }
                 }
             }
 

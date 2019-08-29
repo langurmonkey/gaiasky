@@ -101,7 +101,7 @@ public class Loc extends AbstractPositionEntity implements I3DTextRenderable {
 
     @Override
     public boolean renderText() {
-        if (viewAngle < LOWER_LIMIT || viewAngle > UPPER_LIMIT || !GaiaSky.instance.isOn(ct.getFirstOrdinal())) {
+        if (viewAngle < LOWER_LIMIT || viewAngle > UPPER_LIMIT * Constants.DISTANCE_SCALE_FACTOR || !GaiaSky.instance.isOn(ct.getFirstOrdinal())) {
             return false;
         }
         Vector3d aux = aux3d1.get();
@@ -121,7 +121,7 @@ public class Loc extends AbstractPositionEntity implements I3DTextRenderable {
         textPosition(camera, pos);
         shader.setUniformf("u_viewAngle", (float) (viewAngleApparent * ((ModelBody) parent).locVaMultiplier * Constants.U_TO_KM));
         shader.setUniformf("u_viewAnglePow", 1f);
-        shader.setUniformf("u_thOverFactor", ((ModelBody) parent).locThOverFactor);
+        shader.setUniformf("u_thOverFactor", ((ModelBody) parent).locThOverFactor / (float) Constants.DISTANCE_SCALE_FACTOR);
         shader.setUniformf("u_thOverFactorScl", 1f);
         render3DLabel(batch, shader, sys.fontDistanceField, camera, rc, text(), pos, textScale() * camera.getFovFactor(), textSize() * camera.getFovFactor());
     }
@@ -138,7 +138,7 @@ public class Loc extends AbstractPositionEntity implements I3DTextRenderable {
 
     @Override
     public float textScale() {
-        return 1e-6f / textSize();
+        return 1e-4f / textSize() * (float) Constants.DISTANCE_SCALE_FACTOR;
     }
 
     @Override

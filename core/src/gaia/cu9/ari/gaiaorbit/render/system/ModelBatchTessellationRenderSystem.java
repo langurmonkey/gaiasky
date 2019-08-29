@@ -39,7 +39,7 @@ public class ModelBatchTessellationRenderSystem extends AbstractRenderSystem {
             int size = renderables.size;
             for (int i = 0; i < size; i++) {
                 IModelRenderable s = (IModelRenderable) renderables.get(i);
-                s.render(batch, getAlpha(s), t);
+                s.render(batch, getAlpha(s), t, rc);
             }
             batch.end();
 

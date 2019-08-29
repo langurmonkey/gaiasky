@@ -16,6 +16,8 @@ uniform float u_alpha;
 uniform float u_size;
 uniform float u_scaleFactor;
 uniform int u_cubemap;
+// VR scaling, if any
+uniform float u_vrScale;
 // Current julian date, in days, emulates a double in vec2
 uniform vec2 u_t;
 
@@ -95,9 +97,10 @@ vec4 keplerToCartesian() {
     float z = ox * (sinomega * sini) + oy * (cosomega * sini);
     
     // 7
-    x *= M_TO_U;
-    y *= M_TO_U;
-    z *= M_TO_U;
+    float fac = M_TO_U * u_vrScale;
+    x *= fac;
+    y *= fac;
+    z *= fac;
     
     return vec4(y, z, x, 1.0);
 }

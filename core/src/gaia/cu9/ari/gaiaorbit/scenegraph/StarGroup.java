@@ -629,7 +629,7 @@ public class StarGroup extends ParticleGroup implements ILineRenderable, IStarFo
      * Model rendering
      */
     @Override
-    public void render(IntModelBatch modelBatch, float alpha, double t) {
+    public void render(IntModelBatch modelBatch, float alpha, double t, RenderingContext rc) {
         mc.touch();
         float opct = (float) MathUtilsd.lint(closestDist, modelDist / 50f, modelDist, 1f, 0f);
         if (alpha * opct > 0) {

@@ -34,10 +34,7 @@ import gaia.cu9.ari.gaiaorbit.render.*;
 import gaia.cu9.ari.gaiaorbit.render.ComponentTypes.ComponentType;
 import gaia.cu9.ari.gaiaorbit.render.IPostProcessor.PostProcessBean;
 import gaia.cu9.ari.gaiaorbit.render.IPostProcessor.RenderType;
-import gaia.cu9.ari.gaiaorbit.scenegraph.IFocus;
-import gaia.cu9.ari.gaiaorbit.scenegraph.ISceneGraph;
-import gaia.cu9.ari.gaiaorbit.scenegraph.Particle;
-import gaia.cu9.ari.gaiaorbit.scenegraph.SceneGraphNode;
+import gaia.cu9.ari.gaiaorbit.scenegraph.*;
 import gaia.cu9.ari.gaiaorbit.scenegraph.camera.CameraManager;
 import gaia.cu9.ari.gaiaorbit.scenegraph.camera.CameraManager.CameraMode;
 import gaia.cu9.ari.gaiaorbit.scenegraph.camera.ICamera;
@@ -63,7 +60,13 @@ import gaia.cu9.ari.gaiaorbit.util.time.GlobalClock;
 import gaia.cu9.ari.gaiaorbit.util.time.ITimeFrameProvider;
 import gaia.cu9.ari.gaiaorbit.util.time.RealTimeClock;
 import gaia.cu9.ari.gaiaorbit.util.tree.OctreeNode;
+import gaia.cu9.ari.gaiaorbit.vr.openvr.VRContext;
+import gaia.cu9.ari.gaiaorbit.vr.openvr.VRContext.VRDevice;
+import gaia.cu9.ari.gaiaorbit.vr.openvr.VRContext.VRDeviceType;
 import org.lwjgl.opengl.GL30;
+import org.lwjgl.openvr.Texture;
+import org.lwjgl.openvr.VR;
+import org.lwjgl.openvr.VRCompositor;
 
 import java.io.File;
 import java.time.Instant;
@@ -93,6 +96,26 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
      * Singleton instance
      **/
     public static GaiaSky instance;
+
+    /**
+     * The {@link VRContext} setup in createVR(), may be null if no HMD is
+     * present or SteamVR is not installed
+     */
+    public VRContext vrContext;
+
+    /**
+     * Loading fb
+     **/
+    public FrameBuffer vrLoadingLeftFb, vrLoadingRightFb;
+    /**
+     * Loading texture
+     **/
+    public Texture vrLoadingLeftTex, vrLoadingRightTex;
+
+    /**
+     * Maps the VR devices to model objects
+     */
+    private HashMap<VRDevice, StubModel> vrDeviceToModel;
 
     // Asset manager
     public AssetManager manager;
@@ -130,7 +153,7 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
     /**
      * The user interfaces
      */
-    public IGui initialGui, loadingGui, mainGui, spacecraftGui, stereoGui, debugGui;
+    public IGui initialGui, loadingGui, loadingGuiVR, mainGui, spacecraftGui, stereoGui, debugGui;
 
     /**
      * List of GUIs
@@ -148,6 +171,11 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
     private boolean camRecording = false;
 
     private boolean initialized = false;
+
+    /**
+     * Whether to attempt a connection to the VR HMD
+     */
+    private boolean vr;
 
     /**
      * Forces the dataset download window
@@ -174,7 +202,7 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
      * Creates an instance of Gaia Sky.
      */
     public GaiaSky() {
-        this(false, false);
+        this(false, false, false);
     }
 
     /**
@@ -183,11 +211,12 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
      * @param dsdownload Force-show the datasets download window
      * @param catchooser Force-show the catalog chooser window
      */
-    public GaiaSky(boolean dsdownload, boolean catchooser) {
+    public GaiaSky(boolean dsdownload, boolean catchooser, boolean vr) {
         super();
         instance = this;
         this.runnables = new Array<>();
         this.runnablesMap = new HashMap<>();
+        this.vr = vr;
         this.dsDownload = dsdownload;
         this.catChooser = catchooser;
         this.renderProcess = runnableInitialGui;
@@ -270,6 +299,10 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
         // Set asset manager to asset bean
         AssetBean.setAssetManager(manager);
 
+        // Create vr context if possible
+        boolean vrOk = createVR();
+        cam.updateFrustumPlanes();
+
         // Tooltip to 1s
         TooltipManager.getInstance().initialTime = 1f;
 
@@ -289,7 +322,7 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
         pp = PostProcessorFactory.instance.getPostProcessor();
 
         // Scene graph renderer
-        SceneGraphRenderer.initialise(manager);
+        SceneGraphRenderer.initialise(manager, vrContext);
         sgr = SceneGraphRenderer.instance;
 
         // Initialise scripting gateway server
@@ -303,13 +336,79 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
 
         EventManager.instance.subscribe(this, Events.LOAD_DATA_CMD);
 
-        initialGui = new InitialGui(dsDownload, catChooser);
+        initialGui = new InitialGui(dsDownload, catChooser, vr && !vrOk);
         initialGui.initialize(manager);
         Gdx.input.setInputProcessor(initialGui.getGuiStage());
 
         // GL clear state
         Gdx.gl.glClearColor(0, 0, 0, 0);
         Gdx.gl.glClearDepthf(1);
+    }
+
+    /**
+     * Attempt to create a VR context. This operation will only succeed if an HMD is connected
+     * and detected via OpenVR
+     **/
+    private boolean createVR() {
+        if (vr) {
+            // Initializing the VRContext may fail if no HMD is connected or SteamVR
+            // is not installed.
+            try {
+                //OpenVRQuery.queryOpenVr();
+                GlobalConf.runtime.OPENVR = true;
+                Constants.initialize(1e6d);
+
+                vrContext = new VRContext();
+                vrContext.pollEvents();
+
+                VRDevice hmd = vrContext.getDeviceByType(VRDeviceType.HeadMountedDisplay);
+                logger.info("Initialization of VR successful");
+                if (hmd == null) {
+                    logger.info("HMD device is null!");
+                } else {
+                    logger.info("HMD device is not null: " + vrContext.getDeviceByType(VRDeviceType.HeadMountedDisplay).toString());
+                }
+
+                vrDeviceToModel = new HashMap<>();
+
+                GlobalConf.runtime.OPENVR = true;
+                if (GlobalConf.screen.SCREEN_WIDTH != vrContext.getWidth()) {
+                    logger.info("Warning, resizing according to VRSystem values:  [" + GlobalConf.screen.SCREEN_WIDTH + "x" + GlobalConf.screen.SCREEN_HEIGHT + "] -> [" + vrContext.getWidth() + "x" + vrContext.getHeight() + "]");
+                    // Do not resize the screen!
+                    GlobalConf.screen.BACKBUFFER_HEIGHT = vrContext.getHeight();
+                    GlobalConf.screen.BACKBUFFER_WIDTH = vrContext.getWidth();
+                    this.resizeImmediate(vrContext.getWidth(), vrContext.getHeight(), true, true, true);
+                }
+                GlobalConf.screen.VSYNC = false;
+
+                Gdx.graphics.setWindowedMode(GlobalConf.screen.SCREEN_WIDTH, GlobalConf.screen.SCREEN_HEIGHT);
+                Gdx.graphics.setVSync(GlobalConf.screen.VSYNC);
+
+                vrLoadingLeftFb = new FrameBuffer(Format.RGBA8888, vrContext.getWidth(), vrContext.getHeight(), true);
+                vrLoadingLeftTex = org.lwjgl.openvr.Texture.create();
+                vrLoadingLeftTex.set(vrLoadingLeftFb.getColorBufferTexture().getTextureObjectHandle(), VR.ETextureType_TextureType_OpenGL, VR.EColorSpace_ColorSpace_Gamma);
+
+                vrLoadingRightFb = new FrameBuffer(Format.RGBA8888, vrContext.getWidth(), vrContext.getHeight(), true);
+                vrLoadingRightTex = org.lwjgl.openvr.Texture.create();
+                vrLoadingRightTex.set(vrLoadingRightFb.getColorBufferTexture().getTextureObjectHandle(), VR.ETextureType_TextureType_OpenGL, VR.EColorSpace_ColorSpace_Gamma);
+
+                // Enable visibility of 'Others' if off (for VR controllers)
+                if (!GlobalConf.scene.VISIBILITY[ComponentType.Others.ordinal()]) {
+                    EventManager.instance.post(Events.TOGGLE_VISIBILITY_CMD, "element.others", false, true);
+                }
+                return true;
+            } catch (Exception e) {
+                // If initializing the VRContext failed
+                logger.debug(e);
+                logger.error(e.getLocalizedMessage());
+                logger.error("Initialisation of VR context failed");
+            }
+        } else {
+            // Desktop mode
+            GlobalConf.runtime.OPENVR = false;
+            Constants.initialize(1d);
+        }
+        return false;
     }
 
     /**
@@ -323,6 +422,22 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
 
         loadingGui.dispose();
         loadingGui = null;
+
+        // Dispose vr loading GUI
+        if (GlobalConf.runtime.OPENVR) {
+            loadingGuiVR.dispose();
+            loadingGuiVR = null;
+
+            vrLoadingLeftTex.clear();
+            vrLoadingLeftFb.dispose();
+            vrLoadingLeftTex = null;
+            vrLoadingLeftFb = null;
+
+            vrLoadingRightTex.clear();
+            vrLoadingRightFb.dispose();
+            vrLoadingRightTex = null;
+            vrLoadingRightFb = null;
+        }
 
         // Get attitude
         if (manager.isLoaded(ATTITUDE_FOLDER)) {
@@ -456,6 +571,10 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
             EventManager.instance.post(Events.CAMERA_MODE_CMD, CameraMode.FOCUS_MODE);
             EventManager.instance.post(Events.FOCUS_CHANGE_CMD, sg.getNode(GlobalConf.scene.STARTUP_OBJECT), true);
             EventManager.instance.post(Events.GO_TO_OBJECT_CMD);
+            if (GlobalConf.runtime.OPENVR) {
+                // Free mode by default in VR
+                EventManager.instance.post(Events.CAMERA_MODE_CMD, CameraMode.FREE_MODE);
+            }
         } else {
             // At 5 AU in Y looking towards origin (top-down look)
             EventManager.instance.post(Events.CAMERA_MODE_CMD, CameraMode.FREE_MODE);
@@ -539,6 +658,9 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
         if (saveState)
             ConfInit.instance.persistGlobalConf(new File(System.getProperty("properties.file")));
 
+        if (vrContext != null)
+            vrContext.dispose();
+
         // Flush frames
         EventManager.instance.post(Events.FLUSH_FRAMES);
 
@@ -597,10 +719,18 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
             if (GlobalConf.screen.SCREEN_OUTPUT) {
                 /* RENDER THE SCENE */
                 preRenderScene();
-                renderSgr(cam, t, Gdx.graphics.getWidth(), Gdx.graphics.getHeight(), null, pp.getPostProcessBean(RenderType.screen));
+                if (GlobalConf.runtime.OPENVR) {
+                    renderSgr(cam, t, GlobalConf.screen.BACKBUFFER_WIDTH, GlobalConf.screen.BACKBUFFER_HEIGHT, null, pp.getPostProcessBean(RenderType.screen));
+                } else {
+                    renderSgr(cam, t, Gdx.graphics.getWidth(), Gdx.graphics.getHeight(), null, pp.getPostProcessBean(RenderType.screen));
+                }
 
                 // Render the GUI, setting the viewport
-                GuiRegistry.render(Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
+                if (GlobalConf.runtime.OPENVR) {
+                    GuiRegistry.render(GlobalConf.screen.BACKBUFFER_WIDTH, GlobalConf.screen.BACKBUFFER_HEIGHT);
+                } else {
+                    GuiRegistry.render(Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
+                }
             }
         }
         // Clean lists
@@ -628,6 +758,21 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
         } else {
             // Display loading screen
             renderGui(loadingGui);
+            if (GlobalConf.runtime.OPENVR) {
+                vrContext.pollEvents();
+
+                vrLoadingLeftFb.begin();
+                renderGui(((VRGui) loadingGuiVR).left());
+                vrLoadingLeftFb.end();
+
+                vrLoadingRightFb.begin();
+                renderGui(((VRGui) loadingGuiVR).right());
+                vrLoadingRightFb.end();
+
+                /** SUBMIT TO VR COMPOSITOR **/
+                VRCompositor.VRCompositor_Submit(VR.EVREye_Eye_Left, vrLoadingLeftTex, null, VR.EVRSubmitFlags_Submit_Default);
+                VRCompositor.VRCompositor_Submit(VR.EVREye_Eye_Right, vrLoadingRightTex, null, VR.EVRSubmitFlags_Submit_Default);
+            }
         }
     };
 
@@ -732,12 +877,16 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
 
     @Override
     public void resize(final int width, final int height) {
-        if (!initialized) {
-            resizeImmediate(width, height, true, true, true);
+        if (GlobalConf.runtime.OPENVR) {
+            Gdx.app.postRunnable(() -> resizeImmediate(width, height, false, false, false));
         } else {
-            resizeWidth = width;
-            resizeHeight = height;
-            lastResizeTime = System.currentTimeMillis();
+            if (!initialized) {
+                resizeImmediate(width, height, true, true, true);
+            } else {
+                resizeWidth = width;
+                resizeHeight = height;
+                lastResizeTime = System.currentTimeMillis();
+            }
         }
     }
 
@@ -800,6 +949,10 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
         return w + "x" + h;
     }
 
+    public HashMap<VRDevice, StubModel> getVRDeviceToModel() {
+        return vrDeviceToModel;
+    }
+
     public ICamera getICamera() {
         return cam.current;
     }
@@ -841,6 +994,13 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
             loadingGui.initialize(manager);
 
             Gdx.input.setInputProcessor(loadingGui.getGuiStage());
+
+            // Also VR
+            if (GlobalConf.runtime.OPENVR) {
+                loadingGuiVR = new VRGui(LoadingGui.class, 200);
+                loadingGuiVR.initialize(manager);
+            }
+
             this.renderProcess = runnableLoadingGui;
 
             /* LOAD SCENE GRAPH */

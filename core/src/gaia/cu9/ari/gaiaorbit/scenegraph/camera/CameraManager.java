@@ -286,7 +286,7 @@ public class CameraManager implements ICamera, IObserver {
         speed = (velocity.len() * Constants.U_TO_KM) / (dt * Nature.S_TO_H);
 
         // High speed?
-        if (speed > 5e3) {
+        if (speed > (GlobalConf.runtime.OPENVR ? 5e6 : 5e3)) {
             //System.out.println(panSpeed + " deg/s, " + speed + " km/h");
             StreamingOctreeLoader.clearQueue();
         }
@@ -511,6 +511,16 @@ public class CameraManager implements ICamera, IObserver {
     }
 
     @Override
+    public void setShift(Vector3d shift) {
+        current.setShift(shift);
+    }
+
+    @Override
+    public Vector3d getShift() {
+        return current.getShift();
+    }
+
+    @Override
     public IStarFocus getClosestStar() {
         return current.getClosestStar();
     }
@@ -525,4 +535,19 @@ public class CameraManager implements ICamera, IObserver {
         return current.getTranslateUnits();
     }
 
+    @Override
+    public void updateFrustumPlanes(){
+        for(ICamera cam : cameras)
+            cam.updateFrustumPlanes();
+    }
+
+    @Override
+    public double getNear() {
+        return current.getNear();
+    }
+
+    @Override
+    public double getFar() {
+        return current.getFar();
+    }
 }

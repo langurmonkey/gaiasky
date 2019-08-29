@@ -112,7 +112,7 @@ public class BackgroundModel extends FadeNode implements IModelRenderable, I3DTe
      * Model rendering.
      */
     @Override
-    public void render(IntModelBatch modelBatch, float alpha, double t) {
+    public void render(IntModelBatch modelBatch, float alpha, double t, RenderingContext rc) {
         mc.touch();
         mc.setTransparency(alpha * cc[3] * opacity);
         mc.updateRelativisticEffects(GaiaSky.instance.getICamera());

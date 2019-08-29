@@ -287,6 +287,20 @@ public interface IFocus {
     void addHit(int screenX, int screenY, int w, int h, int pxdist, NaturalCamera camera, Array<IFocus> hits);
 
     /**
+     * Adds this focus to the hits list if it is hit by the given ray
+     *
+     * @param p0
+     *            Start point of the ray
+     * @param p1
+     *            End point of the ray
+     * @param camera
+     *            The camera
+     * @param hits
+     *            The list where the focus is to be added
+     */
+    public void addHit(Vector3d p0, Vector3d p1, NaturalCamera camera, Array<IFocus> hits);
+
+    /**
      * Hook that runs when the candidate is actually made focus
      */
     void makeFocus();

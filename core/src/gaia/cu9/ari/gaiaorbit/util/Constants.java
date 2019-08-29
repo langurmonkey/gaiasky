@@ -15,20 +15,20 @@ public class Constants {
     /**
      * Metre to local unit conversion. Multiply this by all values in m.
      */
-    public static double M_TO_U = 1e-9 * DISTANCE_SCALE_FACTOR;
+    public static double M_TO_U = 1e-9d * DISTANCE_SCALE_FACTOR;
     /**
      * Local unit to m conversion.
      */
-    public static double U_TO_M = 1 / M_TO_U;
+    public static double U_TO_M = 1d / M_TO_U;
 
     /**
      * Kilometre to local unit conversion. Multiply this by all values in Km.
      */
-    public static double KM_TO_U = M_TO_U * 1000;
+    public static double KM_TO_U = M_TO_U * 1000d;
     /**
      * Local unit to km conversion.
      */
-    public static double U_TO_KM = 1 / KM_TO_U;
+    public static double U_TO_KM = 1d / KM_TO_U;
 
     /**
      * AU to local units conversion.
@@ -38,7 +38,7 @@ public class Constants {
     /**
      * Local unit to AU conversion.
      */
-    public static double U_TO_AU = 1 / AU_TO_U;
+    public static double U_TO_AU = 1d / AU_TO_U;
 
     /**
      * Parsec to local unit conversion. Multiply this by all values in pc.
@@ -48,17 +48,17 @@ public class Constants {
     /**
      * Kiloparsec to local unit conversion. Multiply this by all values in Kpc.
      */
-    public static double KPC_TO_U = PC_TO_U * 1000;
+    public static double KPC_TO_U = PC_TO_U * 1000d;
 
     /**
      * Megaparsec to local unit conversion. Multiply this by all values in Mpc.
      */
-    public static double MPC_TO_U = PC_TO_U * 1000000;
+    public static double MPC_TO_U = KPC_TO_U * 1000d;
 
     /**
      * Local unit to pc conversion.
      */
-    public static double U_TO_PC = 1 / PC_TO_U;
+    public static double U_TO_PC = 1d / PC_TO_U;
 
     /**
      * Local unit to Kpc conversion.
@@ -93,7 +93,7 @@ public class Constants {
     /**
      * Units to solar radius
      */
-    public static double U_TO_Ro = 1 / Ro_TO_U;
+    public static double U_TO_Ro = 1d / Ro_TO_U;
 
     /**
      * Logarithmic depth buffer constant. Controls the resolution close to the camera
@@ -106,20 +106,20 @@ public class Constants {
 
     public static void initialize(double distanceScaleFactor) {
         DISTANCE_SCALE_FACTOR = distanceScaleFactor;
-        M_TO_U = 1e-9 * DISTANCE_SCALE_FACTOR;
-        U_TO_M = 1 / M_TO_U;
-        KM_TO_U = M_TO_U * 1000;
-        U_TO_KM = 1 / KM_TO_U;
+        M_TO_U = 1e-9d * DISTANCE_SCALE_FACTOR;
+        U_TO_M = 1d / M_TO_U;
+        KM_TO_U = M_TO_U * 1000d;
+        U_TO_KM = 1d / KM_TO_U;
         AU_TO_U = Nature.AU_TO_KM * KM_TO_U;
-        U_TO_AU = 1 / AU_TO_U;
+        U_TO_AU = 1d / AU_TO_U;
         PC_TO_U = Nature.PC_TO_KM * KM_TO_U;
-        KPC_TO_U = PC_TO_U * 1000;
-        MPC_TO_U = PC_TO_U * 1000000;
-        U_TO_PC = 1 / PC_TO_U;
+        KPC_TO_U = PC_TO_U * 1000d;
+        MPC_TO_U = KPC_TO_U * 1000d;
+        U_TO_PC = 1d / PC_TO_U;
         U_TO_KPC = U_TO_PC / 1000d;
         C_US = C * M_TO_U;
         Ro_TO_U = Ro_TO_KM * KM_TO_U;
-        U_TO_Ro = 1 / Ro_TO_U;
+        U_TO_Ro = 1d / Ro_TO_U;
         CAMERA_K = 1e7d / DISTANCE_SCALE_FACTOR;
     }
 

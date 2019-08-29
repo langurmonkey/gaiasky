@@ -38,7 +38,7 @@ public class Positions2DExtractor {
         try {
             NumberFormatFactory.initialize(new DesktopNumberFormatFactory());
             DateFormatFactory.initialize(new DesktopDateFormatFactory());
-            ConfInit.initialize(new DesktopConfInit());
+            ConfInit.initialize(new DesktopConfInit(false));
         } catch (IOException e) {
             Logger.getLogger(Positions2DExtractor.class).error(e);
         } catch (Exception e) {

@@ -22,6 +22,7 @@ import gaia.cu9.ari.gaiaorbit.render.system.FontRenderSystem;
 import gaia.cu9.ari.gaiaorbit.scenegraph.camera.ICamera;
 import gaia.cu9.ari.gaiaorbit.scenegraph.component.ITransform;
 import gaia.cu9.ari.gaiaorbit.scenegraph.component.ModelComponent;
+import gaia.cu9.ari.gaiaorbit.util.Constants;
 import gaia.cu9.ari.gaiaorbit.util.Logger;
 import gaia.cu9.ari.gaiaorbit.util.coord.Coordinates;
 import gaia.cu9.ari.gaiaorbit.util.gdx.IntModelBatch;
@@ -153,7 +154,7 @@ public class MeshObject extends FadeNode implements IModelRenderable, I3DTextRen
      * Model rendering
      */
     @Override
-    public void render(IntModelBatch modelBatch, float alpha, double t) {
+    public void render(IntModelBatch modelBatch, float alpha, double t, RenderingContext rc) {
         if (mc != null) {
             mc.touch(localTransform);
             if (mc.instance != null) {
@@ -263,6 +264,16 @@ public class MeshObject extends FadeNode implements IModelRenderable, I3DTextRen
     @Override
     public boolean isLabel() {
         return true;
+    }
+
+    @Override
+    public void setSize(Double size) {
+        this.size = (float) (size * Constants.DISTANCE_SCALE_FACTOR);
+    }
+
+    @Override
+    public void setSize(Long size) {
+        this.size = (float) (size.doubleValue() * Constants.DISTANCE_SCALE_FACTOR);
     }
 
     @Override

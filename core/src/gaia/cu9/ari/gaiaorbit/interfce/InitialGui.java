@@ -32,7 +32,7 @@ import java.nio.file.Paths;
 public class InitialGui extends AbstractGui {
     private static final Log logger = Logger.getLogger(InitialGui.class);
 
-    private boolean datasetsDownload, catalogChooser;
+    private boolean datasetsDownload, catalogChooser, vrFail;
 
     protected DownloadDataWindow ddw;
     protected ChooseCatalogWindow cdw;
@@ -45,10 +45,11 @@ public class InitialGui extends AbstractGui {
      * @param datasetsDownload Forces dataset download window
      * @param catalogChooser   Forces catalog chooser window
      */
-    public InitialGui(boolean datasetsDownload, boolean catalogChooser) {
+    public InitialGui(boolean datasetsDownload, boolean catalogChooser, boolean vrFail) {
         lock = new Object();
         this.catalogChooser = catalogChooser;
         this.datasetsDownload = datasetsDownload;
+        this.vrFail = vrFail;
     }
 
     @Override
@@ -58,47 +59,53 @@ public class InitialGui extends AbstractGui {
         ui = new Stage(new ScreenViewport(), GlobalResources.spriteBatch);
         skin = GlobalResources.skin;
 
-        DatasetsWidget dw = new DatasetsWidget(skin, GlobalConf.ASSETS_LOC);
-        Array<FileHandle> catalogFiles = dw.buildCatalogFiles();
+        if(vrFail){
+            Gdx.app.postRunnable(() ->  GuiUtils.addNoVRExit(skin, ui));
 
-        clearGui();
+        } else {
 
-        FileHandle dataDescriptor = Gdx.files.absolute(SysUtils.getDefaultTmpDir() + "/gaiasky-data.json");
-        DownloadHelper.downloadFile(GlobalConf.program.DATA_DESCRIPTOR_URL, dataDescriptor, null, (digest) -> {
-            Gdx.app.postRunnable(() -> {
-                /**
-                 * Display download manager if:
-                 * - force display (args), or
-                 * - base data not found, or
-                 * - no catalogs found in data folder, or
-                 * - new versions of current datasets found
-                 */
+            DatasetsWidget dw = new DatasetsWidget(skin, GlobalConf.ASSETS_LOC);
+            Array<FileHandle> catalogFiles = dw.buildCatalogFiles();
 
-                DataDescriptor dd = DataDescriptorUtils.instance().buildDatasetsDescriptor(dataDescriptor);
-                if (datasetsDownload || !basicDataPresent() || catalogFiles.size == 0 || dd.updatesAvailable) {
-                    // No catalog files, display downloader
-                    addDownloaderWindow(dd);
+            clearGui();
+
+            FileHandle dataDescriptor = Gdx.files.absolute(SysUtils.getDefaultTmpDir() + "/gaiasky-data.json");
+            DownloadHelper.downloadFile(GlobalConf.program.DATA_DESCRIPTOR_URL, dataDescriptor, null, (digest) -> {
+                Gdx.app.postRunnable(() -> {
+                    /**
+                     * Display download manager if:
+                     * - force display (args), or
+                     * - base data not found, or
+                     * - no catalogs found in data folder, or
+                     * - new versions of current datasets found
+                     */
+
+                    DataDescriptor dd = DataDescriptorUtils.instance().buildDatasetsDescriptor(dataDescriptor);
+                    if (datasetsDownload || !basicDataPresent() || catalogFiles.size == 0 || dd.updatesAvailable) {
+                        // No catalog files, display downloader
+                        addDownloaderWindow(dd);
+                    } else {
+                        displayChooser();
+                    }
+                });
+            }, () -> {
+                // Fail?
+                logger.error("No internet connection or server is down! We will attempt to continue");
+                if (basicDataPresent()) {
+                    // Go on all in
+                    Gdx.app.postRunnable(() -> {
+                        GuiUtils.addNoConnectionWindow(skin, ui, () -> displayChooser());
+                    });
                 } else {
-                    displayChooser();
+                    // Error and exit
+                    logger.error("No base data present - need an internet connection to continue, exiting");
+                    Gdx.app.postRunnable(() -> {
+                        GuiUtils.addNoConnectionExit(skin, ui);
+                    });
                 }
-            });
-        }, () -> {
-            // Fail?
-            logger.error("No internet connection or server is down! We will attempt to continue");
-            if (basicDataPresent()) {
-                // Go on all in
-                Gdx.app.postRunnable(() -> {
-                    GuiUtils.addNoConnectionWindow(skin, ui, () -> displayChooser());
-                });
-            } else {
-                // Error and exit
-                logger.error("No base data present - need an internet connection to continue, exiting");
-                Gdx.app.postRunnable(() -> {
-                    GuiUtils.addExitWindow(skin, ui);
-                });
-            }
-        }, null);
+            }, null);
 
+        }
     }
 
     private boolean isCatalogSelected() {

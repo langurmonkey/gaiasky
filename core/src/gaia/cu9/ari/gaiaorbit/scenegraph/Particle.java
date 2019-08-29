@@ -16,6 +16,7 @@ import gaia.cu9.ari.gaiaorbit.render.ComponentTypes;
 import gaia.cu9.ari.gaiaorbit.render.ComponentTypes.ComponentType;
 import gaia.cu9.ari.gaiaorbit.render.ILineRenderable;
 import gaia.cu9.ari.gaiaorbit.render.IRenderable;
+import gaia.cu9.ari.gaiaorbit.render.RenderingContext;
 import gaia.cu9.ari.gaiaorbit.render.SceneGraphRenderer;
 import gaia.cu9.ari.gaiaorbit.render.system.LineRenderSystem;
 import gaia.cu9.ari.gaiaorbit.scenegraph.camera.FovCamera;
@@ -191,17 +192,13 @@ public class Particle extends CelestialBody implements IStarFocus, ILineRenderab
         radius = size * Constants.STAR_SIZE_FACTOR;
     }
 
-    public float getActualRadius() {
-        return (float) radius;
-    }
-
     protected void setDerivedAttributes() {
         double flux = Math.pow(10, -absmag / 2.5f);
         setRGB(colorbv);
 
         // Calculate size - This contains arbitrary boundary values to make
         // things nice on the render side
-        size = (float) ((Math.min((Math.pow(flux, 0.5f) * Constants.PC_TO_U * 0.16f), 1e9f) / DISC_FACTOR) * (1e-4d * Constants.DISTANCE_SCALE_FACTOR));
+        size = (float) (Math.min((Math.pow(flux, 0.5f) * Constants.PC_TO_U * 0.16f), 1e9f) / DISC_FACTOR);
         computedSize = 0;
     }
 
@@ -281,7 +278,7 @@ public class Particle extends CelestialBody implements IStarFocus, ILineRenderab
      * Model rendering
      */
     @Override
-    public void render(IntModelBatch modelBatch, float alpha, double t) {
+    public void render(IntModelBatch modelBatch, float alpha, double t, RenderingContext rc) {
         // Void
     }
 
@@ -348,7 +345,7 @@ public class Particle extends CelestialBody implements IStarFocus, ILineRenderab
             computedSize *= (dist / this.radius) * Constants.THRESHOLD_DOWN;
         }
 
-        computedSize *= GlobalConf.scene.STAR_BRIGHTNESS * 0.07 / Constants.DISTANCE_SCALE_FACTOR;
+        computedSize *= GlobalConf.scene.STAR_BRIGHTNESS * 0.07;
         return (float) computedSize;
     }
 

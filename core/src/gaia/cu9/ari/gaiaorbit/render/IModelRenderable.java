@@ -14,7 +14,7 @@ import gaia.cu9.ari.gaiaorbit.util.gdx.IntModelBatch;
  */
 public interface IModelRenderable extends IRenderable {
 
-    void render(IntModelBatch modelBatch, float alpha, double t);
+    void render(IntModelBatch modelBatch, float alpha, double t, RenderingContext rc);
 
     boolean hasAtmosphere();
 

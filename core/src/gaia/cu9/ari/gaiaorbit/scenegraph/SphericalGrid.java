@@ -13,7 +13,9 @@ import com.badlogic.gdx.utils.reflect.Method;
 import com.badlogic.gdx.utils.reflect.ReflectionException;
 import gaia.cu9.ari.gaiaorbit.render.IAnnotationsRenderable;
 import gaia.cu9.ari.gaiaorbit.scenegraph.camera.ICamera;
+import gaia.cu9.ari.gaiaorbit.scenegraph.camera.NaturalCamera;
 import gaia.cu9.ari.gaiaorbit.scenegraph.component.ModelComponent;
+import gaia.cu9.ari.gaiaorbit.util.Constants;
 import gaia.cu9.ari.gaiaorbit.util.GlobalConf;
 import gaia.cu9.ari.gaiaorbit.util.GlobalResources;
 import gaia.cu9.ari.gaiaorbit.util.Logger;
@@ -89,11 +91,21 @@ public class SphericalGrid extends BackgroundModel implements IAnnotationsRender
 
         font.setColor(labelColour[0], labelColour[1], labelColour[2], labelColour[3] * alpha);
 
+        Vector3 vroffset = aux3f4.get();
+        if (GlobalConf.runtime.OPENVR) {
+            if (camera.getCurrent() instanceof NaturalCamera) {
+                ((NaturalCamera) camera.getCurrent()).vroffset.put(vroffset);
+                vroffset.scl((float)(1 / Constants.M_TO_U));
+            }
+        } else {
+            vroffset.set(0, 0, 0);
+        }
+
         for (int angle = 0; angle < 360; angle += stepAngle) {
             auxf.set(Coordinates.sphericalToCartesian(Math.toRadians(angle), 0, 1f, auxd).valuesf()).mul(annotTransform).nor();
             effectsPos(auxf, camera);
             if (auxf.dot(camera.getCamera().direction.nor()) > 0) {
-                auxf.add(camera.getCamera().position);
+                auxf.add(camera.getCamera().position).scl((float) Constants.DISTANCE_SCALE_FACTOR).add(vroffset);
                 camera.getCamera().project(auxf);
                 font.draw(spriteBatch, Integer.toString(angle), auxf.x, auxf.y);
             }
@@ -106,14 +118,14 @@ public class SphericalGrid extends BackgroundModel implements IAnnotationsRender
                 auxf.set(Coordinates.sphericalToCartesian(0, Math.toRadians(angle), 1f, auxd).valuesf()).mul(annotTransform).nor();
                 effectsPos(auxf, camera);
                 if (auxf.dot(camera.getCamera().direction.nor()) > 0) {
-                    auxf.add(camera.getCamera().position);
+                    auxf.add(camera.getCamera().position).scl((float) Constants.DISTANCE_SCALE_FACTOR).add(vroffset);
                     camera.getCamera().project(auxf);
                     font.draw(spriteBatch, Integer.toString(angle), auxf.x, auxf.y);
                 }
                 auxf.set(Coordinates.sphericalToCartesian(0, Math.toRadians(-angle), -1f, auxd).valuesf()).mul(annotTransform).nor();
                 effectsPos(auxf, camera);
                 if (auxf.dot(camera.getCamera().direction.nor()) > 0) {
-                    auxf.add(camera.getCamera().position);
+                    auxf.add(camera.getCamera().position).scl((float) Constants.DISTANCE_SCALE_FACTOR).add(vroffset);
                     camera.getCamera().project(auxf);
                     font.draw(spriteBatch, Integer.toString(angle), auxf.x, auxf.y);
                 }

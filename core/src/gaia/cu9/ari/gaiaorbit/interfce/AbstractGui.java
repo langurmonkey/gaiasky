@@ -43,6 +43,16 @@ public abstract class AbstractGui implements IObserver, IGui {
      */
     protected String name;
 
+    /**
+     * Whether we're in VR mode
+     */
+    protected boolean vr;
+
+    /**
+     * Horizontal offset, for VR
+     */
+    protected int hoffset;
+
     /** Lock for sync **/
     protected Object lock;
 
@@ -127,5 +137,15 @@ public abstract class AbstractGui implements IObserver, IGui {
     @Override
     public void notify(Events event, Object... data) {
         // Empty by default
+    }
+
+    @Override
+    public void setHoffset(int hoffset) {
+        this.hoffset = hoffset;
+    }
+
+    @Override
+    public boolean mustDraw() {
+        return true;
     }
 }

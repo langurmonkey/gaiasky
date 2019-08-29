@@ -8,6 +8,7 @@ package gaia.cu9.ari.gaiaorbit.data.group;
 import com.badlogic.gdx.utils.Array;
 import gaia.cu9.ari.gaiaorbit.scenegraph.ParticleGroup.ParticleBean;
 import gaia.cu9.ari.gaiaorbit.scenegraph.StarGroup.StarBean;
+import gaia.cu9.ari.gaiaorbit.util.Constants;
 import gaia.cu9.ari.gaiaorbit.util.GlobalConf;
 import gaia.cu9.ari.gaiaorbit.util.I18n;
 
@@ -116,10 +117,14 @@ public class BinaryDataProvider extends AbstractStarGroupDataProvider {
         // Double
         for (int i = 0; i < StarBean.I_APPMAG; i++) {
             data[i] = in.readDouble();
+            if (i < 6)
+                data[i] *= Constants.DISTANCE_SCALE_FACTOR;
         }
         // Float
         for (int i = StarBean.I_APPMAG; i < StarBean.I_HIP; i++) {
             data[i] = in.readFloat();
+            if (i == StarBean.I_SIZE)
+                data[i] *= Constants.DISTANCE_SCALE_FACTOR;
         }
         // Int
         data[StarBean.I_HIP] = in.readInt();
@@ -165,10 +170,14 @@ public class BinaryDataProvider extends AbstractStarGroupDataProvider {
         // Double
         for (int i = 0; i < StarBean.I_APPMAG; i++) {
             data[i] = mem.getDouble();
+            if (i < 6)
+                data[i] *= Constants.DISTANCE_SCALE_FACTOR;
         }
         // Float
         for (int i = StarBean.I_APPMAG; i < StarBean.I_HIP; i++) {
             data[i] = mem.getFloat();
+            if (i == StarBean.I_SIZE)
+                data[i] *= Constants.DISTANCE_SCALE_FACTOR;
         }
         // Int
         data[StarBean.I_HIP] = mem.getInt();

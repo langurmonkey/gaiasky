@@ -46,7 +46,7 @@ public class AtmosphereComponent {
     public Map<String, Object> params;
 
     Vector3 aux;
-    Vector3d aux3;
+    Vector3d aux3, aux1;
 
     public AtmosphereComponent() {
         localTransform = new Matrix4();
@@ -54,6 +54,7 @@ public class AtmosphereComponent {
         mc.initialize();
         aux = new Vector3();
         aux3 = new Vector3d();
+        aux1 = new Vector3d();
         fogColor = new Vector3();
     }
 
@@ -156,11 +157,16 @@ public class AtmosphereComponent {
      * @param planet
      *            The planet itself, holder of this atmosphere
      */
-    public void updateAtmosphericScatteringParams(Material mat, float alpha, boolean ground, Planet planet) {
+    public void updateAtmosphericScatteringParams(Material mat, float alpha, boolean ground, Planet planet, Vector3d vroffset) {
         Vector3d transform = planet.translation;
         RotationComponent rc = planet.rc;
         SceneGraphNode sol = planet.parent;
         transform.put(aux3);
+        if (vroffset != null) {
+            aux1.set(vroffset).scl(1 / Constants.M_TO_U);
+            aux3.sub(aux1);
+        }
+
         // Distance to planet
         float camHeight = (float) (aux3.len());
         float m_ESun = 10f;

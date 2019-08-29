@@ -10,6 +10,7 @@ import com.badlogic.gdx.utils.viewport.ExtendViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
 import gaia.cu9.ari.gaiaorbit.render.IPostProcessor.PostProcessBean;
 import gaia.cu9.ari.gaiaorbit.scenegraph.camera.ICamera;
+import gaia.cu9.ari.gaiaorbit.util.GlobalConf;
 
 /**
  * Abstract implementation with some useful methods for all SGRs.
@@ -46,12 +47,14 @@ public class SGRAbstract {
         ppb.render(fb);
 
         // Render camera
-        if (fb != null && postproc) {
-            fb.begin();
-        }
-        camera.render(rw, rh);
-        if (fb != null && postproc) {
-            fb.end();
+        if(!GlobalConf.runtime.OPENVR) {
+            if (fb != null && postproc) {
+                fb.begin();
+            }
+            camera.render(rw, rh);
+            if (fb != null && postproc) {
+                fb.end();
+            }
         }
     }
 

@@ -30,7 +30,7 @@ public abstract class AbstractCamera implements ICamera {
     /** Camera near value **/
     public double CAM_NEAR;
 
-    public Vector3d pos, posinv, tmp;
+    public Vector3d pos, posinv, shift, tmp;
     /**
      * Angle from the center to the corner of the screen in scene coordinates,
      * in radians
@@ -67,10 +67,9 @@ public abstract class AbstractCamera implements ICamera {
      */
     protected IStarFocus closestStar;
 
-    private void initNearFar(){
-        CAM_FAR = 0.5d * Constants.MPC_TO_U;
-        /** Camera near value **/
+    private void initNearFar() {
         CAM_NEAR = 0.5d * Constants.M_TO_U;
+        CAM_FAR = 1d * Constants.MPC_TO_U;
     }
 
     public AbstractCamera(CameraManager parent) {
@@ -79,6 +78,7 @@ public abstract class AbstractCamera implements ICamera {
         this.parent = parent;
         pos = new Vector3d();
         posinv = new Vector3d();
+        shift = new Vector3d();
         tmp = new Vector3d();
 
         camLeft = new PerspectiveCamera(GlobalConf.scene.CAMERA_FOV, Gdx.graphics.getWidth() / 2, Gdx.graphics.getHeight());
@@ -170,11 +170,9 @@ public abstract class AbstractCamera implements ICamera {
     /**
      * Returns true if a body with the given position is observed in any of the
      * given directions using the given cone angle
-     * 
-     * @param cb
-     *            The body.
-     * @param fcamera
-     *            The FovCamera.
+     *
+     * @param cb      The body.
+     * @param fcamera The FovCamera.
      * @return True if the body is observed. False otherwise.
      */
     protected boolean computeVisibleFovs(CelestialBody cb, FovCamera fcamera) {
@@ -260,8 +258,15 @@ public abstract class AbstractCamera implements ICamera {
         copyCamera(cam, camRight);
     }
 
+    @Override
+    public void setShift(Vector3d shift) {
+        this.shift.set(shift);
+    }
 
-
+    @Override
+    public Vector3d getShift() {
+        return this.shift;
+    }
 
     public void update(PerspectiveCamera cam, Vector3d position, Vector3d direction, Vector3d up) {
         double aspect = cam.viewportWidth / cam.viewportHeight;
@@ -291,11 +296,27 @@ public abstract class AbstractCamera implements ICamera {
         return null;
     }
 
-    protected void setFrustumPlanes(PerspectiveCamera cam){
-        if(cam!= null){
+    @Override
+    public void updateFrustumPlanes() {
+        initNearFar();
+        setFrustumPlanes(camera);
+        setFrustumPlanes(camLeft);
+        setFrustumPlanes(camRight);
+    }
+
+    protected void setFrustumPlanes(PerspectiveCamera cam) {
+        if (cam != null) {
             cam.near = (float) CAM_NEAR;
             cam.far = (float) CAM_FAR;
             cam.update();
         }
+    }
+
+    public double getNear() {
+        return CAM_NEAR;
+    }
+
+    public double getFar() {
+        return CAM_FAR;
     }
 }

@@ -30,10 +30,10 @@ public class StarGroupBinaryIO implements IStarGroupIO {
 
     /**
      * Writes the list to the output stream. The list must contain a single star
-     * vgroup.
+     * group.
      * 
      * @param list
-     *            The list with the star vgroup to write
+     *            The list with the star group to write
      * @param out
      *            The output stream to write to
      */
@@ -45,11 +45,11 @@ public class StarGroupBinaryIO implements IStarGroupIO {
     }
 
     /**
-     * Reads a single star vgroup from the given input stream.
+     * Reads a single star group from the given input stream.
      * 
      * @param in
-     *            The input stream to read the star vgroup from
-     * @return A list with a single star vgroup object
+     *            The input stream to read the star group from
+     * @return A list with a single star group object
      */
     public Array<AbstractPositionEntity> readParticles(InputStream in) {
         @SuppressWarnings("unchecked")

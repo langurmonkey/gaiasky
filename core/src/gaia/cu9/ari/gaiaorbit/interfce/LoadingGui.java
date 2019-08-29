@@ -19,6 +19,7 @@ import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener.ChangeEvent;
 import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
+import com.badlogic.gdx.utils.viewport.Viewport;
 import gaia.cu9.ari.gaiaorbit.event.EventManager;
 import gaia.cu9.ari.gaiaorbit.event.Events;
 import gaia.cu9.ari.gaiaorbit.util.GlobalConf;
@@ -46,7 +47,13 @@ public class LoadingGui extends AbstractGui {
     private long lastUpdateTime;
 
     public LoadingGui() {
+        this(0, false);
+    }
+
+    public LoadingGui(int hoffset, boolean vr) {
         super();
+        this.vr = vr;
+        this.hoffset = hoffset;
     }
 
     @Override
@@ -56,24 +63,34 @@ public class LoadingGui extends AbstractGui {
         float pad10 = 10f * GlobalConf.SCALE_FACTOR;
         float pad05 = 5f * GlobalConf.SCALE_FACTOR;
         // User interface
-        ui = new Stage(new ScreenViewport(), GlobalResources.spriteBatch);
+        Viewport vp = new ScreenViewport();
+        ui = new Stage(vp, GlobalResources.spriteBatch);
+        if(vr) {
+            vp.update(GlobalConf.screen.BACKBUFFER_WIDTH, GlobalConf.screen.BACKBUFFER_HEIGHT, true);
+        }
         skin = GlobalResources.skin;
 
         center = new Table();
         center.setFillParent(true);
         center.center();
-        
+        if (hoffset > 0)
+            center.padLeft(hoffset);
+        else if (hoffset < 0)
+            center.padRight(-hoffset);
+
         bottom = new Table();
         bottom.setFillParent(true);
         bottom.right().bottom();
         bottom.pad(pad10);
 
-        FileHandle gslogo = Gdx.files.internal("img/gaiasky-logo.png");
+        FileHandle gslogo = Gdx.files.internal(vr ? "img/gaiasky-vr-logo-s.png" : "img/gaiasky-logo.png");
         Texture logotex = new Texture(gslogo);
         logotex.setFilter(TextureFilter.Linear, TextureFilter.Linear);
         Image logoimg = new Image(logotex);
-        float scl = GlobalConf.SCALE_FACTOR / 2.5f;
-        logoimg.setScale(scl);
+        if(!vr) {
+            float scl = GlobalConf.SCALE_FACTOR / 2.5f;
+            logoimg.setScale(scl);
+        }
         logoimg.setOrigin(Align.center);
 
         lastUpdateTime = 0;

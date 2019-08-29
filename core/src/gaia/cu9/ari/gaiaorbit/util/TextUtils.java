@@ -99,7 +99,7 @@ public class TextUtils {
     }
 
     /**
-     * Concatenates the strings  using  the given split
+     * Concatenates the strings using the given split
      * @param split The split
      * @param strs The strings
      * @return The concatenation

@@ -42,7 +42,7 @@ import java.util.List;
 public class GlobalConf {
     private static final Log logger = Logger.getLogger(GlobalConf.class);
 
-    public static final String APPLICATION_NAME = "Gaia Sky";
+    public static String APPLICATION_NAME = "Gaia Sky";
     public static final String APPLICATION_SHORT_NAME = "gaiasky";
     public static final String WEBPAGE = "https://www.zah.uni-heidelberg.de/gaia/outreach/gaiasky";
     public static final String WEBPAGE_DOWNLOADS = "https://www.zah.uni-heidelberg.de/gaia/outreach/gaiasky/downloads";
@@ -350,7 +350,9 @@ public class GlobalConf {
      * @author Toni Sagrista
      */
     public static class RuntimeConf implements IConf, IObserver {
-
+        /** Whether the connection to OpenVR has succeeded and the context has been created **/
+        public boolean OPENVR = false;
+        public boolean OVR = false;
         public boolean DISPLAY_GUI;
         public boolean UPDATE_PAUSE;
         public boolean TIME_ON;
@@ -369,8 +371,10 @@ public class GlobalConf {
         public boolean RELATIVISTIC_ABERRATION = false;
         public boolean GRAVITATIONAL_WAVES = false;
 
+        public boolean DISPLAY_VR_GUI = false;
+
         public RuntimeConf() {
-            EventManager.instance.subscribe(this, Events.LIMIT_MAG_CMD, Events.INPUT_ENABLED_CMD, Events.DISPLAY_GUI_CMD, Events.TOGGLE_UPDATEPAUSE, Events.TOGGLE_TIME_CMD, Events.RECORD_CAMERA_CMD, Events.GRAV_WAVE_START, Events.GRAV_WAVE_STOP);
+            EventManager.instance.subscribe(this, Events.LIMIT_MAG_CMD, Events.INPUT_ENABLED_CMD, Events.DISPLAY_GUI_CMD, Events.TOGGLE_UPDATEPAUSE, Events.TOGGLE_TIME_CMD, Events.RECORD_CAMERA_CMD, Events.GRAV_WAVE_START, Events.GRAV_WAVE_STOP, Events.DISPLAY_VR_GUI_CMD);
         }
 
         public void initialize(boolean dISPLAY_GUI, boolean uPDATE_PAUSE, boolean tIME_ON, boolean iNPUT_ENABLED, boolean rECORD_CAMERA, float lIMIT_MAG_RUNTIME, boolean rEAL_TIME, boolean dRAW_OCTREE) {
@@ -398,6 +402,14 @@ public class GlobalConf {
 
             case DISPLAY_GUI_CMD:
                 DISPLAY_GUI = (boolean) data[0];
+                break;
+            case DISPLAY_VR_GUI_CMD:
+                if (data.length > 1) {
+                    Boolean val = (Boolean) data[1];
+                    DISPLAY_VR_GUI = val;
+                } else {
+                    DISPLAY_VR_GUI = !DISPLAY_VR_GUI;
+                }
                 break;
             case TOGGLE_UPDATEPAUSE:
                 UPDATE_PAUSE = !UPDATE_PAUSE;
@@ -676,6 +688,8 @@ public class GlobalConf {
 
         public int SCREEN_WIDTH;
         public int SCREEN_HEIGHT;
+        public int BACKBUFFER_WIDTH;
+        public int BACKBUFFER_HEIGHT;
         public int FULLSCREEN_WIDTH;
         public int FULLSCREEN_HEIGHT;
         public boolean FULLSCREEN;
@@ -687,6 +701,8 @@ public class GlobalConf {
         public void initialize(int sCREEN_WIDTH, int sCREEN_HEIGHT, int fULLSCREEN_WIDTH, int fULLSCREEN_HEIGHT, boolean fULLSCREEN, boolean rESIZABLE, boolean vSYNC, boolean sCREEN_OUTPUT, int lIMIT_FPS) {
             SCREEN_WIDTH = sCREEN_WIDTH;
             SCREEN_HEIGHT = sCREEN_HEIGHT;
+            BACKBUFFER_WIDTH = sCREEN_WIDTH;
+            BACKBUFFER_HEIGHT = sCREEN_HEIGHT;
             FULLSCREEN_WIDTH = fULLSCREEN_WIDTH;
             FULLSCREEN_HEIGHT = fULLSCREEN_HEIGHT;
             FULLSCREEN = fULLSCREEN;
@@ -787,13 +803,9 @@ public class GlobalConf {
          **/
         public CubemapProjections.CubemapProjection CUBEMAP_PROJECTION = CubemapProjections.CubemapProjection.EQUIRECTANGULAR;
         public boolean STEREOSCOPIC_MODE;
-        /**
-         * Eye separation in stereoscopic mode in meters
-         **/
-        public float STEREOSCOPIC_EYE_SEPARATION_M = 1;
-        /**
-         * This controls the side of the images in the stereoscopic mode
-         **/
+        /** Eye separation in stereoscopic mode in meters **/
+        public float STEREOSCOPIC_EYE_SEPARATION_M = 1f;
+        /** This controls the side of the images in the stereoscopic mode **/
         public StereoProfile STEREO_PROFILE = StereoProfile.VR_HEADSET;
         /**
          * Whether to display the dataset dialog at startup or not

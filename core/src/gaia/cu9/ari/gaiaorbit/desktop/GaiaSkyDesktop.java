@@ -7,6 +7,7 @@ package gaia.cu9.ari.gaiaorbit.desktop;
 
 import com.badlogic.gdx.Files;
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.Graphics;
 import com.badlogic.gdx.Graphics.DisplayMode;
 import com.badlogic.gdx.backends.lwjgl3.Lwjgl3Application;
 import com.badlogic.gdx.backends.lwjgl3.Lwjgl3ApplicationConfiguration;
@@ -56,15 +57,15 @@ public class GaiaSkyDesktop implements IObserver {
     private static final Log logger = Logger.getLogger(GaiaSkyDesktop.class);
 
     /*
-    * Configuration file version of the source code
-    * This is usually tag where each chunk takes 2 spaces.
-    * Version = major.minor.rev -> 1.2.5 major=1; minor=2; rev=5
-    * Version = major * 10000 + minor * 100 + rev
-    * So 1.2.5 -> 10205
-    *    2.1.7 -> 20107
-    *
-    * Leading zeroes are omitted to avoid octal literal interpretation.
-    */
+     * Configuration file version of the source code
+     * This is usually tag where each chunk takes 2 spaces.
+     * Version = major.minor.rev -> 1.2.5 major=1; minor=2; rev=5
+     * Version = major * 10000 + minor * 100 + rev
+     * So 1.2.5 -> 10205
+     *    2.1.7 -> 20107
+     *
+     * Leading zeroes are omitted to avoid octal literal interpretation.
+     */
     public static int SOURCE_CONF_VERSION = 20200;
     private static GaiaSkyDesktop gsd;
     private static boolean REST_ENABLED = false;
@@ -89,6 +90,8 @@ public class GaiaSkyDesktop implements IObserver {
         @Parameter(names = { "-p", "--properties" }, description = "Specify the location of the properties file.", order = 4) private String propertiesFile = null;
 
         @Parameter(names = { "-a", "--assets" }, description = "Specify the location of the assets folder. If not present, the default assets location is used.", order = 5) private String assetsLocation = null;
+
+        @Parameter(names = { "--vr", "--openvr" }, description = "Launch in Virtual Reality mode. Gaia Sky will attempt creating an VR context through OpenVR.", order = 6) private boolean vr = false;
     }
 
     /**
@@ -150,6 +153,10 @@ public class GaiaSkyDesktop implements IObserver {
                 System.setProperty("assets.location", gsArgs.assetsLocation);
             }
 
+            if(gsArgs.vr){
+                GlobalConf.APPLICATION_NAME += " VR";
+            }
+
             gsd = new GaiaSkyDesktop();
 
             Gdx.files = new Lwjgl3Files();
@@ -166,14 +173,23 @@ public class GaiaSkyDesktop implements IObserver {
             // Init properties file
             String props = System.getProperty("properties.file");
             if (props == null || props.isEmpty()) {
-                initConfigFile(false);
+                initConfigFile(false, gsArgs.vr);
             }
 
             // Initialize i18n (only for global config logging)
             I18n.initialize(Gdx.files.internal("i18n/gsbundle"));
 
             // Init global configuration
-            ConfInit.initialize(new DesktopConfInit());
+            ConfInit.initialize(new DesktopConfInit(gsArgs.vr));
+
+            if (gsArgs.vr) {
+                Graphics.DisplayMode dm = Lwjgl3ApplicationConfiguration.getDisplayMode();
+                double sh = Math.min(dm.height, 1780);
+                double aspect = 0.8383d;
+                double scale = 1d;
+                GlobalConf.screen.SCREEN_WIDTH = (int) (sh * aspect * scale);
+                GlobalConf.screen.SCREEN_HEIGHT = (int) (sh * scale);
+            }
 
             // Reinitialize with user-defined locale
             I18n.initialize(Gdx.files.absolute(GlobalConf.ASSETS_LOC + File.separator + "i18n/gsbundle"));
@@ -244,28 +260,35 @@ public class GaiaSkyDesktop implements IObserver {
         ConsoleLogger consoleLogger = new ConsoleLogger();
         Lwjgl3ApplicationConfiguration cfg = new Lwjgl3ApplicationConfiguration();
         cfg.setTitle(GlobalConf.APPLICATION_NAME);
-        if (GlobalConf.screen.FULLSCREEN) {
-            // Get mode
-            DisplayMode[] modes = Lwjgl3ApplicationConfiguration.getDisplayModes();
-            DisplayMode mymode = null;
-            for (DisplayMode mode : modes) {
-                if (mode.height == GlobalConf.screen.FULLSCREEN_HEIGHT && mode.width == GlobalConf.screen.FULLSCREEN_WIDTH) {
-                    mymode = mode;
-                    break;
+        if (!gsArgs.vr) {
+            if (GlobalConf.screen.FULLSCREEN) {
+                // Get mode
+                DisplayMode[] modes = Lwjgl3ApplicationConfiguration.getDisplayModes();
+                DisplayMode mymode = null;
+                for (DisplayMode mode : modes) {
+                    if (mode.height == GlobalConf.screen.FULLSCREEN_HEIGHT && mode.width == GlobalConf.screen.FULLSCREEN_WIDTH) {
+                        mymode = mode;
+                        break;
+                    }
                 }
+                if (mymode == null)
+                    mymode = Lwjgl3ApplicationConfiguration.getDisplayMode(Gdx.graphics.getPrimaryMonitor());
+                cfg.setFullscreenMode(mymode);
+            } else {
+                cfg.setWindowedMode(GlobalConf.screen.getScreenWidth(), GlobalConf.screen.getScreenHeight());
+                cfg.setResizable(GlobalConf.screen.RESIZABLE);
             }
-            if (mymode == null)
-                mymode = Lwjgl3ApplicationConfiguration.getDisplayMode(Gdx.graphics.getPrimaryMonitor());
-            cfg.setFullscreenMode(mymode);
+            cfg.setBackBufferConfig(8, 8, 8, 8, 32, 0, 0);
+            cfg.setIdleFPS(0);
+            cfg.useVsync(GlobalConf.screen.VSYNC);
         } else {
-            cfg.setWindowedMode(GlobalConf.screen.getScreenWidth(), GlobalConf.screen.getScreenHeight());
-            cfg.setResizable(GlobalConf.screen.RESIZABLE);
+            // Note that we disable VSync! The VRContext manages vsync with respect to the HMD
+            cfg.useVsync(false);
+            cfg.setWindowedMode(GlobalConf.screen.SCREEN_WIDTH, GlobalConf.screen.SCREEN_HEIGHT);
+            cfg.setResizable(true);
         }
-        cfg.setBackBufferConfig(8, 8, 8, 8, 32, 0, 0);
-        cfg.setIdleFPS(0);
-        cfg.useVsync(GlobalConf.screen.VSYNC);
         cfg.setWindowIcon(Files.FileType.Internal, "icon/ic_launcher.png");
-        cfg.useOpenGL3(true, 4,1);
+        cfg.useOpenGL3(true, 4, 1);
         // Disable logical DPI modes (macOS, Windows)
         cfg.setHdpiMode(Lwjgl3ApplicationConfiguration.HdpiMode.Pixels);
 
@@ -275,20 +298,20 @@ public class GaiaSkyDesktop implements IObserver {
 
         // Launch app
         try {
-            Lwjgl3Application app = new Lwjgl3Application(new GaiaSky(gsArgs.download, gsArgs.catalogChooser), cfg);
-        }catch(Exception e){
+            Lwjgl3Application app = new Lwjgl3Application(new GaiaSky(gsArgs.download, gsArgs.catalogChooser, gsArgs.vr), cfg);
+        } catch (Exception e) {
             // Probably, OpenGL 4.x is not supported and window creation failed
             consoleLogger.subscribe();
             logger.error("Window creation failed (is OpenGL 4.x supported by your card?), trying with OpenGL 3.x");
             logger.info("Disabling tessellation...");
             consoleLogger.unsubscribe();
             ElevationType et = GlobalConf.scene.ELEVATION_TYPE;
-            if(!et.isNone()){
+            if (!et.isNone()) {
                 GlobalConf.scene.ELEVATION_TYPE = ElevationType.PARALLAX_MAPPING;
             }
             cfg.useOpenGL3(true, 3, 2);
 
-            Lwjgl3Application app = new Lwjgl3Application(new GaiaSky(gsArgs.download, gsArgs.catalogChooser), cfg);
+            Lwjgl3Application app = new Lwjgl3Application(new GaiaSky(gsArgs.download, gsArgs.catalogChooser, gsArgs.vr), cfg);
         }
     }
 
@@ -338,13 +361,13 @@ public class GaiaSkyDesktop implements IObserver {
      * @return The path of the file used
      * @throws IOException
      */
-    private static String initConfigFile(boolean ow) throws IOException {
+    private static String initConfigFile(boolean ow, boolean vr) throws IOException {
         // Use user folder
-        File userFolderConfFile = new File(SysUtils.getConfigDir(), "global.properties");
+        File userFolderConfFile = new File(SysUtils.getConfigDir(), DesktopConfInit.getConfigFileName(vr));
 
         // Internal config
         File confFolder = new File("conf" + File.separator);
-        File internalFolderConfFile = new File(confFolder, "global.properties");
+        File internalFolderConfFile = new File(confFolder, DesktopConfInit.getConfigFileName(vr));
 
         boolean overwrite = ow;
         if (userFolderConfFile.exists()) {
@@ -374,7 +397,7 @@ public class GaiaSkyDesktop implements IObserver {
                 if (!new File("../assets/conf" + File.separator).exists()) {
                     throw new IOException("File ../assets/conf does not exist!");
                 }
-                copyFile(new File("../assets/conf" + File.separator + "global.properties"), userFolderConfFile, overwrite);
+                copyFile(new File("../assets/conf" + File.separator + DesktopConfInit.getConfigFileName(vr)), userFolderConfFile, overwrite);
             }
         }
         String props = userFolderConfFile.getAbsolutePath();

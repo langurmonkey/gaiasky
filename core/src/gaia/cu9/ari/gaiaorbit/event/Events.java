@@ -583,6 +583,17 @@ public enum Events {
      **/
     DISPLAY_GUI_CMD,
     /**
+     * Toggles VR GUI display. Contains a name and a boolean with the state
+     */
+    DISPLAY_VR_GUI_CMD,
+    /** Displays VR Controller hints **/
+    DISPLAY_VR_CONTROLLER_HINT_CMD,
+    /**
+     * Informs of the current selecting state. Contains the state (true|false) and a double in [0,1] with the completion
+     * rate
+     */
+    VR_SELECTING_STATE,
+    /**
      * Informs the UI theme has been reloaded. Contains the new skin.
      */
     UI_THEME_RELOAD_INFO,
@@ -1108,6 +1119,12 @@ public enum Events {
      * Unposts a runnable. Contains the identifier (String)
      **/
     UNPOST_RUNNABLE,
+
+    /** New VR device connected. Contains the VRDevice object. **/
+    VR_DEVICE_CONNECTED,
+
+    /** VR device disconnected. Contains the VRDevice object. **/
+    VR_DEVICE_DISCONNECTED,
 
     // INPUT LISTENER EVENTS
     TOUCH_DOWN, TOUCH_UP, TOUCH_DRAGGED, SCROLLED, KEY_DOWN, KEY_UP,

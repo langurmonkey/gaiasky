@@ -119,7 +119,6 @@ public class SceneGraphNode implements IStarContainer, IPosition {
         /** Only diffuse **/
         MODEL_DIFFUSE(28),
 
-
         /** None **/
         NONE(-1);
 

@@ -27,6 +27,7 @@ import gaia.cu9.ari.gaiaorbit.util.GlobalConf.ProgramConf.StereoProfile;
 import gaia.cu9.ari.gaiaorbit.util.GlobalResources;
 import gaia.cu9.ari.gaiaorbit.util.gdx.contrib.postprocess.effects.Anaglyphic;
 import gaia.cu9.ari.gaiaorbit.util.math.Vector3d;
+import org.lwjgl.openvr.VR;
 
 import java.util.HashMap;
 import java.util.Iterator;
@@ -141,7 +142,7 @@ public class SGRStereoscopic extends SGRAbstract implements ISGR, IObserver {
             }
             camera.setCameraStereoLeft(cam);
 
-            sgr.renderGlowPass(camera, null);
+            sgr.renderGlowPass(camera, null, VR.EVREye_Eye_Left);
 
             FrameBuffer fb1 = getFrameBuffer(rw, rh, 1);
             boolean postproc = postprocessCapture(ppb, fb1, rw, rh);
@@ -159,7 +160,7 @@ public class SGRStereoscopic extends SGRAbstract implements ISGR, IObserver {
             }
             camera.setCameraStereoRight(cam);
 
-            sgr.renderGlowPass(camera, null);
+            sgr.renderGlowPass(camera, null, VR.EVREye_Eye_Right);
 
             FrameBuffer fb2 = getFrameBuffer(rw, rh, 2);
             postproc = postprocessCapture(ppb, fb2, rw, rh);
@@ -229,7 +230,7 @@ public class SGRStereoscopic extends SGRAbstract implements ISGR, IObserver {
             }
             camera.setCameraStereoLeft(cam);
 
-            sgr.renderGlowPass(camera, null);
+            sgr.renderGlowPass(camera, null, VR.EVREye_Eye_Left);
 
             FrameBuffer fb3d = getFrameBuffer(boundsw, boundsh);
             boolean postproc = postprocessCapture(ppb, fb3d, boundsw, boundsh);
@@ -263,7 +264,7 @@ public class SGRStereoscopic extends SGRAbstract implements ISGR, IObserver {
             }
             camera.setCameraStereoRight(cam);
 
-            sgr.renderGlowPass(camera, null);
+            sgr.renderGlowPass(camera, null, VR.EVREye_Eye_Right);
 
             postproc = postprocessCapture(ppb, fb3d, boundsw, boundsh);
             sgr.renderScene(camera, t, rc);

@@ -9,6 +9,7 @@ import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.math.Matrix4;
 import gaia.cu9.ari.gaiaorbit.scenegraph.camera.ICamera;
 import gaia.cu9.ari.gaiaorbit.scenegraph.component.RotationComponent;
+import gaia.cu9.ari.gaiaorbit.util.GlobalConf;
 import gaia.cu9.ari.gaiaorbit.util.Logger;
 import gaia.cu9.ari.gaiaorbit.util.Nature;
 import gaia.cu9.ari.gaiaorbit.util.coord.Coordinates;
@@ -150,4 +151,13 @@ public abstract class Satellite extends ModelBody {
         return super.getRotationComponent();
     }
 
+    @Override
+    public void setSize(Long size) {
+        super.setSize(size * (GlobalConf.runtime.OPENVR ? 4000l : 1l));
+    }
+
+    @Override
+    public void setSize(Double size) {
+        super.setSize(size * (GlobalConf.runtime.OPENVR ? 4000d : 1d));
+    }
 }

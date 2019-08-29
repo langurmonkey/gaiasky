@@ -13,6 +13,7 @@ uniform mat4 u_projModelView;
 uniform vec3 u_camPos;
 uniform vec3 u_camDir;
 uniform int u_cubemap;
+uniform float u_vrScale;
 
 uniform vec2 u_pointAlpha;
 uniform float u_thAnglePoint;
@@ -44,10 +45,13 @@ out vec4 v_col;
 
 
 #define len0 170000.0
-#define len1 len0 * 100.0
 #define day_to_year 1.0 / 365.25
 
 void main() {
+	// Lengths
+	float l0 = len0 * u_vrScale;
+	float l1 = l0 * 100.0;
+
     vec3 pos = a_position - u_camPos;
     // Proper motion
     pos = pos + a_pm * float(u_t) * day_to_year;
@@ -81,7 +85,7 @@ void main() {
     float viewAngleApparent = atan((a_sizeMag.x * u_alphaSizeFovBr.w) / dist) / u_alphaSizeFovBr.z;
     float opacity = pow(lint2(viewAngleApparent, 0.0, u_thAnglePoint, u_pointAlpha.x, u_pointAlpha.y), 1.2);
 
-    float fadeout = smoothstep(dist, len0, len1);
+    float fadeout = smoothstep(dist, l0, l1);
     v_col = vec4(a_color.rgb, opacity * u_alphaSizeFovBr.x * fadeout);
 
     gl_Position = u_projModelView * vec4(pos, 0.0) * v_discard;

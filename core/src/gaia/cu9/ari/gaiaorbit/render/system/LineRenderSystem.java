@@ -86,7 +86,6 @@ public class LineRenderSystem extends ImmediateRenderSystem {
     public void renderStud(Array<IRenderable> renderables, ICamera camera, double t) {
 
         shaderProgram = getShaderProgram();
-
         shaderProgram.begin();
         shaderProgram.setUniformMatrix("u_projModelView", camera.getCamera().combined);
 
@@ -105,7 +104,7 @@ public class LineRenderSystem extends ImmediateRenderSystem {
                 renderable.render(this, camera, getAlpha(renderable));
             }
 
-            Gdx.gl.glLineWidth(renderable.getLineWidth() * 2.0f);
+            Gdx.gl.glLineWidth(renderable.getLineWidth() * 1.5f);
 
             for (int md = 0; md < meshIdx; md++) {
                 MeshData meshd = meshes.get(md);

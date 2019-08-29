@@ -154,6 +154,12 @@ public class NBGalaxy extends Particle {
     }
 
     @Override
+    public float getFuzzyRenderSize(ICamera camera) {
+        computedSize = super.getFuzzyRenderSize(camera) / Constants.DISTANCE_SCALE_FACTOR;
+        return (float) computedSize;
+    }
+
+    @Override
     protected float labelFactor() {
         return 1.2e1f;
     }

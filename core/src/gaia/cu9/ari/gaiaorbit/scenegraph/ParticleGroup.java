@@ -33,10 +33,7 @@ import gaia.cu9.ari.gaiaorbit.util.Pair;
 import gaia.cu9.ari.gaiaorbit.util.coord.Coordinates;
 import gaia.cu9.ari.gaiaorbit.util.gdx.g2d.ExtSpriteBatch;
 import gaia.cu9.ari.gaiaorbit.util.gdx.shader.ExtShaderProgram;
-import gaia.cu9.ari.gaiaorbit.util.math.MathUtilsd;
-import gaia.cu9.ari.gaiaorbit.util.math.Quaterniond;
-import gaia.cu9.ari.gaiaorbit.util.math.Vector2d;
-import gaia.cu9.ari.gaiaorbit.util.math.Vector3d;
+import gaia.cu9.ari.gaiaorbit.util.math.*;
 import gaia.cu9.ari.gaiaorbit.util.time.ITimeFrameProvider;
 
 import java.io.Serializable;
@@ -375,7 +372,7 @@ public class ParticleGroup extends FadeNode implements I3DTextRenderable, IFocus
     }
 
     public void setFactor(Double factor) {
-        this.factor = factor;
+        this.factor = factor * Constants.DISTANCE_SCALE_FACTOR;
     }
 
     public void setProfiledecay(Double profiledecay) {
@@ -584,6 +581,51 @@ public class ParticleGroup extends FadeNode implements I3DTextRenderable, IFocus
                     if (pos.dst(screenX % pcamera.viewportWidth, screenY, pos.z) <= pixelSize) {
                         //Hit
                         temporalHits.add(new Pair<>(i, angle));
+                    }
+                }
+            }
+
+            Pair<Integer, Double> best = null;
+            for (Pair<Integer, Double> hit : temporalHits) {
+                if (best == null)
+                    best = hit;
+                else if (hit.getSecond() > best.getSecond()) {
+                    best = hit;
+                }
+            }
+            if (best != null) {
+                // We found the best hit
+                candidateFocusIndex = best.getFirst();
+                updateFocusDataPos();
+                hits.add(this);
+                return;
+            }
+
+        }
+        candidateFocusIndex = -1;
+        updateFocusDataPos();
+    }
+
+    public void addHit(Vector3d p0, Vector3d p1, NaturalCamera camera, Array<IFocus> hits) {
+        int n = pointData.size;
+        if (GaiaSky.instance.isOn(ct) && this.opacity > 0) {
+            Vector3d beamDir = new Vector3d();
+            Array<Pair<Integer, Double>> temporalHits = new Array<Pair<Integer, Double>>();
+            for (int i = 0; i < n; i++) {
+                ParticleBean pb = pointData.get(i);
+                Vector3d posd = fetchPosition(pb, camera.getPos(), aux3d1.get(), getDeltaYears());
+                beamDir.set(p1).sub(p0);
+                if (camera.direction.dot(posd) > 0) {
+                    // The star is in front of us
+                    // Diminish the size of the star
+                    // when we are close by
+                    double dist = posd.len();
+                    double angle = getRadius(i) / dist / camera.getFovFactor();
+                    double distToLine = Intersectord.distanceLinePoint(p0, p1, posd);
+                    double value = distToLine / dist;
+
+                    if (value < 0.01) {
+                        temporalHits.add(new Pair<Integer, Double>(i, angle));
                     }
                 }
             }

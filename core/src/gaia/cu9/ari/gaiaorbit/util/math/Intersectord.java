@@ -5,6 +5,7 @@
 
 package gaia.cu9.ari.gaiaorbit.util.math;
 
+import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.math.collision.Ray;
 import com.badlogic.gdx.utils.Array;
 
@@ -60,18 +61,14 @@ public class Intersectord {
     }
 
     public static boolean checkIntersectRaySpehre(Vector3d linePoint0, Vector3d linePoint1, Vector3d sphereCenter, double sphereRadius) {
-        double cx = sphereCenter.x;
-        double cy = sphereCenter.y;
-        double cz = sphereCenter.z;
+        return checkIntersectRaySpehre(linePoint0.x, linePoint0.y, linePoint0.z, linePoint1.x, linePoint1.y, linePoint1.z, sphereCenter.x, sphereCenter.y, sphereCenter.z, sphereRadius);
+    }
 
-        double px = linePoint0.x;
-        double py = linePoint0.y;
-        double pz = linePoint0.z;
+    public static boolean checkIntersectRaySpehre(Vector3 linePoint0, Vector3 linePoint1, Vector3d sphereCenter, double sphereRadius) {
+        return checkIntersectRaySpehre(linePoint0.x, linePoint0.y, linePoint0.z, linePoint1.x, linePoint1.y, linePoint1.z, sphereCenter.x, sphereCenter.y, sphereCenter.z, sphereRadius);
+    }
 
-        double vx = linePoint1.x - px;
-        double vy = linePoint1.y - py;
-        double vz = linePoint1.z - pz;
-
+    public static boolean checkIntersectRaySpehre(double px, double py, double pz, double vx, double vy, double vz, double cx, double cy, double cz, double sphereRadius) {
         double A = vx * vx + vy * vy + vz * vz;
         double B = 2.0 * (px * vx + py * vy + pz * vz - vx * cx - vy * cy - vz * cz);
         double C = px * px - 2 * px * cx + cx * cx + py * py - 2 * py * cy + cy * cy + pz * pz - 2 * pz * cz + cz * cz - sphereRadius * sphereRadius;

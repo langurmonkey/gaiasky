@@ -13,6 +13,7 @@ import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.Array;
 import gaia.cu9.ari.gaiaorbit.GaiaSky;
+import gaia.cu9.ari.gaiaorbit.render.RenderingContext;
 import gaia.cu9.ari.gaiaorbit.render.ComponentTypes.ComponentType;
 import gaia.cu9.ari.gaiaorbit.render.SceneGraphRenderer;
 import gaia.cu9.ari.gaiaorbit.render.ShadowMapImpl;
@@ -246,7 +247,7 @@ public abstract class ModelBody extends CelestialBody {
 
     /** Model rendering **/
     @Override
-    public void render(IntModelBatch modelBatch, float alpha, double t) {
+    public void render(IntModelBatch modelBatch, float alpha, double t, RenderingContext rc) {
         render(modelBatch, alpha, t, true);
     }
 
@@ -266,7 +267,7 @@ public abstract class ModelBody extends CelestialBody {
 
     @Override
     protected float labelMax() {
-        return .5e-4f;
+        return (float) (.5e-4 / Constants.DISTANCE_SCALE_FACTOR);
     }
 
     public void setModel(ModelComponent mc) {
@@ -507,6 +508,25 @@ public abstract class ModelBody extends CelestialBody {
             }
         }
 
+    }
+
+    public void addHit(Vector3d p0, Vector3d p1, NaturalCamera camera, Array<IFocus> hits) {
+        if (withinMagLimit() && checkHitCondition()) {
+            if (viewAngleApparent < THRESHOLD_QUAD() * camera.getFovFactor()) {
+                super.addHit(p0, p1, camera, hits);
+            } else {
+                Vector3d aux1d = aux3d1.get();
+
+                // aux1d contains the position of the body in the camera ref sys
+                aux1d.set(translation);
+
+                boolean intersect = Intersectord.checkIntersectRaySpehre(p0, p1, aux1d, getRadius());
+                if (intersect) {
+                    //Hit
+                    hits.add(this);
+                }
+            }
+        }
     }
 
     @Override

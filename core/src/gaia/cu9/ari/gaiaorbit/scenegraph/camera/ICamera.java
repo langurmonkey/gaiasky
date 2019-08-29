@@ -20,48 +20,52 @@ public interface ICamera {
      * 
      * @return The perspective camera.
      */
-    public PerspectiveCamera getCamera();
+    PerspectiveCamera getCamera();
 
     /**
      * Sets the active camera
      * 
      * @param cam
      */
-    public void setCamera(PerspectiveCamera cam);
+    void setCamera(PerspectiveCamera cam);
 
-    public PerspectiveCamera getCameraStereoLeft();
+    PerspectiveCamera getCameraStereoLeft();
 
-    public PerspectiveCamera getCameraStereoRight();
+    PerspectiveCamera getCameraStereoRight();
 
-    public void setCameraStereoLeft(PerspectiveCamera cam);
+    void setCameraStereoLeft(PerspectiveCamera cam);
 
-    public void setCameraStereoRight(PerspectiveCamera cam);
+    void setCameraStereoRight(PerspectiveCamera cam);
 
-    public PerspectiveCamera[] getFrontCameras();
+    PerspectiveCamera[] getFrontCameras();
 
-    public ICamera getCurrent();
+    ICamera getCurrent();
 
-    public float getFovFactor();
+    float getFovFactor();
 
-    public Vector3d getPos();
+    Vector3d getPos();
 
-    public void setPos(Vector3d pos);
+    void setPos(Vector3d pos);
 
-    public void setDirection(Vector3d dir);
+    void setDirection(Vector3d dir);
 
-    public Vector3d getInversePos();
+    Vector3d getInversePos();
 
-    public Vector3d getDirection();
+    Vector3d getDirection();
 
-    public Vector3d getVelocity();
+    Vector3d getVelocity();
 
-    public Vector3d getUp();
+    Vector3d getUp();
 
-    public Vector3d[] getDirections();
+    Vector3d[] getDirections();
 
-    public int getNCameras();
+    int getNCameras();
 
-    public double getTranslateUnits();
+    double getTranslateUnits();
+
+    void setShift(Vector3d shift);
+
+    Vector3d getShift();
 
     /**
      * Updates the camera.
@@ -71,13 +75,13 @@ public interface ICamera {
      * @param time
      *            The frame time provider (simulation time).
      */
-    public void update(double dt, ITimeFrameProvider time);
+    void update(double dt, ITimeFrameProvider time);
 
-    public void updateMode(CameraMode mode, boolean centerFocus, boolean postEvent);
+    void updateMode(CameraMode mode, boolean centerFocus, boolean postEvent);
 
-    public CameraMode getMode();
+    CameraMode getMode();
 
-    public void updateAngleEdge(int width, int height);
+    void updateAngleEdge(int width, int height);
 
     /**
      * Gets the angle of the edge of the screen, diagonally. It assumes the
@@ -87,18 +91,18 @@ public interface ICamera {
      * 
      * @return The angle in radians.
      */
-    public float getAngleEdge();
+    float getAngleEdge();
 
-    public CameraManager getManager();
+    CameraManager getManager();
 
-    public void render(int rw, int rh);
+    void render(int rw, int rh);
 
     /**
      * Gets the current velocity of the camera in km/h.
      * 
      * @return The velocity in km/h.
      */
-    public double getSpeed();
+    double getSpeed();
 
     /**
      * Gets the distance from the camera to the centre of our reference frame
@@ -106,14 +110,14 @@ public interface ICamera {
      * 
      * @return The distance
      */
-    public double getDistance();
+    double getDistance();
 
     /**
      * Returns the foucs if any
      * 
      * @return The foucs object if it is in focus mode. Null otherwise
      */
-    public IFocus getFocus();
+    IFocus getFocus();
 
     /**
      * Checks if this body is the current focus
@@ -122,7 +126,7 @@ public interface ICamera {
      *            The body
      * @return Whether the body is focus
      */
-    public boolean isFocus(IFocus cb);
+    boolean isFocus(IFocus cb);
 
     /**
      * Called after updating the body's distance to the cam, it updates the
@@ -131,26 +135,26 @@ public interface ICamera {
      * @param  focus
      *            The body to check
      */
-    public void checkClosest(IFocus focus);
+    void checkClosest(IFocus focus);
 
-    public IFocus getClosest();
+    IFocus getClosest();
 
-    public IFocus getClosest2();
+    IFocus getClosest2();
 
-    public boolean isVisible(ITimeFrameProvider time, CelestialBody cb);
+    boolean isVisible(ITimeFrameProvider time, CelestialBody cb);
 
-    public boolean isVisible(ITimeFrameProvider time, double viewAngle, Vector3d pos, double distToCamera);
+    boolean isVisible(ITimeFrameProvider time, double viewAngle, Vector3d pos, double distToCamera);
 
-    public void computeGaiaScan(ITimeFrameProvider time, CelestialBody cb);
+    void computeGaiaScan(ITimeFrameProvider time, CelestialBody cb);
 
-    public void resize(int width, int height);
+    void resize(int width, int height);
 
     /**
      * Gets the current closest star to this camera
      * 
      * @return The closest star
      */
-    public IStarFocus getClosestStar();
+    IStarFocus getClosestStar();
 
     /**
      * Sets the current closest star to this camera. This will be only set if
@@ -159,6 +163,11 @@ public interface ICamera {
      * @param star
      *            The candidate star
      */
-    public void setClosestStar(IStarFocus star);
+    void setClosestStar(IStarFocus star);
+
+    void updateFrustumPlanes();
+
+    double getNear();
+    double getFar();
 
 }

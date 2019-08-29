@@ -90,6 +90,7 @@ public class DefaultIntShader extends BaseIntShader {
 		public final static Uniform projViewWorldTrans = new Uniform("u_projViewWorldTrans");
 		public final static Uniform normalMatrix = new Uniform("u_normalMatrix");
 		public final static Uniform bones = new Uniform("u_bones");
+		public final static Uniform vroffset = new Uniform("u_vroffset");
 
 		public final static Uniform shininess = new Uniform("u_shininess", FloatAttribute.Shininess);
 		public final static Uniform opacity = new Uniform("u_opacity", BlendingAttribute.Type);

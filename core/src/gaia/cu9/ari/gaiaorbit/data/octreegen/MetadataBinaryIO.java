@@ -5,6 +5,7 @@
 
 package gaia.cu9.ari.gaiaorbit.data.octreegen;
 
+import gaia.cu9.ari.gaiaorbit.util.Constants;
 import gaia.cu9.ari.gaiaorbit.util.GlobalConf;
 import gaia.cu9.ari.gaiaorbit.util.Logger;
 import gaia.cu9.ari.gaiaorbit.util.Logger.Log;
@@ -78,12 +79,12 @@ public class MetadataBinaryIO {
                 try {
                     // name_length, name, appmag, absmag, colorbv, ra, dec, dist
                     long pageId = data_in.readInt();
-                    float x = data_in.readFloat();
-                    float y = data_in.readFloat();
-                    float z = data_in.readFloat();
-                    float hsx = data_in.readFloat() / 2f;
-                    float hsy = data_in.readFloat() / 2f;
-                    float hsz = data_in.readFloat() / 2f;
+                    float x = (float) (data_in.readFloat() * Constants.DISTANCE_SCALE_FACTOR);
+                    float y = (float) (data_in.readFloat() * Constants.DISTANCE_SCALE_FACTOR);
+                    float z = (float) (data_in.readFloat() * Constants.DISTANCE_SCALE_FACTOR);
+                    float hsx = (float) ((data_in.readFloat() / 2f) * Constants.DISTANCE_SCALE_FACTOR);
+                    float hsy = (float) ((data_in.readFloat() / 2f) * Constants.DISTANCE_SCALE_FACTOR);
+                    float hsz = (float) ((data_in.readFloat() / 2f) * Constants.DISTANCE_SCALE_FACTOR);
                     long[] childrenIds = new long[8];
                     for (int i = 0; i < 8; i++) {
                         childrenIds[i] = data_in.readInt();
@@ -146,10 +147,10 @@ public class MetadataBinaryIO {
                 try {
                     // name_length, name, appmag, absmag, colorbv, ra, dec, dist
                     long pageId = mem.getInt();
-                    float x = mem.getFloat();
-                    float y = mem.getFloat();
-                    float z = mem.getFloat();
-                    float hsx = mem.getFloat() / 2f;
+                    float x = (float) (mem.getFloat() * Constants.DISTANCE_SCALE_FACTOR);
+                    float y = (float) (mem.getFloat() * Constants.DISTANCE_SCALE_FACTOR);
+                    float z = (float) (mem.getFloat() * Constants.DISTANCE_SCALE_FACTOR);
+                    float hsx = (float) ((mem.getFloat() / 2f) * Constants.DISTANCE_SCALE_FACTOR);
                     //float hsy = mem.getFloat() / 2f;
                     mem.position(mem.position() + 4); // skip hsy
                     float hsy = hsx;

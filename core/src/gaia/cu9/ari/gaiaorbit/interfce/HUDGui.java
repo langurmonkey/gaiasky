@@ -53,7 +53,7 @@ public class HUDGui implements IGui {
     @Override
     public void doneLoading(AssetManager assetManager) {
         skin = GlobalResources.skin;
-        interfaces = new Array<IGuiInterface>();
+        interfaces = new Array<>();
         buildGui();
     }
 
@@ -179,6 +179,15 @@ public class HUDGui implements IGui {
     @Override
     public Actor findActor(String name) {
         return ui.getRoot().findActor(name);
+    }
+
+    @Override
+    public void setHoffset(int hoffset) {
+    }
+
+    @Override
+    public boolean mustDraw() {
+        return true;
     }
 
 }
