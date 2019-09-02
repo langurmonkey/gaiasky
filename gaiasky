@@ -12,17 +12,19 @@ print_usage() {
   echo
   echo "Options:"
   echo " -v    Print version and exit"
+  echo " -vr   Launch Gaia Sky in VR mode"
   echo " -h    Print help"
   echo " -d    Show download manager at startup"
   echo " -c    Show catalog chooser at startup"
 }
 
-while getopts 'hvdc' flag; do
+while getopts 'hvdcr' flag; do
   case "${flag}" in
     h) args="-h " ;;
     v) args="-v " ;;
     d) args="-d " ;;
     c) args="-c " ;;
+    r) args="-vr " ;;
     *) print_usage
        exit 1 ;;
   esac

@@ -59,6 +59,12 @@ $  gradlew.bat core:runvr
 
 ### 1.5 CLI arguments
 
+You can use the provided bypass script instead of gradle. Use the `-vr` command line argument to launch Gaia Sky in VR mode.
+
+```
+$  gaiasky -vr
+```
+
 Run `gaiasky -h` or `man gaiasky` to find out about how to launch Gaia Sky and what arguments are accepted.
 
 ### 2.3 Getting the data

@@ -91,7 +91,7 @@ public class GaiaSkyDesktop implements IObserver {
 
         @Parameter(names = { "-a", "--assets" }, description = "Specify the location of the assets folder. If not present, the default assets location is used.", order = 5) private String assetsLocation = null;
 
-        @Parameter(names = { "--vr", "--openvr" }, description = "Launch in Virtual Reality mode. Gaia Sky will attempt creating an VR context through OpenVR.", order = 6) private boolean vr = false;
+        @Parameter(names = { "-vr", "--openvr" }, description = "Launch in Virtual Reality mode. Gaia Sky will attempt creating an VR context through OpenVR.", order = 6) private boolean vr = false;
     }
 
     /**
