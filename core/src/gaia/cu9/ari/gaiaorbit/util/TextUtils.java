@@ -7,11 +7,14 @@ package gaia.cu9.ari.gaiaorbit.util;
 
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.utils.StringBuilder;
+import gaia.cu9.ari.gaiaorbit.GaiaSky;
+import gaia.cu9.ari.gaiaorbit.util.format.INumberFormat;
+import gaia.cu9.ari.gaiaorbit.util.format.NumberFormatFactory;
 
 public class TextUtils {
 
-    public static void capLabelWidth(Label l, float targetWidth){
-        while(l.getWidth() > targetWidth){
+    public static void capLabelWidth(Label l, float targetWidth) {
+        while (l.getWidth() > targetWidth) {
             StringBuilder currText = l.getText();
             currText.deleteCharAt(currText.length);
             l.setText(currText);
@@ -40,17 +43,17 @@ public class TextUtils {
         return out;
     }
 
-    public static String capString(String in, int targetLength){
+    public static String capString(String in, int targetLength) {
         return capString(in, targetLength, false);
     }
 
-    public static String capString(String in, int targetLength, boolean fromStart){
-        if(in.length() <= targetLength){
+    public static String capString(String in, int targetLength, boolean fromStart) {
+        if (in.length() <= targetLength) {
             return in;
-        }else{
-            if(fromStart){
+        } else {
+            if (fromStart) {
                 return "..." + in.substring(in.length() - (targetLength - 3));
-            }else {
+            } else {
                 return in.substring(0, targetLength - 3) + "...";
             }
         }
@@ -60,9 +63,8 @@ public class TextUtils {
      * Converts from property displayName to method displayName by removing the
      * separator dots and capitalising each chunk. Example: model.texture.bump
      * -> ModelTextureBump
-     * 
-     * @param property
-     *            The property displayName
+     *
+     * @param property The property displayName
      * @return The method name
      */
     public static String propertyToMethodName(String property) {
@@ -76,9 +78,8 @@ public class TextUtils {
 
     /**
      * Returns the given string with the first letter capitalised
-     * 
-     * @param line
-     *            The input string
+     *
+     * @param line The input string
      * @return The string with its first letter capitalised
      */
     public static String capitalise(String line) {
@@ -88,11 +89,10 @@ public class TextUtils {
     /**
      * Returns the given string with the first letter capitalised and all the
      * others in lower case
-     * 
-     * @param line
-     *            The input string
+     *
+     * @param line The input string
      * @return The string with its first letter capitalised and the others in
-     *         lower case
+     * lower case
      */
     public static String trueCapitalise(String line) {
         return Character.toUpperCase(line.charAt(0)) + line.substring(1).toLowerCase();
@@ -100,8 +100,9 @@ public class TextUtils {
 
     /**
      * Concatenates the strings using the given split
+     *
      * @param split The split
-     * @param strs The strings
+     * @param strs  The strings
      * @return The concatenation
      */
     public static String concatenate(String split, String... strs) {
@@ -122,5 +123,32 @@ public class TextUtils {
             buff += arr[i] + '\n';
         }
         return buff;
+    }
+
+    /** Decimal format **/
+    private static INumberFormat nf, nfsci;
+
+    static {
+        nf = NumberFormatFactory.getFormatter("#########.###");
+        nfsci = NumberFormatFactory.getFormatter("0.#E0");
+    }
+
+    public static String getFormattedTimeWarp(double warp) {
+        if (warp > 0.9 || warp < -0.9) {
+            // Remove decimals
+            warp = Math.round(warp);
+        } else {
+            // Round to 2 decimal places
+            warp = Math.round(warp * 1000.0) / 1000.0;
+        }
+        if (warp > 99999 || warp < -99999) {
+            return "x" + nfsci.format(warp);
+        } else {
+            return "x" + nf.format(warp);
+        }
+    }
+
+    public static String getFormattedTimeWarp() {
+        return TextUtils.getFormattedTimeWarp(GaiaSky.instance.time.getWarpFactor());
     }
 }

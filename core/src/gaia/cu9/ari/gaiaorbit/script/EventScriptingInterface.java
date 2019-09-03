@@ -640,12 +640,12 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
 
     @Override
     public void startSimulationTime() {
-        em.post(Events.TOGGLE_TIME_CMD, true, false);
+        em.post(Events.TIME_STATE_CMD, true, false);
     }
 
     @Override
     public void stopSimulationTime() {
-        em.post(Events.TOGGLE_TIME_CMD, false, false);
+        em.post(Events.TIME_STATE_CMD, false, false);
     }
 
     @Override

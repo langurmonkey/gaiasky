@@ -49,11 +49,13 @@ public class FullGui extends AbstractGui {
     protected ControlsWindow controlsWindow;
 
     protected Container<FocusInfoInterface> fi;
+    protected Container<TopInfoInterface> ti;
     protected FocusInfoInterface focusInterface;
     protected NotificationsInterface notificationsInterface;
     protected MessagesInterface messagesInterface;
     protected CustomInterface customInterface;
     protected RunStateInterface runStateInterface;
+    protected TopInfoInterface topInfoInterface;
 
     protected SearchDialog searchDialog;
     protected RunCameraWindow runcameraWindow;
@@ -94,6 +96,7 @@ public class FullGui extends AbstractGui {
 
     protected void buildGui() {
         float pad = 10f * GlobalConf.SCALE_FACTOR;
+        float pads = 5f * GlobalConf.SCALE_FACTOR;
         // Component types name init
         for (ComponentType ct : ComponentType.values()) {
             ct.getName();
@@ -117,14 +120,26 @@ public class FullGui extends AbstractGui {
         fi.setFillParent(true);
         fi.bottom().right();
         fi.pad(0, 0, pad, pad);
+        interfaces.add(focusInterface);
 
 
         // MESSAGES INTERFACE - LOW CENTER
         messagesInterface = new MessagesInterface(skin, lock);
         messagesInterface.setFillParent(true);
         messagesInterface.left().bottom();
-        messagesInterface.pad(0, 300, 150, 0);
+        messagesInterface.pad(0, 300f, 150f, 0);
         interfaces.add(messagesInterface);
+
+        // TOP INFO - TOP CENTER
+        topInfoInterface = new TopInfoInterface(skin);
+        topInfoInterface.top();
+        topInfoInterface.pad(pads, pad, pads, pad);
+        ti = new Container<>(topInfoInterface);
+        ti.setFillParent(true);
+        ti.top();
+        ti.pad(pad);
+        interfaces.add(topInfoInterface);
+
 
         // INPUT STATE
         runStateInterface = new RunStateInterface(skin, true);
@@ -153,6 +168,7 @@ public class FullGui extends AbstractGui {
         invisibleInStereoMode = new ArrayList<>();
         invisibleInStereoMode.add(controlsWindow);
         invisibleInStereoMode.add(fi);
+        invisibleInStereoMode.add(ti);
         invisibleInStereoMode.add(messagesInterface);
         invisibleInStereoMode.add(runStateInterface);
         // invisibleInStereoMode.add(customInterface);
@@ -232,10 +248,13 @@ public class FullGui extends AbstractGui {
                 ui.addActor(notificationsInterface);
             if (messagesInterface != null)
                 ui.addActor(messagesInterface);
-            if (focusInterface != null)
+            if (fi != null)
                 ui.addActor(fi);
             if (runStateInterface != null) {
                 ui.addActor(runStateInterface);
+            }
+            if(ti != null){
+                ui.addActor(ti);
             }
             if (pointerXCoord != null && pointerYCoord != null) {
                 ui.addActor(pointerXCoord);

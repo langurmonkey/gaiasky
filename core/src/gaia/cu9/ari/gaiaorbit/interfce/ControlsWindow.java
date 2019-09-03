@@ -67,7 +67,7 @@ public class ControlsWindow extends CollapsibleWindow implements IObserver {
         septexreg.getTexture().setWrap(TextureWrap.Repeat, TextureWrap.ClampToEdge);
         this.separator = new TiledDrawable(septexreg);
 
-        EventManager.instance.subscribe(this, Events.TOGGLE_TIME_CMD, Events.GUI_SCROLL_POSITION_CMD, Events.GUI_FOLD_CMD, Events.GUI_MOVE_CMD, Events.RECALCULATE_OPTIONS_SIZE, Events.EXPAND_PANE_CMD, Events.COLLAPSE_PANE_CMD, Events.TOGGLE_EXPANDCOLLAPSE_PANE_CMD);
+        EventManager.instance.subscribe(this, Events.TIME_STATE_CMD, Events.GUI_SCROLL_POSITION_CMD, Events.GUI_FOLD_CMD, Events.GUI_MOVE_CMD, Events.RECALCULATE_OPTIONS_SIZE, Events.EXPAND_PANE_CMD, Events.COLLAPSE_PANE_CMD, Events.TOGGLE_EXPANDCOLLAPSE_PANE_CMD);
     }
 
     public void initialize() {
@@ -84,7 +84,7 @@ public class ControlsWindow extends CollapsibleWindow implements IObserver {
         playstop.setChecked(GlobalConf.runtime.TIME_ON);
         playstop.addListener(event -> {
             if (event instanceof ChangeEvent) {
-                EventManager.instance.post(Events.TOGGLE_TIME_CMD, playstop.isChecked(), true);
+                EventManager.instance.post(Events.TIME_STATE_CMD, playstop.isChecked(), true);
                 return true;
             }
             return false;
@@ -120,11 +120,11 @@ public class ControlsWindow extends CollapsibleWindow implements IObserver {
         recKeyframeCamera.setName("recKeyframeCamera");
         recKeyframeCamera.setChecked(GlobalConf.runtime.RECORD_KEYFRAME_CAMERA);
         recKeyframeCamera.addListener(event -> {
-            if(event instanceof ChangeEvent){
+            if (event instanceof ChangeEvent) {
                 EventManager.instance.post(Events.SHOW_KEYFRAMES_WINDOW_ACTION);
                 return true;
             }
-           return false;
+            return false;
         });
         recKeyframeCamera.addListener(new OwnTextTooltip(I18n.txt("gui.tooltip.reccamerakeyframe"), skin));
 
@@ -240,7 +240,7 @@ public class ControlsWindow extends CollapsibleWindow implements IObserver {
             }
             return false;
         });
-        Button about = new OwnTextIconButton("", skin,"help");
+        Button about = new OwnTextIconButton("", skin, "help");
         about.setName("about");
         about.addListener(new OwnTextTooltip(I18n.txt("gui.help"), skin));
         about.addListener(event -> {
@@ -348,17 +348,11 @@ public class ControlsWindow extends CollapsibleWindow implements IObserver {
     @Override
     public void notify(Events event, Object... data) {
         switch (event) {
-        case TOGGLE_TIME_CMD:
+        case TIME_STATE_CMD:
             // Pause has been toggled, update playstop button only if this does
             // not come from this interface
             if (!(Boolean) data[1]) {
-                Boolean timeOn = null;
-                if (data[0] != null) {
-                    timeOn = (Boolean) data[0];
-                } else {
-                    timeOn = !playstop.isChecked();
-                }
-                playstop.setCheckedNoFire(timeOn);
+                playstop.setCheckedNoFire((Boolean) data[0]);
             }
             break;
         case GUI_SCROLL_POSITION_CMD:
@@ -396,17 +390,17 @@ public class ControlsWindow extends CollapsibleWindow implements IObserver {
             recalculateSize();
             break;
         case EXPAND_PANE_CMD:
-            String paneName = (String)data[0];
+            String paneName = (String) data[0];
             CollapsiblePane pane = panes.get(paneName);
             pane.expandPane();
             break;
         case COLLAPSE_PANE_CMD:
-            paneName = (String)data[0];
+            paneName = (String) data[0];
             pane = panes.get(paneName);
             pane.collapsePane();
             break;
         case TOGGLE_EXPANDCOLLAPSE_PANE_CMD:
-            paneName = (String)data[0];
+            paneName = (String) data[0];
             pane = panes.get(paneName);
             pane.togglePane();
             break;

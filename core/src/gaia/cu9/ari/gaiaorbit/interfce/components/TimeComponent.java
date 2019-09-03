@@ -17,11 +17,10 @@ import gaia.cu9.ari.gaiaorbit.event.IObserver;
 import gaia.cu9.ari.gaiaorbit.interfce.DateDialog;
 import gaia.cu9.ari.gaiaorbit.util.GlobalConf;
 import gaia.cu9.ari.gaiaorbit.util.I18n;
+import gaia.cu9.ari.gaiaorbit.util.TextUtils;
 import gaia.cu9.ari.gaiaorbit.util.format.DateFormatFactory;
 import gaia.cu9.ari.gaiaorbit.util.format.DateFormatFactory.DateType;
 import gaia.cu9.ari.gaiaorbit.util.format.IDateFormat;
-import gaia.cu9.ari.gaiaorbit.util.format.INumberFormat;
-import gaia.cu9.ari.gaiaorbit.util.format.NumberFormatFactory;
 import gaia.cu9.ari.gaiaorbit.util.scene2d.OwnImageButton;
 import gaia.cu9.ari.gaiaorbit.util.scene2d.OwnLabel;
 import gaia.cu9.ari.gaiaorbit.util.scene2d.OwnTextTooltip;
@@ -33,8 +32,6 @@ public class TimeComponent extends GuiComponent implements IObserver {
 
     /** Date format **/
     private IDateFormat dfdate, dftime;
-    /** Decimal format **/
-    private INumberFormat nf, nfsci;
 
     protected OwnLabel date;
     protected OwnLabel time;
@@ -48,8 +45,6 @@ public class TimeComponent extends GuiComponent implements IObserver {
 
         dfdate = DateFormatFactory.getFormatter(I18n.locale, DateType.DATE);
         dftime = DateFormatFactory.getFormatter(I18n.locale, DateType.TIME);
-        nf = NumberFormatFactory.getFormatter("#########.###");
-        nfsci = NumberFormatFactory.getFormatter("0.#E0");
         EventManager.instance.subscribe(this, Events.TIME_CHANGE_INFO, Events.TIME_CHANGE_CMD, Events.PACE_CHANGED_INFO);
     }
 
@@ -58,11 +53,11 @@ public class TimeComponent extends GuiComponent implements IObserver {
         // Time
         date = new OwnLabel("date UT", skin, "mono");
         date.setName("label date");
-        date.setWidth(150 * GlobalConf.SCALE_FACTOR);
+        date.setWidth(150f * GlobalConf.SCALE_FACTOR);
 
         time = new OwnLabel("time UT", skin, "mono");
         time.setName("label time");
-        time.setWidth(150 * GlobalConf.SCALE_FACTOR);
+        time.setWidth(150f * GlobalConf.SCALE_FACTOR);
 
         dateEdit = new OwnImageButton(skin, "edit");
         dateEdit.addListener(event -> {
@@ -105,16 +100,16 @@ public class TimeComponent extends GuiComponent implements IObserver {
         });
         minus.addListener(new OwnTextTooltip(I18n.txt("gui.tooltip.timewarpminus"), skin));
 
-        timeWarp = new OwnLabel(getFormattedTimeWrap(), skin, "warp");
+        timeWarp = new OwnLabel(TextUtils.getFormattedTimeWarp(), skin, "warp");
         timeWarp.setName("time warp");
-        Container<Label> wrapWrapper = new Container<Label>(timeWarp);
+        Container<Label> wrapWrapper = new Container<>(timeWarp);
         wrapWrapper.width(80f * GlobalConf.SCALE_FACTOR);
         wrapWrapper.align(Align.center);
 
         VerticalGroup timeGroup = new VerticalGroup().align(Align.left).columnAlign(Align.left).space(3 * GlobalConf.SCALE_FACTOR).padTop(3 * GlobalConf.SCALE_FACTOR);
 
         HorizontalGroup dateGroup = new HorizontalGroup();
-        dateGroup.space(4 * GlobalConf.SCALE_FACTOR);
+        dateGroup.space(4f * GlobalConf.SCALE_FACTOR);
         VerticalGroup datetimeGroup = new VerticalGroup();
         datetimeGroup.addActor(date);
         datetimeGroup.addActor(time);
@@ -123,7 +118,7 @@ public class TimeComponent extends GuiComponent implements IObserver {
         timeGroup.addActor(dateGroup);
 
         HorizontalGroup paceGroup = new HorizontalGroup();
-        paceGroup.space(3 * GlobalConf.SCALE_FACTOR);
+        paceGroup.space(3f * GlobalConf.SCALE_FACTOR);
         paceGroup.addActor(paceLabel);
         paceGroup.addActor(minus);
         paceGroup.addActor(wrapWrapper);
@@ -150,31 +145,12 @@ public class TimeComponent extends GuiComponent implements IObserver {
             break;
         case PACE_CHANGED_INFO:
             if (data.length == 1)
-                this.timeWarp.setText(getFormattedTimeWarp((double) data[0]));
+                this.timeWarp.setText(TextUtils.getFormattedTimeWarp((double) data[0]));
             break;
         default:
             break;
         }
 
-    }
-
-    private String getFormattedTimeWarp(double warp) {
-        if (warp > 0.9 || warp < -0.9) {
-            // Remove decimals
-            warp = Math.round(warp);
-        } else {
-            // Round to 2 decimal places
-            warp = Math.round(warp * 1000.0) / 1000.0;
-        }
-        if (warp > 99999 || warp < -99999) {
-            return "x" + nfsci.format(warp);
-        } else {
-            return "x" + nf.format(warp);
-        }
-    }
-
-    private String getFormattedTimeWrap() {
-        return getFormattedTimeWarp(GaiaSky.instance.time.getWarpFactor());
     }
 
     @Override

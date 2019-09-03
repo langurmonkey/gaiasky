@@ -374,7 +374,7 @@ public class GlobalConf {
         public boolean DISPLAY_VR_GUI = false;
 
         public RuntimeConf() {
-            EventManager.instance.subscribe(this, Events.LIMIT_MAG_CMD, Events.INPUT_ENABLED_CMD, Events.DISPLAY_GUI_CMD, Events.TOGGLE_UPDATEPAUSE, Events.TOGGLE_TIME_CMD, Events.RECORD_CAMERA_CMD, Events.GRAV_WAVE_START, Events.GRAV_WAVE_STOP, Events.DISPLAY_VR_GUI_CMD);
+            EventManager.instance.subscribe(this, Events.LIMIT_MAG_CMD, Events.INPUT_ENABLED_CMD, Events.DISPLAY_GUI_CMD, Events.TOGGLE_UPDATEPAUSE, Events.TIME_STATE_CMD, Events.RECORD_CAMERA_CMD, Events.GRAV_WAVE_START, Events.GRAV_WAVE_STOP, Events.DISPLAY_VR_GUI_CMD);
         }
 
         public void initialize(boolean dISPLAY_GUI, boolean uPDATE_PAUSE, boolean tIME_ON, boolean iNPUT_ENABLED, boolean rECORD_CAMERA, float lIMIT_MAG_RUNTIME, boolean rEAL_TIME, boolean dRAW_OCTREE) {
@@ -415,7 +415,7 @@ public class GlobalConf {
                 UPDATE_PAUSE = !UPDATE_PAUSE;
                 EventManager.instance.post(Events.UPDATEPAUSE_CHANGED, UPDATE_PAUSE);
                 break;
-            case TOGGLE_TIME_CMD:
+            case TIME_STATE_CMD:
                 toggleTimeOn((Boolean) data[0]);
                 break;
             case RECORD_CAMERA_CMD:

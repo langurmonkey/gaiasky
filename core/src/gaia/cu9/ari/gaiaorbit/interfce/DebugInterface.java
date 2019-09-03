@@ -183,7 +183,6 @@ public class DebugInterface extends Table implements IObserver, IGuiInterface {
 
         pack();
 
-
         this.setVisible(GlobalConf.program.SHOW_DEBUG_INFO);
         this.lock = lock;
         EventManager.instance.subscribe(this, Events.DEBUG_TIME, Events.DEBUG_RAM, Events.DEBUG_VRAM, Events.DEBUG_OBJECTS, Events.DEBUG_QUEUE, Events.FPS_INFO, Events.SHOW_DEBUG_CMD, Events.SAMP_INFO);

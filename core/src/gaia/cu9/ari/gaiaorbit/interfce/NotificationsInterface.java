@@ -122,7 +122,7 @@ public class NotificationsInterface extends Table implements IObserver, IGuiInte
         this.add(message1).left();
 
         this.df = DateFormatFactory.getFormatter("uuuu-MM-dd HH:mm:ss");
-        EventManager.instance.subscribe(this, Events.POST_NOTIFICATION, Events.FOCUS_CHANGED, Events.TOGGLE_TIME_CMD, Events.TOGGLE_VISIBILITY_CMD, Events.CAMERA_MODE_CMD, Events.PACE_CHANGED_INFO, Events.FOCUS_LOCK_CMD, Events.TOGGLE_AMBIENT_LIGHT, Events.FOV_CHANGE_NOTIFICATION, Events.JAVA_EXCEPTION, Events.ORBIT_DATA_LOADED, Events.SCREENSHOT_INFO, Events.COMPUTE_GAIA_SCAN_CMD, Events.ONLY_OBSERVED_STARS_CMD, Events.TRANSIT_COLOUR_CMD, Events.LIMIT_MAG_CMD, Events.STEREOSCOPIC_CMD, Events.DISPLAY_GUI_CMD, Events.FRAME_OUTPUT_CMD, Events.STEREO_PROFILE_CMD, Events.OCTREE_PARTICLE_FADE_CMD, Events.SCREEN_NOTIFICATION_CMD, Events.MODE_POPUP_CMD);
+        EventManager.instance.subscribe(this, Events.POST_NOTIFICATION, Events.FOCUS_CHANGED, Events.TIME_STATE_CMD, Events.TOGGLE_VISIBILITY_CMD, Events.CAMERA_MODE_CMD, Events.PACE_CHANGED_INFO, Events.FOCUS_LOCK_CMD, Events.TOGGLE_AMBIENT_LIGHT, Events.FOV_CHANGE_NOTIFICATION, Events.JAVA_EXCEPTION, Events.ORBIT_DATA_LOADED, Events.SCREENSHOT_INFO, Events.COMPUTE_GAIA_SCAN_CMD, Events.ONLY_OBSERVED_STARS_CMD, Events.TRANSIT_COLOUR_CMD, Events.LIMIT_MAG_CMD, Events.STEREOSCOPIC_CMD, Events.DISPLAY_GUI_CMD, Events.FRAME_OUTPUT_CMD, Events.STEREO_PROFILE_CMD, Events.OCTREE_PARTICLE_FADE_CMD, Events.SCREEN_NOTIFICATION_CMD, Events.MODE_POPUP_CMD);
     }
 
     public void unsubscribe() {
@@ -209,7 +209,7 @@ public class NotificationsInterface extends Table implements IObserver, IGuiInte
                     addMessage(I18n.bundle.format("notif.camerafocus", sgn.getName()));
                 }
                 break;
-            case TOGGLE_TIME_CMD:
+            case TIME_STATE_CMD:
                 Boolean bool = (Boolean) data[0];
                 if (bool == null) {
                     addMessage(I18n.bundle.format("notif.toggle", I18n.bundle.format("gui.time")));

@@ -101,7 +101,7 @@ public class GlobalClock implements IObserver, ITimeFrameProvider {
                 if (currentTime < Constants.MAX_TIME_MS) {
                     EventManager.instance.post(Events.POST_NOTIFICATION, "Maximum time reached (" + (Constants.MAX_TIME_MS * Nature.MS_TO_Y) + " years)!");
                     // Turn off time
-                    EventManager.instance.post(Events.TOGGLE_TIME_CMD, false, false);
+                    EventManager.instance.post(Events.TIME_STATE_CMD, false, false);
                 }
                 newTime = Constants.MAX_TIME_MS;
                 time = Instant.ofEpochMilli(newTime);
@@ -111,7 +111,7 @@ public class GlobalClock implements IObserver, ITimeFrameProvider {
                 if (currentTime > Constants.MIN_TIME_MS) {
                     EventManager.instance.post(Events.POST_NOTIFICATION, "Minimum time reached (" + (Constants.MIN_TIME_MS * Nature.MS_TO_Y) + " years)!");
                     // Turn off time
-                    EventManager.instance.post(Events.TOGGLE_TIME_CMD, false, false);
+                    EventManager.instance.post(Events.TIME_STATE_CMD, false, false);
                 }
                 newTime = Constants.MIN_TIME_MS;
                 time = Instant.ofEpochMilli(newTime);

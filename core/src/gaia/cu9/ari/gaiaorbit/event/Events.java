@@ -210,10 +210,10 @@ public enum Events {
      * the state (may be null) and a boolean indicating whether this comes from
      * the interface.
      **/
-    TOGGLE_TIME_CMD,
+    TIME_STATE_CMD,
     /**
-     * Contains the name of the type, a boolean indicating if this comes from
-     * the interface and an optional boolean with the state
+     * Contains the name of the type, a boolean with the state (on/off) and a boolean indicating if this comes from
+     * the interface
      **/
     TOGGLE_VISIBILITY_CMD,
     /**

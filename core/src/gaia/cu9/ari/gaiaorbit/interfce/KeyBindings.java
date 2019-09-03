@@ -249,7 +249,7 @@ public class KeyBindings {
         addAction(new ProgramAction("action.pauseresume", () -> {
             // Game mode has space bound to 'up'
             if (!GaiaSky.instance.cam.mode.isGame())
-                EventManager.instance.post(Events.TOGGLE_TIME_CMD, null, false);
+                EventManager.instance.post(Events.TIME_STATE_CMD, !GlobalConf.runtime.TIME_ON, false);
         }));
 
         // increase limit magnitude
