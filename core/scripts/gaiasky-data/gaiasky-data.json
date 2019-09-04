@@ -462,6 +462,21 @@
       "file": "http://gaia.ari.uni-heidelberg.de/gaiasky/files/autodownload/galaxies/004_20190621/sdss-12-galaxies.tar.gz"
     },
     {
+      "name": "catalog-sdss-12",
+      "type": "catalog",
+      "version": 2,
+      "mingsversion": 20201,
+      "size": 10296142,
+      "check": "autoload-sdss-small.json",
+      "data": [
+        "autoload-sdss-small.json",
+        "sdss/sdss_dr12_small.csv"
+      ],
+      "description": "SDSS DR12 - Part of Sloan Digital Sky Survey DR12 - 500000 galaxies",
+      "sha256": "bb8650412d9269f28ba97a2d73ac6442986f6163a403e52d1da765534c22b335",
+      "file": "http://gaia.ari.uni-heidelberg.de/gaiasky/files/autodownload/galaxies/005_20190904/sdss-12-galaxies.tar.gz"
+    },
+    {
       "name": "catalog-sdss-14",
       "type": "catalog",
       "version": 0,
@@ -490,6 +505,21 @@
       "description": "SDSS DR14 - Sloan Digital Sky Survey DR14 - 3.9 million galaxies",
       "sha256": "3a72ffcf112408366160c143c4579503d83ebb6b8ee5a130ea2087488ac42a54",
       "file": "http://gaia.ari.uni-heidelberg.de/gaiasky/files/autodownload/galaxies/004_20190621/sdss-14-galaxies.tar.gz"
+    },
+    {
+      "name": "catalog-sdss-14",
+      "type": "catalog",
+      "version": 2,
+      "mingsversion": 20201,
+      "size": 79127047,
+      "check": "autoload-sdss-large.json",
+      "data": [
+        "autoload-sdss-large.json",
+        "sdss/sdss_dr14_large.csv"
+      ],
+      "description": "SDSS DR14 - Sloan Digital Sky Survey DR14 - 3.9 million galaxies",
+      "sha256": "8f37ad1c82cb31092a87fb984ce8c15c3486625963d6491c6e91c463f7cf6cfe",
+      "file": "http://gaia.ari.uni-heidelberg.de/gaiasky/files/autodownload/galaxies/005_20190904/sdss-14-galaxies.tar.gz"
     },
     {
       "name": "catalog-nebulae",
