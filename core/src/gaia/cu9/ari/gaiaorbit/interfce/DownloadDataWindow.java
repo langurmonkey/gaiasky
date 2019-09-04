@@ -183,7 +183,7 @@ public class DownloadDataWindow extends GenericDialog {
         }
 
         // Uploads available?
-        if(dd.updatesAvailable){
+        if (dd.updatesAvailable) {
             OwnLabel updates = new OwnLabel(I18n.txt("gui.download.updates", dd.numUpdates), skin, "hud-big");
             updates.setColor(highlight);
             downloadTable.add(updates).colspan(2).center().padBottom(padLarge).row();
@@ -236,7 +236,16 @@ public class DownloadDataWindow extends GenericDialog {
                 }
 
                 // Version
-                OwnLabel vers = new OwnLabel(dataset.exists && dataset.outdated ? dataset.myVersion + " -> v-" + dataset.serverVersion : "v-" + dataset.myVersion, skin);
+                String vstring;
+                if (!dataset.exists) {
+                    vstring = "-";
+                } else if (dataset.outdated) {
+                    vstring = dataset.myVersion + " -> v-" + dataset.serverVersion;
+                } else {
+                    vstring = "v-" + dataset.myVersion;
+                }
+
+                OwnLabel vers = new OwnLabel(vstring, skin);
                 if (!dataset.exists) {
                     vers.addListener(new OwnTextTooltip(I18n.txt("gui.download.version.server", Integer.toString(dataset.serverVersion)), skin, 10));
                 } else if (dataset.outdated) {
@@ -443,8 +452,7 @@ public class DownloadDataWindow extends GenericDialog {
                             logger.error("SHA256 check failed: " + name);
                             errors++;
                         }
-                    } catch (Exception e)
-                    {
+                    } catch (Exception e) {
                         logger.info("Error checking SHA256: " + name);
                         errors++;
                     }
