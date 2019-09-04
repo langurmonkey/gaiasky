@@ -274,4 +274,14 @@ public class FadeNode extends AbstractPositionEntity {
         super.setUp();
         inSceneGraph = true;
     }
+
+    @Override
+    public void setSize(Long size){
+        this.size = (long) (size * Constants.DISTANCE_SCALE_FACTOR);
+    }
+
+    @Override
+    public void setSize(Double size){
+        this.size = (float) (size * Constants.DISTANCE_SCALE_FACTOR);
+    }
 }

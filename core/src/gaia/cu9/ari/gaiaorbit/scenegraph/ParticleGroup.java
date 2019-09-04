@@ -26,10 +26,7 @@ import gaia.cu9.ari.gaiaorbit.scenegraph.camera.CameraManager.CameraMode;
 import gaia.cu9.ari.gaiaorbit.scenegraph.camera.ICamera;
 import gaia.cu9.ari.gaiaorbit.scenegraph.camera.NaturalCamera;
 import gaia.cu9.ari.gaiaorbit.scenegraph.component.RotationComponent;
-import gaia.cu9.ari.gaiaorbit.util.Constants;
-import gaia.cu9.ari.gaiaorbit.util.GlobalConf;
-import gaia.cu9.ari.gaiaorbit.util.Logger;
-import gaia.cu9.ari.gaiaorbit.util.Pair;
+import gaia.cu9.ari.gaiaorbit.util.*;
 import gaia.cu9.ari.gaiaorbit.util.coord.Coordinates;
 import gaia.cu9.ari.gaiaorbit.util.gdx.g2d.ExtSpriteBatch;
 import gaia.cu9.ari.gaiaorbit.util.gdx.shader.ExtShaderProgram;
@@ -151,9 +148,21 @@ public class ParticleGroup extends FadeNode implements I3DTextRenderable, IFocus
     double focusDistToCamera, focusViewAngle, focusViewAngleApparent, focusSize;
 
     /**
+     * Mapping colors
+     */
+    protected float[] ccMin = null, ccMax = null;
+
+    /**
      * Stores the time when the last sort operation finished, in ms
      */
     protected long lastSortTime;
+
+    /**
+     * The mean distance from the origin of all points in this group.
+     * Gives a sense of the scale.
+     */
+    protected double meanDistance;
+    protected double maxDistance, minDistance;
 
     /**
      * Geometric centre at epoch, for render sorting
@@ -190,18 +199,37 @@ public class ParticleGroup extends FadeNode implements I3DTextRenderable, IFocus
 
             pointData = provider.loadData(datafile, factor);
 
+            meanDistance = 0;
+            maxDistance = Double.MIN_VALUE;
+            minDistance = Double.MAX_VALUE;
+            long n = 0;
+            for (ParticleBean point : pointData) {
+                // Add sample to mean distance
+                double dist = len(point.data[0], point.data[1], point.data[2]);
+                maxDistance = Math.max(maxDistance, dist);
+                minDistance = Math.min(minDistance, dist);
+                meanDistance = (n * meanDistance + dist) / (n + 1);
+                n++;
+            }
+
             if (!fixedMeanPosition) {
                 // Mean position
                 for (ParticleBean point : pointData) {
                     pos.add(point.data[0], point.data[1], point.data[2]);
+
                 }
                 pos.scl(1d / pointData.size);
+
             }
 
         } catch (Exception e) {
             Logger.getLogger(this.getClass()).error(e);
             pointData = null;
         }
+    }
+
+    private double len(double x, double y, double z) {
+        return Math.sqrt(x * x + y * y + z * z);
     }
 
     @Override
@@ -221,19 +249,20 @@ public class ParticleGroup extends FadeNode implements I3DTextRenderable, IFocus
     /**
      * Computes the geometric centre of this data cloud
      */
-    public Vector3d computeGeomCentre(){
+    public Vector3d computeGeomCentre() {
         return computeGeomCentre(false);
     }
 
     /**
      * Computes the geometric centre of this data cloud
+     *
      * @param forceRecompute Recomputes the geometric centre even if it has been already computed
      */
-    public Vector3d computeGeomCentre(boolean forceRecompute){
-        if(pointData != null && (forceRecompute || geomCentre == null)){
-            geomCentre = new Vector3d(0,0,0);
+    public Vector3d computeGeomCentre(boolean forceRecompute) {
+        if (pointData != null && (forceRecompute || geomCentre == null)) {
+            geomCentre = new Vector3d(0, 0, 0);
             int n = pointData.size;
-            for(int i =0; i < n; i++){
+            for (int i = 0; i < n; i++) {
                 ParticleBean pb = pointData.get(i);
                 geomCentre.add(pb.x(), pb.y(), pb.z());
             }
@@ -379,7 +408,7 @@ public class ParticleGroup extends FadeNode implements I3DTextRenderable, IFocus
         this.profileDecay = profiledecay.floatValue();
     }
 
-    public void setColornoise(Double colorNoise){
+    public void setColornoise(Double colorNoise) {
         this.colorNoise = colorNoise.floatValue();
     }
 
@@ -513,7 +542,6 @@ public class ParticleGroup extends FadeNode implements I3DTextRenderable, IFocus
     public double getRadius() {
         return getSize() / 2d;
     }
-
 
     @Override
     public boolean withinMagLimit() {
@@ -751,6 +779,19 @@ public class ParticleGroup extends FadeNode implements I3DTextRenderable, IFocus
             return dest.set(pb.data[0], pb.data[1], pb.data[2]);
     }
 
+    public double getMeanDistance() {
+        return meanDistance;
+    }
+
+    public double getMinDistance(){
+        return minDistance;
+    }
+
+    public double getMaxDistance(){
+        return maxDistance;
+    }
+
+
     /**
      * Returns the delta years to integrate the proper motion.
      *
@@ -799,9 +840,33 @@ public class ParticleGroup extends FadeNode implements I3DTextRenderable, IFocus
     }
 
     @Override
-    public void highlight(boolean hl, int index){
+    public void highlight(boolean hl, int index) {
         this.inGpu = this.highlighted == hl;
         super.highlight(hl, index);
+    }
+
+    public void setColorMin(double[] colorMin) {
+        this.ccMin = GlobalResources.toFloatArray(colorMin);
+    }
+
+    public void setColorMin(float[] colorMin) {
+        this.ccMin = colorMin;
+    }
+
+    public void setColorMax(double[] colorMax) {
+        this.ccMax = GlobalResources.toFloatArray(colorMax);
+    }
+
+    public void setColorMax(float[] colorMax) {
+        this.ccMax = colorMax;
+    }
+
+    public float[] getColorMin() {
+        return ccMin;
+    }
+
+    public float[] getColorMax() {
+        return ccMax;
     }
 
 }

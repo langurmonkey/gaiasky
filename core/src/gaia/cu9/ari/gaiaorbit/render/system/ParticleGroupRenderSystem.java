@@ -21,6 +21,7 @@ import gaia.cu9.ari.gaiaorbit.scenegraph.ParticleGroup;
 import gaia.cu9.ari.gaiaorbit.scenegraph.ParticleGroup.ParticleBean;
 import gaia.cu9.ari.gaiaorbit.scenegraph.SceneGraphNode.RenderGroup;
 import gaia.cu9.ari.gaiaorbit.scenegraph.camera.ICamera;
+import gaia.cu9.ari.gaiaorbit.util.Constants;
 import gaia.cu9.ari.gaiaorbit.util.GlobalConf;
 import gaia.cu9.ari.gaiaorbit.util.comp.DistToCameraComparator;
 import gaia.cu9.ari.gaiaorbit.util.gdx.mesh.IntMesh;
@@ -90,17 +91,28 @@ public class ParticleGroupRenderSystem extends ImmediateRenderSystem implements 
                     curr = meshes.get(particleGroup.offset);
 
                     float[] c = particleGroup.getColor();
+                    float[] cmin = particleGroup.getColorMin();
+                    float[] cmax = particleGroup.getColorMax();
+                    double dmin = particleGroup.getMinDistance();
+                    double dmax = particleGroup.getMaxDistance();
+
                     ensureTempVertsSize(particleGroup.size() * curr.vertexSize);
                     for (ParticleBean pb : particleGroup.data()) {
                         double[] p = pb.data;
                         // COLOR
+                        if (cmin != null && cmax != null) {
+                            double dist = Math.sqrt(p[0] * p[0] + p[1] * p[1] + p[2] * p[2]);
+                            // fac = 0 -> cmin,  fac = 1 -> cmax
+                            double fac = (dist - dmin) / (dmax - dmin);
+                            interpolateColor(cmin, cmax, c, fac);
+                        }
                         float r = 0, g = 0, b = 0;
                         if (particleGroup.colorNoise != 0) {
-                            r = (float) MathUtils.clamp((StdRandom.uniform() - 0.5) * 2.0 * particleGroup.colorNoise, 0, 1);
-                            g = (float) MathUtils.clamp((StdRandom.uniform() - 0.5) * 2.0 * particleGroup.colorNoise, 0, 1);
-                            b = (float) MathUtils.clamp((StdRandom.uniform() - 0.5) * 2.0 * particleGroup.colorNoise, 0, 1);
+                            r = (float) ((StdRandom.uniform() - 0.5) * 2.0 * particleGroup.colorNoise);
+                            g = (float) ((StdRandom.uniform() - 0.5) * 2.0 * particleGroup.colorNoise);
+                            b = (float) ((StdRandom.uniform() - 0.5) * 2.0 * particleGroup.colorNoise);
                         }
-                        tempVerts[curr.vertexIdx + curr.colorOffset] = Color.toFloatBits(c[0] + r, c[1] + g, c[2] + b, c[3]);
+                        tempVerts[curr.vertexIdx + curr.colorOffset] = Color.toFloatBits(MathUtils.clamp(c[0] + r, 0, 1), MathUtils.clamp(c[1] + g, 0, 1), MathUtils.clamp(c[2] + b, 0, 1), MathUtils.clamp(c[3], 0, 1));
 
                         // SIZE
                         tempVerts[curr.vertexIdx + additionalOffset] = (particleGroup.size + (float) (rand.nextGaussian() * particleGroup.size / 4d)) * particleGroup.highlightedSizeFactor();
@@ -123,12 +135,14 @@ public class ParticleGroupRenderSystem extends ImmediateRenderSystem implements 
                 curr = meshes.get(particleGroup.offset);
                 if (curr != null) {
                     boolean stereoHalfWidth = GlobalConf.program.isStereoHalfWidth();
+                    float meanDist = (float) (particleGroup.getMeanDistance());
 
                     shaderProgram.setUniformMatrix("u_projModelView", camera.getCamera().combined);
                     shaderProgram.setUniformf("u_alpha", alphas[particleGroup.ct.getFirstOrdinal()] * particleGroup.getOpacity());
                     shaderProgram.setUniformf("u_ar", stereoHalfWidth ? 2f : 1f);
                     shaderProgram.setUniformf("u_falloff", particleGroup.profileDecay);
-                    shaderProgram.setUniformf("u_sizeFactor", (((stereoHalfWidth ? 2f : 1f) * rc.scaleFactor * GlobalConf.scene.STAR_POINT_SIZE)) * particleGroup.highlightedSizeFactor());
+                    shaderProgram.setUniformf("u_sizeFactor", (float) ((((stereoHalfWidth ? 2.0 : 1.0) * rc.scaleFactor * GlobalConf.scene.STAR_POINT_SIZE)) * particleGroup.highlightedSizeFactor() * meanDist * 0.15 / (camera.getFovFactor() * Constants.DISTANCE_SCALE_FACTOR)));
+                    shaderProgram.setUniformf("u_minSize", (float) (3.0 / (camera.getFovFactor() * Constants.DISTANCE_SCALE_FACTOR)));
                     shaderProgram.setUniformf("u_camPos", camera.getCurrent().getPos().put(aux1));
                     shaderProgram.setUniformf("u_camDir", camera.getCurrent().getCamera().direction);
                     shaderProgram.setUniformi("u_cubemap", GlobalConf.program.CUBEMAP360_MODE ? 1 : 0);
@@ -142,6 +156,14 @@ public class ParticleGroupRenderSystem extends ImmediateRenderSystem implements 
             }
             shaderProgram.end();
         }
+    }
+
+    private void interpolateColor(float[] c0, float[] c1, float[] result, double factor) {
+        float f = (float) factor;
+        result[0] = (1 - f) * c0[0] + f * c1[0];
+        result[1] = (1 - f) * c0[1] + f * c1[1];
+        result[2] = (1 - f) * c0[2] + f * c1[2];
+        result[3] = (1 - f) * c0[3] + f * c1[3];
     }
 
     protected VertexAttribute[] buildVertexAttributes() {

@@ -14,6 +14,7 @@ uniform vec3 u_camPos;
 uniform vec3 u_camDir;
 uniform float u_sizeFactor;
 uniform int u_cubemap;
+uniform float u_minSize;
 
 #ifdef relativisticEffects
     uniform vec3 u_velDir; // Velocity vector
@@ -57,6 +58,8 @@ void main() {
     
     v_col = vec4(a_color.rgb, a_color.a * u_alpha);
 
+    float viewAngle = a_size / dist;
+
     gl_Position = u_projModelView * vec4(pos, 0.0);
-    gl_PointSize = a_size * u_sizeFactor * cubemapSizeFactor;
+    gl_PointSize = max(viewAngle * u_sizeFactor * cubemapSizeFactor, u_minSize * a_size);
 }
