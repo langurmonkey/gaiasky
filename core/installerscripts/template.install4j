@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <install4j version="7.0.10" transformSequenceNumber="7">
   <directoryPresets config="@gs-git-folder@/assets/img" />
-  <application name="GaiaSky" distributionSourceDir="" applicationId="8310-5272-6362-8592" mediaDir="./" mediaFilePattern="${compiler:sys.shortName}_${compiler:sys.platform}_${compiler:sys.version}" compression="9" lzmaCompression="false" pack200Compression="false" excludeSignedFromPacking="true" commonExternalFiles="false" createMd5Sums="true" shrinkRuntime="true" shortName="gaiasky" publisher="ARI - ZAH - Universität Heidelberg" publisherWeb="http://www.zah.uni-heidelberg.de/gaia/outreach/gaiasky" version="@version-tag@" allPathsRelative="true" backupOnSave="false" autoSave="false" convertDotsToUnderscores="true" macSignature="????" macVolumeId="c3380c949a34b4f7" javaMinVersion="1.8" javaMaxVersion="" allowBetaVM="false" jdkMode="runtimeJre" jdkName="">
+  <application name="Gaia Sky" distributionSourceDir="" applicationId="8310-5272-6362-8592" mediaDir="./" mediaFilePattern="${compiler:sys.shortName}_${compiler:sys.platform}_${compiler:sys.version}" compression="9" lzmaCompression="false" pack200Compression="false" excludeSignedFromPacking="true" commonExternalFiles="false" createMd5Sums="true" shrinkRuntime="true" shortName="gaiasky" publisher="ARI - ZAH - Universität Heidelberg" publisherWeb="http://www.zah.uni-heidelberg.de/gaia/outreach/gaiasky" version="@version-tag@" allPathsRelative="true" backupOnSave="false" autoSave="false" convertDotsToUnderscores="true" macSignature="????" macVolumeId="c3380c949a34b4f7" javaMinVersion="1.8" javaMaxVersion="" allowBetaVM="false" jdkMode="runtimeJre" jdkName="">
     <languages skipLanguageSelection="false" languageSelectionInPrincipalLanguage="false">
       <principalLanguage id="en" customLocalizationFile="" />
       <additionalLanguages />
@@ -104,7 +104,7 @@
         <file path="@gs-git-folder@/assets/icon/gs_128.png" />
       </iconImageFiles>
     </launcher>
-    <launcher name="gaiasky vr" id="683" customizedId="" external="false" excludeFromMenu="false" unixMode="755" unixAutoStart="true" menuName="${compiler:sys.fullName}/${compiler:sys.fullName}VR" icnsFile="" customMacBundleIdentifier="false" macBundleIdentifier="" swtApp="false" fileset="" macBundleBinary="JavaApplicationStub" addMacEntitlements="false" macEntitlementsFile="" useCustomMacosExecutableName="false" customMacosExecutableName="" useJavaMinVersionOverride="false" javaMinVersionOverride="" useJavaMaxVersionOverride="false" javaMaxVersionOverride="" checkUpdater="false" updateExecutionMode="unattendedProgress" unattendedUpdateTitle="${i18n:updater.WindowTitle(&quot;${compiler:sys.fullName}&quot;)}">
+    <launcher name="gaiasky vr" id="683" customizedId="" external="false" excludeFromMenu="false" unixMode="755" unixAutoStart="true" menuName="${compiler:sys.fullName}/${compiler:sys.fullName} VR" icnsFile="" customMacBundleIdentifier="false" macBundleIdentifier="" swtApp="false" fileset="" macBundleBinary="JavaApplicationStub" addMacEntitlements="false" macEntitlementsFile="" useCustomMacosExecutableName="false" customMacosExecutableName="" useJavaMinVersionOverride="false" javaMinVersionOverride="" useJavaMaxVersionOverride="false" javaMaxVersionOverride="" checkUpdater="false" updateExecutionMode="unattendedProgress" unattendedUpdateTitle="${i18n:updater.WindowTitle(&quot;${compiler:sys.fullName}&quot;)}">
       <executable name="${compiler:sys.shortName}vr" type="1" iconSet="true" iconFile="@gs-git-folder@/assets/icon/ic_launcher.ico" executableDir="" redirectStderr="true" stderrFile="error.log" stderrMode="overwrite" redirectStdout="true" stdoutFile="output.log" stdoutMode="overwrite" failOnStderrOutput="true" executableMode="1" changeWorkingDirectory="true" workingDirectory="." singleInstance="true" serviceStartType="2" serviceDependencies="" serviceDescription="" jreLocation="" executionLevel="asInvoker" checkConsoleParameter="false" globalSingleInstance="false" singleInstanceActivate="true" dpiAware="false">
         <versionInfo include="true" fileVersion="" fileDescription="Real-time, cross-platform, 3D Universe application which supports more than a billion stars" legalCopyright="MPL" internalName="GaiaSky" productName="${compiler:sys.fullName}" />
       </executable>
@@ -114,7 +114,7 @@
           <versionLine x="20" y="40" text="version ${compiler:sys.version}" fontSize="8" fontColor="0,0,0" bold="false" />
         </text>
       </splashScreen>
-      <java mainClass="gaia.cu9.ari.gaiaorbit.desktop.GaiaSkyDesktop" mainMode="1" vmParameters="-Xms2g -Xmx4g -XX:+UseG1GC -Dpython.console.encoding=UTF-8 -Dassets.location=./" arguments="--vr" allowVMPassthroughParameters="true" preferredVM="" bundleRuntime="true">
+      <java mainClass="gaia.cu9.ari.gaiaorbit.desktop.GaiaSkyDesktop" mainMode="1" vmParameters="-Xms2g -Xmx4g -XX:+UseG1GC -Dpython.console.encoding=UTF-8 -Dassets.location=./" arguments="-vr" allowVMPassthroughParameters="true" preferredVM="" bundleRuntime="true">
         <classPath>
           <scanDirectory location="lib" failOnError="false" />
         </classPath>
@@ -248,11 +248,12 @@
                         </void>
                       </object>
                     </void>
+                    <void id="Integer0" property="cellSpacing" />
                     <void property="imageEdgeBackgroundColor">
                       <object class="java.awt.Color">
-                        <int>0</int>
-                        <int>0</int>
-                        <int>0</int>
+                        <object idref="Integer0" />
+                        <object idref="Integer0" />
+                        <object idref="Integer0" />
                         <int>255</int>
                       </object>
                     </void>
@@ -326,12 +327,13 @@
                 <group name="" id="461" customizedId="" beanClass="com.install4j.runtime.beans.groups.VerticalFormComponentGroup" enabled="true" commentSet="false" comment="" actionElevationType="inherit" useExternalParametrization="false" externalParametrizationName="" externalParametrizationMode="all">
                   <serializedBean>
                     <java class="java.beans.XMLDecoder">
-                      <object class="com.install4j.runtime.beans.groups.VerticalFormComponentGroup">
+                      <object class="com.install4j.runtime.beans.groups.VerticalFormComponentGroup" id="VerticalFormComponentGroup0">
+                        <void id="Integer0" property="cellSpacing" />
                         <void property="imageEdgeBackgroundColor">
                           <object class="java.awt.Color">
-                            <int>0</int>
-                            <int>0</int>
-                            <int>0</int>
+                            <object idref="Integer0" />
+                            <object idref="Integer0" />
+                            <object idref="Integer0" />
                             <int>255</int>
                           </object>
                         </void>
@@ -599,9 +601,35 @@ return console.askOkCancel(message, true);
               <action name="" id="10" customizedId="" beanClass="com.install4j.runtime.beans.actions.desktop.CreateProgramGroupAction" enabled="true" commentSet="false" comment="" actionElevationType="elevated" rollbackBarrier="false" rollbackBarrierExitCode="1" multiExec="false" failureStrategy="1" errorMessage="">
                 <serializedBean>
                   <java class="java.beans.XMLDecoder">
-                    <object class="com.install4j.runtime.beans.actions.desktop.CreateProgramGroupAction">
+                    <object class="com.install4j.runtime.beans.actions.desktop.CreateProgramGroupAction" id="CreateProgramGroupAction0">
                       <void property="addUninstaller">
                         <boolean>true</boolean>
+                      </void>
+                      <void property="programGroupEntryConfigs">
+                        <void method="add">
+                          <object class="com.install4j.runtime.beans.screens.components.ProgramGroupFileConfig">
+                            <void property="name">
+                              <string>${compiler:sys.fullName}/${compiler:sys.fullName}</string>
+                            </void>
+                            <void property="target">
+                              <object class="java.io.File">
+                                <string>${compiler:sys.shortName}</string>
+                              </object>
+                            </void>
+                          </object>
+                        </void>
+                        <void method="add">
+                          <object class="com.install4j.runtime.beans.screens.components.ProgramGroupFileConfig">
+                            <void property="name">
+                              <string>${compiler:sys.fullName}/${compiler:sys.fullName} VR</string>
+                            </void>
+                            <void property="target">
+                              <object class="java.io.File">
+                                <string>${compiler:sys.shortName}vr</string>
+                              </object>
+                            </void>
+                          </object>
+                        </void>
                       </void>
                       <void property="uninstallerMenuName">
                         <string>${i18n:UninstallerMenuEntry(${compiler:sys.fullName})}</string>
@@ -652,12 +680,13 @@ return console.askOkCancel(message, true);
                 <group name="" id="461" customizedId="" beanClass="com.install4j.runtime.beans.groups.VerticalFormComponentGroup" enabled="true" commentSet="false" comment="" actionElevationType="inherit" useExternalParametrization="false" externalParametrizationName="" externalParametrizationMode="all">
                   <serializedBean>
                     <java class="java.beans.XMLDecoder">
-                      <object class="com.install4j.runtime.beans.groups.VerticalFormComponentGroup">
+                      <object class="com.install4j.runtime.beans.groups.VerticalFormComponentGroup" id="VerticalFormComponentGroup0">
+                        <void id="Integer0" property="cellSpacing" />
                         <void property="imageEdgeBackgroundColor">
                           <object class="java.awt.Color">
-                            <int>0</int>
-                            <int>0</int>
-                            <int>0</int>
+                            <object idref="Integer0" />
+                            <object idref="Integer0" />
+                            <object idref="Integer0" />
                             <int>255</int>
                           </object>
                         </void>
@@ -791,12 +820,13 @@ return console.askOkCancel(message, true);
                 <group name="" id="461" customizedId="" beanClass="com.install4j.runtime.beans.groups.VerticalFormComponentGroup" enabled="true" commentSet="false" comment="" actionElevationType="inherit" useExternalParametrization="false" externalParametrizationName="" externalParametrizationMode="all">
                   <serializedBean>
                     <java class="java.beans.XMLDecoder">
-                      <object class="com.install4j.runtime.beans.groups.VerticalFormComponentGroup">
+                      <object class="com.install4j.runtime.beans.groups.VerticalFormComponentGroup" id="VerticalFormComponentGroup0">
+                        <void id="Integer0" property="cellSpacing" />
                         <void property="imageEdgeBackgroundColor">
                           <object class="java.awt.Color">
-                            <int>0</int>
-                            <int>0</int>
-                            <int>0</int>
+                            <object idref="Integer0" />
+                            <object idref="Integer0" />
+                            <object idref="Integer0" />
                             <int>255</int>
                           </object>
                         </void>
@@ -918,12 +948,13 @@ return console.askYesNo(message, true);
                 <group name="" id="461" customizedId="" beanClass="com.install4j.runtime.beans.groups.VerticalFormComponentGroup" enabled="true" commentSet="false" comment="" actionElevationType="inherit" useExternalParametrization="false" externalParametrizationName="" externalParametrizationMode="all">
                   <serializedBean>
                     <java class="java.beans.XMLDecoder">
-                      <object class="com.install4j.runtime.beans.groups.VerticalFormComponentGroup">
+                      <object class="com.install4j.runtime.beans.groups.VerticalFormComponentGroup" id="VerticalFormComponentGroup0">
+                        <void id="Integer0" property="cellSpacing" />
                         <void property="imageEdgeBackgroundColor">
                           <object class="java.awt.Color">
-                            <int>0</int>
-                            <int>0</int>
-                            <int>0</int>
+                            <object idref="Integer0" />
+                            <object idref="Integer0" />
+                            <object idref="Integer0" />
                             <int>255</int>
                           </object>
                         </void>
