@@ -37,8 +37,9 @@ out vec4 v_col;
 void main() {
     vec3 pos = a_position.xyz - u_camPos;
 
-    // Distance to point
-    float dist = length(pos);
+    // Distance to point - watch out, if position contains large values, this produces overflow!
+    // Downscale before computing length()
+    float dist = length(pos * 1e-15) * 1e15;
 
     float cubemapSizeFactor = 1.0;
     if(u_cubemap == 1) {
