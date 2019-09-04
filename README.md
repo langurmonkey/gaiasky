@@ -230,10 +230,10 @@ The latest acknowledgements are always in the [ACKNOWLEDGEMENTS.md](/ACKNOWLEDGE
 
 ##  7. Gaia Sky VR
 
-You can run Gaia Sky in VR with Valve's OpenVR with the `--vr` flag.
+You can run Gaia Sky in VR with Valve's OpenVR with the `-vr` flag.
 
 ```
-gaiasky --vr
+gaiasky -vr
 ```
 
 More information on how to make the VR version work properly in the [VR.md](VR.md) file.
