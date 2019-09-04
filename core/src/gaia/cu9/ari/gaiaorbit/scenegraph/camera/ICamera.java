@@ -135,11 +135,11 @@ public interface ICamera {
      * @param  focus
      *            The body to check
      */
-    void checkClosest(IFocus focus);
+    void checkClosestBody(IFocus focus);
 
-    IFocus getClosest();
+    IFocus getClosestBody();
 
-    IFocus getClosest2();
+    IFocus getSecondClosestBody();
 
     boolean isVisible(ITimeFrameProvider time, CelestialBody cb);
 

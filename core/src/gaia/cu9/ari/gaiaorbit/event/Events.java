@@ -130,6 +130,9 @@ public enum Events {
      **/
     CAMERA_PLAY_INFO,
 
+    /** Broadcasts the closest body (in [0]) and star (in [1]) to this camera. Happens every frame **/
+    CAMERA_CLOSEST_INFO,
+
     CAMERA_PAN,
     /**
      * Contains the roll value between -1 and 1

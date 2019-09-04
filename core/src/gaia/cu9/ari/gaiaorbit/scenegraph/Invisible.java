@@ -79,7 +79,7 @@ public class Invisible extends CelestialBody {
     @Override
     protected void addToRenderLists(ICamera camera) {
         if (name != null && name.length() > 0) {
-            camera.checkClosest(this);
+            camera.checkClosestBody(this);
         }
     }
 

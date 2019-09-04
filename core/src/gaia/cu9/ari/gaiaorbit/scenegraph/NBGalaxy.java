@@ -104,6 +104,7 @@ public class NBGalaxy extends Particle {
                 viewAngle = (radius / distToCamera) / camera.getFovFactor();
                 viewAngleApparent = viewAngle * GlobalConf.scene.STAR_BRIGHTNESS;
 
+                camera.checkClosestBody(this);
                 addToRenderLists(camera);
             }
 

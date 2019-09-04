@@ -95,8 +95,8 @@ public class SGRStereoscopic extends SGRAbstract implements ISGR, IObserver {
         IFocus currentFocus = null;
         if (camera.getMode() == CameraMode.FOCUS_MODE) {
             currentFocus = camera.getFocus();
-        } else if (camera.getCurrent().getClosest() != null) {
-            currentFocus = camera.getCurrent().getClosest();
+        } else if (camera.getCurrent().getClosestBody() != null) {
+            currentFocus = camera.getCurrent().getClosestBody();
         }
         if (currentFocus != null) {
             // If we have focus, we adapt the eye separation

@@ -513,7 +513,7 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
 
     @Override
     public IFocus getClosestObjectToCamera() {
-        return GaiaSky.instance.cam.getClosest();
+        return GaiaSky.instance.cam.getClosestBody();
     }
 
     @Override

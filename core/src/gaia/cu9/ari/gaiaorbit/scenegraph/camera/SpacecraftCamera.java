@@ -66,9 +66,9 @@ public class SpacecraftCamera extends AbstractCamera implements IObserver {
     private float chw2, chh2;
 
     /**
-     * Closest body apart from the spacecraft
+     * Closest body apart from the spacecraft (second closest)
      **/
-    private IFocus closest2;
+    private IFocus secondClosest;
 
     private Vector3d aux1, aux2, todesired, desired, scthrust, scforce, scaccel, scvel, scpos, scdir, scup;
     private Pair<Vector3d, Vector3d> dirup;
@@ -181,7 +181,7 @@ public class SpacecraftCamera extends AbstractCamera implements IObserver {
         scaccel.set(sc.accel);
         scvel.set(sc.vel);
         scpos.set(sc.pos);
-        scpos = sc.computePosition(sdt, closest2, sc.enginePower, scthrust, sc.direction, scforce, scaccel, scvel, scpos);
+        scpos = sc.computePosition(sdt, secondClosest, sc.enginePower, scthrust, sc.direction, scforce, scaccel, scvel, scpos);
         scdir.set(sc.direction);
         scup.set(sc.up);
         sc.computeDirectionUp(sdt, dirup);
@@ -202,10 +202,10 @@ public class SpacecraftCamera extends AbstractCamera implements IObserver {
         if (closestStar != null) {
             double closestStarDist = closestStar.getClosestDist();
             String closestStarName = closestStar.getClosestName();
-            if (closest2 != null) {
-                if (closest2.getDistToCamera() < closestStarDist) {
-                    clname = closest2.getName();
-                    cldist = closest2.getDistToCamera();
+            if (secondClosest != null) {
+                if (secondClosest.getDistToCamera() < closestStarDist) {
+                    clname = secondClosest.getName();
+                    cldist = secondClosest.getDistToCamera();
                 } else {
                     clname = closestStarName;
                     cldist = closestStarDist;
@@ -265,8 +265,8 @@ public class SpacecraftCamera extends AbstractCamera implements IObserver {
         camera.fieldOfView = 40;
         fovFactor = camera.fieldOfView / 40f;
         camera.near = (float) (targetDistance * 0.6);
-        if (closest != null) {
-            camera.near = Math.min(camera.near, ((float) closest.getPos().dst(pos) - (float) closest.getRadius()) * (float) sc.sizeFactor / 2.5f) * (float) sc.sizeFactor;
+        if (closestBody != null) {
+            camera.near = Math.min(camera.near, ((float) closestBody.getPos().dst(pos) - (float) closestBody.getRadius()) * (float) sc.sizeFactor / 2.5f) * (float) sc.sizeFactor;
         }
         camera.position.set(0, 0, 0);
         direction.put(camera.direction);
@@ -473,16 +473,16 @@ public class SpacecraftCamera extends AbstractCamera implements IObserver {
 
 
     @Override
-    public void checkClosest(IFocus cb) {
-        super.checkClosest(cb);
+    public void checkClosestBody(IFocus cb) {
+        super.checkClosestBody(cb);
         if (sc != null)
-            if (closest2 == null || (cb != sc && cb.getDistToCamera() < closest2.getDistToCamera())) //-V6007
-                closest2 = cb;
+            if (secondClosest == null || (cb != sc && cb.getDistToCamera() < secondClosest.getDistToCamera())) //-V6007
+                secondClosest = cb;
     }
 
     @Override
-    public IFocus getClosest2() {
-        return closest2;
+    public IFocus getSecondClosestBody() {
+        return secondClosest;
     }
 
     @Override

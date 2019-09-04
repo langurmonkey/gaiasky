@@ -179,7 +179,7 @@ public class Planet extends ModelBody implements IAtmosphereRenderable, ICloudRe
         // We are an atmosphere :_D
         float near = cam.getCamera().near;
         float nearopacity = 1f;
-        if (near < 1e-3f && cam.getClosest() != this) {
+        if (near < 1e-3f && cam.getClosestBody() != this) {
             nearopacity = MathUtilsd.lint(near, 1e-5f, 1e-3f, 0f, 1f);
         }
         float atmopacity = (float) MathUtilsd.lint(viewAngle, 0.00745329f, 0.02490659f, 0f, 1f) * nearopacity;

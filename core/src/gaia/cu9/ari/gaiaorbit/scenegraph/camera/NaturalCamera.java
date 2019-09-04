@@ -320,9 +320,9 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
         if (getMode().isFocus() && focus != null) {
             focus.getPredictedPosition(nextFocusPosition, time, this, false);
         }
-        if (!getMode().isFocus() && closest != null) {
-            if (closest != focus)
-                closest.getPredictedPosition(nextClosestPosition, time, this, false);
+        if (!getMode().isFocus() && closestBody != null) {
+            if (closestBody != focus)
+                closestBody.getPredictedPosition(nextClosestPosition, time, this, false);
             else
                 nextClosestPosition.set(nextFocusPosition);
 
@@ -438,12 +438,12 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
             }
             break;
         case GAME_MODE:
-            if (gravity && (closest != null) && !currentMouseKbdListener.isKeyPressed(Input.Keys.SPACE)) {
+            if (gravity && (closestBody != null) && !currentMouseKbdListener.isKeyPressed(Input.Keys.SPACE)) {
                 // Add gravity to force, pulling to closest body
-                Vector3d camObj = closest.getAbsolutePosition(aux1).sub(pos);
+                Vector3d camObj = closestBody.getAbsolutePosition(aux1).sub(pos);
                 double dist = camObj.len();
                 // Gravity adds only at twice the radius
-                if (dist < closest.getRadius() * 2) {
+                if (dist < closestBody.getRadius() * 2) {
                     force.add(camObj.nor().scl(0.002));
                     fullStop = false;
                 } else {
@@ -486,7 +486,7 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
             this.posinv.set(this.pos).scl(-1);
             this.direction.set(0, 0, -1);
             this.up.set(0, 1, 0);
-            closest = entity1;
+            closestBody = entity1;
 
             // Return to pool
             SceneGraphNode ape = fccopy;
@@ -972,12 +972,12 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
 
     private void posDistanceCheck() {
         // Check terrain collision
-        if (closest != null) {
+        if (closestBody != null) {
             // New position
-            closest.getPredictedPosition(aux5, GaiaSky.instance.time, this, false);
+            closestBody.getPredictedPosition(aux5, GaiaSky.instance.time, this, false);
 
-            double h = closest.getHeight(pos, aux5);
-            double hs = closest.getHeightScale() * GlobalConf.scene.ELEVATION_MULTIPLIER;
+            double h = closestBody.getHeight(pos, aux5);
+            double hs = closestBody.getHeightScale() * GlobalConf.scene.ELEVATION_MULTIPLIER;
             double minDist = h + hs / 10.0;
             double newDist = aux5.scl(-1).add(pos).len();
             if (newDist < minDist) {
@@ -1193,8 +1193,8 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
         double dist;
         if (parent.mode.useFocus() && focus != null) {
             dist = focus.getDistToCamera() - (focus.getHeight(pos, false) + MIN_DIST);
-        } else if (parent.mode.useClosest() && closest != null) {
-            dist = closest.getDistToCamera() - (closest.getHeight(pos, false) + MIN_DIST);
+        } else if (parent.mode.useClosest() && closestBody != null) {
+            dist = closestBody.getDistToCamera() - (closestBody.getHeight(pos, false) + MIN_DIST);
         } else {
             dist = distance;
         }
@@ -1559,10 +1559,10 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
                 // Green
                 spriteBatch.setColor(0, 1, 0, 1);
                 chFocus = focus;
-            } else if ((getMode().isFree() || getMode().isGame()) && closest != null) {
+            } else if ((getMode().isFree() || getMode().isGame()) && closestBody != null) {
                 // Orange
                 spriteBatch.setColor(1f, .7f, .2f, 1f);
-                chFocus = closest;
+                chFocus = closestBody;
             }
 
             if (chFocus != null && chFocus.getDistToCamera() > chFocus.getRadius() * 2) {

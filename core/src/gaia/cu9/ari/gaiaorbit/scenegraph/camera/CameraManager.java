@@ -304,6 +304,8 @@ public class CameraManager implements ICamera, IObserver {
         updateRADEC(screenX, screenY, Gdx.graphics.getWidth() / 2, Gdx.graphics.getHeight() / 2);
         // Update Pointer LAT/LON
         updateFocusLatLon(screenX, screenY);
+        // Boradcast closest objects
+        EventManager.instance.post(Events.CAMERA_CLOSEST_INFO, getClosestBody(), getClosestStar());
     }
 
     private void updateRADEC(int pointerX, int pointerY, int viewX, int viewY) {
@@ -441,8 +443,8 @@ public class CameraManager implements ICamera, IObserver {
     }
 
     @Override
-    public void checkClosest(IFocus focus) {
-        current.checkClosest(focus);
+    public void checkClosestBody(IFocus focus) {
+        current.checkClosestBody(focus);
     }
 
     @Override
@@ -495,13 +497,13 @@ public class CameraManager implements ICamera, IObserver {
     }
 
     @Override
-    public IFocus getClosest() {
-        return current.getClosest();
+    public IFocus getClosestBody() {
+        return current.getClosestBody();
     }
 
     @Override
-    public IFocus getClosest2() {
-        return current.getClosest2();
+    public IFocus getSecondClosestBody() {
+        return current.getSecondClosestBody();
     }
 
     @Override

@@ -349,7 +349,7 @@ public class Spacecraft extends GenericSpacecraft implements ILineRenderable, IO
             pollKeys(Gdx.graphics.getDeltaTime());
 
             /** POSITION **/
-            pos = computePosition(dt, camera.getClosest2(), enginePower, thrust, direction, force, accel, vel, pos);
+            pos = computePosition(dt, camera.getSecondClosestBody(), enginePower, thrust, direction, force, accel, vel, pos);
 
             /**
              * SCALING FACTOR - counteracts double precision problems at very

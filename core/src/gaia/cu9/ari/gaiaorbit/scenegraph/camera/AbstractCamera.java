@@ -45,8 +45,6 @@ public abstract class AbstractCamera implements ICamera {
     /** The parent **/
     protected CameraManager parent;
 
-    /** Closest entity to camera **/
-    protected IFocus closest;
 
     /** The main camera **/
     public PerspectiveCamera camera;
@@ -61,6 +59,9 @@ public abstract class AbstractCamera implements ICamera {
     protected Frustumd frustumd;
 
     public float fovFactor;
+
+    /** Closest non-star body to the camera **/
+    protected IFocus closestBody;
 
     /**
      * The closest star to the camera
@@ -195,35 +196,12 @@ public abstract class AbstractCamera implements ICamera {
         return distance;
     }
 
-    @Override
-    public void checkClosest(IFocus cb) {
-        // A copy can never bee the closest
-        if (!cb.isCopy())
-            if (closest == null) {
-                closest = cb;
-            } else {
-                if (closest.getDistToCamera() - closest.getRadius() > cb.getDistToCamera() - cb.getRadius()) {
-                    closest = cb;
-                }
-            }
-    }
-
-    @Override
-    public IFocus getClosest() {
-        return closest;
-    }
-
-    @Override
-    public IFocus getClosest2() {
-        return closest;
-    }
-
     public void copyParamsFrom(AbstractCamera other) {
         this.pos.set(other.pos);
         this.posinv.set(other.posinv);
         this.getDirection().set(other.getDirection());
         this.getUp().set(other.getUp());
-        this.closest = other.closest;
+        this.closestBody = other.closestBody;
 
     }
 
@@ -278,6 +256,29 @@ public abstract class AbstractCamera implements ICamera {
         invProjectionView.set(combined);
         Matrix4d.inv(invProjectionView.val);
         frustumd.update(invProjectionView);
+    }
+
+    @Override
+    public void checkClosestBody(IFocus cb) {
+        // A copy can never bee the closest
+        if (!cb.isCopy())
+            if (closestBody == null) {
+                closestBody = cb;
+            } else {
+                if (closestBody.getDistToCamera() - closestBody.getRadius() > cb.getDistToCamera() - cb.getRadius()) {
+                    closestBody = cb;
+                }
+            }
+    }
+
+    @Override
+    public IFocus getClosestBody() {
+        return closestBody;
+    }
+
+    @Override
+    public IFocus getSecondClosestBody() {
+        return closestBody;
     }
 
     public IStarFocus getClosestStar() {

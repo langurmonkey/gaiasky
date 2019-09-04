@@ -270,7 +270,7 @@ public class Star extends Particle {
             if (viewAngleApparent >= thpointTimesFovfactor) {
                 addToRender(this, RenderGroup.BILLBOARD_STAR);
                 if (distToCamera < modelDistance) {
-                    camera.checkClosest(this);
+                    camera.checkClosestBody(this);
                     addToRender(this, RenderGroup.MODEL_VERT_STAR);
                     if (GlobalConf.program.CUBEMAP360_MODE)
                         removeFromRender(this, RenderGroup.BILLBOARD_STAR);
