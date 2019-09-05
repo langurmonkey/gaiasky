@@ -569,7 +569,7 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
         if (sg.containsNode(GlobalConf.scene.STARTUP_OBJECT) && !GlobalConf.program.NET_SLAVE && isOn(ComponentType.Planets.ordinal())) {
             // Set focus to Earth
             EventManager.instance.post(Events.CAMERA_MODE_CMD, CameraMode.FOCUS_MODE);
-            EventManager.instance.post(Events.FOCUS_CHANGE_CMD, sg.getNode(GlobalConf.scene.STARTUP_OBJECT), true);
+            EventManager.instance.post(Events.FOCUS_CHANGE_CMD, sg.findFocus(GlobalConf.scene.STARTUP_OBJECT), true);
             EventManager.instance.post(Events.GO_TO_OBJECT_CMD);
             if (GlobalConf.runtime.OPENVR) {
                 // Free mode by default in VR

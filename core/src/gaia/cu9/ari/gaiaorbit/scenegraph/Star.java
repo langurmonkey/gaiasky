@@ -263,28 +263,30 @@ public class Star extends Particle {
 
     @Override
     protected void addToRenderLists(ICamera camera) {
-        if (camera.getCurrent() instanceof FovCamera) {
-            // Render as point, do nothing
-            addToRender(this, RenderGroup.BILLBOARD_STAR);
-        } else {
-            if (viewAngleApparent >= thpointTimesFovfactor) {
+        if(GaiaSky.instance.isOn(ct)) {
+            camera.checkClosestStar(this);
+            if (camera.getCurrent() instanceof FovCamera) {
+                // Render as point, do nothing
                 addToRender(this, RenderGroup.BILLBOARD_STAR);
-                if (distToCamera < modelDistance) {
-                    camera.checkClosestBody(this);
-                    addToRender(this, RenderGroup.MODEL_VERT_STAR);
-                    if (GlobalConf.program.CUBEMAP360_MODE)
-                        removeFromRender(this, RenderGroup.BILLBOARD_STAR);
+            } else {
+                if (viewAngleApparent >= thpointTimesFovfactor) {
+                    addToRender(this, RenderGroup.BILLBOARD_STAR);
+                    if (distToCamera < modelDistance) {
+                        camera.checkClosestBody(this);
+                        addToRender(this, RenderGroup.MODEL_VERT_STAR);
+                        if (GlobalConf.program.CUBEMAP360_MODE)
+                            removeFromRender(this, RenderGroup.BILLBOARD_STAR);
+                    }
+                }
+                if (this.hasPm && viewAngleApparent >= thpointTimesFovfactor / GlobalConf.scene.PM_NUM_FACTOR) {
+                    addToRender(this, RenderGroup.LINE);
                 }
             }
-            if (this.hasPm && viewAngleApparent >= thpointTimesFovfactor / GlobalConf.scene.PM_NUM_FACTOR) {
-                addToRender(this, RenderGroup.LINE);
+
+            if ((renderText() || camera.getCurrent() instanceof FovCamera)) {
+                addToRender(this, RenderGroup.FONT_LABEL);
             }
         }
-
-        if ((renderText() || camera.getCurrent() instanceof FovCamera)) {
-            addToRender(this, RenderGroup.FONT_LABEL);
-        }
-
     }
 
     @Override

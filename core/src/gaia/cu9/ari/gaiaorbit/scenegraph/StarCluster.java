@@ -459,6 +459,21 @@ public class StarCluster extends AbstractPositionEntity implements IFocus, IProp
     }
 
     @Override
+    public String getClosestName() {
+        return getName();
+    }
+
+    @Override
+    public double getClosestDistToCamera(){
+        return getDistToCamera();
+    }
+
+    @Override
+    public Vector3d getClosestAbsolutePos(Vector3d out){
+        return getAbsolutePosition(out);
+    }
+
+    @Override
     public boolean isCoordinatesTimeOverflow() {
         return false;
     }

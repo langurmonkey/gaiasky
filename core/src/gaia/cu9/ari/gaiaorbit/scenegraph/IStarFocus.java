@@ -42,7 +42,7 @@ public interface IStarFocus extends IFocus, IProperMotion {
      *
      * @return Distance of closest star to camera
      */
-    double getClosestDist();
+    double getClosestDistToCamera();
 
     /**
      * Returns the size of the closest star
@@ -67,10 +67,17 @@ public interface IStarFocus extends IFocus, IProperMotion {
     Vector3d getClosestPos(Vector3d out);
 
     /**
+     * Returns the position of the closest star in world coordinates
+     *
+     * @param out The out vector
+     * @return The out vector with the position
+     */
+    Vector3d getClosestAbsolutePos(Vector3d out);
+
+    /**
      * Returns the color of the closest star
      *
      * @return The color in rgb
      */
     float[] getClosestCol();
-
 }

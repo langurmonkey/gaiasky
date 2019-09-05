@@ -226,9 +226,13 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
     @Override
     public void setCameraFocusInstantAndGo(final String focusName) {
         if (checkString(focusName, "focusName")) {
-            em.post(Events.CAMERA_MODE_CMD, CameraMode.FOCUS_MODE);
-            em.post(Events.FOCUS_CHANGE_CMD, focusName, true);
-            em.post(Events.GO_TO_OBJECT_CMD);
+            SceneGraphNode sgn = getObject(focusName);
+            if (sgn instanceof IFocus) {
+                IFocus focus = (IFocus) sgn;
+                em.post(Events.CAMERA_MODE_CMD, CameraMode.FOCUS_MODE);
+                em.post(Events.FOCUS_CHANGE_CMD, focus, true);
+                em.post(Events.GO_TO_OBJECT_CMD);
+            }
         }
     }
 

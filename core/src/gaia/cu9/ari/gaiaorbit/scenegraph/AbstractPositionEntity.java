@@ -209,17 +209,17 @@ public abstract class AbstractPositionEntity extends SceneGraphNode {
      * Returns the absolute position of this entity in the native coordinates
      * (equatorial system)
      *
-     * @param aux Auxiliary vector to put the result in
+     * @param out Auxiliary vector to put the result in
      * @return The vector with the position
      */
-    public Vector3d getAbsolutePosition(Vector3d aux) {
-        aux.set(pos);
+    public Vector3d getAbsolutePosition(Vector3d out) {
+        out.set(pos);
         AbstractPositionEntity entity = this;
         while (entity.parent != null && entity.parent instanceof AbstractPositionEntity) {
             entity = (AbstractPositionEntity) entity.parent;
-            aux.add(entity.pos);
+            out.add(entity.pos);
         }
-        return aux;
+        return out;
     }
 
     public Vector3d getAbsolutePosition(String name, Vector3d aux) {

@@ -223,8 +223,6 @@ public class Particle extends CelestialBody implements IStarFocus, ILineRenderab
             distToCamera = translation.len();
 
             if (!copy) {
-                camera.setClosestStar(this);
-
                 addToRender(this, RenderGroup.POINT_STAR);
 
                 viewAngle = (radius / distToCamera) / camera.getFovFactor();
@@ -249,21 +247,22 @@ public class Particle extends CelestialBody implements IStarFocus, ILineRenderab
 
     @Override
     protected void addToRenderLists(ICamera camera) {
-        if (camera.getCurrent() instanceof FovCamera) {
-            // Render as point, do nothing
-        } else {
+        if(GaiaSky.instance.isOn(ct)) {
+            if (camera.getCurrent() instanceof FovCamera) {
+                // Render as point, do nothing
+            } else {
 
-            if (viewAngleApparent >= thpointTimesFovfactor) {
-                addToRender(this, RenderGroup.BILLBOARD_STAR);
+                if (viewAngleApparent >= thpointTimesFovfactor) {
+                    addToRender(this, RenderGroup.BILLBOARD_STAR);
+                }
+                if (viewAngleApparent >= thpointTimesFovfactor / GlobalConf.scene.PM_NUM_FACTOR && this.hasPm) {
+                    addToRender(this, RenderGroup.LINE);
+                }
             }
-            if (viewAngleApparent >= thpointTimesFovfactor / GlobalConf.scene.PM_NUM_FACTOR && this.hasPm) {
-                addToRender(this, RenderGroup.LINE);
+            if (renderText() && camera.isVisible(GaiaSky.instance.time, this)) {
+                addToRender(this, RenderGroup.FONT_LABEL);
             }
         }
-        if (renderText() && camera.isVisible(GaiaSky.instance.time, this)) {
-            addToRender(this, RenderGroup.FONT_LABEL);
-        }
-
     }
 
     protected boolean addToRender(IRenderable renderable, RenderGroup rg) {
@@ -419,7 +418,7 @@ public class Particle extends CelestialBody implements IStarFocus, ILineRenderab
     }
 
     @Override
-    public double getClosestDist() {
+    public double getClosestDistToCamera() {
         return this.distToCamera;
     }
 
@@ -431,6 +430,11 @@ public class Particle extends CelestialBody implements IStarFocus, ILineRenderab
     @Override
     public Vector3d getClosestPos(Vector3d out) {
         return translation.put(out);
+    }
+
+    @Override
+    public Vector3d getClosestAbsolutePos(Vector3d out) {
+        return getAbsolutePosition(out);
     }
 
     @Override
@@ -471,4 +475,5 @@ public class Particle extends CelestialBody implements IStarFocus, ILineRenderab
     public float getLineWidth() {
         return 1;
     }
+
 }

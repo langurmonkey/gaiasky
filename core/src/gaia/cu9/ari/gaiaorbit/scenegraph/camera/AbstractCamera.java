@@ -68,6 +68,12 @@ public abstract class AbstractCamera implements ICamera {
      */
     protected IStarFocus closestStar;
 
+    /**
+     * The closest between {@link AbstractCamera#closestBody} and
+     * {@link AbstractCamera#closestStar}
+     */
+    protected IFocus closest;
+
     private void initNearFar() {
         CAM_NEAR = 0.5d * Constants.M_TO_U;
         CAM_FAR = 1d * Constants.MPC_TO_U;
@@ -285,11 +291,21 @@ public abstract class AbstractCamera implements ICamera {
         return closestStar;
     }
 
-    public void setClosestStar(IStarFocus star) {
-        if (closestStar == null || closestStar.getClosestDist() > star.getClosestDist()) {
+    public void checkClosestStar(IStarFocus star) {
+        if (closestStar == null || closestStar.getClosestDistToCamera() > star.getClosestDistToCamera()) {
             closestStar = star;
         }
 
+    }
+
+    @Override
+    public IFocus getClosest(){
+        return closest;
+    }
+
+    @Override
+    public void setClosest(IFocus focus) {
+        closest = focus;
     }
 
     @Override

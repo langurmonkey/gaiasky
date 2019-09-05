@@ -27,9 +27,8 @@ import gaia.cu9.ari.gaiaorbit.util.time.ITimeFrameProvider;
 public class CameraManager implements ICamera, IObserver {
     /**
      * Convenience enum to describe the camera mode
-     * 
-     * @author Toni Sagrista
      *
+     * @author Toni Sagrista
      */
     public enum CameraMode {
         /** Free navigation **/
@@ -61,11 +60,11 @@ public class CameraManager implements ICamera, IObserver {
             }
         }
 
-        public String getKey(){
+        public String getKey() {
             return "camera." + toString();
         }
 
-        public String toStringI18n(){
+        public String toStringI18n() {
             return I18n.txt(getKey());
         }
 
@@ -89,11 +88,11 @@ public class CameraManager implements ICamera, IObserver {
             return this.equals(CameraMode.GAME_MODE);
         }
 
-        public boolean useFocus(){
+        public boolean useFocus() {
             return isFocus();
         }
 
-        public boolean useClosest(){
+        public boolean useClosest() {
             return isFree() || isGame();
         }
 
@@ -105,7 +104,7 @@ public class CameraManager implements ICamera, IObserver {
          * <li>3 - FOV1&2</li>
          * <li>0 - No FOV mode</li>
          * </ul>
-         * 
+         *
          * @return The current FOV mode of the camera as an integer
          */
         public int getGaiaFovMode() {
@@ -214,7 +213,6 @@ public class CameraManager implements ICamera, IObserver {
             break;
         }
 
-
     }
 
     public boolean isNatural() {
@@ -268,11 +266,9 @@ public class CameraManager implements ICamera, IObserver {
 
     /**
      * Update method.
-     * 
-     * @param dt
-     *            Delta time in seconds.
-     * @param time
-     *            The time frame provider.
+     *
+     * @param dt   Delta time in seconds.
+     * @param time The time frame provider.
      */
     public void update(double dt, ITimeFrameProvider time) {
         current.update(dt, time);
@@ -304,8 +300,26 @@ public class CameraManager implements ICamera, IObserver {
         updateRADEC(screenX, screenY, Gdx.graphics.getWidth() / 2, Gdx.graphics.getHeight() / 2);
         // Update Pointer LAT/LON
         updateFocusLatLon(screenX, screenY);
-        // Boradcast closest objects
-        EventManager.instance.post(Events.CAMERA_CLOSEST_INFO, getClosestBody(), getClosestStar());
+
+        // Work out and broadcast closest objects
+        IFocus closestBody = getClosestBody();
+        if (closestBody.getOctant() != null && !closestBody.getOctant().observed)
+            closestBody = null;
+
+        IStarFocus closestStar = getClosestStar();
+        if (closestStar.getOctant() != null && !closestStar.getOctant().observed)
+            closestStar = null;
+
+        if (closestBody != null || closestStar != null) {
+            if (closestBody == null)
+                setClosest(closestStar);
+            else if (closestStar == null)
+                setClosest(closestBody);
+            else {
+                setClosest(closestBody.getDistToCamera() < closestStar.getClosestDistToCamera() ? closestBody : closestStar);
+            }
+        }
+        EventManager.instance.post(Events.CAMERA_CLOSEST_INFO, getClosest(), getClosestBody(), getClosestStar());
     }
 
     private void updateRADEC(int pointerX, int pointerY, int viewX, int viewY) {
@@ -351,7 +365,7 @@ public class CameraManager implements ICamera, IObserver {
 
     /**
      * Sets the new camera mode and updates the frustum
-     * 
+     *
      * @param mode
      */
     public void updateMode(CameraMode mode, boolean centerFocus, boolean postEvent) {
@@ -373,8 +387,8 @@ public class CameraManager implements ICamera, IObserver {
         case CAMERA_MODE_CMD:
             CameraMode cm = (CameraMode) data[0];
             boolean centerFocus = true;
-            if(data.length > 1)
-                centerFocus = (Boolean)data[1];
+            if (data.length > 1)
+                centerFocus = (Boolean) data[1];
             updateMode(cm, centerFocus, true);
             break;
         case FOV_CHANGE_NOTIFICATION:
@@ -528,8 +542,18 @@ public class CameraManager implements ICamera, IObserver {
     }
 
     @Override
-    public void setClosestStar(IStarFocus star) {
-        current.setClosestStar(star);
+    public void checkClosestStar(IStarFocus star) {
+        current.checkClosestStar(star);
+    }
+
+    @Override
+    public IFocus getClosest() {
+        return current.getClosest();
+    }
+
+    @Override
+    public void setClosest(IFocus focus) {
+        current.setClosest(focus);
     }
 
     @Override
@@ -538,8 +562,8 @@ public class CameraManager implements ICamera, IObserver {
     }
 
     @Override
-    public void updateFrustumPlanes(){
-        for(ICamera cam : cameras)
+    public void updateFrustumPlanes() {
+        for (ICamera cam : cameras)
             cam.updateFrustumPlanes();
     }
 

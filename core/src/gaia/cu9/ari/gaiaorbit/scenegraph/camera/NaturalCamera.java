@@ -170,6 +170,9 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
     private double velocityVRX = 0;
     private double velocityVRY = 0;
 
+    /** Home object as defined in the properties file **/
+    private IFocus home;
+
     /**
      * Holds whether the last input was issued by currentMouseKbdListener. Useful to keep
      * things rolling even if currentMouseKbdListener sticks do not move
@@ -583,9 +586,9 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
      * Does the camera math in higher precision Matrix4d objects and then down-casts
      * the results into the perspective camera
      */
-    protected void cameraUpdate(PerspectiveCamera camera){
+    protected void cameraUpdate(PerspectiveCamera camera) {
         // Update in double matrices
-        super.update(camera, aux1.set(0,0,0), direction, up);
+        super.update(camera, aux1.set(0, 0, 0), direction, up);
 
         // Down-cast to perspective camera
         projection.putIn(camera.projection);
@@ -1546,61 +1549,27 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
     @Override
     public void render(int rw, int rh) {
         boolean draw = !GlobalConf.program.CUBEMAP360_MODE && !GlobalConf.program.STEREOSCOPIC_MODE && !GlobalConf.postprocess.POSTPROCESS_FISHEYE;
-        boolean vr = GlobalConf.runtime.OPENVR;
 
         spriteBatch.begin();
 
         // Renders crosshair if focus mode
         if (GlobalConf.scene.CROSSHAIR && draw) {
-
-            // FOCUS_MODE crosshair only in focus mode
-            IFocus chFocus = null;
-            if (getMode().isFocus()) {
-                // Green
-                spriteBatch.setColor(0, 1, 0, 1);
-                chFocus = focus;
-            } else if ((getMode().isFree() || getMode().isGame()) && closestBody != null) {
-                // Orange
-                spriteBatch.setColor(1f, .7f, .2f, 1f);
-                chFocus = closestBody;
+            // Mark home in ORANGE
+            if (home == null && GaiaSky.instance.sg != null)
+                home = GaiaSky.instance.sg.findFocus(GlobalConf.scene.STARTUP_OBJECT);
+            if (home != null) {
+                drawCrosshair(home, false, focusCrosshair, focusArrow, rw, rh, 1f, 0.7f, 0.1f, 1f);
             }
 
-            if (chFocus != null && chFocus.getDistToCamera() > chFocus.getRadius() * 2) {
-                float chw = focusCrosshair.getWidth();
-                float chh = focusCrosshair.getHeight();
-                float chw2 = chw / 2;
-                float chh2 = chh / (vr ? 1 : 2);
+            // Mark closest object in BLUE
+            if (closest != null) {
+                drawCrosshair(closest, false, focusCrosshair, focusArrow, rw, rh, 0.3f, 0.5f, 1f, 1f);
+            }
 
-                chFocus.getAbsolutePosition(aux1).add(posinv);
-
-                GlobalResources.applyRelativisticAberration(aux1, this);
-                RelativisticEffectsManager.getInstance().gravitationalWavePos(aux1);
-
-                if (vr) {
-                    aux1.nor().scl(chFocus.getDistToCamera() - chFocus.getRadius());
-                }
-                boolean inside = projectToScreen(aux1, auxf1, rw, rh, chw, chh, chw2, chh2);
-
-                if (inside) {
-                    spriteBatch.draw(focusCrosshair, auxf1.x - chw2, auxf1.y - chh2, chw, chh);
-                } else {
-                    if (vr) {
-                        float ang = firstAux ? -90 + aux2f2.angle() : firstAngl;
-                        if (firstAux) {
-                            firstAngl = ang;
-                        }
-                        firstAux = !firstAux;
-                        //                    spriteBatch.draw(focusArrow, auxf1.x - chw2, auxf1.y - chh2, chw2, chh2, chw, chh, 1f, 1f, -90 + aux2f2.angle(), 0, 0, (int) chw, (int) chh, false, false);
-                        aux2f2.set(auxf1.x - (rw / 2), auxf1.y - (rh / 2));
-                        aux2.set(up).rotate(direction, 90).add(up).scl(0.04);
-                        aux1.set(vroffset).add(aux2).scl(1 / Constants.M_TO_U).add(direction);
-                        projectToScreen(aux1, auxf1, rw, rh, chw, chh, chw2, chh2);
-                        spriteBatch.draw(focusArrow, auxf1.x, auxf1.y, chw2, chh2, chw, chh, 1f, 1f, ang, 0, 0, (int) chw, (int) chw, false, false);
-                    } else {
-                        aux2f2.set(auxf1.x - (Gdx.graphics.getWidth() / 2), auxf1.y - (Gdx.graphics.getHeight() / 2));
-                        spriteBatch.draw(focusArrow, auxf1.x - chw2, auxf1.y - chh2, chw2, chh2, chw, chh, 1f, 1f, -90 + aux2f2.angle(), 0, 0, (int) chw, (int) chh, false, false);
-                    }
-                }
+            // Mark focus in GREEN
+            if (getMode().isFocus()) {
+                // Green, focus mode
+                drawCrosshair(focus, true, focusCrosshair, focusArrow, rw, rh, 0.2f, 1f, 0.4f, 1f);
             }
 
             // Velocity crosshair only if we move
@@ -1691,6 +1660,56 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
         spriteBatch.end();
     }
 
+    private void drawCrosshair(IFocus chFocus, boolean focusMode, Texture focusCrosshair, Texture focusArrow, int rw, int rh, float r, float g, float b, float a) {
+        if(chFocus != null) {
+            if (!focusMode) {
+                drawCrosshair(chFocus.getClosestAbsolutePos(aux1).add(posinv), chFocus.getClosestDistToCamera(), chFocus.getRadius(), focusCrosshair, focusArrow, rw, rh, r, g, b, a);
+            } else {
+                drawCrosshair(chFocus.getAbsolutePosition(aux1).add(posinv), chFocus.getDistToCamera(), chFocus.getRadius(), focusCrosshair, focusArrow, rw, rh, r, g, b, a);
+            }
+        }
+    }
+    private void drawCrosshair(Vector3d pos, double distToCam, double radius, Texture focusCrosshair, Texture focusArrow, int rw, int rh, float r, float g, float b, float a) {
+        if (distToCam > radius * 2) {
+            float chw = focusCrosshair.getWidth();
+            float chh = focusCrosshair.getHeight();
+            float chw2 = chw / 2;
+            float chh2 = chh / (vr ? 1 : 2);
+
+            GlobalResources.applyRelativisticAberration(pos, this);
+            RelativisticEffectsManager.getInstance().gravitationalWavePos(pos);
+
+            if (vr) {
+                pos.nor().scl(distToCam - radius);
+            }
+            boolean inside = projectToScreen(pos, auxf1, rw, rh, chw, chh, chw2, chh2);
+
+            spriteBatch.setColor(r, g, b, a);
+
+            if (inside) {
+                spriteBatch.draw(focusCrosshair, auxf1.x - chw2, auxf1.y - chh2, chw, chh);
+            } else {
+                if (vr) {
+                    float ang = firstAux ? -90 + aux2f2.angle() : firstAngl;
+                    if (firstAux) {
+                        firstAngl = ang;
+                    }
+                    firstAux = !firstAux;
+                    //                    spriteBatch.draw(focusArrow, auxf1.x - chw2, auxf1.y - chh2, chw2, chh2, chw, chh, 1f, 1f, -90 + aux2f2.angle(), 0, 0, (int) chw, (int) chh, false, false);
+                    aux2f2.set(auxf1.x - (rw / 2), auxf1.y - (rh / 2));
+                    aux2.set(up).rotate(direction, 90).add(up).scl(0.04);
+                    aux1.set(vroffset).add(aux2).scl(1 / Constants.M_TO_U).add(direction);
+                    projectToScreen(aux1, auxf1, rw, rh, chw, chh, chw2, chh2);
+                    spriteBatch.draw(focusArrow, auxf1.x, auxf1.y, chw2, chh2, chw, chh, 1f, 1f, ang, 0, 0, (int) chw, (int) chw, false, false);
+                } else {
+                    aux2f2.set(auxf1.x - (Gdx.graphics.getWidth() / 2), auxf1.y - (Gdx.graphics.getHeight() / 2));
+                    spriteBatch.draw(focusArrow, auxf1.x - chw2, auxf1.y - chh2, chw2, chh2, chw, chh, 1f, 1f, -90 + aux2f2.angle(), 0, 0, (int) chw, (int) chh, false, false);
+                }
+            }
+        }
+
+    }
+
     private void drawVelCrosshair(Texture tex, int rw, int rh, float chw, float chh, float chw2, float chh2, float scl) {
         aux1.set(vel).scl(scl);
         projectToScreen(aux1, auxf1, rw, rh, chw, chh, chw2, chh2);
@@ -1717,7 +1736,6 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
         camera.project(out, 0, 0, rw, rh);
 
         double ang = direction.angle(vec);
-
         if (ang > 90) {
             out.x = rw - out.x;
             out.y = rh - out.y;
@@ -1752,7 +1770,7 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
         out.x = MathUtils.clamp(out.x, chw2, rw - chw2);
         out.y = MathUtils.clamp(out.y, chh2, rh - chh2);
 
-        return ang < camera.fieldOfView;
+        return ang * 2 < camera.fieldOfView;
     }
 
     @Override

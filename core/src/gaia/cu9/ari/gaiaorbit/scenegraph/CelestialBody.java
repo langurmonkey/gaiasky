@@ -548,4 +548,19 @@ public abstract class CelestialBody extends AbstractPositionEntity implements I3
     public boolean isValidPosition() {
         return !coordinatesTimeOverflow;
     }
+
+    @Override
+    public String getClosestName() {
+        return getName();
+    }
+
+    @Override
+    public double getClosestDistToCamera(){
+        return getDistToCamera();
+    }
+
+    @Override
+    public Vector3d getClosestAbsolutePos(Vector3d out){
+        return getAbsolutePosition(out);
+    }
 }

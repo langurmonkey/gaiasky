@@ -163,7 +163,18 @@ public interface ICamera {
      * @param star
      *            The candidate star
      */
-    void setClosestStar(IStarFocus star);
+    void checkClosestStar(IStarFocus star);
+
+    /**
+     * Returns the current closest object
+     */
+    IFocus getClosest();
+
+    /**
+     * Sets the closest of all
+     * @param focus The new closest object
+     */
+    void setClosest(IFocus focus);
 
     void updateFrustumPlanes();
 

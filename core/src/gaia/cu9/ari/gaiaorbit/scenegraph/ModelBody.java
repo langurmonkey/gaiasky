@@ -165,8 +165,8 @@ public abstract class ModelBody extends CelestialBody {
     @Override
     protected void addToRenderLists(ICamera camera) {
         if (isValidPosition() && parent.isValidPosition()) {
-            camera.checkClosestBody(this);
             if (GaiaSky.instance.isOn(ct)) {
+                camera.checkClosestBody(this);
                 double thPoint = (THRESHOLD_POINT() * camera.getFovFactor()) / sizeScaleFactor;
                 if (viewAngleApparent >= thPoint) {
                     double thQuad2 = THRESHOLD_QUAD() * camera.getFovFactor() * 2 / sizeScaleFactor;

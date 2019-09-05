@@ -263,7 +263,7 @@ public class StarGroup extends ParticleGroup implements ILineRenderable, IStarFo
     /**
      * CLOSEST
      **/
-    private Vector3d closestPos, closestPm;
+    private Vector3d closestPos, closestAbsolutePos, closestPm;
     private String closestName;
     private double closestDist;
     private double closestSize;
@@ -288,6 +288,7 @@ public class StarGroup extends ParticleGroup implements ILineRenderable, IStarFo
         id = idSeq++;
         comp = new StarGroupComparator();
         closestPos = new Vector3d();
+        closestAbsolutePos = new Vector3d();
         closestPm = new Vector3d();
         lastSortCameraPos = new Vector3d(Double.MAX_VALUE, Double.MAX_VALUE, Double.MAX_VALUE);
         closestCol = new float[4];
@@ -436,7 +437,8 @@ public class StarGroup extends ParticleGroup implements ILineRenderable, IStarFo
             StarBean closestStar = (StarBean) pointData.get(active[0]);
 
             closestPm.set(closestStar.pmx(), closestStar.pmy(), closestStar.pmz()).scl(currDeltaYears);
-            closestPos.set(closestStar.x(), closestStar.y(), closestStar.z()).sub(camera.getPos()).add(closestPm);
+            closestAbsolutePos.set(closestStar.x(), closestStar.y(), closestStar.z()).add(closestPm);
+            closestPos.set(closestAbsolutePos).sub(camera.getPos());
             closestDist = closestPos.len() - getRadius(active[0]);
             Color c = new Color();
             Color.abgr8888ToColor(c, (float) closestStar.col());
@@ -446,7 +448,7 @@ public class StarGroup extends ParticleGroup implements ILineRenderable, IStarFo
             closestCol[3] = c.a;
             closestSize = getSize(active[0]);
             closestName = closestStar.name;
-            camera.setClosestStar(this);
+            camera.checkClosestStar(this);
 
             // Model dist
             modelDist = 172.4643429 * getRadius(active[0]);
@@ -540,6 +542,7 @@ public class StarGroup extends ParticleGroup implements ILineRenderable, IStarFo
 
     @Override
     protected void addToRenderLists(ICamera camera) {
+
         addToRender(this, RenderGroup.STAR_GROUP);
         addToRender(this, RenderGroup.BILLBOARD_STAR);
         addToRender(this, RenderGroup.MODEL_VERT_STAR);
@@ -1012,7 +1015,7 @@ public class StarGroup extends ParticleGroup implements ILineRenderable, IStarFo
     }
 
     @Override
-    public double getClosestDist() {
+    public double getClosestDistToCamera() {
         return this.closestDist;
     }
 
@@ -1029,6 +1032,11 @@ public class StarGroup extends ParticleGroup implements ILineRenderable, IStarFo
     @Override
     public Vector3d getClosestPos(Vector3d out) {
         return out.set(this.closestPos);
+    }
+
+    @Override
+    public Vector3d getClosestAbsolutePos(Vector3d out) {
+        return out.set(this.closestAbsolutePos);
     }
 
     @Override

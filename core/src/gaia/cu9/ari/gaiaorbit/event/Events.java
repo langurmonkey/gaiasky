@@ -130,7 +130,7 @@ public enum Events {
      **/
     CAMERA_PLAY_INFO,
 
-    /** Broadcasts the closest body (in [0]) and star (in [1]) to this camera. Happens every frame **/
+    /** Broadcasts the overall closest (in [0]), the closest non-star body (in [1]) and the closest star (in [2]) to this camera. Happens every frame **/
     CAMERA_CLOSEST_INFO,
 
     CAMERA_PAN,
@@ -150,14 +150,14 @@ public enum Events {
     /**
      * FOCUS_MODE change command.
      * <ul>
-     * <li>[0] - The new focus object OR its name.</li>
+     * <li>[0] - The new focus object.</li>
      * </ul>
      **/
     FOCUS_CHANGE_CMD,
     /**
      * Informs that the focus has somehow changed and the GUI must be updated.
      * <ul>
-     * <li>[0] - The new focus object OR its name.</li>
+     * <li>[0] - The new focus object.</li>
      * <li>[1] - Center focus (bool). If true, the focus is centered on the view.</li>
      * </ul>
      **/

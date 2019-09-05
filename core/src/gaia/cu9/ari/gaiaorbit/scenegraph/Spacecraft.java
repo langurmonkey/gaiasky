@@ -38,13 +38,12 @@ import gaia.cu9.ari.gaiaorbit.util.time.ITimeFrameProvider;
 
 /**
  * The spacecraft.
- * 
- * @author tsagrista
  *
+ * @author tsagrista
  */
 public class Spacecraft extends GenericSpacecraft implements ILineRenderable, IObserver {
     private static final Log logger = Logger.getLogger(Spacecraft.class);
-    
+
     /** This is the power **/
     public static final double thrustLength = 1e12d;
 
@@ -55,6 +54,7 @@ public class Spacecraft extends GenericSpacecraft implements ILineRenderable, IO
      * Factor (adapt to be able to navigate small and large scale structures
      **/
     public static final double[] thrustFactor = new double[13];
+
     static {
         double val = 0.1;
         for (int i = 0; i < 13; i++) {
@@ -127,10 +127,8 @@ public class Spacecraft extends GenericSpacecraft implements ILineRenderable, IO
         accel = new Vector3d();
         vel = new Vector3d();
 
-        // orientation
-        if(GlobalConf.runtime.OPENVR) {
-            pos.set(1e7 * Constants.KM_TO_U, 0, 1e8 * Constants.KM_TO_U);
-        }
+        // position and orientation
+        pos.set(1e7 * Constants.KM_TO_U, 0, 1e8 * Constants.KM_TO_U);
         direction = new Vector3d(1, 0, 0);
         up = new Vector3d(0, 1, 0);
         dirup = new Pair<Vector3d, Vector3d>(direction, up);
@@ -274,7 +272,7 @@ public class Spacecraft extends GenericSpacecraft implements ILineRenderable, IO
             double twoRadiuses = closest.getRadius() + this.getRadius();
             // d1 is the new distance to the centre of the object
             if (!vel.isZero() && Intersectord.distanceSegmentPoint(pos, position, closest.getPos()) < twoRadiuses) {
-                logger.info( "Crashed against " + closest.getName() + "!");
+                logger.info("Crashed against " + closest.getName() + "!");
 
                 Array<Vector3d> intersections = Intersectord.intersectRaySphere(pos, position, closest.getPos(), twoRadiuses);
 
@@ -439,9 +437,8 @@ public class Spacecraft extends GenericSpacecraft implements ILineRenderable, IO
 
     /**
      * Sets the current engine power
-     * 
-     * @param enginePower
-     *            The power in [-1..1]
+     *
+     * @param enginePower The power in [-1..1]
      */
     public void setEnginePower(double enginePower) {
         this.enginePower = MathUtilsd.clamp(enginePower, -1, 1);
@@ -449,9 +446,8 @@ public class Spacecraft extends GenericSpacecraft implements ILineRenderable, IO
 
     /**
      * Sets the current yaw power
-     * 
-     * @param yawp
-     *            The yaw power in [-1..1]
+     *
+     * @param yawp The yaw power in [-1..1]
      */
     public void setYawPower(double yawp) {
         this.yawp = MathUtilsd.clamp(yawp, -1, 1);
@@ -459,9 +455,8 @@ public class Spacecraft extends GenericSpacecraft implements ILineRenderable, IO
 
     /**
      * Sets the current pitch power
-     * 
-     * @param pitchp
-     *            The pitch power in [-1..1]
+     *
+     * @param pitchp The pitch power in [-1..1]
      */
     public void setPitchPower(double pitchp) {
         this.pitchp = MathUtilsd.clamp(pitchp, -1, 1);
@@ -469,9 +464,8 @@ public class Spacecraft extends GenericSpacecraft implements ILineRenderable, IO
 
     /**
      * Sets the current roll power
-     * 
-     * @param rollp
-     *            The roll power in [-1..1]
+     *
+     * @param rollp The roll power in [-1..1]
      */
     public void setRollPower(double rollp) {
         this.rollp = MathUtilsd.clamp(rollp, -1, 1);
@@ -479,7 +473,7 @@ public class Spacecraft extends GenericSpacecraft implements ILineRenderable, IO
 
     public void increaseThrustFactorIndex(boolean broadcast) {
         thrustFactorIndex = (thrustFactorIndex + 1) % thrustFactor.length;
-        logger.info( "Thrust factor: " + thrustFactor[thrustFactorIndex]);
+        logger.info("Thrust factor: " + thrustFactor[thrustFactorIndex]);
         if (broadcast)
             EventManager.instance.post(Events.SPACECRAFT_THRUST_INFO, thrustFactorIndex);
     }
@@ -488,7 +482,7 @@ public class Spacecraft extends GenericSpacecraft implements ILineRenderable, IO
         thrustFactorIndex = thrustFactorIndex - 1;
         if (thrustFactorIndex < 0)
             thrustFactorIndex = thrustFactor.length - 1;
-        logger.info( "Thrust factor: " + thrustFactor[thrustFactorIndex]);
+        logger.info("Thrust factor: " + thrustFactor[thrustFactorIndex]);
         if (broadcast)
             EventManager.instance.post(Events.SPACECRAFT_THRUST_INFO, thrustFactorIndex);
     }
@@ -496,7 +490,7 @@ public class Spacecraft extends GenericSpacecraft implements ILineRenderable, IO
     public void setThrustFactorIndex(int i, boolean broadcast) {
         assert i >= 0 && i < thrustFactor.length : "Index " + i + " out of range of thrustFactor vector: [0.." + (thrustFactor.length - 1);
         thrustFactorIndex = i;
-        logger.info( "Thrust factor: " + thrustFactor[thrustFactorIndex]);
+        logger.info("Thrust factor: " + thrustFactor[thrustFactorIndex]);
         if (broadcast)
             EventManager.instance.post(Events.SPACECRAFT_THRUST_INFO, thrustFactorIndex);
     }
@@ -519,7 +513,7 @@ public class Spacecraft extends GenericSpacecraft implements ILineRenderable, IO
 
     /**
      * Sets the absolute size of this entity
-     * 
+     *
      * @param size
      */
     public void setSize(Double size) {
@@ -573,13 +567,13 @@ public class Spacecraft extends GenericSpacecraft implements ILineRenderable, IO
     /** Model rendering. SPACECRAFT_MODE in spacecraft mode is not affected by the relativistic aberration **/
     @Override
     public void render(IntModelBatch modelBatch, float alpha, double t, RenderingContext rc) {
-        render(modelBatch,alpha, t, true);
+        render(modelBatch, alpha, t, true);
     }
 
     /** Model opaque rendering for light glow pass. Do not render shadows **/
     public void render(IntModelBatch modelBatch, float alpha, double t, boolean shadowEnv) {
         ICamera cam = GaiaSky.instance.getICamera();
-        if(shadowEnv)
+        if (shadowEnv)
             prepareShadowEnvironment();
         mc.touch();
         mc.setTransparency(alpha * fadeOpacity);

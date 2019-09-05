@@ -435,8 +435,24 @@ public class ParticleGroup extends FadeNode implements I3DTextRenderable, IFocus
     /**
      * Returns name of focus
      */
+    @Override
     public String getName() {
         return name;
+    }
+
+    @Override
+    public String getClosestName() {
+        return getName();
+    }
+
+    @Override
+    public double getClosestDistToCamera(){
+        return getDistToCamera();
+    }
+
+    @Override
+    public Vector3d getClosestAbsolutePos(Vector3d out){
+        return getAbsolutePosition(out);
     }
 
     @Override
@@ -477,12 +493,12 @@ public class ParticleGroup extends FadeNode implements I3DTextRenderable, IFocus
     }
 
     // The focus position
-    public Vector3d getAbsolutePosition(Vector3d aux) {
-        return aux.set(focusPosition);
+    public Vector3d getAbsolutePosition(Vector3d out) {
+        return out.set(focusPosition);
     }
 
-    public Vector3d getAbsolutePosition(String name, Vector3d aux) {
-        return getAbsolutePosition(aux);
+    public Vector3d getAbsolutePosition(String name, Vector3d out) {
+        return getAbsolutePosition(out);
     }
 
     // Same position
