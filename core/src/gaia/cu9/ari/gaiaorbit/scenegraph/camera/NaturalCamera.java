@@ -215,7 +215,7 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
     private OpenVRListener openVRListener;
 
     private SpriteBatch spriteBatch;
-    private Texture focusCrosshair, focusArrow, velocityCrosshair, antivelocityCrosshair, gravWaveCrosshair;
+    private Texture crosshairFocus, crosshairClosest, crosshairHome, crosshairArrow, velocityCrosshair, antivelocityCrosshair, gravWaveCrosshair;
     private Sprite[] hudSprites;
 
     public NaturalCamera(AssetManager assetManager, CameraManager parent, boolean vr) {
@@ -280,13 +280,21 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
         // Init sprite batch for crosshair
         spriteBatch = new SpriteBatch(1000, GlobalResources.spriteShader);
 
-        // FOCUS_MODE crosshair
-        focusCrosshair = new Texture(Gdx.files.internal("img/crosshair-green.png"));
-        focusCrosshair.setFilter(TextureFilter.Linear, TextureFilter.Linear);
+        // Focus crosshair
+        crosshairFocus = new Texture(Gdx.files.internal("img/crosshair-focus.png"));
+        crosshairFocus.setFilter(TextureFilter.Linear, TextureFilter.Linear);
 
-        // FOCUS_MODE arrow
-        focusArrow = new Texture(Gdx.files.internal("img/crosshair-green-arrow.png"));
-        focusArrow.setFilter(TextureFilter.Linear, TextureFilter.Linear);
+        // Closest crosshair
+        crosshairClosest = new Texture(Gdx.files.internal("img/crosshair-closest.png"));
+        crosshairClosest.setFilter(TextureFilter.Linear, TextureFilter.Linear);
+
+        // Home crosshair
+        crosshairHome = new Texture(Gdx.files.internal("img/crosshair-home.png"));
+        crosshairHome.setFilter(TextureFilter.Linear, TextureFilter.Linear);
+
+        // Arrow crosshair
+        crosshairArrow = new Texture(Gdx.files.internal("img/crosshair-arrow.png"));
+        crosshairArrow.setFilter(TextureFilter.Linear, TextureFilter.Linear);
 
         // Velocity vector crosshair
         velocityCrosshair = new Texture(Gdx.files.internal("img/ai-vel.png"));
@@ -1558,18 +1566,18 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
             if (home == null && GaiaSky.instance.sg != null)
                 home = GaiaSky.instance.sg.findFocus(GlobalConf.scene.STARTUP_OBJECT);
             if (home != null) {
-                drawCrosshair(home, false, focusCrosshair, focusArrow, rw, rh, 1f, 0.7f, 0.1f, 1f);
+                drawCrosshair(home, false, crosshairHome, crosshairArrow, rw, rh, 1f, 0.7f, 0.1f, 1f);
             }
 
             // Mark closest object in BLUE
             if (closest != null) {
-                drawCrosshair(closest, false, focusCrosshair, focusArrow, rw, rh, 0.3f, 0.5f, 1f, 1f);
+                drawCrosshair(closest, false, crosshairClosest, crosshairArrow, rw, rh, 0.3f, 0.5f, 1f, 1f);
             }
 
             // Mark focus in GREEN
             if (getMode().isFocus()) {
                 // Green, focus mode
-                drawCrosshair(focus, true, focusCrosshair, focusArrow, rw, rh, 0.2f, 1f, 0.4f, 1f);
+                drawCrosshair(focus, true, crosshairFocus, crosshairArrow, rw, rh, 0.2f, 1f, 0.4f, 1f);
             }
 
             // Velocity crosshair only if we move

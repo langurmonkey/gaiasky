@@ -356,7 +356,7 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
             try {
                 //OpenVRQuery.queryOpenVr();
                 GlobalConf.runtime.OPENVR = true;
-                Constants.initialize(1e6d);
+                Constants.initialize(GlobalConf.scene.DIST_SCALE_VR);
 
                 vrContext = new VRContext();
                 vrContext.pollEvents();
@@ -406,7 +406,7 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
         } else {
             // Desktop mode
             GlobalConf.runtime.OPENVR = false;
-            Constants.initialize(1d);
+            Constants.initialize(GlobalConf.scene.DIST_SCALE_DESKTOP);
         }
         return false;
     }
