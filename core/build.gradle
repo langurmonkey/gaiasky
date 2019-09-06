@@ -84,7 +84,7 @@ task run(dependsOn: jar, type: JavaExec, description: "Runs Gaia Sky") {
 
 task runvr(dependsOn: jar, type: JavaExec, description: "Runs Gaia Sky VR") {
     main = project.mainClassName
-    args = ['--vr']
+    args = ['-vr']
     systemProperties['properties.file'] = ''
     systemProperties['assets.location'] = '../assets/'
     systemProperties['org.slf4j.simpleLogger.defaultLogLevel'] = 'warn'  // logging levels (e.g. REST server warn, info, debug)
