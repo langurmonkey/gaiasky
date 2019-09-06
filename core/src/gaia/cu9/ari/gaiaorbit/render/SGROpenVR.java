@@ -125,6 +125,18 @@ public class SGROpenVR extends SGRAbstract implements ISGR, IObserver {
             selectionGui = new VRGui(VRSelectionGui.class, (int) (GlobalConf.screen.BACKBUFFER_WIDTH / 10f));
             selectionGui.initialize(null);
 
+            VRDevice hmd = vrContext.getDeviceByType(VRDeviceType.HeadMountedDisplay);
+            if(hmd != null) {
+                float fovb = hmd.getFloatProperty(VRContext.VRDeviceProperty.FieldOfViewBottomDegrees_Float);
+                float fovt = hmd.getFloatProperty(VRContext.VRDeviceProperty.FieldOfViewTopDegrees_Float);
+                float fovr = hmd.getFloatProperty(VRContext.VRDeviceProperty.FieldOfViewRightDegrees_Float);
+                float fovl = hmd.getFloatProperty(VRContext.VRDeviceProperty.FieldOfViewLeftDegrees_Float);
+                
+            } else {
+                // Default
+                EventManager.instance.post(Events.FOV_CHANGED_CMD, 90);
+            }
+
             EventManager.instance.subscribe(this, Events.FRAME_SIZE_UDPATE, Events.SCREENSHOT_SIZE_UDPATE, Events.VR_DEVICE_CONNECTED, Events.VR_DEVICE_DISCONNECTED);
         }
     }
