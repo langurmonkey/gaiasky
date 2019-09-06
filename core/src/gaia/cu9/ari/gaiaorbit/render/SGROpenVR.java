@@ -25,6 +25,8 @@ import gaia.cu9.ari.gaiaorbit.scenegraph.camera.NaturalCamera;
 import gaia.cu9.ari.gaiaorbit.util.Constants;
 import gaia.cu9.ari.gaiaorbit.util.GlobalConf;
 import gaia.cu9.ari.gaiaorbit.util.GlobalResources;
+import gaia.cu9.ari.gaiaorbit.util.Logger;
+import gaia.cu9.ari.gaiaorbit.util.Logger.Log;
 import gaia.cu9.ari.gaiaorbit.util.gdx.IntModelBatch;
 import gaia.cu9.ari.gaiaorbit.util.math.Vector3d;
 import gaia.cu9.ari.gaiaorbit.vr.openvr.VRContext;
@@ -43,6 +45,7 @@ import java.util.Map;
  * @author tsagrista
  */
 public class SGROpenVR extends SGRAbstract implements ISGR, IObserver {
+    private static Log logger = Logger.getLogger(SGROpenVR.class);
 
     private VRContext vrContext;
 
@@ -133,12 +136,24 @@ public class SGROpenVR extends SGRAbstract implements ISGR, IObserver {
             FloatBuffer fovl = BufferUtils.newFloatBuffer(1);
             VRSystem.VRSystem_GetProjectionRaw(VR.EVREye_Eye_Left, fovl, fovr, fovt, fovb);
 
-            double fovT = Math.toDegrees(Math.atan(fovt.get()));
-            double fovB = Math.toDegrees(Math.atan(fovb.get()));
-            double fovR = Math.toDegrees(Math.atan(fovr.get()));
-            double fovL = Math.toDegrees(Math.atan(fovl.get()));
-            // Default
-            EventManager.instance.post(Events.FOV_CHANGED_CMD, 90);
+            try {
+                double fovT = Math.toDegrees(Math.atan(fovt.get()));
+                double fovB = Math.toDegrees(Math.atan(fovb.get()));
+                double fovR = Math.toDegrees(Math.atan(fovr.get()));
+                double fovL = Math.toDegrees(Math.atan(fovl.get()));
+                float fov = (float) (fovB - fovT);
+                if (fov > 50) {
+                    logger.info("Setting fov to HMD value: " + fov);
+                    EventManager.instance.post(Events.FOV_CHANGED_CMD, fov);
+                } else {
+                    // Default
+                    logger.info("Setting fov to default value: " + fov);
+                    EventManager.instance.post(Events.FOV_CHANGED_CMD, 89f);
+                }
+            } catch (Exception e) {
+                // Default
+                EventManager.instance.post(Events.FOV_CHANGED_CMD, 89f);
+            }
 
             EventManager.instance.subscribe(this, Events.FRAME_SIZE_UDPATE, Events.SCREENSHOT_SIZE_UDPATE, Events.VR_DEVICE_CONNECTED, Events.VR_DEVICE_DISCONNECTED);
         }
