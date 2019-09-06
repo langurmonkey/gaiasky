@@ -19,6 +19,7 @@ import gaia.cu9.ari.gaiaorbit.util.*;
 import gaia.cu9.ari.gaiaorbit.util.Logger.Log;
 import gaia.cu9.ari.gaiaorbit.util.datadesc.DataDescriptor;
 import gaia.cu9.ari.gaiaorbit.util.datadesc.DataDescriptorUtils;
+import gaia.cu9.ari.gaiaorbit.vr.openvr.VRStatus;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -32,7 +33,8 @@ import java.nio.file.Paths;
 public class InitialGui extends AbstractGui {
     private static final Log logger = Logger.getLogger(InitialGui.class);
 
-    private boolean datasetsDownload, catalogChooser, vrFail;
+    private boolean datasetsDownload, catalogChooser;
+    private VRStatus vrStatus;
 
     protected DownloadDataWindow ddw;
     protected ChooseCatalogWindow cdw;
@@ -44,12 +46,13 @@ public class InitialGui extends AbstractGui {
      *
      * @param datasetsDownload Forces dataset download window
      * @param catalogChooser   Forces catalog chooser window
+     * @param vrStatus         The status of VR
      */
-    public InitialGui(boolean datasetsDownload, boolean catalogChooser, boolean vrFail) {
+    public InitialGui(boolean datasetsDownload, boolean catalogChooser, VRStatus vrStatus) {
         lock = new Object();
         this.catalogChooser = catalogChooser;
         this.datasetsDownload = datasetsDownload;
-        this.vrFail = vrFail;
+        this.vrStatus = vrStatus;
     }
 
     @Override
@@ -59,8 +62,11 @@ public class InitialGui extends AbstractGui {
         ui = new Stage(new ScreenViewport(), GlobalResources.spriteBatch);
         skin = GlobalResources.skin;
 
-        if(vrFail){
-            Gdx.app.postRunnable(() ->  GuiUtils.addNoVRExit(skin, ui));
+        if (vrStatus.vrInitFailed()) {
+            if (vrStatus.equals(VRStatus.ERROR_NO_CONTEXT))
+                Gdx.app.postRunnable(() -> GuiUtils.addNoVRConnectionExit(skin, ui));
+            else if (vrStatus.equals(VRStatus.ERROR_RENDERMODEL))
+                Gdx.app.postRunnable(() -> GuiUtils.addNoVRDataExit(skin, ui));
 
         } else {
 

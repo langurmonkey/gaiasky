@@ -60,9 +60,11 @@ import gaia.cu9.ari.gaiaorbit.util.time.GlobalClock;
 import gaia.cu9.ari.gaiaorbit.util.time.ITimeFrameProvider;
 import gaia.cu9.ari.gaiaorbit.util.time.RealTimeClock;
 import gaia.cu9.ari.gaiaorbit.util.tree.OctreeNode;
+import gaia.cu9.ari.gaiaorbit.vr.openvr.ControllerModelNotFoundException;
 import gaia.cu9.ari.gaiaorbit.vr.openvr.VRContext;
 import gaia.cu9.ari.gaiaorbit.vr.openvr.VRContext.VRDevice;
 import gaia.cu9.ari.gaiaorbit.vr.openvr.VRContext.VRDeviceType;
+import gaia.cu9.ari.gaiaorbit.vr.openvr.VRStatus;
 import org.lwjgl.opengl.GL30;
 import org.lwjgl.openvr.Texture;
 import org.lwjgl.openvr.VR;
@@ -300,7 +302,7 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
         AssetBean.setAssetManager(manager);
 
         // Create vr context if possible
-        boolean vrOk = createVR();
+        VRStatus vrStatus = createVR();
         cam.updateFrustumPlanes();
 
         // Tooltip to 1s
@@ -336,7 +338,7 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
 
         EventManager.instance.subscribe(this, Events.LOAD_DATA_CMD);
 
-        initialGui = new InitialGui(dsDownload, catChooser, vr && !vrOk);
+        initialGui = new InitialGui(dsDownload, catChooser, vrStatus);
         initialGui.initialize(manager);
         Gdx.input.setInputProcessor(initialGui.getGuiStage());
 
@@ -349,7 +351,7 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
      * Attempt to create a VR context. This operation will only succeed if an HMD is connected
      * and detected via OpenVR
      **/
-    private boolean createVR() {
+    private VRStatus createVR() {
         if (vr) {
             // Initializing the VRContext may fail if no HMD is connected or SteamVR
             // is not installed.
@@ -396,19 +398,26 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
                 if (!GlobalConf.scene.VISIBILITY[ComponentType.Others.ordinal()]) {
                     EventManager.instance.post(Events.TOGGLE_VISIBILITY_CMD, "element.others", false, true);
                 }
-                return true;
+                return VRStatus.OK;
+            } catch(ControllerModelNotFoundException e){
+                // If initializing the VRContext failed
+                logger.debug(e);
+                logger.error(e.getLocalizedMessage());
+                logger.error("Initialisation of VR context failed");
+                return VRStatus.ERROR_RENDERMODEL;
             } catch (Exception e) {
                 // If initializing the VRContext failed
                 logger.debug(e);
                 logger.error(e.getLocalizedMessage());
                 logger.error("Initialisation of VR context failed");
+                return VRStatus.ERROR_NO_CONTEXT;
             }
         } else {
             // Desktop mode
             GlobalConf.runtime.OPENVR = false;
             Constants.initialize(GlobalConf.scene.DIST_SCALE_DESKTOP);
         }
-        return false;
+        return VRStatus.NO_VR;
     }
 
     /**
@@ -759,7 +768,11 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
             // Display loading screen
             renderGui(loadingGui);
             if (GlobalConf.runtime.OPENVR) {
-                vrContext.pollEvents();
+                try {
+                    vrContext.pollEvents();
+                }catch(Exception e){
+                    logger.error(e);
+                }
 
                 vrLoadingLeftFb.begin();
                 renderGui(((VRGui) loadingGuiVR).left());

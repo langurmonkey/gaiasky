@@ -439,7 +439,7 @@ public class VRContext implements Disposable {
      * <p>
      * Must be called before begin!
      */
-    public void pollEvents() {
+    public void pollEvents() throws ControllerModelNotFoundException {
         VRCompositor.VRCompositor_WaitGetPoses(trackedDevicePoses, trackedDeviceGamePoses);
 
         if (!initialDevicesReported) {
@@ -562,7 +562,7 @@ public class VRContext implements Disposable {
         }
     }
 
-    private void createDevice(int index) {
+    private void createDevice(int index) throws ControllerModelNotFoundException{
         VRDeviceType type = null;
         int deviceClass = VRSystem.VRSystem_GetTrackedDeviceClass(index);
         switch (deviceClass) {
@@ -602,7 +602,7 @@ public class VRContext implements Disposable {
         VR_ShutdownInternal();
     }
 
-    private IntModel loadRenderModel(String name, String manufacturer) {
+    private IntModel loadRenderModel(String name, String manufacturer) throws ControllerModelNotFoundException {
         if (models.containsKey(name))
             return models.get(name);
 
@@ -691,14 +691,18 @@ public class VRContext implements Disposable {
             VRRenderModels.VRRenderModels_FreeTexture(renderModelTexture);
         } else {
             ObjLoader ol = new ObjLoader();
-            if(manufacturer.equalsIgnoreCase("Oculus")) {
-                if (name.equalsIgnoreCase("renderLeftHand"))
-                    model = ol.loadModel(GlobalConf.data.dataFileHandle("models/controllers/oculus/oculus-left.obj"));
-                else if (name.equalsIgnoreCase("renderRightHand"))
-                    model = ol.loadModel(GlobalConf.data.dataFileHandle("models/controllers/oculus/oculus-right.obj"));
-            }else{
-                if (name.equalsIgnoreCase("renderLeftHand") || name.equalsIgnoreCase("renderRightHand"))
-                model = ol.loadModel(GlobalConf.data.dataFileHandle("models/controllers/vive/vr_controller_vive.obj"));
+            try {
+                if (manufacturer.equalsIgnoreCase("Oculus")) {
+                    if (name.equalsIgnoreCase("renderLeftHand"))
+                        model = ol.loadModel(GlobalConf.data.dataFileHandle("models/controllers/oculus/oculus-left.obj"));
+                    else if (name.equalsIgnoreCase("renderRightHand"))
+                        model = ol.loadModel(GlobalConf.data.dataFileHandle("models/controllers/oculus/oculus-right.obj"));
+                } else {
+                    if (name.equalsIgnoreCase("renderLeftHand") || name.equalsIgnoreCase("renderRightHand"))
+                        model = ol.loadModel(GlobalConf.data.dataFileHandle("models/controllers/vive/vr_controller_vive.obj"));
+                }
+            }catch(GdxRuntimeException e){
+                throw new ControllerModelNotFoundException("Failed to load VR controller model", e);
             }
         }
 
@@ -775,7 +779,7 @@ public class VRContext implements Disposable {
 
         private final Matrix4 matTmp = new Matrix4();
 
-        VRDevice(VRDevicePose pose, VRDeviceType type, VRControllerRole role) {
+        VRDevice(VRDevicePose pose, VRDeviceType type, VRControllerRole role) throws ControllerModelNotFoundException {
             this.pose = pose;
             this.type = type;
             this.role = role;

@@ -78,13 +78,43 @@ public class GuiUtils {
         exitw.show(stage);
     }
 
-    public static void addNoVRExit(Skin skin, Stage stage) {
+    public static void addNoVRConnectionExit(Skin skin, Stage stage) {
         GenericDialog exitw = new GenericDialog(I18n.txt("notif.error", I18n.txt("gui.vr.noconnection.title")), skin, stage) {
 
             @Override
             protected void build() {
                 OwnLabel info1 = new OwnLabel(I18n.txt("gui.vr.noconnection.1"), skin);
                 OwnLabel info2 = new OwnLabel(I18n.txt("gui.vr.noconnection.2"), skin);
+                OwnLabel gsExit = new OwnLabel(I18n.txt("notif.gaiasky.exit"), skin);
+                content.add(info1).left().padTop(10).padBottom(5).row();
+                content.add(info2).left().padBottom(10).row();
+                content.add(gsExit).left().padTop(10).row();
+            }
+
+            @Override
+            protected void accept() {
+                Gdx.app.exit();
+            }
+
+            @Override
+            protected void cancel() {
+                Gdx.app.exit();
+            }
+
+        };
+        exitw.setAcceptText(I18n.txt("gui.exit"));
+        exitw.setCancelText(null);
+        exitw.buildSuper();
+        exitw.show(stage);
+    }
+
+    public static void addNoVRDataExit(Skin skin, Stage stage) {
+        GenericDialog exitw = new GenericDialog(I18n.txt("notif.error", I18n.txt("gui.vr.nodata.title")), skin, stage) {
+
+            @Override
+            protected void build() {
+                OwnLabel info1 = new OwnLabel(I18n.txt("gui.vr.nodata.1"), skin);
+                OwnLabel info2 = new OwnLabel(I18n.txt("gui.vr.nodata.2"), skin);
                 OwnLabel gsExit = new OwnLabel(I18n.txt("notif.gaiasky.exit"), skin);
                 content.add(info1).left().padTop(10).padBottom(5).row();
                 content.add(info2).left().padBottom(10).row();
