@@ -23,6 +23,7 @@ import gaia.cu9.ari.gaiaorbit.scenegraph.camera.ICamera;
 import gaia.cu9.ari.gaiaorbit.scenegraph.camera.NaturalCamera;
 import gaia.cu9.ari.gaiaorbit.util.Constants;
 import gaia.cu9.ari.gaiaorbit.util.GlobalConf;
+import gaia.cu9.ari.gaiaorbit.util.GlobalResources;
 import gaia.cu9.ari.gaiaorbit.util.gdx.IntModelBatch;
 import gaia.cu9.ari.gaiaorbit.util.math.Vector3d;
 import gaia.cu9.ari.gaiaorbit.vr.openvr.VRContext;
@@ -80,7 +81,7 @@ public class SGROpenVR extends SGRAbstract implements ISGR, IObserver {
         // Model batch
         this.modelBatch = modelBatch;
         // Sprite batch for screen rendering
-        this.sb = new SpriteBatch();
+        this.sb = GlobalResources.spriteBatch;
 
         if (vrContext != null) {
             // Left eye, fb and texture
