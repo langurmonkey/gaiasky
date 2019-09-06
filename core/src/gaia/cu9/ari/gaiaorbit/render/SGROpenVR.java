@@ -11,6 +11,7 @@ import com.badlogic.gdx.graphics.glutils.FrameBuffer;
 import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.Array;
+import com.badlogic.gdx.utils.BufferUtils;
 import gaia.cu9.ari.gaiaorbit.GaiaSky;
 import gaia.cu9.ari.gaiaorbit.event.EventManager;
 import gaia.cu9.ari.gaiaorbit.event.Events;
@@ -32,6 +33,7 @@ import gaia.cu9.ari.gaiaorbit.vr.openvr.VRContext.VRDevice;
 import gaia.cu9.ari.gaiaorbit.vr.openvr.VRContext.VRDeviceType;
 import org.lwjgl.openvr.*;
 
+import java.nio.FloatBuffer;
 import java.util.Map;
 
 /**
@@ -125,21 +127,24 @@ public class SGROpenVR extends SGRAbstract implements ISGR, IObserver {
             selectionGui = new VRGui(VRSelectionGui.class, (int) (GlobalConf.screen.BACKBUFFER_WIDTH / 10f));
             selectionGui.initialize(null);
 
-            VRDevice hmd = vrContext.getDeviceByType(VRDeviceType.HeadMountedDisplay);
-            if(hmd != null) {
-                float fovb = hmd.getFloatProperty(VRContext.VRDeviceProperty.FieldOfViewBottomDegrees_Float);
-                float fovt = hmd.getFloatProperty(VRContext.VRDeviceProperty.FieldOfViewTopDegrees_Float);
-                float fovr = hmd.getFloatProperty(VRContext.VRDeviceProperty.FieldOfViewRightDegrees_Float);
-                float fovl = hmd.getFloatProperty(VRContext.VRDeviceProperty.FieldOfViewLeftDegrees_Float);
-                
-            } else {
-                // Default
-                EventManager.instance.post(Events.FOV_CHANGED_CMD, 90);
-            }
+            FloatBuffer fovt = BufferUtils.newFloatBuffer(1);
+            FloatBuffer fovb = BufferUtils.newFloatBuffer(1);
+            FloatBuffer fovr = BufferUtils.newFloatBuffer(1);
+            FloatBuffer fovl = BufferUtils.newFloatBuffer(1);
+            VRSystem.VRSystem_GetProjectionRaw(VR.EVREye_Eye_Left, fovl, fovr, fovt, fovb);
 
-            EventManager.instance.subscribe(this, Events.FRAME_SIZE_UDPATE, Events.SCREENSHOT_SIZE_UDPATE, Events.VR_DEVICE_CONNECTED, Events.VR_DEVICE_DISCONNECTED);
+            double fovT = Math.toDegrees(Math.atan(fovt.get()));
+            double fovB = Math.toDegrees(Math.atan(fovb.get()));
+            double fovR = Math.toDegrees(Math.atan(fovr.get()));
+            double fovL = Math.toDegrees(Math.atan(fovl.get()));
+            // Default
+            EventManager.instance.post(Events.FOV_CHANGED_CMD, 90);
         }
+
+        EventManager.instance.subscribe(this, Events.FRAME_SIZE_UDPATE, Events.SCREENSHOT_SIZE_UDPATE, Events.VR_DEVICE_CONNECTED, Events.VR_DEVICE_DISCONNECTED);
     }
+
+}
 
     @Override
     public void render(SceneGraphRenderer sgr, ICamera camera, double t, int rw, int rh, FrameBuffer fb, PostProcessBean ppb) {
@@ -147,7 +152,7 @@ public class SGROpenVR extends SGRAbstract implements ISGR, IObserver {
             rc.ppb = null;
             try {
                 vrContext.pollEvents();
-            }catch (Exception e){
+            } catch (Exception e) {
                 // Should never happen
             }
 
