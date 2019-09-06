@@ -70,7 +70,7 @@ public class PreferencesWindow extends GenericDialog {
 
     private INumberFormat nf3, nf1;
 
-    private CheckBox fullscreen, windowed, vsync, limitfpsCb, multithreadCb, lodFadeCb, cbAutoCamrec, real, nsl, report, inverty, highAccuracyPositions, shadowsCb, hidpiCb, pointerCoords, datasetChooser, debugInfo;
+    private CheckBox fullscreen, windowed, vsync, limitfpsCb, multithreadCb, lodFadeCb, cbAutoCamrec, real, nsl, report, inverty, highAccuracyPositions, shadowsCb, hidpiCb, pointerCoords, datasetChooser, debugInfo, crosshairFocus, crosshairClosest, crosshairHome;
     private OwnSelectBox<DisplayMode> fullscreenResolutions;
     private OwnSelectBox<ComboBoxBean> gquality, aa, orbitRenderer, lineRenderer, numThreads, screenshotMode, frameoutputMode, nshadows;
     private OwnSelectBox<LangComboBoxBean> lang;
@@ -786,9 +786,36 @@ public class PreferencesWindow extends GenericDialog {
         ui.add(hidpiCb).left().padBottom(pad).row();
         ui.add(pointerCoords).left().padRight(pad5 * 2).padBottom(pad5).row();
 
+
+        /* CROSSHAIR AND MARKERS */
+        OwnLabel titleCrosshair = new OwnLabel(I18n.txt("gui.ui.crosshair"), skin, "help-title");
+        Table ch = new Table();
+
+        // CROSSHAIR FOCUS
+        crosshairFocus = new OwnCheckBox("" + I18n.txt("gui.ui.crosshair.focus"), skin, pad);
+        crosshairFocus.setName("ch focus");
+        crosshairFocus.setChecked(GlobalConf.scene.CROSSHAIR_FOCUS);
+
+        // CROSSHAIR CLOSEST
+        crosshairClosest = new OwnCheckBox("" + I18n.txt("gui.ui.crosshair.closest"), skin, pad);
+        crosshairClosest.setName("ch closest");
+        crosshairClosest.setChecked(GlobalConf.scene.CROSSHAIR_CLOSEST);
+
+        // CROSSHAIR HOME
+        crosshairHome = new OwnCheckBox("" + I18n.txt("gui.ui.crosshair.home"), skin, pad);
+        crosshairHome.setName("ch home");
+        crosshairHome.setChecked(GlobalConf.scene.CROSSHAIR_HOME);
+
+        // Add to table
+        ch.add(crosshairFocus).left().padBottom(pad5).row();
+        ch.add(crosshairClosest).left().padBottom(pad5).row();
+        ch.add(crosshairHome).left().padBottom(pad5).row();
+
         // Add to content
         contentUI.add(titleUI).left().padBottom(pad5 * 2).row();
-        contentUI.add(ui).left();
+        contentUI.add(ui).left().padBottom(pad5 * 4).row();
+        contentUI.add(titleCrosshair).left().padBottom(pad5 * 2).row();
+        contentUI.add(ch).left();
 
         /*
          * ==== PERFORMANCE ====
@@ -1778,6 +1805,11 @@ public class PreferencesWindow extends GenericDialog {
         }
         // Update scale factor according to theme - for HiDPI screens
         GlobalConf.updateScaleFactor(GlobalConf.program.UI_THEME.endsWith("x2") ? 2f : 1f);
+
+        // Crosshairs
+        GlobalConf.scene.CROSSHAIR_FOCUS = crosshairFocus.isChecked();
+        GlobalConf.scene.CROSSHAIR_CLOSEST = crosshairClosest.isChecked();
+        GlobalConf.scene.CROSSHAIR_HOME = crosshairHome.isChecked();
 
         // Performance
         bean = numThreads.getSelected();

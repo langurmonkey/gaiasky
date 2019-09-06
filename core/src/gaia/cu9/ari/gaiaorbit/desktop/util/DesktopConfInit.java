@@ -256,7 +256,9 @@ public class DesktopConfInit extends ConfInit {
         int PM_COLOR_MODE = Integer.parseInt(p.getProperty("scene.propermotion.colormode", "0"));
         boolean PM_ARROWHEADS = Boolean.parseBoolean(p.getProperty("scene.propermotion.arrowheads", "true"));
         boolean GALAXY_3D = Boolean.parseBoolean(p.getProperty("scene.galaxy.3d", "true"));
-        boolean CROSSHAIR = Boolean.parseBoolean(p.getProperty("scene.crosshair", "true"));
+        boolean CROSSHAIR_FOCUS = Boolean.parseBoolean(p.getProperty("scene.crosshair.focus", "true"));
+        boolean CROSSHAIR_CLOSEST = Boolean.parseBoolean(p.getProperty("scene.crosshair.closest", "true"));
+        boolean CROSSHAIR_HOME = Boolean.parseBoolean(p.getProperty("scene.crosshair.home", "true"));
         boolean CINEMATIC_CAMERA = Boolean.parseBoolean(p.getProperty("scene.camera.cinematic", "false"));
         boolean FREE_CAMERA_TARGET_MODE_ON = Boolean.parseBoolean(p.getProperty("scene.camera.free.targetmode", "false"));
         int CUBEMAP_FACE_RESOLUTION = Integer.parseInt(p.getProperty("scene.cubemapface.resolution", "1000"));
@@ -289,7 +291,7 @@ public class DesktopConfInit extends ConfInit {
         double DIST_SCALE_VR = 1e6d;
 
         SceneConf sc = new SceneConf();
-        sc.initialize(STARTUP_OBJECT, GRAPHICS_QUALITY, OBJECT_FADE_MS, STAR_BRIGHTNESS, AMBIENT_LIGHT, CAMERA_FOV, CAMERA_SPEED, TURNING_SPEED, ROTATION_SPEED, CAMERA_SPEED_LIMIT_IDX, FOCUS_LOCK, FOCUS_LOCK_ORIENTATION, LABEL_SIZE_FACTOR, LABEL_NUMBER_FACTOR, VISIBILITY, ORBIT_RENDERER, LINE_RENDERER, STAR_TH_ANGLE_NONE, STAR_TH_ANGLE_POINT, STAR_TH_ANGLE_QUAD, POINT_ALPHA_MIN, POINT_ALPHA_MAX, OCTREE_PARTICLE_FADE, OCTANT_THRESHOLD_0, OCTANT_THRESHOLD_1, PM_NUM_FACTOR, PM_LEN_FACTOR, N_PM_STARS, PM_COLOR_MODE, PM_ARROWHEADS, STAR_POINT_SIZE, GALAXY_3D, CUBEMAP_FACE_RESOLUTION, CROSSHAIR, CINEMATIC_CAMERA, LAZY_TEXTURE_INIT, FREE_CAMERA_TARGET_MODE_ON, SHADOW_MAPPING, SHADOW_MAPPING_N_SHADOWS, SHADOW_MAPPING_RESOLUTION, MAX_LOADED_STARS, ELEVATION_TYPE, ELEVATION_MULTIPLIER, TESSELLATION_QUALITY, DIST_SCALE_DESKTOP, DIST_SCALE_VR);
+        sc.initialize(STARTUP_OBJECT, GRAPHICS_QUALITY, OBJECT_FADE_MS, STAR_BRIGHTNESS, AMBIENT_LIGHT, CAMERA_FOV, CAMERA_SPEED, TURNING_SPEED, ROTATION_SPEED, CAMERA_SPEED_LIMIT_IDX, FOCUS_LOCK, FOCUS_LOCK_ORIENTATION, LABEL_SIZE_FACTOR, LABEL_NUMBER_FACTOR, VISIBILITY, ORBIT_RENDERER, LINE_RENDERER, STAR_TH_ANGLE_NONE, STAR_TH_ANGLE_POINT, STAR_TH_ANGLE_QUAD, POINT_ALPHA_MIN, POINT_ALPHA_MAX, OCTREE_PARTICLE_FADE, OCTANT_THRESHOLD_0, OCTANT_THRESHOLD_1, PM_NUM_FACTOR, PM_LEN_FACTOR, N_PM_STARS, PM_COLOR_MODE, PM_ARROWHEADS, STAR_POINT_SIZE, GALAXY_3D, CUBEMAP_FACE_RESOLUTION, CROSSHAIR_FOCUS, CROSSHAIR_CLOSEST, CROSSHAIR_HOME, CINEMATIC_CAMERA, LAZY_TEXTURE_INIT, FREE_CAMERA_TARGET_MODE_ON, SHADOW_MAPPING, SHADOW_MAPPING_N_SHADOWS, SHADOW_MAPPING_RESOLUTION, MAX_LOADED_STARS, ELEVATION_TYPE, ELEVATION_MULTIPLIER, TESSELLATION_QUALITY, DIST_SCALE_DESKTOP, DIST_SCALE_VR);
 
         /** FRAME CONF **/
         String renderFolder;
@@ -494,7 +496,9 @@ public class DesktopConfInit extends ConfInit {
         p.setProperty("scene.propermotion.arrowheads", Boolean.toString(GlobalConf.scene.PM_ARROWHEADS));
         p.setProperty("scene.galaxy.3d", Boolean.toString(GlobalConf.scene.GALAXY_3D));
         p.setProperty("scene.cubemapface.resolution", Integer.toString(GlobalConf.scene.CUBEMAP_FACE_RESOLUTION));
-        p.setProperty("scene.crosshair", Boolean.toString(GlobalConf.scene.CROSSHAIR));
+        p.setProperty("scene.crosshair.focus", Boolean.toString(GlobalConf.scene.CROSSHAIR_FOCUS));
+        p.setProperty("scene.crosshair.closest", Boolean.toString(GlobalConf.scene.CROSSHAIR_CLOSEST));
+        p.setProperty("scene.crosshair.home", Boolean.toString(GlobalConf.scene.CROSSHAIR_HOME));
         p.setProperty("scene.camera.cinematic", Boolean.toString(GlobalConf.scene.CINEMATIC_CAMERA));
         p.setProperty("scene.camera.free.targetmode", Boolean.toString(GlobalConf.scene.FREE_CAMERA_TARGET_MODE_ON));
         p.setProperty("scene.shadowmapping", Boolean.toString(GlobalConf.scene.SHADOW_MAPPING));

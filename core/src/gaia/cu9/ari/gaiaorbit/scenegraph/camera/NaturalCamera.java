@@ -1561,21 +1561,23 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
         spriteBatch.begin();
 
         // Renders crosshair if focus mode
-        if (GlobalConf.scene.CROSSHAIR && draw) {
+        if (draw) {
             // Mark home in ORANGE
-            if (home == null && GaiaSky.instance.sg != null)
-                home = GaiaSky.instance.sg.findFocus(GlobalConf.scene.STARTUP_OBJECT);
-            if (home != null) {
-                drawCrosshair(home, false, crosshairHome, crosshairArrow, rw, rh, 1f, 0.7f, 0.1f, 1f);
+            if(GlobalConf.scene.CROSSHAIR_HOME) {
+                if (home == null && GaiaSky.instance.sg != null)
+                    home = GaiaSky.instance.sg.findFocus(GlobalConf.scene.STARTUP_OBJECT);
+                if (home != null) {
+                    drawCrosshair(home, false, crosshairHome, crosshairArrow, rw, rh, 1f, 0.7f, 0.1f, 1f);
+                }
             }
 
             // Mark closest object in BLUE
-            if (closest != null) {
+            if (GlobalConf.scene.CROSSHAIR_CLOSEST && closest != null) {
                 drawCrosshair(closest, false, crosshairClosest, crosshairArrow, rw, rh, 0.3f, 0.5f, 1f, 1f);
             }
 
             // Mark focus in GREEN
-            if (getMode().isFocus()) {
+            if (GlobalConf.scene.CROSSHAIR_FOCUS && getMode().isFocus()) {
                 // Green, focus mode
                 drawCrosshair(focus, true, crosshairFocus, crosshairArrow, rw, rh, 0.2f, 1f, 0.4f, 1f);
             }

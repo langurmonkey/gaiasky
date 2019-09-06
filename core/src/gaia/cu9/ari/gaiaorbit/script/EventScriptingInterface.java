@@ -1143,8 +1143,8 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
                 GlobalConf.scene.CINEMATIC_CAMERA = true;
 
                 // Save crosshair
-                boolean crosshair = GlobalConf.scene.CROSSHAIR;
-                GlobalConf.scene.CROSSHAIR = false;
+                boolean crosshair = GlobalConf.scene.CROSSHAIR_FOCUS;
+                GlobalConf.scene.CROSSHAIR_FOCUS = false;
 
                 // Get target position
                 Vector3d target = aux3d1;
@@ -1188,7 +1188,7 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
                 em.post(Events.ROTATION_SPEED_CMD, (float) rotationSpeedBak, false);
 
                 // Restore crosshair
-                GlobalConf.scene.CROSSHAIR = crosshair;
+                GlobalConf.scene.CROSSHAIR_FOCUS = crosshair;
 
                 // Land
                 landOnObject(object, stop);

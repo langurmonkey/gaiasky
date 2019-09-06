@@ -139,12 +139,11 @@ public class SGROpenVR extends SGRAbstract implements ISGR, IObserver {
             double fovL = Math.toDegrees(Math.atan(fovl.get()));
             // Default
             EventManager.instance.post(Events.FOV_CHANGED_CMD, 90);
+
+            EventManager.instance.subscribe(this, Events.FRAME_SIZE_UDPATE, Events.SCREENSHOT_SIZE_UDPATE, Events.VR_DEVICE_CONNECTED, Events.VR_DEVICE_DISCONNECTED);
         }
 
-        EventManager.instance.subscribe(this, Events.FRAME_SIZE_UDPATE, Events.SCREENSHOT_SIZE_UDPATE, Events.VR_DEVICE_CONNECTED, Events.VR_DEVICE_DISCONNECTED);
     }
-
-}
 
     @Override
     public void render(SceneGraphRenderer sgr, ICamera camera, double t, int rw, int rh, FrameBuffer fb, PostProcessBean ppb) {

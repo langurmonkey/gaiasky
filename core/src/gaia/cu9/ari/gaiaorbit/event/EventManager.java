@@ -284,7 +284,8 @@ public class EventManager implements IObserver {
     }
 
     public boolean hasSubscriptors(Events event) {
-        return !subscriptions.get(event.ordinal()).isEmpty();
+        Set<IObserver> scr = subscriptions.get(event.ordinal());
+        return scr != null && !scr.isEmpty();
     }
 
     @Override

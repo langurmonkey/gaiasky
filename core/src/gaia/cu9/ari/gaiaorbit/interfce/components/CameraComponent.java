@@ -31,7 +31,7 @@ public class CameraComponent extends GuiComponent implements IObserver {
     protected SelectBox<String> cameraSpeedLimit;
     protected SelectBox<CameraComboBoxBean> cameraMode;
     protected Slider fieldOfView, cameraSpeed, turnSpeed, rotateSpeed;
-    protected CheckBox focusLock, orientationLock, crosshair, cinematic;
+    protected CheckBox focusLock, orientationLock, cinematic;
     protected OwnTextIconButton button3d, buttonDome, buttonCubemap, buttonAnaglyph, button3dtv, buttonVR, buttonCrosseye;
     protected boolean fovFlag = true;
     private boolean fieldLock = false;
@@ -245,17 +245,6 @@ public class CameraComponent extends GuiComponent implements IObserver {
             return false;
         });
 
-        /** Crosshair **/
-        crosshair = new OwnCheckBox("" + I18n.txt("gui.camera.crosshair"), skin, pad);
-        crosshair.setName("orientation lock");
-        crosshair.setChecked(GlobalConf.scene.CROSSHAIR);
-        crosshair.addListener(event -> {
-            if (event instanceof ChangeEvent) {
-                EventManager.instance.post(Events.CROSSHAIR_CMD, crosshair.isChecked());
-                return true;
-            }
-            return false;
-        });
 
 
         HorizontalGroup buttonGroup = new HorizontalGroup();
@@ -296,7 +285,6 @@ public class CameraComponent extends GuiComponent implements IObserver {
         cameraGroup.addActor(cinematic);
         cameraGroup.addActor(focusLock);
         cameraGroup.addActor(orientationLock);
-        cameraGroup.addActor(crosshair);
         cameraGroup.addActor(vgroup(new Label("", skin), buttonGroup, space2));
 
         component = cameraGroup;

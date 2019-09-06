@@ -1165,10 +1165,13 @@ public class GlobalConf {
         /** Quality of tessellation **/
         public double TESSELLATION_QUALITY;
 
-        /**
-         * Whether to show crosshair in focus mode
-         **/
-        public boolean CROSSHAIR;
+        /** Whether to show the focus crosshair **/
+        public boolean CROSSHAIR_FOCUS;
+        /** Closest object crosshair **/
+        public boolean CROSSHAIR_CLOSEST;
+        /** Home object crosshair **/
+        public boolean CROSSHAIR_HOME;
+
 
         /**
          * Resolution of each of the faces in the cubemap which will be mapped
@@ -1228,7 +1231,7 @@ public class GlobalConf {
         }
 
         public void initialize(String sTARTUP_OBJECT, GraphicsQuality gRAPHICS_QUALITY, long oBJECT_FADE_MS, float sTAR_BRIGHTNESS, float aMBIENT_LIGHT, int cAMERA_FOV, float cAMERA_SPEED, float tURNING_SPEED, float rOTATION_SPEED, int cAMERA_SPEED_LIMIT_IDX, boolean fOCUS_LOCK, boolean fOCUS_LOCK_ORIENTATION, float lABEL_SIZE_FACTOR, float lABEL_NUMBER_FACTOR, boolean[] vISIBILITY, int oRBIT_RENDERER, int lINE_RENDERER, double sTAR_TH_ANGLE_NONE, double sTAR_TH_ANGLE_POINT, double sTAR_TH_ANGLE_QUAD,
-                float pOINT_ALPHA_MIN, float pOINT_ALPHA_MAX, boolean oCTREE_PARTICLE_FADE, float oCTANT_TH_ANGLE_0, float oCTANT_TH_ANGLE_1, float pM_NUM_FACTOR, float pM_LEN_FACTOR, long n_PM_STARS, int pM_COLOR_MODE, boolean pM_ARROWHEADS, float sTAR_POINT_SIZE, boolean gALAXY_3D, int cUBEMAP_FACE_RESOLUTION, boolean cROSSHAIR, boolean cINEMATIC_CAMERA, boolean lAZY_TEXTURE_INIT, boolean fREE_CAMERA_TARGET_MODE_ON, boolean sHADOW_MAPPING, int sHADOW_MAPPING_N_SHADOWS,
+                float pOINT_ALPHA_MIN, float pOINT_ALPHA_MAX, boolean oCTREE_PARTICLE_FADE, float oCTANT_TH_ANGLE_0, float oCTANT_TH_ANGLE_1, float pM_NUM_FACTOR, float pM_LEN_FACTOR, long n_PM_STARS, int pM_COLOR_MODE, boolean pM_ARROWHEADS, float sTAR_POINT_SIZE, boolean gALAXY_3D, int cUBEMAP_FACE_RESOLUTION, boolean cROSSHAIR_FOCUS, boolean cROSSHAIR_CLOSEST, boolean cROSSHAIR_HOME, boolean cINEMATIC_CAMERA, boolean lAZY_TEXTURE_INIT, boolean fREE_CAMERA_TARGET_MODE_ON, boolean sHADOW_MAPPING, int sHADOW_MAPPING_N_SHADOWS,
                 int sHADOW_MAPPING_RESOLUTION, long mAX_LOADED_STARS, ElevationType eLEVATION_TYPE, double eLEVATION_MULTIPLIER, double tESSELLATION_QUALITY, double dIST_SCALE_DESKTOP, double dIST_SCALE_VR) {
             STARTUP_OBJECT = sTARTUP_OBJECT;
             GRAPHICS_QUALITY = gRAPHICS_QUALITY;
@@ -1266,7 +1269,9 @@ public class GlobalConf {
             STAR_POINT_SIZE_BAK = STAR_POINT_SIZE;
             GALAXY_3D = gALAXY_3D;
             CUBEMAP_FACE_RESOLUTION = cUBEMAP_FACE_RESOLUTION;
-            CROSSHAIR = cROSSHAIR;
+            CROSSHAIR_FOCUS = cROSSHAIR_FOCUS;
+            CROSSHAIR_CLOSEST = cROSSHAIR_CLOSEST;
+            CROSSHAIR_HOME = cROSSHAIR_HOME;
             CINEMATIC_CAMERA = cINEMATIC_CAMERA;
             LAZY_TEXTURE_INIT = lAZY_TEXTURE_INIT;
             SHADOW_MAPPING = sHADOW_MAPPING;
@@ -1438,7 +1443,7 @@ public class GlobalConf {
                 GALAXY_3D = (boolean) data[0];
                 break;
             case CROSSHAIR_CMD:
-                CROSSHAIR = (boolean) data[0];
+                CROSSHAIR_FOCUS = (boolean) data[0];
                 break;
             case CAMERA_CINEMATIC_CMD:
                 CINEMATIC_CAMERA = (boolean) data[0];
