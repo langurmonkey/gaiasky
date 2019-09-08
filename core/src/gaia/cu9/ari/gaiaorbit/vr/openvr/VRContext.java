@@ -439,7 +439,7 @@ public class VRContext implements Disposable {
      * <p>
      * Must be called before begin!
      */
-    public void pollEvents() throws ControllerModelNotFoundException {
+    public void pollEvents() {
         VRCompositor.VRCompositor_WaitGetPoses(trackedDevicePoses, trackedDeviceGamePoses);
 
         if (!initialDevicesReported) {
@@ -562,7 +562,7 @@ public class VRContext implements Disposable {
         }
     }
 
-    private void createDevice(int index) throws ControllerModelNotFoundException{
+    private void createDevice(int index) {
         VRDeviceType type = null;
         int deviceClass = VRSystem.VRSystem_GetTrackedDeviceClass(index);
         switch (deviceClass) {
@@ -602,7 +602,7 @@ public class VRContext implements Disposable {
         VR_ShutdownInternal();
     }
 
-    private IntModel loadRenderModel(String name, String manufacturer) throws ControllerModelNotFoundException {
+    private IntModel loadRenderModel(String name, String manufacturer) {
         if (models.containsKey(name))
             return models.get(name);
 
@@ -691,18 +691,14 @@ public class VRContext implements Disposable {
             VRRenderModels.VRRenderModels_FreeTexture(renderModelTexture);
         } else {
             ObjLoader ol = new ObjLoader();
-            try {
-                if (manufacturer.equalsIgnoreCase("Oculus")) {
-                    if (name.equalsIgnoreCase("renderLeftHand"))
-                        model = ol.loadModel(GlobalConf.data.dataFileHandle("models/controllers/oculus/oculus-left.obj"));
-                    else if (name.equalsIgnoreCase("renderRightHand"))
-                        model = ol.loadModel(GlobalConf.data.dataFileHandle("models/controllers/oculus/oculus-right.obj"));
-                } else {
-                    if (name.equalsIgnoreCase("renderLeftHand") || name.equalsIgnoreCase("renderRightHand"))
-                        model = ol.loadModel(GlobalConf.data.dataFileHandle("models/controllers/vive/vr_controller_vive.obj"));
-                }
-            }catch(GdxRuntimeException e){
-                throw new ControllerModelNotFoundException("Failed to load VR controller model", e);
+            if (manufacturer.equalsIgnoreCase("Oculus")) {
+                if (name.equalsIgnoreCase("renderLeftHand"))
+                    model = ol.loadModel(GlobalConf.data.dataFileHandle("models/controllers/oculus/oculus-left.obj"));
+                else if (name.equalsIgnoreCase("renderRightHand"))
+                    model = ol.loadModel(GlobalConf.data.dataFileHandle("models/controllers/oculus/oculus-right.obj"));
+            } else {
+                if (name.equalsIgnoreCase("renderLeftHand") || name.equalsIgnoreCase("renderRightHand"))
+                    model = ol.loadModel(GlobalConf.data.dataFileHandle("models/controllers/vive/vr_controller_vive.obj"));
             }
         }
 
@@ -759,7 +755,7 @@ public class VRContext implements Disposable {
         private VRControllerRole role;
         private long buttons = 0;
         private final VRControllerState state = VRControllerState.create();
-        private final IntModelInstance modelInstance;
+        private IntModelInstance modelInstance;
 
         // tracker space
         private final Vector3 position = new Vector3();
@@ -779,16 +775,23 @@ public class VRContext implements Disposable {
 
         private final Matrix4 matTmp = new Matrix4();
 
-        VRDevice(VRDevicePose pose, VRDeviceType type, VRControllerRole role) throws ControllerModelNotFoundException {
+        private boolean initialized;
+
+        VRDevice(VRDevicePose pose, VRDeviceType type, VRControllerRole role) {
             this.pose = pose;
             this.type = type;
             this.role = role;
+            if (type.equals(VRDeviceType.Controller))
+                axes = new float[5][2];
+            this.initialized = false;
+        }
+
+        public void initialize() {
             IntModel model = loadRenderModel(getStringProperty(VRDeviceProperty.RenderModelName_String), getStringProperty(VRDeviceProperty.ManufacturerName_String));
             this.modelInstance = model != null ? new IntModelInstance(model) : null;
             if (model != null)
                 this.modelInstance.transform.set(pose.transform);
-            if (type.equals(VRDeviceType.Controller))
-                axes = new float[5][2];
+            this.initialized = true;
         }
 
         /**
@@ -1022,6 +1025,10 @@ public class VRContext implements Disposable {
                 return currx != this.axes[axis][0] || curry != this.axes[axis][1];
             }
             return false;
+        }
+
+        public boolean isInitialized() {
+            return initialized;
         }
     }
 

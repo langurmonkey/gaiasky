@@ -103,6 +103,13 @@ public class SGROpenVR extends SGRAbstract implements ISGR, IObserver {
             auxf1 = new Vector3();
             auxd1 = new Vector3d();
 
+            // Init devices
+            for (VRDevice device : vrContext.getDevices()) {
+                if(!device.isInitialized()){
+                    device.initialize();
+                }
+            }
+
             // Controllers
             Array<VRDevice> controllers = vrContext.getDevicesByType(VRDeviceType.Controller);
 
@@ -154,10 +161,8 @@ public class SGROpenVR extends SGRAbstract implements ISGR, IObserver {
                 // Default
                 EventManager.instance.post(Events.FOV_CHANGED_CMD, 89f);
             }
-
             EventManager.instance.subscribe(this, Events.FRAME_SIZE_UDPATE, Events.SCREENSHOT_SIZE_UDPATE, Events.VR_DEVICE_CONNECTED, Events.VR_DEVICE_DISCONNECTED);
         }
-
     }
 
     @Override
@@ -325,24 +330,24 @@ public class SGROpenVR extends SGRAbstract implements ISGR, IObserver {
     @Override
     public void notify(Events event, Object... data) {
         switch (event) {
-        case VR_DEVICE_CONNECTED:
-            VRDevice device = (VRDevice) data[0];
-            if (device.getType() == VRDeviceType.Controller) {
-                Gdx.app.postRunnable(() -> {
-                    addVRController(device);
-                });
-            }
-            break;
-        case VR_DEVICE_DISCONNECTED:
-            device = (VRDevice) data[0];
-            if (device.getType() == VRDeviceType.Controller) {
-                Gdx.app.postRunnable(() -> {
-                    removeVRController(device);
-                });
-            }
-            break;
-        default:
-            break;
+            case VR_DEVICE_CONNECTED:
+                VRDevice device = (VRDevice) data[0];
+                if (device.getType() == VRDeviceType.Controller) {
+                    Gdx.app.postRunnable(() -> {
+                        addVRController(device);
+                    });
+                }
+                break;
+            case VR_DEVICE_DISCONNECTED:
+                device = (VRDevice) data[0];
+                if (device.getType() == VRDeviceType.Controller) {
+                    Gdx.app.postRunnable(() -> {
+                        removeVRController(device);
+                    });
+                }
+                break;
+            default:
+                break;
         }
 
     }
