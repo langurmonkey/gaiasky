@@ -53,11 +53,11 @@ public class TimeComponent extends GuiComponent implements IObserver {
         // Time
         date = new OwnLabel("date UT", skin, "mono");
         date.setName("label date");
-        date.setWidth(150f * GlobalConf.SCALE_FACTOR);
+        date.setWidth(150f * GlobalConf.UI_SCALE_FACTOR);
 
         time = new OwnLabel("time UT", skin, "mono");
         time.setName("label time");
-        time.setWidth(150f * GlobalConf.SCALE_FACTOR);
+        time.setWidth(150f * GlobalConf.UI_SCALE_FACTOR);
 
         dateEdit = new OwnImageButton(skin, "edit");
         dateEdit.addListener(event -> {
@@ -103,13 +103,13 @@ public class TimeComponent extends GuiComponent implements IObserver {
         timeWarp = new OwnLabel(TextUtils.getFormattedTimeWarp(), skin, "warp");
         timeWarp.setName("time warp");
         Container<Label> wrapWrapper = new Container<>(timeWarp);
-        wrapWrapper.width(80f * GlobalConf.SCALE_FACTOR);
+        wrapWrapper.width(80f * GlobalConf.UI_SCALE_FACTOR);
         wrapWrapper.align(Align.center);
 
-        VerticalGroup timeGroup = new VerticalGroup().align(Align.left).columnAlign(Align.left).space(3 * GlobalConf.SCALE_FACTOR).padTop(3 * GlobalConf.SCALE_FACTOR);
+        VerticalGroup timeGroup = new VerticalGroup().align(Align.left).columnAlign(Align.left).space(3 * GlobalConf.UI_SCALE_FACTOR).padTop(3 * GlobalConf.UI_SCALE_FACTOR);
 
         HorizontalGroup dateGroup = new HorizontalGroup();
-        dateGroup.space(4f * GlobalConf.SCALE_FACTOR);
+        dateGroup.space(4f * GlobalConf.UI_SCALE_FACTOR);
         VerticalGroup datetimeGroup = new VerticalGroup();
         datetimeGroup.addActor(date);
         datetimeGroup.addActor(time);
@@ -118,7 +118,7 @@ public class TimeComponent extends GuiComponent implements IObserver {
         timeGroup.addActor(dateGroup);
 
         HorizontalGroup paceGroup = new HorizontalGroup();
-        paceGroup.space(3f * GlobalConf.SCALE_FACTOR);
+        paceGroup.space(3f * GlobalConf.UI_SCALE_FACTOR);
         paceGroup.addActor(paceLabel);
         paceGroup.addActor(minus);
         paceGroup.addActor(wrapWrapper);

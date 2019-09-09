@@ -186,7 +186,7 @@ public class DesktopConfInit extends ConfInit {
         String DATA_DESCRIPTOR_URL = p.getProperty("program.url.data.descriptor");
         String UI_THEME = p.getProperty("program.ui.theme");
         // Update scale factor according to theme - for HiDPI screens
-        GlobalConf.updateScaleFactor(UI_THEME.endsWith("x2") ? 2f : 1f);
+        GlobalConf.updateScaleFactor(UI_THEME.endsWith("x2") ? 1.8f : 1f);
         String SCRIPT_LOCATION = p.getProperty("program.scriptlocation").isEmpty() ? System.getProperty("user.dir") + File.separatorChar + "scripts" : p.getProperty("program.scriptlocation");
         int REST_PORT = Integer.parseInt(p.getProperty("program.restport", "-1"));
 

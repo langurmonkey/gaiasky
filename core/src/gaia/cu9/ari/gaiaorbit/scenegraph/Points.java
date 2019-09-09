@@ -27,7 +27,7 @@ public class Points extends VertsObject implements IPointRenderable {
         for (int i = 0; i < pointCloudData.getNumPoints(); i++) {
             pointCloudData.loadPoint(v, i);
             v.add(translation);
-            renderer.addPoint(this, (float) v.x, (float) v.y, (float) v.z, getPrimitiveSize() * GlobalConf.SCALE_FACTOR, cc[0], cc[1], cc[2], cc[3]);
+            renderer.addPoint(this, (float) v.x, (float) v.y, (float) v.z, getPrimitiveSize() * GlobalConf.UI_SCALE_FACTOR, cc[0], cc[1], cc[2], cc[3]);
         }
     }
 }

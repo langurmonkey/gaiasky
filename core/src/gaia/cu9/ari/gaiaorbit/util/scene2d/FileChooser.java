@@ -112,17 +112,17 @@ public class FileChooser extends GenericDialog {
 
     @Override
     public void build() {
-        scrollPaneWidth = 400 * GlobalConf.SCALE_FACTOR;
-        maxPathLength = GlobalConf.SCALE_FACTOR > 1.5f ? 9.5f : 5.5f;
+        scrollPaneWidth = 400 * GlobalConf.UI_SCALE_FACTOR;
+        maxPathLength = GlobalConf.UI_SCALE_FACTOR > 1.5f ? 9.5f : 5.5f;
 
         content.top().left();
-        content.defaults().space(5 * GlobalConf.SCALE_FACTOR);
-        this.padLeft(10 * GlobalConf.SCALE_FACTOR);
-        this.padRight(10 * GlobalConf.SCALE_FACTOR);
+        content.defaults().space(5 * GlobalConf.UI_SCALE_FACTOR);
+        this.padLeft(10 * GlobalConf.UI_SCALE_FACTOR);
+        this.padRight(10 * GlobalConf.UI_SCALE_FACTOR);
 
         // In windows, we need to be able to change drives
         driveButtonsList = new HorizontalGroup();
-        driveButtonsList.left().space(10 * GlobalConf.SCALE_FACTOR);
+        driveButtonsList.left().space(10 * GlobalConf.UI_SCALE_FACTOR);
         File[] drives = File.listRoots();
         driveButtons = new Array<>(drives.length);
         for (File drive : drives) {
@@ -214,7 +214,7 @@ public class FileChooser extends GenericDialog {
         fileNameLabel = new Label("File name:", skin);
         fileNameInput.setTextFieldListener((textField, c) -> result = textField.getText());
 
-        hidden = new OwnCheckBox("Show hidden", skin, 5 * GlobalConf.SCALE_FACTOR);
+        hidden = new OwnCheckBox("Show hidden", skin, 5 * GlobalConf.UI_SCALE_FACTOR);
         hidden.setChecked(false);
         hidden.addListener(event -> {
             if (event instanceof ChangeListener.ChangeEvent) {
@@ -237,7 +237,7 @@ public class FileChooser extends GenericDialog {
         content.add(acceptedFiles).top().left().row();
         content.add(driveButtonsList).top().left().expandX().fillX().row();
         content.add(fileListLabel).top().left().expandX().fillX().row();
-        content.add(scrollPane).size(scrollPaneWidth, 250 * GlobalConf.SCALE_FACTOR).left().fill().expand().row();
+        content.add(scrollPane).size(scrollPaneWidth, 250 * GlobalConf.UI_SCALE_FACTOR).left().fill().expand().row();
         content.add(hidden).top().left().row();
         if (fileNameEnabled) {
             content.add(fileNameLabel).fillX().expandX().row();

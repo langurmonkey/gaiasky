@@ -50,9 +50,9 @@ public class LogWindow extends GenericDialog {
 
     @Override
     protected void build() {
-        w = Math.min(500 * GlobalConf.SCALE_FACTOR, Gdx.graphics.getWidth() - 200);
-        h = Math.min(400 * GlobalConf.SCALE_FACTOR, Gdx.graphics.getHeight() - 150);
-        pad = 10 * GlobalConf.SCALE_FACTOR;
+        w = Math.min(500 * GlobalConf.UI_SCALE_FACTOR, Gdx.graphics.getWidth() - 200);
+        h = Math.min(400 * GlobalConf.UI_SCALE_FACTOR, Gdx.graphics.getHeight() - 150);
+        pad = 10 * GlobalConf.UI_SCALE_FACTOR;
 
         logs = new Table(skin);
         List<MessageBean> list = NotificationsInterface.historical;

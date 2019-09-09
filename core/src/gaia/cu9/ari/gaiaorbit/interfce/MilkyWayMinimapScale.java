@@ -216,7 +216,7 @@ public class MilkyWayMinimapScale implements IMinimapScale {
     }
 
     private float px(float px) {
-        return px * GlobalConf.SCALE_FACTOR;
+        return px * GlobalConf.UI_SCALE_FACTOR;
     }
 
     /** 

@@ -28,7 +28,7 @@ import java.util.Map;
 
 public class DatasetsComponent extends GuiComponent implements IObserver {
     private VerticalGroup group;
-    private float pad = 3 * GlobalConf.SCALE_FACTOR;
+    private float pad = 3 * GlobalConf.UI_SCALE_FACTOR;
 
     private Map<String, HorizontalGroup> groupMap;
     private Map<String, OwnImageButton[]> imageMap;
@@ -77,8 +77,8 @@ public class DatasetsComponent extends GuiComponent implements IObserver {
         scroll.setFadeScrollBars(false);
         scroll.setOverscroll(false, false);
         scroll.setSmoothScrolling(true);
-        scroll.setWidth(140 * GlobalConf.SCALE_FACTOR);
-        scroll.setHeight(GlobalConf.SCALE_FACTOR > 1 ? 90 : 50);
+        scroll.setWidth(140 * GlobalConf.UI_SCALE_FACTOR);
+        scroll.setHeight(GlobalConf.UI_SCALE_FACTOR > 1 ? 90 : 50);
 
         // Controls
         VerticalGroup controls = new VerticalGroup();

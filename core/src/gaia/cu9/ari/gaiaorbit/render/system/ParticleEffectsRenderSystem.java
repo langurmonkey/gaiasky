@@ -190,7 +190,7 @@ public class ParticleEffectsRenderSystem extends ImmediateRenderSystem {
             updatePositions(camera);
 
             // Regular
-            Gdx.gl.glLineWidth(1f * GlobalConf.SCALE_FACTOR);
+            Gdx.gl.glLineWidth(1f * GlobalConf.UI_SCALE_FACTOR);
 
             if (curr != null) {
                 curr.vertexIdx = 0;

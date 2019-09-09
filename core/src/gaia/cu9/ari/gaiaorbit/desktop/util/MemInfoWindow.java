@@ -33,8 +33,8 @@ public class MemInfoWindow extends GenericDialog {
 
     @Override
     protected void build() {
-        float pad = 5 * GlobalConf.SCALE_FACTOR;
-        float tawidth = 500 * GlobalConf.SCALE_FACTOR;
+        float pad = 5 * GlobalConf.UI_SCALE_FACTOR;
+        float tawidth = 500 * GlobalConf.UI_SCALE_FACTOR;
 
         String meminfostr = "";
         for (MemoryPoolMXBean mpBean : ManagementFactory.getMemoryPoolMXBeans()) {

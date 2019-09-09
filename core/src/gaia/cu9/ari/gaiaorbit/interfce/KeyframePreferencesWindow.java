@@ -41,7 +41,7 @@ public class KeyframePreferencesWindow extends GenericDialog {
         // fps
         OwnLabel camfpsLabel = new OwnLabel(I18n.txt("gui.target.fps"), skin);
         camrecFps = new OwnTextField(Integer.toString(GlobalConf.frame.CAMERA_REC_TARGET_FPS), skin, new IntValidator(1, 200));
-        camrecFps.setWidth(150 * GlobalConf.SCALE_FACTOR);
+        camrecFps.setWidth(150 * GlobalConf.UI_SCALE_FACTOR);
 
         OwnLabel interpTitle = new OwnLabel(I18n.txt("gui.keyframes.interp"), skin, "hud-header");
 
@@ -51,7 +51,7 @@ public class KeyframePreferencesWindow extends GenericDialog {
         posMethod.setItems(interpolation);
         posMethod.setSelectedIndex(GlobalConf.frame.KF_PATH_TYPE_POSITION.ordinal());
         posMethod.setItems(interpolation);
-        posMethod.setWidth(150 * GlobalConf.SCALE_FACTOR);
+        posMethod.setWidth(150 * GlobalConf.UI_SCALE_FACTOR);
 
         // Camera orientation
         OwnLabel orientation = new OwnLabel(I18n.txt("gui.cam.orientation"), skin);
@@ -59,7 +59,7 @@ public class KeyframePreferencesWindow extends GenericDialog {
         orientationMethod.setItems(interpolation);
         orientationMethod.setSelectedIndex(GlobalConf.frame.KF_PATH_TYPE_ORIENTATION.ordinal());
         orientationMethod.setItems(interpolation);
-        orientationMethod.setWidth(150 * GlobalConf.SCALE_FACTOR);
+        orientationMethod.setWidth(150 * GlobalConf.UI_SCALE_FACTOR);
 
         // Time
         OwnLabel time = new OwnLabel(I18n.txt("gui.time"), skin);

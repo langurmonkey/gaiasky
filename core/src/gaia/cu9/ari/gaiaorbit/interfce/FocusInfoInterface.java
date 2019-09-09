@@ -68,11 +68,11 @@ public class FocusInfoInterface extends Table implements IObserver, IGuiInterfac
         nf = NumberFormatFactory.getFormatter("##0.###");
         sf = NumberFormatFactory.getFormatter("#0.###E0");
 
-        float buttonSize = 15 * GlobalConf.SCALE_FACTOR;
-        float imgSize = 15 * GlobalConf.SCALE_FACTOR;
-        pad10 = 10 * GlobalConf.SCALE_FACTOR;
-        pad5 = 5 * GlobalConf.SCALE_FACTOR;
-        pad3 = 3 * GlobalConf.SCALE_FACTOR;
+        float buttonSize = 15 * GlobalConf.UI_SCALE_FACTOR;
+        float imgSize = 15 * GlobalConf.UI_SCALE_FACTOR;
+        pad10 = 10 * GlobalConf.UI_SCALE_FACTOR;
+        pad5 = 5 * GlobalConf.UI_SCALE_FACTOR;
+        pad3 = 3 * GlobalConf.UI_SCALE_FACTOR;
 
         focusInfo = new Table();
         focusInfo.pad(pad5);
@@ -175,7 +175,7 @@ public class FocusInfoInterface extends Table implements IObserver, IGuiInterfac
         landAt.addListener(new OwnTextTooltip(I18n.txt("gui.focusinfo.landat"), skin));
 
         bw = Math.max(landOn.getWidth(), landAt.getWidth());
-        bw += 2 * GlobalConf.SCALE_FACTOR;
+        bw += 2 * GlobalConf.UI_SCALE_FACTOR;
 
         goTo.setWidth(bw);
         landOn.setWidth(bw);
@@ -188,7 +188,7 @@ public class FocusInfoInterface extends Table implements IObserver, IGuiInterfac
         focusNameGroup.addActor(landOn);
         focusNameGroup.addActor(landAt);
 
-        float w = 140 * GlobalConf.SCALE_FACTOR;
+        float w = 140 * GlobalConf.UI_SCALE_FACTOR;
         focusId.setWidth(w);
         focusRA.setWidth(w);
         focusDEC.setWidth(w);

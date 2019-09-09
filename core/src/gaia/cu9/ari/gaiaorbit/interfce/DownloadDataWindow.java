@@ -114,11 +114,11 @@ public class DownloadDataWindow extends GenericDialog {
     @Override
     protected void build() {
         me.acceptButton.setDisabled(false);
-        float pad = 2f * GlobalConf.SCALE_FACTOR;
-        float padLarge = 9f * GlobalConf.SCALE_FACTOR;
-        float minW = GlobalConf.SCALE_FACTOR == 1 ? 550f : 650f;
+        float pad = 2f * GlobalConf.UI_SCALE_FACTOR;
+        float padLarge = 9f * GlobalConf.UI_SCALE_FACTOR;
+        float minW = GlobalConf.UI_SCALE_FACTOR == 1 ? 550f : 650f;
 
-        float buttonPad = 1f * GlobalConf.SCALE_FACTOR;
+        float buttonPad = 1f * GlobalConf.UI_SCALE_FACTOR;
 
         Cell<Actor> topCell = content.add((Actor) null);
         topCell.row();
@@ -129,7 +129,7 @@ public class DownloadDataWindow extends GenericDialog {
         OwnLabel catalogsLocLabel = new OwnLabel(I18n.txt("gui.download.location") + ":", skin);
 
         HorizontalGroup hg = new HorizontalGroup();
-        hg.space(15f * GlobalConf.SCALE_FACTOR);
+        hg.space(15f * GlobalConf.UI_SCALE_FACTOR);
         Image system = new Image(skin.getDrawable("tooltip-icon"));
         OwnLabel downloadInfo = new OwnLabel(I18n.txt("gui.download.info"), skin);
         hg.addActor(system);
@@ -341,8 +341,8 @@ public class DownloadDataWindow extends GenericDialog {
         datasetsScroll.setForceScroll(false, false);
         datasetsScroll.setSmoothScrolling(false);
         datasetsScroll.setFadeScrollBars(false);
-        datasetsScroll.setHeight(Math.min(Gdx.graphics.getHeight() * 0.45f, 750f * GlobalConf.SCALE_FACTOR));
-        datasetsScroll.setWidth(Math.min(Gdx.graphics.getWidth() * 0.9f, GlobalConf.SCALE_FACTOR > 1.4f ? 600f * GlobalConf.SCALE_FACTOR : 750f * GlobalConf.SCALE_FACTOR));
+        datasetsScroll.setHeight(Math.min(Gdx.graphics.getHeight() * 0.45f, 750f * GlobalConf.UI_SCALE_FACTOR));
+        datasetsScroll.setWidth(Math.min(Gdx.graphics.getWidth() * 0.9f, GlobalConf.UI_SCALE_FACTOR > 1.4f ? 600f * GlobalConf.UI_SCALE_FACTOR : 750f * GlobalConf.UI_SCALE_FACTOR));
 
         downloadTable.add(datasetsScroll).center().padBottom(padLarge).colspan(2).row();
 
@@ -354,7 +354,7 @@ public class DownloadDataWindow extends GenericDialog {
         downloadButton = new OwnTextButton(I18n.txt("gui.download.download"), skin, "download");
         downloadButton.pad(buttonPad * 4f);
         downloadButton.setMinWidth(minW);
-        downloadButton.setMinHeight(50f * GlobalConf.SCALE_FACTOR);
+        downloadButton.setMinHeight(50f * GlobalConf.UI_SCALE_FACTOR);
         downloadTable.add(downloadButton).center().colspan(2).padBottom(0f).row();
 
         // Progress bar

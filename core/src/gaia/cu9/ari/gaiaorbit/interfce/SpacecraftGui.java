@@ -124,7 +124,7 @@ public class SpacecraftGui extends AbstractGui {
         sb = GlobalResources.spriteBatch;
         ui = new Stage(new ScreenViewport(), sb);
 
-        float factor = GlobalConf.SCALE_FACTOR;
+        float factor = GlobalConf.UI_SCALE_FACTOR;
 
         indicatorw = 300 * factor;
         indicatorh = 300 * factor;
@@ -177,7 +177,7 @@ public class SpacecraftGui extends AbstractGui {
         aiAntivelDec = Decal.newDecal(new TextureRegion(aiAntivelTex));
 
         Material mat = new Material(new TextureAttribute(TextureAttribute.Diffuse, aiTexture), new ColorAttribute(ColorAttribute.Specular, 0.3f, 0.3f, 0.3f, 1f));
-        aiModel = new IntModelBuilder().createSphere(1 * GlobalConf.SCALE_FACTOR, 30, 30, false, mat, Usage.Position | Usage.Normal | Usage.Tangent | Usage.BiNormal | Usage.TextureCoordinates);
+        aiModel = new IntModelBuilder().createSphere(1 * GlobalConf.UI_SCALE_FACTOR, 30, 30, false, mat, Usage.Position | Usage.Normal | Usage.Tangent | Usage.BiNormal | Usage.TextureCoordinates);
         aiTransform = new Matrix4();
         aiModelInstance = new IntModelInstance(aiModel, aiTransform);
         aiViewport = new ExtendViewport(indicatorw, indicatorh, aiCam);
@@ -190,7 +190,7 @@ public class SpacecraftGui extends AbstractGui {
     }
 
     private void buildGui() {
-        float factor = GlobalConf.SCALE_FACTOR;
+        float factor = GlobalConf.UI_SCALE_FACTOR;
 
         /** BUTTONS **/
         buttonContainer = new Container<>();
@@ -535,7 +535,7 @@ public class SpacecraftGui extends AbstractGui {
 
     @Override
     public void render(int rw, int rh) {
-        float factor = GlobalConf.SCALE_FACTOR;
+        float factor = GlobalConf.UI_SCALE_FACTOR;
 
         /** ATTITUDE INDICATOR **/
         aiViewport.setCamera(aiCam);

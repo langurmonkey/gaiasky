@@ -43,7 +43,7 @@ public class CameraComponent extends GuiComponent implements IObserver {
 
     @Override
     public void initialize() {
-        float width = 140 * GlobalConf.SCALE_FACTOR;
+        float width = 140 * GlobalConf.UI_SCALE_FACTOR;
 
         cinematic = new OwnCheckBox(I18n.txt("gui.camera.cinematic"), skin, pad);
         cinematic.setName("cinematic camera");

@@ -50,7 +50,7 @@ public class ChooseCatalogWindow extends GenericDialog {
     @Override
     protected void build() {
         if(notice != null && !notice.isEmpty()){
-            content.add(new OwnLabel(notice, skin)).left().pad(15 * GlobalConf.SCALE_FACTOR).row();
+            content.add(new OwnLabel(notice, skin)).left().pad(15 * GlobalConf.UI_SCALE_FACTOR).row();
         }
 
         Cell<Actor> cell = content.add((Actor) null);
@@ -59,8 +59,8 @@ public class ChooseCatalogWindow extends GenericDialog {
         Array<FileHandle> catalogFiles = dw.buildCatalogFiles();
 
         cell.clearActor();
-        cell.space(3 * GlobalConf.SCALE_FACTOR);
-        cell.padTop(10 * GlobalConf.SCALE_FACTOR);
+        cell.space(3 * GlobalConf.UI_SCALE_FACTOR);
+        cell.padTop(10 * GlobalConf.UI_SCALE_FACTOR);
         cell.setActor(dw.buildDatasetsWidget(catalogFiles));
     }
 

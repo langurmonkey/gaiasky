@@ -202,8 +202,8 @@ public class KeyframesWindow extends GenericDialog implements IObserver {
     public KeyframesWindow(Stage stage, Skin skin) {
         super(I18n.txt("gui.keyframes.title"), skin, stage);
 
-        buttonSize = 15 * GlobalConf.SCALE_FACTOR;
-        buttonSizeL = 17 * GlobalConf.SCALE_FACTOR;
+        buttonSize = 15 * GlobalConf.UI_SCALE_FACTOR;
+        buttonSizeL = 17 * GlobalConf.UI_SCALE_FACTOR;
 
         this.enterExit = false;
         this.editing = new Editing();
@@ -269,7 +269,7 @@ public class KeyframesWindow extends GenericDialog implements IObserver {
             addKeyframe.setDisabled(true);
         });
         secondsInput = new OwnTextField("1.0", skin, secondsValidator);
-        secondsInput.setWidth(60 * GlobalConf.SCALE_FACTOR);
+        secondsInput.setWidth(60 * GlobalConf.UI_SCALE_FACTOR);
         OwnLabel secondsLabel = new OwnLabel(I18n.txt("gui.keyframes.secsafter") + ":", skin);
         left.add(secondsLabel).center().left().padRight(pad).padBottom(pad);
         left.add(secondsInput).center().left().padBottom(pad).row();
@@ -278,7 +278,7 @@ public class KeyframesWindow extends GenericDialog implements IObserver {
         LengthValidator lengthValidator = new LengthValidator(0, 15);
         RegexpValidator nameValidator = new RegexpValidator(lengthValidator, "^[^*&%\\s\\+\\=\\\\\\/@#\\$&\\*()~]*$");
         nameInput = new OwnTextField("", skin, nameValidator);
-        nameInput.setWidth(60 * GlobalConf.SCALE_FACTOR);
+        nameInput.setWidth(60 * GlobalConf.UI_SCALE_FACTOR);
         OwnLabel nameLabel = new OwnLabel(I18n.txt("gui.keyframes.name") + ":", skin);
         left.add(nameLabel).center().left().padRight(pad).padBottom(pad);
         left.add(nameInput).center().left().padBottom(pad).row();
@@ -295,8 +295,8 @@ public class KeyframesWindow extends GenericDialog implements IObserver {
         rightScroll = new OwnScrollPane(keyframesTable, skin, "minimalist-nobg");
         rightScroll.setExpand(true);
         rightScroll.setScrollingDisabled(true, false);
-        rightScroll.setHeight((GlobalConf.SCALE_FACTOR > 1.5f ? 100 : 110) * GlobalConf.SCALE_FACTOR);
-        rightScroll.setWidth((GlobalConf.SCALE_FACTOR > 1.5f ? 360 : 390) * GlobalConf.SCALE_FACTOR);
+        rightScroll.setHeight((GlobalConf.UI_SCALE_FACTOR > 1.5f ? 100 : 110) * GlobalConf.UI_SCALE_FACTOR);
+        rightScroll.setWidth((GlobalConf.UI_SCALE_FACTOR > 1.5f ? 360 : 390) * GlobalConf.UI_SCALE_FACTOR);
         rightScroll.setFadeScrollBars(true);
 
         right.add(keyframesTitle).top().left().padBottom(pad).row();
@@ -470,7 +470,7 @@ public class KeyframesWindow extends GenericDialog implements IObserver {
 
         /** FINAL LAYOUT **/
         content.add(left).top().left().padRight(pad * 2f).padBottom(pad * 3f);
-        content.add(right).width(370f * GlobalConf.SCALE_FACTOR).top().left().padBottom(pad).row();
+        content.add(right).width(370f * GlobalConf.UI_SCALE_FACTOR).top().left().padBottom(pad).row();
         notice = content.add();
         notice.padBottom(pad * 2f).expandY().center().colspan(2).row();
         content.add(normalizeTime).colspan(2).bottom().center().padBottom(pad).row();
@@ -624,7 +624,7 @@ public class KeyframesWindow extends GenericDialog implements IObserver {
     private Cell addFrameSeconds(Keyframe kf, double prevT, int index, Table table) {
         // Seconds
         OwnLabel secondsL = new OwnLabel(secondsFormatter.format(prevT + kf.seconds), skin, "hud-header");
-        secondsL.setWidth((GlobalConf.SCALE_FACTOR > 1.5f ? 60f : 75f) * GlobalConf.SCALE_FACTOR);
+        secondsL.setWidth((GlobalConf.UI_SCALE_FACTOR > 1.5f ? 60f : 75f) * GlobalConf.UI_SCALE_FACTOR);
         Cell secondsCell;
         if (secondsCells.containsKey(kf))
             secondsCell = secondsCells.get(kf);
@@ -649,7 +649,7 @@ public class KeyframesWindow extends GenericDialog implements IObserver {
                         secondsL.clear();
                         secondsCells.get(kf).clearActor();
                         OwnTextField secondsInput = new OwnTextField(valText, skin, new FloatValidator(0.0001f, 500f));
-                        secondsInput.setWidth((GlobalConf.SCALE_FACTOR > 1.5f ? 55f : 75f) * GlobalConf.SCALE_FACTOR);
+                        secondsInput.setWidth((GlobalConf.UI_SCALE_FACTOR > 1.5f ? 55f : 75f) * GlobalConf.UI_SCALE_FACTOR);
                         secondsInput.selectAll();
                         stage.setKeyboardFocus(secondsInput);
                         editing.setSeconds(kf, index, secondsInput, prevT);
@@ -695,7 +695,7 @@ public class KeyframesWindow extends GenericDialog implements IObserver {
     private Cell addFrameName(Keyframe kf, int index, Table table) {
         // Seconds
         OwnLabel nameL = new OwnLabel((index + 1) + ": " + kf.name, skin);
-        nameL.setWidth((GlobalConf.SCALE_FACTOR > 1.5f ? 100f : 130f) * GlobalConf.SCALE_FACTOR);
+        nameL.setWidth((GlobalConf.UI_SCALE_FACTOR > 1.5f ? 100f : 130f) * GlobalConf.UI_SCALE_FACTOR);
         Cell nameCell;
         if (namesCells.containsKey(kf))
             nameCell = namesCells.get(kf);
@@ -724,7 +724,7 @@ public class KeyframesWindow extends GenericDialog implements IObserver {
                     LengthValidator lengthValidator = new LengthValidator(0, 15);
                     RegexpValidator nameValidator = new RegexpValidator(lengthValidator, "^[^*&%\\+\\=\\\\\\/@#\\$&\\*()~]*$");
                     OwnTextField nameInput = new OwnTextField(valText, skin, nameValidator);
-                    nameInput.setWidth((GlobalConf.SCALE_FACTOR > 1.5f ? 100f : 130f) * GlobalConf.SCALE_FACTOR);
+                    nameInput.setWidth((GlobalConf.UI_SCALE_FACTOR > 1.5f ? 100f : 130f) * GlobalConf.UI_SCALE_FACTOR);
                     nameInput.selectAll();
                     stage.setKeyboardFocus(nameInput);
                     editing.setName(kf, index, nameInput);
@@ -765,7 +765,7 @@ public class KeyframesWindow extends GenericDialog implements IObserver {
         long frame = (long) ((t + kf.seconds) * GlobalConf.frame.RENDER_TARGET_FPS);
 
         OwnLabel framesL = new OwnLabel("(" + frame + ")", skin);
-        framesL.setWidth(40 * GlobalConf.SCALE_FACTOR);
+        framesL.setWidth(40 * GlobalConf.UI_SCALE_FACTOR);
         framesL.addListener(new OwnTextTooltip(I18n.txt("gui.tooltip.kf.frames", frame, (1d / GlobalConf.frame.RENDER_TARGET_FPS)), skin));
         addHighlightListener(framesL, kf);
         table.add(framesL).left().padRight(pad).padBottom(pad5);

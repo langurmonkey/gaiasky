@@ -54,9 +54,9 @@ public class VisibilityComponent extends GuiComponent implements IObserver {
     }
 
     public void initialize() {
-        float space4 = 4 * GlobalConf.SCALE_FACTOR;
-        float space2 = 2 * GlobalConf.SCALE_FACTOR;
-        float sliderWidth = 120 * GlobalConf.SCALE_FACTOR;
+        float space4 = 4f * GlobalConf.UI_SCALE_FACTOR;
+        float space2 = 2f * GlobalConf.UI_SCALE_FACTOR;
+        float sliderWidth = 120f * GlobalConf.UI_SCALE_FACTOR;
         int visTableCols = 5;
         final Table visibilityTable = new Table(skin);
         visibilityTable.setName("visibility table");
@@ -92,9 +92,9 @@ public class VisibilityComponent extends GuiComponent implements IObserver {
                         }
                         return false;
                     });
-                    visibilityTable.add(button).pad(GlobalConf.SCALE_FACTOR).left();
+                    visibilityTable.add(button).pad(GlobalConf.UI_SCALE_FACTOR).left();
                     if ((i + 1) % visTableCols == 0) {
-                        visibilityTable.row().padBottom(2 * GlobalConf.SCALE_FACTOR);
+                        visibilityTable.row().padBottom(2f * GlobalConf.UI_SCALE_FACTOR);
                     }
                     buttons.add(button);
                 }
@@ -230,8 +230,8 @@ public class VisibilityComponent extends GuiComponent implements IObserver {
         // Set button width to max width
         visibilityTable.pack();
 
-        visibilityTable.row().padBottom(3 * GlobalConf.SCALE_FACTOR);
-        visibilityTable.add(pmGroup).padTop(4 * GlobalConf.SCALE_FACTOR).align(Align.left).colspan(visTableCols);
+        visibilityTable.row().padBottom(3 * GlobalConf.UI_SCALE_FACTOR);
+        visibilityTable.add(pmGroup).padTop(4 * GlobalConf.UI_SCALE_FACTOR).align(Align.left).colspan(visTableCols);
 
         component = visibilityTable;
     }

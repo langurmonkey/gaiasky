@@ -68,8 +68,8 @@ public class RunCameraWindow extends GenericDialog {
         scroll.setFadeScrollBars(false);
         scroll.setScrollingDisabled(true, false);
 
-        scroll.setHeight(200 * GlobalConf.SCALE_FACTOR);
-        scroll.setWidth(300 * GlobalConf.SCALE_FACTOR);
+        scroll.setHeight(200 * GlobalConf.UI_SCALE_FACTOR);
+        scroll.setWidth(300 * GlobalConf.UI_SCALE_FACTOR);
 
         content.add(scroll).align(Align.center).pad(pad);
         content.row();

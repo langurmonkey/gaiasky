@@ -63,9 +63,9 @@ public class LoadingGui extends AbstractGui {
     @Override
     public void initialize(AssetManager assetManager) {
         interfaces = new Array<>();
-        float pad30 = 30f * GlobalConf.SCALE_FACTOR;
-        float pad10 = 10f * GlobalConf.SCALE_FACTOR;
-        float pad05 = 5f * GlobalConf.SCALE_FACTOR;
+        float pad30 = 30f * GlobalConf.UI_SCALE_FACTOR;
+        float pad10 = 10f * GlobalConf.UI_SCALE_FACTOR;
+        float pad05 = 5f * GlobalConf.UI_SCALE_FACTOR;
         // User interface
         Viewport vp = new ScreenViewport();
         ui = new Stage(vp, GlobalResources.spriteBatch);
@@ -87,14 +87,10 @@ public class LoadingGui extends AbstractGui {
         bottom.right().bottom();
         bottom.pad(pad10);
 
-        FileHandle gslogo = Gdx.files.internal(vr ? "img/gaiasky-vr-logo-s.png" : "img/gaiasky-logo.png");
+        FileHandle gslogo = Gdx.files.internal(vr ? "img/gaiasky-vr-logo-s.png" : (GlobalConf.UI_SCALE_FACTOR > 1f ? "img/gaiasky-logo.png" : "img/gaiasky-logo-s.png"));
         Texture logotex = new Texture(gslogo);
         logotex.setFilter(TextureFilter.Linear, TextureFilter.Linear);
         Image logoimg = new Image(logotex);
-        if(!vr) {
-            float scl = GlobalConf.SCALE_FACTOR / 2.5f;
-            logoimg.setScale(scl);
-        }
         logoimg.setOrigin(Align.center);
 
         lastUpdateTime = 0;
@@ -105,8 +101,7 @@ public class LoadingGui extends AbstractGui {
         spin = new OwnLabel("0", skin, "mono");
         spin.setColor(skin.getColor("theme"));
 
-        center.add(logoimg).center();
-        center.row();
+        center.add(logoimg).center().padBottom(pad10).row();
         center.add(loading).padBottom(pad05).row();
         center.add(spin).padBottom(pad30).row();
 

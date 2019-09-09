@@ -58,7 +58,7 @@ public class HUDGui implements IGui {
     }
 
     private void buildGui() {
-        float pad = 5 * GlobalConf.SCALE_FACTOR;
+        float pad = 5 * GlobalConf.UI_SCALE_FACTOR;
 
         // FOCUS INFORMATION - BOTTOM RIGHT
         focusInterface = new FocusInfoInterface(skin);
@@ -85,14 +85,14 @@ public class HUDGui implements IGui {
         messagesInterface = new MessagesInterface(skin, lock);
         messagesInterface.setFillParent(true);
         messagesInterface.left().bottom();
-        messagesInterface.pad(0, 300 * GlobalConf.SCALE_FACTOR, 150 * GlobalConf.SCALE_FACTOR, 0);
+        messagesInterface.pad(0, 300 * GlobalConf.UI_SCALE_FACTOR, 150 * GlobalConf.UI_SCALE_FACTOR, 0);
         interfaces.add(messagesInterface);
 
         // INPUT STATE
         inputInterface = new RunStateInterface(skin);
         inputInterface.setFillParent(true);
         inputInterface.right().top();
-        inputInterface.pad(50 * GlobalConf.SCALE_FACTOR, 0, 0, pad);
+        inputInterface.pad(50 * GlobalConf.UI_SCALE_FACTOR, 0, 0, pad);
         interfaces.add(inputInterface);
 
         // Add to GUI

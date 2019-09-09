@@ -46,7 +46,7 @@ public class MusicComponent extends GuiComponent implements IObserver {
 
     @Override
     public void initialize() {
-        float componentWidth = 165 * GlobalConf.SCALE_FACTOR;
+        float componentWidth = 165 * GlobalConf.UI_SCALE_FACTOR;
         nf = NumberFormatFactory.getFormatter("##0");
         intf = NumberFormatFactory.getFormatter("#00");
 
@@ -108,12 +108,12 @@ public class MusicComponent extends GuiComponent implements IObserver {
         /** Track name **/
         track = new OwnLabel("", skin, "mono");
 
-        float space3 = 3 * GlobalConf.SCALE_FACTOR;
+        float space3 = 3 * GlobalConf.UI_SCALE_FACTOR;
         VerticalGroup musicGroup = new VerticalGroup().align(Align.left).columnAlign(Align.left).space(space3);
 
         HorizontalGroup playGroup = new HorizontalGroup();
         playGroup.setWidth(componentWidth);
-        playGroup.space(15 * GlobalConf.SCALE_FACTOR);
+        playGroup.space(15 * GlobalConf.UI_SCALE_FACTOR);
         prev.align(Align.left);
         play.align(Align.left);
         next.align(Align.left);
@@ -123,7 +123,7 @@ public class MusicComponent extends GuiComponent implements IObserver {
         playGroup.addActor(vol);
 
         HorizontalGroup trackGroup = new HorizontalGroup();
-        trackGroup.space(10 * GlobalConf.SCALE_FACTOR);
+        trackGroup.space(10 * GlobalConf.UI_SCALE_FACTOR);
         trackGroup.addActor(position);
         trackGroup.addActor(track);
 
@@ -173,7 +173,7 @@ public class MusicComponent extends GuiComponent implements IObserver {
     }
 
     private int getTrackWindowSize() {
-        return GlobalConf.SCALE_FACTOR > 1.5f ? 20 : 14;
+        return GlobalConf.UI_SCALE_FACTOR > 1.5f ? 20 : 14;
     }
 
     private float getVolumePercentage() {

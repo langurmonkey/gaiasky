@@ -63,10 +63,10 @@ public class AboutWindow extends GenericDialog {
 
     @Override
     protected void build() {
-        float taWidth = GlobalConf.SCALE_FACTOR > 1.5f ? 700 : 440;
-        float taWidth2 = 800 * GlobalConf.SCALE_FACTOR;
-        float taHeight = 100 * GlobalConf.SCALE_FACTOR;
-        float tabWidth = 110 * GlobalConf.SCALE_FACTOR;
+        float taWidth = GlobalConf.UI_SCALE_FACTOR > 1.5f ? 700 : 440;
+        float taWidth2 = 800 * GlobalConf.UI_SCALE_FACTOR;
+        float taHeight = 100 * GlobalConf.UI_SCALE_FACTOR;
+        float tabWidth = 110 * GlobalConf.UI_SCALE_FACTOR;
 
         // Create the tab buttons
         HorizontalGroup group = new HorizontalGroup();
@@ -100,7 +100,7 @@ public class AboutWindow extends GenericDialog {
         final Table contentHelp = new Table(skin);
         contentHelp.align(Align.top);
 
-        FileHandle gslogo = Gdx.files.internal(GlobalConf.SCALE_FACTOR > 1.5f ? "img/gaiasky-logo.png" : "img/gaiasky-logo-s.png");
+        FileHandle gslogo = Gdx.files.internal(GlobalConf.UI_SCALE_FACTOR > 1.5f ? "img/gaiasky-logo.png" : "img/gaiasky-logo-s.png");
         Texture logotex = new Texture(gslogo);
         logotex.setFilter(TextureFilter.Linear, TextureFilter.Linear);
         Image gaiasky = new Image(logotex);
@@ -148,7 +148,7 @@ public class AboutWindow extends GenericDialog {
         TextArea intro = new OwnTextArea(I18n.txt("gui.help.gscredits", GlobalConf.version.version), skin.get("regular", TextFieldStyle.class));
         intro.setDisabled(true);
         intro.setPrefRows(3);
-        intro.setWidth(taWidth + 100 * GlobalConf.SCALE_FACTOR);
+        intro.setWidth(taWidth + 100 * GlobalConf.UI_SCALE_FACTOR);
 
         // Home page
         Label homepagetitle = new OwnLabel(I18n.txt("gui.help.homepage"), skin);
@@ -268,7 +268,7 @@ public class AboutWindow extends GenericDialog {
 
         TextButton memoryinfobutton = new OwnTextButton(I18n.txt("gui.help.meminfo"), skin, "default");
         memoryinfobutton.setName("memoryinfo");
-        memoryinfobutton.setSize(150f * GlobalConf.SCALE_FACTOR, 20f * GlobalConf.SCALE_FACTOR);
+        memoryinfobutton.setSize(150f * GlobalConf.UI_SCALE_FACTOR, 20f * GlobalConf.UI_SCALE_FACTOR);
         memoryinfobutton.addListener(event -> {
             if (event instanceof ChangeEvent) {
                 EventManager.instance.post(Events.DISPLAY_MEM_INFO_WINDOW);

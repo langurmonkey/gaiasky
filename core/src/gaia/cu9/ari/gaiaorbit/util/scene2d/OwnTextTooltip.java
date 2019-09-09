@@ -87,7 +87,7 @@ public class OwnTextTooltip extends Tooltip<Label> {
 
         setStyle(style);
 
-        getContainer().pad(5f * GlobalConf.SCALE_FACTOR);
+        getContainer().pad(5f * GlobalConf.UI_SCALE_FACTOR);
     }
 
     public void setStyle(TextTooltipStyle style) {

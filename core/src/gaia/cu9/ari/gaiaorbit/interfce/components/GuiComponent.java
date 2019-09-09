@@ -28,13 +28,13 @@ public abstract class GuiComponent {
     public GuiComponent(Skin skin, Stage stage) {
         this.skin = skin;
         this.stage = stage;
-        pad = 5 * GlobalConf.SCALE_FACTOR;
-        space8 = 8 * GlobalConf.SCALE_FACTOR;
-        space6 = 6 * GlobalConf.SCALE_FACTOR;
-        space4 = 4 * GlobalConf.SCALE_FACTOR;
-        space3 = 3 * GlobalConf.SCALE_FACTOR;
-        space2 = 2 * GlobalConf.SCALE_FACTOR;
-        space1 = 1 * GlobalConf.SCALE_FACTOR;
+        pad = 5 * GlobalConf.UI_SCALE_FACTOR;
+        space8 = 8 * GlobalConf.UI_SCALE_FACTOR;
+        space6 = 6 * GlobalConf.UI_SCALE_FACTOR;
+        space4 = 4 * GlobalConf.UI_SCALE_FACTOR;
+        space3 = 3 * GlobalConf.UI_SCALE_FACTOR;
+        space2 = 2 * GlobalConf.UI_SCALE_FACTOR;
+        space1 = 1 * GlobalConf.UI_SCALE_FACTOR;
     }
 
     /**

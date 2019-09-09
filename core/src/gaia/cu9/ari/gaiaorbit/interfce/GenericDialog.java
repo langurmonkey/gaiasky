@@ -36,8 +36,8 @@ public abstract class GenericDialog extends CollapsibleWindow {
     }
 
     public static void updatePads() {
-        pad = 10f * GlobalConf.SCALE_FACTOR;
-        pad5 = 5f * GlobalConf.SCALE_FACTOR;
+        pad = 10f * GlobalConf.UI_SCALE_FACTOR;
+        pad5 = 5f * GlobalConf.UI_SCALE_FACTOR;
     }
 
     final protected Stage stage;
@@ -96,7 +96,7 @@ public abstract class GenericDialog extends CollapsibleWindow {
     }
 
     protected void recalculateButtonSize() {
-        float w = 80 * GlobalConf.SCALE_FACTOR;
+        float w = 80 * GlobalConf.UI_SCALE_FACTOR;
         for (Actor button : buttonGroup.getChildren()) {
             w = Math.max(button.getWidth() + pad * 4f, w);
         }

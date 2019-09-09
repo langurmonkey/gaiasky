@@ -37,7 +37,7 @@ public class TopInfoInterface extends Table implements IObserver, IGuiInterface 
         super(skin);
         this.setBackground("table-bg");
 
-        float pad = 15f * GlobalConf.SCALE_FACTOR;
+        float pad = 15f * GlobalConf.UI_SCALE_FACTOR;
 
         dfdate = DateFormatFactory.getFormatter(I18n.locale, DateType.DATE);
         dftime = DateFormatFactory.getFormatter(I18n.locale, DateType.TIME);

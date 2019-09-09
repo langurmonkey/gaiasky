@@ -68,7 +68,7 @@ public class ArchiveViewWindow extends GenericDialog {
     @Override
     protected void build(){
         this.linkStyle = skin.get("link", LabelStyle.class);
-        this.pad = 5 * GlobalConf.SCALE_FACTOR;
+        this.pad = 5 * GlobalConf.UI_SCALE_FACTOR;
 
         /** TABLE and SCROLL **/
         table = new Table(skin);

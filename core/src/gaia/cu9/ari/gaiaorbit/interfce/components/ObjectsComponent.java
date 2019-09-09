@@ -62,7 +62,7 @@ public class ObjectsComponent extends GuiComponent implements IObserver {
 
     @Override
     public void initialize() {
-        float componentWidth = 160 * GlobalConf.SCALE_FACTOR;
+        float componentWidth = 160 * GlobalConf.UI_SCALE_FACTOR;
         searchBox = new OwnTextField("", skin);
         searchBox.setName("search box");
         searchBox.setWidth(componentWidth);
@@ -228,7 +228,7 @@ public class ObjectsComponent extends GuiComponent implements IObserver {
             focusListScrollPane.setFadeScrollBars(false);
             focusListScrollPane.setScrollingDisabled(true, false);
 
-            focusListScrollPane.setHeight(tree ? 200 * GlobalConf.SCALE_FACTOR : 100 * GlobalConf.SCALE_FACTOR);
+            focusListScrollPane.setHeight(tree ? 200 * GlobalConf.UI_SCALE_FACTOR : 100 * GlobalConf.UI_SCALE_FACTOR);
             focusListScrollPane.setWidth(componentWidth);
         }
 
@@ -266,7 +266,7 @@ public class ObjectsComponent extends GuiComponent implements IObserver {
     }
 
     private Group visibilitySwitcher(Class<? extends FadeNode> clazz, String title, String id) {
-        float componentWidth = 160 * GlobalConf.SCALE_FACTOR;
+        float componentWidth = 160 * GlobalConf.UI_SCALE_FACTOR;
         VerticalGroup objectsVgroup = new VerticalGroup();
         objectsVgroup.space(space4);
         objectsVgroup.left();
@@ -321,14 +321,14 @@ public class ObjectsComponent extends GuiComponent implements IObserver {
         scrollPane.setFadeScrollBars(false);
         scrollPane.setScrollingDisabled(true, false);
 
-        scrollPane.setHeight(Math.min(100 * GlobalConf.SCALE_FACTOR, objectsVgroup.getHeight()));
+        scrollPane.setHeight(Math.min(100 * GlobalConf.UI_SCALE_FACTOR, objectsVgroup.getHeight()));
         scrollPane.setWidth(componentWidth);
 
         HorizontalGroup buttons = new HorizontalGroup();
         buttons.space(space4);
         OwnTextButton selAll = new OwnTextButton(I18n.txt("gui.select.all"), skin);
         selAll.pad(space2, space8, space2, space8);
-        selAll.setHeight(18 * GlobalConf.SCALE_FACTOR);
+        selAll.setHeight(18 * GlobalConf.UI_SCALE_FACTOR);
         selAll.addListener((event) -> {
             if (event instanceof ChangeEvent) {
                 Gdx.app.postRunnable(() -> cbs.stream().forEach((i) -> i.setChecked(true)));
@@ -338,7 +338,7 @@ public class ObjectsComponent extends GuiComponent implements IObserver {
         });
         OwnTextButton selNone = new OwnTextButton(I18n.txt("gui.select.none"), skin);
         selNone.pad(space2, space8, space2, space8);
-        selNone.setHeight(18 * GlobalConf.SCALE_FACTOR);
+        selNone.setHeight(18 * GlobalConf.UI_SCALE_FACTOR);
         selNone.addListener((event) -> {
             if (event instanceof ChangeEvent) {
                 Gdx.app.postRunnable(() -> cbs.stream().forEach((i) -> i.setChecked(false)));

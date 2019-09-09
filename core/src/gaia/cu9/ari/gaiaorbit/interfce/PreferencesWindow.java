@@ -107,14 +107,14 @@ public class PreferencesWindow extends GenericDialog {
 
     @Override
     protected void build() {
-        float contentw = 700 * GlobalConf.SCALE_FACTOR;
-        float contenth = 700 * GlobalConf.SCALE_FACTOR;
-        final float tawidth = 400 * GlobalConf.SCALE_FACTOR;
-        float tabwidth = (GlobalConf.SCALE_FACTOR > 1.5 ? 180 : 220) * GlobalConf.SCALE_FACTOR;
-        float textwidth = 65 * GlobalConf.SCALE_FACTOR;
-        float scrollh = 400 * GlobalConf.SCALE_FACTOR;
-        float controlsscrollw = 450 * GlobalConf.SCALE_FACTOR;
-        float controllsscrollh = 250 * GlobalConf.SCALE_FACTOR;
+        float contentw = 700 * GlobalConf.UI_SCALE_FACTOR;
+        float contenth = 700 * GlobalConf.UI_SCALE_FACTOR;
+        final float tawidth = 400 * GlobalConf.UI_SCALE_FACTOR;
+        float tabwidth = (GlobalConf.UI_SCALE_FACTOR > 1.5 ? 180 : 220) * GlobalConf.UI_SCALE_FACTOR;
+        float textwidth = 65 * GlobalConf.UI_SCALE_FACTOR;
+        float scrollh = 400 * GlobalConf.UI_SCALE_FACTOR;
+        float controlsscrollw = 450 * GlobalConf.UI_SCALE_FACTOR;
+        float controllsscrollh = 250 * GlobalConf.UI_SCALE_FACTOR;
         float sliderWidth = textwidth * 3;
 
         // Create the tab buttons
@@ -1438,7 +1438,7 @@ public class PreferencesWindow extends GenericDialog {
         datasetChooser.setChecked(GlobalConf.program.DISPLAY_DATASET_DIALOG);
 
         OwnTextButton dataDownload = new OwnTextButton(I18n.txt("gui.download.title"), skin);
-        dataDownload.setSize(150 * GlobalConf.SCALE_FACTOR, 25 * GlobalConf.SCALE_FACTOR);
+        dataDownload.setSize(150 * GlobalConf.UI_SCALE_FACTOR, 25 * GlobalConf.UI_SCALE_FACTOR);
         dataDownload.addListener((event) -> {
             if (event instanceof ChangeEvent) {
                 if (DataDescriptor.currentDataDescriptor != null) {
@@ -1556,7 +1556,7 @@ public class PreferencesWindow extends GenericDialog {
 
             return false;
         });
-        reloadDefaults.setSize(180 * GlobalConf.SCALE_FACTOR, 25 * GlobalConf.SCALE_FACTOR);
+        reloadDefaults.setSize(180 * GlobalConf.UI_SCALE_FACTOR, 25 * GlobalConf.UI_SCALE_FACTOR);
 
         OwnLabel warningLabel = new OwnLabel(I18n.txt("gui.system.reloaddefaults.warn"), skin, "default-red");
 
@@ -1804,7 +1804,7 @@ public class PreferencesWindow extends GenericDialog {
             EventManager.instance.post(Events.DISPLAY_POINTER_COORDS_CMD, GlobalConf.program.DISPLAY_POINTER_COORDS);
         }
         // Update scale factor according to theme - for HiDPI screens
-        GlobalConf.updateScaleFactor(GlobalConf.program.UI_THEME.endsWith("x2") ? 2f : 1f);
+        GlobalConf.updateScaleFactor(GlobalConf.program.UI_THEME.endsWith("x2") ? 1.8f : 1f);
 
         // Crosshairs
         GlobalConf.scene.CROSSHAIR_FOCUS = crosshairFocus.isChecked();

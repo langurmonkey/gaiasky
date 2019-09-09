@@ -159,9 +159,9 @@ public class VertGPURenderSystem<T extends IGPUVertsRenderable> extends Immediat
 
             // Regular
             if (isLine())
-                Gdx.gl.glLineWidth(renderable.getPrimitiveSize() * GlobalConf.SCALE_FACTOR);
+                Gdx.gl.glLineWidth(renderable.getPrimitiveSize() * GlobalConf.UI_SCALE_FACTOR);
             if (isPoint())
-                shaderProgram.setUniformf("u_pointSize", renderable.getPrimitiveSize() * GlobalConf.SCALE_FACTOR);
+                shaderProgram.setUniformf("u_pointSize", renderable.getPrimitiveSize() * GlobalConf.UI_SCALE_FACTOR);
 
             shaderProgram.setUniformMatrix("u_worldTransform", renderable.getLocalTransform());
             shaderProgram.setUniformMatrix("u_projModelView", camera.getCamera().combined);

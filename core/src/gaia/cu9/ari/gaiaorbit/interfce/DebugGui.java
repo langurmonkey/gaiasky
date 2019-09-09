@@ -33,7 +33,7 @@ public class DebugGui extends AbstractGui {
 
     @Override
     public void doneLoading(AssetManager assetManager) {
-        float pad = 10 * GlobalConf.SCALE_FACTOR;
+        float pad = 10 * GlobalConf.UI_SCALE_FACTOR;
         skin = GlobalResources.skin;
 
         // DEBUG INFO - TOP RIGHT

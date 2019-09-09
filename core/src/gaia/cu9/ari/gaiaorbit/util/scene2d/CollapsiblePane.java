@@ -60,7 +60,7 @@ public class CollapsiblePane extends Table {
         this.labelText = labelText;
         this.content = content;
         this.skin = skin;
-        this.space = 4 * GlobalConf.SCALE_FACTOR;
+        this.space = 4 * GlobalConf.UI_SCALE_FACTOR;
         this.collapseSpeed = 1000;
 
         Label mainLabel = new Label(labelText, skin, labelStyle);
@@ -99,7 +99,7 @@ public class CollapsiblePane extends Table {
         Table headerTable = new Table();
 
         HorizontalGroup titleGroup = new HorizontalGroup();
-        titleGroup.space(3 * GlobalConf.SCALE_FACTOR);
+        titleGroup.space(3 * GlobalConf.UI_SCALE_FACTOR);
         titleGroup.addActor(mainLabel);
         if (shortcut != null && !shortcut.isEmpty())
             titleGroup.addActor(questionLabel);
@@ -119,13 +119,13 @@ public class CollapsiblePane extends Table {
         headerGroupRight.addActor(expandIcon);
         headerGroupRight.addActor(detachIcon);
 
-        headerTable.add(titleGroup).left().padRight(4 * GlobalConf.SCALE_FACTOR);
-        headerTable.add(headerGroupLeft).left().pad(4 * GlobalConf.SCALE_FACTOR);
+        headerTable.add(titleGroup).left().padRight(4 * GlobalConf.UI_SCALE_FACTOR);
+        headerTable.add(headerGroupLeft).left().pad(4 * GlobalConf.UI_SCALE_FACTOR);
         headerTable.add().expandX();
         headerTable.add(headerGroupRight).right();
 
-        add(headerTable).padBottom(this.space).prefWidth(195 * GlobalConf.SCALE_FACTOR).row();
-        contentCell = add().prefHeight(0).prefWidth(195 * GlobalConf.SCALE_FACTOR);
+        add(headerTable).padBottom(this.space).prefWidth(195 * GlobalConf.UI_SCALE_FACTOR).row();
+        contentCell = add().prefHeight(0).prefWidth(195 * GlobalConf.UI_SCALE_FACTOR);
 
         if (expanded)
             contentCell.setActor(content);

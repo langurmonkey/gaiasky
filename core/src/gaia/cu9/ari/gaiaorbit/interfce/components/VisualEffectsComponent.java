@@ -38,7 +38,7 @@ public class VisualEffectsComponent extends GuiComponent implements IObserver {
     }
 
     public void initialize() {
-        float sliderWidth = 140 * GlobalConf.SCALE_FACTOR;
+        float sliderWidth = 140 * GlobalConf.UI_SCALE_FACTOR;
         /** Star brightness **/
         Label sbrightnessLabel = new Label(I18n.txt("gui.starbrightness"), skin, "default");
         starbrightnessl = new OwnLabel(Integer.toString((int) (MathUtilsd.lint(GlobalConf.scene.STAR_BRIGHTNESS, Constants.MIN_STAR_BRIGHT, Constants.MAX_STAR_BRIGHT, Constants.MIN_SLIDER, Constants.MAX_SLIDER))), skin);

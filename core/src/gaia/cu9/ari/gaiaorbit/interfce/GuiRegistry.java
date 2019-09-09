@@ -344,9 +344,9 @@ public class GuiRegistry implements IObserver {
             case MODE_POPUP_CMD:
                 ModePopupInfo mpi = (ModePopupInfo) data[0];
                 Float seconds = (Float) data[1];
-                float pad10 = 10f * GlobalConf.SCALE_FACTOR;
-                float pad5 = 5f * GlobalConf.SCALE_FACTOR;
-                float pad3 = 3f * GlobalConf.SCALE_FACTOR;
+                float pad10 = 10f * GlobalConf.UI_SCALE_FACTOR;
+                float pad5 = 5f * GlobalConf.UI_SCALE_FACTOR;
+                float pad3 = 3f * GlobalConf.UI_SCALE_FACTOR;
                 if (modeChangeTable != null) {
                     modeChangeTable.remove();
                 }

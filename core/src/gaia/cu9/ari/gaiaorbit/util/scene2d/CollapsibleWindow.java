@@ -84,7 +84,7 @@ public class CollapsibleWindow extends Window {
         this.me = this;
         this.skin = skin;
         this.collapseSpeed = collapseSpeed;
-        this.collapseHeight = 20f * GlobalConf.SCALE_FACTOR;
+        this.collapseHeight = 20f * GlobalConf.UI_SCALE_FACTOR;
 
         vec2 = new Vector2();
         addListener(new ClickListener() {
@@ -116,7 +116,7 @@ public class CollapsibleWindow extends Window {
         });
 
         // Pad title cell
-        getTitleTable().getCells().get(0).padLeft(5 * GlobalConf.SCALE_FACTOR);
+        getTitleTable().getCells().get(0).padLeft(5 * GlobalConf.UI_SCALE_FACTOR);
         // Mouse pointer on title
         getTitleTable().addListener(event -> {
             if (event instanceof InputEvent) {

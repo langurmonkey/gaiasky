@@ -269,16 +269,16 @@ public class ControlsWindow extends CollapsibleWindow implements IObserver {
 
         /** ADD GROUPS TO VERTICAL LAYOUT **/
 
-        int padBottom = Math.round(10 * GlobalConf.SCALE_FACTOR);
-        int padSides = Math.round(5 * GlobalConf.SCALE_FACTOR);
-        int padSeparator = Math.round(2 * GlobalConf.SCALE_FACTOR);
+        int padBottom = Math.round(10 * GlobalConf.UI_SCALE_FACTOR);
+        int padSides = Math.round(5 * GlobalConf.UI_SCALE_FACTOR);
+        int padSeparator = Math.round(2 * GlobalConf.UI_SCALE_FACTOR);
 
         guiLayout.padTop(padSides);
 
         int size = mainActors.size();
         for (int i = 0; i < size; i++) {
             Actor actor = mainActors.get(i);
-            guiLayout.add(actor).prefWidth(175 * GlobalConf.SCALE_FACTOR).left().padBottom(padBottom).padLeft(padSides);
+            guiLayout.add(actor).prefWidth(175 * GlobalConf.UI_SCALE_FACTOR).left().padBottom(padBottom).padLeft(padSides);
             if (i < size - 1) {
                 // Not last
                 guiLayout.row();
@@ -287,7 +287,7 @@ public class ControlsWindow extends CollapsibleWindow implements IObserver {
             }
         }
         guiLayout.align(Align.top | Align.left);
-        guiLayout.setWidth(200 * GlobalConf.SCALE_FACTOR);
+        guiLayout.setWidth(200 * GlobalConf.UI_SCALE_FACTOR);
 
         windowScroll = new OwnScrollPane(guiLayout, skin, "minimalist-nobg");
         windowScroll.setFadeScrollBars(false);

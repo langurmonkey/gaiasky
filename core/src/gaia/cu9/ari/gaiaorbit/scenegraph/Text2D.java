@@ -93,8 +93,8 @@ public class Text2D extends FadeNode implements I3DTextRenderable, IShapeRendera
         float x0bottom = (rc.w() - lenwbottom) / 2f;
         float x1bottom = x0bottom + lenwbottom;
 
-        float ytop = (60f + 15f * scale) * GlobalConf.SCALE_FACTOR;
-        float ybottom = (60f - lineHeight * scale + 10f * scale) * GlobalConf.SCALE_FACTOR;
+        float ytop = (60f + 15f * scale) * GlobalConf.UI_SCALE_FACTOR;
+        float ybottom = (60f - lineHeight * scale + 10f * scale) * GlobalConf.UI_SCALE_FACTOR;
 
         // Resize batch
         shapeRenderer.setProjectionMatrix(shapeRenderer.getProjectionMatrix().setToOrtho2D(0, 0, rc.w(), rc.h()));
@@ -120,7 +120,7 @@ public class Text2D extends FadeNode implements I3DTextRenderable, IShapeRendera
         batch.setProjectionMatrix(batch.getProjectionMatrix().setToOrtho2D(0, 0, rc.w(), rc.h()));
 
         // Text
-        render2DLabel(batch, shader, rc, sys.fontTitles, camera, text(), 0, 60f * GlobalConf.SCALE_FACTOR, scale * GlobalConf.SCALE_FACTOR, align);
+        render2DLabel(batch, shader, rc, sys.fontTitles, camera, text(), 0, 60f * GlobalConf.UI_SCALE_FACTOR, scale * GlobalConf.UI_SCALE_FACTOR, align);
 
         lineHeight = sys.fontTitles.getLineHeight();
     }

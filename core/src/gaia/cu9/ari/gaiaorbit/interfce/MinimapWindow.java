@@ -32,9 +32,9 @@ public class MinimapWindow extends GenericDialog {
 
     public MinimapWindow(Stage stage, Skin skin) {
         super(I18n.txt("gui.minimap.title"), skin, stage);
-        side = (int) (GlobalConf.SCALE_FACTOR * 225);
+        side = (int) (GlobalConf.UI_SCALE_FACTOR * 225);
         side2 = side / 2;
-        sideshort = (int) (GlobalConf.SCALE_FACTOR * 112.5);
+        sideshort = (int) (GlobalConf.UI_SCALE_FACTOR * 112.5);
         sideshort2 = sideshort / 2;
 
         setModal(false);
@@ -46,7 +46,7 @@ public class MinimapWindow extends GenericDialog {
 
         SpriteBatch sb = new SpriteBatch(1000, GlobalResources.spriteShader);
 
-        BitmapFont font = skin.getFont(GlobalConf.SCALE_FACTOR != 1 ? "ui-20" : "ui-11");
+        BitmapFont font = skin.getFont(GlobalConf.UI_SCALE_FACTOR != 1 ? "ui-20" : "ui-11");
 
         tfb = new FrameBuffer(Format.RGBA8888, side, side, true);
         sfb = new FrameBuffer(Format.RGBA8888, side, sideshort, true);
@@ -74,7 +74,7 @@ public class MinimapWindow extends GenericDialog {
 
     @Override
     protected void build() {
-        float pb = 10 * GlobalConf.SCALE_FACTOR;
+        float pb = 10 * GlobalConf.UI_SCALE_FACTOR;
         OwnLabel headerSide = new OwnLabel(I18n.txt("gui.minimap.side"), skin, "header");
         Container<TextureWidget> mapSide = new Container<TextureWidget>();
         mapSide.setActor(sideProjection);

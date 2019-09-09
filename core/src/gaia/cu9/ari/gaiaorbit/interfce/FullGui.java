@@ -95,8 +95,8 @@ public class FullGui extends AbstractGui {
     }
 
     protected void buildGui() {
-        float pad = 10f * GlobalConf.SCALE_FACTOR;
-        float pads = 5f * GlobalConf.SCALE_FACTOR;
+        float pad = 10f * GlobalConf.UI_SCALE_FACTOR;
+        float pads = 5f * GlobalConf.UI_SCALE_FACTOR;
         // Component types name init
         for (ComponentType ct : ComponentType.values()) {
             ct.getName();
@@ -196,7 +196,7 @@ public class FullGui extends AbstractGui {
                             UpdatePopup newVersion = new UpdatePopup(tagVersion, ui, skin);
                             newVersion.pack();
                             float ww = newVersion.getWidth();
-                            float margin = 5 * GlobalConf.SCALE_FACTOR;
+                            float margin = 5 * GlobalConf.UI_SCALE_FACTOR;
                             newVersion.setPosition(Gdx.graphics.getWidth() - ww - margin, margin);
                             ui.addActor(newVersion);
                         } else {
@@ -399,9 +399,9 @@ public class FullGui extends AbstractGui {
                 Integer y = (Integer) data[5];
 
                 pointerXCoord.setText("RA/".concat(nf.format(ra)).concat("°"));
-                pointerXCoord.setPosition(x, GlobalConf.SCALE_FACTOR);
+                pointerXCoord.setPosition(x, GlobalConf.UI_SCALE_FACTOR);
                 pointerYCoord.setText("DEC/".concat(nf.format(dec)).concat("°"));
-                pointerYCoord.setPosition(Gdx.graphics.getWidth() + GlobalConf.SCALE_FACTOR, Gdx.graphics.getHeight() - y);
+                pointerYCoord.setPosition(Gdx.graphics.getWidth() + GlobalConf.UI_SCALE_FACTOR, Gdx.graphics.getHeight() - y);
             }
             break;
         case LON_LAT_UPDATED:
@@ -412,9 +412,9 @@ public class FullGui extends AbstractGui {
                 Integer y = (Integer) data[3];
 
                 pointerXCoord.setText("Lon/".concat(nf.format(lon)).concat("°"));
-                pointerXCoord.setPosition(x, GlobalConf.SCALE_FACTOR);
+                pointerXCoord.setPosition(x, GlobalConf.UI_SCALE_FACTOR);
                 pointerYCoord.setText("Lat/".concat(nf.format(lat)).concat("°"));
-                pointerYCoord.setPosition(Gdx.graphics.getWidth() + GlobalConf.SCALE_FACTOR, Gdx.graphics.getHeight() - y);
+                pointerYCoord.setPosition(Gdx.graphics.getWidth() + GlobalConf.UI_SCALE_FACTOR, Gdx.graphics.getHeight() - y);
             }
             break;
         case DISPLAY_POINTER_COORDS_CMD:
@@ -432,7 +432,7 @@ public class FullGui extends AbstractGui {
             int h = Gdx.graphics.getHeight();
 
             float px = screenX;
-            float py = h - screenY - 20 * GlobalConf.SCALE_FACTOR;
+            float py = h - screenY - 20 * GlobalConf.UI_SCALE_FACTOR;
 
             popup.showMenu(ui, px, py);
 

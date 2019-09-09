@@ -56,12 +56,12 @@ public class GlobalConf {
     // macOS needs fully qualified paths when run as an app (GaiaSky.app), that's why we use the getAbsolutePath() part
     public static final String ASSETS_LOC = (new File(System.getProperty("assets.location") != null ? System.getProperty("assets.location") : ".")).getAbsolutePath();
 
-    // Scale factor
-    public static float SCALE_FACTOR = -1.0f;
+    // Interface scale factor (for HiDPI)
+    public static float UI_SCALE_FACTOR = -1.0f;
 
     public static void updateScaleFactor(float sf) {
-        SCALE_FACTOR = sf;
-        logger.debug("GUI scale factor set to " + GlobalConf.SCALE_FACTOR);
+        UI_SCALE_FACTOR = sf;
+        logger.debug("GUI scale factor set to " + GlobalConf.UI_SCALE_FACTOR);
     }
 
     public interface IConf {

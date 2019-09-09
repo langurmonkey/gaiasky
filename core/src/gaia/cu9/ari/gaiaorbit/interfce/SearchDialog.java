@@ -52,7 +52,7 @@ public class SearchDialog extends GenericDialog {
     public void build() {
         // Info message
         searchInput = new OwnTextField("", skin);
-        searchInput.setWidth(300 * GlobalConf.SCALE_FACTOR);
+        searchInput.setWidth(300 * GlobalConf.UI_SCALE_FACTOR);
         searchInput.setMessageText(I18n.bundle.get("gui.objects.search"));
         searchInput.addListener(event -> {
             if (event instanceof InputEvent) {

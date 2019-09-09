@@ -73,7 +73,7 @@ public class MWModelRenderSystem extends ImmediateRenderSystem implements IObser
     }
 
     private GpuData convertDataToGpu(Array<? extends ParticleBean> data, ColorGenerator cg, boolean dust) {
-        float hiDpiScaleFactor = GlobalConf.SCALE_FACTOR;
+        float hiDpiScaleFactor = GlobalConf.UI_SCALE_FACTOR;
 
         GpuData ad = new GpuData();
 
