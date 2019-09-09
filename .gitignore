@@ -78,3 +78,7 @@ pickled_dict
 ################
 **/.gradle
 .gitchangelog.rc
+
+# VR logs #
+###########
+**/openovr_log
