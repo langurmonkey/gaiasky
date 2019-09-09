@@ -271,7 +271,7 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
         // Mouse and keyboard listeners
         naturalMouseKbdListener = new NaturalMouseKbdListener(this);
         gameMouseKbdListener = new GameMouseKbdListener(this);
-        currentMouseKbdListener = null;
+        currentMouseKbdListener = naturalMouseKbdListener;
         // Controller listeners
         controllerListener = new NaturalControllerListener(this, GlobalConf.controls.CONTROLLER_MAPPINGS_FILE);
         if (vr)

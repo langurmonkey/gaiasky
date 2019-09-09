@@ -466,10 +466,6 @@ public class KeyBindings {
             this.conditions = conditions;
         }
 
-        ProgramAction(String actionName, Runnable action) {
-            this(actionName, action, null);
-        }
-
         @Override
         public void run() {
             if (evaluateConditions())
