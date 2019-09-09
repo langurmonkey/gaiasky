@@ -145,6 +145,7 @@ public class MaterialComponent implements IObserver {
         if (tex == null)
             return null;
 
+        logger.info(I18n.txt("notif.loading", tex));
         tex = GlobalResources.unpackTexName(tex);
         AssetBean.addAsset(tex, Texture.class, texParams);
 

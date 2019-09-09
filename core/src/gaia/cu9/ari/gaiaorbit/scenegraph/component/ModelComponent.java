@@ -160,16 +160,16 @@ public class ModelComponent implements Disposable, IObserver {
             materials = modmat.getSecond();
         }
 
-        // INITIALIZE MATERIAL
-        if ((forceInit || !GlobalConf.scene.LAZY_TEXTURE_INIT) && mtc != null) {
-            mtc.initMaterial(manager, materials.get("base"), materials.get("ring"), cc, culling);
-            mtc.texLoading = false;
-            mtc.texInitialised = true;
-        }
-
         // CREATE MAIN MODEL INSTANCE
         if (!mesh || !GlobalConf.scene.LAZY_MESH_INIT) {
             instance = new IntModelInstance(model, localTransform);
+        }
+
+        // INITIALIZE MATERIAL
+        if ((forceInit || !GlobalConf.scene.LAZY_TEXTURE_INIT) && mtc != null) {
+            mtc.initMaterial(manager, instance, cc, culling);
+            mtc.texLoading = false;
+            mtc.texInitialised = true;
         }
 
         // COLOR IF NO TEXTURE

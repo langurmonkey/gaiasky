@@ -22,50 +22,47 @@ public class TextureExtAttribute extends TextureAttribute {
         TextureAttribute.Mask |= Height | Night;
     }
 
-    public static TextureAttribute createHeight (final Texture texture) {
-        return new TextureAttribute(Height, texture);
+    public static TextureExtAttribute createHeight(final Texture texture) {
+        return new TextureExtAttribute(Height, texture);
     }
 
-    public static TextureAttribute createHeight (final TextureRegion region) {
-        return new TextureAttribute(Height, region);
+    public static TextureExtAttribute createHeight(final TextureRegion region) {
+        return new TextureExtAttribute(Height, region);
     }
 
-
-    public static TextureAttribute createNight (final Texture texture) {
-        return new TextureAttribute(Night, texture);
+    public static TextureExtAttribute createNight(final Texture texture) {
+        return new TextureExtAttribute(Night, texture);
     }
 
-    public static TextureAttribute createNight (final TextureRegion region) {
-        return new TextureAttribute(Night, region);
+    public static TextureExtAttribute createNight(final TextureRegion region) {
+        return new TextureExtAttribute(Night, region);
     }
 
-    public TextureExtAttribute (final long type) {
+    public TextureExtAttribute(final long type) {
         super(type);
     }
 
-    public <T extends Texture> TextureExtAttribute (final long type, final TextureDescriptor<T> textureDescription) {
+    public <T extends Texture> TextureExtAttribute(final long type, final TextureDescriptor<T> textureDescription) {
         super(type, textureDescription);
     }
 
-    public <T extends Texture> TextureExtAttribute (final long type, final TextureDescriptor<T> textureDescription, float offsetU,
-            float offsetV, float scaleU, float scaleV, int uvIndex) {
+    public <T extends Texture> TextureExtAttribute(final long type, final TextureDescriptor<T> textureDescription, float offsetU, float offsetV, float scaleU, float scaleV, int uvIndex) {
         super(type, textureDescription, offsetU, offsetV, scaleU, scaleV, uvIndex);
     }
 
-    public <T extends Texture> TextureExtAttribute (final long type, final TextureDescriptor<T> textureDescription, float offsetU,
-            float offsetV, float scaleU, float scaleV) {
+    public <T extends Texture> TextureExtAttribute(final long type, final TextureDescriptor<T> textureDescription, float offsetU, float offsetV, float scaleU, float scaleV) {
         super(type, textureDescription, offsetU, offsetV, scaleU, scaleV);
     }
 
-    public TextureExtAttribute (final long type, final Texture texture) {
+    public TextureExtAttribute(final long type, final Texture texture) {
         super(type, texture);
     }
 
-    public TextureExtAttribute (final long type, final TextureRegion region) {
+    public TextureExtAttribute(final long type, final TextureRegion region) {
         super(type, region);
     }
 
-    public TextureExtAttribute (final TextureAttribute copyFrom) {
+    public TextureExtAttribute(final TextureAttribute copyFrom) {
         super(copyFrom);
     }
 }
