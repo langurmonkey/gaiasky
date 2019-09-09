@@ -1147,7 +1147,7 @@ public class GlobalConf {
         /**
          * Initializes meshes lazily
          **/
-        public boolean LAZY_MESH_INIT = true;
+        public boolean LAZY_MESH_INIT;
 
         /**
          * How to represent elevation, if elevation textures present:
@@ -1231,7 +1231,7 @@ public class GlobalConf {
         }
 
         public void initialize(String sTARTUP_OBJECT, GraphicsQuality gRAPHICS_QUALITY, long oBJECT_FADE_MS, float sTAR_BRIGHTNESS, float aMBIENT_LIGHT, int cAMERA_FOV, float cAMERA_SPEED, float tURNING_SPEED, float rOTATION_SPEED, int cAMERA_SPEED_LIMIT_IDX, boolean fOCUS_LOCK, boolean fOCUS_LOCK_ORIENTATION, float lABEL_SIZE_FACTOR, float lABEL_NUMBER_FACTOR, boolean[] vISIBILITY, int oRBIT_RENDERER, int lINE_RENDERER, double sTAR_TH_ANGLE_NONE, double sTAR_TH_ANGLE_POINT, double sTAR_TH_ANGLE_QUAD,
-                float pOINT_ALPHA_MIN, float pOINT_ALPHA_MAX, boolean oCTREE_PARTICLE_FADE, float oCTANT_TH_ANGLE_0, float oCTANT_TH_ANGLE_1, float pM_NUM_FACTOR, float pM_LEN_FACTOR, long n_PM_STARS, int pM_COLOR_MODE, boolean pM_ARROWHEADS, float sTAR_POINT_SIZE, boolean gALAXY_3D, int cUBEMAP_FACE_RESOLUTION, boolean cROSSHAIR_FOCUS, boolean cROSSHAIR_CLOSEST, boolean cROSSHAIR_HOME, boolean cINEMATIC_CAMERA, boolean lAZY_TEXTURE_INIT, boolean fREE_CAMERA_TARGET_MODE_ON, boolean sHADOW_MAPPING, int sHADOW_MAPPING_N_SHADOWS,
+                float pOINT_ALPHA_MIN, float pOINT_ALPHA_MAX, boolean oCTREE_PARTICLE_FADE, float oCTANT_TH_ANGLE_0, float oCTANT_TH_ANGLE_1, float pM_NUM_FACTOR, float pM_LEN_FACTOR, long n_PM_STARS, int pM_COLOR_MODE, boolean pM_ARROWHEADS, float sTAR_POINT_SIZE, boolean gALAXY_3D, int cUBEMAP_FACE_RESOLUTION, boolean cROSSHAIR_FOCUS, boolean cROSSHAIR_CLOSEST, boolean cROSSHAIR_HOME, boolean cINEMATIC_CAMERA, boolean lAZY_TEXTURE_INIT, boolean lAZY_MESH_INIT, boolean fREE_CAMERA_TARGET_MODE_ON, boolean sHADOW_MAPPING, int sHADOW_MAPPING_N_SHADOWS,
                 int sHADOW_MAPPING_RESOLUTION, long mAX_LOADED_STARS, ElevationType eLEVATION_TYPE, double eLEVATION_MULTIPLIER, double tESSELLATION_QUALITY, double dIST_SCALE_DESKTOP, double dIST_SCALE_VR) {
             STARTUP_OBJECT = sTARTUP_OBJECT;
             GRAPHICS_QUALITY = gRAPHICS_QUALITY;
@@ -1274,6 +1274,7 @@ public class GlobalConf {
             CROSSHAIR_HOME = cROSSHAIR_HOME;
             CINEMATIC_CAMERA = cINEMATIC_CAMERA;
             LAZY_TEXTURE_INIT = lAZY_TEXTURE_INIT;
+            LAZY_MESH_INIT = lAZY_MESH_INIT;
             SHADOW_MAPPING = sHADOW_MAPPING;
             SHADOW_MAPPING_N_SHADOWS = sHADOW_MAPPING_N_SHADOWS;
             SHADOW_MAPPING_RESOLUTION = sHADOW_MAPPING_RESOLUTION;

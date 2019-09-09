@@ -399,12 +399,6 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
                     EventManager.instance.post(Events.TOGGLE_VISIBILITY_CMD, "element.others", false, true);
                 }
                 return VRStatus.OK;
-            } catch(ControllerModelNotFoundException e){
-                // If initializing the VRContext failed
-                logger.debug(e);
-                logger.error(e.getLocalizedMessage());
-                logger.error("Initialisation of VR context failed");
-                return VRStatus.ERROR_RENDERMODEL;
             } catch (Exception e) {
                 // If initializing the VRContext failed
                 logger.debug(e);
