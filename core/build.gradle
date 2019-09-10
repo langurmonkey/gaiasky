@@ -240,7 +240,6 @@ task gaiaskyJar (dependsOn: [compileJava, jar, copyToLib],  description: "Create
 
 task execPermission(type: Exec) {
     commandLine 'chmod', 'ugo+x', "$distDir/gaiasky"
-    print("EXEC PERMISSION: $distDir/gaiasky")
 }
 
 task dist (dependsOn: gaiaskyJar, description: "Compiles the project, creates the jar and moves it all to releases/gaiasky-\$tag-\$rev") {
