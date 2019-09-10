@@ -1,3 +1,139 @@
+<a name="2.2.0"></a>
+## [2.2.0](https://gitlab.com/langurmonkey/gaiasky/tree/2.1.7-vr) (2019-08-01)
+[Full changelog](https://gitlab.com/langurmonkey/gaiasky/compare/2.1.7-vr...2.2.0)
+
+### Bug Fixes
+
+- no-GUI mode inhibits GUI-related mappings 
+- memory info window layout 
+- VRAM leak disposing textures when changin quality 
+- truly release VRAM when unloading textures 
+- scripting parameter check 
+- cameraTransition() 
+- more glsl leftovers 
+- shader errors on macOS [#288](https://gitlab.com/langurmonkey/gaiasky/issues/288) [#288](https://gitlab.com/langurmonkey/gaiasky/issues/288) 
+- show notice with high/ultra quality 
+- tangent and binormal vectors on UV spheres 
+- ui inconsistencies 
+- line occlusion fixed with no depth writes 
+- adjust sun size and selection 
+- aspect ratio of most points 
+- synchronous catalog loading via script is really synchronous 
+- fade node visibility tied to internal frame rate, not absolute time 
+- fix dataset visibility fade time link, add cubemap projection setter in scripting API 
+- frame buffer and effects cleanup on resize 
+- adjust motion blur, remove blur radius 
+- about window layout 
+- add pad to version check buttons 
+- add some value checks to scripting implementation 
+- file chooser file/dir browsing state 
+- bugs determining location of files 
+- macos gradle launch script 
+- dataset version check in download manager 
+- macOS retina display scaling, remove analytics 
+- macos script fix 
+
+### Build System
+
+- Improved readme file instructions 
+- Requirements from JRE8 to JRE11 
+- move postprocessing lib to gaia sky 
+- gitlab issue templates 
+
+### Code Refactoring
+
+- texture component is now material component 
+- remove unused webgl code 
+- sphere creator to own class 
+- render system cleanup 
+- sprite batch shaders to version 330, moved postprocess shaders to own folder 
+- sanity checks and code cleanup in scripting API implementation 
+- reorganised scripts 
+- cleanup scripts folder 
+
+### Features
+
+- add padding to tooltips by default 
+- add reflections in shaders plus skybox 
+- add startup object to config 
+- add VRAM monitoring 
+- add reset sequence number button 
+- improve debug pane layout 
+- initialise elevation data structures asynchronously 
+- CPU generation of height data 
+- add tessellation quality control 
+- noise-based height 
+- new scripting calls: cameraYaw/Pitch 
+- handle server down event correctly 
+- data downloader checks for updates 
+- decouple keyboard bindings from code, i18n camera modes 
+- warnings in object search 
+- new checksum algorithm: MD5 -> SHA256 
+- orbit refresh daemon plus shading 
+- comprehensive info panel on mode switch, star textures 
+- fix point scaling 
+- add starburst to lens flare 
+- add load queue progress to debug 
+- separate HiDPI theme to checkbox in preferences 
+- add point size and color attributes to asteroids 
+- add dithering glsl library to simulate transparency with opaque objects 
+- some work on controller mappings 
+- add optional gravity to game mode 
+- new camera mode: Game mode 
+- walk on the surface of any height-mapped body 
+- add game mode - WASD+mouse 
+- add physically based fog to atmospheres 
+- add Uncharted and Filmic tone mapping types 
+- add color noise parameter to particle groups 
+- parallax mapping 
+- improve light glow performance and visual quality 
+- add ACES tone mapping type 
+- improve atmosphere blending with stars 
+- add plumbing to allow automatic and exposure HDR tone mapping types 
+- automatic tone mapping based on Reinhard's method 
+- move all post-processing shaders to version 330 
+- new milky way model 
+- migrate search window to generic dialog 
+- native support for gzipped obj models (.obj.gz) 
+- implement integer indices 
+- use gitlab API instead of github's 
+- implement sane crash reporting to file 
+- migrate to Java 11 
+- add 'y' and 'n' key bindings to dialogs 
+- add shortcuts to expand/collapse panes 
+- velocity vectors are regular component types 
+- add optional arrowheads to velocity vectors 
+
+<a name="2.1.7"></a>
+## [2.1.7](https://gitlab.com/langurmonkey/gaiasky/tree/2.1.6) (2019-01-11)
+[Full changelog](https://gitlab.com/langurmonkey/gaiasky/compare/2.1.6...2.1.7)
+
+### Bug Fixes
+
+- restored download code 
+- wait for tasks to finish before shutting down 
+- about window layout in non-hidpi mode 
+- 'data files not found' problem 
+
+### Build System
+
+- remove run command echo, rearrange version logging 
+- fix installer-img not found 
+
+### Code Refactoring
+
+- topmost render method rewritten to avoid conditionals 
+
+### Documentation
+
+- fix build system title case 
+- update changelog 
+
+### Features
+
+- data download dialog details 
+- improve music component with scrollable volume, track name and time position 
+- add RUWE to octree generator 
 
 <a name="2.1.6"></a>
 ## [2.1.6](https://gitlab.com/langurmonkey/gaiasky/tree/2.1.5) (2018-12-18)

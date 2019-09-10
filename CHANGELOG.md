@@ -1,8 +1,3 @@
-<a name="unreleased"></a>
-## [Unreleased](https://gitlab.com/langurmonkey/gaiasky/tree/master)
-[Full changelog](https://gitlab.com/langurmonkey/gaiasky/compare/2.2.0...HEAD)
-
-
 <a name="2.2.0"></a>
 ## [2.2.0](https://gitlab.com/langurmonkey/gaiasky/tree/2.1.7-vr) (2019-08-01)
 [Full changelog](https://gitlab.com/langurmonkey/gaiasky/compare/2.1.7-vr...2.2.0)
@@ -16,7 +11,7 @@
 - scripting parameter check 
 - cameraTransition() 
 - more glsl leftovers 
-- shader errors on macOS [#288](https://gitlab.com/langurmonkey/gaiasky/issues/288) 
+- shader errors on macOS [#288](https://gitlab.com/langurmonkey/gaiasky/issues/288) [#288](https://gitlab.com/langurmonkey/gaiasky/issues/288) 
 - show notice with high/ultra quality 
 - tangent and binormal vectors on UV spheres 
 - ui inconsistencies 
@@ -119,17 +114,21 @@
 - wait for tasks to finish before shutting down 
 - about window layout in non-hidpi mode 
 - 'data files not found' problem 
+
 ### Build System
 
 - remove run command echo, rearrange version logging 
 - fix installer-img not found 
+
 ### Code Refactoring
 
 - topmost render method rewritten to avoid conditionals 
+
 ### Documentation
 
 - fix build system title case 
 - update changelog 
+
 ### Features
 
 - data download dialog details 
