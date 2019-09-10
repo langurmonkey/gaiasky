@@ -154,6 +154,7 @@ if __name__ == '__main__':
         print(" > Generate the html listings for the new files: dir2html")
         print(" > Update TYPO3 ARI website: http://zah.uni-heidelberg.de/typo3")
         print(" > Update docs if necessary: %s/docs" % arguments.gs_folder)
+        print(" > Create new docs tag (2.2.1) and generate the docs: %s/docs/bin/publish-docs" % arguments.gs_folder)
         print(" > Update the website (TYPO3) pointing to the new files")
         print(" > Build package ('makepkg' and 'makepkg --printsrcinfo > .SRCINFO') and commit AUR git repository")
         print()
