@@ -15,8 +15,12 @@ public class MathManager implements IObserver {
     public static MathManager instance;
 
     public static void initialize() {
+        initialize(GlobalConf.data.HIGH_ACCURACY_POSITIONS);
+    }
+
+    public static void initialize(boolean highAccuracy) {
         if (instance == null)
-            instance = new MathManager();
+            instance = new MathManager(highAccuracy);
     }
 
     public ITrigonometry trigo;
@@ -24,11 +28,11 @@ public class MathManager implements IObserver {
     private Trigonometry trigonometry;
     private FastTrigonometry fastTrigonometry;
 
-    MathManager() {
+    MathManager(boolean highAccuracy) {
         trigonometry = new Trigonometry();
         fastTrigonometry = new FastTrigonometry();
 
-        trigo = GlobalConf.data.HIGH_ACCURACY_POSITIONS ? trigonometry : fastTrigonometry;
+        trigo = highAccuracy ? trigonometry : fastTrigonometry;
 
         EventManager.instance.subscribe(this, Events.HIGH_ACCURACY_CMD);
     }

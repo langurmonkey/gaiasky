@@ -23,9 +23,8 @@ import java.time.temporal.ChronoField;
 /**
  * Some astronomical goodies to get the position of the Sun, Moon, work out
  * Julian dates, etc.
- * 
- * @author Toni Sagrista
  *
+ * @author Toni Sagrista
  */
 public class AstroUtils {
 
@@ -57,7 +56,7 @@ public class AstroUtils {
     }
 
     /** Julian date cache, since most dates are used more than once **/
-    private static LruCache<Long, Double> jdcache = new LruCache<Long, Double>(50);
+    private static LruCache<Long, Double> jdcache = new LruCache<>(50);
 
     // Earth equatorial radius in Km
     public static final float EARTH_RADIUS = 6378.1370f;
@@ -74,9 +73,8 @@ public class AstroUtils {
     /**
      * Algorithm in "Astronomical Algorithms" book by Jean Meeus. Finds out the
      * distance from the Sun to the Earth in Km
-     * 
-     * @param date
-     *            The date
+     *
+     * @param date The date
      * @return The distancee from the Sun to the Earth in Km
      */
     public static double getSunDistance(Instant date) {
@@ -102,9 +100,8 @@ public class AstroUtils {
     /**
      * Returns the Sun's ecliptic longitude in degrees for the given time.
      * Caches the last Sun's longitude for future use.
-     * 
-     * @param date
-     *            The time for which the longitude must be calculated
+     *
+     * @param date The time for which the longitude must be calculated
      * @return The Sun's longitude in [deg]
      */
     public static double getSunLongitude(Instant date) {
@@ -123,13 +120,12 @@ public class AstroUtils {
     /**
      * Gets the ecliptic longitude of the Sun in degrees as published in
      * Wikipedia.
-     * 
-     * @see <a href=
-     *      "http://en.wikipedia.org/wiki/Position_of_the_Sun">http://en.wikipedia.org/wiki/Position_of_the_Sun</a>
-     * @param jd
-     *            The Julian date for which to calculate the latitude.
+     *
+     * @param jd The Julian date for which to calculate the latitude.
      * @return The ecliptic longitude of the Sun at the given Julian date, in
-     *         degrees.
+     * degrees.
+     * @see <a href=
+     * "http://en.wikipedia.org/wiki/Position_of_the_Sun">http://en.wikipedia.org/wiki/Position_of_the_Sun</a>
      */
     public static double getSunLongitudeWikipedia(double jd) {
         double n = jd - JD_J2000;
@@ -143,7 +139,7 @@ public class AstroUtils {
      * Algorithm in "Astronomical Algorithms" book by Jean Meeus. Returns a
      * vector with the equatorial longitude (&alpha;) in radians, the equatorial
      * latitude (&delta;) in radians and the distance in kilometers.
-     * 
+     *
      * @param date
      */
     public static void moonEquatorialCoordinates(Vector3d placeholder, Instant date) {
@@ -154,7 +150,7 @@ public class AstroUtils {
      * Algorithm in "Astronomical Algorithms" book by Jean Meeus. Returns a
      * vector with the equatorial longitude (&alpha;) in radians, the equatorial
      * latitude (&delta;) in radians and the distance in kilometers.
-     * 
+     *
      * @param julianDate
      */
     public static void moonEquatorialCoordinates(Vector3d placeholder, double julianDate) {
@@ -167,10 +163,9 @@ public class AstroUtils {
      * Algorithm in "Astronomical Algorithms" book by Jean Meeus. Returns a
      * vector with the ecliptic longitude (&lambda;) in radians, the ecliptic
      * latitude (&beta;) in radians and the distance in kilometers.
-     * 
+     *
      * @param date
-     * @param out
-     *            The output vector.
+     * @param out  The output vector.
      * @return The output vector, for chaining.
      */
     public static Vector3d moonEclipticCoordinates(Instant date, Vector3d out) {
@@ -182,12 +177,11 @@ public class AstroUtils {
      * vector with the ecliptic longitude (&lambda;) in radians, the ecliptic
      * latitude (&beta;) in radians and the distance between the centers of the
      * Earth and the Moon in kilometers.
-     * 
+     *
      * @param julianDate
-     * @param out
-     *            The output vector with geocentric longitude (lambda) [rad],
-     *            geocentric latitude (beta) [rad], distance between the centers
-     *            of the Earth and the Moon [km]
+     * @param out        The output vector with geocentric longitude (lambda) [rad],
+     *                   geocentric latitude (beta) [rad], distance between the centers
+     *                   of the Earth and the Moon [km]
      * @return The output vector, for chaining.
      */
     public static Vector3d moonEclipticCoordinates(double julianDate, Vector3d out) {
@@ -198,20 +192,20 @@ public class AstroUtils {
         double T3 = T2 * T;
         double T4 = T3 * T;
         // Moon's mean longitude, referred to the mean equinox of the date
-        double Lp = 218.3164591 + 481267.88134236 * T - 0.0013268 * T2 + T3 / 538841.0 - T4 / 65194000.0;
+        double Lp = 218.316447 + 481267.88123421 * T - 0.0015786 * T2 + T3 / 538841.0 - T4 / 65194000.0;
         Lp = prettyAngle(Lp);
         // Mean elongation of the Moon
-        double D = 297.8502042 + 445267.1115168 * T - 0.00163 * T2 + T3 / 545868.0 - T4 / 113065000.0;
+        double D = 297.8501921 + 445267.1114034 * T - 0.0018819 * T2 + T3 / 545868.0 - T4 / 113065000.0;
         D = prettyAngle(D);
         // Sun's mean anomaly
         double M = 357.5291092 + 35999.0502909 * T - 0.0001536 * T2 + T3 / 24490000.0;
         M = prettyAngle(M);
         // Moon's mean anomaly
-        double Mp = 134.9634114 + 477198.8676313 * T + 0.008997 * T2 + T3 / 69699.0 - T4 / 14712000.0;
+        double Mp = 134.9633964 + 477198.8675055 * T + 0.0087414 * T2 + T3 / 69699.0 - T4 / 14712000.0;
         Mp = prettyAngle(Mp);
         // Moon's argument of latitude (mean distance of the Moon from its
         // ascending node)
-        double F = 93.2720993 + 483202.0175273 * T - 0.0034029 * T2 - T3 / 3526000.0 + T4 / 863310000.0;
+        double F = 93.272095 + 483202.0175233 * T - 0.0036539 * T2 - T3 / 3526000.0 + T4 / 863310000.0;
         F = prettyAngle(F);
         // Three further arguments (again, in degrees) are needed
         double A1 = 119.75 + 131.849 * T;
@@ -223,31 +217,29 @@ public class AstroUtils {
 
         // Multiply by E the arguments that contain M or -M, multiply by E2 the
         // arguments that contain 2M or -2M
-        double E = 1 - 0.002516 * T - 0.0000074 * T2;
+        double E = 1.0 - 0.002516 * T - 0.0000074 * T2;
 
         double[] aux = calculateSumlSumr(D, M, Mp, F, E, A1, A2, Lp);
         double suml = aux[0];
         double sumr = aux[1];
-        double sumb = calculateSumb(D, sumr, Mp, F, E, A1, A3, Lp);
+        double sumb = calculateSumb(D, M, Mp, F, E, A1, A3, Lp);
 
-        double lambda = prettyAngle(Lp + suml / 1000000.0);
-        double beta = prettyAngle((sumb / 1000000.0));
-        double dist = 385000.56 + sumr / 1000.0;
+        double lambda = prettyAngle(Lp + suml * 0.000001);
+        double beta = prettyAngle((sumb * 0.000001));
+        double dist = 385000.56 + sumr * 0.001;
 
         return out.set(Math.toRadians(lambda), Math.toRadians(beta), dist);
     }
 
     /**
      * Ecliptic coordinates of pluto at the given date
-     * 
-     * @param date
-     *            The date
-     * @param out
-     *            The out vector
+     *
+     * @param date The date
+     * @param out  The out vector
      * @return Ecliptic coordinates of Pluto at the given julian date
      */
     public static Vector3d plutoEclipticCoordinates(Instant date, Vector3d out) {
-        if(!Constants.withinVSOPTime(date.toEpochMilli()))
+        if (!Constants.withinVSOPTime(date.toEpochMilli()))
             return null;
         return plutoEclipticCoordinates(getDaysSinceJ2000(date), out);
     }
@@ -255,11 +247,9 @@ public class AstroUtils {
     /**
      * Ecliptic coordinates of pluto at the given date. See
      * http://www.stjarnhimlen.se/comp/ppcomp.html
-     * 
-     * @param d
-     *            Julian date
-     * @param out
-     *            The out vector
+     *
+     * @param d   Julian date
+     * @param out The out vector
      * @return Ecliptic coordinates of Pluto at the given julian date
      */
     public static Vector3d plutoEclipticCoordinates(double d, Vector3d out) {
@@ -280,43 +270,36 @@ public class AstroUtils {
     /**
      * Calculates the longitude Sum(l) and distance Sum(r) of the Moon using the
      * table.
-     * 
-     * @param D
-     *            Mean elongation of the Moon
-     * @param M
-     *            Sun's mean anomaly
-     * @param Mp
-     *            Moon's mean anomaly
-     * @param F
-     *            Moon's argument of latitude (mean distance of the Moon from
-     *            its ascending node)
-     * @param E
-     *            Factor for eccentricity of Earth's orbit around the Sun
-     * @param A1
-     *            Term due to action of Venus
-     * @param A2
-     *            Term due to Jupiter
-     * @param Lp
-     *            Moon's mean longitude, referring to the equinox of the date
+     *
+     * @param D  Mean elongation of the Moon
+     * @param M  Sun's mean anomaly
+     * @param Mp Moon's mean anomaly
+     * @param F  Moon's argument of latitude (mean distance of the Moon from
+     *           its ascending node)
+     * @param E  Factor for eccentricity of Earth's orbit around the Sun
+     * @param A1 Term due to action of Venus
+     * @param A2 Term due to Jupiter
+     * @param Lp Moon's mean longitude, referring to the equinox of the date
      * @return Suml and Sumr
      */
     private static double[] calculateSumlSumr(double D, double M, double Mp, double F, double E, double A1, double A2, double Lp) {
         ITrigonometry trigo = MathManager.instance.trigo;
 
-        double suml = 0, sumr = 0;
-        for (int i = 0; i < table45a.length; i++) {
-            int[] curr = table45a[i];
+        double suml = 0.0, sumr = 0.0;
+        for (int i = 0; i < table47a.length; i++) {
+            double[] curr = table47a[i];
             // Take into effect terms that contain M and thus depend on the
             // eccentricity of the Earth's orbit around the
             // Sun, which presently is decreasing with time.
-            double mul = 1;
-            if (curr[2] == 1 || curr[2] == -1) {
+            double mul = 1.0;
+            if (curr[1] == 1.0 || curr[1] == -1.0) {
                 mul = E;
-            } else if (curr[2] == 2 || curr[2] == -2) {
+            } else if (curr[1] == 2.0 || curr[1] == -2.0) {
                 mul = E * E;
             }
-            suml += curr[4] * trigo.sin(Math.toRadians(curr[0] * D + curr[1] * M + curr[2] * Mp + curr[3] * F)) * mul;
-            sumr += curr[5] * trigo.cos(Math.toRadians(curr[0] * D + curr[1] * M + curr[2] * Mp + curr[3] * F)) * mul;
+            double argument = Math.toRadians(curr[0] * D + curr[1] * M + curr[2] * Mp + curr[3] * F);
+            suml += curr[4] * mul * trigo.sin(argument);
+            sumr += curr[5] * mul * trigo.cos(argument);
         }
         // Addition to Suml. The terms involving A1 are due to the action of
         // Venus. The term involving A2 is due to Jupiter
@@ -331,19 +314,19 @@ public class AstroUtils {
     private static double calculateSumb(double D, double M, double Mp, double F, double E, double A1, double A3, double Lp) {
         ITrigonometry trigo = MathManager.instance.trigo;
 
-        double sumb = 0;
-        for (int i = 0; i < table45b.length; i++) {
-            int[] curr = table45b[i];
+        double sumb = 0.0;
+        for (int i = 0; i < table47b.length; i++) {
+            double[] curr = table47b[i];
             // Take into effect terms that contain M and thus depend on the
             // eccentricity of the Earth's orbit around the
             // Sun, which presently is decreasing with time.
-            double mul = 1;
-            if (curr[2] == 1 || curr[2] == -1) {
-                mul *= E;
-            } else if (curr[2] == 2 || curr[2] == -2) {
-                mul *= E * E;
+            double mul = 1.0;
+            if (curr[1] == 1.0 || curr[1] == -1.0) {
+                mul = E;
+            } else if (curr[1] == 2.0 || curr[1] == -2.0) {
+                mul = E * E;
             }
-            sumb += curr[4] * trigo.sin(Math.toRadians(curr[0] * D + curr[1] * M + curr[2] * Mp + curr[3] * F)) * mul;
+            sumb += curr[4] * mul * trigo.sin(Math.toRadians(curr[0] * D + curr[1] * M + curr[2] * Mp + curr[3] * F));
         }
         // Addition to Sumb. The terms involving A1 are due to the action of
         // Venus. The term involving A2 is due to Jupiter
@@ -359,7 +342,7 @@ public class AstroUtils {
      * Moon. The unit is 0.000001 degree for Sum(l), and 0.001 km for Sum(r).
      * Multiple of D M M' F CoeffSine CoeffCosine
      */
-    private static final int[][] table45a = { { 0, 0, 1, 0, 6288774, -20905355 }, { 2, 0, -1, 0, 1274027, -3699111 }, { 2, 0, 0, 0, 658314, -2955968 }, { 0, 0, 2, 0, 213618, -569925 }, { 0, 1, 0, 0, -185116, 48888 }, { 0, 0, 0, 2, -114332, -3149 }, { 2, 0, -2, 0, 58793, 246158 }, { 2, -1, -1, 0, 57066, -152138 }, { 2, 0, 1, 0, 53322, -170733 }, { 2, -1, 0, 0, 45758, -204586 }, { 0, 1, -1, 0, -40923, -129620 }, { 1, 0, 0, 0, -34720, 108743 }, { 0, 1, 1, 0, -30383, 104755 },
+    private static final double[][] table47a = { { 0, 0, 1, 0, 6288774.0, -20905355 }, { 2, 0, -1, 0, 1274027, -3699111 }, { 2, 0, 0, 0, 658314, -2955968 }, { 0, 0, 2, 0, 213618, -569925 }, { 0, 1, 0, 0, -185116, 48888 }, { 0, 0, 0, 2, -114332, -3149 }, { 2, 0, -2, 0, 58793, 246158 }, { 2, -1, -1, 0, 57066.0, -152138 }, { 2, 0, 1, 0, 53322, -170733 }, { 2, -1, 0, 0, 45758, -204586 }, { 0, 1, -1, 0, -40923, -129620 }, { 1, 0, 0, 0, -34720, 108743 }, { 0, 1, 1, 0, -30383, 104755 },
             { 2, 0, 0, -2, 15327, 10321 }, { 0, 0, 1, 2, -12528, 0 }, { 0, 0, 1, -2, 10980, 79661 }, { 4, 0, -1, 0, 10675, -34782 }, { 0, 0, 3, 0, 10034, -23210 }, { 4, 0, -2, 0, 8548, -21636 }, { 2, 1, -1, 0, -7888, 24208 }, { 2, 1, 0, 0, -6766, 30824 }, { 1, 0, -1, 0, -5163, -8379 }, { 1, 1, 0, 0, 4987, -16675 }, { 2, -1, 1, 0, 4036, -12831 }, { 2, 0, 2, 0, 3994, -10445 }, { 4, 0, 0, 0, 3861, -11650 }, { 2, 0, -3, 0, 3665, 14403 }, { 0, 1, -2, 0, -2689, -7003 }, { 2, 0, -1, 2, -2602, 0 },
             { 2, -1, -2, 0, 2390, 10056 }, { 1, 0, 1, 0, -2348, 6322 }, { 2, -2, 0, 0, 2236, -9884 }, { 0, 1, 2, 0, -2120, 5751 }, { 0, 2, 0, 0, -2069, 0 }, { 2, -2, -1, 0, 2048, -4950 }, { 2, 0, 1, -2, -1773, 4130 }, { 2, 0, 0, 2, -1595, 0 }, { 4, -1, -1, 0, 1215, -3958 }, { 0, 0, 2, 2, -1110, 0 }, { 3, 0, -1, 0, -892, 3258 }, { 2, 1, 1, 0, -810, 2616 }, { 4, -1, -2, 0, 759, -1897 }, { 0, 2, -1, 0, -713, -2117 }, { 2, 2, -1, 0, -700, 2354 }, { 2, 1, -2, 0, 691, 0 }, { 2, -1, 0, -2, 596, 0 },
             { 4, 0, 1, 0, 549, -1423 }, { 0, 0, 4, 0, 537, -1117 }, { 4, -1, 0, 0, 520, -1571 }, { 1, 0, -2, 0, -487, -1739 }, { 2, 1, 0, -2, -399, 0 }, { 0, 0, 2, -2, -381, -4421 }, { 1, 1, 1, 0, 351, 0 }, { 3, 0, -2, 0, -340, 0 }, { 4, 0, -3, 0, 330, 0 }, { 2, -1, 2, 0, 327, 0 }, { 0, 2, 1, 0, -323, 1165 }, { 1, 1, -1, 0, 299, 0 }, { 2, 0, 3, 0, 294, 0 }, { 2, 0, -1, -2, 0, 8752 } };
@@ -369,24 +352,19 @@ public class AstroUtils {
      * 0.000001 degree. Multiple of D M M' F Coefficient of the sine of the
      * argument
      */
-    private static final int[][] table45b = { { 0, 0, 0, 1, 5128122, 0 }, { 0, 0, 1, 1, 280602, 0 }, { 0, 0, 1, -1, 277693, 0 }, { 2, 0, 0, -1, 173237, 0 }, { 2, 0, -1, 1, 55413, 0 }, { 2, 0, -1, -1, 46271, 0 }, { 2, 0, 0, 1, 32573, 0 }, { 0, 0, 2, 1, 17198, 0 }, { 2, 0, 1, -1, 9266, 0 }, { 0, 0, 2, -1, 8822, 0 }, { 2, -1, 0, -1, 8216, 0 }, { 2, 0, -2, -1, 4324, 0 }, { 2, 0, 1, 1, 4200, 0 }, { 2, 1, 0, -1, -3359, 0 }, { 2, -1, -1, 1, 2463, 0 }, { 2, -1, 0, 1, 2211, 0 },
-            { 2, -1, -1, -1, 2065, 0 }, { 0, 1, -1, -1, -1870, 0 }, { 4, 0, -1, -1, 1828, 0 }, { 0, 1, 0, 1, -1794, 0 }, { 0, 0, 0, 3, -1749, 0 }, { 0, 1, -1, 1, -1565, 0 }, { 1, 0, 0, 1, -1491, 0 }, { 0, 1, 1, 1, -1475, 0 }, { 0, 1, 1, -1, -1410, 0 }, { 0, 1, 0, -1, -1344, 0 }, { 1, 0, 0, -1, -1335, 0 }, { 0, 0, 3, 1, 1107, 0 }, { 4, 0, 0, -1, 1021, 0 }, { 4, 0, -1, 1, 833, 0 }, { 0, 0, 1, -3, 777, 0 }, { 4, 0, -2, 1, 671, 0 }, { 2, 0, 0, -3, 607, 0 }, { 2, 0, 2, -1, 596, 0 },
-            { 2, -1, 1, -1, 491, 0 }, { 2, 0, -2, 1, -451, 0 }, { 0, 0, 3, -1, 439, 0 }, { 2, 0, 2, 1, 422, 0 }, { 2, 0, -3, -1, 421, 0 }, { 2, 1, -1, 1, -366, 0 }, { 2, 1, 0, 1, -351, 0 }, { 4, 0, 0, 1, 331, 0 }, { 2, -1, 1, 1, 315, 0 }, { 2, -2, 0, -1, 302, 0 }, { 0, 0, 1, 3, -283, 0 }, { 2, 1, 1, -1, -229, 0 }, { 1, 1, 0, -1, 223, 0 }, { 1, 1, 0, 1, 223, 0 }, { 0, 1, -2, -1, -220, 0 }, { 2, 1, -1, -1, -220, 0 }, { 1, 0, 1, 1, -185, 0 }, { 2, -1, -2, -1, 181, 0 }, { 0, 1, 2, 1, -177, 0 },
-            { 4, 0, -2, -1, 176, 0 }, { 4, -1, -1, -1, 166, 0 }, { 1, 0, 1, -1, -164, 0 }, { 4, 0, 1, -1, 132, 0 }, { 1, 0, -1, -1, -119, 0 }, { 4, -1, 0, -1, 115, 0 }, { 2, -2, 0, 1, 107, 0 } };
+    private static final double[][] table47b = { { 0, 0, 0, 1, 5128122 }, { 0, 0, 1, 1, 280602 }, { 0, 0, 1, -1, 277693 }, { 2, 0, 0, -1, 173237 }, { 2, 0, -1, 1, 55413 }, { 2, 0, -1, -1, 46271 }, { 2, 0, 0, 1, 32573 }, { 0, 0, 2, 1, 17198 }, { 2, 0, 1, -1, 9266 }, { 0, 0, 2, -1, 8822 }, { 2, -1, 0, -1, 8216 }, { 2, 0, -2, -1, 4324 }, { 2, 0, 1, 1, 4200 }, { 2, 1, 0, -1, -3359 }, { 2, -1, -1, 1, 2463 }, { 2, -1, 0, 1, 2211 }, { 2, -1, -1, -1, 2065 }, { 0, 1, -1, -1, -1870 },
+            { 4, 0, -1, -1, 1828 }, { 0, 1, 0, 1, -1794 }, { 0, 0, 0, 3, -1749 }, { 0, 1, -1, 1, -1565 }, { 1, 0, 0, 1, -1491 }, { 0, 1, 1, 1, -1475 }, { 0, 1, 1, -1, -1410 }, { 0, 1, 0, -1, -1344 }, { 1, 0, 0, -1, -1335 }, { 0, 0, 3, 1, 1107 }, { 4, 0, 0, -1, 1021 }, { 4, 0, -1, 1, 833 }, { 0, 0, 1, -3, 777 }, { 4, 0, -2, 1, 671 }, { 2, 0, 0, -3, 607 }, { 2, 0, 2, -1, 596 }, { 2, -1, 1, -1, 491 }, { 2, 0, -2, 1, -451 }, { 0, 0, 3, -1, 439 }, { 2, 0, 2, 1, 422 }, { 2, 0, -3, -1, 421 },
+            { 2, 1, -1, 1, -366 }, { 2, 1, 0, 1, -351 }, { 4, 0, 0, 1, 331 }, { 2, -1, 1, 1, 315 }, { 2, -2, 0, -1, 302 }, { 0, 0, 1, 3, -283 }, { 2, 1, 1, -1, -229 }, { 1, 1, 0, -1, 223 }, { 1, 1, 0, 1, 223 }, { 0, 1, -2, -1, -220 }, { 2, 1, -1, -1, -220 }, { 1, 0, 1, 1, -185 }, { 2, -1, -2, -1, 181 }, { 0, 1, 2, 1, -177 }, { 4, 0, -2, -1, 176 }, { 4, -1, -1, -1, 166 }, { 1, 0, 1, -1, -164 }, { 4, 0, 1, -1, 132 }, { 1, 0, -1, -1, -119 }, { 4, -1, 0, -1, 115 }, { 2, -2, 0, 1, 107 } };
 
     /**
      * Returns a vector with the heliocentric ecliptic latitude and longitude in
      * radians and the distance in internal units.
-     * 
-     * @param body
-     *            The body.
-     * @param instant
-     *            The date to get the position.
-     * @param out
-     *            The output vector
-     * @param highAccuracy
-     *            Whether to use the full precision algorithms or skip some
-     *            terms for speed
+     *
+     * @param body         The body.
+     * @param instant      The date to get the position.
+     * @param out          The output vector
+     * @param highAccuracy Whether to use the full precision algorithms or skip some
+     *                     terms for speed
      * @return The output vector with L, B and R, for chaining.
      * @deprecated Should use the classes that extend IBodyCoordinates instead.
      */
@@ -418,7 +396,7 @@ public class AstroUtils {
 
     /**
      * Gets the Julian date number given the Gregorian calendar quantities.
-     * 
+     *
      * @param year
      * @param month
      * @param day
@@ -426,8 +404,7 @@ public class AstroUtils {
      * @param min
      * @param sec
      * @param nanos
-     * @param gregorian
-     *            Whether to use the Gregorian or the Julian calendar
+     * @param gregorian Whether to use the Gregorian or the Julian calendar
      * @return The julian date number
      */
     public static double getJulianDate(int year, int month, int day, int hour, int min, int sec, int nanos, boolean gregorian) {
@@ -440,7 +417,7 @@ public class AstroUtils {
 
     /**
      * Gets the Julian Date for the given date. It uses a cache.
-     * 
+     *
      * @param instant The date.
      * @return The Julian Date.
      */
@@ -471,9 +448,8 @@ public class AstroUtils {
     /**
      * Returns the elapsed milliseconds since the epoch J2010 until the given
      * date. Can be negavite.
-     * 
-     * @param date
-     *            The date
+     *
+     * @param date The date
      * @return The elapsed milliseconds
      */
     public static double getMsSinceJ2010(Instant date) {
@@ -483,9 +459,8 @@ public class AstroUtils {
     /**
      * Returns the elapsed milliseconds since the epoch J2000 until the given
      * date. Can be negavite.
-     * 
-     * @param date
-     *            The date
+     *
+     * @param date The date
      * @return The elapsed milliseconds
      */
     public static double getMsSinceJ2000(Instant date) {
@@ -495,9 +470,8 @@ public class AstroUtils {
     /**
      * Returns the elapsed days since the epoch J2000 until the given date. Can
      * be negavite.
-     * 
-     * @param date
-     *            The date
+     *
+     * @param date The date
      * @return The elapsed days
      */
     public static double getDaysSinceJ2000(Instant date) {
@@ -507,9 +481,8 @@ public class AstroUtils {
     /**
      * Returns the elapsed milliseconds since the epoch J2015 until the given
      * date. Can be negavite.
-     * 
-     * @param date
-     *            The date
+     *
+     * @param date The date
      * @return The elapsed milliseconds
      */
     public static double getMsSinceJ2015(Instant date) {
@@ -519,11 +492,9 @@ public class AstroUtils {
     /**
      * Returns the elapsed milliseconds since the given julian date jd until the
      * given date. Can be negative
-     * 
-     * @param date
-     *            The date
-     * @param epoch_jd
-     *            The reference epoch in julian days
+     *
+     * @param date     The date
+     * @param epoch_jd The reference epoch in julian days
      * @return The elapsed milliseconds
      */
     public static double getMsSince(Instant date, double epoch_jd) {
@@ -532,15 +503,14 @@ public class AstroUtils {
 
     /**
      * Gets the Gregorian calendar quantities given the Julian date.
-     * 
-     * @param julianDate
-     *            The Julian date
+     *
+     * @param julianDate The Julian date
      * @return Vector with {year, month, day, hour, min, sec, nanos}
      */
     public static int[] getCalendarDay(double julianDate) {
         /**
          * y 4716 v 3 j 1401 u 5 m 2 s 153 n 12 w 2 r 4 B 274277 p 1461 C −38
-         * 
+         *
          * 1. f = J + j + (((4 * J + B)/146097) * 3)/4 + C 2. e = r * f + v 3. g
          * = mod(e, p)/r 4. h = u * g + w 5. D = (mod(h, s))/u + 1 6. M =
          * mod(h/s + m, n) + 1 7. Y = e/p - y + (n + m - M)/n
@@ -567,13 +537,10 @@ public class AstroUtils {
     /**
      * Returns the Julian day number. Uses the method shown in "Astronomical
      * Algorithms" by Jean Meeus.
-     * 
-     * @param year
-     *            The year
-     * @param month
-     *            The month in [1:12]
-     * @param day
-     *            The day in the month, starting at 1
+     *
+     * @param year  The year
+     * @param month The month in [1:12]
+     * @param day   The day in the month, starting at 1
      * @return The Julian date
      * @deprecated This does not work well!
      */
@@ -589,16 +556,13 @@ public class AstroUtils {
     /**
      * Returns the Julian day number of a date in the Gregorian calendar. Uses
      * Wikipedia's algorithm.
-     * 
-     * @see <a href=
-     *      "http://en.wikipedia.org/wiki/Julian_day">http://en.wikipedia.org/wiki/Julian_day</a>
-     * @param year
-     *            The year
-     * @param month
-     *            The month in [1:12]
-     * @param day
-     *            The day in the month, starting at 1
+     *
+     * @param year  The year
+     * @param month The month in [1:12]
+     * @param day   The day in the month, starting at 1
      * @return The Julian date
+     * @see <a href=
+     * "http://en.wikipedia.org/wiki/Julian_day">http://en.wikipedia.org/wiki/Julian_day</a>
      */
     public static double getJulianDayNumberWikipediaGregorianCalendar(int year, int month, int day) {
         int a = (int) ((14 - month) / 12);
@@ -611,16 +575,13 @@ public class AstroUtils {
     /**
      * Returns the Julian day number of a date in the Julian calendar. Uses
      * Wikipedia's algorithm.
-     * 
-     * @see <a href=
-     *      "http://en.wikipedia.org/wiki/Julian_day">http://en.wikipedia.org/wiki/Julian_day</a>
-     * @param year
-     *            The year
-     * @param month
-     *            The month in [1:12]
-     * @param day
-     *            The day in the month, starting at 1
+     *
+     * @param year  The year
+     * @param month The month in [1:12]
+     * @param day   The day in the month, starting at 1
      * @return The Julian date
+     * @see <a href=
+     * "http://en.wikipedia.org/wiki/Julian_day">http://en.wikipedia.org/wiki/Julian_day</a>
      */
     public static double getJulianDayNumberWikipediaJulianCalendar(int year, int month, int day) {
         int a = (int) ((14 - month) / 12);
@@ -638,15 +599,11 @@ public class AstroUtils {
 
     /**
      * Gets the day fraction from the day quantities
-     * 
-     * @param hour
-     *            The hour in 0-24
-     * @param min
-     *            The minute in 0-1440
-     * @param sec
-     *            The second in 0-86400
-     * @param nanos
-     *            The nanoseconds
+     *
+     * @param hour  The hour in 0-24
+     * @param min   The minute in 0-1440
+     * @param sec   The second in 0-86400
+     * @param nanos The nanoseconds
      * @return The day fraction
      */
     public static double getDayFraction(int hour, int min, int sec, int nanos) {
@@ -655,7 +612,7 @@ public class AstroUtils {
 
     /**
      * Gets the day quantities from the day fraction
-     * 
+     *
      * @param dayFraction
      * @return [hours, minutes, seconds, nanos]
      */
@@ -670,7 +627,7 @@ public class AstroUtils {
     /**
      * Returns the obliquity of the ecliptic (inclination of the Earth's axis of
      * rotation) for a given date, in degrees
-     * 
+     *
      * @return The obliquity in degrees
      */
     public static double obliquity(double julianDate) {
@@ -691,28 +648,28 @@ public class AstroUtils {
 
     /**
      * Time T measured in Julian centuries from the Epoch J2000.0
-     * 
-     * @param julianDate
-     *            The julian date
+     *
+     * @param julianDate The julian date
      * @return The time in julian centuries
      */
     public static double T(double julianDate) {
-        return (julianDate - 2451545) / 36525;
+        return (julianDate - 2451545.0) / 36525.0;
     }
 
     public static double tau(double julianDate) {
-        return (julianDate - 2451545) / 365250;
+        return (julianDate - 2451545.0) / 365250.0;
     }
 
     /**
      * Converts proper motions + radial velocity into a cartesian vector.
      * See <a href="http://www.astronexus.com/a-a/motions-long-term">this article</a>.
+     *
      * @param mualphastar Mu alpha star, in mas/yr
-     * @param mudelta Mu delta, in mas/yr
-     * @param radvel Radial velocity in km/s
-     * @param ra Right ascension in radians
-     * @param dec Declination in radians
-     * @param distpc Distance in parsecs to the star
+     * @param mudelta     Mu delta, in mas/yr
+     * @param radvel      Radial velocity in km/s
+     * @param ra          Right ascension in radians
+     * @param dec         Declination in radians
+     * @param distpc      Distance in parsecs to the star
      * @return The proper motion vector in internal_units/year
      */
     public static Vector3d properMotionsToCartesian(double mualphastar, double mudelta, double radvel, double ra, double dec, double distpc) {
@@ -741,7 +698,6 @@ public class AstroUtils {
         double vx = (radvel * cosdelta * cosalpha) - (vta * sinalpha) - (vtd * sindelta * cosalpha);
         double vy = (radvel * cosdelta * sinalpha) + (vta * cosalpha) - (vtd * sindelta * sinalpha);
         double vz = (radvel * sindelta) + (vtd * cosdelta);
-
 
         return (new Vector3d(vy, vz, vx)).scl(Constants.KM_TO_U / Nature.S_TO_Y);
 
