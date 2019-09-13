@@ -1670,19 +1670,34 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
         spriteBatch.end();
     }
 
-    private void drawCrosshair(IFocus chFocus, boolean focusMode, Texture focusCrosshair, Texture focusArrow, int rw, int rh, float r, float g, float b, float a) {
+    private void drawCrosshair(IFocus chFocus, boolean focusMode, Texture crosshairTex, Texture arrowTex, int rw, int rh, float r, float g, float b, float a) {
         if(chFocus != null) {
             if (!focusMode) {
-                drawCrosshair(chFocus.getClosestAbsolutePos(aux1).add(posinv), chFocus.getClosestDistToCamera(), chFocus.getRadius(), focusCrosshair, focusArrow, rw, rh, r, g, b, a);
+                drawCrosshair(chFocus.getClosestAbsolutePos(aux1).add(posinv), chFocus.getClosestDistToCamera(), chFocus.getRadius(), crosshairTex, arrowTex, rw, rh, r, g, b, a);
             } else {
-                drawCrosshair(chFocus.getAbsolutePosition(aux1).add(posinv), chFocus.getDistToCamera(), chFocus.getRadius(), focusCrosshair, focusArrow, rw, rh, r, g, b, a);
+                drawCrosshair(chFocus.getAbsolutePosition(aux1).add(posinv), chFocus.getDistToCamera(), chFocus.getRadius(), crosshairTex, arrowTex, rw, rh, r, g, b, a);
             }
         }
     }
-    private void drawCrosshair(Vector3d pos, double distToCam, double radius, Texture focusCrosshair, Texture focusArrow, int rw, int rh, float r, float g, float b, float a) {
+
+    /**
+     * Draws a crosshair given a camera-relative position
+     * @param pos The position in floating camera coordinates
+     * @param distToCam The distance to the camera
+     * @param radius Radius of object
+     * @param crosshairTex Crosshair texture
+     * @param arrowTex Arrow texture
+     * @param rw Width
+     * @param rh Height
+     * @param r Red
+     * @param g Green
+     * @param b Blue
+     * @param a Alpha
+     */
+    private void drawCrosshair(Vector3d pos, double distToCam, double radius, Texture crosshairTex, Texture arrowTex, int rw, int rh, float r, float g, float b, float a) {
         if (distToCam > radius * 2) {
-            float chw = focusCrosshair.getWidth();
-            float chh = focusCrosshair.getHeight();
+            float chw = crosshairTex.getWidth();
+            float chh = crosshairTex.getHeight();
             float chw2 = chw / 2;
             float chh2 = chh / (vr ? 1 : 2);
 
@@ -1697,7 +1712,7 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
             spriteBatch.setColor(r, g, b, a);
 
             if (inside) {
-                spriteBatch.draw(focusCrosshair, auxf1.x - chw2, auxf1.y - chh2, chw, chh);
+                spriteBatch.draw(crosshairTex, auxf1.x - chw2, auxf1.y - chh2, chw, chh);
             } else {
                 if (vr) {
                     float ang = firstAux ? -90 + aux2f2.angle() : firstAngl;
@@ -1705,15 +1720,14 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
                         firstAngl = ang;
                     }
                     firstAux = !firstAux;
-                    //                    spriteBatch.draw(focusArrow, auxf1.x - chw2, auxf1.y - chh2, chw2, chh2, chw, chh, 1f, 1f, -90 + aux2f2.angle(), 0, 0, (int) chw, (int) chh, false, false);
                     aux2f2.set(auxf1.x - (rw / 2), auxf1.y - (rh / 2));
                     aux2.set(up).rotate(direction, 90).add(up).scl(0.04);
                     aux1.set(vroffset).add(aux2).scl(1 / Constants.M_TO_U).add(direction);
                     projectToScreen(aux1, auxf1, rw, rh, chw, chh, chw2, chh2);
-                    spriteBatch.draw(focusArrow, auxf1.x, auxf1.y, chw2, chh2, chw, chh, 1f, 1f, ang, 0, 0, (int) chw, (int) chw, false, false);
+                    spriteBatch.draw(arrowTex, auxf1.x, auxf1.y, chw2, chh2, chw, chh, 1f, 1f, ang, 0, 0, (int) chw, (int) chw, false, false);
                 } else {
                     aux2f2.set(auxf1.x - (Gdx.graphics.getWidth() / 2), auxf1.y - (Gdx.graphics.getHeight() / 2));
-                    spriteBatch.draw(focusArrow, auxf1.x - chw2, auxf1.y - chh2, chw2, chh2, chw, chh, 1f, 1f, -90 + aux2f2.angle(), 0, 0, (int) chw, (int) chh, false, false);
+                    spriteBatch.draw(arrowTex, auxf1.x - chw2, auxf1.y - chh2, chw2, chh2, chw, chh, 1f, 1f, -90 + aux2f2.angle(), 0, 0, (int) chw, (int) chh, false, false);
                 }
             }
         }
