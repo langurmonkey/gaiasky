@@ -376,6 +376,19 @@ public class DesktopConfInit extends ConfInit {
 
     }
 
+    private int getValidWidth(){
+        int w = Gdx.graphics.getWidth();
+        if(w <= 0)
+            return 1280;
+        return w;
+    }
+    private int getValidHeight(){
+        int h = Gdx.graphics.getHeight();
+        if(h <= 0)
+            return 720;
+        return h;
+    }
+
     @Override
     public void persistGlobalConf(File propsFile) {
 
@@ -430,10 +443,10 @@ public class DesktopConfInit extends ConfInit {
         p.setProperty("data.skybox.location", GlobalConf.data.SKYBOX_LOCATION);
 
         /** SCREEN **/
-        p.setProperty("graphics.screen.width", Integer.toString(Gdx.graphics.isFullscreen() ? GlobalConf.screen.SCREEN_WIDTH : Gdx.graphics.getWidth()));
-        p.setProperty("graphics.screen.height", Integer.toString(Gdx.graphics.isFullscreen() ? GlobalConf.screen.SCREEN_HEIGHT : Gdx.graphics.getHeight()));
-        p.setProperty("graphics.screen.fullscreen.width", Integer.toString(!Gdx.graphics.isFullscreen() ? GlobalConf.screen.FULLSCREEN_WIDTH : Gdx.graphics.getWidth()));
-        p.setProperty("graphics.screen.fullscreen.height", Integer.toString(!Gdx.graphics.isFullscreen() ? GlobalConf.screen.FULLSCREEN_HEIGHT : Gdx.graphics.getHeight()));
+        p.setProperty("graphics.screen.width", Integer.toString(Gdx.graphics.isFullscreen() ? GlobalConf.screen.SCREEN_WIDTH : getValidWidth()));
+        p.setProperty("graphics.screen.height", Integer.toString(Gdx.graphics.isFullscreen() ? GlobalConf.screen.SCREEN_HEIGHT : getValidHeight()));
+        p.setProperty("graphics.screen.fullscreen.width", Integer.toString(!Gdx.graphics.isFullscreen() ? GlobalConf.screen.FULLSCREEN_WIDTH : getValidWidth()));
+        p.setProperty("graphics.screen.fullscreen.height", Integer.toString(!Gdx.graphics.isFullscreen() ? GlobalConf.screen.FULLSCREEN_HEIGHT : getValidHeight()));
         p.setProperty("graphics.screen.fullscreen", Boolean.toString(Gdx.graphics.isFullscreen()));
         p.setProperty("graphics.screen.resizable", Boolean.toString(GlobalConf.screen.RESIZABLE));
         p.setProperty("graphics.screen.vsync", Boolean.toString(GlobalConf.screen.VSYNC));
