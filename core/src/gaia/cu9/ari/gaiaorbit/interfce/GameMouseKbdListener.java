@@ -47,7 +47,7 @@ public class GameMouseKbdListener extends MouseKbdListener implements IObserver 
         double minTranslateUnits = 1e-5;
         if (anyPressed(Keys.W, Keys.A, Keys.S, Keys.D)) {
             camera.vel.setZero();
-            if(anyPressed(Keys.Q, Keys.E, Keys.SPACE, Keys.C)) {
+            if (anyPressed(Keys.Q, Keys.E, Keys.SPACE, Keys.C)) {
                 camera.setInputByController(false);
             }
         }
@@ -76,7 +76,6 @@ public class GameMouseKbdListener extends MouseKbdListener implements IObserver 
             camera.vertical(-1f * keySensitivity * multiplier, minTranslateUnits);
         }
 
-
     }
 
     @Override
@@ -86,29 +85,30 @@ public class GameMouseKbdListener extends MouseKbdListener implements IObserver 
 
     @Override
     public void activate() {
-        camera.setDiverted(true);
-        // Capture mouse
-        setMouseCapture(true);
-        // Unfocus
-        GaiaSky.instance.mainGui.getGuiStage().unfocusAll();
+        Gdx.app.postRunnable(() -> {
+            camera.setDiverted(true);
+            // Capture mouse
+            setMouseCapture(true);
+            // Unfocus
+            GaiaSky.instance.mainGui.getGuiStage().unfocusAll();
 
-        ModePopupInfo mpi = new ModePopupInfo();
-        mpi.title = "Game mode";
-        mpi.header = "You have entered Game mode!";
-        mpi.addMapping("Move forward", "W");
-        mpi.addMapping("Move backward", "S");
-        mpi.addMapping("Strafe left", "A");
-        mpi.addMapping("Strafe right", "D");
-        mpi.addMapping("Roll left", "Q");
-        mpi.addMapping("Roll right", "E");
-        mpi.addMapping("Move up", "Space");
-        mpi.addMapping("Move down", "C");
-        mpi.addMapping("Look around", "Mouse");
-        mpi.addMapping("Toggle mouse capture", "SHIFT", "CTRL", "L");
-        mpi.addMapping("Go back to focus mode", "1");
+            ModePopupInfo mpi = new ModePopupInfo();
+            mpi.title = "Game mode";
+            mpi.header = "You have entered Game mode!";
+            mpi.addMapping("Move forward", "W");
+            mpi.addMapping("Move backward", "S");
+            mpi.addMapping("Strafe left", "A");
+            mpi.addMapping("Strafe right", "D");
+            mpi.addMapping("Roll left", "Q");
+            mpi.addMapping("Roll right", "E");
+            mpi.addMapping("Move up", "Space");
+            mpi.addMapping("Move down", "C");
+            mpi.addMapping("Look around", "Mouse");
+            mpi.addMapping("Toggle mouse capture", "SHIFT", "CTRL", "L");
+            mpi.addMapping("Go back to focus mode", "1");
 
-        EventManager.instance.post(Events.MODE_POPUP_CMD, mpi, 120f);
-
+            EventManager.instance.post(Events.MODE_POPUP_CMD, mpi, 120f);
+        });
     }
 
     @Override

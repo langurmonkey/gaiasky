@@ -1132,25 +1132,22 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
 
     private void setMouseKbdListener(MouseKbdListener newListener) {
         InputMultiplexer im = (InputMultiplexer) Gdx.input.getInputProcessor();
-        if (currentMouseKbdListener != newListener) {
+        // Remove from input processors
+        if (currentMouseKbdListener != null) {
+            im.removeProcessor(currentMouseKbdListener);
 
-            // Remove from input processors
-            if (currentMouseKbdListener != null) {
-                im.removeProcessor(currentMouseKbdListener);
-
-                // Deactivate
-                currentMouseKbdListener.deactivate();
-            }
-
-            // Update reference
-            currentMouseKbdListener = newListener;
-
-            // Add to input processors
-            im.addProcessor(currentMouseKbdListener);
-
-            // Activate
-            currentMouseKbdListener.activate();
+            // Deactivate
+            currentMouseKbdListener.deactivate();
         }
+
+        // Update reference
+        currentMouseKbdListener = newListener;
+
+        // Add to input processors
+        im.addProcessor(currentMouseKbdListener);
+
+        // Activate
+        currentMouseKbdListener.activate();
     }
 
     /**
@@ -1166,25 +1163,21 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
         case FREE_MODE:
         case GAIA_SCENE_MODE:
         case GAME_MODE:
-            Gdx.app.postRunnable(() -> {
-                MouseKbdListener newListener = mode == CameraMode.GAME_MODE ? gameMouseKbdListener : naturalMouseKbdListener;
-                setMouseKbdListener(newListener);
+            MouseKbdListener newListener = mode == CameraMode.GAME_MODE ? gameMouseKbdListener : naturalMouseKbdListener;
+            setMouseKbdListener(newListener);
 
-                Controllers.clearListeners();
-                GlobalConf.controls.addControllerListener(controllerListener);
-                if (GlobalConf.runtime.OPENVR)
-                    GaiaSky.instance.vrContext.addListener(openVRListener);
-            });
+            Controllers.clearListeners();
+            GlobalConf.controls.addControllerListener(controllerListener);
+            if (GlobalConf.runtime.OPENVR)
+                GaiaSky.instance.vrContext.addListener(openVRListener);
             break;
         default:
-            Gdx.app.postRunnable(() -> {
-                // Unregister input controllers
-                im.removeProcessor(currentMouseKbdListener);
-                GlobalConf.controls.removeControllerListener(controllerListener);
-                // Remove vr listener
-                if (GlobalConf.runtime.OPENVR)
-                    GaiaSky.instance.vrContext.removeListener(openVRListener);
-            });
+            // Unregister input controllers
+            im.removeProcessor(currentMouseKbdListener);
+            GlobalConf.controls.removeControllerListener(controllerListener);
+            // Remove vr listener
+            if (GlobalConf.runtime.OPENVR)
+                GaiaSky.instance.vrContext.removeListener(openVRListener);
             break;
         }
     }
@@ -1563,7 +1556,7 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
         // Renders crosshair if focus mode
         if (draw) {
             // Mark home in ORANGE
-            if(GlobalConf.scene.CROSSHAIR_HOME) {
+            if (GlobalConf.scene.CROSSHAIR_HOME) {
                 if (home == null && GaiaSky.instance.sg != null)
                     home = GaiaSky.instance.sg.findFocus(GlobalConf.scene.STARTUP_OBJECT);
                 if (home != null) {
@@ -1671,7 +1664,7 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
     }
 
     private void drawCrosshair(IFocus chFocus, boolean focusMode, Texture crosshairTex, Texture arrowTex, int rw, int rh, float r, float g, float b, float a) {
-        if(chFocus != null) {
+        if (chFocus != null) {
             if (!focusMode) {
                 drawCrosshair(chFocus.getClosestAbsolutePos(aux1).add(posinv), chFocus.getClosestDistToCamera(), chFocus.getRadius(), crosshairTex, arrowTex, rw, rh, r, g, b, a);
             } else {
@@ -1682,17 +1675,18 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
 
     /**
      * Draws a crosshair given a camera-relative position
-     * @param pos The position in floating camera coordinates
-     * @param distToCam The distance to the camera
-     * @param radius Radius of object
+     *
+     * @param pos          The position in floating camera coordinates
+     * @param distToCam    The distance to the camera
+     * @param radius       Radius of object
      * @param crosshairTex Crosshair texture
-     * @param arrowTex Arrow texture
-     * @param rw Width
-     * @param rh Height
-     * @param r Red
-     * @param g Green
-     * @param b Blue
-     * @param a Alpha
+     * @param arrowTex     Arrow texture
+     * @param rw           Width
+     * @param rh           Height
+     * @param r            Red
+     * @param g            Green
+     * @param b            Blue
+     * @param a            Alpha
      */
     private void drawCrosshair(Vector3d pos, double distToCam, double radius, Texture crosshairTex, Texture arrowTex, int rw, int rh, float r, float g, float b, float a) {
         if (distToCam > radius * 2) {
