@@ -12,7 +12,7 @@ uniform sampler2D u_texture0;
 uniform vec2 u_viewportInverse;
 
 in vec2 v_texCoords;
-out vec4 fragColor;
+layout (location = 0) out vec4 fragColor;
 
 vec4 nfaa(sampler2D tex, vec2 texCoords, vec2 viewportInverse){
     vec2 normal = normalMap(tex, texCoords) * viewportInverse;

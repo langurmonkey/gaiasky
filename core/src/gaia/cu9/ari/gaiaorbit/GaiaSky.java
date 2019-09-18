@@ -60,7 +60,6 @@ import gaia.cu9.ari.gaiaorbit.util.time.GlobalClock;
 import gaia.cu9.ari.gaiaorbit.util.time.ITimeFrameProvider;
 import gaia.cu9.ari.gaiaorbit.util.time.RealTimeClock;
 import gaia.cu9.ari.gaiaorbit.util.tree.OctreeNode;
-import gaia.cu9.ari.gaiaorbit.vr.openvr.ControllerModelNotFoundException;
 import gaia.cu9.ari.gaiaorbit.vr.openvr.VRContext;
 import gaia.cu9.ari.gaiaorbit.vr.openvr.VRContext.VRDevice;
 import gaia.cu9.ari.gaiaorbit.vr.openvr.VRContext.VRDeviceType;

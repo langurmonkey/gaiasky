@@ -7,7 +7,7 @@ in vec2 o_texCoords;
 
 in float o_opacity;
 
-out vec4 fragColor;
+layout (location = 0) out vec4 fragColor;
 
 #include shader/lib_logdepthbuff.glsl
 

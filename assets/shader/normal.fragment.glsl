@@ -244,7 +244,7 @@ uniform samplerCube u_environmentCubemap;
 uniform vec4 u_reflectionColor;
 #endif
 
-out vec4 fragColor;
+layout (location = 0) out vec4 fragColor;
 
 #define saturate(x) clamp(x, 0.0, 1.0)
 

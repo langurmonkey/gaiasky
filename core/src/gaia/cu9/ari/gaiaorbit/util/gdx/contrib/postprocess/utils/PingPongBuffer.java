@@ -100,20 +100,31 @@ public final class PingPongBuffer {
 
     public static GaiaSkyFrameBuffer createMainFrameBuffer(int width, int height, boolean hasDepth, Format frameBufferFormat, boolean preventFloatBuffer){
         FrameBufferBuilder frameBufferBuilder = new FrameBufferBuilder(width, height);
+        // Main color render target
         addColorRenderTarget(frameBufferBuilder, frameBufferFormat, preventFloatBuffer);
+        // Depth buffer
         if (hasDepth) {
             addDepthRenderTarget(frameBufferBuilder, preventFloatBuffer);
         }
+
         return new GaiaSkyFrameBuffer(frameBufferBuilder);
 
     }
 
     private static void addColorRenderTarget(FrameBufferBuilder fbb, Format fbf, boolean preventFloatBuffer) {
         if (Gdx.graphics.isGL30Available() && !preventFloatBuffer) {
-            fbb.addFloatAttachment(GL30.GL_RGBA16F, GL30.GL_RGBA, GL30.GL_FLOAT, true);
+            addFloatRenderTarget(fbb, fbf);
         } else {
-            fbb.addBasicColorTextureAttachment(fbf);
+            addColorRenderTarget(fbb, fbf);
         }
+    }
+
+    private static void addFloatRenderTarget(FrameBufferBuilder fbb, Format fbf){
+        fbb.addFloatAttachment(GL30.GL_RGBA16F, GL30.GL_RGBA, GL30.GL_FLOAT, true);
+    }
+
+    private static void addColorRenderTarget(FrameBufferBuilder fbb, Format fbf){
+        fbb.addBasicColorTextureAttachment(fbf);
     }
 
     private static void addDepthRenderTarget(FrameBufferBuilder fbb, boolean preventFloatBuffer) {

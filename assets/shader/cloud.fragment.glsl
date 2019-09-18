@@ -59,7 +59,7 @@ in vec3 v_lightDir;
 in vec3 v_lightCol;
 in vec3 v_viewDir;
 
-out vec4 fragColor;
+layout (location = 0) out vec4 fragColor;
 
 #include shader/lib_logdepthbuff.glsl
 

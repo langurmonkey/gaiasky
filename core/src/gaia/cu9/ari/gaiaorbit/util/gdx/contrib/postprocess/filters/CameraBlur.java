@@ -33,21 +33,23 @@ import gaia.cu9.ari.gaiaorbit.util.gdx.contrib.utils.ShaderLoader;
  */
 public final class CameraBlur extends Filter<CameraBlur> {
 
-    private Texture normaldepth = null;
+    private Texture depthtex = null;
     private Vector2 viewport = new Vector2();
 
     public enum Param implements Parameter {
         // @formatter:off
         InputScene("u_texture0", 0),
         DepthMap("u_texture1", 0),
-        CurrentToPrevious("ctp", 0),
-        Near("near", 0),
-        Far("far", 0),
-        BlurPasses("blur_passes", 0),
-        BlurScale("blur_scale", 0),
-        DepthScale("depth_scale", 0),
-        InvProj("inv_proj", 0),
-        Viewport("viewport", 0);
+        ViewProjInv("u_viewProjInv", 0),
+        PrevViewProj("u_prevViewProj", 0),
+        CurrentToPrevious("u_ctp", 0),
+        InverseProj("u_invProj", 0),
+        Near("u_near", 0),
+        Far("u_far", 0),
+        K("u_k", 0),
+        BlurPasses("u_blurPasses", 0),
+        BlurScale("u_blurScale", 0),
+        Viewport("u_viewport", 0);
         // @formatter:on
 
         private final String mnemonic;
@@ -75,44 +77,43 @@ public final class CameraBlur extends Filter<CameraBlur> {
         // dolut = false;
     }
 
-    public void setNormalDepthMap(Texture texture) {
-        this.normaldepth = texture;
+    public void setDepthTexture(Texture texture) {
+        this.depthtex = texture;
     }
 
+    public void setViewProjectionInverse(Matrix4 viewProjInv){
+        setParam(Param.ViewProjInv, viewProjInv);
+    }
     public void setCurrentToPrevious(Matrix4 ctp) {
-        setParams(Param.CurrentToPrevious, ctp);
-        endParams();
+        setParam(Param.CurrentToPrevious, ctp);
     }
 
-    public void setInverseProj(Matrix4 invProj) {
-        setParams(Param.InvProj, invProj);
-        endParams();
+    public void setPreviousViewProjection(Matrix4 prev){
+        setParam(Param.PrevViewProj, prev);
     }
+
+    public void setInverseProj(Matrix4 invProj){
+        setParam(Param.InverseProj, invProj);
+    }
+
 
     public void setBlurPasses(int passes) {
-        setParams(Param.BlurPasses, passes);
-        endParams();
+        setParam(Param.BlurPasses, passes);
     }
 
     public void setBlurScale(float blurScale) {
-        setParams(Param.BlurScale, blurScale);
-        endParams();
+        setParam(Param.BlurScale, blurScale);
     }
 
-    public void setNearFarPlanes(float near, float far) {
-        setParams(Param.Near, near);
-        setParams(Param.Far, far);
-        endParams();
+    public void setNearFarK(float near, float far, float k) {
+        setParam(Param.Near, near);
+        setParam(Param.Far, far);
+        setParam(Param.K, k);
     }
 
     public void setViewport(float width, float height) {
         viewport.set(width, height);
-        setParams(Param.Viewport, viewport);
-    }
-
-    public void setDepthScale(float scale) {
-        setParams(Param.DepthScale, scale);
-        endParams();
+        setParam(Param.Viewport, viewport);
     }
 
     @Override
@@ -126,6 +127,6 @@ public final class CameraBlur extends Filter<CameraBlur> {
     protected void onBeforeRender() {
         rebind();
         inputTexture.bind(u_texture0);
-        normaldepth.bind(u_texture1);
+        depthtex.bind(u_texture1);
     }
 }

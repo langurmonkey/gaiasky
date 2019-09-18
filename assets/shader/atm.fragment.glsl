@@ -20,7 +20,7 @@ in float v_heightNormalized;
 // Fade factor between hieght-driven opacity and luminosity-driven opacity
 in float v_fadeFactor;
 
-out vec4 fragColor;
+layout (location = 0) out vec4 fragColor;
 
 float luma(vec3 color){
     return dot(color, vec3(0.2126, 0.7152, 0.0722));

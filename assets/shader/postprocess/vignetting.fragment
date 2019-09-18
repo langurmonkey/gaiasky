@@ -23,7 +23,7 @@ uniform float CenterX;
 uniform float CenterY;
 
 in vec2 v_texCoords;
-out vec4 fragColor;
+layout (location = 0) out vec4 fragColor;
 
 #ifdef CONTROL_SATURATION
 	uniform float Saturation;

@@ -98,8 +98,7 @@ in float v_fog;
 uniform vec2 u_cameraNearFar;
 uniform float u_cameraK;
 
-out vec4 fragColor;
-
+layout (location = 0) out vec4 fragColor;
 
 void main() {
 
@@ -187,5 +186,4 @@ void main() {
     fragColor = clamp(fragColor, 0.0, 1.0);
 
 	gl_FragDepth = getDepthValue(u_cameraNearFar.y, u_cameraK);
-
 }

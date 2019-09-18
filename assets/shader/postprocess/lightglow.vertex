@@ -29,8 +29,9 @@ uniform vec2 u_lightPositions[N];
 in vec4 a_position;
 in vec2 a_texCoord0;
 
-out float v_lums[N];
 out vec2 v_texCoords;
+
+out float v_lums[N];
 
 float fx(float t, float a){
     return a * t * cos(t);

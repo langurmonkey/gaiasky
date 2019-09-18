@@ -5,7 +5,7 @@ uniform sampler2D u_texture0;
 uniform vec2 u_massPosition;
 
 in vec2 v_texCoords;
-out vec4 fragColor;
+layout (location = 0) out vec4 fragColor;
 
 float massRadius = 20.0;
 float distortionRadius = 40.0;

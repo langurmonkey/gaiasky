@@ -50,7 +50,8 @@ public class DesktopPostProcessor implements IPostProcessor, IObserver {
 
     Vector3d auxd, prevCampos;
     Vector3 auxf;
-    Matrix4 prevViewProj, prevCombined;
+    Matrix4 prevViewProj;
+    Matrix4 invView, invProj;
 
     private String starTextureName, lensDirtName, lensColorName, lensStarburstName;
 
@@ -61,8 +62,8 @@ public class DesktopPostProcessor implements IPostProcessor, IObserver {
         auxf = new Vector3();
         prevCampos = new Vector3d();
         prevViewProj = new Matrix4();
-        prevCombined = new Matrix4();
-
+        invView = new Matrix4();
+        invProj = new Matrix4();
     }
 
     public void initialize(AssetManager manager) {
@@ -126,6 +127,15 @@ public class DesktopPostProcessor implements IPostProcessor, IObserver {
         //ppb.depthBuffer = new DepthBuffer();
         //ppb.pp.addEffect(ppb.depthBuffer);
 
+        // CAMERA MOTION BLUR
+        //ICamera cam = GaiaSky.instance.getICamera();
+        //ppb.camblur = new CameraMotion(width, height);
+        //ppb.camblur.setBlurPasses(5);
+        //ppb.camblur.setBlurScale(5f);
+        //ppb.camblur.setNearFarK((float) cam.getNear(), (float) cam.getFar(), Constants.getCameraK());
+        //ppb.camblur.setEnabled(false);
+        //ppb.pp.addEffect(ppb.camblur);
+
         // LIGHT GLOW
         int lgw, lgh;
         Texture glow = manager.get(starTextureName);
@@ -160,7 +170,7 @@ public class DesktopPostProcessor implements IPostProcessor, IObserver {
             the activation of the light glow effect is
             not delayed. No time to get to the bottom of this.
          */
-        if(SysUtils.isMac() && GlobalConf.postprocess.POSTPROCESS_LIGHT_SCATTERING) {
+        if (SysUtils.isMac() && GlobalConf.postprocess.POSTPROCESS_LIGHT_SCATTERING) {
             Task enableLG = new Task() {
                 @Override
                 public void run() {
@@ -250,11 +260,11 @@ public class DesktopPostProcessor implements IPostProcessor, IObserver {
     }
 
     private void initMotionBlur(int width, int height, PostProcessBean ppb) {
-        ppb.motionblur = new MotionBlur(width, height);
-        ppb.motionblur.setBlurRadius(0.0f);
-        ppb.motionblur.setBlurOpacity(GlobalConf.postprocess.POSTPROCESS_MOTION_BLUR);
-        ppb.motionblur.setEnabled(GlobalConf.postprocess.POSTPROCESS_MOTION_BLUR > 0);
-        ppb.pp.addEffect(ppb.motionblur);
+        ppb.accumblur = new AccumulationBlur(width, height);
+        ppb.accumblur.setBlurRadius(0.0f);
+        ppb.accumblur.setBlurOpacity(GlobalConf.postprocess.POSTPROCESS_MOTION_BLUR);
+        ppb.accumblur.setEnabled(GlobalConf.postprocess.POSTPROCESS_MOTION_BLUR > 0);
+        ppb.pp.addEffect(ppb.accumblur);
     }
 
     private void initAntiAliasing(Antialias aavalue, int width, int height, PostProcessBean ppb) {
@@ -425,8 +435,15 @@ public class DesktopPostProcessor implements IPostProcessor, IObserver {
                     PostProcessBean ppb = pps[i];
                     ppb.lens.setStarburstOffset(cameraOffset);
                     ppb.lightglow.setOrientation(cameraOffset * 50f);
+
+                    //ppb.camblur.setMatrices(cam.invProjectionView, prevViewProj);
+                    //ppb.camblur.setMatrices(invView.set(cam.view).inv(), prevViewProj, invProj.set(cam.projection).inv());
+                    //ppb.camblur.setBlurScale(0.2f);
+                    //ppb.camblur.setBlurPasses(90);
                 }
             }
+            // Update previous projectionView matrix
+            prevViewProj = cam.combined;
             break;
         case LIGHT_SCATTERING_CMD:
             active = (Boolean) data[0];
@@ -453,8 +470,8 @@ public class DesktopPostProcessor implements IPostProcessor, IObserver {
                 for (int i = 0; i < RenderType.values().length; i++) {
                     if (pps[i] != null) {
                         PostProcessBean ppb = pps[i];
-                        ppb.motionblur.setBlurOpacity(opacity);
-                        ppb.motionblur.setEnabled(opacity > 0);
+                        ppb.accumblur.setBlurOpacity(opacity);
+                        ppb.accumblur.setEnabled(opacity > 0);
                     }
                 }
             });
@@ -465,8 +482,8 @@ public class DesktopPostProcessor implements IPostProcessor, IObserver {
             for (int i = 0; i < RenderType.values().length; i++) {
                 if (pps[i] != null) {
                     PostProcessBean ppb = pps[i];
-                    ppb.motionblur.setBlurOpacity(!enabled ? 0 : GlobalConf.postprocess.POSTPROCESS_MOTION_BLUR);
-                    ppb.motionblur.setEnabled(enabled);
+                    ppb.accumblur.setBlurOpacity(!enabled ? 0 : GlobalConf.postprocess.POSTPROCESS_MOTION_BLUR);
+                    ppb.accumblur.setEnabled(enabled);
                     ppb.lightglow.setNSamples(enabled ? 1 : lightGlowNSamples);
                 }
             }
@@ -496,7 +513,7 @@ public class DesktopPostProcessor implements IPostProcessor, IObserver {
                             // ensure motion blur and levels go after
                             ppb.pp.removeEffect(ppb.levels);
                             initLevels(ppb);
-                            ppb.pp.removeEffect(ppb.motionblur);
+                            ppb.pp.removeEffect(ppb.accumblur);
                             initMotionBlur(Gdx.graphics.getWidth(), Gdx.graphics.getHeight(), ppb);
 
                         } else {
@@ -603,7 +620,7 @@ public class DesktopPostProcessor implements IPostProcessor, IObserver {
             for (int i = 0; i < RenderType.values().length; i++) {
                 if (pps[i] != null) {
                     PostProcessBean ppb = pps[i];
-                    ppb.motionblur.setBlurOpacity(MathUtils.clamp(fps * 1.5f / 60f, 0.2f, 0.95f));
+                    ppb.accumblur.setBlurOpacity(MathUtils.clamp(fps * 1.5f / 60f, 0.2f, 0.95f));
                 }
             }
             break;

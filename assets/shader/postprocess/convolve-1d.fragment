@@ -24,7 +24,7 @@ uniform vec2 SampleOffsets[LENGTH];
 uniform float SampleWeights[LENGTH];
 
 in vec2 v_texCoords;
-out vec4 fragColor;
+layout (location = 0) out vec4 fragColor;
 
 void main()
 {

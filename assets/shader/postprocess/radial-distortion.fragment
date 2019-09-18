@@ -21,7 +21,7 @@ uniform float distortion;// = 0.3
 uniform float zoom;// = 1
 
 in vec2 v_texCoords;
-out vec4 fragColor;
+layout (location = 0) out vec4 fragColor;
 
 vec2 radialDistortion(vec2 coord)
 {

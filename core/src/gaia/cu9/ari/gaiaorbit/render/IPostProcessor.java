@@ -14,13 +14,14 @@ import gaia.cu9.ari.gaiaorbit.util.gdx.contrib.postprocess.effects.*;
 public interface IPostProcessor extends Disposable {
     class PostProcessBean {
         public PostProcessor pp;
+        public CameraMotion camblur;
         public Bloom bloom;
         public Antialiasing antialiasing;
         public LensFlare2 lens;
         public Curvature curvature;
         public Fisheye fisheye;
         public LightGlow lightglow;
-        public MotionBlur motionblur;
+        public AccumulationBlur accumblur;
         public Levels levels;
         public DepthBuffer depthBuffer;
 
@@ -59,10 +60,12 @@ public interface IPostProcessor extends Disposable {
                     fisheye.dispose();
                 if (lightglow != null)
                     lightglow.dispose();
-                if (motionblur != null)
-                    motionblur.dispose();
+                if (accumblur != null)
+                    accumblur.dispose();
                 if (levels != null)
                     levels.dispose();
+                if(camblur != null)
+                    camblur.dispose();
                 if (depthBuffer != null)
                     depthBuffer.dispose();
             }

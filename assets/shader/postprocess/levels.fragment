@@ -112,7 +112,7 @@ vec3 unchartedToneMapping(vec3 pixelColor){
 #endif //toneMappingUncharted
 
 in vec2 v_texCoords;
-out vec4 fragColor;
+layout (location = 0) out vec4 fragColor;
 
 
 vec3 rgb2hsv(vec3 c)

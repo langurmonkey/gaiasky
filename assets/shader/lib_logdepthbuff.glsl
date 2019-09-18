@@ -7,6 +7,11 @@ float getDepthValue(float z, float zfar, float k){
     return log(k * z + 1.0) / log(zfar * k + 1.0);
 }
 
+float recoverWValue(float depth, float zfar, float k){
+    float w = (exp(depth * log(zfar * k + 1.0)) - 1.0) / k;
+    return 1.0 / w;
+}
+
 
 // Visualize both functions:
 // http://fooplot.com/#W3sidHlwZSI6MCwiZXEiOiIoKDEveCktKDEvMSkpLygoMS8xMDApLSgxLzEpKSIsImNvbG9yIjoiIzNFOEExNyJ9LHsidHlwZSI6MCwiZXEiOiJsb2coMS4wKngrMS4wKS9sb2coMS4wKjEwMCsxLjApOyIsImNvbG9yIjoiI0YyMUYxRiJ9LHsidHlwZSI6MTAwMCwid2luZG93IjpbIjEiLCIxMDAiLCIwIiwiMSJdLCJzaXplIjpbNjQ4LDM5OF19XQ--

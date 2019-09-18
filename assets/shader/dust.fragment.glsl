@@ -17,7 +17,7 @@ in vec4 v_position;
 in float v_opacity;
 in vec3 v_viewDir;
 
-out vec4 fragColor;
+layout (location = 0) out vec4 fragColor;
 
 void main() {
     vec4 diffuse = u_diffuseColor;

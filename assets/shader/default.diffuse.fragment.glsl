@@ -44,8 +44,7 @@ in vec3 v_ambientLight;
 uniform vec2 u_cameraNearFar;
 uniform float u_cameraK;
 
-out vec4 fragColor;
-
+layout (location = 0) out vec4 fragColor;
 
 void main() {
 	#if defined(diffuseTextureFlag) && defined(diffuseColorFlag) && defined(colorFlag)

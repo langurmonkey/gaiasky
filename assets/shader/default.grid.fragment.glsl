@@ -12,7 +12,7 @@ in float v_opacity;
 // Color
 in vec4 v_color;
 
-out vec4 fragColor;
+layout (location = 0) out vec4 fragColor;
 
 #define PI 3.141592
 #define N 10.0

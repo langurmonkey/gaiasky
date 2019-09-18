@@ -13,7 +13,6 @@ in vec4 v_col;
 // OUTPUT
 layout (location = 0) out vec4 fragColor;
 
-
 float programmatic(vec2 uv) {
     float dist_center = 1.0 - clamp(distance(vec2(0.5, 0.5 * u_ar), uv) * 2.0, 0.0, 1.0);
     return pow(dist_center, 3.0) * 0.3 + dist_center * 0.05;

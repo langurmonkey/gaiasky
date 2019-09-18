@@ -15,62 +15,60 @@
  ******************************************************************************/
 #version 330 core
 
-uniform sampler2D u_texture0;	// scene
-uniform sampler2D u_texture1;	// depthmap
-uniform mat4 ctp;
-uniform float near, far;
-uniform vec2 viewport;
-uniform mat4 inv_proj;
-uniform float blur_scale;
-uniform float depth_scale;
-uniform int blur_passes;
+uniform sampler2D u_texture0;// scene
+uniform sampler2D u_texture1;// depthmap
+uniform mat4 u_viewProjInv;
+uniform mat4 u_prevViewProj;
+uniform mat4 u_ctp;
+uniform mat4 u_invProj;
+uniform float u_near, u_far, u_k;
+uniform vec2 u_viewport;
+uniform float u_blurScale;
+uniform int u_blurPasses;
 
 in vec2 v_texCoords;
-out vec4 fragColor;
+
+layout (location = 0) out vec4 fragColor;
+
+#include shader/lib_logdepthbuff.glsl
 
 vec3 get_eye_normal(){
-	vec2 frag_coord = gl_FragCoord.xy/viewport;
-	frag_coord = (frag_coord-0.5)*2.0;
-	vec4 device_normal = vec4(frag_coord, 0.0, 1.0);
-	return normalize((inv_proj * device_normal).xyz);
-}
-
-vec3 decode_normal(vec2 enc){
-	vec2 fenc = enc*4.0-2.0;
-	float f = dot(fenc,fenc);
-	float g = sqrt(1.0-f/4.0);
-	return vec3(fenc*g, 1.0-f/2.0);
-}
-
-float decode_depth(vec2 src){
-	float depth = src.x/255.0+src.y;
-	depth *= depth_scale;
-	return depth*far+near;
+    vec2 frag_coord = gl_FragCoord.xy / u_viewport;
+    frag_coord = (frag_coord - 0.5) * 2.0;
+    vec4 device_normal = vec4(frag_coord, 0.0, 1.0);
+    return normalize((u_invProj * device_normal).xyz);
 }
 
 void main() {
-	vec3 eye_ray = get_eye_normal();
-	vec4 eye_data = texture(u_texture1, v_texCoords);
-	vec3 eye_normal = decode_normal(eye_data.xy);
-	float eye_depth = decode_depth(eye_data.zw);
 
-	vec4 current = vec4(eye_ray * eye_depth, 1.0);
-	vec4 previous = ctp * current;
-	previous.xyz /= previous.w;
-	previous.xy = previous.xy * 0.5 + 0.5;
 
-	vec2 velocity = (previous.xy - v_texCoords) * 0.5 * blur_scale;
+    // Get z from depth buffer
+    vec3 depth = texture(u_texture1, v_texCoords).xyz;
+    float w = recoverWValue(depth.r, u_far, u_k);
 
-	// blur pass
-	vec4 result = vec4(0.0);
-	float oneOnNumPasses = 1.0 / float(blur_passes);
+    vec3 eye_ray = get_eye_normal();
+    float eye_depth = 1.0/w;
 
-	for (int i = 0; i < blur_passes; ++i) {
-		// make offset in [-0.5, 0.5] range
-		float scale = (float(i) * oneOnNumPasses) - 0.5;
-		vec2 offset = scale * velocity;
-		result += texture(u_texture0, v_texCoords + offset);
-	}
+    vec4 current = vec4(eye_ray * eye_depth, 1.0);
+    vec4 previous = u_ctp * current;
+    previous.xyz /= previous.w;
+    previous.xy = previous.xy * 0.5 + 0.5;
 
-	fragColor = result * oneOnNumPasses;
+    vec2 velocity = (previous.xy - v_texCoords) * 0.5 * u_blurScale;
+
+    // blur pass
+    vec3 result = vec3(0.0);
+    float oneOnNumPasses = 1.0 / float(u_blurPasses);
+
+    for (int i = 0; i < u_blurPasses; ++i) {
+        // make offset in [-0.5, 0.5] range
+        float scale = (float(i) * oneOnNumPasses) - 0.5;
+        vec2 offset = scale * velocity;
+        result += texture(u_texture0, v_texCoords + offset).xyz;
+    }
+
+    fragColor = vec4(result * oneOnNumPasses, 1.0);
+
+    if (v_texCoords.x < 0.5)
+        fragColor = vec4(depth, 1.0);
 }

@@ -1,6 +1,6 @@
 #version 330 core
 
-out vec4 fragColor;
+layout (location = 0) out vec4 fragColor;
 
 // Renders a depth map for the shadow mapping algorithm
 void main() {

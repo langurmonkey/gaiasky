@@ -13,7 +13,7 @@ uniform float FXAA_REDUCE_MUL;
 uniform float FXAA_SPAN_MAX;
 
 in vec2 v_texCoords;
-out vec4 fragColor;
+layout (location = 0) out vec4 fragColor;
 
 vec4 fxaa(sampler2D tex, vec2 texCoords, vec2 viewportInv) {
     vec3 rgbNW = texture(tex, texCoords.xy + (vec2(-1.0, -1.0) * viewportInv)).xyz;

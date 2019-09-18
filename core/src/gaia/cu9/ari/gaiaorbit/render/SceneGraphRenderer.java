@@ -847,7 +847,6 @@ public class SceneGraphRenderer extends AbstractRenderer implements IProcessRend
 
             // Render model depth map to frame buffer
             shadowMapFb[i].begin();
-            Gdx.gl.glClearColor(0, 0, 0, 0);
             Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT | GL20.GL_DEPTH_BUFFER_BIT);
 
             // No tessellation
@@ -917,7 +916,6 @@ public class SceneGraphRenderer extends AbstractRenderer implements IProcessRend
 
                 // Render model depth map to frame buffer
                 shadowMapFb[i].begin();
-                Gdx.gl.glClearColor(0, 0, 0, 0);
                 Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT | GL20.GL_DEPTH_BUFFER_BIT);
 
                 // Tessellation

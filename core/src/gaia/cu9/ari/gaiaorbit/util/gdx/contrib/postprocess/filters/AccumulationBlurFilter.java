@@ -15,7 +15,7 @@ import gaia.cu9.ari.gaiaorbit.util.gdx.contrib.utils.ShaderLoader;
  *
  * @author Toni Sagrista
  */
-public class MotionFilter extends Filter<MotionFilter> {
+public class AccumulationBlurFilter extends Filter<AccumulationBlurFilter> {
 
     private float blurOpacity = 0.5f;
     private float blurRadius = 0.5f;
@@ -50,7 +50,7 @@ public class MotionFilter extends Filter<MotionFilter> {
         }
     }
 
-    public MotionFilter() {
+    public AccumulationBlurFilter() {
         super(ShaderLoader.fromFile("screenspace", "motionblur"));
         resolution = new Vector2();
         rebind();

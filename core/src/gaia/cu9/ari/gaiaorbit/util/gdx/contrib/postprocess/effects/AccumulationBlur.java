@@ -10,7 +10,7 @@ import com.badlogic.gdx.graphics.Pixmap.Format;
 import com.badlogic.gdx.graphics.glutils.FrameBuffer;
 import gaia.cu9.ari.gaiaorbit.util.gdx.contrib.postprocess.PostProcessorEffect;
 import gaia.cu9.ari.gaiaorbit.util.gdx.contrib.postprocess.filters.Copy;
-import gaia.cu9.ari.gaiaorbit.util.gdx.contrib.postprocess.filters.MotionFilter;
+import gaia.cu9.ari.gaiaorbit.util.gdx.contrib.postprocess.filters.AccumulationBlurFilter;
 import gaia.cu9.ari.gaiaorbit.util.gdx.contrib.utils.GaiaSkyFrameBuffer;
 
 /**
@@ -19,13 +19,13 @@ import gaia.cu9.ari.gaiaorbit.util.gdx.contrib.utils.GaiaSkyFrameBuffer;
  *
  * @author Toni Sagrista
  */
-public class MotionBlur extends PostProcessorEffect {
-    private MotionFilter motionFilter;
+public class AccumulationBlur extends PostProcessorEffect {
+    private AccumulationBlurFilter motionFilter;
     private Copy copyFilter;
     private FrameBuffer fbo;
 
-    public MotionBlur(int width, int height) {
-        motionFilter = new MotionFilter();
+    public AccumulationBlur(int width, int height) {
+        motionFilter = new AccumulationBlurFilter();
         motionFilter.setResolution(width, height);
         copyFilter = new Copy();
     }

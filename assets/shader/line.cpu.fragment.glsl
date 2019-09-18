@@ -7,7 +7,7 @@ uniform float u_k;
 
 in vec4 v_col;
 
-out vec4 fragColor;
+layout (location = 0) out vec4 fragColor;
 
 void main() {
     fragColor = v_col;

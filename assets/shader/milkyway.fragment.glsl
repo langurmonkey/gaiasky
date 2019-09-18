@@ -12,7 +12,7 @@ uniform float u_k;
 in vec4 v_col;
 in float v_dust;
 
-out vec4 fragColor;
+layout (location = 0) out vec4 fragColor;
 
 #define decay 0.2
 #define PI 3.1415927

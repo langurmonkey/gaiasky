@@ -14,7 +14,7 @@ uniform int u_numSamples;
 uniform int u_nLights;
 
 in vec2 v_texCoords;
-out vec4 fragColor;
+layout (location = 0) out vec4 fragColor;
 
 float len(vec2 vect, float ar){
 	return sqrt(vect.x * vect.x * ar * ar + vect.y * vect.y);

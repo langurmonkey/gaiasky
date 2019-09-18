@@ -5,7 +5,7 @@ uniform sampler2D u_texture0;
 uniform float u_fade;
 
 in vec2 v_texCoords;
-out vec4 fragColor;
+layout (location = 0) out vec4 fragColor;
 
 vec4 fuzzy(sampler2D texture, vec2 texCoords, vec2 viewportInv) {
     vec3 rgbN = texture(texture,

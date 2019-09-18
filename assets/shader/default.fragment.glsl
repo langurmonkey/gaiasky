@@ -109,7 +109,7 @@ in float v_fog;
 uniform vec2 u_cameraNearFar;
 uniform float u_cameraK;
 
-out vec4 fragColor;
+layout (location = 0) out vec4 fragColor;
 
 void main() {
 	vec4 night = fetchColorNight(v_texCoords0);

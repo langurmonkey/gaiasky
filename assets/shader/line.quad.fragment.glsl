@@ -8,7 +8,7 @@ uniform float u_k;
 in vec4 v_col;
 in vec2 v_uv;
 
-out vec4 fragColor;
+layout (location = 0) out vec4 fragColor;
 
 #define PI 3.14159
 
@@ -22,5 +22,6 @@ void main() {
     float cplus = pow(core, 10.0);
 
     fragColor = vec4(v_col.rgb + cplus, 1.0) * v_col.a * alpha ;
+
     gl_FragDepth = getDepthValue(u_zfar, u_k);
 }

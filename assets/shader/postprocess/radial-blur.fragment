@@ -23,7 +23,7 @@ uniform float offset_y;
 uniform float zoom;
 
 in vec2 v_texCoords;
-out vec4 fragColor;
+layout (location = 0) out vec4 fragColor;
 
 #ifndef BLUR_LENGTH
 #error Please define a BLUR_LENGTH

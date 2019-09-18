@@ -24,7 +24,7 @@ in vec3 v_viewVec;
 // Color
 in vec4 v_color;
 
-out vec4 fragColor;
+layout (location = 0) out vec4 fragColor;
 
 
 #define time v_time * 0.003

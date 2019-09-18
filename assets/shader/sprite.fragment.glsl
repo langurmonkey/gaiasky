@@ -10,7 +10,7 @@ uniform float u_k;
 in vec2 v_texCoords;
 in vec4 v_color;
 
-out vec4 fragColor;
+layout (location = 0) out vec4 fragColor;
 
 vec4 draw() {
     vec4 tex = texture(u_texture0, v_texCoords);

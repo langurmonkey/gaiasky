@@ -25,7 +25,7 @@ in vec3 v_viewVec;
 
 #include shader/lib_logdepthbuff.glsl
 
-out vec4 fragColor;
+layout (location = 0) out vec4 fragColor;
 
 #define time v_time * 0.003
 

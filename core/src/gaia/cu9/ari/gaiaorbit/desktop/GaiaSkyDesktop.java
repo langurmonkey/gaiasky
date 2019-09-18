@@ -12,6 +12,7 @@ import com.badlogic.gdx.Graphics.DisplayMode;
 import com.badlogic.gdx.backends.lwjgl3.Lwjgl3Application;
 import com.badlogic.gdx.backends.lwjgl3.Lwjgl3ApplicationConfiguration;
 import com.badlogic.gdx.backends.lwjgl3.Lwjgl3Files;
+import com.badlogic.gdx.utils.GdxRuntimeException;
 import com.beust.jcommander.JCommander;
 import com.beust.jcommander.Parameter;
 import gaia.cu9.ari.gaiaorbit.GaiaSky;
@@ -299,7 +300,7 @@ public class GaiaSkyDesktop implements IObserver {
         // Launch app
         try {
             Lwjgl3Application app = new Lwjgl3Application(new GaiaSky(gsArgs.download, gsArgs.catalogChooser, gsArgs.vr), cfg);
-        } catch (Exception e) {
+        } catch (GdxRuntimeException e) {
             // Probably, OpenGL 4.x is not supported and window creation failed
             consoleLogger.subscribe();
             logger.error("Window creation failed (is OpenGL 4.x supported by your card?), trying with OpenGL 3.x");
@@ -312,6 +313,8 @@ public class GaiaSkyDesktop implements IObserver {
             cfg.useOpenGL3(true, 3, 2);
 
             Lwjgl3Application app = new Lwjgl3Application(new GaiaSky(gsArgs.download, gsArgs.catalogChooser, gsArgs.vr), cfg);
+        } catch (Exception e) {
+            logger.error(e);
         }
     }
 

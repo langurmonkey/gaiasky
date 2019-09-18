@@ -32,7 +32,7 @@ uniform float time;
 uniform sampler2D u_texture0;
 
 in vec2 v_texCoords;
-out vec4 fragColor;
+layout (location = 0) out vec4 fragColor;
 
 #ifdef ENABLE_RGB_SHIFT
 // sane values between ~[-0.003, 0.003];

@@ -13,11 +13,8 @@ uniform float u_time;
 in vec2 v_texCoords;
 in vec4 v_color;
 
-out vec4 fragColor;
+layout (location = 0) out vec4 fragColor;
 
-
-#define distfac 3.24e-8 / 60000.0
-#define distfacinv 60000.0 / 3.23e-8
 #define light_decay 0.3
 #define PI 3.1415927
 

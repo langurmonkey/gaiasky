@@ -14,7 +14,7 @@ uniform vec2 u_resolution;
 uniform float u_blurRadius;
 
 in vec2 v_texCoords;
-out vec4 fragColor;
+layout (location = 0) out vec4 fragColor;
 
 vec4 blur(vec2 dir, sampler2D tex, vec2 tc, float radius, float resolution){
     vec4 sum = vec4(0.0);

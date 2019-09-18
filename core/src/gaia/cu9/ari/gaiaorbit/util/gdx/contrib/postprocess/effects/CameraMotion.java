@@ -29,20 +29,20 @@ import gaia.cu9.ari.gaiaorbit.util.gdx.contrib.postprocess.filters.CameraBlur;
 import gaia.cu9.ari.gaiaorbit.util.gdx.contrib.utils.GaiaSkyFrameBuffer;
 
 /**
- * FIXME this effect is INCOMPLETE!
  *
  * @author bmanuel
  */
 public final class CameraMotion extends PostProcessorEffect {
     private CameraBlur camblur;
-    private Matrix4 ctp = new Matrix4();
     private float width, height;
+    private Matrix4 ctp;
 
     public CameraMotion(int width, int height) {
         this.width = width;
         this.height = height;
         camblur = new CameraBlur();
-        camblur.setNormalDepthMap(null);
+        camblur.setDepthTexture(null);
+        ctp = new Matrix4();
     }
 
     @Override
@@ -50,10 +50,14 @@ public final class CameraMotion extends PostProcessorEffect {
         camblur.dispose();
     }
 
-    public void setNormalDepthMap(Texture normalDepthMap) {
-        camblur.setNormalDepthMap(normalDepthMap);
+    public void setDepthTexture(Texture normalDepthMap) {
+        camblur.setDepthTexture(normalDepthMap);
     }
 
+    public void setMatrices(Matrix4 viewProjInv, Matrix4 prevViewProj) {
+        camblur.setViewProjectionInverse(viewProjInv);
+        camblur.setPreviousViewProjection(prevViewProj);
+    }
     public void setMatrices(Matrix4 inv_view, Matrix4 prevViewProj, Matrix4 inv_proj) {
         ctp.set(prevViewProj).mul(inv_view);
         camblur.setCurrentToPrevious(ctp);
@@ -68,12 +72,8 @@ public final class CameraMotion extends PostProcessorEffect {
         camblur.setBlurScale(scale);
     }
 
-    public void setNearFar(float near, float far) {
-        camblur.setNearFarPlanes(near, far);
-    }
-
-    public void setDepthScale(float scale) {
-        camblur.setDepthScale(scale);
+    public void setNearFarK(float near, float far, float k) {
+        camblur.setNearFarK(near, far, k);
     }
 
     @Override
@@ -90,8 +90,7 @@ public final class CameraMotion extends PostProcessorEffect {
         }
 
         restoreViewport(dest);
+        camblur.setDepthTexture(main.getOwnDepthBufferTexture());
         camblur.setInput(src).setOutput(dest).render();
     }
-
-    ;
 }

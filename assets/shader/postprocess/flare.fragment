@@ -14,7 +14,7 @@ float u_ghostDispersal = 0.4;
 float u_distortion = 1.5;
 
 in vec2 v_texCoords;
-out vec4 fragColor;
+layout (location = 0) out vec4 fragColor;
 
 /*----------------------------------------------------------------------------*/
 vec4 textureDistorted(sampler2D tex, vec2 texcoord, vec2 direction,	vec3 distortion) {
