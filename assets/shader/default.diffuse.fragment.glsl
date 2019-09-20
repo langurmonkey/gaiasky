@@ -82,5 +82,5 @@ void main() {
 
 	gl_FragDepth = getDepthValue(u_cameraNearFar.y, u_cameraK);
 	// Do not contribute to motion blur
-	velMap = vec4(0.0);
+	velocityBuffer();
 }

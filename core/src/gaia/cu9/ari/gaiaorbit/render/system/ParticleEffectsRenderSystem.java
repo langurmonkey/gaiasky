@@ -216,7 +216,7 @@ public class ParticleEffectsRenderSystem extends ImmediateRenderSystem {
                 ExtShaderProgram shaderProgram = getShaderProgram();
 
                 shaderProgram.begin();
-                shaderProgram.setUniformMatrix("u_projModelView", camera.getCamera().combined);
+                shaderProgram.setUniformMatrix("u_projView", camera.getCamera().combined);
                 shaderProgram.setUniformf("u_camPos", camera.getCurrent().getPos().put(aux1f));
                 shaderProgram.setUniformf("u_alpha", alpha * 0.6f);
                 shaderProgram.setUniformf("u_sizeFactor", rc.scaleFactor);

@@ -275,6 +275,8 @@ out vec3 v_viewDir;
 out vec3 v_reflect;
 #endif
 
+#include shader/lib_velbuffer.vert.glsl
+
 void main() {
     computeAtmosphericScatteringGround();
 

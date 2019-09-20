@@ -4,7 +4,7 @@ in vec4 a_position;
 in vec4 a_color;
 
 uniform mat4 u_worldTransform;
-uniform mat4 u_projModelView;
+uniform mat4 u_projView;
 uniform vec3 u_parentPos;
 uniform float u_pointSize;
 
@@ -27,8 +27,11 @@ uniform float u_omgw;// Wave frequency
 #include shader/lib_gravwaves.glsl
 #endif// gravitationalWaves
 
+#include shader/lib_velbuffer.vert.glsl
+
 void main() {
-    vec4 pos = vec4(a_position);
+    vec4 pos = a_position;
+    vec4 prevPos = pos + vec4(u_dCamPos, 0.0);
 
     pos.xyz -= u_parentPos;
     pos = u_worldTransform * pos;
@@ -41,8 +44,14 @@ void main() {
     pos.xyz = computeGravitationalWaves(pos.xyz, u_gw, u_gwmat3, u_ts, u_omgw, u_hterms);
     #endif// gravitationalWaves
 
-    gl_Position = u_projModelView * pos;
-
     gl_PointSize = u_pointSize;
     v_col = a_color;
+
+    // Position
+    vec4 gpos = u_projView * pos;
+    gl_Position = gpos;
+
+    // Velocity buffer
+    vec4 gprevpos = u_prevProjView * prevPos;
+    v_vel = ((gpos.xy / gpos.w) - (gprevpos.xy / gprevpos.w));
 }

@@ -33,5 +33,5 @@ void main() {
 
     fragColor = v_col * alpha;
     gl_FragDepth = getDepthValue(u_zfar, u_k);
-    velocityBuffer(profile);
+    velocityBuffer();
 }

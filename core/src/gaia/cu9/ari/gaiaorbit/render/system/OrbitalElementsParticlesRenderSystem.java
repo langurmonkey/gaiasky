@@ -123,7 +123,7 @@ public class OrbitalElementsParticlesRenderSystem extends ImmediateRenderSystem 
                 boolean stereoHw = GlobalConf.program.isStereoHalfWidth();
 
                 shaderProgram.begin();
-                shaderProgram.setUniformMatrix("u_projModelView", camera.getCamera().combined);
+                shaderProgram.setUniformMatrix("u_projView", camera.getCamera().combined);
                 shaderProgram.setUniformf("u_alpha", alphas[first.ct.getFirstOrdinal()] * first.getOpacity());
                 shaderProgram.setUniformf("u_ar", stereoHw ? 2f : 1f);
                 shaderProgram.setUniformf("u_falloff", 2.5f);

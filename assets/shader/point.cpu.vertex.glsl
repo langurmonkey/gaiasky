@@ -1,6 +1,6 @@
 #version 330 core
 
-uniform mat4 u_projModelView;
+uniform mat4 u_projView;
 
 in vec4 a_position;
 in vec4 a_color;
@@ -36,7 +36,7 @@ void main() {
         pos.xyz = computeGravitationalWaves(pos.xyz, u_gw, u_gwmat3, u_ts, u_omgw, u_hterms);
     #endif // gravitationalWaves
     
-    gl_Position = u_projModelView * pos;
+    gl_Position = u_projView * pos;
     gl_PointSize = a_size;
     v_col = a_color;
 }

@@ -10,7 +10,6 @@ import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.graphics.PerspectiveCamera;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.Texture.TextureFilter;
-import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.Timer;
@@ -131,6 +130,7 @@ public class DesktopPostProcessor implements IPostProcessor, IObserver {
         ppb.camblur = new CameraMotion(width, height);
         ppb.camblur.setBlurPasses(5);
         ppb.camblur.setBlurScale(5f);
+        ppb.camblur.setEnabled(GlobalConf.postprocess.POSTPROCESS_MOTION_BLUR > 0);
         ppb.pp.addEffect(ppb.camblur);
 
         // LIGHT GLOW
@@ -226,9 +226,6 @@ public class DesktopPostProcessor implements IPostProcessor, IObserver {
         // LEVELS - BRIGHTNESS, CONTRAST, HUE, SATURATION, GAMMA CORRECTION and HDR TONE MAPPING
         initLevels(ppb);
 
-        // MOTION BLUR
-        initMotionBlur(width, height, ppb);
-
         return ppb;
     }
 
@@ -256,13 +253,6 @@ public class DesktopPostProcessor implements IPostProcessor, IObserver {
         ppb.pp.addEffect(ppb.levels);
     }
 
-    private void initMotionBlur(int width, int height, PostProcessBean ppb) {
-        ppb.accumblur = new AccumulationBlur(width, height);
-        ppb.accumblur.setBlurRadius(0.0f);
-        ppb.accumblur.setBlurOpacity(GlobalConf.postprocess.POSTPROCESS_MOTION_BLUR);
-        ppb.accumblur.setEnabled(GlobalConf.postprocess.POSTPROCESS_MOTION_BLUR > 0);
-        ppb.pp.addEffect(ppb.accumblur);
-    }
 
     private void initAntiAliasing(Antialias aavalue, int width, int height, PostProcessBean ppb) {
         if (aavalue.equals(Antialias.FXAA)) {
@@ -432,9 +422,6 @@ public class DesktopPostProcessor implements IPostProcessor, IObserver {
                     PostProcessBean ppb = pps[i];
                     ppb.lens.setStarburstOffset(cameraOffset);
                     ppb.lightglow.setOrientation(cameraOffset * 50f);
-                    // FPS / targetFPS
-                    float fps = 1f / Gdx.graphics.getDeltaTime();
-                    ppb.camblur.setVelocityScale(fps / 60f);
                 }
             }
             // Update previous projectionView matrix
@@ -465,8 +452,7 @@ public class DesktopPostProcessor implements IPostProcessor, IObserver {
                 for (int i = 0; i < RenderType.values().length; i++) {
                     if (pps[i] != null) {
                         PostProcessBean ppb = pps[i];
-                        ppb.accumblur.setBlurOpacity(opacity);
-                        ppb.accumblur.setEnabled(opacity > 0);
+                        ppb.camblur.setEnabled(opacity > 0);
                     }
                 }
             });
@@ -477,8 +463,7 @@ public class DesktopPostProcessor implements IPostProcessor, IObserver {
             for (int i = 0; i < RenderType.values().length; i++) {
                 if (pps[i] != null) {
                     PostProcessBean ppb = pps[i];
-                    ppb.accumblur.setBlurOpacity(!enabled ? 0 : GlobalConf.postprocess.POSTPROCESS_MOTION_BLUR);
-                    ppb.accumblur.setEnabled(enabled);
+                    ppb.camblur.setEnabled(enabled);
                     ppb.lightglow.setNSamples(enabled ? 1 : lightGlowNSamples);
                 }
             }
@@ -508,9 +493,6 @@ public class DesktopPostProcessor implements IPostProcessor, IObserver {
                             // ensure motion blur and levels go after
                             ppb.pp.removeEffect(ppb.levels);
                             initLevels(ppb);
-                            ppb.pp.removeEffect(ppb.accumblur);
-                            initMotionBlur(Gdx.graphics.getWidth(), Gdx.graphics.getHeight(), ppb);
-
                         } else {
                             // remove
                             if (ppb.antialiasing != null) {
@@ -615,7 +597,7 @@ public class DesktopPostProcessor implements IPostProcessor, IObserver {
             for (int i = 0; i < RenderType.values().length; i++) {
                 if (pps[i] != null) {
                     PostProcessBean ppb = pps[i];
-                    ppb.accumblur.setBlurOpacity(MathUtils.clamp(fps * 1.5f / 60f, 0.2f, 0.95f));
+                    ppb.camblur.setVelocityScale(fps / 60f);
                 }
             }
             break;

@@ -76,6 +76,13 @@ out vec3 o_shadowMapUv;
 
 #include shader/lib_sampleheight.glsl
 
+// Projection-View matrix in previous frame
+uniform mat4 u_prevProjView;
+// Camera position in previous frame
+uniform vec3 u_prevCamPos;
+
+out vec2 v_vel;
+
     #ifdef normalTextureFlag
 // Use normal map
 uniform sampler2D u_normalTexture;
@@ -118,6 +125,9 @@ void main(void){
     vec3 dh = o_normal * o_fragHeight;
     pos += vec4(dh, 0.0);
 
+    // For velocity buffer
+    vec4 prevPos = pos + vec4(u_prevCamPos, 0.0);
+
     #ifdef relativisticEffects
     pos.xyz = computeRelativisticAberration(pos.xyz, length(pos.xyz), u_velDir, u_vc);
     #endif// relativisticEffects
@@ -126,7 +136,12 @@ void main(void){
     pos.xyz = computeGravitationalWaves(pos.xyz, u_gw, u_gwmat3, u_ts, u_omgw, u_hterms);
     #endif// gravitationalWaves
 
-    gl_Position = u_projViewTrans * pos;
+    vec4 gpos = u_projViewTrans * pos;
+    gl_Position = gpos;
+
+    // Velocity buffer
+    vec4 gprevpos = u_prevProjView * prevPos;
+    v_vel = ((gpos.xy / gpos.w) - (gprevpos.xy / gprevpos.w));
 
     // Plumbing
     o_fragPosition = pos.xyz;

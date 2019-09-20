@@ -11,7 +11,7 @@ in float a_t;
 
 uniform float u_alpha;
 
-uniform mat4 u_projModelView;
+uniform mat4 u_projView;
 uniform vec3 u_camPos;
 uniform float u_sizeFactor;
 uniform float u_t; // time in seconds
@@ -55,6 +55,6 @@ void main() {
     
     v_col = vec4(a_color.rgb, a_color.a * alpha);
 
-    gl_Position = u_projModelView * vec4(pos, 0.0);
+    gl_Position = u_projView * vec4(pos, 1.0);
     gl_PointSize = a_size * u_sizeFactor;
 }

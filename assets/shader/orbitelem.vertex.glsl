@@ -8,7 +8,7 @@ in vec4 a_orbitelems01;
 in vec4 a_orbitelems02;
 in float a_size;
 
-uniform mat4 u_projModelView;
+uniform mat4 u_projView;
 uniform mat4 u_eclToEq;
 uniform vec3 u_camPos;
 uniform vec3 u_camDir;
@@ -131,7 +131,7 @@ void main() {
     
     v_col = a_color * u_alpha;
 
-    gl_Position = u_projModelView * vec4(pos, 0.0);
+    gl_Position = u_projView * vec4(pos, 0.0);
     float distNorm = dist / 300.0;
     gl_PointSize = clamp(u_size / distNorm, 1.5, 3.5) * u_scaleFactor * cubemapSizeFactor * a_size;
 }
