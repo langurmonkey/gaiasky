@@ -240,6 +240,16 @@ public class CameraManager implements ICamera, IObserver {
     }
 
     @Override
+    public Vector3d getPreviousPos(){
+        return current.getPreviousPos();
+    }
+
+    @Override
+    public void setPreviousPos(Vector3d prevpos){
+        current.setPreviousPos(prevpos);
+    }
+
+    @Override
     public Vector3d getInversePos() {
         return current.getInversePos();
     }
@@ -271,7 +281,14 @@ public class CameraManager implements ICamera, IObserver {
      * @param time The time frame provider.
      */
     public void update(double dt, ITimeFrameProvider time) {
+        // Update the previous position for this frame
+        current.setPreviousPos(current.getPos());
+        // Update the previous projView matrix
+        current.setPreviousProjView(current.getProjView());
+
+        // Update the camera
         current.update(dt, time);
+
         if (current != fovCamera && GlobalConf.scene.COMPUTE_GAIA_SCAN) {
             fovCamera.updateDirections(time);
         }
@@ -320,6 +337,7 @@ public class CameraManager implements ICamera, IObserver {
             }
         }
         EventManager.instance.post(Events.CAMERA_CLOSEST_INFO, getClosest(), getClosestBody(), getClosestStar());
+
     }
 
     private void updateRADEC(int pointerX, int pointerY, int viewX, int viewY) {
@@ -534,6 +552,21 @@ public class CameraManager implements ICamera, IObserver {
     @Override
     public Vector3d getShift() {
         return current.getShift();
+    }
+
+    @Override
+    public Matrix4 getProjView() {
+        return current.getProjView();
+    }
+
+    @Override
+    public Matrix4 getPreviousProjView() {
+        return current.getPreviousProjView();
+    }
+
+    @Override
+    public void setPreviousProjView(Matrix4 mat) {
+        current.setPreviousProjView(mat);
     }
 
     @Override

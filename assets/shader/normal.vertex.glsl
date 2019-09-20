@@ -301,6 +301,8 @@ out vec3 v_fragPosWorld;
 out vec3 v_reflect;
 #endif
 
+#include shader/lib_velbuffer.vert.glsl
+
 void main() {
     computeAtmosphericScatteringGround();
 
@@ -308,7 +310,8 @@ void main() {
 
     // Location in world coordinates (world origin is at the camera)
     vec4 pos = u_worldTrans * g_position;
-    
+    vec4 prevPos = pos + vec4(u_prevCamPos, 0.0);
+
     #ifdef relativisticEffects
         pos.xyz = computeRelativisticAberration(pos.xyz, length(pos.xyz), u_velDir, u_vc);
     #endif // relativisticEffects
@@ -318,7 +321,12 @@ void main() {
     #endif // gravitationalWaves
 
     v_fragPosWorld = pos.xyz;
-    gl_Position = u_projViewTrans * pos;
+    vec4 gpos = u_projViewTrans * pos;
+    gl_Position = gpos;
+
+    // Velocity buffer
+    vec4 gprevpos = u_prevProjView * prevPos;
+    v_vel = ((gpos.xy / gpos.w) - (gprevpos.xy / gprevpos.w));
 
     #ifdef shadowMapFlag
 	vec4 spos = u_shadowMapProjViewTrans * pos;

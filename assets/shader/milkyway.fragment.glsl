@@ -14,6 +14,8 @@ in float v_dust;
 
 layout (location = 0) out vec4 fragColor;
 
+#include shader/lib_velbuffer.frag.glsl
+
 #define decay 0.2
 #define PI 3.1415927
 
@@ -50,4 +52,5 @@ void main() {
 
     // Logarithmic depth buffer
     gl_FragDepth = getDepthValue(u_zfar, u_k);
+    velocityBuffer(programmatic(dist));
 }

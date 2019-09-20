@@ -98,7 +98,7 @@ public class SceneGraphRenderer extends AbstractRenderer implements IProcessRend
 
     private Array<IRenderSystem> renderProcesses;
 
-    private RenderSystemRunnable depthTestR, additiveBlendR, noDepthTestR, regularBlendR, noDepthWritesR, depthWritesR, clearDepthR;
+    private RenderSystemRunnable depthTestR, additiveBlendR, noDepthTestR, regularBlendR, noDepthWritesR, depthWritesR, clearDepthR, noBlendR;
 
     /** The particular current scene graph renderer **/
     private ISGR sgr;
@@ -233,6 +233,9 @@ public class SceneGraphRenderer extends AbstractRenderer implements IProcessRend
         regularBlendR = (renderSystem, renderables, camera) -> {
             Gdx.gl.glEnable(GL20.GL_BLEND);
             Gdx.gl.glBlendFunc(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA);
+        };
+        noBlendR = (renderSystem, renderables, camera) -> {
+            Gdx.gl.glDisable(GL20.GL_BLEND);
         };
         clearDepthR = (renderSystem, renderables, camera) -> {
             Gdx.gl.glClear(GL20.GL_DEPTH_BUFFER_BIT);
@@ -456,16 +459,16 @@ public class SceneGraphRenderer extends AbstractRenderer implements IProcessRend
 
         // MODEL BACKGROUND - (MW panorama, CMWB)
         AbstractRenderSystem modelBackgroundProc = new ModelBatchRenderSystem(RenderGroup.MODEL_VERT, alphas, mbVertexLighting, ModelRenderType.NORMAL);
-        modelBackgroundProc.addPostRunnables(clearDepthR);
+        //modelBackgroundProc.addPostRunnables(clearDepthR);
 
         // MODEL GRID - (Ecl, Eq, Gal grids)
         AbstractRenderSystem modelGridsProc = new ModelBatchRenderSystem(RenderGroup.MODEL_VERT_GRID, alphas, mbVertexLightingGrid, ModelRenderType.NORMAL);
-        modelGridsProc.addPostRunnables(clearDepthR);
+        //modelGridsProc.addPostRunnables(clearDepthR);
 
         // ANNOTATIONS - (grids)
         AbstractRenderSystem annotationsProc = new FontRenderSystem(RenderGroup.FONT_ANNOTATION, alphas, spriteBatch, null, null, font2d, null);
         annotationsProc.addPreRunnables(regularBlendR, noDepthTestR);
-        annotationsProc.addPostRunnables(clearDepthR);
+        //annotationsProc.addPostRunnables(clearDepthR);
 
         // BILLBOARD STARS
         billboardStarsProc = new BillboardStarRenderSystem(RenderGroup.BILLBOARD_STAR, alphas, starBillboardShaders, GlobalResources.unpackTexName("data/tex/base/star-tex-02*.png"), ComponentType.Stars.ordinal());

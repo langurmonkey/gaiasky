@@ -128,13 +128,10 @@ public class DesktopPostProcessor implements IPostProcessor, IObserver {
         //ppb.pp.addEffect(ppb.depthBuffer);
 
         // CAMERA MOTION BLUR
-        //ICamera cam = GaiaSky.instance.getICamera();
-        //ppb.camblur = new CameraMotion(width, height);
-        //ppb.camblur.setBlurPasses(5);
-        //ppb.camblur.setBlurScale(5f);
-        //ppb.camblur.setNearFarK((float) cam.getNear(), (float) cam.getFar(), Constants.getCameraK());
-        //ppb.camblur.setEnabled(false);
-        //ppb.pp.addEffect(ppb.camblur);
+        ppb.camblur = new CameraMotion(width, height);
+        ppb.camblur.setBlurPasses(5);
+        ppb.camblur.setBlurScale(5f);
+        ppb.pp.addEffect(ppb.camblur);
 
         // LIGHT GLOW
         int lgw, lgh;
@@ -435,11 +432,9 @@ public class DesktopPostProcessor implements IPostProcessor, IObserver {
                     PostProcessBean ppb = pps[i];
                     ppb.lens.setStarburstOffset(cameraOffset);
                     ppb.lightglow.setOrientation(cameraOffset * 50f);
-
-                    //ppb.camblur.setMatrices(cam.invProjectionView, prevViewProj);
-                    //ppb.camblur.setMatrices(invView.set(cam.view).inv(), prevViewProj, invProj.set(cam.projection).inv());
-                    //ppb.camblur.setBlurScale(0.2f);
-                    //ppb.camblur.setBlurPasses(90);
+                    // FPS / targetFPS
+                    float fps = 1f / Gdx.graphics.getDeltaTime();
+                    ppb.camblur.setVelocityScale(fps / 60f);
                 }
             }
             // Update previous projectionView matrix

@@ -41,7 +41,7 @@ public final class CameraMotion extends PostProcessorEffect {
         this.width = width;
         this.height = height;
         camblur = new CameraBlur();
-        camblur.setDepthTexture(null);
+        camblur.setVelocityTexture(null);
         ctp = new Matrix4();
     }
 
@@ -51,17 +51,7 @@ public final class CameraMotion extends PostProcessorEffect {
     }
 
     public void setDepthTexture(Texture normalDepthMap) {
-        camblur.setDepthTexture(normalDepthMap);
-    }
-
-    public void setMatrices(Matrix4 viewProjInv, Matrix4 prevViewProj) {
-        camblur.setViewProjectionInverse(viewProjInv);
-        camblur.setPreviousViewProjection(prevViewProj);
-    }
-    public void setMatrices(Matrix4 inv_view, Matrix4 prevViewProj, Matrix4 inv_proj) {
-        ctp.set(prevViewProj).mul(inv_view);
-        camblur.setCurrentToPrevious(ctp);
-        camblur.setInverseProj(inv_proj);
+        camblur.setVelocityTexture(normalDepthMap);
     }
 
     public void setBlurPasses(int passes) {
@@ -72,8 +62,8 @@ public final class CameraMotion extends PostProcessorEffect {
         camblur.setBlurScale(scale);
     }
 
-    public void setNearFarK(float near, float far, float k) {
-        camblur.setNearFarK(near, far, k);
+    public void setVelocityScale(float scale) {
+        camblur.setVelocityScale(scale);
     }
 
     @Override
@@ -90,7 +80,7 @@ public final class CameraMotion extends PostProcessorEffect {
         }
 
         restoreViewport(dest);
-        camblur.setDepthTexture(main.getOwnDepthBufferTexture());
+        camblur.setVelocityTexture(main.getVelocityBufferTexture());
         camblur.setInput(src).setOutput(dest).render();
     }
 }

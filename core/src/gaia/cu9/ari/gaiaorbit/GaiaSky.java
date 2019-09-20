@@ -343,7 +343,7 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
 
         // GL clear state
         Gdx.gl.glClearColor(0, 0, 0, 0);
-        Gdx.gl.glClearDepthf(1);
+        Gdx.gl.glClearDepthf(1f);
     }
 
     /**
@@ -945,7 +945,7 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
     public FrameBuffer getFrameBuffer(int w, int h) {
         String key = getKey(w, h);
         if (!fbmap.containsKey(key)) {
-            FrameBuffer fb = PingPongBuffer.createMainFrameBuffer(w, h, true, Format.RGB888, true);
+            FrameBuffer fb = PingPongBuffer.createMainFrameBuffer(w, h, true, true, Format.RGB888, true);
             fbmap.put(key, fb);
         }
         return fbmap.get(key);

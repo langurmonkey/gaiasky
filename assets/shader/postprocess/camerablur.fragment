@@ -17,58 +17,63 @@
 
 uniform sampler2D u_texture0;// scene
 uniform sampler2D u_texture1;// depthmap
-uniform mat4 u_viewProjInv;
-uniform mat4 u_prevViewProj;
-uniform mat4 u_ctp;
-uniform mat4 u_invProj;
-uniform float u_near, u_far, u_k;
 uniform vec2 u_viewport;
 uniform float u_blurScale;
 uniform int u_blurPasses;
+uniform float u_velScale;
 
 in vec2 v_texCoords;
 
 layout (location = 0) out vec4 fragColor;
 
-#include shader/lib_logdepthbuff.glsl
+#define MAX_SAMPLES 25
 
-vec3 get_eye_normal(){
-    vec2 frag_coord = gl_FragCoord.xy / u_viewport;
-    frag_coord = (frag_coord - 0.5) * 2.0;
-    vec4 device_normal = vec4(frag_coord, 0.0, 1.0);
-    return normalize((u_invProj * device_normal).xyz);
+vec4 velocityBuffer(vec2 velocity){
+    float valx = 0.0;
+    float valy = 0.0;
+    if(velocity.x < 0.0){
+        valx = abs(velocity.x);
+    }
+    if(velocity.y < 0.0){
+        valy = abs(velocity.y);
+    }
+    return vec4(abs(velocity.x), abs(velocity.y), valx + valy, 1.0);
+}
+
+vec2 maxLength(vec2 v, float maxLength){
+    float len = length(v);
+    if(len > maxLength){
+        v = normalize(v) * maxLength;
+    }
+    return v;
+}
+
+vec2 vpow(vec2 v, float p){
+    return vec2(sign(v.x) * pow(abs(v.x), p), sign(v.y) * pow(abs(v.y), p));
 }
 
 void main() {
+    vec3 col = texture(u_texture0, v_texCoords).rgb;
+    vec2 velocity = texture(u_texture1, v_texCoords).rg;
+    velocity = maxLength(vpow(velocity, 1.5), 0.05);
+    vec2 vel = velocity * u_velScale;
 
+    float speed = length(vel * u_viewport);
+    int nSamples = clamp(int(speed), 1, MAX_SAMPLES);
 
-    // Get z from depth buffer
-    vec3 depth = texture(u_texture1, v_texCoords).xyz;
-    float w = recoverWValue(depth.r, u_far, u_k);
-
-    vec3 eye_ray = get_eye_normal();
-    float eye_depth = 1.0/w;
-
-    vec4 current = vec4(eye_ray * eye_depth, 1.0);
-    vec4 previous = u_ctp * current;
-    previous.xyz /= previous.w;
-    previous.xy = previous.xy * 0.5 + 0.5;
-
-    vec2 velocity = (previous.xy - v_texCoords) * 0.5 * u_blurScale;
-
-    // blur pass
-    vec3 result = vec3(0.0);
-    float oneOnNumPasses = 1.0 / float(u_blurPasses);
-
-    for (int i = 0; i < u_blurPasses; ++i) {
-        // make offset in [-0.5, 0.5] range
-        float scale = (float(i) * oneOnNumPasses) - 0.5;
-        vec2 offset = scale * velocity;
-        result += texture(u_texture0, v_texCoords + offset).xyz;
+    vec3 blurred = col;
+    for (int i = 1; i < nSamples; ++i) {
+        vec2 offset = vel * (float(i) / float(nSamples - 1) - 0.5);
+        //vec2 offset = vel * (float(i) / float(nSamples - 1) - 0.5);
+        blurred += texture(u_texture0, v_texCoords + offset).rgb;
     }
+    blurred /= float(nSamples);
 
-    fragColor = vec4(result * oneOnNumPasses, 1.0);
-
-    if (v_texCoords.x < 0.5)
-        fragColor = vec4(depth, 1.0);
+    if (v_texCoords.x < 0.5){
+        fragColor = vec4(blurred, 1.0);
+    } else {
+        // Show velocity buffer
+        fragColor = velocityBuffer(velocity);
+        //fragColor = vec4(col, 1.0);
+    }
 }

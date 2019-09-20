@@ -262,6 +262,7 @@ uniform float u_heightNoiseSize;
 #include shader/lib_sampleheight.glsl
 
 vec2 parallaxMapping(vec2 texCoords, vec3 viewDir){
+
     // number of depth layers
     const float minLayers = 8;
     const float maxLayers = 32;
@@ -331,6 +332,7 @@ mat3 cotangentFrame(vec3 N, vec3 p, vec2 uv){
 
 #include shader/lib_atmfog.glsl
 #include shader/lib_logdepthbuff.glsl
+#include shader/lib_velbuffer.frag.glsl
 
 void main() {
     vec2 texCoords = v_texCoord0;
@@ -412,4 +414,5 @@ void main() {
     }
     // Logarithmic depth buffer
     gl_FragDepth = getDepthValue(u_cameraNearFar.y, u_cameraK);
+    velocityBuffer();
 }

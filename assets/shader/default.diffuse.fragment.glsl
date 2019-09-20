@@ -46,6 +46,8 @@ uniform float u_cameraK;
 
 layout (location = 0) out vec4 fragColor;
 
+#include shader/lib_velbuffer.frag.glsl
+
 void main() {
 	#if defined(diffuseTextureFlag) && defined(diffuseColorFlag) && defined(colorFlag)
 		vec4 diffuse = texture(u_diffuseTexture, v_texCoords0, TEXTURE_LOD_BIAS) * u_diffuseColor * v_color;
@@ -79,4 +81,6 @@ void main() {
     fragColor = clamp(fragColor, 0.0, 1.0);
 
 	gl_FragDepth = getDepthValue(u_cameraNearFar.y, u_cameraK);
+	// Do not contribute to motion blur
+	velMap = vec4(0.0);
 }
