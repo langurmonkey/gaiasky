@@ -6,7 +6,7 @@ void velocityBufferLen(float maxLen){
     // Clamp length
     vec2 vel = v_vel;
     if(abs(length(vel)) > maxLen){
-       vel = normalize(vel) * maxLen;
+        vel = normalize(vel) * maxLen;
     }
     velMap = vec4(vel.x, vel.y, 0.0, 1.0);
 }

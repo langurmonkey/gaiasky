@@ -95,5 +95,5 @@ void main() {
     gl_Position = gpos * v_discard;
     gl_PointSize = u_alphaSizeFovBr.y * sizefactor;
 
-    velocityBuffer(gpos, dist, pm, vec2(500.0, 3000.0), 2.0);
+    velocityBuffer(gpos, dist, pm, vec2(500.0, 3000.0), 1.0);
 }

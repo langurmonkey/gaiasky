@@ -74,5 +74,4 @@ void main() {
 
 	gl_FragDepth = getDepthValue(u_cameraNearFar.y, u_cameraK);
 	velocityBuffer();
-    velMap.a *= 0.8;
 }

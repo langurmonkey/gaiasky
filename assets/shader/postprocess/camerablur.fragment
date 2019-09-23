@@ -62,14 +62,18 @@ void main() {
     vec3 blurred = col;
     for (int i = 1; i < nSamples; ++i) {
         // The -0.5 centers the blur on the fragment
-        vec2 offset = vel * (float(i) / float(nSamples - 1) - 0.5);
+        vec2 offset = vel * (float(i) / float(nSamples - 1));
         blurred += texture(u_texture0, v_texCoords + offset).rgb;
     }
     blurred /= float(nSamples);
     fragColor = vec4(blurred, 1.0);
 
-    //if(v_texCoords.x > 0.5){
-        // Show velocity buffer
+    //float l = length(velocity) * 3.0;
+    //fragColor.rgb = colormap_rainbow(l);
+    //fragColor.a = 1.0;
+
+    //if(v_texCoords.x < 0.5){
+    //    // Show velocity buffer
     //    fragColor = velocityBuffer(velocity);
     //}
 }

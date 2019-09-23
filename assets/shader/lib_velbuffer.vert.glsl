@@ -22,7 +22,7 @@ void velocityBuffer(vec4 gpos, float dist, vec3 pm, mat4 prevTrans, vec2 fadepc,
     if(fadeScale > 0.0){
         fac = (1.0 - smoothstep(fadepc.x, fadepc.y, distpc)) * fadeScale;
     }
-    v_vel = ((gpos.xy / gpos.w) - (gprevpos.xy / gprevpos.w)) * fac;
+    v_vel = (gpos.xy / gpos.w - gprevpos.xy / gprevpos.w) * fac;
 }
 // This version accepts a proper motion to the position
 void velocityBuffer(vec4 gpos, float dist, vec3 pm){
@@ -30,7 +30,7 @@ void velocityBuffer(vec4 gpos, float dist, vec3 pm){
     prevPos = prevPos + pm;
     vec4 gprevpos = u_prevProjView * vec4(prevPos, 1.0);
 
-    v_vel = ((gpos.xy / gpos.w) - (gprevpos.xy / gprevpos.w));
+    v_vel = (gpos.xy / gpos.w - gprevpos.xy / gprevpos.w);
 }
 
 // This version accepts a proper motion to the position plus the fading parameters
