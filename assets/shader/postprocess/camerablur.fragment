@@ -66,11 +66,10 @@ void main() {
         blurred += texture(u_texture0, v_texCoords + offset).rgb;
     }
     blurred /= float(nSamples);
-
     fragColor = vec4(blurred, 1.0);
 
-    if(v_texCoords.x > 0.5){
+    //if(v_texCoords.x > 0.5){
         // Show velocity buffer
-        fragColor = velocityBuffer(velocity);
-    }
+    //    fragColor = velocityBuffer(velocity);
+    //}
 }
