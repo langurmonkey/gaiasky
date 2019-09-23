@@ -50,6 +50,8 @@ vec2 vpow(vec2 v, float p){
     return vec2(sign(v.x) * pow(abs(v.x), p), sign(v.y) * pow(abs(v.y), p));
 }
 
+//#include shader/lib_colmap.glsl
+
 void main() {
     vec3 col = texture(u_texture0, v_texCoords).rgb;
     vec2 velocity = texture(u_texture1, v_texCoords).rg;
@@ -71,6 +73,9 @@ void main() {
     //float l = length(velocity) * 3.0;
     //fragColor.rgb = colormap_rainbow(l);
     //fragColor.a = 1.0;
+    //if(v_texCoords.x < 0.5)
+    //    fragColor = vec4(blurred, 1.0);
+
 
     //if(v_texCoords.x < 0.5){
     //    // Show velocity buffer

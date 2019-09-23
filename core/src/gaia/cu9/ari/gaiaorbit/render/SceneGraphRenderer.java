@@ -60,6 +60,7 @@ import gaia.cu9.ari.gaiaorbit.util.math.MathUtilsd;
 import gaia.cu9.ari.gaiaorbit.util.math.Vector3d;
 import gaia.cu9.ari.gaiaorbit.vr.openvr.VRContext;
 import org.lwjgl.opengl.GL30;
+import org.lwjgl.opengl.GL40;
 
 import java.nio.IntBuffer;
 import java.util.Comparator;
@@ -228,11 +229,19 @@ public class SceneGraphRenderer extends AbstractRenderer implements IProcessRend
         };
         additiveBlendR = (renderSystem, renderables, camera) -> {
             Gdx.gl.glEnable(GL20.GL_BLEND);
-            Gdx.gl.glBlendFunc(GL20.GL_ONE, GL20.GL_ONE);
+            GL40.glBlendFunc(GL20.GL_ONE, GL20.GL_ONE);
+            //GL40.glBlendEquation(GL20.GL_FUNC_ADD);
+            // Velocity buffer always max
+            //GL40.glBlendFunci(1, GL40.GL_ONE, GL40.GL_ZERO);
+            //GL40.glBlendEquationi(1, GL40.GL_FUNC_ADD);
         };
         regularBlendR = (renderSystem, renderables, camera) -> {
             Gdx.gl.glEnable(GL20.GL_BLEND);
-            Gdx.gl.glBlendFunc(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA);
+            GL40.glBlendFunc(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA);
+            //GL40.glBlendEquation(GL20.GL_FUNC_ADD);
+            // Velocity buffer always max
+            //GL40.glBlendFunci(1, GL40.GL_ONE, GL40.GL_ZERO);
+            //GL40.glBlendEquationi(1, GL40.GL_FUNC_ADD);
         };
         noBlendR = (renderSystem, renderables, camera) -> {
             Gdx.gl.glDisable(GL20.GL_BLEND);

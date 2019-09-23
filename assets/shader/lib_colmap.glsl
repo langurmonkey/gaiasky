@@ -33,5 +33,8 @@ vec3 colormap_rainbow(float x) {
         b = 0.0;
     }
 
+    if(x == 0.0)
+        return vec3(0.0);
+
     return vec3(r, g, b);
 }
