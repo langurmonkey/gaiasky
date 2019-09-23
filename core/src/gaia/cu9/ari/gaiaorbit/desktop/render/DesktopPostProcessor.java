@@ -20,6 +20,9 @@ import gaia.cu9.ari.gaiaorbit.event.EventManager;
 import gaia.cu9.ari.gaiaorbit.event.Events;
 import gaia.cu9.ari.gaiaorbit.event.IObserver;
 import gaia.cu9.ari.gaiaorbit.render.IPostProcessor;
+import gaia.cu9.ari.gaiaorbit.scenegraph.BackgroundModel;
+import gaia.cu9.ari.gaiaorbit.scenegraph.component.MaterialComponent;
+import gaia.cu9.ari.gaiaorbit.scenegraph.component.ModelComponent;
 import gaia.cu9.ari.gaiaorbit.util.GlobalConf;
 import gaia.cu9.ari.gaiaorbit.util.GlobalConf.PostprocessConf.Antialias;
 import gaia.cu9.ari.gaiaorbit.util.GlobalConf.ProgramConf.StereoProfile;
@@ -27,11 +30,15 @@ import gaia.cu9.ari.gaiaorbit.util.GlobalConf.SceneConf.GraphicsQuality;
 import gaia.cu9.ari.gaiaorbit.util.GlobalResources;
 import gaia.cu9.ari.gaiaorbit.util.I18n;
 import gaia.cu9.ari.gaiaorbit.util.Logger;
+import gaia.cu9.ari.gaiaorbit.util.coord.StaticCoordinates;
 import gaia.cu9.ari.gaiaorbit.util.gdx.contrib.postprocess.PostProcessor;
 import gaia.cu9.ari.gaiaorbit.util.gdx.contrib.postprocess.effects.*;
 import gaia.cu9.ari.gaiaorbit.util.gdx.contrib.postprocess.filters.Glow;
 import gaia.cu9.ari.gaiaorbit.util.gdx.contrib.utils.ShaderLoader;
 import gaia.cu9.ari.gaiaorbit.util.math.Vector3d;
+
+import java.util.HashMap;
+import java.util.Map;
 
 public class DesktopPostProcessor implements IPostProcessor, IObserver {
     private Logger.Log logger = Logger.getLogger(this.getClass().getSimpleName());
@@ -46,6 +53,8 @@ public class DesktopPostProcessor implements IPostProcessor, IObserver {
     int nGhosts = 8;
     // Number of samples for the light glow
     int lightGlowNSamples = 1;
+
+    BackgroundModel blurObject;
 
     Vector3d auxd, prevCampos;
     Vector3 auxf;
@@ -75,6 +84,7 @@ public class DesktopPostProcessor implements IPostProcessor, IObserver {
         manager.load(lensDirtName, Texture.class);
         manager.load(lensColorName, Texture.class);
         manager.load(lensStarburstName, Texture.class);
+        initializeBlurObject();
     }
 
     public void doneLoading(AssetManager manager) {
@@ -127,11 +137,7 @@ public class DesktopPostProcessor implements IPostProcessor, IObserver {
         //ppb.pp.addEffect(ppb.depthBuffer);
 
         // CAMERA MOTION BLUR
-        ppb.camblur = new CameraMotion(width, height);
-        ppb.camblur.setBlurPasses(5);
-        ppb.camblur.setBlurScale(5f);
-        ppb.camblur.setEnabled(GlobalConf.postprocess.POSTPROCESS_MOTION_BLUR > 0);
-        ppb.pp.addEffect(ppb.camblur);
+        initCameraBlur(ppb, width, height);
 
         // LIGHT GLOW
         int lgw, lgh;
@@ -229,6 +235,46 @@ public class DesktopPostProcessor implements IPostProcessor, IObserver {
         return ppb;
     }
 
+    private void initializeBlurObject() {
+        // Create blur object
+        BackgroundModel bm = new BackgroundModel();
+        bm.setName("BlurObject1199");
+        bm.setColor(new float[] { 0, 0, 0, 0 });
+        bm.setSize(1e14d);
+        bm.setCt("");
+        bm.setLabel(false);
+        bm.setParent("Universe");
+        StaticCoordinates sc = new StaticCoordinates();
+        sc.setPosition(new double[] { 0, 0, 0 });
+        bm.setCoordinates(sc);
+        ModelComponent mc = new ModelComponent(true);
+        mc.setType("sphere");
+        Map<String, Object> params = new HashMap<>();
+        params.put("quality", 90l);
+        params.put("diameter", 1.0d);
+        params.put("flip", true);
+        mc.setParams(params);
+        MaterialComponent mtc = new MaterialComponent();
+        mc.setMaterial(mtc);
+        bm.setModel(mc);
+        bm.initialize();
+        blurObject = bm;
+    }
+
+    private void initCameraBlur(PostProcessBean ppb, int width, int height) {
+        ppb.camblur = new CameraMotion(width, height);
+        ppb.camblur.setBlurMaxSamples(25);
+        ppb.camblur.setBlurScale(1f);
+        ppb.camblur.setEnabled(GlobalConf.postprocess.POSTPROCESS_MOTION_BLUR > 0);
+        ppb.pp.addEffect(ppb.camblur);
+
+        // Add to scene graph
+        if (blurObject != null) {
+            blurObject.doneLoading(manager);
+            Gdx.app.postRunnable(() -> EventManager.instance.post(Events.SCENE_GRAPH_ADD_OBJECT_CMD, blurObject, false));
+        }
+    }
+
     private void initLevels(PostProcessBean ppb) {
         ppb.levels = new Levels();
         ppb.levels.setBrightness(GlobalConf.postprocess.POSTPROCESS_BRIGHTNESS);
@@ -252,7 +298,6 @@ public class DesktopPostProcessor implements IPostProcessor, IObserver {
 
         ppb.pp.addEffect(ppb.levels);
     }
-
 
     private void initAntiAliasing(Antialias aavalue, int width, int height, PostProcessBean ppb) {
         if (aavalue.equals(Antialias.FXAA)) {

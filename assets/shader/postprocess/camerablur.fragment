@@ -19,14 +19,12 @@ uniform sampler2D u_texture0;// scene
 uniform sampler2D u_texture1;// depthmap
 uniform vec2 u_viewport;
 uniform float u_blurScale;
-uniform int u_blurPasses;
+uniform int u_blurSamplesMax;
 uniform float u_velScale;
 
 in vec2 v_texCoords;
 
 layout (location = 0) out vec4 fragColor;
-
-#define MAX_SAMPLES 25
 
 vec4 velocityBuffer(vec2 velocity){
     float valx = 0.0;
@@ -56,10 +54,10 @@ void main() {
     vec3 col = texture(u_texture0, v_texCoords).rgb;
     vec2 velocity = texture(u_texture1, v_texCoords).rg;
     velocity = maxLength(vpow(velocity, 1.8), 0.03);
-    vec2 vel = velocity * u_velScale;
+    vec2 vel = velocity * u_velScale * u_blurScale;
 
     float speed = length(vel * u_viewport);
-    int nSamples = clamp(int(speed), 1, MAX_SAMPLES);
+    int nSamples = clamp(int(speed), 1, u_blurSamplesMax);
 
     vec3 blurred = col;
     for (int i = 1; i < nSamples; ++i) {
@@ -71,8 +69,8 @@ void main() {
 
     fragColor = vec4(blurred, 1.0);
 
-    //if(v_texCoords.x > 0.5){
+    if(v_texCoords.x > 0.5){
         // Show velocity buffer
-    //    fragColor = velocityBuffer(velocity);
-    //}
+        fragColor = velocityBuffer(velocity);
+    }
 }

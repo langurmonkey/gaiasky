@@ -67,20 +67,12 @@ void main() {
 		vec4 diffuse = vec4(1.0);
 	#endif
 
-	fragColor.rgb = diffuse.rgb;
+	fragColor = diffuse * v_opacity;
 
-	#ifdef blendedFlag
-		fragColor.a = diffuse.a * v_opacity;
-	#else
-		fragColor.a = 1.0;
-	#endif
-
-	fragColor.rgb *= fragColor.a;
-	
 	// Prevent saturation
     fragColor = clamp(fragColor, 0.0, 1.0);
 
 	gl_FragDepth = getDepthValue(u_cameraNearFar.y, u_cameraK);
-	// Do not contribute to motion blur
 	velocityBuffer();
+    velMap.a *= 0.8;
 }

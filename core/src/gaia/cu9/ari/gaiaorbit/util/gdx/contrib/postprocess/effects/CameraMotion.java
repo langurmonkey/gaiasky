@@ -54,8 +54,8 @@ public final class CameraMotion extends PostProcessorEffect {
         camblur.setVelocityTexture(normalDepthMap);
     }
 
-    public void setBlurPasses(int passes) {
-        camblur.setBlurPasses(passes);
+    public void setBlurMaxSamples(int samples) {
+        camblur.setBlurMaxSamples(samples);
     }
 
     public void setBlurScale(float scale) {

@@ -39,7 +39,7 @@ public final class CameraBlur extends Filter<CameraBlur> {
         // @formatter:off
         InputScene("u_texture0", 0),
         VelocityMap("u_texture1", 0),
-        BlurPasses("u_blurPasses", 0),
+        BlurMaxSamples("u_blurSamplesMax", 0),
         BlurScale("u_blurScale", 0),
         VelocityScale("u_velScale", 0),
         Viewport("u_viewport", 0);
@@ -74,8 +74,8 @@ public final class CameraBlur extends Filter<CameraBlur> {
         this.velocityTexture = texture;
     }
 
-    public void setBlurPasses(int passes) {
-        setParam(Param.BlurPasses, passes);
+    public void setBlurMaxSamples(int samples) {
+        setParam(Param.BlurMaxSamples, samples);
     }
 
     public void setBlurScale(float blurScale) {
