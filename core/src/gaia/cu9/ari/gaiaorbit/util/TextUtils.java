@@ -151,4 +151,18 @@ public class TextUtils {
     public static String getFormattedTimeWarp() {
         return TextUtils.getFormattedTimeWarp(GaiaSky.instance.time.getWarpFactor());
     }
+
+    /**
+     * Concatenates the base with each of the strings in suffixes
+     * @param base The base string
+     * @param suffixes All the suffixes
+     * @return The result
+     */
+    public static String[] concatAll(String base, String[] suffixes) {
+        String[] result = new String[suffixes.length];
+        for (int i = 0; i < suffixes.length; i++) {
+            result[i] = base + suffixes[i];
+        }
+        return result;
+    }
 }

@@ -38,10 +38,7 @@ import gaia.cu9.ari.gaiaorbit.scenegraph.*;
 import gaia.cu9.ari.gaiaorbit.scenegraph.SceneGraphNode.RenderGroup;
 import gaia.cu9.ari.gaiaorbit.scenegraph.camera.CameraManager.CameraMode;
 import gaia.cu9.ari.gaiaorbit.scenegraph.camera.ICamera;
-import gaia.cu9.ari.gaiaorbit.util.Constants;
-import gaia.cu9.ari.gaiaorbit.util.GlobalConf;
-import gaia.cu9.ari.gaiaorbit.util.GlobalResources;
-import gaia.cu9.ari.gaiaorbit.util.Logger;
+import gaia.cu9.ari.gaiaorbit.util.*;
 import gaia.cu9.ari.gaiaorbit.util.Logger.Log;
 import gaia.cu9.ari.gaiaorbit.util.gdx.IntModelBatch;
 import gaia.cu9.ari.gaiaorbit.util.gdx.IntRenderableSorter;
@@ -63,7 +60,9 @@ import org.lwjgl.opengl.GL30;
 import org.lwjgl.opengl.GL40;
 
 import java.nio.IntBuffer;
-import java.util.*;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Renders a scenegraph.
@@ -163,23 +162,23 @@ public class SceneGraphRenderer extends AbstractRenderer implements IProcessRend
         ExtShaderProgram.pedantic = false;
 
         /* DATA LOAD */
-        String[] defines = combinations(new String[] { "#define velocityBufferFlag\n", "#define relativisticEffects\n", "#define gravitationalWaves\n" });
-        String[] names = combinations(new String[] { "Velbuff", "Rel", "Grav" });
+        String[] defines = GlobalResources.combinations(new String[] { "#define velocityBufferFlag\n", "#define relativisticEffects\n", "#define gravitationalWaves\n" });
+        String[] names = GlobalResources.combinations(new String[] { "Velbuff", "Rel", "Grav" });
 
         // Add shaders to load (no providers)
-        starBillboardDesc = loadShader(manager, "shader/star.billboard.vertex.glsl", "shader/star.billboard.fragment.glsl", concatAll("star.billboard", names), defines);
-        spriteDesc = loadShader(manager, "shader/sprite.vertex.glsl", "shader/sprite.fragment.glsl", concatAll("sprite", names), defines);
-        starPointDesc = loadShader(manager, "shader/star.point.vertex.glsl", "shader/star.point.fragment.glsl", concatAll("star.point", names), defines);
-        galaxyPointDesc = loadShader(manager, "shader/milkyway.vertex.glsl", "shader/milkyway.fragment.glsl", concatAll("milkyway", names), defines);
-        pointDesc = loadShader(manager, "shader/point.cpu.vertex.glsl", "shader/point.cpu.fragment.glsl", concatAll("point.cpu", names), defines);
-        lineDesc = loadShader(manager, "shader/line.cpu.vertex.glsl", "shader/line.cpu.fragment.glsl", concatAll("line.cpu", names), defines);
-        lineQuadDesc = loadShader(manager, "shader/line.quad.vertex.glsl", "shader/line.quad.fragment.glsl", concatAll("line.quad", names), defines);
-        lineGpuDesc = loadShader(manager, "shader/line.gpu.vertex.glsl", "shader/line.gpu.fragment.glsl", concatAll("line.gpu", names), defines);
-        galDesc = loadShader(manager, "shader/gal.vertex.glsl", "shader/gal.fragment.glsl", concatAll("gal", names), defines);
-        particleEffectDesc = loadShader(manager, "shader/particle.effect.vertex.glsl", "shader/particle.effect.fragment.glsl", concatAll("particle.effect", names), defines);
-        particleGroupDesc = loadShader(manager, "shader/particle.group.vertex.glsl", "shader/particle.group.fragment.glsl", concatAll("particle.group", names), defines);
-        starGroupDesc = loadShader(manager, "shader/star.group.vertex.glsl", "shader/star.group.fragment.glsl", concatAll("star.group", names), defines);
-        orbitElemDesc = loadShader(manager, "shader/orbitelem.vertex.glsl", "shader/particle.group.fragment.glsl", concatAll("orbitelem", names), defines);
+        starBillboardDesc = loadShader(manager, "shader/star.billboard.vertex.glsl", "shader/star.billboard.fragment.glsl", TextUtils.concatAll("star.billboard", names), defines);
+        spriteDesc = loadShader(manager, "shader/sprite.vertex.glsl", "shader/sprite.fragment.glsl", TextUtils.concatAll("sprite", names), defines);
+        starPointDesc = loadShader(manager, "shader/star.point.vertex.glsl", "shader/star.point.fragment.glsl", TextUtils.concatAll("star.point", names), defines);
+        galaxyPointDesc = loadShader(manager, "shader/milkyway.vertex.glsl", "shader/milkyway.fragment.glsl", TextUtils.concatAll("milkyway", names), defines);
+        pointDesc = loadShader(manager, "shader/point.cpu.vertex.glsl", "shader/point.cpu.fragment.glsl", TextUtils.concatAll("point.cpu", names), defines);
+        lineDesc = loadShader(manager, "shader/line.cpu.vertex.glsl", "shader/line.cpu.fragment.glsl", TextUtils.concatAll("line.cpu", names), defines);
+        lineQuadDesc = loadShader(manager, "shader/line.quad.vertex.glsl", "shader/line.quad.fragment.glsl", TextUtils.concatAll("line.quad", names), defines);
+        lineGpuDesc = loadShader(manager, "shader/line.gpu.vertex.glsl", "shader/line.gpu.fragment.glsl", TextUtils.concatAll("line.gpu", names), defines);
+        galDesc = loadShader(manager, "shader/gal.vertex.glsl", "shader/gal.fragment.glsl", TextUtils.concatAll("gal", names), defines);
+        particleEffectDesc = loadShader(manager, "shader/particle.effect.vertex.glsl", "shader/particle.effect.fragment.glsl", TextUtils.concatAll("particle.effect", names), defines);
+        particleGroupDesc = loadShader(manager, "shader/particle.group.vertex.glsl", "shader/particle.group.fragment.glsl", TextUtils.concatAll("particle.group", names), defines);
+        starGroupDesc = loadShader(manager, "shader/star.group.vertex.glsl", "shader/star.group.fragment.glsl", TextUtils.concatAll("star.group", names), defines);
+        orbitElemDesc = loadShader(manager, "shader/orbitelem.vertex.glsl", "shader/particle.group.fragment.glsl", TextUtils.concatAll("orbitelem", names), defines);
 
         // Add shaders to load (with providers)
         manager.load("per-vertex-lighting", GroundShaderProvider.class, new GroundShaderProviderParameter("shader/default.vertex.glsl", "shader/default.fragment.glsl"));
@@ -289,17 +288,17 @@ public class SceneGraphRenderer extends AbstractRenderer implements IProcessRend
         int maxTexSize = intBuffer.get();
         logger.info("Max texture size: " + maxTexSize + "^2 pixels");
 
-        String[] names = combinations(new String[] { " (vel)", " (rel)", " (grav)" });
+        String[] names = GlobalResources.combinations(new String[] { " (vel)", " (rel)", " (grav)" });
 
         /*
           STAR BILLBOARD SHADER
          */
-        starBillboardShaders = fetchShaderProgram(manager, starBillboardDesc, concatAll("star.billboard", names));
+        starBillboardShaders = fetchShaderProgram(manager, starBillboardDesc, TextUtils.concatAll("star.billboard", names));
 
         /*
          * GALAXY SHADER
          */
-        galShaders = fetchShaderProgram(manager, galDesc, concatAll("gal", names));
+        galShaders = fetchShaderProgram(manager, galDesc, TextUtils.concatAll("gal", names));
 
         /*
          * FONT SHADER
@@ -312,57 +311,57 @@ public class SceneGraphRenderer extends AbstractRenderer implements IProcessRend
         /*
          * SPRITE SHADER
          */
-        spriteShaders = fetchShaderProgram(manager, spriteDesc, concatAll("sprite", names));
+        spriteShaders = fetchShaderProgram(manager, spriteDesc, TextUtils.concatAll("sprite", names));
 
         /*
          * POINT CPU
          */
-        pointShaders = fetchShaderProgram(manager, pointDesc, concatAll("point.cpu", names));
+        pointShaders = fetchShaderProgram(manager, pointDesc, TextUtils.concatAll("point.cpu", names));
 
         /*
          * LINE CPU
          */
-        lineShaders = fetchShaderProgram(manager, lineDesc, concatAll("line.cpu", names));
+        lineShaders = fetchShaderProgram(manager, lineDesc, TextUtils.concatAll("line.cpu", names));
 
         /*
          * LINE QUAD
          */
-        lineQuadShaders = fetchShaderProgram(manager, lineQuadDesc, concatAll("line.quad", names));
+        lineQuadShaders = fetchShaderProgram(manager, lineQuadDesc, TextUtils.concatAll("line.quad", names));
 
         /*
          * LINE GPU
          */
-        lineGpuShaders = fetchShaderProgram(manager, lineGpuDesc, concatAll("line.gpu", names));
+        lineGpuShaders = fetchShaderProgram(manager, lineGpuDesc, TextUtils.concatAll("line.gpu", names));
 
         /*
          * GALAXY POINTS
          */
-        galaxyPointShaders = fetchShaderProgram(manager, galaxyPointDesc, concatAll("milkyway", names));
+        galaxyPointShaders = fetchShaderProgram(manager, galaxyPointDesc, TextUtils.concatAll("milkyway", names));
 
         /*
          * PARTICLE EFFECT - default and relativistic
          */
-        particleEffectShaders = fetchShaderProgram(manager, particleEffectDesc, concatAll("particle.effect", names));
+        particleEffectShaders = fetchShaderProgram(manager, particleEffectDesc, TextUtils.concatAll("particle.effect", names));
 
         /*
          * PARTICLE GROUP - default and relativistic
          */
-        particleGroupShaders = fetchShaderProgram(manager, particleGroupDesc, concatAll("particle.group", names));
+        particleGroupShaders = fetchShaderProgram(manager, particleGroupDesc, TextUtils.concatAll("particle.group", names));
 
         /*
          * STAR GROUP - default and relativistic
          */
-        starGroupShaders = fetchShaderProgram(manager, starGroupDesc, concatAll("star.group", names));
+        starGroupShaders = fetchShaderProgram(manager, starGroupDesc, TextUtils.concatAll("star.group", names));
 
         /*
          * STAR POINT
          */
-        starPointShaders = fetchShaderProgram(manager, starPointDesc, concatAll("star.point", names));
+        starPointShaders = fetchShaderProgram(manager, starPointDesc, TextUtils.concatAll("star.point", names));
 
         /*
          * ORBITAL ELEMENTS PARTICLES - default and relativistic
          */
-        orbitElemShaders = fetchShaderProgram(manager, orbitElemDesc, concatAll("orbitelem", names));
+        orbitElemShaders = fetchShaderProgram(manager, orbitElemDesc, TextUtils.concatAll("orbitelem", names));
 
         RenderGroup[] renderGroups = RenderGroup.values();
         render_lists = new Array<>(renderGroups.length);
@@ -694,70 +693,6 @@ public class SceneGraphRenderer extends AbstractRenderer implements IProcessRend
 
     }
 
-    /**
-     * Generates all combinations of the strings in values
-     *
-     * @param values
-     * @return
-     */
-    private String[] combinations(String[] values) {
-        List<String> valueList = Arrays.asList(values);
-        Array<String> combinations = new Array<>();
-        // First, add empty
-        combinations.add("");
-        // Add all combinations
-        int n = values.length;
-        for (int nobj = 1; nobj <= n; nobj++) {
-            // Iterate over all elements
-            List<List<String>> res = combination(valueList, nobj);
-            for (List<String> r : res) {
-                // Concat all strings in r and add to combinations
-                String value = "";
-                for (String s : r)
-                    value += s;
-                combinations.add(value);
-            }
-        }
-        return combinations.toArray(String.class);
-    }
-
-    private <T> List<List<T>> combination(List<T> values, int size) {
-
-        if (0 == size) {
-            return Collections.singletonList(Collections.<T>emptyList());
-        }
-
-        if (values.isEmpty()) {
-            return Collections.emptyList();
-        }
-
-        List<List<T>> combination = new LinkedList<List<T>>();
-
-        T actual = values.iterator().next();
-
-        List<T> subSet = new LinkedList<T>(values);
-        subSet.remove(actual);
-
-        List<List<T>> subSetCombination = combination(subSet, size - 1);
-
-        for (List<T> set : subSetCombination) {
-            List<T> newSet = new LinkedList<T>(set);
-            newSet.add(0, actual);
-            combination.add(newSet);
-        }
-
-        combination.addAll(combination(subSet, size));
-
-        return combination;
-    }
-
-    private String[] concatAll(String base, String[] suffixes) {
-        String[] result = new String[suffixes.length];
-        for (int i = 0; i < suffixes.length; i++) {
-            result[i] = base + suffixes[i];
-        }
-        return result;
-    }
 
     private void initSGR(ICamera camera) {
         if (GlobalConf.runtime.OPENVR) {
