@@ -52,8 +52,8 @@ public final class LightGlow extends PostProcessorEffect {
     private boolean blending = false;
     private int sfactor, dfactor;
 
-    public LightGlow(int fboWidth, int fboHeight) {
-        glow = new Glow(fboWidth, fboHeight);
+    public LightGlow(int width, int height) {
+        glow = new Glow(width, height);
 
     }
 

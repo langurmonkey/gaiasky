@@ -99,7 +99,7 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
     public static GaiaSky instance;
 
     /**
-     * The {@link VRContext} setup in createVR(), may be null if no HMD is
+     * The {@link VRContext} setup in {@link #createVR()}, may be null if no HMD is
      * present or SteamVR is not installed
      */
     public VRContext vrContext;
