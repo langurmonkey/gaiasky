@@ -46,10 +46,8 @@ void main() {
     v_texCoords = a_texCoord0;
 
     mat4 transform = u_projView;
-    mat4 ptransform = u_prevProjView;
 
     vec3 pos = u_pos - u_camShift;
-    vec3 prevPos = u_pos + u_dCamPos;
     float dist = length(pos);
 
     #ifdef relativisticEffects
@@ -67,10 +65,6 @@ void main() {
     translate[3][1] = pos.y;
     translate[3][2] = pos.z;
     transform *= translate;
-    translate[3][0] = prevPos.x;
-    translate[3][1] = prevPos.y;
-    translate[3][2] = prevPos.z;
-    ptransform *= translate;
 
     // Rotate
     mat4 rotation = mat4(0.0);
@@ -96,7 +90,6 @@ void main() {
     rotation[2][2] = 1.0 - 2.0 * (xx + yy);
     rotation[3][3] = 1.0;
     transform *= rotation;
-    ptransform *= rotation;
 
     // Scale
     float size = u_size;
@@ -107,15 +100,24 @@ void main() {
     transform[0][0] *= size;
     transform[1][1] *= size;
     transform[2][2] *= size;
-    ptransform[0][0] *= size;
-    ptransform[1][1] *= size;
-    ptransform[2][2] *= size;
 
     // Position
     vec4 gpos = transform * a_position;
     gl_Position = gpos;
 
-    // Velocity buffer
+    #ifdef velocityBufferFlag
+    vec3 prevPos = u_pos - u_camShift + u_dCamPos;
+    mat4 ptransform = u_prevProjView;
+    translate[3][0] = prevPos.x;
+    translate[3][1] = prevPos.y;
+    translate[3][2] = prevPos.z;
+    ptransform *= translate;
+    ptransform *= rotation;
+    ptransform[0][0] *= size;
+    ptransform[1][1] *= size;
+    ptransform[2][2] *= size;
+
     vec4 gprevpos = ptransform * a_position;
     v_vel = ((gpos.xy / gpos.w) - (gprevpos.xy / gprevpos.w));
+    #endif// velocityBufferFlag
 }

@@ -27,8 +27,7 @@ void main() {
     float alpha = v_col.a * profile;
 
     if(alpha <= 0.0){
-        //discard;
-        alpha = 0.0;
+        discard;
     }
 
     fragColor = v_col * alpha;

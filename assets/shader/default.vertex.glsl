@@ -157,7 +157,6 @@ void main() {
 	#endif // blendedFlag
 
 	vec4 pos = u_worldTrans * vec4(a_position, 1.0);
-	vec4 prevPos = pos /*+ vec4(u_prevCamPos, 0.0)*/;
 
         #ifdef relativisticEffects
             pos.xyz = computeRelativisticAberration(pos.xyz, length(pos.xyz), u_velDir, u_vc);
@@ -171,8 +170,7 @@ void main() {
 	gl_Position = gpos;
 
 	// Velocity buffer
-	vec4 gprevpos = u_prevProjView * prevPos;
-	v_vel = ((gpos.xy / gpos.w) - (gprevpos.xy / gprevpos.w));
+	velocityBufferCam(gpos, pos, 0.0);
 
 	#ifdef shadowMapFlag
 		vec4 spos = u_shadowMapProjViewTrans * pos;

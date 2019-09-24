@@ -16,8 +16,6 @@ uniform float u_alpha;
 uniform float u_size;
 uniform float u_scaleFactor;
 uniform int u_cubemap;
-// VR scaling, if any
-uniform float u_vrScale;
 // Current julian date, in days, emulates a double in vec2
 uniform vec2 u_t;
 
@@ -38,6 +36,7 @@ uniform vec2 u_t;
 #endif // gravitationalWaves
     
 out vec4 v_col;
+#include shader/lib_velbuffer.vert.glsl
 
 #define M_TO_U 1e-9
 #define D_TO_S 86400.0
@@ -131,7 +130,9 @@ void main() {
     
     v_col = a_color * u_alpha;
 
-    gl_Position = u_projView * vec4(pos, 0.0);
+    vec4 gpos = u_projView * vec4(pos, 0.0);
+    gl_Position = gpos;
     float distNorm = dist / 300.0;
     gl_PointSize = clamp(u_size / distNorm, 1.5, 3.5) * u_scaleFactor * cubemapSizeFactor * a_size;
+    velocityBuffer(gpos, pos4.xyz, dist);
 }

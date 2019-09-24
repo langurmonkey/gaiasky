@@ -280,7 +280,6 @@ void main() {
     g_tangent = normalize(u_normalMatrix * g_tangent);
 
     vec4 pos = u_worldTrans * g_position;
-    vec4 prevPos = pos + vec4(u_prevCamPos, 0.0);
 
     #ifdef relativisticEffects
         pos.xyz = computeRelativisticAberration(pos.xyz, length(pos.xyz), u_velDir, u_vc);
@@ -293,9 +292,11 @@ void main() {
     vec4 gpos = u_projViewTrans * pos;
     gl_Position = gpos;
 
-    // Velocity buffer
+    #ifdef velocityBufferFlag
+    vec4 prevPos = pos + vec4(u_prevCamPos, 0.0);
     vec4 gprevpos = u_prevProjView * prevPos;
     v_vel = ((gpos.xy / gpos.w) - (gprevpos.xy / gprevpos.w));
+    #endif// velocityBufferFlag
 
     #ifdef shadowMapFlag
 	vec4 spos = u_shadowMapProjViewTrans * pos;

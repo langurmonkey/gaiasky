@@ -187,5 +187,5 @@ void main() {
     fragColor = clamp(fragColor, 0.0, 1.0);
 
 	gl_FragDepth = getDepthValue(u_cameraNearFar.y, u_cameraK);
-	velocityBuffer(0.1);
+	velocityBuffer();
 }

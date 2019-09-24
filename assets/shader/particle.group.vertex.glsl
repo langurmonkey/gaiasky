@@ -68,5 +68,5 @@ void main() {
     gl_Position = u_projModelView * vec4(pos, 0.0);
     gl_PointSize = max(viewAngle * u_sizeFactor * cubemapSizeFactor, u_minSize * a_size);
 
-    velocityBuffer(gpos, dist, vec2(1e10, 1e12), 1.0);
+    velocityBuffer(gpos, a_position.xyz, dist, vec2(1e10, 1e12), 1.0);
 }

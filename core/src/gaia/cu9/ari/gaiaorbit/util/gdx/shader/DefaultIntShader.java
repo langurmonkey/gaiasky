@@ -43,6 +43,7 @@ import com.badlogic.gdx.utils.GdxRuntimeException;
 import gaia.cu9.ari.gaiaorbit.GaiaSky;
 import gaia.cu9.ari.gaiaorbit.assets.ShaderTemplatingLoader;
 import gaia.cu9.ari.gaiaorbit.util.Constants;
+import gaia.cu9.ari.gaiaorbit.util.GlobalConf;
 import gaia.cu9.ari.gaiaorbit.util.gdx.IntRenderable;
 import gaia.cu9.ari.gaiaorbit.util.math.Vector3d;
 
@@ -89,7 +90,7 @@ public class DefaultIntShader extends BaseIntShader {
         public final static Uniform cameraK = new Uniform("u_cameraK");
 
         public final static Uniform prevProjView = new Uniform("u_prevProjView");
-        public final static Uniform prevCameraPosition = new Uniform("u_prevCamPos");
+        public final static Uniform dCamPos = new Uniform("u_dCamPos");
         public final static Uniform vrScale = new Uniform("u_vrScale");
 
         public final static Uniform worldTrans = new Uniform("u_worldTrans");
@@ -205,21 +206,24 @@ public class DefaultIntShader extends BaseIntShader {
                 shader.set(inputID, tmpM.set(renderable.worldTransform).inv().transpose());
             }
         };
-        public final static Setter prevProjView = new GlobalSetter() {
+        public final static Setter prevProjView = new LocalSetter() {
             @Override
             public void set(BaseIntShader shader, int inputID, IntRenderable renderable, Attributes combinedAttributes) {
-                shader.set(inputID, GaiaSky.instance.cam.getPreviousProjView());
+                if (GlobalConf.postprocess.POSTPROCESS_MOTION_BLUR > 0f)
+                    shader.set(inputID, GaiaSky.instance.cam.getPreviousProjView());
             }
         };
-        public final static Setter prevCameraPosition = new GlobalSetter() {
+        public final static Setter dCamPos = new LocalSetter() {
             @Override
             public void set(BaseIntShader shader, int inputID, IntRenderable renderable, Attributes combinedAttributes) {
-            	Vector3d pos = GaiaSky.instance.cam.getPos();
-                Vector3d ppos = GaiaSky.instance.cam.getPreviousPos();
-                shader.set(inputID, (float) (ppos.x-pos.x), (float) (ppos.y-pos.y), (float) (ppos.z-pos.z));
+                if(GlobalConf.postprocess.POSTPROCESS_MOTION_BLUR > 0f) {
+                    Vector3d pos = GaiaSky.instance.cam.getPos();
+                    Vector3d ppos = GaiaSky.instance.cam.getPreviousPos();
+                    shader.set(inputID, (float) (ppos.x - pos.x), (float) (ppos.y - pos.y), (float) (ppos.z - pos.z));
+                }
             }
         };
-        public final static Setter vrScale = new GlobalSetter() {
+        public final static Setter vrScale = new LocalSetter() {
             @Override
             public void set(BaseIntShader shader, int inputID, IntRenderable renderable, Attributes combinedAttributes) {
                 shader.set(inputID, (float) Constants.DISTANCE_SCALE_FACTOR);
@@ -444,7 +448,7 @@ public class DefaultIntShader extends BaseIntShader {
     public final int u_time;
     // Vel buffer
     public final int u_prevProjView;
-    public final int u_prevCameraPosition;
+    public final int u_dCamPos;
     public final int u_vrScale;
     // Object uniforms
     public final int u_worldTrans;
@@ -581,7 +585,7 @@ public class DefaultIntShader extends BaseIntShader {
         u_cameraK = register(Inputs.cameraK, Setters.cameraK);
         u_time = register(new Uniform("u_time"));
         u_prevProjView = register(Inputs.prevProjView, Setters.prevProjView);
-        u_prevCameraPosition = register(Inputs.prevCameraPosition, Setters.prevCameraPosition);
+        u_dCamPos = register(Inputs.dCamPos, Setters.dCamPos);
         u_vrScale = register(Inputs.vrScale, Setters.vrScale);
         // Object uniforms
         u_worldTrans = register(Inputs.worldTrans, Setters.worldTrans);
@@ -759,6 +763,8 @@ public class DefaultIntShader extends BaseIntShader {
             prefix += "#define " + FloatAttribute.AlphaTestAlias + "Flag\n";
         if (renderable.bones != null && config.numBones > 0)
             prefix += "#define numBones " + config.numBones + "\n";
+        if (GlobalConf.postprocess.POSTPROCESS_MOTION_BLUR > 0)
+            prefix += "#define velocityBufferFlag\n";
         return prefix;
     }
 

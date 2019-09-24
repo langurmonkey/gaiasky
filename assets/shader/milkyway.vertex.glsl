@@ -63,6 +63,6 @@ void main() {
 
     vec4 gpos = u_projModelView * vec4(pos, 1.0);
     gl_Position = gpos;
-    velocityBuffer(gpos, dist);
+    velocityBuffer(gpos, a_position.xyz, dist);
 
 }

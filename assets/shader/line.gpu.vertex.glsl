@@ -31,7 +31,6 @@ uniform float u_omgw;// Wave frequency
 
 void main() {
     vec4 pos = a_position;
-    vec4 prevPos = pos + vec4(u_dCamPos, 0.0);
 
     pos.xyz -= u_parentPos;
     pos = u_worldTransform * pos;
@@ -51,7 +50,5 @@ void main() {
     vec4 gpos = u_projView * pos;
     gl_Position = gpos;
 
-    // Velocity buffer
-    vec4 gprevpos = u_prevProjView * prevPos;
-    v_vel = ((gpos.xy / gpos.w) - (gprevpos.xy / gprevpos.w));
+    velocityBufferCam(gpos, pos);
 }

@@ -126,8 +126,8 @@ public abstract class AbstractRenderSystem implements IRenderSystem {
         addVRScale(shaderProgram);
     }
 
-    protected void addVRScale(ExtShaderProgram shaderProgram){
-        if(!vrScaleFlag) {
+    protected void addVRScale(ExtShaderProgram shaderProgram) {
+        if (!vrScaleFlag) {
             shaderProgram.setUniformf("u_vrScale", (float) Constants.DISTANCE_SCALE_FACTOR);
             vrScaleFlag = true;
         }
@@ -159,8 +159,9 @@ public abstract class AbstractRenderSystem implements IRenderSystem {
 
     /**
      * Uniforms needed to compute the logarithmic depth buffer. They never change, so only add if not present
+     *
      * @param shaderProgram The program
-     * @param camera The camera
+     * @param camera        The camera
      */
     protected void addDepthBufferUniforms(ExtShaderProgram shaderProgram, ICamera camera) {
         if (!depthBufferFlag) {
@@ -185,12 +186,14 @@ public abstract class AbstractRenderSystem implements IRenderSystem {
 
     protected ExtShaderProgram getShaderProgram() {
         try {
-            if (GlobalConf.runtime.RELATIVISTIC_ABERRATION && GlobalConf.runtime.GRAVITATIONAL_WAVES)
-                return programs[3];
-            else if (GlobalConf.runtime.RELATIVISTIC_ABERRATION)
+            if (GlobalConf.postprocess.POSTPROCESS_MOTION_BLUR > 0)
                 return programs[1];
-            else if (GlobalConf.runtime.GRAVITATIONAL_WAVES)
+            else if (GlobalConf.runtime.RELATIVISTIC_ABERRATION && GlobalConf.runtime.GRAVITATIONAL_WAVES)
+                return programs[4];
+            else if (GlobalConf.runtime.RELATIVISTIC_ABERRATION)
                 return programs[2];
+            else if (GlobalConf.runtime.GRAVITATIONAL_WAVES)
+                return programs[3];
         } catch (Exception e) {
         }
         return programs[0];

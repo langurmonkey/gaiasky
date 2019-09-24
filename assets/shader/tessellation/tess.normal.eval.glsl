@@ -75,13 +75,7 @@ out vec3 o_shadowMapUv;
 #endif
 
 #include shader/lib_sampleheight.glsl
-
-// Projection-View matrix in previous frame
-uniform mat4 u_prevProjView;
-// Camera position in previous frame
-uniform vec3 u_prevCamPos;
-
-out vec2 v_vel;
+#include shader/lib_velbuffer.vert.glsl
 
     #ifdef normalTextureFlag
 // Use normal map
@@ -125,8 +119,6 @@ void main(void){
     vec3 dh = o_normal * o_fragHeight;
     pos += vec4(dh, 0.0);
 
-    // For velocity buffer
-    vec4 prevPos = pos + vec4(u_prevCamPos, 0.0);
 
     #ifdef relativisticEffects
     pos.xyz = computeRelativisticAberration(pos.xyz, length(pos.xyz), u_velDir, u_vc);
@@ -139,9 +131,7 @@ void main(void){
     vec4 gpos = u_projViewTrans * pos;
     gl_Position = gpos;
 
-    // Velocity buffer
-    vec4 gprevpos = u_prevProjView * prevPos;
-    v_vel = ((gpos.xy / gpos.w) - (gprevpos.xy / gprevpos.w));
+    velocityBufferCam(gpos, pos);
 
     // Plumbing
     o_fragPosition = pos.xyz;
