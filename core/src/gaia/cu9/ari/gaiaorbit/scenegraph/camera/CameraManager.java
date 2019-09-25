@@ -303,7 +303,7 @@ public class CameraManager implements ICamera, IObserver {
 
         // Work out and broadcast closest objects
         IFocus closestBody = getClosestBody();
-        if (closestBody.getOctant() != null && !closestBody.getOctant().observed)
+        if (closestBody != null && closestBody.getOctant() != null && !closestBody.getOctant().observed)
             closestBody = null;
 
         IStarFocus closestStar = getClosestStar();
