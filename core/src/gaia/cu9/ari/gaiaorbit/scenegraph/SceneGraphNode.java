@@ -600,13 +600,17 @@ public class SceneGraphNode implements IStarContainer, IPosition {
     }
 
     public void setCt(String ct) {
-        this.ct = new ComponentTypes(ComponentType.valueOf(ct));
+        this.ct = new ComponentTypes();
+        if(!ct.isEmpty())
+            this.ct.set(ComponentType.valueOf(ct).ordinal());
     }
 
     public void setCt(String[] cts) {
         this.ct = new ComponentTypes();
         for (int i = 0; i < cts.length; i++) {
-            this.ct.set(ComponentType.valueOf(cts[i]).ordinal());
+            if(!cts[i].isEmpty()) {
+                this.ct.set(ComponentType.valueOf(cts[i]).ordinal());
+            }
         }
     }
 
@@ -711,7 +715,7 @@ public class SceneGraphNode implements IStarContainer, IPosition {
      * @return True if added, false otherwise
      */
     protected boolean addToRender(IRenderable renderable, RenderGroup rg) {
-        boolean on = ct.intersects(SceneGraphRenderer.visible);
+        boolean on = ct.isEmpty() || ct.intersects(SceneGraphRenderer.visible);
         if (on || SceneGraphRenderer.alphas[ct.getFirstOrdinal()] > 0) {
             SceneGraphRenderer.render_lists.get(rg.ordinal()).add(renderable);
             return true;

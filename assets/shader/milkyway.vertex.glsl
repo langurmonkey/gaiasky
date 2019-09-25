@@ -39,6 +39,8 @@ in vec2 a_additional;
 out vec4 v_col;
 out float v_dust;
 
+#include shader/lib_velbuffer.vert.glsl
+
 void main() {
     vec3 pos = a_position.xyz - u_camPos;
     float dist = length(pos);
@@ -57,7 +59,10 @@ void main() {
     v_col = vec4(a_color.rgb, a_color.a * u_intensity * dscale);
     v_dust = a_additional.y;
 
-    gl_Position = u_projModelView * vec4(pos, 1.0);
     gl_PointSize = a_additional.x * u_sizeFactor * u_ar * pow(dscale, 3.0);
+
+    vec4 gpos = u_projModelView * vec4(pos, 1.0);
+    gl_Position = gpos;
+    velocityBuffer(gpos, a_position.xyz, dist);
 
 }

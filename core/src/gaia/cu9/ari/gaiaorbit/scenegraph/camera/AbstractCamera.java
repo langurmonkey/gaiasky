@@ -7,6 +7,7 @@ package gaia.cu9.ari.gaiaorbit.scenegraph.camera;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.PerspectiveCamera;
+import com.badlogic.gdx.math.Matrix4;
 import gaia.cu9.ari.gaiaorbit.scenegraph.CelestialBody;
 import gaia.cu9.ari.gaiaorbit.scenegraph.IFocus;
 import gaia.cu9.ari.gaiaorbit.scenegraph.IStarFocus;
@@ -30,7 +31,7 @@ public abstract class AbstractCamera implements ICamera {
     /** Camera near value **/
     public double CAM_NEAR;
 
-    public Vector3d pos, posinv, shift, tmp;
+    public Vector3d pos, posinv, prevpos, shift, tmp;
     /**
      * Angle from the center to the corner of the screen in scene coordinates,
      * in radians
@@ -68,6 +69,8 @@ public abstract class AbstractCamera implements ICamera {
      */
     protected IStarFocus closestStar;
 
+    protected Matrix4 prevCombined;
+
     /**
      * The closest between {@link AbstractCamera#closestBody} and
      * {@link AbstractCamera#closestStar}
@@ -84,9 +87,11 @@ public abstract class AbstractCamera implements ICamera {
 
         this.parent = parent;
         pos = new Vector3d();
+        prevpos = new Vector3d();
         posinv = new Vector3d();
         shift = new Vector3d();
         tmp = new Vector3d();
+        prevCombined = new Matrix4();
 
         camLeft = new PerspectiveCamera(GlobalConf.scene.CAMERA_FOV, Gdx.graphics.getWidth() / 2, Gdx.graphics.getHeight());
         camLeft.near = (float) CAM_NEAR;
@@ -129,6 +134,17 @@ public abstract class AbstractCamera implements ICamera {
     public void setPos(Vector3d pos) {
         this.pos.set(pos);
     }
+
+    @Override
+    public Vector3d getPreviousPos(){
+        return prevpos;
+    }
+
+    @Override
+    public void setPreviousPos(Vector3d prevpos){
+        this.prevpos.set(prevpos);
+    }
+
 
     @Override
     public Vector3d getInversePos() {
@@ -335,5 +351,20 @@ public abstract class AbstractCamera implements ICamera {
 
     public double getFar() {
         return CAM_FAR;
+    }
+
+    @Override
+    public Matrix4 getProjView(){
+        return camera.combined;
+    }
+
+    @Override
+    public Matrix4 getPreviousProjView(){
+        return prevCombined;
+    }
+
+    @Override
+    public void setPreviousProjView(Matrix4 mat){
+        prevCombined.set(mat);
     }
 }

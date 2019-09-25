@@ -16,6 +16,7 @@ import gaia.cu9.ari.gaiaorbit.util.Constants;
 import gaia.cu9.ari.gaiaorbit.util.GlobalConf;
 import gaia.cu9.ari.gaiaorbit.util.gdx.shader.ExtShaderProgram;
 import gaia.cu9.ari.gaiaorbit.util.gravwaves.RelativisticEffectsManager;
+import gaia.cu9.ari.gaiaorbit.util.math.Vector3d;
 
 import java.util.Comparator;
 
@@ -33,6 +34,9 @@ public abstract class AbstractRenderSystem implements IRenderSystem {
     protected Comparator<IRenderable> comp;
     public RenderingContext rc;
     protected Vector3 aux;
+    protected Vector3d auxd;
+
+    private boolean vrScaleFlag = false, depthBufferFlag = false;
 
     protected Array<RenderSystemRunnable> preRunnables, postRunnables;
 
@@ -42,6 +46,7 @@ public abstract class AbstractRenderSystem implements IRenderSystem {
         this.alphas = alphas;
         this.programs = programs;
         this.aux = new Vector3();
+        this.auxd = new Vector3d();
         this.preRunnables = new Array<>(3);
         this.postRunnables = new Array<>(3);
     }
@@ -117,6 +122,15 @@ public abstract class AbstractRenderSystem implements IRenderSystem {
         addRelativisticUniforms(shaderProgram, camera);
         addGravWaveUniforms(shaderProgram);
         addDepthBufferUniforms(shaderProgram, camera);
+        addPreviousFrameUniforms(shaderProgram, camera);
+        addVRScale(shaderProgram);
+    }
+
+    protected void addVRScale(ExtShaderProgram shaderProgram) {
+        if (!vrScaleFlag) {
+            shaderProgram.setUniformf("u_vrScale", (float) Constants.DISTANCE_SCALE_FACTOR);
+            vrScaleFlag = true;
+        }
     }
 
     protected void addRelativisticUniforms(ExtShaderProgram shaderProgram, ICamera camera) {
@@ -143,20 +157,43 @@ public abstract class AbstractRenderSystem implements IRenderSystem {
         }
     }
 
-    protected void addDepthBufferUniforms(ExtShaderProgram shaderProgram, ICamera camera){
-        // Depth buffer
-        shaderProgram.setUniformf("u_zfar", (float) camera.getFar());
-        shaderProgram.setUniformf("u_k", Constants.getCameraK());
+    /**
+     * Uniforms needed to compute the logarithmic depth buffer. They never change, so only add if not present
+     *
+     * @param shaderProgram The program
+     * @param camera        The camera
+     */
+    protected void addDepthBufferUniforms(ExtShaderProgram shaderProgram, ICamera camera) {
+        if (!depthBufferFlag) {
+            shaderProgram.setUniformf("u_zfar", (float) camera.getFar());
+            shaderProgram.setUniformf("u_k", Constants.getCameraK());
+            depthBufferFlag = true;
+        }
+    }
+
+    /**
+     * Uniforms needed for the velocity buffer
+     *
+     * @param shaderProgram The program
+     * @param camera        The camera
+     */
+    protected void addPreviousFrameUniforms(ExtShaderProgram shaderProgram, ICamera camera) {
+        // Velocity buffer
+        shaderProgram.setUniformf("u_prevCamPos", camera.getPreviousPos().put(aux));
+        shaderProgram.setUniformf("u_dCamPos", auxd.set(camera.getPreviousPos()).sub(camera.getPos()).put(aux));
+        shaderProgram.setUniformMatrix("u_prevProjView", camera.getPreviousProjView());
     }
 
     protected ExtShaderProgram getShaderProgram() {
         try {
-            if (GlobalConf.runtime.RELATIVISTIC_ABERRATION && GlobalConf.runtime.GRAVITATIONAL_WAVES)
-                return programs[3];
-            else if (GlobalConf.runtime.RELATIVISTIC_ABERRATION)
+            if (GlobalConf.postprocess.POSTPROCESS_MOTION_BLUR > 0)
                 return programs[1];
-            else if (GlobalConf.runtime.GRAVITATIONAL_WAVES)
+            else if (GlobalConf.runtime.RELATIVISTIC_ABERRATION && GlobalConf.runtime.GRAVITATIONAL_WAVES)
+                return programs[4];
+            else if (GlobalConf.runtime.RELATIVISTIC_ABERRATION)
                 return programs[2];
+            else if (GlobalConf.runtime.GRAVITATIONAL_WAVES)
+                return programs[3];
         } catch (Exception e) {
         }
         return programs[0];

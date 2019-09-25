@@ -139,7 +139,7 @@ public class ExtSpriteBatch implements ExtBatch {
 		String vertexShader = "attribute vec4 " + ExtShaderProgram.POSITION_ATTRIBUTE + ";\n" //
 			+ "attribute vec4 " + ExtShaderProgram.COLOR_ATTRIBUTE + ";\n" //
 			+ "attribute vec2 " + ExtShaderProgram.TEXCOORD_ATTRIBUTE + "0;\n" //
-			+ "uniform mat4 u_projTrans;\n" //
+			+ "uniform mat4 u_projView;\n" //
 			+ "varying vec4 v_color;\n" //
 			+ "varying vec2 v_texCoords;\n" //
 			+ "\n" //
@@ -148,7 +148,7 @@ public class ExtSpriteBatch implements ExtBatch {
 			+ "   v_color = " + ExtShaderProgram.COLOR_ATTRIBUTE + ";\n" //
 			+ "   v_color.a = v_color.a * (255.0/254.0);\n" //
 			+ "   v_texCoords = " + ExtShaderProgram.TEXCOORD_ATTRIBUTE + "0;\n" //
-			+ "   gl_Position =  u_projTrans * " + ExtShaderProgram.POSITION_ATTRIBUTE + ";\n" //
+			+ "   gl_Position =  u_projView * " + ExtShaderProgram.POSITION_ATTRIBUTE + ";\n" //
 			+ "}\n";
 		String fragmentShader = "#ifdef GL_ES\n" //
 			+ "#define LOWP lowp\n" //
@@ -1063,10 +1063,10 @@ public class ExtSpriteBatch implements ExtBatch {
 	private void setupMatrices () {
 		combinedMatrix.set(projectionMatrix).mul(transformMatrix);
 		if (customShader != null) {
-			customShader.setUniformMatrix("u_projTrans", combinedMatrix);
+			customShader.setUniformMatrix("u_projView", combinedMatrix);
 			customShader.setUniformi("u_texture", 0);
 		} else {
-			shader.setUniformMatrix("u_projTrans", combinedMatrix);
+			shader.setUniformMatrix("u_projView", combinedMatrix);
 			shader.setUniformi("u_texture", 0);
 		}
 	}

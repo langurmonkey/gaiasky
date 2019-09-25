@@ -26,7 +26,7 @@ public class GaiaSkyFrameBuffer extends FrameBuffer {
             return null;
     }
 
-    public Texture getOwnDepthBufferTexture() {
+    public Texture getVelocityBufferTexture() {
         if (textureAttachments.size > 2)
             return textureAttachments.get(2);
         else

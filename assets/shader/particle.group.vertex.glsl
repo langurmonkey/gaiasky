@@ -34,6 +34,8 @@ uniform float u_minSize;
     
 out vec4 v_col;
 
+#include shader/lib_velbuffer.vert.glsl
+
 void main() {
     vec3 pos = a_position.xyz - u_camPos;
 
@@ -61,6 +63,10 @@ void main() {
 
     float viewAngle = a_size / dist;
 
+    vec4 gpos = u_projModelView * vec4(pos, 1.0);
+
     gl_Position = u_projModelView * vec4(pos, 0.0);
     gl_PointSize = max(viewAngle * u_sizeFactor * cubemapSizeFactor, u_minSize * a_size);
+
+    velocityBuffer(gpos, a_position.xyz, dist, vec2(1e10, 1e12), 1.0);
 }

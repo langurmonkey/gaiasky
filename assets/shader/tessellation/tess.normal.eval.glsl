@@ -75,6 +75,7 @@ out vec3 o_shadowMapUv;
 #endif
 
 #include shader/lib_sampleheight.glsl
+#include shader/lib_velbuffer.vert.glsl
 
     #ifdef normalTextureFlag
 // Use normal map
@@ -118,6 +119,7 @@ void main(void){
     vec3 dh = o_normal * o_fragHeight;
     pos += vec4(dh, 0.0);
 
+
     #ifdef relativisticEffects
     pos.xyz = computeRelativisticAberration(pos.xyz, length(pos.xyz), u_velDir, u_vc);
     #endif// relativisticEffects
@@ -126,7 +128,10 @@ void main(void){
     pos.xyz = computeGravitationalWaves(pos.xyz, u_gw, u_gwmat3, u_ts, u_omgw, u_hterms);
     #endif// gravitationalWaves
 
-    gl_Position = u_projViewTrans * pos;
+    vec4 gpos = u_projViewTrans * pos;
+    gl_Position = gpos;
+
+    velocityBufferCam(gpos, pos);
 
     // Plumbing
     o_fragPosition = pos.xyz;

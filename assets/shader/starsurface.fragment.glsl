@@ -139,6 +139,8 @@ float noise(vec3 position, int octaves, float frequency, float persistence) {
     return total / maxAmplitude;
 }
 
+#include shader/lib_velbuffer.frag.glsl
+
 void main() {
     // Perimeter is 1 when normal faces camera, 0 when normal is 90 degrees from view.
     float perimeter = dot(normalize(v_normal), vec3(v_viewVec));
@@ -164,4 +166,5 @@ void main() {
     fragColor = vec4(min(vec3(0.9), color * 6.0 * v_lightDiffuse * percolor), v_opacity);
 
     gl_FragDepth = getDepthValue(u_cameraNearFar.y, u_cameraK);
+    velocityBuffer();
 }

@@ -6,6 +6,7 @@
 package gaia.cu9.ari.gaiaorbit.scenegraph.camera;
 
 import com.badlogic.gdx.graphics.PerspectiveCamera;
+import com.badlogic.gdx.math.Matrix4;
 import gaia.cu9.ari.gaiaorbit.scenegraph.CelestialBody;
 import gaia.cu9.ari.gaiaorbit.scenegraph.IFocus;
 import gaia.cu9.ari.gaiaorbit.scenegraph.IStarFocus;
@@ -47,6 +48,10 @@ public interface ICamera {
 
     void setPos(Vector3d pos);
 
+    Vector3d getPreviousPos();
+
+    void setPreviousPos(Vector3d pos);
+
     void setDirection(Vector3d dir);
 
     Vector3d getInversePos();
@@ -66,6 +71,12 @@ public interface ICamera {
     void setShift(Vector3d shift);
 
     Vector3d getShift();
+
+    Matrix4 getProjView();
+
+    Matrix4 getPreviousProjView();
+
+    void setPreviousProjView(Matrix4 mat);
 
     /**
      * Updates the camera.

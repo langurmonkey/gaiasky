@@ -132,7 +132,8 @@ public class TopInfoInterface extends Table implements IObserver, IGuiInterface 
             break;
         case FOCUS_CHANGE_CMD:
             IFocus f = (IFocus) data[0];
-            lastFocusName = TextUtils.capString(f.getClosestName(), maxNameLen);
+            String candidate = f.getCandidateName();
+            lastFocusName = TextUtils.capString(candidate, maxNameLen);
             focus.setText("focus: " + lastFocusName);
             s1.setText("|");
             break;

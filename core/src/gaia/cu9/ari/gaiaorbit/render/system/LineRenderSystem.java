@@ -87,7 +87,7 @@ public class LineRenderSystem extends ImmediateRenderSystem {
 
         shaderProgram = getShaderProgram();
         shaderProgram.begin();
-        shaderProgram.setUniformMatrix("u_projModelView", camera.getCamera().combined);
+        shaderProgram.setUniformMatrix("u_projView", camera.getCamera().combined);
 
         // Rel, grav, z-buffer
         addEffectsUniforms(shaderProgram, camera);

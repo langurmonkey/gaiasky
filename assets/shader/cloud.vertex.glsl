@@ -267,6 +267,8 @@ out vec3 v_lightDir;
 out vec3 v_lightCol;
 out vec3 v_viewDir;
 
+#include shader/lib_velbuffer.vert.glsl
+
 void main() {
     v_opacity = u_opacity;
     v_alphaTest = u_alphaTest;
@@ -278,7 +280,7 @@ void main() {
     g_tangent = normalize(u_normalMatrix * g_tangent);
 
     vec4 pos = u_worldTrans * g_position;
-    
+
     #ifdef relativisticEffects
         pos.xyz = computeRelativisticAberration(pos.xyz, length(pos.xyz), u_velDir, u_vc);
     #endif // relativisticEffects
@@ -287,7 +289,14 @@ void main() {
         pos.xyz = computeGravitationalWaves(pos.xyz, u_gw, u_gwmat3, u_ts, u_omgw, u_hterms);
     #endif // gravitationalWaves
     
-    gl_Position = u_projViewTrans * pos;
+    vec4 gpos = u_projViewTrans * pos;
+    gl_Position = gpos;
+
+    #ifdef velocityBufferFlag
+    vec4 prevPos = pos + vec4(u_prevCamPos, 0.0);
+    vec4 gprevpos = u_prevProjView * prevPos;
+    v_vel = ((gpos.xy / gpos.w) - (gprevpos.xy / gprevpos.w));
+    #endif// velocityBufferFlag
 
     #ifdef shadowMapFlag
 	vec4 spos = u_shadowMapProjViewTrans * pos;

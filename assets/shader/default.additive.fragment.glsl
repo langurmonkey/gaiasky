@@ -100,9 +100,10 @@ uniform float u_cameraK;
 
 layout (location = 0) out vec4 fragColor;
 
-void main() {
+#include shader/lib_velbuffer.frag.glsl
 
-	#if defined(normalFlag) 
+void main() {
+	#if defined(normalFlag)
 		vec3 normal = v_normal;
 	#endif // normalFlag
 
@@ -186,4 +187,5 @@ void main() {
     fragColor = clamp(fragColor, 0.0, 1.0);
 
 	gl_FragDepth = getDepthValue(u_cameraNearFar.y, u_cameraK);
+	velocityBuffer();
 }

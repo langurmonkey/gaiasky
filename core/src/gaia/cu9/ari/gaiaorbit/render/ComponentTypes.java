@@ -165,6 +165,8 @@ public class ComponentTypes extends BitSet {
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder();
+        if(isEmpty())
+            return "Empty";
         ComponentType[] values = ComponentType.values();
         for (int i = nextSetBit(0); i >= 0; i = nextSetBit(i + 1)) {
             // operate on index i here

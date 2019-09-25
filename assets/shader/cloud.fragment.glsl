@@ -62,6 +62,7 @@ in vec3 v_viewDir;
 layout (location = 0) out vec4 fragColor;
 
 #include shader/lib_logdepthbuff.glsl
+#include shader/lib_velbuffer.frag.glsl
 
 void main() {
     vec2 g_texCoord0 = v_texCoord0;
@@ -81,4 +82,5 @@ void main() {
     fragColor = clamp(fragColor, 0.0, 1.0);
 
     gl_FragDepth = getDepthValue(u_cameraNearFar.y, u_cameraK);
+    velocityBuffer();
 }

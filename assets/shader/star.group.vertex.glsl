@@ -13,7 +13,6 @@ uniform mat4 u_projModelView;
 uniform vec3 u_camPos;
 uniform vec3 u_camDir;
 uniform int u_cubemap;
-uniform float u_vrScale;
 
 uniform vec2 u_pointAlpha;
 uniform float u_thAnglePoint;
@@ -43,9 +42,10 @@ uniform vec4 u_alphaSizeFovBr;
 
 out vec4 v_col;
 
-
 #define len0 170000.0
 #define day_to_year 1.0 / 365.25
+
+#include shader/lib_velbuffer.vert.glsl
 
 void main() {
 	// Lengths
@@ -53,15 +53,17 @@ void main() {
 	float l1 = l0 * 100.0;
 
     vec3 pos = a_position - u_camPos;
+
     // Proper motion
-    pos = pos + a_pm * float(u_t) * day_to_year;
-    
+    vec3 pm = a_pm * float(u_t) * day_to_year;
+    pos = pos + pm;
+
     // Distance to star
     float dist = length(pos);
 
     // Discard vertex if too close or mag out of bounds
     float v_discard = 1.0;
-    if(dist < len0 || a_sizeMag.y > u_magLimit) {
+    if(dist < len0 * u_vrScale || a_sizeMag.y > u_magLimit) {
         v_discard = 0.0;
         v_col *= 0.0;
     }
@@ -88,6 +90,10 @@ void main() {
     float fadeout = smoothstep(dist, l0, l1);
     v_col = vec4(a_color.rgb, opacity * u_alphaSizeFovBr.x * fadeout);
 
-    gl_Position = u_projModelView * vec4(pos, 0.0) * v_discard;
+    vec4 gpos = u_projModelView * vec4(pos, 1.0);
+
+    gl_Position = gpos * v_discard;
     gl_PointSize = u_alphaSizeFovBr.y * sizefactor;
+
+    velocityBuffer(gpos, a_position, dist, pm, vec2(500.0, 3000.0), 1.0);
 }

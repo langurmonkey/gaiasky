@@ -10,7 +10,10 @@ in vec4 v_col;
 
 layout (location = 0) out vec4 fragColor;
 
+#include shader/lib_velbuffer.frag.glsl
+
 void main() {
     fragColor = vec4(v_col.rgb, v_col.a * u_alpha);
     gl_FragDepth = getDepthValue(u_zfar, u_k);
+    velocityBuffer();
 }

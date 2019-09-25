@@ -139,6 +139,7 @@ out vec3 v_ambientLight;
 #endif // gravitationalWaves
 
 out float v_depth;
+#include shader/lib_velbuffer.vert.glsl
 
 void main() {
 	v_time = u_shininess;
@@ -159,7 +160,7 @@ void main() {
 
 	vec4 pos = u_worldTrans * vec4(a_position, 1.0);
 
-    #ifdef relativisticEffects
+	#ifdef relativisticEffects
         pos.xyz = computeRelativisticAberration(pos.xyz, length(pos.xyz), u_velDir, u_vc);
     #endif // relativisticEffects
         
@@ -167,7 +168,10 @@ void main() {
         pos.xyz = computeGravitationalWaves(pos.xyz, u_gw, u_gwmat3, u_ts, u_omgw, u_hterms);
     #endif // gravitationalWaves
 
-	gl_Position = u_projViewTrans * pos;
+	vec4 gpos = u_projViewTrans * pos;
+	gl_Position = gpos;
+
+	velocityBufferCam(gpos, pos);
 
 	#ifdef shadowMapFlag
 		vec4 spos = u_shadowMapProjViewTrans * pos;

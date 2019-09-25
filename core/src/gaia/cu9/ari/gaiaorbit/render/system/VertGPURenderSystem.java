@@ -47,11 +47,11 @@ public class VertGPURenderSystem<T extends IGPUVertsRenderable> extends Immediat
 
     @Override
     protected void initShaderProgram() {
-        if(isLine()){
+        if (isLine()) {
             Gdx.gl.glEnable(GL30.GL_LINE_SMOOTH);
             Gdx.gl.glEnable(GL30.GL_LINE_WIDTH);
             Gdx.gl.glHint(GL30.GL_NICEST, GL30.GL_LINE_SMOOTH_HINT);
-        }else if(isPoint()){
+        } else if (isPoint()) {
             Gdx.gl.glEnable(GL30.GL_POINT_SPRITE);
             Gdx.gl.glEnable(GL30.GL_VERTEX_PROGRAM_POINT_SIZE);
         }
@@ -79,7 +79,6 @@ public class VertGPURenderSystem<T extends IGPUVertsRenderable> extends Immediat
         curr.colorOffset = curr.mesh.getVertexAttribute(Usage.ColorPacked) != null ? curr.mesh.getVertexAttribute(Usage.ColorPacked).offset / 4 : 0;
         return mdi;
     }
-
 
     @Override
     public void renderStud(Array<IRenderable> renderables, ICamera camera, double t) {
@@ -164,7 +163,7 @@ public class VertGPURenderSystem<T extends IGPUVertsRenderable> extends Immediat
                 shaderProgram.setUniformf("u_pointSize", renderable.getPrimitiveSize() * GlobalConf.UI_SCALE_FACTOR);
 
             shaderProgram.setUniformMatrix("u_worldTransform", renderable.getLocalTransform());
-            shaderProgram.setUniformMatrix("u_projModelView", camera.getCamera().combined);
+            shaderProgram.setUniformMatrix("u_projView", camera.getCamera().combined);
             shaderProgram.setUniformf("u_alpha", (float) (renderable.getAlpha()) * getAlpha(renderable));
             if (renderable.getParent() != null && renderable.getParent().name.equals("Gaia")) {
                 Vector3d ppos = ((Gaia) renderable.getParent()).unrotatedPos;

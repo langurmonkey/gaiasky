@@ -32,13 +32,11 @@ in vec3 a_position;
     #include shader/lib_gravwaves.glsl
 #endif // gravitationalWaves
 
+
 void main(void) {
-
     computeAtmosphericScattering();
+    vec4 pos = u_worldTrans * vec4(a_position, 1.0);
 
-    vec4 g_position = vec4(a_position, 1.0);
-    vec4 pos = u_worldTrans * g_position;
-    
     #ifdef relativisticEffects
         pos.xyz = computeRelativisticAberration(pos.xyz, length(pos.xyz), u_velDir, u_vc);
     #endif // relativisticEffects
@@ -47,5 +45,6 @@ void main(void) {
         pos.xyz = computeGravitationalWaves(pos.xyz, u_gw, u_gwmat3, u_ts, u_omgw, u_hterms);
     #endif // gravitationalWaves
     
-    gl_Position = u_projViewTrans * pos;
+    vec4 gpos = u_projViewTrans * pos;
+    gl_Position = gpos;
 }
