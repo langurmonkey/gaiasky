@@ -103,21 +103,25 @@ public class FadeNode extends AbstractPositionEntity {
      * Highlight color
      **/
     protected static float[][] hlColor = new float[][]{
-            {1f, 0f, 0f, 1f},
-            {0f, 1f, 0f, 1f},
-            {0f, 0f, 1f, 1f},
-            {0f, 1f, 1f, 1f},
-            {1f, 0f, 1f, 1f},
-            {1f, 1f, 0f, 1f}
+            GlobalResources.gBlue,
+            GlobalResources.gRed,
+            GlobalResources.gYellow,
+            GlobalResources.gGreen,
+            GlobalResources.gPink,
+            GlobalResources.aOrange,
+            GlobalResources.tPurple,
+            GlobalResources.ddBrown,
+            GlobalResources.ddMagenta
     };
-    protected static float[] hlColorFloat = new float[]{
-            Color.toFloatBits(hlColor[0][0], hlColor[0][1], hlColor[0][2], hlColor[0][3]),
-            Color.toFloatBits(hlColor[1][0], hlColor[1][1], hlColor[1][2], hlColor[1][3]),
-            Color.toFloatBits(hlColor[2][0], hlColor[2][1], hlColor[2][2], hlColor[2][3]),
-            Color.toFloatBits(hlColor[3][0], hlColor[3][1], hlColor[3][2], hlColor[3][3]),
-            Color.toFloatBits(hlColor[4][0], hlColor[4][1], hlColor[4][2], hlColor[4][3]),
-            Color.toFloatBits(hlColor[5][0], hlColor[5][1], hlColor[5][2], hlColor[5][3])
-    };
+    protected static float[] hlColorFloat;
+    static{
+        hlColorFloat = new float[hlColor.length];
+        int i = 0;
+        for(float[] c : hlColor){
+            hlColorFloat[i] = Color.toFloatBits(c[0], c[1], c[2], c[3]);
+            i++;
+        }
+    }
 
     public FadeNode() {
         super();
