@@ -18,8 +18,6 @@ import gaia.cu9.ari.gaiaorbit.util.GlobalResources;
 import gaia.cu9.ari.gaiaorbit.util.TextUtils;
 import gaia.cu9.ari.gaiaorbit.util.scene2d.*;
 
-import java.io.File;
-import java.io.FileFilter;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Map;
@@ -32,31 +30,24 @@ import java.util.Map;
 public class DatasetsWidget {
 
     private Skin skin;
-    private String assetsLoc;
     public OwnCheckBox[] cbs;
     public Map<Button, String> candidates;
 
     public DatasetsWidget(Skin skin, String assetsLoc) {
         super();
         this.skin = skin;
-        this.assetsLoc = assetsLoc;
-        candidates = new HashMap<Button, String>();
+        candidates = new HashMap<>();
     }
 
     public Array<FileHandle> buildCatalogFiles() {
         // Discover data sets, add as buttons
-        Array<FileHandle> catalogLocations = new Array<FileHandle>();
+        Array<FileHandle> catalogLocations = new Array<>();
         catalogLocations.add(Gdx.files.absolute(GlobalConf.data.DATA_LOCATION));
 
-        Array<FileHandle> catalogFiles = new Array<FileHandle>();
+        Array<FileHandle> catalogFiles = new Array<>();
 
         for (FileHandle catalogLocation : catalogLocations) {
-            FileHandle[] cfs = catalogLocation.list(new FileFilter() {
-                @Override
-                public boolean accept(File pathname) {
-                    return pathname.getName().startsWith("catalog-") && pathname.getName().endsWith(".json");
-                }
-            });
+            FileHandle[] cfs = catalogLocation.list(pathname -> pathname.getName().startsWith("catalog-") && pathname.getName().endsWith(".json"));
             catalogFiles.addAll(cfs);
         }
         return catalogFiles;
@@ -186,7 +177,7 @@ public class DatasetsWidget {
             cbs[i++] = cb;
 
         }
-        ButtonGroup<OwnCheckBox> bg = new ButtonGroup<OwnCheckBox>();
+        ButtonGroup<OwnCheckBox> bg = new ButtonGroup<>();
         bg.setMinCheckCount(0);
         bg.setMaxCheckCount(catalogFiles.size);
         bg.add(cbs);

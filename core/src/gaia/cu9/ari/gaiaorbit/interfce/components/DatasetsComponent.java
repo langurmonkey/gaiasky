@@ -26,6 +26,9 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 
+/**
+ * The datasets pane in the controls window
+ */
 public class DatasetsComponent extends GuiComponent implements IObserver {
     private VerticalGroup group;
     private float pad = 3 * GlobalConf.UI_SCALE_FACTOR;

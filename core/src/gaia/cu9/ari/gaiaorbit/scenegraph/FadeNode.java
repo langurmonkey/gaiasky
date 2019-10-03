@@ -86,16 +86,22 @@ public class FadeNode extends AbstractPositionEntity {
      */
     protected CatalogInfo catalogInfo = null;
 
-    /** General track of highlight index **/
+    /**
+     * General track of highlight index
+     **/
     protected static int hli = 0;
     /**
      * Is it highlighted?
      */
     protected boolean highlighted = false;
-    /** Highlight color index **/
+    /**
+     * Highlight color index
+     **/
     protected int hlci;
 
-    /** Highlight color **/
+    /**
+     * Highlight color
+     **/
     protected static float[][] hlColor = new float[][]{
             {1f, 0f, 0f, 1f},
             {0f, 1f, 0f, 1f},
@@ -104,7 +110,7 @@ public class FadeNode extends AbstractPositionEntity {
             {1f, 0f, 1f, 1f},
             {1f, 1f, 0f, 1f}
     };
-    protected static float[] hlColorFloat = new float[] {
+    protected static float[] hlColorFloat = new float[]{
             Color.toFloatBits(hlColor[0][0], hlColor[0][1], hlColor[0][2], hlColor[0][3]),
             Color.toFloatBits(hlColor[1][0], hlColor[1][1], hlColor[1][2], hlColor[1][3]),
             Color.toFloatBits(hlColor[2][0], hlColor[2][1], hlColor[2][2], hlColor[2][3]),
@@ -231,7 +237,7 @@ public class FadeNode extends AbstractPositionEntity {
         return this.visible || msSinceStateChange() <= GlobalConf.scene.OBJECT_FADE_MS;
     }
 
-    private long msSinceStateChange(){
+    private long msSinceStateChange() {
         return (long) (GaiaSky.instance.getT() * 1000f) - this.lastStateChangeTimeMs;
     }
 
@@ -249,23 +255,26 @@ public class FadeNode extends AbstractPositionEntity {
         EventManager.instance.post(Events.CATALOG_ADD, this.catalogInfo, false);
     }
 
-    public static int nextHightlightColorIndex(){
+    public static int nextHightlightColorIndex() {
         hli = (hli + 1) % hlColor.length;
         return hli;
     }
 
-    public void highlight(boolean hl){
-        highlight(hl, nextHightlightColorIndex());
+    public void highlight(boolean hl) {
+        if (hl)
+            highlight(hl, nextHightlightColorIndex());
+        else
+            highlight(hl, hli);
     }
 
-    public void highlight(boolean hl, int colorIndex){
+    public void highlight(boolean hl, int colorIndex) {
         this.highlighted = hl;
-        if(hl) {
+        if (hl) {
             this.hlci = colorIndex;
         }
     }
 
-    public boolean isHighlighted(){
+    public boolean isHighlighted() {
         return highlighted;
     }
 
@@ -276,12 +285,12 @@ public class FadeNode extends AbstractPositionEntity {
     }
 
     @Override
-    public void setSize(Long size){
+    public void setSize(Long size) {
         this.size = (long) (size * Constants.DISTANCE_SCALE_FACTOR);
     }
 
     @Override
-    public void setSize(Double size){
+    public void setSize(Double size) {
         this.size = (float) (size * Constants.DISTANCE_SCALE_FACTOR);
     }
 }
