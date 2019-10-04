@@ -10,6 +10,7 @@ import com.badlogic.gdx.Net.HttpMethods;
 import com.badlogic.gdx.Net.HttpRequest;
 import com.badlogic.gdx.Net.HttpResponse;
 import com.badlogic.gdx.Net.HttpResponseListener;
+import com.badlogic.gdx.backends.lwjgl3.Lwjgl3ApplicationConfiguration;
 import com.badlogic.gdx.backends.lwjgl3.Lwjgl3Net;
 import com.badlogic.gdx.net.HttpStatus;
 import com.badlogic.gdx.scenes.scene2d.Event;
@@ -265,7 +266,7 @@ public class DesktopNetworkChecker extends Thread implements INetworkChecker {
     }
 
     public static void main(String[] args) {
-        Gdx.net = new Lwjgl3Net();
+        Gdx.net = new Lwjgl3Net(new Lwjgl3ApplicationConfiguration());
         DesktopNetworkChecker dnc = new DesktopNetworkChecker();
         dnc.urlCheck("https://ca.ba.de.si.com", new LinkListener() {
             @Override

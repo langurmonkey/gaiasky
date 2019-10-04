@@ -7,7 +7,6 @@ package gaia.cu9.ari.gaiaorbit.interfce.components;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input.Keys;
-import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Group;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
@@ -37,7 +36,6 @@ import java.util.Map;
 
 public class ObjectsComponent extends GuiComponent implements IObserver {
     private static final Log logger = Logger.getLogger(ObjectsComponent.class);
-    boolean tree = false;
     boolean list = true;
 
     protected ISceneGraph sg;
@@ -127,110 +125,70 @@ public class ObjectsComponent extends GuiComponent implements IObserver {
 
         logger.info(I18n.txt("notif.sgtree.init"));
 
-        if (tree) {
-            final Tree objectsTree = new Tree(skin);
-            objectsTree.setName("objects list");
-            objectsTree.setPadding(space2);
-            objectsTree.setIconSpacing(space2, space2);
-            objectsTree.setYSpacing(0);
-            Array<Node> nodes = createTree(sg.getRoot().children);
-            for (Node node : nodes) {
-                objectsTree.add(node);
+        final com.badlogic.gdx.scenes.scene2d.ui.List<String> focusList = new com.badlogic.gdx.scenes.scene2d.ui.List<>(skin);
+        focusList.setName("objects list");
+        Array<IFocus> focusableObjects = sg.getFocusableObjects();
+        Array<String> names = new Array<>(focusableObjects.size);
+
+        for (IFocus focus : focusableObjects) {
+            // Omit stars with no proper names
+            if (focus.getName() != null && !GlobalResources.isNumeric(focus.getName())) {
+                names.add(focus.getName());
             }
-            objectsTree.expandAll();
-            objectsTree.addListener(event -> {
-                if (event instanceof ChangeEvent) {
-                    if (objectsTree.getSelection().hasItems()) {
-                        if (objectsTree.getSelection().hasItems()) {
-                            Node n = objectsTree.getSelection().first();
-                            final SceneGraphNode node = treeToModel.getBackward(n);
-                            if (node instanceof IFocus) {
-                                IFocus focus = (IFocus) node;
-                                if (!focus.isCoordinatesTimeOverflow()) {
-                                    Gdx.app.postRunnable(() -> {
-                                        EventManager.instance.post(Events.CAMERA_MODE_CMD, CameraMode.FOCUS_MODE, true);
-                                        EventManager.instance.post(Events.FOCUS_CHANGE_CMD, focus, true);
-                                    });
-                                }
-
-                            }
-
-                        }
-
-                    }
-                    return true;
-                }
-                return false;
-            });
-            objectsList = objectsTree;
-        } else if (list) {
-            final com.badlogic.gdx.scenes.scene2d.ui.List<String> focusList = new com.badlogic.gdx.scenes.scene2d.ui.List<>(skin);
-            focusList.setName("objects list");
-            Array<IFocus> focusableObjects = sg.getFocusableObjects();
-            Array<String> names = new Array<>(focusableObjects.size);
-
-            for (IFocus focus : focusableObjects) {
-                // Omit stars with no proper names
-                if (focus.getName() != null && !GlobalResources.isNumeric(focus.getName())) {
-                    names.add(focus.getName());
-                }
-            }
-            names.sort();
-
-            SceneGraphNode sol = sg.getNode("Sun");
-            if (sol != null) {
-                Array<IFocus> solChildren = new Array<>();
-                sol.addFocusableObjects(solChildren);
-                solChildren.sort(new CelestialBodyComparator());
-                for (IFocus cb : solChildren)
-                    names.insert(0, cb.getName());
-            }
-
-            focusList.setItems(names);
-            focusList.pack();//
-            focusList.addListener(event -> {
-                if (event instanceof ChangeEvent) {
-                    ChangeEvent ce = (ChangeEvent) event;
-                    Actor actor = ce.getTarget();
-                    @SuppressWarnings("unchecked") final String text = ((com.badlogic.gdx.scenes.scene2d.ui.List<String>) actor).getSelected().toLowerCase().trim();
-                    if (sg.containsNode(text)) {
-                        SceneGraphNode node = sg.getNode(text);
-                        if (node instanceof IFocus) {
-                            IFocus focus = (IFocus) node;
-                            boolean timeOverflow = focus.isCoordinatesTimeOverflow();
-                            boolean ctOn = GaiaSky.instance.isOn(focus.getCt());
-                            if (!timeOverflow && ctOn) {
-                                Gdx.app.postRunnable(() -> {
-                                    EventManager.instance.post(Events.CAMERA_MODE_CMD, CameraMode.FOCUS_MODE, true);
-                                    EventManager.instance.post(Events.FOCUS_CHANGE_CMD, focus, true);
-                                });
-                            } else if (timeOverflow) {
-                                info(I18n.txt("gui.objects.search.timerange.1", text), I18n.txt("gui.objects.search.timerange.2"));
-                            } else {
-                                info(I18n.txt("gui.objects.search.invisible.1", text), I18n.txt("gui.objects.search.invisible.2", focus.getCt().toString()));
-                            }
-                        }
-                    } else {
-                        info(null, null);
-                    }
-                    return true;
-                }
-                return false;
-            });
-            objectsList = focusList;
         }
+        names.sort();
+
+        SceneGraphNode sol = sg.getNode("Sun");
+        if (sol != null) {
+            Array<IFocus> solChildren = new Array<>();
+            sol.addFocusableObjects(solChildren);
+            solChildren.sort(new CelestialBodyComparator());
+            for (IFocus cb : solChildren)
+                names.insert(0, cb.getName());
+        }
+
+        focusList.setItems(names);
+        focusList.pack();//
+        focusList.addListener(event -> {
+            if (event instanceof ChangeEvent) {
+                ChangeEvent ce = (ChangeEvent) event;
+                Actor actor = ce.getTarget();
+                @SuppressWarnings("unchecked") final String text = ((com.badlogic.gdx.scenes.scene2d.ui.List<String>) actor).getSelected().toLowerCase().trim();
+                if (sg.containsNode(text)) {
+                    SceneGraphNode node = sg.getNode(text);
+                    if (node instanceof IFocus) {
+                        IFocus focus = (IFocus) node;
+                        boolean timeOverflow = focus.isCoordinatesTimeOverflow();
+                        boolean ctOn = GaiaSky.instance.isOn(focus.getCt());
+                        if (!timeOverflow && ctOn) {
+                            Gdx.app.postRunnable(() -> {
+                                EventManager.instance.post(Events.CAMERA_MODE_CMD, CameraMode.FOCUS_MODE, true);
+                                EventManager.instance.post(Events.FOCUS_CHANGE_CMD, focus, true);
+                            });
+                        } else if (timeOverflow) {
+                            info(I18n.txt("gui.objects.search.timerange.1", text), I18n.txt("gui.objects.search.timerange.2"));
+                        } else {
+                            info(I18n.txt("gui.objects.search.invisible.1", text), I18n.txt("gui.objects.search.invisible.2", focus.getCt().toString()));
+                        }
+                    }
+                } else {
+                    info(null, null);
+                }
+                return true;
+            }
+            return false;
+        });
+        objectsList = focusList;
         logger.info(I18n.txt("notif.sgtree.initialised"));
 
-        if (tree || list) {
-            focusListScrollPane = new OwnScrollPane(objectsList, skin, "minimalist-nobg");
-            focusListScrollPane.setName("objects list scroll");
+        focusListScrollPane = new OwnScrollPane(objectsList, skin, "minimalist-nobg");
+        focusListScrollPane.setName("objects list scroll");
 
-            focusListScrollPane.setFadeScrollBars(false);
-            focusListScrollPane.setScrollingDisabled(true, false);
+        focusListScrollPane.setFadeScrollBars(false);
+        focusListScrollPane.setScrollingDisabled(true, false);
 
-            focusListScrollPane.setHeight(tree ? 200 * GlobalConf.UI_SCALE_FACTOR : 100 * GlobalConf.UI_SCALE_FACTOR);
-            focusListScrollPane.setWidth(componentWidth);
-        }
+        focusListScrollPane.setHeight(100 * GlobalConf.UI_SCALE_FACTOR);
+        focusListScrollPane.setWidth(componentWidth);
 
         /*
          * MESHES
@@ -361,24 +319,6 @@ public class ObjectsComponent extends GuiComponent implements IObserver {
         return objects.size == 0 ? null : group;
     }
 
-    private Array<Node> createTree(Array<SceneGraphNode> nodes) {
-        Array<Node> treeNodes = new Array<Node>(nodes.size);
-        for (SceneGraphNode node : nodes) {
-            Label l = new Label(node.name, skin, "ui-10");
-            l.setColor(Color.BLACK);
-            Node treeNode = new Node(l);
-
-            if (node.children != null && node.children.size != 0) {
-                treeNode.addAll(createTree(node.children));
-            }
-
-            treeNodes.add(treeNode);
-            treeToModel.add(node, treeNode);
-        }
-
-        return treeNodes;
-    }
-
     public void setSceneGraph(ISceneGraph sg) {
         this.sg = sg;
     }
@@ -419,31 +359,22 @@ public class ObjectsComponent extends GuiComponent implements IObserver {
             }
             // Select only if data[1] is true
             if (sgn != null) {
-                if (tree) {
-                    Tree objList = ((Tree) objectsList);
-                    Node node = treeToModel.getForward(sgn);
-                    objList.getSelection().set(node);
-                    node.expandTo();
+                // Update focus selection in focus list
+                @SuppressWarnings("unchecked") com.badlogic.gdx.scenes.scene2d.ui.List<String> objList = (com.badlogic.gdx.scenes.scene2d.ui.List<String>) objectsList;
+                Array<String> items = objList.getItems();
+                SceneGraphNode node = (SceneGraphNode) data[0];
 
-                    focusListScrollPane.setScrollY(focusListScrollPane.getMaxY() - node.getActor().getY());
-                } else if (list) {
-                    // Update focus selection in focus list
-                    @SuppressWarnings("unchecked") com.badlogic.gdx.scenes.scene2d.ui.List<String> objList = (com.badlogic.gdx.scenes.scene2d.ui.List<String>) objectsList;
-                    Array<String> items = objList.getItems();
-                    SceneGraphNode node = (SceneGraphNode) data[0];
+                // Select without firing events, do not use set()
+                objList.getSelection().items().clear();
+                objList.getSelection().items().add(node.name);
 
-                    // Select without firing events, do not use set()
-                    objList.getSelection().items().clear();
-                    objList.getSelection().items().add(node.name);
-
-                    int itemIdx = items.indexOf(node.name, false);
-                    if (itemIdx >= 0) {
-                        objList.getSelection().setProgrammaticChangeEvents(false);
-                        objList.setSelectedIndex(itemIdx);
-                        objList.getSelection().setProgrammaticChangeEvents(true);
-                        float itemHeight = objList.getItemHeight();
-                        focusListScrollPane.setScrollY(itemIdx * itemHeight);
-                    }
+                int itemIdx = items.indexOf(node.name, false);
+                if (itemIdx >= 0) {
+                    objList.getSelection().setProgrammaticChangeEvents(false);
+                    objList.setSelectedIndex(itemIdx);
+                    objList.getSelection().setProgrammaticChangeEvents(true);
+                    float itemHeight = objList.getItemHeight();
+                    focusListScrollPane.setScrollY(itemIdx * itemHeight);
                 }
             }
             break;

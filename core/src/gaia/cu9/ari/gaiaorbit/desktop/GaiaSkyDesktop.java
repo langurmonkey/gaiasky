@@ -12,6 +12,7 @@ import com.badlogic.gdx.Graphics.DisplayMode;
 import com.badlogic.gdx.backends.lwjgl3.Lwjgl3Application;
 import com.badlogic.gdx.backends.lwjgl3.Lwjgl3ApplicationConfiguration;
 import com.badlogic.gdx.backends.lwjgl3.Lwjgl3Files;
+import com.badlogic.gdx.graphics.glutils.HdpiMode;
 import com.badlogic.gdx.utils.GdxRuntimeException;
 import com.beust.jcommander.JCommander;
 import com.beust.jcommander.Parameter;
@@ -291,7 +292,7 @@ public class GaiaSkyDesktop implements IObserver {
         cfg.setWindowIcon(Files.FileType.Internal, "icon/ic_launcher.png");
         cfg.useOpenGL3(true, 4, 1);
         // Disable logical DPI modes (macOS, Windows)
-        cfg.setHdpiMode(Lwjgl3ApplicationConfiguration.HdpiMode.Pixels);
+        cfg.setHdpiMode(HdpiMode.Pixels);
 
         if (consoleLogger != null) {
             consoleLogger.unsubscribe();
