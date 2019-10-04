@@ -27,7 +27,7 @@ public class RotationComponent {
     public double axialTilt;
     /** Angle between orbital plane and the ecliptic in degrees. **/
     public double inclination;
-    /** The ascending node in degrees. **/
+    /** The ascending node in degrees, should not be used, as it obviously causes the body to wobble. **/
     public double ascendingNode;
     /** The meridian (hour) angle at the epoch J2000.0, in degrees **/
     public double meridianAngle;
