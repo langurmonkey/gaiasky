@@ -26,7 +26,7 @@ import java.util.Map;
  */
 public class BillboardGalaxy extends Billboard {
 
-    protected static final double TH_ANGLE_POINT_M = Math.toRadians(0.9);
+    protected static double TH_ANGLE_POINT_M = Math.toRadians(0.9);
 
 
     public BillboardGalaxy(){

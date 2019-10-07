@@ -198,7 +198,7 @@ public class DecalUtils {
      */
     public static void setBillboardRotation(Quaternion rotation, final Vector3 direction, final Vector3 up) {
         tmp.set(up).crs(direction).nor();
-        tmp2.set(up).nor();
+        tmp2.set(direction).crs(tmp).nor();
         rotation.setFromAxes(tmp.x, tmp2.x, direction.x, tmp.y, tmp2.y, direction.y, tmp.z, tmp2.z, direction.z);
     }
 
@@ -213,7 +213,7 @@ public class DecalUtils {
      */
     public static void setBillboardRotation(Quaternion rotation, final Vector3d direction, final Vector3d up) {
         tmp.set((float) up.x, (float) up.y, (float) up.z).crs((float) direction.x, (float) direction.y, (float) direction.z).nor();
-        tmp2.set((float) up.x, (float) up.y, (float) up.z).crs(tmp).nor();
+        tmp2.set((float) direction.x, (float) direction.y, (float) direction.z).crs(tmp).nor();
         rotation.setFromAxes(tmp.x, tmp2.x, (float) direction.x, tmp.y, tmp2.y, (float) direction.y, tmp.z, tmp2.z, (float) direction.z);
     }
 

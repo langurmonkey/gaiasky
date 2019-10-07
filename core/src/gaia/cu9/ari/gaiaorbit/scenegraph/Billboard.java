@@ -63,7 +63,7 @@ public class Billboard extends ModelBody {
     public void updateLocalValues(ITimeFrameProvider time, ICamera camera) {
         forceUpdatePosition(time, false);
         if (fade != null) {
-            fadeOpacity = (float) MathUtilsd.lint(distToCamera, fade[0], fade[1], 1, 0.3);
+            fadeOpacity = (float) MathUtilsd.lint(distToCamera, fade[0], fade[1], 1, 0.5);
         } else {
             fadeOpacity = 1f;
         }
