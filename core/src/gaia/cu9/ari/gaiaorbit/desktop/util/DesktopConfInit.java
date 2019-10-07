@@ -129,7 +129,7 @@ public class DesktopConfInit extends ConfInit {
         PostprocessConf ppc = new PostprocessConf();
         Antialias POSTPROCESS_ANTIALIAS = ppc.getAntialias(Integer.parseInt(p.getProperty("postprocess.antialiasing")));
         float POSTPROCESS_BLOOM_INTENSITY = Float.parseFloat(p.getProperty("postprocess.bloom.intensity"));
-        boolean POSTPROCESS_MOTION_BLUR = parseMotionBlur(p);
+        boolean POSTPROCESS_MOTION_BLUR = Float.parseFloat(p.getProperty("postprocess.motionblur")) > 0;
         boolean POSTPROCESS_LENS_FLARE = Boolean.parseBoolean(p.getProperty("postprocess.lensflare"));
         boolean POSTPROCESS_LIGHT_SCATTERING = Boolean.parseBoolean(p.getProperty("postprocess.lightscattering", "false"));
         boolean POSTPROCESS_FISHEYE = Boolean.parseBoolean(p.getProperty("postprocess.fisheye", "false"));
@@ -217,7 +217,7 @@ public class DesktopConfInit extends ConfInit {
             // Use ordinal integer
             int quality = Parser.parseIntException(gc);
             GRAPHICS_QUALITY = GraphicsQuality.values()[quality % GraphicsQuality.values().length];
-        }catch(NumberFormatException e){
+        } catch (NumberFormatException e) {
             // Use string
             GRAPHICS_QUALITY = GraphicsQuality.valueOf(gc.toUpperCase());
         }
@@ -376,25 +376,16 @@ public class DesktopConfInit extends ConfInit {
 
     }
 
-    private boolean parseMotionBlur(Properties p){
-        String prop = p.getProperty("postprocess.motionblur");
-        try{
-            float f = Float.parseFloat(prop);
-            return f > 0;
-        }catch(Exception e){
-            return Boolean.parseBoolean(prop);
-        }
-    }
-
-    private int getValidWidth(){
+    private int getValidWidth() {
         int w = Gdx.graphics.getWidth();
-        if(w <= 0)
+        if (w <= 0)
             return 1280;
         return w;
     }
-    private int getValidHeight(){
+
+    private int getValidHeight() {
         int h = Gdx.graphics.getHeight();
-        if(h <= 0)
+        if (h <= 0)
             return 720;
         return h;
     }
@@ -417,7 +408,7 @@ public class DesktopConfInit extends ConfInit {
         /** POSTPROCESS **/
         p.setProperty("postprocess.antialiasing", Integer.toString(GlobalConf.postprocess.POSTPROCESS_ANTIALIAS.getAACode()));
         p.setProperty("postprocess.bloom.intensity", Float.toString(GlobalConf.postprocess.POSTPROCESS_BLOOM_INTENSITY));
-        p.setProperty("postprocess.motionblur", Boolean.toString(GlobalConf.postprocess.POSTPROCESS_MOTION_BLUR));
+        p.setProperty("postprocess.motionblur", GlobalConf.postprocess.POSTPROCESS_MOTION_BLUR ? "1.0" : "0.0");
         p.setProperty("postprocess.lensflare", Boolean.toString(GlobalConf.postprocess.POSTPROCESS_LENS_FLARE));
         p.setProperty("postprocess.lightscattering", Boolean.toString(GlobalConf.postprocess.POSTPROCESS_LIGHT_SCATTERING));
         p.setProperty("postprocess.brightness", Float.toString(GlobalConf.postprocess.POSTPROCESS_BRIGHTNESS));
@@ -613,8 +604,8 @@ public class DesktopConfInit extends ConfInit {
         }
     }
 
-    public static String getConfigFileName(boolean vr){
-        if(vr)
+    public static String getConfigFileName(boolean vr) {
+        if (vr)
             return "global.vr.properties";
         else
             return "global.properties";

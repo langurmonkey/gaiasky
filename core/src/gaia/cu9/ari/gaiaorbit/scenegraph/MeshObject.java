@@ -68,7 +68,7 @@ public class MeshObject extends FadeNode implements IModelRenderable, I3DTextRen
         if (mc != null) {
             try {
                 mc.doneLoading(manager, localTransform, cc, true);
-                if(additiveBlending){
+                if (additiveBlending) {
                     mc.setDepthTest(GL20.GL_NONE, false);
                 }
             } catch (Exception e) {
@@ -156,11 +156,15 @@ public class MeshObject extends FadeNode implements IModelRenderable, I3DTextRen
     @Override
     public void render(IntModelBatch modelBatch, float alpha, double t, RenderingContext rc) {
         if (mc != null) {
-            if(additiveBlending){
+            if (additiveBlending) {
                 mc.update(localTransform, alpha * opacity, GL20.GL_ONE, GL20.GL_ONE);
+                mc.setDepthTest(GL20.GL_NONE, false);
             } else {
-                mc.update(localTransform, alpha*opacity);
+                mc.update(localTransform, alpha * opacity);
             }
+            // Render
+            if (mc.instance != null)
+                modelBatch.render(mc.instance, mc.env);
         }
     }
 
