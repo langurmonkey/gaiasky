@@ -37,6 +37,7 @@ import gaia.cu9.ari.gaiaorbit.util.MasterManager;
 import gaia.cu9.ari.gaiaorbit.util.coord.Coordinates;
 import gaia.cu9.ari.gaiaorbit.util.gravwaves.RelativisticEffectsManager;
 import gaia.cu9.ari.gaiaorbit.util.math.MathUtilsd;
+import gaia.cu9.ari.gaiaorbit.util.math.Matrix4d;
 import gaia.cu9.ari.gaiaorbit.util.math.Vector3d;
 import gaia.cu9.ari.gaiaorbit.util.time.ITimeFrameProvider;
 import gaia.cu9.ari.gaiaorbit.util.tree.OctreeNode;
@@ -100,6 +101,10 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
      * Previous angle in orientation lock
      **/
     double previousOrientationAngle = 0;
+    /**
+     * Previous orientation matrix, for focus lock
+     */
+    Matrix4d orip;
     /**
      * Fov value backup
      **/
@@ -225,6 +230,7 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
         accel = new Vector3d();
         force = new Vector3d();
         posbak = new Vector3d();
+        orip = new Matrix4d();
         this.vr = vr;
         initialize(assetManager);
 
@@ -380,32 +386,44 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
                     // Lock orientation - FOR NOW THIS ONLY WORKS WITH
                     // PLANETS and MOONS
                     if (GlobalConf.scene.FOCUS_LOCK_ORIENTATION && time.getDt() > 0 && focus.getOrientation() != null) {
-                        Double anglebak = null;
                         RotationComponent rc = focus.getRotationComponent();
                         if (rc != null) {
                             // Rotation component present - planets, etc
-                            anglebak = rc.angle;
+                            Double anglebak = rc.angle;
+                            if (anglebak != null) {
+                                Double angle = previousOrientationAngle != 0 ? (anglebak - previousOrientationAngle) : 0;
+                                // aux5 <- focus (future) position
+                                focus.getAbsolutePosition(aux5);
+                                // aux3 <- focus to camera vector
+                                aux3.set(pos).sub(aux5);
+                                // aux2 <- spin axis
+                                aux2.set(0, 1, 0).mul(focus.getOrientation());
+                                // rotate aux3 around focus spin axis
+                                aux3.rotate(aux2, angle);
+                                // aux3 <- camera pos after rotating
+                                aux3.add(aux5);
+                                // pos <- aux3
+                                pos.set(aux3);
+                                direction.rotate(aux2, angle);
+                                up.rotate(aux2, angle);
+                                previousOrientationAngle = anglebak;
+                            }
                         } else if (focus.getOrientationQuaternion() != null) {
-                            anglebak = focus.getOrientationQuaternion().getPitch();
-                        }
-                        if (anglebak != null) {
-                            Double angle = previousOrientationAngle != 0 ? (anglebak - previousOrientationAngle) : 0;
+                            Matrix4d ori = focus.getOrientation();
                             // aux5 <- focus (future) position
                             focus.getAbsolutePosition(aux5);
-                            // aux3 <- focus to camera vector
+                            // aux3 <- focus->camera vector
                             aux3.set(pos).sub(aux5);
-                            // aux2 <- spin axis
-                            aux2.set(0, 1, 0).mul(focus.getOrientation());
-                            // rotate aux3 around focus spin axis
-                            aux3.rotate(aux2, angle);
+                            // aux3 <- orientation difference from last frame = aux * O * O'^-1
+                            aux3.mul(ori).mul(orip);
                             // aux3 <- camera pos after rotating
                             aux3.add(aux5);
                             // pos <- aux3
                             pos.set(aux3);
-                            direction.rotate(aux2, angle);
-                            up.rotate(aux2, angle);
-
-                            previousOrientationAngle = anglebak;
+                            direction.mul(ori).mul(orip);
+                            up.mul(ori).mul(orip);
+                            // Set orip to this frame's inv(ori)
+                            orip.set(ori).inv();
                         }
 
                     }

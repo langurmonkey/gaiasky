@@ -210,6 +210,10 @@ public class Matrix4d implements Serializable {
         return this.set(matrix.val);
     }
 
+    public Matrix4d set(Matrix4 matrix){
+        return this.set(matrix.val);
+    }
+
     /**
      * Sets the matrix to the given matrix as a double array. The double array
      * must have at least 16 elements; the first 16 will be copied.
