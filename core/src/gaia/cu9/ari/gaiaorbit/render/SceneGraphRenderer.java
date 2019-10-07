@@ -469,16 +469,16 @@ public class SceneGraphRenderer extends AbstractRenderer implements IProcessRend
 
         // MODEL BACKGROUND - (MW panorama, CMWB)
         AbstractRenderSystem modelBackgroundProc = new ModelBatchRenderSystem(RenderGroup.MODEL_VERT, alphas, mbVertexLighting, ModelRenderType.NORMAL);
-        //modelBackgroundProc.addPostRunnables(clearDepthR);
+        modelBackgroundProc.addPostRunnables(clearDepthR);
 
         // MODEL GRID - (Ecl, Eq, Gal grids)
         AbstractRenderSystem modelGridsProc = new ModelBatchRenderSystem(RenderGroup.MODEL_VERT_GRID, alphas, mbVertexLightingGrid, ModelRenderType.NORMAL);
-        //modelGridsProc.addPostRunnables(clearDepthR);
+        modelGridsProc.addPostRunnables(clearDepthR);
 
         // ANNOTATIONS - (grids)
         AbstractRenderSystem annotationsProc = new FontRenderSystem(RenderGroup.FONT_ANNOTATION, alphas, spriteBatch, null, null, font2d, null);
         annotationsProc.addPreRunnables(regularBlendR, noDepthTestR);
-        //annotationsProc.addPostRunnables(clearDepthR);
+        annotationsProc.addPostRunnables(clearDepthR);
 
         // BILLBOARD STARS
         billboardStarsProc = new BillboardStarRenderSystem(RenderGroup.BILLBOARD_STAR, alphas, starBillboardShaders, GlobalResources.unpackTexName("data/tex/base/star-tex-02*.png"), ComponentType.Stars.ordinal());
