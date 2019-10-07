@@ -8,7 +8,7 @@ in vec4 a_position;
 in vec2 a_texCoord0;
 
 // Uniforms
-uniform mat4 u_projView;
+uniform mat4 u_projTrans;
 uniform vec4 u_color;
 uniform vec4 u_quaternion;
 uniform vec3 u_pos;
@@ -44,7 +44,7 @@ void main() {
     v_color = vec4(u_color.rgb, u_color.a * alpha);
     v_texCoords = a_texCoord0;
 
-    mat4 transform = u_projView;
+    mat4 transform = u_projTrans;
 
     vec3 pos = u_pos;
     float dist = length(pos);

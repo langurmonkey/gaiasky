@@ -4,7 +4,7 @@ in vec4 a_position;
 in vec4 a_color;
 in vec2 a_texCoord0;
 
-uniform mat4 u_projView;
+uniform mat4 u_projTrans;
 uniform float u_viewAngle;
 uniform float u_viewAnglePow;
 uniform float u_thOverFactor;
@@ -24,5 +24,5 @@ void main()
    v_color = u_color;
    v_texCoords = a_texCoord0;
    
-   gl_Position =  u_projView * a_position;
+   gl_Position =  u_projTrans * a_position;
 }
