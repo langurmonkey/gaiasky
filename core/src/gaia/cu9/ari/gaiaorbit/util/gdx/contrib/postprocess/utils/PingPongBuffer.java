@@ -49,7 +49,7 @@ import org.lwjgl.opengl.GL30;
  */
 public final class PingPongBuffer {
     private GaiaSkyFrameBuffer buffer1, buffer2;
-    public Texture texture1, texture2, textureDepth;
+    public Texture texture1, texture2, textureDepth, textureVel;
     public int width, height;
     public final boolean ownResources;
 
@@ -194,6 +194,7 @@ public final class PingPongBuffer {
         texture1 = buffer1.getColorBufferTexture();
         texture2 = buffer2.getColorBufferTexture();
         textureDepth = buffer1.getDepthBufferTexture();
+        textureVel = buffer1.getVelocityBufferTexture();
     }
 
     /**

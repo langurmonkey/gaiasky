@@ -43,9 +43,7 @@ import com.badlogic.gdx.utils.GdxRuntimeException;
 import gaia.cu9.ari.gaiaorbit.GaiaSky;
 import gaia.cu9.ari.gaiaorbit.assets.ShaderTemplatingLoader;
 import gaia.cu9.ari.gaiaorbit.util.Constants;
-import gaia.cu9.ari.gaiaorbit.util.GlobalConf;
 import gaia.cu9.ari.gaiaorbit.util.gdx.IntRenderable;
-import gaia.cu9.ari.gaiaorbit.util.math.Vector3d;
 
 public class DefaultIntShader extends BaseIntShader {
     public static class Config {
@@ -209,18 +207,15 @@ public class DefaultIntShader extends BaseIntShader {
         public final static Setter prevProjView = new LocalSetter() {
             @Override
             public void set(BaseIntShader shader, int inputID, IntRenderable renderable, Attributes combinedAttributes) {
-                if (GlobalConf.postprocess.POSTPROCESS_MOTION_BLUR > 0f)
-                    shader.set(inputID, GaiaSky.instance.cam.getPreviousProjView());
+                if (combinedAttributes.has(Matrix4Attribute.PrevProjView))
+                    shader.set(inputID, ((Matrix4Attribute) (combinedAttributes.get(Matrix4Attribute.PrevProjView))).value);
             }
         };
         public final static Setter dCamPos = new LocalSetter() {
             @Override
             public void set(BaseIntShader shader, int inputID, IntRenderable renderable, Attributes combinedAttributes) {
-                if(GlobalConf.postprocess.POSTPROCESS_MOTION_BLUR > 0f) {
-                    Vector3d pos = GaiaSky.instance.cam.getPos();
-                    Vector3d ppos = GaiaSky.instance.cam.getPreviousPos();
-                    shader.set(inputID, (float) (ppos.x - pos.x), (float) (ppos.y - pos.y), (float) (ppos.z - pos.z));
-                }
+                if (combinedAttributes.has(Vector3Attribute.DCamPos))
+                    shader.set(inputID, ((Vector3Attribute) (combinedAttributes.get(Vector3Attribute.DCamPos))).value);
             }
         };
         public final static Setter vrScale = new LocalSetter() {
@@ -746,6 +741,9 @@ public class DefaultIntShader extends BaseIntShader {
         if ((attributesMask & FloatExtAttribute.HeightNoiseSize) == FloatExtAttribute.HeightNoiseSize) {
             prefix += "#define heightFlag\n";
         }
+        if ((attributesMask & Matrix4Attribute.PrevProjView) == Matrix4Attribute.PrevProjView) {
+            prefix += "#define velocityBufferFlag\n";
+        }
         if ((attributesMask & TextureAttribute.Ambient) == TextureAttribute.Ambient) {
             prefix += "#define " + TextureAttribute.AmbientAlias + "Flag\n";
         }
@@ -763,8 +761,6 @@ public class DefaultIntShader extends BaseIntShader {
             prefix += "#define " + FloatAttribute.AlphaTestAlias + "Flag\n";
         if (renderable.bones != null && config.numBones > 0)
             prefix += "#define numBones " + config.numBones + "\n";
-        if (GlobalConf.postprocess.POSTPROCESS_MOTION_BLUR > 0)
-            prefix += "#define velocityBufferFlag\n";
         return prefix;
     }
 
@@ -780,7 +776,7 @@ public class DefaultIntShader extends BaseIntShader {
             return -1;
         if (other == this)
             return 0;
-        return 0; // FIXME compare shaders on their impact on performance
+        return 0;
     }
 
     @Override
@@ -872,8 +868,6 @@ public class DefaultIntShader extends BaseIntShader {
         final Array<DirectionalLight> dirs = dla == null ? null : dla.lights;
         final PointLightsAttribute pla = attributes.get(PointLightsAttribute.class, PointLightsAttribute.Type);
         final Array<PointLight> points = pla == null ? null : pla.lights;
-        final SpotLightsAttribute sla = attributes.get(SpotLightsAttribute.class, SpotLightsAttribute.Type);
-        final Array<SpotLight> spots = sla == null ? null : sla.lights;
 
         if (dirLightsLoc >= 0) {
             for (int i = 0; i < directionalLights.length; i++) {
@@ -911,30 +905,6 @@ public class DefaultIntShader extends BaseIntShader {
                 if (pointLightsIntensityOffset >= 0)
                     program.setUniformf(idx + pointLightsIntensityOffset, pointLights[i].intensity);
                 if (pointLightsSize <= 0)
-                    break;
-            }
-        }
-
-        if (spotLightsLoc >= 0) {
-            for (int i = 0; i < spotLights.length; i++) {
-                if (spots == null || i >= spots.size) {
-                    if (lightsSet && spotLights[i].intensity == 0f)
-                        continue;
-                    spotLights[i].intensity = 0f;
-                } else if (lightsSet && spotLights[i].equals(spots.get(i)))
-                    continue;
-                else
-                    spotLights[i].set(spots.get(i));
-
-                int idx = spotLightsLoc + i * spotLightsSize;
-                program.setUniformf(idx + spotLightsColorOffset, spotLights[i].color.r * spotLights[i].intensity, spotLights[i].color.g * spotLights[i].intensity, spotLights[i].color.b * spotLights[i].intensity);
-                program.setUniformf(idx + spotLightsPositionOffset, spotLights[i].position);
-                program.setUniformf(idx + spotLightsDirectionOffset, spotLights[i].direction);
-                program.setUniformf(idx + spotLightsCutoffAngleOffset, spotLights[i].cutoffAngle);
-                program.setUniformf(idx + spotLightsExponentOffset, spotLights[i].exponent);
-                if (spotLightsIntensityOffset >= 0)
-                    program.setUniformf(idx + spotLightsIntensityOffset, spotLights[i].intensity);
-                if (spotLightsSize <= 0)
                     break;
             }
         }

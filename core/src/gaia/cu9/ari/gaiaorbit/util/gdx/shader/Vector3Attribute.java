@@ -48,6 +48,9 @@ public class Vector3Attribute extends Attribute {
     public static final String FogColorAlias = "fogCol";
     public static final long FogColor = register(FogColorAlias);
 
+    public static final String DCamPosAlias = "dCamPos";
+    public static final long DCamPos = register(DCamPosAlias);
+
     @Override
     public Attribute copy() {
         return new Vector3Attribute(type, value);

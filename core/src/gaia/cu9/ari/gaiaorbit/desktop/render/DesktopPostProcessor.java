@@ -58,6 +58,7 @@ public class DesktopPostProcessor implements IPostProcessor, IObserver {
     float ar;
 
     BackgroundModel blurObject;
+    boolean blurObjectAdded = false;
 
     Vector3d auxd, prevCampos;
     Vector3 auxf;
@@ -303,14 +304,15 @@ public class DesktopPostProcessor implements IPostProcessor, IObserver {
     private void initCameraBlur(PostProcessBean ppb, int width, int height, GraphicsQuality gq) {
         ppb.camblur = new CameraMotion(width, height);
         ppb.camblur.setBlurScale(1f);
-        ppb.camblur.setEnabled(GlobalConf.postprocess.POSTPROCESS_MOTION_BLUR > 0);
+        ppb.camblur.setEnabled(GlobalConf.postprocess.POSTPROCESS_MOTION_BLUR);
         updateCameraBlur(ppb, gq);
         ppb.pp.addEffect(ppb.camblur);
 
         // Add to scene graph
-        if (blurObject != null) {
+        if (blurObject != null && !blurObjectAdded) {
             blurObject.doneLoading(manager);
             Gdx.app.postRunnable(() -> EventManager.instance.post(Events.SCENE_GRAPH_ADD_OBJECT_CMD, blurObject, false));
+            blurObjectAdded = true;
         }
     }
 
@@ -532,18 +534,18 @@ public class DesktopPostProcessor implements IPostProcessor, IObserver {
             break;
         case MOTION_BLUR_CMD:
             Gdx.app.postRunnable(() -> {
-                float opacity = (float) data[0];
+                boolean enabled = (boolean) data[0];
                 for (int i = 0; i < RenderType.values().length; i++) {
                     if (pps[i] != null) {
                         PostProcessBean ppb = pps[i];
-                        ppb.camblur.setEnabled(opacity > 0);
+                        ppb.camblur.setEnabled(enabled);
                     }
                 }
             });
             break;
         case CUBEMAP360_CMD:
             boolean c360 = (Boolean) data[0];
-            boolean enabled = !c360 && GlobalConf.postprocess.POSTPROCESS_MOTION_BLUR > 0;
+            boolean enabled = !c360 && GlobalConf.postprocess.POSTPROCESS_MOTION_BLUR;
             for (int i = 0; i < RenderType.values().length; i++) {
                 if (pps[i] != null) {
                     PostProcessBean ppb = pps[i];

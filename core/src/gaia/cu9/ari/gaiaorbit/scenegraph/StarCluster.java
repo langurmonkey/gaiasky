@@ -220,10 +220,8 @@ public class StarCluster extends AbstractPositionEntity implements IFocus, IProp
      */
     @Override
     public void render(IntModelBatch modelBatch, float alpha, double t, RenderingContext rc) {
-        mc.touch();
-        mc.setTransparency(alpha * opacity, GL20.GL_ONE, GL20.GL_ONE);
+        mc.update(null, alpha * opacity, GL20.GL_ONE, GL20.GL_ONE);
         mc.instance.transform.set(this.localTransform);
-        mc.updateRelativisticEffects(GaiaSky.instance.getICamera());
         modelBatch.render(mc.instance, mc.env);
 
     }

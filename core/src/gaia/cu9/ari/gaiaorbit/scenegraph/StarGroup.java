@@ -643,6 +643,7 @@ public class StarGroup extends ParticleGroup implements ILineRenderable, IStarFo
             // Local transform
             mc.instance.transform.idt().translate((float) closestPos.x, (float) closestPos.y, (float) closestPos.z).scl((float) (getRadius(active[0]) * 2d));
             mc.updateRelativisticEffects(GaiaSky.instance.getICamera());
+            mc.updateVelocityBufferUniforms(GaiaSky.instance.getICamera());
             modelBatch.render(mc.instance, mc.env);
         }
     }

@@ -50,8 +50,8 @@ public final class CameraMotion extends PostProcessorEffect {
         camblur.dispose();
     }
 
-    public void setDepthTexture(Texture normalDepthMap) {
-        camblur.setVelocityTexture(normalDepthMap);
+    public void setVelocityTexture(Texture velocityTexture) {
+        camblur.setVelocityTexture(velocityTexture);
     }
 
     public void setBlurMaxSamples(int samples) {

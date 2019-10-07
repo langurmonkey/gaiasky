@@ -186,14 +186,20 @@ public abstract class AbstractRenderSystem implements IRenderSystem {
 
     protected ExtShaderProgram getShaderProgram() {
         try {
-            if (GlobalConf.postprocess.POSTPROCESS_MOTION_BLUR > 0)
+            if (GlobalConf.postprocess.POSTPROCESS_MOTION_BLUR && !GlobalConf.runtime.RELATIVISTIC_ABERRATION && !GlobalConf.runtime.GRAVITATIONAL_WAVES)
                 return programs[1];
-            else if (GlobalConf.runtime.RELATIVISTIC_ABERRATION && GlobalConf.runtime.GRAVITATIONAL_WAVES)
-                return programs[4];
-            else if (GlobalConf.runtime.RELATIVISTIC_ABERRATION)
+            else if (!GlobalConf.postprocess.POSTPROCESS_MOTION_BLUR && GlobalConf.runtime.RELATIVISTIC_ABERRATION && !GlobalConf.runtime.GRAVITATIONAL_WAVES)
                 return programs[2];
-            else if (GlobalConf.runtime.GRAVITATIONAL_WAVES)
+            else if (!GlobalConf.postprocess.POSTPROCESS_MOTION_BLUR && !GlobalConf.runtime.RELATIVISTIC_ABERRATION && GlobalConf.runtime.GRAVITATIONAL_WAVES)
                 return programs[3];
+            else if (GlobalConf.postprocess.POSTPROCESS_MOTION_BLUR && GlobalConf.runtime.RELATIVISTIC_ABERRATION && !GlobalConf.runtime.GRAVITATIONAL_WAVES)
+                return programs[4];
+            else if (GlobalConf.postprocess.POSTPROCESS_MOTION_BLUR && !GlobalConf.runtime.RELATIVISTIC_ABERRATION && GlobalConf.runtime.GRAVITATIONAL_WAVES)
+                return programs[5];
+            else if (!GlobalConf.postprocess.POSTPROCESS_MOTION_BLUR && GlobalConf.runtime.RELATIVISTIC_ABERRATION && GlobalConf.runtime.GRAVITATIONAL_WAVES)
+                return programs[6];
+            else if (GlobalConf.postprocess.POSTPROCESS_MOTION_BLUR && GlobalConf.runtime.RELATIVISTIC_ABERRATION && GlobalConf.runtime.GRAVITATIONAL_WAVES)
+                return programs[7];
         } catch (Exception e) {
         }
         return programs[0];

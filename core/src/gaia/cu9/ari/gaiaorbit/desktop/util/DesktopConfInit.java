@@ -129,7 +129,7 @@ public class DesktopConfInit extends ConfInit {
         PostprocessConf ppc = new PostprocessConf();
         Antialias POSTPROCESS_ANTIALIAS = ppc.getAntialias(Integer.parseInt(p.getProperty("postprocess.antialiasing")));
         float POSTPROCESS_BLOOM_INTENSITY = Float.parseFloat(p.getProperty("postprocess.bloom.intensity"));
-        float POSTPROCESS_MOTION_BLUR = Float.parseFloat(p.getProperty("postprocess.motionblur"));
+        boolean POSTPROCESS_MOTION_BLUR = parseMotionBlur(p);
         boolean POSTPROCESS_LENS_FLARE = Boolean.parseBoolean(p.getProperty("postprocess.lensflare"));
         boolean POSTPROCESS_LIGHT_SCATTERING = Boolean.parseBoolean(p.getProperty("postprocess.lightscattering", "false"));
         boolean POSTPROCESS_FISHEYE = Boolean.parseBoolean(p.getProperty("postprocess.fisheye", "false"));
@@ -376,6 +376,16 @@ public class DesktopConfInit extends ConfInit {
 
     }
 
+    private boolean parseMotionBlur(Properties p){
+        String prop = p.getProperty("postprocess.motionblur");
+        try{
+            float f = Float.parseFloat(prop);
+            return f > 0;
+        }catch(Exception e){
+            return Boolean.parseBoolean(prop);
+        }
+    }
+
     private int getValidWidth(){
         int w = Gdx.graphics.getWidth();
         if(w <= 0)
@@ -407,7 +417,7 @@ public class DesktopConfInit extends ConfInit {
         /** POSTPROCESS **/
         p.setProperty("postprocess.antialiasing", Integer.toString(GlobalConf.postprocess.POSTPROCESS_ANTIALIAS.getAACode()));
         p.setProperty("postprocess.bloom.intensity", Float.toString(GlobalConf.postprocess.POSTPROCESS_BLOOM_INTENSITY));
-        p.setProperty("postprocess.motionblur", Float.toString(GlobalConf.postprocess.POSTPROCESS_MOTION_BLUR));
+        p.setProperty("postprocess.motionblur", Boolean.toString(GlobalConf.postprocess.POSTPROCESS_MOTION_BLUR));
         p.setProperty("postprocess.lensflare", Boolean.toString(GlobalConf.postprocess.POSTPROCESS_LENS_FLARE));
         p.setProperty("postprocess.lightscattering", Boolean.toString(GlobalConf.postprocess.POSTPROCESS_LIGHT_SCATTERING));
         p.setProperty("postprocess.brightness", Float.toString(GlobalConf.postprocess.POSTPROCESS_BRIGHTNESS));

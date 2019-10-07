@@ -1880,7 +1880,7 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
 
     @Override
     public void setMotionBlur(boolean state) {
-        Gdx.app.postRunnable(() -> em.post(Events.MOTION_BLUR_CMD, state ? Constants.MOTION_BLUR_VALUE : 0f, false));
+        Gdx.app.postRunnable(() -> em.post(Events.MOTION_BLUR_CMD, state, false));
     }
 
     @Override

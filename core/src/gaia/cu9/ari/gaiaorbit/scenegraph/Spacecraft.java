@@ -582,6 +582,7 @@ public class Spacecraft extends GenericSpacecraft implements ILineRenderable, IO
             mc.updateRelativisticEffects(cam, 0);
         else
             mc.updateRelativisticEffects(cam);
+        mc.updateVelocityBufferUniforms(cam);
         modelBatch.render(mc.instance, mc.env);
     }
 

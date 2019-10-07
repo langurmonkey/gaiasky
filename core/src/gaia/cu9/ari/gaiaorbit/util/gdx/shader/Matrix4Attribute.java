@@ -25,6 +25,9 @@ public class Matrix4Attribute extends Attribute {
     public static final String ShadowMapProjViewTransAlias = "shadowMapProjViewTrans";
     public static final long ShadowMapProjViewTrans = register(ShadowMapProjViewTransAlias);
 
+    public static final String PrevProjViewAlias = "prevProjView";
+    public static final long PrevProjView = register(PrevProjViewAlias);
+
     public void set(Matrix4 value) {
         this.value.set(value);
     }

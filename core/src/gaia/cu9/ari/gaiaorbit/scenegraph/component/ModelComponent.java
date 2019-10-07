@@ -16,6 +16,7 @@ import com.badlogic.gdx.graphics.g3d.attributes.*;
 import com.badlogic.gdx.graphics.g3d.environment.DirectionalLight;
 import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.utils.Disposable;
+import gaia.cu9.ari.gaiaorbit.GaiaSky;
 import gaia.cu9.ari.gaiaorbit.data.AssetBean;
 import gaia.cu9.ari.gaiaorbit.event.EventManager;
 import gaia.cu9.ari.gaiaorbit.event.Events;
@@ -89,6 +90,8 @@ public class ModelComponent implements Disposable, IObserver {
     public MaterialComponent mtc;
     // Relativistic effects
     public RelativisticEffectsComponent rec;
+    // Velocity buffer
+    public VelocityBufferComponent vbc;
 
     public ModelComponent() {
         this(true);
@@ -127,6 +130,7 @@ public class ModelComponent implements Disposable, IObserver {
         }
 
         rec = new RelativisticEffectsComponent();
+        vbc = new VelocityBufferComponent();
 
         SkyboxComponent.initSkybox();
     }
@@ -226,6 +230,23 @@ public class ModelComponent implements Disposable, IObserver {
         return new Pair<>(model, materials);
     }
 
+    public void update(Matrix4 localTransform, float alpha, int blendSrc, int blendDst){
+        touch(localTransform);
+        if(instance != null) {
+            setTransparency(alpha, blendSrc, blendDst);
+            updateRelativisticEffects(GaiaSky.instance.getICamera());
+            updateVelocityBufferUniforms(GaiaSky.instance.getICamera());
+        }
+    }
+
+    public void update(Matrix4 localTransform, float alpha){
+        update(localTransform, alpha, GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA);
+    }
+
+    public void update(float alpha){
+        update(null, alpha);
+    }
+
     public void touch() {
         touch(null);
     }
@@ -282,13 +303,14 @@ public class ModelComponent implements Disposable, IObserver {
         }
     }
 
+
     private void updateStaticLight() {
         Gdx.app.postRunnable(() -> {
             updateStaticLightImmediate();
         });
     }
 
-    private void updateStaticLightImmediate(){
+    private void updateStaticLightImmediate() {
         // Update static
         if (updateStaticLight) {
             ColorAttribute ambient = (ColorAttribute) env.get(ColorAttribute.AmbientLight);
@@ -326,7 +348,6 @@ public class ModelComponent implements Disposable, IObserver {
     }
 
     public void setTransparency(float alpha, int src, int dst) {
-        if (instance != null) {
             int n = instance.materials.size;
             for (int i = 0; i < n; i++) {
                 Material mat = instance.materials.get(i);
@@ -341,7 +362,6 @@ public class ModelComponent implements Disposable, IObserver {
                 }
                 ba.opacity = alpha;
             }
-        }
     }
 
     public void setDepthTest(int func, boolean mask) {
@@ -447,6 +467,22 @@ public class ModelComponent implements Disposable, IObserver {
         } catch (Exception e) {
         }
     }
+
+    public void updateVelocityBufferUniforms(ICamera camera) {
+        for (Material mat : instance.materials) {
+            updateVelocityBufferUniforms(mat, camera);
+        }
+    }
+
+    public void updateVelocityBufferUniforms(Material mat, ICamera camera) {
+        if (GlobalConf.postprocess.POSTPROCESS_MOTION_BLUR) {
+            vbc.updateVelocityBufferMaterial(mat, camera);
+        } else if (vbc.hasVelocityBuffer(mat)) {
+            vbc.removeVelocityBufferMaterial(mat);
+        }
+    }
+
+
 
     public void updateRelativisticEffects(ICamera camera) {
         updateRelativisticEffects(camera, -1);

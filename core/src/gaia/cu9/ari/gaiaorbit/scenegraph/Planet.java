@@ -163,9 +163,7 @@ public class Planet extends ModelBody implements IAtmosphereRenderable, ICloudRe
 
         ICamera cam = GaiaSky.instance.getICamera();
         prepareShadowEnvironment();
-        mc.touch();
-        mc.setTransparency(alpha * opacity);
-        mc.updateRelativisticEffects(cam);
+        mc.update(alpha * opacity);
         modelBatch.render(mc.instance, mc.env);
     }
 
@@ -198,6 +196,7 @@ public class Planet extends ModelBody implements IAtmosphereRenderable, ICloudRe
         clc.touch();
         ICamera cam = GaiaSky.instance.getICamera();
         clc.mc.updateRelativisticEffects(cam);
+        clc.mc.updateVelocityBufferUniforms(cam);
         clc.mc.setTransparency(alpha * opacity);
         modelBatch.render(clc.mc.instance, mc.env);
     }

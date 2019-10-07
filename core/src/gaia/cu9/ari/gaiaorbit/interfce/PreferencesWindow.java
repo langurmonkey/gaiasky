@@ -86,8 +86,8 @@ public class PreferencesWindow extends GenericDialog {
 
     // Backup values
     private ToneMapping toneMappingBak;
-    private float brightnessBak, contrastBak, hueBak, saturationBak, gammaBak, exposureBak, motionblurBak, bloomBak;
-    private boolean lensflareBak, lightglowBak, debugInfoBak;
+    private float brightnessBak, contrastBak, hueBak, saturationBak, gammaBak, exposureBak, bloomBak;
+    private boolean lensflareBak, lightglowBak, debugInfoBak, motionblurBak;
 
     public PreferencesWindow(Stage stage, Skin skin) {
         super(I18n.txt("gui.settings") + " - " + GlobalConf.version.version + " - " + I18n.txt("gui.build", GlobalConf.version.build), skin, stage);
@@ -403,10 +403,10 @@ public class PreferencesWindow extends GenericDialog {
         motionblurBak = GlobalConf.postprocess.POSTPROCESS_MOTION_BLUR;
         CheckBox motionBlur = new CheckBox(" " + I18n.txt("gui.motionblur"), skin);
         motionBlur.setName("motion blur");
-        motionBlur.setChecked(GlobalConf.postprocess.POSTPROCESS_MOTION_BLUR != 0);
+        motionBlur.setChecked(GlobalConf.postprocess.POSTPROCESS_MOTION_BLUR);
         motionBlur.addListener(event -> {
             if (event instanceof ChangeEvent) {
-                EventManager.instance.post(Events.MOTION_BLUR_CMD, motionBlur.isChecked() ? Constants.MOTION_BLUR_VALUE : 0.0f, true);
+                EventManager.instance.post(Events.MOTION_BLUR_CMD, motionBlur.isChecked(), true);
                 return true;
             }
             return false;

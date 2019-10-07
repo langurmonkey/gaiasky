@@ -291,17 +291,15 @@ public class Star extends Particle {
 
     @Override
     public void render(IntModelBatch modelBatch, float alpha, double t, RenderingContext rc) {
-        mc.touch();
         float opac = 1;
         if (!GlobalConf.program.CUBEMAP360_MODE)
             opac = (float) MathUtilsd.lint(distToCamera, modelDistance / 50f, modelDistance, 1f, 0f);
-        mc.setTransparency(alpha * opac);
         float[] col = GlobalConf.scene.STAR_COLOR_TRANSIT ? ccTransit : cc;
         ((ColorAttribute) mc.env.get(ColorAttribute.AmbientLight)).color.set(col[0], col[1], col[2], 1f);
         ((FloatAttribute) mc.env.get(FloatAttribute.Shininess)).value = (float) t;
+        mc.update(alpha * opac);
         // Local transform
         translation.getMatrix(mc.instance.transform).scl((float) (getRadius() * 2d));
-        mc.updateRelativisticEffects(GaiaSky.instance.getICamera());
         modelBatch.render(mc.instance, mc.env);
     }
 
