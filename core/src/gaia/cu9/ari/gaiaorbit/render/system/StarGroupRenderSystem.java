@@ -109,9 +109,10 @@ public class StarGroupRenderSystem extends ImmediateRenderSystem implements IObs
                                 // COLOR
                                 tempVerts[curr.vertexIdx + curr.colorOffset] = starGroup.getColor(i);
 
-                                // SIZE and APPMAG
+                                // SIZE, APPMAG, CMAP VALUE, OTHER
                                 tempVerts[curr.vertexIdx + sizeOffset] = (float) (p.size() * Constants.STAR_SIZE_FACTOR) * starGroup.highlightedSizeFactor();
                                 tempVerts[curr.vertexIdx + sizeOffset + 1] = (float) p.appmag();
+                                tempVerts[curr.vertexIdx + sizeOffset + 2] = (float) p.appmag();
 
                                 // POSITION [u]
                                 tempVerts[curr.vertexIdx] = (float) p.x();
@@ -145,6 +146,9 @@ public class StarGroupRenderSystem extends ImmediateRenderSystem implements IObs
                             shaderProgram.setUniformf("u_camDir", camera.getCurrent().getCamera().direction);
                             shaderProgram.setUniformi("u_cubemap", GlobalConf.program.CUBEMAP360_MODE ? 1 : 0);
                             shaderProgram.setUniformf("u_magLimit", GlobalConf.runtime.LIMIT_MAG_RUNTIME);
+
+                            shaderProgram.setUniformi("u_cmap", -1);
+                            shaderProgram.setUniformf("u_cmapMinMax", 13f, 7f);
 
                             // Rel, grav, z-buffer, etc.
                             addEffectsUniforms(shaderProgram, camera);
@@ -186,7 +190,7 @@ public class StarGroupRenderSystem extends ImmediateRenderSystem implements IObs
         attributes.add(new VertexAttribute(Usage.Position, 3, ExtShaderProgram.POSITION_ATTRIBUTE));
         attributes.add(new VertexAttribute(Usage.Tangent, 3, "a_pm"));
         attributes.add(new VertexAttribute(Usage.ColorPacked, 4, ExtShaderProgram.COLOR_ATTRIBUTE));
-        attributes.add(new VertexAttribute(Usage.Generic, 2, "a_sizeMag"));
+        attributes.add(new VertexAttribute(Usage.Generic, 4, "a_additional"));
 
         VertexAttribute[] array = new VertexAttribute[attributes.size];
         for (int i = 0; i < attributes.size; i++)
