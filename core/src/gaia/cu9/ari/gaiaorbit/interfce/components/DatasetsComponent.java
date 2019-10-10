@@ -61,7 +61,7 @@ public class DatasetsComponent extends GuiComponent implements IObserver {
         // Controls
         HorizontalGroup controls = new HorizontalGroup();
         controls.space(pad);
-        OwnImageButton eye = new OwnImageButton(skin, "eye-toggle-s");
+        OwnImageButton eye = new OwnImageButton(skin, "eye-toggle");
         eye.setCheckedNoFire(!ci.isVisible());
         eye.addListener(new OwnTextTooltip(I18n.txt("gui.tooltip.dataset.toggle"), skin));
         eye.addListener((event) -> {
@@ -87,7 +87,7 @@ public class DatasetsComponent extends GuiComponent implements IObserver {
             return false;
         });
 
-        OwnImageButton prefs = new OwnImageButton(skin, "prefs-s");
+        OwnImageButton prefs = new OwnImageButton(skin, "prefs");
         prefs.addListener(new OwnTextTooltip(I18n.txt("gui.tooltip.dataset.preferences"), skin));
         prefs.addListener((event) -> {
             if(event instanceof ChangeEvent){
@@ -96,7 +96,7 @@ public class DatasetsComponent extends GuiComponent implements IObserver {
             return false;
         });
 
-        ImageButton rubbish = new OwnImageButton(skin, "rubbish-bin-s");
+        ImageButton rubbish = new OwnImageButton(skin, "rubbish-bin");
         rubbish.addListener(new OwnTextTooltip(I18n.txt("gui.tooltip.dataset.remove"), skin));
         rubbish.addListener((event) -> {
             if (event instanceof ChangeEvent) {
@@ -110,7 +110,6 @@ public class DatasetsComponent extends GuiComponent implements IObserver {
 
         imageMap.put(ci.name, new OwnImageButton[]{eye, mark});
         controls.addActor(eye);
-        controls.addActor(mark);
         controls.addActor(prefs);
         controls.addActor(rubbish);
 
@@ -123,8 +122,9 @@ public class DatasetsComponent extends GuiComponent implements IObserver {
             ci.setColor(cp.getPickedColor());
         });
         t.add(new OwnLabel(ci.name, skin, "hud-subheader")).left().padBottom(pad);
-        t.add(cp).size(18f * GlobalConf.UI_SCALE_FACTOR).left().padBottom(pad).row();
-        t.add(controls).colspan(2).left().padBottom(pad).row();
+        t.add(cp).size(18f * GlobalConf.UI_SCALE_FACTOR).right().padBottom(pad).row();
+        t.add(controls).left().padBottom(pad);
+        t.add(mark).right().padBottom(pad).row();
         t.add(new OwnLabel(I18n.txt("gui.dataset.type") + ": " + ci.type.toString(), skin)).colspan(2).left().row();
         t.add(new OwnLabel(TextUtils.capString(ci.description, GlobalConf.UI_SCALE_FACTOR < 1.5 ? 22 : 28), skin)).left();
         Link plus = new Link("(i)",  skin.get("link", Label.LabelStyle.class), null);
@@ -143,7 +143,7 @@ public class DatasetsComponent extends GuiComponent implements IObserver {
         scroll.setOverscroll(false, false);
         scroll.setSmoothScrolling(true);
         scroll.setWidth(175 * GlobalConf.UI_SCALE_FACTOR);
-        scroll.setHeight(GlobalConf.UI_SCALE_FACTOR > 1.5 ? 120 : 60);
+        scroll.setHeight(GlobalConf.UI_SCALE_FACTOR > 1.5 ? 125 : 75);
 
 
         //ciGroup.addActor(controls);

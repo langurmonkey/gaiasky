@@ -478,6 +478,9 @@
       "imageUp": "highlight-off",
       "imageChecked" : "highlight-on"
     },
+    "prefs": {
+      "imageUp": "prefs-icon"
+    },
     "rubbish-bin-s": {
       "imageUp": "bin-s-icon",
       "imageDisabled": "bin-s-icon-grey"
