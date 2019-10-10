@@ -30,7 +30,7 @@ public class KeyInputController extends InputAdapter {
 
     public KeyInputController() {
         super();
-        pressedKeys = new HashSet<Integer>();
+        pressedKeys = new HashSet<>();
         KeyBindings.initialize();
         mappings = KeyBindings.instance;
     }

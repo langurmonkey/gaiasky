@@ -8,7 +8,6 @@ package gaia.cu9.ari.gaiaorbit.util;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.files.FileHandle;
-import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Cursor;
 import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
@@ -69,36 +68,9 @@ public class GlobalResources {
 
     private static Vector3d aux = new Vector3d();
 
-    // Google colors
-    public static float[] gGreen = new float[] { 0f / 255f, 135f / 255f, 68f / 255f, 1f };
-    public static Color gGreenC = getCol(gGreen);
-    public static float[] gBlue = new float[] { 0f / 255f, 87f / 255f, 231f / 255f, 1f };
-    public static Color gBlueC = getCol(gBlue);
-    public static float[] gRed = new float[] { 214f / 255f, 45f / 255f, 32f / 255f, 1f };
-    public static Color gRedC = getCol(gRed);
-    public static float[] gYellow = new float[] { 255f / 255f, 167f / 255f, 0f / 255f, 1f };
-    public static Color gYellowC = getCol(gYellow);
-    public static float[] gWhite = new float[] { 255f / 255f, 255f / 255f, 255f / 255f, 1f };
-    public static Color gWhiteC = getCol(gWhite);
-    public static float[] gPink = new float[] { 255f / 255f, 102f / 255f, 255f / 255f, 1f };
-    public static Color gPinkC = getCol(gPink);
-    // Amazon orange
-    public static float[] aOrange = new float[] { 255f / 255f, 153f / 255f, 0f / 255f, 1f };
-    public static Color aOrangeC = getCol(aOrange);
-    // Taco Bell purple
-    public static float[] tPurple = new float[] { 12f / 255f, 32f / 255f, 130f / 255f, 1f };
-    public static Color tPurpleC = getCol(tPurple);
-    // DunkinDonuts
-    public static float[] ddMagenta = new float[] { 218f / 255f, 24f / 255f, 132f / 255f, 1f };
-    public static Color ddMagentaC = getCol(ddMagenta);
-    public static float[] ddBrown = new float[] { 101f / 255f, 56f / 255f, 25f / 255f, 1f };
-    public static Color ddBrownC = getCol(ddBrown);
 
 
 
-    private static Color getCol(float[] c) {
-        return new Color(c[0], c[1], c[2], c[3]);
-    }
 
     public static void initialize(AssetManager manager) {
         // Sprite shader

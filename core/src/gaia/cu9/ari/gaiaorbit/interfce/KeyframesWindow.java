@@ -26,9 +26,9 @@ import gaia.cu9.ari.gaiaorbit.event.IObserver;
 import gaia.cu9.ari.gaiaorbit.scenegraph.KeyframesPathObject;
 import gaia.cu9.ari.gaiaorbit.scenegraph.camera.CameraManager;
 import gaia.cu9.ari.gaiaorbit.util.GlobalConf;
-import gaia.cu9.ari.gaiaorbit.util.GlobalResources;
 import gaia.cu9.ari.gaiaorbit.util.I18n;
 import gaia.cu9.ari.gaiaorbit.util.Logger;
+import gaia.cu9.ari.gaiaorbit.util.color.ColourUtils;
 import gaia.cu9.ari.gaiaorbit.util.format.DateFormatFactory;
 import gaia.cu9.ari.gaiaorbit.util.format.IDateFormat;
 import gaia.cu9.ari.gaiaorbit.util.format.INumberFormat;
@@ -815,9 +815,9 @@ public class KeyframesWindow extends GenericDialog implements IObserver {
                     keyframesPathObject.refreshData();
                     if (keyframesPathObject.selected == kf) {
                         if (seam.isChecked())
-                            keyframesPathObject.selectedKnot.setColor(GlobalResources.gRed);
+                            keyframesPathObject.selectedKnot.setColor(ColourUtils.gRed);
                         else
-                            keyframesPathObject.selectedKnot.setColor(GlobalResources.gWhite);
+                            keyframesPathObject.selectedKnot.setColor(ColourUtils.gWhite);
 
                     }
                 });

@@ -307,7 +307,7 @@ public abstract class CelestialBody extends AbstractPositionEntity implements I3
             transits = Math.max(0, transits + (int) Math.signum(time.getDt()));
             lastTransitIncrease = time.getTime().toEpochMilli();
             // Update transit colour
-            ColourUtils.long_rainbow(ColourUtils.normalize(transits, 0, 30), this.ccTransit);
+            ColourUtils.colormap_long_rainbow(ColourUtils.normalize(transits, 0, 30), this.ccTransit);
         }
     }
 

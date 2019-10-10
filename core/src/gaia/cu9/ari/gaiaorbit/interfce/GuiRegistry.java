@@ -13,10 +13,12 @@ import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.utils.Array;
+import gaia.cu9.ari.gaiaorbit.GaiaSky;
 import gaia.cu9.ari.gaiaorbit.desktop.util.SysUtils;
 import gaia.cu9.ari.gaiaorbit.event.EventManager;
 import gaia.cu9.ari.gaiaorbit.event.Events;
 import gaia.cu9.ari.gaiaorbit.event.IObserver;
+import gaia.cu9.ari.gaiaorbit.scenegraph.camera.CameraManager;
 import gaia.cu9.ari.gaiaorbit.script.EventScriptingInterface;
 import gaia.cu9.ari.gaiaorbit.util.*;
 import gaia.cu9.ari.gaiaorbit.util.scene2d.FileChooser;
@@ -237,7 +239,7 @@ public class GuiRegistry implements IObserver {
         super();
         this.skin = skin;
         // Windows which are visible from any GUI
-        EventManager.instance.subscribe(this, Events.QUIT_ACTION, Events.SHOW_ABOUT_ACTION, Events.SHOW_LOAD_CATALOG_ACTION, Events.SHOW_PREFERENCES_ACTION, Events.SHOW_KEYFRAMES_WINDOW_ACTION, Events.UI_THEME_RELOAD_INFO, Events.TOGGLE_MINIMAP, Events.MODE_POPUP_CMD, Events.DISPLAY_GUI_CMD, Events.CAMERA_MODE_CMD);
+        EventManager.instance.subscribe(this, Events.QUIT_ACTION, Events.SHOW_ABOUT_ACTION, Events.SHOW_LOAD_CATALOG_ACTION, Events.SHOW_PREFERENCES_ACTION, Events.SHOW_KEYFRAMES_WINDOW_ACTION, Events.UI_THEME_RELOAD_INFO, Events.TOGGLE_MINIMAP, Events.MODE_POPUP_CMD, Events.DISPLAY_GUI_CMD, Events.CAMERA_MODE_CMD, Events.UI_RELOAD_CMD);
     }
 
     public void dispose() {
@@ -274,6 +276,13 @@ public class GuiRegistry implements IObserver {
                 (new PreferencesWindow(ui, skin)).show(ui);
                 break;
             case SHOW_LOAD_CATALOG_ACTION:
+                if (lastOpenLocation == null && GlobalConf.program.LAST_OPEN_LOCATION != null && !GlobalConf.program.LAST_OPEN_LOCATION.isEmpty()) {
+                    try {
+                        lastOpenLocation = new File(GlobalConf.program.LAST_OPEN_LOCATION);
+                    } catch (Exception e) {
+                        lastOpenLocation = null;
+                    }
+                }
                 if (lastOpenLocation == null) {
                     lastOpenLocation = SysUtils.getHomeDir();
                 } else if (!lastOpenLocation.exists() || !lastOpenLocation.isDirectory()) {
@@ -304,6 +313,7 @@ public class GuiRegistry implements IObserver {
                                 t.start();
 
                                 lastOpenLocation = result.file().getParentFile();
+                                GlobalConf.program.LAST_OPEN_LOCATION = lastOpenLocation.getAbsolutePath();
                                 return true;
                             } catch (Exception e) {
                                 logger.error(I18n.txt("notif.error", result.file().getName()), e);
@@ -314,6 +324,14 @@ public class GuiRegistry implements IObserver {
                             logger.error("Selection must be a file: " + result.file().getAbsolutePath());
                             return false;
                         }
+                    } else {
+                        // Still, update last location
+                        if(!result.isDirectory()){
+                            lastOpenLocation = result.file().getParentFile();
+                        }else{
+                            lastOpenLocation = result.file();
+                        }
+                        GlobalConf.program.LAST_OPEN_LOCATION = lastOpenLocation.getAbsolutePath();
                     }
                     return false;
                 });
@@ -402,6 +420,9 @@ public class GuiRegistry implements IObserver {
                     im.addProcessor(0, current.getGuiStage());
                 }
                 break;
+            case UI_RELOAD_CMD:
+                reloadUI();
+                break;
             default:
                 break;
             }
@@ -425,6 +446,27 @@ public class GuiRegistry implements IObserver {
     private void startModePopupInfoThread(Actor actor, float seconds) {
         removeActorThread = new RemoveActorThread(actor, seconds);
         removeActorThread.start();
+    }
+
+    private void reloadUI() {
+        // Reinitialise user interface
+        Gdx.app.postRunnable(() -> {
+            // Reinitialise GUI system
+            GlobalResources.updateSkin();
+            GenericDialog.updatePads();
+            GaiaSky.instance.reinitialiseGUI1();
+            EventManager.instance.post(Events.SPACECRAFT_LOADED, GaiaSky.instance.sg.getNode("Spacecraft"));
+            GaiaSky.instance.reinitialiseGUI2();
+            // Time init
+            EventManager.instance.post(Events.TIME_CHANGE_INFO, GaiaSky.instance.time.getTime());
+            if (GaiaSky.instance.cam.mode == CameraManager.CameraMode.FOCUS_MODE)
+                // Refocus
+                EventManager.instance.post(Events.FOCUS_CHANGE_CMD, GaiaSky.instance.cam.getFocus());
+            // Update names with new language
+            GaiaSky.instance.sg.getRoot().updateNamesRec();
+            // UI theme reload broadcast
+            EventManager.instance.post(Events.UI_THEME_RELOAD_INFO, GlobalResources.skin);
+        });
     }
 
 }

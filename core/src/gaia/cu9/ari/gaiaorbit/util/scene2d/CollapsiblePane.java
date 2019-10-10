@@ -124,8 +124,8 @@ public class CollapsiblePane extends Table {
         headerTable.add().expandX();
         headerTable.add(headerGroupRight).right();
 
-        add(headerTable).padBottom(this.space).prefWidth(195 * GlobalConf.UI_SCALE_FACTOR).row();
-        contentCell = add().prefHeight(0).prefWidth(195 * GlobalConf.UI_SCALE_FACTOR);
+        add(headerTable).padBottom(this.space).prefWidth(220 * GlobalConf.UI_SCALE_FACTOR).row();
+        contentCell = add().prefHeight(0).prefWidth(220 * GlobalConf.UI_SCALE_FACTOR);
 
         if (expanded)
             contentCell.setActor(content);

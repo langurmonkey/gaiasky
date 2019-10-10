@@ -26,7 +26,6 @@ import gaia.cu9.ari.gaiaorbit.event.EventManager;
 import gaia.cu9.ari.gaiaorbit.event.Events;
 import gaia.cu9.ari.gaiaorbit.interfce.KeyBindings.ProgramAction;
 import gaia.cu9.ari.gaiaorbit.interfce.beans.*;
-import gaia.cu9.ari.gaiaorbit.scenegraph.camera.CameraManager;
 import gaia.cu9.ari.gaiaorbit.screenshot.ImageRenderer;
 import gaia.cu9.ari.gaiaorbit.util.*;
 import gaia.cu9.ari.gaiaorbit.util.GlobalConf.PostprocessConf.Antialias;
@@ -1955,24 +1954,7 @@ public class PreferencesWindow extends GenericDialog {
     }
 
     private void reloadUI() {
-        // Reinitialise user interface
-        Gdx.app.postRunnable(() -> {
-            // Reinitialise GUI system
-            GlobalResources.updateSkin();
-            GenericDialog.updatePads();
-            GaiaSky.instance.reinitialiseGUI1();
-            EventManager.instance.post(Events.SPACECRAFT_LOADED, GaiaSky.instance.sg.getNode("Spacecraft"));
-            GaiaSky.instance.reinitialiseGUI2();
-            // Time init
-            EventManager.instance.post(Events.TIME_CHANGE_INFO, GaiaSky.instance.time.getTime());
-            if (GaiaSky.instance.cam.mode == CameraManager.CameraMode.FOCUS_MODE)
-                // Refocus
-                EventManager.instance.post(Events.FOCUS_CHANGE_CMD, GaiaSky.instance.cam.getFocus());
-            // Update names with new language
-            GaiaSky.instance.sg.getRoot().updateNamesRec();
-            // UI theme reload broadcast
-            EventManager.instance.post(Events.UI_THEME_RELOAD_INFO, GlobalResources.skin);
-        });
+        EventManager.instance.post(Events.UI_RELOAD_CMD);
     }
 
     private void selectFullscreen(boolean fullscreen, OwnTextField widthField, OwnTextField heightField, SelectBox<DisplayMode> fullScreenResolutions, OwnLabel widthLabel, OwnLabel heightLabel) {

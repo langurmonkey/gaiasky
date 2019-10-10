@@ -11,6 +11,10 @@ import com.badlogic.gdx.scenes.scene2d.ui.Slider;
 public class OwnSlider extends Slider {
     private float ownwidth = 0f, ownheight = 0f;
 
+    public OwnSlider(float min, float max, float stepSize, Skin skin){
+        super(min, max, stepSize, false, skin);
+    }
+
     public OwnSlider(float min, float max, float stepSize, boolean vertical, Skin skin) {
         super(min, max, stepSize, vertical, skin);
     }

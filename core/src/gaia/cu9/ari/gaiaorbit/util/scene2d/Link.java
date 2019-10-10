@@ -14,7 +14,6 @@ import com.badlogic.gdx.scenes.scene2d.InputEvent.Type;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import gaia.cu9.ari.gaiaorbit.util.GlobalResources;
-import gaia.cu9.ari.gaiaorbit.util.Logger;
 
 /**
  * Link widget.
@@ -61,7 +60,8 @@ public class Link extends Label {
                 Type type = ((InputEvent) event).getType();
                 // Click
                 if (type == Type.touchUp && ((InputEvent) event).getButton() == Buttons.LEFT) {
-                    Gdx.net.openURI(linkURL);
+                    if (linkURL != null && !linkURL.isEmpty())
+                        Gdx.net.openURI(linkURL);
                 } else if (type == Type.enter) {
                     Gdx.graphics.setCursor(GlobalResources.linkCursor);
                 } else if (type == Type.exit) {

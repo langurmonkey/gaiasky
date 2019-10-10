@@ -73,6 +73,7 @@ public class ControlsWindow extends CollapsibleWindow implements IObserver {
     public void initialize() {
         /** Global layout **/
         guiLayout = new Table();
+        guiLayout.pad(0);
         guiLayout.align(Align.left);
 
         List<Actor> mainActors = new ArrayList<>();
@@ -278,7 +279,7 @@ public class ControlsWindow extends CollapsibleWindow implements IObserver {
         int size = mainActors.size();
         for (int i = 0; i < size; i++) {
             Actor actor = mainActors.get(i);
-            guiLayout.add(actor).prefWidth(175 * GlobalConf.UI_SCALE_FACTOR).left().padBottom(padBottom).padLeft(padSides);
+            guiLayout.add(actor).prefWidth(185 * GlobalConf.UI_SCALE_FACTOR).left().padBottom(padBottom).padLeft(padSides);
             if (i < size - 1) {
                 // Not last
                 guiLayout.row();
@@ -287,7 +288,6 @@ public class ControlsWindow extends CollapsibleWindow implements IObserver {
             }
         }
         guiLayout.align(Align.top | Align.left);
-        guiLayout.setWidth(200 * GlobalConf.UI_SCALE_FACTOR);
 
         windowScroll = new OwnScrollPane(guiLayout, skin, "minimalist-nobg");
         windowScroll.setFadeScrollBars(false);
@@ -295,7 +295,7 @@ public class ControlsWindow extends CollapsibleWindow implements IObserver {
         windowScroll.setOverscroll(false, false);
         windowScroll.setSmoothScrolling(true);
         windowScroll.pack();
-        windowScroll.setWidth(guiLayout.getWidth() + windowScroll.getStyle().vScroll.getMinWidth());
+        //windowScroll.setWidth(guiLayout.getWidth() + windowScroll.getStyle().vScroll.getMinWidth());
 
         mainVertical = new VerticalGroup();
         mainVertical.space(padSides);

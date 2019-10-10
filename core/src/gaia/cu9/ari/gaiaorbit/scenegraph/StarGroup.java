@@ -700,7 +700,7 @@ public class StarGroup extends ParticleGroup implements ILineRenderable, IStarFo
                         // Units/year to Km/s
                         ppm.scl(Constants.U_TO_KM / Nature.Y_TO_S);
                         double len = MathUtilsd.clamp(ppm.len(), 0d, maxSpeedKms) / maxSpeedKms;
-                        ColourUtils.long_rainbow((float) (1 - len), rgba);
+                        ColourUtils.colormap_long_rainbow((float) (1 - len), rgba);
                         r = rgba[0];
                         g = rgba[1];
                         b = rgba[2];
@@ -708,13 +708,13 @@ public class StarGroup extends ParticleGroup implements ILineRenderable, IStarFo
                     case 2:
                         // HAS RADIAL VELOCITY - blue: stars with RV, red: stars without RV
                         if (star.radvel() != 0) {
-                            r = GlobalResources.gBlue[0] + 0.2f;
-                            g = GlobalResources.gBlue[1] + 0.4f;
-                            b = GlobalResources.gBlue[2] + 0.4f;
+                            r = ColourUtils.gBlue[0] + 0.2f;
+                            g = ColourUtils.gBlue[1] + 0.4f;
+                            b = ColourUtils.gBlue[2] + 0.4f;
                         } else {
-                            r = GlobalResources.gRed[0] + 0.4f;
-                            g = GlobalResources.gRed[1] + 0.2f;
-                            b = GlobalResources.gRed[2] + 0.2f;
+                            r = ColourUtils.gRed[0] + 0.4f;
+                            g = ColourUtils.gRed[1] + 0.2f;
+                            b = ColourUtils.gRed[2] + 0.2f;
                         }
                         break;
                     case 3:
@@ -724,7 +724,7 @@ public class StarGroup extends ParticleGroup implements ILineRenderable, IStarFo
                             double max = maxSpeedKms;
                             // rv in [0:1]
                             double rv = ((MathUtilsd.clamp(rav, -max, max) / max) + 1) / 2;
-                            ColourUtils.blue_white_red((float) rv, rgba);
+                            ColourUtils.colormap_blue_white_red((float) rv, rgba);
                             r = rgba[0];
                             g = rgba[1];
                             b = rgba[2];
@@ -742,7 +742,7 @@ public class StarGroup extends ParticleGroup implements ILineRenderable, IStarFo
                             Vector3d camstar = aux3d4.get().set(p1);
                             double pr = ppm.dot(camstar.nor());
                             double projection = ((MathUtilsd.clamp(pr, -max, max) / max) + 1) / 2;
-                            ColourUtils.blue_white_red((float) projection, rgba);
+                            ColourUtils.colormap_blue_white_red((float) projection, rgba);
                             r = rgba[0];
                             g = rgba[1];
                             b = rgba[2];
@@ -752,9 +752,9 @@ public class StarGroup extends ParticleGroup implements ILineRenderable, IStarFo
                         break;
                     case 5:
                         // SINGLE COLOR
-                        r = GlobalResources.gBlue[0] + 0.2f;
-                        g = GlobalResources.gBlue[1] + 0.4f;
-                        b = GlobalResources.gBlue[2] + 0.4f;
+                        r = ColourUtils.gBlue[0] + 0.2f;
+                        g = ColourUtils.gBlue[1] + 0.4f;
+                        b = ColourUtils.gBlue[2] + 0.4f;
                         break;
                     }
 
@@ -1149,7 +1149,7 @@ public class StarGroup extends ParticleGroup implements ILineRenderable, IStarFo
     }
 
     public float getColor(int index) {
-        return highlighted ? hlColorFloat[hlci] : (float) ((Array<StarBean>) pointData).get(index).col();
+        return highlighted ? Color.toFloatBits(hlc[0], hlc[1], hlc[2], hlc[3]) : (float) ((Array<StarBean>) pointData).get(index).col();
     }
 
     /**

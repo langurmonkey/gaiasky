@@ -10,6 +10,73 @@ import gaia.cu9.ari.gaiaorbit.util.math.MathUtilsd;
 
 public class ColourUtils {
 
+    /*
+     * LETS DEFINE SOME COLORS
+     */
+
+    // Google colors
+    public static float[] gGreen = new float[] { 0f / 255f, 135f / 255f, 68f / 255f, 1f };
+    public static Color gGreenC = getCol(gGreen);
+    public static float[] gBlue = new float[] { 0f / 255f, 87f / 255f, 231f / 255f, 1f };
+    public static Color gBlueC = getCol(gBlue);
+    public static float[] gRed = new float[] { 214f / 255f, 45f / 255f, 32f / 255f, 1f };
+    public static Color gRedC = getCol(gRed);
+    public static float[] gYellow = new float[] { 255f / 255f, 167f / 255f, 0f / 255f, 1f };
+    public static Color gYellowC = getCol(gYellow);
+    public static float[] gWhite = new float[] { 255f / 255f, 255f / 255f, 255f / 255f, 1f };
+    public static Color gWhiteC = getCol(gWhite);
+    public static float[] gPink = new float[] { 255f / 255f, 102f / 255f, 255f / 255f, 1f };
+    public static Color gPinkC = getCol(gPink);
+    // Amazon orange
+    public static float[] aOrange = new float[] { 255f / 255f, 153f / 255f, 0f / 255f, 1f };
+    public static Color aOrangeC = getCol(aOrange);
+    // Taco Bell purple
+    public static float[] tPurple = new float[] { 12f / 255f, 32f / 255f, 130f / 255f, 1f };
+    public static Color tPurpleC = getCol(tPurple);
+    // DunkinDonuts
+    public static float[] ddMagenta = new float[] { 218f / 255f, 24f / 255f, 132f / 255f, 1f };
+    public static Color ddMagentaC = getCol(ddMagenta);
+    public static float[] ddBrown = new float[] { 101f / 255f, 56f / 255f, 25f / 255f, 1f };
+    public static Color ddBrownC = getCol(ddBrown);
+
+    private static Color getCol(float[] c) {
+        return new Color(c[0], c[1], c[2], c[3]);
+    }
+
+    /**
+     * Highlight color array for datasets
+     **/
+    public static float[][] hlColor = new float[][] { gBlue, gRed, gYellow, gGreen, gPink, aOrange, tPurple, ddBrown, ddMagenta };
+
+    public static float[] getColorFromIndex(int idx) {
+        return hlColor[idx % hlColor.length];
+    }
+
+    public static String rgbaToHex(float[] color) {
+        int r = (int) (color[0] * 255f);
+        int g = (int) (color[1] * 255f);
+        int b = (int) (color[2] * 255f);
+        int a = (int) (color[3] * 255f);
+        return String.format("#%02x%02x%02x%02x", r, g, b, a);
+    }
+
+    public static String rgbToHex(float[] color) {
+        int r = (int) (color[0] * 255f);
+        int g = (int) (color[1] * 255f);
+        int b = (int) (color[2] * 255f);
+        return String.format("#%02x%02x%02x", r, g, b);
+    }
+
+    public static float[] hexToRgba(String hex) {
+        return new float[] { Integer.valueOf(hex.substring(1, 3), 16) / 255f, Integer.valueOf(hex.substring(3, 5), 16) / 255f, Integer.valueOf(hex.substring(5, 7), 16) / 255f, Integer.valueOf(hex.substring(7, 9), 16) / 255f };
+
+    }
+
+    public static float[] hexToRgb(String hex) {
+        return new float[] { Integer.valueOf(hex.substring(1, 3), 16) / 255f, Integer.valueOf(hex.substring(3, 5), 16) / 255f, Integer.valueOf(hex.substring(5, 7), 16) / 255f };
+
+    }
+
     public static float normalize(float value, float min, float max) {
         if (value > max)
             return max;
@@ -21,7 +88,7 @@ public class ColourUtils {
     /**
      * Converts a scalar value that is normalized to [0:1] into a grayscale
      * color vector rgba. See: http://www.particleincell.com/blog/2014/colormap/
-     * 
+     *
      * @param value
      */
     public static void grayscale(float value, float rgba[]) {
@@ -34,13 +101,14 @@ public class ColourUtils {
     /**
      * Converts a scalar normalized to the range [0:1] into a blue-white-red
      * rgba color, with blue at 0, white at 0.5 and red at 1
+     *
      * @param value The value
-     * @param rgba The color
+     * @param rgba  The color
      */
-    public static void blue_white_red(float value, float[] rgba){
+    public static void colormap_blue_white_red(float value, float[] rgba) {
         // Make it in [-1:1]
         float a = value * 2f - 1f;
-        if(a <= 0){
+        if (a <= 0) {
             rgba[0] = rgba[1] = 1 + a;
             rgba[2] = 1;
         } else {
@@ -52,10 +120,10 @@ public class ColourUtils {
     /**
      * Converts a scalar normalized to the range [0:1] into a short rainbow of
      * rgba values. See: http://www.particleincell.com/blog/2014/colormap/
-     * 
+     *
      * @param value
      */
-    public static void short_rainbow(float value, float[] rgba) {
+    public static void colormap_short_rainbow(float value, float[] rgba) {
         /* plot short rainbow RGB */
         float a = (1 - value) / 0.25f; //invert and vgroup
         final int X = (int) Math.floor(a); //this is the integer part
@@ -95,11 +163,10 @@ public class ColourUtils {
     /**
      * Converts a scalar in [0..1] to a long rainbow of rgba values. See
      * <a href="http://www.particleincell.com/blog/2014/colormap/">here</a>
-     * 
-     * @param value
-     *            The value in [0..1]
+     *
+     * @param value The value in [0..1]
      */
-    public static void long_rainbow(float value, float[] rgba) {
+    public static void colormap_long_rainbow(float value, float[] rgba) {
         if (rgba == null)
             return;
         /* plot long rainbow RGB */
@@ -146,17 +213,16 @@ public class ColourUtils {
     /**
      * Converts a scalar in [0..1] to a yellow to red map. See
      * <a href="http://www.particleincell.com/blog/2014/colormap/">here</a>
-     * 
-     * @param value
-     *            The value to convert
+     *
+     * @param value The value to convert
      */
-    public static void yellow_to_red(float value, float[] rgba) {
+    public static void colormap_yellow_to_red(float value, float[] rgba) {
         rgba[0] = 1;
         rgba[1] = value;
         rgba[2] = 0;
     }
 
-    public static void blue_to_magenta(float value, float[] rgba) {
+    public static void colormap_blue_to_magenta(float value, float[] rgba) {
         rgba[0] = value;
         rgba[1] = 0;
         rgba[2] = 1;
@@ -164,12 +230,11 @@ public class ColourUtils {
 
     /**
      * Converts effective temperature in Kelvin (1000-40000) to RGB
-     * 
-     * @see <a href="www.tannerhelland.com/4435/convert-temperature-rgb-algorithm-code/">Temperature to RGB</a>
-     * @see <a href="www.zombieprototypes.com/?p=210">Color temperature conversion</a>
-     * 
+     *
      * @param teff Effective temperature
      * @return The RGB color in a float array
+     * @see <a href="www.tannerhelland.com/4435/convert-temperature-rgb-algorithm-code/">Temperature to RGB</a>
+     * @see <a href="www.zombieprototypes.com/?p=210">Color temperature conversion</a>
      */
     public static float[] teffToRGB(double teff) {
         double r, g, b;
@@ -215,9 +280,8 @@ public class ColourUtils {
     /**
      * Converts the color index B-V to RGB model. See <a href=
      * "http://stackoverflow.com/questions/21977786/star-b-v-color-index-to-apparent-rgb-color">here</a>
-     * 
-     * @param bv
-     *            The B-V color index
+     *
+     * @param bv The B-V color index
      * @return The RGB as a float array in [0..1]
      */
     public static float[] BVtoRGB(double bv) {
@@ -273,11 +337,9 @@ public class ColourUtils {
 
     /**
      * Returns a copy of the RGB colour brightened up by the given amount
-     * 
-     * @param rgb
-     *            The RGB color
-     * @param luminosity
-     *            The new luminosity amount in [0..1]
+     *
+     * @param rgb        The RGB color
+     * @param luminosity The new luminosity amount in [0..1]
      * @return The new RGB array
      */
     public static float[] brighten(float[] rgb, float luminosity) {
@@ -423,7 +485,7 @@ public class ColourUtils {
         return (rgb >> 0) & 0xFF;
     }
 
-    public static boolean isZero(Color c){
+    public static boolean isZero(Color c) {
         return c.r == 0 && c.g == 0 && c.b == 0;
     }
 

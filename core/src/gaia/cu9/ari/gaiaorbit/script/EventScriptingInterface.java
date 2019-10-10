@@ -2157,18 +2157,18 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
         if (checkString(dsName, "datasetName")) {
             boolean exists = CatalogManager.instance().contains(dsName);
             if (exists)
-                EventManager.instance.post(Events.CATALOG_HIGHLIGHT, dsName, highlight, -1, false);
+                EventManager.instance.post(Events.CATALOG_HIGHLIGHT, dsName, highlight, null, false);
             return exists;
         }
         return false;
     }
 
     @Override
-    public boolean highlightDataset(String dsName, int colorIndex, boolean highlight) {
+    public boolean highlightDataset(String dsName, float[] color, boolean highlight) {
         if (checkString(dsName, "datasetName")) {
             boolean exists = CatalogManager.instance().contains(dsName);
             if (exists)
-                EventManager.instance.post(Events.CATALOG_HIGHLIGHT, dsName, highlight, colorIndex, false);
+                EventManager.instance.post(Events.CATALOG_HIGHLIGHT, dsName, highlight, color, false);
             return exists;
         }
         return false;

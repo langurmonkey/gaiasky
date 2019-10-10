@@ -198,6 +198,7 @@ public class DesktopConfInit extends ConfInit {
         boolean DISPLAY_DATASET_DIALOG = Boolean.parseBoolean(p.getProperty("program.catalog.chooser", "false"));
         boolean NET_MASTER = Boolean.parseBoolean(p.getProperty("program.net.master", "false"));
         boolean NET_SLAVE = Boolean.parseBoolean(p.getProperty("program.net.slave", "false"));
+        String LAST_FOLDER_LOCATION = p.getProperty("program.last.filesystem.location");
 
         LinkedList<String> NET_MASTER_SLAVES = null;
         if (NET_MASTER) {
@@ -208,7 +209,7 @@ public class DesktopConfInit extends ConfInit {
             }
         }
 
-        prc.initialize(SHOW_DEBUG_INFO, LAST_CHECKED, LAST_VERSION, VERSION_CHECK_URL, DATA_DESCRIPTOR_URL, UI_THEME, SCRIPT_LOCATION, REST_PORT, LOCALE, STEREOSCOPIC_MODE, STEREO_PROFILE, CUBEMAPE360_MODE, DISPLAY_HUD, DISPLAY_POINTER_COORDS, DISPLAY_DATASET_DIALOG, NET_MASTER, NET_SLAVE, NET_MASTER_SLAVES);
+        prc.initialize(SHOW_DEBUG_INFO, LAST_CHECKED, LAST_VERSION, VERSION_CHECK_URL, DATA_DESCRIPTOR_URL, UI_THEME, SCRIPT_LOCATION, REST_PORT, LOCALE, STEREOSCOPIC_MODE, STEREO_PROFILE, CUBEMAPE360_MODE, DISPLAY_HUD, DISPLAY_POINTER_COORDS, DISPLAY_DATASET_DIALOG, NET_MASTER, NET_SLAVE, NET_MASTER_SLAVES, LAST_FOLDER_LOCATION);
 
         /** SCENE CONF **/
         String gc = p.getProperty("scene.graphics.quality");
@@ -477,6 +478,7 @@ public class DesktopConfInit extends ConfInit {
                 i++;
             }
         p.setProperty("program.net.slave", Boolean.toString(GlobalConf.program.NET_SLAVE));
+        p.setProperty("program.last.filesystem.location", GlobalConf.program.LAST_OPEN_LOCATION);
 
         /** SCENE **/
         p.setProperty("scene.object.startup", GlobalConf.scene.STARTUP_OBJECT);

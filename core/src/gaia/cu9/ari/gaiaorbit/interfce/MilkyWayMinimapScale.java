@@ -16,7 +16,10 @@ import com.badlogic.gdx.graphics.glutils.ShapeRenderer.ShapeType;
 import com.badlogic.gdx.math.Vector2;
 import gaia.cu9.ari.gaiaorbit.GaiaSky;
 import gaia.cu9.ari.gaiaorbit.scenegraph.camera.ICamera;
-import gaia.cu9.ari.gaiaorbit.util.*;
+import gaia.cu9.ari.gaiaorbit.util.Constants;
+import gaia.cu9.ari.gaiaorbit.util.GlobalConf;
+import gaia.cu9.ari.gaiaorbit.util.I18n;
+import gaia.cu9.ari.gaiaorbit.util.color.ColourUtils;
 import gaia.cu9.ari.gaiaorbit.util.coord.Coordinates;
 import gaia.cu9.ari.gaiaorbit.util.math.Vector2d;
 import gaia.cu9.ari.gaiaorbit.util.math.Vector3d;
@@ -94,7 +97,7 @@ public class MilkyWayMinimapScale implements IMinimapScale {
         sr.circle(side2, sideshort2, side * 0.08f);
 
         // Camera
-        sr.setColor(GlobalResources.gRedC);
+        sr.setColor(ColourUtils.gRedC);
         sr.circle(cx, cy, 8f);
         Vector2d endx = aux2d1.set(camdir2.x, camdir2.y);
         endx.rotate(-cam.getCamera().fieldOfView / 2d);
@@ -172,7 +175,7 @@ public class MilkyWayMinimapScale implements IMinimapScale {
         sr.circle(side2, side2, 1.5f);
 
         // Camera
-        sr.setColor(GlobalResources.gRedC);
+        sr.setColor(ColourUtils.gRedC);
         sr.circle(cx, cy, 8f);
         Vector2d endx = aux2d1.set(camdir2.x, camdir2.y);
         endx.rotate(-cam.getCamera().fieldOfView / 2d);

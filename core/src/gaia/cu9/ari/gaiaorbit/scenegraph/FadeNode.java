@@ -6,7 +6,6 @@
 package gaia.cu9.ari.gaiaorbit.scenegraph;
 
 import com.badlogic.gdx.assets.AssetManager;
-import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.math.Vector2;
 import gaia.cu9.ari.gaiaorbit.GaiaSky;
 import gaia.cu9.ari.gaiaorbit.event.EventManager;
@@ -87,48 +86,22 @@ public class FadeNode extends AbstractPositionEntity {
     protected CatalogInfo catalogInfo = null;
 
     /**
-     * General track of highlight index
-     **/
-    protected static int hli = 0;
-    /**
      * Is it highlighted?
      */
     protected boolean highlighted = false;
     /**
      * Highlight color index
      **/
-    protected int hlci;
-
-    /**
-     * Highlight color
-     **/
-    protected static float[][] hlColor = new float[][]{
-            GlobalResources.gBlue,
-            GlobalResources.gRed,
-            GlobalResources.gYellow,
-            GlobalResources.gGreen,
-            GlobalResources.gPink,
-            GlobalResources.aOrange,
-            GlobalResources.tPurple,
-            GlobalResources.ddBrown,
-            GlobalResources.ddMagenta
-    };
-    protected static float[] hlColorFloat;
-    static{
-        hlColorFloat = new float[hlColor.length];
-        int i = 0;
-        for(float[] c : hlColor){
-            hlColorFloat[i] = Color.toFloatBits(c[0], c[1], c[2], c[3]);
-            i++;
-        }
-    }
+    protected float[] hlc;
 
     public FadeNode() {
         super();
+        this.hlc = new float[4];
     }
 
     public FadeNode(String name, SceneGraphNode parent) {
         super(name, parent);
+        this.hlc = new float[4];
     }
 
     @Override
@@ -259,22 +232,10 @@ public class FadeNode extends AbstractPositionEntity {
         EventManager.instance.post(Events.CATALOG_ADD, this.catalogInfo, false);
     }
 
-    public static int nextHightlightColorIndex() {
-        hli = (hli + 1) % hlColor.length;
-        return hli;
-    }
-
-    public void highlight(boolean hl) {
-        if (hl)
-            highlight(hl, nextHightlightColorIndex());
-        else
-            highlight(hl, hli);
-    }
-
-    public void highlight(boolean hl, int colorIndex) {
+    public void highlight(boolean hl, float[] color) {
         this.highlighted = hl;
         if (hl) {
-            this.hlci = colorIndex;
+            System.arraycopy(color, 0, this.hlc, 0, color.length);
         }
     }
 

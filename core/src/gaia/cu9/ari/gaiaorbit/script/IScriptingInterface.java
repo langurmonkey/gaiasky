@@ -1622,7 +1622,7 @@ public interface IScriptingInterface {
     boolean showDataset(String dsName);
 
     /**
-     * Enables or disables the dataset highlight, using a cyclic color which changes every call
+     * Enables or disables the dataset highlight using a color chosen by the system
      * @param dsName The dataset name
      * @param highlight State
      * @return False if the dataset could not be found
@@ -1630,21 +1630,13 @@ public interface IScriptingInterface {
     boolean highlightDataset(String dsName, boolean highlight);
 
     /**
-     * Enables or disables the dataset highlight, using a given color index:
-     * <ul>
-     *     <li>0 - red</li>
-     *     <li>1 - green</li>
-     *     <li>2 - blue</li>
-     *     <li>3 - cyan</li>
-     *     <li>4 - magenta</li>
-     *     <li>5 - yellow</li>
-     * </ul>
+     * Enables or disables the dataset highlight, using a given color
      * @param dsName The dataset name
-     * @param colorIndex Color index in [0..5]
+     * @param color The rgba color
      * @param highlight State
      * @return False if the dataset could not be found
      */
-    boolean highlightDataset(String dsName, int colorIndex, boolean highlight);
+    boolean highlightDataset(String dsName, float[] color, boolean highlight);
 
     /**
      * Gets the current frame number. The number begins at 0 for the first frame produced

@@ -27,6 +27,10 @@ import java.time.ZoneId;
 import java.time.ZoneOffset;
 import java.time.temporal.ChronoField;
 
+/**
+ * A dialog to pick a date.
+ * TODO Migrate to GenericDialog
+ */
 public class DateDialog extends CollapsibleWindow {
     private final Window me;
     private final Stage stage;

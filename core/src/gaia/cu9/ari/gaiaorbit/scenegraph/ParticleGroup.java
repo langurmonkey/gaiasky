@@ -34,6 +34,7 @@ import gaia.cu9.ari.gaiaorbit.util.math.*;
 import gaia.cu9.ari.gaiaorbit.util.time.ITimeFrameProvider;
 
 import java.io.Serializable;
+import java.util.Arrays;
 
 /**
  * This class represents a vgroup of non-focusable particles, all with the same
@@ -575,7 +576,7 @@ public class ParticleGroup extends FadeNode implements I3DTextRenderable, IFocus
     }
 
     public float[] getColor() {
-        return highlighted ? hlColor[hlci] : cc;
+        return highlighted ? hlc : cc;
 
     }
 
@@ -850,15 +851,9 @@ public class ParticleGroup extends FadeNode implements I3DTextRenderable, IFocus
     }
 
     @Override
-    public void highlight(boolean hl) {
-        this.inGpu = this.highlighted == hl;
-        super.highlight(hl);
-    }
-
-    @Override
-    public void highlight(boolean hl, int index) {
-        this.inGpu = this.highlighted == hl;
-        super.highlight(hl, index);
+    public void highlight(boolean hl, float[] color) {
+        this.inGpu = this.highlighted == hl && Arrays.equals(this.hlc, color);
+        super.highlight(hl, color);
     }
 
     public void setColorMin(double[] colorMin) {

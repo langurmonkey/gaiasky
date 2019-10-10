@@ -89,8 +89,6 @@ public class FileChooser extends GenericDialog {
         this(title, skin, stage, baseDir, target, null);
     }
 
-
-
     public FileChooser(String title, final Skin skin, Stage stage, FileHandle baseDir, FileChooserTarget target, EventListener selectionListener) {
         this(title, skin, stage, baseDir, target, selectionListener, true);
     }
@@ -417,7 +415,9 @@ public class FileChooser extends GenericDialog {
 
     @Override
     public void cancel() {
-
+        if (resultListener != null) {
+            resultListener.result(false, getResult());
+        }
     }
 
     public class FileListItem {

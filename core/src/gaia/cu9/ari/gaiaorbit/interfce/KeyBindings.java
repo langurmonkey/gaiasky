@@ -368,6 +368,9 @@ public class KeyBindings {
         // Toggle mouse capture
         addAction(new ProgramAction("action.toggle/gui.mousecapture", () -> EventManager.instance.post(Events.MOUSE_CAPTURE_TOGGLE)));
 
+        // Reload UI (debugging)
+        addAction(new ProgramAction("action.ui.reload", () -> EventManager.instance.post(Events.UI_RELOAD_CMD)));
+
         // Camera modes
         for (CameraMode mode : CameraMode.values()) {
             addAction(new ProgramAction("camera.full/camera." + mode.toString(), () -> EventManager.instance.post(Events.CAMERA_MODE_CMD, mode)));

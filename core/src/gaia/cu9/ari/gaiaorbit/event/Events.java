@@ -597,6 +597,10 @@ public enum Events {
      */
     VR_SELECTING_STATE,
     /**
+     * Issues the command to reload the UI
+     */
+    UI_RELOAD_CMD,
+    /**
      * Informs the UI theme has been reloaded. Contains the new skin.
      */
     UI_THEME_RELOAD_INFO,
