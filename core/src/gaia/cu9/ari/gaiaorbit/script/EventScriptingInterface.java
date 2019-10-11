@@ -2182,6 +2182,36 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
     }
 
     @Override
+    public double getMeterToInternalUnitConversion() {
+        return Constants.M_TO_U;
+    }
+
+    @Override
+    public double getInternalUnitToMeterConversion() {
+        return Constants.U_TO_M;
+    }
+
+    @Override
+    public double internalUnitsToMetres(double internalUnits) {
+        return internalUnits * Constants.U_TO_M;
+    }
+
+    @Override
+    public double internalUnitsToKilometres(double internalUnits) {
+        return internalUnits * Constants.U_TO_KM;
+    }
+
+    @Override
+    public double metresToInternalUnits(double metres) {
+        return metres * Constants.M_TO_U;
+    }
+
+    @Override
+    public double kilometrestointernalunits(double kilometres) {
+        return kilometres * Constants.KM_TO_U;
+    }
+
+    @Override
     public List<String> listDatasets() {
         Set<String> names = CatalogManager.instance().getDatasetNames();
         if (names != null)

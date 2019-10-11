@@ -1660,6 +1660,49 @@ public interface IScriptingInterface {
     boolean highlightDataset(String dsName, float[] color, boolean highlight);
 
     /**
+     * Returns the meter to internal unit conversion factor. Use this factor to multiply
+     * your coordinates in meters to get them in internal units
+     * @return The factor M_TO_U
+     */
+    double getMeterToInternalUnitConversion();
+
+    /**
+     * Returns the internal unit to meter conversion factor. Use this factor to multiply
+     * your coordinates in internal units to get them in meters.
+     * @return The factor U_TO_M
+     */
+    double getInternalUnitToMeterConversion();
+
+    /**
+     * Converts the value in internal units to metres
+     * @param internalUnits The value in internal units
+     * @return The value in metres
+     */
+    double internalUnitsToMetres(double internalUnits);
+
+    /**
+     * Converts the value in internal units to Kilometers
+     * @param internalUnits The value in internal units
+     * @return The value in Kilometers
+     */
+    double internalUnitsToKilometres(double internalUnits);
+
+    /**
+     * Converts the metres to internal units
+     * @param metres The value in metres
+     * @return The value in internal units
+     */
+    double metresToInternalUnits(double metres);
+
+    /**
+     * Converts the kilometres to internal units
+     * @param kilometres The value in kilometers
+     * @return The value in internal units
+     */
+    double kilometrestointernalunits(double kilometres);
+
+
+    /**
      * Gets the current frame number. The number begins at 0 for the first frame produced
      * when Gaia Sky is started and increases continuously.
      * @return The current frame number
