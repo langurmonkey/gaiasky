@@ -130,4 +130,7 @@ gs.removeObject(0)
 gs.setVisibility("element.galactic", False)
 gs.sleep(1.5)
 
+# Restore
+gs.enableInput()
+
 gateway.close()
