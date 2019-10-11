@@ -1622,6 +1622,27 @@ public interface IScriptingInterface {
     boolean showDataset(String dsName);
 
     /**
+     * Enables or disables the dataset highlight, using a given color index:
+     * <ul>
+     *     <li>0 - blue</li>
+     *     <li>1 - red</li>
+     *     <li>2 - yellow</li>
+     *     <li>3 - green</li>
+     *     <li>4 - pink</li>
+     *     <li>5 - orange</li>
+     *     <li>6 - purple</li>
+     *     <li>7 - brown</li>
+     *     <li>8 - magenta</li>
+     * </ul>
+     * @param dsName The dataset name
+     * @param colorIndex Color index in [0..8]
+     * @param highlight Whether to highlight or not
+     * @return False if the dataset could not be found
+     */
+    boolean highlightDataset(String dsName, int colorIndex, boolean highlight);
+
+
+    /**
      * Enables or disables the dataset highlight using a color chosen by the system
      * @param dsName The dataset name
      * @param highlight State

@@ -29,6 +29,7 @@ import gaia.cu9.ari.gaiaorbit.scenegraph.camera.NaturalCamera;
 import gaia.cu9.ari.gaiaorbit.screenshot.ImageRenderer;
 import gaia.cu9.ari.gaiaorbit.util.*;
 import gaia.cu9.ari.gaiaorbit.util.Logger.Log;
+import gaia.cu9.ari.gaiaorbit.util.color.ColourUtils;
 import gaia.cu9.ari.gaiaorbit.util.coord.Coordinates;
 import gaia.cu9.ari.gaiaorbit.util.gdx.contrib.postprocess.effects.CubemapProjections;
 import gaia.cu9.ari.gaiaorbit.util.math.*;
@@ -2161,6 +2162,12 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
             return exists;
         }
         return false;
+    }
+
+    @Override
+    public boolean highlightDataset(String dsName, int colorIndex, boolean highlight) {
+        float[] color = ColourUtils.getColorFromIndex(colorIndex);
+        return highlightDataset(dsName, color, highlight);
     }
 
     @Override
