@@ -240,7 +240,11 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
     @Override
     public void setCameraLock(final boolean lock) {
         Gdx.app.postRunnable(() -> em.post(Events.FOCUS_LOCK_CMD, I18n.bundle.get("gui.camera.lock"), lock));
+    }
 
+    @Override
+    public void setCameraCenterFocus(boolean centerFocus) {
+        Gdx.app.postRunnable(() -> em.post(Events.CAMERA_CENTER_FOCUS_CMD, centerFocus));
     }
 
     @Override

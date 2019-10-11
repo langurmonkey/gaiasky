@@ -262,6 +262,23 @@ public interface IScriptingInterface {
     void setCameraLock(boolean lock);
 
     /**
+     * Whether to look for the focus constantly when in focus mode and center it
+     * in the view or whether the view must be free. Use True to center the focus
+     * (default behaviour) and False to set it to a free view
+     * @param centerFocus Whether to center the focus or not
+     */
+    void setCameraCenterFocus(boolean centerFocus);
+
+    /**
+     * Locks or unlocks the orientation of the camera to the focus object's
+     * rotation.
+     *
+     * @param lock Whether to lock or unlock the camera orientation to the focus
+     */
+    void setCameraOrientationLock(boolean lock);
+
+
+    /**
      * Sets the camera in free mode.
      */
     void setCameraFree();
@@ -412,14 +429,6 @@ public interface IScriptingInterface {
      * @param index The index of the top speed.
      */
     void setCameraSpeedLimit(int index);
-
-    /**
-     * Locks or unlocks the orientation of the camera to the focus object's
-     * rotation.
-     *
-     * @param lock Whether to lock or unlock the camera orientation to the focus
-     */
-    void setCameraOrientationLock(boolean lock);
 
     /**
      * Adds a forward movement to the camera with the given value. If value is
@@ -1382,7 +1391,7 @@ public interface IScriptingInterface {
     /**
      * Sets the cubemap projection to use.
      * Accepted values are "EQUIRECTANGULAR", "CYLINDRICAL" and "HAMMER".
-     * See {@link com.bitfire.postprocessing.effects.CubemapProjections.CubemapProjection} for possible
+     * See {@link gaia.cu9.ari.gaiaorbit.util.gdx.contrib.postprocess.effects.CubemapProjections} for possible
      * values.
      * @param projection
      */

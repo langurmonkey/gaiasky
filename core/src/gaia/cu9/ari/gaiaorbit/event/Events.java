@@ -225,6 +225,10 @@ public enum Events {
      **/
     FOCUS_LOCK_CMD,
     /**
+     * Sets the 'diverted' attribute of the camera. Gets a boolean
+     */
+    CAMERA_CENTER_FOCUS_CMD,
+    /**
      * Contains the name, the lock orientation boolean value and an optional
      * boolean indicating if this comes from the interface.
      */
