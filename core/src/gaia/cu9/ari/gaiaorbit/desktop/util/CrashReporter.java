@@ -14,6 +14,9 @@ import gaia.cu9.ari.gaiaorbit.event.EventManager;
 import gaia.cu9.ari.gaiaorbit.event.Events;
 import gaia.cu9.ari.gaiaorbit.util.GlobalConf;
 import gaia.cu9.ari.gaiaorbit.util.Logger;
+import oshi.SystemInfo;
+import oshi.hardware.CentralProcessor;
+import oshi.hardware.HardwareAbstractionLayer;
 
 import java.io.*;
 import java.nio.IntBuffer;
@@ -121,6 +124,16 @@ public class CrashReporter {
         /* System information */
         strArray.add("");
         strArray.add("## SYSTEM INFORMATION");
+        try {
+            SystemInfo si = new SystemInfo();
+            HardwareAbstractionLayer hal = si.getHardware();
+            CentralProcessor cp = hal.getProcessor();
+            strArray.add("CPU: " + cp.getName());
+            strArray.add("CPU arch: " + (cp.isCpu64bit() ? "64-bit" : "32-bit"));
+        }catch(Error e){
+            strArray.add("Could not get CPU information!");
+        }
+
         strArray.add("Available processors (cores): " + Runtime.getRuntime().availableProcessors());
         strArray.add("Free memory (bytes): " + Runtime.getRuntime().freeMemory());
         long maxMemory = Runtime.getRuntime().maxMemory();

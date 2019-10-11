@@ -33,6 +33,9 @@ import gaia.cu9.ari.gaiaorbit.util.format.IDateFormat;
 import gaia.cu9.ari.gaiaorbit.util.scene2d.*;
 import gaia.cu9.ari.gaiaorbit.util.update.VersionCheckEvent;
 import gaia.cu9.ari.gaiaorbit.util.update.VersionChecker;
+import oshi.SystemInfo;
+import oshi.hardware.CentralProcessor;
+import oshi.hardware.HardwareAbstractionLayer;
 
 import java.nio.IntBuffer;
 import java.time.Instant;
@@ -280,6 +283,7 @@ public class AboutWindow extends GenericDialog {
         // System info
         Label sysinfo = new OwnLabel(I18n.txt("gui.help.sysinfo"), skin, "help-title");
 
+
         Label sysostitle = new OwnLabel(I18n.txt("gui.help.os"), skin);
         Label sysos = new OwnLabel(System.getProperty("os.name") + " " + System.getProperty("os.version") + " " + System.getProperty("os.arch"), skin);
 
@@ -358,6 +362,27 @@ public class AboutWindow extends GenericDialog {
 
         contentSystem.add(sysinfo).colspan(2).align(Align.left).padTop(pad).padBottom(pad);
         contentSystem.row();
+        try {
+            SystemInfo si = new SystemInfo();
+            HardwareAbstractionLayer hal = si.getHardware();
+            CentralProcessor cp = hal.getProcessor();
+
+            Label cputitle = new OwnLabel(I18n.txt("gui.help.cpu"), skin);
+            Label cpu = new OwnLabel(cp.getName(), skin);
+
+            Label cpuarchtitle = new OwnLabel(I18n.txt("gui.help.cpuarch"), skin);
+            Label cpuarch = new OwnLabel(cp.isCpu64bit() ? "64-bit" : "32-bit", skin);
+
+            contentSystem.add(cputitle).align(Align.topLeft).padRight(pad).padTop(pad5);
+            contentSystem.add(cpu).align(Align.left).padTop(pad5);
+            contentSystem.row();
+
+            contentSystem.add(cpuarchtitle).align(Align.topLeft).padRight(pad).padTop(pad5).padBottom(pad5);
+            contentSystem.add(cpuarch).align(Align.left).padTop(pad5).padBottom(pad5);
+            contentSystem.row();
+        }catch(Error e){
+            contentSystem.add(new OwnLabel(I18n.txt("gui.help.cpu.no"), skin)).colspan(2).align(Align.left).padTop(pad).padBottom(pad).row();
+        }
         contentSystem.add(sysostitle).align(Align.topLeft).padRight(pad);
         contentSystem.add(sysos).align(Align.left);
         contentSystem.row();
