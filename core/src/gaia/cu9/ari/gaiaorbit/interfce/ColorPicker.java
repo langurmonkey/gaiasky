@@ -10,12 +10,10 @@ import com.badlogic.gdx.Input.Buttons;
 import com.badlogic.gdx.graphics.Cursor;
 import com.badlogic.gdx.scenes.scene2d.*;
 import com.badlogic.gdx.scenes.scene2d.InputEvent.Type;
-import com.badlogic.gdx.scenes.scene2d.ui.HorizontalGroup;
-import com.badlogic.gdx.scenes.scene2d.ui.Image;
-import com.badlogic.gdx.scenes.scene2d.ui.Skin;
-import com.badlogic.gdx.scenes.scene2d.ui.Table;
+import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener.ChangeEvent;
+import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import gaia.cu9.ari.gaiaorbit.util.GlobalConf;
 import gaia.cu9.ari.gaiaorbit.util.GlobalResources;
 import gaia.cu9.ari.gaiaorbit.util.I18n;
@@ -29,27 +27,30 @@ import gaia.cu9.ari.gaiaorbit.util.validator.FloatValidator;
 import gaia.cu9.ari.gaiaorbit.util.validator.HexColorValidator;
 import gaia.cu9.ari.gaiaorbit.util.validator.IValidator;
 
+import java.util.Arrays;
+
 public class ColorPicker extends Image {
     private Stage stage;
     private Skin skin;
     private Runnable newColorRunnable;
     private float[] color;
+    private String name;
 
-    private ColorPicker(Stage stage, Skin skin) {
+    private ColorPicker(String name, Stage stage, Skin skin) {
         super(skin.getDrawable("white"));
+        this.name = name;
         this.skin = skin;
         this.stage = stage;
         initialize();
     }
 
     public ColorPicker(float[] rgba, Stage stage, Skin skin) {
-        this(stage, skin);
-        setColor(rgba);
+        this(null, rgba, stage, skin);
     }
 
-    public ColorPicker(float r, float g, float b, float a, Stage stage, Skin skin) {
-        this(stage, skin);
-        setColor(r, g, b, a);
+    public ColorPicker(String name ,float[] rgba, Stage stage, Skin skin) {
+        this(name, stage, skin);
+        setPickedColor(rgba);
     }
 
     private void initialize() {
@@ -59,10 +60,10 @@ public class ColorPicker extends Image {
                 // Click
                 if ((type == Type.touchUp) && (((InputEvent) event).getButton() == Buttons.LEFT)) {
                     // Launch color picker window
-                    ColorPickerDialog cpd = new ColorPickerDialog(color, stage, skin);
+                    ColorPickerDialog cpd = new ColorPickerDialog(name, color, stage, skin);
                     cpd.setAcceptRunnable(() -> {
                         // Set color and run runnable, if any
-                        setColor(cpd.color);
+                        setPickedColor(cpd.color);
                         if (newColorRunnable != null) {
                             newColorRunnable.run();
                         }
@@ -91,13 +92,13 @@ public class ColorPicker extends Image {
         }
     }
 
-    public void setColor(float[] rgba) {
+    public void setPickedColor(float[] rgba) {
         initColor();
         System.arraycopy(rgba, 0, this.color, 0, rgba.length);
         super.setColor(rgba[0], rgba[1], rgba[2], rgba[3]);
     }
 
-    public void setColor(float r, float g, float b, float a) {
+    public void setPickedColor(float r, float g, float b, float a) {
         initColor();
         color[0] = r;
         color[1] = g;
@@ -121,8 +122,8 @@ public class ColorPicker extends Image {
         private boolean changeEvents = true;
         private ColorPickerDialog cpd;
 
-        public ColorPickerDialog(float[] color, Stage stage, Skin skin) {
-            super(I18n.bundle.get("gui.colorpicker.title"), skin, stage);
+        public ColorPickerDialog(String elementName, float[] color, Stage stage, Skin skin) {
+            super(I18n.bundle.get("gui.colorpicker.title") + (elementName != null ? ": " + elementName : ""), skin, stage);
             this.cpd = this;
             this.color = new float[4];
             this.color[0] = color[0];
@@ -138,10 +139,14 @@ public class ColorPicker extends Image {
 
             buildSuper();
         }
+        public ColorPickerDialog(float[] color, Stage stage, Skin skin) {
+            this(null, color, stage, skin);
+        }
 
         @Override
         protected void build() {
-            float tlen = 50f * GlobalConf.UI_SCALE_FACTOR;
+            float textfieldLen = 50f * GlobalConf.UI_SCALE_FACTOR;
+            float sliderLen = 150f * GlobalConf.UI_SCALE_FACTOR;
             float colsize = 100f * GlobalConf.UI_SCALE_FACTOR;
             content.clear();
 
@@ -163,15 +168,19 @@ public class ColorPicker extends Image {
             sliders = new OwnSlider[4];
             OwnSlider sred, sgreen, sblue, salpha;
             sred = new OwnSlider(0f, 1f, 0.01f, skin);
+            sred.setWidth(sliderLen);
             sred.setValue(color[0]);
             sliders[0] = sred;
             sgreen = new OwnSlider(0f, 1f, 0.01f, skin);
+            sgreen.setWidth(sliderLen);
             sgreen.setValue(color[1]);
             sliders[1] = sgreen;
             sblue = new OwnSlider(0f, 1f, 0.01f, skin);
+            sblue.setWidth(sliderLen);
             sblue.setValue(color[2]);
             sliders[2] = sblue;
             salpha = new OwnSlider(0f, 1f, 0.01f, skin);
+            salpha.setWidth(sliderLen);
             salpha.setValue(color[3]);
             sliders[3] = salpha;
 
@@ -180,21 +189,52 @@ public class ColorPicker extends Image {
             FloatValidator fval = new FloatValidator(0f, 1f);
             OwnTextField tred, tgreen, tblue, talpha;
             tred = new OwnTextField(nf.format(color[0]), skin, fval);
-            tred.setWidth(tlen);
+            tred.setWidth(textfieldLen);
             textfields[0] = tred;
             tgreen = new OwnTextField(nf.format(color[1]), skin, fval);
-            tgreen.setWidth(tlen);
+            tgreen.setWidth(textfieldLen);
             textfields[1] = tgreen;
             tblue = new OwnTextField(nf.format(color[2]), skin, fval);
-            tblue.setWidth(tlen);
+            tblue.setWidth(textfieldLen);
             textfields[2] = tblue;
             talpha = new OwnTextField(nf.format(color[3]), skin, fval);
-            talpha.setWidth(tlen);
+            talpha.setWidth(textfieldLen);
             textfields[3] = talpha;
 
             /* Hex */
             IValidator hval = new HexColorValidator(true);
             hexfield = new OwnTextField(ColourUtils.rgbaToHex(color), skin, hval);
+            hexfield.setWidth(sliderLen);
+
+            /* Color table */
+            Table coltable = new Table();
+            float size = 15f * GlobalConf.UI_SCALE_FACTOR;
+            float cpad = 1f * GlobalConf.UI_SCALE_FACTOR;
+            int i = 1;
+            int n = 4 * 4 * 4;
+            float a = 1f;
+            for (float r = 0f; r <= 1f; r += 0.3333f) {
+                for (float g = 0f; g <= 1f; g += 0.3333f) {
+                    for (float b = 0f; b <= 1f; b += 0.3333f) {
+                        Image c = new Image(skin.getDrawable("white"));
+                        c.setColor(r, g, b, a);
+                        final float[] pick = new float[] { r, g, b, a };
+                        c.addListener(new ClickListener() {
+                            @Override
+                            public void clicked(InputEvent event, float x, float y) {
+                                cpd.setColor(pick);
+                            }
+                        });
+                        c.addListener(new TextTooltip(Arrays.toString(pick), skin));
+                        if (i % (n / 4) == 0) {
+                            coltable.add(c).size(size).pad(cpad).row();
+                        } else {
+                            coltable.add(c).size(size).pad(cpad);
+                        }
+                        i++;
+                    }
+                }
+            }
 
             // Connect sliders
             sred.addListener(new UpdaterListener(true, this, color, 0));
@@ -223,23 +263,25 @@ public class ColorPicker extends Image {
             content.add(hg).padBottom(pad * 2f).colspan(3).row();
 
             content.add(new OwnLabel(I18n.txt("gui.colorpicker.red"), skin)).padRight(pad).padBottom(pad);
-            content.add(sred).padRight(pad).padBottom(pad);
+            content.add(sred).left().padRight(pad).padBottom(pad);
             content.add(tred).padBottom(pad).row();
 
             content.add(new OwnLabel(I18n.txt("gui.colorpicker.green"), skin)).padRight(pad).padBottom(pad);
-            content.add(sgreen).padRight(pad).padBottom(pad);
+            content.add(sgreen).left().padRight(pad).padBottom(pad);
             content.add(tgreen).padBottom(pad).row();
 
             content.add(new OwnLabel(I18n.txt("gui.colorpicker.blue"), skin)).padRight(pad).padBottom(pad);
-            content.add(sblue).padRight(pad).padBottom(pad);
+            content.add(sblue).left().padRight(pad).padBottom(pad);
             content.add(tblue).padBottom(pad).row();
 
             content.add(new OwnLabel(I18n.txt("gui.colorpicker.alpha"), skin)).padRight(pad).padBottom(pad);
-            content.add(salpha).padRight(pad).padBottom(pad);
+            content.add(salpha).left().padRight(pad).padBottom(pad);
             content.add(talpha).padBottom(pad).row();
 
             content.add(new OwnLabel(I18n.txt("gui.colorpicker.hex"), skin)).padRight(pad).padBottom(pad);
-            content.add(hexfield).colspan(2).padBottom(pad).row();
+            content.add(hexfield).colspan(2).left().padBottom(pad).row();
+
+            content.add(coltable).colspan(3).padBottom(pad).row();
 
         }
 
@@ -251,6 +293,10 @@ public class ColorPicker extends Image {
         @Override
         protected void cancel() {
             color = null;
+        }
+
+        public void setColor(float[] color){
+            setColor(color[0], color[1], color[2], color[3]);
         }
 
         public void setColor(float red, float green, float blue, float alpha) {

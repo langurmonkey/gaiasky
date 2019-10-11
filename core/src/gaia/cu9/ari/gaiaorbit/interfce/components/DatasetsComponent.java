@@ -116,7 +116,7 @@ public class DatasetsComponent extends GuiComponent implements IObserver {
         // Dataset table
         Table t = new Table();
         // Color picker
-        ColorPicker cp = new ColorPicker(ci.color, stage, skin);
+        ColorPicker cp = new ColorPicker(ci.name, ci.color, stage, skin);
         cp.addListener(new TextTooltip(I18n.txt("gui.tooltip.dataset.highlight.color.select"), skin));
         cp.setNewColorRunnable(()->{
             ci.setColor(cp.getPickedColor());

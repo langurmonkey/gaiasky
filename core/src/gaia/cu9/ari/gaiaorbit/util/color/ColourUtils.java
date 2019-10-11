@@ -69,7 +69,6 @@ public class ColourUtils {
 
     public static float[] hexToRgba(String hex) {
         return new float[] { Integer.valueOf(hex.substring(1, 3), 16) / 255f, Integer.valueOf(hex.substring(3, 5), 16) / 255f, Integer.valueOf(hex.substring(5, 7), 16) / 255f, Integer.valueOf(hex.substring(7, 9), 16) / 255f };
-
     }
 
     public static float[] hexToRgb(String hex) {
