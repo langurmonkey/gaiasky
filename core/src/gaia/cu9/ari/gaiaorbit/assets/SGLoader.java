@@ -51,7 +51,7 @@ public class SGLoader extends AsynchronousAssetLoader<ISceneGraph, SGLoader.SGLo
         String[] tokens = files.split("\\s*,\\s*");
 
         // Add autoload files to the mix
-        Array<String> filePaths = new Array<String>(tokens);
+        Array<String> filePaths = new Array<>(tokens);
         Path dataFolder = Paths.get(GlobalConf.data.DATA_LOCATION);
         File[] autoloadFiles = dataFolder.toFile().listFiles((dir, name) -> {
             return name != null && name.startsWith("autoload-") && name.endsWith(".json");

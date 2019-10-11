@@ -118,6 +118,22 @@ public class CrashReporter {
         strArray.add("Java VM version: " + System.getProperty("java.vm.version"));
         strArray.add("Java VM vendor: " + System.getProperty("java.vm.vendor"));
 
+        /* System information */
+        strArray.add("");
+        strArray.add("## SYSTEM INFORMATION");
+        strArray.add("Available processors (cores): " + Runtime.getRuntime().availableProcessors());
+        strArray.add("Free memory (bytes): " + Runtime.getRuntime().freeMemory());
+        long maxMemory = Runtime.getRuntime().maxMemory();
+        strArray.add("Maximum memory (bytes): " + (maxMemory == Long.MAX_VALUE ? "no limit" : maxMemory));
+        strArray.add("Total memory available to JVM (bytes): " + Runtime.getRuntime().totalMemory());
+        File[] roots = File.listRoots();
+        for (File root : roots) {
+            strArray.add("File system root: " + root.getAbsolutePath());
+            strArray.add("Total space (bytes): " + root.getTotalSpace());
+            strArray.add("Free space (bytes): " + root.getFreeSpace());
+            strArray.add("Usable space (bytes): " + root.getUsableSpace());
+        }
+
         /* OS info */
         strArray.add("");
         strArray.add("## OS INFORMATION");
@@ -125,9 +141,9 @@ public class CrashReporter {
         strArray.add("OS version: " + System.getProperty("os.version"));
         strArray.add("OS architecture: " + System.getProperty("os.arch"));
 
-        strArray.add("");
         try {
             /* GL info */
+            strArray.add("");
             strArray.add("## GL INFORMATION");
             strArray.add("Graphcis device: " + Gdx.gl.glGetString(GL20.GL_RENDERER));
             strArray.add("GL vendor: " + Gdx.gl.glGetString(GL20.GL_VENDOR));
@@ -154,20 +170,6 @@ public class CrashReporter {
             strArray.add("## GL INFORMATION not available");
         }
 
-        strArray.add("");
-        strArray.add("## SYSTEM INFORMATION");
-        strArray.add("Available processors (cores): " + Runtime.getRuntime().availableProcessors());
-        strArray.add("Free memory (bytes): " + Runtime.getRuntime().freeMemory());
-        long maxMemory = Runtime.getRuntime().maxMemory();
-        strArray.add("Maximum memory (bytes): " + (maxMemory == Long.MAX_VALUE ? "no limit" : maxMemory));
-        strArray.add("Total memory available to JVM (bytes): " + Runtime.getRuntime().totalMemory());
-        File[] roots = File.listRoots();
-        for (File root : roots) {
-            strArray.add("File system root: " + root.getAbsolutePath());
-            strArray.add("Total space (bytes): " + root.getTotalSpace());
-            strArray.add("Free space (bytes): " + root.getFreeSpace());
-            strArray.add("Usable space (bytes): " + root.getUsableSpace());
-        }
     }
 
     private static String arrayToStr(String[] arr, String sep) {

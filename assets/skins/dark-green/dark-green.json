@@ -782,6 +782,13 @@
       "messageFontColor": "dark-gray",
       "cursor": "cursor"
     },
+    "disabled-nobg": {
+      "selection": "selection",
+      "font": "ui-11",
+      "fontColor": "white",
+      "messageFontColor": "dark-gray",
+      "cursor": "cursor"
+    },
     "info": {
       "font": "ui-11",
       "fontColor": "sc-blue",

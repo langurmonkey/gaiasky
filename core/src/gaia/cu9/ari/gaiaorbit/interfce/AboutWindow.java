@@ -305,12 +305,12 @@ public class AboutWindow extends GenericDialog {
         Gdx.gl.glGetIntegerv(GL20.GL_MAX_TEXTURE_SIZE, buf);
         int maxSize = buf.get(0);
         int lines = GlobalResources.countOccurrences(extensions, '\n');
-        OwnTextArea maxTexSize = new OwnTextArea("Max texture size: " + maxSize + '\n' + extensions, skin, "no-disabled");
+        OwnTextArea maxTexSize = new OwnTextArea("Max texture size: " + maxSize + '\n' + extensions, skin, "disabled-nobg");
         maxTexSize.setDisabled(true);
         maxTexSize.setPrefRows(lines);
         maxTexSize.clearListeners();
 
-        OwnScrollPane glextensionsscroll = new OwnScrollPane(maxTexSize, skin, "minimalist-nobg");
+        OwnScrollPane glextensionsscroll = new OwnScrollPane(maxTexSize, skin, "default-nobg");
         glextensionsscroll.setWidth(taWidth);
         glextensionsscroll.setHeight(taHeight);
         glextensionsscroll.setForceScroll(false, true);
@@ -361,6 +361,8 @@ public class AboutWindow extends GenericDialog {
         contentSystem.add(sysostitle).align(Align.topLeft).padRight(pad);
         contentSystem.add(sysos).align(Align.left);
         contentSystem.row();
+
+        contentSystem.row();
         contentSystem.add(glrenderertitle).align(Align.topLeft).padRight(pad).padTop(pad5);
         contentSystem.add(glrenderer).align(Align.left).padTop(pad5);
         contentSystem.row();
@@ -378,6 +380,15 @@ public class AboutWindow extends GenericDialog {
         contentSystem.row();
         contentSystem.add(glextensionstitle).align(Align.topLeft).padRight(pad).padTop(pad5);
         contentSystem.add(glextensionsscroll).align(Align.left).padTop(pad5);
+
+        OwnScrollPane systemScroll = new OwnScrollPane(contentSystem, skin, "minimalist-nobg");
+        systemScroll.setFadeScrollBars(false);
+        systemScroll.setScrollingDisabled(true, false);
+        systemScroll.setOverscroll(false, false);
+        systemScroll.setSmoothScrolling(true);
+        systemScroll.setHeight(500f * GlobalConf.UI_SCALE_FACTOR);
+        systemScroll.pack();
+
 
         /* CONTENT 4 - UPDATES */
         final Table contentUpdates = new Table(skin);
@@ -402,7 +413,7 @@ public class AboutWindow extends GenericDialog {
         /** ADD ALL CONTENT **/
         tabContent.addActor(contentHelp);
         tabContent.addActor(contentAbout);
-        tabContent.addActor(contentSystem);
+        tabContent.addActor(systemScroll);
         tabContent.addActor(contentUpdates);
 
         content.add(tabContent).expand().fill();
@@ -442,7 +453,6 @@ public class AboutWindow extends GenericDialog {
             return false;
         }
     }
-
 
     @Override
     protected void accept() {
