@@ -5,6 +5,9 @@
 
 package gaia.cu9.ari.gaiaorbit.script;
 
+import com.badlogic.gdx.Gdx;
+import gaia.cu9.ari.gaiaorbit.event.EventManager;
+import gaia.cu9.ari.gaiaorbit.event.Events;
 import gaia.cu9.ari.gaiaorbit.util.Logger;
 import py4j.DefaultGatewayServerListener;
 import py4j.GatewayServer;
@@ -27,12 +30,14 @@ public class ScriptingServer {
 
                 @Override
                 public void connectionStarted(Py4JServerConnection gatewayConnection) {
-                    logger.debug("Connection started");
+                    logger.info("Connection started: " + gatewayConnection.getSocket().toString());
                 }
 
                 @Override
                 public void connectionStopped(Py4JServerConnection gatewayConnection) {
-                    logger.debug("Connection stopped");
+                    // Enable input, just in case
+                    Gdx.app.postRunnable(() -> EventManager.instance.post(Events.INPUT_ENABLED_CMD, true));
+                    logger.info("Connection stopped: " + gatewayConnection.getSocket().toString());
                 }
 
                 @Override
