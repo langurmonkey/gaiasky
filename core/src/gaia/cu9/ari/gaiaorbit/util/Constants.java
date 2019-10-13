@@ -168,7 +168,7 @@ public class Constants {
     /** Minimum star brightness **/
     public static final float MIN_STAR_BRIGHT = 0.1f;
     /** Maximum star brightness **/
-    public static final float MAX_STAR_BRIGHT = 15f;
+    public static final float MAX_STAR_BRIGHT = 25f;
 
     /** Minimum number factor for proper motion vectors **/
     public static final float MIN_PM_NUM_FACTOR = 1f;

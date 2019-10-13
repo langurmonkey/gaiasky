@@ -110,7 +110,7 @@ public class StarGroupRenderSystem extends ImmediateRenderSystem implements IObs
                                 tempVerts[curr.vertexIdx + curr.colorOffset] = starGroup.getColor(i);
 
                                 // SIZE, APPMAG, CMAP VALUE, OTHER
-                                tempVerts[curr.vertexIdx + sizeOffset] = (float) (p.size() * Constants.STAR_SIZE_FACTOR) * starGroup.highlightedSizeFactor();
+                                tempVerts[curr.vertexIdx + sizeOffset] = (float) (Math.pow(p.size(), 0.9) * Constants.STAR_SIZE_FACTOR) * starGroup.highlightedSizeFactor();
                                 tempVerts[curr.vertexIdx + sizeOffset + 1] = (float) p.appmag();
                                 tempVerts[curr.vertexIdx + sizeOffset + 2] = (float) p.appmag();
 
