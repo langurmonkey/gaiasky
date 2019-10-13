@@ -132,7 +132,7 @@ public class AttitudeXmlParser {
 
         /** MODEL ELEMENT **/
         String name = model.get("name");
-        String className = model.get("classname");
+        String className = model.get("classname").replace("gaia.cu9.ari.gaiaorbit", "gaiasky");
         double startTimeNsSince2010 = (AstroUtils.getJulianDate(activationTime) - AstroUtils.JD_J2010) * Nature.D_TO_NS;
 
         /** SCAN LAW ELEMENT **/
