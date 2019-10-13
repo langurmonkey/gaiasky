@@ -3,15 +3,15 @@
  * See the file LICENSE.md in the project root for full license details.
  */
 
-package gaia.cu9.ari.gaiaorbit.rest;
+package gaiasky.rest;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import gaia.cu9.ari.gaiaorbit.script.EventScriptingInterface;
-import gaia.cu9.ari.gaiaorbit.script.IScriptingInterface;
-import gaia.cu9.ari.gaiaorbit.util.GlobalConf;
-import gaia.cu9.ari.gaiaorbit.util.Logger;
-import gaia.cu9.ari.gaiaorbit.util.Logger.Log;
+import gaiasky.script.EventScriptingInterface;
+import gaiasky.script.IScriptingInterface;
+import gaiasky.util.GlobalConf;
+import gaiasky.util.Logger;
+import gaiasky.util.Logger.Log;
 
 import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
@@ -29,7 +29,7 @@ import static spark.Spark.*;
  * dangerous. This REST API was developed for an exhibition with an isolated network.
  *
  * The API allows to call methods from the scripting interface
- * (gaia.cu9.ari.gaiaorbit.script.IScriptingInterface) remotely via HTTP for remote control.
+ * (gaiasky.script.IScriptingInterface) remotely via HTTP for remote control.
  *
  * Syntax of API commands is set to be close to the Java method interface, but does not cover
  * it in all generality to permit simple usage. Particularly note that the REST server receives
@@ -62,7 +62,7 @@ import static spark.Spark.*;
  * The 'cmd_syntax' entry you get from the 'help' command (e.g. http://localhost:8080/api/help)
  * gives a summary of permitted commands and their return type. Details on the meaning of the
  * command and its parameters need to be found from the scripting API documention:
- * https://langurmonkey.github.io/gaiasky/javadoc/gaia/cu9/ari/gaiaorbit/script/IScriptingInterface.html
+ * https://langurmonkey.github.io/gaiasky/javadoc/gaiasky/script/IScriptingInterface.html
  *
  * To examine, what happens during an API call, set the default loglevel of SimpleLogger to
  * 'info' or lower (in core/build.gradle).
@@ -85,7 +85,7 @@ import static spark.Spark.*;
  *         recommends static context.
  *
  *         This gets initialized in
- *         core/src/gaia/cu9/ari/gaiaorbit/desktop/GaiaSkyDesktop.java with some
+ *         core/src/gaiasky/desktop/GaiaSkyDesktop.java with some
  *         lazy initialization since Spark wants be be used in static context.
  */
 public class RESTServer {
@@ -262,7 +262,7 @@ public class RESTServer {
 	 *
 	 * This is implemented via Java Reflections and gives access to all methods from
 	 * IScriptingInterface
-	 * (core/src/gaia/cu9/ari/gaiaorbit/script/IScriptingInterface.java).
+	 * (core/src/gaiasky/script/IScriptingInterface.java).
 	 * Additionally, it provides "special-purpose commands", see commented source
 	 * block.
 	 *

@@ -3,9 +3,9 @@
  * See the file LICENSE.md in the project root for full license details.
  */
 
-package gaia.cu9.ari.gaiaorbit.render;
+package gaiasky.render;
 
-import gaia.cu9.ari.gaiaorbit.scenegraph.ISceneGraph;
+import gaiasky.scenegraph.ISceneGraph;
 
 /**
  * An abstract renderer.

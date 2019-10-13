@@ -9,12 +9,12 @@
  * @author tsagrista
  */
 
-package gaia.cu9.ari.gaiaorbit.util.gdx.contrib.postprocess.effects;
+package gaiasky.util.gdx.contrib.postprocess.effects;
 
 import com.badlogic.gdx.graphics.glutils.FrameBuffer;
-import gaia.cu9.ari.gaiaorbit.util.gdx.contrib.postprocess.PostProcessorEffect;
-import gaia.cu9.ari.gaiaorbit.util.gdx.contrib.postprocess.filters.CubemapProjectionsFilter;
-import gaia.cu9.ari.gaiaorbit.util.gdx.contrib.utils.GaiaSkyFrameBuffer;
+import gaiasky.util.gdx.contrib.postprocess.PostProcessorEffect;
+import gaiasky.util.gdx.contrib.postprocess.filters.CubemapProjectionsFilter;
+import gaiasky.util.gdx.contrib.utils.GaiaSkyFrameBuffer;
 
 public final class CubemapProjections extends PostProcessorEffect {
     private CubemapProjectionsFilter filter;

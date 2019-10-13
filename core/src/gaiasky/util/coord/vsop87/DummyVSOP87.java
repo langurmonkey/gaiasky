@@ -3,7 +3,7 @@
  * See the file LICENSE.md in the project root for full license details.
  */
 
-package gaia.cu9.ari.gaiaorbit.util.coord.vsop87;
+package gaiasky.util.coord.vsop87;
 
 public class DummyVSOP87 extends AbstractVSOP87 {
 

@@ -3,9 +3,9 @@
  * See the file LICENSE.md in the project root for full license details.
  */
 
-package gaia.cu9.ari.gaiaorbit.desktop.format;
+package gaiasky.desktop.format;
 
-import gaia.cu9.ari.gaiaorbit.util.format.INumberFormat;
+import gaiasky.util.format.INumberFormat;
 
 import java.text.DecimalFormat;
 

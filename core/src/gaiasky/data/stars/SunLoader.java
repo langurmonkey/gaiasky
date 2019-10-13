@@ -3,14 +3,14 @@
  * See the file LICENSE.md in the project root for full license details.
  */
 
-package gaia.cu9.ari.gaiaorbit.data.stars;
+package gaiasky.data.stars;
 
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.TimeUtils;
-import gaia.cu9.ari.gaiaorbit.data.ISceneGraphLoader;
-import gaia.cu9.ari.gaiaorbit.scenegraph.CelestialBody;
-import gaia.cu9.ari.gaiaorbit.scenegraph.Star;
-import gaia.cu9.ari.gaiaorbit.util.math.Vector3d;
+import gaiasky.data.ISceneGraphLoader;
+import gaiasky.scenegraph.CelestialBody;
+import gaiasky.scenegraph.Star;
+import gaiasky.util.math.Vector3d;
 
 /**
  * Adds the sun manually

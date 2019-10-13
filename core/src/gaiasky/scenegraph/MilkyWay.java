@@ -3,7 +3,7 @@
  * See the file LICENSE.md in the project root for full license details.
  */
 
-package gaia.cu9.ari.gaiaorbit.scenegraph;
+package gaiasky.scenegraph;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.assets.AssetManager;
@@ -15,28 +15,28 @@ import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.reflect.ClassReflection;
 import com.badlogic.gdx.utils.reflect.Method;
 import com.badlogic.gdx.utils.reflect.ReflectionException;
-import gaia.cu9.ari.gaiaorbit.GaiaSky;
-import gaia.cu9.ari.gaiaorbit.data.group.PointDataProvider;
-import gaia.cu9.ari.gaiaorbit.render.ComponentTypes.ComponentType;
-import gaia.cu9.ari.gaiaorbit.render.I3DTextRenderable;
-import gaia.cu9.ari.gaiaorbit.render.RenderingContext;
-import gaia.cu9.ari.gaiaorbit.render.system.FontRenderSystem;
-import gaia.cu9.ari.gaiaorbit.scenegraph.ParticleGroup.ParticleBean;
-import gaia.cu9.ari.gaiaorbit.scenegraph.camera.ICamera;
-import gaia.cu9.ari.gaiaorbit.scenegraph.component.GalaxydataComponent;
-import gaia.cu9.ari.gaiaorbit.scenegraph.component.ModelComponent;
-import gaia.cu9.ari.gaiaorbit.util.Constants;
-import gaia.cu9.ari.gaiaorbit.util.GlobalResources;
-import gaia.cu9.ari.gaiaorbit.util.Logger;
-import gaia.cu9.ari.gaiaorbit.util.coord.Coordinates;
-import gaia.cu9.ari.gaiaorbit.util.gdx.g2d.ExtSpriteBatch;
-import gaia.cu9.ari.gaiaorbit.util.gdx.shader.ExtShaderProgram;
-import gaia.cu9.ari.gaiaorbit.util.gravwaves.RelativisticEffectsManager;
-import gaia.cu9.ari.gaiaorbit.util.math.MathUtilsd;
-import gaia.cu9.ari.gaiaorbit.util.math.Matrix4d;
-import gaia.cu9.ari.gaiaorbit.util.math.Vector3d;
-import gaia.cu9.ari.gaiaorbit.util.time.ITimeFrameProvider;
-import gaia.cu9.ari.gaiaorbit.util.tree.LoadStatus;
+import gaiasky.GaiaSky;
+import gaiasky.data.group.PointDataProvider;
+import gaiasky.render.ComponentTypes.ComponentType;
+import gaiasky.render.I3DTextRenderable;
+import gaiasky.render.RenderingContext;
+import gaiasky.render.system.FontRenderSystem;
+import gaiasky.scenegraph.ParticleGroup.ParticleBean;
+import gaiasky.scenegraph.camera.ICamera;
+import gaiasky.scenegraph.component.GalaxydataComponent;
+import gaiasky.scenegraph.component.ModelComponent;
+import gaiasky.util.Constants;
+import gaiasky.util.GlobalResources;
+import gaiasky.util.Logger;
+import gaiasky.util.coord.Coordinates;
+import gaiasky.util.gdx.g2d.ExtSpriteBatch;
+import gaiasky.util.gdx.shader.ExtShaderProgram;
+import gaiasky.util.gravwaves.RelativisticEffectsManager;
+import gaiasky.util.math.MathUtilsd;
+import gaiasky.util.math.Matrix4d;
+import gaiasky.util.math.Vector3d;
+import gaiasky.util.time.ITimeFrameProvider;
+import gaiasky.util.tree.LoadStatus;
 
 public class MilkyWay extends AbstractPositionEntity implements I3DTextRenderable {
     float[] labelColour = new float[] { 1f, 1f, 1f, 1f };

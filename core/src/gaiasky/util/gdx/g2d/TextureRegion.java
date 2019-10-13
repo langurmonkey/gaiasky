@@ -19,7 +19,7 @@
  * limitations under the License.
  ******************************************************************************/
 
-package gaia.cu9.ari.gaiaorbit.util.gdx.g2d;
+package gaiasky.util.gdx.g2d;
 
 import com.badlogic.gdx.graphics.Texture;
 

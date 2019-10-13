@@ -1,4 +1,4 @@
-package gaia.cu9.ari.gaiaorbit.scenegraph;
+package gaiasky.scenegraph;
 
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.g3d.Environment;
@@ -6,17 +6,17 @@ import com.badlogic.gdx.graphics.g3d.Material;
 import com.badlogic.gdx.graphics.g3d.attributes.BlendingAttribute;
 import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Vector3;
-import gaia.cu9.ari.gaiaorbit.render.ComponentTypes;
-import gaia.cu9.ari.gaiaorbit.render.ILineRenderable;
-import gaia.cu9.ari.gaiaorbit.render.IModelRenderable;
-import gaia.cu9.ari.gaiaorbit.render.RenderingContext;
-import gaia.cu9.ari.gaiaorbit.render.system.LineRenderSystem;
-import gaia.cu9.ari.gaiaorbit.scenegraph.camera.ICamera;
-import gaia.cu9.ari.gaiaorbit.util.Constants;
-import gaia.cu9.ari.gaiaorbit.util.gdx.IntModelBatch;
-import gaia.cu9.ari.gaiaorbit.util.gdx.model.IntModelInstance;
-import gaia.cu9.ari.gaiaorbit.util.time.ITimeFrameProvider;
-import gaia.cu9.ari.gaiaorbit.vr.openvr.VRContext.VRDevice;
+import gaiasky.render.ComponentTypes;
+import gaiasky.render.ILineRenderable;
+import gaiasky.render.IModelRenderable;
+import gaiasky.render.RenderingContext;
+import gaiasky.render.system.LineRenderSystem;
+import gaiasky.scenegraph.camera.ICamera;
+import gaiasky.util.Constants;
+import gaiasky.util.gdx.IntModelBatch;
+import gaiasky.util.gdx.model.IntModelInstance;
+import gaiasky.util.time.ITimeFrameProvider;
+import gaiasky.vr.openvr.VRContext.VRDevice;
 
 public class StubModel extends AbstractPositionEntity implements IModelRenderable, ILineRenderable {
 

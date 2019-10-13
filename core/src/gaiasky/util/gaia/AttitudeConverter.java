@@ -3,12 +3,12 @@
  * See the file LICENSE.md in the project root for full license details.
  */
 
-package gaia.cu9.ari.gaiaorbit.util.gaia;
+package gaiasky.util.gaia;
 
-import gaia.cu9.ari.gaiaorbit.util.coord.Coordinates;
-import gaia.cu9.ari.gaiaorbit.util.coord.NslSun;
-import gaia.cu9.ari.gaiaorbit.util.math.Quaterniond;
-import gaia.cu9.ari.gaiaorbit.util.math.Vector3d;
+import gaiasky.util.coord.Coordinates;
+import gaiasky.util.coord.NslSun;
+import gaiasky.util.math.Quaterniond;
+import gaiasky.util.math.Vector3d;
 
 /**
  * Convert a given set of heliotropic angles into a quaternion

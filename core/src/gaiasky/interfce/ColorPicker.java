@@ -3,7 +3,7 @@
  * See the file LICENSE.md in the project root for full license details.
  */
 
-package gaia.cu9.ari.gaiaorbit.interfce;
+package gaiasky.interfce;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input.Buttons;
@@ -14,18 +14,18 @@ import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener.ChangeEvent;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
-import gaia.cu9.ari.gaiaorbit.util.GlobalConf;
-import gaia.cu9.ari.gaiaorbit.util.GlobalResources;
-import gaia.cu9.ari.gaiaorbit.util.I18n;
-import gaia.cu9.ari.gaiaorbit.util.color.ColourUtils;
-import gaia.cu9.ari.gaiaorbit.util.format.INumberFormat;
-import gaia.cu9.ari.gaiaorbit.util.format.NumberFormatFactory;
-import gaia.cu9.ari.gaiaorbit.util.scene2d.OwnLabel;
-import gaia.cu9.ari.gaiaorbit.util.scene2d.OwnSlider;
-import gaia.cu9.ari.gaiaorbit.util.scene2d.OwnTextField;
-import gaia.cu9.ari.gaiaorbit.util.validator.FloatValidator;
-import gaia.cu9.ari.gaiaorbit.util.validator.HexColorValidator;
-import gaia.cu9.ari.gaiaorbit.util.validator.IValidator;
+import gaiasky.util.GlobalConf;
+import gaiasky.util.GlobalResources;
+import gaiasky.util.I18n;
+import gaiasky.util.color.ColourUtils;
+import gaiasky.util.format.INumberFormat;
+import gaiasky.util.format.NumberFormatFactory;
+import gaiasky.util.scene2d.OwnLabel;
+import gaiasky.util.scene2d.OwnSlider;
+import gaiasky.util.scene2d.OwnTextField;
+import gaiasky.util.validator.FloatValidator;
+import gaiasky.util.validator.HexColorValidator;
+import gaiasky.util.validator.IValidator;
 
 import java.util.Arrays;
 

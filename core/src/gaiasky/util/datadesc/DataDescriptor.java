@@ -3,7 +3,7 @@
  * See the file LICENSE.md in the project root for full license details.
  */
 
-package gaia.cu9.ari.gaiaorbit.util.datadesc;
+package gaiasky.util.datadesc;
 
 import java.util.List;
 

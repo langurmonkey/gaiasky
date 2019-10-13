@@ -3,11 +3,11 @@
  * See the file LICENSE.md in the project root for full license details.
  */
 
-package gaia.cu9.ari.gaiaorbit.util.units;
+package gaiasky.util.units;
 
-import gaia.cu9.ari.gaiaorbit.util.units.Quantity.Angle.AngleUnit;
-import gaia.cu9.ari.gaiaorbit.util.units.Quantity.Brightness.BrightnessUnit;
-import gaia.cu9.ari.gaiaorbit.util.units.Quantity.Length.LengthUnit;
+import gaiasky.util.units.Quantity.Angle.AngleUnit;
+import gaiasky.util.units.Quantity.Brightness.BrightnessUnit;
+import gaiasky.util.units.Quantity.Length.LengthUnit;
 
 /**
  * A wee utility class that provides unit conversion mechanisms.

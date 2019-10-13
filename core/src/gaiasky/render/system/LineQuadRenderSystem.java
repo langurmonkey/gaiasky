@@ -3,7 +3,7 @@
  * See the file LICENSE.md in the project root for full license details.
  */
 
-package gaia.cu9.ari.gaiaorbit.render.system;
+package gaiasky.render.system;
 
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
@@ -11,17 +11,17 @@ import com.badlogic.gdx.graphics.VertexAttribute;
 import com.badlogic.gdx.graphics.VertexAttributes.Usage;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Pool;
-import gaia.cu9.ari.gaiaorbit.render.ComponentTypes;
-import gaia.cu9.ari.gaiaorbit.render.ILineRenderable;
-import gaia.cu9.ari.gaiaorbit.render.IRenderable;
-import gaia.cu9.ari.gaiaorbit.render.SceneGraphRenderer;
-import gaia.cu9.ari.gaiaorbit.scenegraph.Particle;
-import gaia.cu9.ari.gaiaorbit.scenegraph.SceneGraphNode.RenderGroup;
-import gaia.cu9.ari.gaiaorbit.scenegraph.camera.ICamera;
-import gaia.cu9.ari.gaiaorbit.util.gdx.mesh.IntMesh;
-import gaia.cu9.ari.gaiaorbit.util.gdx.shader.ExtShaderProgram;
-import gaia.cu9.ari.gaiaorbit.util.math.MathUtilsd;
-import gaia.cu9.ari.gaiaorbit.util.math.Vector3d;
+import gaiasky.render.ComponentTypes;
+import gaiasky.render.ILineRenderable;
+import gaiasky.render.IRenderable;
+import gaiasky.render.SceneGraphRenderer;
+import gaiasky.scenegraph.Particle;
+import gaiasky.scenegraph.SceneGraphNode.RenderGroup;
+import gaiasky.scenegraph.camera.ICamera;
+import gaiasky.util.gdx.mesh.IntMesh;
+import gaiasky.util.gdx.shader.ExtShaderProgram;
+import gaiasky.util.math.MathUtilsd;
+import gaiasky.util.math.Vector3d;
 
 /**
  * Renders lines as Polyline Quadstrips (Polyboards).

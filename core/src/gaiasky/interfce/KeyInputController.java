@@ -3,15 +3,15 @@
  * See the file LICENSE.md in the project root for full license details.
  */
 
-package gaia.cu9.ari.gaiaorbit.interfce;
+package gaiasky.interfce;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.InputAdapter;
-import gaia.cu9.ari.gaiaorbit.event.EventManager;
-import gaia.cu9.ari.gaiaorbit.event.Events;
-import gaia.cu9.ari.gaiaorbit.interfce.KeyBindings.ProgramAction;
-import gaia.cu9.ari.gaiaorbit.util.GlobalConf;
+import gaiasky.event.EventManager;
+import gaiasky.event.Events;
+import gaiasky.interfce.KeyBindings.ProgramAction;
+import gaiasky.util.GlobalConf;
 
 import java.util.HashSet;
 import java.util.Set;

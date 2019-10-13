@@ -3,14 +3,14 @@
  * See the file LICENSE.md in the project root for full license details.
  */
 
-package gaia.cu9.ari.gaiaorbit.util.units;
+package gaiasky.util.units;
 
-import gaia.cu9.ari.gaiaorbit.util.coord.Coordinates;
-import gaia.cu9.ari.gaiaorbit.util.math.Vector3d;
-import gaia.cu9.ari.gaiaorbit.util.units.Quantity.Angle;
-import gaia.cu9.ari.gaiaorbit.util.units.Quantity.Angle.AngleUnit;
-import gaia.cu9.ari.gaiaorbit.util.units.Quantity.Length;
-import gaia.cu9.ari.gaiaorbit.util.units.Quantity.Length.LengthUnit;
+import gaiasky.util.coord.Coordinates;
+import gaiasky.util.math.Vector3d;
+import gaiasky.util.units.Quantity.Angle;
+import gaiasky.util.units.Quantity.Angle.AngleUnit;
+import gaiasky.util.units.Quantity.Length;
+import gaiasky.util.units.Quantity.Length.LengthUnit;
 
 /**
  * Helper class that transforms various positional information into the internal

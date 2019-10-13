@@ -19,12 +19,12 @@
  * limitations under the License.
  ******************************************************************************/
 
-package gaia.cu9.ari.gaiaorbit.util.gdx.shader.provider;
+package gaiasky.util.gdx.shader.provider;
 
 import com.badlogic.gdx.files.FileHandle;
-import gaia.cu9.ari.gaiaorbit.util.gdx.IntRenderable;
-import gaia.cu9.ari.gaiaorbit.util.gdx.shader.DepthIntShader;
-import gaia.cu9.ari.gaiaorbit.util.gdx.shader.IntShader;
+import gaiasky.util.gdx.IntRenderable;
+import gaiasky.util.gdx.shader.DepthIntShader;
+import gaiasky.util.gdx.shader.IntShader;
 
 public class DepthIntShaderProvider extends BaseIntShaderProvider {
 	public final DepthIntShader.Config config;

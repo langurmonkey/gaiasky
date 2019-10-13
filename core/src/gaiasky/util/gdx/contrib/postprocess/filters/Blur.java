@@ -19,10 +19,10 @@
  * limitations under the License.
  ******************************************************************************/
 
-package gaia.cu9.ari.gaiaorbit.util.gdx.contrib.postprocess.filters;
+package gaiasky.util.gdx.contrib.postprocess.filters;
 
 import com.badlogic.gdx.utils.IntMap;
-import gaia.cu9.ari.gaiaorbit.util.gdx.contrib.postprocess.utils.PingPongBuffer;
+import gaiasky.util.gdx.contrib.postprocess.utils.PingPongBuffer;
 
 public final class Blur extends MultipassFilter {
     // @formatter:off

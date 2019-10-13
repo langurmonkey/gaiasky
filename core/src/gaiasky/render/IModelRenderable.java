@@ -3,9 +3,9 @@
  * See the file LICENSE.md in the project root for full license details.
  */
 
-package gaia.cu9.ari.gaiaorbit.render;
+package gaiasky.render;
 
-import gaia.cu9.ari.gaiaorbit.util.gdx.IntModelBatch;
+import gaiasky.util.gdx.IntModelBatch;
 
 /**
  * Interface to implement by all the entities that can be rendered as a model.

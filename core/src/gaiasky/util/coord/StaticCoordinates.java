@@ -3,17 +3,17 @@
  * See the file LICENSE.md in the project root for full license details.
  */
 
-package gaia.cu9.ari.gaiaorbit.util.coord;
+package gaiasky.util.coord;
 
 import com.badlogic.gdx.utils.reflect.ClassReflection;
 import com.badlogic.gdx.utils.reflect.Method;
 import com.badlogic.gdx.utils.reflect.ReflectionException;
-import gaia.cu9.ari.gaiaorbit.scenegraph.Orbit;
-import gaia.cu9.ari.gaiaorbit.util.Constants;
-import gaia.cu9.ari.gaiaorbit.util.Logger;
-import gaia.cu9.ari.gaiaorbit.util.math.MathUtilsd;
-import gaia.cu9.ari.gaiaorbit.util.math.Matrix4d;
-import gaia.cu9.ari.gaiaorbit.util.math.Vector3d;
+import gaiasky.scenegraph.Orbit;
+import gaiasky.util.Constants;
+import gaiasky.util.Logger;
+import gaiasky.util.math.MathUtilsd;
+import gaiasky.util.math.Matrix4d;
+import gaiasky.util.math.Vector3d;
 
 import java.time.Instant;
 

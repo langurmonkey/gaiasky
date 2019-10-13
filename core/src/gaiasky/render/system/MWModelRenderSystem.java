@@ -3,7 +3,7 @@
  * See the file LICENSE.md in the project root for full license details.
  */
 
-package gaia.cu9.ari.gaiaorbit.render.system;
+package gaiasky.render.system;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
@@ -13,19 +13,19 @@ import com.badlogic.gdx.graphics.VertexAttributes.Usage;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer.ShapeType;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.Array;
-import gaia.cu9.ari.gaiaorbit.event.Events;
-import gaia.cu9.ari.gaiaorbit.event.IObserver;
-import gaia.cu9.ari.gaiaorbit.render.IRenderable;
-import gaia.cu9.ari.gaiaorbit.scenegraph.MilkyWay;
-import gaia.cu9.ari.gaiaorbit.scenegraph.ParticleGroup.ParticleBean;
-import gaia.cu9.ari.gaiaorbit.scenegraph.SceneGraphNode.RenderGroup;
-import gaia.cu9.ari.gaiaorbit.scenegraph.camera.ICamera;
-import gaia.cu9.ari.gaiaorbit.util.GlobalConf;
-import gaia.cu9.ari.gaiaorbit.util.gdx.mesh.IntMesh;
-import gaia.cu9.ari.gaiaorbit.util.gdx.shader.ExtShaderProgram;
-import gaia.cu9.ari.gaiaorbit.util.math.MathUtilsd;
-import gaia.cu9.ari.gaiaorbit.util.math.StdRandom;
-import gaia.cu9.ari.gaiaorbit.util.tree.LoadStatus;
+import gaiasky.event.Events;
+import gaiasky.event.IObserver;
+import gaiasky.render.IRenderable;
+import gaiasky.scenegraph.MilkyWay;
+import gaiasky.scenegraph.ParticleGroup.ParticleBean;
+import gaiasky.scenegraph.SceneGraphNode.RenderGroup;
+import gaiasky.scenegraph.camera.ICamera;
+import gaiasky.util.GlobalConf;
+import gaiasky.util.gdx.mesh.IntMesh;
+import gaiasky.util.gdx.shader.ExtShaderProgram;
+import gaiasky.util.math.MathUtilsd;
+import gaiasky.util.math.StdRandom;
+import gaiasky.util.tree.LoadStatus;
 import org.lwjgl.opengl.GL30;
 
 public class MWModelRenderSystem extends ImmediateRenderSystem implements IObserver {

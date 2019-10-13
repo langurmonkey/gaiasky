@@ -3,12 +3,12 @@
  * See the file LICENSE.md in the project root for full license details.
  */
 
-package gaia.cu9.ari.gaiaorbit.interfce;
+package gaiasky.interfce;
 
 import com.badlogic.gdx.input.GestureDetector;
 import com.badlogic.gdx.utils.IntSet;
-import gaia.cu9.ari.gaiaorbit.scenegraph.camera.NaturalCamera;
-import gaia.cu9.ari.gaiaorbit.util.GlobalConf;
+import gaiasky.scenegraph.camera.NaturalCamera;
+import gaiasky.util.GlobalConf;
 
 public abstract class MouseKbdListener extends GestureDetector implements IInputListener {
 

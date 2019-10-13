@@ -3,11 +3,11 @@
  * See the file LICENSE.md in the project root for full license details.
  */
 
-package gaia.cu9.ari.gaiaorbit.util;
+package gaiasky.util;
 
-import gaia.cu9.ari.gaiaorbit.scenegraph.FadeNode;
-import gaia.cu9.ari.gaiaorbit.util.Logger.Log;
-import gaia.cu9.ari.gaiaorbit.util.color.ColourUtils;
+import gaiasky.scenegraph.FadeNode;
+import gaiasky.util.Logger.Log;
+import gaiasky.util.color.ColourUtils;
 
 import java.time.Instant;
 

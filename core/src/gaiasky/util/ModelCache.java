@@ -3,14 +3,14 @@
  * See the file LICENSE.md in the project root for full license details.
  */
 
-package gaia.cu9.ari.gaiaorbit.util;
+package gaiasky.util;
 
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.VertexAttributes.Usage;
 import com.badlogic.gdx.graphics.g3d.Material;
-import gaia.cu9.ari.gaiaorbit.util.gdx.IntMeshPartBuilder.VertexInfo;
-import gaia.cu9.ari.gaiaorbit.util.gdx.IntModelBuilder;
-import gaia.cu9.ari.gaiaorbit.util.gdx.model.IntModel;
+import gaiasky.util.gdx.IntMeshPartBuilder.VertexInfo;
+import gaiasky.util.gdx.IntModelBuilder;
+import gaiasky.util.gdx.model.IntModel;
 
 import java.util.Collection;
 import java.util.HashMap;

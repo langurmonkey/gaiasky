@@ -3,7 +3,7 @@
  * See the file LICENSE.md in the project root for full license details.
  */
 
-package gaia.cu9.ari.gaiaorbit.interfce;
+package gaiasky.interfce;
 
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Group;
@@ -11,23 +11,23 @@ import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener.ChangeEvent;
 import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.SnapshotArray;
-import gaia.cu9.ari.gaiaorbit.GaiaSky;
-import gaia.cu9.ari.gaiaorbit.event.EventManager;
-import gaia.cu9.ari.gaiaorbit.event.Events;
-import gaia.cu9.ari.gaiaorbit.event.IObserver;
-import gaia.cu9.ari.gaiaorbit.render.ComponentTypes.ComponentType;
-import gaia.cu9.ari.gaiaorbit.scenegraph.*;
-import gaia.cu9.ari.gaiaorbit.scenegraph.camera.CameraManager.CameraMode;
-import gaia.cu9.ari.gaiaorbit.util.*;
-import gaia.cu9.ari.gaiaorbit.util.coord.Coordinates;
-import gaia.cu9.ari.gaiaorbit.util.format.INumberFormat;
-import gaia.cu9.ari.gaiaorbit.util.format.NumberFormatFactory;
-import gaia.cu9.ari.gaiaorbit.util.math.MathUtilsd;
-import gaia.cu9.ari.gaiaorbit.util.math.Vector2d;
-import gaia.cu9.ari.gaiaorbit.util.math.Vector3d;
-import gaia.cu9.ari.gaiaorbit.util.scene2d.OwnLabel;
-import gaia.cu9.ari.gaiaorbit.util.scene2d.OwnTextIconButton;
-import gaia.cu9.ari.gaiaorbit.util.scene2d.OwnTextTooltip;
+import gaiasky.GaiaSky;
+import gaiasky.event.EventManager;
+import gaiasky.event.Events;
+import gaiasky.event.IObserver;
+import gaiasky.render.ComponentTypes.ComponentType;
+import gaiasky.scenegraph.*;
+import gaiasky.scenegraph.camera.CameraManager.CameraMode;
+import gaiasky.util.*;
+import gaiasky.util.coord.Coordinates;
+import gaiasky.util.format.INumberFormat;
+import gaiasky.util.format.NumberFormatFactory;
+import gaiasky.util.math.MathUtilsd;
+import gaiasky.util.math.Vector2d;
+import gaiasky.util.math.Vector3d;
+import gaiasky.util.scene2d.OwnLabel;
+import gaiasky.util.scene2d.OwnTextIconButton;
+import gaiasky.util.scene2d.OwnTextTooltip;
 
 /**
  * Part of the user interface which holds the information on the current focus

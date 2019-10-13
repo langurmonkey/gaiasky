@@ -3,7 +3,7 @@
  * See the file LICENSE.md in the project root for full license details.
  */
 
-package gaia.cu9.ari.gaiaorbit.render.system;
+package gaiasky.render.system;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
@@ -12,19 +12,19 @@ import com.badlogic.gdx.graphics.VertexAttributes.Usage;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer.ShapeType;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.Array;
-import gaia.cu9.ari.gaiaorbit.GaiaSky;
-import gaia.cu9.ari.gaiaorbit.event.EventManager;
-import gaia.cu9.ari.gaiaorbit.event.Events;
-import gaia.cu9.ari.gaiaorbit.event.IObserver;
-import gaia.cu9.ari.gaiaorbit.render.ComponentTypes.ComponentType;
-import gaia.cu9.ari.gaiaorbit.render.IRenderable;
-import gaia.cu9.ari.gaiaorbit.scenegraph.CelestialBody;
-import gaia.cu9.ari.gaiaorbit.scenegraph.SceneGraphNode.RenderGroup;
-import gaia.cu9.ari.gaiaorbit.scenegraph.camera.ICamera;
-import gaia.cu9.ari.gaiaorbit.util.GlobalConf;
-import gaia.cu9.ari.gaiaorbit.util.coord.AstroUtils;
-import gaia.cu9.ari.gaiaorbit.util.gdx.mesh.IntMesh;
-import gaia.cu9.ari.gaiaorbit.util.gdx.shader.ExtShaderProgram;
+import gaiasky.GaiaSky;
+import gaiasky.event.EventManager;
+import gaiasky.event.Events;
+import gaiasky.event.IObserver;
+import gaiasky.render.ComponentTypes.ComponentType;
+import gaiasky.render.IRenderable;
+import gaiasky.scenegraph.CelestialBody;
+import gaiasky.scenegraph.SceneGraphNode.RenderGroup;
+import gaiasky.scenegraph.camera.ICamera;
+import gaiasky.util.GlobalConf;
+import gaiasky.util.coord.AstroUtils;
+import gaiasky.util.gdx.mesh.IntMesh;
+import gaiasky.util.gdx.shader.ExtShaderProgram;
 import org.lwjgl.opengl.GL30;
 
 public class StarPointRenderSystem extends ImmediateRenderSystem implements IObserver {

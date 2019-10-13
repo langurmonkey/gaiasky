@@ -3,7 +3,7 @@
  * See the file LICENSE.md in the project root for full license details.
  */
 
-package gaia.cu9.ari.gaiaorbit.data;
+package gaiasky.data;
 
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.utils.Array;
@@ -13,10 +13,10 @@ import com.badlogic.gdx.utils.reflect.ClassReflection;
 import com.badlogic.gdx.utils.reflect.Constructor;
 import com.badlogic.gdx.utils.reflect.Method;
 import com.badlogic.gdx.utils.reflect.ReflectionException;
-import gaia.cu9.ari.gaiaorbit.scenegraph.SceneGraphNode;
-import gaia.cu9.ari.gaiaorbit.util.*;
-import gaia.cu9.ari.gaiaorbit.util.Logger.Log;
-import gaia.cu9.ari.gaiaorbit.util.coord.IBodyCoordinates;
+import gaiasky.scenegraph.SceneGraphNode;
+import gaiasky.util.*;
+import gaiasky.util.Logger.Log;
+import gaiasky.util.coord.IBodyCoordinates;
 
 import java.io.File;
 import java.nio.file.Path;
@@ -36,7 +36,7 @@ import java.util.TreeMap;
 public class JsonLoader<T extends SceneGraphNode> implements ISceneGraphLoader {
     private static final Log logger = Logger.getLogger(JsonLoader.class);
 
-    private static final String COMPONENTS_PACKAGE = "gaia.cu9.ari.gaiaorbit.scenegraph.component.";
+    private static final String COMPONENTS_PACKAGE = "gaiasky.scenegraph.component.";
     /** Params to skip in the normal processing **/
     private static final List<String> PARAM_SKIP = Arrays.asList("args", "impl", "comment", "comments");
 
@@ -75,7 +75,7 @@ public class JsonLoader<T extends SceneGraphNode> implements ISceneGraphLoader {
                     int size = 0;
                     while (child != null) {
                         size++;
-                        String clazzName = child.getString("impl");
+                        String clazzName = child.getString("impl").replace("gaia.cu9.ari.gaiaorbit", "gaiasky");
 
                         @SuppressWarnings("unchecked") Class<Object> clazz = (Class<Object>) ClassReflection.forName(clazzName);
 
@@ -166,7 +166,7 @@ public class JsonLoader<T extends SceneGraphNode> implements ISceneGraphLoader {
                         JsonValue vectorattrib = attribute.child;
                         int i = 0;
                         while (vectorattrib != null) {
-                            String clazzName = vectorattrib.getString("impl");
+                            String clazzName = vectorattrib.getString("impl").replace("gaia.cu9.ari.gaiaorbit", "gaiasky");
                             @SuppressWarnings("unchecked") Class<Object> childclazz = (Class<Object>) ClassReflection.forName(clazzName);
                             ((Object[]) value)[i] = convertJsonToObject(vectorattrib, childclazz);
                             i++;
@@ -185,6 +185,7 @@ public class JsonLoader<T extends SceneGraphNode> implements ISceneGraphLoader {
 
                 } else if (attribute.isObject()) {
                     String clazzName = attribute.has("impl") ? attribute.getString("impl") : COMPONENTS_PACKAGE + TextUtils.capitalise(attribute.name) + "Component";
+                    clazzName = clazzName.replace("gaia.cu9.ari.gaiaorbit", "gaiasky");
                     try {
                         valueClass = ClassReflection.forName(clazzName);
                         value = convertJsonToObject(attribute, valueClass);
@@ -196,7 +197,6 @@ public class JsonLoader<T extends SceneGraphNode> implements ISceneGraphLoader {
 
                 }
                 String methodName = "set" + TextUtils.propertyToMethodName(attribute.name);
-                //                Method m = ClassReflection.getMethod(clazz, methodName, valueClass);
                 Method m = searchMethod(methodName, valueClass, clazz);
                 if (m != null)
                     m.invoke(instance, value);

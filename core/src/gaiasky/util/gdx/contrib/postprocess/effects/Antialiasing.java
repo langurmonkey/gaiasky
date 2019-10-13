@@ -4,9 +4,9 @@
  * See the file LICENSE.md in the project root for full license details.
  */
 
-package gaia.cu9.ari.gaiaorbit.util.gdx.contrib.postprocess.effects;
+package gaiasky.util.gdx.contrib.postprocess.effects;
 
-import gaia.cu9.ari.gaiaorbit.util.gdx.contrib.postprocess.PostProcessorEffect;
+import gaiasky.util.gdx.contrib.postprocess.PostProcessorEffect;
 
 public abstract class Antialiasing extends PostProcessorEffect {
 

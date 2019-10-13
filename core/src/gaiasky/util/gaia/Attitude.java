@@ -3,10 +3,10 @@
  * See the file LICENSE.md in the project root for full license details.
  */
 
-package gaia.cu9.ari.gaiaorbit.util.gaia;
+package gaiasky.util.gaia;
 
-import gaia.cu9.ari.gaiaorbit.util.math.Quaterniond;
-import gaia.cu9.ari.gaiaorbit.util.math.Vector3d;
+import gaiasky.util.math.Quaterniond;
+import gaiasky.util.math.Vector3d;
 
 /**
  * This is the basic interface for all attitude representations and scanning

@@ -3,11 +3,11 @@
  * See the file LICENSE.md in the project root for full license details.
  */
 
-package gaia.cu9.ari.gaiaorbit.util.gaia.utils;
+package gaiasky.util.gaia.utils;
 
-import gaia.cu9.ari.gaiaorbit.util.Nature;
-import gaia.cu9.ari.gaiaorbit.util.math.MathUtilsd;
-import gaia.cu9.ari.gaiaorbit.util.math.Quaterniond;
+import gaiasky.util.Nature;
+import gaiasky.util.math.MathUtilsd;
+import gaiasky.util.math.Quaterniond;
 
 public class Interpolator {
 

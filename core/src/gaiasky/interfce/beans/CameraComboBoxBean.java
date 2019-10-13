@@ -3,9 +3,9 @@
  * See the file LICENSE.md in the project root for full license details.
  */
 
-package gaia.cu9.ari.gaiaorbit.interfce.beans;
+package gaiasky.interfce.beans;
 
-import gaia.cu9.ari.gaiaorbit.scenegraph.camera.CameraManager.CameraMode;
+import gaiasky.scenegraph.camera.CameraManager.CameraMode;
 
 public class CameraComboBoxBean {
 

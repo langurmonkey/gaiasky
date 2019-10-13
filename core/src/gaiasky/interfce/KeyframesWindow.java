@@ -3,7 +3,7 @@
  * See the file LICENSE.md in the project root for full license details.
  */
 
-package gaia.cu9.ari.gaiaorbit.interfce;
+package gaiasky.interfce;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
@@ -17,29 +17,29 @@ import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener.ChangeEvent;
 import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.Array;
-import gaia.cu9.ari.gaiaorbit.desktop.util.SysUtils;
-import gaia.cu9.ari.gaiaorbit.desktop.util.camera.CameraKeyframeManager;
-import gaia.cu9.ari.gaiaorbit.desktop.util.camera.Keyframe;
-import gaia.cu9.ari.gaiaorbit.event.EventManager;
-import gaia.cu9.ari.gaiaorbit.event.Events;
-import gaia.cu9.ari.gaiaorbit.event.IObserver;
-import gaia.cu9.ari.gaiaorbit.scenegraph.KeyframesPathObject;
-import gaia.cu9.ari.gaiaorbit.scenegraph.camera.CameraManager;
-import gaia.cu9.ari.gaiaorbit.util.GlobalConf;
-import gaia.cu9.ari.gaiaorbit.util.I18n;
-import gaia.cu9.ari.gaiaorbit.util.Logger;
-import gaia.cu9.ari.gaiaorbit.util.color.ColourUtils;
-import gaia.cu9.ari.gaiaorbit.util.format.DateFormatFactory;
-import gaia.cu9.ari.gaiaorbit.util.format.IDateFormat;
-import gaia.cu9.ari.gaiaorbit.util.format.INumberFormat;
-import gaia.cu9.ari.gaiaorbit.util.format.NumberFormatFactory;
-import gaia.cu9.ari.gaiaorbit.util.math.Interpolationd;
-import gaia.cu9.ari.gaiaorbit.util.math.Vector3d;
-import gaia.cu9.ari.gaiaorbit.util.scene2d.*;
-import gaia.cu9.ari.gaiaorbit.util.time.ITimeFrameProvider;
-import gaia.cu9.ari.gaiaorbit.util.validator.FloatValidator;
-import gaia.cu9.ari.gaiaorbit.util.validator.LengthValidator;
-import gaia.cu9.ari.gaiaorbit.util.validator.RegexpValidator;
+import gaiasky.desktop.util.SysUtils;
+import gaiasky.desktop.util.camera.CameraKeyframeManager;
+import gaiasky.desktop.util.camera.Keyframe;
+import gaiasky.event.EventManager;
+import gaiasky.event.Events;
+import gaiasky.event.IObserver;
+import gaiasky.scenegraph.KeyframesPathObject;
+import gaiasky.scenegraph.camera.CameraManager;
+import gaiasky.util.GlobalConf;
+import gaiasky.util.I18n;
+import gaiasky.util.Logger;
+import gaiasky.util.color.ColourUtils;
+import gaiasky.util.format.DateFormatFactory;
+import gaiasky.util.format.IDateFormat;
+import gaiasky.util.format.INumberFormat;
+import gaiasky.util.format.NumberFormatFactory;
+import gaiasky.util.math.Interpolationd;
+import gaiasky.util.math.Vector3d;
+import gaiasky.util.scene2d.*;
+import gaiasky.util.time.ITimeFrameProvider;
+import gaiasky.util.validator.FloatValidator;
+import gaiasky.util.validator.LengthValidator;
+import gaiasky.util.validator.RegexpValidator;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -221,7 +221,7 @@ public class KeyframesWindow extends GenericDialog implements IObserver {
         // Build UI
         buildSuper();
 
-        // Add {@link gaia.cu9.ari.gaiaorbit.scenegraph.KeyframesPathObject} to model
+        // Add {@link gaiasky.scenegraph.KeyframesPathObject} to model
         keyframesPathObject = new KeyframesPathObject();
         keyframesPathObject.setCt("Others");
         keyframesPathObject.setParent("Universe");

@@ -3,12 +3,12 @@
  * See the file LICENSE.md in the project root for full license details.
  */
 
-package gaia.cu9.ari.gaiaorbit.interfce;
+package gaiasky.interfce;
 
-import gaia.cu9.ari.gaiaorbit.util.I18n;
-import gaia.cu9.ari.gaiaorbit.util.format.DateFormatFactory;
-import gaia.cu9.ari.gaiaorbit.util.format.DateFormatFactory.DateType;
-import gaia.cu9.ari.gaiaorbit.util.format.IDateFormat;
+import gaiasky.util.I18n;
+import gaiasky.util.format.DateFormatFactory;
+import gaiasky.util.format.DateFormatFactory.DateType;
+import gaiasky.util.format.IDateFormat;
 
 import java.time.Instant;
 

@@ -3,7 +3,7 @@
  * See the file LICENSE.md in the project root for full license details.
  */
 
-package gaia.cu9.ari.gaiaorbit.desktop.util;
+package gaiasky.desktop.util;
 
 public class PackTextures {
     public static void main(String[] args) {

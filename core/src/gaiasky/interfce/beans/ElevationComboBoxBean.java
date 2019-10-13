@@ -3,9 +3,9 @@
  * See the file LICENSE.md in the project root for full license details.
  */
 
-package gaia.cu9.ari.gaiaorbit.interfce.beans;
+package gaiasky.interfce.beans;
 
-import gaia.cu9.ari.gaiaorbit.util.GlobalConf.SceneConf.ElevationType;
+import gaiasky.util.GlobalConf.SceneConf.ElevationType;
 
 public class ElevationComboBoxBean {
 

@@ -3,15 +3,15 @@
  * See the file LICENSE.md in the project root for full license details.
  */
 
-package gaia.cu9.ari.gaiaorbit.util;
+package gaiasky.util;
 
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.Pool;
-import gaia.cu9.ari.gaiaorbit.scenegraph.*;
-import gaia.cu9.ari.gaiaorbit.scenegraph.octreewrapper.OctreeWrapper;
-import gaia.cu9.ari.gaiaorbit.util.math.Matrix4d;
-import gaia.cu9.ari.gaiaorbit.util.math.Vector2d;
-import gaia.cu9.ari.gaiaorbit.util.math.Vector3d;
+import gaiasky.scenegraph.*;
+import gaiasky.scenegraph.octreewrapper.OctreeWrapper;
+import gaiasky.util.math.Matrix4d;
+import gaiasky.util.math.Vector2d;
+import gaiasky.util.math.Vector3d;
 
 public class SimplePool<T> extends Pool<T> {
 

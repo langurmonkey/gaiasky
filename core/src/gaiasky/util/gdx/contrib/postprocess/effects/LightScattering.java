@@ -19,21 +19,21 @@
  * limitations under the License.
  ******************************************************************************/
 
-package gaia.cu9.ari.gaiaorbit.util.gdx.contrib.postprocess.effects;
+package gaiasky.util.gdx.contrib.postprocess.effects;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.glutils.FrameBuffer;
-import gaia.cu9.ari.gaiaorbit.util.gdx.contrib.postprocess.PostProcessor;
-import gaia.cu9.ari.gaiaorbit.util.gdx.contrib.postprocess.PostProcessorEffect;
-import gaia.cu9.ari.gaiaorbit.util.gdx.contrib.postprocess.filters.Bias;
-import gaia.cu9.ari.gaiaorbit.util.gdx.contrib.postprocess.filters.Blur;
-import gaia.cu9.ari.gaiaorbit.util.gdx.contrib.postprocess.filters.Blur.BlurType;
-import gaia.cu9.ari.gaiaorbit.util.gdx.contrib.postprocess.filters.Combine;
-import gaia.cu9.ari.gaiaorbit.util.gdx.contrib.postprocess.filters.Scattering;
-import gaia.cu9.ari.gaiaorbit.util.gdx.contrib.postprocess.utils.PingPongBuffer;
-import gaia.cu9.ari.gaiaorbit.util.gdx.contrib.utils.GaiaSkyFrameBuffer;
+import gaiasky.util.gdx.contrib.postprocess.PostProcessor;
+import gaiasky.util.gdx.contrib.postprocess.PostProcessorEffect;
+import gaiasky.util.gdx.contrib.postprocess.filters.Bias;
+import gaiasky.util.gdx.contrib.postprocess.filters.Blur;
+import gaiasky.util.gdx.contrib.postprocess.filters.Blur.BlurType;
+import gaiasky.util.gdx.contrib.postprocess.filters.Combine;
+import gaiasky.util.gdx.contrib.postprocess.filters.Scattering;
+import gaiasky.util.gdx.contrib.postprocess.utils.PingPongBuffer;
+import gaiasky.util.gdx.contrib.utils.GaiaSkyFrameBuffer;
 
 /**
  * Light scattering implementation.

@@ -3,23 +3,23 @@
  * See the file LICENSE.md in the project root for full license details.
  */
 
-package gaia.cu9.ari.gaiaorbit.scenegraph.octreewrapper;
+package gaiasky.scenegraph.octreewrapper;
 
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Pool;
-import gaia.cu9.ari.gaiaorbit.event.EventManager;
-import gaia.cu9.ari.gaiaorbit.event.Events;
-import gaia.cu9.ari.gaiaorbit.render.ComponentTypes;
-import gaia.cu9.ari.gaiaorbit.render.ComponentTypes.ComponentType;
-import gaia.cu9.ari.gaiaorbit.render.system.AbstractRenderSystem;
-import gaia.cu9.ari.gaiaorbit.scenegraph.*;
-import gaia.cu9.ari.gaiaorbit.scenegraph.camera.ICamera;
-import gaia.cu9.ari.gaiaorbit.util.GlobalConf;
-import gaia.cu9.ari.gaiaorbit.util.Logger;
-import gaia.cu9.ari.gaiaorbit.util.MyPools;
-import gaia.cu9.ari.gaiaorbit.util.math.Vector3d;
-import gaia.cu9.ari.gaiaorbit.util.time.ITimeFrameProvider;
-import gaia.cu9.ari.gaiaorbit.util.tree.OctreeNode;
+import gaiasky.event.EventManager;
+import gaiasky.event.Events;
+import gaiasky.render.ComponentTypes;
+import gaiasky.render.ComponentTypes.ComponentType;
+import gaiasky.render.system.AbstractRenderSystem;
+import gaiasky.scenegraph.*;
+import gaiasky.scenegraph.camera.ICamera;
+import gaiasky.util.GlobalConf;
+import gaiasky.util.Logger;
+import gaiasky.util.MyPools;
+import gaiasky.util.math.Vector3d;
+import gaiasky.util.time.ITimeFrameProvider;
+import gaiasky.util.tree.OctreeNode;
 
 import java.util.HashMap;
 import java.util.Iterator;

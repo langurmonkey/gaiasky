@@ -3,7 +3,7 @@
  * See the file LICENSE.md in the project root for full license details.
  */
 
-package gaia.cu9.ari.gaiaorbit.scenegraph;
+package gaiasky.scenegraph;
 
 import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.math.MathUtils;
@@ -11,26 +11,26 @@ import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.utils.reflect.ClassReflection;
 import com.badlogic.gdx.utils.reflect.Method;
 import com.badlogic.gdx.utils.reflect.ReflectionException;
-import gaia.cu9.ari.gaiaorbit.GaiaSky;
-import gaia.cu9.ari.gaiaorbit.assets.OrbitDataLoader.OrbitDataLoaderParameter;
-import gaia.cu9.ari.gaiaorbit.data.OrbitRefresher;
-import gaia.cu9.ari.gaiaorbit.data.orbit.IOrbitDataProvider;
-import gaia.cu9.ari.gaiaorbit.data.orbit.OrbitFileDataProvider;
-import gaia.cu9.ari.gaiaorbit.data.orbit.OrbitalParametersProvider;
-import gaia.cu9.ari.gaiaorbit.render.ComponentTypes.ComponentType;
-import gaia.cu9.ari.gaiaorbit.render.system.LineRenderSystem;
-import gaia.cu9.ari.gaiaorbit.scenegraph.camera.ICamera;
-import gaia.cu9.ari.gaiaorbit.scenegraph.component.OrbitComponent;
-import gaia.cu9.ari.gaiaorbit.util.Constants;
-import gaia.cu9.ari.gaiaorbit.util.GlobalConf;
-import gaia.cu9.ari.gaiaorbit.util.GlobalResources;
-import gaia.cu9.ari.gaiaorbit.util.Logger;
-import gaia.cu9.ari.gaiaorbit.util.Logger.Log;
-import gaia.cu9.ari.gaiaorbit.util.coord.Coordinates;
-import gaia.cu9.ari.gaiaorbit.util.math.MathUtilsd;
-import gaia.cu9.ari.gaiaorbit.util.math.Matrix4d;
-import gaia.cu9.ari.gaiaorbit.util.math.Vector3d;
-import gaia.cu9.ari.gaiaorbit.util.time.ITimeFrameProvider;
+import gaiasky.GaiaSky;
+import gaiasky.assets.OrbitDataLoader.OrbitDataLoaderParameter;
+import gaiasky.data.OrbitRefresher;
+import gaiasky.data.orbit.IOrbitDataProvider;
+import gaiasky.data.orbit.OrbitFileDataProvider;
+import gaiasky.data.orbit.OrbitalParametersProvider;
+import gaiasky.render.ComponentTypes.ComponentType;
+import gaiasky.render.system.LineRenderSystem;
+import gaiasky.scenegraph.camera.ICamera;
+import gaiasky.scenegraph.component.OrbitComponent;
+import gaiasky.util.Constants;
+import gaiasky.util.GlobalConf;
+import gaiasky.util.GlobalResources;
+import gaiasky.util.Logger;
+import gaiasky.util.Logger.Log;
+import gaiasky.util.coord.Coordinates;
+import gaiasky.util.math.MathUtilsd;
+import gaiasky.util.math.Matrix4d;
+import gaiasky.util.math.Vector3d;
+import gaiasky.util.time.ITimeFrameProvider;
 
 import java.time.Instant;
 import java.util.Date;
@@ -371,7 +371,7 @@ public class Orbit extends Polyline {
     }
 
     public void setProvider(String provider) {
-        this.provider = provider;
+        this.provider = provider.replace("gaia.cu9.ari.gaiaorbit", "gaiasky");
     }
 
     public void setOrbit(OrbitComponent oc) {

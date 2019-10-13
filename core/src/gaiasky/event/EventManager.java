@@ -3,14 +3,14 @@
  * See the file LICENSE.md in the project root for full license details.
  */
 
-package gaia.cu9.ari.gaiaorbit.event;
+package gaiasky.event;
 
 import com.badlogic.gdx.utils.IntMap;
 import com.badlogic.gdx.utils.IntMap.Keys;
 import com.badlogic.gdx.utils.ObjectMap;
 import com.badlogic.gdx.utils.Pool;
 import com.badlogic.gdx.utils.TimeUtils;
-import gaia.cu9.ari.gaiaorbit.GaiaSky;
+import gaiasky.GaiaSky;
 
 import java.util.LinkedHashSet;
 import java.util.Set;

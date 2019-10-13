@@ -3,10 +3,10 @@
  * See the file LICENSE.md in the project root for full license details.
  */
 
-package gaia.cu9.ari.gaiaorbit.util.coord;
+package gaiasky.util.coord;
 
-import gaia.cu9.ari.gaiaorbit.util.Constants;
-import gaia.cu9.ari.gaiaorbit.util.math.Vector3d;
+import gaiasky.util.Constants;
+import gaiasky.util.math.Vector3d;
 
 import java.time.Instant;
 

@@ -19,7 +19,7 @@
  * limitations under the License.
  ******************************************************************************/
 
-package gaia.cu9.ari.gaiaorbit.util.gdx.model.data;
+package gaiasky.util.gdx.model.data;
 
 import com.badlogic.gdx.graphics.VertexAttribute;
 

@@ -19,13 +19,13 @@
  * limitations under the License.
  ******************************************************************************/
 
-package gaia.cu9.ari.gaiaorbit.util.gdx.contrib.postprocess.effects;
+package gaiasky.util.gdx.contrib.postprocess.effects;
 
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.glutils.FrameBuffer;
-import gaia.cu9.ari.gaiaorbit.util.gdx.contrib.postprocess.PostProcessorEffect;
-import gaia.cu9.ari.gaiaorbit.util.gdx.contrib.postprocess.filters.Vignetting;
-import gaia.cu9.ari.gaiaorbit.util.gdx.contrib.utils.GaiaSkyFrameBuffer;
+import gaiasky.util.gdx.contrib.postprocess.PostProcessorEffect;
+import gaiasky.util.gdx.contrib.postprocess.filters.Vignetting;
+import gaiasky.util.gdx.contrib.utils.GaiaSkyFrameBuffer;
 
 public final class Vignette extends PostProcessorEffect {
     private Vignetting vignetting;

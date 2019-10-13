@@ -19,11 +19,11 @@
  * limitations under the License.
  ******************************************************************************/
 
-package gaia.cu9.ari.gaiaorbit.util.gdx.contrib.postprocess;
+package gaiasky.util.gdx.contrib.postprocess;
 
 import com.badlogic.gdx.graphics.glutils.FrameBuffer;
 import com.badlogic.gdx.utils.Disposable;
-import gaia.cu9.ari.gaiaorbit.util.gdx.contrib.utils.GaiaSkyFrameBuffer;
+import gaiasky.util.gdx.contrib.utils.GaiaSkyFrameBuffer;
 
 /**
  * This interface defines the base class for the concrete implementation of post-processor effects. An effect is considered

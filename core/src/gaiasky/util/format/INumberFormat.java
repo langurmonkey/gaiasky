@@ -3,7 +3,7 @@
  * See the file LICENSE.md in the project root for full license details.
  */
 
-package gaia.cu9.ari.gaiaorbit.util.format;
+package gaiasky.util.format;
 
 public interface INumberFormat {
     public String format(double num);

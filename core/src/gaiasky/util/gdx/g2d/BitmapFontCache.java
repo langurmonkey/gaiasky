@@ -19,13 +19,13 @@
  * limitations under the License.
  ******************************************************************************/
 
-package gaia.cu9.ari.gaiaorbit.util.gdx.g2d;
+package gaiasky.util.gdx.g2d;
 
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.utils.*;
-import gaia.cu9.ari.gaiaorbit.util.gdx.g2d.BitmapFont.BitmapFontData;
+import gaiasky.util.gdx.g2d.BitmapFont.BitmapFontData;
 
-import static gaia.cu9.ari.gaiaorbit.util.gdx.g2d.GlyphLayout.GlyphRun;
+import static gaiasky.util.gdx.g2d.GlyphLayout.GlyphRun;
 
 /** Caches glyph geometry for a BitmapFont, providing a fast way to render static text. This saves needing to compute the glyph
  * geometry each frame.
@@ -229,7 +229,7 @@ public class BitmapFontCache {
 	}
 
 	public void draw (ExtBatch spriteBatch) {
-		Array<gaia.cu9.ari.gaiaorbit.util.gdx.g2d.TextureRegion> regions = font.getRegions();
+		Array<gaiasky.util.gdx.g2d.TextureRegion> regions = font.getRegions();
 		for (int j = 0, n = pageVertices.length; j < n; j++) {
 			if (idx[j] > 0) { // ignore if this texture has no glyphs
 				float[] vertices = pageVertices[j];

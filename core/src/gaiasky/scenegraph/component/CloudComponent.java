@@ -3,7 +3,7 @@
  * See the file LICENSE.md in the project root for full license details.
  */
 
-package gaia.cu9.ari.gaiaorbit.scenegraph.component;
+package gaiasky.scenegraph.component;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.assets.AssetManager;
@@ -18,13 +18,13 @@ import com.badlogic.gdx.graphics.g3d.attributes.IntAttribute;
 import com.badlogic.gdx.graphics.g3d.attributes.TextureAttribute;
 import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Vector3;
-import gaia.cu9.ari.gaiaorbit.data.AssetBean;
-import gaia.cu9.ari.gaiaorbit.util.*;
-import gaia.cu9.ari.gaiaorbit.util.Logger.Log;
-import gaia.cu9.ari.gaiaorbit.util.gdx.model.IntModel;
-import gaia.cu9.ari.gaiaorbit.util.gdx.model.IntModelInstance;
-import gaia.cu9.ari.gaiaorbit.util.gdx.shader.AtmosphereAttribute;
-import gaia.cu9.ari.gaiaorbit.util.math.Vector3d;
+import gaiasky.data.AssetBean;
+import gaiasky.util.*;
+import gaiasky.util.Logger.Log;
+import gaiasky.util.gdx.model.IntModel;
+import gaiasky.util.gdx.model.IntModelInstance;
+import gaiasky.util.gdx.shader.AtmosphereAttribute;
+import gaiasky.util.math.Vector3d;
 
 import java.util.Map;
 

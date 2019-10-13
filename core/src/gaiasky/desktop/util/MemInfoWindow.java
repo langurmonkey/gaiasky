@@ -3,16 +3,16 @@
  * See the file LICENSE.md in the project root for full license details.
  */
 
-package gaia.cu9.ari.gaiaorbit.desktop.util;
+package gaiasky.desktop.util;
 
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.TextArea;
-import gaia.cu9.ari.gaiaorbit.interfce.GenericDialog;
-import gaia.cu9.ari.gaiaorbit.util.GlobalConf;
-import gaia.cu9.ari.gaiaorbit.util.I18n;
-import gaia.cu9.ari.gaiaorbit.util.scene2d.OwnScrollPane;
-import gaia.cu9.ari.gaiaorbit.util.scene2d.OwnTextArea;
+import gaiasky.interfce.GenericDialog;
+import gaiasky.util.GlobalConf;
+import gaiasky.util.I18n;
+import gaiasky.util.scene2d.OwnScrollPane;
+import gaiasky.util.scene2d.OwnTextArea;
 
 import java.lang.management.ManagementFactory;
 import java.lang.management.MemoryPoolMXBean;

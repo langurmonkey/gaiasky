@@ -3,23 +3,23 @@
  * See the file LICENSE.md in the project root for full license details.
  */
 
-package gaia.cu9.ari.gaiaorbit.interfce;
+package gaiasky.interfce;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
-import gaia.cu9.ari.gaiaorbit.event.EventManager;
-import gaia.cu9.ari.gaiaorbit.event.Events;
-import gaia.cu9.ari.gaiaorbit.event.IObserver;
-import gaia.cu9.ari.gaiaorbit.scenegraph.IFocus;
-import gaia.cu9.ari.gaiaorbit.scenegraph.camera.CameraManager.CameraMode;
-import gaia.cu9.ari.gaiaorbit.util.GlobalConf;
-import gaia.cu9.ari.gaiaorbit.util.I18n;
-import gaia.cu9.ari.gaiaorbit.util.TextUtils;
-import gaia.cu9.ari.gaiaorbit.util.format.DateFormatFactory;
-import gaia.cu9.ari.gaiaorbit.util.format.DateFormatFactory.DateType;
-import gaia.cu9.ari.gaiaorbit.util.format.IDateFormat;
-import gaia.cu9.ari.gaiaorbit.util.scene2d.OwnLabel;
+import gaiasky.event.EventManager;
+import gaiasky.event.Events;
+import gaiasky.event.IObserver;
+import gaiasky.scenegraph.IFocus;
+import gaiasky.scenegraph.camera.CameraManager.CameraMode;
+import gaiasky.util.GlobalConf;
+import gaiasky.util.I18n;
+import gaiasky.util.TextUtils;
+import gaiasky.util.format.DateFormatFactory;
+import gaiasky.util.format.DateFormatFactory.DateType;
+import gaiasky.util.format.IDateFormat;
+import gaiasky.util.scene2d.OwnLabel;
 
 import java.time.Instant;
 

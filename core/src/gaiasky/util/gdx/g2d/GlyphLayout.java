@@ -19,17 +19,17 @@
  * limitations under the License.
  ******************************************************************************/
 
-package gaia.cu9.ari.gaiaorbit.util.gdx.g2d;
+package gaiasky.util.gdx.g2d;
 
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Colors;
 import com.badlogic.gdx.utils.*;
 import com.badlogic.gdx.utils.Pool.Poolable;
-import gaia.cu9.ari.gaiaorbit.util.gdx.g2d.BitmapFont.Glyph;
+import gaiasky.util.gdx.g2d.BitmapFont.Glyph;
 
 import java.lang.StringBuilder;
 
-import static gaia.cu9.ari.gaiaorbit.util.gdx.g2d.BitmapFont.*;
+import static gaiasky.util.gdx.g2d.BitmapFont.*;
 
 /** Stores {@link GlyphRun runs} of glyphs for a piece of text. The text may contain newlines and color markup tags.
  * @author Nathan Sweet

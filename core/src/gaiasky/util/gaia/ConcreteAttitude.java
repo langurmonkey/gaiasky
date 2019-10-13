@@ -3,12 +3,12 @@
  * See the file LICENSE.md in the project root for full license details.
  */
 
-package gaia.cu9.ari.gaiaorbit.util.gaia;
+package gaiasky.util.gaia;
 
-import gaia.cu9.ari.gaiaorbit.util.coord.Coordinates;
-import gaia.cu9.ari.gaiaorbit.util.coord.NslSun;
-import gaia.cu9.ari.gaiaorbit.util.math.Quaterniond;
-import gaia.cu9.ari.gaiaorbit.util.math.Vector3d;
+import gaiasky.util.coord.Coordinates;
+import gaiasky.util.coord.NslSun;
+import gaiasky.util.math.Quaterniond;
+import gaiasky.util.math.Vector3d;
 
 /**
  * This class implements the Attitude interface and contains just the minimum
@@ -244,7 +244,7 @@ public class ConcreteAttitude implements Attitude {
     }
 
     /**
-     * @see gaia.cu9.ari.gaiaorbit.util.gaia.Attitude#getSrsAxes(Vector3d[])
+     * @see gaiasky.util.gaia.Attitude#getSrsAxes(Vector3d[])
      */
     @Override
     public Vector3d[] getSrsAxes(Vector3d[] xyz) {

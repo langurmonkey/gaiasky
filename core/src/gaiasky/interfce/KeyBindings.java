@@ -3,21 +3,21 @@
  * See the file LICENSE.md in the project root for full license details.
  */
 
-package gaia.cu9.ari.gaiaorbit.interfce;
+package gaiasky.interfce;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.utils.Array;
-import gaia.cu9.ari.gaiaorbit.GaiaSky;
-import gaia.cu9.ari.gaiaorbit.desktop.util.SysUtils;
-import gaia.cu9.ari.gaiaorbit.event.EventManager;
-import gaia.cu9.ari.gaiaorbit.event.Events;
-import gaia.cu9.ari.gaiaorbit.scenegraph.camera.CameraManager.CameraMode;
-import gaia.cu9.ari.gaiaorbit.util.*;
-import gaia.cu9.ari.gaiaorbit.util.GlobalConf.ProgramConf.StereoProfile;
-import gaia.cu9.ari.gaiaorbit.util.Logger.Log;
-import gaia.cu9.ari.gaiaorbit.util.gdx.contrib.postprocess.effects.CubemapProjections;
+import gaiasky.GaiaSky;
+import gaiasky.desktop.util.SysUtils;
+import gaiasky.event.EventManager;
+import gaiasky.event.Events;
+import gaiasky.scenegraph.camera.CameraManager.CameraMode;
+import gaiasky.util.*;
+import gaiasky.util.GlobalConf.ProgramConf.StereoProfile;
+import gaiasky.util.Logger.Log;
+import gaiasky.util.gdx.contrib.postprocess.effects.CubemapProjections;
 
 import java.io.*;
 import java.time.Instant;

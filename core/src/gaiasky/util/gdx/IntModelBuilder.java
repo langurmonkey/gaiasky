@@ -19,7 +19,7 @@
  * the License.
  ******************************************************************************/
 
-package gaia.cu9.ari.gaiaorbit.util.gdx;
+package gaiasky.util.gdx;
 
 import com.badlogic.gdx.graphics.*;
 import com.badlogic.gdx.graphics.g3d.Material;
@@ -29,11 +29,11 @@ import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Disposable;
 import com.badlogic.gdx.utils.GdxRuntimeException;
-import gaia.cu9.ari.gaiaorbit.util.gdx.mesh.IntMesh;
-import gaia.cu9.ari.gaiaorbit.util.gdx.model.IntMeshPart;
-import gaia.cu9.ari.gaiaorbit.util.gdx.model.IntModel;
-import gaia.cu9.ari.gaiaorbit.util.gdx.model.IntNode;
-import gaia.cu9.ari.gaiaorbit.util.gdx.model.IntNodePart;
+import gaiasky.util.gdx.mesh.IntMesh;
+import gaiasky.util.gdx.model.IntMeshPart;
+import gaiasky.util.gdx.model.IntModel;
+import gaiasky.util.gdx.model.IntNode;
+import gaiasky.util.gdx.model.IntNodePart;
 
 /**
  * Helper class to create {@link IntModel}s from code. To start building use the

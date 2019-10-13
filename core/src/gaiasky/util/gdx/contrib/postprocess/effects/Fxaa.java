@@ -19,11 +19,11 @@
  * limitations under the License.
  ******************************************************************************/
 
-package gaia.cu9.ari.gaiaorbit.util.gdx.contrib.postprocess.effects;
+package gaiasky.util.gdx.contrib.postprocess.effects;
 
 import com.badlogic.gdx.graphics.glutils.FrameBuffer;
-import gaia.cu9.ari.gaiaorbit.util.gdx.contrib.postprocess.filters.FxaaFilter;
-import gaia.cu9.ari.gaiaorbit.util.gdx.contrib.utils.GaiaSkyFrameBuffer;
+import gaiasky.util.gdx.contrib.postprocess.filters.FxaaFilter;
+import gaiasky.util.gdx.contrib.utils.GaiaSkyFrameBuffer;
 
 /**
  * Implements the fast approximate anti-aliasing. Very fast and useful for combining with other post-processing effects.

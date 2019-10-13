@@ -19,14 +19,14 @@
  * limitations under the License.
  ******************************************************************************/
 
-package gaia.cu9.ari.gaiaorbit.util.gdx.mesh;
+package gaiasky.util.gdx.mesh;
 
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.VertexAttribute;
 import com.badlogic.gdx.graphics.VertexAttributes;
 import com.badlogic.gdx.graphics.glutils.VertexBufferObject;
 import com.badlogic.gdx.utils.BufferUtils;
-import gaia.cu9.ari.gaiaorbit.util.gdx.shader.ExtShaderProgram;
+import gaiasky.util.gdx.shader.ExtShaderProgram;
 
 import java.nio.ByteBuffer;
 import java.nio.FloatBuffer;

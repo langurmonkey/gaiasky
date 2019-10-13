@@ -3,11 +3,11 @@
  * See the file LICENSE.md in the project root for full license details.
  */
 
-package gaia.cu9.ari.gaiaorbit.interfce.beans;
+package gaiasky.interfce.beans;
 
 import com.badlogic.gdx.files.FileHandle;
-import gaia.cu9.ari.gaiaorbit.util.GlobalConf;
-import gaia.cu9.ari.gaiaorbit.util.Logger;
+import gaiasky.util.GlobalConf;
+import gaiasky.util.Logger;
 
 import java.io.File;
 import java.io.IOException;

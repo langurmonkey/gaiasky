@@ -3,10 +3,10 @@
  * See the file LICENSE.md in the project root for full license details.
  */
 
-package gaia.cu9.ari.gaiaorbit.util.validator;
+package gaiasky.util.validator;
 
-import gaia.cu9.ari.gaiaorbit.scenegraph.Loc;
-import gaia.cu9.ari.gaiaorbit.scenegraph.SceneGraphNode;
+import gaiasky.scenegraph.Loc;
+import gaiasky.scenegraph.SceneGraphNode;
 
 public class ExistingLocationValidator extends CallbackValidator {
 

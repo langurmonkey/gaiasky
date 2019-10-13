@@ -3,7 +3,7 @@
  * See the file LICENSE.md in the project root for full license details.
  */
 
-package gaia.cu9.ari.gaiaorbit.scenegraph;
+package gaiasky.scenegraph;
 
 import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.math.Matrix4;
@@ -11,19 +11,19 @@ import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Bits;
 import com.badlogic.gdx.utils.ObjectMap;
-import gaia.cu9.ari.gaiaorbit.GaiaSky;
-import gaia.cu9.ari.gaiaorbit.render.ComponentTypes;
-import gaia.cu9.ari.gaiaorbit.render.ComponentTypes.ComponentType;
-import gaia.cu9.ari.gaiaorbit.render.IRenderable;
-import gaia.cu9.ari.gaiaorbit.render.SceneGraphRenderer;
-import gaia.cu9.ari.gaiaorbit.scenegraph.camera.ICamera;
-import gaia.cu9.ari.gaiaorbit.scenegraph.octreewrapper.AbstractOctreeWrapper;
-import gaia.cu9.ari.gaiaorbit.util.I18n;
-import gaia.cu9.ari.gaiaorbit.util.Logger;
-import gaia.cu9.ari.gaiaorbit.util.math.Matrix4d;
-import gaia.cu9.ari.gaiaorbit.util.math.Vector3d;
-import gaia.cu9.ari.gaiaorbit.util.time.ITimeFrameProvider;
-import gaia.cu9.ari.gaiaorbit.util.tree.IPosition;
+import gaiasky.GaiaSky;
+import gaiasky.render.ComponentTypes;
+import gaiasky.render.ComponentTypes.ComponentType;
+import gaiasky.render.IRenderable;
+import gaiasky.render.SceneGraphRenderer;
+import gaiasky.scenegraph.camera.ICamera;
+import gaiasky.scenegraph.octreewrapper.AbstractOctreeWrapper;
+import gaiasky.util.I18n;
+import gaiasky.util.Logger;
+import gaiasky.util.math.Matrix4d;
+import gaiasky.util.math.Vector3d;
+import gaiasky.util.time.ITimeFrameProvider;
+import gaiasky.util.tree.IPosition;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.Iterator;

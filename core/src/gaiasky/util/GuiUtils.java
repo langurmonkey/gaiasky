@@ -3,14 +3,14 @@
  * See the file LICENSE.md in the project root for full license details.
  */
 
-package gaia.cu9.ari.gaiaorbit.util;
+package gaiasky.util;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
-import gaia.cu9.ari.gaiaorbit.interfce.GenericDialog;
-import gaia.cu9.ari.gaiaorbit.util.scene2d.Link;
-import gaia.cu9.ari.gaiaorbit.util.scene2d.OwnLabel;
+import gaiasky.interfce.GenericDialog;
+import gaiasky.util.scene2d.Link;
+import gaiasky.util.scene2d.OwnLabel;
 
 public class GuiUtils {
 

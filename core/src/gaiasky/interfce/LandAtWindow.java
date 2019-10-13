@@ -3,7 +3,7 @@
  * See the file LICENSE.md in the project root for full license details.
  */
 
-package gaia.cu9.ari.gaiaorbit.interfce;
+package gaiasky.interfce;
 
 import com.badlogic.gdx.scenes.scene2d.Event;
 import com.badlogic.gdx.scenes.scene2d.EventListener;
@@ -13,15 +13,15 @@ import com.badlogic.gdx.scenes.scene2d.ui.CheckBox;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener.ChangeEvent;
 import com.badlogic.gdx.scenes.scene2d.utils.Disableable;
-import gaia.cu9.ari.gaiaorbit.event.EventManager;
-import gaia.cu9.ari.gaiaorbit.event.Events;
-import gaia.cu9.ari.gaiaorbit.scenegraph.CelestialBody;
-import gaia.cu9.ari.gaiaorbit.util.I18n;
-import gaia.cu9.ari.gaiaorbit.util.scene2d.OwnCheckBox;
-import gaia.cu9.ari.gaiaorbit.util.scene2d.OwnLabel;
-import gaia.cu9.ari.gaiaorbit.util.scene2d.OwnTextField;
-import gaia.cu9.ari.gaiaorbit.util.validator.ExistingLocationValidator;
-import gaia.cu9.ari.gaiaorbit.util.validator.FloatValidator;
+import gaiasky.event.EventManager;
+import gaiasky.event.Events;
+import gaiasky.scenegraph.CelestialBody;
+import gaiasky.util.I18n;
+import gaiasky.util.scene2d.OwnCheckBox;
+import gaiasky.util.scene2d.OwnLabel;
+import gaiasky.util.scene2d.OwnTextField;
+import gaiasky.util.validator.ExistingLocationValidator;
+import gaiasky.util.validator.FloatValidator;
 
 public class LandAtWindow extends GenericDialog {
 

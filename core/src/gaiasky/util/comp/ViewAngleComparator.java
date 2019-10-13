@@ -3,9 +3,9 @@
  * See the file LICENSE.md in the project root for full license details.
  */
 
-package gaia.cu9.ari.gaiaorbit.util.comp;
+package gaiasky.util.comp;
 
-import gaia.cu9.ari.gaiaorbit.scenegraph.IFocus;
+import gaiasky.scenegraph.IFocus;
 
 import java.util.Comparator;
 

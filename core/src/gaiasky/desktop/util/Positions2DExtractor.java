@@ -3,21 +3,21 @@
  * See the file LICENSE.md in the project root for full license details.
  */
 
-package gaia.cu9.ari.gaiaorbit.desktop.util;
+package gaiasky.desktop.util;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.backends.lwjgl3.Lwjgl3Files;
 import com.badlogic.gdx.files.FileHandle;
-import gaia.cu9.ari.gaiaorbit.desktop.format.DesktopDateFormatFactory;
-import gaia.cu9.ari.gaiaorbit.desktop.format.DesktopNumberFormatFactory;
-import gaia.cu9.ari.gaiaorbit.interfce.ConsoleLogger;
-import gaia.cu9.ari.gaiaorbit.util.*;
-import gaia.cu9.ari.gaiaorbit.util.coord.MoonAACoordinates;
-import gaia.cu9.ari.gaiaorbit.util.coord.vsop87.AbstractVSOP87;
-import gaia.cu9.ari.gaiaorbit.util.coord.vsop87.VSOP87;
-import gaia.cu9.ari.gaiaorbit.util.format.DateFormatFactory;
-import gaia.cu9.ari.gaiaorbit.util.format.NumberFormatFactory;
-import gaia.cu9.ari.gaiaorbit.util.math.Vector3d;
+import gaiasky.desktop.format.DesktopDateFormatFactory;
+import gaiasky.desktop.format.DesktopNumberFormatFactory;
+import gaiasky.interfce.ConsoleLogger;
+import gaiasky.util.*;
+import gaiasky.util.coord.MoonAACoordinates;
+import gaiasky.util.coord.vsop87.AbstractVSOP87;
+import gaiasky.util.coord.vsop87.VSOP87;
+import gaiasky.util.format.DateFormatFactory;
+import gaiasky.util.format.NumberFormatFactory;
+import gaiasky.util.math.Vector3d;
 
 import java.io.BufferedWriter;
 import java.io.FileWriter;

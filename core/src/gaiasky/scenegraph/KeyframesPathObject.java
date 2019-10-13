@@ -3,37 +3,37 @@
  * See the file LICENSE.md in the project root for full license details.
  */
 
-package gaia.cu9.ari.gaiaorbit.scenegraph;
+package gaiasky.scenegraph;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.PerspectiveCamera;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.Array;
-import gaia.cu9.ari.gaiaorbit.data.util.PointCloudData;
-import gaia.cu9.ari.gaiaorbit.desktop.util.camera.CameraKeyframeManager;
-import gaia.cu9.ari.gaiaorbit.desktop.util.camera.Keyframe;
-import gaia.cu9.ari.gaiaorbit.event.EventManager;
-import gaia.cu9.ari.gaiaorbit.event.Events;
-import gaia.cu9.ari.gaiaorbit.render.I3DTextRenderable;
-import gaia.cu9.ari.gaiaorbit.render.ILineRenderable;
-import gaia.cu9.ari.gaiaorbit.render.IPointRenderable;
-import gaia.cu9.ari.gaiaorbit.render.RenderingContext;
-import gaia.cu9.ari.gaiaorbit.render.system.FontRenderSystem;
-import gaia.cu9.ari.gaiaorbit.render.system.LineRenderSystem;
-import gaia.cu9.ari.gaiaorbit.render.system.PointRenderSystem;
-import gaia.cu9.ari.gaiaorbit.scenegraph.camera.FovCamera;
-import gaia.cu9.ari.gaiaorbit.scenegraph.camera.ICamera;
-import gaia.cu9.ari.gaiaorbit.scenegraph.camera.NaturalCamera;
-import gaia.cu9.ari.gaiaorbit.util.Constants;
-import gaia.cu9.ari.gaiaorbit.util.GlobalConf;
-import gaia.cu9.ari.gaiaorbit.util.GlobalResources;
-import gaia.cu9.ari.gaiaorbit.util.color.ColourUtils;
-import gaia.cu9.ari.gaiaorbit.util.gdx.g2d.ExtSpriteBatch;
-import gaia.cu9.ari.gaiaorbit.util.gdx.shader.ExtShaderProgram;
-import gaia.cu9.ari.gaiaorbit.util.gravwaves.RelativisticEffectsManager;
-import gaia.cu9.ari.gaiaorbit.util.math.Vector3d;
-import gaia.cu9.ari.gaiaorbit.util.time.ITimeFrameProvider;
+import gaiasky.data.util.PointCloudData;
+import gaiasky.desktop.util.camera.CameraKeyframeManager;
+import gaiasky.desktop.util.camera.Keyframe;
+import gaiasky.event.EventManager;
+import gaiasky.event.Events;
+import gaiasky.render.I3DTextRenderable;
+import gaiasky.render.ILineRenderable;
+import gaiasky.render.IPointRenderable;
+import gaiasky.render.RenderingContext;
+import gaiasky.render.system.FontRenderSystem;
+import gaiasky.render.system.LineRenderSystem;
+import gaiasky.render.system.PointRenderSystem;
+import gaiasky.scenegraph.camera.FovCamera;
+import gaiasky.scenegraph.camera.ICamera;
+import gaiasky.scenegraph.camera.NaturalCamera;
+import gaiasky.util.Constants;
+import gaiasky.util.GlobalConf;
+import gaiasky.util.GlobalResources;
+import gaiasky.util.color.ColourUtils;
+import gaiasky.util.gdx.g2d.ExtSpriteBatch;
+import gaiasky.util.gdx.shader.ExtShaderProgram;
+import gaiasky.util.gravwaves.RelativisticEffectsManager;
+import gaiasky.util.math.Vector3d;
+import gaiasky.util.time.ITimeFrameProvider;
 
 public class KeyframesPathObject extends VertsObject implements I3DTextRenderable, ILineRenderable, IPointRenderable {
 

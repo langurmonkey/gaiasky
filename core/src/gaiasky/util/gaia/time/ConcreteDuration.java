@@ -22,7 +22,7 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  *
  */
-package gaia.cu9.ari.gaiaorbit.util.gaia.time;
+package gaiasky.util.gaia.time;
 
 /**
  * A {@code ConcreteDuration} is a duration that is linked to a time scale
@@ -48,7 +48,7 @@ public abstract class ConcreteDuration implements Duration {
     }
 
     /**
-     * @see gaia.cu9.ari.gaiaorbit.util.gaia.time.Duration#negate()
+     * @see gaiasky.util.gaia.time.Duration#negate()
      */
     @Override
     public Duration negate() {
@@ -58,7 +58,7 @@ public abstract class ConcreteDuration implements Duration {
     }
 
     /**
-     * @see gaia.cu9.ari.gaiaorbit.util.gaia.time.Duration#mult(double)
+     * @see gaiasky.util.gaia.time.Duration#mult(double)
      */
     @Override
     public Duration mult(double s) {
@@ -68,7 +68,7 @@ public abstract class ConcreteDuration implements Duration {
     }
 
     /**
-     * @see gaia.cu9.ari.gaiaorbit.util.gaia.time.Duration#isLongerThan(gaia.cu9.ari.gaiaorbit.util.gaia.time.Duration)
+     * @see gaiasky.util.gaia.time.Duration#isLongerThan(gaiasky.util.gaia.time.Duration)
      */
     @Override
     public boolean isLongerThan(Duration d) {

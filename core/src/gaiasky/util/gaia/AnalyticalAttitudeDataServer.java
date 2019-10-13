@@ -3,13 +3,13 @@
  * See the file LICENSE.md in the project root for full license details.
  */
 
-package gaia.cu9.ari.gaiaorbit.util.gaia;
+package gaiasky.util.gaia;
 
-import gaia.cu9.ari.gaiaorbit.util.Nature;
-import gaia.cu9.ari.gaiaorbit.util.coord.AstroUtils;
-import gaia.cu9.ari.gaiaorbit.util.coord.Coordinates;
-import gaia.cu9.ari.gaiaorbit.util.coord.NslSun;
-import gaia.cu9.ari.gaiaorbit.util.math.Vector3d;
+import gaiasky.util.Nature;
+import gaiasky.util.coord.AstroUtils;
+import gaiasky.util.coord.Coordinates;
+import gaiasky.util.coord.NslSun;
+import gaiasky.util.math.Vector3d;
 
 /**
  * This abstract class defines the fields and implements the methods that any

@@ -3,21 +3,21 @@
  * See the file LICENSE.md in the project root for full license details.
  */
 
-package gaia.cu9.ari.gaiaorbit.scenegraph;
+package gaiasky.scenegraph;
 
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.math.Vector3;
-import gaia.cu9.ari.gaiaorbit.GaiaSky;
-import gaia.cu9.ari.gaiaorbit.render.IRenderable;
-import gaia.cu9.ari.gaiaorbit.render.SceneGraphRenderer;
-import gaia.cu9.ari.gaiaorbit.scenegraph.camera.FovCamera;
-import gaia.cu9.ari.gaiaorbit.scenegraph.camera.ICamera;
-import gaia.cu9.ari.gaiaorbit.util.Constants;
-import gaia.cu9.ari.gaiaorbit.util.GlobalConf;
-import gaia.cu9.ari.gaiaorbit.util.gdx.mesh.IntMesh;
-import gaia.cu9.ari.gaiaorbit.util.gdx.shader.ExtShaderProgram;
-import gaia.cu9.ari.gaiaorbit.util.math.Vector3d;
-import gaia.cu9.ari.gaiaorbit.util.time.ITimeFrameProvider;
+import gaiasky.GaiaSky;
+import gaiasky.render.IRenderable;
+import gaiasky.render.SceneGraphRenderer;
+import gaiasky.scenegraph.camera.FovCamera;
+import gaiasky.scenegraph.camera.ICamera;
+import gaiasky.util.Constants;
+import gaiasky.util.GlobalConf;
+import gaiasky.util.gdx.mesh.IntMesh;
+import gaiasky.util.gdx.shader.ExtShaderProgram;
+import gaiasky.util.math.Vector3d;
+import gaiasky.util.time.ITimeFrameProvider;
 
 public class NBGalaxy extends Particle {
 

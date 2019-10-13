@@ -9,10 +9,10 @@
  * @author tsagrista
  */
 
-package gaia.cu9.ari.gaiaorbit.util.gdx.contrib.postprocess.filters;
+package gaiasky.util.gdx.contrib.postprocess.filters;
 
 import com.badlogic.gdx.graphics.Texture;
-import gaia.cu9.ari.gaiaorbit.util.gdx.contrib.utils.ShaderLoader;
+import gaiasky.util.gdx.contrib.utils.ShaderLoader;
 
 public final class AnaglyphicFilter extends Filter<AnaglyphicFilter> {
 

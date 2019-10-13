@@ -3,11 +3,11 @@
  * See the file LICENSE.md in the project root for full license details.
  */
 
-package gaia.cu9.ari.gaiaorbit.util.gdx;
+package gaiasky.util.gdx;
 
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
-import gaia.cu9.ari.gaiaorbit.util.math.MathUtilsd;
+import gaiasky.util.math.MathUtilsd;
 
 /**
  * Helper generic class to create rings.

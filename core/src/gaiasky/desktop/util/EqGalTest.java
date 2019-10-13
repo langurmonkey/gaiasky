@@ -3,11 +3,11 @@
  * See the file LICENSE.md in the project root for full license details.
  */
 
-package gaia.cu9.ari.gaiaorbit.desktop.util;
+package gaiasky.desktop.util;
 
-import gaia.cu9.ari.gaiaorbit.util.coord.Coordinates;
-import gaia.cu9.ari.gaiaorbit.util.math.MathUtilsd;
-import gaia.cu9.ari.gaiaorbit.util.math.Vector3d;
+import gaiasky.util.coord.Coordinates;
+import gaiasky.util.math.MathUtilsd;
+import gaiasky.util.math.Vector3d;
 
 import java.util.Scanner;
 

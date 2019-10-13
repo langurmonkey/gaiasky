@@ -19,11 +19,11 @@
  * limitations under the License.
  ******************************************************************************/
 
-package gaia.cu9.ari.gaiaorbit.util.gdx.shader.provider;
+package gaiasky.util.gdx.shader.provider;
 
 import com.badlogic.gdx.graphics.glutils.ShaderProgram;
-import gaia.cu9.ari.gaiaorbit.util.gdx.IntRenderable;
-import gaia.cu9.ari.gaiaorbit.util.gdx.shader.IntShader;
+import gaiasky.util.gdx.IntRenderable;
+import gaiasky.util.gdx.shader.IntShader;
 
 /** Returns {@link IntShader} instances for a {@link IntRenderable} on request. Also responsible for disposing of any created
  * {@link ShaderProgram} instances on a call to {@link #dispose()}.

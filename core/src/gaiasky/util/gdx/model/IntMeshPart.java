@@ -19,14 +19,14 @@
  * limitations under the License.
  ******************************************************************************/
 
-package gaia.cu9.ari.gaiaorbit.util.gdx.model;
+package gaiasky.util.gdx.model;
 
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Mesh;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.math.collision.BoundingBox;
-import gaia.cu9.ari.gaiaorbit.util.gdx.mesh.IntMesh;
-import gaia.cu9.ari.gaiaorbit.util.gdx.shader.ExtShaderProgram;
+import gaiasky.util.gdx.mesh.IntMesh;
+import gaiasky.util.gdx.shader.ExtShaderProgram;
 
 /**
  * A libgdx MeshPart which uses {@link IntMesh} (for integer indices) instead of a regular {@link Mesh}

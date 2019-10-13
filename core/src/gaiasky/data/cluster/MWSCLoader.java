@@ -3,18 +3,18 @@
  * See the file LICENSE.md in the project root for full license details.
  */
 
-package gaia.cu9.ari.gaiaorbit.data.cluster;
+package gaiasky.data.cluster;
 
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.Array;
-import gaia.cu9.ari.gaiaorbit.data.ISceneGraphLoader;
-import gaia.cu9.ari.gaiaorbit.data.stars.AbstractCatalogLoader;
-import gaia.cu9.ari.gaiaorbit.scenegraph.StarCluster;
-import gaia.cu9.ari.gaiaorbit.util.*;
-import gaia.cu9.ari.gaiaorbit.util.coord.Coordinates;
-import gaia.cu9.ari.gaiaorbit.util.math.Vector3d;
-import gaia.cu9.ari.gaiaorbit.util.parse.Parser;
+import gaiasky.data.ISceneGraphLoader;
+import gaiasky.data.stars.AbstractCatalogLoader;
+import gaiasky.scenegraph.StarCluster;
+import gaiasky.util.*;
+import gaiasky.util.coord.Coordinates;
+import gaiasky.util.math.Vector3d;
+import gaiasky.util.parse.Parser;
 
 import java.io.*;
 

@@ -3,7 +3,7 @@
  * See the file LICENSE.md in the project root for full license details.
  */
 
-package gaia.cu9.ari.gaiaorbit.scenegraph.component;
+package gaiasky.scenegraph.component;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.assets.AssetManager;
@@ -18,17 +18,17 @@ import com.badlogic.gdx.graphics.g3d.Attribute;
 import com.badlogic.gdx.graphics.g3d.Material;
 import com.badlogic.gdx.graphics.g3d.attributes.*;
 import com.badlogic.gdx.math.Vector2;
-import gaia.cu9.ari.gaiaorbit.data.AssetBean;
-import gaia.cu9.ari.gaiaorbit.event.EventManager;
-import gaia.cu9.ari.gaiaorbit.event.Events;
-import gaia.cu9.ari.gaiaorbit.event.IObserver;
-import gaia.cu9.ari.gaiaorbit.util.*;
-import gaia.cu9.ari.gaiaorbit.util.GlobalConf.SceneConf.ElevationType;
-import gaia.cu9.ari.gaiaorbit.util.Logger.Log;
-import gaia.cu9.ari.gaiaorbit.util.gdx.model.IntModelInstance;
-import gaia.cu9.ari.gaiaorbit.util.gdx.shader.FloatExtAttribute;
-import gaia.cu9.ari.gaiaorbit.util.gdx.shader.TextureExtAttribute;
-import gaia.cu9.ari.gaiaorbit.util.gdx.shader.Vector2Attribute;
+import gaiasky.data.AssetBean;
+import gaiasky.event.EventManager;
+import gaiasky.event.Events;
+import gaiasky.event.IObserver;
+import gaiasky.util.*;
+import gaiasky.util.GlobalConf.SceneConf.ElevationType;
+import gaiasky.util.Logger.Log;
+import gaiasky.util.gdx.model.IntModelInstance;
+import gaiasky.util.gdx.shader.FloatExtAttribute;
+import gaiasky.util.gdx.shader.TextureExtAttribute;
+import gaiasky.util.gdx.shader.Vector2Attribute;
 
 /**
  * A basic component that contains the info on a material.

@@ -3,9 +3,9 @@
  * See the file LICENSE.md in the project root for full license details.
  */
 
-package gaia.cu9.ari.gaiaorbit.event;
+package gaiasky.event;
 
-import gaia.cu9.ari.gaiaorbit.util.GlobalConf;
+import gaiasky.util.GlobalConf;
 
 /**
  * Contains all the events
@@ -305,7 +305,7 @@ public enum Events {
     GAMMA_CMD,
 
     /**
-     * Contains the tone mapping type as an {@link gaia.cu9.ari.gaiaorbit.util.GlobalConf.PostprocessConf.ToneMapping} or a
+     * Contains the tone mapping type as an {@link gaiasky.util.GlobalConf.PostprocessConf.ToneMapping} or a
      * string in [AUTO|EXPOSURE|NONE].
      */
     TONEMAPPING_TYPE_CMD,
@@ -514,12 +514,12 @@ public enum Events {
     STAR_POINT_SIZE_CMD,
     /**
      * Increase star point size by
-     * {@link gaia.cu9.ari.gaiaorbit.util.Constants#STEP_STAR_POINT_SIZE}
+     * {@link gaiasky.util.Constants#STEP_STAR_POINT_SIZE}
      **/
     STAR_POINT_SIZE_INCREASE_CMD,
     /**
      * Decrease star point size by
-     * {@link gaia.cu9.ari.gaiaorbit.util.Constants#STEP_STAR_POINT_SIZE}
+     * {@link gaiasky.util.Constants#STEP_STAR_POINT_SIZE}
      **/
     STAR_POINT_SIZE_DECREASE_CMD,
     /**
@@ -543,12 +543,12 @@ public enum Events {
      */
     ELEVATION_TYPE_CMD,
     /**
-     * Sets the elevation multiplier. Contains the new multiplier in [{@link gaia.cu9.ari.gaiaorbit.util.Constants#MIN_ELEVATION_MULT}, {@link gaia.cu9.ari.gaiaorbit.util.Constants#MAX_ELEVATION_MULT}]
+     * Sets the elevation multiplier. Contains the new multiplier in [{@link gaiasky.util.Constants#MIN_ELEVATION_MULT}, {@link gaiasky.util.Constants#MAX_ELEVATION_MULT}]
      */
     ELEVATION_MUTLIPLIER_CMD,
 
     /**
-     * Sets the tessellation quality. Contains the new quality in [{@link gaia.cu9.ari.gaiaorbit.util.Constants#MIN_TESS_QUALITY}, {@link gaia.cu9.ari.gaiaorbit.util.Constants#MAX_TESS_QUALITY}]
+     * Sets the tessellation quality. Contains the new quality in [{@link gaiasky.util.Constants#MIN_TESS_QUALITY}, {@link gaiasky.util.Constants#MAX_TESS_QUALITY}]
      */
     TESSELLATION_QUALITY_CMD,
 
@@ -617,7 +617,7 @@ public enum Events {
      **/
     UPDATEPAUSE_CHANGED,
     /**
-     * Graphics quality updated, contains the new {@link gaia.cu9.ari.gaiaorbit.util.GlobalConf.SceneConf.GraphicsQuality} object.
+     * Graphics quality updated, contains the new {@link gaiasky.util.GlobalConf.SceneConf.GraphicsQuality} object.
      **/
     GRAPHICS_QUALITY_UPDATED,
     /**
@@ -754,7 +754,7 @@ public enum Events {
     PM_ARROWHEADS_CMD,
     /**
      * Updates the screen mode according to whats in the
-     * {@link gaia.cu9.ari.gaiaorbit.util.GlobalConf#screen} bean.
+     * {@link gaiasky.util.GlobalConf#screen} bean.
      **/
     SCREEN_MODE_CMD,
     /**

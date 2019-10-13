@@ -3,7 +3,7 @@
  * See the file LICENSE.md in the project root for full license details.
  */
 
-package gaia.cu9.ari.gaiaorbit.util.gaia.utils;
+package gaiasky.util.gaia.utils;
 
 public interface Area {
 

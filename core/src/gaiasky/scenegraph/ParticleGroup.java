@@ -3,7 +3,7 @@
  * See the file LICENSE.md in the project root for full license details.
  */
 
-package gaia.cu9.ari.gaiaorbit.scenegraph;
+package gaiasky.scenegraph;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.assets.AssetManager;
@@ -12,26 +12,26 @@ import com.badlogic.gdx.graphics.PerspectiveCamera;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.TimeUtils;
-import gaia.cu9.ari.gaiaorbit.GaiaSky;
-import gaia.cu9.ari.gaiaorbit.data.group.IParticleGroupDataProvider;
-import gaia.cu9.ari.gaiaorbit.event.EventManager;
-import gaia.cu9.ari.gaiaorbit.event.Events;
-import gaia.cu9.ari.gaiaorbit.event.IObserver;
-import gaia.cu9.ari.gaiaorbit.render.ComponentTypes.ComponentType;
-import gaia.cu9.ari.gaiaorbit.render.I3DTextRenderable;
-import gaia.cu9.ari.gaiaorbit.render.RenderingContext;
-import gaia.cu9.ari.gaiaorbit.render.system.FontRenderSystem;
-import gaia.cu9.ari.gaiaorbit.scenegraph.camera.CameraManager;
-import gaia.cu9.ari.gaiaorbit.scenegraph.camera.CameraManager.CameraMode;
-import gaia.cu9.ari.gaiaorbit.scenegraph.camera.ICamera;
-import gaia.cu9.ari.gaiaorbit.scenegraph.camera.NaturalCamera;
-import gaia.cu9.ari.gaiaorbit.scenegraph.component.RotationComponent;
-import gaia.cu9.ari.gaiaorbit.util.*;
-import gaia.cu9.ari.gaiaorbit.util.coord.Coordinates;
-import gaia.cu9.ari.gaiaorbit.util.gdx.g2d.ExtSpriteBatch;
-import gaia.cu9.ari.gaiaorbit.util.gdx.shader.ExtShaderProgram;
-import gaia.cu9.ari.gaiaorbit.util.math.*;
-import gaia.cu9.ari.gaiaorbit.util.time.ITimeFrameProvider;
+import gaiasky.GaiaSky;
+import gaiasky.data.group.IParticleGroupDataProvider;
+import gaiasky.event.EventManager;
+import gaiasky.event.Events;
+import gaiasky.event.IObserver;
+import gaiasky.render.ComponentTypes.ComponentType;
+import gaiasky.render.I3DTextRenderable;
+import gaiasky.render.RenderingContext;
+import gaiasky.render.system.FontRenderSystem;
+import gaiasky.scenegraph.camera.CameraManager;
+import gaiasky.scenegraph.camera.CameraManager.CameraMode;
+import gaiasky.scenegraph.camera.ICamera;
+import gaiasky.scenegraph.camera.NaturalCamera;
+import gaiasky.scenegraph.component.RotationComponent;
+import gaiasky.util.*;
+import gaiasky.util.coord.Coordinates;
+import gaiasky.util.gdx.g2d.ExtSpriteBatch;
+import gaiasky.util.gdx.shader.ExtShaderProgram;
+import gaiasky.util.math.*;
+import gaiasky.util.time.ITimeFrameProvider;
 
 import java.io.Serializable;
 import java.util.Arrays;
@@ -349,7 +349,7 @@ public class ParticleGroup extends FadeNode implements I3DTextRenderable, IFocus
     }
 
     public void setProvider(String provider) {
-        this.provider = provider;
+        this.provider = provider.replace("gaia.cu9.ari.gaiaorbit", "gaiasky");
     }
 
     public void setDatafile(String datafile) {

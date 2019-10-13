@@ -3,15 +3,15 @@
  * See the file LICENSE.md in the project root for full license details.
  */
 
-package gaia.cu9.ari.gaiaorbit.interfce;
+package gaiasky.interfce;
 
 import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.utils.Disposable;
-import gaia.cu9.ari.gaiaorbit.render.ComponentTypes;
-import gaia.cu9.ari.gaiaorbit.render.ComponentTypes.ComponentType;
-import gaia.cu9.ari.gaiaorbit.scenegraph.ISceneGraph;
+import gaiasky.render.ComponentTypes;
+import gaiasky.render.ComponentTypes.ComponentType;
+import gaiasky.scenegraph.ISceneGraph;
 
 /**
  * An interface to be implemented by all top-level GUIs in Gaia Sky

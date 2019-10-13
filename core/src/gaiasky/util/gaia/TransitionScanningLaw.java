@@ -21,12 +21,12 @@
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  *
  */
-package gaia.cu9.ari.gaiaorbit.util.gaia;
+package gaiasky.util.gaia;
 
-import gaia.cu9.ari.gaiaorbit.util.Nature;
-import gaia.cu9.ari.gaiaorbit.util.coord.NslSun;
-import gaia.cu9.ari.gaiaorbit.util.gaia.time.Duration;
-import gaia.cu9.ari.gaiaorbit.util.math.Quaterniond;
+import gaiasky.util.Nature;
+import gaiasky.util.coord.NslSun;
+import gaiasky.util.gaia.time.Duration;
+import gaiasky.util.math.Quaterniond;
 
 /**
  * Implements a smooth transition from {@link Nsl37} to {@link Epsl}, or vice
@@ -167,7 +167,7 @@ public class TransitionScanningLaw extends AnalyticalAttitudeDataServer {
     }
 
     /**
-     * @see gaia.cu9.ari.gaiaorbit.util.gaia.AnalyticalAttitudeDataServer#getAttitude(long)
+     * @see gaiasky.util.gaia.AnalyticalAttitudeDataServer#getAttitude(long)
      * 
      * @param time
      *            - the time elapsed since the epoch of J2010 in ns (TCB)

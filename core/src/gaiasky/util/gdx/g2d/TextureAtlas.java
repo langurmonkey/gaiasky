@@ -19,7 +19,7 @@
  * limitations under the License.
  ******************************************************************************/
 
-package gaia.cu9.ari.gaiaorbit.util.gdx.g2d;
+package gaiasky.util.gdx.g2d;
 
 import com.badlogic.gdx.Files.FileType;
 import com.badlogic.gdx.Gdx;
@@ -37,7 +37,7 @@ import java.util.Comparator;
 
 import static com.badlogic.gdx.graphics.Texture.TextureWrap.ClampToEdge;
 import static com.badlogic.gdx.graphics.Texture.TextureWrap.Repeat;
-import static gaia.cu9.ari.gaiaorbit.util.gdx.g2d.TextureAtlas.TextureAtlasData.*;
+import static gaiasky.util.gdx.g2d.TextureAtlas.TextureAtlasData.*;
 
 /** Loads images from texture atlases created by TexturePacker.<br>
  * <br>

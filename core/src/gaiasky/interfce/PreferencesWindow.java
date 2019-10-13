@@ -3,7 +3,7 @@
  * See the file LICENSE.md in the project root for full license details.
  */
 
-package gaia.cu9.ari.gaiaorbit.interfce;
+package gaiasky.interfce;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Graphics.DisplayMode;
@@ -20,29 +20,29 @@ import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener.ChangeEvent;
 import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.Array;
-import gaia.cu9.ari.gaiaorbit.GaiaSky;
-import gaia.cu9.ari.gaiaorbit.desktop.util.SysUtils;
-import gaia.cu9.ari.gaiaorbit.event.EventManager;
-import gaia.cu9.ari.gaiaorbit.event.Events;
-import gaia.cu9.ari.gaiaorbit.interfce.KeyBindings.ProgramAction;
-import gaia.cu9.ari.gaiaorbit.interfce.beans.*;
-import gaia.cu9.ari.gaiaorbit.screenshot.ImageRenderer;
-import gaia.cu9.ari.gaiaorbit.util.*;
-import gaia.cu9.ari.gaiaorbit.util.GlobalConf.PostprocessConf.Antialias;
-import gaia.cu9.ari.gaiaorbit.util.GlobalConf.PostprocessConf.ToneMapping;
-import gaia.cu9.ari.gaiaorbit.util.GlobalConf.SceneConf.ElevationType;
-import gaia.cu9.ari.gaiaorbit.util.GlobalConf.SceneConf.GraphicsQuality;
-import gaia.cu9.ari.gaiaorbit.util.GlobalConf.ScreenshotMode;
-import gaia.cu9.ari.gaiaorbit.util.Logger.Log;
-import gaia.cu9.ari.gaiaorbit.util.datadesc.DataDescriptor;
-import gaia.cu9.ari.gaiaorbit.util.datadesc.DataDescriptorUtils;
-import gaia.cu9.ari.gaiaorbit.util.format.INumberFormat;
-import gaia.cu9.ari.gaiaorbit.util.format.NumberFormatFactory;
-import gaia.cu9.ari.gaiaorbit.util.math.MathUtilsd;
-import gaia.cu9.ari.gaiaorbit.util.scene2d.*;
-import gaia.cu9.ari.gaiaorbit.util.validator.IValidator;
-import gaia.cu9.ari.gaiaorbit.util.validator.IntValidator;
-import gaia.cu9.ari.gaiaorbit.util.validator.RegexpValidator;
+import gaiasky.GaiaSky;
+import gaiasky.desktop.util.SysUtils;
+import gaiasky.event.EventManager;
+import gaiasky.event.Events;
+import gaiasky.interfce.KeyBindings.ProgramAction;
+import gaiasky.interfce.beans.*;
+import gaiasky.screenshot.ImageRenderer;
+import gaiasky.util.*;
+import gaiasky.util.GlobalConf.PostprocessConf.Antialias;
+import gaiasky.util.GlobalConf.PostprocessConf.ToneMapping;
+import gaiasky.util.GlobalConf.SceneConf.ElevationType;
+import gaiasky.util.GlobalConf.SceneConf.GraphicsQuality;
+import gaiasky.util.GlobalConf.ScreenshotMode;
+import gaiasky.util.Logger.Log;
+import gaiasky.util.datadesc.DataDescriptor;
+import gaiasky.util.datadesc.DataDescriptorUtils;
+import gaiasky.util.format.INumberFormat;
+import gaiasky.util.format.NumberFormatFactory;
+import gaiasky.util.math.MathUtilsd;
+import gaiasky.util.scene2d.*;
+import gaiasky.util.validator.IValidator;
+import gaiasky.util.validator.IntValidator;
+import gaiasky.util.validator.RegexpValidator;
 
 import java.io.File;
 import java.io.FileInputStream;

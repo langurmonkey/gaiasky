@@ -3,12 +3,12 @@
  * See the file LICENSE.md in the project root for full license details.
  */
 
-package gaia.cu9.ari.gaiaorbit.screenshot;
+package gaiasky.screenshot;
 
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.Pixmap;
-import gaia.cu9.ari.gaiaorbit.util.Logger;
-import gaia.cu9.ari.gaiaorbit.util.Logger.Log;
+import gaiasky.util.Logger;
+import gaiasky.util.Logger.Log;
 
 import javax.imageio.IIOImage;
 import javax.imageio.ImageIO;

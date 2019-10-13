@@ -3,7 +3,7 @@
  * See the file LICENSE.md in the project root for full license details.
  */
 
-package gaia.cu9.ari.gaiaorbit.script;
+package gaiasky.script;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input.Keys;
@@ -13,27 +13,27 @@ import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Group;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.TimeUtils;
-import gaia.cu9.ari.gaiaorbit.GaiaSky;
-import gaia.cu9.ari.gaiaorbit.data.group.STILDataProvider;
-import gaia.cu9.ari.gaiaorbit.desktop.util.SysUtils;
-import gaia.cu9.ari.gaiaorbit.event.EventManager;
-import gaia.cu9.ari.gaiaorbit.event.EventManager.TimeFrame;
-import gaia.cu9.ari.gaiaorbit.event.Events;
-import gaia.cu9.ari.gaiaorbit.event.IObserver;
-import gaia.cu9.ari.gaiaorbit.interfce.IGui;
-import gaia.cu9.ari.gaiaorbit.render.ComponentTypes;
-import gaia.cu9.ari.gaiaorbit.scenegraph.*;
-import gaia.cu9.ari.gaiaorbit.scenegraph.StarGroup.StarBean;
-import gaia.cu9.ari.gaiaorbit.scenegraph.camera.CameraManager.CameraMode;
-import gaia.cu9.ari.gaiaorbit.scenegraph.camera.NaturalCamera;
-import gaia.cu9.ari.gaiaorbit.screenshot.ImageRenderer;
-import gaia.cu9.ari.gaiaorbit.util.*;
-import gaia.cu9.ari.gaiaorbit.util.Logger.Log;
-import gaia.cu9.ari.gaiaorbit.util.color.ColourUtils;
-import gaia.cu9.ari.gaiaorbit.util.coord.Coordinates;
-import gaia.cu9.ari.gaiaorbit.util.gdx.contrib.postprocess.effects.CubemapProjections;
-import gaia.cu9.ari.gaiaorbit.util.math.*;
-import gaia.cu9.ari.gaiaorbit.util.time.ITimeFrameProvider;
+import gaiasky.GaiaSky;
+import gaiasky.data.group.STILDataProvider;
+import gaiasky.desktop.util.SysUtils;
+import gaiasky.event.EventManager;
+import gaiasky.event.EventManager.TimeFrame;
+import gaiasky.event.Events;
+import gaiasky.event.IObserver;
+import gaiasky.interfce.IGui;
+import gaiasky.render.ComponentTypes;
+import gaiasky.scenegraph.*;
+import gaiasky.scenegraph.StarGroup.StarBean;
+import gaiasky.scenegraph.camera.CameraManager.CameraMode;
+import gaiasky.scenegraph.camera.NaturalCamera;
+import gaiasky.screenshot.ImageRenderer;
+import gaiasky.util.*;
+import gaiasky.util.Logger.Log;
+import gaiasky.util.color.ColourUtils;
+import gaiasky.util.coord.Coordinates;
+import gaiasky.util.gdx.contrib.postprocess.effects.CubemapProjections;
+import gaiasky.util.math.*;
+import gaiasky.util.time.ITimeFrameProvider;
 import uk.ac.starlink.util.DataSource;
 import uk.ac.starlink.util.FileDataSource;
 

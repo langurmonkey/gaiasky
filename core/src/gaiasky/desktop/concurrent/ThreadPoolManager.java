@@ -3,7 +3,7 @@
  * See the file LICENSE.md in the project root for full license details.
  */
 
-package gaia.cu9.ari.gaiaorbit.desktop.concurrent;
+package gaiasky.desktop.concurrent;
 
 import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadPoolExecutor;

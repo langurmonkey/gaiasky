@@ -3,7 +3,7 @@
  * See the file LICENSE.md in the project root for full license details.
  */
 
-package gaia.cu9.ari.gaiaorbit.assets;
+package gaiasky.assets;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.assets.AssetDescriptor;
@@ -13,7 +13,7 @@ import com.badlogic.gdx.assets.loaders.AsynchronousAssetLoader;
 import com.badlogic.gdx.assets.loaders.FileHandleResolver;
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.utils.Array;
-import gaia.cu9.ari.gaiaorbit.util.gdx.shader.TessellationShaderProvider;
+import gaiasky.util.gdx.shader.TessellationShaderProvider;
 
 public class TessellationShaderProviderLoader<T extends TessellationShaderProviderLoader.TessellationShaderProviderParameter> extends AsynchronousAssetLoader<TessellationShaderProvider, T> {
 

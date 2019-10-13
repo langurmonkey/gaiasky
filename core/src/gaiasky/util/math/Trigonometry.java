@@ -3,7 +3,7 @@
  * See the file LICENSE.md in the project root for full license details.
  */
 
-package gaia.cu9.ari.gaiaorbit.util.math;
+package gaiasky.util.math;
 
 /**
  * Uses the default {@link java.lang.Math} library. Very accurate but not the

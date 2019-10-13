@@ -3,14 +3,14 @@
  * See the file LICENSE.md in the project root for full license details.
  */
 
-package gaia.cu9.ari.gaiaorbit.util.coord.vsop87;
+package gaiasky.util.coord.vsop87;
 
-import gaia.cu9.ari.gaiaorbit.util.Constants;
-import gaia.cu9.ari.gaiaorbit.util.Nature;
-import gaia.cu9.ari.gaiaorbit.util.coord.AbstractOrbitCoordinates;
-import gaia.cu9.ari.gaiaorbit.util.coord.AstroUtils;
-import gaia.cu9.ari.gaiaorbit.util.coord.Coordinates;
-import gaia.cu9.ari.gaiaorbit.util.math.Vector3d;
+import gaiasky.util.Constants;
+import gaiasky.util.Nature;
+import gaiasky.util.coord.AbstractOrbitCoordinates;
+import gaiasky.util.coord.AstroUtils;
+import gaiasky.util.coord.Coordinates;
+import gaiasky.util.math.Vector3d;
 
 import java.time.Instant;
 

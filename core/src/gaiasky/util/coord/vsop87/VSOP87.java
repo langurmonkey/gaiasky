@@ -3,13 +3,13 @@
  * See the file LICENSE.md in the project root for full license details.
  */
 
-package gaia.cu9.ari.gaiaorbit.util.coord.vsop87;
+package gaiasky.util.coord.vsop87;
 
 import com.badlogic.gdx.utils.reflect.ClassReflection;
 import com.badlogic.gdx.utils.reflect.ReflectionException;
-import gaia.cu9.ari.gaiaorbit.util.Logger;
-import gaia.cu9.ari.gaiaorbit.util.Logger.Log;
-import gaia.cu9.ari.gaiaorbit.util.TextUtils;
+import gaiasky.util.Logger;
+import gaiasky.util.Logger.Log;
+import gaiasky.util.TextUtils;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -32,7 +32,7 @@ public class VSOP87 {
     public iVSOP87 getVOSP87(String cb) {
         if (!tried.containsKey(cb) || !tried.get(cb)) {
             // Initialize
-            String pkg = "gaia.cu9.ari.gaiaorbit.util.coord.vsop87.";
+            String pkg = "gaiasky.util.coord.vsop87.";
             String name = TextUtils.trueCapitalise(cb) + "VSOP87";
             Class<?> clazz = null;
             try {

@@ -3,7 +3,7 @@
  * See the file LICENSE.md in the project root for full license details.
  */
 
-package gaia.cu9.ari.gaiaorbit.util.io;
+package gaiasky.util.io;
 
 import java.io.File;
 import java.io.FileInputStream;

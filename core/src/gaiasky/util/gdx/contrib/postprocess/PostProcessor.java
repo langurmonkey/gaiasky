@@ -19,7 +19,7 @@
  * limitations under the License.
  ******************************************************************************/
 
-package gaia.cu9.ari.gaiaorbit.util.gdx.contrib.postprocess;
+package gaiasky.util.gdx.contrib.postprocess;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
@@ -30,10 +30,10 @@ import com.badlogic.gdx.graphics.glutils.FrameBuffer;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Disposable;
-import gaia.cu9.ari.gaiaorbit.render.IPostProcessor.RenderType;
-import gaia.cu9.ari.gaiaorbit.util.gdx.contrib.postprocess.utils.PingPongBuffer;
-import gaia.cu9.ari.gaiaorbit.util.gdx.contrib.utils.GaiaSkyFrameBuffer;
-import gaia.cu9.ari.gaiaorbit.util.gdx.contrib.utils.ItemsManager;
+import gaiasky.render.IPostProcessor.RenderType;
+import gaiasky.util.gdx.contrib.postprocess.utils.PingPongBuffer;
+import gaiasky.util.gdx.contrib.utils.GaiaSkyFrameBuffer;
+import gaiasky.util.gdx.contrib.utils.ItemsManager;
 
 /**
  * Provides a way to capture the rendered scene to an off-screen buffer and to apply a chain of effects on it before rendering to

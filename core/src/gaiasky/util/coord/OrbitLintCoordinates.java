@@ -3,13 +3,13 @@
  * See the file LICENSE.md in the project root for full license details.
  */
 
-package gaia.cu9.ari.gaiaorbit.util.coord;
+package gaiasky.util.coord;
 
-import gaia.cu9.ari.gaiaorbit.data.util.PointCloudData;
-import gaia.cu9.ari.gaiaorbit.scenegraph.CelestialBody;
-import gaia.cu9.ari.gaiaorbit.scenegraph.component.OrbitComponent;
-import gaia.cu9.ari.gaiaorbit.util.math.Matrix4d;
-import gaia.cu9.ari.gaiaorbit.util.math.Vector3d;
+import gaiasky.data.util.PointCloudData;
+import gaiasky.scenegraph.CelestialBody;
+import gaiasky.scenegraph.component.OrbitComponent;
+import gaiasky.util.math.Matrix4d;
+import gaiasky.util.math.Vector3d;
 
 import java.time.Instant;
 

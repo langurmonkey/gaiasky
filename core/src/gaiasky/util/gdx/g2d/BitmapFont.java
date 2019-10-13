@@ -25,7 +25,7 @@
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package gaia.cu9.ari.gaiaorbit.util.gdx.g2d;
+package gaiasky.util.gdx.g2d;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.files.FileHandle;
@@ -33,7 +33,7 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.Texture.TextureFilter;
 import com.badlogic.gdx.utils.*;
-import gaia.cu9.ari.gaiaorbit.util.gdx.g2d.GlyphLayout.GlyphRun;
+import gaiasky.util.gdx.g2d.GlyphLayout.GlyphRun;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
@@ -41,7 +41,7 @@ import java.util.StringTokenizer;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import static gaia.cu9.ari.gaiaorbit.util.gdx.g2d.TextureAtlas.AtlasRegion;
+import static gaiasky.util.gdx.g2d.TextureAtlas.AtlasRegion;
 
 /** Renders bitmap fonts. The font consists of 2 files: an image file or {@link TextureRegion} containing the glyphs and a file in
  * the AngleCode BMFont text format that describes where each glyph is on the image.

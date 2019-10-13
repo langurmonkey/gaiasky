@@ -19,7 +19,7 @@
  * limitations under the License.
  ******************************************************************************/
 
-package gaia.cu9.ari.gaiaorbit.util.gdx.loader;
+package gaiasky.util.gdx.loader;
 
 import com.badlogic.gdx.assets.AssetDescriptor;
 import com.badlogic.gdx.assets.AssetLoaderParameters;
@@ -34,12 +34,12 @@ import com.badlogic.gdx.graphics.Texture.TextureFilter;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.GdxRuntimeException;
-import gaia.cu9.ari.gaiaorbit.util.gdx.g2d.BitmapFont;
-import gaia.cu9.ari.gaiaorbit.util.gdx.g2d.BitmapFont.BitmapFontData;
-import gaia.cu9.ari.gaiaorbit.util.gdx.g2d.TextureAtlas;
-import gaia.cu9.ari.gaiaorbit.util.gdx.g2d.TextureRegion;
+import gaiasky.util.gdx.g2d.BitmapFont;
+import gaiasky.util.gdx.g2d.BitmapFont.BitmapFontData;
+import gaiasky.util.gdx.g2d.TextureAtlas;
+import gaiasky.util.gdx.g2d.TextureRegion;
 
-import static gaia.cu9.ari.gaiaorbit.util.gdx.g2d.TextureAtlas.*;
+import static gaiasky.util.gdx.g2d.TextureAtlas.*;
 
 /** {@link AssetLoader} for {@link BitmapFont} instances. Loads the font description file (.fnt) asynchronously, loads the
  * {@link Texture} containing the glyphs as a dependency. The {@link BitmapFontParameter} allows you to set things like texture

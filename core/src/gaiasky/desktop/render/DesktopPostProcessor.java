@@ -3,7 +3,7 @@
  * See the file LICENSE.md in the project root for full license details.
  */
 
-package gaia.cu9.ari.gaiaorbit.desktop.render;
+package gaiasky.desktop.render;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.assets.AssetManager;
@@ -14,28 +14,28 @@ import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.Timer;
 import com.badlogic.gdx.utils.Timer.Task;
-import gaia.cu9.ari.gaiaorbit.GaiaSky;
-import gaia.cu9.ari.gaiaorbit.desktop.util.SysUtils;
-import gaia.cu9.ari.gaiaorbit.event.EventManager;
-import gaia.cu9.ari.gaiaorbit.event.Events;
-import gaia.cu9.ari.gaiaorbit.event.IObserver;
-import gaia.cu9.ari.gaiaorbit.render.IPostProcessor;
-import gaia.cu9.ari.gaiaorbit.scenegraph.BackgroundModel;
-import gaia.cu9.ari.gaiaorbit.scenegraph.component.MaterialComponent;
-import gaia.cu9.ari.gaiaorbit.scenegraph.component.ModelComponent;
-import gaia.cu9.ari.gaiaorbit.util.GlobalConf;
-import gaia.cu9.ari.gaiaorbit.util.GlobalConf.PostprocessConf.Antialias;
-import gaia.cu9.ari.gaiaorbit.util.GlobalConf.ProgramConf.StereoProfile;
-import gaia.cu9.ari.gaiaorbit.util.GlobalConf.SceneConf.GraphicsQuality;
-import gaia.cu9.ari.gaiaorbit.util.GlobalResources;
-import gaia.cu9.ari.gaiaorbit.util.I18n;
-import gaia.cu9.ari.gaiaorbit.util.Logger;
-import gaia.cu9.ari.gaiaorbit.util.coord.StaticCoordinates;
-import gaia.cu9.ari.gaiaorbit.util.gdx.contrib.postprocess.PostProcessor;
-import gaia.cu9.ari.gaiaorbit.util.gdx.contrib.postprocess.effects.*;
-import gaia.cu9.ari.gaiaorbit.util.gdx.contrib.postprocess.filters.Glow;
-import gaia.cu9.ari.gaiaorbit.util.gdx.contrib.utils.ShaderLoader;
-import gaia.cu9.ari.gaiaorbit.util.math.Vector3d;
+import gaiasky.GaiaSky;
+import gaiasky.desktop.util.SysUtils;
+import gaiasky.event.EventManager;
+import gaiasky.event.Events;
+import gaiasky.event.IObserver;
+import gaiasky.render.IPostProcessor;
+import gaiasky.scenegraph.BackgroundModel;
+import gaiasky.scenegraph.component.MaterialComponent;
+import gaiasky.scenegraph.component.ModelComponent;
+import gaiasky.util.GlobalConf;
+import gaiasky.util.GlobalConf.PostprocessConf.Antialias;
+import gaiasky.util.GlobalConf.ProgramConf.StereoProfile;
+import gaiasky.util.GlobalConf.SceneConf.GraphicsQuality;
+import gaiasky.util.GlobalResources;
+import gaiasky.util.I18n;
+import gaiasky.util.Logger;
+import gaiasky.util.coord.StaticCoordinates;
+import gaiasky.util.gdx.contrib.postprocess.PostProcessor;
+import gaiasky.util.gdx.contrib.postprocess.effects.*;
+import gaiasky.util.gdx.contrib.postprocess.filters.Glow;
+import gaiasky.util.gdx.contrib.utils.ShaderLoader;
+import gaiasky.util.math.Vector3d;
 
 import java.util.HashMap;
 import java.util.Map;

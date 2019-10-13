@@ -3,7 +3,7 @@
  * See the file LICENSE.md in the project root for full license details.
  */
 
-package gaia.cu9.ari.gaiaorbit.scenegraph.component;
+package gaiasky.scenegraph.component;
 
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.VertexAttributes.Usage;
@@ -11,17 +11,17 @@ import com.badlogic.gdx.graphics.g3d.Material;
 import com.badlogic.gdx.graphics.g3d.attributes.BlendingAttribute;
 import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Vector3;
-import gaia.cu9.ari.gaiaorbit.scenegraph.Planet;
-import gaia.cu9.ari.gaiaorbit.scenegraph.SceneGraphNode;
-import gaia.cu9.ari.gaiaorbit.util.Constants;
-import gaia.cu9.ari.gaiaorbit.util.ModelCache;
-import gaia.cu9.ari.gaiaorbit.util.Pair;
-import gaia.cu9.ari.gaiaorbit.util.coord.Coordinates;
-import gaia.cu9.ari.gaiaorbit.util.gdx.model.IntModel;
-import gaia.cu9.ari.gaiaorbit.util.gdx.model.IntModelInstance;
-import gaia.cu9.ari.gaiaorbit.util.gdx.shader.AtmosphereAttribute;
-import gaia.cu9.ari.gaiaorbit.util.gdx.shader.Vector3Attribute;
-import gaia.cu9.ari.gaiaorbit.util.math.Vector3d;
+import gaiasky.scenegraph.Planet;
+import gaiasky.scenegraph.SceneGraphNode;
+import gaiasky.util.Constants;
+import gaiasky.util.ModelCache;
+import gaiasky.util.Pair;
+import gaiasky.util.coord.Coordinates;
+import gaiasky.util.gdx.model.IntModel;
+import gaiasky.util.gdx.model.IntModelInstance;
+import gaiasky.util.gdx.shader.AtmosphereAttribute;
+import gaiasky.util.gdx.shader.Vector3Attribute;
+import gaiasky.util.math.Vector3d;
 
 import java.util.Map;
 

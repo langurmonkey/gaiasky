@@ -3,12 +3,12 @@
  * See the file LICENSE.md in the project root for full license details.
  */
 
-package gaia.cu9.ari.gaiaorbit.util.gdx.shader;
+package gaiasky.util.gdx.shader;
 
 import com.badlogic.gdx.files.FileHandle;
-import gaia.cu9.ari.gaiaorbit.assets.ShaderTemplatingLoader;
-import gaia.cu9.ari.gaiaorbit.util.gdx.IntRenderable;
-import gaia.cu9.ari.gaiaorbit.util.gdx.shader.provider.DefaultIntShaderProvider;
+import gaiasky.assets.ShaderTemplatingLoader;
+import gaiasky.util.gdx.IntRenderable;
+import gaiasky.util.gdx.shader.provider.DefaultIntShaderProvider;
 
 public class RelativisticShaderProvider extends DefaultIntShaderProvider {
     public final RelativisticShader.Config config;

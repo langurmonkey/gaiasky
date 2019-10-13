@@ -3,7 +3,7 @@
  * See the file LICENSE.md in the project root for full license details.
  */
 
-package gaia.cu9.ari.gaiaorbit.util.gdx.shader;
+package gaiasky.util.gdx.shader;
 
 import com.badlogic.gdx.graphics.g3d.Attribute;
 import com.badlogic.gdx.math.Matrix4;

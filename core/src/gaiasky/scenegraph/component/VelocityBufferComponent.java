@@ -3,16 +3,16 @@
  * See the file LICENSE.md in the project root for full license details.
  */
 
-package gaia.cu9.ari.gaiaorbit.scenegraph.component;
+package gaiasky.scenegraph.component;
 
 import com.badlogic.gdx.graphics.g3d.Material;
 import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.Array;
-import gaia.cu9.ari.gaiaorbit.scenegraph.camera.ICamera;
-import gaia.cu9.ari.gaiaorbit.util.gdx.shader.Matrix4Attribute;
-import gaia.cu9.ari.gaiaorbit.util.gdx.shader.Vector3Attribute;
-import gaia.cu9.ari.gaiaorbit.util.math.Vector3d;
+import gaiasky.scenegraph.camera.ICamera;
+import gaiasky.util.gdx.shader.Matrix4Attribute;
+import gaiasky.util.gdx.shader.Vector3Attribute;
+import gaiasky.util.math.Vector3d;
 
 import java.util.Map;
 import java.util.Set;

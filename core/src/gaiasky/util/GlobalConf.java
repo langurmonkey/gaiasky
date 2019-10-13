@@ -3,7 +3,7 @@
  * See the file LICENSE.md in the project root for full license details.
  */
 
-package gaia.cu9.ari.gaiaorbit.util;
+package gaiasky.util;
 
 import com.badlogic.gdx.controllers.Controller;
 import com.badlogic.gdx.controllers.ControllerListener;
@@ -11,21 +11,21 @@ import com.badlogic.gdx.controllers.Controllers;
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.utils.Array;
-import gaia.cu9.ari.gaiaorbit.GaiaSky;
-import gaia.cu9.ari.gaiaorbit.desktop.util.camera.CameraKeyframeManager;
-import gaia.cu9.ari.gaiaorbit.event.EventManager;
-import gaia.cu9.ari.gaiaorbit.event.Events;
-import gaia.cu9.ari.gaiaorbit.event.IObserver;
-import gaia.cu9.ari.gaiaorbit.interfce.ModePopupInfo;
-import gaia.cu9.ari.gaiaorbit.render.ComponentTypes.ComponentType;
-import gaia.cu9.ari.gaiaorbit.render.system.AbstractRenderSystem;
-import gaia.cu9.ari.gaiaorbit.util.Logger.Log;
-import gaia.cu9.ari.gaiaorbit.util.format.DateFormatFactory;
-import gaia.cu9.ari.gaiaorbit.util.format.DateFormatFactory.DateType;
-import gaia.cu9.ari.gaiaorbit.util.format.IDateFormat;
-import gaia.cu9.ari.gaiaorbit.util.gdx.contrib.postprocess.effects.CubemapProjections;
-import gaia.cu9.ari.gaiaorbit.util.math.MathUtilsd;
-import gaia.cu9.ari.gaiaorbit.util.update.VersionChecker;
+import gaiasky.GaiaSky;
+import gaiasky.desktop.util.camera.CameraKeyframeManager;
+import gaiasky.event.EventManager;
+import gaiasky.event.Events;
+import gaiasky.event.IObserver;
+import gaiasky.interfce.ModePopupInfo;
+import gaiasky.render.ComponentTypes.ComponentType;
+import gaiasky.render.system.AbstractRenderSystem;
+import gaiasky.util.Logger.Log;
+import gaiasky.util.format.DateFormatFactory;
+import gaiasky.util.format.DateFormatFactory.DateType;
+import gaiasky.util.format.IDateFormat;
+import gaiasky.util.gdx.contrib.postprocess.effects.CubemapProjections;
+import gaiasky.util.math.MathUtilsd;
+import gaiasky.util.update.VersionChecker;
 
 import java.io.File;
 import java.nio.file.Path;

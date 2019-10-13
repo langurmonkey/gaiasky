@@ -3,13 +3,13 @@
  * See the file LICENSE.md in the project root for full license details.
  */
 
-package gaia.cu9.ari.gaiaorbit.render;
+package gaiasky.render;
 
 import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.graphics.glutils.FrameBuffer;
 import com.badlogic.gdx.utils.Disposable;
-import gaia.cu9.ari.gaiaorbit.render.IPostProcessor.PostProcessBean;
-import gaia.cu9.ari.gaiaorbit.scenegraph.camera.ICamera;
+import gaiasky.render.IPostProcessor.PostProcessBean;
+import gaiasky.scenegraph.camera.ICamera;
 
 /**
  * Interface for component renderers.

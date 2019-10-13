@@ -3,28 +3,28 @@
  * See the file LICENSE.md in the project root for full license details.
  */
 
-package gaia.cu9.ari.gaiaorbit.scenegraph;
+package gaiasky.scenegraph;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.math.Vector3;
-import gaia.cu9.ari.gaiaorbit.render.I3DTextRenderable;
-import gaia.cu9.ari.gaiaorbit.render.RenderingContext;
-import gaia.cu9.ari.gaiaorbit.render.RenderingContext.CubemapSide;
-import gaia.cu9.ari.gaiaorbit.scenegraph.camera.ICamera;
-import gaia.cu9.ari.gaiaorbit.util.DecalUtils;
-import gaia.cu9.ari.gaiaorbit.util.GlobalConf;
-import gaia.cu9.ari.gaiaorbit.util.GlobalResources;
-import gaia.cu9.ari.gaiaorbit.util.Logger;
-import gaia.cu9.ari.gaiaorbit.util.coord.IBodyCoordinates;
-import gaia.cu9.ari.gaiaorbit.util.gdx.g2d.BitmapFont;
-import gaia.cu9.ari.gaiaorbit.util.gdx.g2d.ExtSpriteBatch;
-import gaia.cu9.ari.gaiaorbit.util.gdx.shader.ExtShaderProgram;
-import gaia.cu9.ari.gaiaorbit.util.math.Matrix4d;
-import gaia.cu9.ari.gaiaorbit.util.math.Vector2d;
-import gaia.cu9.ari.gaiaorbit.util.math.Vector3d;
-import gaia.cu9.ari.gaiaorbit.util.time.ITimeFrameProvider;
-import gaia.cu9.ari.gaiaorbit.util.tree.OctreeNode;
+import gaiasky.render.I3DTextRenderable;
+import gaiasky.render.RenderingContext;
+import gaiasky.render.RenderingContext.CubemapSide;
+import gaiasky.scenegraph.camera.ICamera;
+import gaiasky.util.DecalUtils;
+import gaiasky.util.GlobalConf;
+import gaiasky.util.GlobalResources;
+import gaiasky.util.Logger;
+import gaiasky.util.coord.IBodyCoordinates;
+import gaiasky.util.gdx.g2d.BitmapFont;
+import gaiasky.util.gdx.g2d.ExtSpriteBatch;
+import gaiasky.util.gdx.shader.ExtShaderProgram;
+import gaiasky.util.math.Matrix4d;
+import gaiasky.util.math.Vector2d;
+import gaiasky.util.math.Vector3d;
+import gaiasky.util.time.ITimeFrameProvider;
+import gaiasky.util.tree.OctreeNode;
 import net.jafama.FastMath;
 
 /**
@@ -35,7 +35,7 @@ import net.jafama.FastMath;
 public abstract class AbstractPositionEntity extends SceneGraphNode {
     /**
      * Position of this entity in the local reference system. The units are
-     * {@link gaia.cu9.ari.gaiaorbit.util.Constants#U_TO_KM} by default.
+     * {@link gaiasky.util.Constants#U_TO_KM} by default.
      */
     public Vector3d pos;
 

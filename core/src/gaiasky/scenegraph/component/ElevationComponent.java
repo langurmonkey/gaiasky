@@ -3,17 +3,17 @@
  * See the file LICENSE.md in the project root for full license details.
  */
 
-package gaia.cu9.ari.gaiaorbit.scenegraph.component;
+package gaiasky.scenegraph.component;
 
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.math.Vector2;
-import gaia.cu9.ari.gaiaorbit.util.Logger;
-import gaia.cu9.ari.gaiaorbit.util.Logger.Log;
-import gaia.cu9.ari.gaiaorbit.util.Pair;
-import gaia.cu9.ari.gaiaorbit.util.math.MathUtilsd;
-import gaia.cu9.ari.gaiaorbit.util.noise.NoiseUtils;
-import gaia.cu9.ari.gaiaorbit.util.noise.OpenSimplexNoise;
+import gaiasky.util.Logger;
+import gaiasky.util.Logger.Log;
+import gaiasky.util.Pair;
+import gaiasky.util.math.MathUtilsd;
+import gaiasky.util.noise.NoiseUtils;
+import gaiasky.util.noise.OpenSimplexNoise;
 
 /**
  * Contains the parameters and functions for procedural elevation

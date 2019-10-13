@@ -3,13 +3,13 @@
  * See the file LICENSE.md in the project root for full license details.
  */
 
-package gaia.cu9.ari.gaiaorbit.util.gdx;
+package gaiasky.util.gdx;
 
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.IntArray;
-import gaia.cu9.ari.gaiaorbit.util.gdx.IntMeshPartBuilder.VertexInfo;
+import gaiasky.util.gdx.IntMeshPartBuilder.VertexInfo;
 
 public class SphereCreator extends ModelCreator {
 

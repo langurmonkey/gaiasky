@@ -3,11 +3,11 @@
  * See the file LICENSE.md in the project root for full license details.
  */
 
-package gaia.cu9.ari.gaiaorbit.data.stars;
+package gaiasky.data.stars;
 
 import com.badlogic.gdx.utils.Array;
-import gaia.cu9.ari.gaiaorbit.scenegraph.CelestialBody;
-import gaia.cu9.ari.gaiaorbit.scenegraph.SceneGraphNode;
+import gaiasky.scenegraph.CelestialBody;
+import gaiasky.scenegraph.SceneGraphNode;
 
 import java.io.FileNotFoundException;
 import java.util.ArrayList;

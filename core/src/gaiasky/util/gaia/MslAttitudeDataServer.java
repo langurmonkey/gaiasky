@@ -3,11 +3,11 @@
  * See the file LICENSE.md in the project root for full license details.
  */
 
-package gaia.cu9.ari.gaiaorbit.util.gaia;
+package gaiasky.util.gaia;
 
-import gaia.cu9.ari.gaiaorbit.util.gaia.time.Duration;
-import gaia.cu9.ari.gaiaorbit.util.gaia.utils.AttitudeUtils;
-import gaia.cu9.ari.gaiaorbit.util.math.Quaterniond;
+import gaiasky.util.gaia.time.Duration;
+import gaiasky.util.gaia.utils.AttitudeUtils;
+import gaiasky.util.math.Quaterniond;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -110,7 +110,7 @@ public class MslAttitudeDataServer extends HermiteInterpolatedAttitudeDataServer
     }
 
     /**
-     * @see gaia.cu9.ari.gaiaorbit.util.gaia.HermiteInterpolatedAttitudeDataServer#initialize()
+     * @see gaiasky.util.gaia.HermiteInterpolatedAttitudeDataServer#initialize()
      */
     @Override
     public void initialize() {
@@ -329,7 +329,7 @@ public class MslAttitudeDataServer extends HermiteInterpolatedAttitudeDataServer
     }
 
     /**
-     * @see gaia.cu9.ari.gaiaorbit.util.gaia.HermiteInterpolatedAttitudeDataServer#getAttitude(long)
+     * @see gaiasky.util.gaia.HermiteInterpolatedAttitudeDataServer#getAttitude(long)
      */
     public Attitude getAttitudeNative(long t) throws RuntimeException {
 

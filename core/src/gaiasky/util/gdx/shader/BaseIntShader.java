@@ -19,7 +19,7 @@
  * limitations under the License.
  ******************************************************************************/
 
-package gaia.cu9.ari.gaiaorbit.util.gdx.shader;
+package gaiasky.util.gdx.shader;
 
 import com.badlogic.gdx.graphics.*;
 import com.badlogic.gdx.graphics.g3d.Attributes;
@@ -33,9 +33,9 @@ import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.GdxRuntimeException;
 import com.badlogic.gdx.utils.IntArray;
 import com.badlogic.gdx.utils.IntIntMap;
-import gaia.cu9.ari.gaiaorbit.util.gdx.IntRenderable;
-import gaia.cu9.ari.gaiaorbit.util.gdx.mesh.IntMesh;
-import gaia.cu9.ari.gaiaorbit.util.gdx.model.IntMeshPart;
+import gaiasky.util.gdx.IntRenderable;
+import gaiasky.util.gdx.mesh.IntMesh;
+import gaiasky.util.gdx.model.IntMeshPart;
 
 /** @author Xoppa A BaseIntShader is a wrapper around a ExtShaderProgram that keeps track of the uniform and attribute locations. It does
  *         not manage the ShaderPogram, you are still responsible for disposing the ExtShaderProgram. */

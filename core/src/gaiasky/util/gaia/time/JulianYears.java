@@ -21,7 +21,7 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  *
  */
-package gaia.cu9.ari.gaiaorbit.util.gaia.time;
+package gaiasky.util.gaia.time;
 
 import java.io.Serializable;
 
@@ -35,7 +35,7 @@ import java.io.Serializable;
  * Performance tests of both implementations have come up with a performance
  * improvement of 20% of the static methods compared with the object methods.
  *
- * @see gaia.cu9.ari.gaiaorbit.util.gaia.time.test.DurationTest
+ * @see gaiasky.util.gaia.time.test.DurationTest
  * @author ulammers
  * @version $Id: JulianYears.java 405499 2014-12-18 20:21:02Z hsiddiqu $
  */
@@ -59,7 +59,7 @@ public class JulianYears extends ConcreteDuration implements Serializable {
     }
 
     /**
-     * @see gaia.cu9.ari.gaiaorbit.util.gaia.time.Duration#set(Duration)
+     * @see gaiasky.util.gaia.time.Duration#set(Duration)
      */
     @Override
     public Duration set(final Duration d) {
@@ -69,7 +69,7 @@ public class JulianYears extends ConcreteDuration implements Serializable {
     }
 
     /**
-     * @see gaia.cu9.ari.gaiaorbit.util.gaia.time.Duration#asNanoSecs()
+     * @see gaiasky.util.gaia.time.Duration#asNanoSecs()
      */
     @Override
     public long asNanoSecs() {
@@ -86,7 +86,7 @@ public class JulianYears extends ConcreteDuration implements Serializable {
     }
 
     /**
-     * @see gaia.cu9.ari.gaiaorbit.util.gaia.time.Duration#asSecs()
+     * @see gaiasky.util.gaia.time.Duration#asSecs()
      */
     @Override
     public double asSecs() {
@@ -103,7 +103,7 @@ public class JulianYears extends ConcreteDuration implements Serializable {
     }
 
     /**
-     * @see gaia.cu9.ari.gaiaorbit.util.gaia.time.Duration#asMins()
+     * @see gaiasky.util.gaia.time.Duration#asMins()
      */
     @Override
     public double asMins() {
@@ -120,7 +120,7 @@ public class JulianYears extends ConcreteDuration implements Serializable {
     }
 
     /**
-     * @see gaia.cu9.ari.gaiaorbit.util.gaia.time.Duration#asHours()
+     * @see gaiasky.util.gaia.time.Duration#asHours()
      */
     @Override
     public double asHours() {
@@ -137,7 +137,7 @@ public class JulianYears extends ConcreteDuration implements Serializable {
     }
 
     /**
-     * @see gaia.cu9.ari.gaiaorbit.util.gaia.time.Duration#asRevs()
+     * @see gaiasky.util.gaia.time.Duration#asRevs()
      */
     @Override
     public double asRevs() {
@@ -154,7 +154,7 @@ public class JulianYears extends ConcreteDuration implements Serializable {
     }
 
     /**
-     * @see gaia.cu9.ari.gaiaorbit.util.gaia.time.Duration#asDays()
+     * @see gaiasky.util.gaia.time.Duration#asDays()
      */
     @Override
     public double asDays() {
@@ -171,7 +171,7 @@ public class JulianYears extends ConcreteDuration implements Serializable {
     }
 
     /**
-     * @see gaia.cu9.ari.gaiaorbit.util.gaia.time.Duration#asJulianYears()
+     * @see gaiasky.util.gaia.time.Duration#asJulianYears()
      */
     @Override
     public double asJulianYears() {
@@ -179,7 +179,7 @@ public class JulianYears extends ConcreteDuration implements Serializable {
     }
 
     /**
-     * @see gaia.cu9.ari.gaiaorbit.util.gaia.time.Duration#sub(Duration)
+     * @see gaiasky.util.gaia.time.Duration#sub(Duration)
      */
     @Override
     public Duration add(final Duration d) {
@@ -189,7 +189,7 @@ public class JulianYears extends ConcreteDuration implements Serializable {
     }
 
     /**
-     * @see gaia.cu9.ari.gaiaorbit.util.gaia.time.Duration#sub(Duration)
+     * @see gaiasky.util.gaia.time.Duration#sub(Duration)
      */
     @Override
     public Duration sub(final Duration d) {
@@ -199,7 +199,7 @@ public class JulianYears extends ConcreteDuration implements Serializable {
     }
 
     /**
-     * @see gaia.cu9.ari.gaiaorbit.util.gaia.time.ConcreteDuration#clone()
+     * @see gaiasky.util.gaia.time.ConcreteDuration#clone()
      */
     public JulianYears clone() {
         return new JulianYears(value);

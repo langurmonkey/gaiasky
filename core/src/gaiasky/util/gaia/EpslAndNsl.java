@@ -22,7 +22,7 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  *
  */
-package gaia.cu9.ari.gaiaorbit.util.gaia;
+package gaiasky.util.gaia;
 
 
 /**
@@ -83,7 +83,7 @@ public class EpslAndNsl extends AnalyticalAttitudeDataServer {
 	}
 
 	/**
-	 * @see gaia.cu9.ari.gaiaorbit.util.gaia.AnalyticalAttitudeDataServer#getAttitude(long)
+	 * @see gaiasky.util.gaia.AnalyticalAttitudeDataServer#getAttitude(long)
 	 * 
 	 * @param tNow - the time elapsed since the epoch of J2010 in ns (TCB)
 	 * @return attitude for the given time

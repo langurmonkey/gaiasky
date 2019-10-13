@@ -6,7 +6,7 @@
 /**
  * 
  */
-package gaia.cu9.ari.gaiaorbit.util.parse;
+package gaiasky.util.parse;
 
 import java.util.Locale;
 

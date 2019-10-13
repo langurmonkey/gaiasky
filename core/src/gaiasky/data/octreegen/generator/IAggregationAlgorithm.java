@@ -3,11 +3,11 @@
  * See the file LICENSE.md in the project root for full license details.
  */
 
-package gaia.cu9.ari.gaiaorbit.data.octreegen.generator;
+package gaiasky.data.octreegen.generator;
 
 import com.badlogic.gdx.utils.Array;
-import gaia.cu9.ari.gaiaorbit.scenegraph.StarGroup.StarBean;
-import gaia.cu9.ari.gaiaorbit.util.tree.OctreeNode;
+import gaiasky.scenegraph.StarGroup.StarBean;
+import gaiasky.util.tree.OctreeNode;
 
 /**
  * Interface to be implemented by all algorithms that create a vgroup of virtual

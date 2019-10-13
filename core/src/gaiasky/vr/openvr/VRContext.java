@@ -3,7 +3,7 @@
  * See the file LICENSE.md in the project root for full license details.
  */
 
-package gaia.cu9.ari.gaiaorbit.vr.openvr;
+package gaiasky.vr.openvr;
 
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Pixmap;
@@ -16,11 +16,11 @@ import com.badlogic.gdx.graphics.glutils.PixmapTextureData;
 import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.*;
-import gaia.cu9.ari.gaiaorbit.util.GlobalConf;
-import gaia.cu9.ari.gaiaorbit.util.Logger;
-import gaia.cu9.ari.gaiaorbit.util.gdx.loader.ObjLoader;
-import gaia.cu9.ari.gaiaorbit.util.gdx.mesh.IntMesh;
-import gaia.cu9.ari.gaiaorbit.util.gdx.model.*;
+import gaiasky.util.GlobalConf;
+import gaiasky.util.Logger;
+import gaiasky.util.gdx.loader.ObjLoader;
+import gaiasky.util.gdx.mesh.IntMesh;
+import gaiasky.util.gdx.model.*;
 import org.lwjgl.PointerBuffer;
 import org.lwjgl.openvr.*;
 

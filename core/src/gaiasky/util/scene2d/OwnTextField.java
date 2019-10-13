@@ -3,14 +3,14 @@
  * See the file LICENSE.md in the project root for full license details.
  */
 
-package gaia.cu9.ari.gaiaorbit.util.scene2d;
+package gaiasky.util.scene2d;
 
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.TextField;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener.ChangeEvent;
 import com.badlogic.gdx.scenes.scene2d.utils.FocusListener.FocusEvent;
-import gaia.cu9.ari.gaiaorbit.util.validator.IValidator;
+import gaiasky.util.validator.IValidator;
 
 /**
  * TextButton in which the cursor changes when the mouse rolls over.

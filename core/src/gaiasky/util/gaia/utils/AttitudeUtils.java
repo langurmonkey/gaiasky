@@ -21,9 +21,9 @@
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  *
  */
-package gaia.cu9.ari.gaiaorbit.util.gaia.utils;
+package gaiasky.util.gaia.utils;
 
-import gaia.cu9.ari.gaiaorbit.util.Logger;
+import gaiasky.util.Logger;
 
 /**
  * Class with static utility methods to deal with B-splines.

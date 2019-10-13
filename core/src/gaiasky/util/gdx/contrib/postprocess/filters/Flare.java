@@ -18,11 +18,11 @@
  * the License.
  ******************************************************************************/
 
-package gaia.cu9.ari.gaiaorbit.util.gdx.contrib.postprocess.filters;
+package gaiasky.util.gdx.contrib.postprocess.filters;
 
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.math.Vector2;
-import gaia.cu9.ari.gaiaorbit.util.gdx.contrib.utils.ShaderLoader;
+import gaiasky.util.gdx.contrib.utils.ShaderLoader;
 
 /**
  * Lens flare effect as described in John Chapman's article (without lens dirt

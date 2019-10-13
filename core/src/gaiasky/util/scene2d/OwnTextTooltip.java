@@ -3,7 +3,7 @@
  * See the file LICENSE.md in the project root for full license details.
  */
 
-package gaia.cu9.ari.gaiaorbit.util.scene2d;
+package gaiasky.util.scene2d;
 
 /*******************************************************************************
  * Copyright 2015 See AUTHORS file.
@@ -24,7 +24,7 @@ package gaia.cu9.ari.gaiaorbit.util.scene2d;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.scenes.scene2d.ui.TextTooltip.TextTooltipStyle;
-import gaia.cu9.ari.gaiaorbit.util.GlobalConf;
+import gaiasky.util.GlobalConf;
 
 /** A tooltip that shows a label.
  * @author Nathan Sweet */

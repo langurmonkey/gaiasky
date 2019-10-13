@@ -18,7 +18,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package gaia.cu9.ari.gaiaorbit.util.scene2d;
+package gaiasky.util.scene2d;
 
 import com.badlogic.gdx.ApplicationListener;
 import com.badlogic.gdx.Input;

@@ -75,7 +75,7 @@ OPTS="$OPTS -Dorg.slf4j.simpleLogger.defaultLogLevel=warn -Dorg.slf4j.simpleLogg
 # Run.
 #
 
-CMD="$JAVA $OPTS -cp \"$LIB_PATH\" gaia.cu9.ari.gaiaorbit.desktop.GaiaSkyDesktop $@"
+CMD="$JAVA $OPTS -cp \"$LIB_PATH\" gaiasky.desktop.GaiaSkyDesktop $@"
 # Uncomment to print run command
 # echo "$CMD"
 

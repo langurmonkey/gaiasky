@@ -3,26 +3,26 @@
  * See the file LICENSE.md in the project root for full license details.
  */
 
-package gaia.cu9.ari.gaiaorbit.data.group;
+package gaiasky.data.group;
 
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.LongMap;
-import gaia.cu9.ari.gaiaorbit.scenegraph.ParticleGroup.ParticleBean;
-import gaia.cu9.ari.gaiaorbit.scenegraph.StarGroup.StarBean;
-import gaia.cu9.ari.gaiaorbit.util.*;
-import gaia.cu9.ari.gaiaorbit.util.Logger.Log;
-import gaia.cu9.ari.gaiaorbit.util.color.ColourUtils;
-import gaia.cu9.ari.gaiaorbit.util.coord.AstroUtils;
-import gaia.cu9.ari.gaiaorbit.util.coord.Coordinates;
-import gaia.cu9.ari.gaiaorbit.util.math.MathUtilsd;
-import gaia.cu9.ari.gaiaorbit.util.math.Vector3d;
-import gaia.cu9.ari.gaiaorbit.util.ucd.UCD;
-import gaia.cu9.ari.gaiaorbit.util.ucd.UCDParser;
-import gaia.cu9.ari.gaiaorbit.util.units.Position;
-import gaia.cu9.ari.gaiaorbit.util.units.Position.PositionType;
-import gaia.cu9.ari.gaiaorbit.util.units.Quantity.Angle;
-import gaia.cu9.ari.gaiaorbit.util.units.Quantity.Angle.AngleUnit;
+import gaiasky.scenegraph.ParticleGroup.ParticleBean;
+import gaiasky.scenegraph.StarGroup.StarBean;
+import gaiasky.util.*;
+import gaiasky.util.Logger.Log;
+import gaiasky.util.color.ColourUtils;
+import gaiasky.util.coord.AstroUtils;
+import gaiasky.util.coord.Coordinates;
+import gaiasky.util.math.MathUtilsd;
+import gaiasky.util.math.Vector3d;
+import gaiasky.util.ucd.UCD;
+import gaiasky.util.ucd.UCDParser;
+import gaiasky.util.units.Position;
+import gaiasky.util.units.Position.PositionType;
+import gaiasky.util.units.Quantity.Angle;
+import gaiasky.util.units.Quantity.Angle.AngleUnit;
 import uk.ac.starlink.table.RowSequence;
 import uk.ac.starlink.table.StarTable;
 import uk.ac.starlink.table.StarTableFactory;

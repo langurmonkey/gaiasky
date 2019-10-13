@@ -3,22 +3,22 @@
  * See the file LICENSE.md in the project root for full license details.
  */
 
-package gaia.cu9.ari.gaiaorbit.screenshot;
+package gaiasky.screenshot;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.glutils.FrameBuffer;
-import gaia.cu9.ari.gaiaorbit.GaiaSky;
-import gaia.cu9.ari.gaiaorbit.event.EventManager;
-import gaia.cu9.ari.gaiaorbit.event.Events;
-import gaia.cu9.ari.gaiaorbit.event.IObserver;
-import gaia.cu9.ari.gaiaorbit.interfce.IGui;
-import gaia.cu9.ari.gaiaorbit.interfce.RenderGui;
-import gaia.cu9.ari.gaiaorbit.render.IMainRenderer;
-import gaia.cu9.ari.gaiaorbit.render.IPostProcessor.PostProcessBean;
-import gaia.cu9.ari.gaiaorbit.render.IPostProcessor.RenderType;
-import gaia.cu9.ari.gaiaorbit.scenegraph.camera.ICamera;
-import gaia.cu9.ari.gaiaorbit.util.GlobalConf;
-import gaia.cu9.ari.gaiaorbit.util.GlobalConf.ImageFormat;
+import gaiasky.GaiaSky;
+import gaiasky.event.EventManager;
+import gaiasky.event.Events;
+import gaiasky.event.IObserver;
+import gaiasky.interfce.IGui;
+import gaiasky.interfce.RenderGui;
+import gaiasky.render.IMainRenderer;
+import gaiasky.render.IPostProcessor.PostProcessBean;
+import gaiasky.render.IPostProcessor.RenderType;
+import gaiasky.scenegraph.camera.ICamera;
+import gaiasky.util.GlobalConf;
+import gaiasky.util.GlobalConf.ImageFormat;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;

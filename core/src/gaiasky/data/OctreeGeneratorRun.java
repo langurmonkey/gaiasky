@@ -3,7 +3,7 @@
  * See the file LICENSE.md in the project root for full license details.
  */
 
-package gaia.cu9.ari.gaiaorbit.data;
+package gaiasky.data;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.backends.lwjgl3.Lwjgl3Files;
@@ -12,31 +12,31 @@ import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.TimeUtils;
 import com.beust.jcommander.JCommander;
 import com.beust.jcommander.Parameter;
-import gaia.cu9.ari.gaiaorbit.data.group.AbstractStarGroupDataProvider;
-import gaia.cu9.ari.gaiaorbit.data.group.IStarGroupDataProvider;
-import gaia.cu9.ari.gaiaorbit.data.group.STILDataProvider;
-import gaia.cu9.ari.gaiaorbit.data.octreegen.IStarGroupIO;
-import gaia.cu9.ari.gaiaorbit.data.octreegen.MetadataBinaryIO;
-import gaia.cu9.ari.gaiaorbit.data.octreegen.StarGroupBinaryIO;
-import gaia.cu9.ari.gaiaorbit.data.octreegen.StarGroupSerializedIO;
-import gaia.cu9.ari.gaiaorbit.data.octreegen.generator.IOctreeGenerator;
-import gaia.cu9.ari.gaiaorbit.data.octreegen.generator.OctreeGeneratorMag;
-import gaia.cu9.ari.gaiaorbit.data.octreegen.generator.OctreeGeneratorParams;
-import gaia.cu9.ari.gaiaorbit.desktop.format.DesktopDateFormatFactory;
-import gaia.cu9.ari.gaiaorbit.desktop.format.DesktopNumberFormatFactory;
-import gaia.cu9.ari.gaiaorbit.desktop.util.DesktopConfInit;
-import gaia.cu9.ari.gaiaorbit.interfce.ConsoleLogger;
-import gaia.cu9.ari.gaiaorbit.interfce.MessageBean;
-import gaia.cu9.ari.gaiaorbit.interfce.NotificationsInterface;
-import gaia.cu9.ari.gaiaorbit.scenegraph.StarGroup.StarBean;
-import gaia.cu9.ari.gaiaorbit.util.*;
-import gaia.cu9.ari.gaiaorbit.util.Logger.Log;
-import gaia.cu9.ari.gaiaorbit.util.coord.Coordinates;
-import gaia.cu9.ari.gaiaorbit.util.format.DateFormatFactory;
-import gaia.cu9.ari.gaiaorbit.util.format.NumberFormatFactory;
-import gaia.cu9.ari.gaiaorbit.util.math.Vector3d;
-import gaia.cu9.ari.gaiaorbit.util.parse.Parser;
-import gaia.cu9.ari.gaiaorbit.util.tree.OctreeNode;
+import gaiasky.data.group.AbstractStarGroupDataProvider;
+import gaiasky.data.group.IStarGroupDataProvider;
+import gaiasky.data.group.STILDataProvider;
+import gaiasky.data.octreegen.IStarGroupIO;
+import gaiasky.data.octreegen.MetadataBinaryIO;
+import gaiasky.data.octreegen.StarGroupBinaryIO;
+import gaiasky.data.octreegen.StarGroupSerializedIO;
+import gaiasky.data.octreegen.generator.IOctreeGenerator;
+import gaiasky.data.octreegen.generator.OctreeGeneratorMag;
+import gaiasky.data.octreegen.generator.OctreeGeneratorParams;
+import gaiasky.desktop.format.DesktopDateFormatFactory;
+import gaiasky.desktop.format.DesktopNumberFormatFactory;
+import gaiasky.desktop.util.DesktopConfInit;
+import gaiasky.interfce.ConsoleLogger;
+import gaiasky.interfce.MessageBean;
+import gaiasky.interfce.NotificationsInterface;
+import gaiasky.scenegraph.StarGroup.StarBean;
+import gaiasky.util.*;
+import gaiasky.util.Logger.Log;
+import gaiasky.util.coord.Coordinates;
+import gaiasky.util.format.DateFormatFactory;
+import gaiasky.util.format.NumberFormatFactory;
+import gaiasky.util.math.Vector3d;
+import gaiasky.util.parse.Parser;
+import gaiasky.util.tree.OctreeNode;
 
 import java.io.*;
 import java.lang.reflect.InvocationTargetException;
@@ -216,7 +216,7 @@ public class OctreeGeneratorRun {
 
         if (loaderClass != null) {
             /* CATALOG */
-            String fullLoaderClass = "gaia.cu9.ari.gaiaorbit.data.vgroup." + loaderClass;
+            String fullLoaderClass = "gaiasky.data.vgroup." + loaderClass;
             IStarGroupDataProvider loader = (IStarGroupDataProvider) Class.forName(fullLoaderClass).getDeclaredConstructor().newInstance();
             loader.setParallaxErrorFactorFaint(pllxerrfaint);
             loader.setParallaxErrorFactorBright(pllxerrbright);

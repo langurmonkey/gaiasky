@@ -3,16 +3,16 @@
  * See the file LICENSE.md in the project root for full license details.
  */
 
-package gaia.cu9.ari.gaiaorbit.util;
+package gaiasky.util;
 
 import com.badlogic.gdx.graphics.Camera;
 import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Quaternion;
 import com.badlogic.gdx.math.Vector3;
-import gaia.cu9.ari.gaiaorbit.render.RenderingContext;
-import gaia.cu9.ari.gaiaorbit.util.gdx.g2d.BitmapFont;
-import gaia.cu9.ari.gaiaorbit.util.gdx.g2d.ExtSpriteBatch;
-import gaia.cu9.ari.gaiaorbit.util.math.Vector3d;
+import gaiasky.render.RenderingContext;
+import gaiasky.util.gdx.g2d.BitmapFont;
+import gaiasky.util.gdx.g2d.ExtSpriteBatch;
+import gaiasky.util.math.Vector3d;
 
 /**
  * This class provides utils to use Sprites and Fonts as if they were Decals,

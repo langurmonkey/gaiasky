@@ -3,20 +3,20 @@
  * See the file LICENSE.md in the project root for full license details.
  */
 
-package gaia.cu9.ari.gaiaorbit.data.constel;
+package gaiasky.data.constel;
 
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.utils.Array;
-import gaia.cu9.ari.gaiaorbit.data.ISceneGraphLoader;
-import gaia.cu9.ari.gaiaorbit.render.ComponentTypes;
-import gaia.cu9.ari.gaiaorbit.render.ComponentTypes.ComponentType;
-import gaia.cu9.ari.gaiaorbit.scenegraph.Constellation;
-import gaia.cu9.ari.gaiaorbit.scenegraph.FadeNode;
-import gaia.cu9.ari.gaiaorbit.scenegraph.SceneGraphNode;
-import gaia.cu9.ari.gaiaorbit.util.GlobalConf;
-import gaia.cu9.ari.gaiaorbit.util.I18n;
-import gaia.cu9.ari.gaiaorbit.util.Logger;
-import gaia.cu9.ari.gaiaorbit.util.parse.Parser;
+import gaiasky.data.ISceneGraphLoader;
+import gaiasky.render.ComponentTypes;
+import gaiasky.render.ComponentTypes.ComponentType;
+import gaiasky.scenegraph.Constellation;
+import gaiasky.scenegraph.FadeNode;
+import gaiasky.scenegraph.SceneGraphNode;
+import gaiasky.util.GlobalConf;
+import gaiasky.util.I18n;
+import gaiasky.util.Logger;
+import gaiasky.util.parse.Parser;
 
 import java.io.BufferedReader;
 import java.io.IOException;

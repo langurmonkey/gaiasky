@@ -3,7 +3,7 @@
  * See the file LICENSE.md in the project root for full license details.
  */
 
-package gaia.cu9.ari.gaiaorbit.util.gdx.shader;
+package gaiasky.util.gdx.shader;
 
 /*******************************************************************************
  * Copyright 2011 See AUTHORS file.
@@ -32,8 +32,8 @@ import com.badlogic.gdx.graphics.g3d.utils.RenderContext;
 import com.badlogic.gdx.math.Matrix3;
 import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.utils.GdxRuntimeException;
-import gaia.cu9.ari.gaiaorbit.util.Constants;
-import gaia.cu9.ari.gaiaorbit.util.gdx.IntRenderable;
+import gaiasky.util.Constants;
+import gaiasky.util.gdx.IntRenderable;
 
 public class AtmosphereShader extends BaseIntShader {
     public static class Config {

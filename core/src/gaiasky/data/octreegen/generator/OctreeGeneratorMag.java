@@ -3,16 +3,16 @@
  * See the file LICENSE.md in the project root for full license details.
  */
 
-package gaia.cu9.ari.gaiaorbit.data.octreegen.generator;
+package gaiasky.data.octreegen.generator;
 
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.LongMap;
-import gaia.cu9.ari.gaiaorbit.data.octreegen.StarBrightnessComparator;
-import gaia.cu9.ari.gaiaorbit.scenegraph.StarGroup;
-import gaia.cu9.ari.gaiaorbit.scenegraph.StarGroup.StarBean;
-import gaia.cu9.ari.gaiaorbit.util.math.BoundingBoxd;
-import gaia.cu9.ari.gaiaorbit.util.math.Vector3d;
-import gaia.cu9.ari.gaiaorbit.util.tree.OctreeNode;
+import gaiasky.data.octreegen.StarBrightnessComparator;
+import gaiasky.scenegraph.StarGroup;
+import gaiasky.scenegraph.StarGroup.StarBean;
+import gaiasky.util.math.BoundingBoxd;
+import gaiasky.util.math.Vector3d;
+import gaiasky.util.tree.OctreeNode;
 
 import java.util.*;
 

@@ -3,11 +3,11 @@
  * See the file LICENSE.md in the project root for full license details.
  */
 
-package gaia.cu9.ari.gaiaorbit.vr.openvr;
+package gaiasky.vr.openvr;
 
-import gaia.cu9.ari.gaiaorbit.vr.openvr.VRContext.VRControllerAxes;
-import gaia.cu9.ari.gaiaorbit.vr.openvr.VRContext.VRControllerButtons;
-import gaia.cu9.ari.gaiaorbit.vr.openvr.VRContext.VRDevice;
+import gaiasky.vr.openvr.VRContext.VRControllerAxes;
+import gaiasky.vr.openvr.VRContext.VRControllerButtons;
+import gaiasky.vr.openvr.VRContext.VRDevice;
 
 public interface VRDeviceListener {
     /** A new {@link VRDevice} has connected **/

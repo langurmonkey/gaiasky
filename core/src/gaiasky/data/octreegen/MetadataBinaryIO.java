@@ -3,15 +3,15 @@
  * See the file LICENSE.md in the project root for full license details.
  */
 
-package gaia.cu9.ari.gaiaorbit.data.octreegen;
+package gaiasky.data.octreegen;
 
-import gaia.cu9.ari.gaiaorbit.util.Constants;
-import gaia.cu9.ari.gaiaorbit.util.GlobalConf;
-import gaia.cu9.ari.gaiaorbit.util.Logger;
-import gaia.cu9.ari.gaiaorbit.util.Logger.Log;
-import gaia.cu9.ari.gaiaorbit.util.Pair;
-import gaia.cu9.ari.gaiaorbit.util.tree.LoadStatus;
-import gaia.cu9.ari.gaiaorbit.util.tree.OctreeNode;
+import gaiasky.util.Constants;
+import gaiasky.util.GlobalConf;
+import gaiasky.util.Logger;
+import gaiasky.util.Logger.Log;
+import gaiasky.util.Pair;
+import gaiasky.util.tree.LoadStatus;
+import gaiasky.util.tree.OctreeNode;
 
 import java.io.*;
 import java.nio.BufferUnderflowException;

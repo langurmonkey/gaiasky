@@ -19,7 +19,7 @@
  * limitations under the License.
  ******************************************************************************/
 
-package gaia.cu9.ari.gaiaorbit.util.gdx.shader;
+package gaiasky.util.gdx.shader;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Camera;
@@ -40,10 +40,10 @@ import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.GdxRuntimeException;
-import gaia.cu9.ari.gaiaorbit.GaiaSky;
-import gaia.cu9.ari.gaiaorbit.assets.ShaderTemplatingLoader;
-import gaia.cu9.ari.gaiaorbit.util.Constants;
-import gaia.cu9.ari.gaiaorbit.util.gdx.IntRenderable;
+import gaiasky.GaiaSky;
+import gaiasky.assets.ShaderTemplatingLoader;
+import gaiasky.util.Constants;
+import gaiasky.util.gdx.IntRenderable;
 
 public class DefaultIntShader extends BaseIntShader {
     public static class Config {

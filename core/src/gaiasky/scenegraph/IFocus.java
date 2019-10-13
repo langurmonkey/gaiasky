@@ -3,19 +3,19 @@
  * See the file LICENSE.md in the project root for full license details.
  */
 
-package gaia.cu9.ari.gaiaorbit.scenegraph;
+package gaiasky.scenegraph;
 
 import com.badlogic.gdx.utils.Array;
-import gaia.cu9.ari.gaiaorbit.render.ComponentTypes;
-import gaia.cu9.ari.gaiaorbit.scenegraph.camera.ICamera;
-import gaia.cu9.ari.gaiaorbit.scenegraph.camera.NaturalCamera;
-import gaia.cu9.ari.gaiaorbit.scenegraph.component.RotationComponent;
-import gaia.cu9.ari.gaiaorbit.util.math.Matrix4d;
-import gaia.cu9.ari.gaiaorbit.util.math.Quaterniond;
-import gaia.cu9.ari.gaiaorbit.util.math.Vector2d;
-import gaia.cu9.ari.gaiaorbit.util.math.Vector3d;
-import gaia.cu9.ari.gaiaorbit.util.time.ITimeFrameProvider;
-import gaia.cu9.ari.gaiaorbit.util.tree.OctreeNode;
+import gaiasky.render.ComponentTypes;
+import gaiasky.scenegraph.camera.ICamera;
+import gaiasky.scenegraph.camera.NaturalCamera;
+import gaiasky.scenegraph.component.RotationComponent;
+import gaiasky.util.math.Matrix4d;
+import gaiasky.util.math.Quaterniond;
+import gaiasky.util.math.Vector2d;
+import gaiasky.util.math.Vector3d;
+import gaiasky.util.time.ITimeFrameProvider;
+import gaiasky.util.tree.OctreeNode;
 
 /**
  * Contract that all focus objects must implement
@@ -78,7 +78,7 @@ public interface IFocus {
 
     /**
      * Returns true if the focus is within the magnitude limit defined in
-     * {@link gaia.cu9.ari.gaiaorbit.util.GlobalConf}
+     * {@link gaiasky.util.GlobalConf}
      *
      * @return True if focus within magnitude limit
      */

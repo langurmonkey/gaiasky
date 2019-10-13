@@ -19,7 +19,7 @@
  * limitations under the License.
  ******************************************************************************/
 
-package gaia.cu9.ari.gaiaorbit.util.gdx.model;
+package gaiasky.util.gdx.model;
 
 import com.badlogic.gdx.assets.loaders.ModelLoader;
 import com.badlogic.gdx.graphics.GL20;
@@ -44,12 +44,12 @@ import com.badlogic.gdx.math.Quaternion;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.math.collision.BoundingBox;
 import com.badlogic.gdx.utils.*;
-import gaia.cu9.ari.gaiaorbit.util.gdx.loader.IntModelLoader;
-import gaia.cu9.ari.gaiaorbit.util.gdx.mesh.IntMesh;
-import gaia.cu9.ari.gaiaorbit.util.gdx.model.data.IntModelData;
-import gaia.cu9.ari.gaiaorbit.util.gdx.model.data.IntModelMesh;
-import gaia.cu9.ari.gaiaorbit.util.gdx.model.data.IntModelMeshPart;
-import gaia.cu9.ari.gaiaorbit.util.gdx.model.data.IntModelNode;
+import gaiasky.util.gdx.loader.IntModelLoader;
+import gaiasky.util.gdx.mesh.IntMesh;
+import gaiasky.util.gdx.model.data.IntModelData;
+import gaiasky.util.gdx.model.data.IntModelMesh;
+import gaiasky.util.gdx.model.data.IntModelMeshPart;
+import gaiasky.util.gdx.model.data.IntModelNode;
 
 /**
  * This implementation uses {@link IntMesh} and {@link IntMeshPart} instead of {@link Mesh} and {@link MeshPart}.

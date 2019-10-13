@@ -3,10 +3,10 @@
  * See the file LICENSE.md in the project root for full license details.
  */
 
-package gaia.cu9.ari.gaiaorbit.desktop.render;
+package gaiasky.desktop.render;
 
-import gaia.cu9.ari.gaiaorbit.render.IPostProcessor;
-import gaia.cu9.ari.gaiaorbit.render.PostProcessorFactory;
+import gaiasky.render.IPostProcessor;
+import gaiasky.render.PostProcessorFactory;
 
 public class DesktopPostProcessorFactory extends PostProcessorFactory {
 	DesktopPostProcessor instance = null;

@@ -3,9 +3,9 @@
  * See the file LICENSE.md in the project root for full license details.
  */
 
-package gaia.cu9.ari.gaiaorbit.util.validator;
+package gaiasky.util.validator;
 
-import gaia.cu9.ari.gaiaorbit.util.color.ColourUtils;
+import gaiasky.util.color.ColourUtils;
 
 public class HexColorValidator implements IValidator {
     private boolean alpha = false;

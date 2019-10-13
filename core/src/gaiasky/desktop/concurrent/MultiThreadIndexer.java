@@ -3,9 +3,9 @@
  * See the file LICENSE.md in the project root for full license details.
  */
 
-package gaia.cu9.ari.gaiaorbit.desktop.concurrent;
+package gaiasky.desktop.concurrent;
 
-import gaia.cu9.ari.gaiaorbit.desktop.concurrent.GaiaSkyThreadFactory.GSThread;
+import gaiasky.desktop.concurrent.GaiaSkyThreadFactory.GSThread;
 
 /**
  * Thread indexer for a multithread environment.

@@ -3,7 +3,7 @@
  * See the file LICENSE.md in the project root for full license details.
  */
 
-package gaia.cu9.ari.gaiaorbit.vr.openvr;
+package gaiasky.vr.openvr;
 
 import static org.lwjgl.openvr.VR.ETrackedDeviceProperty_Prop_ModelNumber_String;
 import static org.lwjgl.openvr.VR.ETrackedDeviceProperty_Prop_SerialNumber_String;
@@ -24,8 +24,8 @@ import java.nio.IntBuffer;
 import org.lwjgl.openvr.OpenVR;
 import org.lwjgl.system.MemoryStack;
 
-import gaia.cu9.ari.gaiaorbit.util.Logger;
-import gaia.cu9.ari.gaiaorbit.util.Logger.Log;
+import gaiasky.util.Logger;
+import gaiasky.util.Logger.Log;
 
 public class OpenVRQuery {
     private static final Log logger = Logger.getLogger(OpenVRQuery.class);

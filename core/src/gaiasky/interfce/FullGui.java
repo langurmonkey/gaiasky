@@ -3,7 +3,7 @@
  * See the file LICENSE.md in the project root for full license details.
  */
 
-package gaia.cu9.ari.gaiaorbit.interfce;
+package gaiasky.interfce;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.assets.AssetManager;
@@ -17,22 +17,22 @@ import com.badlogic.gdx.utils.reflect.ClassReflection;
 import com.badlogic.gdx.utils.reflect.Method;
 import com.badlogic.gdx.utils.reflect.ReflectionException;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
-import gaia.cu9.ari.gaiaorbit.desktop.util.MemInfoWindow;
-import gaia.cu9.ari.gaiaorbit.desktop.util.RunCameraWindow;
-import gaia.cu9.ari.gaiaorbit.event.EventManager;
-import gaia.cu9.ari.gaiaorbit.event.Events;
-import gaia.cu9.ari.gaiaorbit.render.ComponentTypes;
-import gaia.cu9.ari.gaiaorbit.render.ComponentTypes.ComponentType;
-import gaia.cu9.ari.gaiaorbit.scenegraph.CelestialBody;
-import gaia.cu9.ari.gaiaorbit.scenegraph.IFocus;
-import gaia.cu9.ari.gaiaorbit.scenegraph.ISceneGraph;
-import gaia.cu9.ari.gaiaorbit.util.*;
-import gaia.cu9.ari.gaiaorbit.util.Logger.Log;
-import gaia.cu9.ari.gaiaorbit.util.format.INumberFormat;
-import gaia.cu9.ari.gaiaorbit.util.format.NumberFormatFactory;
-import gaia.cu9.ari.gaiaorbit.util.scene2d.OwnLabel;
-import gaia.cu9.ari.gaiaorbit.util.update.VersionCheckEvent;
-import gaia.cu9.ari.gaiaorbit.util.update.VersionChecker;
+import gaiasky.desktop.util.MemInfoWindow;
+import gaiasky.desktop.util.RunCameraWindow;
+import gaiasky.event.EventManager;
+import gaiasky.event.Events;
+import gaiasky.render.ComponentTypes;
+import gaiasky.render.ComponentTypes.ComponentType;
+import gaiasky.scenegraph.CelestialBody;
+import gaiasky.scenegraph.IFocus;
+import gaiasky.scenegraph.ISceneGraph;
+import gaiasky.util.*;
+import gaiasky.util.Logger.Log;
+import gaiasky.util.format.INumberFormat;
+import gaiasky.util.format.NumberFormatFactory;
+import gaiasky.util.scene2d.OwnLabel;
+import gaiasky.util.update.VersionCheckEvent;
+import gaiasky.util.update.VersionChecker;
 
 import java.time.Instant;
 import java.util.ArrayList;

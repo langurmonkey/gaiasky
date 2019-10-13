@@ -3,10 +3,10 @@
  * See the file LICENSE.md in the project root for full license details.
  */
 
-package gaia.cu9.ari.gaiaorbit.render;
+package gaiasky.render;
 
-import gaia.cu9.ari.gaiaorbit.render.system.LineRenderSystem;
-import gaia.cu9.ari.gaiaorbit.scenegraph.camera.ICamera;
+import gaiasky.render.system.LineRenderSystem;
+import gaiasky.scenegraph.camera.ICamera;
 
 /**
  * Interface to implement by all entities that are to be rendered as lines whose

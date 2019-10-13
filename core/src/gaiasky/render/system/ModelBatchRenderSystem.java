@@ -3,15 +3,15 @@
  * See the file LICENSE.md in the project root for full license details.
  */
 
-package gaia.cu9.ari.gaiaorbit.render.system;
+package gaiasky.render.system;
 
 import com.badlogic.gdx.utils.Array;
-import gaia.cu9.ari.gaiaorbit.render.*;
-import gaia.cu9.ari.gaiaorbit.render.ComponentTypes.ComponentType;
-import gaia.cu9.ari.gaiaorbit.scenegraph.SceneGraphNode.RenderGroup;
-import gaia.cu9.ari.gaiaorbit.scenegraph.camera.ICamera;
-import gaia.cu9.ari.gaiaorbit.util.comp.ModelComparator;
-import gaia.cu9.ari.gaiaorbit.util.gdx.IntModelBatch;
+import gaiasky.render.*;
+import gaiasky.render.ComponentTypes.ComponentType;
+import gaiasky.scenegraph.SceneGraphNode.RenderGroup;
+import gaiasky.scenegraph.camera.ICamera;
+import gaiasky.util.comp.ModelComparator;
+import gaiasky.util.gdx.IntModelBatch;
 
 /**
  * Renders with a given model batch.

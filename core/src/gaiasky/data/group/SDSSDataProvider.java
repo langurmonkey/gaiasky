@@ -3,18 +3,18 @@
  * See the file LICENSE.md in the project root for full license details.
  */
 
-package gaia.cu9.ari.gaiaorbit.data.group;
+package gaiasky.data.group;
 
 import com.badlogic.gdx.utils.Array;
-import gaia.cu9.ari.gaiaorbit.scenegraph.ParticleGroup.ParticleBean;
-import gaia.cu9.ari.gaiaorbit.util.Constants;
-import gaia.cu9.ari.gaiaorbit.util.GlobalConf;
-import gaia.cu9.ari.gaiaorbit.util.I18n;
-import gaia.cu9.ari.gaiaorbit.util.Logger;
-import gaia.cu9.ari.gaiaorbit.util.Logger.Log;
-import gaia.cu9.ari.gaiaorbit.util.parse.Parser;
-import gaia.cu9.ari.gaiaorbit.util.units.Position;
-import gaia.cu9.ari.gaiaorbit.util.units.Position.PositionType;
+import gaiasky.scenegraph.ParticleGroup.ParticleBean;
+import gaiasky.util.Constants;
+import gaiasky.util.GlobalConf;
+import gaiasky.util.I18n;
+import gaiasky.util.Logger;
+import gaiasky.util.Logger.Log;
+import gaiasky.util.parse.Parser;
+import gaiasky.util.units.Position;
+import gaiasky.util.units.Position.PositionType;
 
 import java.io.*;
 import java.nio.CharBuffer;

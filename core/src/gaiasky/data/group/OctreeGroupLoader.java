@@ -3,34 +3,34 @@
  * See the file LICENSE.md in the project root for full license details.
  */
 
-package gaia.cu9.ari.gaiaorbit.data.group;
+package gaiasky.data.group;
 
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.utils.Array;
-import gaia.cu9.ari.gaiaorbit.GaiaSky;
-import gaia.cu9.ari.gaiaorbit.data.StreamingOctreeLoader;
-import gaia.cu9.ari.gaiaorbit.data.octreegen.MetadataBinaryIO;
-import gaia.cu9.ari.gaiaorbit.event.EventManager;
-import gaia.cu9.ari.gaiaorbit.event.Events;
-import gaia.cu9.ari.gaiaorbit.scenegraph.StarGroup;
-import gaia.cu9.ari.gaiaorbit.scenegraph.StarGroup.StarBean;
-import gaia.cu9.ari.gaiaorbit.scenegraph.octreewrapper.AbstractOctreeWrapper;
-import gaia.cu9.ari.gaiaorbit.scenegraph.octreewrapper.OctreeWrapper;
-import gaia.cu9.ari.gaiaorbit.util.CatalogInfo;
-import gaia.cu9.ari.gaiaorbit.util.CatalogInfo.CatalogInfoType;
-import gaia.cu9.ari.gaiaorbit.util.GlobalConf;
-import gaia.cu9.ari.gaiaorbit.util.I18n;
-import gaia.cu9.ari.gaiaorbit.util.Logger;
-import gaia.cu9.ari.gaiaorbit.util.Logger.Log;
-import gaia.cu9.ari.gaiaorbit.util.tree.LoadStatus;
-import gaia.cu9.ari.gaiaorbit.util.tree.OctreeNode;
+import gaiasky.GaiaSky;
+import gaiasky.data.StreamingOctreeLoader;
+import gaiasky.data.octreegen.MetadataBinaryIO;
+import gaiasky.event.EventManager;
+import gaiasky.event.Events;
+import gaiasky.scenegraph.StarGroup;
+import gaiasky.scenegraph.StarGroup.StarBean;
+import gaiasky.scenegraph.octreewrapper.AbstractOctreeWrapper;
+import gaiasky.scenegraph.octreewrapper.OctreeWrapper;
+import gaiasky.util.CatalogInfo;
+import gaiasky.util.CatalogInfo.CatalogInfoType;
+import gaiasky.util.GlobalConf;
+import gaiasky.util.I18n;
+import gaiasky.util.Logger;
+import gaiasky.util.Logger.Log;
+import gaiasky.util.tree.LoadStatus;
+import gaiasky.util.tree.OctreeNode;
 
 import java.io.IOException;
 
 /**
  * Implements the loading and streaming of octree nodes from files. This version
  * loads star groups using the
- * {@link gaia.cu9.ari.gaiaorbit.data.group.SerializedDataProvider}
+ * {@link gaiasky.data.group.SerializedDataProvider}
  * 
  * @author tsagrista
  */

@@ -3,10 +3,10 @@
  * See the file LICENSE.md in the project root for full license details.
  */
 
-package gaia.cu9.ari.gaiaorbit.util.gaia;
+package gaiasky.util.gaia;
 
-import gaia.cu9.ari.gaiaorbit.util.math.Quaterniond;
-import gaia.cu9.ari.gaiaorbit.util.math.Vector3d;
+import gaiasky.util.math.Quaterniond;
+import gaiasky.util.math.Vector3d;
 
 /**
  * Implementation of the Ecliptic Pole Scanning Law (EPSL)
@@ -67,7 +67,7 @@ public class Epsl extends AnalyticalAttitudeDataServer {
     }
 
     /**
-     * @see gaia.cu9.ari.gaiaorbit.util.gaia.BaseAttitudeDataServer#getAttitude(long)
+     * @see gaiasky.util.gaia.BaseAttitudeDataServer#getAttitude(long)
      *
      * @param t - the time elapsed since the epoch of J2010 in ns (TCB)
      * @return attitude for the given time
@@ -124,7 +124,7 @@ public class Epsl extends AnalyticalAttitudeDataServer {
     }
 
     /**
-     * @see gaia.cu9.ari.gaiaorbit.util.gaia.AnalyticalAttitudeDataServer#setDefault()
+     * @see gaiasky.util.gaia.AnalyticalAttitudeDataServer#setDefault()
      */
     @Override
     public void setDefault() {

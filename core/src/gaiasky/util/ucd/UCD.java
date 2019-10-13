@@ -3,7 +3,7 @@
  * See the file LICENSE.md in the project root for full license details.
  */
 
-package gaia.cu9.ari.gaiaorbit.util.ucd;
+package gaiasky.util.ucd;
 
 /**
  * Very naive class that represents and UCD and does the parsing.

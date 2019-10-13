@@ -3,18 +3,18 @@
  * See the file LICENSE.md in the project root for full license details.
  */
 
-package gaia.cu9.ari.gaiaorbit.data;
+package gaiasky.data;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.utils.Array;
-import gaia.cu9.ari.gaiaorbit.assets.OrbitDataLoader.OrbitDataLoaderParameter;
-import gaia.cu9.ari.gaiaorbit.data.orbit.OrbitSamplerDataProvider;
-import gaia.cu9.ari.gaiaorbit.data.util.PointCloudData;
-import gaia.cu9.ari.gaiaorbit.event.EventManager;
-import gaia.cu9.ari.gaiaorbit.event.Events;
-import gaia.cu9.ari.gaiaorbit.scenegraph.Orbit;
-import gaia.cu9.ari.gaiaorbit.util.Logger;
-import gaia.cu9.ari.gaiaorbit.util.Logger.Log;
+import gaiasky.assets.OrbitDataLoader.OrbitDataLoaderParameter;
+import gaiasky.data.orbit.OrbitSamplerDataProvider;
+import gaiasky.data.util.PointCloudData;
+import gaiasky.event.EventManager;
+import gaiasky.event.Events;
+import gaiasky.scenegraph.Orbit;
+import gaiasky.util.Logger;
+import gaiasky.util.Logger.Log;
 
 import java.util.Queue;
 import java.util.concurrent.ArrayBlockingQueue;

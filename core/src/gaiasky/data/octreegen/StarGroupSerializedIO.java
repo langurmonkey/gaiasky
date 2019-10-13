@@ -3,16 +3,16 @@
  * See the file LICENSE.md in the project root for full license details.
  */
 
-package gaia.cu9.ari.gaiaorbit.data.octreegen;
+package gaiasky.data.octreegen;
 
 import com.badlogic.gdx.utils.Array;
-import gaia.cu9.ari.gaiaorbit.data.group.IStarGroupDataProvider;
-import gaia.cu9.ari.gaiaorbit.data.group.SerializedDataProvider;
-import gaia.cu9.ari.gaiaorbit.scenegraph.AbstractPositionEntity;
-import gaia.cu9.ari.gaiaorbit.scenegraph.StarGroup;
-import gaia.cu9.ari.gaiaorbit.scenegraph.StarGroup.StarBean;
-import gaia.cu9.ari.gaiaorbit.util.Logger;
-import gaia.cu9.ari.gaiaorbit.util.Logger.Log;
+import gaiasky.data.group.IStarGroupDataProvider;
+import gaiasky.data.group.SerializedDataProvider;
+import gaiasky.scenegraph.AbstractPositionEntity;
+import gaiasky.scenegraph.StarGroup;
+import gaiasky.scenegraph.StarGroup.StarBean;
+import gaiasky.util.Logger;
+import gaiasky.util.Logger.Log;
 
 import java.io.FileNotFoundException;
 import java.io.InputStream;

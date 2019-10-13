@@ -3,27 +3,27 @@
  * See the file LICENSE.md in the project root for full license details.
  */
 
-package gaia.cu9.ari.gaiaorbit.data.orbit;
+package gaiasky.data.orbit;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.backends.lwjgl3.Lwjgl3Files;
 import com.badlogic.gdx.files.FileHandle;
-import gaia.cu9.ari.gaiaorbit.assets.OrbitDataLoader.OrbitDataLoaderParameter;
-import gaia.cu9.ari.gaiaorbit.data.util.PointCloudData;
-import gaia.cu9.ari.gaiaorbit.desktop.format.DesktopDateFormatFactory;
-import gaia.cu9.ari.gaiaorbit.desktop.format.DesktopNumberFormatFactory;
-import gaia.cu9.ari.gaiaorbit.desktop.util.DesktopConfInit;
-import gaia.cu9.ari.gaiaorbit.interfce.ConsoleLogger;
-import gaia.cu9.ari.gaiaorbit.util.ConfInit;
-import gaia.cu9.ari.gaiaorbit.util.GlobalConf;
-import gaia.cu9.ari.gaiaorbit.util.I18n;
-import gaia.cu9.ari.gaiaorbit.util.Logger;
-import gaia.cu9.ari.gaiaorbit.util.coord.AstroUtils;
-import gaia.cu9.ari.gaiaorbit.util.coord.Coordinates;
-import gaia.cu9.ari.gaiaorbit.util.format.DateFormatFactory;
-import gaia.cu9.ari.gaiaorbit.util.format.NumberFormatFactory;
-import gaia.cu9.ari.gaiaorbit.util.math.MathManager;
-import gaia.cu9.ari.gaiaorbit.util.math.Vector3d;
+import gaiasky.assets.OrbitDataLoader.OrbitDataLoaderParameter;
+import gaiasky.data.util.PointCloudData;
+import gaiasky.desktop.format.DesktopDateFormatFactory;
+import gaiasky.desktop.format.DesktopNumberFormatFactory;
+import gaiasky.desktop.util.DesktopConfInit;
+import gaiasky.interfce.ConsoleLogger;
+import gaiasky.util.ConfInit;
+import gaiasky.util.GlobalConf;
+import gaiasky.util.I18n;
+import gaiasky.util.Logger;
+import gaiasky.util.coord.AstroUtils;
+import gaiasky.util.coord.Coordinates;
+import gaiasky.util.format.DateFormatFactory;
+import gaiasky.util.format.NumberFormatFactory;
+import gaiasky.util.math.MathManager;
+import gaiasky.util.math.Vector3d;
 
 import java.io.File;
 import java.io.FileInputStream;

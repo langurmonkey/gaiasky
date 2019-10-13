@@ -3,7 +3,7 @@
  * See the file LICENSE.md in the project root for full license details.
  */
 
-package gaia.cu9.ari.gaiaorbit.assets;
+package gaiasky.assets;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.assets.AssetDescriptor;
@@ -13,7 +13,7 @@ import com.badlogic.gdx.assets.loaders.AsynchronousAssetLoader;
 import com.badlogic.gdx.assets.loaders.FileHandleResolver;
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.utils.Array;
-import gaia.cu9.ari.gaiaorbit.util.gdx.shader.AtmosphereShaderProvider;
+import gaiasky.util.gdx.shader.AtmosphereShaderProvider;
 
 public class AtmosphereShaderProviderLoader<T extends AtmosphereShaderProviderLoader.AtmosphereShaderProviderParameter> extends AsynchronousAssetLoader<AtmosphereShaderProvider, T> {
 

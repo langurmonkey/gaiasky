@@ -3,7 +3,7 @@
  * See the file LICENSE.md in the project root for full license details.
  */
 
-package gaia.cu9.ari.gaiaorbit.util.gdx.loader;
+package gaiasky.util.gdx.loader;
 
 /*******************************************************************************
  * Copyright 2011 See AUTHORS file.
@@ -40,13 +40,13 @@ import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.FloatArray;
 import com.badlogic.gdx.utils.IntArray;
-import gaia.cu9.ari.gaiaorbit.util.gdx.loader.is.InputStreamProvider;
-import gaia.cu9.ari.gaiaorbit.util.gdx.loader.is.RegularInputStreamProvider;
-import gaia.cu9.ari.gaiaorbit.util.gdx.model.IntModel;
-import gaia.cu9.ari.gaiaorbit.util.gdx.model.data.IntModelData;
-import gaia.cu9.ari.gaiaorbit.util.gdx.model.data.IntModelMesh;
-import gaia.cu9.ari.gaiaorbit.util.gdx.model.data.IntModelMeshPart;
-import gaia.cu9.ari.gaiaorbit.util.gdx.model.data.IntModelNode;
+import gaiasky.util.gdx.loader.is.InputStreamProvider;
+import gaiasky.util.gdx.loader.is.RegularInputStreamProvider;
+import gaiasky.util.gdx.model.IntModel;
+import gaiasky.util.gdx.model.data.IntModelData;
+import gaiasky.util.gdx.model.data.IntModelMesh;
+import gaiasky.util.gdx.model.data.IntModelMeshPart;
+import gaiasky.util.gdx.model.data.IntModelNode;
 
 import java.io.BufferedReader;
 import java.io.IOException;

@@ -3,14 +3,14 @@
  * See the file LICENSE.md in the project root for full license details.
  */
 
-package gaia.cu9.ari.gaiaorbit.util.gaia;
+package gaiasky.util.gaia;
 
-import gaia.cu9.ari.gaiaorbit.util.Logger;
-import gaia.cu9.ari.gaiaorbit.util.gaia.time.Duration;
-import gaia.cu9.ari.gaiaorbit.util.gaia.time.GtiList;
-import gaia.cu9.ari.gaiaorbit.util.gaia.utils.AttitudeUtils;
-import gaia.cu9.ari.gaiaorbit.util.gaia.utils.Interpolator;
-import gaia.cu9.ari.gaiaorbit.util.math.Quaterniond;
+import gaiasky.util.Logger;
+import gaiasky.util.gaia.time.Duration;
+import gaiasky.util.gaia.time.GtiList;
+import gaiasky.util.gaia.utils.AttitudeUtils;
+import gaiasky.util.gaia.utils.Interpolator;
+import gaiasky.util.math.Quaterniond;
 
 /**
  * This abstract class contains the fields needed to store numerical attitude in
@@ -45,7 +45,7 @@ public abstract class HermiteInterpolatedAttitudeDataServer extends
     }
 
     /**
-     * @see gaia.cu9.ari.gaiaorbit.util.gaia.NumericalAttitudeDataServer#initialize()
+     * @see gaiasky.util.gaia.NumericalAttitudeDataServer#initialize()
      *
      *      This method will compute the attitude and attitude rate at discrete
      *      points and store in the arrays tNs, qX, rateX, etc
@@ -54,7 +54,7 @@ public abstract class HermiteInterpolatedAttitudeDataServer extends
     public abstract void initialize() throws RuntimeException;
 
     /**
-     * @see gaia.cu9.ari.gaiaorbit.util.gaia.BaseAttitudeDataServer#getAttitude(long)
+     * @see gaiasky.util.gaia.BaseAttitudeDataServer#getAttitude(long)
      *
      * @param t - the time elapsed since the epoch of J2010 in ns (TCB)
      * @return attitude for the given time

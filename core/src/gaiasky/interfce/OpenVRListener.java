@@ -1,23 +1,23 @@
-package gaia.cu9.ari.gaiaorbit.interfce;
+package gaiasky.interfce;
 
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.TimeUtils;
-import gaia.cu9.ari.gaiaorbit.GaiaSky;
-import gaia.cu9.ari.gaiaorbit.event.EventManager;
-import gaia.cu9.ari.gaiaorbit.event.Events;
-import gaia.cu9.ari.gaiaorbit.scenegraph.IFocus;
-import gaia.cu9.ari.gaiaorbit.scenegraph.StubModel;
-import gaia.cu9.ari.gaiaorbit.scenegraph.camera.CameraManager.CameraMode;
-import gaia.cu9.ari.gaiaorbit.scenegraph.camera.NaturalCamera;
-import gaia.cu9.ari.gaiaorbit.util.GlobalConf;
-import gaia.cu9.ari.gaiaorbit.util.Logger;
-import gaia.cu9.ari.gaiaorbit.util.Logger.Log;
-import gaia.cu9.ari.gaiaorbit.util.comp.ViewAngleComparator;
-import gaia.cu9.ari.gaiaorbit.util.math.Vector3d;
-import gaia.cu9.ari.gaiaorbit.vr.openvr.VRContext.VRControllerAxes;
-import gaia.cu9.ari.gaiaorbit.vr.openvr.VRContext.VRControllerButtons;
-import gaia.cu9.ari.gaiaorbit.vr.openvr.VRContext.VRDevice;
-import gaia.cu9.ari.gaiaorbit.vr.openvr.VRDeviceListener;
+import gaiasky.GaiaSky;
+import gaiasky.event.EventManager;
+import gaiasky.event.Events;
+import gaiasky.scenegraph.IFocus;
+import gaiasky.scenegraph.StubModel;
+import gaiasky.scenegraph.camera.CameraManager.CameraMode;
+import gaiasky.scenegraph.camera.NaturalCamera;
+import gaiasky.util.GlobalConf;
+import gaiasky.util.Logger;
+import gaiasky.util.Logger.Log;
+import gaiasky.util.comp.ViewAngleComparator;
+import gaiasky.util.math.Vector3d;
+import gaiasky.vr.openvr.VRContext.VRControllerAxes;
+import gaiasky.vr.openvr.VRContext.VRControllerButtons;
+import gaiasky.vr.openvr.VRContext.VRDevice;
+import gaiasky.vr.openvr.VRDeviceListener;
 
 import java.util.*;
 

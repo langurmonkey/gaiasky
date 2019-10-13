@@ -3,11 +3,11 @@
  * See the file LICENSE.md in the project root for full license details.
  */
 
-package gaia.cu9.ari.gaiaorbit.util.gaia;
+package gaiasky.util.gaia;
 
-import gaia.cu9.ari.gaiaorbit.util.Logger;
-import gaia.cu9.ari.gaiaorbit.util.gaia.time.Gti;
-import gaia.cu9.ari.gaiaorbit.util.gaia.time.GtiList;
+import gaiasky.util.Logger;
+import gaiasky.util.gaia.time.Gti;
+import gaiasky.util.gaia.time.GtiList;
 
 /**
  * This abstract class defines the fields and implements the methods that any

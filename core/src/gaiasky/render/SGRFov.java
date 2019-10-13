@@ -3,14 +3,14 @@
  * See the file LICENSE.md in the project root for full license details.
  */
 
-package gaia.cu9.ari.gaiaorbit.render;
+package gaiasky.render;
 
 import com.badlogic.gdx.graphics.glutils.FrameBuffer;
-import gaia.cu9.ari.gaiaorbit.render.IPostProcessor.PostProcessBean;
-import gaia.cu9.ari.gaiaorbit.render.system.StarGroupRenderSystem;
-import gaia.cu9.ari.gaiaorbit.scenegraph.camera.CameraManager;
-import gaia.cu9.ari.gaiaorbit.scenegraph.camera.FovCamera;
-import gaia.cu9.ari.gaiaorbit.scenegraph.camera.ICamera;
+import gaiasky.render.IPostProcessor.PostProcessBean;
+import gaiasky.render.system.StarGroupRenderSystem;
+import gaiasky.scenegraph.camera.CameraManager;
+import gaiasky.scenegraph.camera.FovCamera;
+import gaiasky.scenegraph.camera.ICamera;
 
 /**
  * Renders the Gaia Field of View camera mode. Positions two cameras inside

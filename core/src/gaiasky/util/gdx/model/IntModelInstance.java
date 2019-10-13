@@ -19,7 +19,7 @@
  * limitations under the License.
  ******************************************************************************/
 
-package gaia.cu9.ari.gaiaorbit.util.gdx.model;
+package gaiasky.util.gdx.model;
 
 import com.badlogic.gdx.graphics.g3d.Material;
 import com.badlogic.gdx.graphics.g3d.model.NodeKeyframe;
@@ -30,10 +30,10 @@ import com.badlogic.gdx.math.collision.BoundingBox;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.ArrayMap;
 import com.badlogic.gdx.utils.Pool;
-import gaia.cu9.ari.gaiaorbit.util.gdx.IntModelBatch;
-import gaia.cu9.ari.gaiaorbit.util.gdx.IntRenderable;
-import gaia.cu9.ari.gaiaorbit.util.gdx.IntRenderableProvider;
-import gaia.cu9.ari.gaiaorbit.util.gdx.shader.IntShader;
+import gaiasky.util.gdx.IntModelBatch;
+import gaiasky.util.gdx.IntRenderable;
+import gaiasky.util.gdx.IntRenderableProvider;
+import gaiasky.util.gdx.shader.IntShader;
 
 /** An instance of a {@link IntModel}, allows to specify global transform and modify the materials, as it has a copy of the model's
  * materials. Multiple instances can be created from the same IntModel, all sharing the meshes and textures of the IntModel. The IntModel

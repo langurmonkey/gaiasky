@@ -3,19 +3,19 @@
  * See the file LICENSE.md in the project root for full license details.
  */
 
-package gaia.cu9.ari.gaiaorbit.util.gaia;
+package gaiasky.util.gaia;
 
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.XmlReader;
-import gaia.cu9.ari.gaiaorbit.util.*;
-import gaia.cu9.ari.gaiaorbit.util.Logger.Log;
-import gaia.cu9.ari.gaiaorbit.util.coord.AstroUtils;
-import gaia.cu9.ari.gaiaorbit.util.format.DateFormatFactory;
-import gaia.cu9.ari.gaiaorbit.util.format.IDateFormat;
-import gaia.cu9.ari.gaiaorbit.util.gaia.time.Duration;
-import gaia.cu9.ari.gaiaorbit.util.gaia.time.Hours;
-import gaia.cu9.ari.gaiaorbit.util.units.Quantity;
+import gaiasky.util.*;
+import gaiasky.util.Logger.Log;
+import gaiasky.util.coord.AstroUtils;
+import gaiasky.util.format.DateFormatFactory;
+import gaiasky.util.format.IDateFormat;
+import gaiasky.util.gaia.time.Duration;
+import gaiasky.util.gaia.time.Hours;
+import gaiasky.util.units.Quantity;
 
 import java.nio.file.Files;
 import java.nio.file.Path;

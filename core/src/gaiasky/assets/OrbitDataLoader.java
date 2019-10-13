@@ -3,7 +3,7 @@
  * See the file LICENSE.md in the project root for full license details.
  */
 
-package gaia.cu9.ari.gaiaorbit.assets;
+package gaiasky.assets;
 
 import com.badlogic.gdx.assets.AssetDescriptor;
 import com.badlogic.gdx.assets.AssetLoaderParameters;
@@ -13,11 +13,11 @@ import com.badlogic.gdx.assets.loaders.FileHandleResolver;
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.reflect.ClassReflection;
-import gaia.cu9.ari.gaiaorbit.data.orbit.IOrbitDataProvider;
-import gaia.cu9.ari.gaiaorbit.data.util.PointCloudData;
-import gaia.cu9.ari.gaiaorbit.scenegraph.Orbit;
-import gaia.cu9.ari.gaiaorbit.scenegraph.component.OrbitComponent;
-import gaia.cu9.ari.gaiaorbit.util.Logger;
+import gaiasky.data.orbit.IOrbitDataProvider;
+import gaiasky.data.util.PointCloudData;
+import gaiasky.scenegraph.Orbit;
+import gaiasky.scenegraph.component.OrbitComponent;
+import gaiasky.util.Logger;
 
 import java.util.Date;
 

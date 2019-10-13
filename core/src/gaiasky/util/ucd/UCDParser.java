@@ -3,11 +3,11 @@
  * See the file LICENSE.md in the project root for full license details.
  */
 
-package gaia.cu9.ari.gaiaorbit.util.ucd;
+package gaiasky.util.ucd;
 
 import com.badlogic.gdx.utils.Array;
-import gaia.cu9.ari.gaiaorbit.util.ucd.UCD.UCDType;
-import gaia.cu9.ari.gaiaorbit.util.units.Position.PositionType;
+import gaiasky.util.ucd.UCD.UCDType;
+import gaiasky.util.units.Position.PositionType;
 import uk.ac.starlink.table.ColumnInfo;
 import uk.ac.starlink.table.StarTable;
 

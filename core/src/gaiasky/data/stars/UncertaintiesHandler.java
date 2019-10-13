@@ -3,17 +3,17 @@
  * See the file LICENSE.md in the project root for full license details.
  */
 
-package gaia.cu9.ari.gaiaorbit.data.stars;
+package gaiasky.data.stars;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.utils.Array;
-import gaia.cu9.ari.gaiaorbit.GaiaSky;
-import gaia.cu9.ari.gaiaorbit.event.EventManager;
-import gaia.cu9.ari.gaiaorbit.event.Events;
-import gaia.cu9.ari.gaiaorbit.event.IObserver;
-import gaia.cu9.ari.gaiaorbit.scenegraph.IStarFocus;
-import gaia.cu9.ari.gaiaorbit.scenegraph.ParticleGroup;
-import gaia.cu9.ari.gaiaorbit.util.Logger;
+import gaiasky.GaiaSky;
+import gaiasky.event.EventManager;
+import gaiasky.event.Events;
+import gaiasky.event.IObserver;
+import gaiasky.scenegraph.IStarFocus;
+import gaiasky.scenegraph.ParticleGroup;
+import gaiasky.util.Logger;
 
 import java.io.IOException;
 import java.nio.file.*;
@@ -128,7 +128,7 @@ public class UncertaintiesHandler implements IObserver {
         pg.setLabelposition(new double[] { 0, 0, 0 });
         pg.setCt("Others");
         pg.setParent("Universe");
-        pg.setProvider("gaia.cu9.ari.gaiaorbit.data.vgroup.UncertaintiesProvider");
+        pg.setProvider("gaiasky.data.vgroup.UncertaintiesProvider");
         pg.setDatafile(path + source_id + ".csv");
         pg.initialize();
         return pg;

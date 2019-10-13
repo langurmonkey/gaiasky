@@ -19,7 +19,7 @@
  * the License.
  ******************************************************************************/
 
-package gaia.cu9.ari.gaiaorbit.util.gdx.contrib.postprocess.filters;
+package gaiasky.util.gdx.contrib.postprocess.filters;
 
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.glutils.FrameBuffer;
@@ -28,7 +28,7 @@ import com.badlogic.gdx.math.Matrix3;
 import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
-import gaia.cu9.ari.gaiaorbit.util.gdx.contrib.postprocess.utils.FullscreenQuad;
+import gaiasky.util.gdx.contrib.postprocess.utils.FullscreenQuad;
 
 /** The base class for any single-pass filter. */
 

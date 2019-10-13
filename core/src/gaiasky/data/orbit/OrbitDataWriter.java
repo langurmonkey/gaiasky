@@ -3,12 +3,12 @@
  * See the file LICENSE.md in the project root for full license details.
  */
 
-package gaia.cu9.ari.gaiaorbit.data.orbit;
+package gaiasky.data.orbit;
 
-import gaia.cu9.ari.gaiaorbit.data.util.PointCloudData;
-import gaia.cu9.ari.gaiaorbit.util.Constants;
-import gaia.cu9.ari.gaiaorbit.util.format.DateFormatFactory;
-import gaia.cu9.ari.gaiaorbit.util.format.IDateFormat;
+import gaiasky.data.util.PointCloudData;
+import gaiasky.util.Constants;
+import gaiasky.util.format.DateFormatFactory;
+import gaiasky.util.format.IDateFormat;
 
 import java.io.BufferedWriter;
 import java.io.File;

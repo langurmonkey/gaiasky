@@ -19,7 +19,7 @@
  * limitations under the License.
  ******************************************************************************/
 
-package gaia.cu9.ari.gaiaorbit.util.gdx.loader;
+package gaiasky.util.gdx.loader;
 
 import com.badlogic.gdx.assets.loaders.FileHandleResolver;
 import com.badlogic.gdx.files.FileHandle;
@@ -32,10 +32,10 @@ import com.badlogic.gdx.math.Quaternion;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.*;
-import gaia.cu9.ari.gaiaorbit.util.gdx.model.data.IntModelData;
-import gaia.cu9.ari.gaiaorbit.util.gdx.model.data.IntModelMesh;
-import gaia.cu9.ari.gaiaorbit.util.gdx.model.data.IntModelMeshPart;
-import gaia.cu9.ari.gaiaorbit.util.gdx.model.data.IntModelNode;
+import gaiasky.util.gdx.model.data.IntModelData;
+import gaiasky.util.gdx.model.data.IntModelMesh;
+import gaiasky.util.gdx.model.data.IntModelMeshPart;
+import gaiasky.util.gdx.model.data.IntModelNode;
 
 public class G3dModelLoader extends IntModelLoader<IntModelLoader.IntModelParameters> {
 	public static final short VERSION_HI = 0;

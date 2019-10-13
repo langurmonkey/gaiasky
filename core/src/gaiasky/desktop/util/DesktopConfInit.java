@@ -3,23 +3,23 @@
  * See the file LICENSE.md in the project root for full license details.
  */
 
-package gaia.cu9.ari.gaiaorbit.desktop.util;
+package gaiasky.desktop.util;
 
 import com.badlogic.gdx.Gdx;
-import gaia.cu9.ari.gaiaorbit.desktop.GaiaSkyDesktop;
-import gaia.cu9.ari.gaiaorbit.desktop.util.camera.CameraKeyframeManager;
-import gaia.cu9.ari.gaiaorbit.render.ComponentTypes.ComponentType;
-import gaia.cu9.ari.gaiaorbit.util.*;
-import gaia.cu9.ari.gaiaorbit.util.GlobalConf.*;
-import gaia.cu9.ari.gaiaorbit.util.GlobalConf.PostprocessConf.Antialias;
-import gaia.cu9.ari.gaiaorbit.util.GlobalConf.ProgramConf.StereoProfile;
-import gaia.cu9.ari.gaiaorbit.util.GlobalConf.SceneConf.ElevationType;
-import gaia.cu9.ari.gaiaorbit.util.GlobalConf.SceneConf.GraphicsQuality;
-import gaia.cu9.ari.gaiaorbit.util.Logger.Log;
-import gaia.cu9.ari.gaiaorbit.util.format.DateFormatFactory;
-import gaia.cu9.ari.gaiaorbit.util.format.IDateFormat;
-import gaia.cu9.ari.gaiaorbit.util.math.MathUtilsd;
-import gaia.cu9.ari.gaiaorbit.util.parse.Parser;
+import gaiasky.desktop.GaiaSkyDesktop;
+import gaiasky.desktop.util.camera.CameraKeyframeManager;
+import gaiasky.render.ComponentTypes.ComponentType;
+import gaiasky.util.*;
+import gaiasky.util.GlobalConf.*;
+import gaiasky.util.GlobalConf.PostprocessConf.Antialias;
+import gaiasky.util.GlobalConf.ProgramConf.StereoProfile;
+import gaiasky.util.GlobalConf.SceneConf.ElevationType;
+import gaiasky.util.GlobalConf.SceneConf.GraphicsQuality;
+import gaiasky.util.Logger.Log;
+import gaiasky.util.format.DateFormatFactory;
+import gaiasky.util.format.IDateFormat;
+import gaiasky.util.math.MathUtilsd;
+import gaiasky.util.parse.Parser;
 
 import java.io.*;
 import java.nio.channels.FileChannel;
@@ -478,7 +478,8 @@ public class DesktopConfInit extends ConfInit {
                 i++;
             }
         p.setProperty("program.net.slave", Boolean.toString(GlobalConf.program.NET_SLAVE));
-        p.setProperty("program.last.filesystem.location", GlobalConf.program.LAST_OPEN_LOCATION);
+        if (GlobalConf.program.LAST_OPEN_LOCATION != null && !GlobalConf.program.LAST_OPEN_LOCATION.isEmpty())
+            p.setProperty("program.last.filesystem.location", GlobalConf.program.LAST_OPEN_LOCATION);
 
         /** SCENE **/
         p.setProperty("scene.object.startup", GlobalConf.scene.STARTUP_OBJECT);

@@ -3,14 +3,14 @@
  * See the file LICENSE.md in the project root for full license details.
  */
 
-package gaia.cu9.ari.gaiaorbit.desktop.util;
+package gaiasky.desktop.util;
 
-import gaia.cu9.ari.gaiaorbit.util.coord.Coordinates;
-import gaia.cu9.ari.gaiaorbit.util.gaia.Attitude;
-import gaia.cu9.ari.gaiaorbit.util.gaia.GaiaAttitudeServer;
-import gaia.cu9.ari.gaiaorbit.util.gaia.Satellite;
-import gaia.cu9.ari.gaiaorbit.util.math.Quaterniond;
-import gaia.cu9.ari.gaiaorbit.util.math.Vector3d;
+import gaiasky.util.coord.Coordinates;
+import gaiasky.util.gaia.Attitude;
+import gaiasky.util.gaia.GaiaAttitudeServer;
+import gaiasky.util.gaia.Satellite;
+import gaiasky.util.math.Quaterniond;
+import gaiasky.util.math.Vector3d;
 
 import java.io.*;
 import java.util.Calendar;

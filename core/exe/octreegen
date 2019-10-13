@@ -55,7 +55,7 @@ OPTS="$OPTS -Dassets.location=$GSDIR/"
 # Run.
 #
 
-CMD="$JAVA $OPTS -cp \"$LIB_PATH\" gaia.cu9.ari.gaiaorbit.data.OctreeGroupGeneratorTest $@"
+CMD="$JAVA $OPTS -cp \"$LIB_PATH\" gaiasky.data.OctreeGroupGeneratorTest $@"
 echo "$CMD"
 
 ( cd "$GSDIR" && eval $CMD )

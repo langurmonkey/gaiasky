@@ -3,7 +3,7 @@
  * See the file LICENSE.md in the project root for full license details.
  */
 
-package gaia.cu9.ari.gaiaorbit.interfce;
+package gaiasky.interfce;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.files.FileHandle;
@@ -13,17 +13,17 @@ import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener.ChangeEvent;
 import com.badlogic.gdx.utils.Array;
-import gaia.cu9.ari.gaiaorbit.desktop.util.SysUtils;
-import gaia.cu9.ari.gaiaorbit.util.*;
-import gaia.cu9.ari.gaiaorbit.util.Logger.Log;
-import gaia.cu9.ari.gaiaorbit.util.datadesc.DataDescriptor;
-import gaia.cu9.ari.gaiaorbit.util.datadesc.DataDescriptorUtils;
-import gaia.cu9.ari.gaiaorbit.util.datadesc.DatasetDesc;
-import gaia.cu9.ari.gaiaorbit.util.datadesc.DatasetType;
-import gaia.cu9.ari.gaiaorbit.util.format.INumberFormat;
-import gaia.cu9.ari.gaiaorbit.util.format.NumberFormatFactory;
-import gaia.cu9.ari.gaiaorbit.util.io.FileInfoInputStream;
-import gaia.cu9.ari.gaiaorbit.util.scene2d.*;
+import gaiasky.desktop.util.SysUtils;
+import gaiasky.util.*;
+import gaiasky.util.Logger.Log;
+import gaiasky.util.datadesc.DataDescriptor;
+import gaiasky.util.datadesc.DataDescriptorUtils;
+import gaiasky.util.datadesc.DatasetDesc;
+import gaiasky.util.datadesc.DatasetType;
+import gaiasky.util.format.INumberFormat;
+import gaiasky.util.format.NumberFormatFactory;
+import gaiasky.util.io.FileInfoInputStream;
+import gaiasky.util.scene2d.*;
 import org.apache.commons.compress.archivers.tar.TarArchiveEntry;
 import org.apache.commons.compress.archivers.tar.TarArchiveInputStream;
 import org.apache.commons.compress.compressors.gzip.GzipCompressorInputStream;

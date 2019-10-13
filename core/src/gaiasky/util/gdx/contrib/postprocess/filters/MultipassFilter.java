@@ -19,9 +19,9 @@
  * limitations under the License.
  ******************************************************************************/
 
-package gaia.cu9.ari.gaiaorbit.util.gdx.contrib.postprocess.filters;
+package gaiasky.util.gdx.contrib.postprocess.filters;
 
-import gaia.cu9.ari.gaiaorbit.util.gdx.contrib.postprocess.utils.PingPongBuffer;
+import gaiasky.util.gdx.contrib.postprocess.utils.PingPongBuffer;
 
 /**
  * The base class for any multi-pass filter. Usually a multi-pass filter will make use of one or more single-pass filters,

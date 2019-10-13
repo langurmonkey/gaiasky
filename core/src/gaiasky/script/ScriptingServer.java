@@ -3,12 +3,12 @@
  * See the file LICENSE.md in the project root for full license details.
  */
 
-package gaia.cu9.ari.gaiaorbit.script;
+package gaiasky.script;
 
 import com.badlogic.gdx.Gdx;
-import gaia.cu9.ari.gaiaorbit.event.EventManager;
-import gaia.cu9.ari.gaiaorbit.event.Events;
-import gaia.cu9.ari.gaiaorbit.util.Logger;
+import gaiasky.event.EventManager;
+import gaiasky.event.Events;
+import gaiasky.util.Logger;
 import py4j.DefaultGatewayServerListener;
 import py4j.GatewayServer;
 import py4j.GatewayServerListener;

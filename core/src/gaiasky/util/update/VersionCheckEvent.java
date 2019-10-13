@@ -3,7 +3,7 @@
  * See the file LICENSE.md in the project root for full license details.
  */
 
-package gaia.cu9.ari.gaiaorbit.util.update;
+package gaiasky.util.update;
 
 import com.badlogic.gdx.scenes.scene2d.Event;
 

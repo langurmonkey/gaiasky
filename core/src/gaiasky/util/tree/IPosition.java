@@ -3,9 +3,9 @@
  * See the file LICENSE.md in the project root for full license details.
  */
 
-package gaia.cu9.ari.gaiaorbit.util.tree;
+package gaiasky.util.tree;
 
-import gaia.cu9.ari.gaiaorbit.util.math.Vector3d;
+import gaiasky.util.math.Vector3d;
 
 /**
  * Interface that must implement all entities that have a position.

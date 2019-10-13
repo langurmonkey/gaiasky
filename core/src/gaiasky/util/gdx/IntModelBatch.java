@@ -19,18 +19,18 @@
  * limitations under the License.
  ******************************************************************************/
 
-package gaia.cu9.ari.gaiaorbit.util.gdx;
+package gaiasky.util.gdx;
 
 import com.badlogic.gdx.graphics.Camera;
 import com.badlogic.gdx.graphics.g3d.Environment;
 import com.badlogic.gdx.graphics.g3d.RenderableProvider;
 import com.badlogic.gdx.graphics.g3d.utils.*;
 import com.badlogic.gdx.utils.*;
-import gaia.cu9.ari.gaiaorbit.util.gdx.model.IntModelInstance;
-import gaia.cu9.ari.gaiaorbit.util.gdx.shader.DefaultIntShader;
-import gaia.cu9.ari.gaiaorbit.util.gdx.shader.IntShader;
-import gaia.cu9.ari.gaiaorbit.util.gdx.shader.provider.DefaultIntShaderProvider;
-import gaia.cu9.ari.gaiaorbit.util.gdx.shader.provider.IntShaderProvider;
+import gaiasky.util.gdx.model.IntModelInstance;
+import gaiasky.util.gdx.shader.DefaultIntShader;
+import gaiasky.util.gdx.shader.IntShader;
+import gaiasky.util.gdx.shader.provider.DefaultIntShaderProvider;
+import gaiasky.util.gdx.shader.provider.IntShaderProvider;
 
 /** Batches {@link IntRenderable} instances, fetches {@link IntShader}s for them, sorts them and then renders them. Fetching the shaders
  * is done using a {@link IntShaderProvider}, which defaults to {@link DefaultShaderProvider}. Sorting the renderables is done using

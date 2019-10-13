@@ -19,7 +19,7 @@
  * limitations under the License.
  ******************************************************************************/
 
-package gaia.cu9.ari.gaiaorbit.util.gdx.contrib.postprocess;
+package gaiasky.util.gdx.contrib.postprocess;
 
 public interface PostProcessorListener {
     void beforeRenderToScreen();

@@ -3,10 +3,10 @@
  * See the file LICENSE.md in the project root for full license details.
  */
 
-package gaia.cu9.ari.gaiaorbit.data.orbit;
+package gaiasky.data.orbit;
 
-import gaia.cu9.ari.gaiaorbit.assets.OrbitDataLoader.OrbitDataLoaderParameter;
-import gaia.cu9.ari.gaiaorbit.data.util.PointCloudData;
+import gaiasky.assets.OrbitDataLoader.OrbitDataLoaderParameter;
+import gaiasky.data.util.PointCloudData;
 
 public interface IOrbitDataProvider {
 

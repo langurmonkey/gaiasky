@@ -3,9 +3,9 @@
  * See the file LICENSE.md in the project root for full license details.
  */
 
-package gaia.cu9.ari.gaiaorbit.desktop.util.camera;
+package gaiasky.desktop.util.camera;
 
-import gaia.cu9.ari.gaiaorbit.util.math.Vector3d;
+import gaiasky.util.math.Vector3d;
 
 /**
  * Represents a keyframe and contains the camera state, the simulation time, the frame and a descriptor name.

@@ -3,10 +3,10 @@
  * See the file LICENSE.md in the project root for full license details.
  */
 
-package gaia.cu9.ari.gaiaorbit.data.octreegen;
+package gaiasky.data.octreegen;
 
 import com.badlogic.gdx.utils.Array;
-import gaia.cu9.ari.gaiaorbit.scenegraph.AbstractPositionEntity;
+import gaiasky.scenegraph.AbstractPositionEntity;
 
 import java.io.FileNotFoundException;
 import java.io.InputStream;

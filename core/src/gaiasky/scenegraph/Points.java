@@ -3,13 +3,13 @@
  * See the file LICENSE.md in the project root for full license details.
  */
 
-package gaia.cu9.ari.gaiaorbit.scenegraph;
+package gaiasky.scenegraph;
 
-import gaia.cu9.ari.gaiaorbit.render.IPointRenderable;
-import gaia.cu9.ari.gaiaorbit.render.system.PointRenderSystem;
-import gaia.cu9.ari.gaiaorbit.scenegraph.camera.ICamera;
-import gaia.cu9.ari.gaiaorbit.util.GlobalConf;
-import gaia.cu9.ari.gaiaorbit.util.math.Vector3d;
+import gaiasky.render.IPointRenderable;
+import gaiasky.render.system.PointRenderSystem;
+import gaiasky.scenegraph.camera.ICamera;
+import gaiasky.util.GlobalConf;
+import gaiasky.util.math.Vector3d;
 
 /**
  * A vgroup of points

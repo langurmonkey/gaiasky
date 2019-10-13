@@ -3,7 +3,7 @@
  * See the file LICENSE.md in the project root for full license details.
  */
 
-package gaia.cu9.ari.gaiaorbit.data;
+package gaiasky.data;
 
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.utils.Array;
@@ -11,12 +11,12 @@ import com.badlogic.gdx.utils.JsonReader;
 import com.badlogic.gdx.utils.JsonValue;
 import com.badlogic.gdx.utils.reflect.ClassReflection;
 import com.badlogic.gdx.utils.reflect.Constructor;
-import gaia.cu9.ari.gaiaorbit.scenegraph.ISceneGraph;
-import gaia.cu9.ari.gaiaorbit.scenegraph.SceneGraphNode;
-import gaia.cu9.ari.gaiaorbit.scenegraph.StarGroup;
-import gaia.cu9.ari.gaiaorbit.scenegraph.octreewrapper.AbstractOctreeWrapper;
-import gaia.cu9.ari.gaiaorbit.util.Logger;
-import gaia.cu9.ari.gaiaorbit.util.time.ITimeFrameProvider;
+import gaiasky.scenegraph.ISceneGraph;
+import gaiasky.scenegraph.SceneGraphNode;
+import gaiasky.scenegraph.StarGroup;
+import gaiasky.scenegraph.octreewrapper.AbstractOctreeWrapper;
+import gaiasky.util.Logger;
+import gaiasky.util.time.ITimeFrameProvider;
 
 public class SceneGraphJsonLoader {
 
@@ -36,7 +36,7 @@ public class SceneGraphJsonLoader {
 
                     JsonValue child = model.get("data").child;
                     while (child != null) {
-                        String clazzName = child.getString("loader");
+                        String clazzName = child.getString("loader").replace("gaia.cu9.ari.gaiaorbit", "gaiasky");
                         @SuppressWarnings("unchecked") Class<Object> clazz = (Class<Object>) ClassReflection.forName(clazzName);
 
                         JsonValue filesJson = child.get("files");

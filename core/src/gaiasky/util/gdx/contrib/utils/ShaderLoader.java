@@ -19,13 +19,13 @@
  * limitations under the License.
  ******************************************************************************/
 
-package gaia.cu9.ari.gaiaorbit.util.gdx.contrib.utils;
+package gaiasky.util.gdx.contrib.utils;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.glutils.ShaderProgram;
-import gaia.cu9.ari.gaiaorbit.assets.ShaderTemplatingLoader;
-import gaia.cu9.ari.gaiaorbit.util.Logger;
-import gaia.cu9.ari.gaiaorbit.util.Logger.Log;
+import gaiasky.assets.ShaderTemplatingLoader;
+import gaiasky.util.Logger;
+import gaiasky.util.Logger.Log;
 
 public final class ShaderLoader {
     private static Log logger = Logger.getLogger(ShaderLoader.class);

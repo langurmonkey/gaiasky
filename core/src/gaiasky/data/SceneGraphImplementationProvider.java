@@ -3,9 +3,9 @@
  * See the file LICENSE.md in the project root for full license details.
  */
 
-package gaia.cu9.ari.gaiaorbit.data;
+package gaiasky.data;
 
-import gaia.cu9.ari.gaiaorbit.scenegraph.ISceneGraph;
+import gaiasky.scenegraph.ISceneGraph;
 
 /**
  * Provides the scene graph implementation.

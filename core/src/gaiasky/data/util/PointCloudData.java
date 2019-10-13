@@ -3,11 +3,11 @@
  * See the file LICENSE.md in the project root for full license details.
  */
 
-package gaia.cu9.ari.gaiaorbit.data.util;
+package gaiasky.data.util;
 
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.Array;
-import gaia.cu9.ari.gaiaorbit.util.math.Vector3d;
+import gaiasky.util.math.Vector3d;
 
 import java.time.Instant;
 

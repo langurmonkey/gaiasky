@@ -3,11 +3,11 @@
  * See the file LICENSE.md in the project root for full license details.
  */
 
-package gaia.cu9.ari.gaiaorbit.render;
+package gaiasky.render;
 
-import gaia.cu9.ari.gaiaorbit.util.gdx.IntModelBatch;
+import gaiasky.util.gdx.IntModelBatch;
 
-import gaia.cu9.ari.gaiaorbit.util.math.Vector3d;
+import gaiasky.util.math.Vector3d;
 
 /**
  * To be implemented by all entities wanting to render an atmosphere.

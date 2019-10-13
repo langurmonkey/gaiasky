@@ -19,7 +19,7 @@
  * limitations under the License.
  ******************************************************************************/
 
-package gaia.cu9.ari.gaiaorbit.util.gdx;
+package gaiasky.util.gdx;
 
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
@@ -33,9 +33,9 @@ import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.*;
-import gaia.cu9.ari.gaiaorbit.util.gdx.ModelCreator.IFace;
-import gaia.cu9.ari.gaiaorbit.util.gdx.mesh.IntMesh;
-import gaia.cu9.ari.gaiaorbit.util.gdx.model.IntMeshPart;
+import gaiasky.util.gdx.ModelCreator.IFace;
+import gaiasky.util.gdx.mesh.IntMesh;
+import gaiasky.util.gdx.model.IntMeshPart;
 
 /**
  * Class to construct a mesh, optionally splitting it into one or more mesh parts. Before you can call any other method you must

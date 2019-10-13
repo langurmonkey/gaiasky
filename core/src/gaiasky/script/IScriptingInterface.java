@@ -3,10 +3,10 @@
  * See the file LICENSE.md in the project root for full license details.
  */
 
-package gaia.cu9.ari.gaiaorbit.script;
+package gaiasky.script;
 
-import gaia.cu9.ari.gaiaorbit.scenegraph.IFocus;
-import gaia.cu9.ari.gaiaorbit.scenegraph.SceneGraphNode;
+import gaiasky.scenegraph.IFocus;
+import gaiasky.scenegraph.SceneGraphNode;
 
 import java.util.List;
 
@@ -501,7 +501,7 @@ public interface IScriptingInterface {
 
     /**
      * Returns the closest object to the camera in this instant as a
-     * {@link gaia.cu9.ari.gaiaorbit.scenegraph.IFocus}.
+     * {@link gaiasky.scenegraph.IFocus}.
      *
      * @return The closest object to the camera
      */
@@ -538,7 +538,7 @@ public interface IScriptingInterface {
      * Sets the component described by the given name visible or invisible.
      *
      * @param key     The key of the component, see
-     *                {@link gaia.cu9.ari.gaiaorbit.render.ComponentTypes.ComponentType}. Usually
+     *                {@link gaiasky.render.ComponentTypes.ComponentType}. Usually
      *                'element.stars', 'element.moons', 'element.atmospheres', etc.
      * @param visible The visible value.
      */
@@ -828,7 +828,7 @@ public interface IScriptingInterface {
      *
      * @param name The name or id (HIP, TYC, Gaia SourceId) of the object.
      * @return The object as a
-     * {@link gaia.cu9.ari.gaiaorbit.scenegraph.SceneGraphNode}, or null
+     * {@link gaiasky.scenegraph.SceneGraphNode}, or null
      * if it does not exist.
      */
     SceneGraphNode getObject(String name);
@@ -918,7 +918,7 @@ public interface IScriptingInterface {
 
     /**
      * Lands on the object with the given name, if it is an instance of
-     * {@link gaia.cu9.ari.gaiaorbit.scenegraph.Planet}. The land location is
+     * {@link gaiasky.scenegraph.Planet}. The land location is
      * determined by the line of sight from the current position of the camera
      * to the object.
      *
@@ -928,7 +928,7 @@ public interface IScriptingInterface {
 
     /**
      * Lands on the object with the given <code>name</code>, if it is an
-     * instance of {@link gaia.cu9.ari.gaiaorbit.scenegraph.Planet}, at the
+     * instance of {@link gaiasky.scenegraph.Planet}, at the
      * location with the given name, if it exists.
      *
      * @param name         The proper name of the object.
@@ -938,7 +938,7 @@ public interface IScriptingInterface {
 
     /**
      * Lands on the object with the given <code>name</code>, if it is an
-     * instance of {@link gaia.cu9.ari.gaiaorbit.scenegraph.Planet}, at the
+     * instance of {@link gaiasky.scenegraph.Planet}, at the
      * location specified in by [latitude, longitude], in degrees.
      *
      * @param name      The proper name of the object.
@@ -1391,7 +1391,7 @@ public interface IScriptingInterface {
     /**
      * Sets the cubemap projection to use.
      * Accepted values are "EQUIRECTANGULAR", "CYLINDRICAL" and "HAMMER".
-     * See {@link gaia.cu9.ari.gaiaorbit.util.gdx.contrib.postprocess.effects.CubemapProjections} for possible
+     * See {@link gaiasky.util.gdx.contrib.postprocess.effects.CubemapProjections} for possible
      * values.
      * @param projection
      */

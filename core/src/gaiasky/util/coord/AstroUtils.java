@@ -3,17 +3,17 @@
  * See the file LICENSE.md in the project root for full license details.
  */
 
-package gaia.cu9.ari.gaiaorbit.util.coord;
+package gaiasky.util.coord;
 
-import gaia.cu9.ari.gaiaorbit.util.Constants;
-import gaia.cu9.ari.gaiaorbit.util.LruCache;
-import gaia.cu9.ari.gaiaorbit.util.Nature;
-import gaia.cu9.ari.gaiaorbit.util.coord.vsop87.VSOP87;
-import gaia.cu9.ari.gaiaorbit.util.coord.vsop87.iVSOP87;
-import gaia.cu9.ari.gaiaorbit.util.math.ITrigonometry;
-import gaia.cu9.ari.gaiaorbit.util.math.MathManager;
-import gaia.cu9.ari.gaiaorbit.util.math.Vector2d;
-import gaia.cu9.ari.gaiaorbit.util.math.Vector3d;
+import gaiasky.util.Constants;
+import gaiasky.util.LruCache;
+import gaiasky.util.Nature;
+import gaiasky.util.coord.vsop87.VSOP87;
+import gaiasky.util.coord.vsop87.iVSOP87;
+import gaiasky.util.math.ITrigonometry;
+import gaiasky.util.math.MathManager;
+import gaiasky.util.math.Vector2d;
+import gaiasky.util.math.Vector3d;
 
 import java.time.Instant;
 import java.time.LocalDateTime;

@@ -20,7 +20,7 @@ au_to_km = 149597900.0
 text_x = 0.2
 text_y = 0.2
 # Text size scaling (HiDPI)
-text_size = 22 * gateway.jvm.gaia.cu9.ari.gaiaorbit.util.GlobalConf.SCALE_FACTOR
+text_size = 22 * gateway.jvm.gaiasky.util.GlobalConf.SCALE_FACTOR
 
 # Disable all grids
 gs.setVisibility("element.equatorial", False)

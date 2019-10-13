@@ -3,7 +3,7 @@
  * See the file LICENSE.md in the project root for full license details.
  */
 
-package gaia.cu9.ari.gaiaorbit.util.math;
+package gaiasky.util.math;
 
 /** Interface that specifies a path of type T within the window 0.0<=t<=1.0.
  * @author Xoppa */

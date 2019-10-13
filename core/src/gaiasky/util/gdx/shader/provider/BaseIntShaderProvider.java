@@ -19,11 +19,11 @@
  * limitations under the License.
  ******************************************************************************/
 
-package gaia.cu9.ari.gaiaorbit.util.gdx.shader.provider;
+package gaiasky.util.gdx.shader.provider;
 
 import com.badlogic.gdx.utils.Array;
-import gaia.cu9.ari.gaiaorbit.util.gdx.IntRenderable;
-import gaia.cu9.ari.gaiaorbit.util.gdx.shader.IntShader;
+import gaiasky.util.gdx.IntRenderable;
+import gaiasky.util.gdx.shader.IntShader;
 
 public abstract class BaseIntShaderProvider implements IntShaderProvider {
 	protected Array<IntShader> shaders = new Array<>();

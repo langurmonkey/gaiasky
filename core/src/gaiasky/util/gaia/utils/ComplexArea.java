@@ -3,9 +3,9 @@
  * See the file LICENSE.md in the project root for full license details.
  */
 
-package gaia.cu9.ari.gaiaorbit.util.gaia.utils;
+package gaiasky.util.gaia.utils;
 
-import gaia.cu9.ari.gaiaorbit.util.math.Vector3d;
+import gaiasky.util.math.Vector3d;
 
 import java.util.ArrayList;
 import java.util.Collection;

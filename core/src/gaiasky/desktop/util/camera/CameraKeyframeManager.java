@@ -3,20 +3,20 @@
  * See the file LICENSE.md in the project root for full license details.
  */
 
-package gaia.cu9.ari.gaiaorbit.desktop.util.camera;
+package gaiasky.desktop.util.camera;
 
 import com.badlogic.gdx.utils.Array;
-import gaia.cu9.ari.gaiaorbit.desktop.util.SysUtils;
-import gaia.cu9.ari.gaiaorbit.event.EventManager;
-import gaia.cu9.ari.gaiaorbit.event.Events;
-import gaia.cu9.ari.gaiaorbit.event.IObserver;
-import gaia.cu9.ari.gaiaorbit.util.GlobalConf;
-import gaia.cu9.ari.gaiaorbit.util.Logger;
-import gaia.cu9.ari.gaiaorbit.util.math.CatmullRomSplined;
-import gaia.cu9.ari.gaiaorbit.util.math.Lineard;
-import gaia.cu9.ari.gaiaorbit.util.math.Pathd;
-import gaia.cu9.ari.gaiaorbit.util.math.Vector3d;
-import gaia.cu9.ari.gaiaorbit.util.parse.Parser;
+import gaiasky.desktop.util.SysUtils;
+import gaiasky.event.EventManager;
+import gaiasky.event.Events;
+import gaiasky.event.IObserver;
+import gaiasky.util.GlobalConf;
+import gaiasky.util.Logger;
+import gaiasky.util.math.CatmullRomSplined;
+import gaiasky.util.math.Lineard;
+import gaiasky.util.math.Pathd;
+import gaiasky.util.math.Vector3d;
+import gaiasky.util.parse.Parser;
 
 import java.io.*;
 

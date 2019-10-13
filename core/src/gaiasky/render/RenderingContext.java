@@ -3,11 +3,11 @@
  * See the file LICENSE.md in the project root for full license details.
  */
 
-package gaia.cu9.ari.gaiaorbit.render;
+package gaiasky.render;
 
 import com.badlogic.gdx.graphics.glutils.FrameBuffer;
-import gaia.cu9.ari.gaiaorbit.render.IPostProcessor.PostProcessBean;
-import gaia.cu9.ari.gaiaorbit.util.math.Vector3d;
+import gaiasky.render.IPostProcessor.PostProcessBean;
+import gaiasky.util.math.Vector3d;
 
 /**
  * Holds some context information useful when rendering.

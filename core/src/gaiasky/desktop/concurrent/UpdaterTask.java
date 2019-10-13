@@ -3,14 +3,14 @@
  * See the file LICENSE.md in the project root for full license details.
  */
 
-package gaia.cu9.ari.gaiaorbit.desktop.concurrent;
+package gaiasky.desktop.concurrent;
 
 import com.badlogic.gdx.utils.Array;
-import gaia.cu9.ari.gaiaorbit.scenegraph.FadeNode;
-import gaia.cu9.ari.gaiaorbit.scenegraph.Particle;
-import gaia.cu9.ari.gaiaorbit.scenegraph.SceneGraphNode;
-import gaia.cu9.ari.gaiaorbit.scenegraph.camera.ICamera;
-import gaia.cu9.ari.gaiaorbit.util.time.ITimeFrameProvider;
+import gaiasky.scenegraph.FadeNode;
+import gaiasky.scenegraph.Particle;
+import gaiasky.scenegraph.SceneGraphNode;
+import gaiasky.scenegraph.camera.ICamera;
+import gaiasky.util.time.ITimeFrameProvider;
 
 import java.util.concurrent.Callable;
 

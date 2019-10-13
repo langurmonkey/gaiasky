@@ -1,12 +1,12 @@
-package gaia.cu9.ari.gaiaorbit.interfce;
+package gaiasky.interfce;
 
 import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Stage;
-import gaia.cu9.ari.gaiaorbit.render.ComponentTypes;
-import gaia.cu9.ari.gaiaorbit.scenegraph.ISceneGraph;
-import gaia.cu9.ari.gaiaorbit.util.GlobalConf;
-import gaia.cu9.ari.gaiaorbit.util.Logger;
+import gaiasky.render.ComponentTypes;
+import gaiasky.scenegraph.ISceneGraph;
+import gaiasky.util.GlobalConf;
+import gaiasky.util.Logger;
 
 public class VRGui<T extends IGui> implements IGui {
 

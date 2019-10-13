@@ -3,7 +3,7 @@
  * See the file LICENSE.md in the project root for full license details.
  */
 
-package gaia.cu9.ari.gaiaorbit.desktop;
+package gaiasky.desktop;
 
 import com.badlogic.gdx.Files;
 import com.badlogic.gdx.Gdx;
@@ -16,30 +16,30 @@ import com.badlogic.gdx.graphics.glutils.HdpiMode;
 import com.badlogic.gdx.utils.GdxRuntimeException;
 import com.beust.jcommander.JCommander;
 import com.beust.jcommander.Parameter;
-import gaia.cu9.ari.gaiaorbit.GaiaSky;
-import gaia.cu9.ari.gaiaorbit.data.DesktopSceneGraphImplementationProvider;
-import gaia.cu9.ari.gaiaorbit.data.SceneGraphImplementationProvider;
-import gaia.cu9.ari.gaiaorbit.desktop.format.DesktopDateFormatFactory;
-import gaia.cu9.ari.gaiaorbit.desktop.format.DesktopNumberFormatFactory;
-import gaia.cu9.ari.gaiaorbit.desktop.render.DesktopPostProcessorFactory;
-import gaia.cu9.ari.gaiaorbit.desktop.render.ScreenModeCmd;
-import gaia.cu9.ari.gaiaorbit.desktop.util.*;
-import gaia.cu9.ari.gaiaorbit.desktop.util.camera.CamRecorder;
-import gaia.cu9.ari.gaiaorbit.event.EventManager;
-import gaia.cu9.ari.gaiaorbit.event.Events;
-import gaia.cu9.ari.gaiaorbit.event.IObserver;
-import gaia.cu9.ari.gaiaorbit.interfce.ConsoleLogger;
-import gaia.cu9.ari.gaiaorbit.interfce.KeyBindings;
-import gaia.cu9.ari.gaiaorbit.interfce.MusicActorsManager;
-import gaia.cu9.ari.gaiaorbit.interfce.NetworkCheckerManager;
-import gaia.cu9.ari.gaiaorbit.render.PostProcessorFactory;
-import gaia.cu9.ari.gaiaorbit.screenshot.ScreenshotsManager;
-import gaia.cu9.ari.gaiaorbit.util.*;
-import gaia.cu9.ari.gaiaorbit.util.GlobalConf.SceneConf.ElevationType;
-import gaia.cu9.ari.gaiaorbit.util.Logger.Log;
-import gaia.cu9.ari.gaiaorbit.util.format.DateFormatFactory;
-import gaia.cu9.ari.gaiaorbit.util.format.NumberFormatFactory;
-import gaia.cu9.ari.gaiaorbit.util.math.MathManager;
+import gaiasky.GaiaSky;
+import gaiasky.data.DesktopSceneGraphImplementationProvider;
+import gaiasky.data.SceneGraphImplementationProvider;
+import gaiasky.desktop.format.DesktopDateFormatFactory;
+import gaiasky.desktop.format.DesktopNumberFormatFactory;
+import gaiasky.desktop.render.DesktopPostProcessorFactory;
+import gaiasky.desktop.render.ScreenModeCmd;
+import gaiasky.desktop.util.*;
+import gaiasky.desktop.util.camera.CamRecorder;
+import gaiasky.event.EventManager;
+import gaiasky.event.Events;
+import gaiasky.event.IObserver;
+import gaiasky.interfce.ConsoleLogger;
+import gaiasky.interfce.KeyBindings;
+import gaiasky.interfce.MusicActorsManager;
+import gaiasky.interfce.NetworkCheckerManager;
+import gaiasky.render.PostProcessorFactory;
+import gaiasky.screenshot.ScreenshotsManager;
+import gaiasky.util.*;
+import gaiasky.util.GlobalConf.SceneConf.ElevationType;
+import gaiasky.util.Logger.Log;
+import gaiasky.util.format.DateFormatFactory;
+import gaiasky.util.format.NumberFormatFactory;
+import gaiasky.util.math.MathManager;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -207,7 +207,7 @@ public class GaiaSkyDesktop implements IObserver {
             // REST API server
             REST_ENABLED = GlobalConf.program.REST_PORT >= 0 && checkRestDepsInClasspath();
             if (REST_ENABLED) {
-                REST_SERVER_CLASS = Class.forName("gaia.cu9.ari.gaiaorbit.rest.RESTServer");
+                REST_SERVER_CLASS = Class.forName("gaiasky.rest.RESTServer");
                 Method init = REST_SERVER_CLASS.getMethod("initialize", Integer.class);
                 init.invoke(null, GlobalConf.program.REST_PORT);
             }
@@ -418,7 +418,7 @@ public class GaiaSkyDesktop implements IObserver {
         try {
             Class.forName("com.google.gson.Gson");
             Class.forName("spark.Spark");
-            Class.forName("gaia.cu9.ari.gaiaorbit.rest.RESTServer");
+            Class.forName("gaiasky.rest.RESTServer");
             return true;
         } catch (ClassNotFoundException e) {
             // my class isn't there!

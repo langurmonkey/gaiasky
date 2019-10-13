@@ -27,9 +27,9 @@
  * questions.
  */
 
-package gaia.cu9.ari.gaiaorbit.render;
+package gaiasky.render;
 
-import gaia.cu9.ari.gaiaorbit.util.I18n;
+import gaiasky.util.I18n;
 
 import java.util.BitSet;
 import java.util.HashMap;

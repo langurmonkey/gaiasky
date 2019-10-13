@@ -14,7 +14,7 @@ sourceSets {
    }
 }
 
-project.ext.mainClassName = "gaia.cu9.ari.gaiaorbit.desktop.GaiaSkyDesktop"
+project.ext.mainClassName = "gaiasky.desktop.GaiaSkyDesktop"
 project.ext.assetsDir = new File("../assets");
 project.ext.workDir = new File(".");
 
@@ -143,7 +143,7 @@ task rund(dependsOn: jar, type: JavaExec, description: "Runs Gaia Sky - forces d
 }
 
 task runCatalogFilter(dependsOn: jar, type: JavaExec, description: "Runs the catalog filter application to generate day catalogs for WebGL") {
-    main = 'gaia.cu9.ari.gaiaorbit.data.GaiaCatalogFilter'
+    main = 'gaiasky.data.GaiaCatalogFilter'
     classpath = sourceSets.main.runtimeClasspath
     classpath += files(project.assetsDir)
     standardInput = System.in
@@ -152,7 +152,7 @@ task runCatalogFilter(dependsOn: jar, type: JavaExec, description: "Runs the cat
 }
 
 task runOctreeGenerator(dependsOn: jar, type: JavaExec, description: "Runs the octree generator with star groups to create the lod structure from a base catalog") {
-    main = 'gaia.cu9.ari.gaiaorbit.data.OctreeGeneratorRun'
+    main = 'gaiasky.data.OctreeGeneratorRun'
     systemProperties['properties.file'] = '../..//assets/conf/global.properties'
     args = [
         "--input",
@@ -174,7 +174,7 @@ task runOctreeGenerator(dependsOn: jar, type: JavaExec, description: "Runs the o
 }
 
 task runGalaxyGenerator(dependsOn: jar, type: JavaExec, description: "Runs the galaxy generator to procedurally generate a galaxy") {
-    main = 'gaia.cu9.ari.gaiaorbit.data.galaxy.GalaxyGenerator'
+    main = 'gaiasky.data.galaxy.GalaxyGenerator'
     systemProperties['properties.file'] = '../assets/conf/global.properties'
     classpath = sourceSets.main.runtimeClasspath
     classpath += files(project.assetsDir)

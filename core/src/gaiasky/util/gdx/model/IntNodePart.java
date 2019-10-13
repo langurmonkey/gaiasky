@@ -19,12 +19,12 @@
  * limitations under the License.
  ******************************************************************************/
 
-package gaia.cu9.ari.gaiaorbit.util.gdx.model;
+package gaiasky.util.gdx.model;
 
 import com.badlogic.gdx.graphics.g3d.Material;
 import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.utils.ArrayMap;
-import gaia.cu9.ari.gaiaorbit.util.gdx.IntRenderable;
+import gaiasky.util.gdx.IntRenderable;
 
 /** A combination of {@link IntMeshPart} and {@link Material}, used to represent a {@link IntNode}'s graphical properties. A NodePart is
  * the smallest visible part of a {@link IntModel}, each NodePart implies a render call.

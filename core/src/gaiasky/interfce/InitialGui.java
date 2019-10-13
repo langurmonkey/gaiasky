@@ -3,7 +3,7 @@
  * See the file LICENSE.md in the project root for full license details.
  */
 
-package gaia.cu9.ari.gaiaorbit.interfce;
+package gaiasky.interfce;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.assets.AssetManager;
@@ -12,14 +12,14 @@ import com.badlogic.gdx.graphics.Cursor.SystemCursor;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
-import gaia.cu9.ari.gaiaorbit.desktop.util.SysUtils;
-import gaia.cu9.ari.gaiaorbit.event.EventManager;
-import gaia.cu9.ari.gaiaorbit.event.Events;
-import gaia.cu9.ari.gaiaorbit.util.*;
-import gaia.cu9.ari.gaiaorbit.util.Logger.Log;
-import gaia.cu9.ari.gaiaorbit.util.datadesc.DataDescriptor;
-import gaia.cu9.ari.gaiaorbit.util.datadesc.DataDescriptorUtils;
-import gaia.cu9.ari.gaiaorbit.vr.openvr.VRStatus;
+import gaiasky.desktop.util.SysUtils;
+import gaiasky.event.EventManager;
+import gaiasky.event.Events;
+import gaiasky.util.*;
+import gaiasky.util.Logger.Log;
+import gaiasky.util.datadesc.DataDescriptor;
+import gaiasky.util.datadesc.DataDescriptorUtils;
+import gaiasky.vr.openvr.VRStatus;
 
 import java.nio.file.Files;
 import java.nio.file.Path;

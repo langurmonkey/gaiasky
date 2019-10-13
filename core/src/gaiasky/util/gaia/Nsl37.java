@@ -21,12 +21,12 @@
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  *
  */
-package gaia.cu9.ari.gaiaorbit.util.gaia;
+package gaiasky.util.gaia;
 
-import gaia.cu9.ari.gaiaorbit.util.Nature;
-import gaia.cu9.ari.gaiaorbit.util.coord.AstroUtils;
-import gaia.cu9.ari.gaiaorbit.util.coord.NslSun;
-import gaia.cu9.ari.gaiaorbit.util.math.Quaterniond;
+import gaiasky.util.Nature;
+import gaiasky.util.coord.AstroUtils;
+import gaiasky.util.coord.NslSun;
+import gaiasky.util.math.Quaterniond;
 
 /**
  * Improved analytical representation of the Gaia Nominal Scanning Law (NSL).

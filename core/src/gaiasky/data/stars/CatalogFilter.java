@@ -3,9 +3,9 @@
  * See the file LICENSE.md in the project root for full license details.
  */
 
-package gaia.cu9.ari.gaiaorbit.data.stars;
+package gaiasky.data.stars;
 
-import gaia.cu9.ari.gaiaorbit.scenegraph.CelestialBody;
+import gaiasky.scenegraph.CelestialBody;
 
 /**
  * Interface for catalog filters for celestial bodies

@@ -3,7 +3,7 @@
  * See the file LICENSE.md in the project root for full license details.
  */
 
-package gaia.cu9.ari.gaiaorbit.util.gdx.loader.is;
+package gaiasky.util.gdx.loader.is;
 
 import com.badlogic.gdx.files.FileHandle;
 

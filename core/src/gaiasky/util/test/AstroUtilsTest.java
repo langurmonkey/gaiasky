@@ -3,11 +3,11 @@
  * See the file LICENSE.md in the project root for full license details.
  */
 
-package gaia.cu9.ari.gaiaorbit.util.test;
+package gaiasky.util.test;
 
-import gaia.cu9.ari.gaiaorbit.util.coord.AstroUtils;
-import gaia.cu9.ari.gaiaorbit.util.math.MathManager;
-import gaia.cu9.ari.gaiaorbit.util.math.Vector3d;
+import gaiasky.util.coord.AstroUtils;
+import gaiasky.util.math.MathManager;
+import gaiasky.util.math.Vector3d;
 
 /**
  * Implements the same test as in Jean Meeus' Astronomical Algorithms page 343.

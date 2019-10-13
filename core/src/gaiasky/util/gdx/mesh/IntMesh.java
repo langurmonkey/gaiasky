@@ -19,7 +19,7 @@
  * limitations under the License.
  ******************************************************************************/
 
-package gaia.cu9.ari.gaiaorbit.util.gdx.mesh;
+package gaiasky.util.gdx.mesh;
 
 import com.badlogic.gdx.Application;
 import com.badlogic.gdx.Gdx;
@@ -35,7 +35,7 @@ import com.badlogic.gdx.math.collision.BoundingBox;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Disposable;
 import com.badlogic.gdx.utils.GdxRuntimeException;
-import gaia.cu9.ari.gaiaorbit.util.gdx.shader.ExtShaderProgram;
+import gaiasky.util.gdx.shader.ExtShaderProgram;
 
 import java.nio.FloatBuffer;
 import java.nio.IntBuffer;

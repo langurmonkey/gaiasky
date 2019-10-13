@@ -18,15 +18,15 @@
  * limitations under the License.
  ******************************************************************************/
 
-package gaia.cu9.ari.gaiaorbit.util.gdx.contrib.postprocess.filters;
+package gaiasky.util.gdx.contrib.postprocess.filters;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.TextureData;
 import com.badlogic.gdx.graphics.glutils.FrameBuffer;
 import com.badlogic.gdx.graphics.glutils.ShaderProgram;
-import gaia.cu9.ari.gaiaorbit.util.gdx.contrib.postprocess.effects.CubemapProjections;
-import gaia.cu9.ari.gaiaorbit.util.gdx.contrib.utils.ShaderLoader;
+import gaiasky.util.gdx.contrib.postprocess.effects.CubemapProjections;
+import gaiasky.util.gdx.contrib.utils.ShaderLoader;
 
 /**
  * Fast approximate anti-aliasing filter.

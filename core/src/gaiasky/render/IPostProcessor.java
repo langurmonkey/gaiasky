@@ -3,13 +3,13 @@
  * See the file LICENSE.md in the project root for full license details.
  */
 
-package gaia.cu9.ari.gaiaorbit.render;
+package gaiasky.render;
 
 import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.graphics.glutils.FrameBuffer;
 import com.badlogic.gdx.utils.Disposable;
-import gaia.cu9.ari.gaiaorbit.util.gdx.contrib.postprocess.PostProcessor;
-import gaia.cu9.ari.gaiaorbit.util.gdx.contrib.postprocess.effects.*;
+import gaiasky.util.gdx.contrib.postprocess.PostProcessor;
+import gaiasky.util.gdx.contrib.postprocess.effects.*;
 
 public interface IPostProcessor extends Disposable {
     class PostProcessBean {

@@ -3,7 +3,7 @@
  * See the file LICENSE.md in the project root for full license details.
  */
 
-package gaia.cu9.ari.gaiaorbit.util;// BinarySearchTree class
+package gaiasky.util;// BinarySearchTree class
 //
 // CONSTRUCTION: with no initializer
 //

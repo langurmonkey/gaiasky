@@ -23,7 +23,7 @@
 *
 *------------------------------------------------------------------------*/
 
-package gaia.cu9.ari.gaiaorbit.util.gaia.time;
+package gaiasky.util.gaia.time;
 
 
 /**

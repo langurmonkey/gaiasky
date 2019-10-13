@@ -3,10 +3,10 @@
  * See the file LICENSE.md in the project root for full license details.
  */
 
-package gaia.cu9.ari.gaiaorbit.util.color;
+package gaiasky.util.color;
 
 import com.badlogic.gdx.graphics.Color;
-import gaia.cu9.ari.gaiaorbit.util.math.MathUtilsd;
+import gaiasky.util.math.MathUtilsd;
 
 public class ColourUtils {
 
