@@ -18,8 +18,8 @@ class SSO(object):
         self.name = name
         self.color = color
         self.parent = "Sol"
-        self.impl = "gaia.cu9.ari.gaiaorbit.scenegraph.Orbit"
-        self.provider = "gaia.cu9.ari.gaiaorbit.data.orbit.OrbitalParametersProvider"
+        self.impl = "gaiasky.scenegraph.Orbit"
+        self.provider = "gaiasky.data.orbit.OrbitalParametersProvider"
         self.ct = [ "Asteroids", "Orbits" ]
         self.transformFunction = "eclipticToEquatorial"
         self.orbit = {}

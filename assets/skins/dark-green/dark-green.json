@@ -281,7 +281,7 @@
       "downFontColor": "green"
     }
   },
-  "gaia.cu9.ari.gaiaorbit.util.scene2d.OwnTextIconButton$TextIconButtonStyle": {
+  "gaiasky.util.scene2d.OwnTextIconButton$TextIconButtonStyle": {
     "seam": {
       "imageUp": "seam"
     },
@@ -951,7 +951,7 @@
       "background": "default-round"
     }
   },
-  "gaia.cu9.ari.gaiaorbit.util.scene2d.ContextMenu$ContextMenuStyle": {
+  "gaiasky.util.scene2d.ContextMenu$ContextMenuStyle": {
     "noborder": {
       "background": "button"
     },
@@ -960,7 +960,7 @@
       "border": "border"
     }
   },
-  "gaia.cu9.ari.gaiaorbit.util.scene2d.Separator$SeparatorStyle": {
+  "gaiasky.util.scene2d.Separator$SeparatorStyle": {
     "default": {
       "background": "separator-context",
       "thickness": 3
@@ -970,7 +970,7 @@
       "thickness": 2
     }
   },
-  "gaia.cu9.ari.gaiaorbit.util.scene2d.MenuItem$MenuItemStyle": {
+  "gaiasky.util.scene2d.MenuItem$MenuItemStyle": {
     "default": {
       "subMenu": "sub-menu",
       "down": "button-down",

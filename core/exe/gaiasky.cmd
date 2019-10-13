@@ -36,5 +36,5 @@ IF EXIST ".\jre\bin\java.exe" (
 )
 @ECHO ON
 :: Run
-%JAVA_CMD% %OPTS% -cp .\lib\* gaia.cu9.ari.gaiaorbit.desktop.GaiaSkyDesktop
+%JAVA_CMD% %OPTS% -cp .\lib\* gaiasky.desktop.GaiaSkyDesktop
 ::END

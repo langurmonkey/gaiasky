@@ -6,7 +6,7 @@ class Country(object):
     def __init__(self, name, population, gdp, censusYear, perimeter):
         self.name = name
         self.parent = "Earth"
-        self.impl = "gaia.cu9.ari.gaiaorbit.scenegraph.Area"
+        self.impl = "gaiasky.scenegraph.Area"
         self.ct = [ "Countries" ]
         self.population = population
         self.gdp = gdp

@@ -73,7 +73,7 @@ Example:
 
     {
         "parent" : "Gaia", 
-        "impl" : "gaia.cu9.ari.gaiaorbit.scenegraph.Loc",
+        "impl" : "gaiasky.scenegraph.Loc",
         "ct"   : Others,
         "name" : "FoV2",                
         "location" : [141.0, 62.0],
@@ -97,7 +97,7 @@ for i, loc in enumerate(loclist):
 
     output_file.write(tab + "{" + nl)
     output_file.write(tab2 + "\"parent\" : \"%s\"," % loc.parent + nl)
-    output_file.write(tab2 + "\"impl\" : \"gaia.cu9.ari.gaiaorbit.scenegraph.Loc\"," + nl)
+    output_file.write(tab2 + "\"impl\" : \"gaiasky.scenegraph.Loc\"," + nl)
     output_file.write(tab2 + "\"ct\" : Others," + nl)
     output_file.write(tab2 + "\"name\" : \"%s\"," % loc.name.title() + nl)
     output_file.write(tab2 + "\"location\" : [%.2f, %.2f]," % (loc.lon, loc.lat) + nl)
