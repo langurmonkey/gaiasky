@@ -503,7 +503,9 @@ public class StarGroup extends ParticleGroup implements ILineRenderable, IStarFo
             // Pos
             Vector3d x = aux3d1.get().set(d.x(), d.y(), d.z()).add(dx);
 
-            additional[i] = -(((d.size() * Constants.STAR_SIZE_FACTOR) / cpos.dst(x.x, x.y, x.z)) / camera.getFovFactor()) * GlobalConf.scene.STAR_BRIGHTNESS;
+            boolean filter = filter(i);
+
+            additional[i] = filter ? (-(((d.size() * Constants.STAR_SIZE_FACTOR) / cpos.dst(x.x, x.y, x.z)) / camera.getFovFactor()) * GlobalConf.scene.STAR_BRIGHTNESS) : Double.MAX_VALUE;
         }
     }
 

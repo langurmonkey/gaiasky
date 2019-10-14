@@ -9,10 +9,7 @@ import gaiasky.event.EventManager;
 import gaiasky.event.Events;
 import gaiasky.event.IObserver;
 
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 public class CatalogManager implements IObserver {
     private static final Logger.Log logger = Logger.getLogger(CatalogManager.class);
@@ -30,15 +27,17 @@ public class CatalogManager implements IObserver {
     }
 
     private Map<String, CatalogInfo> ciMap;
+    private List<CatalogInfo> cis;
 
     CatalogManager() {
         super();
         ciMap = new HashMap<>();
+        cis = new ArrayList(5);
         EventManager.instance.subscribe(this, Events.CATALOG_ADD, Events.CATALOG_REMOVE, Events.CATALOG_VISIBLE, Events.CATALOG_HIGHLIGHT);
     }
 
     public Collection<CatalogInfo> getCatalogInfos() {
-        return ciMap.values();
+        return cis;
     }
 
     public boolean contains(String dsName) {
@@ -62,8 +61,9 @@ public class CatalogManager implements IObserver {
                 // Insert object into scene graph
                 EventManager.instance.post(Events.SCENE_GRAPH_ADD_OBJECT_CMD, ci.object, true);
             }
-            // Add to map
+            // Add to map and list
             ciMap.put(ci.name, ci);
+            cis.add(ci);
             break;
         case CATALOG_REMOVE:
             String dsName = (String) data[0];
@@ -72,6 +72,7 @@ public class CatalogManager implements IObserver {
                 EventManager.instance.post(Events.FOCUS_NOT_AVAILABLE, ci.object);
                 ci.removeCatalog();
                 ciMap.remove(dsName);
+                cis.remove(ci);
             }
             break;
         case CATALOG_VISIBLE:

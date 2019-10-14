@@ -97,35 +97,45 @@ public class ParticleGroupRenderSystem extends ImmediateRenderSystem implements 
                     double dmax = particleGroup.getMaxDistance();
 
                     ensureTempVertsSize(particleGroup.size() * curr.vertexSize);
-                    for (ParticleBean pb : particleGroup.data()) {
-                        double[] p = pb.data;
-                        // COLOR
-                        if (cmin != null && cmax != null) {
-                            double dist = Math.sqrt(p[0] * p[0] + p[1] * p[1] + p[2] * p[2]);
-                            // fac = 0 -> cmin,  fac = 1 -> cmax
-                            double fac = (dist - dmin) / (dmax - dmin);
-                            interpolateColor(cmin, cmax, c, fac);
+                    int n = particleGroup.data().size;
+                    int nadded = 0;
+                    for (int i = 0; i < n; i++) {
+                        if(particleGroup.filter(i)) {
+                            ParticleBean pb = particleGroup.get(i);
+                            double[] p = pb.data;
+                            // COLOR
+                            if(particleGroup.isHighlighted()){
+                                tempVerts[curr.vertexIdx + curr.colorOffset] = Color.toFloatBits(c[0], c[1], c[2], c[3]);
+                            }else {
+                                if (cmin != null && cmax != null) {
+                                    double dist = Math.sqrt(p[0] * p[0] + p[1] * p[1] + p[2] * p[2]);
+                                    // fac = 0 -> cmin,  fac = 1 -> cmax
+                                    double fac = (dist - dmin) / (dmax - dmin);
+                                    interpolateColor(cmin, cmax, c, fac);
+                                }
+                                float r = 0, g = 0, b = 0;
+                                if (particleGroup.colorNoise != 0) {
+                                    r = (float) ((StdRandom.uniform() - 0.5) * 2.0 * particleGroup.colorNoise);
+                                    g = (float) ((StdRandom.uniform() - 0.5) * 2.0 * particleGroup.colorNoise);
+                                    b = (float) ((StdRandom.uniform() - 0.5) * 2.0 * particleGroup.colorNoise);
+                                }
+                                tempVerts[curr.vertexIdx + curr.colorOffset] = Color.toFloatBits(MathUtils.clamp(c[0] + r, 0, 1), MathUtils.clamp(c[1] + g, 0, 1), MathUtils.clamp(c[2] + b, 0, 1), MathUtils.clamp(c[3], 0, 1));
+                            }
+
+                            // SIZE
+                            tempVerts[curr.vertexIdx + additionalOffset] = (particleGroup.size + (float) (rand.nextGaussian() * particleGroup.size / 4d)) * particleGroup.highlightedSizeFactor();
+
+                            // POSITION
+                            final int idx = curr.vertexIdx;
+                            tempVerts[idx] = (float) p[0];
+                            tempVerts[idx + 1] = (float) p[1];
+                            tempVerts[idx + 2] = (float) p[2];
+
+                            curr.vertexIdx += curr.vertexSize;
+                            nadded++;
                         }
-                        float r = 0, g = 0, b = 0;
-                        if (particleGroup.colorNoise != 0) {
-                            r = (float) ((StdRandom.uniform() - 0.5) * 2.0 * particleGroup.colorNoise);
-                            g = (float) ((StdRandom.uniform() - 0.5) * 2.0 * particleGroup.colorNoise);
-                            b = (float) ((StdRandom.uniform() - 0.5) * 2.0 * particleGroup.colorNoise);
-                        }
-                        tempVerts[curr.vertexIdx + curr.colorOffset] = Color.toFloatBits(MathUtils.clamp(c[0] + r, 0, 1), MathUtils.clamp(c[1] + g, 0, 1), MathUtils.clamp(c[2] + b, 0, 1), MathUtils.clamp(c[3], 0, 1));
-
-                        // SIZE
-                        tempVerts[curr.vertexIdx + additionalOffset] = (particleGroup.size + (float) (rand.nextGaussian() * particleGroup.size / 4d)) * particleGroup.highlightedSizeFactor();
-
-                        // POSITION
-                        final int idx = curr.vertexIdx;
-                        tempVerts[idx] = (float) p[0];
-                        tempVerts[idx + 1] = (float) p[1];
-                        tempVerts[idx + 2] = (float) p[2];
-
-                        curr.vertexIdx += curr.vertexSize;
                     }
-                    particleGroup.count = particleGroup.size() * curr.vertexSize;
+                    particleGroup.count = nadded * curr.vertexSize;
                     curr.mesh.setVertices(tempVerts, 0, particleGroup.count);
 
                     particleGroup.inGpu = true;

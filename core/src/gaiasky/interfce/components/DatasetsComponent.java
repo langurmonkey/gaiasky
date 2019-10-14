@@ -126,10 +126,10 @@ public class DatasetsComponent extends GuiComponent implements IObserver {
         t.add(controls).left().padBottom(pad);
         t.add(mark).right().padBottom(pad).row();
         t.add(new OwnLabel(I18n.txt("gui.dataset.type") + ": " + ci.type.toString(), skin)).colspan(2).left().row();
-        t.add(new OwnLabel(TextUtils.capString(ci.description, GlobalConf.UI_SCALE_FACTOR < 1.5 ? 22 : 28), skin)).left();
-        Link plus = new Link("(i)",  skin.get("link", Label.LabelStyle.class), null);
-        plus.addListener(new OwnTextTooltip(ci.description, skin));
-        t.add(plus).left().padLeft(pad);
+        t.add(new OwnLabel(TextUtils.capString(ci.description, GlobalConf.UI_SCALE_FACTOR < 1.5 ? 22 : 28), skin)).left().expandX();
+        Link info = new Link("(i)",  skin.get("link", Label.LabelStyle.class), null);
+        info.addListener(new OwnTextTooltip(ci.description, skin));
+        t.add(info).left().padLeft(pad);
 
         VerticalGroup ciGroup = new VerticalGroup();
         ciGroup.space(pad * 2f);

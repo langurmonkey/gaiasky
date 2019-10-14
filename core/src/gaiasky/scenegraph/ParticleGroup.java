@@ -27,7 +27,9 @@ import gaiasky.scenegraph.camera.ICamera;
 import gaiasky.scenegraph.camera.NaturalCamera;
 import gaiasky.scenegraph.component.RotationComponent;
 import gaiasky.util.*;
+import gaiasky.util.CatalogInfo.CatalogInfoType;
 import gaiasky.util.coord.Coordinates;
+import gaiasky.util.filter.Filter;
 import gaiasky.util.gdx.g2d.ExtSpriteBatch;
 import gaiasky.util.gdx.shader.ExtShaderProgram;
 import gaiasky.util.math.*;
@@ -64,6 +66,10 @@ public class ParticleGroup extends FadeNode implements I3DTextRenderable, IFocus
 
         public Vector3d pos(Vector3d aux) {
             return aux.set(x(), y(), z());
+        }
+
+        public double distance() {
+            return Math.sqrt(x() * x() + y() * y() + z() * z());
         }
 
         public double x() {
@@ -173,7 +179,12 @@ public class ParticleGroup extends FadeNode implements I3DTextRenderable, IFocus
     /**
      * Reference to the current focus
      */
-    ParticleBean focus;
+    protected ParticleBean focus;
+
+    /**
+     * Active filter object
+     */
+    protected Filter filter;
 
     // Has been disposed
     public boolean disposed = false;
@@ -223,6 +234,12 @@ public class ParticleGroup extends FadeNode implements I3DTextRenderable, IFocus
 
             }
 
+            // Create catalog info and broadcast
+            CatalogInfo ci = new CatalogInfo(name, name, null, CatalogInfoType.INTERNAL, this);
+
+            // Insert
+            EventManager.instance.post(Events.CATALOG_ADD, ci, false);
+
         } catch (Exception e) {
             Logger.getLogger(this.getClass()).error(e);
             pointData = null;
@@ -245,6 +262,10 @@ public class ParticleGroup extends FadeNode implements I3DTextRenderable, IFocus
      */
     public Array<? extends ParticleBean> data() {
         return pointData;
+    }
+
+    public ParticleBean get(int index) {
+        return pointData.get(index);
     }
 
     /**
@@ -447,12 +468,12 @@ public class ParticleGroup extends FadeNode implements I3DTextRenderable, IFocus
     }
 
     @Override
-    public double getClosestDistToCamera(){
+    public double getClosestDistToCamera() {
         return getDistToCamera();
     }
 
     @Override
-    public Vector3d getClosestAbsolutePos(Vector3d out){
+    public Vector3d getClosestAbsolutePos(Vector3d out) {
         return getAbsolutePosition(out);
     }
 
@@ -589,43 +610,45 @@ public class ParticleGroup extends FadeNode implements I3DTextRenderable, IFocus
         if (GaiaSky.instance.isOn(ct) && this.opacity > 0) {
             Array<Pair<Integer, Double>> temporalHits = new Array<>();
             for (int i = 0; i < n; i++) {
-                ParticleBean pb = pointData.get(i);
-                Vector3 pos = aux3f1.get();
-                Vector3d posd = fetchPosition(pb, camera.getPos(), aux3d1.get(), getDeltaYears());
-                pos.set(posd.valuesf());
+                if (filter(i)) {
+                    ParticleBean pb = pointData.get(i);
+                    Vector3 pos = aux3f1.get();
+                    Vector3d posd = fetchPosition(pb, camera.getPos(), aux3d1.get(), getDeltaYears());
+                    pos.set(posd.valuesf());
 
-                if (camera.direction.dot(posd) > 0) {
-                    // The star is in front of us
-                    // Diminish the size of the star
-                    // when we are close by
-                    double dist = posd.len();
-                    double angle = getRadius(i) / dist / camera.getFovFactor();
+                    if (camera.direction.dot(posd) > 0) {
+                        // The star is in front of us
+                        // Diminish the size of the star
+                        // when we are close by
+                        double dist = posd.len();
+                        double angle = getRadius(i) / dist / camera.getFovFactor();
 
-                    PerspectiveCamera pcamera;
-                    if (GlobalConf.program.STEREOSCOPIC_MODE) {
-                        if (screenX < Gdx.graphics.getWidth() / 2f) {
-                            pcamera = camera.getCameraStereoLeft();
-                            pcamera.update();
+                        PerspectiveCamera pcamera;
+                        if (GlobalConf.program.STEREOSCOPIC_MODE) {
+                            if (screenX < Gdx.graphics.getWidth() / 2f) {
+                                pcamera = camera.getCameraStereoLeft();
+                                pcamera.update();
+                            } else {
+                                pcamera = camera.getCameraStereoRight();
+                                pcamera.update();
+                            }
                         } else {
-                            pcamera = camera.getCameraStereoRight();
-                            pcamera.update();
+                            pcamera = camera.camera;
                         }
-                    } else {
-                        pcamera = camera.camera;
-                    }
 
-                    angle = (float) Math.toDegrees(angle * camera.fovFactor) * (40f / pcamera.fieldOfView);
-                    double pixelSize = Math.max(pxdist, ((angle * pcamera.viewportHeight) / pcamera.fieldOfView) / 2);
-                    pcamera.project(pos);
-                    pos.y = pcamera.viewportHeight - pos.y;
-                    if (GlobalConf.program.STEREOSCOPIC_MODE) {
-                        pos.x /= 2;
-                    }
+                        angle = (float) Math.toDegrees(angle * camera.fovFactor) * (40f / pcamera.fieldOfView);
+                        double pixelSize = Math.max(pxdist, ((angle * pcamera.viewportHeight) / pcamera.fieldOfView) / 2);
+                        pcamera.project(pos);
+                        pos.y = pcamera.viewportHeight - pos.y;
+                        if (GlobalConf.program.STEREOSCOPIC_MODE) {
+                            pos.x /= 2;
+                        }
 
-                    // Check click distance
-                    if (pos.dst(screenX % pcamera.viewportWidth, screenY, pos.z) <= pixelSize) {
-                        //Hit
-                        temporalHits.add(new Pair<>(i, angle));
+                        // Check click distance
+                        if (pos.dst(screenX % pcamera.viewportWidth, screenY, pos.z) <= pixelSize) {
+                            //Hit
+                            temporalHits.add(new Pair<>(i, angle));
+                        }
                     }
                 }
             }
@@ -657,20 +680,22 @@ public class ParticleGroup extends FadeNode implements I3DTextRenderable, IFocus
             Vector3d beamDir = new Vector3d();
             Array<Pair<Integer, Double>> temporalHits = new Array<Pair<Integer, Double>>();
             for (int i = 0; i < n; i++) {
-                ParticleBean pb = pointData.get(i);
-                Vector3d posd = fetchPosition(pb, camera.getPos(), aux3d1.get(), getDeltaYears());
-                beamDir.set(p1).sub(p0);
-                if (camera.direction.dot(posd) > 0) {
-                    // The star is in front of us
-                    // Diminish the size of the star
-                    // when we are close by
-                    double dist = posd.len();
-                    double angle = getRadius(i) / dist / camera.getFovFactor();
-                    double distToLine = Intersectord.distanceLinePoint(p0, p1, posd);
-                    double value = distToLine / dist;
+                if(filter(i)) {
+                    ParticleBean pb = pointData.get(i);
+                    Vector3d posd = fetchPosition(pb, camera.getPos(), aux3d1.get(), getDeltaYears());
+                    beamDir.set(p1).sub(p0);
+                    if (camera.direction.dot(posd) > 0) {
+                        // The star is in front of us
+                        // Diminish the size of the star
+                        // when we are close by
+                        double dist = posd.len();
+                        double angle = getRadius(i) / dist / camera.getFovFactor();
+                        double distToLine = Intersectord.distanceLinePoint(p0, p1, posd);
+                        double value = distToLine / dist;
 
-                    if (value < 0.01) {
-                        temporalHits.add(new Pair<Integer, Double>(i, angle));
+                        if (value < 0.01) {
+                            temporalHits.add(new Pair<Integer, Double>(i, angle));
+                        }
                     }
                 }
             }
@@ -800,14 +825,13 @@ public class ParticleGroup extends FadeNode implements I3DTextRenderable, IFocus
         return meanDistance;
     }
 
-    public double getMinDistance(){
+    public double getMinDistance() {
         return minDistance;
     }
 
-    public double getMaxDistance(){
+    public double getMaxDistance() {
         return maxDistance;
     }
-
 
     /**
      * Returns the delta years to integrate the proper motion.
@@ -821,6 +845,10 @@ public class ParticleGroup extends FadeNode implements I3DTextRenderable, IFocus
     @Override
     public boolean isCoordinatesTimeOverflow() {
         return false;
+    }
+
+    public boolean canSelect(){
+        return candidateFocusIndex >= 0 && candidateFocusIndex < size() ? filter(candidateFocusIndex) : true;
     }
 
     public boolean mustAddToIndex() {
@@ -878,6 +906,19 @@ public class ParticleGroup extends FadeNode implements I3DTextRenderable, IFocus
 
     public float[] getColorMax() {
         return ccMax;
+    }
+
+    /**
+     * Evaluates the filter of this dataset (if any) for the given particle index
+     *
+     * @param index The index to filter
+     * @return The result of the filter evaluation
+     */
+    public boolean filter(int index) {
+        if (filter != null) {
+            return filter.evaluate(get(index));
+        }
+        return true;
     }
 
 }

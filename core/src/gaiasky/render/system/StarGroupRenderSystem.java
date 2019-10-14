@@ -44,7 +44,7 @@ public class StarGroupRenderSystem extends ImmediateRenderSystem implements IObs
         BRIGHTNESS_FACTOR = 10;
         this.comp = new DistToCameraComparator<>();
         this.alphaSizeFovBr = new float[4];
-        this.pointAlphaHl = new float[]{2, 4};
+        this.pointAlphaHl = new float[] { 2, 4 };
         this.aux1 = new Vector3();
 
         EventManager.instance.subscribe(this, Events.STAR_MIN_OPACITY_CMD, Events.DISPOSE_STAR_GROUP_GPU_MESH);
@@ -104,29 +104,33 @@ public class StarGroupRenderSystem extends ImmediateRenderSystem implements IObs
                             starGroup.offset = addMeshData(n);
                             curr = meshes.get(starGroup.offset);
                             ensureTempVertsSize(n * curr.vertexSize);
+                            int nadded = 0;
                             for (int i = 0; i < n; i++) {
-                                StarBean p = starGroup.data().get(i);
-                                // COLOR
-                                tempVerts[curr.vertexIdx + curr.colorOffset] = starGroup.getColor(i);
+                                if (starGroup.filter(i)) {
+                                    StarBean p = starGroup.data().get(i);
+                                    // COLOR
+                                    tempVerts[curr.vertexIdx + curr.colorOffset] = starGroup.getColor(i);
 
-                                // SIZE, APPMAG, CMAP VALUE, OTHER
-                                tempVerts[curr.vertexIdx + sizeOffset] = (float) (Math.pow(p.size(), 0.9) * Constants.STAR_SIZE_FACTOR) * starGroup.highlightedSizeFactor();
-                                tempVerts[curr.vertexIdx + sizeOffset + 1] = (float) p.appmag();
-                                tempVerts[curr.vertexIdx + sizeOffset + 2] = (float) p.appmag();
+                                    // SIZE, APPMAG, CMAP VALUE, OTHER
+                                    tempVerts[curr.vertexIdx + sizeOffset] = (float) (Math.pow(p.size(), 0.9) * Constants.STAR_SIZE_FACTOR) * starGroup.highlightedSizeFactor();
+                                    tempVerts[curr.vertexIdx + sizeOffset + 1] = (float) p.appmag();
+                                    tempVerts[curr.vertexIdx + sizeOffset + 2] = (float) p.appmag();
 
-                                // POSITION [u]
-                                tempVerts[curr.vertexIdx] = (float) p.x();
-                                tempVerts[curr.vertexIdx + 1] = (float) p.y();
-                                tempVerts[curr.vertexIdx + 2] = (float) p.z();
+                                    // POSITION [u]
+                                    tempVerts[curr.vertexIdx] = (float) p.x();
+                                    tempVerts[curr.vertexIdx + 1] = (float) p.y();
+                                    tempVerts[curr.vertexIdx + 2] = (float) p.z();
 
-                                // PROPER MOTION [u/yr]
-                                tempVerts[curr.vertexIdx + pmOffset] = (float) p.pmx();
-                                tempVerts[curr.vertexIdx + pmOffset + 1] = (float) p.pmy();
-                                tempVerts[curr.vertexIdx + pmOffset + 2] = (float) p.pmz();
+                                    // PROPER MOTION [u/yr]
+                                    tempVerts[curr.vertexIdx + pmOffset] = (float) p.pmx();
+                                    tempVerts[curr.vertexIdx + pmOffset + 1] = (float) p.pmy();
+                                    tempVerts[curr.vertexIdx + pmOffset + 2] = (float) p.pmz();
 
-                                curr.vertexIdx += curr.vertexSize;
+                                    curr.vertexIdx += curr.vertexSize;
+                                    nadded++;
+                                }
                             }
-                            starGroup.count = starGroup.size() * curr.vertexSize;
+                            starGroup.count = nadded * curr.vertexSize;
                             curr.mesh.setVertices(tempVerts, 0, starGroup.count);
 
                             starGroup.inGpu = true;

@@ -18,6 +18,7 @@ import gaiasky.event.EventManager;
 import gaiasky.event.Events;
 import gaiasky.scenegraph.IFocus;
 import gaiasky.scenegraph.ISceneGraph;
+import gaiasky.scenegraph.ParticleGroup;
 import gaiasky.scenegraph.SceneGraphNode;
 import gaiasky.scenegraph.camera.CameraManager.CameraMode;
 import gaiasky.scenegraph.camera.NaturalCamera;
@@ -109,25 +110,28 @@ public class SearchDialog extends GenericDialog {
                 if (node instanceof IFocus) {
                     IFocus focus = ((IFocus) node).getFocus(text);
                     boolean timeOverflow = focus.isCoordinatesTimeOverflow();
+                    boolean canSelect = focus instanceof ParticleGroup ? ((ParticleGroup)focus).canSelect() : true;
                     boolean ctOn = GaiaSky.instance.isOn(focus.getCt());
-                    if (!timeOverflow && ctOn) {
+                    if (!timeOverflow && canSelect && ctOn) {
                         Gdx.app.postRunnable(() -> {
                             EventManager.instance.post(Events.CAMERA_MODE_CMD, CameraMode.FOCUS_MODE, true);
                             EventManager.instance.post(Events.FOCUS_CHANGE_CMD, focus, true);
                         });
                         info(null);
-                        return true;
-                    } else if (timeOverflow){
+                    } else if (timeOverflow) {
                         info(I18n.txt("gui.objects.search.timerange", text));
+                    } else if(!canSelect) {
+                        info(I18n.txt("gui.objects.search.filter", text));
                     } else {
                         info(I18n.txt("gui.objects.search.invisible", text, focus.getCt().toString()));
                     }
+                    return true;
                 }
             } else {
                 info(null);
             }
         }catch(Exception e){
-            logger.error(e.getLocalizedMessage());
+            logger.error(e);
         }
         return false;
     }
