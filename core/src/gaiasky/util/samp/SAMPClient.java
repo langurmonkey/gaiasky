@@ -213,7 +213,7 @@ public class SAMPClient implements IObserver {
                 StarGroup sg = StarGroup.getDefaultStarGroup(id, data);
 
                 // Catalog info
-                CatalogInfo ci = new CatalogInfo(name, url, null, CatalogInfoType.SAMP, sg);
+                CatalogInfo ci = new CatalogInfo(name, url, null, CatalogInfoType.SAMP, 1.5f, sg);
 
                 mapIdSg.put(id, sg);
                 mapIdUrl.put(id, url);

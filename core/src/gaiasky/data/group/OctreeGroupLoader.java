@@ -76,7 +76,7 @@ public class OctreeGroupLoader extends StreamingOctreeLoader {
             // Catalog info
             String name = this.name != null ? this.name : "LOD data";
             String description = this.description != null ? this.description : "Octree-based LOD dataset";
-            CatalogInfo ci = new CatalogInfo(name, description, null, CatalogInfoType.LOD, octreeWrapper);
+            CatalogInfo ci = new CatalogInfo(name, description, null, CatalogInfoType.LOD, 1.5f, octreeWrapper);
             EventManager.instance.post(Events.CATALOG_ADD, ci, false);
 
             /**
@@ -106,6 +106,7 @@ public class OctreeGroupLoader extends StreamingOctreeLoader {
         @SuppressWarnings("unchecked")
         Array<StarBean> data = (Array<StarBean>) particleReader.loadDataMapped(octantFile.path(), 1.0);
         StarGroup sg = StarGroup.getDefaultStarGroup("stargroup-%%SGID%%", data, fullInit);
+        sg.setCatalogInfoBare(octreeWrapper.getCatalogInfo());
 
         synchronized (octant) {
             sg.octant = octant;

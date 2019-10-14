@@ -24,14 +24,16 @@ public class CatalogInfo {
     public String description;
     public String source;
     public Instant loadDateUTC;
-    public float[] color;
+    public float[] hlColor;
+    public float hlSizeFactor;
+    public boolean hlAllVisible;
 
     public CatalogInfoType type;
 
     public FadeNode object;
     public boolean highlighted;
 
-    public CatalogInfo(String name, String description, String source, CatalogInfoType type, FadeNode object) {
+    public CatalogInfo(String name, String description, String source, CatalogInfoType type, float hlSizeFactor, FadeNode object) {
         super();
         this.name = name;
         this.description = description;
@@ -39,8 +41,10 @@ public class CatalogInfo {
         this.type = type;
         this.object = object;
         this.loadDateUTC = Instant.now();
-        this.color = new float[4];
-        System.arraycopy(ColourUtils.getColorFromIndex(colorIndexSequence++), 0, this.color, 0, 4);
+        this.hlColor = new float[4];
+        this.hlSizeFactor = hlSizeFactor;
+        this.hlAllVisible = true;
+        System.arraycopy(ColourUtils.getColorFromIndex(colorIndexSequence++), 0, this.hlColor, 0, 4);
 
         this.object.setCatalogInfo(this);
     }
@@ -59,19 +63,29 @@ public class CatalogInfo {
     }
 
     public void setColor(float r, float g, float b, float a){
-        this.color[0] = r;
-        this.color[1] = g;
-        this.color[2] = b;
-        this.color[3] = a;
+        this.hlColor[0] = r;
+        this.hlColor[1] = g;
+        this.hlColor[2] = b;
+        this.hlColor[3] = a;
         highlight(highlighted);
     }
 
-    public void setColor(float[] color){
-        setColor(color[0], color[1], color[2], color[3]);
+    public void setHlColor(float[] hlColor){
+        setColor(hlColor[0], hlColor[1], hlColor[2], hlColor[3]);
     }
 
-    public float[] getColor(){
-        return color;
+    public float[] getHlColor(){
+        return hlColor;
+    }
+
+    public void setHlSizeFactor(float hlSizeFactor){
+        this.hlSizeFactor = hlSizeFactor;
+        highlight(highlighted);
+    }
+
+    public void setHlAllVisible(boolean allVisible){
+        this.hlAllVisible = allVisible;
+        highlight(highlighted);
     }
 
     /**
@@ -90,7 +104,7 @@ public class CatalogInfo {
      */
     public void highlight(boolean hl){
         this.highlighted = hl;
-        object.highlight(hl, color);
+        object.highlight(hl, hlColor);
     }
 
     /**

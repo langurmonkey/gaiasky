@@ -218,6 +218,10 @@ public class FadeNode extends AbstractPositionEntity {
         return (long) (GaiaSky.instance.getT() * 1000f) - this.lastStateChangeTimeMs;
     }
 
+    public void setCatalogInfoBare(CatalogInfo info) {
+        this.catalogInfo = info;
+    }
+
     public void setCatalogInfo(CatalogInfo info) {
         this.catalogInfo = info;
         this.catalogInfo.object = this;
@@ -228,7 +232,7 @@ public class FadeNode extends AbstractPositionEntity {
     }
 
     public void setCataloginfo(Map<String, String> map) {
-        this.catalogInfo = new CatalogInfo(map.get("name"), map.get("description"), map.get("source"), CatalogInfoType.valueOf(map.get("type")), this);
+        this.catalogInfo = new CatalogInfo(map.get("name"), map.get("description"), map.get("source"), CatalogInfoType.valueOf(map.get("type")), Float.parseFloat(map.get("size")), this);
         EventManager.instance.post(Events.CATALOG_ADD, this.catalogInfo, false);
     }
 

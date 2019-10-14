@@ -235,7 +235,7 @@ public class ParticleGroup extends FadeNode implements I3DTextRenderable, IFocus
             }
 
             // Create catalog info and broadcast
-            CatalogInfo ci = new CatalogInfo(name, name, null, CatalogInfoType.INTERNAL, this);
+            CatalogInfo ci = new CatalogInfo(name, name, null, CatalogInfoType.INTERNAL, 1f, this);
 
             // Insert
             EventManager.instance.post(Events.CATALOG_ADD, ci, false);
@@ -602,7 +602,7 @@ public class ParticleGroup extends FadeNode implements I3DTextRenderable, IFocus
     }
 
     public float highlightedSizeFactor() {
-        return highlighted ? 2f : 1f;
+        return (highlighted && catalogInfo != null) ? catalogInfo.hlSizeFactor : 1f;
     }
 
     public void addHit(int screenX, int screenY, int w, int h, int pxdist, NaturalCamera camera, Array<IFocus> hits) {

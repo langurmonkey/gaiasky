@@ -13,6 +13,7 @@ import gaiasky.event.EventManager;
 import gaiasky.event.Events;
 import gaiasky.event.IObserver;
 import gaiasky.interfce.ColorPicker;
+import gaiasky.interfce.DatasetPreferencesWindow;
 import gaiasky.util.*;
 import gaiasky.util.scene2d.*;
 
@@ -81,7 +82,7 @@ public class DatasetsComponent extends GuiComponent implements IObserver {
         mark.addListener(new OwnTextTooltip(I18n.txt("gui.tooltip.dataset.highlight"), skin));
         mark.addListener((event) -> {
             if(event instanceof ChangeEvent){
-                EventManager.instance.post(Events.CATALOG_HIGHLIGHT, ci.name, mark.isChecked(), ci.color, true);
+                EventManager.instance.post(Events.CATALOG_HIGHLIGHT, ci.name, mark.isChecked(), ci.hlColor, true);
                 return true;
             }
             return false;
@@ -91,6 +92,8 @@ public class DatasetsComponent extends GuiComponent implements IObserver {
         prefs.addListener(new OwnTextTooltip(I18n.txt("gui.tooltip.dataset.preferences"), skin));
         prefs.addListener((event) -> {
             if(event instanceof ChangeEvent){
+                DatasetPreferencesWindow dpw = new DatasetPreferencesWindow(ci, skin, stage);
+                dpw.show(stage);
                 return true;
             }
             return false;
@@ -116,10 +119,10 @@ public class DatasetsComponent extends GuiComponent implements IObserver {
         // Dataset table
         Table t = new Table();
         // Color picker
-        ColorPicker cp = new ColorPicker(ci.name, ci.color, stage, skin);
+        ColorPicker cp = new ColorPicker(ci.name, ci.hlColor, stage, skin);
         cp.addListener(new TextTooltip(I18n.txt("gui.tooltip.dataset.highlight.color.select"), skin));
         cp.setNewColorRunnable(()->{
-            ci.setColor(cp.getPickedColor());
+            ci.setHlColor(cp.getPickedColor());
         });
         t.add(new OwnLabel(ci.name, skin, "hud-subheader")).left().padBottom(pad);
         t.add(cp).size(18f * GlobalConf.UI_SCALE_FACTOR).right().padBottom(pad).row();

@@ -2091,7 +2091,7 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
                         starGroup.set(StarGroup.getDefaultStarGroup(dsName, data));
 
                         // Catalog info
-                        CatalogInfo ci = new CatalogInfo(dsName, absolutePath, null, type, starGroup.get());
+                        CatalogInfo ci = new CatalogInfo(dsName, absolutePath, null, type, 1.5f, starGroup.get());
                         EventManager.instance.post(Events.CATALOG_ADD, ci, true);
 
                         logger.info(data.size + " objects loaded");
