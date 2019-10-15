@@ -12,4 +12,7 @@ public class AttributeMualpha implements IAttribute<StarBean> {
     public double get(StarBean bean) {
         return bean.mualpha();
     }
+    public String getUnit(){
+        return "mas/yr";
+    }
 }

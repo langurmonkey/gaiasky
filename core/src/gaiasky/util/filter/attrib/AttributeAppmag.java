@@ -12,4 +12,8 @@ public class AttributeAppmag implements IAttribute<StarBean> {
     public double get(StarBean bean) {
         return bean.appmag();
     }
+
+    public String getUnit(){
+        return "mag";
+    }
 }

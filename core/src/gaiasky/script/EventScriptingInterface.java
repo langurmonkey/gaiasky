@@ -605,7 +605,24 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
 
     @Override
     public void setCrosshairVisibility(boolean visible) {
-        Gdx.app.postRunnable(() -> em.post(Events.CROSSHAIR_CMD, visible));
+        setFocusCrosshairVisibility(visible);
+        setClosestCrosshairVisibility(visible);
+        setHomeCrosshairVisibility(visible);
+    }
+
+    @Override
+    public void setFocusCrosshairVisibility(boolean visible) {
+        Gdx.app.postRunnable(() -> em.post(Events.CROSSHAIR_FOCUS_CMD, visible));
+    }
+
+    @Override
+    public void setClosestCrosshairVisibility(boolean visible) {
+        Gdx.app.postRunnable(() -> em.post(Events.CROSSHAIR_CLOSEST_CMD, visible));
+    }
+
+    @Override
+    public void setHomeCrosshairVisibility(boolean visible) {
+        Gdx.app.postRunnable(() -> em.post(Events.CROSSHAIR_HOME_CMD, visible));
     }
 
     @Override

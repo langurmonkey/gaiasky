@@ -12,4 +12,7 @@ public class AttributeRA implements IAttribute<ParticleBean> {
     public double get(ParticleBean bean) {
         return bean.ra();
     }
+    public String getUnit(){
+        return "deg";
+    }
 }

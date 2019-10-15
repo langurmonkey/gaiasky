@@ -12,4 +12,7 @@ public class AttributeRadvel implements IAttribute<StarBean> {
     public double get(StarBean bean) {
         return bean.radvel();
     }
+    public String getUnit(){
+        return "km/s";
+    }
 }

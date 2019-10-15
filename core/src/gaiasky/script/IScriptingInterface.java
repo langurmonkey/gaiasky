@@ -601,11 +601,32 @@ public interface IScriptingInterface {
     long getProperMotionsMaxNumber();
 
     /**
-     * Sets the visibility of the crosshair in focus and free modes.
+     * Sets the visibility of all crosshairs.
      *
-     * @param visible The visibility state.
+     * @param visible The visibility state, which applies to all crosshairs
      */
     void setCrosshairVisibility(boolean visible);
+
+    /**
+     * Sets the visibility of the focus object crosshair.
+     *
+     * @param visible The visibility state
+     */
+    void setFocusCrosshairVisibility(boolean visible);
+
+    /**
+     * Sets the visibility of the closest object crosshair.
+     *
+     * @param visible The visibility state
+     */
+    void setClosestCrosshairVisibility(boolean visible);
+
+    /**
+     * Sets the visibility of the home object crosshair.
+     *
+     * @param visible The visibility state
+     */
+    void setHomeCrosshairVisibility(boolean visible);
 
     /**
      * Sets the ambient light to a certain value.

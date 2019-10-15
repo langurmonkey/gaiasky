@@ -12,4 +12,8 @@ public class AttributeAbsmag implements IAttribute<StarBean> {
     public double get(StarBean pb) {
         return pb.absmag();
     }
+
+    public String getUnit(){
+        return "mag";
+    }
 }

@@ -1806,9 +1806,9 @@ public class PreferencesWindow extends GenericDialog {
         GlobalConf.updateScaleFactor(GlobalConf.program.UI_THEME.endsWith("x2") ? 1.8f : 1f);
 
         // Crosshairs
-        GlobalConf.scene.CROSSHAIR_FOCUS = crosshairFocus.isChecked();
-        GlobalConf.scene.CROSSHAIR_CLOSEST = crosshairClosest.isChecked();
-        GlobalConf.scene.CROSSHAIR_HOME = crosshairHome.isChecked();
+        EventManager.instance.post(Events.CROSSHAIR_FOCUS_CMD, crosshairFocus.isChecked());
+        EventManager.instance.post(Events.CROSSHAIR_CLOSEST_CMD, crosshairClosest.isChecked());
+        EventManager.instance.post(Events.CROSSHAIR_HOME_CMD, crosshairHome.isChecked());
 
         // Performance
         bean = numThreads.getSelected();

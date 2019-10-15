@@ -6,10 +6,14 @@
 package gaiasky.util.filter.attrib;
 
 import gaiasky.scenegraph.ParticleGroup.ParticleBean;
+import gaiasky.util.Constants;
 
 public class AttributeDistance implements IAttribute<ParticleBean> {
     @Override
     public double get(ParticleBean bean) {
-        return Math.sqrt(bean.x() * bean.x() + bean.y() * bean.y() + bean.z() * bean.z());
+        return Math.sqrt(bean.x() * bean.x() + bean.y() * bean.y() + bean.z() * bean.z()) * Constants.U_TO_PC;
+    }
+    public String getUnit(){
+        return "pc";
     }
 }

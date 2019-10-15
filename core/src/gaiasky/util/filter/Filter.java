@@ -5,13 +5,14 @@
 
 package gaiasky.util.filter;
 
+import com.badlogic.gdx.utils.Array;
 import gaiasky.scenegraph.ParticleGroup.ParticleBean;
 
 /**
  * A filter on a dataset as a set of rules
  */
 public class Filter {
-    private FilterRule[] rules;
+    private Array<FilterRule> rules;
     private IOperation operation;
 
     /**
@@ -20,7 +21,8 @@ public class Filter {
      * @param rule
      */
     public Filter(FilterRule rule) {
-        this.rules = new FilterRule[] { rule };
+        this.rules = new Array<>();
+        this.rules.add(rule);
         this.operation = new OperationAnd();
     }
 
@@ -31,15 +33,35 @@ public class Filter {
      * @param operation The operation: 'and', 'or'
      */
     public Filter(String operation, FilterRule... rules) {
+        this.rules = new Array<>(rules);
+        this.operation = getOperationFromString(operation);
+    }
+
+    public Filter(String operation, Array<FilterRule> rules){
         this.rules = rules;
         this.operation = getOperationFromString(operation);
     }
 
-    public boolean evaluate(ParticleBean pb) {
-        return operation.evaluate(rules, pb);
+    public Filter deepCopy() {
+        Array<FilterRule> rulesCopy = new Array<>(rules.size);
+        for (int i = 0; i < rules.size; i++) {
+            rulesCopy.add(rules.get(i).copy());
+        }
+        Filter copy = new Filter(operation.getOperationString(), rulesCopy);
+        return copy;
     }
 
-    public FilterRule[] getRules() {
+    public boolean evaluate(ParticleBean pb) {
+        synchronized (this) {
+            return operation.evaluate(rules, pb);
+        }
+    }
+
+    public boolean hasRules(){
+        return rules != null && rules.size > 0;
+    }
+
+    public Array<FilterRule> getRules() {
         return rules;
     }
 
@@ -49,6 +71,10 @@ public class Filter {
 
     public String getOperationString() {
         return operation != null ? operation.getOperationString() : null;
+    }
+
+    public void setOperation(String op) {
+        this.operation = getOperationFromString(op);
     }
 
     public IOperation getOperationFromString(String op) {
@@ -61,8 +87,16 @@ public class Filter {
         }
     }
 
+    public void addRule(FilterRule rule) {
+        rules.add(rule);
+    }
+
+    public boolean removeRule(FilterRule rule) {
+        return rules.removeValue(rule, true);
+    }
+
     private interface IOperation {
-        boolean evaluate(FilterRule[] rules, ParticleBean pb);
+        boolean evaluate(Array<FilterRule> rules, ParticleBean pb);
 
         String getOperationString();
     }
@@ -75,7 +109,7 @@ public class Filter {
         }
 
         @Override
-        public boolean evaluate(FilterRule[] rules, ParticleBean bean) {
+        public boolean evaluate(Array<FilterRule> rules, ParticleBean bean) {
             boolean result = true;
             for (FilterRule rule : rules) {
                 result = result && rule.evaluate(bean);
@@ -97,7 +131,7 @@ public class Filter {
         }
 
         @Override
-        public boolean evaluate(FilterRule[] rules, ParticleBean bean) {
+        public boolean evaluate(Array<FilterRule> rules, ParticleBean bean) {
             boolean result = false;
             for (FilterRule rule : rules) {
                 result = result || rule.evaluate(bean);

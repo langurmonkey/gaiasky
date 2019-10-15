@@ -35,7 +35,6 @@ import gaiasky.util.math.*;
 import gaiasky.util.time.ITimeFrameProvider;
 
 import java.io.Serializable;
-import java.util.Arrays;
 
 /**
  * This class represents a vgroup of non-focusable particles, all with the same
@@ -897,7 +896,7 @@ public class ParticleGroup extends FadeNode implements I3DTextRenderable, IFocus
 
     @Override
     public void highlight(boolean hl, float[] color) {
-        this.inGpu = this.highlighted == hl && Arrays.equals(this.hlc, color);
+        this.inGpu = false;
         super.highlight(hl, color);
     }
 

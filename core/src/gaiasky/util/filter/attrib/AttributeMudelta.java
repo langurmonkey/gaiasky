@@ -12,4 +12,7 @@ public class AttributeMudelta implements IAttribute<StarBean> {
     public double get(StarBean bean) {
         return bean.mudelta();
     }
+    public String getUnit(){
+        return "mas/yr";
+    }
 }

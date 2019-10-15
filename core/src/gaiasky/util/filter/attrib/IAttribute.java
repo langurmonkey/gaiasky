@@ -21,4 +21,10 @@ public interface IAttribute<T extends ParticleBean> {
      */
     double get(T bean);
 
+    /**
+     * Gets the unit in string
+     * @return The unit of this attribute
+     */
+    String getUnit();
+
 }

@@ -12,4 +12,7 @@ public class AttributeDEC implements IAttribute<ParticleBean> {
     public double get(ParticleBean bean) {
         return bean.dec();
     }
+    public String getUnit(){
+        return "deg";
+    }
 }
