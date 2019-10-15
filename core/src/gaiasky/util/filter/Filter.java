@@ -16,6 +16,7 @@ public class Filter {
 
     /**
      * Creates a filter with only one rule
+     *
      * @param rule
      */
     public Filter(FilterRule rule) {
@@ -31,27 +32,48 @@ public class Filter {
      */
     public Filter(String operation, FilterRule... rules) {
         this.rules = rules;
-        switch (operation.toLowerCase()) {
-        case "or":
-            this.operation = new OperationOr();
-            break;
-        case "and":
-        default:
-            this.operation = new OperationAnd();
-            break;
-        }
-
+        this.operation = getOperationFromString(operation);
     }
 
     public boolean evaluate(ParticleBean pb) {
         return operation.evaluate(rules, pb);
     }
 
+    public FilterRule[] getRules() {
+        return rules;
+    }
+
+    public IOperation getOperation() {
+        return operation;
+    }
+
+    public String getOperationString() {
+        return operation != null ? operation.getOperationString() : null;
+    }
+
+    public IOperation getOperationFromString(String op) {
+        switch (op.toLowerCase()) {
+        case "or":
+            return new OperationOr();
+        case "and":
+        default:
+            return new OperationAnd();
+        }
+    }
+
     private interface IOperation {
         boolean evaluate(FilterRule[] rules, ParticleBean pb);
+
+        String getOperationString();
     }
 
     private class OperationAnd implements IOperation {
+        public String op;
+
+        public OperationAnd() {
+            this.op = "and";
+        }
+
         @Override
         public boolean evaluate(FilterRule[] rules, ParticleBean bean) {
             boolean result = true;
@@ -60,9 +82,20 @@ public class Filter {
             }
             return result;
         }
+
+        @Override
+        public String getOperationString() {
+            return op;
+        }
     }
 
     private class OperationOr implements IOperation {
+        public String op;
+
+        public OperationOr() {
+            this.op = "or";
+        }
+
         @Override
         public boolean evaluate(FilterRule[] rules, ParticleBean bean) {
             boolean result = false;
@@ -70,6 +103,11 @@ public class Filter {
                 result = result || rule.evaluate(bean);
             }
             return result;
+        }
+
+        @Override
+        public String getOperationString() {
+            return op;
         }
     }
 }

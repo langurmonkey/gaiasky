@@ -286,6 +286,11 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
         });
     }
 
+    @Override
+    public void setCameraPosition(double x, double y, double z) {
+        setCameraPosition(new double[]{x, y, z});
+    }
+
     public void setCameraPosition(final List vec) {
         setCameraPosition(dArray(vec));
     }
@@ -2014,13 +2019,13 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
     @Override
     public void parkRunnable(String id, Runnable runnable) {
         if (checkString(id, "id"))
-            em.post(Events.POST_RUNNABLE, id, runnable);
+            em.post(Events.PARK_POST_RUNNABLE, id, runnable);
     }
 
     @Override
     public void unparkRunnable(String id) {
         if (checkString(id, "id"))
-            em.post(Events.UNPOST_RUNNABLE, id);
+            em.post(Events.UNPARK_POST_RUNNABLE, id);
     }
 
     @Override

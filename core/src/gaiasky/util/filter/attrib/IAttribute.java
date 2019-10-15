@@ -6,11 +6,14 @@
 package gaiasky.util.filter.attrib;
 
 import gaiasky.scenegraph.ParticleGroup.ParticleBean;
+import gaiasky.util.math.Vector3d;
 
 /**
  * Represents an attribute
  */
 public interface IAttribute<T extends ParticleBean> {
+    Vector3d aux1 = new Vector3d();
+    Vector3d aux2 = new Vector3d();
     /**
      * Gets the value of this attribute
      * @bean The particle or star bean

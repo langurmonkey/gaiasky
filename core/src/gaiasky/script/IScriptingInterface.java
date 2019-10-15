@@ -320,6 +320,15 @@ public interface IScriptingInterface {
     void setCameraPosition(double[] vec);
 
     /**
+     * Sets the camera position to the given coordinates, in Km, equatorial
+     * system.
+     * @param x The x component
+     * @param y The y component
+     * @param z The z component
+     */
+    void setCameraPosition(double x, double y, double z);
+
+    /**
      * Gets the current camera position, in km.
      *
      * @return The camera position coordinates in the internal reference system,

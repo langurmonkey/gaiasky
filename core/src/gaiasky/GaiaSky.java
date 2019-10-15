@@ -512,7 +512,7 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
         EventManager.instance.post(Events.TIME_CHANGE_INFO, time.getTime());
 
         // Subscribe to events
-        EventManager.instance.subscribe(this, Events.TOGGLE_AMBIENT_LIGHT, Events.AMBIENT_LIGHT_CMD, Events.RECORD_CAMERA_CMD, Events.CAMERA_MODE_CMD, Events.STEREOSCOPIC_CMD, Events.FRAME_SIZE_UDPATE, Events.SCREENSHOT_SIZE_UDPATE, Events.POST_RUNNABLE, Events.UNPOST_RUNNABLE, Events.SCENE_GRAPH_ADD_OBJECT_CMD, Events.SCENE_GRAPH_ADD_OBJECT_NO_POST_CMD, Events.SCENE_GRAPH_REMOVE_OBJECT_CMD, Events.HOME_CMD);
+        EventManager.instance.subscribe(this, Events.TOGGLE_AMBIENT_LIGHT, Events.AMBIENT_LIGHT_CMD, Events.RECORD_CAMERA_CMD, Events.CAMERA_MODE_CMD, Events.STEREOSCOPIC_CMD, Events.FRAME_SIZE_UDPATE, Events.SCREENSHOT_SIZE_UDPATE, Events.PARK_POST_RUNNABLE, Events.UNPARK_POST_RUNNABLE, Events.SCENE_GRAPH_ADD_OBJECT_CMD, Events.SCENE_GRAPH_ADD_OBJECT_NO_POST_CMD, Events.SCENE_GRAPH_REMOVE_OBJECT_CMD, Events.HOME_CMD);
 
         // Re-enable input
         EventManager.instance.post(Events.INPUT_ENABLED_CMD, true);
@@ -864,8 +864,16 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
 
         // Run parked runnables
         synchronized (runnables) {
-            for (Runnable r : runnables) {
-                r.run();
+            Iterator<Runnable> it = runnables.iterator();
+            while(it.hasNext()) {
+                Runnable r = it.next();
+                try {
+                    r.run();
+                }catch(Exception e){
+                    logger.error(e);
+                    // If it crashed, remove it
+                    it.remove();
+                }
             }
         }
     }
@@ -1111,17 +1119,22 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
         case HOME_CMD:
             goHome();
             break;
-        case POST_RUNNABLE:
+        case PARK_POST_RUNNABLE:
             synchronized (runnables) {
-                runnablesMap.put((String) data[0], (Runnable) data[1]);
-                runnables.add((Runnable) data[1]);
+                String key = (String) data[0];
+                Runnable runnable = (Runnable) data[1];
+                runnablesMap.put(key, runnable);
+                runnables.add(runnable);
             }
             break;
-        case UNPOST_RUNNABLE:
+        case UNPARK_POST_RUNNABLE:
             synchronized (runnables) {
-                Runnable r = runnablesMap.get(data[0]);
-                runnables.removeValue(r, true);
-                runnablesMap.remove(data[0]);
+                String key = (String) data[0];
+                Runnable r = runnablesMap.get(key);
+                if(r != null) {
+                    runnables.removeValue(r, true);
+                    runnablesMap.remove(data[0]);
+                }
             }
             break;
         default:

@@ -8,6 +8,7 @@ package gaiasky.util;
 import gaiasky.scenegraph.FadeNode;
 import gaiasky.util.Logger.Log;
 import gaiasky.util.color.ColourUtils;
+import gaiasky.util.filter.Filter;
 
 import java.time.Instant;
 
@@ -20,18 +21,26 @@ public class CatalogInfo {
         INTERNAL, LOD, SAMP, SCRIPT, UI
     }
 
+    // Base properties
     public String name;
     public String description;
     public String source;
     public Instant loadDateUTC;
+
+    // Highlight
+    public boolean highlighted;
     public float[] hlColor;
     public float hlSizeFactor;
     public boolean hlAllVisible;
 
+    // The filter object. May be null
+    public Filter filter;
+
+    // Catalog type
     public CatalogInfoType type;
 
+    // Reference to scene graph object
     public FadeNode object;
-    public boolean highlighted;
 
     public CatalogInfo(String name, String description, String source, CatalogInfoType type, float hlSizeFactor, FadeNode object) {
         super();

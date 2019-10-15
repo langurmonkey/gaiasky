@@ -29,7 +29,6 @@ import gaiasky.scenegraph.component.RotationComponent;
 import gaiasky.util.*;
 import gaiasky.util.CatalogInfo.CatalogInfoType;
 import gaiasky.util.coord.Coordinates;
-import gaiasky.util.filter.Filter;
 import gaiasky.util.gdx.g2d.ExtSpriteBatch;
 import gaiasky.util.gdx.shader.ExtShaderProgram;
 import gaiasky.util.math.*;
@@ -68,8 +67,31 @@ public class ParticleGroup extends FadeNode implements I3DTextRenderable, IFocus
             return aux.set(x(), y(), z());
         }
 
+        /**
+         * Distance in internal units. Beware, does the computation on the fly.
+         * @return The distance, in internal units
+         */
         public double distance() {
             return Math.sqrt(x() * x() + y() * y() + z() * z());
+        }
+
+        /**
+         * Right ascension in degrees. Beware, does the conversion on the fly.
+         * @return The right ascension, in degrees
+         **/
+        public double ra() {
+            Vector3d cartPos = pos(aux3d1.get());
+            Vector3d sphPos = Coordinates.cartesianToSpherical(cartPos, aux3d2.get());
+            return MathUtilsd.radDeg * sphPos.x;
+        }
+        /**
+         * Declination in degrees. Beware, does the conversion on the fly.
+         * @return The declination, in degrees
+         **/
+        public double dec() {
+            Vector3d cartPos = pos(aux3d1.get());
+            Vector3d sphPos = Coordinates.cartesianToSpherical(cartPos, aux3d2.get());
+            return MathUtilsd.radDeg * sphPos.y;
         }
 
         public double x() {
@@ -180,11 +202,6 @@ public class ParticleGroup extends FadeNode implements I3DTextRenderable, IFocus
      * Reference to the current focus
      */
     protected ParticleBean focus;
-
-    /**
-     * Active filter object
-     */
-    protected Filter filter;
 
     // Has been disposed
     public boolean disposed = false;
@@ -915,8 +932,8 @@ public class ParticleGroup extends FadeNode implements I3DTextRenderable, IFocus
      * @return The result of the filter evaluation
      */
     public boolean filter(int index) {
-        if (filter != null) {
-            return filter.evaluate(get(index));
+        if (catalogInfo != null && catalogInfo.filter != null) {
+            return catalogInfo.filter.evaluate(get(index));
         }
         return true;
     }

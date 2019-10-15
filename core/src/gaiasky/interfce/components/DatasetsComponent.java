@@ -65,7 +65,7 @@ public class DatasetsComponent extends GuiComponent implements IObserver {
         OwnImageButton eye = new OwnImageButton(skin, "eye-toggle");
         eye.setCheckedNoFire(!ci.isVisible());
         eye.addListener(new OwnTextTooltip(I18n.txt("gui.tooltip.dataset.toggle"), skin));
-        eye.addListener((event) -> {
+        eye.addListener(event -> {
             if (event instanceof ChangeEvent) {
                 // Toggle visibility
                 if (ci.object != null) {
@@ -80,7 +80,7 @@ public class DatasetsComponent extends GuiComponent implements IObserver {
         OwnImageButton mark = new OwnImageButton(skin, "highlight-ds-s");
         mark.setCheckedNoFire(ci.highlighted);
         mark.addListener(new OwnTextTooltip(I18n.txt("gui.tooltip.dataset.highlight"), skin));
-        mark.addListener((event) -> {
+        mark.addListener(event -> {
             if(event instanceof ChangeEvent){
                 EventManager.instance.post(Events.CATALOG_HIGHLIGHT, ci.name, mark.isChecked(), ci.hlColor, true);
                 return true;
@@ -90,7 +90,7 @@ public class DatasetsComponent extends GuiComponent implements IObserver {
 
         OwnImageButton prefs = new OwnImageButton(skin, "prefs");
         prefs.addListener(new OwnTextTooltip(I18n.txt("gui.tooltip.dataset.preferences"), skin));
-        prefs.addListener((event) -> {
+        prefs.addListener(event -> {
             if(event instanceof ChangeEvent){
                 DatasetPreferencesWindow dpw = new DatasetPreferencesWindow(ci, skin, stage);
                 dpw.show(stage);
@@ -101,7 +101,7 @@ public class DatasetsComponent extends GuiComponent implements IObserver {
 
         ImageButton rubbish = new OwnImageButton(skin, "rubbish-bin");
         rubbish.addListener(new OwnTextTooltip(I18n.txt("gui.tooltip.dataset.remove"), skin));
-        rubbish.addListener((event) -> {
+        rubbish.addListener(event -> {
             if (event instanceof ChangeEvent) {
                 // Remove dataset
                 EventManager.instance.post(Events.CATALOG_REMOVE, ci.name);

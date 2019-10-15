@@ -1124,12 +1124,12 @@ public enum Events {
     /**
      * Posts a recurrent runnable. Contains an identifier (String) and the runnable object
      **/
-    POST_RUNNABLE,
+    PARK_POST_RUNNABLE,
 
     /**
      * Unposts a runnable. Contains the identifier (String)
      **/
-    UNPOST_RUNNABLE,
+    UNPARK_POST_RUNNABLE,
 
     /** New VR device connected. Contains the VRDevice object. **/
     VR_DEVICE_CONNECTED,

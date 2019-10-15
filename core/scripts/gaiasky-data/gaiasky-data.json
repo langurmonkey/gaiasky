@@ -239,7 +239,7 @@
       ],
       "sha256": "f7ceac7cbe506870e246cdd7285371ce9a535b92b2fe6e46437cac0067213762",
       "description": "Default data pack for Gaia Sky - For Gaia Sky 2.2.2 and above. Contains the Solar System, constellations, meshes and more",
-      "file": "http://gaia.ari.uni-heidelberg.de/gaiasky/files/autodownload/basedata/005_20191014/gaiasky_data.tar.gz"
+      "file": "http://gaia.ari.uni-heidelberg.de/gaiasky/files/autodownload/basedata/005_20191004/gaiasky_data.tar.gz"
     },
     {
       "name": "hi-res-textures",

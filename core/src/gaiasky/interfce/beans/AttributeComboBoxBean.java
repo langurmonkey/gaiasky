@@ -1,0 +1,24 @@
+/*
+ * This file is part of Gaia Sky, which is released under the Mozilla Public License 2.0.
+ * See the file LICENSE.md in the project root for full license details.
+ */
+
+package gaiasky.interfce.beans;
+
+import gaiasky.util.filter.attrib.IAttribute;
+
+public class AttributeComboBoxBean {
+    public String name;
+    public IAttribute attr;
+
+    public AttributeComboBoxBean(IAttribute attr){
+        this.attr = attr;
+        String className = attr.getClass().getSimpleName();
+        this.name = className.substring(9);
+    }
+
+    @Override
+    public String toString(){
+        return name;
+    }
+}
