@@ -11,12 +11,14 @@ class LineUpdaterRunnable(object):
         self.frames = 0
         self.prevpos = None
         self.lnames = []
+        self.factor = 4.0
 
     def run(self):
         earthp = gs.getObjectPosition("Earth")
         marsp = gs.getObjectPosition("Mars")
 
         lpos = [marsp[0] - earthp[0], marsp[1] - earthp[1], marsp[2] - earthp[2]]
+        lpos = [lpos[0] * self.factor, lpos[1] * self.factor, lpos[2] * self.factor]
 
         if self.frames % 15 == 0:
             self.seq += 1
@@ -44,9 +46,9 @@ gs.setVisibility("element.orbits", True)
 gs.setCameraLock(True)
 gs.setCameraOrientationLock(False)
 
-gs.setFov(49)
-gs.setCameraFocus("Earth")
-gs.setCameraPosition([-372392379.013749, 693877297.622799, 159753345.098243])
+gs.setFov(60)
+gs.setCameraFocus("Sun")
+gs.setCameraPosition([342940450.081941, -760817299.386802, -115719592.450915])
 
 earthp = gs.getObjectPosition("Earth")
 marsp = gs.getObjectPosition("Mars")
