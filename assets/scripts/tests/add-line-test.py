@@ -14,8 +14,8 @@ gs.setCinematicCamera(True)
 gs.setRotationCameraSpeed(50.)
 gs.setCameraSpeed(15.)
 
-gs.setCameraFocusInstantAndGo("Sol")
-gs.goToObject("Sol", 1e-8)
+gs.setCameraFocusInstantAndGo("Sun")
+gs.goToObject("Sun", 1e-8)
 
 gs.sleep(3)
 

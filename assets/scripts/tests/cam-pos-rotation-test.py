@@ -11,23 +11,23 @@ gs.cameraStop()
 gs.minimizeInterfaceWindow()
 
 # Camera looks at sunny side of Earth
-gs.setCameraPositionAndFocus("Earth", "Sol", 0, 30)
+gs.setCameraPositionAndFocus("Earth", "Sun", 0, 30)
 gs.sleep(3)
 
 # Camera looks at 50% sunny, 50% shady
-gs.setCameraPositionAndFocus("Earth", "Sol", 90, 30)
+gs.setCameraPositionAndFocus("Earth", "Sun", 90, 30)
 gs.sleep(3)
 
 # Camera looks at shady side of Earth
-gs.setCameraPositionAndFocus("Earth", "Sol", 180, 30)
+gs.setCameraPositionAndFocus("Earth", "Sun", 180, 30)
 gs.sleep(3)
 
 # Camera looks at sunny side of Mars
-gs.setCameraPositionAndFocus("Mars", "Sol", 0, 30)
+gs.setCameraPositionAndFocus("Mars", "Sun", 0, 30)
 gs.sleep(3)
 
 # Camera looks at shady side of Mars
-gs.setCameraPositionAndFocus("Mars", "Sol", 180, 30)
+gs.setCameraPositionAndFocus("Mars", "Sun", 180, 30)
 gs.sleep(3)
 
 

@@ -51,7 +51,7 @@ gs.setSimulationTime(2018, 4, 25, 10, 0, 0, 0)
 gs.setCameraPosition([-1294.3864339045447 * 1e6,156.30069319755347 * 1e6,-1150.2743059128413 * 1e6])
 gs.setCameraDirection([0.739144930622408,-0.09348275378626529,0.6670275453680645])
 gs.setCameraUp([-0.1374839626900124,0.9485312542098752,0.2852834025843425])
-gs.setCameraFocus("Sol")
+gs.setCameraFocus("Sun")
 
 gs.sleep(stdwait)
 
@@ -67,7 +67,7 @@ gs.sleep(stdwait)
 gs.setVisibility("element.asteroids", True)
 gs.sleep(stdwait)
 
-gs.goToObject("Sol", 0.05, 0.0)
+gs.goToObject("Sun", 0.05, 0.0)
 
 gs.cameraRotate(0.5, 0.0)
 
@@ -105,7 +105,7 @@ gs.sleep(stdwaitlong)
 
 gs.cameraRotate(0.0, -0.9)
 
-gs.goToObject("Sol", 0.01, 0.0)
+gs.goToObject("Sun", 0.01, 0.0)
 
 gs.stopSimulationTime()
 gs.cameraStop()

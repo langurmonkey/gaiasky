@@ -14,7 +14,7 @@ gs.setRotationCameraSpeed(20)
 gs.setTurningCameraSpeed(20)
 gs.setCameraSpeed(20)
 
-gs.goToObject("Sol", 20.0, 4.5)
+gs.goToObject("Sun", 20.0, 4.5)
 
 gs.setHeadlineMessage("Sun")
 gs.setSubheadMessage("This is the Sun, our star")
@@ -22,7 +22,7 @@ gs.setSubheadMessage("This is the Sun, our star")
 gs.sleep(4)
 gs.clearAllMessages()
 
-gs.goToObject("Sol", 5.5)
+gs.goToObject("Sun", 5.5)
 
 gs.setHeadlineMessage("Sun")
 gs.setSubheadMessage("We are now zooming out a bit")
@@ -46,7 +46,7 @@ gs.setSubheadMessage("Zooming out here...")
 gs.sleep(4)
 gs.clearAllMessages()
 
-gs.setCameraFocus("Sol")
+gs.setCameraFocus("Sun")
 gs.sleep(4)
 
 gs.enableInput()

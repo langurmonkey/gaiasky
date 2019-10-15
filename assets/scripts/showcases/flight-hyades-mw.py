@@ -57,7 +57,7 @@ gs.setVisibility('element.planets',True)
 gs.setVisibility('element.moons',True)
 gs.setCinematicCamera(True)
 
-gs.setCameraFocusInstantAndGo("Sol")
+gs.setCameraFocusInstantAndGo("Sun")
 gs.sleep(2)
 gs.setCameraFocusInstant("Bellatrix")
 
@@ -128,7 +128,7 @@ for t in range(0, 500000):
     fwdval += 0.1
     if fwdval >= 1.0:
         fwdval = 1.0
-    if gs.getDistanceTo("Sol") > 6622825900000000000:
+    if gs.getDistanceTo("Sun") > 6622825900000000000:
         break
 
 

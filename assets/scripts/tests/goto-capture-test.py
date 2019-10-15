@@ -17,7 +17,7 @@ gs.setCameraSpeed(30)
 gs.configureRenderOutput(1280, 720, 60, gs.getDefaultFramesDir(), 'scripting-test')
 gs.setFrameOutput(True)
 
-gs.goToObject("Sol", -1, 2.5)
+gs.goToObject("Sun", -1, 2.5)
 
 gs.setHeadlineMessage("Sun")
 gs.setSubheadMessage("This is the Sun, our star")
@@ -33,7 +33,7 @@ gs.setSubheadMessage("This is the Earth, our home")
 gs.sleepFrames(40)
 gs.clearAllMessages()
 
-gs.setCameraFocus("Sol")
+gs.setCameraFocus("Sun")
 gs.sleep(4)
 
 gs.setFrameOutput(False)
