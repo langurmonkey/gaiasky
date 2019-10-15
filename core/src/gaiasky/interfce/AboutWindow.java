@@ -22,6 +22,7 @@ import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener.ChangeEvent;
 import com.badlogic.gdx.scenes.scene2d.utils.SpriteDrawable;
 import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.BufferUtils;
+import gaiasky.desktop.util.SysUtils;
 import gaiasky.event.EventManager;
 import gaiasky.event.Events;
 import gaiasky.util.GlobalConf;
@@ -251,6 +252,25 @@ public class AboutWindow extends GenericDialog {
         Label buildertitle = new OwnLabel(I18n.txt("gui.help.builder"), skin);
         Label builder = new OwnLabel(GlobalConf.version.builder, skin);
 
+        // Paths
+        Label paths = new OwnLabel(I18n.txt("gui.help.paths"), skin, "help-title");
+
+        Label configtitle = new OwnLabel(I18n.txt("gui.help.paths.config"), skin);
+        Label config = new OwnLabel(SysUtils.getConfigDir().getAbsolutePath(), skin);
+        Label datatitle = new OwnLabel(I18n.txt("gui.help.paths.data"), skin);
+        Label data = new OwnLabel(SysUtils.getDataDir().getAbsolutePath(), skin);
+        Label screenshotstitle = new OwnLabel(I18n.txt("gui.help.paths.screenshots"), skin);
+        Label screenshots = new OwnLabel(SysUtils.getDefaultScreenshotsDir().getAbsolutePath(), skin);
+        Label framestitle = new OwnLabel(I18n.txt("gui.help.paths.frames"), skin);
+        Label frames = new OwnLabel(SysUtils.getDefaultFramesDir().getAbsolutePath(), skin);
+        Label musictitle = new OwnLabel(I18n.txt("gui.help.paths.music"), skin);
+        Label music = new OwnLabel(SysUtils.getDefaultMusicDir().getAbsolutePath(), skin);
+        Label mappingstitle = new OwnLabel(I18n.txt("gui.help.paths.mappings"), skin);
+        Label mappings = new OwnLabel(SysUtils.getDefaultMappingsDir().getAbsolutePath(), skin);
+        Label cameratitle = new OwnLabel(I18n.txt("gui.help.paths.camera"), skin);
+        Label camera = new OwnLabel(SysUtils.getDefaultCameraDir().getAbsolutePath(), skin);
+
+
         // Java info
         Label javainfo = new OwnLabel(I18n.txt("gui.help.javainfo"), skin, "help-title");
 
@@ -338,6 +358,30 @@ public class AboutWindow extends GenericDialog {
         contentSystem.row();
         contentSystem.add(systemtitle).align(Align.topLeft).padRight(pad).padTop(pad5);
         contentSystem.add(system).align(Align.left).padTop(pad5);
+        contentSystem.row();
+
+        contentSystem.add(paths).colspan(2).align(Align.left).padTop(pad * 2f).padBottom(pad);
+        contentSystem.row();
+        contentSystem.add(configtitle).align(Align.topLeft).padRight(pad);
+        contentSystem.add(config).align(Align.left);
+        contentSystem.row();
+        contentSystem.add(datatitle).align(Align.topLeft).padRight(pad);
+        contentSystem.add(data).align(Align.left);
+        contentSystem.row();
+        contentSystem.add(screenshotstitle).align(Align.topLeft).padRight(pad);
+        contentSystem.add(screenshots).align(Align.left);
+        contentSystem.row();
+        contentSystem.add(framestitle).align(Align.topLeft).padRight(pad);
+        contentSystem.add(frames).align(Align.left);
+        contentSystem.row();
+        contentSystem.add(cameratitle).align(Align.topLeft).padRight(pad);
+        contentSystem.add(camera).align(Align.left);
+        contentSystem.row();
+        contentSystem.add(mappingstitle).align(Align.topLeft).padRight(pad);
+        contentSystem.add(mappings).align(Align.left);
+        contentSystem.row();
+        contentSystem.add(musictitle).align(Align.topLeft).padRight(pad);
+        contentSystem.add(music).align(Align.left);
         contentSystem.row();
 
         contentSystem.add(javainfo).colspan(2).align(Align.left).padTop(pad).padBottom(pad);
