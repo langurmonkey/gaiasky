@@ -1711,21 +1711,21 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
 
     @Override
     public double[] galacticToInternalCartesian(double l, double b, double r) {
-        Vector3d pos = Coordinates.sphericalToCartesian(l * Nature.TO_RAD, b * Nature.TO_RAD, r, new Vector3d());
+        Vector3d pos = Coordinates.sphericalToCartesian(l * Nature.TO_RAD, b * Nature.TO_RAD, r * Constants.KM_TO_U, new Vector3d());
         pos.mul(Coordinates.galacticToEquatorial());
         return new double[] { pos.x, pos.y, pos.z };
     }
 
     @Override
     public double[] eclipticToInternalCartesian(double l, double b, double r) {
-        Vector3d pos = Coordinates.sphericalToCartesian(l * Nature.TO_RAD, b * Nature.TO_RAD, r, new Vector3d());
+        Vector3d pos = Coordinates.sphericalToCartesian(l * Nature.TO_RAD, b * Nature.TO_RAD, r * Constants.KM_TO_U, new Vector3d());
         pos.mul(Coordinates.eclipticToEquatorial());
         return new double[] { pos.x, pos.y, pos.z };
     }
 
     @Override
     public double[] equatorialToInternalCartesian(double ra, double dec, double r) {
-        Vector3d pos = Coordinates.sphericalToCartesian(ra * Nature.TO_RAD, dec * Nature.TO_RAD, r, new Vector3d());
+        Vector3d pos = Coordinates.sphericalToCartesian(ra * Nature.TO_RAD, dec * Nature.TO_RAD, r * Constants.KM_TO_U, new Vector3d());
         return new double[] { pos.x, pos.y, pos.z };
     }
 
