@@ -93,6 +93,46 @@ public class ParticleGroup extends FadeNode implements I3DTextRenderable, IFocus
             return MathUtilsd.radDeg * sphPos.y;
         }
 
+        /**
+         * Ecliptic longitude in degrees.
+         * @return The ecliptic longitude, in degrees
+         */
+        public double lambda(){
+            Vector3d cartEclPos = pos(aux3d1.get()).mul(Coordinates.eqToEcl());
+            Vector3d sphPos = Coordinates.cartesianToSpherical(cartEclPos, aux3d2.get());
+            return MathUtilsd.radDeg * sphPos.x;
+        }
+
+        /**
+         * Ecliptic latitude in degrees.
+         * @return The ecliptic latitude, in degrees
+         */
+        public double beta(){
+            Vector3d cartEclPos = pos(aux3d1.get()).mul(Coordinates.eqToEcl());
+            Vector3d sphPos = Coordinates.cartesianToSpherical(cartEclPos, aux3d2.get());
+            return MathUtilsd.radDeg * sphPos.y;
+        }
+
+        /**
+         * Galactic longitude in degrees.
+         * @return The galactic longitude, in degrees
+         */
+        public double l(){
+            Vector3d cartEclPos = pos(aux3d1.get()).mul(Coordinates.eqToGal());
+            Vector3d sphPos = Coordinates.cartesianToSpherical(cartEclPos, aux3d2.get());
+            return MathUtilsd.radDeg * sphPos.x;
+        }
+
+        /**
+         * Galactic latitude in degrees.
+         * @return The galactic latitude, in degrees
+         */
+        public double b(){
+            Vector3d cartEclPos = pos(aux3d1.get()).mul(Coordinates.eqToGal());
+            Vector3d sphPos = Coordinates.cartesianToSpherical(cartEclPos, aux3d2.get());
+            return MathUtilsd.radDeg * sphPos.y;
+        }
+
         public double x() {
             return data[I_X];
         }

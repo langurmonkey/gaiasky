@@ -6,6 +6,7 @@
 package gaiasky.util.filter.attrib;
 
 import gaiasky.scenegraph.StarGroup.StarBean;
+import gaiasky.util.I18n;
 
 public class AttributeAbsmag implements IAttribute<StarBean> {
     @Override
@@ -15,5 +16,8 @@ public class AttributeAbsmag implements IAttribute<StarBean> {
 
     public String getUnit(){
         return "mag";
+    }
+    public String toString(){
+        return I18n.txt("gui.focusinfo.absmag");
     }
 }

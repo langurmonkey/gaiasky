@@ -27,4 +27,10 @@ public interface IAttribute<T extends ParticleBean> {
      */
     String getUnit();
 
+    /**
+     * Gets the name
+     * @return The name
+     */
+    String toString();
+
 }

@@ -6,6 +6,7 @@
 package gaiasky.util.filter.attrib;
 
 import gaiasky.scenegraph.StarGroup.StarBean;
+import gaiasky.util.I18n;
 
 public class AttributeMudelta implements IAttribute<StarBean> {
     @Override
@@ -14,5 +15,8 @@ public class AttributeMudelta implements IAttribute<StarBean> {
     }
     public String getUnit(){
         return "mas/yr";
+    }
+    public String toString(){
+        return I18n.txt("gui.focusinfo.mudelta");
     }
 }

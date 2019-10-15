@@ -16,4 +16,7 @@ public class AttributeDistance implements IAttribute<ParticleBean> {
     public String getUnit(){
         return "pc";
     }
+    public String toString(){
+        return "Distance from Sun";
+    }
 }

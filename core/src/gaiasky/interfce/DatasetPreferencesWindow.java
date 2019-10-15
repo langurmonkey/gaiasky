@@ -91,7 +91,7 @@ public class DatasetPreferencesWindow extends GenericDialog {
     }
 
     private void generateFilterTable(Filter filter) {
-        float minSelectWidth = 120f * GlobalConf.UI_SCALE_FACTOR;
+        float minSelectWidth = 100f * GlobalConf.UI_SCALE_FACTOR;
         filterTable.clearChildren();
         if (filter != null && filter.hasRules()) {
             // Operation
@@ -122,11 +122,15 @@ public class DatasetPreferencesWindow extends GenericDialog {
 
                 // ATTRIBUTE
                 boolean stars = (ci.object instanceof StarGroup || ci.object instanceof OctreeWrapper);
-                Array<AttributeComboBoxBean> attrs = new Array<>(stars ? 8 : 3);
+                Array<AttributeComboBoxBean> attrs = new Array<>(stars ? 12 : 7);
                 // Add particle attributes (dist, alpha, delta)
                 attrs.add(new AttributeComboBoxBean(new AttributeDistance()));
                 attrs.add(new AttributeComboBoxBean(new AttributeRA()));
                 attrs.add(new AttributeComboBoxBean(new AttributeDEC()));
+                attrs.add(new AttributeComboBoxBean(new AttributeEclLatitude()));
+                attrs.add(new AttributeComboBoxBean(new AttributeEclLongitude()));
+                attrs.add(new AttributeComboBoxBean(new AttributeGalLatitude()));
+                attrs.add(new AttributeComboBoxBean(new AttributeGalLongitude()));
                 if (stars) {
                     // Star attributes (appmag, absmag, mualpha, mudelta, radvel)
                     attrs.add(new AttributeComboBoxBean(new AttributeAppmag()));
@@ -136,7 +140,6 @@ public class DatasetPreferencesWindow extends GenericDialog {
                     attrs.add(new AttributeComboBoxBean(new AttributeRadvel()));
                 }
                 OwnSelectBox<AttributeComboBoxBean> attribute = new OwnSelectBox<>(skin);
-                attribute.setWidth(minSelectWidth);
                 attribute.setItems(attrs);
                 attribute.setSelected(getAttributeBean(rule.getAttribute(), attrs));
                 attribute.addListener(event -> {
@@ -268,7 +271,7 @@ public class DatasetPreferencesWindow extends GenericDialog {
 
     private AttributeComboBoxBean getAttributeBean(IAttribute attr, Array<AttributeComboBoxBean> attrs){
         for(AttributeComboBoxBean attribute : attrs){
-            if(attr.getClass().getSimpleName().contains(attribute.name)){
+            if(attr.toString().contains(attribute.name)){
                 return attribute;
             }
         }

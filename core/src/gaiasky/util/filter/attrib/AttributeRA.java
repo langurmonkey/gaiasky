@@ -6,6 +6,7 @@
 package gaiasky.util.filter.attrib;
 
 import gaiasky.scenegraph.ParticleGroup.ParticleBean;
+import gaiasky.util.I18n;
 
 public class AttributeRA implements IAttribute<ParticleBean> {
     @Override
@@ -14,5 +15,8 @@ public class AttributeRA implements IAttribute<ParticleBean> {
     }
     public String getUnit(){
         return "deg";
+    }
+    public String toString(){
+        return "Right ascension (" + I18n.txt("gui.focusinfo.alpha") + ")";
     }
 }

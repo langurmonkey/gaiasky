@@ -6,17 +6,16 @@
 package gaiasky.util.filter.attrib;
 
 import gaiasky.scenegraph.ParticleGroup.ParticleBean;
-import gaiasky.util.I18n;
 
-public class AttributeDEC implements IAttribute<ParticleBean> {
+public class AttributeGalLongitude implements IAttribute<ParticleBean> {
     @Override
     public double get(ParticleBean bean) {
-        return bean.dec();
+        return bean.l();
     }
     public String getUnit(){
         return "deg";
     }
     public String toString(){
-        return "Declination (" + I18n.txt("gui.focusinfo.delta") + ")";
+        return "Galactic longitude (l)";
     }
 }

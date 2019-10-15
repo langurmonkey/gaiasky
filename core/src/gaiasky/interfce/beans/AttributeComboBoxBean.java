@@ -14,7 +14,7 @@ public class AttributeComboBoxBean {
     public AttributeComboBoxBean(IAttribute attr){
         this.attr = attr;
         String className = attr.getClass().getSimpleName();
-        this.name = className.substring(9);
+        this.name = attr.toString();
     }
 
     @Override
