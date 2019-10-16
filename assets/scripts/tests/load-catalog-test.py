@@ -1,7 +1,7 @@
 # This script tests the catalog load functionality.
 # Created by Toni Sagrista
 
-from py4j.java_gateway import JavaGateway, GatewayParameters
+from py4j.clientserver import ClientServer, JavaParameters
 from os.path import expanduser
 
 """
@@ -11,7 +11,7 @@ def lprint(string):
     gs.print(string)
     print(string)
 
-gateway = JavaGateway(gateway_parameters=GatewayParameters(auto_convert=True))
+gateway = ClientServer(java_parameters=JavaParameters(auto_convert=True))
 gs = gateway.entry_point
 
 gs.cameraStop()
@@ -39,4 +39,4 @@ gs.removeDataset(name)
 
 lprint("Test finished")
 
-gateway.close()
+gateway.shutdown()

@@ -1,7 +1,7 @@
 # This script tests posting and parking runnables that run on the main loop thread
 # Created by Toni Sagrista
 
-from py4j.java_gateway import JavaGateway, GatewayParameters, CallbackServerParameters
+from py4j.clientserver import ClientServer, JavaParameters, PythonParameters
 
 """
 Prints to both gaia sky and python
@@ -30,8 +30,8 @@ class FrameCounterRunnable(object):
         implements = ["java.lang.Runnable"]
 
 
-gateway = JavaGateway(gateway_parameters=GatewayParameters(auto_convert=True),
-                      callback_server_parameters=CallbackServerParameters())
+gateway = ClientServer(java_parameters=JavaParameters(auto_convert=True),
+                      python_parameters=PythonParameters())
 gs = gateway.entry_point
 
 # We post a simple runnable which prints "Hello from Python!" through the event interface once
@@ -48,5 +48,5 @@ gs.unparkRunnable("frame_counter")
 
 lprint("Exiting script")
 
-gateway.close()
+gateway.shutdown()
 

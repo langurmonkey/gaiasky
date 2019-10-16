@@ -7,7 +7,7 @@
 
 # Created by Toni Sagrista
 
-from py4j.java_gateway import JavaGateway, GatewayParameters, CallbackServerParameters
+from py4j.clientserver import ClientServer, JavaParameters, PythonParameters
 
 class LineUpdaterRunnable(object):
     def __init__(self, polyline):
@@ -33,8 +33,8 @@ class LineUpdaterRunnable(object):
     class Java:
         implements = ["java.lang.Runnable"]
 
-gateway = JavaGateway(gateway_parameters=GatewayParameters(auto_convert=True),
-                      callback_server_parameters=CallbackServerParameters())
+gateway = ClientServer(java_parameters=JavaParameters(auto_convert=True),
+                      python_parameters=PythonParameters())
 gs = gateway.entry_point
 
 gs.cameraStop()
@@ -81,5 +81,5 @@ gs.maximizeInterfaceWindow()
 gs.enableInput()
 
 # close connection
-gateway.close()
+gateway.shutdown()
 

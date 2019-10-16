@@ -1,9 +1,9 @@
 # This script tests the displaying of custom messages and images.
 # Created by Toni Sagrista
 
-from py4j.java_gateway import JavaGateway, GatewayParameters
+from py4j.clientserver import ClientServer, JavaParameters
 
-gateway = JavaGateway(gateway_parameters=GatewayParameters(auto_convert=True))
+gateway = ClientServer(java_parameters=JavaParameters(auto_convert=True))
 gs = gateway.entry_point
 
 
@@ -55,4 +55,4 @@ wait_input(0.0, [1, 2])
 
 gs.maximizeInterfaceWindow()
 
-gateway.close()
+gateway.shutdown()

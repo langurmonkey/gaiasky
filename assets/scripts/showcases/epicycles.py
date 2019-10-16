@@ -2,7 +2,7 @@
 
 # Created by Toni Sagrista
 
-from py4j.java_gateway import JavaGateway, GatewayParameters, CallbackServerParameters
+from py4j.clientserver import ClientServer, JavaParameters, PythonParameters
 import time
 
 class LineUpdaterRunnable(object):
@@ -44,7 +44,7 @@ class LineUpdaterRunnable(object):
             self.lastt = currt
 
         # Update all lines to put center on Earth
-        if self.line is not None:
+        if self.line is not None and len(self.positions) > 1:
             pc = self.line.getPointCloud()
             #gs.print("Polyline: %d, positions: %d" % (pc.getNumPoints(), len(self.positions)))
             for i in range(pc.getNumPoints()):
@@ -61,8 +61,8 @@ class LineUpdaterRunnable(object):
     class Java:
         implements = ["java.lang.Runnable"]
 
-gateway = JavaGateway(gateway_parameters=GatewayParameters(auto_convert=True),
-                      callback_server_parameters=CallbackServerParameters())
+gateway = ClientServer(java_parameters=JavaParameters(auto_convert=True),
+                      python_parameters=PythonParameters())
 gs = gateway.entry_point
 
 gs.cameraStop()
@@ -74,7 +74,7 @@ gs.setCameraOrientationLock(False)
 
 gs.setFov(60)
 gs.setCameraFocus("Sun")
-gs.setCameraPosition([342940450.081941, -760817299.386802, -115719592.450915])
+gs.setCameraPosition([650591440.987582, -1443344531.151316, -219531339.581399])
 
 earthp = gs.getObjectPosition("Earth")
 marsp = gs.getObjectPosition("Mars")
@@ -94,13 +94,11 @@ gs.startSimulationTime()
 
 gs.sleep(10)
 gs.setVisibility("element.orbits", False)
-gs.sleep(40)
+gs.sleep(20)
 
 gs.stopSimulationTime()
 
 # clean up and finish
-print("Cleaning up and ending")
-
 gs.unparkRunnable("line-updater")
 gs.removeModelObject("line-em")
 gs.cameraStop()
@@ -111,4 +109,4 @@ gs.maximizeInterfaceWindow()
 gs.enableInput()
 
 # close connection
-gateway.close(keep_callback_server=False, close_callback_server_connections=True)
+gateway.shutdown()

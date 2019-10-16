@@ -9,10 +9,7 @@ import com.badlogic.gdx.Gdx;
 import gaiasky.event.EventManager;
 import gaiasky.event.Events;
 import gaiasky.util.Logger;
-import py4j.DefaultGatewayServerListener;
-import py4j.GatewayServer;
-import py4j.GatewayServerListener;
-import py4j.Py4JServerConnection;
+import py4j.*;
 
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -22,7 +19,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 public class ScriptingServer {
     private static final Logger.Log logger = Logger.getLogger(ScriptingServer.class);
 
-    private static GatewayServer gatewayServer;
+    private static ClientServer gatewayServer;
     private static GatewayServerListener listener;
     private static AtomicInteger connections = new AtomicInteger(0);
 
@@ -40,7 +37,7 @@ public class ScriptingServer {
             }
         }
         if (gatewayServer == null) {
-            gatewayServer = new GatewayServer(EventScriptingInterface.instance());
+            gatewayServer = new ClientServer(EventScriptingInterface.instance());
             listener = new DefaultGatewayServerListener() {
 
                 @Override
@@ -67,12 +64,13 @@ public class ScriptingServer {
 
                 @Override
                 public void serverStarted() {
-                    logger.info("Server started");
+                    logger.info("Server started on port " + gatewayServer.getJavaServer().getListeningPort());
                 }
 
                 @Override
                 public void serverStopped() {
                     logger.info("Server stopped");
+                    initialize(true);
                 }
 
                 @Override
@@ -83,13 +81,13 @@ public class ScriptingServer {
                 @Override
                 public void serverError(Exception e) {
                     logger.error(e);
-                    initialize();
+                    initialize(force);
                 }
             };
-            gatewayServer.addListener(listener);
+            gatewayServer.getJavaServer().addListener(listener);
         }
         try {
-            gatewayServer.start();
+            gatewayServer.startServer();
         } catch (Exception e) {
             logger.error("Could not initialize the Py4J gateway server, is there another instance of Gaia Sky running?");
             logger.error(e);
@@ -99,7 +97,7 @@ public class ScriptingServer {
     public static void dispose() {
         if (gatewayServer != null) {
             if (listener != null) {
-                gatewayServer.removeListener(listener);
+                gatewayServer.getJavaServer().removeListener(listener);
                 listener = null;
             }
             gatewayServer.shutdown();
