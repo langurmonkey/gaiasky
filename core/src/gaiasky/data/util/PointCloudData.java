@@ -79,6 +79,18 @@ public class PointCloudData {
     }
 
     /**
+     * Adds a single point to the cloud
+     * @param x The x component
+     * @param y The y component
+     * @param z The z component
+     */
+    public void addPoint(double x, double y, double z){
+        this.x.add(x);
+        this.y.add(y);
+        this.z.add(z);
+    }
+
+    /**
      * Loads the data point at the index in the vector in the Orbit reference
      * system
      *

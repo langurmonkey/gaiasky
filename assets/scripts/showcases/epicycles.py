@@ -3,29 +3,55 @@
 # Created by Toni Sagrista
 
 from py4j.java_gateway import JavaGateway, GatewayParameters, CallbackServerParameters
+import time
 
 class LineUpdaterRunnable(object):
 
-    def __init__(self):
+    def __init__(self, line):
         self.seq = -1
         self.frames = 0
         self.prevpos = None
-        self.lnames = []
+        self.positions = []
         self.factor = 4.0
+        self.lastt = 0.0
+        self.line = line
 
     def run(self):
         earthp = gs.getObjectPosition("Earth")
         marsp = gs.getObjectPosition("Mars")
 
         lpos = [marsp[0] - earthp[0], marsp[1] - earthp[1], marsp[2] - earthp[2]]
+        # Scale up
         lpos = [lpos[0] * self.factor, lpos[1] * self.factor, lpos[2] * self.factor]
 
-        if self.frames % 15 == 0:
+        # Add line every .25 seconds
+        currt = time.time()
+        if currt - self.lastt >= 0.25:
             self.seq += 1
             if self.seq > 0:
-                gs.addPolyline("line-em-%d" % self.seq, [self.prevpos[0], self.prevpos[1], self.prevpos[2], lpos[0], lpos[1], lpos[2]], [ 1., .2, .2, .8 ], 1 )
-                self.lnames.append("line-em-%d" % self.seq)
+                pc = self.line.getPointCloud()
+                if pc.getNumPoints() == 0:
+                    # Add two first
+                    pc.addPoint(self.prevpos[0], self.prevpos[1], self.prevpos[2])
+                    pc.addPoint(lpos[0], lpos[1], lpos[2])
+                else:
+                    # Add one
+                    pc.addPoint(lpos[0], lpos[1], lpos[2])
+
+            # Save raw positions
+            self.positions.append([lpos[0], lpos[1], lpos[2]])
             self.prevpos = lpos
+            self.lastt = currt
+
+        # Update all lines to put center on Earth
+        if self.line is not None:
+            pc = self.line.getPointCloud()
+            #gs.print("Polyline: %d, positions: %d" % (pc.getNumPoints(), len(self.positions)))
+            for i in range(pc.getNumPoints()):
+                pc.setX(i, self.positions[i][0] + earthp[0])
+                pc.setY(i, self.positions[i][1] + earthp[1])
+                pc.setZ(i, self.positions[i][2] + earthp[2])
+            self.line.markForUpdate()
 
         self.frames += 1
 
@@ -53,19 +79,22 @@ gs.setCameraPosition([342940450.081941, -760817299.386802, -115719592.450915])
 earthp = gs.getObjectPosition("Earth")
 marsp = gs.getObjectPosition("Mars")
 
+gs.addPolyline("line-em", [], [ 1., .2, .2, .8 ], 1 )
+line = gs.getObject("line-em", 10.0)
+
 gs.sleep(0.5)
 
 # park the line updater
-lineUpdater = LineUpdaterRunnable()
+lineUpdater = LineUpdaterRunnable(line)
 gs.parkRunnable("line-updater", lineUpdater)
 
 gs.setSimulationTime(2015, 11, 19, 0, 0, 0, 0)
 gs.setSimulationPace(4e6)
 gs.startSimulationTime()
 
-gs.sleep(30)
+gs.sleep(10)
 gs.setVisibility("element.orbits", False)
-gs.sleep(30)
+gs.sleep(40)
 
 gs.stopSimulationTime()
 
@@ -73,12 +102,13 @@ gs.stopSimulationTime()
 print("Cleaning up and ending")
 
 gs.unparkRunnable("line-updater")
-for lname in lineUpdater.lnames:
-    gs.removeModelObject(lname)
+gs.removeModelObject("line-em")
 gs.cameraStop()
+# Finish flushing
+gs.sleepFrames(4)
 
 gs.maximizeInterfaceWindow()
 gs.enableInput()
 
 # close connection
-gateway.close()
+gateway.close(keep_callback_server=False, close_callback_server_connections=True)
