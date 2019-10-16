@@ -17,6 +17,7 @@ import gaiasky.event.IObserver;
 import gaiasky.util.GlobalConf;
 import gaiasky.util.I18n;
 import gaiasky.util.TextUtils;
+import gaiasky.util.color.ColourUtils;
 import gaiasky.util.format.INumberFormat;
 import gaiasky.util.format.NumberFormatFactory;
 import gaiasky.util.scene2d.*;
@@ -67,27 +68,12 @@ public class DebugInterface extends Table implements IObserver, IGuiInterface {
         add(spf).colspan(2).right().padBottom(pad10);
         row();
 
-        /* GRAPHICS DEVICE */
-        HorizontalGroup deviceGroup = new HorizontalGroup();
-        deviceGroup.space(pad05);
-        String glDevice = Gdx.gl.glGetString(GL20.GL_RENDERER);
-        String glDeviceShort = TextUtils.capString(glDevice, 30);
-        device = new OwnLabel(glDeviceShort, skin, "hud-big");
-        device.setColor(skin.getColor("blue"));
-        device.addListener(new OwnTextTooltip(glDevice, skin));
-        deviceGroup.addActor(device);
-        if (glDevice.length() != glDeviceShort.length()) {
-            OwnImageButton deviceTooltip = new OwnImageButton(skin, "tooltip");
-            deviceTooltip.addListener(new OwnTextTooltip(glDevice, skin));
-            deviceGroup.addActor(deviceTooltip);
-        }
-        add(deviceGroup).colspan(2).right().padBottom(pad05);
-        row();
 
         /* MINIMIZE/MAXIMIZE */
         extra = new Table(skin);
 
-        Link toggleSize = new Link(maximized ? "(-)" : "(+)", skin.get("link", Label.LabelStyle.class), null);
+        Link toggleSize = new Link(maximized ? "(-)" : "(+)", skin, null);
+        toggleSize.setColor(ColourUtils.gYellowC);
         toggleSize.addListener(new ClickListener() {
             public void clicked(InputEvent event, float x, float y) {
                 if (maximized) {
@@ -103,11 +89,28 @@ public class DebugInterface extends Table implements IObserver, IGuiInterface {
             }
         });
 
-        add(toggleSize).colspan(2).right().row();
+        add(toggleSize).colspan(2).padBottom(pad05).right().row();
         extraCell = add();
         if (maximized) {
             extraCell.setActor(extra);
         }
+
+        /* GRAPHICS DEVICE */
+        HorizontalGroup deviceGroup = new HorizontalGroup();
+        deviceGroup.space(pad05);
+        String glDevice = Gdx.gl.glGetString(GL20.GL_RENDERER);
+        String glDeviceShort = TextUtils.capString(glDevice, 30);
+        device = new OwnLabel(glDeviceShort, skin, "hud-big");
+        device.setColor(skin.getColor("blue"));
+        device.addListener(new OwnTextTooltip(glDevice, skin));
+        deviceGroup.addActor(device);
+        if (glDevice.length() != glDeviceShort.length()) {
+            OwnImageButton deviceTooltip = new OwnImageButton(skin, "tooltip");
+            deviceTooltip.addListener(new OwnTextTooltip(glDevice, skin));
+            deviceGroup.addActor(deviceTooltip);
+        }
+        extra.add(deviceGroup).colspan(2).right();
+        extra.row();
 
 
         /* RUNNING TIME */
