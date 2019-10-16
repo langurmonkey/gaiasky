@@ -143,6 +143,7 @@ public class AboutWindow extends GenericDialog {
         contentHelp.add(docsLink).align(Align.left).padBottom(pad * 4f);
         contentHelp.row();
         contentHelp.add(gaiaskyIcon).colspan(2).align(Align.center);
+        contentHelp.pack();
 
         /* CONTENT 2 - ABOUT */
         final Table contentAbout = new Table(skin);
@@ -152,33 +153,38 @@ public class AboutWindow extends GenericDialog {
         TextArea intro = new OwnTextArea(I18n.txt("gui.help.gscredits", GlobalConf.version.version), skin.get("regular", TextFieldStyle.class));
         intro.setDisabled(true);
         intro.setPrefRows(3);
-        intro.setWidth(taWidth + 100 * GlobalConf.UI_SCALE_FACTOR);
+        intro.setWidth(contentHelp.getWidth());
 
         // Home page
         Label homepagetitle = new OwnLabel(I18n.txt("gui.help.homepage"), skin);
         Link homepage = new Link(GlobalConf.WEBPAGE, linkStyle, GlobalConf.WEBPAGE);
 
+        // Twitter
+        Label twtitle = new OwnLabel(I18n.txt("gui.help.twitter"), skin);
+        Link tw = new Link("@GaiaSky_Dev", linkStyle, "https://twitter.com/GaiaSky_Dev");
+
         // Author
         Label authortitle = new OwnLabel(I18n.txt("gui.help.author"), skin);
 
-        VerticalGroup author = new VerticalGroup();
-        author.align(Align.left);
+        Table author = new Table(skin);
         Label authorname = new OwnLabel(GlobalConf.AUTHOR_NAME, skin);
         Link authormail = new Link(GlobalConf.AUTHOR_EMAIL, linkStyle, "mailto:" + GlobalConf.AUTHOR_EMAIL);
         Link authorpage = new Link("www.tonisagrista.com", linkStyle, "https://tonisagrista.com");
-        author.addActor(authorname);
-        author.addActor(authormail);
-        author.addActor(authorpage);
+        Link authortwitter = new Link("@jumpinglangur", linkStyle, "https://twitter.com/jumpinglangur");
+        author.add(authorname).left().row();
+        author.add(authormail).left().row();
+        author.add(authorpage).left().row();
+        author.add(authortwitter).left().row();
 
         // Contributor
         Label contribtitle = new OwnLabel(I18n.txt("gui.help.contributors"), skin);
 
-        VerticalGroup contrib = new VerticalGroup();
+        Table contrib = new Table(skin);
         contrib.align(Align.left);
         Label contribname = new OwnLabel("Apl. Prof. Dr. Stefan Jordan", skin);
         Link contribmail = new Link("jordan@ari.uni-heidelberg.de", linkStyle, "mailto:jordan@ari.uni-heidelberg.de");
-        contrib.addActor(contribname);
-        contrib.addActor(contribmail);
+        contrib.add(contribname).left().row();
+        contrib.add(contribmail).left().row();
 
         // License
         HorizontalGroup licenseh = new HorizontalGroup();
@@ -212,20 +218,23 @@ public class AboutWindow extends GenericDialog {
         thanks.addActor(bwt);
         thanks.addActor(dpac);
 
-        contentAbout.add(intro).colspan(2).align(Align.left).padTop(pad * 2f);
+        contentAbout.add(intro).colspan(2).left().padTop(pad * 2f);
         contentAbout.row();
-        contentAbout.add(homepagetitle).align(Align.topLeft).padRight(pad * 2f).padTop(pad * 2f);
-        contentAbout.add(homepage).align(Align.left).padTop(pad * 2f);
+        contentAbout.add(homepagetitle).left().padRight(pad * 2f).padTop(pad * 2f);
+        contentAbout.add(homepage).left().padTop(pad * 2f);
         contentAbout.row();
-        contentAbout.add(authortitle).align(Align.topLeft).padRight(pad).padTop(pad * 2f);
-        contentAbout.add(author).align(Align.left).padTop(pad5).padTop(pad * 2f);
+        contentAbout.add(twtitle).left().padRight(pad * 2f).padTop(pad * 2f);
+        contentAbout.add(tw).left().padTop(pad * 2f);
         contentAbout.row();
-        contentAbout.add(contribtitle).align(Align.topLeft).padRight(pad).padTop(pad * 2f);
-        contentAbout.add(contrib).align(Align.left).padTop(pad * 2f);
+        contentAbout.add(authortitle).left().padRight(pad).padTop(pad * 2f);
+        contentAbout.add(author).left().padTop(pad5).padTop(pad * 2f);
         contentAbout.row();
-        contentAbout.add(licenseh).colspan(2).align(Align.center).padTop(pad * 2f);
+        contentAbout.add(contribtitle).left().padRight(pad).padTop(pad * 2f);
+        contentAbout.add(contrib).left().padTop(pad * 2f);
         contentAbout.row();
-        contentAbout.add(thanksc).colspan(2).align(Align.center).padTop(pad * 4f);
+        contentAbout.add(licenseh).colspan(2).center().padTop(pad * 2f);
+        contentAbout.row();
+        contentAbout.add(thanksc).colspan(2).center().padTop(pad * 4f);
 
         /* CONTENT 3 - SYSTEM */
         final Table contentSystem = new Table(skin);
@@ -342,7 +351,8 @@ public class AboutWindow extends GenericDialog {
         glextensionsscroll.setFadeScrollBars(false);
         scrolls.add(glextensionsscroll);
 
-        contentSystem.add(buildinfo).colspan(2).align(Align.left).padTop(pad * 2f).padBottom(pad);
+        // BUILD
+        contentSystem.add(buildinfo).colspan(2).align(Align.left).padTop(pad * 2f).padBottom(pad5);
         contentSystem.row();
         contentSystem.add(versiontitle).align(Align.topLeft).padRight(pad);
         contentSystem.add(version).align(Align.left);
@@ -360,7 +370,8 @@ public class AboutWindow extends GenericDialog {
         contentSystem.add(system).align(Align.left).padTop(pad5);
         contentSystem.row();
 
-        contentSystem.add(paths).colspan(2).align(Align.left).padTop(pad * 2f).padBottom(pad);
+        // PATHS
+        contentSystem.add(paths).colspan(2).align(Align.left).padTop(pad * 2f).padBottom(pad5);
         contentSystem.row();
         contentSystem.add(configtitle).align(Align.topLeft).padRight(pad);
         contentSystem.add(config).align(Align.left);
@@ -384,7 +395,8 @@ public class AboutWindow extends GenericDialog {
         contentSystem.add(music).align(Align.left);
         contentSystem.row();
 
-        contentSystem.add(javainfo).colspan(2).align(Align.left).padTop(pad).padBottom(pad);
+        // JAVA
+        contentSystem.add(javainfo).colspan(2).align(Align.left).padTop(pad * 2f).padBottom(pad5);
         contentSystem.row();
         contentSystem.add(javaversiontitle).align(Align.topLeft).padRight(pad);
         contentSystem.add(javaversion).align(Align.left);
@@ -404,7 +416,8 @@ public class AboutWindow extends GenericDialog {
         contentSystem.add(memoryinfobutton).colspan(2).align(Align.left).padTop(pad);
         contentSystem.row();
 
-        contentSystem.add(sysinfo).colspan(2).align(Align.left).padTop(pad).padBottom(pad);
+        // SYSTEM
+        contentSystem.add(sysinfo).colspan(2).align(Align.left).padTop(pad * 2f).padBottom(pad5);
         contentSystem.row();
         try {
             SystemInfo si = new SystemInfo();
@@ -430,13 +443,12 @@ public class AboutWindow extends GenericDialog {
         contentSystem.add(sysostitle).align(Align.topLeft).padRight(pad);
         contentSystem.add(sysos).align(Align.left);
         contentSystem.row();
-
-        contentSystem.row();
-        contentSystem.add(glrenderertitle).align(Align.topLeft).padRight(pad).padTop(pad5);
+        contentSystem.add(glrenderertitle).align(Align.topLeft).padRight(pad).padTop(pad);
         contentSystem.add(glrenderer).align(Align.left).padTop(pad5);
         contentSystem.row();
 
-        contentSystem.add(glinfo).colspan(2).align(Align.left).padTop(pad).padBottom(pad);
+        // GL
+        contentSystem.add(glinfo).colspan(2).align(Align.left).padTop(pad * 2f).padBottom(pad5);
         contentSystem.row();
         contentSystem.add(glversiontitle).align(Align.topLeft).padRight(pad);
         contentSystem.add(glversion).align(Align.left);
@@ -494,7 +506,7 @@ public class AboutWindow extends GenericDialog {
             public void changed(ChangeEvent event, Actor actor) {
                 contentHelp.setVisible(tabHelp.isChecked());
                 contentAbout.setVisible(tabAbout.isChecked());
-                contentSystem.setVisible(tabSystem.isChecked());
+                systemScroll.setVisible(tabSystem.isChecked());
                 contentUpdates.setVisible(tabUpdates.isChecked());
             }
         };
