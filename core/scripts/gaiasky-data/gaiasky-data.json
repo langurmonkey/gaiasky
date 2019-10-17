@@ -237,7 +237,7 @@
         "tex/base/telescopebeam.png",
         "tex/skybox/gaiasky"
       ],
-      "sha256": "f7ceac7cbe506870e246cdd7285371ce9a535b92b2fe6e46437cac0067213762",
+      "sha256": "755e7ce24ee5ee0cf8aa5bf62f8828c80e9b1b5c63f95c4ea0f2c2aa8b49c508",
       "description": "Default data pack for Gaia Sky - For Gaia Sky 2.2.2 and above. Contains the Solar System, constellations, meshes and more",
       "file": "http://gaia.ari.uni-heidelberg.de/gaiasky/files/autodownload/basedata/005_20191004/gaiasky_data.tar.gz"
     },
