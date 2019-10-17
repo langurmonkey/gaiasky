@@ -74,9 +74,10 @@ public class ComponentTypes extends BitSet {
         Effects("icon-elem-effects"),
         Atmospheres("icon-elem-atmospheres"),
         Clouds("icon-elem-clouds"),
-        Others("icon-elem-others"),
+        Axes("icon-elem-axes"),
 
         VelocityVectors("icon-elem-arrows"),
+        Others("icon-elem-others"),
 
         // ALWAYS LAST
         Invisible(null);

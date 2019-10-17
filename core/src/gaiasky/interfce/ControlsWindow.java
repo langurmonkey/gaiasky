@@ -223,12 +223,12 @@ public class ControlsWindow extends CollapsibleWindow implements IObserver {
 
         Table buttonsTable;
         /** BUTTONS **/
-        Button preferences = new OwnTextIconButton("", skin, "preferences");
-        preferences.setName("preferences");
-        preferences.addListener(new OwnTextTooltip(I18n.txt("gui.preferences"), skin));
-        preferences.addListener(event -> {
+        Button map = new OwnTextIconButton("", skin, "map");
+        map.setName("map");
+        map.addListener(new OwnTextTooltip(I18n.txt("gui.map"), skin));
+        map.addListener(event -> {
             if (event instanceof ChangeEvent) {
-                EventManager.instance.post(Events.SHOW_PREFERENCES_ACTION);
+                EventManager.instance.post(Events.SHOW_MINIMAP_ACTION);
             }
             return false;
         });
@@ -238,6 +238,15 @@ public class ControlsWindow extends CollapsibleWindow implements IObserver {
         load.addListener(event -> {
             if (event instanceof ChangeEvent) {
                 EventManager.instance.post(Events.SHOW_LOAD_CATALOG_ACTION);
+            }
+            return false;
+        });
+        Button preferences = new OwnTextIconButton("", skin, "preferences");
+        preferences.setName("preferences");
+        preferences.addListener(new OwnTextTooltip(I18n.txt("gui.preferences"), skin));
+        preferences.addListener(event -> {
+            if (event instanceof ChangeEvent) {
+                EventManager.instance.post(Events.SHOW_PREFERENCES_ACTION);
             }
             return false;
         });
@@ -270,6 +279,7 @@ public class ControlsWindow extends CollapsibleWindow implements IObserver {
         });
 
         buttonsTable = new Table(skin);
+        buttonsTable.add(map).pad(1).top().left();
         buttonsTable.add(load).pad(1).top().left();
         buttonsTable.add(preferences).pad(1).top().left();
         buttonsTable.add(showLog).pad(1).top().left();

@@ -323,6 +323,9 @@
     "preferences": {
       "imageUp": "prefs-icon"
     },
+    "map": {
+      "imageUp": "map-icon"
+    },
     "load": {
       "imageUp": "open-icon"
     },

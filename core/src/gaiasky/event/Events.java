@@ -504,7 +504,6 @@ public enum Events {
      **/
     SHOW_QUIT_ACTION,
     SHOW_KEYFRAMES_WINDOW_ACTION,
-    SHOW_MINIMAP_WINDOW_ACTION,
     /**
      * Shows the camera path file selector, contains the stage and the skin
      **/
@@ -632,6 +631,10 @@ public enum Events {
      * Toggles minimap visibility
      **/
     TOGGLE_MINIMAP,
+    /**
+     * Shows the minimap window if it is not yet there
+     */
+    SHOW_MINIMAP_ACTION,
     /**
      * Sets the vertical scroll position. Contains the scroll position in pixels
      **/
