@@ -52,6 +52,11 @@ public class MilkyWayMinimapScale implements IMinimapScale {
     }
 
     @Override
+    public void update(){
+
+    }
+
+    @Override
     public boolean isActive(Vector3d campos) {
         return campos.len() > 50 * Constants.AU_TO_U;
     }

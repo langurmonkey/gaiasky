@@ -16,12 +16,14 @@ import com.badlogic.gdx.graphics.glutils.ShapeRenderer.ShapeType;
 import com.badlogic.gdx.math.Vector2;
 import gaiasky.GaiaSky;
 import gaiasky.interfce.IMinimapScale;
+import gaiasky.scenegraph.Planet;
 import gaiasky.scenegraph.camera.ICamera;
 import gaiasky.util.Constants;
 import gaiasky.util.GlobalConf;
 import gaiasky.util.I18n;
 import gaiasky.util.color.ColourUtils;
 import gaiasky.util.coord.Coordinates;
+import gaiasky.util.math.Matrix4d;
 import gaiasky.util.math.Vector2d;
 import gaiasky.util.math.Vector3d;
 
@@ -43,12 +45,55 @@ public class SolarSystemMinimapScale implements IMinimapScale {
     private Vector2d aux2d1, aux2d2;
     private Vector2 sunPos;
 
+    private Matrix4d trans;
+
+    private float[] camf, satf, uraf, nepf, plutf;
+    private Planet sat, ura, nep, plut;
+
     public SolarSystemMinimapScale() {
         super();
         aux3d1 = new Vector3d();
         aux3d2 = new Vector3d();
         aux2d1 = new Vector2d();
         aux2d2 = new Vector2d();
+        camf = new float[4];
+        satf = new float[4];
+        uraf = new float[4];
+        nepf = new float[4];
+        plutf = new float[4];
+        trans = Coordinates.eqToEcl();
+    }
+
+    @Override
+    public void update(){
+        if(sat == null){
+            sat = (Planet) GaiaSky.instance.sg.getNode("Saturn");
+            ura = (Planet) GaiaSky.instance.sg.getNode("Uranus");
+            nep = (Planet) GaiaSky.instance.sg.getNode("Neptune");
+            plut = (Planet) GaiaSky.instance.sg.getNode("Pluto");
+        }
+        project(sat.getAbsolutePosition(aux3d1), satf);
+        project(ura.getAbsolutePosition(aux3d1), uraf);
+        project(nep.getAbsolutePosition(aux3d1), nepf);
+        project(plut.getAbsolutePosition(aux3d1), plutf);
+        project(GaiaSky.instance.cam.getPos(), camf);
+    }
+
+    public float[] project(Vector3d pos, float[] out){
+        Vector3d p = aux3d1.set(pos).mul(trans);
+        Vector2d pos2d = aux2d1;
+        pos2d.set(p.z, p.y).scl(from);
+        float cx = ecl2Px(pos2d.x, side2);
+        float cy = ecl2Px(pos2d.y, sideshort2);
+        out[0] = cx;
+        out[1] = cy;
+
+        pos2d.set(p.x, p.z).scl(from);
+        cx = ecl2Px(pos2d.x, side2);
+        cy = ecl2Px(pos2d.y, side2);
+        out[2] = cx;
+        out[3] = cy;
+        return out;
     }
 
     @Override
@@ -88,20 +133,17 @@ public class SolarSystemMinimapScale implements IMinimapScale {
 
         ICamera cam = GaiaSky.instance.cam.current;
         // Position
-        Vector3d pos = aux3d1.set(cam.getPos()).mul(Coordinates.eqToEcl());
-        Vector2d campos2 = aux2d1;
-        campos2.set(pos.z, pos.y).scl(from);
-        float cx = ecl2Px(campos2.x, side2);
-        float cy = ecl2Px(campos2.y, sideshort2);
+        float cx = this.camf[0];
+        float cy = this.camf[1];
         // Direction
-        Vector3d dir = aux3d2.set(cam.getDirection()).mul(Coordinates.eqToEcl());
+        Vector3d dir = aux3d2.set(cam.getDirection()).mul(trans);
         Vector2d camdir2 = aux2d2.set(dir.z, dir.y).nor().scl(px(15f));
 
         sr.begin(ShapeType.Filled);
         float ycenter = ecl2Px(0, sideshort2);
         // Pluto orbit
         sr.setColor(0.3f, 1.0f, 0.3f, 1f);
-        sr.rectLine(ecl2Px(-49, side2), ycenter, ecl2Px(49, side2), ycenter, 2f);
+        sr.rectLine(ecl2Px(-40, side2), ycenter +  10, ecl2Px(40, side2), ycenter -25, 2f);
         // Neptune orbit
         sr.setColor(0.6f, 0.6f, 1.0f, 1f);
         sr.rectLine(ecl2Px(-30, side2), ycenter, ecl2Px(30, side2), ycenter, 2f);
@@ -111,7 +153,6 @@ public class SolarSystemMinimapScale implements IMinimapScale {
         // Saturn orbit
         sr.setColor(0.0f, 1.f, 1.f, 1f);
         sr.rectLine(ecl2Px(-9.2, side2), ycenter, ecl2Px(9.2, side2), ycenter, 2f);
-        //sr.ellipse(0, sideshort2 - side * 0.015f, side, side * 0.02f);
         // Sun
         sr.setColor(1f, 1f, 0f, 1f);
         sr.circle(ecl2Px(0, side2), ycenter, px(7f));
@@ -140,20 +181,16 @@ public class SolarSystemMinimapScale implements IMinimapScale {
         // Planet positions
         // Saturn
         sr.setColor(0f, 1f, 1f, 1f);
-        sr.circle(ecl2Px(-9.2, side2), ycenter, px(2.5f));
-        sr.circle(ecl2Px(9.2, side2), ycenter, px(2.5f));
+        sr.circle(satf[0], satf[1], px(3f));
         // Uranus
         sr.setColor(1f, 0.3f, 0.3f, 1f);
-        sr.circle(ecl2Px(-20.0, side2), ycenter, px(2.5f));
-        sr.circle(ecl2Px(20.0, side2), ycenter, px(2.5f));
+        sr.circle(uraf[0], uraf[1], px(3f));
         // Neptune
         sr.setColor(0.6f, 0.6f, 1f, 1f);
-        sr.circle(ecl2Px(-30.0, side2), ycenter, px(2.5f));
-        sr.circle(ecl2Px(30.0, side2), ycenter, px(2.5f));
-        // Neptune
+        sr.circle(nepf[0], nepf[1], px(3f));
+        // Pluto
         sr.setColor(0.3f, 1.0f, 0.3f, 1f);
-        sr.circle(ecl2Px(-49.0, side2), ycenter, px(2.5f));
-        sr.circle(ecl2Px(49.0, side2), ycenter, px(2.5f));
+        sr.circle(plutf[0], plutf[1], px(3f));
         sr.end();
 
         // Fonts
@@ -188,13 +225,10 @@ public class SolarSystemMinimapScale implements IMinimapScale {
 
         ICamera cam = GaiaSky.instance.cam.current;
         // Position
-        Vector3d pos = aux3d1.set(cam.getPos()).mul(Coordinates.eqToEcl());
-        Vector2d campos2 = aux2d1;
-        campos2.set(pos.x, pos.z).scl(from);
-        float cx = ecl2Px(campos2.x, side2);
-        float cy = ecl2Px(campos2.y, side2);
+        float cx = this.camf[2];
+        float cy = this.camf[3];
         // Direction
-        Vector3d dir = aux3d2.set(cam.getDirection()).mul(Coordinates.eqToEcl());
+        Vector3d dir = aux3d2.set(cam.getDirection()).mul(trans);
         Vector2d camdir2 = aux2d2.set(dir.x, dir.z).nor().scl(px(15f));
 
         sr.begin(ShapeType.Line);
@@ -211,11 +245,25 @@ public class SolarSystemMinimapScale implements IMinimapScale {
         sr.circle(side2, side2, (float) (30 / extent) * side2);
         // Pluto
         sr.setColor(0.4f, 1f, 0.4f, 1f);
-        sr.circle(side2, side2, (float) (49 / extent) * side2);
+        sr.circle(side2 + side2 / 6, side2 + side2 / 10, (float) (38 / extent) * side2);
         sr.end();
         Gdx.gl.glLineWidth(1f);
 
         sr.begin(ShapeType.Filled);
+        // Bodies
+        // Saturn
+        sr.setColor(0f, 1f, 1f, 1f);
+        sr.circle(satf[2], satf[3], px(3f));
+        // Uranus
+        sr.setColor(1f, 0.3f, 0.3f, 1f);
+        sr.circle(uraf[2], uraf[3], px(3f));
+        // Neptune
+        sr.setColor(0.6f, 0.6f, 1f, 1f);
+        sr.circle(nepf[2], nepf[3], px(3f));
+        // Pluto
+        sr.setColor(0.3f, 1.0f, 0.3f, 1f);
+        sr.circle(plutf[2], plutf[3], px(3f));
+
         // Camera
         sr.setColor(ColourUtils.gRedC);
         sr.circle(cx, cy, 8f);
@@ -227,7 +275,7 @@ public class SolarSystemMinimapScale implements IMinimapScale {
         endx.rotate(cam.getCamera().fieldOfView / 2d);
         sr.triangle(cx, cy, c1x, c1y, (float) endx.x + cx, (float) endx.y + cy);
 
-        // Camera span
+        // Camera viewport
         sr.setColor(1,1,1,0.1f);
         endx = aux2d1.set(camdir2.x, camdir2.y).scl(40f);
         endx.rotate(-cam.getCamera().fieldOfView / 2d);

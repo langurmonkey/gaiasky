@@ -81,10 +81,10 @@ public class MinimapWindow extends GenericDialog {
     protected void build() {
         float pb = 10 * GlobalConf.UI_SCALE_FACTOR;
         OwnLabel headerSide = new OwnLabel(I18n.txt("gui.minimap.side"), skin, "header");
-        Container<TextureWidget> mapSide = new Container<TextureWidget>();
+        Container<TextureWidget> mapSide = new Container<>();
         mapSide.setActor(sideProjection);
         OwnLabel headerTop = new OwnLabel(I18n.txt("gui.minimap.top"), skin, "header");
-        Container<TextureWidget> mapTop = new Container<TextureWidget>();
+        Container<TextureWidget> mapTop = new Container<>();
         mapTop.setActor(topProjection);
 
         content.add(headerSide).left().padBottom(pb).row();
@@ -107,6 +107,7 @@ public class MinimapWindow extends GenericDialog {
         super.act(delta);
         for (IMinimapScale mms : scales) {
             if (mms.isActive(GaiaSky.instance.cam.getPos())) {
+                mms.update();
                 mms.renderSideProjection(sfb);
                 mms.renderTopProjection(tfb);
                 break;

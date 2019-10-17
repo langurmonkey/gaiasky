@@ -15,6 +15,8 @@ import gaiasky.util.math.Vector3d;
 public interface IMinimapScale {
     boolean isActive(Vector3d campos);
 
+    void update();
+
     void initialize(OrthographicCamera ortho, SpriteBatch sb, ShapeRenderer sr, BitmapFont font, int side, int sideshort);
 
     void renderSideProjection(FrameBuffer fb);
