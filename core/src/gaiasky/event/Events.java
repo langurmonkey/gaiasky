@@ -502,7 +502,7 @@ public enum Events {
     /**
      * Quit action, can contain optional Runnable to run on accept()
      **/
-    QUIT_ACTION,
+    SHOW_QUIT_ACTION,
     SHOW_KEYFRAMES_WINDOW_ACTION,
     SHOW_MINIMAP_WINDOW_ACTION,
     /**
@@ -1124,7 +1124,7 @@ public enum Events {
     CATALOG_VISIBLE,
 
     /**
-     * Highlight the catalog. Contains the dataset name, the highlight status (bool), the color index (negative for automatic) and an optional boolean if it comes from the UI
+     * Highlight the catalog. Contains the dataset name, the highlight status (bool), the color as a float[] (null to use current) and an optional boolean if it comes from the UI
      */
     CATALOG_HIGHLIGHT,
 

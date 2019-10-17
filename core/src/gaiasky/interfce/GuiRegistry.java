@@ -239,7 +239,7 @@ public class GuiRegistry implements IObserver {
         super();
         this.skin = skin;
         // Windows which are visible from any GUI
-        EventManager.instance.subscribe(this, Events.QUIT_ACTION, Events.SHOW_ABOUT_ACTION, Events.SHOW_LOAD_CATALOG_ACTION, Events.SHOW_PREFERENCES_ACTION, Events.SHOW_KEYFRAMES_WINDOW_ACTION, Events.UI_THEME_RELOAD_INFO, Events.TOGGLE_MINIMAP, Events.MODE_POPUP_CMD, Events.DISPLAY_GUI_CMD, Events.CAMERA_MODE_CMD, Events.UI_RELOAD_CMD);
+        EventManager.instance.subscribe(this, Events.SHOW_QUIT_ACTION, Events.SHOW_ABOUT_ACTION, Events.SHOW_LOAD_CATALOG_ACTION, Events.SHOW_PREFERENCES_ACTION, Events.SHOW_KEYFRAMES_WINDOW_ACTION, Events.UI_THEME_RELOAD_INFO, Events.TOGGLE_MINIMAP, Events.MODE_POPUP_CMD, Events.DISPLAY_GUI_CMD, Events.CAMERA_MODE_CMD, Events.UI_RELOAD_CMD);
     }
 
     public void dispose() {
@@ -252,7 +252,7 @@ public class GuiRegistry implements IObserver {
             Stage ui = current.getGuiStage();
             // Treats windows that can appear in any GUI
             switch (event) {
-            case QUIT_ACTION:
+            case SHOW_QUIT_ACTION:
                 if (!removeModeChangePopup()) {
                     if (GLFW.glfwGetInputMode(((Lwjgl3Graphics) Gdx.graphics).getWindow().getWindowHandle(), GLFW.GLFW_CURSOR) == GLFW.GLFW_CURSOR_DISABLED) {
                         // Release mouse if captured

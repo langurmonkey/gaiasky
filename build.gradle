@@ -121,7 +121,7 @@ project(":core") {
         // *****************************
         // GENERATE SKINS (PackTextures)
         // *****************************
-        //compile "com.badlogicgames.gdx:gdx-tools:$gdxVersion"
+        compile "com.badlogicgames.gdx:gdx-tools:$gdxVersion"
 
 
         // ************

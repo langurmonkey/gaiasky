@@ -181,7 +181,7 @@ public class KeyBindings {
         // show quit
         final Runnable runnableQuit = () -> {
             // Quit action
-            EventManager.instance.post(Events.QUIT_ACTION);
+            EventManager.instance.post(Events.SHOW_QUIT_ACTION);
         };
 
         // run quit action

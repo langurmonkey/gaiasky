@@ -241,15 +241,6 @@ public class ControlsWindow extends CollapsibleWindow implements IObserver {
             }
             return false;
         });
-        Button about = new OwnTextIconButton("", skin, "help");
-        about.setName("about");
-        about.addListener(new OwnTextTooltip(I18n.txt("gui.help"), skin));
-        about.addListener(event -> {
-            if (event instanceof ChangeEvent) {
-                EventManager.instance.post(Events.SHOW_ABOUT_ACTION);
-            }
-            return false;
-        });
         Button showLog = new OwnTextIconButton("", skin, "log");
         showLog.setName("show log");
         showLog.addListener(new OwnTextTooltip(I18n.txt("gui.tooltip.log"), skin));
@@ -259,12 +250,31 @@ public class ControlsWindow extends CollapsibleWindow implements IObserver {
             }
             return false;
         });
+        Button about = new OwnTextIconButton("", skin, "help");
+        about.setName("about");
+        about.addListener(new OwnTextTooltip(I18n.txt("gui.help"), skin));
+        about.addListener(event -> {
+            if (event instanceof ChangeEvent) {
+                EventManager.instance.post(Events.SHOW_ABOUT_ACTION);
+            }
+            return false;
+        });
+        Button quit = new OwnTextIconButton("", skin, "quit");
+        quit.setName("quit");
+        quit.addListener(new OwnTextTooltip(I18n.txt("gui.quit.title"), skin));
+        quit.addListener(event -> {
+            if (event instanceof ChangeEvent) {
+                EventManager.instance.post(Events.SHOW_QUIT_ACTION);
+            }
+            return false;
+        });
 
         buttonsTable = new Table(skin);
         buttonsTable.add(load).pad(1).top().left();
         buttonsTable.add(preferences).pad(1).top().left();
         buttonsTable.add(showLog).pad(1).top().left();
         buttonsTable.add(about).pad(1).top().left();
+        buttonsTable.add(quit).pad(1).top().left();
 
         buttonsTable.pack();
 

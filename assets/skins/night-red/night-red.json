@@ -331,6 +331,9 @@
     "help": {
       "imageUp": "help-icon"
     },
+    "quit": {
+      "imageUp": "quit-icon"
+    },
     "car": {
       "imageUp": "car-icon"
     },
@@ -951,10 +954,10 @@
   },
   "gaiasky.util.scene2d.ContextMenu$ContextMenuStyle": {
     "noborder": {
-      "background": "button"
+      "background": "button-dark"
     },
     "default": {
-      "background": "button",
+      "background": "button-dark",
       "border": "border"
     }
   },
@@ -972,7 +975,7 @@
     "default": {
       "subMenu": "sub-menu",
       "down": "button-down",
-      "up": "button",
+      "up": "button-dark",
       "over": "button-over",
       "disabled": "button",
       "font": "ui-11",
@@ -982,7 +985,7 @@
     "toggle": {
       "checked": "button-down",
       "down": "button-down",
-      "up": "button",
+      "up": "button-dark",
       "font": "ui-11",
       "fontColor": "red",
       "over": "button-over",
