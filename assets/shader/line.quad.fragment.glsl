@@ -10,7 +10,9 @@ in vec2 v_uv;
 
 layout (location = 0) out vec4 fragColor;
 
+#ifdef velocityBufferFlag
 #include shader/lib_velbuffer.frag.glsl
+#endif
 
 #define PI 3.14159
 
@@ -26,5 +28,8 @@ void main() {
     fragColor = vec4(v_col.rgb + cplus, 1.0) * v_col.a * alpha ;
 
     gl_FragDepth = getDepthValue(u_zfar, u_k);
+
+    #ifdef velocityBufferFlag
     velocityBuffer(alpha);
+    #endif
 }

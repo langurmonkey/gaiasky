@@ -92,12 +92,14 @@ public class Axes extends AbstractPositionEntity implements ILineRenderable {
 
     @Override
     public void render(LineRenderSystem renderer, ICamera camera, float alpha) {
-        // X
-        renderer.addLine(this, o.x, o.y, o.z, x.x, x.y, x.z, axesColors[0][0], axesColors[0][1], axesColors[0][2], alpha);
-        // Y
-        renderer.addLine(this, o.x, o.y, o.z, y.x, y.y, y.z, axesColors[1][0], axesColors[1][1], axesColors[1][2], alpha);
-        // Z
-        renderer.addLine(this, o.x, o.y, o.z, z.x, z.y, z.z, axesColors[2][0], axesColors[2][1], axesColors[2][2], alpha);
+        if(alpha > 0) {
+            // X
+            renderer.addLine(this, o.x, o.y, o.z, x.x, x.y, x.z, axesColors[0][0], axesColors[0][1], axesColors[0][2], alpha);
+            // Y
+            renderer.addLine(this, o.x, o.y, o.z, y.x, y.y, y.z, axesColors[1][0], axesColors[1][1], axesColors[1][2], alpha);
+            // Z
+            renderer.addLine(this, o.x, o.y, o.z, z.x, z.y, z.z, axesColors[2][0], axesColors[2][1], axesColors[2][2], alpha);
+        }
     }
 
     public float getLineWidth(){

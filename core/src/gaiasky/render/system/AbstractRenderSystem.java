@@ -179,13 +179,19 @@ public abstract class AbstractRenderSystem implements IRenderSystem {
      */
     protected void addPreviousFrameUniforms(ExtShaderProgram shaderProgram, ICamera camera) {
         // Velocity buffer
-        shaderProgram.setUniformf("u_prevCamPos", camera.getPreviousPos().put(aux));
-        shaderProgram.setUniformf("u_dCamPos", auxd.set(camera.getPreviousPos()).sub(camera.getPos()).put(aux));
-        shaderProgram.setUniformMatrix("u_prevProjView", camera.getPreviousProjView());
+        if(GlobalConf.postprocess.POSTPROCESS_MOTION_BLUR) {
+            shaderProgram.setUniformf("u_prevCamPos", camera.getPreviousPos().put(aux));
+            shaderProgram.setUniformf("u_dCamPos", auxd.set(camera.getPreviousPos()).sub(camera.getPos()).put(aux));
+            shaderProgram.setUniformMatrix("u_prevProjView", camera.getPreviousProjView());
+        }
     }
 
     protected ExtShaderProgram getShaderProgram() {
         try {
+            if (!GlobalConf.postprocess.POSTPROCESS_MOTION_BLUR && !GlobalConf.runtime.RELATIVISTIC_ABERRATION && !GlobalConf.runtime.GRAVITATIONAL_WAVES)
+                //return programs[0];
+                // TODO this is a hack till I narrow down the bug, for the moment, velocity map always computed
+                return programs[1];
             if (GlobalConf.postprocess.POSTPROCESS_MOTION_BLUR && !GlobalConf.runtime.RELATIVISTIC_ABERRATION && !GlobalConf.runtime.GRAVITATIONAL_WAVES)
                 return programs[1];
             else if (!GlobalConf.postprocess.POSTPROCESS_MOTION_BLUR && GlobalConf.runtime.RELATIVISTIC_ABERRATION && !GlobalConf.runtime.GRAVITATIONAL_WAVES)
@@ -202,7 +208,7 @@ public abstract class AbstractRenderSystem implements IRenderSystem {
                 return programs[7];
         } catch (Exception e) {
         }
-        return programs[0];
+        return programs[1];
     }
 
 }

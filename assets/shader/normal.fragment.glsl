@@ -332,7 +332,10 @@ mat3 cotangentFrame(vec3 N, vec3 p, vec2 uv){
 
 #include shader/lib_atmfog.glsl
 #include shader/lib_logdepthbuff.glsl
+
+#ifdef velocityBufferFlag
 #include shader/lib_velbuffer.frag.glsl
+#endif
 
 void main() {
     vec2 texCoords = v_texCoord0;
@@ -414,5 +417,8 @@ void main() {
     }
     // Logarithmic depth buffer
     gl_FragDepth = getDepthValue(u_cameraNearFar.y, u_cameraK);
+
+    #ifdef velocityBufferFlag
     velocityBuffer();
+    #endif
 }

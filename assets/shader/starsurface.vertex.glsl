@@ -31,8 +31,8 @@ in vec2 a_texCoord0;
 out vec2 v_texCoords0;
 #endif // textureFlag
 
-
 uniform mat4 u_worldTrans;
+uniform float u_vrScale;
 
 #ifdef shininessFlag
 uniform float u_shininess;
@@ -118,11 +118,8 @@ out vec3 v_ambientLight;
 //////////RELATIVISTIC EFFECTS - VERTEX
 ////////////////////////////////////////////////////////////////////////////////////
 #ifdef relativisticEffects
-    uniform float u_vc; // v/c
-    uniform vec3 u_velDir; // Camera velocity direction
-
-    #include shader/lib_geometry.glsl
-    #include shader/lib_relativity.glsl
+#include shader/lib_geometry.glsl
+#include shader/lib_relativity.glsl
 #endif // relativisticEffects
 
 
@@ -130,16 +127,14 @@ out vec3 v_ambientLight;
 //////////GRAVITATIONAL WAVES - VERTEX
 ////////////////////////////////////////////////////////////////////////////////////
 #ifdef gravitationalWaves
-    uniform vec4 u_hterms; // hpluscos, hplussin, htimescos, htimessin
-    uniform vec3 u_gw; // Location of gravitational wave, cartesian
-    uniform mat3 u_gwmat3; // Rotation matrix so that u_gw = u_gw_mat * (0 0 1)^T
-    uniform float u_ts; // Time in seconds since start
-    uniform float u_omgw; // Wave frequency
-    #include shader/lib_gravwaves.glsl
+#include shader/lib_gravwaves.glsl
 #endif // gravitationalWaves
 
 out float v_depth;
+
+#ifdef velocityBufferFlag
 #include shader/lib_velbuffer.vert.glsl
+#endif
 
 void main() {
 	v_time = u_shininess;
@@ -171,7 +166,9 @@ void main() {
 	vec4 gpos = u_projViewTrans * pos;
 	gl_Position = gpos;
 
+	#ifdef velocityBufferFlag
 	velocityBufferCam(gpos, pos);
+    #endif
 
 	#ifdef shadowMapFlag
 		vec4 spos = u_shadowMapProjViewTrans * pos;

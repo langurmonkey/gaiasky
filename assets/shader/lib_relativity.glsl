@@ -1,5 +1,6 @@
-
-// This needs lib_geometry to be included in main file	
+uniform vec3 u_velDir;// Velocity vector
+uniform float u_vc;// Fraction of the speed of light, v/c
+// This needs lib_geometry to be included in main file
 vec3 computeRelativisticAberration(vec3 pos, float poslen, vec3 veldir, float vc) { 	
 	// Relativistic aberration
     // Current cosine of angle cos(th_s)

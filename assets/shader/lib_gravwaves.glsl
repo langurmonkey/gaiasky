@@ -1,4 +1,9 @@
-// Computes 
+uniform vec4 u_hterms; // hpluscos, hplussin, htimescos, htimessin
+uniform vec3 u_gw; // Location of gravitational wave, cartesian
+uniform mat3 u_gwmat3; // Rotation matrix so that u_gw = u_gw_mat * (0 0 1)^T
+uniform float u_ts; // Time in seconds since start
+uniform float u_omgw; // Wave frequency
+// Computes
 vec3 computeGravitationalWaves(vec3 pos, vec3 gw, mat3 gwmat3, float t, float omgw, vec4 hterms) {
     float hpluscos = hterms.x;
     float hplussin = hterms.y;

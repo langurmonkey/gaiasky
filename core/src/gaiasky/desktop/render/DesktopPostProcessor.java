@@ -533,7 +533,6 @@ public class DesktopPostProcessor implements IPostProcessor, IObserver {
             }
             break;
         case MOTION_BLUR_CMD:
-            Gdx.app.postRunnable(() -> {
                 boolean enabled = (boolean) data[0];
                 for (int i = 0; i < RenderType.values().length; i++) {
                     if (pps[i] != null) {
@@ -541,11 +540,10 @@ public class DesktopPostProcessor implements IPostProcessor, IObserver {
                         ppb.camblur.setEnabled(enabled);
                     }
                 }
-            });
             break;
         case CUBEMAP360_CMD:
             boolean c360 = (Boolean) data[0];
-            boolean enabled = !c360 && GlobalConf.postprocess.POSTPROCESS_MOTION_BLUR;
+            enabled = !c360 && GlobalConf.postprocess.POSTPROCESS_MOTION_BLUR;
             for (int i = 0; i < RenderType.values().length; i++) {
                 if (pps[i] != null) {
                     PostProcessBean ppb = pps[i];

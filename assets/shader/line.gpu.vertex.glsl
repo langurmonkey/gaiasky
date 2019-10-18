@@ -7,27 +7,22 @@ uniform mat4 u_worldTransform;
 uniform mat4 u_projView;
 uniform vec3 u_parentPos;
 uniform float u_pointSize;
+uniform float u_vrScale;
 
 out vec4 v_col;
 
 #ifdef relativisticEffects
-uniform vec3 u_velDir;// Velocity vector
-uniform float u_vc;// Fraction of the speed of light, v/c
-
 #include shader/lib_geometry.glsl
 #include shader/lib_relativity.glsl
 #endif// relativisticEffects
 
 #ifdef gravitationalWaves
-uniform vec4 u_hterms;// hpluscos, hplussin, htimescos, htimessin
-uniform vec3 u_gw;// Location of gravitational wave, cartesian
-uniform mat3 u_gwmat3;// Rotation matrix so that u_gw = u_gw_mat * (0 0 1)^T
-uniform float u_ts;// Time in seconds since start
-uniform float u_omgw;// Wave frequency
 #include shader/lib_gravwaves.glsl
 #endif// gravitationalWaves
 
+#ifdef velocityBufferFlag
 #include shader/lib_velbuffer.vert.glsl
+#endif
 
 void main() {
     vec4 pos = a_position;
@@ -50,5 +45,7 @@ void main() {
     vec4 gpos = u_projView * pos;
     gl_Position = gpos;
 
+    #ifdef velocityBufferFlag
     velocityBufferCam(gpos, pos);
+    #endif
 }

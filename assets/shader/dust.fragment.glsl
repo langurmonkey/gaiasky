@@ -19,7 +19,9 @@ in vec3 v_viewDir;
 
 layout (location = 0) out vec4 fragColor;
 
+#ifdef velocityBufferFlag
 #include shader/lib_velbuffer.frag.glsl
+#endif
 
 void main() {
     vec4 diffuse = u_diffuseColor;
@@ -43,6 +45,9 @@ void main() {
         discard;
     } else {
         gl_FragDepth = getDepthValue(u_cameraNearFar.y, u_cameraK);
+
+        #ifdef velocityBufferFlag
         velocityBuffer();
+        #endif
     }
 }

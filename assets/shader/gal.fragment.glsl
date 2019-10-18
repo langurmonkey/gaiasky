@@ -18,7 +18,9 @@ layout (location = 0) out vec4 fragColor;
 #define light_decay 0.3
 #define PI 3.1415927
 
+#ifdef velocityBufferFlag
 #include shader/lib_velbuffer.frag.glsl
+#endif
 
 vec4 galaxyTexture(vec2 tc){
 	return texture(u_texture0, tc);
@@ -40,5 +42,8 @@ vec4 drawSimple(vec2 tc) {
 
 void main() {
 	fragColor = drawSimple(v_texCoords) * u_alpha;
+
+	#ifdef velocityBufferFlag
 	velocityBuffer(fragColor.a);
+    #endif
 }

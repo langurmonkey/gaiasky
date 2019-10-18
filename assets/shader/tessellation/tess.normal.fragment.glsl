@@ -223,7 +223,10 @@ layout (location = 0) out vec4 fragColor;
 
 #include shader/lib_atmfog.glsl
 #include shader/lib_logdepthbuff.glsl
+
+#ifdef velocityBufferFlag
 #include shader/lib_velbuffer.frag.glsl
+#endif
 
 // MAIN
 void main() {
@@ -280,6 +283,9 @@ void main() {
 
     // Logarithmic depth buffer
     gl_FragDepth = getDepthValue(u_cameraNearFar.y, u_cameraK);
+
+    #ifdef velocityBufferFlag
     velocityBuffer();
+    #endif
 }
 

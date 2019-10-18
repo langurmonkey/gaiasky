@@ -482,8 +482,6 @@ public class ModelComponent implements Disposable, IObserver {
         }
     }
 
-
-
     public void updateRelativisticEffects(ICamera camera) {
         updateRelativisticEffects(camera, -1);
     }

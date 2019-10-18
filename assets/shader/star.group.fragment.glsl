@@ -13,7 +13,9 @@ in vec4 v_col;
 // OUTPUT
 layout (location = 0) out vec4 fragColor;
 
+#ifdef velocityBufferFlag
 #include shader/lib_velbuffer.frag.glsl
+#endif
 
 float programmatic(vec2 uv) {
     float dist_center = 1.0 - clamp(distance(vec2(0.5, 0.5 * u_ar), uv) * 2.0, 0.0, 1.0);
@@ -32,5 +34,8 @@ void main() {
 
     fragColor = v_col * alpha;
     gl_FragDepth = getDepthValue(u_zfar, u_k);
+
+    #ifdef velocityBufferFlag
     velocityBuffer();
+    #endif
 }

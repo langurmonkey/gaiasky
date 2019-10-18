@@ -13,7 +13,9 @@ layout (location = 0) out vec4 fragColor;
 
 #define PI 3.1415927
 
+#ifdef velocityBufferFlag
 #include shader/lib_velbuffer.frag.glsl
+#endif
 
 float programmatic(float dist) {
     return 1.0 - pow(abs(sin(PI * dist / 2.0)), u_falloff);
@@ -30,5 +32,8 @@ void main() {
 
     fragColor = vec4(v_col.rgb * profile, 1.0) * v_col.a;
     gl_FragDepth = getDepthValue(u_zfar, u_k);
+
+    #ifdef velocityBufferFlag
     velocityBuffer(profile);
+    #endif
 }

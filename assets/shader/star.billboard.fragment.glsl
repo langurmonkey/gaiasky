@@ -33,7 +33,9 @@ layout (location = 0) out vec4 fragColor;
 #define corona_decay 0.2
 #define light_decay 0.05
 
+#ifdef velocityBufferFlag
 #include shader/lib_velbuffer.frag.glsl
+#endif
 
 float core(float distance_center, float inner_rad){
     if(inner_rad == 0.0){
@@ -103,5 +105,8 @@ void main() {
     fragColor = clamp(draw(), 0.0, 0.999);
     // Logarithmic depth buffer
     gl_FragDepth = getDepthValue(u_zfar, u_k);
+
+    #ifdef velocityBufferFlag
     velocityBuffer(fragColor.a);
+    #endif
 }

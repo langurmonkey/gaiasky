@@ -125,9 +125,6 @@ out vec3 v_shadowMapUv;
 //////////RELATIVISTIC EFFECTS - VERTEX
 ////////////////////////////////////////////////////////////////////////////////////
 #ifdef relativisticEffects
-    uniform float u_vc; // v/c
-    uniform vec3 u_velDir; // Camera velocity direction
-
     #include shader/lib_geometry.glsl
     #include shader/lib_relativity.glsl
 #endif // relativisticEffects
@@ -137,11 +134,6 @@ out vec3 v_shadowMapUv;
 //////////GRAVITATIONAL WAVES - VERTEX
 ////////////////////////////////////////////////////////////////////////////////////
 #ifdef gravitationalWaves
-    uniform vec4 u_hterms; // hpluscos, hplussin, htimescos, htimessin
-    uniform vec3 u_gw; // Location of gravitational wave, cartesian
-    uniform mat3 u_gwmat3; // Rotation matrix so that u_gw = u_gw_mat * (0 0 1)^T
-    uniform float u_ts; // Time in seconds since start
-    uniform float u_omgw; // Wave frequency
     #include shader/lib_gravwaves.glsl
 #endif // gravitationalWaves
 
@@ -149,6 +141,7 @@ out vec3 v_shadowMapUv;
 uniform mat4 u_projViewTrans;
 uniform mat4 u_worldTrans;
 uniform mat3 u_normalMatrix;
+uniform float u_vrScale;
 
 // Other uniforms
 out float v_opacity;
@@ -301,7 +294,9 @@ out vec3 v_fragPosWorld;
 out vec3 v_reflect;
 #endif
 
+#ifdef velocityBufferFlag
 #include shader/lib_velbuffer.vert.glsl
+#endif
 
 void main() {
     computeAtmosphericScatteringGround();
@@ -323,8 +318,9 @@ void main() {
     vec4 gpos = u_projViewTrans * pos;
     gl_Position = gpos;
 
-    // Velocity buffer
+    #ifdef velocityBufferFlag
     velocityBufferCam(gpos, pos);
+    #endif
 
     #ifdef shadowMapFlag
 	vec4 spos = u_shadowMapProjViewTrans * pos;
