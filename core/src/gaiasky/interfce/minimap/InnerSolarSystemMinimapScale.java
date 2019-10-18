@@ -23,46 +23,46 @@ import gaiasky.util.coord.Coordinates;
 import gaiasky.util.math.Vector2d;
 import gaiasky.util.math.Vector3d;
 
-public class OuterSolarSystemMinimapScale extends AbstractMinimapScale {
+public class InnerSolarSystemMinimapScale extends AbstractMinimapScale {
 
-    private float[] camf, satf, uraf, nepf, jupf;
-    private Planet sat, ura, nep, jup;
-    private Color jupc, satc, nepc, urac, sunc;
+    private float[] camf, merf, venf, earf, marf;
+    private Planet mer, ven, ear, mar;
+    private Color merc, venc, marc, earc, sunc;
 
-    public OuterSolarSystemMinimapScale() {
+    public InnerSolarSystemMinimapScale() {
         super();
         camf = new float[4];
-        satf = new float[4];
-        uraf = new float[4];
-        nepf = new float[4];
-        jupf = new float[4];
+        merf = new float[4];
+        venf = new float[4];
+        earf = new float[4];
+        marf = new float[4];
 
-        jupc = new Color(0.4f, 0.8f, 1f, 1f);
-        satc = new Color(1f, 1f, 0.4f, 1f);
-        urac = new Color(0.3f, 0.4f, 1f, 1f);
-        nepc = new Color(0.8f, 0.2f, 1f, 1f);
+        merc = new Color(0.4f, 0.5f, 0.4f, 1f);
+        venc = new Color(1f, 0.6f, 0.1f, 1f);
+        earc = new Color(0.4f, 0.4f, 1f, 1f);
+        marc = new Color(0.8f, 0.2f, 0.2f, 1f);
         sunc = new Color(1f, 1f, 0.4f, 1f);
     }
 
     @Override
     public void update(){
-        if(sat == null){
-            sat = (Planet) GaiaSky.instance.sg.getNode("Saturn");
-            ura = (Planet) GaiaSky.instance.sg.getNode("Uranus");
-            nep = (Planet) GaiaSky.instance.sg.getNode("Neptune");
-            jup = (Planet) GaiaSky.instance.sg.getNode("Jupiter");
+        if(mer == null){
+            mer = (Planet) GaiaSky.instance.sg.getNode("Mercury");
+            ven = (Planet) GaiaSky.instance.sg.getNode("Venus");
+            ear = (Planet) GaiaSky.instance.sg.getNode("Earth");
+            mar = (Planet) GaiaSky.instance.sg.getNode("Mars");
         }
-        project(sat.getAbsolutePosition(aux3d1), satf);
-        project(ura.getAbsolutePosition(aux3d1), uraf);
-        project(nep.getAbsolutePosition(aux3d1), nepf);
-        project(jup.getAbsolutePosition(aux3d1), jupf);
+        project(mer.getAbsolutePosition(aux3d1), merf);
+        project(ven.getAbsolutePosition(aux3d1), venf);
+        project(ear.getAbsolutePosition(aux3d1), earf);
+        project(mar.getAbsolutePosition(aux3d1), marf);
         project(GaiaSky.instance.cam.getPos(), camf);
     }
 
 
     @Override
     public void initialize(OrthographicCamera ortho, SpriteBatch sb, ShapeRenderer sr, BitmapFont font, int side, int sideshort) {
-        super.initialize(ortho, sb, sr, font, side, sideshort, Constants.AU_TO_U, Constants.U_TO_AU, 50, 2.2);
+        super.initialize(ortho, sb, sr, font, side, sideshort, Constants.AU_TO_U, Constants.U_TO_AU, 2.2, 0);
         trans = Coordinates.eqToEcl();
     }
 
@@ -88,36 +88,36 @@ public class OuterSolarSystemMinimapScale extends AbstractMinimapScale {
 
         sr.begin(ShapeType.Filled);
         float ycenter = u2Px(0, sideshort2);
-        // Neptune orbit
-        sr.setColor(nepc);
-        sr.rectLine(u2Px(-30, side2), ycenter, u2Px(30, side2), ycenter, 2f);
-        // Uranus orbit
-        sr.setColor(urac);
-        sr.rectLine(u2Px(-20, side2), ycenter, u2Px(20, side2), ycenter, 2f);
-        // Saturn orbit
-        sr.setColor(satc);
-        sr.rectLine(u2Px(-9.2, side2), ycenter, u2Px(9.2, side2), ycenter, 2f);
-        // Jupiter orbit
-        sr.setColor(jupc);
-        sr.rectLine(u2Px(-5.4, side2), ycenter, u2Px(5.4, side2), ycenter, 2f);
+        // Mars orbit
+        sr.setColor(marc);
+        sr.rectLine(u2Px(-1.6, side2), ycenter, u2Px(1.6, side2), ycenter, 2f);
+        // Earth orbit
+        sr.setColor(earc);
+        sr.rectLine(u2Px(-1, side2), ycenter, u2Px(1, side2), ycenter, 2f);
+        // Venus orbit
+        sr.setColor(venc);
+        sr.rectLine(u2Px(-0.71, side2), ycenter, u2Px(0.71, side2), ycenter, 2f);
+        // Mercury orbit
+        sr.setColor(merc);
+        sr.rectLine(u2Px(-0.45, side2), ycenter, u2Px(0.45, side2), ycenter, 2f);
         // Sun
         sr.setColor(sunc);
         sr.circle(u2Px(0, side2), ycenter, px(5f));
 
 
         // Planet positions
-        // Jupiter
-        sr.setColor(jupc);
-        sr.circle(jupf[0], jupf[1], px(3f));
-        // Saturn
-        sr.setColor(satc);
-        sr.circle(satf[0], satf[1], px(3f));
-        // Uranus
-        sr.setColor(urac);
-        sr.circle(uraf[0], uraf[1], px(3f));
-        // Neptune
-        sr.setColor(nepc);
-        sr.circle(nepf[0], nepf[1], px(3f));
+        // Mercury
+        sr.setColor(merc);
+        sr.circle(merf[0], merf[1], px(3f));
+        // Venus
+        sr.setColor(venc);
+        sr.circle(venf[0], venf[1], px(3f));
+        // Earth
+        sr.setColor(earc);
+        sr.circle(earf[0], earf[1], px(3f));
+        // Mars
+        sr.setColor(marc);
+        sr.circle(marf[0], marf[1], px(3f));
 
         // Camera
         sr.setColor(camc);
@@ -131,7 +131,7 @@ public class OuterSolarSystemMinimapScale extends AbstractMinimapScale {
         sr.triangle(cx, cy, c1x, c1y, (float) endx.x + cx, (float) endx.y + cy);
 
         // Camera viewport
-        sr.setColor(1,1,1,0.4f);
+        sr.setColor(1,1,1,.4f);
         endx = aux2d1.set(camdir2.x, camdir2.y).scl(40f);
         endx.rotate(-cam.getCamera().fieldOfView / 2d);
         c1x = (float) endx.x + cx;
@@ -143,14 +143,14 @@ public class OuterSolarSystemMinimapScale extends AbstractMinimapScale {
 
         // Fonts
         sb.begin();
-        font.setColor(jupc);
-        font.draw(sb, I18n.txt("gui.minimap.jupiter"), jupf[0] - px(20),  jupf[1] - px(10));
-        font.setColor(satc);
-        font.draw(sb, I18n.txt("gui.minimap.saturn"), satf[0] - px(20),  satf[1] + px(25));
-        font.setColor(urac);
-        font.draw(sb, I18n.txt("gui.minimap.uranus"), uraf[0] - px(20), uraf[1] - px(25));
-        font.setColor(nepc);
-        font.draw(sb, I18n.txt("gui.minimap.neptune"), nepf[0] - px(20), nepf[1] + px(40));
+        font.setColor(merc);
+        font.draw(sb, I18n.txt("gui.minimap.mercury"), merf[0] - px(20),  merf[1] + px(25));
+        font.setColor(venc);
+        font.draw(sb, I18n.txt("gui.minimap.venus"), venf[0] - px(20), venf[1] - px(25));
+        font.setColor(earc);
+        font.draw(sb, I18n.txt("gui.minimap.earth"), earf[0] - px(20), earf[1] + px(40));
+        font.setColor(marc);
+        font.draw(sb, I18n.txt("gui.minimap.mars"), marf[0] - px(20),  marf[1] - px(10));
         font.setColor(sunc);
         font.draw(sb, I18n.txt("gui.minimap.sun"), side2 + px(8), u2Px(10, sideshort2) - px(2));
         sb.end();
@@ -181,39 +181,39 @@ public class OuterSolarSystemMinimapScale extends AbstractMinimapScale {
 
         // Fill
         sr.begin(ShapeType.Filled);
-        // Neptune
-        sr.setColor(nepc);
+        // Mars
+        sr.setColor(marc);
         sr.getColor().mul(0.2f, 0.2f, 0.2f, 1f);
-        sr.circle(side2, side2, (float) (30 / extentUp) * side2);
-        // Uranus
-        sr.setColor(urac);
+        sr.circle(side2 + px(4), side2 - px(4), (float) (1.54 / extentUp) * side2);
+        // Earth
+        sr.setColor(earc);
         sr.getColor().mul(0.2f, 0.2f, 0.2f, 1f);
-        sr.circle(side2, side2, (float) (20 / extentUp) * side2);
-        // Saturn
-        sr.setColor(satc);
+        sr.circle(side2, side2, (float) (1 / extentUp) * side2);
+        // Venus
+        sr.setColor(venc);
         sr.getColor().mul(0.2f, 0.2f, 0.2f, 1f);
-        sr.circle(side2, side2, (float) (9.2 / extentUp) * side2);
-        // Jupiter
-        sr.setColor(jupc);
+        sr.circle(side2, side2, (float) (0.71 / extentUp) * side2);
+        // Mercury
+        sr.setColor(merc);
         sr.getColor().mul(0.2f, 0.2f, 0.2f, 1f);
-        sr.circle(side2, side2, (float) (5.4 / extentUp) * side2);
+        sr.circle(side2 - px(3), side2, (float) (0.4 / extentUp) * side2);
         sr.end();
 
         sr.begin(ShapeType.Line);
         Gdx.gl.glLineWidth(2f);
         // Orbits
-        // Jupiter
-        sr.setColor(jupc);
-        sr.circle(side2, side2, (float) (5.4 / extentUp) * side2);
-        // Saturn
-        sr.setColor(satc);
-        sr.circle(side2, side2, (float) (9.2 / extentUp) * side2);
-        // Uranus
-        sr.setColor(urac);
-        sr.circle(side2, side2, (float) (20 / extentUp) * side2);
-        // Neptune
-        sr.setColor(nepc);
-        sr.circle(side2, side2, (float) (30 / extentUp) * side2);
+        // Mercury
+        sr.setColor(merc);
+        sr.circle(side2 - px(3), side2, (float) (0.4 / extentUp) * side2);
+        // Venus
+        sr.setColor(venc);
+        sr.circle(side2, side2, (float) (0.71 / extentUp) * side2);
+        // Earth
+        sr.setColor(earc);
+        sr.circle(side2, side2, (float) (1 / extentUp) * side2);
+        // Mars
+        sr.setColor(marc);
+        sr.circle(side2 + px(4), side2 - px(4), (float) (1.54 / extentUp) * side2);
         sr.end();
         Gdx.gl.glLineWidth(1f);
 
@@ -222,18 +222,18 @@ public class OuterSolarSystemMinimapScale extends AbstractMinimapScale {
         // Sun
         sr.setColor(sunc);
         sr.circle(side2, side2, px(5f));
-        // Jupiter
-        sr.setColor(jupc);
-        sr.circle(jupf[2], jupf[3], px(3f));
-        // Saturn
-        sr.setColor(satc);
-        sr.circle(satf[2], satf[3], px(3f));
-        // Uranus
-        sr.setColor(urac);
-        sr.circle(uraf[2], uraf[3], px(3f));
-        // Neptune
-        sr.setColor(nepc);
-        sr.circle(nepf[2], nepf[3], px(3f));
+        // Mercury
+        sr.setColor(merc);
+        sr.circle(merf[2], merf[3], px(3f));
+        // Venus
+        sr.setColor(venc);
+        sr.circle(venf[2], venf[3], px(3f));
+        // Earth
+        sr.setColor(earc);
+        sr.circle(earf[2], earf[3], px(3f));
+        // Mars
+        sr.setColor(marc);
+        sr.circle(marf[2], marf[3], px(3f));
 
         // Camera
         sr.setColor(camc);
@@ -261,19 +261,19 @@ public class OuterSolarSystemMinimapScale extends AbstractMinimapScale {
         // Fonts
         sb.begin();
         font.setColor(textc);
-        font.draw(sb, "5.4 AU", side2, u2Px(5.4 + 2.6, side2));
-        font.draw(sb, "9.2 AU", side2, u2Px(9.2 + 3, side2));
-        font.draw(sb, "20 AU", side2, u2Px(20 + 3, side2));
-        font.draw(sb, "30 AU", side2, u2Px(30 + 3, side2));
-
-        font.setColor(jupc);
-        font.draw(sb, I18n.txt("gui.minimap.jupiter"), jupf[2] - px( 20),  jupf[3] - px(8));
-        font.setColor(satc);
-        font.draw(sb, I18n.txt("gui.minimap.saturn"), satf[2] - px(20),  satf[3] - px(8));
-        font.setColor(urac);
-        font.draw(sb, I18n.txt("gui.minimap.uranus"), uraf[2] - px(20), uraf[3] - px(8));
-        font.setColor(nepc);
-        font.draw(sb, I18n.txt("gui.minimap.neptune"), nepf[2] - px(20), nepf[3] - px(8));
+        font.draw(sb, "0.45 AU", side2, u2Px(0.45 + 0.2, side2));
+        font.draw(sb, "0.71 AU", side2, u2Px(0.71 + 0.2, side2));
+        font.draw(sb, "1 AU", side2, u2Px(1 + 0.2, side2));
+        font.draw(sb, "1.6 AU", side2, u2Px(1.6 + 0.2, side2));
+        
+        font.setColor(merc);
+        font.draw(sb, I18n.txt("gui.minimap.mercury"), merf[2] - px( 20),  merf[3] - px(8));
+        font.setColor(venc);
+        font.draw(sb, I18n.txt("gui.minimap.venus"), venf[2] - px(20), venf[3] - px(8));
+        font.setColor(earc);
+        font.draw(sb, I18n.txt("gui.minimap.earth"), earf[2] - px(20), earf[3] - px(8));
+        font.setColor(marc);
+        font.draw(sb, I18n.txt("gui.minimap.mars"), marf[2] - px(20), marf[3] - px(8));
         font.setColor(sunc);
         font.draw(sb, I18n.txt("gui.minimap.sun"), side2 + px(5), side2 - px(5));
 

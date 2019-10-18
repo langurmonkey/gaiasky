@@ -16,8 +16,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.Container;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.utils.Array;
 import gaiasky.GaiaSky;
-import gaiasky.interfce.minimap.MilkyWayMinimapScale;
-import gaiasky.interfce.minimap.SolarSystemMinimapScale;
+import gaiasky.interfce.minimap.*;
 import gaiasky.util.GlobalConf;
 import gaiasky.util.GlobalResources;
 import gaiasky.util.I18n;
@@ -61,13 +60,22 @@ public class MinimapWindow extends GenericDialog {
         // Init scales
         scales = new Array<>();
 
+        InnerSolarSystemMinimapScale issms = new InnerSolarSystemMinimapScale();
+        issms.initialize(ortho, sb, sr, font, side, sideshort);
+        OuterSolarSystemMinimapScale ossms = new OuterSolarSystemMinimapScale();
+        ossms.initialize(ortho, sb, sr, font, side, sideshort);
+        HeliosphereMinimapScale hsms = new HeliosphereMinimapScale();
+        hsms.initialize(ortho, sb, sr, font, side, sideshort);
+        OortCloudMinimapScale ocms = new OortCloudMinimapScale();
+        ocms.initialize(ortho, sb, sr, font, side, sideshort);
         MilkyWayMinimapScale mmms = new MilkyWayMinimapScale();
         mmms.initialize(ortho, sb, sr, font, side, sideshort);
-        SolarSystemMinimapScale ssms = new SolarSystemMinimapScale();
-        ssms.initialize(ortho, sb, sr, font, side, sideshort);
 
+        scales.add(issms);
+        scales.add(ossms);
+        scales.add(hsms);
+        scales.add(ocms);
         scales.add(mmms);
-        scales.add(ssms);
 
         // Build
         buildSuper();

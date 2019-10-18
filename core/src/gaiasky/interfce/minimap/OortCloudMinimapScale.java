@@ -6,6 +6,7 @@
 package gaiasky.interfce.minimap;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
@@ -13,38 +14,37 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.FrameBuffer;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer.ShapeType;
-import com.badlogic.gdx.math.Vector2;
 import gaiasky.GaiaSky;
 import gaiasky.scenegraph.camera.ICamera;
 import gaiasky.util.Constants;
 import gaiasky.util.I18n;
-import gaiasky.util.color.ColourUtils;
-import gaiasky.util.coord.Coordinates;
+import gaiasky.util.math.Matrix4d;
 import gaiasky.util.math.Vector2d;
 import gaiasky.util.math.Vector3d;
 
-public class MilkyWayMinimapScale extends AbstractMinimapScale {
-    private Vector2 sunPos;
+public class OortCloudMinimapScale extends AbstractMinimapScale {
 
-    public MilkyWayMinimapScale() {
+    private float[] camf;
+    private Color occ, sunc;
+
+    public OortCloudMinimapScale() {
         super();
+        camf = new float[4];
+
+        sunc = new Color(1f, 1f, 0.4f, 1f);
+        occ = new Color(0.4f, 0.8f, 0.5f, 1f);
     }
 
     @Override
     public void update(){
-
+        project(GaiaSky.instance.cam.getPos(), camf);
     }
 
-    @Override
-    public boolean isActive(Vector3d campos) {
-        return campos.len() > 50 * Constants.AU_TO_U;
-    }
 
     @Override
     public void initialize(OrthographicCamera ortho, SpriteBatch sb, ShapeRenderer sr, BitmapFont font, int side, int sideshort) {
-        super.initialize(ortho, sb, sr, font, side, sideshort, Constants.PC_TO_U, Constants.U_TO_PC, 16000, 100000 * Constants.AU_TO_U * Constants.U_TO_PC);
-        trans = Coordinates.eqToGal();
-        sunPos = new Vector2(u2Px(0, side2), u2Px(-8000, side2));
+        super.initialize(ortho, sb, sr, font, side, sideshort, Constants.AU_TO_U, Constants.U_TO_AU, 100000, 1000);
+        trans = new Matrix4d();
     }
 
     @Override
@@ -61,27 +61,29 @@ public class MilkyWayMinimapScale extends AbstractMinimapScale {
 
         ICamera cam = GaiaSky.instance.cam.current;
         // Position
-        Vector3d pos = aux3d1.set(cam.getPos()).mul(trans);
-        Vector2d campos2 = aux2d1;
-        campos2.set(pos.z, pos.y).scl(Constants.U_TO_PC);
-        campos2.x -= 8000;
-        campos2.y *= side / sideshort;
-        float cx = u2Px(campos2.x, side2);
-        float cy = u2Px(campos2.y, sideshort2);
+        float cx = this.camf[0];
+        float cy = this.camf[1];
         // Direction
-        Vector3d dir = aux3d2.set(cam.getDirection()).mul(trans);
+        Vector3d dir = aux3d2.set(cam.getDirection());
         Vector2d camdir2 = aux2d2.set(dir.z, dir.y).nor().scl(px(15f));
 
         sr.begin(ShapeType.Filled);
-        // Mw disk
-        sr.setColor(0.15f, 0.15f, 0.35f, 1f);
-        sr.ellipse(0, sideshort2 - side * 0.015f, side, side * 0.03f);
-        // Mw bulge
-        sr.setColor(0.05f, 0.05f, 0.2f, 1f);
-        sr.circle(side2, sideshort2, side * 0.08f);
+        float xcenter = u2Px(0, side2);
+        float ycenter = u2Px(0, sideshort2);
+        // Oort
+        sr.setColor(occ);
+        sr.getColor().a = 0.7f;
+        sr.circle(xcenter, ycenter, (float) (100000d / extentUp) * side2);
+        sr.setColor(0, 0, 0, 1);
+        sr.circle(xcenter, ycenter, (float) (10000d / extentUp) * side2);
+
+        // Sun
+        sr.setColor(sunc);
+        sr.circle(xcenter, ycenter, px(5f));
+
 
         // Camera
-        sr.setColor(ColourUtils.gRedC);
+        sr.setColor(camc);
         sr.circle(cx, cy, 8f);
         Vector2d endx = aux2d1.set(camdir2.x, camdir2.y);
         endx.rotate(-cam.getCamera().fieldOfView / 2d);
@@ -91,8 +93,8 @@ public class MilkyWayMinimapScale extends AbstractMinimapScale {
         endx.rotate(cam.getCamera().fieldOfView / 2d);
         sr.triangle(cx, cy, c1x, c1y, (float) endx.x + cx, (float) endx.y + cy);
 
-        // Camera span
-        sr.setColor(1,1,1,0.1f);
+        // Camera viewport
+        sr.setColor(1,1,1,0.4f);
         endx = aux2d1.set(camdir2.x, camdir2.y).scl(40f);
         endx.rotate(-cam.getCamera().fieldOfView / 2d);
         c1x = (float) endx.x + cx;
@@ -100,21 +102,23 @@ public class MilkyWayMinimapScale extends AbstractMinimapScale {
         endx.set(camdir2.x, camdir2.y).scl(40f);
         endx.rotate(cam.getCamera().fieldOfView / 2d);
         sr.triangle(cx, cy, c1x, c1y, (float) endx.x + cx, (float) endx.y + cy);
-
-        // Sun position, 8 Kpc to do galactocentric
-        sr.setColor(1f, 1f, 0f, 1f);
-        sr.circle(u2Px(-8000, side2), u2Px(0, sideshort2), px(2.5f));
-        // GC
-        sr.setColor(0f, 0f, 0f, 1f);
-        sr.circle(u2Px(0, side2), u2Px(0, sideshort2), px(2.5f));
         sr.end();
+
+        Gdx.gl.glLineWidth(2f);
+        sr.begin(ShapeType.Line);
+        sr.setColor(occ);
+        sr.circle(side2, sideshort2, (float) (100000d / extentUp) * side2);
+        sr.circle(side2, sideshort2, (float) (50000d / extentUp) * side2);
+        sr.circle(side2, sideshort2, (float) (10000d / extentUp) * side2);
+        sr.end();
+        Gdx.gl.glLineWidth(1f);
 
         // Fonts
         sb.begin();
-        font.setColor(1, 1, 0, 1);
-        font.draw(sb, I18n.txt("gui.minimap.sun"), u2Px(-8000, side2), u2Px(0, sideshort2) - px(8));
-        font.setColor(textc);
-        font.draw(sb, I18n.txt("gui.minimap.gc"), side2, sideshort2 - px(4));
+        font.setColor(occ);
+        font.draw(sb, I18n.txt("gui.minimap.oort"),  side2 - px(60),  u2Px(-50000, sideshort2) + px(8));
+        font.setColor(sunc);
+        font.draw(sb, I18n.txt("gui.minimap.sun"), side2 + px(8), u2Px(10, sideshort2) - px(2));
         sb.end();
 
         fb.end();
@@ -135,28 +139,28 @@ public class MilkyWayMinimapScale extends AbstractMinimapScale {
 
         ICamera cam = GaiaSky.instance.cam.current;
         // Position
-        Vector3d pos = aux3d1.set(cam.getPos()).mul(trans);
-        Vector2d campos2 = aux2d1;
-        campos2.set(pos.x, pos.z).scl(Constants.U_TO_PC);
-        campos2.y -= 8000;
-        float cx = u2Px(campos2.x, side2);
-        float cy = u2Px(campos2.y, side2);
+        float cx = this.camf[2];
+        float cy = this.camf[3];
         // Direction
-        Vector3d dir = aux3d2.set(cam.getDirection()).mul(trans);
+        Vector3d dir = aux3d2.set(cam.getDirection());
         Vector2d camdir2 = aux2d2.set(dir.x, dir.z).nor().scl(px(15f));
 
+
+        // Fill
         sr.begin(ShapeType.Filled);
-        // Grid
-        float col = 0.0f;
-        for (int i = 16000; i >= 4000; i -= 4000) {
-            sr.setColor(0.15f-col, 0.15f-col, 0.35f-col, 1f);
-            sr.circle(side2, side2, i * side / 32000);
-            col += 0.05f;
-        }
-        sr.circle(side2, side2, 1.5f);
+        // Oort
+        sr.setColor(occ);
+        sr.getColor().a = 0.7f;
+        sr.circle(side2, side2, (float) (100000d / extentUp) * side2);
+        sr.setColor(0, 0, 0, 1);
+        sr.circle(side2, side2, (float) (10000d / extentUp) * side2);
+
+        // Sun
+        sr.setColor(sunc);
+        sr.circle(side2, side2, px(5f));
 
         // Camera
-        sr.setColor(ColourUtils.gRedC);
+        sr.setColor(camc);
         sr.circle(cx, cy, 8f);
         Vector2d endx = aux2d1.set(camdir2.x, camdir2.y);
         endx.rotate(-cam.getCamera().fieldOfView / 2d);
@@ -166,8 +170,8 @@ public class MilkyWayMinimapScale extends AbstractMinimapScale {
         endx.rotate(cam.getCamera().fieldOfView / 2d);
         sr.triangle(cx, cy, c1x, c1y, (float) endx.x + cx, (float) endx.y + cy);
 
-        // Camera span
-        sr.setColor(1,1,1,0.1f);
+        // Camera viewport
+        sr.setColor(1,1,1,0.4f);
         endx = aux2d1.set(camdir2.x, camdir2.y).scl(40f);
         endx.rotate(-cam.getCamera().fieldOfView / 2d);
         c1x = (float) endx.x + cx;
@@ -176,27 +180,33 @@ public class MilkyWayMinimapScale extends AbstractMinimapScale {
         endx.rotate(cam.getCamera().fieldOfView / 2d);
         sr.triangle(cx, cy, c1x, c1y, (float) endx.x + cx, (float) endx.y + cy);
 
-        // Sun position, 8 Kpc to do galactocentric
-        sr.setColor(1f, 1f, 0f, 1f);
-        sr.circle(sunPos.x, sunPos.y, px(2.5f));
-        // GC
-        sr.setColor(0f, 0f, 0f, 1f);
-        sr.circle(side2, side2, px(2.5f));
         sr.end();
+
+        Gdx.gl.glLineWidth(2f);
+        sr.begin(ShapeType.Line);
+        sr.setColor(occ);
+        sr.circle(side2, side2, (float) (100000d / extentUp) * side2);
+        sr.circle(side2, side2, (float) (50000d / extentUp) * side2);
+        sr.circle(side2, side2, (float) (10000d / extentUp) * side2);
+        sr.end();
+        Gdx.gl.glLineWidth(1f);
+
 
         // Fonts
         sb.begin();
-        font.setColor(1, 1, 0, 1);
-        font.draw(sb, I18n.txt("gui.minimap.sun"), side2, sunPos.y - px(8));
         font.setColor(textc);
-        font.draw(sb, I18n.txt("gui.minimap.gc"), side2 + px(4), side2 - px(4));
-        for (int i = 4000; i <= 16000; i += 4000) {
-            font.draw(sb, "" + (i / 1000) + "Kpc", side2, (16000 + i) * side / 32000 - px(6));
-        }
+        font.draw(sb, "10,000 AU", side2, u2Px(19000, side2));
+        font.draw(sb, "50,000 AU", side2, u2Px(60000, side2));
+        font.draw(sb, "100,000 AU", side2, u2Px(95000, side2));
+
+        font.setColor(occ);
+        font.draw(sb, I18n.txt("gui.minimap.oort"),  side2 + px(15),  u2Px(-60000, side2) + px(8));
+        font.setColor(sunc);
+        font.draw(sb, I18n.txt("gui.minimap.sun"), side2 + px(5), side2 - px(5));
+
         sb.end();
 
         fb.end();
 
     }
-
 }
