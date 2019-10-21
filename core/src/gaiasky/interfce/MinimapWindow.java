@@ -17,6 +17,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.utils.Array;
 import gaiasky.GaiaSky;
 import gaiasky.interfce.minimap.*;
+import gaiasky.scenegraph.camera.ICamera;
 import gaiasky.util.GlobalConf;
 import gaiasky.util.GlobalResources;
 import gaiasky.util.I18n;
@@ -68,14 +69,20 @@ public class MinimapWindow extends GenericDialog {
         hsms.initialize(ortho, sb, sr, font, side, sideshort);
         OortCloudMinimapScale ocms = new OortCloudMinimapScale();
         ocms.initialize(ortho, sb, sr, font, side, sideshort);
+        SolarNeighbourhoodMinimapScale snms = new SolarNeighbourhoodMinimapScale();
+        snms.initialize(ortho, sb, sr, font, side, sideshort);
         MilkyWayMinimapScale mmms = new MilkyWayMinimapScale();
         mmms.initialize(ortho, sb, sr, font, side, sideshort);
+        LocalGroupMinimapScale lgms = new LocalGroupMinimapScale();
+        lgms.initialize(ortho, sb, sr, font, side, sideshort);
 
         scales.add(issms);
         scales.add(ossms);
         scales.add(hsms);
         scales.add(ocms);
+        scales.add(snms);
         scales.add(mmms);
+        scales.add(lgms);
 
         // Build
         buildSuper();
@@ -113,8 +120,10 @@ public class MinimapWindow extends GenericDialog {
 
     public void act(float delta) {
         super.act(delta);
+        ICamera cam = GaiaSky.instance.cam;
+        double distSun = cam.getPos().len();
         for (IMinimapScale mms : scales) {
-            if (mms.isActive(GaiaSky.instance.cam.getPos())) {
+            if (mms.isActive(cam.getPos(), distSun)) {
                 mms.update();
                 mms.renderSideProjection(sfb);
                 mms.renderTopProjection(tfb);

@@ -79,8 +79,8 @@ public abstract class AbstractMinimapScale implements IMinimapScale {
     }
 
     @Override
-    public boolean isActive(Vector3d campos) {
-        return campos.len() <= extentUp * to && campos.len() > extentDown * to;
+    public boolean isActive(Vector3d campos, double distSun) {
+        return distSun <= extentUp * to && distSun > extentDown * to;
     }
 
     protected float px(float px) {

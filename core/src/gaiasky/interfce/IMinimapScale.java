@@ -13,7 +13,7 @@ import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import gaiasky.util.math.Vector3d;
 
 public interface IMinimapScale {
-    boolean isActive(Vector3d campos);
+    boolean isActive(Vector3d campos, double distanceFromSun);
 
     void update();
 
