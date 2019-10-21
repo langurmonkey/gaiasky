@@ -81,9 +81,7 @@ public class SolarNeighbourhoodMinimapScale extends AbstractMinimapScale {
         sb.setProjectionMatrix(ortho.combined);
         fb.begin();
         // Clear
-        Gdx.gl.glEnable(GL30.GL_BLEND);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT | GL20.GL_DEPTH_BUFFER_BIT | (Gdx.graphics.getBufferFormat().coverageSampling ? GL20.GL_COVERAGE_BUFFER_BIT_NV : 0));
-        Gdx.gl.glBlendFunc(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA);
         ICamera cam = GaiaSky.instance.cam.current;
         // Position
         float cx = this.camf[0];
@@ -99,6 +97,8 @@ public class SolarNeighbourhoodMinimapScale extends AbstractMinimapScale {
         sideProjection.draw(sb, 1);
         sb.end();
 
+        Gdx.gl.glEnable(GL30.GL_BLEND);
+        Gdx.gl.glBlendFunc(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA);
         // Grid
         sr.begin(ShapeType.Line);
         sr.setColor(textc);
