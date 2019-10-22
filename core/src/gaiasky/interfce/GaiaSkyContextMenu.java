@@ -259,7 +259,7 @@ public class GaiaSkyContextMenu extends ContextMenu {
         });
         addItem(dsLoad);
 
-        // Highlight
+        // Dataset highlight
         CatalogManager cm = CatalogManager.instance();
         Collection<CatalogInfo> cis = cm.getCatalogInfos();
         if (cis != null && cis.size() > 0) {
@@ -284,6 +284,29 @@ public class GaiaSkyContextMenu extends ContextMenu {
             }
             dsHighlight.setSubMenu(dsHighlightSubmenu);
             addItem(dsHighlight);
+        }
+
+        // Dataset visibility
+        if (cis != null && cis.size() > 0) {
+            MenuItem dsVisibility = new MenuItem(I18n.txt("context.dataset.visibility"), skin, skin.getDrawable("eye-icon"));
+            ContextMenu dsVisibilitySubmenu = new ContextMenu(skin, "default");
+            for (CatalogInfo ci : cis) {
+                    MenuItem cim = new MenuItem(ci.name, skin, "default");
+                    cim.align(Align.right);
+                    OwnCheckBox cb = new OwnCheckBox(null, skin, pad);
+                    cb.setChecked(ci.isVisible());
+                    cim.add(cb).right().expand();
+                    cim.addListener(event ->{
+                        if(event instanceof ChangeEvent){
+                            EventManager.instance.post(Events.CATALOG_VISIBLE, ci.name, !ci.isVisible(), false);
+                            return true;
+                        }
+                        return false;
+                    });
+                    dsVisibilitySubmenu.addItem(cim);
+            }
+            dsVisibility.setSubMenu(dsVisibilitySubmenu);
+            addItem(dsVisibility);
         }
 
 
