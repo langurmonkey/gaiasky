@@ -20,7 +20,9 @@ import gaiasky.scenegraph.MilkyWay;
 import gaiasky.scenegraph.ParticleGroup.ParticleBean;
 import gaiasky.scenegraph.SceneGraphNode.RenderGroup;
 import gaiasky.scenegraph.camera.ICamera;
+import gaiasky.util.Constants;
 import gaiasky.util.GlobalConf;
+import gaiasky.util.GlobalConf.SceneConf.GraphicsQuality;
 import gaiasky.util.gdx.mesh.IntMesh;
 import gaiasky.util.gdx.shader.ExtShaderProgram;
 import gaiasky.util.math.MathUtilsd;
@@ -56,8 +58,8 @@ public class MWModelRenderSystem extends ImmediateRenderSystem implements IObser
     protected void initVertices() {
     }
 
-    private MeshData toMeshData(GpuData ad){
-        if(ad != null && ad.vertices != null){
+    private MeshData toMeshData(GpuData ad) {
+        if (ad != null && ad.vertices != null) {
             MeshData md = new MeshData();
             VertexAttribute[] attribs = buildVertexAttributes();
             md.mesh = new IntMesh(true, ad.vertices.length / 6, 0, attribs);
@@ -73,6 +75,25 @@ public class MWModelRenderSystem extends ImmediateRenderSystem implements IObser
     }
 
     private GpuData convertDataToGpu(Array<? extends ParticleBean> data, ColorGenerator cg, boolean dust) {
+        GraphicsQuality gq = GlobalConf.scene.GRAPHICS_QUALITY;
+        int modulus;
+        switch (gq) {
+            case LOW:
+                // Every second out
+                modulus = 2;
+                break;
+            case NORMAL:
+                // Every fourth out
+                modulus = 4;
+                break;
+            case HIGH:
+            case ULTRA:
+            default:
+                // All of them
+                modulus = 0;
+                break;
+        }
+
         float hiDpiScaleFactor = GlobalConf.UI_SCALE_FACTOR;
 
         GpuData ad = new GpuData();
@@ -82,28 +103,31 @@ public class MWModelRenderSystem extends ImmediateRenderSystem implements IObser
         int additionalOffset = 4;
         ad.vertices = new float[data.size * vertexSize];
 
+        int i = 0;
         for (ParticleBean star : data) {
-            // COLOR
-            float[] col = star.data.length >= 7 ? new float[] { (float) star.data[4], (float) star.data[5], (float) star.data[6] } : cg.generateColor();
-            col[0] = MathUtilsd.clamp(col[0], 0f, 1f);
-            col[1] = MathUtilsd.clamp(col[1], 0f, 1f);
-            col[2] = MathUtilsd.clamp(col[2], 0f, 1f);
-            ad.vertices[ad.vertexIdx + colorOffset] = Color.toFloatBits(col[0], col[1], col[2], 1f);
+            if(modulus == 0 || i % modulus != 0) {
+                // COLOR
+                float[] col = star.data.length >= 7 ? new float[]{(float) star.data[4], (float) star.data[5], (float) star.data[6]} : cg.generateColor();
+                col[0] = MathUtilsd.clamp(col[0], 0f, 1f);
+                col[1] = MathUtilsd.clamp(col[1], 0f, 1f);
+                col[2] = MathUtilsd.clamp(col[2], 0f, 1f);
+                ad.vertices[ad.vertexIdx + colorOffset] = Color.toFloatBits(col[0], col[1], col[2], 1f);
 
-            // SIZE
-            double starSize = star.data[3];
-            ad.vertices[ad.vertexIdx + additionalOffset] = (float) (starSize * hiDpiScaleFactor);
-            ad.vertices[ad.vertexIdx + additionalOffset + 1] = dust ? 1f : 0f;
+                // SIZE
+                double starSize = star.data[3];
+                ad.vertices[ad.vertexIdx + additionalOffset] = (float) (starSize * hiDpiScaleFactor);
+                ad.vertices[ad.vertexIdx + additionalOffset + 1] = dust ? 1f : 0f;
 
-            // POSITION
-            aux3f1.set((float) star.data[0], (float) star.data[1], (float) star.data[2]);
-            final int idx = ad.vertexIdx;
-            ad.vertices[idx] = aux3f1.x;
-            ad.vertices[idx + 1] = aux3f1.y;
-            ad.vertices[idx + 2] = aux3f1.z;
+                // POSITION
+                aux3f1.set((float) star.data[0], (float) star.data[1], (float) star.data[2]);
+                final int idx = ad.vertexIdx;
+                ad.vertices[idx] = aux3f1.x;
+                ad.vertices[idx + 1] = aux3f1.y;
+                ad.vertices[idx + 2] = aux3f1.z;
 
-            ad.vertexIdx += vertexSize;
-
+                ad.vertexIdx += vertexSize;
+            }
+            i++;
         }
         return ad;
     }
@@ -142,77 +166,77 @@ public class MWModelRenderSystem extends ImmediateRenderSystem implements IObser
             MilkyWay mw = (MilkyWay) renderables.get(0);
 
             switch (mw.status) {
-            case NOT_LOADED:
-                // PRELOAD
-                mw.status = LoadStatus.LOADING;
-                Thread loader = new Thread(() -> {
-                    convertDataToGpuFormat(mw);
-                    mw.status = LoadStatus.READY;
-                });
-                loader.start();
-                break;
-            case READY:
-                // TO GPU
-                streamToGpu();
-                mw.status = LoadStatus.LOADED;
-                break;
-            case LOADED:
-                // RENDER
-                float alpha = getAlpha(mw);
-                if (alpha > 0) {
-                    ExtShaderProgram shaderProgram = getShaderProgram();
+                case NOT_LOADED:
+                    // PRELOAD
+                    mw.status = LoadStatus.LOADING;
+                    Thread loader = new Thread(() -> {
+                        convertDataToGpuFormat(mw);
+                        mw.status = LoadStatus.READY;
+                    });
+                    loader.start();
+                    break;
+                case READY:
+                    // TO GPU
+                    streamToGpu();
+                    mw.status = LoadStatus.LOADED;
+                    break;
+                case LOADED:
+                    // RENDER
+                    float alpha = getAlpha(mw);
+                    if (alpha > 0) {
+                        ExtShaderProgram shaderProgram = getShaderProgram();
 
-                    shaderProgram.begin();
+                        shaderProgram.begin();
 
-                    shaderProgram.setUniformMatrix("u_projModelView", camera.getCamera().combined);
-                    shaderProgram.setUniformf("u_camPos", camera.getCurrent().getPos().put(aux3f1));
-                    shaderProgram.setUniformf("u_alpha", mw.opacity * alpha);
-                    shaderProgram.setUniformf("u_ar", GlobalConf.program.isStereoHalfWidth() ? 2f : 1f);
-                    shaderProgram.setUniformf("u_edges", mw.getFadeIn().y, mw.getFadeOut().y);
+                        shaderProgram.setUniformMatrix("u_projModelView", camera.getCamera().combined);
+                        shaderProgram.setUniformf("u_camPos", camera.getCurrent().getPos().put(aux3f1));
+                        shaderProgram.setUniformf("u_alpha", mw.opacity * alpha);
+                        shaderProgram.setUniformf("u_ar", GlobalConf.program.isStereoHalfWidth() ? 2f : 1f);
+                        shaderProgram.setUniformf("u_edges", mw.getFadeIn().y, mw.getFadeOut().y);
 
-                    // Rel, grav, z-buffer
-                    addEffectsUniforms(shaderProgram, camera);
+                        // Rel, grav, z-buffer
+                        addEffectsUniforms(shaderProgram, camera);
 
-                    // General settings for all
-                    Gdx.gl20.glEnable(GL20.GL_DEPTH_TEST);
-                    Gdx.gl20.glEnable(GL20.GL_BLEND);
+                        // General settings for all
+                        Gdx.gl20.glEnable(GL20.GL_DEPTH_TEST);
+                        Gdx.gl20.glEnable(GL20.GL_BLEND);
 
-                    // PART 1: DUST - depth enabled - depth writes
-                    Gdx.gl20.glBlendFunc(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA);
-                    Gdx.gl20.glDepthMask(true);
+                        // PART 1: DUST - depth enabled - depth writes
+                        Gdx.gl20.glBlendFunc(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA);
+                        Gdx.gl20.glDepthMask(true);
 
-                    //  Dust
-                    shaderProgram.setUniformf("u_sizeFactor", 5f);
-                    shaderProgram.setUniformf("u_intensity", 1f);
-                    dust.mesh.render(shaderProgram, ShapeType.Point.getGlType());
+                        //  Dust
+                        shaderProgram.setUniformf("u_sizeFactor", (float) (3e12 * Constants.DISTANCE_SCALE_FACTOR));
+                        shaderProgram.setUniformf("u_intensity", 1f);
+                        dust.mesh.render(shaderProgram, ShapeType.Point.getGlType());
 
-                    // PART2: BULGE + STARS + HII + GAS - depth enabled - no depth writes
-                    Gdx.gl20.glBlendFunc(GL20.GL_ONE, GL20.GL_ONE);
-                    Gdx.gl20.glDepthMask(false);
+                        // PART2: BULGE + STARS + HII + GAS - depth enabled - no depth writes
+                        Gdx.gl20.glBlendFunc(GL20.GL_ONE, GL20.GL_ONE);
+                        Gdx.gl20.glDepthMask(false);
 
-                    // HII
-                    shaderProgram.setUniformf("u_sizeFactor", 0.3f);
-                    shaderProgram.setUniformf("u_intensity", 2.0f);
-                    hii.mesh.render(shaderProgram, ShapeType.Point.getGlType());
+                        // HII
+                        shaderProgram.setUniformf("u_sizeFactor", (float) (6e11 * Constants.DISTANCE_SCALE_FACTOR));
+                        shaderProgram.setUniformf("u_intensity", 2.0f);
+                        hii.mesh.render(shaderProgram, ShapeType.Point.getGlType());
 
-                    // Gas
-                    shaderProgram.setUniformf("u_sizeFactor", 1.0f);
-                    shaderProgram.setUniformf("u_intensity", 0.6f);
-                    gas.mesh.render(shaderProgram, ShapeType.Point.getGlType());
+                        // Gas
+                        shaderProgram.setUniformf("u_sizeFactor", (float) (1e12 * Constants.DISTANCE_SCALE_FACTOR));
+                        shaderProgram.setUniformf("u_intensity", 0.6f);
+                        gas.mesh.render(shaderProgram, ShapeType.Point.getGlType());
 
-                    // Bulge
-                    shaderProgram.setUniformf("u_sizeFactor", 1.0f);
-                    shaderProgram.setUniformf("u_intensity", 0.3f);
-                    bulge.mesh.render(shaderProgram, ShapeType.Point.getGlType());
+                        // Bulge
+                        shaderProgram.setUniformf("u_sizeFactor", (float) (6e11 * Constants.DISTANCE_SCALE_FACTOR));
+                        shaderProgram.setUniformf("u_intensity", 0.3f);
+                        bulge.mesh.render(shaderProgram, ShapeType.Point.getGlType());
 
-                    // Stars
-                    shaderProgram.setUniformf("u_sizeFactor", 0.2f);
-                    shaderProgram.setUniformf("u_intensity", 1.5f);
-                    stars.mesh.render(shaderProgram, ShapeType.Point.getGlType());
+                        // Stars
+                        shaderProgram.setUniformf("u_sizeFactor", (float) (1.5e11 * Constants.DISTANCE_SCALE_FACTOR));
+                        shaderProgram.setUniformf("u_intensity", 1.5f);
+                        stars.mesh.render(shaderProgram, ShapeType.Point.getGlType());
 
-                    shaderProgram.end();
-                }
-                break;
+                        shaderProgram.end();
+                    }
+                    break;
             }
         }
 
@@ -243,10 +267,10 @@ public class MWModelRenderSystem extends ImmediateRenderSystem implements IObser
             float r = (float) StdRandom.gaussian() * 0.15f;
             if (StdRandom.uniform(2) == 0) {
                 // Blue/white star
-                return new float[] { 0.95f - r, 0.8f - r, 0.6f };
+                return new float[]{0.95f - r, 0.8f - r, 0.6f};
             } else {
                 // Red/white star
-                return new float[] { 0.95f, 0.8f - r, 0.6f - r };
+                return new float[]{0.95f, 0.8f - r, 0.6f - r};
             }
         }
     }
@@ -255,7 +279,7 @@ public class MWModelRenderSystem extends ImmediateRenderSystem implements IObser
         @Override
         public float[] generateColor() {
             float r = (float) Math.abs(StdRandom.uniform() * 0.15);
-            return new float[] { r, r, r };
+            return new float[]{r, r, r};
         }
     }
 

@@ -50,11 +50,12 @@ void main() {
     
 
     float dscale = smoothstep(u_edges.y, u_edges.x, dist);
+    float viewAngle = a_additional.x / dist;
 
     v_col = vec4(a_color.rgb, a_color.a * u_intensity * dscale);
     v_dust = a_additional.y;
 
-    gl_PointSize = a_additional.x * u_sizeFactor * u_ar * pow(dscale, 3.0);
+    gl_PointSize = viewAngle * u_sizeFactor * u_ar;
 
     vec4 gpos = u_projModelView * vec4(pos, 1.0);
     gl_Position = gpos;
