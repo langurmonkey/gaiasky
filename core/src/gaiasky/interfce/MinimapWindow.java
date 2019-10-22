@@ -30,7 +30,10 @@ public class MinimapWindow extends GenericDialog {
     int side, side2;
     int sideshort, sideshort2;
 
+    private OwnLabel mapName;
+
     private Array<IMinimapScale> scales;
+    private IMinimapScale current;
 
     public MinimapWindow(Stage stage, Skin skin) {
         super(I18n.txt("gui.minimap.title"), skin, stage);
@@ -84,6 +87,8 @@ public class MinimapWindow extends GenericDialog {
         scales.add(mmms);
         scales.add(lgms);
 
+        current = null;
+
         // Build
         buildSuper();
 
@@ -95,12 +100,15 @@ public class MinimapWindow extends GenericDialog {
     @Override
     protected void build() {
         float pb = 10 * GlobalConf.UI_SCALE_FACTOR;
-        OwnLabel headerSide = new OwnLabel(I18n.txt("gui.minimap.side"), skin, "header");
+        mapName = new OwnLabel("", skin, "header");
+        OwnLabel headerSide = new OwnLabel(I18n.txt("gui.minimap.side"), skin);
         Container<TextureWidget> mapSide = new Container<>();
         mapSide.setActor(sideProjection);
-        OwnLabel headerTop = new OwnLabel(I18n.txt("gui.minimap.top"), skin, "header");
+        OwnLabel headerTop = new OwnLabel(I18n.txt("gui.minimap.top"), skin);
         Container<TextureWidget> mapTop = new Container<>();
         mapTop.setActor(topProjection);
+
+        content.add(mapName).left().padBottom(pad).row();
 
         content.add(headerSide).left().padBottom(pb).row();
         content.add(sideProjection).left().padBottom(pb).row();
@@ -118,6 +126,11 @@ public class MinimapWindow extends GenericDialog {
     protected void cancel() {
     }
 
+    private void updateMapName(String mapName){
+        if(this.mapName != null)
+            this.mapName.setText(mapName);
+    }
+
     public void act(float delta) {
         super.act(delta);
         ICamera cam = GaiaSky.instance.cam;
@@ -127,6 +140,10 @@ public class MinimapWindow extends GenericDialog {
                 mms.update();
                 mms.renderSideProjection(sfb);
                 mms.renderTopProjection(tfb);
+                if(current == null || current != mms){
+                    current = mms;
+                    updateMapName(current.getName());
+                }
                 break;
             }
         }

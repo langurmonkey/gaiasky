@@ -16,22 +16,18 @@ import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer.ShapeType;
 import gaiasky.GaiaSky;
 import gaiasky.scenegraph.Planet;
-import gaiasky.scenegraph.camera.ICamera;
 import gaiasky.util.Constants;
 import gaiasky.util.I18n;
 import gaiasky.util.coord.Coordinates;
-import gaiasky.util.math.Vector2d;
-import gaiasky.util.math.Vector3d;
 
 public class OuterSolarSystemMinimapScale extends AbstractMinimapScale {
 
-    private float[] camf, satf, uraf, nepf, jupf;
+    private float[] satf, uraf, nepf, jupf;
     private Planet sat, ura, nep, jup;
-    private Color jupc, satc, nepc, urac, sunc;
+    private Color jupc, satc, nepc, urac;
 
     public OuterSolarSystemMinimapScale() {
         super();
-        camf = new float[4];
         satf = new float[4];
         uraf = new float[4];
         nepf = new float[4];
@@ -41,22 +37,21 @@ public class OuterSolarSystemMinimapScale extends AbstractMinimapScale {
         satc = new Color(1f, 1f, 0.4f, 1f);
         urac = new Color(0.3f, 0.4f, 1f, 1f);
         nepc = new Color(0.8f, 0.2f, 1f, 1f);
-        sunc = new Color(1f, 1f, 0.4f, 1f);
     }
 
     @Override
-    public void update(){
+    public void updateLocal(){
         if(sat == null){
             sat = (Planet) GaiaSky.instance.sg.getNode("Saturn");
             ura = (Planet) GaiaSky.instance.sg.getNode("Uranus");
             nep = (Planet) GaiaSky.instance.sg.getNode("Neptune");
             jup = (Planet) GaiaSky.instance.sg.getNode("Jupiter");
         }
-        project(sat.getAbsolutePosition(aux3d1), satf);
-        project(ura.getAbsolutePosition(aux3d1), uraf);
-        project(nep.getAbsolutePosition(aux3d1), nepf);
-        project(jup.getAbsolutePosition(aux3d1), jupf);
-        project(GaiaSky.instance.cam.getPos(), camf);
+        position(sat.getAbsolutePosition(aux3d1), satf);
+        position(ura.getAbsolutePosition(aux3d1), uraf);
+        position(nep.getAbsolutePosition(aux3d1), nepf);
+        position(jup.getAbsolutePosition(aux3d1), jupf);
+        position(GaiaSky.instance.cam.getPos(), camp);
     }
 
 
@@ -78,14 +73,6 @@ public class OuterSolarSystemMinimapScale extends AbstractMinimapScale {
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT | GL20.GL_DEPTH_BUFFER_BIT | (Gdx.graphics.getBufferFormat().coverageSampling ? GL20.GL_COVERAGE_BUFFER_BIT_NV : 0));
         Gdx.gl.glBlendFunc(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA);
 
-        ICamera cam = GaiaSky.instance.cam.current;
-        // Position
-        float cx = this.camf[0];
-        float cy = this.camf[1];
-        // Direction
-        Vector3d dir = aux3d2.set(cam.getDirection()).mul(trans);
-        Vector2d camdir2 = aux2d2.set(dir.z, dir.y).nor().scl(px(15f));
-
         sr.begin(ShapeType.Filled);
         float ycenter = u2Px(0, sideshort2);
         // Neptune orbit
@@ -102,7 +89,7 @@ public class OuterSolarSystemMinimapScale extends AbstractMinimapScale {
         sr.rectLine(u2Px(-5.4, side2), ycenter, u2Px(5.4, side2), ycenter, 2f);
         // Sun
         sr.setColor(sunc);
-        sr.circle(u2Px(0, side2), ycenter, px(5f));
+        sr.circle(u2Px(0, side2), ycenter, px(suns));
 
 
         // Planet positions
@@ -119,26 +106,7 @@ public class OuterSolarSystemMinimapScale extends AbstractMinimapScale {
         sr.setColor(nepc);
         sr.circle(nepf[0], nepf[1], px(3f));
 
-        // Camera
-        sr.setColor(camc);
-        sr.circle(cx, cy, 8f);
-        Vector2d endx = aux2d1.set(camdir2.x, camdir2.y);
-        endx.rotate(-cam.getCamera().fieldOfView / 2d);
-        float c1x = (float) endx.x + cx;
-        float c1y = (float) endx.y + cy;
-        endx.set(camdir2.x, camdir2.y);
-        endx.rotate(cam.getCamera().fieldOfView / 2d);
-        sr.triangle(cx, cy, c1x, c1y, (float) endx.x + cx, (float) endx.y + cy);
-
-        // Camera viewport
-        sr.setColor(1,1,1,0.4f);
-        endx = aux2d1.set(camdir2.x, camdir2.y).scl(40f);
-        endx.rotate(-cam.getCamera().fieldOfView / 2d);
-        c1x = (float) endx.x + cx;
-        c1y = (float) endx.y + cy;
-        endx.set(camdir2.x, camdir2.y).scl(40f);
-        endx.rotate(cam.getCamera().fieldOfView / 2d);
-        sr.triangle(cx, cy, c1x, c1y, (float) endx.x + cx, (float) endx.y + cy);
+        renderCameraSide(0.4f);
         sr.end();
 
         // Fonts
@@ -170,14 +138,6 @@ public class OuterSolarSystemMinimapScale extends AbstractMinimapScale {
         // Clear
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT | GL20.GL_DEPTH_BUFFER_BIT | (Gdx.graphics.getBufferFormat().coverageSampling ? GL20.GL_COVERAGE_BUFFER_BIT_NV : 0));
         Gdx.gl.glBlendFunc(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA);
-
-        ICamera cam = GaiaSky.instance.cam.current;
-        // Position
-        float cx = this.camf[2];
-        float cy = this.camf[3];
-        // Direction
-        Vector3d dir = aux3d2.set(cam.getDirection()).mul(trans);
-        Vector2d camdir2 = aux2d2.set(dir.x, dir.z).nor().scl(px(15f));
 
         // Fill
         sr.begin(ShapeType.Filled);
@@ -221,7 +181,7 @@ public class OuterSolarSystemMinimapScale extends AbstractMinimapScale {
         // Bodies
         // Sun
         sr.setColor(sunc);
-        sr.circle(side2, side2, px(5f));
+        sr.circle(side2, side2, px(suns));
         // Jupiter
         sr.setColor(jupc);
         sr.circle(jupf[2], jupf[3], px(3f));
@@ -235,32 +195,12 @@ public class OuterSolarSystemMinimapScale extends AbstractMinimapScale {
         sr.setColor(nepc);
         sr.circle(nepf[2], nepf[3], px(3f));
 
-        // Camera
-        sr.setColor(camc);
-        sr.circle(cx, cy, 8f);
-        Vector2d endx = aux2d1.set(camdir2.x, camdir2.y);
-        endx.rotate(-cam.getCamera().fieldOfView / 2d);
-        float c1x = (float) endx.x + cx;
-        float c1y = (float) endx.y + cy;
-        endx.set(camdir2.x, camdir2.y);
-        endx.rotate(cam.getCamera().fieldOfView / 2d);
-        sr.triangle(cx, cy, c1x, c1y, (float) endx.x + cx, (float) endx.y + cy);
-
-        // Camera viewport
-        sr.setColor(1,1,1,0.1f);
-        endx = aux2d1.set(camdir2.x, camdir2.y).scl(40f);
-        endx.rotate(-cam.getCamera().fieldOfView / 2d);
-        c1x = (float) endx.x + cx;
-        c1y = (float) endx.y + cy;
-        endx.set(camdir2.x, camdir2.y).scl(40f);
-        endx.rotate(cam.getCamera().fieldOfView / 2d);
-        sr.triangle(cx, cy, c1x, c1y, (float) endx.x + cx, (float) endx.y + cy);
-
+        renderCameraTop(0.2f);
         sr.end();
 
         // Fonts
         sb.begin();
-        font.setColor(textc);
+        font.setColor(textbc);
         font.draw(sb, "5.4 AU", side2, u2Px(5.4 + 2.6, side2));
         font.draw(sb, "9.2 AU", side2, u2Px(9.2 + 3, side2));
         font.draw(sb, "20 AU", side2, u2Px(20 + 3, side2));
@@ -281,5 +221,10 @@ public class OuterSolarSystemMinimapScale extends AbstractMinimapScale {
 
         fb.end();
 
+    }
+
+    @Override
+    public String getName() {
+        return I18n.txt("gui.minimap.outerss");
     }
 }

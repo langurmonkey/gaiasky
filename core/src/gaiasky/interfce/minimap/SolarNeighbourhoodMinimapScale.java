@@ -18,27 +18,23 @@ import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer.ShapeType;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.utils.Scaling;
-import gaiasky.GaiaSky;
-import gaiasky.scenegraph.camera.ICamera;
 import gaiasky.util.Constants;
-import gaiasky.util.color.ColourUtils;
+import gaiasky.util.I18n;
 import gaiasky.util.coord.Coordinates;
 import gaiasky.util.math.Vector2d;
 import gaiasky.util.math.Vector3d;
 
 public class SolarNeighbourhoodMinimapScale extends AbstractMinimapScale {
-    private float[] camf;
     private Image topProjection;
     private Image sideProjection;
 
     public SolarNeighbourhoodMinimapScale(){
         super();
-        camf = new float[4];
+        camp = new float[4];
     }
 
     @Override
-    public void update() {
-        project(GaiaSky.instance.cam.getPos(), camf);
+    public void updateLocal() {
     }
 
     @Override
@@ -57,7 +53,7 @@ public class SolarNeighbourhoodMinimapScale extends AbstractMinimapScale {
         trans = Coordinates.eqToGal();
     }
 
-    public float[] project(Vector3d pos, float[] out) {
+    public float[] position(Vector3d pos, float[] out) {
         Vector3d p = aux3d1.set(pos).mul(trans);
         Vector2d pos2d = aux2d1;
         pos2d.set(p.z, p.y).scl(from);
@@ -82,17 +78,8 @@ public class SolarNeighbourhoodMinimapScale extends AbstractMinimapScale {
         fb.begin();
         // Clear
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT | GL20.GL_DEPTH_BUFFER_BIT | (Gdx.graphics.getBufferFormat().coverageSampling ? GL20.GL_COVERAGE_BUFFER_BIT_NV : 0));
-        ICamera cam = GaiaSky.instance.cam.current;
-        // Position
-        float cx = this.camf[0];
-        float cy = this.camf[1];
-        // Direction
-        Vector3d dir = aux3d2.set(cam.getDirection()).mul(trans);
-        Vector2d camdir2 = aux2d2.set(dir.z, dir.y).nor().scl(px(15f));
 
         // Background
-        sb.enableBlending();
-        sb.setBlendFunction(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA);
         sb.begin();
         sideProjection.draw(sb, 1);
         sb.end();
@@ -101,46 +88,35 @@ public class SolarNeighbourhoodMinimapScale extends AbstractMinimapScale {
         Gdx.gl.glBlendFunc(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA);
         // Grid
         sr.begin(ShapeType.Line);
-        sr.setColor(textc);
+        sr.setColor(textbc);
         sr.line(0, sideshort2, side, sideshort2);
         sr.line(side2, 0, side2, side);
         sr.circle(side2, sideshort2, side2);
         sr.circle(side2, sideshort2, side2 / 2f);
         sr.end();
 
-
         sr.begin(ShapeType.Filled);
-        sr.setColor(1f, 1f, 0f, 1f);
-        sr.circle(u2Px(side2, side2), u2Px(0, sideshort2), px(2.5f));
-        // Camera
-        sr.setColor(camc);
-        sr.circle(cx, cy, 8f);
-        Vector2d endx = aux2d1.set(camdir2.x, camdir2.y);
-        endx.rotate(-cam.getCamera().fieldOfView / 2d);
-        float c1x = (float) endx.x + cx;
-        float c1y = (float) endx.y + cy;
-        endx.set(camdir2.x, camdir2.y);
-        endx.rotate(cam.getCamera().fieldOfView / 2d);
-        sr.triangle(cx, cy, c1x, c1y, (float) endx.x + cx, (float) endx.y + cy);
-
-        // Camera viewport
-        sr.setColor(1,1,1,0.1f);
-        endx = aux2d1.set(camdir2.x, camdir2.y).scl(40f);
-        endx.rotate(-cam.getCamera().fieldOfView / 2d);
-        c1x = (float) endx.x + cx;
-        c1y = (float) endx.y + cy;
-        endx.set(camdir2.x, camdir2.y).scl(40f);
-        endx.rotate(cam.getCamera().fieldOfView / 2d);
-        sr.triangle(cx, cy, c1x, c1y, (float) endx.x + cx, (float) endx.y + cy);
+        sr.setColor(sunc);
+        sr.circle(side2, sideshort2, px(suns));
+        renderCameraSide();
         sr.end();
+
+        // Fonts
+        sb.begin();
+        font.setColor(sunc);
+        font.draw(sb, I18n.txt("gui.minimap.sun"), side2 + px(7), sideshort2);
+        font.setColor(textgc);
+        font.draw(sb, "To\nGalactic\nCenter", side - px(50), sideshort2 + px(15));
+        font.draw(sb, "To\nOuter\nGalaxy", 0, sideshort2 + px(15));
+        font.draw(sb, "Galactic\nNorth Pole", side2 - px(30), sideshort);
+        font.draw(sb, "Galactic\nSouth Pole", side2 - px(30), px(30));
+        sb.end();
 
         fb.end();
     }
 
     @Override
     public void renderTopProjection(FrameBuffer fb) {
-        Gdx.gl.glEnable(GL20.GL_BLEND);
-
         ortho.setToOrtho(true, side, side);
         sr.setProjectionMatrix(ortho.combined);
         sb.setProjectionMatrix(ortho.combined);
@@ -149,53 +125,66 @@ public class SolarNeighbourhoodMinimapScale extends AbstractMinimapScale {
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT | GL20.GL_DEPTH_BUFFER_BIT | (Gdx.graphics.getBufferFormat().coverageSampling ? GL20.GL_COVERAGE_BUFFER_BIT_NV : 0));
         Gdx.gl.glBlendFunc(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA);
 
-        ICamera cam = GaiaSky.instance.cam.current;
-
-
         // Background
         sb.begin();
         topProjection.draw(sb, 1);
         sb.end();
 
+        Gdx.gl.glEnable(GL30.GL_BLEND);
+        Gdx.gl.glBlendFunc(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA);
         // Grid
         sr.begin(ShapeType.Line);
-        sr.setColor(textc);
+        sr.setColor(textbc);
         sr.line(0, side2, side, side2);
         sr.line(side2, 0, side2, side);
         sr.circle(side2, side2, side2);
         sr.circle(side2, side2, side2 / 2f);
         sr.end();
 
-        // Camera
-        // Position
-        float cx = this.camf[2];
-        float cy = this.camf[3];
-        // Direction
-        Vector3d dir = aux3d2.set(cam.getDirection()).mul(trans);
-        Vector2d camdir2 = aux2d2.set(-dir.x, dir.z).nor().scl(px(15f));
-
         sr.begin(ShapeType.Filled);
-        sr.setColor(ColourUtils.gRedC);
-        sr.circle(cx, cy, 8f);
-        Vector2d endx = aux2d1.set(camdir2.x, camdir2.y);
-        endx.rotate(-cam.getCamera().fieldOfView / 2d);
-        float c1x = (float) endx.x + cx;
-        float c1y = (float) endx.y + cy;
-        endx.set(camdir2.x, camdir2.y);
-        endx.rotate(cam.getCamera().fieldOfView / 2d);
-        sr.triangle(cx, cy, c1x, c1y, (float) endx.x + cx, (float) endx.y + cy);
-
-        // Camera span
-        sr.setColor(1,1,1,0.0f);
-        endx = aux2d1.set(camdir2.x, camdir2.y).scl(40f);
-        endx.rotate(-cam.getCamera().fieldOfView / 2d);
-        c1x = (float) endx.x + cx;
-        c1y = (float) endx.y + cy;
-        endx.set(camdir2.x, camdir2.y).scl(40f);
-        endx.rotate(cam.getCamera().fieldOfView / 2d);
-        //sr.triangle(cx, cy, c1x, c1y, (float) endx.x + cx, (float) endx.y + cy);
+        sr.setColor(sunc);
+        sr.circle(side2, side2, px(suns));
+        renderCameraTop();
         sr.end();
 
+        // Fonts
+        sb.begin();
+        font.setColor(1, 1, 0, 1);
+        font.draw(sb, I18n.txt("gui.minimap.sun"), side2 + px(10), side2 + px(10));
+        font.setColor(textgc);
+        font.draw(sb, "Hyades", side2 + px(5), side2 - px(5));
+        font.draw(sb, "Pleiades", side2, side2 - px(20));
+        font.draw(sb, "Taurus", side2 - px(30), side2 - px(40));
+        font.draw(sb, "Near\nPerseus", side2 - px(70), side2 - px(50));
+        font.draw(sb, "Far\nPerseus", side2 - px(50), side2 - px(85));
+        font.draw(sb, "Orion", side2 + px(20), side2 - px(85));
+        font.draw(sb, "Cepheus", side2 - px(110), side2 - px(30));
+        font.draw(sb, "Coalsack", side2 + px(30), side2 + px(30));
+        font.draw(sb, "Ophiucus", side2, side2 + px(45));
+        font.draw(sb, "Near\nAquila", side2 - px(50), side2 + px(55));
+        font.draw(sb, "Serpens", side2 - px(70), side2 + px(85));
+
+        font.setColor(textrc);
+        font.draw(sb, "ORI OB1", side2 + px(30), side2 - px(70));
+        font.draw(sb, "VEL OB1", side2 + px(65), side2 - px(15));
+
+        font.setColor(textmc);
+        font.draw(sb, "0°", side2 - px(15), side - px(5));
+        font.draw(sb, "270°", side - px(30), side2 + px(5));
+        font.draw(sb, "180°", side2 + px(3), px(15));
+        font.draw(sb, "90°", px(5), side2 + px(5));
+
+        font.setColor(textbc);
+        font.draw(sb, "250pc", side2 + px(15), side2 + side2 / 2f + px(10));
+        font.draw(sb, "500pc", side2 + px(25), side);
+
+        sb.end();
+
         fb.end();
+    }
+
+    @Override
+    public String getName() {
+        return I18n.txt("gui.minimap.solarneighbourhood");
     }
 }

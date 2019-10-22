@@ -14,32 +14,23 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.FrameBuffer;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer.ShapeType;
-import gaiasky.GaiaSky;
-import gaiasky.scenegraph.camera.ICamera;
 import gaiasky.util.Constants;
 import gaiasky.util.I18n;
 import gaiasky.util.math.Matrix4d;
-import gaiasky.util.math.Vector2d;
-import gaiasky.util.math.Vector3d;
 
 public class HeliosphereMinimapScale extends AbstractMinimapScale {
 
-    private float[] camf;
-    private Color helc, helpc, intc, sunc;
+    private Color helc, helpc, intc;
 
     public HeliosphereMinimapScale() {
         super();
-        camf = new float[4];
-
-        sunc = new Color(1f, 1f, 0.4f, 1f);
         helc = new Color(0.4f, 0.8f, 0.5f, 1f);
         helpc = new Color(1f, 1f, 0.4f, 1f);
         intc = new Color(0.8f, 0.2f, 1f, 1f);
     }
 
     @Override
-    public void update(){
-        project(GaiaSky.instance.cam.getPos(), camf);
+    public void updateLocal(){
     }
 
 
@@ -61,55 +52,25 @@ public class HeliosphereMinimapScale extends AbstractMinimapScale {
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT | GL20.GL_DEPTH_BUFFER_BIT | (Gdx.graphics.getBufferFormat().coverageSampling ? GL20.GL_COVERAGE_BUFFER_BIT_NV : 0));
         Gdx.gl.glBlendFunc(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA);
 
-        ICamera cam = GaiaSky.instance.cam.current;
-        // Position
-        float cx = this.camf[0];
-        float cy = this.camf[1];
-        // Direction
-        Vector3d dir = aux3d2.set(cam.getDirection());
-        Vector2d camdir2 = aux2d2.set(dir.z, dir.y).nor().scl(px(15f));
-
         sr.begin(ShapeType.Filled);
-        float xcenter = u2Px(0, side2);
-        float ycenter = u2Px(0, sideshort2);
         // Interstellar
         sr.setColor(intc);
         sr.getColor().a = 0.4f;
-        sr.circle(xcenter, ycenter, (float) (1000d / extentUp) * side2);
+        sr.circle(side2, sideshort2, (float) (1000d / extentUp) * side2);
         // Heliopause
         sr.setColor(helpc);
         sr.getColor().a = 0.9f;
-        sr.circle(xcenter, ycenter, (float) (110d / extentUp) * side2);
+        sr.circle(side2, sideshort2, (float) (110d / extentUp) * side2);
         // Heliosphere
         sr.setColor(helc);
         sr.getColor().a = 0.9f;
-        sr.circle(xcenter, ycenter, (float) (90d / extentUp) * side2);
+        sr.circle(side2, sideshort2, (float) (90d / extentUp) * side2);
 
         // Sun
         sr.setColor(sunc);
-        sr.circle(xcenter, ycenter, px(5f));
+        sr.circle(side2, sideshort2, px(suns));
 
-
-        // Camera
-        sr.setColor(camc);
-        sr.circle(cx, cy, 8f);
-        Vector2d endx = aux2d1.set(camdir2.x, camdir2.y);
-        endx.rotate(-cam.getCamera().fieldOfView / 2d);
-        float c1x = (float) endx.x + cx;
-        float c1y = (float) endx.y + cy;
-        endx.set(camdir2.x, camdir2.y);
-        endx.rotate(cam.getCamera().fieldOfView / 2d);
-        sr.triangle(cx, cy, c1x, c1y, (float) endx.x + cx, (float) endx.y + cy);
-
-        // Camera viewport
-        sr.setColor(1,1,1,0.4f);
-        endx = aux2d1.set(camdir2.x, camdir2.y).scl(40f);
-        endx.rotate(-cam.getCamera().fieldOfView / 2d);
-        c1x = (float) endx.x + cx;
-        c1y = (float) endx.y + cy;
-        endx.set(camdir2.x, camdir2.y).scl(40f);
-        endx.rotate(cam.getCamera().fieldOfView / 2d);
-        sr.triangle(cx, cy, c1x, c1y, (float) endx.x + cx, (float) endx.y + cy);
+        renderCameraSide(0.4f);
         sr.end();
 
         // Fonts
@@ -140,15 +101,6 @@ public class HeliosphereMinimapScale extends AbstractMinimapScale {
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT | GL20.GL_DEPTH_BUFFER_BIT | (Gdx.graphics.getBufferFormat().coverageSampling ? GL20.GL_COVERAGE_BUFFER_BIT_NV : 0));
         Gdx.gl.glBlendFunc(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA);
 
-        ICamera cam = GaiaSky.instance.cam.current;
-        // Position
-        float cx = this.camf[2];
-        float cy = this.camf[3];
-        // Direction
-        Vector3d dir = aux3d2.set(cam.getDirection());
-        Vector2d camdir2 = aux2d2.set(dir.x, dir.z).nor().scl(px(15f));
-
-
         // Fill
         sr.begin(ShapeType.Filled);
         // Interstellar
@@ -166,34 +118,14 @@ public class HeliosphereMinimapScale extends AbstractMinimapScale {
 
         // Sun
         sr.setColor(sunc);
-        sr.circle(side2, side2, px(5f));
+        sr.circle(side2, side2, px(suns));
 
-        // Camera
-        sr.setColor(camc);
-        sr.circle(cx, cy, 8f);
-        Vector2d endx = aux2d1.set(camdir2.x, camdir2.y);
-        endx.rotate(-cam.getCamera().fieldOfView / 2d);
-        float c1x = (float) endx.x + cx;
-        float c1y = (float) endx.y + cy;
-        endx.set(camdir2.x, camdir2.y);
-        endx.rotate(cam.getCamera().fieldOfView / 2d);
-        sr.triangle(cx, cy, c1x, c1y, (float) endx.x + cx, (float) endx.y + cy);
-
-        // Camera viewport
-        sr.setColor(1,1,1,0.4f);
-        endx = aux2d1.set(camdir2.x, camdir2.y).scl(40f);
-        endx.rotate(-cam.getCamera().fieldOfView / 2d);
-        c1x = (float) endx.x + cx;
-        c1y = (float) endx.y + cy;
-        endx.set(camdir2.x, camdir2.y).scl(40f);
-        endx.rotate(cam.getCamera().fieldOfView / 2d);
-        sr.triangle(cx, cy, c1x, c1y, (float) endx.x + cx, (float) endx.y + cy);
-
+        renderCameraTop(0.4f);
         sr.end();
 
         // Fonts
         sb.begin();
-        font.setColor(textc);
+        font.setColor(textbc);
         font.draw(sb, "100 AU", side2, u2Px(200, side2));
         font.draw(sb, "1000 AU", side2, u2Px(1000 + 3, side2));
 
@@ -210,5 +142,10 @@ public class HeliosphereMinimapScale extends AbstractMinimapScale {
 
         fb.end();
 
+    }
+
+    @Override
+    public String getName() {
+        return I18n.txt("gui.minimap.heliosphere");
     }
 }
