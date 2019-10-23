@@ -62,7 +62,6 @@ public final class LightGlow extends PostProcessorEffect {
         glow.dispose();
     }
 
-    /** Sets the positions of the 10 lights in [0..1] in both coordinates **/
     public void setLightPositions(int nLights, float[] vec) {
         glow.setLightPositions(nLights, vec);
     }

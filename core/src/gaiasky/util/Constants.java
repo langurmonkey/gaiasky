@@ -146,6 +146,8 @@ public class Constants {
     public static final float MIN_SLIDER_1 = 1;
     /** Maximum generic slider value **/
     public static final float MAX_SLIDER = 100;
+    /** Default step value for sliders **/
+    public static final float SLIDER_STEP = 1f;
 
     /** Max motion blur value **/
     public static final int MAX_MOTION_BLUR = 85;
@@ -154,6 +156,11 @@ public class Constants {
     public static final int MAX_FOV = 95;
     /** Minimum fov value, in degrees **/
     public static final int MIN_FOV = 2;
+
+    /** Maximum camera speed **/
+    public static final float MAX_CAM_SPEED = 10f;
+    /** Minimum camera speed **/
+    public static final float MIN_CAM_SPEED = 0.1f;
 
     /** Maximum rotation speed **/
     public static final float MAX_ROT_SPEED = 0.5e4f;
@@ -192,6 +199,11 @@ public class Constants {
     /** Step to increase/decrease **/
     public static final float STEP_STAR_POINT_SIZE = 0.1f;
 
+    /** Min ambient light **/
+    public static final float MIN_AMBIENT_LIGHT = 0f;
+    /** Max ambient light **/
+    public static final float MAX_AMBIENT_LIGHT = 1f;
+
     /** Minimum spacecraft responsiveness **/
     public static final float MIN_SC_RESPONSIVENESS = .5e6f;
     /** Maximum spacecraft responsiveness **/
@@ -224,7 +236,7 @@ public class Constants {
     public static final float MAX_LABEL_SIZE = 2.3f;
 
     public final static float MIN_ELEVATION_MULT = 0f;
-    public final static float MAX_ELEVATION_MULT = 7.5f;
+    public final static float MAX_ELEVATION_MULT = 15f;
 
     public final static float MIN_TESS_QUALITY = 1f;
     public final static float MAX_TESS_QUALITY = 10f;
@@ -244,12 +256,6 @@ public class Constants {
     public static final double MAX_WARP = 35184372088832d;
     // Minimum time warp factor
     public static final double MIN_WARP = -MAX_WARP;
-
-    /** Camera speed factor **/
-    public static final float CAMERA_SPEED_FACTOR = 10f;
-
-    /** Motion blur value **/
-    public static final float MOTION_BLUR_VALUE = 0.7f;
 
 
     /**

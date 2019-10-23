@@ -86,7 +86,7 @@ public class ParticleGroupRenderSystem extends ImmediateRenderSystem implements 
                 /**
                  * GROUP RENDER
                  */
-                if (!particleGroup.inGpu) {
+                if (!particleGroup.inGpu()) {
                     particleGroup.offset = addMeshData(particleGroup.size());
                     curr = meshes.get(particleGroup.offset);
 
@@ -138,7 +138,7 @@ public class ParticleGroupRenderSystem extends ImmediateRenderSystem implements 
                     particleGroup.count = nadded * curr.vertexSize;
                     curr.mesh.setVertices(tempVerts, 0, particleGroup.count);
 
-                    particleGroup.inGpu = true;
+                    particleGroup.inGpu(true);
 
                 }
 

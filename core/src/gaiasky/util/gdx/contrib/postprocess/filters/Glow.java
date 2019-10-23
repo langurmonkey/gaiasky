@@ -32,14 +32,12 @@ import gaiasky.util.gdx.contrib.utils.ShaderLoader;
  * rays-whats-that-5a67f26aeac2</a>
  **/
 public final class Glow extends Filter<Glow> {
-    // Number of light supported
-    public static int N = 30;
     private Vector2 viewport;
 
     private float[] lightPositions;
     private float[] lightViewAngles;
     private float[] lightColors;
-    private int nLights;
+    private int nLights = 0;
     private int nSamples = 30;
     private float textureScale = 1f;
     private float spiralScale = 1f;
@@ -86,9 +84,6 @@ public final class Glow extends Filter<Glow> {
 
     public Glow(int width, int height) {
         super(ShaderLoader.fromFile("lightglow", "lightglow"));
-        lightPositions = new float[N * 2];
-        lightViewAngles = new float[N];
-        lightColors = new float[N * 3];
         viewport = new Vector2(width, height);
         rebind();
     }
@@ -102,17 +97,17 @@ public final class Glow extends Filter<Glow> {
         this.nLights = nLights;
         this.lightPositions = vec;
         setParam(Param.NLights, this.nLights);
-        setParamv(Param.LightPositions, this.lightPositions, 0, N * 2);
+        setParamv(Param.LightPositions, this.lightPositions, 0, this.nLights * 2);
     }
 
     public void setLightViewAngles(float[] ang) {
         this.lightViewAngles = ang;
-        setParamv(Param.LightViewAngles, this.lightViewAngles, 0, N);
+        setParamv(Param.LightViewAngles, this.lightViewAngles, 0, nLights);
     }
 
     public void setLightColors(float[] colors) {
         this.lightColors = colors;
-        setParamv(Param.LightColors, this.lightColors, 0, N * 3);
+        setParamv(Param.LightColors, this.lightColors, 0, nLights * 3);
     }
 
     public void setNSamples(int nSamples) {
@@ -148,7 +143,7 @@ public final class Glow extends Filter<Glow> {
         return prePassTexture;
     }
 
-    public void setOrientation(float o){
+    public void setOrientation(float o) {
         orientation = o;
         setParam(Param.Orientation, o);
     }
@@ -159,15 +154,18 @@ public final class Glow extends Filter<Glow> {
         setParams(Param.Texture, u_texture0);
         setParams(Param.LightGlowTexture, u_texture1);
         setParams(Param.PrePassTexture, u_texture2);
-        setParams(Param.NLights, nLights);
         setParams(Param.NSamples, nSamples);
         setParams(Param.TextureScale, textureScale);
         setParams(Param.SpiralScale, spiralScale);
         setParams(Param.Orientation, orientation);
         setParams(Param.Viewport, viewport);
-        setParamsv(Param.LightPositions, lightPositions, 0, N * 2);
-        setParamsv(Param.LightViewAngles, lightViewAngles, 0, N);
-        setParamsv(Param.LightColors, lightColors, 0, N * 3);
+        setParams(Param.NLights, nLights);
+        if (lightPositions != null)
+            setParamsv(Param.LightPositions, lightPositions, 0, nLights * 2);
+        if (lightViewAngles != null)
+            setParamsv(Param.LightViewAngles, lightViewAngles, 0, nLights);
+        if (lightColors != null)
+            setParamsv(Param.LightColors, lightColors, 0, nLights * 3);
         endParams();
     }
 

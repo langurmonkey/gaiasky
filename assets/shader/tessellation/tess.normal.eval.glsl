@@ -79,10 +79,21 @@ vec3 calcNormal(vec2 p, vec2 dp){
     return normalize(texture(u_normalTexture, p).rgb * 2.0 - 1.0);
 }
     #else
+// maps the height scale in internal units to a normal strength
+float computeNormalStrength(float heightScale){
+    // to [0,100] km
+    vec2 heightSpanKm = vec2(0.0, 80.0);
+    vec2 span = vec2(0.2, 1.0);
+    heightScale *= u_vrScale * 1e6;
+    heightScale = clamp(heightScale, heightSpanKm.x, heightSpanKm.y);
+    // normalize to [0,1]
+    heightScale = (heightSpanKm.y - heightScale) / (heightSpanKm.y - heightSpanKm.x);
+    return span.x + (span.y - span.x) * heightScale;
+}
 // Use height texture for normals
 vec3 calcNormal(vec2 p, vec2 dp){
     vec4 h;
-    const vec2 size = vec2(0.7, 0.0);
+    vec2 size = vec2(computeNormalStrength(u_heightScale), 0.0);
     if (dp.x < 0.0){
         // Generated height using perlin noise
         dp = vec2(3e-4);
@@ -96,6 +107,7 @@ vec3 calcNormal(vec2 p, vec2 dp){
     vec3 n = cross(va, vb);
     return normalize(n);
 }
+
     #endif
 
 void main(void){

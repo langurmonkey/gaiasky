@@ -206,7 +206,7 @@ public class MWModelRenderSystem extends ImmediateRenderSystem implements IObser
                         Gdx.gl20.glDepthMask(true);
 
                         //  Dust
-                        shaderProgram.setUniformf("u_sizeFactor", (float) (3e12 * Constants.DISTANCE_SCALE_FACTOR));
+                        shaderProgram.setUniformf("u_sizeFactor", (float) (5e12 * Constants.DISTANCE_SCALE_FACTOR));
                         shaderProgram.setUniformf("u_intensity", 1f);
                         dust.mesh.render(shaderProgram, ShapeType.Point.getGlType());
 
@@ -220,18 +220,18 @@ public class MWModelRenderSystem extends ImmediateRenderSystem implements IObser
                         hii.mesh.render(shaderProgram, ShapeType.Point.getGlType());
 
                         // Gas
-                        shaderProgram.setUniformf("u_sizeFactor", (float) (1e12 * Constants.DISTANCE_SCALE_FACTOR));
-                        shaderProgram.setUniformf("u_intensity", 0.6f);
+                        shaderProgram.setUniformf("u_sizeFactor", (float) (2e12 * Constants.DISTANCE_SCALE_FACTOR));
+                        shaderProgram.setUniformf("u_intensity", 1f);
                         gas.mesh.render(shaderProgram, ShapeType.Point.getGlType());
 
                         // Bulge
-                        shaderProgram.setUniformf("u_sizeFactor", (float) (6e11 * Constants.DISTANCE_SCALE_FACTOR));
-                        shaderProgram.setUniformf("u_intensity", 0.3f);
+                        shaderProgram.setUniformf("u_sizeFactor", (float) (8e11 * Constants.DISTANCE_SCALE_FACTOR));
+                        shaderProgram.setUniformf("u_intensity", 0.8f);
                         bulge.mesh.render(shaderProgram, ShapeType.Point.getGlType());
 
                         // Stars
-                        shaderProgram.setUniformf("u_sizeFactor", (float) (1.5e11 * Constants.DISTANCE_SCALE_FACTOR));
-                        shaderProgram.setUniformf("u_intensity", 1.5f);
+                        shaderProgram.setUniformf("u_sizeFactor", (float) (1.8e11 * Constants.DISTANCE_SCALE_FACTOR));
+                        shaderProgram.setUniformf("u_intensity", 2f);
                         stars.mesh.render(shaderProgram, ShapeType.Point.getGlType());
 
                         shaderProgram.end();

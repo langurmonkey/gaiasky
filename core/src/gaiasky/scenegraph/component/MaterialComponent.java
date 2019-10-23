@@ -441,6 +441,7 @@ public class MaterialComponent implements IObserver {
         case ELEVATION_MUTLIPLIER_CMD:
             if (this.hasHeight() && this.material != null) {
                 float newMultiplier = (Float) data[0];
+                System.out.println(heightScale * newMultiplier + "");
                 Gdx.app.postRunnable(() -> this.material.set(new FloatExtAttribute(FloatExtAttribute.HeightScale, heightScale * newMultiplier)));
             }
             break;

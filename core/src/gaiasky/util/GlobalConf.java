@@ -1046,6 +1046,19 @@ public class GlobalConf {
             public boolean isUltra() {
                 return this.equals(ULTRA);
             }
+
+            public int getGlowNLights(){
+                if(isLow()){
+                    return 10;
+                } else if (isNormal()){
+                    return 20;
+                } else if (isHigh()) {
+                    return 30;
+                } else if (isUltra()) {
+                    return 40;
+                }
+                return 20;
+            }
         }
 
         public String STARTUP_OBJECT;
@@ -1184,7 +1197,7 @@ public class GlobalConf {
         public double STAR_THRESHOLD_POINT;
         public double STAR_THRESHOLD_QUAD;
 
-        public float POINT_ALPHA_MIN;
+        public float STAR_MIN_OPACITY;
         public float POINT_ALPHA_MAX;
 
         /**
@@ -1265,7 +1278,7 @@ public class GlobalConf {
             STAR_THRESHOLD_NONE = sTAR_TH_ANGLE_NONE;
             STAR_THRESHOLD_POINT = sTAR_TH_ANGLE_POINT;
             STAR_THRESHOLD_QUAD = sTAR_TH_ANGLE_QUAD;
-            POINT_ALPHA_MIN = pOINT_ALPHA_MIN;
+            STAR_MIN_OPACITY = pOINT_ALPHA_MIN;
             POINT_ALPHA_MAX = pOINT_ALPHA_MAX;
             OCTREE_PARTICLE_FADE = oCTREE_PARTICLE_FADE;
             OCTANT_THRESHOLD_0 = oCTANT_TH_ANGLE_0;
@@ -1448,7 +1461,7 @@ public class GlobalConf {
                 STAR_POINT_SIZE = STAR_POINT_SIZE_BAK;
                 break;
             case STAR_MIN_OPACITY_CMD:
-                POINT_ALPHA_MIN = (float) data[0];
+                STAR_MIN_OPACITY = (float) data[0];
                 break;
             case GALAXY_3D_CMD:
                 GALAXY_3D = (boolean) data[0];

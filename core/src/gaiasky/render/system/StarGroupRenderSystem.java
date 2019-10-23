@@ -55,7 +55,7 @@ public class StarGroupRenderSystem extends ImmediateRenderSystem implements IObs
         Gdx.gl.glEnable(GL30.GL_POINT_SPRITE);
         Gdx.gl.glEnable(GL30.GL_VERTEX_PROGRAM_POINT_SIZE);
 
-        pointAlpha = new float[] { GlobalConf.scene.POINT_ALPHA_MIN, GlobalConf.scene.POINT_ALPHA_MIN + GlobalConf.scene.POINT_ALPHA_MAX };
+        pointAlpha = new float[] { GlobalConf.scene.STAR_MIN_OPACITY, GlobalConf.scene.STAR_MIN_OPACITY + GlobalConf.scene.POINT_ALPHA_MAX };
     }
 
     @Override
@@ -99,7 +99,7 @@ public class StarGroupRenderSystem extends ImmediateRenderSystem implements IObs
                         /*
                          * ADD PARTICLES
                          */
-                        if (!starGroup.inGpu) {
+                        if (!starGroup.inGpu()) {
                             int n = starGroup.size();
                             starGroup.offset = addMeshData(n);
                             curr = meshes.get(starGroup.offset);
@@ -133,7 +133,7 @@ public class StarGroupRenderSystem extends ImmediateRenderSystem implements IObs
                             starGroup.count = nadded * curr.vertexSize;
                             curr.mesh.setVertices(tempVerts, 0, starGroup.count);
 
-                            starGroup.inGpu = true;
+                            starGroup.inGpu(true);
 
                         }
 

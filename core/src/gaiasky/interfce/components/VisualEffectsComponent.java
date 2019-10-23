@@ -23,7 +23,7 @@ import gaiasky.util.scene2d.OwnSlider;
 
 public class VisualEffectsComponent extends GuiComponent implements IObserver {
 
-    protected Slider starBrightness, starSize, starOpacity, ambientLight, labelSize, elevMult;
+    protected OwnSlider starBrightness, starSize, starOpacity, ambientLight, labelSize, elevMult;
     protected OwnLabel starbrightnessl, size, opacity, ambient, bloomLabel, labels, elevm;
 
     protected INumberFormat nf;
@@ -40,101 +40,101 @@ public class VisualEffectsComponent extends GuiComponent implements IObserver {
     public void initialize() {
         float sliderWidth = 140 * GlobalConf.UI_SCALE_FACTOR;
         /** Star brightness **/
-        Label sbrightnessLabel = new Label(I18n.txt("gui.starbrightness"), skin, "default");
-        starbrightnessl = new OwnLabel(Integer.toString((int) (MathUtilsd.lint(GlobalConf.scene.STAR_BRIGHTNESS, Constants.MIN_STAR_BRIGHT, Constants.MAX_STAR_BRIGHT, Constants.MIN_SLIDER, Constants.MAX_SLIDER))), skin);
-        starBrightness = new OwnSlider(Constants.MIN_SLIDER, Constants.MAX_SLIDER, 1, false, skin);
+        starBrightness = new OwnSlider(Constants.MIN_SLIDER, Constants.MAX_SLIDER, Constants.SLIDER_STEP, Constants.MIN_STAR_BRIGHT, Constants.MAX_STAR_BRIGHT, skin);
         starBrightness.setName("star brightness");
         starBrightness.setWidth(sliderWidth);
-        starBrightness.setValue((float) MathUtilsd.lint(GlobalConf.scene.STAR_BRIGHTNESS, Constants.MIN_STAR_BRIGHT, Constants.MAX_STAR_BRIGHT, Constants.MIN_SLIDER, Constants.MAX_SLIDER));
+        starBrightness.setMappedValue(GlobalConf.scene.STAR_BRIGHTNESS);
         starBrightness.addListener(event -> {
             if (event instanceof ChangeEvent && hackProgrammaticChangeEvents) {
-                EventManager.instance.post(Events.STAR_BRIGHTNESS_CMD, MathUtilsd.lint(starBrightness.getValue(), Constants.MIN_SLIDER, Constants.MAX_SLIDER, Constants.MIN_STAR_BRIGHT, Constants.MAX_STAR_BRIGHT), true);
+                EventManager.instance.post(Events.STAR_BRIGHTNESS_CMD, starBrightness.getMappedValue(), true);
                 starbrightnessl.setText(Integer.toString((int) starBrightness.getValue()));
                 return true;
             }
             return false;
         });
+        Label sbrightnessLabel = new Label(I18n.txt("gui.starbrightness"), skin, "default");
+        starbrightnessl = new OwnLabel(Integer.toString((int) (starBrightness.getValue())), skin);
         HorizontalGroup sbrightnessGroup = new HorizontalGroup();
         sbrightnessGroup.space(space4);
         sbrightnessGroup.addActor(starBrightness);
         sbrightnessGroup.addActor(starbrightnessl);
 
         /** Star size **/
-        Label sizeLabel = new Label(I18n.txt("gui.star.size"), skin, "default");
-        size = new OwnLabel(Integer.toString((int) (MathUtilsd.lint(GlobalConf.scene.STAR_POINT_SIZE, Constants.MIN_STAR_POINT_SIZE, Constants.MAX_STAR_POINT_SIZE, Constants.MIN_SLIDER, Constants.MAX_SLIDER))), skin);
-        starSize = new OwnSlider(Constants.MIN_SLIDER, Constants.MAX_SLIDER, 1, false, skin);
+        starSize = new OwnSlider(Constants.MIN_SLIDER, Constants.MAX_SLIDER, Constants.SLIDER_STEP, Constants.MIN_STAR_POINT_SIZE, Constants.MAX_STAR_POINT_SIZE, skin);
         starSize.setName("star size");
         starSize.setWidth(sliderWidth);
-        starSize.setValue(MathUtilsd.lint(GlobalConf.scene.STAR_POINT_SIZE, Constants.MIN_STAR_POINT_SIZE, Constants.MAX_STAR_POINT_SIZE, Constants.MIN_SLIDER, Constants.MAX_SLIDER));
+        starSize.setMappedValue(GlobalConf.scene.STAR_POINT_SIZE);
         starSize.addListener(event -> {
             if (flag && event instanceof ChangeEvent) {
-                EventManager.instance.post(Events.STAR_POINT_SIZE_CMD, MathUtilsd.lint(starSize.getValue(), Constants.MIN_SLIDER, Constants.MAX_SLIDER, Constants.MIN_STAR_POINT_SIZE, Constants.MAX_STAR_POINT_SIZE), true);
+                EventManager.instance.post(Events.STAR_POINT_SIZE_CMD, starSize.getMappedValue(), true);
                 size.setText(Integer.toString((int) starSize.getValue()));
                 return true;
             }
             return false;
         });
+        Label sizeLabel = new Label(I18n.txt("gui.star.size"), skin, "default");
+        size = new OwnLabel(Integer.toString((int) (starSize.getValue())), skin);
         HorizontalGroup sizeGroup = new HorizontalGroup();
         sizeGroup.space(space4);
         sizeGroup.addActor(starSize);
         sizeGroup.addActor(size);
 
         /** Star opacity **/
-        Label opacityLabel = new Label(I18n.txt("gui.star.opacity"), skin, "default");
-        opacity = new OwnLabel(Integer.toString((int) (MathUtilsd.lint(GlobalConf.scene.POINT_ALPHA_MIN, Constants.MIN_STAR_MIN_OPACITY, Constants.MAX_STAR_MIN_OPACITY, Constants.MIN_SLIDER, Constants.MAX_SLIDER))), skin);
-        starOpacity = new OwnSlider(Constants.MIN_SLIDER, Constants.MAX_SLIDER, 1, false, skin);
+        starOpacity = new OwnSlider(Constants.MIN_SLIDER, Constants.MAX_SLIDER, Constants.SLIDER_STEP, Constants.MIN_STAR_MIN_OPACITY, Constants.MAX_STAR_MIN_OPACITY, skin);
         starOpacity.setName("star opacity");
         starOpacity.setWidth(sliderWidth);
-        starOpacity.setValue(MathUtilsd.lint(GlobalConf.scene.POINT_ALPHA_MIN, Constants.MIN_STAR_MIN_OPACITY, Constants.MAX_STAR_MIN_OPACITY, Constants.MIN_SLIDER, Constants.MAX_SLIDER));
+        starOpacity.setMappedValue(GlobalConf.scene.STAR_MIN_OPACITY);
         starOpacity.addListener(event -> {
             if (event instanceof ChangeEvent && hackProgrammaticChangeEvents) {
-                EventManager.instance.post(Events.STAR_MIN_OPACITY_CMD, MathUtilsd.lint(starOpacity.getValue(), Constants.MIN_SLIDER, Constants.MAX_SLIDER, Constants.MIN_STAR_MIN_OPACITY, Constants.MAX_STAR_MIN_OPACITY), true);
+                EventManager.instance.post(Events.STAR_MIN_OPACITY_CMD, starOpacity.getMappedValue(), true);
                 opacity.setText(Integer.toString((int) starOpacity.getValue()));
                 return true;
             }
             return false;
         });
+        Label opacityLabel = new Label(I18n.txt("gui.star.opacity"), skin, "default");
+        opacity = new OwnLabel(Integer.toString((int) starOpacity.getValue()), skin);
         HorizontalGroup opacityGroup = new HorizontalGroup();
         opacityGroup.space(space4);
         opacityGroup.addActor(starOpacity);
         opacityGroup.addActor(opacity);
 
         /** Ambient light **/
-        Label ambientLightLabel = new Label(I18n.txt("gui.light.ambient"), skin, "default");
-        ambient = new OwnLabel(Integer.toString((int) (GlobalConf.scene.AMBIENT_LIGHT * 100)), skin);
-        ambientLight = new OwnSlider(Constants.MIN_SLIDER, Constants.MAX_SLIDER, 1, false, skin);
+        ambientLight = new OwnSlider(Constants.MIN_SLIDER, Constants.MAX_SLIDER, Constants.SLIDER_STEP, Constants.MIN_AMBIENT_LIGHT, Constants.MAX_AMBIENT_LIGHT, skin);
         ambientLight.setName("ambient light");
         ambientLight.setWidth(sliderWidth);
-        ambientLight.setValue((float) GlobalConf.scene.AMBIENT_LIGHT * 100);
+        ambientLight.setMappedValue(GlobalConf.scene.AMBIENT_LIGHT);
         ambientLight.addListener(event -> {
             if (event instanceof ChangeEvent) {
-                EventManager.instance.post(Events.AMBIENT_LIGHT_CMD, ambientLight.getValue() / 100f);
+                EventManager.instance.post(Events.AMBIENT_LIGHT_CMD, ambientLight.getMappedValue());
                 ambient.setText(Integer.toString((int) ambientLight.getValue()));
                 return true;
             }
             return false;
         });
+        Label ambientLightLabel = new Label(I18n.txt("gui.light.ambient"), skin, "default");
+        ambient = new OwnLabel(Integer.toString((int) ambientLight.getValue()), skin);
         HorizontalGroup ambientGroup = new HorizontalGroup();
         ambientGroup.space(space4);
         ambientGroup.addActor(ambientLight);
         ambientGroup.addActor(ambient);
 
         /** Label size **/
-        Label labelSizeLabel = new Label(I18n.txt("gui.label.size"), skin, "default");
-        labels = new OwnLabel(Integer.toString((int) MathUtilsd.lint(GlobalConf.scene.LABEL_SIZE_FACTOR, Constants.MIN_LABEL_SIZE, Constants.MAX_LABEL_SIZE, Constants.MIN_SLIDER, Constants.MAX_SLIDER)), skin);
-        labelSize = new OwnSlider(Constants.MIN_SLIDER, Constants.MAX_SLIDER, 1, false, skin);
+        labelSize = new OwnSlider(Constants.MIN_SLIDER, Constants.MAX_SLIDER, Constants.SLIDER_STEP, Constants.MIN_LABEL_SIZE, Constants.MAX_LABEL_SIZE, skin);
         labelSize.setName("label size");
         labelSize.setWidth(sliderWidth);
-        labelSize.setValue(MathUtilsd.lint(GlobalConf.scene.LABEL_SIZE_FACTOR, Constants.MIN_LABEL_SIZE, Constants.MAX_LABEL_SIZE, Constants.MIN_SLIDER, Constants.MAX_SLIDER));
+        labelSize.setMappedValue(GlobalConf.scene.LABEL_SIZE_FACTOR);
         labelSize.addListener(event -> {
             if (event instanceof ChangeEvent) {
-                float val = MathUtilsd.lint(labelSize.getValue(), Constants.MIN_SLIDER, Constants.MAX_SLIDER, Constants.MIN_LABEL_SIZE, Constants.MAX_LABEL_SIZE);
+                float val = labelSize.getMappedValue();
                 EventManager.instance.post(Events.LABEL_SIZE_CMD, val, true);
                 labels.setText(Integer.toString((int) labelSize.getValue()));
                 return true;
             }
             return false;
         });
+        Label labelSizeLabel = new Label(I18n.txt("gui.label.size"), skin, "default");
+        labels = new OwnLabel(Integer.toString((int) labelSize.getValue()), skin);
         HorizontalGroup labelSizeGroup = new HorizontalGroup();
         labelSizeGroup.space(space4);
         labelSizeGroup.addActor(labelSize);

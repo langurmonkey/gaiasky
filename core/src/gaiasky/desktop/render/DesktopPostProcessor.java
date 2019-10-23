@@ -33,7 +33,6 @@ import gaiasky.util.Logger;
 import gaiasky.util.coord.StaticCoordinates;
 import gaiasky.util.gdx.contrib.postprocess.PostProcessor;
 import gaiasky.util.gdx.contrib.postprocess.effects.*;
-import gaiasky.util.gdx.contrib.postprocess.filters.Glow;
 import gaiasky.util.gdx.contrib.utils.ShaderLoader;
 import gaiasky.util.math.Vector3d;
 
@@ -267,19 +266,15 @@ public class DesktopPostProcessor implements IPostProcessor, IObserver {
         if (gq.isUltra()) {
             samples = 15;
             lgw = 1280;
-            Glow.N = 35;
         }else if (gq.isHigh()) {
             samples = 12;
             lgw = 1280;
-            Glow.N = 30;
         } else if (gq.isNormal()) {
             samples = 8;
             lgw = 1000;
-            Glow.N = 20;
         } else {
             samples = 4;
             lgw = 1000;
-            Glow.N = 10;
         }
         lgh = Math.round(lgw / ar);
         ppb.lightglow.setNSamples(samples);

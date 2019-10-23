@@ -16,7 +16,6 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.Texture.TextureFilter;
 import com.badlogic.gdx.graphics.glutils.FrameBuffer;
 import com.badlogic.gdx.graphics.glutils.GLFrameBuffer.FrameBufferBuilder;
-import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.Array;
@@ -34,15 +33,17 @@ import gaiasky.render.IPostProcessor.PostProcessBean;
 import gaiasky.render.system.*;
 import gaiasky.render.system.AbstractRenderSystem.RenderSystemRunnable;
 import gaiasky.render.system.ModelBatchRenderSystem.ModelRenderType;
-import gaiasky.scenegraph.*;
+import gaiasky.scenegraph.AbstractPositionEntity;
+import gaiasky.scenegraph.ModelBody;
 import gaiasky.scenegraph.SceneGraphNode.RenderGroup;
+import gaiasky.scenegraph.Star;
+import gaiasky.scenegraph.StubModel;
 import gaiasky.scenegraph.camera.CameraManager.CameraMode;
 import gaiasky.scenegraph.camera.ICamera;
 import gaiasky.util.*;
 import gaiasky.util.Logger.Log;
 import gaiasky.util.gdx.IntModelBatch;
 import gaiasky.util.gdx.IntRenderableSorter;
-import gaiasky.util.gdx.contrib.postprocess.filters.Glow;
 import gaiasky.util.gdx.contrib.utils.GaiaSkyFrameBuffer;
 import gaiasky.util.gdx.contrib.utils.ShaderLoader;
 import gaiasky.util.gdx.g2d.BitmapFont;
@@ -51,7 +52,6 @@ import gaiasky.util.gdx.loader.BitmapFontLoader.BitmapFontParameter;
 import gaiasky.util.gdx.shader.*;
 import gaiasky.util.gdx.shader.ShaderProgramProvider.ShaderProgramParameter;
 import gaiasky.util.gdx.shader.provider.IntShaderProvider;
-import gaiasky.util.gravwaves.RelativisticEffectsManager;
 import gaiasky.util.math.Intersectord;
 import gaiasky.util.math.MathUtilsd;
 import gaiasky.util.math.Vector3d;
@@ -117,8 +117,8 @@ public class SceneGraphRenderer extends AbstractRenderer implements IProcessRend
 
     // Light glow pre-render
     private FrameBuffer glowFb;
-    private Texture glowTex;
     private IntModelBatch mbPixelLightingDepth, mbPixelLightingOpaque, mbPixelLightingOpaqueTessellation, mbPixelLightingDepthTessellation;
+    private LightPositionUpdater lpu;
 
     private Vector3 aux1;
     private Vector3d aux1d, aux2d, aux3d, aux4d;
@@ -483,57 +483,8 @@ public class SceneGraphRenderer extends AbstractRenderer implements IProcessRend
         // BILLBOARD STARS
         billboardStarsProc = new BillboardStarRenderSystem(RenderGroup.BILLBOARD_STAR, alphas, starBillboardShaders, GlobalResources.unpackTexName("data/tex/base/star-tex-02*.png"), ComponentType.Stars.ordinal());
         billboardStarsProc.addPreRunnables(additiveBlendR, noDepthTestR);
-        billboardStarsProc.addPostRunnables(new RenderSystemRunnable() {
-
-            private float[] positions = new float[Glow.N * 2];
-            private float[] viewAngles = new float[Glow.N];
-            private float[] colors = new float[Glow.N * 3];
-            private Vector3 auxV = new Vector3();
-            private Vector3d auxD = new Vector3d();
-
-            @Override
-            public void run(AbstractRenderSystem renderSystem, Array<IRenderable> renderables, ICamera camera) {
-                int size = renderables.size;
-                if (PostProcessorFactory.instance.getPostProcessor().isLightScatterEnabled() && Particle.renderOn) {
-                    // Compute light positions for light scattering or light
-                    // glow
-                    int lightIndex = 0;
-                    float angleEdgeDeg = camera.getAngleEdge() * MathUtils.radDeg;
-                    for (int i = size - 1; i >= 0; i--) {
-                        IRenderable s = renderables.get(i);
-                        if (s instanceof Particle) {
-                            Particle p = (Particle) s;
-                            if (lightIndex < Glow.N && (GlobalConf.program.CUBEMAP360_MODE || GlobalConf.runtime.OPENVR || GaiaSky.instance.cam.getDirection().angle(p.translation) < angleEdgeDeg)) {
-                                Vector3d pos3d = p.translation.put(auxD);
-
-                                // Aberration
-                                GlobalResources.applyRelativisticAberration(pos3d, camera);
-                                // GravWaves
-                                RelativisticEffectsManager.getInstance().gravitationalWavePos(pos3d);
-                                Vector3 pos3 = pos3d.put(auxV);
-
-                                camera.getCamera().project(pos3);
-                                // Here we **need** to use
-                                // Gdx.graphics.getWidth/Height() because we use
-                                // camera.project() which uses screen
-                                // coordinates only
-                                positions[lightIndex * 2] = auxV.x / Gdx.graphics.getWidth();
-                                positions[lightIndex * 2 + 1] = auxV.y / Gdx.graphics.getHeight();
-                                viewAngles[lightIndex] = (float) p.viewAngleApparent;
-                                colors[lightIndex * 3] = p.cc[0];
-                                colors[lightIndex * 3 + 1] = p.cc[1];
-                                colors[lightIndex * 3 + 2] = p.cc[2];
-                                lightIndex++;
-                            }
-                        }
-                    }
-                    EventManager.instance.post(Events.LIGHT_POS_2D_UPDATED, lightIndex, positions, viewAngles, colors, glowTex);
-                } else {
-                    EventManager.instance.post(Events.LIGHT_POS_2D_UPDATED, 0, positions, viewAngles, colors, glowTex);
-                }
-            }
-
-        });
+        lpu = new LightPositionUpdater();
+        billboardStarsProc.addPostRunnables(lpu);
 
         // BILLBOARD GALAXIES
         AbstractRenderSystem billboardGalaxiesProc = new BillboardStarRenderSystem(RenderGroup.BILLBOARD_GAL, alphas, galShaders, "data/tex/base/static.jpg", ComponentType.Galaxies.ordinal());
@@ -789,8 +740,10 @@ public class SceneGraphRenderer extends AbstractRenderer implements IProcessRend
                 }
             }
 
-            // Save to texture for later use
-            glowTex = fb.getColorBufferTexture();
+            // Set texture to updater
+            if(lpu != null){
+                lpu.setGlowTexture(fb.getColorBufferTexture());
+            }
 
             fb.end();
 

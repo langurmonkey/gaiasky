@@ -502,7 +502,7 @@ public class DesktopConfInit extends ConfInit {
         p.setProperty("scene.star.threshold.point", Double.toString(GlobalConf.scene.STAR_THRESHOLD_POINT));
         p.setProperty("scene.star.threshold.none", Double.toString(GlobalConf.scene.STAR_THRESHOLD_NONE));
         p.setProperty("scene.star.point.size", Float.toString(GlobalConf.scene.STAR_POINT_SIZE));
-        p.setProperty("scene.point.alpha.min", Float.toString(GlobalConf.scene.POINT_ALPHA_MIN));
+        p.setProperty("scene.point.alpha.min", Float.toString(GlobalConf.scene.STAR_MIN_OPACITY));
         p.setProperty("scene.point.alpha.max", Float.toString(GlobalConf.scene.POINT_ALPHA_MAX));
         p.setProperty("scene.renderer.orbit", Integer.toString(GlobalConf.scene.ORBIT_RENDERER));
         p.setProperty("scene.renderer.line", Integer.toString(GlobalConf.scene.LINE_RENDERER));

@@ -740,7 +740,7 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
 
     @Override
     public float getMinStarOpacity() {
-        return MathUtilsd.lint(GlobalConf.scene.POINT_ALPHA_MIN, Constants.MIN_STAR_MIN_OPACITY, Constants.MAX_STAR_MIN_OPACITY, Constants.MIN_SLIDER, Constants.MAX_SLIDER);
+        return MathUtilsd.lint(GlobalConf.scene.STAR_MIN_OPACITY, Constants.MIN_STAR_MIN_OPACITY, Constants.MAX_STAR_MIN_OPACITY, Constants.MIN_SLIDER, Constants.MAX_SLIDER);
     }
 
     @Override

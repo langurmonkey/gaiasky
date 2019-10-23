@@ -174,7 +174,7 @@ public class ParticleGroup extends FadeNode implements I3DTextRenderable, IFocus
     /**
      * Are the data of this vgroup in the GPU memory?
      */
-    public boolean inGpu;
+    private boolean inGpu;
 
     // Offset and count for this vgroup
     public int offset, count;
@@ -929,6 +929,22 @@ public class ParticleGroup extends FadeNode implements I3DTextRenderable, IFocus
         }
     }
 
+    public boolean inGpu(){
+        return inGpu;
+    }
+
+    public void inGpu(boolean inGpu){
+        this.inGpu = inGpu;
+    }
+
+    public void setInGpu(boolean inGpu){
+        if(this.inGpu && !inGpu){
+            // Dispose of GPU data
+            EventManager.instance.post(Events.DISPOSE_PARTICLE_GROUP_GPU_MESH, this.offset);
+        }
+        this.inGpu = inGpu;
+    }
+
     @Override
     public float getTextOpacity() {
         return getOpacity();
@@ -936,7 +952,7 @@ public class ParticleGroup extends FadeNode implements I3DTextRenderable, IFocus
 
     @Override
     public void highlight(boolean hl, float[] color) {
-        this.inGpu = false;
+        setInGpu(false);
         super.highlight(hl, color);
     }
 

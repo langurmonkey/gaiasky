@@ -30,7 +30,7 @@ public class CameraComponent extends GuiComponent implements IObserver {
     protected OwnLabel fov, speed, turn, rotate, date;
     protected SelectBox<String> cameraSpeedLimit;
     protected SelectBox<CameraComboBoxBean> cameraMode;
-    protected Slider fieldOfView, cameraSpeed, turnSpeed, rotateSpeed;
+    protected OwnSlider fieldOfView, cameraSpeed, turnSpeed, rotateSpeed;
     protected CheckBox focusLock, orientationLock, cinematic;
     protected OwnTextIconButton button3d, buttonDome, buttonCubemap, buttonAnaglyph, button3dtv, buttonVR, buttonCrosseye;
     protected boolean fovFlag = true;
@@ -119,7 +119,7 @@ public class CameraComponent extends GuiComponent implements IObserver {
         buttonList.add(buttonCubemap);
 
         Label fovLabel = new Label(I18n.txt("gui.camera.fov"), skin, "default");
-        fieldOfView = new OwnSlider(Constants.MIN_FOV, Constants.MAX_FOV, 1, false, skin);
+        fieldOfView = new OwnSlider(Constants.MIN_FOV, Constants.MAX_FOV, Constants.SLIDER_STEP, false, skin);
         fieldOfView.setName("field of view");
         fieldOfView.setWidth(width);
         fieldOfView.setValue(GlobalConf.scene.CAMERA_FOV);
@@ -172,29 +172,29 @@ public class CameraComponent extends GuiComponent implements IObserver {
         cameraSpeedLimit.setSelectedIndex(GlobalConf.scene.CAMERA_SPEED_LIMIT_IDX);
 
         /** CAMERA SPEED **/
-        cameraSpeed = new OwnSlider(Constants.MIN_SLIDER, Constants.MAX_SLIDER / 2, 1, false, skin);
+        cameraSpeed = new OwnSlider(Constants.MIN_SLIDER, Constants.MAX_SLIDER, Constants.SLIDER_STEP, Constants.MIN_CAM_SPEED, Constants.MAX_CAM_SPEED, skin);
         cameraSpeed.setName("camera speed");
         cameraSpeed.setWidth(width);
-        cameraSpeed.setValue((float) (GlobalConf.scene.CAMERA_SPEED * Constants.CAMERA_SPEED_FACTOR));
+        cameraSpeed.setMappedValue(GlobalConf.scene.CAMERA_SPEED);
         cameraSpeed.addListener(event -> {
             if (!fieldLock && event instanceof ChangeEvent) {
-                EventManager.instance.post(Events.CAMERA_SPEED_CMD, cameraSpeed.getValue() / Constants.CAMERA_SPEED_FACTOR, true);
+                EventManager.instance.post(Events.CAMERA_SPEED_CMD, cameraSpeed.getMappedValue(), true);
                 speed.setText(Integer.toString((int) cameraSpeed.getValue()));
                 return true;
             }
             return false;
         });
 
-        speed = new OwnLabel(Integer.toString((int) (GlobalConf.scene.CAMERA_SPEED * Constants.CAMERA_SPEED_FACTOR)), skin, "default");
+        speed = new OwnLabel(Integer.toString((int) cameraSpeed.getValue()), skin, "default");
 
         /** ROTATION SPEED **/
-        rotateSpeed = new OwnSlider(Constants.MIN_SLIDER, Constants.MAX_SLIDER, 1, false, skin);
+        rotateSpeed = new OwnSlider(Constants.MIN_SLIDER, Constants.MAX_SLIDER, Constants.SLIDER_STEP, Constants.MIN_ROT_SPEED, Constants.MAX_ROT_SPEED, skin);
         rotateSpeed.setName("rotate speed");
         rotateSpeed.setWidth(width);
-        rotateSpeed.setValue((float) MathUtilsd.lint(GlobalConf.scene.ROTATION_SPEED, Constants.MIN_ROT_SPEED, Constants.MAX_ROT_SPEED, Constants.MIN_SLIDER, Constants.MAX_SLIDER));
+        rotateSpeed.setMappedValue(GlobalConf.scene.ROTATION_SPEED);
         rotateSpeed.addListener(event -> {
             if (!fieldLock && event instanceof ChangeEvent) {
-                EventManager.instance.post(Events.ROTATION_SPEED_CMD, (float) MathUtilsd.lint(rotateSpeed.getValue(), Constants.MIN_SLIDER, Constants.MAX_SLIDER, Constants.MIN_ROT_SPEED, Constants.MAX_ROT_SPEED), true);
+                EventManager.instance.post(Events.ROTATION_SPEED_CMD, rotateSpeed.getMappedValue(), true);
                 rotate.setText(Integer.toString((int) rotateSpeed.getValue()));
                 return true;
             }
@@ -204,13 +204,13 @@ public class CameraComponent extends GuiComponent implements IObserver {
         rotate = new OwnLabel(Integer.toString((int) MathUtilsd.lint(GlobalConf.scene.ROTATION_SPEED, Constants.MIN_ROT_SPEED, Constants.MAX_ROT_SPEED, Constants.MIN_SLIDER, Constants.MAX_SLIDER)), skin, "default");
 
         /** TURNING SPEED **/
-        turnSpeed = new OwnSlider(Constants.MIN_SLIDER, Constants.MAX_SLIDER, 1, false, skin);
+        turnSpeed = new OwnSlider(Constants.MIN_SLIDER, Constants.MAX_SLIDER, Constants.SLIDER_STEP, Constants.MIN_TURN_SPEED, Constants.MAX_TURN_SPEED, skin);
         turnSpeed.setName("turn speed");
         turnSpeed.setWidth(width);
-        turnSpeed.setValue((float) MathUtilsd.lint(GlobalConf.scene.TURNING_SPEED, Constants.MIN_TURN_SPEED, Constants.MAX_TURN_SPEED, Constants.MIN_SLIDER, Constants.MAX_SLIDER));
+        turnSpeed.setMappedValue(GlobalConf.scene.TURNING_SPEED);
         turnSpeed.addListener(event -> {
             if (!fieldLock && event instanceof ChangeEvent) {
-                EventManager.instance.post(Events.TURNING_SPEED_CMD, MathUtilsd.lint(turnSpeed.getValue(), Constants.MIN_SLIDER, Constants.MAX_SLIDER, Constants.MIN_TURN_SPEED, Constants.MAX_TURN_SPEED), true);
+                EventManager.instance.post(Events.TURNING_SPEED_CMD, turnSpeed.getMappedValue(), true);
                 turn.setText(Integer.toString((int) turnSpeed.getValue()));
                 return true;
             }
@@ -328,9 +328,8 @@ public class CameraComponent extends GuiComponent implements IObserver {
             Boolean interf = (Boolean) data[1];
             if (!interf) {
                 float value = (Float) data[0];
-                value = MathUtilsd.lint(value, Constants.MIN_ROT_SPEED, Constants.MAX_ROT_SPEED, Constants.MIN_SLIDER, Constants.MAX_SLIDER);
                 fieldLock = true;
-                rotateSpeed.setValue(value);
+                rotateSpeed.setMappedValue(value);
                 fieldLock = false;
                 rotate.setText(Integer.toString((int) value));
             }
@@ -339,9 +338,8 @@ public class CameraComponent extends GuiComponent implements IObserver {
             interf = (Boolean) data[1];
             if (!interf) {
                 float value = (Float) data[0];
-                value *= Constants.CAMERA_SPEED_FACTOR;
                 fieldLock = true;
-                cameraSpeed.setValue(value);
+                cameraSpeed.setMappedValue(value);
                 fieldLock = false;
                 speed.setText(Integer.toString((int) value));
             }
@@ -351,9 +349,8 @@ public class CameraComponent extends GuiComponent implements IObserver {
             interf = (Boolean) data[1];
             if (!interf) {
                 float value = (Float) data[0];
-                value = MathUtilsd.lint(value, Constants.MIN_TURN_SPEED, Constants.MAX_TURN_SPEED, Constants.MIN_SLIDER, Constants.MAX_SLIDER);
                 fieldLock = true;
-                turnSpeed.setValue(value);
+                turnSpeed.setMappedValue(value);
                 fieldLock = false;
                 turn.setText(Integer.toString((int) value));
             }
