@@ -26,11 +26,17 @@ uniform mat4 u_view;
 
 in vec4 a_position;
 in vec4 a_color;
-// x - size, y - 0: star, 1: dust
-in vec2 a_additional;
+// x - size, y - type, z - layer
+in vec3 a_additional;
 
 out vec4 v_col;
-out float v_dust;
+// 0 - dust
+// 1 - star
+// 2 - bulge
+// 3 - gas
+// 4 - hii
+flat out int v_type;
+flat out int v_layer;
 
 #ifdef velocityBufferFlag
 #include shader/lib_velbuffer.vert.glsl
@@ -53,7 +59,8 @@ void main() {
     float viewAngle = a_additional.x / dist;
 
     v_col = vec4(a_color.rgb, a_color.a * u_intensity * dscale);
-    v_dust = a_additional.y;
+    v_type = int(a_additional.y);
+    v_layer = int(a_additional.z);
 
     gl_PointSize = viewAngle * u_sizeFactor * u_ar;
 

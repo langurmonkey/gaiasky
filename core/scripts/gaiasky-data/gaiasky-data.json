@@ -189,7 +189,7 @@
       "type": "data-pack",
       "version": 4,
       "mingsversion": 20202,
-      "size": 64756608,
+      "size": 65149645,
       "check": "data-main.json",
       "data": [
         "asteroids-dr2.json",
@@ -237,7 +237,7 @@
         "tex/base/telescopebeam.png",
         "tex/skybox/gaiasky"
       ],
-      "sha256": "7ca69895ba5842b5421cf82421649537ca7be6e6d2737f5052f9fb955dac3c04",
+      "sha256": "742541c79318645cfe2575deb690fc17193222a73c132dc07da28a0731cf912c",
       "description": "Default data pack for Gaia Sky - For Gaia Sky 2.2.2 and above. Contains the Solar System, constellations, meshes and more",
       "file": "http://gaia.ari.uni-heidelberg.de/gaiasky/files/autodownload/basedata/005_20191004/gaiasky_data.tar.gz"
     },
