@@ -65,8 +65,12 @@ public class MinimapWidget {
         snms.initialize(ortho, sb, sr, font, side, sideshort);
         MilkyWayMinimapScale mmms = new MilkyWayMinimapScale();
         mmms.initialize(ortho, sb, sr, font, side, sideshort);
-        LocalGroupMinimapScale lgms = new LocalGroupMinimapScale();
-        lgms.initialize(ortho, sb, sr, font, side, sideshort);
+        LocalGroup1MinimapScale lg1ms = new LocalGroup1MinimapScale();
+        lg1ms.initialize(ortho, sb, sr, font, side, sideshort);
+        LocalGroup2MinimapScale lg2ms = new LocalGroup2MinimapScale();
+        lg2ms.initialize(ortho, sb, sr, font, side, sideshort);
+        HighZMinimapScale hzms = new HighZMinimapScale();
+        hzms.initialize(ortho, sb, sr, font, side, sideshort);
 
         scales.add(issms);
         scales.add(ossms);
@@ -74,7 +78,9 @@ public class MinimapWidget {
         scales.add(ocms);
         scales.add(snms);
         scales.add(mmms);
-        scales.add(lgms);
+        scales.add(lg1ms);
+        scales.add(lg2ms);
+        scales.add(hzms);
 
         current = null;
     }

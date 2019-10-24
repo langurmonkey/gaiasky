@@ -22,16 +22,16 @@ import gaiasky.util.coord.Coordinates;
 
 public class InnerSolarSystemMinimapScale extends AbstractMinimapScale {
 
-    private float[] merf, venf, earf, marf;
+    private float[] merp, venp, earp, marp;
     private Planet mer, ven, ear, mar;
     private Color merc, venc, marc, earc;
 
     public InnerSolarSystemMinimapScale() {
         super();
-        merf = new float[4];
-        venf = new float[4];
-        earf = new float[4];
-        marf = new float[4];
+        merp = new float[4];
+        venp = new float[4];
+        earp = new float[4];
+        marp = new float[4];
 
         merc = new Color(0.4f, 0.5f, 0.4f, 1f);
         venc = new Color(1f, 0.6f, 0.1f, 1f);
@@ -47,10 +47,10 @@ public class InnerSolarSystemMinimapScale extends AbstractMinimapScale {
             ear = (Planet) GaiaSky.instance.sg.getNode("Earth");
             mar = (Planet) GaiaSky.instance.sg.getNode("Mars");
         }
-        position(mer.getAbsolutePosition(aux3d1), merf);
-        position(ven.getAbsolutePosition(aux3d1), venf);
-        position(ear.getAbsolutePosition(aux3d1), earf);
-        position(mar.getAbsolutePosition(aux3d1), marf);
+        position(mer.getAbsolutePosition(aux3d1), merp);
+        position(ven.getAbsolutePosition(aux3d1), venp);
+        position(ear.getAbsolutePosition(aux3d1), earp);
+        position(mar.getAbsolutePosition(aux3d1), marp);
     }
 
 
@@ -94,16 +94,16 @@ public class InnerSolarSystemMinimapScale extends AbstractMinimapScale {
         // Planet positions
         // Mercury
         sr.setColor(merc);
-        sr.circle(merf[0], merf[1], px(3f));
+        sr.circle(merp[0], merp[1], px(3f));
         // Venus
         sr.setColor(venc);
-        sr.circle(venf[0], venf[1], px(3f));
+        sr.circle(venp[0], venp[1], px(3f));
         // Earth
         sr.setColor(earc);
-        sr.circle(earf[0], earf[1], px(3f));
+        sr.circle(earp[0], earp[1], px(3f));
         // Mars
         sr.setColor(marc);
-        sr.circle(marf[0], marf[1], px(3f));
+        sr.circle(marp[0], marp[1], px(3f));
 
         renderCameraSide(0.4f);
         sr.end();
@@ -111,13 +111,13 @@ public class InnerSolarSystemMinimapScale extends AbstractMinimapScale {
         // Fonts
         sb.begin();
         font.setColor(merc);
-        font.draw(sb, I18n.txt("gui.minimap.mercury"), merf[0] - px(20),  merf[1] + px(25));
+        font.draw(sb, I18n.txt("gui.minimap.mercury"), merp[0] - px(20),  merp[1] + px(25));
         font.setColor(venc);
-        font.draw(sb, I18n.txt("gui.minimap.venus"), venf[0] - px(20), venf[1] - px(25));
+        font.draw(sb, I18n.txt("gui.minimap.venus"), venp[0] - px(20), venp[1] - px(25));
         font.setColor(earc);
-        font.draw(sb, I18n.txt("gui.minimap.earth"), earf[0] - px(20), earf[1] + px(40));
+        font.draw(sb, I18n.txt("gui.minimap.earth"), earp[0] - px(20), earp[1] + px(40));
         font.setColor(marc);
-        font.draw(sb, I18n.txt("gui.minimap.mars"), marf[0] - px(20),  marf[1] - px(10));
+        font.draw(sb, I18n.txt("gui.minimap.mars"), marp[0] - px(20),  marp[1] - px(10));
         font.setColor(sunc);
         font.draw(sb, I18n.txt("gui.minimap.sun"), side2 + px(8), u2Px(10, sideshort2) - px(2));
         sb.end();
@@ -183,16 +183,16 @@ public class InnerSolarSystemMinimapScale extends AbstractMinimapScale {
         sr.circle(side2, side2, px(suns));
         // Mercury
         sr.setColor(merc);
-        sr.circle(merf[2], merf[3], px(3f));
+        sr.circle(merp[2], merp[3], px(3f));
         // Venus
         sr.setColor(venc);
-        sr.circle(venf[2], venf[3], px(3f));
+        sr.circle(venp[2], venp[3], px(3f));
         // Earth
         sr.setColor(earc);
-        sr.circle(earf[2], earf[3], px(3f));
+        sr.circle(earp[2], earp[3], px(3f));
         // Mars
         sr.setColor(marc);
-        sr.circle(marf[2], marf[3], px(3f));
+        sr.circle(marp[2], marp[3], px(3f));
 
         renderCameraTop(0.1f);
         sr.end();
@@ -206,13 +206,13 @@ public class InnerSolarSystemMinimapScale extends AbstractMinimapScale {
         font.draw(sb, "1.6 AU", side2, u2Px(1.6 + 0.1, side2));
         
         font.setColor(merc);
-        font.draw(sb, I18n.txt("gui.minimap.mercury"), merf[2] - px( 20),  merf[3] - px(8));
+        font.draw(sb, I18n.txt("gui.minimap.mercury"), merp[2] - px( 20),  merp[3] - px(8));
         font.setColor(venc);
-        font.draw(sb, I18n.txt("gui.minimap.venus"), venf[2] - px(20), venf[3] - px(8));
+        font.draw(sb, I18n.txt("gui.minimap.venus"), venp[2] - px(20), venp[3] - px(8));
         font.setColor(earc);
-        font.draw(sb, I18n.txt("gui.minimap.earth"), earf[2] - px(20), earf[3] - px(8));
+        font.draw(sb, I18n.txt("gui.minimap.earth"), earp[2] - px(20), earp[3] - px(8));
         font.setColor(marc);
-        font.draw(sb, I18n.txt("gui.minimap.mars"), marf[2] - px(20), marf[3] - px(8));
+        font.draw(sb, I18n.txt("gui.minimap.mars"), marp[2] - px(20), marp[3] - px(8));
         font.setColor(sunc);
         font.draw(sb, I18n.txt("gui.minimap.sun"), side2 + px(5), side2 - px(5));
 

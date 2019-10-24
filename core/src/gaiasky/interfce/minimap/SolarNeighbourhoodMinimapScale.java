@@ -177,7 +177,6 @@ public class SolarNeighbourhoodMinimapScale extends AbstractMinimapScale {
         font.setColor(textbc);
         font.draw(sb, "250pc", side2 + px(15), side2 + side2 / 2f + px(10));
         font.draw(sb, "500pc", side2 + px(25), side);
-
         sb.end();
 
         fb.end();
