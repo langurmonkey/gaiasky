@@ -25,7 +25,6 @@ import java.util.Map;
  */
 public class MessagesInterface extends Table implements IObserver, IGuiInterface {
     Label headline, subhead;
-    boolean displaying = false;
     /** Lock object for synchronization **/
     private Object lock;
 

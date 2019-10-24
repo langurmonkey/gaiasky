@@ -7,9 +7,11 @@ package gaiasky.interfce;
 
 import com.badlogic.gdx.Application;
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.scenes.scene2d.ui.Cell;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
+import com.badlogic.gdx.utils.StringBuilder;
 import gaiasky.GaiaSky;
 import gaiasky.data.util.PointCloudData;
 import gaiasky.event.EventManager;
@@ -40,8 +42,8 @@ public class NotificationsInterface extends Table implements IObserver, IGuiInte
     static LinkedList<MessageBean> historical = new LinkedList<>();
     IDateFormat df;
     long msTimeout;
-    Label message1;
-    Label message2;
+    Label message1, message2;
+    Cell<Label> c1, c2;
     boolean displaying = false;
     boolean consoleLog = true;
     boolean historicalLog = false;
@@ -112,14 +114,19 @@ public class NotificationsInterface extends Table implements IObserver, IGuiInte
         this.msTimeout = msTimeout;
         this.multiple = multiple;
 
+        float pad05 = 5f;
+        this.setBackground("table-bg");
+        this.pad(pad05);
+
         // Create second message if necessary
         if (multiple) {
             message2 = new OwnLabel("", skin, "hud-med");
-            this.add(message2).left().row();
+            c2 = this.add(message2).left();
+            c2.row();
         }
         // Create message
         message1 = new OwnLabel("", skin, "hud-med");
-        this.add(message1).left();
+        c1 = this.add(message1).left();
 
         this.df = DateFormatFactory.getFormatter("uuuu-MM-dd HH:mm:ss");
         EventManager.instance.subscribe(this, Events.POST_NOTIFICATION, Events.FOCUS_CHANGED, Events.TIME_STATE_CMD, Events.TOGGLE_VISIBILITY_CMD, Events.CAMERA_MODE_CMD, Events.PACE_CHANGED_INFO, Events.FOCUS_LOCK_CMD, Events.TOGGLE_AMBIENT_LIGHT, Events.FOV_CHANGE_NOTIFICATION, Events.JAVA_EXCEPTION, Events.ORBIT_DATA_LOADED, Events.SCREENSHOT_INFO, Events.COMPUTE_GAIA_SCAN_CMD, Events.ONLY_OBSERVED_STARS_CMD, Events.TRANSIT_COLOUR_CMD, Events.LIMIT_MAG_CMD, Events.STEREOSCOPIC_CMD, Events.DISPLAY_GUI_CMD, Events.FRAME_OUTPUT_CMD, Events.STEREO_PROFILE_CMD, Events.OCTREE_PARTICLE_FADE_CMD, Events.SCREEN_NOTIFICATION_CMD, Events.MODE_POPUP_CMD);
@@ -141,10 +148,10 @@ public class NotificationsInterface extends Table implements IObserver, IGuiInte
         if (add) {
             if (multiple && !historical.isEmpty() && !historical.getLast().finished(msTimeout)) {
                 // Move current up
-                this.message2.setText(this.message1.getText());
+                setText(message2, c2, message1.getText());
             }
             // Set 1
-            this.message1.setText(formatMessage(messageBean));
+            setText(message1, c1, formatMessage(messageBean));
 
             this.displaying = true;
             this.permanent = permanent;
@@ -168,15 +175,33 @@ public class NotificationsInterface extends Table implements IObserver, IGuiInte
     public void update() {
         if (displaying && !permanent) {
             if (multiple && historical.size() > 1 && historical.get(historical.size() - 2).finished(msTimeout)) {
-                message2.setText("");
+                clearText(message2, c2);
             }
 
             if (historical.getLast().finished(msTimeout)) {
                 displaying = false;
-                message1.setText("");
+                clearText(message1, c1);
             }
 
+            if(!c1.hasActor() && !c2.hasActor()){
+                setVisible(false);
+            } else {
+                setVisible(true);
+            }
         }
+    }
+
+    private void setText(Label l, Cell<Label> c, String text){
+        l.setText(text);
+        c.setActor(l);
+    }
+    private void setText(Label l, Cell<Label> c, StringBuilder text){
+        setText(l, c, text.toString());
+    }
+
+    private void clearText(Label l, Cell<Label> c){
+        l.setText("");
+        c.setActor(null);
     }
 
     @Override

@@ -50,6 +50,7 @@ public class FullGui extends AbstractGui {
 
     protected Container<FocusInfoInterface> fi;
     protected Container<TopInfoInterface> ti;
+    protected Container<NotificationsInterface> ni;
     protected FocusInfoInterface focusInterface;
     protected NotificationsInterface notificationsInterface;
     protected MessagesInterface messagesInterface;
@@ -105,9 +106,11 @@ public class FullGui extends AbstractGui {
 
         // NOTIFICATIONS INTERFACE - BOTTOM LEFT
         notificationsInterface = new NotificationsInterface(skin, lock, true, true, true, true);
-        notificationsInterface.setFillParent(true);
-        notificationsInterface.left().bottom();
-        notificationsInterface.pad(0, pad, pad, 0);
+        notificationsInterface.pad(pad);
+        ni = new Container<>(notificationsInterface);
+        ni.setFillParent(true);
+        ni.bottom().left();
+        ni.pad(0, pad, pad, 0);
         interfaces.add(notificationsInterface);
 
         // CONTROLS WINDOW
@@ -244,8 +247,8 @@ public class FullGui extends AbstractGui {
                 controlsWindow.setPosition(0, Gdx.graphics.getHeight() - controlsWindow.getHeight());
                 ui.addActor(controlsWindow);
             }
-            if (notificationsInterface != null)
-                ui.addActor(notificationsInterface);
+            if (ni != null)
+                ui.addActor(ni);
             if (messagesInterface != null)
                 ui.addActor(messagesInterface);
             if (fi != null)
