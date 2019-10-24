@@ -857,7 +857,7 @@ public class StarGroup extends ParticleGroup implements ILineRenderable, IStarFo
 
     @Override
     public float textScale() {
-        return 0.1f;
+        return .5f / GlobalConf.scene.LABEL_SIZE_FACTOR;
     }
 
     public double getFocusSize() {
