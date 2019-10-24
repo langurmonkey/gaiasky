@@ -654,10 +654,9 @@ public class GlobalResources {
 
     }
 
-    public static String unpackTexName(String tex) {
+    public static String unpackTexName(String tex, GraphicsQuality gq) {
         if (tex.contains("*")) {
             // Try to figure out which is it
-            GraphicsQuality gq = GlobalConf.scene.GRAPHICS_QUALITY;
             for (int i = gq.ordinal(); i >= 0; i--) {
                 GraphicsQuality quality = GraphicsQuality.values()[i];
                 String suffix = quality.suffix;
@@ -667,11 +666,13 @@ public class GlobalResources {
                     return texSuffix;
                 }
             }
-
             return tex.replace("*", "");
         } else {
             return tex;
         }
+    }
+    public static String unpackTexName(String tex) {
+        return GlobalResources.unpackTexName(tex, GlobalConf.scene.GRAPHICS_QUALITY);
     }
 
     public static String unpackSkyboxSide(String skyboxLoc, String side) throws RuntimeException {

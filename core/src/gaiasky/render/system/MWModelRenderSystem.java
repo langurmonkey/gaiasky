@@ -6,11 +6,13 @@
 package gaiasky.render.system;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.*;
 import com.badlogic.gdx.graphics.VertexAttributes.Usage;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer.ShapeType;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.Array;
+import gaiasky.event.EventManager;
 import gaiasky.event.Events;
 import gaiasky.event.IObserver;
 import gaiasky.render.IRenderable;
@@ -21,6 +23,7 @@ import gaiasky.scenegraph.camera.ICamera;
 import gaiasky.util.Constants;
 import gaiasky.util.GlobalConf;
 import gaiasky.util.GlobalConf.SceneConf.GraphicsQuality;
+import gaiasky.util.GlobalResources;
 import gaiasky.util.gdx.mesh.IntMesh;
 import gaiasky.util.gdx.shader.ExtShaderProgram;
 import gaiasky.util.math.MathUtilsd;
@@ -29,12 +32,15 @@ import gaiasky.util.tree.LoadStatus;
 import org.lwjgl.opengl.GL30;
 
 public class MWModelRenderSystem extends ImmediateRenderSystem implements IObserver {
-    private Vector3 aux3f1;
+    private static final String texFolder = "data/galaxy/sprites/";
 
+    private Vector3 aux3f1;
     private MeshData dust, bulge, stars, hii, gas;
     private GpuData dustA, bulgeA, starsA, hiiA, gasA;
 
     private TextureArray ta;
+    // Max sizes for dust, star, bulge, gas and hii
+    private float[] maxSizes;
 
     private enum PType {
         DUST(0, new int[] { 3, 5, 7 }),
@@ -47,10 +53,17 @@ public class MWModelRenderSystem extends ImmediateRenderSystem implements IObser
         public int id;
         // The layers it can use
         public int[] layers;
+        // The modulus to skip particles, usually 0
+        public int modulus;
 
-        PType(int id, int[] layers) {
+        PType(int id, int[] layers, int modulus) {
             this.id = id;
             this.layers = layers;
+            this.modulus = modulus;
+        }
+
+        PType(int id, int[] layers) {
+            this(id, layers, 0);
         }
 
     }
@@ -58,6 +71,41 @@ public class MWModelRenderSystem extends ImmediateRenderSystem implements IObser
     public MWModelRenderSystem(RenderGroup rg, float[] alphas, ExtShaderProgram[] starShaders) {
         super(rg, alphas, starShaders);
         aux3f1 = new Vector3();
+        this.maxSizes = new float[PType.values().length];
+        initializeMaxSizes(GlobalConf.scene.GRAPHICS_QUALITY);
+        EventManager.instance.subscribe(this, Events.GRAPHICS_QUALITY_UPDATED);
+    }
+
+    /**
+     * Initializes the maximum size per component regarding the given graphics quality
+     * @param gq The graphics quality
+     */
+    private void initializeMaxSizes(GraphicsQuality gq) {
+        if (gq.isUltra()) {
+            this.maxSizes[PType.DUST.ordinal()] = 4000f;
+            this.maxSizes[PType.STAR.ordinal()] = 150f;
+            this.maxSizes[PType.BULGE.ordinal()] = 300f;
+            this.maxSizes[PType.GAS.ordinal()] = 4000f;
+            this.maxSizes[PType.HII.ordinal()] = 4000f;
+        } else if (gq.isHigh()) {
+            this.maxSizes[PType.DUST.ordinal()] = 1000f;
+            this.maxSizes[PType.STAR.ordinal()] = 100f;
+            this.maxSizes[PType.BULGE.ordinal()] = 250f;
+            this.maxSizes[PType.GAS.ordinal()] = 1200f;
+            this.maxSizes[PType.HII.ordinal()] = 400f;
+        } else if (gq.isNormal()) {
+            this.maxSizes[PType.DUST.ordinal()] = 60f;
+            this.maxSizes[PType.STAR.ordinal()] = 30f;
+            this.maxSizes[PType.BULGE.ordinal()] = 60f;
+            this.maxSizes[PType.GAS.ordinal()] = 120f;
+            this.maxSizes[PType.HII.ordinal()] = 70f;
+        } else if (gq.isLow()) {
+            this.maxSizes[PType.DUST.ordinal()] = 50f;
+            this.maxSizes[PType.STAR.ordinal()] = 20f;
+            this.maxSizes[PType.BULGE.ordinal()] = 50f;
+            this.maxSizes[PType.GAS.ordinal()] = 100f;
+            this.maxSizes[PType.HII.ordinal()] = 60f;
+        }
     }
 
     @Override
@@ -71,11 +119,35 @@ public class MWModelRenderSystem extends ImmediateRenderSystem implements IObser
             shaderProgram.setUniformf("u_pointAlphaMax", 1.0f);
             shaderProgram.end();
         }
+        initializeTextureArray(GlobalConf.scene.GRAPHICS_QUALITY);
+    }
 
+    private void initializeTextureArray(GraphicsQuality gq) {
         // Create TextureArray with 8 layers
-        ta = new TextureArray(true, Pixmap.Format.RGBA8888, GlobalConf.data.dataFileHandle("data/tex/base/mw-sprites/star-00.png"), GlobalConf.data.dataFileHandle("data/tex/base/mw-sprites/star-01.png"), GlobalConf.data.dataFileHandle("data/tex/base/mw-sprites/dust-00.png"), GlobalConf.data.dataFileHandle("data/tex/base/mw-sprites/dust-01.png"), GlobalConf.data.dataFileHandle("data/tex/base/mw-sprites/dust-02.png"), GlobalConf.data.dataFileHandle("data/tex/base/mw-sprites/dust-03.png"), GlobalConf.data.dataFileHandle("data/tex/base/mw-sprites/dust-04.png"), GlobalConf.data.dataFileHandle("data/tex/base/mw-sprites/dust-05.png"));
+        FileHandle s00 = unpack("star-00*.png", gq);
+        FileHandle s01 = unpack("star-01*.png", gq);
+        FileHandle d00 = unpack("dust-00*.png", gq);
+        FileHandle d01 = unpack("dust-01*.png", gq);
+        FileHandle d02 = unpack("dust-02*.png", gq);
+        FileHandle d03 = unpack("dust-03*.png", gq);
+        FileHandle d04 = unpack("dust-04*.png", gq);
+        FileHandle d05 = unpack("dust-05*.png", gq);
+        ta = new TextureArray(true, Pixmap.Format.RGBA8888, s00, s01, d00, d01, d02, d03, d04, d05);
         ta.setFilter(Texture.TextureFilter.Linear, Texture.TextureFilter.Linear);
+    }
 
+    private FileHandle unpack(String texName, GraphicsQuality gq) {
+        return GlobalConf.data.dataFileHandle(GlobalResources.unpackTexName(texFolder + texName, gq));
+    }
+
+    private void disposeTextureArray() {
+        ta.dispose();
+    }
+
+    @Override
+    public void dispose() {
+        super.dispose();
+        disposeTextureArray();
     }
 
     @Override
@@ -111,28 +183,6 @@ public class MWModelRenderSystem extends ImmediateRenderSystem implements IObser
      * @return
      */
     private GpuData convertDataToGpu(Array<? extends ParticleBean> data, ColorGenerator cg, PType type) {
-        GraphicsQuality gq = GlobalConf.scene.GRAPHICS_QUALITY;
-        int modulus;
-        switch (gq) {
-        case LOW:
-            // Every second out
-            modulus = 2;
-            break;
-        case NORMAL:
-            // Every fourth out
-            modulus = 4;
-            break;
-        case HIGH:
-        case ULTRA:
-        default:
-            // All of them
-            modulus = 0;
-            break;
-        }
-        if (type == PType.DUST) {
-            modulus = 50;
-        }
-
         float hiDpiScaleFactor = GlobalConf.UI_SCALE_FACTOR;
 
         GpuData ad = new GpuData();
@@ -146,7 +196,7 @@ public class MWModelRenderSystem extends ImmediateRenderSystem implements IObser
 
         int i = 0;
         for (ParticleBean star : data) {
-            if (modulus == 0 || i % modulus == 0) {
+            if (type.modulus == 0 || i % type.modulus == 0) {
                 // COLOR
                 float[] col = star.data.length >= 7 ? new float[] { (float) star.data[4], (float) star.data[5], (float) star.data[6] } : cg.generateColor();
                 col[0] = MathUtilsd.clamp(col[0], 0f, 1f);
@@ -251,8 +301,9 @@ public class MWModelRenderSystem extends ImmediateRenderSystem implements IObser
                     Gdx.gl20.glDepthMask(true);
 
                     //  Dust
-                    shaderProgram.setUniformf("u_sizeFactor", (float) (4.5e13 * Constants.DISTANCE_SCALE_FACTOR));
-                    shaderProgram.setUniformf("u_intensity", 1.3f);
+                    shaderProgram.setUniformf("u_maxPointSize", maxSizes[PType.DUST.ordinal()]);
+                    shaderProgram.setUniformf("u_sizeFactor", (float) (2e13 * Constants.DISTANCE_SCALE_FACTOR));
+                    shaderProgram.setUniformf("u_intensity", 1.9f);
                     dust.mesh.render(shaderProgram, ShapeType.Point.getGlType());
 
                     // PART2: BULGE + STARS + HII + GAS - depth enabled - no depth writes
@@ -260,23 +311,27 @@ public class MWModelRenderSystem extends ImmediateRenderSystem implements IObser
                     Gdx.gl20.glDepthMask(false);
 
                     // HII
-                    shaderProgram.setUniformf("u_sizeFactor", (float) (6e11 * Constants.DISTANCE_SCALE_FACTOR));
-                    shaderProgram.setUniformf("u_intensity", 0.6f);
+                    shaderProgram.setUniformf("u_maxPointSize", maxSizes[PType.HII.ordinal()]);
+                    shaderProgram.setUniformf("u_sizeFactor", (float) (5e11 * Constants.DISTANCE_SCALE_FACTOR));
+                    shaderProgram.setUniformf("u_intensity", 1f);
                     hii.mesh.render(shaderProgram, ShapeType.Point.getGlType());
 
                     // Gas
-                    shaderProgram.setUniformf("u_sizeFactor", (float) (2e12 * Constants.DISTANCE_SCALE_FACTOR));
-                    shaderProgram.setUniformf("u_intensity", 0.6f);
+                    shaderProgram.setUniformf("u_maxPointSize", maxSizes[PType.GAS.ordinal()]);
+                    shaderProgram.setUniformf("u_sizeFactor", (float) (1.4e12 * Constants.DISTANCE_SCALE_FACTOR));
+                    shaderProgram.setUniformf("u_intensity", 1.8f);
                     gas.mesh.render(shaderProgram, ShapeType.Point.getGlType());
 
                     // Bulge
-                    shaderProgram.setUniformf("u_sizeFactor", (float) (5e11 * Constants.DISTANCE_SCALE_FACTOR));
-                    shaderProgram.setUniformf("u_intensity", 0.8f);
+                    shaderProgram.setUniformf("u_maxPointSize", maxSizes[PType.BULGE.ordinal()]);
+                    shaderProgram.setUniformf("u_sizeFactor", (float) (2e12 * Constants.DISTANCE_SCALE_FACTOR));
+                    shaderProgram.setUniformf("u_intensity", 0.5f);
                     bulge.mesh.render(shaderProgram, ShapeType.Point.getGlType());
 
                     // Stars
-                    shaderProgram.setUniformf("u_sizeFactor", (float) (1e11 * Constants.DISTANCE_SCALE_FACTOR));
-                    shaderProgram.setUniformf("u_intensity", 1f);
+                    shaderProgram.setUniformf("u_maxPointSize", maxSizes[PType.STAR.ordinal()]);
+                    shaderProgram.setUniformf("u_sizeFactor", (float) (2e11 * Constants.DISTANCE_SCALE_FACTOR));
+                    shaderProgram.setUniformf("u_intensity", 0.8f);
                     stars.mesh.render(shaderProgram, ShapeType.Point.getGlType());
 
                     shaderProgram.end();
@@ -301,6 +356,18 @@ public class MWModelRenderSystem extends ImmediateRenderSystem implements IObser
 
     @Override
     public void notify(Events event, Object... data) {
+        switch (event) {
+        case GRAPHICS_QUALITY_UPDATED:
+            GraphicsQuality gq = (GraphicsQuality) data[0];
+            Gdx.app.postRunnable(() -> {
+                disposeTextureArray();
+                initializeTextureArray(gq);
+                initializeMaxSizes(gq);
+            });
+            break;
+        default:
+            break;
+        }
     }
 
     private interface ColorGenerator {
@@ -323,7 +390,7 @@ public class MWModelRenderSystem extends ImmediateRenderSystem implements IObser
     private class DustColorGenerator implements ColorGenerator {
         @Override
         public float[] generateColor() {
-            float r = (float) Math.abs(StdRandom.uniform() * 0.15);
+            float r = (float) Math.abs(StdRandom.uniform() * 0.19);
             return new float[] { r, r, r };
         }
     }

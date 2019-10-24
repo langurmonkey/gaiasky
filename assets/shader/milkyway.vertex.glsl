@@ -12,6 +12,7 @@ uniform float u_sizeFactor;
 uniform float u_intensity;
 uniform float u_ar;
 uniform vec2 u_edges;
+uniform float u_maxPointSize;
 uniform float u_vrScale;
 
 uniform mat4 u_view;
@@ -62,7 +63,7 @@ void main() {
     v_type = int(a_additional.y);
     v_layer = int(a_additional.z);
 
-    gl_PointSize = viewAngle * u_sizeFactor * u_ar;
+    gl_PointSize = min(viewAngle * u_sizeFactor * u_ar * u_vrScale, u_maxPointSize);
 
     vec4 gpos = u_projModelView * vec4(pos, 1.0);
     gl_Position = gpos;
