@@ -605,7 +605,7 @@
     },
     "question": {
       "font": "ui-10",
-      "fontColor": "gray"
+      "fontColor": "grey"
     },
     "hotkey": {
       "font": "ui-11",
