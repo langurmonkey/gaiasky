@@ -654,9 +654,9 @@ public class GlobalResources {
 
     }
 
-    public static String unpackTexName(String tex, GraphicsQuality gq) {
+        public static String unpackTexName(String tex, GraphicsQuality gq) {
         if (tex.contains("*")) {
-            // Try to figure out which is it
+            // Start with current quality and scan to lower ones
             for (int i = gq.ordinal(); i >= 0; i--) {
                 GraphicsQuality quality = GraphicsQuality.values()[i];
                 String suffix = quality.suffix;
@@ -666,7 +666,24 @@ public class GlobalResources {
                     return texSuffix;
                 }
             }
-            return tex.replace("*", "");
+            // Try with no suffix
+            String texNoSuffix = tex.replace("*", "");
+            if (GlobalConf.data.dataFileHandle(texNoSuffix).exists()) {
+                return texNoSuffix;
+            }
+            // Try higher qualities
+            int n = GraphicsQuality.values().length;
+            for (int i = gq.ordinal(); i < n; i++) {
+                GraphicsQuality quality = GraphicsQuality.values()[i];
+                String suffix = quality.suffix;
+
+                String texSuffix = tex.replace("*", suffix);
+                if (GlobalConf.data.dataFileHandle(texSuffix).exists()) {
+                    return texSuffix;
+                }
+            }
+            logger.error("Texture not found: " + tex);
+            return null;
         } else {
             return tex;
         }
