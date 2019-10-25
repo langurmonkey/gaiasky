@@ -626,6 +626,11 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
     }
 
     @Override
+    public void setMinimapVisibility(boolean visible) {
+        Gdx.app.postRunnable(() -> em.post(Events.SHOW_MINIMAP_ACTION, visible, false));
+    }
+
+    @Override
     public void setAmbientLight(final float ambientLight) {
         if (checkNum(ambientLight, Constants.MIN_SLIDER, Constants.MAX_SLIDER, "ambientLight"))
             Gdx.app.postRunnable(() -> em.post(Events.AMBIENT_LIGHT_CMD, ambientLight / 100f));

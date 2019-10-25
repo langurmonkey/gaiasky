@@ -13,6 +13,7 @@ import com.badlogic.gdx.graphics.glutils.FrameBuffer;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.utils.Array;
+import com.badlogic.gdx.utils.Disposable;
 import gaiasky.GaiaSky;
 import gaiasky.interfce.minimap.*;
 import gaiasky.scenegraph.camera.ICamera;
@@ -20,7 +21,7 @@ import gaiasky.util.GlobalConf;
 import gaiasky.util.GlobalResources;
 import gaiasky.util.scene2d.TextureWidget;
 
-public class MinimapWidget {
+public class MinimapWidget implements Disposable {
     private FrameBuffer tfb, sfb;
     private TextureWidget topProjection, sideProjection;
     int side, side2;
@@ -114,5 +115,8 @@ public class MinimapWidget {
             return current.getName();
         else
             return null;
+    }
+
+    public void dispose(){
     }
 }

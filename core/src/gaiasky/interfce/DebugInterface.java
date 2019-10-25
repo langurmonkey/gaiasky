@@ -22,7 +22,7 @@ import gaiasky.util.format.INumberFormat;
 import gaiasky.util.format.NumberFormatFactory;
 import gaiasky.util.scene2d.*;
 
-public class DebugInterface extends Table implements IObserver, IGuiInterface {
+public class DebugInterface extends TableGuiInterface implements IObserver {
     private OwnLabel debugRuntime, debugRAMUsed, debugRAMFree, debugRAMAlloc, debugRAMTotal, debugVRAMUsed, debugVRAMTotal, debugObjectsDisplay, debugObjectsLoaded, debugOcObserved, debugOcQueue, debugSamp, fps, spf, device;
     private OwnSlider queueStatus;
     private int previousQueueSize = 0, currentQueueMax = 0;
@@ -346,6 +346,11 @@ public class DebugInterface extends Table implements IObserver, IGuiInterface {
     @Override
     public void dispose() {
         unsubscribe();
+    }
+
+    @Override
+    public void update() {
+
     }
 
 }

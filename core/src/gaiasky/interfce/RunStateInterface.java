@@ -23,7 +23,7 @@ import gaiasky.util.scene2d.OwnTextTooltip;
  * @author tsagrista
  *
  */
-public class RunStateInterface extends Table implements IObserver, IGuiInterface {
+public class RunStateInterface extends TableGuiInterface implements IObserver {
 
     private Cell<?> keyboardImgCell, stopCameraCell, pauseBgCell, frameoutputImgCell;
     private Image keyboardImg, frameoutputImg;
@@ -154,6 +154,11 @@ public class RunStateInterface extends Table implements IObserver, IGuiInterface
     @Override
     public void dispose() {
         unsubscribe();
+    }
+
+    @Override
+    public void update() {
+
     }
 
 }

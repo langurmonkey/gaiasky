@@ -632,7 +632,7 @@ public enum Events {
      **/
     TOGGLE_MINIMAP,
     /**
-     * Shows the minimap window if it is not yet there
+     * Shows the minimap window/interface. Contains a boolean with the state and a boolean if it comes from UI
      */
     SHOW_MINIMAP_ACTION,
     /**

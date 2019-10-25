@@ -15,6 +15,7 @@ import gaiasky.event.EventManager;
 import gaiasky.event.Events;
 import gaiasky.event.IObserver;
 import gaiasky.interfce.DateDialog;
+import gaiasky.interfce.KeyBindings;
 import gaiasky.util.GlobalConf;
 import gaiasky.util.I18n;
 import gaiasky.util.TextUtils;
@@ -23,6 +24,7 @@ import gaiasky.util.format.DateFormatFactory.DateType;
 import gaiasky.util.format.IDateFormat;
 import gaiasky.util.scene2d.OwnImageButton;
 import gaiasky.util.scene2d.OwnLabel;
+import gaiasky.util.scene2d.OwnTextHotkeyTooltip;
 import gaiasky.util.scene2d.OwnTextTooltip;
 
 import java.time.Instant;
@@ -50,6 +52,8 @@ public class TimeComponent extends GuiComponent implements IObserver {
 
     @Override
     public void initialize() {
+        KeyBindings kb = KeyBindings.instance;
+
         // Time
         date = new OwnLabel("date UT", skin, "mono");
         date.setName("label date");
@@ -86,7 +90,7 @@ public class TimeComponent extends GuiComponent implements IObserver {
             }
             return false;
         });
-        plus.addListener(new OwnTextTooltip(I18n.txt("gui.tooltip.timewarpplus"), skin));
+        plus.addListener(new OwnTextHotkeyTooltip(I18n.txt("gui.tooltip.timewarpplus"), kb.getStringKeys("action.doubletime"), skin));
 
         minus = new OwnImageButton(skin, "minus");
         minus.setName("minus");
@@ -98,7 +102,7 @@ public class TimeComponent extends GuiComponent implements IObserver {
             }
             return false;
         });
-        minus.addListener(new OwnTextTooltip(I18n.txt("gui.tooltip.timewarpminus"), skin));
+        minus.addListener(new OwnTextHotkeyTooltip(I18n.txt("gui.tooltip.timewarpminus"), kb.getStringKeys("action.dividetime"), skin));
 
         timeWarp = new OwnLabel(TextUtils.getFormattedTimeWarp(), skin, "warp");
         timeWarp.setName("time warp");

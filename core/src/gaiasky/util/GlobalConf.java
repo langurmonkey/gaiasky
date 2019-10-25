@@ -798,6 +798,8 @@ public class GlobalConf {
         public String LOCALE;
         public boolean DISPLAY_HUD;
         public boolean DISPLAY_POINTER_COORDS;
+        public boolean DISPLAY_MINIMAP;
+        public boolean MINIMAP_IN_WINDOW = false;
         public boolean CUBEMAP360_MODE;
         /**
          * Cubemap projection
@@ -814,10 +816,10 @@ public class GlobalConf {
         public boolean DISPLAY_DATASET_DIALOG;
 
         public ProgramConf() {
-            EventManager.instance.subscribe(this, Events.STEREOSCOPIC_CMD, Events.STEREO_PROFILE_CMD, Events.CUBEMAP360_CMD, Events.CUBEMAP_PROJECTION_CMD);
+            EventManager.instance.subscribe(this, Events.STEREOSCOPIC_CMD, Events.STEREO_PROFILE_CMD, Events.CUBEMAP360_CMD, Events.CUBEMAP_PROJECTION_CMD, Events.SHOW_MINIMAP_ACTION);
         }
 
-        public void initialize(boolean sHOW_DEBUG_INFO, Instant lAST_CHECKED, String lAST_VERSION, String vERSION_CHECK_URL, String dATA_DESCRIPTOR_URL, String uI_THEME, String sCRIPT_LOCATION, int rEST_PORT, String lOCALE, boolean sTEREOSCOPIC_MODE, StereoProfile sTEREO_PROFILE, boolean cUBEMAP360_MODE, boolean dISPLAY_HUD, boolean dISPLAY_POINTER_COORDS, boolean dISPLAY_DATASET_DIALOG, boolean nET_MASTER, boolean nET_SLAVE, List<String> nET_MASTER_SLAVES, String lAST_OPEN_LOCATION) {
+        public void initialize(boolean sHOW_DEBUG_INFO, Instant lAST_CHECKED, String lAST_VERSION, String vERSION_CHECK_URL, String dATA_DESCRIPTOR_URL, String uI_THEME, String sCRIPT_LOCATION, int rEST_PORT, String lOCALE, boolean sTEREOSCOPIC_MODE, StereoProfile sTEREO_PROFILE, boolean cUBEMAP360_MODE, boolean dISPLAY_HUD, boolean dISPLAY_POINTER_COORDS, boolean dISPLAY_DATASET_DIALOG, boolean nET_MASTER, boolean nET_SLAVE, List<String> nET_MASTER_SLAVES, String lAST_OPEN_LOCATION, boolean dISPLAY_MINIMAP) {
             SHOW_DEBUG_INFO = sHOW_DEBUG_INFO;
             VERSION_LAST_TIME = lAST_CHECKED;
             VERSION_LAST_VERSION = lAST_VERSION;
@@ -837,6 +839,7 @@ public class GlobalConf {
             NET_SLAVE = nET_SLAVE;
             NET_MASTER_SLAVES = nET_MASTER_SLAVES;
             LAST_OPEN_LOCATION = lAST_OPEN_LOCATION;
+            DISPLAY_MINIMAP = dISPLAY_MINIMAP;
         }
 
         public void initialize(boolean sHOW_DEBUG_INFO, String uI_THEME, String lOCALE, boolean sTEREOSCOPIC_MODE, StereoProfile sTEREO_PROFILE) {
@@ -931,6 +934,13 @@ public class GlobalConf {
             case CUBEMAP_PROJECTION_CMD:
                 CUBEMAP_PROJECTION = (CubemapProjections.CubemapProjection) data[0];
                 logger.info("Cubemap projection set to " + CUBEMAP_PROJECTION.toString());
+                break;
+            case SHOW_MINIMAP_ACTION:
+                boolean show = (Boolean) data[0];
+                DISPLAY_MINIMAP = show;
+                break;
+            case TOGGLE_MINIMAP:
+                DISPLAY_MINIMAP = !DISPLAY_MINIMAP;
                 break;
             default:
                 break;

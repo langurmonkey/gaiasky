@@ -186,9 +186,9 @@
     },
     "grey": {
       "a": 1,
-      "b": 0.6,
-      "g": 0.6,
-      "r": 0.6
+      "b": 0.8,
+      "g": 0.8,
+      "r": 0.8
     },
     "theme": {
       "a": 1.0,
@@ -603,7 +603,11 @@
       "fontColor": "red"
     },
     "question": {
-      "font": "ui-09",
+      "font": "ui-10",
+      "fontColor": "red"
+    },
+    "hotkey": {
+      "font": "ui-11",
       "fontColor": "red"
     },
     "default": {

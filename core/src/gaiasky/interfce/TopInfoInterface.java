@@ -7,7 +7,6 @@ package gaiasky.interfce;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
-import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import gaiasky.event.EventManager;
 import gaiasky.event.Events;
 import gaiasky.event.IObserver;
@@ -23,7 +22,7 @@ import gaiasky.util.scene2d.OwnLabel;
 
 import java.time.Instant;
 
-public class TopInfoInterface extends Table implements IObserver, IGuiInterface {
+public class TopInfoInterface extends TableGuiInterface implements IObserver {
 
     /** Date format **/
     private IDateFormat dfdate, dftime;
@@ -145,6 +144,11 @@ public class TopInfoInterface extends Table implements IObserver, IGuiInterface 
     @Override
     public void dispose() {
         unsubscribe();
+    }
+
+    @Override
+    public void update() {
+
     }
 
 }

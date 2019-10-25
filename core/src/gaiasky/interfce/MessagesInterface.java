@@ -7,7 +7,6 @@ package gaiasky.interfce;
 
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
-import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.Widget;
 import gaiasky.event.EventManager;
 import gaiasky.event.Events;
@@ -23,7 +22,7 @@ import java.util.Map;
  * @author Toni Sagrista
  *
  */
-public class MessagesInterface extends Table implements IObserver, IGuiInterface {
+public class MessagesInterface extends TableGuiInterface implements IObserver {
     Label headline, subhead;
     /** Lock object for synchronization **/
     private Object lock;
@@ -77,6 +76,11 @@ public class MessagesInterface extends Table implements IObserver, IGuiInterface
     @Override
     public void dispose() {
         unsubscribe();
+    }
+
+    @Override
+    public void update() {
+
     }
 
 }

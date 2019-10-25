@@ -9,4 +9,8 @@ public interface IGuiInterface {
 
     void dispose();
 
+    void update();
+
+    boolean isOn();
+
 }

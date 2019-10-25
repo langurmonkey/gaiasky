@@ -24,4 +24,6 @@ public interface IMinimapScale {
     void renderTopProjection(FrameBuffer fb);
 
     String getName();
+
+    void dispose();
 }

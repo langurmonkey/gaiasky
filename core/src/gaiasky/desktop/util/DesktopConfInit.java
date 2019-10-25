@@ -193,9 +193,10 @@ public class DesktopConfInit extends ConfInit {
         boolean STEREOSCOPIC_MODE = Boolean.parseBoolean(p.getProperty("program.stereoscopic"));
         StereoProfile STEREO_PROFILE = StereoProfile.values()[Integer.parseInt(p.getProperty("program.stereoscopic.profile"))];
         boolean CUBEMAPE360_MODE = Boolean.parseBoolean(p.getProperty("program.cubemap360", "false"));
-        boolean DISPLAY_HUD = Boolean.parseBoolean(p.getProperty("program.displayhud", "false"));
-        boolean DISPLAY_POINTER_COORDS = Boolean.parseBoolean(p.getProperty("program.displaypointercoords", "true"));
+        boolean DISPLAY_HUD = Boolean.parseBoolean(p.getProperty("program.display.hud", "false"));
+        boolean DISPLAY_POINTER_COORDS = Boolean.parseBoolean(p.getProperty("program.display.pointercoords", "true"));
         boolean DISPLAY_DATASET_DIALOG = Boolean.parseBoolean(p.getProperty("program.catalog.chooser", "false"));
+        boolean DISPLAY_MINIMAP = Boolean.parseBoolean(p.getProperty("program.display.minimap", "true"));
         boolean NET_MASTER = Boolean.parseBoolean(p.getProperty("program.net.master", "false"));
         boolean NET_SLAVE = Boolean.parseBoolean(p.getProperty("program.net.slave", "false"));
         String LAST_FOLDER_LOCATION = p.getProperty("program.last.filesystem.location");
@@ -209,7 +210,7 @@ public class DesktopConfInit extends ConfInit {
             }
         }
 
-        prc.initialize(SHOW_DEBUG_INFO, LAST_CHECKED, LAST_VERSION, VERSION_CHECK_URL, DATA_DESCRIPTOR_URL, UI_THEME, SCRIPT_LOCATION, REST_PORT, LOCALE, STEREOSCOPIC_MODE, STEREO_PROFILE, CUBEMAPE360_MODE, DISPLAY_HUD, DISPLAY_POINTER_COORDS, DISPLAY_DATASET_DIALOG, NET_MASTER, NET_SLAVE, NET_MASTER_SLAVES, LAST_FOLDER_LOCATION);
+        prc.initialize(SHOW_DEBUG_INFO, LAST_CHECKED, LAST_VERSION, VERSION_CHECK_URL, DATA_DESCRIPTOR_URL, UI_THEME, SCRIPT_LOCATION, REST_PORT, LOCALE, STEREOSCOPIC_MODE, STEREO_PROFILE, CUBEMAPE360_MODE, DISPLAY_HUD, DISPLAY_POINTER_COORDS, DISPLAY_DATASET_DIALOG, NET_MASTER, NET_SLAVE, NET_MASTER_SLAVES, LAST_FOLDER_LOCATION, DISPLAY_MINIMAP);
 
         /** SCENE CONF **/
         String gc = p.getProperty("scene.graphics.quality");
@@ -457,8 +458,9 @@ public class DesktopConfInit extends ConfInit {
         p.setProperty("graphics.screen.screenoutput", Boolean.toString(GlobalConf.screen.SCREEN_OUTPUT));
 
         /** PROGRAM **/
-        p.setProperty("program.displayhud", Boolean.toString(GlobalConf.program.DISPLAY_HUD));
-        p.setProperty("program.displaypointercoords", Boolean.toString(GlobalConf.program.DISPLAY_POINTER_COORDS));
+        p.setProperty("program.display.hud", Boolean.toString(GlobalConf.program.DISPLAY_HUD));
+        p.setProperty("program.displaypointer.coords", Boolean.toString(GlobalConf.program.DISPLAY_POINTER_COORDS));
+        p.setProperty("program.display.minimap", Boolean.toString(GlobalConf.program.DISPLAY_MINIMAP));
         p.setProperty("program.debuginfo", Boolean.toString(GlobalConf.program.SHOW_DEBUG_INFO));
         p.setProperty("program.lastchecked", GlobalConf.program.VERSION_LAST_TIME != null ? df.format(GlobalConf.program.VERSION_LAST_TIME) : "");
         p.setProperty("program.url.versioncheck", GlobalConf.program.VERSION_CHECK_URL);

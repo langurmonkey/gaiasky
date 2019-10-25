@@ -41,6 +41,7 @@ public class ControlsWindow extends CollapsibleWindow implements IObserver {
     protected OwnScrollPane windowScroll;
     protected Table guiLayout;
     protected OwnImageButton recCamera = null, recKeyframeCamera = null, playCamera = null, playstop = null;
+    protected OwnTextIconButton map = null;
     protected TiledDrawable separator;
     /**
      * The scene graph
@@ -67,7 +68,7 @@ public class ControlsWindow extends CollapsibleWindow implements IObserver {
         septexreg.getTexture().setWrap(TextureWrap.Repeat, TextureWrap.ClampToEdge);
         this.separator = new TiledDrawable(septexreg);
 
-        EventManager.instance.subscribe(this, Events.TIME_STATE_CMD, Events.GUI_SCROLL_POSITION_CMD, Events.GUI_FOLD_CMD, Events.GUI_MOVE_CMD, Events.RECALCULATE_OPTIONS_SIZE, Events.EXPAND_PANE_CMD, Events.COLLAPSE_PANE_CMD, Events.TOGGLE_EXPANDCOLLAPSE_PANE_CMD);
+        EventManager.instance.subscribe(this, Events.TIME_STATE_CMD, Events.GUI_SCROLL_POSITION_CMD, Events.GUI_FOLD_CMD, Events.GUI_MOVE_CMD, Events.RECALCULATE_OPTIONS_SIZE, Events.EXPAND_PANE_CMD, Events.COLLAPSE_PANE_CMD, Events.TOGGLE_EXPANDCOLLAPSE_PANE_CMD, Events.SHOW_MINIMAP_ACTION, Events.TOGGLE_MINIMAP);
     }
 
     public void initialize() {
@@ -90,7 +91,8 @@ public class ControlsWindow extends CollapsibleWindow implements IObserver {
             }
             return false;
         });
-        playstop.addListener(new OwnTextTooltip(I18n.txt("gui.tooltip.playstop"), skin));
+        String timeHotkey = KeyBindings.instance.getStringKeys("action.pauseresume");
+        playstop.addListener(new OwnTextHotkeyTooltip(I18n.txt("gui.tooltip.playstop"), timeHotkey, skin));
 
         TimeComponent timeComponent = new TimeComponent(skin, ui);
         timeComponent.initialize();
@@ -223,12 +225,16 @@ public class ControlsWindow extends CollapsibleWindow implements IObserver {
 
         Table buttonsTable;
         /** BUTTONS **/
-        Button map = new OwnTextIconButton("", skin, "map");
+        KeyBindings kb = KeyBindings.instance;
+        Image mapIcon = new Image(skin.getDrawable("map-icon"));
+        map = new OwnTextIconButton("", mapIcon, skin, "toggle");
         map.setName("map");
-        map.addListener(new OwnTextTooltip(I18n.txt("gui.map"), skin));
+        map.setChecked(GlobalConf.program.DISPLAY_MINIMAP);
+        String minimapHotkey = kb.getStringKeys("action.toggle/gui.minimap.title");
+        map.addListener(new OwnTextHotkeyTooltip(I18n.txt("gui.map"),minimapHotkey, skin));
         map.addListener(event -> {
             if (event instanceof ChangeEvent) {
-                EventManager.instance.post(Events.SHOW_MINIMAP_ACTION);
+                EventManager.instance.post(Events.SHOW_MINIMAP_ACTION, map.isChecked(), true);
             }
             return false;
         });
@@ -243,7 +249,8 @@ public class ControlsWindow extends CollapsibleWindow implements IObserver {
         });
         Button preferences = new OwnTextIconButton("", skin, "preferences");
         preferences.setName("preferences");
-        preferences.addListener(new OwnTextTooltip(I18n.txt("gui.preferences"), skin));
+        String prefsHotkey = kb.getStringKeys("action.preferences");
+        preferences.addListener(new OwnTextHotkeyTooltip(I18n.txt("gui.preferences"), prefsHotkey, skin));
         preferences.addListener(event -> {
             if (event instanceof ChangeEvent) {
                 EventManager.instance.post(Events.SHOW_PREFERENCES_ACTION);
@@ -261,7 +268,8 @@ public class ControlsWindow extends CollapsibleWindow implements IObserver {
         });
         Button about = new OwnTextIconButton("", skin, "help");
         about.setName("about");
-        about.addListener(new OwnTextTooltip(I18n.txt("gui.help"), skin));
+        String helpHotkey = kb.getStringKeys("action.help");
+        about.addListener(new OwnTextHotkeyTooltip(I18n.txt("gui.help"), helpHotkey, skin));
         about.addListener(event -> {
             if (event instanceof ChangeEvent) {
                 EventManager.instance.post(Events.SHOW_ABOUT_ACTION);
@@ -270,7 +278,7 @@ public class ControlsWindow extends CollapsibleWindow implements IObserver {
         });
         Button quit = new OwnTextIconButton("", skin, "quit");
         quit.setName("quit");
-        quit.addListener(new OwnTextTooltip(I18n.txt("gui.quit.title"), skin));
+        quit.addListener(new OwnTextHotkeyTooltip(I18n.txt("gui.quit.title"), kb.getStringKeys("action.exit"), skin));
         quit.addListener(event -> {
             if (event instanceof ChangeEvent) {
                 EventManager.instance.post(Events.SHOW_QUIT_ACTION);
@@ -423,6 +431,20 @@ public class ControlsWindow extends CollapsibleWindow implements IObserver {
             paneName = (String) data[0];
             pane = panes.get(paneName);
             pane.togglePane();
+            break;
+        case SHOW_MINIMAP_ACTION:
+            boolean show = (Boolean) data[0];
+            boolean ui = (Boolean) data[1];
+            if (!ui) {
+                map.setProgrammaticChangeEvents(false);
+                map.setChecked(show);
+                map.setProgrammaticChangeEvents(true);
+            }
+            break;
+        case TOGGLE_MINIMAP:
+            map.setProgrammaticChangeEvents(false);
+            map.setChecked(!map.isChecked());
+            map.setProgrammaticChangeEvents(true);
             break;
         default:
             break;

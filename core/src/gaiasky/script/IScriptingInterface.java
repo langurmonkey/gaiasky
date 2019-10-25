@@ -629,6 +629,12 @@ public interface IScriptingInterface {
     void setHomeCrosshairVisibility(boolean visible);
 
     /**
+     * Shows or hides the minimap.
+     * @param visible The visibility state
+     */
+    void setMinimapVisibility(boolean visible);
+
+    /**
      * Sets the ambient light to a certain value.
      *
      * @param value The value of the ambient light, between 0 and 100.

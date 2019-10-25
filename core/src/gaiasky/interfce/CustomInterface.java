@@ -265,4 +265,14 @@ public class CustomInterface implements IObserver, IGuiInterface {
         unsubscribe();
     }
 
+    @Override
+    public void update() {
+
+    }
+
+    @Override
+    public boolean isOn() {
+        return true;
+    }
+
 }

@@ -138,14 +138,18 @@ public class KeyBindings {
 
     public String getStringKeys(String actionId) {
         TreeSet<Integer> keys = getKeys(actionId);
-        StringBuilder sb = new StringBuilder();
-        Iterator<Integer> it = keys.descendingIterator();
-        while (it.hasNext()) {
-            sb.append(Keys.toString(it.next()));
-            if (it.hasNext())
-                sb.append("+");
+        if(keys != null) {
+            StringBuilder sb = new StringBuilder();
+            Iterator<Integer> it = keys.descendingIterator();
+            while (it.hasNext()) {
+                sb.append(Keys.toString(it.next()));
+                if (it.hasNext())
+                    sb.append("+");
+            }
+            return sb.toString();
+        } else {
+            return null;
         }
-        return sb.toString();
     }
 
     /**

@@ -233,4 +233,7 @@ public abstract class AbstractMinimapScale implements IMinimapScale {
 
     }
 
+    public void dispose(){
+    }
+
 }

@@ -216,11 +216,6 @@ public class GuiRegistry implements IObserver {
     private KeyframesWindow keyframesWindow;
 
     /**
-     * Minimap window
-     **/
-    private MinimapWindow minimapWindow;
-
-    /**
      * Mode change info popup
      */
     public Table modeChangeTable;
@@ -239,7 +234,7 @@ public class GuiRegistry implements IObserver {
         super();
         this.skin = skin;
         // Windows which are visible from any GUI
-        EventManager.instance.subscribe(this, Events.SHOW_QUIT_ACTION, Events.SHOW_ABOUT_ACTION, Events.SHOW_LOAD_CATALOG_ACTION, Events.SHOW_PREFERENCES_ACTION, Events.SHOW_KEYFRAMES_WINDOW_ACTION, Events.UI_THEME_RELOAD_INFO, Events.TOGGLE_MINIMAP, Events.SHOW_MINIMAP_ACTION, Events.MODE_POPUP_CMD, Events.DISPLAY_GUI_CMD, Events.CAMERA_MODE_CMD, Events.UI_RELOAD_CMD);
+        EventManager.instance.subscribe(this, Events.SHOW_QUIT_ACTION, Events.SHOW_ABOUT_ACTION, Events.SHOW_LOAD_CATALOG_ACTION, Events.SHOW_PREFERENCES_ACTION, Events.SHOW_KEYFRAMES_WINDOW_ACTION, Events.UI_THEME_RELOAD_INFO, Events.MODE_POPUP_CMD, Events.DISPLAY_GUI_CMD, Events.CAMERA_MODE_CMD, Events.UI_RELOAD_CMD);
     }
 
     public void dispose() {
@@ -337,20 +332,6 @@ public class GuiRegistry implements IObserver {
                 });
                 fc.show(ui);
                 break;
-            case TOGGLE_MINIMAP:
-                if (minimapWindow == null)
-                    minimapWindow = new MinimapWindow(ui, skin);
-                if (!minimapWindow.isVisible() || !minimapWindow.hasParent())
-                    minimapWindow.show(ui, Gdx.graphics.getWidth() - minimapWindow.getWidth(), Gdx.graphics.getHeight() - minimapWindow.getHeight());
-                else
-                    minimapWindow.hide();
-                break;
-            case SHOW_MINIMAP_ACTION:
-                if (minimapWindow == null)
-                    minimapWindow = new MinimapWindow(ui, skin);
-                if (!minimapWindow.isVisible() || !minimapWindow.hasParent())
-                    minimapWindow.show(ui, Gdx.graphics.getWidth() - minimapWindow.getWidth(), Gdx.graphics.getHeight() - minimapWindow.getHeight());
-                break;
             case SHOW_KEYFRAMES_WINDOW_ACTION:
                 if (keyframesWindow == null) {
                     keyframesWindow = new KeyframesWindow(ui, skin);
@@ -434,6 +415,7 @@ public class GuiRegistry implements IObserver {
             }
         }
     }
+
 
     public boolean removeModeChangePopup() {
         boolean removed = false;

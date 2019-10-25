@@ -35,7 +35,7 @@ import gaiasky.util.scene2d.OwnTextTooltip;
  *
  * @author tsagrista
  */
-public class FocusInfoInterface extends Table implements IObserver, IGuiInterface {
+public class FocusInfoInterface extends TableGuiInterface implements IObserver {
     static private INetworkChecker daemon;
     static private int MAX_RULER_NAME_LEN = 9;
 
@@ -514,6 +514,11 @@ public class FocusInfoInterface extends Table implements IObserver, IGuiInterfac
 
     public void dispose() {
         unsubscribe();
+    }
+
+    @Override
+    public void update() {
+
     }
 
 }

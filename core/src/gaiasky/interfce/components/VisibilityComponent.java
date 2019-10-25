@@ -12,6 +12,7 @@ import com.badlogic.gdx.utils.Align;
 import gaiasky.event.EventManager;
 import gaiasky.event.Events;
 import gaiasky.event.IObserver;
+import gaiasky.interfce.KeyBindings;
 import gaiasky.interfce.beans.ComboBoxBean;
 import gaiasky.render.ComponentTypes.ComponentType;
 import gaiasky.render.SceneGraphRenderer;
@@ -77,8 +78,13 @@ public class VisibilityComponent extends GuiComponent implements IObserver {
                     }
                     // Name is the key
                     button.setName(ct.key);
-                    // Tooltip
-                    button.addListener(new OwnTextTooltip(TextUtils.capitalise(ct.getName()), skin));
+                    // Tooltip (with or without hotkey)
+                    String hk = KeyBindings.instance.getStringKeys("action.toggle/" + ct.key);
+                    if(hk != null){
+                        button.addListener(new OwnTextHotkeyTooltip(TextUtils.capitalise(ct.getName()), hk, skin));
+                    } else {
+                        button.addListener(new OwnTextTooltip(TextUtils.capitalise(ct.getName()), skin));
+                    }
 
                     buttonMap.put(name, button);
                     if (!ct.key.equals(name))

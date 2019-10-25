@@ -10,7 +10,6 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.scenes.scene2d.ui.Cell;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
-import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.utils.StringBuilder;
 import gaiasky.GaiaSky;
 import gaiasky.data.util.PointCloudData;
@@ -36,7 +35,7 @@ import java.util.List;
  *
  * @author Toni Sagrista
  */
-public class NotificationsInterface extends Table implements IObserver, IGuiInterface {
+public class NotificationsInterface extends TableGuiInterface implements IObserver {
     private static final long DEFAULT_TIMEOUT = 5000;
     private static final String TAG_SEPARATOR = " - ";
     static LinkedList<MessageBean> historical = new LinkedList<>();

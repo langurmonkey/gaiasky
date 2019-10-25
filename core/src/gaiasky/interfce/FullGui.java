@@ -9,7 +9,10 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.scenes.scene2d.*;
 import com.badlogic.gdx.scenes.scene2d.InputEvent.Type;
-import com.badlogic.gdx.scenes.scene2d.ui.*;
+import com.badlogic.gdx.scenes.scene2d.ui.Container;
+import com.badlogic.gdx.scenes.scene2d.ui.Label;
+import com.badlogic.gdx.scenes.scene2d.ui.ScrollPane;
+import com.badlogic.gdx.scenes.scene2d.ui.TextField;
 import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Timer;
@@ -47,6 +50,7 @@ public class FullGui extends AbstractGui {
     private static final Log logger = Logger.getLogger(FullGui.class);
 
     protected ControlsWindow controlsWindow;
+    protected MinimapWindow minimapWindow;
 
     protected Container<FocusInfoInterface> fi;
     protected Container<TopInfoInterface> ti;
@@ -57,6 +61,7 @@ public class FullGui extends AbstractGui {
     protected CustomInterface customInterface;
     protected RunStateInterface runStateInterface;
     protected TopInfoInterface topInfoInterface;
+    protected MinimapInterface minimapInterface;
 
     protected SearchDialog searchDialog;
     protected RunCameraWindow runcameraWindow;
@@ -65,6 +70,8 @@ public class FullGui extends AbstractGui {
 
     protected INumberFormat nf;
     protected Label pointerXCoord, pointerYCoord;
+
+    protected float pad, pad5;
 
     protected ISceneGraph sg;
     private ComponentType[] visibilityEntities;
@@ -92,12 +99,12 @@ public class FullGui extends AbstractGui {
         buildGui();
 
         // We must subscribe to the desired events
-        EventManager.instance.subscribe(this, Events.FOV_CHANGED_CMD, Events.SHOW_SEARCH_ACTION, Events.SHOW_PLAYCAMERA_ACTION, Events.DISPLAY_MEM_INFO_WINDOW, Events.REMOVE_KEYBOARD_FOCUS, Events.REMOVE_GUI_COMPONENT, Events.ADD_GUI_COMPONENT, Events.SHOW_LOG_ACTION, Events.RA_DEC_UPDATED, Events.LON_LAT_UPDATED, Events.POPUP_MENU_FOCUS, Events.SHOW_LAND_AT_LOCATION_ACTION, Events.DISPLAY_POINTER_COORDS_CMD);
+        EventManager.instance.subscribe(this, Events.FOV_CHANGED_CMD, Events.SHOW_SEARCH_ACTION, Events.SHOW_PLAYCAMERA_ACTION, Events.DISPLAY_MEM_INFO_WINDOW, Events.REMOVE_KEYBOARD_FOCUS, Events.REMOVE_GUI_COMPONENT, Events.ADD_GUI_COMPONENT, Events.SHOW_LOG_ACTION, Events.RA_DEC_UPDATED, Events.LON_LAT_UPDATED, Events.POPUP_MENU_FOCUS, Events.SHOW_LAND_AT_LOCATION_ACTION, Events.DISPLAY_POINTER_COORDS_CMD, Events.TOGGLE_MINIMAP, Events.SHOW_MINIMAP_ACTION);
     }
 
     protected void buildGui() {
-        float pad = 10f * GlobalConf.UI_SCALE_FACTOR;
-        float pads = 5f * GlobalConf.UI_SCALE_FACTOR;
+        pad = 10f * GlobalConf.UI_SCALE_FACTOR;
+        pad5 = 5f * GlobalConf.UI_SCALE_FACTOR;
         // Component types name init
         for (ComponentType ct : ComponentType.values()) {
             ct.getName();
@@ -125,7 +132,6 @@ public class FullGui extends AbstractGui {
         fi.pad(0, 0, pad, pad);
         interfaces.add(focusInterface);
 
-
         // MESSAGES INTERFACE - LOW CENTER
         messagesInterface = new MessagesInterface(skin, lock);
         messagesInterface.setFillParent(true);
@@ -136,13 +142,15 @@ public class FullGui extends AbstractGui {
         // TOP INFO - TOP CENTER
         topInfoInterface = new TopInfoInterface(skin);
         topInfoInterface.top();
-        topInfoInterface.pad(pads, pad, pads, pad);
+        topInfoInterface.pad(pad5, pad, pad5, pad);
         ti = new Container<>(topInfoInterface);
         ti.setFillParent(true);
         ti.top();
         ti.pad(pad);
         interfaces.add(topInfoInterface);
 
+        // MINIMAP
+        initializeMinimap(ui);
 
         // INPUT STATE
         runStateInterface = new RunStateInterface(skin, true);
@@ -256,9 +264,13 @@ public class FullGui extends AbstractGui {
             if (runStateInterface != null) {
                 ui.addActor(runStateInterface);
             }
-            if(ti != null){
+            if (ti != null) {
                 ui.addActor(ti);
             }
+            if(minimapInterface != null){
+                ui.addActor(minimapInterface);
+            }
+
             if (pointerXCoord != null && pointerYCoord != null) {
                 ui.addActor(pointerXCoord);
                 ui.addActor(pointerYCoord);
@@ -330,7 +342,10 @@ public class FullGui extends AbstractGui {
     @Override
     public void update(double dt) {
         ui.act((float) dt);
-        notificationsInterface.update();
+        for (IGuiInterface i : interfaces) {
+            if (i.isOn())
+                i.update();
+        }
     }
 
     @Override
@@ -440,6 +455,21 @@ public class FullGui extends AbstractGui {
             popup.showMenu(ui, px, py);
 
             break;
+        case TOGGLE_MINIMAP:
+            if (GlobalConf.program.MINIMAP_IN_WINDOW) {
+                toggleMinimapWindow(ui);
+            } else {
+                toggleMinimapInterface(ui);
+            }
+            break;
+        case SHOW_MINIMAP_ACTION:
+            boolean show = (Boolean) data[0];
+            if (GlobalConf.program.MINIMAP_IN_WINDOW) {
+                showMinimapWindow(ui, show);
+            } else {
+                showMinimapInterface(ui, show);
+            }
+            break;
         default:
             break;
         }
@@ -480,6 +510,59 @@ public class FullGui extends AbstractGui {
         controlsWindow.padBottom(5);
 
         controlsWindow.collapseInstant();
+    }
+
+    public void initializeMinimap(Stage ui) {
+        if (GlobalConf.program.DISPLAY_MINIMAP) {
+            if (GlobalConf.program.MINIMAP_IN_WINDOW) {
+                showMinimapWindow(ui, true);
+            } else {
+                if(minimapInterface == null) {
+                    minimapInterface = new MinimapInterface(skin);
+                    minimapInterface.setFillParent(true);
+                    minimapInterface.right().top();
+                    minimapInterface.pad(pad, 0f, 0f, pad);
+                    interfaces.add(minimapInterface);
+                }
+            }
+        }
+    }
+
+    public void showMinimapInterface(Stage ui, boolean show){
+        if(minimapInterface == null) {
+            minimapInterface = new MinimapInterface(skin);
+            minimapInterface.setFillParent(true);
+            minimapInterface.right().top();
+            minimapInterface.pad(pad, 0f, 0f, pad);
+            interfaces.add(minimapInterface);
+        }
+        if(show){
+            // Add to ui
+            if(!minimapInterface.hasParent() || minimapInterface.getParent() != ui.getRoot()){
+                ui.addActor(minimapInterface);
+            }
+        } else {
+            // Remove from ui
+            minimapInterface.remove();
+        }
+
+    }
+
+    public void toggleMinimapInterface(Stage ui){
+        showMinimapInterface(ui, minimapInterface == null || (!minimapInterface.isVisible() || !minimapInterface.hasParent()));
+    }
+
+    public void showMinimapWindow(Stage ui, boolean show) {
+        if (minimapWindow == null)
+            minimapWindow = new MinimapWindow(ui, skin);
+        if (show)
+            minimapWindow.show(ui, Gdx.graphics.getWidth() - minimapWindow.getWidth(), Gdx.graphics.getHeight() - minimapWindow.getHeight());
+        else
+            minimapWindow.hide();
+    }
+
+    public void toggleMinimapWindow(Stage ui) {
+        showMinimapWindow(ui, minimapWindow == null || (!minimapWindow.isVisible() || !minimapWindow.hasParent()));
     }
 
 }
