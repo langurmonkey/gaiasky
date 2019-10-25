@@ -89,19 +89,19 @@ public class MWModelRenderSystem extends ImmediateRenderSystem implements IObser
             this.maxSizes[PType.HII.ordinal()] = 4000f;
         } else if (gq.isHigh()) {
             this.maxSizes[PType.DUST.ordinal()] = 1000f;
-            this.maxSizes[PType.STAR.ordinal()] = 100f;
+            this.maxSizes[PType.STAR.ordinal()] = 20f;
             this.maxSizes[PType.BULGE.ordinal()] = 250f;
             this.maxSizes[PType.GAS.ordinal()] = 1200f;
             this.maxSizes[PType.HII.ordinal()] = 400f;
         } else if (gq.isNormal()) {
             this.maxSizes[PType.DUST.ordinal()] = 60f;
-            this.maxSizes[PType.STAR.ordinal()] = 30f;
+            this.maxSizes[PType.STAR.ordinal()] = 10f;
             this.maxSizes[PType.BULGE.ordinal()] = 60f;
             this.maxSizes[PType.GAS.ordinal()] = 120f;
             this.maxSizes[PType.HII.ordinal()] = 70f;
         } else if (gq.isLow()) {
             this.maxSizes[PType.DUST.ordinal()] = 50f;
-            this.maxSizes[PType.STAR.ordinal()] = 20f;
+            this.maxSizes[PType.STAR.ordinal()] = 10f;
             this.maxSizes[PType.BULGE.ordinal()] = 50f;
             this.maxSizes[PType.GAS.ordinal()] = 100f;
             this.maxSizes[PType.HII.ordinal()] = 60f;
@@ -302,7 +302,7 @@ public class MWModelRenderSystem extends ImmediateRenderSystem implements IObser
 
                     //  Dust
                     shaderProgram.setUniformf("u_maxPointSize", maxSizes[PType.DUST.ordinal()]);
-                    shaderProgram.setUniformf("u_sizeFactor", (float) (2e13 * Constants.DISTANCE_SCALE_FACTOR));
+                    shaderProgram.setUniformf("u_sizeFactor", (float) (1.5e13 * Constants.DISTANCE_SCALE_FACTOR));
                     shaderProgram.setUniformf("u_intensity", 1.9f);
                     dust.mesh.render(shaderProgram, ShapeType.Point.getGlType());
 
@@ -318,8 +318,8 @@ public class MWModelRenderSystem extends ImmediateRenderSystem implements IObser
 
                     // Gas
                     shaderProgram.setUniformf("u_maxPointSize", maxSizes[PType.GAS.ordinal()]);
-                    shaderProgram.setUniformf("u_sizeFactor", (float) (1.4e12 * Constants.DISTANCE_SCALE_FACTOR));
-                    shaderProgram.setUniformf("u_intensity", 1.8f);
+                    shaderProgram.setUniformf("u_sizeFactor", (float) (1e12 * Constants.DISTANCE_SCALE_FACTOR));
+                    shaderProgram.setUniformf("u_intensity", 1f);
                     gas.mesh.render(shaderProgram, ShapeType.Point.getGlType());
 
                     // Bulge
