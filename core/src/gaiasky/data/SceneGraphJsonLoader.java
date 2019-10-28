@@ -15,14 +15,25 @@ import gaiasky.scenegraph.ISceneGraph;
 import gaiasky.scenegraph.SceneGraphNode;
 import gaiasky.scenegraph.StarGroup;
 import gaiasky.scenegraph.octreewrapper.AbstractOctreeWrapper;
+import gaiasky.util.I18n;
 import gaiasky.util.Logger;
+import gaiasky.util.Logger.Log;
 import gaiasky.util.time.ITimeFrameProvider;
 
 public class SceneGraphJsonLoader {
+    private static Log logger = Logger.getLogger(SceneGraphJsonLoader.class);
 
     public static ISceneGraph loadSceneGraph(FileHandle[] jsonFiles, ITimeFrameProvider time, boolean multithreading, int maxThreads) {
         ISceneGraph sg = null;
         try {
+            logger.info(I18n.txt("notif.loading","JSON data descriptor files:"));
+            for(FileHandle fh : jsonFiles){
+                logger.info("\t" + fh.path() + " - exists: " + fh.exists());
+                if(!fh.exists()){
+                    logger.error(I18n.txt("error.loading.nonexistent", fh.path()));
+                }
+            }
+
             Array<SceneGraphNode> nodes = new Array<SceneGraphNode>(false, 5000);
 
             for (FileHandle jsonFile : jsonFiles) {

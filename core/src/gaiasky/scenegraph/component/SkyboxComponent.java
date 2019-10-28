@@ -34,7 +34,7 @@ public class SkyboxComponent {
             skyboxLoad = true;
             try {
                 String skbLoc = GlobalConf.data.SKYBOX_LOCATION;
-                logger.info(I18n.txt("notif.loading", " skybox: " + skbLoc));
+                logger.info(I18n.txt("notif.loading", "skybox: " + skbLoc));
                 skyboxBack = GlobalResources.unpackSkyboxSide(skbLoc, "bk");
                 skyboxFront = GlobalResources.unpackSkyboxSide(skbLoc, "ft");
                 skyboxUp = GlobalResources.unpackSkyboxSide(skbLoc, "up");
