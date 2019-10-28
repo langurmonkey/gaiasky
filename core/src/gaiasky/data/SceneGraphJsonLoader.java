@@ -37,9 +37,6 @@ public class SceneGraphJsonLoader {
                 }
             }
 
-            Object dte = null;
-            dte.hashCode();
-
             Array<SceneGraphNode> nodes = new Array<>(false, 5000);
 
             for (FileHandle jsonFile : jsonFiles) {
