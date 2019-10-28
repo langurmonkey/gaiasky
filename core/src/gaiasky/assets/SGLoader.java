@@ -5,6 +5,7 @@
 
 package gaiasky.assets;
 
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.assets.AssetDescriptor;
 import com.badlogic.gdx.assets.AssetLoaderParameters;
 import com.badlogic.gdx.assets.AssetManager;
@@ -14,11 +15,13 @@ import com.badlogic.gdx.assets.loaders.FileHandleResolver;
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.utils.Array;
 import gaiasky.data.SceneGraphJsonLoader;
+import gaiasky.desktop.util.CrashReporter;
 import gaiasky.scenegraph.ISceneGraph;
 import gaiasky.scenegraph.SceneGraphNode;
 import gaiasky.util.GlobalConf;
 import gaiasky.util.I18n;
 import gaiasky.util.Logger;
+import gaiasky.util.Logger.Log;
 import gaiasky.util.time.ITimeFrameProvider;
 
 import java.io.File;
@@ -28,11 +31,11 @@ import java.nio.file.Paths;
 /**
  * {@link AssetLoader} for all the {@link SceneGraphNode} instances. Loads all
  * the entities in the scene graph.
- * 
- * @author Toni Sagrista
  *
+ * @author Toni Sagrista
  */
 public class SGLoader extends AsynchronousAssetLoader<ISceneGraph, SGLoader.SGLoaderParameter> {
+    private static Log logger = Logger.getLogger(SGLoader.class);
 
     ISceneGraph sg;
 
@@ -56,7 +59,7 @@ public class SGLoader extends AsynchronousAssetLoader<ISceneGraph, SGLoader.SGLo
         File[] autoloadFiles = dataFolder.toFile().listFiles((dir, name) -> {
             return name != null && name.startsWith("autoload-") && name.endsWith(".json");
         });
-        for(File autoloadFile : autoloadFiles) {
+        for (File autoloadFile : autoloadFiles) {
             filePaths.add(autoloadFile.getAbsolutePath());
         }
 
@@ -65,12 +68,20 @@ public class SGLoader extends AsynchronousAssetLoader<ISceneGraph, SGLoader.SGLo
             filehandles[i] = this.resolve(filePaths.get(i));
         }
 
-        sg = SceneGraphJsonLoader.loadSceneGraph(filehandles, parameter.time, parameter.multithreading, parameter.maxThreads);
-        Logger.getLogger(this.getClass()).info(I18n.bundle.get("notif.render.init"));
+        try {
+            sg = SceneGraphJsonLoader.loadSceneGraph(filehandles, parameter.time, parameter.multithreading, parameter.maxThreads);
+        } catch (Exception e) {
+            Gdx.app.postRunnable(() -> {
+                CrashReporter.reportCrash(e, logger);
+                Gdx.app.exit();
+            });
+        }
+
+        logger.info(I18n.bundle.get("notif.render.init"));
     }
 
     /**
-     * 
+     *
      */
     public ISceneGraph loadSync(AssetManager manager, String fileName, FileHandle file, SGLoaderParameter parameter) {
         return sg;

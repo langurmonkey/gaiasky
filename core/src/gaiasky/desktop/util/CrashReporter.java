@@ -12,8 +12,10 @@ import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.BufferUtils;
 import gaiasky.event.EventManager;
 import gaiasky.event.Events;
+import gaiasky.interfce.MessageBean;
+import gaiasky.interfce.NotificationsInterface;
 import gaiasky.util.GlobalConf;
-import gaiasky.util.Logger;
+import gaiasky.util.Logger.Log;
 import oshi.SystemInfo;
 import oshi.hardware.CentralProcessor;
 import oshi.hardware.HardwareAbstractionLayer;
@@ -23,18 +25,25 @@ import java.nio.IntBuffer;
 import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.Date;
+import java.util.List;
 
 public class CrashReporter {
 
-    public static void reportCrash(Throwable t, Logger.Log logger) {
+    public static void reportCrash(Throwable t, Log logger) {
         SimpleDateFormat df = new SimpleDateFormat("yyyyMMdd-HHmmss");
 
+        // Crash directory
+        File crashDir = SysUtils.getCrashReportsDir();
+        crashDir.mkdirs();
+        // Date string
+        Date now = new Date();
+        String dateString = df.format(now);
+
+        // Write system info
         StringWriter sw = new StringWriter();
         PrintWriter pw = new PrintWriter(sw);
         t.printStackTrace(pw);
         String stackTrace = sw.toString();
-
-        Date now = new Date();
 
         Array<String> crashInfo = new Array<>();
         crashInfo.add("#");
@@ -46,14 +55,65 @@ public class CrashReporter {
 
         appendSystemInfo(crashInfo);
 
+        // LOG FILE
+        File logFile = writeLog(logger, crashDir, dateString);
+
+        // Output crash info
         for (String str : crashInfo)
             print(logger, str);
 
-        // File reporting
-        File crashDir = SysUtils.getCrashReportsDir();
-        crashDir.mkdirs();
+        // CRASH FILE
+        File crashReportFile = writeCrash(logger, crashDir, dateString, crashInfo);
 
-        File crashReportFile = new File(crashDir, "gaiasky_crash_" + df.format(now) + ".txt");
+        // Closure
+        String crf1 = "Crash report file saved to: " + crashReportFile.getPath();
+        String crf4 = "Full log file saved to: " + logFile.getPath();
+        String crf2 = "Please attach these files to the bug report";
+        String crf3 = "Create a bug report here: https://gitlab.com/langurmonkey/gaiasky/issues";
+        int len = Math.max(crf1.length(), Math.max(crf2.length(), Math.max(crf3.length(), crf4.length())));
+        char[] chars = new char[len];
+        Arrays.fill(chars, '#');
+        String separatorLine = new String(chars);
+        print(logger, "");
+        print(logger, separatorLine);
+        print(logger, crf1);
+        print(logger, crf4);
+        print(logger, crf2);
+        print(logger, crf3);
+        print(logger, separatorLine);
+        print(logger, "");
+    }
+
+    private static File writeLog(Log logger, File crashDir, String dateString) {
+        // LOG FILE
+        List<MessageBean> logMessages = NotificationsInterface.getHistorical();
+        File logFile = new File(crashDir, "gaiasky_log_" + dateString + ".txt");
+        BufferedWriter writer = null;
+        try {
+            writer = new BufferedWriter(new FileWriter(logFile));
+            for (MessageBean b : logMessages) {
+                writer.write(b.formatMessage(true));
+                writer.newLine();
+            }
+        } catch (Exception e) {
+            if (logger != null) {
+                logger.error("Writing log crashed... Inception level 1 achieved! :_D", e);
+            } else {
+                System.err.println("Writing log crashed... Inception level 1 achieved! :_D");
+                e.printStackTrace(System.err);
+            }
+        } finally {
+            try {
+                // Close the writer regardless of what happens...
+                writer.close();
+            } catch (Exception e) {
+            }
+        }
+        return logFile;
+    }
+
+    private static File writeCrash(Log logger, File crashDir, String dateString, Array<String> crashInfo) {
+        File crashReportFile = new File(crashDir, "gaiasky_crash_" + dateString + ".txt");
         BufferedWriter writer = null;
         try {
             writer = new BufferedWriter(new FileWriter(crashReportFile));
@@ -72,27 +132,14 @@ public class CrashReporter {
             try {
                 // Close the writer regardless of what happens...
                 writer.close();
-
-                String crf1 = "Crash report file saved to: " + crashReportFile.getPath();
-                String crf2 = "Please attach this file to the bug report";
-                String crf3 = "Create a bug report here: https://gitlab.com/langurmonkey/gaiasky/issues";
-                int len = Math.max(crf1.length(), Math.max(crf2.length(), crf3.length()));
-                char[] chars = new char[len];
-                Arrays.fill(chars, '#');
-                String separatorLine = new String(chars);
-                print(logger, "");
-                print(logger, separatorLine);
-                print(logger, crf1);
-                print(logger, crf2);
-                print(logger, crf3);
-                print(logger, separatorLine);
-                print(logger, "");
             } catch (Exception e) {
+
             }
         }
+        return crashReportFile;
     }
 
-    private static void print(Logger.Log logger, String str) {
+    private static void print(Log logger, String str) {
         if (logger == null || !EventManager.instance.hasSubscriptors(Events.POST_NOTIFICATION)) {
             System.err.println(str);
         } else {
@@ -130,7 +177,7 @@ public class CrashReporter {
             CentralProcessor cp = hal.getProcessor();
             strArray.add("CPU: " + cp.getName());
             strArray.add("CPU arch: " + (cp.isCpu64bit() ? "64-bit" : "32-bit"));
-        }catch(Error e){
+        } catch (Error e) {
             strArray.add("Could not get CPU information!");
         }
 

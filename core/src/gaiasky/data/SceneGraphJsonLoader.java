@@ -11,6 +11,7 @@ import com.badlogic.gdx.utils.JsonReader;
 import com.badlogic.gdx.utils.JsonValue;
 import com.badlogic.gdx.utils.reflect.ClassReflection;
 import com.badlogic.gdx.utils.reflect.Constructor;
+import com.badlogic.gdx.utils.reflect.ReflectionException;
 import gaiasky.scenegraph.ISceneGraph;
 import gaiasky.scenegraph.SceneGraphNode;
 import gaiasky.scenegraph.StarGroup;
@@ -20,10 +21,12 @@ import gaiasky.util.Logger;
 import gaiasky.util.Logger.Log;
 import gaiasky.util.time.ITimeFrameProvider;
 
+import java.io.FileNotFoundException;
+
 public class SceneGraphJsonLoader {
     private static Log logger = Logger.getLogger(SceneGraphJsonLoader.class);
 
-    public static ISceneGraph loadSceneGraph(FileHandle[] jsonFiles, ITimeFrameProvider time, boolean multithreading, int maxThreads) {
+    public static ISceneGraph loadSceneGraph(FileHandle[] jsonFiles, ITimeFrameProvider time, boolean multithreading, int maxThreads) throws FileNotFoundException, ReflectionException {
         ISceneGraph sg = null;
         try {
             logger.info(I18n.txt("notif.loading","JSON data descriptor files:"));
@@ -34,7 +37,10 @@ public class SceneGraphJsonLoader {
                 }
             }
 
-            Array<SceneGraphNode> nodes = new Array<SceneGraphNode>(false, 5000);
+            Object dte = null;
+            dte.hashCode();
+
+            Array<SceneGraphNode> nodes = new Array<>(false, 5000);
 
             for (FileHandle jsonFile : jsonFiles) {
                 JsonReader jsonReader = new JsonReader();
@@ -102,7 +108,7 @@ public class SceneGraphJsonLoader {
             sg.initialize(nodes, time, hasOctree, hasStarGroup);
 
         } catch (Exception e) {
-            Logger.getLogger(SceneGraphJsonLoader.class).error(e);
+            throw e;
         }
         return sg;
     }
