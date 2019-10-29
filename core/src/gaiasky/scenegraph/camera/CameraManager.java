@@ -300,7 +300,6 @@ public class CameraManager implements ICamera, IObserver {
 
         // High speed?
         if (speed > (GlobalConf.runtime.OPENVR ? 5e6 : 5e3)) {
-            //System.out.println(panSpeed + " deg/s, " + speed + " km/h");
             StreamingOctreeLoader.clearQueue();
         }
 
