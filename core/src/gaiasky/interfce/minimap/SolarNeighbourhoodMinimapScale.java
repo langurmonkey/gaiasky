@@ -88,9 +88,12 @@ public class SolarNeighbourhoodMinimapScale extends AbstractMinimapScale {
         Gdx.gl.glBlendFunc(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA);
         // Grid
         sr.begin(ShapeType.Line);
-        sr.setColor(textbc);
+        sr.setColor(textyc);
+        sr.getColor().a *= 0.6f;
         sr.line(0, sideshort2, side, sideshort2);
         sr.line(side2, 0, side2, side);
+        sr.setColor(textbc);
+        sr.getColor().a *= 0.3f;
         sr.circle(side2, sideshort2, side2);
         sr.circle(side2, sideshort2, side2 / 2f);
         sr.end();
@@ -134,11 +137,16 @@ public class SolarNeighbourhoodMinimapScale extends AbstractMinimapScale {
         Gdx.gl.glBlendFunc(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA);
         // Grid
         sr.begin(ShapeType.Line);
-        sr.setColor(textbc);
+        sr.setColor(textyc);
+        sr.getColor().a *= 0.6f;
         sr.line(0, side2, side, side2);
         sr.line(side2, 0, side2, side);
+        sr.setColor(textbc);
+        sr.getColor().a *= 0.3f;
         sr.circle(side2, side2, side2);
+        sr.circle(side2, side2, side2 * 3f / 4f);
         sr.circle(side2, side2, side2 / 2f);
+        sr.circle(side2, side2, side2 / 4f);
         sr.end();
 
         sr.begin(ShapeType.Filled);

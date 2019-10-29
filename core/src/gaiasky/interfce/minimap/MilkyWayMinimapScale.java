@@ -7,13 +7,18 @@ package gaiasky.interfce.minimap;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.GL20;
+import com.badlogic.gdx.graphics.GL30;
 import com.badlogic.gdx.graphics.OrthographicCamera;
+import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.Texture.TextureFilter;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.FrameBuffer;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer.ShapeType;
 import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.scenes.scene2d.ui.Image;
+import com.badlogic.gdx.utils.Scaling;
 import gaiasky.util.Constants;
 import gaiasky.util.I18n;
 import gaiasky.util.coord.Coordinates;
@@ -21,6 +26,7 @@ import gaiasky.util.math.Vector2d;
 import gaiasky.util.math.Vector3d;
 
 public class MilkyWayMinimapScale extends AbstractMinimapScale {
+    private Image topProjection, sideProjection;
     private Vector2 sunPos;
 
     public MilkyWayMinimapScale() {
@@ -35,8 +41,18 @@ public class MilkyWayMinimapScale extends AbstractMinimapScale {
     @Override
     public void initialize(OrthographicCamera ortho, SpriteBatch sb, ShapeRenderer sr, BitmapFont font, int side, int sideshort) {
         super.initialize(ortho, sb, sr, font, side, sideshort, Constants.PC_TO_U, Constants.U_TO_PC, 16000, 100000 * Constants.AU_TO_U * Constants.U_TO_PC);
-        trans = Coordinates.eqToGal();
         sunPos = new Vector2(u2Px(0, side2), u2Px(-8000, side2));
+        Texture texTop = new Texture(Gdx.files.internal("img/minimap/mw_top.jpg"));
+        texTop.setFilter(TextureFilter.Linear, TextureFilter.Linear);
+        topProjection = new Image(texTop);
+        topProjection.setScaling(Scaling.fit);
+        topProjection.setSize(side, side);
+        Texture texSide = new Texture(Gdx.files.internal("img/minimap/mw_side.jpg"));
+        texSide.setFilter(TextureFilter.Linear, TextureFilter.Linear);
+        sideProjection = new Image(texSide);
+        sideProjection.setScaling(Scaling.fit);
+        sideProjection.setSize(side, sideshort);
+        trans = Coordinates.eqToGal();
     }
 
     public float[] position(Vector3d pos, float[] out) {
@@ -62,25 +78,32 @@ public class MilkyWayMinimapScale extends AbstractMinimapScale {
 
     @Override
     public void renderSideProjection(FrameBuffer fb) {
-        Gdx.gl.glEnable(GL20.GL_BLEND);
-
         ortho.setToOrtho(true, side, sideshort);
         sr.setProjectionMatrix(ortho.combined);
         sb.setProjectionMatrix(ortho.combined);
         fb.begin();
         // Clear
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT | GL20.GL_DEPTH_BUFFER_BIT | (Gdx.graphics.getBufferFormat().coverageSampling ? GL20.GL_COVERAGE_BUFFER_BIT_NV : 0));
+
+        // Background
+        sb.begin();
+        sideProjection.draw(sb, 1);
+        sb.end();
+
+        Gdx.gl.glEnable(GL30.GL_BLEND);
         Gdx.gl.glBlendFunc(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA);
 
+        // Grid
+        sr.begin(ShapeType.Line);
+        sr.setColor(textbc);
+        sr.getColor().a *= 0.2f;
+        sr.circle(side2, sideshort2, side2);
+        sr.circle(side2, sideshort2, side2 / 2);
+        sr.circle(side2, sideshort2, side2 * 3 / 4);
+        sr.circle(side2, sideshort2, side2 / 4);
+        sr.end();
+
         sr.begin(ShapeType.Filled);
-        // Mw disk
-        sr.setColor(0.15f, 0.15f, 0.35f, 1f);
-        sr.ellipse(0, sideshort2 - side * 0.015f, side, side * 0.03f);
-        // Mw bulge
-        sr.setColor(0.05f, 0.05f, 0.2f, 1f);
-        sr.circle(side2, sideshort2, side * 0.08f);
-
-
         // Sun position, 8 Kpc to do galactocentric
         sr.setColor(sunc);
         sr.circle(u2Px(-8000, side2), sideshort2, px(suns));
@@ -88,7 +111,7 @@ public class MilkyWayMinimapScale extends AbstractMinimapScale {
         sr.setColor(0f, 0f, 0f, 1f);
         sr.circle(side2, sideshort2, px(2.5f));
 
-        renderCameraSide(0.4f);
+        renderCameraSide(.1f);
         sr.end();
 
         // Fonts
@@ -97,6 +120,11 @@ public class MilkyWayMinimapScale extends AbstractMinimapScale {
         font.draw(sb, I18n.txt("gui.minimap.sun"), u2Px(-8000, side2), sideshort2 - px(8));
         font.setColor(textbc);
         font.draw(sb, I18n.txt("gui.minimap.gc"), side2, sideshort2 - px(4));
+        font.setColor(textmc);
+        font.draw(sb, "4Kpc", side2 + px(15), sideshort2 - px(10));
+        font.draw(sb, "8Kpc", side2 + px(50), sideshort2 + px(20));
+        font.draw(sb, "12Kpc", side2 + px(70), sideshort2 - px(30));
+        font.draw(sb, "16Kpc", side2 + px(90), sideshort2 + px(60));
         sb.end();
 
         fb.end();
@@ -105,32 +133,31 @@ public class MilkyWayMinimapScale extends AbstractMinimapScale {
 
     @Override
     public void renderTopProjection(FrameBuffer fb) {
-        Gdx.gl.glEnable(GL20.GL_BLEND);
-
         ortho.setToOrtho(true, side, side);
         sr.setProjectionMatrix(ortho.combined);
         sb.setProjectionMatrix(ortho.combined);
         fb.begin();
         // Clear
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT | GL20.GL_DEPTH_BUFFER_BIT | (Gdx.graphics.getBufferFormat().coverageSampling ? GL20.GL_COVERAGE_BUFFER_BIT_NV : 0));
+
+        // Background
+        sb.begin();
+        topProjection.draw(sb, 1);
+        sb.end();
+
+        Gdx.gl.glEnable(GL30.GL_BLEND);
         Gdx.gl.glBlendFunc(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA);
-
-
-        sr.begin(ShapeType.Filled);
-        // Grid
-        float col = 0.0f;
-        for (int i = 16000; i >= 4000; i -= 4000) {
-            sr.setColor(0.15f-col, 0.15f-col, 0.35f-col, 1f);
-            sr.circle(side2, side2, i * side / 32000);
-            col += 0.05f;
-        }
-        sr.circle(side2, side2, 1.5f);
-
-        sr.end();
 
         // Grid
         sr.begin(ShapeType.Line);
         sr.setColor(textbc);
+        sr.getColor().a *= 0.2f;
+        sr.circle(side2, side2, side2);
+        sr.circle(side2, side2, side2 / 2);
+        sr.circle(side2, side2, side2 * 3 / 4);
+        sr.circle(side2, side2, side2 / 4);
+        sr.setColor(textyc);
+        sr.getColor().a *= 0.6f;
         sr.line(side2, 0, side2, side);
         sr.line(px(15), sunPos.y, side - px(15), sunPos.y);
         sr.end();
@@ -144,7 +171,7 @@ public class MilkyWayMinimapScale extends AbstractMinimapScale {
         sr.setColor(0f, 0f, 0f, 1f);
         sr.circle(side2, side2, px(2.5f));
 
-        renderCameraTop();
+        renderCameraTop(.1f);
         sr.end();
 
 
@@ -152,16 +179,17 @@ public class MilkyWayMinimapScale extends AbstractMinimapScale {
         sb.begin();
         font.setColor(sunc);
         font.draw(sb, I18n.txt("gui.minimap.sun"), side2, sunPos.y - px(8));
-        font.setColor(textbc);
+        font.setColor(0, 0, 0, 1);
         font.draw(sb, I18n.txt("gui.minimap.gc"), side2 + px(4), side2 - px(4));
+        font.setColor(textmc);
         for (int i = 4000; i <= 16000; i += 4000) {
             font.draw(sb, "" + (i / 1000) + "Kpc", side2 + px(4), (16000 + i) * side / 32000 - px(6));
         }
 
         font.draw(sb, "0°", side2 - px(15), side - px(5));
-        font.draw(sb, "270°", side - px(33), sunPos.y + px(15));
+        font.draw(sb, "270°", side - px(50), sunPos.y + px(15));
         font.draw(sb, "180°", side2 - px(32), px(15));
-        font.draw(sb, "90°", px(15), sunPos.y + px(15));
+        font.draw(sb, "90°", px(18), sunPos.y + px(15));
         sb.end();
 
         fb.end();

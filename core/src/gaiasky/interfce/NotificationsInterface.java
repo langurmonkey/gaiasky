@@ -113,9 +113,7 @@ public class NotificationsInterface extends TableGuiInterface implements IObserv
         this.msTimeout = msTimeout;
         this.multiple = multiple;
 
-        float pad05 = 5f;
         this.setBackground("table-bg");
-        this.pad(pad05);
 
         // Create second message if necessary
         if (multiple) {
@@ -182,23 +180,25 @@ public class NotificationsInterface extends TableGuiInterface implements IObserv
                 clearText(message1, c1);
             }
 
-            if(!c1.hasActor() && !c2.hasActor()){
+            if (!c1.hasActor() && !c2.hasActor()) {
                 setVisible(false);
-            } else {
+            } else if (c1.hasActor() || c2.hasActor()) {
                 setVisible(true);
             }
         }
     }
 
-    private void setText(Label l, Cell<Label> c, String text){
+    private void setText(Label l, Cell<Label> c, String text) {
         l.setText(text);
         c.setActor(l);
+        setVisible(true);
     }
-    private void setText(Label l, Cell<Label> c, StringBuilder text){
+
+    private void setText(Label l, Cell<Label> c, StringBuilder text) {
         setText(l, c, text.toString());
     }
 
-    private void clearText(Label l, Cell<Label> c){
+    private void clearText(Label l, Cell<Label> c) {
         l.setText("");
         c.setActor(null);
     }

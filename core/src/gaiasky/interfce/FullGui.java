@@ -113,7 +113,7 @@ public class FullGui extends AbstractGui {
 
         // NOTIFICATIONS INTERFACE - BOTTOM LEFT
         notificationsInterface = new NotificationsInterface(skin, lock, true, true, true, true);
-        notificationsInterface.pad(pad);
+        notificationsInterface.pad(pad5);
         ni = new Container<>(notificationsInterface);
         ni.setFillParent(true);
         ni.bottom().left();
@@ -125,7 +125,6 @@ public class FullGui extends AbstractGui {
 
         // FOCUS INFORMATION - BOTTOM RIGHT
         focusInterface = new FocusInfoInterface(skin);
-        focusInterface.left().top();
         fi = new Container<>(focusInterface);
         fi.setFillParent(true);
         fi.bottom().right();
@@ -243,7 +242,6 @@ public class FullGui extends AbstractGui {
     }
 
     protected void rebuildGui() {
-
         if (ui != null) {
             ui.clear();
             boolean collapsed;

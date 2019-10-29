@@ -25,8 +25,9 @@
 
 ## Textures, models, music and other assets
 
--  Nick Risinger for the artist’s conception of the Milky Way (not used anymore)
+-  Nick Risinger for the artist’s conception of the Milky Way (versions lower than `2.2.0`)
 -  Andreas Ressl and Georg Hammershmid for the star glow texture
+-  [Stefan Payne-Wardenaar](http://twitter.com/StefanPWinc) for the Milky Way minimap scale background
 -  [Tom Patterson](www.shadedrelief.com) for some textures
 -  [Solar System Scope](http://www.solarsystemscope.com/) for some of the planetary and moon textures
 -  Phil Stooke and Grant Hutchison (http://www.classe.cornell.edu/~seb/celestia/hutchison/index-125.html) for some of the textures
