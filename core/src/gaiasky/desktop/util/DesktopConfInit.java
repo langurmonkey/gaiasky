@@ -291,7 +291,7 @@ public class DesktopConfInit extends ConfInit {
         double TESSELLATION_QUALITY = Double.parseDouble(p.getProperty("scene.tessellation.quality", "4.0"));
 
         // Hardcoded for now
-        double DIST_SCALE_DESKTOP = 1d;
+        double DIST_SCALE_DESKTOP = 1e6d;
         double DIST_SCALE_VR = 1e6d;
 
         SceneConf sc = new SceneConf();

@@ -37,7 +37,7 @@ public class SceneGraphJsonLoader {
                 }
             }
 
-            Array<SceneGraphNode> nodes = new Array<>(false, 5000);
+            Array<SceneGraphNode> nodes = new Array<>(false, 20600);
 
             for (FileHandle jsonFile : jsonFiles) {
                 JsonReader jsonReader = new JsonReader();
@@ -76,6 +76,15 @@ public class SceneGraphJsonLoader {
                         }
 
                         child = child.next;
+                    }
+                } else {
+                    // Use regular JsonLoader
+                    JsonLoader loader = new JsonLoader();
+                    loader.initialize(new String[]{jsonFile.file().getAbsolutePath()});
+                    // Load data
+                    Array<? extends SceneGraphNode> data = loader.loadData();
+                    for (SceneGraphNode elem : data) {
+                        nodes.add(elem);
                     }
                 }
             }

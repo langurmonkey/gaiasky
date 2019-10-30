@@ -18,9 +18,6 @@ import gaiasky.util.*;
 import gaiasky.util.Logger.Log;
 import gaiasky.util.coord.IBodyCoordinates;
 
-import java.io.File;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
@@ -52,15 +49,7 @@ public class JsonLoader<T extends SceneGraphNode> implements ISceneGraphLoader {
     public Array<? extends SceneGraphNode> loadData() {
         Array<T> bodies = new Array<T>();
 
-        // Add autoload files to the mix
-        Array<String> filePaths = new Array<String>(this.filePaths);
-        Path dataFolder = Paths.get(GlobalConf.data.DATA_LOCATION);
-        File[] autoloadFiles = dataFolder.toFile().listFiles((dir, name) -> {
-            return name != null && name.startsWith("autoload-") && name.endsWith(".json");
-        });
-        for (File autoloadFile : autoloadFiles) {
-            filePaths.add(autoloadFile.getAbsolutePath());
-        }
+        Array<String> filePaths = new Array<>(this.filePaths);
 
         // Actually load the files
         JsonReader json = new JsonReader();
@@ -208,18 +197,18 @@ public class JsonLoader<T extends SceneGraphNode> implements ISceneGraphLoader {
         return instance;
     }
 
-    public int depth(JsonValue attribute){
+    public int depth(JsonValue attribute) {
         int d = 1;
-        if(attribute.child != null){
+        if (attribute.child != null) {
             return d + depth(attribute.child);
-        }else{
+        } else {
             return d;
         }
     }
 
     public Pair<Object, Class> toMultidimDoubleArray(JsonValue attribute) {
         final int dim = depth(attribute) - 1;
-        switch(dim){
+        switch (dim) {
         case 1:
             return to1DoubleArray(attribute);
         case 2:
@@ -231,12 +220,11 @@ public class JsonLoader<T extends SceneGraphNode> implements ISceneGraphLoader {
         return null;
     }
 
-    public Pair<Object, Class> to1DoubleArray(JsonValue attribute){
+    public Pair<Object, Class> to1DoubleArray(JsonValue attribute) {
         return new Pair<>(attribute.asDouble(), double[].class);
     }
 
-
-    public Pair<Object, Class> to2DoubleArray(JsonValue attribute){
+    public Pair<Object, Class> to2DoubleArray(JsonValue attribute) {
         JsonValue json = attribute.child;
         int size = attribute.size;
         double[][] result = new double[size][];
@@ -250,7 +238,7 @@ public class JsonLoader<T extends SceneGraphNode> implements ISceneGraphLoader {
         return new Pair<>(result, double[][].class);
     }
 
-    public Pair<Object, Class> to3DoubleArray(JsonValue attribute){
+    public Pair<Object, Class> to3DoubleArray(JsonValue attribute) {
         JsonValue json = attribute.child;
         int size = attribute.size;
         double[][][] result = new double[size][][];

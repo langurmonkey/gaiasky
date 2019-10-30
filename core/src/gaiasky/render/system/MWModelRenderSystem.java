@@ -20,7 +20,6 @@ import gaiasky.scenegraph.MilkyWay;
 import gaiasky.scenegraph.ParticleGroup.ParticleBean;
 import gaiasky.scenegraph.SceneGraphNode.RenderGroup;
 import gaiasky.scenegraph.camera.ICamera;
-import gaiasky.util.Constants;
 import gaiasky.util.GlobalConf;
 import gaiasky.util.GlobalConf.SceneConf.GraphicsQuality;
 import gaiasky.util.GlobalResources;
@@ -302,7 +301,7 @@ public class MWModelRenderSystem extends ImmediateRenderSystem implements IObser
 
                     //  Dust
                     shaderProgram.setUniformf("u_maxPointSize", maxSizes[PType.DUST.ordinal()]);
-                    shaderProgram.setUniformf("u_sizeFactor", (float) (1.5e13 * Constants.DISTANCE_SCALE_FACTOR));
+                    shaderProgram.setUniformf("u_sizeFactor", (float) (1.5e13));
                     shaderProgram.setUniformf("u_intensity", 1.9f);
                     dust.mesh.render(shaderProgram, ShapeType.Point.getGlType());
 
@@ -312,25 +311,25 @@ public class MWModelRenderSystem extends ImmediateRenderSystem implements IObser
 
                     // HII
                     shaderProgram.setUniformf("u_maxPointSize", maxSizes[PType.HII.ordinal()]);
-                    shaderProgram.setUniformf("u_sizeFactor", (float) (5e11 * Constants.DISTANCE_SCALE_FACTOR));
+                    shaderProgram.setUniformf("u_sizeFactor", (float) (5e11));
                     shaderProgram.setUniformf("u_intensity", 1f);
                     hii.mesh.render(shaderProgram, ShapeType.Point.getGlType());
 
                     // Gas
                     shaderProgram.setUniformf("u_maxPointSize", maxSizes[PType.GAS.ordinal()]);
-                    shaderProgram.setUniformf("u_sizeFactor", (float) (1e12 * Constants.DISTANCE_SCALE_FACTOR));
+                    shaderProgram.setUniformf("u_sizeFactor", (float) (1.7e12));
                     shaderProgram.setUniformf("u_intensity", 1f);
                     gas.mesh.render(shaderProgram, ShapeType.Point.getGlType());
 
                     // Bulge
                     shaderProgram.setUniformf("u_maxPointSize", maxSizes[PType.BULGE.ordinal()]);
-                    shaderProgram.setUniformf("u_sizeFactor", (float) (2e12 * Constants.DISTANCE_SCALE_FACTOR));
+                    shaderProgram.setUniformf("u_sizeFactor", (float) (2e12));
                     shaderProgram.setUniformf("u_intensity", 0.5f);
                     bulge.mesh.render(shaderProgram, ShapeType.Point.getGlType());
 
                     // Stars
                     shaderProgram.setUniformf("u_maxPointSize", maxSizes[PType.STAR.ordinal()]);
-                    shaderProgram.setUniformf("u_sizeFactor", (float) (2e11 * Constants.DISTANCE_SCALE_FACTOR));
+                    shaderProgram.setUniformf("u_sizeFactor", (float) (2e11));
                     shaderProgram.setUniformf("u_intensity", 0.8f);
                     stars.mesh.render(shaderProgram, ShapeType.Point.getGlType());
 

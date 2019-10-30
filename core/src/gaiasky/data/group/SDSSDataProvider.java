@@ -93,7 +93,7 @@ public class SDSSDataProvider implements IParticleGroupDataProvider {
 
     @Override
     public Array<? extends ParticleBean> loadDataMapped(String file, double factor) {
-        Array<ParticleBean> pointData = new Array<ParticleBean>();
+        Array<ParticleBean> pointData = new Array<>();
 
         try {
             FileChannel fc = new RandomAccessFile(file, "r").getChannel();
