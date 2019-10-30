@@ -33,7 +33,7 @@ public class SceneGraphJsonLoader {
             for(FileHandle fh : jsonFiles){
                 logger.info("\t" + fh.path() + " - exists: " + fh.exists());
                 if(!fh.exists()){
-                    logger.error(I18n.txt("error.loading.nonexistent", fh.path()));
+                    logger.error(I18n.txt("error.loading.notexistent", fh.path()));
                 }
             }
 
