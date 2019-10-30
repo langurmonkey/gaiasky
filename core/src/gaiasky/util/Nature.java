@@ -36,13 +36,17 @@ public class Nature {
      * ======= DISTANCE UNITS =======
      */
     /** Parsecs to kilometres **/
-    public static final double PC_TO_KM = 3.08567758149137e13d;
+    public static final double PC_TO_KM = 3.08567758149137e13;
     /** Kilometres to parsecs **/
-    public static final double KM_TO_PC = 1 / PC_TO_KM;
+    public static final double KM_TO_PC = 1.0 / PC_TO_KM;
+    /** Parsecs to metres **/
+    public static final double PC_TO_M = PC_TO_KM * 1000.0;
+    /** Metres to parsecs **/
+    public static final double M_TO_PC = 1.0 / PC_TO_M;
     /** Astronomical units to kilometres **/
-    public static final double AU_TO_KM = 149597871d;
+    public static final double AU_TO_KM = 149597871.0;
     /** Kilometres to astronomical units **/
-    public static final double KM_TO_AU = 1 / AU_TO_KM;
+    public static final double KM_TO_AU = 1.0 / AU_TO_KM;
     
     
     /**

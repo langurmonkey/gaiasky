@@ -205,7 +205,9 @@ public class STILDataProvider extends AbstractStarGroupDataProvider {
                         }
                         double absmag = (appmag - 2.5 * Math.log10(Math.pow(distpc / 10.0, 2.0)));
                         double flux = Math.pow(10, -absmag / 2.5);
-                        double size = Math.min((Math.pow(flux, 0.5) * Constants.PC_TO_U * 0.16), 1e9) / 1.5;
+                        double sizeFactor = Nature.PC_TO_M * Constants.ORIGINAL_M_TO_U * 0.16;
+                        double size = Math.min((Math.pow(flux, 0.5) * sizeFactor), 1e9) / 1.5;
+                        size *= Constants.DISTANCE_SCALE_FACTOR;
 
                         /* COLOR */
                         float color;

@@ -12,10 +12,12 @@ public class Constants {
      */
     public static double DISTANCE_SCALE_FACTOR = 1d;
 
+    public static double ORIGINAL_M_TO_U = 1e-9d;
+
     /**
      * Metre to local unit conversion. Multiply this by all values in m.
      */
-    public static double M_TO_U = 1e-9d * DISTANCE_SCALE_FACTOR;
+    public static double M_TO_U = ORIGINAL_M_TO_U * DISTANCE_SCALE_FACTOR;
     /**
      * Local unit to m conversion.
      */
@@ -106,7 +108,7 @@ public class Constants {
 
     public static void initialize(double distanceScaleFactor) {
         DISTANCE_SCALE_FACTOR = distanceScaleFactor;
-        M_TO_U = 1e-9d * DISTANCE_SCALE_FACTOR;
+        M_TO_U = ORIGINAL_M_TO_U * DISTANCE_SCALE_FACTOR;
         U_TO_M = 1d / M_TO_U;
         KM_TO_U = M_TO_U * 1000d;
         U_TO_KM = 1d / KM_TO_U;
