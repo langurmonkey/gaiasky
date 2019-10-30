@@ -27,7 +27,6 @@ import gaiasky.util.GlobalConf;
 import gaiasky.util.GlobalResources;
 import gaiasky.util.Logger;
 import gaiasky.util.Logger.Log;
-import gaiasky.util.gdx.IntModelBatch;
 import gaiasky.util.math.Vector3d;
 import gaiasky.vr.openvr.VRContext;
 import gaiasky.vr.openvr.VRContext.Space;
@@ -64,7 +63,6 @@ public class SGROpenVR extends SGRAbstract implements ISGR, IObserver {
     public final Matrix4 eyeSpace = new Matrix4();
     public final Matrix4 invEyeSpace = new Matrix4();
 
-    private IntModelBatch modelBatch;
     public Array<StubModel> controllerObjects;
     private Map<VRDevice, StubModel> vrDeviceToModel;
     private Environment controllersEnv;
@@ -79,12 +77,10 @@ public class SGROpenVR extends SGRAbstract implements ISGR, IObserver {
     private Vector3 auxf1;
     private Vector3d auxd1;
 
-    public SGROpenVR(VRContext vrContext, IntModelBatch modelBatch) {
+    public SGROpenVR(VRContext vrContext) {
         super();
         // VR Context
         this.vrContext = vrContext;
-        // Model batch
-        this.modelBatch = modelBatch;
         // Sprite batch for screen rendering
         this.sb = GlobalResources.spriteBatch;
 
