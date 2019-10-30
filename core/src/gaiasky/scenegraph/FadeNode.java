@@ -18,6 +18,7 @@ import gaiasky.util.GlobalConf;
 import gaiasky.util.GlobalResources;
 import gaiasky.util.math.MathUtilsd;
 import gaiasky.util.math.Vector3d;
+import gaiasky.util.parse.Parser;
 import gaiasky.util.time.ITimeFrameProvider;
 
 import java.util.Map;
@@ -232,7 +233,12 @@ public class FadeNode extends AbstractPositionEntity {
     }
 
     public void setCataloginfo(Map<String, String> map) {
-        this.catalogInfo = new CatalogInfo(map.get("name"), map.get("description"), map.get("source"), CatalogInfoType.valueOf(map.get("type")), Float.parseFloat(map.get("size")), this);
+        String name = map.get("name");
+        String desc = map.get("description");
+        String source = map.get("source");
+        CatalogInfoType type = map.get("type") != null ? CatalogInfoType.valueOf(map.get("type")) : CatalogInfoType.INTERNAL;
+        float size = map.get("size") != null ? Parser.parseFloat(map.get("size")) : 1;
+        this.catalogInfo = new CatalogInfo(name, desc, source, type, size, this);
         EventManager.instance.post(Events.CATALOG_ADD, this.catalogInfo, false);
     }
 
