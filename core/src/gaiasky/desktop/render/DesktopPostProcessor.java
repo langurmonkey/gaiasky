@@ -299,7 +299,7 @@ public class DesktopPostProcessor implements IPostProcessor, IObserver {
     private void initCameraBlur(PostProcessBean ppb, int width, int height, GraphicsQuality gq) {
         ppb.camblur = new CameraMotion(width, height);
         ppb.camblur.setBlurScale(1f);
-        ppb.camblur.setEnabled(GlobalConf.postprocess.POSTPROCESS_MOTION_BLUR);
+        ppb.camblur.setEnabled(GlobalConf.postprocess.POSTPROCESS_MOTION_BLUR && !GlobalConf.runtime.OPENVR);
         updateCameraBlur(ppb, gq);
         ppb.pp.addEffect(ppb.camblur);
 
@@ -532,7 +532,7 @@ public class DesktopPostProcessor implements IPostProcessor, IObserver {
                 for (int i = 0; i < RenderType.values().length; i++) {
                     if (pps[i] != null) {
                         PostProcessBean ppb = pps[i];
-                        ppb.camblur.setEnabled(enabled);
+                        ppb.camblur.setEnabled(enabled && !GlobalConf.runtime.OPENVR);
                     }
                 }
             break;
@@ -542,7 +542,7 @@ public class DesktopPostProcessor implements IPostProcessor, IObserver {
             for (int i = 0; i < RenderType.values().length; i++) {
                 if (pps[i] != null) {
                     PostProcessBean ppb = pps[i];
-                    ppb.camblur.setEnabled(enabled);
+                    ppb.camblur.setEnabled(enabled && !GlobalConf.runtime.OPENVR);
                     ppb.lightglow.setNSamples(enabled ? 1 : lightGlowNSamples);
                 }
             }
