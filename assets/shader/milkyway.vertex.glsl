@@ -63,7 +63,7 @@ void main() {
     v_type = int(a_additional.y);
     v_layer = int(a_additional.z);
 
-    gl_PointSize = min(viewAngle * u_sizeFactor * u_ar * u_vrScale, u_maxPointSize * u_vrScale);
+    gl_PointSize = min(viewAngle * u_sizeFactor * u_ar * u_vrScale, u_maxPointSize);
 
     vec4 gpos = u_projModelView * vec4(pos, 1.0);
     gl_Position = gpos;
