@@ -28,6 +28,8 @@ import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
 import java.nio.ShortBuffer;
 
+import static gaiasky.util.Logger.*;
+import static org.lwjgl.openvr.VR.ETrackedDeviceProperty_Prop_ModelNumber_String;
 import static org.lwjgl.openvr.VR.VR_ShutdownInternal;
 
 /**
@@ -39,6 +41,7 @@ import static org.lwjgl.openvr.VR.VR_ShutdownInternal;
  * FIXME add multisampling plus draw/resolve buffers
  */
 public class VRContext implements Disposable {
+    private static final Log logger = getLogger(VRContext.class);
 
     /**
      * device index of the head mounted display
@@ -55,7 +58,8 @@ public class VRContext implements Disposable {
      * methods taking a {@link Space}.
      */
     public enum Space {
-        Tracker, World
+        Tracker,
+        World
     }
 
     /**
@@ -84,7 +88,9 @@ public class VRContext implements Disposable {
      * The role of a {@link VRDevice} of type {@link VRDeviceType#Controller}
      */
     public static enum VRControllerRole {
-        Unknown, LeftHand, RightHand
+        Unknown,
+        LeftHand,
+        RightHand
     }
 
     /**
@@ -479,75 +485,75 @@ public class VRContext implements Disposable {
             int button = 0;
 
             switch (event.eventType()) {
-                case VR.EVREventType_VREvent_DualAnalog_Move:
-                case VR.EVREventType_VREvent_DualAnalog_Press:
-                case VR.EVREventType_VREvent_DualAnalog_Touch:
-                case VR.EVREventType_VREvent_DualAnalog_Unpress:
-                case VR.EVREventType_VREvent_DualAnalog_Untouch:
-                case VR.EVREventType_VREvent_DualAnalog_Cancel:
-                case VR.EVREventType_VREvent_DualAnalog_ModeSwitch1:
-                case VR.EVREventType_VREvent_DualAnalog_ModeSwitch2:
-                    if (GlobalConf.controls.DEBUG_MODE) {
-                        Logger.getLogger(this.getClass()).info("Dual analog event: move/press/touch/unpress/untouch");
-                    }
-                    for (VRDeviceListener l : listeners)
-                        l.event(event.eventType());
-                    break;
-                case VR.EVREventType_VREvent_TrackedDeviceActivated:
-                    createDevice(index);
-                    for (VRDeviceListener l : listeners) {
-                        l.connected(devices[index]);
-                    }
-                    break;
-                case VR.EVREventType_VREvent_TrackedDeviceDeactivated:
-                    index = event.trackedDeviceIndex();
-                    if (devices[index] == null)
-                        continue;
-                    for (VRDeviceListener l : listeners) {
-                        l.disconnected(devices[index]);
-                    }
-                    devices[index] = null;
-                    break;
-                case VR.EVREventType_VREvent_ButtonPress:
-                    if (devices[index] == null)
-                        continue;
-                    button = event.data().controller().button();
-                    devices[index].setButton(button, true);
-                    for (VRDeviceListener l : listeners) {
-                        l.buttonPressed(devices[index], button);
-                    }
-                    break;
-                case VR.EVREventType_VREvent_ButtonUnpress:
-                    if (devices[index] == null)
-                        continue;
-                    button = event.data().controller().button();
-                    devices[index].setButton(button, false);
-                    for (VRDeviceListener l : listeners) {
-                        l.buttonReleased(devices[index], button);
-                    }
-                    break;
-                case VR.EVREventType_VREvent_ButtonTouch:
-                    if (devices[index] == null)
-                        continue;
-                    button = event.data().controller().button();
-                    devices[index].setButton(button, true);
-                    for (VRDeviceListener l : listeners) {
-                        l.buttonTouched(devices[index], button);
-                    }
-                    break;
-                case VR.EVREventType_VREvent_ButtonUntouch:
-                    if (devices[index] == null)
-                        continue;
-                    button = event.data().controller().button();
-                    devices[index].setButton(button, false);
-                    for (VRDeviceListener l : listeners) {
-                        l.buttonUntouched(devices[index], button);
-                    }
-                    break;
-                default:
-                    for (VRDeviceListener l : listeners)
-                        l.event(event.eventType());
-                    break;
+            case VR.EVREventType_VREvent_DualAnalog_Move:
+            case VR.EVREventType_VREvent_DualAnalog_Press:
+            case VR.EVREventType_VREvent_DualAnalog_Touch:
+            case VR.EVREventType_VREvent_DualAnalog_Unpress:
+            case VR.EVREventType_VREvent_DualAnalog_Untouch:
+            case VR.EVREventType_VREvent_DualAnalog_Cancel:
+            case VR.EVREventType_VREvent_DualAnalog_ModeSwitch1:
+            case VR.EVREventType_VREvent_DualAnalog_ModeSwitch2:
+                if (GlobalConf.controls.DEBUG_MODE) {
+                    getLogger(this.getClass()).info("Dual analog event: move/press/touch/unpress/untouch");
+                }
+                for (VRDeviceListener l : listeners)
+                    l.event(event.eventType());
+                break;
+            case VR.EVREventType_VREvent_TrackedDeviceActivated:
+                createDevice(index);
+                for (VRDeviceListener l : listeners) {
+                    l.connected(devices[index]);
+                }
+                break;
+            case VR.EVREventType_VREvent_TrackedDeviceDeactivated:
+                index = event.trackedDeviceIndex();
+                if (devices[index] == null)
+                    continue;
+                for (VRDeviceListener l : listeners) {
+                    l.disconnected(devices[index]);
+                }
+                devices[index] = null;
+                break;
+            case VR.EVREventType_VREvent_ButtonPress:
+                if (devices[index] == null)
+                    continue;
+                button = event.data().controller().button();
+                devices[index].setButton(button, true);
+                for (VRDeviceListener l : listeners) {
+                    l.buttonPressed(devices[index], button);
+                }
+                break;
+            case VR.EVREventType_VREvent_ButtonUnpress:
+                if (devices[index] == null)
+                    continue;
+                button = event.data().controller().button();
+                devices[index].setButton(button, false);
+                for (VRDeviceListener l : listeners) {
+                    l.buttonReleased(devices[index], button);
+                }
+                break;
+            case VR.EVREventType_VREvent_ButtonTouch:
+                if (devices[index] == null)
+                    continue;
+                button = event.data().controller().button();
+                devices[index].setButton(button, true);
+                for (VRDeviceListener l : listeners) {
+                    l.buttonTouched(devices[index], button);
+                }
+                break;
+            case VR.EVREventType_VREvent_ButtonUntouch:
+                if (devices[index] == null)
+                    continue;
+                button = event.data().controller().button();
+                devices[index].setButton(button, false);
+                for (VRDeviceListener l : listeners) {
+                    l.buttonUntouched(devices[index], button);
+                }
+                break;
+            default:
+                for (VRDeviceListener l : listeners)
+                    l.event(event.eventType());
+                break;
             }
         }
 
@@ -566,32 +572,32 @@ public class VRContext implements Disposable {
         VRDeviceType type = null;
         int deviceClass = VRSystem.VRSystem_GetTrackedDeviceClass(index);
         switch (deviceClass) {
-            case VR.ETrackedDeviceClass_TrackedDeviceClass_HMD:
-                type = VRDeviceType.HeadMountedDisplay;
-                break;
-            case VR.ETrackedDeviceClass_TrackedDeviceClass_Controller:
-                type = VRDeviceType.Controller;
-                break;
-            case VR.ETrackedDeviceClass_TrackedDeviceClass_TrackingReference:
-                type = VRDeviceType.BaseStation;
-                break;
-            case VR.ETrackedDeviceClass_TrackedDeviceClass_GenericTracker:
-                type = VRDeviceType.Generic;
-                break;
-            default:
-                return;
+        case VR.ETrackedDeviceClass_TrackedDeviceClass_HMD:
+            type = VRDeviceType.HeadMountedDisplay;
+            break;
+        case VR.ETrackedDeviceClass_TrackedDeviceClass_Controller:
+            type = VRDeviceType.Controller;
+            break;
+        case VR.ETrackedDeviceClass_TrackedDeviceClass_TrackingReference:
+            type = VRDeviceType.BaseStation;
+            break;
+        case VR.ETrackedDeviceClass_TrackedDeviceClass_GenericTracker:
+            type = VRDeviceType.Generic;
+            break;
+        default:
+            return;
         }
 
         VRControllerRole role = VRControllerRole.Unknown;
         if (type == VRDeviceType.Controller) {
             int r = VRSystem.VRSystem_GetControllerRoleForTrackedDeviceIndex(index);
             switch (r) {
-                case VR.ETrackedControllerRole_TrackedControllerRole_LeftHand:
-                    role = VRControllerRole.LeftHand;
-                    break;
-                case VR.ETrackedControllerRole_TrackedControllerRole_RightHand:
-                    role = VRControllerRole.RightHand;
-                    break;
+            case VR.ETrackedControllerRole_TrackedControllerRole_LeftHand:
+                role = VRControllerRole.LeftHand;
+                break;
+            case VR.ETrackedControllerRole_TrackedControllerRole_RightHand:
+                role = VRControllerRole.RightHand;
+                break;
             }
         }
         devices[index] = new VRDevice(devicePoses[index], type, role);
@@ -602,7 +608,7 @@ public class VRContext implements Disposable {
         VR_ShutdownInternal();
     }
 
-    private IntModel loadRenderModel(String name, String manufacturer) {
+    private IntModel loadRenderModel(String name, String modelNumber, String manufacturer) {
         if (models.containsKey(name))
             return models.get(name);
 
@@ -692,20 +698,40 @@ public class VRContext implements Disposable {
         } else {
             ObjLoader ol = new ObjLoader();
             if (manufacturer.equalsIgnoreCase("Oculus")) {
-                if (name.equalsIgnoreCase("renderLeftHand") || name.contains("controller_right")) {
+                if (isControllerLeft(name, modelNumber)) {
                     model = ol.loadModel(GlobalConf.data.dataFileHandle("models/controllers/oculus/oculus-left.obj"));
-                } else if (name.equalsIgnoreCase("renderRightHand") || name.contains("controller_left")) {
+                } else if (isControllerRight(name, modelNumber)) {
                     model = ol.loadModel(GlobalConf.data.dataFileHandle("models/controllers/oculus/oculus-right.obj"));
+                } else {
+                    logger.info("WARN: Could not parse controller name - Manufacturer: " + manufacturer + ", Name: " + name + ", ModelNumber: " + modelNumber);
                 }
             } else {
-                if (name.equalsIgnoreCase("renderLeftHand") || name.equalsIgnoreCase("renderRightHand"))
+                // HTC
+                if (isControllerRight(name, modelNumber) || isControllerLeft(name, modelNumber)) {
                     model = ol.loadModel(GlobalConf.data.dataFileHandle("models/controllers/vive/vr_controller_vive.obj"));
+                } else {
+                    logger.info("WARN: Could not parse controller name - Manufacturer: " + manufacturer + ", Name: " + name + ", ModelNumber: " + modelNumber);
+                }
+            }
+
+            // Load default
+            if(model == null) {
+                logger.info("WARN: Could not find suitable controller model, using default...");
+                model = ol.loadModel(GlobalConf.data.dataFileHandle("models/controllers/vive/vr_controller_vive.obj"));
             }
         }
 
         models.put(name, model);
 
         return model;
+    }
+
+    private boolean isControllerLeft(String name, String modelNumber) {
+        return name.equals("renderLeftHand") || name.contains("controller_left") || modelNumber.contains("Left Controller");
+    }
+
+    private boolean isControllerRight(String name, String modelNumber) {
+        return name.equals("renderRightHand") || name.contains("controller_right") || modelNumber.contains("Right Controller");
     }
 
     /**
@@ -788,7 +814,7 @@ public class VRContext implements Disposable {
         }
 
         public void initialize() {
-            IntModel model = loadRenderModel(getStringProperty(VRDeviceProperty.RenderModelName_String), getStringProperty(VRDeviceProperty.ManufacturerName_String));
+            IntModel model = loadRenderModel(getStringProperty(VRDeviceProperty.RenderModelName_String), getStringProperty(VRDeviceProperty.ModelNumber_String), getStringProperty(VRDeviceProperty.ManufacturerName_String));
             this.modelInstance = model != null ? new IntModelInstance(model) : null;
             if (model != null)
                 this.modelInstance.transform.set(pose.transform);
