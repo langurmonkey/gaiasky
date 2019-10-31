@@ -692,10 +692,11 @@ public class VRContext implements Disposable {
         } else {
             ObjLoader ol = new ObjLoader();
             if (manufacturer.equalsIgnoreCase("Oculus")) {
-                if (name.equalsIgnoreCase("renderLeftHand"))
+                if (name.equalsIgnoreCase("renderLeftHand") || name.contains("controller_right")) {
                     model = ol.loadModel(GlobalConf.data.dataFileHandle("models/controllers/oculus/oculus-left.obj"));
-                else if (name.equalsIgnoreCase("renderRightHand"))
+                } else if (name.equalsIgnoreCase("renderRightHand") || name.contains("controller_left")) {
                     model = ol.loadModel(GlobalConf.data.dataFileHandle("models/controllers/oculus/oculus-right.obj"));
+                }
             } else {
                 if (name.equalsIgnoreCase("renderLeftHand") || name.equalsIgnoreCase("renderRightHand"))
                     model = ol.loadModel(GlobalConf.data.dataFileHandle("models/controllers/vive/vr_controller_vive.obj"));
