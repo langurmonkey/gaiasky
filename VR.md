@@ -19,7 +19,7 @@ The minimum system requirements for running Gaia Sky VR are as following:
 | | |
 |-|-|
 | **VR Headset**        | [OpenVR](https://en.wikipedia.org/wiki/OpenVR)-compatible (Oculus Rift, HTC Vive)     |
-| **Operating system**  | Linux (untested) / Windows 10                                                         |
+| **Operating system**  | Linux (only supported headsets) / Windows 10                                          |
 | **CPU**               | Intel Core i5 3rd Generation or similar. 4 core or higher recommended                 |
 | **GPU**               | VR-capable GPU (GTX 970 or above)                                                     |
 | **Memory**            | 8+ GB RAM                                                                             |
@@ -41,7 +41,7 @@ You will need the following:
 
 First, open the Git or Cygwin CLI and clone the [Gitlab](https://gitlab.com/langurmonkey/gaiasky) repository. Right now only the master branch contains the version which shares the codebase with the desktop application, but starting with `2.2.1`, you'll need to check out a tag to get a guaranteed working version. This should give you a working version:
 
-```
+```bash
 $  git clone https://github.com/langurmonkey/gaiasky.git
 $  cd gaiasky
 $  git checkout master
@@ -60,7 +60,7 @@ $  gradlew.bat core:runvr
 
 You can use the provided bypass script instead of gradle. Use the `-vr` command line argument to launch Gaia Sky in VR mode.
 
-```
+```bash
 $  gaiasky -vr
 ```
 
@@ -68,11 +68,22 @@ Run `gaiasky -h` or `man gaiasky` to find out about how to launch Gaia Sky and w
 
 ## 2. Getting the data
 
+The download manager should show up automatically at startup. If it does not, force it
+with the `-d` argument (or using `gradlew core:rund` if running
+from sources). Just select the data packs and catalogs that you want
+to download, press `Download now` and wait for the process to finish.
+
+```bash
+$  gaiasky -d
+```
+
+You can also download the **data packs manually**
+`here <http://gaia.ari.uni-heidelberg.de/gaiasky/files/autodownload/>`__.
 As of version `2.1.0`, Gaia Sky offers an automated way to download all data packs and catalogs from within the application. When Gaia Sky starts, if no base data or catalogs are found, the downloader window will prompt automatically. Otherwise, you can force the download window at startup with the `-d` argument (`gradlew core:rund` with the gradle wrapper). Just select the data packs and catalogs that you want to download, press `Download now` and wait for the process to finish.
 
 You can also download the **data packs manually** [here](http://gaia.ari.uni-heidelberg.de/gaiasky/files/autodownload/).
 
-## 3. Usage
+## 3. Controls
 
 On the Oculus Rift controller the mappings are as follow:
 
