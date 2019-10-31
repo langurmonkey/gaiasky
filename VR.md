@@ -8,7 +8,6 @@
 
 The Gaia Sky VR project is the Virtual Reality version of Gaia Sky. At the moment, only [OpenVR](https://github.com/ValveSoftware/openvr) is supported, but nothing prevents us from supporting other APIs (like the Kronos Group's [OpenXR](https://www.khronos.org/openxr)) in the future if it makes sense. Our tests have only been carried out with the Oculus Rift CV1 headset in direct mode under Windows. Supporting Linux is a top priority for us, and the HTC Vive should work well under Linux, even though the state of OpenVR in the platform is a bit rough. We have reports indicating that the HTC Vive VR controllers' mappings are not fully working.
 
-
 Also, we want to point out that Linux support for the Oculus Rift was dropped for the CV1 and it is not expected to be continued any time soon, unfortunately.
 
 Gaia Sky VR is heavily under development, and it is not guaranteed to work. Currently, no binaries are provided, but it can still be run by compiling the source. Just keep in mind that this is the development branch.
@@ -31,10 +30,10 @@ From now on, this guide will assume you aim at running Gaia Sky VR with the Ocul
 You will need the following:
 
 1. Download and install [Git for Windows](http://gitforwindows.org/) or [cygwin](https://www.cygwin.com/) and get used to the unix-like command line interface.
-2. Follow the provided vendor instructions and install the Oculus app with the runtime. If using a SteamVR headset, just get Steam and download SteamVR.
-3. OpenVR to LibOVR. GaiaSky uses the OpenVR API. It is implemented by SteamVR but also by OpenOVR. The latter is much much faster.
-  3.1. OpenOVR is the faster option. Download [OpenOVR's OpenComposite Launcher](https://gitlab.com/znixian/OpenOVR), launch it and select 'Switch to OpenComposite'. That's it.
-  3.2. Or, use SteamVR, which is the default option but much slower. Download and install [Steam](http://store.steampowered.com/) and then install [SteamVR](http://store.steampowered.com/steamvr).
+2. Follow the provided vendor instructions and install the Oculus app with the runtime. If using a SteamVR headset (HTC Vive/Pro, Valve Index, etc.), just get Steam and download SteamVR.
+3. For the Oculus, you need a translation layer from OpenVR to LibOVR. You can either use SteamVR (slower) or OpenOVR (faster). We recommend using OpenOVR, as it is much simpler and faster.
+    1. **OpenOVR** - Download [OpenOVR's OpenComposite Launcher](https://gitlab.com/znixian/OpenOVR), launch it and select 'Switch to OpenComposite'. That's it.
+    2. **SteamVR** - Download and install [Steam](http://store.steampowered.com/) and then install [SteamVR](http://store.steampowered.com/steamvr) and launch it. The SteamVR runtime must be running alongside the Oculus Runtime for it to work.
 4. [OpenJDK 11+](https://jdk.java.net/java-se-ri/11).
 5. A setup [VR-ready rig](https://www.digitaltrends.com/virtual-reality/how-to-build-a-cheap-vr-ready-pc/).
 
