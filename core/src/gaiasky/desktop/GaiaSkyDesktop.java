@@ -72,6 +72,9 @@ public class GaiaSkyDesktop implements IObserver {
     private static GaiaSkyDesktop gsd;
     private static boolean REST_ENABLED = false;
     private static Class<?> REST_SERVER_CLASS = null;
+    private static boolean JAVA_VERSION_FLAG = false;
+
+    private static final String REQUIRED_JAVA_VERSION = "11";
 
     private static GaiaSkyArgs gsArgs;
 
@@ -155,7 +158,7 @@ public class GaiaSkyDesktop implements IObserver {
                 System.setProperty("assets.location", gsArgs.assetsLocation);
             }
 
-            if(gsArgs.vr){
+            if (gsArgs.vr) {
                 GlobalConf.APPLICATION_NAME += " VR";
             }
 
@@ -294,7 +297,7 @@ public class GaiaSkyDesktop implements IObserver {
         // Disable logical DPI modes (macOS, Windows)
         cfg.setHdpiMode(HdpiMode.Pixels);
 
-        if (consoleLogger != null) {
+        if (consoleLogger != null && EventManager.instance.isSubscribedToAny(consoleLogger)) {
             consoleLogger.unsubscribe();
         }
 
@@ -302,18 +305,23 @@ public class GaiaSkyDesktop implements IObserver {
         try {
             Lwjgl3Application app = new Lwjgl3Application(new GaiaSky(gsArgs.download, gsArgs.catalogChooser, gsArgs.vr), cfg);
         } catch (GdxRuntimeException e) {
-            // Probably, OpenGL 4.x is not supported and window creation failed
-            consoleLogger.subscribe();
-            logger.error("Window creation failed (is OpenGL 4.x supported by your card?), trying with OpenGL 3.x");
-            logger.info("Disabling tessellation...");
-            consoleLogger.unsubscribe();
-            ElevationType et = GlobalConf.scene.ELEVATION_TYPE;
-            if (!et.isNone()) {
-                GlobalConf.scene.ELEVATION_TYPE = ElevationType.PARALLAX_MAPPING;
-            }
-            cfg.useOpenGL3(true, 3, 2);
+            if (!JAVA_VERSION_FLAG) {
+                // Probably, OpenGL 4.x is not supported and window creation failed
+                if (!EventManager.instance.isSubscribedToAny(consoleLogger))
+                    consoleLogger.subscribe();
+                logger.error("Window creation failed (is OpenGL 4.x supported by your card?), trying with OpenGL 3.x");
+                logger.info("Disabling tessellation...");
+                consoleLogger.unsubscribe();
+                ElevationType et = GlobalConf.scene.ELEVATION_TYPE;
+                if (!et.isNone()) {
+                    GlobalConf.scene.ELEVATION_TYPE = ElevationType.PARALLAX_MAPPING;
+                }
+                cfg.useOpenGL3(true, 3, 2);
 
-            Lwjgl3Application app = new Lwjgl3Application(new GaiaSky(gsArgs.download, gsArgs.catalogChooser, gsArgs.vr), cfg);
+                Lwjgl3Application app = new Lwjgl3Application(new GaiaSky(gsArgs.download, gsArgs.catalogChooser, gsArgs.vr), cfg);
+            } else {
+                logger.error("Please update your java installation. Gaia Sky needs at least Java " + REQUIRED_JAVA_VERSION);
+            }
         } catch (Exception e) {
             logger.error(e);
         }
@@ -467,6 +475,14 @@ public class GaiaSkyDesktop implements IObserver {
             System.out.println("It looks like you are running Gaia Sky with java " + jv + " in Linux with Gnome.\n" + "This version may crash. If it does, comment out the property\n" + "'assistive_technologies' in the '/etc/java-[version]/accessibility.properties' file.");
             System.out.println("========================================================================================");
             System.out.println();
+        }
+
+        if (jv < 9) {
+            System.out.println("========================== ERROR ==============================");
+            System.out.println("You are using Java " + jv + ", which is unsupported by Gaia Sky");
+            System.out.println("             Please, use at least Java " + REQUIRED_JAVA_VERSION);
+            System.out.println("===============================================================");
+            JAVA_VERSION_FLAG = true;
         }
     }
 }

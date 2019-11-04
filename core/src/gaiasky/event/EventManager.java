@@ -53,7 +53,7 @@ public class EventManager implements IObserver {
     private final Pool<Telegram> pool;
 
     /** Subscriptions Event-Observers **/
-    private IntMap<Set<IObserver>> subscriptions = new IntMap<Set<IObserver>>();
+    private IntMap<Set<IObserver>> subscriptions = new IntMap<>();
 
     /** The time frame to use if none is specified **/
     private TimeFrame defaultTimeFrame;
@@ -67,7 +67,7 @@ public class EventManager implements IObserver {
         // Initialize queues, one for each time frame.
         queues = new ObjectMap<>(TimeFrame.values().length);
         for (TimeFrame tf : TimeFrame.values()) {
-            PriorityQueue<Telegram> pq = new PriorityQueue<Telegram>();
+            PriorityQueue<Telegram> pq = new PriorityQueue<>();
             queues.put(tf, pq);
         }
         defaultTimeFrame = TimeFrame.REAL_TIME;
@@ -286,6 +286,18 @@ public class EventManager implements IObserver {
     public boolean hasSubscriptors(Events event) {
         Set<IObserver> scr = subscriptions.get(event.ordinal());
         return scr != null && !scr.isEmpty();
+    }
+
+    public boolean isSubscribedToAny(IObserver o){
+        IntMap.Keys keys = subscriptions.keys();
+
+        for(int key : keys.toArray().items){
+            Set<IObserver> set = subscriptions.get(key);
+            if(set.contains(o)){
+                return true;
+            }
+        }
+        return false;
     }
 
     @Override
