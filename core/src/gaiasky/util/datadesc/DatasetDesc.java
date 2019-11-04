@@ -43,6 +43,8 @@ public class DatasetDesc {
     public boolean outdated;
     public boolean baseData;
 
+    public String releaseNotes;
+
     public boolean mustDownload;
     public boolean cbDisabled;
     public String[] filesToDelete;
@@ -76,6 +78,13 @@ public class DatasetDesc {
             this.shortDescription = description.substring(0, description.indexOf("-"));
         } else {
             this.shortDescription = description;
+        }
+
+        // Release notes
+        if(source.has("releasenotes")){
+            this.releaseNotes = source.getString("releasenotes");
+        } else {
+            this.releaseNotes = null;
         }
 
         // Link

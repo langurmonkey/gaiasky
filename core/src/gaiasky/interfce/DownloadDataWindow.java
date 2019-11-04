@@ -207,12 +207,12 @@ public class DownloadDataWindow extends GenericDialog {
                 OwnLabel haveit = new OwnLabel("", skin);
                 if (dataset.exists) {
                     if (dataset.outdated) {
-                        setStatusOutdated(haveit);
+                        setStatusOutdated(dataset, haveit);
                     } else {
-                        setStatusFound(haveit);
+                        setStatusFound(dataset, haveit);
                     }
                 } else {
-                    setStatusNotFound(haveit);
+                    setStatusNotFound(dataset, haveit);
                 }
 
                 // Can't proceed without base data - force download
@@ -493,14 +493,14 @@ public class DownloadDataWindow extends GenericDialog {
                     }
 
                     setMessageOk(I18n.txt("gui.download.idle"));
-                    setStatusFound(trio.getThird());
+                    setStatusFound(currentDataset, trio.getThird());
 
                     Gdx.app.postRunnable(() -> {
                         downloadNext();
                     });
                 } else {
                     logger.info("Error getting dataset: " + name);
-                    setStatusError(trio.getThird());
+                    setStatusError(currentDataset, trio.getThird());
                     setMessageError(I18n.txt("gui.download.failed", name));
                 }
 
@@ -508,7 +508,7 @@ public class DownloadDataWindow extends GenericDialog {
 
             Runnable fail = () -> {
                 logger.error("Download failed: " + name);
-                setStatusError(trio.getThird());
+                setStatusError(currentDataset, trio.getThird());
                 setMessageError(I18n.txt("gui.download.failed", name));
                 me.acceptButton.setDisabled(false);
                 downloadProgress.setVisible(false);
@@ -518,7 +518,7 @@ public class DownloadDataWindow extends GenericDialog {
 
             Runnable cancel = () -> {
                 logger.error("Download cancelled: " + name);
-                setStatusCancelled(trio.getThird());
+                setStatusCancelled(currentDataset, trio.getThird());
                 setMessageError(I18n.txt("gui.download.failed", name));
                 me.acceptButton.setDisabled(false);
                 downloadProgress.setVisible(false);
@@ -641,28 +641,32 @@ public class DownloadDataWindow extends GenericDialog {
 
     }
 
-    private void setStatusOutdated(OwnLabel label) {
+    private void setStatusOutdated(DatasetDesc ds, OwnLabel label) {
         label.setText(I18n.txt("gui.download.status.outdated"));
         label.setColor(1, 1, 0, 1);
+        if(ds.releaseNotes != null && !ds.releaseNotes.isEmpty()){
+            label.setText(label.getText() + " (i)");
+            label.addListener(new OwnTextTooltip(I18n.txt("gui.download.releasenotes", ds.releaseNotes), skin, 10));
+        }
     }
 
-    private void setStatusFound(OwnLabel label) {
+    private void setStatusFound(DatasetDesc ds, OwnLabel label) {
         label.setText(I18n.txt("gui.download.status.found"));
         label.setColor(0, 1, 0, 1);
     }
 
-    private void setStatusNotFound(OwnLabel label) {
+    private void setStatusNotFound(DatasetDesc ds, OwnLabel label) {
         label.setText(I18n.txt("gui.download.status.notfound"));
         label.setColor(1, 0.3f, 0, 1);
     }
 
-    private void setStatusError(OwnLabel label) {
+    private void setStatusError(DatasetDesc ds, OwnLabel label) {
         label.setText("Failed");
         label.setText(I18n.txt("gui.download.status.failed"));
         label.setColor(1, 0, 0, 1);
     }
 
-    private void setStatusCancelled(OwnLabel label) {
+    private void setStatusCancelled(DatasetDesc ds, OwnLabel label) {
         label.setText(I18n.txt("gui.download.status.cancelled"));
         label.setColor(1, 0, 0, 1);
     }

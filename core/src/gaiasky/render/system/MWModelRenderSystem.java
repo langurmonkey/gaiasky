@@ -318,7 +318,7 @@ public class MWModelRenderSystem extends ImmediateRenderSystem implements IObser
                     // Gas
                     shaderProgram.setUniformf("u_maxPointSize", maxSizes[PType.GAS.ordinal()]);
                     shaderProgram.setUniformf("u_sizeFactor", (float) (1.7e12));
-                    shaderProgram.setUniformf("u_intensity", 1f);
+                    shaderProgram.setUniformf("u_intensity", 0.7f);
                     gas.mesh.render(shaderProgram, ShapeType.Point.getGlType());
 
                     // Bulge

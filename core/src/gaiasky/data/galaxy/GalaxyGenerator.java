@@ -17,6 +17,7 @@ import gaiasky.util.I18n;
 import gaiasky.util.Logger;
 import gaiasky.util.format.DateFormatFactory;
 import gaiasky.util.format.NumberFormatFactory;
+import gaiasky.util.math.MathUtilsd;
 import gaiasky.util.math.StdRandom;
 import gaiasky.util.math.Vector3d;
 
@@ -40,7 +41,7 @@ public class GalaxyGenerator {
     private static String PARTICLE_TYPE = "gas";
 
     /** Number of particles **/
-    private static int N = 4000;
+    private static int N = 3000;
 
     /** Number of spiral arms **/
     private static int Narms = 8;
@@ -125,16 +126,22 @@ public class GalaxyGenerator {
         }
     }
 
+    // Clamp
+    private static double[] cl(double r, double g, double b) {
+        return new double[] { MathUtilsd.clamp(r, 0, 1), MathUtilsd.clamp(g, 0, 1), MathUtilsd.clamp(b, 0, 1) };
+    }
+
     private static double[] generateNewColor() {
-        double r = StdRandom.gaussian() * 0.15;
+        double r = StdRandom.gaussian();
         switch (PARTICLE_TYPE) {
         case "star":
+            r *= 0.15;
             if (StdRandom.uniform(2) == 0) {
                 // Blue/white star
-                return new double[] { 0.95 - r, 0.8 - r, 0.6 };
+                return cl(0.95 - r, 0.8 - r, 0.6);
             } else {
                 // Red/white star
-                return new double[] { 0.95, 0.8 - r, 0.6 - r };
+                return cl(0.95, 0.8 - r, 0.6 - r);
             }
         case "bulge":
             return new double[] { 0.9, 0.9, 0.8 };
@@ -143,7 +150,8 @@ public class GalaxyGenerator {
         case "hii":
             return new double[] { 0.78, 0.31, 0.55 };
         case "gas":
-            return new double[] { 0.13, 0.09, 0.3 };
+            r *= 0.1;
+            return cl(0.068 + r, 0.06 + r, 0.2 + r * 1.3);
         default:
             return null;
         }
@@ -174,8 +182,8 @@ public class GalaxyGenerator {
         List<double[]> particles = new ArrayList<>(N);
 
         for (int i = 0; i < N; i++) {
-            double x = StdRandom.gaussian(0, 5) * xExtent;
-            double y = StdRandom.gaussian(0, 5) * yExtent;
+            double x = 0.5 * StdRandom.gaussian(0, 10) * xExtent;
+            double y = 0.5 * StdRandom.gaussian(0, 10) * yExtent;
             double z = StdRandom.gaussian() * zExtent;
 
             addMWParticle(x, y, z, aux, particles);
@@ -351,7 +359,7 @@ public class GalaxyGenerator {
 
         bw.close();
 
-        Logger.getLogger(GalaxyGenerator.class).info("File written to " + filePath);
+        Logger.getLogger(GalaxyGenerator.class).info(I18n.txt("notif.written", gal.size(), filePath));
     }
 
 }

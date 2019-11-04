@@ -40,7 +40,7 @@ import gaiasky.util.tree.LoadStatus;
 
 public class MilkyWay extends AbstractPositionEntity implements I3DTextRenderable {
     float[] labelColour = new float[] { 1f, 1f, 1f, 1f };
-    String model, transformName;
+    String transformName;
     Matrix4 coordinateSystem;
 
     public Array<? extends ParticleBean> starData, bulgeData, dustData, hiiData, gasData;
@@ -86,7 +86,6 @@ public class MilkyWay extends AbstractPositionEntity implements I3DTextRenderabl
                 hiiData = provider.loadData(gc.hiisource);
             if (gc.gassource != null)
                 gasData = provider.loadData(gc.gassource);
-
         } catch (Exception e) {
             Logger.getLogger(this.getClass()).error(e);
         }
