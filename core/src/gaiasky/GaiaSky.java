@@ -1019,7 +1019,7 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
 
             /* LOAD SCENE GRAPH */
             if (sg == null) {
-                dataLoadString = TextUtils.concatenate(",", GlobalConf.data.CATALOG_JSON_FILES, GlobalConf.data.OBJECTS_JSON_FILES).replace("\\\\", "/");
+                dataLoadString = TextUtils.concatenate(",", GlobalConf.data.CATALOG_JSON_FILES, GlobalConf.data.OBJECTS_JSON_FILES).replaceAll("\\\\+", "/");
                 manager.load(dataLoadString, ISceneGraph.class, new SGLoaderParameter(time, GlobalConf.performance.MULTITHREADING, GlobalConf.performance.NUMBER_THREADS()));
             }
             break;
