@@ -26,12 +26,13 @@ import java.security.MessageDigest;
 public class DownloadHelper {
     private static final Log logger = Logger.getLogger(DownloadHelper.class);
 
+
     /*
      * Spawns a new thread which downloads the file from the given location, running the
      * progress {@link ProgressRunnable} while downloading, and running the finish {@link java.lang.Runnable}
      * when finished.
      */
-    public static void downloadFile(String url, FileHandle to, ProgressRunnable progress, ChecksumRunnable finish, Runnable fail, Runnable cancel) {
+    public static HttpRequest downloadFile(String url, FileHandle to, ProgressRunnable progress, ChecksumRunnable finish, Runnable fail, Runnable cancel) {
 
         // Make a GET request to get data descriptor
         HttpRequest request = new HttpRequest(HttpMethods.GET);
@@ -40,6 +41,8 @@ public class DownloadHelper {
 
         // Send the request, listen for the response
         Gdx.net.sendHttpRequest(request, new HttpResponseListener() {
+            private boolean cancelled = false;
+
             @Override
             public void handleHttpResponse(HttpResponse httpResponse) {
                 // Determine how much we have to download
@@ -62,7 +65,7 @@ public class DownloadHelper {
                         MessageDigest md = MessageDigest.getInstance("SHA-256");
                         DigestInputStream dis = new DigestInputStream(is, md);
                         // Keep reading bytes and storing them until there are no more.
-                        while ((count = dis.read(bytes, 0, bytes.length)) != -1) {
+                        while ((count = dis.read(bytes, 0, bytes.length)) != -1 && !cancelled) {
                             os.write(bytes, 0, count);
                             read += count;
 
@@ -94,7 +97,7 @@ public class DownloadHelper {
                         logger.info(I18n.txt("gui.download.finished", to.path()));
 
                         // Run finish runnable
-                        if (finish != null) {
+                        if (finish != null && !cancelled) {
                             byte[] digestBytes = md.digest();
                             StringBuffer digestString = new StringBuffer();
                             for (int i = 0; i < digestBytes.length; i++) {
@@ -129,10 +132,13 @@ public class DownloadHelper {
             @Override
             public void cancelled() {
                 logger.error(I18n.txt("gui.download.cancelled", url));
+                cancelled = true;
                 if (cancel != null)
                     cancel.run();
             }
         });
+
+        return request;
     }
 
 }

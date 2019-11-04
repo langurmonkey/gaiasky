@@ -6,11 +6,13 @@
 package gaiasky.interfce;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.Net;
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.*;
+import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener.ChangeEvent;
 import com.badlogic.gdx.utils.Array;
 import gaiasky.desktop.util.SysUtils;
@@ -77,6 +79,7 @@ public class DownloadDataWindow extends GenericDialog {
     private OwnProgressBar downloadProgress;
     private OwnLabel currentDownloadFile, downloadSpeed;
     private OwnScrollPane datasetsScroll;
+    private Cell<OwnTextButton> cancelCell;
     private float scrollX = 0, scrollY = 0;
 
     private Color highlight;
@@ -364,10 +367,13 @@ public class DownloadDataWindow extends GenericDialog {
         downloadProgress.setPrefWidth(minW);
         downloadTable.add(downloadProgress).center().colspan(2).padBottom(padLarge).row();
 
-        // Download info
+        // Download info and cancel
+        Table infoCancel = new Table(skin);
         downloadSpeed = new OwnLabel("", skin);
         downloadSpeed.setVisible(false);
-        downloadTable.add(downloadSpeed).center().colspan(2).padBottom(padLarge).row();
+        infoCancel.add(downloadSpeed).padRight(padLarge * 2f);
+        cancelCell = infoCancel.add();
+        downloadTable.add(infoCancel).colspan(2).padBottom(padLarge).row();
 
         downloadButton.addListener((event) -> {
             if (event instanceof ChangeEvent) {
@@ -478,6 +484,7 @@ public class DownloadDataWindow extends GenericDialog {
                     downloadProgress.setVisible(false);
                     downloadSpeed.setText("");
                     downloadSpeed.setVisible(false);
+                    cancelCell.setActor(null);
                     me.acceptButton.setDisabled(false);
                     // Enable all
                     setDisabled(choiceList, false);
@@ -495,9 +502,7 @@ public class DownloadDataWindow extends GenericDialog {
                     setMessageOk(I18n.txt("gui.download.idle"));
                     setStatusFound(currentDataset, trio.getThird());
 
-                    Gdx.app.postRunnable(() -> {
-                        downloadNext();
-                    });
+                    Gdx.app.postRunnable(() -> downloadNext());
                 } else {
                     logger.info("Error getting dataset: " + name);
                     setStatusError(currentDataset, trio.getThird());
@@ -513,16 +518,18 @@ public class DownloadDataWindow extends GenericDialog {
                 me.acceptButton.setDisabled(false);
                 downloadProgress.setVisible(false);
                 downloadSpeed.setVisible(false);
+                cancelCell.setActor(null);
                 Gdx.app.postRunnable(() -> downloadNext());
             };
 
             Runnable cancel = () -> {
-                logger.error("Download cancelled: " + name);
+                logger.error(I18n.txt("gui.download.cancelled", name));
                 setStatusCancelled(currentDataset, trio.getThird());
-                setMessageError(I18n.txt("gui.download.failed", name));
+                setMessageError(I18n.txt("gui.download.cancelled", name));
                 me.acceptButton.setDisabled(false);
                 downloadProgress.setVisible(false);
                 downloadSpeed.setVisible(false);
+                cancelCell.setActor(null);
                 Gdx.app.postRunnable(() -> downloadNext());
             };
 
@@ -533,7 +540,21 @@ public class DownloadDataWindow extends GenericDialog {
             downloadSpeed.setVisible(true);
             setStatusProgress(trio.getThird());
             setMessageOk(I18n.txt("gui.download.downloading.info", (current + 1), toDownload.size, currentDataset.name));
-            DownloadHelper.downloadFile(url, tempDownload, pr, finish, fail, cancel);
+            final Net.HttpRequest request = DownloadHelper.downloadFile(url, tempDownload, pr, finish, fail, cancel);
+
+            // Cancel button
+            OwnTextButton cancelDownloadButton = new OwnTextButton(I18n.txt("gui.download.cancel"), skin);
+            cancelDownloadButton.pad(9f * GlobalConf.UI_SCALE_FACTOR);
+            cancelDownloadButton.getLabel().setColor(1, 0, 0, 1);
+            cancelDownloadButton.addListener(new ChangeListener() {
+                @Override
+                public void changed(ChangeEvent event, Actor actor) {
+                    if (request != null) {
+                        Gdx.app.postRunnable(() -> Gdx.net.cancelHttpRequest(request));
+                    }
+                }
+            });
+            cancelCell.setActor(cancelDownloadButton);
         } else {
             // Finished all downloads!
             // RELOAD DATASETS VIEW
@@ -644,7 +665,7 @@ public class DownloadDataWindow extends GenericDialog {
     private void setStatusOutdated(DatasetDesc ds, OwnLabel label) {
         label.setText(I18n.txt("gui.download.status.outdated"));
         label.setColor(1, 1, 0, 1);
-        if(ds.releaseNotes != null && !ds.releaseNotes.isEmpty()){
+        if (ds.releaseNotes != null && !ds.releaseNotes.isEmpty()) {
             label.setText(label.getText() + " (i)");
             label.addListener(new OwnTextTooltip(I18n.txt("gui.download.releasenotes", ds.releaseNotes), skin, 10));
         }
@@ -717,6 +738,8 @@ public class DownloadDataWindow extends GenericDialog {
      * Drops the current view and regenerates all window content
      */
     private void reloadAll() {
+        choiceList.clear();
+        toDownload.clear();
         dd = DataDescriptorUtils.instance().buildDatasetsDescriptor(null);
         backupScrollValues();
         content.clear();
