@@ -767,8 +767,10 @@ public class DownloadDataWindow extends GenericDialog {
      * Drops the current view and regenerates all window content
      */
     private void reloadAll() {
-        choiceList.clear();
-        toDownload.clear();
+        if (choiceList != null)
+            choiceList.clear();
+        if (toDownload != null)
+            toDownload.clear();
         dd = DataDescriptorUtils.instance().buildDatasetsDescriptor(null);
         backupScrollValues();
         content.clear();
