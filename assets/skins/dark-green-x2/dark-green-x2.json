@@ -253,7 +253,8 @@
       "up": "default-round",
       "disabled": "default-round",
       "font": "ui-21",
-      "fontColor": "green"
+      "fontColor": "green",
+      "disabledFontColor": "dark-gray"
     },
     "toggle": {
       "down": "default-round-down",

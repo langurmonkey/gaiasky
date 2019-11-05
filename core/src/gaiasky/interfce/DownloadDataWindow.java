@@ -207,6 +207,13 @@ public class DownloadDataWindow extends GenericDialog {
                 OwnCheckBox cb = new OwnCheckBox(dataset.name, skin, "title", pad * 2f);
                 cb.setChecked(dataset.mustDownload);
                 cb.setDisabled(dataset.cbDisabled);
+                cb.addListener((event) -> {
+                    if (event instanceof ChangeEvent) {
+                        updateDatasetsSelected();
+                        return true;
+                    }
+                    return false;
+                });
                 OwnLabel haveit = new OwnLabel("", skin);
                 if (dataset.exists) {
                     if (dataset.outdated) {
@@ -350,7 +357,7 @@ public class DownloadDataWindow extends GenericDialog {
         downloadTable.add(datasetsScroll).center().padBottom(padLarge).colspan(2).row();
 
         // Current dataset info
-        currentDownloadFile = new OwnLabel(I18n.txt("gui.download.idle"), skin);
+        currentDownloadFile = new OwnLabel("", skin, "hotkey");
         downloadTable.add(currentDownloadFile).center().colspan(2).padBottom(padLarge).row();
 
         // Download button
@@ -390,6 +397,28 @@ public class DownloadDataWindow extends GenericDialog {
 
         topCell.setActor(downloadTable);
 
+        // Update selected
+        updateDatasetsSelected();
+    }
+
+    private void updateDatasetsSelected() {
+        int nSelected = 0;
+        for (Trio<DatasetDesc, OwnCheckBox, OwnLabel> choice : choiceList) {
+            if (choice.getSecond().isChecked()) {
+                nSelected++;
+            }
+        }
+
+        if (nSelected <= 0) {
+            currentDownloadFile.setText(I18n.txt("gui.download.selected.none"));
+            downloadButton.setDisabled(true);
+        } else if (nSelected == 1) {
+            currentDownloadFile.setText(I18n.txt("gui.download.selected.one"));
+            downloadButton.setDisabled(false);
+        } else {
+            currentDownloadFile.setText(I18n.txt("gui.download.selected.more", nSelected));
+            downloadButton.setDisabled(false);
+        }
     }
 
     private synchronized void downloadAndExtractFiles(List<Trio<DatasetDesc, OwnCheckBox, OwnLabel>> choices) {

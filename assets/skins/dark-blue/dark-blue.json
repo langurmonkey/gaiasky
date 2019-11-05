@@ -251,8 +251,10 @@
     "download": {
       "down": "default-round-down",
       "up": "default-round",
+      "disabled": "default-round",
       "font": "ui-14",
-      "fontColor": "blue"
+      "fontColor": "blue",
+      "disabledFontColor": "dark-gray"
     },
     "toggle": {
       "down": "default-round-down",
