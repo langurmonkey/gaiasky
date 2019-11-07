@@ -1,10 +1,8 @@
 # This script showcases lines and parked runnables
 #
-# The script creates a line object between the positions of the Earth and the Moon. Then,
-# it parks a runnable which updates the line points with the new positions of the
-# objects, so that the line is always up to date, even when the objects move. Finally,
-# time is started to showcase the line movement.
-
+# The script creates a polyline and updates it with a new segment
+# between the current positions of Earth and Venus every 0.2 seconds.
+#
 # Created by Toni Sagrista
 
 from py4j.clientserver import ClientServer, JavaParameters, PythonParameters
