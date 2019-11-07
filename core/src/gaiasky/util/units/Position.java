@@ -180,6 +180,6 @@ public class Position {
         double aux = gsposition.x;
         gsposition.x = gsposition.y;
         gsposition.y = gsposition.z;
-        gsposition.x = aux;
+        gsposition.z = aux;
     }
 }

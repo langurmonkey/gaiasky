@@ -31,10 +31,10 @@ public class UCDParser {
     private static String[] distcolnames = new String[] { "dist", "distance" };
     private static String[] pllxcolnames = new String[] { "plx", "parallax", "pllx" };
     private static String[] magcolnames = new String[] { "phot_g_mean_mag", "mag", "bmag", "gmag" };
-    private static String[] colorcolnames = new String[] { "b_v", "v_i", "bp_rp", "bp_g", "g_rp" };
+    private static String[] colorcolnames = new String[] { "b_v", "v_i", "bp_rp", "bp_g", "g_rp", "ci" };
     private static String[] pmracolnames = new String[] { "pmra", "pmalpha", "pm_ra" };
     private static String[] pmdeccolnames = new String[] { "pmdec", "pmdelta", "pm_dec", "pm_de" };
-    private static String[] radvelcolnames = new String[] { "radial_velocity", "radvel" };
+    private static String[] radvelcolnames = new String[] { "radial_velocity", "radvel", "rv" };
 
     public Map<UCDType, Set<UCD>> ucdmap;
 

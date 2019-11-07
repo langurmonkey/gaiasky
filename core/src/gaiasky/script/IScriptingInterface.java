@@ -1303,6 +1303,16 @@ public interface IScriptingInterface {
     double[] internalCartesianToEquatorial(double x, double y, double z);
 
     /**
+     * Converts regular cartesian coordinates, where XY is the equatorial plane, with X pointing to
+     * the vernal equinox (ra=0) and Y points to ra=90, and Z pointing to the celestial north pole (dec=90)
+     * to internal cartesian coordinates with internal units.
+     * @param eq Equatorial cartesian coordinates (X->[ra=0,dec=0], Y->[ra=90,dec=0], Z->[ra=0,dec=90])
+     * @param kmFactor Factor used to bring the input coordinate units to Kilometers, so that <code>eq * factor = Km</code>
+     * @return Internal coordinates ready to be fed in other scripting functions
+     */
+    double[] equatorialCartesianToInternalCartesian(double[] eq, double kmFactor);
+
+    /**
      * Converts equatorial cartesian coordinates (in the internal reference system)
      * to galactic cartesian coordinates.
      *
@@ -1315,28 +1325,28 @@ public interface IScriptingInterface {
      * Converts equatorial cartesian coordinates (in the internal reference system)
      * to ecliptic cartesian coordinates.
      *
-     * @param eq Vector with [x, y, z] equatorial cartesian coordinates
+     * @param eqInternal Vector with [x, y, z] equatorial cartesian coordinates
      * @return Vector with [x, y, z] ecliptic cartesian coordinates
      */
-    double[] equatorialToEcliptic(double[] eq);
+    double[] equatorialToEcliptic(double[] eqInternal);
 
     /**
      * Converts galactic cartesian coordinates (in the internal reference system)
      * to equatorial cartesian coordinates.
      *
-     * @param gal Vector with [x, y, z] galactic cartesian coordinates
+     * @param galInternal Vector with [x, y, z] galactic cartesian coordinates
      * @return Vector with [x, y, z] equatorial cartesian coordinates
      */
-    double[] galacticToEquatorial(double[] gal);
+    double[] galacticToEquatorial(double[] galInternal);
 
     /**
      * Converts ecliptic cartesian coordinates (in the internal reference system)
      * to equatorial cartesian coordinates.
      *
-     * @param ecl Vector with [x, y, z] ecliptic cartesian coordinates
+     * @param eclInternal Vector with [x, y, z] ecliptic cartesian coordinates
      * @return Vector with [x, y, z] equatorial cartesian coordinates
      */
-    double[] eclipticToEquatorial(double[] ecl);
+    double[] eclipticToEquatorial(double[] eclInternal);
 
     /**
      * Sets the brightness level of the render system.

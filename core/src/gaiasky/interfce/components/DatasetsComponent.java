@@ -124,7 +124,12 @@ public class DatasetsComponent extends GuiComponent implements IObserver {
         cp.setNewColorRunnable(()->{
             ci.setHlColor(cp.getPickedColor());
         });
-        t.add(new OwnLabel(ci.name, skin, "hud-subheader")).left().padBottom(pad);
+        String name = TextUtils.capString(ci.name, 17);
+        OwnLabel nameLabel = new OwnLabel(TextUtils.capString(ci.name, 17), skin, "hud-subheader");
+        if(!ci.name.equals(name)){
+            nameLabel.addListener(new OwnTextTooltip(ci.name, skin));
+        }
+        t.add(nameLabel).left().padBottom(pad);
         t.add(cp).size(18f * GlobalConf.UI_SCALE_FACTOR).right().padBottom(pad).row();
         t.add(controls).left().padBottom(pad);
         t.add(mark).right().padBottom(pad).row();

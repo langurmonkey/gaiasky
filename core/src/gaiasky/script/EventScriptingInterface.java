@@ -1752,10 +1752,16 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
     }
 
     public double[] internalCartesianToEquatorial(double x, double y, double z) {
-        Vector3d in = new Vector3d(x, y, z);
-        Vector3d out = new Vector3d();
+        Vector3d in = aux3d1.set(x, y, z);
+        Vector3d out = aux3d2;
         Coordinates.cartesianToSpherical(in, out);
         return new double[] { out.x * Nature.TO_DEG, out.y * Nature.TO_DEG, in.len() };
+    }
+
+    @Override
+    public double[] equatorialCartesianToInternalCartesian(double[] eq, double kmFactor) {
+        aux3d1.set(eq).scl(kmFactor).scl(Constants.KM_TO_U);
+        return new double[]{aux3d1.y, aux3d1.z, aux3d1.x};
     }
 
     @Override
