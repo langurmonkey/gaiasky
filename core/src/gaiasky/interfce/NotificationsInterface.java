@@ -63,9 +63,10 @@ public class NotificationsInterface extends TableGuiInterface implements IObserv
      * @param multiple   Allow multiple messages?
      * @param writeDates Write dates with messages?
      * @param consoleLog Log to console
+     * @param bg       Apply background
      */
-    public NotificationsInterface(Skin skin, Object lock, boolean multiple, boolean writeDates, boolean consoleLog) {
-        this(skin, lock, multiple);
+    public NotificationsInterface(Skin skin, Object lock, boolean multiple, boolean writeDates, boolean consoleLog, boolean bg) {
+        this(skin, lock, multiple, bg);
         this.writeDates = writeDates;
         this.consoleLog = consoleLog;
     }
@@ -79,9 +80,10 @@ public class NotificationsInterface extends TableGuiInterface implements IObserv
      * @param writeDates    Write dates with messages?
      * @param consoleLog    Log to console
      * @param historicalLog Save logs to historical list
+     * @param bg       Apply background
      */
-    public NotificationsInterface(Skin skin, Object lock, boolean multiple, boolean writeDates, boolean consoleLog, boolean historicalLog) {
-        this(skin, lock, multiple, writeDates, consoleLog);
+    public NotificationsInterface(Skin skin, Object lock, boolean multiple, boolean writeDates, boolean consoleLog, boolean historicalLog, boolean bg) {
+        this(skin, lock, multiple, writeDates, consoleLog, bg);
         this.historicalLog = historicalLog;
     }
 
@@ -91,9 +93,10 @@ public class NotificationsInterface extends TableGuiInterface implements IObserv
      * @param skin     The skin.
      * @param lock     The lock object.
      * @param multiple Allow multiple messages?
+     * @param bg       Apply background
      */
-    public NotificationsInterface(Skin skin, Object lock, boolean multiple) {
-        this(null, DEFAULT_TIMEOUT, skin, multiple);
+    public NotificationsInterface(Skin skin, Object lock, boolean multiple, boolean bg) {
+        this(null, DEFAULT_TIMEOUT, skin, multiple, bg);
         this.lock = lock;
 
     }
@@ -105,15 +108,17 @@ public class NotificationsInterface extends TableGuiInterface implements IObserv
      * @param msTimeout The timeout in ms
      * @param skin      The skin
      * @param multiple  Multiple messages enabled
+     * @param bg        Apply background
      */
-    public NotificationsInterface(List<MessageBean> logs, long msTimeout, Skin skin, boolean multiple) {
+    public NotificationsInterface(List<MessageBean> logs, long msTimeout, Skin skin, boolean multiple, boolean bg) {
         super(skin);
         if (logs != null)
             this.historical.addAll(logs);
         this.msTimeout = msTimeout;
         this.multiple = multiple;
 
-        this.setBackground("table-bg");
+        if (bg)
+            this.setBackground("table-bg");
 
         // Create second message if necessary
         if (multiple) {

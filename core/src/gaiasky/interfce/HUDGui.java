@@ -75,7 +75,7 @@ public class HUDGui implements IGui {
         interfaces.add(debugInterface);
 
         // NOTIFICATIONS INTERFACE - BOTTOM LEFT
-        notificationsInterface = new NotificationsInterface(skin, lock, true);
+        notificationsInterface = new NotificationsInterface(skin, lock, true, false);
         notificationsInterface.setFillParent(true);
         notificationsInterface.left().bottom();
         notificationsInterface.pad(0, pad, pad, 0);

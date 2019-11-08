@@ -69,14 +69,14 @@ public class StereoGui extends AbstractGui {
         nf = NumberFormatFactory.getFormatter("##0.###");
 
         // NOTIFICATIONS ONE - BOTTOM LEFT
-        notificationsOne = new NotificationsInterface(skin, lock, true, true, false, false);
+        notificationsOne = new NotificationsInterface(skin, lock, true, true, false,  false, false);
         notificationsOne.setFillParent(true);
         notificationsOne.left().bottom();
         notificationsOne.pad(0, 5, 5, 0);
         interfaces.add(notificationsOne);
 
         // NOTIFICATIONS TWO - BOTTOM CENTRE
-        notificationsTwo = new NotificationsInterface(skin, lock, true, true, false, false);
+        notificationsTwo = new NotificationsInterface(skin, lock, true, true, false, false, false);
         notificationsTwo.setFillParent(true);
         notificationsTwo.bottom();
         notificationsTwo.setX(Gdx.graphics.getWidth() / 2);
