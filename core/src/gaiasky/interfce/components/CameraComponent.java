@@ -13,6 +13,7 @@ import com.badlogic.gdx.utils.Array;
 import gaiasky.event.EventManager;
 import gaiasky.event.Events;
 import gaiasky.event.IObserver;
+import gaiasky.interfce.KeyBindings;
 import gaiasky.interfce.beans.CameraComboBoxBean;
 import gaiasky.scenegraph.camera.CameraManager.CameraMode;
 import gaiasky.util.Constants;
@@ -79,8 +80,10 @@ public class CameraComponent extends GuiComponent implements IObserver {
 
         List<Button> buttonList = new ArrayList<>();
 
-        button3d = new OwnTextIconButton("", skin, "3d");
-        button3d.addListener(new OwnTextTooltip(TextUtils.capitalise(I18n.txt("element.stereomode")), skin));
+        Image icon3d = new Image(skin.getDrawable("3d-icon"));
+        button3d = new OwnTextIconButton("", icon3d, skin, "toggle");
+        String hk3d = KeyBindings.instance.getStringKeys("action.toggle/element.stereomode");
+        button3d.addListener(new OwnTextHotkeyTooltip(TextUtils.capitalise(I18n.txt("element.stereomode")), hk3d, skin));
         button3d.setName("3d");
         button3d.addListener(event -> {
             if (event instanceof ChangeEvent) {
@@ -90,8 +93,10 @@ public class CameraComponent extends GuiComponent implements IObserver {
             return false;
         });
 
-        buttonDome = new OwnTextIconButton("", skin, "dome");
-        buttonDome.addListener(new OwnTextTooltip(TextUtils.capitalise(I18n.txt("element.planetarium")), skin));
+        Image iconDome = new Image(skin.getDrawable("dome-icon"));
+        buttonDome = new OwnTextIconButton("", iconDome, skin, "toggle");
+        String hkdome = KeyBindings.instance.getStringKeys("action.toggle/element.planetarium");
+        buttonDome.addListener(new OwnTextHotkeyTooltip(TextUtils.capitalise(I18n.txt("element.planetarium")), hkdome, skin));
         buttonDome.setName("dome");
         buttonDome.addListener(event -> {
             if (event instanceof ChangeEvent) {
@@ -102,9 +107,11 @@ public class CameraComponent extends GuiComponent implements IObserver {
             return false;
         });
 
-        buttonCubemap = new OwnTextIconButton("", skin, "cubemap");
+        Image iconCubemap = new Image(skin.getDrawable("cubemap-icon"));
+        buttonCubemap = new OwnTextIconButton("", iconCubemap, skin, "toggle");
         buttonCubemap.setProgrammaticChangeEvents(false);
-        buttonCubemap.addListener(new OwnTextTooltip(TextUtils.capitalise(I18n.txt("element.360")), skin));
+        String hkcubemap = KeyBindings.instance.getStringKeys("action.toggle/element.360");
+        buttonCubemap.addListener(new OwnTextHotkeyTooltip(TextUtils.capitalise(I18n.txt("element.360")), hkcubemap, skin));
         buttonCubemap.setName("cubemap");
         buttonCubemap.addListener(event -> {
             if (event instanceof ChangeEvent) {

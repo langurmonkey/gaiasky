@@ -271,8 +271,8 @@ public class KeyBindings {
             EventManager.instance.post(Events.SCREEN_MODE_CMD);
         }));
 
-        // toggle fisheye effect
-        addAction(new ProgramAction("action.fisheye", () -> EventManager.instance.post(Events.FISHEYE_CMD, !GlobalConf.postprocess.POSTPROCESS_FISHEYE)));
+        // toggle planetarium mode
+        addAction(new ProgramAction("action.toggle/element.planetarium", () -> EventManager.instance.post(Events.FISHEYE_CMD, !GlobalConf.postprocess.POSTPROCESS_FISHEYE)));
 
         // take screenshot
         addAction(new ProgramAction("action.screenshot", () -> EventManager.instance.post(Events.SCREENSHOT_CMD, GlobalConf.screenshot.SCREENSHOT_WIDTH, GlobalConf.screenshot.SCREENSHOT_HEIGHT, GlobalConf.screenshot.SCREENSHOT_FOLDER)));
