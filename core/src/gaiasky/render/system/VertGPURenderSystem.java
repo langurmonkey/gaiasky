@@ -153,8 +153,8 @@ public class VertGPURenderSystem<T extends IGPUVertsRenderable> extends Immediat
 
             shaderProgram.begin();
 
-            renderable.blend();
-            renderable.depth();
+            //renderable.blend();
+            //renderable.depth();
 
             // Regular
             if (isLine())
@@ -174,7 +174,6 @@ public class VertGPURenderSystem<T extends IGPUVertsRenderable> extends Immediat
 
             // Rel, grav, z-buffer
             addEffectsUniforms(shaderProgram, camera);
-
             curr.mesh.render(shaderProgram, renderable.getGlPrimitive());
 
             shaderProgram.end();

@@ -27,7 +27,7 @@ public class VertsObject extends AbstractPositionEntity implements IGPUVertsRend
     protected int offset = -1;
     protected int count;
 
-    protected boolean blend = true, depth = true;
+    protected boolean blend = true, depth = true, additive = true;
 
     protected int glPrimitive;
 
@@ -202,6 +202,10 @@ public class VertsObject extends AbstractPositionEntity implements IGPUVertsRend
         this.blend = blend;
     }
 
+    public void setAdditive(boolean additive) {
+        this.additive = additive;
+    }
+
     public void setDepth(boolean depth) {
         this.depth = depth;
     }
@@ -210,7 +214,11 @@ public class VertsObject extends AbstractPositionEntity implements IGPUVertsRend
     public void blend() {
         if (blend) {
             Gdx.gl20.glEnable(GL20.GL_BLEND);
-            Gdx.gl20.glBlendFunc(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA);
+            if(additive){
+                Gdx.gl20.glBlendFunc(GL20.GL_ONE, GL20.GL_ONE);
+            }else {
+                Gdx.gl20.glBlendFunc(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA);
+            }
         } else {
             Gdx.gl20.glDisable(GL20.GL_BLEND);
         }

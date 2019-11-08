@@ -499,7 +499,7 @@ public class SceneGraphRenderer extends AbstractRenderer implements IProcessRend
 
         // LINES GPU
         AbstractRenderSystem lineGpuProc = new VertGPURenderSystem(RenderGroup.LINE_GPU, alphas, lineGpuShaders, true);
-        lineGpuProc.addPreRunnables(regularBlendR, depthTestR);
+        lineGpuProc.addPreRunnables(additiveBlendR, depthTestR, noDepthWritesR);
 
         // POINTS CPU
         AbstractRenderSystem pointProc = new PointRenderSystem(RenderGroup.POINT, alphas, pointShaders);
