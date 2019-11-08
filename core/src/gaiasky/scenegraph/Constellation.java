@@ -243,7 +243,7 @@ public class Constellation extends FadeNode implements ILineRenderable, I3DTextR
     }
 
     @Override
-    public int getGlType() {
+    public int getGlPrimitive() {
         return GL20.GL_LINES;
     }
 }

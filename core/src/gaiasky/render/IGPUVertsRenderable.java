@@ -41,6 +41,8 @@ public interface IGPUVertsRenderable extends IRenderable {
     void blend();
     void depth();
 
+    int getGlPrimitive();
+
     /**
      * Line width for lines, point size for points
      *

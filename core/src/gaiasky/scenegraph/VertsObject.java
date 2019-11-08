@@ -29,6 +29,8 @@ public class VertsObject extends AbstractPositionEntity implements IGPUVertsRend
 
     protected boolean blend = true, depth = true;
 
+    protected int glPrimitive;
+
     /** The render vgroup **/
     protected RenderGroup renderGroup;
 
@@ -40,10 +42,11 @@ public class VertsObject extends AbstractPositionEntity implements IGPUVertsRend
 
     protected PointCloudData pointCloudData;
 
-    public VertsObject(RenderGroup rg) {
+    public VertsObject(RenderGroup rg, int glPrimitive) {
         super();
         this.renderGroup = rg;
         this.localTransform = new Matrix4();
+        this.glPrimitive = glPrimitive;
     }
 
     @Override
@@ -221,6 +224,31 @@ public class VertsObject extends AbstractPositionEntity implements IGPUVertsRend
         } else {
             Gdx.gl20.glDisable(GL20.GL_DEPTH_TEST);
         }
+    }
+
+    public void setGlPrimitive(int glPrimitive){
+        this.glPrimitive = glPrimitive;
+    }
+
+    @Override
+    public int getGlPrimitive() {
+        return glPrimitive;
+    }
+
+    public void setPrimitiveLineStip() {
+        glPrimitive = GL20.GL_LINE_STRIP;
+    }
+
+    public void setPrimitiveLines() {
+        glPrimitive = GL20.GL_LINES;
+    }
+
+    public void setPrimitiveLineLoop() {
+        glPrimitive = GL20.GL_LINE_LOOP;
+    }
+
+    public void setPrimitivePoints() {
+        glPrimitive = GL20.GL_POINTS;
     }
 
     @Override

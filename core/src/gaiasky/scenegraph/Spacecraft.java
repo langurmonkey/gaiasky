@@ -662,7 +662,7 @@ public class Spacecraft extends GenericSpacecraft implements ILineRenderable, IO
     }
 
     @Override
-    public int getGlType() {
+    public int getGlPrimitive() {
         return GL20.GL_LINES;
     }
 

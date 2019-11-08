@@ -85,7 +85,7 @@ public class StubModel extends AbstractPositionEntity implements IModelRenderabl
     }
 
     @Override
-    public int getGlType() {
+    public int getGlPrimitive() {
         return GL20.GL_LINES;
     }
 

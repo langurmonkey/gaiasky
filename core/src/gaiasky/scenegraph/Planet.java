@@ -242,7 +242,7 @@ public class Planet extends ModelBody implements IAtmosphereRenderable, ICloudRe
     }
 
     @Override
-    public int getGlType() {
+    public int getGlPrimitive() {
         return GL20.GL_LINE_STRIP;
     }
 

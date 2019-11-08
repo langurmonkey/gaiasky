@@ -97,7 +97,7 @@ public class KeyframesPathObject extends VertsObject implements I3DTextRenderabl
     private float ss = 1f;
 
     public KeyframesPathObject() {
-        super(null);
+        super(null, -1);
     }
 
     public void initialize() {
@@ -709,7 +709,7 @@ public class KeyframesPathObject extends VertsObject implements I3DTextRenderabl
     }
 
     @Override
-    public int getGlType() {
+    public int getGlPrimitive() {
         return GL20.GL_LINE_STRIP;
     }
 

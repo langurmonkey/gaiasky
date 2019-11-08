@@ -107,7 +107,7 @@ public class Axes extends AbstractPositionEntity implements ILineRenderable {
     }
 
 
-    public int getGlType(){
+    public int getGlPrimitive(){
         return GL30.GL_LINES;
     }
 

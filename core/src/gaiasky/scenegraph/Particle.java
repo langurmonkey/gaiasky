@@ -394,7 +394,7 @@ public class Particle extends CelestialBody implements IStarFocus, ILineRenderab
     }
 
     @Override
-    public int getGlType() {
+    public int getGlPrimitive() {
         return GL20.GL_LINES;
     }
 

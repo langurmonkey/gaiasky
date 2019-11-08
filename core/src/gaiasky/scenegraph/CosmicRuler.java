@@ -260,7 +260,7 @@ public class CosmicRuler extends AbstractPositionEntity implements I3DTextRender
     }
 
     @Override
-    public int getGlType() {
+    public int getGlPrimitive() {
         return GL20.GL_LINES;
     }
 }

@@ -109,7 +109,7 @@ public class LineRenderSystem extends ImmediateRenderSystem {
             for (int md = 0; md < meshIdx; md++) {
                 MeshData meshd = meshes.get(md);
                 meshd.mesh.setVertices(meshd.vertices, 0, meshd.vertexIdx);
-                meshd.mesh.render(shaderProgram, renderable.getGlType());
+                meshd.mesh.render(shaderProgram, renderable.getGlPrimitive());
 
                 meshd.clear();
             }

@@ -892,7 +892,7 @@ public class OctreeNode implements ILineRenderable {
 
 
     @Override
-    public int getGlType() {
+    public int getGlPrimitive() {
         return GL20.GL_LINE_STRIP;
     }
 }

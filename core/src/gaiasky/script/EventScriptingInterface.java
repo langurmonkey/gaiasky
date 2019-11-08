@@ -8,6 +8,7 @@ package gaiasky.script;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.assets.AssetManager;
+import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Group;
@@ -288,7 +289,7 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
 
     @Override
     public void setCameraPosition(double x, double y, double z) {
-        setCameraPosition(new double[]{x, y, z});
+        setCameraPosition(new double[] { x, y, z });
     }
 
     public void setCameraPosition(final List vec) {
@@ -1761,7 +1762,7 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
     @Override
     public double[] equatorialCartesianToInternalCartesian(double[] eq, double kmFactor) {
         aux3d1.set(eq).scl(kmFactor).scl(Constants.KM_TO_U);
-        return new double[]{aux3d1.y, aux3d1.z, aux3d1.x};
+        return new double[] { aux3d1.y, aux3d1.z, aux3d1.x };
     }
 
     @Override
@@ -2006,31 +2007,49 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
     }
 
     @Override
-    public void addPolyline(String name, double[] points, double[] color, float lineWidth) {
-        if (checkString(name, "name") && checkNum(lineWidth, 0.1f, 50f, "lineWidth")) {
-            Polyline pl = new Polyline();
+    public void addPolyline(String name, double[] points, double[] color, double lineWidth) {
+        addPolyline(name, points, color, lineWidth, GL20.GL_LINE_STRIP);
+    }
+
+    @Override
+    public void addPolyline(String name, double[] points, double[] color, double lineWidth, int primitive) {
+        if (checkString(name, "name") && checkNum(lineWidth, 0.1f, 50f, "lineWidth") && checkNum(primitive, 1, 3, "primitive")) {
+            Polyline pl = new Polyline(primitive);
             pl.setCt("Others");
             pl.setColor(color);
             pl.setName(name);
             pl.setPoints(points);
-            pl.setPrimitiveSize(lineWidth);
+            pl.setPrimitiveSize((float) lineWidth);
             pl.setParent("Universe");
             pl.initialize();
 
             em.post(Events.SCENE_GRAPH_ADD_OBJECT_CMD, pl, true);
         }
+
     }
 
     public void addPolyline(String name, double[] points, double[] color, int lineWidth) {
         addPolyline(name, points, color, (float) lineWidth);
     }
 
+    public void addPolyline(String name, double[] points, double[] color, int lineWidth, int primitive) {
+        addPolyline(name, points, color, (float) lineWidth, primitive);
+    }
+
     public void addPolyline(String name, List points, List color, float lineWidth) {
         addPolyline(name, dArray(points), dArray(color), lineWidth);
     }
 
+    public void addPolyline(String name, List points, List color, float lineWidth, int primitive) {
+        addPolyline(name, dArray(points), dArray(color), lineWidth, primitive);
+    }
+
     public void addPolyline(String name, List points, List color, int lineWidth) {
         addPolyline(name, points, color, (float) lineWidth);
+    }
+
+    public void addPolyline(String name, List points, List color, int lineWidth, int primitive) {
+        addPolyline(name, points, color, (float) lineWidth, primitive);
     }
 
     @Override

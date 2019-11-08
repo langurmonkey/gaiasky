@@ -196,7 +196,7 @@ public class Area extends AbstractPositionEntity implements ILineRenderable {
     }
 
     @Override
-    public int getGlType() {
+    public int getGlPrimitive() {
         return GL20.GL_LINES;
     }
 

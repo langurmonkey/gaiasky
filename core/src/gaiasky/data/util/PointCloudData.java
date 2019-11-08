@@ -10,6 +10,7 @@ import com.badlogic.gdx.utils.Array;
 import gaiasky.util.math.Vector3d;
 
 import java.time.Instant;
+import java.util.ArrayList;
 
 public class PointCloudData {
     // Values of x, y, z in world coordinates
@@ -63,6 +64,22 @@ public class PointCloudData {
                 x.add(points[i * 3]);
                 y.add(points[i * 3 + 1]);
                 z.add(points[i * 3 + 2]);
+            }
+        }
+    }
+
+    /**
+     * Same as {@link PointCloudData#addPoints(double[])} but with an array list
+     *
+     * @param points The points to add to this point cloud
+     */
+    public void addPoints(ArrayList points){
+        if (points.size() % 3 == 0) {
+            int nPoints = points.size() / 3;
+            for (int i = 0; i < nPoints; i++) {
+                x.add((double) points.get(i * 3));
+                y.add((double) points.get(i * 3 + 1));
+                z.add((double) points.get(i * 3 + 2));
             }
         }
     }

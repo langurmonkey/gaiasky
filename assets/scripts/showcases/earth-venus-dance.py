@@ -9,29 +9,33 @@ from py4j.clientserver import ClientServer, JavaParameters, PythonParameters
 import time
 
 class LineUpdaterRunnable(object):
-    def __init__(self, polyline):
-        self.polyline = polyline
+    def __init__(self, plcurrent, plhistory):
+        self.plcurrent = plcurrent
+        self.plhistory = plhistory
         self.t0 = 0
         self.seq = 1
 
     def run(self):
         earthp = gs.getObjectPosition("Earth")
         venusp = gs.getObjectPosition("Venus")
-        pl = self.polyline.getPointCloud()
+        plc = self.plcurrent.getPointCloud()
 
-        pl.setX(0, earthp[0])
-        pl.setY(0, earthp[1])
-        pl.setZ(0, earthp[2])
-        pl.setX(1, venusp[0])
-        pl.setY(1, venusp[1])
-        pl.setZ(1, venusp[2])
+        plc.setX(0, earthp[0])
+        plc.setY(0, earthp[1])
+        plc.setZ(0, earthp[2])
+        plc.setX(1, venusp[0])
+        plc.setY(1, venusp[1])
+        plc.setZ(1, venusp[2])
 
-        self.polyline.markForUpdate()
+        self.plcurrent.markForUpdate()
         
         currt = time.time()
         # Each 0.2 seconds
         if currt - self.t0 > 0.2:
-            gs.addPolyline("line-%d" % self.seq, [earthp[0], earthp[1], earthp[2], venusp[0], venusp[1], venusp[2]], [ 0.8, 0.8, .2, .4 ], 1 )
+            plh = self.plhistory.getPointCloud()
+            plh.addPoint(earthp[0], earthp[1], earthp[2])
+            plh.addPoint(venusp[0], venusp[1], venusp[2])
+            self.plhistory.markForUpdate()
             self.seq = self.seq + 1
             self.t0 = currt
 
@@ -64,15 +68,18 @@ print("We will now add a line between the Earth and Venus")
 earthp = gs.getObjectPosition("Earth")
 venusp = gs.getObjectPosition("Venus")
 
-gs.addPolyline("line-em", [earthp[0], earthp[1], earthp[2], venusp[0], venusp[1], venusp[2]], [ 1., .2, .2, .8 ], 1 )
+# Create polyline objects
+gs.addPolyline("line-current", [earthp[0], earthp[1], earthp[2], venusp[0], venusp[1], venusp[2]], [ 1., .2, .2, .8 ], 1)
+gs.addPolyline("line-hist", [], [ .7, .7, .1, .7 ], 1, 1)
 
 gs.sleep(0.5)
 
-# create line
-line_em = gs.getObject("line-em")
+# Get polyline objects
+line_curr = gs.getObject("line-current")
+line_hist = gs.getObject("line-hist")
 
 # park the line updater
-gs.parkRunnable("line-updater", LineUpdaterRunnable(line_em))
+gs.parkRunnable("line-updater", LineUpdaterRunnable(line_curr, line_hist))
 
 gs.setSimulationPace(3e6)
 gs.startSimulationTime()
@@ -85,7 +92,8 @@ gs.stopSimulationTime()
 print("Cleaning up and ending")
 
 gs.unparkRunnable("line-updater")
-gs.removeModelObject("line-em")
+gs.removeModelObject("line-current")
+gs.removeModelObject("line-hist")
 gs.cameraStop()
 
 gs.maximizeInterfaceWindow()

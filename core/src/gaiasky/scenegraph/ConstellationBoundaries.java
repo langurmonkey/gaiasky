@@ -66,7 +66,7 @@ public class ConstellationBoundaries extends AbstractPositionEntity implements I
     }
 
     @Override
-    public int getGlType() {
+    public int getGlPrimitive() {
         return GL20.GL_LINES;
     }
 }

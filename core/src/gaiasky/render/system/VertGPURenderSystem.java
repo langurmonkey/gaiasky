@@ -30,19 +30,19 @@ import org.lwjgl.opengl.GL30;
  */
 public class VertGPURenderSystem<T extends IGPUVertsRenderable> extends ImmediateRenderSystem {
     protected ICamera camera;
-    protected int glType;
+    protected boolean lines = false;
 
-    public VertGPURenderSystem(RenderGroup rg, float[] alphas, ExtShaderProgram[] shaders, int glType) {
+    public VertGPURenderSystem(RenderGroup rg, float[] alphas, ExtShaderProgram[] shaders, boolean lines) {
         super(rg, alphas, shaders);
-        this.glType = glType;
+        this.lines = lines;
     }
 
     public boolean isLine() {
-        return glType == GL20.GL_LINE_STRIP || glType == GL20.GL_LINES;
+        return lines;
     }
 
     public boolean isPoint() {
-        return glType == GL20.GL_POINTS;
+        return !lines;
     }
 
     @Override
@@ -175,7 +175,7 @@ public class VertGPURenderSystem<T extends IGPUVertsRenderable> extends Immediat
             // Rel, grav, z-buffer
             addEffectsUniforms(shaderProgram, camera);
 
-            curr.mesh.render(shaderProgram, glType);
+            curr.mesh.render(shaderProgram, renderable.getGlPrimitive());
 
             shaderProgram.end();
         }

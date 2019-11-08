@@ -5,6 +5,7 @@
 
 package gaiasky.scenegraph;
 
+import com.badlogic.gdx.graphics.GL20;
 import gaiasky.render.IPointRenderable;
 import gaiasky.render.system.PointRenderSystem;
 import gaiasky.scenegraph.camera.ICamera;
@@ -17,7 +18,7 @@ import gaiasky.util.math.Vector3d;
 public class Points extends VertsObject implements IPointRenderable {
 
     public Points(RenderGroup rg){
-        super(rg);
+        super(rg, GL20.GL_POINTS);
     }
 
     @Override

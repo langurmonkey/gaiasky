@@ -18,12 +18,17 @@ import gaiasky.util.math.Vector3d;
  */
 public class Polyline extends VertsObject implements ILineRenderable {
 
+
     public Polyline() {
-        super(RenderGroup.LINE_GPU);
+        super(RenderGroup.LINE_GPU, GL20.GL_LINE_STRIP);
+    }
+
+    public Polyline(int primitive) {
+        super(RenderGroup.LINE_GPU, primitive);
     }
 
     public Polyline(RenderGroup rg) {
-        super(rg);
+        super(rg, GL20.GL_LINE_STRIP);
     }
 
     @Override
@@ -51,11 +56,6 @@ public class Polyline extends VertsObject implements ILineRenderable {
     @Override
     public float getLineWidth() {
         return getPrimitiveSize();
-    }
-
-    @Override
-    public int getGlType() {
-        return GL20.GL_LINE_STRIP;
     }
 
 }
