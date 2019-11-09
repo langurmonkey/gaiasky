@@ -18,16 +18,16 @@ finished = False
 
 # Time [seconds] until the next point batch is added
 # Decrease to make the tour appear faster (limited by frame rate)
-dt = 0.02
+dt = 0.01
 
 # Number of points to add at once
 # Increase to make the tour appear faster
-batch_size = 400
+batch_size = 1000
 
 # The file containing [ID, X, Y, Z]
-positions_file = "/media/tsagrista/NeuDaten/Gaia/gaiasky/tsp/gaia250000.tsp.gz"
+positions_file = "/home/tsagrista/Downloads/tsp/gaia250000.tsp.gz"
 # The file containing a list of integer indices, one for each position in the positions file
-indices_file = "/media/tsagrista/NeuDaten/Gaia/gaiasky/tsp/star250000.9794191.tour.txt.gz"
+indices_file = "/home/tsagrista/Downloads/tsp/star250000.9794191.tour.txt.gz"
 
 """
 Prints to Gaia Sky and python outputs
@@ -44,35 +44,38 @@ class LineUpdaterRunnable(object):
         self.seq = 0
         self.n = len(positions)
         self.d_class = gateway.jvm.double
+        self.running = True
 
         # Auxiliary double array
         self.darr = gateway.new_array(self.d_class, 3)
 
     def run(self):
-        currt = time.time()
-        if currt - self.t0 > dt:
-            pl = self.polyline.getPointCloud()
+        if self.running:
+            currt = time.time()
+            if currt - self.t0 > dt:
+                pl = self.polyline.getPointCloud()
 
-            for i in range(batch_size):
-                if self.seq < self.n:
-                    # Still have points, add next
-                    self.darr[0] = positions[self.seq][0]
-                    self.darr[1] = positions[self.seq][1]
-                    self.darr[2] = positions[self.seq][2]
+                for i in range(batch_size):
+                    if self.seq < self.n:
+                        # Still have points, add next
+                        self.darr[0] = positions[self.seq][0]
+                        self.darr[1] = positions[self.seq][1]
+                        self.darr[2] = positions[self.seq][2]
 
-                    internal_pos = gs.equatorialCartesianToInternalCartesian(self.darr, to_km)
-                    pl.addPoints(internal_pos)
-                else: 
-                    global finished
-                    lprint("We are done")
-                    finished = True
-                    break
-                
-                self.seq += 1
+                        internal_pos = gs.equatorialCartesianToInternalCartesian(self.darr, to_km)
+                        pl.addPoints(internal_pos)
+                    else: 
+                        global finished
+                        lprint("We are done")
+                        self.running = False
+                        finished = True
+                        break
                     
-            self.polyline.markForUpdate()
-        
-            self.t0 = currt
+                    self.seq += 1
+                        
+                self.polyline.markForUpdate()
+            
+                self.t0 = currt
 
 
 
@@ -144,10 +147,10 @@ if npoints != nindices:
 sorted_positions = [None] * npoints
 for i in range(npoints):
     # Indices are in [1,n], we need [0,n-1]
-    sorted_positions[indices[i] - 1] = positions[i]
+    sorted_positions[i] = positions[indices[i] - 1]
 
 # Create line object
-gs.addPolyline("tsp-tour", [], [1., .2, .2, .4], 1)
+gs.addPolyline("tsp-tour", [], [.5, .5, .1, .1], 0.2)
 gs.sleep(1.0)
 tsp_path = gs.getObject("tsp-tour")
 
@@ -158,7 +161,7 @@ lprint("Runnable is parked")
 
 # Sleep till runnable is done
 while not finished:
-    gs.sleep(2.0)
+    time.sleep(2.0)
 
 # Cleanup and exit
 gs.enableInput()
