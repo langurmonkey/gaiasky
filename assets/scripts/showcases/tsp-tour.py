@@ -22,12 +22,12 @@ dt = 0.01
 
 # Number of points to add at once
 # Increase to make the tour appear faster
-batch_size = 1000
+batch_size = 10
 
 # The file containing [ID, X, Y, Z]
-positions_file = "/home/tsagrista/Downloads/tsp/gaia250000.tsp.gz"
+positions_file = "/home/tsagrista/Downloads/tsp/gaia100.tsp"
 # The file containing a list of integer indices, one for each position in the positions file
-indices_file = "/home/tsagrista/Downloads/tsp/star250000.9794191.tour.txt.gz"
+indices_file = "/home/tsagrista/Downloads/tsp/gaia100.tour.txt"
 
 """
 Prints to Gaia Sky and python outputs
@@ -63,7 +63,7 @@ class LineUpdaterRunnable(object):
                         self.darr[2] = positions[self.seq][2]
 
                         internal_pos = gs.equatorialCartesianToInternalCartesian(self.darr, to_km)
-                        pl.addPoints(internal_pos)
+                        pl.addPoint(internal_pos[0], internal_pos[1], internal_pos[2])
                     else: 
                         global finished
                         lprint("We are done")
@@ -150,7 +150,7 @@ for i in range(npoints):
     sorted_positions[i] = positions[indices[i] - 1]
 
 # Create line object
-gs.addPolyline("tsp-tour", [], [.5, .5, .1, .1], 0.2)
+gs.addPolyline("tsp-tour", [], [.5, .5, .1, .5], 0.5)
 gs.sleep(1.0)
 tsp_path = gs.getObject("tsp-tour")
 
