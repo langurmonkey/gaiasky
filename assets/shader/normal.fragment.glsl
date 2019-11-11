@@ -330,7 +330,6 @@ mat3 cotangentFrame(vec3 N, vec3 p, vec2 uv){
     return mat3( T * invmax, B * invmax, N );
 }
 
-#include shader/lib_atmfog.glsl
 #include shader/lib_logdepthbuff.glsl
 
 #ifdef velocityBufferFlag
@@ -406,7 +405,6 @@ void main() {
     #ifdef atmosphereGround
     #define exposure 4.0
     fragColor.rgb += (vec3(1.0) - exp(v_atmosphereColor.rgb * -exposure)) * v_atmosphereColor.a;
-    fragColor.rgb = applyFog(fragColor.rgb, NL);
     #endif
 
     // Prevent saturation
