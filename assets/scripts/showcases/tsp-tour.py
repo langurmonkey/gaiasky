@@ -24,10 +24,13 @@ dt = 0.01
 # Increase to make the tour appear faster
 batch_size = 10
 
-# The file containing [ID, X, Y, Z]
+# The file containing [idx, X, Y, Z]
 positions_file = "/home/tsagrista/Downloads/tsp/gaia100.tsp"
-# The file containing a list of integer indices, one for each position in the positions file
+# The file containing a list of integer indices corresponding to the index of the position that goes at the position of the index
 indices_file = "/home/tsagrista/Downloads/tsp/gaia100.tour.txt"
+
+# Whether to write the sorted positions list
+write_sorted_pos = False
 
 """
 Prints to Gaia Sky and python outputs
@@ -77,9 +80,6 @@ class LineUpdaterRunnable(object):
             
                 self.t0 = currt
 
-
-
-
     def toString():
         return "line-update-runnable"
 
@@ -102,6 +102,15 @@ def read_file_lines(file_path):
         with open(file_path) as f:
             lines = f.readlines()
     return lines
+
+"""
+Writes a list to the given file path
+"""
+def write_list(my_list, file_path):
+    with open(file_path, 'w') as f:
+        for item in my_list:
+            f.write("%s\n" % item)
+    lprint("List written to %s" % file_path)
 
 gateway = ClientServer(java_parameters=JavaParameters(auto_convert=True),
                       python_parameters=PythonParameters())
@@ -149,10 +158,13 @@ for i in range(npoints):
     # Indices are in [1,n], we need [0,n-1]
     sorted_positions[i] = positions[indices[i] - 1]
 
+# Write
+if write_sorted_pos:
+    write_list(sorted_positions, "/tmp/final_positions")
+
 # Create line object
 gs.addPolyline("tsp-tour", [], [.5, .5, .1, .5], 0.5)
-gs.sleep(1.0)
-tsp_path = gs.getObject("tsp-tour")
+tsp_path = gs.getObject("tsp-tour", 10.0)
 
 # park the line updater
 gs.parkRunnable("line-updater", LineUpdaterRunnable(tsp_path, sorted_positions))
