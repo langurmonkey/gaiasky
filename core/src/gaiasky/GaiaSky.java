@@ -462,7 +462,7 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
         if (manager.isLoaded(dataLoadString)) {
             sg = manager.get(dataLoadString);
         } else {
-            throw new RuntimeException("Error loading scene graph from data load string: " + dataLoadString);
+            throw new RuntimeException("Error loading scene graph from data load string: " + dataLoadString + ", and files: " + TextUtils.concatenate(File.pathSeparator, GlobalConf.data.CATALOG_JSON_FILES));
         }
 
         /*

@@ -320,9 +320,11 @@ task dist (dependsOn: gaiaskyJar, description: "Compiles the project, creates th
         copy {
             from "$baseDir/assets/icon"
             into "$distDir"
-            include "ic_launcher.png"
-            include "ic_launcher.ico"
-            include "ic_launcher.svg"
+            include "gs_icon.png"
+            include "gs_icon.ico"
+            include "gs_icon.svg"
+            include "gsvr_icon.png"
+            include "gsvr_icon.ico"
         }
 
         // Replace version in readme file

@@ -292,7 +292,11 @@ public class GaiaSkyDesktop implements IObserver {
             cfg.setWindowedMode(GlobalConf.screen.SCREEN_WIDTH, GlobalConf.screen.SCREEN_HEIGHT);
             cfg.setResizable(true);
         }
-        cfg.setWindowIcon(Files.FileType.Internal, "icon/ic_launcher.png");
+        if(gsArgs.vr){
+            cfg.setWindowIcon(Files.FileType.Internal, "icon/gsvr_icon.png");
+        } else {
+            cfg.setWindowIcon(Files.FileType.Internal, "icon/gs_icon.png");
+        }
         cfg.useOpenGL3(true, 4, 1);
         // Disable logical DPI modes (macOS, Windows)
         cfg.setHdpiMode(HdpiMode.Pixels);

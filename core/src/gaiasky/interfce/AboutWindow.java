@@ -121,7 +121,7 @@ public class AboutWindow extends GenericDialog {
         Link docsLink = new Link(GlobalConf.DOCUMENTATION, linkStyle, GlobalConf.DOCUMENTATION);
 
         // Icon
-        FileHandle gsIcon = Gdx.files.internal("icon/ic_launcher.png");
+        FileHandle gsIcon = Gdx.files.internal(GlobalConf.runtime.OPENVR ? "icon/gsvr_icon.png" : "icon/gs_icon.png");
         Texture iconTex = new Texture(gsIcon);
         iconTex.setFilter(TextureFilter.Linear, TextureFilter.Linear);
         Image gaiaskyIcon = new Image(iconTex);
