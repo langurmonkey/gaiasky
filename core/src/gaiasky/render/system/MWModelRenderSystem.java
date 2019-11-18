@@ -302,8 +302,8 @@ public class MWModelRenderSystem extends ImmediateRenderSystem implements IObser
 
                     //  Dust
                     shaderProgram.setUniformf("u_maxPointSize", maxSizes[PType.DUST.ordinal()]);
-                    shaderProgram.setUniformf("u_sizeFactor", (float) (1.5e13 / fovf));
-                    shaderProgram.setUniformf("u_intensity", 1.9f);
+                    shaderProgram.setUniformf("u_sizeFactor", (float) (1.6e13 / fovf));
+                    shaderProgram.setUniformf("u_intensity", 2.2f);
                     dust.mesh.render(shaderProgram, ShapeType.Point.getGlType());
 
                     // PART2: BULGE + STARS + HII + GAS - depth enabled - no depth writes
@@ -312,14 +312,14 @@ public class MWModelRenderSystem extends ImmediateRenderSystem implements IObser
 
                     // HII
                     shaderProgram.setUniformf("u_maxPointSize", maxSizes[PType.HII.ordinal()]);
-                    shaderProgram.setUniformf("u_sizeFactor", (float) (5e11 / fovf));
-                    shaderProgram.setUniformf("u_intensity", 1f);
+                    shaderProgram.setUniformf("u_sizeFactor", (float) (7e11 / fovf));
+                    shaderProgram.setUniformf("u_intensity", 1.2f);
                     hii.mesh.render(shaderProgram, ShapeType.Point.getGlType());
 
                     // Gas
                     shaderProgram.setUniformf("u_maxPointSize", maxSizes[PType.GAS.ordinal()]);
-                    shaderProgram.setUniformf("u_sizeFactor", (float) (1.7e12 / fovf));
-                    shaderProgram.setUniformf("u_intensity", 0.7f);
+                    shaderProgram.setUniformf("u_sizeFactor", (float) (1.9e12 / fovf));
+                    shaderProgram.setUniformf("u_intensity", 0.8f);
                     gas.mesh.render(shaderProgram, ShapeType.Point.getGlType());
 
                     // Bulge
@@ -330,7 +330,7 @@ public class MWModelRenderSystem extends ImmediateRenderSystem implements IObser
 
                     // Stars
                     shaderProgram.setUniformf("u_maxPointSize", maxSizes[PType.STAR.ordinal()]);
-                    shaderProgram.setUniformf("u_sizeFactor", (float) (2e11 / fovf));
+                    shaderProgram.setUniformf("u_sizeFactor", (float) (2.5e11 / fovf));
                     shaderProgram.setUniformf("u_intensity", 0.8f);
                     stars.mesh.render(shaderProgram, ShapeType.Point.getGlType());
 
