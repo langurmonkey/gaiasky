@@ -698,7 +698,7 @@ public class GlobalResources {
         for (FileHandle file : files) {
             if (file.name().contains("_" + side + ".")) {
                 // Found!
-                return file.file().getAbsolutePath().replace("\\", "/");
+                return file.file().getAbsolutePath();
             }
         }
         throw new RuntimeException("Skybox side '" + side + "' not found in folder: " + skyboxLoc);
