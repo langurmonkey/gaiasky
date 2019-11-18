@@ -42,10 +42,9 @@ import java.util.Properties;
 public class DesktopConfInit extends ConfInit {
     private static final Log logger = Logger.getLogger(DesktopConfInit.class);
 
-    CommentedProperties p;
-    Properties vp;
-
-    IDateFormat df = DateFormatFactory.getFormatter("dd/MM/yyyy HH:mm:ss");
+    private CommentedProperties p;
+    private Properties vp;
+    private IDateFormat df = DateFormatFactory.getFormatter("dd/MM/yyyy HH:mm:ss");
 
     public DesktopConfInit(boolean vr) {
         super();
