@@ -17,26 +17,30 @@ import gaiasky.util.gdx.contrib.postprocess.filters.FisheyeDistortion;
 import gaiasky.util.gdx.contrib.utils.GaiaSkyFrameBuffer;
 
 public final class Fisheye extends PostProcessorEffect {
-    private FisheyeDistortion distort;
+    private FisheyeDistortion fisheye;
 
-    public Fisheye() {
-        distort = new FisheyeDistortion();
+    public Fisheye(int width, int height) {
+        fisheye = new FisheyeDistortion(width, height);
+    }
+
+    public void setViewportSize(int width, int height) {
+        this.fisheye.setViewportSize(width, height);
     }
 
     @Override
     public void dispose() {
-        distort.dispose();
+        fisheye.dispose();
     }
 
     @Override
     public void rebind() {
-        distort.rebind();
+        fisheye.rebind();
     }
 
     @Override
     public void render(FrameBuffer src, FrameBuffer dest, GaiaSkyFrameBuffer main) {
         restoreViewport(dest);
-        distort.setInput(src).setOutput(dest).render();
+        fisheye.setInput(src).setOutput(dest).render();
     }
 
     ;

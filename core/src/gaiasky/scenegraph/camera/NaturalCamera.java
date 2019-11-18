@@ -240,6 +240,7 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
         camera = new PerspectiveCamera(GlobalConf.scene.CAMERA_FOV, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
         camera.near = (float) CAM_NEAR;
         camera.far = (float) CAM_FAR;
+        fovBackup = GlobalConf.scene.CAMERA_FOV;
 
         // init cameras vector
         cameras = new PerspectiveCamera[] { camera, camLeft, camRight };

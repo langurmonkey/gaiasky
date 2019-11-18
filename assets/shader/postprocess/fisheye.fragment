@@ -16,6 +16,7 @@
 #version 330 core
 
 uniform sampler2D u_texture0;
+uniform vec2 u_viewport;
 
 in vec2 v_texCoords;
 layout (location = 0) out vec4 fragColor;
@@ -24,28 +25,27 @@ layout (location = 0) out vec4 fragColor;
  
 void main()
 {
-  float aperture = 180.0;
-  float apertureHalf = 0.5 * aperture * (PI / 180.0);
-  float maxFactor = sin(apertureHalf);
-  maxFactor = maxFactor;
-  
+  float arx = min(1.0, u_viewport.y / u_viewport.x);
+  float ary = min(1.0, u_viewport.x / u_viewport.y);
+
   vec2 uv;
-  vec2 xy = 2.0 * v_texCoords - 1.0;
+
+  // tc in v_texCoords in [-1, 1]
+  vec2 tc = v_texCoords * 2.0 - 1.0;
+  vec2 arv = u_viewport.xy / min(u_viewport.x, u_viewport.y);
+  vec2 xy = tc * arv;
   float d = length(xy);
-  if (d < (2.0 - maxFactor))
-  {
-    d = length(xy * maxFactor);
+  if (d < 1.0) {
     float z = sqrt(1.0 - d * d);
     float r = atan(d, z) / PI;
     float phi = atan(xy.y, xy.x);
     
-    uv.x = r * cos(phi) + 0.5;
-    uv.y = r * sin(phi) + 0.5;
+    uv.x = (r * cos(phi) + 0.5) * arx + (1.0 - arx) / 2.0;
+    uv.y = (r * sin(phi) + 0.5) * ary + (1.0 - ary) / 2.0;
+
     vec4 c = texture(u_texture0, uv);
   	fragColor = c;
-  }
-  else
-  {
+  } else {
 	fragColor = vec4(0.0, 0.0, 0.0, 1.0);
   }
   

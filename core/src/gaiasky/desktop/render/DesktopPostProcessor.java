@@ -211,7 +211,7 @@ public class DesktopPostProcessor implements IPostProcessor, IObserver {
         ppb.pp.addEffect(ppb.curvature);
 
         // FISHEYE DISTORTION (DOME)
-        ppb.fisheye = new Fisheye();
+        ppb.fisheye = new Fisheye(width, height);
         ppb.fisheye.setEnabled(GlobalConf.postprocess.POSTPROCESS_FISHEYE);
         ppb.pp.addEffect(ppb.fisheye);
 
