@@ -425,6 +425,7 @@ public class DesktopConfInit extends ConfInit {
         p.setProperty("postprocess.gamma", Float.toString(GlobalConf.postprocess.POSTPROCESS_GAMMA));
         p.setProperty("postprocess.tonemapping.type", GlobalConf.postprocess.POSTPROCESS_TONEMAPPING_TYPE.toString());
         p.setProperty("postprocess.exposure", Float.toString(GlobalConf.postprocess.POSTPROCESS_EXPOSURE));
+        p.setProperty("postprocess.fisheye", Boolean.toString(GlobalConf.postprocess.POSTPROCESS_FISHEYE));
 
         /** FRAME CONF **/
         p.setProperty("graphics.render.folder", GlobalConf.frame.RENDER_FOLDER);
