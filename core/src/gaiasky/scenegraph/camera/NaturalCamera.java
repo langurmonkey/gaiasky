@@ -1278,7 +1278,8 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
 
             break;
         case FOV_CHANGED_CMD:
-            float fov = MathUtilsd.clamp((float) data[0], Constants.MIN_FOV, Constants.MAX_FOV);
+            boolean checkMax = data.length == 1 || (boolean) data[1];
+            float fov = MathUtilsd.clamp((float) data[0], Constants.MIN_FOV, checkMax ? Constants.MAX_FOV : 180);
 
             for (PerspectiveCamera cam : cameras) {
                 cam.fieldOfView = fov;
@@ -1293,8 +1294,8 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
             EventManager.instance.post(Events.FISHEYE_CMD, state);
             if (state) {
                 fovBackup = GaiaSky.instance.cam.getCamera().fieldOfView;
-                EventManager.instance.post(Events.FOV_CHANGED_CMD, 130f);
-                EventManager.instance.post(Events.PLANETARIUM_FOCUS_ANGLE_CMD, 30f);
+                EventManager.instance.post(Events.FOV_CHANGED_CMD, 140f, false);
+                EventManager.instance.post(Events.PLANETARIUM_FOCUS_ANGLE_CMD, 50f);
             } else {
                 EventManager.instance.post(Events.FOV_CHANGED_CMD, fovBackup);
                 EventManager.instance.post(Events.PLANETARIUM_FOCUS_ANGLE_CMD, 0f);

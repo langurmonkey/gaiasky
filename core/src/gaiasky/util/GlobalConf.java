@@ -1425,7 +1425,8 @@ public class GlobalConf {
                 STAR_BRIGHTNESS = Math.max(0.01f, (float) data[0]);
                 break;
             case FOV_CHANGED_CMD:
-                CAMERA_FOV = MathUtilsd.clamp(((Float) data[0]).intValue(), Constants.MIN_FOV, Constants.MAX_FOV);
+                boolean checkMax = data.length == 1 || (boolean) data[1];
+                CAMERA_FOV = MathUtilsd.clamp(((Float) data[0]).intValue(), Constants.MIN_FOV, checkMax ? Constants.MAX_FOV : 180);
                 break;
             case PM_NUM_FACTOR_CMD:
                 PM_NUM_FACTOR = MathUtilsd.clamp((float) data[0], Constants.MIN_PM_NUM_FACTOR, Constants.MAX_PM_NUM_FACTOR);
