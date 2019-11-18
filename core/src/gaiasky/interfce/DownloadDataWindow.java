@@ -164,7 +164,7 @@ public class DownloadDataWindow extends GenericDialog {
                                 me.pack();
                                 Gdx.app.postRunnable(() -> {
                                     // Reset datasets
-                                    GlobalConf.data.CATALOG_JSON_FILES = "";
+                                    GlobalConf.data.CATALOG_JSON_FILES.clear();
                                     reloadAll();
                                 });
                             } else {
@@ -525,7 +525,7 @@ public class DownloadDataWindow extends GenericDialog {
                     // Select dataset if needed
                     if (type.startsWith("catalog-")) {
                         // Descriptor file
-                        GlobalConf.data.CATALOG_JSON_FILES = currentDataset.check.toString();
+                        GlobalConf.data.CATALOG_JSON_FILES.add(currentDataset.check.toString());
                     }
 
                     setMessageOk(I18n.txt("gui.download.idle"));

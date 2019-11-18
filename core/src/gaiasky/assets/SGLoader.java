@@ -51,10 +51,8 @@ public class SGLoader extends AsynchronousAssetLoader<ISceneGraph, SGLoader.SGLo
 
     @Override
     public void loadAsync(AssetManager manager, String files, FileHandle file, SGLoaderParameter parameter) {
-        String[] tokens = files.split("\\s*,\\s*");
-
         // Add autoload files to the mix
-        Array<String> filePaths = new Array<>(tokens);
+        Array<String> filePaths = new Array<>(parameter.files);
         Path dataFolder = Paths.get(GlobalConf.data.DATA_LOCATION);
         File[] autoloadFiles = dataFolder.toFile().listFiles((dir, name) -> {
             return name != null && name.startsWith("autoload-") && name.endsWith(".json");
@@ -88,11 +86,13 @@ public class SGLoader extends AsynchronousAssetLoader<ISceneGraph, SGLoader.SGLo
     }
 
     static public class SGLoaderParameter extends AssetLoaderParameters<ISceneGraph> {
-        ITimeFrameProvider time;
-        boolean multithreading;
-        int maxThreads;
+        public String[] files;
+        public ITimeFrameProvider time;
+        public boolean multithreading;
+        public int maxThreads;
 
-        public SGLoaderParameter(ITimeFrameProvider time, boolean multithreading, int maxThreads) {
+        public SGLoaderParameter(String[] files, ITimeFrameProvider time, boolean multithreading, int maxThreads) {
+            this.files = files;
             this.time = time;
             this.multithreading = multithreading;
             this.maxThreads = maxThreads;

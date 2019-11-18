@@ -1019,8 +1019,16 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
 
             /* LOAD SCENE GRAPH */
             if (sg == null) {
-                dataLoadString = TextUtils.concatenate(",", GlobalConf.data.CATALOG_JSON_FILES, GlobalConf.data.OBJECTS_JSON_FILES).replaceAll("\\\\+", "/");
-                manager.load(dataLoadString, ISceneGraph.class, new SGLoaderParameter(time, GlobalConf.performance.MULTITHREADING, GlobalConf.performance.NUMBER_THREADS()));
+                dataLoadString = "SceneGraphData";
+                String[] dataFilesToLoad = new String[GlobalConf.data.CATALOG_JSON_FILES.size + 1];
+                // Prepare files to load
+                int i = 0;
+                for(String dataFile : GlobalConf.data.CATALOG_JSON_FILES){
+                    dataFilesToLoad[i] = dataFile;
+                    i++;
+                }
+                dataFilesToLoad[i] = GlobalConf.data.OBJECTS_JSON_FILES;
+                manager.load(dataLoadString, ISceneGraph.class, new SGLoaderParameter(dataFilesToLoad, time, GlobalConf.performance.MULTITHREADING, GlobalConf.performance.NUMBER_THREADS()));
             }
             break;
         case TOGGLE_AMBIENT_LIGHT:

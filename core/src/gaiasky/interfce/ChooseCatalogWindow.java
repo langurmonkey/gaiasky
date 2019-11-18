@@ -66,20 +66,14 @@ public class ChooseCatalogWindow extends GenericDialog {
 
     @Override
     protected void accept() {
-        boolean first = true;
         // Update setting
         if (dw != null && dw.cbs != null) {
-            GlobalConf.data.CATALOG_JSON_FILES = "";
+            GlobalConf.data.CATALOG_JSON_FILES.clear();
             for (Button b : dw.cbs) {
                 if (b.isChecked()) {
                     // Add all selected to list
                     String candidate = dw.candidates.get(b);
-                    if (!first) {
-                        GlobalConf.data.CATALOG_JSON_FILES += "," + candidate;
-                    } else {
-                        GlobalConf.data.CATALOG_JSON_FILES += candidate;
-                        first = false;
-                    }
+                    GlobalConf.data.CATALOG_JSON_FILES.add(candidate);
                 }
             }
         }

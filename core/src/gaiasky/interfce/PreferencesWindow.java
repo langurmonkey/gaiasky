@@ -1828,17 +1828,10 @@ public class PreferencesWindow extends GenericDialog {
             // Event
             EventManager.instance.post(Events.HIGH_ACCURACY_CMD, GlobalConf.data.HIGH_ACCURACY_POSITIONS);
         }
-        GlobalConf.data.CATALOG_JSON_FILES = "";
-        boolean first = true;
+        GlobalConf.data.CATALOG_JSON_FILES.clear();
         for (Button b : dw.cbs) {
             if (b.isChecked()) {
-                // Add all selected to list
-                if (!first) {
-                    GlobalConf.data.CATALOG_JSON_FILES += "," + dw.candidates.get(b);
-                } else {
-                    GlobalConf.data.CATALOG_JSON_FILES += dw.candidates.get(b);
-                    first = false;
-                }
+                GlobalConf.data.CATALOG_JSON_FILES.add(dw.candidates.get(b));
             }
         }
         GlobalConf.program.DISPLAY_DATASET_DIALOG = datasetChooser.isChecked();

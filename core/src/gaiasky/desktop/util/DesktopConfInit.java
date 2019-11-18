@@ -6,6 +6,7 @@
 package gaiasky.desktop.util;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.utils.Array;
 import gaiasky.desktop.GaiaSkyDesktop;
 import gaiasky.desktop.util.camera.CameraKeyframeManager;
 import gaiasky.render.ComponentTypes.ComponentType;
@@ -153,7 +154,10 @@ public class DesktopConfInit extends ConfInit {
         if (DATA_LOCATION == null || DATA_LOCATION.isEmpty())
             DATA_LOCATION = SysUtils.getLocalDataDir().getAbsolutePath();
 
-        String CATALOG_JSON_FILE = p.getProperty("data.json.catalog", "");
+        String CATALOG_JSON_FILE_SEQUENCE = p.getProperty("data.json.catalog", "");
+        Array<String> CATALOG_JSON_FILES = new Array<>();
+        if (CATALOG_JSON_FILE_SEQUENCE != null && !CATALOG_JSON_FILE_SEQUENCE.isEmpty())
+            CATALOG_JSON_FILES.addAll(CATALOG_JSON_FILE_SEQUENCE.split(File.pathSeparator));
 
         String OBJECTS_JSON_FILE = p.getProperty("data.json.objects");
 
@@ -168,7 +172,7 @@ public class DesktopConfInit extends ConfInit {
         }
         String SKYBOX_LOCATION = p.getProperty("data.skybox.location", "data/tex/skybox/stars/");
 
-        dc.initialize(DATA_LOCATION, CATALOG_JSON_FILE, OBJECTS_JSON_FILE, LIMIT_MAG_LOAD, REAL_GAIA_ATTITUDE, HIGH_ACCURACY_POSITIONS, SKYBOX_LOCATION);
+        dc.initialize(DATA_LOCATION, CATALOG_JSON_FILES, OBJECTS_JSON_FILE, LIMIT_MAG_LOAD, REAL_GAIA_ATTITUDE, HIGH_ACCURACY_POSITIONS, SKYBOX_LOCATION);
 
         /** PROGRAM CONF **/
         ProgramConf prc = new ProgramConf();
@@ -439,7 +443,7 @@ public class DesktopConfInit extends ConfInit {
 
         /** DATA **/
         p.setProperty("data.location", GlobalConf.data.DATA_LOCATION);
-        p.setProperty("data.json.catalog", GlobalConf.data.CATALOG_JSON_FILES);
+        p.setProperty("data.json.catalog", TextUtils.concatenate(File.pathSeparator, GlobalConf.data.CATALOG_JSON_FILES));
         p.setProperty("data.json.objects", GlobalConf.data.OBJECTS_JSON_FILES);
         p.setProperty("data.limit.mag", Float.toString(GlobalConf.data.LIMIT_MAG_LOAD));
         p.setProperty("data.attitude.real", Boolean.toString(GlobalConf.data.REAL_GAIA_ATTITUDE));

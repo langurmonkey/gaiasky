@@ -88,7 +88,7 @@ public class DatasetsWidget {
 
         cbs = new OwnCheckBox[catalogFiles.size];
         int i = 0;
-        String[] currentSetting = GlobalConf.data.CATALOG_JSON_FILES.split("\\s*,\\s*");
+        Array<String> currentSetting = GlobalConf.data.CATALOG_JSON_FILES;
         for (FileHandle catalogFile : catalogFiles) {
             String path = catalogFile.path();
 
@@ -203,7 +203,7 @@ public class DatasetsWidget {
         return result;
     }
 
-    private boolean contains(String name, String[] list) {
+    private boolean contains(String name, Array<String> list) {
         for (String candidate : list)
             if (candidate != null && !candidate.isEmpty() && name.contains(candidate))
                 return true;

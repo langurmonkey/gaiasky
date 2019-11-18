@@ -115,7 +115,7 @@ public class InitialGui extends AbstractGui {
     }
 
     private boolean isCatalogSelected() {
-        return GlobalConf.data.CATALOG_JSON_FILES != null && !GlobalConf.data.CATALOG_JSON_FILES.isEmpty();
+        return GlobalConf.data.CATALOG_JSON_FILES != null && GlobalConf.data.CATALOG_JSON_FILES.size > 0;
     }
 
     private void displayChooser() {
