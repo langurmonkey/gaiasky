@@ -58,7 +58,7 @@ public class SGLoader extends AsynchronousAssetLoader<ISceneGraph, SGLoader.SGLo
             return name != null && name.startsWith("autoload-") && name.endsWith(".json");
         });
         for (File autoloadFile : autoloadFiles) {
-            filePaths.add(autoloadFile.getAbsolutePath());
+            filePaths.add(autoloadFile.getAbsolutePath().replace("\\\\", "/"));
         }
 
         FileHandle[] filehandles = new FileHandle[filePaths.size];
