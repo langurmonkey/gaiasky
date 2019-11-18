@@ -191,6 +191,7 @@ public class DesktopConfInit extends ConfInit {
         // Update scale factor according to theme - for HiDPI screens
         GlobalConf.updateScaleFactor(UI_THEME.endsWith("x2") ? 1.8f : 1f);
         String SCRIPT_LOCATION = p.getProperty("program.scriptlocation").isEmpty() ? System.getProperty("user.dir") + File.separatorChar + "scripts" : p.getProperty("program.scriptlocation");
+        SCRIPT_LOCATION = SCRIPT_LOCATION.replaceAll("\\\\", "/");
         int REST_PORT = Integer.parseInt(p.getProperty("program.restport", "-1"));
 
         boolean STEREOSCOPIC_MODE = Boolean.parseBoolean(p.getProperty("program.stereoscopic"));
@@ -309,7 +310,7 @@ public class DesktopConfInit extends ConfInit {
         } else {
             renderFolder = p.getProperty("graphics.render.folder");
         }
-        String RENDER_FOLDER = renderFolder;
+        String RENDER_FOLDER = renderFolder.replaceAll("\\\\", "/");
         String RENDER_FILE_NAME = p.getProperty("graphics.render.filename");
         int RENDER_WIDTH = Integer.parseInt(p.getProperty("graphics.render.width"));
         int RENDER_HEIGHT = Integer.parseInt(p.getProperty("graphics.render.height"));
@@ -350,7 +351,7 @@ public class DesktopConfInit extends ConfInit {
         } else {
             screenshotFolder = p.getProperty("screenshot.folder");
         }
-        String SCREENSHOT_FOLDER = screenshotFolder;
+        String SCREENSHOT_FOLDER = screenshotFolder.replaceAll("\\\\", "/");
         int SCREENSHOT_WIDTH = Integer.parseInt(p.getProperty("screenshot.width"));
         int SCREENSHOT_HEIGHT = Integer.parseInt(p.getProperty("screenshot.height"));
         ScreenshotMode SCREENSHOT_MODE = ScreenshotMode.valueOf(p.getProperty("screenshot.mode"));
