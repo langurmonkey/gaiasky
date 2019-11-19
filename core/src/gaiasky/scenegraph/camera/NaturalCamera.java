@@ -1279,7 +1279,7 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
             break;
         case FOV_CHANGED_CMD:
             boolean checkMax = data.length == 1 || (boolean) data[1];
-            float fov = MathUtilsd.clamp((float) data[0], Constants.MIN_FOV, checkMax ? Constants.MAX_FOV : 180);
+            float fov = MathUtilsd.clamp((float) data[0], Constants.MIN_FOV, checkMax ? Constants.MAX_FOV : 179);
 
             for (PerspectiveCamera cam : cameras) {
                 cam.fieldOfView = fov;

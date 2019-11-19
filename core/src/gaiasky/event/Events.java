@@ -63,7 +63,7 @@ public enum Events {
      **/
     CAMERA_UP_CMD,
     /**
-     * Contains the a float with the new fov value
+     * Contains the a float with the new fov value and an optional boolean to indicate whether to cap the value to 95 degrees or not
      **/
     FOV_CHANGED_CMD,
     /**
