@@ -260,6 +260,12 @@ public class Constants {
     public static final double MIN_WARP = -MAX_WARP;
 
 
+    // Maximum minimap size (px)
+    public static final float MAX_MINIMAP_SIZE = 350f;
+    // Minimum minimap size (px)
+    public static final float MIN_MINIMAP_SIZE = 150f;
+
+
     /**
      * Checks whether the given time is within the acceptable bounds of VSOP87
      * algorithms.

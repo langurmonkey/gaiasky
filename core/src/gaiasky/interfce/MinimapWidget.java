@@ -19,6 +19,8 @@ import gaiasky.interfce.minimap.*;
 import gaiasky.scenegraph.camera.ICamera;
 import gaiasky.util.GlobalConf;
 import gaiasky.util.GlobalResources;
+import gaiasky.util.I18n;
+import gaiasky.util.scene2d.OwnTextHotkeyTooltip;
 import gaiasky.util.scene2d.TextureWidget;
 
 public class MinimapWidget implements Disposable {
@@ -31,9 +33,9 @@ public class MinimapWidget implements Disposable {
     private IMinimapScale current;
 
     public MinimapWidget(Skin skin) {
-        side = (int) (GlobalConf.UI_SCALE_FACTOR * 270f);
+        side = (int) (GlobalConf.UI_SCALE_FACTOR * GlobalConf.program.MINIMAP_SIZE);
         side2 = side / 2;
-        sideshort = (int) (GlobalConf.UI_SCALE_FACTOR * 135f);
+        sideshort = (int) (GlobalConf.UI_SCALE_FACTOR * GlobalConf.program.MINIMAP_SIZE * 0.5f);
         sideshort2 = sideshort / 2;
 
         OrthographicCamera ortho = new OrthographicCamera();
@@ -84,6 +86,10 @@ public class MinimapWidget implements Disposable {
         scales.add(hzms);
 
         current = null;
+
+        String minimapHotkey = KeyBindings.instance.getStringKeys("action.toggle/gui.minimap.title");
+        topProjection.addListener(new OwnTextHotkeyTooltip(I18n.txt("gui.minimap.title") + " - " + I18n.txt("gui.minimap.top"), minimapHotkey, skin));
+        sideProjection.addListener(new OwnTextHotkeyTooltip(I18n.txt("gui.minimap.title") + " - " + I18n.txt("gui.minimap.side"), minimapHotkey, skin));
     }
 
     public void update() {

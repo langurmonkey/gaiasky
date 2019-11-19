@@ -201,6 +201,7 @@ public class DesktopConfInit extends ConfInit {
         boolean DISPLAY_POINTER_COORDS = Boolean.parseBoolean(p.getProperty("program.display.pointercoords", "true"));
         boolean DISPLAY_DATASET_DIALOG = Boolean.parseBoolean(p.getProperty("program.catalog.chooser", "false"));
         boolean DISPLAY_MINIMAP = Boolean.parseBoolean(p.getProperty("program.display.minimap", "true"));
+        float MINIMAP_SIZE = MathUtilsd.clamp(Float.parseFloat(p.getProperty("program.minimap.size", "220f")), Constants.MIN_MINIMAP_SIZE, Constants.MAX_MINIMAP_SIZE);
         boolean NET_MASTER = Boolean.parseBoolean(p.getProperty("program.net.master", "false"));
         boolean NET_SLAVE = Boolean.parseBoolean(p.getProperty("program.net.slave", "false"));
         String LAST_FOLDER_LOCATION = p.getProperty("program.last.filesystem.location");
@@ -214,7 +215,7 @@ public class DesktopConfInit extends ConfInit {
             }
         }
 
-        prc.initialize(SHOW_DEBUG_INFO, LAST_CHECKED, LAST_VERSION, VERSION_CHECK_URL, DATA_DESCRIPTOR_URL, UI_THEME, SCRIPT_LOCATION, REST_PORT, LOCALE, STEREOSCOPIC_MODE, STEREO_PROFILE, CUBEMAPE360_MODE, DISPLAY_HUD, DISPLAY_POINTER_COORDS, DISPLAY_DATASET_DIALOG, NET_MASTER, NET_SLAVE, NET_MASTER_SLAVES, LAST_FOLDER_LOCATION, DISPLAY_MINIMAP);
+        prc.initialize(SHOW_DEBUG_INFO, LAST_CHECKED, LAST_VERSION, VERSION_CHECK_URL, DATA_DESCRIPTOR_URL, UI_THEME, SCRIPT_LOCATION, REST_PORT, LOCALE, STEREOSCOPIC_MODE, STEREO_PROFILE, CUBEMAPE360_MODE, DISPLAY_HUD, DISPLAY_POINTER_COORDS, DISPLAY_DATASET_DIALOG, NET_MASTER, NET_SLAVE, NET_MASTER_SLAVES, LAST_FOLDER_LOCATION, DISPLAY_MINIMAP, MINIMAP_SIZE);
 
         /** SCENE CONF **/
         String gc = p.getProperty("scene.graphics.quality");
@@ -466,6 +467,7 @@ public class DesktopConfInit extends ConfInit {
         p.setProperty("program.display.hud", Boolean.toString(GlobalConf.program.DISPLAY_HUD));
         p.setProperty("program.displaypointer.coords", Boolean.toString(GlobalConf.program.DISPLAY_POINTER_COORDS));
         p.setProperty("program.display.minimap", Boolean.toString(GlobalConf.program.DISPLAY_MINIMAP));
+        p.setProperty("program.minimap.size", Float.toString(GlobalConf.program.MINIMAP_SIZE));
         p.setProperty("program.debuginfo", Boolean.toString(GlobalConf.program.SHOW_DEBUG_INFO));
         p.setProperty("program.lastchecked", GlobalConf.program.VERSION_LAST_TIME != null ? df.format(GlobalConf.program.VERSION_LAST_TIME) : "");
         p.setProperty("program.url.versioncheck", GlobalConf.program.VERSION_CHECK_URL);

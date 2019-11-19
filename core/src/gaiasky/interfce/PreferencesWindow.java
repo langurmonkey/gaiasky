@@ -77,7 +77,7 @@ public class PreferencesWindow extends GenericDialog {
     private OwnSelectBox<String> theme;
     private OwnSelectBox<FileComboBoxBean> controllerMappings;
     private OwnTextField widthField, heightField, sswidthField, ssheightField, frameoutputPrefix, frameoutputFps, fowidthField, foheightField, camrecFps, cmResolution, smResolution, limitFps;
-    private OwnSlider lodTransitions, tessQuality;
+    private OwnSlider lodTransitions, tessQuality, minimapSize;
     private OwnTextButton screenshotsLocation, frameoutputLocation;
     private DatasetsWidget dw;
     private OwnLabel tessQualityLabel;
@@ -774,16 +774,35 @@ public class PreferencesWindow extends GenericDialog {
         pointerCoords = new OwnCheckBox(I18n.txt("gui.ui.pointercoordinates"), skin, "default", pad5);
         pointerCoords.setChecked(GlobalConf.program.DISPLAY_POINTER_COORDS);
 
+        // MINIMAP SIZE
+        OwnLabel minimapsizel = new OwnLabel(I18n.txt("gui.ui.minimap.size"), skin, "default");
+        Label minimapsizeLabel = new OwnLabel(Integer.toString((int) GlobalConf.program.MINIMAP_SIZE), skin);
+        minimapSize = new OwnSlider(Constants.MIN_MINIMAP_SIZE, Constants.MAX_MINIMAP_SIZE, 1f, skin);
+        minimapSize.setName("minimapSize");
+        minimapSize.setWidth(sliderWidth);
+        minimapSize.setValue(GlobalConf.program.MINIMAP_SIZE);
+        minimapsizeLabel.setText((int) GlobalConf.program.MINIMAP_SIZE);
+        minimapSize.addListener(event ->{
+           if(event instanceof ChangeEvent){
+               minimapsizeLabel.setText((int) minimapSize.getValue());
+               return true;
+           }
+           return false;
+        });
+
         // LABELS
         labels.addAll(langLabel, themeLabel);
 
         // Add to table
-        ui.add(langLabel).left().padRight(pad5 * 4).padBottom(pad5);
+        ui.add(langLabel).left().padRight(pad5 * 4).padBottom(pad);
         ui.add(lang).left().padBottom(pad).row();
-        ui.add(themeLabel).left().padRight(pad5 * 4).padBottom(pad5);
-        ui.add(theme).left().padBottom(pad5).row();
-        ui.add(hidpiCb).left().padBottom(pad).row();
-        ui.add(pointerCoords).left().padRight(pad5 * 2).padBottom(pad5).row();
+        ui.add(themeLabel).left().padRight(pad5 * 4).padBottom(pad);
+        ui.add(theme).left().padBottom(pad).row();
+        ui.add(hidpiCb).colspan(2).left().padBottom(pad).row();
+        ui.add(pointerCoords).colspan(2).left().padRight(pad5 * 2).padBottom(pad).row();
+        ui.add(minimapsizel).left().padRight(pad5 * 4).padBottom(pad);
+        ui.add(minimapSize).left().padRight(pad5 * 4).padBottom(pad);
+        ui.add(minimapsizeLabel).left().padBottom(pad).row();
 
 
         /* CROSSHAIR AND MARKERS */
@@ -1793,7 +1812,7 @@ public class PreferencesWindow extends GenericDialog {
         if (hidpiCb.isChecked()) {
             newTheme += "-x2";
         }
-        boolean reloadUI = !GlobalConf.program.UI_THEME.equals(newTheme) || !lbean.locale.toLanguageTag().equals(GlobalConf.program.LOCALE);
+        boolean reloadUI = !GlobalConf.program.UI_THEME.equals(newTheme) || !lbean.locale.toLanguageTag().equals(GlobalConf.program.LOCALE) || GlobalConf.program.MINIMAP_SIZE != minimapSize.getValue();
         GlobalConf.program.LOCALE = lbean.locale.toLanguageTag();
         I18n.forceInit(new FileHandle(GlobalConf.ASSETS_LOC + File.separator + "i18n/gsbundle"));
         GlobalConf.program.UI_THEME = newTheme;
@@ -1809,6 +1828,9 @@ public class PreferencesWindow extends GenericDialog {
         EventManager.instance.post(Events.CROSSHAIR_FOCUS_CMD, crosshairFocus.isChecked());
         EventManager.instance.post(Events.CROSSHAIR_CLOSEST_CMD, crosshairClosest.isChecked());
         EventManager.instance.post(Events.CROSSHAIR_HOME_CMD, crosshairHome.isChecked());
+
+        // Minimap size
+        GlobalConf.program.MINIMAP_SIZE = minimapSize.getValue();
 
         // Performance
         bean = numThreads.getSelected();
