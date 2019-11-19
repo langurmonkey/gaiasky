@@ -1420,7 +1420,6 @@ public class GlobalConf {
             case AMBIENT_LIGHT_CMD:
                 AMBIENT_LIGHT = (float) data[0];
                 break;
-
             case STAR_BRIGHTNESS_CMD:
                 STAR_BRIGHTNESS = Math.max(0.01f, (float) data[0]);
                 break;

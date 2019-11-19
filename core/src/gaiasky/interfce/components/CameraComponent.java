@@ -394,7 +394,7 @@ public class CameraComponent extends GuiComponent implements IObserver {
         case FOV_CHANGE_NOTIFICATION:
             fovFlag = false;
             fieldOfView.setValue(GlobalConf.scene.CAMERA_FOV);
-            fov.setText(Integer.toString((int) GlobalConf.scene.CAMERA_FOV) + "°");
+            fov.setText(GlobalConf.scene.CAMERA_FOV + "°");
             fovFlag = true;
             break;
         case CUBEMAP360_CMD:

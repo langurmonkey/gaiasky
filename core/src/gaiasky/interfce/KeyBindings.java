@@ -265,6 +265,13 @@ public class KeyBindings {
         // reset limit mag
         addAction(new ProgramAction("action.resetmag", () -> EventManager.instance.post(Events.LIMIT_MAG_CMD, GlobalConf.data.LIMIT_MAG_LOAD)));
 
+
+        // increase field of view
+        addAction(new ProgramAction("action.incfov", () -> EventManager.instance.post(Events.FOV_CHANGED_CMD, GlobalConf.scene.CAMERA_FOV + 1f, false)));
+
+        // decrease field of view
+        addAction(new ProgramAction("action.decfov", () -> EventManager.instance.post(Events.FOV_CHANGED_CMD, GlobalConf.scene.CAMERA_FOV - 1f, false)));
+
         // fullscreen
         addAction(new ProgramAction("action.togglefs", () -> {
             GlobalConf.screen.FULLSCREEN = !GlobalConf.screen.FULLSCREEN;
