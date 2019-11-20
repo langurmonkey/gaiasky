@@ -5,9 +5,11 @@
 
 package gaiasky.interfce;
 
-import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.scenes.scene2d.ui.*;
+import com.badlogic.gdx.scenes.scene2d.ui.Cell;
+import com.badlogic.gdx.scenes.scene2d.ui.Image;
+import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener.ChangeEvent;
+import gaiasky.GaiaSky;
 import gaiasky.event.EventManager;
 import gaiasky.event.Events;
 import gaiasky.event.IObserver;
@@ -100,7 +102,7 @@ public class RunStateInterface extends TableGuiInterface implements IObserver {
     public void notify(Events event, Object... data) {
         switch (event) {
         case INPUT_ENABLED_CMD:
-            Gdx.app.postRunnable(() -> {
+            GaiaSky.postRunnable(() -> {
                 boolean visible = !(boolean) data[0];
                 if (visible) {
                     if (keyboardImgCell.getActor() == null)
@@ -111,7 +113,7 @@ public class RunStateInterface extends TableGuiInterface implements IObserver {
             });
             break;
         case FRAME_OUTPUT_CMD:
-            Gdx.app.postRunnable(() -> {
+            GaiaSky.postRunnable(() -> {
                 boolean visible = (Boolean) data[0];
                 if (visible) {
                     if (frameoutputImgCell.getActor() == null)
@@ -122,7 +124,7 @@ public class RunStateInterface extends TableGuiInterface implements IObserver {
             });
             break;
         case CAMERA_PLAY_INFO:
-            Gdx.app.postRunnable(() -> {
+            GaiaSky.postRunnable(() -> {
                 boolean visible = (boolean) data[0];
                 if (visible) {
                     if (stopCameraCell.getActor() == null)
@@ -134,13 +136,13 @@ public class RunStateInterface extends TableGuiInterface implements IObserver {
 
             break;
         case BACKGROUND_LOADING_INFO:
-            Gdx.app.postRunnable(() -> {
+            GaiaSky.postRunnable(() -> {
                 if (pauseBgCell.getActor() == null)
                     pauseBgCell.setActor(bgLoading);
             });
             break;
         case OCTREE_DISPOSED:
-            Gdx.app.postRunnable(() -> {
+            GaiaSky.postRunnable(() -> {
                 if (pauseBgCell.getActor() != null) {
                     pauseBgCell.clearActor();
                 }

@@ -5,7 +5,6 @@
 
 package gaiasky.scenegraph.component;
 
-import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.GL20;
@@ -262,7 +261,7 @@ public class ModelComponent implements Disposable, IObserver {
                     mtc.initialize(manager);
                     mtc.texLoading = true;
                 } else if (mtc.isFinishedLoading(manager)) {
-                    Gdx.app.postRunnable(() -> {
+                    GaiaSky.postRunnable(() -> {
                         mtc.initMaterial(manager, instance, cc, culling);
                         // Set to initialised
                         updateStaticLightImmediate();
@@ -305,7 +304,7 @@ public class ModelComponent implements Disposable, IObserver {
 
 
     private void updateStaticLight() {
-        Gdx.app.postRunnable(() -> {
+        GaiaSky.postRunnable(() -> {
             updateStaticLightImmediate();
         });
     }
@@ -518,7 +517,7 @@ public class ModelComponent implements Disposable, IObserver {
     public void notify(Events event, Object... data) {
         switch (event) {
         case GRAPHICS_QUALITY_UPDATED:
-            Gdx.app.postRunnable(() -> {
+            GaiaSky.postRunnable(() -> {
                 if (mtc != null && mtc.texInitialised) {
                     // Remove current textures
                     if (mtc != null)

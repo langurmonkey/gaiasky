@@ -134,7 +134,7 @@ public class CosmicRuler extends AbstractPositionEntity implements I3DTextRender
             Pair<Double, String> d = GlobalResources.doubleToDistanceString(dst);
             dist = nf.format(d.getFirst()) + " " + d.getSecond();
             
-            Gdx.app.postRunnable(()->{
+            GaiaSky.postRunnable(()->{
                EventManager.instance.post(Events.RULER_DIST, dst, dist); 
             });
         } else {

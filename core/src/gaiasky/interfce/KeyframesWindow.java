@@ -5,7 +5,6 @@
 
 package gaiasky.interfce;
 
-import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.Color;
@@ -17,6 +16,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener.ChangeEvent;
 import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.Array;
+import gaiasky.GaiaSky;
 import gaiasky.desktop.util.SysUtils;
 import gaiasky.desktop.util.camera.CameraKeyframeManager;
 import gaiasky.desktop.util.camera.Keyframe;
@@ -453,7 +453,7 @@ public class KeyframesWindow extends GenericDialog implements IObserver {
                 KeyframePreferencesWindow kpw = new KeyframePreferencesWindow(stage, skin);
                 kpw.setAcceptRunnable(() -> {
                     // Resample
-                    Gdx.app.postRunnable(() -> {
+                    GaiaSky.postRunnable(() -> {
                         keyframesPathObject.resamplePath();
                     });
                 });
@@ -481,7 +481,7 @@ public class KeyframesWindow extends GenericDialog implements IObserver {
         clear.setName("clear");
         clear.addListener((event) -> {
             if (event instanceof ChangeEvent) {
-                Gdx.app.postRunnable(() -> {
+                GaiaSky.postRunnable(() -> {
                     clean();
                 });
                 return true;
@@ -549,7 +549,7 @@ public class KeyframesWindow extends GenericDialog implements IObserver {
                 } else {
                     keyframes.insert(index, kf);
                 }
-                Gdx.app.postRunnable(() -> {
+                GaiaSky.postRunnable(() -> {
                     if (insert)
                         reinitialiseKeyframes(keyframes, kf);
                     scrollToKeyframe(kf);
@@ -608,7 +608,7 @@ public class KeyframesWindow extends GenericDialog implements IObserver {
             i++;
         }
         if (keyframesPathObject != null) {
-            Gdx.app.postRunnable(() -> {
+            GaiaSky.postRunnable(() -> {
                 keyframesPathObject.setKeyframes(keyframes);
                 keyframesPathObject.refreshData();
             });
@@ -667,7 +667,7 @@ public class KeyframesWindow extends GenericDialog implements IObserver {
                                     ievt.cancel();
                                     if (val > t) {
                                         kf.seconds = val - t;
-                                        Gdx.app.postRunnable(() -> {
+                                        GaiaSky.postRunnable(() -> {
                                             secondsCells.get(kf).clearActor();
                                             secondsInput.clear();
                                             // Rebuild
@@ -789,7 +789,7 @@ public class KeyframesWindow extends GenericDialog implements IObserver {
             if (event instanceof ChangeEvent) {
                 // Go to keyframe
                 EventManager.instance.post(Events.CAMERA_MODE_CMD, CameraManager.CameraMode.FREE_MODE);
-                Gdx.app.postRunnable(() -> {
+                GaiaSky.postRunnable(() -> {
                     EventManager.instance.post(Events.CAMERA_POS_CMD, kf.pos.values());
                     EventManager.instance.post(Events.CAMERA_DIR_CMD, kf.dir.values());
                     EventManager.instance.post(Events.CAMERA_UP_CMD, kf.up.values());
@@ -811,7 +811,7 @@ public class KeyframesWindow extends GenericDialog implements IObserver {
             if (event instanceof ChangeEvent) {
                 // Make seam
                 kf.seam = seam.isChecked();
-                Gdx.app.postRunnable(() -> {
+                GaiaSky.postRunnable(() -> {
                     keyframesPathObject.refreshData();
                     if (keyframesPathObject.selected == kf) {
                         if (seam.isChecked())
@@ -893,7 +893,7 @@ public class KeyframesWindow extends GenericDialog implements IObserver {
         table.pack();
 
         if (addToModel && keyframesPathObject != null) {
-            Gdx.app.postRunnable(() -> {
+            GaiaSky.postRunnable(() -> {
                 // Update model data
                 keyframesPathObject.addKnot(kf.pos, kf.dir, kf.up, kf.seam);
                 keyframesPathObject.segments.addPoint(kf.pos);
@@ -963,7 +963,7 @@ public class KeyframesWindow extends GenericDialog implements IObserver {
         nameInput.setText("");
         secondsInput.setText("1.0");
         if (cleanModel)
-            Gdx.app.postRunnable(() -> {
+            GaiaSky.postRunnable(() -> {
                 keyframesPathObject.clear();
             });
     }
@@ -1040,7 +1040,7 @@ public class KeyframesWindow extends GenericDialog implements IObserver {
 
         // Model
         if (keyframesPathObject != null && keyframesPathObject.getParent() != null) {
-            Gdx.app.postRunnable(() -> {
+            GaiaSky.postRunnable(() -> {
                 keyframesPathObject.getParent().removeChild(keyframesPathObject, false);
                 keyframesPathObject.clear();
                 keyframesPathObject = null;

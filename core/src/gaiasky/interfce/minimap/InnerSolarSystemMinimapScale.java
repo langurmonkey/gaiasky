@@ -56,7 +56,7 @@ public class InnerSolarSystemMinimapScale extends AbstractMinimapScale {
 
     @Override
     public void initialize(OrthographicCamera ortho, SpriteBatch sb, ShapeRenderer sr, BitmapFont font, int side, int sideshort) {
-        super.initialize(ortho, sb, sr, font, side, sideshort, Constants.AU_TO_U, Constants.U_TO_AU, 2.2, 0);
+        super.initialize(ortho, sb, sr, font, side, sideshort, Constants.AU_TO_U, Constants.U_TO_AU, 2.2, -1);
         trans = Coordinates.eqToEcl();
     }
 

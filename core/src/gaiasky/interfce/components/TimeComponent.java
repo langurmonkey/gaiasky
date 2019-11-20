@@ -141,7 +141,7 @@ public class TimeComponent extends GuiComponent implements IObserver {
         case TIME_CHANGE_CMD:
             // Update input time
             Instant datetime = (Instant) data[0];
-            Gdx.app.postRunnable(() -> {
+            GaiaSky.postRunnable(() -> {
                 date.setText(dfdate.format(datetime));
                 time.setText(dftime.format(datetime) + " UTC");
             });

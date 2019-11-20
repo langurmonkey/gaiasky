@@ -8,6 +8,7 @@ package gaiasky.interfce;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
+import gaiasky.GaiaSky;
 import gaiasky.util.I18n;
 import gaiasky.util.scene2d.OwnLabel;
 
@@ -39,7 +40,7 @@ public class QuitWindow extends GenericDialog {
     protected void accept() {
         // Only run if it does not have an accept runnable already
         // Otherwise, it comes from the exit hook
-        Gdx.app.postRunnable(() -> Gdx.app.exit());
+        GaiaSky.postRunnable(() -> Gdx.app.exit());
     }
 
     @Override

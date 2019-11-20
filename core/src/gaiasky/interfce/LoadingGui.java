@@ -20,6 +20,7 @@ import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
+import gaiasky.GaiaSky;
 import gaiasky.event.EventManager;
 import gaiasky.event.Events;
 import gaiasky.util.GlobalConf;
@@ -71,7 +72,10 @@ public class LoadingGui extends AbstractGui {
         ui = new Stage(vp, GlobalResources.spriteBatch);
         if(vr) {
             vp.update(GlobalConf.screen.BACKBUFFER_WIDTH, GlobalConf.screen.BACKBUFFER_HEIGHT, true);
+        } else {
+            vp.update(GaiaSky.graphics.getWidth(), GaiaSky.graphics.getHeight(), true);
         }
+
         skin = GlobalResources.skin;
 
         center = new Table();

@@ -7,6 +7,7 @@ package gaiasky.interfce;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.assets.AssetManager;
+import com.badlogic.gdx.backends.lwjgl3.Lwjgl3Graphics;
 import com.badlogic.gdx.scenes.scene2d.*;
 import com.badlogic.gdx.scenes.scene2d.InputEvent.Type;
 import com.badlogic.gdx.scenes.scene2d.ui.Container;
@@ -20,6 +21,7 @@ import com.badlogic.gdx.utils.reflect.ClassReflection;
 import com.badlogic.gdx.utils.reflect.Method;
 import com.badlogic.gdx.utils.reflect.ReflectionException;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
+import com.badlogic.gdx.utils.viewport.Viewport;
 import gaiasky.desktop.util.MemInfoWindow;
 import gaiasky.desktop.util.RunCameraWindow;
 import gaiasky.event.EventManager;
@@ -49,6 +51,7 @@ import java.util.List;
 public class FullGui extends AbstractGui {
     private static final Log logger = Logger.getLogger(FullGui.class);
 
+    protected Lwjgl3Graphics graphics;
     protected ControlsWindow controlsWindow;
     protected MinimapWindow minimapWindow;
 
@@ -79,14 +82,21 @@ public class FullGui extends AbstractGui {
 
     private List<Actor> invisibleInStereoMode;
 
-    public FullGui() {
+    public FullGui(Lwjgl3Graphics graphics) {
         super();
+        this.graphics = graphics;
     }
 
     @Override
     public void initialize(AssetManager assetManager) {
         // User interface
-        ui = new Stage(new ScreenViewport(), GlobalResources.spriteBatch);
+        Viewport vp = new ScreenViewport();
+        this.ui = new Stage(vp, GlobalResources.spriteBatch);
+        vp.update(graphics.getWidth(), graphics.getHeight(), true);
+    }
+
+    public void initialize(Stage ui){
+        this.ui = ui;
     }
 
     @Override
@@ -207,7 +217,7 @@ public class FullGui extends AbstractGui {
                             newVersion.pack();
                             float ww = newVersion.getWidth();
                             float margin = 5 * GlobalConf.UI_SCALE_FACTOR;
-                            newVersion.setPosition(Gdx.graphics.getWidth() - ww - margin, margin);
+                            newVersion.setPosition(graphics.getWidth() - ww - margin, margin);
                             ui.addActor(newVersion);
                         } else {
                             // No new version
@@ -250,7 +260,7 @@ public class FullGui extends AbstractGui {
                 recalculateOptionsSize();
                 if (collapsed)
                     controlsWindow.collapseInstant();
-                controlsWindow.setPosition(0, Gdx.graphics.getHeight() - controlsWindow.getHeight());
+                controlsWindow.setPosition(0, graphics.getHeight() - controlsWindow.getHeight());
                 ui.addActor(controlsWindow);
             }
             if (ni != null)
@@ -417,7 +427,7 @@ public class FullGui extends AbstractGui {
                 pointerXCoord.setText("RA/".concat(nf.format(ra)).concat("°"));
                 pointerXCoord.setPosition(x, GlobalConf.UI_SCALE_FACTOR);
                 pointerYCoord.setText("DEC/".concat(nf.format(dec)).concat("°"));
-                pointerYCoord.setPosition(Gdx.graphics.getWidth() + GlobalConf.UI_SCALE_FACTOR, Gdx.graphics.getHeight() - y);
+                pointerYCoord.setPosition(graphics.getWidth() + GlobalConf.UI_SCALE_FACTOR, graphics.getHeight() - y);
             }
             break;
         case LON_LAT_UPDATED:
@@ -430,7 +440,7 @@ public class FullGui extends AbstractGui {
                 pointerXCoord.setText("Lon/".concat(nf.format(lon)).concat("°"));
                 pointerXCoord.setPosition(x, GlobalConf.UI_SCALE_FACTOR);
                 pointerYCoord.setText("Lat/".concat(nf.format(lat)).concat("°"));
-                pointerYCoord.setPosition(Gdx.graphics.getWidth() + GlobalConf.UI_SCALE_FACTOR, Gdx.graphics.getHeight() - y);
+                pointerYCoord.setPosition(graphics.getWidth() + GlobalConf.UI_SCALE_FACTOR, graphics.getHeight() - y);
             }
             break;
         case DISPLAY_POINTER_COORDS_CMD:
@@ -445,7 +455,7 @@ public class FullGui extends AbstractGui {
 
             GaiaSkyContextMenu popup = new GaiaSkyContextMenu(skin, "default", screenX, screenY, candidate);
 
-            int h = Gdx.graphics.getHeight();
+            int h = graphics.getHeight();
 
             float px = screenX;
             float py = h - screenY - 20 * GlobalConf.UI_SCALE_FACTOR;
@@ -554,7 +564,7 @@ public class FullGui extends AbstractGui {
         if (minimapWindow == null)
             minimapWindow = new MinimapWindow(ui, skin);
         if (show)
-            minimapWindow.show(ui, Gdx.graphics.getWidth() - minimapWindow.getWidth(), Gdx.graphics.getHeight() - minimapWindow.getHeight());
+            minimapWindow.show(ui, graphics.getWidth() - minimapWindow.getWidth(), graphics.getHeight() - minimapWindow.getHeight());
         else
             minimapWindow.hide();
     }

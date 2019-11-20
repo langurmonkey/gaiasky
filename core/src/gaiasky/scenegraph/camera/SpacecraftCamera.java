@@ -282,7 +282,7 @@ public class SpacecraftCamera extends AbstractCamera implements IObserver {
     public void updateMode(CameraMode mode, boolean centerFocus, boolean postEvent) {
         InputMultiplexer im = (InputMultiplexer) Gdx.input.getInputProcessor();
         if (mode == CameraMode.SPACECRAFT_MODE && sc != null) {
-            Gdx.app.postRunnable(() -> {
+            GaiaSky.postRunnable(() -> {
                 // Register input inputListener
                 if (!im.getProcessors().contains(inputController, true))
                     im.addProcessor(im.size(), inputController);
@@ -303,7 +303,7 @@ public class SpacecraftCamera extends AbstractCamera implements IObserver {
             });
         } else {
             if (sc != null)
-                Gdx.app.postRunnable(() -> {
+                GaiaSky.postRunnable(() -> {
                     // Unregister input inputListener
                     im.removeProcessor(inputController);
                     // Unregister inputListener listener

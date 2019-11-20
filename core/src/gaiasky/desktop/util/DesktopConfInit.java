@@ -7,6 +7,7 @@ package gaiasky.desktop.util;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.utils.Array;
+import gaiasky.GaiaSky;
 import gaiasky.desktop.GaiaSkyDesktop;
 import gaiasky.desktop.util.camera.CameraKeyframeManager;
 import gaiasky.render.ComponentTypes.ComponentType;
@@ -385,14 +386,14 @@ public class DesktopConfInit extends ConfInit {
     }
 
     private int getValidWidth() {
-        int w = Gdx.graphics.getWidth();
+        int w = GaiaSky.graphics.getWidth();
         if (w <= 0)
             return 1280;
         return w;
     }
 
     private int getValidHeight() {
-        int h = Gdx.graphics.getHeight();
+        int h = GaiaSky.graphics.getHeight();
         if (h <= 0)
             return 720;
         return h;

@@ -210,7 +210,7 @@ public class StarGroupRenderSystem extends ImmediateRenderSystem implements IObs
             pointAlpha[1] = (float) data[0] + GlobalConf.scene.POINT_ALPHA_MAX;
             for (ExtShaderProgram p : programs) {
                 if (p != null && p.isCompiled()) {
-                    Gdx.app.postRunnable(() -> {
+                    GaiaSky.postRunnable(() -> {
                         p.begin();
                         p.setUniform2fv("u_pointAlpha", pointAlpha, 0, 2);
                         p.end();

@@ -5,7 +5,6 @@
 
 package gaiasky.scenegraph.component;
 
-import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.assets.loaders.TextureLoader.TextureParameter;
 import com.badlogic.gdx.files.FileHandle;
@@ -18,6 +17,7 @@ import com.badlogic.gdx.graphics.g3d.Attribute;
 import com.badlogic.gdx.graphics.g3d.Material;
 import com.badlogic.gdx.graphics.g3d.attributes.*;
 import com.badlogic.gdx.math.Vector2;
+import gaiasky.GaiaSky;
 import gaiasky.data.AssetBean;
 import gaiasky.event.EventManager;
 import gaiasky.event.Events;
@@ -234,7 +234,7 @@ public class MaterialComponent implements IObserver {
             float[][] data = pair.getFirst();
             Pixmap pixmap = pair.getSecond();
 
-            Gdx.app.postRunnable(() -> {
+            GaiaSky.postRunnable(() -> {
                 // Create texture, populate material
                 heightMap = data;
                 Texture tex = new Texture(pixmap, true);
@@ -264,7 +264,7 @@ public class MaterialComponent implements IObserver {
                 }
             }
 
-            Gdx.app.postRunnable(() -> {
+            GaiaSky.postRunnable(() -> {
                 // Populate material
                 heightMap = partialData;
                 heightSize.set(tex.getWidth(), tex.getHeight());
@@ -411,7 +411,7 @@ public class MaterialComponent implements IObserver {
         case ELEVATION_TYPE_CMD:
             if (this.hasHeight() && this.material != null) {
                 ElevationType newType = (ElevationType) data[0];
-                Gdx.app.postRunnable(() -> {
+                GaiaSky.postRunnable(() -> {
                     if (newType.isNone()) {
                         removeElevationData();
                     } else {
@@ -441,13 +441,13 @@ public class MaterialComponent implements IObserver {
         case ELEVATION_MUTLIPLIER_CMD:
             if (this.hasHeight() && this.material != null) {
                 float newMultiplier = (Float) data[0];
-                Gdx.app.postRunnable(() -> this.material.set(new FloatExtAttribute(FloatExtAttribute.HeightScale, heightScale * newMultiplier)));
+                GaiaSky.postRunnable(() -> this.material.set(new FloatExtAttribute(FloatExtAttribute.HeightScale, heightScale * newMultiplier)));
             }
             break;
         case TESSELLATION_QUALITY_CMD:
             if (this.hasHeight() && this.material != null) {
                 float newQuality = (Float) data[0];
-                Gdx.app.postRunnable(() -> this.material.set(new FloatExtAttribute(FloatExtAttribute.TessQuality, newQuality)));
+                GaiaSky.postRunnable(() -> this.material.set(new FloatExtAttribute(FloatExtAttribute.TessQuality, newQuality)));
             }
             break;
         default:

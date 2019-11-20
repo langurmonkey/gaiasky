@@ -113,7 +113,7 @@ public class SearchDialog extends GenericDialog {
                     boolean canSelect = focus instanceof ParticleGroup ? ((ParticleGroup)focus).canSelect() : true;
                     boolean ctOn = GaiaSky.instance.isOn(focus.getCt());
                     if (!timeOverflow && canSelect && ctOn) {
-                        Gdx.app.postRunnable(() -> {
+                        GaiaSky.postRunnable(() -> {
                             EventManager.instance.post(Events.CAMERA_MODE_CMD, CameraMode.FOCUS_MODE, true);
                             EventManager.instance.post(Events.FOCUS_CHANGE_CMD, focus, true);
                         });

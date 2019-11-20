@@ -1924,19 +1924,19 @@ public class PreferencesWindow extends GenericDialog {
         EventManager.instance.post(Events.PROPERTIES_WRITTEN);
 
         if (reloadScreenMode) {
-            Gdx.app.postRunnable(() -> {
+            GaiaSky.postRunnable(() -> {
                 EventManager.instance.post(Events.SCREEN_MODE_CMD);
             });
         }
 
         if (reloadLineRenderer) {
-            Gdx.app.postRunnable(() -> {
+            GaiaSky.postRunnable(() -> {
                 EventManager.instance.post(Events.LINE_RENDERER_UPDATE);
             });
         }
 
         if (reloadShadows) {
-            Gdx.app.postRunnable(() -> {
+            GaiaSky.postRunnable(() -> {
                 GlobalConf.scene.SHADOW_MAPPING_RESOLUTION = newshadowres;
                 GlobalConf.scene.SHADOW_MAPPING_N_SHADOWS = newnshadows;
 

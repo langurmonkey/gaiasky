@@ -5,13 +5,13 @@
 
 package gaiasky.interfce;
 
-import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
+import gaiasky.GaiaSky;
 import gaiasky.render.ComponentTypes;
 import gaiasky.render.ComponentTypes.ComponentType;
 import gaiasky.scenegraph.ISceneGraph;
@@ -144,7 +144,7 @@ public class HUDGui implements IGui {
 
     @Override
     public void resize(final int width, final int height) {
-        Gdx.app.postRunnable(() -> resizeImmediate(width, height));
+        GaiaSky.postRunnable(() -> resizeImmediate(width, height));
     }
 
     @Override

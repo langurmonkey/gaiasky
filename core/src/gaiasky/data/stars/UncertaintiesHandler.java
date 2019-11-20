@@ -85,7 +85,7 @@ public class UncertaintiesHandler implements IObserver {
         case SHOW_UNCERTAINTIES:
             if (data[0] instanceof IStarFocus) {
                 final IStarFocus s = (IStarFocus) data[0];
-                Gdx.app.postRunnable(new Runnable() {
+                GaiaSky.postRunnable(new Runnable() {
 
                     @Override
                     public void run() {
@@ -100,7 +100,7 @@ public class UncertaintiesHandler implements IObserver {
             }
             break;
         case HIDE_UNCERTAINTIES:
-            Gdx.app.postRunnable(new Runnable() {
+            GaiaSky.postRunnable(new Runnable() {
                 @Override
                 public void run() {
                     for (ParticleGroup pg : particleGroups) {

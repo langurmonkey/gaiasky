@@ -306,7 +306,7 @@ public class DesktopPostProcessor implements IPostProcessor, IObserver {
         // Add to scene graph
         if (blurObject != null && !blurObjectAdded) {
             blurObject.doneLoading(manager);
-            Gdx.app.postRunnable(() -> EventManager.instance.post(Events.SCENE_GRAPH_ADD_OBJECT_CMD, blurObject, false));
+            GaiaSky.postRunnable(() -> EventManager.instance.post(Events.SCENE_GRAPH_ADD_OBJECT_CMD, blurObject, false));
             blurObjectAdded = true;
         }
     }
@@ -359,7 +359,7 @@ public class DesktopPostProcessor implements IPostProcessor, IObserver {
 
     @Override
     public void resize(final int width, final int height) {
-        Gdx.app.postRunnable(() -> replace(RenderType.screen, width, height));
+        GaiaSky.postRunnable(() -> replace(RenderType.screen, width, height));
     }
 
     @Override
@@ -393,7 +393,7 @@ public class DesktopPostProcessor implements IPostProcessor, IObserver {
         switch (event) {
         case STAR_BRIGHTNESS_CMD:
             float brightness = (Float) data[0];
-            Gdx.app.postRunnable(() -> {
+            GaiaSky.postRunnable(() -> {
                 for (int i = 0; i < RenderType.values().length; i++) {
                     if (pps[i] != null) {
                         PostProcessBean ppb = pps[i];
@@ -405,7 +405,7 @@ public class DesktopPostProcessor implements IPostProcessor, IObserver {
             break;
         case STAR_POINT_SIZE_CMD:
             float size = (Float) data[0];
-            Gdx.app.postRunnable(() -> {
+            GaiaSky.postRunnable(() -> {
                 for (int i = 0; i < RenderType.values().length; i++) {
                     if (pps[i] != null) {
                         PostProcessBean ppb = pps[i];
@@ -433,7 +433,7 @@ public class DesktopPostProcessor implements IPostProcessor, IObserver {
             }
             break;
         case FOV_CHANGE_NOTIFICATION:
-            Gdx.app.postRunnable(() -> {
+            GaiaSky.postRunnable(() -> {
                 for (int i = 0; i < RenderType.values().length; i++) {
                     if (pps[i] != null) {
                         PostProcessBean ppb = pps[i];
@@ -449,7 +449,7 @@ public class DesktopPostProcessor implements IPostProcessor, IObserver {
                 int newh = (Integer) data[1];
                 if (pps[RenderType.screenshot.index] != null) {
                     if (changed(pps[RenderType.screenshot.index].pp, neww, newh)) {
-                        Gdx.app.postRunnable(() -> replace(RenderType.screenshot, neww, newh));
+                        GaiaSky.postRunnable(() -> replace(RenderType.screenshot, neww, newh));
                     }
                 } else {
                     pps[RenderType.screenshot.index] = newPostProcessor(RenderType.screenshot, neww, newh, manager);
@@ -462,7 +462,7 @@ public class DesktopPostProcessor implements IPostProcessor, IObserver {
                 int newh = (Integer) data[1];
                 if (pps[RenderType.frame.index] != null) {
                     if (changed(pps[RenderType.frame.index].pp, neww, newh)) {
-                        Gdx.app.postRunnable(() -> {
+                        GaiaSky.postRunnable(() -> {
                             replace(RenderType.frame, neww, newh);
                         });
                     }
@@ -472,7 +472,7 @@ public class DesktopPostProcessor implements IPostProcessor, IObserver {
             }
             break;
         case BLOOM_CMD:
-            Gdx.app.postRunnable(() -> {
+            GaiaSky.postRunnable(() -> {
                 float intensity = (float) data[0];
                 for (int i = 0; i < RenderType.values().length; i++) {
                     if (pps[i] != null) {
@@ -556,7 +556,7 @@ public class DesktopPostProcessor implements IPostProcessor, IObserver {
             break;
         case ANTIALIASING_CMD:
             final Antialias aavalue = (Antialias) data[0];
-            Gdx.app.postRunnable(() -> {
+            GaiaSky.postRunnable(() -> {
                 for (int i = 0; i < RenderType.values().length; i++) {
                     if (pps[i] != null) {
                         PostProcessBean ppb = pps[i];
@@ -683,7 +683,7 @@ public class DesktopPostProcessor implements IPostProcessor, IObserver {
         case GRAPHICS_QUALITY_UPDATED:
             // Update graphics quality
             GraphicsQuality gq = (GraphicsQuality) data[0];
-            Gdx.app.postRunnable(()-> {
+            GaiaSky.postRunnable(()-> {
                 for (int i = 0; i < RenderType.values().length; i++) {
                     if (pps[i] != null) {
                         PostProcessBean ppb = pps[i];

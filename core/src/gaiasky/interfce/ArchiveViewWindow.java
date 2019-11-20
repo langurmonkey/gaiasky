@@ -21,6 +21,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.JsonReader;
 import com.badlogic.gdx.utils.JsonValue;
+import gaiasky.GaiaSky;
 import gaiasky.scenegraph.IStarFocus;
 import gaiasky.util.GlobalConf;
 import gaiasky.util.I18n;
@@ -276,7 +277,7 @@ public class ArchiveViewWindow extends GenericDialog {
         }
 
         public void ok(final String[][] data, boolean hip) {
-            Gdx.app.postRunnable(() -> {
+            GaiaSky.postRunnable(() -> {
 
                 HorizontalGroup links = new HorizontalGroup();
                 links.align(Align.center);
@@ -326,7 +327,7 @@ public class ArchiveViewWindow extends GenericDialog {
 
         public void ko() {
             // Error getting data
-            Gdx.app.postRunnable(() -> {
+            GaiaSky.postRunnable(() -> {
                 String msg = I18n.bundle.format("error.gaiacatalog.data", st.getName());
                 table.add(new OwnLabel(msg, skin, "ui-15"));
                 table.pack();
@@ -337,7 +338,7 @@ public class ArchiveViewWindow extends GenericDialog {
 
         public void ko(String error) {
             // Error
-            Gdx.app.postRunnable(() -> {
+            GaiaSky.postRunnable(() -> {
                 String msg = error;
                 table.add(new OwnLabel(msg, skin, "ui-15"));
                 table.pack();

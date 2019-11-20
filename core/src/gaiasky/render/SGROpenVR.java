@@ -335,7 +335,7 @@ public class SGROpenVR extends SGRAbstract implements ISGR, IObserver {
             case VR_DEVICE_CONNECTED:
                 VRDevice device = (VRDevice) data[0];
                 if (device.getType() == VRDeviceType.Controller) {
-                    Gdx.app.postRunnable(() -> {
+                    GaiaSky.postRunnable(() -> {
                         addVRController(device);
                     });
                 }
@@ -343,7 +343,7 @@ public class SGROpenVR extends SGRAbstract implements ISGR, IObserver {
             case VR_DEVICE_DISCONNECTED:
                 device = (VRDevice) data[0];
                 if (device.getType() == VRDeviceType.Controller) {
-                    Gdx.app.postRunnable(() -> {
+                    GaiaSky.postRunnable(() -> {
                         removeVRController(device);
                     });
                 }

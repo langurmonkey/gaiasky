@@ -177,7 +177,7 @@ public class StarPointRenderSystem extends ImmediateRenderSystem implements IObs
             for (ExtShaderProgram p : programs) {
                 if (p != null && p.isCompiled()) {
                     pointAlpha[0] = (float) data[0];
-                    Gdx.app.postRunnable(new Runnable() {
+                    GaiaSky.postRunnable(new Runnable() {
                         @Override
                         public void run() {
                             p.begin();

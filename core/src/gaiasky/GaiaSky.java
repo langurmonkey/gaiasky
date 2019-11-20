@@ -10,6 +10,7 @@ import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.assets.loaders.FileHandleResolver;
 import com.badlogic.gdx.assets.loaders.resolvers.InternalFileHandleResolver;
 import com.badlogic.gdx.backends.lwjgl3.Lwjgl3Application;
+import com.badlogic.gdx.backends.lwjgl3.Lwjgl3Graphics;
 import com.badlogic.gdx.backends.lwjgl3.Lwjgl3Window;
 import com.badlogic.gdx.backends.lwjgl3.Lwjgl3WindowConfiguration;
 import com.badlogic.gdx.graphics.GL20;
@@ -97,6 +98,11 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
      * Singleton instance
      **/
     public static GaiaSky instance;
+
+    /** Window **/
+    public static Lwjgl3Window window;
+    /** Graphics **/
+    public static Lwjgl3Graphics graphics;
 
     /**
      * The {@link VRContext} setup in {@link #createVR()}, may be null if no HMD is
@@ -201,22 +207,13 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
     /**
      * External UI window
      */
-    public GaiaSkyUI gaiaskyUI = null;
+    public GaiaSkySeparateUI gaiaskyUI = null;
 
     /**
      * Runnables
      */
     private final Array<Runnable> runnables;
     private Map<String, Runnable> runnablesMap;
-
-    /**
-     * Graphics width and height (avoid Gdx.graphics.getWidth/Height)
-     */
-    private int gw, gh;
-    /**
-     * Delta time (avoid Gdx.graphics.getDeltaTime)
-     */
-    private float dt;
 
     /**
      * Creates an instance of Gaia Sky.
@@ -253,11 +250,13 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
         Gdx.app.setLogLevel(Application.LOG_INFO);
         clogger = new ConsoleLogger(true, true);
 
+        // Init graphics and window
+        this.graphics = (Lwjgl3Graphics) Gdx.graphics;
+        this.window = this.graphics.getWindow();
+
         // Basic info
-        gw = Gdx.graphics.getWidth();
-        gh = Gdx.graphics.getHeight();
         logger.info(GlobalConf.version.version, I18n.bundle.format("gui.build", GlobalConf.version.build));
-        logger.info("Display mode", gw + "x" + gh, "Fullscreen: " + Gdx.graphics.isFullscreen());
+        logger.info("Display mode", graphics.getWidth() + "x" + graphics.getHeight(), "Fullscreen: " + Gdx.graphics.isFullscreen());
         logger.info("Device", GL30.glGetString(GL30.GL_RENDERER));
         logger.info(I18n.bundle.format("notif.glversion", GL30.glGetString(GL30.GL_VERSION)));
         logger.info(I18n.bundle.format("notif.glslversion", GL30.glGetString(GL30.GL_SHADING_LANGUAGE_VERSION)));
@@ -408,8 +407,8 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
                 }
                 GlobalConf.screen.VSYNC = false;
 
-                Gdx.graphics.setWindowedMode(GlobalConf.screen.SCREEN_WIDTH, GlobalConf.screen.SCREEN_HEIGHT);
-                Gdx.graphics.setVSync(GlobalConf.screen.VSYNC);
+                graphics.setWindowedMode(GlobalConf.screen.SCREEN_WIDTH, GlobalConf.screen.SCREEN_HEIGHT);
+                graphics.setVSync(GlobalConf.screen.VSYNC);
 
                 vrLoadingLeftFb = new FrameBuffer(Format.RGBA8888, vrContext.getWidth(), vrContext.getHeight(), true);
                 vrLoadingLeftTex = org.lwjgl.openvr.Texture.create();
@@ -496,7 +495,7 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
          */
         AbstractRenderer.initialize(sg);
         sgr.doneLoading(manager);
-        sgr.resize(gw, gh);
+        sgr.resize(graphics.getWidth(), graphics.getHeight());
 
         // First time, set assets
         Array<SceneGraphNode> nodes = sg.getNodes();
@@ -548,7 +547,7 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
 
         // Resize GUIs to current size
         for (IGui gui : guis)
-            gui.resize(gw, gh);
+            gui.resize(graphics.getWidth(), graphics.getHeight());
 
         // Initialise frames
         frames = 0;
@@ -558,7 +557,7 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
             @Override
             public void run() {
                 // FPS
-                EventManager.instance.post(Events.FPS_INFO, 1f / dt);
+                EventManager.instance.post(Events.FPS_INFO, 1f / graphics.getDeltaTime());
                 // Current session time
                 EventManager.instance.post(Events.DEBUG_TIME, TimeUtils.timeSinceMillis(startTime) / 1000d);
                 // Memory
@@ -623,7 +622,7 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
             guis.clear();
         }
 
-        mainGui = new FullGui();
+        mainGui = new FullGui(graphics);
         mainGui.initialize(manager);
 
         debugGui = new DebugGui();
@@ -731,7 +730,7 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
             /*
              * UPDATE
              */
-            update(dt);
+            update(graphics.getDeltaTime());
 
             /*
              * FRAME OUTPUT
@@ -752,14 +751,14 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
                 if (GlobalConf.runtime.OPENVR) {
                     renderSgr(cam, t, GlobalConf.screen.BACKBUFFER_WIDTH, GlobalConf.screen.BACKBUFFER_HEIGHT, null, pp.getPostProcessBean(RenderType.screen));
                 } else {
-                    renderSgr(cam, t, gw, gh, null, pp.getPostProcessBean(RenderType.screen));
+                    renderSgr(cam, t, graphics.getWidth(), graphics.getHeight(), null, pp.getPostProcessBean(RenderType.screen));
                 }
 
                 // Render the GUI, setting the viewport
                 if (GlobalConf.runtime.OPENVR) {
                     GuiRegistry.render(GlobalConf.screen.BACKBUFFER_WIDTH, GlobalConf.screen.BACKBUFFER_HEIGHT);
                 } else {
-                    GuiRegistry.render(gw, gh);
+                    GuiRegistry.render(graphics.getWidth(), graphics.getHeight());
                 }
             }
         }
@@ -812,7 +811,6 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
 
     @Override
     public void render() {
-        dt = Gdx.graphics.getDeltaTime();
         try {
             // Run the render process
             renderProcess.run();
@@ -824,7 +822,7 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
 
         // Create UI window if needed
         if (separateUI && gaiaskyUI == null) {
-            Gdx.app.postRunnable(() -> {
+            postRunnable(() -> {
                 // Create window
                 Lwjgl3Application app = (Lwjgl3Application) Gdx.app;
                 Lwjgl3WindowConfiguration config = new Lwjgl3WindowConfiguration();
@@ -833,7 +831,7 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
                 config.setTitle(GlobalConf.APPLICATION_NAME + " - User controls");
                 config.useVsync(false);
                 config.setWindowIcon(Files.FileType.Internal, "icon/gs_icon.png");
-                gaiaskyUI = new GaiaSkyUI(this);
+                gaiaskyUI = new GaiaSkySeparateUI();
                 Lwjgl3Window newWindow = app.newWindow(gaiaskyUI, config);
                 gaiaskyUI.setWindow(newWindow);
             });
@@ -938,16 +936,14 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
 
     @Override
     public void resize(final int width, final int height) {
-        gw = width;
-        gh = height;
         if (GlobalConf.runtime.OPENVR) {
-            Gdx.app.postRunnable(() -> resizeImmediate(gw, gh, false, false, false));
+            postRunnable(() -> resizeImmediate(graphics.getWidth(), graphics.getHeight(), false, false, false));
         } else {
             if (!initialized) {
-                resizeImmediate(gw, gh, true, true, true);
+                resizeImmediate(graphics.getWidth(), graphics.getHeight(), true, true, true);
             } else {
-                resizeWidth = gw;
-                resizeHeight = gh;
+                resizeWidth = graphics.getWidth();
+                resizeHeight = graphics.getHeight();
                 lastResizeTime = System.currentTimeMillis();
             }
         }
@@ -955,7 +951,7 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
 
     private void updateResize() {
         long currResizeTime = System.currentTimeMillis();
-        if (currResizeTime - lastResizeTime > 300l) {
+        if (currResizeTime - lastResizeTime > 100l) {
             resizeImmediate(resizeWidth, resizeHeight, true, true, true);
             lastResizeTime = Long.MAX_VALUE;
         }
@@ -988,11 +984,11 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
      * @param gui The GUI to render
      */
     private void renderGui(IGui gui) {
-        gui.update(dt);
+        gui.update(graphics.getDeltaTime());
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT | GL20.GL_DEPTH_BUFFER_BIT);
         Gdx.gl.glBlendFunc(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA);
         Gdx.gl.glEnable(GL20.GL_DEPTH_TEST);
-        gui.render(gw, gh);
+        gui.render(graphics.getWidth(), graphics.getHeight());
     }
 
     public Array<IFocus> getFocusableEntities() {
@@ -1128,7 +1124,7 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
             break;
         case SCREENSHOT_SIZE_UDPATE:
         case FRAME_SIZE_UDPATE:
-            //Gdx.app.postRunnable(() -> {
+            //GaiaSky.postRunnable(() -> {
             //clearFrameBufferMap();
             //});
             break;
@@ -1136,7 +1132,7 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
             final SceneGraphNode nodeToAdd = (SceneGraphNode) data[0];
             final boolean addToIndex = data.length == 1 ? true : (Boolean) data[1];
             if (sg != null) {
-                Gdx.app.postRunnable(() -> {
+                postRunnable(() -> {
                     try {
                         sg.insert(nodeToAdd, addToIndex);
                     } catch (Exception e) {
@@ -1168,7 +1164,7 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
             final SceneGraphNode nodeToRemove = aux;
             final boolean removeFromIndex = data.length == 1 ? true : (Boolean) data[1];
             if (sg != null) {
-                Gdx.app.postRunnable(() -> {
+                postRunnable(() -> {
                     sg.remove(nodeToRemove, removeFromIndex);
                 });
             }
@@ -1204,4 +1200,10 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
         return initialized;
     }
 
+    public static void postRunnable(Runnable r) {
+        if (window != null)
+            window.postRunnable(r);
+        else
+            Gdx.app.postRunnable(r);
+    }
 }

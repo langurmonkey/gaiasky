@@ -1087,13 +1087,13 @@ public class SceneGraphRenderer extends AbstractRenderer implements IProcessRend
             break;
 
         case PIXEL_RENDERER_UPDATE:
-            Gdx.app.postRunnable(() -> {
+            GaiaSky.postRunnable(() -> {
                 AbstractRenderSystem.POINT_UPDATE_FLAG = true;
                 // updatePixelRenderSystem();
             });
             break;
         case LINE_RENDERER_UPDATE:
-            Gdx.app.postRunnable(() -> updateLineRenderSystem());
+            GaiaSky.postRunnable(() -> updateLineRenderSystem());
             break;
         case STEREOSCOPIC_CMD:
             boolean stereo = (Boolean) data[0];

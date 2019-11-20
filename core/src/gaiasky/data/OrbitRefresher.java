@@ -5,13 +5,11 @@
 
 package gaiasky.data;
 
-import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.utils.Array;
+import gaiasky.GaiaSky;
 import gaiasky.assets.OrbitDataLoader.OrbitDataLoaderParameter;
 import gaiasky.data.orbit.OrbitSamplerDataProvider;
 import gaiasky.data.util.PointCloudData;
-import gaiasky.event.EventManager;
-import gaiasky.event.Events;
 import gaiasky.scenegraph.Orbit;
 import gaiasky.util.Logger;
 import gaiasky.util.Logger.Log;
@@ -142,7 +140,7 @@ public class OrbitRefresher {
                                     provider.load(null, param);
                                     final PointCloudData pcd = provider.getData();
                                     // Post new data to object
-                                    Gdx.app.postRunnable(() -> {
+                                    GaiaSky.postRunnable(() -> {
                                         // Update orbit object
                                         orbit.setPointCloudData(pcd);
                                         orbit.initOrbitMetadata();

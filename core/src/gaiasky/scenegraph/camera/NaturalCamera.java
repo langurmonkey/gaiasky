@@ -1335,7 +1335,7 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
         case GO_TO_OBJECT_CMD:
             if (this.focus != null) {
                 final IFocus f = this.focus;
-                Gdx.app.postRunnable(() -> {
+                GaiaSky.postRunnable(() -> {
                     // Position camera near focus
                     stopTotalMovement();
 

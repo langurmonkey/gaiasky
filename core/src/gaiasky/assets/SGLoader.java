@@ -14,6 +14,7 @@ import com.badlogic.gdx.assets.loaders.AsynchronousAssetLoader;
 import com.badlogic.gdx.assets.loaders.FileHandleResolver;
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.utils.Array;
+import gaiasky.GaiaSky;
 import gaiasky.data.SceneGraphJsonLoader;
 import gaiasky.desktop.util.CrashReporter;
 import gaiasky.scenegraph.ISceneGraph;
@@ -69,7 +70,7 @@ public class SGLoader extends AsynchronousAssetLoader<ISceneGraph, SGLoader.SGLo
         try {
             sg = SceneGraphJsonLoader.loadSceneGraph(filehandles, parameter.time, parameter.multithreading, parameter.maxThreads);
         } catch (Exception e) {
-            Gdx.app.postRunnable(() -> {
+            GaiaSky.postRunnable(() -> {
                 CrashReporter.reportCrash(e, logger);
                 Gdx.app.exit();
             });

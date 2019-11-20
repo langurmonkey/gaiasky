@@ -13,6 +13,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener.ChangeEvent;
 import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.Array;
+import gaiasky.GaiaSky;
 import gaiasky.event.EventManager;
 import gaiasky.event.Events;
 import gaiasky.interfce.GenericDialog;
@@ -139,7 +140,7 @@ public class RunCameraWindow extends GenericDialog {
             return false;
         });
         // Select first
-        Gdx.app.postRunnable(new Runnable() {
+        GaiaSky.postRunnable(new Runnable() {
             @Override
             public void run() {
                 if (scripts.size > 0) {

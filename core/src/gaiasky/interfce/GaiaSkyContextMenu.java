@@ -205,7 +205,7 @@ public class GaiaSkyContextMenu extends ContextMenu {
                 rulerAttach0 = new MenuItem(I18n.txt("context.ruler.attach", "0", cnameShort), skin, rulerDwb);
                 rulerAttach0.addListener((ev) -> {
                     if (ev instanceof ChangeEvent) {
-                        Gdx.app.postRunnable(() -> {
+                        GaiaSky.postRunnable(() -> {
                             EventManager.instance.post(Events.RULER_ATTACH_0, cname);
                         });
                         return true;
@@ -215,7 +215,7 @@ public class GaiaSkyContextMenu extends ContextMenu {
                 rulerAttach1 = new MenuItem(I18n.txt("context.ruler.attach", "1", cnameShort), skin, rulerDwb);
                 rulerAttach1.addListener((ev) -> {
                     if (ev instanceof ChangeEvent) {
-                        Gdx.app.postRunnable(() -> {
+                        GaiaSky.postRunnable(() -> {
                             EventManager.instance.post(Events.RULER_ATTACH_1, cname);
                         });
                         return true;
@@ -238,7 +238,7 @@ public class GaiaSkyContextMenu extends ContextMenu {
             MenuItem clearRuler = new MenuItem("Clear ruler", skin, rulerDwb);
             clearRuler.addListener((evt) -> {
                 if (evt instanceof ChangeEvent) {
-                    Gdx.app.postRunnable(() -> {
+                    GaiaSky.postRunnable(() -> {
                         EventManager.instance.post(Events.RULER_CLEAR);
                     });
                     return true;

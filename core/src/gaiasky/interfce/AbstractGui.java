@@ -5,11 +5,11 @@
 
 package gaiasky.interfce;
 
-import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.utils.Array;
+import gaiasky.GaiaSky;
 import gaiasky.event.EventManager;
 import gaiasky.event.Events;
 import gaiasky.event.IObserver;
@@ -94,7 +94,7 @@ public abstract class AbstractGui implements IObserver, IGui {
 
     @Override
     public void resize(final int width, final int height) {
-        Gdx.app.postRunnable(() -> resizeImmediate(width, height));
+        GaiaSky.postRunnable(() -> resizeImmediate(width, height));
     }
 
     @Override

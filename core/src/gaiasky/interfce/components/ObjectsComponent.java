@@ -77,7 +77,7 @@ public class ObjectsComponent extends GuiComponent implements IObserver {
                             boolean timeOverflow = focus.isCoordinatesTimeOverflow();
                             boolean ctOn = GaiaSky.instance.isOn(focus.getCt());
                             if (!timeOverflow && ctOn) {
-                                Gdx.app.postRunnable(() -> {
+                                GaiaSky.postRunnable(() -> {
                                     EventManager.instance.post(Events.CAMERA_MODE_CMD, CameraMode.FOCUS_MODE, true);
                                     EventManager.instance.post(Events.FOCUS_CHANGE_CMD, focus, true);
                                 });
@@ -161,7 +161,7 @@ public class ObjectsComponent extends GuiComponent implements IObserver {
                         boolean timeOverflow = focus.isCoordinatesTimeOverflow();
                         boolean ctOn = GaiaSky.instance.isOn(focus.getCt());
                         if (!timeOverflow && ctOn) {
-                            Gdx.app.postRunnable(() -> {
+                            GaiaSky.postRunnable(() -> {
                                 EventManager.instance.post(Events.CAMERA_MODE_CMD, CameraMode.FOCUS_MODE, true);
                                 EventManager.instance.post(Events.FOCUS_CHANGE_CMD, focus, true);
                             });
@@ -254,7 +254,7 @@ public class ObjectsComponent extends GuiComponent implements IObserver {
 
             cb.addListener((event) -> {
                 if (event instanceof ChangeEvent && cmap.containsKey(name)) {
-                    Gdx.app.postRunnable(() -> obj.setVisible(cb.isChecked()));
+                    GaiaSky.postRunnable(() -> obj.setVisible(cb.isChecked()));
                     return true;
                 }
                 return false;
@@ -289,7 +289,7 @@ public class ObjectsComponent extends GuiComponent implements IObserver {
         selAll.setHeight(18 * GlobalConf.UI_SCALE_FACTOR);
         selAll.addListener((event) -> {
             if (event instanceof ChangeEvent) {
-                Gdx.app.postRunnable(() -> cbs.stream().forEach((i) -> i.setChecked(true)));
+                GaiaSky.postRunnable(() -> cbs.stream().forEach((i) -> i.setChecked(true)));
                 return true;
             }
             return false;
@@ -299,7 +299,7 @@ public class ObjectsComponent extends GuiComponent implements IObserver {
         selNone.setHeight(18 * GlobalConf.UI_SCALE_FACTOR);
         selNone.addListener((event) -> {
             if (event instanceof ChangeEvent) {
-                Gdx.app.postRunnable(() -> cbs.stream().forEach((i) -> i.setChecked(false)));
+                GaiaSky.postRunnable(() -> cbs.stream().forEach((i) -> i.setChecked(false)));
                 return true;
             }
             return false;

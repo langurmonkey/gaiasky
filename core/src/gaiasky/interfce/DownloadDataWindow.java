@@ -15,6 +15,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener.ChangeEvent;
 import com.badlogic.gdx.utils.Array;
+import gaiasky.GaiaSky;
 import gaiasky.desktop.util.SysUtils;
 import gaiasky.util.*;
 import gaiasky.util.Logger.Log;
@@ -162,7 +163,7 @@ public class DownloadDataWindow extends GenericDialog {
                                 catalogsLoc.setText(result.path());
                                 GlobalConf.data.DATA_LOCATION = result.path();
                                 me.pack();
-                                Gdx.app.postRunnable(() -> {
+                                GaiaSky.postRunnable(() -> {
                                     // Reset datasets
                                     GlobalConf.data.CATALOG_JSON_FILES.clear();
                                     reloadAll();
@@ -319,7 +320,7 @@ public class DownloadDataWindow extends GenericDialog {
                                 }
                             }
                             // RELOAD DATASETS VIEW
-                            Gdx.app.postRunnable(() -> {
+                            GaiaSky.postRunnable(() -> {
                                 reloadAll();
                             });
 
@@ -464,7 +465,7 @@ public class DownloadDataWindow extends GenericDialog {
                 double mbPerSecond = speed / 1000d;
                 final String speedString = nf.format(readMb) + "/" + nf.format(totalMb) + " MB   -   " + nf.format(mbPerSecond) + " MB/s";
                 // Since we are downloading on a background thread, post a runnable to touch UI
-                Gdx.app.postRunnable(() -> {
+                GaiaSky.postRunnable(() -> {
                     downloadButton.setText(progressString);
                     downloadProgress.setValue((float) progress);
                     downloadSpeed.setText(speedString);
@@ -507,7 +508,7 @@ public class DownloadDataWindow extends GenericDialog {
                     }
 
                 // Done
-                Gdx.app.postRunnable(() -> {
+                GaiaSky.postRunnable(() -> {
                     downloadButton.setText(I18n.txt("gui.download.download"));
                     downloadProgress.setValue(0);
                     downloadProgress.setVisible(false);
@@ -531,7 +532,7 @@ public class DownloadDataWindow extends GenericDialog {
                     setMessageOk(I18n.txt("gui.download.idle"));
                     setStatusFound(currentDataset, trio.getThird());
 
-                    Gdx.app.postRunnable(() -> downloadNext());
+                    GaiaSky.postRunnable(() -> downloadNext());
                 } else {
                     logger.info("Error getting dataset: " + name);
                     setStatusError(currentDataset, trio.getThird());
@@ -548,7 +549,7 @@ public class DownloadDataWindow extends GenericDialog {
                 downloadProgress.setVisible(false);
                 downloadSpeed.setVisible(false);
                 cancelCell.setActor(null);
-                Gdx.app.postRunnable(() -> downloadNext());
+                GaiaSky.postRunnable(() -> downloadNext());
             };
 
             Runnable cancel = () -> {
@@ -559,7 +560,7 @@ public class DownloadDataWindow extends GenericDialog {
                 downloadProgress.setVisible(false);
                 downloadSpeed.setVisible(false);
                 cancelCell.setActor(null);
-                Gdx.app.postRunnable(() -> downloadNext());
+                GaiaSky.postRunnable(() -> downloadNext());
             };
 
             // Download
@@ -579,7 +580,7 @@ public class DownloadDataWindow extends GenericDialog {
                 @Override
                 public void changed(ChangeEvent event, Actor actor) {
                     if (request != null) {
-                        Gdx.app.postRunnable(() -> Gdx.net.cancelHttpRequest(request));
+                        GaiaSky.postRunnable(() -> Gdx.net.cancelHttpRequest(request));
                     }
                 }
             });
@@ -587,7 +588,7 @@ public class DownloadDataWindow extends GenericDialog {
         } else {
             // Finished all downloads!
             // RELOAD DATASETS VIEW
-            Gdx.app.postRunnable(() -> reloadAll());
+            GaiaSky.postRunnable(() -> reloadAll());
         }
 
     }
@@ -632,7 +633,7 @@ public class DownloadDataWindow extends GenericDialog {
             long current = System.currentTimeMillis();
             long elapsed = current - last;
             if (elapsed > 250) {
-                Gdx.app.postRunnable(() -> {
+                GaiaSky.postRunnable(() -> {
                     float val = (float) ((fin.getBytesRead() / 1000d) / sizeKb);
                     b.setText(I18n.txt("gui.download.extracting", nf.format(fin.getBytesRead() / 1000d) + "/" + sizeKbStr + " Kb"));
                     p.setValue(val * 100);
@@ -755,7 +756,7 @@ public class DownloadDataWindow extends GenericDialog {
 
     private void restoreScrollValues() {
         if (datasetsScroll != null) {
-            Gdx.app.postRunnable(() -> {
+            GaiaSky.postRunnable(() -> {
                 datasetsScroll.setScrollX(scrollX);
                 datasetsScroll.setScrollY(scrollY);
             });

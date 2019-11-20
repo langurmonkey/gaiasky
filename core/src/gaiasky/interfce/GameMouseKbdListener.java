@@ -85,7 +85,7 @@ public class GameMouseKbdListener extends MouseKbdListener implements IObserver 
 
     @Override
     public void activate() {
-        Gdx.app.postRunnable(() -> {
+        GaiaSky.postRunnable(() -> {
             camera.setDiverted(true);
             // Capture mouse
             setMouseCapture(true);

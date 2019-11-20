@@ -5,12 +5,12 @@
 
 package gaiasky.interfce;
 
-import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener.ChangeEvent;
 import com.badlogic.gdx.utils.Array;
+import gaiasky.GaiaSky;
 import gaiasky.interfce.beans.AttributeComboBoxBean;
 import gaiasky.scenegraph.StarGroup;
 import gaiasky.scenegraph.octreewrapper.OctreeWrapper;
@@ -248,7 +248,7 @@ public class DatasetPreferencesWindow extends GenericDialog {
             boolean removed = filter.removeRule(rule);
             if(removed){
                 // Reload table
-                Gdx.app.postRunnable(() -> generateFilterTable(filter));
+                GaiaSky.postRunnable(() -> generateFilterTable(filter));
             }
         }
     }
@@ -258,7 +258,7 @@ public class DatasetPreferencesWindow extends GenericDialog {
             FilterRule rule = new FilterRule("<", new AttributeDistance(), 500);
             filter.addRule(rule);
             // Reload table
-            Gdx.app.postRunnable(() -> generateFilterTable(filter));
+            GaiaSky.postRunnable(() -> generateFilterTable(filter));
         }
     }
 
@@ -266,7 +266,7 @@ public class DatasetPreferencesWindow extends GenericDialog {
         FilterRule rule = new FilterRule("<", new AttributeDistance(), 500);
         filter = new Filter(rule);
         // Reload table
-        Gdx.app.postRunnable(() -> generateFilterTable(filter));
+        GaiaSky.postRunnable(() -> generateFilterTable(filter));
     }
 
     private AttributeComboBoxBean getAttributeBean(IAttribute attr, Array<AttributeComboBoxBean> attrs){

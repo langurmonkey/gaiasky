@@ -55,7 +55,7 @@ public class MinimapInterface extends TableGuiInterface {
         if (minimap != null) {
             minimap.update();
             String mapName = minimap.getCurrentName();
-            if (!mapName.equals(this.mapName.getName())) {
+            if (mapName != null && !mapName.equals(this.mapName.getName())) {
                 updateMapName(mapName);
             }
         }

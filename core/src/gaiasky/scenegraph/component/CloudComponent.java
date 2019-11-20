@@ -5,7 +5,6 @@
 
 package gaiasky.scenegraph.component;
 
-import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.assets.loaders.TextureLoader.TextureParameter;
 import com.badlogic.gdx.graphics.Texture;
@@ -18,6 +17,7 @@ import com.badlogic.gdx.graphics.g3d.attributes.IntAttribute;
 import com.badlogic.gdx.graphics.g3d.attributes.TextureAttribute;
 import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Vector3;
+import gaiasky.GaiaSky;
 import gaiasky.data.AssetBean;
 import gaiasky.util.*;
 import gaiasky.util.Logger.Log;
@@ -128,7 +128,7 @@ public class CloudComponent {
                 // Set to loading
                 texLoading = true;
             } else if (isFinishedLoading(manager)) {
-                Gdx.app.postRunnable(() -> initMaterial());
+                GaiaSky.postRunnable(() -> initMaterial());
 
                 // Set to initialised
                 texInitialised = true;

@@ -12,6 +12,7 @@ import com.badlogic.gdx.graphics.Cursor.SystemCursor;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
+import gaiasky.GaiaSky;
 import gaiasky.desktop.util.SysUtils;
 import gaiasky.event.EventManager;
 import gaiasky.event.Events;
@@ -64,9 +65,9 @@ public class InitialGui extends AbstractGui {
 
         if (vrStatus.vrInitFailed()) {
             if (vrStatus.equals(VRStatus.ERROR_NO_CONTEXT))
-                Gdx.app.postRunnable(() -> GuiUtils.addNoVRConnectionExit(skin, ui));
+                GaiaSky.postRunnable(() -> GuiUtils.addNoVRConnectionExit(skin, ui));
             else if (vrStatus.equals(VRStatus.ERROR_RENDERMODEL))
-                Gdx.app.postRunnable(() -> GuiUtils.addNoVRDataExit(skin, ui));
+                GaiaSky.postRunnable(() -> GuiUtils.addNoVRDataExit(skin, ui));
 
         } else {
 
@@ -77,7 +78,7 @@ public class InitialGui extends AbstractGui {
 
             FileHandle dataDescriptor = Gdx.files.absolute(SysUtils.getDefaultTmpDir() + "/gaiasky-data.json");
             DownloadHelper.downloadFile(GlobalConf.program.DATA_DESCRIPTOR_URL, dataDescriptor, null, (digest) -> {
-                Gdx.app.postRunnable(() -> {
+                GaiaSky.postRunnable(() -> {
                     /**
                      * Display download manager if:
                      * - force display (args), or
@@ -99,13 +100,13 @@ public class InitialGui extends AbstractGui {
                 logger.error("No internet connection or server is down! We will attempt to continue");
                 if (basicDataPresent()) {
                     // Go on all in
-                    Gdx.app.postRunnable(() -> {
+                    GaiaSky.postRunnable(() -> {
                         GuiUtils.addNoConnectionWindow(skin, ui, () -> displayChooser());
                     });
                 } else {
                     // Error and exit
                     logger.error("No base data present - need an internet connection to continue, exiting");
-                    Gdx.app.postRunnable(() -> {
+                    GaiaSky.postRunnable(() -> {
                         GuiUtils.addNoConnectionExit(skin, ui);
                     });
                 }

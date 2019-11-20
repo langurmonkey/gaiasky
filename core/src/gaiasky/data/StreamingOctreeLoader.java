@@ -376,7 +376,7 @@ public abstract class StreamingOctreeLoader implements IObserver, ISceneGraphLoa
         synchronized (octant) {
             Array<AbstractPositionEntity> objects = octant.objects;
             if (objects != null) {
-                Gdx.app.postRunnable(() -> {
+                GaiaSky.postRunnable(() -> {
                     try {
                         for (AbstractPositionEntity object : objects) {
                             int count = object.getStarCount();
@@ -495,7 +495,7 @@ public abstract class StreamingOctreeLoader implements IObserver, ISceneGraphLoa
                             }
                         }
 
-                    Gdx.app.postRunnable(() -> {
+                    GaiaSky.postRunnable(() -> {
                         // Update octree numbers
                         if (octreeWrapper != null && octreeWrapper.root != null)
                             octreeWrapper.root.updateNumbers();

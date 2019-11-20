@@ -441,7 +441,7 @@ public class GuiRegistry implements IObserver {
 
     private void reloadUI() {
         // Reinitialise user interface
-        Gdx.app.postRunnable(() -> {
+        GaiaSky.postRunnable(() -> {
             // Reinitialise GUI system
             GlobalResources.updateSkin();
             GenericDialog.updatePads();

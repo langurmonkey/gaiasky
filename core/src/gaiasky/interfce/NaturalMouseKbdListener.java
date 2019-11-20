@@ -262,7 +262,7 @@ public class NaturalMouseKbdListener extends MouseKbdListener implements IObserv
                 final long currentTime = TimeUtils.millis();
                 final long lastLeftTime = lastClickTime;
 
-                Gdx.app.postRunnable(() -> {
+                GaiaSky.postRunnable(() -> {
                     // 5% of width pixels distance
                     if (!GlobalConf.scene.CINEMATIC_CAMERA || gesture.dst(screenX, screenY) < MOVE_PX_DIST) {
                         boolean stopped = camera.stopMovement();
@@ -291,7 +291,7 @@ public class NaturalMouseKbdListener extends MouseKbdListener implements IObserv
                     getKeyframesPathObject().unselect();
                 } else {
                     // Ensure Octants observed property is computed
-                    Gdx.app.postRunnable(() -> {
+                    GaiaSky.postRunnable(() -> {
                         // 5% of width pixels distance
                         if (gesture.dst(screenX, screenY) < MOVE_PX_DIST) {
                             // Stop

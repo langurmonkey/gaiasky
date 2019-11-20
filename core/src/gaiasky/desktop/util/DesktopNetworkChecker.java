@@ -131,7 +131,7 @@ public class DesktopNetworkChecker extends Thread implements INetworkChecker {
                     break;
                 executing = true;
 
-                Gdx.app.postRunnable(() -> {
+                GaiaSky.postRunnable(() -> {
                     if (focus != null) {
                         logger.debug(this.getClass().getSimpleName(), "Looking up network resources for '" + focus.getName() + "'");
 

@@ -12,6 +12,7 @@ import com.badlogic.gdx.graphics.VertexAttributes.Usage;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer.ShapeType;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.Array;
+import gaiasky.GaiaSky;
 import gaiasky.event.EventManager;
 import gaiasky.event.Events;
 import gaiasky.event.IObserver;
@@ -359,7 +360,7 @@ public class MWModelRenderSystem extends ImmediateRenderSystem implements IObser
         switch (event) {
         case GRAPHICS_QUALITY_UPDATED:
             GraphicsQuality gq = (GraphicsQuality) data[0];
-            Gdx.app.postRunnable(() -> {
+            GaiaSky.postRunnable(() -> {
                 disposeTextureArray();
                 initializeTextureArray(gq);
                 initializeMaxSizes(gq);

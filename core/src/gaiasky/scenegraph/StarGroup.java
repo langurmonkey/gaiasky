@@ -530,7 +530,7 @@ public class StarGroup extends ParticleGroup implements ILineRenderable, IStarFo
     }
 
     private void swapBuffers() {
-        Gdx.app.postRunnable(() -> {
+        GaiaSky.postRunnable(() -> {
             if (active == indices1) { //-V6013
                 active = indices2;
                 background = indices1;

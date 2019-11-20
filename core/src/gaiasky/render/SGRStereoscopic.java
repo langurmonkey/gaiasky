@@ -14,6 +14,7 @@ import com.badlogic.gdx.graphics.glutils.FrameBuffer;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.viewport.StretchViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
+import gaiasky.GaiaSky;
 import gaiasky.event.EventManager;
 import gaiasky.event.Events;
 import gaiasky.event.IObserver;
@@ -385,7 +386,7 @@ public class SGRStereoscopic extends SGRAbstract implements ISGR, IObserver {
         switch (event) {
         case SCREENSHOT_SIZE_UDPATE:
         case FRAME_SIZE_UDPATE:
-            Gdx.app.postRunnable(() -> clearFrameBufferMap());
+            GaiaSky.postRunnable(() -> clearFrameBufferMap());
             break;
         default:
             break;

@@ -5,11 +5,14 @@
 
 package gaiasky.script;
 
-import com.badlogic.gdx.Gdx;
+import gaiasky.GaiaSky;
 import gaiasky.event.EventManager;
 import gaiasky.event.Events;
 import gaiasky.util.Logger;
-import py4j.*;
+import py4j.ClientServer;
+import py4j.DefaultGatewayServerListener;
+import py4j.GatewayServerListener;
+import py4j.Py4JServerConnection;
 
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -48,7 +51,7 @@ public class ScriptingServer {
                 @Override
                 public void connectionStopped(Py4JServerConnection gatewayConnection) {
                     // Enable input, just in case
-                    Gdx.app.postRunnable(() -> EventManager.instance.post(Events.INPUT_ENABLED_CMD, true));
+                    GaiaSky.postRunnable(() -> EventManager.instance.post(Events.INPUT_ENABLED_CMD, true));
                     logger.info("Connection stopped (" + connections.decrementAndGet() + "): " + gatewayConnection.getSocket().toString());
                 }
 

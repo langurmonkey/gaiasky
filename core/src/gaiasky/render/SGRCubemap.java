@@ -13,6 +13,7 @@ import com.badlogic.gdx.graphics.glutils.FrameBuffer;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.viewport.StretchViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
+import gaiasky.GaiaSky;
 import gaiasky.event.EventManager;
 import gaiasky.event.Events;
 import gaiasky.event.IObserver;
@@ -229,7 +230,7 @@ public class SGRCubemap extends SGRAbstract implements ISGR, IObserver {
             break;
         case CUBEMAP_PROJECTION_CMD:
             CubemapProjections.CubemapProjection p = (CubemapProjections.CubemapProjection) data[0];
-            Gdx.app.postRunnable(() -> {
+            GaiaSky.postRunnable(() -> {
                 cubemapEffect.setProjection(p);
             });
             break;

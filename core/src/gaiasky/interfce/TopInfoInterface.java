@@ -5,8 +5,8 @@
 
 package gaiasky.interfce;
 
-import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
+import gaiasky.GaiaSky;
 import gaiasky.event.EventManager;
 import gaiasky.event.Events;
 import gaiasky.event.IObserver;
@@ -91,7 +91,7 @@ public class TopInfoInterface extends TableGuiInterface implements IObserver {
         case TIME_CHANGE_CMD:
             // Update input time
             Instant datetime = (Instant) data[0];
-            Gdx.app.postRunnable(() -> {
+            GaiaSky.postRunnable(() -> {
                 date.setText(dfdate.format(datetime));
                 time.setText(dftime.format(datetime) + " UTC");
                 pack();
