@@ -35,7 +35,7 @@ import java.util.Locale;
 import java.util.Properties;
 
 /**
- * Desktop GlobalConf initialiser, where the configuration comes from a
+ * Desktop GlobalConf initializer, where the configuration comes from a
  * global.properties file (global.vr.properties in case of VR).
  *
  * @author tsagrista
