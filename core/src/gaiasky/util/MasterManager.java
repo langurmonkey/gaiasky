@@ -29,9 +29,8 @@ import java.util.Map;
 /**
  * Manages a master instance which makes available state information to others
  * in order to synchronize a session.
- * 
- * @author tsagrista
  *
+ * @author tsagrista
  */
 public class MasterManager implements IObserver {
     private static final Log logger = Logger.getLogger(MasterManager.class);
@@ -50,13 +49,13 @@ public class MasterManager implements IObserver {
     // Slave list
     private List<String> slaves;
     /**
-    	 * Vector with slave states
-    	 * <ul>
-    	 * <li>0 - ok</li>
-    	 * <li>-1 - error</li>
-    	 * <li>1 - retrying</li>
-    	 * </ul>
-    	 */
+     * Vector with slave states
+     * <ul>
+     * <li>0 - ok</li>
+     * <li>-1 - error</li>
+     * <li>1 - retrying</li>
+     * </ul>
+     */
     private byte[] slaveStates;
     /** Last ping times for each slave **/
     private long[] slavePingTimes;
@@ -85,9 +84,9 @@ public class MasterManager implements IObserver {
         }
 
         // Create parameter maps
-        camStateTimeParams = new HashMap<String, String>();
-        camStateParams = new HashMap<String, String>();
-        params = new HashMap<String, String>();
+        camStateTimeParams = new HashMap<>();
+        camStateParams = new HashMap<>();
+        params = new HashMap<>();
 
         // Create request and response objects
         request = new HttpRequest(HttpMethods.POST);
@@ -103,13 +102,13 @@ public class MasterManager implements IObserver {
     }
 
     /**
-    	 * Broadcasts the given camera state and time to all the slaves
-    	 * 
-    	 * @param pos  Camera position
-    	 * @param dir  Camera direction
-    	 * @param up   Camera up
-    	 * @param time Current time
-    	 */
+     * Broadcasts the given camera state and time to all the slaves
+     *
+     * @param pos  Camera position
+     * @param dir  Camera direction
+     * @param up   Camera up
+     * @param time Current time
+     */
     public void boardcastCameraAndTime(Vector3d pos, Vector3d dir, Vector3d up, ITimeFrameProvider time) {
         camStateTimeParams.put("arg0", Arrays.toString(pos.values()));
         camStateTimeParams.put("arg1", Arrays.toString(dir.values()));
@@ -144,12 +143,12 @@ public class MasterManager implements IObserver {
     }
 
     /**
-    	 * Broadcasts the given camera state to all the slaves
-    	 * 
-    	 * @param pos Camera position
-    	 * @param dir Camera direction
-    	 * @param up  Camera up
-    	 */
+     * Broadcasts the given camera state to all the slaves
+     *
+     * @param pos Camera position
+     * @param dir Camera direction
+     * @param up  Camera up
+     */
     public void boardcastCamera(Vector3d pos, Vector3d dir, Vector3d up) {
         camStateParams.put("arg0", Arrays.toString(pos.values()));
         camStateParams.put("arg1", Arrays.toString(dir.values()));
