@@ -97,6 +97,8 @@ public class GaiaSkyDesktop implements IObserver {
         @Parameter(names = { "-a", "--assets" }, description = "Specify the location of the assets folder. If not present, the default assets location is used.", order = 5) private String assetsLocation = null;
 
         @Parameter(names = { "-vr", "--openvr" }, description = "Launch in Virtual Reality mode. Gaia Sky will attempt creating a VR context through OpenVR.", order = 6) private boolean vr = false;
+
+        @Parameter(names = { "-u", "--separateui" }, description = "Use a different window for the user interface.", order = 7) private boolean separateUi = false;
     }
 
     /**
@@ -147,6 +149,9 @@ public class GaiaSkyDesktop implements IObserver {
         try {
             // Check java version
             javaVersionCheck();
+
+            // Experimental features
+            experimentalCheck();
 
             // Set properties file from arguments to VM params if needed
             if (gsArgs.propertiesFile != null && !gsArgs.propertiesFile.isEmpty()) {
@@ -307,7 +312,7 @@ public class GaiaSkyDesktop implements IObserver {
 
         // Launch app
         try {
-            Lwjgl3Application app = new Lwjgl3Application(new GaiaSky(gsArgs.download, gsArgs.catalogChooser, gsArgs.vr), cfg);
+            new Lwjgl3Application(new GaiaSky(gsArgs.download, gsArgs.catalogChooser, gsArgs.vr, gsArgs.separateUi), cfg);
         } catch (GdxRuntimeException e) {
             if (!JAVA_VERSION_FLAG) {
                 // Probably, OpenGL 4.x is not supported and window creation failed
@@ -322,7 +327,7 @@ public class GaiaSkyDesktop implements IObserver {
                 }
                 cfg.useOpenGL3(true, 3, 2);
 
-                Lwjgl3Application app = new Lwjgl3Application(new GaiaSky(gsArgs.download, gsArgs.catalogChooser, gsArgs.vr), cfg);
+                Lwjgl3Application app = new Lwjgl3Application(new GaiaSky(gsArgs.download, gsArgs.catalogChooser, gsArgs.vr, gsArgs.separateUi), cfg);
             } else {
                 logger.error("Please update your java installation. Gaia Sky needs at least Java " + REQUIRED_JAVA_VERSION);
             }
@@ -487,6 +492,18 @@ public class GaiaSkyDesktop implements IObserver {
             System.out.println("             Please, use at least Java " + REQUIRED_JAVA_VERSION);
             System.out.println("===============================================================");
             JAVA_VERSION_FLAG = true;
+        }
+    }
+
+    /**
+     * Checks for experimental features and issues warnings
+     */
+    private static void experimentalCheck(){
+        if(gsArgs.separateUi){
+            System.out.println("========================== WARNING =============================");
+            System.out.println("The -u/--separateui feature is experimental and not yet working!");
+            System.out.println("================================================================");
+            System.out.println();
         }
     }
 }

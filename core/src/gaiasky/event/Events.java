@@ -1172,6 +1172,11 @@ public enum Events {
     MOUSE_CAPTURE_TOGGLE,
 
     /**
+     * Informs Gaia Sky is fully initialized and normal operation is about to start
+     */
+    INITIALIZED_INFO,
+
+    /**
      * Dispose all resources, app is shutting down
      **/
     DISPOSE;

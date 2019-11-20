@@ -66,6 +66,10 @@ public class GuiRegistry implements IObserver {
         GuiRegistry.im = im;
     }
 
+    public static InputMultiplexer getInputMultiplexer() {
+        return GuiRegistry.im;
+    }
+
     /**
      * Switches the current GUI with the given one, updating the processors.
      * It also sets the previous GUI to the given value.
@@ -321,9 +325,9 @@ public class GuiRegistry implements IObserver {
                         }
                     } else {
                         // Still, update last location
-                        if(!result.isDirectory()){
+                        if (!result.isDirectory()) {
                             lastOpenLocation = result.file().getParentFile();
-                        }else{
+                        } else {
                             lastOpenLocation = result.file();
                         }
                         GlobalConf.program.LAST_OPEN_LOCATION = lastOpenLocation.getAbsolutePath();
@@ -415,7 +419,6 @@ public class GuiRegistry implements IObserver {
             }
         }
     }
-
 
     public boolean removeModeChangePopup() {
         boolean removed = false;
