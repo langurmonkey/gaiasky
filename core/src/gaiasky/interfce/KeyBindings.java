@@ -171,7 +171,7 @@ public class KeyBindings {
         // Condition that checks the current camera is not Game
         BooleanRunnable noGameCondition = () -> !GaiaSky.instance.getCameraManager().getMode().isGame();
         // Condition that checks the GUI is visible (no clean mode)
-        BooleanRunnable noCleanMode = () -> GlobalConf.runtime.DISPLAY_GUI;
+        BooleanRunnable noCleanMode = () -> GlobalConf.runtime.DISPLAY_GUI || GaiaSky.instance.separateUI;
 
         // about action
         final Runnable runnableAbout = () -> EventManager.instance.post(Events.SHOW_ABOUT_ACTION);

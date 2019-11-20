@@ -12,6 +12,7 @@ import com.badlogic.gdx.ApplicationListener;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.InputMultiplexer;
 import com.badlogic.gdx.backends.lwjgl3.Lwjgl3Graphics;
+import com.badlogic.gdx.backends.lwjgl3.Lwjgl3Input;
 import com.badlogic.gdx.backends.lwjgl3.Lwjgl3Window;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
@@ -23,8 +24,7 @@ import com.badlogic.gdx.utils.viewport.Viewport;
 import gaiasky.event.EventManager;
 import gaiasky.event.Events;
 import gaiasky.event.IObserver;
-import gaiasky.interfce.FullGui;
-import gaiasky.interfce.QuitWindow;
+import gaiasky.interfce.*;
 import gaiasky.render.ComponentTypes.ComponentType;
 import gaiasky.render.SceneGraphRenderer;
 import gaiasky.util.GlobalResources;
@@ -36,6 +36,8 @@ public class GaiaSkySeparateUI implements ApplicationListener, IObserver {
     public static Lwjgl3Window window;
     /** Graphics **/
     public static Lwjgl3Graphics graphics;
+    /** Input **/
+    public static Lwjgl3Input input;
 
     private FullGui gui;
     private Skin skin;
@@ -50,7 +52,7 @@ public class GaiaSkySeparateUI implements ApplicationListener, IObserver {
     public GaiaSkySeparateUI() {
         super();
         this.skin = GlobalResources.skin;
-        EventManager.instance.subscribe(this, Events.INITIALIZED_INFO, Events.SHOW_QUIT_ACTION);
+        EventManager.instance.subscribe(this, Events.INITIALIZED_INFO, Events.SHOW_QUIT_ACTION, Events.SHOW_ABOUT_ACTION, Events.SHOW_PREFERENCES_ACTION, Events.SHOW_SEARCH_ACTION);
     }
 
     public void setWindow(Lwjgl3Window window) {
@@ -94,6 +96,9 @@ public class GaiaSkySeparateUI implements ApplicationListener, IObserver {
         im = new InputMultiplexer();
         Gdx.input.setInputProcessor(im);
 
+        // Key bindings
+        im.addProcessor(new KeyInputController(input));
+        // Mouse
         im.addProcessor(ui);
 
         initializing = false;
@@ -110,7 +115,7 @@ public class GaiaSkySeparateUI implements ApplicationListener, IObserver {
     public void render() {
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT | GL20.GL_DEPTH_BUFFER_BIT);
 
-        checkGraphics();
+        updateGlobals();
         createInitGui();
 
         if (initializing) {
@@ -123,9 +128,12 @@ public class GaiaSkySeparateUI implements ApplicationListener, IObserver {
         }
     }
 
-    private void checkGraphics() {
+    private void updateGlobals() {
         if (graphics == null)
             graphics = (Lwjgl3Graphics) Gdx.graphics;
+        if (input == null)
+            input = (Lwjgl3Input) Gdx.input;
+
     }
 
     @Override
@@ -143,6 +151,7 @@ public class GaiaSkySeparateUI implements ApplicationListener, IObserver {
 
     }
 
+    protected SearchDialog searchDialog;
     @Override
     public void notify(Events event, Object... data) {
         switch (event) {
@@ -156,6 +165,21 @@ public class GaiaSkySeparateUI implements ApplicationListener, IObserver {
                 quit.setAcceptRunnable((Runnable) data[0]);
             }
             quit.show(ui);
+            break;
+        case SHOW_ABOUT_ACTION:
+            (new AboutWindow(ui, skin)).show(ui);
+            break;
+        case SHOW_PREFERENCES_ACTION:
+            (new PreferencesWindow(ui, skin)).show(ui);
+            break;
+        case SHOW_SEARCH_ACTION:
+            if (searchDialog == null) {
+                searchDialog = new SearchDialog(skin, ui, GaiaSky.instance.sg);
+            } else {
+                searchDialog.clearText();
+            }
+            searchDialog.show(ui);
+
             break;
         default:
             break;

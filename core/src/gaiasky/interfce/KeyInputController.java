@@ -5,7 +5,7 @@
 
 package gaiasky.interfce;
 
-import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.Input;
 import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.InputAdapter;
 import gaiasky.event.EventManager;
@@ -26,10 +26,13 @@ public class KeyInputController extends InputAdapter {
 
     public KeyBindings mappings;
     /** Holds the pressed keys at any moment **/
-    public static Set<Integer> pressedKeys;
+    public Set<Integer> pressedKeys;
 
-    public KeyInputController() {
+    private Input input;
+
+    public KeyInputController(Input input) {
         super();
+        this.input = input;
         pressedKeys = new HashSet<>();
         KeyBindings.initialize();
         mappings = KeyBindings.instance;
@@ -38,7 +41,7 @@ public class KeyInputController extends InputAdapter {
     @Override
     public boolean keyDown(int keycode) {
         // Fix leftovers
-        if (!Gdx.input.isKeyPressed(KeyBindings.CTRL_L))
+        if (!input.isKeyPressed(KeyBindings.CTRL_L))
             pressedKeys.remove(KeyBindings.CTRL_L);
 
         if (GlobalConf.runtime.INPUT_ENABLED) {
@@ -53,7 +56,7 @@ public class KeyInputController extends InputAdapter {
         EventManager.instance.post(Events.INPUT_EVENT, keycode);
 
         // Fix leftovers
-        if (!Gdx.input.isKeyPressed(KeyBindings.CTRL_L))
+        if (!input.isKeyPressed(KeyBindings.CTRL_L))
             pressedKeys.remove(KeyBindings.CTRL_L);
 
         if (GlobalConf.runtime.INPUT_ENABLED) {

@@ -95,7 +95,7 @@ public class FullGui extends AbstractGui {
         vp.update(graphics.getWidth(), graphics.getHeight(), true);
     }
 
-    public void initialize(Stage ui){
+    public void initialize(Stage ui) {
         this.ui = ui;
     }
 
@@ -275,7 +275,7 @@ public class FullGui extends AbstractGui {
             if (ti != null) {
                 ui.addActor(ti);
             }
-            if(minimapInterface != null){
+            if (minimapInterface != null) {
                 ui.addActor(minimapInterface);
             }
 
@@ -525,7 +525,7 @@ public class FullGui extends AbstractGui {
             if (GlobalConf.program.MINIMAP_IN_WINDOW) {
                 showMinimapWindow(ui, true);
             } else {
-                if(minimapInterface == null) {
+                if (minimapInterface == null) {
                     minimapInterface = new MinimapInterface(skin);
                     minimapInterface.setFillParent(true);
                     minimapInterface.right().top();
@@ -536,17 +536,17 @@ public class FullGui extends AbstractGui {
         }
     }
 
-    public void showMinimapInterface(Stage ui, boolean show){
-        if(minimapInterface == null) {
+    public void showMinimapInterface(Stage ui, boolean show) {
+        if (minimapInterface == null) {
             minimapInterface = new MinimapInterface(skin);
             minimapInterface.setFillParent(true);
             minimapInterface.right().top();
             minimapInterface.pad(pad, 0f, 0f, pad);
             interfaces.add(minimapInterface);
         }
-        if(show){
+        if (show) {
             // Add to ui
-            if(!minimapInterface.hasParent() || minimapInterface.getParent() != ui.getRoot()){
+            if (!minimapInterface.hasParent() || minimapInterface.getParent() != ui.getRoot()) {
                 ui.addActor(minimapInterface);
             }
         } else {
@@ -556,7 +556,7 @@ public class FullGui extends AbstractGui {
 
     }
 
-    public void toggleMinimapInterface(Stage ui){
+    public void toggleMinimapInterface(Stage ui) {
         showMinimapInterface(ui, minimapInterface == null || (!minimapInterface.isVisible() || !minimapInterface.hasParent()));
     }
 
