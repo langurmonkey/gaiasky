@@ -1,4 +1,4 @@
-image: java:11
+image: openjdk:11
 
 stages:
     - compile
