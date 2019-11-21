@@ -17,6 +17,7 @@ import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.FrameBuffer;
+import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Container;
@@ -48,12 +49,12 @@ public class GaiaSkyView implements ApplicationListener, IObserver {
     private boolean initGui = false;
     private boolean initializing = true;
 
-    private Vector2 aux;
+    private Vector2 lastTexSize;
 
     public GaiaSkyView() {
         super();
         this.skin = GlobalResources.skin;
-        this.aux = new Vector2();
+        this.lastTexSize = new Vector2(-1, -1);
         EventManager.instance.subscribe(this, Events.INITIALIZED_INFO);
     }
 
@@ -119,7 +120,14 @@ public class GaiaSkyView implements ApplicationListener, IObserver {
                 float gw = graphics.getWidth();
                 float gh = graphics.getHeight();
                 float gar = gw / gh;
-                System.out.println("g/ " + gw + "x" + gh + " (" + gar + ")  t/ " + tw + "x" + th + " (" + tar + ")");
+
+                if(tw != lastTexSize.x || th != lastTexSize.y){
+                    // Adapt projection matrix to new size
+                    Matrix4 mat = sb.getProjectionMatrix();
+                    mat.setToOrtho2D(0, 0, tw, th);
+                }
+
+                System.out.println(tex.toString() + " g/ " + gw + "x" + gh + " (" + gar + ")  t/ " + tw + "x" + th + " (" + tar + ")");
 
                 // Output
                 float x = 0, y = 0;
@@ -127,33 +135,19 @@ public class GaiaSkyView implements ApplicationListener, IObserver {
                 int sx = 0, sy = 0;
                 int sw = (int) gw, sh = (int) gh;
 
-                if(tw >= gw) {
-                    sx = (int)((tw - gw) / 2f);
-                    if(th >= gh){
-                        sy = (int)((th - gh) / 2f);
-                    } else {
-                        h =  gh;
-                    }
-                } else {
-                    w = gw;
-                    if(th >= gh){
-                        sy = (int)((th - gh) / 2f);
-                    } else {
-                        h =  gh;
-                    }
-                }
-
-                sb.begin();
-                if(gw > tw && gh > th){
+                if (gw > tw && gh > th) {
+                    x = 0;
+                    y = 0;
+                    w = tw;
+                    h = th;
                     // Texture contained in screen, extend texture keeping ratio
-                    if(gar > tar){
+                    if (gar > tar) {
                         // Graphics are stretched horizontally
                         sw = (int) tw;
                         sh = (int) (tw / gar);
 
                         sx = (int) ((tw - sw) / 2f);
                         sy = (int) ((th - sh) / 2f);
-                        sb.draw(tex, 0, 0, tw, th, sx, sy, sw, sh, false, true);
                     } else {
                         // Graphics are stretched vertically
                         sw = (int) (th * gar);
@@ -161,24 +155,54 @@ public class GaiaSkyView implements ApplicationListener, IObserver {
 
                         sx = (int) ((tw - sw) / 2f);
                         sy = (int) ((th - sh) / 2f);
-                        sb.draw(tex, 0, 0, tw, th, sx, sy, sw, sh, false, true);
+                    }
+                } else if (tw >= gw) {
+                    sx = (int) ((tw - gw) / 2f);
+                    if (th >= gh) {
+                        sy = (int) ((th - gh) / 2f);
+                    } else {
+                        x = 0;
+                        y = 0;
+                        w = tw;
+                        h = th;
+                        sw = (int) (th * gar);
+                        sh = (int) th;
+
+                        sx = (int) ((tw - sw) / 2f);
+                        sy = (int) ((th - sh) / 2f);
                     }
                 } else {
-                    sb.draw(tex, x, y, w, h, sx, sy, sw, sh, false, true);
+                    w = gw;
+                    if (th >= gh) {
+                        x = 0;
+                        y = 0;
+                        w = tw;
+                        h = th;
+                        sw = (int) tw;
+                        sh = (int) (tw / gar);
+
+                        sx = (int) ((tw - sw) / 2f);
+                        sy = (int) ((th - sh) / 2f);
+                    } else {
+                        h = gh;
+                    }
                 }
+                sb.begin();
+                sb.draw(tex, x, y, w, h, sx, sy, sw, sh, false, true);
                 sb.end();
 
+                lastTexSize.set(tw, th);
             }
         }
     }
 
-    private Vector2 maintainRatio(float ar, float w, float h){
+    private Vector2 maintainRatio(float ar, float w, float h) {
         float nar = w / h;
-        if(nar == ar){
-            return aux.set(w, h);
-        } else{
+        if (nar == ar) {
+            return lastTexSize.set(w, h);
+        } else {
 
-            return aux.set(w, h);
+            return lastTexSize.set(w, h);
         }
     }
 
