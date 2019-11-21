@@ -98,7 +98,7 @@ public class GaiaSkyDesktop implements IObserver {
 
         @Parameter(names = { "-vr", "--openvr" }, description = "Launch in Virtual Reality mode. Gaia Sky will attempt creating a VR context through OpenVR.", order = 6) private boolean vr = false;
 
-        @Parameter(names = { "-u", "--separateui" }, description = "Use a different window for the user interface.", order = 7) private boolean separateUi = false;
+        @Parameter(names = { "-e", "--externalview" }, description = "Create a window with a view of the scene and no UI.", order = 7) private boolean externalView = false;
     }
 
     /**
@@ -312,7 +312,7 @@ public class GaiaSkyDesktop implements IObserver {
 
         // Launch app
         try {
-            new Lwjgl3Application(new GaiaSky(gsArgs.download, gsArgs.catalogChooser, gsArgs.vr, gsArgs.separateUi), cfg);
+            new Lwjgl3Application(new GaiaSky(gsArgs.download, gsArgs.catalogChooser, gsArgs.vr, gsArgs.externalView), cfg);
         } catch (GdxRuntimeException e) {
             if (!JAVA_VERSION_FLAG) {
                 // Probably, OpenGL 4.x is not supported and window creation failed
@@ -327,7 +327,7 @@ public class GaiaSkyDesktop implements IObserver {
                 }
                 cfg.useOpenGL3(true, 3, 2);
 
-                Lwjgl3Application app = new Lwjgl3Application(new GaiaSky(gsArgs.download, gsArgs.catalogChooser, gsArgs.vr, gsArgs.separateUi), cfg);
+                Lwjgl3Application app = new Lwjgl3Application(new GaiaSky(gsArgs.download, gsArgs.catalogChooser, gsArgs.vr, gsArgs.externalView), cfg);
             } else {
                 logger.error("Please update your java installation. Gaia Sky needs at least Java " + REQUIRED_JAVA_VERSION);
             }
@@ -499,10 +499,10 @@ public class GaiaSkyDesktop implements IObserver {
      * Checks for experimental features and issues warnings
      */
     private static void experimentalCheck(){
-        if(gsArgs.separateUi){
-            System.out.println("========================== WARNING =============================");
-            System.out.println("The -u/--separateui feature is experimental and not yet working!");
-            System.out.println("================================================================");
+        if(gsArgs.externalView){
+            System.out.println("============================ WARNING =============================");
+            System.out.println("The -e/--externalview feature is experimental and not yet working!");
+            System.out.println("==================================================================");
             System.out.println();
         }
     }

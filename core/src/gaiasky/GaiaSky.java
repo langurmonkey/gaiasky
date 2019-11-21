@@ -200,14 +200,14 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
     public boolean saveState = true;
 
     /**
-     * Use a separate window for the UI
+     * External view with final rendered scene and no UI
      */
-    public boolean separateUI;
+    public boolean externalView;
 
     /**
      * External UI window
      */
-    public GaiaSkySeparateUI gaiaskyUI = null;
+    public GaiaSkyView gaiaskyUI = null;
 
     /**
      * Runnables
@@ -227,8 +227,10 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
      *
      * @param dsdownload Force-show the datasets download window
      * @param catchooser Force-show the catalog chooser window
+     * @param vr Launch in VR mode
+     * @param externalView Open a new window with a view of the rendered scene
      */
-    public GaiaSky(boolean dsdownload, boolean catchooser, boolean vr, boolean separateUI) {
+    public GaiaSky(boolean dsdownload, boolean catchooser, boolean vr, boolean externalView) {
         super();
         instance = this;
         this.runnables = new Array<>();
@@ -236,12 +238,9 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
         this.vr = vr;
         this.dsDownload = dsdownload;
         this.catChooser = catchooser;
-        this.separateUI = separateUI;
+        this.externalView = externalView;
         this.renderProcess = runnableInitialGui;
 
-        if (separateUI) {
-            GlobalConf.runtime.DISPLAY_GUI = false;
-        }
     }
 
     @Override
@@ -821,17 +820,17 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
         }
 
         // Create UI window if needed
-        if (separateUI && gaiaskyUI == null) {
+        if (externalView && gaiaskyUI == null) {
             postRunnable(() -> {
                 // Create window
                 Lwjgl3Application app = (Lwjgl3Application) Gdx.app;
                 Lwjgl3WindowConfiguration config = new Lwjgl3WindowConfiguration();
                 config.setWindowPosition(0, 0);
-                config.setWindowedMode(1000, 1080);
-                config.setTitle(GlobalConf.APPLICATION_NAME + " - User controls");
+                config.setWindowedMode(graphics.getWidth(), graphics.getHeight());
+                config.setTitle(GlobalConf.APPLICATION_NAME + " - External view");
                 config.useVsync(false);
                 config.setWindowIcon(Files.FileType.Internal, "icon/gs_icon.png");
-                gaiaskyUI = new GaiaSkySeparateUI();
+                gaiaskyUI = new GaiaSkyView();
                 Lwjgl3Window newWindow = app.newWindow(gaiaskyUI, config);
                 gaiaskyUI.setWindow(newWindow);
             });
