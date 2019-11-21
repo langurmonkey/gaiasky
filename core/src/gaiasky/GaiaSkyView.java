@@ -17,6 +17,7 @@ import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.FrameBuffer;
+import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Container;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
@@ -47,10 +48,12 @@ public class GaiaSkyView implements ApplicationListener, IObserver {
     private boolean initGui = false;
     private boolean initializing = true;
 
+    private Vector2 aux;
 
     public GaiaSkyView() {
         super();
         this.skin = GlobalResources.skin;
+        this.aux = new Vector2();
         EventManager.instance.subscribe(this, Events.INITIALIZED_INFO);
     }
 
@@ -108,12 +111,54 @@ public class GaiaSkyView implements ApplicationListener, IObserver {
             ui.draw();
         } else {
             renderBuffer = PostProcessorFactory.instance.getPostProcessor().getPostProcessBean(RenderType.screen).pp.getCombinedBuffer().getResultBuffer();
-            if(renderBuffer != null) {
+            if (renderBuffer != null) {
                 Texture tex = renderBuffer.getColorBufferTexture();
+                float tw = tex.getWidth();
+                float th = tex.getHeight();
+                float tar = tw / th;
+                float gw = graphics.getWidth();
+                float gh = graphics.getHeight();
+                float gar = gw / gh;
+                System.out.println("g/ " + gw + "x" + gh + "  t/ " + tw + "x" + th);
+
+                // Output
+                float x = 0, y = 0;
+                float w = tw, h = th;
+                int sx = 0, sy = 0;
+                int sw = (int) gw, sh = (int) gh;
+
+                if(tw >= gw) {
+                    sx = (int)((tw - gw) / 2f);
+                    if(th >= gh){
+                        sy = (int)((th - gh) / 2f);
+                    } else {
+                        h =  gh;
+                    }
+                } else {
+                    w = gw;
+                    if(th >= gh){
+                        sy = (int)((th - gh) / 2f);
+                    } else {
+                        h =  gh;
+                    }
+                }
+
+
                 sb.begin();
-                sb.draw(tex, 0, 0, graphics.getWidth(), graphics.getHeight(), 0, 0, tex.getWidth(), tex.getHeight(), false, true);
+
+                sb.draw(tex, x, y, w, h, sx, sy, sw, sh, false, true);
                 sb.end();
             }
+        }
+    }
+
+    private Vector2 maintainRatio(float ar, float w, float h){
+        float nar = w / h;
+        if(nar == ar){
+            return aux.set(w, h);
+        } else{
+
+            return aux.set(w, h);
         }
     }
 
