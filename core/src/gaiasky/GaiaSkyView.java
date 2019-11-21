@@ -119,7 +119,7 @@ public class GaiaSkyView implements ApplicationListener, IObserver {
                 float gw = graphics.getWidth();
                 float gh = graphics.getHeight();
                 float gar = gw / gh;
-                System.out.println("g/ " + gw + "x" + gh + "  t/ " + tw + "x" + th);
+                System.out.println("g/ " + gw + "x" + gh + " (" + gar + ")  t/ " + tw + "x" + th + " (" + tar + ")");
 
                 // Output
                 float x = 0, y = 0;
@@ -143,11 +143,31 @@ public class GaiaSkyView implements ApplicationListener, IObserver {
                     }
                 }
 
-
                 sb.begin();
+                if(gw > tw && gh > th){
+                    // Texture contained in screen, extend texture keeping ratio
+                    if(gar > tar){
+                        // Graphics are stretched horizontally
+                        sw = (int) tw;
+                        sh = (int) (tw / gar);
 
-                sb.draw(tex, x, y, w, h, sx, sy, sw, sh, false, true);
+                        sx = (int) ((tw - sw) / 2f);
+                        sy = (int) ((th - sh) / 2f);
+                        sb.draw(tex, 0, 0, tw, th, sx, sy, sw, sh, false, true);
+                    } else {
+                        // Graphics are stretched vertically
+                        sw = (int) (th * gar);
+                        sh = (int) th;
+
+                        sx = (int) ((tw - sw) / 2f);
+                        sy = (int) ((th - sh) / 2f);
+                        sb.draw(tex, 0, 0, tw, th, sx, sy, sw, sh, false, true);
+                    }
+                } else {
+                    sb.draw(tex, x, y, w, h, sx, sy, sw, sh, false, true);
+                }
                 sb.end();
+
             }
         }
     }
