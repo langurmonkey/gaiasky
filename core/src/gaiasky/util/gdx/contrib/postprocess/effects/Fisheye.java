@@ -43,6 +43,4 @@ public final class Fisheye extends PostProcessorEffect {
         fisheye.setInput(src).setOutput(dest).render();
     }
 
-    ;
-
 }

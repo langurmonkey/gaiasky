@@ -92,7 +92,7 @@ public class BitmapFontLoader extends AsynchronousAssetLoader<BitmapFont, Bitmap
 	public BitmapFont loadSync (AssetManager manager, String fileName, FileHandle file, BitmapFontParameter parameter) {
 		if (parameter != null && parameter.atlasName != null) {
 			TextureAtlas atlas = manager.get(parameter.atlasName, TextureAtlas.class);
-			String name = file.sibling(data.imagePaths[0]).nameWithoutExtension().toString();
+			String name = file.sibling(data.imagePaths[0]).nameWithoutExtension();
 			AtlasRegion region = atlas.findRegion(name);
 
 			if (region == null)

@@ -37,7 +37,7 @@ public class Luma extends Filter<Luma> {
         private final String mnemonic;
         private int elementSize;
 
-        private Param(String m, int elementSize) {
+        Param(String m, int elementSize) {
             this.mnemonic = m;
             this.elementSize = elementSize;
         }

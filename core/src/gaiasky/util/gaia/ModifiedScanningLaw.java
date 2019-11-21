@@ -193,8 +193,6 @@ public class ModifiedScanningLaw {
         NOMINAL, TRANSITION, MODIFIED
     }
 
-    ;
-
     protected ScanState status;
 
     /**
@@ -900,8 +898,6 @@ public class ModifiedScanningLaw {
     protected enum TransitionFunction {
         LINEAR, SQUAREROOT, COSINE, FANCY
     }
-
-    ;
 
     /**
      * Calculates a smooth transition of kappa from a nominal value (kappaN) to

@@ -55,7 +55,7 @@ public abstract class NumericalAttitudeDataServer<A extends Attitude> extends Ba
         GtiList gtisCopy = new GtiList();
         int nGtis = gtis.size();
         for (int n = 0; n < nGtis; n++) {
-            Gti gti = (Gti) gtis.get(n);
+            Gti gti = gtis.get(n);
             long tStart = gti.getStart();
             long tEnd = gti.getEnd();
             try {

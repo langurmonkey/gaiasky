@@ -134,9 +134,9 @@ public class Matrix4d implements Serializable {
      */
     public static final int M33 = 15;
 
-    public final static double stmp[] = new double[16];
-    public final double tmp[] = new double[16];
-    public final double val[] = new double[16];
+    public final static double[] stmp = new double[16];
+    public final double[] tmp = new double[16];
+    public final double[] val = new double[16];
 
     /** Constructs an identity matrix */
     public Matrix4d() {
@@ -628,7 +628,7 @@ public class Matrix4d implements Serializable {
      */
     public Matrix4d setToProjection(double near, double far, double fov, double aspectRatio) {
         idt();
-        double l_fd = (double) (1.0 / Math.tan((fov * (Math.PI / 180)) / 2.0));
+        double l_fd = 1.0 / Math.tan((fov * (Math.PI / 180)) / 2.0);
         double l_a1 = (far + near) / (near - far);
         double l_a2 = (2 * far * near) / (near - far);
         val[M00] = l_fd / aspectRatio;
@@ -1225,17 +1225,17 @@ public class Matrix4d implements Serializable {
 
     /** @return the scale factor on the X axis (non-negative) */
     public double getScaleX() {
-        return (MathUtilsd.isZero(val[Matrix4d.M01]) && MathUtilsd.isZero(val[Matrix4d.M02])) ? val[Matrix4d.M00] : (double) Math.sqrt(getScaleXSquared());
+        return (MathUtilsd.isZero(val[Matrix4d.M01]) && MathUtilsd.isZero(val[Matrix4d.M02])) ? val[Matrix4d.M00] : Math.sqrt(getScaleXSquared());
     }
 
     /** @return the scale factor on the Y axis (non-negative) */
     public double getScaleY() {
-        return (MathUtilsd.isZero(val[Matrix4d.M10]) && MathUtilsd.isZero(val[Matrix4d.M12])) ? val[Matrix4d.M11] : (double) Math.sqrt(getScaleYSquared());
+        return (MathUtilsd.isZero(val[Matrix4d.M10]) && MathUtilsd.isZero(val[Matrix4d.M12])) ? val[Matrix4d.M11] : Math.sqrt(getScaleYSquared());
     }
 
     /** @return the scale factor on the X axis (non-negative) */
     public double getScaleZ() {
-        return (MathUtilsd.isZero(val[Matrix4d.M20]) && MathUtilsd.isZero(val[Matrix4d.M21])) ? val[Matrix4d.M22] : (double) Math.sqrt(getScaleZSquared());
+        return (MathUtilsd.isZero(val[Matrix4d.M20]) && MathUtilsd.isZero(val[Matrix4d.M21])) ? val[Matrix4d.M22] : Math.sqrt(getScaleZSquared());
     }
 
     public Vector3d getScale(Vector3d scale) {
@@ -1323,7 +1323,7 @@ public class Matrix4d implements Serializable {
     }
 
     static boolean matrix4_inv(double[] val) {
-        double tmp[] = new double[16];
+        double[] tmp = new double[16];
         double l_det = matrix4_det(val);
         if (l_det == 0)
             return false;

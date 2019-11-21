@@ -23,7 +23,7 @@ public class ElevationComponent {
 
     public enum NoiseType {
         PERLIN,
-        OPENSIMPLEX;
+        OPENSIMPLEX
     }
 
     private NoiseType noiseType;

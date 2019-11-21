@@ -35,7 +35,6 @@ import java.io.Serializable;
  * Performance tests of both implementations have come up with a performance
  * improvement of 20% of the static methods compared with the object methods.
  *
- * @see gaiasky.util.gaia.time.test.DurationTest
  * @author ulammers
  * @version $Id: NanoSecs.java 405499 2014-12-18 20:21:02Z hsiddiqu $
  */

@@ -16,7 +16,7 @@ public interface IOrbitDataProvider {
      * @param file The file path
      * @param source The parameters
      */
-    public void load(String file, OrbitDataLoaderParameter source);
+    void load(String file, OrbitDataLoaderParameter source);
 
     /**
      * Loads the orbit data into the OrbitData object in the internal
@@ -25,8 +25,8 @@ public interface IOrbitDataProvider {
      * @param source The parameters
      * @param newmethod Use new method (for orbital elements only)
      */
-    public void load(String file, OrbitDataLoaderParameter source, boolean newmethod);
+    void load(String file, OrbitDataLoaderParameter source, boolean newmethod);
 
-    public PointCloudData getData();
+    PointCloudData getData();
 
 }

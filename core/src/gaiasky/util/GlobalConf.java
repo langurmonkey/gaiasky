@@ -72,7 +72,7 @@ public class GlobalConf {
         redraw
     }
 
-    public static enum ImageFormat {
+    public enum ImageFormat {
         PNG,
         JPG
     }
@@ -144,7 +144,7 @@ public class GlobalConf {
 
             int aacode;
 
-            private Antialias(int aacode) {
+            Antialias(int aacode) {
                 this.aacode = aacode;
             }
 

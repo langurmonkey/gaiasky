@@ -102,13 +102,13 @@ public abstract class HermiteInterpolatedAttitudeDataServer extends
         //                qW[left + 1], qWDotL1);
 
         // LINEAR
-        double intX[] = Interpolator.linear(x, x0, qX[left], x1,
+        double[] intX = Interpolator.linear(x, x0, qX[left], x1,
                 qX[left + 1]);
-        double intY[] = Interpolator.linear(x, x0, qY[left], x1,
+        double[] intY = Interpolator.linear(x, x0, qY[left], x1,
                 qY[left + 1]);
-        double intZ[] = Interpolator.linear(x, x0, qZ[left], x1,
+        double[] intZ = Interpolator.linear(x, x0, qZ[left], x1,
                 qZ[left + 1]);
-        double intW[] = Interpolator.linear(x, x0, qW[left], x1,
+        double[] intW = Interpolator.linear(x, x0, qW[left], x1,
                 qW[left + 1]);
 
         Quaterniond qInt = new Quaterniond(intX[0], intY[0], intZ[0], intW[0]);

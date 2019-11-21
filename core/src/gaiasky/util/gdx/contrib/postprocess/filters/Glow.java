@@ -66,7 +66,7 @@ public final class Glow extends Filter<Glow> {
         private String mnemonic;
         private int elementSize;
 
-        private Param(String mnemonic, int arrayElementSize) {
+        Param(String mnemonic, int arrayElementSize) {
             this.mnemonic = mnemonic;
             this.elementSize = arrayElementSize;
         }

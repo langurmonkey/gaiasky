@@ -1221,7 +1221,6 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
         } else {
             dist = distance;
         }
-        ;
         return dist > 0 ? Math.max(dist, min) * GlobalConf.scene.CAMERA_SPEED : 0;
     }
 

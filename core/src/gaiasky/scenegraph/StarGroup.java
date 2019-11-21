@@ -662,7 +662,7 @@ public class StarGroup extends ParticleGroup implements ILineRenderable, IStarFo
      */
     @Override
     public void render(LineRenderSystem renderer, ICamera camera, float alpha) {
-        alpha *= SceneGraphRenderer.instance.alphas[ComponentTypes.ComponentType.VelocityVectors.ordinal()];
+        alpha *= SceneGraphRenderer.alphas[ComponentTypes.ComponentType.VelocityVectors.ordinal()];
         float thPointTimesFovFactor = (float) GlobalConf.scene.STAR_THRESHOLD_POINT * camera.getFovFactor();
         int n = (int) Math.min(getMaxProperMotionLines(), pointData.size);
         for (int i = n - 1; i >= 0; i--) {

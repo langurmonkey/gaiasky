@@ -114,7 +114,7 @@ public class BillboardSpriteRenderSystem extends AbstractRenderSystem {
 
     @Override
     public void renderStud(Array<IRenderable> renderables, ICamera camera, double t) {
-        if ((ctIndex >= 0 ? alphas[ctIndex] != 0 : true)) {
+        if ((ctIndex < 0 || alphas[ctIndex] != 0)) {
             renderables.sort(comp);
 
             // Calculate billobard rotation quaternion ONCE

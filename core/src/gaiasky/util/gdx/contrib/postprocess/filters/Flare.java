@@ -51,7 +51,7 @@ public final class Flare extends Filter<Flare> {
         private String mnemonic;
         private int elementSize;
 
-        private Param(String mnemonic, int arrayElementSize) {
+        Param(String mnemonic, int arrayElementSize) {
             this.mnemonic = mnemonic;
             this.elementSize = arrayElementSize;
         }

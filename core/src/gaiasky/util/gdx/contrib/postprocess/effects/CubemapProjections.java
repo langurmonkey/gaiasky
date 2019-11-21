@@ -49,8 +49,6 @@ public final class CubemapProjections extends PostProcessorEffect {
         filter.setInput(src).setOutput(dest).render();
     }
 
-    ;
-
     public void setProjection(CubemapProjection projection) {
         filter.setProjection(projection);
     }

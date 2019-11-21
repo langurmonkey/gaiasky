@@ -87,7 +87,7 @@ public class VRContext implements Disposable {
     /**
      * The role of a {@link VRDevice} of type {@link VRDeviceType#Controller}
      */
-    public static enum VRControllerRole {
+    public enum VRControllerRole {
         Unknown,
         LeftHand,
         RightHand
@@ -137,7 +137,7 @@ public class VRContext implements Disposable {
         public static final int SteamVR_Trigger = Axis1;
     }
 
-    public static enum VRDeviceProperty {
+    public enum VRDeviceProperty {
         Invalid(0),
 
         // general properties that apply to all device classes
@@ -669,7 +669,7 @@ public class VRContext implements Disposable {
             int j = 0;
             while (sb.hasRemaining()) {
                 short index = sb.get();
-                indices[j++] = (int) index;
+                indices[j++] = index;
             }
 
             mesh.setIndices(indices);

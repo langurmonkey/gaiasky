@@ -140,7 +140,7 @@ public class CameraComponent extends GuiComponent implements IObserver {
             return false;
         });
 
-        fov = new OwnLabel((int) GlobalConf.scene.CAMERA_FOV + "°", skin, "default");
+        fov = new OwnLabel(GlobalConf.scene.CAMERA_FOV + "°", skin, "default");
 
         /** CAMERA SPEED LIMIT **/
         String[] speedLimits = new String[19];

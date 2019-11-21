@@ -46,7 +46,7 @@ public final class FlareDirt extends Filter<FlareDirt> {
         private String mnemonic;
         private int elementSize;
 
-        private Param(String mnemonic, int arrayElementSize) {
+        Param(String mnemonic, int arrayElementSize) {
             this.mnemonic = mnemonic;
             this.elementSize = arrayElementSize;
         }

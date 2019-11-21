@@ -242,7 +242,7 @@ public final class Levels extends PostProcessorEffect {
         double max = -Double.MIN_VALUE;
         int i = 1;
         while (buff.hasRemaining()) {
-            double v = (double) buff.get();
+            double v = buff.get();
 
             // Skip g, b, a
             buff.get();

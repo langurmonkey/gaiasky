@@ -474,7 +474,7 @@ public class Vector3d implements Serializable, Vectord<Vector3d> {
 	 * @return This vector for chaining
 	 */
 	public Vector3d mul(final Matrix4d matrix) {
-		final double l_mat[] = matrix.val;
+		final double[] l_mat = matrix.val;
 		return this.set(
 				x * l_mat[Matrix4d.M00] + y * l_mat[Matrix4d.M01] + z * l_mat[Matrix4d.M02] + l_mat[Matrix4d.M03],
 				x * l_mat[Matrix4d.M10] + y * l_mat[Matrix4d.M11] + z * l_mat[Matrix4d.M12] + l_mat[Matrix4d.M13],
@@ -482,14 +482,14 @@ public class Vector3d implements Serializable, Vectord<Vector3d> {
 	}
 
 	public Vector3d mulLeft(final Matrix3 matrix) {
-		final float l_mat[] = matrix.val;
+		final float[] l_mat = matrix.val;
 		return this.set(x * l_mat[Matrix3.M00] + y * l_mat[Matrix3.M01] + z * l_mat[Matrix3.M02],
 				x * l_mat[Matrix3.M10] + y * l_mat[Matrix3.M11] + z * l_mat[Matrix3.M12],
 				x * l_mat[Matrix3.M20] + y * l_mat[Matrix3.M21] + z * l_mat[Matrix3.M22]);
 	}
 
 	public Vector3d mulRight(final Matrix3 matrix) {
-		final float l_mat[] = matrix.val;
+		final float[] l_mat = matrix.val;
 		return this.set(x * l_mat[Matrix3.M00] + y * l_mat[Matrix3.M10] + z * l_mat[Matrix3.M20],
 				x * l_mat[Matrix3.M01] + y * l_mat[Matrix3.M11] + z * l_mat[Matrix3.M21],
 				x * l_mat[Matrix3.M02] + y * l_mat[Matrix3.M12] + z * l_mat[Matrix3.M22]);
@@ -503,7 +503,7 @@ public class Vector3d implements Serializable, Vectord<Vector3d> {
 	 * @return This vector for chaining
 	 */
 	public Vector3d traMul(final Matrix4d matrix) {
-		final double l_mat[] = matrix.val;
+		final double[] l_mat = matrix.val;
 		return this.set(
 				x * l_mat[Matrix4d.M00] + y * l_mat[Matrix4d.M10] + z * l_mat[Matrix4d.M20] + l_mat[Matrix4d.M30],
 				x * l_mat[Matrix4d.M01] + y * l_mat[Matrix4d.M11] + z * l_mat[Matrix4d.M21] + l_mat[Matrix4d.M31],
@@ -528,7 +528,7 @@ public class Vector3d implements Serializable, Vectord<Vector3d> {
 	 * @return This vector for chaining
 	 */
 	public Vector3d prj(final Matrix4d matrix) {
-		final double l_mat[] = matrix.val;
+		final double[] l_mat = matrix.val;
 		final double l_w = 1f
 				/ (x * l_mat[Matrix4d.M30] + y * l_mat[Matrix4d.M31] + z * l_mat[Matrix4d.M32] + l_mat[Matrix4d.M33]);
 		return this.set(
@@ -548,7 +548,7 @@ public class Vector3d implements Serializable, Vectord<Vector3d> {
 	 * @return This vector for chaining
 	 */
 	public Vector3d rot(final Matrix4d matrix) {
-		final double l_mat[] = matrix.val;
+		final double[] l_mat = matrix.val;
 		return this.set(x * l_mat[Matrix4d.M00] + y * l_mat[Matrix4d.M01] + z * l_mat[Matrix4d.M02],
 				x * l_mat[Matrix4d.M10] + y * l_mat[Matrix4d.M11] + z * l_mat[Matrix4d.M12],
 				x * l_mat[Matrix4d.M20] + y * l_mat[Matrix4d.M21] + z * l_mat[Matrix4d.M22]);
@@ -563,7 +563,7 @@ public class Vector3d implements Serializable, Vectord<Vector3d> {
 	 * @return The vector for chaining
 	 */
 	public Vector3d unrotate(final Matrix4d matrix) {
-		final double l_mat[] = matrix.val;
+		final double[] l_mat = matrix.val;
 		return this.set(x * l_mat[Matrix4d.M00] + y * l_mat[Matrix4d.M10] + z * l_mat[Matrix4d.M20],
 				x * l_mat[Matrix4d.M01] + y * l_mat[Matrix4d.M11] + z * l_mat[Matrix4d.M21],
 				x * l_mat[Matrix4d.M02] + y * l_mat[Matrix4d.M12] + z * l_mat[Matrix4d.M22]);
@@ -580,7 +580,7 @@ public class Vector3d implements Serializable, Vectord<Vector3d> {
 	 * @return The vector for chaining
 	 */
 	public Vector3d untransform(final Matrix4d matrix) {
-		final double l_mat[] = matrix.val;
+		final double[] l_mat = matrix.val;
 		x -= l_mat[Matrix4d.M03];
 		y -= l_mat[Matrix4d.M03];
 		z -= l_mat[Matrix4d.M03];
@@ -903,8 +903,7 @@ public class Vector3d implements Serializable, Vectord<Vector3d> {
 		Vector3 other = (Vector3)obj;
 		if (NumberUtils.doubleToLongBits(x) != NumberUtils.doubleToLongBits(other.x)) return false;
 		if (NumberUtils.doubleToLongBits(y) != NumberUtils.doubleToLongBits(other.y)) return false;
-		if (NumberUtils.doubleToLongBits(z) != NumberUtils.doubleToLongBits(other.z)) return false;
-		return true;
+		return NumberUtils.doubleToLongBits(z) == NumberUtils.doubleToLongBits(other.z);
 	}
 
 	@Override
@@ -912,8 +911,7 @@ public class Vector3d implements Serializable, Vectord<Vector3d> {
 		if (other == null) return false;
 		if (Math.abs(other.x - x) > epsilon) return false;
 		if (Math.abs(other.y - y) > epsilon) return false;
-		if (Math.abs(other.z - z) > epsilon) return false;
-		return true;
+		return !(Math.abs(other.z - z) > epsilon);
 	}
 
 	/** Compares this vector with the other vector, using the supplied epsilon for fuzzy equality testing.
@@ -921,8 +919,7 @@ public class Vector3d implements Serializable, Vectord<Vector3d> {
 	public boolean epsilonEquals (float x, float y, float z, float epsilon) {
 		if (Math.abs(x - this.x) > epsilon) return false;
 		if (Math.abs(y - this.y) > epsilon) return false;
-		if (Math.abs(z - this.z) > epsilon) return false;
-		return true;
+		return !(Math.abs(z - this.z) > epsilon);
 	}
 
 	/**

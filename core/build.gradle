@@ -1,7 +1,7 @@
 apply plugin: "java"
 apply plugin: "com.install4j.gradle"
 
-sourceCompatibility = 1.8
+sourceCompatibility = 11
 [compileJava, compileTestJava]*.options*.encoding = 'UTF-8'
 
 sourceSets {
@@ -10,13 +10,14 @@ sourceSets {
             srcDir 'src'
             // Only enable when building desktop Gaia Sky
             //exclude "**/rest/**"
-       }
-   }
+        }
+    }
 }
 
 project.ext.mainClassName = "gaiasky.desktop.GaiaSkyDesktop"
 project.ext.assetsDir = new File("../assets");
 project.ext.workDir = new File(".");
+project.ext.sourceSets = sourceSets
 
 task versionFile {
     doLast {
@@ -37,12 +38,12 @@ task versionFile {
     }
 }
 
-jar { 
+jar {
     dependsOn versionFile
 }
 
-install4j { 
-    installDir = file('/home/tsagrista/Programs/install4j7') 
+install4j {
+    installDir = file('/home/tsagrista/Programs/install4j7')
 }
 
 sourceSets {
@@ -53,93 +54,59 @@ sourceSets {
     }
 }
 
-task run(dependsOn: jar, type: JavaExec, description: "Runs Gaia Sky") {
-    main = project.mainClassName
-    systemProperties['properties.file'] = ''
-    systemProperties['assets.location'] = '../assets/'
-    systemProperties['org.slf4j.simpleLogger.defaultLogLevel'] = 'warn'  // logging levels (e.g. REST server warn, info, debug)
-    systemProperties['org.slf4j.simpleLogger.showThreadName'] = 'false'
+class GaiaSkyRun extends JavaExec {
+    public void setup() {
+        main = project.mainClassName
+        systemProperties['properties.file'] = ''
+        systemProperties['assets.location'] = '../assets/'
+        systemProperties['org.slf4j.simpleLogger.defaultLogLevel'] = 'warn'  // logging levels (e.g. REST server warn, info, debug)
+        systemProperties['org.slf4j.simpleLogger.showThreadName'] = 'false'
 
-    minHeapSize = "3g"
-    maxHeapSize = "6g"
+        minHeapSize = "3g"
+        maxHeapSize = "6g"
+        // Parallel GC
+        //jvmArgs = [ '-XX:+UseParNewGC']
+        // CMS GC
+        //jvmArgs = ['-server', '-XX:+UseConcMarkSweepGC', '-XX:+UseParNewGC', '-XX:MaxGCPauseMillis=5', '-XX:+CMSParallelRemarkEnabled', '-XX:CMSInitiatingOccupancyFraction=60', '-XX:MaxTenuringThreshold=4', '-XX:MaxNewSize=384m', '-XX:NewSize=384m', '-XX:SurvivorRatio=12']
+        // G1 GC
+        jvmArgs "-XX:+UseG1GC"
+        if (System.getProperty("os.name").toLowerCase().contains("mac")) {
+            // Required to run lwjgl3 java apps on macOS
+            jvmArgs("-XstartOnFirstThread")
+        }
+        // Verbose GC
+        // jvmArgs = ['-verbose:gc']
+        classpath = project.ext.sourceSets.main.runtimeClasspath
+        classpath += project.files(project.ext.assetsDir)
+        standardInput = System.in
+        workingDir = project.ext.workDir
+        ignoreExitValue = true
 
-    // Parallel GC
-    //jvmArgs = [ '-XX:+UseParNewGC']
-    // CMS GC
-    //jvmArgs = ['-server', '-XX:+UseConcMarkSweepGC', '-XX:+UseParNewGC', '-XX:MaxGCPauseMillis=5', '-XX:+CMSParallelRemarkEnabled', '-XX:CMSInitiatingOccupancyFraction=60', '-XX:MaxTenuringThreshold=4', '-XX:MaxNewSize=384m', '-XX:NewSize=384m', '-XX:SurvivorRatio=12']
-    // G1 GC
-    jvmArgs "-XX:+UseG1GC"
-    if (System.getProperty("os.name").toLowerCase().contains("mac")) {
-    // Required to run lwjgl3 java apps on macOS
-         jvmArgs("-XstartOnFirstThread")
     }
-    // Verbose GC
-    // jvmArgs = ['-verbose:gc']
-    classpath = sourceSets.main.runtimeClasspath
-    classpath += files(project.assetsDir)
-    standardInput = System.in
-    workingDir = project.workDir
-    ignoreExitValue = true
 }
 
-task runvr(dependsOn: jar, type: JavaExec, description: "Runs Gaia Sky VR") {
-    main = project.mainClassName
+task run(dependsOn: jar, type: GaiaSkyRun, description: "Runs Gaia Sky") {
+    setup()
+}
+
+task runvr(dependsOn: jar, type: GaiaSkyRun, description: "Runs Gaia Sky VR") {
+    setup()
     args = ['-vr']
-    systemProperties['properties.file'] = ''
-    systemProperties['assets.location'] = '../assets/'
-    systemProperties['org.slf4j.simpleLogger.defaultLogLevel'] = 'warn'  // logging levels (e.g. REST server warn, info, debug)
-    systemProperties['org.slf4j.simpleLogger.showThreadName'] = 'false'
-
-    minHeapSize = "3g"
-    maxHeapSize = "6g"
-
-    // Parallel GC
-    //jvmArgs = ['-XX:+UseParNewGC']
-    // CMS GC
-    //jvmArgs = ['-server', '-XX:+UseConcMarkSweepGC', '-XX:+UseParNewGC', '-XX:MaxGCPauseMillis=5', '-XX:+CMSParallelRemarkEnabled', '-XX:CMSInitiatingOccupancyFraction=60', '-XX:MaxTenuringThreshold=4', '-XX:MaxNewSize=384m', '-XX:NewSize=384m', '-XX:SurvivorRatio=12']
-    // G1 GC
-    jvmArgs "-XX:+UseG1GC"
-    if (System.getProperty("os.name").toLowerCase().contains("mac")) {
-        // Required to run lwjgl java apps on macOS
-        jvmArgs("-XstartOnFirstThread")
-    }
-    // Verbose GC
-    // jvmArgs = ['-verbose:gc']
-    classpath = sourceSets.main.runtimeClasspath
-    classpath += files(project.assetsDir)
-    standardInput = System.in
-    workingDir = project.workDir
-    ignoreExitValue = true
 }
 
-task rund(dependsOn: jar, type: JavaExec, description: "Runs Gaia Sky - forces download manager and catalog chooser") {
-    main = project.mainClassName
+task rund(dependsOn: jar, type: GaiaSkyRun, description: "Runs Gaia Sky showing the download manager at startup") {
+    setup()
     args = ['-d']
-    systemProperties['properties.file'] = ''
-    systemProperties['assets.location'] = '../assets/'
-    systemProperties['org.slf4j.simpleLogger.defaultLogLevel'] = 'warn'  // logging levels (e.g. REST server warn, info, debug)
-    systemProperties['org.slf4j.simpleLogger.showThreadName'] = 'false'
+}
 
-    minHeapSize = "3g"
-    maxHeapSize = "6g"
+task runc(dependsOn: jar, type: GaiaSkyRun, description: "Runs Gaia Sky showing the catalog chooser at startup") {
+    setup()
+    args = ['-c']
+}
 
-    // Parallel GC
-    //jvmArgs = ['-XX:+UseParNewGC']
-    // CMS GC
-    //jvmArgs = ['-server', '-XX:+UseConcMarkSweepGC', '-XX:+UseParNewGC', '-XX:MaxGCPauseMillis=5', '-XX:+CMSParallelRemarkEnabled', '-XX:CMSInitiatingOccupancyFraction=60', '-XX:MaxTenuringThreshold=4', '-XX:MaxNewSize=384m', '-XX:NewSize=384m', '-XX:SurvivorRatio=12']
-    // G1 GC
-    jvmArgs "-XX:+UseG1GC"
-    if (System.getProperty("os.name").toLowerCase().contains("mac")) {
-         // Required to run lwjgl java apps on macOS
-         jvmArgs("-XstartOnFirstThread")
-    }
-    // Verbose GC
-    // jvmArgs = ['-verbose:gc']
-    classpath = sourceSets.main.runtimeClasspath
-    classpath += files(project.assetsDir)
-    standardInput = System.in
-    workingDir = project.workDir
-    ignoreExitValue = true
+task rune(dependsOn: jar, type: GaiaSkyRun, description: "Runs Gaia Sky with an external view") {
+    setup()
+    args = ['-e']
 }
 
 task runCatalogFilter(dependsOn: jar, type: JavaExec, description: "Runs the catalog filter application to generate day catalogs for WebGL") {
@@ -155,16 +122,16 @@ task runOctreeGenerator(dependsOn: jar, type: JavaExec, description: "Runs the o
     main = 'gaiasky.data.OctreeGeneratorRun'
     systemProperties['properties.file'] = '../..//assets/conf/global.properties'
     args = [
-        "--input",
-        "/media/tsagrista/Daten/Gaia/data/GDR2/dr2/csv/",
-        "--output",
-        "/media/tsagrista/Daten/Gaia/data/GDR2/dr2/out/"
+            "--input",
+            "/media/tsagrista/Daten/Gaia/data/GDR2/dr2/csv/",
+            "--output",
+            "/media/tsagrista/Daten/Gaia/data/GDR2/dr2/out/"
     ]
 
     minHeapSize = "10g"
     maxHeapSize = "20g"
 
-    jvmArgs = [ '-server', ]
+    jvmArgs = ['-server',]
 
     classpath = sourceSets.main.runtimeClasspath
     classpath += files(project.assetsDir)
@@ -183,7 +150,7 @@ task runGalaxyGenerator(dependsOn: jar, type: JavaExec, description: "Runs the g
     ignoreExitValue = true
 }
 
-task createDistDir (description: "Creates the releases/dist folder") {
+task createDistDir(description: "Creates the releases/dist folder") {
     doLast {
         File distDir = new File(project.distDir)
         // Prepare output directory
@@ -192,7 +159,7 @@ task createDistDir (description: "Creates the releases/dist folder") {
     }
 }
 
-task copyToLib (dependsOn: createDistDir, description: "Copies the runtime dependencies to releases/dist/lib") {
+task copyToLib(dependsOn: createDistDir, description: "Copies the runtime dependencies to releases/dist/lib") {
     doLast {
         // Create releases/dist/lib
         File distLib = new File(project.distDir, 'lib')
@@ -228,7 +195,7 @@ task copyToLib (dependsOn: createDistDir, description: "Copies the runtime depen
     }
 }
 
-task gaiaskyJar (dependsOn: [compileJava, jar, copyToLib],  description: "Creates the gaiasky jar and puts it to the dist folder") {
+task gaiaskyJar(dependsOn: [compileJava, jar, copyToLib], description: "Creates the gaiasky jar and puts it to the dist folder") {
     doLast {
         copy {
             from "$baseDir/core/build/libs/core-" + version + ".jar"
@@ -242,23 +209,23 @@ task execPermission(type: Exec) {
     commandLine 'chmod', 'ugo+x', "$distDir/gaiasky"
 }
 
-task dist (dependsOn: gaiaskyJar, description: "Compiles the project, creates the jar and moves it all to releases/gaiasky-\$tag-\$rev") {
+task dist(dependsOn: gaiaskyJar, description: "Compiles the project, creates the jar and moves it all to releases/gaiasky-\$tag-\$rev") {
     doLast {
         // Version check
         String vsc = "${System.env.GS_JAVA_VERSION_CHECK}"
         boolean javaVersionOk = JavaVersion.current().isJava11Compatible()
-        if(vsc.equalsIgnoreCase("false")){
-            if(!javaVersionOk){
+        if (vsc.equalsIgnoreCase("false")) {
+            if (!javaVersionOk) {
                 println("WARNING: Gaia Sky must be built with Java " + JavaVersion.VERSION_11 + " or compatible, you are using " + JavaVersion.current())
             }
         } else {
-            if(!javaVersionOk){
+            if (!javaVersionOk) {
                 print("FAILURE: Do 'export GS_JAVA_VERSION_CHECK=false' to skip this check")
                 throw new GradleException("Gaia Sky must be built with java " + JavaVersion.VERSION_11 + " or compatible, you are using " + JavaVersion.current())
             }
         }
 
-        if(javaVersionOk){
+        if (javaVersionOk) {
             println("OK: Building with Java " + JavaVersion.current())
         }
 
@@ -278,21 +245,21 @@ task dist (dependsOn: gaiaskyJar, description: "Compiles the project, creates th
 
         // Copy music
         mkdir "$distDir/music"
-        copy{
+        copy {
             from "../assets/music"
             into "$distDir/music"
         }
 
         // Copy mappings
         mkdir "$distDir/mappings"
-        copy{
+        copy {
             from "../assets/mappings"
             into "$distDir/mappings"
         }
 
         // Copy rest-static
         mkdir "$distDir/rest-static"
-        copy{
+        copy {
             from "../assets/rest-static"
             into "$distDir/rest-static"
         }
@@ -356,10 +323,10 @@ task createTar(dependsOn: dist, description: "Creates application tar package") 
 
         ant.tar(destfile: "$packageDir/" + project.distName + ".tar.gz", compression: 'gzip', longfile: 'gnu') {
             tarfileset(dir: "$releasesDir") {
-                include (name: "$distName/**")
-                exclude (name: "$distName/gaiasky")
+                include(name: "$distName/**")
+                exclude(name: "$distName/gaiasky")
             }
-            tarfileset(dir: "$releasesDir", filemode:'755') {
+            tarfileset(dir: "$releasesDir", filemode: '755') {
                 include(name: "$distName/gaiasky")
             }
         }
@@ -434,7 +401,7 @@ task createDeb(dependsOn: createArch, description: "Creates the .deb package") {
         // Create deb
         exec {
             executable "dpkg-deb"
-            args "--build","$packageDir/$distName"
+            args "--build", "$packageDir/$distName"
         }
 
         // Remove temp dir directory
@@ -442,7 +409,7 @@ task createDeb(dependsOn: createArch, description: "Creates the .deb package") {
     }
 }
 
-task prepareInstall4jScript (dependsOn: createArch, description: "Prepares the install4j script and copies it to the packages folder") {
+task prepareInstall4jScript(dependsOn: createArch, description: "Prepares the install4j script and copies it to the packages folder") {
     doLast {
         copy {
             from "installerscripts/template.install4j"
@@ -466,7 +433,7 @@ task install4jMedia(type: com.install4j.gradle.Install4jTask, description: "Runs
 }
 
 
-task pack (dependsOn: install4jMedia, description: "Creates the releases for windows, mac, linux and the tar package") { doLast { } }
+task pack(dependsOn: install4jMedia, description: "Creates the releases for windows, mac, linux and the tar package") { doLast {} }
 
 eclipse {
     project {
@@ -478,7 +445,7 @@ eclipse {
 task afterEclipseImport(description: "Post processing after project generation", group: "IDE") {
     doLast {
         def classpath = new XmlParser().parse(file(".classpath"))
-        new Node(classpath, "classpathentry", [ kind: 'src', path: 'assets' ]);
+        new Node(classpath, "classpathentry", [kind: 'src', path: 'assets']);
         def writer = new FileWriter(file(".classpath"))
         def printer = new XmlNodePrinter(new PrintWriter(writer))
         printer.setPreserveWhitespace(true)

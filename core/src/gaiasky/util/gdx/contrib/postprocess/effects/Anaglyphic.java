@@ -63,5 +63,4 @@ public final class Anaglyphic extends PostProcessorEffect {
         anaglyphic.setInput(src).setOutput(dest).render();
     }
 
-    ;
 }

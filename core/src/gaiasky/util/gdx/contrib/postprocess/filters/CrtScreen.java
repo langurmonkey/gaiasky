@@ -45,7 +45,7 @@ public final class CrtScreen extends Filter<CrtScreen> {
 
         public int v;
 
-        private RgbMode(int value) {
+        RgbMode(int value) {
             this.v = value;
         }
     }
@@ -61,7 +61,7 @@ public final class CrtScreen extends Filter<CrtScreen> {
 
         public int v;
 
-        private Effect(int value) {
+        Effect(int value) {
             this.v = value;
         }
     }
@@ -80,7 +80,7 @@ public final class CrtScreen extends Filter<CrtScreen> {
         private final String mnemonic;
         private int elementSize;
 
-        private Param(String m, int elementSize) {
+        Param(String m, int elementSize) {
             this.mnemonic = m;
             this.elementSize = elementSize;
         }

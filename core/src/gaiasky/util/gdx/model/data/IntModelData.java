@@ -32,7 +32,7 @@ import com.badlogic.gdx.utils.GdxRuntimeException;
  * @author badlogic */
 public class IntModelData {
 	public String id;
-	public final short version[] = new short[2];
+	public final short[] version = new short[2];
 	public final Array<IntModelMesh> meshes = new Array<>();
 	public final Array<ModelMaterial> materials = new Array<>();
 	public final Array<IntModelNode> nodes = new Array<>();

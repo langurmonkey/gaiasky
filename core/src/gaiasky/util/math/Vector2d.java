@@ -342,7 +342,7 @@ public class Vector2d implements Serializable, Vectord<Vector2d> {
      * counter-clockwise) and between 0 and 360.
      */
     public double angle() {
-        double angle = (double) Math.atan2(y, x) * MathUtils.radiansToDegrees;
+        double angle = Math.atan2(y, x) * MathUtils.radiansToDegrees;
         if (angle < 0)
             angle += 360;
         return angle;
@@ -353,7 +353,7 @@ public class Vector2d implements Serializable, Vectord<Vector2d> {
      * (typically counter-clockwise)
      */
     public double getAngleRad() {
-        return (double) Math.atan2(y, x);
+        return Math.atan2(y, x);
     }
 
     /**
@@ -392,8 +392,8 @@ public class Vector2d implements Serializable, Vectord<Vector2d> {
      * @param radians the angle in radians
      */
     public Vector2d rotateRad(double radians) {
-        double cos = (double) Math.cos(radians);
-        double sin = (double) Math.sin(radians);
+        double cos = Math.cos(radians);
+        double sin = Math.sin(radians);
 
         double newX = this.x * cos - this.y * sin;
         double newY = this.x * sin + this.y * cos;
@@ -444,9 +444,7 @@ public class Vector2d implements Serializable, Vectord<Vector2d> {
             return false;
         if (Math.abs(other.x - x) > epsilon)
             return false;
-        if (Math.abs(other.y - y) > epsilon)
-            return false;
-        return true;
+        return !(Math.abs(other.y - y) > epsilon);
     }
 
     /**
@@ -457,9 +455,7 @@ public class Vector2d implements Serializable, Vectord<Vector2d> {
     public boolean epsilonEquals(double x, double y, double epsilon) {
         if (Math.abs(x - this.x) > epsilon)
             return false;
-        if (Math.abs(y - this.y) > epsilon)
-            return false;
-        return true;
+        return !(Math.abs(y - this.y) > epsilon);
     }
 
     public boolean isUnit() {

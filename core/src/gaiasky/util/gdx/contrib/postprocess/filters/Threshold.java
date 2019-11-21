@@ -34,7 +34,7 @@ public final class Threshold extends Filter<Threshold> {
         private String mnemonic;
         private int elementSize;
 
-        private Param(String mnemonic, int elementSize) {
+        Param(String mnemonic, int elementSize) {
             this.mnemonic = mnemonic;
             this.elementSize = elementSize;
         }

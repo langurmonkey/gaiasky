@@ -33,6 +33,7 @@ import gaiasky.util.scene2d.OwnScrollPane;
 import gaiasky.util.scene2d.OwnTextTooltip;
 
 import java.io.*;
+import java.nio.charset.StandardCharsets;
 
 /**
  * This window shows the Gaia Archive information for a single star
@@ -132,11 +133,11 @@ public class ArchiveViewWindow extends GenericDialog {
     }
 
     private void getDataBySourceId(long sourceid, GaiaDataListener listener) {
-        getTAPData(URL_GAIA_JSON_SOURCE + Long.toString(sourceid), false, "json", listener);
+        getTAPData(URL_GAIA_JSON_SOURCE + sourceid, false, "json", listener);
     }
 
     private void getDataByHipId(int hip, GaiaDataListener listener) {
-        getTAPData(URL_HIP_JSON_SOURCE + Integer.toString(hip), true, "json", listener);
+        getTAPData(URL_HIP_JSON_SOURCE + hip, true, "json", listener);
     }
 
     private String[][] getTAPData(String url, boolean hip, final String format, final GaiaDataListener listener) {
@@ -190,7 +191,7 @@ public class ArchiveViewWindow extends GenericDialog {
     private String slurp(final InputStream is, final int bufferSize) {
         final char[] buffer = new char[bufferSize];
         final StringBuilder out = new StringBuilder();
-        try (Reader in = new InputStreamReader(is, "UTF-8")) {
+        try (Reader in = new InputStreamReader(is, StandardCharsets.UTF_8)) {
             for (;;) {
                 int rsz = in.read(buffer, 0, buffer.length);
                 if (rsz < 0)

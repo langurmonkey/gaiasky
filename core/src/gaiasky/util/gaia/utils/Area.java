@@ -14,7 +14,7 @@ public interface Area {
      *            great circle pole given as a Place
      * @return minimum angle [rad]
      */
-    public double altitude(Place spinAxisPlace);
+    double altitude(Place spinAxisPlace);
 
     /**
      * Determine whether a given Place is within the Area
@@ -23,19 +23,19 @@ public interface Area {
      *            the Place
      * @return true if p is within the Area
      */
-    public boolean contains(Place p);
+    boolean contains(Place p);
 
     /**
      * Determine the weighted mid-point of the Area
      *
      * @return the centre
      */
-    public Place getMidPoint();
+    Place getMidPoint();
 
     /**
      * Determine the weight of the Area
      *
      * @return the weight
      */
-    public double getWeight();
+    double getWeight();
 }

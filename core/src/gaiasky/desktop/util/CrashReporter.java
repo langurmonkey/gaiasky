@@ -233,7 +233,7 @@ public class CrashReporter {
     }
 
     private static String arrayToStr(String[] arr, String sep) {
-        String buff = new String();
+        String buff = "";
         for (int i = 0; i < arr.length; i++) {
             buff += arr[i] + sep;
         }

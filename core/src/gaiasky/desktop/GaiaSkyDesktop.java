@@ -348,7 +348,7 @@ public class GaiaSkyDesktop implements IObserver {
                 Method activate;
                 try {
                     activate = REST_SERVER_CLASS.getMethod("activate");
-                    activate.invoke(null, new Object[0]);
+                    activate.invoke(null);
                 } catch (NoSuchMethodException | SecurityException | IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
                     logger.error(e);
                 }
@@ -359,7 +359,7 @@ public class GaiaSkyDesktop implements IObserver {
                 /* Shutdown REST server thread on termination */
                 try {
                     Method stop = REST_SERVER_CLASS.getMethod("stop");
-                    stop.invoke(null, new Object[0]);
+                    stop.invoke(null);
                 } catch (NoSuchMethodException | SecurityException | IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
                     logger.error(e);
                 }

@@ -160,7 +160,7 @@ public class ConsoleLogger implements IObserver {
         case CAMERA_MODE_CMD:
             CameraMode cm = (CameraMode) data[0];
             if (cm != CameraMode.FOCUS_MODE)
-                addMessage(I18n.bundle.format("notif.cameramode.change", (CameraMode) data[0]));
+                addMessage(I18n.bundle.format("notif.cameramode.change", data[0]));
             break;
         case PACE_CHANGED_INFO:
             addMessage(I18n.bundle.format("notif.timepace.change", data[0]));

@@ -162,7 +162,7 @@ public class GlobalResources {
      * @return An array containing the float number and the string units
      */
     public static Pair<Float, String> floatToDistanceString(float f) {
-        Pair<Double, String> result = doubleToDistanceString((double) f);
+        Pair<Double, String> result = doubleToDistanceString(f);
         return new Pair<>(result.getFirst().floatValue(), result.getSecond());
     }
 
@@ -758,7 +758,7 @@ public class GlobalResources {
     public static <T> List<List<T>> combination(List<T> values, int size) {
 
         if (0 == size) {
-            return Collections.singletonList(Collections.<T>emptyList());
+            return Collections.singletonList(Collections.emptyList());
         }
 
         if (values.isEmpty()) {

@@ -110,12 +110,7 @@ public enum FOV {
      */
     public static boolean validFov(int fovIndex) {
 
-        if ((fovIndex < FOV1.getIndex()) || (fovIndex > FOV4.getIndex())) {
-
-            return false;
-        }
-
-        return true;
+        return (fovIndex >= FOV1.getIndex()) && (fovIndex <= FOV4.getIndex());
     }
 
     /**

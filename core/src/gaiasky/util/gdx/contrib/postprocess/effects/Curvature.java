@@ -65,6 +65,4 @@ public final class Curvature extends PostProcessorEffect {
         distort.setInput(src).setOutput(dest).render();
     }
 
-    ;
-
 }

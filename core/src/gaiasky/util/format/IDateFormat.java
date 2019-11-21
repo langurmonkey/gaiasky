@@ -8,7 +8,7 @@ package gaiasky.util.format;
 import java.time.Instant;
 
 public interface IDateFormat {
-    public String format(Instant date);
+    String format(Instant date);
 
-    public Instant parse(String date);
+    Instant parse(String date);
 }

@@ -201,13 +201,7 @@ public class Gti implements Comparable<Gti> {
      * @return true if inside
      */
     public boolean isInside(final long time) {
-        if ((time > this.start || time == this.start) &&
-                (time < this.end ||
-                        time == this.end)) {
-            return true;
-        } else {
-            return false;
-        }
+        return (time > this.start || time == this.start) && (time < this.end || time == this.end);
     }
 
     /**

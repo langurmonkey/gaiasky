@@ -21,6 +21,7 @@ import java.nio.CharBuffer;
 import java.nio.MappedByteBuffer;
 import java.nio.channels.FileChannel;
 import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 
 /**
  * Loads SDSS data from a text file with a series of [ra, dec, z]
@@ -100,7 +101,7 @@ public class SDSSDataProvider implements IParticleGroupDataProvider {
             MappedByteBuffer mem = fc.map(FileChannel.MapMode.READ_ONLY, 0, fc.size());
 
             if (mem != null) {
-                CharBuffer charBuffer = Charset.forName("UTF-8").decode(mem);
+                CharBuffer charBuffer = StandardCharsets.UTF_8.decode(mem);
                 BufferedReader br = new BufferedReader(new StringReader(charBuffer.toString()));
                 loadFromBufferedReader(br, pointData);
                 br.close();

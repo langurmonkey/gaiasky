@@ -216,7 +216,7 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
                     Vector3d dir = new Vector3d();
                     focus.getAbsolutePosition(dir).sub(campos[0], campos[1], campos[2]);
                     double[] d = dir.nor().values();
-                    em.post(Events.CAMERA_DIR_CMD, (Object) d);
+                    em.post(Events.CAMERA_DIR_CMD, d);
 
                 });
             } else {
@@ -283,7 +283,7 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
             vec[1] = vec[1] * Constants.KM_TO_U;
             vec[2] = vec[2] * Constants.KM_TO_U;
             // Send event
-            em.post(Events.CAMERA_POS_CMD, (Object) vec);
+            em.post(Events.CAMERA_POS_CMD, vec);
         });
     }
 
@@ -304,7 +304,7 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
 
     @Override
     public void setCameraDirection(final double[] dir) {
-        GaiaSky.postRunnable(() -> em.post(Events.CAMERA_DIR_CMD, (Object) dir));
+        GaiaSky.postRunnable(() -> em.post(Events.CAMERA_DIR_CMD, dir));
     }
 
     public void setCameraDirection(final List dir) {
@@ -319,7 +319,7 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
 
     @Override
     public void setCameraUp(final double[] up) {
-        GaiaSky.postRunnable(() -> em.post(Events.CAMERA_UP_CMD, (Object) up));
+        GaiaSky.postRunnable(() -> em.post(Events.CAMERA_UP_CMD, up));
 
     }
 
@@ -1332,12 +1332,12 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
 
     @Override
     public void removeObject(final int id) {
-        GaiaSky.postRunnable(() -> em.post(Events.REMOVE_OBJECTS, (Object) new int[] { id }));
+        GaiaSky.postRunnable(() -> em.post(Events.REMOVE_OBJECTS, new int[] { id }));
     }
 
     @Override
     public void removeObjects(final int[] ids) {
-        GaiaSky.postRunnable(() -> em.post(Events.REMOVE_OBJECTS, (Object) ids));
+        GaiaSky.postRunnable(() -> em.post(Events.REMOVE_OBJECTS, ids));
     }
 
     public void removeObjects(final List ids) {
@@ -2078,9 +2078,9 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
     @Override
     public void setCameraState(double[] pos, double[] dir, double[] up) {
         GaiaSky.postRunnable(() -> {
-            em.post(Events.CAMERA_POS_CMD, (Object) pos);
-            em.post(Events.CAMERA_DIR_CMD, (Object) dir);
-            em.post(Events.CAMERA_UP_CMD, (Object) up);
+            em.post(Events.CAMERA_POS_CMD, pos);
+            em.post(Events.CAMERA_DIR_CMD, dir);
+            em.post(Events.CAMERA_UP_CMD, up);
         });
     }
 
@@ -2091,9 +2091,9 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
     @Override
     public void setCameraStateAndTime(double[] pos, double[] dir, double[] up, long time) {
         GaiaSky.postRunnable(() -> {
-            em.post(Events.CAMERA_POS_CMD, (Object) pos);
-            em.post(Events.CAMERA_DIR_CMD, (Object) dir);
-            em.post(Events.CAMERA_UP_CMD, (Object) up);
+            em.post(Events.CAMERA_POS_CMD, pos);
+            em.post(Events.CAMERA_DIR_CMD, dir);
+            em.post(Events.CAMERA_UP_CMD, up);
             em.post(Events.TIME_CHANGE_CMD, Instant.ofEpochMilli(time));
         });
     }

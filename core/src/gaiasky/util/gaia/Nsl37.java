@@ -144,7 +144,7 @@ public class Nsl37 extends AnalyticalAttitudeDataServer {
 
         // EventManager.instance.post(Events.DEBUG_RAM, "Nu: " + (float) Math.toDegrees(getNuMod4Pi()) + ", Omega: " + (float) Math.toDegrees(getOmegaMod4Pi()));
 
-        Quaterniond qAndRate[] = AttitudeConverter.heliotropicToQuaternions(lSun, super.getXiRef(), getNuMod4Pi(), getOmegaMod4Pi(), lSunDot, nuDot, omegaDot);
+        Quaterniond[] qAndRate = AttitudeConverter.heliotropicToQuaternions(lSun, super.getXiRef(), getNuMod4Pi(), getOmegaMod4Pi(), lSunDot, nuDot, omegaDot);
 
         return new ConcreteAttitude(tNow, qAndRate[0], qAndRate[1], true);
     }

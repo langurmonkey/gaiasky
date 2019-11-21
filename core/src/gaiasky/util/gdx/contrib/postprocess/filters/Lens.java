@@ -47,7 +47,7 @@ public final class Lens extends Filter<Lens> {
         private String mnemonic;
         private int elementSize;
 
-        private Param(String mnemonic, int arrayElementSize) {
+        Param(String mnemonic, int arrayElementSize) {
             this.mnemonic = mnemonic;
             this.elementSize = arrayElementSize;
         }

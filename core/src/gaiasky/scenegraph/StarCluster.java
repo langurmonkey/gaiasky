@@ -502,7 +502,7 @@ public class StarCluster extends AbstractPositionEntity implements IFocus, IProp
 
     @Override
     public <T extends SceneGraphNode> T getSimpleCopy() {
-        StarCluster copy = (StarCluster) super.getSimpleCopy();
+        StarCluster copy = super.getSimpleCopy();
         copy.localTransform.set(this.localTransform);
         copy.pm.set(this.pm);
         copy.pmSph.set(this.pmSph);

@@ -53,7 +53,7 @@ public class ConstelBoundariesLoader<T extends SceneGraphNode> implements IScene
                     boundary.ct = new ComponentTypes(ComponentType.Boundaries);
                     List<List<Vector3d>> list = new ArrayList<List<Vector3d>>();
                     List<Vector3d> buffer = new ArrayList<Vector3d>(4);
-                    String lastName = new String();
+                    String lastName = "";
                     int interp = 0;
                     while ((line = br.readLine()) != null) {
                         if (!line.startsWith("#")) {

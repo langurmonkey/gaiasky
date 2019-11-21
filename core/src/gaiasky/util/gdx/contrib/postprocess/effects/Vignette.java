@@ -148,5 +148,4 @@ public final class Vignette extends PostProcessorEffect {
         vignetting.setInput(src).setOutput(dest).render();
     }
 
-    ;
 }

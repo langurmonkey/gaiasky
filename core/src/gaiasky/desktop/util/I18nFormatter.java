@@ -6,6 +6,7 @@
 package gaiasky.desktop.util;
 
 import java.io.*;
+import java.nio.charset.StandardCharsets;
 import java.util.Properties;
 import java.util.Set;
 
@@ -33,7 +34,7 @@ public class I18nFormatter {
             p0.load(fis0);
 
             FileInputStream fis1 = new FileInputStream(f1);
-            InputStreamReader isr1 = new InputStreamReader(fis1,"UTF-8");
+            InputStreamReader isr1 = new InputStreamReader(fis1, StandardCharsets.UTF_8);
             Properties p1 = new Properties();
             p1.load(isr1);
 
@@ -64,7 +65,7 @@ public class I18nFormatter {
             }
 
             FileOutputStream fos1 = new FileOutputStream(outf, true);
-            PrintStream ps = new PrintStream(fos1, true, "UTF-8");
+            PrintStream ps = new PrintStream(fos1, true, StandardCharsets.UTF_8);
             op.store(ps, null, "UTF-8");
             ps.close();
         } catch (Exception e) {

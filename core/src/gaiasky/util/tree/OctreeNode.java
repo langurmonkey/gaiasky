@@ -232,7 +232,7 @@ public class OctreeNode implements ILineRenderable {
         int[] hashv = new int[25];
         hashv[0] = depth;
         computePageIdRec(hashv);
-        return (long) Arrays.hashCode(hashv);
+        return Arrays.hashCode(hashv);
     }
 
     protected void computePageIdRec(int[] hashv) {
@@ -622,7 +622,7 @@ public class OctreeNode implements ILineRenderable {
     }
 
     public boolean isObserved() {
-        return observed && (parent == null ? true : parent.isObserved());
+        return observed && (parent == null || parent.isObserved());
     }
 
     /**

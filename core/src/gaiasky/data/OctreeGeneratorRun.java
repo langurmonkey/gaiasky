@@ -40,6 +40,7 @@ import gaiasky.util.tree.OctreeNode;
 
 import java.io.*;
 import java.lang.reflect.InvocationTargetException;
+import java.nio.charset.StandardCharsets;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.util.HashMap;
@@ -485,7 +486,7 @@ public class OctreeGeneratorRun {
     protected void dumpToDiskCsv(Array<StarBean> data, String filename) {
         String sep = ", ";
         try {
-            PrintWriter writer = new PrintWriter(filename, "UTF-8");
+            PrintWriter writer = new PrintWriter(filename, StandardCharsets.UTF_8);
             writer.println("name, x[km], y[km], z[km], absmag, appmag, r, g, b");
             Vector3d gal = new Vector3d();
             for (StarBean star : data) {

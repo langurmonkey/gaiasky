@@ -18,6 +18,7 @@ import gaiasky.util.math.Vector3d;
 import gaiasky.util.parse.Parser;
 
 import java.io.*;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.LinkOption;
 import java.nio.file.Path;
@@ -206,9 +207,7 @@ public abstract class AbstractStarGroupDataProvider implements IStarGroupDataPro
     }
 
     protected boolean hasGeoDistance(long sourceId) {
-        if (geoDistances != null && geoDistances.containsKey(sourceId))
-            return true;
-        return false;
+        return geoDistances != null && geoDistances.containsKey(sourceId);
     }
 
     protected boolean hasGeoDistances() {
@@ -289,7 +288,7 @@ public abstract class AbstractStarGroupDataProvider implements IStarGroupDataPro
     protected void dumpToDiskCsv(Array<StarBean> data, String filename) {
         String sep = "' ";
         try {
-            PrintWriter writer = new PrintWriter(filename, "UTF-8");
+            PrintWriter writer = new PrintWriter(filename, StandardCharsets.UTF_8);
             writer.println("name, x[km], y[km], z[km], absmag, appmag, r, g, b");
             Vector3d gal = new Vector3d();
             int n = 0;

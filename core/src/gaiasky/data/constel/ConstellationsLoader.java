@@ -23,7 +23,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 
 public class ConstellationsLoader<T extends SceneGraphNode> implements ISceneGraphLoader {
-    private static final String separator = "\\t|,";
+    private static final String separator = "[\\t,]";
     String[] files;
 
     public void initialize(String[] files) {

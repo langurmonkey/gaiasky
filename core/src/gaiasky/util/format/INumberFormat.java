@@ -6,7 +6,7 @@
 package gaiasky.util.format;
 
 public interface INumberFormat {
-    public String format(double num);
+    String format(double num);
 
-    public String format(long num);
+    String format(long num);
 }

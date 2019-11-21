@@ -16,8 +16,7 @@ import gaiasky.util.math.Vector3d;
  * 
  * Getters exists to provide the attitude and inertial rotation in various
  * forms, including a quaternion ({@link #getQuaternion()}, a set of heliotropic
- * or equatorial angles ({@link #getHeliotropicAnglesRates() and @link
- * #getEquatorialAnglesRates()} plus corresponding time derivatives. There are
+ * or equatorial angles and corresponding time derivatives. There are
  * also methods to obtain a number of attitude-related quantities, e.g., the
  * celestial pointings of two FOVs and the AL and AC rates for a particular
  * point in the FoV.
@@ -33,33 +32,33 @@ public interface Attitude {
      * 
      * @return time time that the attitude is valid for
      */
-    public long getTime();
+    long getTime();
 
     /**
      * @return quaternion that represents the attitude
      */
-    public Quaterniond getQuaternion();
+    Quaterniond getQuaternion();
 
     /**
      * 
      * @return time derivative [1/day] of the quaternion returned by
      *         {@link #getQuaternion()}
      */
-    public Quaterniond getQuaternionDot();
+    Quaterniond getQuaternionDot();
 
     /**
      * Get the inertial spin vector in the SRS.
      * 
      * @return spin vector in [rad/day] relative to SRS
      */
-    public Vector3d getSpinVectorInSrs();
+    Vector3d getSpinVectorInSrs();
 
     /**
      * Get the inertial spin vector in the ICRS (or CoMRS).
      * 
      * @return spin vector in [rad/day] relative to ICRS
      */
-    public Vector3d getSpinVectorInIcrs();
+    Vector3d getSpinVectorInIcrs();
 
     /**
      * Get the PFoV and FFoV directions as an array of unit vectors expressed in
@@ -67,7 +66,7 @@ public interface Attitude {
      * 
      * @return array of two (PFoV, FFoV3) vectors
      */
-    public Vector3d[] getFovDirections();
+    Vector3d[] getFovDirections();
 
     /**
      * Get the x, y, z axes of the SRS as an array of three unit vectors
@@ -75,7 +74,7 @@ public interface Attitude {
      * 
      * @return array of three (x, y, z) vectors
      */
-    public Vector3d[] getSrsAxes(Vector3d[] xyz);
+    Vector3d[] getSrsAxes(Vector3d[] xyz);
 
     /**
      * Compute the angular speed AL and AC of an inertial direction in the SRS
@@ -88,7 +87,7 @@ public interface Attitude {
      * @return two-element double array containing the angular speed AL and AC
      *         [rad/s]
      */
-    public double[] getAlAcRates(double alInstrumentAngle, double acFieldAngle);
+    double[] getAlAcRates(double alInstrumentAngle, double acFieldAngle);
 
     /**
      * Compute the angular speed AL and AC of an inertial direction in the SRS
@@ -103,5 +102,5 @@ public interface Attitude {
      * @return two-element double array containing the angular speed AL and AC
      *         [rad/s]
      */
-    public double[] getAlAcRates(FOV fov, double alFieldAngle, double acFieldAngle);
+    double[] getAlAcRates(FOV fov, double alFieldAngle, double acFieldAngle);
 }

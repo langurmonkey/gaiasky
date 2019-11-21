@@ -408,7 +408,7 @@ public class KeyBindings {
                 ProgramAction action = actions.get(key);
                 if (action != null) {
                     // Parse keys
-                    String keyMappings[] = mapping.getSecond().trim().split("\\s+");
+                    String[] keyMappings = mapping.getSecond().trim().split("\\s+");
                     int[] keyCodes = new int[keyMappings.length];
                     for (int i = 0; i < keyMappings.length; i++) {
                         keyCodes[i] = GSKeys.valueOf(keyMappings[i]);

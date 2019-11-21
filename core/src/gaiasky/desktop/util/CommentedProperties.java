@@ -6,6 +6,7 @@
 package gaiasky.desktop.util;
 
 import java.io.*;
+import java.nio.charset.StandardCharsets;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.Vector;
@@ -39,7 +40,7 @@ public class CommentedProperties extends java.util.Properties {
     public void load(InputStream inStream) throws IOException {
         // The spec says that the file must be encoded using ISO-8859-1.
         BufferedReader reader =
-                new BufferedReader(new InputStreamReader(inStream, "ISO-8859-1"));
+                new BufferedReader(new InputStreamReader(inStream, StandardCharsets.ISO_8859_1));
         String line;
 
         while ((line = reader.readLine()) != null) {

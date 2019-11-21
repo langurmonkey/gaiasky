@@ -129,8 +129,6 @@ public class NaturalMouseKbdListener extends MouseKbdListener implements IObserv
         }
     }
 
-    ;
-
     public final GaiaGestureListener gestureListener;
 
     protected NaturalMouseKbdListener(final GaiaGestureListener gestureListener, NaturalCamera camera) {

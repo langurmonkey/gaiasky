@@ -814,7 +814,7 @@ public class AtmosphereShader extends BaseIntShader {
 
     @Override
     public boolean equals(Object obj) {
-        return (obj instanceof AtmosphereShader) ? equals((AtmosphereShader) obj) : false;
+        return (obj instanceof AtmosphereShader) && equals((AtmosphereShader) obj);
     }
 
     public boolean equals(AtmosphereShader obj) {

@@ -122,7 +122,7 @@ public abstract class ModelCreator {
         for (IFace face : faces) {
             // All vertices of a face share the same normal
             osw.append("f ");
-            int v[] = face.v();
+            int[] v = face.v();
             for (int i = 0; i < v.length; i++) {
                 osw.append(idx(face.v()[i], face.n()[i]));
                 if (i != v.length - 1) {

@@ -1179,6 +1179,6 @@ public enum Events {
     /**
      * Dispose all resources, app is shutting down
      **/
-    DISPOSE;
+    DISPOSE
 
 }

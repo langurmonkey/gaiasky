@@ -113,7 +113,7 @@ public class BinaryDataProvider extends AbstractStarGroupDataProvider {
     }
 
     protected StarBean readStarBean(DataInputStream in) throws IOException {
-        double data[] = new double[StarBean.SIZE];
+        double[] data = new double[StarBean.SIZE];
         // Double
         for (int i = 0; i < StarBean.I_APPMAG; i++) {
             data[i] = in.readDouble();
@@ -166,7 +166,7 @@ public class BinaryDataProvider extends AbstractStarGroupDataProvider {
     }
 
     public StarBean readStarBean(MappedByteBuffer mem) {
-        double data[] = new double[StarBean.SIZE];
+        double[] data = new double[StarBean.SIZE];
         // Double
         for (int i = 0; i < StarBean.I_APPMAG; i++) {
             data[i] = mem.getDouble();

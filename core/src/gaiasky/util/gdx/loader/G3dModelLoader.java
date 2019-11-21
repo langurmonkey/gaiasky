@@ -141,7 +141,7 @@ public class G3dModelLoader extends IntModelLoader<IntModelLoader.IntModelParame
 		int blendWeightCount = 0;
 		for (JsonValue value = attributes.child; value != null; value = value.next) {
 			String attribute = value.asString();
-			String attr = (String)attribute;
+			String attr = attribute;
 			if (attr.equals("POSITION")) {
 				vertexAttributes.add(VertexAttribute.Position());
 			} else if (attr.equals("NORMAL")) {

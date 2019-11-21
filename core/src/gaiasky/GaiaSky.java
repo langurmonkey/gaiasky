@@ -250,8 +250,8 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
         clogger = new ConsoleLogger(true, true);
 
         // Init graphics and window
-        this.graphics = (Lwjgl3Graphics) Gdx.graphics;
-        this.window = this.graphics.getWindow();
+        graphics = (Lwjgl3Graphics) Gdx.graphics;
+        window = graphics.getWindow();
 
         // Basic info
         logger.info(GlobalConf.version.version, I18n.bundle.format("gui.build", GlobalConf.version.build));
@@ -605,9 +605,9 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
         } else {
             // At 5 AU in Y looking towards origin (top-down look)
             EventManager.instance.post(Events.CAMERA_MODE_CMD, CameraMode.FREE_MODE);
-            EventManager.instance.post(Events.CAMERA_POS_CMD, (Object) new double[] { 0, 5 * Constants.AU_TO_U, 0 });
-            EventManager.instance.post(Events.CAMERA_DIR_CMD, (Object) new double[] { 0, -1, 0 });
-            EventManager.instance.post(Events.CAMERA_UP_CMD, (Object) new double[] { 0, 0, 1 });
+            EventManager.instance.post(Events.CAMERA_POS_CMD, new double[] { 0, 5 * Constants.AU_TO_U, 0 });
+            EventManager.instance.post(Events.CAMERA_DIR_CMD, new double[] { 0, -1, 0 });
+            EventManager.instance.post(Events.CAMERA_UP_CMD, new double[] { 0, 0, 1 });
         }
     }
 

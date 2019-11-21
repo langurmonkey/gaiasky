@@ -209,5 +209,4 @@ public final class CrtMonitor extends PostProcessorEffect {
         combine.setOutput(dest).setInput(in, out).render();
     }
 
-    ;
 }

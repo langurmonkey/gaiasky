@@ -6,5 +6,5 @@
 package gaiasky.util.validator;
 
 public interface IValidator {
-    public boolean validate(String value);
+    boolean validate(String value);
 }

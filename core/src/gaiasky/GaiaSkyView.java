@@ -59,7 +59,7 @@ public class GaiaSkyView implements ApplicationListener, IObserver {
     }
 
     public void setWindow(Lwjgl3Window window) {
-        this.window = window;
+        GaiaSkyView.window = window;
     }
 
     @Override

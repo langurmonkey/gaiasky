@@ -102,7 +102,7 @@ public abstract class BaseIntShader implements IntShader {
 	private final Array<String> uniforms = new Array<>();
 	private final Array<Validator> validators = new Array<>();
 	private final Array<Setter> setters = new Array<>();
-	private int locations[];
+	private int[] locations;
 	private final IntArray globalUniforms = new IntArray();
 	private final IntArray localUniforms = new IntArray();
 	private final IntIntMap attributes = new IntIntMap();

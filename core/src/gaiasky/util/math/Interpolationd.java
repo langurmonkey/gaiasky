@@ -219,7 +219,7 @@ public abstract class Interpolationd {
             if (a <= 0.5) return (Math.pow(value, power * (a * 2 - 1)) - min) * scale / 2;
             return (2 - (Math.pow(value, -power * (a * 2 - 1)) - min) * scale) / 2;
         }
-    };
+    }
 
     static public class ExpIn extends Exp {
         public ExpIn (double value, double power) {

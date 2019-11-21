@@ -90,7 +90,7 @@ public class ColourUtils {
      *
      * @param value
      */
-    public static void grayscale(float value, float rgba[]) {
+    public static void grayscale(float value, float[] rgba) {
         rgba[0] = value;
         rgba[1] = value;
         rgba[2] = value;

@@ -189,7 +189,7 @@ public class MslAttitudeDataServer extends HermiteInterpolatedAttitudeDataServer
             double nuDot = msl.getNuDot();
             double omegaDot = msl.getOmegaDot();
 
-            Quaterniond qq[] = AttitudeConverter.heliotropicToQuaternions(lSun, xi, nu, omega, lSunDot, nuDot, omegaDot);
+            Quaterniond[] qq = AttitudeConverter.heliotropicToQuaternions(lSun, xi, nu, omega, lSunDot, nuDot, omegaDot);
             Quaterniond q = qq[0];
             Quaterniond qInvQDot = qq[1].mulLeftInverse(q);
             qX[i] = q.x;

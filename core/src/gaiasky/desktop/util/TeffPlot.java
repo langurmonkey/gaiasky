@@ -7,6 +7,7 @@ package gaiasky.desktop.util;
 
 import java.io.File;
 import java.io.PrintWriter;
+import java.nio.charset.StandardCharsets;
 
 /**
  * Produces a plot of ColorXP (BP-RP) vs log(Teff))
@@ -25,7 +26,7 @@ public class TeffPlot {
         double step = (endxp - startxp) / (double) nsteps;
 
         try {
-            PrintWriter writer = new PrintWriter(f, "UTF-8");
+            PrintWriter writer = new PrintWriter(f, StandardCharsets.UTF_8);
             writer.println("bp-rp,logteff,teff");
 
             double currxp = startxp;

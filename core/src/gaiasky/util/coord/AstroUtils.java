@@ -546,8 +546,8 @@ public class AstroUtils {
      */
     @SuppressWarnings("unused")
     public static double getJulianDayNumberBook(int year, int month, int day) {
-        int a = (int) (year / 100);
-        int b = 2 - a + (int) (a / 4);
+        int a = year / 100;
+        int b = 2 - a + (a / 4);
 
         // Julian day
         return (int) (365.242 * (year + 4716)) + (int) (30.6001 * (month)) + day + b - 1524.5d;
@@ -565,11 +565,11 @@ public class AstroUtils {
      * "http://en.wikipedia.org/wiki/Julian_day">http://en.wikipedia.org/wiki/Julian_day</a>
      */
     public static double getJulianDayNumberWikipediaGregorianCalendar(int year, int month, int day) {
-        int a = (int) ((14 - month) / 12);
+        int a = (14 - month) / 12;
         int y = year + 4800 - a;
         int m = month + 12 * a - 3;
 
-        return day + (int) ((153 * m + 2) / 5) + 365 * y + (int) (y / 4) - (int) (y / 100) + (int) (y / 400) - 32045.5;
+        return day + ((153 * m + 2) / 5) + 365 * y + (y / 4) - (y / 100) + (y / 400) - 32045.5;
     }
 
     /**
@@ -584,11 +584,11 @@ public class AstroUtils {
      * "http://en.wikipedia.org/wiki/Julian_day">http://en.wikipedia.org/wiki/Julian_day</a>
      */
     public static double getJulianDayNumberWikipediaJulianCalendar(int year, int month, int day) {
-        int a = (int) ((14 - month) / 12);
+        int a = (14 - month) / 12;
         int y = year + 4800 - a;
         int m = month + 12 * a - 3;
 
-        return day + (int) ((153 * m + 2) / 5) + 365 * y + (int) (y / 4) - 32083.5;
+        return day + ((153 * m + 2) / 5) + 365 * y + (y / 4) - 32083.5;
     }
 
     public static Instant julianDateToInstant(double jd) {

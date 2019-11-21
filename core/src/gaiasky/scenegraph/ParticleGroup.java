@@ -904,7 +904,7 @@ public class ParticleGroup extends FadeNode implements I3DTextRenderable, IFocus
     }
 
     public boolean canSelect(){
-        return candidateFocusIndex >= 0 && candidateFocusIndex < size() ? filter(candidateFocusIndex) : true;
+        return candidateFocusIndex < 0 || candidateFocusIndex >= size() || filter(candidateFocusIndex);
     }
 
     public boolean mustAddToIndex() {

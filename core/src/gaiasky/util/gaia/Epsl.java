@@ -28,8 +28,6 @@ public class Epsl extends AnalyticalAttitudeDataServer {
         FOLLOWING
     }
 
-    ;
-
     /** The current mode **/
     private Mode currentMode;
 

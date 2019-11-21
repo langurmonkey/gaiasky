@@ -58,7 +58,7 @@ public final class Vignetting extends Filter<Vignetting> {
         private final String mnemonic;
         private int elementSize;
 
-        private Param(String m, int elementSize) {
+        Param(String m, int elementSize) {
             this.mnemonic = m;
             this.elementSize = elementSize;
         }
@@ -184,7 +184,7 @@ public final class Vignetting extends Filter<Vignetting> {
     }
 
     public int getLutIndexVal(int index) {
-        return (int) lutindex[index];
+        return lutindex[index];
     }
 
     public float getLutIntensity() {

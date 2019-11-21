@@ -88,7 +88,7 @@ public class IntRenderable {
 	 * index in the array. If the array isn't large enough then the identity matrix is used. Each BoneWeight weight is used to
 	 * combine multiple bones into a single transformation matrix, which is used to transform the vertex to model space. In other
 	 * words: the bone transformation is applied prior to the {@link #worldTransform}. */
-	public Matrix4 bones[];
+	public Matrix4[] bones;
 	/** The {@link IntShader} to be used to render this Renderable using a {@link IntModelBatch}, may be null. It is not guaranteed that
 	 * the shader will be used, the used {@link IntShaderProvider} is responsible for actually choosing the correct shader to use. **/
 	public IntShader shader;

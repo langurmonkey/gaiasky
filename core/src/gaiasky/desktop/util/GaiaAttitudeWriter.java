@@ -13,6 +13,7 @@ import gaiasky.util.math.Quaterniond;
 import gaiasky.util.math.Vector3d;
 
 import java.io.*;
+import java.nio.charset.StandardCharsets;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
@@ -51,8 +52,8 @@ public class GaiaAttitudeWriter {
         File feq = new File(System.getProperty("java.io.tmpdir") + File.separator + filenameEq);
 
         try {
-            Writer writerEcl = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(fecl), "utf-8"));
-            Writer writerEq = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(feq), "utf-8"));
+            Writer writerEcl = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(fecl), StandardCharsets.UTF_8));
+            Writer writerEq = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(feq), StandardCharsets.UTF_8));
 
             if (type.equals(OutputType.UP_VECTOR)) {
                 writerEcl.append("#EclLong[deg], EclLat[deg], t[ms-January_1_1970_00:00:00_GMT], current[date], attitudeFile\n");

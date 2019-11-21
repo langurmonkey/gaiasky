@@ -110,7 +110,7 @@ public class SearchDialog extends GenericDialog {
                 if (node instanceof IFocus) {
                     IFocus focus = ((IFocus) node).getFocus(text);
                     boolean timeOverflow = focus.isCoordinatesTimeOverflow();
-                    boolean canSelect = focus instanceof ParticleGroup ? ((ParticleGroup)focus).canSelect() : true;
+                    boolean canSelect = !(focus instanceof ParticleGroup) || ((ParticleGroup) focus).canSelect();
                     boolean ctOn = GaiaSky.instance.isOn(focus.getCt());
                     if (!timeOverflow && canSelect && ctOn) {
                         GaiaSky.postRunnable(() -> {

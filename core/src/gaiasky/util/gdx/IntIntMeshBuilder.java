@@ -131,7 +131,7 @@ public class IntIntMeshBuilder implements IntMeshPartBuilder {
             attrs.add(new VertexAttribute(Usage.BiNormal, 3, ShaderProgram.BINORMAL_ATTRIBUTE));
         if ((usage & Usage.TextureCoordinates) == Usage.TextureCoordinates)
             attrs.add(new VertexAttribute(Usage.TextureCoordinates, 2, ShaderProgram.TEXCOORD_ATTRIBUTE + "0"));
-        final VertexAttribute attributes[] = new VertexAttribute[attrs.size];
+        final VertexAttribute[] attributes = new VertexAttribute[attrs.size];
         for (int i = 0; i < attributes.length; i++)
             attributes[i] = attrs.get(i);
         return new VertexAttributes(attributes);
@@ -679,7 +679,7 @@ public class IntIntMeshBuilder implements IntMeshPartBuilder {
             for (int v = 0; v <= divisionsV; v++) {
                 final int idx = vertex(vertTmp7.set(vertTmp5).lerp(vertTmp6, (float) v / (float) divisionsV));
                 if (u > 0 && v > 0)
-                    rect((int) (idx - divisionsV - 2), (int) (idx - 1), idx, (int) (idx - divisionsV - 1));
+                    rect(idx - divisionsV - 2, idx - 1, idx, idx - divisionsV - 1);
             }
         }
     }

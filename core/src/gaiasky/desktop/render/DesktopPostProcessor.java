@@ -152,7 +152,7 @@ public class DesktopPostProcessor implements IPostProcessor, IObserver {
         ppb.lightglow.setTextureScale(getGlowTextureScale(GlobalConf.scene.STAR_BRIGHTNESS, GlobalConf.scene.STAR_POINT_SIZE, GaiaSky.instance.cam.getFovFactor()));
         ppb.lightglow.setSpiralScale(getGlowSpiralScale(GlobalConf.scene.STAR_BRIGHTNESS, GlobalConf.scene.STAR_POINT_SIZE, GaiaSky.instance.cam.getFovFactor()));
         updateGlow(ppb, gq);
-        ppb.lightglow.setEnabled(SysUtils.isMac() ? false : GlobalConf.postprocess.POSTPROCESS_LIGHT_SCATTERING);
+        ppb.lightglow.setEnabled(!SysUtils.isMac() && GlobalConf.postprocess.POSTPROCESS_LIGHT_SCATTERING);
         ppb.pp.addEffect(ppb.lightglow);
 
         /*

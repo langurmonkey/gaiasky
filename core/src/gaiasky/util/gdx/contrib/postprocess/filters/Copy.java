@@ -33,7 +33,7 @@ public class Copy extends Filter<Copy> {
         private final String mnemonic;
         private int elementSize;
 
-        private Param(String m, int elementSize) {
+        Param(String m, int elementSize) {
             this.mnemonic = m;
             this.elementSize = elementSize;
         }

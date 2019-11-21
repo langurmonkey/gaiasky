@@ -129,7 +129,7 @@ public class ObjLoader extends IntModelLoader<ObjLoader.ObjLoaderParameters> {
 
     @Override
     public IntModelData loadModelData(FileHandle file, ObjLoaderParameters parameters) {
-        return loadModelData(file, parameters == null ? false : parameters.flipV);
+        return loadModelData(file, parameters != null && parameters.flipV);
     }
 
     protected IntModelData loadModelData(FileHandle file, boolean flipV) {

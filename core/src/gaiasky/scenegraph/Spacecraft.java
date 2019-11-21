@@ -165,11 +165,7 @@ public class Spacecraft extends GenericSpacecraft implements ILineRenderable, IO
         switch (event) {
         case CAMERA_MODE_CMD:
             CameraMode mode = (CameraMode) data[0];
-            if (mode == CameraMode.SPACECRAFT_MODE) {
-                render = true;
-            } else {
-                render = false;
-            }
+            render = mode == CameraMode.SPACECRAFT_MODE;
             break;
         case SPACECRAFT_STABILISE_CMD:
             leveling = (Boolean) data[0];

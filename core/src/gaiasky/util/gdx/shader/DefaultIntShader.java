@@ -227,7 +227,7 @@ public class DefaultIntShader extends BaseIntShader {
 
         public static class Bones extends LocalSetter {
             private final static Matrix4 idtMatrix = new Matrix4();
-            public final float bones[];
+            public final float[] bones;
 
             public Bones(final int numBones) {
                 this.bones = new float[numBones * 16];
@@ -360,7 +360,7 @@ public class DefaultIntShader extends BaseIntShader {
         };
 
         public static class ACubemap extends LocalSetter {
-            private final static float ones[] = { 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1 };
+            private final static float[] ones = { 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1 };
             private final AmbientCubemap cacheAmbientCubemap = new AmbientCubemap();
             private final static Vector3 tmpV1 = new Vector3();
             public final int dirLightsOffset;
@@ -516,9 +516,9 @@ public class DefaultIntShader extends BaseIntShader {
     protected final boolean environmentCubemap;
     protected final boolean shadowMap;
     protected final AmbientCubemap ambientCubemap = new AmbientCubemap();
-    protected final DirectionalLight directionalLights[];
-    protected final PointLight pointLights[];
-    protected final SpotLight spotLights[];
+    protected final DirectionalLight[] directionalLights;
+    protected final PointLight[] pointLights;
+    protected final SpotLight[] spotLights;
 
     /** The renderable used to create this shader, invalid after the call to init */
     private IntRenderable renderable;

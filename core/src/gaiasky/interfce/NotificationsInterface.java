@@ -113,7 +113,7 @@ public class NotificationsInterface extends TableGuiInterface implements IObserv
     public NotificationsInterface(List<MessageBean> logs, long msTimeout, Skin skin, boolean multiple, boolean bg) {
         super(skin);
         if (logs != null)
-            this.historical.addAll(logs);
+            historical.addAll(logs);
         this.msTimeout = msTimeout;
         this.multiple = multiple;
 
@@ -264,7 +264,7 @@ public class NotificationsInterface extends TableGuiInterface implements IObserv
             case CAMERA_MODE_CMD:
                 CameraMode cm = (CameraMode) data[0];
                 if (cm != CameraMode.FOCUS_MODE)
-                    addMessage(I18n.bundle.format("notif.cameramode.change", (CameraMode) data[0]));
+                    addMessage(I18n.bundle.format("notif.cameramode.change", data[0]));
                 break;
             case PACE_CHANGED_INFO:
                 addMessage(I18n.bundle.format("notif.timepace.change", data[0]));

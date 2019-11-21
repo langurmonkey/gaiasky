@@ -201,11 +201,9 @@ public class AttitudeConverter {
         double rateY = -lSunDot * sinObliquity + h.getNuDot() * sinLSun
                 * cosObliquity + h.getOmegaDot() * zInSrs.y + h.getXiDot()
                 * sz.y;
-        ;
         double rateZ = lSunDot * cosObliquity + h.getNuDot() * sinLSun
                 * sinObliquity + h.getOmegaDot() * zInSrs.z + h.getXiDot()
                 * sz.z;
-        ;
         Quaterniond halfSpinInIcrs = new Quaterniond(0.5 * rateZ, 0.5 * rateX,
                 0.5 * rateY, 0.0);
         Quaterniond qDot = halfSpinInIcrs.mul(q);

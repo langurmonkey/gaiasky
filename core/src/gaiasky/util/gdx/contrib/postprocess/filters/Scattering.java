@@ -64,7 +64,7 @@ public final class Scattering extends Filter<Scattering> {
         private String mnemonic;
         private int elementSize;
 
-        private Param(String mnemonic, int arrayElementSize) {
+        Param(String mnemonic, int arrayElementSize) {
             this.mnemonic = mnemonic;
             this.elementSize = arrayElementSize;
         }

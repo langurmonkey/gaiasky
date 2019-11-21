@@ -188,7 +188,7 @@ public class CatmullRomSplined<T extends Vectord<T>> implements Pathd<T> {
         double L1Sqr = P1.dst2(P2);
         double L2Sqr = P3.dst2(P2);
         double L3Sqr = P3.dst2(P1);
-        double L1 = (double)Math.sqrt(L1Sqr);
+        double L1 = Math.sqrt(L1Sqr);
         double s = (L2Sqr + L1Sqr - L3Sqr) / (2.0 * L1);
         double u = MathUtils.clamp((L1 - s) / L1, 0f, 1f);
         return (n + u) / spanCount;

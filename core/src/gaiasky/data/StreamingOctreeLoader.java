@@ -276,9 +276,7 @@ public abstract class StreamingOctreeLoader implements IObserver, ISceneGraphLoa
         // it follows naturally that lower levels will always be kept
         // at the head of the queue, whereas higher level octants
         // are always at the tail and are the last to be unloaded
-        if (toUnloadQueue.contains(octant)) {
-            toUnloadQueue.remove(octant);
-        }
+        toUnloadQueue.remove(octant);
         // Only attempt to unload the octants with a depth larger than preload_depth
         if (octant.depth > PRELOAD_DEPTH)
             toUnloadQueue.offer(octant);

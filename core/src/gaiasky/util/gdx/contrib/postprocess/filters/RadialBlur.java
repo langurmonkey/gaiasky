@@ -41,7 +41,7 @@ public final class RadialBlur extends Filter<RadialBlur> {
 
         final int length;
 
-        private Quality(int value) {
+        Quality(int value) {
             this.length = value;
         }
     }
@@ -60,7 +60,7 @@ public final class RadialBlur extends Filter<RadialBlur> {
         private String mnemonic;
         private int elementSize;
 
-        private Param(String mnemonic, int arrayElementSize) {
+        Param(String mnemonic, int arrayElementSize) {
             this.mnemonic = mnemonic;
             this.elementSize = arrayElementSize;
         }

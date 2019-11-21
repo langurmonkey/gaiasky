@@ -13,5 +13,5 @@ import com.badlogic.gdx.math.Matrix4;
  *
  */
 public interface ITransform {
-    public void apply(Matrix4 mat);
+    void apply(Matrix4 mat);
 }

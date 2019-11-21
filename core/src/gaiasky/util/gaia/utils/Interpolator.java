@@ -128,9 +128,9 @@ public class Interpolator {
      * @author lennartlindegren
      * @version $Id: Interpolator.java 374850 2014-07-01 16:04:16Z pbalm $
      */
-    public static enum Kind {
+    public enum Kind {
         DER, VAL, INT
-    };
+    }
 
     /**
      * Evaluates the quaternion derivative, value or integral at point tx, using
@@ -157,7 +157,7 @@ public class Interpolator {
     public static Quaterniond qEval(double tx, double[] t, Quaterniond[] q, Quaterniond[] qDot, int left, Kind kind) {
         double dt = t[left + 1] - t[left];
         double x = (tx - t[left]) / dt;
-        double p[];
+        double[] p;
         switch (kind) {
         case DER:
             p = Interpolator.interPolDer(x);

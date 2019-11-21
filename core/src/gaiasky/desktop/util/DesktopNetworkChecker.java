@@ -300,8 +300,8 @@ public class DesktopNetworkChecker extends Thread implements INetworkChecker {
     }
 
     private interface LinkListener {
-        public void ok(String link);
+        void ok(String link);
 
-        public void ko(String link);
+        void ko(String link);
     }
 }

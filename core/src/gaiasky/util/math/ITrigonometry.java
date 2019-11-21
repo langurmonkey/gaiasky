@@ -12,16 +12,16 @@ package gaiasky.util.math;
  *
  */
 public interface ITrigonometry {
-    public double sin(double angle);
+    double sin(double angle);
 
-    public double asin(double angle);
+    double asin(double angle);
 
-    public double cos(double angle);
+    double cos(double angle);
 
-    public double acos(double angle);
+    double acos(double angle);
 
-    public double tan(double angle);
+    double tan(double angle);
 
-    public double atan(double angle);
+    double atan(double angle);
 
 }

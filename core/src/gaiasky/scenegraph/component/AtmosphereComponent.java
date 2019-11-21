@@ -60,7 +60,7 @@ public class AtmosphereComponent {
 
     public void doneLoading(Material planetMat, float planetSize) {
         this.planetSize = planetSize;
-        setUpAtmosphericScatteringMaterial(planetMat, correctGround ? true : false);
+        setUpAtmosphericScatteringMaterial(planetMat, correctGround);
 
         Pair<IntModel, Map<String, Material>> pair = ModelCache.cache.getModel("sphere", params, Usage.Position | Usage.Normal);
         IntModel atmosphereModel = pair.getFirst();

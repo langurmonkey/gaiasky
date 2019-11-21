@@ -31,26 +31,26 @@ public interface IAggregationAlgorithm {
      *            The percentage of objects to be included in the octant.
      * @return True if we are in a leaf.
      */
-    public boolean sample(Array<StarBean> inputStars, OctreeNode octant, float percentage);
+    boolean sample(Array<StarBean> inputStars, OctreeNode octant, float percentage);
 
     /**
      * Gets the maximum number of particles in a single node
      * 
      * @return maximum number of particles in a node
      */
-    public int getMaxPart();
+    int getMaxPart();
 
     /**
      * Returns the number of discarded stars by this algorithm so far.
      * 
      * @return The number of stars discarded.
      */
-    public int getDiscarded();
+    int getDiscarded();
 
     /**
      * Returns the max depth setting.
      * @return The max depth
      */
-    public int getMaxDepth();
+    int getMaxDepth();
 
 }

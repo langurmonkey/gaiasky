@@ -118,7 +118,7 @@ public class Logger {
     private static String parse(String msg, Object... args) {
         for (Object arg1 : args) {
             String arg = arg1 != null ? arg1.toString() : "null";
-            msg = msg.replaceFirst("\\{\\}", arg);
+            msg = msg.replaceFirst("\\{}", arg);
         }
         return msg;
 

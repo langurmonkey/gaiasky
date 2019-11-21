@@ -326,6 +326,6 @@ public class GtiList extends ArrayList<Gti> {
         SORTED, /**
          * Field REDUCED.
          */
-        REDUCED;
+        REDUCED
     }
 }

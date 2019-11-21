@@ -33,7 +33,7 @@ public final class MathUtilsd {
 
     static private final int ACOS_RESOLUTION = 50;
     static private final int ACOS_COUNT = 360 * ACOS_RESOLUTION;
-    static private final int ACOS_COUNT_1 = ACOS_COUNT - 1;;
+    static private final int ACOS_COUNT_1 = ACOS_COUNT - 1;
 
     static private final double radFull = PI * 2;
     static private final double degFull = 360;
@@ -186,8 +186,8 @@ public final class MathUtilsd {
     public static double randomTriangular (double min, double max, double mode) {
         double u = random.nextDouble();
         double d = max - min;
-        if (u <= (mode - min) / d) return min + (double)Math.sqrt(u * d * (mode - min));
-        return max - (double)Math.sqrt((1 - u) * d * (max - mode));
+        if (u <= (mode - min) / d) return min + Math.sqrt(u * d * (mode - min));
+        return max - Math.sqrt((1 - u) * d * (max - mode));
     }
 
 

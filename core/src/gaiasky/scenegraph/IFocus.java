@@ -306,7 +306,7 @@ public interface IFocus {
      * @param camera The camera
      * @param hits   The list where the focus is to be added
      */
-    public void addHit(Vector3d p0, Vector3d p1, NaturalCamera camera, Array<IFocus> hits);
+    void addHit(Vector3d p0, Vector3d p1, NaturalCamera camera, Array<IFocus> hits);
 
     /**
      * Hook that runs when the candidate is actually made focus

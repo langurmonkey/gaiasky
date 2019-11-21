@@ -35,13 +35,13 @@ import java.nio.FloatBuffer;
  * @author mzechner */
 public interface IntVertexData extends Disposable {
 	/** @return the number of vertices this VertexData stores */
-	public int getNumVertices();
+    int getNumVertices();
 
 	/** @return the number of vertices this VertedData can store */
-	public int getNumMaxVertices();
+    int getNumMaxVertices();
 
 	/** @return the {@link VertexAttributes} as specified during construction. */
-	public VertexAttributes getAttributes();
+    VertexAttributes getAttributes();
 
 	/** Sets the vertices of this VertexData, discarding the old vertex data. The count must equal the number of floats per vertex
 	 * times the number of vertices to be copied to this VertexData. The order of the vertex attributes must be the same as
@@ -51,37 +51,37 @@ public interface IntVertexData extends Disposable {
 	 * @param vertices the vertex data
 	 * @param offset the offset to start copying the data from
 	 * @param count the number of floats to copy */
-	public void setVertices(float[] vertices, int offset, int count);
+    void setVertices(float[] vertices, int offset, int count);
 
 	/** Update (a portion of) the vertices. Does not resize the backing buffer.
 	 * @param vertices the vertex data
 	 * @param sourceOffset the offset to start copying the data from
 	 * @param count the number of floats to copy */
-	public void updateVertices(int targetOffset, float[] vertices, int sourceOffset, int count);
+    void updateVertices(int targetOffset, float[] vertices, int sourceOffset, int count);
 
 	/** Returns the underlying FloatBuffer and marks it as dirty, causing the buffer contents to be uploaded on the next call to
 	 * bind. If you need immediate uploading use {@link #setVertices(float[], int, int)}; Any modifications made to the Buffer
 	 * *after* the call to bind will not automatically be uploaded.
 	 * @return the underlying FloatBuffer holding the vertex data. */
-	public FloatBuffer getBuffer();
+    FloatBuffer getBuffer();
 
 	/** Binds this VertexData for rendering via glDrawArrays or glDrawElements. */
-	public void bind(ExtShaderProgram shader);
+    void bind(ExtShaderProgram shader);
 
 	/** Binds this VertexData for rendering via glDrawArrays or glDrawElements.
 	 * @param locations array containing the attribute locations. */
-	public void bind(ExtShaderProgram shader, int[] locations);
+    void bind(ExtShaderProgram shader, int[] locations);
 
 	/** Unbinds this VertexData. */
-	public void unbind(ExtShaderProgram shader);
+    void unbind(ExtShaderProgram shader);
 
 	/** Unbinds this VertexData.
 	 * @param locations array containing the attribute locations. */
-	public void unbind(ExtShaderProgram shader, int[] locations);
+    void unbind(ExtShaderProgram shader, int[] locations);
 
 	/** Invalidates the VertexData if applicable. Use this in case of a context loss. */
-	public void invalidate();
+    void invalidate();
 
 	/** Disposes this VertexData and all its associated OpenGL resources. */
-	public void dispose();
+    void dispose();
 }
