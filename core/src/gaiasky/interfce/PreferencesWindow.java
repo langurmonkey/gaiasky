@@ -120,37 +120,37 @@ public class PreferencesWindow extends GenericDialog {
         VerticalGroup group = new VerticalGroup();
         group.align(Align.left | Align.top);
 
-        final Button tabGraphics = new OwnTextIconButton(I18n.txt("gui.graphicssettings"), new Image(skin.getDrawable("icon-p-graphics")), skin, "toggle-big");
+        final Button tabGraphics = new OwnTextIconButton(I18n.txt("gui.graphicssettings"), new Image(skin.getDrawable("iconic-bolt")), skin, "toggle-big");
         tabGraphics.pad(pad5);
         tabGraphics.setWidth(tabwidth);
-        final Button tabUI = new OwnTextIconButton(I18n.txt("gui.ui.interfacesettings"), new Image(skin.getDrawable("icon-p-interface")), skin, "toggle-big");
+        final Button tabUI = new OwnTextIconButton(I18n.txt("gui.ui.interfacesettings"), new Image(skin.getDrawable("iconic-browser")), skin, "toggle-big");
         tabUI.pad(pad5);
         tabUI.setWidth(tabwidth);
-        final Button tabPerformance = new OwnTextIconButton(I18n.txt("gui.performance"), new Image(skin.getDrawable("icon-p-performance")), skin, "toggle-big");
+        final Button tabPerformance = new OwnTextIconButton(I18n.txt("gui.performance"), new Image(skin.getDrawable("iconic-dial")), skin, "toggle-big");
         tabPerformance.pad(pad5);
         tabPerformance.setWidth(tabwidth);
-        final Button tabControls = new OwnTextIconButton(I18n.txt("gui.controls"), new Image(skin.getDrawable("icon-p-controls")), skin, "toggle-big");
+        final Button tabControls = new OwnTextIconButton(I18n.txt("gui.controls"), new Image(skin.getDrawable("iconic-laptop")), skin, "toggle-big");
         tabControls.pad(pad5);
         tabControls.setWidth(tabwidth);
-        final Button tabScreenshots = new OwnTextIconButton(I18n.txt("gui.screenshots"), new Image(skin.getDrawable("icon-p-screenshots")), skin, "toggle-big");
+        final Button tabScreenshots = new OwnTextIconButton(I18n.txt("gui.screenshots"), new Image(skin.getDrawable("iconic-image")), skin, "toggle-big");
         tabScreenshots.pad(pad5);
         tabScreenshots.setWidth(tabwidth);
-        final Button tabFrames = new OwnTextIconButton(I18n.txt("gui.frameoutput.title"), new Image(skin.getDrawable("icon-p-frameoutput")), skin, "toggle-big");
+        final Button tabFrames = new OwnTextIconButton(I18n.txt("gui.frameoutput.title"), new Image(skin.getDrawable("iconic-layers")), skin, "toggle-big");
         tabFrames.pad(pad5);
         tabFrames.setWidth(tabwidth);
-        final Button tabCamera = new OwnTextIconButton(I18n.txt("gui.camerarec.title"), new Image(skin.getDrawable("icon-p-camera")), skin, "toggle-big");
+        final Button tabCamera = new OwnTextIconButton(I18n.txt("gui.camerarec.title"), new Image(skin.getDrawable("iconic-camera-slr")), skin, "toggle-big");
         tabCamera.pad(pad5);
         tabCamera.setWidth(tabwidth);
-        final Button tab360 = new OwnTextIconButton(I18n.txt("gui.360.title"), new Image(skin.getDrawable("icon-p-360")), skin, "toggle-big");
+        final Button tab360 = new OwnTextIconButton(I18n.txt("gui.360.title"), new Image(skin.getDrawable("iconic-globe")), skin, "toggle-big");
         tab360.pad(pad5);
         tab360.setWidth(tabwidth);
-        final Button tabData = new OwnTextIconButton(I18n.txt("gui.data"), new Image(skin.getDrawable("icon-p-data")), skin, "toggle-big");
+        final Button tabData = new OwnTextIconButton(I18n.txt("gui.data"), new Image(skin.getDrawable("iconic-clipboard")), skin, "toggle-big");
         tabData.pad(pad5);
         tabData.setWidth(tabwidth);
-        final Button tabGaia = new OwnTextIconButton(I18n.txt("gui.gaia"), new Image(skin.getDrawable("icon-p-gaia")), skin, "toggle-big");
+        final Button tabGaia = new OwnTextIconButton(I18n.txt("gui.gaia"), new Image(skin.getDrawable("iconic-gaia")), skin, "toggle-big");
         tabGaia.pad(pad5);
         tabGaia.setWidth(tabwidth);
-        final Button tabSystem = new OwnTextIconButton(I18n.txt("gui.system"), new Image(skin.getDrawable("icon-p-system")), skin, "toggle-big");
+        final Button tabSystem = new OwnTextIconButton(I18n.txt("gui.system"), new Image(skin.getDrawable("iconic-terminal")), skin, "toggle-big");
         tabSystem.pad(pad5);
         tabSystem.setWidth(tabwidth);
 
@@ -1032,7 +1032,12 @@ public class PreferencesWindow extends GenericDialog {
             HorizontalGroup keysGroup = new HorizontalGroup();
             keysGroup.space(pad5);
             for (int j = 1; j < action.length; j++) {
-                keysGroup.addActor(new OwnLabel(action[j], skin, "default-pink"));
+                String[] keys = action[j].split("\\+");
+                for(int k = 0; k < keys.length; k++){
+                    keysGroup.addActor(new OwnLabel(keys[k].trim(), skin, "default-pink"));
+                    if(k < keys.length - 1)
+                        keysGroup.addActor(new OwnLabel("+", skin));
+                }
                 if (j < action.length - 1)
                     keysGroup.addActor(new OwnLabel("/", skin));
             }
@@ -2013,7 +2018,7 @@ public class PreferencesWindow extends GenericDialog {
         int i = 0;
         int n = keys.size();
         for (Integer key : keys) {
-            s += Keys.toString(key).toUpperCase().replace(' ', '_');
+            s += keyToString(key).toUpperCase().replace(' ', '_');
             if (i < n - 1) {
                 s += "+";
             }
@@ -2022,6 +2027,15 @@ public class PreferencesWindow extends GenericDialog {
         }
 
         return s;
+    }
+
+    private String keyToString(int key){
+        switch(key){
+        case Keys.PLUS:
+            return "+";
+        default:
+            return Keys.toString(key);
+        }
     }
 
 }

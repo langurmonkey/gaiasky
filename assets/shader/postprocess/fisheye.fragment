@@ -17,36 +17,50 @@
 
 uniform sampler2D u_texture0;
 uniform vec2 u_viewport;
+uniform float u_fov;
+// 0 - default
+// 1 - accurate (with fov, no full coverage)
+uniform int u_mode;
 
 in vec2 v_texCoords;
 layout (location = 0) out vec4 fragColor;
 
 #define PI 3.1415926535
- 
+
 void main()
 {
-  float arx = min(1.0, u_viewport.y / u_viewport.x);
-  float ary = min(1.0, u_viewport.x / u_viewport.y);
+    float arx = min(1.0, u_viewport.y / u_viewport.x);
+    float ary = min(1.0, u_viewport.x / u_viewport.y);
 
-  vec2 uv;
+    vec2 uv;
 
-  // tc in v_texCoords in [-1, 1]
-  vec2 tc = v_texCoords * 2.0 - 1.0;
-  vec2 arv = u_viewport.xy / min(u_viewport.x, u_viewport.y);
-  vec2 xy = tc * arv;
-  float d = length(xy);
-  if (d < 1.0) {
-    float z = sqrt(1.0 - d * d);
-    float r = atan(d, z) / PI;
-    float phi = atan(xy.y, xy.x);
-    
-    uv.x = (r * cos(phi) + 0.5) * arx + (1.0 - arx) / 2.0;
-    uv.y = (r * sin(phi) + 0.5) * ary + (1.0 - ary) / 2.0;
+    // tc in v_texCoords in [-1, 1]
+    vec2 tc = v_texCoords * 2.0 - 1.0;
+    vec2 arv = u_viewport.xy / min(u_viewport.x, u_viewport.y);
+    // Coordinates of current fragment
+    vec2 xy = tc * arv;
+    // Distance from centre to current fragment
+    float d = length(xy);
+    if (d < 1.0) {
 
-    vec4 c = texture(u_texture0, uv);
-  	fragColor = c;
-  } else {
-	fragColor = vec4(0.0, 0.0, 0.0, 1.0);
-  }
-  
+        if (u_mode == 1){
+            float z = sqrt(1.0 - d * d);
+            float r = atan(d, z) / PI;
+            float phi = atan(xy.y, xy.x);
+
+            uv.x = (r * cos(phi) + 0.5) * arx + (1.0 - arx) / 2.0;
+            uv.y = (r * sin(phi) + 0.5) * ary + (1.0 - ary) / 2.0;
+            fragColor = texture(u_texture0, uv);
+        } else {
+            uv = v_texCoords - 0.5;
+            uv = v_texCoords * 2.0 - 1.0;
+            float z = sqrt(1.0 - d * d);
+            float a = 1.0 / (z * tan(u_fov * 0.5));
+            fragColor = texture2D(u_texture0, (uv* a) + 0.5);
+        }
+
+    } else {
+        fragColor = vec4(0.0, 0.0, 0.0, 1.0);
+    }
+
 }
