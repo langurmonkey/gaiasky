@@ -62,6 +62,10 @@ import java.util.TreeSet;
 public class PreferencesWindow extends GenericDialog {
     private static Log logger = Logger.getLogger(PreferencesWindow.class);
 
+    // Remember the last tab opened
+    private static OwnTextIconButton lastTab;
+    private static boolean lastTabFlag = true;
+
     private Array<Actor> contents;
     private Array<OwnLabel> labels;
 
@@ -102,6 +106,7 @@ public class PreferencesWindow extends GenericDialog {
 
         // Build UI
         buildSuper();
+
     }
 
     @Override
@@ -120,37 +125,37 @@ public class PreferencesWindow extends GenericDialog {
         VerticalGroup group = new VerticalGroup();
         group.align(Align.left | Align.top);
 
-        final Button tabGraphics = new OwnTextIconButton(I18n.txt("gui.graphicssettings"), new Image(skin.getDrawable("iconic-bolt")), skin, "toggle-big");
+        final OwnTextIconButton tabGraphics = new OwnTextIconButton(I18n.txt("gui.graphicssettings"), new Image(skin.getDrawable("iconic-bolt")), skin, "toggle-big");
         tabGraphics.pad(pad5);
         tabGraphics.setWidth(tabwidth);
-        final Button tabUI = new OwnTextIconButton(I18n.txt("gui.ui.interfacesettings"), new Image(skin.getDrawable("iconic-browser")), skin, "toggle-big");
+        final OwnTextIconButton tabUI = new OwnTextIconButton(I18n.txt("gui.ui.interfacesettings"), new Image(skin.getDrawable("iconic-browser")), skin, "toggle-big");
         tabUI.pad(pad5);
         tabUI.setWidth(tabwidth);
-        final Button tabPerformance = new OwnTextIconButton(I18n.txt("gui.performance"), new Image(skin.getDrawable("iconic-dial")), skin, "toggle-big");
+        final OwnTextIconButton tabPerformance = new OwnTextIconButton(I18n.txt("gui.performance"), new Image(skin.getDrawable("iconic-dial")), skin, "toggle-big");
         tabPerformance.pad(pad5);
         tabPerformance.setWidth(tabwidth);
-        final Button tabControls = new OwnTextIconButton(I18n.txt("gui.controls"), new Image(skin.getDrawable("iconic-laptop")), skin, "toggle-big");
+        final OwnTextIconButton tabControls = new OwnTextIconButton(I18n.txt("gui.controls"), new Image(skin.getDrawable("iconic-laptop")), skin, "toggle-big");
         tabControls.pad(pad5);
         tabControls.setWidth(tabwidth);
-        final Button tabScreenshots = new OwnTextIconButton(I18n.txt("gui.screenshots"), new Image(skin.getDrawable("iconic-image")), skin, "toggle-big");
+        final OwnTextIconButton tabScreenshots = new OwnTextIconButton(I18n.txt("gui.screenshots"), new Image(skin.getDrawable("iconic-image")), skin, "toggle-big");
         tabScreenshots.pad(pad5);
         tabScreenshots.setWidth(tabwidth);
-        final Button tabFrames = new OwnTextIconButton(I18n.txt("gui.frameoutput.title"), new Image(skin.getDrawable("iconic-layers")), skin, "toggle-big");
+        final OwnTextIconButton tabFrames = new OwnTextIconButton(I18n.txt("gui.frameoutput.title"), new Image(skin.getDrawable("iconic-layers")), skin, "toggle-big");
         tabFrames.pad(pad5);
         tabFrames.setWidth(tabwidth);
-        final Button tabCamera = new OwnTextIconButton(I18n.txt("gui.camerarec.title"), new Image(skin.getDrawable("iconic-camera-slr")), skin, "toggle-big");
+        final OwnTextIconButton tabCamera = new OwnTextIconButton(I18n.txt("gui.camerarec.title"), new Image(skin.getDrawable("iconic-camera-slr")), skin, "toggle-big");
         tabCamera.pad(pad5);
         tabCamera.setWidth(tabwidth);
-        final Button tab360 = new OwnTextIconButton(I18n.txt("gui.360.title"), new Image(skin.getDrawable("iconic-globe")), skin, "toggle-big");
+        final OwnTextIconButton tab360 = new OwnTextIconButton(I18n.txt("gui.360.title"), new Image(skin.getDrawable("iconic-globe")), skin, "toggle-big");
         tab360.pad(pad5);
         tab360.setWidth(tabwidth);
-        final Button tabData = new OwnTextIconButton(I18n.txt("gui.data"), new Image(skin.getDrawable("iconic-clipboard")), skin, "toggle-big");
+        final OwnTextIconButton tabData = new OwnTextIconButton(I18n.txt("gui.data"), new Image(skin.getDrawable("iconic-clipboard")), skin, "toggle-big");
         tabData.pad(pad5);
         tabData.setWidth(tabwidth);
-        final Button tabGaia = new OwnTextIconButton(I18n.txt("gui.gaia"), new Image(skin.getDrawable("iconic-gaia")), skin, "toggle-big");
+        final OwnTextIconButton tabGaia = new OwnTextIconButton(I18n.txt("gui.gaia"), new Image(skin.getDrawable("iconic-gaia")), skin, "toggle-big");
         tabGaia.pad(pad5);
         tabGaia.setWidth(tabwidth);
-        final Button tabSystem = new OwnTextIconButton(I18n.txt("gui.system"), new Image(skin.getDrawable("iconic-terminal")), skin, "toggle-big");
+        final OwnTextIconButton tabSystem = new OwnTextIconButton(I18n.txt("gui.system"), new Image(skin.getDrawable("iconic-terminal")), skin, "toggle-big");
         tabSystem.pad(pad5);
         tabSystem.setWidth(tabwidth);
 
@@ -782,12 +787,12 @@ public class PreferencesWindow extends GenericDialog {
         minimapSize.setWidth(sliderWidth);
         minimapSize.setValue(GlobalConf.program.MINIMAP_SIZE);
         minimapsizeLabel.setText((int) GlobalConf.program.MINIMAP_SIZE);
-        minimapSize.addListener(event ->{
-           if(event instanceof ChangeEvent){
-               minimapsizeLabel.setText((int) minimapSize.getValue());
-               return true;
-           }
-           return false;
+        minimapSize.addListener(event -> {
+            if (event instanceof ChangeEvent) {
+                minimapsizeLabel.setText((int) minimapSize.getValue());
+                return true;
+            }
+            return false;
         });
 
         // LABELS
@@ -1033,9 +1038,9 @@ public class PreferencesWindow extends GenericDialog {
             keysGroup.space(pad5);
             for (int j = 1; j < action.length; j++) {
                 String[] keys = action[j].split("\\+");
-                for(int k = 0; k < keys.length; k++){
+                for (int k = 0; k < keys.length; k++) {
                     keysGroup.addActor(new OwnLabel(keys[k].trim(), skin, "default-pink"));
-                    if(k < keys.length - 1)
+                    if (k < keys.length - 1)
                         keysGroup.addActor(new OwnLabel("+", skin));
                 }
                 if (j < action.length - 1)
@@ -1282,8 +1287,8 @@ public class PreferencesWindow extends GenericDialog {
         counter.setWidth(textwidth * 3f);
         OwnTextButton resetCounter = new OwnTextButton(I18n.txt("gui.frameoutput.sequence.reset"), skin);
         resetCounter.pad(pad);
-        resetCounter.addListener((event)->{
-            if(event instanceof ChangeEvent){
+        resetCounter.addListener((event) -> {
+            if (event instanceof ChangeEvent) {
                 ImageRenderer.resetSequenceNumber();
                 counter.setText("0");
             }
@@ -1292,9 +1297,6 @@ public class PreferencesWindow extends GenericDialog {
 
         counterGroup.addActor(counter);
         counterGroup.addActor(resetCounter);
-
-
-
 
         // LABELS
         labels.addAll(frameoutputLocationLabel, prefixLabel, fpsLabel, fomodeLabel, frameoutputSizeLabel);
@@ -1625,17 +1627,21 @@ public class PreferencesWindow extends GenericDialog {
         ChangeListener tab_listener = new ChangeListener() {
             @Override
             public void changed(ChangeEvent event, Actor actor) {
-                contentGraphics.setVisible(tabGraphics.isChecked());
-                contentUI.setVisible(tabUI.isChecked());
-                contentPerformance.setVisible(tabPerformance.isChecked());
-                contentControls.setVisible(tabControls.isChecked());
-                contentScreenshots.setVisible(tabScreenshots.isChecked());
-                contentFrames.setVisible(tabFrames.isChecked());
-                contentCamera.setVisible(tabCamera.isChecked());
-                content360.setVisible(tab360.isChecked());
-                contentData.setVisible(tabData.isChecked());
-                contentGaia.setVisible(tabGaia.isChecked());
-                contentSystem.setVisible(tabSystem.isChecked());
+                if (((Button) actor).isChecked()) {
+                    contentGraphics.setVisible(tabGraphics.isChecked());
+                    contentUI.setVisible(tabUI.isChecked());
+                    contentPerformance.setVisible(tabPerformance.isChecked());
+                    contentControls.setVisible(tabControls.isChecked());
+                    contentScreenshots.setVisible(tabScreenshots.isChecked());
+                    contentFrames.setVisible(tabFrames.isChecked());
+                    contentCamera.setVisible(tabCamera.isChecked());
+                    content360.setVisible(tab360.isChecked());
+                    contentData.setVisible(tabData.isChecked());
+                    contentGaia.setVisible(tabGaia.isChecked());
+                    contentSystem.setVisible(tabSystem.isChecked());
+                    if (lastTabFlag)
+                        lastTab = (OwnTextIconButton) actor;
+                }
             }
         };
         tabGraphics.addListener(tab_listener);
@@ -1650,8 +1656,9 @@ public class PreferencesWindow extends GenericDialog {
         tabGaia.addListener(tab_listener);
         tabSystem.addListener(tab_listener);
 
+        lastTabFlag = false;
         // Let only one tab button be checked at a time
-        ButtonGroup<Button> tabs = new ButtonGroup<Button>();
+        ButtonGroup<Button> tabs = new ButtonGroup<>();
         tabs.setMinCheckCount(1);
         tabs.setMaxCheckCount(1);
         tabs.add(tabGraphics);
@@ -1665,6 +1672,10 @@ public class PreferencesWindow extends GenericDialog {
         tabs.add(tabData);
         tabs.add(tabGaia);
         tabs.add(tabSystem);
+        lastTabFlag = true;
+
+        if (lastTab != null)
+            tabs.setChecked(lastTab.getText().toString());
 
     }
 
@@ -1798,7 +1809,7 @@ public class PreferencesWindow extends GenericDialog {
         // Elevation representation
         ElevationType newType = elevationSb.getSelected().type;
         boolean reloadElevation = newType != GlobalConf.scene.ELEVATION_TYPE;
-        if( reloadElevation) {
+        if (reloadElevation) {
             EventManager.instance.post(Events.ELEVATION_TYPE_CMD, newType);
         }
 
@@ -2029,8 +2040,8 @@ public class PreferencesWindow extends GenericDialog {
         return s;
     }
 
-    private String keyToString(int key){
-        switch(key){
+    private String keyToString(int key) {
+        switch (key) {
         case Keys.PLUS:
             return "+";
         default:
