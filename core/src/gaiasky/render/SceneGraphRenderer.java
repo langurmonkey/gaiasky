@@ -950,6 +950,10 @@ public class SceneGraphRenderer extends AbstractRenderer implements IProcessRend
         sgr.render(this, camera, t, rw, rh, tw, th, fb, ppb);
     }
 
+    public ISGR getCurrentSGR(){
+        return sgr;
+    }
+
     public FrameBuffer getGlowFb() {
         return glowFb;
     }

@@ -500,9 +500,9 @@ public class GaiaSkyDesktop implements IObserver {
      */
     private static void experimentalCheck(){
         if(gsArgs.externalView){
-            System.out.println("============================ WARNING =============================");
-            System.out.println("The -e/--externalview feature is experimental and not yet working!");
-            System.out.println("==================================================================");
+            System.out.println("============================ WARNING ================================");
+            System.out.println("The -e/--externalview feature is experimental and may cause problems!");
+            System.out.println("=====================================================================");
             System.out.println();
         }
     }

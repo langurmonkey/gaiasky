@@ -41,7 +41,6 @@ public final class CubemapProjectionsFilter extends Filter<CubemapProjectionsFil
 
     public enum Param implements Parameter {
         // @formatter:off
-        Texture("u_texture0", 0),
         Cubemap("u_cubemap", 0),
         Viewport("u_viewport", 2);
         // @formatter:on
@@ -171,7 +170,6 @@ public final class CubemapProjectionsFilter extends Filter<CubemapProjectionsFil
     public void rebind() {
         // reimplement super to batch every parameter
         setParams(Param.Cubemap, u_texture1);
-        setParams(Param.Texture, u_texture0);
         setParams(Param.Viewport, this.viewport);
         endParams();
     }
@@ -181,7 +179,5 @@ public final class CubemapProjectionsFilter extends Filter<CubemapProjectionsFil
         // Bind cubemap
         Gdx.gl.glActiveTexture(GL20.GL_TEXTURE0 + u_texture1);
         Gdx.gl.glBindTexture(GL20.GL_TEXTURE_CUBE_MAP, cmId);
-
-        inputTexture.bind(u_texture0);
     }
 }

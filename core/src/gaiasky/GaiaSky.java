@@ -779,7 +779,12 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
     };
 
     public FrameBuffer getBackRenderBuffer() {
-        return PostProcessorFactory.instance.getPostProcessor().getPostProcessBean(RenderType.screen).pp.getCombinedBuffer().getResultBuffer();
+        if(GlobalConf.program.CUBEMAP360_MODE){
+            // Get from SGRCubemapProjections
+            return ((SGRCubemapProjections)sgr.getCurrentSGR()).getResultFrameBuffer();
+        }else {
+            return PostProcessorFactory.instance.getPostProcessor().getPostProcessBean(RenderType.screen).pp.getCombinedBuffer().getResultBuffer();
+        }
     }
 
     /**

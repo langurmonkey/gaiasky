@@ -65,7 +65,10 @@ public abstract class Filter<T> {
 
     public T setInput(FrameBuffer input) {
         this.inputBuffer = input;
-        return setInput(input.getColorBufferTexture());
+        if (input != null)
+            return setInput(input.getColorBufferTexture());
+        else
+            return (T) this;
     }
 
     public T setOutput(FrameBuffer output) {
