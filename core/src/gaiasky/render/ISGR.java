@@ -41,4 +41,6 @@ public interface ISGR extends Disposable {
 
     RenderingContext getRenderingContext();
 
+    FrameBuffer getResultBuffer();
+
 }

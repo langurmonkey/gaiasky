@@ -27,7 +27,6 @@ import java.util.Set;
  */
 public class SGRCubemapProjections extends SGRCubemap implements ISGR, IObserver {
 
-    private FrameBuffer mainFb;
     private CubemapProjections cubemapEffect;
     private Copy copy;
 
@@ -42,24 +41,20 @@ public class SGRCubemapProjections extends SGRCubemap implements ISGR, IObserver
         EventManager.instance.subscribe(this, Events.CUBEMAP_RESOLUTION_CMD, Events.CUBEMAP_PROJECTION_CMD);
     }
 
-    public FrameBuffer getResultFrameBuffer() {
-        return mainFb;
-    }
-
     @Override
     public void render(SceneGraphRenderer sgr, ICamera camera, double t, int rw, int rh, int tw, int th, FrameBuffer fb, PostProcessBean ppb) {
         // This renders the cubemap to [x|y|z][pos|neg]fb
         super.renderCubemapSides(sgr, camera, t, rw, rh, ppb);
 
         // Render to frame buffer
-        mainFb = fb == null ? getFrameBuffer(rw, rh) : fb;
+        resultBuffer = fb == null ? getFrameBuffer(rw, rh) : fb;
         cubemapEffect.setViewportSize(tw, th);
         cubemapEffect.setSides(xposfb, xnegfb, yposfb, ynegfb, zposfb, znegfb);
-        cubemapEffect.render(null, mainFb, null);
+        cubemapEffect.render(null, resultBuffer, null);
 
         // To screen
         if (fb == null)
-            copy.setInput(mainFb).setOutput(null).render();
+            copy.setInput(resultBuffer).setOutput(null).render();
 
         // Post render actions
         super.postRender(fb);

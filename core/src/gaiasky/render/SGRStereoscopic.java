@@ -27,6 +27,7 @@ import gaiasky.util.GlobalConf;
 import gaiasky.util.GlobalConf.ProgramConf.StereoProfile;
 import gaiasky.util.GlobalResources;
 import gaiasky.util.gdx.contrib.postprocess.effects.Anaglyphic;
+import gaiasky.util.gdx.contrib.postprocess.filters.Copy;
 import gaiasky.util.math.Vector3d;
 import org.lwjgl.openvr.VR;
 
@@ -54,6 +55,7 @@ public class SGRStereoscopic extends SGRAbstract implements ISGR, IObserver {
     Map<Integer, FrameBuffer> fb3D;
 
     private Anaglyphic anaglyphic;
+    private Copy copy;
 
     private Vector3 aux1, aux2, aux3;
     private Vector3d aux1d, aux2d, aux3d, aux4d, aux5d;
@@ -69,6 +71,9 @@ public class SGRStereoscopic extends SGRAbstract implements ISGR, IObserver {
 
         // Init anaglyphic effect
         anaglyphic = new Anaglyphic();
+
+        // Copy
+        copy = new Copy();
 
         // Aux vectors
         aux1 = new Vector3();
@@ -86,6 +91,7 @@ public class SGRStereoscopic extends SGRAbstract implements ISGR, IObserver {
     @Override
     public void render(SceneGraphRenderer sgr, ICamera camera, double t, int rw, int rh, int tw, int th, FrameBuffer fb, PostProcessBean ppb) {
         boolean movecam = camera.getMode() == CameraMode.FREE_MODE || camera.getMode() == CameraMode.FOCUS_MODE || camera.getMode() == CameraMode.SPACECRAFT_MODE;
+
 
         PerspectiveCamera cam = camera.getCamera();
         // Vector of 1 meter length pointing to the side of the camera
@@ -133,8 +139,6 @@ public class SGRStereoscopic extends SGRAbstract implements ISGR, IObserver {
             extendViewport.setScreenBounds(0, 0, rw, rh);
             extendViewport.apply();
 
-            FrameBuffer fbmain = getFrameBuffer(rw, rh, 0);
-
             /** LEFT EYE **/
 
             // Camera to the left
@@ -176,10 +180,8 @@ public class SGRStereoscopic extends SGRAbstract implements ISGR, IObserver {
             anaglyphic.setTextureRight(texRight);
 
             // Render 
-            anaglyphic.render(fbmain, fb, null);
-
-            if (fb != null)
-                fb.end();
+            anaglyphic.render(null, resultBuffer, null);
+            resultBuffer.end();
 
             // ensure default texture unit #0 is active
             Gdx.gl.glActiveTexture(GL20.GL_TEXTURE0);
@@ -233,7 +235,7 @@ public class SGRStereoscopic extends SGRAbstract implements ISGR, IObserver {
 
             sgr.renderGlowPass(camera, null, VR.EVREye_Eye_Left);
 
-            FrameBuffer fb3d = getFrameBuffer(boundsw, boundsh);
+            FrameBuffer fb3d = getFrameBuffer(boundsw, boundsh, 3);
             boolean postproc = postprocessCapture(ppb, fb3d, boundsw, boundsh);
             sgr.renderScene(camera, t, rc);
 
@@ -241,17 +243,13 @@ public class SGRStereoscopic extends SGRAbstract implements ISGR, IObserver {
             postprocessRender(ppb, fb3d, postproc, camera, boundsw, boundsh);
             tex = fb3d.getColorBufferTexture();
 
-            if (fb != null) {
-                fb.begin();
-            }
-
+            resultBuffer = fb == null ? getFrameBuffer(rw, rh, 0) : fb;
+            resultBuffer.begin();
             GlobalResources.spriteBatch.begin();
             GlobalResources.spriteBatch.setColor(1f, 1f, 1f, 1f);
             GlobalResources.spriteBatch.draw(tex, 0, 0, 0, 0, boundsw, boundsh, 1, 1, 0, 0, 0, boundsw, boundsh, false, true);
             GlobalResources.spriteBatch.end();
-
-            if (fb != null)
-                fb.end();
+            resultBuffer.end();
 
             /** RIGHT EYE **/
 
@@ -273,16 +271,13 @@ public class SGRStereoscopic extends SGRAbstract implements ISGR, IObserver {
             postprocessRender(ppb, fb3d, postproc, camera, boundsw, boundsh);
             tex = fb3d.getColorBufferTexture();
 
-            if (fb != null)
-                fb.begin();
-
+            resultBuffer = fb == null ? getFrameBuffer(rw, rh, 0) : fb;
+            resultBuffer.begin();
             GlobalResources.spriteBatch.begin();
             GlobalResources.spriteBatch.setColor(1f, 1f, 1f, 1f);
             GlobalResources.spriteBatch.draw(tex, start2w, start2h, 0, 0, boundsw, boundsh, 1, 1, 0, 0, 0, boundsw, boundsh, false, true);
             GlobalResources.spriteBatch.end();
-
-            if (fb != null)
-                fb.end();
+            resultBuffer.end();
 
             /* Restore viewport */
             viewport.setScreenBounds(0, 0, rw, rh);
@@ -291,6 +286,10 @@ public class SGRStereoscopic extends SGRAbstract implements ISGR, IObserver {
 
         /** RESTORE **/
         restoreCameras(camera, cam, backupPosd, backupPos, backupDir);
+
+        // To screen
+        if (fb == null)
+            copy.setInput(resultBuffer).setOutput(null).render();
 
     }
 

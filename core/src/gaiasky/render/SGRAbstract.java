@@ -20,6 +20,7 @@ import gaiasky.util.GlobalConf;
  */
 public class SGRAbstract {
 
+    protected FrameBuffer resultBuffer;
     protected RenderingContext rc;
     /** Viewport to use in normal mode **/
     protected Viewport extendViewport;
@@ -56,10 +57,16 @@ public class SGRAbstract {
                 fb.end();
             }
         }
+
+        resultBuffer = fb != null? fb : ppb.pp.getCombinedBuffer().getResultBuffer();
     }
 
     public RenderingContext getRenderingContext(){
         return rc;
+    }
+
+    public FrameBuffer getResultBuffer() {
+        return resultBuffer;
     }
 
 }
