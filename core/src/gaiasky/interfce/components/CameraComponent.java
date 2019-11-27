@@ -20,6 +20,7 @@ import gaiasky.util.Constants;
 import gaiasky.util.GlobalConf;
 import gaiasky.util.I18n;
 import gaiasky.util.TextUtils;
+import gaiasky.util.gdx.contrib.postprocess.effects.CubemapProjections.CubemapProjection;
 import gaiasky.util.math.MathUtilsd;
 import gaiasky.util.scene2d.*;
 
@@ -39,7 +40,7 @@ public class CameraComponent extends GuiComponent implements IObserver {
 
     public CameraComponent(Skin skin, Stage stage) {
         super(skin, stage);
-        EventManager.instance.subscribe(this, Events.CAMERA_MODE_CMD, Events.ROTATION_SPEED_CMD, Events.TURNING_SPEED_CMD, Events.CAMERA_SPEED_CMD, Events.SPEED_LIMIT_CMD, Events.STEREOSCOPIC_CMD, Events.FOV_CHANGE_NOTIFICATION, Events.CUBEMAP360_CMD, Events.CAMERA_CINEMATIC_CMD, Events.ORIENTATION_LOCK_CMD, Events.PLANETARIUM_CMD);
+        EventManager.instance.subscribe(this, Events.CAMERA_MODE_CMD, Events.ROTATION_SPEED_CMD, Events.TURNING_SPEED_CMD, Events.CAMERA_SPEED_CMD, Events.SPEED_LIMIT_CMD, Events.STEREOSCOPIC_CMD, Events.FOV_CHANGE_NOTIFICATION, Events.CUBEMAP_CMD, Events.CAMERA_CINEMATIC_CMD, Events.ORIENTATION_LOCK_CMD, Events.PLANETARIUM_CMD);
     }
 
     @Override
@@ -79,6 +80,7 @@ public class CameraComponent extends GuiComponent implements IObserver {
         });
 
         List<Button> buttonList = new ArrayList<>();
+       // Group<Button> buttonGroup = new Group<>();
 
         Image icon3d = new Image(skin.getDrawable("3d-icon"));
         button3d = new OwnTextIconButton("", icon3d, skin, "toggle");
@@ -87,6 +89,13 @@ public class CameraComponent extends GuiComponent implements IObserver {
         button3d.setName("3d");
         button3d.addListener(event -> {
             if (event instanceof ChangeEvent) {
+                if(button3d.isChecked()) {
+                    buttonCubemap.setProgrammaticChangeEvents(true);
+                    buttonCubemap.setChecked(false);
+                    buttonDome.setProgrammaticChangeEvents(true);
+                    buttonDome.setChecked(false);
+                }
+                // Enable/disable
                 EventManager.instance.post(Events.STEREOSCOPIC_CMD, button3d.isChecked(), true);
                 return true;
             }
@@ -100,8 +109,14 @@ public class CameraComponent extends GuiComponent implements IObserver {
         buttonDome.setName("dome");
         buttonDome.addListener(event -> {
             if (event instanceof ChangeEvent) {
-                // Enable
-                EventManager.instance.post(Events.PLANETARIUM_CMD, buttonDome.isChecked(), true);
+                if(buttonDome.isChecked()) {
+                    buttonCubemap.setProgrammaticChangeEvents(true);
+                    buttonCubemap.setChecked(false);
+                    button3d.setProgrammaticChangeEvents(true);
+                    button3d.setChecked(false);
+                }
+                // Enable/disable
+                EventManager.instance.post(Events.CUBEMAP_CMD, buttonDome.isChecked(), CubemapProjection.FISHEYE, true);
                 return true;
             }
             return false;
@@ -115,7 +130,14 @@ public class CameraComponent extends GuiComponent implements IObserver {
         buttonCubemap.setName("cubemap");
         buttonCubemap.addListener(event -> {
             if (event instanceof ChangeEvent) {
-                EventManager.instance.post(Events.CUBEMAP360_CMD, buttonCubemap.isChecked(), true);
+                if(buttonCubemap.isChecked()) {
+                    buttonDome.setProgrammaticChangeEvents(true);
+                    buttonDome.setChecked(false);
+                    button3d.setProgrammaticChangeEvents(true);
+                    button3d.setChecked(false);
+                }
+                // Enable/disable
+                EventManager.instance.post(Events.CUBEMAP_CMD, buttonCubemap.isChecked(), CubemapProjection.EQUIRECTANGULAR, true);
                 return true;
             }
             return false;
@@ -397,11 +419,18 @@ public class CameraComponent extends GuiComponent implements IObserver {
             fov.setText(GlobalConf.scene.CAMERA_FOV + "°");
             fovFlag = true;
             break;
-        case CUBEMAP360_CMD:
-            if (!(boolean) data[1]) {
-                buttonCubemap.setProgrammaticChangeEvents(false);
-                buttonCubemap.setChecked((boolean) data[0]);
-                buttonCubemap.setProgrammaticChangeEvents(true);
+        case CUBEMAP_CMD:
+            if (!(boolean) data[2]) {
+                CubemapProjection proj = (CubemapProjection) data[1];
+                if(proj.isPanorama()) {
+                    buttonCubemap.setProgrammaticChangeEvents(false);
+                    buttonCubemap.setChecked((boolean) data[0]);
+                    buttonCubemap.setProgrammaticChangeEvents(true);
+                }else if(proj.isPlanetarium()){
+                    buttonDome.setProgrammaticChangeEvents(false);
+                    buttonDome.setChecked((boolean) data[0]);
+                    buttonDome.setProgrammaticChangeEvents(true);
+                }
             }
             break;
         case PLANETARIUM_CMD:

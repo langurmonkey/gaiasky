@@ -17,7 +17,7 @@ import gaiasky.scenegraph.camera.CameraManager.CameraMode;
 import gaiasky.util.*;
 import gaiasky.util.GlobalConf.ProgramConf.StereoProfile;
 import gaiasky.util.Logger.Log;
-import gaiasky.util.gdx.contrib.postprocess.effects.CubemapProjections;
+import gaiasky.util.gdx.contrib.postprocess.effects.CubemapProjections.CubemapProjection;
 
 import java.io.*;
 import java.time.Instant;
@@ -138,7 +138,7 @@ public class KeyBindings {
 
     public String getStringKeys(String actionId) {
         TreeSet<Integer> keys = getKeys(actionId);
-        if(keys != null) {
+        if (keys != null) {
             StringBuilder sb = new StringBuilder();
             Iterator<Integer> it = keys.descendingIterator();
             while (it.hasNext()) {
@@ -173,9 +173,9 @@ public class KeyBindings {
         // Condition that checks the GUI is visible (no clean mode)
         BooleanRunnable noCleanMode = () -> GlobalConf.runtime.DISPLAY_GUI || GaiaSky.instance.externalView;
         // Condition that checks that panorama mode is off
-        BooleanRunnable noPanorama = () -> !GlobalConf.program.CUBEMAP360_MODE;
+        BooleanRunnable noPanorama = () -> !(GlobalConf.program.CUBEMAP_MODE && GlobalConf.program.CUBEMAP_PROJECTION.isPanorama());
         // Condition that checks that planetarium mode is off
-        BooleanRunnable noPlanetarium = () -> !GlobalConf.postprocess.POSTPROCESS_FISHEYE;
+        BooleanRunnable noPlanetarium = () -> !(GlobalConf.program.CUBEMAP_MODE && GlobalConf.program.CUBEMAP_PROJECTION.isPlanetarium());
 
         // about action
         final Runnable runnableAbout = () -> EventManager.instance.post(Events.SHOW_ABOUT_ACTION);
@@ -269,7 +269,6 @@ public class KeyBindings {
         // reset limit mag
         addAction(new ProgramAction("action.resetmag", () -> EventManager.instance.post(Events.LIMIT_MAG_CMD, GlobalConf.data.LIMIT_MAG_LOAD)));
 
-
         // increase field of view
         addAction(new ProgramAction("action.incfov", () -> EventManager.instance.post(Events.FOV_CHANGED_CMD, GlobalConf.scene.CAMERA_FOV + 1f, false)));
 
@@ -294,13 +293,22 @@ public class KeyBindings {
         // toggle UI collapse/expand
         addAction(new ProgramAction("action.toggle/element.controls", () -> EventManager.instance.post(Events.GUI_FOLD_CMD), fullGuiCondition, noCleanMode));
 
+        // toggle planetarium mode
+        addAction(new ProgramAction("action.toggle/element.planetarium", () -> {
+            boolean enable = !GlobalConf.program.CUBEMAP_MODE;
+            EventManager.instance.post(Events.CUBEMAP_CMD, enable, CubemapProjection.FISHEYE, false);
+        }, noPanorama));
+
         // toggle cubemap mode
-        addAction(new ProgramAction("action.toggle/element.360", () -> EventManager.instance.post(Events.CUBEMAP360_CMD, !GlobalConf.program.CUBEMAP360_MODE, false), noPlanetarium));
+        addAction(new ProgramAction("action.toggle/element.360", () -> {
+            boolean enable = !GlobalConf.program.CUBEMAP_MODE;
+            EventManager.instance.post(Events.CUBEMAP_CMD, enable, CubemapProjection.EQUIRECTANGULAR, false);
+        }, noPlanetarium));
 
         // toggle cubemap projection
         addAction(new ProgramAction("action.toggle/element.projection", () -> {
-            int newprojidx = (GlobalConf.program.CUBEMAP_PROJECTION.ordinal() + 1) % CubemapProjections.CubemapProjection.values().length;
-            EventManager.instance.post(Events.CUBEMAP_PROJECTION_CMD, CubemapProjections.CubemapProjection.values()[newprojidx]);
+            int newprojidx = (GlobalConf.program.CUBEMAP_PROJECTION.ordinal() + 1) % (CubemapProjection.HAMMER.ordinal() + 1);
+            EventManager.instance.post(Events.CUBEMAP_PROJECTION_CMD, CubemapProjection.values()[newprojidx]);
         }));
 
         // increase star point size by 0.5
@@ -340,9 +348,6 @@ public class KeyBindings {
             newidx = (newidx + 1) % StereoProfile.values().length;
             EventManager.instance.post(Events.STEREO_PROFILE_CMD, newidx);
         }));
-
-        // toggle planetarium mode
-        addAction(new ProgramAction("action.toggle/element.planetarium", () -> EventManager.instance.post(Events.PLANETARIUM_CMD, !GlobalConf.postprocess.POSTPROCESS_FISHEYE, false), noPanorama));
 
         // Toggle clean (no GUI) mode
         addAction(new ProgramAction("action.toggle/element.cleanmode", () -> EventManager.instance.post(Events.DISPLAY_GUI_CMD, !GlobalConf.runtime.DISPLAY_GUI, I18n.txt("notif.cleanmode"))));

@@ -1434,11 +1434,17 @@ public interface IScriptingInterface {
     void setPlanetariumMode(boolean state);
 
     /**
-     * Enables and disables the 360 mode.
+     * Enables and disables the cubemap mode.
      *
      * @param state The boolean sate. True to activate, false to deactivate.
      */
-    void set360Mode(boolean state);
+    void setCubemapMode(boolean state, String projection);
+
+    /**
+     * Enables and disables the panorama mode.
+     * @param state The boolean staet. True to activate, false to deactivate.
+     */
+    void setPanoramaMode(boolean state);
 
     /**
      * Sets the resolution (width and height are the same) of each side of the

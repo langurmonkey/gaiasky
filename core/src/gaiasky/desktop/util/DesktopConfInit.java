@@ -479,7 +479,7 @@ public class DesktopConfInit extends ConfInit {
         p.setProperty("program.locale", GlobalConf.program.LOCALE);
         p.setProperty("program.stereoscopic", Boolean.toString(GlobalConf.program.STEREOSCOPIC_MODE));
         p.setProperty("program.stereoscopic.profile", Integer.toString(GlobalConf.program.STEREO_PROFILE.ordinal()));
-        p.setProperty("program.cubemap360", Boolean.toString(GlobalConf.program.CUBEMAP360_MODE));
+        p.setProperty("program.cubemap360", Boolean.toString(GlobalConf.program.CUBEMAP_MODE));
         p.setProperty("program.catalog.chooser", Boolean.toString(GlobalConf.program.DISPLAY_DATASET_DIALOG));
         p.setProperty("program.net.master", Boolean.toString(GlobalConf.program.NET_MASTER));
         int i = 0;

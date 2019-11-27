@@ -35,6 +35,7 @@ import gaiasky.util.GlobalConf;
 import gaiasky.util.GlobalResources;
 import gaiasky.util.MasterManager;
 import gaiasky.util.coord.Coordinates;
+import gaiasky.util.gdx.contrib.postprocess.effects.CubemapProjections.CubemapProjection;
 import gaiasky.util.gravwaves.RelativisticEffectsManager;
 import gaiasky.util.math.MathUtilsd;
 import gaiasky.util.math.Matrix4d;
@@ -1288,8 +1289,20 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
                 EventManager.instance.post(Events.FOV_CHANGE_NOTIFICATION, fov, fovFactor);
             }
             break;
-        case PLANETARIUM_CMD:
+        case CUBEMAP_CMD:
             boolean state = (boolean) data[0];
+            CubemapProjection p = (CubemapProjection) data[1];
+            if (p.isPlanetarium() && state) {
+                fovBackup = GaiaSky.instance.cam.getCamera().fieldOfView;
+                EventManager.instance.post(Events.FOV_CHANGED_CMD, 140f, false);
+                EventManager.instance.post(Events.PLANETARIUM_FOCUS_ANGLE_CMD, 50f);
+            } else {
+                EventManager.instance.post(Events.FOV_CHANGED_CMD, fovBackup);
+                EventManager.instance.post(Events.PLANETARIUM_FOCUS_ANGLE_CMD, 0f);
+            }
+            break;
+        case PLANETARIUM_CMD:
+            state = (boolean) data[0];
             EventManager.instance.post(Events.FISHEYE_CMD, state);
             if (state) {
                 fovBackup = GaiaSky.instance.cam.getCamera().fieldOfView;
@@ -1575,7 +1588,7 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
 
     @Override
     public void render(int rw, int rh) {
-        boolean draw = !GlobalConf.program.CUBEMAP360_MODE && !GlobalConf.program.STEREOSCOPIC_MODE && !GlobalConf.postprocess.POSTPROCESS_FISHEYE;
+        boolean draw = !GlobalConf.program.CUBEMAP_MODE && !GlobalConf.program.STEREOSCOPIC_MODE && !GlobalConf.postprocess.POSTPROCESS_FISHEYE;
 
         spriteBatch.begin();
 

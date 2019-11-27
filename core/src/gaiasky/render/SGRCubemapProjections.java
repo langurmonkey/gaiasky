@@ -14,6 +14,7 @@ import gaiasky.render.IPostProcessor.PostProcessBean;
 import gaiasky.scenegraph.camera.ICamera;
 import gaiasky.util.GlobalConf;
 import gaiasky.util.gdx.contrib.postprocess.effects.CubemapProjections;
+import gaiasky.util.gdx.contrib.postprocess.effects.CubemapProjections.CubemapProjection;
 import gaiasky.util.gdx.contrib.postprocess.filters.Copy;
 
 import java.util.Set;
@@ -38,7 +39,7 @@ public class SGRCubemapProjections extends SGRCubemap implements ISGR, IObserver
 
         copy = new Copy();
 
-        EventManager.instance.subscribe(this, Events.CUBEMAP_RESOLUTION_CMD, Events.CUBEMAP_PROJECTION_CMD);
+        EventManager.instance.subscribe(this, Events.CUBEMAP_RESOLUTION_CMD, Events.CUBEMAP_PROJECTION_CMD, Events.CUBEMAP_CMD);
     }
 
     @Override
@@ -76,6 +77,18 @@ public class SGRCubemapProjections extends SGRCubemap implements ISGR, IObserver
     @Override
     public void notify(Events event, Object... data) {
         switch (event) {
+        case CUBEMAP_CMD:
+            CubemapProjection p = (CubemapProjection) data[1];
+            GaiaSky.postRunnable(() -> {
+                cubemapEffect.setProjection(p);
+            });
+            break;
+        case CUBEMAP_PROJECTION_CMD:
+            p = (CubemapProjection) data[0];
+            GaiaSky.postRunnable(() -> {
+                cubemapEffect.setProjection(p);
+            });
+            break;
         case CUBEMAP_RESOLUTION_CMD:
             int res = (Integer) data[0];
             GaiaSky.postRunnable(() -> {
@@ -87,12 +100,6 @@ public class SGRCubemapProjections extends SGRCubemap implements ISGR, IObserver
                 } else {
                     // All good
                 }
-            });
-            break;
-        case CUBEMAP_PROJECTION_CMD:
-            CubemapProjections.CubemapProjection p = (CubemapProjections.CubemapProjection) data[0];
-            GaiaSky.postRunnable(() -> {
-                cubemapEffect.setProjection(p);
             });
             break;
         default:

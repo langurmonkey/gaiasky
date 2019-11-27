@@ -155,7 +155,7 @@ public class ParticleGroupRenderSystem extends ImmediateRenderSystem implements 
                     shaderProgram.setUniformf("u_minSize", (float) (3.0 / (camera.getFovFactor() * Constants.DISTANCE_SCALE_FACTOR)));
                     shaderProgram.setUniformf("u_camPos", camera.getCurrent().getPos().put(aux1));
                     shaderProgram.setUniformf("u_camDir", camera.getCurrent().getCamera().direction);
-                    shaderProgram.setUniformi("u_cubemap", GlobalConf.program.CUBEMAP360_MODE ? 1 : 0);
+                    shaderProgram.setUniformi("u_cubemap", GlobalConf.program.CUBEMAP_MODE ? 1 : 0);
 
                     // Rel, grav, z-buffer
                     addEffectsUniforms(shaderProgram, camera);

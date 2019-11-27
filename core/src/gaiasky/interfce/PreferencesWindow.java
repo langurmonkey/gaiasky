@@ -146,7 +146,7 @@ public class PreferencesWindow extends GenericDialog {
         final OwnTextIconButton tabCamera = new OwnTextIconButton(I18n.txt("gui.camerarec.title"), new Image(skin.getDrawable("iconic-camera-slr")), skin, "toggle-big");
         tabCamera.pad(pad5);
         tabCamera.setWidth(tabwidth);
-        final OwnTextIconButton tab360 = new OwnTextIconButton(I18n.txt("gui.360.title"), new Image(skin.getDrawable("iconic-globe")), skin, "toggle-big");
+        final OwnTextIconButton tab360 = new OwnTextIconButton(I18n.txt("gui.360.title"), new Image(skin.getDrawable("iconic-cubemap")), skin, "toggle-big");
         tab360.pad(pad5);
         tab360.setWidth(tabwidth);
         final OwnTextIconButton tabData = new OwnTextIconButton(I18n.txt("gui.data"), new Image(skin.getDrawable("iconic-clipboard")), skin, "toggle-big");

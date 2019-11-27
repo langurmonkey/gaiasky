@@ -80,7 +80,7 @@ public class Text2D extends FadeNode implements I3DTextRenderable, IShapeRendera
 
     @Override
     public boolean renderText() {
-        return this.opacity > 0 && !GlobalConf.program.CUBEMAP360_MODE;
+        return this.opacity > 0 && !GlobalConf.program.CUBEMAP_MODE;
     }
 
     @Override

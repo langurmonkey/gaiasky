@@ -254,6 +254,17 @@ public class GlobalConf {
                 break;
             case FISHEYE_CMD:
                 POSTPROCESS_FISHEYE = (Boolean) data[0];
+
+                // Post a message to the screen
+                if (POSTPROCESS_FISHEYE) {
+                    ModePopupInfo mpi = new ModePopupInfo();
+                    mpi.title = "Planetarium mode";
+                    mpi.header = "You have entered Planetarium mode!";
+                    mpi.addMapping("Back to normal mode", "CTRL", "P");
+                    mpi.addMapping("Switch planetarium mode type", "CTRL", "SHIFT", "P");
+
+                    EventManager.instance.post(Events.MODE_POPUP_CMD, mpi, 120f);
+                }
                 break;
             case BRIGHTNESS_CMD:
                 POSTPROCESS_BRIGHTNESS = MathUtils.clamp((float) data[0], Constants.MIN_BRIGHTNESS, Constants.MAX_BRIGHTNESS);
@@ -721,8 +732,8 @@ public class GlobalConf {
             return FULLSCREEN ? FULLSCREEN_HEIGHT : SCREEN_HEIGHT;
         }
 
-        public void resize(int w, int h){
-            if(FULLSCREEN){
+        public void resize(int w, int h) {
+            if (FULLSCREEN) {
                 FULLSCREEN_WIDTH = w;
                 FULLSCREEN_HEIGHT = h;
             } else {
@@ -812,7 +823,7 @@ public class GlobalConf {
         public boolean DISPLAY_MINIMAP;
         public float MINIMAP_SIZE;
         public boolean MINIMAP_IN_WINDOW = false;
-        public boolean CUBEMAP360_MODE;
+        public boolean CUBEMAP_MODE;
         /**
          * Cubemap projection
          **/
@@ -828,10 +839,11 @@ public class GlobalConf {
         public boolean DISPLAY_DATASET_DIALOG;
 
         public ProgramConf() {
-            EventManager.instance.subscribe(this, Events.STEREOSCOPIC_CMD, Events.STEREO_PROFILE_CMD, Events.CUBEMAP360_CMD, Events.CUBEMAP_PROJECTION_CMD, Events.SHOW_MINIMAP_ACTION, Events.TOGGLE_MINIMAP);
+            EventManager.instance.subscribe(this, Events.STEREOSCOPIC_CMD, Events.STEREO_PROFILE_CMD, Events.CUBEMAP_CMD, Events.CUBEMAP_PROJECTION_CMD, Events.SHOW_MINIMAP_ACTION, Events.TOGGLE_MINIMAP);
         }
 
-        public void initialize(boolean sHOW_DEBUG_INFO, Instant lAST_CHECKED, String lAST_VERSION, String vERSION_CHECK_URL, String dATA_DESCRIPTOR_URL, String uI_THEME, String sCRIPT_LOCATION, int rEST_PORT, String lOCALE, boolean sTEREOSCOPIC_MODE, StereoProfile sTEREO_PROFILE, boolean cUBEMAP360_MODE, boolean dISPLAY_HUD, boolean dISPLAY_POINTER_COORDS, boolean dISPLAY_DATASET_DIALOG, boolean nET_MASTER, boolean nET_SLAVE, List<String> nET_MASTER_SLAVES, String lAST_OPEN_LOCATION, boolean dISPLAY_MINIMAP, float mINIMAP_SIZE) {
+        public void initialize(boolean sHOW_DEBUG_INFO, Instant lAST_CHECKED, String lAST_VERSION, String vERSION_CHECK_URL, String dATA_DESCRIPTOR_URL, String uI_THEME, String sCRIPT_LOCATION, int rEST_PORT, String lOCALE, boolean sTEREOSCOPIC_MODE, StereoProfile sTEREO_PROFILE, boolean cUBEMAP360_MODE, boolean dISPLAY_HUD, boolean dISPLAY_POINTER_COORDS, boolean dISPLAY_DATASET_DIALOG, boolean nET_MASTER, boolean nET_SLAVE, List<String> nET_MASTER_SLAVES, String lAST_OPEN_LOCATION,
+                boolean dISPLAY_MINIMAP, float mINIMAP_SIZE) {
             SHOW_DEBUG_INFO = sHOW_DEBUG_INFO;
             VERSION_LAST_TIME = lAST_CHECKED;
             VERSION_LAST_VERSION = lAST_VERSION;
@@ -843,7 +855,7 @@ public class GlobalConf {
             LOCALE = lOCALE;
             STEREOSCOPIC_MODE = sTEREOSCOPIC_MODE;
             STEREO_PROFILE = sTEREO_PROFILE;
-            CUBEMAP360_MODE = cUBEMAP360_MODE;
+            CUBEMAP_MODE = cUBEMAP360_MODE;
             DISPLAY_HUD = dISPLAY_HUD;
             DISPLAY_POINTER_COORDS = dISPLAY_POINTER_COORDS;
             DISPLAY_DATASET_DIALOG = dISPLAY_DATASET_DIALOG;
@@ -921,8 +933,8 @@ public class GlobalConf {
                 if (!GaiaSky.instance.cam.mode.isGaiaFov()) {
                     boolean stereomode = (Boolean) data[0];
                     STEREOSCOPIC_MODE = stereomode;
-                    if (STEREOSCOPIC_MODE && CUBEMAP360_MODE) {
-                        CUBEMAP360_MODE = false;
+                    if (STEREOSCOPIC_MODE && CUBEMAP_MODE) {
+                        CUBEMAP_MODE = false;
                         EventManager.instance.post(Events.DISPLAY_GUI_CMD, true, I18n.bundle.get("notif.cleanmode"));
                     }
                 }
@@ -930,16 +942,23 @@ public class GlobalConf {
             case STEREO_PROFILE_CMD:
                 STEREO_PROFILE = StereoProfile.values()[(Integer) data[0]];
                 break;
-            case CUBEMAP360_CMD:
-                CUBEMAP360_MODE = (Boolean) data[0];
+            case CUBEMAP_CMD:
+                CUBEMAP_MODE = (Boolean) data[0];
+                if (CUBEMAP_MODE) {
+                    CUBEMAP_PROJECTION = (CubemapProjections.CubemapProjection) data[1];
 
-                // Post a message to the screen
-                if (CUBEMAP360_MODE) {
+                    // Post a message to the screen
                     ModePopupInfo mpi = new ModePopupInfo();
-                    mpi.title = "Panorama mode";
-                    mpi.header = "You have entered Panorama mode!";
-                    mpi.addMapping("Back to normal mode", "CTRL", "K");
-                    mpi.addMapping("Switch projection type", "CTRL", "SHIFT", "K");
+                    if (CUBEMAP_PROJECTION.isPanorama()) {
+                        mpi.title = "Panorama mode";
+                        mpi.header = "You have entered Panorama mode!";
+                        mpi.addMapping("Back to normal mode", "CTRL", "K");
+                        mpi.addMapping("Switch projection type", "CTRL", "SHIFT", "K");
+                    } else if (CUBEMAP_PROJECTION.isPlanetarium()) {
+                        mpi.title = "Planetarium mode";
+                        mpi.header = "You have entered Planetarium mode!";
+                        mpi.addMapping("Back to normal mode", "CTRL", "P");
+                    }
 
                     EventManager.instance.post(Events.MODE_POPUP_CMD, mpi, 120f);
                 }
@@ -1070,10 +1089,10 @@ public class GlobalConf {
                 return this.equals(ULTRA);
             }
 
-            public int getGlowNLights(){
-                if(isLow()){
+            public int getGlowNLights() {
+                if (isLow()) {
                     return 10;
-                } else if (isNormal()){
+                } else if (isNormal()) {
                     return 20;
                 } else if (isHigh()) {
                     return 30;
@@ -1209,7 +1228,6 @@ public class GlobalConf {
         /** Home object crosshair **/
         public boolean CROSSHAIR_HOME;
 
-
         /**
          * Resolution of each of the faces in the cubemap which will be mapped
          * to a equirectangular projection for the 360 mode.
@@ -1275,9 +1293,9 @@ public class GlobalConf {
             EventManager.instance.subscribe(this, Events.TOGGLE_VISIBILITY_CMD, Events.FOCUS_LOCK_CMD, Events.ORIENTATION_LOCK_CMD, Events.STAR_BRIGHTNESS_CMD, Events.PM_LEN_FACTOR_CMD, Events.PM_NUM_FACTOR_CMD, Events.PM_COLOR_MODE_CMD, Events.PM_ARROWHEADS_CMD, Events.FOV_CHANGED_CMD, Events.CAMERA_SPEED_CMD, Events.ROTATION_SPEED_CMD, Events.TURNING_SPEED_CMD, Events.SPEED_LIMIT_CMD, Events.TRANSIT_COLOUR_CMD, Events.ONLY_OBSERVED_STARS_CMD, Events.COMPUTE_GAIA_SCAN_CMD, Events.OCTREE_PARTICLE_FADE_CMD, Events.STAR_POINT_SIZE_CMD, Events.STAR_POINT_SIZE_INCREASE_CMD, Events.STAR_POINT_SIZE_DECREASE_CMD, Events.STAR_POINT_SIZE_RESET_CMD, Events.STAR_MIN_OPACITY_CMD, Events.AMBIENT_LIGHT_CMD, Events.GALAXY_3D_CMD, Events.CROSSHAIR_FOCUS_CMD, Events.CROSSHAIR_CLOSEST_CMD, Events.CROSSHAIR_HOME_CMD, Events.CAMERA_CINEMATIC_CMD, Events.CUBEMAP_RESOLUTION_CMD, Events.LABEL_SIZE_CMD, Events.ELEVATION_MUTLIPLIER_CMD, Events.ELEVATION_TYPE_CMD, Events.TESSELLATION_QUALITY_CMD);
         }
 
-        public void initialize(String sTARTUP_OBJECT, GraphicsQuality gRAPHICS_QUALITY, long oBJECT_FADE_MS, float sTAR_BRIGHTNESS, float sTAR_BRIGHTNESS_POWER, float aMBIENT_LIGHT, int cAMERA_FOV, float cAMERA_SPEED, float tURNING_SPEED, float rOTATION_SPEED, int cAMERA_SPEED_LIMIT_IDX, boolean fOCUS_LOCK, boolean fOCUS_LOCK_ORIENTATION, float lABEL_SIZE_FACTOR, float lABEL_NUMBER_FACTOR, boolean[] vISIBILITY, int oRBIT_RENDERER, int lINE_RENDERER, double sTAR_TH_ANGLE_NONE, double sTAR_TH_ANGLE_POINT, double sTAR_TH_ANGLE_QUAD,
-                float pOINT_ALPHA_MIN, float pOINT_ALPHA_MAX, boolean oCTREE_PARTICLE_FADE, float oCTANT_TH_ANGLE_0, float oCTANT_TH_ANGLE_1, float pM_NUM_FACTOR, float pM_LEN_FACTOR, long n_PM_STARS, int pM_COLOR_MODE, boolean pM_ARROWHEADS, float sTAR_POINT_SIZE, boolean gALAXY_3D, int cUBEMAP_FACE_RESOLUTION, boolean cROSSHAIR_FOCUS, boolean cROSSHAIR_CLOSEST, boolean cROSSHAIR_HOME, boolean cINEMATIC_CAMERA, boolean lAZY_TEXTURE_INIT, boolean lAZY_MESH_INIT, boolean fREE_CAMERA_TARGET_MODE_ON, boolean sHADOW_MAPPING, int sHADOW_MAPPING_N_SHADOWS,
-                int sHADOW_MAPPING_RESOLUTION, long mAX_LOADED_STARS, ElevationType eLEVATION_TYPE, double eLEVATION_MULTIPLIER, double tESSELLATION_QUALITY, double dIST_SCALE_DESKTOP, double dIST_SCALE_VR) {
+        public void initialize(String sTARTUP_OBJECT, GraphicsQuality gRAPHICS_QUALITY, long oBJECT_FADE_MS, float sTAR_BRIGHTNESS, float sTAR_BRIGHTNESS_POWER, float aMBIENT_LIGHT, int cAMERA_FOV, float cAMERA_SPEED, float tURNING_SPEED, float rOTATION_SPEED, int cAMERA_SPEED_LIMIT_IDX, boolean fOCUS_LOCK, boolean fOCUS_LOCK_ORIENTATION, float lABEL_SIZE_FACTOR, float lABEL_NUMBER_FACTOR, boolean[] vISIBILITY, int oRBIT_RENDERER, int lINE_RENDERER, double sTAR_TH_ANGLE_NONE,
+                double sTAR_TH_ANGLE_POINT, double sTAR_TH_ANGLE_QUAD, float pOINT_ALPHA_MIN, float pOINT_ALPHA_MAX, boolean oCTREE_PARTICLE_FADE, float oCTANT_TH_ANGLE_0, float oCTANT_TH_ANGLE_1, float pM_NUM_FACTOR, float pM_LEN_FACTOR, long n_PM_STARS, int pM_COLOR_MODE, boolean pM_ARROWHEADS, float sTAR_POINT_SIZE, boolean gALAXY_3D, int cUBEMAP_FACE_RESOLUTION, boolean cROSSHAIR_FOCUS, boolean cROSSHAIR_CLOSEST, boolean cROSSHAIR_HOME, boolean cINEMATIC_CAMERA, boolean lAZY_TEXTURE_INIT,
+                boolean lAZY_MESH_INIT, boolean fREE_CAMERA_TARGET_MODE_ON, boolean sHADOW_MAPPING, int sHADOW_MAPPING_N_SHADOWS, int sHADOW_MAPPING_RESOLUTION, long mAX_LOADED_STARS, ElevationType eLEVATION_TYPE, double eLEVATION_MULTIPLIER, double tESSELLATION_QUALITY, double dIST_SCALE_DESKTOP, double dIST_SCALE_VR) {
             STARTUP_OBJECT = sTARTUP_OBJECT;
             GRAPHICS_QUALITY = gRAPHICS_QUALITY;
             OBJECT_FADE_MS = oBJECT_FADE_MS;

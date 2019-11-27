@@ -640,7 +640,7 @@ public class SceneGraphRenderer extends AbstractRenderer implements IProcessRend
         GL30.glClampColor(GL30.GL_CLAMP_VERTEX_COLOR, GL30.GL_FALSE);
         GL30.glClampColor(GL30.GL_CLAMP_FRAGMENT_COLOR, GL30.GL_FALSE);
 
-        EventManager.instance.subscribe(this, Events.TOGGLE_VISIBILITY_CMD, Events.PIXEL_RENDERER_UPDATE, Events.LINE_RENDERER_UPDATE, Events.STEREOSCOPIC_CMD, Events.CAMERA_MODE_CMD, Events.CUBEMAP360_CMD, Events.REBUILD_SHADOW_MAP_DATA_CMD, Events.LIGHT_SCATTERING_CMD);
+        EventManager.instance.subscribe(this, Events.TOGGLE_VISIBILITY_CMD, Events.PIXEL_RENDERER_UPDATE, Events.LINE_RENDERER_UPDATE, Events.STEREOSCOPIC_CMD, Events.CAMERA_MODE_CMD, Events.CUBEMAP_CMD, Events.REBUILD_SHADOW_MAP_DATA_CMD, Events.LIGHT_SCATTERING_CMD);
 
     }
 
@@ -655,7 +655,7 @@ public class SceneGraphRenderer extends AbstractRenderer implements IProcessRend
         } else if (GlobalConf.program.STEREOSCOPIC_MODE) {
             // Stereoscopic mode
             sgr = sgrs[SGR_STEREO_IDX];
-        } else if (GlobalConf.program.CUBEMAP360_MODE) {
+        } else if (GlobalConf.program.CUBEMAP_MODE) {
             // 360 mode: cube map -> equirectangular map
             sgr = sgrs[SGR_CUBEMAP_IDX];
         } else {
@@ -918,7 +918,7 @@ public class SceneGraphRenderer extends AbstractRenderer implements IProcessRend
             Array<IRenderable> modelsTess = render_lists.get(RenderGroup.MODEL_PIX_TESS.ordinal());
             models.sort(Comparator.comparingDouble(a -> ((AbstractPositionEntity) a).getDistToCamera()));
 
-            int shadowNRender = (GlobalConf.program.STEREOSCOPIC_MODE || GlobalConf.runtime.OPENVR) ? 2 : GlobalConf.program.CUBEMAP360_MODE ? 6 : 1;
+            int shadowNRender = (GlobalConf.program.STEREOSCOPIC_MODE || GlobalConf.runtime.OPENVR) ? 2 : GlobalConf.program.CUBEMAP_MODE ? 6 : 1;
 
             if (shadowMapFb != null && smCombinedMap != null) {
                 addCandidates(models, shadowCandidates, true);
@@ -943,7 +943,7 @@ public class SceneGraphRenderer extends AbstractRenderer implements IProcessRend
         renderShadowMap(camera);
 
         // In stereo and cubemap modes, the glow pass is rendered in the SGR itself
-        if (!GlobalConf.program.STEREOSCOPIC_MODE && !GlobalConf.program.CUBEMAP360_MODE && !GlobalConf.runtime.OPENVR) {
+        if (!GlobalConf.program.STEREOSCOPIC_MODE && !GlobalConf.program.CUBEMAP_MODE && !GlobalConf.runtime.OPENVR) {
             renderGlowPass(camera, glowFb, 0);
         }
 
@@ -1110,7 +1110,7 @@ public class SceneGraphRenderer extends AbstractRenderer implements IProcessRend
                     sgr = sgrs[SGR_DEFAULT_IDX];
             }
             break;
-        case CUBEMAP360_CMD:
+        case CUBEMAP_CMD:
             boolean cubemap = (Boolean) data[0];
             if (cubemap) {
                 sgr = sgrs[SGR_CUBEMAP_IDX];
@@ -1130,7 +1130,7 @@ public class SceneGraphRenderer extends AbstractRenderer implements IProcessRend
                     sgr = sgrs[SGR_OPENVR_IDX];
                 else if (GlobalConf.program.STEREOSCOPIC_MODE)
                     sgr = sgrs[SGR_STEREO_IDX];
-                else if (GlobalConf.program.CUBEMAP360_MODE)
+                else if (GlobalConf.program.CUBEMAP_MODE)
                     sgr = sgrs[SGR_CUBEMAP_IDX];
                 else
                     sgr = sgrs[SGR_DEFAULT_IDX];

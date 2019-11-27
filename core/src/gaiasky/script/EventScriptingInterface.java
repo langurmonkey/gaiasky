@@ -1872,8 +1872,19 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
     }
 
     @Override
-    public void set360Mode(boolean state) {
-        GaiaSky.postRunnable(() -> em.post(Events.CUBEMAP360_CMD, state, false));
+    public void setCubemapMode(boolean state, String projection) {
+        CubemapProjections.CubemapProjection newProj = CubemapProjections.CubemapProjection.valueOf(projection.toUpperCase());
+        GaiaSky.postRunnable(() -> em.post(Events.CUBEMAP_CMD, state, newProj, false));
+    }
+
+    @Override
+    public void setPanoramaMode(boolean state) {
+        GaiaSky.postRunnable(() -> em.post(Events.CUBEMAP_CMD, state, CubemapProjections.CubemapProjection.EQUIRECTANGULAR, false));
+    }
+
+    @Override
+    public void setPlanetariumMode(boolean state) {
+        GaiaSky.postRunnable(() -> em.post(Events.CUBEMAP_CMD, state, CubemapProjections.CubemapProjection.FISHEYE, false));
     }
 
     @Override
@@ -1901,11 +1912,6 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
         GaiaSky.postRunnable(() -> em.post(Events.STEREO_PROFILE_CMD, index));
     }
 
-    @Override
-    public void setPlanetariumMode(boolean state) {
-        GaiaSky.postRunnable(() -> em.post(Events.PLANETARIUM_CMD, state, false));
-
-    }
 
     @Override
     public long getCurrentFrameNumber() {
