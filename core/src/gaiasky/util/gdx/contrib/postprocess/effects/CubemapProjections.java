@@ -22,11 +22,12 @@ public final class CubemapProjections extends PostProcessorEffect {
     public enum CubemapProjection {
         EQUIRECTANGULAR,
         CYLINDRICAL,
-        HAMMER
+        HAMMER,
+        FISHEYE
     }
 
-    public CubemapProjections() {
-        filter = new CubemapProjectionsFilter();
+    public CubemapProjections(float w, float h) {
+        filter = new CubemapProjectionsFilter(w, h);
     }
 
     @Override
@@ -41,6 +42,10 @@ public final class CubemapProjections extends PostProcessorEffect {
 
     public void setSides(FrameBuffer xpositive, FrameBuffer xnegative, FrameBuffer ypositive, FrameBuffer ynegative, FrameBuffer zpositive, FrameBuffer znegative) {
         filter.setSides(xpositive, xnegative, ypositive, ynegative, zpositive, znegative);
+    }
+
+    public void setViewportSize(float w, float h){
+        filter.setViewportSize(w, h);
     }
 
     @Override

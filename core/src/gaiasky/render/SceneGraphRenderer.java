@@ -453,7 +453,7 @@ public class SceneGraphRenderer extends AbstractRenderer implements IProcessRend
         sgrs[SGR_DEFAULT_IDX] = new SGR();
         sgrs[SGR_STEREO_IDX] = new SGRStereoscopic();
         sgrs[SGR_FOV_IDX] = new SGRFov();
-        sgrs[SGR_CUBEMAP_IDX] = new SGRCubemap();
+        sgrs[SGR_CUBEMAP_IDX] = new SGRCubemapProjections();
         sgrs[SGR_OPENVR_IDX] = new SGROpenVR(vrContext);
         sgr = null;
 

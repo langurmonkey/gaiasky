@@ -7,6 +7,7 @@ package gaiasky.script;
 
 import gaiasky.scenegraph.IFocus;
 import gaiasky.scenegraph.SceneGraphNode;
+import gaiasky.util.gdx.contrib.postprocess.effects.CubemapProjections;
 
 import java.util.List;
 
@@ -1454,7 +1455,7 @@ public interface IScriptingInterface {
     /**
      * Sets the cubemap projection to use.
      * Accepted values are "EQUIRECTANGULAR", "CYLINDRICAL" and "HAMMER".
-     * See {@link gaiasky.util.gdx.contrib.postprocess.effects.CubemapProjections} for possible
+     * See {@link CubemapProjections} for possible
      * values.
      * @param projection
      */

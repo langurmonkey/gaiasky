@@ -13,39 +13,30 @@ import com.badlogic.gdx.graphics.glutils.FrameBuffer;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.viewport.StretchViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
-import gaiasky.GaiaSky;
 import gaiasky.event.EventManager;
 import gaiasky.event.Events;
-import gaiasky.event.IObserver;
 import gaiasky.render.IPostProcessor.PostProcessBean;
 import gaiasky.render.RenderingContext.CubemapSide;
 import gaiasky.scenegraph.camera.ICamera;
 import gaiasky.util.GlobalConf;
-import gaiasky.util.gdx.contrib.postprocess.effects.CubemapProjections;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Set;
 
-/**
- * Renders the cube map 360 degree mode. Basically, it renders the six sides of
- * the cube map (front, back, up, down, right, left) with a 90 degree fov each
- * and applies the cube map to equirectangular transformation.
- *
- * @author tsagrista
- */
-public class SGRCubemap extends SGRAbstract implements ISGR, IObserver {
+public abstract class SGRCubemap extends SGRAbstract {
 
-    Vector3 aux1, aux2, aux3, dirbak, upbak;
+    protected Vector3 aux1, aux2, aux3, dirbak, upbak;
+    protected StretchViewport stretchViewport;
+    // Frame buffers for each side of the cubemap
+    protected Map<Integer, FrameBuffer> fbcm;
 
-    StretchViewport stretchViewport;
+    // Backup of fov value
+    protected float fovbak;
 
-    CubemapProjections cubemapEffect;
+    // Frame buffers
+    protected FrameBuffer zposfb, znegfb, xposfb, xnegfb, yposfb, ynegfb;
 
-    /** Frame buffers for each side of the cubemap **/
-    Map<Integer, FrameBuffer> fbcm;
-
-    public SGRCubemap() {
+    protected SGRCubemap(){
         super();
         aux1 = new Vector3();
         aux3 = new Vector3();
@@ -55,34 +46,27 @@ public class SGRCubemap extends SGRAbstract implements ISGR, IObserver {
         stretchViewport = new StretchViewport(Gdx.graphics.getHeight(), Gdx.graphics.getHeight());
 
         fbcm = new HashMap<>();
-
-        cubemapEffect = new CubemapProjections();
-        cubemapEffect.setProjection(GlobalConf.program.CUBEMAP_PROJECTION);
-
-        EventManager.instance.subscribe(this, Events.CUBEMAP_RESOLUTION_CMD, Events.CUBEMAP_PROJECTION_CMD);
     }
 
-    @Override
-    public void render(SceneGraphRenderer sgr, ICamera camera, double t, int rw, int rh, int tw, int th, FrameBuffer fb, PostProcessBean ppb) {
 
+    protected void renderCubemapSides(SceneGraphRenderer sgr, ICamera camera, double t, int rw, int rh, PostProcessBean ppb) {
         PerspectiveCamera cam = camera.getCamera();
 
-        float fovbak = cam.fieldOfView;
+        // Backup fov, direction and up
+        fovbak = cam.fieldOfView;
         dirbak.set(cam.direction);
         upbak.set(cam.up);
 
         EventManager.instance.post(Events.FOV_CHANGED_CMD, 90f);
 
-        FrameBuffer mainfb = getFrameBuffer(rw, rh);
-
         // The sides of the cubemap must be square. We use the max of our resolution
         int wh = GlobalConf.scene.CUBEMAP_FACE_RESOLUTION;
-        FrameBuffer zposfb = getFrameBuffer(wh, wh, 0);
-        FrameBuffer znegfb = getFrameBuffer(wh, wh, 1);
-        FrameBuffer xposfb = getFrameBuffer(wh, wh, 2);
-        FrameBuffer xnegfb = getFrameBuffer(wh, wh, 3);
-        FrameBuffer yposfb = getFrameBuffer(wh, wh, 4);
-        FrameBuffer ynegfb = getFrameBuffer(wh, wh, 5);
+        zposfb = getFrameBuffer(wh, wh, 0);
+        znegfb = getFrameBuffer(wh, wh, 1);
+        xposfb = getFrameBuffer(wh, wh, 2);
+        xnegfb = getFrameBuffer(wh, wh, 3);
+        yposfb = getFrameBuffer(wh, wh, 4);
+        ynegfb = getFrameBuffer(wh, wh, 5);
 
         Viewport viewport = stretchViewport;
         viewport.setCamera(cam);
@@ -154,26 +138,24 @@ public class SGRCubemap extends SGRAbstract implements ISGR, IObserver {
         cam.direction.set(dirbak);
         cam.up.set(upbak);
         rc.cubemapSide = CubemapSide.SIDE_NONE;
+    }
 
-        // Effect
-        cubemapEffect.setSides(xposfb, xnegfb, yposfb, ynegfb, zposfb, znegfb);
-        cubemapEffect.render(mainfb, fb, null);
-
+    protected void postRender(FrameBuffer fb){
         if (fb != null)
             fb.end();
 
         // ensure default texture unit #0 is active
         Gdx.gl.glActiveTexture(GL20.GL_TEXTURE0);
 
+        // Restore fov
         EventManager.instance.post(Events.FOV_CHANGED_CMD, fovbak);
-
     }
 
-    private void renderFace(FrameBuffer fb, ICamera camera, SceneGraphRenderer sgr, PostProcessBean ppb, int rw, int rh, int wh, double t) {
+    protected void renderFace(FrameBuffer fb, ICamera camera, SceneGraphRenderer sgr, PostProcessBean ppb, int rw, int rh, int wh, double t) {
         renderRegularFace(fb, camera, sgr, ppb, rw, rh, wh, t);
     }
 
-    private void renderRegularFace(FrameBuffer fb, ICamera camera, SceneGraphRenderer sgr, PostProcessBean ppb, int rw, int rh, int wh, double t) {
+    protected void renderRegularFace(FrameBuffer fb, ICamera camera, SceneGraphRenderer sgr, PostProcessBean ppb, int rw, int rh, int wh, double t) {
         sgr.renderGlowPass(camera, null, 0);
 
         boolean postproc = postprocessCapture(ppb, fb, wh, wh);
@@ -181,61 +163,19 @@ public class SGRCubemap extends SGRAbstract implements ISGR, IObserver {
         postprocessRender(ppb, fb, postproc, camera, rw, rh);
     }
 
-    private int getKey(int w, int h, int extra) {
+    protected int getKey(int w, int h, int extra) {
         return w * 100 + h * 10 + extra;
     }
 
-    private FrameBuffer getFrameBuffer(int w, int h) {
+    protected FrameBuffer getFrameBuffer(int w, int h) {
         return getFrameBuffer(w, h, 0);
     }
 
-    private FrameBuffer getFrameBuffer(int w, int h, int extra) {
+    protected FrameBuffer getFrameBuffer(int w, int h, int extra) {
         int key = getKey(w, h, extra);
         if (!fbcm.containsKey(key)) {
             fbcm.put(key, new FrameBuffer(Format.RGB888, w, h, true));
         }
         return fbcm.get(key);
     }
-
-    @Override
-    public void resize(int w, int h) {
-
-    }
-
-    @Override
-    public void dispose() {
-        Set<Integer> keySet = fbcm.keySet();
-        for (Integer key : keySet) {
-            fbcm.get(key).dispose();
-        }
-    }
-
-    @Override
-    public void notify(Events event, Object... data) {
-        switch (event) {
-        case CUBEMAP_RESOLUTION_CMD:
-            int res = (Integer) data[0];
-            GaiaSky.postRunnable(() -> {
-                // Create new ones
-                if (!fbcm.containsKey(getKey(res, res, 0))) {
-                    // Clear
-                    dispose();
-                    fbcm.clear();
-                } else {
-                    // All good
-                }
-            });
-            break;
-        case CUBEMAP_PROJECTION_CMD:
-            CubemapProjections.CubemapProjection p = (CubemapProjections.CubemapProjection) data[0];
-            GaiaSky.postRunnable(() -> {
-                cubemapEffect.setProjection(p);
-            });
-            break;
-        default:
-            break;
-        }
-
-    }
-
 }

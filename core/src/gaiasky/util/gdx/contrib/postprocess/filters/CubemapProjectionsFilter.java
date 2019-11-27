@@ -25,22 +25,25 @@ import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.TextureData;
 import com.badlogic.gdx.graphics.glutils.FrameBuffer;
 import com.badlogic.gdx.graphics.glutils.ShaderProgram;
+import com.badlogic.gdx.math.Vector2;
 import gaiasky.util.gdx.contrib.postprocess.effects.CubemapProjections;
 import gaiasky.util.gdx.contrib.utils.ShaderLoader;
 
 /**
- * Fast approximate anti-aliasing filter.
+ * Cubemap projections (spherical, cylindrical, hammer, fisheye) filter.
  *
  * @author Toni Sagrista
  */
 public final class CubemapProjectionsFilter extends Filter<CubemapProjectionsFilter> {
 
     private ShaderProgram[] programs;
+    private Vector2 viewport;
 
     public enum Param implements Parameter {
         // @formatter:off
         Texture("u_texture0", 0),
-        Cubemap("u_cubemap", 0);
+        Cubemap("u_cubemap", 0),
+        Viewport("u_viewport", 2);
         // @formatter:on
 
         private String mnemonic;
@@ -65,16 +68,20 @@ public final class CubemapProjectionsFilter extends Filter<CubemapProjectionsFil
     private TextureData[] cubemapSides;
     private int cmId = Integer.MIN_VALUE;
 
-    public CubemapProjectionsFilter() {
+    public CubemapProjectionsFilter(float w, float h) {
         super(null);
+        this.viewport = new Vector2(w, h);
+
         ShaderProgram equirectangular = ShaderLoader.fromFile("screenspace", "cubemapprojections", "#define equirectangular");
         ShaderProgram cylindrical = ShaderLoader.fromFile("screenspace", "cubemapprojections", "#define cylindrical");
         ShaderProgram hammeraitoff = ShaderLoader.fromFile("screenspace", "cubemapprojections", "#define hammer");
+        ShaderProgram fisheye = ShaderLoader.fromFile("screenspace", "cubemapprojections", "#define fisheye");
 
-        programs = new ShaderProgram[3];
+        programs = new ShaderProgram[4];
         programs[0] = equirectangular;
         programs[1] = cylindrical;
         programs[2] = hammeraitoff;
+        programs[3] = fisheye;
 
         super.program = equirectangular;
         rebind();
@@ -98,6 +105,10 @@ public final class CubemapProjectionsFilter extends Filter<CubemapProjectionsFil
             break;
         case HAMMER:
             super.program = programs[2];
+            rebind();
+            break;
+        case FISHEYE:
+            super.program = programs[3];
             rebind();
             break;
         default:
@@ -151,12 +162,17 @@ public final class CubemapProjectionsFilter extends Filter<CubemapProjectionsFil
         setParam(Param.Cubemap, u_texture1);
 
     }
+    public void setViewportSize(float width, float height) {
+        this.viewport.set(width, height);
+        setParam(FisheyeDistortion.Param.Viewport, this.viewport);
+    }
 
     @Override
     public void rebind() {
         // reimplement super to batch every parameter
         setParams(Param.Cubemap, u_texture1);
         setParams(Param.Texture, u_texture0);
+        setParams(Param.Viewport, this.viewport);
         endParams();
     }
 
