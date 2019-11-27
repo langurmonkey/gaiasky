@@ -58,4 +58,8 @@ public class SGRAbstract {
         }
     }
 
+    public RenderingContext getRenderingContext(){
+        return rc;
+    }
+
 }

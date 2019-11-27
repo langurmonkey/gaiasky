@@ -39,4 +39,6 @@ public interface ISGR extends Disposable {
      */
     void resize(final int w, final int h);
 
+    RenderingContext getRenderingContext();
+
 }

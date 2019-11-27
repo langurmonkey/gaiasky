@@ -187,7 +187,7 @@ public abstract class AbstractCamera implements ICamera {
 
     @Override
     public boolean isVisible(ITimeFrameProvider time, double viewAngle, Vector3d pos, double distToCamera) {
-        return (!(this instanceof FovCamera) && viewAngle > VIEW_ANGLE) || GlobalResources.isInView(pos, distToCamera, angleEdgeRad, getDirection());
+        return (!(this instanceof FovCamera) && viewAngle > VIEW_ANGLE) || GlobalResources.isInView(pos, distToCamera, angleEdgeRad, tmp.set(getCamera().direction));
     }
 
     /**
@@ -200,7 +200,7 @@ public abstract class AbstractCamera implements ICamera {
      */
     protected boolean computeVisibleFovs(CelestialBody cb, FovCamera fcamera) {
         boolean visible = false;
-        Vector3d[] dirs = null;
+        Vector3d[] dirs;
         if (GlobalConf.scene.COMPUTE_GAIA_SCAN && !fcamera.interpolatedDirections.isEmpty()) {
             // We need to interpolate...
             for (Vector3d[] interpolatedDirection : fcamera.interpolatedDirections) {

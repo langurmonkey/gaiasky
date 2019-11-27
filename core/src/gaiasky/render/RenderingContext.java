@@ -81,4 +81,7 @@ public class RenderingContext {
         this.h = h;
     }
 
+    public boolean isCubemap(){
+        return cubemapSide != null && !cubemapSide.equals(CubemapSide.SIDE_NONE);
+    }
 }

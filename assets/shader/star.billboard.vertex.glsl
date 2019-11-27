@@ -52,6 +52,9 @@ void main() {
     pos = computeGravitationalWaves(pos, u_gw, u_gwmat3, u_ts, u_omgw, u_hterms);
     #endif// gravitationalWaves
 
+    // Compute quaternion
+    vec4 quat = u_quaternion;
+
     // Translate
     mat4 translate = mat4(1.0);
 
@@ -62,15 +65,15 @@ void main() {
 
     // Rotate
     mat4 rotation = mat4(0.0);
-    float xx = u_quaternion.x * u_quaternion.x;
-    float xy = u_quaternion.x * u_quaternion.y;
-    float xz = u_quaternion.x * u_quaternion.z;
-    float xw = u_quaternion.x * u_quaternion.w;
-    float yy = u_quaternion.y * u_quaternion.y;
-    float yz = u_quaternion.y * u_quaternion.z;
-    float yw = u_quaternion.y * u_quaternion.w;
-    float zz = u_quaternion.z * u_quaternion.z;
-    float zw = u_quaternion.z * u_quaternion.w;
+    float xx = quat.x * quat.x;
+    float xy = quat.x * quat.y;
+    float xz = quat.x * quat.z;
+    float xw = quat.x * quat.w;
+    float yy = quat.y * quat.y;
+    float yz = quat.y * quat.z;
+    float yw = quat.y * quat.w;
+    float zz = quat.z * quat.z;
+    float zw = quat.z * quat.w;
 
     rotation[0][0] = 1.0 - 2.0 * (yy + zz);
     rotation[1][0] = 2.0 * (xy - zw);

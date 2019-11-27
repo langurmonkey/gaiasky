@@ -211,6 +211,10 @@ public class GlobalResources {
         return FastMath.acos(point.dot(dir) / len) < coneAngle;
     }
 
+    public static boolean isInView(Vector3 point, double len, float coneAngle, Vector3 dir) {
+        return FastMath.acos(point.dot(dir) / len) < coneAngle;
+    }
+
     /**
      * Computes whether any of the given points is visible by a camera with the
      * given direction and the given cone angle. Coordinates are assumed to be

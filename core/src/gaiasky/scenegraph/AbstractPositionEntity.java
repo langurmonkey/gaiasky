@@ -457,7 +457,7 @@ public abstract class AbstractPositionEntity extends SceneGraphNode {
 
             shader.setUniformf("u_pos", pos.put(aux3f1.get()));
 
-            DecalUtils.drawFont3D(font, batch, label, (float) pos.x, (float) pos.y, (float) pos.z, size, rot, camera.getCamera(), true);
+            DecalUtils.drawFont3D(font, batch, label, (float) pos.x, (float) pos.y, (float) pos.z, size, rot, camera.getCamera(), !rc.isCubemap());
         }
     }
 

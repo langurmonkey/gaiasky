@@ -5,7 +5,6 @@
 
 package gaiasky.scenegraph;
 
-import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
@@ -374,7 +373,7 @@ public class StarGroup extends ParticleGroup implements ILineRenderable, IStarFo
             n = 80;
             break;
         case NORMAL:
-            n = 60;
+            n = 50;
             break;
         case LOW:
         default:

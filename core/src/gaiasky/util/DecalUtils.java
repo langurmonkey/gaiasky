@@ -23,11 +23,12 @@ import gaiasky.util.math.Vector3d;
  */
 public class DecalUtils {
 
-    static Vector3 tmp, tmp2;
+    static Vector3 tmp, tmp2, tmp3;
     static Matrix4 idt, aux1, aux2;
     static {
         tmp = new Vector3();
         tmp2 = new Vector3();
+        tmp3 = new Vector3();
         idt = new Matrix4();
         aux1 = new Matrix4();
         aux2 = new Matrix4();
@@ -88,7 +89,7 @@ public class DecalUtils {
         aux1.set(batch.getTransformMatrix());
         aux2.set(batch.getProjectionMatrix());
 
-        Quaternion rotation = faceCamera ? getBillboardRotation(camera) : new Quaternion();
+        Quaternion rotation = getBillboardRotation(faceCamera ? camera.direction : tmp3.set(x, y, z).nor(), camera.up);
 
         batch.getTransformMatrix().set(camera.combined).translate(x, y, z).rotate(rotation).rotate(0, 1, 0, 180).rotate(0, 0, 1, rotationCenter).scale(scale, scale, scale);
         // Force matrices to be set to shader
