@@ -98,7 +98,7 @@ public class DesktopPostProcessor implements IPostProcessor, IObserver {
 
         int[] screen, target, screenshot, frame;
         screen = getSize(RenderType.screen);
-        target = new int[]{GlobalConf.screen.SCREEN_WIDTH, GlobalConf.screen.SCREEN_HEIGHT};
+        target = new int[] { GlobalConf.screen.SCREEN_WIDTH, GlobalConf.screen.SCREEN_HEIGHT };
         screenshot = getSize(RenderType.screenshot);
         frame = getSize(RenderType.frame);
         pps[RenderType.screen.index] = newPostProcessor(RenderType.screen, screen[0], screen[1], target[0], target[1], manager);
@@ -113,11 +113,11 @@ public class DesktopPostProcessor implements IPostProcessor, IObserver {
     private int[] getSize(RenderType type) {
         switch (type) {
         case screen:
-            return new int[]{Math.round(GlobalConf.screen.SCREEN_WIDTH * GlobalConf.screen.BACKBUFFER_SCALE), Math.round(GlobalConf.screen.SCREEN_HEIGHT * GlobalConf.screen.BACKBUFFER_SCALE)};
+            return new int[] { Math.round(GlobalConf.screen.SCREEN_WIDTH * GlobalConf.screen.BACKBUFFER_SCALE), Math.round(GlobalConf.screen.SCREEN_HEIGHT * GlobalConf.screen.BACKBUFFER_SCALE) };
         case screenshot:
-            return new int[]{GlobalConf.screenshot.SCREENSHOT_WIDTH, GlobalConf.screenshot.SCREENSHOT_HEIGHT};
+            return new int[] { GlobalConf.screenshot.SCREENSHOT_WIDTH, GlobalConf.screenshot.SCREENSHOT_HEIGHT };
         case frame:
-            return new int[]{GlobalConf.frame.RENDER_WIDTH, GlobalConf.frame.RENDER_HEIGHT};
+            return new int[] { GlobalConf.frame.RENDER_WIDTH, GlobalConf.frame.RENDER_HEIGHT };
         }
         return null;
     }
@@ -144,7 +144,7 @@ public class DesktopPostProcessor implements IPostProcessor, IObserver {
         glow.setFilter(TextureFilter.Linear, TextureFilter.Linear);
         ppb.lightglow = new LightGlow(5, 5);
         ppb.lightglow.setLightGlowTexture(glow);
-        ppb.lightglow.setTextureScale(getGlowTextureScale(GlobalConf.scene.STAR_BRIGHTNESS, GlobalConf.scene.STAR_POINT_SIZE, GaiaSky.instance.cam.getFovFactor()));
+        ppb.lightglow.setTextureScale(getGlowTextureScale(GlobalConf.scene.STAR_BRIGHTNESS, GlobalConf.scene.STAR_POINT_SIZE, GaiaSky.instance.cam.getFovFactor(), GlobalConf.program.CUBEMAP360_MODE));
         ppb.lightglow.setSpiralScale(getGlowSpiralScale(GlobalConf.scene.STAR_BRIGHTNESS, GlobalConf.scene.STAR_POINT_SIZE, GaiaSky.instance.cam.getFovFactor()));
         ppb.lightglow.setBackbufferScale(GlobalConf.screen.BACKBUFFER_SCALE);
         updateGlow(ppb, gq);
@@ -264,7 +264,7 @@ public class DesktopPostProcessor implements IPostProcessor, IObserver {
         if (gq.isUltra()) {
             samples = 15;
             lgw = 1280;
-        }else if (gq.isHigh()) {
+        } else if (gq.isHigh()) {
             samples = 12;
             lgw = 1280;
         } else if (gq.isNormal()) {
@@ -282,10 +282,10 @@ public class DesktopPostProcessor implements IPostProcessor, IObserver {
 
     }
 
-    private void updateCameraBlur(PostProcessBean ppb, GraphicsQuality gq){
+    private void updateCameraBlur(PostProcessBean ppb, GraphicsQuality gq) {
         if (gq.isUltra()) {
             ppb.camblur.setBlurMaxSamples(60);
-        }else if (gq.isHigh()) {
+        } else if (gq.isHigh()) {
             ppb.camblur.setBlurMaxSamples(50);
         } else if (gq.isNormal()) {
             ppb.camblur.setBlurMaxSamples(35);
@@ -376,9 +376,9 @@ public class DesktopPostProcessor implements IPostProcessor, IObserver {
             }
     }
 
-    private float getGlowTextureScale(double starBrightness, float starSize, float fovFactor) {
+    private float getGlowTextureScale(double starBrightness, float starSize, float fovFactor, boolean cubemap) {
         float ts = (float) starBrightness * starSize * 7e-2f / fovFactor;
-        return ts;
+        return cubemap ? Math.min(ts * 0.2f, 4e-1f) : 1f;
     }
 
     private float getGlowSpiralScale(double starBrightness, float starSize, float fovFactor) {
@@ -395,7 +395,7 @@ public class DesktopPostProcessor implements IPostProcessor, IObserver {
                 for (int i = 0; i < RenderType.values().length; i++) {
                     if (pps[i] != null) {
                         PostProcessBean ppb = pps[i];
-                        ppb.lightglow.setTextureScale(getGlowTextureScale(brightness, GlobalConf.scene.STAR_POINT_SIZE, GaiaSky.instance.cam.getFovFactor()));
+                        ppb.lightglow.setTextureScale(getGlowTextureScale(brightness, GlobalConf.scene.STAR_POINT_SIZE, GaiaSky.instance.cam.getFovFactor(), GlobalConf.program.CUBEMAP360_MODE));
                         ppb.lightglow.setSpiralScale(getGlowSpiralScale(brightness, GlobalConf.scene.STAR_POINT_SIZE, GaiaSky.instance.cam.getFovFactor()));
                     }
                 }
@@ -407,7 +407,7 @@ public class DesktopPostProcessor implements IPostProcessor, IObserver {
                 for (int i = 0; i < RenderType.values().length; i++) {
                     if (pps[i] != null) {
                         PostProcessBean ppb = pps[i];
-                        ppb.lightglow.setTextureScale(getGlowTextureScale(GlobalConf.scene.STAR_BRIGHTNESS, size, GaiaSky.instance.cam.getFovFactor()));
+                        ppb.lightglow.setTextureScale(getGlowTextureScale(GlobalConf.scene.STAR_BRIGHTNESS, size, GaiaSky.instance.cam.getFovFactor(), GlobalConf.program.CUBEMAP360_MODE));
                         ppb.lightglow.setSpiralScale(getGlowSpiralScale(GlobalConf.scene.STAR_BRIGHTNESS, size, GaiaSky.instance.cam.getFovFactor()));
                     }
                 }
@@ -436,7 +436,7 @@ public class DesktopPostProcessor implements IPostProcessor, IObserver {
                 for (int i = 0; i < RenderType.values().length; i++) {
                     if (pps[i] != null) {
                         PostProcessBean ppb = pps[i];
-                        ppb.lightglow.setTextureScale(getGlowTextureScale(GlobalConf.scene.STAR_BRIGHTNESS, GlobalConf.scene.STAR_POINT_SIZE, GaiaSky.instance.cam.getFovFactor()));
+                        ppb.lightglow.setTextureScale(getGlowTextureScale(GlobalConf.scene.STAR_BRIGHTNESS, GlobalConf.scene.STAR_POINT_SIZE, GaiaSky.instance.cam.getFovFactor(), GlobalConf.program.CUBEMAP360_MODE));
                         ppb.lightglow.setSpiralScale(getGlowSpiralScale(GlobalConf.scene.STAR_BRIGHTNESS, GlobalConf.scene.STAR_POINT_SIZE, GaiaSky.instance.cam.getFovFactor()));
                         ppb.fisheye.setFov(newFov);
                     }
@@ -528,13 +528,13 @@ public class DesktopPostProcessor implements IPostProcessor, IObserver {
             }
             break;
         case MOTION_BLUR_CMD:
-                boolean enabled = (boolean) data[0];
-                for (int i = 0; i < RenderType.values().length; i++) {
-                    if (pps[i] != null) {
-                        PostProcessBean ppb = pps[i];
-                        ppb.camblur.setEnabled(enabled && !GlobalConf.runtime.OPENVR);
-                    }
+            boolean enabled = (boolean) data[0];
+            for (int i = 0; i < RenderType.values().length; i++) {
+                if (pps[i] != null) {
+                    PostProcessBean ppb = pps[i];
+                    ppb.camblur.setEnabled(enabled && !GlobalConf.runtime.OPENVR);
                 }
+            }
             break;
         case CUBEMAP360_CMD:
             boolean c360 = (Boolean) data[0];
@@ -544,6 +544,7 @@ public class DesktopPostProcessor implements IPostProcessor, IObserver {
                     PostProcessBean ppb = pps[i];
                     ppb.camblur.setEnabled(enabled && !GlobalConf.runtime.OPENVR);
                     ppb.lightglow.setNSamples(enabled ? 1 : lightGlowNSamples);
+                    ppb.lightglow.setTextureScale(getGlowTextureScale(GlobalConf.scene.STAR_BRIGHTNESS, GlobalConf.scene.STAR_POINT_SIZE, GaiaSky.instance.cam.getFovFactor(), GlobalConf.program.CUBEMAP360_MODE));
                 }
             }
 
@@ -683,7 +684,7 @@ public class DesktopPostProcessor implements IPostProcessor, IObserver {
         case GRAPHICS_QUALITY_UPDATED:
             // Update graphics quality
             GraphicsQuality gq = (GraphicsQuality) data[0];
-            GaiaSky.postRunnable(()-> {
+            GaiaSky.postRunnable(() -> {
                 for (int i = 0; i < RenderType.values().length; i++) {
                     if (pps[i] != null) {
                         PostProcessBean ppb = pps[i];

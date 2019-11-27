@@ -274,8 +274,6 @@ public class Star extends Particle {
                     if (distToCamera < modelDistance) {
                         camera.checkClosestBody(this);
                         addToRender(this, RenderGroup.MODEL_VERT_STAR);
-                        if (GlobalConf.program.CUBEMAP360_MODE)
-                            removeFromRender(this, RenderGroup.BILLBOARD_STAR);
                     }
                 }
                 if (this.hasPm && viewAngleApparent >= thpointTimesFovfactor / GlobalConf.scene.PM_NUM_FACTOR) {
@@ -291,9 +289,7 @@ public class Star extends Particle {
 
     @Override
     public void render(IntModelBatch modelBatch, float alpha, double t, RenderingContext rc) {
-        float opac = 1;
-        if (!GlobalConf.program.CUBEMAP360_MODE)
-            opac = (float) MathUtilsd.lint(distToCamera, modelDistance / 50f, modelDistance, 1f, 0f);
+        float opac = (float) MathUtilsd.lint(distToCamera, modelDistance / 50f, modelDistance, 1f, 0f);
         float[] col = GlobalConf.scene.STAR_COLOR_TRANSIT ? ccTransit : cc;
         ((ColorAttribute) mc.env.get(ColorAttribute.AmbientLight)).color.set(col[0], col[1], col[2], 1f);
         ((FloatAttribute) mc.env.get(FloatAttribute.Shininess)).value = (float) t;

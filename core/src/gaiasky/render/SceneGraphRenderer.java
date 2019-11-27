@@ -713,7 +713,7 @@ public class SceneGraphRenderer extends AbstractRenderer implements IProcessRend
             Gdx.gl.glEnable(GL30.GL_DEPTH_TEST);
             Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT | GL20.GL_DEPTH_BUFFER_BIT);
 
-            if (!GlobalConf.program.CUBEMAP360_MODE) {
+            //if (!GlobalConf.program.CUBEMAP360_MODE) {
                 // Render billboard stars
                 billboardStarsProc.render(stars, camera, 0, null);
 
@@ -738,7 +738,7 @@ public class SceneGraphRenderer extends AbstractRenderer implements IProcessRend
                     }
                     mbPixelLightingOpaqueTessellation.end();
                 }
-            }
+            //}
 
             // Set texture to updater
             if(lpu != null){

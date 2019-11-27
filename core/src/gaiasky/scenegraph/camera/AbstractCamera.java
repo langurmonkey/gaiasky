@@ -311,7 +311,6 @@ public abstract class AbstractCamera implements ICamera {
         if (closestStar == null || closestStar.getClosestDistToCamera() > star.getClosestDistToCamera()) {
             closestStar = star;
         }
-
     }
 
     @Override
