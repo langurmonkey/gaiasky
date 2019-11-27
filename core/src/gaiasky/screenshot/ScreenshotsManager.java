@@ -136,9 +136,7 @@ public class ScreenshotsManager implements IObserver {
 
         // this is the main render function
         mr.preRenderScene();
-        // sgr.render(camera, width, height, postprocessing ? m_fbo : null,
-        // ppb);
-        mr.renderSgr(camera, dt, width, height, frameBuffer, ppb);
+        mr.renderSgr(camera, dt, width, height, width, height, frameBuffer, ppb);
 
         if (postprocessing) {
             // If post processing is active, we have to begin the buffer now again because

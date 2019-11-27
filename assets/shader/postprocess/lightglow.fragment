@@ -15,6 +15,7 @@ uniform float u_lightViewAngles[N];
 uniform vec3 u_lightColors[N];
 uniform int u_nLights;
 uniform float u_orientation;
+uniform float u_backbufferScale;
 
 in float v_lums[N];
 in vec2 v_texCoords;
@@ -52,7 +53,7 @@ void main() {
         float viewAngle = min(0.0001, u_lightViewAngles[li]);
         float size = u_textureScale * min(1.6, viewAngle * 5.0e5) * lum;
 
-        vec2 glow_tc = (v_texCoords - u_lightPositions[li]);
+        vec2 glow_tc = (v_texCoords * u_backbufferScale - u_lightPositions[li]);
         glow_tc.x *= ar;
         float dist_center = length(glow_tc);
         glow_tc /= size;

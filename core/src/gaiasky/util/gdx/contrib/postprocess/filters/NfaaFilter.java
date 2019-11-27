@@ -56,7 +56,7 @@ public final class NfaaFilter extends Filter<NfaaFilter> {
         }
     }
 
-    public NfaaFilter(int viewportWidth, int viewportHeight) {
+    public NfaaFilter(float viewportWidth, float viewportHeight) {
         this(new Vector2(viewportWidth, viewportHeight));
     }
 

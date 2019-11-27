@@ -19,12 +19,24 @@ import gaiasky.util.gdx.contrib.utils.GaiaSkyFrameBuffer;
 public final class Fisheye extends PostProcessorEffect {
     private FisheyeDistortion fisheye;
 
-    public Fisheye(int width, int height) {
+    public Fisheye(float width, float height) {
         fisheye = new FisheyeDistortion(width, height);
+    }
+
+    public Fisheye(int width, int height) {
+        this((float) width, (float) height);
     }
 
     public void setViewportSize(int width, int height) {
         this.fisheye.setViewportSize(width, height);
+    }
+
+    public void setFov(float fovDegrees) {
+        this.fisheye.setFov(fovDegrees);
+    }
+
+    public void setMode(int mode) {
+        this.fisheye.setMode(mode);
     }
 
     @Override

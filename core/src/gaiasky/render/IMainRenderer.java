@@ -16,7 +16,7 @@ public interface IMainRenderer {
 
     void preRenderScene();
 
-    void renderSgr(ICamera camera, double dt, int width, int height, FrameBuffer frameBuffer, PostProcessBean ppb);
+    void renderSgr(ICamera camera, double dt, int width, int height, int tw, int th, FrameBuffer frameBuffer, PostProcessBean ppb);
 
     ICamera getICamera();
 

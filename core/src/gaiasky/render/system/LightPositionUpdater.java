@@ -5,7 +5,6 @@
 
 package gaiasky.render.system;
 
-import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector3;
@@ -50,8 +49,8 @@ public class LightPositionUpdater implements RenderSystemRunnable, IObserver {
         EventManager.instance.subscribe(this, Events.GRAPHICS_QUALITY_UPDATED);
     }
 
-    public void reinitialize(int nLights){
-        synchronized(lock) {
+    public void reinitialize(int nLights) {
+        synchronized (lock) {
             this.nLights = nLights;
             this.positions = initializeList(null, nLights * 2);
             this.viewAngles = initializeList(null, nLights);
@@ -75,9 +74,10 @@ public class LightPositionUpdater implements RenderSystemRunnable, IObserver {
 
     /**
      * Sets the occlusion texture to use for the glow effect
+     *
      * @param tex The texture
      */
-    public void setGlowTexture(Texture tex){
+    public void setGlowTexture(Texture tex) {
         this.glowTex = tex;
     }
 
@@ -103,13 +103,16 @@ public class LightPositionUpdater implements RenderSystemRunnable, IObserver {
                             RelativisticEffectsManager.getInstance().gravitationalWavePos(pos3d);
                             Vector3 pos3 = pos3d.put(auxV);
 
-                            camera.getCamera().project(pos3);
+                            float w = GlobalConf.screen.SCREEN_WIDTH;
+                            float h = GlobalConf.screen.SCREEN_HEIGHT;
+
+                            camera.getCamera().project(pos3, 0, 0, w, h);
                             // Here we **need** to use
                             // Gdx.graphics.getWidth/Height() because we use
                             // camera.project() which uses screen
                             // coordinates only
-                            positions[lightIndex * 2] = auxV.x / Gdx.graphics.getWidth();
-                            positions[lightIndex * 2 + 1] = auxV.y / Gdx.graphics.getHeight();
+                            positions[lightIndex * 2] = auxV.x / w;
+                            positions[lightIndex * 2 + 1] = auxV.y / h;
                             viewAngles[lightIndex] = (float) p.viewAngleApparent;
                             colors[lightIndex * 3] = p.cc[0];
                             colors[lightIndex * 3 + 1] = p.cc[1];

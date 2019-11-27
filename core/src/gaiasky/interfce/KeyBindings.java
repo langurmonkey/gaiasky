@@ -172,6 +172,10 @@ public class KeyBindings {
         BooleanRunnable noGameCondition = () -> !GaiaSky.instance.getCameraManager().getMode().isGame();
         // Condition that checks the GUI is visible (no clean mode)
         BooleanRunnable noCleanMode = () -> GlobalConf.runtime.DISPLAY_GUI || GaiaSky.instance.externalView;
+        // Condition that checks that panorama mode is off
+        BooleanRunnable noPanorama = () -> !GlobalConf.program.CUBEMAP360_MODE;
+        // Condition that checks that planetarium mode is off
+        BooleanRunnable noPlanetarium = () -> !GlobalConf.postprocess.POSTPROCESS_FISHEYE;
 
         // about action
         final Runnable runnableAbout = () -> EventManager.instance.post(Events.SHOW_ABOUT_ACTION);
@@ -291,7 +295,7 @@ public class KeyBindings {
         addAction(new ProgramAction("action.toggle/element.controls", () -> EventManager.instance.post(Events.GUI_FOLD_CMD), fullGuiCondition, noCleanMode));
 
         // toggle cubemap mode
-        addAction(new ProgramAction("action.toggle/element.360", () -> EventManager.instance.post(Events.CUBEMAP360_CMD, !GlobalConf.program.CUBEMAP360_MODE, false)));
+        addAction(new ProgramAction("action.toggle/element.360", () -> EventManager.instance.post(Events.CUBEMAP360_CMD, !GlobalConf.program.CUBEMAP360_MODE, false), noPlanetarium));
 
         // toggle cubemap projection
         addAction(new ProgramAction("action.toggle/element.projection", () -> {
@@ -338,7 +342,7 @@ public class KeyBindings {
         }));
 
         // toggle planetarium mode
-        addAction(new ProgramAction("action.toggle/element.planetarium", () -> EventManager.instance.post(Events.PLANETARIUM_CMD, !GlobalConf.postprocess.POSTPROCESS_FISHEYE, false)));
+        addAction(new ProgramAction("action.toggle/element.planetarium", () -> EventManager.instance.post(Events.PLANETARIUM_CMD, !GlobalConf.postprocess.POSTPROCESS_FISHEYE, false), noPanorama));
 
         // Toggle clean (no GUI) mode
         addAction(new ProgramAction("action.toggle/element.cleanmode", () -> EventManager.instance.post(Events.DISPLAY_GUI_CMD, !GlobalConf.runtime.DISPLAY_GUI, I18n.txt("notif.cleanmode"))));

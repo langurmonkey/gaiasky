@@ -935,7 +935,7 @@ public class SceneGraphRenderer extends AbstractRenderer implements IProcessRend
     }
 
     @Override
-    public void render(ICamera camera, double t, int rw, int rh, FrameBuffer fb, PostProcessBean ppb) {
+    public void render(ICamera camera, double t, int rw, int rh, int tw, int th, FrameBuffer fb, PostProcessBean ppb) {
         if (sgr == null)
             initSGR(camera);
 
@@ -947,7 +947,7 @@ public class SceneGraphRenderer extends AbstractRenderer implements IProcessRend
             renderGlowPass(camera, glowFb, 0);
         }
 
-        sgr.render(this, camera, t, rw, rh, fb, ppb);
+        sgr.render(this, camera, t, rw, rh, tw, th, fb, ppb);
     }
 
     public FrameBuffer getGlowFb() {

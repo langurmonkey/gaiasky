@@ -14,10 +14,8 @@ import com.badlogic.gdx.backends.lwjgl3.Lwjgl3Graphics;
 import com.badlogic.gdx.backends.lwjgl3.Lwjgl3Input;
 import com.badlogic.gdx.backends.lwjgl3.Lwjgl3Window;
 import com.badlogic.gdx.graphics.GL20;
-import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.FrameBuffer;
-import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Container;
@@ -27,9 +25,8 @@ import com.badlogic.gdx.utils.viewport.Viewport;
 import gaiasky.event.EventManager;
 import gaiasky.event.Events;
 import gaiasky.event.IObserver;
-import gaiasky.render.IPostProcessor.RenderType;
-import gaiasky.render.PostProcessorFactory;
 import gaiasky.util.GlobalResources;
+import gaiasky.util.RenderUtils;
 import gaiasky.util.scene2d.OwnLabel;
 
 public class GaiaSkyView implements ApplicationListener, IObserver {
@@ -111,87 +108,9 @@ public class GaiaSkyView implements ApplicationListener, IObserver {
             ui.getViewport().apply();
             ui.draw();
         } else {
-            renderBuffer = PostProcessorFactory.instance.getPostProcessor().getPostProcessBean(RenderType.screen).pp.getCombinedBuffer().getResultBuffer();
+            renderBuffer = GaiaSky.instance.getBackRenderBuffer();
             if (renderBuffer != null) {
-                Texture tex = renderBuffer.getColorBufferTexture();
-                float tw = tex.getWidth();
-                float th = tex.getHeight();
-                float tar = tw / th;
-                float gw = graphics.getWidth();
-                float gh = graphics.getHeight();
-                float gar = gw / gh;
-
-                if(tw != lastTexSize.x || th != lastTexSize.y){
-                    // Adapt projection matrix to new size
-                    Matrix4 mat = sb.getProjectionMatrix();
-                    mat.setToOrtho2D(0, 0, tw, th);
-                }
-
-                System.out.println(tex.toString() + " g/ " + gw + "x" + gh + " (" + gar + ")  t/ " + tw + "x" + th + " (" + tar + ")");
-
-                // Output
-                float x = 0, y = 0;
-                float w = tw, h = th;
-                int sx = 0, sy = 0;
-                int sw = (int) gw, sh = (int) gh;
-
-                if (gw > tw && gh > th) {
-                    x = 0;
-                    y = 0;
-                    w = tw;
-                    h = th;
-                    // Texture contained in screen, extend texture keeping ratio
-                    if (gar > tar) {
-                        // Graphics are stretched horizontally
-                        sw = (int) tw;
-                        sh = (int) (tw / gar);
-
-                        sx = (int) ((tw - sw) / 2f);
-                        sy = (int) ((th - sh) / 2f);
-                    } else {
-                        // Graphics are stretched vertically
-                        sw = (int) (th * gar);
-                        sh = (int) th;
-
-                        sx = (int) ((tw - sw) / 2f);
-                        sy = (int) ((th - sh) / 2f);
-                    }
-                } else if (tw >= gw) {
-                    sx = (int) ((tw - gw) / 2f);
-                    if (th >= gh) {
-                        sy = (int) ((th - gh) / 2f);
-                    } else {
-                        x = 0;
-                        y = 0;
-                        w = tw;
-                        h = th;
-                        sw = (int) (th * gar);
-                        sh = (int) th;
-
-                        sx = (int) ((tw - sw) / 2f);
-                        sy = (int) ((th - sh) / 2f);
-                    }
-                } else {
-                    w = gw;
-                    if (th >= gh) {
-                        x = 0;
-                        y = 0;
-                        w = tw;
-                        h = th;
-                        sw = (int) tw;
-                        sh = (int) (tw / gar);
-
-                        sx = (int) ((tw - sw) / 2f);
-                        sy = (int) ((th - sh) / 2f);
-                    } else {
-                        h = gh;
-                    }
-                }
-                sb.begin();
-                sb.draw(tex, x, y, w, h, sx, sy, sw, sh, false, true);
-                sb.end();
-
-                lastTexSize.set(tw, th);
+                RenderUtils.renderKeepAspect(renderBuffer, sb, graphics, lastTexSize);
             }
         }
     }

@@ -15,6 +15,7 @@ import com.badlogic.gdx.backends.lwjgl3.Lwjgl3Window;
 import com.badlogic.gdx.backends.lwjgl3.Lwjgl3WindowConfiguration;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Pixmap.Format;
+import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.FrameBuffer;
 import com.badlogic.gdx.scenes.scene2d.ui.TooltipManager;
 import com.badlogic.gdx.utils.Timer;
@@ -172,6 +173,9 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
      */
     public ITimeFrameProvider time;
 
+    // The sprite batch to render the backbuffer to screen
+    private SpriteBatch renderBatch;
+
     /**
      * Camera recording or not?
      */
@@ -225,9 +229,9 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
     /**
      * Creates an instance of Gaia Sky.
      *
-     * @param dsdownload Force-show the datasets download window
-     * @param catchooser Force-show the catalog chooser window
-     * @param vr Launch in VR mode
+     * @param dsdownload   Force-show the datasets download window
+     * @param catchooser   Force-show the catalog chooser window
+     * @param vr           Launch in VR mode
      * @param externalView Open a new window with a view of the rendered scene
      */
     public GaiaSky(boolean dsdownload, boolean catchooser, boolean vr, boolean externalView) {
@@ -248,6 +252,8 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
         startTime = TimeUtils.millis();
         Gdx.app.setLogLevel(Application.LOG_INFO);
         clogger = new ConsoleLogger(true, true);
+
+        renderBatch = new SpriteBatch();
 
         // Init graphics and window
         graphics = (Lwjgl3Graphics) Gdx.graphics;
@@ -748,9 +754,10 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
                 /* RENDER THE SCENE */
                 preRenderScene();
                 if (GlobalConf.runtime.OPENVR) {
-                    renderSgr(cam, t, GlobalConf.screen.BACKBUFFER_WIDTH, GlobalConf.screen.BACKBUFFER_HEIGHT, null, pp.getPostProcessBean(RenderType.screen));
+                    renderSgr(cam, t, GlobalConf.screen.BACKBUFFER_WIDTH, GlobalConf.screen.BACKBUFFER_HEIGHT, GlobalConf.screen.BACKBUFFER_WIDTH, GlobalConf.screen.BACKBUFFER_HEIGHT, null, pp.getPostProcessBean(RenderType.screen));
                 } else {
-                    renderSgr(cam, t, graphics.getWidth(), graphics.getHeight(), null, pp.getPostProcessBean(RenderType.screen));
+                    PostProcessBean ppb = pp.getPostProcessBean(RenderType.screen);
+                    renderSgr(cam, t, Math.round(graphics.getWidth() * GlobalConf.screen.BACKBUFFER_SCALE), Math.round(graphics.getHeight() * GlobalConf.screen.BACKBUFFER_SCALE), graphics.getWidth(), graphics.getHeight(), null, ppb);
                 }
 
                 // Render the GUI, setting the viewport
@@ -770,6 +777,10 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
             sleep(GlobalConf.screen.LIMIT_FPS);
         }
     };
+
+    public FrameBuffer getBackRenderBuffer() {
+        return PostProcessorFactory.instance.getPostProcessor().getPostProcessBean(RenderType.screen).pp.getCombinedBuffer().getResultBuffer();
+    }
 
     /**
      * Displays the initial GUI
@@ -926,8 +937,8 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT | GL20.GL_DEPTH_BUFFER_BIT);
     }
 
-    public void renderSgr(ICamera camera, double t, int width, int height, FrameBuffer frameBuffer, PostProcessBean ppb) {
-        sgr.render(camera, t, width, height, frameBuffer, ppb);
+    public void renderSgr(ICamera camera, double t, int width, int height, int tw, int th, FrameBuffer frameBuffer, PostProcessBean ppb) {
+        sgr.render(camera, t, width, height, tw, th, frameBuffer, ppb);
     }
 
     private long lastResizeTime = Long.MAX_VALUE;
@@ -946,6 +957,8 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
                 lastResizeTime = System.currentTimeMillis();
             }
         }
+
+        renderBatch.getProjectionMatrix().setToOrtho2D(0, 0, graphics.getWidth(), graphics.getHeight());
     }
 
     private void updateResize() {
@@ -963,14 +976,18 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
             if (loadingGui != null)
                 loadingGui.resizeImmediate(width, height);
         } else {
+            int bw = Math.round(width * GlobalConf.screen.BACKBUFFER_SCALE);
+            int bh = Math.round(height * GlobalConf.screen.BACKBUFFER_SCALE);
             if (resizePostProcessors)
-                pp.resizeImmediate(width, height);
+                pp.resizeImmediate(bw, bh);
 
             if (resizeGuis)
                 for (IGui gui : guis)
                     gui.resizeImmediate(width, height);
 
             sgr.resize(width, height, resizeRenderSys);
+
+            GlobalConf.screen.resize(width, height);
         }
 
         cam.updateAngleEdge(width, height);

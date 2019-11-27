@@ -62,6 +62,10 @@ public final class LightGlow extends PostProcessorEffect {
         glow.dispose();
     }
 
+    public void setBackbufferScale(float bbs){
+        glow.setBackbufferScale(bbs);
+    }
+
     public void setLightPositions(int nLights, float[] vec) {
         glow.setLightPositions(nLights, vec);
     }

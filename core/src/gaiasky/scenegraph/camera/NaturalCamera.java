@@ -1746,7 +1746,7 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
                     projectToScreen(aux1, auxf1, rw, rh, chw, chh, chw2, chh2);
                     spriteBatch.draw(arrowTex, auxf1.x, auxf1.y, chw2, chh2, chw, chh, 1f, 1f, ang, 0, 0, (int) chw, (int) chw, false, false);
                 } else {
-                    aux2f2.set(auxf1.x - (Gdx.graphics.getWidth() / 2), auxf1.y - (Gdx.graphics.getHeight() / 2));
+                    aux2f2.set(auxf1.x - (rw / 2), auxf1.y - (rh / 2));
                     spriteBatch.draw(arrowTex, auxf1.x - chw2, auxf1.y - chh2, chw2, chh2, chw, chh, 1f, 1f, -90 + aux2f2.angle(), 0, 0, (int) chw, (int) chh, false, false);
                 }
             }

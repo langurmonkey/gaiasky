@@ -27,8 +27,8 @@ public class SGRFov extends SGRAbstract implements ISGR {
     }
 
     @Override
-    public void render(SceneGraphRenderer sgr, ICamera camera, double t, int rw, int rh, FrameBuffer fb, PostProcessBean ppb) {
-        boolean postproc = postprocessCapture(ppb, fb, rw, rh);
+    public void render(SceneGraphRenderer sgr, ICamera camera, double t, int rw, int rh, int tw, int th, FrameBuffer fb, PostProcessBean ppb) {
+        boolean postproc = postprocessCapture(ppb, fb, tw, th);
 
         /** FIELD OF VIEW CAMERA - we only render the star vgroup process **/
 

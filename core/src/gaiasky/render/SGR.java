@@ -22,13 +22,13 @@ public class SGR extends SGRAbstract implements ISGR {
     }
 
     @Override
-    public void render(SceneGraphRenderer sgr, ICamera camera, double t, int rw, int rh, FrameBuffer fb, PostProcessBean ppb) {
-        boolean postproc = postprocessCapture(ppb, fb, rw, rh);
+    public void render(SceneGraphRenderer sgr, ICamera camera, double t, int rw, int rh, int tw, int th, FrameBuffer fb, PostProcessBean ppb) {
+        boolean postproc = postprocessCapture(ppb, fb, tw, th);
 
         // Viewport
         extendViewport.setCamera(camera.getCamera());
         extendViewport.setWorldSize(rw, rh);
-        extendViewport.setScreenSize(rw, rh);
+        extendViewport.setScreenSize(tw, th);
         extendViewport.apply();
 
         // Render
@@ -47,7 +47,7 @@ public class SGR extends SGRAbstract implements ISGR {
         //    sb.end();
         //}
 
-        postprocessRender(ppb, fb, postproc, camera, rw, rh);
+        postprocessRender(ppb, fb, postproc, camera, tw * tw / rw, th * th / rh);
 
     }
 

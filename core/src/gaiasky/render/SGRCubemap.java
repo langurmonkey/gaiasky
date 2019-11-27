@@ -31,9 +31,8 @@ import java.util.Set;
  * Renders the cube map 360 degree mode. Basically, it renders the six sides of
  * the cube map (front, back, up, down, right, left) with a 90 degree fov each
  * and applies the cube map to equirectangular transformation.
- * 
- * @author tsagrista
  *
+ * @author tsagrista
  */
 public class SGRCubemap extends SGRAbstract implements ISGR, IObserver {
 
@@ -55,7 +54,7 @@ public class SGRCubemap extends SGRAbstract implements ISGR, IObserver {
         upbak = new Vector3();
         stretchViewport = new StretchViewport(Gdx.graphics.getHeight(), Gdx.graphics.getHeight());
 
-        fbcm = new HashMap<Integer, FrameBuffer>();
+        fbcm = new HashMap<>();
 
         cubemapEffect = new CubemapProjections();
         cubemapEffect.setProjection(GlobalConf.program.CUBEMAP_PROJECTION);
@@ -64,7 +63,7 @@ public class SGRCubemap extends SGRAbstract implements ISGR, IObserver {
     }
 
     @Override
-    public void render(SceneGraphRenderer sgr, ICamera camera, double t, int rw, int rh, FrameBuffer fb, PostProcessBean ppb) {
+    public void render(SceneGraphRenderer sgr, ICamera camera, double t, int rw, int rh, int tw, int th, FrameBuffer fb, PostProcessBean ppb) {
 
         PerspectiveCamera cam = camera.getCamera();
 
@@ -207,8 +206,7 @@ public class SGRCubemap extends SGRAbstract implements ISGR, IObserver {
     public void dispose() {
         Set<Integer> keySet = fbcm.keySet();
         for (Integer key : keySet) {
-            FrameBuffer fb = fbcm.get(key);
-            fb.dispose();
+            fbcm.get(key).dispose();
         }
     }
 
@@ -217,16 +215,16 @@ public class SGRCubemap extends SGRAbstract implements ISGR, IObserver {
         switch (event) {
         case CUBEMAP_RESOLUTION_CMD:
             int res = (Integer) data[0];
-            if (!fbcm.containsKey(getKey(res, res, 0))) {
-                // Clear
-                Set<Integer> keyset = fbcm.keySet();
-                for (Integer key : keyset) {
-                    fbcm.get(key).dispose();
+            GaiaSky.postRunnable(() -> {
+                // Create new ones
+                if (!fbcm.containsKey(getKey(res, res, 0))) {
+                    // Clear
+                    dispose();
+                    fbcm.clear();
+                } else {
+                    // All good
                 }
-                fbcm.clear();
-            } else {
-                // All good
-            }
+            });
             break;
         case CUBEMAP_PROJECTION_CMD:
             CubemapProjections.CubemapProjection p = (CubemapProjections.CubemapProjection) data[0];

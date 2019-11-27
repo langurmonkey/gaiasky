@@ -62,11 +62,15 @@ public final class FxaaFilter extends Filter<FxaaFilter> {
         }
     }
 
-    public FxaaFilter(int viewportWidth, int viewportHeight) {
+    public FxaaFilter(float viewportWidth, float viewportHeight) {
         this(new Vector2(viewportWidth, viewportHeight), 1f / 128f, 1f / 8f, 8f);
     }
 
-    public FxaaFilter(int viewportWidth, int viewportHeight, float fxaa_reduce_min, float fxaa_reduce_mul, float fxaa_span_max) {
+    public FxaaFilter(int viewportWidth, int viewportHeight) {
+        this((float) viewportWidth, (float) viewportHeight);
+    }
+
+    public FxaaFilter(float viewportWidth, float viewportHeight, float fxaa_reduce_min, float fxaa_reduce_mul, float fxaa_span_max) {
         this(new Vector2(viewportWidth, viewportHeight), fxaa_reduce_min, fxaa_reduce_mul, fxaa_span_max);
     }
 

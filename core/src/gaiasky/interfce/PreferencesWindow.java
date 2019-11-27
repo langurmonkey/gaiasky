@@ -211,11 +211,11 @@ public class PreferencesWindow extends GenericDialog {
         // Get current resolution
         Table windowedResolutions = new Table(skin);
         DisplayMode nativeMode = Gdx.graphics.getDisplayMode();
-        widthValidator = new IntValidator(100, nativeMode.width);
-        widthField = new OwnTextField(Integer.toString(MathUtils.clamp(GlobalConf.screen.SCREEN_WIDTH, 100, nativeMode.width)), skin, widthValidator);
+        widthValidator = new IntValidator(100, 10000);
+        widthField = new OwnTextField(Integer.toString(MathUtils.clamp(GlobalConf.screen.SCREEN_WIDTH, 100, 10000)), skin, widthValidator);
         widthField.setWidth(textwidth);
-        heightValidator = new IntValidator(100, nativeMode.height);
-        heightField = new OwnTextField(Integer.toString(MathUtils.clamp(GlobalConf.screen.SCREEN_HEIGHT, 100, nativeMode.height)), skin, heightValidator);
+        heightValidator = new IntValidator(100, 10000);
+        heightField = new OwnTextField(Integer.toString(MathUtils.clamp(GlobalConf.screen.SCREEN_HEIGHT, 100, 10000)), skin, heightValidator);
         heightField.setWidth(textwidth);
         final OwnLabel widthLabel = new OwnLabel(I18n.txt("gui.width") + ":", skin);
         final OwnLabel heightLabel = new OwnLabel(I18n.txt("gui.height") + ":", skin);

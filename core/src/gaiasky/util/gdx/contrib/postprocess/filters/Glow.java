@@ -42,6 +42,7 @@ public final class Glow extends Filter<Glow> {
     private float textureScale = 1f;
     private float spiralScale = 1f;
     private float orientation = 0f;
+    private float backbufferScale = 1f;
 
     // Contians a pre pass texture which is used to compute occlusion
     private Texture prePassTexture;
@@ -60,6 +61,7 @@ public final class Glow extends Filter<Glow> {
         NSamples("u_nSamples", 0),
         Orientation("u_orientation", 0),
         SpiralScale("u_spiralScale", 0),
+        BackbufferScale("u_backbufferScale", 0),
         TextureScale("u_textureScale", 0);
         // @formatter:on
 
@@ -86,6 +88,11 @@ public final class Glow extends Filter<Glow> {
         super(ShaderLoader.fromFile("lightglow", "lightglow"));
         viewport = new Vector2(width, height);
         rebind();
+    }
+
+    public void setBackbufferScale(float s){
+        this.backbufferScale = s;
+        setParam(Param.BackbufferScale, s);
     }
 
     public void setViewportSize(float width, float height) {
@@ -159,6 +166,7 @@ public final class Glow extends Filter<Glow> {
         setParams(Param.SpiralScale, spiralScale);
         setParams(Param.Orientation, orientation);
         setParams(Param.Viewport, viewport);
+        setParams(Param.BackbufferScale, backbufferScale);
         setParams(Param.NLights, nLights);
         if (lightPositions != null)
             setParamsv(Param.LightPositions, lightPositions, 0, nLights * 2);

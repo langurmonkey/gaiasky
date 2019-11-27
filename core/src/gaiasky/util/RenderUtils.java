@@ -1,0 +1,130 @@
+/*
+ * This file is part of Gaia Sky, which is released under the Mozilla Public License 2.0.
+ * See the file LICENSE.md in the project root for full license details.
+ */
+
+package gaiasky.util;
+
+import com.badlogic.gdx.Graphics;
+import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.graphics.glutils.FrameBuffer;
+import com.badlogic.gdx.math.Matrix4;
+import com.badlogic.gdx.math.Vector2;
+
+/**
+ * Contains utilities to render stuff
+ */
+public class RenderUtils {
+
+    /**
+     * Assumes the aspect ratio is fine
+     * @param fb The frame buffer to render
+     * @param sb The sprite batch to use
+     * @param g The graphics instance
+     */
+    public static void renderBackbuffer(FrameBuffer fb, SpriteBatch sb, Graphics g){
+        Texture tex = fb.getColorBufferTexture();
+        sb.begin();
+        sb.draw(tex, 0, 0, tex.getWidth(), tex.getHeight(), 0, 0, 1, 1);
+        sb.end();
+    }
+
+    /**
+     * Renders the given frame buffer to screen with a fill scaling, maintaining the aspect ratio
+     * @param fb The frame buffer to render
+     * @param sb The sprite batch to use
+     * @param g The graphics instance
+     */
+    public static void renderKeepAspect(FrameBuffer fb, SpriteBatch sb, Graphics g){
+        renderKeepAspect(fb, sb, g, null);
+    }
+
+    /**
+     * Renders the given frame buffer to screen with a fill scaling, maintaining the aspect ratio
+     * @param fb The frame buffer to render
+     * @param sb The sprite batch to use
+     * @param g The graphics instance
+     * @param lastSize The previous size, for recomputing the sprite batch transform
+     */
+    public static void renderKeepAspect(FrameBuffer fb, SpriteBatch sb, Graphics g, Vector2 lastSize) {
+        Texture tex = fb.getColorBufferTexture();
+        float tw = tex.getWidth();
+        float th = tex.getHeight();
+        float tar = tw / th;
+        float gw = g.getWidth();
+        float gh = g.getHeight();
+        float gar = gw / gh;
+
+        if (lastSize != null && (tw != lastSize.x || th != lastSize.y)) {
+            // Adapt projection matrix to new size
+            Matrix4 mat = sb.getProjectionMatrix();
+            mat.setToOrtho2D(0, 0, tw, th);
+        }
+
+        // Output
+        float x = 0, y = 0;
+        float w = tw, h = th;
+        int sx = 0, sy = 0;
+        int sw = (int) gw, sh = (int) gh;
+
+        if (gw > tw && gh > th) {
+            x = 0;
+            y = 0;
+            w = tw;
+            h = th;
+            // Texture contained in screen, extend texture keeping ratio
+            if (gar > tar) {
+                // Graphics are stretched horizontally
+                sw = (int) tw;
+                sh = (int) (tw / gar);
+
+                sx = (int) ((tw - sw) / 2f);
+                sy = (int) ((th - sh) / 2f);
+            } else {
+                // Graphics are stretched vertically
+                sw = (int) (th * gar);
+                sh = (int) th;
+
+                sx = (int) ((tw - sw) / 2f);
+                sy = (int) ((th - sh) / 2f);
+            }
+        } else if (tw >= gw) {
+            sx = (int) ((tw - gw) / 2f);
+            if (th >= gh) {
+                sy = (int) ((th - gh) / 2f);
+            } else {
+                x = 0;
+                y = 0;
+                w = tw;
+                h = th;
+                sw = (int) (th * gar);
+                sh = (int) th;
+
+                sx = (int) ((tw - sw) / 2f);
+                sy = (int) ((th - sh) / 2f);
+            }
+        } else {
+            w = gw;
+            if (th >= gh) {
+                x = 0;
+                y = 0;
+                w = tw;
+                h = th;
+                sw = (int) tw;
+                sh = (int) (tw / gar);
+
+                sx = (int) ((tw - sw) / 2f);
+                sy = (int) ((th - sh) / 2f);
+            } else {
+                h = gh;
+            }
+        }
+        sb.begin();
+        sb.draw(tex, x, y, w, h, sx, sy, sw, sh, false, true);
+        sb.end();
+
+        if (lastSize != null)
+            lastSize.set(tw, th);
+    }
+}

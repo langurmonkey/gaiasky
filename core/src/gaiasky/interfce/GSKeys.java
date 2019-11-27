@@ -70,6 +70,7 @@ public class GSKeys {
     public static final int K = Keys.K;
     public static final int L = Keys.L;
     public static final int L_BRACKET = Keys.LEFT_BRACKET;
+    public static final int LEFT_BRACKET = Keys.LEFT_BRACKET;
     public static final int M = Keys.M;
     public static final int MEDIA_FAST_FORWARD = Keys.MEDIA_FAST_FORWARD;
     public static final int MEDIA_NEXT = Keys.MEDIA_NEXT;
@@ -92,6 +93,7 @@ public class GSKeys {
     public static final int Q = Keys.Q;
     public static final int R = Keys.R;
     public static final int R_BRACKET = Keys.RIGHT_BRACKET;
+    public static final int RIGHT_BRACKET = Keys.RIGHT_BRACKET;
     public static final int S = Keys.S;
     public static final int SEARCH = Keys.SEARCH;
     public static final int SEMICOLON = Keys.SEMICOLON;

@@ -11,6 +11,7 @@ import com.badlogic.gdx.graphics.PerspectiveCamera;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.Texture.TextureFilter;
 import com.badlogic.gdx.math.Matrix4;
+import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.Timer;
 import com.badlogic.gdx.utils.Timer.Task;
@@ -95,47 +96,41 @@ public class DesktopPostProcessor implements IPostProcessor, IObserver {
 
         pps = new PostProcessBean[RenderType.values().length];
 
-        pps[RenderType.screen.index] = newPostProcessor(RenderType.screen, getWidth(RenderType.screen), getHeight(RenderType.screen), manager);
+        int[] screen, target, screenshot, frame;
+        screen = getSize(RenderType.screen);
+        target = new int[]{GlobalConf.screen.SCREEN_WIDTH, GlobalConf.screen.SCREEN_HEIGHT};
+        screenshot = getSize(RenderType.screenshot);
+        frame = getSize(RenderType.frame);
+        pps[RenderType.screen.index] = newPostProcessor(RenderType.screen, screen[0], screen[1], target[0], target[1], manager);
         if (GlobalConf.screenshot.isRedrawMode())
-            pps[RenderType.screenshot.index] = newPostProcessor(RenderType.screenshot, getWidth(RenderType.screenshot), getHeight(RenderType.screenshot), manager);
+            pps[RenderType.screenshot.index] = newPostProcessor(RenderType.screenshot, screenshot[0], screenshot[1], screenshot[0], screenshot[1], manager);
         if (GlobalConf.frame.isRedrawMode())
-            pps[RenderType.frame.index] = newPostProcessor(RenderType.frame, getWidth(RenderType.frame), getHeight(RenderType.frame), manager);
+            pps[RenderType.frame.index] = newPostProcessor(RenderType.frame, frame[0], frame[1], frame[0], frame[1], manager);
 
         EventManager.instance.subscribe(this, Events.SCREENSHOT_SIZE_UDPATE, Events.FRAME_SIZE_UDPATE, Events.BLOOM_CMD, Events.LENS_FLARE_CMD, Events.MOTION_BLUR_CMD, Events.LIGHT_POS_2D_UPDATED, Events.LIGHT_SCATTERING_CMD, Events.FISHEYE_CMD, Events.CUBEMAP360_CMD, Events.ANTIALIASING_CMD, Events.BRIGHTNESS_CMD, Events.CONTRAST_CMD, Events.HUE_CMD, Events.SATURATION_CMD, Events.GAMMA_CMD, Events.TONEMAPPING_TYPE_CMD, Events.EXPOSURE_CMD, Events.STEREO_PROFILE_CMD, Events.STEREOSCOPIC_CMD, Events.FPS_INFO, Events.FOV_CHANGE_NOTIFICATION, Events.STAR_BRIGHTNESS_CMD, Events.STAR_POINT_SIZE_CMD, Events.CAMERA_MOTION_UPDATED, Events.GRAPHICS_QUALITY_UPDATED);
     }
 
-    private int getWidth(RenderType type) {
+    private int[] getSize(RenderType type) {
         switch (type) {
         case screen:
-            return Gdx.graphics.getWidth();
+            return new int[]{Math.round(GlobalConf.screen.SCREEN_WIDTH * GlobalConf.screen.BACKBUFFER_SCALE), Math.round(GlobalConf.screen.SCREEN_HEIGHT * GlobalConf.screen.BACKBUFFER_SCALE)};
         case screenshot:
-            return GlobalConf.screenshot.SCREENSHOT_WIDTH;
+            return new int[]{GlobalConf.screenshot.SCREENSHOT_WIDTH, GlobalConf.screenshot.SCREENSHOT_HEIGHT};
         case frame:
-            return GlobalConf.frame.RENDER_WIDTH;
+            return new int[]{GlobalConf.frame.RENDER_WIDTH, GlobalConf.frame.RENDER_HEIGHT};
         }
-        return 0;
+        return null;
     }
 
-    private int getHeight(RenderType type) {
-        switch (type) {
-        case screen:
-            return Gdx.graphics.getHeight();
-        case screenshot:
-            return GlobalConf.screenshot.SCREENSHOT_HEIGHT;
-        case frame:
-            return GlobalConf.frame.RENDER_HEIGHT;
-        }
-        return 0;
-    }
-
-    private PostProcessBean newPostProcessor(RenderType rt, int width, int height, AssetManager manager) {
+    private PostProcessBean newPostProcessor(RenderType rt, float width, float height, float targetWidth, float targetHeight, AssetManager manager) {
         PostProcessBean ppb = new PostProcessBean();
 
         GraphicsQuality gq = GlobalConf.scene.GRAPHICS_QUALITY;
 
-        ar = (float) width / (float) height;
+        ar = width / height;
 
-        ppb.pp = new PostProcessor(rt, width, height, true, false, true);
+        ppb.pp = new PostProcessor(rt, Math.round(width), Math.round(height), true, false, true);
+        ppb.pp.setViewport(new Rectangle(0, 0, width, height));
 
         // DEPTH BUFFER
         //ppb.depthBuffer = new DepthBuffer();
@@ -151,6 +146,7 @@ public class DesktopPostProcessor implements IPostProcessor, IObserver {
         ppb.lightglow.setLightGlowTexture(glow);
         ppb.lightglow.setTextureScale(getGlowTextureScale(GlobalConf.scene.STAR_BRIGHTNESS, GlobalConf.scene.STAR_POINT_SIZE, GaiaSky.instance.cam.getFovFactor()));
         ppb.lightglow.setSpiralScale(getGlowSpiralScale(GlobalConf.scene.STAR_BRIGHTNESS, GlobalConf.scene.STAR_POINT_SIZE, GaiaSky.instance.cam.getFovFactor()));
+        ppb.lightglow.setBackbufferScale(GlobalConf.screen.BACKBUFFER_SCALE);
         updateGlow(ppb, gq);
         ppb.lightglow.setEnabled(!SysUtils.isMac() && GlobalConf.postprocess.POSTPROCESS_LIGHT_SCATTERING);
         ppb.pp.addEffect(ppb.lightglow);
@@ -212,6 +208,8 @@ public class DesktopPostProcessor implements IPostProcessor, IObserver {
 
         // FISHEYE DISTORTION (DOME)
         ppb.fisheye = new Fisheye(width, height);
+        ppb.fisheye.setFov(GaiaSky.instance.cam.getCamera().fieldOfView);
+        ppb.fisheye.setMode(0);
         ppb.fisheye.setEnabled(GlobalConf.postprocess.POSTPROCESS_FISHEYE);
         ppb.pp.addEffect(ppb.fisheye);
 
@@ -296,7 +294,7 @@ public class DesktopPostProcessor implements IPostProcessor, IObserver {
         }
     }
 
-    private void initCameraBlur(PostProcessBean ppb, int width, int height, GraphicsQuality gq) {
+    private void initCameraBlur(PostProcessBean ppb, float width, float height, GraphicsQuality gq) {
         ppb.camblur = new CameraMotion(width, height);
         ppb.camblur.setBlurScale(1f);
         ppb.camblur.setEnabled(GlobalConf.postprocess.POSTPROCESS_MOTION_BLUR && !GlobalConf.runtime.OPENVR);
@@ -335,7 +333,7 @@ public class DesktopPostProcessor implements IPostProcessor, IObserver {
         ppb.pp.addEffect(ppb.levels);
     }
 
-    private void initAntiAliasing(Antialias aavalue, int width, int height, PostProcessBean ppb) {
+    private void initAntiAliasing(Antialias aavalue, float width, float height, PostProcessBean ppb) {
         if (aavalue.equals(Antialias.FXAA)) {
             ppb.antialiasing = new Fxaa(width, height);
             ((Fxaa) ppb.antialiasing).setSpanMax(8f);
@@ -359,12 +357,12 @@ public class DesktopPostProcessor implements IPostProcessor, IObserver {
 
     @Override
     public void resize(final int width, final int height) {
-        GaiaSky.postRunnable(() -> replace(RenderType.screen, width, height));
+        GaiaSky.postRunnable(() -> replace(RenderType.screen, width * GlobalConf.screen.BACKBUFFER_SCALE, height * GlobalConf.screen.BACKBUFFER_SCALE, width, height));
     }
 
     @Override
     public void resizeImmediate(final int width, final int height) {
-        replace(RenderType.screen, width, height);
+        replace(RenderType.screen, width * GlobalConf.screen.BACKBUFFER_SCALE, height * GlobalConf.screen.BACKBUFFER_SCALE, width, height);
     }
 
     @Override
@@ -433,12 +431,14 @@ public class DesktopPostProcessor implements IPostProcessor, IObserver {
             }
             break;
         case FOV_CHANGE_NOTIFICATION:
+            float newFov = (Float) data[0];
             GaiaSky.postRunnable(() -> {
                 for (int i = 0; i < RenderType.values().length; i++) {
                     if (pps[i] != null) {
                         PostProcessBean ppb = pps[i];
                         ppb.lightglow.setTextureScale(getGlowTextureScale(GlobalConf.scene.STAR_BRIGHTNESS, GlobalConf.scene.STAR_POINT_SIZE, GaiaSky.instance.cam.getFovFactor()));
                         ppb.lightglow.setSpiralScale(getGlowSpiralScale(GlobalConf.scene.STAR_BRIGHTNESS, GlobalConf.scene.STAR_POINT_SIZE, GaiaSky.instance.cam.getFovFactor()));
+                        ppb.fisheye.setFov(newFov);
                     }
                 }
             });
@@ -449,10 +449,10 @@ public class DesktopPostProcessor implements IPostProcessor, IObserver {
                 int newh = (Integer) data[1];
                 if (pps[RenderType.screenshot.index] != null) {
                     if (changed(pps[RenderType.screenshot.index].pp, neww, newh)) {
-                        GaiaSky.postRunnable(() -> replace(RenderType.screenshot, neww, newh));
+                        GaiaSky.postRunnable(() -> replace(RenderType.screenshot, neww, newh, neww, newh));
                     }
                 } else {
-                    pps[RenderType.screenshot.index] = newPostProcessor(RenderType.screenshot, neww, newh, manager);
+                    pps[RenderType.screenshot.index] = newPostProcessor(RenderType.screenshot, neww, newh, neww, newh, manager);
                 }
             }
             break;
@@ -463,11 +463,11 @@ public class DesktopPostProcessor implements IPostProcessor, IObserver {
                 if (pps[RenderType.frame.index] != null) {
                     if (changed(pps[RenderType.frame.index].pp, neww, newh)) {
                         GaiaSky.postRunnable(() -> {
-                            replace(RenderType.frame, neww, newh);
+                            replace(RenderType.frame, neww, newh, neww, newh);
                         });
                     }
                 } else {
-                    pps[RenderType.frame.index] = newPostProcessor(RenderType.frame, neww, newh, manager);
+                    pps[RenderType.frame.index] = newPostProcessor(RenderType.frame, neww, newh, neww, newh, manager);
                 }
             }
             break;
@@ -707,11 +707,11 @@ public class DesktopPostProcessor implements IPostProcessor, IObserver {
      * @param height
      * @Override public void run()
      */
-    private void replace(RenderType rt, final int width, final int height) {
+    private void replace(RenderType rt, final float width, final float height, final float targetWidth, final float targetHeight) {
         // Dispose of old post processor
         pps[rt.index].dispose(false);
         // Create new
-        pps[rt.index] = newPostProcessor(rt, width, height, manager);
+        pps[rt.index] = newPostProcessor(rt, width, height, targetWidth, targetHeight, manager);
     }
 
     private boolean changed(PostProcessor postProcess, int width, int height) {
@@ -733,7 +733,8 @@ public class DesktopPostProcessor implements IPostProcessor, IObserver {
                 ppb.curvature.setEnabled(curvatureEnabled);
 
                 RenderType currentRenderType = RenderType.values()[i];
-                ppb.lightglow.setViewportSize(getWidth(currentRenderType) / (viewportHalved ? 2 : 1), getHeight(currentRenderType));
+                int[] size = getSize(currentRenderType);
+                ppb.lightglow.setViewportSize(size[0] / (viewportHalved ? 2 : 1), size[1]);
             }
         }
     }

@@ -34,11 +34,15 @@ public final class Fxaa extends Antialiasing {
     private FxaaFilter fxaaFilter = null;
 
     /** Create a FXAA with the viewport size */
-    public Fxaa(int viewportWidth, int viewportHeight) {
+    public Fxaa(float viewportWidth, float viewportHeight) {
         setup(viewportWidth, viewportHeight);
     }
 
-    private void setup(int viewportWidth, int viewportHeight) {
+    public Fxaa(int viewportWidth, int viewportHeight) {
+        this((float) viewportWidth, (float) viewportHeight);
+    }
+
+    private void setup(float viewportWidth, float viewportHeight) {
         fxaaFilter = new FxaaFilter(viewportWidth, viewportHeight);
     }
 

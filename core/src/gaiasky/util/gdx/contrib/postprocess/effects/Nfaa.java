@@ -34,11 +34,11 @@ public final class Nfaa extends Antialiasing {
     private NfaaFilter nfaaFilter = null;
 
     /** Create a NFAA with the viewport size */
-    public Nfaa(int viewportWidth, int viewportHeight) {
+    public Nfaa(float viewportWidth, float viewportHeight) {
         setup(viewportWidth, viewportHeight);
     }
 
-    private void setup(int viewportWidth, int viewportHeight) {
+    private void setup(float viewportWidth, float viewportHeight) {
         nfaaFilter = new NfaaFilter(viewportWidth, viewportHeight);
     }
 

@@ -688,6 +688,7 @@ public class GlobalConf {
 
         public int SCREEN_WIDTH;
         public int SCREEN_HEIGHT;
+        public float BACKBUFFER_SCALE = 1f;
         public int BACKBUFFER_WIDTH;
         public int BACKBUFFER_HEIGHT;
         public int FULLSCREEN_WIDTH;
@@ -718,6 +719,16 @@ public class GlobalConf {
 
         public int getScreenHeight() {
             return FULLSCREEN ? FULLSCREEN_HEIGHT : SCREEN_HEIGHT;
+        }
+
+        public void resize(int w, int h){
+            if(FULLSCREEN){
+                FULLSCREEN_WIDTH = w;
+                FULLSCREEN_HEIGHT = h;
+            } else {
+                SCREEN_WIDTH = w;
+                SCREEN_HEIGHT = h;
+            }
         }
 
     }

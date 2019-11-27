@@ -22,12 +22,14 @@ public interface ISGR extends Disposable {
      * @param sgr    The scene graph renderer object
      * @param camera The camera.
      * @param t      The time in seconds since the start
-     * @param rw     The width
-     * @param rh     The height
+     * @param rw     The width of the buffer
+     * @param rh     The height of the buffer
+     * @param tw     The final target width
+     * @param th     The final target height
      * @param fb     The frame buffer, if any
      * @param ppb    The post processing bean
      */
-    void render(SceneGraphRenderer sgr, ICamera camera, double t, int rw, int rh, FrameBuffer fb, PostProcessBean ppb);
+    void render(SceneGraphRenderer sgr, ICamera camera, double t, int rw, int rh, int tw, int th, FrameBuffer fb, PostProcessBean ppb);
 
     /**
      * Resizes the assets of this renderer to the given new size

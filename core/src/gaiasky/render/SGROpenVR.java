@@ -166,7 +166,7 @@ public class SGROpenVR extends SGRAbstract implements ISGR, IObserver {
     }
 
     @Override
-    public void render(SceneGraphRenderer sgr, ICamera camera, double t, int rw, int rh, FrameBuffer fb, PostProcessBean ppb) {
+    public void render(SceneGraphRenderer sgr, ICamera camera, double t, int rw, int rh, int tw, int th, FrameBuffer fb, PostProcessBean ppb) {
         if (vrContext != null) {
             rc.ppb = null;
             try {
@@ -193,7 +193,7 @@ public class SGROpenVR extends SGRAbstract implements ISGR, IObserver {
 
             sgr.renderGlowPass(camera, sgr.getGlowFb(), VR.EVREye_Eye_Left);
 
-            boolean postproc = postprocessCapture(ppb, fbLeft, rw, rh);
+            boolean postproc = postprocessCapture(ppb, fbLeft, tw, th);
 
             // Render scene
             sgr.renderScene(camera, t, rc);
@@ -221,7 +221,7 @@ public class SGROpenVR extends SGRAbstract implements ISGR, IObserver {
 
             sgr.renderGlowPass(camera, sgr.getGlowFb(), VR.EVREye_Eye_Right);
 
-            postproc = postprocessCapture(ppb, fbRight, rw, rh);
+            postproc = postprocessCapture(ppb, fbRight, tw, th);
 
             // Render scene
             sgr.renderScene(camera, t, rc);

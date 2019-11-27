@@ -84,7 +84,7 @@ public class SGRStereoscopic extends SGRAbstract implements ISGR, IObserver {
     }
 
     @Override
-    public void render(SceneGraphRenderer sgr, ICamera camera, double t, int rw, int rh, FrameBuffer fb, PostProcessBean ppb) {
+    public void render(SceneGraphRenderer sgr, ICamera camera, double t, int rw, int rh, int tw, int th, FrameBuffer fb, PostProcessBean ppb) {
         boolean movecam = camera.getMode() == CameraMode.FREE_MODE || camera.getMode() == CameraMode.FOCUS_MODE || camera.getMode() == CameraMode.SPACECRAFT_MODE;
 
         PerspectiveCamera cam = camera.getCamera();
@@ -146,7 +146,7 @@ public class SGRStereoscopic extends SGRAbstract implements ISGR, IObserver {
             sgr.renderGlowPass(camera, null, VR.EVREye_Eye_Left);
 
             FrameBuffer fb1 = getFrameBuffer(rw, rh, 1);
-            boolean postproc = postprocessCapture(ppb, fb1, rw, rh);
+            boolean postproc = postprocessCapture(ppb, fb1, tw, th);
             sgr.renderScene(camera, t, rc);
 
             postprocessRender(ppb, fb1, postproc, camera, rw, rh);
@@ -164,7 +164,7 @@ public class SGRStereoscopic extends SGRAbstract implements ISGR, IObserver {
             sgr.renderGlowPass(camera, null, VR.EVREye_Eye_Right);
 
             FrameBuffer fb2 = getFrameBuffer(rw, rh, 2);
-            postproc = postprocessCapture(ppb, fb2, rw, rh);
+            postproc = postprocessCapture(ppb, fb2, tw, th);
             sgr.renderScene(camera, t, rc);
 
             postprocessRender(ppb, fb2, postproc, camera, rw, rh);
