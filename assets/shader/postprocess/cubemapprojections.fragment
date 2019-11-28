@@ -3,6 +3,7 @@
 uniform sampler2D u_texture0;
 uniform samplerCube u_cubemap;
 uniform vec2 u_viewport;
+uniform float u_aperture;
 
 in vec2 v_texCoords;
 layout (location = 0) out vec4 fragColor;
@@ -74,7 +75,7 @@ vec4 cubeToProjection(samplerCube cubemap, vec2 tc) {
 #ifdef fisheye
 // Fisheye (planetarium)
 vec4 cubeToProjection(samplerCube cubemap, vec2 tc){
-    float aperture = 180.0;
+    float aperture = u_aperture;
 
     vec2 vp = u_viewport;
     tc = tc * 2.0 - 1.0;

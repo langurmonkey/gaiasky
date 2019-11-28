@@ -666,12 +666,17 @@ public enum Events {
      * Enables and disables the planetarium mode. Contains a boolean with the
      * state and another boolean indicating whether it comes from the interface.
      */
-    @Deprecated PLANETARIUM_CMD,
+    PLANETARIUM_CMD,
     /**
-     * Contains the angle to use in the directionToTarget() function. Defaults
-     * to 0
+     * Contains the delta angle from the zenith at which the focus will be put
+     * in planetarium mode. An angle of 0 puts the focus directly at the centre of
+     * the picture (zenith)
      **/
     PLANETARIUM_FOCUS_ANGLE_CMD,
+    /**
+     * Sets the aperture angle [deg] of the planetarium in cubemap mode
+     */
+    PLANETARIUM_APERTURE_CMD,
     /**
      * Issues the play command. Contains the path to the file to play
      **/

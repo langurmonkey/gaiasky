@@ -36,10 +36,11 @@ public class SGRCubemapProjections extends SGRCubemap implements ISGR, IObserver
 
         cubemapEffect = new CubemapProjections(0, 0);
         cubemapEffect.setProjection(GlobalConf.program.CUBEMAP_PROJECTION);
+        cubemapEffect.setPlanetariumAperture(GlobalConf.program.PLANETARIUM_APERTURE);
 
         copy = new Copy();
 
-        EventManager.instance.subscribe(this, Events.CUBEMAP_RESOLUTION_CMD, Events.CUBEMAP_PROJECTION_CMD, Events.CUBEMAP_CMD);
+        EventManager.instance.subscribe(this, Events.CUBEMAP_RESOLUTION_CMD, Events.CUBEMAP_PROJECTION_CMD, Events.CUBEMAP_CMD, Events.PLANETARIUM_APERTURE_CMD);
     }
 
     @Override
@@ -101,6 +102,9 @@ public class SGRCubemapProjections extends SGRCubemap implements ISGR, IObserver
                     // All good
                 }
             });
+            break;
+        case PLANETARIUM_APERTURE_CMD:
+            cubemapEffect.setPlanetariumAperture((float) data[0]);
             break;
         default:
             break;

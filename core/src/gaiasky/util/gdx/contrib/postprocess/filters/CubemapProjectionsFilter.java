@@ -38,11 +38,13 @@ public final class CubemapProjectionsFilter extends Filter<CubemapProjectionsFil
 
     private ShaderProgram[] programs;
     private Vector2 viewport;
+    private float aperture;
 
     public enum Param implements Parameter {
         // @formatter:off
         Cubemap("u_cubemap", 0),
-        Viewport("u_viewport", 2);
+        Viewport("u_viewport", 2),
+        Aperture("u_aperture", 0);
         // @formatter:on
 
         private String mnemonic;
@@ -163,14 +165,19 @@ public final class CubemapProjectionsFilter extends Filter<CubemapProjectionsFil
     }
     public void setViewportSize(float width, float height) {
         this.viewport.set(width, height);
-        setParam(FisheyeDistortion.Param.Viewport, this.viewport);
+        setParam(Param.Viewport, this.viewport);
+    }
+    public void setPlanetariumAperture(float ap){
+        this.aperture = ap;
+        setParam(Param.Aperture, ap);
     }
 
     @Override
     public void rebind() {
         // reimplement super to batch every parameter
         setParams(Param.Cubemap, u_texture1);
-        setParams(Param.Viewport, this.viewport);
+        setParams(Param.Viewport, viewport);
+        setParams(Param.Aperture, aperture);
         endParams();
     }
 

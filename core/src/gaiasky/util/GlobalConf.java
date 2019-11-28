@@ -824,6 +824,7 @@ public class GlobalConf {
         public float MINIMAP_SIZE;
         public boolean MINIMAP_IN_WINDOW = false;
         public boolean CUBEMAP_MODE;
+        public float PLANETARIUM_APERTURE;
         /**
          * Cubemap projection
          **/
@@ -839,11 +840,11 @@ public class GlobalConf {
         public boolean DISPLAY_DATASET_DIALOG;
 
         public ProgramConf() {
-            EventManager.instance.subscribe(this, Events.STEREOSCOPIC_CMD, Events.STEREO_PROFILE_CMD, Events.CUBEMAP_CMD, Events.CUBEMAP_PROJECTION_CMD, Events.SHOW_MINIMAP_ACTION, Events.TOGGLE_MINIMAP);
+            EventManager.instance.subscribe(this, Events.STEREOSCOPIC_CMD, Events.STEREO_PROFILE_CMD, Events.CUBEMAP_CMD, Events.CUBEMAP_PROJECTION_CMD, Events.SHOW_MINIMAP_ACTION, Events.TOGGLE_MINIMAP, Events.PLANETARIUM_APERTURE_CMD);
         }
 
         public void initialize(boolean sHOW_DEBUG_INFO, Instant lAST_CHECKED, String lAST_VERSION, String vERSION_CHECK_URL, String dATA_DESCRIPTOR_URL, String uI_THEME, String sCRIPT_LOCATION, int rEST_PORT, String lOCALE, boolean sTEREOSCOPIC_MODE, StereoProfile sTEREO_PROFILE, boolean cUBEMAP360_MODE, boolean dISPLAY_HUD, boolean dISPLAY_POINTER_COORDS, boolean dISPLAY_DATASET_DIALOG, boolean nET_MASTER, boolean nET_SLAVE, List<String> nET_MASTER_SLAVES, String lAST_OPEN_LOCATION,
-                boolean dISPLAY_MINIMAP, float mINIMAP_SIZE) {
+                boolean dISPLAY_MINIMAP, float mINIMAP_SIZE, float pLANETARIUM_APERTURE) {
             SHOW_DEBUG_INFO = sHOW_DEBUG_INFO;
             VERSION_LAST_TIME = lAST_CHECKED;
             VERSION_LAST_VERSION = lAST_VERSION;
@@ -865,6 +866,7 @@ public class GlobalConf {
             LAST_OPEN_LOCATION = lAST_OPEN_LOCATION;
             DISPLAY_MINIMAP = dISPLAY_MINIMAP;
             MINIMAP_SIZE = mINIMAP_SIZE;
+            PLANETARIUM_APERTURE = pLANETARIUM_APERTURE;
         }
 
         public void initialize(boolean sHOW_DEBUG_INFO, String uI_THEME, String lOCALE, boolean sTEREOSCOPIC_MODE, StereoProfile sTEREO_PROFILE) {
@@ -973,6 +975,9 @@ public class GlobalConf {
                 break;
             case TOGGLE_MINIMAP:
                 DISPLAY_MINIMAP = !DISPLAY_MINIMAP;
+                break;
+            case PLANETARIUM_APERTURE_CMD:
+                PLANETARIUM_APERTURE = (float) data[0];
                 break;
             default:
                 break;

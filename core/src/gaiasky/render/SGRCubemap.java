@@ -126,17 +126,19 @@ public abstract class SGRCubemap extends SGRAbstract {
         renderFace(zposfb, camera, sgr, ppb, rw, rh, wh, t);
 
         // BACK -Z
-        rc.cubemapSide = CubemapSide.SIDE_BACK;
+        if(!(GlobalConf.program.CUBEMAP_PROJECTION.isPlanetarium() && GlobalConf.program.PLANETARIUM_APERTURE <= 180f)) {
+            rc.cubemapSide = CubemapSide.SIDE_BACK;
 
-        cam.up.set(upbak);
-        cam.direction.set(dirbak).rotate(upbak, -180);
-        cam.update();
+            cam.up.set(upbak);
+            cam.direction.set(dirbak).rotate(upbak, -180);
+            cam.update();
 
-        renderFace(znegfb, camera, sgr, ppb, rw, rh, wh, t);
+            renderFace(znegfb, camera, sgr, ppb, rw, rh, wh, t);
 
-        // Restore camera parameters
-        cam.direction.set(dirbak);
-        cam.up.set(upbak);
+            // Restore camera parameters
+            cam.direction.set(dirbak);
+            cam.up.set(upbak);
+        }
         rc.cubemapSide = CubemapSide.SIDE_NONE;
     }
 

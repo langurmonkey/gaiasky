@@ -40,6 +40,7 @@ import gaiasky.util.format.INumberFormat;
 import gaiasky.util.format.NumberFormatFactory;
 import gaiasky.util.math.MathUtilsd;
 import gaiasky.util.scene2d.*;
+import gaiasky.util.validator.FloatValidator;
 import gaiasky.util.validator.IValidator;
 import gaiasky.util.validator.IntValidator;
 import gaiasky.util.validator.RegexpValidator;
@@ -80,7 +81,7 @@ public class PreferencesWindow extends GenericDialog {
     private OwnSelectBox<ElevationComboBoxBean> elevationSb;
     private OwnSelectBox<String> theme;
     private OwnSelectBox<FileComboBoxBean> controllerMappings;
-    private OwnTextField widthField, heightField, sswidthField, ssheightField, frameoutputPrefix, frameoutputFps, fowidthField, foheightField, camrecFps, cmResolution, smResolution, limitFps;
+    private OwnTextField widthField, heightField, sswidthField, ssheightField, frameoutputPrefix, frameoutputFps, fowidthField, foheightField, camrecFps, cmResolution, plResolution, plAperture, smResolution, limitFps;
     private OwnSlider lodTransitions, tessQuality, minimapSize;
     private OwnTextButton screenshotsLocation, frameoutputLocation;
     private DatasetsWidget dw;
@@ -113,7 +114,7 @@ public class PreferencesWindow extends GenericDialog {
     protected void build() {
         float contentw = 700 * GlobalConf.UI_SCALE_FACTOR;
         float contenth = 700 * GlobalConf.UI_SCALE_FACTOR;
-        final float tawidth = 400 * GlobalConf.UI_SCALE_FACTOR;
+        final float tawidth = 600 * GlobalConf.UI_SCALE_FACTOR;
         float tabwidth = (GlobalConf.UI_SCALE_FACTOR > 1.5 ? 180 : 220) * GlobalConf.UI_SCALE_FACTOR;
         float textwidth = 65 * GlobalConf.UI_SCALE_FACTOR;
         float scrollh = 400 * GlobalConf.UI_SCALE_FACTOR;
@@ -149,6 +150,9 @@ public class PreferencesWindow extends GenericDialog {
         final OwnTextIconButton tab360 = new OwnTextIconButton(I18n.txt("gui.360.title"), new Image(skin.getDrawable("iconic-cubemap")), skin, "toggle-big");
         tab360.pad(pad5);
         tab360.setWidth(tabwidth);
+        final OwnTextIconButton tabPlanetarium = new OwnTextIconButton(I18n.txt("gui.planetarium.title"), new Image(skin.getDrawable("iconic-dome")), skin, "toggle-big");
+        tabPlanetarium.pad(pad5);
+        tabPlanetarium.setWidth(tabwidth);
         final OwnTextIconButton tabData = new OwnTextIconButton(I18n.txt("gui.data"), new Image(skin.getDrawable("iconic-clipboard")), skin, "toggle-big");
         tabData.pad(pad5);
         tabData.setWidth(tabwidth);
@@ -167,6 +171,7 @@ public class PreferencesWindow extends GenericDialog {
         group.addActor(tabFrames);
         group.addActor(tabCamera);
         group.addActor(tab360);
+        group.addActor(tabPlanetarium);
         group.addActor(tabData);
         group.addActor(tabGaia);
         group.addActor(tabSystem);
@@ -1382,7 +1387,7 @@ public class PreferencesWindow extends GenericDialog {
         contentCamera.add(camrec).left();
 
         /*
-         * ==== 360 ====
+         * ==== PANORAMA ====
          */
         final Table content360 = new Table(skin);
         contents.add(content360);
@@ -1405,6 +1410,15 @@ public class PreferencesWindow extends GenericDialog {
         OwnLabel cmResolutionLabel = new OwnLabel(I18n.txt("gui.360.resolution"), skin);
         cmResolution = new OwnTextField(Integer.toString(GlobalConf.scene.CUBEMAP_FACE_RESOLUTION), skin, new IntValidator(20, 15000));
         cmResolution.setWidth(textwidth * 3f);
+        cmResolution.addListener((event)->{
+            if(event instanceof ChangeEvent){
+                if(cmResolution.isValid()){
+                    plResolution.setText(cmResolution.getText());
+                }
+                return true;
+            }
+            return false;
+        });
 
         // LABELS
         labels.add(cmResolutionLabel);
@@ -1417,6 +1431,60 @@ public class PreferencesWindow extends GenericDialog {
         // Add to content
         content360.add(titleCubemap).left().padBottom(pad5 * 2).row();
         content360.add(cubemap).left();
+
+        /*
+         * ==== PLANETARIUM ====
+         */
+        final Table contentPlanetarium = new Table(skin);
+        contents.add(contentPlanetarium);
+        contentPlanetarium.align(Align.top | Align.left);
+
+        // CUBEMAP
+        OwnLabel titlePlanetarium = new OwnLabel(I18n.txt("gui.planetarium"), skin, "help-title");
+        Table planetarium = new Table(skin);
+
+        // Aperture
+        Label apertureLabel = new OwnLabel(I18n.txt("gui.planetarium.aperture"), skin);
+        plAperture = new OwnTextField(Float.toString(GlobalConf.program.PLANETARIUM_APERTURE), skin, new FloatValidator(30, 360));
+        plAperture.setWidth(textwidth * 3f);
+
+        // Info
+        String plinfostr = I18n.txt("gui.planetarium.info") + '\n';
+        ssLines = GlobalResources.countOccurrences(plinfostr, '\n');
+        TextArea plInfo = new OwnTextArea(plinfostr, skin, "info");
+        plInfo.setDisabled(true);
+        plInfo.setPrefRows(ssLines + 1);
+        plInfo.setWidth(tawidth);
+        plInfo.clearListeners();
+
+        // Resolution
+        OwnLabel plResolutionLabel = new OwnLabel(I18n.txt("gui.360.resolution"), skin);
+        plResolution = new OwnTextField(Integer.toString(GlobalConf.scene.CUBEMAP_FACE_RESOLUTION), skin, new IntValidator(20, 15000));
+        plResolution.setWidth(textwidth * 3f);
+        plResolution.addListener((event)->{
+            if(event instanceof ChangeEvent){
+                if(plResolution.isValid()){
+                    cmResolution.setText(plResolution.getText());
+                }
+                return true;
+            }
+            return false;
+        });
+
+        // LABELS
+        labels.add(plResolutionLabel);
+
+        // Add to table
+        planetarium.add(apertureLabel).left().padRight(pad5 * 4).padBottom(pad5);
+        planetarium.add(plAperture).left().expandX().padBottom(pad5).row();
+        planetarium.add(plInfo).colspan(2).left().padBottom(pad5).row();
+        planetarium.add(plResolutionLabel).left().padRight(pad5 * 4).padBottom(pad5);
+        planetarium.add(plResolution).left().expandX().padBottom(pad5).row();
+
+        // Add to content
+        contentPlanetarium.add(titlePlanetarium).left().padBottom(pad5 * 2).row();
+        contentPlanetarium.add(planetarium).left();
+
 
         /*
          * ==== DATA ====
@@ -1615,6 +1683,7 @@ public class PreferencesWindow extends GenericDialog {
         tabContent.addActor(contentFrames);
         tabContent.addActor(contentCamera);
         tabContent.addActor(content360);
+        tabContent.addActor(contentPlanetarium);
         tabContent.addActor(contentData);
         tabContent.addActor(contentGaia);
         tabContent.addActor(contentSystem);
@@ -1636,6 +1705,7 @@ public class PreferencesWindow extends GenericDialog {
                     contentFrames.setVisible(tabFrames.isChecked());
                     contentCamera.setVisible(tabCamera.isChecked());
                     content360.setVisible(tab360.isChecked());
+                    contentPlanetarium.setVisible(tabPlanetarium.isChecked());
                     contentData.setVisible(tabData.isChecked());
                     contentGaia.setVisible(tabGaia.isChecked());
                     contentSystem.setVisible(tabSystem.isChecked());
@@ -1652,6 +1722,7 @@ public class PreferencesWindow extends GenericDialog {
         tabFrames.addListener(tab_listener);
         tabCamera.addListener(tab_listener);
         tab360.addListener(tab_listener);
+        tabPlanetarium.addListener(tab_listener);
         tabData.addListener(tab_listener);
         tabGaia.addListener(tab_listener);
         tabSystem.addListener(tab_listener);
@@ -1669,6 +1740,7 @@ public class PreferencesWindow extends GenericDialog {
         tabs.add(tabFrames);
         tabs.add(tabCamera);
         tabs.add(tab360);
+        tabs.add(tabPlanetarium);
         tabs.add(tabData);
         tabs.add(tabGaia);
         tabs.add(tabSystem);
@@ -1911,10 +1983,16 @@ public class PreferencesWindow extends GenericDialog {
         GlobalConf.frame.CAMERA_REC_TARGET_FPS = Integer.parseInt(camrecFps.getText());
         GlobalConf.frame.AUTO_FRAME_OUTPUT_CAMERA_PLAY = cbAutoCamrec.isChecked();
 
-        // Cube map resolution
+        // Cubemap resolution (same as plResolution)
         int newres = Integer.parseInt(cmResolution.getText());
         if (newres != GlobalConf.scene.CUBEMAP_FACE_RESOLUTION)
             EventManager.instance.post(Events.CUBEMAP_RESOLUTION_CMD, newres);
+
+        // Planetarium aperture
+        float ap = Float.parseFloat(plAperture.getText());
+        if(ap != GlobalConf.program.PLANETARIUM_APERTURE){
+            EventManager.instance.post(Events.PLANETARIUM_APERTURE_CMD, ap);
+        }
 
         // Controllers
         if (controllerMappings.getSelected() != null) {
