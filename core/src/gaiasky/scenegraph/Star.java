@@ -50,6 +50,7 @@ import java.util.TreeMap;
  * @author tsagrista
  *
  */
+@Deprecated
 public class Star extends Particle {
 
     /** Has the model used to represent the star **/

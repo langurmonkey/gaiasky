@@ -28,7 +28,7 @@ allprojects {
     ext {
         appName = "GaiaSky"
         gdxVersion = "1.9.10"
-        lwjglVersion = "3.2.2"
+        lwjglVersion = "3.2.3"
         jcommanderVersion = "1.72"
         slf4jVersion = "1.7.25"
         sparkjavaVersion = "2.7.2"

@@ -5,42 +5,48 @@
  */
 package org.lwjgl.openvr;
 
-        import org.lwjgl.system.*;
-        import java.util.Set;
-        import java.nio.*;
-        import java.util.function.*;
-        import org.lwjgl.*;
+import com.beust.jcommander.internal.Nullable;
+import org.lwjgl.PointerBuffer;
+import org.lwjgl.system.Library;
+import org.lwjgl.system.MemoryStack;
+import org.lwjgl.system.Platform;
 
-        import static org.lwjgl.openvr.VR.*;
-        import static org.lwjgl.system.MemoryStack.*;
-        import static org.lwjgl.system.MemoryUtil.*;
+import java.nio.IntBuffer;
+import java.util.function.LongFunction;
+
+import static org.lwjgl.openvr.VR.*;
+import static org.lwjgl.system.MemoryStack.stackPush;
+import static org.lwjgl.system.MemoryUtil.NULL;
+import static org.lwjgl.system.MemoryUtil.memPointerBuffer;
 
 /** The OpenVR function tables. */
 public final class OpenVR {
 
-    public static IVRSystem VRSystem;
-    public static IVRChaperone VRChaperone;
-    public static IVRChaperoneSetup VRChaperoneSetup;
-    public static IVRCompositor VRCompositor;
-    public static IVROverlay VROverlay;
-    public static IVRResources VRResources;
-    public static IVRRenderModels VRRenderModels;
-    public static IVRExtendedDisplay VRExtendedDisplay;
-    public static IVRSettings VRSettings;
-    public static IVRApplications VRApplications;
-    public static IVRTrackedCamera VRTrackedCamera;
-    public static IVRScreenshots VRScreenshots;
-    public static IVRDriverManager VRDriverManager;
-    public static IVRInput VRInput;
-    public static IVRIOBuffer VRIOBuffer;
-    public static IVRSpatialAnchors VRSpatialAnchors;
-    public static IVRNotifications VRNotifications;
+    @Nullable public static IVRSystem VRSystem;
+    @Nullable public static IVRChaperone VRChaperone;
+    @Nullable public static IVRChaperoneSetup VRChaperoneSetup;
+    @Nullable public static IVRCompositor VRCompositor;
+    @Nullable public static IVROverlay VROverlay;
+    @Nullable public static IVRResources VRResources;
+    @Nullable public static IVRRenderModels VRRenderModels;
+    @Nullable public static IVRExtendedDisplay VRExtendedDisplay;
+    @Nullable public static IVRSettings VRSettings;
+    @Nullable public static IVRApplications VRApplications;
+    @Nullable public static IVRTrackedCamera VRTrackedCamera;
+    @Nullable public static IVRScreenshots VRScreenshots;
+    @Nullable public static IVRDriverManager VRDriverManager;
+    @Nullable public static IVRInput VRInput;
+    @Nullable public static IVRIOBuffer VRIOBuffer;
+    @Nullable public static IVRSpatialAnchors VRSpatialAnchors;
+    @Nullable public static IVRDebug VRDebug;
+    @Nullable public static IVRNotifications VRNotifications;
 
     private static int token;
 
     static {
         String libName = Platform.mapLibraryNameBundled("lwjgl_openvr");
-        Library.loadSystem(System::load, System::loadLibrary, OpenVR.class, libName);
+        Library.loadSystem(System::load, System::loadLibrary, OpenVR.class, "org.lwjgl.openvr", libName);
+        //Library.loadSystem(System::load, System::loadLibrary, OpenVR.class, libName);
     }
 
     private OpenVR() {
@@ -69,6 +75,7 @@ public final class OpenVR {
         //VRInput = getGenericInterface(IVRInput_Version, IVRInput::new);
         //VRIOBuffer = getGenericInterface(IVRIOBuffer_Version, IVRIOBuffer::new);
         //VRSpatialAnchors = getGenericInterface(IVRSpatialAnchors_Version, IVRSpatialAnchors::new);
+        //VRDebug = getGenericInterface(IVRDebug_Version, IVRDebug::new);
         //VRNotifications = getGenericInterface(IVRNotifications_Version, IVRNotifications::new);
     }
 
@@ -111,6 +118,7 @@ public final class OpenVR {
         VRInput = null;
         VRIOBuffer = null;
         VRSpatialAnchors = null;
+        VRDebug = null;
         VRNotifications = null;
     }
 
@@ -160,10 +168,10 @@ public final class OpenVR {
                 IsSteamVRDrawingControllers,
                 ShouldApplicationPause,
                 ShouldApplicationReduceRenderingWork,
-                DriverDebugRequest,
                 PerformFirmwareUpdate,
                 AcknowledgeQuit_Exiting,
-                AcknowledgeQuit_UserPrompt;
+                AcknowledgeQuit_UserPrompt,
+                GetAppContainerFilePaths;
 
         public IVRSystem(long tableAddress) {
             PointerBuffer table = memPointerBuffer(tableAddress, 47);
@@ -210,10 +218,10 @@ public final class OpenVR {
             IsSteamVRDrawingControllers = table.get(40);
             ShouldApplicationPause = table.get(41);
             ShouldApplicationReduceRenderingWork = table.get(42);
-            DriverDebugRequest = table.get(43);
-            PerformFirmwareUpdate = table.get(44);
-            AcknowledgeQuit_Exiting = table.get(45);
-            AcknowledgeQuit_UserPrompt = table.get(46);
+            PerformFirmwareUpdate = table.get(43);
+            AcknowledgeQuit_Exiting = table.get(44);
+            AcknowledgeQuit_UserPrompt = table.get(45);
+            GetAppContainerFilePaths = table.get(46);
         }
 
     }
@@ -265,10 +273,11 @@ public final class OpenVR {
                 ExportLiveToBuffer,
                 ImportFromBufferToWorking,
                 ShowWorkingSetPreview,
-                HideWorkingSetPreview;
+                HideWorkingSetPreview,
+                RoomSetupStarting;
 
         public IVRChaperoneSetup(long tableAddress) {
-            PointerBuffer table = memPointerBuffer(tableAddress, 19);
+            PointerBuffer table = memPointerBuffer(tableAddress, 20);
             CommitWorkingCopy = table.get(0);
             RevertWorkingCopy = table.get(1);
             GetWorkingPlayAreaSize = table.get(2);
@@ -288,6 +297,7 @@ public final class OpenVR {
             ImportFromBufferToWorking = table.get(16);
             ShowWorkingSetPreview = table.get(17);
             HideWorkingSetPreview = table.get(18);
+            RoomSetupStarting = table.get(19);
         }
 
     }
@@ -338,10 +348,12 @@ public final class OpenVR {
                 GetVulkanDeviceExtensionsRequired,
                 SetExplicitTimingMode,
                 SubmitExplicitTimingData,
-                IsMotionSmoothingEnabled;
+                IsMotionSmoothingEnabled,
+                IsMotionSmoothingSupported,
+                IsCurrentSceneFocusAppLoading;
 
         public IVRCompositor(long tableAddress) {
-            PointerBuffer table = memPointerBuffer(tableAddress, 44);
+            PointerBuffer table = memPointerBuffer(tableAddress, 46);
             SetTrackingSpace = table.get(0);
             GetTrackingSpace = table.get(1);
             WaitGetPoses = table.get(2);
@@ -386,6 +398,8 @@ public final class OpenVR {
             SetExplicitTimingMode = table.get(41);
             SubmitExplicitTimingData = table.get(42);
             IsMotionSmoothingEnabled = table.get(43);
+            IsMotionSmoothingSupported = table.get(44);
+            IsCurrentSceneFocusAppLoading = table.get(45);
         }
 
     }
@@ -811,13 +825,15 @@ public final class OpenVR {
         public final long
                 GetDriverCount,
                 GetDriverName,
-                GetDriverHandle;
+                GetDriverHandle,
+                IsEnabled;
 
         public IVRDriverManager(long tableAddress) {
-            PointerBuffer table = memPointerBuffer(tableAddress, 3);
+            PointerBuffer table = memPointerBuffer(tableAddress, 4);
             GetDriverCount = table.get(0);
             GetDriverName = table.get(1);
             GetDriverHandle = table.get(2);
+            IsEnabled = table.get(3);
         }
 
     }
@@ -832,7 +848,8 @@ public final class OpenVR {
                 UpdateActionState,
                 GetDigitalActionData,
                 GetAnalogActionData,
-                GetPoseActionData,
+                GetPoseActionDataRelativeToNow,
+                GetPoseActionDataForNextFrame,
                 GetSkeletalActionData,
                 GetBoneCount,
                 GetBoneHierarchy,
@@ -847,11 +864,12 @@ public final class OpenVR {
                 GetActionOrigins,
                 GetOriginLocalizedName,
                 GetOriginTrackedDeviceInfo,
+                GetActionBindingInfo,
                 ShowActionOrigins,
                 ShowBindingsForActionSet;
 
         public IVRInput(long tableAddress) {
-            PointerBuffer table = memPointerBuffer(tableAddress, 24);
+            PointerBuffer table = memPointerBuffer(tableAddress, 26);
             SetActionManifestPath = table.get(0);
             GetActionSetHandle = table.get(1);
             GetActionHandle = table.get(2);
@@ -859,23 +877,25 @@ public final class OpenVR {
             UpdateActionState = table.get(4);
             GetDigitalActionData = table.get(5);
             GetAnalogActionData = table.get(6);
-            GetPoseActionData = table.get(7);
-            GetSkeletalActionData = table.get(8);
-            GetBoneCount = table.get(9);
-            GetBoneHierarchy = table.get(10);
-            GetBoneName = table.get(11);
-            GetSkeletalReferenceTransforms = table.get(12);
-            GetSkeletalTrackingLevel = table.get(13);
-            GetSkeletalBoneData = table.get(14);
-            GetSkeletalSummaryData = table.get(15);
-            GetSkeletalBoneDataCompressed = table.get(16);
-            DecompressSkeletalBoneData = table.get(17);
-            TriggerHapticVibrationAction = table.get(18);
-            GetActionOrigins = table.get(19);
-            GetOriginLocalizedName = table.get(20);
-            GetOriginTrackedDeviceInfo = table.get(21);
-            ShowActionOrigins = table.get(22);
-            ShowBindingsForActionSet = table.get(23);
+            GetPoseActionDataRelativeToNow = table.get(7);
+            GetPoseActionDataForNextFrame = table.get(8);
+            GetSkeletalActionData = table.get(9);
+            GetBoneCount = table.get(10);
+            GetBoneHierarchy = table.get(11);
+            GetBoneName = table.get(12);
+            GetSkeletalReferenceTransforms = table.get(13);
+            GetSkeletalTrackingLevel = table.get(14);
+            GetSkeletalBoneData = table.get(15);
+            GetSkeletalSummaryData = table.get(16);
+            GetSkeletalBoneDataCompressed = table.get(17);
+            DecompressSkeletalBoneData = table.get(18);
+            TriggerHapticVibrationAction = table.get(19);
+            GetActionOrigins = table.get(20);
+            GetOriginLocalizedName = table.get(21);
+            GetOriginTrackedDeviceInfo = table.get(22);
+            GetActionBindingInfo = table.get(23);
+            ShowActionOrigins = table.get(24);
+            ShowBindingsForActionSet = table.get(25);
         }
 
     }
@@ -916,6 +936,24 @@ public final class OpenVR {
             CreateSpatialAnchorFromPose = table.get(1);
             GetSpatialAnchorPose = table.get(2);
             GetSpatialAnchorDescriptor = table.get(3);
+        }
+
+    }
+
+    public static final class IVRDebug {
+
+        public final long
+                EmitVrProfilerEvent,
+                BeginVrProfilerEvent,
+                FinishVrProfilerEvent,
+                DriverDebugRequest;
+
+        public IVRDebug(long tableAddress) {
+            PointerBuffer table = memPointerBuffer(tableAddress, 4);
+            EmitVrProfilerEvent = table.get(0);
+            BeginVrProfilerEvent = table.get(1);
+            FinishVrProfilerEvent = table.get(2);
+            DriverDebugRequest = table.get(3);
         }
 
     }

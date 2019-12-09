@@ -368,6 +368,7 @@ public class AstroUtils {
      * @return The output vector with L, B and R, for chaining.
      * @deprecated Should use the classes that extend IBodyCoordinates instead.
      */
+    @Deprecated
     public static Vector3d getEclipticCoordinates(String body, Instant instant, Vector3d out, boolean highAccuracy) {
 
         switch (body) {
@@ -544,7 +545,7 @@ public class AstroUtils {
      * @return The Julian date
      * @deprecated This does not work well!
      */
-    @SuppressWarnings("unused")
+    @Deprecated
     public static double getJulianDayNumberBook(int year, int month, int day) {
         int a = year / 100;
         int b = 2 - a + (a / 4);

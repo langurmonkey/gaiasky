@@ -15,8 +15,8 @@ sourceSets {
 }
 
 project.ext.mainClassName = "gaiasky.desktop.GaiaSkyDesktop"
-project.ext.assetsDir = new File("./assets");
 project.ext.workDir = new File("../");
+project.ext.assetsDir = new File(project.ext.workDir, "assets");
 project.ext.sourceSets = sourceSets
 
 task versionFile {

@@ -40,6 +40,7 @@ import java.util.Random;
  * @deprecated Only the Sun uses this via the Star subclass. Move to star vgroup.
  * @author Toni Sagrista
  */
+@Deprecated
 public class Particle extends CelestialBody implements IStarFocus, ILineRenderable {
 
     private static final float DISC_FACTOR = 1.5f;

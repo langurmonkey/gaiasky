@@ -312,6 +312,7 @@ public interface IScriptingInterface {
      * @param vec Vector of three components in internal coordinates and Km.
      * @deprecated Use {@link #setCameraPosition(double[])} instead.
      */
+    @Deprecated
     void setCameraPostion(double[] vec);
 
     /**
@@ -799,6 +800,7 @@ public interface IScriptingInterface {
      * @param namePrefix The file name prefix.
      * @deprecated
      */
+    @Deprecated
     void configureRenderOutput(int width, int height, int fps, String folder, String namePrefix);
 
     /**
@@ -830,6 +832,7 @@ public interface IScriptingInterface {
      * @return True if the frame output is active.
      * @deprecated
      */
+    @Deprecated
     boolean isRenderOutputActive();
 
     /**
@@ -845,6 +848,7 @@ public interface IScriptingInterface {
      * @return The FPS setting.
      * @deprecated
      */
+    @Deprecated
     int getRenderOutputFps();
 
     /**
