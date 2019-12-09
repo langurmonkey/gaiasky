@@ -1475,8 +1475,8 @@ public class PreferencesWindow extends GenericDialog {
         labels.add(plResolutionLabel);
 
         // Add to table
-        planetarium.add(apertureLabel).left().padRight(pad5 * 4).padBottom(pad5);
-        planetarium.add(plAperture).left().expandX().padBottom(pad5).row();
+        planetarium.add(apertureLabel).left().padRight(pad5 * 4f).padBottom(pad * 3f);
+        planetarium.add(plAperture).left().expandX().padBottom(pad * 3f).row();
         planetarium.add(plInfo).colspan(2).left().padBottom(pad5).row();
         planetarium.add(plResolutionLabel).left().padRight(pad5 * 4).padBottom(pad5);
         planetarium.add(plResolution).left().expandX().padBottom(pad5).row();
