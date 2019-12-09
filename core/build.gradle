@@ -15,8 +15,8 @@ sourceSets {
 }
 
 project.ext.mainClassName = "gaiasky.desktop.GaiaSkyDesktop"
-project.ext.assetsDir = new File("../assets");
-project.ext.workDir = new File(".");
+project.ext.assetsDir = new File("./assets");
+project.ext.workDir = new File("../");
 project.ext.sourceSets = sourceSets
 
 task versionFile {
@@ -58,7 +58,7 @@ class GaiaSkyRun extends JavaExec {
     public void setup() {
         main = project.mainClassName
         systemProperties['properties.file'] = ''
-        systemProperties['assets.location'] = '../assets/'
+        systemProperties['assets.location'] = './assets/'
         systemProperties['org.slf4j.simpleLogger.defaultLogLevel'] = 'warn'  // logging levels (e.g. REST server warn, info, debug)
         systemProperties['org.slf4j.simpleLogger.showThreadName'] = 'false'
 

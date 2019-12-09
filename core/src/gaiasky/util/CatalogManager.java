@@ -44,6 +44,15 @@ public class CatalogManager implements IObserver {
         return ciMap.containsKey(dsName);
     }
 
+    /**
+     * Gets the CatalogInfo with the given name, if any
+     * @param dsName The name of the dataset
+     * @return The CatalogInfo object, null if it does not exist
+     */
+    public CatalogInfo get(String dsName) {
+        return ciMap.get(dsName);
+    }
+
     public Set<String> getDatasetNames() {
         if (ciMap != null) {
             return ciMap.keySet();

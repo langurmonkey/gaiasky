@@ -1476,6 +1476,11 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
     }
 
     @Override
+    public String getAssetsLocation() {
+        return GlobalConf.ASSETS_LOC;
+    }
+
+    @Override
     public void preloadTextures(String[] paths) {
         initializeTextures();
         for (final String path : paths) {
@@ -2119,24 +2124,24 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
     }
 
     @Override
-    public boolean loadDataset(String dsName, String absolutePath, boolean sync) {
-        return loadDataset(dsName, absolutePath, CatalogInfo.CatalogInfoType.SCRIPT, sync);
+    public boolean loadDataset(String dsName, String path, boolean sync) {
+        return loadDataset(dsName, path, CatalogInfo.CatalogInfoType.SCRIPT, sync);
     }
 
-    public boolean loadDataset(String dsName, String absolutePath, CatalogInfo.CatalogInfoType type, boolean sync) {
+    public boolean loadDataset(String dsName, String path, CatalogInfo.CatalogInfoType type, boolean sync) {
         if (sync) {
-            return loadDatasetPrivate(dsName, absolutePath, type, true);
+            return loadDatasetPrivate(dsName, path, type, true);
         } else {
-            Thread t = new Thread(() -> loadDatasetPrivate(dsName, absolutePath, type, false));
+            Thread t = new Thread(() -> loadDatasetPrivate(dsName, path, type, false));
             t.start();
             return true;
         }
     }
 
-    private boolean loadDatasetPrivate(String dsName, String absolutePath, CatalogInfo.CatalogInfoType type, boolean sync) {
+    private boolean loadDatasetPrivate(String dsName, String path, CatalogInfo.CatalogInfoType type, boolean sync) {
         try {
-            logger.info(I18n.txt("notif.catalog.loading", absolutePath));
-            File f = new File(absolutePath);
+            logger.info(I18n.txt("notif.catalog.loading", path));
+            File f = new File(path);
             if (f.exists() && f.canRead()) {
                 STILDataProvider provider = new STILDataProvider();
                 DataSource ds = new FileDataSource(f);
@@ -2149,7 +2154,7 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
                         starGroup.set(StarGroup.getDefaultStarGroup(dsName, data));
 
                         // Catalog info
-                        CatalogInfo ci = new CatalogInfo(dsName, absolutePath, null, type, 1.5f, starGroup.get());
+                        CatalogInfo ci = new CatalogInfo(dsName, path, null, type, 1.5f, starGroup.get());
                         EventManager.instance.post(Events.CATALOG_ADD, ci, true);
 
                         logger.info(data.size + " objects loaded");
@@ -2165,7 +2170,7 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
                     return false;
                 }
             } else {
-                logger.error("Can't read file: " + absolutePath);
+                logger.error("Can't read file: " + path);
                 return false;
             }
         } catch (Exception e) {
@@ -2188,6 +2193,8 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
             boolean exists = CatalogManager.instance().contains(dsName);
             if (exists)
                 GaiaSky.postRunnable(() -> EventManager.instance.post(Events.CATALOG_REMOVE, dsName));
+            else
+                logger.warn("Dataset with name " + dsName + " does not exist");
             return exists;
         }
         return false;
@@ -2199,6 +2206,8 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
             boolean exists = CatalogManager.instance().contains(dsName);
             if (exists)
                 EventManager.instance.post(Events.CATALOG_VISIBLE, dsName, false);
+            else
+                logger.warn("Dataset with name " + dsName + " does not exist");
             return exists;
         }
         return false;
@@ -2210,6 +2219,8 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
             boolean exists = CatalogManager.instance().contains(dsName);
             if (exists)
                 EventManager.instance.post(Events.CATALOG_VISIBLE, dsName, true);
+            else
+                logger.warn("Dataset with name " + dsName + " does not exist");
             return exists;
         }
         return false;
@@ -2221,10 +2232,14 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
             boolean exists = CatalogManager.instance().contains(dsName);
             if (exists)
                 EventManager.instance.post(Events.CATALOG_HIGHLIGHT, dsName, highlight, null, false);
+            else
+                logger.warn("Dataset with name " + dsName + " does not exist");
             return exists;
         }
         return false;
     }
+
+
 
     @Override
     public boolean highlightDataset(String dsName, int colorIndex, boolean highlight) {
@@ -2238,6 +2253,24 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
             boolean exists = CatalogManager.instance().contains(dsName);
             if (exists)
                 EventManager.instance.post(Events.CATALOG_HIGHLIGHT, dsName, highlight, color, false);
+            else
+                logger.warn("Dataset with name " + dsName + " does not exist");
+            return exists;
+        }
+        return false;
+    }
+
+    @Override
+    public boolean setDatasetHighlightSizeFactor(String dsName, float sizeFactor) {
+        if (checkString(dsName, "datasetName") && checkNum(sizeFactor, Constants.MIN_DATASET_SIZE_FACTOR, Constants.MAX_DATASET_SIZE_FACTOR, "sizeFactor")) {
+
+            boolean exists = CatalogManager.instance().contains(dsName);
+            if (exists) {
+                CatalogInfo ci = CatalogManager.instance().get(dsName);
+                ci.setHlSizeFactor(sizeFactor);
+            }else {
+                logger.warn("Dataset with name " + dsName + " does not exist");
+            }
             return exists;
         }
         return false;

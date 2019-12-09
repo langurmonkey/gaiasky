@@ -22,6 +22,8 @@ import java.util.List;
 @SuppressWarnings("unused")
 public interface IScriptingInterface {
 
+    String getAssetsLocation();
+
     /**
      * Pre-loads the given images as textures for later use. They will be cached
      * for the subsequent uses.
@@ -1633,11 +1635,11 @@ public interface IScriptingInterface {
      *
      * @param dsName       The name of the dataset, used to identify the subsequent operations on the
      *                     dataset
-     * @param absolutePath Absolute path to the <code>.vot</code> file to load
+     * @param path Absolute path (or relative to the working path of Gaia Sky) to the <code>.vot</code> file to load
      *
      * @return False if the dataset could not be loaded, true otherwise
      */
-    boolean loadDataset(String dsName, String absolutePath);
+    boolean loadDataset(String dsName, String path);
 
     /**
      * Loads a VOTable file (<code>.vot</code>) with a given name.
@@ -1653,12 +1655,12 @@ public interface IScriptingInterface {
      *
      * @param dsName       The name of the dataset, used to identify the subsequent operations on the
      *                     dataset
-     * @param absolutePath Absolute path to the <code>.vot</code> file to load
+     * @param path Absolute path (or relative to the working path of Gaia Sky) to the <code>.vot</code> file to load
      * @param sync        Whether the load must happen synchronously or asynchronously
      *
      * @return False if the dataset could not be loaded (sync mode). True if it could not be loaded (sync mode), or <code>sync</code> is false
      */
-    boolean loadDataset(String dsName, String absolutePath, boolean sync);
+    boolean loadDataset(String dsName, String path, boolean sync);
 
     /**
      * Removes the dataset identified by the given name, if it exists
@@ -1737,6 +1739,14 @@ public interface IScriptingInterface {
      * @return False if the dataset could not be found
      */
     boolean highlightDataset(String dsName, float[] color, boolean highlight);
+
+    /**
+     * Sets the size increase factor of this dataset when highlighted
+     * @param dsName The dataset name
+     * @param sizeFactor The size factor to apply to the particles when highlighted, must be in [{@link gaiasky.util.Constants#MIN_DATASET_SIZE_FACTOR}, {@link gaiasky.util.Constants#MAX_DATASET_SIZE_FACTOR}].
+     * @return False if the dataset could not be found
+     */
+    boolean setDatasetHighlightSizeFactor(String dsName, float sizeFactor);
 
     /**
      * Returns the meter to internal unit conversion factor. Use this factor to multiply
