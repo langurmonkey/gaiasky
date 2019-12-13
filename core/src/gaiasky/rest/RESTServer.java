@@ -279,7 +279,7 @@ public class RESTServer {
 		loggerRequestInfo(request);
 
 		// map containing information for http return response
-		Map<String, Object> ret = new HashMap<String, Object>();
+		Map<String, Object> ret = new HashMap<>();
 
 		// Only process API calls if already activated (GUI launched).
 		if (!activated) {
@@ -493,7 +493,7 @@ public class RESTServer {
 		port = rest_port;
 		printStartupInfo();
 		if (port < 0) {
-			System.out.println("Error: invalid port. REST API inactive.");
+			logger.error("Error: invalid port. REST API inactive.");
 			return;
 		}
 
@@ -523,8 +523,7 @@ public class RESTServer {
 			logger.info("Startup finished.");
 
 		} catch (Exception e) {
-			logger.error("Caught an exception during initialization:");
-			e.printStackTrace(System.err);
+			logger.error(e, "Caught an exception during initialization:");
 		}
 	}
 
@@ -538,7 +537,7 @@ public class RESTServer {
 	/**
 	 * Stops the REST server gracefully.
 	 */
-	public static void stop() {
+	public static void dispose() {
 		try {
 			if (!shutdownTriggered) {
 				shutdownTriggered = true;
