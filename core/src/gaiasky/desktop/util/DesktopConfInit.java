@@ -206,6 +206,7 @@ public class DesktopConfInit extends ConfInit {
         float MINIMAP_SIZE = MathUtilsd.clamp(Float.parseFloat(p.getProperty("program.minimap.size", "220f")), Constants.MIN_MINIMAP_SIZE, Constants.MAX_MINIMAP_SIZE);
         boolean NET_MASTER = Boolean.parseBoolean(p.getProperty("program.net.master", "false"));
         boolean NET_SLAVE = Boolean.parseBoolean(p.getProperty("program.net.slave", "false"));
+        String NET_SLAVE_CONFIG = p.getProperty("program.net.slave.config", "");
         String LAST_FOLDER_LOCATION = p.getProperty("program.last.filesystem.location");
 
         LinkedList<String> NET_MASTER_SLAVES = null;
@@ -217,7 +218,7 @@ public class DesktopConfInit extends ConfInit {
             }
         }
 
-        prc.initialize(SHOW_DEBUG_INFO, LAST_CHECKED, LAST_VERSION, VERSION_CHECK_URL, DATA_DESCRIPTOR_URL, UI_THEME, SCRIPT_LOCATION, REST_PORT, LOCALE, STEREOSCOPIC_MODE, STEREO_PROFILE, CUBEMAP_MODE, DISPLAY_HUD, DISPLAY_POINTER_COORDS, DISPLAY_DATASET_DIALOG, NET_MASTER, NET_SLAVE, NET_MASTER_SLAVES, LAST_FOLDER_LOCATION, DISPLAY_MINIMAP, MINIMAP_SIZE, PLANETARIUM_APERTURE);
+        prc.initialize(SHOW_DEBUG_INFO, LAST_CHECKED, LAST_VERSION, VERSION_CHECK_URL, DATA_DESCRIPTOR_URL, UI_THEME, SCRIPT_LOCATION, REST_PORT, LOCALE, STEREOSCOPIC_MODE, STEREO_PROFILE, CUBEMAP_MODE, DISPLAY_HUD, DISPLAY_POINTER_COORDS, DISPLAY_DATASET_DIALOG, NET_MASTER, NET_SLAVE, NET_MASTER_SLAVES, NET_SLAVE_CONFIG, LAST_FOLDER_LOCATION, DISPLAY_MINIMAP, MINIMAP_SIZE, PLANETARIUM_APERTURE);
 
         /** SCENE CONF **/
         String gc = p.getProperty("scene.graphics.quality");
@@ -235,7 +236,7 @@ public class DesktopConfInit extends ConfInit {
         float STAR_BRIGHTNESS = Float.parseFloat(p.getProperty("scene.star.brightness"));
         float STAR_BRIGHTNESS_POWER = Float.parseFloat(p.getProperty("scene.star.brightness.pow", "1.0"));
         float AMBIENT_LIGHT = Float.parseFloat(p.getProperty("scene.ambient"));
-        int CAMERA_FOV = Integer.parseInt(p.getProperty("scene.camera.fov"));
+        float CAMERA_FOV = Float.parseFloat(p.getProperty("scene.camera.fov"));
         int CAMERA_SPEED_LIMIT_IDX = Integer.parseInt(p.getProperty("scene.camera.speedlimit"));
         float CAMERA_SPEED = Float.parseFloat(p.getProperty("scene.camera.focus.vel"));
         boolean FOCUS_LOCK = Boolean.parseBoolean(p.getProperty("scene.focuslock"));
@@ -501,7 +502,7 @@ public class DesktopConfInit extends ConfInit {
         p.setProperty("scene.star.brightness", Double.toString(GlobalConf.scene.STAR_BRIGHTNESS));
         p.setProperty("scene.star.brightness.pow", Double.toString(GlobalConf.scene.STAR_BRIGHTNESS_POWER));
         p.setProperty("scene.ambient", Double.toString(GlobalConf.scene.AMBIENT_LIGHT));
-        p.setProperty("scene.camera.fov", Integer.toString(GlobalConf.scene.CAMERA_FOV));
+        p.setProperty("scene.camera.fov", Float.toString(GlobalConf.scene.CAMERA_FOV));
         p.setProperty("scene.camera.speedlimit", Integer.toString(GlobalConf.scene.CAMERA_SPEED_LIMIT_IDX));
         p.setProperty("scene.camera.focus.vel", Double.toString(GlobalConf.scene.CAMERA_SPEED));
         p.setProperty("scene.camera.turn.vel", Double.toString(GlobalConf.scene.TURNING_SPEED));

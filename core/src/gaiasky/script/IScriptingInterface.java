@@ -1861,4 +1861,9 @@ public interface IScriptingInterface {
      */
     void error(String message);
 
+    /**
+     * Initiates the quit action to terminate the program
+     */
+    void quit();
+
 }

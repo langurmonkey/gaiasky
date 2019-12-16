@@ -16,10 +16,9 @@ import gaiasky.event.IObserver;
 import gaiasky.interfce.KeyBindings;
 import gaiasky.interfce.beans.CameraComboBoxBean;
 import gaiasky.scenegraph.camera.CameraManager.CameraMode;
-import gaiasky.util.Constants;
-import gaiasky.util.GlobalConf;
-import gaiasky.util.I18n;
-import gaiasky.util.TextUtils;
+import gaiasky.util.*;
+import gaiasky.util.format.INumberFormat;
+import gaiasky.util.format.NumberFormatFactory;
 import gaiasky.util.gdx.contrib.postprocess.effects.CubemapProjections.CubemapProjection;
 import gaiasky.util.math.MathUtilsd;
 import gaiasky.util.scene2d.*;
@@ -38,8 +37,11 @@ public class CameraComponent extends GuiComponent implements IObserver {
     protected boolean fovFlag = true;
     private boolean fieldLock = false;
 
+    private INumberFormat nf;
+
     public CameraComponent(Skin skin, Stage stage) {
         super(skin, stage);
+        this.nf = NumberFormatFactory.getFormatter("##0.0#");
         EventManager.instance.subscribe(this, Events.CAMERA_MODE_CMD, Events.ROTATION_SPEED_CMD, Events.TURNING_SPEED_CMD, Events.CAMERA_SPEED_CMD, Events.SPEED_LIMIT_CMD, Events.STEREOSCOPIC_CMD, Events.FOV_CHANGE_NOTIFICATION, Events.CUBEMAP_CMD, Events.CAMERA_CINEMATIC_CMD, Events.ORIENTATION_LOCK_CMD, Events.PLANETARIUM_CMD);
     }
 
@@ -153,7 +155,7 @@ public class CameraComponent extends GuiComponent implements IObserver {
         fieldOfView.setWidth(width);
         fieldOfView.setValue(GlobalConf.scene.CAMERA_FOV);
         fieldOfView.addListener(event -> {
-            if (fovFlag && event instanceof ChangeEvent) {
+            if (fovFlag && event instanceof ChangeEvent && !SlaveManager.projectionActive()) {
                 float value = MathUtilsd.clamp(fieldOfView.getValue(), Constants.MIN_FOV, Constants.MAX_FOV);
                 EventManager.instance.post(Events.FOV_CHANGED_CMD, value);
                 fov.setText((int) value + "°");
@@ -162,7 +164,7 @@ public class CameraComponent extends GuiComponent implements IObserver {
             return false;
         });
 
-        fov = new OwnLabel(GlobalConf.scene.CAMERA_FOV + "°", skin, "default");
+        fov = new OwnLabel(nf.format(GlobalConf.scene.CAMERA_FOV) + "°", skin, "default");
 
         /** CAMERA SPEED LIMIT **/
         String[] speedLimits = new String[19];
@@ -416,7 +418,7 @@ public class CameraComponent extends GuiComponent implements IObserver {
         case FOV_CHANGE_NOTIFICATION:
             fovFlag = false;
             fieldOfView.setValue(GlobalConf.scene.CAMERA_FOV);
-            fov.setText(GlobalConf.scene.CAMERA_FOV + "°");
+            fov.setText(nf.format(GlobalConf.scene.CAMERA_FOV) + "°");
             fovFlag = true;
             break;
         case CUBEMAP_CMD:

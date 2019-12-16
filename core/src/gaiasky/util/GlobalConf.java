@@ -804,6 +804,12 @@ public class GlobalConf {
          */
         public List<String> NET_MASTER_SLAVES;
 
+        /**
+         * If this is a slave, this entry contains the path to the MPCDI configuration file
+         * for this instance
+         */
+        public String NET_SLAVE_CONFIG;
+
         public boolean SHOW_DEBUG_INFO;
 
         // Update checker
@@ -843,7 +849,7 @@ public class GlobalConf {
             EventManager.instance.subscribe(this, Events.STEREOSCOPIC_CMD, Events.STEREO_PROFILE_CMD, Events.CUBEMAP_CMD, Events.CUBEMAP_PROJECTION_CMD, Events.SHOW_MINIMAP_ACTION, Events.TOGGLE_MINIMAP, Events.PLANETARIUM_APERTURE_CMD);
         }
 
-        public void initialize(boolean sHOW_DEBUG_INFO, Instant lAST_CHECKED, String lAST_VERSION, String vERSION_CHECK_URL, String dATA_DESCRIPTOR_URL, String uI_THEME, String sCRIPT_LOCATION, int rEST_PORT, String lOCALE, boolean sTEREOSCOPIC_MODE, StereoProfile sTEREO_PROFILE, boolean cUBEMAP360_MODE, boolean dISPLAY_HUD, boolean dISPLAY_POINTER_COORDS, boolean dISPLAY_DATASET_DIALOG, boolean nET_MASTER, boolean nET_SLAVE, List<String> nET_MASTER_SLAVES, String lAST_OPEN_LOCATION,
+        public void initialize(boolean sHOW_DEBUG_INFO, Instant lAST_CHECKED, String lAST_VERSION, String vERSION_CHECK_URL, String dATA_DESCRIPTOR_URL, String uI_THEME, String sCRIPT_LOCATION, int rEST_PORT, String lOCALE, boolean sTEREOSCOPIC_MODE, StereoProfile sTEREO_PROFILE, boolean cUBEMAP360_MODE, boolean dISPLAY_HUD, boolean dISPLAY_POINTER_COORDS, boolean dISPLAY_DATASET_DIALOG, boolean nET_MASTER, boolean nET_SLAVE, List<String> nET_MASTER_SLAVES, String nET_SLAVE_CONFIG, String lAST_OPEN_LOCATION,
                 boolean dISPLAY_MINIMAP, float mINIMAP_SIZE, float pLANETARIUM_APERTURE) {
             SHOW_DEBUG_INFO = sHOW_DEBUG_INFO;
             VERSION_LAST_TIME = lAST_CHECKED;
@@ -863,6 +869,7 @@ public class GlobalConf {
             NET_MASTER = nET_MASTER;
             NET_SLAVE = nET_SLAVE;
             NET_MASTER_SLAVES = nET_MASTER_SLAVES;
+            NET_SLAVE_CONFIG = nET_SLAVE_CONFIG;
             LAST_OPEN_LOCATION = lAST_OPEN_LOCATION;
             DISPLAY_MINIMAP = dISPLAY_MINIMAP;
             MINIMAP_SIZE = mINIMAP_SIZE;
@@ -1111,7 +1118,7 @@ public class GlobalConf {
         public String STARTUP_OBJECT;
         public long OBJECT_FADE_MS;
         public double AMBIENT_LIGHT;
-        public int CAMERA_FOV;
+        public float CAMERA_FOV;
         public double CAMERA_SPEED;
         public double TURNING_SPEED;
         public double ROTATION_SPEED;
@@ -1298,7 +1305,7 @@ public class GlobalConf {
             EventManager.instance.subscribe(this, Events.TOGGLE_VISIBILITY_CMD, Events.FOCUS_LOCK_CMD, Events.ORIENTATION_LOCK_CMD, Events.STAR_BRIGHTNESS_CMD, Events.PM_LEN_FACTOR_CMD, Events.PM_NUM_FACTOR_CMD, Events.PM_COLOR_MODE_CMD, Events.PM_ARROWHEADS_CMD, Events.FOV_CHANGED_CMD, Events.CAMERA_SPEED_CMD, Events.ROTATION_SPEED_CMD, Events.TURNING_SPEED_CMD, Events.SPEED_LIMIT_CMD, Events.TRANSIT_COLOUR_CMD, Events.ONLY_OBSERVED_STARS_CMD, Events.COMPUTE_GAIA_SCAN_CMD, Events.OCTREE_PARTICLE_FADE_CMD, Events.STAR_POINT_SIZE_CMD, Events.STAR_POINT_SIZE_INCREASE_CMD, Events.STAR_POINT_SIZE_DECREASE_CMD, Events.STAR_POINT_SIZE_RESET_CMD, Events.STAR_MIN_OPACITY_CMD, Events.AMBIENT_LIGHT_CMD, Events.GALAXY_3D_CMD, Events.CROSSHAIR_FOCUS_CMD, Events.CROSSHAIR_CLOSEST_CMD, Events.CROSSHAIR_HOME_CMD, Events.CAMERA_CINEMATIC_CMD, Events.CUBEMAP_RESOLUTION_CMD, Events.LABEL_SIZE_CMD, Events.ELEVATION_MUTLIPLIER_CMD, Events.ELEVATION_TYPE_CMD, Events.TESSELLATION_QUALITY_CMD);
         }
 
-        public void initialize(String sTARTUP_OBJECT, GraphicsQuality gRAPHICS_QUALITY, long oBJECT_FADE_MS, float sTAR_BRIGHTNESS, float sTAR_BRIGHTNESS_POWER, float aMBIENT_LIGHT, int cAMERA_FOV, float cAMERA_SPEED, float tURNING_SPEED, float rOTATION_SPEED, int cAMERA_SPEED_LIMIT_IDX, boolean fOCUS_LOCK, boolean fOCUS_LOCK_ORIENTATION, float lABEL_SIZE_FACTOR, float lABEL_NUMBER_FACTOR, boolean[] vISIBILITY, int oRBIT_RENDERER, int lINE_RENDERER, double sTAR_TH_ANGLE_NONE,
+        public void initialize(String sTARTUP_OBJECT, GraphicsQuality gRAPHICS_QUALITY, long oBJECT_FADE_MS, float sTAR_BRIGHTNESS, float sTAR_BRIGHTNESS_POWER, float aMBIENT_LIGHT, float cAMERA_FOV, float cAMERA_SPEED, float tURNING_SPEED, float rOTATION_SPEED, int cAMERA_SPEED_LIMIT_IDX, boolean fOCUS_LOCK, boolean fOCUS_LOCK_ORIENTATION, float lABEL_SIZE_FACTOR, float lABEL_NUMBER_FACTOR, boolean[] vISIBILITY, int oRBIT_RENDERER, int lINE_RENDERER, double sTAR_TH_ANGLE_NONE,
                 double sTAR_TH_ANGLE_POINT, double sTAR_TH_ANGLE_QUAD, float pOINT_ALPHA_MIN, float pOINT_ALPHA_MAX, boolean oCTREE_PARTICLE_FADE, float oCTANT_TH_ANGLE_0, float oCTANT_TH_ANGLE_1, float pM_NUM_FACTOR, float pM_LEN_FACTOR, long n_PM_STARS, int pM_COLOR_MODE, boolean pM_ARROWHEADS, float sTAR_POINT_SIZE, boolean gALAXY_3D, int cUBEMAP_FACE_RESOLUTION, boolean cROSSHAIR_FOCUS, boolean cROSSHAIR_CLOSEST, boolean cROSSHAIR_HOME, boolean cINEMATIC_CAMERA, boolean lAZY_TEXTURE_INIT,
                 boolean lAZY_MESH_INIT, boolean fREE_CAMERA_TARGET_MODE_ON, boolean sHADOW_MAPPING, int sHADOW_MAPPING_N_SHADOWS, int sHADOW_MAPPING_RESOLUTION, long mAX_LOADED_STARS, ElevationType eLEVATION_TYPE, double eLEVATION_MULTIPLIER, double tESSELLATION_QUALITY, double dIST_SCALE_DESKTOP, double dIST_SCALE_VR) {
             STARTUP_OBJECT = sTARTUP_OBJECT;
@@ -1460,8 +1467,10 @@ public class GlobalConf {
                 STAR_BRIGHTNESS = Math.max(0.01f, (float) data[0]);
                 break;
             case FOV_CHANGED_CMD:
-                boolean checkMax = data.length == 1 || (boolean) data[1];
-                CAMERA_FOV = MathUtilsd.clamp(((Float) data[0]).intValue(), Constants.MIN_FOV, checkMax ? Constants.MAX_FOV : 179);
+                if(!SlaveManager.projectionActive()) {
+                    boolean checkMax = data.length == 1 || (boolean) data[1];
+                    CAMERA_FOV = MathUtilsd.clamp(((Float) data[0]).intValue(), Constants.MIN_FOV, checkMax ? Constants.MAX_FOV : 179);
+                }
                 break;
             case PM_NUM_FACTOR_CMD:
                 PM_NUM_FACTOR = MathUtilsd.clamp((float) data[0], Constants.MIN_PM_NUM_FACTOR, Constants.MAX_PM_NUM_FACTOR);

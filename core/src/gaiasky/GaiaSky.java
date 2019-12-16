@@ -28,6 +28,7 @@ import gaiasky.data.AssetBean;
 import gaiasky.data.StreamingOctreeLoader;
 import gaiasky.data.util.PointCloudData;
 import gaiasky.desktop.util.CrashReporter;
+import gaiasky.desktop.util.SysUtils;
 import gaiasky.event.EventManager;
 import gaiasky.event.Events;
 import gaiasky.event.IObserver;
@@ -52,6 +53,7 @@ import gaiasky.util.gdx.g2d.BitmapFont;
 import gaiasky.util.gdx.loader.BitmapFontLoader;
 import gaiasky.util.gdx.loader.G3dModelLoader;
 import gaiasky.util.gdx.loader.ObjLoader;
+import gaiasky.util.gdx.loader.PFMTextureLoader;
 import gaiasky.util.gdx.loader.is.GzipInputStreamProvider;
 import gaiasky.util.gdx.loader.is.RegularInputStreamProvider;
 import gaiasky.util.gdx.model.IntModel;
@@ -66,6 +68,7 @@ import gaiasky.vr.openvr.VRContext;
 import gaiasky.vr.openvr.VRContext.VRDevice;
 import gaiasky.vr.openvr.VRContext.VRDeviceType;
 import gaiasky.vr.openvr.VRStatus;
+import org.apache.commons.io.FileUtils;
 import org.lwjgl.opengl.GL30;
 import org.lwjgl.openvr.Texture;
 import org.lwjgl.openvr.VR;
@@ -295,7 +298,7 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
         FileHandleResolver internalResolver = new InternalFileHandleResolver();
         FileHandleResolver dataResolver = fileName -> GlobalConf.data.dataFileHandle(fileName);
         manager = new AssetManager(internalResolver);
-        //manager.setLoader(Model.class, ".obj", new AdvancedObjLoader(resolver));
+        manager.setLoader(com.badlogic.gdx.graphics.Texture.class, ".pfm", new PFMTextureLoader(dataResolver));
         manager.setLoader(ISceneGraph.class, new SGLoader(dataResolver));
         manager.setLoader(PointCloudData.class, new OrbitDataLoader(dataResolver));
         manager.setLoader(GaiaAttitudeServer.class, new GaiaAttitudeLoader(dataResolver));
@@ -720,6 +723,16 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
 
         // Dispose music manager
         MusicManager.dispose();
+
+        // Clear temp
+        try {
+            File tmp = SysUtils.getDefaultTmpDir();
+            if (tmp.exists() && tmp.isDirectory())
+                FileUtils.deleteDirectory(tmp);
+        } catch (Exception e) {
+            logger.error(e, "Error deleting tmp directory");
+        }
+
     }
 
     /**

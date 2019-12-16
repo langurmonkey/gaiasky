@@ -151,6 +151,12 @@ public enum Events {
     CAMERA_POS_CMD,
 
     /**
+     * Update camera position, direction and up vectors all at once.
+     * Only meant for master-slave setups.
+     */
+    CAMERA_PROJECTION_CMD,
+
+    /**
      * Contains the roll value between -1 and 1
      **/
     CAMERA_ROLL,

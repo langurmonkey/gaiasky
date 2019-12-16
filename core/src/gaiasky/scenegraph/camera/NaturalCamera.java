@@ -30,10 +30,7 @@ import gaiasky.scenegraph.*;
 import gaiasky.scenegraph.camera.CameraManager.CameraMode;
 import gaiasky.scenegraph.component.RotationComponent;
 import gaiasky.scenegraph.octreewrapper.OctreeWrapper;
-import gaiasky.util.Constants;
-import gaiasky.util.GlobalConf;
-import gaiasky.util.GlobalResources;
-import gaiasky.util.MasterManager;
+import gaiasky.util.*;
 import gaiasky.util.coord.Coordinates;
 import gaiasky.util.gdx.contrib.postprocess.effects.CubemapProjections.CubemapProjection;
 import gaiasky.util.gravwaves.RelativisticEffectsManager;
@@ -188,6 +185,12 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
     boolean diverted = false;
     boolean vr = false;
 
+    /**
+     * Flag that marks whether the projection has already been modified.
+     * Only in master-slave configurations.
+     */
+    boolean projectionFlag = false;
+
     private float planetariumFocusAngle = 0f;
 
     public double[] hudScales;
@@ -332,7 +335,7 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
         }
 
         // FOCUS_MODE is changed from GUI
-        EventManager.instance.subscribe(this, Events.FOCUS_CHANGE_CMD, Events.FOV_CHANGED_CMD, Events.ORIENTATION_LOCK_CMD, Events.CAMERA_POS_CMD, Events.CAMERA_DIR_CMD, Events.CAMERA_UP_CMD, Events.CAMERA_FWD, Events.CAMERA_ROTATE, Events.CAMERA_PAN, Events.CAMERA_ROLL, Events.CAMERA_TURN, Events.CAMERA_STOP, Events.CAMERA_CENTER, Events.GO_TO_OBJECT_CMD, Events.PLANETARIUM_FOCUS_ANGLE_CMD, Events.PLANETARIUM_CMD, Events.CUBEMAP_CMD, Events.FREE_MODE_COORD_CMD, Events.CATALOG_VISIBLE, Events.CATALOG_REMOVE, Events.FOCUS_NOT_AVAILABLE, Events.TOGGLE_VISIBILITY_CMD, Events.CAMERA_CENTER_FOCUS_CMD);
+        EventManager.instance.subscribe(this, Events.FOCUS_CHANGE_CMD, Events.FOV_CHANGED_CMD, Events.ORIENTATION_LOCK_CMD, Events.CAMERA_POS_CMD, Events.CAMERA_DIR_CMD, Events.CAMERA_UP_CMD, Events.CAMERA_PROJECTION_CMD, Events.CAMERA_FWD, Events.CAMERA_ROTATE, Events.CAMERA_PAN, Events.CAMERA_ROLL, Events.CAMERA_TURN, Events.CAMERA_STOP, Events.CAMERA_CENTER, Events.GO_TO_OBJECT_CMD, Events.PLANETARIUM_FOCUS_ANGLE_CMD, Events.PLANETARIUM_CMD, Events.CUBEMAP_CMD, Events.FREE_MODE_COORD_CMD, Events.CATALOG_VISIBLE, Events.CATALOG_REMOVE, Events.FOCUS_NOT_AVAILABLE, Events.TOGGLE_VISIBILITY_CMD, Events.CAMERA_CENTER_FOCUS_CMD);
     }
 
     private void computeNextPositions(ITimeFrameProvider time) {
@@ -349,7 +352,15 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
     }
 
     public void update(double dt, ITimeFrameProvider time) {
+        // SLAVE - orient
+        if (SlaveManager.projectionActive()) {
+            camOrientProjection(SlaveManager.instance.yaw, SlaveManager.instance.pitch, SlaveManager.instance.roll);
+        }
+
+        // Update camera
         camUpdate(dt, time);
+
+        // MASTER - broadcast
         if (MasterManager.instance != null) {
             // Send camera state
             MasterManager.instance.boardcastCameraAndTime(this.pos, this.direction, this.up, time);
@@ -547,6 +558,30 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
         }
 
         updatePerspectiveCamera();
+    }
+
+    /**
+     * Does a pre-transformation to the camera to orient it using the given yaw, pitch and roll
+     * angles.
+     *
+     * @param yaw   The yaw angle (to the right)
+     * @param pitch The pitch angle (up)
+     * @param roll  The roll angle (clockwise)
+     */
+    public void camOrientProjection(float yaw, float pitch, float roll) {
+        if(projectionFlag) {
+            // yaw - rotate to the right
+            direction.rotate(up, -yaw);
+
+            // pitch - rotate up
+            aux1.set(direction).crs(up);
+            direction.rotate(aux1, pitch);
+            up.rotate(aux1, pitch);
+
+            // roll - clockwise
+            up.rotate(direction, roll);
+            projectionFlag = false;
+        }
     }
 
     public void updateHUD(float dt) {
@@ -1278,15 +1313,17 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
 
             break;
         case FOV_CHANGED_CMD:
-            boolean checkMax = data.length == 1 || (boolean) data[1];
-            float fov = MathUtilsd.clamp((float) data[0], Constants.MIN_FOV, checkMax ? Constants.MAX_FOV : 179);
+            if (!SlaveManager.projectionActive()) {
+                boolean checkMax = data.length == 1 || (boolean) data[1];
+                float fov = MathUtilsd.clamp((float) data[0], Constants.MIN_FOV, checkMax ? Constants.MAX_FOV : 179);
 
-            for (PerspectiveCamera cam : cameras) {
-                cam.fieldOfView = fov;
-            }
-            fovFactor = camera.fieldOfView / 40f;
-            if (parent.current == this) {
-                EventManager.instance.post(Events.FOV_CHANGE_NOTIFICATION, fov, fovFactor);
+                for (PerspectiveCamera cam : cameras) {
+                    cam.fieldOfView = fov;
+                }
+                fovFactor = camera.fieldOfView / 40f;
+                if (parent.current == this) {
+                    EventManager.instance.post(Events.FOV_CHANGE_NOTIFICATION, fov, fovFactor);
+                }
             }
             break;
         case CUBEMAP_CMD:
@@ -1320,6 +1357,17 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
             break;
         case CAMERA_UP_CMD:
             up.set((double[]) data[0]).nor();
+            break;
+        case CAMERA_PROJECTION_CMD:
+            // Position
+            pos.set((double[]) data[0]);
+            posinv.set(pos).scl(-1d);
+            // Direction
+            direction.set((double[]) data[1]).nor();
+            // Up
+            up.set((double[]) data[2]).nor();
+            // Change projection flag
+            projectionFlag = true;
             break;
         case CAMERA_FWD:
             addForwardForce((double) data[0]);

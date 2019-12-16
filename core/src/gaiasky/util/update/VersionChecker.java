@@ -59,12 +59,19 @@ public class VersionChecker implements Runnable {
                         Integer version = stringToVersionNumber(tag);
                         String commitDate = result.get(i).get("commit").getString("committed_date");
                         //Format 2016-12-07T10:41:35Z
+                        //    or 2016-12-07T10:41:35+01:00
                         DateTimeFormatter df = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.nnn'Z'");
                         try {
                             LocalDateTime tagDate = LocalDateTime.parse(commitDate, df);
                             tags.add(new VersionObject(result.get(i), version, tagDate.toInstant(ZoneOffset.UTC)));
                         } catch (DateTimeParseException e) {
-                            logger.error(e);
+                            df = DateTimeFormatter.ISO_OFFSET_DATE_TIME;
+                            try {
+                                LocalDateTime tagDate = LocalDateTime.parse(commitDate, df);
+                                tags.add(new VersionObject(result.get(i), version, tagDate.toInstant(ZoneOffset.UTC)));
+                            }catch(DateTimeParseException e1) {
+                                logger.error(e1, "Can't parse datetime: " + commitDate);
+                            }
                         }
                     }
                 }

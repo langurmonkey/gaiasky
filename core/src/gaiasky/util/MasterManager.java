@@ -98,7 +98,7 @@ public class MasterManager implements IObserver {
         }
 
         // Subscribe to events that need to be broadcasted
-        EventManager.instance.subscribe(this, Events.FOV_CHANGED_CMD, Events.TOGGLE_VISIBILITY_CMD, Events.STAR_BRIGHTNESS_CMD, Events.STAR_MIN_OPACITY_CMD, Events.STAR_POINT_SIZE_CMD);
+        EventManager.instance.subscribe(this, Events.FOV_CHANGED_CMD, Events.TOGGLE_VISIBILITY_CMD, Events.STAR_BRIGHTNESS_CMD, Events.STAR_MIN_OPACITY_CMD, Events.STAR_POINT_SIZE_CMD, Events.DISPOSE);
     }
 
     /**
@@ -236,8 +236,17 @@ public class MasterManager implements IObserver {
             i = 0;
             for (String slave : slaves) {
                 if (slaveStates[i] == 0) {
-                    evtrequest.setUrl(slave + "setStarMinOpacity");
+                    evtrequest.setUrl(slave + "setMinStarOpacity");
                     evtrequest.setContent(paramString);
+                    Gdx.net.sendHttpRequest(evtrequest, responseListeners[i++]);
+                }
+            }
+            break;
+        case DISPOSE:
+            i = 0;
+            for (String slave : slaves) {
+                if (slaveStates[i] == 0) {
+                    evtrequest.setUrl(slave + "quit");
                     Gdx.net.sendHttpRequest(evtrequest, responseListeners[i++]);
                 }
             }

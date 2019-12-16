@@ -176,6 +176,9 @@ public class KeyBindings {
         BooleanRunnable noPanorama = () -> !(GlobalConf.program.CUBEMAP_MODE && GlobalConf.program.CUBEMAP_PROJECTION.isPanorama());
         // Condition that checks that planetarium mode is off
         BooleanRunnable noPlanetarium = () -> !(GlobalConf.program.CUBEMAP_MODE && GlobalConf.program.CUBEMAP_PROJECTION.isPlanetarium());
+        // Condition that checks that we are not a slave with a special projection
+        BooleanRunnable noSlaveProj = () -> !SlaveManager.projectionActive();
+
 
         // about action
         final Runnable runnableAbout = () -> EventManager.instance.post(Events.SHOW_ABOUT_ACTION);
@@ -270,10 +273,10 @@ public class KeyBindings {
         addAction(new ProgramAction("action.resetmag", () -> EventManager.instance.post(Events.LIMIT_MAG_CMD, GlobalConf.data.LIMIT_MAG_LOAD)));
 
         // increase field of view
-        addAction(new ProgramAction("action.incfov", () -> EventManager.instance.post(Events.FOV_CHANGED_CMD, GlobalConf.scene.CAMERA_FOV + 1f, false)));
+        addAction(new ProgramAction("action.incfov", () -> EventManager.instance.post(Events.FOV_CHANGED_CMD, GlobalConf.scene.CAMERA_FOV + 1f, false), noSlaveProj));
 
         // decrease field of view
-        addAction(new ProgramAction("action.decfov", () -> EventManager.instance.post(Events.FOV_CHANGED_CMD, GlobalConf.scene.CAMERA_FOV - 1f, false)));
+        addAction(new ProgramAction("action.decfov", () -> EventManager.instance.post(Events.FOV_CHANGED_CMD, GlobalConf.scene.CAMERA_FOV - 1f, false), noSlaveProj));
 
         // fullscreen
         addAction(new ProgramAction("action.togglefs", () -> {
@@ -282,7 +285,7 @@ public class KeyBindings {
         }));
 
         // toggle planetarium mode
-        addAction(new ProgramAction("action.toggle/element.planetarium", () -> EventManager.instance.post(Events.FISHEYE_CMD, !GlobalConf.postprocess.POSTPROCESS_FISHEYE)));
+        // addAction(new ProgramAction("action.toggle/element.planetarium", () -> EventManager.instance.post(Events.FISHEYE_CMD, !GlobalConf.postprocess.POSTPROCESS_FISHEYE)));
 
         // take screenshot
         addAction(new ProgramAction("action.screenshot", () -> EventManager.instance.post(Events.SCREENSHOT_CMD, GlobalConf.screenshot.SCREENSHOT_WIDTH, GlobalConf.screenshot.SCREENSHOT_HEIGHT, GlobalConf.screenshot.SCREENSHOT_FOLDER)));

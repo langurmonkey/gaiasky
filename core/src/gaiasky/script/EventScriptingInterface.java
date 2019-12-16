@@ -2102,9 +2102,7 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
     @Override
     public void setCameraStateAndTime(double[] pos, double[] dir, double[] up, long time) {
         GaiaSky.postRunnable(() -> {
-            em.post(Events.CAMERA_POS_CMD, pos);
-            em.post(Events.CAMERA_DIR_CMD, dir);
-            em.post(Events.CAMERA_UP_CMD, up);
+            em.post(Events.CAMERA_PROJECTION_CMD, pos, dir, up);
             em.post(Events.TIME_CHANGE_CMD, Instant.ofEpochMilli(time));
         });
     }
@@ -2373,6 +2371,11 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
     @Override
     public void error(String message) {
         logger.error(message);
+    }
+
+    @Override
+    public void quit() {
+        Gdx.app.exit();
     }
 
     @Override

@@ -33,6 +33,7 @@ import gaiasky.interfce.KeyBindings;
 import gaiasky.interfce.MusicActorsManager;
 import gaiasky.interfce.NetworkCheckerManager;
 import gaiasky.render.PostProcessorFactory;
+import gaiasky.rest.RESTServer;
 import gaiasky.screenshot.ScreenshotsManager;
 import gaiasky.util.*;
 import gaiasky.util.GlobalConf.SceneConf.ElevationType;
@@ -45,8 +46,6 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
 import java.nio.channels.FileChannel;
 import java.util.Properties;
 
@@ -192,6 +191,7 @@ public class GaiaSkyDesktop implements IObserver {
             // Init global configuration
             ConfInit.initialize(new DesktopConfInit(gsArgs.vr));
 
+            // VR resolution
             if (gsArgs.vr) {
                 Graphics.DisplayMode dm = Lwjgl3ApplicationConfiguration.getDisplayMode();
                 double sh = Math.min(dm.height, 1780);
@@ -204,6 +204,7 @@ public class GaiaSkyDesktop implements IObserver {
             // Reinitialize with user-defined locale
             I18n.initialize(Gdx.files.absolute(GlobalConf.ASSETS_LOC + File.separator + "i18n/gsbundle"));
 
+
             if (gsArgs.version) {
                 System.out.println(GlobalConf.getShortApplicationName());
                 System.out.println("License MPL 2.0: Mozilla Public License 2.0 <https://www.mozilla.org/en-US/MPL/2.0/>");
@@ -212,13 +213,16 @@ public class GaiaSkyDesktop implements IObserver {
                 return;
             }
 
+            ConsoleLogger consoleLogger = new ConsoleLogger();
+
             // REST API server
             REST_ENABLED = GlobalConf.program.REST_PORT >= 0 && checkRestDepsInClasspath();
             if (REST_ENABLED) {
-                REST_SERVER_CLASS = Class.forName("gaiasky.rest.RESTServer");
-                Method init = REST_SERVER_CLASS.getMethod("initialize", Integer.class);
-                init.invoke(null, GlobalConf.program.REST_PORT);
+                RESTServer.initialize(GlobalConf.program.REST_PORT);
             }
+
+            // Slave manager
+            SlaveManager.initialize();
 
             // Fullscreen command
             ScreenModeCmd.initialize();
@@ -249,6 +253,8 @@ public class GaiaSkyDesktop implements IObserver {
 
             // Math
             MathManager.initialize();
+
+            consoleLogger.dispose();
 
             gsd.init();
         } catch (Exception e) {
@@ -281,9 +287,14 @@ public class GaiaSkyDesktop implements IObserver {
                         break;
                     }
                 }
-                if (mymode == null)
-                    mymode = Lwjgl3ApplicationConfiguration.getDisplayMode(Gdx.graphics.getPrimaryMonitor());
-                cfg.setFullscreenMode(mymode);
+                if (mymode == null) {
+                    // Fall back to windowed
+                    logger.warn("Warning: no full screen mode with the given resolution found (" + GlobalConf.screen.FULLSCREEN_WIDTH + "x" + GlobalConf.screen.FULLSCREEN_HEIGHT+"). Falling back to windowed mode.");
+                    cfg.setWindowedMode(GlobalConf.screen.getScreenWidth(), GlobalConf.screen.getScreenHeight());
+                    cfg.setResizable(GlobalConf.screen.RESIZABLE);
+                } else {
+                    cfg.setFullscreenMode(mymode);
+                }
             } else {
                 cfg.setWindowedMode(GlobalConf.screen.getScreenWidth(), GlobalConf.screen.getScreenHeight());
                 cfg.setResizable(GlobalConf.screen.RESIZABLE);
@@ -345,11 +356,9 @@ public class GaiaSkyDesktop implements IObserver {
                  * Notify REST server that GUI is loaded and everything should be in a
                  * well-defined state
                  */
-                Method activate;
                 try {
-                    activate = REST_SERVER_CLASS.getMethod("activate");
-                    activate.invoke(null);
-                } catch (NoSuchMethodException | SecurityException | IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
+                    RESTServer.activate();
+                } catch (SecurityException | IllegalArgumentException e) {
                     logger.error(e);
                 }
             }
@@ -358,9 +367,8 @@ public class GaiaSkyDesktop implements IObserver {
             if (REST_ENABLED) {
                 /* Shutdown REST server thread on termination */
                 try {
-                    Method stop = REST_SERVER_CLASS.getMethod("stop");
-                    stop.invoke(null);
-                } catch (NoSuchMethodException | SecurityException | IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
+                    RESTServer.dispose();
+                } catch (SecurityException | IllegalArgumentException e) {
                     logger.error(e);
                 }
             }

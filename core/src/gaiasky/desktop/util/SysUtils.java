@@ -125,6 +125,7 @@ public class SysUtils {
     private static final String FRAMES_DIR_NAME = "frames";
     private static final String MUSIC_DIR_NAME = "music";
     private static final String MAPPINGS_DIR_NAME = "mappings";
+    private static final String MPCDI_DIR_NAME = "mpcdi";
     private static final String DATA_DIR_NAME = "data";
     private static final String TMP_DIR_NAME = "tmp";
     private static final String CRASHREPORTS_DIR_NAME = "crashreports";
@@ -179,6 +180,19 @@ public class SysUtils {
     }
 
     /**
+     * Gets a file pointer to the mpcdi directory.
+     *
+     * @return A pointer to the Gaia Sky mpcdi directory
+     */
+    public static File getDefaultMpcdiDir() {
+        return new File(getDataDir(), MPCDI_DIR_NAME);
+    }
+
+    public static String getMpcdiDirName(){
+        return MPCDI_DIR_NAME;
+    }
+
+    /**
      * Gets a file pointer to the local data directory where the data files are downloaded and stored.
      *
      * @return A pointer to the local data directory where the data files are
@@ -197,12 +211,12 @@ public class SysUtils {
     }
 
     /**
-     * Gets a file pointer to the $HOME/.gaiasky/tmp directory.
+     * Gets a file pointer to the temporary directory within the cache directory. See {@link #getCacheDir()}.
      *
      * @return A pointer to the Gaia Sky temporary directory in the user's home.
      */
     public static File getDefaultTmpDir() {
-        return new File(getDataDir(), TMP_DIR_NAME);
+        return new File(getCacheDir(), TMP_DIR_NAME);
     }
 
     /**
@@ -216,6 +230,20 @@ public class SysUtils {
             return new File(getXdgDataHome(), GAIASKY_DIR_NAME + File.separator);
         } else {
             return new File(System.getProperty("user.home"), DOTGAIASKY_DIR_NAME + File.separator);
+        }
+    }
+
+    /**
+     * Returns the default cache directory, for non-essential data. This is ~/.gaiasky/ in Windows and macOS, and ~/.cache/gaiasky
+     * in Linux.
+     *
+     * @return The default cache directory
+     */
+    public static File getCacheDir(){
+        if(isLinux()){
+            return new File(getXdgCacheHome(), GAIASKY_DIR_NAME + File.separator);
+        } else {
+           return getDataDir();
         }
     }
 
@@ -236,22 +264,30 @@ public class SysUtils {
     }
 
     private static String getXdgDataHome() {
-        String dhome = System.getenv("XDG_DATA_HOME");
-        if (dhome == null || dhome.isEmpty()) {
+        String dataHome = System.getenv("XDG_DATA_HOME");
+        if (dataHome == null || dataHome.isEmpty()) {
             return System.getProperty("user.home") + File.separator + ".local" + File.separator + "share";
         } else {
-            return dhome;
+            return dataHome;
         }
     }
 
     private static String getXdgConfigHome() {
-        String chome = System.getenv("XDG_CONFIG_HOME");
-        if (chome == null || chome.isEmpty()) {
+        String configHome = System.getenv("XDG_CONFIG_HOME");
+        if (configHome == null || configHome.isEmpty()) {
             return System.getProperty("user.home") + File.separator + ".config";
         } else {
-            return chome;
+            return configHome;
         }
+    }
 
+    private static String getXdgCacheHome() {
+        String cacheHome = System.getenv("XDG_CACHE_HOME");
+        if (cacheHome == null || cacheHome.isEmpty()) {
+            return System.getProperty("user.home") + File.separator + ".cache";
+        } else {
+            return cacheHome;
+        }
     }
 
     public static double getJavaVersion() {
