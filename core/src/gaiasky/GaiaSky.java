@@ -202,6 +202,11 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
     private boolean catChooser;
 
     /**
+     * Forbids the creation of the scripting server
+     */
+    private boolean noScripting;
+
+    /**
      * Save state on exit
      */
     public boolean saveState = true;
@@ -226,7 +231,7 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
      * Creates an instance of Gaia Sky.
      */
     public GaiaSky() {
-        this(false, false, false, false);
+        this(false, false, false, false, false);
     }
 
     /**
@@ -237,7 +242,7 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
      * @param vr           Launch in VR mode
      * @param externalView Open a new window with a view of the rendered scene
      */
-    public GaiaSky(boolean dsdownload, boolean catchooser, boolean vr, boolean externalView) {
+    public GaiaSky(boolean dsdownload, boolean catchooser, boolean vr, boolean externalView, boolean noScriptingServer) {
         super();
         instance = this;
         this.runnables = new Array<>();
@@ -247,6 +252,8 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
         this.catChooser = catchooser;
         this.externalView = externalView;
         this.renderProcess = runnableInitialGui;
+        this.noScripting = noScriptingServer;
+
 
     }
 
@@ -360,7 +367,8 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
         sgr = SceneGraphRenderer.instance;
 
         // Initialise scripting gateway server
-        ScriptingServer.initialize();
+        if(!noScripting)
+            ScriptingServer.initialize();
 
         // Tell the asset manager to load all the assets
         Set<AssetBean> assets = AssetBean.getAssets();

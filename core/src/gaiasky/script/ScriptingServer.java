@@ -32,7 +32,7 @@ public class ScriptingServer {
     }
 
     public static void initialize(boolean force) {
-        if(!GlobalConf.program.NET_SLAVE) {
+        if (!GlobalConf.program.NET_SLAVE) {
             if (force && gatewayServer != null) {
                 // Shutdown
                 try {
@@ -42,59 +42,64 @@ public class ScriptingServer {
                 }
             }
             if (gatewayServer == null) {
-                gatewayServer = new ClientServer(EventScriptingInterface.instance());
-                listener = new DefaultGatewayServerListener() {
+                try {
+                    gatewayServer = new ClientServer(EventScriptingInterface.instance());
+                    listener = new DefaultGatewayServerListener() {
 
-                    @Override
-                    public void connectionStarted(Py4JServerConnection gatewayConnection) {
-                        logger.info("Connection started (" + connections.incrementAndGet() + "): " + gatewayConnection.getSocket().toString());
-                    }
+                        @Override
+                        public void connectionStarted(Py4JServerConnection gatewayConnection) {
+                            logger.info("Connection started (" + connections.incrementAndGet() + "): " + gatewayConnection.getSocket().toString());
+                        }
 
-                    @Override
-                    public void connectionStopped(Py4JServerConnection gatewayConnection) {
-                        // Enable input, just in case
-                        GaiaSky.postRunnable(() -> EventManager.instance.post(Events.INPUT_ENABLED_CMD, true));
-                        logger.info("Connection stopped (" + connections.decrementAndGet() + "): " + gatewayConnection.getSocket().toString());
-                    }
+                        @Override
+                        public void connectionStopped(Py4JServerConnection gatewayConnection) {
+                            // Enable input, just in case
+                            GaiaSky.postRunnable(() -> EventManager.instance.post(Events.INPUT_ENABLED_CMD, true));
+                            logger.info("Connection stopped (" + connections.decrementAndGet() + "): " + gatewayConnection.getSocket().toString());
+                        }
 
-                    @Override
-                    public void serverPostShutdown() {
-                        logger.debug("Post shutdown");
-                    }
+                        @Override
+                        public void serverPostShutdown() {
+                            logger.debug("Post shutdown");
+                        }
 
-                    @Override
-                    public void serverPreShutdown() {
-                        logger.debug("Pre shutdown");
-                    }
+                        @Override
+                        public void serverPreShutdown() {
+                            logger.debug("Pre shutdown");
+                        }
 
-                    @Override
-                    public void serverStarted() {
-                        logger.info("Server started on port " + gatewayServer.getJavaServer().getListeningPort());
-                    }
+                        @Override
+                        public void serverStarted() {
+                            logger.info("Server started on port " + gatewayServer.getJavaServer().getListeningPort());
+                        }
 
-                    @Override
-                    public void serverStopped() {
-                        logger.info("Server stopped");
-                        initialize(true);
-                    }
+                        @Override
+                        public void serverStopped() {
+                            logger.info("Server stopped");
+                            initialize(true);
+                        }
 
-                    @Override
-                    public void connectionError(Exception e) {
-                        logger.error(e);
-                    }
+                        @Override
+                        public void connectionError(Exception e) {
+                            logger.error(e);
+                        }
 
-                    @Override
-                    public void serverError(Exception e) {
-                        logger.error(e);
-                        initialize(force);
-                    }
-                };
-                gatewayServer.getJavaServer().addListener(listener);
+                        @Override
+                        public void serverError(Exception e) {
+                            logger.error(e);
+                            initialize(force);
+                        }
+                    };
+                    gatewayServer.getJavaServer().addListener(listener);
+                } catch (Exception e) {
+                    logger.error("Could not initialize the Py4J gateway server, is there another instance of Gaia Sky running? Proceeding without scripting...");
+                    logger.error(e);
+                }
             }
             try {
                 gatewayServer.startServer();
             } catch (Exception e) {
-                logger.error("Could not initialize the Py4J gateway server, is there another instance of Gaia Sky running?");
+                logger.error("Could not initialize the Py4J gateway server, is there another instance of Gaia Sky running? Proceeding without scripting...");
                 logger.error(e);
             }
         }

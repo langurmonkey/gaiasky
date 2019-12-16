@@ -98,6 +98,8 @@ public class GaiaSkyDesktop implements IObserver {
         @Parameter(names = { "-vr", "--openvr" }, description = "Launch in Virtual Reality mode. Gaia Sky will attempt creating a VR context through OpenVR.", order = 6) private boolean vr = false;
 
         @Parameter(names = { "-e", "--externalview" }, description = "Create a window with a view of the scene and no UI.", order = 7) private boolean externalView = false;
+
+        @Parameter(names = { "-n", "--noscript" }, description = "Do not start the scripting server. Useful to run more than one Gaia Sky instance at once.", order = 7) private boolean noScriptingServer = false;
     }
 
     /**
@@ -323,7 +325,7 @@ public class GaiaSkyDesktop implements IObserver {
 
         // Launch app
         try {
-            new Lwjgl3Application(new GaiaSky(gsArgs.download, gsArgs.catalogChooser, gsArgs.vr, gsArgs.externalView), cfg);
+            new Lwjgl3Application(new GaiaSky(gsArgs.download, gsArgs.catalogChooser, gsArgs.vr, gsArgs.externalView, gsArgs.noScriptingServer), cfg);
         } catch (GdxRuntimeException e) {
             if (!JAVA_VERSION_FLAG) {
                 // Probably, OpenGL 4.x is not supported and window creation failed
@@ -338,7 +340,7 @@ public class GaiaSkyDesktop implements IObserver {
                 }
                 cfg.useOpenGL3(true, 3, 2);
 
-                Lwjgl3Application app = new Lwjgl3Application(new GaiaSky(gsArgs.download, gsArgs.catalogChooser, gsArgs.vr, gsArgs.externalView), cfg);
+                Lwjgl3Application app = new Lwjgl3Application(new GaiaSky(gsArgs.download, gsArgs.catalogChooser, gsArgs.vr, gsArgs.externalView, gsArgs.noScriptingServer), cfg);
             } else {
                 logger.error("Please update your java installation. Gaia Sky needs at least Java " + REQUIRED_JAVA_VERSION);
             }

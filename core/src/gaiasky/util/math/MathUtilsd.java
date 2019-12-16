@@ -14,7 +14,7 @@ import java.util.Random;
  * Utility and fast math functions.
  * <p>
  * Thanks to Riven on JavaGaming.org for the basis of sin/cos/atan2/floor/ceil.
- * 
+ *
  * @author Nathan Sweet
  */
 public final class MathUtilsd {
@@ -55,44 +55,49 @@ public final class MathUtilsd {
             for (int i = 0; i < SIN_COUNT; i++)
                 table[i] = Math.sin((i + 0.5) / SIN_COUNT * radFull);
             for (int i = 0; i < 360; i += 90)
-                table[(int)(i * degToIndex) & SIN_MASK] = Math.sin(i * degreesToRadians);
+                table[(int) (i * degToIndex) & SIN_MASK] = Math.sin(i * degreesToRadians);
         }
     }
 
     /** Returns the sine in radians from a lookup table. */
-    static public double sin (double radians) {
-        return Sin.table[(int)(radians * radToIndex) & SIN_MASK];
+    static public double sin(double radians) {
+        return Sin.table[(int) (radians * radToIndex) & SIN_MASK];
     }
 
     /** Returns the cosine in radians from a lookup table. */
-    static public double cos (double radians) {
-        return Sin.table[(int)((radians + PI / 2) * radToIndex) & SIN_MASK];
+    static public double cos(double radians) {
+        return Sin.table[(int) ((radians + PI / 2) * radToIndex) & SIN_MASK];
     }
 
     /** Returns the sine in radians from a lookup table. */
-    static public double sinDeg (double degrees) {
-        return Sin.table[(int)(degrees * degToIndex) & SIN_MASK];
+    static public double sinDeg(double degrees) {
+        return Sin.table[(int) (degrees * degToIndex) & SIN_MASK];
     }
 
     /** Returns the cosine in radians from a lookup table. */
-    static public double cosDeg (double degrees) {
-        return Sin.table[(int)((degrees + 90) * degToIndex) & SIN_MASK];
+    static public double cosDeg(double degrees) {
+        return Sin.table[(int) ((degrees + 90) * degToIndex) & SIN_MASK];
     }
 
     // ---
 
-    /** Returns atan2 in radians, faster but less accurate than Math.atan2. Average error of 0.00231 radians (0.1323 degrees),
-     * largest error of 0.00488 radians (0.2796 degrees). */
-    static public double atan2 (double y, double x) {
+    /**
+     * Returns atan2 in radians, faster but less accurate than Math.atan2. Average error of 0.00231 radians (0.1323 degrees),
+     * largest error of 0.00488 radians (0.2796 degrees).
+     */
+    static public double atan2(double y, double x) {
         if (x == 0) {
-            if (y > 0) return PI / 2;
-            if (y == 0) return 0;
+            if (y > 0)
+                return PI / 2;
+            if (y == 0)
+                return 0;
             return -PI / 2;
         }
         final double atan, z = y / x;
         if (Math.abs(z) < 1) {
             atan = z / (1 + 0.28 * z * z);
-            if (x < 0) return atan + (y < 0 ? -PI : PI);
+            if (x < 0)
+                return atan + (y < 0 ? -PI : PI);
             return atan;
         }
         atan = PI / 2 - z / (z * z + 0.28);
@@ -102,94 +107,105 @@ public final class MathUtilsd {
     static public Random random = new RandomXS128();
 
     /** Returns a random number between 0 (inclusive) and the specified value (inclusive). */
-    static public int random (int range) {
+    static public int random(int range) {
         return random.nextInt(range + 1);
     }
 
     /** Returns a random number between start (inclusive) and end (inclusive). */
-    static public int random (int start, int end) {
+    static public int random(int start, int end) {
         return start + random.nextInt(end - start + 1);
     }
 
     /** Returns a random number between 0 (inclusive) and the specified value (inclusive). */
-    static public long random (long range) {
-        return (long)(random.nextDouble() * range);
+    static public long random(long range) {
+        return (long) (random.nextDouble() * range);
     }
 
     /** Returns a random number between start (inclusive) and end (inclusive). */
-    static public long random (long start, long end) {
-        return start + (long)(random.nextDouble() * (end - start));
+    static public long random(long start, long end) {
+        return start + (long) (random.nextDouble() * (end - start));
     }
 
     /** Returns a random boolean value. */
-    static public boolean randomBoolean () {
+    static public boolean randomBoolean() {
         return random.nextBoolean();
     }
 
     /** Returns true if a random value between 0 and 1 is less than the specified value. */
-    static public boolean randomBoolean (double chance) {
+    static public boolean randomBoolean(double chance) {
         return MathUtils.random() < chance;
     }
 
     /** Returns random number between 0.0 (inclusive) and 1.0 (exclusive). */
-    static public double random () {
+    static public double random() {
         return random.nextDouble();
     }
 
     /** Returns a random number between 0 (inclusive) and the specified value (exclusive). */
-    static public double random (double range) {
+    static public double random(double range) {
         return random.nextDouble() * range;
     }
 
     /** Returns a random number between start (inclusive) and end (exclusive). */
-    static public double random (double start, double end) {
+    static public double random(double start, double end) {
         return start + random.nextDouble() * (end - start);
     }
 
     /** Returns -1 or 1, randomly. */
-    static public int randomSign () {
+    static public int randomSign() {
         return 1 | (random.nextInt() >> 31);
     }
 
-    /** Returns a triangularly distributed random number between -1.0 (exclusive) and 1.0 (exclusive), where values around zero are
+    /**
+     * Returns a triangularly distributed random number between -1.0 (exclusive) and 1.0 (exclusive), where values around zero are
      * more likely.
      * <p>
-     * This is an optimized version of {@link #randomTriangular(double, double, double) randomTriangular(-1, 1, 0)} */
-    public static double randomTriangular () {
+     * This is an optimized version of {@link #randomTriangular(double, double, double) randomTriangular(-1, 1, 0)}
+     */
+    public static double randomTriangular() {
         return random.nextDouble() - random.nextDouble(); //-V6001
     }
 
-    /** Returns a triangularly distributed random number between {@code -max} (exclusive) and {@code max} (exclusive), where values
+    /**
+     * Returns a triangularly distributed random number between {@code -max} (exclusive) and {@code max} (exclusive), where values
      * around zero are more likely.
      * <p>
      * This is an optimized version of {@link #randomTriangular(double, double, double) randomTriangular(-max, max, 0)}
-     * @param max the upper limit */
-    public static double randomTriangular (double max) {
+     *
+     * @param max the upper limit
+     */
+    public static double randomTriangular(double max) {
         return (random.nextDouble() - random.nextDouble()) * max; //-V6001
     }
 
-    /** Returns a triangularly distributed random number between {@code min} (inclusive) and {@code max} (exclusive), where the
+    /**
+     * Returns a triangularly distributed random number between {@code min} (inclusive) and {@code max} (exclusive), where the
      * {@code mode} argument defaults to the midpoint between the bounds, giving a symmetric distribution.
      * <p>
      * This method is equivalent of {@link #randomTriangular(double, double, double) randomTriangular(min, max, (min + max) * .5f)}
+     *
      * @param min the lower limit
-     * @param max the upper limit */
-    public static double randomTriangular (double min, double max) {
+     * @param max the upper limit
+     */
+    public static double randomTriangular(double min, double max) {
         return randomTriangular(min, max, (min + max) * 0.5f);
     }
 
-    /** Returns a triangularly distributed random number between {@code min} (inclusive) and {@code max} (exclusive), where values
+    /**
+     * Returns a triangularly distributed random number between {@code min} (inclusive) and {@code max} (exclusive), where values
      * around {@code mode} are more likely.
-     * @param min the lower limit
-     * @param max the upper limit
-     * @param mode the point around which the values are more likely */
-    public static double randomTriangular (double min, double max, double mode) {
+     *
+     * @param min  the lower limit
+     * @param max  the upper limit
+     * @param mode the point around which the values are more likely
+     */
+    public static double randomTriangular(double min, double max, double mode) {
         double u = random.nextDouble();
         double d = max - min;
-        if (u <= (mode - min) / d) return min + Math.sqrt(u * d * (mode - min));
+        if (u <= (mode - min) / d)
+            return min + Math.sqrt(u * d * (mode - min));
         return max - Math.sqrt((1 - u) * d * (max - mode));
     }
-
 
     static public int clamp(int value, int min, int max) {
         if (value < min)
@@ -233,10 +249,9 @@ public final class MathUtilsd {
 
     /**
      * Returns true if the value is zero.
-     * 
-     * @param tolerance
-     *            represent an upper bound below which the value is considered
-     *            zero.
+     *
+     * @param tolerance represent an upper bound below which the value is considered
+     *                  zero.
      */
     static public boolean isZero(double value, double tolerance) {
         return Math.abs(value) <= tolerance;
@@ -245,11 +260,9 @@ public final class MathUtilsd {
     /**
      * Returns true if a is nearly equal to b. The function uses the default
      * doubleing error tolerance.
-     * 
-     * @param a
-     *            the first value.
-     * @param b
-     *            the second value.
+     *
+     * @param a the first value.
+     * @param b the second value.
      */
     static public boolean isEqual(double a, double b) {
         return Math.abs(a - b) <= FLOAT_ROUNDING_ERROR;
@@ -257,14 +270,11 @@ public final class MathUtilsd {
 
     /**
      * Returns true if a is nearly equal to b.
-     * 
-     * @param a
-     *            the first value.
-     * @param b
-     *            the second value.
-     * @param tolerance
-     *            represent an upper bound below which the two values are
-     *            considered equal.
+     *
+     * @param a         the first value.
+     * @param b         the second value.
+     * @param tolerance represent an upper bound below which the two values are
+     *                  considered equal.
      */
     static public boolean isEqual(double a, double b, double tolerance) {
         return Math.abs(a - b) <= tolerance;
@@ -272,9 +282,8 @@ public final class MathUtilsd {
 
     /**
      * Fast sqrt method. Default passes it through one round of Newton's method
-     * 
-     * @param value
-     *            The value
+     *
+     * @param value The value
      * @return The square root value
      */
     static public double sqrt(double value) {
@@ -285,6 +294,7 @@ public final class MathUtilsd {
     /**
      * Does an exponential interpolation:
      * y = y0 + (y1-y0) * 10 ^ (exp * (x-x0)/(x1-x0))
+     *
      * @param x
      * @param x0
      * @param x1
@@ -293,7 +303,7 @@ public final class MathUtilsd {
      * @param exp
      * @return
      */
-    public static double eint(double x, double x0, double x1, double y0, double y1, double exp){
+    public static double eint(double x, double x0, double x1, double y0, double y1, double exp) {
         double rx0 = x0;
         double rx1 = x1;
         if (x0 > x1) {
@@ -313,17 +323,12 @@ public final class MathUtilsd {
 
     /**
      * Linear interpolation
-     * 
-     * @param x
-     *            The value to interpolate
-     * @param x0
-     *            Inferior limit to the independent value
-     * @param x1
-     *            Superior limit to the independent value
-     * @param y0
-     *            Inferior limit to the dependent value
-     * @param y1
-     *            Superior limit to the dependent value
+     *
+     * @param x  The value to interpolate
+     * @param x0 Inferior limit to the independent value
+     * @param x1 Superior limit to the independent value
+     * @param y0 Inferior limit to the dependent value
+     * @param y1 Superior limit to the dependent value
      * @return The interpolated value
      */
     public static double lint(double x, double x0, double x1, double y0, double y1) {
@@ -344,19 +349,18 @@ public final class MathUtilsd {
         return y0 + (y1 - y0) * (x - rx0) / (rx1 - rx0);
     }
 
+    public static double lerp(double x, double y, double a) {
+        return x * (1 - a) + y * a;
+    }
+
     /**
      * Linear interpolation
-     * 
-     * @param x
-     *            The value to interpolate
-     * @param x0
-     *            Inferior limit to the independent value
-     * @param x1
-     *            Superior limit to the independent value
-     * @param y0
-     *            Inferior limit to the dependent value
-     * @param y1
-     *            Superior limit to the dependent value
+     *
+     * @param x  The value to interpolate
+     * @param x0 Inferior limit to the independent value
+     * @param x1 Superior limit to the independent value
+     * @param y0 Inferior limit to the dependent value
+     * @param y1 Superior limit to the dependent value
      * @return The interpolated value
      */
     public static float lint(float x, float x0, float x1, float y0, float y1) {
@@ -377,19 +381,18 @@ public final class MathUtilsd {
         return y0 + (y1 - y0) * (x - rx0) / (rx1 - rx0);
     }
 
+    public static float lerp(float x, float y, float a) {
+        return x * (1 - a) + y * a;
+    }
+
     /**
      * Linear interpolation
-     * 
-     * @param x
-     *            The value to interpolate
-     * @param x0
-     *            Inferior limit to the independent value
-     * @param x1
-     *            Superior limit to the independent value
-     * @param y0
-     *            Inferior limit to the dependent value
-     * @param y1
-     *            Superior limit to the dependent value
+     *
+     * @param x  The value to interpolate
+     * @param x0 Inferior limit to the independent value
+     * @param x1 Superior limit to the independent value
+     * @param y0 Inferior limit to the dependent value
+     * @param y1 Superior limit to the dependent value
      * @return The interpolated value
      */
     public static float lint(long x, long x0, long x1, float y0, float y1) {
@@ -410,7 +413,12 @@ public final class MathUtilsd {
         return (float) (y0 + (y1 - y0) * (x - rx0) / (rx1 - rx0));
     }
 
+    public static long lerp(long x, long y, long a) {
+        return x * (1 - a) + y * a;
+    }
+
     static Vector3d aux0, aux1, aux2, aux3, aux4, aux5;
+
     static {
         aux0 = new Vector3d();
         aux1 = new Vector3d();
@@ -425,13 +433,10 @@ public final class MathUtilsd {
      * Check <a href=
      * "http://mathworld.wolfram.com/Point-LineDistance3-Dimensional.html">this
      * link</a>
-     * 
-     * @param x1
-     *            The first point in the line
-     * @param x2
-     *            The second point in the line
-     * @param x0
-     *            The point
+     *
+     * @param x1 The first point in the line
+     * @param x2 The second point in the line
+     * @param x0 The point
      * @return The Euclidean distance between the line (x1, x2) and x0
      */
     public static double distancePointLine(double x1, double y1, double z1, double x2, double y2, double z2, double x0, double y0, double z0) {
@@ -449,13 +454,10 @@ public final class MathUtilsd {
      * Check <a href=
      * "http://mathworld.wolfram.com/Point-LineDistance3-Dimensional.html">this
      * link</a>.
-     * 
-     * @param x1
-     *            The first segment delimiter.
-     * @param x2
-     *            The second segment delimiter.
-     * @param x0
-     *            The point.
+     *
+     * @param x1 The first segment delimiter.
+     * @param x2 The second segment delimiter.
+     * @param x0 The point.
      * @return The Euclidean distance between the segment (x1, x2)
      */
     public static double distancePointSegment(double x1, double y1, double z1, double x2, double y2, double z2, double x0, double y0, double z0) {
@@ -486,13 +488,10 @@ public final class MathUtilsd {
      * Check <a href=
      * "http://stackoverflow.com/questions/9368436/3d-perpendicular-point-on-line-from-3d-point">
      * this link</a>.
-     * 
-     * @param x1
-     *            The first segment delimiter.
-     * @param x2
-     *            The second segment delimiter.
-     * @param x0
-     *            The point.
+     *
+     * @param x1 The first segment delimiter.
+     * @param x2 The second segment delimiter.
+     * @param x0 The point.
      * @return The vector with the closest point on the line to p0
      */
     public static Vector3d getClosestPoint(double x1, double y1, double z1, double x2, double y2, double z2, double x0, double y0, double z0) {
@@ -535,8 +534,9 @@ public final class MathUtilsd {
         return result;
     }
 
-/**
+    /**
      * Gets perpendicular vector to in vector
+     *
      * @param in
      * @return
      */
@@ -560,7 +560,8 @@ public final class MathUtilsd {
 
     /**
      * Rounds the double value to a number of decimal places
-     * @param value The value to round
+     *
+     * @param value  The value to round
      * @param places The number of decimal places
      * @return The rounded value
      */

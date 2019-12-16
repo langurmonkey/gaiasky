@@ -39,8 +39,8 @@ public class PFMTextureLoader extends TextureLoader {
                 info.texture = parameter.texture;
             }
 
-            Pixmap pixmap = PFMReader.readPFMPixmap(file);
-            info.data =new FileTextureData(file, pixmap, parameter.format, parameter.genMipMaps);
+            Pixmap pixmap = PFMReader.readPFMPixmap(file, true);
+            info.data = new FileTextureData(file, pixmap, parameter.format, parameter.genMipMaps);
             //info.data = PFMReader.readPFMTextureData(file);
         } else {
             info.data = parameter.textureData;

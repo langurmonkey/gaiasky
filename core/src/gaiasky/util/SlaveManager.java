@@ -18,6 +18,7 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
 
 /**
@@ -36,14 +37,17 @@ public class SlaveManager {
 
     /**
      * Checks if a special projection is active in this slave (yaw/pitch/roll, etc.)
+     *
      * @return True if a special projection is active
      */
-    public static boolean projectionActive(){
+    public static boolean projectionActive() {
         return instance != null && instance.initialized;
     }
 
     private boolean initialized = false;
 
+    public String bufferId, regionId;
+    public Path pfm;
     public int xResolution, yResolution;
     public float yaw, pitch, roll, upAngle, downAngle, rightAngle, leftAngle;
     public float cameraFov;
@@ -110,14 +114,14 @@ public class SlaveManager {
     private void parseMpcdi(String mpcdi, File loc) throws IOException, ParserConfigurationException, SAXException {
         if (loc != null) {
             // Parse mpcdi.xml
-            File mpcdiXml = new File(loc, "mpcdi.xml");
-            if (!mpcdiXml.exists()) {
+            Path mpcdiXml = Path.of(loc.getPath(), "mpcdi.xml");
+            if (!Files.exists(mpcdiXml)) {
                 logger.error("mpcdi.xml file not found in " + mpcdi);
                 return;
             }
             DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
             DocumentBuilder builder = factory.newDocumentBuilder();
-            Document doc = builder.parse(mpcdiXml);
+            Document doc = builder.parse(mpcdiXml.toFile());
 
             if (doc != null) {
                 // Get data and modify config
@@ -141,7 +145,7 @@ public class SlaveManager {
                     Node bufferNode = buffers.item(0);
                     if (bufferNode.getNodeType() == Node.ELEMENT_NODE) {
                         Element buffer = (Element) bufferNode;
-                        String id = buffer.getAttribute("id");
+                        bufferId = buffer.getAttribute("id");
                         int xRes = Integer.parseInt(buffer.getAttribute("xResolution"));
                         int yRes = Integer.parseInt(buffer.getAttribute("yResolution"));
                         NodeList regions = buffer.getElementsByTagName("region");
@@ -151,7 +155,7 @@ public class SlaveManager {
                         Node regionNode = regions.item(0);
                         if (regionNode.getNodeType() == Node.ELEMENT_NODE) {
                             Element region = (Element) regionNode;
-                            String regionId = region.getAttribute("id");
+                            regionId = region.getAttribute("id");
                             float x = Float.parseFloat(region.getAttribute("x"));
                             float y = Float.parseFloat(region.getAttribute("y"));
                             float xs = Float.parseFloat(region.getAttribute("xSize"));
@@ -191,9 +195,43 @@ public class SlaveManager {
                 }
 
                 // Files
-                NodeList files = root.getElementsByTagName("files");
-                if (files.getLength() != 1) {
-                    logger.warn(files.getLength() + " <files> elements found in MPCDI, which goes against the specs");
+                NodeList filesNodes = root.getElementsByTagName("files");
+                if (filesNodes.getLength() != 1) {
+                    logger.warn(filesNodes.getLength() + " <files> elements found in MPCDI, which goes against the specs");
+                } else {
+                    Node filesNode = filesNodes.item(0);
+                    if (filesNode.getNodeType() == Node.ELEMENT_NODE) {
+                        Element files = (Element) filesNode;
+                        Node filesetNode = files.getElementsByTagName("fileset").item(0);
+                        if (filesetNode.getNodeType() == Node.ELEMENT_NODE) {
+                            Element fileset = (Element) filesetNode;
+                            String reg = fileset.getAttribute("region");
+                            if (reg.equals(regionId)) {
+                                NodeList geometryWarpFiles = fileset.getElementsByTagName("geometryWarpFile");
+                                if (geometryWarpFiles.getLength() < 1) {
+                                    logger.warn("Geometry warp file not found!");
+                                } else {
+                                    Element geowarp = (Element) geometryWarpFiles.item(0);
+                                    Element path = (Element) geowarp.getElementsByTagName("path").item(0);
+                                    String pfmFile = path.getTextContent();
+                                    pfm = Path.of(loc.getPath(), pfmFile);
+                                    if (!Files.exists(pfm)) {
+                                        logger.error("The geometry warp file does not exist: " + pfm);
+                                    }
+                                    NodeList interpolationNodes = geowarp.getElementsByTagName("interpolation");
+                                    if (interpolationNodes.getLength() > 0) {
+                                        Element interpolation = (Element) interpolationNodes.item(0);
+                                        if (!interpolation.getTextContent().equals("linear")) {
+                                            logger.warn("WARN: only linear interpolation supported, found " + interpolation.getTextContent());
+                                        }
+                                    }
+                                }
+                            } else {
+                                logger.warn("Region in fileset tag does not match region id: " + regionId + " != " + reg);
+                            }
+                        }
+
+                    }
                 }
 
             }
