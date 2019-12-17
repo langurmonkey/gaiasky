@@ -24,19 +24,17 @@ import gaiasky.render.IPostProcessor;
 import gaiasky.scenegraph.BackgroundModel;
 import gaiasky.scenegraph.component.MaterialComponent;
 import gaiasky.scenegraph.component.ModelComponent;
-import gaiasky.util.GlobalConf;
+import gaiasky.util.*;
 import gaiasky.util.GlobalConf.PostprocessConf.Antialias;
 import gaiasky.util.GlobalConf.ProgramConf.StereoProfile;
 import gaiasky.util.GlobalConf.SceneConf.GraphicsQuality;
-import gaiasky.util.GlobalResources;
-import gaiasky.util.I18n;
-import gaiasky.util.Logger;
 import gaiasky.util.coord.StaticCoordinates;
 import gaiasky.util.gdx.contrib.postprocess.PostProcessor;
 import gaiasky.util.gdx.contrib.postprocess.effects.*;
 import gaiasky.util.gdx.contrib.utils.ShaderLoader;
 import gaiasky.util.math.Vector3d;
 
+import java.nio.file.Path;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -218,6 +216,18 @@ public class DesktopPostProcessor implements IPostProcessor, IObserver {
 
         // LEVELS - BRIGHTNESS, CONTRAST, HUE, SATURATION, GAMMA CORRECTION and HDR TONE MAPPING
         initLevels(ppb);
+
+
+        // SLAVE DISTORTION
+        if(GlobalConf.program.isSlave() && SlaveManager.projectionActive()){
+            Path warpFile = SlaveManager.instance.pfm;
+
+            ppb.geometryWarp = new GeometryWarp();
+            ppb.geometryWarp.setWarpTexture(manager.get(warpFile.toString()));
+            ppb.geometryWarp.setEnabled(true);
+            ppb.pp.addEffect(ppb.geometryWarp);
+
+        }
 
         return ppb;
     }

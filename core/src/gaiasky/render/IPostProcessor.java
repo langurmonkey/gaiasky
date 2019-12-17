@@ -24,6 +24,7 @@ public interface IPostProcessor extends Disposable {
         public AccumulationBlur accumblur;
         public Levels levels;
         public DepthBuffer depthBuffer;
+        public GeometryWarp geometryWarp;
 
         public boolean capture() {
             return pp.capture();
@@ -68,6 +69,8 @@ public interface IPostProcessor extends Disposable {
                     camblur.dispose();
                 if (depthBuffer != null)
                     depthBuffer.dispose();
+                if(geometryWarp != null)
+                    geometryWarp.dispose();
             }
         }
 

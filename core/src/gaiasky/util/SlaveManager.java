@@ -5,6 +5,10 @@
 
 package gaiasky.util;
 
+import com.badlogic.gdx.assets.AssetManager;
+import com.badlogic.gdx.assets.loaders.TextureLoader.TextureParameter;
+import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.Texture.TextureFilter;
 import gaiasky.desktop.util.SysUtils;
 import gaiasky.util.Logger.Log;
 import org.w3c.dom.Document;
@@ -43,6 +47,12 @@ public class SlaveManager {
      */
     public static boolean projectionActive() {
         return instance != null && instance.initialized;
+    }
+
+    public static void load(AssetManager manager){
+        if(projectionActive()){
+            instance.loadAssets(manager);
+        }
     }
 
     private boolean initialized = false;
@@ -273,6 +283,16 @@ public class SlaveManager {
         logger.info("   Resolution: " + xResolution + "x" + yResolution);
         logger.info("   Fov: " + cameraFov);
         logger.info("   Yaw/Pitch/Roll: " + yaw + "/" + pitch + "/" + roll);
+    }
+
+    public void loadAssets(AssetManager manager){
+        if(pfm != null && Files.exists(pfm)){
+            TextureParameter param =new TextureParameter();
+            param.magFilter = TextureFilter.Linear;
+            param.minFilter = TextureFilter.Linear;
+            param.genMipMaps = false;
+            manager.load(pfm.toString(), Texture.class, param);
+        }
     }
 
 }

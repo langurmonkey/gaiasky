@@ -331,6 +331,9 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
         // Initialise master manager
         MasterManager.initialize();
 
+        // Load slave assets
+        SlaveManager.load(manager);
+
         // Init timer if needed
         Timer.instance();
 

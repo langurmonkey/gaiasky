@@ -1,0 +1,41 @@
+// Geometry warping and blending post-processor effect for slaves
+// This implements part of the MPCDI specification to support multi-projector setups
+#version 330 core
+
+// Scene
+uniform sampler2D u_texture0;
+// Warp texture
+uniform sampler2D u_texture1;
+// Blend texture
+uniform sampler2D u_texture2;
+
+uniform vec2 u_viewport;
+
+uniform int u_warp;
+uniform int u_blend;
+
+
+in vec2 v_texCoords;
+layout (location = 0) out vec4 fragColor;
+
+void main() {
+    vec4 col;
+    if(u_warp == 1){
+        // Warp
+        vec4 warp = texture(u_texture1, v_texCoords);
+        col = texture(u_texture0, warp.rg);
+    } else {
+        // No warp
+        col = texture(u_texture0, v_texCoords);
+    }
+
+    if(u_blend == 1){
+        // Blend
+        vec4 blend = texture(u_texture0, v_texCoords);
+        col *= blend.a;
+    } else {
+        // Nothing
+    }
+
+    fragColor = col;
+}

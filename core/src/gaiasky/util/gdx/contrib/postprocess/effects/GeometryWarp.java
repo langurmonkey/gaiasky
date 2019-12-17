@@ -23,38 +23,30 @@ package gaiasky.util.gdx.contrib.postprocess.effects;
 
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.glutils.FrameBuffer;
+import gaiasky.util.gdx.contrib.postprocess.PostProcessorEffect;
 import gaiasky.util.gdx.contrib.postprocess.filters.GeometryWarpFilter;
 import gaiasky.util.gdx.contrib.utils.GaiaSkyFrameBuffer;
 
 /**
- * Implements the fast approximate anti-aliasing. Very fast and useful for combining with other post-processing effects.
+ * Implements geometry warp and blending from MPCDI
  *
  * @author Toni Sagrista
  */
-public final class GeometryWarp extends Antialiasing {
+public final class GeometryWarp extends PostProcessorEffect {
     private GeometryWarpFilter warpFilter = null;
 
     /** Create a FXAA with the viewport size */
-    public GeometryWarp(float viewportWidth, float viewportHeight) {
-        setup(viewportWidth, viewportHeight);
-    }
-
-    public GeometryWarp(int viewportWidth, int viewportHeight) {
-        this((float) viewportWidth, (float) viewportHeight);
-    }
-
-    private void setup(float viewportWidth, float viewportHeight) {
-        warpFilter = new GeometryWarpFilter(viewportWidth, viewportHeight);
-    }
-
-    public void setViewportSize(int width, int height) {
-        warpFilter.setViewportSize(width, height);
+    public GeometryWarp() {
+        warpFilter = new GeometryWarpFilter();
     }
 
     public void setWarpTexture(Texture tex){
         warpFilter.setWarpTexture(tex);
     }
 
+    public void setBlendTexture(Texture tex){
+        warpFilter.setBlendTexture(tex);
+    }
 
     @Override
     public void dispose() {
