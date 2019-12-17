@@ -207,6 +207,11 @@ public class DesktopConfInit extends ConfInit {
         boolean NET_MASTER = Boolean.parseBoolean(p.getProperty("program.net.master", "false"));
         boolean NET_SLAVE = Boolean.parseBoolean(p.getProperty("program.net.slave", "false"));
         String NET_SLAVE_CONFIG = p.getProperty("program.net.slave.config", "");
+        float NET_SLAVE_YAW = Parser.parseFloat(p.getProperty("program.net.slave.yaw", "NaN"));
+        float NET_SLAVE_PITCH = Parser.parseFloat(p.getProperty("program.net.slave.pitch", "NaN"));
+        float NET_SLAVE_ROLL = Parser.parseFloat(p.getProperty("program.net.slave.roll", "NaN"));
+        String NET_SLAVE_WARP = p.getProperty("program.net.slave.warp", "");
+        String NET_SLAVE_BLEND = p.getProperty("program.net.slave.blend", "");
         String LAST_FOLDER_LOCATION = p.getProperty("program.last.filesystem.location");
 
         LinkedList<String> NET_MASTER_SLAVES = null;
@@ -218,7 +223,7 @@ public class DesktopConfInit extends ConfInit {
             }
         }
 
-        prc.initialize(SHOW_DEBUG_INFO, LAST_CHECKED, LAST_VERSION, VERSION_CHECK_URL, DATA_DESCRIPTOR_URL, UI_THEME, SCRIPT_LOCATION, REST_PORT, LOCALE, STEREOSCOPIC_MODE, STEREO_PROFILE, CUBEMAP_MODE, DISPLAY_HUD, DISPLAY_POINTER_COORDS, DISPLAY_DATASET_DIALOG, NET_MASTER, NET_SLAVE, NET_MASTER_SLAVES, NET_SLAVE_CONFIG, LAST_FOLDER_LOCATION, DISPLAY_MINIMAP, MINIMAP_SIZE, PLANETARIUM_APERTURE);
+        prc.initialize(SHOW_DEBUG_INFO, LAST_CHECKED, LAST_VERSION, VERSION_CHECK_URL, DATA_DESCRIPTOR_URL, UI_THEME, SCRIPT_LOCATION, REST_PORT, LOCALE, STEREOSCOPIC_MODE, STEREO_PROFILE, CUBEMAP_MODE, DISPLAY_HUD, DISPLAY_POINTER_COORDS, DISPLAY_DATASET_DIALOG, NET_MASTER, NET_SLAVE, NET_MASTER_SLAVES, NET_SLAVE_CONFIG, NET_SLAVE_YAW, NET_SLAVE_PITCH, NET_SLAVE_ROLL, NET_SLAVE_WARP, NET_SLAVE_BLEND, LAST_FOLDER_LOCATION, DISPLAY_MINIMAP, MINIMAP_SIZE, PLANETARIUM_APERTURE);
 
         /** SCENE CONF **/
         String gc = p.getProperty("scene.graphics.quality");
@@ -484,14 +489,6 @@ public class DesktopConfInit extends ConfInit {
         p.setProperty("program.cubemap360", Boolean.toString(GlobalConf.program.CUBEMAP_MODE));
         p.setProperty("program.planetarium.aperture", Float.toString(GlobalConf.program.PLANETARIUM_APERTURE));
         p.setProperty("program.catalog.chooser", Boolean.toString(GlobalConf.program.DISPLAY_DATASET_DIALOG));
-        p.setProperty("program.net.master", Boolean.toString(GlobalConf.program.NET_MASTER));
-        int i = 0;
-        if (GlobalConf.program.NET_MASTER_SLAVES != null)
-            for (String slave : GlobalConf.program.NET_MASTER_SLAVES) {
-                p.setProperty("program.net.master.slaves." + i, slave);
-                i++;
-            }
-        p.setProperty("program.net.slave", Boolean.toString(GlobalConf.program.NET_SLAVE));
         if (GlobalConf.program.LAST_OPEN_LOCATION != null && !GlobalConf.program.LAST_OPEN_LOCATION.isEmpty())
             p.setProperty("program.last.filesystem.location", GlobalConf.program.LAST_OPEN_LOCATION);
 

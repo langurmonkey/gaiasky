@@ -809,6 +809,22 @@ public class GlobalConf {
          * for this instance
          */
         public String NET_SLAVE_CONFIG;
+        /**
+         * Slave yaw angle (turn head right), in degrees
+         */
+        public float NET_SLAVE_YAW;
+        /**
+         * Slave pitch angle (turn head up), in degrees
+         */
+        public float NET_SLAVE_PITCH;
+        /**
+         * Slave roll angle (rotate head cw), in degrees
+         */
+        public float NET_SLAVE_ROLL;
+        /** Warp PFM file **/
+        public String NET_SLAVE_WARP;
+        /** Blend PNG file **/
+        public String NET_SLAVE_BLEND;
 
         public boolean SHOW_DEBUG_INFO;
 
@@ -849,8 +865,8 @@ public class GlobalConf {
             EventManager.instance.subscribe(this, Events.STEREOSCOPIC_CMD, Events.STEREO_PROFILE_CMD, Events.CUBEMAP_CMD, Events.CUBEMAP_PROJECTION_CMD, Events.SHOW_MINIMAP_ACTION, Events.TOGGLE_MINIMAP, Events.PLANETARIUM_APERTURE_CMD);
         }
 
-        public void initialize(boolean sHOW_DEBUG_INFO, Instant lAST_CHECKED, String lAST_VERSION, String vERSION_CHECK_URL, String dATA_DESCRIPTOR_URL, String uI_THEME, String sCRIPT_LOCATION, int rEST_PORT, String lOCALE, boolean sTEREOSCOPIC_MODE, StereoProfile sTEREO_PROFILE, boolean cUBEMAP360_MODE, boolean dISPLAY_HUD, boolean dISPLAY_POINTER_COORDS, boolean dISPLAY_DATASET_DIALOG, boolean nET_MASTER, boolean nET_SLAVE, List<String> nET_MASTER_SLAVES, String nET_SLAVE_CONFIG, String lAST_OPEN_LOCATION,
-                boolean dISPLAY_MINIMAP, float mINIMAP_SIZE, float pLANETARIUM_APERTURE) {
+        public void initialize(boolean sHOW_DEBUG_INFO, Instant lAST_CHECKED, String lAST_VERSION, String vERSION_CHECK_URL, String dATA_DESCRIPTOR_URL, String uI_THEME, String sCRIPT_LOCATION, int rEST_PORT, String lOCALE, boolean sTEREOSCOPIC_MODE, StereoProfile sTEREO_PROFILE, boolean cUBEMAP360_MODE, boolean dISPLAY_HUD, boolean dISPLAY_POINTER_COORDS, boolean dISPLAY_DATASET_DIALOG, boolean nET_MASTER, boolean nET_SLAVE, List<String> nET_MASTER_SLAVES, String nET_SLAVE_CONFIG,
+                float nET_SLAVE_YAW, float nET_SLAVE_PITCH, float nET_SLAVE_ROLL, String nET_SLAVE_WARP, String nET_SLAVE_BLEND, String lAST_OPEN_LOCATION, boolean dISPLAY_MINIMAP, float mINIMAP_SIZE, float pLANETARIUM_APERTURE) {
             SHOW_DEBUG_INFO = sHOW_DEBUG_INFO;
             VERSION_LAST_TIME = lAST_CHECKED;
             VERSION_LAST_VERSION = lAST_VERSION;
@@ -870,6 +886,11 @@ public class GlobalConf {
             NET_SLAVE = nET_SLAVE;
             NET_MASTER_SLAVES = nET_MASTER_SLAVES;
             NET_SLAVE_CONFIG = nET_SLAVE_CONFIG;
+            NET_SLAVE_PITCH = nET_SLAVE_PITCH;
+            NET_SLAVE_YAW = nET_SLAVE_YAW;
+            NET_SLAVE_ROLL = nET_SLAVE_ROLL;
+            NET_SLAVE_WARP = nET_SLAVE_WARP;
+            NET_SLAVE_BLEND = nET_SLAVE_BLEND;
             LAST_OPEN_LOCATION = lAST_OPEN_LOCATION;
             DISPLAY_MINIMAP = dISPLAY_MINIMAP;
             MINIMAP_SIZE = mINIMAP_SIZE;
@@ -933,6 +954,31 @@ public class GlobalConf {
             else if (NET_SLAVE)
                 return " SLAVE";
             return "";
+        }
+
+        public boolean isMaster() {
+            return NET_MASTER;
+        }
+
+        public boolean isSlave() {
+            return NET_SLAVE;
+        }
+
+        /**
+         * Checks whether the MPCDI configuration file for this slave is set
+         * @return Whether the MPCDI file for this slave is set
+         */
+        public boolean isSlaveMPCDIPresent(){
+            return NET_SLAVE_CONFIG != null && !NET_SLAVE_CONFIG.isEmpty();
+        }
+
+        /**
+         * Checks whether the slave is configured directly in the properties file
+         * of Gaia Sky
+         * @return Whether the slave is configured in the properties file
+         */
+        public boolean areSlaveConfigPropertiesPresent(){
+            return !Float.isNaN(NET_SLAVE_YAW) && !Float.isNaN(NET_SLAVE_PITCH) && !Float.isNaN(NET_SLAVE_ROLL);
         }
 
         @Override
@@ -1467,7 +1513,7 @@ public class GlobalConf {
                 STAR_BRIGHTNESS = Math.max(0.01f, (float) data[0]);
                 break;
             case FOV_CHANGED_CMD:
-                if(!SlaveManager.projectionActive()) {
+                if (!SlaveManager.projectionActive()) {
                     boolean checkMax = data.length == 1 || (boolean) data[1];
                     CAMERA_FOV = MathUtilsd.clamp(((Float) data[0]).intValue(), Constants.MIN_FOV, checkMax ? Constants.MAX_FOV : 179);
                 }

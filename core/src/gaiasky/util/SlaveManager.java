@@ -20,6 +20,7 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 
 /**
  * Manages a slave instance configured with an MPCDI file.
@@ -54,17 +55,34 @@ public class SlaveManager {
 
     public SlaveManager() {
         super();
-        if (GlobalConf.program.NET_SLAVE) {
-            String mpcdi = GlobalConf.program.NET_SLAVE_CONFIG;
-            try {
-                File loc = unpackMpcdi(mpcdi);
-                parseMpcdi(mpcdi, loc);
+        if (GlobalConf.program.isSlave()) {
+            if(GlobalConf.program.isSlaveMPCDIPresent()) {
+                logger.info("Using slave configuration file: " + GlobalConf.program.NET_SLAVE_CONFIG);
+                String mpcdi = GlobalConf.program.NET_SLAVE_CONFIG;
+                try {
+                    File loc = unpackMpcdi(mpcdi);
+                    parseMpcdi(mpcdi, loc);
 
-                if (initialized) {
-                    pushToConf();
+                    if (initialized) {
+                        pushToConf();
+                        printInfo();
+                    }
+                } catch (Exception e) {
+                    logger.error(e);
                 }
-            } catch (Exception e) {
-                logger.error(e);
+            } else if (GlobalConf.program.areSlaveConfigPropertiesPresent()){
+                yaw = GlobalConf.program.NET_SLAVE_YAW;
+                pitch = GlobalConf.program.NET_SLAVE_PITCH;
+                roll = GlobalConf.program.NET_SLAVE_ROLL;
+
+                xResolution = GlobalConf.screen.FULLSCREEN_WIDTH;
+                yResolution = GlobalConf.screen.FULLSCREEN_HEIGHT;
+                upAngle = downAngle = rightAngle = leftAngle = GlobalConf.scene.CAMERA_FOV / 2f;
+                pfm = Paths.get(GlobalConf.program.NET_SLAVE_WARP);
+
+                initialized = true;
+
+                printInfo();
             }
         } else {
             // Not a slave
@@ -247,13 +265,14 @@ public class SlaveManager {
 
             GlobalConf.runtime.DISPLAY_GUI = false;
             GlobalConf.runtime.INPUT_ENABLED = false;
-
-            logger.info("Slave configuration modified with MPCDI settings");
-            logger.info("   Resolution: " + xResolution + "x" + yResolution);
-            logger.info("   Fov: " + cameraFov);
-            logger.info("   Yaw/Pitch/Roll: " + yaw + "/" + pitch + "/" + roll);
         }
+    }
 
+    private void printInfo(){
+        logger.info("Slave configuration modified with MPCDI settings");
+        logger.info("   Resolution: " + xResolution + "x" + yResolution);
+        logger.info("   Fov: " + cameraFov);
+        logger.info("   Yaw/Pitch/Roll: " + yaw + "/" + pitch + "/" + roll);
     }
 
 }
