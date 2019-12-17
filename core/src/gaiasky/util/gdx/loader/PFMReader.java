@@ -11,13 +11,14 @@ import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.Pixmap.Format;
 import com.badlogic.gdx.graphics.TextureData;
 import com.badlogic.gdx.graphics.glutils.FloatTextureData;
+import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.GdxRuntimeException;
-import gaiasky.util.math.MathUtilsd;
 
 import java.nio.ByteBuffer;
 import java.nio.FloatBuffer;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
 
 public class PFMReader {
 
@@ -28,7 +29,7 @@ public class PFMReader {
             int width = pfm.width;
             int height = pfm.height;
             if (invert)
-                floatData = invertMapping(floatData, width, height);
+                floatData = invertWarp(floatData, width, height);
 
             FloatTextureData td = new FloatTextureData(width, height, GL30.GL_RGB16F, GL30.GL_RGB, GL30.GL_FLOAT, false);
             td.prepare();
@@ -44,14 +45,17 @@ public class PFMReader {
 
     static public Pixmap readPFMPixmap(FileHandle file, boolean invert) {
         try {
-            PortableFloatMap pfm = new PortableFloatMap(file.file());
-            float[] floatData = pfm.pixels;
-            int width = pfm.width;
-            int height = pfm.height;
-            floatData = generateSqrt(width, height);
+            //PortableFloatMap pfm = new PortableFloatMap(file.file());
+            //float[] floatData = pfm.pixels;
+            //int width = pfm.width;
+            //int height = pfm.height;
+            int width = 100;
+            int height = 100;
+            float[] floatData = generateSqrt(width, height);
             if (invert)
-                floatData = invertMapping(floatData, width, height);
-            int totalSize = pfm.pixels.length;
+                floatData = invertWarp(floatData, width, height);
+            //int totalSize = pfm.pixels.length;
+            int totalSize = width * height * 3;
 
             // Convert to Pixmap
             Format format = Format.RGB888;
@@ -89,192 +93,6 @@ public class PFMReader {
         return value;
     }
 
-    /**
-     * Inverts the mapping in data. The mapping must be bijective, i.e. no folds must be
-     * present. If folds are present, the inverse function can't decide which of the sources
-     * to choose.
-     *
-     * @param data
-     * @param w
-     * @param h
-     * @return
-     */
-    private static float[] invertMapping(final float[] data, int w, int h) {
-        boolean bilinear = true;
-
-        float[] out = new float[data.length];
-        if (data.length != w * h * 3) {
-            return null;
-        }
-
-        Set<Integer> positions = new HashSet<>();
-
-        for (int j = 0; j < h; j++) {
-            for (int i = 0; i < w; i++) {
-                int p = (w * j + i) * 3;
-
-                float r = data[p + 0];
-                float g = data[p + 1];
-                float b = data[p + 2];
-
-                // Normalize
-                r = normalize(r);
-                g = normalize(g);
-                b = normalize(b);
-
-                // Find end location of this pixel
-                int ip = (int) ((w - 1) * r);
-                int jp = (int) ((h - 1) * g);
-
-                // Store this pixel's position at end location
-                int pp = (w * jp + ip) * 3;
-                // Prevent double-mapping
-                if (true || !positions.contains(pp)) {
-                    out[pp + 0] = (float) i / (w - 1f);
-                    out[pp + 1] = (float) j / (h - 1f);
-                    out[pp + 2] = b;
-
-                    positions.add(pp);
-                }
-            }
-        }
-
-        if (bilinear) {
-            while(bilinearInterpolation(out, w, h, positions) != 0){};
-        }
-
-        return out;
-    }
-
-    private static int bilinearInterpolation(float[] out, int w, int h, Set<Integer> positions) {
-        int untreated = 0;
-        // Fill the gaps by bilinear interpolation in the horizontal and vertical directions
-        for (int j = 0; j < h; j++) {
-            for (int i = 0; i < w; i++) {
-                int p = (w * j + i) * 3;
-
-                if (!positions.contains(p)) {
-                    float r = bilinear(out, i, j, w, h, 0, positions);
-                    float g = bilinear(out, i, j, w, h, 1, positions);
-                    float b = bilinear(out, i, j, w, h, 2, positions);
-
-                    if(!Float.isNaN(r) && !Float.isNaN(g)) {
-                        out[p + 0] = r;
-                        out[p + 1] = g;
-                        out[p + 2] = b;
-
-                        positions.add(p);
-                    } else {
-                        untreated++;
-                    }
-                }
-            }
-        }
-        return untreated;
-    }
-
-    /**
-     * Performs a bilinear interpolation on the array d [w, h] with the given color channel c and
-     * coordinates [i, j]
-     *
-     * @param d         Array
-     * @param i         Horizontal position
-     * @param j         Vertical position
-     * @param w         Width
-     * @param h         Height
-     * @param c         Channel
-     * @param positions Set with all treated positions
-     * @return
-     */
-    private static float bilinear(float[] d, int i, int j, int w, int h, int c, Set<Integer> positions) {
-        int ir = findRight(d, i, j, w, positions);
-        int il = findLeft(d, i, j, w, positions);
-        int ju = findUp(d, i, j, w, h, positions);
-        int jd = findDown(d, i, j, w, h, positions);
-
-        float rvert, rhor;
-
-        // Horizontal
-        if (ir > w - 1 && il < 0) {
-            // No horizontal
-            rhor = Float.NaN;
-        } else if (ir > w - 1) {
-            rhor = d[(w * j + il) * 3 + c];
-        } else if (il < 0) {
-            rhor = d[(w * j + ir) * 3 + c];
-        } else {
-            float rr = d[(w * j + ir) * 3 + c];
-            float rl = d[(w * j + il) * 3 + c];
-            rhor = MathUtilsd.lerp(rl, rr, 0.5f);
-        }
-
-        // Vertical
-        if (ju > h - 1 && jd < 0) {
-            // No vertical
-            rvert = Float.NaN;
-        } else if (ju > h - 1) {
-            rvert = d[(w * jd + i) * 3 + c];
-        } else if (jd < 0) {
-            rvert = d[(w * ju + i) * 3 + c];
-        } else {
-            float ru = d[(w * ju + i) * 3 + c];
-            float rd = d[(w * jd + i) * 3 + c];
-            rvert = MathUtilsd.lerp(ru, rd, 0.5f);
-        }
-
-        float total;
-        if(Float.isNaN(rhor) && Float.isNaN(rvert)){
-            total = Float.NaN;
-        } else if (Float.isNaN(rhor)) {
-            total = rvert;
-        }else if(Float.isNaN(rvert)){
-            total = rhor;
-        } else {
-            total = MathUtilsd.lerp(rvert, rhor, 0.5f);
-        }
-        return total;
-    }
-
-    private static int findRight(float[] d, int i, int j, int w, Set<Integer> positions) {
-        int ir = i + 1;
-        int p = (w * j + ir) * 3;
-        while (ir < w - 1 && !positions.contains(p)) {
-            ir += 1;
-            p = (w * j + ir) * 3;
-        }
-        return ir;
-    }
-
-    private static int findLeft(float[] d, int i, int j, int w, Set<Integer> positions) {
-        int il = i - 1;
-        int p = (w * j + il) * 3;
-        while (il > 0 && !positions.contains(p)) {
-            il -= 1;
-            p = (w * j + il) * 3;
-        }
-        return il;
-    }
-
-    private static int findUp(float[] d, int i, int j, int w, int h, Set<Integer> positions) {
-        int ju = j + 1;
-        int p = (w * ju + i) * 3;
-        while (ju < h - 1 && !positions.contains(p)) {
-            ju += 1;
-            p = (w * ju + i) * 3;
-        }
-        return ju;
-    }
-
-    private static int findDown(float[] d, int i, int j, int w, int h, Set<Integer> positions) {
-        int jd = j - 1;
-        int p = (w * jd + i) * 3;
-        while (jd > 0 && !positions.contains(p)) {
-            jd -= 1;
-            p = (w * jd + i) * 3;
-        }
-        return jd;
-    }
-
     private static float[] generateIdentity(int w, int h) {
         float[] out = new float[w * h * 3];
 
@@ -309,4 +127,131 @@ public class PFMReader {
         return out;
     }
 
+    /**
+     * Inverts the warp function. The mapping must be invertible, i.e. no folds must be
+     * present.
+     *
+     * @param d The data
+     * @param w The source width
+     * @param h The source height
+     * @return
+     */
+    private static float[] invertWarp(final float[] d, int w, int h) throws RuntimeException {
+        // Create transformed mesh
+        List<Quad> mesh = new ArrayList<>();
+        float du = 1f / (w - 1f);
+        float dv = 1f / (h - 1f);
+        for (int j = 0; j < h - 1; j++) {
+            for (int i = 0; i < w - 1; i++) {
+                float u = i / (w - 1f);
+                float v = j / (h - 1f);
+                float[] origuv = new float[]{u, v};
+
+                int bl = (w * j + i) * 3;
+                int br = (w * j + i + 1) * 3;
+                int tl = (w * (j + 1) + i) * 3;
+                int tr = (w * (j + 1) + i + 1) * 3;
+                float[] positions = new float[]{d[bl], d[bl + 1], d[br], d[br + 1], d[tr], d[tr + 1], d[tl], d[tl + 1]};
+
+                Quad quad = new Quad(positions, origuv);
+                mesh.add(quad);
+            }
+        }
+
+        // Go over every pixel in final image and map it to original
+        float[] out = new float[d.length];
+        for (int j = 0; j < h; j++) {
+            for (int i = 0; i < w; i++) {
+                int p = (w * j + i) * 3;
+                float u = i / (w - 1f);
+                float v = j / (h - 1f);
+
+                List<Quad> matches = mesh.stream().filter(quad -> quad.contains(u, v)).collect(Collectors.toList());
+                if (matches.size() == 0) {
+                    // Black
+                    out[p + 0] = 0;
+                    out[p + 1] = 0;
+                    out[p + 2] = Float.NaN;
+                } else if (matches.size() > 1) {
+                    // Not invertible!
+                    throw new RuntimeException("Warp function not invertible, it has folds");
+                } else {
+                    // Good, interpolate
+                    Quad quad = matches.get(0);
+                    Vector2 uv = quad.invBilinear(u, v);
+
+                    float finalU = quad.origUV[0] + du * uv.x;
+                    float finalV = quad.origUV[1] + dv * uv.y;
+
+                    out[p + 0] = finalU;
+                    out[p + 1] = finalV;
+                    out[p + 2] = Float.NaN;
+                }
+            }
+        }
+        return out;
+    }
+
+    /**
+     * Quad with the mapped and original positions
+     */
+    private static class Quad {
+        float[] positions, origUV;
+
+        public Quad(float[] positions, float[] origUV) {
+            this.positions = positions;
+            this.origUV = origUV;
+        }
+
+        public boolean contains(float x, float y) {
+            final int numFloats = positions.length;
+            int intersects = 0;
+
+            for (int i = 0; i < numFloats; i += 2) {
+                float x1 = positions[i];
+                float y1 = positions[i + 1];
+                float x2 = positions[(i + 2) % numFloats];
+                float y2 = positions[(i + 3) % numFloats];
+                if (((y1 <= y && y < y2) || (y2 <= y && y < y1)) && x < ((x2 - x1) / (y2 - y1) * (y - y1) + x1))
+                    intersects++;
+            }
+            return (intersects & 1) == 1;
+        }
+
+        float cross2d(Vector2 a, Vector2 b) {
+            return a.x * b.y - a.y * b.x;
+        }
+
+        // given a point p and a quad defined by four points {a,b,c,d}, return the bilinear
+        // coordinates of p in the quad. Returns (-1,-1) if the point is outside of the quad.
+        public Vector2 invBilinear(float x, float y) {
+            Vector2 p = new Vector2(x, y);
+            Vector2 a = new Vector2(positions[0], positions[1]);
+            Vector2 b = new Vector2(positions[2], positions[3]);
+            Vector2 c = new Vector2(positions[4], positions[5]);
+            Vector2 d = new Vector2(positions[6], positions[7]);
+
+            Vector2 e = new Vector2(b.x - a.x, b.y - a.y);
+            Vector2 f = new Vector2(d.x - a.x, d.y - a.y);
+            Vector2 g = new Vector2(a.x - b.x + c.x - d.x, a.y - b.y + c.y - d.y);
+            Vector2 h = new Vector2(p.x - a.x, p.y - a.y);
+
+            float k2 = cross2d(g, f);
+            float k1 = cross2d(e, f) + cross2d(h, g);
+            float k0 = cross2d(h, e);
+
+            float w = k1 * k1 - 4f * k0 * k2;
+            if (w < 0f) return new Vector2(-1f, -1f);
+            w = (float) Math.sqrt(w);
+
+            // will fail for k0=0, which is only on the ba edge
+            float v = 2f * k0 / (-k1 - w);
+            if (v < 0.0 || v > 1.0) v = 2f * k0 / (-k1 + w);
+
+            float u = (h.x - f.x * v) / (e.x + g.x * v);
+            if (u < 0.0 || u > 1.0 || v < 0.0 || v > 1.0) return new Vector2(-1f, -1f);
+            return new Vector2(u, v);
+        }
+
+    }
 }
