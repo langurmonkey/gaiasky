@@ -26,6 +26,7 @@ import com.badlogic.gdx.graphics.glutils.FrameBuffer;
 import gaiasky.util.gdx.contrib.postprocess.PostProcessorEffect;
 import gaiasky.util.gdx.contrib.postprocess.filters.GeometryWarpFilter;
 import gaiasky.util.gdx.contrib.utils.GaiaSkyFrameBuffer;
+import gaiasky.util.gdx.loader.PFMData;
 
 /**
  * Implements geometry warp and blending from MPCDI
@@ -33,15 +34,11 @@ import gaiasky.util.gdx.contrib.utils.GaiaSkyFrameBuffer;
  * @author Toni Sagrista
  */
 public final class GeometryWarp extends PostProcessorEffect {
-    private GeometryWarpFilter warpFilter = null;
+    private GeometryWarpFilter warpFilter;
 
     /** Create a FXAA with the viewport size */
-    public GeometryWarp() {
-        warpFilter = new GeometryWarpFilter();
-    }
-
-    public void setWarpTexture(Texture tex){
-        warpFilter.setWarpTexture(tex);
+    public GeometryWarp(PFMData data) {
+        warpFilter = new GeometryWarpFilter(data);
     }
 
     public void setBlendTexture(Texture tex){

@@ -6,12 +6,10 @@
 package gaiasky.util;
 
 import com.badlogic.gdx.assets.AssetManager;
-import com.badlogic.gdx.graphics.GL20;
-import com.badlogic.gdx.graphics.Texture;
-import com.badlogic.gdx.graphics.Texture.TextureFilter;
 import gaiasky.desktop.util.SysUtils;
 import gaiasky.util.Logger.Log;
-import gaiasky.util.gdx.loader.PFMTextureLoader.PFMTextureParameter;
+import gaiasky.util.gdx.loader.PFMData;
+import gaiasky.util.gdx.loader.PFMDataLoader.PFMDataParameter;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -296,13 +294,9 @@ public class SlaveManager {
 
     public void loadAssets(AssetManager manager){
         if(pfm != null && Files.exists(pfm)){
-            PFMTextureParameter param =new PFMTextureParameter();
-            param.invert = true;
-            param.internalFormat = GL20.GL_RGB;
-            param.magFilter = TextureFilter.Linear;
-            param.minFilter = TextureFilter.Linear;
-            param.genMipMaps = false;
-            manager.load(pfm.toString(), Texture.class, param);
+            PFMDataParameter param = new PFMDataParameter();
+            param.invert = false;
+            manager.load(pfm.toString(), PFMData.class, param);
         }
     }
 

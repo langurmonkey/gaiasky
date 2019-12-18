@@ -270,7 +270,7 @@ public abstract class Filter<T> {
         }
     }
 
-    private void realRender() {
+    protected void realRender() {
         // gives a chance to filters to perform needed operations just before the rendering operation take place.
         onBeforeRender();
 

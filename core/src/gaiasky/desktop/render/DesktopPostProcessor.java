@@ -32,6 +32,7 @@ import gaiasky.util.coord.StaticCoordinates;
 import gaiasky.util.gdx.contrib.postprocess.PostProcessor;
 import gaiasky.util.gdx.contrib.postprocess.effects.*;
 import gaiasky.util.gdx.contrib.utils.ShaderLoader;
+import gaiasky.util.gdx.loader.PFMData;
 import gaiasky.util.math.Vector3d;
 
 import java.nio.file.Path;
@@ -222,8 +223,9 @@ public class DesktopPostProcessor implements IPostProcessor, IObserver {
         if(GlobalConf.program.isSlave() && SlaveManager.projectionActive()){
             Path warpFile = SlaveManager.instance.pfm;
 
-            ppb.geometryWarp = new GeometryWarp();
-            ppb.geometryWarp.setWarpTexture(manager.get(warpFile.toString()));
+            PFMData data = manager.get(warpFile.toString());
+
+            ppb.geometryWarp = new GeometryWarp(data);
             ppb.geometryWarp.setEnabled(true);
             ppb.pp.addEffect(ppb.geometryWarp);
 
