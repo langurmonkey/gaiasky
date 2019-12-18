@@ -6,11 +6,12 @@
 package gaiasky.util;
 
 import com.badlogic.gdx.assets.AssetManager;
-import com.badlogic.gdx.assets.loaders.TextureLoader.TextureParameter;
+import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.Texture.TextureFilter;
 import gaiasky.desktop.util.SysUtils;
 import gaiasky.util.Logger.Log;
+import gaiasky.util.gdx.loader.PFMTextureLoader.PFMTextureParameter;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -92,6 +93,7 @@ public class SlaveManager {
 
                 initialized = true;
 
+                setDefaultConf();
                 printInfo();
             }
         } else {
@@ -273,9 +275,16 @@ public class SlaveManager {
             GlobalConf.screen.FULLSCREEN = true;
             GlobalConf.scene.CAMERA_FOV = cameraFov;
 
-            GlobalConf.runtime.DISPLAY_GUI = false;
-            GlobalConf.runtime.INPUT_ENABLED = false;
+            setDefaultConf();
         }
+    }
+
+    private void setDefaultConf() {
+        GlobalConf.runtime.DISPLAY_GUI = false;
+        GlobalConf.runtime.INPUT_ENABLED = false;
+        GlobalConf.scene.CROSSHAIR_FOCUS = false;
+        GlobalConf.scene.CROSSHAIR_HOME = false;
+        GlobalConf.scene.CROSSHAIR_CLOSEST = false;
     }
 
     private void printInfo(){
@@ -287,7 +296,9 @@ public class SlaveManager {
 
     public void loadAssets(AssetManager manager){
         if(pfm != null && Files.exists(pfm)){
-            TextureParameter param =new TextureParameter();
+            PFMTextureParameter param =new PFMTextureParameter();
+            param.invert = true;
+            param.internalFormat = GL20.GL_RGB;
             param.magFilter = TextureFilter.Linear;
             param.minFilter = TextureFilter.Linear;
             param.genMipMaps = false;

@@ -25,6 +25,7 @@ import gaiasky.event.IObserver;
 import gaiasky.util.*;
 import gaiasky.util.GlobalConf.SceneConf.ElevationType;
 import gaiasky.util.Logger.Log;
+import gaiasky.util.gdx.loader.PFMTextureLoader.PFMTextureParameter;
 import gaiasky.util.gdx.model.IntModelInstance;
 import gaiasky.util.gdx.shader.FloatExtAttribute;
 import gaiasky.util.gdx.shader.TextureExtAttribute;
@@ -42,6 +43,7 @@ public class MaterialComponent implements IObserver {
     public static final String GEN_HEIGHT_KEYWORD = "generate";
     /** Default texture parameters **/
     protected static final TextureParameter textureParamsMipMap, textureParams;
+    protected static final PFMTextureParameter pfmTextureParams;
 
     static {
         textureParamsMipMap = new TextureParameter();
@@ -53,6 +55,25 @@ public class MaterialComponent implements IObserver {
         textureParams.genMipMaps = false;
         textureParams.magFilter = TextureFilter.Linear;
         textureParams.minFilter = TextureFilter.Linear;
+
+        pfmTextureParams = new PFMTextureParameter(textureParams);
+        pfmTextureParams.invert = true;
+        pfmTextureParams.internalFormat = GL20.GL_RGB;
+    }
+
+    private static TextureParameter getTP(String tex) {
+        return getTP(tex, false);
+    }
+
+    private static TextureParameter getTP(String tex, boolean mipmap) {
+            if (tex != null && tex.endsWith(".pfm")) {
+                return pfmTextureParams;
+            } else {
+                if (mipmap)
+                    return textureParamsMipMap;
+                else
+                    return textureParams;
+            }
     }
 
     // TEXTURES
@@ -83,28 +104,28 @@ public class MaterialComponent implements IObserver {
 
     public void initialize(AssetManager manager) {
         // Add textures to load
-        baseUnpacked = addToLoad(base, textureParamsMipMap, manager);
-        normalUnpacked = addToLoad(normal, textureParams, manager);
-        specularUnpacked = addToLoad(specular, textureParamsMipMap, manager);
-        nightUnpacked = addToLoad(night, textureParamsMipMap, manager);
-        ringUnpacked = addToLoad(ring, textureParamsMipMap, manager);
-        ringnormalUnpacked = addToLoad(ringnormal, textureParamsMipMap, manager);
+        baseUnpacked = addToLoad(base, getTP(base, true), manager);
+        normalUnpacked = addToLoad(normal, getTP(normal), manager);
+        specularUnpacked = addToLoad(specular, getTP(specular, true), manager);
+        nightUnpacked = addToLoad(night, getTP(night, true), manager);
+        ringUnpacked = addToLoad(ring, getTP(ring, true), manager);
+        ringnormalUnpacked = addToLoad(ringnormal, getTP(ringnormal, true), manager);
         if (height != null)
             if (!height.endsWith(GEN_HEIGHT_KEYWORD))
-                heightUnpacked = addToLoad(height, textureParamsMipMap, manager);
+                heightUnpacked = addToLoad(height, getTP(height, true), manager);
     }
 
     public void initialize() {
         // Add textures to load
-        baseUnpacked = addToLoad(base, textureParamsMipMap);
-        normalUnpacked = addToLoad(normal, textureParams);
-        specularUnpacked = addToLoad(specular, textureParamsMipMap);
-        nightUnpacked = addToLoad(night, textureParamsMipMap);
-        ringUnpacked = addToLoad(ring, textureParamsMipMap);
-        ringnormalUnpacked = addToLoad(ringnormal, textureParamsMipMap);
+        baseUnpacked = addToLoad(base, getTP(base, true));
+        normalUnpacked = addToLoad(normal, getTP(normal));
+        specularUnpacked = addToLoad(specular, getTP(specular, true));
+        nightUnpacked = addToLoad(night, getTP(night, true));
+        ringUnpacked = addToLoad(ring, getTP(ring, true));
+        ringnormalUnpacked = addToLoad(ringnormal, getTP(ringnormal, true));
         if (height != null)
             if (!height.endsWith(GEN_HEIGHT_KEYWORD))
-                heightUnpacked = addToLoad(height, textureParamsMipMap);
+                heightUnpacked = addToLoad(height, getTP(height, true));
     }
 
     public boolean isFinishedLoading(AssetManager manager) {
