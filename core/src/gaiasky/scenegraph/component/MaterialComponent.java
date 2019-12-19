@@ -57,7 +57,7 @@ public class MaterialComponent implements IObserver {
         textureParams.minFilter = TextureFilter.Linear;
 
         pfmTextureParams = new PFMTextureParameter(textureParams);
-        pfmTextureParams.invert = true;
+        pfmTextureParams.invert = false;
         pfmTextureParams.internalFormat = GL20.GL_RGB;
     }
 

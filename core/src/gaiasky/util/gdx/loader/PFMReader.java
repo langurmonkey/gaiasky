@@ -53,7 +53,7 @@ public class PFMReader {
             float[] data = pfm.pixels;
             int width = pfm.width;
             int height = pfm.height;
-            //floatData = generateMapping(width, height, val -> val * val);
+            //data = generateMapping(width, height, val -> val * val);
             if (invert) {
                 data = invertWarp(data, width, height);
             } else {
