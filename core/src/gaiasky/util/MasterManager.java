@@ -46,8 +46,33 @@ public class MasterManager implements IObserver {
             MasterManager.instance = new MasterManager();
     }
 
+    public static boolean hasSlaves() {
+        return instance != null && instance.slaves != null && !instance.slaves.isEmpty();
+    }
+
     // Slave list
     private List<String> slaves;
+
+    public boolean isSlaveConnected(String slaveName) {
+        return isSlaveConnected(getSlaveIndex(slaveName));
+
+    }
+
+    public int getSlaveIndex(String slaveName){
+        return slaves.indexOf(slaveName);
+    }
+
+    public boolean isSlaveConnected(int index) {
+        if (index >= 0 && index < slaves.size()) {
+            return slaveStates[index] == 0;
+        }
+        return false;
+    }
+
+    public byte[] getSlaveStates() {
+        return slaveStates;
+    }
+
     /**
      * Vector with slave states
      * <ul>
@@ -165,94 +190,154 @@ public class MasterManager implements IObserver {
         }
     }
 
+    public void setSlaveYaw(String slave, float yaw){
+        synchronized(params) {
+            params.clear();
+            params.put("arg0", Float.toString(yaw));
+            String paramString = HttpParametersUtils.convertHttpParameters(params);
+            if(isSlaveConnected(slave)){
+                evtrequest.setUrl(slave + "setProjectionYaw");
+                evtrequest.setContent(paramString);
+                Gdx.net.sendHttpRequest(evtrequest, responseListeners[0]);
+            }
+        }
+    }
+    public void setSlavePitch(String slave, float pitch){
+        synchronized(params) {
+            params.clear();
+            params.put("arg0", Float.toString(pitch));
+            String paramString = HttpParametersUtils.convertHttpParameters(params);
+            if(isSlaveConnected(slave)){
+                evtrequest.setUrl(slave + "setProjectionPitch");
+                evtrequest.setContent(paramString);
+                Gdx.net.sendHttpRequest(evtrequest, responseListeners[0]);
+            }
+        }
+    }
+    public void setSlaveRoll(String slave, float roll){
+        synchronized(params) {
+            params.clear();
+            params.put("arg0", Float.toString(roll));
+            String paramString = HttpParametersUtils.convertHttpParameters(params);
+            if(isSlaveConnected(slave)){
+                evtrequest.setUrl(slave + "setProjectionRoll");
+                evtrequest.setContent(paramString);
+                Gdx.net.sendHttpRequest(evtrequest, responseListeners[0]);
+            }
+        }
+    }
+    public void setSlaveFov(String slave, float fov){
+        synchronized(params) {
+            params.clear();
+            params.put("arg0", Float.toString(fov));
+            String paramString = HttpParametersUtils.convertHttpParameters(params);
+            if(isSlaveConnected(slave)){
+                evtrequest.setUrl(slave + "setProjectionFov");
+                evtrequest.setContent(paramString);
+                Gdx.net.sendHttpRequest(evtrequest, responseListeners[0]);
+            }
+        }
+    }
+
+    public List<String> getSlaves() {
+        return slaves;
+    }
+
     @Override
     public void notify(Events event, Object... data) {
-        params.clear();
-        switch (event) {
-        case FOV_CHANGED_CMD:
-            params.put("arg0", Float.toString((float) data[0]));
-            String paramString = HttpParametersUtils.convertHttpParameters(params);
-            int i = 0;
-            for (String slave : slaves) {
-                if (slaveStates[i] == 0) {
-                    evtrequest.setUrl(slave + "setFov");
-                    evtrequest.setContent(paramString);
-                    Gdx.net.sendHttpRequest(evtrequest, responseListeners[i++]);
-                }
-            }
-            break;
-        case TOGGLE_VISIBILITY_CMD:
-            String key = (String) data[0];
-            Boolean state = null;
-            if (data.length > 2) {
-                state = (Boolean) data[2];
-            } else {
-                ComponentType ct = ComponentType.getFromKey(key);
-                state = GlobalConf.scene.VISIBILITY[ct.ordinal()];
-            }
+        synchronized(params) {
+            params.clear();
+            String paramString;
+            int i;
 
-            params.put("arg0", key);
-            params.put("arg1", state.toString());
-            paramString = HttpParametersUtils.convertHttpParameters(params);
-            i = 0;
-            for (String slave : slaves) {
-                if (slaveStates[i] == 0) {
-                    evtrequest.setUrl(slave + "setVisibility");
-                    evtrequest.setContent(paramString);
-                    Gdx.net.sendHttpRequest(evtrequest, responseListeners[i++]);
+            switch (event) {
+            case FOV_CHANGED_CMD:
+                if(false) { // Each slave has its own fov configured via file/mpcdi
+                    params.put("arg0", Float.toString((float) data[0]));
+                    paramString = HttpParametersUtils.convertHttpParameters(params);
+                    i = 0;
+                    for (String slave : slaves) {
+                        if (slaveStates[i] == 0) {
+                            evtrequest.setUrl(slave + "setFov");
+                            evtrequest.setContent(paramString);
+                            Gdx.net.sendHttpRequest(evtrequest, responseListeners[i++]);
+                        }
+                    }
                 }
-            }
-            break;
-        case STAR_BRIGHTNESS_CMD:
-            float brightness = MathUtilsd.lint((float) data[0], Constants.MIN_STAR_BRIGHT, Constants.MAX_STAR_BRIGHT, Constants.MIN_SLIDER, Constants.MAX_SLIDER);
-            params.put("arg0", Float.toString(brightness));
-            paramString = HttpParametersUtils.convertHttpParameters(params);
-            i = 0;
-            for (String slave : slaves) {
-                if (slaveStates[i] == 0) {
-                    evtrequest.setUrl(slave + "setStarBrightness");
-                    evtrequest.setContent(paramString);
-                    Gdx.net.sendHttpRequest(evtrequest, responseListeners[i++]);
+                break;
+            case TOGGLE_VISIBILITY_CMD:
+                String key = (String) data[0];
+                Boolean state = null;
+                if (data.length > 2) {
+                    state = (Boolean) data[2];
+                } else {
+                    ComponentType ct = ComponentType.getFromKey(key);
+                    state = GlobalConf.scene.VISIBILITY[ct.ordinal()];
                 }
-            }
-            break;
-        case STAR_POINT_SIZE_CMD:
-            float size = MathUtilsd.lint((float) data[0], Constants.MIN_STAR_POINT_SIZE, Constants.MAX_STAR_POINT_SIZE, Constants.MIN_SLIDER, Constants.MAX_SLIDER);
-            params.put("arg0", Float.toString(size));
-            paramString = HttpParametersUtils.convertHttpParameters(params);
-            i = 0;
-            for (String slave : slaves) {
-                if (slaveStates[i] == 0) {
-                    evtrequest.setUrl(slave + "setStarSize");
-                    evtrequest.setContent(paramString);
-                    Gdx.net.sendHttpRequest(evtrequest, responseListeners[i++]);
+
+                params.put("arg0", key);
+                params.put("arg1", state.toString());
+                paramString = HttpParametersUtils.convertHttpParameters(params);
+                i = 0;
+                for (String slave : slaves) {
+                    if (slaveStates[i] == 0) {
+                        evtrequest.setUrl(slave + "setVisibility");
+                        evtrequest.setContent(paramString);
+                        Gdx.net.sendHttpRequest(evtrequest, responseListeners[i++]);
+                    }
                 }
-            }
-            break;
-        case STAR_MIN_OPACITY_CMD:
-            float opacity = MathUtilsd.lint((float) data[0], Constants.MIN_STAR_MIN_OPACITY, Constants.MAX_STAR_MIN_OPACITY, Constants.MIN_SLIDER, Constants.MAX_SLIDER);
-            params.put("arg0", Float.toString(opacity));
-            paramString = HttpParametersUtils.convertHttpParameters(params);
-            i = 0;
-            for (String slave : slaves) {
-                if (slaveStates[i] == 0) {
-                    evtrequest.setUrl(slave + "setMinStarOpacity");
-                    evtrequest.setContent(paramString);
-                    Gdx.net.sendHttpRequest(evtrequest, responseListeners[i++]);
+                break;
+            case STAR_BRIGHTNESS_CMD:
+                float brightness = MathUtilsd.lint((float) data[0], Constants.MIN_STAR_BRIGHT, Constants.MAX_STAR_BRIGHT, Constants.MIN_SLIDER, Constants.MAX_SLIDER);
+                params.put("arg0", Float.toString(brightness));
+                paramString = HttpParametersUtils.convertHttpParameters(params);
+                i = 0;
+                for (String slave : slaves) {
+                    if (slaveStates[i] == 0) {
+                        evtrequest.setUrl(slave + "setStarBrightness");
+                        evtrequest.setContent(paramString);
+                        Gdx.net.sendHttpRequest(evtrequest, responseListeners[i++]);
+                    }
                 }
-            }
-            break;
-        case DISPOSE:
-            i = 0;
-            for (String slave : slaves) {
-                if (slaveStates[i] == 0) {
-                    evtrequest.setUrl(slave + "quit");
-                    Gdx.net.sendHttpRequest(evtrequest, responseListeners[i++]);
+                break;
+            case STAR_POINT_SIZE_CMD:
+                float size = MathUtilsd.lint((float) data[0], Constants.MIN_STAR_POINT_SIZE, Constants.MAX_STAR_POINT_SIZE, Constants.MIN_SLIDER, Constants.MAX_SLIDER);
+                params.put("arg0", Float.toString(size));
+                paramString = HttpParametersUtils.convertHttpParameters(params);
+                i = 0;
+                for (String slave : slaves) {
+                    if (slaveStates[i] == 0) {
+                        evtrequest.setUrl(slave + "setStarSize");
+                        evtrequest.setContent(paramString);
+                        Gdx.net.sendHttpRequest(evtrequest, responseListeners[i++]);
+                    }
                 }
+                break;
+            case STAR_MIN_OPACITY_CMD:
+                float opacity = MathUtilsd.lint((float) data[0], Constants.MIN_STAR_MIN_OPACITY, Constants.MAX_STAR_MIN_OPACITY, Constants.MIN_SLIDER, Constants.MAX_SLIDER);
+                params.put("arg0", Float.toString(opacity));
+                paramString = HttpParametersUtils.convertHttpParameters(params);
+                i = 0;
+                for (String slave : slaves) {
+                    if (slaveStates[i] == 0) {
+                        evtrequest.setUrl(slave + "setMinStarOpacity");
+                        evtrequest.setContent(paramString);
+                        Gdx.net.sendHttpRequest(evtrequest, responseListeners[i++]);
+                    }
+                }
+                break;
+            case DISPOSE:
+                i = 0;
+                for (String slave : slaves) {
+                    if (slaveStates[i] == 0) {
+                        evtrequest.setUrl(slave + "quit");
+                        Gdx.net.sendHttpRequest(evtrequest, responseListeners[i++]);
+                    }
+                }
+                break;
+            default:
+                break;
             }
-            break;
-        default:
-            break;
         }
     }
 

@@ -533,8 +533,10 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
 
     @Override
     public void setFov(final float newFov) {
-        if (checkNum(newFov, Constants.MIN_FOV, Constants.MAX_FOV, "newFov"))
-            GaiaSky.postRunnable(() -> em.post(Events.FOV_CHANGED_CMD, newFov));
+        if (!SlaveManager.projectionActive()) {
+            if (checkNum(newFov, Constants.MIN_FOV, Constants.MAX_FOV, "newFov"))
+                GaiaSky.postRunnable(() -> em.post(Events.FOV_CHANGED_CMD, newFov));
+        }
     }
 
     public void setFov(final int newFov) {
@@ -753,6 +755,33 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
     public void setMinStarOpacity(float opacity) {
         if (checkNum(opacity, Constants.MIN_SLIDER, Constants.MAX_SLIDER, "opacity"))
             GaiaSky.postRunnable(() -> EventManager.instance.post(Events.STAR_MIN_OPACITY_CMD, MathUtilsd.lint(opacity, Constants.MIN_SLIDER, Constants.MAX_SLIDER, Constants.MIN_STAR_MIN_OPACITY, Constants.MAX_STAR_MIN_OPACITY), false));
+    }
+
+    @Override
+    public void setProjectionYaw(float yaw) {
+        if (SlaveManager.projectionActive()) {
+            GaiaSky.postRunnable(() -> SlaveManager.instance.yaw = yaw);
+        }
+    }
+
+    @Override
+    public void setProjectionPitch(float pitch) {
+        if (SlaveManager.projectionActive()) {
+            GaiaSky.postRunnable(() -> SlaveManager.instance.pitch = pitch);
+        }
+    }
+
+    @Override
+    public void setProjectionRoll(float roll) {
+        if (SlaveManager.projectionActive()) {
+            GaiaSky.postRunnable(() -> SlaveManager.instance.roll = roll);
+        }
+    }
+
+    @Override
+    public void setProjectionFov(float newFov) {
+        if (checkNum(newFov, Constants.MIN_FOV, 170f, "newFov"))
+            GaiaSky.postRunnable(() -> em.post(Events.FOV_CHANGED_CMD, newFov, false));
     }
 
     public void setMinStarOpacity(int opacity) {
@@ -1917,7 +1946,6 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
         GaiaSky.postRunnable(() -> em.post(Events.STEREO_PROFILE_CMD, index));
     }
 
-
     @Override
     public long getCurrentFrameNumber() {
         return GaiaSky.instance.frames;
@@ -2237,8 +2265,6 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
         return false;
     }
 
-
-
     @Override
     public boolean highlightDataset(String dsName, int colorIndex, boolean highlight) {
         float[] color = ColourUtils.getColorFromIndex(colorIndex);
@@ -2266,7 +2292,7 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
             if (exists) {
                 CatalogInfo ci = CatalogManager.instance().get(dsName);
                 ci.setHlSizeFactor(sizeFactor);
-            }else {
+            } else {
                 logger.warn("Dataset with name " + dsName + " does not exist");
             }
             return exists;

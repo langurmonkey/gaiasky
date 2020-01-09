@@ -220,7 +220,7 @@ public class DesktopPostProcessor implements IPostProcessor, IObserver {
 
 
         // SLAVE DISTORTION
-        if(GlobalConf.program.isSlave() && SlaveManager.projectionActive()){
+        if(GlobalConf.program.isSlave() && SlaveManager.projectionActive() && SlaveManager.instance.pfm != null){
             Path warpFile = SlaveManager.instance.pfm;
 
             PFMData data = manager.get(warpFile.toString());

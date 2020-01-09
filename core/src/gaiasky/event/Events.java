@@ -900,6 +900,9 @@ public enum Events {
 
     SHOW_ABOUT_ACTION,
 
+    /** Shows the slave configuration window **/
+    SHOW_SLAVE_CONFIG_ACTION,
+
     /**
      * Contains an optional boolean indicating whether debug info should be
      * shown or not. Otherwise, it toggles its state

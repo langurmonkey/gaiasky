@@ -48,8 +48,8 @@ public class SlaveManager {
         return instance != null && instance.initialized;
     }
 
-    public static void load(AssetManager manager){
-        if(projectionActive()){
+    public static void load(AssetManager manager) {
+        if (projectionActive()) {
             instance.loadAssets(manager);
         }
     }
@@ -65,7 +65,7 @@ public class SlaveManager {
     public SlaveManager() {
         super();
         if (GlobalConf.program.isSlave()) {
-            if(GlobalConf.program.isSlaveMPCDIPresent()) {
+            if (GlobalConf.program.isSlaveMPCDIPresent()) {
                 logger.info("Using slave configuration file: " + GlobalConf.program.NET_SLAVE_CONFIG);
                 String mpcdi = GlobalConf.program.NET_SLAVE_CONFIG;
                 try {
@@ -79,7 +79,7 @@ public class SlaveManager {
                 } catch (Exception e) {
                     logger.error(e);
                 }
-            } else if (GlobalConf.program.areSlaveConfigPropertiesPresent()){
+            } else if (GlobalConf.program.areSlaveConfigPropertiesPresent()) {
                 yaw = GlobalConf.program.NET_SLAVE_YAW;
                 pitch = GlobalConf.program.NET_SLAVE_PITCH;
                 roll = GlobalConf.program.NET_SLAVE_ROLL;
@@ -87,7 +87,10 @@ public class SlaveManager {
                 xResolution = GlobalConf.screen.FULLSCREEN_WIDTH;
                 yResolution = GlobalConf.screen.FULLSCREEN_HEIGHT;
                 upAngle = downAngle = rightAngle = leftAngle = GlobalConf.scene.CAMERA_FOV / 2f;
-                pfm = Paths.get(GlobalConf.program.NET_SLAVE_WARP);
+                if (GlobalConf.program.NET_SLAVE_WARP != null && !GlobalConf.program.NET_SLAVE_WARP.isEmpty())
+                    pfm = Paths.get(GlobalConf.program.NET_SLAVE_WARP);
+                else
+                    pfm = null;
 
                 initialized = true;
 
@@ -285,15 +288,15 @@ public class SlaveManager {
         GlobalConf.scene.CROSSHAIR_CLOSEST = false;
     }
 
-    private void printInfo(){
+    private void printInfo() {
         logger.info("Slave configuration modified with MPCDI settings");
         logger.info("   Resolution: " + xResolution + "x" + yResolution);
         logger.info("   Fov: " + cameraFov);
         logger.info("   Yaw/Pitch/Roll: " + yaw + "/" + pitch + "/" + roll);
     }
 
-    public void loadAssets(AssetManager manager){
-        if(pfm != null && Files.exists(pfm)){
+    public void loadAssets(AssetManager manager) {
+        if (pfm != null && Files.exists(pfm)) {
             PFMDataParameter param = new PFMDataParameter();
             param.invert = false;
             manager.load(pfm.toString(), PFMData.class, param);

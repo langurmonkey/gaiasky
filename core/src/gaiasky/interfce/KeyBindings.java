@@ -178,6 +178,8 @@ public class KeyBindings {
         BooleanRunnable noPlanetarium = () -> !(GlobalConf.program.CUBEMAP_MODE && GlobalConf.program.CUBEMAP_PROJECTION.isPlanetarium());
         // Condition that checks that we are not a slave with a special projection
         BooleanRunnable noSlaveProj = () -> !SlaveManager.projectionActive();
+        // Condition that checks that we are a master and have slaves
+        BooleanRunnable masterWithSlaves = () -> MasterManager.hasSlaves();
 
 
         // about action
@@ -393,6 +395,9 @@ public class KeyBindings {
 
         // Reload UI (debugging)
         addAction(new ProgramAction("action.ui.reload", () -> EventManager.instance.post(Events.UI_RELOAD_CMD)));
+
+        // Configure slave
+        addAction(new ProgramAction("action.slave.configure", () -> EventManager.instance.post(Events.SHOW_SLAVE_CONFIG_ACTION), masterWithSlaves));
 
         // Camera modes
         for (CameraMode mode : CameraMode.values()) {

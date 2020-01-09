@@ -114,5 +114,8 @@ action.expandcollapse.pane/gui.dataset.title= ALT_L D
 action.expandcollapse.pane/gui.objects      = ALT_L O
 action.expandcollapse.pane/gui.music        = ALT_L M
 
+# Master/slave
+action.slave.configure                      = S L V
+
 # Debug
 action.ui.reload                            = CTRL_L SHIFT_L U I

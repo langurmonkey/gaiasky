@@ -569,7 +569,7 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
      * @param roll  The roll angle (clockwise)
      */
     public void camOrientProjection(float yaw, float pitch, float roll) {
-        if(projectionFlag) {
+        if (projectionFlag) {
             // yaw - rotate to the right
             direction.rotate(up, -yaw);
 
@@ -1313,17 +1313,15 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
 
             break;
         case FOV_CHANGED_CMD:
-            if (!SlaveManager.projectionActive()) {
-                boolean checkMax = data.length == 1 || (boolean) data[1];
-                float fov = MathUtilsd.clamp((float) data[0], Constants.MIN_FOV, checkMax ? Constants.MAX_FOV : 179);
+            boolean checkMax = data.length == 1 || (boolean) data[1];
+            float fov = MathUtilsd.clamp((float) data[0], Constants.MIN_FOV, checkMax ? Constants.MAX_FOV : 179);
 
-                for (PerspectiveCamera cam : cameras) {
-                    cam.fieldOfView = fov;
-                }
-                fovFactor = camera.fieldOfView / 40f;
-                if (parent.current == this) {
-                    EventManager.instance.post(Events.FOV_CHANGE_NOTIFICATION, fov, fovFactor);
-                }
+            for (PerspectiveCamera cam : cameras) {
+                cam.fieldOfView = fov;
+            }
+            fovFactor = camera.fieldOfView / 40f;
+            if (parent.current == this) {
+                EventManager.instance.post(Events.FOV_CHANGE_NOTIFICATION, fov, fovFactor);
             }
             break;
         case CUBEMAP_CMD:

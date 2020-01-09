@@ -523,7 +523,7 @@ public interface IScriptingInterface {
     /**
      * Changes the field of view of the camera.
      *
-     * @param newFov The new field of view value in degrees, between 20 and 160.
+     * @param newFov The new field of view value in degrees, between {@link gaiasky.util.Constants#MIN_FOV} and {@link gaiasky.util.Constants#MAX_FOV}.
      */
     void setFov(float newFov);
 
@@ -787,6 +787,41 @@ public interface IScriptingInterface {
      * @param opacity The minimum opacity value, between 0 and 100.
      */
     void setMinStarOpacity(float opacity);
+
+    /**
+     * Sets the projection yaw angle (if this is a slave instance), in degrees.
+     * The yaw angle turns the camera to the right.
+     * This function is intended for multi-projector setups, to configure
+     * slaves without restarting Gaia Sky.
+     * @param yaw The yaw angle in degrees.
+     */
+    void setProjectionYaw(float yaw);
+
+    /**
+     * Sets the projection pitch angle (if this is a slave instance), in degrees.
+     * The pitch angle turns the camera up.
+     * This function is intended for multi-projector setups, to configure
+     * slaves without restarting Gaia Sky.
+     * @param pitch The pitch angle in degrees.
+     */
+    void setProjectionPitch(float pitch);
+
+    /**
+     * Sets the projection roll angle (if this is a slave instance), in degrees.
+     * The roll angle rolls the camera clockwise.
+     * This function is intended for multi-projector setups, to configure
+     * slaves without restarting Gaia Sky.
+     * @param roll The roll angle in degrees.
+     */
+    void setProjectionRoll(float roll);
+
+    /**
+     * Same as {@link #setFov(float)}, but bypassing the restriction of an active
+     * projection in the slave (slaves that have an active projection do not accept
+     * fov modification events).
+     * @param fov The field of view angle.
+     */
+    void setProjectionFov(float fov);
 
     /**
      * Configures the frame output system, setting the resolution of the images,
