@@ -152,7 +152,7 @@ public class DesktopConfInit extends ConfInit {
 
         String DATA_LOCATION = p.getProperty("data.location");
         if (DATA_LOCATION == null || DATA_LOCATION.isEmpty())
-            DATA_LOCATION = SysUtils.getLocalDataDir().getAbsolutePath();
+            DATA_LOCATION = SysUtils.getLocalDataDir().getAbsolutePath().replaceAll("\\\\", "/");;
 
         String CATALOG_JSON_FILE_SEQUENCE = p.getProperty("data.json.catalog", "");
         Array<String> CATALOG_JSON_FILES = new Array<>();

@@ -161,7 +161,7 @@ public class DownloadDataWindow extends GenericDialog {
                             if (result.file().canRead() && result.file().canWrite()) {
                                 // do stuff with result
                                 catalogsLoc.setText(result.path());
-                                GlobalConf.data.DATA_LOCATION = result.path();
+                                GlobalConf.data.DATA_LOCATION = result.path().replaceAll("\\\\", "/");;
                                 me.pack();
                                 GaiaSky.postRunnable(() -> {
                                     // Reset datasets
