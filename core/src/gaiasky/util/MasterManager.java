@@ -34,7 +34,7 @@ public class MasterManager implements IObserver {
     private static final Log logger = Logger.getLogger(MasterManager.class);
 
     /** Will attempt reconnection to offline slaves with this frequency **/
-    private static final long RECONNECT_TIME_MS = 10000;
+    private static final long RECONNECT_TIME_MS = 5000;
 
     // Singleton instance
     public static MasterManager instance;

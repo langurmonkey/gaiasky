@@ -7,7 +7,7 @@ package gaiasky.interfce;
 
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
-import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
+import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener.ChangeEvent;
 import com.badlogic.gdx.utils.Array;
 import gaiasky.util.*;
 import gaiasky.util.parse.Parser;
@@ -17,16 +17,25 @@ import gaiasky.util.scene2d.OwnTextButton;
 import gaiasky.util.scene2d.OwnTextField;
 import gaiasky.util.validator.FloatValidator;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class SlaveConfigWindow extends GenericDialog {
     private static Logger.Log logger = Logger.getLogger(SlaveConfigWindow.class);
 
+    private static Map<String, Map<String, String>> parametersMap;
+    static {
+        parametersMap = new HashMap();
+    }
+
     private OwnTextField yaw, pitch, roll, fov;
     private OwnSelectBox<String> slaveSelect;
 
+
     public SlaveConfigWindow(Stage stage, Skin skin) {
         super(I18n.txt("gui.slave.config.title"), skin, stage);
+
 
         setModal(false);
         setCancelText(I18n.txt("gui.close"));
@@ -47,7 +56,7 @@ public class SlaveConfigWindow extends GenericDialog {
         OwnTextButton sendButton = new OwnTextButton(I18n.txt("gui.send"), skin, "default");
         sendButton.setName("send");
         sendButton.addListener((event) -> {
-            if (event instanceof ChangeListener.ChangeEvent) {
+            if (event instanceof ChangeEvent) {
                 accept();
                 return true;
             }
@@ -68,6 +77,14 @@ public class SlaveConfigWindow extends GenericDialog {
         slaveSelect = new OwnSelectBox<>(skin);
         slaveSelect.setWidth(tw * 4f);
         slaveSelect.setItems(slaveList);
+        slaveSelect.addListener((event) -> {
+            if (event instanceof ChangeEvent) {
+                String newSlave = slaveSelect.getSelected();
+                pullParameters(newSlave);
+                return true;
+            }
+            return false;
+        });
         OwnLabel slaveLabel = new OwnLabel(I18n.txt("gui.slave.config.instance") + ":", skin);
         content.add(slaveLabel).center().left().padRight(pad).padBottom(pad * 2f);
         content.add(slaveSelect).center().left().padBottom(pad * 2f).row();
@@ -97,6 +114,42 @@ public class SlaveConfigWindow extends GenericDialog {
         content.add(fovLabel).center().left().padRight(pad).padBottom(pad);
         content.add(fov).center().left().padBottom(pad).row();
 
+        if (slaveSelect.getSelected() != null)
+            pullParameters(slaveSelect.getSelected());
+    }
+
+    private void pullParameters(String slave) {
+        pullParameter(slave, "yaw", yaw);
+        pullParameter(slave, "pitch", pitch);
+        pullParameter(slave, "roll", roll);
+        pullParameter(slave, "fov", fov);
+    }
+
+    private void pullParameter(String slave, String param, OwnTextField field) {
+        if (parametersMap.containsKey(slave)) {
+            Map<String, String> params = parametersMap.get(slave);
+            if (params.containsKey(param)) {
+                field.setText(params.get(param));
+            }
+        }
+    }
+
+    private void pushParameters(String slave) {
+        pushParameter(slave, "yaw", yaw.getText());
+        pushParameter(slave, "pitch", pitch.getText());
+        pushParameter(slave, "roll", roll.getText());
+        pushParameter(slave, "fov", fov.getText());
+    }
+
+    private void pushParameter(String slave, String param, String value) {
+        Map<String, String> params;
+        if (parametersMap.containsKey(slave)) {
+            params = parametersMap.get(slave);
+        } else {
+            params = new HashMap<>();
+        }
+        params.put(param, value);
+        parametersMap.put(slave, params);
     }
 
     @Override
@@ -109,21 +162,25 @@ public class SlaveConfigWindow extends GenericDialog {
                 float val = Parser.parseFloat(yaw.getText());
                 MasterManager.instance.setSlaveYaw(slave, val);
                 logStr += "yaw=" + val + ";";
+                pushParameter(slave, "yaw", yaw.getText());
             }
             if (pitch.isValid()) {
                 float val = Parser.parseFloat(pitch.getText());
                 MasterManager.instance.setSlavePitch(slave, val);
                 logStr += "pitch=" + val + ";";
+                pushParameter(slave, "pitch", pitch.getText());
             }
             if (roll.isValid()) {
                 float val = Parser.parseFloat(roll.getText());
                 MasterManager.instance.setSlaveRoll(slave, val);
                 logStr += "roll=" + val + ";";
+                pushParameter(slave, "roll", roll.getText());
             }
             if (fov.isValid()) {
                 float val = Parser.parseFloat(fov.getText());
                 MasterManager.instance.setSlaveFov(slave, val);
                 logStr += "fov=" + val + ";";
+                pushParameter(slave, "fov", fov.getText());
             }
         }
 
