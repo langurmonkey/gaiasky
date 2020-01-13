@@ -14,6 +14,10 @@ import gaiasky.util.format.NumberFormatFactory;
 
 public class TextUtils {
 
+    public static String surround(String in, String pre, String post){
+        return pre + in + post;
+    }
+
     public static void capLabelWidth(Label l, float targetWidth) {
         while (l.getWidth() > targetWidth) {
             StringBuilder currText = l.getText();

@@ -5,12 +5,6 @@
 
 package gaiasky.util;
 
-import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.Net.HttpMethods;
-import com.badlogic.gdx.Net.HttpRequest;
-import com.badlogic.gdx.Net.HttpResponse;
-import com.badlogic.gdx.Net.HttpResponseListener;
-import com.badlogic.gdx.net.HttpParametersUtils;
 import com.badlogic.gdx.net.HttpStatus;
 import gaiasky.event.EventManager;
 import gaiasky.event.Events;
@@ -21,10 +15,14 @@ import gaiasky.util.math.MathUtilsd;
 import gaiasky.util.math.Vector3d;
 import gaiasky.util.time.ITimeFrameProvider;
 
-import java.util.Arrays;
-import java.util.HashMap;
+import java.net.URI;
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
+import java.net.http.HttpResponse.BodyHandler;
+import java.net.http.HttpResponse.BodySubscriber;
 import java.util.List;
-import java.util.Map;
+import java.util.function.Function;
 
 /**
  * Manages a master instance which makes available state information to others
@@ -58,7 +56,7 @@ public class MasterManager implements IObserver {
 
     }
 
-    public int getSlaveIndex(String slaveName){
+    public int getSlaveIndex(String slaveName) {
         return slaves.indexOf(slaveName);
     }
 
@@ -85,14 +83,12 @@ public class MasterManager implements IObserver {
     /** Last ping times for each slave **/
     private long[] slavePingTimes;
 
-    // Parameters maps
-    private Map<String, String> camStateTimeParams, camStateParams, params;
+    // Handlers
+    private ResponseHandler[] responseHandlers;
+    private ExceptHandler[] exceptHandlers;
 
-    // HTTP request objects
-    private HttpRequest request, evtrequest;
-
-    // Response object
-    private MasterResponseListener[] responseListeners;
+    // HTTP client
+    private HttpClient http;
 
     private MasterManager() {
         super();
@@ -108,19 +104,17 @@ public class MasterManager implements IObserver {
             }
         }
 
-        // Create parameter maps
-        camStateTimeParams = new HashMap<>();
-        camStateParams = new HashMap<>();
-        params = new HashMap<>();
-
-        // Create request and response objects
-        request = new HttpRequest(HttpMethods.POST);
-        evtrequest = new HttpRequest(HttpMethods.POST);
         if (slaves != null && slaves.size() > 0) {
-            responseListeners = new MasterResponseListener[slaves.size()];
-            for (int i = 0; i < slaveStates.length; i++)
-                responseListeners[i] = new MasterResponseListener(i);
+            responseHandlers = new ResponseHandler[slaves.size()];
+            exceptHandlers = new ExceptHandler[slaves.size()];
+            for (int i = 0; i < slaveStates.length; i++) {
+                responseHandlers[i] = new ResponseHandler(i);
+                exceptHandlers[i] = new ExceptHandler(i);
+            }
         }
+
+        // Initialize http client
+        http = HttpClient.newBuilder().version(HttpClient.Version.HTTP_2).build();
 
         // Subscribe to events that need to be broadcasted
         EventManager.instance.subscribe(this, Events.FOV_CHANGED_CMD, Events.TOGGLE_VISIBILITY_CMD, Events.STAR_BRIGHTNESS_CMD, Events.STAR_MIN_OPACITY_CMD, Events.STAR_POINT_SIZE_CMD, Events.DISPOSE);
@@ -135,19 +129,23 @@ public class MasterManager implements IObserver {
      * @param time Current time
      */
     public void boardcastCameraAndTime(Vector3d pos, Vector3d dir, Vector3d up, ITimeFrameProvider time) {
-        camStateTimeParams.put("arg0", Arrays.toString(pos.values()));
-        camStateTimeParams.put("arg1", Arrays.toString(dir.values()));
-        camStateTimeParams.put("arg2", Arrays.toString(up.values()));
-        camStateTimeParams.put("arg3", Long.toString(time.getTime().toEpochMilli()));
-        String paramString = HttpParametersUtils.convertHttpParameters(camStateTimeParams);
+        String spos = TextUtils.surround(pos.toString(), "[", "]");
+        String sdir = TextUtils.surround(dir.toString(), "[", "]");
+        String sup = TextUtils.surround(up.toString(), "[", "]");
+        String stime = Long.toString(time.getTime().toEpochMilli());
 
         boolean slaveOffline = false;
         int i = 0;
         for (String slave : slaves) {
             if (slaveStates[i] == 0) {
-                request.setUrl(slave + "setCameraStateAndTime");
-                request.setContent(paramString);
-                Gdx.net.sendHttpRequest(request, responseListeners[i]);
+                HttpRequest req = HttpRequest.newBuilder().uri(URI.create(slave + "setCameraStateAndTime?arg0=" + spos + "&arg1=" + sdir + "&arg2=" + sup + "&arg3=" + stime)).GET().
+                        build();
+
+                try {
+                    http.sendAsync(req, rhandler(i)).thenApply(HttpResponse::body).exceptionally(ehandler(i));
+                }catch(Exception e){
+                    logger.error(e);
+                }
                 i++;
             } else {
                 slaveOffline = true;
@@ -175,67 +173,58 @@ public class MasterManager implements IObserver {
      * @param up  Camera up
      */
     public void boardcastCamera(Vector3d pos, Vector3d dir, Vector3d up) {
-        camStateParams.put("arg0", Arrays.toString(pos.values()));
-        camStateParams.put("arg1", Arrays.toString(dir.values()));
-        camStateParams.put("arg2", Arrays.toString(up.values()));
-        String paramString = HttpParametersUtils.convertHttpParameters(camStateParams);
+        String spos = TextUtils.surround(pos.toString(), "[", "]");
+        String sdir = TextUtils.surround(dir.toString(), "[", "]");
+        String sup = TextUtils.surround(up.toString(), "[", "]");
 
         int i = 0;
         for (String slave : slaves) {
             if (slaveStates[i] == 0) {
-                request.setUrl(slave + "setCameraState");
-                request.setContent(paramString);
-                Gdx.net.sendHttpRequest(request, responseListeners[i++]);
+                HttpRequest req = HttpRequest.newBuilder().uri(URI.create(slave + "setCameraState?arg0=" + spos + "&arg1=" + sdir + "&arg2=" + sup)).GET().
+                        build();
+                http.sendAsync(req, rhandler(i)).thenApply(HttpResponse::body).exceptionally(ehandler(i));
             }
+            i++;
         }
     }
 
-    public void setSlaveYaw(String slave, float yaw){
-        synchronized(params) {
-            params.clear();
-            params.put("arg0", Float.toString(yaw));
-            String paramString = HttpParametersUtils.convertHttpParameters(params);
-            if(isSlaveConnected(slave)){
-                evtrequest.setUrl(slave + "setProjectionYaw");
-                evtrequest.setContent(paramString);
-                Gdx.net.sendHttpRequest(evtrequest, responseListeners[0]);
-            }
+    public void setSlaveYaw(String slave, float yaw) {
+        String syaw = Float.toString(yaw);
+        if (isSlaveConnected(slave)) {
+            int i = getSlaveIndex(slave);
+            HttpRequest req = HttpRequest.newBuilder().uri(URI.create(slave + "setProjectionYaw?arg0=" + syaw)).GET().
+                    build();
+            http.sendAsync(req, rhandler(i)).thenApply(HttpResponse::body).exceptionally(ehandler(i));
         }
     }
-    public void setSlavePitch(String slave, float pitch){
-        synchronized(params) {
-            params.clear();
-            params.put("arg0", Float.toString(pitch));
-            String paramString = HttpParametersUtils.convertHttpParameters(params);
-            if(isSlaveConnected(slave)){
-                evtrequest.setUrl(slave + "setProjectionPitch");
-                evtrequest.setContent(paramString);
-                Gdx.net.sendHttpRequest(evtrequest, responseListeners[0]);
-            }
+
+    public void setSlavePitch(String slave, float pitch) {
+        String spitch = Float.toString(pitch);
+        if (isSlaveConnected(slave)) {
+            int i = getSlaveIndex(slave);
+            HttpRequest req = HttpRequest.newBuilder().uri(URI.create(slave + "setProjectionPitch?arg0=" + spitch)).GET().
+                    build();
+            http.sendAsync(req, rhandler(i)).thenApply(HttpResponse::body).exceptionally(ehandler(i));
         }
     }
-    public void setSlaveRoll(String slave, float roll){
-        synchronized(params) {
-            params.clear();
-            params.put("arg0", Float.toString(roll));
-            String paramString = HttpParametersUtils.convertHttpParameters(params);
-            if(isSlaveConnected(slave)){
-                evtrequest.setUrl(slave + "setProjectionRoll");
-                evtrequest.setContent(paramString);
-                Gdx.net.sendHttpRequest(evtrequest, responseListeners[0]);
-            }
+
+    public void setSlaveRoll(String slave, float roll) {
+        String sroll = Float.toString(roll);
+        if (isSlaveConnected(slave)) {
+            int i = getSlaveIndex(slave);
+            HttpRequest req = HttpRequest.newBuilder().uri(URI.create(slave + "setProjectionRoll?arg0=" + sroll)).GET().
+                    build();
+            http.sendAsync(req, rhandler(i)).thenApply(HttpResponse::body).exceptionally(ehandler(i));
         }
     }
-    public void setSlaveFov(String slave, float fov){
-        synchronized(params) {
-            params.clear();
-            params.put("arg0", Float.toString(fov));
-            String paramString = HttpParametersUtils.convertHttpParameters(params);
-            if(isSlaveConnected(slave)){
-                evtrequest.setUrl(slave + "setProjectionFov");
-                evtrequest.setContent(paramString);
-                Gdx.net.sendHttpRequest(evtrequest, responseListeners[0]);
-            }
+
+    public void setSlaveFov(String slave, float fov) {
+        String sfov = Float.toString(fov);
+        if (isSlaveConnected(slave)) {
+            int i = getSlaveIndex(slave);
+            HttpRequest req = HttpRequest.newBuilder().uri(URI.create(slave + "setProjectionFov?arg0=" + sfov)).GET().
+                    build();
+            http.sendAsync(req, rhandler(i)).thenApply(HttpResponse::body).exceptionally(ehandler(i));
         }
     }
 
@@ -245,131 +234,138 @@ public class MasterManager implements IObserver {
 
     @Override
     public void notify(Events event, Object... data) {
-        synchronized(params) {
-            params.clear();
-            String paramString;
-            int i;
-
-            switch (event) {
-            case FOV_CHANGED_CMD:
-                if(false) { // Each slave has its own fov configured via file/mpcdi
-                    params.put("arg0", Float.toString((float) data[0]));
-                    paramString = HttpParametersUtils.convertHttpParameters(params);
-                    i = 0;
-                    for (String slave : slaves) {
-                        if (slaveStates[i] == 0) {
-                            evtrequest.setUrl(slave + "setFov");
-                            evtrequest.setContent(paramString);
-                            Gdx.net.sendHttpRequest(evtrequest, responseListeners[i++]);
-                        }
-                    }
-                }
-                break;
-            case TOGGLE_VISIBILITY_CMD:
-                String key = (String) data[0];
-                Boolean state = null;
-                if (data.length > 2) {
-                    state = (Boolean) data[2];
-                } else {
-                    ComponentType ct = ComponentType.getFromKey(key);
-                    state = GlobalConf.scene.VISIBILITY[ct.ordinal()];
-                }
-
-                params.put("arg0", key);
-                params.put("arg1", state.toString());
-                paramString = HttpParametersUtils.convertHttpParameters(params);
-                i = 0;
+        int i;
+        switch (event) {
+        case FOV_CHANGED_CMD:
+            if (false) { // Each slave has its own fov configured via file/mpcdi
+                String sfov = Float.toString((float) data[0]);
                 for (String slave : slaves) {
                     if (slaveStates[i] == 0) {
-                        evtrequest.setUrl(slave + "setVisibility");
-                        evtrequest.setContent(paramString);
-                        Gdx.net.sendHttpRequest(evtrequest, responseListeners[i++]);
+                        HttpRequest req = HttpRequest.newBuilder().uri(URI.create(slave + "setFov?arg0=" + sfov)).GET().
+                                build();
+                        http.sendAsync(req, rhandler(i)).thenApply(HttpResponse::body).exceptionally(ehandler(i));
                     }
+                    i++;
                 }
-                break;
-            case STAR_BRIGHTNESS_CMD:
-                float brightness = MathUtilsd.lint((float) data[0], Constants.MIN_STAR_BRIGHT, Constants.MAX_STAR_BRIGHT, Constants.MIN_SLIDER, Constants.MAX_SLIDER);
-                params.put("arg0", Float.toString(brightness));
-                paramString = HttpParametersUtils.convertHttpParameters(params);
-                i = 0;
-                for (String slave : slaves) {
-                    if (slaveStates[i] == 0) {
-                        evtrequest.setUrl(slave + "setStarBrightness");
-                        evtrequest.setContent(paramString);
-                        Gdx.net.sendHttpRequest(evtrequest, responseListeners[i++]);
-                    }
-                }
-                break;
-            case STAR_POINT_SIZE_CMD:
-                float size = MathUtilsd.lint((float) data[0], Constants.MIN_STAR_POINT_SIZE, Constants.MAX_STAR_POINT_SIZE, Constants.MIN_SLIDER, Constants.MAX_SLIDER);
-                params.put("arg0", Float.toString(size));
-                paramString = HttpParametersUtils.convertHttpParameters(params);
-                i = 0;
-                for (String slave : slaves) {
-                    if (slaveStates[i] == 0) {
-                        evtrequest.setUrl(slave + "setStarSize");
-                        evtrequest.setContent(paramString);
-                        Gdx.net.sendHttpRequest(evtrequest, responseListeners[i++]);
-                    }
-                }
-                break;
-            case STAR_MIN_OPACITY_CMD:
-                float opacity = MathUtilsd.lint((float) data[0], Constants.MIN_STAR_MIN_OPACITY, Constants.MAX_STAR_MIN_OPACITY, Constants.MIN_SLIDER, Constants.MAX_SLIDER);
-                params.put("arg0", Float.toString(opacity));
-                paramString = HttpParametersUtils.convertHttpParameters(params);
-                i = 0;
-                for (String slave : slaves) {
-                    if (slaveStates[i] == 0) {
-                        evtrequest.setUrl(slave + "setMinStarOpacity");
-                        evtrequest.setContent(paramString);
-                        Gdx.net.sendHttpRequest(evtrequest, responseListeners[i++]);
-                    }
-                }
-                break;
-            case DISPOSE:
-                i = 0;
-                for (String slave : slaves) {
-                    if (slaveStates[i] == 0) {
-                        evtrequest.setUrl(slave + "quit");
-                        Gdx.net.sendHttpRequest(evtrequest, responseListeners[i++]);
-                    }
-                }
-                break;
-            default:
-                break;
             }
+            break;
+        case TOGGLE_VISIBILITY_CMD:
+            String key = (String) data[0];
+            Boolean state = null;
+            if (data.length > 2) {
+                state = (Boolean) data[2];
+            } else {
+                ComponentType ct = ComponentType.getFromKey(key);
+                state = GlobalConf.scene.VISIBILITY[ct.ordinal()];
+            }
+            i = 0;
+            for (String slave : slaves) {
+                if (slaveStates[i] == 0) {
+                    HttpRequest req = HttpRequest.newBuilder().uri(URI.create(slave + "setVisibility?arg0=" + key + "&arg1=" + state.toString())).GET().
+                            build();
+                    http.sendAsync(req, rhandler(i)).thenApply(HttpResponse::body).exceptionally(ehandler(i));
+                }
+                i++;
+            }
+            break;
+        case STAR_BRIGHTNESS_CMD:
+            float brightness = MathUtilsd.lint((float) data[0], Constants.MIN_STAR_BRIGHT, Constants.MAX_STAR_BRIGHT, Constants.MIN_SLIDER, Constants.MAX_SLIDER);
+            String sbr = Float.toString(brightness);
+            i = 0;
+            for (String slave : slaves) {
+                if (slaveStates[i] == 0) {
+                    HttpRequest req = HttpRequest.newBuilder().uri(URI.create(slave + "setStarBrightness?arg0=" + sbr)).GET().
+                            build();
+                    http.sendAsync(req, rhandler(i)).thenApply(HttpResponse::body).exceptionally(ehandler(i));
+                }
+                i++;
+            }
+            break;
+        case STAR_POINT_SIZE_CMD:
+            float size = MathUtilsd.lint((float) data[0], Constants.MIN_STAR_POINT_SIZE, Constants.MAX_STAR_POINT_SIZE, Constants.MIN_SLIDER, Constants.MAX_SLIDER);
+            String ssize = Float.toString(size);
+            i = 0;
+            for (String slave : slaves) {
+                if (slaveStates[i] == 0) {
+                    HttpRequest req = HttpRequest.newBuilder().uri(URI.create(slave + "setStarSize?arg0=" + ssize)).GET().
+                            build();
+                    http.sendAsync(req, rhandler(i)).thenApply(HttpResponse::body).exceptionally(ehandler(i));
+                }
+                i++;
+            }
+            break;
+        case STAR_MIN_OPACITY_CMD:
+            float opacity = MathUtilsd.lint((float) data[0], Constants.MIN_STAR_MIN_OPACITY, Constants.MAX_STAR_MIN_OPACITY, Constants.MIN_SLIDER, Constants.MAX_SLIDER);
+            String sop = Float.toString(opacity);
+            i = 0;
+            for (String slave : slaves) {
+                if (slaveStates[i] == 0) {
+                    HttpRequest req = HttpRequest.newBuilder().uri(URI.create(slave + "setMinStarOpacity?arg0=" + sop)).GET().
+                            build();
+                    http.sendAsync(req, rhandler(i)).thenApply(HttpResponse::body).exceptionally(ehandler(i));
+                }
+                i++;
+            }
+            break;
+        case DISPOSE:
+            i = 0;
+            for (String slave : slaves) {
+                if (slaveStates[i] == 0) {
+                    HttpRequest req = HttpRequest.newBuilder().uri(URI.create(slave + "quit")).GET().
+                            build();
+                    http.sendAsync(req, rhandler(i)).thenApply(HttpResponse::body).exceptionally(ehandler(i));
+                }
+                i++;
+            }
+            break;
+        default:
+            break;
         }
     }
 
-    private class MasterResponseListener implements HttpResponseListener {
-        private int index;
 
-        public MasterResponseListener(int index) {
-            super();
-            this.index = index;
+
+    private ResponseHandler rhandler(int index) {
+        return responseHandlers[index];
+    }
+    private ExceptHandler ehandler(int index) {
+        return exceptHandlers[index];
+    }
+
+    private class ExceptHandler implements Function<Throwable, String>{
+        private int idx;
+
+        public ExceptHandler(int idx){
+            this.idx = idx;
         }
 
         @Override
-        public void handleHttpResponse(HttpResponse httpResponse) {
-            if (httpResponse.getStatus().getStatusCode() == HttpStatus.SC_OK) {
+        public String apply(Throwable throwable) {
+            //logger.error(throwable);
+            logger.error("Connection failed for slave " + idx + " (" + slaves.get(idx) + ") with " + throwable.getMessage());
+            markSlaveOffline(idx);
+            return null;
+        }
+    }
+
+    private class ResponseHandler implements BodyHandler<String> {
+        private int idx;
+
+        public ResponseHandler(int idx) {
+            this.idx = idx;
+        }
+
+        @Override
+        public BodySubscriber apply(HttpResponse.ResponseInfo responseInfo) {
+            if (responseInfo.statusCode() != HttpStatus.SC_OK) {
+                markSlaveOffline(idx);
+                logger.error("Connection failed for slave " + idx + " (" + slaves.get(idx) + ")");
             } else {
-                logger.error("HTTP status not ok for slave " + index);
-                markSlaveOffline(index);
+
             }
+            return HttpResponse.BodySubscribers.discarding();
         }
 
-        @Override
-        public void failed(Throwable t) {
-            logger.error(t);
-            markSlaveOffline(index);
-            logger.error("Connection failed for slave " + index + " (" + slaves.get(index) + ")");
-        }
-
-        @Override
-        public void cancelled() {
-            markSlaveOffline(index);
-            logger.info("Cancelled request for slave " + 0);
-        }
     }
 
     private void markSlaveOffline(int index) {
