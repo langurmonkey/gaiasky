@@ -5,6 +5,7 @@
 
 package gaiasky.rest;
 
+import com.badlogic.gdx.utils.Array;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import gaiasky.script.EventScriptingInterface;
@@ -121,6 +122,11 @@ public class RESTServer {
      * Logger
      */
     private static Log logger = Logger.getLogger(RESTServer.class);
+
+    /**
+     * Name to method map
+     */
+    private static Map<String, Array<Method>> methodMap;
 
     /* Methods: */
 
@@ -293,10 +299,6 @@ public class RESTServer {
         // params
         Set<String> queryParams = request.queryParams();
 
-        // get set of permitted API commands
-        Class<IScriptingInterface> cisi = IScriptingInterface.class;
-        Method[] allMethods = cisi.getDeclaredMethods();
-
         /* Special-treatment commands */
         if ("help".equals(cmd)) {
             logger.debug("Help command received");
@@ -311,16 +313,31 @@ public class RESTServer {
 
         /* Method matching (name and parameters) */
         logger.debug("Method matching...");
-        int matchIndex = -1;
+        Method matchMethod = null;
         boolean methodNameMatches = false;
-        for (int i = 0; i < allMethods.length; i++) {
-            logger.debug("match check cmd={} with method={}...", cmd, allMethods[i].getName());
+
+        if (!methodMap.containsKey(cmd)) {
+            /* No match: could not find matching method */
+            logger.debug("No suitable method found.");
+
+            String msg = String.format("Failed: command name '%s' not found. " + "See syntax in 'cmd_syntax'.", cmd);
+            ret.put("cmd_syntax", getMethodDeclarationStrings("", IScriptingInterface.class));
+            logger.warn(msg);
+            ret.put("text", msg);
+            return responseData(request, response, ret, false);
+        }
+
+        Array<Method> matchMethods = methodMap.get(cmd);
+
+        for (int i = 0; i < matchMethods.size; i++) {
+            Method m = matchMethods.get(i);
+            logger.debug("match check cmd={} with method={}...", cmd, m.getName());
 
             // name matches, but parameters may be different
-            if (allMethods[i].getName().equals(cmd)) {
+            if (m.getName().equals(cmd)) {
                 logger.debug("  [+] name matches");
                 methodNameMatches = true;
-                Parameter[] methodParams = allMethods[i].getParameters();
+                Parameter[] methodParams = matchMethods.get(i).getParameters();
 
                 // check if parameters present (and optionally type fits?)
                 boolean allParamsFound = true;
@@ -337,18 +354,17 @@ public class RESTServer {
 
                 if (allParamsFound) {
                     logger.debug("  [+] method parameters ok");
-                    matchIndex = i;
+                    matchMethod = m;
                     break; // no need to continue checking: the the first match
                 }
             }
         }
 
         /* Handle matching result */
-        if (matchIndex >= 0) {
+        if (matchMethod != null) {
             /* Found suitable method */
-            logger.debug("Suitable method found: {}", methodDeclarationString(allMethods[matchIndex]));
+            logger.debug("Suitable method found: {}", methodDeclarationString(matchMethod));
 
-            Method matchMethod = allMethods[matchIndex];
             Parameter[] matchParameters = matchMethod.getParameters();
             Class<?> matchReturnType = matchMethod.getReturnType();
 
@@ -522,6 +538,25 @@ public class RESTServer {
             get("/api/:cmd", (request, response) -> handleApiCall(request, response));
 
             post("/api/:cmd", RESTServer::handleApiCall);
+
+
+            /* Initialize method index */
+            // get set of permitted API commands
+            Class<IScriptingInterface> cisi = IScriptingInterface.class;
+            Method[] allMethods = cisi.getDeclaredMethods();
+
+            methodMap = new HashMap();
+            for (Method method : allMethods) {
+                Array<Method> matches;
+                if (methodMap.containsKey(method.getName())) {
+                    matches = methodMap.get(method.getName());
+                } else {
+                    matches = new Array(1);
+                }
+                if (!matches.contains(method, true))
+                    matches.add(method);
+                methodMap.put(method.getName(), matches);
+            }
 
             logger.info("Startup finished.");
 
