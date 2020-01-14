@@ -760,28 +760,40 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
     @Override
     public void setProjectionYaw(float yaw) {
         if (SlaveManager.projectionActive()) {
-            GaiaSky.postRunnable(() -> SlaveManager.instance.yaw = yaw);
+            GaiaSky.postRunnable(() -> {
+                GlobalConf.program.NET_SLAVE_YAW = yaw;
+                SlaveManager.instance.yaw = yaw;
+            });
         }
     }
 
     @Override
     public void setProjectionPitch(float pitch) {
         if (SlaveManager.projectionActive()) {
-            GaiaSky.postRunnable(() -> SlaveManager.instance.pitch = pitch);
+            GaiaSky.postRunnable(() -> {
+                GlobalConf.program.NET_SLAVE_PITCH = pitch;
+                SlaveManager.instance.pitch = pitch;
+            });
         }
     }
 
     @Override
     public void setProjectionRoll(float roll) {
         if (SlaveManager.projectionActive()) {
-            GaiaSky.postRunnable(() -> SlaveManager.instance.roll = roll);
+            GaiaSky.postRunnable(() -> {
+                GlobalConf.program.NET_SLAVE_ROLL = roll;
+                SlaveManager.instance.roll = roll;
+            });
         }
     }
 
     @Override
     public void setProjectionFov(float newFov) {
         if (checkNum(newFov, Constants.MIN_FOV, 170f, "newFov"))
-            GaiaSky.postRunnable(() -> em.post(Events.FOV_CHANGED_CMD, newFov, false));
+            GaiaSky.postRunnable(() -> {
+                SlaveManager.instance.cameraFov = newFov;
+                em.post(Events.FOV_CHANGED_CMD, newFov, false);
+            });
     }
 
     public void setMinStarOpacity(int opacity) {

@@ -489,6 +489,9 @@ public class DesktopConfInit extends ConfInit {
         p.setProperty("program.cubemap360", Boolean.toString(GlobalConf.program.CUBEMAP_MODE));
         p.setProperty("program.planetarium.aperture", Float.toString(GlobalConf.program.PLANETARIUM_APERTURE));
         p.setProperty("program.catalog.chooser", Boolean.toString(GlobalConf.program.DISPLAY_DATASET_DIALOG));
+        p.setProperty("program.net.slave.yaw", Float.toString(GlobalConf.program.NET_SLAVE_YAW));
+        p.setProperty("program.net.slave.pitch", Float.toString(GlobalConf.program.NET_SLAVE_PITCH));
+        p.setProperty("program.net.slave.roll", Float.toString(GlobalConf.program.NET_SLAVE_ROLL));
         if (GlobalConf.program.LAST_OPEN_LOCATION != null && !GlobalConf.program.LAST_OPEN_LOCATION.isEmpty())
             p.setProperty("program.last.filesystem.location", GlobalConf.program.LAST_OPEN_LOCATION);
 
