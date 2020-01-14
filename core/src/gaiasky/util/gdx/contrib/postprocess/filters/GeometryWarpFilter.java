@@ -57,6 +57,13 @@ public final class GeometryWarpFilter extends Filter<GeometryWarpFilter> {
         rebind();
     }
 
+    public GeometryWarpFilter(PFMData warpData, Texture blend) {
+        super(ShaderLoader.fromFile("screenspace", "geometrywarp"));
+        this.mesh = new FullscreenMesh(warpData.data, warpData.width, warpData.height);
+        rebind();
+        setBlendTexture(blend);
+    }
+
     public void setBlendTexture(Texture tex) {
         this.blendTexture = tex;
         setParam(Param.Blend, u_texture1);

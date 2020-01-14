@@ -36,9 +36,12 @@ import gaiasky.util.gdx.loader.PFMData;
 public final class GeometryWarp extends PostProcessorEffect {
     private GeometryWarpFilter warpFilter;
 
-    /** Create a FXAA with the viewport size */
     public GeometryWarp(PFMData data) {
         warpFilter = new GeometryWarpFilter(data);
+    }
+
+    public GeometryWarp(PFMData data, Texture blend) {
+        warpFilter = new GeometryWarpFilter(data, blend);
     }
 
     public void setBlendTexture(Texture tex){

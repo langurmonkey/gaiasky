@@ -119,6 +119,16 @@ public class PFMReader {
         //return value;
     }
 
+    static public PFMData constructPFMData(int width, int height, Function<Float, Float> f) {
+        try {
+            float[] data = generateMapping(width, height, f);
+            return new PFMData(data, width, height);
+        } catch (Exception e) {
+            throw new GdxRuntimeException("Couldn't construct PFM data", e);
+        } finally {
+        }
+    }
+
     private static float[] generateMapping(int w, int h, Function<Float, Float> f) {
         float[] out = new float[w * h * 3];
 

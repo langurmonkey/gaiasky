@@ -33,6 +33,7 @@ import gaiasky.util.gdx.contrib.postprocess.PostProcessor;
 import gaiasky.util.gdx.contrib.postprocess.effects.*;
 import gaiasky.util.gdx.contrib.utils.ShaderLoader;
 import gaiasky.util.gdx.loader.PFMData;
+import gaiasky.util.gdx.loader.PFMReader;
 import gaiasky.util.math.Vector3d;
 
 import java.nio.file.Path;
@@ -220,12 +221,26 @@ public class DesktopPostProcessor implements IPostProcessor, IObserver {
 
 
         // SLAVE DISTORTION
-        if(GlobalConf.program.isSlave() && SlaveManager.projectionActive() && SlaveManager.instance.pfm != null){
+        if(GlobalConf.program.isSlave() && SlaveManager.projectionActive() && SlaveManager.instance.isWarpOrBlend()){
             Path warpFile = SlaveManager.instance.pfm;
+            Path blendFile = SlaveManager.instance.blend;
 
-            PFMData data = manager.get(warpFile.toString());
-
-            ppb.geometryWarp = new GeometryWarp(data);
+            PFMData data;
+            if(warpFile != null) {
+                // Load from file
+                data = manager.get(warpFile.toString());
+            } else {
+                // Generate identity
+                data = PFMReader.constructPFMData(50, 50, val -> val);
+            }
+            if(blendFile != null){
+                // Set up blend texture
+                Texture blendTex = manager.get(blendFile.toString());
+                ppb.geometryWarp = new GeometryWarp(data, blendTex);
+            } else {
+                // No blend
+                ppb.geometryWarp = new GeometryWarp(data);
+            }
             ppb.geometryWarp.setEnabled(true);
             ppb.pp.addEffect(ppb.geometryWarp);
 

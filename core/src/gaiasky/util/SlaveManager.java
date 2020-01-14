@@ -6,6 +6,9 @@
 package gaiasky.util;
 
 import com.badlogic.gdx.assets.AssetManager;
+import com.badlogic.gdx.assets.loaders.TextureLoader.TextureParameter;
+import com.badlogic.gdx.graphics.Pixmap;
+import com.badlogic.gdx.graphics.Texture;
 import gaiasky.desktop.util.SysUtils;
 import gaiasky.util.Logger.Log;
 import gaiasky.util.gdx.loader.PFMData;
@@ -57,7 +60,7 @@ public class SlaveManager {
     private boolean initialized = false;
 
     public String bufferId, regionId;
-    public Path pfm;
+    public Path pfm, blend;
     public int xResolution, yResolution;
     public float yaw, pitch, roll, upAngle, downAngle, rightAngle, leftAngle;
     public float cameraFov;
@@ -91,6 +94,11 @@ public class SlaveManager {
                     pfm = Paths.get(GlobalConf.program.NET_SLAVE_WARP);
                 else
                     pfm = null;
+
+                if (GlobalConf.program.NET_SLAVE_BLEND != null && !GlobalConf.program.NET_SLAVE_BLEND.isEmpty())
+                    blend = Paths.get(GlobalConf.program.NET_SLAVE_BLEND);
+                else
+                    blend = null;
 
                 initialized = true;
 
@@ -269,6 +277,10 @@ public class SlaveManager {
         }
     }
 
+    public boolean isWarpOrBlend(){
+        return pfm != null || blend != null;
+    }
+
     private void pushToConf() {
         if (initialized) {
             GlobalConf.screen.FULLSCREEN_WIDTH = GlobalConf.screen.SCREEN_WIDTH = xResolution;
@@ -300,6 +312,12 @@ public class SlaveManager {
             PFMDataParameter param = new PFMDataParameter();
             param.invert = false;
             manager.load(pfm.toString(), PFMData.class, param);
+        }
+        if (blend != null && Files.exists(blend)) {
+            TextureParameter param = new TextureParameter();
+            param.magFilter = Texture.TextureFilter.Linear;
+            param.format = Pixmap.Format.RGBA8888;
+            manager.load(blend.toString(), Texture.class, param);
         }
     }
 
