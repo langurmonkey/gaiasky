@@ -231,6 +231,10 @@ public class GuiRegistry implements IObserver {
      */
     private File lastOpenLocation;
 
+
+    /* Slave config window */
+    private SlaveConfigWindow slaveConfigWindow;
+
     /**
      * One object to handle observer pattern
      */
@@ -278,7 +282,9 @@ public class GuiRegistry implements IObserver {
                 break;
             case SHOW_SLAVE_CONFIG_ACTION:
                 if(MasterManager.hasSlaves()){
-                    (new SlaveConfigWindow(ui, skin)).show(ui);
+                    if(slaveConfigWindow == null)
+                        slaveConfigWindow = new SlaveConfigWindow(ui, skin);
+                    slaveConfigWindow.show(ui);
                 }
                 break;
             case SHOW_LOAD_CATALOG_ACTION:

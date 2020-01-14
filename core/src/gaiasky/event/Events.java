@@ -902,6 +902,8 @@ public enum Events {
 
     /** Shows the slave configuration window **/
     SHOW_SLAVE_CONFIG_ACTION,
+    /** Slave connection event. Contains slave index, url and a boolean with the state (true-connected, false-disconnected) **/
+    SLAVE_CONNECTION_EVENT,
 
     /**
      * Contains an optional boolean indicating whether debug info should be

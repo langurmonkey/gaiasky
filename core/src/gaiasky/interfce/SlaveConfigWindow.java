@@ -5,10 +5,15 @@
 
 package gaiasky.interfce;
 
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
+import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener.ChangeEvent;
 import com.badlogic.gdx.utils.Array;
+import gaiasky.event.EventManager;
+import gaiasky.event.Events;
+import gaiasky.event.IObserver;
 import gaiasky.util.*;
 import gaiasky.util.parse.Parser;
 import gaiasky.util.scene2d.OwnLabel;
@@ -21,27 +26,30 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class SlaveConfigWindow extends GenericDialog {
+public class SlaveConfigWindow extends GenericDialog implements IObserver {
     private static Logger.Log logger = Logger.getLogger(SlaveConfigWindow.class);
 
     private static Map<String, Map<String, String>> parametersMap;
+
     static {
         parametersMap = new HashMap();
     }
 
     private OwnTextField yaw, pitch, roll, fov;
     private OwnSelectBox<String> slaveSelect;
-
+    private OwnLabel[] slaveStatuses;
+    private OwnLabel slaveStatusLabel;
 
     public SlaveConfigWindow(Stage stage, Skin skin) {
         super(I18n.txt("gui.slave.config.title"), skin, stage);
-
 
         setModal(false);
         setCancelText(I18n.txt("gui.close"));
 
         // Build UI
         buildSuper();
+
+        EventManager.instance.subscribe(this, Events.SLAVE_CONNECTION_EVENT);
     }
 
     @Override
@@ -66,13 +74,28 @@ public class SlaveConfigWindow extends GenericDialog {
         buttonGroup.addActor(sendButton);
         recalculateButtonSize();
 
-        // Instance
+        // Get slaves
         List<String> slaves = MasterManager.instance.getSlaves();
-        Array<String> slaveList = new Array<>();
-        for (String slave : slaves) {
-            if (MasterManager.instance.isSlaveConnected(slave))
-                slaveList.add(slave);
+
+        // Status
+        slaveStatuses = new OwnLabel[slaves.size()];
+        OwnLabel statusLabel = new OwnLabel(I18n.txt("gui.slave.config.status") + ":", skin);
+        Table statusTable = new Table(skin);
+        for (int i = 0; i < slaves.size(); i++) {
+            OwnLabel slaveMarker = new OwnLabel("[" + (i + 1) + "]", skin);
+            if (MasterManager.instance.isSlaveConnected(slaves.get(i))) {
+                slaveMarker.setColor(Color.GREEN);
+            } else {
+                slaveMarker.setColor(Color.RED);
+            }
+            slaveStatuses[i] = slaveMarker;
+            statusTable.add(slaveMarker).left().padRight(pad);
         }
+        content.add(statusLabel).center().left().padRight(pad).padBottom(pad * 2f);
+        content.add(statusTable).center().left().padBottom(pad * 2f).row();
+
+        // Instance
+        Array<String> slaveList = getSlaveBeans();
 
         slaveSelect = new OwnSelectBox<>(skin);
         slaveSelect.setWidth(tw * 4f);
@@ -81,13 +104,20 @@ public class SlaveConfigWindow extends GenericDialog {
             if (event instanceof ChangeEvent) {
                 String newSlave = slaveSelect.getSelected();
                 pullParameters(newSlave);
+                updateSlaveStatusText(newSlave);
                 return true;
             }
             return false;
         });
         OwnLabel slaveLabel = new OwnLabel(I18n.txt("gui.slave.config.instance") + ":", skin);
-        content.add(slaveLabel).center().left().padRight(pad).padBottom(pad * 2f);
-        content.add(slaveSelect).center().left().padBottom(pad * 2f).row();
+        content.add(slaveLabel).center().left().padRight(pad).padBottom(pad);
+        content.add(slaveSelect).center().left().padBottom(pad).row();
+
+        // Slave status label
+        slaveStatusLabel = new OwnLabel("", skin);
+        content.add(slaveStatusLabel).colspan(2).center().padBottom(pad * 2f).row();
+        if (slaves.size() > 0)
+            updateSlaveStatusText(slaves.get(0));
 
         // Yaw
         yaw = new OwnTextField("", skin, angleVal);
@@ -182,13 +212,58 @@ public class SlaveConfigWindow extends GenericDialog {
                 logStr += "fov=" + val + ";";
                 pushParameter(slave, "fov", fov.getText());
             }
+            logger.info("New configuration sent to slave successfully: " + logStr);
+        } else {
+            logger.warn("Slave is down, no configuration sent: " + slave);
         }
 
-        logger.info("New configuration sent to slave successfully: " + logStr);
+    }
+
+    private synchronized void updateSlaveStatusText(boolean connected) {
+        if (connected) {
+            slaveStatusLabel.setText("Slave is connected");
+            slaveStatusLabel.setColor(Color.GREEN);
+        } else {
+            slaveStatusLabel.setText("Slave is down");
+            slaveStatusLabel.setColor(Color.RED);
+        }
+    }
+    private synchronized void updateSlaveStatusText(String newSlave) {
+        List<String> slaves = MasterManager.instance.getSlaves();
+        int idx = slaves.indexOf(newSlave);
+        updateSlaveStatusText(MasterManager.instance.isSlaveConnected(idx));
+    }
+
+    private Array<String> getSlaveBeans() {
+        List<String> slaves = MasterManager.instance.getSlaves();
+        Array<String> slaveList = new Array<>();
+        for (java.lang.String slave : slaves) {
+            slaveList.add(slave);
+        }
+        return slaveList;
     }
 
     @Override
     protected void cancel() {
 
+    }
+
+    @Override
+    public void notify(Events event, Object... data) {
+        switch (event) {
+        case SLAVE_CONNECTION_EVENT:
+            int idx = (Integer) data[0];
+            String slaveURL = (String) data[1];
+            boolean status = (Boolean) data[2];
+            if (slaveStatuses != null && slaveStatuses.length > idx && idx >= 0) {
+                slaveStatuses[idx].setColor(status ? Color.GREEN : Color.RED);
+            }
+            if(slaveSelect.getSelectedIndex() == idx){
+                updateSlaveStatusText(status);
+            }
+            break;
+        default:
+            break;
+        }
     }
 }

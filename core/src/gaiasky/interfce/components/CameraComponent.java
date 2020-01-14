@@ -33,7 +33,7 @@ public class CameraComponent extends GuiComponent implements IObserver {
     protected SelectBox<CameraComboBoxBean> cameraMode;
     protected OwnSlider fieldOfView, cameraSpeed, turnSpeed, rotateSpeed;
     protected CheckBox focusLock, orientationLock, cinematic;
-    protected OwnTextIconButton button3d, buttonDome, buttonCubemap, buttonAnaglyph, button3dtv, buttonVR, buttonCrosseye;
+    protected OwnTextIconButton button3d, buttonDome, buttonCubemap, buttonMaster, buttonAnaglyph, button3dtv, buttonVR, buttonCrosseye;
     protected boolean fovFlag = true;
     private boolean fieldLock = false;
 
@@ -145,9 +145,29 @@ public class CameraComponent extends GuiComponent implements IObserver {
             return false;
         });
 
+        if(GlobalConf.program.isMaster()) {
+            Image iconMaster = new Image(skin.getDrawable("iconic-link-intact"));
+            buttonMaster = new OwnTextIconButton("", iconMaster, skin, "default");
+            buttonMaster.setProgrammaticChangeEvents(false);
+            buttonMaster.setSize(25f * GlobalConf.UI_SCALE_FACTOR, 26f * GlobalConf.UI_SCALE_FACTOR);
+            String hkmaster = KeyBindings.instance.getStringKeys("action.slave.configure");
+            buttonMaster.addListener(new OwnTextHotkeyTooltip(TextUtils.capitalise(I18n.txt("element.slave.config")), hkmaster, skin));
+            buttonMaster.setName("master");
+            buttonMaster.addListener(event -> {
+                if (event instanceof ChangeEvent) {
+                    // Enable/disable
+                    EventManager.instance.post(Events.SHOW_SLAVE_CONFIG_ACTION);
+                    return true;
+                }
+                return false;
+            });
+        }
+
         buttonList.add(button3d);
         buttonList.add(buttonDome);
         buttonList.add(buttonCubemap);
+        if(GlobalConf.program.isMaster())
+            buttonList.add(buttonMaster);
 
         Label fovLabel = new Label(I18n.txt("gui.camera.fov"), skin, "default");
         fieldOfView = new OwnSlider(Constants.MIN_FOV, Constants.MAX_FOV, Constants.SLIDER_STEP, false, skin);
@@ -283,6 +303,8 @@ public class CameraComponent extends GuiComponent implements IObserver {
         buttonGroup.addActor(button3d);
         buttonGroup.addActor(buttonDome);
         buttonGroup.addActor(buttonCubemap);
+        if(GlobalConf.program.isMaster())
+            buttonGroup.addActor(buttonMaster);
 
         HorizontalGroup fovGroup = new HorizontalGroup();
         fovGroup.space(space3);

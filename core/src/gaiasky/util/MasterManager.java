@@ -80,6 +80,8 @@ public class MasterManager implements IObserver {
      * </ul>
      */
     private byte[] slaveStates;
+    /** Slave connection attempt flags **/
+    private byte[] slaveFlags;
     /** Last ping times for each slave **/
     private long[] slavePingTimes;
 
@@ -97,9 +99,11 @@ public class MasterManager implements IObserver {
         slaves = GlobalConf.program.NET_MASTER_SLAVES;
         if (slaves != null && slaves.size() > 0) {
             slaveStates = new byte[slaves.size()];
+            slaveFlags = new byte[slaves.size()];
             slavePingTimes = new long[slaves.size()];
             for (int i = 0; i < slaveStates.length; i++) {
                 slaveStates[i] = 0;
+                slaveFlags[i] = 0;
                 slavePingTimes[i] = 0l;
             }
         }
@@ -137,7 +141,7 @@ public class MasterManager implements IObserver {
         boolean slaveOffline = false;
         int i = 0;
         for (String slave : slaves) {
-            if (slaveStates[i] == 0) {
+            if (slaveStates[i] == 0 || slaveFlags[i] == 1) {
                 HttpRequest req = HttpRequest.newBuilder().uri(URI.create(slave + "setCameraStateAndTime?arg0=" + spos + "&arg1=" + sdir + "&arg2=" + sup + "&arg3=" + stime)).GET().
                         build();
 
@@ -146,18 +150,20 @@ public class MasterManager implements IObserver {
                 }catch(Exception e){
                     logger.error(e);
                 }
-                i++;
+                if(slaveFlags[i] == 1)
+                    slaveFlags[i] = 0;
             } else {
-                slaveOffline = true;
+                slaveOffline = slaveStates[i] == -1;
             }
+            i++;
         }
 
         // Retry connections after RECONNECT_TIME_MS milliseconds
         if (slaveOffline) {
             long now = System.currentTimeMillis();
-            for (i = 0; i < slaveStates.length; i++) {
+            for (i = 0; i < slaveFlags.length; i++) {
                 if (slaveStates[i] < 0 && now - slavePingTimes[i] > RECONNECT_TIME_MS) {
-                    slaveStates[i] = 0;
+                    slaveFlags[i] = 1;
                 }
             }
 
@@ -361,7 +367,7 @@ public class MasterManager implements IObserver {
                 markSlaveOffline(idx);
                 logger.error("Connection failed for slave " + idx + " (" + slaves.get(idx) + ")");
             } else {
-
+                makeSlaveOnline(idx);
             }
             return HttpResponse.BodySubscribers.discarding();
         }
@@ -369,7 +375,19 @@ public class MasterManager implements IObserver {
     }
 
     private void markSlaveOffline(int index) {
+        slaveEvent(index, -1);
         slaveStates[index] = -1;
         slavePingTimes[index] = System.currentTimeMillis();
+    }
+
+    private void makeSlaveOnline(int index){
+        slaveEvent(index, 0);
+        slaveStates[index] = 0;
+    }
+
+    private void slaveEvent(int idx, int newState){
+        if(slaveStates[idx] != newState){
+            EventManager.instance.post(Events.SLAVE_CONNECTION_EVENT, idx, slaves.get(idx), newState >= 0);
+        }
     }
 }

@@ -69,8 +69,11 @@ public class InitialGui extends AbstractGui {
             else if (vrStatus.equals(VRStatus.ERROR_RENDERMODEL))
                 GaiaSky.postRunnable(() -> GuiUtils.addNoVRDataExit(skin, ui));
 
+        } else if(GlobalConf.program.isSlave()){
+            // If slave, data load can start
+            EventManager.instance.post(Events.LOAD_DATA_CMD);
         } else {
-
+            // Otherwise, check for updates, etc.
             DatasetsWidget dw = new DatasetsWidget(skin, GlobalConf.ASSETS_LOC);
             Array<FileHandle> catalogFiles = dw.buildCatalogFiles();
 
