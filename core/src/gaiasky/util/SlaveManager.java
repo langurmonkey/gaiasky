@@ -5,6 +5,7 @@
 
 package gaiasky.util;
 
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.assets.loaders.TextureLoader.TextureParameter;
 import com.badlogic.gdx.graphics.Pixmap;
@@ -54,6 +55,8 @@ public class SlaveManager {
     public static void load(AssetManager manager) {
         if (projectionActive()) {
             instance.loadAssets(manager);
+            // Mute cursor
+            Gdx.graphics.setCursor(GlobalResources.emptyCursor);
         }
     }
 

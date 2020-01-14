@@ -251,7 +251,6 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
         this.renderProcess = runnableInitialGui;
         this.noScripting = noScriptingServer;
 
-
     }
 
     @Override
@@ -368,7 +367,7 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
         sgr = SceneGraphRenderer.instance;
 
         // Initialise scripting gateway server
-        if(!noScripting)
+        if (!noScripting)
             ScriptingServer.initialize();
 
         // Tell the asset manager to load all the assets
@@ -973,11 +972,11 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
         } else {
             if (!initialized) {
                 resizeImmediate(graphics.getWidth(), graphics.getHeight(), true, true, true);
-            } else {
-                resizeWidth = graphics.getWidth();
-                resizeHeight = graphics.getHeight();
-                lastResizeTime = System.currentTimeMillis();
             }
+            resizeWidth = graphics.getWidth();
+            resizeHeight = graphics.getHeight();
+            lastResizeTime = System.currentTimeMillis();
+
         }
 
         renderBatch.getProjectionMatrix().setToOrtho2D(0, 0, graphics.getWidth(), graphics.getHeight());

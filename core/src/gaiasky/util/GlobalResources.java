@@ -62,7 +62,7 @@ public class GlobalResources {
     /** Sprite batch using int indices **/
     public static ExtSpriteBatch extSpriteBatch;
     /** Cursors **/
-    public static Cursor linkCursor, resizeXCursor, resizeYCursor;
+    public static Cursor linkCursor, resizeXCursor, resizeYCursor, emptyCursor;
     /** The global skin **/
     public static Skin skin;
 
@@ -112,6 +112,7 @@ public class GlobalResources {
             resizeXCursor = Gdx.graphics.newCursor(new Pixmap(Gdx.files.internal("img/cursor-resizex.png")), 8, 8);
             resizeYCursor = Gdx.graphics.newCursor(new Pixmap(Gdx.files.internal("img/cursor-resizey.png")), 8, 8);
         }
+        emptyCursor = Gdx.graphics.newCursor(new Pixmap(Gdx.files.internal("img/cursor-empty.png")), 0, 5);
 
     }
 
