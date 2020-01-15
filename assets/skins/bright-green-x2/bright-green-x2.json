@@ -284,6 +284,9 @@
     }
   },
   "gaiasky.util.scene2d.OwnTextIconButton$TextIconButtonStyle": {
+    "edit": {
+      "imageUp": "edit-icon"
+    },
     "seam": {
       "imageUp": "seam"
     },

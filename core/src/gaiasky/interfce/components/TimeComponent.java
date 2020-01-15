@@ -5,7 +5,6 @@
 
 package gaiasky.interfce.components;
 
-import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener.ChangeEvent;
@@ -22,10 +21,7 @@ import gaiasky.util.TextUtils;
 import gaiasky.util.format.DateFormatFactory;
 import gaiasky.util.format.DateFormatFactory.DateType;
 import gaiasky.util.format.IDateFormat;
-import gaiasky.util.scene2d.OwnImageButton;
-import gaiasky.util.scene2d.OwnLabel;
-import gaiasky.util.scene2d.OwnTextHotkeyTooltip;
-import gaiasky.util.scene2d.OwnTextTooltip;
+import gaiasky.util.scene2d.*;
 
 import java.time.Instant;
 import java.time.ZoneOffset;
@@ -39,7 +35,7 @@ public class TimeComponent extends GuiComponent implements IObserver {
     protected OwnLabel time;
     protected ImageButton plus, minus;
     protected Label timeWarp;
-    protected ImageButton dateEdit;
+    protected OwnTextIconButton dateEdit;
     protected DateDialog dateDialog;
 
     public TimeComponent(Skin skin, Stage stage) {
@@ -63,7 +59,7 @@ public class TimeComponent extends GuiComponent implements IObserver {
         time.setName("label time");
         time.setWidth(150f * GlobalConf.UI_SCALE_FACTOR);
 
-        dateEdit = new OwnImageButton(skin, "edit");
+        dateEdit = new OwnTextIconButton("", skin, "edit");
         dateEdit.addListener(event -> {
             if (event instanceof ChangeEvent) {
                 // Left button click
