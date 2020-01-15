@@ -28,7 +28,7 @@ public class OwnSliderPlus extends Slider {
     private boolean displayValueMapped = false;
     private String valuePrefix, valueSuffix;
     private float padX = 3f * GlobalConf.UI_SCALE_FACTOR;
-    private float padY = 2f * GlobalConf.UI_SCALE_FACTOR;
+    private float padY = 3f * GlobalConf.UI_SCALE_FACTOR;
 
     public OwnSliderPlus(String title, float min, float max, float stepSize, float mapMin, float mapMax, Skin skin) {
         super(min, max, stepSize, false, skin, "big-horizontal");
@@ -168,7 +168,7 @@ public class OwnSliderPlus extends Slider {
             title.draw(batch, parentAlpha);
         }
         if (value != null) {
-            value.setPosition(getX() + getPrefWidth() - (value.getPrefWidth() + padX), getY() + padY);
+            value.setPosition(getX() + getPrefWidth() - (value.getPrefWidth() + padX * 2f), getY() + padY);
             value.draw(batch, parentAlpha);
         }
     }
