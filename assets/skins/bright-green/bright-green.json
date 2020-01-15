@@ -502,7 +502,7 @@
       "imageChecked" : "highlight-s-on"
     },
     "prefs-s": {
-      "imageUp": "prefs-s-icon",
+      "imageUp": "prefs-s-icon"
     },
     "link": {
       "imageUp": "link",
@@ -548,7 +548,7 @@
       "listStyle": {
         "font": "ui-11",
         "fontColorSelected": "black",
-        "fontColorUnselected": "grey",
+        "fontColorUnselected": "black",
         "selection": "default-select-selection"
       }
     }
@@ -584,6 +584,11 @@
       "background": "default-slider",
       "knob": "default-slider-knob",
       "knobBefore": "default-slider-knob-before"
+    },
+    "big-horizontal": {
+      "background": "big-slider",
+      "knob": "big-slider-knob",
+      "knobBefore": "big-slider-knob-before"
     },
     "sc-engine": {
       "background": "sc-engine-power-bg",

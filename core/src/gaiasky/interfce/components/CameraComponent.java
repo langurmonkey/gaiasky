@@ -20,7 +20,6 @@ import gaiasky.util.*;
 import gaiasky.util.format.INumberFormat;
 import gaiasky.util.format.NumberFormatFactory;
 import gaiasky.util.gdx.contrib.postprocess.effects.CubemapProjections.CubemapProjection;
-import gaiasky.util.math.MathUtilsd;
 import gaiasky.util.scene2d.*;
 
 import java.util.ArrayList;
@@ -28,10 +27,10 @@ import java.util.List;
 
 public class CameraComponent extends GuiComponent implements IObserver {
 
-    protected OwnLabel fov, speed, turn, rotate, date;
+    protected OwnLabel date;
     protected SelectBox<String> cameraSpeedLimit;
     protected SelectBox<CameraComboBoxBean> cameraMode;
-    protected OwnSlider fieldOfView, cameraSpeed, turnSpeed, rotateSpeed;
+    protected OwnSliderPlus fieldOfView, cameraSpeed, turnSpeed, rotateSpeed;
     protected CheckBox focusLock, orientationLock, cinematic;
     protected OwnTextIconButton button3d, buttonDome, buttonCubemap, buttonMaster, buttonAnaglyph, button3dtv, buttonVR, buttonCrosseye;
     protected boolean fovFlag = true;
@@ -47,7 +46,7 @@ public class CameraComponent extends GuiComponent implements IObserver {
 
     @Override
     public void initialize() {
-        float width = 140 * GlobalConf.UI_SCALE_FACTOR;
+        float width = 180 * GlobalConf.UI_SCALE_FACTOR;
 
         cinematic = new OwnCheckBox(I18n.txt("gui.camera.cinematic"), skin, pad);
         cinematic.setName("cinematic camera");
@@ -169,22 +168,20 @@ public class CameraComponent extends GuiComponent implements IObserver {
         if(GlobalConf.program.isMaster())
             buttonList.add(buttonMaster);
 
-        Label fovLabel = new Label(I18n.txt("gui.camera.fov"), skin, "default");
-        fieldOfView = new OwnSlider(Constants.MIN_FOV, Constants.MAX_FOV, Constants.SLIDER_STEP, false, skin);
+        fieldOfView = new OwnSliderPlus(I18n.txt("gui.camera.fov"), Constants.MIN_FOV, Constants.MAX_FOV, Constants.SLIDER_STEP, false, skin);
+        fieldOfView.setValueSuffix("°");
         fieldOfView.setName("field of view");
         fieldOfView.setWidth(width);
         fieldOfView.setValue(GlobalConf.scene.CAMERA_FOV);
         fieldOfView.addListener(event -> {
             if (fovFlag && event instanceof ChangeEvent && !SlaveManager.projectionActive()) {
-                float value = MathUtilsd.clamp(fieldOfView.getValue(), Constants.MIN_FOV, Constants.MAX_FOV);
+                float value = fieldOfView.getMappedValue();
                 EventManager.instance.post(Events.FOV_CHANGED_CMD, value);
-                fov.setText((int) value + "°");
                 return true;
             }
             return false;
         });
 
-        fov = new OwnLabel(nf.format(GlobalConf.scene.CAMERA_FOV) + "°", skin, "default");
 
         /** CAMERA SPEED LIMIT **/
         String[] speedLimits = new String[19];
@@ -223,52 +220,43 @@ public class CameraComponent extends GuiComponent implements IObserver {
         cameraSpeedLimit.setSelectedIndex(GlobalConf.scene.CAMERA_SPEED_LIMIT_IDX);
 
         /** CAMERA SPEED **/
-        cameraSpeed = new OwnSlider(Constants.MIN_SLIDER, Constants.MAX_SLIDER, Constants.SLIDER_STEP, Constants.MIN_CAM_SPEED, Constants.MAX_CAM_SPEED, skin);
+        cameraSpeed = new OwnSliderPlus(I18n.txt("gui.camera.speed"), Constants.MIN_SLIDER, Constants.MAX_SLIDER, Constants.SLIDER_STEP, Constants.MIN_CAM_SPEED, Constants.MAX_CAM_SPEED, skin);
         cameraSpeed.setName("camera speed");
         cameraSpeed.setWidth(width);
         cameraSpeed.setMappedValue(GlobalConf.scene.CAMERA_SPEED);
         cameraSpeed.addListener(event -> {
             if (!fieldLock && event instanceof ChangeEvent) {
                 EventManager.instance.post(Events.CAMERA_SPEED_CMD, cameraSpeed.getMappedValue(), true);
-                speed.setText(Integer.toString((int) cameraSpeed.getValue()));
                 return true;
             }
             return false;
         });
 
-        speed = new OwnLabel(Integer.toString((int) cameraSpeed.getValue()), skin, "default");
-
         /** ROTATION SPEED **/
-        rotateSpeed = new OwnSlider(Constants.MIN_SLIDER, Constants.MAX_SLIDER, Constants.SLIDER_STEP, Constants.MIN_ROT_SPEED, Constants.MAX_ROT_SPEED, skin);
+        rotateSpeed = new OwnSliderPlus(I18n.txt("gui.rotation.speed"), Constants.MIN_SLIDER, Constants.MAX_SLIDER, Constants.SLIDER_STEP, Constants.MIN_ROT_SPEED, Constants.MAX_ROT_SPEED, skin);
         rotateSpeed.setName("rotate speed");
         rotateSpeed.setWidth(width);
         rotateSpeed.setMappedValue(GlobalConf.scene.ROTATION_SPEED);
         rotateSpeed.addListener(event -> {
             if (!fieldLock && event instanceof ChangeEvent) {
                 EventManager.instance.post(Events.ROTATION_SPEED_CMD, rotateSpeed.getMappedValue(), true);
-                rotate.setText(Integer.toString((int) rotateSpeed.getValue()));
                 return true;
             }
             return false;
         });
 
-        rotate = new OwnLabel(Integer.toString((int) MathUtilsd.lint(GlobalConf.scene.ROTATION_SPEED, Constants.MIN_ROT_SPEED, Constants.MAX_ROT_SPEED, Constants.MIN_SLIDER, Constants.MAX_SLIDER)), skin, "default");
-
         /** TURNING SPEED **/
-        turnSpeed = new OwnSlider(Constants.MIN_SLIDER, Constants.MAX_SLIDER, Constants.SLIDER_STEP, Constants.MIN_TURN_SPEED, Constants.MAX_TURN_SPEED, skin);
+        turnSpeed = new OwnSliderPlus(I18n.txt("gui.turn.speed"), Constants.MIN_SLIDER, Constants.MAX_SLIDER, Constants.SLIDER_STEP, Constants.MIN_TURN_SPEED, Constants.MAX_TURN_SPEED, skin);
         turnSpeed.setName("turn speed");
         turnSpeed.setWidth(width);
         turnSpeed.setMappedValue(GlobalConf.scene.TURNING_SPEED);
         turnSpeed.addListener(event -> {
             if (!fieldLock && event instanceof ChangeEvent) {
                 EventManager.instance.post(Events.TURNING_SPEED_CMD, turnSpeed.getMappedValue(), true);
-                turn.setText(Integer.toString((int) turnSpeed.getValue()));
                 return true;
             }
             return false;
         });
-
-        turn = new OwnLabel(Integer.toString((int) MathUtilsd.lint(GlobalConf.scene.TURNING_SPEED, Constants.MIN_TURN_SPEED, Constants.MAX_TURN_SPEED, Constants.MIN_SLIDER, Constants.MAX_SLIDER)), skin, "default");
 
         /** FOCUS_MODE lock **/
         focusLock = new CheckBox(" " + I18n.txt("gui.camera.lock"), skin);
@@ -306,35 +294,15 @@ public class CameraComponent extends GuiComponent implements IObserver {
         if(GlobalConf.program.isMaster())
             buttonGroup.addActor(buttonMaster);
 
-        HorizontalGroup fovGroup = new HorizontalGroup();
-        fovGroup.space(space3);
-        fovGroup.addActor(fieldOfView);
-        fovGroup.addActor(fov);
-
-        HorizontalGroup speedGroup = new HorizontalGroup();
-        speedGroup.space(space3);
-        speedGroup.addActor(cameraSpeed);
-        speedGroup.addActor(speed);
-
-        HorizontalGroup rotateGroup = new HorizontalGroup();
-        rotateGroup.space(space3);
-        rotateGroup.addActor(rotateSpeed);
-        rotateGroup.addActor(rotate);
-
-        HorizontalGroup turnGroup = new HorizontalGroup();
-        turnGroup.space(space3);
-        turnGroup.addActor(turnSpeed);
-        turnGroup.addActor(turn);
-
         VerticalGroup cameraGroup = new VerticalGroup().align(Align.left).columnAlign(Align.left);
-        cameraGroup.space(space4);
+        cameraGroup.space(space6);
 
         cameraGroup.addActor(vgroup(modeLabel, cameraMode, space2));
         cameraGroup.addActor(vgroup(new Label(I18n.txt("gui.camera.speedlimit"), skin, "default"), cameraSpeedLimit, space2));
-        cameraGroup.addActor(vgroup(fovLabel, fovGroup, space2));
-        cameraGroup.addActor(vgroup(new Label(I18n.txt("gui.camera.speed"), skin, "default"), speedGroup, space2));
-        cameraGroup.addActor(vgroup(new Label(I18n.txt("gui.rotation.speed"), skin, "default"), rotateGroup, space2));
-        cameraGroup.addActor(vgroup(new Label(I18n.txt("gui.turn.speed"), skin, "default"), turnGroup, space2));
+        cameraGroup.addActor(fieldOfView);
+        cameraGroup.addActor(cameraSpeed);
+        cameraGroup.addActor(rotateSpeed);
+        cameraGroup.addActor(turnSpeed);
         cameraGroup.addActor(cinematic);
         cameraGroup.addActor(focusLock);
         cameraGroup.addActor(orientationLock);
@@ -384,7 +352,6 @@ public class CameraComponent extends GuiComponent implements IObserver {
                 fieldLock = true;
                 rotateSpeed.setMappedValue(value);
                 fieldLock = false;
-                rotate.setText(Integer.toString((int) value));
             }
             break;
         case CAMERA_SPEED_CMD:
@@ -394,7 +361,6 @@ public class CameraComponent extends GuiComponent implements IObserver {
                 fieldLock = true;
                 cameraSpeed.setMappedValue(value);
                 fieldLock = false;
-                speed.setText(Integer.toString((int) value));
             }
             break;
 
@@ -405,7 +371,6 @@ public class CameraComponent extends GuiComponent implements IObserver {
                 fieldLock = true;
                 turnSpeed.setMappedValue(value);
                 fieldLock = false;
-                turn.setText(Integer.toString((int) value));
             }
             break;
         case SPEED_LIMIT_CMD:
@@ -440,7 +405,6 @@ public class CameraComponent extends GuiComponent implements IObserver {
         case FOV_CHANGE_NOTIFICATION:
             fovFlag = false;
             fieldOfView.setValue(GlobalConf.scene.CAMERA_FOV);
-            fov.setText(nf.format(GlobalConf.scene.CAMERA_FOV) + "°");
             fovFlag = true;
             break;
         case CUBEMAP_CMD:

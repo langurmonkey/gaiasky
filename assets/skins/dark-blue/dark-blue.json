@@ -586,6 +586,11 @@
       "knob": "default-slider-knob",
       "knobBefore": "default-slider-knob-before"
     },
+    "big-horizontal": {
+      "background": "big-slider",
+      "knob": "big-slider-knob",
+      "knobBefore": "big-slider-knob-before"
+    },
     "sc-engine": {
       "background": "sc-engine-power-bg",
       "knob": "sc-engine-power-knob",
