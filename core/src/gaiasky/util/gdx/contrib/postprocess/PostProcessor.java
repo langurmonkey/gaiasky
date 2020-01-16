@@ -46,6 +46,7 @@ import gaiasky.util.gdx.contrib.utils.ItemsManager;
 public final class PostProcessor implements Disposable {
     /** Enable pipeline state queries: beware the pipeline can stall! */
     public static boolean EnableQueryStates = false;
+    public static PostProcessor currentPostProcessor;
 
     private static PipelineState pipelineState = null;
     private static Format fbFormat;
@@ -57,8 +58,8 @@ public final class PostProcessor implements Disposable {
     private final Color clearColor = Color.CLEAR;
     private int clearBits = GL20.GL_COLOR_BUFFER_BIT;
     private float clearDepth = 1f;
-    private static Rectangle viewport = new Rectangle();
-    private static boolean hasViewport = false;
+    private Rectangle viewport = new Rectangle();
+    private boolean hasViewport = false;
 
     private boolean enabled;
     private boolean capturing;
@@ -169,9 +170,9 @@ public final class PostProcessor implements Disposable {
      * restoreViewport static method.
      */
     public void setViewport(Rectangle viewport) {
-        PostProcessor.hasViewport = (viewport != null);
+        hasViewport = (viewport != null);
         if (hasViewport) {
-            PostProcessor.viewport.set(viewport);
+            viewport.set(viewport);
         }
     }
 
@@ -189,9 +190,9 @@ public final class PostProcessor implements Disposable {
             for (int i = 0; i < buffers.size; i++) {
                 buffers.get(i).dispose();
             }
-
             buffers.clear();
         } else {
+            composite.dispose();
             buffers.removeValue(composite, true);
         }
 
@@ -401,6 +402,7 @@ public final class PostProcessor implements Disposable {
 
         int count = items.size;
         if (count > 0) {
+            currentPostProcessor = this;
 
             Gdx.gl.glDisable(GL20.GL_CULL_FACE);
             Gdx.gl.glDisable(GL20.GL_DEPTH_TEST);
@@ -419,6 +421,8 @@ public final class PostProcessor implements Disposable {
                 // complete
                 composite.end();
             }
+
+            currentPostProcessor = null;
 
             if (listener != null && dest == null) {
                 listener.beforeRenderToScreen();
@@ -451,7 +455,7 @@ public final class PostProcessor implements Disposable {
     }
 
     /** Restores the previously set viewport if one was specified earlier and the destination buffer is the screen */
-    protected static void restoreViewport(FrameBuffer dest) {
+    protected void restoreViewport(FrameBuffer dest) {
         if (hasViewport && dest == null) {
             Gdx.gl.glViewport((int) viewport.x, (int) viewport.y, (int) viewport.width, (int) viewport.height);
         }
