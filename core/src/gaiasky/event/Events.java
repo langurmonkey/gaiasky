@@ -530,9 +530,13 @@ public enum Events {
     KEY_DOWN,
     KEY_UP,
     /**
-     * Set label size. Contains the new label size [0.2, 5]
+     * Set label size. Contains the new label size and a boolean (interface)
      */
     LABEL_SIZE_CMD,
+    /**
+     * Line width factor. Contains the new factor and a boolean (interface)
+     */
+    LINE_WIDTH_CMD,
     /**
      * Lands at a certain location on a planet object
      **/

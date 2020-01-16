@@ -193,9 +193,4 @@ public class StarPointRenderSystem extends ImmediateRenderSystem implements IObs
             break;
         }
     }
-
-    @Override
-    public void resize(int w, int h) {
-
-    }
 }

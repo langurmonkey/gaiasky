@@ -555,6 +555,27 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
         }
     }
 
+    @Override
+    public void setLabelSizeFactor(float factor) {
+        if(checkNum(factor, Constants.MIN_LABEL_SIZE, Constants.MAX_LABEL_SIZE, "labelSizeFactor")){
+            GaiaSky.postRunnable(() -> em.post(Events.LABEL_SIZE_CMD, factor, false));
+        }
+    }
+    public void setLabelSizeFactor(int factor) {
+        setLabelSizeFactor((float) factor);
+    }
+
+    @Override
+    public void setLineWidthFactor(final float factor) {
+        if(checkNum(factor, Constants.MIN_LINE_WIDTH, Constants.MAX_LINE_WIDTH, "lineWidthFactor")){
+            GaiaSky.postRunnable(() -> em.post(Events.LINE_WIDTH_CMD, factor, false));
+        }
+    }
+
+    public void setLineWidthFactor(int factor){
+        setLineWidthFactor((float) factor);
+    }
+
     private boolean checkComponentTypeKey(String key) {
         ComponentTypes.ComponentType[] cts = ComponentTypes.ComponentType.values();
         boolean keyFound = false;

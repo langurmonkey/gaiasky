@@ -18,6 +18,7 @@ import gaiasky.render.SceneGraphRenderer;
 import gaiasky.scenegraph.Particle;
 import gaiasky.scenegraph.SceneGraphNode.RenderGroup;
 import gaiasky.scenegraph.camera.ICamera;
+import gaiasky.util.GlobalConf;
 import gaiasky.util.gdx.mesh.IntMesh;
 import gaiasky.util.gdx.shader.ExtShaderProgram;
 import org.lwjgl.opengl.GL30;
@@ -105,7 +106,7 @@ public class LineRenderSystem extends ImmediateRenderSystem {
                 renderable.render(this, camera, getAlpha(renderable));
             }
 
-            Gdx.gl.glLineWidth(renderable.getLineWidth() * 1.5f);
+            Gdx.gl.glLineWidth(renderable.getLineWidth() * 1.5f * GlobalConf.scene.LINE_WIDTH_FACTOR);
 
             for (int md = 0; md < meshIdx; md++) {
                 MeshData meshd = meshes.get(md);

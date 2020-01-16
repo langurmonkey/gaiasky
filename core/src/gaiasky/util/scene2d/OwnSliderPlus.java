@@ -21,7 +21,7 @@ public class OwnSliderPlus extends Slider {
     private static INumberFormat nf = NumberFormatFactory.getFormatter("####0.#");
 
     private float ownwidth = 0f, ownheight = 0f;
-    private float mapMin, mapMax, min, max;
+    private float mapMin, mapMax;
     private boolean map = false;
     private Skin skin;
     private OwnLabel title, value;
@@ -33,29 +33,29 @@ public class OwnSliderPlus extends Slider {
     public OwnSliderPlus(String title, float min, float max, float stepSize, float mapMin, float mapMax, Skin skin) {
         super(min, max, stepSize, false, skin, "big-horizontal");
         this.skin = skin;
-        setUp(title, min, max, mapMin, mapMax);
+        setUp(title, mapMin, mapMax);
     }
 
     public OwnSliderPlus(String title, float min, float max, float stepSize, Skin skin) {
         super(min, max, stepSize, false, skin, "big-horizontal");
         this.skin = skin;
-        setUp(title, min, max, min, max);
+        setUp(title, min, max);
     }
 
     public OwnSliderPlus(String title, float min, float max, float stepSize, boolean vertical, Skin skin) {
         super(min, max, stepSize, vertical, skin, "big-horizontal");
         this.skin = skin;
-        setUp(title, min, max, min, max);
+        setUp(title, min, max);
     }
 
     public OwnSliderPlus(String title, float min, float max, float stepSize, boolean vertical, Skin skin, String styleName) {
         super(min, max, stepSize, vertical, skin, styleName);
         this.skin = skin;
-        setUp(title, min, max, min, max);
+        setUp(title, min, max);
     }
 
-    public void setUp(String title, float min, float max, float mapMin, float mapMax) {
-        setMapValues(min, max, mapMin, mapMax);
+    public void setUp(String title, float mapMin, float mapMax) {
+        setMapValues(mapMin, mapMax);
 
         if (title != null && !title.isEmpty()) {
             this.title = new OwnLabel(title, skin);
@@ -77,12 +77,10 @@ public class OwnSliderPlus extends Slider {
         this.displayValueMapped = displayValueMapped;
     }
 
-    public void setMapValues(float min, float max, float mapMin, float mapMax) {
-        this.min = min;
-        this.max = max;
+    public void setMapValues(float mapMin, float mapMax) {
         this.mapMin = mapMin;
         this.mapMax = mapMax;
-        this.map = mapMin != min && mapMax != max;
+        this.map = mapMin != getMinValue() && mapMax != getMaxValue();
     }
 
     public void removeMapValues() {

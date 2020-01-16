@@ -150,6 +150,8 @@ public class Constants {
     public static final float MAX_SLIDER = 100;
     /** Default step value for sliders **/
     public static final float SLIDER_STEP = 1f;
+    /** Default step value for sliders (small) **/
+    public static final float SLIDER_STEP_SMALL = 0.1f;
 
     /** Max motion blur value **/
     public static final int MAX_MOTION_BLUR = 85;
@@ -234,8 +236,11 @@ public class Constants {
     public static final float MIN_EXPOSURE = 0.0f;
     public static final float MAX_EXPOSURE = 10.0f;
 
-    public static final float MIN_LABEL_SIZE = 0.5f;
+    public static final float MIN_LABEL_SIZE = 0.1f;
     public static final float MAX_LABEL_SIZE = 2.3f;
+
+    public static final float MIN_LINE_WIDTH = 0f;
+    public static final float MAX_LINE_WIDTH = 5f;
 
     public final static float MIN_ELEVATION_MULT = 0f;
     public final static float MAX_ELEVATION_MULT = 15f;

@@ -7,6 +7,7 @@ package gaiasky.script;
 
 import gaiasky.scenegraph.IFocus;
 import gaiasky.scenegraph.SceneGraphNode;
+import gaiasky.util.Constants;
 import gaiasky.util.gdx.contrib.postprocess.effects.CubemapProjections;
 
 import java.util.List;
@@ -558,16 +559,30 @@ public interface IScriptingInterface {
     void setVisibility(String key, boolean visible);
 
     /**
-     * Sets the number factor of proper motion vectors that are visible. In [1..100].
+     * Sets the label size factor. The label size will be multiplied by this.
      *
-     * @param factor Factor in [1..100]
+     * @param factor Factor in {@link Constants#MIN_LABEL_SIZE} and {@link Constants#MAX_LABEL_SIZE}
+     */
+    void setLabelSizeFactor(float factor);
+
+    /**
+     * Sets the line width factor. The line width will be multiplied by this.
+     *
+     * @param factor Factor in {@link Constants#MIN_LINE_WIDTH} and {@link Constants#MAX_LINE_WIDTH}
+     */
+    void setLineWidthFactor(float factor);
+
+    /**
+     * Sets the number factor of proper motion vectors that are visible. In [1,100].
+     *
+     * @param factor Factor in [1,100]
      */
     void setProperMotionsNumberFactor(float factor);
 
     /**
-     * Sets the length of the proper motion vectors, in [500..30000].
+     * Sets the length of the proper motion vectors, in [500,30000].
      *
-     * @param factor Factor in [500.30000]
+     * @param factor Factor in [500,30000]
      */
     void setProperMotionsLengthFactor(float factor);
 
