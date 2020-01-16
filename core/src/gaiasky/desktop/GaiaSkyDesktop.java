@@ -412,7 +412,10 @@ public class GaiaSkyDesktop implements IObserver {
             }
 
             // Check latest version
-            if (!userprops.containsKey("properties.version") || Integer.parseInt(userprops.getProperty("properties.version")) < internalversion) {
+            if (!userprops.containsKey("properties.version")) {
+                System.out.println("Properties file version not found, overwriting with new version (" + internalversion + ")");
+                overwrite = true;
+            } else if (Integer.parseInt(userprops.getProperty("properties.version")) < internalversion) {
                 System.out.println("Properties file version mismatch, overwriting with new version: found " + Integer.parseInt(userprops.getProperty("properties.version")) + ", required " + internalversion);
                 overwrite = true;
             }
