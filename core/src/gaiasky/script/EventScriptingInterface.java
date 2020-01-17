@@ -557,22 +557,23 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
 
     @Override
     public void setLabelSizeFactor(float factor) {
-        if(checkNum(factor, Constants.MIN_LABEL_SIZE, Constants.MAX_LABEL_SIZE, "labelSizeFactor")){
+        if (checkNum(factor, Constants.MIN_LABEL_SIZE, Constants.MAX_LABEL_SIZE, "labelSizeFactor")) {
             GaiaSky.postRunnable(() -> em.post(Events.LABEL_SIZE_CMD, factor, false));
         }
     }
+
     public void setLabelSizeFactor(int factor) {
         setLabelSizeFactor((float) factor);
     }
 
     @Override
     public void setLineWidthFactor(final float factor) {
-        if(checkNum(factor, Constants.MIN_LINE_WIDTH, Constants.MAX_LINE_WIDTH, "lineWidthFactor")){
+        if (checkNum(factor, Constants.MIN_LINE_WIDTH, Constants.MAX_LINE_WIDTH, "lineWidthFactor")) {
             GaiaSky.postRunnable(() -> em.post(Events.LINE_WIDTH_CMD, factor, false));
         }
     }
 
-    public void setLineWidthFactor(int factor){
+    public void setLineWidthFactor(int factor) {
         setLineWidthFactor((float) factor);
     }
 
@@ -2301,16 +2302,17 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
     @Override
     public boolean highlightDataset(String dsName, int colorIndex, boolean highlight) {
         float[] color = ColourUtils.getColorFromIndex(colorIndex);
-        return highlightDataset(dsName, color, highlight);
+        return highlightDataset(dsName, color[0], color[1], color[2], color[3], highlight);
     }
 
     @Override
-    public boolean highlightDataset(String dsName, float[] color, boolean highlight) {
+    public boolean highlightDataset(String dsName, float r, float g, float b, float a, boolean highlight) {
         if (checkString(dsName, "datasetName")) {
             boolean exists = CatalogManager.instance().contains(dsName);
-            if (exists)
+            if (exists) {
+                float[] color = new float[]{r, g, b, a};
                 EventManager.instance.post(Events.CATALOG_HIGHLIGHT, dsName, highlight, color, false);
-            else
+            } else
                 logger.warn("Dataset with name " + dsName + " does not exist");
             return exists;
         }

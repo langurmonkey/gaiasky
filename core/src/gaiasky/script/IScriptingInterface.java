@@ -394,7 +394,7 @@ public interface IScriptingInterface {
     /**
      * Changes the speed multiplier of the camera and its acceleration
      *
-     * @param speed The new speed, from 1 to 100
+     * @param speed The new speed, from 0 to 100
      */
     void setCameraSpeed(float speed);
 
@@ -408,7 +408,7 @@ public interface IScriptingInterface {
     /**
      * Changes the speed of the camera when it rotates around a focus.
      *
-     * @param speed The new rotation speed, from 1 to 100.
+     * @param speed The new rotation speed, from 0 to 100.
      */
     void setRotationCameraSpeed(float speed);
 
@@ -1788,11 +1788,11 @@ public interface IScriptingInterface {
     /**
      * Enables or disables the dataset highlight, using a given color
      * @param dsName The dataset name
-     * @param color The rgba color
+     * @param r Red component 
      * @param highlight State
      * @return False if the dataset could not be found
      */
-    boolean highlightDataset(String dsName, float[] color, boolean highlight);
+    boolean highlightDataset(String dsName, float r, float g, float b, float a, boolean highlight);
 
     /**
      * Sets the size increase factor of this dataset when highlighted

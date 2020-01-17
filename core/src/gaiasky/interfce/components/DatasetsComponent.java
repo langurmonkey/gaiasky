@@ -31,11 +31,13 @@ public class DatasetsComponent extends GuiComponent implements IObserver {
 
     private Map<String, WidgetGroup> groupMap;
     private Map<String, OwnImageButton[]> imageMap;
+    private Map<String, ColorPicker> colorMap;
 
     public DatasetsComponent(Skin skin, Stage stage) {
         super(skin, stage);
         groupMap = new HashMap<>();
         imageMap = new HashMap<>();
+        colorMap = new HashMap<>();
         EventManager.instance.subscribe(this, Events.CATALOG_ADD, Events.CATALOG_REMOVE, Events.CATALOG_VISIBLE, Events.CATALOG_HIGHLIGHT);
     }
 
@@ -124,6 +126,8 @@ public class DatasetsComponent extends GuiComponent implements IObserver {
         cp.setNewColorRunnable(()->{
             ci.setHlColor(cp.getPickedColor());
         });
+        colorMap.put(ci.name, cp);
+
         String name = TextUtils.capString(ci.name, 17);
         OwnLabel nameLabel = new OwnLabel(TextUtils.capString(ci.name, 17), skin, "hud-subheader");
         if(!ci.name.equals(name)){
@@ -174,6 +178,7 @@ public class DatasetsComponent extends GuiComponent implements IObserver {
                 groupMap.get(ciName).remove();
                 groupMap.remove(ciName);
                 imageMap.remove(ciName);
+                colorMap.remove(ciName);
             }
             break;
         case CATALOG_VISIBLE:
@@ -193,9 +198,16 @@ public class DatasetsComponent extends GuiComponent implements IObserver {
                  ui = (Boolean) data[3];
              if(!ui){
                  ciName = (String) data[0];
-                 boolean hl = (Boolean) data[1];
-                 OwnImageButton hig = imageMap.get(ciName)[1];
-                 hig.setCheckedNoFire(hl);
+                 float[] col = (float[]) data[2];
+                 if(colorMap.containsKey(ciName) && col != null) {
+                     colorMap.get(ciName).setPickedColor(col);
+                 }
+
+                 if(imageMap.containsKey(ciName)) {
+                     boolean hl = (Boolean) data[1];
+                     OwnImageButton hig = imageMap.get(ciName)[1];
+                     hig.setCheckedNoFire(hl);
+                 }
              }
             break;
         default:
