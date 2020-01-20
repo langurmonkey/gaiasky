@@ -1,4 +1,4 @@
-font.name=Tahoma
+font.name=Ubuntu Mono
 font.size=23
 font.bold=true
 font.italic=false
@@ -6,7 +6,7 @@ font.gamma=0.0
 font.mono=false
 
 font2.file=/home/tsagrista/.fonts/Tahoma.ttf
-font2.use=false
+font2.use=true
 
 pad.top=1
 pad.right=1
@@ -18,7 +18,7 @@ pad.advance.y=0
 glyph.native.rendering=false
 glyph.page.width=512
 glyph.page.height=256
-glyph.text=AÀÁÄÂBCDEÈÉËÊFGHIÌÍÏÎJKLMNOÒÓÔPQRSTUÙÚÜÛVWXYZÑÇ\naàáäâbcdeèéêëfghiìíîïjklmnoòóôöpqrstuùúûüvwxyzñç\n1234567890\n"!`?'.,;:()[]{}<>|/@\^$-%+=#_&~*\nθωερτψυιοπασδφγηςκλζχξωβνμ\nΘΩΕΡΤΨΥΙΟΠΑΣΔΦΓΗςΚΛΖΧΞΩΒΝΜ\n±∓×·÷√∑∫∮¬∝∞≠≈⇔↔≪≫≤≥\n°ℏÅ⊙ ☉ ☼ ☀¶ß©®£€¼½¾²³\nčžšČŽŠ
+glyph.text=AÀÁÄÂBCDEÈÉËÊFGHIÌÍÏÎJKLMNOÒÓÔPQRSTUÙÚÜÛVWXYZÑÇ\naàáäâbcdeèéêëfghiìíîïjklmnoòóôöpqrstuùúûüvwxyzñç\n1234567890\n"!`?'.,;:()[]{}<>|/@\^$-%+=#_&~*\nθωερτψυιοπασδφγηςκλζχξωβνμ\nΘΩΕΡΤΨΥΙΟΠΑΣΔΦΓΗςΚΛΖΧΞΩΒΝΜ\nАаБбВвГгДдЕеЁёЖжЗзИиЙйКкЛлМмНнОоПпРрСсТтУуФфХхЦцЧчШшЩщЪъЫыЬьЭэЮюЯя\n±∓×·÷√∑∫∮¬∝∞≠≈⇔↔≪≫≤≥\n°ℏÅ⊙ ☉ ☼ ☀¶ß©®£€¼½¾²³\nčžšČŽŠ
 
 render_type=0
 

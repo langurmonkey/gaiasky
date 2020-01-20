@@ -161,7 +161,6 @@ public class Planet extends ModelBody implements IAtmosphereRenderable, ICloudRe
             }
         }
 
-        ICamera cam = GaiaSky.instance.getICamera();
         prepareShadowEnvironment();
         mc.update(alpha * opacity);
         modelBatch.render(mc.instance, mc.env);

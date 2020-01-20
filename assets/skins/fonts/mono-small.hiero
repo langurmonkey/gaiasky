@@ -17,8 +17,8 @@ pad.advance.y=0
 
 glyph.native.rendering=false
 glyph.page.width=256
-glyph.page.height=64
-glyph.text=AÀÁÄÂBCDEÈÉËÊFGHIÌÍÏÎJKLMNOÒÓÔPQRSTUÙÚÜÛVWXYZÑÇ\naàáäâbcdeèéêëfghiìíîïjklmnoòóôöpqrstuùúûüvwxyzñç\n1234567890\n"!`?'.,;:()[]{}<>|/@\^$-%+=#_&~\nθωερτψυιοπασδφγηςκλζχξωβνμ\n±×·÷¬
+glyph.page.height=128
+glyph.text=AÀÁÄÂBCDEÈÉËÊFGHIÌÍÏÎJKLMNOÒÓÔPQRSTUÙÚÜÛVWXYZÑÇ\naàáäâbcdeèéêëfghiìíîïjklmnoòóôöpqrstuùúûüvwxyzñç\n1234567890\n"!`?'.,;:()[]{}<>|/@\^$-%+=#_&~*\nθωερτψυιοπασδφγηςκλζχξωβνμ\nΘΩΕΡΤΨΥΙΟΠΑΣΔΦΓΗςΚΛΖΧΞΩΒΝΜ\nАаБбВвГгДдЕеЁёЖжЗзИиЙйКкЛлМмНнОоПпРрСсТтУуФфХхЦцЧчШшЩщЪъЫыЬьЭэЮюЯя\n±∓×·÷√∑∫∮¬∝∞≠≈⇔↔≪≫≤≥\n°ℏÅ⊙ ☉ ☼ ☀¶ß©®£€¼½¾²³\nčžšČŽŠ
 
 render_type=0
 

@@ -206,7 +206,6 @@ public class GaiaSkyDesktop implements IObserver {
             // Reinitialize with user-defined locale
             I18n.initialize(Gdx.files.absolute(GlobalConf.ASSETS_LOC + File.separator + "i18n/gsbundle"));
 
-
             if (gsArgs.version) {
                 System.out.println(GlobalConf.getShortApplicationName());
                 System.out.println("License MPL 2.0: Mozilla Public License 2.0 <https://www.mozilla.org/en-US/MPL/2.0/>");
@@ -291,7 +290,7 @@ public class GaiaSkyDesktop implements IObserver {
                 }
                 if (mymode == null) {
                     // Fall back to windowed
-                    logger.warn("Warning: no full screen mode with the given resolution found (" + GlobalConf.screen.FULLSCREEN_WIDTH + "x" + GlobalConf.screen.FULLSCREEN_HEIGHT+"). Falling back to windowed mode.");
+                    logger.warn("Warning: no full screen mode with the given resolution found (" + GlobalConf.screen.FULLSCREEN_WIDTH + "x" + GlobalConf.screen.FULLSCREEN_HEIGHT + "). Falling back to windowed mode.");
                     cfg.setWindowedMode(GlobalConf.screen.getScreenWidth(), GlobalConf.screen.getScreenHeight());
                     cfg.setResizable(GlobalConf.screen.RESIZABLE);
                 } else {
@@ -310,7 +309,7 @@ public class GaiaSkyDesktop implements IObserver {
             cfg.setWindowedMode(GlobalConf.screen.SCREEN_WIDTH, GlobalConf.screen.SCREEN_HEIGHT);
             cfg.setResizable(true);
         }
-        if(gsArgs.vr){
+        if (gsArgs.vr) {
             cfg.setWindowIcon(Files.FileType.Internal, "icon/gsvr_icon.png");
         } else {
             cfg.setWindowIcon(Files.FileType.Internal, "icon/gs_icon.png");
@@ -334,10 +333,7 @@ public class GaiaSkyDesktop implements IObserver {
                 logger.error("Window creation failed (is OpenGL 4.x supported by your card?), trying with OpenGL 3.x");
                 logger.info("Disabling tessellation...");
                 consoleLogger.unsubscribe();
-                ElevationType et = GlobalConf.scene.ELEVATION_TYPE;
-                if (!et.isNone()) {
-                    GlobalConf.scene.ELEVATION_TYPE = ElevationType.PARALLAX_MAPPING;
-                }
+                GlobalConf.scene.ELEVATION_TYPE = ElevationType.NONE;
                 cfg.useOpenGL3(true, 3, 2);
 
                 Lwjgl3Application app = new Lwjgl3Application(new GaiaSky(gsArgs.download, gsArgs.catalogChooser, gsArgs.vr, gsArgs.externalView, gsArgs.noScriptingServer), cfg);
@@ -511,8 +507,8 @@ public class GaiaSkyDesktop implements IObserver {
     /**
      * Checks for experimental features and issues warnings
      */
-    private static void experimentalCheck(){
-        if(gsArgs.externalView){
+    private static void experimentalCheck() {
+        if (gsArgs.externalView) {
             System.out.println("============================ WARNING ================================");
             System.out.println("The -e/--externalview feature is experimental and may cause problems!");
             System.out.println("=====================================================================");
