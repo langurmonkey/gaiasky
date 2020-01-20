@@ -6,8 +6,8 @@
 UTILSDIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null && pwd )"
 GSDIR=`realpath $UTILSDIR/../../../`
 
-git-chglog -c $GSDIR/.chglog/config.yml -o $GSDIR/temp.md 2.2.1..
-cat $GSDIR/temp.md $UTILSDIR/CHANGELOG-to-220.md > $GSDIR/CHANGELOG.md
+git-chglog -c $GSDIR/.chglog/config.yml -o $GSDIR/temp.md 2.2.3..
+cat $GSDIR/temp.md $UTILSDIR/CHANGELOG-to-222.md > $GSDIR/CHANGELOG.md
 rm $GSDIR/temp.md
 
 echo "Changelog generated to $GSDIR/CHANGELOG.md"

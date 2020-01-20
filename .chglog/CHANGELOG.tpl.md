@@ -7,7 +7,7 @@
 {{ range .Unreleased.CommitGroups -}}
 ### {{ .Title }}
 {{ range .Commits -}}
-- {{ .Subject }}
+- {{ if .Scope }}**{{ .Scope }}:** {{ end }}{{ .Subject }}
 {{ end }}
 {{ end -}}
 {{ end -}}
@@ -20,33 +20,32 @@
 
 {{ range .CommitGroups -}}
 ### {{ .Title }}
-{{ range .Commits }}
-- {{ .Subject }} {{ if .Refs -}} {{ range .Refs }}{{ if .Action }}[#{{ .Ref }}]({{ $.Info.RepositoryURL }}/issues/{{ .Ref }}) {{ end }}{{end}}{{ end }}{{ end }}
+{{ range .Commits -}}
+- {{ .Subject }} {{ if .Refs -}} {{ range .Refs }}{{ if .Action }}[#{{ .Ref }}]({{ $.Info.RepositoryURL }}/issues/{{ .Ref }}) {{ end }}{{end}}{{ end }}
 {{ end }}
+{{ end -}}
 
 {{- if .RevertCommits -}}
 ### Reverts
-
 {{ range .RevertCommits -}}
-* {{ .Revert.Header }}
+- {{ .Revert.Header }}
 {{ end }}
 {{ end -}}
 
 {{- if .MergeCommits -}}
-### Merge Requests
-
+### Pull Requests
 {{ range .MergeCommits -}}
-* {{ .Header }}
+- {{ .Header }}
 {{ end }}
 {{ end -}}
 
 {{- if .NoteGroups -}}
 {{ range .NoteGroups -}}
 ### {{ .Title }}
-
 {{ range .Notes }}
 {{ .Body }}
 {{ end }}
 {{ end -}}
 {{ end -}}
 {{ end -}}
+

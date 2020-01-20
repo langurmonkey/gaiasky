@@ -1,3 +1,141 @@
+
+<a name="2.2.2"></a>
+## [2.2.2](https://gitlab.com/langurmonkey/gaiasky/tree/2.2.1) (2019-10-31)
+[Full changelog](https://gitlab.com/langurmonkey/gaiasky/compare/2.2.1...2.2.2)
+
+### Bug Fixes
+
+- crash loading scene graph on windows [#306](https://gitlab.com/langurmonkey/gaiasky/issues/306) 
+- add default controller rendermodel in case no suitable model is found 
+- controller identifier in SteamVR - controllers work again when using SteamVR 
+- block motion blur if vr mode is on 
+- STIL catalogs not scaling well with global scale factor 
+- catalogs loading twice 
+- catalog info creation from json 
+- wrong frame size when UI elements are on in VR 
+- graphics quality images not found looking to lower qualities - not it also looks for the image in higher qualities 
+- star group label scale and size 
+- live update of number of glow lights 
+- scripting crash when running several successive scripts 
+- eq/ec/galtoInternalCartesian() calls unit fix 
+- scripts using 'Sol' instead of 'Sun' 
+- adjust star brightness map to magnitudes 
+- enable input after script is finished, log connection details 
+- layout of datasets pane 
+- billboard positioning 
+- orientation lock for quaternion-based objects 
+- dataset color cycling 
+- closest body being null in first frame [#303](https://gitlab.com/langurmonkey/gaiasky/issues/303) 
+- crash resizing window when loading scene graph 
+- add screen size check before persist 
+- java version string without minor or revision [#302](https://gitlab.com/langurmonkey/gaiasky/issues/302) 
+
+### Build System
+
+- improve crash reporting by also outputting the log 
+- update source version number to 020202 
+- update to gdx 1.9.10, gradle 5.6.2 
+
+### Code Refactoring
+
+- motion blur shaders to work like the rest 
+- complete package renaming 
+- package rename, first commit 
+- relocate some functions to more suitable spots 
+
+### Documentation
+
+- info on vr controls and whatnot 
+- clarify OpenComposite vs SteamVR for running with Oculus headsets 
+
+### Features
+
+- minimaps finished with local group (1 and 2) and High-z 
+- container background to notifications interface 
+- better milky way in high and ultra quality 
+- use texture_array for milky way components 
+- scaling milky way particles 
+- add dataset visibility toggle to context menu 
+- add minimap scales for inner/outer solar system, heliosphere, oort cloud 
+- add axes objects and show map button 
+- improve context menu, add highlight and quit actions 
+- add twitter info and fix help layout 
+- add paths to help dialog (config, data, screenshots, frames, music, mappings) 
+- add ecliptic and galactic longitudes and latitudes to filter attributes 
+- add collapse/expand button to debug interface 
+- user-defined per-dataset filters 
+- add epicycles script plus some handy API calls 
+- add brightness power to config file 
+- add particle groups as catalog infos, start filters 
+- add CPU detection to system information 
+- add setCenterFocus() API call to disable focus centering 
+- add API calls to get unit conversion factor 
+- color picker to highlight datasets 
+- colormap stars according to arbitrary attributtes (first draft) 
+- add new default colors 
+- update post-processing effects in real time when changing graphics quality 
+- new velocity-based camera blur 
+
+<a name="2.2.1"></a>
+## [2.2.1](https://gitlab.com/langurmonkey/gaiasky/tree/2.2.0) (2019-09-10)
+[Full changelog](https://gitlab.com/langurmonkey/gaiasky/compare/2.2.0...2.2.1)
+
+### Bug Fixes
+
+- spacecraft mode broken 
+- moon coordinates typo causing high-frequency sinusoidal drift 
+- greedy texture initialization works again 
+- init vr models after vr context creation 
+- vr version can't download the data before connecting to the HMD 
+- parameter name in build script 
+- default sprite batch causes core profile error 
+- particle group length() with very distant positions 
+- windows program group for VR 
+- most problems with the VR version fixed by scaling the background models correctly 
+- wee missing bits in z-buffer shaders 
+- wee fixes imported from the vr branch 
+- roll back to GL 3.2 if 4.x not supported 
+- depth computation done per fragment 
+- scripts Sol -> Sun 
+- controller mappings format error in loading 
+- cmd windows launch script actually works 
+- report scene graph loading errors ([#293](https://gitlab.com/langurmonkey/gaiasky/issues/293)) 
+- deb dependency, issue [#291](https://gitlab.com/langurmonkey/gaiasky/issues/291) 
+
+### Build System
+
+- remove unused deps, update version number 
+- add VR launcher 
+- info on the new VR stuff 
+
+### Code Refactoring
+
+- cleanup glsl log z-buffer library 
+- improve shader performance and readability (from vr) 
+
+### Documentation
+
+- fix vr flag in readme 
+- some more on the VR version 
+- update vr info 
+- update docs reference 
+- requirements table in readme 
+- update readme reqs and supported hw 
+
+### Features
+
+- update logos and x2 UI scaling factor 
+- add lazy texture and mesh initialisation to config file 
+- add checkboxes for all crosshairs/markers 
+- change crosshair appearance so that they stack well 
+- add focus, closest and home objects to top bar 
+- better particle group renderer with scaling particles and color-distance mapping 
+- add closest object to top info bar 
+- add top ui element with current time 
+- unify VR with desktop version 
+- migrate completely to adaptive-scale logarithmic z-buffer 
+
+
 <a name="2.2.0"></a>
 ## [2.2.0](https://gitlab.com/langurmonkey/gaiasky/tree/2.1.7-vr) (2019-08-01)
 [Full changelog](https://gitlab.com/langurmonkey/gaiasky/compare/2.1.7-vr...2.2.0)
