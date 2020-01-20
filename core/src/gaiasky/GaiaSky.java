@@ -259,8 +259,6 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
         Gdx.app.setLogLevel(Application.LOG_INFO);
         clogger = new ConsoleLogger(true, true);
 
-        renderBatch = new SpriteBatch();
-
         // Init graphics and window
         graphics = (Lwjgl3Graphics) Gdx.graphics;
         window = graphics.getWindow();
@@ -375,6 +373,8 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
         for (AssetBean ab : assets) {
             ab.load(manager);
         }
+
+        renderBatch = GlobalResources.spriteBatch;
 
         EventManager.instance.subscribe(this, Events.LOAD_DATA_CMD);
 

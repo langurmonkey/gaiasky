@@ -68,10 +68,6 @@ public class GlobalResources {
 
     private static Vector3d aux = new Vector3d();
 
-
-
-
-
     public static void initialize(AssetManager manager) {
         // Sprite shader
         spriteShader = new ShaderProgram(Gdx.files.internal("shader/2d/spritebatch.vertex.glsl"), Gdx.files.internal("shader/2d/spritebatch.fragment.glsl"));
