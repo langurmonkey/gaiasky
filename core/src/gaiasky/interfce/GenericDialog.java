@@ -96,7 +96,7 @@ public abstract class GenericDialog extends CollapsibleWindow {
     }
 
     protected void recalculateButtonSize() {
-        float w = 80 * GlobalConf.UI_SCALE_FACTOR;
+        float w = 80f * GlobalConf.UI_SCALE_FACTOR;
         for (Actor button : buttonGroup.getChildren()) {
             w = Math.max(button.getWidth() + pad * 4f, w);
         }

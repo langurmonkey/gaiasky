@@ -30,7 +30,6 @@ import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.InputEvent.Type;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
-import com.badlogic.gdx.scenes.scene2d.ui.Window;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.scenes.scene2d.utils.Drawable;
 import com.badlogic.gdx.utils.Align;
@@ -45,7 +44,7 @@ import gaiasky.util.I18n;
  * @author Xoppa
  * @author Toni Sagrista
  **/
-public class CollapsibleWindow extends Window {
+public class CollapsibleWindow extends OwnWindow {
     private boolean collapsed, collapsing = false, expanding = false;
     private float collapseHeight;
     private float expandHeight;
@@ -53,7 +52,7 @@ public class CollapsibleWindow extends Window {
     protected Actor me;
     protected Skin skin;
 
-    private float maxWidth = -1, maxHeight = -1;
+    private float maxWidth = -1f, maxHeight = -1f;
     /**
      * Collapse speed in pixels per second
      **/
@@ -103,8 +102,8 @@ public class CollapsibleWindow extends Window {
                 float endy = y + getY();
                 vec2.set(endx - startx, endy - starty);
                 // pixels of margin
-                if (vec2.len() < 3) {
-                    if (getHeight() - y <= getPadTop() && y < getHeight() && x > 0 && x < getWidth())
+                if (vec2.len() < 3f) {
+                    if (getHeight() - y <= getPadTop() && y < getHeight() && x > 0f && x < getWidth())
                         if (button == Input.Buttons.LEFT) {
                             // Left mouse button on title toggles collapse
                             toggleCollapsed();
@@ -116,7 +115,7 @@ public class CollapsibleWindow extends Window {
         });
 
         // Pad title cell
-        getTitleTable().getCells().get(0).padLeft(5 * GlobalConf.UI_SCALE_FACTOR);
+        getTitleTable().getCells().get(0).padLeft(5f * GlobalConf.UI_SCALE_FACTOR);
         // Mouse pointer on title
         getTitleTable().addListener(event -> {
             if (event instanceof InputEvent) {
@@ -137,9 +136,9 @@ public class CollapsibleWindow extends Window {
                 if (event instanceof InputEvent) {
                     Type type = ((InputEvent) event).getType();
                     if (type == Type.mouseMoved) {
-                        if ((edge & Align.bottom) != 0 && maxHeight == -1) {
+                        if ((edge & Align.bottom) != 0 && maxHeight == -1f) {
                             Gdx.graphics.setCursor(GlobalResources.resizeYCursor);
-                        } else if ((edge & Align.right) != 0 && maxWidth == -1) {
+                        } else if ((edge & Align.right) != 0 && maxWidth == -1f) {
                             Gdx.graphics.setCursor(GlobalResources.resizeXCursor);
                         }
                     } else if (type == Type.exit) {
@@ -164,8 +163,8 @@ public class CollapsibleWindow extends Window {
         float ih = icon.getMinHeight();
 
         x += width - iw - getPadRight();
-        y += height - getPadTop() / 2;
-        y -= (padTop - ih) / 2;
+        y += height - getPadTop() / 2f;
+        y -= (padTop - ih) / 2f;
 
         icon.draw(batch, x, y, iw, ih);
 
@@ -260,13 +259,13 @@ public class CollapsibleWindow extends Window {
     public void setResizable(boolean w, boolean h) {
         setResizable(w || h);
         if (w) {
-            maxWidth = -1;
+            maxWidth = -1f;
         } else {
             pack();
             maxWidth = this.getWidth();
         }
         if (h) {
-            maxHeight = -1;
+            maxHeight = -1f;
         } else {
             pack();
             maxHeight = this.getHeight();
@@ -275,7 +274,7 @@ public class CollapsibleWindow extends Window {
 
     @Override
     public float getPrefWidth() {
-        if (maxWidth < 0)
+        if (maxWidth < 0f)
             return super.getPrefWidth();
         else
             return maxWidth;
@@ -283,7 +282,7 @@ public class CollapsibleWindow extends Window {
 
     @Override
     public float getMaxWidth() {
-        if (maxWidth < 0)
+        if (maxWidth < 0f)
             return super.getMaxWidth();
         else
             return maxWidth;
@@ -291,7 +290,7 @@ public class CollapsibleWindow extends Window {
 
     @Override
     public float getWidth() {
-        if (maxWidth < 0)
+        if (maxWidth < 0f)
             return super.getWidth();
         else
             return maxWidth;
@@ -299,7 +298,7 @@ public class CollapsibleWindow extends Window {
 
     @Override
     public float getPrefHeight() {
-        if (maxHeight < 0)
+        if (maxHeight < 0f)
             return super.getPrefHeight();
         else
             return maxHeight;
@@ -307,7 +306,7 @@ public class CollapsibleWindow extends Window {
 
     @Override
     public float getMaxHeight() {
-        if (maxHeight < 0)
+        if (maxHeight < 0f)
             return super.getMaxHeight();
         else
             return maxHeight;
@@ -315,7 +314,7 @@ public class CollapsibleWindow extends Window {
 
     @Override
     public float getHeight() {
-        if (maxHeight < 0)
+        if (maxHeight < 0f)
             return super.getHeight();
         else
             return maxHeight;

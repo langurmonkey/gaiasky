@@ -16,10 +16,7 @@ import gaiasky.event.EventManager;
 import gaiasky.event.Events;
 import gaiasky.util.GlobalConf;
 import gaiasky.util.I18n;
-import gaiasky.util.scene2d.CollapsibleWindow;
-import gaiasky.util.scene2d.OwnLabel;
-import gaiasky.util.scene2d.OwnTextButton;
-import gaiasky.util.scene2d.OwnTextField;
+import gaiasky.util.scene2d.*;
 
 import java.time.Instant;
 import java.time.LocalDateTime;
@@ -32,7 +29,7 @@ import java.time.temporal.ChronoField;
  * TODO Migrate to GenericDialog
  */
 public class DateDialog extends CollapsibleWindow {
-    private final Window me;
+    private final OwnWindow me;
     private final Stage stage;
 
     private final TextField day, year, hour, min, sec;
