@@ -1,0 +1,15 @@
+{
+
+	"releaserules" : {
+    },
+    
+    
+    "releasecommands" : [
+    	"git tag -a &tag& -m &tag_annotation&",
+    	"git push --tags",
+    	"git push --tags gitlab",
+    	"core/scripts/gaiasky-release/generate-changelog",
+    	"gradlew core:pack"
+    ]
+    	
+}

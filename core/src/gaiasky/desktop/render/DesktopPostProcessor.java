@@ -290,13 +290,13 @@ public class DesktopPostProcessor implements IPostProcessor, IObserver {
         int samples, lgw, lgh;
         if (gq.isUltra()) {
             samples = 15;
-            lgw = 1280;
+            lgw = 1920;
         } else if (gq.isHigh()) {
             samples = 12;
-            lgw = 1280;
+            lgw = 1500;
         } else if (gq.isNormal()) {
-            samples = 8;
-            lgw = 1000;
+            samples = 10;
+            lgw = 1280;
         } else {
             samples = 4;
             lgw = 1000;
@@ -404,8 +404,12 @@ public class DesktopPostProcessor implements IPostProcessor, IObserver {
     }
 
     private float getGlowTextureScale(double starBrightness, float starSize, float fovFactor, boolean cubemap) {
-        float ts = (float) starBrightness * starSize * 7e-2f / fovFactor;
-        return cubemap ? Math.min(ts * 0.2f, 4e-1f) : 1f;
+        if(cubemap) {
+            float ts = (float) starBrightness * starSize * 7e-2f / fovFactor;
+            return Math.min(ts * 0.2f, 4e-1f);
+        }else{
+            return 0.5f;
+        }
     }
 
     private float getGlowSpiralScale(double starBrightness, float starSize, float fovFactor) {

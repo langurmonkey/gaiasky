@@ -70,7 +70,7 @@ public class Particle extends CelestialBody implements IStarFocus, ILineRenderab
                     thdownOverFovfactor = (float) Constants.THRESHOLD_DOWN / fovFactor;
                     break;
                 case STAR_POINT_SIZE_CMD:
-                    innerRad = 0.004f * DISC_FACTOR + (Float) data[0] * 0.008f;
+                    innerRad = (0.004f * DISC_FACTOR + (Float) data[0] * 0.008f) * 1.5f;
                     break;
                 default:
                     break;
@@ -88,7 +88,7 @@ public class Particle extends CelestialBody implements IStarFocus, ILineRenderab
         thupOverFovfactor = (float) Constants.THRESHOLD_UP / fovFactor;
         thdownOverFovfactor = (float) Constants.THRESHOLD_DOWN / fovFactor;
         float psize = GlobalConf.scene.STAR_POINT_SIZE < 0 ? 8 : GlobalConf.scene.STAR_POINT_SIZE;
-        innerRad = 0.004f * DISC_FACTOR + psize * 0.008f;
+        innerRad = (0.004f * DISC_FACTOR + psize * 0.008f) * 1.5f;
         paramUpdater = new ParamUpdater();
     }
 
