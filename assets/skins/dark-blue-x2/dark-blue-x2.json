@@ -1,132 +1,88 @@
 {
   "com.badlogic.gdx.graphics.g2d.BitmapFont": {
+    "title-40": {
+      "file": "skins/fonts/title-40.fnt"
+    },
+    "title-80": {
+      "file": "skins/fonts/title-80.fnt"
+    },
     "ui-09": {
       "file": "skins/fonts/ui-09.fnt"
-    }
-  },
-  "com.badlogic.gdx.graphics.g2d.BitmapFont": {
+    },
     "ui-10": {
       "file": "skins/fonts/ui-10.fnt"
-    }
-  },
-  "com.badlogic.gdx.graphics.g2d.BitmapFont": {
+    },
     "ui-11": {
       "file": "skins/fonts/ui-11.fnt"
-    }
-  },
-  "com.badlogic.gdx.graphics.g2d.BitmapFont": {
+    },
     "ui-12": {
       "file": "skins/fonts/ui-12.fnt"
-    }
-  },
-  "com.badlogic.gdx.graphics.g2d.BitmapFont": {
+    },
     "ui-13": {
       "file": "skins/fonts/ui-13.fnt"
-    }
-  },
-  "com.badlogic.gdx.graphics.g2d.BitmapFont": {
+    },
     "ui-14": {
       "file": "skins/fonts/ui-14.fnt"
-    }
-  },
-  "com.badlogic.gdx.graphics.g2d.BitmapFont": {
+    },
     "ui-15": {
       "file": "skins/fonts/ui-15.fnt"
-    }
-  },
-  "com.badlogic.gdx.graphics.g2d.BitmapFont": {
+    },
     "ui-15-bold": {
       "file": "skins/fonts/ui-15-bold.fnt"
-    }
-  },
-  "com.badlogic.gdx.graphics.g2d.BitmapFont": {
+    },
     "ui-16": {
       "file": "skins/fonts/ui-16.fnt"
-    }
-  },
-  "com.badlogic.gdx.graphics.g2d.BitmapFont": {
+    },
     "ui-17": {
       "file": "skins/fonts/ui-17.fnt"
-    }
-  },
-  "com.badlogic.gdx.graphics.g2d.BitmapFont": {
+    },
     "ui-17-bold": {
       "file": "skins/fonts/ui-17-bold.fnt"
-    }
-  },
-  "com.badlogic.gdx.graphics.g2d.BitmapFont": {
+    },
     "ui-18": {
       "file": "skins/fonts/ui-18.fnt"
-    }
-  },
-  "com.badlogic.gdx.graphics.g2d.BitmapFont": {
+    },
     "ui-19": {
       "file": "skins/fonts/ui-19.fnt"
-    }
-  },
-  "com.badlogic.gdx.graphics.g2d.BitmapFont": {
+    },
     "ui-20": {
       "file": "skins/fonts/ui-20.fnt"
-    }
-  },
-  "com.badlogic.gdx.graphics.g2d.BitmapFont": {
+    },
     "ui-21": {
       "file": "skins/fonts/ui-21.fnt"
-    }
-  },
-  "com.badlogic.gdx.graphics.g2d.BitmapFont": {
+    },
     "ui-23": {
       "file": "skins/fonts/ui-23.fnt"
-    }
-  },
-  "com.badlogic.gdx.graphics.g2d.BitmapFont": {
+    },
     "ui-23-bold": {
       "file": "skins/fonts/ui-23-bold.fnt"
-    }
-  },
-  "com.badlogic.gdx.graphics.g2d.BitmapFont": {
+    },
     "ui-25": {
       "file": "skins/fonts/ui-25.fnt"
-    }
-  },
-  "com.badlogic.gdx.graphics.g2d.BitmapFont": {
+    },
     "ui-28": {
       "file": "skins/fonts/ui-28.fnt"
-    }
-  },
-  "com.badlogic.gdx.graphics.g2d.BitmapFont": {
+    },
     "ui-30": {
       "file": "skins/fonts/ui-30.fnt"
-    }
-  },
-  "com.badlogic.gdx.graphics.g2d.BitmapFont": {
+    },
     "ui-33": {
       "file": "skins/fonts/ui-33.fnt"
-    }
-  },
-  "com.badlogic.gdx.graphics.g2d.BitmapFont": {
+    },
     "ui-25-shadow": {
       "file": "skins/fonts/ui-25-shadow.fnt"
-    }
-  },
-  "com.badlogic.gdx.graphics.g2d.BitmapFont": {
+    },
     "ui-12-bold": {
       "file": "skins/fonts/ui-12-bold.fnt"
-    }
-  },
-  "com.badlogic.gdx.graphics.g2d.BitmapFont": {
+    },
     "ui-19-bold": {
       "file": "skins/fonts/ui-19-bold.fnt"
-    }
-  },
-  "com.badlogic.gdx.graphics.g2d.BitmapFont": {
+    },
     "mono": {
-      "file": "skins/fonts/mono-large.fnt"
-    }
-  },
-  "com.badlogic.gdx.graphics.g2d.BitmapFont": {
+      "file": "skins/fonts/mono-small.fnt"
+    },
     "grid-annotation": {
-      "file": "skins/fonts/ui-18.fnt"
+      "file": "skins/fonts/ui-11.fnt"
     }
   },
   "com.badlogic.gdx.graphics.Color": {
@@ -487,7 +443,7 @@
     },
     "highlight-ds": {
       "imageUp": "highlight-off",
-      "imageChecked" : "highlight-on"
+      "imageChecked": "highlight-on"
     },
     "prefs": {
       "imageUp": "prefs-icon"
@@ -502,10 +458,10 @@
     },
     "highlight-ds-s": {
       "imageUp": "highlight-s-off",
-      "imageChecked" : "highlight-s-on"
+      "imageChecked": "highlight-s-on"
     },
     "prefs-s": {
-      "imageUp": "prefs-s-icon",
+      "imageUp": "prefs-s-icon"
     },
     "link": {
       "imageUp": "link",
@@ -553,7 +509,7 @@
         "fontColorSelected": "white",
         "fontColorUnselected": "white",
         "selection": "default-select-selection",
-        "background" : "dark-grey"
+        "background": "dark-grey"
       }
     }
   },
@@ -781,6 +737,10 @@
       "font": "ui-17",
       "fontColor": "white",
       "background": "tooltip-bg"
+    },
+    "main-title": {
+      "font": "title-80",
+      "fontColor": "white"
     }
   },
   "com.badlogic.gdx.scenes.scene2d.ui.TextField$TextFieldStyle": {
@@ -927,7 +887,7 @@
       "selection": "selection",
       "fontColorSelected": "white",
       "font": "ui-18",
-      "background" : "dark-grey"
+      "background": "dark-grey"
     },
     "light": {
       "fontColorUnselected": "white",

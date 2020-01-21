@@ -5,18 +5,12 @@
 
 package gaiasky.interfce;
 
-import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.assets.AssetManager;
-import com.badlogic.gdx.files.FileHandle;
-import com.badlogic.gdx.graphics.Texture;
-import com.badlogic.gdx.graphics.Texture.TextureFilter;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Button;
 import com.badlogic.gdx.scenes.scene2d.ui.Container;
-import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener.ChangeEvent;
-import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
@@ -91,11 +85,7 @@ public class LoadingGui extends AbstractGui {
         bottom.right().bottom();
         bottom.pad(pad10);
 
-        FileHandle gslogo = Gdx.files.internal(vr ? "img/gaiasky-vr-logo-s.png" : (GlobalConf.UI_SCALE_FACTOR > 1f ? "img/gaiasky-logo.png" : "img/gaiasky-logo-s.png"));
-        Texture logotex = new Texture(gslogo);
-        logotex.setFilter(TextureFilter.Linear, TextureFilter.Linear);
-        Image logoimg = new Image(logotex);
-        logoimg.setOrigin(Align.center);
+        OwnLabel gaiasky = new OwnLabel(GlobalConf.getApplicationTitle(vr), skin, "main-title");
 
         lastUpdateTime = 0;
         i = -1;
@@ -105,7 +95,7 @@ public class LoadingGui extends AbstractGui {
         spin = new OwnLabel("0", skin, "mono");
         spin.setColor(skin.getColor("theme"));
 
-        center.add(logoimg).center().padBottom(pad10).row();
+        center.add(gaiasky).center().padBottom(pad10 * 2f).row();
         center.add(loading).padBottom(pad05).row();
         center.add(spin).padBottom(pad30).row();
 

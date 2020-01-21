@@ -43,6 +43,7 @@ public class GlobalConf {
     private static final Log logger = Logger.getLogger(GlobalConf.class);
 
     public static String APPLICATION_NAME = "Gaia Sky";
+    public static String APPLICATION_NAME_TITLE = "G a i a   S k y";
     public static final String APPLICATION_SHORT_NAME = "gaiasky";
     public static final String WEBPAGE = "https://www.zah.uni-heidelberg.de/gaia/outreach/gaiasky";
     public static final String WEBPAGE_DOWNLOADS = "https://www.zah.uni-heidelberg.de/gaia/outreach/gaiasky/downloads";
@@ -58,6 +59,10 @@ public class GlobalConf {
 
     // Interface scale factor (for HiDPI)
     public static float UI_SCALE_FACTOR = -1.0f;
+
+    public static String getApplicationTitle(boolean vr) {
+        return APPLICATION_NAME_TITLE + (vr ? "  VR" : "");
+    }
 
     public static void updateScaleFactor(float sf) {
         UI_SCALE_FACTOR = sf;

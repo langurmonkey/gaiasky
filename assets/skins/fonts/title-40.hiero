@@ -1,11 +1,11 @@
 font.name=Open Sans Condensed
-font.size=9
+font.size=40
 font.bold=false
 font.italic=false
 font.gamma=0.0
 font.mono=false
 
-font2.file=/home/tsagrista/.fonts/truetype/Tahoma.ttf
+font2.file=/home/tsagrista/.fonts/truetype/Comfortaa-Regular.ttf
 font2.use=true
 
 pad.top=1
@@ -16,8 +16,8 @@ pad.advance.x=-2
 pad.advance.y=-2
 
 glyph.native.rendering=false
-glyph.page.width=256
-glyph.page.height=128
+glyph.page.width=1024
+glyph.page.height=256
 glyph.text=AÀÁÄÂBCDEÈÉËÊFGHIÌÍÏÎJKLMNOÒÓÔPQRSTUÙÚÜÛVWXYZÑÇ\naàáäâbcdeèéêëfghiìíîïjklmnoòóôöpqrstuùúûüvwxyzñç\n1234567890\n"!`?'.,;:()[]{}<>|/@\^$-%+=#_&~*\nθωερτψυιοπασδφγηςκλζχξωβνμ\nΘΩΕΡΤΨΥΙΟΠΑΣΔΦΓΗςΚΛΖΧΞΩΒΝΜ\nАаБбВвГгДдЕеЁёЖжЗзИиЙйКкЛлМмНнОоПпРрСсТтУуФфХхЦцЧчШшЩщЪъЫыЬьЭэЮюЯя\n±∓×·÷√∑∫∮¬∝∞≠≈⇔↔≪≫≤≥\n°ℏÅ⊙ ☉ ☼ ☀¶ß©®£€¼½¾²³\nčžšČŽŠ
 
 render_type=0

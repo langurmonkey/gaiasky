@@ -104,11 +104,7 @@ public class AboutWindow extends GenericDialog {
         final Table contentHelp = new Table(skin);
         contentHelp.align(Align.top);
 
-        FileHandle gslogo = Gdx.files.internal(GlobalConf.UI_SCALE_FACTOR > 1.5f ? "img/gaiasky-logo.png" : "img/gaiasky-logo-s.png");
-        Texture logotex = new Texture(gslogo);
-        logotex.setFilter(TextureFilter.Linear, TextureFilter.Linear);
-        Image gaiasky = new Image(logotex);
-        gaiasky.setOrigin(Align.center);
+        OwnLabel gaiasky = new OwnLabel(GlobalConf.getApplicationTitle(GlobalConf.runtime.OPENVR), skin, "main-title");
 
         // User manual
         Label homepageTitle = new OwnLabel(I18n.txt("gui.help.homepage"), skin);
@@ -128,7 +124,7 @@ public class AboutWindow extends GenericDialog {
         gaiaskyIcon.setOrigin(Align.center);
 
         // Add all to content
-        contentHelp.add(gaiasky).pad(pad * 2).colspan(2);
+        contentHelp.add(gaiasky).pad(pad * 2f).padBottom(pad * 5f).colspan(2);
         contentHelp.row();
         contentHelp.add(homepageTitle).align(Align.left).padRight(pad);
         contentHelp.add(homepageTxt).align(Align.left);
