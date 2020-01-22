@@ -95,7 +95,7 @@ if __name__ == '__main__':
     
     # PARSE FILE DATA
     if arguments.def_file is None:
-        arguments.def_file = "%s/%s" % (get_script_path(), "gaiasky-release.json")
+        arguments.def_file = "%s/%s" % (get_script_path(), "gaiasky-release-none.json")
     
     print("Loading definitions file: %s" % arguments.def_file)
     with open(arguments.def_file, 'r') as f:
