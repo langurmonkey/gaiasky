@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<install4j version="7.0.10" transformSequenceNumber="7">
+<install4j version="7.0.12" transformSequenceNumber="7">
   <directoryPresets config="@gs-git-folder@/assets/img" />
   <application name="Gaia Sky" distributionSourceDir="" applicationId="8310-5272-6362-8592" mediaDir="./" mediaFilePattern="${compiler:sys.shortName}_${compiler:sys.platform}_${compiler:sys.version}" compression="9" lzmaCompression="false" pack200Compression="false" excludeSignedFromPacking="true" commonExternalFiles="false" createMd5Sums="true" shrinkRuntime="true" shortName="gaiasky" publisher="ARI - ZAH - Universität Heidelberg" publisherWeb="http://www.zah.uni-heidelberg.de/gaia/outreach/gaiasky" version="@version-tag@" allPathsRelative="true" backupOnSave="false" autoSave="false" convertDotsToUnderscores="true" macSignature="????" macVolumeId="c3380c949a34b4f7" javaMinVersion="1.8" javaMaxVersion="" allowBetaVM="false" jdkMode="runtimeJre" jdkName="">
     <languages skipLanguageSelection="false" languageSelectionInPrincipalLanguage="false">
@@ -250,9 +250,9 @@
                     </void>
                     <void property="imageEdgeBackgroundColor">
                       <object class="java.awt.Color">
-                        <object idref="Integer0" />
-                        <object idref="Integer0" />
-                        <object idref="Integer0" />
+                        <int>0</int>
+                        <int>0</int>
+                        <int>255</int>
                         <int>255</int>
                       </object>
                     </void>

@@ -1,76 +1,85 @@
 <a name="unreleased"></a>
 ## [Unreleased](https://gitlab.com/langurmonkey/gaiasky/tree/master)
-[Full changelog](https://gitlab.com/langurmonkey/gaiasky/compare/2.2.3...HEAD)
+[Full changelog](https://gitlab.com/langurmonkey/gaiasky/compare/2.2.4...HEAD)
+
+
+<a name="2.2.4"></a>
+## [2.2.4](https://gitlab.com/langurmonkey/gaiasky/tree/2.2.3) (2020-01-22)
+[Full changelog](https://gitlab.com/langurmonkey/gaiasky/compare/2.2.3...2.2.4)
 
 ### Bug Fixes
-- libgdx scene2d ui Window snaps to integer pixel positions resulting in text rendering artifacts
-- assets location when running from source and no properties found
-- dataset highlighting API calls improved, add test scripts for a few use cases
-- screenshot/frame advanced mode messes viewport. Fixes [#319](https://gitlab.com/langurmonkey/gaiasky/issues/319)
-- properties file version not found. Fixes [#317](https://gitlab.com/langurmonkey/gaiasky/issues/317)
-- fullscreen mode before initialization, cursor in slaves
-- stop the rest server the right way
-- correct perspective of labels in cubemap modes
-- master-slave connection messed up by scripting engine
-- fisheye setting persisted
-- do not replace backslaches with forward slashes
-- use fixed keyword for scene graph loader, improve internal catalog path handling
-- typo - geenden -> beenden
-- do not apply fog to normal shaders
-- default constructor for NBG
-- milky way adapts to fov changes
-- toggle buttons for dome, cubemap and stereo
-- notifications interface background in stereo mode
-- additive gpu VBOs
+- adjust brightness of sun glow, add empty release instructions file 
+- macos shader and sprite batch crashes 
+- libgdx scene2d ui Window snaps to integer pixel positions resulting in text rendering artifacts 
+- assets location when running from source and no properties found 
+- dataset highlighting API calls improved, add test scripts for a few use cases 
+- screenshot/frame advanced mode messes viewport. Fixes [#319](https://gitlab.com/langurmonkey/gaiasky/issues/319) [#319](https://gitlab.com/langurmonkey/gaiasky/issues/319) 
+- properties file version not found. Fixes [#317](https://gitlab.com/langurmonkey/gaiasky/issues/317) [#317](https://gitlab.com/langurmonkey/gaiasky/issues/317) 
+- fullscreen mode before initialization, cursor in slaves 
+- stop the rest server the right way 
+- correct perspective of labels in cubemap modes 
+- master-slave connection messed up by scripting engine 
+- fisheye setting persisted 
+- do not replace backslaches with forward slashes 
+- use fixed keyword for scene graph loader, improve internal catalog path handling 
+- typo - geenden -> beenden 
+- do not apply fog to normal shaders [#312](https://gitlab.com/langurmonkey/gaiasky/issues/312) 
+- default constructor for NBG 
+- milky way adapts to fov changes 
+- toggle buttons for dome, cubemap and stereo 
+- notifications interface background in stereo mode 
+- additive gpu VBOs 
 
 ### Build System
-- allow more than one instance with the .exe file
-- update to lwjgl 3.2.3, deprecated annotations
-- update gradle version to 6.0.1
-- to openjdk 11
-- update CI java image to 11
-- code analyzer, gradle update, build file runners
-- update checks to java 11
-- disable motion blur by default
+- update changelog, changelog template and scripts 
+- allow more than one instance with the .exe file 
+- update to lwjgl 3.2.3, deprecated annotations 
+- update gradle version to 6.0.1 
+- to openjdk 11 
+- update CI java image to 11 
+- code analyzer, gradle update, build file runners 
+- update checks to java 11 
+- disable motion blur by default 
 
 ### Code Refactoring
-- reorganize things for multiple windows
+- reorganize things for multiple windows 
 
 ### Documentation
-- update reference
-- update docs ref and minor changes
-- add open iconic to acknowledgements
+- update reference 
+- update docs ref and minor changes 
+- add open iconic to acknowledgements 
 
 ### Features
-- add cyrillic characters for russian translation
-- add line width factor to conf and UI controls
-- edit timedate button is text icon button
-- new compact sliders
-- finish blend map implementation for multiple-projector blend support
-- add slave configuration and status window (S+L+V) to master instances
-- configure slave instances live
-- proper image warping for MPCDI support
-- geometry warp and blend shader, improve reverse mapping
-- configure slave instance using gaia sky configuration file
-- add MPCDI parsing and orientation
-- dataset highlight size factor API call
-- active planetarium mode uses cubemap method
-- add fisheye projection to cubemap mode
-- remember last tab in preferences window
-- update old preferences window icons
-- replaced external UI window with external scene view
-- half-functioning separate UI controls window
-- add experimental separate UI window (not working yet)
-- minimap size controls and tooltips
-- add CTRL+PLUS/MINUS to increase/decrease the FOV
-- add VR icon
-- maintain a 1:1 aspect ratio for the fisheye/planetarium effect
-- adjust mw parameters
-- add support for per-object primitive in GPU arrays, improved earth-venus-dance script
-- new API call to convert equatorial cartesian to internal cartesian with unit conversion factor
+- replace logo images by ttf text 
+- add cyrillic characters for russian translation 
+- add line width factor to conf and UI controls 
+- edit timedate button is text icon button 
+- new compact sliders 
+- finish blend map implementation for multiple-projector blend support 
+- add slave configuration and status window (S+L+V) to master instances 
+- configure slave instances live 
+- proper image warping for MPCDI support 
+- geometry warp and blend shader, improve reverse mapping 
+- configure slave instance using gaia sky configuration file 
+- add MPCDI parsing and orientation 
+- dataset highlight size factor API call 
+- active planetarium mode uses cubemap method 
+- add fisheye projection to cubemap mode 
+- remember last tab in preferences window 
+- update old preferences window icons 
+- replaced external UI window with external scene view 
+- half-functioning separate UI controls window 
+- add experimental separate UI window (not working yet) 
+- minimap size controls and tooltips 
+- add CTRL+PLUS/MINUS to increase/decrease the FOV 
+- add VR icon 
+- maintain a 1:1 aspect ratio for the fisheye/planetarium effect 
+- adjust mw parameters 
+- add support for per-object primitive in GPU arrays, improved earth-venus-dance script 
+- new API call to convert equatorial cartesian to internal cartesian with unit conversion factor 
 
 ### Performance Improvements
-- improve performance of api call method/parameter matching
+- improve performance of api call method/parameter matching 
 
 
 <a name="2.2.3"></a>

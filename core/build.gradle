@@ -348,6 +348,7 @@ task createArch(dependsOn: createTar, description: "Copies Arch Linux AUR build 
         String md5Tar = new File("$packageDir/" + project.distName + ".tar.gz.md5").text
         md5Tar = md5Tar.replace("\n", "").replace("\r", "");
 
+
         ant.replace(file: "$packageDir/arch/PKGBUILD", token: '@version.revision@', value: "$tagRev")
         ant.replace(file: "$packageDir/arch/PKGBUILD", token: '@md5checksum@', value: md5Tar)
 
@@ -433,7 +434,17 @@ task install4jMedia(type: com.install4j.gradle.Install4jTask, description: "Runs
 }
 
 
-task pack(dependsOn: install4jMedia, description: "Creates the releases for windows, mac, linux and the tar package") { doLast {} }
+task pack(dependsOn: install4jMedia, description: "Creates the releases for windows, mac, linux and the tar package") {
+    doLast {
+        println("Appending md5 checksum of " + project.distName + ".tar.gz to md5sums file")
+        String md5Tar = file("$packageDir/" + project.distName + ".tar.gz.md5").text
+        md5Tar = md5Tar.replace("\n", "").replace("\r", "");
+        file("$packageDir/" + 'md5sums').text = file("$packageDir/" + 'md5sums').text + md5Tar + " *" + project.distName + ".tar.gz\n"
+
+        println("Removing file " + project.distName + ".tar.gz.md5")
+        file("$packageDir/" + project.distName + ".tar.gz.md5").delete()
+    }
+}
 
 eclipse {
     project {
