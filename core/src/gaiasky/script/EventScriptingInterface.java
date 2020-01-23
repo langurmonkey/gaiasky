@@ -658,7 +658,7 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
     @Override
     public void setAmbientLight(final float ambientLight) {
         if (checkNum(ambientLight, Constants.MIN_SLIDER, Constants.MAX_SLIDER, "ambientLight"))
-            GaiaSky.postRunnable(() -> em.post(Events.AMBIENT_LIGHT_CMD, ambientLight / 100f));
+            GaiaSky.postRunnable(() -> em.post(Events.AMBIENT_LIGHT_CMD, ambientLight));
     }
 
     public void setAmbientLight(final int value) {

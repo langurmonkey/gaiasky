@@ -656,7 +656,7 @@ public interface IScriptingInterface {
     /**
      * Sets the ambient light to a certain value.
      *
-     * @param value The value of the ambient light, between 0 and 100.
+     * @param value The value of the ambient light in [0,1].
      */
     void setAmbientLight(float value);
 

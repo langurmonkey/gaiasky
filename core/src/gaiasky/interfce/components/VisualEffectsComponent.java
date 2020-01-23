@@ -78,7 +78,7 @@ public class VisualEffectsComponent extends GuiComponent implements IObserver {
         });
 
         /** Ambient light **/
-        ambientLight = new OwnSliderPlus(I18n.txt("gui.light.ambient"), Constants.MIN_SLIDER, Constants.MAX_SLIDER, Constants.SLIDER_STEP, Constants.MIN_AMBIENT_LIGHT, Constants.MAX_AMBIENT_LIGHT, skin);
+        ambientLight = new OwnSliderPlus(I18n.txt("gui.light.ambient"), Constants.MIN_AMBIENT_LIGHT, Constants.MAX_AMBIENT_LIGHT, Constants.SLIDER_STEP_TINY, skin);
         ambientLight.setName("ambient light");
         ambientLight.setWidth(sliderWidth);
         ambientLight.setMappedValue(GlobalConf.scene.AMBIENT_LIGHT);
@@ -91,7 +91,7 @@ public class VisualEffectsComponent extends GuiComponent implements IObserver {
         });
 
         /** Label size **/
-        labelSize = new OwnSliderPlus(I18n.txt("gui.label.size"), Constants.MIN_LABEL_SIZE, Constants.MAX_LABEL_SIZE, Constants.SLIDER_STEP_SMALL, Constants.MIN_LABEL_SIZE, Constants.MAX_LABEL_SIZE, skin);
+        labelSize = new OwnSliderPlus(I18n.txt("gui.label.size"), Constants.MIN_LABEL_SIZE, Constants.MAX_LABEL_SIZE, Constants.SLIDER_STEP_SMALL, skin);
         labelSize.setName("label size");
         labelSize.setWidth(sliderWidth);
         labelSize.setMappedValue(GlobalConf.scene.LABEL_SIZE_FACTOR);

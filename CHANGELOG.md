@@ -31,6 +31,7 @@
 - additive gpu VBOs 
 
 ### Build System
+- fix install4j crash, sort out tar.gz md5, update changelog 
 - update changelog, changelog template and scripts 
 - allow more than one instance with the .exe file 
 - update to lwjgl 3.2.3, deprecated annotations 

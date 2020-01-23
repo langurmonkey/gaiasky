@@ -18,7 +18,6 @@ import gaiasky.util.math.MathUtilsd;
  * Same as a regular slider, but contains the title (name) and the value within its bounds.
  */
 public class OwnSliderPlus extends Slider {
-    private static INumberFormat nf = NumberFormatFactory.getFormatter("####0.#");
 
     private float ownwidth = 0f, ownheight = 0f;
     private float mapMin, mapMax;
@@ -29,6 +28,7 @@ public class OwnSliderPlus extends Slider {
     private String valuePrefix, valueSuffix;
     private float padX = 3f * GlobalConf.UI_SCALE_FACTOR;
     private float padY = 3f * GlobalConf.UI_SCALE_FACTOR;
+    private INumberFormat nf;
 
     public OwnSliderPlus(String title, float min, float max, float stepSize, float mapMin, float mapMax, Skin skin) {
         super(min, max, stepSize, false, skin, "big-horizontal");
@@ -55,6 +55,11 @@ public class OwnSliderPlus extends Slider {
     }
 
     public void setUp(String title, float mapMin, float mapMax) {
+        setUp(title, mapMin, mapMax, NumberFormatFactory.getFormatter("####0.##"));
+    }
+
+    public void setUp(String title, float mapMin, float mapMax, INumberFormat nf){
+        this.nf = nf;
         setMapValues(mapMin, mapMax);
 
         if (title != null && !title.isEmpty()) {
@@ -71,6 +76,10 @@ public class OwnSliderPlus extends Slider {
             }
             return false;
         });
+    }
+
+    public void setNumberFormatter(INumberFormat nf) {
+        this.nf = nf;
     }
 
     public void setDisplayValueMapped(boolean displayValueMapped) {

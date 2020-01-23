@@ -439,7 +439,7 @@ task pack(dependsOn: install4jMedia, description: "Creates the releases for wind
         println("Appending md5 checksum of " + project.distName + ".tar.gz to md5sums file")
         String md5Tar = file("$packageDir/" + project.distName + ".tar.gz.md5").text
         md5Tar = md5Tar.replace("\n", "").replace("\r", "");
-        file("$packageDir/" + 'md5sums').text = file("$packageDir/" + 'md5sums').text + md5Tar + " *" + project.distName + ".tar.gz\n"
+        file("$packageDir/" + 'md5sums').text = file("$packageDir/" + 'md5sums').s ext + md5Tar + " *" + project.distName + ".tar.gz\n"
 
         println("Removing file " + project.distName + ".tar.gz.md5")
         file("$packageDir/" + project.distName + ".tar.gz.md5").delete()
