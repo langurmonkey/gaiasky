@@ -8,6 +8,7 @@
 [Full changelog](https://gitlab.com/langurmonkey/gaiasky/compare/2.2.4...2.2.4-1)
 
 ### Bug Fixes
+- build script typo 
 - ambient light slider 
 
 

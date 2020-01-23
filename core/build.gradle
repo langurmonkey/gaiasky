@@ -348,8 +348,11 @@ task createArch(dependsOn: createTar, description: "Copies Arch Linux AUR build 
         String md5Tar = new File("$packageDir/" + project.distName + ".tar.gz.md5").text
         md5Tar = md5Tar.replace("\n", "").replace("\r", "");
 
+        String tagRevEscaped = "$tagRev"
+        tagRevEscaped = tagRevEscaped.replace(":", "_").replace("/", "_").replace("-", "_").replace(" ", "_");
 
         ant.replace(file: "$packageDir/arch/PKGBUILD", token: '@version.revision@', value: "$tagRev")
+        ant.replace(file: "$packageDir/arch/PKGBUILD", token: '@version.revision.escaped@', value: "$tagRevEscaped")
         ant.replace(file: "$packageDir/arch/PKGBUILD", token: '@md5checksum@', value: md5Tar)
 
         copy {
