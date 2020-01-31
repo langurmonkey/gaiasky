@@ -971,18 +971,20 @@ public class GlobalConf {
 
         /**
          * Checks whether the MPCDI configuration file for this slave is set
+         *
          * @return Whether the MPCDI file for this slave is set
          */
-        public boolean isSlaveMPCDIPresent(){
+        public boolean isSlaveMPCDIPresent() {
             return NET_SLAVE_CONFIG != null && !NET_SLAVE_CONFIG.isEmpty();
         }
 
         /**
          * Checks whether the slave is configured directly in the properties file
          * of Gaia Sky
+         *
          * @return Whether the slave is configured in the properties file
          */
-        public boolean areSlaveConfigPropertiesPresent(){
+        public boolean areSlaveConfigPropertiesPresent() {
             return !Float.isNaN(NET_SLAVE_YAW) && !Float.isNaN(NET_SLAVE_PITCH) && !Float.isNaN(NET_SLAVE_ROLL);
         }
 
@@ -1357,9 +1359,9 @@ public class GlobalConf {
             EventManager.instance.subscribe(this, Events.TOGGLE_VISIBILITY_CMD, Events.FOCUS_LOCK_CMD, Events.ORIENTATION_LOCK_CMD, Events.STAR_BRIGHTNESS_CMD, Events.PM_LEN_FACTOR_CMD, Events.PM_NUM_FACTOR_CMD, Events.PM_COLOR_MODE_CMD, Events.PM_ARROWHEADS_CMD, Events.FOV_CHANGED_CMD, Events.CAMERA_SPEED_CMD, Events.ROTATION_SPEED_CMD, Events.TURNING_SPEED_CMD, Events.SPEED_LIMIT_CMD, Events.TRANSIT_COLOUR_CMD, Events.ONLY_OBSERVED_STARS_CMD, Events.COMPUTE_GAIA_SCAN_CMD, Events.OCTREE_PARTICLE_FADE_CMD, Events.STAR_POINT_SIZE_CMD, Events.STAR_POINT_SIZE_INCREASE_CMD, Events.STAR_POINT_SIZE_DECREASE_CMD, Events.STAR_POINT_SIZE_RESET_CMD, Events.STAR_MIN_OPACITY_CMD, Events.AMBIENT_LIGHT_CMD, Events.GALAXY_3D_CMD, Events.CROSSHAIR_FOCUS_CMD, Events.CROSSHAIR_CLOSEST_CMD, Events.CROSSHAIR_HOME_CMD, Events.CAMERA_CINEMATIC_CMD, Events.CUBEMAP_RESOLUTION_CMD, Events.LABEL_SIZE_CMD, Events.LINE_WIDTH_CMD, Events.ELEVATION_MUTLIPLIER_CMD, Events.ELEVATION_TYPE_CMD, Events.TESSELLATION_QUALITY_CMD);
         }
 
-        public void initialize(String sTARTUP_OBJECT, GraphicsQuality gRAPHICS_QUALITY, long oBJECT_FADE_MS, float sTAR_BRIGHTNESS, float sTAR_BRIGHTNESS_POWER, float aMBIENT_LIGHT, float cAMERA_FOV, float cAMERA_SPEED, float tURNING_SPEED, float rOTATION_SPEED, int cAMERA_SPEED_LIMIT_IDX, boolean fOCUS_LOCK, boolean fOCUS_LOCK_ORIENTATION, float lABEL_SIZE_FACTOR, float lABEL_NUMBER_FACTOR, float lINE_WIDTH_FACTOR, boolean[] vISIBILITY, int oRBIT_RENDERER, int lINE_RENDERER, double sTAR_TH_ANGLE_NONE,
-                double sTAR_TH_ANGLE_POINT, double sTAR_TH_ANGLE_QUAD, float pOINT_ALPHA_MIN, float pOINT_ALPHA_MAX, boolean oCTREE_PARTICLE_FADE, float oCTANT_TH_ANGLE_0, float oCTANT_TH_ANGLE_1, float pM_NUM_FACTOR, float pM_LEN_FACTOR, long n_PM_STARS, int pM_COLOR_MODE, boolean pM_ARROWHEADS, float sTAR_POINT_SIZE, boolean gALAXY_3D, int cUBEMAP_FACE_RESOLUTION, boolean cROSSHAIR_FOCUS, boolean cROSSHAIR_CLOSEST, boolean cROSSHAIR_HOME, boolean cINEMATIC_CAMERA, boolean lAZY_TEXTURE_INIT,
-                boolean lAZY_MESH_INIT, boolean fREE_CAMERA_TARGET_MODE_ON, boolean sHADOW_MAPPING, int sHADOW_MAPPING_N_SHADOWS, int sHADOW_MAPPING_RESOLUTION, long mAX_LOADED_STARS, ElevationType eLEVATION_TYPE, double eLEVATION_MULTIPLIER, double tESSELLATION_QUALITY, double dIST_SCALE_DESKTOP, double dIST_SCALE_VR) {
+        public void initialize(String sTARTUP_OBJECT, GraphicsQuality gRAPHICS_QUALITY, long oBJECT_FADE_MS, float sTAR_BRIGHTNESS, float sTAR_BRIGHTNESS_POWER, float aMBIENT_LIGHT, float cAMERA_FOV, float cAMERA_SPEED, float tURNING_SPEED, float rOTATION_SPEED, int cAMERA_SPEED_LIMIT_IDX, boolean fOCUS_LOCK, boolean fOCUS_LOCK_ORIENTATION, float lABEL_SIZE_FACTOR, float lABEL_NUMBER_FACTOR, float lINE_WIDTH_FACTOR, boolean[] vISIBILITY, int oRBIT_RENDERER, int lINE_RENDERER,
+                double sTAR_TH_ANGLE_NONE, double sTAR_TH_ANGLE_POINT, double sTAR_TH_ANGLE_QUAD, float pOINT_ALPHA_MIN, float pOINT_ALPHA_MAX, boolean oCTREE_PARTICLE_FADE, float oCTANT_TH_ANGLE_0, float oCTANT_TH_ANGLE_1, float pM_NUM_FACTOR, float pM_LEN_FACTOR, long n_PM_STARS, int pM_COLOR_MODE, boolean pM_ARROWHEADS, float sTAR_POINT_SIZE, boolean gALAXY_3D, int cUBEMAP_FACE_RESOLUTION, boolean cROSSHAIR_FOCUS, boolean cROSSHAIR_CLOSEST, boolean cROSSHAIR_HOME, boolean cINEMATIC_CAMERA,
+                boolean lAZY_TEXTURE_INIT, boolean lAZY_MESH_INIT, boolean fREE_CAMERA_TARGET_MODE_ON, boolean sHADOW_MAPPING, int sHADOW_MAPPING_N_SHADOWS, int sHADOW_MAPPING_RESOLUTION, long mAX_LOADED_STARS, ElevationType eLEVATION_TYPE, double eLEVATION_MULTIPLIER, double tESSELLATION_QUALITY, double dIST_SCALE_DESKTOP, double dIST_SCALE_VR) {
             STARTUP_OBJECT = sTARTUP_OBJECT;
             GRAPHICS_QUALITY = gRAPHICS_QUALITY;
             OBJECT_FADE_MS = oBJECT_FADE_MS;
@@ -1607,7 +1609,6 @@ public class GlobalConf {
             default:
                 break;
             }
-
         }
 
         public boolean isNormalLineRenderer() {
@@ -1616,6 +1617,28 @@ public class GlobalConf {
 
         public boolean isQuadLineRenderer() {
             return LINE_RENDERER == 1;
+        }
+
+    }
+
+    /**
+     * Computes the runtime star point size taking into account cubemap rendering
+     * @return The point size in pixels
+     */
+    public static float getStarPointSize() {
+        if(program.CUBEMAP_MODE) {
+            float screenArea = screen.getScreenHeight() * screen.getScreenWidth();
+            float cubemapRes = scene.CUBEMAP_FACE_RESOLUTION;
+            float pointSize;
+            if (cubemapRes <= 2000) {
+                pointSize = MathUtilsd.lint(cubemapRes, 500f, 2000f, 20f, 8f);
+            } else {
+                pointSize = MathUtilsd.lint(cubemapRes, 2000f, 3000f, 8f, 4f);
+            }
+            return MathUtils.clamp(pointSize, 0f, 50f) * (scene.STAR_POINT_SIZE / 3.75f) * (MathUtilsd.lint(screenArea, 500000f, 8000000f, 1.8f, 4.8f) / 3.75f);
+            //return MathUtils.clamp(pointSize, 0f, 50f) * scene.STAR_POINT_SIZE / 3.75f;
+        }else{
+            return scene.STAR_POINT_SIZE;
         }
     }
 

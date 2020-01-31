@@ -776,16 +776,16 @@ public interface IScriptingInterface {
     void setStarBrightness(float brightness);
 
     /**
-     * Gets the current star size.
+     * Gets the current star size value in pixels.
      *
-     * @return The size value, between 0 and 100.
+     * @return The size value, in pixels.
      */
     float getStarSize();
 
     /**
-     * Sets the star size value.
+     * Sets the size of the rasterized stars, in pixels.
      *
-     * @param size The size value, between 0 and 100.
+     * @param size The size value in pixels, between {@link Constants#MIN_STAR_POINT_SIZE} and {@link Constants#MAX_STAR_POINT_SIZE}.
      */
     void setStarSize(float size);
 

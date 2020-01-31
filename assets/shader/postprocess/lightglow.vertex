@@ -53,12 +53,8 @@ void main(){
 
         float lum = 0.0;
         for (int idx = 0; idx < u_nSamples; idx++){
-            vec2 curr_coord = u_lightPositions[li] + vec2(fx(t, a) / ar, fy(t, a));
-            if(curr_coord.x < 0.0 || curr_coord.x > 1.0 || curr_coord.y < 0.0 || curr_coord.y > 1.0){
-                lum += 0.7;
-            } else {
-                lum += (clamp(texture(u_texture2, curr_coord), 0.0, 1.0)).r;
-            }
+            vec2 curr_coord = clamp(u_lightPositions[li] + vec2(fx(t, a) / ar, fy(t, a)), 0.0, 1.0);
+            lum += (clamp(texture(u_texture2, curr_coord), 0.0, 1.0)).r;
             t += dt;
         }
         lum += texture(u_texture2, u_lightPositions[li] + vec2(fx(t, a) / ar, fy(t, a) * ar)).r;

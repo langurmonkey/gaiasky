@@ -755,8 +755,8 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
 
     @Override
     public void setStarSize(final float size) {
-        if (checkNum(size, Constants.MIN_SLIDER, Constants.MAX_SLIDER, "size"))
-            GaiaSky.postRunnable(() -> em.post(Events.STAR_POINT_SIZE_CMD, MathUtilsd.lint(size, Constants.MIN_SLIDER, Constants.MAX_SLIDER, Constants.MIN_STAR_POINT_SIZE, Constants.MAX_STAR_POINT_SIZE), false));
+        if (checkNum(size, Constants.MIN_STAR_POINT_SIZE, Constants.MAX_STAR_POINT_SIZE, "size"))
+            GaiaSky.postRunnable(() -> em.post(Events.STAR_POINT_SIZE_CMD, size, false));
     }
 
     public void setStarSize(final int size) {

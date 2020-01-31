@@ -201,7 +201,7 @@ public class Constants {
     /** Minimum star pixel size **/
     public static final float MIN_STAR_POINT_SIZE = 0.1f;
     /** Maximum star pixel size **/
-    public static final float MAX_STAR_POINT_SIZE = 10;
+    public static final float MAX_STAR_POINT_SIZE = 20;
     /** Step to increase/decrease **/
     public static final float STEP_STAR_POINT_SIZE = 0.1f;
 

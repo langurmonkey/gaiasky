@@ -151,7 +151,7 @@ public class ParticleGroupRenderSystem extends ImmediateRenderSystem implements 
                     shaderProgram.setUniformf("u_alpha", alphas[particleGroup.ct.getFirstOrdinal()] * particleGroup.getOpacity());
                     shaderProgram.setUniformf("u_ar", stereoHalfWidth ? 2f : 1f);
                     shaderProgram.setUniformf("u_falloff", particleGroup.profileDecay);
-                    shaderProgram.setUniformf("u_sizeFactor", (float) ((((stereoHalfWidth ? 2.0 : 1.0) * rc.scaleFactor * GlobalConf.scene.STAR_POINT_SIZE)) * particleGroup.highlightedSizeFactor() * meanDist * 0.15 / (camera.getFovFactor() * Constants.DISTANCE_SCALE_FACTOR)));
+                    shaderProgram.setUniformf("u_sizeFactor", (float) ((((stereoHalfWidth ? 2.0 : 1.0) * rc.scaleFactor * GlobalConf.getStarPointSize())) * particleGroup.highlightedSizeFactor() * meanDist * 0.15 / (camera.getFovFactor() * Constants.DISTANCE_SCALE_FACTOR)));
                     shaderProgram.setUniformf("u_minSize", (float) (3.0 / (camera.getFovFactor() * Constants.DISTANCE_SCALE_FACTOR)));
                     shaderProgram.setUniformf("u_camPos", camera.getCurrent().getPos().put(aux1));
                     shaderProgram.setUniformf("u_camDir", camera.getCurrent().getCamera().direction);

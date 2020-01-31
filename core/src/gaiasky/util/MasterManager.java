@@ -288,7 +288,7 @@ public class MasterManager implements IObserver {
             }
             break;
         case STAR_POINT_SIZE_CMD:
-            float size = MathUtilsd.lint((float) data[0], Constants.MIN_STAR_POINT_SIZE, Constants.MAX_STAR_POINT_SIZE, Constants.MIN_SLIDER, Constants.MAX_SLIDER);
+            float size = (float) data[0];
             String ssize = Float.toString(size);
             i = 0;
             for (String slave : slaves) {

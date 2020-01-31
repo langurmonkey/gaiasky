@@ -52,7 +52,7 @@ public class VisualEffectsComponent extends GuiComponent implements IObserver {
         });
 
         /** Star size **/
-        starSize = new OwnSliderPlus(I18n.txt("gui.star.size"), Constants.MIN_SLIDER, Constants.MAX_SLIDER, Constants.SLIDER_STEP, Constants.MIN_STAR_POINT_SIZE, Constants.MAX_STAR_POINT_SIZE, skin);
+        starSize = new OwnSliderPlus(I18n.txt("gui.star.size"), Constants.MIN_STAR_POINT_SIZE, Constants.MAX_STAR_POINT_SIZE, Constants.STEP_STAR_POINT_SIZE, skin);
         starSize.setName("star size");
         starSize.setWidth(sliderWidth);
         starSize.setMappedValue(GlobalConf.scene.STAR_POINT_SIZE);
@@ -153,17 +153,16 @@ public class VisualEffectsComponent extends GuiComponent implements IObserver {
         case STAR_POINT_SIZE_CMD:
             if (!(boolean) data[1]) {
                 flag = false;
-                float newsize = MathUtilsd.lint((float) data[0], Constants.MIN_STAR_POINT_SIZE, Constants.MAX_STAR_POINT_SIZE, Constants.MIN_SLIDER, Constants.MAX_SLIDER);
-                starSize.setValue(newsize);
+                float newsize = (float) data[0];
+                starSize.setMappedValue(newsize);
                 flag = true;
             }
             break;
         case STAR_BRIGHTNESS_CMD:
             if (!(boolean) data[1]) {
                 Float brightness = (Float) data[0];
-                float sliderValue = MathUtilsd.lint(brightness, Constants.MIN_STAR_BRIGHT, Constants.MAX_STAR_BRIGHT, Constants.MIN_SLIDER, Constants.MAX_SLIDER);
                 hackProgrammaticChangeEvents = false;
-                starBrightness.setValue(sliderValue);
+                starBrightness.setMappedValue(brightness);
                 hackProgrammaticChangeEvents = true;
             }
             break;

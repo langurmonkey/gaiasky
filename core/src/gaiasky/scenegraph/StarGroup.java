@@ -370,14 +370,14 @@ public class StarGroup extends ParticleGroup implements ILineRenderable, IStarFo
         switch(GlobalConf.scene.GRAPHICS_QUALITY){
         case ULTRA:
         case HIGH:
-            n = 80;
+            n = 100;
             break;
         case NORMAL:
-            n = 50;
+            n = 80;
             break;
         case LOW:
         default:
-            n = 40;
+            n = 60;
             break;
         }
         return Math.min(n ,pointData.size);
