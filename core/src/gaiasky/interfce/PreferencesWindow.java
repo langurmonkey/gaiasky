@@ -1767,7 +1767,7 @@ public class PreferencesWindow extends GenericDialog {
         File userFolderConfFile = new File(userFolder, "global.properties");
 
         // Internal config
-        File confFolder = new File("conf" + File.separator);
+        File confFolder = new File(GlobalConf.ASSETS_LOC, "conf" + File.separator);
         File internalFolderConfFile = new File(confFolder, "global.properties");
 
         // Delete current conf
@@ -1780,12 +1780,9 @@ public class PreferencesWindow extends GenericDialog {
             if (confFolder.exists() && confFolder.isDirectory()) {
                 // Running released package
                 copyFile(internalFolderConfFile, userFolderConfFile, true);
+                logger.info("Default configuration file applied successfully! Gaia Sky will shut down now");
             } else {
-                // Running from code?
-                if (!new File("../android/assets/conf" + File.separator).exists()) {
-                    throw new IOException("File ../android/assets/conf does not exist!");
-                }
-                copyFile(new File("../android/assets/conf" + File.separator + "global.properties"), userFolderConfFile, true);
+                    throw new IOException("File " + confFolder.getAbsolutePath() + " does not exist!");
             }
 
         } catch (Exception e) {
