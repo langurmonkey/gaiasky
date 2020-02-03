@@ -267,7 +267,7 @@ public class MilkyWay extends AbstractPositionEntity implements I3DTextRenderabl
 
     @Override
     public String text() {
-        return name;
+        return names[0];
     }
 
     @Override

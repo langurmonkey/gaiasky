@@ -10,7 +10,6 @@ import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.PerspectiveCamera;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.Array;
-import com.badlogic.gdx.utils.ObjectMap;
 import gaiasky.GaiaSky;
 import gaiasky.render.ComponentTypes.ComponentType;
 import gaiasky.render.*;
@@ -86,9 +85,6 @@ public abstract class CelestialBody extends AbstractPositionEntity implements I3
 
     /** Component alpha mirror **/
     public float compalpha;
-
-    /** Alternative name **/
-    private String altname;
 
     /**
      * Whether we are out of the time baseline range in the algorithm that works
@@ -327,7 +323,7 @@ public abstract class CelestialBody extends AbstractPositionEntity implements I3
 
     @Override
     public boolean renderText() {
-        return name != null && GaiaSky.instance.isOn(ComponentType.Labels) && Math.pow(viewAngleApparent, getViewAnglePow()) >= (TH_OVER_FACTOR * getThOverFactorScl());
+        return names != null && GaiaSky.instance.isOn(ComponentType.Labels) && Math.pow(viewAngleApparent, getViewAnglePow()) >= (TH_OVER_FACTOR * getThOverFactorScl());
     }
 
     @Override
@@ -376,7 +372,7 @@ public abstract class CelestialBody extends AbstractPositionEntity implements I3
 
     @Override
     public String text() {
-        return name;
+        return names[0];
     }
 
     @Override
@@ -516,29 +512,13 @@ public abstract class CelestialBody extends AbstractPositionEntity implements I3
     }
 
     public void setAltname(String altname) {
-        this.altname = altname;
+        this.addName(altname);
     }
 
-    public String getAltname() {
-        return this.altname;
-    }
 
-    @Override
-    protected void addToIndex(ObjectMap<String, SceneGraphNode> map) {
-        if (altname != null && !altname.isEmpty()) {
-            map.put(altname.toLowerCase(), this);
-        }
-    }
-
-    @Override
-    protected void removeFromIndex(ObjectMap<String, SceneGraphNode> map) {
-        if (altname != null && !altname.isEmpty()) {
-            map.remove(altname.toLowerCase());
-        }
-    }
     @Override
     public IFocus getFocus(String name) {
-        if (this.name.toLowerCase().equals(name) || (altname != null && altname.toLowerCase().equals(name)))
+        if (this.hasName(name))
             return this;
 
         return null;

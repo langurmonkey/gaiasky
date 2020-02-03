@@ -5,7 +5,6 @@
 
 package gaiasky.interfce.components;
 
-import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Group;
@@ -366,9 +365,9 @@ public class ObjectsComponent extends GuiComponent implements IObserver {
 
                 // Select without firing events, do not use set()
                 objList.getSelection().items().clear();
-                objList.getSelection().items().add(node.name);
+                objList.getSelection().items().add(node.getName());
 
-                int itemIdx = items.indexOf(node.name, false);
+                int itemIdx = items.indexOf(node.getName(), false);
                 if (itemIdx >= 0) {
                     objList.getSelection().setProgrammaticChangeEvents(false);
                     objList.setSelectedIndex(itemIdx);

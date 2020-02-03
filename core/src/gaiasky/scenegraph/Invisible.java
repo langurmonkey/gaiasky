@@ -36,7 +36,7 @@ public class Invisible extends CelestialBody {
 
     public Invisible(String name, double size) {
         super();
-        this.name = name;
+        this.setName(name);
         this.parentName = "Universe";
         this.size = (float) size;
         this.ct = new ComponentTypes(ComponentType.Invisible);
@@ -78,7 +78,7 @@ public class Invisible extends CelestialBody {
 
     @Override
     protected void addToRenderLists(ICamera camera) {
-        if (name != null && name.length() > 0) {
+        if (names != null) {
             camera.checkClosestBody(this);
         }
     }

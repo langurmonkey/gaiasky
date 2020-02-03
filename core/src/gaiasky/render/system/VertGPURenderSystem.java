@@ -165,7 +165,7 @@ public class VertGPURenderSystem<T extends IGPUVertsRenderable> extends Immediat
             shaderProgram.setUniformMatrix("u_worldTransform", renderable.getLocalTransform());
             shaderProgram.setUniformMatrix("u_projView", camera.getCamera().combined);
             shaderProgram.setUniformf("u_alpha", (float) (renderable.getAlpha()) * getAlpha(renderable));
-            if (renderable.getParent() != null && renderable.getParent().name.equals("Gaia")) {
+            if (renderable.getParent() != null && renderable.getParent().hasName("Gaia")) {
                 Vector3d ppos = ((Gaia) renderable.getParent()).unrotatedPos;
                 shaderProgram.setUniformf("u_parentPos", (float) ppos.x, (float) ppos.y, (float) ppos.z);
             } else {

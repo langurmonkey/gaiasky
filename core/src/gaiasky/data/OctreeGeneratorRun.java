@@ -493,7 +493,7 @@ public class OctreeGeneratorRun {
                 float[] col = colors.get(star.id);
                 gal.set(star.x(), star.y(), star.z()).scl(Constants.U_TO_KM);
                 //gal.mul(Coordinates.equatorialToGalactic());
-                writer.println(star.name + sep + gal.x + sep + gal.y + sep + gal.z + sep + star.absmag() + sep + star.appmag() + sep + col[0] + sep + col[1] + sep + col[2]);
+                writer.println(star.namesConcat() + sep + gal.x + sep + gal.y + sep + gal.z + sep + star.absmag() + sep + star.appmag() + sep + col[0] + sep + col[1] + sep + col[2]);
             }
             writer.close();
         } catch (Exception e) {

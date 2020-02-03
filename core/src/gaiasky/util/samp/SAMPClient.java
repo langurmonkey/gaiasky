@@ -240,7 +240,7 @@ public class SAMPClient implements IObserver {
             if (!preventProgrammaticEvents && data[0] instanceof StarGroup) {
                 StarGroup sg = (StarGroup) data[0];
                 if (conn != null && conn.isConnected() && mapIdSg.containsValue(sg)) {
-                    String id = sg.name;
+                    String id = sg.getName();
                     String url = mapIdUrl.get(id);
                     int row = sg.getCandidateIndex();
 

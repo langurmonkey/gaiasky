@@ -21,7 +21,7 @@ public class ConstellationBoundaries extends AbstractPositionEntity implements I
     public ConstellationBoundaries() {
         super();
         cc = new float[] { .8f, .8f, 1f, alpha };
-        this.name = "Constellation boundaries";
+        this.setName("Constellation boundaries");
         this.parentName = SceneGraphNode.ROOT_NAME;
     }
 

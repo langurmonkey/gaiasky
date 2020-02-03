@@ -223,7 +223,7 @@ public abstract class AbstractPositionEntity extends SceneGraphNode {
     }
 
     public Vector3d getAbsolutePosition(String name, Vector3d aux) {
-        return this.name.toLowerCase().equals(name) ? getAbsolutePosition(aux) : null;
+        return this.hasName(name) ? getAbsolutePosition(aux) : null;
     }
 
     public Matrix4d getAbsoluteOrientation(Matrix4d aux) {
@@ -363,7 +363,7 @@ public abstract class AbstractPositionEntity extends SceneGraphNode {
         try {
             AbstractPositionEntity instance = clazz.newInstance();
             instance.copy = true;
-            instance.name = this.name;
+            instance.names = this.names;
             instance.pos.set(this.pos);
             instance.size = this.size;
             instance.distToCamera = this.distToCamera;

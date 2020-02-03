@@ -219,7 +219,7 @@ public abstract class AbstractOctreeWrapper extends FadeNode implements Iterable
         try {
             AbstractOctreeWrapper instance = pool.obtain();
             instance.copy = true;
-            instance.name = this.name;
+            instance.names = this.names;
             instance.translation.set(this.translation);
             instance.ct = this.ct;
             if (this.localTransform != null)

@@ -250,13 +250,14 @@ public class DR2DataProvider extends AbstractStarGroupDataProvider {
                                 ag = Parser.parseDouble(tokens[IDX_A_G]);
                             } else {
                                 // Compute extinction analytically
-                                // TODO limit Absorption to ~3
                                 Vector3d posgal = new Vector3d(pos);
                                 posgal.mul(Coordinates.eqToGal());
                                 Vector3d posgalsph = Coordinates.cartesianToSpherical(posgal, new Vector3d());
                                 double b = posgalsph.y;
                                 magcorraux = Math.min(distpc, 150d / Math.abs(Math.sin(b)));
                                 ag = magcorraux * 5.9e-4;
+                                // Limit to 3
+                                ag = Math.min(ag, 3.2);
                             }
                         }
                         // Apply extinction
@@ -275,8 +276,9 @@ public class DR2DataProvider extends AbstractStarGroupDataProvider {
                                 ebr = Parser.parseDouble(tokens[IDX_E_BP_MIN_RP]);
                             } else {
                                 // Compute reddening analtytically
-                                // TODO limit reddening to ~1.6
                                 ebr = magcorraux * 2.9e-4;
+                                // Limit to 1.6
+                                ebr = Math.min(ebr, 1.6);
                             }
                         }
 

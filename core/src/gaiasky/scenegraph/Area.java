@@ -200,4 +200,9 @@ public class Area extends AbstractPositionEntity implements ILineRenderable {
         return GL20.GL_LINES;
     }
 
+    @Override
+    public boolean mustAddToIndex() {
+        return false;
+    }
+
 }

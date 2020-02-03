@@ -18,8 +18,10 @@ import gaiasky.render.IRenderable;
 import gaiasky.render.SceneGraphRenderer;
 import gaiasky.scenegraph.camera.ICamera;
 import gaiasky.scenegraph.octreewrapper.AbstractOctreeWrapper;
+import gaiasky.util.Constants;
 import gaiasky.util.I18n;
 import gaiasky.util.Logger;
+import gaiasky.util.TextUtils;
 import gaiasky.util.math.Matrix4d;
 import gaiasky.util.math.Vector3d;
 import gaiasky.util.time.ITimeFrameProvider;
@@ -31,9 +33,8 @@ import java.util.List;
 
 /**
  * A scene graph entity.
- * 
- * @author Toni Sagrista
  *
+ * @author Toni Sagrista
  */
 public class SceneGraphNode implements IStarContainer, IPosition {
     public static final String ROOT_NAME = "Universe";
@@ -134,11 +135,9 @@ public class SceneGraphNode implements IStarContainer, IPosition {
 
         /**
          * Adds the given render groups to the given Bits mask
-         * 
-         * @param rgmask
-         *            The bit mask
-         * @param rgs
-         *            The render groups
+         *
+         * @param rgmask The bit mask
+         * @param rgs    The render groups
          * @return The bits instance
          */
         public static Bits add(Bits rgmask, RenderGroup... rgs) {
@@ -150,11 +149,9 @@ public class SceneGraphNode implements IStarContainer, IPosition {
 
         /**
          * Sets the given Bits mask to the given render groups
-         * 
-         * @param rgmask
-         *            The bit mask
-         * @param rgs
-         *            The render groups
+         *
+         * @param rgmask The bit mask
+         * @param rgs    The render groups
          * @return The bits instance
          */
         public static Bits set(Bits rgmask, RenderGroup... rgs) {
@@ -201,9 +198,9 @@ public class SceneGraphNode implements IStarContainer, IPosition {
     public Matrix4d orientation;
 
     /**
-     * The name of the node, if any.
+     * The name(s) of the node, if any.
      */
-    public String name;
+    public String[] names;
 
     /**
      * The key to the name in the i18n system.
@@ -211,7 +208,7 @@ public class SceneGraphNode implements IStarContainer, IPosition {
     protected String namekey = null;
 
     /**
-     * The parent name.
+     * The first name of the parent object.
      */
     public String parentName = null;
 
@@ -255,10 +252,14 @@ public class SceneGraphNode implements IStarContainer, IPosition {
         this.ct = new ComponentTypes(ct);
     }
 
-    public SceneGraphNode(String name, SceneGraphNode parent) {
+    public SceneGraphNode(String[] names, SceneGraphNode parent) {
         this();
-        this.name = name;
+        this.names = names;
         this.parent = parent;
+    }
+
+    public SceneGraphNode(String name, SceneGraphNode parent) {
+        this(new String[] { name }, parent);
     }
 
     public SceneGraphNode(String name) {
@@ -266,12 +267,12 @@ public class SceneGraphNode implements IStarContainer, IPosition {
     }
 
     public SceneGraphNode(SceneGraphNode parent) {
-        this(null, parent);
+        this((String[]) null, parent);
     }
 
     /**
      * Adds the given SceneGraphNode list as children to this node.
-     * 
+     *
      * @param children
      */
     public final void add(SceneGraphNode... children) {
@@ -289,11 +290,9 @@ public class SceneGraphNode implements IStarContainer, IPosition {
     /**
      * Adds a child to the given node and updates the number of children in this
      * node and in all ancestors.
-     * 
-     * @param child
-     *            The child node to add.
-     * @param updateAncestorCount
-     *            Whether to update the ancestors number of children.
+     *
+     * @param child               The child node to add.
+     * @param updateAncestorCount Whether to update the ancestors number of children.
      */
     public final void addChild(SceneGraphNode child, boolean updateAncestorCount) {
         if (this.children == null) {
@@ -315,7 +314,7 @@ public class SceneGraphNode implements IStarContainer, IPosition {
 
     /**
      * Removes the given child from this node, if it exists.
-     * 
+     *
      * @param child
      * @param updateAncestorCount
      */
@@ -338,13 +337,10 @@ public class SceneGraphNode implements IStarContainer, IPosition {
     /**
      * Adds a child to the given node and updates the number of children in this
      * node and in all ancestors.
-     * 
-     * @param child
-     *            The child node to add.
-     * @param updateAncestorCount
-     *            Whether to update the ancestors number of children.
-     * @param numChildren
-     *            The number of children this will hold.
+     *
+     * @param child               The child node to add.
+     * @param updateAncestorCount Whether to update the ancestors number of children.
+     * @param numChildren         The number of children this will hold.
      */
     public final void addChild(SceneGraphNode child, boolean updateAncestorCount, int numChildren) {
         if (this.children == null) {
@@ -366,7 +362,7 @@ public class SceneGraphNode implements IStarContainer, IPosition {
 
     /**
      * Adds the given list of children as child nodes.
-     * 
+     *
      * @param children
      */
     public void add(List<? extends SceneGraphNode> children) {
@@ -375,7 +371,7 @@ public class SceneGraphNode implements IStarContainer, IPosition {
 
     /**
      * Inserts the list of nodes under the parents that match each node's name.
-     * 
+     *
      * @param nodes
      */
     public final void insert(List<? extends SceneGraphNode> nodes) {
@@ -384,7 +380,7 @@ public class SceneGraphNode implements IStarContainer, IPosition {
         // Insert top level
         while (it.hasNext()) {
             SceneGraphNode node = it.next();
-            if ((this.name == null && node.parentName == null) || (this.name != null && this.name.equals(node.parentName))) {
+            if ((this.names == null && node.parentName == null) || (this.names != null && this.names[0].equals(node.parentName))) {
                 // Match, add and remove from list
                 addChild(node, false);
                 node.setUp();
@@ -442,7 +438,7 @@ public class SceneGraphNode implements IStarContainer, IPosition {
     }
 
     public SceneGraphNode getNode(String name) {
-        if (this.name != null && this.name.equals(name)) {
+        if (this.names != null && this.names[0].equals(name)) {
             return this;
         } else if (children != null) {
             int size = children.size;
@@ -495,7 +491,7 @@ public class SceneGraphNode implements IStarContainer, IPosition {
      * Updates the transform matrix with the transformations that will apply to
      * the children and the local transform matrix with the transformations that
      * will apply only to this object.
-     * 
+     *
      * @param time
      */
     protected void updateLocal(ITimeFrameProvider time, ICamera camera) {
@@ -509,12 +505,66 @@ public class SceneGraphNode implements IStarContainer, IPosition {
     public void doneLoading(AssetManager manager) {
     }
 
+    public void setNames(String... names) {
+        this.names = names;
+    }
+
     public void setName(String name) {
-        this.name = name;
+        if (names != null)
+            names[0] = name;
+        else
+            names = new String[] { name };
+    }
+
+    /**
+     * Adds a name to the list of names
+     *
+     * @param name The name
+     */
+    public void addName(String name) {
+        if (!hasName(name))
+            if (names != null) {
+                // Extend array
+                String[] newNames = new String[names.length + 1];
+                System.arraycopy(names, 0, newNames, 0, names.length);
+                newNames[names.length] = name;
+                names = newNames;
+            } else {
+                setName(name);
+            }
+    }
+
+    public String[] getNames() {
+        return names;
     }
 
     public String getName() {
-        return name;
+        return names != null ? names[0] : null;
+    }
+
+    public String namesConcat() {
+        return TextUtils.concatenate(Constants.nameSeparator, names);
+    }
+
+    public boolean hasName(String candidate) {
+        return hasName(candidate, false);
+    }
+
+    public boolean hasName(String candidate, boolean matchCase) {
+        if (names == null) {
+            return false;
+        } else {
+            for (String name : names) {
+                if (matchCase) {
+                    if (name.equals(candidate))
+                        return true;
+                } else {
+                    if (name.equalsIgnoreCase(candidate))
+                        return true;
+                }
+            }
+        }
+        return false;
     }
 
     public void setNamekey(String namekey) {
@@ -528,7 +578,7 @@ public class SceneGraphNode implements IStarContainer, IPosition {
      */
     public void updateNames() {
         if (namekey != null)
-            this.name = I18n.bundle.get(namekey);
+            setName(I18n.bundle.get(namekey));
         if (parentkey != null)
             this.parentName = I18n.bundle.get(parentkey);
     }
@@ -545,7 +595,7 @@ public class SceneGraphNode implements IStarContainer, IPosition {
         }
     }
 
-    public void setId(Long id){
+    public void setId(Long id) {
         this.id = id;
     }
 
@@ -571,7 +621,7 @@ public class SceneGraphNode implements IStarContainer, IPosition {
 
     /**
      * Adds all the children that are focusable objects to the list.
-     * 
+     *
      * @param list
      */
     public void addFocusableObjects(Array<IFocus> list) {
@@ -601,14 +651,14 @@ public class SceneGraphNode implements IStarContainer, IPosition {
 
     public void setCt(String ct) {
         this.ct = new ComponentTypes();
-        if(!ct.isEmpty())
+        if (!ct.isEmpty())
             this.ct.set(ComponentType.valueOf(ct).ordinal());
     }
 
     public void setCt(String[] cts) {
         this.ct = new ComponentTypes();
         for (int i = 0; i < cts.length; i++) {
-            if(!cts[i].isEmpty()) {
+            if (!cts[i].isEmpty()) {
                 this.ct.set(ComponentType.valueOf(cts[i]).ordinal());
             }
         }
@@ -624,7 +674,7 @@ public class SceneGraphNode implements IStarContainer, IPosition {
 
     /**
      * Gets the number of nodes contained in this node, including itself
-     * 
+     *
      * @return The number of children of this node and its descendents
      */
     public int getAggregatedChildren() {
@@ -645,7 +695,7 @@ public class SceneGraphNode implements IStarContainer, IPosition {
 
     /**
      * Gets a copy of this object but does not copy its parent or children
-     * 
+     *
      * @return The copied object
      */
     public <T extends SceneGraphNode> T getSimpleCopy() {
@@ -655,7 +705,7 @@ public class SceneGraphNode implements IStarContainer, IPosition {
         } catch (InstantiationException | IllegalAccessException | NoSuchMethodException | InvocationTargetException e) {
             Logger.getLogger(this.getClass()).error(e);
         }
-        copy.name = this.name;
+        copy.names = this.names;
         copy.parentName = this.parentName;
         return copy;
     }
@@ -670,8 +720,8 @@ public class SceneGraphNode implements IStarContainer, IPosition {
 
     @Override
     public String toString() {
-        if (name != null)
-            return name;
+        if (names != null)
+            return names[0];
         return super.toString();
     }
 
@@ -688,11 +738,9 @@ public class SceneGraphNode implements IStarContainer, IPosition {
     /**
      * Sets the computed flag of the list of nodes and their children to the
      * given value.
-     * 
-     * @param nodes
-     *            List of nodes to set the flag to. May be null.
-     * @param computed
-     *            The computed value.
+     *
+     * @param nodes    List of nodes to set the flag to. May be null.
+     * @param computed The computed value.
      */
     public void setComputedFlag(Array<SceneGraphNode> nodes, boolean computed) {
         if (nodes != null) {
@@ -707,11 +755,9 @@ public class SceneGraphNode implements IStarContainer, IPosition {
 
     /**
      * Adds the given renderable to the given render vgroup list
-     * 
-     * @param renderable
-     *            The renderable to add
-     * @param rg
-     *            The render vgroup that identifies the renderable list
+     *
+     * @param renderable The renderable to add
+     * @param rg         The render vgroup that identifies the renderable list
      * @return True if added, false otherwise
      */
     protected boolean addToRender(IRenderable renderable, RenderGroup rg) {
@@ -725,11 +771,9 @@ public class SceneGraphNode implements IStarContainer, IPosition {
 
     /**
      * Removes the given renderable from the given render vgroup list.
-     * 
-     * @param renderable
-     *            The renderable to remove
-     * @param rg
-     *            The render vgroup to remove from
+     *
+     * @param renderable The renderable to remove
+     * @param rg         The render vgroup to remove from
      * @return True if removed, false otherwise
      */
     protected boolean removeFromRender(IRenderable renderable, RenderGroup rg) {
@@ -742,14 +786,14 @@ public class SceneGraphNode implements IStarContainer, IPosition {
 
     protected boolean isInRender(IRenderable renderable, RenderGroup... rgs) {
         boolean is = false;
-        for(RenderGroup rg : rgs)
+        for (RenderGroup rg : rgs)
             is = is || SceneGraphRenderer.render_lists.get(rg.ordinal()).contains(renderable, true);
         return is;
     }
 
     /**
      * Gets the first ancestor of this node that is of type {@link Star}
-     * 
+     *
      * @return The first ancestor of type {@link Star}
      */
     public SceneGraphNode getFirstStarAncestor() {
@@ -796,9 +840,10 @@ public class SceneGraphNode implements IStarContainer, IPosition {
             return this.parent.getSceneGraphDepth() + 1;
         }
     }
-   
+
     /**
      * Special actions to be taken for this object when adding to the index.
+     *
      * @param map The index
      */
     protected void addToIndex(ObjectMap<String, SceneGraphNode> map) {
@@ -806,6 +851,7 @@ public class SceneGraphNode implements IStarContainer, IPosition {
 
     /**
      * Special actions to be taken for this object when removing from the index. Must implement if addToIndex is implemented
+     *
      * @param map The index
      */
     protected void removeFromIndex(ObjectMap<String, SceneGraphNode> map) {
@@ -813,6 +859,7 @@ public class SceneGraphNode implements IStarContainer, IPosition {
 
     /**
      * Whether to add this node to the index
+     *
      * @return True if the node needs to be added to the index.
      */
     public boolean mustAddToIndex() {
@@ -822,9 +869,10 @@ public class SceneGraphNode implements IStarContainer, IPosition {
     /**
      * Returns whether the current position is valid (usually, when there is no
      * coordinates overflow)
+     *
      * @return
      */
-    public boolean isValidPosition(){
+    public boolean isValidPosition() {
         return true;
     }
 }

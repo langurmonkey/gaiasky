@@ -430,7 +430,7 @@ public class KeyframesPathObject extends VertsObject implements I3DTextRenderabl
                     select(kf);
                     initFocus();
                     focus.pos.set(selected.pos);
-                    focus.name = selected.name;
+                    focus.setName(selected.name);
 
                     return focus;
                 }
@@ -500,7 +500,7 @@ public class KeyframesPathObject extends VertsObject implements I3DTextRenderabl
                 up.setPrimitiveSize(0.6f * ss);
             }
             initFocus();
-            focus.name = "";
+            focus.setName("");
             Keyframe aux = selected;
             selected = null;
             selectedKnot.clear();

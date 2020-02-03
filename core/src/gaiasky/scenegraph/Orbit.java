@@ -117,7 +117,7 @@ public class Orbit extends Polyline {
                 IOrbitDataProvider provider;
                 try {
                     provider = ClassReflection.newInstance(providerClass);
-                    provider.load(oc.source, new OrbitDataLoaderParameter(name, providerClass, oc, multiplier, 100), newmethod);
+                    provider.load(oc.source, new OrbitDataLoaderParameter(names[0], providerClass, oc, multiplier, 100), newmethod);
                     pointCloudData = provider.getData();
                 } catch (Exception e) {
                     logger.error(e);
@@ -136,7 +136,7 @@ public class Orbit extends Polyline {
         primitiveSize = 1.1f;
 
         if (body != null) {
-            params = new OrbitDataLoaderParameter(body.name, null, oc.period, 500);
+            params = new OrbitDataLoaderParameter(body.names[0], null, oc.period, 500);
             params.orbit = this;
         }
     }

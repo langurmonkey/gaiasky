@@ -10,6 +10,7 @@ import com.badlogic.gdx.utils.Array;
 import gaiasky.scenegraph.AbstractPositionEntity;
 import gaiasky.scenegraph.Particle;
 import gaiasky.scenegraph.Star;
+import gaiasky.util.Constants;
 import gaiasky.util.GlobalConf;
 import gaiasky.util.Logger;
 import gaiasky.util.Logger.Log;
@@ -77,8 +78,9 @@ public class ParticleDataBinaryIO {
                     // (double) z[u], mualpha[mas/yr], mudelta[mas/yr],
                     // radvel[km/s], pmx[u/yr], pmy[u/yr], pmz[u/yr], id, hip,
                     // tychoLength, tycho, sourceCatalog, pageid, type
-                    data_out.writeInt(s.name.length());
-                    data_out.writeChars(s.name);
+                    String namesConcat = s.namesConcat();
+                    data_out.writeInt(namesConcat.length());
+                    data_out.writeChars(namesConcat);
                     data_out.writeFloat(s.appmag);
                     data_out.writeFloat(s.absmag);
                     data_out.writeFloat(s.colorbv);
@@ -140,7 +142,9 @@ public class ParticleDataBinaryIO {
                     for (int i = 0; i < nameLength; i++) {
                         sb.append(data_in.readChar());
                     }
-                    String name = sb.toString();
+                    String namesConcat = sb.toString();
+
+                    String[] names = namesConcat.split(Constants.nameSeparator);
                     float appmag = data_in.readFloat();
                     float absmag = data_in.readFloat();
                     float colorbv = data_in.readFloat();
@@ -185,7 +189,7 @@ public class ParticleDataBinaryIO {
                             cc = new float[] { r, g, b, a };
                         }
 
-                        Star s = new Star(pos, pm, pmSph, appmag, absmag, colorbv, name, ra, dec, id, hip, tycho, source);
+                        Star s = new Star(pos, pm, pmSph, appmag, absmag, colorbv, names, ra, dec, id, hip, tycho, source);
                         s.cc = cc;
                         s.octantId = pageId;
                         s.initialize();

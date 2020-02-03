@@ -122,6 +122,12 @@
       "g": 0.6,
       "r": 0.4
     },
+    "lightblue": {
+      "a": 1,
+      "b": 0.95,
+      "g": 0.75,
+      "r": 0.65
+    },
     "sc-blue": {
       "a": 1,
       "b": 0.756,
@@ -565,6 +571,10 @@
     }
   },
   "com.badlogic.gdx.scenes.scene2d.ui.Label$LabelStyle": {
+    "object-name": {
+      "font": "ui-11",
+      "fontColor": "lightblue"
+    },
     "header": {
       "font": "ui-13",
       "fontColor": "blue"

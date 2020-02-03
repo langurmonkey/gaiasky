@@ -96,13 +96,12 @@ public class NBGLoader extends AbstractCatalogLoader implements ISceneGraphLoade
                                 float colorbv = 0;
                                 float absmag = (float) (kmag - 2.5 * Math.log10(Math.pow(distPc / 10d, 2d)));
 
-                                NBGalaxy gal = new NBGalaxy(pos, (float) kmag, absmag, colorbv, name, (float) ra, (float) dec, (float) bmag, (float) a26, (float) ba, hrv, i, tt, Mcl, baseid + offset);
+                                NBGalaxy gal = new NBGalaxy(pos, (float) kmag, absmag, colorbv, new String[] { name, altname }, (float) ra, (float) dec, (float) bmag, (float) a26, (float) ba, hrv, i, tt, Mcl, baseid + offset);
                                 gal.setParent("NBG");
-                                gal.setAltname(altname);
                                 g = gal;
                             } else {
                                 // Billboard
-                                BillboardGalaxy gal = new BillboardGalaxy(name, altname, ra, dec, distPc, sizepc, "data/tex/extragal/" + img);
+                                BillboardGalaxy gal = new BillboardGalaxy(new String[] { name, altname }, ra, dec, distPc, sizepc, "data/tex/extragal/" + img);
                                 // Fade in parsecs from sun
                                 gal.setFade(new double[] { distPc * 0.3, distPc * 0.6 });
                                 g = gal;

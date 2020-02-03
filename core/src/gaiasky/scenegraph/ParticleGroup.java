@@ -291,7 +291,7 @@ public class ParticleGroup extends FadeNode implements I3DTextRenderable, IFocus
             }
 
             // Create catalog info and broadcast
-            CatalogInfo ci = new CatalogInfo(name, name, null, CatalogInfoType.INTERNAL, 1f, this);
+            CatalogInfo ci = new CatalogInfo(names[0], names[0], null, CatalogInfoType.INTERNAL, 1f, this);
 
             // Insert
             EventManager.instance.post(Events.CATALOG_ADD, ci, false);
@@ -464,7 +464,7 @@ public class ParticleGroup extends FadeNode implements I3DTextRenderable, IFocus
 
     @Override
     public String text() {
-        return name;
+        return names[0];
     }
 
     @Override
@@ -508,14 +508,6 @@ public class ParticleGroup extends FadeNode implements I3DTextRenderable, IFocus
      */
     public long getId() {
         return 123l;
-    }
-
-    /**
-     * Returns name of focus
-     */
-    @Override
-    public String getName() {
-        return name;
     }
 
     @Override

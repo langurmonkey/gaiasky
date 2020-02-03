@@ -94,13 +94,17 @@ public class StarGroup extends ParticleGroup implements ILineRenderable, IStarFo
 
         public Long id;
         public transient OctreeNode octant;
-        public String name;
+        public String[] names;
 
-        public StarBean(double[] data, Long id, String name) {
+        public StarBean(double[] data, Long id, String[] names) {
             super(data);
             this.id = id;
-            this.name = name;
+            this.names = names;
             this.octant = null;
+        }
+
+        public StarBean(double[] data, Long id, String name) {
+            this(data, id, new String[] { name });
         }
 
         public double pmx() {
@@ -149,6 +153,10 @@ public class StarGroup extends ParticleGroup implements ILineRenderable, IStarFo
 
         public double radvel() {
             return data[I_RADVEL];
+        }
+
+        public String namesConcat(){
+            return TextUtils.concatenate(Constants.nameSeparator, names);
         }
 
     }
@@ -367,7 +375,7 @@ public class StarGroup extends ParticleGroup implements ILineRenderable, IStarFo
 
     private int getNCloseupStars() {
         int n;
-        switch(GlobalConf.scene.GRAPHICS_QUALITY){
+        switch (GlobalConf.scene.GRAPHICS_QUALITY) {
         case ULTRA:
         case HIGH:
             n = 100;
@@ -380,7 +388,7 @@ public class StarGroup extends ParticleGroup implements ILineRenderable, IStarFo
             n = 60;
             break;
         }
-        return Math.min(n ,pointData.size);
+        return Math.min(n, pointData.size);
     }
 
     public void regenerateIndex() {
@@ -399,16 +407,18 @@ public class StarGroup extends ParticleGroup implements ILineRenderable, IStarFo
         int n = pointData.size;
         for (int i = 0; i < n; i++) {
             StarBean sb = pointData.get(i);
-            String lcname = sb.name.toLowerCase();
-            index.put(lcname, i);
-            String lcid = sb.id.toString().toLowerCase();
-            if (sb.id > 0 && !lcid.equals(lcname)) {
-                index.put(lcid, i);
-            }
-            if (sb.hip() > 0) {
-                String lchip = "hip " + sb.hip();
-                if (!lchip.equals(lcname))
-                    index.put(lchip, i);
+            for (String lcname : sb.names) {
+                lcname = lcname.toLowerCase();
+                index.put(lcname, i);
+                String lcid = sb.id.toString().toLowerCase();
+                if (sb.id > 0 && !lcid.equals(lcname)) {
+                    index.put(lcid, i);
+                }
+                if (sb.hip() > 0) {
+                    String lchip = "hip " + sb.hip();
+                    if (!lchip.equals(lcname))
+                        index.put(lchip, i);
+                }
             }
         }
         return index;
@@ -446,7 +456,7 @@ public class StarGroup extends ParticleGroup implements ILineRenderable, IStarFo
             closestCol[2] = c.b;
             closestCol[3] = c.a;
             closestSize = getSize(active[0]);
-            closestName = closestStar.name;
+            closestName = closestStar.names[0];
             camera.checkClosestStar(this);
 
             // Model dist
@@ -808,7 +818,7 @@ public class StarGroup extends ParticleGroup implements ILineRenderable, IStarFo
                 float viewAngle = (float) (((radius / distToCamera) / camera.getFovFactor()) * GlobalConf.scene.STAR_BRIGHTNESS);
 
                 if (camera.isVisible(GaiaSky.instance.time, viewAngle, lpos, distToCamera)) {
-                    render2DLabel(batch, shader, rc, sys.font2d, camera, star.name, lpos);
+                    render2DLabel(batch, shader, rc, sys.font2d, camera, star.names[0], lpos);
                 }
             }
         } else {
@@ -829,7 +839,7 @@ public class StarGroup extends ParticleGroup implements ILineRenderable, IStarFo
                     float textSize = (float) FastMath.tanh(viewAngle) * distToCamera * 1e5f;
                     float alpha = Math.min((float) FastMath.atan(textSize / distToCamera), 1.e-3f);
                     textSize = (float) FastMath.tan(alpha) * distToCamera * 0.5f;
-                    render3DLabel(batch, shader, sys.fontDistanceField, camera, rc, star.name, lpos, textScale() * camera.getFovFactor(), textSize * camera.getFovFactor());
+                    render3DLabel(batch, shader, sys.fontDistanceField, camera, rc, star.names[0], lpos, textScale() * camera.getFovFactor(), textSize * camera.getFovFactor());
 
                 }
             }
@@ -883,7 +893,14 @@ public class StarGroup extends ParticleGroup implements ILineRenderable, IStarFo
 
     public String getName() {
         if (focus != null)
-            return ((StarBean) focus).name;
+            return ((StarBean) focus).names[0];
+        else
+            return null;
+    }
+
+    public String[] getNames(){
+        if (focus != null)
+            return ((StarBean) focus).names;
         else
             return null;
     }
@@ -1000,7 +1017,7 @@ public class StarGroup extends ParticleGroup implements ILineRenderable, IStarFo
 
     @Override
     public String getCandidateName() {
-        return ((StarBean) pointData.get(candidateFocusIndex)).name;
+        return ((StarBean) pointData.get(candidateFocusIndex)).names[0];
     }
 
     @Override
@@ -1167,8 +1184,8 @@ public class StarGroup extends ParticleGroup implements ILineRenderable, IStarFo
     /**
      * Creates a default star vgroup with some sane parameters, given the name and the data
      *
-     * @param name The name of the star vgroup. Any occurrence of '%%SGID%%' in name will be replaced with the id of the star vgroup
-     * @param data The data of the star vgroup
+     * @param name     The name of the star vgroup. Any occurrence of '%%SGID%%' in name will be replaced with the id of the star vgroup
+     * @param data     The data of the star vgroup
      * @param fullInit Initializes the vgroup right away
      * @return A new star vgroup with sane parameters
      */

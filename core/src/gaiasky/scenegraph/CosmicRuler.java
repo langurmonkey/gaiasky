@@ -29,8 +29,8 @@ import net.jafama.FastMath;
 
 /**
  * Cosmic ruler between two objects
- * @author tsagrista
  *
+ * @author tsagrista
  */
 public class CosmicRuler extends AbstractPositionEntity implements I3DTextRenderable, ILineRenderable, IObserver {
     private String name0, name1;
@@ -50,7 +50,7 @@ public class CosmicRuler extends AbstractPositionEntity implements I3DTextRender
         this.p1 = new Vector3d();
         this.m = new Vector3d();
         this.sg = GaiaSky.instance.sg;
-        this.name = "Cosmicruler";
+        this.setName("Cosmicruler");
         this.cc = new float[] { 1f, 1f, 0f };
         this.nf = new DesktopNumberFormat("0.#########E0");
         setCt("Ruler");
@@ -72,7 +72,7 @@ public class CosmicRuler extends AbstractPositionEntity implements I3DTextRender
     @Override
     public void render(LineRenderSystem renderer, ICamera camera, float alpha) {
         double va = 0.01 * camera.getFovFactor();
-        
+
         // Main line
         renderer.addLine(this, p0.x, p0.y, p0.z, p1.x, p1.y, p1.z, cc[0], cc[1], cc[2], alpha);
         // Cap 1
@@ -80,13 +80,13 @@ public class CosmicRuler extends AbstractPositionEntity implements I3DTextRender
         // Cap 1
         addCap(p1, p0, va, renderer, alpha);
     }
-    
+
     private void addCap(Vector3d p0, Vector3d p1, double va, LineRenderSystem renderer, float alpha) {
         // cpos-p0
         Vector3d cp = aux3d2.get().set(p0);
         // cross(cpos-p0, p0-p1)
         Vector3d crs = aux3d1.get().set(p1).sub(p0).crs(cp);
-        
+
         double d = p0.len();
         double caplen = FastMath.tan(va) * d;
         crs.setLength(caplen);
@@ -133,9 +133,9 @@ public class CosmicRuler extends AbstractPositionEntity implements I3DTextRender
             double dst = p0.dst(p1);
             Pair<Double, String> d = GlobalResources.doubleToDistanceString(dst);
             dist = nf.format(d.getFirst()) + " " + d.getSecond();
-            
-            GaiaSky.postRunnable(()->{
-               EventManager.instance.post(Events.RULER_DIST, dst, dist); 
+
+            GaiaSky.postRunnable(() -> {
+                EventManager.instance.post(Events.RULER_DIST, dst, dist);
             });
         } else {
             dist = null;
@@ -162,9 +162,10 @@ public class CosmicRuler extends AbstractPositionEntity implements I3DTextRender
     public boolean rulerOk() {
         return rulerOk;
     }
-    
+
     /**
      * Returns true if the ruler is attached to at least one object.
+     *
      * @return Ture if the ruler is attached.
      */
     public boolean hasAttached() {
@@ -191,7 +192,7 @@ public class CosmicRuler extends AbstractPositionEntity implements I3DTextRender
 
     @Override
     public float textSize() {
-        return (float)(0.0005 * distToCamera);
+        return (float) (0.0005 * distToCamera);
     }
 
     @Override
@@ -202,7 +203,7 @@ public class CosmicRuler extends AbstractPositionEntity implements I3DTextRender
     @Override
     public void textPosition(ICamera cam, Vector3d out) {
         out.set(m);
-        
+
         double len = out.len();
         out.clamp(0, len - getRadius()).scl(0.9f);
 
@@ -235,7 +236,7 @@ public class CosmicRuler extends AbstractPositionEntity implements I3DTextRender
     }
 
     @Override
-    public float getTextOpacity(){
+    public float getTextOpacity() {
         return getOpacity();
     }
 

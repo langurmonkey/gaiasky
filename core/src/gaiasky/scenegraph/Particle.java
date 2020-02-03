@@ -149,34 +149,34 @@ public class Particle extends CelestialBody implements IStarFocus, ILineRenderab
      * @param appmag  Apparent magnitude.
      * @param absmag  Absolute magnitude.
      * @param colorbv The B-V color index.
-     * @param name    The label or name.
+     * @param names    The labels or names.
      * @param starid  The star unique id.
      */
-    public Particle(Vector3d pos, float appmag, float absmag, float colorbv, String name, long starid) {
+    public Particle(Vector3d pos, float appmag, float absmag, float colorbv, String[] names, long starid) {
         this();
         this.pos = pos;
-        this.name = name;
+        this.names = names;
         this.appmag = appmag;
         this.absmag = absmag;
         this.colorbv = colorbv;
         this.id = starid;
 
-        if (this.name == null) {
+        if (this.names == null || this.names.length == 0) {
             randomName = true;
-            this.name = "star_" + rnd.nextInt(10000000);
+            this.setName("star_" + rnd.nextInt(10000000));
         }
         this.pm = new Vector3();
         this.pmSph = new Vector3();
     }
 
-    public Particle(Vector3d pos, float appmag, float absmag, float colorbv, String name, float ra, float dec, long starid) {
-        this(pos, appmag, absmag, colorbv, name, starid);
+    public Particle(Vector3d pos, float appmag, float absmag, float colorbv, String[] names, float ra, float dec, long starid) {
+        this(pos, appmag, absmag, colorbv, names, starid);
         this.posSph = new Vector2d(ra, dec);
 
     }
 
-    public Particle(Vector3d pos, Vector3 pm, Vector3 pmSph, float appmag, float absmag, float colorbv, String name, float ra, float dec, long starid) {
-        this(pos, appmag, absmag, colorbv, name, starid);
+    public Particle(Vector3d pos, Vector3 pm, Vector3 pmSph, float appmag, float absmag, float colorbv, String[] names, float ra, float dec, long starid) {
+        this(pos, appmag, absmag, colorbv, names, starid);
         this.posSph = new Vector2d(ra, dec);
         this.pm.set(pm);
         this.pmSph.set(pmSph);
@@ -425,7 +425,7 @@ public class Particle extends CelestialBody implements IStarFocus, ILineRenderab
 
     @Override
     public String getClosestName() {
-        return this.name;
+        return this.getName();
     }
 
     @Override

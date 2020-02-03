@@ -187,7 +187,7 @@ public class BackgroundModel extends FadeNode implements IModelRenderable, I3DTe
 
     @Override
     public String text() {
-        return name;
+        return names[0];
     }
 
     @Override

@@ -146,7 +146,7 @@ public class Text2D extends FadeNode implements I3DTextRenderable, IShapeRendera
 
     @Override
     public String text() {
-        return name;
+        return names[0];
     }
 
     @Override

@@ -208,7 +208,7 @@ public class MeshObject extends FadeNode implements IModelRenderable, I3DTextRen
 
     @Override
     public boolean renderText() {
-        return name != null && GaiaSky.instance.isOn(ComponentType.Labels) && this.opacity > 0;
+        return names != null && GaiaSky.instance.isOn(ComponentType.Labels) && this.opacity > 0;
     }
 
     /**
@@ -250,7 +250,7 @@ public class MeshObject extends FadeNode implements IModelRenderable, I3DTextRen
 
     @Override
     public String text() {
-        return name;
+        return names[0];
     }
 
     @Override

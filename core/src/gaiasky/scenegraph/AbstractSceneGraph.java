@@ -47,7 +47,7 @@ public abstract class AbstractSceneGraph implements ISceneGraph {
     public AbstractSceneGraph() {
         // Id = -1 for root
         root = new SceneGraphNode(-1);
-        root.name = SceneGraphNode.ROOT_NAME;
+        root.names = new String[] { SceneGraphNode.ROOT_NAME };
 
         // Objects per thread
         objectsPerThread = new int[1];
@@ -77,7 +77,7 @@ public abstract class AbstractSceneGraph implements ISceneGraph {
 
         // Initialize stringToNode and starMap maps
         stringToNode = new ObjectMap<>(nodes.size);
-        stringToNode.put(root.name.toLowerCase().trim(), root);
+        stringToNode.put(root.names[0].toLowerCase().trim(), root);
         hipMap = new IntMap<>();
         for (SceneGraphNode node : nodes) {
             addToIndex(node, stringToNode);
@@ -113,7 +113,7 @@ public abstract class AbstractSceneGraph implements ISceneGraph {
                 addToIndex(node, stringToNode);
             }
         } else {
-            throw new RuntimeException("Parent of node " + node.name + " not found: " + node.parentName);
+            throw new RuntimeException("Parent of node " + node.names[0] + " not found: " + node.parentName);
         }
     }
 
@@ -183,10 +183,16 @@ public abstract class AbstractSceneGraph implements ISceneGraph {
     }
 
     protected void addToIndex(SceneGraphNode node, ObjectMap<String, SceneGraphNode> map) {
-        if (node.name != null && !node.name.isEmpty()) {
-
+        if (node.names != null) {
             if (node.mustAddToIndex()) {
-                map.put(node.name.toLowerCase().trim(), node);
+                for (String name : node.names) {
+                    String namelc = name.toLowerCase().trim();
+                    if (!map.containsKey(namelc)) {
+                        map.put(namelc, node);
+                    } else if (!namelc.isEmpty()) {
+                        logger.warn("Name conflict: " + namelc + " already exists in index");
+                    }
+                }
 
                 // Id
                 if (node.id > 0) {
@@ -201,8 +207,10 @@ public abstract class AbstractSceneGraph implements ISceneGraph {
     }
 
     private void removeFromIndex(SceneGraphNode node, ObjectMap<String, SceneGraphNode> map) {
-        if (node.name != null && !node.name.isEmpty()) {
-            map.remove(node.name.toLowerCase().trim());
+        if (node.names != null) {
+            for (String name : node.names) {
+                map.remove(name.toLowerCase().trim());
+            }
 
             // Id
             if (node.id > 0) {

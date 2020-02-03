@@ -98,7 +98,7 @@ public class StarCluster extends AbstractPositionEntity implements IFocus, IProp
     public StarCluster(String name, String parentName, Vector3d pos, Vector3d pm, Vector3d posSph, Vector3 pmSph, double raddeg, int nstars) {
         this();
         this.parentName = parentName;
-        this.name = name.replace("_", " ");
+        this.setName(name.replace("_", " "));
         this.pos = pos;
         this.posSph.set((float) posSph.x, (float) posSph.y);
         this.pm = pm;
@@ -269,7 +269,7 @@ public class StarCluster extends AbstractPositionEntity implements IFocus, IProp
 
     @Override
     public boolean renderText() {
-        return name != null && GaiaSky.instance.isOn(ComponentType.Labels) && this.opacity > 0;
+        return names != null && GaiaSky.instance.isOn(ComponentType.Labels) && this.opacity > 0;
     }
 
     @Override
@@ -310,7 +310,7 @@ public class StarCluster extends AbstractPositionEntity implements IFocus, IProp
 
     @Override
     public String text() {
-        return name;
+        return names[0];
     }
 
     @Override
@@ -331,7 +331,7 @@ public class StarCluster extends AbstractPositionEntity implements IFocus, IProp
 
     @Override
     public String getCandidateName() {
-        return name;
+        return names[0];
     }
 
     @Override

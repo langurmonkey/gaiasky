@@ -101,8 +101,8 @@ public class Star extends Particle {
         this.parentName = ROOT_NAME;
     }
 
-    public Star(Vector3d pos, float appmag, float absmag, float colorbv, String name, long starid) {
-        super(pos, appmag, absmag, colorbv, name, starid);
+    public Star(Vector3d pos, float appmag, float absmag, float colorbv, String[] names, long starid) {
+        super(pos, appmag, absmag, colorbv, names, starid);
     }
 
     /**
@@ -116,8 +116,8 @@ public class Star extends Particle {
      *            The absolute magnitude
      * @param colorbv
      *            The B-V color index
-     * @param name
-     *            The proper name of the star, if any
+     * @param names
+     *            The proper names of the star, if any
      * @param ra
      *            in degrees
      * @param dec
@@ -125,8 +125,8 @@ public class Star extends Particle {
      * @param starid
      *            The star id
      */
-    public Star(Vector3d pos, float appmag, float absmag, float colorbv, String name, float ra, float dec, long starid) {
-        super(pos, appmag, absmag, colorbv, name, ra, dec, starid);
+    public Star(Vector3d pos, float appmag, float absmag, float colorbv, String[] names, float ra, float dec, long starid) {
+        super(pos, appmag, absmag, colorbv, names, ra, dec, starid);
     }
 
     /**
@@ -140,8 +140,8 @@ public class Star extends Particle {
      *            The absolute magnitude
      * @param colorbv
      *            The B-V color index
-     * @param name
-     *            The proper name of the star, if any
+     * @param names
+     *            The proper names of the star, if any
      * @param ra
      *            in degrees
      * @param dec
@@ -153,8 +153,8 @@ public class Star extends Particle {
      * @param source
      *            Catalog source. 1: Gaia, 2: HIP, 3: TYC, -1: Unknown
      */
-    public Star(Vector3d pos, float appmag, float absmag, float colorbv, String name, float ra, float dec, long starid, int hip, byte source) {
-        super(pos, appmag, absmag, colorbv, name, ra, dec, starid);
+    public Star(Vector3d pos, float appmag, float absmag, float colorbv, String[] names, float ra, float dec, long starid, int hip, byte source) {
+        super(pos, appmag, absmag, colorbv, names, ra, dec, starid);
         this.hip = hip;
         this.catalogSource = source;
     }
@@ -175,8 +175,8 @@ public class Star extends Particle {
      *            The absolute magnitude
      * @param colorbv
      *            The B-V color index
-     * @param name
-     *            The proper name of the star, if any
+     * @param names
+     *            The proper names of the star, if any
      * @param ra
      *            in degrees
      * @param dec
@@ -188,8 +188,8 @@ public class Star extends Particle {
      * @param source
      *            Catalog source. See {#Particle}
      */
-    public Star(Vector3d pos, Vector3 pm, Vector3 pmSph, float appmag, float absmag, float colorbv, String name, float ra, float dec, long starid, int hip, String tycho, byte source) {
-        super(pos, pm, pmSph, appmag, absmag, colorbv, name, ra, dec, starid);
+    public Star(Vector3d pos, Vector3 pm, Vector3 pmSph, float appmag, float absmag, float colorbv, String[] names, float ra, float dec, long starid, int hip, String tycho, byte source) {
+        super(pos, pm, pmSph, appmag, absmag, colorbv, names, ra, dec, starid);
         this.hip = hip;
         this.catalogSource = source;
         this.tycho = tycho;
@@ -206,8 +206,8 @@ public class Star extends Particle {
      *            The absolute magnitude
      * @param colorbv
      *            The B-V color index
-     * @param name
-     *            The proper name of the star, if any
+     * @param names
+     *            The proper names of the star, if any
      * @param ra
      *            in degrees
      * @param dec
@@ -221,8 +221,8 @@ public class Star extends Particle {
      * @param source
      *            Catalog source. See {#Particle}
      */
-    public Star(Vector3d pos, float appmag, float absmag, float colorbv, String name, float ra, float dec, long starid, int hip, String tycho, byte source) {
-        this(pos, appmag, absmag, colorbv, name, ra, dec, starid, hip, source);
+    public Star(Vector3d pos, float appmag, float absmag, float colorbv, String[] names, float ra, float dec, long starid, int hip, String tycho, byte source) {
+        this(pos, appmag, absmag, colorbv, names, ra, dec, starid, hip, source);
         this.tycho = tycho;
     }
 
@@ -242,8 +242,8 @@ public class Star extends Particle {
      *            The absolute magnitude
      * @param colorbv
      *            The B-V color index
-     * @param name
-     *            The proper name of the star, if any
+     * @param names
+     *            The proper names of the star, if any
      * @param ra
      *            in degrees
      * @param dec
@@ -251,8 +251,8 @@ public class Star extends Particle {
      * @param starid
      *            The star id
      */
-    public Star(Vector3d pos, Vector3 pm, Vector3 pmSph, float appmag, float absmag, float colorbv, String name, float ra, float dec, long starid) {
-        super(pos, pm, pmSph, appmag, absmag, colorbv, name, ra, dec, starid);
+    public Star(Vector3d pos, Vector3 pm, Vector3 pmSph, float appmag, float absmag, float colorbv, String[] names, float ra, float dec, long starid) {
+        super(pos, pm, pmSph, appmag, absmag, colorbv, names, ra, dec, starid);
     }
 
     @Override
@@ -346,7 +346,7 @@ public class Star extends Particle {
     }
 
     public String toString() {
-        return "Star{" + " name=" + name + " id=" + id + " sph=" + posSph + " pos=" + pos + " appmag=" + appmag + '}';
+        return "Star{" + " name=" + namesConcat() + " id=" + id + " sph=" + posSph + " pos=" + pos + " appmag=" + appmag + '}';
     }
 
     @Override

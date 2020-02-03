@@ -13,6 +13,7 @@ import gaiasky.util.Constants;
 import gaiasky.util.LargeLongMap;
 import gaiasky.util.Logger;
 import gaiasky.util.Logger.Log;
+import gaiasky.util.TextUtils;
 import gaiasky.util.coord.Coordinates;
 import gaiasky.util.math.Vector3d;
 import gaiasky.util.parse.Parser;
@@ -289,7 +290,7 @@ public abstract class AbstractStarGroupDataProvider implements IStarGroupDataPro
         String sep = "' ";
         try {
             PrintWriter writer = new PrintWriter(filename, StandardCharsets.UTF_8);
-            writer.println("name, x[km], y[km], z[km], absmag, appmag, r, g, b");
+            writer.println("name(s), x[km], y[km], z[km], absmag, appmag, r, g, b");
             Vector3d gal = new Vector3d();
             int n = 0;
             for (StarBean star : data) {
@@ -299,7 +300,7 @@ public abstract class AbstractStarGroupDataProvider implements IStarGroupDataPro
                 double z = star.y();
                 gal.set(x, y, z).scl(Constants.U_TO_KM);
                 gal.mul(Coordinates.equatorialToGalactic());
-                writer.println(star.name + sep + x + sep + y + sep + z + sep + star.absmag() + sep + star.appmag() + sep + col[0] + sep + col[1] + sep + col[2]);
+                writer.println(TextUtils.concatenate("|", star.names) + sep + x + sep + y + sep + z + sep + star.absmag() + sep + star.appmag() + sep + col[0] + sep + col[1] + sep + col[2]);
                 n++;
             }
             writer.close();

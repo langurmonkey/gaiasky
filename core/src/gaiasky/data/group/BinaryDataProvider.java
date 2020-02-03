@@ -83,8 +83,10 @@ public class BinaryDataProvider extends AbstractStarGroupDataProvider {
         out.writeInt(-1);
 
         out.writeLong(sb.id);
-        out.writeInt(sb.name.length());
-        out.writeChars(sb.name);
+
+        String namesConcat = sb.namesConcat();
+        out.writeInt(namesConcat.length());
+        out.writeChars(namesConcat);
     }
 
     public Array<StarBean> readData(InputStream in) {
@@ -136,11 +138,11 @@ public class BinaryDataProvider extends AbstractStarGroupDataProvider {
 
         Long id = in.readLong();
         int nameLength = in.readInt();
-        StringBuilder name = new StringBuilder();
+        StringBuilder namesConcat = new StringBuilder();
         for (int i = 0; i < nameLength; i++)
-            name.append(in.readChar());
-
-        return new StarBean(data, id, name.toString());
+            namesConcat.append(in.readChar());
+        String[] names = namesConcat.toString().split(Constants.nameSeparator);
+        return new StarBean(data, id, names);
     }
 
     public Array<? extends ParticleBean> loadDataMapped(String file, double factor) {

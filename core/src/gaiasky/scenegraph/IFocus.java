@@ -40,11 +40,33 @@ public interface IFocus {
     long getCandidateId();
 
     /**
-     * Returns the name of this focus
+     * Returns the first name of this focus
      *
-     * @return The name
+     * @return The first name
      */
     String getName();
+
+    /**
+     * Returns all names of this focus
+     *
+     * @return All names of this focus
+     */
+    String[] getNames();
+
+    /**
+     * Checks whether the focus has the given name
+     * @param name The name
+     * @return True if there is a match
+     */
+    boolean hasName(String name);
+
+    /**
+     * Checks whether the focus has the given name
+     * @param name The name
+     * @param matchCase Whether to match the case when comparing
+     * @return True if there is a match
+     */
+    boolean hasName(String name, boolean matchCase);
 
     /**
      * Same as {@link IFocus#getName()}

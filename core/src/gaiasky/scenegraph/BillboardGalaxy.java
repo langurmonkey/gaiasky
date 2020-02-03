@@ -33,10 +33,9 @@ public class BillboardGalaxy extends Billboard {
         super();
     }
 
-    public BillboardGalaxy(String name, String altname, double alpha, double delta, double dist, double sizePc, String tex) {
+    public BillboardGalaxy(String[] names, double alpha, double delta, double dist, double sizePc, String tex) {
         super();
-        setName(name);
-        setAltname(altname);
+        setNames(names);
         setColor(new double[] { 1, 1, 1, 1 });
         setSizepc(sizePc);
         setCt("Galaxies");
@@ -102,7 +101,7 @@ public class BillboardGalaxy extends Billboard {
 
     @Override
     public boolean renderText() {
-        return name != null && GaiaSky.instance.isOn(ComponentType.Labels) && (opacity > 0 || fadeOpacity > 0);
+        return names != null && GaiaSky.instance.isOn(ComponentType.Labels) && (opacity > 0 || fadeOpacity > 0);
     }
 
 }

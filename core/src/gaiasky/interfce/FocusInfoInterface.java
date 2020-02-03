@@ -39,6 +39,7 @@ public class FocusInfoInterface extends TableGuiInterface implements IObserver {
     static private INetworkChecker daemon;
     static private int MAX_RULER_NAME_LEN = 9;
 
+    protected Skin skin;
     protected OwnLabel focusName, focusType, focusId, focusRA, focusDEC, focusMuAlpha, focusMuDelta, focusRadVel, focusAngle, focusDistCam, focusDistSol, focusAppMag, focusAbsMag, focusRadius;
     protected Button goTo, landOn, landAt;
     protected OwnLabel pointerName, pointerLonLat, pointerRADEC, viewRADEC;
@@ -49,7 +50,7 @@ public class FocusInfoInterface extends TableGuiInterface implements IObserver {
 
     protected IFocus currentFocus;
 
-    private Table focusInfo, pointerInfo, cameraInfo, moreInfo, rulerInfo;
+    private Table focusInfo, pointerInfo, cameraInfo, moreInfo, rulerInfo, focusNames;
     private Cell<?> focusInfoCell, rulerCell;
     Vector3d pos;
 
@@ -64,6 +65,7 @@ public class FocusInfoInterface extends TableGuiInterface implements IObserver {
     public FocusInfoInterface(Skin skin, boolean vr) {
         super(skin);
         this.setBackground("table-bg");
+        this.skin = skin;
 
         nf = NumberFormatFactory.getFormatter("##0.###");
         sf = NumberFormatFactory.getFormatter("#0.###E0");
@@ -88,6 +90,7 @@ public class FocusInfoInterface extends TableGuiInterface implements IObserver {
         focusName = new OwnLabel("", skin, "hud-header");
         focusType = new OwnLabel("", skin, "hud-subheader");
         focusId = new OwnLabel("", skin, "hud");
+        focusNames = new Table(skin);
         focusRA = new OwnLabel("", skin, "hud");
         focusDEC = new OwnLabel("", skin, "hud");
         focusMuAlpha = new OwnLabel("", skin, "hud");
@@ -142,35 +145,35 @@ public class FocusInfoInterface extends TableGuiInterface implements IObserver {
         goTo = new OwnTextIconButton("", skin, "go-to");
         goTo.setSize(buttonSize, buttonSize);
         goTo.addListener((event) -> {
-                if (currentFocus != null && event instanceof ChangeEvent) {
-                    EventManager.instance.post(Events.NAVIGATE_TO_OBJECT, currentFocus);
-                    return true;
-                }
-                return false;
+            if (currentFocus != null && event instanceof ChangeEvent) {
+                EventManager.instance.post(Events.NAVIGATE_TO_OBJECT, currentFocus);
+                return true;
+            }
+            return false;
 
         });
         goTo.addListener(new OwnTextTooltip(I18n.txt("gui.focusinfo.goto"), skin));
 
         landOn = new OwnTextIconButton("", skin, "land-on");
         landOn.setSize(buttonSize, buttonSize);
-        landOn.addListener(( event)-> {
-                if (currentFocus != null && event instanceof ChangeEvent) {
-                    EventManager.instance.post(Events.LAND_ON_OBJECT, currentFocus);
-                    return true;
-                }
-                return false;
+        landOn.addListener((event) -> {
+            if (currentFocus != null && event instanceof ChangeEvent) {
+                EventManager.instance.post(Events.LAND_ON_OBJECT, currentFocus);
+                return true;
+            }
+            return false;
 
         });
         landOn.addListener(new OwnTextTooltip(I18n.txt("gui.focusinfo.landon"), skin));
 
         landAt = new OwnTextIconButton("", skin, "land-at");
         landAt.setSize(buttonSize, buttonSize);
-        landAt.addListener((event) ->{
-                if (currentFocus != null && event instanceof ChangeEvent) {
-                    EventManager.instance.post(Events.SHOW_LAND_AT_LOCATION_ACTION, currentFocus);
-                    return true;
-                }
-                return false;
+        landAt.addListener((event) -> {
+            if (currentFocus != null && event instanceof ChangeEvent) {
+                EventManager.instance.post(Events.SHOW_LAND_AT_LOCATION_ACTION, currentFocus);
+                return true;
+            }
+            return false;
         });
         landAt.addListener(new OwnTextTooltip(I18n.txt("gui.focusinfo.landat"), skin));
 
@@ -208,6 +211,9 @@ public class FocusInfoInterface extends TableGuiInterface implements IObserver {
         focusInfo.row();
         focusInfo.add(new OwnLabel("ID", skin, "hud-big")).left();
         focusInfo.add(focusId).left().padLeft(pad10);
+        focusInfo.row();
+        focusInfo.add(new OwnLabel(I18n.txt("gui.focusinfo.names"), skin, "hud-big")).left().padBottom(pad5);
+        focusInfo.add(focusNames).left().padBottom(pad5).padLeft(pad10);
         focusInfo.row();
         if (!vr) {
             focusInfo.add(new OwnLabel(I18n.txt("gui.focusinfo.alpha"), skin, "hud-big")).left();
@@ -298,18 +304,18 @@ public class FocusInfoInterface extends TableGuiInterface implements IObserver {
         EventManager.instance.subscribe(this, Events.FOCUS_CHANGED, Events.FOCUS_INFO_UPDATED, Events.CAMERA_MOTION_UPDATED, Events.CAMERA_MODE_CMD, Events.LON_LAT_UPDATED, Events.RA_DEC_UPDATED, Events.RULER_ATTACH_0, Events.RULER_ATTACH_1, Events.RULER_CLEAR, Events.RULER_DIST);
     }
 
-
-    private void scaleFonts(SnapshotArray<Actor> a, float scl){
-        for(Actor actor : a){
-            if(actor instanceof Group){
+    private void scaleFonts(SnapshotArray<Actor> a, float scl) {
+        for (Actor actor : a) {
+            if (actor instanceof Group) {
                 Group g = (Group) actor;
                 scaleFonts(g.getChildren(), scl);
-            } else if(actor instanceof Label){
+            } else if (actor instanceof Label) {
                 Label l = (Label) actor;
                 l.setScale(scl);
             }
         }
     }
+
     private void unsubscribe() {
         EventManager.instance.removeAllSubscriptions(this);
     }
@@ -326,6 +332,7 @@ public class FocusInfoInterface extends TableGuiInterface implements IObserver {
             }
             currentFocus = focus;
 
+            // ID
             String id = "";
             if (focus instanceof IStarFocus) {
                 IStarFocus sf = (IStarFocus) focus;
@@ -334,11 +341,6 @@ public class FocusInfoInterface extends TableGuiInterface implements IObserver {
                 } else if (sf.getHip() > 0) {
                     id = "HIP " + sf.getHip();
                 }
-            } else if (focus instanceof CelestialBody) {
-                CelestialBody cb = (CelestialBody) focus;
-                // Special case of messier object
-                if(cb.getAltname() != null && !cb.getAltname().isEmpty())
-                    id = cb.getAltname();
             }
             if (id.length() == 0) {
                 id = "-";
@@ -364,12 +366,29 @@ public class FocusInfoInterface extends TableGuiInterface implements IObserver {
             // Coords
             pointerLonLat.setText("-/-");
 
+            // Id, names
             focusId.setText(id);
-
-            // Update focus information
             String objectName = focus.getName();
-
             focusName.setText(objectName);
+
+            focusNames.clearChildren();
+            String[] names = focus.getNames();
+            if (names != null && names.length > 0) {
+                int count = 0;
+                for (int i = 0; i < names.length; i++) {
+                    String name = names[i];
+                    OwnLabel nl =new OwnLabel(name, skin, "object-name");
+                    focusNames.add(nl).left().padRight(pad10);
+                    count += name.length() + 1;
+                    if (i < names.length - 1 && count > 14) {
+                        focusNames.row();
+                        count = 0;
+                    }
+                }
+            } else {
+                focusNames.add(new OwnLabel("-", skin));
+            }
+
             Vector2d posSph = focus.getPosSph();
             if (posSph != null && posSph.len() > 0f) {
                 focusRA.setText(nf.format(posSph.x) + "°");

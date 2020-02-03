@@ -277,6 +277,8 @@ public class Constants {
     // Minimum minimap size (px)
     public static final float MIN_MINIMAP_SIZE = 150f;
 
+    // Separates the array of names when converted to a single string
+    public static final String nameSeparator = "|";
 
     /**
      * Checks whether the given time is within the acceptable bounds of VSOP87
