@@ -159,6 +159,51 @@ public class StarGroup extends ParticleGroup implements ILineRenderable, IStarFo
             return TextUtils.concatenate(Constants.nameSeparator, names);
         }
 
+        public boolean hasName(String candidate) {
+            return hasName(candidate, false);
+        }
+
+        public boolean hasName(String candidate, boolean matchCase) {
+            if (names == null) {
+                return false;
+            } else {
+                for (String name : names) {
+                    if (matchCase) {
+                        if (name.equals(candidate))
+                            return true;
+                    } else {
+                        if (name.equalsIgnoreCase(candidate))
+                            return true;
+                    }
+                }
+            }
+            return false;
+        }
+
+        public void setNames(String... names) {
+            this.names = names;
+        }
+
+        public void setName(String name) {
+            if (names != null)
+                names[0] = name;
+            else
+                names = new String[] { name };
+        }
+
+        public void addName(String name) {
+            if (!hasName(name))
+                if (names != null) {
+                    // Extend array
+                    String[] newNames = new String[names.length + 1];
+                    System.arraycopy(names, 0, newNames, 0, names.length);
+                    newNames[names.length] = name;
+                    names = newNames;
+                } else {
+                    setName(name);
+                }
+        }
+
     }
 
     // Camera dx threshold

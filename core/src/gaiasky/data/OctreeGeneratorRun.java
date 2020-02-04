@@ -22,6 +22,7 @@ import gaiasky.data.octreegen.StarGroupSerializedIO;
 import gaiasky.data.octreegen.generator.IOctreeGenerator;
 import gaiasky.data.octreegen.generator.OctreeGeneratorMag;
 import gaiasky.data.octreegen.generator.OctreeGeneratorParams;
+import gaiasky.data.util.HipNames;
 import gaiasky.desktop.format.DesktopDateFormatFactory;
 import gaiasky.desktop.format.DesktopNumberFormatFactory;
 import gaiasky.desktop.util.DesktopConfInit;
@@ -41,6 +42,7 @@ import gaiasky.util.tree.OctreeNode;
 import java.io.*;
 import java.lang.reflect.InvocationTargetException;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Paths;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.util.HashMap;
@@ -115,8 +117,11 @@ public class OctreeGeneratorRun {
     @Parameter(names = "--nfiles", description = "Caps the number of data files to load. Defaults to unlimited")
     private int fileNumCap = -1;
 
-    @Parameter(names = {"--hip", "--addhip"}, description = "Add the Hipparcos catalog additionally to the catalog provided by -l")
+    @Parameter(names = {"--hip", "--addhip"}, description = "Add the Hipparcos catalog on top of the catalog provided by -l")
     private boolean addHip = false;
+
+    @Parameter(names = "--hip-names", description = "Directory containing HIP names files (Name_To_HIP.dat, Var_To_HIP.dat, etc.)")
+    private String hipNamesDir = null;
 
     @Parameter(names = "--xmatchfile", description = "Crossmatch file with source_id to hip, only if --hip is enabled")
     private String xmatchFile = null;
@@ -132,6 +137,7 @@ public class OctreeGeneratorRun {
 
     @Parameter(names = "--ruwe-file", description = "Location of gzipped file containing the RUWE value for each source id")
     private String ruweFile = null;
+
 
     @Parameter(names = {"-h", "--help"}, help = true)
     private boolean help = false;
@@ -244,6 +250,13 @@ public class OctreeGeneratorRun {
         }
 
         if (addHip) {
+            // Load Hipparcos star names
+            HipNames hipNames =  null;
+            if(hipNamesDir != null) {
+                hipNames = new HipNames();
+                hipNames.load(Paths.get(hipNamesDir));
+            }
+
             /* HIPPARCOS */
             STILDataProvider stil = new STILDataProvider();
 
@@ -257,6 +270,20 @@ public class OctreeGeneratorRun {
             }
 
             Array<StarBean> listHip = (Array<StarBean>) stil.loadData("data/catalog/hipparcos/hip.vot");
+
+            // Update names
+            if(hipNames != null){
+                Map<Integer, Array<String>> hn = hipNames.getHipNames();
+                for (StarBean star : listHip) {
+                    if(hn.containsKey(star.hip())){
+                        Array<String> names = hn.get(star.hip());
+                        for(String name : names)
+                            star.addName(name);
+                    }
+                }
+            }
+
+            // Create hip map
             long[] cpmhip = stil.getCountsPerMag();
             combineCpm(cpm, cpmhip);
             Map<Integer, StarBean> hipMap = new HashMap<>();
