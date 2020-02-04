@@ -38,7 +38,7 @@ import java.util.logging.Level;
 /**
  * Loads VOTables, FITS, etc. This data provider makes educated guesses using UCDs and column names to
  * match columns to attributes.
- *
+ * <p>
  * More information on this can be found <a href="http://gaia.ari.uni-heidelberg.de/gaiasky/docs/html/latest/SAMP.html#stil-data-provider">here</a>.
  *
  * @author tsagrista
@@ -68,10 +68,10 @@ public class STILDataProvider extends AbstractStarGroupDataProvider {
         try {
             loadData(new FileDataSource(GlobalConf.data.dataFile(file)), factor);
         } catch (Exception e1) {
-            try{
+            try {
                 logger.info("File " + file + " not found in data folder, trying relative path");
                 loadData(new FileDataSource(file), factor);
-            }catch (Exception e2) {
+            } catch (Exception e2) {
                 logger.error(e1);
                 logger.error(e2);
             }
@@ -82,8 +82,9 @@ public class STILDataProvider extends AbstractStarGroupDataProvider {
 
     /**
      * Gets the first ucd that can be translated to a double from the set.
+     *
      * @param ucds The array of UCDs. The UCDs which coincide with the names should be first.
-     * @param row The row objects
+     * @param row  The row objects
      * @return Pair of <UCD,Double>
      */
     private Pair<UCD, Double> getDoubleUcd(Array<UCD> ucds, Object[] row) {
@@ -101,12 +102,11 @@ public class STILDataProvider extends AbstractStarGroupDataProvider {
         return null;
     }
 
-
     /**
      * Gets the first ucd as a string from the set.
      *
      * @param ucds The set of UCD objects
-     * @param row The row
+     * @param row  The row
      * @return
      */
     private Pair<UCD, String> getStringUcd(Array<UCD> ucds, Object[] row) {
@@ -140,7 +140,7 @@ public class STILDataProvider extends AbstractStarGroupDataProvider {
             if (ucdp.haspos) {
                 int i = 0;
                 RowSequence rs = table.getRowSequence();
-                while(rs.next()){
+                while (rs.next()) {
                     Object[] row = rs.getRow();
                     boolean skip = false;
                     try {
@@ -166,7 +166,6 @@ public class STILDataProvider extends AbstractStarGroupDataProvider {
                         }
 
                         Position p = new Position(a.getSecond(), a.getFirst().unit, b.getSecond(), b.getFirst().unit, c.getSecond(), unitc, pt);
-
 
                         double distpc = p.gsposition.len();
                         p.gsposition.scl(Constants.PC_TO_U);
@@ -226,7 +225,7 @@ public class STILDataProvider extends AbstractStarGroupDataProvider {
                         double col = Color.toFloatBits(rgb[0], rgb[1], rgb[2], 1.0f);
 
                         /* IDENTIFIER AND NAME */
-                        String name;
+                        String[] names;
                         Long id;
                         int hip = -1;
                         if (ucdp.NAME.isEmpty()) {
@@ -234,7 +233,7 @@ public class STILDataProvider extends AbstractStarGroupDataProvider {
                             if (!ucdp.ID.isEmpty()) {
                                 // We have ID
                                 Pair<UCD, String> namePair = getStringUcd(ucdp.ID, row);
-                                name = namePair.getSecond();
+                                names = new String[]{namePair.getSecond()};
                                 if (namePair.getFirst().colname.equalsIgnoreCase("hip")) {
                                     hip = Integer.valueOf(namePair.getSecond());
                                     id = (long) hip;
@@ -244,12 +243,12 @@ public class STILDataProvider extends AbstractStarGroupDataProvider {
                             } else {
                                 // Emtpy ID
                                 id = ++starid;
-                                name = id.toString();
+                                names = new String[]{id.toString()};
                             }
                         } else {
                             // We have name
                             Pair<UCD, String> namePair = getStringUcd(ucdp.NAME, row);
-                            name = namePair.getSecond();
+                            names = namePair.getSecond().split("\\|");
                             // Take care of HIP stars
                             if (!ucdp.ID.isEmpty()) {
                                 Pair<UCD, String> idpair = getStringUcd(ucdp.ID, row);
@@ -264,7 +263,6 @@ public class STILDataProvider extends AbstractStarGroupDataProvider {
                             }
                         }
 
-
                         if (mustLoad(id)) {
                             // Check must load
                             skip = false;
@@ -277,7 +275,7 @@ public class STILDataProvider extends AbstractStarGroupDataProvider {
 
                         // Populate provider lists
                         colors.put(id, rgb);
-                        sphericalPositions.put(id, new double[]{sph.x, sph.y, sph.z});
+                        sphericalPositions.put(id, new double[] { sph.x, sph.y, sph.z });
 
                         double[] point = new double[StarBean.SIZE + 3];
                         point[StarBean.I_HIP] = hip;
@@ -300,7 +298,8 @@ public class STILDataProvider extends AbstractStarGroupDataProvider {
                         point[StarBean.I_APPMAG] = appmag;
                         point[StarBean.I_ABSMAG] = absmag;
 
-                        list.add(new StarBean(point, id, name));
+                        StarBean sb = new StarBean(point, id, names);
+                        list.add(sb);
 
                         int appclmp = (int) MathUtilsd.clamp(appmag, 0, 21);
                         countsPerMag[appclmp] += 1;

@@ -533,6 +533,23 @@
       "file": "http://gaia.ari.uni-heidelberg.de/gaiasky/files/autodownload/hipparcos/001_20181218/catalog-hipparcos-newreduction.tar.gz"
     },
     {
+      "name": "catalog-hipparcos-newred",
+      "type": "catalog",
+      "version": 2,
+      "mingsversion": 20205,
+      "size": 5433177,
+      "check": "catalog-hip.json",
+      "data": [
+        "catalog-hip.json",
+        "particles-hip.json",
+        "catalog/hipparcos"
+      ],
+      "description": "Hipparcos - Hipparcos new reduction (van Leeuwen, 2007) with curated star names, already included in all DR2 catalogs - 177955 stars",
+      "link": "http://adsabs.harvard.edu/abs/2007ASSL..350.....V",
+      "sha256": "7c22dfec8f16e8342c6556384c4a715d55a2095430203b27411b69552efc7cbc",
+      "file": "http://gaia.ari.uni-heidelberg.de/gaiasky/files/autodownload/hipparcos/002_20200204/catalog-hipparcos-newreduction.tar.gz"
+    },
+    {
       "name": "catalog-nbg",
       "type": "catalog",
       "version": 2,

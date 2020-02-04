@@ -374,16 +374,28 @@ public class FocusInfoInterface extends TableGuiInterface implements IObserver {
             focusNames.clearChildren();
             String[] names = focus.getNames();
             if (names != null && names.length > 0) {
-                int count = 0;
+                HorizontalGroup hg = new HorizontalGroup();
+                hg.space(pad3);
+                int chars = 0;
                 for (int i = 0; i < names.length; i++) {
                     String name = names[i];
-                    OwnLabel nl =new OwnLabel(name, skin, "object-name");
-                    focusNames.add(nl).left().padRight(pad10);
-                    count += name.length() + 1;
-                    if (i < names.length - 1 && count > 14) {
-                        focusNames.row();
-                        count = 0;
+                    OwnLabel nl = new OwnLabel(name, skin, "object-name");
+                    hg.addActor(nl);
+                    chars += name.length() + 1;
+                    if(i < names.length - 1){
+                        hg.addActor(new OwnLabel(", ", skin));
+                        chars++;
                     }
+                    if (i < names.length - 1 && chars > 14) {
+                        focusNames.add(hg).left();
+                        focusNames.row();
+                        hg = new HorizontalGroup();
+                        hg.space(pad3);
+                        chars = 0;
+                    }
+                }
+                if(!hg.hasParent()){
+                    focusNames.add(hg).left();
                 }
             } else {
                 focusNames.add(new OwnLabel("-", skin));

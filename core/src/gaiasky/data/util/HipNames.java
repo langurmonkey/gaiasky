@@ -45,7 +45,7 @@ public class HipNames {
     public void load(Path path) {
         if (Files.isDirectory(path)) {
             try {
-                Files.list(path).filter(file -> file.getFileName().toString().endsWith("_To_HIP.dat")).forEach(this::load);
+                Files.list(path).filter(file -> file.getFileName().toString().endsWith("_To_HIP.dat")).sorted().forEach(this::load);
             } catch (IOException e) {
                 logger.error(e);
             }
@@ -76,6 +76,7 @@ public class HipNames {
     }
 
     public void load(Path... paths) {
-        Stream.of(paths).forEach(this::load);
+        for(Path path : paths)
+            load(path);
     }
 }

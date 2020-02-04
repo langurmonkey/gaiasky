@@ -15,7 +15,7 @@ class HipNamesTest {
 
     public static void main(String[] args) {
         HipNames hn = new HipNames();
-        Path folder = Paths.get("/home/tsagrista/git/gaiasky/assets/assets-bak/data/");
+        Path folder = Paths.get("/home/tsagrista/git/gaiasky/assets/assets-bak/data/hipnames/");
 
         hn.load(folder);
 
@@ -23,12 +23,12 @@ class HipNamesTest {
 
         hipNames.keySet().stream().sorted().forEach(hip -> {
             Array<String> nms = hipNames.get(hip);
-            System.out.print("HIP " + hip + " ->\t ");
+            System.out.print(hip + ",");
 
             for (int i = 0; i < nms.size; i++) {
                 System.out.print(nms.get(i));
                 if (i < nms.size - 1)
-                    System.out.print(" | ");
+                    System.out.print("|");
             }
 
             System.out.println();
