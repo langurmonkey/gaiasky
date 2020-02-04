@@ -5,27 +5,50 @@
 
 package gaiasky.util;
 
-import org.lwjgl.opengl.*;
+import gaiasky.util.Logger.Log;
+import org.lwjgl.opengl.ATIMeminfo;
+import org.lwjgl.opengl.GL20;
+import org.lwjgl.opengl.NVXGPUMemoryInfo;
+import org.lwjgl.opengl.WGLAMDGPUAssociation;
 
 public class VMemInfo {
+    private static Log logger = Logger.getLogger(VMemInfo.class);
 
     private static IGraphicsDeviceInfo graphicsDeviceInfo;
+    private static boolean crash = false;
 
     public static void initialize() {
         String extensions = GlobalResources.getGLExtensions();
         if (extensions.contains("GL_NVX_gpu_memory_info")) {
             // Nvidia
-            graphicsDeviceInfo = new NVIDIAVRAM();
+            try {
+                graphicsDeviceInfo = new NVIDIAVRAM();
+            } catch (Exception e) {
+                logger.error(e);
+                crash = true;
+            }
         } else if (extensions.contains("GL_ATI_meminfo")) {
             // ATI
-            graphicsDeviceInfo = new ATIVRAM();
+            try {
+                graphicsDeviceInfo = new ATIVRAM();
+            } catch (Exception e) {
+                logger.error(e);
+                crash = true;
+            }
         } else {
             // None
-            graphicsDeviceInfo = new NONEVRAM();
+            try {
+                graphicsDeviceInfo = new NONEVRAM();
+            } catch (Exception e) {
+                logger.error(e);
+                crash = true;
+            }
         }
     }
 
     public static double getFreeMemory() {
+        if(crash)
+            return -1;
         if (graphicsDeviceInfo == null) {
             initialize();
         }
@@ -33,6 +56,8 @@ public class VMemInfo {
     }
 
     public static double getTotalMemory() {
+        if(crash)
+            return -1;
         if (graphicsDeviceInfo == null) {
             initialize();
         }
@@ -40,6 +65,8 @@ public class VMemInfo {
     }
 
     public static double getUsedMemory() {
+        if(crash)
+            return -1;
         if (graphicsDeviceInfo == null) {
             initialize();
         }
