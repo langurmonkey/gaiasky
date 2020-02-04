@@ -49,7 +49,7 @@ public class DataDescriptorUtils {
             boolean hasMinGsVersion = dst.has("mingsversion");
             int minGsVersion = dst.getInt("mingsversion", 0);
             int thisVersion = dst.getInt("version", 0);
-            if (!hasMinGsVersion || GaiaSkyDesktop.SOURCE_CONF_VERSION >= minGsVersion) {
+            if (!hasMinGsVersion || GaiaSkyDesktop.SOURCE_VERSION >= minGsVersion) {
                 // Dataset type
                 String type = dst.getString("type");
 

@@ -50,6 +50,7 @@ import gaiasky.util.math.MathUtilsd;
 import gaiasky.util.math.Vector3d;
 import gaiasky.util.time.ITimeFrameProvider;
 import gaiasky.util.tree.OctreeNode;
+import gaiasky.util.ucd.UCD;
 import net.jafama.FastMath;
 
 import java.util.Arrays;
@@ -95,12 +96,18 @@ public class StarGroup extends ParticleGroup implements ILineRenderable, IStarFo
         public Long id;
         public transient OctreeNode octant;
         public String[] names;
+        public Map<UCD, Double> extra;
 
-        public StarBean(double[] data, Long id, String[] names) {
+        public StarBean(double[] data, Long id, String[] names, Map<UCD, Double> extraAttributes) {
             super(data);
             this.id = id;
             this.names = names;
             this.octant = null;
+            this.extra = extraAttributes;
+        }
+
+        public StarBean(double[] data, Long id, String[] names) {
+            this(data, id, names, null);
         }
 
         public StarBean(double[] data, Long id, String name) {

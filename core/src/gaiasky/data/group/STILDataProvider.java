@@ -32,7 +32,9 @@ import uk.ac.starlink.util.DataSource;
 import uk.ac.starlink.util.FileDataSource;
 
 import java.io.InputStream;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.logging.Level;
 
 /**
@@ -233,7 +235,7 @@ public class STILDataProvider extends AbstractStarGroupDataProvider {
                             if (!ucdp.ID.isEmpty()) {
                                 // We have ID
                                 Pair<UCD, String> namePair = getStringUcd(ucdp.ID, row);
-                                names = new String[]{namePair.getSecond()};
+                                names = new String[] { namePair.getSecond() };
                                 if (namePair.getFirst().colname.equalsIgnoreCase("hip")) {
                                     hip = Integer.valueOf(namePair.getSecond());
                                     id = (long) hip;
@@ -243,7 +245,7 @@ public class STILDataProvider extends AbstractStarGroupDataProvider {
                             } else {
                                 // Emtpy ID
                                 id = ++starid;
-                                names = new String[]{id.toString()};
+                                names = new String[] { id.toString() };
                             }
                         } else {
                             // We have name
@@ -298,7 +300,19 @@ public class STILDataProvider extends AbstractStarGroupDataProvider {
                         point[StarBean.I_APPMAG] = appmag;
                         point[StarBean.I_ABSMAG] = absmag;
 
-                        StarBean sb = new StarBean(point, id, names);
+                        // Extra
+                        Map<UCD, Double> extraAttributes = null;
+                        for (UCD extra : ucdp.extra) {
+                            Double val = Double.NaN;
+                            try {
+                                val = ((Number) row[extra.index]).doubleValue();
+                            } catch (Exception e) {
+                            }
+                            if(extraAttributes == null)
+                                extraAttributes = new HashMap<>();
+                            extraAttributes.put(extra, val);
+                        }
+                        StarBean sb = new StarBean(point, id, names, extraAttributes);
                         list.add(sb);
 
                         int appclmp = (int) MathUtilsd.clamp(appmag, 0, 21);

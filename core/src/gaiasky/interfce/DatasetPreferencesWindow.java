@@ -13,6 +13,7 @@ import com.badlogic.gdx.utils.Array;
 import gaiasky.GaiaSky;
 import gaiasky.interfce.beans.AttributeComboBoxBean;
 import gaiasky.scenegraph.StarGroup;
+import gaiasky.scenegraph.StarGroup.StarBean;
 import gaiasky.scenegraph.octreewrapper.OctreeWrapper;
 import gaiasky.util.*;
 import gaiasky.util.filter.Filter;
@@ -21,10 +22,12 @@ import gaiasky.util.filter.FilterRule.IComparator;
 import gaiasky.util.filter.attrib.*;
 import gaiasky.util.parse.Parser;
 import gaiasky.util.scene2d.*;
+import gaiasky.util.ucd.UCD;
 import gaiasky.util.validator.FloatValidator;
 import gaiasky.util.validator.IValidator;
 
 import java.time.ZoneId;
+import java.util.Set;
 
 public class DatasetPreferencesWindow extends GenericDialog {
     private static final Logger.Log logger = Logger.getLogger(DatasetPreferencesWindow.class);
@@ -132,12 +135,24 @@ public class DatasetPreferencesWindow extends GenericDialog {
                 attrs.add(new AttributeComboBoxBean(new AttributeGalLatitude()));
                 attrs.add(new AttributeComboBoxBean(new AttributeGalLongitude()));
                 if (stars) {
+                    StarGroup sg = (StarGroup) ci.object;
                     // Star attributes (appmag, absmag, mualpha, mudelta, radvel)
                     attrs.add(new AttributeComboBoxBean(new AttributeAppmag()));
                     attrs.add(new AttributeComboBoxBean(new AttributeAbsmag()));
                     attrs.add(new AttributeComboBoxBean(new AttributeMualpha()));
                     attrs.add(new AttributeComboBoxBean(new AttributeMudelta()));
                     attrs.add(new AttributeComboBoxBean(new AttributeRadvel()));
+
+                    // Extra attributes
+                    if(sg.size() > 0) {
+                        StarBean first = (StarBean) sg.get(0);
+                        if (first.extra != null) {
+                            Set<UCD> ucds = first.extra.keySet();
+                            for(UCD ucd : ucds)
+                                attrs.add(new AttributeComboBoxBean(new AttributeUCD(ucd)));
+                        }
+                    }
+
                 }
                 OwnSelectBox<AttributeComboBoxBean> attribute = new OwnSelectBox<>(skin);
                 attribute.setItems(attrs);

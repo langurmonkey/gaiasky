@@ -58,7 +58,7 @@ public class GaiaSkyDesktop implements IObserver {
     private static final Log logger = Logger.getLogger(GaiaSkyDesktop.class);
 
     /*
-     * Configuration file version of the source code
+     * Source version to compare to config file and datasets.
      * This is usually tag where each chunk takes 2 spaces.
      * Version = major.minor.rev -> 1.2.5 major=1; minor=2; rev=5
      * Version = major * 10000 + minor * 100 + rev
@@ -67,10 +67,9 @@ public class GaiaSkyDesktop implements IObserver {
      *
      * Leading zeroes are omitted to avoid octal literal interpretation.
      */
-    public static int SOURCE_CONF_VERSION = 20205;
+    public static int SOURCE_VERSION = 20205;
     private static GaiaSkyDesktop gsd;
     private static boolean REST_ENABLED = false;
-    private static Class<?> REST_SERVER_CLASS = null;
     private static boolean JAVA_VERSION_FLAG = false;
 
     private static final String REQUIRED_JAVA_VERSION = "11";
@@ -400,7 +399,7 @@ public class GaiaSkyDesktop implements IObserver {
         if (userFolderConfFile.exists()) {
             Properties userprops = new Properties();
             userprops.load(new FileInputStream(userFolderConfFile));
-            int internalversion = SOURCE_CONF_VERSION;
+            int internalversion = SOURCE_VERSION;
             if (internalFolderConfFile.exists()) {
                 Properties internalprops = new Properties();
                 internalprops.load(new FileInputStream(internalFolderConfFile));
@@ -411,7 +410,7 @@ public class GaiaSkyDesktop implements IObserver {
             if (!userprops.containsKey("properties.version")) {
                 System.out.println("Properties file version not found, overwriting with new version (" + internalversion + ")");
                 overwrite = true;
-            } else if (Integer.parseInt(userprops.getProperty("properties.version")) < internalversion) {
+            } else if (Integer.parseInt(userprops.getProperty("properties.version")) > internalversion) {
                 System.out.println("Properties file version mismatch, overwriting with new version: found " + Integer.parseInt(userprops.getProperty("properties.version")) + ", required " + internalversion);
                 overwrite = true;
             }

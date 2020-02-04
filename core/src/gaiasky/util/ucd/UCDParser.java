@@ -23,7 +23,6 @@ import java.util.Set;
  * @author tsagrista
  */
 public class UCDParser {
-
     private static String[] idcolnames = new String[] { "hip", "id", "source_id", "tycho2_id" };
     private static String[] namecolnames = new String[] { "name", "proper", "proper_name", "common_name", "designation" };
     private static String[] pos1colnames = new String[] { "ra", "right_ascension", "rightascension", "alpha" };
@@ -65,6 +64,9 @@ public class UCDParser {
     // PHYSICAL PARAMS
     // TODO - not supported yet
 
+    // REST
+    public Array<UCD> extra;
+
     public UCDParser() {
         super();
         ucdmap = new HashMap<>();
@@ -78,6 +80,7 @@ public class UCDParser {
         PMRA = new Array<>();
         PMDEC = new Array<>();
         RADVEL = new Array<>();
+        extra = new Array<>();
     }
 
     /**
@@ -105,7 +108,8 @@ public class UCDParser {
         if (meta != null)
             for (UCD candidate : meta) {
                 if (candidate.ucdstrings[0].equals("meta.id")) {
-                    this.ID.add(candidate);
+                    if (candidate.ucdstrings.length == 1 || candidate.ucdstrings[1].equals("meta.main"))
+                        this.ID.add(candidate);
                 }
             }
         if (this.ID.isEmpty()) {
@@ -270,6 +274,24 @@ public class UCDParser {
         /** PHYSICAL QUANTITIES **/
         // TODO - not supported yet
 
+        /** REST OF COLUMNS **/
+        Set<UCDType> keys = ucdmap.keySet();
+        for (UCDType ucdType : keys) {
+            Set<UCD> ucds = ucdmap.get(ucdType);
+            for (UCD ucd : ucds) {
+                if (!has(ucd)) {
+                    extra.add(ucd);
+                }
+            }
+        }
+    }
+
+    public boolean has(UCD ucd) {
+        return has(ucd, POS1) || has(ucd, POS2) || has(ucd, POS3) || has(ucd, PMRA) || has(ucd, PMDEC) || has(ucd, RADVEL) || has(ucd, ID) || has(ucd, COL) || has(ucd, NAME) || has(ucd, MAG);
+    }
+
+    public boolean has(UCD ucd, Array<UCD> a) {
+        return a.contains(ucd, true);
     }
 
     public PositionType getPositionType(UCD pos1, UCD pos2, UCD pos3) {
@@ -347,12 +369,13 @@ public class UCDParser {
      * Adds the given UCD to the list. If the column name of the candidates is in
      * the given array of colnames, then it is added at the position 0, otherwise, it is
      * added at the back of the list.
+     *
      * @param candidate The candidate UCD object
-     * @param colnames Array of column names to check
-     * @param list The list to add
+     * @param colnames  Array of column names to check
+     * @param list      The list to add
      */
-    private void add(UCD candidate, String[] colnames, Array<UCD> list){
-        if(candidate.colname != null && contains(colnames, candidate.colname)){
+    private void add(UCD candidate, String[] colnames, Array<UCD> list) {
+        if (candidate.colname != null && contains(colnames, candidate.colname)) {
             list.insert(0, candidate);
         } else {
             list.add(candidate);
@@ -414,7 +437,7 @@ public class UCDParser {
 
     private void addToMap(UCD ucd) {
         if (!ucdmap.containsKey(ucd.type)) {
-            Set<UCD> set = new HashSet<UCD>();
+            Set<UCD> set = new HashSet<>();
             set.add(ucd);
             ucdmap.put(ucd.type, set);
         } else {
