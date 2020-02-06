@@ -188,7 +188,7 @@ public enum Events {
      **/
     CATALOG_ADD,
     /**
-     * Highlight the catalog. Contains the dataset name, the highlight status (bool), the color as a float[] (null to use current) and an optional boolean if it comes from the UI
+     * Highlight the catalog. Contains the CatalogInfo object, the highlight status (bool), and an optional boolean if it comes from the UI
      */
     CATALOG_HIGHLIGHT,
     /**

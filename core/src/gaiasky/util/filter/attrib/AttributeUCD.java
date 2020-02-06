@@ -29,6 +29,16 @@ public class AttributeUCD implements IAttribute<ParticleBean> {
         return ucd.unit;
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o)
+            return true;
+        if (o == null || getClass() != o.getClass())
+            return false;
+        AttributeUCD that = (AttributeUCD) o;
+        return ucd.colname.equals(that.ucd.colname);
+    }
+
     public String toString(){
         return ucd.colname;
     }

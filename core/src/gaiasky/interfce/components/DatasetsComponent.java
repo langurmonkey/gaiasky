@@ -12,7 +12,7 @@ import com.badlogic.gdx.utils.Align;
 import gaiasky.event.EventManager;
 import gaiasky.event.Events;
 import gaiasky.event.IObserver;
-import gaiasky.interfce.ColorPicker;
+import gaiasky.interfce.ColormapPicker;
 import gaiasky.interfce.DatasetPreferencesWindow;
 import gaiasky.util.*;
 import gaiasky.util.scene2d.*;
@@ -31,7 +31,7 @@ public class DatasetsComponent extends GuiComponent implements IObserver {
 
     private Map<String, WidgetGroup> groupMap;
     private Map<String, OwnImageButton[]> imageMap;
-    private Map<String, ColorPicker> colorMap;
+    private Map<String, ColormapPicker> colorMap;
 
     public DatasetsComponent(Skin skin, Stage stage) {
         super(skin, stage);
@@ -83,8 +83,8 @@ public class DatasetsComponent extends GuiComponent implements IObserver {
         mark.setCheckedNoFire(ci.highlighted);
         mark.addListener(new OwnTextTooltip(I18n.txt("gui.tooltip.dataset.highlight"), skin));
         mark.addListener(event -> {
-            if(event instanceof ChangeEvent){
-                EventManager.instance.post(Events.CATALOG_HIGHLIGHT, ci.name, mark.isChecked(), ci.hlColor, true);
+            if (event instanceof ChangeEvent) {
+                EventManager.instance.post(Events.CATALOG_HIGHLIGHT, ci, mark.isChecked(), true);
                 return true;
             }
             return false;
@@ -93,7 +93,7 @@ public class DatasetsComponent extends GuiComponent implements IObserver {
         OwnImageButton prefs = new OwnImageButton(skin, "prefs");
         prefs.addListener(new OwnTextTooltip(I18n.txt("gui.tooltip.dataset.preferences"), skin));
         prefs.addListener(event -> {
-            if(event instanceof ChangeEvent){
+            if (event instanceof ChangeEvent) {
                 DatasetPreferencesWindow dpw = new DatasetPreferencesWindow(ci, skin, stage);
                 dpw.show(stage);
                 return true;
@@ -112,8 +112,7 @@ public class DatasetsComponent extends GuiComponent implements IObserver {
             return false;
         });
 
-
-        imageMap.put(ci.name, new OwnImageButton[]{eye, mark});
+        imageMap.put(ci.name, new OwnImageButton[] { eye, mark });
         controls.addActor(eye);
         controls.addActor(prefs);
         controls.addActor(rubbish);
@@ -121,16 +120,19 @@ public class DatasetsComponent extends GuiComponent implements IObserver {
         // Dataset table
         Table t = new Table();
         // Color picker
-        ColorPicker cp = new ColorPicker(ci.name, ci.hlColor, stage, skin);
+        ColormapPicker cp = new ColormapPicker(ci.name, ci.hlColor, ci, stage, skin);
         cp.addListener(new TextTooltip(I18n.txt("gui.tooltip.dataset.highlight.color.select"), skin));
-        cp.setNewColorRunnable(()->{
+        cp.setNewColorRunnable(() -> {
             ci.setHlColor(cp.getPickedColor());
+        });
+        cp.setNewColormapRunnable(()-> {
+            ci.setHlColormap(cp.getPickedCmapIndex(), cp.getPickedCmapAttribute(), cp.getPickedCmapMin(), cp.getPickedCmapMax());
         });
         colorMap.put(ci.name, cp);
 
         String name = TextUtils.capString(ci.name, 17);
         OwnLabel nameLabel = new OwnLabel(TextUtils.capString(ci.name, 17), skin, "hud-subheader");
-        if(!ci.name.equals(name)){
+        if (!ci.name.equals(name)) {
             nameLabel.addListener(new OwnTextTooltip(ci.name, skin));
         }
         t.add(nameLabel).left().padBottom(pad);
@@ -139,7 +141,7 @@ public class DatasetsComponent extends GuiComponent implements IObserver {
         t.add(mark).right().padBottom(pad).row();
         t.add(new OwnLabel(I18n.txt("gui.dataset.type") + ": " + ci.type.toString(), skin)).colspan(2).left().row();
         t.add(new OwnLabel(TextUtils.capString(ci.description, GlobalConf.UI_SCALE_FACTOR < 1.5 ? 22 : 28), skin)).left().expandX();
-        Link info = new Link("(i)",  skin.get("link", Label.LabelStyle.class), null);
+        Link info = new Link("(i)", skin.get("link", Label.LabelStyle.class), null);
         info.addListener(new OwnTextTooltip(ci.description, skin));
         t.add(info).left().padLeft(pad);
 
@@ -157,7 +159,6 @@ public class DatasetsComponent extends GuiComponent implements IObserver {
         scroll.setWidth(175 * GlobalConf.UI_SCALE_FACTOR);
         scroll.setHeight(GlobalConf.UI_SCALE_FACTOR > 1.5 ? 125 : 75);
 
-
         //ciGroup.addActor(controls);
         ciGroup.addActor(scroll);
 
@@ -174,7 +175,7 @@ public class DatasetsComponent extends GuiComponent implements IObserver {
             break;
         case CATALOG_REMOVE:
             String ciName = (String) data[0];
-            if(groupMap.containsKey(ciName)){
+            if (groupMap.containsKey(ciName)) {
                 groupMap.get(ciName).remove();
                 groupMap.remove(ciName);
                 imageMap.remove(ciName);
@@ -193,22 +194,22 @@ public class DatasetsComponent extends GuiComponent implements IObserver {
             }
             break;
         case CATALOG_HIGHLIGHT:
-             ui = false;
-             if(data.length > 3)
-                 ui = (Boolean) data[3];
-             if(!ui){
-                 ciName = (String) data[0];
-                 float[] col = (float[]) data[2];
-                 if(colorMap.containsKey(ciName) && col != null) {
-                     colorMap.get(ciName).setPickedColor(col);
-                 }
+            ui = false;
+            if (data.length > 2)
+                ui = (Boolean) data[2];
+            if (!ui) {
+                CatalogInfo ci = (CatalogInfo) data[0];
+                float[] col = ci.hlColor;
+                if (colorMap.containsKey(ci.name) && col != null) {
+                    colorMap.get(ci.name).setPickedColor(col);
+                }
 
-                 if(imageMap.containsKey(ciName)) {
-                     boolean hl = (Boolean) data[1];
-                     OwnImageButton hig = imageMap.get(ciName)[1];
-                     hig.setCheckedNoFire(hl);
-                 }
-             }
+                if (imageMap.containsKey(ci.name)) {
+                    boolean hl = (Boolean) data[1];
+                    OwnImageButton hig = imageMap.get(ci.name)[1];
+                    hig.setCheckedNoFire(hl);
+                }
+            }
             break;
         default:
             break;

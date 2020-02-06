@@ -21,6 +21,7 @@ import gaiasky.event.EventManager;
 import gaiasky.event.EventManager.TimeFrame;
 import gaiasky.event.Events;
 import gaiasky.event.IObserver;
+import gaiasky.interfce.ColormapPicker;
 import gaiasky.interfce.IGui;
 import gaiasky.render.ComponentTypes;
 import gaiasky.scenegraph.*;
@@ -32,13 +33,18 @@ import gaiasky.util.*;
 import gaiasky.util.Logger.Log;
 import gaiasky.util.color.ColourUtils;
 import gaiasky.util.coord.Coordinates;
+import gaiasky.util.filter.attrib.AttributeUCD;
+import gaiasky.util.filter.attrib.IAttribute;
 import gaiasky.util.gdx.contrib.postprocess.effects.CubemapProjections;
 import gaiasky.util.math.*;
 import gaiasky.util.time.ITimeFrameProvider;
+import gaiasky.util.ucd.UCD;
 import uk.ac.starlink.util.DataSource;
 import uk.ac.starlink.util.FileDataSource;
 
 import java.io.File;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
@@ -2290,10 +2296,12 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
     public boolean highlightDataset(String dsName, boolean highlight) {
         if (checkString(dsName, "datasetName")) {
             boolean exists = CatalogManager.instance().contains(dsName);
-            if (exists)
-                EventManager.instance.post(Events.CATALOG_HIGHLIGHT, dsName, highlight, null, false);
-            else
+            if (exists) {
+                CatalogInfo ci = CatalogManager.instance().get(dsName);
+                EventManager.instance.post(Events.CATALOG_HIGHLIGHT, ci, highlight, false);
+            } else {
                 logger.warn("Dataset with name " + dsName + " does not exist");
+            }
             return exists;
         }
         return false;
@@ -2310,13 +2318,75 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
         if (checkString(dsName, "datasetName")) {
             boolean exists = CatalogManager.instance().contains(dsName);
             if (exists) {
-                float[] color = new float[]{r, g, b, a};
-                EventManager.instance.post(Events.CATALOG_HIGHLIGHT, dsName, highlight, color, false);
-            } else
+                CatalogInfo ci = CatalogManager.instance().get(dsName);
+                ci.plainColor = true;
+                ci.hlColor[0] = r;
+                ci.hlColor[1] = g;
+                ci.hlColor[2] = b;
+                ci.hlColor[3] = a;
+                EventManager.instance.post(Events.CATALOG_HIGHLIGHT, ci, highlight, false);
+            } else {
                 logger.warn("Dataset with name " + dsName + " does not exist");
+            }
             return exists;
         }
         return false;
+    }
+
+    @Override
+    public boolean highlightDataset(String dsName, String attributeName, String colorMap, double minMap, double maxMap, boolean highlight) {
+        if (checkString(dsName, "datasetName")) {
+            boolean exists = CatalogManager.instance().contains(dsName);
+            if (exists) {
+                CatalogInfo ci = CatalogManager.instance().get(dsName);
+                IAttribute attribute = getAttributeByName(attributeName, ci);
+                int cmapIndex = getCmapIndexByName(colorMap);
+                if (attribute != null && cmapIndex >= 0) {
+                    ci.plainColor = false;
+                    ci.hlCmapIndex = cmapIndex;
+                    ci.hlCmapMin = minMap;
+                    ci.hlCmapMax = maxMap;
+                    ci.hlCmapAttribute = attribute;
+                    EventManager.instance.post(Events.CATALOG_HIGHLIGHT, ci, highlight, false);
+                } else {
+                    if (attribute == null)
+                        logger.error("Could not find attribute with name '" + attributeName + "'");
+                    if(cmapIndex < 0)
+                        logger.error("Could not find color map with name '" + colorMap + "'");
+                }
+            } else {
+                logger.warn("Dataset with name " + dsName + " does not exist");
+            }
+            return exists;
+        }
+        return false;
+    }
+
+    private int getCmapIndexByName(String name) {
+        for (Pair<String, Integer> cmap : ColormapPicker.cmapList) {
+            if (name.equalsIgnoreCase(cmap.getFirst()))
+                return cmap.getSecond();
+        }
+        return -1;
+    }
+
+    private IAttribute getAttributeByName(String name, CatalogInfo ci) {
+        try {
+            // One of the default attributes
+            Class<?> clazz = Class.forName("gaiasky.util.filter.attrib.Attribute" + name);
+            Constructor<?> ctor = clazz.getConstructor();
+            return (IAttribute) ctor.newInstance();
+        } catch (ClassNotFoundException | NoSuchMethodException | InstantiationException | IllegalAccessException | InvocationTargetException e) {
+            // Try extra attributes
+            if (ci.object instanceof ParticleGroup) {
+                ParticleGroup pg = (ParticleGroup) ci.object;
+                Set<UCD> ucds = pg.get(0).extra.keySet();
+                for (UCD ucd : ucds)
+                    if (ucd.colname.equalsIgnoreCase(name))
+                        return new AttributeUCD(ucd);
+            }
+        }
+        return null;
     }
 
     @Override

@@ -7,7 +7,7 @@ package gaiasky.util.filter.attrib;
 
 import gaiasky.scenegraph.ParticleGroup.ParticleBean;
 
-public class AttributeEclLongitude implements IAttribute<ParticleBean> {
+public class AttributeEclLongitude extends AttributeAbstract implements IAttribute<ParticleBean> {
     @Override
     public double get(ParticleBean bean) {
         return bean.lambda();

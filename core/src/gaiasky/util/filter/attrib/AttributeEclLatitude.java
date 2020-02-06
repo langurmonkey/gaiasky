@@ -7,7 +7,7 @@ package gaiasky.util.filter.attrib;
 
 import gaiasky.scenegraph.ParticleGroup.ParticleBean;
 
-public class AttributeEclLatitude implements IAttribute<ParticleBean> {
+public class AttributeEclLatitude extends AttributeAbstract implements IAttribute<ParticleBean> {
     @Override
     public double get(ParticleBean bean) {
         return bean.beta();

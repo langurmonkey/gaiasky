@@ -8,7 +8,7 @@ package gaiasky.util.filter.attrib;
 import gaiasky.scenegraph.ParticleGroup.ParticleBean;
 import gaiasky.util.I18n;
 
-public class AttributeDEC implements IAttribute<ParticleBean> {
+public class AttributeDEC extends AttributeAbstract implements IAttribute<ParticleBean> {
     @Override
     public double get(ParticleBean bean) {
         return bean.dec();

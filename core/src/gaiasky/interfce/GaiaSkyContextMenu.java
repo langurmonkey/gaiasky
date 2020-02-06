@@ -5,7 +5,6 @@
 
 package gaiasky.interfce;
 
-import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
@@ -274,7 +273,7 @@ public class GaiaSkyContextMenu extends ContextMenu {
                     cim.add(cb).right().expand();
                     cim.addListener(event ->{
                        if(event instanceof ChangeEvent){
-                           EventManager.instance.post(Events.CATALOG_HIGHLIGHT, ci.name, !ci.highlighted, null, false);
+                           EventManager.instance.post(Events.CATALOG_HIGHLIGHT, ci, !ci.highlighted, false);
                            return true;
                        }
                        return false;

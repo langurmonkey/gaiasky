@@ -8,7 +8,7 @@ package gaiasky.util.filter.attrib;
 import gaiasky.scenegraph.StarGroup.StarBean;
 import gaiasky.util.I18n;
 
-public class AttributeRadvel implements IAttribute<StarBean> {
+public class AttributeRadvel extends AttributeAbstract implements IAttribute<StarBean> {
     @Override
     public double get(StarBean bean) {
         return bean.radvel();

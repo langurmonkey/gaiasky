@@ -36,7 +36,7 @@ public class StarGroupRenderSystem extends ImmediateRenderSystem implements IObs
     private final double BRIGHTNESS_FACTOR;
 
     private Vector3 aux1;
-    private int sizeOffset, pmOffset;
+    private int additionalOffset, pmOffset;
     private float[] pointAlpha, alphaSizeFovBr, pointAlphaHl;
 
     public StarGroupRenderSystem(RenderGroup rg, float[] alphas, ExtShaderProgram[] shaders) {
@@ -80,7 +80,7 @@ public class StarGroupRenderSystem extends ImmediateRenderSystem implements IObs
         curr.vertexSize = curr.mesh.getVertexAttributes().vertexSize / 4;
         curr.colorOffset = curr.mesh.getVertexAttribute(Usage.ColorPacked) != null ? curr.mesh.getVertexAttribute(Usage.ColorPacked).offset / 4 : 0;
         pmOffset = curr.mesh.getVertexAttribute(Usage.Tangent) != null ? curr.mesh.getVertexAttribute(Usage.Tangent).offset / 4 : 0;
-        sizeOffset = curr.mesh.getVertexAttribute(Usage.Generic) != null ? curr.mesh.getVertexAttribute(Usage.Generic).offset / 4 : 0;
+        additionalOffset = curr.mesh.getVertexAttribute(Usage.Generic) != null ? curr.mesh.getVertexAttribute(Usage.Generic).offset / 4 : 0;
         return mdi;
     }
 
@@ -97,9 +97,7 @@ public class StarGroupRenderSystem extends ImmediateRenderSystem implements IObs
                 StarGroup starGroup = (StarGroup) renderable;
                 synchronized (starGroup) {
                     if (!starGroup.disposed) {
-                        /*
-                         * ADD PARTICLES
-                         */
+                        boolean hlCmap = starGroup.isHighlighted() && !starGroup.isHlplain();
                         if (!starGroup.inGpu()) {
                             int n = starGroup.size();
                             starGroup.offset = addMeshData(n);
@@ -108,24 +106,25 @@ public class StarGroupRenderSystem extends ImmediateRenderSystem implements IObs
                             int nadded = 0;
                             for (int i = 0; i < n; i++) {
                                 if (starGroup.filter(i)) {
-                                    StarBean p = starGroup.data().get(i);
+                                    StarBean sb = starGroup.data().get(i);
                                     // COLOR
                                     tempVerts[curr.vertexIdx + curr.colorOffset] = starGroup.getColor(i);
 
-                                    // SIZE, APPMAG, CMAP VALUE, OTHER
-                                    tempVerts[curr.vertexIdx + sizeOffset] = (float) (Math.pow(p.size(), GlobalConf.scene.STAR_BRIGHTNESS_POWER) * Constants.STAR_SIZE_FACTOR) * starGroup.highlightedSizeFactor();
-                                    tempVerts[curr.vertexIdx + sizeOffset + 1] = (float) p.appmag();
-                                    tempVerts[curr.vertexIdx + sizeOffset + 2] = (float) p.appmag();
+                                    // SIZE, APPMAG, CMAP VALUE
+                                    tempVerts[curr.vertexIdx + additionalOffset + 0] = (float) (Math.pow(sb.size(), GlobalConf.scene.STAR_BRIGHTNESS_POWER) * Constants.STAR_SIZE_FACTOR) * starGroup.highlightedSizeFactor();
+                                    tempVerts[curr.vertexIdx + additionalOffset + 1] = (float) sb.appmag();
+                                    if (hlCmap)
+                                        tempVerts[curr.vertexIdx + additionalOffset + 2] = (float) starGroup.getHlcma().get(sb);
 
                                     // POSITION [u]
-                                    tempVerts[curr.vertexIdx] = (float) p.x();
-                                    tempVerts[curr.vertexIdx + 1] = (float) p.y();
-                                    tempVerts[curr.vertexIdx + 2] = (float) p.z();
+                                    tempVerts[curr.vertexIdx] = (float) sb.x();
+                                    tempVerts[curr.vertexIdx + 1] = (float) sb.y();
+                                    tempVerts[curr.vertexIdx + 2] = (float) sb.z();
 
                                     // PROPER MOTION [u/yr]
-                                    tempVerts[curr.vertexIdx + pmOffset] = (float) p.pmx();
-                                    tempVerts[curr.vertexIdx + pmOffset + 1] = (float) p.pmy();
-                                    tempVerts[curr.vertexIdx + pmOffset + 2] = (float) p.pmz();
+                                    tempVerts[curr.vertexIdx + pmOffset] = (float) sb.pmx();
+                                    tempVerts[curr.vertexIdx + pmOffset + 1] = (float) sb.pmy();
+                                    tempVerts[curr.vertexIdx + pmOffset + 2] = (float) sb.pmz();
 
                                     curr.vertexIdx += curr.vertexSize;
                                     nadded++;
@@ -152,8 +151,9 @@ public class StarGroupRenderSystem extends ImmediateRenderSystem implements IObs
                             shaderProgram.setUniformi("u_cubemap", GlobalConf.program.CUBEMAP_MODE ? 1 : 0);
                             shaderProgram.setUniformf("u_magLimit", GlobalConf.runtime.LIMIT_MAG_RUNTIME);
 
-                            shaderProgram.setUniformi("u_cmap", -1);
-                            shaderProgram.setUniformf("u_cmapMinMax", 13f, 7f);
+                            shaderProgram.setUniformi("u_cmap", hlCmap ? starGroup.getHlcmi() : -1);
+                            if (hlCmap)
+                                shaderProgram.setUniformf("u_cmapMinMax", (float) starGroup.getHlcmmin(), (float) starGroup.getHlcmmax());
 
                             // Rel, grav, z-buffer, etc.
                             addEffectsUniforms(shaderProgram, camera);
@@ -195,7 +195,7 @@ public class StarGroupRenderSystem extends ImmediateRenderSystem implements IObs
         attributes.add(new VertexAttribute(Usage.Position, 3, ExtShaderProgram.POSITION_ATTRIBUTE));
         attributes.add(new VertexAttribute(Usage.Tangent, 3, "a_pm"));
         attributes.add(new VertexAttribute(Usage.ColorPacked, 4, ExtShaderProgram.COLOR_ATTRIBUTE));
-        attributes.add(new VertexAttribute(Usage.Generic, 4, "a_additional"));
+        attributes.add(new VertexAttribute(Usage.Generic, 3, "a_additional"));
 
         VertexAttribute[] array = new VertexAttribute[attributes.size];
         for (int i = 0; i < attributes.size; i++)

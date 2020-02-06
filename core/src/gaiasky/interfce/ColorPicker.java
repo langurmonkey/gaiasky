@@ -14,6 +14,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener.ChangeEvent;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
+import gaiasky.util.CatalogInfo;
 import gaiasky.util.GlobalConf;
 import gaiasky.util.GlobalResources;
 import gaiasky.util.I18n;
@@ -29,31 +30,30 @@ import gaiasky.util.validator.IValidator;
 
 import java.util.Arrays;
 
-public class ColorPicker extends Image {
-    private Stage stage;
-    private Skin skin;
-    private Runnable newColorRunnable;
-    private float[] color;
-    private String name;
+/**
+ * A little widget showing a color and allowing to change it
+ * using a color picker dialog.
+ */
+public class ColorPicker extends ColorPickerAbstract {
 
-    private ColorPicker(String name, Stage stage, Skin skin) {
-        super(skin.getDrawable("white"));
+    private ColorPicker(String name, CatalogInfo ci, Stage stage, Skin skin) {
+        super(name, ci, stage, skin);
         this.name = name;
         this.skin = skin;
         this.stage = stage;
         initialize();
     }
 
-    public ColorPicker(float[] rgba, Stage stage, Skin skin) {
-        this(null, rgba, stage, skin);
+    public ColorPicker(float[] rgba, CatalogInfo ci, Stage stage, Skin skin) {
+        this(null, rgba, ci, stage, skin);
     }
 
-    public ColorPicker(String name ,float[] rgba, Stage stage, Skin skin) {
-        this(name, stage, skin);
+    public ColorPicker(String name, float[] rgba, CatalogInfo ci, Stage stage, Skin skin) {
+        this(name, ci, stage, skin);
         setPickedColor(rgba);
     }
 
-    private void initialize() {
+    protected void initialize() {
         this.addListener(event -> {
             if (event instanceof InputEvent) {
                 Type type = ((InputEvent) event).getType();

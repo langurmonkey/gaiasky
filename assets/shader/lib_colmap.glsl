@@ -1,75 +1,149 @@
 // Value is assumed to be normalized in [0,1] in all cases
 
 
-// SPACE
-float colormap_space_red(float x) {
-    if (x < 37067.0 / 158860.0) {
-        return 0.0;
-    } else if (x < 85181.0 / 230350.0) {
-        float xx = x - 37067.0 / 158860.0;
-        return (780.25 * xx + 319.71) * xx / 255.0;
-    } else if (x < (sqrt(3196965649.0) + 83129.0) / 310480.0) {
-        return ((1035.33580904442 * x - 82.5380748768798) * x - 52.8985266363332) / 255.0;
-    } else if (x < 231408.0 / 362695.0) {
-        return (339.41 * x - 33.194) / 255.0;
-    } else if (x < 152073.0 / 222340.0) {
-        return (1064.8 * x - 496.01) / 255.0;
-    } else if (x < 294791.0 / 397780.0) {
-        return (397.78 * x - 39.791) / 255.0;
-    } else if (x < 491189.0 / 550980.0) {
-        return 1.0;
-    } else if (x < 1.0) {
-        return (5509.8 * x + 597.91) * x / 255.0;
+// BLUES
+float colormap_blues_red(float x) {
+    if (x < 0.8724578971287745) {
+        return ((((-2.98580898761749E+03 * x + 6.75014845489710E+03) * x - 4.96941610635258E+03) * x + 1.20190439358912E+03) * x - 2.94374708396149E+02) * x + 2.48449410219242E+02;
     } else {
-        return 1.0;
+        return 8.0;
     }
 }
 
-float colormap_space_green(float x) {
-    float xx;
-    if (x < 0.0) {
-        return 0.0;
-    } else if (x < (-sqrt(166317494.0) + 39104.0) / 183830.0) {
-        return (-1838.3 * x + 464.36) * x / 255.0;
-    } else if (x < 37067.0 / 158860.0) {
-        return (-317.72 * x + 74.134) / 255.0;
-    } else if (x < (3.0 * sqrt(220297369.0) + 58535.0) / 155240.0) {
-        return 0.0;
-    } else if (x < 294791.0 / 397780.0) {
-        xx = x - (3.0 * sqrt(220297369.0) + 58535.0) / 155240.0;
-        return (-1945.0 * xx + 1430.2) * xx / 255.0;
-    } else if (x < 491189.0 / 550980.0) {
-        return ((-1770.0 * x + 3.92813840044638e3) * x - 1.84017494792245e3) / 255.0;
+float colormap_blues_green(float x) {
+    if (x < 0.3725897611307026) {
+        return -1.30453729372935E+02 * x + 2.51073069306930E+02;
     } else {
-        return 1.0;
+        return (-4.97095598364922E+01 * x - 1.77638812495581E+02) * x + 2.75554584848896E+02;
     }
 }
 
-float colormap_space_blue(float x) {
-    if (x < 0.0) {
-        return 0.0;
-    } else if (x < 51987.0 / 349730.0) {
-        return (458.79 * x) / 255.0;
-    } else if (x < 85181.0 / 230350.0) {
-        return (109.06 * x + 51.987) / 255.0;
-    } else if (x < (sqrt(3196965649.0) + 83129.0) / 310480.0) {
-        return (339.41 * x - 33.194) / 255.0;
-    } else if (x < (3.0 * sqrt(220297369.0) + 58535.0) / 155240.0) {
-        return ((-1552.4 * x + 1170.7) * x - 92.996) / 255.0;
-    } else if (x < 27568.0 / 38629.0) {
-        return 0.0;
-    } else if (x < 81692.0 / 96241.0) {
-        return (386.29 * x - 275.68) / 255.0;
-    } else if (x <= 1.0) {
-        return (1348.7 * x - 1092.6) / 255.0;
+float colormap_blues_blue(float x) {
+    if (x < 0.8782350698420436) {
+        return (((-1.66242968759033E+02 * x + 2.50865766027010E+02) * x - 1.82046165445353E+02) * x - 3.29698266187334E+01) * x + 2.53927912915449E+02;
     } else {
-        return 1.0;
+        return -3.85153281423831E+02 * x + 4.93849833147981E+02;
     }
 }
 
-vec3 colormap_space(float x) {
-    return vec3(colormap_space_red(x), colormap_space_green(x), colormap_space_blue(x));
+vec3 colormap_blues(float x) {
+    float r = clamp(colormap_blues_red(x) / 255.0, 0.0, 1.0);
+    float g = clamp(colormap_blues_green(x) / 255.0, 0.0, 1.0);
+    float b = clamp(colormap_blues_blue(x) / 255.0, 0.0, 1.0);
+    return vec3(r, g, b);
 }
+
+// GREENS
+float colormap_greens_red(float x) {
+    if (x < 0.6193682068820651) {
+        return ((1.41021531432983E+02 * x - 3.78122271460656E+02) * x - 1.08403692154170E+02) * x + 2.45743977533647E+02;
+    } else {
+        return ((-8.63146749682724E+02 * x + 1.76195389457266E+03) * x - 1.43807716183136E+03) * x + 4.86922446232568E+02;
+    }
+}
+
+float colormap_greens_green(float x) {
+    return (-1.37013460576160E+02 * x - 4.54698187198101E+01) * x + 2.52098684286706E+02;
+}
+
+float colormap_greens_blue(float x) {
+    if (x < 0.5062477983469252) {
+        return ((3.95067226937040E+02 * x - 4.52381961582927E+02) * x - 1.25304923569201E+02) * x + 2.43770002412197E+02;
+    } else {
+        return ((2.98249378459208E+02 * x - 6.14859580726999E+02) * x + 2.22299590241459E+02) * x + 1.21998454489668E+02;
+    }
+}
+
+vec3 colormap_greens(float x) { float r = clamp(colormap_greens_red(x) / 255.0, 0.0, 1.0);
+    float g = clamp(colormap_greens_green(x) / 255.0, 0.0, 1.0);
+    float b = clamp(colormap_greens_blue(x) / 255.0, 0.0, 1.0);
+    return vec3(r, g, b);
+}
+
+// REDS
+float colormap_reds_red(float x) {
+    if (x < 0.7109796106815338) {
+        return (((-9.58108609441667E+02 * x + 8.89060620527714E+02) * x - 2.42747192807495E+02) * x + 9.97906310565304E+00) * x + 2.54641252219400E+02;
+    } else {
+        return ((-9.93985373158007E+02 * x + 1.96524174972026E+03) * x - 1.54068189744713E+03) * x + 6.72947219603874E+02;
+    }
+}
+
+float colormap_reds_green(float x) {
+    if (x < 0.7679868638515472) {
+        return ((((2.66433610509335E+03 * x - 5.05488641558587E+03) * x + 3.69542277742922E+03) * x - 1.36931912848446E+03) * x - 5.12669839132577E+01) * x + 2.41929417192750E+02;
+    } else {
+        return (-2.11738816337853E+02 * x + 2.78333107855597E+02) * x - 6.66958752910143E+01;
+    }
+}
+
+float colormap_reds_blue(float x) {
+    return (((-6.83475279000297E+02 * x + 1.55250107598171E+03) * x - 9.25799053039285E+02) * x - 1.67380812671938E+02) * x + 2.37145226675143E+02;
+}
+
+vec3 colormap_reds(float x) {
+    float r = clamp(colormap_reds_red(x) / 255.0, 0.0, 1.0);
+    float g = clamp(colormap_reds_green(x) / 255.0, 0.0, 1.0);
+    float b = clamp(colormap_reds_blue(x) / 255.0, 0.0, 1.0);
+    return vec3(r, g, b);
+}
+
+
+// RAINBOW18
+vec3 colormap_rainbow18(float x) {
+    float x16 = x * 16.0;
+    const float s = 1.0 / 255.0;
+    if (x16 < 1.0) {
+        return vec3(150.0, 0.0, 150.0) * s;
+    } else if (x16 < 2.0) {
+        return vec3(200.0, 0.0, 200.0) * s;
+    } else if (x16 < 3.0) {
+        return vec3(100.0, 100.0, 150.0) * s;
+    } else if (x16 < 4.0) {
+        return vec3(100.0, 100.0, 200.0) * s;
+    } else if (x16 < 5.0) {
+        return vec3(100.0, 100.0, 255.0) * s;
+    } else if (x16 < 6.0) {
+        return vec3(0.0, 140.0, 0.0) * s;
+    } else if (x16 < 7.0) {
+        return vec3(150.0, 170.0, 0.0) *s;
+    } else if (x16 < 8.0) {
+        return vec3(200.0, 200.0, 0.0) * s;
+    } else if (x16 < 9.0) {
+        return vec3(150.0, 200.0, 0.0) * s;
+    } else if (x16 < 10.0) {
+        return vec3(200.0, 255.0, 120.0) * s;
+    } else if (x16 < 11.0) {
+        return vec3(255.0, 255.0, 0.0) * s;
+    } else if (x16 < 12.0) {
+        return vec3(255.0, 200.0, 0.0) * s;
+    } else if (x16 < 13.0) {
+        return vec3(255.0, 160.0, 0.0) * s;
+    } else if (x16 < 14.0) {
+        return vec3(255.0, 125.0, 0.0) * s;
+    } else if (x16 < 15.0) {
+        return vec3(200.0, 50.0, 100.0) * s;
+    } else {
+        return vec3(175.0, 50.0, 75.0) * s;
+    }
+}
+
+// COOL
+float colormap_cool_red(float x) {
+    return (1.0 + 1.0 / 63.0) * x - 1.0 / 63.0;
+}
+
+float colormap_cool_green(float x) {
+    return -(1.0 + 1.0 / 63.0) * x + (1.0 + 1.0 / 63.0);
+}
+
+vec3 colormap_cool(float x) {
+    float r = clamp(colormap_cool_red(x), 0.0, 1.0);
+    float g = clamp(colormap_cool_green(x), 0.0, 1.0);
+    float b = 1.0;
+    return vec3(r, g, b);
+}
+
 
 // SEISMIC
 float colormap_seismic_f(float x) {
@@ -259,24 +333,36 @@ vec3 colormap_rainbow(float x) {
 /*
     Computes the color map for the normalized value using the given color map.
     Color maps:
-        0 - space
-        1 - seismic
-        2 - carnation
-        3 - hotmetal
+        0 - reds
+        1 - greens
+        2 - blues
+        3 - rainbow18
         4 - rainbow
+        5 - seismic
+        6 - carnation
+        7 - hotmetal
+        8 - cool
 */
 vec3 colormap(int cmap, float value){
-    cmap = cmap % 5;
+    cmap = cmap % 9;
     if (cmap == 0){
-        return colormap_space(value);
+        return colormap_reds(value);
     } else if (cmap == 1){
-        return colormap_seismic(value);
+        return colormap_greens(value);
     } else if (cmap == 2){
-        return colormap_carnation(value);
+        return colormap_blues(value);
     } else if (cmap == 3){
-        return colormap_hotmetal(value);
+        return colormap_rainbow18(value);
     }else if (cmap == 4){
         return colormap_rainbow(value);
+    } else if (cmap == 5){
+        return colormap_seismic(value);
+    } else if (cmap == 6){
+        return colormap_carnation(value);
+    } else if (cmap == 7){
+        return colormap_hotmetal(value);
+    }else if (cmap == 8){
+        return colormap_cool(value);
     }
     return vec3(0.0);
 }

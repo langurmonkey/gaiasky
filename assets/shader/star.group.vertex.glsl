@@ -11,8 +11,7 @@ in vec4 a_color;
 // x - size
 // y - magnitude
 // z - colmap_attribute_value
-// w - additional
-in vec4 a_additional;
+in vec3 a_additional;
 
 uniform int u_t; // time in days since epoch
 uniform mat4 u_projModelView;

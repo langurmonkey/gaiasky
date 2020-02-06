@@ -9,6 +9,7 @@ import gaiasky.scenegraph.FadeNode;
 import gaiasky.util.Logger.Log;
 import gaiasky.util.color.ColourUtils;
 import gaiasky.util.filter.Filter;
+import gaiasky.util.filter.attrib.IAttribute;
 
 import java.time.Instant;
 
@@ -29,9 +30,14 @@ public class CatalogInfo {
 
     // Highlight
     public boolean highlighted;
+    public boolean plainColor;
     public float[] hlColor;
     public float hlSizeFactor;
     public boolean hlAllVisible;
+    public int hlCmapIndex = 0;
+    public IAttribute hlCmapAttribute;
+    public double hlCmapMin = 0, hlCmapMax = 0;
+
 
     // The filter object. May be null
     public Filter filter;
@@ -50,6 +56,7 @@ public class CatalogInfo {
         this.type = type;
         this.object = object;
         this.loadDateUTC = Instant.now();
+        this.plainColor = true;
         this.hlColor = new float[4];
         this.hlSizeFactor = hlSizeFactor;
         this.hlAllVisible = true;
@@ -80,11 +87,21 @@ public class CatalogInfo {
     }
 
     public void setHlColor(float[] hlColor){
+        this.plainColor = true;
         setColor(hlColor[0], hlColor[1], hlColor[2], hlColor[3]);
     }
 
     public float[] getHlColor(){
         return hlColor;
+    }
+
+    public void setHlColormap(int cmapIndex, IAttribute cmapAttribute, double cmapMin, double cmapMax){
+        this.plainColor = false;
+        this.hlCmapIndex = cmapIndex;
+        this.hlCmapAttribute = cmapAttribute;
+        this.hlCmapMin = cmapMin;
+        this.hlCmapMax = cmapMax;
+        highlight(highlighted);
     }
 
     public void setHlSizeFactor(float hlSizeFactor){
@@ -113,17 +130,11 @@ public class CatalogInfo {
      */
     public void highlight(boolean hl){
         this.highlighted = hl;
-        object.highlight(hl, hlColor);
-    }
-
-    /**
-     * Highlight the dataset using a specific color index
-     * @param hl Whether to highlight or not
-     * @param color The color
-     */
-    public void highlight(boolean hl, float[] color){
-        this.highlighted = hl;
-        object.highlight(hl, color);
+        if(plainColor) {
+            object.highlight(hl, hlColor);
+        }else{
+            object.highlight(hl, hlCmapIndex, hlCmapAttribute, hlCmapMin, hlCmapMax);
+        }
     }
 
 }

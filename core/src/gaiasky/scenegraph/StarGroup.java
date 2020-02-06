@@ -96,14 +96,12 @@ public class StarGroup extends ParticleGroup implements ILineRenderable, IStarFo
         public Long id;
         public transient OctreeNode octant;
         public String[] names;
-        public Map<UCD, Double> extra;
 
-        public StarBean(double[] data, Long id, String[] names, Map<UCD, Double> extraAttributes) {
-            super(data);
+        public StarBean(double[] data, Long id, String[] names, Map<UCD, Double> extra) {
+            super(data, extra);
             this.id = id;
             this.names = names;
             this.octant = null;
-            this.extra = extraAttributes;
         }
 
         public StarBean(double[] data, Long id, String[] names) {

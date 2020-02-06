@@ -12,8 +12,9 @@ import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener.ChangeEvent;
 import com.badlogic.gdx.utils.Array;
 import gaiasky.GaiaSky;
 import gaiasky.interfce.beans.AttributeComboBoxBean;
+import gaiasky.scenegraph.ParticleGroup;
+import gaiasky.scenegraph.ParticleGroup.ParticleBean;
 import gaiasky.scenegraph.StarGroup;
-import gaiasky.scenegraph.StarGroup.StarBean;
 import gaiasky.scenegraph.octreewrapper.OctreeWrapper;
 import gaiasky.util.*;
 import gaiasky.util.filter.Filter;
@@ -124,7 +125,7 @@ public class DatasetPreferencesWindow extends GenericDialog {
                 OwnLabel unit = new OwnLabel(rule.getAttribute().getUnit(), skin);
 
                 // ATTRIBUTE
-                boolean stars = (ci.object instanceof StarGroup || ci.object instanceof OctreeWrapper);
+                boolean stars = ci.object instanceof StarGroup || ci.object instanceof OctreeWrapper;
                 Array<AttributeComboBoxBean> attrs = new Array<>(stars ? 12 : 7);
                 // Add particle attributes (dist, alpha, delta)
                 attrs.add(new AttributeComboBoxBean(new AttributeDistance()));
@@ -135,24 +136,24 @@ public class DatasetPreferencesWindow extends GenericDialog {
                 attrs.add(new AttributeComboBoxBean(new AttributeGalLatitude()));
                 attrs.add(new AttributeComboBoxBean(new AttributeGalLongitude()));
                 if (stars) {
-                    StarGroup sg = (StarGroup) ci.object;
-                    // Star attributes (appmag, absmag, mualpha, mudelta, radvel)
+                    // Star-only attributes (appmag, absmag, mualpha, mudelta, radvel)
                     attrs.add(new AttributeComboBoxBean(new AttributeAppmag()));
                     attrs.add(new AttributeComboBoxBean(new AttributeAbsmag()));
                     attrs.add(new AttributeComboBoxBean(new AttributeMualpha()));
                     attrs.add(new AttributeComboBoxBean(new AttributeMudelta()));
                     attrs.add(new AttributeComboBoxBean(new AttributeRadvel()));
-
-                    // Extra attributes
-                    if(sg.size() > 0) {
-                        StarBean first = (StarBean) sg.get(0);
+                }
+                // Extra attributes
+                if (ci.object instanceof ParticleGroup) {
+                    ParticleGroup pg = (ParticleGroup) ci.object;
+                    if (pg.size() > 0) {
+                        ParticleBean first = pg.get(0);
                         if (first.extra != null) {
                             Set<UCD> ucds = first.extra.keySet();
-                            for(UCD ucd : ucds)
+                            for (UCD ucd : ucds)
                                 attrs.add(new AttributeComboBoxBean(new AttributeUCD(ucd)));
                         }
                     }
-
                 }
                 OwnSelectBox<AttributeComboBoxBean> attribute = new OwnSelectBox<>(skin);
                 attribute.setItems(attrs);

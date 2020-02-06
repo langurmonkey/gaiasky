@@ -8,7 +8,7 @@ package gaiasky.util.filter.attrib;
 import gaiasky.scenegraph.StarGroup.StarBean;
 import gaiasky.util.I18n;
 
-public class AttributeAbsmag implements IAttribute<StarBean> {
+public class AttributeAbsmag extends AttributeAbstract implements IAttribute<StarBean> {
     @Override
     public double get(StarBean pb) {
         return pb.absmag();

@@ -145,7 +145,7 @@ public abstract class GenericDialog extends CollapsibleWindow {
         }
         recalculateButtonSize();
 
-        add(content).pad(pad).row();
+        add(content).left().pad(pad).row();
         add().expandY().bottom().row();
         add(buttonGroup).pad(pad).bottom().right();
         getTitleTable().align(Align.left);

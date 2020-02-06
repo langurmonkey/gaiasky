@@ -29,12 +29,15 @@ import gaiasky.scenegraph.component.RotationComponent;
 import gaiasky.util.*;
 import gaiasky.util.CatalogInfo.CatalogInfoType;
 import gaiasky.util.coord.Coordinates;
+import gaiasky.util.filter.attrib.IAttribute;
 import gaiasky.util.gdx.g2d.ExtSpriteBatch;
 import gaiasky.util.gdx.shader.ExtShaderProgram;
 import gaiasky.util.math.*;
 import gaiasky.util.time.ITimeFrameProvider;
+import gaiasky.util.ucd.UCD;
 
 import java.io.Serializable;
+import java.util.Map;
 
 /**
  * This class represents a vgroup of non-focusable particles, all with the same
@@ -56,10 +59,19 @@ public class ParticleGroup extends FadeNode implements I3DTextRenderable, IFocus
         public static final int I_Y = 1;
         public static final int I_Z = 2;
 
+        // Main attributes
         public double[] data;
+
+        // Extra attributes
+        public Map<UCD, Double> extra;
 
         public ParticleBean(double[] data) {
             this.data = data;
+        }
+
+        public ParticleBean(double[] data, Map<UCD, Double> extra) {
+            this.data = data;
+            this.extra = extra;
         }
 
         public Vector3d pos(Vector3d aux) {
@@ -946,6 +958,12 @@ public class ParticleGroup extends FadeNode implements I3DTextRenderable, IFocus
     public void highlight(boolean hl, float[] color) {
         setInGpu(false);
         super.highlight(hl, color);
+    }
+
+    @Override
+    public void highlight(boolean hl, int cmi, IAttribute cma, double cmmin, double cmmax) {
+        setInGpu(false);
+        super.highlight(hl, cmi, cma, cmmin, cmmax);
     }
 
     public void setColorMin(double[] colorMin) {

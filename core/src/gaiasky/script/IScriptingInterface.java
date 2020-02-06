@@ -269,6 +269,7 @@ public interface IScriptingInterface {
      * Whether to look for the focus constantly when in focus mode and center it
      * in the view or whether the view must be free. Use True to center the focus
      * (default behaviour) and False to set it to a free view
+     *
      * @param centerFocus Whether to center the focus or not
      */
     void setCameraCenterFocus(boolean centerFocus);
@@ -280,7 +281,6 @@ public interface IScriptingInterface {
      * @param lock Whether to lock or unlock the camera orientation to the focus
      */
     void setCameraOrientationLock(boolean lock);
-
 
     /**
      * Sets the camera in free mode.
@@ -327,6 +327,7 @@ public interface IScriptingInterface {
     /**
      * Sets the camera position to the given coordinates, in Km, equatorial
      * system.
+     *
      * @param x The x component
      * @param y The y component
      * @param z The z component
@@ -454,7 +455,7 @@ public interface IScriptingInterface {
 
     /**
      * Adds a rotation movement to the camera around the current focus, or a pitch/yaw if in free mode.
-     *
+     * <p>
      * If the camera is not using the cinematic behaviour ({@link #setCinematicCamera(boolean)},
      * the rotation movement will not be permanent. Use the cinematic behaviour to have the camera
      * continue to rotate around the focus.
@@ -491,6 +492,7 @@ public interface IScriptingInterface {
     /**
      * Adds a yaw to the camera. Same as {@link #cameraTurn(double, double)} with
      * deltaY set to zero.
+     *
      * @param amount
      */
     void cameraYaw(double amount);
@@ -498,6 +500,7 @@ public interface IScriptingInterface {
     /**
      * Adds a pitch to the camera. Same as {@link #cameraTurn(double, double)} with
      * deltaX set to zero.
+     *
      * @param amount
      */
     void cameraPitch(double amount);
@@ -588,6 +591,7 @@ public interface IScriptingInterface {
 
     /**
      * Sets the color mode of proper motion vectors.
+     *
      * @param mode The color mode:
      *             <ul>
      *             <li>0 - direction: the normalised cartesian velocity components XYZ are mapped to the color channels RGB</li>
@@ -602,6 +606,7 @@ public interface IScriptingInterface {
 
     /**
      * Sets whether to show arrowheads or not for the velocity vectors.
+     *
      * @param arrowheadsEnabled Whether to show the velocity vectors with arrowheads.
      */
     void setProperMotionsArrowheads(boolean arrowheadsEnabled);
@@ -609,12 +614,14 @@ public interface IScriptingInterface {
     /**
      * Overrides the maximum number of proper motion vectors that the program
      * is allowed to show.
+     *
      * @param maxNumber The maximum number of proper motion vectors. Negative to use default
      */
     void setProperMotionsMaxNumber(long maxNumber);
 
     /**
      * Returns the current maximum number of proper motion vectors allowed.
+     *
      * @return Max number of pm vectors
      */
     long getProperMotionsMaxNumber();
@@ -649,6 +656,7 @@ public interface IScriptingInterface {
 
     /**
      * Shows or hides the minimap.
+     *
      * @param visible The visibility state
      */
     void setMinimapVisibility(boolean visible);
@@ -808,6 +816,7 @@ public interface IScriptingInterface {
      * The yaw angle turns the camera to the right.
      * This function is intended for multi-projector setups, to configure
      * slaves without restarting Gaia Sky.
+     *
      * @param yaw The yaw angle in degrees.
      */
     void setProjectionYaw(float yaw);
@@ -817,6 +826,7 @@ public interface IScriptingInterface {
      * The pitch angle turns the camera up.
      * This function is intended for multi-projector setups, to configure
      * slaves without restarting Gaia Sky.
+     *
      * @param pitch The pitch angle in degrees.
      */
     void setProjectionPitch(float pitch);
@@ -826,6 +836,7 @@ public interface IScriptingInterface {
      * The roll angle rolls the camera clockwise.
      * This function is intended for multi-projector setups, to configure
      * slaves without restarting Gaia Sky.
+     *
      * @param roll The roll angle in degrees.
      */
     void setProjectionRoll(float roll);
@@ -834,6 +845,7 @@ public interface IScriptingInterface {
      * Same as {@link #setFov(float)}, but bypassing the restriction of an active
      * projection in the slave (slaves that have an active projection do not accept
      * fov modification events).
+     *
      * @param fov The field of view angle.
      */
     void setProjectionFov(float fov);
@@ -872,6 +884,7 @@ public interface IScriptingInterface {
      * resolution and containing the UI elements.
      * Redraw mode redraws the last frame using the resolution configured using {@link #configureFrameOutput(int, int, int, String, String)} and
      * it does not draw the UI elements.
+     *
      * @param screenshotMode The screenshot mode. 'simple' or 'redraw'.
      */
     void setFrameOutputMode(String screenshotMode);
@@ -930,13 +943,14 @@ public interface IScriptingInterface {
      * Gets an object by <code>name</code> or id (HIP, TYC, Gaia SourceID), optionally waiting
      * until the object is available, with a timeout.
      *
-     * @param name The name or id (HIP, TYC, Gaia SourceId) of the object
+     * @param name           The name or id (HIP, TYC, Gaia SourceId) of the object
      * @param timeOutSeconds The timeout in seconds to wait until returning.
      *                       If negative, it waits indefinitely.
      * @return The object if it exists, or null if it does not and block is false, or if block is true and
      * the timeout has passed.
      */
     SceneGraphNode getObject(String name, double timeOutSeconds);
+
     /**
      * Sets the given size scaling factor to the object identified by
      * <code>name</code>. This method will only work with model objects such as
@@ -1087,7 +1101,6 @@ public interface IScriptingInterface {
      * @param lineWidth The line width. Usually a value between 1 (default) and 10.
      */
     void addPolyline(String name, double[] points, double[] color, double lineWidth);
-
 
     /**
      * Adds a new polyline with the given name, points, color, line width and primitive. The polyline will
@@ -1380,7 +1393,8 @@ public interface IScriptingInterface {
      * Converts regular cartesian coordinates, where XY is the equatorial plane, with X pointing to
      * the vernal equinox (ra=0) and Y points to ra=90, and Z pointing to the celestial north pole (dec=90)
      * to internal cartesian coordinates with internal units.
-     * @param eq Equatorial cartesian coordinates (X->[ra=0,dec=0], Y->[ra=90,dec=0], Z->[ra=0,dec=90])
+     *
+     * @param eq       Equatorial cartesian coordinates (X->[ra=0,dec=0], Y->[ra=90,dec=0], Z->[ra=0,dec=90])
      * @param kmFactor Factor used to bring the input coordinate units to Kilometers, so that <code>eq * factor = Km</code>
      * @return Internal coordinates ready to be fed in other scripting functions
      */
@@ -1472,12 +1486,14 @@ public interface IScriptingInterface {
      *     <li>"filmic" - performs a filmic tone mapping</li>
      *     <li>"none" - no HDR tone mapping</li>
      * </ul>
+     *
      * @param type The HDR tone mapping type. One of ["auto"|"exposure"|"aces"|"uncharted"|"filmic"|"none"].
      */
     void setHDRToneMappingType(String type);
 
     /**
      * Sets the exposure level.
+     *
      * @param level The exposure level in [0..n]. Set to 0 to disable exposure tone mapping.
      */
     void setExposureToneMappingLevel(double level);
@@ -1498,6 +1514,7 @@ public interface IScriptingInterface {
 
     /**
      * Enables and disables the panorama mode.
+     *
      * @param state The boolean staet. True to activate, false to deactivate.
      */
     void setPanoramaMode(boolean state);
@@ -1519,6 +1536,7 @@ public interface IScriptingInterface {
      * Accepted values are "EQUIRECTANGULAR", "CYLINDRICAL" and "HAMMER".
      * See {@link CubemapProjections} for possible
      * values.
+     *
      * @param projection
      */
     void setCubemapProjection(String projection);
@@ -1687,10 +1705,9 @@ public interface IScriptingInterface {
      * Please check <a href="http://gaia.ari.uni-heidelberg.de/gaiasky/docs/html/latest/SAMP.html#stil-data-provider">the
      * official documentation</a> for a complete reference on what can and what can't be loaded.
      *
-     * @param dsName       The name of the dataset, used to identify the subsequent operations on the
-     *                     dataset
-     * @param path Absolute path (or relative to the working path of Gaia Sky) to the <code>.vot</code> file to load
-     *
+     * @param dsName The name of the dataset, used to identify the subsequent operations on the
+     *               dataset
+     * @param path   Absolute path (or relative to the working path of Gaia Sky) to the <code>.vot</code> file to load
      * @return False if the dataset could not be loaded, true otherwise
      */
     boolean loadDataset(String dsName, String path);
@@ -1707,11 +1724,10 @@ public interface IScriptingInterface {
      * Please check <a href="http://gaia.ari.uni-heidelberg.de/gaiasky/docs/html/latest/SAMP.html#stil-data-provider">the
      * official documentation</a> for a complete reference on what can and what can't be loaded.
      *
-     * @param dsName       The name of the dataset, used to identify the subsequent operations on the
-     *                     dataset
-     * @param path Absolute path (or relative to the working path of Gaia Sky) to the <code>.vot</code> file to load
-     * @param sync        Whether the load must happen synchronously or asynchronously
-     *
+     * @param dsName The name of the dataset, used to identify the subsequent operations on the
+     *               dataset
+     * @param path   Absolute path (or relative to the working path of Gaia Sky) to the <code>.vot</code> file to load
+     * @param sync   Whether the load must happen synchronously or asynchronously
      * @return False if the dataset could not be loaded (sync mode). True if it could not be loaded (sync mode), or <code>sync</code> is false
      */
     boolean loadDataset(String dsName, String path, boolean sync);
@@ -1720,7 +1736,6 @@ public interface IScriptingInterface {
      * Removes the dataset identified by the given name, if it exists
      *
      * @param dsName The name of the dataset to remove
-     *
      * @return False if the dataset could not be found
      */
     boolean removeDataset(String dsName);
@@ -1729,19 +1744,20 @@ public interface IScriptingInterface {
      * Hides the dataset identified by the given name, if it exists and is not hidden
      *
      * @param dsName The name of the dataset to hide
-     *
      * @return False if the dataset could not be found
      */
     boolean hideDataset(String dsName);
 
     /**
      * Returns the names of all datasets currently loaded
+     *
      * @return A list with all the names of the loaded datasets
      */
     List<String> listDatasets();
 
     /**
      * Checks whether the dataset identified by the given name is loaded
+     *
      * @param dsName The name of the dataset to query
      * @return True if the dataset is loaded, false otherwise
      */
@@ -1751,13 +1767,12 @@ public interface IScriptingInterface {
      * Shows (un-hides) the dataset identified by the given name, if it exists and is hidden
      *
      * @param dsName The name of the dataset to show
-     *
      * @return False if the dataset could not be found
      */
     boolean showDataset(String dsName);
 
     /**
-     * Enables or disables the dataset highlight, using a given color index:
+     * Enables or disables the dataset highlight, using a plain color given by the color index:
      * <ul>
      *     <li>0 - blue</li>
      *     <li>1 - red</li>
@@ -1769,34 +1784,55 @@ public interface IScriptingInterface {
      *     <li>7 - brown</li>
      *     <li>8 - magenta</li>
      * </ul>
-     * @param dsName The dataset name
+     *
+     * @param dsName     The dataset name
      * @param colorIndex Color index in [0..8]
-     * @param highlight Whether to highlight or not
+     * @param highlight  Whether to highlight or not
      * @return False if the dataset could not be found
      */
     boolean highlightDataset(String dsName, int colorIndex, boolean highlight);
 
-
     /**
-     * Enables or disables the dataset highlight using a color chosen by the system
-     * @param dsName The dataset name
+     * Enables or disables the dataset highlight using a plain color chosen by the system
+     *
+     * @param dsName    The dataset name
      * @param highlight State
      * @return False if the dataset could not be found
      */
     boolean highlightDataset(String dsName, boolean highlight);
 
     /**
-     * Enables or disables the dataset highlight, using a given color
-     * @param dsName The dataset name
-     * @param r Red component 
+     * Enables or disables the dataset highlight, using a given plain color
+     *
+     * @param dsName    The dataset name
+     * @param r         Red component
      * @param highlight State
      * @return False if the dataset could not be found
      */
     boolean highlightDataset(String dsName, float r, float g, float b, float a, boolean highlight);
 
     /**
+     * Enables or disables the dataset highlight, using the given color map on the given attribute with the given
+     * maximum and minimum mapping values
+     *
+     * @param dsName        The dataset name
+     * @param attributeName The attribute name. You can use basic attributes (please mind the case!):
+     *                      <ul><li>RA</li><li>DEC</li><li>Distance</li><li>GalLatitude</li><li>GalLongitude</li><li>EclLatitude</li><li>EclLongitude</li></ul>
+     *                       Or star-only attributes (if your dataset contains stars, mind the case!):
+     *                       <ul><li>Mualpha</li><li>Mudelta</li><li>Radvel</li><li>Absmag</li><li>Appmag</li></ul>
+     *                       Or even extra attributes (if you loaded the dataset yourself), matching by column name.
+     * @param colorMap      The color map to use, in ["reds", "greens", "blues", "rainbow18", "rainbow", "seismic", "carnation", "hotmeal", "cool"]
+     * @param minMap        The minimum mapping value
+     * @param maxMap        The maximum mapping value
+     * @param highlight     State
+     * @return False if the dataset could not be found
+     */
+    boolean highlightDataset(String dsName, String attributeName, String colorMap, double minMap, double maxMap, boolean highlight);
+
+    /**
      * Sets the size increase factor of this dataset when highlighted
-     * @param dsName The dataset name
+     *
+     * @param dsName     The dataset name
      * @param sizeFactor The size factor to apply to the particles when highlighted, must be in [{@link gaiasky.util.Constants#MIN_DATASET_SIZE_FACTOR}, {@link gaiasky.util.Constants#MAX_DATASET_SIZE_FACTOR}].
      * @return False if the dataset could not be found
      */
@@ -1805,6 +1841,7 @@ public interface IScriptingInterface {
     /**
      * Returns the meter to internal unit conversion factor. Use this factor to multiply
      * your coordinates in meters to get them in internal units
+     *
      * @return The factor M_TO_U
      */
     double getMeterToInternalUnitConversion();
@@ -1812,12 +1849,14 @@ public interface IScriptingInterface {
     /**
      * Returns the internal unit to meter conversion factor. Use this factor to multiply
      * your coordinates in internal units to get them in meters.
+     *
      * @return The factor U_TO_M
      */
     double getInternalUnitToMeterConversion();
 
     /**
      * Converts the value in internal units to metres
+     *
      * @param internalUnits The value in internal units
      * @return The value in metres
      */
@@ -1825,6 +1864,7 @@ public interface IScriptingInterface {
 
     /**
      * Converts the value in internal units to Kilometers
+     *
      * @param internalUnits The value in internal units
      * @return The value in Kilometers
      */
@@ -1832,6 +1872,7 @@ public interface IScriptingInterface {
 
     /**
      * Converts the metres to internal units
+     *
      * @param metres The value in metres
      * @return The value in internal units
      */
@@ -1839,15 +1880,16 @@ public interface IScriptingInterface {
 
     /**
      * Converts the kilometres to internal units
+     *
      * @param kilometres The value in kilometers
      * @return The value in internal units
      */
     double kilometrestointernalunits(double kilometres);
 
-
     /**
      * Gets the current frame number. The number begins at 0 for the first frame produced
      * when Gaia Sky is started and increases continuously.
+     *
      * @return The current frame number
      */
     long getFrameNumber();

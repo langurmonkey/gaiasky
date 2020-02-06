@@ -46,6 +46,7 @@ public class CatalogManager implements IObserver {
 
     /**
      * Gets the CatalogInfo with the given name, if any
+     *
      * @param dsName The name of the dataset
      * @return The CatalogInfo object, null if it does not exist
      */
@@ -96,15 +97,10 @@ public class CatalogManager implements IObserver {
             }
             break;
         case CATALOG_HIGHLIGHT:
-            dsName = (String) data[0];
+            ci = (CatalogInfo) data[0];
             boolean highlight = (Boolean) data[1];
-            float[] col = (float[]) data[2];
-            if (ciMap.containsKey(dsName)) {
-                ci = ciMap.get(dsName);
-                if (col == null)
-                    ci.highlight(highlight);
-                else
-                    ci.highlight(highlight, col);
+            if (ci != null) {
+                ci.highlight(highlight);
 
                 if (ci.highlighted)
                     logger.info(I18n.txt("notif.highlight.on", ci.name));

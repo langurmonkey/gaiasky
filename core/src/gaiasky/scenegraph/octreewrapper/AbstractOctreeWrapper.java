@@ -17,6 +17,7 @@ import gaiasky.scenegraph.camera.ICamera;
 import gaiasky.util.GlobalConf;
 import gaiasky.util.Logger;
 import gaiasky.util.MyPools;
+import gaiasky.util.filter.attrib.IAttribute;
 import gaiasky.util.math.Vector3d;
 import gaiasky.util.time.ITimeFrameProvider;
 import gaiasky.util.tree.OctreeNode;
@@ -204,6 +205,16 @@ public abstract class AbstractOctreeWrapper extends FadeNode implements Iterable
         getChildrenByType(StarGroup.class, l);
         for (SceneGraphNode n : l) {
             ((StarGroup) n).highlight(hl, color);
+        }
+    }
+
+    @Override
+    public void highlight(boolean hl, int cmi, IAttribute cma, double cmmin, double cmmax) {
+        super.highlight(hl, cmi, cma, cmmin, cmmax);
+        Array<SceneGraphNode> l = new Array<>();
+        getChildrenByType(StarGroup.class, l);
+        for (SceneGraphNode n : l) {
+            ((StarGroup) n).highlight(hl, cmi, cma, cmmin, cmmax);
         }
     }
 

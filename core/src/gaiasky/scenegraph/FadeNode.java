@@ -16,6 +16,7 @@ import gaiasky.util.CatalogInfo.CatalogInfoType;
 import gaiasky.util.Constants;
 import gaiasky.util.GlobalConf;
 import gaiasky.util.GlobalResources;
+import gaiasky.util.filter.attrib.IAttribute;
 import gaiasky.util.math.MathUtilsd;
 import gaiasky.util.math.Vector3d;
 import gaiasky.util.parse.Parser;
@@ -90,10 +91,18 @@ public class FadeNode extends AbstractPositionEntity {
      * Is it highlighted?
      */
     protected boolean highlighted = false;
-    /**
-     * Highlight color index
-     **/
+    // Plain color for highlighting
+    protected boolean hlplain = false;
+    // Highlight color
     protected float[] hlc;
+    // Highlight colormap index
+    protected int hlcmi;
+    // Hightlight colormap attribute
+    protected IAttribute hlcma;
+    // Highlight colormap min
+    protected double hlcmmin;
+    // Highlight colormap max
+    protected double hlcmmax;
 
     public FadeNode() {
         super();
@@ -242,10 +251,35 @@ public class FadeNode extends AbstractPositionEntity {
         EventManager.instance.post(Events.CATALOG_ADD, this.catalogInfo, false);
     }
 
+    /**
+     * Highlight using a plain color
+     * @param hl Whether to highlight
+     * @param color The plain color
+     */
     public void highlight(boolean hl, float[] color) {
         this.highlighted = hl;
         if (hl) {
+            this.hlplain = true;
             System.arraycopy(color, 0, this.hlc, 0, color.length);
+        }
+    }
+
+    /**
+     * Highlight using a colormap
+     * @param hl Whether to highlight
+     * @param cmi Color map index
+     * @param cma Attribute
+     * @param cmmin Min mapping value
+     * @param cmmax Max mapping value
+     */
+    public void highlight(boolean hl, int cmi, IAttribute cma, double cmmin, double cmmax) {
+        this.highlighted = hl;
+        if (hl) {
+            this.hlplain = false;
+            this.hlcmi = cmi;
+            this.hlcma = cma;
+            this.hlcmmin = cmmin;
+            this.hlcmmax = cmmax;
         }
     }
 
@@ -267,5 +301,25 @@ public class FadeNode extends AbstractPositionEntity {
     @Override
     public void setSize(Double size) {
         this.size = (float) (size * Constants.DISTANCE_SCALE_FACTOR);
+    }
+
+    public boolean isHlplain() {
+        return hlplain;
+    }
+
+    public int getHlcmi() {
+        return hlcmi;
+    }
+
+    public IAttribute getHlcma() {
+        return hlcma;
+    }
+
+    public double getHlcmmin() {
+        return hlcmmin;
+    }
+
+    public double getHlcmmax() {
+        return hlcmmax;
     }
 }

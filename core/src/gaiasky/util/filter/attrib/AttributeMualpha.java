@@ -8,7 +8,7 @@ package gaiasky.util.filter.attrib;
 import gaiasky.scenegraph.StarGroup.StarBean;
 import gaiasky.util.I18n;
 
-public class AttributeMualpha implements IAttribute<StarBean> {
+public class AttributeMualpha extends AttributeAbstract implements IAttribute<StarBean> {
     @Override
     public double get(StarBean bean) {
         return bean.mualpha();
