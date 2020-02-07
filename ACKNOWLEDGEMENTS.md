@@ -10,6 +10,7 @@
 -  [Stefan Payne-Wardenaar](http://twitter.com/StefanPWinc) for some of the data used in the Milky Way model
 -  [DPAC](https://www.cosmos.esa.int/web/gaia/dpac/consortium) and the Gaia Collaboration
 -  The available catalogs and datasets have their own acknowledgements in the form of links to the original source and/or papers
+-  Floor van Leeuwen for the Hipparcos star name files.
 
 ## Libraries and code
 
