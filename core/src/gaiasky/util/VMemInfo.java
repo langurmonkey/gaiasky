@@ -23,7 +23,7 @@ public class VMemInfo {
             // Nvidia
             try {
                 graphicsDeviceInfo = new NVIDIAVRAM();
-            } catch (Exception e) {
+            } catch (Error e) {
                 logger.error(e);
                 crash = true;
             }
@@ -47,30 +47,24 @@ public class VMemInfo {
     }
 
     public static double getFreeMemory() {
-        if(crash)
-            return -1;
-        if (graphicsDeviceInfo == null) {
+        if (!crash && graphicsDeviceInfo == null) {
             initialize();
         }
-        return graphicsDeviceInfo.getFreeMemory();
+        return graphicsDeviceInfo == null ? -1 : graphicsDeviceInfo.getFreeMemory();
     }
 
     public static double getTotalMemory() {
-        if(crash)
-            return -1;
-        if (graphicsDeviceInfo == null) {
+        if (!crash && graphicsDeviceInfo == null) {
             initialize();
         }
-        return graphicsDeviceInfo.getTotalMemory();
+        return graphicsDeviceInfo == null ? -1 : graphicsDeviceInfo.getTotalMemory();
     }
 
     public static double getUsedMemory() {
-        if(crash)
-            return -1;
-        if (graphicsDeviceInfo == null) {
+        if (!crash && graphicsDeviceInfo == null) {
             initialize();
         }
-        return graphicsDeviceInfo.getUsedMemory();
+        return graphicsDeviceInfo == null ? -1 : graphicsDeviceInfo.getUsedMemory();
     }
 
     public interface IGraphicsDeviceInfo {
