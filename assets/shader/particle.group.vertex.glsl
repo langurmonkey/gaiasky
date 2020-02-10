@@ -1,7 +1,6 @@
 #version 330 core
 
 #include shader/lib_geometry.glsl
-#include shader/lib_colmap.glsl
 
 in vec4 a_position;
 in vec4 a_color;
@@ -19,9 +18,6 @@ uniform float u_sizeFactor;
 uniform int u_cubemap;
 uniform float u_minSize;
 uniform float u_vrScale;
-// Color map code, negative to not apply colormap
-uniform int u_cmap;
-uniform vec2 u_cmapMinMax;
 
 #ifdef relativisticEffects
     #include shader/lib_relativity.glsl
@@ -60,12 +56,7 @@ void main() {
         pos = computeGravitationalWaves(pos, u_gw, u_gwmat3, u_ts, u_omgw, u_hterms);
     #endif // gravitationalWaves
     
-    // Color map if needed
-    if(u_cmap < 0){
-        v_col = vec4(a_color.rgb, a_color.a * u_alpha);
-    } else {
-        v_col = vec4(colormap(u_cmap, a_additional.y, u_cmapMinMax), u_alpha);
-    }
+    v_col = vec4(a_color.rgb, a_color.a * u_alpha);
 
     float viewAngle = a_additional.x / dist;
 

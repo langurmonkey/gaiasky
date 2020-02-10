@@ -23,6 +23,7 @@ import gaiasky.scenegraph.SceneGraphNode.RenderGroup;
 import gaiasky.scenegraph.camera.ICamera;
 import gaiasky.util.Constants;
 import gaiasky.util.GlobalConf;
+import gaiasky.util.color.Colormap;
 import gaiasky.util.comp.DistToCameraComparator;
 import gaiasky.util.gdx.mesh.IntMesh;
 import gaiasky.util.gdx.shader.ExtShaderProgram;
@@ -32,15 +33,17 @@ import org.lwjgl.opengl.GL30;
 import java.util.Random;
 
 public class ParticleGroupRenderSystem extends ImmediateRenderSystem implements IObserver {
-    Vector3 aux1;
-    int additionalOffset;
-    Random rand;
+    private Vector3 aux1;
+    private int additionalOffset;
+    private Random rand;
+    private Colormap cmap;
 
     public ParticleGroupRenderSystem(RenderGroup rg, float[] alphas, ExtShaderProgram[] shaders) {
         super(rg, alphas, shaders);
         comp = new DistToCameraComparator<>();
         rand = new Random(123);
         aux1 = new Vector3();
+        cmap = new Colormap();
         EventManager.instance.subscribe(this, Events.DISPOSE_PARTICLE_GROUP_GPU_MESH);
     }
 
@@ -104,7 +107,14 @@ public class ParticleGroupRenderSystem extends ImmediateRenderSystem implements 
                                     double[] p = pb.data;
                                     // COLOR
                                     if (particleGroup.isHighlighted()) {
-                                        tempVerts[curr.vertexIdx + curr.colorOffset] = Color.toFloatBits(c[0], c[1], c[2], c[3]);
+                                        if(hlCmap){
+                                            // Color map
+                                            double[] color = cmap.colormap(particleGroup.getHlcmi(), particleGroup.getHlcma().get(pb), particleGroup.getHlcmmin(), particleGroup.getHlcmmax());
+                                            tempVerts[curr.vertexIdx + curr.colorOffset] = Color.toFloatBits((float) color[0], (float) color[1], (float) color[2], 1.0f);
+                                        } else {
+                                            // Plain
+                                            tempVerts[curr.vertexIdx + curr.colorOffset] = Color.toFloatBits(c[0], c[1], c[2], c[3]);
+                                        }
                                     } else {
                                         if (cmin != null && cmax != null) {
                                             double dist = Math.sqrt(p[0] * p[0] + p[1] * p[1] + p[2] * p[2]);
@@ -123,8 +133,6 @@ public class ParticleGroupRenderSystem extends ImmediateRenderSystem implements 
 
                                     // SIZE, CMAP_VALUE
                                     tempVerts[curr.vertexIdx + additionalOffset + 0] = (particleGroup.size + (float) (rand.nextGaussian() * particleGroup.size / 4d)) * particleGroup.highlightedSizeFactor();
-                                    if (hlCmap)
-                                        tempVerts[curr.vertexIdx + additionalOffset + 1] = (float) particleGroup.getHlcma().get(pb);
 
                                     // POSITION
                                     final int idx = curr.vertexIdx;
@@ -157,10 +165,6 @@ public class ParticleGroupRenderSystem extends ImmediateRenderSystem implements 
                             shaderProgram.setUniformf("u_camPos", camera.getCurrent().getPos().put(aux1));
                             shaderProgram.setUniformf("u_camDir", camera.getCurrent().getCamera().direction);
                             shaderProgram.setUniformi("u_cubemap", GlobalConf.program.CUBEMAP_MODE ? 1 : 0);
-
-                            shaderProgram.setUniformi("u_cmap", hlCmap ? particleGroup.getHlcmi() : -1);
-                            if (hlCmap)
-                                shaderProgram.setUniformf("u_cmapMinMax", (float) particleGroup.getHlcmmin(), (float) particleGroup.getHlcmmax());
 
                             // Rel, grav, z-buffer
                             addEffectsUniforms(shaderProgram, camera);

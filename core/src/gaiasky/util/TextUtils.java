@@ -14,7 +14,7 @@ import gaiasky.util.format.NumberFormatFactory;
 
 public class TextUtils {
 
-    public static String surround(String in, String pre, String post){
+    public static String surround(String in, String pre, String post) {
         return pre + in + post;
     }
 
@@ -178,7 +178,8 @@ public class TextUtils {
 
     /**
      * Concatenates the base with each of the strings in suffixes
-     * @param base The base string
+     *
+     * @param base     The base string
      * @param suffixes All the suffixes
      * @return The result
      */
@@ -188,5 +189,13 @@ public class TextUtils {
             result[i] = base + suffixes[i];
         }
         return result;
+    }
+
+    public static String[] concatAll(String base, String[] suffixes, String suffixAdditional) {
+        String[] suffixesNew = new String[suffixes.length + 1];
+        for (int i = 0; i < suffixes.length; i++)
+            suffixesNew[i] = suffixes[1];
+        suffixesNew[suffixes.length] = suffixAdditional;
+        return concatAll(base, suffixesNew);
     }
 }

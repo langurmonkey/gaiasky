@@ -6,6 +6,7 @@
 package gaiasky.render.system;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.PerspectiveCamera;
 import com.badlogic.gdx.graphics.VertexAttribute;
 import com.badlogic.gdx.graphics.VertexAttributes.Usage;
@@ -26,6 +27,7 @@ import gaiasky.scenegraph.camera.ICamera;
 import gaiasky.util.Constants;
 import gaiasky.util.GlobalConf;
 import gaiasky.util.Nature;
+import gaiasky.util.color.Colormap;
 import gaiasky.util.comp.DistToCameraComparator;
 import gaiasky.util.coord.AstroUtils;
 import gaiasky.util.gdx.mesh.IntMesh;
@@ -38,6 +40,7 @@ public class StarGroupRenderSystem extends ImmediateRenderSystem implements IObs
     private Vector3 aux1;
     private int additionalOffset, pmOffset;
     private float[] pointAlpha, alphaSizeFovBr, pointAlphaHl;
+    private Colormap cmap;
 
     public StarGroupRenderSystem(RenderGroup rg, float[] alphas, ExtShaderProgram[] shaders) {
         super(rg, alphas, shaders);
@@ -46,6 +49,7 @@ public class StarGroupRenderSystem extends ImmediateRenderSystem implements IObs
         this.alphaSizeFovBr = new float[4];
         this.pointAlphaHl = new float[] { 2, 4 };
         this.aux1 = new Vector3();
+        cmap = new Colormap();
 
         EventManager.instance.subscribe(this, Events.STAR_MIN_OPACITY_CMD, Events.DISPOSE_STAR_GROUP_GPU_MESH);
     }
@@ -108,13 +112,18 @@ public class StarGroupRenderSystem extends ImmediateRenderSystem implements IObs
                                 if (starGroup.filter(i)) {
                                     StarBean sb = starGroup.data().get(i);
                                     // COLOR
-                                    tempVerts[curr.vertexIdx + curr.colorOffset] = starGroup.getColor(i);
+                                    if(hlCmap){
+                                        // Color map
+                                        double[] color = cmap.colormap(starGroup.getHlcmi(), starGroup.getHlcma().get(sb), starGroup.getHlcmmin(), starGroup.getHlcmmax());
+                                        tempVerts[curr.vertexIdx + curr.colorOffset] = Color.toFloatBits((float) color[0], (float) color[1], (float) color[2], 1.0f);
+                                    } else {
+                                        // Plain
+                                        tempVerts[curr.vertexIdx + curr.colorOffset] = starGroup.getColor(i);
+                                    }
 
                                     // SIZE, APPMAG, CMAP VALUE
                                     tempVerts[curr.vertexIdx + additionalOffset + 0] = (float) (Math.pow(sb.size(), GlobalConf.scene.STAR_BRIGHTNESS_POWER) * Constants.STAR_SIZE_FACTOR) * starGroup.highlightedSizeFactor();
                                     tempVerts[curr.vertexIdx + additionalOffset + 1] = (float) sb.appmag();
-                                    if (hlCmap)
-                                        tempVerts[curr.vertexIdx + additionalOffset + 2] = (float) starGroup.getHlcma().get(sb);
 
                                     // POSITION [u]
                                     tempVerts[curr.vertexIdx] = (float) sb.x();
@@ -150,10 +159,6 @@ public class StarGroupRenderSystem extends ImmediateRenderSystem implements IObs
                             shaderProgram.setUniformf("u_camDir", camera.getCurrent().getCamera().direction);
                             shaderProgram.setUniformi("u_cubemap", GlobalConf.program.CUBEMAP_MODE ? 1 : 0);
                             shaderProgram.setUniformf("u_magLimit", GlobalConf.runtime.LIMIT_MAG_RUNTIME);
-
-                            shaderProgram.setUniformi("u_cmap", hlCmap ? starGroup.getHlcmi() : -1);
-                            if (hlCmap)
-                                shaderProgram.setUniformf("u_cmapMinMax", (float) starGroup.getHlcmmin(), (float) starGroup.getHlcmmax());
 
                             // Rel, grav, z-buffer, etc.
                             addEffectsUniforms(shaderProgram, camera);

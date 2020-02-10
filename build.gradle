@@ -148,9 +148,6 @@ project(":core") {
         compile group: "com.github.oshi", name: "oshi-core", version: "$oshiVersion"
         compile group: "org.astrogrid", name: "jsamp", version: "$jsampVersion"
 
-
-
-
         // ****************
         // REST SERVER DEPS
         // ****************
@@ -159,7 +156,6 @@ project(":core") {
         compile "com.sparkjava:spark-core:$sparkjavaVersion"
         compile "com.google.code.gson:gson:$gsonVersion"
         compile "junit:junit:4.12"
-
 
         // *************
         // INTERNAL DEPS

@@ -2,7 +2,6 @@
 
 #include shader/lib_math.glsl
 #include shader/lib_geometry.glsl
-#include shader/lib_colmap.glsl
 
 in vec3 a_position;
 in vec3 a_pm;
@@ -22,9 +21,6 @@ uniform int u_cubemap;
 uniform vec2 u_pointAlpha;
 uniform float u_thAnglePoint;
 
-// Color map code, negative to not apply colormap
-uniform int u_cmap;
-uniform vec2 u_cmapMinMax;
 // VR scale factor
 uniform float u_vrScale;
 
@@ -95,12 +91,7 @@ void main() {
 
     float fadeout = smoothstep(dist, l0, l1);
 
-    // Color map if needed
-    if(u_cmap < 0){
-        v_col = vec4(a_color.rgb, opacity * u_alphaSizeFovBr.x * fadeout);
-    } else {
-        v_col = vec4(colormap(u_cmap, a_additional.z, u_cmapMinMax), u_alphaSizeFovBr.x * fadeout);
-    }
+    v_col = vec4(a_color.rgb, opacity * u_alphaSizeFovBr.x * fadeout);
 
     vec4 gpos = u_projModelView * vec4(pos, 1.0);
 

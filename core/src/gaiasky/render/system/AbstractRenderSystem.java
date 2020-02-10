@@ -7,6 +7,7 @@ package gaiasky.render.system;
 
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.Array;
+import gaiasky.desktop.util.SysUtils;
 import gaiasky.render.ComponentTypes;
 import gaiasky.render.IRenderable;
 import gaiasky.render.RenderingContext;
@@ -191,7 +192,7 @@ public abstract class AbstractRenderSystem implements IRenderSystem {
             if (!GlobalConf.postprocess.POSTPROCESS_MOTION_BLUR && !GlobalConf.runtime.RELATIVISTIC_ABERRATION && !GlobalConf.runtime.GRAVITATIONAL_WAVES)
                 //return programs[0];
                 // TODO this is a hack till I narrow down the bug, for the moment, velocity map always computed
-                return programs[1];
+                return programs[SysUtils.isMac() ? 1 : 0];
             if (GlobalConf.postprocess.POSTPROCESS_MOTION_BLUR && !GlobalConf.runtime.RELATIVISTIC_ABERRATION && !GlobalConf.runtime.GRAVITATIONAL_WAVES)
                 return programs[1];
             else if (!GlobalConf.postprocess.POSTPROCESS_MOTION_BLUR && GlobalConf.runtime.RELATIVISTIC_ABERRATION && !GlobalConf.runtime.GRAVITATIONAL_WAVES)

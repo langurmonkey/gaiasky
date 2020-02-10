@@ -31,7 +31,17 @@ public class SysUtils {
         getDefaultMappingsDir().mkdirs();
     }
 
-    private static String OS = System.getProperty("os.name").toLowerCase();
+    private static String OS;
+    private static boolean linux, mac, windows, unix, solaris;
+    static {
+        OS = System.getProperty("os.name").toLowerCase();
+        linux = OS.indexOf("linux") >= 0;
+        mac = OS.indexOf("macos") >= 0;
+        windows = OS.indexOf("win") >= 0;
+        unix = OS.indexOf("unix") >= 0;
+        solaris = OS.indexOf("sunos") >= 0;
+    }
+
 
     public static String getXdgDesktop() {
         return System.getenv("XDG_CURRENT_DESKTOP");
@@ -91,23 +101,23 @@ public class SysUtils {
     }
 
     public static boolean isLinux() {
-        return (OS.indexOf("linux") >= 0);
+        return linux;
     }
 
     public static boolean isWindows() {
-        return (OS.indexOf("win") >= 0);
+        return windows;
     }
 
     public static boolean isMac() {
-        return (OS.indexOf("mac") >= 0);
+        return mac;
     }
 
     public static boolean isUnix() {
-        return (OS.indexOf("unix") >= 0);
+        return unix;
     }
 
     public static boolean isSolaris() {
-        return (OS.indexOf("sunos") >= 0);
+        return solaris;
     }
 
     public static String getOSArchitecture() {
