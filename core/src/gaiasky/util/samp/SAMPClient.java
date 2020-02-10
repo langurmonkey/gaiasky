@@ -73,9 +73,9 @@ public class SAMPClient implements IObserver {
         meta.setDescriptionText("3D Universe application focused on ESA's Gaia satellite");
         meta.setDocumentationUrl(GlobalConf.DOCUMENTATION);
         meta.setIconUrl(GlobalConf.ICON_URL);
-        meta.put("author.name", GlobalConf.AUTHOR_NAME);
+        meta.put("author.name", GlobalConf.AUTHOR_NAME_PLAIN);
         meta.put("author.email", GlobalConf.AUTHOR_EMAIL);
-        meta.put("author.affiliation", GlobalConf.AUTHOR_AFFILIATION);
+        meta.put("author.affiliation", GlobalConf.AUTHOR_AFFILIATION_PLAIN);
         meta.put("home.page", GlobalConf.WEBPAGE);
         meta.put("gaiasky.version", GlobalConf.version.version);
 

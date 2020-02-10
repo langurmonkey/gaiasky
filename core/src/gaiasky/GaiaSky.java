@@ -84,6 +84,7 @@ import java.util.*;
 public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
     private static final Log logger = Logger.getLogger(GaiaSky.class);
 
+
     /**
      * Current render process.
      * One of {@link #runnableInitialGui}, {@link #runnableLoadingGui} or {@link #runnableRender}.
@@ -181,7 +182,10 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
      */
     private boolean camRecording = false;
 
+    // Gaia Sky has finished initialization
     private boolean initialized = false;
+    // Window has been created successfully
+    public boolean windowCreated = false;
 
     /**
      * Whether to attempt a connection to the VR HMD
@@ -459,6 +463,7 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
      * to their classes and removes the Loading message
      */
     private void doneLoading() {
+        windowCreated = true;
         // Dispose of initial and loading GUIs
         initialGui.dispose();
         initialGui = null;

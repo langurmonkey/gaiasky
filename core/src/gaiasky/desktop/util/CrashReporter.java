@@ -69,7 +69,7 @@ public class CrashReporter {
         String crf1 = "Crash report file saved to: " + crashReportFile.getPath();
         String crf4 = "Full log file saved to: " + logFile.getPath();
         String crf2 = "Please attach these files to the bug report";
-        String crf3 = "Create a bug report here: https://gitlab.com/langurmonkey/gaiasky/issues";
+        String crf3 = "Create a bug report here: " + GlobalConf.REPO_ISSUES;
         int len = Math.max(crf1.length(), Math.max(crf2.length(), Math.max(crf3.length(), crf4.length())));
         char[] chars = new char[len];
         Arrays.fill(chars, '#');

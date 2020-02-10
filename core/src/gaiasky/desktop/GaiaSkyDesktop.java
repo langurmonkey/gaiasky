@@ -322,20 +322,30 @@ public class GaiaSkyDesktop implements IObserver {
         }
 
         // Launch app
+        GaiaSky gs = null;
+        Lwjgl3Application app = null;
         try {
-            new Lwjgl3Application(new GaiaSky(gsArgs.download, gsArgs.catalogChooser, gsArgs.vr, gsArgs.externalView, gsArgs.noScriptingServer), cfg);
+            gs = new GaiaSky(gsArgs.download, gsArgs.catalogChooser, gsArgs.vr, gsArgs.externalView, gsArgs.noScriptingServer);
+            app = new Lwjgl3Application(gs, cfg);
         } catch (GdxRuntimeException e) {
             if (!JAVA_VERSION_FLAG) {
-                // Probably, OpenGL 4.x is not supported and window creation failed
-                if (!EventManager.instance.isSubscribedToAny(consoleLogger))
-                    consoleLogger.subscribe();
-                logger.error("Window creation failed (is OpenGL 4.x supported by your card?), trying with OpenGL 3.x");
-                logger.info("Disabling tessellation...");
-                consoleLogger.unsubscribe();
-                GlobalConf.scene.ELEVATION_TYPE = ElevationType.NONE;
-                cfg.useOpenGL3(true, 3, 2);
+                if (!gs.windowCreated) {
+                    // Probably, OpenGL 4.x is not supported and window creation failed
+                    if (!EventManager.instance.isSubscribedToAny(consoleLogger)) {
+                        consoleLogger.subscribe();
+                        gs.dispose();
+                    }
+                    logger.error("Window creation failed (is OpenGL 4.x supported by your card?), trying with OpenGL 3.x");
+                    logger.info("Disabling tessellation...");
+                    consoleLogger.unsubscribe();
+                    GlobalConf.scene.ELEVATION_TYPE = ElevationType.NONE;
+                    cfg.useOpenGL3(true, 3, 2);
 
-                Lwjgl3Application app = new Lwjgl3Application(new GaiaSky(gsArgs.download, gsArgs.catalogChooser, gsArgs.vr, gsArgs.externalView, gsArgs.noScriptingServer), cfg);
+                    gs = new GaiaSky(gsArgs.download, gsArgs.catalogChooser, gsArgs.vr, gsArgs.externalView, gsArgs.noScriptingServer);
+                    app = new Lwjgl3Application(gs, cfg);
+                } else {
+                    logger.error("Gaia Sky crashed, please report the bug at " + GlobalConf.REPO_ISSUES);
+                }
             } else {
                 logger.error("Please update your java installation. Gaia Sky needs at least Java " + REQUIRED_JAVA_VERSION);
             }
