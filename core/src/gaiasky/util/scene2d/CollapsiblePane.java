@@ -55,7 +55,7 @@ public class CollapsiblePane extends Table {
      *                          expand/detach icons.
      */
     public CollapsiblePane(final Stage stage, final String labelText, final Actor content, final Skin skin, String labelStyle, String expandButtonStyle, String detachButtonStyle, boolean expanded, String shortcut, Actor... topIcons) {
-        super();
+        super(skin);
         this.stage = stage;
         this.labelText = labelText;
         this.content = content;
