@@ -27,10 +27,10 @@ public class VMemInfo {
                 logger.error(e);
                 crash = true;
             }
-        } else if (extensions.contains("GL_ATI_meminfo")) {
-            // ATI
+        } else if (extensions.contains("WGL_AMD_gpu_association") || extensions.contains("GL_ATI_meminfo")) {
+            // AMD
             try {
-                graphicsDeviceInfo = new ATIVRAM();
+                graphicsDeviceInfo = new AMDVRAM(extensions.contains("WGL_AMD_gpu_association"), extensions.contains("GL_ATI_meminfo"));
             } catch (Exception e) {
                 logger.error(e);
                 crash = true;
@@ -105,30 +105,38 @@ public class VMemInfo {
         }
     }
 
-    private static class ATIVRAM implements IGraphicsDeviceInfo {
+    private static class AMDVRAM implements IGraphicsDeviceInfo {
         private int[] buff;
         private double totalMem;
+        private boolean gpuassoc, meminfo;
 
-        public ATIVRAM() {
-            buff = new int[4];
+        public AMDVRAM(boolean gpuassoc, boolean meminfo) {
+            this.buff = new int[4];
+            this.gpuassoc = gpuassoc;
+            this.meminfo = meminfo;
             totalMem = computeTotalMemory();
         }
 
         public double getFreeMemory() {
-            GL20.glGetIntegerv(ATIMeminfo.GL_VBO_FREE_MEMORY_ATI, buff);
-            double freeMem = buff[0] * 1e-3d;
-            return freeMem;
+            if(meminfo) {
+                GL20.glGetIntegerv(ATIMeminfo.GL_VBO_FREE_MEMORY_ATI, buff);
+                double freeMem = buff[0] * 1e-3d;
+                return freeMem;
+            }
+            return -1;
         }
 
         public double computeTotalMemory() {
-            int n = WGLAMDGPUAssociation.nwglGetGPUIDsAMD(0, 0);
-            int[] ids = new int[n];
-            int res = WGLAMDGPUAssociation.wglGetGPUIDsAMD(ids);
-            if (res > 0) {
-                WGLAMDGPUAssociation.wglGetGPUInfoAMD(ids[0], WGLAMDGPUAssociation.WGL_GPU_RAM_AMD, GL20.GL_UNSIGNED_INT, buff);
-                return buff[0] * 1e-3d;
+            if (gpuassoc) {
+                int n = WGLAMDGPUAssociation.nwglGetGPUIDsAMD(0, 0);
+                int[] ids = new int[n];
+                int res = WGLAMDGPUAssociation.wglGetGPUIDsAMD(ids);
+                if (res > 0) {
+                    WGLAMDGPUAssociation.wglGetGPUInfoAMD(ids[0], WGLAMDGPUAssociation.WGL_GPU_RAM_AMD, GL20.GL_UNSIGNED_INT, buff);
+                    return buff[0] * 1e-3d;
+                }
             }
-            return 0;
+            return -1;
         }
 
         public double getTotalMemory() {
@@ -136,7 +144,10 @@ public class VMemInfo {
         }
 
         public double getUsedMemory() {
-            return getTotalMemory() - getFreeMemory();
+            if(gpuassoc && meminfo) {
+                return getTotalMemory() - getFreeMemory();
+            }
+            return -1;
         }
     }
 
