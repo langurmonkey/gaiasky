@@ -24,6 +24,7 @@ import gaiasky.GaiaSky;
 import gaiasky.desktop.util.SysUtils;
 import gaiasky.event.EventManager;
 import gaiasky.event.Events;
+import gaiasky.event.IObserver;
 import gaiasky.interfce.KeyBindings.ProgramAction;
 import gaiasky.interfce.beans.*;
 import gaiasky.screenshot.ImageRenderer;
@@ -60,7 +61,7 @@ import java.util.TreeSet;
  *
  * @author tsagrista
  */
-public class PreferencesWindow extends GenericDialog {
+public class PreferencesWindow extends GenericDialog implements IObserver {
     private static Log logger = Logger.getLogger(PreferencesWindow.class);
 
     // Remember the last tab opened
@@ -87,6 +88,7 @@ public class PreferencesWindow extends GenericDialog {
     private DatasetsWidget dw;
     private OwnLabel tessQualityLabel;
     private Cell noticeHiResCell;
+    private Table controllersTable;
 
     // Backup values
     private ToneMapping toneMappingBak;
@@ -108,6 +110,7 @@ public class PreferencesWindow extends GenericDialog {
         // Build UI
         buildSuper();
 
+        EventManager.instance.subscribe(this, Events.CONTROLLER_CONNECTED_INFO, Events.CONTROLLER_DISCONNECTED_INFO);
     }
 
     @Override
@@ -961,21 +964,9 @@ public class PreferencesWindow extends GenericDialog {
         OwnLabel titleController = new OwnLabel(I18n.txt("gui.controller"), skin, "help-title");
 
         // DETECTED CONTROLLER NAMES
+        controllersTable = new Table(skin);
         OwnLabel detectedLabel = new OwnLabel(I18n.txt("gui.controller.detected"), skin);
-        Array<Controller> controllers = Controllers.getControllers();
-
-        Array<OwnLabel> controllerNames = new Array<>();
-        for (Controller c : controllers) {
-            OwnLabel cl = new OwnLabel(c.getName(), skin);
-            if (GlobalConf.controls.isControllerBlacklisted(c.getName())) {
-                cl.setText(cl.getText() + " [*]");
-                cl.setColor(1, 0, 0, 1);
-                cl.addListener(new OwnTextTooltip(I18n.txt("gui.tooltip.controller.blacklist"), skin));
-            }
-            controllerNames.add(cl);
-        }
-        if (controllerNames.isEmpty())
-            controllerNames.add(new OwnLabel(I18n.txt("gui.controller.nocontrollers"), skin));
+        generateControllersList(controllersTable);
 
         // CONTROLLER MAPPINGS
         OwnLabel mappingsLabel = new OwnLabel(I18n.txt("gui.controller.mappingsfile"), skin);
@@ -1066,13 +1057,7 @@ public class PreferencesWindow extends GenericDialog {
         // Add to content
         contentControls.add(titleController).colspan(2).left().padBottom(pad5 * 2).row();
         contentControls.add(detectedLabel).left().padBottom(pad5 * 2).padRight(pad5);
-        int ci = 0;
-        for (OwnLabel cn : controllerNames) {
-            if (ci > 0)
-                contentControls.add();
-            contentControls.add(cn).left().padBottom(pad5 * 2).row();
-            ci++;
-        }
+        contentControls.add(controllersTable).left().padBottom(pad5 * 2).row();
         contentControls.add(mappingsLabel).left().padBottom(pad5 * 2).padRight(pad5);
         contentControls.add(controllerMappings).left().padBottom(pad5 * 2).row();
         contentControls.add(inverty).left().colspan(2).padBottom(pad5 * 2).row();
@@ -1410,9 +1395,9 @@ public class PreferencesWindow extends GenericDialog {
         OwnLabel cmResolutionLabel = new OwnLabel(I18n.txt("gui.360.resolution"), skin);
         cmResolution = new OwnTextField(Integer.toString(GlobalConf.scene.CUBEMAP_FACE_RESOLUTION), skin, new IntValidator(20, 15000));
         cmResolution.setWidth(textwidth * 3f);
-        cmResolution.addListener((event)->{
-            if(event instanceof ChangeEvent){
-                if(cmResolution.isValid()){
+        cmResolution.addListener((event) -> {
+            if (event instanceof ChangeEvent) {
+                if (cmResolution.isValid()) {
                     plResolution.setText(cmResolution.getText());
                 }
                 return true;
@@ -1461,9 +1446,9 @@ public class PreferencesWindow extends GenericDialog {
         OwnLabel plResolutionLabel = new OwnLabel(I18n.txt("gui.360.resolution"), skin);
         plResolution = new OwnTextField(Integer.toString(GlobalConf.scene.CUBEMAP_FACE_RESOLUTION), skin, new IntValidator(20, 15000));
         plResolution.setWidth(textwidth * 3f);
-        plResolution.addListener((event)->{
-            if(event instanceof ChangeEvent){
-                if(plResolution.isValid()){
+        plResolution.addListener((event) -> {
+            if (event instanceof ChangeEvent) {
+                if (plResolution.isValid()) {
                     cmResolution.setText(plResolution.getText());
                 }
                 return true;
@@ -1751,14 +1736,42 @@ public class PreferencesWindow extends GenericDialog {
 
     }
 
+    protected void generateControllersList(Table table) {
+        Array<Controller> controllers = Controllers.getControllers();
+
+        Array<OwnLabel> controllerNames = new Array<>();
+        for (Controller c : controllers) {
+            OwnLabel cl = new OwnLabel(c.getName(), skin);
+            if (GlobalConf.controls.isControllerBlacklisted(c.getName())) {
+                cl.setText(cl.getText() + " [*]");
+                cl.setColor(1, 0, 0, 1);
+                cl.addListener(new OwnTextTooltip(I18n.txt("gui.tooltip.controller.blacklist"), skin));
+            }
+            controllerNames.add(cl);
+        }
+        if (controllerNames.isEmpty())
+            controllerNames.add(new OwnLabel(I18n.txt("gui.controller.nocontrollers"), skin));
+
+        if (table == null)
+            table = new Table(skin);
+        table.clear();
+        for (OwnLabel cn : controllerNames) {
+            table.add(cn).left().padBottom(pad5 * 2).row();
+        }
+        table.pack();
+
+    }
+
     @Override
     protected void accept() {
         saveCurrentPreferences();
+        unsubscribe();
     }
 
     @Override
     protected void cancel() {
         revertLivePreferences();
+        unsubscribe();
     }
 
     private void reloadDefaultPreferences() {
@@ -1782,7 +1795,7 @@ public class PreferencesWindow extends GenericDialog {
                 copyFile(internalFolderConfFile, userFolderConfFile, true);
                 logger.info("Default configuration file applied successfully! Gaia Sky will shut down now");
             } else {
-                    throw new IOException("File " + confFolder.getAbsolutePath() + " does not exist!");
+                throw new IOException("File " + confFolder.getAbsolutePath() + " does not exist!");
             }
 
         } catch (Exception e) {
@@ -1987,7 +2000,7 @@ public class PreferencesWindow extends GenericDialog {
 
         // Planetarium aperture
         float ap = Float.parseFloat(plAperture.getText());
-        if(ap != GlobalConf.program.PLANETARIUM_APERTURE){
+        if (ap != GlobalConf.program.PLANETARIUM_APERTURE) {
             EventManager.instance.post(Events.PLANETARIUM_APERTURE_CMD, ap);
         }
 
@@ -2039,6 +2052,10 @@ public class PreferencesWindow extends GenericDialog {
             reloadUI();
         }
 
+    }
+
+    private void unsubscribe(){
+        EventManager.instance.removeAllSubscriptions(this);
     }
 
     /**
@@ -2124,4 +2141,15 @@ public class PreferencesWindow extends GenericDialog {
         }
     }
 
+    @Override
+    public void notify(Events event, Object... data) {
+        switch (event) {
+        case CONTROLLER_CONNECTED_INFO:
+        case CONTROLLER_DISCONNECTED_INFO:
+            generateControllersList(controllersTable);
+            break;
+        default:
+            break;
+        }
+    }
 }

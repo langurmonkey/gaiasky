@@ -16,7 +16,7 @@ allprojects {
     apply plugin: "eclipse"
     apply plugin: "idea"
 
-    version = '2.2.1'
+    version = '2.2.5'
 
     ext {
         appName = "GaiaSky"
@@ -132,13 +132,14 @@ project(":core") {
         compile "org.lwjgl:lwjgl-openvr:$lwjglVersion:natives-windows"
         compile "org.lwjgl:lwjgl-openvr:$lwjglVersion:natives-macos"
 
-        compile "com.badlogicgames.gdx:gdx-backend-lwjgl3:$gdxVersion"
         compile "com.badlogicgames.gdx:gdx:$gdxVersion"
+        compile "com.badlogicgames.gdx:gdx-backend-lwjgl3:$gdxVersion"
         compile "com.badlogicgames.gdx:gdx-controllers-lwjgl3:$gdxVersion"
 
         compile "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-desktop"
         compile "com.badlogicgames.gdx:gdx-controllers-desktop:$gdxVersion"
         compile "com.badlogicgames.gdx:gdx-controllers-platform:$gdxVersion:natives-desktop"
+
         compile group: "commons-io", name: "commons-io", version: "$commonsioVersion"
         compile "org.apache.commons:commons-compress:$compressVersion"
         compile "com.beust:jcommander:$jcommanderVersion"

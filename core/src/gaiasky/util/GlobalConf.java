@@ -327,7 +327,6 @@ public class GlobalConf {
             INVERT_LOOK_Y_AXIS = iNVERT_LOOK_Y_AXIS;
             DEBUG_MODE = dEBUG_MODE;
             CONTROLLER_BLACKLIST = cONTROLLER_BLACKLIST;
-
         }
 
         public boolean isControllerBlacklisted(String controllerName) {
@@ -346,6 +345,18 @@ public class GlobalConf {
             Array<Controller> controllers = Controllers.getControllers();
             for (Controller controller : controllers) {
                 if (!isControllerBlacklisted(controller.getName())) {
+                    // Prevent duplicates
+                    controller.removeListener(listener);
+                    // Add
+                    controller.addListener(listener);
+                }
+            }
+        }
+
+        public void addControllerListener(ControllerListener listener, String controllerName) {
+            Array<Controller> controllers = Controllers.getControllers();
+            for (Controller controller : controllers) {
+                if (!isControllerBlacklisted(controller.getName()) && controllerName.equals(controller.getName())) {
                     // Prevent duplicates
                     controller.removeListener(listener);
                     // Add

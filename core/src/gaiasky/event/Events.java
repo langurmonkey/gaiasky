@@ -282,6 +282,10 @@ public enum Events {
 
     /** Displays VR Controller hints **/
     DISPLAY_VR_CONTROLLER_HINT_CMD,
+    /** A controller has been connected, contains the name **/
+    CONTROLLER_CONNECTED_INFO,
+    /** A controller has been disconnected, contains the name **/
+    CONTROLLER_DISCONNECTED_INFO,
     /**
      * Toggles VR GUI display. Contains a name and a boolean with the state
      */

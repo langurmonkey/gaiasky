@@ -102,11 +102,13 @@ public class NaturalControllerListener implements ControllerListener, IObserver,
     @Override
     public void connected(Controller controller) {
         logger.info("Controller connected: " + controller.getName());
+        EventManager.instance.post(Events.CONTROLLER_CONNECTED_INFO, controller.getName());
     }
 
     @Override
     public void disconnected(Controller controller) {
         logger.info("Controller disconnected: " + controller.getName());
+        EventManager.instance.post(Events.CONTROLLER_DISCONNECTED_INFO, controller.getName());
     }
 
     @Override
