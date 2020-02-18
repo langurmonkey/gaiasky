@@ -108,21 +108,7 @@ public class GaiaSkyDesktop implements IObserver {
      * @param jc The JCommander object
      */
     private static void printUsage(JCommander jc) {
-        StringBuilder sb = new StringBuilder();
-        jc.usage(sb, "");
-        String usage = sb.toString();
-
-        sb = new StringBuilder();
-        String[] lines = usage.split("\n");
-        for (int i = 0; i < lines.length; i++) {
-            if (i == 0) {
-                // Add extra line between usage and options
-                sb.append(lines[i] + "\n\n");
-            } else {
-                sb.append(lines[i].substring(2) + '\n');
-            }
-        }
-        System.out.println(sb.toString());
+        jc.usage();
     }
 
     /**
