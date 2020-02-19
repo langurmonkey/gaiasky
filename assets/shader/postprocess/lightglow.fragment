@@ -65,4 +65,5 @@ void main() {
     }
     fragColor.rgb += texture(u_texture0, v_texCoords).rgb;
     fragColor.a = 1.0;
+    fragColor = clamp(fragColor, 0.0, 1.0);
 }

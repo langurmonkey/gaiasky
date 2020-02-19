@@ -18,8 +18,11 @@ public class VMemInfo {
     private static boolean crash = false;
 
     public static void initialize() {
-        String extensions = GlobalResources.getGLExtensions();
-        if (extensions.contains("GL_NVX_gpu_memory_info")) {
+        String extensions = GlobalResources.getGLExtensions().toLowerCase();
+        boolean nvxgpu = extensions.contains("GL_NVX_gpu_memory_info".toLowerCase());
+        boolean amdgpuassoc = extensions.contains("WGL_AMD_gpu_association".toLowerCase());
+        boolean atimeminfo = extensions.contains("GL_ATI_meminfo".toLowerCase());
+        if (nvxgpu) {
             // Nvidia
             try {
                 graphicsDeviceInfo = new NVIDIAVRAM();
@@ -27,10 +30,10 @@ public class VMemInfo {
                 logger.error(e);
                 crash = true;
             }
-        } else if (extensions.contains("WGL_AMD_gpu_association") || extensions.contains("GL_ATI_meminfo")) {
+        } else if (amdgpuassoc || atimeminfo) {
             // AMD
             try {
-                graphicsDeviceInfo = new AMDVRAM(extensions.contains("WGL_AMD_gpu_association"), extensions.contains("GL_ATI_meminfo"));
+                graphicsDeviceInfo = new AMDVRAM(amdgpuassoc, atimeminfo);
             } catch (Exception e) {
                 logger.error(e);
                 crash = true;
@@ -118,7 +121,7 @@ public class VMemInfo {
         }
 
         public double getFreeMemory() {
-            if(meminfo) {
+            if (meminfo) {
                 GL20.glGetIntegerv(ATIMeminfo.GL_VBO_FREE_MEMORY_ATI, buff);
                 double freeMem = buff[0] * 1e-3d;
                 return freeMem;
@@ -144,7 +147,7 @@ public class VMemInfo {
         }
 
         public double getUsedMemory() {
-            if(gpuassoc && meminfo) {
+            if (gpuassoc && meminfo) {
                 return getTotalMemory() - getFreeMemory();
             }
             return -1;
