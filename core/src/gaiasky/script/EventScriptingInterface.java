@@ -223,8 +223,9 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
                     focus.getAbsolutePosition(dir).sub(campos[0], campos[1], campos[2]);
                     double[] d = dir.nor().values();
                     em.post(Events.CAMERA_DIR_CMD, d);
-
                 });
+                // Make sure the last action is flushed
+                sleepFrames(2);
             } else {
                 logger.error("FOCUS_MODE object does not exist: " + focusName);
             }
@@ -240,6 +241,8 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
                 em.post(Events.CAMERA_MODE_CMD, CameraMode.FOCUS_MODE);
                 em.post(Events.FOCUS_CHANGE_CMD, focus, true);
                 em.post(Events.GO_TO_OBJECT_CMD);
+                // Make sure the last action is flushed
+                sleepFrames(2);
             }
         }
     }
