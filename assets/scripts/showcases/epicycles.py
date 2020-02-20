@@ -69,6 +69,7 @@ gs.cameraStop()
 
 gs.stopSimulationTime()
 gs.setVisibility("element.orbits", True)
+gs.setVisibility("element.others", True)
 gs.setCameraLock(True)
 gs.setCameraOrientationLock(False)
 
