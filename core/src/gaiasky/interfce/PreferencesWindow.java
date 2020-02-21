@@ -1435,7 +1435,7 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
 
         // Skew angle
         Label plangleLabel = new OwnLabel(I18n.txt("gui.planetarium.angle"), skin);
-        plAngle = new OwnTextField(Float.toString(GlobalConf.program.PLANETARIUM_ANGLE), skin, new FloatValidator(0, 90));
+        plAngle = new OwnTextField(Float.toString(GlobalConf.program.PLANETARIUM_ANGLE), skin, new FloatValidator(-180, 180));
         plAngle.setWidth(textwidth * 3f);
 
 
