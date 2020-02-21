@@ -60,6 +60,10 @@ public final class CubemapProjections extends PostProcessorEffect {
         filter.setPlanetariumAperture(ap);
     }
 
+    public void setPlanetariumAngle(float angle){
+        filter.setPlanetariumAngle(angle);
+    }
+
     @Override
     public void render(FrameBuffer src, FrameBuffer dest, GaiaSkyFrameBuffer main) {
         restoreViewport(dest);

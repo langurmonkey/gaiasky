@@ -867,6 +867,7 @@ public class GlobalConf {
         public boolean MINIMAP_IN_WINDOW = false;
         public boolean CUBEMAP_MODE;
         public float PLANETARIUM_APERTURE;
+        public float PLANETARIUM_ANGLE;
         /**
          * Cubemap projection
          **/
@@ -886,7 +887,7 @@ public class GlobalConf {
         }
 
         public void initialize(boolean sHOW_DEBUG_INFO, Instant lAST_CHECKED, String lAST_VERSION, String vERSION_CHECK_URL, String dATA_DESCRIPTOR_URL, String uI_THEME, String sCRIPT_LOCATION, int rEST_PORT, String lOCALE, boolean sTEREOSCOPIC_MODE, StereoProfile sTEREO_PROFILE, boolean cUBEMAP360_MODE, boolean dISPLAY_HUD, boolean dISPLAY_POINTER_COORDS, boolean dISPLAY_DATASET_DIALOG, boolean nET_MASTER, boolean nET_SLAVE, List<String> nET_MASTER_SLAVES, String nET_SLAVE_CONFIG,
-                float nET_SLAVE_YAW, float nET_SLAVE_PITCH, float nET_SLAVE_ROLL, String nET_SLAVE_WARP, String nET_SLAVE_BLEND, String lAST_OPEN_LOCATION, boolean dISPLAY_MINIMAP, float mINIMAP_SIZE, float pLANETARIUM_APERTURE) {
+                float nET_SLAVE_YAW, float nET_SLAVE_PITCH, float nET_SLAVE_ROLL, String nET_SLAVE_WARP, String nET_SLAVE_BLEND, String lAST_OPEN_LOCATION, boolean dISPLAY_MINIMAP, float mINIMAP_SIZE, float pLANETARIUM_APERTURE, float pLANETARIUM_ANGLE) {
             SHOW_DEBUG_INFO = sHOW_DEBUG_INFO;
             VERSION_LAST_TIME = lAST_CHECKED;
             VERSION_LAST_VERSION = lAST_VERSION;
@@ -915,6 +916,7 @@ public class GlobalConf {
             DISPLAY_MINIMAP = dISPLAY_MINIMAP;
             MINIMAP_SIZE = mINIMAP_SIZE;
             PLANETARIUM_APERTURE = pLANETARIUM_APERTURE;
+            PLANETARIUM_ANGLE = pLANETARIUM_ANGLE;
         }
 
         public void initialize(boolean sHOW_DEBUG_INFO, String uI_THEME, String lOCALE, boolean sTEREOSCOPIC_MODE, StereoProfile sTEREO_PROFILE) {
@@ -1001,6 +1003,22 @@ public class GlobalConf {
          */
         public boolean areSlaveConfigPropertiesPresent() {
             return !Float.isNaN(NET_SLAVE_YAW) && !Float.isNaN(NET_SLAVE_PITCH) && !Float.isNaN(NET_SLAVE_ROLL);
+        }
+
+        /**
+         * Checks whether the program is in planetarium mode
+         * @return Whether planetarium mode is on
+         */
+        public boolean isPlanetarium() {
+            return CUBEMAP_MODE && CUBEMAP_PROJECTION.isPlanetarium();
+        }
+
+        /**
+         * Checks whether the program is in panorama mode
+         * @return Whether panorama mode is on
+         */
+        public boolean isPanorama() {
+            return CUBEMAP_MODE && CUBEMAP_PROJECTION.isPanorama();
         }
 
         @Override

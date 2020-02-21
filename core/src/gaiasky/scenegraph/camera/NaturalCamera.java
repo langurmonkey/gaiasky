@@ -191,8 +191,6 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
      */
     boolean projectionFlag = false;
 
-    private float planetariumFocusAngle = 0f;
-
     public double[] hudScales;
     public Color[] hudColors;
     public int hudColor;
@@ -338,7 +336,7 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
         }
 
         // FOCUS_MODE is changed from GUI
-        EventManager.instance.subscribe(this, Events.FOCUS_CHANGE_CMD, Events.FOV_CHANGED_CMD, Events.ORIENTATION_LOCK_CMD, Events.CAMERA_POS_CMD, Events.CAMERA_DIR_CMD, Events.CAMERA_UP_CMD, Events.CAMERA_PROJECTION_CMD, Events.CAMERA_FWD, Events.CAMERA_ROTATE, Events.CAMERA_PAN, Events.CAMERA_ROLL, Events.CAMERA_TURN, Events.CAMERA_STOP, Events.CAMERA_CENTER, Events.GO_TO_OBJECT_CMD, Events.PLANETARIUM_FOCUS_ANGLE_CMD, Events.PLANETARIUM_CMD, Events.CUBEMAP_CMD, Events.FREE_MODE_COORD_CMD, Events.CATALOG_VISIBLE, Events.CATALOG_REMOVE, Events.FOCUS_NOT_AVAILABLE, Events.TOGGLE_VISIBILITY_CMD, Events.CAMERA_CENTER_FOCUS_CMD, Events.CONTROLLER_CONNECTED_INFO, Events.CONTROLLER_DISCONNECTED_INFO);
+        EventManager.instance.subscribe(this, Events.FOCUS_CHANGE_CMD, Events.FOV_CHANGED_CMD, Events.ORIENTATION_LOCK_CMD, Events.CAMERA_POS_CMD, Events.CAMERA_DIR_CMD, Events.CAMERA_UP_CMD, Events.CAMERA_PROJECTION_CMD, Events.CAMERA_FWD, Events.CAMERA_ROTATE, Events.CAMERA_PAN, Events.CAMERA_ROLL, Events.CAMERA_TURN, Events.CAMERA_STOP, Events.CAMERA_CENTER, Events.GO_TO_OBJECT_CMD, Events.PLANETARIUM_CMD, Events.CUBEMAP_CMD, Events.FREE_MODE_COORD_CMD, Events.CATALOG_VISIBLE, Events.CATALOG_REMOVE, Events.FOCUS_NOT_AVAILABLE, Events.TOGGLE_VISIBILITY_CMD, Events.CAMERA_CENTER_FOCUS_CMD, Events.CONTROLLER_CONNECTED_INFO, Events.CONTROLLER_DISCONNECTED_INFO);
     }
 
     private void computeNextPositions(ITimeFrameProvider time) {
@@ -455,7 +453,7 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
 
                 if (!GlobalConf.runtime.OPENVR) {
                     if (!diverted) {
-                        directionToTarget(dt, aux4, GlobalConf.scene.TURNING_SPEED / (GlobalConf.scene.CINEMATIC_CAMERA ? 1e3f : 1e2f), planetariumFocusAngle);
+                        directionToTarget(dt, aux4, GlobalConf.scene.TURNING_SPEED / (GlobalConf.scene.CINEMATIC_CAMERA ? 1e3f : 1e2f));
                     } else {
                         updateRotationFree(dt, GlobalConf.scene.TURNING_SPEED);
                     }
@@ -499,11 +497,10 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
             }
         case FREE_MODE:
             updatePosition(dt, translateUnits, GlobalConf.scene.FREE_CAMERA_TARGET_MODE_ON ? realTransUnits : 1);
-
             if (!GlobalConf.runtime.OPENVR) {
                 // If target is present, update direction
                 if (freeTargetOn) {
-                    directionToTarget(dt, freeTargetPos, GlobalConf.scene.TURNING_SPEED / (GlobalConf.scene.CINEMATIC_CAMERA ? 1e3f : 1e2f), planetariumFocusAngle);
+                    directionToTarget(dt, freeTargetPos, GlobalConf.scene.TURNING_SPEED / (GlobalConf.scene.CINEMATIC_CAMERA ? 1e3f : 1e2f));
                     if (facingFocus) {
                         freeTargetOn = false;
                     }
@@ -638,14 +635,26 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
 
     }
 
+    /**
+     * Updates the perspective camera float values from the computed double vectors
+     */
     protected void updatePerspectiveCamera() {
         camera.position.set(0f, 0f, 0f);
         camera.direction.set(direction.valuesf());
         camera.up.set(up.valuesf());
         camera.update();
-        //cameraUpdate(camera);
 
         posinv.set(pos).scl(-1);
+    }
+
+    /**
+     * Gets the effective direction to use for the perspective camera. Takes into account planetarium down angle in free mode
+     * @return The effective direction
+     */
+    public Vector3d getEffectiveDirection(){
+        if(getMode().isFree() && GlobalConf.program.isPlanetarium())
+            return focusDirection;
+        return direction;
     }
 
     /**
@@ -1154,22 +1163,9 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
      * @param dt               The current time step
      * @param target           The position of the target
      * @param turnVelocity     The velocity at which to turn
-     * @param planetariumAngle In degrees. In the case of planetaria, the target
-     *                         must be a few degrees lower (skewed domes) so that we
-     *                         need to target a point which is a few degrees above
-     *                         the focus.
      */
-    private void directionToTarget(double dt, final Vector3d target, double turnVelocity, double planetariumAngle) {
+    private void directionToTarget(double dt, final Vector3d target, double turnVelocity) {
         desired.set(target).sub(pos);
-        if (planetariumAngle != 0) {
-            // Use up to target area above focus with given angle
-            double uplen = Math.tan(MathUtilsd.degRad * planetariumAngle) * desired.len();
-            aux3.set(desired).crs(up);
-            aux3.crs(desired);
-            aux2.set(aux3).nor().scl(uplen);
-            aux1.set(target).add(aux2);
-            desired.set(aux1).sub(pos);
-        }
         desired.nor();
         double angl = desired.angle(direction);
         // boolean samedir = aux1.set(desired).add(direction).len2() >
@@ -1331,9 +1327,6 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
             CubemapProjection p = (CubemapProjection) data[1];
             if (p.isPlanetarium() && state) {
                 fovBackup = GaiaSky.instance.cam.getCamera().fieldOfView;
-                EventManager.instance.post(Events.PLANETARIUM_FOCUS_ANGLE_CMD, 50f);
-            } else {
-                EventManager.instance.post(Events.PLANETARIUM_FOCUS_ANGLE_CMD, 0f);
             }
             break;
         case PLANETARIUM_CMD:
@@ -1342,10 +1335,8 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
             if (state) {
                 fovBackup = GaiaSky.instance.cam.getCamera().fieldOfView;
                 EventManager.instance.post(Events.FOV_CHANGED_CMD, 140f, false);
-                EventManager.instance.post(Events.PLANETARIUM_FOCUS_ANGLE_CMD, 50f);
             } else {
                 EventManager.instance.post(Events.FOV_CHANGED_CMD, fovBackup);
-                EventManager.instance.post(Events.PLANETARIUM_FOCUS_ANGLE_CMD, 0f);
             }
             break;
         case CAMERA_POS_CMD:
@@ -1409,12 +1400,6 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
                 });
 
             }
-            break;
-        case PLANETARIUM_FOCUS_ANGLE_CMD:
-            if (GlobalConf.runtime.OPENVR || data.length == 0)
-                planetariumFocusAngle = 0;
-            else
-                planetariumFocusAngle = (float) data[0];
             break;
         case ORIENTATION_LOCK_CMD:
             previousOrientationAngle = 0;

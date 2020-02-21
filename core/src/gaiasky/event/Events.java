@@ -682,15 +682,13 @@ public enum Events {
      */
     PLANETARIUM_CMD,
     /**
-     * Contains the delta angle from the zenith at which the focus will be put
-     * in planetarium mode. An angle of 0 puts the focus directly at the centre of
-     * the picture (zenith)
-     **/
-    PLANETARIUM_FOCUS_ANGLE_CMD,
-    /**
      * Sets the aperture angle [deg] of the planetarium in cubemap mode
      */
     PLANETARIUM_APERTURE_CMD,
+    /**
+     * Sets the planetarium angle [deg], an angle from the zenith to put the focus on in planetarium mode
+     */
+    PLANETARIUM_ANGLE_CMD,
     /**
      * Issues the play command. Contains the path to the file to play
      **/

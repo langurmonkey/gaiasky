@@ -82,7 +82,7 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
     private OwnSelectBox<ElevationComboBoxBean> elevationSb;
     private OwnSelectBox<String> theme;
     private OwnSelectBox<FileComboBoxBean> controllerMappings;
-    private OwnTextField widthField, heightField, sswidthField, ssheightField, frameoutputPrefix, frameoutputFps, fowidthField, foheightField, camrecFps, cmResolution, plResolution, plAperture, smResolution, limitFps;
+    private OwnTextField widthField, heightField, sswidthField, ssheightField, frameoutputPrefix, frameoutputFps, fowidthField, foheightField, camrecFps, cmResolution, plResolution, plAperture, plAngle, smResolution, limitFps;
     private OwnSlider lodTransitions, tessQuality, minimapSize;
     private OwnTextButton screenshotsLocation, frameoutputLocation;
     private DatasetsWidget dw;
@@ -1433,6 +1433,12 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         plAperture = new OwnTextField(Float.toString(GlobalConf.program.PLANETARIUM_APERTURE), skin, new FloatValidator(30, 360));
         plAperture.setWidth(textwidth * 3f);
 
+        // Skew angle
+        Label plangleLabel = new OwnLabel(I18n.txt("gui.planetarium.angle"), skin);
+        plAngle = new OwnTextField(Float.toString(GlobalConf.program.PLANETARIUM_ANGLE), skin, new FloatValidator(0, 90));
+        plAngle.setWidth(textwidth * 3f);
+
+
         // Info
         String plinfostr = I18n.txt("gui.planetarium.info") + '\n';
         ssLines = GlobalResources.countOccurrences(plinfostr, '\n');
@@ -1462,6 +1468,8 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         // Add to table
         planetarium.add(apertureLabel).left().padRight(pad5 * 4f).padBottom(pad * 3f);
         planetarium.add(plAperture).left().expandX().padBottom(pad * 3f).row();
+        planetarium.add(plangleLabel).left().padRight(pad5 * 4f).padBottom(pad * 3f);
+        planetarium.add(plAngle).left().expandX().padBottom(pad * 3f).row();
         planetarium.add(plInfo).colspan(2).left().padBottom(pad5).row();
         planetarium.add(plResolutionLabel).left().padRight(pad5 * 4).padBottom(pad5);
         planetarium.add(plResolution).left().expandX().padBottom(pad5).row();
@@ -2003,6 +2011,13 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         if (ap != GlobalConf.program.PLANETARIUM_APERTURE) {
             EventManager.instance.post(Events.PLANETARIUM_APERTURE_CMD, ap);
         }
+
+        // Planetarium angle
+        float pa = Float.parseFloat(plAngle.getText());
+        if (pa != GlobalConf.program.PLANETARIUM_ANGLE) {
+            EventManager.instance.post(Events.PLANETARIUM_ANGLE_CMD, pa);
+        }
+
 
         // Controllers
         if (controllerMappings.getSelected() != null) {

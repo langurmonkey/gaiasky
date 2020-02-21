@@ -38,13 +38,14 @@ public final class CubemapProjectionsFilter extends Filter<CubemapProjectionsFil
 
     private ShaderProgram[] programs;
     private Vector2 viewport;
-    private float aperture;
+    private float planetariumAperture, planetariumAngle;
 
     public enum Param implements Parameter {
         // @formatter:off
         Cubemap("u_cubemap", 0),
         Viewport("u_viewport", 2),
-        Aperture("u_aperture", 0);
+        PlanetariumAperture("u_planetariumAperture", 0),
+        PlanetariumAngle("u_planetariumAngle", 0);
         // @formatter:on
 
         private String mnemonic;
@@ -168,8 +169,12 @@ public final class CubemapProjectionsFilter extends Filter<CubemapProjectionsFil
         setParam(Param.Viewport, this.viewport);
     }
     public void setPlanetariumAperture(float ap){
-        this.aperture = ap;
-        setParam(Param.Aperture, ap);
+        this.planetariumAperture = ap;
+        setParam(Param.PlanetariumAperture, ap);
+    }
+    public void setPlanetariumAngle(float angle){
+        this.planetariumAngle = angle;
+        setParam(Param.PlanetariumAngle, angle);
     }
 
     @Override
@@ -177,7 +182,8 @@ public final class CubemapProjectionsFilter extends Filter<CubemapProjectionsFil
         // reimplement super to batch every parameter
         setParams(Param.Cubemap, u_texture1);
         setParams(Param.Viewport, viewport);
-        setParams(Param.Aperture, aperture);
+        setParams(Param.PlanetariumAperture, planetariumAperture);
+        setParams(Param.PlanetariumAngle, planetariumAngle);
         endParams();
     }
 
