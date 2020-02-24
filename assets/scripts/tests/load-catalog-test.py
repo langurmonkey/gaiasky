@@ -19,7 +19,8 @@ gs.maximizeInterfaceWindow()
 
 name = "hip-script"
 # Modify this path to your own file!
-gs.loadDataset(name, expanduser("~") + "/.local/share/gaiasky/data/catalog/wd/wd_10.vot")
+assets = gs.getAssetsLocation()
+gs.loadDataset(name, assets + "/scripts/tests/hip-subset.vot")
 
 lprint("Dataset ready: %s" % name)
 gs.sleep(4)
