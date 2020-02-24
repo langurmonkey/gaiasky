@@ -2,6 +2,35 @@
 ## [Unreleased](https://gitlab.com/langurmonkey/gaiasky/tree/master)
 [Full changelog](https://gitlab.com/langurmonkey/gaiasky/compare/2.2.4-1...HEAD)
 
+### Bug Fixes
+- add flush frames to postRunnable() actions in scripting implementation
+- proper extension checking for ATI vram info
+- proper fix for VMemInfo crash on arcolinux+ATI graphics
+- VRAM profiling crash for AMDGPUs
+- adapt star brightness in cubemap modes
+- reload default configuration file crash
+
+### Build System
+- fix versions of sdl2gdx and jsamp, refactor VMemInfo
+- update compress, jcommander and jsamp versions, replace gdx-controllers with sdl2glx for better compatibility
+- update stil library jar
+- get jsamp from repository
+- substitute underscore by hyphen in pkgver
+
+### Code Refactoring
+- cubemap-related properties organised and cleaned-up
+- improve error handling of OpenGL 4.x incapable video cards
+
+### Features
+- add script to test color map highlighting
+- implement planetarium deviation angle in shader
+- update controller list live in preferences window, fix connection/disconnection events
+- add extra attributes, colormaps for highlighting
+- load all attributes from VOTables
+- STIL provider works with multiple names
+- support for multiple star names in octree gen
+- add support for multiple names per object
+
 
 <a name="2.2.4-1"></a>
 ## [2.2.4-1](https://gitlab.com/langurmonkey/gaiasky/tree/2.2.4) (2020-01-23)
