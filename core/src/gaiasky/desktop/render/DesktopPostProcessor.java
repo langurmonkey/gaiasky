@@ -413,7 +413,7 @@ public class DesktopPostProcessor implements IPostProcessor, IObserver {
     }
 
     private float getGlowSpiralScale(double starBrightness, float starSize, float fovFactor) {
-        float ss = (float) starBrightness * starSize * 1e-4f / fovFactor;
+        float ss = (float) starBrightness * starSize * 0.5e-4f / fovFactor;
         return ss;
     }
 
