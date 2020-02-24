@@ -866,12 +866,14 @@ public class GlobalConf {
         public float MINIMAP_SIZE;
         public boolean MINIMAP_IN_WINDOW = false;
         public boolean CUBEMAP_MODE;
+        public CubemapProjections.CubemapProjection CUBEMAP_PROJECTION;
+        /*
+         * Resolution of each of the faces in the cubemap which will be mapped
+         * to a equirectangular projection for the 360 mode.
+         */
+        public int CUBEMAP_FACE_RESOLUTION;
         public float PLANETARIUM_APERTURE;
         public float PLANETARIUM_ANGLE;
-        /**
-         * Cubemap projection
-         **/
-        public CubemapProjections.CubemapProjection CUBEMAP_PROJECTION = CubemapProjections.CubemapProjection.EQUIRECTANGULAR;
         public boolean STEREOSCOPIC_MODE;
         /** Eye separation in stereoscopic mode in meters **/
         public float STEREOSCOPIC_EYE_SEPARATION_M = 1f;
@@ -883,10 +885,10 @@ public class GlobalConf {
         public boolean DISPLAY_DATASET_DIALOG;
 
         public ProgramConf() {
-            EventManager.instance.subscribe(this, Events.STEREOSCOPIC_CMD, Events.STEREO_PROFILE_CMD, Events.CUBEMAP_CMD, Events.CUBEMAP_PROJECTION_CMD, Events.SHOW_MINIMAP_ACTION, Events.TOGGLE_MINIMAP, Events.PLANETARIUM_APERTURE_CMD);
+            EventManager.instance.subscribe(this, Events.STEREOSCOPIC_CMD, Events.STEREO_PROFILE_CMD, Events.CUBEMAP_CMD, Events.CUBEMAP_PROJECTION_CMD, Events.SHOW_MINIMAP_ACTION, Events.TOGGLE_MINIMAP, Events.PLANETARIUM_APERTURE_CMD, Events.CUBEMAP_PROJECTION_CMD, Events.CUBEMAP_RESOLUTION_CMD);
         }
 
-        public void initialize(boolean sHOW_DEBUG_INFO, Instant lAST_CHECKED, String lAST_VERSION, String vERSION_CHECK_URL, String dATA_DESCRIPTOR_URL, String uI_THEME, String sCRIPT_LOCATION, int rEST_PORT, String lOCALE, boolean sTEREOSCOPIC_MODE, StereoProfile sTEREO_PROFILE, boolean cUBEMAP360_MODE, boolean dISPLAY_HUD, boolean dISPLAY_POINTER_COORDS, boolean dISPLAY_DATASET_DIALOG, boolean nET_MASTER, boolean nET_SLAVE, List<String> nET_MASTER_SLAVES, String nET_SLAVE_CONFIG,
+        public void initialize(boolean sHOW_DEBUG_INFO, Instant lAST_CHECKED, String lAST_VERSION, String vERSION_CHECK_URL, String dATA_DESCRIPTOR_URL, String uI_THEME, String sCRIPT_LOCATION, int rEST_PORT, String lOCALE, boolean sTEREOSCOPIC_MODE, StereoProfile sTEREO_PROFILE, boolean cUBEMAP_MODE, CubemapProjections.CubemapProjection cUBEMAP_PROJECTION, int cUBEMAP_FACE_RESOLUTION, boolean dISPLAY_HUD, boolean dISPLAY_POINTER_COORDS, boolean dISPLAY_DATASET_DIALOG, boolean nET_MASTER, boolean nET_SLAVE, List<String> nET_MASTER_SLAVES, String nET_SLAVE_CONFIG,
                 float nET_SLAVE_YAW, float nET_SLAVE_PITCH, float nET_SLAVE_ROLL, String nET_SLAVE_WARP, String nET_SLAVE_BLEND, String lAST_OPEN_LOCATION, boolean dISPLAY_MINIMAP, float mINIMAP_SIZE, float pLANETARIUM_APERTURE, float pLANETARIUM_ANGLE) {
             SHOW_DEBUG_INFO = sHOW_DEBUG_INFO;
             VERSION_LAST_TIME = lAST_CHECKED;
@@ -899,7 +901,9 @@ public class GlobalConf {
             LOCALE = lOCALE;
             STEREOSCOPIC_MODE = sTEREOSCOPIC_MODE;
             STEREO_PROFILE = sTEREO_PROFILE;
-            CUBEMAP_MODE = cUBEMAP360_MODE;
+            CUBEMAP_MODE = cUBEMAP_MODE;
+            CUBEMAP_PROJECTION = cUBEMAP_PROJECTION;
+            CUBEMAP_FACE_RESOLUTION = cUBEMAP_FACE_RESOLUTION;
             DISPLAY_HUD = dISPLAY_HUD;
             DISPLAY_POINTER_COORDS = dISPLAY_POINTER_COORDS;
             DISPLAY_DATASET_DIALOG = dISPLAY_DATASET_DIALOG;
@@ -1061,6 +1065,9 @@ public class GlobalConf {
             case CUBEMAP_PROJECTION_CMD:
                 CUBEMAP_PROJECTION = (CubemapProjections.CubemapProjection) data[0];
                 logger.info("Cubemap projection set to " + CUBEMAP_PROJECTION.toString());
+                break;
+            case CUBEMAP_RESOLUTION_CMD:
+                CUBEMAP_FACE_RESOLUTION = (int) data[0];
                 break;
             case SHOW_MINIMAP_ACTION:
                 boolean show = (Boolean) data[0];
@@ -1327,12 +1334,6 @@ public class GlobalConf {
         /** Home object crosshair **/
         public boolean CROSSHAIR_HOME;
 
-        /**
-         * Resolution of each of the faces in the cubemap which will be mapped
-         * to a equirectangular projection for the 360 mode.
-         */
-        public int CUBEMAP_FACE_RESOLUTION;
-
         public double STAR_THRESHOLD_NONE;
         public double STAR_THRESHOLD_POINT;
         public double STAR_THRESHOLD_QUAD;
@@ -1389,7 +1390,7 @@ public class GlobalConf {
         public double DIST_SCALE_VR;
 
         public SceneConf() {
-            EventManager.instance.subscribe(this, Events.TOGGLE_VISIBILITY_CMD, Events.FOCUS_LOCK_CMD, Events.ORIENTATION_LOCK_CMD, Events.STAR_BRIGHTNESS_CMD, Events.PM_LEN_FACTOR_CMD, Events.PM_NUM_FACTOR_CMD, Events.PM_COLOR_MODE_CMD, Events.PM_ARROWHEADS_CMD, Events.FOV_CHANGED_CMD, Events.CAMERA_SPEED_CMD, Events.ROTATION_SPEED_CMD, Events.TURNING_SPEED_CMD, Events.SPEED_LIMIT_CMD, Events.TRANSIT_COLOUR_CMD, Events.ONLY_OBSERVED_STARS_CMD, Events.COMPUTE_GAIA_SCAN_CMD, Events.OCTREE_PARTICLE_FADE_CMD, Events.STAR_POINT_SIZE_CMD, Events.STAR_POINT_SIZE_INCREASE_CMD, Events.STAR_POINT_SIZE_DECREASE_CMD, Events.STAR_POINT_SIZE_RESET_CMD, Events.STAR_MIN_OPACITY_CMD, Events.AMBIENT_LIGHT_CMD, Events.GALAXY_3D_CMD, Events.CROSSHAIR_FOCUS_CMD, Events.CROSSHAIR_CLOSEST_CMD, Events.CROSSHAIR_HOME_CMD, Events.CAMERA_CINEMATIC_CMD, Events.CUBEMAP_RESOLUTION_CMD, Events.LABEL_SIZE_CMD, Events.LINE_WIDTH_CMD, Events.ELEVATION_MUTLIPLIER_CMD, Events.ELEVATION_TYPE_CMD, Events.TESSELLATION_QUALITY_CMD);
+            EventManager.instance.subscribe(this, Events.TOGGLE_VISIBILITY_CMD, Events.FOCUS_LOCK_CMD, Events.ORIENTATION_LOCK_CMD, Events.STAR_BRIGHTNESS_CMD, Events.PM_LEN_FACTOR_CMD, Events.PM_NUM_FACTOR_CMD, Events.PM_COLOR_MODE_CMD, Events.PM_ARROWHEADS_CMD, Events.FOV_CHANGED_CMD, Events.CAMERA_SPEED_CMD, Events.ROTATION_SPEED_CMD, Events.TURNING_SPEED_CMD, Events.SPEED_LIMIT_CMD, Events.TRANSIT_COLOUR_CMD, Events.ONLY_OBSERVED_STARS_CMD, Events.COMPUTE_GAIA_SCAN_CMD, Events.OCTREE_PARTICLE_FADE_CMD, Events.STAR_POINT_SIZE_CMD, Events.STAR_POINT_SIZE_INCREASE_CMD, Events.STAR_POINT_SIZE_DECREASE_CMD, Events.STAR_POINT_SIZE_RESET_CMD, Events.STAR_MIN_OPACITY_CMD, Events.AMBIENT_LIGHT_CMD, Events.GALAXY_3D_CMD, Events.CROSSHAIR_FOCUS_CMD, Events.CROSSHAIR_CLOSEST_CMD, Events.CROSSHAIR_HOME_CMD, Events.CAMERA_CINEMATIC_CMD, Events.LABEL_SIZE_CMD, Events.LINE_WIDTH_CMD, Events.ELEVATION_MUTLIPLIER_CMD, Events.ELEVATION_TYPE_CMD, Events.TESSELLATION_QUALITY_CMD);
         }
 
         public void initialize(String sTARTUP_OBJECT, GraphicsQuality gRAPHICS_QUALITY, long oBJECT_FADE_MS, float sTAR_BRIGHTNESS, float sTAR_BRIGHTNESS_POWER, float aMBIENT_LIGHT, float cAMERA_FOV, float cAMERA_SPEED, float tURNING_SPEED, float rOTATION_SPEED, int cAMERA_SPEED_LIMIT_IDX, boolean fOCUS_LOCK, boolean fOCUS_LOCK_ORIENTATION, float lABEL_SIZE_FACTOR, float lABEL_NUMBER_FACTOR, float lINE_WIDTH_FACTOR, boolean[] vISIBILITY, int oRBIT_RENDERER, int lINE_RENDERER,
@@ -1432,7 +1433,6 @@ public class GlobalConf {
             STAR_POINT_SIZE = sTAR_POINT_SIZE;
             STAR_POINT_SIZE_BAK = STAR_POINT_SIZE;
             GALAXY_3D = gALAXY_3D;
-            CUBEMAP_FACE_RESOLUTION = cUBEMAP_FACE_RESOLUTION;
             CROSSHAIR_FOCUS = cROSSHAIR_FOCUS;
             CROSSHAIR_CLOSEST = cROSSHAIR_CLOSEST;
             CROSSHAIR_HOME = cROSSHAIR_HOME;
@@ -1621,9 +1621,6 @@ public class GlobalConf {
             case CAMERA_CINEMATIC_CMD:
                 CINEMATIC_CAMERA = (boolean) data[0];
                 break;
-            case CUBEMAP_RESOLUTION_CMD:
-                CUBEMAP_FACE_RESOLUTION = (int) data[0];
-                break;
             case LABEL_SIZE_CMD:
                 LABEL_SIZE_FACTOR = MathUtilsd.clamp((float) data[0], Constants.MIN_LABEL_SIZE, Constants.MAX_LABEL_SIZE);
                 break;
@@ -1661,7 +1658,7 @@ public class GlobalConf {
     public static float getStarPointSize() {
         if(program.CUBEMAP_MODE) {
             float screenArea = screen.getScreenHeight() * screen.getScreenWidth();
-            float cubemapRes = scene.CUBEMAP_FACE_RESOLUTION;
+            float cubemapRes = program.CUBEMAP_FACE_RESOLUTION;
             float pointSize;
             if (cubemapRes <= 2000) {
                 pointSize = MathUtilsd.lint(cubemapRes, 500f, 2000f, 20f, 8f);

@@ -59,7 +59,7 @@ public abstract class SGRCubemap extends SGRAbstract {
         EventManager.instance.post(Events.FOV_CHANGED_CMD, 90f);
 
         // The sides of the cubemap must be square. We use the max of our resolution
-        int wh = GlobalConf.scene.CUBEMAP_FACE_RESOLUTION;
+        int wh = GlobalConf.program.CUBEMAP_FACE_RESOLUTION;
         zposfb = getFrameBuffer(wh, wh, 0);
         znegfb = getFrameBuffer(wh, wh, 1);
         xposfb = getFrameBuffer(wh, wh, 2);
@@ -136,7 +136,7 @@ public abstract class SGRCubemap extends SGRAbstract {
         // Restore camera parameters
         cam.direction.set(dirbak);
         cam.up.set(upbak);
-            
+
         rc.cubemapSide = CubemapSide.SIDE_NONE;
     }
 

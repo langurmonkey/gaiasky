@@ -20,6 +20,7 @@ import gaiasky.util.GlobalConf.SceneConf.GraphicsQuality;
 import gaiasky.util.Logger.Log;
 import gaiasky.util.format.DateFormatFactory;
 import gaiasky.util.format.IDateFormat;
+import gaiasky.util.gdx.contrib.postprocess.effects.CubemapProjections.CubemapProjection;
 import gaiasky.util.math.MathUtilsd;
 import gaiasky.util.parse.Parser;
 
@@ -197,7 +198,9 @@ public class DesktopConfInit extends ConfInit {
 
         boolean STEREOSCOPIC_MODE = Boolean.parseBoolean(p.getProperty("program.stereoscopic"));
         StereoProfile STEREO_PROFILE = StereoProfile.values()[Integer.parseInt(p.getProperty("program.stereoscopic.profile"))];
-        boolean CUBEMAP_MODE = Boolean.parseBoolean(p.getProperty("program.cubemap360", "false"));
+        boolean CUBEMAP_MODE = Boolean.parseBoolean(p.getProperty("program.cubemap", "false"));
+        CubemapProjection CUBEMAP_PROJECTION = CubemapProjection.valueOf(p.getProperty("program.cubemap.projection", "equirectangular").toUpperCase());
+        int CUBEMAP_FACE_RESOLUTION = Integer.parseInt(p.getProperty("program.cubemap.face.resolution", "1500"));
         float PLANETARIUM_APERTURE = Float.parseFloat(p.getProperty("program.planetarium.aperture", "180.0"));
         float PLANETARIUM_ANGLE = Float.parseFloat(p.getProperty("program.planetarium.angle", "50.0"));
         boolean DISPLAY_HUD = Boolean.parseBoolean(p.getProperty("program.display.hud", "false"));
@@ -224,7 +227,7 @@ public class DesktopConfInit extends ConfInit {
             }
         }
 
-        prc.initialize(SHOW_DEBUG_INFO, LAST_CHECKED, LAST_VERSION, VERSION_CHECK_URL, DATA_DESCRIPTOR_URL, UI_THEME, SCRIPT_LOCATION, REST_PORT, LOCALE, STEREOSCOPIC_MODE, STEREO_PROFILE, CUBEMAP_MODE, DISPLAY_HUD, DISPLAY_POINTER_COORDS, DISPLAY_DATASET_DIALOG, NET_MASTER, NET_SLAVE, NET_MASTER_SLAVES, NET_SLAVE_CONFIG, NET_SLAVE_YAW, NET_SLAVE_PITCH, NET_SLAVE_ROLL, NET_SLAVE_WARP, NET_SLAVE_BLEND, LAST_FOLDER_LOCATION, DISPLAY_MINIMAP, MINIMAP_SIZE, PLANETARIUM_APERTURE, PLANETARIUM_ANGLE);
+        prc.initialize(SHOW_DEBUG_INFO, LAST_CHECKED, LAST_VERSION, VERSION_CHECK_URL, DATA_DESCRIPTOR_URL, UI_THEME, SCRIPT_LOCATION, REST_PORT, LOCALE, STEREOSCOPIC_MODE, STEREO_PROFILE, CUBEMAP_MODE, CUBEMAP_PROJECTION, CUBEMAP_FACE_RESOLUTION, DISPLAY_HUD, DISPLAY_POINTER_COORDS, DISPLAY_DATASET_DIALOG, NET_MASTER, NET_SLAVE, NET_MASTER_SLAVES, NET_SLAVE_CONFIG, NET_SLAVE_YAW, NET_SLAVE_PITCH, NET_SLAVE_ROLL, NET_SLAVE_WARP, NET_SLAVE_BLEND, LAST_FOLDER_LOCATION, DISPLAY_MINIMAP, MINIMAP_SIZE, PLANETARIUM_APERTURE, PLANETARIUM_ANGLE);
 
         /** SCENE CONF **/
         String gc = p.getProperty("scene.graphics.quality");
@@ -279,7 +282,6 @@ public class DesktopConfInit extends ConfInit {
         boolean CROSSHAIR_HOME = Boolean.parseBoolean(p.getProperty("scene.crosshair.home", "true"));
         boolean CINEMATIC_CAMERA = Boolean.parseBoolean(p.getProperty("scene.camera.cinematic", "false"));
         boolean FREE_CAMERA_TARGET_MODE_ON = Boolean.parseBoolean(p.getProperty("scene.camera.free.targetmode", "false"));
-        int CUBEMAP_FACE_RESOLUTION = Integer.parseInt(p.getProperty("scene.cubemapface.resolution", "1000"));
         boolean SHADOW_MAPPING = Boolean.parseBoolean(p.getProperty("scene.shadowmapping", "true"));
         int SHADOW_MAPPING_N_SHADOWS = MathUtilsd.clamp(Integer.parseInt(p.getProperty("scene.shadowmapping.nshadows", "2")), 0, 4);
         int SHADOW_MAPPING_RESOLUTION = Integer.parseInt(p.getProperty("scene.shadowmapping.resolution", "512"));
@@ -488,7 +490,9 @@ public class DesktopConfInit extends ConfInit {
         p.setProperty("program.locale", GlobalConf.program.LOCALE);
         p.setProperty("program.stereoscopic", Boolean.toString(GlobalConf.program.STEREOSCOPIC_MODE));
         p.setProperty("program.stereoscopic.profile", Integer.toString(GlobalConf.program.STEREO_PROFILE.ordinal()));
-        p.setProperty("program.cubemap360", Boolean.toString(GlobalConf.program.CUBEMAP_MODE));
+        p.setProperty("program.cubemap", Boolean.toString(GlobalConf.program.CUBEMAP_MODE));
+        p.setProperty("program.cubemap.projection", GlobalConf.program.CUBEMAP_PROJECTION.toString().toLowerCase());
+        p.setProperty("program.cubemap.face.resolution", Integer.toString(GlobalConf.program.CUBEMAP_FACE_RESOLUTION));
         p.setProperty("program.planetarium.aperture", Float.toString(GlobalConf.program.PLANETARIUM_APERTURE));
         p.setProperty("program.planetarium.angle", Float.toString(GlobalConf.program.PLANETARIUM_ANGLE));
         p.setProperty("program.catalog.chooser", Boolean.toString(GlobalConf.program.DISPLAY_DATASET_DIALOG));
@@ -532,7 +536,6 @@ public class DesktopConfInit extends ConfInit {
         p.setProperty("scene.propermotion.colormode", Integer.toString(GlobalConf.scene.PM_COLOR_MODE));
         p.setProperty("scene.propermotion.arrowheads", Boolean.toString(GlobalConf.scene.PM_ARROWHEADS));
         p.setProperty("scene.galaxy.3d", Boolean.toString(GlobalConf.scene.GALAXY_3D));
-        p.setProperty("scene.cubemapface.resolution", Integer.toString(GlobalConf.scene.CUBEMAP_FACE_RESOLUTION));
         p.setProperty("scene.crosshair.focus", Boolean.toString(GlobalConf.scene.CROSSHAIR_FOCUS));
         p.setProperty("scene.crosshair.closest", Boolean.toString(GlobalConf.scene.CROSSHAIR_CLOSEST));
         p.setProperty("scene.crosshair.home", Boolean.toString(GlobalConf.scene.CROSSHAIR_HOME));

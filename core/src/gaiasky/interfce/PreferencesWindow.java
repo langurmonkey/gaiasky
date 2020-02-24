@@ -1393,7 +1393,7 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
 
         // Resolution
         OwnLabel cmResolutionLabel = new OwnLabel(I18n.txt("gui.360.resolution"), skin);
-        cmResolution = new OwnTextField(Integer.toString(GlobalConf.scene.CUBEMAP_FACE_RESOLUTION), skin, new IntValidator(20, 15000));
+        cmResolution = new OwnTextField(Integer.toString(GlobalConf.program.CUBEMAP_FACE_RESOLUTION), skin, new IntValidator(20, 15000));
         cmResolution.setWidth(textwidth * 3f);
         cmResolution.addListener((event) -> {
             if (event instanceof ChangeEvent) {
@@ -1450,7 +1450,7 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
 
         // Resolution
         OwnLabel plResolutionLabel = new OwnLabel(I18n.txt("gui.360.resolution"), skin);
-        plResolution = new OwnTextField(Integer.toString(GlobalConf.scene.CUBEMAP_FACE_RESOLUTION), skin, new IntValidator(20, 15000));
+        plResolution = new OwnTextField(Integer.toString(GlobalConf.program.CUBEMAP_FACE_RESOLUTION), skin, new IntValidator(20, 15000));
         plResolution.setWidth(textwidth * 3f);
         plResolution.addListener((event) -> {
             if (event instanceof ChangeEvent) {
@@ -2003,7 +2003,7 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
 
         // Cubemap resolution (same as plResolution)
         int newres = Integer.parseInt(cmResolution.getText());
-        if (newres != GlobalConf.scene.CUBEMAP_FACE_RESOLUTION)
+        if (newres != GlobalConf.program.CUBEMAP_FACE_RESOLUTION)
             EventManager.instance.post(Events.CUBEMAP_RESOLUTION_CMD, newres);
 
         // Planetarium aperture
