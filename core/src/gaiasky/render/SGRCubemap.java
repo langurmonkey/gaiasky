@@ -36,7 +36,7 @@ public abstract class SGRCubemap extends SGRAbstract {
     // Frame buffers
     protected FrameBuffer zposfb, znegfb, xposfb, xnegfb, yposfb, ynegfb;
 
-    protected SGRCubemap(){
+    protected SGRCubemap() {
         super();
         aux1 = new Vector3();
         aux3 = new Vector3();
@@ -47,7 +47,6 @@ public abstract class SGRCubemap extends SGRAbstract {
 
         fbcm = new HashMap<>();
     }
-
 
     protected void renderCubemapSides(SceneGraphRenderer sgr, ICamera camera, double t, int rw, int rh, PostProcessBean ppb) {
         PerspectiveCamera cam = camera.getCamera();
@@ -126,23 +125,22 @@ public abstract class SGRCubemap extends SGRAbstract {
         renderFace(zposfb, camera, sgr, ppb, rw, rh, wh, t);
 
         // BACK -Z
-        if(!(GlobalConf.program.CUBEMAP_PROJECTION.isPlanetarium() && GlobalConf.program.PLANETARIUM_APERTURE <= 180f)) {
-            rc.cubemapSide = CubemapSide.SIDE_BACK;
+        rc.cubemapSide = CubemapSide.SIDE_BACK;
 
-            cam.up.set(upbak);
-            cam.direction.set(dirbak).rotate(upbak, -180);
-            cam.update();
+        cam.up.set(upbak);
+        cam.direction.set(dirbak).rotate(upbak, -180);
+        cam.update();
 
-            renderFace(znegfb, camera, sgr, ppb, rw, rh, wh, t);
+        renderFace(znegfb, camera, sgr, ppb, rw, rh, wh, t);
 
-            // Restore camera parameters
-            cam.direction.set(dirbak);
-            cam.up.set(upbak);
-        }
+        // Restore camera parameters
+        cam.direction.set(dirbak);
+        cam.up.set(upbak);
+            
         rc.cubemapSide = CubemapSide.SIDE_NONE;
     }
 
-    protected void postRender(FrameBuffer fb){
+    protected void postRender(FrameBuffer fb) {
         if (fb != null)
             fb.end();
 
