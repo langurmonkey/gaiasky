@@ -13,6 +13,7 @@ import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.TimeUtils;
 import gaiasky.GaiaSky;
+import gaiasky.data.group.DatasetOptions;
 import gaiasky.data.group.IParticleGroupDataProvider;
 import gaiasky.event.EventManager;
 import gaiasky.event.Events;
@@ -34,6 +35,7 @@ import gaiasky.util.gdx.g2d.ExtSpriteBatch;
 import gaiasky.util.gdx.shader.ExtShaderProgram;
 import gaiasky.util.math.*;
 import gaiasky.util.time.ITimeFrameProvider;
+import gaiasky.util.tree.OctreeNode;
 import gaiasky.util.ucd.UCD;
 
 import java.io.Serializable;
@@ -65,6 +67,9 @@ public class ParticleGroup extends FadeNode implements I3DTextRenderable, IFocus
         // Extra attributes
         public Map<UCD, Double> extra;
 
+        // Octant, if in octree
+        public transient OctreeNode octant;
+
         public ParticleBean(double[] data) {
             this.data = data;
         }
@@ -80,6 +85,7 @@ public class ParticleGroup extends FadeNode implements I3DTextRenderable, IFocus
 
         /**
          * Distance in internal units. Beware, does the computation on the fly.
+         *
          * @return The distance, in internal units
          */
         public double distance() {
@@ -88,6 +94,7 @@ public class ParticleGroup extends FadeNode implements I3DTextRenderable, IFocus
 
         /**
          * Right ascension in degrees. Beware, does the conversion on the fly.
+         *
          * @return The right ascension, in degrees
          **/
         public double ra() {
@@ -95,8 +102,10 @@ public class ParticleGroup extends FadeNode implements I3DTextRenderable, IFocus
             Vector3d sphPos = Coordinates.cartesianToSpherical(cartPos, aux3d2.get());
             return MathUtilsd.radDeg * sphPos.x;
         }
+
         /**
          * Declination in degrees. Beware, does the conversion on the fly.
+         *
          * @return The declination, in degrees
          **/
         public double dec() {
@@ -107,9 +116,10 @@ public class ParticleGroup extends FadeNode implements I3DTextRenderable, IFocus
 
         /**
          * Ecliptic longitude in degrees.
+         *
          * @return The ecliptic longitude, in degrees
          */
-        public double lambda(){
+        public double lambda() {
             Vector3d cartEclPos = pos(aux3d1.get()).mul(Coordinates.eqToEcl());
             Vector3d sphPos = Coordinates.cartesianToSpherical(cartEclPos, aux3d2.get());
             return MathUtilsd.radDeg * sphPos.x;
@@ -117,9 +127,10 @@ public class ParticleGroup extends FadeNode implements I3DTextRenderable, IFocus
 
         /**
          * Ecliptic latitude in degrees.
+         *
          * @return The ecliptic latitude, in degrees
          */
-        public double beta(){
+        public double beta() {
             Vector3d cartEclPos = pos(aux3d1.get()).mul(Coordinates.eqToEcl());
             Vector3d sphPos = Coordinates.cartesianToSpherical(cartEclPos, aux3d2.get());
             return MathUtilsd.radDeg * sphPos.y;
@@ -127,9 +138,10 @@ public class ParticleGroup extends FadeNode implements I3DTextRenderable, IFocus
 
         /**
          * Galactic longitude in degrees.
+         *
          * @return The galactic longitude, in degrees
          */
-        public double l(){
+        public double l() {
             Vector3d cartEclPos = pos(aux3d1.get()).mul(Coordinates.eqToGal());
             Vector3d sphPos = Coordinates.cartesianToSpherical(cartEclPos, aux3d2.get());
             return MathUtilsd.radDeg * sphPos.x;
@@ -137,9 +149,10 @@ public class ParticleGroup extends FadeNode implements I3DTextRenderable, IFocus
 
         /**
          * Galactic latitude in degrees.
+         *
          * @return The galactic latitude, in degrees
          */
-        public double b(){
+        public double b() {
             Vector3d cartEclPos = pos(aux3d1.get()).mul(Coordinates.eqToGal());
             Vector3d sphPos = Coordinates.cartesianToSpherical(cartEclPos, aux3d2.get());
             return MathUtilsd.radDeg * sphPos.y;
@@ -158,10 +171,13 @@ public class ParticleGroup extends FadeNode implements I3DTextRenderable, IFocus
         }
     }
 
+    // Sequence id
+    private static long idSeq = 0;
+
     /**
      * List that contains the point data. It contains only [x y z]
      */
-    protected Array<? extends ParticleBean> pointData;
+    protected Array<ParticleBean> pointData;
 
     /**
      * Fully qualified name of data provider class
@@ -257,13 +273,21 @@ public class ParticleGroup extends FadeNode implements I3DTextRenderable, IFocus
     // Has been disposed
     public boolean disposed = false;
 
-    public ParticleGroup() {
+    public boolean createCatalogInfo = true;
+
+    public ParticleGroup(boolean createCatalogInfo) {
         super();
+        id = idSeq++;
         inGpu = false;
         focusIndex = -1;
         focusPosition = new Vector3d();
         focusPositionSph = new Vector2d();
+        this.createCatalogInfo = createCatalogInfo;
         EventManager.instance.subscribe(this, Events.FOCUS_CHANGED);
+    }
+
+    public ParticleGroup() {
+        this(true);
     }
 
     public void initialize() {
@@ -292,25 +316,33 @@ public class ParticleGroup extends FadeNode implements I3DTextRenderable, IFocus
                 n++;
             }
 
-            if (!fixedMeanPosition) {
-                // Mean position
-                for (ParticleBean point : pointData) {
-                    pos.add(point.data[0], point.data[1], point.data[2]);
+            computeMeanPosition();
 
-                }
-                pos.scl(1d / pointData.size);
+            // Label position
+            if (labelPosition == null)
+                labelPosition.set(pos);
 
+            if (createCatalogInfo) {
+                // Create catalog info and broadcast
+                CatalogInfo ci = new CatalogInfo(names[0], names[0], null, CatalogInfoType.INTERNAL, 1f, this);
+
+                // Insert
+                EventManager.instance.post(Events.CATALOG_ADD, ci, false);
             }
-
-            // Create catalog info and broadcast
-            CatalogInfo ci = new CatalogInfo(names[0], names[0], null, CatalogInfoType.INTERNAL, 1f, this);
-
-            // Insert
-            EventManager.instance.post(Events.CATALOG_ADD, ci, false);
 
         } catch (Exception e) {
             Logger.getLogger(this.getClass()).error(e);
             pointData = null;
+        }
+    }
+
+    public void computeMeanPosition() {
+        if (!fixedMeanPosition) {
+            // Mean position
+            for (ParticleBean point : data()) {
+                pos.add(point.x(), point.y(), point.z());
+            }
+            pos.scl(1d / pointData.size);
         }
     }
 
@@ -740,7 +772,7 @@ public class ParticleGroup extends FadeNode implements I3DTextRenderable, IFocus
             Vector3d beamDir = new Vector3d();
             Array<Pair<Integer, Double>> temporalHits = new Array<Pair<Integer, Double>>();
             for (int i = 0; i < n; i++) {
-                if(filter(i)) {
+                if (filter(i)) {
                     ParticleBean pb = pointData.get(i);
                     Vector3d posd = fetchPosition(pb, camera.getPos(), aux3d1.get(), getDeltaYears());
                     beamDir.set(p1).sub(p0);
@@ -907,7 +939,7 @@ public class ParticleGroup extends FadeNode implements I3DTextRenderable, IFocus
         return false;
     }
 
-    public boolean canSelect(){
+    public boolean canSelect() {
         return candidateFocusIndex < 0 || candidateFocusIndex >= size() || filter(candidateFocusIndex);
     }
 
@@ -933,16 +965,16 @@ public class ParticleGroup extends FadeNode implements I3DTextRenderable, IFocus
         }
     }
 
-    public boolean inGpu(){
+    public boolean inGpu() {
         return inGpu;
     }
 
-    public void inGpu(boolean inGpu){
+    public void inGpu(boolean inGpu) {
         this.inGpu = inGpu;
     }
 
-    public void setInGpu(boolean inGpu){
-        if(this.inGpu && !inGpu){
+    public void setInGpu(boolean inGpu) {
+        if (this.inGpu && !inGpu) {
             // Dispose of GPU data
             EventManager.instance.post(Events.DISPOSE_PARTICLE_GROUP_GPU_MESH, this.offset);
         }
@@ -1001,6 +1033,40 @@ public class ParticleGroup extends FadeNode implements I3DTextRenderable, IFocus
             return catalogInfo.filter.evaluate(get(index));
         }
         return true;
+    }
+
+    /**
+     * Creates a default particle group with some parameters, given the name and data
+     *
+     * @param name The name of the particle group. Any occurrence of '%%PGID%%' will be replaced with the id of the particle group
+     * @param data The data of the particle group
+     * @param dops The dataset options
+     * @return A new particle group with the given parameters
+     */
+    public static ParticleGroup getParticleGroup(String name, Array<ParticleBean> data, DatasetOptions dops) {
+        double[] fadeIn = dops == null || dops.fadeIn == null ? null : dops.fadeIn;
+        double[] fadeOut = dops == null || dops.fadeOut == null ? null : dops.fadeOut;
+        double[] particleColor = dops == null || dops.particleColor == null ? new double[] { 1.0, 1.0, 1.0, 1.0 } : dops.particleColor;
+        double colorNoise = dops == null ? 0 : dops.particleColorNoise;
+        double[] labelColor = dops == null || dops.labelColor == null ? new double[] { 1.0, 1.0, 1.0, 1.0 } : dops.labelColor;
+        double particleSize = dops == null ? 0 : dops.particleSize;
+        double profileDecay = dops == null ? 1 : dops.profileDecay;
+        String ct = dops == null || dops.ct == null ? ComponentType.Galaxies.toString() : dops.ct.toString();
+
+        ParticleGroup pg = new ParticleGroup(false);
+        pg.setName(name.replace("%%PGID%%", Long.toString(pg.id)));
+        pg.setParent("Universe");
+        pg.setFadein(fadeIn);
+        pg.setFadeout(fadeOut);
+        pg.setProfiledecay(profileDecay);
+        pg.setColor(particleColor);
+        pg.setColornoise(colorNoise);
+        pg.setLabelcolor(labelColor);
+        pg.setSize(particleSize);
+        pg.setCt(ct);
+        pg.pointData = data;
+        pg.doneLoading(null);
+        return pg;
     }
 
 }

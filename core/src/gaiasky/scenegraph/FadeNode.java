@@ -181,11 +181,13 @@ public class FadeNode extends AbstractPositionEntity {
     }
 
     public void setFadein(double[] fadein) {
-        fadeIn = new Vector2((float) (fadein[0] * Constants.PC_TO_U), (float) (fadein[1] * Constants.PC_TO_U));
+        if (fadein != null)
+            fadeIn = new Vector2((float) (fadein[0] * Constants.PC_TO_U), (float) (fadein[1] * Constants.PC_TO_U));
     }
 
     public void setFadeout(double[] fadeout) {
-        fadeOut = new Vector2((float) (fadeout[0] * Constants.PC_TO_U), (float) (fadeout[1] * Constants.PC_TO_U));
+        if (fadeout != null)
+            fadeOut = new Vector2((float) (fadeout[0] * Constants.PC_TO_U), (float) (fadeout[1] * Constants.PC_TO_U));
     }
 
     public void setPosition(double[] pos) {
@@ -199,7 +201,8 @@ public class FadeNode extends AbstractPositionEntity {
      * @param labelposition
      */
     public void setLabelposition(double[] labelposition) {
-        this.labelPosition = new Vector3d(labelposition[0] * Constants.PC_TO_U, labelposition[1] * Constants.PC_TO_U, labelposition[2] * Constants.PC_TO_U);
+        if (labelposition != null)
+            this.labelPosition = new Vector3d(labelposition[0] * Constants.PC_TO_U, labelposition[1] * Constants.PC_TO_U, labelposition[2] * Constants.PC_TO_U);
     }
 
     /**
@@ -253,7 +256,8 @@ public class FadeNode extends AbstractPositionEntity {
 
     /**
      * Highlight using a plain color
-     * @param hl Whether to highlight
+     *
+     * @param hl    Whether to highlight
      * @param color The plain color
      */
     public void highlight(boolean hl, float[] color) {
@@ -266,9 +270,10 @@ public class FadeNode extends AbstractPositionEntity {
 
     /**
      * Highlight using a colormap
-     * @param hl Whether to highlight
-     * @param cmi Color map index
-     * @param cma Attribute
+     *
+     * @param hl    Whether to highlight
+     * @param cmi   Color map index
+     * @param cma   Attribute
      * @param cmmin Min mapping value
      * @param cmmax Max mapping value
      */

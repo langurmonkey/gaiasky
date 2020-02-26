@@ -153,7 +153,7 @@ if __name__ == '__main__':
         print(" > Upload the files in mintaka.ari.uni-heidelberg.de:/dataB/gaiasky/files/releases/")
         print(" > Generate the html listings for the new files: dir2html")
         print(" > Update TYPO3 ARI website to point to new files: http://zah.uni-heidelberg.de/typo3")
-        print(" > Update docs if necessary: %s/docs" % arguments.gs_folder)
+        print(" > Update docs if necessary (in particular, scripting API links): %s/docs" % arguments.gs_folder)
         print(" > Add new release to gitlab: https://gitlab.com/langurmonkey/gaiasky/-/releases")
         print(" > Create new docs tag (%s) and generate the docs: %s/docs/bin/publish-docs" % (arguments.tag, arguments.gs_folder))
         print(" > Build AUR package (do 'makepkg --printsrcinfo > .SRCINFO') and commit AUR git repository")

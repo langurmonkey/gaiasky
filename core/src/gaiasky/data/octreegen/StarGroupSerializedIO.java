@@ -9,6 +9,7 @@ import com.badlogic.gdx.utils.Array;
 import gaiasky.data.group.IStarGroupDataProvider;
 import gaiasky.data.group.SerializedDataProvider;
 import gaiasky.scenegraph.AbstractPositionEntity;
+import gaiasky.scenegraph.ParticleGroup.ParticleBean;
 import gaiasky.scenegraph.StarGroup;
 import gaiasky.scenegraph.StarGroup.StarBean;
 import gaiasky.util.Logger;
@@ -48,9 +49,10 @@ public class StarGroupSerializedIO implements IStarGroupIO {
     public void writeParticles(Array<AbstractPositionEntity> list, OutputStream out) {
         if (list.size > 0) {
             StarGroup sg = (StarGroup) list.get(0);
-            List<StarBean> l = new ArrayList<StarBean>(sg.size());
-            for (StarBean p : sg.data())
-                l.add(p);
+            List<StarBean> l = new ArrayList<>(sg.size());
+            for (ParticleBean p : sg.data()) {
+                l.add((StarBean) p);
+            }
 
             try {
                 ObjectOutputStream oos = new ObjectOutputStream(out);
@@ -71,12 +73,11 @@ public class StarGroupSerializedIO implements IStarGroupIO {
      * @return A list with a single star vgroup object
      */
     public Array<AbstractPositionEntity> readParticles(InputStream in) throws FileNotFoundException {
-        @SuppressWarnings("unchecked")
-        Array<StarBean> data = (Array<StarBean>) provider.loadData(in, 1.0);
+        Array<ParticleBean> data = provider.loadData(in, 1.0);
         StarGroup sg = new StarGroup();
         sg.setData(data);
 
-        Array<AbstractPositionEntity> l = new Array<AbstractPositionEntity>(1);
+        Array<AbstractPositionEntity> l = new Array<>(1);
         l.add(sg);
         return l;
     }

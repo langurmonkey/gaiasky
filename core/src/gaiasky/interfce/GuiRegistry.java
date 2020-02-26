@@ -14,6 +14,7 @@ import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.utils.Array;
 import gaiasky.GaiaSky;
+import gaiasky.data.group.DatasetOptions;
 import gaiasky.desktop.util.SysUtils;
 import gaiasky.event.EventManager;
 import gaiasky.event.Events;
@@ -231,7 +232,6 @@ public class GuiRegistry implements IObserver {
      */
     private File lastOpenLocation;
 
-
     /* Slave config window */
     private SlaveConfigWindow slaveConfigWindow;
 
@@ -281,8 +281,8 @@ public class GuiRegistry implements IObserver {
                 (new PreferencesWindow(ui, skin)).show(ui);
                 break;
             case SHOW_SLAVE_CONFIG_ACTION:
-                if(MasterManager.hasSlaves()){
-                    if(slaveConfigWindow == null)
+                if (MasterManager.hasSlaves()) {
+                    if (slaveConfigWindow == null)
                         slaveConfigWindow = new SlaveConfigWindow(ui, skin);
                     slaveConfigWindow.show(ui);
                 }
@@ -310,19 +310,22 @@ public class GuiRegistry implements IObserver {
                         if (result.file().exists() && result.file().isFile()) {
                             // Load selected file
                             try {
-                                Runnable loader = () -> {
+                                String fileName = result.file().getName();
+                                final DatasetLoadDialog dld = new DatasetLoadDialog(I18n.txt("gui.dsload.title") + ": " + fileName, skin, ui);
+                                Runnable doLoad = () -> {
                                     try {
-                                        EventScriptingInterface.instance().loadDataset(result.file().getName(), result.file().getAbsolutePath(), CatalogInfo.CatalogInfoType.UI, true);
+                                        DatasetOptions dops = dld.generateDatasetOptions();
+                                        // Access dld properties
+                                        EventScriptingInterface.instance().loadDataset(fileName, result.file().getAbsolutePath(), CatalogInfo.CatalogInfoType.UI, dops, false);
                                         // Open UI datasets
                                         EventScriptingInterface.instance().maximizeInterfaceWindow();
                                         EventScriptingInterface.instance().expandGuiComponent("DatasetsComponent");
                                     } catch (Exception e) {
-                                        logger.error(I18n.txt("notif.error", result.file().getName()), e);
+                                        logger.error(I18n.txt("notif.error", fileName), e);
                                     }
                                 };
-                                // Load in new thread
-                                Thread t = new Thread(loader);
-                                t.start();
+                                dld.setAcceptRunnable(doLoad);
+                                dld.show(ui);
 
                                 lastOpenLocation = result.file().getParentFile();
                                 GlobalConf.program.LAST_OPEN_LOCATION = lastOpenLocation.getAbsolutePath();
@@ -433,6 +436,7 @@ public class GuiRegistry implements IObserver {
                 break;
             }
         }
+
     }
 
     public boolean removeModeChangePopup() {

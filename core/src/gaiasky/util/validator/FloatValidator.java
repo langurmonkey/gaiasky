@@ -20,6 +20,14 @@ public class FloatValidator extends CallbackValidator {
         this.max = max;
     }
 
+    public float getMin() {
+        return min;
+    }
+
+    public float getMax() {
+        return max;
+    }
+
     @Override
     protected boolean validateLocal(String value) {
         Float val;

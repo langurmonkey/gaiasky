@@ -43,7 +43,7 @@ public class UncertaintiesProvider implements IParticleGroupDataProvider {
     }
 
     @Override
-    public Array<? extends ParticleBean> loadData(InputStream is, double factor) {
+    public Array<ParticleBean> loadData(InputStream is, double factor) {
         Array<ParticleBean> pointData = new Array<ParticleBean>();
         try {
             int tokenslen;
@@ -86,7 +86,7 @@ public class UncertaintiesProvider implements IParticleGroupDataProvider {
     }
 
     @Override
-    public Array<? extends ParticleBean> loadDataMapped(String file, double factor) {
+    public Array<ParticleBean> loadDataMapped(String file, double factor) {
         // TODO Auto-generated method stub
         return null;
     }

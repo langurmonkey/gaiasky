@@ -43,6 +43,10 @@ public abstract class CallbackValidator implements IValidator{
             isInvalidCallback.run();
     }
 
+    public IValidator getParent(){
+        return parent;
+    }
+
     @Override
     public boolean validate(String value){
         boolean valid = validateLocal(value);

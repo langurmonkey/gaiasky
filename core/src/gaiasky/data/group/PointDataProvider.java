@@ -27,11 +27,11 @@ import java.util.zip.GZIPInputStream;
 public class PointDataProvider implements IParticleGroupDataProvider {
     private static final Log logger = Logger.getLogger(PointDataProvider.class);
 
-    public Array<? extends ParticleBean> loadData(String file) {
+    public Array<ParticleBean> loadData(String file) {
         return loadData(file, 1d);
     }
 
-    public Array<? extends ParticleBean> loadData(String file, double factor) {
+    public Array<ParticleBean> loadData(String file, double factor) {
         InputStream is = GlobalConf.data.dataFileHandle(file).read();
 
         if(file.endsWith(".gz")){
@@ -52,7 +52,7 @@ public class PointDataProvider implements IParticleGroupDataProvider {
     }
 
     @Override
-    public Array<? extends ParticleBean> loadData(InputStream is, double factor) {
+    public Array<ParticleBean> loadData(InputStream is, double factor) {
         Array<ParticleBean> pointData = new Array<>();
         try {
             int tokenslen;
@@ -97,7 +97,7 @@ public class PointDataProvider implements IParticleGroupDataProvider {
     }
 
     @Override
-    public Array<? extends ParticleBean> loadDataMapped(String file, double factor) {
+    public Array<ParticleBean> loadDataMapped(String file, double factor) {
         // TODO Auto-generated method stub
         return null;
     }

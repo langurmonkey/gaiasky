@@ -14,7 +14,6 @@ import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener.ChangeEvent;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
-import gaiasky.util.CatalogInfo;
 import gaiasky.util.GlobalConf;
 import gaiasky.util.GlobalResources;
 import gaiasky.util.I18n;
@@ -36,20 +35,27 @@ import java.util.Arrays;
  */
 public class ColorPicker extends ColorPickerAbstract {
 
-    private ColorPicker(String name, CatalogInfo ci, Stage stage, Skin skin) {
-        super(name, ci, stage, skin);
-        this.name = name;
+    public ColorPicker(Stage stage, Skin skin) {
+        super(I18n.txt("gui.colorpicker.title"), stage, skin);
         this.skin = skin;
         this.stage = stage;
         initialize();
     }
 
-    public ColorPicker(float[] rgba, CatalogInfo ci, Stage stage, Skin skin) {
-        this(null, rgba, ci, stage, skin);
+    public ColorPicker(String name, Stage stage, Skin skin) {
+        super(name, stage, skin);
+        this.skin = skin;
+        this.stage = stage;
+        initialize();
     }
 
-    public ColorPicker(String name, float[] rgba, CatalogInfo ci, Stage stage, Skin skin) {
-        this(name, ci, stage, skin);
+    public ColorPicker(float[] rgba, Stage stage, Skin skin) {
+        this(stage, skin);
+        setPickedColor(rgba);
+    }
+
+    public ColorPicker(String name, float[] rgba, Stage stage, Skin skin) {
+        this(name, stage, skin);
         setPickedColor(rgba);
     }
 
@@ -109,6 +115,13 @@ public class ColorPicker extends ColorPickerAbstract {
 
     public float[] getPickedColor() {
         return color;
+    }
+
+    public double[] getPickedColorDouble() {
+        double[] c = new double[color.length];
+        for(int i = 0; i < color.length; i++)
+            c[i] = color[i];
+        return c;
     }
 
     /** A color picker dialog **/

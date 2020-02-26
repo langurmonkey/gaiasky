@@ -29,6 +29,7 @@ import gaiasky.desktop.util.DesktopConfInit;
 import gaiasky.interfce.ConsoleLogger;
 import gaiasky.interfce.MessageBean;
 import gaiasky.interfce.NotificationsInterface;
+import gaiasky.scenegraph.ParticleGroup.ParticleBean;
 import gaiasky.scenegraph.StarGroup.StarBean;
 import gaiasky.util.*;
 import gaiasky.util.Logger.Log;
@@ -75,72 +76,49 @@ public class OctreeGeneratorRun {
         }
     }
 
-    @Parameter(names = {"-l", "--loader"}, description = "Name of the star vgroup loader class")
-    private String loaderClass = null;
+    @Parameter(names = { "-l", "--loader" }, description = "Name of the star vgroup loader class") private String loaderClass = null;
 
-    @Parameter(names = {"-i", "--input"}, description = "Location of the input catalog")
-    private String input = null;
+    @Parameter(names = { "-i", "--input" }, description = "Location of the input catalog") private String input = null;
 
-    @Parameter(names = {"-o", "--output"}, description = "Output folder. Defaults to system temp")
-    private String outFolder;
+    @Parameter(names = { "-o", "--output" }, description = "Output folder. Defaults to system temp") private String outFolder;
 
-    @Parameter(names = "--maxpart", description = "Maximum number of objects in an octant")
-    private int maxPart = 100000;
+    @Parameter(names = "--maxpart", description = "Maximum number of objects in an octant") private int maxPart = 100000;
 
-    @Parameter(names = "--serialized", description = "Use the java serialization method instead of the binary format to output the particle files")
-    private boolean serialized = false;
+    @Parameter(names = "--serialized", description = "Use the java serialization method instead of the binary format to output the particle files") private boolean serialized = false;
 
-    @Parameter(names = "--pllxerrfaint", description = "Parallax error factor for faint (gmag>=13.1) stars, acceptance criteria as a percentage of parallax error with respect to parallax, in [0..1]")
-    private double pllxerrfaint = 0.125;
+    @Parameter(names = "--pllxerrfaint", description = "Parallax error factor for faint (gmag>=13.1) stars, acceptance criteria as a percentage of parallax error with respect to parallax, in [0..1]") private double pllxerrfaint = 0.125;
 
-    @Parameter(names = "--pllxerrbright", description = "Parallax error factor for bright (gmag<13.1) stars, acceptance criteria as a percentage of parallax error with respect to parallax, in [0..1]")
-    private double pllxerrbright = 0.25;
+    @Parameter(names = "--pllxerrbright", description = "Parallax error factor for bright (gmag<13.1) stars, acceptance criteria as a percentage of parallax error with respect to parallax, in [0..1]") private double pllxerrbright = 0.25;
 
-    @Parameter(names = "--pllxzeropoint", description = "Zero point value for the parallax in mas")
-    private double pllxzeropoint = 0d;
+    @Parameter(names = "--pllxzeropoint", description = "Zero point value for the parallax in mas") private double pllxzeropoint = 0d;
 
-    @Parameter(names = {"-c", "--magcorrections"}, description = "Flag to apply magnitude and color corrections for extinction and reddening")
-    private boolean magCorrections = false;
+    @Parameter(names = { "-c", "--magcorrections" }, description = "Flag to apply magnitude and color corrections for extinction and reddening") private boolean magCorrections = false;
 
-    @Parameter(names = {"-p", "--postprocess"}, description = "Low object count nodes (<=100) will be merged with their parents if parents have less than 1000 objects. Avoids very large and mostly empty subtrees")
-    private boolean postprocess = false;
+    @Parameter(names = { "-p", "--postprocess" }, description = "Low object count nodes (<=100) will be merged with their parents if parents have less than 1000 objects. Avoids very large and mostly empty subtrees") private boolean postprocess = false;
 
-    @Parameter(names = "--childcount", description = "If --postprocess is on, children nodes with less than --childcount objects and whose parents have less than --parentcount objects) will be merged with thier parents. Defaults to 100")
-    private long childCount = 100;
+    @Parameter(names = "--childcount", description = "If --postprocess is on, children nodes with less than --childcount objects and whose parents have less than --parentcount objects) will be merged with thier parents. Defaults to 100") private long childCount = 100;
 
-    @Parameter(names = "--parentcount", description = "If --postprocess is on, children nodes with less than --childcount objects and whose parent has less than --parentcount objects will be merged with thier parents. Defaults to 1000")
-    private long parentCount = 1000;
+    @Parameter(names = "--parentcount", description = "If --postprocess is on, children nodes with less than --childcount objects and whose parent has less than --parentcount objects will be merged with thier parents. Defaults to 1000") private long parentCount = 1000;
 
-    @Parameter(names = {"-s", "--suncentre", "--suncenter"}, description = "Make the Sun the centre of the octree")
-    private boolean sunCentre = false;
+    @Parameter(names = { "-s", "--suncentre", "--suncenter" }, description = "Make the Sun the centre of the octree") private boolean sunCentre = false;
 
-    @Parameter(names = "--nfiles", description = "Caps the number of data files to load. Defaults to unlimited")
-    private int fileNumCap = -1;
+    @Parameter(names = "--nfiles", description = "Caps the number of data files to load. Defaults to unlimited") private int fileNumCap = -1;
 
-    @Parameter(names = {"--hip", "--addhip"}, description = "Add the Hipparcos catalog on top of the catalog provided by -l")
-    private boolean addHip = false;
+    @Parameter(names = { "--hip", "--addhip" }, description = "Add the Hipparcos catalog on top of the catalog provided by -l") private boolean addHip = false;
 
-    @Parameter(names = "--hip-names", description = "Directory containing HIP names files (Name_To_HIP.dat, Var_To_HIP.dat, etc.)")
-    private String hipNamesDir = null;
+    @Parameter(names = "--hip-names", description = "Directory containing HIP names files (Name_To_HIP.dat, Var_To_HIP.dat, etc.)") private String hipNamesDir = null;
 
-    @Parameter(names = "--xmatchfile", description = "Crossmatch file with source_id to hip, only if --hip is enabled")
-    private String xmatchFile = null;
+    @Parameter(names = "--xmatchfile", description = "Crossmatch file with source_id to hip, only if --hip is enabled") private String xmatchFile = null;
 
-    @Parameter(names = "--geodistfile", description = "Use this file or directory to lookup distances. Argument is a file or directory with files of of <sourceid, dist[pc]>. If this argument is used, both --pllxerrfaint and --pllxerrbright are ignored")
-    private String geodistFile = null;
+    @Parameter(names = "--geodistfile", description = "Use this file or directory to lookup distances. Argument is a file or directory with files of of <sourceid, dist[pc]>. If this argument is used, both --pllxerrfaint and --pllxerrbright are ignored") private String geodistFile = null;
 
-    @Parameter(names = "--distcap", description = "Specifies a maximum distance in parsecs. Stars beyond this distance are not loaded")
-    private double distcap = Long.MAX_VALUE;
+    @Parameter(names = "--distcap", description = "Specifies a maximum distance in parsecs. Stars beyond this distance are not loaded") private double distcap = Long.MAX_VALUE;
 
-    @Parameter(names = "--ruwe", description = "RUWE threshold value. All stars with a RUWE larger than this value will not be used. Must be used in conjunction with --ruwe-file. Also, if present, --pllxerrfaint and --pllxerrbright are ignored")
-    private double ruwe = Double.NaN;
+    @Parameter(names = "--ruwe", description = "RUWE threshold value. All stars with a RUWE larger than this value will not be used. Must be used in conjunction with --ruwe-file. Also, if present, --pllxerrfaint and --pllxerrbright are ignored") private double ruwe = Double.NaN;
 
-    @Parameter(names = "--ruwe-file", description = "Location of gzipped file containing the RUWE value for each source id")
-    private String ruweFile = null;
+    @Parameter(names = "--ruwe-file", description = "Location of gzipped file containing the RUWE value for each source id") private String ruweFile = null;
 
-
-    @Parameter(names = {"-h", "--help"}, help = true)
-    private boolean help = false;
+    @Parameter(names = { "-h", "--help" }, help = true) private boolean help = false;
 
     protected Map<Long, float[]> colors;
 
@@ -160,7 +138,6 @@ public class OctreeGeneratorRun {
 
             File outfolderFile = new File(outFolder);
             outfolderFile.mkdirs();
-
 
             // Assets location
             String ASSETS_LOC = GlobalConf.ASSETS_LOC;
@@ -217,7 +194,7 @@ public class OctreeGeneratorRun {
         //IOctreeGenerator og = new OctreeGeneratorPart(ogp);
         IOctreeGenerator og = new OctreeGeneratorMag(ogp);
 
-        Array<StarBean> listLoader = null, list = null;
+        Array<ParticleBean> listLoader = null, list = null;
         Map<Long, Integer> xmatchTable = null;
         long[] cpm = null;
 
@@ -246,13 +223,13 @@ public class OctreeGeneratorRun {
             }
 
             /* LOAD CATALOG */
-            listLoader = (Array<StarBean>) loader.loadData(input);
+            listLoader = loader.loadData(input);
         }
 
         if (addHip) {
             // Load Hipparcos star names
-            HipNames hipNames =  null;
-            if(hipNamesDir != null) {
+            HipNames hipNames = null;
+            if (hipNamesDir != null) {
                 hipNames = new HipNames();
                 hipNames.load(Paths.get(hipNamesDir));
             }
@@ -269,15 +246,16 @@ public class OctreeGeneratorRun {
                 stil.setMustLoadIds(mustLoad);
             }
 
-            Array<StarBean> listHip = (Array<StarBean>) stil.loadData("data/catalog/hipparcos/hip.vot");
+            Array<ParticleBean> listHip = stil.loadData("data/catalog/hipparcos/hip.vot");
 
             // Update names
-            if(hipNames != null){
+            if (hipNames != null) {
                 Map<Integer, Array<String>> hn = hipNames.getHipNames();
-                for (StarBean star : listHip) {
-                    if(hn.containsKey(star.hip())){
+                for (ParticleBean pb : listHip) {
+                    StarBean star = (StarBean) pb;
+                    if (hn.containsKey(star.hip())) {
                         Array<String> names = hn.get(star.hip());
-                        for(String name : names)
+                        for (String name : names)
                             star.addName(name);
                     }
                 }
@@ -287,8 +265,8 @@ public class OctreeGeneratorRun {
             long[] cpmhip = stil.getCountsPerMag();
             combineCpm(cpm, cpmhip);
             Map<Integer, StarBean> hipMap = new HashMap<>();
-            for (StarBean star : listHip) {
-                hipMap.put(star.hip(), star);
+            for (ParticleBean star : listHip) {
+                hipMap.put(((StarBean) star).hip(), (StarBean) star);
             }
 
             /* Check x-match file */
@@ -299,7 +277,8 @@ public class OctreeGeneratorRun {
             Vector3d aux1 = new Vector3d();
             Vector3d aux2 = new Vector3d();
             if (listLoader != null) {
-                for (StarBean gaiaStar : listLoader) {
+                for (ParticleBean pb : listLoader) {
+                    StarBean gaiaStar = (StarBean) pb;
                     // Check if star is also in HYG catalog
                     if (xmatchTable == null || !xmatchTable.containsKey(gaiaStar.id)) {
                         // No hit, add to main list

@@ -49,6 +49,7 @@ import java.util.Set;
  */
 public class ColormapPicker extends ColorPickerAbstract {
 
+    private CatalogInfo catalogInfo;
     private int cmapIndex;
     private IAttribute cmapAttrib;
     private double cmapMin, cmapMax;
@@ -83,7 +84,8 @@ public class ColormapPicker extends ColorPickerAbstract {
     private Drawable drawableColor, drawableColormap;
 
     private ColormapPicker(String name, CatalogInfo ci, Stage stage, Skin skin) {
-        super(name, ci, stage, skin);
+        super(name, stage, skin);
+        this.catalogInfo = ci;
         this.drawableColor = skin.getDrawable("white");
         this.drawableColormap = skin.getDrawable("iconic-star");
         initialize();
@@ -260,8 +262,6 @@ public class ColormapPicker extends ColorPickerAbstract {
             // Table containing the actual widget
             Table container = new Table(skin);
             Container<Table> cont = new Container<>(container);
-
-            // Radio buttons
 
             // Radio buttons
             plainColor = new OwnCheckBox(I18n.txt("gui.colorpicker.plaincolor"), skin, "radio", pad5);

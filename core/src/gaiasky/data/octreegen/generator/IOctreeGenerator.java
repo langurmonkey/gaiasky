@@ -6,6 +6,7 @@
 package gaiasky.data.octreegen.generator;
 
 import com.badlogic.gdx.utils.Array;
+import gaiasky.scenegraph.ParticleGroup.ParticleBean;
 import gaiasky.scenegraph.StarGroup.StarBean;
 import gaiasky.util.Constants;
 import gaiasky.util.Logger;
@@ -19,11 +20,11 @@ import java.util.Iterator;
 public interface IOctreeGenerator {
     Log logger = Logger.getLogger(IOctreeGenerator.class);
 
-    OctreeNode generateOctree(Array<StarBean> catalog);
+    OctreeNode generateOctree(Array<ParticleBean> catalog);
 
     int getDiscarded();
 
-    static OctreeNode startGeneration(Array<StarBean> catalog, OctreeGeneratorParams params) {
+    static OctreeNode startGeneration(Array<ParticleBean> catalog, OctreeGeneratorParams params) {
         
         logger.info("Starting generation of octree");
 
@@ -37,9 +38,9 @@ public interface IOctreeGenerator {
         Vector3d pos0 = new Vector3d();
         Vector3d pos1 = new Vector3d();
 
-        Iterator<StarBean> it = catalog.iterator();
+        Iterator<ParticleBean> it = catalog.iterator();
         while (it.hasNext()) {
-            StarBean s = it.next();
+            StarBean s = (StarBean) it.next();
 
             double dist = pos(s.data, pos0).len();
             if (dist * Constants.U_TO_PC > params.maxDistanceCap) {
@@ -64,7 +65,7 @@ public interface IOctreeGenerator {
             BoundingBoxd box = new BoundingBoxd();
             // Lets try to maximize the volume: from furthest star to star where axis-aligned bounding box volume is maximum
             pos(furthest.data, pos1);
-            for (StarBean s : catalog) {
+            for (ParticleBean s : catalog) {
                 pos(s.data, pos0);
                 aux.set(pos1, pos0);
                 double vol = aux.getVolume();

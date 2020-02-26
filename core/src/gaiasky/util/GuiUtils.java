@@ -6,11 +6,15 @@
 package gaiasky.util;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Stage;
+import com.badlogic.gdx.scenes.scene2d.ui.HorizontalGroup;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import gaiasky.interfce.GenericDialog;
 import gaiasky.util.scene2d.Link;
+import gaiasky.util.scene2d.OwnImageButton;
 import gaiasky.util.scene2d.OwnLabel;
+import gaiasky.util.scene2d.OwnTextTooltip;
 
 public class GuiUtils {
 
@@ -136,6 +140,24 @@ public class GuiUtils {
         exitw.setCancelText(null);
         exitw.buildSuper();
         exitw.show(stage);
+    }
+
+    public static HorizontalGroup getTooltipHorizontalGroup(Actor actor, String tooltipText, Skin skin){
+        return getTooltipHorizontalGroup(actor, tooltipText, 8f * GlobalConf.UI_SCALE_FACTOR, skin);
+    }
+
+    public static HorizontalGroup getTooltipHorizontalGroup(Actor actor, String tooltipText, float space, Skin skin){
+        HorizontalGroup hg = new HorizontalGroup();
+        hg.space(space);
+        hg.addActor(actor);
+        OwnImageButton tooltip = new OwnImageButton(skin, "tooltip");
+        tooltip.addListener(new OwnTextTooltip(tooltipText, skin));
+        hg.addActor(tooltip);
+        return hg;
+    }
+
+    public static HorizontalGroup tooltipHg(Actor actor, String key, Skin skin){
+       return getTooltipHorizontalGroup(actor, I18n.txt(key), 8f * GlobalConf.UI_SCALE_FACTOR, skin);
     }
 
 }

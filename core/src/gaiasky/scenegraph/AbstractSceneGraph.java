@@ -10,6 +10,7 @@ import com.badlogic.gdx.utils.IntMap;
 import com.badlogic.gdx.utils.ObjectMap;
 import gaiasky.GaiaSky;
 import gaiasky.render.system.StarPointRenderSystem;
+import gaiasky.scenegraph.ParticleGroup.ParticleBean;
 import gaiasky.scenegraph.StarGroup.StarBean;
 import gaiasky.scenegraph.camera.ICamera;
 import gaiasky.scenegraph.octreewrapper.AbstractOctreeWrapper;
@@ -146,8 +147,9 @@ public abstract class AbstractSceneGraph implements ISceneGraph {
                     }
                 }
             } else if (node instanceof StarGroup) {
-                Array<StarBean> stars = ((StarGroup) node).data();
-                for (StarBean s : stars) {
+                Array<ParticleBean> stars = ((StarGroup) node).data();
+                for (ParticleBean pb : stars) {
+                    StarBean s = (StarBean) pb;
                     if (s.hip() > 0) {
                         hipMap.put(s.hip(), new Position(s.x(), s.y(), s.z(), s.pmx(), s.pmy(), s.pmz()));
                     }
@@ -171,9 +173,10 @@ public abstract class AbstractSceneGraph implements ISceneGraph {
                 }
             } else if (node instanceof StarGroup) {
                 StarGroup sg = (StarGroup) node;
-                Array<StarBean> arr = sg.data();
+                Array<ParticleBean> arr = sg.data();
                 if (arr != null) {
-                    for (StarBean sb : arr) {
+                    for (ParticleBean pb : arr) {
+                        StarBean sb = (StarBean) pb;
                         if (sb != null && sb.hip() >= 0)
                             hipMap.remove(sb.hip());
                     }

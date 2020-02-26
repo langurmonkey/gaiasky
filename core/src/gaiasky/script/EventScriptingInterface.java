@@ -15,6 +15,7 @@ import com.badlogic.gdx.scenes.scene2d.Group;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.TimeUtils;
 import gaiasky.GaiaSky;
+import gaiasky.data.group.DatasetOptions;
 import gaiasky.data.group.STILDataProvider;
 import gaiasky.desktop.util.SysUtils;
 import gaiasky.event.EventManager;
@@ -23,9 +24,9 @@ import gaiasky.event.Events;
 import gaiasky.event.IObserver;
 import gaiasky.interfce.ColormapPicker;
 import gaiasky.interfce.IGui;
-import gaiasky.render.ComponentTypes;
+import gaiasky.render.ComponentTypes.ComponentType;
 import gaiasky.scenegraph.*;
-import gaiasky.scenegraph.StarGroup.StarBean;
+import gaiasky.scenegraph.ParticleGroup.ParticleBean;
 import gaiasky.scenegraph.camera.CameraManager.CameraMode;
 import gaiasky.scenegraph.camera.NaturalCamera;
 import gaiasky.screenshot.ImageRenderer;
@@ -556,8 +557,8 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
     public void setVisibility(final String key, final boolean visible) {
         if (!checkComponentTypeKey(key)) {
             logger.error("Element '" + key + "' does not exist. Possible values are:");
-            ComponentTypes.ComponentType[] cts = ComponentTypes.ComponentType.values();
-            for (ComponentTypes.ComponentType ct : cts)
+            ComponentType[] cts = ComponentType.values();
+            for (ComponentType ct : cts)
                 logger.error(ct.key);
         } else {
             GaiaSky.postRunnable(() -> em.post(Events.TOGGLE_VISIBILITY_CMD, key, false, visible));
@@ -587,9 +588,9 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
     }
 
     private boolean checkComponentTypeKey(String key) {
-        ComponentTypes.ComponentType[] cts = ComponentTypes.ComponentType.values();
+        ComponentType[] cts = ComponentType.values();
         boolean keyFound = false;
-        for (ComponentTypes.ComponentType ct : cts)
+        for (ComponentType ct : cts)
             keyFound = keyFound || key.equals(ct.key);
 
         return keyFound;
@@ -2199,39 +2200,102 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
 
     public boolean loadDataset(String dsName, String path, CatalogInfo.CatalogInfoType type, boolean sync) {
         if (sync) {
-            return loadDatasetPrivate(dsName, path, type, true);
+            return loadDatasetImmediate(dsName, path, type, true);
         } else {
-            Thread t = new Thread(() -> loadDatasetPrivate(dsName, path, type, false));
+            Thread t = new Thread(() -> loadDatasetImmediate(dsName, path, type, false));
             t.start();
             return true;
         }
     }
 
-    private boolean loadDatasetPrivate(String dsName, String path, CatalogInfo.CatalogInfoType type, boolean sync) {
+    public boolean loadDataset(String dsName, String path, CatalogInfo.CatalogInfoType type, DatasetOptions dops, boolean sync) {
+        if (sync) {
+            return loadDatasetImmediate(dsName, path, type, dops, true);
+        } else {
+            Thread t = new Thread(() -> loadDatasetImmediate(dsName, path, type, dops, false));
+            t.start();
+            return true;
+        }
+    }
+
+
+    @Override
+    public boolean loadStarDataset(String dsName, String path, double magnitudeScale, double[] labelColor, double[] fadeIn, double[] fadeOut, boolean sync) {
+        return loadStarDataset(dsName, path, CatalogInfo.CatalogInfoType.SCRIPT, magnitudeScale, labelColor, fadeIn, fadeOut, sync);
+    }
+
+    public boolean loadStarDataset(String dsName, String path, CatalogInfo.CatalogInfoType type, double magnitudeScale, double[] labelColor, double[] fadeIn, double[] fadeOut, boolean sync) {
+        DatasetOptions dops = DatasetOptions.getStarDatasetOptions(magnitudeScale, labelColor, fadeIn, fadeOut);
+        return loadDataset(dsName, path, type, dops, sync);
+    }
+
+    @Override
+    public boolean loadParticleDataset(String dsName, String path, double profileDecay, double[] particleColor, double colorNoise, double[] labelColor, double particleSize, String ct, double[] fadeIn, double[] fadeOut, boolean sync) {
+        ComponentType compType = ComponentType.valueOf(ct);
+        return loadParticleDataset(dsName, path, profileDecay, particleColor, colorNoise, labelColor, particleSize, compType, fadeIn, fadeOut, sync);
+    }
+
+    public boolean loadParticleDataset(String dsName, String path, double profileDecay, double[] particleColor, double colorNoise, double[] labelColor, double particleSize, ComponentType ct, double[] fadeIn, double[] fadeOut, boolean sync) {
+        return loadParticleDataset(dsName, path, CatalogInfo.CatalogInfoType.SCRIPT, profileDecay, particleColor, colorNoise, labelColor, particleSize, ct, fadeIn, fadeOut, sync);
+    }
+
+    public boolean loadParticleDataset(String dsName, String path, CatalogInfo.CatalogInfoType type, double profileDecay, double[] particleColor, double colorNoise, double[] labelColor, double particleSize, ComponentType ct, double[] fadeIn, double[] fadeOut, boolean sync) {
+        DatasetOptions dops = DatasetOptions.getParticleDatasetOptions(profileDecay, particleColor, colorNoise, labelColor, particleSize, ct, fadeIn, fadeOut);
+        return loadDataset(dsName, path, type, dops, sync);
+    }
+
+
+    private boolean loadDatasetImmediate(String dsName, String path, CatalogInfo.CatalogInfoType type, boolean sync) {
+        return loadDatasetImmediate(dsName, path, type, null, sync);
+    }
+
+    private boolean loadDatasetImmediate(String dsName, String path, CatalogInfo.CatalogInfoType type, DatasetOptions dops, boolean sync) {
         try {
             logger.info(I18n.txt("notif.catalog.loading", path));
             File f = new File(path);
             if (f.exists() && f.canRead()) {
                 STILDataProvider provider = new STILDataProvider();
+                provider.setDatasetOptions(dops);
                 DataSource ds = new FileDataSource(f);
-                @SuppressWarnings("unchecked") Array<StarBean> data = (Array<StarBean>) provider.loadData(ds, 1.0f);
+                @SuppressWarnings("unchecked") Array<ParticleBean> data = (Array<ParticleBean>) provider.loadData(ds, 1.0f);
 
-                // Create star vgroup
+                // Create star/particle group
                 if (data != null && data.size > 0 && checkString(dsName, "datasetName")) {
-                    AtomicReference<StarGroup> starGroup = new AtomicReference<>();
-                    GaiaSky.postRunnable(() -> {
-                        starGroup.set(StarGroup.getDefaultStarGroup(dsName, data));
+                    if (dops == null || dops.type == DatasetOptions.DatasetLoadType.STARS) {
+                        // STAR GROUP
+                        AtomicReference<StarGroup> starGroup = new AtomicReference<>();
+                        GaiaSky.postRunnable(() -> {
+                            starGroup.set(StarGroup.getStarGroup(dsName, data, dops));
 
-                        // Catalog info
-                        CatalogInfo ci = new CatalogInfo(dsName, path, null, type, 1.5f, starGroup.get());
-                        EventManager.instance.post(Events.CATALOG_ADD, ci, true);
+                            // Catalog info
+                            CatalogInfo ci = new CatalogInfo(dsName, path, null, type, 1.5f, starGroup.get());
+                            EventManager.instance.post(Events.CATALOG_ADD, ci, true);
 
-                        logger.info(data.size + " objects loaded");
-                    });
-                    // Sync waiting until the node is in the scene graph
-                    while (sync && (starGroup.get() == null || !starGroup.get().inSceneGraph)) {
-                        sleepFrames(1);
+                            logger.info(data.size + " stars loaded");
+                        });
+                        // Sync waiting until the node is in the scene graph
+                        while (sync && (starGroup.get() == null || !starGroup.get().inSceneGraph)) {
+                            sleepFrames(1);
+                        }
+                    } else {
+                        // PARTICLE GROUP
+                        AtomicReference<ParticleGroup> particleGroup = new AtomicReference<>();
+                        GaiaSky.postRunnable(() -> {
+                            particleGroup.set(ParticleGroup.getParticleGroup(dsName, data, dops));
+
+                            // Catalog info
+                            CatalogInfo ci = new CatalogInfo(dsName, path, null, type, 1.5f, particleGroup.get());
+                            EventManager.instance.post(Events.CATALOG_ADD, ci, true);
+
+                            logger.info(data.size + " particles loaded");
+                        });
+                        // Sync waiting until the node is in the scene graph
+                        while (sync && (particleGroup.get() == null || !particleGroup.get().inSceneGraph)) {
+                            sleepFrames(1);
+                        }
+
                     }
+                    // One extra flush frame
                     sleepFrames(1);
                     return true;
                 } else {
@@ -2354,7 +2418,7 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
                 } else {
                     if (attribute == null)
                         logger.error("Could not find attribute with name '" + attributeName + "'");
-                    if(cmapIndex < 0)
+                    if (cmapIndex < 0)
                         logger.error("Could not find color map with name '" + colorMap + "'");
                 }
             } else {

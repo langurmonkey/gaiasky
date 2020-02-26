@@ -8,8 +8,8 @@ package gaiasky.data.octreegen;
 import com.badlogic.gdx.utils.Array;
 import gaiasky.data.group.BinaryDataProvider;
 import gaiasky.scenegraph.AbstractPositionEntity;
+import gaiasky.scenegraph.ParticleGroup.ParticleBean;
 import gaiasky.scenegraph.StarGroup;
-import gaiasky.scenegraph.StarGroup.StarBean;
 
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -52,8 +52,7 @@ public class StarGroupBinaryIO implements IStarGroupIO {
      * @return A list with a single star group object
      */
     public Array<AbstractPositionEntity> readParticles(InputStream in) {
-        @SuppressWarnings("unchecked")
-        Array<StarBean> data = (Array<StarBean>) provider.loadData(in, 1.0);
+        Array<ParticleBean> data = provider.loadData(in, 1.0);
         StarGroup sg = new StarGroup();
         sg.setData(data);
 

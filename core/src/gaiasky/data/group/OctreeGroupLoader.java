@@ -12,8 +12,8 @@ import gaiasky.data.StreamingOctreeLoader;
 import gaiasky.data.octreegen.MetadataBinaryIO;
 import gaiasky.event.EventManager;
 import gaiasky.event.Events;
+import gaiasky.scenegraph.ParticleGroup.ParticleBean;
 import gaiasky.scenegraph.StarGroup;
-import gaiasky.scenegraph.StarGroup.StarBean;
 import gaiasky.scenegraph.octreewrapper.AbstractOctreeWrapper;
 import gaiasky.scenegraph.octreewrapper.OctreeWrapper;
 import gaiasky.util.CatalogInfo;
@@ -104,7 +104,7 @@ public class OctreeGroupLoader extends StreamingOctreeLoader {
             return false;
         }
         @SuppressWarnings("unchecked")
-        Array<StarBean> data = (Array<StarBean>) particleReader.loadDataMapped(octantFile.path(), 1.0);
+        Array<ParticleBean> data =  particleReader.loadDataMapped(octantFile.path(), 1.0);
         StarGroup sg = StarGroup.getDefaultStarGroup("stargroup-%%SGID%%", data, fullInit);
         sg.setCatalogInfoBare(octreeWrapper.getCatalogInfo());
 

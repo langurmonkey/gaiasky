@@ -723,6 +723,9 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
         }
         ModelCache.cache.dispose();
 
+        // Star group thread pool
+        StarGroup.shutDownThreadPool();
+
         // Scripting
         ScriptingServer.dispose();
 

@@ -613,10 +613,11 @@ public class SceneGraphNode implements IStarContainer, IPosition {
     }
 
     public void dispose() {
-        if (children != null)
+        if (children != null) {
             for (SceneGraphNode child : children) {
                 child.dispose();
             }
+        }
     }
 
     /**

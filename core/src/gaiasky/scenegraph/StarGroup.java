@@ -24,6 +24,7 @@ import com.badlogic.gdx.utils.ObjectIntMap;
 import com.badlogic.gdx.utils.ObjectMap;
 import com.badlogic.gdx.utils.TimeUtils;
 import gaiasky.GaiaSky;
+import gaiasky.data.group.DatasetOptions;
 import gaiasky.data.group.IStarGroupDataProvider;
 import gaiasky.event.EventManager;
 import gaiasky.event.Events;
@@ -49,7 +50,6 @@ import gaiasky.util.gravwaves.RelativisticEffectsManager;
 import gaiasky.util.math.MathUtilsd;
 import gaiasky.util.math.Vector3d;
 import gaiasky.util.time.ITimeFrameProvider;
-import gaiasky.util.tree.OctreeNode;
 import gaiasky.util.ucd.UCD;
 import net.jafama.FastMath;
 
@@ -94,7 +94,6 @@ public class StarGroup extends ParticleGroup implements ILineRenderable, IStarFo
         public static final int I_HIP = 13;
 
         public Long id;
-        public transient OctreeNode octant;
         public String[] names;
 
         public StarBean(double[] data, Long id, String[] names, Map<UCD, Double> extra) {
@@ -160,7 +159,7 @@ public class StarGroup extends ParticleGroup implements ILineRenderable, IStarFo
             return data[I_RADVEL];
         }
 
-        public String namesConcat(){
+        public String namesConcat() {
             return TextUtils.concatenate(Constants.nameSeparator, names);
         }
 
@@ -285,6 +284,21 @@ public class StarGroup extends ParticleGroup implements ILineRenderable, IStarFo
     private static ThreadPoolExecutor pool;
     private static BlockingQueue<Runnable> workQueue;
 
+    public static void shutDownThreadPool(){
+        // Shut down pool
+        if (pool != null && !pool.isShutdown()) {
+            pool.shutdown();
+            try {
+                // Wait for task to end before proceeding
+                pool.awaitTermination(500, TimeUnit.MILLISECONDS);
+            } catch (Exception e) {
+                Logger.getLogger(StarGroup.class.getSimpleName()).error(e);
+            }
+        }
+        if(workQueue != null)
+            workQueue.clear();
+    }
+
     static {
         workQueue = new LinkedBlockingQueue<>();
         int nThreads = !GlobalConf.performance.MULTITHREADING ? 1 : Math.max(1, GlobalConf.performance.NUMBER_THREADS() - 1);
@@ -365,7 +379,7 @@ public class StarGroup extends ParticleGroup implements ILineRenderable, IStarFo
                 factor = 1d;
 
             // Set data, generate index
-            Array<StarBean> l = (Array<StarBean>) provider.loadData(datafile, factor);
+            Array<ParticleBean> l = provider.loadData(datafile, factor);
             this.setData(l);
 
         } catch (Exception e) {
@@ -373,7 +387,10 @@ public class StarGroup extends ParticleGroup implements ILineRenderable, IStarFo
             pointData = null;
         }
 
-        computeFixedMeanPosition();
+        computeMeanPosition();
+
+        if(labelPosition == null)
+            labelPosition.set(pos);
     }
 
     @Override
@@ -406,15 +423,15 @@ public class StarGroup extends ParticleGroup implements ILineRenderable, IStarFo
      * @return The data list
      */
     @SuppressWarnings("unchecked")
-    public Array<StarBean> data() {
-        return (Array<StarBean>) pointData;
+    public Array<ParticleBean> data() {
+        return pointData;
     }
 
-    public void setData(Array<StarBean> pointData) {
+    public void setData(Array<ParticleBean> pointData) {
         setData(pointData, true);
     }
 
-    public void setData(Array<StarBean> pointData, boolean regenerateIndex) {
+    public void setData(Array<ParticleBean> pointData, boolean regenerateIndex) {
         this.pointData = pointData;
         this.N_CLOSEUP_STARS = getNCloseupStars();
 
@@ -452,11 +469,11 @@ public class StarGroup extends ParticleGroup implements ILineRenderable, IStarFo
      * @param pointData The star data
      * @return An map{string,int} mapping names/ids to indexes
      */
-    public ObjectIntMap<String> generateIndex(Array<StarBean> pointData) {
+    public ObjectIntMap<String> generateIndex(Array<? extends ParticleBean> pointData) {
         ObjectIntMap<String> index = new ObjectIntMap<>();
         int n = pointData.size;
         for (int i = 0; i < n; i++) {
-            StarBean sb = pointData.get(i);
+            StarBean sb = (StarBean) pointData.get(i);
             for (String lcname : sb.names) {
                 lcname = lcname.toLowerCase();
                 index.put(lcname, i);
@@ -474,15 +491,6 @@ public class StarGroup extends ParticleGroup implements ILineRenderable, IStarFo
         return index;
     }
 
-    public void computeFixedMeanPosition() {
-        if (!fixedMeanPosition) {
-            // Mean position
-            for (StarBean point : data()) {
-                pos.add(point.x(), point.y(), point.z());
-            }
-            pos.scl(1d / pointData.size);
-        }
-    }
 
     public void update(ITimeFrameProvider time, final Vector3d parentTransform, ICamera camera, float opacity) {
         // Fade node visibility
@@ -948,7 +956,7 @@ public class StarGroup extends ParticleGroup implements ILineRenderable, IStarFo
             return null;
     }
 
-    public String[] getNames(){
+    public String[] getNames() {
         if (focus != null)
             return ((StarBean) focus).names;
         else
@@ -1045,7 +1053,6 @@ public class StarGroup extends ParticleGroup implements ILineRenderable, IStarFo
         default:
             break;
         }
-
     }
 
     @Override
@@ -1194,16 +1201,6 @@ public class StarGroup extends ParticleGroup implements ILineRenderable, IStarFo
         sg.remove(this, true);
         // Unsubscribe from all events
         EventManager.instance.removeAllSubscriptions(this);
-        // Shut down pool
-        if (pool != null && !pool.isShutdown()) {
-            pool.shutdown();
-            try {
-                // Wait for task to end before proceeding
-                pool.awaitTermination(500, TimeUnit.MILLISECONDS);
-            } catch (Exception e) {
-                Logger.getLogger(this.getClass().getSimpleName()).error(e);
-            }
-        }
         // Dispose of GPU datOLO
         EventManager.instance.post(Events.DISPOSE_STAR_GROUP_GPU_MESH, this.offset);
         // Data to be gc'd
@@ -1217,29 +1214,57 @@ public class StarGroup extends ParticleGroup implements ILineRenderable, IStarFo
     }
 
     public float getColor(int index) {
-        return highlighted ? Color.toFloatBits(hlc[0], hlc[1], hlc[2], hlc[3]) : (float) ((Array<StarBean>) pointData).get(index).col();
+        return highlighted ? Color.toFloatBits(hlc[0], hlc[1], hlc[2], hlc[3]) : (float) ((StarBean) pointData.get(index)).col();
     }
 
     /**
-     * Creates a default star vgroup with some sane parameters, given the name and the data
+     * Creates a default star group with some parameters, given the name and data
      *
-     * @param name The name of the star vgroup. Any occurrence of '%%SGID%%' in name will be replaced with the id of the star vgroup
-     * @param data The data of the star vgroup
-     * @return A new star vgroup with sane parameters
+     * @param name The name of the star group. Any occurrence of '%%SGID%%' will be replaced with the id of the star group
+     * @param data The data of the star group
+     * @param dops The dataset options
+     * @return A new star group with the given parameters
      */
-    public static StarGroup getDefaultStarGroup(String name, Array<StarBean> data) {
+    public static StarGroup getStarGroup(String name, Array<ParticleBean> data, DatasetOptions dops) {
+        double[] fadeIn = dops == null || dops.fadeIn == null ? null : dops.fadeIn;
+        double[] fadeOut = dops == null || dops.fadeOut == null ? new double[] { 2e3, 1e5 } : dops.fadeOut;
+        double[] labelColor = dops == null || dops.labelColor == null ? new double[]{1.0, 1.0, 1.0, 1.0} : dops.labelColor;
+
+        StarGroup sg = new StarGroup();
+        sg.setName(name.replace("%%SGID%%", Long.toString(sg.id)));
+        sg.setParent("Universe");
+        sg.setFadein(fadeIn);
+        sg.setFadeout(fadeOut);
+        sg.setLabelcolor(labelColor);
+        sg.setColor(new double[] { 1.0, 1.0, 1.0, 0.25 });
+        sg.setSize(6.0);
+        sg.setLabelposition(new double[] { 0.0, -5.0e7, -4e8 });
+        sg.setCt("Stars");
+        sg.setData(data);
+        sg.doneLoading(null);
+        return sg;
+    }
+
+    /**
+     * Creates a default star group with some sane parameters, given the name and the data
+     *
+     * @param name The name of the star group. Any occurrence of '%%SGID%%' in name will be replaced with the id of the star group
+     * @param data The data of the star group
+     * @return A new star group with sane parameters
+     */
+    public static StarGroup getDefaultStarGroup(String name, Array<ParticleBean> data) {
         return getDefaultStarGroup(name, data, true);
     }
 
     /**
      * Creates a default star vgroup with some sane parameters, given the name and the data
      *
-     * @param name     The name of the star vgroup. Any occurrence of '%%SGID%%' in name will be replaced with the id of the star vgroup
-     * @param data     The data of the star vgroup
-     * @param fullInit Initializes the vgroup right away
-     * @return A new star vgroup with sane parameters
+     * @param name     The name of the star group. Any occurrence of '%%SGID%%' in name will be replaced with the id of the star group
+     * @param data     The data of the star group
+     * @param fullInit Initializes the group right away
+     * @return A new star group with sane parameters
      */
-    public static StarGroup getDefaultStarGroup(String name, Array<StarBean> data, boolean fullInit) {
+    public static StarGroup getDefaultStarGroup(String name, Array<ParticleBean> data, boolean fullInit) {
         StarGroup sg = new StarGroup();
         sg.setName(name.replace("%%SGID%%", Long.toString(sg.id)));
         sg.setParent("Universe");

@@ -24,12 +24,12 @@ import java.nio.channels.FileChannel;
 public class BinaryDataProvider extends AbstractStarGroupDataProvider {
 
     @Override
-    public Array<? extends ParticleBean> loadData(String file) {
+    public Array<ParticleBean> loadData(String file) {
         return loadData(file, 1d);
     }
 
     @Override
-    public Array<? extends ParticleBean> loadData(String file, double factor) {
+    public Array<ParticleBean> loadData(String file, double factor) {
         logger.info(I18n.bundle.format("notif.datafile", file));
         loadDataMapped(file, factor);
         logger.info(I18n.bundle.format("notif.nodeloader", list.size, file));
@@ -38,19 +38,19 @@ public class BinaryDataProvider extends AbstractStarGroupDataProvider {
     }
 
     @Override
-    public Array<? extends ParticleBean> loadData(InputStream is, double factor) {
+    public Array<ParticleBean> loadData(InputStream is, double factor) {
         list = readData(is);
         return list;
     }
 
-    public void writeData(Array<StarBean> data, OutputStream out) {
+    public void writeData(Array<? extends ParticleBean> data, OutputStream out) {
         // Wrap the FileOutputStream with a DataOutputStream
         DataOutputStream data_out = new DataOutputStream(out);
         try {
             // Size of stars
             data_out.writeInt(data.size);
-            for (StarBean sb : data) {
-                writeStarBean(sb, data_out);
+            for (ParticleBean sb : data) {
+                writeStarBean((StarBean) sb, data_out);
             }
 
         } catch (Exception e) {
@@ -89,8 +89,8 @@ public class BinaryDataProvider extends AbstractStarGroupDataProvider {
         out.writeChars(namesConcat);
     }
 
-    public Array<StarBean> readData(InputStream in) {
-        Array<StarBean> data = null;
+    public Array<ParticleBean> readData(InputStream in) {
+        Array<ParticleBean> data = null;
         DataInputStream data_in = new DataInputStream(in);
 
         try {
@@ -145,7 +145,7 @@ public class BinaryDataProvider extends AbstractStarGroupDataProvider {
         return new StarBean(data, id, names);
     }
 
-    public Array<? extends ParticleBean> loadDataMapped(String file, double factor) {
+    public Array<ParticleBean> loadDataMapped(String file, double factor) {
         try {
             FileChannel fc = new RandomAccessFile(GlobalConf.data.dataFile(file), "r").getChannel();
 

@@ -8,6 +8,7 @@ package gaiasky.data.octreegen.generator;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.LongMap;
 import gaiasky.data.octreegen.StarBrightnessComparator;
+import gaiasky.scenegraph.ParticleGroup.ParticleBean;
 import gaiasky.scenegraph.StarGroup;
 import gaiasky.scenegraph.StarGroup.StarBean;
 import gaiasky.util.math.BoundingBoxd;
@@ -28,7 +29,7 @@ import java.util.*;
 public class OctreeGeneratorMag implements IOctreeGenerator {
 
     private OctreeGeneratorParams params;
-    private Comparator<StarBean> comp;
+    private Comparator<ParticleBean> comp;
     private OctreeNode root;
 
     public OctreeGeneratorMag(OctreeGeneratorParams params) {
@@ -37,14 +38,14 @@ public class OctreeGeneratorMag implements IOctreeGenerator {
     }
 
     @Override
-    public OctreeNode generateOctree(Array<StarBean> catalog) {
+    public OctreeNode generateOctree(Array<ParticleBean> catalog) {
         root = IOctreeGenerator.startGeneration(catalog, params);
 
         // Holds all octree nodes indexed by id
-        LongMap<OctreeNode> idMap = new LongMap<OctreeNode>();
+        LongMap<OctreeNode> idMap = new LongMap<>();
         idMap.put(root.pageId, root);
 
-        Map<OctreeNode, Array<StarBean>> sbMap = new HashMap<OctreeNode, Array<StarBean>>();
+        Map<OctreeNode, Array<ParticleBean>> sbMap = new HashMap<>();
 
         logger.info("Sorting source catalog with " + catalog.size + " stars");
         catalog.sort(comp);
@@ -55,7 +56,7 @@ public class OctreeGeneratorMag implements IOctreeGenerator {
             logger.info("Generating level " + level + " (" + (catalog.size - catalogIndex) + " stars left)");
             while (catalogIndex < catalog.size) {
                 // Add star beans to octants till we reach max capacity
-                StarBean sb = catalog.get(catalogIndex++);
+                StarBean sb = (StarBean) catalog.get(catalogIndex++);
                 double x = sb.data[StarBean.I_X];
                 double y = sb.data[StarBean.I_Y];
                 double z = sb.data[StarBean.I_Z];
@@ -100,8 +101,8 @@ public class OctreeGeneratorMag implements IOctreeGenerator {
             for (int i = n - 1; i >= 0; i--) {
                 OctreeNode current = (OctreeNode) nodes[i];
                 if (current.parent != null && sbMap.containsKey(current) && sbMap.containsKey(current.parent)) {
-                    Array<StarBean> childrenArr = sbMap.get(current);
-                    Array<StarBean> parentArr = sbMap.get(current.parent);
+                    Array<ParticleBean> childrenArr = sbMap.get(current);
+                    Array<ParticleBean> parentArr = sbMap.get(current.parent);
                     if (childrenArr.size <= params.childCount && parentArr.size <= params.parentCount) {
                         // Merge children nodes with parent nodes, remove children
                         parentArr.addAll(childrenArr);
@@ -121,7 +122,7 @@ public class OctreeGeneratorMag implements IOctreeGenerator {
         // Tree is ready, create star groups
         Set<OctreeNode> nodes = sbMap.keySet();
         for (OctreeNode node : nodes) {
-            Array<StarBean> list = sbMap.get(node);
+            Array<ParticleBean> list = sbMap.get(node);
             StarGroup sg = new StarGroup();
             sg.setData(list, false);
             node.add(sg);
@@ -191,12 +192,12 @@ public class OctreeGeneratorMag implements IOctreeGenerator {
         return current;
     }
 
-    private int addStarToNode(StarBean sb, OctreeNode node, Map<OctreeNode, Array<StarBean>> map) {
+    private int addStarToNode(StarBean sb, OctreeNode node, Map<OctreeNode, Array<ParticleBean>> map) {
         if (!map.containsKey(node)) {
             // Array of a fraction of max part (four array resizes gives max part)
-            map.put(node, new Array<StarBean>((int) Math.round(this.params.maxPart * 0.10662224073)));
+            map.put(node, new Array<>((int) Math.round(this.params.maxPart * 0.10662224073)));
         }
-        Array<StarBean> array = map.get(node);
+        Array<ParticleBean> array = map.get(node);
         array.add(sb);
         return array.size;
     }

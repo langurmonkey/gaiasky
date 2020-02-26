@@ -1697,7 +1697,7 @@ public interface IScriptingInterface {
     void unparkRunnable(String id);
 
     /**
-     * Loads a VOTable file (<code>.vot</code>) with a given name.
+     * Loads a VOTable file (<code>.vot</code>) of stars with a given name.
      * In this version, the loading happens synchronously, so the catalog is available to Gaia Sky immediately after
      * this call returns.
      * The actual loading process is carried out
@@ -1713,7 +1713,7 @@ public interface IScriptingInterface {
     boolean loadDataset(String dsName, String path);
 
     /**
-     * Loads a VOTable file (<code>.vot</code>) with a given name.
+     * Loads a VOTable file (<code>.vot</code>) of stars with a given name.
      * The call can be made synchronous or asynchronous.<br/>
      * If <code>sync</code> is true, the call acts exactly like
      * {@link IScriptingInterface#loadDataset(String, String)}.<br/>
@@ -1731,6 +1731,46 @@ public interface IScriptingInterface {
      * @return False if the dataset could not be loaded (sync mode). True if it could not be loaded (sync mode), or <code>sync</code> is false
      */
     boolean loadDataset(String dsName, String path, boolean sync);
+
+    /**
+     * Loads a star dataset from a VOTable file (<code>.vot</code>).
+     * The call can be made synchronous or asynchronous.<br/>
+     * If <code>sync</code> is true, the call acts exactly like
+     * {@link IScriptingInterface#loadDataset(String, String)}.<br/>
+     * If <code>sync</code> is false, the loading happens in a new thread and
+     * the call returns immediately. It includes some parameters to apply to the new star group.
+     * @param dsName The name of the dataset
+     * @param path Aboslute path (or relative to the working path of Gaia Sky) to the <code>.vot</code> file to load
+     * @param magnitudeScale Scale factor to apply to the star magnitudes
+     * @param labelColor The color of the dataset label
+     * @param fadeIn Two values which represent the fade in mapping distances (in parsecs, as distance from camera to the Sun) of this dataset
+     * @param fadeOut Two values which represent the fade out mapping distances (in parsecs, as distance from camera to the Sun) of this dataset
+     * @param sync   Whether the load must happen synchronously or asynchronously
+     * @return False if the dataset could not be loaded (sync mode). True if it could not be loaded (sync mode), or <code>sync</code> is false
+     */
+    boolean loadStarDataset(String dsName, String path, double magnitudeScale, double[] labelColor, double[] fadeIn, double[] fadeOut, boolean sync);
+
+    /**
+     * Loads a particle dataset (only positions and extra attributes) from a VOTable file (<code>.vot</code>).
+     * The call can be made synchronous or asynchronous.<br/>
+     * If <code>sync</code> is true, the call acts exactly like
+     * {@link IScriptingInterface#loadDataset(String, String)}.<br/>
+     * If <code>sync</code> is false, the loading happens in a new thread and
+     * the call returns immediately. It includes some parameters to apply to the new star group.
+     * @param dsName The name of the dataset
+     * @param path Aboslute path (or relative to the working path of Gaia Sky) to the <code>.vot</code> file to load
+     * @param profileDecay The profile decay of the particles as in 1 - distCentre^decay
+     * @param particleColor The base color of the particles
+     * @param colorNoise In [0,1], the noise to apply to the color
+     * @param labelColor The color of the dataset label
+     * @param particleSize The size of the particles
+     * @param ct The name of the component type to use (see {@link gaiasky.render.ComponentTypes.ComponentType})
+     * @param fadeIn Two values which represent the fade in mapping distances (in parsecs, as distance from camera to the Sun) of this dataset
+     * @param fadeOut Two values which represent the fade out mapping distances (in parsecs, as distance from camera to the Sun) of this dataset
+     * @param sync   Whether the load must happen synchronously or asynchronously
+     * @return False if the dataset could not be loaded (sync mode). True if it could not be loaded (sync mode), or <code>sync</code> is false
+     */
+    boolean loadParticleDataset(String dsName, String path, double profileDecay, double[] particleColor, double colorNoise, double[] labelColor, double particleSize, String ct, double[] fadeIn, double[] fadeOut, boolean sync);
 
     /**
      * Removes the dataset identified by the given name, if it exists

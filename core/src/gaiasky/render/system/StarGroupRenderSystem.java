@@ -110,7 +110,7 @@ public class StarGroupRenderSystem extends ImmediateRenderSystem implements IObs
                             int nadded = 0;
                             for (int i = 0; i < n; i++) {
                                 if (starGroup.filter(i)) {
-                                    StarBean sb = starGroup.data().get(i);
+                                    StarBean sb = (StarBean) starGroup.data().get(i);
                                     // COLOR
                                     if(hlCmap){
                                         // Color map

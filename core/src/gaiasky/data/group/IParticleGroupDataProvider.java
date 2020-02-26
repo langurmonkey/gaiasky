@@ -22,7 +22,7 @@ public interface IParticleGroupDataProvider {
      * @param file The file to load
      * @return Array of particle beans
      */
-    Array<? extends ParticleBean> loadData(String file);
+    Array<ParticleBean> loadData(String file);
 
     /**
      * Loads the data applying a factor using a memory mapped file for improved speed.
@@ -31,7 +31,7 @@ public interface IParticleGroupDataProvider {
      * @param factor Factor to apply to the positions
      * @return Array of particle beans
      */
-    Array<? extends ParticleBean> loadDataMapped(String file, double factor);
+    Array<ParticleBean> loadDataMapped(String file, double factor);
 
     /**
      * Loads the data applying a factor.
@@ -40,7 +40,7 @@ public interface IParticleGroupDataProvider {
      * @param factor Factor to apply to the positions
      * @return Array of particle beans
      */
-    Array<? extends ParticleBean> loadData(String file, double factor);
+    Array<ParticleBean> loadData(String file, double factor);
 
     /**
      * Loads the data applying a factor.
@@ -49,7 +49,7 @@ public interface IParticleGroupDataProvider {
      * @param factor Factor to apply to the positions
      * @return Array of particle beans
      */
-    Array<? extends ParticleBean> loadData(InputStream is, double factor);
+    Array<ParticleBean> loadData(InputStream is, double factor);
 
     /**
      * Sets a cap on the number of files to load. Set to 0 or negative for

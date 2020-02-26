@@ -26,6 +26,14 @@ public class IntValidator extends CallbackValidator {
         this.max = max;
     }
 
+    public int getMin() {
+        return min;
+    }
+
+    public int getMax() {
+        return max;
+    }
+
     @Override
     protected boolean validateLocal(String value) {
         Integer val = null;

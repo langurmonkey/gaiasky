@@ -10,13 +10,20 @@ import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.TextField;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener.ChangeEvent;
 import com.badlogic.gdx.scenes.scene2d.utils.FocusListener.FocusEvent;
+import gaiasky.util.I18n;
+import gaiasky.util.parse.Parser;
+import gaiasky.util.validator.CallbackValidator;
+import gaiasky.util.validator.FloatValidator;
 import gaiasky.util.validator.IValidator;
+import gaiasky.util.validator.IntValidator;
+
+import static gaiasky.util.GlobalResources.skin;
 
 /**
  * TextButton in which the cursor changes when the mouse rolls over.
  * It also fixes the size issue.
- * @author Toni Sagrista
  *
+ * @author Toni Sagrista
  */
 public class OwnTextField extends TextField {
 
@@ -56,6 +63,11 @@ public class OwnTextField extends TextField {
         initValidator();
     }
 
+    public void setValidator(IValidator validator) {
+        this.validator = validator;
+        initValidator();
+    }
+
     public void setErrorColor(Color errorColor) {
         this.errorColor = errorColor;
     }
@@ -64,10 +76,32 @@ public class OwnTextField extends TextField {
      * Checks the validity of the value. If the text field has no validator, all
      * values are valid. If it has a validator, it checks whether the value
      * is ok
+     *
      * @return True if the value is valid or the text field has no validator, false otherwise
      */
-    public boolean isValid(){
+    public boolean isValid() {
         return this.validator == null || this.validator.validate(this.getText());
+    }
+
+    public float getFloatValue(float defaultValue){
+        return (float) getDoubleValue(defaultValue);
+    }
+    public double getDoubleValue(double defaultValue){
+        try{
+            return Parser.parseFloatException(getText());
+        } catch(Exception e){
+            return defaultValue;
+        }
+    }
+    public long getIntValue(int defaultValue){
+        return (int) getLongValue(defaultValue);
+    }
+    public long getLongValue(long defaultValue){
+        try{
+            return Parser.parseLongException(getText());
+        }catch(Exception e){
+            return defaultValue;
+        }
     }
 
     private void initValidator() {
@@ -98,7 +132,29 @@ public class OwnTextField extends TextField {
                 }
                 return false;
             });
+            addValidatorTooltip();
         }
+    }
+
+    private void addValidatorTooltip() {
+        addValidatorTooltip(validator);
+    }
+
+    private void addValidatorTooltip(IValidator validator) {
+        if (validator != null) {
+            if (validator instanceof FloatValidator) {
+                FloatValidator fv = (FloatValidator) validator;
+                addListener(new OwnTextTooltip(I18n.txt("gui.validator.values", fv.getMin(), fv.getMax()), skin));
+            } else if (validator instanceof IntValidator) {
+                IntValidator iv = (IntValidator) validator;
+                addListener(new OwnTextTooltip(I18n.txt("gui.validator.values", iv.getMin(), iv.getMax()), skin));
+            }
+            if (validator instanceof CallbackValidator) {
+                CallbackValidator cv = (CallbackValidator) validator;
+                addValidatorTooltip(cv.getParent());
+            }
+        }
+
     }
 
     @Override

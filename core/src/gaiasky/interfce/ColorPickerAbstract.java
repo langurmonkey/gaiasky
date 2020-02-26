@@ -8,7 +8,6 @@ package gaiasky.interfce;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
-import gaiasky.util.CatalogInfo;
 
 public abstract class ColorPickerAbstract extends Image {
     protected Stage stage;
@@ -16,14 +15,12 @@ public abstract class ColorPickerAbstract extends Image {
     protected Runnable newColorRunnable, newColormapRunnable;
     protected float[] color;
     protected String name;
-    protected CatalogInfo catalogInfo;
 
-    protected ColorPickerAbstract(String name, CatalogInfo ci, Stage stage, Skin skin) {
+    protected ColorPickerAbstract(String name, Stage stage, Skin skin) {
         super(skin.getDrawable("white"));
         this.name = name;
         this.skin = skin;
         this.stage = stage;
-        this.catalogInfo = ci;
     }
 
     protected abstract void initialize();

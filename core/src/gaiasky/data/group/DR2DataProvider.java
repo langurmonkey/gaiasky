@@ -95,12 +95,12 @@ public class DR2DataProvider extends AbstractStarGroupDataProvider {
         fileNumberCap = cap;
     }
 
-    public Array<StarBean> loadData(String file) {
+    public Array<ParticleBean> loadData(String file) {
         return loadData(file, 1d);
     }
 
 
-    public Array<StarBean> loadData(String file, double factor) {
+    public Array<ParticleBean> loadData(String file, double factor) {
         initLists(10000000);
 
         FileHandle f = GlobalConf.data.dataFileHandle(file);
@@ -131,7 +131,7 @@ public class DR2DataProvider extends AbstractStarGroupDataProvider {
         return list;
     }
 
-    public Array<StarBean> loadData(InputStream is, double factor) {
+    public Array<ParticleBean> loadData(InputStream is, double factor) {
         initLists(100000);
 
         loadFileIs(is, factor, new LongWrap(0l), new LongWrap(0l));
@@ -351,7 +351,7 @@ public class DR2DataProvider extends AbstractStarGroupDataProvider {
     }
 
     @Override
-    public Array<? extends ParticleBean> loadDataMapped(String file, double factor) {
+    public Array<ParticleBean> loadDataMapped(String file, double factor) {
         return loadDataMapped(file, factor, -1, -1);
     }
 
@@ -364,7 +364,7 @@ public class DR2DataProvider extends AbstractStarGroupDataProvider {
      * @param fileNumber
      * @return
      */
-    public Array<? extends ParticleBean> loadDataMapped(String file, double factor, int fileNumber, long totalFiles) {
+    public Array<ParticleBean> loadDataMapped(String file, double factor, int fileNumber, long totalFiles) {
         boolean gz = file.endsWith(".gz");
         String fileName = file.substring(file.lastIndexOf('/') + 1);
         FileChannel fc = null;

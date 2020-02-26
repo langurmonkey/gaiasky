@@ -49,6 +49,9 @@ public class STILDataProvider extends AbstractStarGroupDataProvider {
     private static Log logger = Logger.getLogger(STILDataProvider.class);
     private StarTableFactory factory;
     private long starid = 10000000;
+    // Dataset options, may be null
+    private DatasetOptions dops;
+
 
     public STILDataProvider() {
         super();
@@ -59,13 +62,17 @@ public class STILDataProvider extends AbstractStarGroupDataProvider {
         initLists();
     }
 
+    public void setDatasetOptions(DatasetOptions dops){
+        this.dops = dops;
+    }
+
     @Override
-    public Array<? extends ParticleBean> loadData(String file) {
+    public Array<ParticleBean> loadData(String file) {
         return loadData(file, 1.0f);
     }
 
     @Override
-    public Array<? extends ParticleBean> loadData(String file, double factor) {
+    public Array<ParticleBean> loadData(String file, double factor) {
         logger.info(I18n.bundle.format("notif.datafile", file));
         try {
             loadData(new FileDataSource(GlobalConf.data.dataFile(file)), factor);
@@ -204,6 +211,10 @@ public class STILDataProvider extends AbstractStarGroupDataProvider {
                             // Default magnitude
                             appmag = 15;
                         }
+                        // Scale magnitude if needed
+                        double magscl = (dops != null && dops.type == DatasetOptions.DatasetLoadType.STARS) ? dops.magnitudeScale : 1f;
+                        appmag /= magscl;
+
                         double absmag = (appmag - 2.5 * Math.log10(Math.pow(distpc / 10.0, 2.0)));
                         double flux = Math.pow(10, -absmag / 2.5);
                         double sizeFactor = Nature.PC_TO_M * Constants.ORIGINAL_M_TO_U * 0.16;
@@ -279,44 +290,44 @@ public class STILDataProvider extends AbstractStarGroupDataProvider {
                         colors.put(id, rgb);
                         sphericalPositions.put(id, new double[] { sph.x, sph.y, sph.z });
 
-                        double[] point = new double[StarBean.SIZE + 3];
-                        point[StarBean.I_HIP] = hip;
-                        //point[StarBean.I_TYC1] = -1;
-                        //point[StarBean.I_TYC2] = -1;
-                        //point[StarBean.I_TYC3] = -1;
-                        point[StarBean.I_X] = p.gsposition.x;
-                        point[StarBean.I_Y] = p.gsposition.y;
-                        point[StarBean.I_Z] = p.gsposition.z;
-                        point[StarBean.I_PMX] = pm.x;
-                        point[StarBean.I_PMY] = pm.y;
-                        point[StarBean.I_PMZ] = pm.z;
-                        point[StarBean.I_MUALPHA] = mualphastar;
-                        point[StarBean.I_MUDELTA] = mudelta;
-                        point[StarBean.I_RADVEL] = radvel;
-                        point[StarBean.I_COL] = col;
-                        point[StarBean.I_SIZE] = size;
-                        //point[StarBean.I_RADIUS] = radius;
-                        //point[StarBean.I_TEFF] = teff;
-                        point[StarBean.I_APPMAG] = appmag;
-                        point[StarBean.I_ABSMAG] = absmag;
+                        if(dops == null || dops.type == DatasetOptions.DatasetLoadType.STARS) {
+                            double[] point = new double[StarBean.SIZE + 3];
+                            point[StarBean.I_HIP] = hip;
+                            point[StarBean.I_X] = p.gsposition.x;
+                            point[StarBean.I_Y] = p.gsposition.y;
+                            point[StarBean.I_Z] = p.gsposition.z;
+                            point[StarBean.I_PMX] = pm.x;
+                            point[StarBean.I_PMY] = pm.y;
+                            point[StarBean.I_PMZ] = pm.z;
+                            point[StarBean.I_MUALPHA] = mualphastar;
+                            point[StarBean.I_MUDELTA] = mudelta;
+                            point[StarBean.I_RADVEL] = radvel;
+                            point[StarBean.I_COL] = col;
+                            point[StarBean.I_SIZE] = size;
+                            point[StarBean.I_APPMAG] = appmag;
+                            point[StarBean.I_ABSMAG] = absmag;
 
-                        // Extra
-                        Map<UCD, Double> extraAttributes = null;
-                        for (UCD extra : ucdp.extra) {
-                            Double val = Double.NaN;
-                            try {
-                                val = ((Number) row[extra.index]).doubleValue();
-                            } catch (Exception e) {
-                            }
-                            if(extraAttributes == null)
-                                extraAttributes = new HashMap<>();
-                            extraAttributes.put(extra, val);
+                            // Extra
+                            Map<UCD, Double> extraAttributes = addExtraAttributes(ucdp, row);
+
+                            StarBean sb = new StarBean(point, id, names, extraAttributes);
+                            list.add(sb);
+
+                            int appclmp = (int) MathUtilsd.clamp(appmag, 0, 21);
+                            countsPerMag[appclmp] += 1;
+                        } else if(dops.type == DatasetOptions.DatasetLoadType.PARTICLES){
+                            double[] point = new double[3];
+                            point[ParticleBean.I_X] = p.gsposition.x;
+                            point[ParticleBean.I_Y] = p.gsposition.y;
+                            point[ParticleBean.I_Z] = p.gsposition.z;
+
+                            // Extra
+                            Map<UCD, Double> extraAttributes = addExtraAttributes(ucdp, row);
+
+                            ParticleBean pb = new ParticleBean(point, extraAttributes);
+                            list.add(pb);
                         }
-                        StarBean sb = new StarBean(point, id, names, extraAttributes);
-                        list.add(sb);
 
-                        int appclmp = (int) MathUtilsd.clamp(appmag, 0, 21);
-                        countsPerMag[appclmp] += 1;
                     } catch (Exception e) {
                         logger.debug(e);
                         logger.debug("Exception parsing row " + i + ": skipping");
@@ -334,14 +345,30 @@ public class STILDataProvider extends AbstractStarGroupDataProvider {
         return list;
     }
 
+    private Map<UCD, Double> addExtraAttributes(UCDParser ucdp, Object[] row){
+        // Extra
+        Map<UCD, Double> extraAttributes = null;
+        for (UCD extra : ucdp.extra) {
+            Double val = Double.NaN;
+            try {
+                val = ((Number) row[extra.index]).doubleValue();
+            } catch (Exception e) {
+            }
+            if (extraAttributes == null)
+                extraAttributes = new HashMap<>();
+            extraAttributes.put(extra, val);
+        }
+        return extraAttributes;
+    }
+
     @Override
-    public Array<? extends ParticleBean> loadData(InputStream is, double factor) {
+    public Array<ParticleBean> loadData(InputStream is, double factor) {
         // TODO Auto-generated method stub
         return null;
     }
 
     @Override
-    public Array<? extends ParticleBean> loadDataMapped(String file, double factor) {
+    public Array<ParticleBean> loadDataMapped(String file, double factor) {
         return null;
     }
 

@@ -10,8 +10,8 @@ import gaiasky.data.group.STILDataProvider;
 import gaiasky.event.EventManager;
 import gaiasky.event.Events;
 import gaiasky.event.IObserver;
+import gaiasky.scenegraph.ParticleGroup.ParticleBean;
 import gaiasky.scenegraph.StarGroup;
-import gaiasky.scenegraph.StarGroup.StarBean;
 import gaiasky.scenegraph.camera.CameraManager.CameraMode;
 import gaiasky.util.CatalogInfo;
 import gaiasky.util.CatalogInfo.CatalogInfoType;
@@ -207,7 +207,7 @@ public class SAMPClient implements IObserver {
 
         try {
             DataSource ds = new URLDataSource(new URL(url));
-            @SuppressWarnings("unchecked") Array<StarBean> data = (Array<StarBean>) provider.loadData(ds, 1.0f);
+            @SuppressWarnings("unchecked") Array<ParticleBean> data = (Array<ParticleBean>) provider.loadData(ds, 1.0f);
 
             if (data != null && data.size > 0) {
                 StarGroup sg = StarGroup.getDefaultStarGroup(id, data);

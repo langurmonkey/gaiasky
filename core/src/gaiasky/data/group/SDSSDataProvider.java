@@ -20,7 +20,6 @@ import java.io.*;
 import java.nio.CharBuffer;
 import java.nio.MappedByteBuffer;
 import java.nio.channels.FileChannel;
-import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 
 /**
@@ -42,7 +41,7 @@ public class SDSSDataProvider implements IParticleGroupDataProvider {
     }
 
     @Override
-    public Array<? extends ParticleBean> loadData(InputStream is, double factor) {
+    public Array<ParticleBean> loadData(InputStream is, double factor) {
         Array<ParticleBean> pointData = new Array<>();
 
         try {
@@ -93,7 +92,7 @@ public class SDSSDataProvider implements IParticleGroupDataProvider {
     }
 
     @Override
-    public Array<? extends ParticleBean> loadDataMapped(String file, double factor) {
+    public Array<ParticleBean> loadDataMapped(String file, double factor) {
         Array<ParticleBean> pointData = new Array<>();
 
         try {

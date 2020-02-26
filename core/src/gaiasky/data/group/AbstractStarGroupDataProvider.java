@@ -8,6 +8,7 @@ package gaiasky.data.group;
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.LongMap;
+import gaiasky.scenegraph.ParticleGroup.ParticleBean;
 import gaiasky.scenegraph.StarGroup.StarBean;
 import gaiasky.util.Constants;
 import gaiasky.util.LargeLongMap;
@@ -33,7 +34,7 @@ public abstract class AbstractStarGroupDataProvider implements IStarGroupDataPro
     protected static Log logger = Logger.getLogger(AbstractStarGroupDataProvider.class);
     public static double NEGATIVE_DIST = 1 * Constants.M_TO_U;
 
-    protected Array<StarBean> list;
+    protected Array<ParticleBean> list;
     protected LongMap<double[]> sphericalPositions;
     protected LongMap<float[]> colors;
     protected long[] countsPerMag;
