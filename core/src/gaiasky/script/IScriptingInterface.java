@@ -1735,12 +1735,11 @@ public interface IScriptingInterface {
     /**
      * Loads a star dataset from a VOTable file (<code>.vot</code>).
      * The call can be made synchronous or asynchronous.<br/>
-     * If <code>sync</code> is true, the call acts exactly like
-     * {@link IScriptingInterface#loadDataset(String, String)}.<br/>
+     * If <code>sync</code> is true, the call waits until the dataset is loaded and then returns.
      * If <code>sync</code> is false, the loading happens in a new thread and
      * the call returns immediately. It includes some parameters to apply to the new star group.
      * @param dsName The name of the dataset
-     * @param path Aboslute path (or relative to the working path of Gaia Sky) to the <code>.vot</code> file to load
+     * @param path Absolute path (or relative to the working path of Gaia Sky) to the <code>.vot</code> file to load
      * @param magnitudeScale Scale factor to apply to the star magnitudes
      * @param labelColor The color of the dataset label
      * @param fadeIn Two values which represent the fade in mapping distances (in parsecs, as distance from camera to the Sun) of this dataset
@@ -1753,15 +1752,14 @@ public interface IScriptingInterface {
     /**
      * Loads a particle dataset (only positions and extra attributes) from a VOTable file (<code>.vot</code>).
      * The call can be made synchronous or asynchronous.<br/>
-     * If <code>sync</code> is true, the call acts exactly like
-     * {@link IScriptingInterface#loadDataset(String, String)}.<br/>
+     * If <code>sync</code> is true, the call waits until the dataset is loaded and then returns.
      * If <code>sync</code> is false, the loading happens in a new thread and
      * the call returns immediately. It includes some parameters to apply to the new star group.
      * @param dsName The name of the dataset
-     * @param path Aboslute path (or relative to the working path of Gaia Sky) to the <code>.vot</code> file to load
+     * @param path Absolute path (or relative to the working path of Gaia Sky) to the <code>.vot</code> file to load
      * @param profileDecay The profile decay of the particles as in 1 - distCentre^decay
      * @param particleColor The base color of the particles
-     * @param colorNoise In [0,1], the noise to apply to the color
+     * @param colorNoise In [0,1], the noise to apply to the color so that each particle gets a slightly different tone. Set to 0 so that all particles get the same color
      * @param labelColor The color of the dataset label
      * @param particleSize The size of the particles
      * @param ct The name of the component type to use (see {@link gaiasky.render.ComponentTypes.ComponentType})
