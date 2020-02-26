@@ -37,7 +37,7 @@ public interface IScriptingInterface {
      * Pre-loads the given image as a texture for later use. The texture will
      * be cached for later use.
      *
-     * @param path The path of the image file to preload
+     * @param path The path of the image file to preload.
      */
     void preloadTexture(String path);
 
@@ -76,7 +76,7 @@ public interface IScriptingInterface {
     void clearHeadlineMessage();
 
     /**
-     * Clears the subhead message
+     * Clears the subhead message.
      */
     void clearSubheadMessage();
 
@@ -268,9 +268,9 @@ public interface IScriptingInterface {
     /**
      * Whether to look for the focus constantly when in focus mode and center it
      * in the view or whether the view must be free. Use True to center the focus
-     * (default behaviour) and False to set it to a free view
+     * (default behaviour) and False to set it to a free view.
      *
-     * @param centerFocus Whether to center the focus or not
+     * @param centerFocus Whether to center the focus or not.
      */
     void setCameraCenterFocus(boolean centerFocus);
 
@@ -278,7 +278,7 @@ public interface IScriptingInterface {
      * Locks or unlocks the orientation of the camera to the focus object's
      * rotation.
      *
-     * @param lock Whether to lock or unlock the camera orientation to the focus
+     * @param lock Whether to lock or unlock the camera orientation to the focus.
      */
     void setCameraOrientationLock(boolean lock);
 
@@ -328,9 +328,9 @@ public interface IScriptingInterface {
      * Sets the camera position to the given coordinates, in Km, equatorial
      * system.
      *
-     * @param x The x component
-     * @param y The y component
-     * @param z The z component
+     * @param x The x component.
+     * @param y The y component.
+     * @param z The z component.
      */
     void setCameraPosition(double x, double y, double z);
 
@@ -376,33 +376,33 @@ public interface IScriptingInterface {
      * <code>rotation</code> degrees around <code>focus<code> using the camera
      * up vector as a rotation axis.
      *
-     * @param focus     The name of the focus object
+     * @param focus     The name of the focus object.
      * @param other     The name of the other object, to the fine a line from this to
-     *                  foucs. Usually a light source
-     * @param rotation  The rotation angle, in degrees
+     *                  foucs. Usually a light source.
+     * @param rotation  The rotation angle, in degrees.
      * @param viewAngle The view angle which determines the distance, in degrees.
      */
     void setCameraPositionAndFocus(String focus, String other, double rotation, double viewAngle);
 
     /**
-     * Sets the camera in free mode and points it to the given coordinates in equatorial system
+     * Sets the camera in free mode and points it to the given coordinates in equatorial system.
      *
-     * @param ra  Right ascension in degrees
-     * @param dec Declination in degrees
+     * @param ra  Right ascension in degrees.
+     * @param dec Declination in degrees.
      */
     void pointAtSkyCoordinate(double ra, double dec);
 
     /**
-     * Changes the speed multiplier of the camera and its acceleration
+     * Changes the speed multiplier of the camera and its acceleration.
      *
-     * @param speed The new speed, from 0 to 100
+     * @param speed The new speed, from 0 to 100.
      */
     void setCameraSpeed(float speed);
 
     /**
-     * Gets the current physical speed of the camera in km/h
+     * Gets the current physical speed of the camera in km/h.
      *
-     * @return The current speed of the camera in km/h
+     * @return The current speed of the camera in km/h.
      */
     double getCameraSpeed();
 
@@ -493,7 +493,7 @@ public interface IScriptingInterface {
      * Adds a yaw to the camera. Same as {@link #cameraTurn(double, double)} with
      * deltaY set to zero.
      *
-     * @param amount
+     * @param amount The amount.
      */
     void cameraYaw(double amount);
 
@@ -501,7 +501,7 @@ public interface IScriptingInterface {
      * Adds a pitch to the camera. Same as {@link #cameraTurn(double, double)} with
      * deltaX set to zero.
      *
-     * @param amount
+     * @param amount The amount.
      */
     void cameraPitch(double amount);
 
@@ -520,7 +520,7 @@ public interface IScriptingInterface {
      * Returns the closest object to the camera in this instant as a
      * {@link gaiasky.scenegraph.IFocus}.
      *
-     * @return The closest object to the camera
+     * @return The closest object to the camera.
      */
     IFocus getClosestObjectToCamera();
 
@@ -534,20 +534,20 @@ public interface IScriptingInterface {
     /**
      * Sets the camera state (position, direction and up vector).
      *
-     * @param pos The position of the camera in internal units, not Km
-     * @param dir The direction of the camera
-     * @param up  The up vector of the camera
+     * @param pos The position of the camera in internal units, not Km.
+     * @param dir The direction of the camera.
+     * @param up  The up vector of the camera.
      */
     void setCameraState(double[] pos, double[] dir, double[] up);
 
     /**
      * Sets the camera state (position, direction and up vector) plus the current time.
      *
-     * @param pos  The position of the camera in internal units, not Km
-     * @param dir  The direction of the camera
-     * @param up   The up vector of the camera
+     * @param pos  The position of the camera in internal units, not Km.
+     * @param dir  The direction of the camera.
+     * @param up   The up vector of the camera.
      * @param time The new time of the camera as the
-     *             number of milliseconds since the epoch (Jan 1, 1970)
+     *             number of milliseconds since the epoch (Jan 1, 1970).
      */
     void setCameraStateAndTime(double[] pos, double[] dir, double[] up, long time);
 
@@ -564,28 +564,28 @@ public interface IScriptingInterface {
     /**
      * Sets the label size factor. The label size will be multiplied by this.
      *
-     * @param factor Factor in {@link Constants#MIN_LABEL_SIZE} and {@link Constants#MAX_LABEL_SIZE}
+     * @param factor Factor in {@link Constants#MIN_LABEL_SIZE} and {@link Constants#MAX_LABEL_SIZE}.
      */
     void setLabelSizeFactor(float factor);
 
     /**
      * Sets the line width factor. The line width will be multiplied by this.
      *
-     * @param factor Factor in {@link Constants#MIN_LINE_WIDTH} and {@link Constants#MAX_LINE_WIDTH}
+     * @param factor Factor in {@link Constants#MIN_LINE_WIDTH} and {@link Constants#MAX_LINE_WIDTH}.
      */
     void setLineWidthFactor(float factor);
 
     /**
      * Sets the number factor of proper motion vectors that are visible. In [1,100].
      *
-     * @param factor Factor in [1,100]
+     * @param factor Factor in [1,100].
      */
     void setProperMotionsNumberFactor(float factor);
 
     /**
      * Sets the length of the proper motion vectors, in [500,30000].
      *
-     * @param factor Factor in [500,30000]
+     * @param factor Factor in [500,30000].
      */
     void setProperMotionsLengthFactor(float factor);
 
@@ -594,12 +594,12 @@ public interface IScriptingInterface {
      *
      * @param mode The color mode:
      *             <ul>
-     *             <li>0 - direction: the normalised cartesian velocity components XYZ are mapped to the color channels RGB</li>
-     *             <li>1 - magnitude (speed): the magnitude of the velocity vector is mapped using a rainbow scheme (blue-green-yellow-red) with the color map limit at 100 Km/s</li>
-     *             <li>2 - has radial velocity: blue for stars with radial velocity, red for stars without</li>
-     *             <li>3 - redshift from Sun: blue stars have negative radial velocity (from the Sun), red stars have positive radial velocity (from the Sun). Blue is mapped to -100 Km/s, red is mapped to 100 Km/s</li>
-     *             <li>4 - redshift from camera: blue stars have negative radial velocity (from the camera), red stars have positive radial velocity (from the camera). Blue is mapped to -100 Km/s, red is mapped to 100 Km/s</li>
-     *             <li>5 - single color: same color for all velocity vectors</li>
+     *             <li>0 - direction: the normalised cartesian velocity components XYZ are mapped to the color channels RGB.</li>
+     *             <li>1 - magnitude (speed): the magnitude of the velocity vector is mapped using a rainbow scheme (blue-green-yellow-red) with the color map limit at 100 Km/s.</li>
+     *             <li>2 - has radial velocity: blue for stars with radial velocity, red for stars without.</li>
+     *             <li>3 - redshift from Sun: blue stars have negative radial velocity (from the Sun), red stars have positive radial velocity (from the Sun). Blue is mapped to -100 Km/s, red is mapped to 100 Km/s.</li>
+     *             <li>4 - redshift from camera: blue stars have negative radial velocity (from the camera), red stars have positive radial velocity (from the camera). Blue is mapped to -100 Km/s, red is mapped to 100 Km/s.</li>
+     *             <li>5 - single color: same color for all velocity vectors.</li>
      *             </ul>
      */
     void setProperMotionsColorMode(int mode);
@@ -615,49 +615,49 @@ public interface IScriptingInterface {
      * Overrides the maximum number of proper motion vectors that the program
      * is allowed to show.
      *
-     * @param maxNumber The maximum number of proper motion vectors. Negative to use default
+     * @param maxNumber The maximum number of proper motion vectors. Negative to use default.
      */
     void setProperMotionsMaxNumber(long maxNumber);
 
     /**
      * Returns the current maximum number of proper motion vectors allowed.
      *
-     * @return Max number of pm vectors
+     * @return Max number of pm vectors.
      */
     long getProperMotionsMaxNumber();
 
     /**
      * Sets the visibility of all crosshairs.
      *
-     * @param visible The visibility state, which applies to all crosshairs
+     * @param visible The visibility state, which applies to all crosshairs.
      */
     void setCrosshairVisibility(boolean visible);
 
     /**
      * Sets the visibility of the focus object crosshair.
      *
-     * @param visible The visibility state
+     * @param visible The visibility state.
      */
     void setFocusCrosshairVisibility(boolean visible);
 
     /**
      * Sets the visibility of the closest object crosshair.
      *
-     * @param visible The visibility state
+     * @param visible The visibility state.
      */
     void setClosestCrosshairVisibility(boolean visible);
 
     /**
      * Sets the visibility of the home object crosshair.
      *
-     * @param visible The visibility state
+     * @param visible The visibility state.
      */
     void setHomeCrosshairVisibility(boolean visible);
 
     /**
      * Shows or hides the minimap.
      *
-     * @param visible The visibility state
+     * @param visible The visibility state.
      */
     void setMinimapVisibility(boolean visible);
 
@@ -671,14 +671,14 @@ public interface IScriptingInterface {
     /**
      * Sets the time of the application, in UTC.
      *
-     * @param year     The year to represent
+     * @param year     The year to represent.
      * @param month    The month-of-year to represent, from 1 (January) to 12
-     *                 (December)
-     * @param day      The day-of-month to represent, from 1 to 31
-     * @param hour     The hour-of-day to represent, from 0 to 23
-     * @param min      The minute-of-hour to represent, from 0 to 59
-     * @param sec      The second-of-minute to represent, from 0 to 59
-     * @param millisec The millisecond-of-second, from 0 to 999
+     *                 (December).
+     * @param day      The day-of-month to represent, from 1 to 31.
+     * @param hour     The hour-of-day to represent, from 0 to 23.
+     * @param min      The minute-of-hour to represent, from 0 to 59.
+     * @param sec      The second-of-minute to represent, from 0 to 59.
+     * @param millisec The millisecond-of-second, from 0 to 999.
      */
     void setSimulationTime(int year, int month, int day, int hour, int min, int sec, int millisec);
 
@@ -687,7 +687,7 @@ public interface IScriptingInterface {
      * number of milliseconds since the standard base time known as "the epoch",
      * namely January 1, 1970, 00:00:00 GMT.
      *
-     * @param time Number of milliseconds since the epoch (Jan 1, 1970)
+     * @param time Number of milliseconds since the epoch (Jan 1, 1970).
      */
     void setSimulationTime(long time);
 
@@ -695,7 +695,7 @@ public interface IScriptingInterface {
      * Returns the current simulation time as the number of milliseconds since
      * Jan 1, 1970 GMT.
      *
-     * @return Number of milliseconds since the epoch (Jan 1, 1970)
+     * @return Number of milliseconds since the epoch (Jan 1, 1970).
      */
     long getSimulationTime();
 
@@ -704,13 +704,13 @@ public interface IScriptingInterface {
      *
      * @return The current simulation time in an array with the given indices.
      * <ul>
-     * <li>0 - The year</li>
-     * <li>1 - The month, from 1 (January) to 12 (December)</li>
-     * <li>2 - The day-of-month, from 1 to 31</li>
-     * <li>3 - The hour-of-day, from 0 to 23</li>
-     * <li>4 - The minute-of-hour, from 0 to 59</li>
-     * <li>5 - The second-of-minute, from 0 to 59</li>
-     * <li>6 - The millisecond-of-second, from 0 to 999</li>
+     * <li>0 - The year.</li>
+     * <li>1 - The month, from 1 (January) to 12 (December).</li>
+     * <li>2 - The day-of-month, from 1 to 31.</li>
+     * <li>3 - The hour-of-day, from 0 to 23.</li>
+     * <li>4 - The minute-of-hour, from 0 to 59.</li>
+     * <li>5 - The second-of-minute, from 0 to 59.</li>
+     * <li>6 - The millisecond-of-second, from 0 to 999.</li>
      * </ul>
      */
     int[] getSimulationTimeArr();
@@ -745,7 +745,7 @@ public interface IScriptingInterface {
      * automatically stops.
      *
      * @param ms The time as the number of milliseconds since the epoch (Jan 1,
-     *           1970)
+     *           1970).
      */
     void setTargetTime(long ms);
 
@@ -753,14 +753,14 @@ public interface IScriptingInterface {
      * Sets a time bookmark in the global clock that, when reached, the clock
      * automatically stops.
      *
-     * @param year     The year to represent
+     * @param year     The year to represent.
      * @param month    The month-of-year to represent, from 1 (January) to 12
-     *                 (December)
-     * @param day      The day-of-month to represent, from 1 to 31
-     * @param hour     The hour-of-day to represent, from 0 to 23
-     * @param min      The minute-of-hour to represent, from 0 to 59
-     * @param sec      The second-of-minute to represent, from 0 to 59
-     * @param millisec The millisecond-of-second, from 0 to 999
+     *                 (December).
+     * @param day      The day-of-month to represent, from 1 to 31.
+     * @param hour     The hour-of-day to represent, from 0 to 23.
+     * @param min      The minute-of-hour to represent, from 0 to 59.
+     * @param sec      The second-of-minute to represent, from 0 to 59.
+     * @param millisec The millisecond-of-second, from 0 to 999.
      */
     void setTargetTime(int year, int month, int day, int hour, int min, int sec, int millisec);
 
@@ -860,7 +860,7 @@ public interface IScriptingInterface {
      * @param fps        Target frames per second (number of images per second).
      * @param folder     The output folder path.
      * @param namePrefix The file name prefix.
-     * @deprecated
+     * @deprecated Use {@link IScriptingInterface#configureFrameOutput(int, int, int, String, String)} instead.
      */
     @Deprecated
     void configureRenderOutput(int width, int height, int fps, String folder, String namePrefix);
@@ -893,7 +893,7 @@ public interface IScriptingInterface {
      * Is the frame output system on?
      *
      * @return True if the frame output is active.
-     * @deprecated
+     * @deprecated Use {@link IScriptingInterface#isFrameOutputActive()} instead.
      */
     @Deprecated
     boolean isRenderOutputActive();
@@ -909,7 +909,7 @@ public interface IScriptingInterface {
      * Gets the current FPS setting in the frame output system.
      *
      * @return The FPS setting.
-     * @deprecated
+     * @deprecated Use {@link IScriptingInterface#getFrameOutputFps()} instead.
      */
     @Deprecated
     int getRenderOutputFps();
@@ -943,7 +943,7 @@ public interface IScriptingInterface {
      * Gets an object by <code>name</code> or id (HIP, TYC, Gaia SourceID), optionally waiting
      * until the object is available, with a timeout.
      *
-     * @param name           The name or id (HIP, TYC, Gaia SourceId) of the object
+     * @param name           The name or id (HIP, TYC, Gaia SourceId) of the object.
      * @param timeOutSeconds The timeout in seconds to wait until returning.
      *                       If negative, it waits indefinitely.
      * @return The object if it exists, or null if it does not and block is false, or if block is true and
@@ -1537,7 +1537,7 @@ public interface IScriptingInterface {
      * See {@link CubemapProjections} for possible
      * values.
      *
-     * @param projection
+     * @param projection The projection, in ["EQUIRECTANGULAR"|"CYLINDRICAL"|"HAMMER"].
      */
     void setCubemapProjection(String projection);
 
@@ -1565,28 +1565,28 @@ public interface IScriptingInterface {
     /**
      * Gets the current frame number. Useful for timing actions in scripts.
      *
-     * @return The current frame number
+     * @return The current frame number.
      */
     long getCurrentFrameNumber();
 
     /**
      * Enables or deisables the lens flare effect.
      *
-     * @param state Activate (true) or deactivate (false)
+     * @param state Activate (true) or deactivate (false).
      */
     void setLensFlare(boolean state);
 
     /**
      * Enables or disables the motion blur effect.
      *
-     * @param state Activate (true) or deactivate (false)
+     * @param state Activate (true) or deactivate (false).
      */
     void setMotionBlur(boolean state);
 
     /**
      * Enables or disables the star glow effect.
      *
-     * @param state Activate (true) or deactivate (false)
+     * @param state Activate (true) or deactivate (false).
      */
     void setStarGlow(boolean state);
 
@@ -1602,7 +1602,7 @@ public interface IScriptingInterface {
      * Sets the value of smooth lod transitions, allowing or disallowing octant fade-ins of
      * as they come into view.
      *
-     * @param value Activate (true) or deactivate (false)
+     * @param value Activate (true) or deactivate (false).
      */
     void setSmoothLodTransitions(boolean value);
 
@@ -1613,23 +1613,23 @@ public interface IScriptingInterface {
     void resetImageSequenceNumber();
 
     /**
-     * Gets the absolute path of the default directory where the still frames are saved
+     * Gets the absolute path of the default directory where the still frames are saved.
      *
-     * @return Absolute path of directory where still frames are saved
+     * @return Absolute path of directory where still frames are saved.
      */
     String getDefaultFramesDir();
 
     /**
-     * Gets the absolute path of the default directory where the screenshots are saved
+     * Gets the absolute path of the default directory where the screenshots are saved.
      *
-     * @return Absolute path of directory where screenshots are saved
+     * @return Absolute path of directory where screenshots are saved.
      */
     String getDefaultScreenshotsDir();
 
     /**
-     * Gets the absolute path of the default directory where the camera files are saved
+     * Gets the absolute path of the default directory where the camera files are saved.
      *
-     * @return Absolute path of directory where camera files are saved
+     * @return Absolute path of directory where camera files are saved.
      */
     String getDefaultCameraDir();
 
@@ -1641,23 +1641,23 @@ public interface IScriptingInterface {
     String getDefaultMusicDir();
 
     /**
-     * Gets the absolute path to the location of the inputListener mappings
+     * Gets the absolute path to the location of the inputListener mappings.
      *
-     * @return Absolute path to the location of the inputListener mappings
+     * @return Absolute path to the location of the inputListener mappings.
      */
     String getDefaultMappingsDir();
 
     /**
-     * Gets the absolute path of the local data directory, configured in your global.properties file
+     * Gets the absolute path of the local data directory, configured in your global.properties file.
      *
-     * @return Absolute path to the location of the data files
+     * @return Absolute path to the location of the data files.
      */
     String getDataDir();
 
     /**
      * Gets the absolute path to the location of the configuration directory
      *
-     * @return Absolute path of config directory
+     * @return Absolute path of config directory.
      */
     String getConfigDir();
 
@@ -1665,7 +1665,7 @@ public interface IScriptingInterface {
      * Returns the default data directory. That is ~/.gaiasky/ in Windows and macOS, and ~/.local/share/gaiasky
      * in Linux.
      *
-     * @return Absolute path of data directory
+     * @return Absolute path of data directory.
      */
     String getLocalDataDir();
 
@@ -1673,7 +1673,7 @@ public interface IScriptingInterface {
      * Posts a {@link Runnable} to the main loop thread. The runnable runs only once.
      * This will execute the runnable right after the current update-render cycle has finished.
      *
-     * @param runnable The runnable to run
+     * @param runnable The runnable to run.
      */
     void postRunnable(Runnable runnable);
 
@@ -1684,15 +1684,15 @@ public interface IScriptingInterface {
      * all parked runnables will keep running until Gaia Sky is restarted, so make sure to
      * remove them with {@link #unparkRunnable(String)} if needed.
      *
-     * @param id       The string id to identify the runnable
-     * @param runnable The runnable to park
+     * @param id       The string id to identify the runnable.
+     * @param runnable The runnable to park.
      */
     void parkRunnable(String id, Runnable runnable);
 
     /**
-     * Removes the runnable with the given id, if any
+     * Removes the runnable with the given id, if any.
      *
-     * @param id The id of the runnable to remove
+     * @param id The id of the runnable to remove.
      */
     void unparkRunnable(String id);
 
@@ -1706,9 +1706,9 @@ public interface IScriptingInterface {
      * official documentation</a> for a complete reference on what can and what can't be loaded.
      *
      * @param dsName The name of the dataset, used to identify the subsequent operations on the
-     *               dataset
-     * @param path   Absolute path (or relative to the working path of Gaia Sky) to the <code>.vot</code> file to load
-     * @return False if the dataset could not be loaded, true otherwise
+     *               dataset.
+     * @param path   Absolute path (or relative to the working path of Gaia Sky) to the <code>.vot</code> file to load.
+     * @return False if the dataset could not be loaded, true otherwise.
      */
     boolean loadDataset(String dsName, String path);
 
@@ -1725,10 +1725,10 @@ public interface IScriptingInterface {
      * official documentation</a> for a complete reference on what can and what can't be loaded.
      *
      * @param dsName The name of the dataset, used to identify the subsequent operations on the
-     *               dataset
-     * @param path   Absolute path (or relative to the working path of Gaia Sky) to the <code>.vot</code> file to load
-     * @param sync   Whether the load must happen synchronously or asynchronously
-     * @return False if the dataset could not be loaded (sync mode). True if it could not be loaded (sync mode), or <code>sync</code> is false
+     *               dataset.
+     * @param path   Absolute path (or relative to the working path of Gaia Sky) to the <code>.vot</code> file to load.
+     * @param sync   Whether the load must happen synchronously or asynchronously.
+     * @return False if the dataset could not be loaded (sync mode). True if it could not be loaded (sync mode), or <code>sync</code> is false.
      */
     boolean loadDataset(String dsName, String path, boolean sync);
 
@@ -1738,14 +1738,14 @@ public interface IScriptingInterface {
      * If <code>sync</code> is true, the call waits until the dataset is loaded and then returns.
      * If <code>sync</code> is false, the loading happens in a new thread and
      * the call returns immediately. It includes some parameters to apply to the new star group.
-     * @param dsName The name of the dataset
-     * @param path Absolute path (or relative to the working path of Gaia Sky) to the <code>.vot</code> file to load
-     * @param magnitudeScale Scale factor to apply to the star magnitudes
-     * @param labelColor The color of the dataset label
-     * @param fadeIn Two values which represent the fade in mapping distances (in parsecs, as distance from camera to the Sun) of this dataset
-     * @param fadeOut Two values which represent the fade out mapping distances (in parsecs, as distance from camera to the Sun) of this dataset
-     * @param sync   Whether the load must happen synchronously or asynchronously
-     * @return False if the dataset could not be loaded (sync mode). True if it could not be loaded (sync mode), or <code>sync</code> is false
+     * @param dsName The name of the dataset.
+     * @param path Absolute path (or relative to the working path of Gaia Sky) to the <code>.vot</code> file to load.
+     * @param magnitudeScale Scale factor to apply to the star magnitudes.
+     * @param labelColor The color of the dataset label.
+     * @param fadeIn Two values which represent the fade in mapping distances (in parsecs, as distance from camera to the Sun) of this dataset.
+     * @param fadeOut Two values which represent the fade out mapping distances (in parsecs, as distance from camera to the Sun) of this dataset.
+     * @param sync   Whether the load must happen synchronously or asynchronously.
+     * @return False if the dataset could not be loaded (sync mode). True if it could not be loaded (sync mode), or <code>sync</code> is false.
      */
     boolean loadStarDataset(String dsName, String path, double magnitudeScale, double[] labelColor, double[] fadeIn, double[] fadeOut, boolean sync);
 
@@ -1755,57 +1755,57 @@ public interface IScriptingInterface {
      * If <code>sync</code> is true, the call waits until the dataset is loaded and then returns.
      * If <code>sync</code> is false, the loading happens in a new thread and
      * the call returns immediately. It includes some parameters to apply to the new star group.
-     * @param dsName The name of the dataset
-     * @param path Absolute path (or relative to the working path of Gaia Sky) to the <code>.vot</code> file to load
-     * @param profileDecay The profile decay of the particles as in 1 - distCentre^decay
-     * @param particleColor The base color of the particles
-     * @param colorNoise In [0,1], the noise to apply to the color so that each particle gets a slightly different tone. Set to 0 so that all particles get the same color
-     * @param labelColor The color of the dataset label
-     * @param particleSize The size of the particles
-     * @param ct The name of the component type to use (see {@link gaiasky.render.ComponentTypes.ComponentType})
-     * @param fadeIn Two values which represent the fade in mapping distances (in parsecs, as distance from camera to the Sun) of this dataset
-     * @param fadeOut Two values which represent the fade out mapping distances (in parsecs, as distance from camera to the Sun) of this dataset
-     * @param sync   Whether the load must happen synchronously or asynchronously
-     * @return False if the dataset could not be loaded (sync mode). True if it could not be loaded (sync mode), or <code>sync</code> is false
+     * @param dsName The name of the dataset.
+     * @param path Absolute path (or relative to the working path of Gaia Sky) to the <code>.vot</code> file to load.
+     * @param profileDecay The profile decay of the particles as in 1 - distCentre^decay.
+     * @param particleColor The base color of the particles.
+     * @param colorNoise In [0,1], the noise to apply to the color so that each particle gets a slightly different tone. Set to 0 so that all particles get the same color.
+     * @param labelColor The color of the dataset label.
+     * @param particleSize The size of the particles.
+     * @param ct The name of the component type to use (see {@link gaiasky.render.ComponentTypes.ComponentType}).
+     * @param fadeIn Two values which represent the fade in mapping distances (in parsecs, as distance from camera to the Sun) of this dataset.
+     * @param fadeOut Two values which represent the fade out mapping distances (in parsecs, as distance from camera to the Sun) of this dataset.
+     * @param sync   Whether the load must happen synchronously or asynchronously.
+     * @return False if the dataset could not be loaded (sync mode). True if it could not be loaded (sync mode), or <code>sync</code> is false.
      */
     boolean loadParticleDataset(String dsName, String path, double profileDecay, double[] particleColor, double colorNoise, double[] labelColor, double particleSize, String ct, double[] fadeIn, double[] fadeOut, boolean sync);
 
     /**
-     * Removes the dataset identified by the given name, if it exists
+     * Removes the dataset identified by the given name, if it exists.
      *
-     * @param dsName The name of the dataset to remove
-     * @return False if the dataset could not be found
+     * @param dsName The name of the dataset to remove.
+     * @return False if the dataset could not be found.
      */
     boolean removeDataset(String dsName);
 
     /**
-     * Hides the dataset identified by the given name, if it exists and is not hidden
+     * Hides the dataset identified by the given name, if it exists and is not hidden.
      *
-     * @param dsName The name of the dataset to hide
-     * @return False if the dataset could not be found
+     * @param dsName The name of the dataset to hide.
+     * @return False if the dataset could not be found.
      */
     boolean hideDataset(String dsName);
 
     /**
-     * Returns the names of all datasets currently loaded
+     * Returns the names of all datasets currently loaded.
      *
-     * @return A list with all the names of the loaded datasets
+     * @return A list with all the names of the loaded datasets.
      */
     List<String> listDatasets();
 
     /**
      * Checks whether the dataset identified by the given name is loaded
      *
-     * @param dsName The name of the dataset to query
-     * @return True if the dataset is loaded, false otherwise
+     * @param dsName The name of the dataset to query.
+     * @return True if the dataset is loaded, false otherwise.
      */
     boolean hasDataset(String dsName);
 
     /**
      * Shows (un-hides) the dataset identified by the given name, if it exists and is hidden
      *
-     * @param dsName The name of the dataset to show
-     * @return False if the dataset could not be found
+     * @param dsName The name of the dataset to show.
+     * @return False if the dataset could not be found.
      */
     boolean showDataset(String dsName);
 
@@ -1823,64 +1823,64 @@ public interface IScriptingInterface {
      *     <li>8 - magenta</li>
      * </ul>
      *
-     * @param dsName     The dataset name
-     * @param colorIndex Color index in [0..8]
-     * @param highlight  Whether to highlight or not
-     * @return False if the dataset could not be found
+     * @param dsName     The dataset name.
+     * @param colorIndex Color index in [0..8].
+     * @param highlight  Whether to highlight or not.
+     * @return False if the dataset could not be found.
      */
     boolean highlightDataset(String dsName, int colorIndex, boolean highlight);
 
     /**
-     * Enables or disables the dataset highlight using a plain color chosen by the system
+     * Enables or disables the dataset highlight using a plain color chosen by the system.
      *
-     * @param dsName    The dataset name
-     * @param highlight State
-     * @return False if the dataset could not be found
+     * @param dsName    The dataset name.
+     * @param highlight State.
+     * @return False if the dataset could not be found.
      */
     boolean highlightDataset(String dsName, boolean highlight);
 
     /**
-     * Enables or disables the dataset highlight, using a given plain color
+     * Enables or disables the dataset highlight, using a given plain color.
      *
-     * @param dsName    The dataset name
-     * @param r         Red component
-     * @param highlight State
-     * @return False if the dataset could not be found
+     * @param dsName    The dataset name.
+     * @param r         Red component.
+     * @param highlight State.
+     * @return False if the dataset could not be found.
      */
     boolean highlightDataset(String dsName, float r, float g, float b, float a, boolean highlight);
 
     /**
      * Enables or disables the dataset highlight, using the given color map on the given attribute with the given
-     * maximum and minimum mapping values
+     * maximum and minimum mapping values.
      *
-     * @param dsName        The dataset name
+     * @param dsName        The dataset name.
      * @param attributeName The attribute name. You can use basic attributes (please mind the case!):
      *                      <ul><li>RA</li><li>DEC</li><li>Distance</li><li>GalLatitude</li><li>GalLongitude</li><li>EclLatitude</li><li>EclLongitude</li></ul>
      *                       Or star-only attributes (if your dataset contains stars, mind the case!):
      *                       <ul><li>Mualpha</li><li>Mudelta</li><li>Radvel</li><li>Absmag</li><li>Appmag</li></ul>
      *                       Or even extra attributes (if you loaded the dataset yourself), matching by column name.
-     * @param colorMap      The color map to use, in ["reds", "greens", "blues", "rainbow18", "rainbow", "seismic", "carnation", "hotmeal", "cool"]
-     * @param minMap        The minimum mapping value
-     * @param maxMap        The maximum mapping value
-     * @param highlight     State
-     * @return False if the dataset could not be found
+     * @param colorMap      The color map to use, in ["reds"|"greens"|"blues"|"rainbow18"|"rainbow"|"seismic"|"carnation"|"hotmeal"|"cool"].
+     * @param minMap        The minimum mapping value.
+     * @param maxMap        The maximum mapping value.
+     * @param highlight     State.
+     * @return False if the dataset could not be found.
      */
     boolean highlightDataset(String dsName, String attributeName, String colorMap, double minMap, double maxMap, boolean highlight);
 
     /**
-     * Sets the size increase factor of this dataset when highlighted
+     * Sets the size increase factor of this dataset when highlighted.
      *
-     * @param dsName     The dataset name
+     * @param dsName     The dataset name.
      * @param sizeFactor The size factor to apply to the particles when highlighted, must be in [{@link gaiasky.util.Constants#MIN_DATASET_SIZE_FACTOR}, {@link gaiasky.util.Constants#MAX_DATASET_SIZE_FACTOR}].
-     * @return False if the dataset could not be found
+     * @return False if the dataset could not be found.
      */
     boolean setDatasetHighlightSizeFactor(String dsName, float sizeFactor);
 
     /**
      * Returns the meter to internal unit conversion factor. Use this factor to multiply
-     * your coordinates in meters to get them in internal units
+     * your coordinates in meters to get them in internal units.
      *
-     * @return The factor M_TO_U
+     * @return The factor M_TO_U.
      */
     double getMeterToInternalUnitConversion();
 
@@ -1888,39 +1888,39 @@ public interface IScriptingInterface {
      * Returns the internal unit to meter conversion factor. Use this factor to multiply
      * your coordinates in internal units to get them in meters.
      *
-     * @return The factor U_TO_M
+     * @return The factor U_TO_M.
      */
     double getInternalUnitToMeterConversion();
 
     /**
-     * Converts the value in internal units to metres
+     * Converts the value in internal units to metres.
      *
-     * @param internalUnits The value in internal units
-     * @return The value in metres
+     * @param internalUnits The value in internal units.
+     * @return The value in metres.
      */
     double internalUnitsToMetres(double internalUnits);
 
     /**
-     * Converts the value in internal units to Kilometers
+     * Converts the value in internal units to Kilometers.
      *
-     * @param internalUnits The value in internal units
-     * @return The value in Kilometers
+     * @param internalUnits The value in internal units.
+     * @return The value in Kilometers.
      */
     double internalUnitsToKilometres(double internalUnits);
 
     /**
-     * Converts the metres to internal units
+     * Converts the metres to internal units.
      *
-     * @param metres The value in metres
-     * @return The value in internal units
+     * @param metres The value in metres.
+     * @return The value in internal units.
      */
     double metresToInternalUnits(double metres);
 
     /**
-     * Converts the kilometres to internal units
+     * Converts the kilometres to internal units.
      *
-     * @param kilometres The value in kilometers
-     * @return The value in internal units
+     * @param kilometres The value in kilometers.
+     * @return The value in internal units.
      */
     double kilometrestointernalunits(double kilometres);
 
@@ -1928,7 +1928,7 @@ public interface IScriptingInterface {
      * Gets the current frame number. The number begins at 0 for the first frame produced
      * when Gaia Sky is started and increases continuously.
      *
-     * @return The current frame number
+     * @return The current frame number.
      */
     long getFrameNumber();
 
@@ -1936,10 +1936,10 @@ public interface IScriptingInterface {
      * Rotates a 3D vector around the given axis by the specified angle in degrees.
      * Vectors are arrays with 3 components. If more components are there, they are ignored.
      *
-     * @param vector Vector to rotate, with at least 3 components
-     * @param axis   The axis, with at least 3 components
-     * @param angle  Angle in degrees
-     * @return The new vector, rotated
+     * @param vector Vector to rotate, with at least 3 components.
+     * @param axis   The axis, with at least 3 components.
+     * @param angle  Angle in degrees.
+     * @return The new vector, rotated.
      */
     double[] rotate3(double[] vector, double[] axis, double angle);
 
@@ -1947,52 +1947,52 @@ public interface IScriptingInterface {
      * Rotates a 2D vector by the specified angle in degrees, counter-clockwise assuming that
      * the y axis points up.
      *
-     * @param vector Vector to rotate, with at least 2 components
-     * @return The new vector, rotated
+     * @param vector Vector to rotate, with at least 2 components.
+     * @return The new vector, rotated.
      */
     double[] rotate2(double[] vector, double angle);
 
     /**
      * Computes the cross product between the two 3D vectors.
      *
-     * @param vec1 First 3D vector
-     * @param vec2 Second 3D vector
-     * @return Cross product 3D vector
+     * @param vec1 First 3D vector.
+     * @param vec2 Second 3D vector.
+     * @return Cross product 3D vector.
      */
     double[] cross3(double[] vec1, double[] vec2);
 
     /**
      * Computes the dot product between the two 3D vectors.
      *
-     * @param vec1 First 3D vector
-     * @param vec2 Second 3D vector
-     * @return The dot product scalar
+     * @param vec1 First 3D vector.
+     * @param vec2 Second 3D vector.
+     * @return The dot product scalar.
      */
     double dot3(double[] vec1, double[] vec2);
 
     /**
-     * Print text using the internal logging system
+     * Print text using the internal logging system.
      *
-     * @param message The message
+     * @param message The message.
      */
     void print(String message);
 
     /**
-     * Print text using the internal logging system
+     * Print text using the internal logging system.
      *
-     * @param message The message
+     * @param message The message.
      */
     void log(String message);
 
     /**
-     * Log an error using the internal logging system
+     * Log an error using the internal logging system.
      *
-     * @param message The error message
+     * @param message The error message.
      */
     void error(String message);
 
     /**
-     * Initiates the quit action to terminate the program
+     * Initiates the quit action to terminate the program.
      */
     void quit();
 
