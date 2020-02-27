@@ -11,4 +11,5 @@ import gaiasky.util.gdx.contrib.postprocess.PostProcessorEffect;
 public abstract class Antialiasing extends PostProcessorEffect {
 
     public abstract void setViewportSize(int width, int height);
+    public abstract void updateQuality(int quality);
 }

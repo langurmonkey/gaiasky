@@ -284,6 +284,7 @@ public class DesktopPostProcessor implements IPostProcessor, IObserver {
     private void updateGraphicsQuality(PostProcessBean ppb, GraphicsQuality gq) {
         updateGlow(ppb, gq);
         updateCameraBlur(ppb, gq);
+        updateFxaa(ppb, gq);
     }
 
     private void updateGlow(PostProcessBean ppb, GraphicsQuality gq) {
@@ -319,6 +320,10 @@ public class DesktopPostProcessor implements IPostProcessor, IObserver {
         } else {
             ppb.camblur.setBlurMaxSamples(20);
         }
+    }
+
+    private void updateFxaa(PostProcessBean ppb, GraphicsQuality gq){
+        ppb.antialiasing.updateQuality(getFxaaQuality(gq));
     }
 
     private void initCameraBlur(PostProcessBean ppb, float width, float height, GraphicsQuality gq) {
@@ -360,12 +365,22 @@ public class DesktopPostProcessor implements IPostProcessor, IObserver {
         ppb.pp.addEffect(ppb.levels);
     }
 
+    private int getFxaaQuality(GraphicsQuality gq){
+        switch(gq){
+        case LOW:
+            return 0;
+        case NORMAL:
+            return 1;
+        case HIGH:
+        case ULTRA:
+        default:
+            return 2;
+        }
+    }
+
     private void initAntiAliasing(Antialias aavalue, float width, float height, PostProcessBean ppb) {
         if (aavalue.equals(Antialias.FXAA)) {
-            ppb.antialiasing = new Fxaa(width, height);
-            ((Fxaa) ppb.antialiasing).setSpanMax(8f);
-            ((Fxaa) ppb.antialiasing).setReduceMin(1f / 128f);
-            ((Fxaa) ppb.antialiasing).setReduceMul(1f / 8f);
+            ppb.antialiasing = new Fxaa(width, height, getFxaaQuality(GlobalConf.scene.GRAPHICS_QUALITY));
             Logger.getLogger(this.getClass()).debug(I18n.bundle.format("notif.selected", "FXAA"));
         } else if (aavalue.equals(Antialias.NFAA)) {
             ppb.antialiasing = new Nfaa(width, height);

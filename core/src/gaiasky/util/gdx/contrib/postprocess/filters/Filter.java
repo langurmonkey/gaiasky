@@ -76,6 +76,18 @@ public abstract class Filter<T> {
         return (T) this;
     }
 
+    /**
+     * Caution, disposes of the current program and updates it with the new one. Run synchronously after render().
+     * @param program The new shader program.
+     */
+    public void updateProgram(ShaderProgram program){
+        if(this.program != null){
+            this.program.dispose();
+        }
+        this.program = program;
+        rebind();
+    }
+
     public void dispose() {
         program.dispose();
     }

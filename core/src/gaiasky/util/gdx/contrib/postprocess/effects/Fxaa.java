@@ -34,16 +34,16 @@ public final class Fxaa extends Antialiasing {
     private FxaaFilter fxaaFilter = null;
 
     /** Create a FXAA with the viewport size */
-    public Fxaa(float viewportWidth, float viewportHeight) {
-        setup(viewportWidth, viewportHeight);
+    public Fxaa(float viewportWidth, float viewportHeight, int quality) {
+        setup(viewportWidth, viewportHeight, quality);
     }
 
-    public Fxaa(int viewportWidth, int viewportHeight) {
-        this((float) viewportWidth, (float) viewportHeight);
+    public Fxaa(int viewportWidth, int viewportHeight, int quality) {
+        this((float) viewportWidth, (float) viewportHeight, quality);
     }
 
-    private void setup(float viewportWidth, float viewportHeight) {
-        fxaaFilter = new FxaaFilter(viewportWidth, viewportHeight);
+    private void setup(float viewportWidth, float viewportHeight, int quality) {
+        fxaaFilter = new FxaaFilter(viewportWidth, viewportHeight, quality);
     }
 
     public void setViewportSize(int width, int height) {
@@ -51,30 +51,11 @@ public final class Fxaa extends Antialiasing {
     }
 
     /**
-     * Sets the span max parameter. The default value is 8.
-     *
-     * @param value
+     * Updates the FXAA quality setting.
+     * @param quality      The quality in [0,1,2], from worst to best
      */
-    public void setSpanMax(float value) {
-        fxaaFilter.setFxaaSpanMax(value);
-    }
-
-    /**
-     * Sets the parameter. The default value is 1/128.
-     *
-     * @param value
-     */
-    public void setReduceMin(float value) {
-        fxaaFilter.setFxaaReduceMin(value);
-    }
-
-    /**
-     * Sets the parameter. The default value is 1/8.
-     *
-     * @param value
-     */
-    public void setReduceMul(float value) {
-        fxaaFilter.setFxaaReduceMul(value);
+    public void updateQuality(int quality) {
+        fxaaFilter.updateQuality(quality);
     }
 
     @Override
