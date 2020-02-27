@@ -1206,7 +1206,7 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
         if (checkNotNull(object, "object") && checkNum(latitude, -90d, 90d, "latitude") && checkNum(longitude, 0d, 360d, "longitude")) {
             stops.add(stop);
             ISceneGraph sg = GaiaSky.instance.sg;
-            String nameStub = object.getCandidateName() + " ";
+            String nameStub = object.getCandidateName() + " [loc]";
 
             if (!sg.containsNode(nameStub)) {
                 Invisible invisible = new Invisible(nameStub);
