@@ -79,7 +79,7 @@
       "file": "skins/fonts/ui-19-bold.fnt"
     },
     "mono": {
-      "file": "skins/fonts/mono-small.fnt"
+      "file": "skins/fonts/mono-large.fnt"
     },
     "grid-annotation": {
       "file": "skins/fonts/ui-11.fnt"
@@ -154,9 +154,9 @@
     },
     "theme": {
       "a": 1,
-      "b": 1,
-      "g": 0.6,
-      "r": 0.4
+      "b": 0.211,
+      "g": 0.407,
+      "r": 1
     },
     "highlight": {
       "a": 1,
@@ -374,8 +374,8 @@
       "imageUp": "eye-icon"
     },
     "expand-collapse": {
-      "imageUp": "plus-icon",
-      "imageChecked": "minus-icon",
+      "imageUp": "iconic-arrow-expand",
+      "imageChecked": "iconic-arrow-collapse",
       "imageDisabled": "disabled-icon"
     },
     "detach": {
@@ -464,7 +464,7 @@
     },
     "highlight-ds-s": {
       "imageUp": "highlight-s-off",
-      "imageChecked" : "highlight-s-on"
+      "imageChecked": "highlight-s-on"
     },
     "prefs-s": {
       "imageUp": "prefs-s-icon"
@@ -515,7 +515,7 @@
         "fontColorSelected": "white",
         "fontColorUnselected": "white",
         "selection": "default-select-selection",
-        "background" : "dark-grey"
+        "background": "dark-grey"
       }
     }
   },
@@ -753,6 +753,7 @@
       "fontColor": "white"
     }
   },
+
   "com.badlogic.gdx.scenes.scene2d.ui.TextField$TextFieldStyle": {
     "default": {
       "selection": "selection",
@@ -900,9 +901,9 @@
       "background" : "dark-grey"
     },
     "light": {
-      "fontColorUnselected": "white",
+      "fontColorUnselected": "black",
       "selection": "selection",
-      "fontColorSelected": "white",
+      "fontColorSelected": "black",
       "font": "ui-18",
       "background": "light-grey"
     },

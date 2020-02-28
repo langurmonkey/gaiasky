@@ -83,7 +83,7 @@ public class CollapsiblePane extends Table {
 
         // Detach icon
         detachIcon = new OwnImageButton(skin, detachButtonStyle);
-        detachIcon.setName("expand-collapse");
+        detachIcon.setName("detach-panel");
         detachIcon.setChecked(false);
         detachIcon.addListener(event -> {
             if (event instanceof ChangeEvent) {
@@ -103,6 +103,7 @@ public class CollapsiblePane extends Table {
 
         HorizontalGroup titleGroup = new HorizontalGroup();
         titleGroup.space(3 * GlobalConf.UI_SCALE_FACTOR);
+        titleGroup.addActor(expandIcon);
         titleGroup.addActor(mainLabel);
         if (shortcut != null && !shortcut.isEmpty())
             titleGroup.addActor(questionLabel);
@@ -119,7 +120,7 @@ public class CollapsiblePane extends Table {
 
         HorizontalGroup headerGroupRight = new HorizontalGroup();
         headerGroupRight.space(space).align(Align.right);
-        headerGroupRight.addActor(expandIcon);
+        //headerGroupRight.addActor(expandIcon);
         headerGroupRight.addActor(detachIcon);
 
         headerTable.add(titleGroup).left().padRight(4 * GlobalConf.UI_SCALE_FACTOR);

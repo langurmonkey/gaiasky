@@ -374,8 +374,8 @@
       "imageUp": "eye-icon"
     },
     "expand-collapse": {
-      "imageUp": "plus-icon",
-      "imageChecked": "minus-icon",
+      "imageUp": "iconic-arrow-expand",
+      "imageChecked": "iconic-arrow-collapse",
       "imageDisabled": "disabled-icon"
     },
     "detach": {
@@ -449,7 +449,7 @@
     },
     "highlight-ds": {
       "imageUp": "highlight-off",
-      "imageChecked" : "highlight-on"
+      "imageChecked": "highlight-on"
     },
     "prefs": {
       "imageUp": "prefs-icon"
@@ -464,10 +464,10 @@
     },
     "highlight-ds-s": {
       "imageUp": "highlight-s-off",
-      "imageChecked" : "highlight-s-on"
+      "imageChecked": "highlight-s-on"
     },
     "prefs-s": {
-      "imageUp": "prefs-s-icon",
+      "imageUp": "prefs-s-icon"
     },
     "link": {
       "imageUp": "link",
@@ -515,7 +515,7 @@
         "fontColorSelected": "white",
         "fontColorUnselected": "white",
         "selection": "default-select-selection",
-        "background" : "dark-grey"
+        "background": "dark-grey"
       }
     }
   },
@@ -824,6 +824,11 @@
       "fontColor": "white",
       "background": null
     },
+    "msg-18": {
+      "font": "ui-18",
+      "fontColor": "white",
+      "background": null
+    },
     "msg-19": {
       "font": "ui-19",
       "fontColor": "white",
@@ -892,7 +897,7 @@
       "selection": "selection",
       "fontColorSelected": "white",
       "font": "ui-11",
-      "background" : "dark-grey"
+      "background": "dark-grey"
     },
     "light": {
       "fontColorUnselected": "black",
@@ -907,6 +912,12 @@
       "fontColorSelected": "white",
       "font": "ui-12",
       "background": "dark-grey"
+    }
+  },
+  "com.badlogic.gdx.scenes.scene2d.ui.Touchpad$TouchpadStyle": {
+    "default": {
+      "background": "default-pane",
+      "knob": "default-round-large"
     }
   },
   "com.badlogic.gdx.scenes.scene2d.ui.Tree$TreeStyle": {

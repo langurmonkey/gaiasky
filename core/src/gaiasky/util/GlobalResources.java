@@ -92,6 +92,12 @@ public class GlobalResources {
     public static void updateSkin() {
         initCursors();
         FileHandle fh = Gdx.files.internal("skins/" + GlobalConf.program.UI_THEME + "/" + GlobalConf.program.UI_THEME + ".json");
+        if(!fh.exists()){
+            // Default to dark-green
+            logger.info("User interface theme '" + GlobalConf.program.UI_THEME + "' not found, using 'dark-green' instead");
+            GlobalConf.program.UI_THEME = "dark-green";
+            fh = Gdx.files.internal("skins/" + GlobalConf.program.UI_THEME + "/" + GlobalConf.program.UI_THEME + ".json");
+        }
         skin = new Skin(fh);
     }
 

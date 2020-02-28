@@ -32,12 +32,6 @@ public class PackTextures {
         //// DARK-BLUE x2
         //TexturePacker.process(x2settings, gs + "/assets/skins/raw/dark-blue/", gs + "/assets/skins/dark-blue-x2/", "dark-blue-x2");
 
-        //// BRIGHT-GREEN
-        //TexturePacker.process(x1settings, gs + "/assets/skins/raw/bright-green/", gs + "/assets/skins/bright-green/", "bright-green");
-
-        //// BRIGHT-GREEN x2
-        //TexturePacker.process(x2settings, gs + "/assets/skins/raw/bright-green/", gs + "/assets/skins/bright-green-x2/", "bright-green-x2");
-
         //// NIGHT-RED
         //TexturePacker.process(x1settings, gs + "/assets/skins/raw/night-red/", gs + "/assets/skins/night-red/", "night-red");
 

@@ -79,7 +79,7 @@
       "file": "skins/fonts/ui-19-bold.fnt"
     },
     "mono": {
-      "file": "skins/fonts/mono-small.fnt"
+      "file": "skins/fonts/mono-large.fnt"
     },
     "grid-annotation": {
       "file": "skins/fonts/ui-11.fnt"
@@ -89,8 +89,8 @@
     "green": {
       "a": 1,
       "b": 0,
-      "g": 1,
-      "r": 0
+      "g": 0.701,
+      "r": 0.18
     },
     "white": {
       "a": 1,
@@ -374,8 +374,8 @@
       "imageUp": "eye-icon"
     },
     "expand-collapse": {
-      "imageUp": "plus-icon",
-      "imageChecked": "minus-icon",
+      "imageUp": "iconic-arrow-expand",
+      "imageChecked": "iconic-arrow-collapse",
       "imageDisabled": "disabled-icon"
     },
     "detach": {
@@ -900,9 +900,9 @@
       "background": "dark-grey"
     },
     "light": {
-      "fontColorUnselected": "white",
+      "fontColorUnselected": "black",
       "selection": "selection",
-      "fontColorSelected": "white",
+      "fontColorSelected": "black",
       "font": "ui-18",
       "background": "light-grey"
     },

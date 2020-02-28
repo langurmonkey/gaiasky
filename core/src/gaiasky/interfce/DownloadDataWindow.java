@@ -14,6 +14,7 @@ import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener.ChangeEvent;
+import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.Array;
 import gaiasky.GaiaSky;
 import gaiasky.desktop.util.SysUtils;
@@ -123,12 +124,12 @@ public class DownloadDataWindow extends GenericDialog {
         float minW = GlobalConf.UI_SCALE_FACTOR == 1 ? 550f : 650f;
 
         float buttonPad = 1f * GlobalConf.UI_SCALE_FACTOR;
-
-        Cell<Actor> topCell = content.add((Actor) null);
+        Cell<Actor> topCell = content.add((Actor) null).left().top();
         topCell.row();
 
         // Offer downloads
         Table downloadTable = new Table(skin);
+        downloadTable.setFillParent(true);
 
         OwnLabel catalogsLocLabel = new OwnLabel(I18n.txt("gui.download.location") + ":", skin);
 
@@ -161,7 +162,8 @@ public class DownloadDataWindow extends GenericDialog {
                             if (result.file().canRead() && result.file().canWrite()) {
                                 // do stuff with result
                                 catalogsLoc.setText(result.path());
-                                GlobalConf.data.DATA_LOCATION = result.path().replaceAll("\\\\", "/");;
+                                GlobalConf.data.DATA_LOCATION = result.path().replaceAll("\\\\", "/");
+                                ;
                                 me.pack();
                                 GaiaSky.postRunnable(() -> {
                                     // Reset datasets
@@ -198,14 +200,42 @@ public class DownloadDataWindow extends GenericDialog {
 
         for (DatasetType type : dd.types) {
             List<DatasetDesc> datasets = type.datasets;
+            OwnLabel dsType = new OwnLabel(I18n.txt("gui.download.type." + type.typeStr), skin, "hud-header");
+            OwnImageButton expandIcon = new OwnImageButton(skin, "expand-collapse");
+            expandIcon.setChecked(true);
+            HorizontalGroup titleGroup = new HorizontalGroup();
+            titleGroup.space(padLarge);
+            titleGroup.addActor(expandIcon);
+            titleGroup.addActor(dsType);
+            datasetsTable.add(titleGroup).left().padBottom(pad * 3f).padTop(padLarge * 2f).row();
 
-            datasetsTable.add(new OwnLabel(I18n.txt("gui.download.type." + type.typeStr), skin, "hud-header")).colspan(6).left().padBottom(pad * 3f).padTop(padLarge * 2f).row();
+            Table t = new Table(skin);
+            Cell c = datasetsTable.add(t).colspan(2).left();
+            c.row();
 
+            expandIcon.addListener((event) -> {
+                if (event instanceof ChangeEvent) {
+                    if (c.getActor() == null) {
+                        c.setActor(t);
+                    } else {
+                        c.setActor(null);
+                    }
+                    datasetsTable.pack();
+                    me.pack();
+                    return true;
+                }
+                return false;
+            });
+
+            boolean haveAll = true;
             for (DatasetDesc dataset : datasets) {
+                haveAll = haveAll && dataset.exists && !dataset.outdated;
                 // Check if dataset requires a minimum version of Gaia Sky
 
                 // Add dataset to desc table
                 OwnCheckBox cb = new OwnCheckBox(dataset.name, skin, "title", pad * 2f);
+                cb.left();
+                cb.setMinWidth(GlobalConf.UI_SCALE_FACTOR < 1.5f ? 245f * GlobalConf.UI_SCALE_FACTOR : 160f * GlobalConf.UI_SCALE_FACTOR);
                 cb.setChecked(dataset.mustDownload);
                 cb.setDisabled(dataset.cbDisabled);
                 cb.addListener((event) -> {
@@ -216,6 +246,7 @@ public class DownloadDataWindow extends GenericDialog {
                     return false;
                 });
                 OwnLabel haveit = new OwnLabel("", skin);
+                haveit.setWidth(55f * GlobalConf.UI_SCALE_FACTOR);
                 if (dataset.exists) {
                     if (dataset.outdated) {
                         setStatusOutdated(dataset, haveit);
@@ -235,6 +266,7 @@ public class DownloadDataWindow extends GenericDialog {
                 HorizontalGroup descGroup = new HorizontalGroup();
                 descGroup.space(padLarge);
                 OwnLabel desc = new OwnLabel(dataset.shortDescription, skin);
+                desc.setWidth(GlobalConf.UI_SCALE_FACTOR < 1.5f ? 200f * GlobalConf.UI_SCALE_FACTOR : 140f * GlobalConf.UI_SCALE_FACTOR);
                 // Info
                 OwnImageButton imgTooltip = new OwnImageButton(skin, "tooltip");
                 imgTooltip.addListener(new OwnTextTooltip(dataset.description, skin, 10));
@@ -244,6 +276,10 @@ public class DownloadDataWindow extends GenericDialog {
                 if (dataset.link != null) {
                     LinkButton imgLink = new LinkButton(dataset.link, skin);
                     descGroup.addActor(imgLink);
+                } else {
+                    Image emptyImg = new Image(skin, "iconic-empty");
+                    descGroup.addActor(emptyImg);
+
                 }
 
                 // Version
@@ -257,6 +293,7 @@ public class DownloadDataWindow extends GenericDialog {
                 }
 
                 OwnLabel vers = new OwnLabel(vstring, skin);
+                vers.setWidth(20f * GlobalConf.UI_SCALE_FACTOR);
                 if (!dataset.exists) {
                     vers.addListener(new OwnTextTooltip(I18n.txt("gui.download.version.server", Integer.toString(dataset.serverVersion)), skin, 10));
                 } else if (dataset.outdated) {
@@ -277,6 +314,7 @@ public class DownloadDataWindow extends GenericDialog {
 
                 // Size
                 OwnLabel size = new OwnLabel(dataset.size, skin);
+                size.setWidth(60f * GlobalConf.UI_SCALE_FACTOR);
 
                 // Delete
                 OwnImageButton rubbish = null;
@@ -330,23 +368,24 @@ public class DownloadDataWindow extends GenericDialog {
                     });
                     rubbishes.add(rubbish);
                 }
-
-                datasetsTable.add(cb).left().padRight(padLarge).padBottom(pad);
-                datasetsTable.add(descGroup).left().padRight(padLarge).padBottom(pad);
-                datasetsTable.add(vers).center().padRight(padLarge).padBottom(pad);
-                datasetsTable.add(typeImage).center().padRight(padLarge).padBottom(pad);
-                datasetsTable.add(size).left().padRight(padLarge).padBottom(pad);
-                datasetsTable.add(haveit).center().padBottom(pad);
+                t.add(cb).left().padRight(padLarge).padBottom(pad);
+                t.add(descGroup).left().padRight(padLarge).padBottom(pad);
+                t.add(vers).center().padRight(padLarge).padBottom(pad);
+                t.add(typeImage).center().padRight(padLarge).padBottom(pad);
+                t.add(size).left().padRight(padLarge).padBottom(pad);
+                t.add(haveit).center().padBottom(pad);
                 if (dataset.exists) {
-                    datasetsTable.add(rubbish).center().padLeft(padLarge * 2.5f);
+                    t.add(rubbish).center().padLeft(padLarge * 2.5f);
                 }
-                datasetsTable.row();
+                t.row();
 
                 choiceList.add(new Trio<>(dataset, cb, haveit));
             }
+            expandIcon.setChecked(!haveAll);
 
         }
 
+        datasetsTable.align(Align.top|Align.left);
         datasetsScroll = new OwnScrollPane(datasetsTable, skin, "minimalist-nobg");
         datasetsScroll.setScrollingDisabled(true, false);
         datasetsScroll.setForceScroll(false, false);
@@ -355,7 +394,7 @@ public class DownloadDataWindow extends GenericDialog {
         datasetsScroll.setHeight(Math.min(Gdx.graphics.getHeight() * 0.45f, 750f * GlobalConf.UI_SCALE_FACTOR));
         datasetsScroll.setWidth(Math.min(Gdx.graphics.getWidth() * 0.9f, GlobalConf.UI_SCALE_FACTOR > 1.4f ? 600f * GlobalConf.UI_SCALE_FACTOR : 750f * GlobalConf.UI_SCALE_FACTOR));
 
-        downloadTable.add(datasetsScroll).center().padBottom(padLarge).colspan(2).row();
+        downloadTable.add(datasetsScroll).top().left().padBottom(padLarge).colspan(2).row();
 
         // Current dataset info
         currentDownloadFile = new OwnLabel("", skin, "hotkey");

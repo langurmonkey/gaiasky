@@ -773,7 +773,7 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
 
         // THEME
         OwnLabel themeLabel = new OwnLabel(I18n.txt("gui.ui.theme"), skin);
-        String[] themes = new String[] { "dark-green", "dark-blue", "dark-orange", "bright-green", "night-red" };
+        String[] themes = new String[] { "dark-green", "dark-blue", "dark-orange", "night-red" };
         theme = new OwnSelectBox<>(skin);
         theme.setWidth(textwidth * 3f);
         theme.setItems(themes);
