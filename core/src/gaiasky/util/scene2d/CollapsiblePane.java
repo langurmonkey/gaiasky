@@ -102,7 +102,7 @@ public class CollapsiblePane extends Table {
         Table headerTable = new Table();
 
         HorizontalGroup titleGroup = new HorizontalGroup();
-        titleGroup.space(3 * GlobalConf.UI_SCALE_FACTOR);
+        titleGroup.space(4f * GlobalConf.UI_SCALE_FACTOR);
         titleGroup.addActor(expandIcon);
         titleGroup.addActor(mainLabel);
         if (shortcut != null && !shortcut.isEmpty())
@@ -175,16 +175,6 @@ public class CollapsiblePane extends Table {
             collapsing = true;
         }
         EventManager.instance.post(Events.RECALCULATE_OPTIONS_SIZE);
-    }
-
-    public void act(float dt) {
-        super.act(dt);
-
-        if (expanding) {
-
-        } else if (collapsing) {
-
-        }
     }
 
     public void detach() {
