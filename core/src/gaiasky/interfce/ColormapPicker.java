@@ -207,6 +207,9 @@ public class ColormapPicker extends ColorPickerAbstract {
         return cmapMax;
     }
 
+    // Stores minimum and maximum mapping values for the session
+    private static Map<String, double[]> minMaxMap = new HashMap<>();
+
     /** A color picker and colormap dialog **/
     private class ColorPickerColormapDialog extends GenericDialog {
         private CheckBox plainColor, colormap;
@@ -320,11 +323,11 @@ public class ColormapPicker extends ColorPickerAbstract {
                 }
                 return false;
             });
-            container.add(cmap).left().padBottom(pad5).padTop(pad * 2).row();
+            container.add(cmap).colspan(2).left().padBottom(pad5).padTop(pad * 2).row();
 
             // Color map image
             cmapImageCell = container.add();
-            cmapImageCell.colspan(2).center().padBottom(pad * 2).row();
+            cmapImageCell.colspan(3).center().padBottom(pad * 2).row();
             updateCmapImage(cmap.getSelected().name);
 
             // Attribute
@@ -372,33 +375,48 @@ public class ColormapPicker extends ColorPickerAbstract {
                 }
                 return false;
             });
-            container.add(attribs).left().padBottom(pad5).row();
+            container.add(attribs).colspan(2).left().padBottom(pad5).row();
+
 
             // Min mapping value
             container.add(new OwnLabel(I18n.txt("gui.colorpicker.min"), skin)).left().padRight(pad).padBottom(pad5);
-            minMap = new OwnTextField(Double.toString(catalogInfo.hlCmapMin), skin);
-            minMap.setWidth(sbwidth);
+            minMap = new OwnTextField(Double.toString(getCmapMin(cmapAttrib, catalogInfo)), skin);
+            minMap.setWidth(sbwidth * 0.9f);
             minMap.addListener(event -> {
                 if (event instanceof ChangeEvent && minMap.isValid()) {
                     cmapMin = Parser.parseFloat(minMap.getText());
+                    updateMinMaxMap(catalogInfo, cmapAttrib, 0, cmapMin);
                     return true;
                 }
                 return false;
             });
-            container.add(minMap).left().padBottom(pad5).row();
+            container.add(minMap).left().padBottom(pad5).padRight(pad5);
+            // Reload
+            OwnImageButton reloadCmap = new OwnImageButton(skin, "reload");
+            reloadCmap.addListener(new OwnTextTooltip(I18n.txt("gui.colorpicker.minmax.reload"), skin, 3));
+            reloadCmap.addListener((event)->{
+                if(event instanceof ChangeEvent){
+                    recomputeAttributeMinMax(catalogInfo, cmapAttrib, true);
+                    return true;
+                }
+                return false;
+            });
+            container.add(reloadCmap).left().padBottom(pad5).row();
 
             // Max mapping value
             container.add(new OwnLabel(I18n.txt("gui.colorpicker.max"), skin)).left().padRight(pad).padBottom(pad5);
-            maxMap = new OwnTextField(Double.toString(catalogInfo.hlCmapMax), skin);
-            maxMap.setWidth(sbwidth);
+            maxMap = new OwnTextField(Double.toString(getCmapMax(cmapAttrib, catalogInfo)), skin);
+            maxMap.setWidth(sbwidth * 0.9f);
             maxMap.addListener(event -> {
                 if (event instanceof ChangeEvent && maxMap.isValid()) {
                     cmapMax = Parser.parseFloat(maxMap.getText());
+                    updateMinMaxMap(catalogInfo, cmapAttrib, 1, cmapMax);
                     return true;
                 }
                 return false;
             });
-            container.add(maxMap).left().padBottom(pad5).row();
+            container.add(maxMap).colspan(2).left().padBottom(pad5);
+            container.add().row();
 
             // Select
             cmap.setSelectedIndex(catalogInfo.hlCmapIndex);
@@ -407,6 +425,7 @@ public class ColormapPicker extends ColorPickerAbstract {
             // Trigger first update
             attribs.getSelection().fireChangeEvent();
             cmap.getSelection().fireChangeEvent();
+
         }
 
         private void updateCmapImage(String cmap) {
@@ -416,9 +435,53 @@ public class ColormapPicker extends ColorPickerAbstract {
             pack();
         }
 
+        private double getCmapMin(IAttribute attrib, CatalogInfo ci) {
+            if(attrib != null && ci != null) {
+                String key = key(ci, attrib);
+                if (!minMaxMap.containsKey(key))
+                    return ci.hlCmapMin;
+                else
+                    return minMaxMap.get(key)[0];
+            }else{
+                return 0;
+            }
+        }
+
+        private double getCmapMax(IAttribute attrib, CatalogInfo ci) {
+            String key = key(ci, attrib);
+            if (!minMaxMap.containsKey(key))
+                return ci.hlCmapMax;
+            else
+                return minMaxMap.get(key)[1];
+        }
+
+        private void updateMinMaxMap(CatalogInfo ci, IAttribute attrib, int index, double value) {
+            String key = key(ci, attrib);
+            if (!minMaxMap.containsKey(key)) {
+                minMaxMap.put(key, new double[] { value, value });
+            } else {
+                minMaxMap.get(key)[index] = value;
+            }
+        }
+
+        private String key(CatalogInfo ci, IAttribute attrib){
+            return (ci != null ? ci.name + "-" : "") + (attrib != null ? attrib.toString() : "dummy");
+        }
+
         /** Compute every time, this is costly **/
         private void recomputeAttributeMinMax(CatalogInfo ci, IAttribute attrib) {
-            if (ci.object instanceof ParticleGroup || ci.object instanceof OctreeWrapper) {
+            recomputeAttributeMinMax(ci, attrib, false);
+        }
+        private void recomputeAttributeMinMax(CatalogInfo ci, IAttribute attrib, boolean force) {
+            String key = key(ci, attrib);
+            if (!force && minMaxMap.containsKey(key)) {
+                double[] minmax = minMaxMap.get(key);
+                // Set to fields
+                minMap.setText(Double.toString(minmax[0]));
+                maxMap.setText(Double.toString(minmax[1]));
+                cmapMin = minmax[0];
+                cmapMax = minmax[1];
+            } else if (ci.object instanceof ParticleGroup || ci.object instanceof OctreeWrapper) {
                 pgarray.clear();
                 apearray.clear();
                 if (ci.object instanceof OctreeWrapper) {
@@ -448,6 +511,8 @@ public class ColormapPicker extends ColorPickerAbstract {
                 maxMap.setText(Double.toString(max));
                 cmapMin = min;
                 cmapMax = max;
+                // Add to map
+                minMaxMap.put(key, new double[] { min, max });
             }
         }
 

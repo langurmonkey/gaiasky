@@ -6,22 +6,18 @@
 package gaiasky.util.filter.attrib;
 
 import gaiasky.scenegraph.ParticleGroup.ParticleBean;
-import gaiasky.scenegraph.StarGroup.StarBean;
 import gaiasky.util.ucd.UCD;
 
 public class AttributeUCD implements IAttribute<ParticleBean> {
     public UCD ucd;
-    public AttributeUCD(UCD ucd){
+
+    public AttributeUCD(UCD ucd) {
         this.ucd = ucd;
     }
 
     @Override
     public double get(ParticleBean bean) {
-        if(bean instanceof StarBean){
-            StarBean sb = (StarBean) bean;
-            return sb.extra != null ? sb.extra.get(ucd) : Double.NaN;
-        }
-        return Double.NaN;
+        return bean.extra != null ? bean.extra.get(ucd) : Double.NaN;
     }
 
     @Override
@@ -39,7 +35,7 @@ public class AttributeUCD implements IAttribute<ParticleBean> {
         return ucd.colname.equals(that.ucd.colname);
     }
 
-    public String toString(){
+    public String toString() {
         return ucd.colname;
     }
 }
