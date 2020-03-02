@@ -43,9 +43,11 @@ import gaiasky.util.ucd.UCD;
 import uk.ac.starlink.util.DataSource;
 import uk.ac.starlink.util.FileDataSource;
 
-import java.io.File;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
@@ -118,6 +120,8 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
     }
 
     private double[] dArray(List l) {
+        if(l == null)
+            return null;
         double[] res = new double[l.size()];
         int i = 0;
         for (Object o : l) {
@@ -127,6 +131,8 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
     }
 
     private int[] iArray(List l) {
+        if(l == null)
+            return null;
         int[] res = new int[l.size()];
         int i = 0;
         for (Object o : l) {
@@ -1376,6 +1382,9 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
             displayMessageObject(id, message, (float) x, (float) y, (float) color[0], (float) color[1], (float) color[2], a, (float) fontSize);
         }
     }
+    public void displayMessageObject(final int id, final String message, final double x, final double y, final List color, final double fontSize) {
+        displayMessageObject(id, message, x, y, dArray(color), fontSize);
+    }
 
     public void displayMessageObject(final int id, final String message, final float x, final float y, final float r, final float g, final float b, final float a, final int fontSize) {
         displayMessageObject(id, message, x, y, r, g, b, a, (float) fontSize);
@@ -1404,7 +1413,9 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
             float a = color.length > 3 ? (float) color[3] : 1f;
             displayImageObject(id, path, (float) x, (float) y, (float) color[0], (float) color[1], (float) color[2], a);
         }
-
+    }
+    public void displayImageObject(final int id, final String path, final double x, final double y, final List color) {
+        displayImageObject(id, path, x, y, dArray(color));
     }
 
     @Override
@@ -1860,6 +1871,10 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
         return new double[] { aux3d1.y, aux3d1.z, aux3d1.x };
     }
 
+    public double[] equatorialCartesianToInternalCartesian(final List eq, double kmFactor) {
+        return equatorialCartesianToInternalCartesian(dArray(eq), kmFactor);
+    }
+
     @Override
     public double[] equatorialToGalactic(double[] eq) {
         aux3d1.set(eq).mul(Coordinates.eqToGal());
@@ -1953,7 +1968,7 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
     @Override
     public void setHDRToneMappingType(String type) {
         if (checkString(type, new String[] { "auto", "AUTO", "exposure", "EXPOSURE", "none", "NONE" }, "tone mapping type"))
-            GaiaSky.postRunnable(() -> em.post(Events.TONEMAPPING_TYPE_CMD, GlobalConf.PostprocessConf.ToneMapping.valueOf(type), false));
+            GaiaSky.postRunnable(() -> em.post(Events.TONEMAPPING_TYPE_CMD, GlobalConf.PostprocessConf.ToneMapping.valueOf(type.toUpperCase()), false));
     }
 
     @Override
@@ -2235,10 +2250,13 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
         }
     }
 
-
     @Override
     public boolean loadStarDataset(String dsName, String path, double magnitudeScale, double[] labelColor, double[] fadeIn, double[] fadeOut, boolean sync) {
         return loadStarDataset(dsName, path, CatalogInfo.CatalogInfoType.SCRIPT, magnitudeScale, labelColor, fadeIn, fadeOut, sync);
+    }
+
+    public boolean loadStarDataset(String dsName, String path, double magnitudeScale, final List labelColor, final List fadeIn, final List fadeOut, boolean sync) {
+        return loadStarDataset(dsName, path, magnitudeScale, dArray(labelColor), dArray(fadeIn), dArray(fadeOut), sync);
     }
 
     public boolean loadStarDataset(String dsName, String path, CatalogInfo.CatalogInfoType type, double magnitudeScale, double[] labelColor, double[] fadeIn, double[] fadeOut, boolean sync) {
@@ -2250,6 +2268,9 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
     public boolean loadParticleDataset(String dsName, String path, double profileDecay, double[] particleColor, double colorNoise, double[] labelColor, double particleSize, String ct, double[] fadeIn, double[] fadeOut, boolean sync) {
         ComponentType compType = ComponentType.valueOf(ct);
         return loadParticleDataset(dsName, path, profileDecay, particleColor, colorNoise, labelColor, particleSize, compType, fadeIn, fadeOut, sync);
+    }
+    public boolean loadParticleDataset(String dsName, String path, double profileDecay, final List particleColor, double colorNoise, final List labelColor, double particleSize, String ct, final List fadeIn, final List fadeOut, boolean sync) {
+        return loadParticleDataset(dsName, path, profileDecay, dArray(particleColor), colorNoise, dArray(labelColor), particleSize, ct, dArray(fadeIn), dArray(fadeOut), sync);
     }
 
     public boolean loadParticleDataset(String dsName, String path, double profileDecay, double[] particleColor, double colorNoise, double[] labelColor, double particleSize, ComponentType ct, double[] fadeIn, double[] fadeOut, boolean sync) {
@@ -2269,11 +2290,11 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
     private boolean loadDatasetImmediate(String dsName, String path, CatalogInfo.CatalogInfoType type, DatasetOptions dops, boolean sync) {
         try {
             logger.info(I18n.txt("notif.catalog.loading", path));
-            File f = new File(path);
-            if (f.exists() && f.canRead()) {
+            Path p = Paths.get(path);
+            if (Files.exists(p) && Files.isReadable(p)) {
                 STILDataProvider provider = new STILDataProvider();
                 provider.setDatasetOptions(dops);
-                DataSource ds = new FileDataSource(f);
+                DataSource ds = new FileDataSource(p.toFile());
                 @SuppressWarnings("unchecked") Array<ParticleBean> data = (Array<ParticleBean>) provider.loadData(ds, 1.0f);
 
                 // Create star/particle group
