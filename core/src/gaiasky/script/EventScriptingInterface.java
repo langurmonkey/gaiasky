@@ -1369,6 +1369,14 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
         GaiaSky.postRunnable(() -> em.post(Events.ADD_CUSTOM_MESSAGE, id, message, x, y, r, g, b, a, fontSize));
     }
 
+    @Override
+    public void displayMessageObject(final int id, final String message, final double x, final double y, final double[] color, final double fontSize) {
+        if(checkNotNull(color, "color") && checkLengths(color, 3, 4, "color")) {
+            float a = color.length > 3 ? (float) color[3] : 1f;
+            displayMessageObject(id, message, (float) x, (float) y, (float) color[0], (float) color[1], (float) color[2], a, (float) fontSize);
+        }
+    }
+
     public void displayMessageObject(final int id, final String message, final float x, final float y, final float r, final float g, final float b, final float a, final int fontSize) {
         displayMessageObject(id, message, x, y, r, g, b, a, (float) fontSize);
     }
@@ -1388,6 +1396,15 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
             Texture tex = getTexture(path);
             em.post(Events.ADD_CUSTOM_IMAGE, id, tex, x, y, r, g, b, a);
         });
+    }
+
+    @Override
+    public void displayImageObject(final int id, final String path, final double x, final double y, final double[] color) {
+        if(checkNotNull(color, "color") && checkLengths(color, 3, 4, "color")){
+            float a = color.length > 3 ? (float) color[3] : 1f;
+            displayImageObject(id, path, (float) x, (float) y, (float) color[0], (float) color[1], (float) color[2], a);
+        }
+
     }
 
     @Override
@@ -2629,6 +2646,22 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
     private boolean checkNum(double value, double min, double max, String name) {
         if (value < min || value > max) {
             logger.error(name + " must be between " + min + " and " + max + ": " + value);
+            return false;
+        }
+        return true;
+    }
+
+    private boolean checkLengths(double[] array, int length1, int length2, String name){
+        if(array.length != length1 && array.length != length2){
+            logger.error(name + " must have a length of " + length1 + " or " + length2 + ". Current length is " + array.length);
+            return false;
+        }
+        return true;
+    }
+
+    private boolean checkLength(double[] array, int length, String name){
+        if(array.length != length){
+            logger.error(name + " must have a length of " + length + ". Current length is " + array.length);
             return false;
         }
         return true;

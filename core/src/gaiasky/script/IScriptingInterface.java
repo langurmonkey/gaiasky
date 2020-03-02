@@ -97,20 +97,40 @@ public interface IScriptingInterface {
      *                 want to remove it.
      * @param message  The string message, to be displayed in one line. But explicit
      *                 newline breaks the line.
-     * @param x        The x coordinate of the bottom-left corner, in [0..1] from
+     * @param x        The x coordinate of the bottom-left corner, in [0,1] from
      *                 left to right. This is not resolution-dependant.
-     * @param y        The y coordinate of the bottom-left corner, in [0..1] from
+     * @param y        The y coordinate of the bottom-left corner, in [0,1] from
      *                 bottom to top. This is not resolution-dependant.
-     * @param r        The red component of the color in [0..1].
-     * @param g        The green component of the color in [0..1].
-     * @param b        The blue component of the color in [0..1].
-     * @param a        The alpha component of the color in [0..1].
+     * @param r        The red component of the color in [0,1].
+     * @param g        The green component of the color in [0,1].
+     * @param b        The blue component of the color in [0,1].
+     * @param a        The alpha component of the color in [0,1].
      * @param fontSize The size of the font. The system will use the existing font
      *                 closest to the chosen size and scale it up or down to match
      *                 the desired size. Scaling can cause artifacts, so to ensure
      *                 the best font quality, stick to the existing sizes.
      */
     void displayMessageObject(int id, String message, float x, float y, float r, float g, float b, float a, float fontSize);
+
+    /**
+     * Same as {@link IScriptingInterface#displayImageObject(int, String, float, float, float, float, float, float)} but using an array for the color
+     * instead of giving each component separately.
+     *
+     * @param id       A unique identifier, used to identify this message when you
+     *                 want to remove it.
+     * @param message  The string message, to be displayed in one line. But explicit
+     *                 newline breaks the line.
+     * @param x        The x coordinate of the bottom-left corner, in [0,1] from
+     *                 left to right. This is not resolution-dependant.
+     * @param y        The y coordinate of the bottom-left corner, in [0,1] from
+     *                 bottom to top. This is not resolution-dependant.
+     * @param color    The color as an array of {red, green, blue, alpha} where each element is in [0,1].
+     * @param fontSize The size of the font. The system will use the existing font
+     *                 closest to the chosen size and scale it up or down to match
+     *                 the desired size. Scaling can cause artifacts, so to ensure
+     *                 the best font quality, stick to the existing sizes.
+     */
+    void displayMessageObject(int id, String message, double x, double y, double[] color, double fontSize);
 
     /**
      * Adds a new multi-line text in the screen with the given id, coordinates
@@ -125,18 +145,18 @@ public interface IScriptingInterface {
      * @param text      The string message, to be displayed line-wrapped in the box
      *                  defined by maxWidth and maxHeight. Explicit newline still
      *                  breaks the line.
-     * @param x         The x coordinate of the bottom-left corner, in [0..1] from
+     * @param x         The x coordinate of the bottom-left corner, in [0,1] from
      *                  left to right. This is not resolution-dependant.
-     * @param y         The y coordinate of the bottom-left corner, in [0..1] from
+     * @param y         The y coordinate of the bottom-left corner, in [0,1] from
      *                  bottom to top. This is not resolution-dependant.
-     * @param maxWidth  The maximum width in screen percentage [0..1]. Set to 0 to let
+     * @param maxWidth  The maximum width in screen percentage [0,1]. Set to 0 to let
      *                  the system decide.
-     * @param maxHeight The maximum height in screen percentage [0..1]. Set to 0 to
+     * @param maxHeight The maximum height in screen percentage [0,1]. Set to 0 to
      *                  let the system decide.
-     * @param r         The red component of the color in [0..1].
-     * @param g         The green component of the color in [0..1].
-     * @param b         The blue component of the color in [0..1].
-     * @param a         The alpha component of the color in [0..1].
+     * @param r         The red component of the color in [0,1].
+     * @param g         The green component of the color in [0,1].
+     * @param b         The blue component of the color in [0,1].
+     * @param a         The alpha component of the color in [0,1].
      * @param fontSize  The size of the font. The system will use the existing font
      *                  closest to the chosen size.
      */
@@ -154,9 +174,9 @@ public interface IScriptingInterface {
      *             want to remove it.
      * @param path The path to the image. It can either be an absolute path (not
      *             recommended) or a path relative to the Gaia Sandbox folder.
-     * @param x    The x coordinate of the bottom-left corner, in [0..1] from
+     * @param x    The x coordinate of the bottom-left corner, in [0,1] from
      *             left to right. This is not resolution-dependant.
-     * @param y    The y coordinate of the bottom-left corner, in [0..1] from
+     * @param y    The y coordinate of the bottom-left corner, in [0,1] from
      *             bottom to top. This is not resolution-dependant.
      */
     void displayImageObject(int id, String path, float x, float y);
@@ -172,16 +192,32 @@ public interface IScriptingInterface {
      *             want to remove it.
      * @param path The path to the image. It can either be an absolute path (not
      *             recommended) or a path relative to the Gaia Sky folder.
-     * @param x    The x coordinate of the bottom-left corner, in [0..1] from
+     * @param x    The x coordinate of the bottom-left corner, in [0,1] from
      *             left to right. This is not resolution-dependant.
-     * @param y    The y coordinate of the bottom-left corner, in [0..1] from
+     * @param y    The y coordinate of the bottom-left corner, in [0,1] from
      *             bottom to top. This is not resolution-dependant.
-     * @param r    The red component of the color in [0..1].
-     * @param g    The green component of the color in [0..1].
-     * @param b    The blue component of the color in [0..1].
-     * @param a    The alpha component of the color in [0..1].
+     * @param r    The red component of the color in [0,1].
+     * @param g    The green component of the color in [0,1].
+     * @param b    The blue component of the color in [0,1].
+     * @param a    The alpha component of the color in [0,1].
      */
     void displayImageObject(int id, final String path, float x, float y, float r, float g, float b, float a);
+
+    /**
+     * Same as {@link IScriptingInterface#displayImageObject(int, String, float, float, float, float, float, float)} but using a
+     * double array for the color instead of each component separately.
+     *
+     * @param id    A unique identifier, used to identify this message when you
+     *              want to remove it.
+     * @param path  The path to the image. It can either be an absolute path (not
+     *              recommended) or a path relative to the Gaia Sky folder.
+     * @param x     The x coordinate of the bottom-left corner, in [0,1] from
+     *              left to right. This is not resolution-dependant.
+     * @param y     The y coordinate of the bottom-left corner, in [0,1] from
+     *              bottom to top. This is not resolution-dependant.
+     * @param color The color as an array of {red, green, blue, alpha} where each element is in [0,1].
+     */
+    void displayImageObject(int id, final String path, double x, double y, double[] color);
 
     /**
      * Removes all objects.
@@ -1084,7 +1120,7 @@ public interface IScriptingInterface {
      * @param name   The name to identify the polyline, to possibly remove it later.
      * @param points The points of the polyline. It is an array containing all the
      *               points as in [x0, y0, z0, x1, y1, z1, ..., xn, yn, zn].
-     * @param color  A 4D array with the RGBA color, where each element is in [0..1].
+     * @param color  The color of the polyline as an array of {red, green, blue, alpha}, where each element is in [0,1].
      */
     void addPolyline(String name, double[] points, double[] color);
 
@@ -1097,7 +1133,7 @@ public interface IScriptingInterface {
      * @param name      The name to identify the polyline, to possibly remove it later.
      * @param points    The points of the polyline. It is an array containing all the
      *                  points as in [x0, y0, z0, x1, y1, z1, ..., xn, yn, zn].
-     * @param color     A 4D array with the RGBA color, where each element is in [0..1].
+     * @param color     The color of the polyline as an array of {red, green, blue, alpha}, where each element is in [0,1].
      * @param lineWidth The line width. Usually a value between 1 (default) and 10.
      */
     void addPolyline(String name, double[] points, double[] color, double lineWidth);
@@ -1110,7 +1146,7 @@ public interface IScriptingInterface {
      * @param name      The name to identify the polyline, to possibly remove it later.
      * @param points    The points of the polyline. It is an array containing all the
      *                  points as in [x0, y0, z0, x1, y1, z1, ..., xn, yn, zn].
-     * @param color     A 4D array with the RGBA color, where each element is in [0..1].
+     * @param color     The color of the polyline as an array of {red, green, blue, alpha}, where each element is in [0,1].
      * @param lineWidth The line width. Usually a value between 1 (default) and 10.
      * @param primitive The GL primitive: GL_LINES=1, GL_LINE_LOOP=2, GL_LINE_STRIP=3
      */
@@ -1172,9 +1208,9 @@ public interface IScriptingInterface {
      * Moves the interface window to a new position.
      *
      * @param x The new x coordinate of the new top-left corner of the window,
-     *          in [0..1] from left to right.
+     *          in [0,1] from left to right.
      * @param y The new y coordinate of the new top-left corner of the window,
-     *          in [0..1] from bottom to top.
+     *          in [0,1] from bottom to top.
      */
     void setGuiPosition(float x, float y);
 
@@ -1440,7 +1476,7 @@ public interface IScriptingInterface {
      * Sets the brightness level of the render system.
      *
      * @param level The brightness level as a double precision floating point
-     *              number in [-1..1]. The neutral value is 0.0.
+     *              number in [-1,1]. The neutral value is 0.0.
      */
     void setBrightnessLevel(double level);
 
@@ -1448,7 +1484,7 @@ public interface IScriptingInterface {
      * Sets the contrast level of the render system.
      *
      * @param level The contrast level as a double precision floating point number
-     *              in [0..2]. The neutral value is 1.0.
+     *              in [0,2]. The neutral value is 1.0.
      */
     void setContrastLevel(double level);
 
@@ -1456,7 +1492,7 @@ public interface IScriptingInterface {
      * Sets the hue level of the render system.
      *
      * @param level The hue level as a double precision floating point number
-     *              in [0..2]. The neutral value is 1.0.
+     *              in [0,2]. The neutral value is 1.0.
      */
     void setHueLevel(double level);
 
@@ -1464,14 +1500,14 @@ public interface IScriptingInterface {
      * Sets the saturation level of the render system.
      *
      * @param level The saturation level as a double precision floating point number
-     *              in [0..2]. The neutral value is 1.0.
+     *              in [0,2]. The neutral value is 1.0.
      */
     void setSaturationLevel(double level);
 
     /**
      * Sets the gamma correction level.
      *
-     * @param level The gamma correction level in [0..3] as a floating point number.
+     * @param level The gamma correction level in [0,3] as a floating point number.
      *              The neutral value is 1.2.
      */
     void setGammaCorrectionLevel(double level);
@@ -1494,7 +1530,7 @@ public interface IScriptingInterface {
     /**
      * Sets the exposure level.
      *
-     * @param level The exposure level in [0..n]. Set to 0 to disable exposure tone mapping.
+     * @param level The exposure level in [0,n]. Set to 0 to disable exposure tone mapping.
      */
     void setExposureToneMappingLevel(double level);
 
@@ -1738,13 +1774,14 @@ public interface IScriptingInterface {
      * If <code>sync</code> is true, the call waits until the dataset is loaded and then returns.
      * If <code>sync</code> is false, the loading happens in a new thread and
      * the call returns immediately. It includes some parameters to apply to the new star group.
-     * @param dsName The name of the dataset.
-     * @param path Absolute path (or relative to the working path of Gaia Sky) to the <code>.vot</code> file to load.
+     *
+     * @param dsName         The name of the dataset.
+     * @param path           Absolute path (or relative to the working path of Gaia Sky) to the <code>.vot</code> file to load.
      * @param magnitudeScale Scale factor to apply to the star magnitudes.
-     * @param labelColor The color of the dataset label.
-     * @param fadeIn Two values which represent the fade in mapping distances (in parsecs, as distance from camera to the Sun) of this dataset.
-     * @param fadeOut Two values which represent the fade out mapping distances (in parsecs, as distance from camera to the Sun) of this dataset.
-     * @param sync   Whether the load must happen synchronously or asynchronously.
+     * @param labelColor     The color of the dataset label, as an array of {red, green, blue, alpha} where each element is in [0,1].
+     * @param fadeIn         Two values which represent the fade in mapping distances (in parsecs, as distance from camera to the Sun) of this dataset.
+     * @param fadeOut        Two values which represent the fade out mapping distances (in parsecs, as distance from camera to the Sun) of this dataset.
+     * @param sync           Whether the load must happen synchronously or asynchronously.
      * @return False if the dataset could not be loaded (sync mode). True if it could not be loaded (sync mode), or <code>sync</code> is false.
      */
     boolean loadStarDataset(String dsName, String path, double magnitudeScale, double[] labelColor, double[] fadeIn, double[] fadeOut, boolean sync);
@@ -1755,17 +1792,18 @@ public interface IScriptingInterface {
      * If <code>sync</code> is true, the call waits until the dataset is loaded and then returns.
      * If <code>sync</code> is false, the loading happens in a new thread and
      * the call returns immediately. It includes some parameters to apply to the new star group.
-     * @param dsName The name of the dataset.
-     * @param path Absolute path (or relative to the working path of Gaia Sky) to the <code>.vot</code> file to load.
-     * @param profileDecay The profile decay of the particles as in 1 - distCentre^decay.
-     * @param particleColor The base color of the particles.
-     * @param colorNoise In [0,1], the noise to apply to the color so that each particle gets a slightly different tone. Set to 0 so that all particles get the same color.
-     * @param labelColor The color of the dataset label.
-     * @param particleSize The size of the particles.
-     * @param ct The name of the component type to use (see {@link gaiasky.render.ComponentTypes.ComponentType}).
-     * @param fadeIn Two values which represent the fade in mapping distances (in parsecs, as distance from camera to the Sun) of this dataset.
-     * @param fadeOut Two values which represent the fade out mapping distances (in parsecs, as distance from camera to the Sun) of this dataset.
-     * @param sync   Whether the load must happen synchronously or asynchronously.
+     *
+     * @param dsName        The name of the dataset.
+     * @param path          Absolute path (or relative to the working path of Gaia Sky) to the <code>.vot</code> file to load.
+     * @param profileDecay  The profile decay of the particles as in 1 - distCentre^decay.
+     * @param particleColor The base color of the particles, as an array of {red, green, blue, alpha} where each element is in [0,1].
+     * @param colorNoise    In [0,1], the noise to apply to the color so that each particle gets a slightly different tone. Set to 0 so that all particles get the same color.
+     * @param labelColor    The color of the dataset label, as an array of {red, green, blue, alpha} where each element is in [0,1].
+     * @param particleSize  The size of the particles.
+     * @param ct            The name of the component type to use (see {@link gaiasky.render.ComponentTypes.ComponentType}).
+     * @param fadeIn        Two values which represent the fade in mapping distances (in parsecs, as distance from camera to the Sun) of this dataset.
+     * @param fadeOut       Two values which represent the fade out mapping distances (in parsecs, as distance from camera to the Sun) of this dataset.
+     * @param sync          Whether the load must happen synchronously or asynchronously.
      * @return False if the dataset could not be loaded (sync mode). True if it could not be loaded (sync mode), or <code>sync</code> is false.
      */
     boolean loadParticleDataset(String dsName, String path, double profileDecay, double[] particleColor, double colorNoise, double[] labelColor, double particleSize, String ct, double[] fadeIn, double[] fadeOut, boolean sync);
@@ -1824,7 +1862,7 @@ public interface IScriptingInterface {
      * </ul>
      *
      * @param dsName     The dataset name.
-     * @param colorIndex Color index in [0..8].
+     * @param colorIndex Color index in [0,8].
      * @param highlight  Whether to highlight or not.
      * @return False if the dataset could not be found.
      */
