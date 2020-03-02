@@ -366,9 +366,7 @@ public class AstroUtils {
      * @param highAccuracy Whether to use the full precision algorithms or skip some
      *                     terms for speed
      * @return The output vector with L, B and R, for chaining.
-     * @deprecated Should use the classes that extend IBodyCoordinates instead.
      */
-    @Deprecated
     public static Vector3d getEclipticCoordinates(String body, Instant instant, Vector3d out, boolean highAccuracy) {
 
         switch (body) {

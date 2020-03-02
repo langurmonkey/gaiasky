@@ -95,7 +95,10 @@ public class OrbitSamplerDataProvider implements IOrbitDataProvider {
     public void load(String file, OrbitDataLoaderParameter parameter) {
         // Sample using VSOP
         // If num samples is not defined, we use 300 samples per year of period
-        int numSamples = parameter.numSamples > 0 ? parameter.numSamples : (int) (300.0 * parameter.orbitalPeriod / 365.0);
+
+        // Prevent overlapping by rescaling the period
+        double period = parameter.orbitalPeriod * 0.99d;
+        int numSamples = parameter.numSamples > 0 ? parameter.numSamples : (int) (300.0 * period / 365.0);
         numSamples = Math.max(100, Math.min(2000, numSamples));
         data = new PointCloudData();
         String bodyDesc = parameter.name;
@@ -103,7 +106,7 @@ public class OrbitSamplerDataProvider implements IOrbitDataProvider {
         double last = 0, accum = 0;
 
         // Milliseconds of this orbit in one revolution
-        double orbitalMs = parameter.orbitalPeriod * 86400000.0;
+        double orbitalMs = period * 86400000.0;
         double stepMs = orbitalMs / (double) numSamples;
 
         // Load orbit data
