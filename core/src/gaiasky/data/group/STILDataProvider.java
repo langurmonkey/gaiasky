@@ -353,6 +353,11 @@ public class STILDataProvider extends AbstractStarGroupDataProvider {
             try {
                 val = ((Number) row[extra.index]).doubleValue();
             } catch (Exception e) {
+                Object o = row[extra.index];
+                if(o instanceof Character){
+                   Character c = (Character) o;
+                   val = (double) c.charValue();
+                }
             }
             if (extraAttributes == null)
                 extraAttributes = new HashMap<>();
