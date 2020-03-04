@@ -5,20 +5,21 @@
 
 package gaiasky.util.samp;
 
-import com.badlogic.gdx.utils.Array;
+import com.badlogic.gdx.scenes.scene2d.Stage;
+import gaiasky.GaiaSky;
+import gaiasky.data.group.DatasetOptions;
 import gaiasky.data.group.STILDataProvider;
 import gaiasky.event.EventManager;
 import gaiasky.event.Events;
 import gaiasky.event.IObserver;
-import gaiasky.scenegraph.ParticleGroup.ParticleBean;
+import gaiasky.interfce.DatasetLoadDialog;
 import gaiasky.scenegraph.StarGroup;
 import gaiasky.scenegraph.camera.CameraManager.CameraMode;
-import gaiasky.util.CatalogInfo;
-import gaiasky.util.CatalogInfo.CatalogInfoType;
-import gaiasky.util.GlobalConf;
-import gaiasky.util.Logger;
+import gaiasky.script.EventScriptingInterface;
+import gaiasky.util.*;
 import gaiasky.util.Logger.Log;
 import gaiasky.util.parse.Parser;
+import org.apache.commons.io.FilenameUtils;
 import org.astrogrid.samp.Message;
 import org.astrogrid.samp.Metadata;
 import org.astrogrid.samp.client.*;
@@ -204,33 +205,32 @@ public class SAMPClient implements IObserver {
      */
     private boolean loadVOTable(String url, String id, String name) {
         logger.info("Loading VOTable: " + name + " from " + url);
-
+        // Load selected file
         try {
             DataSource ds = new URLDataSource(new URL(url));
-            @SuppressWarnings("unchecked") Array<ParticleBean> data = (Array<ParticleBean>) provider.loadData(ds, 1.0f);
-
-            if (data != null && data.size > 0) {
-                StarGroup sg = StarGroup.getDefaultStarGroup(id, data);
-
-                // Catalog info
-                CatalogInfo ci = new CatalogInfo(name, url, null, CatalogInfoType.SAMP, 1.5f, sg);
-
-                mapIdSg.put(id, sg);
-                mapIdUrl.put(id, url);
-
-                // Insert
-                EventManager.instance.post(Events.CATALOG_ADD, ci, true);
-
-                logger.info(data.size + " objects loaded via SAMP");
-                return true;
-            } else {
-                // No data has been loaded
-                return false;
-            }
+            Stage ui = GaiaSky.instance.mainGui.getGuiStage();
+            String fileName = ds.getName();
+            final DatasetLoadDialog dld = new DatasetLoadDialog(I18n.txt("gui.dsload.title") + ": " + fileName, GlobalResources.skin, ui);
+            Runnable doLoad = () -> {
+                try {
+                    DatasetOptions dops = dld.generateDatasetOptions();
+                    // Access dld properties
+                    EventScriptingInterface.instance().loadDataset(FilenameUtils.getName(fileName), ds, CatalogInfo.CatalogInfoType.UI, dops, false);
+                    // Open UI datasets
+                    EventScriptingInterface.instance().maximizeInterfaceWindow();
+                    EventScriptingInterface.instance().expandGuiComponent("DatasetsComponent");
+                } catch (Exception e) {
+                    logger.error(I18n.txt("notif.error", fileName), e);
+                }
+            };
+            dld.setAcceptRunnable(doLoad);
+            dld.show(ui);
+            return true;
         } catch (Exception e) {
-            logger.error(e);
+            logger.error(I18n.txt("notif.error", url), e);
             return false;
         }
+
     }
 
     @Override

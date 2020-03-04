@@ -180,6 +180,7 @@ public class DatasetsComponent extends GuiComponent implements IObserver {
                 groupMap.remove(ciName);
                 imageMap.remove(ciName);
                 colorMap.remove(ciName);
+                EventManager.instance.post(Events.RECALCULATE_OPTIONS_SIZE);
             }
             break;
         case CATALOG_VISIBLE:

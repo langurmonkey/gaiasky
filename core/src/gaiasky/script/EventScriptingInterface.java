@@ -120,7 +120,7 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
     }
 
     private double[] dArray(List l) {
-        if(l == null)
+        if (l == null)
             return null;
         double[] res = new double[l.size()];
         int i = 0;
@@ -131,7 +131,7 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
     }
 
     private int[] iArray(List l) {
-        if(l == null)
+        if (l == null)
             return null;
         int[] res = new int[l.size()];
         int i = 0;
@@ -1377,11 +1377,12 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
 
     @Override
     public void displayMessageObject(final int id, final String message, final double x, final double y, final double[] color, final double fontSize) {
-        if(checkNotNull(color, "color") && checkLengths(color, 3, 4, "color")) {
+        if (checkNotNull(color, "color") && checkLengths(color, 3, 4, "color")) {
             float a = color.length > 3 ? (float) color[3] : 1f;
             displayMessageObject(id, message, (float) x, (float) y, (float) color[0], (float) color[1], (float) color[2], a, (float) fontSize);
         }
     }
+
     public void displayMessageObject(final int id, final String message, final double x, final double y, final List color, final double fontSize) {
         displayMessageObject(id, message, x, y, dArray(color), fontSize);
     }
@@ -1409,11 +1410,12 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
 
     @Override
     public void displayImageObject(final int id, final String path, final double x, final double y, final double[] color) {
-        if(checkNotNull(color, "color") && checkLengths(color, 3, 4, "color")){
+        if (checkNotNull(color, "color") && checkLengths(color, 3, 4, "color")) {
             float a = color.length > 3 ? (float) color[3] : 1f;
             displayImageObject(id, path, (float) x, (float) y, (float) color[0], (float) color[1], (float) color[2], a);
         }
     }
+
     public void displayImageObject(final int id, final String path, final double x, final double y, final List color) {
         displayImageObject(id, path, x, y, dArray(color));
     }
@@ -2250,6 +2252,16 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
         }
     }
 
+    public boolean loadDataset(String dsName, DataSource ds, CatalogInfo.CatalogInfoType type, DatasetOptions dops, boolean sync) {
+        if (sync) {
+            return loadDatasetImmediate(dsName, ds, type, dops, true);
+        } else {
+            Thread t = new Thread(() -> loadDatasetImmediate(dsName, ds, type, dops, false));
+            t.start();
+            return true;
+        }
+    }
+
     @Override
     public boolean loadStarDataset(String dsName, String path, double magnitudeScale, double[] labelColor, double[] fadeIn, double[] fadeOut, boolean sync) {
         return loadStarDataset(dsName, path, CatalogInfo.CatalogInfoType.SCRIPT, magnitudeScale, labelColor, fadeIn, fadeOut, sync);
@@ -2269,6 +2281,7 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
         ComponentType compType = ComponentType.valueOf(ct);
         return loadParticleDataset(dsName, path, profileDecay, particleColor, colorNoise, labelColor, particleSize, compType, fadeIn, fadeOut, sync);
     }
+
     public boolean loadParticleDataset(String dsName, String path, double profileDecay, final List particleColor, double colorNoise, final List labelColor, double particleSize, String ct, final List fadeIn, final List fadeOut, boolean sync) {
         return loadParticleDataset(dsName, path, profileDecay, dArray(particleColor), colorNoise, dArray(labelColor), particleSize, ct, dArray(fadeIn), dArray(fadeOut), sync);
     }
@@ -2282,66 +2295,72 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
         return loadDataset(dsName, path, type, dops, sync);
     }
 
-
     private boolean loadDatasetImmediate(String dsName, String path, CatalogInfo.CatalogInfoType type, boolean sync) {
         return loadDatasetImmediate(dsName, path, type, null, sync);
     }
 
     private boolean loadDatasetImmediate(String dsName, String path, CatalogInfo.CatalogInfoType type, DatasetOptions dops, boolean sync) {
+        Path p = Paths.get(path);
+        if (Files.exists(p) && Files.isReadable(p)) {
+            try {
+                return loadDatasetImmediate(dsName, new FileDataSource(p.toFile()), type, dops, sync);
+            } catch (Exception e) {
+                logger.error("Error loading file: " + p, e);
+            }
+        } else {
+            logger.error("Can't read file: " + path);
+        }
+        return false;
+    }
+
+    private boolean loadDatasetImmediate(String dsName, DataSource ds, CatalogInfo.CatalogInfoType type, DatasetOptions dops, boolean sync) {
         try {
-            logger.info(I18n.txt("notif.catalog.loading", path));
-            Path p = Paths.get(path);
-            if (Files.exists(p) && Files.isReadable(p)) {
-                STILDataProvider provider = new STILDataProvider();
-                provider.setDatasetOptions(dops);
-                DataSource ds = new FileDataSource(p.toFile());
-                @SuppressWarnings("unchecked") Array<ParticleBean> data = (Array<ParticleBean>) provider.loadData(ds, 1.0f);
+            logger.info(I18n.txt("notif.catalog.loading", dsName));
+            STILDataProvider provider = new STILDataProvider();
+            provider.setDatasetOptions(dops);
+            @SuppressWarnings("unchecked") Array<ParticleBean> data = (Array<ParticleBean>) provider.loadData(ds, 1.0f);
 
-                // Create star/particle group
-                if (data != null && data.size > 0 && checkString(dsName, "datasetName")) {
-                    if (dops == null || dops.type == DatasetOptions.DatasetLoadType.STARS) {
-                        // STAR GROUP
-                        AtomicReference<StarGroup> starGroup = new AtomicReference<>();
-                        GaiaSky.postRunnable(() -> {
-                            starGroup.set(StarGroup.getStarGroup(dsName, data, dops));
+            // Create star/particle group
+            if (data != null && data.size > 0 && checkString(dsName, "datasetName")) {
+                if (dops == null || dops.type == DatasetOptions.DatasetLoadType.STARS) {
+                    // STAR GROUP
+                    AtomicReference<StarGroup> starGroup = new AtomicReference<>();
+                    GaiaSky.postRunnable(() -> {
+                        starGroup.set(StarGroup.getStarGroup(dsName, data, dops));
 
-                            // Catalog info
-                            CatalogInfo ci = new CatalogInfo(dsName, path, null, type, 1.5f, starGroup.get());
-                            EventManager.instance.post(Events.CATALOG_ADD, ci, true);
+                        // Catalog info
+                        CatalogInfo ci = new CatalogInfo(dsName, ds.getName(), null, type, 1.5f, starGroup.get());
+                        EventManager.instance.post(Events.CATALOG_ADD, ci, true);
 
-                            logger.info(data.size + " stars loaded");
-                        });
-                        // Sync waiting until the node is in the scene graph
-                        while (sync && (starGroup.get() == null || !starGroup.get().inSceneGraph)) {
-                            sleepFrames(1);
-                        }
-                    } else {
-                        // PARTICLE GROUP
-                        AtomicReference<ParticleGroup> particleGroup = new AtomicReference<>();
-                        GaiaSky.postRunnable(() -> {
-                            particleGroup.set(ParticleGroup.getParticleGroup(dsName, data, dops));
-
-                            // Catalog info
-                            CatalogInfo ci = new CatalogInfo(dsName, path, null, type, 1.5f, particleGroup.get());
-                            EventManager.instance.post(Events.CATALOG_ADD, ci, true);
-
-                            logger.info(data.size + " particles loaded");
-                        });
-                        // Sync waiting until the node is in the scene graph
-                        while (sync && (particleGroup.get() == null || !particleGroup.get().inSceneGraph)) {
-                            sleepFrames(1);
-                        }
-
+                        logger.info(data.size + " stars loaded");
+                    });
+                    // Sync waiting until the node is in the scene graph
+                    while (sync && (starGroup.get() == null || !starGroup.get().inSceneGraph)) {
+                        sleepFrames(1);
                     }
-                    // One extra flush frame
-                    sleepFrames(1);
-                    return true;
                 } else {
-                    // No data has been loaded
-                    return false;
+                    // PARTICLE GROUP
+                    AtomicReference<ParticleGroup> particleGroup = new AtomicReference<>();
+                    GaiaSky.postRunnable(() -> {
+                        particleGroup.set(ParticleGroup.getParticleGroup(dsName, data, dops));
+
+                        // Catalog info
+                        CatalogInfo ci = new CatalogInfo(dsName, ds.getName(), null, type, 1.5f, particleGroup.get());
+                        EventManager.instance.post(Events.CATALOG_ADD, ci, true);
+
+                        logger.info(data.size + " particles loaded");
+                    });
+                    // Sync waiting until the node is in the scene graph
+                    while (sync && (particleGroup.get() == null || !particleGroup.get().inSceneGraph)) {
+                        sleepFrames(1);
+                    }
+
                 }
+                // One extra flush frame
+                sleepFrames(1);
+                return true;
             } else {
-                logger.error("Can't read file: " + path);
+                // No data has been loaded
                 return false;
             }
         } catch (Exception e) {
@@ -2672,16 +2691,16 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
         return true;
     }
 
-    private boolean checkLengths(double[] array, int length1, int length2, String name){
-        if(array.length != length1 && array.length != length2){
+    private boolean checkLengths(double[] array, int length1, int length2, String name) {
+        if (array.length != length1 && array.length != length2) {
             logger.error(name + " must have a length of " + length1 + " or " + length2 + ". Current length is " + array.length);
             return false;
         }
         return true;
     }
 
-    private boolean checkLength(double[] array, int length, String name){
-        if(array.length != length){
+    private boolean checkLength(double[] array, int length, String name) {
+        if (array.length != length) {
             logger.error(name + " must have a length of " + length + ". Current length is " + array.length);
             return false;
         }
