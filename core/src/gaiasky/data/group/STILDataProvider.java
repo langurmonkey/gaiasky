@@ -321,10 +321,12 @@ public class STILDataProvider extends AbstractStarGroupDataProvider {
                             point[ParticleBean.I_Y] = p.gsposition.y;
                             point[ParticleBean.I_Z] = p.gsposition.z;
 
+                            // TODO reorganise existing star properties into extra attributes
+
                             // Extra
                             Map<UCD, Double> extraAttributes = addExtraAttributes(ucdp, row);
 
-                            ParticleBean pb = new ParticleBean(point, extraAttributes);
+                            ParticleBean pb = new ParticleBean(point, names, extraAttributes);
                             list.add(pb);
                         }
 

@@ -11,6 +11,8 @@ import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.PerspectiveCamera;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.Array;
+import com.badlogic.gdx.utils.ObjectIntMap;
+import com.badlogic.gdx.utils.ObjectMap;
 import com.badlogic.gdx.utils.TimeUtils;
 import gaiasky.GaiaSky;
 import gaiasky.data.group.DatasetOptions;
@@ -30,15 +32,20 @@ import gaiasky.scenegraph.component.RotationComponent;
 import gaiasky.util.*;
 import gaiasky.util.CatalogInfo.CatalogInfoType;
 import gaiasky.util.coord.Coordinates;
+import gaiasky.util.ds.DatasetUpdater;
 import gaiasky.util.filter.attrib.IAttribute;
 import gaiasky.util.gdx.g2d.ExtSpriteBatch;
 import gaiasky.util.gdx.shader.ExtShaderProgram;
+import gaiasky.util.gravwaves.RelativisticEffectsManager;
 import gaiasky.util.math.*;
 import gaiasky.util.time.ITimeFrameProvider;
 import gaiasky.util.tree.OctreeNode;
 import gaiasky.util.ucd.UCD;
+import net.jafama.FastMath;
 
 import java.io.Serializable;
+import java.util.Arrays;
+import java.util.Comparator;
 import java.util.Map;
 
 /**
@@ -64,19 +71,31 @@ public class ParticleGroup extends FadeNode implements I3DTextRenderable, IFocus
         // Main attributes
         public double[] data;
 
-        // Extra attributes
+        // Particle names (optional)
+        public String[] names;
+
+        // Extra attributes (optional)
         public Map<UCD, Double> extra;
 
         // Octant, if in octree
         public transient OctreeNode octant;
 
-        public ParticleBean(double[] data) {
+        public ParticleBean(double[] data, String[] names, Map<UCD, Double> extra) {
             this.data = data;
+            this.names = names;
+            this.extra = extra;
+        }
+
+        public ParticleBean(double[] data) {
+            this(data, null, null);
+        }
+
+        public ParticleBean(double[] data, String[] names) {
+            this(data, names, null);
         }
 
         public ParticleBean(double[] data, Map<UCD, Double> extra) {
-            this.data = data;
-            this.extra = extra;
+            this(data, null, extra);
         }
 
         public Vector3d pos(Vector3d aux) {
@@ -168,6 +187,55 @@ public class ParticleGroup extends FadeNode implements I3DTextRenderable, IFocus
 
         public double z() {
             return data[I_Z];
+        }
+
+        public String namesConcat() {
+            return TextUtils.concatenate(Constants.nameSeparator, names);
+        }
+
+        public boolean hasName(String candidate) {
+            return hasName(candidate, false);
+        }
+
+        public boolean hasName(String candidate, boolean matchCase) {
+            if (names == null) {
+                return false;
+            } else {
+                for (String name : names) {
+                    if (matchCase) {
+                        if (name.equals(candidate))
+                            return true;
+                    } else {
+                        if (name.equalsIgnoreCase(candidate))
+                            return true;
+                    }
+                }
+            }
+            return false;
+        }
+
+        public void setNames(String... names) {
+            this.names = names;
+        }
+
+        public void setName(String name) {
+            if (names != null)
+                names[0] = name;
+            else
+                names = new String[] { name };
+        }
+
+        public void addName(String name) {
+            if (!hasName(name))
+                if (names != null) {
+                    // Extend array
+                    String[] newNames = new String[names.length + 1];
+                    System.arraycopy(names, 0, newNames, 0, names.length);
+                    newNames[names.length] = name;
+                    names = newNames;
+                } else {
+                    setName(name);
+                }
         }
     }
 
@@ -275,6 +343,65 @@ public class ParticleGroup extends FadeNode implements I3DTextRenderable, IFocus
 
     public boolean createCatalogInfo = true;
 
+    // Name index
+    protected ObjectIntMap<String> index;
+
+    // Minimum amount of time [ms] between two update calls
+    protected static final double MIN_UPDATE_TIME_MS = 200;
+
+    // Metadata, for sorting
+    protected double[] metadata;
+
+    // Comparator
+    private Comparator<Integer> comp;
+
+    // Indices list buffer 1
+    protected Integer[] indices1;
+    // Indices list buffer 2
+    protected Integer[] indices2;
+    // Active indices list
+    protected Integer[] active;
+    // Background indices list (the one we sort)
+    protected Integer[] background;
+
+    // Is it updating?
+    protected volatile boolean updating = false;
+
+    // Updater task
+    protected UpdaterTask updaterTask;
+
+    // Camera dx threshold
+    protected static final double CAM_DX_TH = 1000 * Constants.AU_TO_U;
+    // Last sort position
+    protected Vector3d lastSortCameraPos;
+
+    /**
+     * Uses whatever precomputed value is in index 8 to compare the values
+     */
+    private class ParticleGroupComparator implements Comparator<Integer> {
+        @Override
+        public int compare(Integer i1, Integer i2) {
+            return Double.compare(metadata[i1], metadata[i2]);
+        }
+    }
+
+    // Updates the group
+    public class UpdaterTask implements Runnable {
+
+        private ParticleGroup pg;
+
+        public UpdaterTask(ParticleGroup pg) {
+            this.pg = pg;
+        }
+
+        @Override
+        public void run() {
+            pg.updateSorter(GaiaSky.instance.time, GaiaSky.instance.getICamera());
+            updating = false;
+        }
+
+    }
+
     public ParticleGroup(boolean createCatalogInfo) {
         super();
         id = idSeq++;
@@ -282,8 +409,10 @@ public class ParticleGroup extends FadeNode implements I3DTextRenderable, IFocus
         focusIndex = -1;
         focusPosition = new Vector3d();
         focusPositionSph = new Vector2d();
+        lastSortCameraPos = new Vector3d(Double.MAX_VALUE, Double.MAX_VALUE, Double.MAX_VALUE);
         this.createCatalogInfo = createCatalogInfo;
-        EventManager.instance.subscribe(this, Events.FOCUS_CHANGED);
+        this.comp = new ParticleGroupComparator();
+        EventManager.instance.subscribe(this, Events.FOCUS_CHANGED, Events.CAMERA_MOTION_UPDATED);
     }
 
     public ParticleGroup() {
@@ -301,7 +430,7 @@ public class ParticleGroup extends FadeNode implements I3DTextRenderable, IFocus
 
             lastSortTime = -1;
 
-            pointData = provider.loadData(datafile, factor);
+            setData(provider.loadData(datafile, factor));
 
             meanDistance = 0;
             maxDistance = Double.MIN_VALUE;
@@ -353,6 +482,22 @@ public class ParticleGroup extends FadeNode implements I3DTextRenderable, IFocus
     @Override
     public void doneLoading(AssetManager manager) {
         super.doneLoading(manager);
+
+        // Metadata
+        metadata = new double[pointData.size];
+
+        // Initialise indices list with natural order
+        indices1 = new Integer[pointData.size];
+        indices2 = new Integer[pointData.size];
+        for (int i = 0; i < pointData.size; i++) {
+            indices1[i] = i;
+            indices2[i] = i;
+        }
+        active = indices1;
+        background = indices2;
+
+        // Initialize updater task
+        updaterTask = new UpdaterTask(this);
     }
 
     /**
@@ -362,6 +507,67 @@ public class ParticleGroup extends FadeNode implements I3DTextRenderable, IFocus
      */
     public Array<? extends ParticleBean> data() {
         return pointData;
+    }
+
+    public void setData(Array<ParticleBean> pointData) {
+        setData(pointData, true);
+    }
+
+    public void setData(Array<ParticleBean> pointData, boolean regenerateIndex) {
+        this.pointData = pointData;
+
+        // Regenerate index
+        if (regenerateIndex)
+            regenerateIndex();
+    }
+
+    /**
+     * Regenerates the name index
+     */
+    public void regenerateIndex() {
+        index = generateIndex(data());
+    }
+
+    /**
+     * Generates the index (maps name to array index)
+     * and computes the geometric center of this group
+     *
+     * @param pointData The data
+     * @return An map{string,int} mapping names to indices
+     */
+    public ObjectIntMap<String> generateIndex(Array<? extends ParticleBean> pointData) {
+        ObjectIntMap<String> index = new ObjectIntMap<>();
+        int n = pointData.size;
+        for (int i = 0; i < n; i++) {
+            ParticleBean pb = pointData.get(i);
+            if (pb.names != null) {
+                for (String lcname : pb.names) {
+                    lcname = lcname.toLowerCase();
+                    index.put(lcname, i);
+                }
+            }
+        }
+        return index;
+    }
+
+    @Override
+    protected void addToIndex(ObjectMap<String, SceneGraphNode> map) {
+        if (index != null) {
+            ObjectIntMap.Keys<String> keys = index.keys();
+            for (String key : keys) {
+                map.put(key, this);
+            }
+        }
+    }
+
+    @Override
+    protected void removeFromIndex(ObjectMap<String, SceneGraphNode> map) {
+        if (index != null) {
+            ObjectIntMap.Keys<String> keys = index.keys();
+            for (String key : keys) {
+                map.remove(key);
+            }
+        }
     }
 
     public ParticleBean get(int index) {
@@ -433,11 +639,6 @@ public class ParticleGroup extends FadeNode implements I3DTextRenderable, IFocus
         this.focusViewAngleApparent = this.focusViewAngle * GlobalConf.scene.STAR_BRIGHTNESS;
     }
 
-    public void updateSorter(ITimeFrameProvider time, ICamera camera) {
-        // Simple particle vgroup does not sort
-        lastSortTime = TimeUtils.millis();
-    }
-
     @Override
     protected void addToRenderLists(ICamera camera) {
         addToRender(this, RenderGroup.PARTICLE_GROUP);
@@ -448,17 +649,63 @@ public class ParticleGroup extends FadeNode implements I3DTextRenderable, IFocus
     }
 
     /**
-     * Label rendering.
+     * Label rendering
      */
     @Override
     public void render(ExtSpriteBatch batch, ExtShaderProgram shader, FontRenderSystem sys, RenderingContext rc, ICamera camera) {
+        // Dataset label
         Vector3d pos = aux3d1.get();
         textPosition(camera, pos);
         shader.setUniformf("u_viewAngle", 90f);
         shader.setUniformf("u_viewAnglePow", 1f);
         shader.setUniformf("u_thOverFactor", 1f);
         shader.setUniformf("u_thOverFactorScl", 1f);
-        render3DLabel(batch, shader, sys.fontDistanceField, camera, rc, text(), pos, textScale() * camera.getFovFactor(), textSize() * camera.getFovFactor());
+        render3DLabel(batch, shader, sys.fontDistanceField, camera, rc, text(), pos, textScale() * 2f * camera.getFovFactor(), textSize() * camera.getFovFactor());
+
+        // Particle labels
+        float thOverFactor = 1e-15f;
+
+        for (int i = 0; i < Math.min(50, pointData.size); i++) {
+            ParticleBean pb = pointData.get(active[i]);
+            Vector3d lpos = fetchPosition(pb, camera.getPos(), aux3d1.get(), 0);
+            float distToCamera = (float) lpos.len();
+            float viewAngle = 1e-4f / camera.getFovFactor();
+
+            textPosition(camera, lpos, distToCamera, 0);
+
+            shader.setUniformf("u_viewAngle", viewAngle);
+            shader.setUniformf("u_viewAnglePow", 1f);
+            shader.setUniformf("u_thOverFactor", thOverFactor);
+            shader.setUniformf("u_thOverFactorScl", camera.getFovFactor());
+            float textSize = (float) FastMath.tanh(viewAngle) * distToCamera * 1e5f;
+            float alpha = Math.min((float) FastMath.atan(textSize / distToCamera), 1.e-3f);
+            textSize = (float) FastMath.tan(alpha) * distToCamera * 0.5f;
+            render3DLabel(batch, shader, sys.fontDistanceField, camera, rc, pb.names[0], lpos, textScale() * camera.getFovFactor(), textSize * camera.getFovFactor());
+
+        }
+    }
+
+    public void textPosition(ICamera cam, Vector3d out, float len, float rad) {
+        out.clamp(0, len - rad);
+
+        Vector3d aux = aux3d2.get();
+        aux.set(cam.getUp());
+
+        aux.crs(out).nor();
+
+        float dist = -0.02f * cam.getFovFactor() * (float) out.len();
+
+        aux.add(cam.getUp()).nor().scl(dist);
+
+        out.add(aux);
+
+        GlobalResources.applyRelativisticAberration(out, cam);
+        RelativisticEffectsManager.getInstance().gravitationalWavePos(out);
+    }
+
+    @Override
+    public float textScale() {
+        return .5f / GlobalConf.scene.LABEL_SIZE_FACTOR;
     }
 
     /**
@@ -494,11 +741,6 @@ public class ParticleGroup extends FadeNode implements I3DTextRenderable, IFocus
     @Override
     public float textSize() {
         return (float) distToCamera * 1e-3f;
-    }
-
-    @Override
-    public float textScale() {
-        return 0.1f;
     }
 
     @Override
@@ -824,6 +1066,16 @@ public class ParticleGroup extends FadeNode implements I3DTextRenderable, IFocus
             }
             updateFocusDataPos();
             break;
+        case CAMERA_MOTION_UPDATED:
+            // Check that the particles have names
+            if (updaterTask != null && pointData.get(0).names != null) {
+                final Vector3d currentCameraPos = (Vector3d) data[0];
+                long t = TimeUtils.millis() - lastSortTime;
+                if (!updating && this.opacity > 0 && (t > MIN_UPDATE_TIME_MS * 2 || (lastSortCameraPos.dst(currentCameraPos) > CAM_DX_TH && t > MIN_UPDATE_TIME_MS))) {
+                    updating = DatasetUpdater.execute(updaterTask);
+                }
+            }
+            break;
         default:
             break;
         }
@@ -866,7 +1118,7 @@ public class ParticleGroup extends FadeNode implements I3DTextRenderable, IFocus
 
     @Override
     public String getCandidateName() {
-        return getName();
+        return pointData.get(candidateFocusIndex).names != null ? pointData.get(candidateFocusIndex).names[0] : getName();
     }
 
     @Override
@@ -1064,9 +1316,51 @@ public class ParticleGroup extends FadeNode implements I3DTextRenderable, IFocus
         pg.setLabelcolor(labelColor);
         pg.setSize(particleSize);
         pg.setCt(ct);
-        pg.pointData = data;
+        pg.setData(data);
         pg.doneLoading(null);
         return pg;
     }
 
+    /**
+     * Updates the metadata information, to use for sorting. For particles, only the position (distance
+     * from camera) is important.
+     *
+     * @param time   The time frame provider
+     * @param camera The camera
+     */
+    public void updateMetadata(ITimeFrameProvider time, ICamera camera) {
+        Vector3d camPos = camera.getPos();
+        int n = pointData.size;
+        for (int i = 0; i < n; i++) {
+            ParticleBean d = pointData.get(i);
+            // Pos
+            Vector3d x = aux3d1.get().set(d.x(), d.y(), d.z());
+            metadata[i] = filter(i) ? camPos.dst(x.x, x.y, x.z) : Double.MAX_VALUE;
+        }
+    }
+
+    public void updateSorter(ITimeFrameProvider time, ICamera camera) {
+        // Prepare metadata to sort
+        updateMetadata(time, camera);
+
+        // Sort background list of indices
+        Arrays.sort(background, comp);
+        // Swap indices lists
+        swapBuffers();
+        // Simple particle vgroup does not sort
+        lastSortTime = TimeUtils.millis();
+    }
+
+    protected void swapBuffers() {
+        GaiaSky.postRunnable(() -> {
+            if (active == indices1) { //-V6013
+                active = indices2;
+                background = indices1;
+            } else {
+                active = indices1;
+                background = indices2;
+            }
+
+        });
+    }
 }

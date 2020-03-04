@@ -47,6 +47,7 @@ import gaiasky.script.ScriptingServer;
 import gaiasky.util.Logger;
 import gaiasky.util.*;
 import gaiasky.util.Logger.Log;
+import gaiasky.util.ds.DatasetUpdater;
 import gaiasky.util.gaia.GaiaAttitudeServer;
 import gaiasky.util.gdx.contrib.postprocess.utils.PingPongBuffer;
 import gaiasky.util.gdx.g2d.BitmapFont;
@@ -329,6 +330,9 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
 
         // Initialise master manager
         MasterManager.initialize();
+
+        // Initialise dataset updater
+        DatasetUpdater.initialize();
 
         // Load slave assets
         SlaveManager.load(manager);
@@ -723,8 +727,8 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
         }
         ModelCache.cache.dispose();
 
-        // Star group thread pool
-        StarGroup.shutDownThreadPool();
+        // Shutdown dataset updater thread pool
+        DatasetUpdater.shutDownThreadPool();
 
         // Scripting
         ScriptingServer.dispose();

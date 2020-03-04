@@ -21,8 +21,6 @@ import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.ObjectIntMap;
-import com.badlogic.gdx.utils.ObjectMap;
-import com.badlogic.gdx.utils.TimeUtils;
 import gaiasky.GaiaSky;
 import gaiasky.data.group.DatasetOptions;
 import gaiasky.data.group.IStarGroupDataProvider;
@@ -46,18 +44,14 @@ import gaiasky.util.gdx.mesh.IntMesh;
 import gaiasky.util.gdx.model.IntModel;
 import gaiasky.util.gdx.model.IntModelInstance;
 import gaiasky.util.gdx.shader.ExtShaderProgram;
-import gaiasky.util.gravwaves.RelativisticEffectsManager;
 import gaiasky.util.math.MathUtilsd;
 import gaiasky.util.math.Vector3d;
 import gaiasky.util.time.ITimeFrameProvider;
 import gaiasky.util.ucd.UCD;
 import net.jafama.FastMath;
 
-import java.util.Arrays;
-import java.util.Comparator;
 import java.util.Map;
 import java.util.TreeMap;
-import java.util.concurrent.*;
 
 /**
  * A particle vgroup which additionally to the xyz position, supports color and
@@ -94,12 +88,10 @@ public class StarGroup extends ParticleGroup implements ILineRenderable, IStarFo
         public static final int I_HIP = 13;
 
         public Long id;
-        public String[] names;
 
         public StarBean(double[] data, Long id, String[] names, Map<UCD, Double> extra) {
-            super(data, extra);
+            super(data, names, extra);
             this.id = id;
-            this.names = names;
             this.octant = null;
         }
 
@@ -158,64 +150,8 @@ public class StarGroup extends ParticleGroup implements ILineRenderable, IStarFo
         public double radvel() {
             return data[I_RADVEL];
         }
-
-        public String namesConcat() {
-            return TextUtils.concatenate(Constants.nameSeparator, names);
-        }
-
-        public boolean hasName(String candidate) {
-            return hasName(candidate, false);
-        }
-
-        public boolean hasName(String candidate, boolean matchCase) {
-            if (names == null) {
-                return false;
-            } else {
-                for (String name : names) {
-                    if (matchCase) {
-                        if (name.equals(candidate))
-                            return true;
-                    } else {
-                        if (name.equalsIgnoreCase(candidate))
-                            return true;
-                    }
-                }
-            }
-            return false;
-        }
-
-        public void setNames(String... names) {
-            this.names = names;
-        }
-
-        public void setName(String name) {
-            if (names != null)
-                names[0] = name;
-            else
-                names = new String[] { name };
-        }
-
-        public void addName(String name) {
-            if (!hasName(name))
-                if (names != null) {
-                    // Extend array
-                    String[] newNames = new String[names.length + 1];
-                    System.arraycopy(names, 0, newNames, 0, names.length);
-                    newNames[names.length] = name;
-                    names = newNames;
-                } else {
-                    setName(name);
-                }
-        }
-
     }
 
-    // Camera dx threshold
-    private static final double CAM_DX_TH = 100 * Constants.AU_TO_U;
-    // Min update time
-    private static final double MIN_UPDATE_TIME_MS = 100;
-    // Sequence id
-    private static long idSeq = 0;
     /**
      * Star model
      **/
@@ -265,71 +201,8 @@ public class StarGroup extends ParticleGroup implements ILineRenderable, IStarFo
         }
     }
 
-    private static class DaemonThreadFactory implements ThreadFactory {
-        private int sequence = 0;
-
-        @Override
-        public Thread newThread(Runnable r) {
-            Thread t = new Thread(r, "updater-daemon-" + sequence);
-            sequence++;
-            t.setDaemon(true);
-            return t;
-        }
-
-    }
-
-    /**
-     * Thread pool executor
-     */
-    private static ThreadPoolExecutor pool;
-    private static BlockingQueue<Runnable> workQueue;
-
-    public static void shutDownThreadPool(){
-        // Shut down pool
-        if (pool != null && !pool.isShutdown()) {
-            pool.shutdown();
-            try {
-                // Wait for task to end before proceeding
-                pool.awaitTermination(500, TimeUnit.MILLISECONDS);
-            } catch (Exception e) {
-                Logger.getLogger(StarGroup.class.getSimpleName()).error(e);
-            }
-        }
-        if(workQueue != null)
-            workQueue.clear();
-    }
-
-    static {
-        workQueue = new LinkedBlockingQueue<>();
-        int nThreads = !GlobalConf.performance.MULTITHREADING ? 1 : Math.max(1, GlobalConf.performance.NUMBER_THREADS() - 1);
-        pool = new ThreadPoolExecutor(nThreads, nThreads, 5, TimeUnit.SECONDS, workQueue);
-        pool.setThreadFactory(new DaemonThreadFactory());
-    }
-
-    /**
-     * The name index
-     */
-    ObjectIntMap<String> index;
-
-    /**
-     * Additional values
-     */
-    double[] additional;
-
-    // Indices list buffer 1
-    Integer[] indices1;
-    // Indices list buffer 2
-    Integer[] indices2;
-    // Active indices list
-    Integer[] active;
-    // Background indices list (the one we sort)
-    Integer[] background;
-
     // Close up stars treated
     private int N_CLOSEUP_STARS;
-
-    // Updater task
-    private UpdaterTask updaterTask;
 
     /**
      * CLOSEST
@@ -342,30 +215,14 @@ public class StarGroup extends ParticleGroup implements ILineRenderable, IStarFo
 
     private double modelDist;
 
-    private Vector3d lastSortCameraPos;
-
-    /**
-     * Comparator
-     **/
-    private Comparator<Integer> comp;
-
-    private Vector3d aux;
-
-    // Is it updating?
-    private volatile boolean updating = false;
-
     public StarGroup() {
         super();
-        id = idSeq++;
-        comp = new StarGroupComparator();
         closestPos = new Vector3d();
         closestAbsolutePos = new Vector3d();
         closestPm = new Vector3d();
-        lastSortCameraPos = new Vector3d(Double.MAX_VALUE, Double.MAX_VALUE, Double.MAX_VALUE);
         closestCol = new float[4];
         lastSortTime = -1;
-        aux = new Vector3d();
-        EventManager.instance.subscribe(this, Events.CAMERA_MOTION_UPDATED, Events.GRAPHICS_QUALITY_UPDATED);
+        EventManager.instance.subscribe(this, Events.GRAPHICS_QUALITY_UPDATED);
     }
 
     @SuppressWarnings("unchecked")
@@ -389,7 +246,7 @@ public class StarGroup extends ParticleGroup implements ILineRenderable, IStarFo
 
         computeMeanPosition();
 
-        if(labelPosition == null)
+        if (labelPosition == null)
             labelPosition.set(pos);
     }
 
@@ -397,24 +254,6 @@ public class StarGroup extends ParticleGroup implements ILineRenderable, IStarFo
     public void doneLoading(AssetManager manager) {
         super.doneLoading(manager);
         initModel();
-
-        // Additional
-        additional = new double[pointData.size];
-
-        // Initialise indices list with natural order
-        indices1 = new Integer[pointData.size];
-        indices2 = new Integer[pointData.size];
-        for (int i = 0; i < pointData.size; i++) {
-            indices1[i] = i;
-            indices2[i] = i;
-        }
-        active = indices1;
-        background = indices2;
-
-        /**
-         * INIT UPDATER TASK
-         */
-        updaterTask = new UpdaterTask(this);
     }
 
     /**
@@ -427,17 +266,9 @@ public class StarGroup extends ParticleGroup implements ILineRenderable, IStarFo
         return pointData;
     }
 
-    public void setData(Array<ParticleBean> pointData) {
-        setData(pointData, true);
-    }
-
     public void setData(Array<ParticleBean> pointData, boolean regenerateIndex) {
-        this.pointData = pointData;
+        super.setData(pointData, regenerateIndex);
         this.N_CLOSEUP_STARS = getNCloseupStars();
-
-        // Regenerate index
-        if (regenerateIndex)
-            regenerateIndex();
     }
 
     private int getNCloseupStars() {
@@ -458,13 +289,8 @@ public class StarGroup extends ParticleGroup implements ILineRenderable, IStarFo
         return Math.min(n, pointData.size);
     }
 
-    public void regenerateIndex() {
-        index = generateIndex(data());
-    }
-
     /**
      * Generates the index (maps star name and id to array index)
-     * and computes the geometric center of this star vgroup
      *
      * @param pointData The star data
      * @return An map{string,int} mapping names/ids to indexes
@@ -474,23 +300,24 @@ public class StarGroup extends ParticleGroup implements ILineRenderable, IStarFo
         int n = pointData.size;
         for (int i = 0; i < n; i++) {
             StarBean sb = (StarBean) pointData.get(i);
-            for (String lcname : sb.names) {
-                lcname = lcname.toLowerCase();
-                index.put(lcname, i);
-                String lcid = sb.id.toString().toLowerCase();
-                if (sb.id > 0 && !lcid.equals(lcname)) {
-                    index.put(lcid, i);
-                }
-                if (sb.hip() > 0) {
-                    String lchip = "hip " + sb.hip();
-                    if (!lchip.equals(lcname))
-                        index.put(lchip, i);
+            if (sb.names != null) {
+                for (String lcname : sb.names) {
+                    lcname = lcname.toLowerCase();
+                    index.put(lcname, i);
+                    String lcid = sb.id.toString().toLowerCase();
+                    if (sb.id > 0 && !lcid.equals(lcname)) {
+                        index.put(lcid, i);
+                    }
+                    if (sb.hip() > 0) {
+                        String lchip = "hip " + sb.hip();
+                        if (!lchip.equals(lcname))
+                            index.put(lchip, i);
+                    }
                 }
             }
         }
         return index;
     }
-
 
     public void update(ITimeFrameProvider time, final Vector3d parentTransform, ICamera camera, float opacity) {
         // Fade node visibility
@@ -551,62 +378,6 @@ public class StarGroup extends ParticleGroup implements ILineRenderable, IStarFo
             double deltaYears = AstroUtils.getMsSince(time.getTime(), epoch_jd) * Nature.MS_TO_Y;
             return this.fetchPosition(pointData.get(focusIndex), null, aux, deltaYears);
         }
-    }
-
-    /**
-     * Updates the additional information array, to use for sorting.
-     *
-     * @param camera
-     */
-    public void updateAdditional(ITimeFrameProvider time, ICamera camera) {
-        Vector3d cpos = camera.getPos();
-        double deltaYears = AstroUtils.getMsSince(time.getTime(), epoch_jd) * Nature.MS_TO_Y;
-        int n = pointData.size;
-        for (int i = 0; i < n; i++) {
-            StarBean d = (StarBean) pointData.get(i);
-
-            // Pm
-            Vector3d dx = aux3d2.get().set(d.pmx(), d.pmy(), d.pmz()).scl(deltaYears);
-            // Pos
-            Vector3d x = aux3d1.get().set(d.x(), d.y(), d.z()).add(dx);
-
-            boolean filter = filter(i);
-
-            additional[i] = filter ? (-(((d.size() * Constants.STAR_SIZE_FACTOR) / cpos.dst(x.x, x.y, x.z)) / camera.getFovFactor()) * GlobalConf.scene.STAR_BRIGHTNESS) : Double.MAX_VALUE;
-        }
-    }
-
-    /**
-     * Sorts the list of particles using the apparent magnitude (view angle)
-     * criterion. This should be called only when the camera frustum is
-     * significantly changed. By no means should this be called every cycle.
-     * Sorting happens always in the working buffer, which is not the active
-     * buffer. After sorting, buffers are swapped.
-     */
-    public void updateSorter(ITimeFrameProvider time, ICamera camera) {
-        // Prepare metadata to sort
-        updateAdditional(time, camera);
-
-        // Sort background list of indices
-        Arrays.sort(background, comp);
-        // Swap indices lists
-        swapBuffers();
-        // Update last sort call
-        super.updateSorter(time, camera);
-
-    }
-
-    private void swapBuffers() {
-        GaiaSky.postRunnable(() -> {
-            if (active == indices1) { //-V6013
-                active = indices2;
-                background = indices1;
-            } else {
-                active = indices1;
-                background = indices2;
-            }
-
-        });
     }
 
     @Override
@@ -904,29 +675,6 @@ public class StarGroup extends ParticleGroup implements ILineRenderable, IStarFo
         }
     }
 
-    public void textPosition(ICamera cam, Vector3d out, float len, float rad) {
-        out.clamp(0, len - rad);
-
-        Vector3d aux = aux3d2.get();
-        aux.set(cam.getUp());
-
-        aux.crs(out).nor();
-
-        float dist = -0.02f * cam.getFovFactor() * (float) out.len();
-
-        aux.add(cam.getUp()).nor().scl(dist);
-
-        out.add(aux);
-
-        GlobalResources.applyRelativisticAberration(out, cam);
-        RelativisticEffectsManager.getInstance().gravitationalWavePos(out);
-    }
-
-    @Override
-    public float textScale() {
-        return .5f / GlobalConf.scene.LABEL_SIZE_FACTOR;
-    }
-
     public double getFocusSize() {
         return focus.data[StarBean.I_SIZE];
     }
@@ -1004,49 +752,11 @@ public class StarGroup extends ParticleGroup implements ILineRenderable, IStarFo
         return ((StarBean) pointData.get(i)).size();
     }
 
-    /**
-     * Uses whatever precomputed value is in index 8 to compare the values
-     *
-     * @author tsagrista
-     */
-    private class StarGroupComparator implements Comparator<Integer> {
-        @Override
-        public int compare(Integer i1, Integer i2) {
-            return Double.compare(additional[i1], additional[i2]);
-        }
-    }
-
-    public class UpdaterTask implements Runnable {
-
-        private StarGroup sg;
-
-        public UpdaterTask(StarGroup sg) {
-            this.sg = sg;
-        }
-
-        @Override
-        public void run() {
-            sg.updateSorter(GaiaSky.instance.time, GaiaSky.instance.getICamera());
-            updating = false;
-        }
-
-    }
-
     @Override
     public void notify(Events event, Object... data) {
-        // Super handles FOCUS_CHANGED event
+        // Super handles FOCUS_CHANGED and CAMERA_MOTION_UPDATED event
         super.notify(event, data);
         switch (event) {
-        case CAMERA_MOTION_UPDATED:
-            if (updaterTask != null) {
-                final Vector3d currentCameraPos = (Vector3d) data[0];
-                long t = TimeUtils.millis() - lastSortTime;
-                if (!updating && !pool.isShutdown() && !workQueue.contains(updaterTask) && this.opacity > 0 && (t > MIN_UPDATE_TIME_MS * 2 || (lastSortCameraPos.dst(currentCameraPos) > CAM_DX_TH && t > MIN_UPDATE_TIME_MS))) {
-                    updating = true;
-                    pool.execute(updaterTask);
-                }
-            }
-            break;
         case GRAPHICS_QUALITY_UPDATED:
             this.N_CLOSEUP_STARS = getNCloseupStars();
             break;
@@ -1145,7 +855,7 @@ public class StarGroup extends ParticleGroup implements ILineRenderable, IStarFo
     @Override
     protected Vector3d fetchPosition(ParticleBean pb, Vector3d campos, Vector3d dest, double deltaYears) {
         StarBean sb = (StarBean) pb;
-        Vector3d pm = aux.set(sb.pmx(), sb.pmy(), sb.pmz()).scl(deltaYears);
+        Vector3d pm = aux3d2.get().set(sb.pmx(), sb.pmy(), sb.pmz()).scl(deltaYears);
         if (campos != null && !campos.hasNaN())
             return dest.set(sb.x(), sb.y(), sb.z()).sub(campos).add(pm);
         else
@@ -1173,26 +883,6 @@ public class StarGroup extends ParticleGroup implements ILineRenderable, IStarFo
      */
     public Double getEpoch() {
         return this.epoch_jd;
-    }
-
-    @Override
-    protected void addToIndex(ObjectMap<String, SceneGraphNode> map) {
-        if (index != null) {
-            ObjectIntMap.Keys<String> keys = index.keys();
-            for (String key : keys) {
-                map.put(key, this);
-            }
-        }
-    }
-
-    @Override
-    protected void removeFromIndex(ObjectMap<String, SceneGraphNode> map) {
-        if (index != null) {
-            ObjectIntMap.Keys<String> keys = index.keys();
-            for (String key : keys) {
-                map.remove(key);
-            }
-        }
     }
 
     @Override
@@ -1228,7 +918,7 @@ public class StarGroup extends ParticleGroup implements ILineRenderable, IStarFo
     public static StarGroup getStarGroup(String name, Array<ParticleBean> data, DatasetOptions dops) {
         double[] fadeIn = dops == null || dops.fadeIn == null ? null : dops.fadeIn;
         double[] fadeOut = dops == null || dops.fadeOut == null ? new double[] { 2e3, 1e5 } : dops.fadeOut;
-        double[] labelColor = dops == null || dops.labelColor == null ? new double[]{1.0, 1.0, 1.0, 1.0} : dops.labelColor;
+        double[] labelColor = dops == null || dops.labelColor == null ? new double[] { 1.0, 1.0, 1.0, 1.0 } : dops.labelColor;
 
         StarGroup sg = new StarGroup();
         sg.setName(name.replace("%%SGID%%", Long.toString(sg.id)));
@@ -1278,5 +968,30 @@ public class StarGroup extends ParticleGroup implements ILineRenderable, IStarFo
         if (fullInit)
             sg.doneLoading(null);
         return sg;
+    }
+
+    /**
+     * Updates the additional information array, to use for sorting.
+     * In stars, we need to take into account the proper motion and the brightness.
+     *
+     * @param time   The current time frame provider
+     * @param camera The camera
+     */
+    public void updateMetadata(ITimeFrameProvider time, ICamera camera) {
+        Vector3d camPos = camera.getPos();
+        double deltaYears = AstroUtils.getMsSince(time.getTime(), epoch_jd) * Nature.MS_TO_Y;
+        int n = pointData.size;
+        for (int i = 0; i < n; i++) {
+            StarBean d = (StarBean) pointData.get(i);
+
+            // Pm
+            Vector3d dx = aux3d2.get().set(d.pmx(), d.pmy(), d.pmz()).scl(deltaYears);
+            // Pos
+            Vector3d x = aux3d1.get().set(d.x(), d.y(), d.z()).add(dx);
+
+            boolean filter = filter(i);
+
+            metadata[i] = filter ? (-(((d.size() * Constants.STAR_SIZE_FACTOR) / camPos.dst(x.x, x.y, x.z)) / camera.getFovFactor()) * GlobalConf.scene.STAR_BRIGHTNESS) : Double.MAX_VALUE;
+        }
     }
 }
