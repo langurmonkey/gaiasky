@@ -123,8 +123,8 @@ public class DatasetLoadDialog extends GenericDialog {
         container.add(particleProps).colspan(2).left().padTop(pad15).padBottom(pad10).row();
 
         // Color noise
-        FloatValidator decayValidator = new FloatValidator(1e-3f, 50f);
-        profileDecay = new OwnTextField("1.0", skin, decayValidator);
+        FloatValidator decayValidator = new FloatValidator(0.1f, 1000f);
+        profileDecay = new OwnTextField("10.0", skin, decayValidator);
         container.add(new OwnLabel(I18n.txt("gui.dsload.profiledecay"), skin)).left().padRight(pad10).padBottom(pad10);
         container.add(GuiUtils.tooltipHg(profileDecay, "gui.dsload.profiledecay.tooltip", skin)).left().padBottom(pad10).row();
 
@@ -135,7 +135,7 @@ public class DatasetLoadDialog extends GenericDialog {
 
         // Color noise
         FloatValidator zeroOneValidator = new FloatValidator(0f, 1f);
-        colorNoise = new OwnTextField("0.0", skin, zeroOneValidator);
+        colorNoise = new OwnTextField("0.2", skin, zeroOneValidator);
         container.add(new OwnLabel(I18n.txt("gui.dsload.color.noise"), skin)).left().padRight(pad10).padBottom(pad10);
         container.add(GuiUtils.tooltipHg(colorNoise, "gui.dsload.color.noise.tooltip", skin)).left().padBottom(pad10).row();
 
@@ -148,7 +148,7 @@ public class DatasetLoadDialog extends GenericDialog {
 
         // Particle size
         FloatValidator sizeValidator = new FloatValidator(0.5f, 50f);
-        particleSize = new OwnTextField("3.0", skin, sizeValidator);
+        particleSize = new OwnTextField("5.0", skin, sizeValidator);
         container.add(new OwnLabel(I18n.txt("gui.dsload.size"), skin)).left().padRight(pad10).padBottom(pad5);
         container.add(particleSize).left().padBottom(pad5).row();
 

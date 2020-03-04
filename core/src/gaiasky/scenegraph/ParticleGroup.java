@@ -667,21 +667,22 @@ public class ParticleGroup extends FadeNode implements I3DTextRenderable, IFocus
 
         for (int i = 0; i < Math.min(50, pointData.size); i++) {
             ParticleBean pb = pointData.get(active[i]);
-            Vector3d lpos = fetchPosition(pb, camera.getPos(), aux3d1.get(), 0);
-            float distToCamera = (float) lpos.len();
-            float viewAngle = 1e-4f / camera.getFovFactor();
+            if (pb.names != null) {
+                Vector3d lpos = fetchPosition(pb, camera.getPos(), aux3d1.get(), 0);
+                float distToCamera = (float) lpos.len();
+                float viewAngle = 1e-4f / camera.getFovFactor();
 
-            textPosition(camera, lpos, distToCamera, 0);
+                textPosition(camera, lpos, distToCamera, 0);
 
-            shader.setUniformf("u_viewAngle", viewAngle);
-            shader.setUniformf("u_viewAnglePow", 1f);
-            shader.setUniformf("u_thOverFactor", thOverFactor);
-            shader.setUniformf("u_thOverFactorScl", camera.getFovFactor());
-            float textSize = (float) FastMath.tanh(viewAngle) * distToCamera * 1e5f;
-            float alpha = Math.min((float) FastMath.atan(textSize / distToCamera), 1.e-3f);
-            textSize = (float) FastMath.tan(alpha) * distToCamera * 0.5f;
-            render3DLabel(batch, shader, sys.fontDistanceField, camera, rc, pb.names[0], lpos, textScale() * camera.getFovFactor(), textSize * camera.getFovFactor());
-
+                shader.setUniformf("u_viewAngle", viewAngle);
+                shader.setUniformf("u_viewAnglePow", 1f);
+                shader.setUniformf("u_thOverFactor", thOverFactor);
+                shader.setUniformf("u_thOverFactorScl", camera.getFovFactor());
+                float textSize = (float) FastMath.tanh(viewAngle) * distToCamera * 1e5f;
+                float alpha = Math.min((float) FastMath.atan(textSize / distToCamera), 1.e-3f);
+                textSize = (float) FastMath.tan(alpha) * distToCamera * 0.5f;
+                render3DLabel(batch, shader, sys.fontDistanceField, camera, rc, pb.names[0], lpos, textScale() * camera.getFovFactor(), textSize * camera.getFovFactor());
+            }
         }
     }
 
