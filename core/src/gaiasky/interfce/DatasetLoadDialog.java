@@ -11,10 +11,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener.ChangeEvent;
 import gaiasky.data.group.DatasetOptions;
 import gaiasky.render.ComponentTypes.ComponentType;
-import gaiasky.util.GlobalConf;
-import gaiasky.util.GlobalResources;
-import gaiasky.util.GuiUtils;
-import gaiasky.util.I18n;
+import gaiasky.util.*;
 import gaiasky.util.scene2d.*;
 import gaiasky.util.validator.FloatValidator;
 import gaiasky.util.validator.IValidator;
@@ -23,11 +20,12 @@ import gaiasky.util.validator.TextFieldComparatorValidator;
 public class DatasetLoadDialog extends GenericDialog {
 
     public OwnCheckBox particles, stars, fadeIn, fadeOut;
-    public OwnTextField colorNoise, particleSize, profileDecay, magnitudeScale, fadeInMin, fadeInMax, fadeOutMin, fadeOutMax;
+    public OwnTextField magnitudeScale, fadeInMin, fadeInMax, fadeOutMin, fadeOutMax;
+    public OwnSliderPlus profileDecay, particleSize, colorNoise;
     public ColorPicker particleColor, labelColor;
     public OwnSelectBox<ComponentType> componentType;
 
-    private float pad5, pad10, pad15;
+    private float pad5, pad10, pad15, sliderWidth, fieldWidth, titleWidth;
 
     public DatasetLoadDialog(String title, Skin skin, Stage ui) {
         super(title, skin, ui);
@@ -35,6 +33,9 @@ public class DatasetLoadDialog extends GenericDialog {
         pad5 = 5f * GlobalConf.UI_SCALE_FACTOR;
         pad10 = 10f * GlobalConf.UI_SCALE_FACTOR;
         pad15 = 15f * GlobalConf.UI_SCALE_FACTOR;
+        sliderWidth = GlobalConf.UI_SCALE_FACTOR < 1.5f ? 370f * GlobalConf.UI_SCALE_FACTOR : 415f * GlobalConf.UI_SCALE_FACTOR;
+        fieldWidth = 180f * GlobalConf.UI_SCALE_FACTOR;
+        titleWidth = 180f * GlobalConf.UI_SCALE_FACTOR;
 
         setAcceptText(I18n.txt("gui.ok"));
         setCancelText(I18n.txt("gui.cancel"));
@@ -102,12 +103,13 @@ public class DatasetLoadDialog extends GenericDialog {
         // Magnitude multiplier
         FloatValidator sclValidator = new FloatValidator(0.1f, 100f);
         magnitudeScale = new OwnTextField("1.0", skin, sclValidator);
-        container.add(new OwnLabel(I18n.txt("gui.dsload.magnitude.scale"), skin)).left().padRight(pad10).padBottom(pad10);
+        magnitudeScale.setWidth(fieldWidth);
+        container.add(new OwnLabel(I18n.txt("gui.dsload.magnitude.scale"), skin, titleWidth)).left().padRight(pad10).padBottom(pad10);
         container.add(GuiUtils.tooltipHg(magnitudeScale, "gui.dsload.magnitude.scale.tooltip", skin)).left().padBottom(pad10).row();
 
         // Label color
         labelColor = new ColorPicker(new float[] { 0.8f, 0.7f, 0.2f, 1f }, stage, skin);
-        container.add(new OwnLabel(I18n.txt("gui.dsload.color.label"), skin)).left().padRight(pad10).padBottom(pad5);
+        container.add(new OwnLabel(I18n.txt("gui.dsload.color.label"), skin, titleWidth)).left().padRight(pad10).padBottom(pad5);
         Table lc = new Table(skin);
         lc.add(labelColor).size(cpsize);
         container.add(GuiUtils.tooltipHg(lc, "gui.dsload.color.label.tooltip", skin)).left().padBottom(pad5).row();
@@ -122,41 +124,72 @@ public class DatasetLoadDialog extends GenericDialog {
         OwnLabel particleProps = new OwnLabel(I18n.txt("gui.dsload.particles.properties"), skin, "hud-subheader");
         container.add(particleProps).colspan(2).left().padTop(pad15).padBottom(pad10).row();
 
-        // Color noise
-        FloatValidator decayValidator = new FloatValidator(0.1f, 1000f);
-        profileDecay = new OwnTextField("10.0", skin, decayValidator);
-        container.add(new OwnLabel(I18n.txt("gui.dsload.profiledecay"), skin)).left().padRight(pad10).padBottom(pad10);
-        container.add(GuiUtils.tooltipHg(profileDecay, "gui.dsload.profiledecay.tooltip", skin)).left().padBottom(pad10).row();
-
         // Particle color
-        particleColor = new ColorPicker(new float[] { 0.5f, 0f, 1f, 1f }, stage, skin);
-        container.add(new OwnLabel(I18n.txt("gui.dsload.color"), skin)).left().padRight(pad10).padBottom(pad5);
+        particleColor = new ColorPicker(new float[] { 0.3f, 0.3f, 1f, 1f }, stage, skin);
+        particleColor.setNewColorRunnable(()->{
+            updateFrameBuffer();
+        });
+        container.add(new OwnLabel(I18n.txt("gui.dsload.color"), skin, titleWidth)).left().padRight(pad10).padBottom(pad5);
         container.add(particleColor).size(cpsize).left().padBottom(pad5).row();
 
         // Color noise
-        FloatValidator zeroOneValidator = new FloatValidator(0f, 1f);
-        colorNoise = new OwnTextField("0.2", skin, zeroOneValidator);
-        container.add(new OwnLabel(I18n.txt("gui.dsload.color.noise"), skin)).left().padRight(pad10).padBottom(pad10);
-        container.add(GuiUtils.tooltipHg(colorNoise, "gui.dsload.color.noise.tooltip", skin)).left().padBottom(pad10).row();
+        colorNoise = new OwnSliderPlus(I18n.txt("gui.dsload.color.noise"), Constants.MIN_COLOR_NOISE, Constants.MAX_COLOR_NOISE, Constants.SLIDER_STEP_TINY, false, skin);
+        colorNoise.setName("profile decay");
+        colorNoise.setWidth(sliderWidth);
+        colorNoise.setValue(0.2f);
+        colorNoise.addListener(event -> {
+            if (event instanceof ChangeEvent) {
+                updateFrameBuffer();
+                return true;
+            }
+            return false;
+        });
+        container.add(GuiUtils.tooltipHg(colorNoise, "gui.dsload.color.noise.tooltip", skin)).colspan(2).left().padBottom(pad15).row();
 
         // Label color
-        labelColor = new ColorPicker(new float[] { 0.8f, 0.7f, 0.2f, 1f }, stage, skin);
-        container.add(new OwnLabel(I18n.txt("gui.dsload.color.label"), skin)).left().padRight(pad10).padBottom(pad5);
+        labelColor = new ColorPicker(new float[] { 0.3f, 0.3f, 1f, 1f }, stage, skin);
+        labelColor.setNewColorRunnable(()->{
+            updateFrameBuffer();
+        });
+        container.add(new OwnLabel(I18n.txt("gui.dsload.color.label"), skin, titleWidth)).left().padRight(pad10).padBottom(pad5);
         Table lc = new Table(skin);
         lc.add(labelColor).size(cpsize);
         container.add(GuiUtils.tooltipHg(lc, "gui.dsload.color.label.tooltip", skin)).left().padBottom(pad5).row();
 
         // Particle size
-        FloatValidator sizeValidator = new FloatValidator(0.5f, 50f);
-        particleSize = new OwnTextField("5.0", skin, sizeValidator);
-        container.add(new OwnLabel(I18n.txt("gui.dsload.size"), skin)).left().padRight(pad10).padBottom(pad5);
-        container.add(particleSize).left().padBottom(pad5).row();
+        particleSize = new OwnSliderPlus(I18n.txt("gui.dsload.size"), Constants.MIN_PARTICLE_SIZE, Constants.MAX_PARTICLE_SIZE, Constants.SLIDER_STEP_SMALL, false, skin);
+        particleSize.setName("profile decay");
+        particleSize.setWidth(sliderWidth);
+        particleSize.setValue(10f);
+        particleSize.addListener(event -> {
+            if (event instanceof ChangeEvent) {
+                updateFrameBuffer();
+                return true;
+            }
+            return false;
+        });
+        container.add(particleSize).colspan(2).left().padBottom(pad10).row();
+
+        // Profile falloff
+        profileDecay = new OwnSliderPlus(I18n.txt("gui.dsload.profiledecay"), Constants.MIN_PROFILE_DECAY, Constants.MAX_PROFILE_DECAY, Constants.SLIDER_STEP_SMALL, false, skin);
+        profileDecay.setName("profile decay");
+        profileDecay.setWidth(sliderWidth);
+        profileDecay.setValue(10f);
+        profileDecay.addListener(event -> {
+            if (event instanceof ChangeEvent) {
+                updateFrameBuffer();
+                return true;
+            }
+            return false;
+        });
+        container.add(GuiUtils.tooltipHg(profileDecay, "gui.dsload.profiledecay.tooltip", skin)).colspan(2).left().padBottom(pad15).row();
 
         // Component type
-        ComponentType[] componentTypes = new ComponentType[] { ComponentType.Others, ComponentType.Galaxies, ComponentType.Stars };
+        ComponentType[] componentTypes = new ComponentType[] { ComponentType.Others, ComponentType.Stars, ComponentType.Galaxies, ComponentType.Clusters, ComponentType.Asteroids, ComponentType.Locations };
         componentType = new OwnSelectBox(skin);
+        componentType.setWidth(fieldWidth);
         componentType.setItems(componentTypes);
-        container.add(new OwnLabel(I18n.txt("gui.dsload.ct"), skin)).left().padRight(pad10).padBottom(pad5);
+        container.add(new OwnLabel(I18n.txt("gui.dsload.ct"), skin, titleWidth)).left().padRight(pad10).padBottom(pad5);
         container.add(componentType).left().padBottom(pad5).row();
 
         // Fade
@@ -271,10 +304,10 @@ public class DatasetLoadDialog extends GenericDialog {
         } else {
             dops.type = DatasetOptions.DatasetLoadType.PARTICLES;
             dops.ct = componentType.getSelected();
-            dops.profileDecay = profileDecay.getDoubleValue(1);
+            dops.profileDecay = profileDecay.getValue();
             dops.particleColor = particleColor.getPickedColorDouble();
-            dops.particleColorNoise = colorNoise.getDoubleValue(0);
-            dops.particleSize = particleSize.getDoubleValue(3);
+            dops.particleColorNoise = colorNoise.getValue();
+            dops.particleSize = particleSize.getValue();
         }
         dops.labelColor = labelColor.getPickedColorDouble();
         addFadeInfo(dops);
@@ -289,6 +322,9 @@ public class DatasetLoadDialog extends GenericDialog {
         if (fadeOut.isChecked()) {
             dops.fadeOut = new double[] { fadeInMin.getDoubleValue(0f), fadeInMax.getDoubleValue(10f) };
         }
+    }
+
+    private void updateFrameBuffer(){
     }
 
     @Override

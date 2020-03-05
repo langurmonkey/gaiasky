@@ -17,8 +17,6 @@ import gaiasky.interfce.KeyBindings;
 import gaiasky.interfce.beans.CameraComboBoxBean;
 import gaiasky.scenegraph.camera.CameraManager.CameraMode;
 import gaiasky.util.*;
-import gaiasky.util.format.INumberFormat;
-import gaiasky.util.format.NumberFormatFactory;
 import gaiasky.util.gdx.contrib.postprocess.effects.CubemapProjections.CubemapProjection;
 import gaiasky.util.scene2d.*;
 
@@ -36,11 +34,8 @@ public class CameraComponent extends GuiComponent implements IObserver {
     protected boolean fovFlag = true;
     private boolean fieldLock = false;
 
-    private INumberFormat nf;
-
     public CameraComponent(Skin skin, Stage stage) {
         super(skin, stage);
-        this.nf = NumberFormatFactory.getFormatter("##0.0#");
         EventManager.instance.subscribe(this, Events.CAMERA_MODE_CMD, Events.ROTATION_SPEED_CMD, Events.TURNING_SPEED_CMD, Events.CAMERA_SPEED_CMD, Events.SPEED_LIMIT_CMD, Events.STEREOSCOPIC_CMD, Events.FOV_CHANGE_NOTIFICATION, Events.CUBEMAP_CMD, Events.CAMERA_CINEMATIC_CMD, Events.ORIENTATION_LOCK_CMD, Events.PLANETARIUM_CMD);
     }
 

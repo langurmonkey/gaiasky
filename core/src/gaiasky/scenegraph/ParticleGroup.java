@@ -78,7 +78,7 @@ public class ParticleGroup extends FadeNode implements I3DTextRenderable, IFocus
         public Map<UCD, Double> extra;
 
         // Octant, if in octree
-        public transient OctreeNode octant;
+        public OctreeNode octant;
 
         public ParticleBean(double[] data, String[] names, Map<UCD, Double> extra) {
             this.data = data;
@@ -397,7 +397,6 @@ public class ParticleGroup extends FadeNode implements I3DTextRenderable, IFocus
         @Override
         public void run() {
             pg.updateSorter(GaiaSky.instance.time, GaiaSky.instance.getICamera());
-            updating = false;
         }
 
     }
@@ -1336,7 +1335,7 @@ public class ParticleGroup extends FadeNode implements I3DTextRenderable, IFocus
             ParticleBean d = pointData.get(i);
             // Pos
             Vector3d x = aux3d1.get().set(d.x(), d.y(), d.z());
-            metadata[i] = filter(i) ? camPos.dst(x.x, x.y, x.z) : Double.MAX_VALUE;
+            metadata[i] = filter(i) ? camPos.dst(x) : Double.MAX_VALUE;
         }
     }
 
@@ -1346,22 +1345,22 @@ public class ParticleGroup extends FadeNode implements I3DTextRenderable, IFocus
 
         // Sort background list of indices
         Arrays.sort(background, comp);
-        // Swap indices lists
-        swapBuffers();
-        // Simple particle vgroup does not sort
-        lastSortTime = TimeUtils.millis();
+
+        // Synchronously with the render thread, update indices, lastSortTime and updating state
+        GaiaSky.postRunnable(() -> {
+            swapBuffers();
+            lastSortTime = TimeUtils.millis();
+            updating = false;
+        });
     }
 
     protected void swapBuffers() {
-        GaiaSky.postRunnable(() -> {
-            if (active == indices1) { //-V6013
-                active = indices2;
-                background = indices1;
-            } else {
-                active = indices1;
-                background = indices2;
-            }
-
-        });
+        if (active == indices1) { //-V6013
+            active = indices2;
+            background = indices1;
+        } else {
+            active = indices1;
+            background = indices2;
+        }
     }
 }

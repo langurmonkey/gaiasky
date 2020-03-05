@@ -250,6 +250,15 @@ public class Constants {
     public final static float MIN_TESS_QUALITY = 1f;
     public final static float MAX_TESS_QUALITY = 10f;
 
+    public final static float MIN_PROFILE_DECAY = 0.1f;
+    public final static float MAX_PROFILE_DECAY = 500f;
+
+    public final static float MIN_PARTICLE_SIZE = 0.5f;
+    public final static float MAX_PARTICLE_SIZE = 50f;
+
+    public final static float MIN_COLOR_NOISE = 0.0f;
+    public final static float MAX_COLOR_NOISE = 1.0f;
+
     // Max time, 5 Myr
     public static final long MAX_TIME_MS = 5000000l * (long) Nature.Y_TO_MS;
     // Min time, -5 Myr

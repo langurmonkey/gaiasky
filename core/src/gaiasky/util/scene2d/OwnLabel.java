@@ -16,6 +16,12 @@ public class OwnLabel extends Label implements Disableable {
     private Color regularColor;
     private boolean disabled = false;
 
+    public OwnLabel(CharSequence text, Skin skin, float width) {
+        super(text, skin);
+        this.regularColor = this.getColor().cpy();
+        this.setWidth(width);
+    }
+
     public OwnLabel(CharSequence text, Skin skin) {
         super(text, skin);
         this.regularColor = this.getColor().cpy();
