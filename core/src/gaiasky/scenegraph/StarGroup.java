@@ -245,9 +245,7 @@ public class StarGroup extends ParticleGroup implements ILineRenderable, IStarFo
         }
 
         computeMeanPosition();
-
-        if (labelPosition == null)
-            labelPosition.set(pos);
+        setLabelPosition();
     }
 
     @Override

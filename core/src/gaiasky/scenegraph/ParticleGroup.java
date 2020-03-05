@@ -272,7 +272,7 @@ public class ParticleGroup extends FadeNode implements I3DTextRenderable, IFocus
      */
     private boolean inGpu;
 
-    // Offset and count for this vgroup
+    // Offset and count for this group
     public int offset, count;
 
     /**
@@ -341,8 +341,6 @@ public class ParticleGroup extends FadeNode implements I3DTextRenderable, IFocus
     // Has been disposed
     public boolean disposed = false;
 
-    public boolean createCatalogInfo = true;
-
     // Name index
     protected ObjectIntMap<String> index;
 
@@ -401,7 +399,7 @@ public class ParticleGroup extends FadeNode implements I3DTextRenderable, IFocus
 
     }
 
-    public ParticleGroup(boolean createCatalogInfo) {
+    public ParticleGroup() {
         super();
         id = idSeq++;
         inGpu = false;
@@ -409,46 +407,32 @@ public class ParticleGroup extends FadeNode implements I3DTextRenderable, IFocus
         focusPosition = new Vector3d();
         focusPositionSph = new Vector2d();
         lastSortCameraPos = new Vector3d(Double.MAX_VALUE, Double.MAX_VALUE, Double.MAX_VALUE);
-        this.createCatalogInfo = createCatalogInfo;
         this.comp = new ParticleGroupComparator();
         EventManager.instance.subscribe(this, Events.FOCUS_CHANGED, Events.CAMERA_MOTION_UPDATED);
     }
 
-    public ParticleGroup() {
-        this(true);
+    public void initialize() {
+        initialize(true, true);
     }
 
-    public void initialize() {
+    public void initialize(boolean dataLoad, boolean createCatalogInfo) {
         /** Load data **/
         try {
-            Class<?> clazz = Class.forName(provider);
-            IParticleGroupDataProvider provider = (IParticleGroupDataProvider) clazz.newInstance();
-
             if (factor == null)
                 factor = 1d;
 
             lastSortTime = -1;
 
-            setData(provider.loadData(datafile, factor));
+            if (dataLoad) {
+                Class<?> clazz = Class.forName(provider);
+                IParticleGroupDataProvider provider = (IParticleGroupDataProvider) clazz.getConstructor().newInstance();
 
-            meanDistance = 0;
-            maxDistance = Double.MIN_VALUE;
-            minDistance = Double.MAX_VALUE;
-            long n = 0;
-            for (ParticleBean point : pointData) {
-                // Add sample to mean distance
-                double dist = len(point.data[0], point.data[1], point.data[2]);
-                maxDistance = Math.max(maxDistance, dist);
-                minDistance = Math.min(minDistance, dist);
-                meanDistance = (n * meanDistance + dist) / (n + 1);
-                n++;
+                setData(provider.loadData(datafile, factor));
             }
 
+            computeMinMeanMaxDistances();
             computeMeanPosition();
-
-            // Label position
-            if (labelPosition == null)
-                labelPosition.set(pos);
+            setLabelPosition();
 
             if (createCatalogInfo) {
                 // Create catalog info and broadcast
@@ -464,6 +448,21 @@ public class ParticleGroup extends FadeNode implements I3DTextRenderable, IFocus
         }
     }
 
+    public void computeMinMeanMaxDistances() {
+        meanDistance = 0;
+        maxDistance = Double.MIN_VALUE;
+        minDistance = Double.MAX_VALUE;
+        long n = 0;
+        for (ParticleBean point : pointData) {
+            // Add sample to mean distance
+            double dist = len(point.data[0], point.data[1], point.data[2]);
+            maxDistance = Math.max(maxDistance, dist);
+            minDistance = Math.min(minDistance, dist);
+            meanDistance = (n * meanDistance + dist) / (n + 1);
+            n++;
+        }
+    }
+
     public void computeMeanPosition() {
         if (!fixedMeanPosition) {
             // Mean position
@@ -472,6 +471,12 @@ public class ParticleGroup extends FadeNode implements I3DTextRenderable, IFocus
             }
             pos.scl(1d / pointData.size);
         }
+    }
+
+    public void setLabelPosition() {
+        // Label position
+        if (labelPosition == null)
+            labelPosition = new Vector3d(pos);
     }
 
     private double len(double x, double y, double z) {
@@ -1305,7 +1310,7 @@ public class ParticleGroup extends FadeNode implements I3DTextRenderable, IFocus
         double profileDecay = dops == null ? 1 : dops.profileDecay;
         String ct = dops == null || dops.ct == null ? ComponentType.Galaxies.toString() : dops.ct.toString();
 
-        ParticleGroup pg = new ParticleGroup(false);
+        ParticleGroup pg = new ParticleGroup();
         pg.setName(name.replace("%%PGID%%", Long.toString(pg.id)));
         pg.setParent("Universe");
         pg.setFadein(fadeIn);
@@ -1317,6 +1322,7 @@ public class ParticleGroup extends FadeNode implements I3DTextRenderable, IFocus
         pg.setSize(particleSize);
         pg.setCt(ct);
         pg.setData(data);
+        pg.initialize(false, false);
         pg.doneLoading(null);
         return pg;
     }

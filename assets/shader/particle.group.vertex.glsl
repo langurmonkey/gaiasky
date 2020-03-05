@@ -38,7 +38,7 @@ void main() {
 
     // Distance to point - watch out, if position contains large values, this produces overflow!
     // Downscale before computing length()
-    float dist = length(pos * 1e-15) * 1e15;
+    float dist = length(pos * 1e-14) * 1e14;
 
     float cubemapSizeFactor = 1.0;
     if(u_cubemap == 1) {
