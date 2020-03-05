@@ -338,6 +338,13 @@ public class ParticleGroup extends FadeNode implements I3DTextRenderable, IFocus
      */
     protected ParticleBean focus;
 
+    /**
+     * Closest
+     */
+    protected Vector3d closestPos, closestAbsolutePos;
+    protected double closestDist;
+    protected String closestName;
+
     // Has been disposed
     public boolean disposed = false;
 
@@ -404,6 +411,8 @@ public class ParticleGroup extends FadeNode implements I3DTextRenderable, IFocus
         id = idSeq++;
         inGpu = false;
         focusIndex = -1;
+        closestPos = new Vector3d();
+        closestAbsolutePos = new Vector3d();
         focusPosition = new Vector3d();
         focusPositionSph = new Vector2d();
         lastSortCameraPos = new Vector3d(Double.MAX_VALUE, Double.MAX_VALUE, Double.MAX_VALUE);
@@ -620,6 +629,15 @@ public class ParticleGroup extends FadeNode implements I3DTextRenderable, IFocus
             if (focusIndex >= 0) {
                 updateFocus(time, camera);
             }
+
+            if (active.length > 0) {
+                ParticleBean closest = pointData.get(active[0]);
+                closestAbsolutePos.set(closest.x(), closest.y(), closest.z());
+                closestPos.set(closestAbsolutePos).sub(camera.getPos());
+                closestDist = closestPos.len() - getRadius(active[0]);
+                closestName = closest.names != null ? closest.names[0] : this.names[0];
+                camera.checkClosestParticle(this);
+            }
         }
     }
 
@@ -635,7 +653,6 @@ public class ParticleGroup extends FadeNode implements I3DTextRenderable, IFocus
      * @param camera The current camera
      */
     public void updateFocus(ITimeFrameProvider time, ICamera camera) {
-
         Vector3d aux = aux3d1.get().set(this.focusPosition);
         this.focusDistToCamera = aux.sub(camera.getPos()).len();
         this.focusSize = getFocusSize();
@@ -803,7 +820,7 @@ public class ParticleGroup extends FadeNode implements I3DTextRenderable, IFocus
 
     @Override
     public String getClosestName() {
-        return getName();
+        return closestName;
     }
 
     @Override
@@ -900,6 +917,20 @@ public class ParticleGroup extends FadeNode implements I3DTextRenderable, IFocus
         return 0;
     }
 
+    public String getName() {
+        if (focus != null && focus.names != null)
+            return focus.names[0];
+        else
+            return super.getName();
+    }
+
+    public String[] getNames() {
+        if (focus != null && focus.names != null)
+            return focus.names;
+        else
+            return super.getNames();
+    }
+
     /**
      * Returns the size of the particle at index i
      *
@@ -956,7 +987,7 @@ public class ParticleGroup extends FadeNode implements I3DTextRenderable, IFocus
                     pos.set(posd.valuesf());
 
                     if (camera.direction.dot(posd) > 0) {
-                        // The star is in front of us
+                        // The particle is in front of us
                         // Diminish the size of the star
                         // when we are close by
                         double dist = posd.len();
@@ -1128,11 +1159,19 @@ public class ParticleGroup extends FadeNode implements I3DTextRenderable, IFocus
 
     @Override
     public double getCandidateViewAngleApparent() {
-        return getViewAngleApparent();
+        if (candidateFocusIndex >= 0) {
+            ParticleBean candidate = pointData.get(candidateFocusIndex);
+            Vector3d aux = candidate.pos(aux3d1.get());
+            ICamera camera = GaiaSky.instance.getICamera();
+            return (float) ((size * .5e2f / aux.sub(camera.getPos()).len()) / camera.getFovFactor());
+        } else {
+            return -1;
+        }
     }
 
     @Override
     public IFocus getFocus(String name) {
+        candidateFocusIndex = index.get(name, -1);
         return this;
     }
 

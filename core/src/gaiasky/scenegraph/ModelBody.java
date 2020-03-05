@@ -116,8 +116,9 @@ public abstract class ModelBody extends CelestialBody {
         // Update light with global position
         if (mc != null) {
             translation.put(mc.dLight.direction);
-            IStarFocus sf = camera.getClosestStar();
-            if (sf != null) {
+            IFocus pf = camera.getClosestParticle();
+            if (pf != null && pf instanceof IStarFocus) {
+                IStarFocus sf = (IStarFocus) pf;
                 float[] col = sf.getClosestCol();
                 mc.dLight.direction.sub(sf.getClosestPos(aux3d1.get()).put(aux3f1.get()));
                 mc.dLight.color.set(col[0], col[1], col[2], 1.0f);

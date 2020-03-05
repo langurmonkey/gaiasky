@@ -265,7 +265,7 @@ public class Star extends Particle {
     @Override
     protected void addToRenderLists(ICamera camera) {
         if(GaiaSky.instance.isOn(ct)) {
-            camera.checkClosestStar(this);
+            camera.checkClosestParticle(this);
             if (camera.getCurrent() instanceof FovCamera) {
                 // Render as point, do nothing
                 addToRender(this, RenderGroup.BILLBOARD_STAR);

@@ -207,9 +207,7 @@ public class StarGroup extends ParticleGroup implements ILineRenderable, IStarFo
     /**
      * CLOSEST
      **/
-    private Vector3d closestPos, closestAbsolutePos, closestPm;
-    private String closestName;
-    private double closestDist;
+    private Vector3d closestPm;
     private double closestSize;
     private float[] closestCol;
 
@@ -217,8 +215,6 @@ public class StarGroup extends ParticleGroup implements ILineRenderable, IStarFo
 
     public StarGroup() {
         super();
-        closestPos = new Vector3d();
-        closestAbsolutePos = new Vector3d();
         closestPm = new Vector3d();
         closestCol = new float[4];
         lastSortTime = -1;
@@ -340,7 +336,7 @@ public class StarGroup extends ParticleGroup implements ILineRenderable, IStarFo
             closestCol[3] = c.a;
             closestSize = getSize(active[0]);
             closestName = closestStar.names[0];
-            camera.checkClosestStar(this);
+            camera.checkClosestParticle(this);
 
             // Model dist
             modelDist = 172.4643429 * getRadius(active[0]);
@@ -695,20 +691,6 @@ public class StarGroup extends ParticleGroup implements ILineRenderable, IStarFo
         return (float) focus.data[StarBean.I_ABSMAG];
     }
 
-    public String getName() {
-        if (focus != null)
-            return ((StarBean) focus).names[0];
-        else
-            return null;
-    }
-
-    public String[] getNames() {
-        if (focus != null)
-            return ((StarBean) focus).names;
-        else
-            return null;
-    }
-
     public long getId() {
         if (focus != null)
             return ((StarBean) focus).id;
@@ -782,7 +764,7 @@ public class StarGroup extends ParticleGroup implements ILineRenderable, IStarFo
 
     @Override
     public String getCandidateName() {
-        return ((StarBean) pointData.get(candidateFocusIndex)).names[0];
+        return pointData.get(candidateFocusIndex).names[0];
     }
 
     @Override

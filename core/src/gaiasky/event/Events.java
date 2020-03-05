@@ -113,7 +113,7 @@ public enum Events {
      * indicating if this comes from the interface
      **/
     CAMERA_CINEMATIC_CMD,
-    /** Broadcasts the overall closest (in [0]), the closest non-star body (in [1]) and the closest star (in [2]) to this camera. Happens every frame **/
+    /** Broadcasts the overall closest (in [0]), the closest non-star body (in [1]) and the closest particle (in [2]) to this camera. Happens every frame **/
     CAMERA_CLOSEST_INFO,
 
     /**

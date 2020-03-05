@@ -324,7 +324,7 @@ public class FocusInfoInterface extends TableGuiInterface implements IObserver {
     public void notify(Events event, Object... data) {
         switch (event) {
         case FOCUS_CHANGED:
-            IFocus focus = null;
+            IFocus focus;
             if (data[0] instanceof String) {
                 focus = (IFocus) GaiaSky.instance.sg.getNode((String) data[0]);
             } else {

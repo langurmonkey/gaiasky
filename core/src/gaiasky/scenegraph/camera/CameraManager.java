@@ -16,7 +16,6 @@ import gaiasky.event.Events;
 import gaiasky.event.IObserver;
 import gaiasky.scenegraph.CelestialBody;
 import gaiasky.scenegraph.IFocus;
-import gaiasky.scenegraph.IStarFocus;
 import gaiasky.scenegraph.Planet;
 import gaiasky.util.*;
 import gaiasky.util.camera.CameraUtils;
@@ -322,20 +321,20 @@ public class CameraManager implements ICamera, IObserver {
         if (closestBody != null && closestBody.getOctant() != null && !closestBody.getOctant().observed)
             closestBody = null;
 
-        IStarFocus closestStar = getClosestStar();
-        if (closestStar != null && closestStar.getOctant() != null && !closestStar.getOctant().observed)
-            closestStar = null;
+        IFocus closestParticle = getClosestParticle();
+        if (closestParticle != null && closestParticle.getOctant() != null && !closestParticle.getOctant().observed)
+            closestParticle = null;
 
-        if (closestBody != null || closestStar != null) {
+        if (closestBody != null || closestParticle != null) {
             if (closestBody == null)
-                setClosest(closestStar);
-            else if (closestStar == null)
+                setClosest(closestParticle);
+            else if (closestParticle == null)
                 setClosest(closestBody);
             else {
-                setClosest(closestBody.getDistToCamera() < closestStar.getClosestDistToCamera() ? closestBody : closestStar);
+                setClosest(closestBody.getDistToCamera() < closestParticle.getClosestDistToCamera() ? closestBody : closestParticle);
             }
         }
-        EventManager.instance.post(Events.CAMERA_CLOSEST_INFO, getClosest(), getClosestBody(), getClosestStar());
+        EventManager.instance.post(Events.CAMERA_CLOSEST_INFO, getClosest(), getClosestBody(), getClosestParticle());
 
     }
 
@@ -569,13 +568,13 @@ public class CameraManager implements ICamera, IObserver {
     }
 
     @Override
-    public IStarFocus getClosestStar() {
-        return current.getClosestStar();
+    public IFocus getClosestParticle() {
+        return current.getClosestParticle();
     }
 
     @Override
-    public void checkClosestStar(IStarFocus star) {
-        current.checkClosestStar(star);
+    public void checkClosestParticle(IFocus particle) {
+        current.checkClosestParticle(particle);
     }
 
     @Override

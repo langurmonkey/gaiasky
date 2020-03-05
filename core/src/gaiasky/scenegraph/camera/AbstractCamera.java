@@ -10,7 +10,6 @@ import com.badlogic.gdx.graphics.PerspectiveCamera;
 import com.badlogic.gdx.math.Matrix4;
 import gaiasky.scenegraph.CelestialBody;
 import gaiasky.scenegraph.IFocus;
-import gaiasky.scenegraph.IStarFocus;
 import gaiasky.util.Constants;
 import gaiasky.util.GlobalConf;
 import gaiasky.util.GlobalResources;
@@ -65,9 +64,9 @@ public abstract class AbstractCamera implements ICamera {
     protected IFocus closestBody;
 
     /**
-     * The closest star to the camera
+     * The closest particle to the camera
      */
-    protected IStarFocus closestStar;
+    protected IFocus closestStar;
 
     protected Matrix4 prevCombined;
 
@@ -303,11 +302,11 @@ public abstract class AbstractCamera implements ICamera {
         return closestBody;
     }
 
-    public IStarFocus getClosestStar() {
+    public IFocus getClosestParticle() {
         return closestStar;
     }
 
-    public void checkClosestStar(IStarFocus star) {
+    public void checkClosestParticle(IFocus star) {
         if (closestStar == null || closestStar.getClosestDistToCamera() > star.getClosestDistToCamera()) {
             closestStar = star;
         }

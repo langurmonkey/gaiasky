@@ -20,8 +20,8 @@ import gaiasky.util.validator.TextFieldComparatorValidator;
 public class DatasetLoadDialog extends GenericDialog {
 
     public OwnCheckBox particles, stars, fadeIn, fadeOut;
-    public OwnTextField magnitudeScale, fadeInMin, fadeInMax, fadeOutMin, fadeOutMax;
-    public OwnSliderPlus profileDecay, particleSize, colorNoise;
+    public OwnTextField magnitudeScale, fadeInMin, fadeInMax, fadeOutMin, fadeOutMax, profileDecay;
+    public OwnSliderPlus particleSize, colorNoise;
     public ColorPicker particleColor, labelColor;
     public OwnSelectBox<ComponentType> componentType;
 
@@ -171,18 +171,11 @@ public class DatasetLoadDialog extends GenericDialog {
         container.add(particleSize).colspan(2).left().padBottom(pad10).row();
 
         // Profile falloff
-        profileDecay = new OwnSliderPlus(I18n.txt("gui.dsload.profiledecay"), Constants.MIN_PROFILE_DECAY, Constants.MAX_PROFILE_DECAY, Constants.SLIDER_STEP_SMALL, false, skin);
-        profileDecay.setName("profile decay");
-        profileDecay.setWidth(sliderWidth);
-        profileDecay.setValue(10f);
-        profileDecay.addListener(event -> {
-            if (event instanceof ChangeEvent) {
-                updateFrameBuffer();
-                return true;
-            }
-            return false;
-        });
-        container.add(GuiUtils.tooltipHg(profileDecay, "gui.dsload.profiledecay.tooltip", skin)).colspan(2).left().padBottom(pad15).row();
+        FloatValidator falloffVal = new FloatValidator(0.3f, 200f);
+        profileDecay = new OwnTextField("5.0", skin, falloffVal);
+        profileDecay.setWidth(fieldWidth);
+        container.add(new OwnLabel(I18n.txt("gui.dsload.profiledecay"), skin, titleWidth)).left().padRight(pad10).padBottom(pad15);
+        container.add(GuiUtils.tooltipHg(profileDecay, "gui.dsload.profiledecay.tooltip", skin)).left().padBottom(pad15).row();
 
         // Component type
         ComponentType[] componentTypes = new ComponentType[] { ComponentType.Others, ComponentType.Stars, ComponentType.Galaxies, ComponentType.Clusters, ComponentType.Asteroids, ComponentType.Locations };
@@ -304,7 +297,7 @@ public class DatasetLoadDialog extends GenericDialog {
         } else {
             dops.type = DatasetOptions.DatasetLoadType.PARTICLES;
             dops.ct = componentType.getSelected();
-            dops.profileDecay = profileDecay.getValue();
+            dops.profileDecay = profileDecay.getDoubleValue(5d);
             dops.particleColor = particleColor.getPickedColorDouble();
             dops.particleColorNoise = colorNoise.getValue();
             dops.particleSize = particleSize.getValue();

@@ -9,7 +9,6 @@ import com.badlogic.gdx.graphics.PerspectiveCamera;
 import com.badlogic.gdx.math.Matrix4;
 import gaiasky.scenegraph.CelestialBody;
 import gaiasky.scenegraph.IFocus;
-import gaiasky.scenegraph.IStarFocus;
 import gaiasky.scenegraph.camera.CameraManager.CameraMode;
 import gaiasky.util.math.Vector3d;
 import gaiasky.util.time.ITimeFrameProvider;
@@ -161,20 +160,20 @@ public interface ICamera {
     void resize(int width, int height);
 
     /**
-     * Gets the current closest star to this camera
+     * Gets the current closest particle to this camera
      * 
-     * @return The closest star
+     * @return The closest particle
      */
-    IStarFocus getClosestStar();
+    IFocus getClosestParticle();
 
     /**
-     * Sets the current closest star to this camera. This will be only set if
-     * the given star is closer than the current.
+     * Sets the current closest particle to this camera. This will be only set if
+     * the given particle is closer than the current.
      * 
-     * @param star
-     *            The candidate star
+     * @param particle
+     *            The candidate particle
      */
-    void checkClosestStar(IStarFocus star);
+    void checkClosestParticle(IFocus particle);
 
     /**
      * Returns the current closest object
