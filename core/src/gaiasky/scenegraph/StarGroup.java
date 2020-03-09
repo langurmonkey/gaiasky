@@ -54,7 +54,7 @@ import java.util.Map;
 import java.util.TreeMap;
 
 /**
- * A particle vgroup which additionally to the xyz position, supports color and
+ * A particle group which additionally to the xyz position, supports color and
  * magnitude. id x y z pmx pmy pmz appmag absmag col size additional
  *
  * @author tsagrista
@@ -345,7 +345,7 @@ public class StarGroup extends ParticleGroup implements ILineRenderable, IStarFo
     }
 
     /**
-     * Updates the parameters of the focus, if the focus is active in this vgroup
+     * Updates the parameters of the focus, if the focus is active in this group
      *
      * @param time   The time frame provider
      * @param camera The current camera
@@ -833,13 +833,13 @@ public class StarGroup extends ParticleGroup implements ILineRenderable, IStarFo
     }
 
     @Override
-    protected Vector3d fetchPosition(ParticleBean pb, Vector3d campos, Vector3d dest, double deltaYears) {
+    protected Vector3d fetchPosition(ParticleBean pb, Vector3d campos, Vector3d destination, double deltaYears) {
         StarBean sb = (StarBean) pb;
         Vector3d pm = aux3d2.get().set(sb.pmx(), sb.pmy(), sb.pmz()).scl(deltaYears);
         if (campos != null && !campos.hasNaN())
-            return dest.set(sb.x(), sb.y(), sb.z()).sub(campos).add(pm);
+            return destination.set(sb.x(), sb.y(), sb.z()).sub(campos).add(pm);
         else
-            return dest.set(sb.x(), sb.y(), sb.z()).add(pm);
+            return destination.set(sb.x(), sb.y(), sb.z()).add(pm);
     }
 
     @Override
@@ -848,7 +848,7 @@ public class StarGroup extends ParticleGroup implements ILineRenderable, IStarFo
     }
 
     /**
-     * Sets the epoch to use for the stars in this vgroup
+     * Sets the epoch to use for the stars in this group
      *
      * @param epochJd The epoch in julian days (days since January 1, 4713 BCE)
      */
@@ -857,7 +857,7 @@ public class StarGroup extends ParticleGroup implements ILineRenderable, IStarFo
     }
 
     /**
-     * Returns the epoch in Julian Days used for the stars in this vgroup
+     * Returns the epoch in Julian Days used for the stars in this group
      *
      * @return The epoch in julian days
      */
@@ -927,7 +927,7 @@ public class StarGroup extends ParticleGroup implements ILineRenderable, IStarFo
     }
 
     /**
-     * Creates a default star vgroup with some sane parameters, given the name and the data
+     * Creates a default star group with some sane parameters, given the name and the data
      *
      * @param name     The name of the star group. Any occurrence of '%%SGID%%' in name will be replaced with the id of the star group
      * @param data     The data of the star group

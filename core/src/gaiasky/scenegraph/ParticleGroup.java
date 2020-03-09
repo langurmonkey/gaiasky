@@ -49,8 +49,8 @@ import java.util.Comparator;
 import java.util.Map;
 
 /**
- * This class represents a vgroup of non-focusable particles, all with the same
- * luminosity. The contents of this vgroup will be sent once to GPU memory and
+ * This class represents a group of non-focusable particles, all with the same
+ * luminosity. The contents of this group will be sent once to GPU memory and
  * stay there, so all particles get rendered directly in the GPU from the GPU
  * with no CPU intervention. This allows for much faster rendering. Use this for
  * large groups of particles.
@@ -268,7 +268,7 @@ public class ParticleGroup extends FadeNode implements I3DTextRenderable, IFocus
     public float colorNoise = 0;
 
     /**
-     * Are the data of this vgroup in the GPU memory?
+     * Are the data of this group in the GPU memory?
      */
     private boolean inGpu;
 
@@ -613,7 +613,7 @@ public class ParticleGroup extends FadeNode implements I3DTextRenderable, IFocus
     }
 
     /**
-     * Number of objects of this vgroup
+     * Number of objects of this group
      *
      * @return The number of objects
      */
@@ -647,7 +647,7 @@ public class ParticleGroup extends FadeNode implements I3DTextRenderable, IFocus
     }
 
     /**
-     * Updates the parameters of the focus, if the focus is active in this vgroup
+     * Updates the parameters of the focus, if the focus is active in this group
      *
      * @param time   The time frame provider
      * @param camera The current camera
@@ -1198,15 +1198,15 @@ public class ParticleGroup extends FadeNode implements I3DTextRenderable, IFocus
      * @param campos     The position of the camera. If null, the camera position is
      *                   not subtracted so that the coordinates are given in the global
      *                   reference system instead of the camera reference system.
-     * @param dest       The destination fector
+     * @param destination       The destination factor
      * @param deltaYears The delta years
      * @return The vector for chaining
      */
-    protected Vector3d fetchPosition(ParticleBean pb, Vector3d campos, Vector3d dest, double deltaYears) {
+    protected Vector3d fetchPosition(ParticleBean pb, Vector3d campos, Vector3d destination, double deltaYears) {
         if (campos != null)
-            return dest.set(pb.data[0], pb.data[1], pb.data[2]).sub(campos);
+            return destination.set(pb.data[0], pb.data[1], pb.data[2]).sub(campos);
         else
-            return dest.set(pb.data[0], pb.data[1], pb.data[2]);
+            return destination.set(pb.data[0], pb.data[1], pb.data[2]);
     }
 
     public double getMeanDistance() {
