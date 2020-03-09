@@ -461,20 +461,24 @@ public interface IScriptingInterface {
      * to the following:
      * <ul>
      * <li>0 - 100 Km/h</li>
-     * <li>1 - 1 c</li>
-     * <li>2 - 2 c</li>
-     * <li>3 - 10 c</li>
-     * <li>4 - 1e3 c</li>
-     * <li>5 - 1 AU/s</li>
-     * <li>6 - 10 AU/s</li>
-     * <li>7 - 1000 AU/s</li>
-     * <li>8 - 10000 AU/s</li>
-     * <li>9 - 1 pc/s</li>
-     * <li>10 - 1 pc/s</li>
-     * <li>11 - 2 pc/s</li>
-     * <li>12 - 10 pc/s</li>
-     * <li>13 - 1000 pc/s</li>
-     * <li>14 - unlimited</li>
+     * <li>1 - 0.5 c</li>
+     * <li>2 - 0.8 c</li>
+     * <li>3 - 0.9 c</li>
+     * <li>4 - 0.99 c</li>
+     * <li>5 - 0.99999 c</li>
+     * <li>6 - 1 c</li>
+     * <li>7 - 2 c</li>
+     * <li>8 - 10 c</li>
+     * <li>9 - 1e3 c</li>
+     * <li>10 - 1 AU/s</li>
+     * <li>11 - 10 AU/s</li>
+     * <li>12 - 1000 AU/s</li>
+     * <li>13 - 10000 AU/s</li>
+     * <li>14 - 1 pc/s</li>
+     * <li>15 - 2 pc/s</li>
+     * <li>16 - 10 pc/s</li>
+     * <li>17 - 1000 pc/s</li>
+     * <li>18 - unlimited</li>
      * </ul>
      *
      * @param index The index of the top speed.
