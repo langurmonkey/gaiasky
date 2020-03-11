@@ -44,9 +44,7 @@ import gaiasky.util.ucd.UCD;
 import net.jafama.FastMath;
 
 import java.io.Serializable;
-import java.util.Arrays;
-import java.util.Comparator;
-import java.util.Map;
+import java.util.*;
 
 /**
  * This class represents a group of non-focusable particles, all with the same
@@ -268,6 +266,11 @@ public class ParticleGroup extends FadeNode implements I3DTextRenderable, IFocus
     public float colorNoise = 0;
 
     /**
+     * Particle size limits, in pixels
+     */
+    public double[] particleSizeLimits = new double[] { 3.5d, 800d };
+
+    /**
      * Are the data of this group in the GPU memory?
      */
     private boolean inGpu;
@@ -461,15 +464,20 @@ public class ParticleGroup extends FadeNode implements I3DTextRenderable, IFocus
         meanDistance = 0;
         maxDistance = Double.MIN_VALUE;
         minDistance = Double.MAX_VALUE;
-        long n = 0;
+        List<Double> distances = new ArrayList<>();
         for (ParticleBean point : pointData) {
             // Add sample to mean distance
             double dist = len(point.data[0], point.data[1], point.data[2]);
-            maxDistance = Math.max(maxDistance, dist);
-            minDistance = Math.min(minDistance, dist);
-            meanDistance = (n * meanDistance + dist) / (n + 1);
-            n++;
+            if (Double.isFinite(dist)) {
+                distances.add(dist);
+                maxDistance = Math.max(maxDistance, dist);
+                minDistance = Math.min(minDistance, dist);
+            }
         }
+        // Mean is computed as half of the 90th percentile to avoid outliers
+        distances.sort(Double::compare);
+        int idx = (int) Math.ceil((90d / 100d) * (double) distances.size());
+        meanDistance = distances.get(idx - 1) / 2d;
     }
 
     public void computeMeanPosition() {
@@ -796,6 +804,12 @@ public class ParticleGroup extends FadeNode implements I3DTextRenderable, IFocus
 
     public void setColornoise(Double colorNoise) {
         this.colorNoise = colorNoise.floatValue();
+    }
+
+    public void setParticlesizelimits(double[] sizeLimits) {
+        if (sizeLimits[0] > sizeLimits[1])
+            sizeLimits[0] = sizeLimits[1];
+        this.particleSizeLimits = sizeLimits;
     }
 
     /**
@@ -1194,12 +1208,12 @@ public class ParticleGroup extends FadeNode implements I3DTextRenderable, IFocus
      * Fetches the real position of the particle. It will apply the necessary
      * integrations (i.e. proper motion).
      *
-     * @param pb         The particle bean
-     * @param campos     The position of the camera. If null, the camera position is
-     *                   not subtracted so that the coordinates are given in the global
-     *                   reference system instead of the camera reference system.
-     * @param destination       The destination factor
-     * @param deltaYears The delta years
+     * @param pb          The particle bean
+     * @param campos      The position of the camera. If null, the camera position is
+     *                    not subtracted so that the coordinates are given in the global
+     *                    reference system instead of the camera reference system.
+     * @param destination The destination factor
+     * @param deltaYears  The delta years
      * @return The vector for chaining
      */
     protected Vector3d fetchPosition(ParticleBean pb, Vector3d campos, Vector3d destination, double deltaYears) {
@@ -1346,6 +1360,7 @@ public class ParticleGroup extends FadeNode implements I3DTextRenderable, IFocus
         double colorNoise = dops == null ? 0 : dops.particleColorNoise;
         double[] labelColor = dops == null || dops.labelColor == null ? new double[] { 1.0, 1.0, 1.0, 1.0 } : dops.labelColor;
         double particleSize = dops == null ? 0 : dops.particleSize;
+        double[] minParticleSize = dops == null ? new double[] { 2d, 200d } : dops.particleSizeLimits;
         double profileDecay = dops == null ? 1 : dops.profileDecay;
         String ct = dops == null || dops.ct == null ? ComponentType.Galaxies.toString() : dops.ct.toString();
 
@@ -1359,6 +1374,7 @@ public class ParticleGroup extends FadeNode implements I3DTextRenderable, IFocus
         pg.setColornoise(colorNoise);
         pg.setLabelcolor(labelColor);
         pg.setSize(particleSize);
+        pg.setParticlesizelimits(minParticleSize);
         pg.setCt(ct);
         pg.setData(data);
         pg.initialize(false, false);

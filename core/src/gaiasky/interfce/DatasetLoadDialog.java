@@ -126,7 +126,7 @@ public class DatasetLoadDialog extends GenericDialog {
 
         // Particle color
         particleColor = new ColorPicker(new float[] { 0.3f, 0.3f, 1f, 1f }, stage, skin);
-        particleColor.setNewColorRunnable(()->{
+        particleColor.setNewColorRunnable(() -> {
             updateFrameBuffer();
         });
         container.add(new OwnLabel(I18n.txt("gui.dsload.color"), skin, titleWidth)).left().padRight(pad10).padBottom(pad5);
@@ -148,7 +148,7 @@ public class DatasetLoadDialog extends GenericDialog {
 
         // Label color
         labelColor = new ColorPicker(new float[] { 0.3f, 0.3f, 1f, 1f }, stage, skin);
-        labelColor.setNewColorRunnable(()->{
+        labelColor.setNewColorRunnable(() -> {
             updateFrameBuffer();
         });
         container.add(new OwnLabel(I18n.txt("gui.dsload.color.label"), skin, titleWidth)).left().padRight(pad10).padBottom(pad5);
@@ -301,6 +301,7 @@ public class DatasetLoadDialog extends GenericDialog {
             dops.particleColor = particleColor.getPickedColorDouble();
             dops.particleColorNoise = colorNoise.getValue();
             dops.particleSize = particleSize.getValue();
+            dops.particleSizeLimits = new double[] { 2.5d, Math.min(100d, 5d * dops.particleSize) };
         }
         dops.labelColor = labelColor.getPickedColorDouble();
         addFadeInfo(dops);
@@ -317,7 +318,7 @@ public class DatasetLoadDialog extends GenericDialog {
         }
     }
 
-    private void updateFrameBuffer(){
+    private void updateFrameBuffer() {
     }
 
     @Override

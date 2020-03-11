@@ -97,8 +97,9 @@ public class Quantity {
          */
         public Length getParallaxDistance() {
             double mas = get(AngleUnit.MAS);
-            if (mas < 0) {
-                mas = 0.001;
+            if (Double.isFinite(mas) && mas <= 0) {
+                // What to do with zero or negative parallaxes?
+                return new Length(-1, LengthUnit.PC);
             }
             return new Length(1000d / mas, LengthUnit.PC);
         }

@@ -177,6 +177,11 @@ public class STILDataProvider extends AbstractStarGroupDataProvider {
                         Position p = new Position(a.getSecond(), a.getFirst().unit, b.getSecond(), b.getFirst().unit, c.getSecond(), unitc, pt);
 
                         double distpc = p.gsposition.len();
+                        if(!Double.isFinite(distpc) || distpc <= 0){
+                            // Next
+                            break;
+                        }
+
                         p.gsposition.scl(Constants.PC_TO_U);
                         // Find out RA/DEC/Dist
                         Vector3d sph = new Vector3d();

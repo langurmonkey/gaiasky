@@ -19,7 +19,7 @@ public class DatasetOptions {
        return dops;
     }
 
-    public static DatasetOptions getParticleDatasetOptions(double profileDecay, double[] particleColor, double colorNoise, double[] labelColor, double particleSize, ComponentType ct, double[] fadeIn, double[] fadeOut){
+    public static DatasetOptions getParticleDatasetOptions(double profileDecay, double[] particleColor, double colorNoise, double[] labelColor, double particleSize, double[] particleSizeLimits, ComponentType ct, double[] fadeIn, double[] fadeOut){
         DatasetOptions dops = new DatasetOptions();
         dops.type = DatasetLoadType.PARTICLES;
         dops.profileDecay = profileDecay;
@@ -27,6 +27,7 @@ public class DatasetOptions {
         dops.particleColorNoise = colorNoise;
         dops.labelColor = labelColor;
         dops.particleSize = particleSize;
+        dops.particleSizeLimits = particleSizeLimits;
         dops.ct = ct;
         dops.fadeIn = fadeIn;
         dops.fadeOut = fadeOut;
@@ -45,6 +46,7 @@ public class DatasetOptions {
     public double[] particleColor;
     public double particleColorNoise;
     public double particleSize;
+    public double[] particleSizeLimits;
     public ComponentType ct;
 
     // Stars
