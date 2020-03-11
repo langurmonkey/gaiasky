@@ -67,7 +67,6 @@ void main() {
     float v_discard = 1.0;
     if(dist < len0 * u_vrScale || a_additional.y > u_magLimit) {
         v_discard = 0.0;
-        v_col *= 0.0;
     }
 
     float sizefactor = 1.0;
@@ -101,4 +100,8 @@ void main() {
     #ifdef velocityBufferFlag
     velocityBuffer(gpos, a_position, dist, pm, vec2(500.0, 3000.0), 1.0);
     #endif
+
+    if(v_discard < 0.5){
+        v_col = vec4(0.0, 0.0, 0.0, 0.0);
+    }
 }

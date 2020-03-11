@@ -1170,7 +1170,7 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
         double angl = desired.angle(direction);
         // boolean samedir = aux1.set(desired).add(direction).len2() >
         // Math.max(desired.len2(), direction.len2());
-        if (angl > 0.5) {
+        if (angl > Math.min(0.3, 0.3 * fovFactor)) {
             // Add desired to direction with given turn velocity (v*dt)
             desired.scl(turnVelocity * dt);
             direction.add(desired).nor();

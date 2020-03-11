@@ -10,6 +10,7 @@ uniform float u_k;
 // INPUT
 in vec4 v_col;
 
+
 // OUTPUT
 layout (location = 0) out vec4 fragColor;
 
