@@ -131,7 +131,7 @@ public class DatasetsComponent extends GuiComponent implements IObserver {
         colorMap.put(ci.name, cp);
 
         String name = TextUtils.capString(ci.name, 17);
-        OwnLabel nameLabel = new OwnLabel(TextUtils.capString(ci.name, 17), skin, "hud-subheader");
+        OwnLabel nameLabel = new OwnLabel(TextUtils.capString(ci.name, 20), skin, "hud-subheader");
         if (!ci.name.equals(name)) {
             nameLabel.addListener(new OwnTextTooltip(ci.name, skin));
         }
@@ -140,7 +140,7 @@ public class DatasetsComponent extends GuiComponent implements IObserver {
         t.add(controls).left().padBottom(pad);
         t.add(mark).right().padBottom(pad).row();
         t.add(new OwnLabel(I18n.txt("gui.dataset.type") + ": " + ci.type.toString(), skin)).colspan(2).left().row();
-        t.add(new OwnLabel(TextUtils.capString(ci.description, GlobalConf.UI_SCALE_FACTOR < 1.5 ? 22 : 28), skin)).left().expandX();
+        t.add(new OwnLabel(TextUtils.capString(ci.description, GlobalConf.UI_SCALE_FACTOR < 1.5 ? 22 : 25), skin)).left().expandX();
         Link info = new Link("(i)", skin.get("link", Label.LabelStyle.class), null);
         info.addListener(new OwnTextTooltip(ci.description, skin));
         t.add(info).left().padLeft(pad);

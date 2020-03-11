@@ -318,7 +318,7 @@ public class ControlsWindow extends CollapsibleWindow implements IObserver {
         guiLayout.align(Align.top | Align.left);
 
         windowScroll = new OwnScrollPane(guiLayout, skin, "minimalist-nobg");
-        windowScroll.setFadeScrollBars(false);
+        windowScroll.setFadeScrollBars(true);
         windowScroll.setScrollingDisabled(true, false);
         windowScroll.setOverscroll(false, false);
         windowScroll.setSmoothScrolling(true);

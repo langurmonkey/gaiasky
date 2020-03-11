@@ -9,7 +9,7 @@ public class PackTextures {
     public static void main(String[] args) {
         //TexturePacker.Settings x1settings = new TexturePacker.Settings();
         //TexturePacker.Settings x2settings = new TexturePacker.Settings();
-        //x2settings.scale[0] = 2;
+        //x2settings.scale[0] = 1.6f;
 
         //// Use current path variable
         //String gs = (new java.io.File("")).getAbsolutePath();
