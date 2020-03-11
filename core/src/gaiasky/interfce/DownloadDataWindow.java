@@ -41,6 +41,7 @@ import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
+import java.nio.file.FileAlreadyExistsException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -144,7 +145,9 @@ public class DownloadDataWindow extends GenericDialog {
 
         try {
             Files.createDirectories(SysUtils.getLocalDataDir());
-        }catch (IOException e) {
+        } catch (FileAlreadyExistsException e) {
+            // Good
+        } catch (IOException e) {
             logger.error(e);
             return;
         }
@@ -390,7 +393,7 @@ public class DownloadDataWindow extends GenericDialog {
 
         }
 
-        datasetsTable.align(Align.top|Align.left);
+        datasetsTable.align(Align.top | Align.left);
         datasetsScroll = new OwnScrollPane(datasetsTable, skin, "minimalist-nobg");
         datasetsScroll.setScrollingDisabled(true, false);
         datasetsScroll.setForceScroll(false, false);

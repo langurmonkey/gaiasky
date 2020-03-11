@@ -18,6 +18,7 @@ import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.TimeUtils;
+import gaiasky.GaiaSky;
 import gaiasky.desktop.util.SysUtils;
 import gaiasky.interfce.GenericDialog;
 import gaiasky.util.GlobalConf;
@@ -54,7 +55,7 @@ public class FileChooser extends GenericDialog {
     private TextField fileNameInput;
     private Label fileNameLabel, acceptedFiles;
     private Path baseDir;
-    private Label fileListLabel;
+    private OwnTextField location;
     private List<FileListItem> fileList;
     private Table controlsTable;
     private HorizontalGroup driveButtonsList;
@@ -130,6 +131,7 @@ public class FileChooser extends GenericDialog {
         // Controls
         controlsTable = new Table(skin);
         OwnTextIconButton home = new OwnTextIconButton("", skin, "home");
+        home.addListener(new OwnTextTooltip(I18n.txt("gui.fc.home"), skin));
         home.addListener(event -> {
             if (event instanceof ChangeEvent) {
                 try {
@@ -144,10 +146,11 @@ public class FileChooser extends GenericDialog {
             return false;
         });
         OwnTextIconButton back = new OwnTextIconButton("", skin, "back");
+        back.addListener(new OwnTextTooltip(I18n.txt("gui.fc.back"), skin));
         back.addListener(event -> {
             if (event instanceof ChangeEvent) {
                 try {
-                    if(previousDir != null) {
+                    if (previousDir != null) {
                         nextDir = currentDir;
                         changeDirectory(previousDir);
                     }
@@ -160,6 +163,7 @@ public class FileChooser extends GenericDialog {
             return false;
         });
         OwnTextIconButton fwd = new OwnTextIconButton("", skin, "forward");
+        fwd.addListener(new OwnTextTooltip(I18n.txt("gui.fc.forward"), skin));
         fwd.addListener(event -> {
             if (event instanceof ChangeEvent) {
                 try {
@@ -175,8 +179,9 @@ public class FileChooser extends GenericDialog {
             }
             return false;
         });
-        OwnTextIconButton up = new OwnTextIconButton("", skin, "up");
-        up.addListener(event -> {
+        OwnTextIconButton parent = new OwnTextIconButton("", skin, "up");
+        parent.addListener(new OwnTextTooltip(I18n.txt("gui.fc.parent"), skin));
+        parent.addListener(event -> {
             if (event instanceof ChangeEvent) {
                 try {
                     if (currentDir.getParent() != null) {
@@ -194,16 +199,43 @@ public class FileChooser extends GenericDialog {
 
         controlsTable.add(home).left().padRight(pad5);
         controlsTable.add(back).left().padRight(pad5);
-        controlsTable.add(up).left().padRight(pad5);
-        controlsTable.add(fwd).left().padRight(pad5).padRight(pad * 2f);
+        controlsTable.add(parent).left().padRight(pad5);
+        controlsTable.add(fwd).left().padRight(pad5).padRight(pad);
+
+        // Text input with current location
+        location = new OwnTextField("", skin);
+        location.setWidth(465f * GlobalConf.UI_SCALE_FACTOR);
+        location.setAlignment(Align.left);
+        location.addListener(event -> {
+            if (event instanceof ChangeEvent) {
+                try {
+                    Path locPath = Path.of(location.getText());
+                    if (Files.exists(locPath) && Files.isDirectory(locPath)) {
+                        previousDir = currentDir;
+                        changeDirectory(locPath);
+                        GaiaSky.postRunnable(()-> {
+                            stage.setKeyboardFocus(location);
+                            location.setCursorPosition(location.getText().length());
+                        });
+                    }
+                } catch (IOException e) {
+                    logger.error(e);
+                }
+                return true;
+            }
+            return false;
+        });
+        controlsTable.add(location).left().pad(pad);
 
         // In windows, we need to be able to change drives
         driveButtonsList = new HorizontalGroup();
         driveButtonsList.left().space(10 * GlobalConf.UI_SCALE_FACTOR);
+        driveButtonsList.addActor(new OwnLabel(I18n.txt("gui.fc.drives") + ":", skin));
         Iterable<Path> drives = FileSystems.getDefault().getRootDirectories();
         driveButtons = new Array<>();
         for (Path drive : drives) {
             TextButton driveButton = new OwnTextIconButton(drive.toString(), skin, "drive");
+            driveButton.addListener(new OwnTextTooltip(I18n.txt("gui.fc.drive", drive.toString()), skin));
             driveButton.addListener(event -> {
                 if (event instanceof ChangeEvent) {
                     try {
@@ -219,10 +251,6 @@ public class FileChooser extends GenericDialog {
             driveButtons.add(driveButton);
             driveButtonsList.addActor(driveButton);
         }
-        controlsTable.add(driveButtonsList).left().pad(pad);
-
-        fileListLabel = new Label("", skin);
-        fileListLabel.setAlignment(Align.left);
 
         acceptedFiles = new Label("", skin, "sc-header");
         acceptedFiles.setAlignment(Align.right);
@@ -280,7 +308,7 @@ public class FileChooser extends GenericDialog {
                     try {
                         if (directoryBrowsingEnabled && Files.isDirectory(sel)) {
                             // Change directory
-                            if(selected.name.trim().equals("..")){
+                            if (selected.name.trim().equals("..")) {
                                 // Going back, set next
                                 nextDir = currentDir;
                             } else {
@@ -306,7 +334,7 @@ public class FileChooser extends GenericDialog {
         });
 
         fileNameInput = new TextField("", skin);
-        fileNameLabel = new Label("File name:", skin);
+        fileNameLabel = new Label(I18n.txt("gui.fc.filename") + ":", skin);
         fileNameInput.setTextFieldListener((textField, c) -> result = textField.getText());
 
         hidden = new OwnCheckBox("Show hidden", skin, 5 * GlobalConf.UI_SCALE_FACTOR);
@@ -334,8 +362,8 @@ public class FileChooser extends GenericDialog {
         setTargetListener();
 
         content.add(acceptedFiles).top().left().row();
+        content.add(driveButtonsList).top().left().row();
         content.add(controlsTable).top().left().row();
-        content.add(fileListLabel).top().left().expandX().fillX().row();
         content.add(scrollPane).size(scrollPaneWidth, scrollPanelHeight).left().fill().expand().row();
         content.add(hidden).top().left().row();
         if (fileNameEnabled) {
@@ -360,7 +388,7 @@ public class FileChooser extends GenericDialog {
         while (path.length() * maxPathLength > scrollPaneWidth * 0.9f) {
             path = TextUtils.capString(path, path.length() - 4, true);
         }
-        fileListLabel.setText(path);
+        location.setText(path);
 
         final Array<FileListItem> items = new Array<>();
 

@@ -1901,7 +1901,7 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
             EventManager.instance.post(Events.DISPLAY_POINTER_COORDS_CMD, GlobalConf.program.DISPLAY_POINTER_COORDS);
         }
         // Update scale factor according to theme - for HiDPI screens
-        GlobalConf.updateScaleFactor(GlobalConf.program.UI_THEME.endsWith("x2") ? 1.8f : 1f);
+        GlobalConf.updateScaleFactor(GlobalConf.program.UI_THEME.endsWith("x2") ? 1.6f : 1f);
 
         // Crosshairs
         EventManager.instance.post(Events.CROSSHAIR_FOCUS_CMD, crosshairFocus.isChecked());
