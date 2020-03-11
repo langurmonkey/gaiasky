@@ -24,6 +24,7 @@ public class OwnTextIconButton extends OwnTextButton {
     private Skin skin;
     private Image icon;
     private TextIconButtonStyle style;
+    private float pad = 2f;
 
     public OwnTextIconButton(String text, Skin skin, String styleName) {
         super(text, skin);
@@ -46,6 +47,11 @@ public class OwnTextIconButton extends OwnTextButton {
         super(text, skin, styleName);
         this.skin = skin;
         setIcon(up);
+    }
+
+    public void setPad(float pad){
+        this.pad = pad;
+        setIcon(this.icon);
     }
 
     public void setStyle(TextButtonStyle style, String defaultTextButtonStyle) {
@@ -81,8 +87,8 @@ public class OwnTextIconButton extends OwnTextButton {
         this.icon = icon;
         clearChildren();
         this.align(Align.left);
-        add(this.icon).left().padLeft(GlobalConf.UI_SCALE_FACTOR).padRight((getLabel().getText().length > 0 ? 5 : 1) * GlobalConf.UI_SCALE_FACTOR);
-        add(getLabel()).left();
+        add(this.icon).left().pad(pad).padRight((getLabel().getText().length > 0 ? 5 : 1) * GlobalConf.UI_SCALE_FACTOR);
+        add(getLabel()).left().padRight(pad);
     }
 
     public void draw (Batch batch, float parentAlpha) {

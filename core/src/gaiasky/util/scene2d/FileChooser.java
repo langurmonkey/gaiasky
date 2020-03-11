@@ -13,10 +13,12 @@ import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.scenes.scene2d.utils.ArraySelection;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
+import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener.ChangeEvent;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.TimeUtils;
+import gaiasky.desktop.util.SysUtils;
 import gaiasky.interfce.GenericDialog;
 import gaiasky.util.GlobalConf;
 import gaiasky.util.I18n;
@@ -54,13 +56,14 @@ public class FileChooser extends GenericDialog {
     private Path baseDir;
     private Label fileListLabel;
     private List<FileListItem> fileList;
+    private Table controlsTable;
     private HorizontalGroup driveButtonsList;
     private Array<TextButton> driveButtons;
-    private float scrollPaneWidth, maxPathLength;
+    private float scrollPaneWidth, scrollPanelHeight, maxPathLength;
     private ScrollPane scrollPane;
     private CheckBox hidden;
 
-    private Path currentDir;
+    private Path currentDir, previousDir, nextDir;
     protected String result;
 
     private boolean showHidden = false;
@@ -96,6 +99,7 @@ public class FileChooser extends GenericDialog {
     public FileChooser(String title, final Skin skin, Stage stage, Path baseDir, FileChooserTarget target, EventListener selectionListener) {
         this(title, skin, stage, baseDir, target, selectionListener, true);
     }
+
     public FileChooser(String title, final Skin skin, Stage stage, Path baseDir, FileChooserTarget target, EventListener selectionListener, boolean directoryBrowsingEnabled) {
         super(title, skin, stage);
         this.baseDir = baseDir;
@@ -114,13 +118,84 @@ public class FileChooser extends GenericDialog {
 
     @Override
     public void build() {
-        scrollPaneWidth = 400 * GlobalConf.UI_SCALE_FACTOR;
+        scrollPaneWidth = 600 * GlobalConf.UI_SCALE_FACTOR;
+        scrollPanelHeight = 450 * GlobalConf.UI_SCALE_FACTOR;
         maxPathLength = GlobalConf.UI_SCALE_FACTOR > 1.5f ? 9.5f : 5.5f;
 
         content.top().left();
         content.defaults().space(5 * GlobalConf.UI_SCALE_FACTOR);
         this.padLeft(10 * GlobalConf.UI_SCALE_FACTOR);
         this.padRight(10 * GlobalConf.UI_SCALE_FACTOR);
+
+        // Controls
+        controlsTable = new Table(skin);
+        OwnTextIconButton home = new OwnTextIconButton("", skin, "home");
+        home.addListener(event -> {
+            if (event instanceof ChangeEvent) {
+                try {
+                    previousDir = currentDir;
+                    changeDirectory(SysUtils.getHomeDir());
+                } catch (IOException e) {
+                    logger.error(e);
+                }
+                lastClick = 0;
+                return true;
+            }
+            return false;
+        });
+        OwnTextIconButton back = new OwnTextIconButton("", skin, "back");
+        back.addListener(event -> {
+            if (event instanceof ChangeEvent) {
+                try {
+                    if(previousDir != null) {
+                        nextDir = currentDir;
+                        changeDirectory(previousDir);
+                    }
+                } catch (IOException e) {
+                    logger.error(e);
+                }
+                lastClick = 0;
+                return true;
+            }
+            return false;
+        });
+        OwnTextIconButton fwd = new OwnTextIconButton("", skin, "forward");
+        fwd.addListener(event -> {
+            if (event instanceof ChangeEvent) {
+                try {
+                    if (nextDir != null) {
+                        previousDir = currentDir;
+                        changeDirectory(nextDir);
+                    }
+                } catch (IOException e) {
+                    logger.error(e);
+                }
+                lastClick = 0;
+                return true;
+            }
+            return false;
+        });
+        OwnTextIconButton up = new OwnTextIconButton("", skin, "up");
+        up.addListener(event -> {
+            if (event instanceof ChangeEvent) {
+                try {
+                    if (currentDir.getParent() != null) {
+                        previousDir = currentDir;
+                        changeDirectory(currentDir.getParent());
+                    }
+                } catch (IOException e) {
+                    logger.error(e);
+                }
+                lastClick = 0;
+                return true;
+            }
+            return false;
+        });
+
+        controlsTable.add(home).left().padRight(pad5);
+        controlsTable.add(back).left().padRight(pad5);
+        controlsTable.add(up).left().padRight(pad5);
+        controlsTable.add(fwd).left().padRight(pad5).padRight(pad * 2f);
 
         // In windows, we need to be able to change drives
         driveButtonsList = new HorizontalGroup();
@@ -129,20 +204,22 @@ public class FileChooser extends GenericDialog {
         driveButtons = new Array<>();
         for (Path drive : drives) {
             TextButton driveButton = new OwnTextIconButton(drive.toString(), skin, "drive");
-            driveButton.addListener(new ClickListener() {
-                @Override
-                public void clicked(InputEvent event, float x, float y) {
+            driveButton.addListener(event -> {
+                if (event instanceof ChangeEvent) {
                     try {
                         changeDirectory(drive);
                     } catch (IOException e) {
-                       logger.error(e);
+                        logger.error(e);
                     }
                     lastClick = 0;
+                    return true;
                 }
+                return false;
             });
             driveButtons.add(driveButton);
             driveButtonsList.addActor(driveButton);
         }
+        controlsTable.add(driveButtonsList).left().pad(pad);
 
         fileListLabel = new Label("", skin);
         fileListLabel.setAlignment(Align.left);
@@ -203,15 +280,22 @@ public class FileChooser extends GenericDialog {
                     try {
                         if (directoryBrowsingEnabled && Files.isDirectory(sel)) {
                             // Change directory
+                            if(selected.name.trim().equals("..")){
+                                // Going back, set next
+                                nextDir = currentDir;
+                            } else {
+                                // Set last
+                                previousDir = currentDir;
+                            }
                             changeDirectory(sel);
                             lastClick = 0;
                         } else if (target == FileChooserTarget.FILES && (filter == null || filter.accept(sel))) {
                             // Accept
-                            acceptButton.fire(new ChangeListener.ChangeEvent());
+                            acceptButton.fire(new ChangeEvent());
 
                             lastClick = 0;
                         }
-                    }catch(IOException e){
+                    } catch (IOException e) {
                         logger.error(e);
                         lastClick = 0;
                     }
@@ -228,7 +312,7 @@ public class FileChooser extends GenericDialog {
         hidden = new OwnCheckBox("Show hidden", skin, 5 * GlobalConf.UI_SCALE_FACTOR);
         hidden.setChecked(false);
         hidden.addListener(event -> {
-            if (event instanceof ChangeListener.ChangeEvent) {
+            if (event instanceof ChangeEvent) {
                 this.showHidden = hidden.isChecked();
                 try {
                     changeDirectory(currentDir);
@@ -250,9 +334,9 @@ public class FileChooser extends GenericDialog {
         setTargetListener();
 
         content.add(acceptedFiles).top().left().row();
-        content.add(driveButtonsList).top().left().expandX().fillX().row();
+        content.add(controlsTable).top().left().row();
         content.add(fileListLabel).top().left().expandX().fillX().row();
-        content.add(scrollPane).size(scrollPaneWidth, 250 * GlobalConf.UI_SCALE_FACTOR).left().fill().expand().row();
+        content.add(scrollPane).size(scrollPaneWidth, scrollPanelHeight).left().fill().expand().row();
         content.add(hidden).top().left().row();
         if (fileNameEnabled) {
             content.add(fileNameLabel).fillX().expandX().row();
@@ -281,11 +365,11 @@ public class FileChooser extends GenericDialog {
         final Array<FileListItem> items = new Array<>();
 
         DirectoryStream<Path> list = Files.newDirectoryStream(directory, filter);
-        for (final Path handle : list) {
+        for (final Path p : list) {
             // Only list hidden if user chose it
-            if (showHidden || !handle.getFileName().startsWith(".")) {
-                if(pathnameFilter != null && pathnameFilter.accept(handle) || Files.isDirectory(handle) && directoryBrowsingEnabled) {
-                    FileListItem fli = new FileListItem(handle);
+            if (showHidden || !p.getFileName().toString().startsWith(".")) {
+                if (pathnameFilter != null && pathnameFilter.accept(p) || Files.isDirectory(p) && directoryBrowsingEnabled) {
+                    FileListItem fli = new FileListItem(p);
                     items.add(fli);
                 }
             }
@@ -301,7 +385,7 @@ public class FileChooser extends GenericDialog {
         fileList.setItems(items);
         scrollPane.layout();
 
-        if (lastDir != null && lastDir.getParent().equals(currentDir)) {
+        if (lastDir != null && lastDir.getParent() != null && lastDir.getParent().equals(currentDir)) {
             // select last if we're going back
             Array<FileListItem> l = fileList.getItems();
             for (FileListItem fli : l) {
@@ -332,7 +416,7 @@ public class FileChooser extends GenericDialog {
 
     private void setTargetListener() {
         setSelectionListener(event1 -> {
-            if (event1 instanceof ChangeListener.ChangeEvent) {
+            if (event1 instanceof ChangeEvent) {
                 List<FileChooser.FileListItem> list = (List<FileChooser.FileListItem>) event1.getListenerActor();
                 if (list != null) {
                     ArraySelection<FileListItem> as = list.getSelection();
@@ -394,7 +478,7 @@ public class FileChooser extends GenericDialog {
         try {
             changeDirectory(currentDir);
         } catch (IOException e) {
-           logger.error(e);
+            logger.error(e);
         }
 
         return this;
@@ -462,7 +546,7 @@ public class FileChooser extends GenericDialog {
         }
 
         public String toString() {
-            return name;
+            return " " + name;
         }
 
     }

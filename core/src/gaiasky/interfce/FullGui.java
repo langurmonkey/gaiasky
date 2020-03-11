@@ -23,7 +23,6 @@ import com.badlogic.gdx.utils.reflect.ReflectionException;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
 import gaiasky.desktop.util.MemInfoWindow;
-import gaiasky.desktop.util.RunCameraWindow;
 import gaiasky.desktop.util.SysUtils;
 import gaiasky.event.EventManager;
 import gaiasky.event.Events;
@@ -70,7 +69,6 @@ public class FullGui extends AbstractGui {
     protected MinimapInterface minimapInterface;
 
     protected SearchDialog searchDialog;
-    protected RunCameraWindow runcameraWindow;
     protected MemInfoWindow memInfoWindow;
     protected LogWindow logWindow;
 

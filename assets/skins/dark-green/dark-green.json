@@ -246,6 +246,18 @@
     }
   },
   "gaiasky.util.scene2d.OwnTextIconButton$TextIconButtonStyle": {
+    "home": {
+      "imageUp": "iconic-home"
+    },
+    "back": {
+      "imageUp": "iconic-arrow-thick-left"
+    },
+    "forward": {
+      "imageUp": "iconic-arrow-thick-right"
+    },
+    "up": {
+      "imageUp": "iconic-arrow-thick-top"
+    },
     "edit": {
       "imageUp": "edit-icon"
     },
@@ -338,7 +350,7 @@
       "imageUp": "camera-stop"
     },
     "drive": {
-      "imageUp": "drive-icon"
+      "imageUp": "iconic-hard-drive"
     },
     "3d": {
       "imageUp": "3d-icon"
