@@ -261,19 +261,19 @@ public class AboutWindow extends GenericDialog {
         Label paths = new OwnLabel(I18n.txt("gui.help.paths"), skin, "help-title");
 
         Label configtitle = new OwnLabel(I18n.txt("gui.help.paths.config"), skin);
-        Label config = new OwnLabel(SysUtils.getConfigDir().getAbsolutePath(), skin);
+        Label config = new OwnLabel(SysUtils.getConfigDir().toAbsolutePath().toString(), skin);
         Label datatitle = new OwnLabel(I18n.txt("gui.help.paths.data"), skin);
-        Label data = new OwnLabel(SysUtils.getDataDir().getAbsolutePath(), skin);
+        Label data = new OwnLabel(SysUtils.getDataDir().toAbsolutePath().toString(), skin);
         Label screenshotstitle = new OwnLabel(I18n.txt("gui.help.paths.screenshots"), skin);
-        Label screenshots = new OwnLabel(SysUtils.getDefaultScreenshotsDir().getAbsolutePath(), skin);
+        Label screenshots = new OwnLabel(SysUtils.getDefaultScreenshotsDir().toAbsolutePath().toString(), skin);
         Label framestitle = new OwnLabel(I18n.txt("gui.help.paths.frames"), skin);
-        Label frames = new OwnLabel(SysUtils.getDefaultFramesDir().getAbsolutePath(), skin);
+        Label frames = new OwnLabel(SysUtils.getDefaultFramesDir().toAbsolutePath().toString(), skin);
         Label musictitle = new OwnLabel(I18n.txt("gui.help.paths.music"), skin);
-        Label music = new OwnLabel(SysUtils.getDefaultMusicDir().getAbsolutePath(), skin);
+        Label music = new OwnLabel(SysUtils.getDefaultMusicDir().toAbsolutePath().toString(), skin);
         Label mappingstitle = new OwnLabel(I18n.txt("gui.help.paths.mappings"), skin);
-        Label mappings = new OwnLabel(SysUtils.getDefaultMappingsDir().getAbsolutePath(), skin);
+        Label mappings = new OwnLabel(SysUtils.getDefaultMappingsDir().toAbsolutePath().toString(), skin);
         Label cameratitle = new OwnLabel(I18n.txt("gui.help.paths.camera"), skin);
-        Label camera = new OwnLabel(SysUtils.getDefaultCameraDir().getAbsolutePath(), skin);
+        Label camera = new OwnLabel(SysUtils.getDefaultCameraDir().toAbsolutePath().toString(), skin);
 
 
         // Java info

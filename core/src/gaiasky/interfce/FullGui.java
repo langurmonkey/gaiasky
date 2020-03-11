@@ -24,6 +24,7 @@ import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
 import gaiasky.desktop.util.MemInfoWindow;
 import gaiasky.desktop.util.RunCameraWindow;
+import gaiasky.desktop.util.SysUtils;
 import gaiasky.event.EventManager;
 import gaiasky.event.Events;
 import gaiasky.render.ComponentTypes;
@@ -35,10 +36,12 @@ import gaiasky.util.*;
 import gaiasky.util.Logger.Log;
 import gaiasky.util.format.INumberFormat;
 import gaiasky.util.format.NumberFormatFactory;
+import gaiasky.util.scene2d.FileChooser;
 import gaiasky.util.scene2d.OwnLabel;
 import gaiasky.util.update.VersionCheckEvent;
 import gaiasky.util.update.VersionChecker;
 
+import java.nio.file.Files;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
@@ -373,11 +376,22 @@ public class FullGui extends AbstractGui {
             landAtLocation.show(ui);
             break;
         case SHOW_PLAYCAMERA_ACTION:
-            if (runcameraWindow != null)
-                runcameraWindow.remove();
-
-            runcameraWindow = new RunCameraWindow(ui, skin);
-            runcameraWindow.show(ui);
+            FileChooser fc = new FileChooser(I18n.txt("gui.camera.title"), skin, ui, SysUtils.getDefaultCameraDir(), FileChooser.FileChooserTarget.FILES);
+            fc.setAcceptText(I18n.txt("gui.camera.run"));
+            fc.setFileFilter(pathname -> pathname.getFileName().toString().endsWith(".dat") || pathname.getFileName().toString().endsWith(".gsc"));
+            fc.setAcceptedFiles("*.dat, *.gsc");
+            fc.setResultListener((success, result) -> {
+                if (success) {
+                    if (Files.exists(result) && Files.exists(result)) {
+                        EventManager.instance.post(Events.PLAY_CAMERA_CMD, result);
+                        return true;
+                    } else {
+                        logger.error("Selection must be a file: " + result.toAbsolutePath());
+                    }
+                }
+                return false;
+            });
+            fc.show(ui);
             break;
         case DISPLAY_MEM_INFO_WINDOW:
             if (memInfoWindow == null) {

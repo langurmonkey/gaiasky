@@ -5,7 +5,7 @@
 
 package gaiasky.desktop;
 
-import com.badlogic.gdx.Files;
+import com.badlogic.gdx.Files.FileType;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Graphics;
 import com.badlogic.gdx.Graphics.DisplayMode;
@@ -43,10 +43,10 @@ import gaiasky.util.format.NumberFormatFactory;
 import gaiasky.util.math.MathManager;
 
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.nio.channels.FileChannel;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Properties;
 
 /**
@@ -216,7 +216,7 @@ public class GaiaSkyDesktop implements IObserver {
             MusicActorsManager.initialize(new DesktopMusicActors());
 
             // Init music manager
-            MusicManager.initialize(Gdx.files.absolute(GlobalConf.ASSETS_LOC + "music"), Gdx.files.absolute(SysUtils.getDefaultMusicDir().getAbsolutePath()));
+            MusicManager.initialize(Paths.get(GlobalConf.ASSETS_LOC, "music"), SysUtils.getDefaultMusicDir());
 
             // Initialize post processor factory
             PostProcessorFactory.initialize(new DesktopPostProcessorFactory());
@@ -291,9 +291,9 @@ public class GaiaSkyDesktop implements IObserver {
             cfg.setResizable(true);
         }
         if (gsArgs.vr) {
-            cfg.setWindowIcon(Files.FileType.Internal, "icon/gsvr_icon.png");
+            cfg.setWindowIcon(FileType.Internal, "icon/gsvr_icon.png");
         } else {
-            cfg.setWindowIcon(Files.FileType.Internal, "icon/gs_icon.png");
+            cfg.setWindowIcon(FileType.Internal, "icon/gs_icon.png");
         }
         cfg.useOpenGL3(true, 4, 1);
         // Disable logical DPI modes (macOS, Windows)
@@ -381,20 +381,20 @@ public class GaiaSkyDesktop implements IObserver {
      */
     private static String initConfigFile(boolean ow, boolean vr) throws IOException {
         // Use user folder
-        File userFolderConfFile = new File(SysUtils.getConfigDir(), DesktopConfInit.getConfigFileName(vr));
+        Path userFolderConfFile = SysUtils.getConfigDir().resolve(DesktopConfInit.getConfigFileName(vr));
 
         // Internal config
-        File confFolder = new File("conf" + File.separator);
-        File internalFolderConfFile = new File(confFolder, DesktopConfInit.getConfigFileName(vr));
+        Path confFolder = Paths.get("conf");
+        Path internalFolderConfFile = confFolder.resolve(DesktopConfInit.getConfigFileName(vr));
 
         boolean overwrite = ow;
-        if (userFolderConfFile.exists()) {
+        if (Files.exists(userFolderConfFile)) {
             Properties userprops = new Properties();
-            userprops.load(new FileInputStream(userFolderConfFile));
+            userprops.load(Files.newInputStream(userFolderConfFile));
             int internalversion = SOURCE_VERSION;
-            if (internalFolderConfFile.exists()) {
+            if (Files.exists(internalFolderConfFile)) {
                 Properties internalprops = new Properties();
-                internalprops.load(new FileInputStream(internalFolderConfFile));
+                internalprops.load(Files.newInputStream(internalFolderConfFile));
                 internalversion = Integer.parseInt(internalprops.getProperty("properties.version"));
             }
 
@@ -408,20 +408,21 @@ public class GaiaSkyDesktop implements IObserver {
             }
         }
 
-        if (overwrite || !userFolderConfFile.exists()) {
+        if (overwrite || !Files.exists(userFolderConfFile)) {
             // Copy file
-            if (confFolder.exists() && confFolder.isDirectory()) {
+            if (Files.exists(confFolder) && Files.isDirectory(confFolder)) {
                 // Running released package
-                copyFile(internalFolderConfFile, userFolderConfFile, overwrite);
+                GlobalResources.copyFile(internalFolderConfFile, userFolderConfFile, overwrite);
             } else {
                 // Running from code?
-                if (!new File(GlobalConf.ASSETS_LOC, "conf" + File.separator).exists()) {
-                    throw new IOException("File " + GlobalConf.ASSETS_LOC + File.separator + "conf does not exist!");
+                Path assetsConf = Path.of(GlobalConf.ASSETS_LOC, "conf");
+                if (!Files.exists(assetsConf)) {
+                    throw new IOException("File " + assetsConf + " does not exist!");
                 }
-                copyFile(new File(GlobalConf.ASSETS_LOC, "conf" + File.separator + DesktopConfInit.getConfigFileName(vr)), userFolderConfFile, overwrite);
+                GlobalResources.copyFile(assetsConf.resolve(DesktopConfInit.getConfigFileName(vr)), userFolderConfFile, overwrite);
             }
         }
-        String props = userFolderConfFile.getAbsolutePath();
+        String props = userFolderConfFile.toAbsolutePath().toString();
         System.setProperty("properties.file", props);
         return props;
     }
@@ -443,34 +444,6 @@ public class GaiaSkyDesktop implements IObserver {
         }
     }
 
-    @SuppressWarnings("resource")
-    private static void copyFile(File sourceFile, File destFile, boolean ow) throws IOException {
-        if (destFile.exists()) {
-            if (ow) {
-                // Overwrite, delete file
-                destFile.delete();
-            } else {
-                return;
-            }
-        }
-        // Create new
-        destFile.createNewFile();
-
-        FileChannel source = null;
-        FileChannel destination = null;
-        try {
-            source = new FileInputStream(sourceFile).getChannel();
-            destination = new FileOutputStream(destFile).getChannel();
-            destination.transferFrom(source, 0, source.size());
-        } finally {
-            if (source != null) {
-                source.close();
-            }
-            if (destination != null) {
-                destination.close();
-            }
-        }
-    }
 
     /**
      * Checks for incompatibilities between the java version and the OS. Prints the necessary warnings for known issues.

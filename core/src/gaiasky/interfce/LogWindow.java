@@ -20,8 +20,8 @@ import gaiasky.util.format.IDateFormat;
 import gaiasky.util.scene2d.*;
 
 import java.io.BufferedWriter;
-import java.io.File;
 import java.io.FileWriter;
+import java.nio.file.Path;
 import java.time.Instant;
 import java.util.List;
 
@@ -115,18 +115,18 @@ public class LogWindow extends GenericDialog {
     public void export() {
         String filename = Instant.now().toString() + "_gaiasky.log";
         filename = filename.replace(":", "-");
-        File gshome = SysUtils.getDataDir();
-        File log = new File(gshome, filename);
+        Path gshome = SysUtils.getDataDir();
+        Path log = gshome.resolve(filename);
 
         try {
-            FileWriter fw = new FileWriter(log);
+            FileWriter fw = new FileWriter(log.toFile());
             BufferedWriter bw = new BufferedWriter(fw);
             for (MessageBean mb : NotificationsInterface.historical) {
                 fw.write(format.format(mb.date) + " - " + mb.msg + '\n');
             }
             bw.flush();
             bw.close();
-            Logger.getLogger(this.getClass()).info("Log file written to " + log.getAbsolutePath());
+            Logger.getLogger(this.getClass()).info("Log file written to " + log.toAbsolutePath());
         } catch (Exception e) {
             Logger.getLogger(this.getClass()).error(e);
         }

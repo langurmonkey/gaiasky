@@ -5,7 +5,13 @@
 
 package gaiasky.desktop.util;
 
-import java.io.File;
+import gaiasky.util.Logger;
+import gaiasky.util.Logger.Log;
+
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 
 /**
  * Wee utility class to check the operating system and the desktop environment.
@@ -14,21 +20,26 @@ import java.io.File;
  * @author Toni Sagrista
  */
 public class SysUtils {
+    private static Log logger = Logger.getLogger(SysUtils.class);
 
     /**
      * Initialise directories
      */
     public static void mkdirs() {
         // Top level
-        getDataDir().mkdirs();
-        getConfigDir().mkdirs();
-        // Bottom level
-        getDefaultCameraDir().mkdirs();
-        getDefaultMusicDir().mkdirs();
-        getDefaultFramesDir().mkdirs();
-        getDefaultScreenshotsDir().mkdirs();
-        getDefaultTmpDir().mkdirs();
-        getDefaultMappingsDir().mkdirs();
+        try {
+            Files.createDirectories(getDataDir());
+            Files.createDirectories(getConfigDir());
+            // Bottom level
+            Files.createDirectories(getDefaultCameraDir());
+            Files.createDirectories(getDefaultMusicDir());
+            Files.createDirectories(getDefaultFramesDir());
+            Files.createDirectories(getDefaultScreenshotsDir());
+            Files.createDirectories(getDefaultTmpDir());
+            Files.createDirectories(getDefaultMappingsDir());
+        }catch(IOException e){
+           logger.error(e);
+        }
     }
 
     private static String OS;
@@ -145,8 +156,8 @@ public class SysUtils {
      *
      * @return A pointer to the Gaia Sky camera directory
      */
-    public static File getDefaultCameraDir() {
-        return new File(getDataDir(), CAMERA_DIR_NAME);
+    public static Path getDefaultCameraDir() {
+        return getDataDir().resolve(CAMERA_DIR_NAME);
     }
 
     /**
@@ -154,8 +165,8 @@ public class SysUtils {
      *
      * @return A pointer to the Gaia Sky screenshots directory
      */
-    public static File getDefaultScreenshotsDir() {
-        return new File(getDataDir(), SCREENSHOTS_DIR_NAME);
+    public static Path getDefaultScreenshotsDir() {
+        return getDataDir().resolve(SCREENSHOTS_DIR_NAME);
     }
 
     /**
@@ -163,8 +174,8 @@ public class SysUtils {
      *
      * @return A pointer to the Gaia Sky frames directory
      */
-    public static File getDefaultFramesDir() {
-        return new File(getDataDir(), FRAMES_DIR_NAME);
+    public static Path getDefaultFramesDir() {
+        return getDataDir().resolve(FRAMES_DIR_NAME);
     }
 
     /**
@@ -172,8 +183,8 @@ public class SysUtils {
      *
      * @return A pointer to the Gaia Sky music directory
      */
-    public static File getDefaultMusicDir() {
-        return new File(getDataDir(), MUSIC_DIR_NAME);
+    public static Path getDefaultMusicDir() {
+        return getDataDir().resolve(MUSIC_DIR_NAME);
     }
 
     /**
@@ -181,8 +192,8 @@ public class SysUtils {
      *
      * @return A pointer to the Gaia Sky mappings directory
      */
-    public static File getDefaultMappingsDir() {
-        return new File(getDataDir(), MAPPINGS_DIR_NAME);
+    public static Path getDefaultMappingsDir() {
+        return getDataDir().resolve(MAPPINGS_DIR_NAME);
     }
 
     public static String getMappingsDirName(){
@@ -194,21 +205,18 @@ public class SysUtils {
      *
      * @return A pointer to the Gaia Sky mpcdi directory
      */
-    public static File getDefaultMpcdiDir() {
-        return new File(getDataDir(), MPCDI_DIR_NAME);
+    public static Path getDefaultMpcdiDir() {
+        return getDataDir().resolve(MPCDI_DIR_NAME);
     }
 
-    public static String getMpcdiDirName(){
-        return MPCDI_DIR_NAME;
-    }
 
     /**
      * Gets a file pointer to the local data directory where the data files are downloaded and stored.
      *
      * @return A pointer to the local data directory where the data files are
      */
-    public static File getLocalDataDir() {
-        return new File(getDataDir(), DATA_DIR_NAME);
+    public static Path getLocalDataDir() {
+        return getDataDir().resolve(DATA_DIR_NAME);
     }
 
     /**
@@ -216,8 +224,8 @@ public class SysUtils {
      *
      * @return A pointer to the crash reports directory
      */
-    public static File getCrashReportsDir() {
-        return new File(getDataDir(), CRASHREPORTS_DIR_NAME);
+    public static Path getCrashReportsDir() {
+        return getDataDir().resolve(CRASHREPORTS_DIR_NAME);
     }
 
     /**
@@ -225,8 +233,8 @@ public class SysUtils {
      *
      * @return A pointer to the Gaia Sky temporary directory in the user's home.
      */
-    public static File getDefaultTmpDir() {
-        return new File(getCacheDir(), TMP_DIR_NAME);
+    public static Path getDefaultTmpDir() {
+        return getCacheDir().resolve(TMP_DIR_NAME);
     }
 
     /**
@@ -235,11 +243,11 @@ public class SysUtils {
      *
      * @return Default data directory
      */
-    public static File getDataDir() {
+    public static Path getDataDir() {
         if (isLinux()) {
-            return new File(getXdgDataHome(), GAIASKY_DIR_NAME + File.separator);
+            return getXdgDataHome().resolve(GAIASKY_DIR_NAME);
         } else {
-            return new File(System.getProperty("user.home"), DOTGAIASKY_DIR_NAME + File.separator);
+            return getUserHome().resolve(DOTGAIASKY_DIR_NAME);
         }
     }
 
@@ -249,54 +257,54 @@ public class SysUtils {
      *
      * @return The default cache directory
      */
-    public static File getCacheDir(){
+    public static Path getCacheDir(){
         if(isLinux()){
-            return new File(getXdgCacheHome(), GAIASKY_DIR_NAME + File.separator);
+            return getXdgCacheHome().resolve(GAIASKY_DIR_NAME);
         } else {
            return getDataDir();
         }
     }
 
-    public static File getHomeDir() {
-        return new File(System.getProperty("user.home"));
-    }
-
-    public static String getHomeDirString() {
-        return System.getProperty("user.home");
-    }
-
-    public static File getConfigDir() {
+    public static Path getConfigDir() {
         if (isLinux()) {
-            return new File(getXdgConfigHome(), GAIASKY_DIR_NAME + File.separator);
+            return getXdgConfigHome().resolve(GAIASKY_DIR_NAME);
         } else {
-            return new File(System.getProperty("user.home"), DOTGAIASKY_DIR_NAME + File.separator);
+            return getUserHome().resolve(DOTGAIASKY_DIR_NAME);
         }
     }
 
-    private static String getXdgDataHome() {
+    public static Path getHomeDir() {
+        return getUserHome();
+    }
+
+    public static Path getUserHome() {
+        return Paths.get(System.getProperty("user.home"));
+    }
+
+    private static Path getXdgDataHome() {
         String dataHome = System.getenv("XDG_DATA_HOME");
         if (dataHome == null || dataHome.isEmpty()) {
-            return System.getProperty("user.home") + File.separator + ".local" + File.separator + "share";
+            return Paths.get(System.getProperty("user.home"),".local", "share");
         } else {
-            return dataHome;
+            return Paths.get(dataHome);
         }
     }
 
-    private static String getXdgConfigHome() {
+    private static Path getXdgConfigHome() {
         String configHome = System.getenv("XDG_CONFIG_HOME");
         if (configHome == null || configHome.isEmpty()) {
-            return System.getProperty("user.home") + File.separator + ".config";
+            return Paths.get(System.getProperty("user.home"), ".config");
         } else {
-            return configHome;
+            return Paths.get(configHome);
         }
     }
 
-    private static String getXdgCacheHome() {
+    private static Path getXdgCacheHome() {
         String cacheHome = System.getenv("XDG_CACHE_HOME");
         if (cacheHome == null || cacheHome.isEmpty()) {
-            return System.getProperty("user.home") + File.separator + ".cache";
+            return Paths.get(System.getProperty("user.home"), ".cache");
         } else {
-            return cacheHome;
+            return Paths.get(cacheHome);
         }
     }
 

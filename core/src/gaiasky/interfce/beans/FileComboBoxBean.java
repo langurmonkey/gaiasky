@@ -5,16 +5,16 @@
 
 package gaiasky.interfce.beans;
 
-import com.badlogic.gdx.files.FileHandle;
+import java.nio.file.Path;
 
 public class FileComboBoxBean {
     public String name;
     public String file;
 
-    public FileComboBoxBean(FileHandle file) {
+    public FileComboBoxBean(Path file) {
 	super();
-	this.name = file.name();
-	this.file = file.path();
+	this.name = file.getFileName().toString();
+	this.file = file.toString();
     }
 
     @Override

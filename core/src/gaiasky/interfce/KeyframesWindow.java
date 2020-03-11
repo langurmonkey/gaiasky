@@ -6,7 +6,6 @@
 package gaiasky.interfce;
 
 import com.badlogic.gdx.Input;
-import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.scenes.scene2d.Action;
 import com.badlogic.gdx.scenes.scene2d.Actor;
@@ -41,6 +40,7 @@ import gaiasky.util.validator.FloatValidator;
 import gaiasky.util.validator.LengthValidator;
 import gaiasky.util.validator.RegexpValidator;
 
+import java.nio.file.Files;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.time.Instant;
@@ -352,31 +352,31 @@ public class KeyframesWindow extends GenericDialog implements IObserver {
         open.pad(pad5);
         open.addListener((event) -> {
             if (event instanceof ChangeEvent) {
-                FileChooser fc = new FileChooser(I18n.txt("gui.download.pickloc"), skin, stage, new FileHandle(SysUtils.getDefaultCameraDir()), FileChooser.FileChooserTarget.FILES);
-                fc.setFileFilter(pathname -> pathname.getName().endsWith(".gkf"));
+                FileChooser fc = new FileChooser(I18n.txt("gui.download.pickloc"), skin, stage, SysUtils.getDefaultCameraDir(), FileChooser.FileChooserTarget.FILES);
+                fc.setFileFilter(pathname -> pathname.getFileName().toString().endsWith(".gkf"));
                 fc.setAcceptedFiles("*.gkf");
                 fc.setResultListener((success, result) -> {
                     if (success) {
-                        if (result.file().exists() && result.file().isFile()) {
+                        if (Files.exists(result) && Files.isRegularFile(result)) {
                             // Load selected file
                             try {
-                                Array<Keyframe> kfs = CameraKeyframeManager.instance.loadKeyframesFile(result.file());
+                                Array<Keyframe> kfs = CameraKeyframeManager.instance.loadKeyframesFile(result);
                                 // Update current instance
                                 reinitialiseKeyframes(kfs, null);
                                 keyframesPathObject.unselect();
-                                lastKeyframeFileName = result.file().getName();
-                                logger.info(I18n.txt("gui.keyframes.load.success", keyframes.size, result.file().getName()));
+                                lastKeyframeFileName = result.getFileName().toString();
+                                logger.info(I18n.txt("gui.keyframes.load.success", keyframes.size, result.getFileName()));
                             } catch (RuntimeException e) {
-                                logger.error(I18n.txt("gui.keyframes.load.error", result.file().getName()), e);
-                                Label warn = new OwnLabel(I18n.txt("error.loading.format", result.file().getName()), skin);
+                                logger.error(I18n.txt("gui.keyframes.load.error", result.getFileName()), e);
+                                Label warn = new OwnLabel(I18n.txt("error.loading.format", result.getFileName()), skin);
                                 warn.setColor(1f, .4f, .4f, 1f);
                                 notice.setActor(warn);
                                 return false;
                             }
 
                         } else {
-                            logger.error(I18n.txt("error.loading.notexistent", result.file().getName()));
-                            Label warn = new OwnLabel(I18n.txt("error.loading.notexistent", result.file().getName()), skin);
+                            logger.error(I18n.txt("error.loading.notexistent", result.getFileName()));
+                            Label warn = new OwnLabel(I18n.txt("error.loading.notexistent", result.getFileName()), skin);
                             warn.setColor(1f, .4f, .4f, 1f);
                             notice.setActor(warn);
                             return false;

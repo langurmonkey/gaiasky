@@ -142,7 +142,12 @@ public class DownloadDataWindow extends GenericDialog {
 
         downloadTable.add(hg).left().colspan(2).padBottom(padLarge).row();
 
-        SysUtils.getLocalDataDir().mkdirs();
+        try {
+            Files.createDirectories(SysUtils.getLocalDataDir());
+        }catch (IOException e) {
+            logger.error(e);
+            return;
+        }
         String catLoc = GlobalConf.data.DATA_LOCATION;
 
         if (dataLocation) {
@@ -156,13 +161,13 @@ public class DownloadDataWindow extends GenericDialog {
 
             catalogsLoc.addListener((event) -> {
                 if (event instanceof ChangeEvent) {
-                    FileChooser fc = new FileChooser(I18n.txt("gui.download.pickloc"), skin, stage, Gdx.files.absolute(GlobalConf.data.DATA_LOCATION), FileChooser.FileChooserTarget.DIRECTORIES);
+                    FileChooser fc = new FileChooser(I18n.txt("gui.download.pickloc"), skin, stage, Path.of(GlobalConf.data.DATA_LOCATION), FileChooser.FileChooserTarget.DIRECTORIES);
                     fc.setResultListener((success, result) -> {
                         if (success) {
-                            if (result.file().canRead() && result.file().canWrite()) {
+                            if (Files.isReadable(result) && Files.isWritable(result)) {
                                 // do stuff with result
-                                catalogsLoc.setText(result.path());
-                                GlobalConf.data.DATA_LOCATION = result.path().replaceAll("\\\\", "/");
+                                catalogsLoc.setText(result.toAbsolutePath().toString());
+                                GlobalConf.data.DATA_LOCATION = result.toAbsolutePath().toString().replaceAll("\\\\", "/");
                                 ;
                                 me.pack();
                                 GaiaSky.postRunnable(() -> {

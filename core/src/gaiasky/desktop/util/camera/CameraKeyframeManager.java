@@ -19,6 +19,8 @@ import gaiasky.util.math.Vector3d;
 import gaiasky.util.parse.Parser;
 
 import java.io.*;
+import java.nio.file.Files;
+import java.nio.file.Path;
 
 public class CameraKeyframeManager implements IObserver {
     private static final Logger.Log logger = Logger.getLogger(CameraKeyframeManager.class);
@@ -66,11 +68,11 @@ public class CameraKeyframeManager implements IObserver {
         return new Lineard<>(data);
     }
 
-    public Array<Keyframe> loadKeyframesFile(File file) throws RuntimeException {
+    public Array<Keyframe> loadKeyframesFile(Path file) throws RuntimeException {
         Array<Keyframe> result = new Array<Keyframe>();
         BufferedReader br = null;
         try {
-            br = new BufferedReader(new FileReader(file));
+            br = new BufferedReader(new FileReader(file.toFile()));
             String line;
             while ((line = br.readLine()) != null) {
                 String[] tokens = line.split(ksep);
@@ -100,17 +102,18 @@ public class CameraKeyframeManager implements IObserver {
     }
 
     public void saveKeyframesFile(Array<Keyframe> keyframes, String fileName) {
-        File f = new File(SysUtils.getDefaultCameraDir(), fileName);
-        if (f.exists()) {
-            f.delete();
+        Path f = SysUtils.getDefaultCameraDir().resolve(fileName);
+        if (Files.exists(f)) {
+            try {
+                Files.delete(f);
+            } catch (IOException e) {
+               logger.error(e);
+            }
         }
         BufferedWriter os = null;
-        if (f.exists()) {
-            f.delete();
-        }
         try {
-            f.createNewFile();
-            os = new BufferedWriter(new FileWriter(f));
+            Files.createFile(f);
+            os = new BufferedWriter(new FileWriter(f.toFile()));
 
             for (Keyframe kf : keyframes) {
                 os.append(Double.toString(kf.seconds)).append(ksep).append(Long.toString(kf.time)).append(ksep);
@@ -132,7 +135,7 @@ public class CameraKeyframeManager implements IObserver {
                     logger.error(e);
                 }
         }
-        logger.info(keyframes.size + " keyframes saved to file " + f.getName());
+        logger.info(keyframes.size + " keyframes saved to file " + f);
 
     }
 
@@ -181,22 +184,23 @@ public class CameraKeyframeManager implements IObserver {
     }
 
     public void exportKeyframesFile(Array<Keyframe> keyframes, String fileName) {
-        File f = new File(SysUtils.getDefaultCameraDir(), fileName);
-        if (f.exists()) {
-            f.delete();
+        Path f = SysUtils.getDefaultCameraDir().resolve(fileName);
+        if (Files.exists(f)) {
+            try{
+                Files.delete(f);
+            }catch(IOException e){
+                logger.error(e);
+            }
         }
         BufferedWriter os = null;
-        if (f.exists()) {
-            f.delete();
-        }
 
         /** Frame counter **/
         long frames = 0;
         long frameRate = GlobalConf.frame.CAMERA_REC_TARGET_FPS;
 
         try {
-            f.createNewFile();
-            os = new BufferedWriter(new FileWriter(f));
+            Files.createFile(f);
+            os = new BufferedWriter(new FileWriter(f.toFile()));
 
             Vector3d[] directions = new Vector3d[keyframes.size];
             Vector3d[] ups = new Vector3d[keyframes.size];
@@ -290,7 +294,7 @@ public class CameraKeyframeManager implements IObserver {
                     logger.error(e);
                 }
         }
-        logger.info(keyframes.size + " keyframes (" + frames + " frames, " + frameRate + " FPS) exported to camera file " + f.getName());
+        logger.info(keyframes.size + " keyframes (" + frames + " frames, " + frameRate + " FPS) exported to camera file " + f);
     }
 
     private PathPart[] positionsToPathParts(Array<Keyframe> keyframes, PathType pathType) {

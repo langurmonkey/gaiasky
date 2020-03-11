@@ -47,10 +47,10 @@ import gaiasky.util.validator.IntValidator;
 import gaiasky.util.validator.RegexpValidator;
 
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.nio.channels.FileChannel;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.Locale;
 import java.util.Map;
@@ -971,16 +971,16 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         // CONTROLLER MAPPINGS
         OwnLabel mappingsLabel = new OwnLabel(I18n.txt("gui.controller.mappingsfile"), skin);
         Array<FileComboBoxBean> controllerMappingsFiles = new Array<>();
-        FileHandle mappingsAssets = new FileHandle(GlobalConf.ASSETS_LOC + File.separator + SysUtils.getMappingsDirName());
-        FileHandle mappingsData = Gdx.files.absolute(SysUtils.getDefaultMappingsDir().getPath());
-        Array<FileHandle> mappingFiles = new Array<>();
+        Path mappingsAssets = Path.of(GlobalConf.ASSETS_LOC, SysUtils.getMappingsDirName());
+        Path mappingsData = SysUtils.getDefaultMappingsDir();
+        Array<Path> mappingFiles = new Array<>();
         GlobalResources.listRec(mappingsAssets, mappingFiles, ".inputListener", ".controller");
         GlobalResources.listRec(mappingsData, mappingFiles, ".inputListener", ".controller");
         FileComboBoxBean selected = null;
-        for (FileHandle fh : mappingFiles) {
-            FileComboBoxBean fcbb = new MappingFileComboBoxBean(fh);
+        for (Path path : mappingFiles) {
+            FileComboBoxBean fcbb = new MappingFileComboBoxBean(path);
             controllerMappingsFiles.add(fcbb);
-            if (GlobalConf.controls.CONTROLLER_MAPPINGS_FILE.endsWith(fh.name())) {
+            if (GlobalConf.controls.CONTROLLER_MAPPINGS_FILE.endsWith(path.getFileName().toString())) {
                 selected = fcbb;
             }
         }
@@ -1092,11 +1092,11 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         screenshotsLocation.pad(pad5);
         screenshotsLocation.addListener(event -> {
             if (event instanceof ChangeEvent) {
-                FileChooser fc = new FileChooser(I18n.txt("gui.screenshots.directory.choose"), skin, stage, Gdx.files.absolute(GlobalConf.screenshot.SCREENSHOT_FOLDER), FileChooser.FileChooserTarget.DIRECTORIES);
+                FileChooser fc = new FileChooser(I18n.txt("gui.screenshots.directory.choose"), skin, stage, Paths.get(GlobalConf.screenshot.SCREENSHOT_FOLDER), FileChooser.FileChooserTarget.DIRECTORIES);
                 fc.setResultListener((success, result) -> {
                     if (success) {
                         // do stuff with result
-                        screenshotsLocation.setText(result.path());
+                        screenshotsLocation.setText(result.toString());
                     }
                     return true;
                 });
@@ -1197,11 +1197,11 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         frameoutputLocation.pad(pad5);
         frameoutputLocation.addListener(event -> {
             if (event instanceof ChangeEvent) {
-                FileChooser fc = new FileChooser(I18n.txt("gui.frameoutput.directory.choose"), skin, stage, Gdx.files.absolute(GlobalConf.frame.RENDER_FOLDER), FileChooser.FileChooserTarget.DIRECTORIES);
+                FileChooser fc = new FileChooser(I18n.txt("gui.frameoutput.directory.choose"), skin, stage, Paths.get(GlobalConf.frame.RENDER_FOLDER), FileChooser.FileChooserTarget.DIRECTORIES);
                 fc.setResultListener((success, result) -> {
                     if (success) {
                         // do stuff with result
-                        frameoutputLocation.setText(result.path());
+                        frameoutputLocation.setText(result.toString());
                     }
                     return true;
                 });
@@ -1784,65 +1784,38 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
 
     private void reloadDefaultPreferences() {
         // User config file
-        File userFolder = SysUtils.getConfigDir();
-        File userFolderConfFile = new File(userFolder, "global.properties");
+        Path userFolder = SysUtils.getConfigDir();
+        Path userFolderConfFile = userFolder.resolve("global.properties");
 
         // Internal config
-        File confFolder = new File(GlobalConf.ASSETS_LOC, "conf" + File.separator);
-        File internalFolderConfFile = new File(confFolder, "global.properties");
+        Path confFolder = Paths.get(GlobalConf.ASSETS_LOC, "conf" + File.separator);
+        Path internalFolderConfFile = confFolder.resolve("global.properties");
 
         // Delete current conf
-        if (userFolderConfFile.exists()) {
-            userFolderConfFile.delete();
+        if (Files.exists(userFolderConfFile)) {
+            try {
+                Files.delete(userFolderConfFile);
+            } catch (IOException e) {
+                logger.error(e);
+            }
         }
 
         // Copy file
         try {
-            if (confFolder.exists() && confFolder.isDirectory()) {
+            if (Files.exists(confFolder) && Files.isDirectory(confFolder)) {
                 // Running released package
-                copyFile(internalFolderConfFile, userFolderConfFile, true);
+                GlobalResources.copyFile(internalFolderConfFile, userFolderConfFile, true);
                 logger.info("Default configuration file applied successfully! Gaia Sky will shut down now");
             } else {
-                throw new IOException("File " + confFolder.getAbsolutePath() + " does not exist!");
+                throw new IOException("File " + confFolder + " does not exist!");
             }
 
         } catch (Exception e) {
-            Logger.getLogger(this.getClass()).error(e, "Error copying default preferences file to user folder: " + userFolderConfFile.getAbsolutePath());
+            Logger.getLogger(this.getClass()).error(e, "Error copying default preferences file to user folder: " + userFolderConfFile);
         }
 
     }
 
-    private static void copyFile(File sourceFile, File destFile, boolean ow) throws IOException {
-        if (destFile.exists()) {
-            if (ow) {
-                // Overwrite, delete file
-                destFile.delete();
-            } else {
-                return;
-            }
-        }
-        // Create new
-        destFile.createNewFile();
-
-        FileChannel source = null;
-        FileChannel destination = null;
-        FileInputStream fis = null;
-        FileOutputStream fos = null;
-        try {
-            source = (fis = new FileInputStream(sourceFile)).getChannel();
-            destination = (fos = new FileOutputStream(destFile)).getChannel();
-            destination.transferFrom(source, 0, source.size());
-        } finally {
-            if (source != null) {
-                source.close();
-                fis.close();
-            }
-            if (destination != null) {
-                destination.close();
-                fos.close();
-            }
-        }
-    }
 
     private void saveCurrentPreferences() {
         // Add all properties to GlobalConf.instance

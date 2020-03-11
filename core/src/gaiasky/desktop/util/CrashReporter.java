@@ -15,6 +15,7 @@ import gaiasky.event.Events;
 import gaiasky.interfce.MessageBean;
 import gaiasky.interfce.NotificationsInterface;
 import gaiasky.util.GlobalConf;
+import gaiasky.util.Logger;
 import gaiasky.util.Logger.Log;
 import oshi.SystemInfo;
 import oshi.hardware.CentralProcessor;
@@ -22,19 +23,26 @@ import oshi.hardware.HardwareAbstractionLayer;
 
 import java.io.*;
 import java.nio.IntBuffer;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
 public class CrashReporter {
+    private static final Log logger = Logger.getLogger(CrashReporter.class);
 
     public static void reportCrash(Throwable t, Log logger) {
         SimpleDateFormat df = new SimpleDateFormat("yyyyMMdd-HHmmss");
 
         // Crash directory
-        File crashDir = SysUtils.getCrashReportsDir();
-        crashDir.mkdirs();
+        Path crashDir = SysUtils.getCrashReportsDir();
+        try {
+            Files.createDirectories(crashDir);
+        } catch (IOException e) {
+            logger.error(e);
+        }
         // Date string
         Date now = new Date();
         String dateString = df.format(now);
@@ -56,18 +64,18 @@ public class CrashReporter {
         appendSystemInfo(crashInfo);
 
         // LOG FILE
-        File logFile = writeLog(logger, crashDir, dateString);
+        Path logFile = writeLog(logger, crashDir, dateString);
 
         // Output crash info
         for (String str : crashInfo)
             print(logger, str);
 
         // CRASH FILE
-        File crashReportFile = writeCrash(logger, crashDir, dateString, crashInfo);
+        Path crashReportFile = writeCrash(logger, crashDir, dateString, crashInfo);
 
         // Closure
-        String crf1 = "Crash report file saved to: " + crashReportFile.getPath();
-        String crf4 = "Full log file saved to: " + logFile.getPath();
+        String crf1 = "Crash report file saved to: " + crashReportFile.toAbsolutePath();
+        String crf4 = "Full log file saved to: " + logFile.toAbsolutePath();
         String crf2 = "Please attach these files to the bug report";
         String crf3 = "Create a bug report here: " + GlobalConf.REPO_ISSUES;
         int len = Math.max(crf1.length(), Math.max(crf2.length(), Math.max(crf3.length(), crf4.length())));
@@ -84,13 +92,13 @@ public class CrashReporter {
         print(logger, "");
     }
 
-    private static File writeLog(Log logger, File crashDir, String dateString) {
+    private static Path writeLog(Log logger, Path crashDir, String dateString) {
         // LOG FILE
         List<MessageBean> logMessages = NotificationsInterface.getHistorical();
-        File logFile = new File(crashDir, "gaiasky_log_" + dateString + ".txt");
+        Path logFile = crashDir.resolve("gaiasky_log_" + dateString + ".txt");
         BufferedWriter writer = null;
         try {
-            writer = new BufferedWriter(new FileWriter(logFile));
+            writer = new BufferedWriter(new FileWriter(logFile.toFile()));
             for (MessageBean b : logMessages) {
                 writer.write(b.formatMessage(true));
                 writer.newLine();
@@ -112,11 +120,11 @@ public class CrashReporter {
         return logFile;
     }
 
-    private static File writeCrash(Log logger, File crashDir, String dateString, Array<String> crashInfo) {
-        File crashReportFile = new File(crashDir, "gaiasky_crash_" + dateString + ".txt");
+    private static Path writeCrash(Log logger, Path crashDir, String dateString, Array<String> crashInfo) {
+        Path crashReportFile = crashDir.resolve("gaiasky_crash_" + dateString + ".txt");
         BufferedWriter writer = null;
         try {
-            writer = new BufferedWriter(new FileWriter(crashReportFile));
+            writer = new BufferedWriter(new FileWriter(crashReportFile.toFile()));
             for (String str : crashInfo) {
                 writer.write(str);
                 writer.newLine();

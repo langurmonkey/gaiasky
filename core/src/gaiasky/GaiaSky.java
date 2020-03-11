@@ -66,13 +66,13 @@ import gaiasky.vr.openvr.VRContext;
 import gaiasky.vr.openvr.VRContext.VRDevice;
 import gaiasky.vr.openvr.VRContext.VRDeviceType;
 import gaiasky.vr.openvr.VRStatus;
-import org.apache.commons.io.FileUtils;
 import org.lwjgl.opengl.GL30;
 import org.lwjgl.openvr.Texture;
 import org.lwjgl.openvr.VR;
 import org.lwjgl.openvr.VRCompositor;
 
 import java.io.File;
+import java.nio.file.Path;
 import java.time.Instant;
 import java.util.*;
 
@@ -746,9 +746,9 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
 
         // Clear temp
         try {
-            File tmp = SysUtils.getDefaultTmpDir();
-            if (tmp.exists() && tmp.isDirectory())
-                FileUtils.deleteDirectory(tmp);
+            Path tmp = SysUtils.getDefaultTmpDir();
+            if (java.nio.file.Files.exists(tmp) && java.nio.file.Files.isDirectory(tmp))
+                GlobalResources.deleteRecursively(tmp);
         } catch (Exception e) {
             logger.error(e, "Error deleting tmp directory");
         }

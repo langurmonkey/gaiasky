@@ -5,8 +5,6 @@
 
 package gaiasky.desktop.util.camera;
 
-import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.files.FileHandle;
 import gaiasky.desktop.util.SysUtils;
 import gaiasky.event.EventManager;
 import gaiasky.event.Events;
@@ -20,6 +18,7 @@ import gaiasky.util.parse.Parser;
 import gaiasky.util.time.ITimeFrameProvider;
 
 import java.io.*;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.text.DateFormat;
@@ -61,7 +60,7 @@ public class CamRecorder implements IObserver {
     private RecorderState mode;
     private BufferedWriter os;
     private BufferedReader is;
-    private File f;
+    private Path f;
     private DateFormat df;
 
     private long startMs;
@@ -169,13 +168,17 @@ public class CamRecorder implements IObserver {
                         return;
                     }
                     // Annotate by date
-                    f = new File(SysUtils.getDefaultCameraDir(), df.format(new Date()) + ".gsc");
-                    if (f.exists()) {
-                        f.delete();
+                    f = SysUtils.getDefaultCameraDir().resolve(df.format(new Date()) + ".gsc");
+                    if (Files.exists(f)) {
+                        try {
+                            Files.delete(f);
+                        } catch (IOException e) {
+                            logger.error(e);
+                        }
                     }
                     try {
-                        f.createNewFile();
-                        os = new BufferedWriter(new FileWriter(f));
+                        Files.createFile(f);
+                        os = new BufferedWriter(new FileWriter(f.toFile()));
                     } catch (IOException e) {
                         logger.error(e);
                         return;
@@ -200,7 +203,7 @@ public class CamRecorder implements IObserver {
                     long elapsed = System.currentTimeMillis() - startMs;
                     startMs = 0;
                     float secs = elapsed / 1000f;
-                    logger.info(I18n.bundle.format("notif.camerarecord.done", f.getAbsolutePath(), secs));
+                    logger.info(I18n.bundle.format("notif.camerarecord.done", f.toAbsolutePath(), secs));
                     f = null;
                     mode = RecorderState.IDLE;
                 }
@@ -214,29 +217,29 @@ public class CamRecorder implements IObserver {
                     throw new RuntimeException("The recorder is busy! The current mode is " + mode);
                 }
                 Object f = data[0];
-                FileHandle file;
+                Path file;
                 if (f instanceof String) {
-                    Path p = Paths.get((String) f);
-                    if (p.isAbsolute())
-                        file = Gdx.files.absolute((String) f);
-                    else
-                        file = Gdx.files.local((String) f);
+                    file = Paths.get((String) f);
                 } else {
-                    file = (FileHandle) f;
+                    file = (Path) f;
                 }
 
-                is = new BufferedReader(new InputStreamReader(file.read()));
+                try {
+                    is = new BufferedReader(new InputStreamReader(Files.newInputStream(file)));
 
-                logger.info(I18n.bundle.format("notif.cameraplay.start", file.path()));
-                mode = RecorderState.PLAYING;
+                    logger.info(I18n.bundle.format("notif.cameraplay.start", file));
+                    mode = RecorderState.PLAYING;
 
-                // Issue message informing playing has started
-                EventManager.instance.post(Events.CAMERA_PLAY_INFO, true);
+                    // Issue message informing playing has started
+                    EventManager.instance.post(Events.CAMERA_PLAY_INFO, true);
 
-                // Enable frame output if option is on
-                if (GlobalConf.frame.AUTO_FRAME_OUTPUT_CAMERA_PLAY) {
-                    // Stop frame output if it is on!
-                    EventManager.instance.post(Events.FRAME_OUTPUT_CMD, true);
+                    // Enable frame output if option is on
+                    if (GlobalConf.frame.AUTO_FRAME_OUTPUT_CAMERA_PLAY) {
+                        // Stop frame output if it is on!
+                        EventManager.instance.post(Events.FRAME_OUTPUT_CMD, true);
+                    }
+                }catch(Exception e){
+                    logger.error(e);
                 }
 
                 break;

@@ -5,7 +5,6 @@
 
 package gaiasky.desktop.util;
 
-import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Stage;
@@ -22,6 +21,8 @@ import gaiasky.util.GlobalResources;
 import gaiasky.util.I18n;
 import gaiasky.util.scene2d.*;
 
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.Comparator;
 
 /**
@@ -36,8 +37,8 @@ public class RunCameraWindow extends GenericDialog {
     private Label outConsole;
     private Actor scriptsList;
 
-    private Array<FileHandle> scripts = null;
-    private FileHandle selectedScript = null;
+    private Array<Path> scripts = null;
+    private Path selectedScript = null;
 
     private float pad;
 
@@ -69,8 +70,8 @@ public class RunCameraWindow extends GenericDialog {
         scroll.setFadeScrollBars(false);
         scroll.setScrollingDisabled(true, false);
 
-        scroll.setHeight(200 * GlobalConf.UI_SCALE_FACTOR);
-        scroll.setWidth(300 * GlobalConf.UI_SCALE_FACTOR);
+        scroll.setHeight(700 * GlobalConf.UI_SCALE_FACTOR);
+        scroll.setWidth(600 * GlobalConf.UI_SCALE_FACTOR);
 
         content.add(scroll).align(Align.center).pad(pad);
         content.row();
@@ -109,22 +110,22 @@ public class RunCameraWindow extends GenericDialog {
 
     private Actor generateFileList() {
         // Init files
-        FileHandle scriptFolder = Gdx.files.absolute(SysUtils.getDefaultCameraDir().getPath());
+        Path scriptFolder = SysUtils.getDefaultCameraDir();
         if (scripts == null)
             scripts = new Array<>();
         else
             scripts.clear();
         
-        if (scriptFolder.exists())
+        if (Files.exists(scriptFolder))
             scripts = GlobalResources.listRec(scriptFolder, scripts, ".dat", ".gsc");
-        scripts.sort(new FileHandleComparator());
+        scripts.sort(new PathNameComparator());
         
         final com.badlogic.gdx.scenes.scene2d.ui.List<FileHandle> scriptsList = new com.badlogic.gdx.scenes.scene2d.ui.List<FileHandle>(skin, "normal");
         scriptsList.setName("camera path files list");
 
         Array<String> names = new Array<String>();
-        for (FileHandle fh : scripts)
-            names.add(fh.name());
+        for (Path p : scripts)
+            names.add(p.getFileName().toString());
 
         scriptsList.setItems(names);
         scriptsList.pack();//
@@ -145,7 +146,7 @@ public class RunCameraWindow extends GenericDialog {
             public void run() {
                 if (scripts.size > 0) {
                     scriptsList.setSelectedIndex(0);
-                    select(scripts.get(0).name());
+                    select(scripts.get(0).getFileName().toString());
                 }
             }
         });
@@ -157,9 +158,9 @@ public class RunCameraWindow extends GenericDialog {
 
     private void select(String name) {
         if (name != null) {
-            for (FileHandle fh : scripts) {
-                if (fh.name().equals(name)) {
-                    selectedScript = fh;
+            for (Path p : scripts) {
+                if (p.getFileName().toString().equals(name)) {
+                    selectedScript = p;
                     break;
                 }
             }
@@ -179,10 +180,10 @@ public class RunCameraWindow extends GenericDialog {
         }
     }
 
-    private class FileHandleComparator implements Comparator<FileHandle> {
+    private class PathNameComparator implements Comparator<Path> {
         @Override
-        public int compare(FileHandle fh0, FileHandle fh1) {
-            return fh0.name().compareTo(fh1.name());
+        public int compare(Path fh0, Path fh1) {
+            return fh0.getFileName().compareTo(fh1.getFileName());
 
         }
 

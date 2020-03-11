@@ -23,7 +23,6 @@ import org.xml.sax.SAXException;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
-import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -75,7 +74,7 @@ public class SlaveManager {
                 logger.info("Using slave configuration file: " + GlobalConf.program.NET_SLAVE_CONFIG);
                 String mpcdi = GlobalConf.program.NET_SLAVE_CONFIG;
                 try {
-                    File loc = unpackMpcdi(mpcdi);
+                    Path loc = unpackMpcdi(mpcdi);
                     parseMpcdi(mpcdi, loc);
 
                     if (initialized) {
@@ -120,20 +119,20 @@ public class SlaveManager {
      * @return
      * @throws IOException
      */
-    private File unpackMpcdi(String mpcdi) throws IOException {
+    private Path unpackMpcdi(String mpcdi) throws IOException {
         if (mpcdi != null && !mpcdi.isEmpty()) {
             // Using MPCDI
             Path mpcdiPath = Path.of(mpcdi);
             if (!mpcdiPath.isAbsolute()) {
                 // Assume mpcdi folder
-                mpcdiPath = Path.of(SysUtils.getDefaultMpcdiDir().getPath(), mpcdi);
+                mpcdiPath = SysUtils.getDefaultMpcdiDir().resolve(mpcdi);
             }
             logger.info(I18n.txt("notif.loading", mpcdiPath));
 
             String unpackDirName = "mpcdi_" + System.nanoTime();
-            File unzipLocation = new File(SysUtils.getDefaultTmpDir(), unpackDirName + File.separator);
-            unzipLocation.mkdirs();
-            ZipUtils.unzip(mpcdiPath.toString(), unzipLocation.getAbsolutePath());
+            Path unzipLocation = SysUtils.getDefaultTmpDir().resolve(unpackDirName);
+            Files.createDirectories(unzipLocation);
+            ZipUtils.unzip(mpcdiPath.toString(), unzipLocation.toAbsolutePath().toString());
 
             return unzipLocation;
 
@@ -153,10 +152,10 @@ public class SlaveManager {
      * @throws ParserConfigurationException
      * @throws SAXException
      */
-    private void parseMpcdi(String mpcdi, File loc) throws IOException, ParserConfigurationException, SAXException {
+    private void parseMpcdi(String mpcdi, Path loc) throws IOException, ParserConfigurationException, SAXException {
         if (loc != null) {
             // Parse mpcdi.xml
-            Path mpcdiXml = Path.of(loc.getPath(), "mpcdi.xml");
+            Path mpcdiXml = loc.resolve("mpcdi.xml");
             if (!Files.exists(mpcdiXml)) {
                 logger.error("mpcdi.xml file not found in " + mpcdi);
                 return;
@@ -256,7 +255,7 @@ public class SlaveManager {
                                     Element geowarp = (Element) geometryWarpFiles.item(0);
                                     Element path = (Element) geowarp.getElementsByTagName("path").item(0);
                                     String pfmFile = path.getTextContent();
-                                    pfm = Path.of(loc.getPath(), pfmFile);
+                                    pfm = loc.resolve(pfmFile);
                                     if (!Files.exists(pfm)) {
                                         logger.error("The geometry warp file does not exist: " + pfm);
                                     }

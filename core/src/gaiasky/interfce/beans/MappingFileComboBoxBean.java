@@ -5,19 +5,19 @@
 
 package gaiasky.interfce.beans;
 
-import com.badlogic.gdx.files.FileHandle;
 import gaiasky.util.GlobalConf;
 import gaiasky.util.Logger;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Path;
 
 public class MappingFileComboBoxBean extends FileComboBoxBean {
-    public MappingFileComboBoxBean(FileHandle file) {
+    public MappingFileComboBoxBean(Path file) {
         super(file);
         File assetsFolder = new File(GlobalConf.ASSETS_LOC + File.separator);
         try {
-            String suffix = file.file().getCanonicalPath().contains(assetsFolder.getCanonicalPath()) ? " [internal]" : " [user]";
+            String suffix = file.toAbsolutePath().toString().contains(assetsFolder.getCanonicalPath()) ? " [internal]" : " [user]";
             this.name += suffix;
         }catch(IOException e){
             Logger.getLogger(MappingFileComboBoxBean.class.getSimpleName()).error(e);

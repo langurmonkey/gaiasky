@@ -2575,42 +2575,42 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
 
     @Override
     public String getDefaultFramesDir() {
-        return SysUtils.getDefaultFramesDir().getAbsolutePath();
+        return SysUtils.getDefaultFramesDir().toAbsolutePath().toString();
     }
 
     @Override
     public String getDefaultScreenshotsDir() {
-        return SysUtils.getDefaultScreenshotsDir().getAbsolutePath();
+        return SysUtils.getDefaultScreenshotsDir().toAbsolutePath().toString();
     }
 
     @Override
     public String getDefaultCameraDir() {
-        return SysUtils.getDefaultCameraDir().getAbsolutePath();
+        return SysUtils.getDefaultCameraDir().toAbsolutePath().toString();
     }
 
     @Override
     public String getDefaultMusicDir() {
-        return SysUtils.getDefaultMusicDir().getAbsolutePath();
+        return SysUtils.getDefaultMusicDir().toAbsolutePath().toString();
     }
 
     @Override
     public String getDefaultMappingsDir() {
-        return SysUtils.getDefaultMappingsDir().getAbsolutePath();
+        return SysUtils.getDefaultMappingsDir().toAbsolutePath().toString();
     }
 
     @Override
     public String getDataDir() {
-        return SysUtils.getDataDir().getAbsolutePath();
+        return SysUtils.getDataDir().toAbsolutePath().toString();
     }
 
     @Override
     public String getConfigDir() {
-        return SysUtils.getConfigDir().getAbsolutePath();
+        return SysUtils.getConfigDir().toAbsolutePath().toString();
     }
 
     @Override
     public String getLocalDataDir() {
-        return SysUtils.getLocalDataDir().getAbsolutePath();
+        return SysUtils.getLocalDataDir().toAbsolutePath().toString();
     }
 
     @Override

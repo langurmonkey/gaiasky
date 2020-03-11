@@ -25,7 +25,8 @@ import gaiasky.util.math.MathUtilsd;
 import gaiasky.util.parse.Parser;
 
 import java.io.*;
-import java.nio.channels.FileChannel;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
@@ -153,7 +154,7 @@ public class DesktopConfInit extends ConfInit {
 
         String DATA_LOCATION = p.getProperty("data.location");
         if (DATA_LOCATION == null || DATA_LOCATION.isEmpty())
-            DATA_LOCATION = SysUtils.getLocalDataDir().getAbsolutePath().replaceAll("\\\\", "/");;
+            DATA_LOCATION = SysUtils.getLocalDataDir().toAbsolutePath().toString().replaceAll("\\\\", "/");;
 
         String CATALOG_JSON_FILE_SEQUENCE = p.getProperty("data.json.catalog", "");
         Array<String> CATALOG_JSON_FILES = new Array<>();
@@ -317,9 +318,9 @@ public class DesktopConfInit extends ConfInit {
         /** FRAME CONF **/
         String renderFolder;
         if (p.getProperty("graphics.render.folder") == null || p.getProperty("graphics.render.folder").isEmpty()) {
-            File framesDir = SysUtils.getDefaultFramesDir();
-            framesDir.mkdirs();
-            renderFolder = framesDir.getAbsolutePath();
+            Path framesDir = SysUtils.getDefaultFramesDir();
+            Files.createDirectories(framesDir);
+            renderFolder = framesDir.toAbsolutePath().toString();
         } else {
             renderFolder = p.getProperty("graphics.render.folder");
         }
@@ -358,9 +359,9 @@ public class DesktopConfInit extends ConfInit {
         /** SCREENSHOT CONF **/
         String screenshotFolder = null;
         if (p.getProperty("screenshot.folder") == null || p.getProperty("screenshot.folder").isEmpty()) {
-            File screenshotDir = SysUtils.getDefaultScreenshotsDir();
-            screenshotDir.mkdirs();
-            screenshotFolder = screenshotDir.getAbsolutePath();
+            Path screenshotDir = SysUtils.getDefaultScreenshotsDir();
+            Files.createDirectories(screenshotDir);
+            screenshotFolder = screenshotDir.toAbsolutePath().toString();
         } else {
             screenshotFolder = p.getProperty("screenshot.folder");
         }
@@ -586,47 +587,16 @@ public class DesktopConfInit extends ConfInit {
 
     private String initConfigFile(boolean ow, boolean vr) throws IOException {
         // Use user folder
-        File userFolder = SysUtils.getConfigDir();
-        File userFolderConfFile = new File(userFolder, getConfigFileName(vr));
+        Path userFolder = SysUtils.getConfigDir();
+        Path userFolderConfFile =userFolder.resolve(getConfigFileName(vr));
 
-        if (ow || !userFolderConfFile.exists()) {
+        if (ow || !Files.exists(userFolderConfFile)) {
             // Copy file
-            copyFile(new File("conf" + File.separator + getConfigFileName(vr)), userFolderConfFile, ow);
+            GlobalResources.copyFile(Path.of("conf", getConfigFileName(vr)), userFolderConfFile, ow);
         }
-        String props = userFolderConfFile.getAbsolutePath();
+        String props = userFolderConfFile.toAbsolutePath().toString();
         System.setProperty("properties.file", props);
         return props;
-    }
-
-    private void copyFile(File sourceFile, File destFile, boolean ow) throws IOException {
-        if (destFile.exists()) {
-            if (ow) {
-                // Overwrite, delete file
-                destFile.delete();
-            } else {
-                return;
-            }
-        }
-        // Create new
-        destFile.createNewFile();
-
-        FileInputStream sourceFis = null;
-        FileOutputStream destinationFis = null;
-        try {
-            // Open channels
-            sourceFis = new FileInputStream(sourceFile);
-            destinationFis = new FileOutputStream(destFile);
-
-            FileChannel source = sourceFis.getChannel();
-
-            // Transfer
-            destinationFis.getChannel().transferFrom(source, 0, source.size());
-        } finally {
-            if (sourceFis != null)
-                sourceFis.close();
-            if (destinationFis != null)
-                destinationFis.close();
-        }
     }
 
     public static String getConfigFileName(boolean vr) {

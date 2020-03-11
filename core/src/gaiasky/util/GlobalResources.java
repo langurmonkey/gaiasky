@@ -31,20 +31,17 @@ import net.jafama.FastMath;
 import org.lwjgl.opengl.GL30;
 
 import java.io.FileInputStream;
-import java.io.FilenameFilter;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.IntBuffer;
 import java.nio.channels.FileChannel;
-import java.nio.file.FileVisitResult;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.SimpleFileVisitor;
+import java.nio.file.*;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicLong;
+import java.util.stream.Stream;
 
 /**
  * Holds and initialises resources utilised globally.
@@ -92,7 +89,7 @@ public class GlobalResources {
     public static void updateSkin() {
         initCursors();
         FileHandle fh = Gdx.files.internal("skins/" + GlobalConf.program.UI_THEME + "/" + GlobalConf.program.UI_THEME + ".json");
-        if(!fh.exists()){
+        if (!fh.exists()) {
             // Default to dark-green
             logger.info("User interface theme '" + GlobalConf.program.UI_THEME + "' not found, using 'dark-green' instead");
             GlobalConf.program.UI_THEME = "dark-green";
@@ -293,23 +290,25 @@ public class GlobalResources {
     }
 
     /**
-     * Gets all the files with the given extension in the given file handle f.
+     * Gets all the files with the given extension in the given path f.
      *
      * @param f          The directory to get all the files
-     * @param l          The list with re results
+     * @param l          The list with the results
      * @param extensions The allowed extensions
      * @return The list l
      */
-    public static Array<FileHandle> listRec(FileHandle f, Array<FileHandle> l, String... extensions) {
-        if (f.exists()) {
-            if (f.isDirectory()) {
-                FileHandle[] partial = f.list();
-                for (FileHandle fh : partial) {
-                    l = listRec(fh, l, extensions);
+    public static Array<Path> listRec(Path f, final Array<Path> l, String... extensions) {
+        if (Files.exists(f)) {
+            if (Files.isDirectory(f)) {
+                try {
+                    Stream<Path> partial = Files.list(f);
+                    partial.forEachOrdered(p -> listRec(p, l, extensions));
+                } catch (IOException e) {
+                    logger.error(e);
                 }
 
             } else {
-                if (endsWithAny(f.name(), extensions)) {
+                if (endsWithAny(f.getFileName().toString(), extensions)) {
                     l.add(f);
                 }
             }
@@ -326,21 +325,37 @@ public class GlobalResources {
         return false;
     }
 
-    public static Array<FileHandle> listRec(FileHandle f, Array<FileHandle> l, FilenameFilter filter) {
-        if (f.exists()) {
-            if (f.isDirectory()) {
-                FileHandle[] partial = f.list();
-                for (FileHandle fh : partial) {
-                    l = listRec(fh, l, filter);
+    public static void deleteRecursively(Path path) throws IOException {
+        Files.walk(path)
+                .sorted(Comparator.reverseOrder())
+                .map(Path::toFile)
+                .forEach(java.io.File::delete);
+    }
+
+    public static void copyFile(Path sourceFile, Path destFile, boolean ow) throws IOException {
+        if (!Files.exists(destFile) || ow)
+            Files.copy(sourceFile, destFile, StandardCopyOption.REPLACE_EXISTING);
+    }
+
+    public static Array<Path> listRec(Path f, final Array<Path> l, DirectoryStream.Filter<Path> filter) {
+        if (Files.exists(f)) {
+            if (Files.isDirectory(f)) {
+                try {
+                    Stream<Path> partial = Files.list(f);
+                    partial.forEachOrdered(p -> listRec(p, l, filter));
+                } catch (IOException e) {
+                    logger.error(e);
                 }
 
             } else {
-                if (filter.accept(null, f.name())) {
-                    l.add(f);
+                try {
+                    if (filter.accept(f))
+                        l.add(f);
+                } catch (IOException e) {
+                    logger.error(e);
                 }
             }
         }
-
         return l;
     }
 
@@ -661,7 +676,7 @@ public class GlobalResources {
 
     }
 
-        public static String unpackTexName(String tex, GraphicsQuality gq) {
+    public static String unpackTexName(String tex, GraphicsQuality gq) {
         if (tex.contains("*")) {
             // Start with current quality and scan to lower ones
             for (int i = gq.ordinal(); i >= 0; i--) {
@@ -695,6 +710,7 @@ public class GlobalResources {
             return tex;
         }
     }
+
     public static String unpackTexName(String tex) {
         return GlobalResources.unpackTexName(tex, GlobalConf.scene.GRAPHICS_QUALITY);
     }
@@ -728,6 +744,7 @@ public class GlobalResources {
         }
         return extensions;
     }
+
     /**
      * Generates all combinations of all sizes of all the strings given in values
      *
@@ -757,9 +774,10 @@ public class GlobalResources {
 
     /**
      * Generates all combinations of the given size using the elements in values.
+     *
      * @param values The elements to combine
-     * @param size The size of the combinations
-     * @param <T> The type
+     * @param size   The size of the combinations
+     * @param <T>    The type
      * @return The combinations
      */
     public static <T> List<List<T>> combination(List<T> values, int size) {

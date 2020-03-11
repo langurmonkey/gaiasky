@@ -7,23 +7,22 @@ package gaiasky.util;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.audio.Music;
-import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.utils.Array;
 import gaiasky.event.EventManager;
 import gaiasky.event.Events;
 import gaiasky.event.IObserver;
 import gaiasky.util.Logger.Log;
 
-import java.io.File;
-import java.io.FilenameFilter;
+import java.nio.file.DirectoryStream;
+import java.nio.file.Path;
 
 public class MusicManager implements IObserver {
     private static final Log logger = Logger.getLogger(MusicManager.class);
 
     public static MusicManager instance;
-    private static FileHandle[] folders;
+    private static Path[] folders;
 
-    public static void initialize(FileHandle... folders) {
+    public static void initialize(Path... folders) {
         MusicManager.folders = folders;
         instance = new MusicManager(folders);
     }
@@ -32,23 +31,23 @@ public class MusicManager implements IObserver {
         return instance != null;
     }
 
-    private Array<FileHandle> musicFiles;
+    private Array<Path> musicFiles;
     private int i = 0;
     private Music currentMusic;
     private float volume = 0.05f;
 
-    public MusicManager(FileHandle[] dirs) {
+    public MusicManager(Path[] dirs) {
         super();
         initFiles(dirs);
 
         EventManager.instance.subscribe(this, Events.MUSIC_NEXT_CMD, Events.MUSIC_PLAYPAUSE_CMD, Events.MUSIC_PREVIOUS_CMD, Events.MUSIC_VOLUME_CMD, Events.MUSIC_RELOAD_CMD);
     }
 
-    private void initFiles(FileHandle[] folders) {
+    private void initFiles(Path[] folders) {
         if (folders != null) {
             musicFiles = new Array<>();
 
-            for (FileHandle folder : folders) {
+            for (Path folder : folders) {
                 GlobalResources.listRec(folder, musicFiles, new MusicFileFilter());
             }
             logger.debug(I18n.bundle.format("gui.music.load", musicFiles.size));
@@ -79,7 +78,7 @@ public class MusicManager implements IObserver {
     }
 
     private void playIndex(int i) {
-        FileHandle f = musicFiles.get(i);
+        Path f = musicFiles.get(i);
 
         if (currentMusic != null) {
             if (currentMusic.isPlaying()) {
@@ -88,13 +87,13 @@ public class MusicManager implements IObserver {
             currentMusic.dispose();
         }
         try {
-            currentMusic = Gdx.audio.newMusic(f);
+            currentMusic = Gdx.audio.newMusic(Gdx.files.absolute(f.toAbsolutePath().toString()));
             currentMusic.setVolume(volume);
             currentMusic.setOnCompletionListener(music -> playNextMusic());
 
             currentMusic.play();
-            EventManager.instance.post(Events.MUSIC_TRACK_INFO, musicFiles.get(i).name());
-            logger.info(I18n.bundle.format("gui.music.playing", musicFiles.get(i).name()));
+            EventManager.instance.post(Events.MUSIC_TRACK_INFO, musicFiles.get(i).getFileName().toString());
+            logger.info(I18n.bundle.format("gui.music.playing", musicFiles.get(i).getFileName().toString()));
         } catch (Exception e) {
             logger.error(e);
         }
@@ -162,11 +161,10 @@ public class MusicManager implements IObserver {
         initFiles(folders);
     }
 
-    private class MusicFileFilter implements FilenameFilter {
-
+    private class MusicFileFilter implements DirectoryStream.Filter<Path> {
         @Override
-        public boolean accept(File dir, String name) {
-            return name.endsWith(".mp3") || name.endsWith(".wav") || name.endsWith(".ogg");
+        public boolean accept(Path dir) {
+            return dir.endsWith(".mp3") || dir.endsWith(".wav") || dir.endsWith(".ogg");
         }
 
     }

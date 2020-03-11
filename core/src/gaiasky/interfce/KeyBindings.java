@@ -5,9 +5,7 @@
 
 package gaiasky.interfce;
 
-import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input.Keys;
-import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.utils.Array;
 import gaiasky.GaiaSky;
 import gaiasky.desktop.util.SysUtils;
@@ -19,7 +17,14 @@ import gaiasky.util.GlobalConf.ProgramConf.StereoProfile;
 import gaiasky.util.Logger.Log;
 import gaiasky.util.gdx.contrib.postprocess.effects.CubemapProjections.CubemapProjection;
 
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 import java.time.Instant;
 import java.util.*;
 
@@ -407,12 +412,16 @@ public class KeyBindings {
 
     private void initMappings() {
         final String mappingsFileName = "keyboard.mappings";
-        // Check if keyboard.mappings file exists in data folder, otherwise use default mappings in assets
-        FileHandle customMappings = Gdx.files.absolute(SysUtils.getDefaultMappingsDir().getPath() + File.separator + mappingsFileName);
-        FileHandle defaultMappings = new FileHandle(GlobalConf.ASSETS_LOC + File.separator + SysUtils.getMappingsDirName() + File.separator + mappingsFileName);
-        FileHandle mappingsFile = customMappings;
-        if (!customMappings.exists()) {
-            mappingsFile = defaultMappings;
+        // Check if keyboard.mappings file exists in data folder, otherwise copy it there
+        Path customMappings = SysUtils.getDefaultMappingsDir().resolve(mappingsFileName);
+        Path defaultMappings = Paths.get(GlobalConf.ASSETS_LOC, SysUtils.getMappingsDirName(), mappingsFileName);
+        Path mappingsFile = customMappings;
+        if (!Files.exists(customMappings)) {
+            try {
+                Files.copy(defaultMappings, customMappings, StandardCopyOption.REPLACE_EXISTING);
+            } catch (IOException e) {
+                logger.error(e);
+            }
         }
         logger.info("Using keyboard mappings file: " + mappingsFile);
 
@@ -438,14 +447,14 @@ public class KeyBindings {
             }
 
         } catch (Exception e) {
-            logger.error(e, "Error loading keyboard mappings: " + mappingsFile.path());
+            logger.error(e, "Error loading keyboard mappings: " + mappingsFile);
         }
 
     }
 
-    private Array<Pair<String, String>> readMappingsFile(FileHandle file) throws IOException {
+    private Array<Pair<String, String>> readMappingsFile(Path file) throws IOException {
         Array<Pair<String, String>> result = new Array<>();
-        InputStream is = file.read();
+        InputStream is = Files.newInputStream(file);
         BufferedReader br = new BufferedReader(new InputStreamReader(is));
 
         String line;

@@ -8,7 +8,6 @@ package gaiasky.interfce;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.InputMultiplexer;
 import com.badlogic.gdx.backends.lwjgl3.Lwjgl3Graphics;
-import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.*;
@@ -26,7 +25,9 @@ import gaiasky.util.scene2d.FileChooser;
 import gaiasky.util.scene2d.OwnLabel;
 import org.lwjgl.glfw.GLFW;
 
-import java.io.File;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 
 /**
  * Manages the Graphical User Interfaces of Gaia Sky
@@ -230,7 +231,7 @@ public class GuiRegistry implements IObserver {
     /**
      * Last open location
      */
-    private File lastOpenLocation;
+    private Path lastOpenLocation;
 
     /* Slave config window */
     private SlaveConfigWindow slaveConfigWindow;
@@ -290,33 +291,33 @@ public class GuiRegistry implements IObserver {
             case SHOW_LOAD_CATALOG_ACTION:
                 if (lastOpenLocation == null && GlobalConf.program.LAST_OPEN_LOCATION != null && !GlobalConf.program.LAST_OPEN_LOCATION.isEmpty()) {
                     try {
-                        lastOpenLocation = new File(GlobalConf.program.LAST_OPEN_LOCATION);
+                        lastOpenLocation = Paths.get(GlobalConf.program.LAST_OPEN_LOCATION);
                     } catch (Exception e) {
                         lastOpenLocation = null;
                     }
                 }
                 if (lastOpenLocation == null) {
-                    lastOpenLocation = SysUtils.getHomeDir();
-                } else if (!lastOpenLocation.exists() || !lastOpenLocation.isDirectory()) {
+                    lastOpenLocation = SysUtils.getUserHome();
+                } else if (!Files.exists(lastOpenLocation) || !Files.isDirectory(lastOpenLocation)) {
                     lastOpenLocation = SysUtils.getHomeDir();
                 }
 
-                FileChooser fc = new FileChooser(I18n.txt("gui.loadcatalog"), skin, ui, new FileHandle(lastOpenLocation), FileChooser.FileChooserTarget.FILES);
+                FileChooser fc = new FileChooser(I18n.txt("gui.loadcatalog"), skin, ui, lastOpenLocation, FileChooser.FileChooserTarget.FILES);
                 fc.setAcceptText(I18n.txt("gui.loadcatalog"));
-                fc.setFileFilter(pathname -> pathname.getName().endsWith(".vot") || pathname.getName().endsWith(".csv"));
+                fc.setFileFilter(pathname -> pathname.getFileName().toString().endsWith(".vot") || pathname.getFileName().toString().endsWith(".csv"));
                 fc.setAcceptedFiles("*.vot, *.csv");
                 fc.setResultListener((success, result) -> {
                     if (success) {
-                        if (result.file().exists() && result.file().isFile()) {
+                        if (Files.exists(result) && Files.exists(result)) {
                             // Load selected file
                             try {
-                                String fileName = result.file().getName();
+                                String fileName = result.getFileName().toString();
                                 final DatasetLoadDialog dld = new DatasetLoadDialog(I18n.txt("gui.dsload.title") + ": " + fileName, skin, ui);
                                 Runnable doLoad = () -> {
                                     try {
                                         DatasetOptions dops = dld.generateDatasetOptions();
                                         // Access dld properties
-                                        EventScriptingInterface.instance().loadDataset(fileName, result.file().getAbsolutePath(), CatalogInfo.CatalogInfoType.UI, dops, false);
+                                        EventScriptingInterface.instance().loadDataset(fileName, result.toAbsolutePath().toString(), CatalogInfo.CatalogInfoType.UI, dops, false);
                                         // Open UI datasets
                                         EventScriptingInterface.instance().maximizeInterfaceWindow();
                                         EventScriptingInterface.instance().expandGuiComponent("DatasetsComponent");
@@ -327,26 +328,26 @@ public class GuiRegistry implements IObserver {
                                 dld.setAcceptRunnable(doLoad);
                                 dld.show(ui);
 
-                                lastOpenLocation = result.file().getParentFile();
-                                GlobalConf.program.LAST_OPEN_LOCATION = lastOpenLocation.getAbsolutePath();
+                                lastOpenLocation = result.getParent();
+                                GlobalConf.program.LAST_OPEN_LOCATION = lastOpenLocation.toAbsolutePath().toString();
                                 return true;
                             } catch (Exception e) {
-                                logger.error(I18n.txt("notif.error", result.file().getName()), e);
+                                logger.error(I18n.txt("notif.error", result.getFileName()), e);
                                 return false;
                             }
 
                         } else {
-                            logger.error("Selection must be a file: " + result.file().getAbsolutePath());
+                            logger.error("Selection must be a file: " + result.toAbsolutePath());
                             return false;
                         }
                     } else {
                         // Still, update last location
-                        if (!result.isDirectory()) {
-                            lastOpenLocation = result.file().getParentFile();
+                        if (!Files.isDirectory(result)) {
+                            lastOpenLocation = result.getParent();
                         } else {
-                            lastOpenLocation = result.file();
+                            lastOpenLocation = result;
                         }
-                        GlobalConf.program.LAST_OPEN_LOCATION = lastOpenLocation.getAbsolutePath();
+                        GlobalConf.program.LAST_OPEN_LOCATION = lastOpenLocation.toAbsolutePath().toString();
                     }
                     return false;
                 });

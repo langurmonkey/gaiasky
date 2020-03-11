@@ -5,7 +5,6 @@
 
 package gaiasky.util.scene2d;
 
-import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.EventListener;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
@@ -21,16 +20,21 @@ import com.badlogic.gdx.utils.TimeUtils;
 import gaiasky.interfce.GenericDialog;
 import gaiasky.util.GlobalConf;
 import gaiasky.util.I18n;
+import gaiasky.util.Logger;
 import gaiasky.util.TextUtils;
 
-import java.io.File;
-import java.io.FileFilter;
+import java.io.IOException;
+import java.nio.file.*;
 import java.util.Comparator;
 
+/**
+ * A simple file chooser for scene2d.ui
+ */
 public class FileChooser extends GenericDialog {
+    private static final Logger.Log logger = Logger.getLogger(FileChooser.class);
 
     public interface ResultListener {
-        boolean result(boolean success, FileHandle result);
+        boolean result(boolean success, Path result);
     }
 
     /**
@@ -47,7 +51,7 @@ public class FileChooser extends GenericDialog {
     private boolean fileNameEnabled;
     private TextField fileNameInput;
     private Label fileNameLabel, acceptedFiles;
-    private FileHandle baseDir;
+    private Path baseDir;
     private Label fileListLabel;
     private List<FileListItem> fileList;
     private HorizontalGroup driveButtonsList;
@@ -56,7 +60,7 @@ public class FileChooser extends GenericDialog {
     private ScrollPane scrollPane;
     private CheckBox hidden;
 
-    private FileHandle currentDir;
+    private Path currentDir;
     protected String result;
 
     private boolean showHidden = false;
@@ -65,19 +69,19 @@ public class FileChooser extends GenericDialog {
     protected EventListener selectionListener;
 
     private static final Comparator<FileListItem> dirListComparator = (file1, file2) -> {
-        if (file1.file.isDirectory() && !file2.file.isDirectory()) {
+        if (Files.isDirectory(file1.file) && !Files.isDirectory(file2.file)) {
             return -1;
         }
-        if (file1.file.isDirectory() && file2.file.isDirectory()) {
+        if (Files.isDirectory(file1.file) && Files.isDirectory(file2.file)) {
             return file1.name.compareTo(file2.name);
         }
-        if (!file1.file.isDirectory() && !file2.file.isDirectory()) {
+        if (!Files.isDirectory(file1.file) && !Files.isDirectory(file2.file)) {
             return file1.name.compareTo(file2.name);
         }
         return 1;
     };
     /** Filters files that appear in the file chooser. For internal use only! **/
-    private FileFilter filter;
+    private DirectoryStream.Filter<Path> filter;
     /** Enables directories in the file chooser **/
     private final boolean directoryBrowsingEnabled;
     /** Enables files in the file chooser **/
@@ -85,14 +89,14 @@ public class FileChooser extends GenericDialog {
     /** Allows setting filters on the files which are to be selected **/
     private PathnameFilter pathnameFilter;
 
-    public FileChooser(String title, final Skin skin, Stage stage, FileHandle baseDir, FileChooserTarget target) {
+    public FileChooser(String title, final Skin skin, Stage stage, Path baseDir, FileChooserTarget target) {
         this(title, skin, stage, baseDir, target, null);
     }
 
-    public FileChooser(String title, final Skin skin, Stage stage, FileHandle baseDir, FileChooserTarget target, EventListener selectionListener) {
+    public FileChooser(String title, final Skin skin, Stage stage, Path baseDir, FileChooserTarget target, EventListener selectionListener) {
         this(title, skin, stage, baseDir, target, selectionListener, true);
     }
-    public FileChooser(String title, final Skin skin, Stage stage, FileHandle baseDir, FileChooserTarget target, EventListener selectionListener, boolean directoryBrowsingEnabled) {
+    public FileChooser(String title, final Skin skin, Stage stage, Path baseDir, FileChooserTarget target, EventListener selectionListener, boolean directoryBrowsingEnabled) {
         super(title, skin, stage);
         this.baseDir = baseDir;
         this.selectionListener = selectionListener;
@@ -121,14 +125,18 @@ public class FileChooser extends GenericDialog {
         // In windows, we need to be able to change drives
         driveButtonsList = new HorizontalGroup();
         driveButtonsList.left().space(10 * GlobalConf.UI_SCALE_FACTOR);
-        File[] drives = File.listRoots();
-        driveButtons = new Array<>(drives.length);
-        for (File drive : drives) {
+        Iterable<Path> drives = FileSystems.getDefault().getRootDirectories();
+        driveButtons = new Array<>();
+        for (Path drive : drives) {
             TextButton driveButton = new OwnTextIconButton(drive.toString(), skin, "drive");
             driveButton.addListener(new ClickListener() {
                 @Override
                 public void clicked(InputEvent event, float x, float y) {
-                    changeDirectory(new FileHandle(drive));
+                    try {
+                        changeDirectory(drive);
+                    } catch (IOException e) {
+                       logger.error(e);
+                    }
                     lastClick = 0;
                 }
             });
@@ -190,16 +198,21 @@ public class FileChooser extends GenericDialog {
             public void clicked(InputEvent event, float x, float y) {
                 final FileListItem selected = fileList.getSelected();
                 if (TimeUtils.millis() - lastClick < 250) {
-                    FileHandle sel = selected.file;
+                    Path sel = selected.file;
                     // Double click
-                    if (directoryBrowsingEnabled && sel.isDirectory()) {
-                        // Change directory
-                        changeDirectory(sel);
-                        lastClick = 0;
-                    } else if (target == FileChooserTarget.FILES && (filter == null || filter.accept(sel.file()))) {
-                        // Accept
-                        acceptButton.fire(new ChangeListener.ChangeEvent());
+                    try {
+                        if (directoryBrowsingEnabled && Files.isDirectory(sel)) {
+                            // Change directory
+                            changeDirectory(sel);
+                            lastClick = 0;
+                        } else if (target == FileChooserTarget.FILES && (filter == null || filter.accept(sel))) {
+                            // Accept
+                            acceptButton.fire(new ChangeListener.ChangeEvent());
 
+                            lastClick = 0;
+                        }
+                    }catch(IOException e){
+                        logger.error(e);
                         lastClick = 0;
                     }
                 } else if (event.getType() == Type.touchUp) {
@@ -217,15 +230,19 @@ public class FileChooser extends GenericDialog {
         hidden.addListener(event -> {
             if (event instanceof ChangeListener.ChangeEvent) {
                 this.showHidden = hidden.isChecked();
-                changeDirectory(currentDir);
+                try {
+                    changeDirectory(currentDir);
+                } catch (IOException e) {
+                    logger.error(e);
+                }
                 return true;
             }
             return false;
         });
 
         filter = pathname -> {
-            boolean root = (pathname.isDirectory() && directoryBrowsingEnabled) || (pathname.isFile() && fileBrowsingEnabled);
-            if (root && pathnameFilter != null && pathname.isFile()) {
+            boolean root = (Files.isDirectory(pathname) && directoryBrowsingEnabled) || (Files.isRegularFile(pathname) && fileBrowsingEnabled);
+            if (root && pathnameFilter != null && Files.isRegularFile(pathname)) {
                 root = pathnameFilter.accept(pathname);
             }
             return root;
@@ -243,13 +260,17 @@ public class FileChooser extends GenericDialog {
             stage.setKeyboardFocus(fileNameInput);
         }
 
-        changeDirectory(baseDir);
+        try {
+            changeDirectory(baseDir);
+        } catch (IOException e) {
+            logger.error(e);
+        }
     }
 
-    private void changeDirectory(FileHandle directory) {
-        FileHandle lastDir = directory != currentDir ? currentDir : null;
+    private void changeDirectory(Path directory) throws IOException {
+        Path lastDir = directory != currentDir ? currentDir : null;
         currentDir = directory;
-        String path = currentDir.path();
+        String path = currentDir.toAbsolutePath().toString();
 
         maxPathLength = 6.5f;
         while (path.length() * maxPathLength > scrollPaneWidth * 0.9f) {
@@ -259,11 +280,11 @@ public class FileChooser extends GenericDialog {
 
         final Array<FileListItem> items = new Array<>();
 
-        final FileHandle[] list = directory.list(filter);
-        for (final FileHandle handle : list) {
+        DirectoryStream<Path> list = Files.newDirectoryStream(directory, filter);
+        for (final Path handle : list) {
             // Only list hidden if user chose it
-            if (showHidden || !handle.name().startsWith(".")) {
-                if(pathnameFilter != null && pathnameFilter.accept(handle.file()) || handle.isDirectory() && directoryBrowsingEnabled) {
+            if (showHidden || !handle.getFileName().startsWith(".")) {
+                if(pathnameFilter != null && pathnameFilter.accept(handle) || Files.isDirectory(handle) && directoryBrowsingEnabled) {
                     FileListItem fli = new FileListItem(handle);
                     items.add(fli);
                 }
@@ -272,21 +293,21 @@ public class FileChooser extends GenericDialog {
 
         items.sort(dirListComparator);
 
-        if (directory.file().getParentFile() != null) {
-            items.insert(0, new FileListItem("..", directory.parent()));
+        if (directory.getParent() != null) {
+            items.insert(0, new FileListItem("..", directory.getParent()));
         }
 
         acceptButton.setDisabled(true);
         fileList.setItems(items);
         scrollPane.layout();
 
-        if (lastDir != null && lastDir.parent().equals(currentDir)) {
+        if (lastDir != null && lastDir.getParent().equals(currentDir)) {
             // select last if we're going back
             Array<FileListItem> l = fileList.getItems();
             for (FileListItem fli : l) {
                 if (fli.file.equals(lastDir)) {
                     fileList.setSelected(fli);
-                    acceptButton.setDisabled(!isTargetOk(fli.file.file()));
+                    acceptButton.setDisabled(!isTargetOk(fli.file));
                     break;
                 }
             }
@@ -298,12 +319,12 @@ public class FileChooser extends GenericDialog {
         }
     }
 
-    private boolean isTargetOk(File file) {
+    private boolean isTargetOk(Path file) {
         switch (target) {
         case FILES:
-            return file.isFile();
+            return Files.isRegularFile(file);
         case DIRECTORIES:
-            return file.isDirectory();
+            return Files.isDirectory(file);
         default:
             return true;
         }
@@ -317,7 +338,7 @@ public class FileChooser extends GenericDialog {
                     ArraySelection<FileListItem> as = list.getSelection();
                     if (as != null && as.hasItems()) {
                         FileChooser.FileListItem selected = as.getLastSelected();
-                        acceptButton.setDisabled(!isTargetOk(selected.file.file()));
+                        acceptButton.setDisabled(!isTargetOk(selected.file));
                     }
                 }
                 return true;
@@ -330,12 +351,12 @@ public class FileChooser extends GenericDialog {
         acceptedFiles.setText("Accepted: " + accepted);
     }
 
-    public FileHandle getResult() {
-        String path = currentDir.path() + "/";
+    public Path getResult() {
+        String path = currentDir.toAbsolutePath().toString() + "/";
         if (result != null && result.length() > 0) {
-            String folder = currentDir.file().getName();
+            String folder = currentDir.getFileName().toString();
             if (folder.equals(result)) {
-                if ((new FileHandle(path + result)).exists()) {
+                if (Files.exists(Paths.get(path, result))) {
                     path += result;
                 } else {
                     // Nothing
@@ -344,7 +365,7 @@ public class FileChooser extends GenericDialog {
                 path += result;
             }
         }
-        return new FileHandle(path);
+        return Paths.get(path);
     }
 
     /**
@@ -355,7 +376,7 @@ public class FileChooser extends GenericDialog {
      * @param filter The new file filter
      * @return This file chooser
      */
-    public FileChooser setFilter(FileFilter filter) {
+    public FileChooser setFilter(DirectoryStream.Filter<Path> filter) {
         this.filter = filter;
         return this;
     }
@@ -370,7 +391,12 @@ public class FileChooser extends GenericDialog {
      */
     public FileChooser setFileFilter(PathnameFilter f) {
         this.pathnameFilter = f;
-        changeDirectory(currentDir);
+        try {
+            changeDirectory(currentDir);
+        } catch (IOException e) {
+           logger.error(e);
+        }
+
         return this;
     }
 
@@ -422,15 +448,15 @@ public class FileChooser extends GenericDialog {
 
     public class FileListItem {
 
-        public FileHandle file;
+        public Path file;
         public String name;
 
-        public FileListItem(FileHandle file) {
+        public FileListItem(Path file) {
             this.file = file;
-            this.name = file.name();
+            this.name = file.getFileName().toString();
         }
 
-        public FileListItem(String name, FileHandle file) {
+        public FileListItem(String name, Path file) {
             this.file = file;
             this.name = name;
         }
@@ -442,7 +468,7 @@ public class FileChooser extends GenericDialog {
     }
 
     public interface PathnameFilter {
-        boolean accept(File pathname);
+        boolean accept(Path pathname);
     }
 
 }
