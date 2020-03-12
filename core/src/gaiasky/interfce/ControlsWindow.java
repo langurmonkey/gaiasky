@@ -225,9 +225,10 @@ public class ControlsWindow extends CollapsibleWindow implements IObserver {
 
         Table buttonsTable;
         /** BUTTONS **/
+        float bw = 30f * GlobalConf.UI_SCALE_FACTOR, bh = 30f * GlobalConf.UI_SCALE_FACTOR;
         KeyBindings kb = KeyBindings.instance;
-        Image mapIcon = new Image(skin.getDrawable("map-icon"));
-        map = new OwnTextIconButton("", mapIcon, skin, "toggle");
+        map = new OwnTextIconButton("", skin, "map");
+        map.setSize(bw, bh);
         map.setName("map");
         map.setChecked(GlobalConf.program.DISPLAY_MINIMAP);
         String minimapHotkey = kb.getStringKeys("action.toggle/gui.minimap.title");
@@ -239,6 +240,7 @@ public class ControlsWindow extends CollapsibleWindow implements IObserver {
             return false;
         });
         Button load = new OwnTextIconButton("", skin, "load");
+        load.setSize(bw, bh);
         load.setName("loadcatalog");
         load.addListener(new OwnTextTooltip(I18n.txt("gui.loadcatalog"), skin));
         load.addListener(event -> {
@@ -248,6 +250,7 @@ public class ControlsWindow extends CollapsibleWindow implements IObserver {
             return false;
         });
         Button preferences = new OwnTextIconButton("", skin, "preferences");
+        preferences.setSize(bw, bh);
         preferences.setName("preferences");
         String prefsHotkey = kb.getStringKeys("action.preferences");
         preferences.addListener(new OwnTextHotkeyTooltip(I18n.txt("gui.preferences"), prefsHotkey, skin));
@@ -258,6 +261,7 @@ public class ControlsWindow extends CollapsibleWindow implements IObserver {
             return false;
         });
         Button showLog = new OwnTextIconButton("", skin, "log");
+        showLog.setSize(bw, bh);
         showLog.setName("show log");
         showLog.addListener(new OwnTextTooltip(I18n.txt("gui.tooltip.log"), skin));
         showLog.addListener((event) -> {
@@ -267,6 +271,7 @@ public class ControlsWindow extends CollapsibleWindow implements IObserver {
             return false;
         });
         Button about = new OwnTextIconButton("", skin, "help");
+        about.setSize(bw, bh);
         about.setName("about");
         String helpHotkey = kb.getStringKeys("action.help");
         about.addListener(new OwnTextHotkeyTooltip(I18n.txt("gui.help"), helpHotkey, skin));
@@ -277,6 +282,7 @@ public class ControlsWindow extends CollapsibleWindow implements IObserver {
             return false;
         });
         Button quit = new OwnTextIconButton("", skin, "quit");
+        quit.setSize(bw, bh);
         quit.setName("quit");
         quit.addListener(new OwnTextHotkeyTooltip(I18n.txt("gui.quit.title"), kb.getStringKeys("action.exit"), skin));
         quit.addListener(event -> {

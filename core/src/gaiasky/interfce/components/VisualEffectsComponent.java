@@ -91,7 +91,7 @@ public class VisualEffectsComponent extends GuiComponent implements IObserver {
         });
 
         /** Label size **/
-        labelSize = new OwnSliderPlus(I18n.txt("gui.label.size"), Constants.MIN_LABEL_SIZE, Constants.MAX_LABEL_SIZE, Constants.SLIDER_STEP_SMALL, skin);
+        labelSize = new OwnSliderPlus(I18n.txt("gui.label.size"), Constants.MIN_LABEL_SIZE, Constants.MAX_LABEL_SIZE, Constants.SLIDER_STEP_TINY, skin);
         labelSize.setName("label size");
         labelSize.setWidth(sliderWidth);
         labelSize.setMappedValue(GlobalConf.scene.LABEL_SIZE_FACTOR);
@@ -105,7 +105,7 @@ public class VisualEffectsComponent extends GuiComponent implements IObserver {
         });
 
         /** Line width **/
-        lineWidth = new OwnSliderPlus(I18n.txt("gui.line.width"), Constants.MIN_LINE_WIDTH, Constants.MAX_LINE_WIDTH, Constants.SLIDER_STEP_SMALL, Constants.MIN_LINE_WIDTH, Constants.MAX_LINE_WIDTH, skin);
+        lineWidth = new OwnSliderPlus(I18n.txt("gui.line.width"), Constants.MIN_LINE_WIDTH, Constants.MAX_LINE_WIDTH, Constants.SLIDER_STEP_TINY, Constants.MIN_LINE_WIDTH, Constants.MAX_LINE_WIDTH, skin);
         lineWidth.setName("line width");
         lineWidth.setWidth(sliderWidth);
         lineWidth.setMappedValue(GlobalConf.scene.LINE_WIDTH_FACTOR);
