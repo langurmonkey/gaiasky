@@ -26,8 +26,11 @@ public class UCDParser {
     private static String[] idcolnames = new String[] { "hip", "id", "source_id", "tycho2_id" };
     private static String[] namecolnames = new String[] { "name", "proper", "proper_name", "common_name", "designation" };
     private static String[] pos1colnames = new String[] { "ra", "right_ascension", "rightascension", "alpha" };
+    private static String[] pos1cartcolnames = new String[] { "x", "X" };
     private static String[] pos2colnames = new String[] { "dec", "de", "declination", "delta" };
+    private static String[] pos2cartcolnames = new String[] { "y", "Y" };
     private static String[] distcolnames = new String[] { "dist", "distance" };
+    private static String[] pos3cartcolnames = new String[] { "z", "Z" };
     private static String[] pllxcolnames = new String[] { "plx", "parallax", "pllx" };
     private static String[] magcolnames = new String[] { "phot_g_mean_mag", "mag", "bmag", "gmag" };
     private static String[] colorcolnames = new String[] { "b_v", "v_i", "bp_rp", "bp_g", "g_rp", "ci" };
@@ -137,9 +140,11 @@ public class UCDParser {
                     case "eq":
                         switch (coord) {
                         case "ra":
+                            setDefaultUnit(candidate, "deg");
                             add(candidate, pos1colnames, this.POS1);
                             break;
                         case "dec":
+                            setDefaultUnit(candidate, "deg");
                             add(candidate, pos2colnames, this.POS2);
                             break;
                         }
@@ -148,14 +153,17 @@ public class UCDParser {
                     case "galactic":
                         switch (coord) {
                         case "lon":
+                            setDefaultUnit(candidate, "deg");
                             this.POS1.add(candidate);
                             break;
                         case "lat":
+                            setDefaultUnit(candidate, "deg");
                             this.POS2.add(candidate);
                             break;
                         }
                         break;
                     case "cartesian":
+                        setDefaultUnit(candidate, "pc");
                         switch (coord) {
                         case "x":
                             this.POS1.add(candidate);
@@ -169,9 +177,11 @@ public class UCDParser {
                         }
                         break;
                     case "parallax":
+                        setDefaultUnit(candidate, "mas");
                         add(candidate, pllxcolnames, this.POS3);
                         break;
                     case "distance":
+                        setDefaultUnit(candidate, "pc");
                         add(candidate, distcolnames, this.POS3);
                         break;
                     }
@@ -187,6 +197,12 @@ public class UCDParser {
                 if (this.POS3.isEmpty()) {
                     this.POS3 = getByColNames(pllxcolnames, "mas");
                 }
+            }
+            // Try cartesian
+            if (this.POS1.isEmpty() || this.POS2.isEmpty()) {
+                this.POS1 = getByColNames(pos1cartcolnames, "pc");
+                this.POS2 = getByColNames(pos2cartcolnames, "pc");
+                this.POS3 = getByColNames(pos3cartcolnames, "pc");
             }
         }
 
@@ -400,6 +416,13 @@ public class UCDParser {
         else if (cart)
             return "cartesian";
         return "";
+    }
+
+    private void setDefaultUnit(UCD candidate, String unit){
+        // Default unit
+        if(candidate.unit == null){
+            candidate.unit = unit;
+        }
     }
 
     /**

@@ -177,7 +177,7 @@ public class STILDataProvider extends AbstractStarGroupDataProvider {
                         Position p = new Position(a.getSecond(), a.getFirst().unit, b.getSecond(), b.getFirst().unit, c.getSecond(), unitc, pt);
 
                         double distpc = p.gsposition.len();
-                        if(!Double.isFinite(distpc) || distpc <= 0){
+                        if((pt.isParallax() && c.getSecond() <= 0) || !Double.isFinite(distpc) || distpc < 0){
                             // Next
                             break;
                         }
@@ -220,7 +220,7 @@ public class STILDataProvider extends AbstractStarGroupDataProvider {
                         double magscl = (dops != null && dops.type == DatasetOptions.DatasetLoadType.STARS) ? dops.magnitudeScale : 1f;
                         appmag /= magscl;
 
-                        double absmag = (appmag - 2.5 * Math.log10(Math.pow(distpc / 10.0, 2.0)));
+                        double absmag = appmag - 2.5 * Math.log10(Math.pow((distpc <= 0 ? 10 : distpc) / 10.0, 2.0));
                         double flux = Math.pow(10, -absmag / 2.5);
                         double sizeFactor = Nature.PC_TO_M * Constants.ORIGINAL_M_TO_U * 0.16;
                         double size = Math.min((Math.pow(flux, 0.5) * sizeFactor), 1e9) / 1.5;
