@@ -4,15 +4,18 @@
  */
 
 /**
- * 
+ *
  */
 package gaiasky.util.parse;
 
+import java.util.Arrays;
+import java.util.List;
 import java.util.Locale;
+import java.util.stream.Collectors;
 
 /**
  * Parser utilities.
- * 
+ *
  * @author Miguel Gomes (mdg@uninova.pt)
  * @since 10/02/2015 14:29:47
  *
@@ -25,7 +28,7 @@ public final class Parser {
      * <p>
      * Parser supports leading/trailing whitespace.
      * </p>
-     * 
+     *
      * @param input
      *            String to parse
      * @return Parsed long or 0 if the parsing fails
@@ -84,7 +87,7 @@ public final class Parser {
      * <p>
      * Parser supports leading/trailing whitespace.
      * </p>
-     * 
+     *
      * @param input
      *            String to parse
      * @return Parsed long or 0 if the parsing fails
@@ -149,7 +152,7 @@ public final class Parser {
      * <p>
      * Parser is mostly locale unaware except for dot and comma for decimal
      * separator.
-     * 
+     *
      * @param input
      *            String to parse
      * @return Parsed double or Double.NaN if the parsing fails See also
@@ -302,7 +305,7 @@ public final class Parser {
      * <p>
      * Parser is mostly locale unaware except for dot and comma for decimal
      * separator.
-     * 
+     *
      * @param input
      *            String to parse
      * @return Parsed double or Double.NaN if the parsing fails
@@ -446,7 +449,7 @@ public final class Parser {
 
     /**
      * Method used to parse accepted boolean values in incoming messages
-     * 
+     *
      * @param what
      *            What to parse
      * @return True or false (also default return) depending on the value of
@@ -465,7 +468,7 @@ public final class Parser {
     /**
      * Parses an integer. If the input is not a valid integer representation it
      * returns 0.
-     * 
+     *
      * @param str
      *            The input string.
      * @return The integer representation of the string.
@@ -478,7 +481,7 @@ public final class Parser {
         if (str == null || (end = str.length()) == 0 || ((ch = str.charAt(0)) < '0' || ch > '9') && (!(sign = ch == '-') || ++idx == end || ((ch = str.charAt(idx)) < '0' || ch > '9')))
             return 0;
 
-        for (;; ival *= 10) {
+        for (; ; ival *= 10) {
             ival += '0' - ch;
             if (++idx == end)
                 return sign ? ival : -ival;
@@ -490,7 +493,7 @@ public final class Parser {
     /**
      * Parses an integer. Throws a {@link NumberFormatException} if the input is
      * not a valid integer representation.
-     * 
+     *
      * @param str
      *            The input string.
      * @return The integer representation of the string.
@@ -503,7 +506,7 @@ public final class Parser {
         if (str == null || (end = str.length()) == 0 || ((ch = str.charAt(0)) < '0' || ch > '9') && (!(sign = ch == '-') || ++idx == end || ((ch = str.charAt(idx)) < '0' || ch > '9')))
             throw new NumberFormatException(str);
 
-        for (;; ival *= 10) {
+        for (; ; ival *= 10) {
             ival += '0' - ch;
             if (++idx == end)
                 return sign ? ival : -ival;
@@ -515,7 +518,7 @@ public final class Parser {
     /**
      * Convenience method which uses the double parser and casts the result. It
      * will not throw Please check {@link Parser#parseDouble(String)}.
-     * 
+     *
      * @param input
      *            The input string.
      * @return The parsed float, or 0 if the parsing failed.
@@ -526,14 +529,56 @@ public final class Parser {
 
     /**
      * Convenience method which uses the double parser and casts the result.
-     * Please check {@link Parser#parseDouble(String)}
-     * 
+     * Please check {@link Parser#parseDoubleException(String)}
+     *
      * @param input
      *            The input string.
-     * @return The parsed float, or 0 if the parsing failed.
+     * @return The parsed float, or {@link Float#NaN} if the parsing failed.
+     * @throws NumberFormatException if the parsing failed.
      */
-    public static float parseFloatException(String input) {
-        return (float) parseDouble(input);
+    public static float parseFloatException(String input) throws NumberFormatException {
+        return (float) parseDoubleException(input);
     }
 
+    /**
+     * Parses a float array in the form '[a, b, c, ...]
+     * @param input The input string.
+     * @return The parsed float array, or null if the parsing failed.
+     */
+    public static float[] parseFloatArray(String input) {
+        if (input == null) {
+            return null;
+        }
+        input = input.trim();
+        String[] tokens = input.substring(1, input.length() - 1).split(",");
+        List<Float> list = Arrays.stream(tokens).map(token -> parseFloat(token)).collect(Collectors.toList());
+        float[] result = new float[list.size()];
+        int i = 0;
+        for (Float f : list) {
+            result[i] = f;
+            i++;
+        }
+        return result;
+    }
+
+    /**
+     * Parses a float array in the form '[a, b, c, ...]
+     * @param input The input string.
+     * @return The parsed float array, or null if the parsing failed.
+     */
+    public static float[] parseFloatArrayException(String input) throws NumberFormatException {
+        if (input == null) {
+            return null;
+        }
+        input = input.trim();
+        String[] tokens = input.substring(1, input.length() - 1).split(",");
+        List<Float> list = Arrays.stream(tokens).map(token -> parseFloatException(token)).collect(Collectors.toList());
+        float[] result = new float[list.size()];
+        int i = 0;
+        for (Float f : list) {
+            result[i] = f;
+            i++;
+        }
+        return result;
+    }
 }

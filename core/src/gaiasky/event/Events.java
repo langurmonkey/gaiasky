@@ -280,6 +280,11 @@ public enum Events {
      */
     DISPLAY_POINTER_COORDS_CMD,
 
+    /**
+     * Contains the state (boolean), the color (float[4]) and the line width (float)
+     */
+    POINTER_GUIDES_CMD,
+
     /** Displays VR Controller hints **/
     DISPLAY_VR_CONTROLLER_HINT_CMD,
     /** A controller has been connected, contains the name **/

@@ -862,6 +862,9 @@ public class GlobalConf {
         public String LOCALE;
         public boolean DISPLAY_HUD;
         public boolean DISPLAY_POINTER_COORDS;
+        public boolean DISPLAY_POINTER_GUIDES;
+        public float[] POINTER_GUIDES_COLOR;
+        public float POINTER_GUIDES_WIDTH;
         public boolean DISPLAY_MINIMAP;
         public float MINIMAP_SIZE;
         public boolean MINIMAP_IN_WINDOW = false;
@@ -885,11 +888,11 @@ public class GlobalConf {
         public boolean DISPLAY_DATASET_DIALOG;
 
         public ProgramConf() {
-            EventManager.instance.subscribe(this, Events.STEREOSCOPIC_CMD, Events.STEREO_PROFILE_CMD, Events.CUBEMAP_CMD, Events.CUBEMAP_PROJECTION_CMD, Events.SHOW_MINIMAP_ACTION, Events.TOGGLE_MINIMAP, Events.PLANETARIUM_APERTURE_CMD, Events.CUBEMAP_PROJECTION_CMD, Events.CUBEMAP_RESOLUTION_CMD);
+            EventManager.instance.subscribe(this, Events.STEREOSCOPIC_CMD, Events.STEREO_PROFILE_CMD, Events.CUBEMAP_CMD, Events.CUBEMAP_PROJECTION_CMD, Events.SHOW_MINIMAP_ACTION, Events.TOGGLE_MINIMAP, Events.PLANETARIUM_APERTURE_CMD, Events.CUBEMAP_PROJECTION_CMD, Events.CUBEMAP_RESOLUTION_CMD, Events.POINTER_GUIDES_CMD);
         }
 
         public void initialize(boolean sHOW_DEBUG_INFO, Instant lAST_CHECKED, String lAST_VERSION, String vERSION_CHECK_URL, String dATA_DESCRIPTOR_URL, String uI_THEME, String sCRIPT_LOCATION, int rEST_PORT, String lOCALE, boolean sTEREOSCOPIC_MODE, StereoProfile sTEREO_PROFILE, boolean cUBEMAP_MODE, CubemapProjections.CubemapProjection cUBEMAP_PROJECTION, int cUBEMAP_FACE_RESOLUTION, boolean dISPLAY_HUD, boolean dISPLAY_POINTER_COORDS, boolean dISPLAY_DATASET_DIALOG, boolean nET_MASTER, boolean nET_SLAVE, List<String> nET_MASTER_SLAVES, String nET_SLAVE_CONFIG,
-                float nET_SLAVE_YAW, float nET_SLAVE_PITCH, float nET_SLAVE_ROLL, String nET_SLAVE_WARP, String nET_SLAVE_BLEND, String lAST_OPEN_LOCATION, boolean dISPLAY_MINIMAP, float mINIMAP_SIZE, float pLANETARIUM_APERTURE, float pLANETARIUM_ANGLE) {
+                float nET_SLAVE_YAW, float nET_SLAVE_PITCH, float nET_SLAVE_ROLL, String nET_SLAVE_WARP, String nET_SLAVE_BLEND, String lAST_OPEN_LOCATION, boolean dISPLAY_MINIMAP, float mINIMAP_SIZE, float pLANETARIUM_APERTURE, float pLANETARIUM_ANGLE, boolean dISPLAY_POINTER_GUIDES, float[] pOINTER_GUIDES_COLOR, float pOINTER_GUIDES_WIDTH) {
             SHOW_DEBUG_INFO = sHOW_DEBUG_INFO;
             VERSION_LAST_TIME = lAST_CHECKED;
             VERSION_LAST_VERSION = lAST_VERSION;
@@ -921,6 +924,9 @@ public class GlobalConf {
             MINIMAP_SIZE = mINIMAP_SIZE;
             PLANETARIUM_APERTURE = pLANETARIUM_APERTURE;
             PLANETARIUM_ANGLE = pLANETARIUM_ANGLE;
+            DISPLAY_POINTER_GUIDES = dISPLAY_POINTER_GUIDES;
+            POINTER_GUIDES_COLOR = pOINTER_GUIDES_COLOR;
+            POINTER_GUIDES_WIDTH = pOINTER_GUIDES_WIDTH;
         }
 
         public void initialize(boolean sHOW_DEBUG_INFO, String uI_THEME, String lOCALE, boolean sTEREOSCOPIC_MODE, StereoProfile sTEREO_PROFILE) {
@@ -1078,6 +1084,18 @@ public class GlobalConf {
                 break;
             case PLANETARIUM_APERTURE_CMD:
                 PLANETARIUM_APERTURE = (float) data[0];
+                break;
+            case POINTER_GUIDES_CMD:
+                if(data.length > 0 && data[0] != null) {
+                    DISPLAY_POINTER_GUIDES = (boolean) data[0];
+                    if(data.length > 1 && data[1] != null){
+                        POINTER_GUIDES_COLOR = (float[]) data[1];
+                        if(data.length >2 && data[2] != null){
+                            POINTER_GUIDES_WIDTH = (float) data[2];
+                        }
+                    }
+                }
+
                 break;
             default:
                 break;

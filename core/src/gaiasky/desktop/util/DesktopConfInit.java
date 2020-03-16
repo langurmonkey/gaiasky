@@ -32,6 +32,7 @@ import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
+import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.Locale;
 import java.util.Properties;
@@ -131,18 +132,18 @@ public class DesktopConfInit extends ConfInit {
         /** POSTPROCESS CONF **/
         PostprocessConf ppc = new PostprocessConf();
         Antialias POSTPROCESS_ANTIALIAS = ppc.getAntialias(Integer.parseInt(p.getProperty("postprocess.antialiasing")));
-        float POSTPROCESS_BLOOM_INTENSITY = Float.parseFloat(p.getProperty("postprocess.bloom.intensity"));
-        boolean POSTPROCESS_MOTION_BLUR = Float.parseFloat(p.getProperty("postprocess.motionblur")) > 0;
+        float POSTPROCESS_BLOOM_INTENSITY = Parser.parseFloat(p.getProperty("postprocess.bloom.intensity"));
+        boolean POSTPROCESS_MOTION_BLUR = Parser.parseFloat(p.getProperty("postprocess.motionblur")) > 0;
         boolean POSTPROCESS_LENS_FLARE = Boolean.parseBoolean(p.getProperty("postprocess.lensflare"));
         boolean POSTPROCESS_LIGHT_SCATTERING = Boolean.parseBoolean(p.getProperty("postprocess.lightscattering", "false"));
         boolean POSTPROCESS_FISHEYE = Boolean.parseBoolean(p.getProperty("postprocess.fisheye", "false"));
-        float POSTPROCESS_BRIGHTNESS = Float.parseFloat(p.getProperty("postprocess.brightness", "0"));
-        float POSTPROCESS_CONTRAST = Float.parseFloat(p.getProperty("postprocess.contrast", "1"));
-        float POSTPROCESS_HUE = Float.parseFloat(p.getProperty("postprocess.hue", "1"));
-        float POSTPROCESS_SATURATION = Float.parseFloat(p.getProperty("postprocess.saturation", "1"));
-        float POSTPROCESS_GAMMA = Float.parseFloat(p.getProperty("postprocess.gamma", "1"));
+        float POSTPROCESS_BRIGHTNESS = Parser.parseFloat(p.getProperty("postprocess.brightness", "0"));
+        float POSTPROCESS_CONTRAST = Parser.parseFloat(p.getProperty("postprocess.contrast", "1"));
+        float POSTPROCESS_HUE = Parser.parseFloat(p.getProperty("postprocess.hue", "1"));
+        float POSTPROCESS_SATURATION = Parser.parseFloat(p.getProperty("postprocess.saturation", "1"));
+        float POSTPROCESS_GAMMA = Parser.parseFloat(p.getProperty("postprocess.gamma", "1"));
         PostprocessConf.ToneMapping POSTPROCESS_TONEMAPPING_TYPE = PostprocessConf.ToneMapping.valueOf(p.getProperty("postprocess.tonemapping.type", "auto").toUpperCase());
-        float POSTPROCESS_EXPOSURE = Float.parseFloat(p.getProperty("postprocess.exposure", "0"));
+        float POSTPROCESS_EXPOSURE = Parser.parseFloat(p.getProperty("postprocess.exposure", "0"));
         ppc.initialize(POSTPROCESS_ANTIALIAS, POSTPROCESS_BLOOM_INTENSITY, POSTPROCESS_MOTION_BLUR, POSTPROCESS_LENS_FLARE, POSTPROCESS_LIGHT_SCATTERING, POSTPROCESS_FISHEYE, POSTPROCESS_BRIGHTNESS, POSTPROCESS_CONTRAST, POSTPROCESS_HUE, POSTPROCESS_SATURATION, POSTPROCESS_GAMMA, POSTPROCESS_TONEMAPPING_TYPE, POSTPROCESS_EXPOSURE);
 
         /** RUNTIME CONF **/
@@ -168,7 +169,7 @@ public class DesktopConfInit extends ConfInit {
 
         float LIMIT_MAG_LOAD;
         if (p.getProperty("data.limit.mag") != null && !p.getProperty("data.limit.mag").isEmpty()) {
-            LIMIT_MAG_LOAD = Float.parseFloat(p.getProperty("data.limit.mag"));
+            LIMIT_MAG_LOAD = Parser.parseFloat(p.getProperty("data.limit.mag"));
         } else {
             LIMIT_MAG_LOAD = Float.MAX_VALUE;
         }
@@ -202,13 +203,13 @@ public class DesktopConfInit extends ConfInit {
         boolean CUBEMAP_MODE = Boolean.parseBoolean(p.getProperty("program.cubemap", "false"));
         CubemapProjection CUBEMAP_PROJECTION = CubemapProjection.valueOf(p.getProperty("program.cubemap.projection", "equirectangular").toUpperCase());
         int CUBEMAP_FACE_RESOLUTION = Integer.parseInt(p.getProperty("program.cubemap.face.resolution", "1500"));
-        float PLANETARIUM_APERTURE = Float.parseFloat(p.getProperty("program.planetarium.aperture", "180.0"));
-        float PLANETARIUM_ANGLE = Float.parseFloat(p.getProperty("program.planetarium.angle", "50.0"));
+        float PLANETARIUM_APERTURE = Parser.parseFloat(p.getProperty("program.planetarium.aperture", "180.0"));
+        float PLANETARIUM_ANGLE = Parser.parseFloat(p.getProperty("program.planetarium.angle", "50.0"));
         boolean DISPLAY_HUD = Boolean.parseBoolean(p.getProperty("program.display.hud", "false"));
-        boolean DISPLAY_POINTER_COORDS = Boolean.parseBoolean(p.getProperty("program.display.pointercoords", "true"));
+        boolean DISPLAY_POINTER_COORDS = Boolean.parseBoolean(p.getProperty("program.pointer.coords.display", "true"));
         boolean DISPLAY_DATASET_DIALOG = Boolean.parseBoolean(p.getProperty("program.catalog.chooser", "false"));
         boolean DISPLAY_MINIMAP = Boolean.parseBoolean(p.getProperty("program.display.minimap", "true"));
-        float MINIMAP_SIZE = MathUtilsd.clamp(Float.parseFloat(p.getProperty("program.minimap.size", "220f")), Constants.MIN_MINIMAP_SIZE, Constants.MAX_MINIMAP_SIZE);
+        float MINIMAP_SIZE = MathUtilsd.clamp(Parser.parseFloat(p.getProperty("program.minimap.size", "220.0")), Constants.MIN_MINIMAP_SIZE, Constants.MAX_MINIMAP_SIZE);
         boolean NET_MASTER = Boolean.parseBoolean(p.getProperty("program.net.master", "false"));
         boolean NET_SLAVE = Boolean.parseBoolean(p.getProperty("program.net.slave", "false"));
         String NET_SLAVE_CONFIG = p.getProperty("program.net.slave.config", "");
@@ -219,6 +220,11 @@ public class DesktopConfInit extends ConfInit {
         String NET_SLAVE_BLEND = p.getProperty("program.net.slave.blend", "");
         String LAST_FOLDER_LOCATION = p.getProperty("program.last.filesystem.location");
 
+        // Pointer guides
+        boolean DISPLAY_POINTER_GUIDES = Boolean.parseBoolean(p.getProperty("program.pointer.guides.display", "false"));
+        float[] POINTER_GUIDES_COLOR = Parser.parseFloatArray(p.getProperty("program.pointer.guides.color", "[1.0,1.0,1.0,0.3]"));
+        float POINTER_GUIDES_WIDTH = Parser.parseFloat(p.getProperty("program.pointer.guides.width", "1.5"));
+
         LinkedList<String> NET_MASTER_SLAVES = null;
         if (NET_MASTER) {
             NET_MASTER_SLAVES = new LinkedList<>();
@@ -228,7 +234,7 @@ public class DesktopConfInit extends ConfInit {
             }
         }
 
-        prc.initialize(SHOW_DEBUG_INFO, LAST_CHECKED, LAST_VERSION, VERSION_CHECK_URL, DATA_DESCRIPTOR_URL, UI_THEME, SCRIPT_LOCATION, REST_PORT, LOCALE, STEREOSCOPIC_MODE, STEREO_PROFILE, CUBEMAP_MODE, CUBEMAP_PROJECTION, CUBEMAP_FACE_RESOLUTION, DISPLAY_HUD, DISPLAY_POINTER_COORDS, DISPLAY_DATASET_DIALOG, NET_MASTER, NET_SLAVE, NET_MASTER_SLAVES, NET_SLAVE_CONFIG, NET_SLAVE_YAW, NET_SLAVE_PITCH, NET_SLAVE_ROLL, NET_SLAVE_WARP, NET_SLAVE_BLEND, LAST_FOLDER_LOCATION, DISPLAY_MINIMAP, MINIMAP_SIZE, PLANETARIUM_APERTURE, PLANETARIUM_ANGLE);
+        prc.initialize(SHOW_DEBUG_INFO, LAST_CHECKED, LAST_VERSION, VERSION_CHECK_URL, DATA_DESCRIPTOR_URL, UI_THEME, SCRIPT_LOCATION, REST_PORT, LOCALE, STEREOSCOPIC_MODE, STEREO_PROFILE, CUBEMAP_MODE, CUBEMAP_PROJECTION, CUBEMAP_FACE_RESOLUTION, DISPLAY_HUD, DISPLAY_POINTER_COORDS, DISPLAY_DATASET_DIALOG, NET_MASTER, NET_SLAVE, NET_MASTER_SLAVES, NET_SLAVE_CONFIG, NET_SLAVE_YAW, NET_SLAVE_PITCH, NET_SLAVE_ROLL, NET_SLAVE_WARP, NET_SLAVE_BLEND, LAST_FOLDER_LOCATION, DISPLAY_MINIMAP, MINIMAP_SIZE, PLANETARIUM_APERTURE, PLANETARIUM_ANGLE, DISPLAY_POINTER_GUIDES, POINTER_GUIDES_COLOR, POINTER_GUIDES_WIDTH);
 
         /** SCENE CONF **/
         String gc = p.getProperty("scene.graphics.quality");
@@ -243,37 +249,37 @@ public class DesktopConfInit extends ConfInit {
         }
         String STARTUP_OBJECT = p.getProperty("scene.object.startup", "Earth");
         long OBJECT_FADE_MS = Long.parseLong(p.getProperty("scene.object.fadems"));
-        float STAR_BRIGHTNESS = Float.parseFloat(p.getProperty("scene.star.brightness"));
-        float STAR_BRIGHTNESS_POWER = Float.parseFloat(p.getProperty("scene.star.brightness.pow", "1.0"));
-        float AMBIENT_LIGHT = Float.parseFloat(p.getProperty("scene.ambient"));
-        float CAMERA_FOV = Float.parseFloat(p.getProperty("scene.camera.fov"));
+        float STAR_BRIGHTNESS = Parser.parseFloat(p.getProperty("scene.star.brightness"));
+        float STAR_BRIGHTNESS_POWER = Parser.parseFloat(p.getProperty("scene.star.brightness.pow", "1.0"));
+        float AMBIENT_LIGHT = Parser.parseFloat(p.getProperty("scene.ambient"));
+        float CAMERA_FOV = Parser.parseFloat(p.getProperty("scene.camera.fov"));
         int CAMERA_SPEED_LIMIT_IDX = Integer.parseInt(p.getProperty("scene.camera.speedlimit"));
-        float CAMERA_SPEED = Float.parseFloat(p.getProperty("scene.camera.focus.vel"));
+        float CAMERA_SPEED = Parser.parseFloat(p.getProperty("scene.camera.focus.vel"));
         boolean FOCUS_LOCK = Boolean.parseBoolean(p.getProperty("scene.focuslock"));
         boolean FOCUS_LOCK_ORIENTATION = Boolean.parseBoolean(p.getProperty("scene.focuslock.orientation", "false"));
-        float TURNING_SPEED = Float.parseFloat(p.getProperty("scene.camera.turn.vel"));
-        float ROTATION_SPEED = Float.parseFloat(p.getProperty("scene.camera.rotate.vel"));
-        float LABEL_SIZE_FACTOR = Float.parseFloat(p.getProperty("scene.label.size"));
-        float LABEL_NUMBER_FACTOR = Float.parseFloat(p.getProperty("scene.label.number"));
-        float LINE_WIDTH_FACTOR = Float.parseFloat(p.getProperty("scene.line.width", "1.0"));
+        float TURNING_SPEED = Parser.parseFloat(p.getProperty("scene.camera.turn.vel"));
+        float ROTATION_SPEED = Parser.parseFloat(p.getProperty("scene.camera.rotate.vel"));
+        float LABEL_SIZE_FACTOR = Parser.parseFloat(p.getProperty("scene.label.size"));
+        float LABEL_NUMBER_FACTOR = Parser.parseFloat(p.getProperty("scene.label.number"));
+        float LINE_WIDTH_FACTOR = Parser.parseFloat(p.getProperty("scene.line.width", "1.0"));
         double STAR_TH_ANGLE_QUAD = Double.parseDouble(p.getProperty("scene.star.threshold.quad"));
         double STAR_TH_ANGLE_POINT = Double.parseDouble(p.getProperty("scene.star.threshold.point"));
         double STAR_TH_ANGLE_NONE = Double.parseDouble(p.getProperty("scene.star.threshold.none"));
-        float POINT_ALPHA_MIN = Float.parseFloat(p.getProperty("scene.point.alpha.min"));
-        float POINT_ALPHA_MAX = Float.parseFloat(p.getProperty("scene.point.alpha.max"));
+        float POINT_ALPHA_MIN = Parser.parseFloat(p.getProperty("scene.point.alpha.min"));
+        float POINT_ALPHA_MAX = Parser.parseFloat(p.getProperty("scene.point.alpha.max"));
         int ORBIT_RENDERER = Integer.parseInt(p.getProperty("scene.renderer.orbit", "0"));
         int LINE_RENDERER = Integer.parseInt(p.getProperty("scene.renderer.line"));
         boolean OCTREE_PARTICLE_FADE = Boolean.parseBoolean(p.getProperty("scene.octree.particle.fade"));
-        float OCTANT_THRESHOLD_0 = Float.parseFloat(p.getProperty("scene.octant.threshold.0"));
-        float OCTANT_THRESHOLD_1 = Float.parseFloat(p.getProperty("scene.octant.threshold.1"));
+        float OCTANT_THRESHOLD_0 = Parser.parseFloat(p.getProperty("scene.octant.threshold.0"));
+        float OCTANT_THRESHOLD_1 = Parser.parseFloat(p.getProperty("scene.octant.threshold.1"));
         // Limiting draw distance in 32-bit JVM
         if (ARCH.equals("32")) {
             float delta = Math.abs(OCTANT_THRESHOLD_1 - OCTANT_THRESHOLD_0);
             OCTANT_THRESHOLD_0 = (float) Math.toRadians(80);
             OCTANT_THRESHOLD_1 = OCTANT_THRESHOLD_0 + delta;
         }
-        float PM_NUM_FACTOR = Float.parseFloat(p.getProperty("scene.propermotion.numfactor", "20f"));
-        float PM_LEN_FACTOR = Float.parseFloat(p.getProperty("scene.propermotion.lenfactor", "1E1f"));
+        float PM_NUM_FACTOR = Parser.parseFloat(p.getProperty("scene.propermotion.numfactor", "20.0"));
+        float PM_LEN_FACTOR = Parser.parseFloat(p.getProperty("scene.propermotion.lenfactor", "1E1"));
         long N_PM_STARS = Long.parseLong(p.getProperty("scene.propermotion.maxnumber", "-1"));
         int PM_COLOR_MODE = Integer.parseInt(p.getProperty("scene.propermotion.colormode", "0"));
         boolean PM_ARROWHEADS = Boolean.parseBoolean(p.getProperty("scene.propermotion.arrowheads", "true"));
@@ -301,7 +307,7 @@ public class DesktopConfInit extends ConfInit {
                 VISIBILITY[ct.ordinal()] = Boolean.parseBoolean(p.getProperty(key));
             }
         }
-        float STAR_POINT_SIZE = Float.parseFloat(p.getProperty("scene.star.point.size", "-1"));
+        float STAR_POINT_SIZE = Parser.parseFloat(p.getProperty("scene.star.point.size", "-1.0"));
         boolean LAZY_TEXTURE_INIT = Boolean.parseBoolean(p.getProperty("scene.lazy.texture", "true"));
         boolean LAZY_MESH_INIT = Boolean.parseBoolean(p.getProperty("scene.lazy.mesh", "true"));
         ElevationType ELEVATION_TYPE = ElevationType.valueOf(p.getProperty("scene.elevation.type", "tessellation").toUpperCase());
@@ -335,7 +341,7 @@ public class DesktopConfInit extends ConfInit {
 
         ScreenshotMode FRAME_MODE = ScreenshotMode.valueOf(p.getProperty("graphics.render.mode"));
         ImageFormat FRAME_FORMAT = ImageFormat.valueOf(p.getProperty("graphics.render.format", "jpg").toUpperCase());
-        float FRAME_QUALITY = Float.parseFloat(p.getProperty("graphics.render.quality", "0.93"));
+        float FRAME_QUALITY = Parser.parseFloat(p.getProperty("graphics.render.quality", "0.93"));
 
         CameraKeyframeManager.PathType KF_POS = CameraKeyframeManager.PathType.valueOf(p.getProperty("graphics.camera.keyframe.path.position", CameraKeyframeManager.PathType.SPLINE.toString()));
         CameraKeyframeManager.PathType KF_ORI = CameraKeyframeManager.PathType.valueOf(p.getProperty("graphics.camera.keyframe.path.orientation", CameraKeyframeManager.PathType.SPLINE.toString()));
@@ -370,7 +376,7 @@ public class DesktopConfInit extends ConfInit {
         int SCREENSHOT_HEIGHT = Integer.parseInt(p.getProperty("screenshot.height"));
         ScreenshotMode SCREENSHOT_MODE = ScreenshotMode.valueOf(p.getProperty("screenshot.mode"));
         ImageFormat SCREENSHOT_FORMAT = ImageFormat.valueOf(p.getProperty("screenshot.format", "jpg").toUpperCase());
-        float SCREENSHOT_QUALITY = Float.parseFloat(p.getProperty("screenshot.quality", "0.93"));
+        float SCREENSHOT_QUALITY = Parser.parseFloat(p.getProperty("screenshot.quality", "0.93"));
         ScreenshotConf shc = new ScreenshotConf();
         shc.initialize(SCREENSHOT_WIDTH, SCREENSHOT_HEIGHT, SCREENSHOT_FOLDER, SCREENSHOT_MODE, SCREENSHOT_FORMAT, SCREENSHOT_QUALITY);
 
@@ -385,9 +391,9 @@ public class DesktopConfInit extends ConfInit {
 
         /** SPACECRAFT CONF **/
         SpacecraftConf scc = new SpacecraftConf();
-        float sC_RESPONSIVENESS = MathUtilsd.lint(Float.parseFloat(p.getProperty("spacecraft.responsiveness", "0.1")), 0, 1, Constants.MIN_SC_RESPONSIVENESS, Constants.MAX_SC_RESPONSIVENESS);
+        float sC_RESPONSIVENESS = MathUtilsd.lint(Parser.parseFloat(p.getProperty("spacecraft.responsiveness", "0.1")), 0, 1, Constants.MIN_SC_RESPONSIVENESS, Constants.MAX_SC_RESPONSIVENESS);
         boolean sC_VEL_TO_DIRECTION = Boolean.parseBoolean(p.getProperty("spacecraft.velocity.direction", "false"));
-        float sC_HANDLING_FRICTION = Float.parseFloat(p.getProperty("spacecraft.handling.friction", "0.37"));
+        float sC_HANDLING_FRICTION = Parser.parseFloat(p.getProperty("spacecraft.handling.friction", "0.37"));
         boolean sC_SHOW_AXES = Boolean.parseBoolean(p.getProperty("spacecraft.show.axes", "false"));
 
         scc.initialize(sC_RESPONSIVENESS, sC_VEL_TO_DIRECTION, sC_HANDLING_FRICTION, sC_SHOW_AXES);
@@ -478,7 +484,10 @@ public class DesktopConfInit extends ConfInit {
 
         /** PROGRAM **/
         p.setProperty("program.display.hud", Boolean.toString(GlobalConf.program.DISPLAY_HUD));
-        p.setProperty("program.displaypointer.coords", Boolean.toString(GlobalConf.program.DISPLAY_POINTER_COORDS));
+        p.setProperty("program.pointer.coords.display", Boolean.toString(GlobalConf.program.DISPLAY_POINTER_COORDS));
+        p.setProperty("program.pointer.guides.display", Boolean.toString(GlobalConf.program.DISPLAY_POINTER_GUIDES));
+        p.setProperty("program.pointer.guides.color", Arrays.toString(GlobalConf.program.POINTER_GUIDES_COLOR));
+        p.setProperty("program.pointer.guides.width", Float.toString(GlobalConf.program.POINTER_GUIDES_WIDTH));
         p.setProperty("program.display.minimap", Boolean.toString(GlobalConf.program.DISPLAY_MINIMAP));
         p.setProperty("program.minimap.size", Float.toString(GlobalConf.program.MINIMAP_SIZE));
         p.setProperty("program.debuginfo", Boolean.toString(GlobalConf.program.SHOW_DEBUG_INFO));

@@ -259,6 +259,10 @@ public class Constants {
     public final static float MIN_COLOR_NOISE = 0.0f;
     public final static float MAX_COLOR_NOISE = 1.0f;
 
+    public final static float MIN_POINTER_GUIDES_WIDTH = 0.5f;
+    public final static float MAX_POINTER_GUIDES_WIDTH = 20f;
+
+
     // Max time, 5 Myr
     public static final long MAX_TIME_MS = 5000000l * (long) Nature.Y_TO_MS;
     // Min time, -5 Myr

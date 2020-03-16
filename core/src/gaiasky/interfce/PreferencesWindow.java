@@ -75,7 +75,11 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
 
     private INumberFormat nf3, nf1;
 
-    private CheckBox fullscreen, windowed, vsync, limitfpsCb, multithreadCb, lodFadeCb, cbAutoCamrec, real, nsl, report, inverty, highAccuracyPositions, shadowsCb, hidpiCb, pointerCoords, datasetChooser, debugInfo, crosshairFocus, crosshairClosest, crosshairHome;
+    private CheckBox fullscreen, windowed, vsync, limitfpsCb, multithreadCb,
+                    lodFadeCb, cbAutoCamrec, real, nsl, report,
+                    inverty, highAccuracyPositions, shadowsCb,
+                    hidpiCb, pointerCoords, datasetChooser, debugInfo,
+                    crosshairFocusCb, crosshairClosestCb, crosshairHomeCb, pointerGuidesCb;
     private OwnSelectBox<DisplayMode> fullscreenResolutions;
     private OwnSelectBox<ComboBoxBean> gquality, aa, orbitRenderer, lineRenderer, numThreads, screenshotMode, frameoutputMode, nshadows;
     private OwnSelectBox<LangComboBoxBean> lang;
@@ -83,8 +87,9 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
     private OwnSelectBox<String> theme;
     private OwnSelectBox<FileComboBoxBean> controllerMappings;
     private OwnTextField widthField, heightField, sswidthField, ssheightField, frameoutputPrefix, frameoutputFps, fowidthField, foheightField, camrecFps, cmResolution, plResolution, plAperture, plAngle, smResolution, limitFps;
-    private OwnSlider lodTransitions, tessQuality, minimapSize;
+    private OwnSlider lodTransitions, tessQuality, minimapSize, pointerGuidesWidth;
     private OwnTextButton screenshotsLocation, frameoutputLocation;
+    private ColorPicker pointerGuidesColor;
     private DatasetsWidget dw;
     private OwnLabel tessQualityLabel;
     private Cell noticeHiResCell;
@@ -722,6 +727,8 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         /*
          * ==== UI ====
          */
+        float labelWidth = 250f * GlobalConf.UI_SCALE_FACTOR;
+
         final Table contentUI = new Table(skin);
         contents.add(contentUI);
         contentUI.align(Align.top | Align.left);
@@ -732,6 +739,7 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
 
         // LANGUAGE
         OwnLabel langLabel = new OwnLabel(I18n.txt("gui.ui.language"), skin);
+        langLabel.setWidth(labelWidth);
         File i18nfolder = new File(GlobalConf.ASSETS_LOC + File.separator + "i18n");
         String i18nname = "gsbundle";
         String[] files = i18nfolder.list();
@@ -773,6 +781,7 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
 
         // THEME
         OwnLabel themeLabel = new OwnLabel(I18n.txt("gui.ui.theme"), skin);
+        themeLabel.setWidth(labelWidth);
         String[] themes = new String[] { "dark-green", "dark-blue", "dark-orange", "night-red" };
         theme = new OwnSelectBox<>(skin);
         theme.setWidth(textwidth * 3f);
@@ -788,16 +797,17 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         pointerCoords.setChecked(GlobalConf.program.DISPLAY_POINTER_COORDS);
 
         // MINIMAP SIZE
-        OwnLabel minimapsizel = new OwnLabel(I18n.txt("gui.ui.minimap.size"), skin, "default");
-        Label minimapsizeLabel = new OwnLabel(Integer.toString((int) GlobalConf.program.MINIMAP_SIZE), skin);
+        OwnLabel minimapSizeLabel = new OwnLabel(I18n.txt("gui.ui.minimap.size"), skin, "default");
+        minimapSizeLabel.setWidth(labelWidth);
+        OwnLabel minimapSizeValue = new OwnLabel(Integer.toString((int) GlobalConf.program.MINIMAP_SIZE), skin);
         minimapSize = new OwnSlider(Constants.MIN_MINIMAP_SIZE, Constants.MAX_MINIMAP_SIZE, 1f, skin);
         minimapSize.setName("minimapSize");
         minimapSize.setWidth(sliderWidth);
         minimapSize.setValue(GlobalConf.program.MINIMAP_SIZE);
-        minimapsizeLabel.setText((int) GlobalConf.program.MINIMAP_SIZE);
+        minimapSizeValue.setText((int) GlobalConf.program.MINIMAP_SIZE);
         minimapSize.addListener(event -> {
             if (event instanceof ChangeEvent) {
-                minimapsizeLabel.setText((int) minimapSize.getValue());
+                minimapSizeValue.setText((int) minimapSize.getValue());
                 return true;
             }
             return false;
@@ -812,10 +822,10 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         ui.add(themeLabel).left().padRight(pad5 * 4).padBottom(pad);
         ui.add(theme).left().padBottom(pad).row();
         ui.add(hidpiCb).colspan(2).left().padBottom(pad).row();
-        ui.add(pointerCoords).colspan(2).left().padRight(pad5 * 2).padBottom(pad).row();
-        ui.add(minimapsizel).left().padRight(pad5 * 4).padBottom(pad);
-        ui.add(minimapSize).left().padRight(pad5 * 4).padBottom(pad);
-        ui.add(minimapsizeLabel).left().padBottom(pad).row();
+        ui.add(pointerCoords).colspan(2).left().padRight(pad5).padBottom(pad).row();
+        ui.add(minimapSizeLabel).left().padRight(pad5).padBottom(pad);
+        ui.add(minimapSize).left().padRight(pad5).padBottom(pad);
+        ui.add(minimapSizeValue).left().padBottom(pad).row();
 
 
         /* CROSSHAIR AND MARKERS */
@@ -823,30 +833,72 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         Table ch = new Table();
 
         // CROSSHAIR FOCUS
-        crosshairFocus = new OwnCheckBox("" + I18n.txt("gui.ui.crosshair.focus"), skin, pad);
-        crosshairFocus.setName("ch focus");
-        crosshairFocus.setChecked(GlobalConf.scene.CROSSHAIR_FOCUS);
+        crosshairFocusCb = new OwnCheckBox("" + I18n.txt("gui.ui.crosshair.focus"), skin, pad);
+        crosshairFocusCb.setName("ch focus");
+        crosshairFocusCb.setChecked(GlobalConf.scene.CROSSHAIR_FOCUS);
 
         // CROSSHAIR CLOSEST
-        crosshairClosest = new OwnCheckBox("" + I18n.txt("gui.ui.crosshair.closest"), skin, pad);
-        crosshairClosest.setName("ch closest");
-        crosshairClosest.setChecked(GlobalConf.scene.CROSSHAIR_CLOSEST);
+        crosshairClosestCb = new OwnCheckBox("" + I18n.txt("gui.ui.crosshair.closest"), skin, pad);
+        crosshairClosestCb.setName("ch closest");
+        crosshairClosestCb.setChecked(GlobalConf.scene.CROSSHAIR_CLOSEST);
 
         // CROSSHAIR HOME
-        crosshairHome = new OwnCheckBox("" + I18n.txt("gui.ui.crosshair.home"), skin, pad);
-        crosshairHome.setName("ch home");
-        crosshairHome.setChecked(GlobalConf.scene.CROSSHAIR_HOME);
+        crosshairHomeCb = new OwnCheckBox("" + I18n.txt("gui.ui.crosshair.home"), skin, pad);
+        crosshairHomeCb.setName("ch home");
+        crosshairHomeCb.setChecked(GlobalConf.scene.CROSSHAIR_HOME);
 
         // Add to table
-        ch.add(crosshairFocus).left().padBottom(pad5).row();
-        ch.add(crosshairClosest).left().padBottom(pad5).row();
-        ch.add(crosshairHome).left().padBottom(pad5).row();
+        ch.add(crosshairFocusCb).left().padBottom(pad5).row();
+        ch.add(crosshairClosestCb).left().padBottom(pad5).row();
+        ch.add(crosshairHomeCb).left().padBottom(pad5).row();
+
+        /* POINTER GUIDES */
+        OwnLabel titleGuides = new OwnLabel(I18n.txt("gui.ui.pointer.guides"), skin, "help-title");
+        Table pg = new Table();
+
+        // GUIDES CHECKBOX
+        pointerGuidesCb = new OwnCheckBox("" + I18n.txt("gui.ui.pointer.guides"), skin, pad);
+        pointerGuidesCb.setName("pointer guides cb");
+        pointerGuidesCb.setChecked(GlobalConf.program.DISPLAY_POINTER_GUIDES);
+
+        // GUIDES COLOR
+        float cpsize = 20f * GlobalConf.UI_SCALE_FACTOR;
+        pointerGuidesColor = new ColorPicker(stage, skin);
+        pointerGuidesColor.setPickedColor(GlobalConf.program.POINTER_GUIDES_COLOR);
+
+        // GUIDES WIDTH
+        OwnLabel guidesWidthLabel = new OwnLabel(I18n.txt("gui.ui.pointer.guides.width"), skin, "default");
+        guidesWidthLabel.setWidth(labelWidth);
+        Label guidesWidthValue = new OwnLabel(nf1.format(GlobalConf.program.POINTER_GUIDES_WIDTH), skin);
+        pointerGuidesWidth = new OwnSlider(Constants.MIN_POINTER_GUIDES_WIDTH, Constants.MAX_POINTER_GUIDES_WIDTH, Constants.SLIDER_STEP_TINY, skin);
+        pointerGuidesWidth.setName("pointerguideswidth");
+        pointerGuidesWidth.setWidth(sliderWidth);
+        pointerGuidesWidth.setValue(GlobalConf.program.POINTER_GUIDES_WIDTH);
+        pointerGuidesWidth.addListener(event -> {
+            if (event instanceof ChangeEvent) {
+                guidesWidthValue.setText(nf1.format(pointerGuidesWidth.getValue()));
+                return true;
+            }
+            return false;
+        });
+
+        // Add to table
+        pg.add(pointerGuidesCb).left().colspan(2).padBottom(pad5).row();
+        pg.add(new OwnLabel(I18n.txt("gui.ui.pointer.guides.color"), skin)).left().padBottom(pad5).padRight(pad);
+        pg.add(pointerGuidesColor).left().size(cpsize).padBottom(pad5).row();
+        pg.add(guidesWidthLabel).left().padBottom(pad5).padRight(pad);
+        pg.add(pointerGuidesWidth).left().padBottom(pad5).padRight(pad);
+        pg.add(guidesWidthValue).left().padBottom(pad5);
+
 
         // Add to content
         contentUI.add(titleUI).left().padBottom(pad5 * 2).row();
         contentUI.add(ui).left().padBottom(pad5 * 4).row();
         contentUI.add(titleCrosshair).left().padBottom(pad5 * 2).row();
-        contentUI.add(ch).left();
+        contentUI.add(ch).left().padBottom(pad5 * 4).row();
+        contentUI.add(titleGuides).left().padBottom(pad5 * 2).row();
+        contentUI.add(pg).left();
+
 
         /*
          * ==== PERFORMANCE ====
@@ -1904,9 +1956,12 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         GlobalConf.updateScaleFactor(GlobalConf.program.UI_THEME.endsWith("x2") ? 1.6f : 1f);
 
         // Crosshairs
-        EventManager.instance.post(Events.CROSSHAIR_FOCUS_CMD, crosshairFocus.isChecked());
-        EventManager.instance.post(Events.CROSSHAIR_CLOSEST_CMD, crosshairClosest.isChecked());
-        EventManager.instance.post(Events.CROSSHAIR_HOME_CMD, crosshairHome.isChecked());
+        EventManager.instance.post(Events.CROSSHAIR_FOCUS_CMD, crosshairFocusCb.isChecked());
+        EventManager.instance.post(Events.CROSSHAIR_CLOSEST_CMD, crosshairClosestCb.isChecked());
+        EventManager.instance.post(Events.CROSSHAIR_HOME_CMD, crosshairHomeCb.isChecked());
+
+        // Pointer guides
+        EventManager.instance.post(Events.POINTER_GUIDES_CMD, pointerGuidesCb.isChecked(), pointerGuidesColor.getPickedColor(), pointerGuidesWidth.getMappedValue());
 
         // Minimap size
         GlobalConf.program.MINIMAP_SIZE = minimapSize.getValue();

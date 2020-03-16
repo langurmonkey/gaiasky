@@ -16,6 +16,8 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.Texture.TextureFilter;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
+import com.badlogic.gdx.graphics.glutils.ShapeRenderer.ShapeType;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Vector2;
@@ -39,6 +41,7 @@ import gaiasky.util.math.Matrix4d;
 import gaiasky.util.math.Vector3d;
 import gaiasky.util.time.ITimeFrameProvider;
 import gaiasky.util.tree.OctreeNode;
+import org.lwjgl.opengl.GL30;
 
 /**
  * Models the movement of the camera
@@ -223,6 +226,7 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
     private OpenVRListener openVRListener;
 
     private SpriteBatch spriteBatch;
+    private ShapeRenderer shapeRenderer;
     private Texture crosshairFocus, crosshairClosest, crosshairHome, crosshairArrow, velocityCrosshair, antivelocityCrosshair, gravWaveCrosshair;
     private Sprite[] hudSprites;
 
@@ -289,8 +293,11 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
         if (vr)
             openVRListener = new OpenVRListener(this);
 
+        // Shape renderer (pointer guide lines)
+        shapeRenderer = new ShapeRenderer(10);
+
         // Init sprite batch for crosshair
-        spriteBatch = new SpriteBatch(1000, GlobalResources.spriteShader);
+        spriteBatch = new SpriteBatch(50, GlobalResources.spriteShader);
 
         // Focus crosshair
         crosshairFocus = new Texture(Gdx.files.internal("img/crosshair-focus.png"));
@@ -1626,6 +1633,20 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
     @Override
     public void render(int rw, int rh) {
         boolean draw = !GlobalConf.program.CUBEMAP_MODE && !GlobalConf.program.STEREOSCOPIC_MODE && !GlobalConf.postprocess.POSTPROCESS_FISHEYE;
+
+        // Pointer guides
+        if(GlobalConf.program.DISPLAY_POINTER_GUIDES) {
+            int mouseX = Gdx.input.getX();
+            int mouseY = Gdx.input.getY();
+            shapeRenderer.begin(ShapeType.Line);
+            Gdx.gl.glEnable(GL30.GL_BLEND);
+            Gdx.gl.glLineWidth(GlobalConf.program.POINTER_GUIDES_WIDTH);
+            float pc[] = GlobalConf.program.POINTER_GUIDES_COLOR;
+            shapeRenderer.setColor(pc[0], pc[1], pc[2], pc[3]);
+            shapeRenderer.line(0, rh - mouseY, rw, rh - mouseY);
+            shapeRenderer.line(mouseX, 0, mouseX,rh);
+            shapeRenderer.end();
+        }
 
         spriteBatch.begin();
 
