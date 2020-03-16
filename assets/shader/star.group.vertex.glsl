@@ -19,7 +19,7 @@ uniform vec3 u_camDir;
 uniform int u_cubemap;
 
 uniform vec2 u_pointAlpha;
-uniform float u_thAnglePoint;
+uniform vec2 u_thAnglePoint;
 
 // VR scale factor
 uniform float u_vrScale;
@@ -80,7 +80,7 @@ void main() {
     #endif // gravitationalWaves
 
     float viewAngleApparent = atan((a_additional.x * u_alphaSizeFovBr.w) / dist) / u_alphaSizeFovBr.z;
-    float opacity = pow(lint2(viewAngleApparent, 0.0, u_thAnglePoint, u_pointAlpha.x, u_pointAlpha.y), 1.2);
+    float opacity = pow(lint2(viewAngleApparent, u_thAnglePoint.x, u_thAnglePoint.y, u_pointAlpha.x, u_pointAlpha.y), 1.1);
 
     float fadeout = smoothstep(dist, l0, l1);
 

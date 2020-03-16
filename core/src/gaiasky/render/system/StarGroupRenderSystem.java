@@ -60,6 +60,12 @@ public class StarGroupRenderSystem extends ImmediateRenderSystem implements IObs
         Gdx.gl.glEnable(GL30.GL_VERTEX_PROGRAM_POINT_SIZE);
 
         pointAlpha = new float[] { GlobalConf.scene.STAR_MIN_OPACITY, GlobalConf.scene.STAR_MIN_OPACITY + GlobalConf.scene.POINT_ALPHA_MAX };
+
+        ExtShaderProgram shaderProgram = getShaderProgram();
+        ICamera camera = GaiaSky.instance.cam;
+        shaderProgram.begin();
+        // Uniforms that rarely change
+        shaderProgram.end();
     }
 
     @Override
@@ -112,7 +118,7 @@ public class StarGroupRenderSystem extends ImmediateRenderSystem implements IObs
                                 if (starGroup.filter(i)) {
                                     StarBean sb = (StarBean) starGroup.data().get(i);
                                     // COLOR
-                                    if(hlCmap){
+                                    if (hlCmap) {
                                         // Color map
                                         double[] color = cmap.colormap(starGroup.getHlcmi(), starGroup.getHlcma().get(sb), starGroup.getHlcmmin(), starGroup.getHlcmmax());
                                         tempVerts[curr.vertexIdx + curr.colorOffset] = Color.toFloatBits((float) color[0], (float) color[1], (float) color[2], 1.0f);
@@ -155,10 +161,11 @@ public class StarGroupRenderSystem extends ImmediateRenderSystem implements IObs
 
                             shaderProgram.setUniform2fv("u_pointAlpha", starGroup.isHighlighted() && starGroup.getCatalogInfo().hlAllVisible ? pointAlphaHl : pointAlpha, 0, 2);
                             shaderProgram.setUniformMatrix("u_projModelView", camera.getCamera().combined);
-                            shaderProgram.setUniformf("u_camPos", camera.getCurrent().getPos().put(aux1));
-                            shaderProgram.setUniformf("u_camDir", camera.getCurrent().getCamera().direction);
+                            shaderProgram.setUniformf("u_camPos", camera.getPos().put(aux1));
+                            shaderProgram.setUniformf("u_camDir", camera.getCamera().direction);
                             shaderProgram.setUniformi("u_cubemap", GlobalConf.program.CUBEMAP_MODE ? 1 : 0);
                             shaderProgram.setUniformf("u_magLimit", GlobalConf.runtime.LIMIT_MAG_RUNTIME);
+                            shaderProgram.setUniformf("u_thAnglePoint", 0f, 1.5e-8f * camera.getFovFactor());
 
                             // Rel, grav, z-buffer, etc.
                             addEffectsUniforms(shaderProgram, camera);
@@ -172,7 +179,6 @@ public class StarGroupRenderSystem extends ImmediateRenderSystem implements IObs
                             // Days since epoch
                             shaderProgram.setUniformi("u_t", (int) (AstroUtils.getMsSince(GaiaSky.instance.time.getTime(), starGroup.getEpoch()) * Nature.MS_TO_D));
                             shaderProgram.setUniformf("u_ar", GlobalConf.program.isStereoHalfWidth() ? 2f : 1f);
-                            shaderProgram.setUniformf("u_thAnglePoint", (float) 1e-8);
 
                             // Update projection if fovmode is 3
                             if (fovMode == 3) {

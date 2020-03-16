@@ -262,9 +262,11 @@ public class DR2DataProvider extends AbstractStarGroupDataProvider {
                         }
                         // Apply extinction
                         appmag -= ag;
-                        double absmag = (appmag - 2.5 * Math.log10(Math.pow(distpc / 10.0, 2.0)));
-                        double flux = Math.pow(10.0, -absmag / 2.5);
-                        double size = Math.min((Math.pow(flux, 0.5) * Constants.PC_TO_U * 0.16), 1e9) / 1.5;
+                        double absmag = appmag - 5 * Math.log10((distpc <= 0 ? 10 : distpc)) + 5;
+                        // Pseudo-luminosity. Usually L = L0 * 10^(-0.4*Mbol). We omit M0 and approximate Mbol = M
+                        double pseudoL = Math.pow(10, -0.4 * absmag);
+                        double sizeFactor = Nature.PC_TO_M * Constants.ORIGINAL_M_TO_U * 0.15;
+                        double size = Math.min((Math.pow(pseudoL, 0.45) * sizeFactor), 1e10);
                         //double radius = tokens.length >= 19 && !tokens[IDX_RADIUS]].isEmpty() ? Parser.parseDouble(tokens[IDX_RADIUS]]) * Constants.Ro_TO_U : size * Constants.STAR_SIZE_FACTOR;
 
                         /** COLOR, we use the tycBV map if present **/

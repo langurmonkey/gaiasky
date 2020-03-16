@@ -65,7 +65,7 @@ public class VisualEffectsComponent extends GuiComponent implements IObserver {
         });
 
         /** Star opacity **/
-        starOpacity = new OwnSliderPlus(I18n.txt("gui.star.opacity"), Constants.MIN_SLIDER, Constants.MAX_SLIDER, Constants.SLIDER_STEP, Constants.MIN_STAR_MIN_OPACITY, Constants.MAX_STAR_MIN_OPACITY, skin);
+        starOpacity = new OwnSliderPlus(I18n.txt("gui.star.opacity"), Constants.MIN_STAR_MIN_OPACITY, Constants.MAX_STAR_MIN_OPACITY, Constants.SLIDER_STEP_TINY, skin);
         starOpacity.setName("star opacity");
         starOpacity.setWidth(sliderWidth);
         starOpacity.setMappedValue(GlobalConf.scene.STAR_MIN_OPACITY);
