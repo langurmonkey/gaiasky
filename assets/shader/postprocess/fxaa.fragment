@@ -37,7 +37,7 @@ vec3 lerp3(vec3 a, vec3 b, float amountOfA) {
 }
 
 /*
-FXAA_PRESET - Choose compile-in knob preset 0-5.
+FXAA_PRESET - Choose compile-in knob preset 1-5.
 ------------------------------------------------------------------------------
 FXAA_EDGE_THRESHOLD - The minimum amount of local contrast required
                       to apply algorithm.
@@ -57,23 +57,39 @@ FXAA_SEARCH_STEPS - Maximum number of search steps for end of span.
 FXAA_SEARCH_THRESHOLD - Controls when to stop searching.
                         1.0/4.0 - seems to be the best quality wise
 ------------------------------------------------------------------------------
-FXAA_SUBPIX_TRIM - Controls sub-pixel aliasing removal.
-                   1.0/2.0 - low removal
-                   1.0/3.0 - medium removal
-                   1.0/4.0 - default removal
-                   1.0/8.0 - high removal
-                   0.0 - complete removal
-------------------------------------------------------------------------------
 FXAA_SUBPIX_CAP - Insures fine detail is not completely removed.
                   This is important for the transition of sub-pixel detail,
                   like fences and wires.
                   3.0/4.0 - default (medium amount of filtering)
                   7.0/8.0 - high amount of filtering
                   1.0 - no capping of sub-pixel aliasing removal
+------------------------------------------------------------------------------
+FXAA_SUBPIX_TRIM - Controls sub-pixel aliasing removal.
+                   1.0/2.0 - low removal
+                   1.0/3.0 - medium removal
+                   1.0/4.0 - default removal
+                   1.0/8.0 - high removal
+                   0.0 - complete removal
 */
 
 #ifndef FXAA_PRESET
     #define FXAA_PRESET 5
+#endif
+#if (FXAA_PRESET == 1)
+    #define FXAA_EDGE_THRESHOLD      (1.0/4.0)
+    #define FXAA_EDGE_THRESHOLD_MIN  (1.0/12.0)
+    #define FXAA_SEARCH_STEPS        10
+    #define FXAA_SEARCH_THRESHOLD    (1.0/4.0)
+    #define FXAA_SUBPIX_CAP          (3.0/4.0)
+    #define FXAA_SUBPIX_TRIM         (1.0/3.0)
+ #endif
+#if (FXAA_PRESET == 2)
+    #define FXAA_EDGE_THRESHOLD      (1.0/4.0)
+    #define FXAA_EDGE_THRESHOLD_MIN  (1.0/12.0)
+    #define FXAA_SEARCH_STEPS        12
+    #define FXAA_SEARCH_THRESHOLD    (1.0/4.0)
+    #define FXAA_SUBPIX_CAP          (3.0/4.0)
+    #define FXAA_SUBPIX_TRIM         (1.0/3.0)
 #endif
 #if (FXAA_PRESET == 3)
     #define FXAA_EDGE_THRESHOLD      (1.0/8.0)
@@ -96,7 +112,7 @@ FXAA_SUBPIX_CAP - Insures fine detail is not completely removed.
     #define FXAA_EDGE_THRESHOLD_MIN  (1.0/24.0)
     #define FXAA_SEARCH_STEPS        32
     #define FXAA_SEARCH_THRESHOLD    (1.0/4.0)
-    #define FXAA_SUBPIX_CAP          (3.0/4.0)
+    #define FXAA_SUBPIX_CAP          (4.0/5.0)
     #define FXAA_SUBPIX_TRIM         (1.0/4.0)
 #endif
 
