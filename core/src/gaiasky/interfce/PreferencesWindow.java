@@ -857,9 +857,16 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         Table pg = new Table();
 
         // GUIDES CHECKBOX
-        pointerGuidesCb = new OwnCheckBox("" + I18n.txt("gui.ui.pointer.guides"), skin, pad);
+        pointerGuidesCb = new OwnCheckBox("" + I18n.txt("gui.ui.pointer.guides.display"), skin, pad);
         pointerGuidesCb.setName("pointer guides cb");
         pointerGuidesCb.setChecked(GlobalConf.program.DISPLAY_POINTER_GUIDES);
+        OwnImageButton guidesTooltip = new OwnImageButton(skin, "tooltip");
+        guidesTooltip.addListener(new OwnTextTooltip(I18n.txt("gui.ui.pointer.guides.info"), skin));
+        HorizontalGroup pointerGuidesCbGroup = new HorizontalGroup();
+        pointerGuidesCbGroup.space(pad);
+        pointerGuidesCbGroup.addActor(pointerGuidesCb);
+        pointerGuidesCbGroup.addActor(guidesTooltip);
+
 
         // GUIDES COLOR
         float cpsize = 20f * GlobalConf.UI_SCALE_FACTOR;
@@ -883,7 +890,7 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         });
 
         // Add to table
-        pg.add(pointerGuidesCb).left().colspan(2).padBottom(pad5).row();
+        pg.add(pointerGuidesCbGroup).left().colspan(2).padBottom(pad5).row();
         pg.add(new OwnLabel(I18n.txt("gui.ui.pointer.guides.color"), skin)).left().padBottom(pad5).padRight(pad);
         pg.add(pointerGuidesColor).left().size(cpsize).padBottom(pad5).row();
         pg.add(guidesWidthLabel).left().padBottom(pad5).padRight(pad);
