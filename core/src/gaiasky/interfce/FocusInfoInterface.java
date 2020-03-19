@@ -56,7 +56,7 @@ public class FocusInfoInterface extends TableGuiInterface implements IObserver {
 
     INumberFormat nf, sf;
 
-    float pad3, pad5, pad10, bw;
+    float pad3, pad5, pad10, pad15, bw;
 
     public FocusInfoInterface(Skin skin) {
         this(skin, false);
@@ -67,11 +67,12 @@ public class FocusInfoInterface extends TableGuiInterface implements IObserver {
         this.setBackground("table-bg");
         this.skin = skin;
 
-        nf = NumberFormatFactory.getFormatter("##0.###");
-        sf = NumberFormatFactory.getFormatter("#0.###E0");
+        nf = NumberFormatFactory.getFormatter("##0.##");
+        sf = NumberFormatFactory.getFormatter("#0.##E0");
 
         float buttonSize = 15 * GlobalConf.UI_SCALE_FACTOR;
         float imgSize = 15 * GlobalConf.UI_SCALE_FACTOR;
+        pad15 = 15 * GlobalConf.UI_SCALE_FACTOR;
         pad10 = 10 * GlobalConf.UI_SCALE_FACTOR;
         pad5 = 5 * GlobalConf.UI_SCALE_FACTOR;
         pad3 = 3 * GlobalConf.UI_SCALE_FACTOR;
@@ -104,17 +105,17 @@ public class FocusInfoInterface extends TableGuiInterface implements IObserver {
         focusRadius = new OwnLabel("", skin, "hud");
 
         // Labels
-        appmagLabel = new OwnLabel(I18n.txt("gui.focusinfo.appmag"), skin, "hud-big");
-        absmagLabel = new OwnLabel(I18n.txt("gui.focusinfo.absmag"), skin, "hud-big");
+        appmagLabel = new OwnLabel(I18n.txt("gui.focusinfo.appmag"), skin, "hud");
+        absmagLabel = new OwnLabel(I18n.txt("gui.focusinfo.absmag"), skin, "hud");
 
         // Pointer
         pointerName = new OwnLabel(I18n.bundle.get("gui.pointer"), skin, "hud-header");
         pointerRADEC = new OwnLabel("", skin, "hud");
         pointerLonLat = new OwnLabel("", skin, "hud");
         viewRADEC = new OwnLabel("", skin, "hud");
-        lonLatLabel = new OwnLabel("Lat/Lon", skin, "hud-big");
-        RADECPointerLabel = new OwnLabel(I18n.txt("gui.focusinfo.alpha") + "/" + I18n.txt("gui.focusinfo.delta"), skin, "hud-big");
-        RADECViewLabel = new OwnLabel(I18n.txt("gui.focusinfo.alpha") + "/" + I18n.txt("gui.focusinfo.delta"), skin, "hud-big");
+        lonLatLabel = new OwnLabel("Lat/Lon", skin, "hud");
+        RADECPointerLabel = new OwnLabel(I18n.txt("gui.focusinfo.alpha") + "/" + I18n.txt("gui.focusinfo.delta"), skin, "hud");
+        RADECViewLabel = new OwnLabel(I18n.txt("gui.focusinfo.alpha") + "/" + I18n.txt("gui.focusinfo.delta"), skin, "hud");
         Button pointerImgBtn1 = new OwnTextIconButton("", skin, "pointer");
         pointerImgBtn1.setSize(imgSize, imgSize);
         pointerImgBtn1.addListener(new OwnTextTooltip(I18n.txt("gui.focusinfo.pointer"), skin));
@@ -191,7 +192,7 @@ public class FocusInfoInterface extends TableGuiInterface implements IObserver {
         focusNameGroup.addActor(landOn);
         focusNameGroup.addActor(landAt);
 
-        float w = 140 * GlobalConf.UI_SCALE_FACTOR;
+        float w = 130 * GlobalConf.UI_SCALE_FACTOR;
         focusId.setWidth(w);
         focusRA.setWidth(w);
         focusDEC.setWidth(w);
@@ -209,46 +210,46 @@ public class FocusInfoInterface extends TableGuiInterface implements IObserver {
         focusInfo.row();
         focusInfo.add(focusType).left().padBottom(pad5).colspan(2);
         focusInfo.row();
-        focusInfo.add(new OwnLabel("ID", skin, "hud-big")).left();
-        focusInfo.add(focusId).left().padLeft(pad10);
+        focusInfo.add(new OwnLabel("ID", skin, "hud")).left();
+        focusInfo.add(focusId).left().padLeft(pad15);
         focusInfo.row();
-        focusInfo.add(new OwnLabel(I18n.txt("gui.focusinfo.names"), skin, "hud-big")).left().padBottom(pad5);
-        focusInfo.add(focusNames).left().padBottom(pad5).padLeft(pad10);
+        focusInfo.add(new OwnLabel(I18n.txt("gui.focusinfo.names"), skin, "hud")).left().padBottom(pad5);
+        focusInfo.add(focusNames).left().padBottom(pad5).padLeft(pad15);
         focusInfo.row();
         if (!vr) {
-            focusInfo.add(new OwnLabel(I18n.txt("gui.focusinfo.alpha"), skin, "hud-big")).left();
-            focusInfo.add(focusRA).left().padLeft(pad10);
+            focusInfo.add(new OwnLabel(I18n.txt("gui.focusinfo.alpha"), skin, "hud")).left();
+            focusInfo.add(focusRA).left().padLeft(pad15);
             focusInfo.row();
-            focusInfo.add(new OwnLabel(I18n.txt("gui.focusinfo.delta"), skin, "hud-big")).left();
-            focusInfo.add(focusDEC).left().padLeft(pad10);
+            focusInfo.add(new OwnLabel(I18n.txt("gui.focusinfo.delta"), skin, "hud")).left();
+            focusInfo.add(focusDEC).left().padLeft(pad15);
             focusInfo.row();
-            focusInfo.add(new OwnLabel(I18n.txt("gui.focusinfo.mualpha"), skin, "hud-big")).left();
-            focusInfo.add(focusMuAlpha).left().padLeft(pad10);
+            focusInfo.add(new OwnLabel(I18n.txt("gui.focusinfo.mualpha"), skin, "hud")).left();
+            focusInfo.add(focusMuAlpha).left().padLeft(pad15);
             focusInfo.row();
-            focusInfo.add(new OwnLabel(I18n.txt("gui.focusinfo.mudelta"), skin, "hud-big")).left();
-            focusInfo.add(focusMuDelta).left().padLeft(pad10);
+            focusInfo.add(new OwnLabel(I18n.txt("gui.focusinfo.mudelta"), skin, "hud")).left();
+            focusInfo.add(focusMuDelta).left().padLeft(pad15);
             focusInfo.row();
-            focusInfo.add(new OwnLabel(I18n.txt("gui.focusinfo.radvel"), skin, "hud-big")).left();
-            focusInfo.add(focusRadVel).left().padLeft(pad10);
+            focusInfo.add(new OwnLabel(I18n.txt("gui.focusinfo.radvel"), skin, "hud")).left();
+            focusInfo.add(focusRadVel).left().padLeft(pad15);
             focusInfo.row();
             focusInfo.add(appmagLabel).left();
-            focusInfo.add(focusAppMag).left().padLeft(pad10);
+            focusInfo.add(focusAppMag).left().padLeft(pad15);
             focusInfo.row();
             focusInfo.add(absmagLabel).left();
-            focusInfo.add(focusAbsMag).left().padLeft(pad10);
+            focusInfo.add(focusAbsMag).left().padLeft(pad15);
             focusInfo.row();
         }
-        focusInfo.add(new OwnLabel(I18n.txt("gui.focusinfo.angle"), skin, "hud-big")).left();
-        focusInfo.add(focusAngle).left().padLeft(pad10);
+        focusInfo.add(new OwnLabel(I18n.txt("gui.focusinfo.angle"), skin, "hud")).left();
+        focusInfo.add(focusAngle).left().padLeft(pad15);
         focusInfo.row();
-        focusInfo.add(new OwnLabel(I18n.txt("gui.focusinfo.distance.sol"), skin, "hud-big")).left();
-        focusInfo.add(focusDistSol).left().padLeft(pad10);
+        focusInfo.add(new OwnLabel(I18n.txt("gui.focusinfo.distance.sol"), skin, "hud")).left();
+        focusInfo.add(focusDistSol).left().padLeft(pad15);
         focusInfo.row();
-        focusInfo.add(new OwnLabel(I18n.txt("gui.focusinfo.distance.cam"), skin, "hud-big")).left();
-        focusInfo.add(focusDistCam).left().padLeft(pad10);
+        focusInfo.add(new OwnLabel(I18n.txt("gui.focusinfo.distance.cam"), skin, "hud")).left();
+        focusInfo.add(focusDistCam).left().padLeft(pad15);
         focusInfo.row();
-        focusInfo.add(new OwnLabel(I18n.txt("gui.focusinfo.radius"), skin, "hud-big")).left();
-        focusInfo.add(focusRadius).left().padLeft(pad10);
+        focusInfo.add(new OwnLabel(I18n.txt("gui.focusinfo.radius"), skin, "hud")).left();
+        focusInfo.add(focusRadius).left().padLeft(pad15);
         focusInfo.row();
         focusInfo.add(moreInfo).left().colspan(2).padBottom(pad5).padTop(pad10);
 
@@ -258,22 +259,22 @@ public class FocusInfoInterface extends TableGuiInterface implements IObserver {
             pointerInfo.row();
             pointerInfo.add(pointerImgBtn1).left().padRight(pad3);
             pointerInfo.add(RADECPointerLabel).left();
-            pointerInfo.add(pointerRADEC).left().padLeft(pad10);
+            pointerInfo.add(pointerRADEC).left().padLeft(pad15);
             pointerInfo.row();
             pointerInfo.add(pointerImgBtn2).left().padRight(pad3);
             pointerInfo.add(lonLatLabel).left();
-            pointerInfo.add(pointerLonLat).left().padLeft(pad10);
+            pointerInfo.add(pointerLonLat).left().padLeft(pad15);
             pointerInfo.row();
             pointerInfo.add(viewImgBtn).left().padRight(pad3);
             pointerInfo.add(RADECViewLabel).left();
-            pointerInfo.add(viewRADEC).left().padLeft(pad10);
+            pointerInfo.add(viewRADEC).left().padLeft(pad15);
         }
 
         /** CAMERA INFO **/
         cameraInfo.add(camName).left().colspan(2);
         cameraInfo.row();
-        cameraInfo.add(new OwnLabel(I18n.txt("gui.camera.vel"), skin, "hud-big")).left();
-        cameraInfo.add(camVel).left().padLeft(pad10);
+        cameraInfo.add(new OwnLabel(I18n.txt("gui.camera.vel"), skin, "hud")).left();
+        cameraInfo.add(camVel).left().padLeft(pad15);
         cameraInfo.row();
         cameraInfo.add(camPos).left().colspan(2);
 
