@@ -8,8 +8,12 @@ package gaiasky.interfce;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
+import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
+import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener.ChangeEvent;
 import gaiasky.GaiaSky;
+import gaiasky.util.GlobalConf;
 import gaiasky.util.I18n;
+import gaiasky.util.scene2d.OwnCheckBox;
 import gaiasky.util.scene2d.OwnLabel;
 
 /**
@@ -19,7 +23,7 @@ import gaiasky.util.scene2d.OwnLabel;
  * @author tsagrista
  */
 public class QuitWindow extends GenericDialog {
-
+    private OwnCheckBox doNotAsk;
     public QuitWindow(Stage ui, Skin skin) {
         super(I18n.txt("gui.quit.title"), skin, ui);
 
@@ -33,11 +37,18 @@ public class QuitWindow extends GenericDialog {
     protected void build() {
         content.clear();
 
-        content.add(new OwnLabel(I18n.txt("gui.quit.sure"), skin)).left().pad(pad5).row();
+        content.add(new OwnLabel(I18n.txt("gui.quit.sure"), skin)).left().padBottom(pad * 2f).row();
+
+        doNotAsk = new OwnCheckBox(I18n.txt("gui.donotask"), skin, pad5);
+        doNotAsk.setChecked(false);
+
+        bottom.add(doNotAsk).right().row();
     }
 
     @Override
     protected void accept() {
+        // Update exit confirmation
+        GlobalConf.program.EXIT_CONFIRMATION = !doNotAsk.isChecked();
         // Only run if it does not have an accept runnable already
         // Otherwise, it comes from the exit hook
         GaiaSky.postRunnable(() -> Gdx.app.exit());

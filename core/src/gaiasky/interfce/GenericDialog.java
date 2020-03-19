@@ -43,7 +43,7 @@ public abstract class GenericDialog extends CollapsibleWindow {
     final protected Stage stage;
     final protected Skin skin;
     protected GenericDialog me;
-    protected Table content;
+    protected Table content, bottom;
     private String acceptText = null, cancelText = null;
     protected boolean modal = true;
 
@@ -71,6 +71,7 @@ public abstract class GenericDialog extends CollapsibleWindow {
         this.stage = stage;
         this.me = this;
         this.content = new Table(skin);
+        this.bottom = new Table(skin);
         this.scrolls = new Array<>(5);
     }
 
@@ -146,7 +147,7 @@ public abstract class GenericDialog extends CollapsibleWindow {
         recalculateButtonSize();
 
         add(content).left().pad(pad).row();
-        add().expandY().bottom().row();
+        add(bottom).expandY().bottom().right().padRight(pad).row();
         add(buttonGroup).pad(pad).bottom().right();
         getTitleTable().align(Align.left);
 

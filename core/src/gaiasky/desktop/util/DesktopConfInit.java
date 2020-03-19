@@ -219,6 +219,7 @@ public class DesktopConfInit extends ConfInit {
         String NET_SLAVE_WARP = p.getProperty("program.net.slave.warp", "");
         String NET_SLAVE_BLEND = p.getProperty("program.net.slave.blend", "");
         String LAST_FOLDER_LOCATION = p.getProperty("program.last.filesystem.location");
+        boolean EXIT_CONFIRMATION = Boolean.parseBoolean(p.getProperty("program.exit.confirmation", "true"));
 
         // Pointer guides
         boolean DISPLAY_POINTER_GUIDES = Boolean.parseBoolean(p.getProperty("program.pointer.guides.display", "false"));
@@ -234,7 +235,7 @@ public class DesktopConfInit extends ConfInit {
             }
         }
 
-        prc.initialize(SHOW_DEBUG_INFO, LAST_CHECKED, LAST_VERSION, VERSION_CHECK_URL, DATA_DESCRIPTOR_URL, UI_THEME, SCRIPT_LOCATION, REST_PORT, LOCALE, STEREOSCOPIC_MODE, STEREO_PROFILE, CUBEMAP_MODE, CUBEMAP_PROJECTION, CUBEMAP_FACE_RESOLUTION, DISPLAY_HUD, DISPLAY_POINTER_COORDS, DISPLAY_DATASET_DIALOG, NET_MASTER, NET_SLAVE, NET_MASTER_SLAVES, NET_SLAVE_CONFIG, NET_SLAVE_YAW, NET_SLAVE_PITCH, NET_SLAVE_ROLL, NET_SLAVE_WARP, NET_SLAVE_BLEND, LAST_FOLDER_LOCATION, DISPLAY_MINIMAP, MINIMAP_SIZE, PLANETARIUM_APERTURE, PLANETARIUM_ANGLE, DISPLAY_POINTER_GUIDES, POINTER_GUIDES_COLOR, POINTER_GUIDES_WIDTH);
+        prc.initialize(SHOW_DEBUG_INFO, LAST_CHECKED, LAST_VERSION, VERSION_CHECK_URL, DATA_DESCRIPTOR_URL, UI_THEME, SCRIPT_LOCATION, REST_PORT, LOCALE, STEREOSCOPIC_MODE, STEREO_PROFILE, CUBEMAP_MODE, CUBEMAP_PROJECTION, CUBEMAP_FACE_RESOLUTION, DISPLAY_HUD, DISPLAY_POINTER_COORDS, DISPLAY_DATASET_DIALOG, NET_MASTER, NET_SLAVE, NET_MASTER_SLAVES, NET_SLAVE_CONFIG, NET_SLAVE_YAW, NET_SLAVE_PITCH, NET_SLAVE_ROLL, NET_SLAVE_WARP, NET_SLAVE_BLEND, LAST_FOLDER_LOCATION, DISPLAY_MINIMAP, MINIMAP_SIZE, PLANETARIUM_APERTURE, PLANETARIUM_ANGLE, DISPLAY_POINTER_GUIDES, POINTER_GUIDES_COLOR, POINTER_GUIDES_WIDTH, EXIT_CONFIRMATION);
 
         /** SCENE CONF **/
         String gc = p.getProperty("scene.graphics.quality");
@@ -495,6 +496,7 @@ public class DesktopConfInit extends ConfInit {
         p.setProperty("program.url.versioncheck", GlobalConf.program.VERSION_CHECK_URL);
         p.setProperty("program.url.data.descriptor", GlobalConf.program.DATA_DESCRIPTOR_URL);
         p.setProperty("program.ui.theme", GlobalConf.program.UI_THEME);
+        p.setProperty("program.exit.confirmation", Boolean.toString(GlobalConf.program.EXIT_CONFIRMATION));
         p.setProperty("program.scriptlocation", GlobalConf.program.SCRIPT_LOCATION);
         p.setProperty("program.restport", Integer.toString(GlobalConf.program.REST_PORT));
         p.setProperty("program.locale", GlobalConf.program.LOCALE);

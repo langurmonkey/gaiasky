@@ -258,183 +258,190 @@ public class GuiRegistry implements IObserver {
             Stage ui = current.getGuiStage();
             // Treats windows that can appear in any GUI
             switch (event) {
-            case SHOW_QUIT_ACTION:
-                if (!removeModeChangePopup()) {
-                    if (GLFW.glfwGetInputMode(((Lwjgl3Graphics) Gdx.graphics).getWindow().getWindowHandle(), GLFW.GLFW_CURSOR) == GLFW.GLFW_CURSOR_DISABLED) {
-                        // Release mouse if captured
-                        GLFW.glfwSetInputMode(((Lwjgl3Graphics) Gdx.graphics).getWindow().getWindowHandle(), GLFW.GLFW_CURSOR, GLFW.GLFW_CURSOR_NORMAL);
-                    } else {
-                        QuitWindow quit = new QuitWindow(ui, skin);
-                        if (data.length > 0) {
-                            quit.setAcceptRunnable((Runnable) data[0]);
+                case SHOW_QUIT_ACTION:
+                    if (!removeModeChangePopup()) {
+                        if (GLFW.glfwGetInputMode(((Lwjgl3Graphics) Gdx.graphics).getWindow().getWindowHandle(), GLFW.GLFW_CURSOR) == GLFW.GLFW_CURSOR_DISABLED) {
+                            // Release mouse if captured
+                            GLFW.glfwSetInputMode(((Lwjgl3Graphics) Gdx.graphics).getWindow().getWindowHandle(), GLFW.GLFW_CURSOR, GLFW.GLFW_CURSOR_NORMAL);
+                        } else {
+                            Runnable quitRunnable = data.length > 0 ? (Runnable) data[0] : null;
+                            if (GlobalConf.program.EXIT_CONFIRMATION) {
+                                QuitWindow quit = new QuitWindow(ui, skin);
+                                if (data.length > 0) {
+                                    quit.setAcceptRunnable(quitRunnable);
+                                }
+                                quit.show(ui);
+                            } else {
+                                if (quitRunnable != null)
+                                    quitRunnable.run();
+                                GaiaSky.postRunnable(() -> Gdx.app.exit());
+                            }
                         }
-                        quit.show(ui);
                     }
-                }
-                break;
-            case CAMERA_MODE_CMD:
-                removeModeChangePopup();
-                break;
-            case SHOW_ABOUT_ACTION:
-                (new AboutWindow(ui, skin)).show(ui);
-                break;
-            case SHOW_PREFERENCES_ACTION:
-                (new PreferencesWindow(ui, skin)).show(ui);
-                break;
-            case SHOW_SLAVE_CONFIG_ACTION:
-                if (MasterManager.hasSlaves()) {
-                    if (slaveConfigWindow == null)
-                        slaveConfigWindow = new SlaveConfigWindow(ui, skin);
-                    slaveConfigWindow.show(ui);
-                }
-                break;
-            case SHOW_LOAD_CATALOG_ACTION:
-                if (lastOpenLocation == null && GlobalConf.program.LAST_OPEN_LOCATION != null && !GlobalConf.program.LAST_OPEN_LOCATION.isEmpty()) {
-                    try {
-                        lastOpenLocation = Paths.get(GlobalConf.program.LAST_OPEN_LOCATION);
-                    } catch (Exception e) {
-                        lastOpenLocation = null;
+                    break;
+                case CAMERA_MODE_CMD:
+                    removeModeChangePopup();
+                    break;
+                case SHOW_ABOUT_ACTION:
+                    (new AboutWindow(ui, skin)).show(ui);
+                    break;
+                case SHOW_PREFERENCES_ACTION:
+                    (new PreferencesWindow(ui, skin)).show(ui);
+                    break;
+                case SHOW_SLAVE_CONFIG_ACTION:
+                    if (MasterManager.hasSlaves()) {
+                        if (slaveConfigWindow == null)
+                            slaveConfigWindow = new SlaveConfigWindow(ui, skin);
+                        slaveConfigWindow.show(ui);
                     }
-                }
-                if (lastOpenLocation == null) {
-                    lastOpenLocation = SysUtils.getUserHome();
-                } else if (!Files.exists(lastOpenLocation) || !Files.isDirectory(lastOpenLocation)) {
-                    lastOpenLocation = SysUtils.getHomeDir();
-                }
+                    break;
+                case SHOW_LOAD_CATALOG_ACTION:
+                    if (lastOpenLocation == null && GlobalConf.program.LAST_OPEN_LOCATION != null && !GlobalConf.program.LAST_OPEN_LOCATION.isEmpty()) {
+                        try {
+                            lastOpenLocation = Paths.get(GlobalConf.program.LAST_OPEN_LOCATION);
+                        } catch (Exception e) {
+                            lastOpenLocation = null;
+                        }
+                    }
+                    if (lastOpenLocation == null) {
+                        lastOpenLocation = SysUtils.getUserHome();
+                    } else if (!Files.exists(lastOpenLocation) || !Files.isDirectory(lastOpenLocation)) {
+                        lastOpenLocation = SysUtils.getHomeDir();
+                    }
 
-                FileChooser fc = new FileChooser(I18n.txt("gui.loadcatalog"), skin, ui, lastOpenLocation, FileChooser.FileChooserTarget.FILES);
-                fc.setAcceptText(I18n.txt("gui.loadcatalog"));
-                fc.setFileFilter(pathname -> pathname.getFileName().toString().endsWith(".vot") || pathname.getFileName().toString().endsWith(".csv"));
-                fc.setAcceptedFiles("*.vot, *.csv");
-                fc.setResultListener((success, result) -> {
-                    if (success) {
-                        if (Files.exists(result) && Files.exists(result)) {
-                            // Load selected file
-                            try {
-                                String fileName = result.getFileName().toString();
-                                final DatasetLoadDialog dld = new DatasetLoadDialog(I18n.txt("gui.dsload.title") + ": " + fileName, skin, ui);
-                                Runnable doLoad = () -> {
-                                    try {
-                                        DatasetOptions dops = dld.generateDatasetOptions();
-                                        // Access dld properties
-                                        EventScriptingInterface.instance().loadDataset(fileName, result.toAbsolutePath().toString(), CatalogInfo.CatalogInfoType.UI, dops, false);
-                                        // Open UI datasets
-                                        EventScriptingInterface.instance().maximizeInterfaceWindow();
-                                        EventScriptingInterface.instance().expandGuiComponent("DatasetsComponent");
-                                    } catch (Exception e) {
-                                        logger.error(I18n.txt("notif.error", fileName), e);
-                                    }
-                                };
-                                dld.setAcceptRunnable(doLoad);
-                                dld.show(ui);
+                    FileChooser fc = new FileChooser(I18n.txt("gui.loadcatalog"), skin, ui, lastOpenLocation, FileChooser.FileChooserTarget.FILES);
+                    fc.setAcceptText(I18n.txt("gui.loadcatalog"));
+                    fc.setFileFilter(pathname -> pathname.getFileName().toString().endsWith(".vot") || pathname.getFileName().toString().endsWith(".csv"));
+                    fc.setAcceptedFiles("*.vot, *.csv");
+                    fc.setResultListener((success, result) -> {
+                        if (success) {
+                            if (Files.exists(result) && Files.exists(result)) {
+                                // Load selected file
+                                try {
+                                    String fileName = result.getFileName().toString();
+                                    final DatasetLoadDialog dld = new DatasetLoadDialog(I18n.txt("gui.dsload.title") + ": " + fileName, skin, ui);
+                                    Runnable doLoad = () -> {
+                                        try {
+                                            DatasetOptions dops = dld.generateDatasetOptions();
+                                            // Access dld properties
+                                            EventScriptingInterface.instance().loadDataset(fileName, result.toAbsolutePath().toString(), CatalogInfo.CatalogInfoType.UI, dops, false);
+                                            // Open UI datasets
+                                            EventScriptingInterface.instance().maximizeInterfaceWindow();
+                                            EventScriptingInterface.instance().expandGuiComponent("DatasetsComponent");
+                                        } catch (Exception e) {
+                                            logger.error(I18n.txt("notif.error", fileName), e);
+                                        }
+                                    };
+                                    dld.setAcceptRunnable(doLoad);
+                                    dld.show(ui);
 
-                                lastOpenLocation = result.getParent();
-                                GlobalConf.program.LAST_OPEN_LOCATION = lastOpenLocation.toAbsolutePath().toString();
-                                return true;
-                            } catch (Exception e) {
-                                logger.error(I18n.txt("notif.error", result.getFileName()), e);
+                                    lastOpenLocation = result.getParent();
+                                    GlobalConf.program.LAST_OPEN_LOCATION = lastOpenLocation.toAbsolutePath().toString();
+                                    return true;
+                                } catch (Exception e) {
+                                    logger.error(I18n.txt("notif.error", result.getFileName()), e);
+                                    return false;
+                                }
+
+                            } else {
+                                logger.error("Selection must be a file: " + result.toAbsolutePath());
                                 return false;
                             }
-
                         } else {
-                            logger.error("Selection must be a file: " + result.toAbsolutePath());
-                            return false;
-                        }
-                    } else {
-                        // Still, update last location
-                        if (!Files.isDirectory(result)) {
-                            lastOpenLocation = result.getParent();
-                        } else {
-                            lastOpenLocation = result;
-                        }
-                        GlobalConf.program.LAST_OPEN_LOCATION = lastOpenLocation.toAbsolutePath().toString();
-                    }
-                    return false;
-                });
-                fc.show(ui);
-                break;
-            case SHOW_KEYFRAMES_WINDOW_ACTION:
-                if (keyframesWindow == null) {
-                    keyframesWindow = new KeyframesWindow(ui, skin);
-                }
-                if (!keyframesWindow.isVisible() || !keyframesWindow.hasParent())
-                    keyframesWindow.show(ui, 0, 0);
-                break;
-            case UI_THEME_RELOAD_INFO:
-                if (keyframesWindow != null) {
-                    keyframesWindow.dispose();
-                    keyframesWindow = null;
-                }
-                this.skin = (Skin) data[0];
-                break;
-            case MODE_POPUP_CMD:
-                if (GlobalConf.runtime.DISPLAY_GUI) {
-                    ModePopupInfo mpi = (ModePopupInfo) data[0];
-                    Float seconds = (Float) data[1];
-                    float pad10 = 10f * GlobalConf.UI_SCALE_FACTOR;
-                    float pad5 = 5f * GlobalConf.UI_SCALE_FACTOR;
-                    float pad3 = 3f * GlobalConf.UI_SCALE_FACTOR;
-                    if (modeChangeTable != null) {
-                        modeChangeTable.remove();
-                    }
-                    modeChangeTable = new Table(skin);
-                    modeChangeTable.setBackground("table-bg");
-                    modeChangeTable.pad(pad10);
-
-                    // Fill up table
-                    OwnLabel ttl = new OwnLabel(mpi.title, skin, "hud-header");
-                    modeChangeTable.add(ttl).left().padBottom(pad10).row();
-
-                    OwnLabel dsc = new OwnLabel(mpi.header, skin);
-                    modeChangeTable.add(dsc).left().padBottom(pad5 * 3f).row();
-
-                    Table keysTable = new Table(skin);
-                    for (Pair<String[], String> m : mpi.mappings) {
-                        HorizontalGroup keysGroup = new HorizontalGroup();
-                        keysGroup.space(pad3);
-                        String[] keys = m.getFirst();
-                        String action = m.getSecond();
-                        for (int i = 0; i < keys.length; i++) {
-                            TextButton key = new TextButton(keys[i], skin, "key");
-                            key.pad(pad5);
-                            keysGroup.addActor(key);
-                            if (i < keys.length - 1) {
-                                keysGroup.addActor(new OwnLabel("+", skin));
+                            // Still, update last location
+                            if (!Files.isDirectory(result)) {
+                                lastOpenLocation = result.getParent();
+                            } else {
+                                lastOpenLocation = result;
                             }
+                            GlobalConf.program.LAST_OPEN_LOCATION = lastOpenLocation.toAbsolutePath().toString();
                         }
-                        keysTable.add(keysGroup).right().padBottom(pad5).padRight(pad10 * 2f);
-                        keysTable.add(new OwnLabel(action, skin)).left().padBottom(pad5).row();
+                        return false;
+                    });
+                    fc.show(ui);
+                    break;
+                case SHOW_KEYFRAMES_WINDOW_ACTION:
+                    if (keyframesWindow == null) {
+                        keyframesWindow = new KeyframesWindow(ui, skin);
                     }
-                    modeChangeTable.add(keysTable).center().row();
-                    modeChangeTable.add(new OwnLabel("ESC - close this", skin, "mono")).right().padTop(pad10 * 2f);
+                    if (!keyframesWindow.isVisible() || !keyframesWindow.hasParent())
+                        keyframesWindow.show(ui, 0, 0);
+                    break;
+                case UI_THEME_RELOAD_INFO:
+                    if (keyframesWindow != null) {
+                        keyframesWindow.dispose();
+                        keyframesWindow = null;
+                    }
+                    this.skin = (Skin) data[0];
+                    break;
+                case MODE_POPUP_CMD:
+                    if (GlobalConf.runtime.DISPLAY_GUI) {
+                        ModePopupInfo mpi = (ModePopupInfo) data[0];
+                        Float seconds = (Float) data[1];
+                        float pad10 = 10f * GlobalConf.UI_SCALE_FACTOR;
+                        float pad5 = 5f * GlobalConf.UI_SCALE_FACTOR;
+                        float pad3 = 3f * GlobalConf.UI_SCALE_FACTOR;
+                        if (modeChangeTable != null) {
+                            modeChangeTable.remove();
+                        }
+                        modeChangeTable = new Table(skin);
+                        modeChangeTable.setBackground("table-bg");
+                        modeChangeTable.pad(pad10);
 
-                    modeChangeTable.pack();
+                        // Fill up table
+                        OwnLabel ttl = new OwnLabel(mpi.title, skin, "hud-header");
+                        modeChangeTable.add(ttl).left().padBottom(pad10).row();
 
-                    // Add table to UI
-                    Container mct = new Container<>(modeChangeTable);
-                    mct.setFillParent(true);
-                    mct.top();
-                    mct.pad(pad10 * 2, 0, 0, 0);
-                    ui.addActor(mct);
+                        OwnLabel dsc = new OwnLabel(mpi.header, skin);
+                        modeChangeTable.add(dsc).left().padBottom(pad5 * 3f).row();
 
-                    startModePopupInfoThread(modeChangeTable, seconds);
-                }
-                break;
-            case DISPLAY_GUI_CMD:
-                boolean displayGui = (Boolean) data[0];
-                if (!displayGui) {
-                    // Remove processor
-                    im.removeProcessor(current.getGuiStage());
-                } else {
-                    // Add processor
-                    im.addProcessor(0, current.getGuiStage());
-                }
-                break;
-            case UI_RELOAD_CMD:
-                reloadUI();
-                break;
-            default:
-                break;
+                        Table keysTable = new Table(skin);
+                        for (Pair<String[], String> m : mpi.mappings) {
+                            HorizontalGroup keysGroup = new HorizontalGroup();
+                            keysGroup.space(pad3);
+                            String[] keys = m.getFirst();
+                            String action = m.getSecond();
+                            for (int i = 0; i < keys.length; i++) {
+                                TextButton key = new TextButton(keys[i], skin, "key");
+                                key.pad(pad5);
+                                keysGroup.addActor(key);
+                                if (i < keys.length - 1) {
+                                    keysGroup.addActor(new OwnLabel("+", skin));
+                                }
+                            }
+                            keysTable.add(keysGroup).right().padBottom(pad5).padRight(pad10 * 2f);
+                            keysTable.add(new OwnLabel(action, skin)).left().padBottom(pad5).row();
+                        }
+                        modeChangeTable.add(keysTable).center().row();
+                        modeChangeTable.add(new OwnLabel("ESC - close this", skin, "mono")).right().padTop(pad10 * 2f);
+
+                        modeChangeTable.pack();
+
+                        // Add table to UI
+                        Container mct = new Container<>(modeChangeTable);
+                        mct.setFillParent(true);
+                        mct.top();
+                        mct.pad(pad10 * 2, 0, 0, 0);
+                        ui.addActor(mct);
+
+                        startModePopupInfoThread(modeChangeTable, seconds);
+                    }
+                    break;
+                case DISPLAY_GUI_CMD:
+                    boolean displayGui = (Boolean) data[0];
+                    if (!displayGui) {
+                        // Remove processor
+                        im.removeProcessor(current.getGuiStage());
+                    } else {
+                        // Add processor
+                        im.addProcessor(0, current.getGuiStage());
+                    }
+                    break;
+                case UI_RELOAD_CMD:
+                    reloadUI();
+                    break;
+                default:
+                    break;
             }
         }
 

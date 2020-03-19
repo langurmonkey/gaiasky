@@ -79,7 +79,8 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
                     lodFadeCb, cbAutoCamrec, real, nsl, report,
                     inverty, highAccuracyPositions, shadowsCb,
                     hidpiCb, pointerCoords, datasetChooser, debugInfo,
-                    crosshairFocusCb, crosshairClosestCb, crosshairHomeCb, pointerGuidesCb;
+                    crosshairFocusCb, crosshairClosestCb, crosshairHomeCb, pointerGuidesCb,
+                    exitConfirmation;
     private OwnSelectBox<DisplayMode> fullscreenResolutions;
     private OwnSelectBox<ComboBoxBean> gquality, aa, orbitRenderer, lineRenderer, numThreads, screenshotMode, frameoutputMode, nshadows;
     private OwnSelectBox<LangComboBoxBean> lang;
@@ -1687,6 +1688,10 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
             return false;
         });
 
+        // EXIT CONFIRMATION
+        exitConfirmation = new OwnCheckBox(I18n.txt("gui.quit.confirmation"), skin, pad5);
+        exitConfirmation.setChecked(GlobalConf.program.EXIT_CONFIRMATION);
+
         // RELOAD DEFAULTS
         OwnTextButton reloadDefaults = new OwnTextButton(I18n.txt("gui.system.reloaddefaults"), skin);
         reloadDefaults.addListener(event -> {
@@ -1707,6 +1712,7 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
 
         // Add to table
         stats.add(debugInfo).left().padBottom(pad5).row();
+        stats.add(exitConfirmation).left().padBottom(pad5).row();
         stats.add(report).left().padBottom(pad5 * 5).row();
         stats.add(warningLabel).left().padBottom(pad5).row();
         stats.add(reloadDefaults).left();
@@ -2071,6 +2077,7 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         if (GlobalConf.program.SHOW_DEBUG_INFO != debugInfoBak) {
             EventManager.instance.post(Events.SHOW_DEBUG_CMD, !debugInfoBak);
         }
+        GlobalConf.program.EXIT_CONFIRMATION = exitConfirmation.isChecked();
 
         // Save configuration
         ConfInit.instance.persistGlobalConf(new File(System.getProperty("properties.file")));
