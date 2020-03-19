@@ -180,42 +180,42 @@ public class NaturalControllerListener implements ControllerListener, IObserver,
 
         boolean treated = false;
 
-        // y = x^4
+        // y = x^pow
         // http://www.wolframalpha.com/input/?i=y+%3D+sign%28x%29+*+x%5E2+%28x+from+-1+to+1%29}
-        value = Math.signum(value) * value * value * value * value;
+        double val = Math.signum(value) * Math.abs(Math.pow(value, mappings.getAxisValuePower()));
 
         if (axisCode == mappings.getAxisRoll()) {
             if (cam.getMode().isFocus()) {
-                cam.setRoll(value * 1e-2f);
+                cam.setRoll(val * 1e-2 * mappings.getAxisRollSensitivity());
             } else {
                 // Use this for lateral movement
-                cam.setHorizontal(value);
+                cam.setHorizontal(val * mappings.getAxisRollSensitivity());
             }
             treated = true;
         } else if (axisCode == mappings.getAxisPitch()) {
             if (cam.getMode().isFocus()) {
-                cam.setVertical(value * 0.1);
+                cam.setVertical(val * 0.1 * mappings.getAxisPitchSensitivity());
             } else {
-                cam.setPitch((GlobalConf.controls.INVERT_LOOK_Y_AXIS ? 1 : -1) * value * 3e-2f);
+                cam.setPitch((GlobalConf.controls.INVERT_LOOK_Y_AXIS ? 1.0 : -1.0) * val * 3e-2 * mappings.getAxisPitchSensitivity());
             }
             treated = true;
         } else if (axisCode == mappings.getAxisYaw()) {
             if (cam.getMode().isFocus()) {
-                cam.setHorizontal(value * 0.1);
+                cam.setHorizontal(val * 0.1 * mappings.getAxisYawSensitivity());
             } else {
-                cam.setYaw(value * 3e-2f);
+                cam.setYaw(val * 3e-2 * mappings.getAxisYawSensitivity());
             }
             treated = true;
         } else if (axisCode == mappings.getAxisMove()) {
-            if (Math.abs(value) < 0.005)
-                value = 0;
-            cam.setVelocity(-value);
+            if (Math.abs(val) < 0.005)
+                val = 0;
+            cam.setVelocity(-val * mappings.getAxisMoveSensitivity());
             treated = true;
         } else if (axisCode == mappings.getAxisVelocityUp()) {
-            cam.setVelocity((value + 1f) / 2.0f);
+            cam.setVelocity((val * mappings.getAxisVelUpSensitivity() + 1.0) / 2.0);
             treated = true;
         } else if (axisCode == mappings.getAxisVelocityDown()) {
-            cam.setVelocity(-(value + 1f) / 2.0f);
+            cam.setVelocity(-(val * mappings.getAxisVelDownSensitivity() + 1.0) / 2.0);
             treated = true;
         }
 
