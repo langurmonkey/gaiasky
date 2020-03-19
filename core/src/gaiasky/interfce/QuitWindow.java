@@ -23,7 +23,9 @@ import gaiasky.util.scene2d.OwnLabel;
  * @author tsagrista
  */
 public class QuitWindow extends GenericDialog {
+
     private OwnCheckBox doNotAsk;
+
     public QuitWindow(Stage ui, Skin skin) {
         super(I18n.txt("gui.quit.title"), skin, ui);
 

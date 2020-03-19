@@ -38,7 +38,7 @@ public class InitialGui extends AbstractGui {
     private VRStatus vrStatus;
 
     protected DownloadDataWindow ddw;
-    protected ChooseCatalogWindow cdw;
+    protected CatalogChooserWindow cdw;
 
     /** Lock object for synchronisation **/
 
@@ -129,10 +129,10 @@ public class InitialGui extends AbstractGui {
         /**
          * Display chooser if:
          * - force display (args), or
-         * - force display (conf), or
-         * - catalogs available and yet no catalog is selected
+         * - show criterion is 'always' (conf)
+         * - catalogs available and no catalogs are selected
          */
-        if (catalogChooser || GlobalConf.program.DISPLAY_DATASET_DIALOG || (catalogFiles.size > 0 && !isCatalogSelected())) {
+        if (catalogChooser || GlobalConf.program.CATALOG_CHOOSER.always() || (catalogFiles.size > 0 && (!isCatalogSelected() && !GlobalConf.program.CATALOG_CHOOSER.never()))) {
             String noticeKey = "gui.dschooser.nocatselected";
             addDatasetChooser(noticeKey);
         } else {
@@ -188,7 +188,7 @@ public class InitialGui extends AbstractGui {
 
     private void addDatasetChooser(String noticeKey) {
         if (cdw == null)
-            cdw = new ChooseCatalogWindow(ui, skin, noticeKey);
+            cdw = new CatalogChooserWindow(ui, skin, noticeKey);
         cdw.show(ui);
     }
 

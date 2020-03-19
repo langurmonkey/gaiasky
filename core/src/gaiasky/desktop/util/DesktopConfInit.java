@@ -14,6 +14,7 @@ import gaiasky.render.ComponentTypes.ComponentType;
 import gaiasky.util.*;
 import gaiasky.util.GlobalConf.*;
 import gaiasky.util.GlobalConf.PostprocessConf.Antialias;
+import gaiasky.util.GlobalConf.ProgramConf.ShowCriterion;
 import gaiasky.util.GlobalConf.ProgramConf.StereoProfile;
 import gaiasky.util.GlobalConf.SceneConf.ElevationType;
 import gaiasky.util.GlobalConf.SceneConf.GraphicsQuality;
@@ -207,7 +208,10 @@ public class DesktopConfInit extends ConfInit {
         float PLANETARIUM_ANGLE = Parser.parseFloat(p.getProperty("program.planetarium.angle", "50.0"));
         boolean DISPLAY_HUD = Boolean.parseBoolean(p.getProperty("program.display.hud", "false"));
         boolean DISPLAY_POINTER_COORDS = Boolean.parseBoolean(p.getProperty("program.pointer.coords.display", "true"));
-        boolean DISPLAY_DATASET_DIALOG = Boolean.parseBoolean(p.getProperty("program.catalog.chooser", "false"));
+        String catChoos = p.getProperty("program.catalog.chooser", "default");
+        if(catChoos.equalsIgnoreCase("true") || catChoos.equalsIgnoreCase("false"))
+            catChoos = "default";
+        ShowCriterion CATALOG_CHOOSER = ShowCriterion.valueOf(catChoos.toUpperCase());
         boolean DISPLAY_MINIMAP = Boolean.parseBoolean(p.getProperty("program.display.minimap", "true"));
         float MINIMAP_SIZE = MathUtilsd.clamp(Parser.parseFloat(p.getProperty("program.minimap.size", "220.0")), Constants.MIN_MINIMAP_SIZE, Constants.MAX_MINIMAP_SIZE);
         boolean NET_MASTER = Boolean.parseBoolean(p.getProperty("program.net.master", "false"));
@@ -235,7 +239,7 @@ public class DesktopConfInit extends ConfInit {
             }
         }
 
-        prc.initialize(SHOW_DEBUG_INFO, LAST_CHECKED, LAST_VERSION, VERSION_CHECK_URL, DATA_DESCRIPTOR_URL, UI_THEME, SCRIPT_LOCATION, REST_PORT, LOCALE, STEREOSCOPIC_MODE, STEREO_PROFILE, CUBEMAP_MODE, CUBEMAP_PROJECTION, CUBEMAP_FACE_RESOLUTION, DISPLAY_HUD, DISPLAY_POINTER_COORDS, DISPLAY_DATASET_DIALOG, NET_MASTER, NET_SLAVE, NET_MASTER_SLAVES, NET_SLAVE_CONFIG, NET_SLAVE_YAW, NET_SLAVE_PITCH, NET_SLAVE_ROLL, NET_SLAVE_WARP, NET_SLAVE_BLEND, LAST_FOLDER_LOCATION, DISPLAY_MINIMAP, MINIMAP_SIZE, PLANETARIUM_APERTURE, PLANETARIUM_ANGLE, DISPLAY_POINTER_GUIDES, POINTER_GUIDES_COLOR, POINTER_GUIDES_WIDTH, EXIT_CONFIRMATION);
+        prc.initialize(SHOW_DEBUG_INFO, LAST_CHECKED, LAST_VERSION, VERSION_CHECK_URL, DATA_DESCRIPTOR_URL, UI_THEME, SCRIPT_LOCATION, REST_PORT, LOCALE, STEREOSCOPIC_MODE, STEREO_PROFILE, CUBEMAP_MODE, CUBEMAP_PROJECTION, CUBEMAP_FACE_RESOLUTION, DISPLAY_HUD, DISPLAY_POINTER_COORDS, NET_MASTER, NET_SLAVE, NET_MASTER_SLAVES, NET_SLAVE_CONFIG, NET_SLAVE_YAW, NET_SLAVE_PITCH, NET_SLAVE_ROLL, NET_SLAVE_WARP, NET_SLAVE_BLEND, LAST_FOLDER_LOCATION, DISPLAY_MINIMAP, MINIMAP_SIZE, PLANETARIUM_APERTURE, PLANETARIUM_ANGLE, DISPLAY_POINTER_GUIDES, POINTER_GUIDES_COLOR, POINTER_GUIDES_WIDTH, EXIT_CONFIRMATION, CATALOG_CHOOSER);
 
         /** SCENE CONF **/
         String gc = p.getProperty("scene.graphics.quality");
@@ -507,7 +511,7 @@ public class DesktopConfInit extends ConfInit {
         p.setProperty("program.cubemap.face.resolution", Integer.toString(GlobalConf.program.CUBEMAP_FACE_RESOLUTION));
         p.setProperty("program.planetarium.aperture", Float.toString(GlobalConf.program.PLANETARIUM_APERTURE));
         p.setProperty("program.planetarium.angle", Float.toString(GlobalConf.program.PLANETARIUM_ANGLE));
-        p.setProperty("program.catalog.chooser", Boolean.toString(GlobalConf.program.DISPLAY_DATASET_DIALOG));
+        p.setProperty("program.catalog.chooser", GlobalConf.program.CATALOG_CHOOSER.toString().toLowerCase());
         p.setProperty("program.net.slave.yaw", Float.toString(GlobalConf.program.NET_SLAVE_YAW));
         p.setProperty("program.net.slave.pitch", Float.toString(GlobalConf.program.NET_SLAVE_PITCH));
         p.setProperty("program.net.slave.roll", Float.toString(GlobalConf.program.NET_SLAVE_ROLL));

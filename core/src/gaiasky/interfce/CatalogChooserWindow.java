@@ -18,24 +18,27 @@ import gaiasky.event.EventManager;
 import gaiasky.event.Events;
 import gaiasky.util.GlobalConf;
 import gaiasky.util.I18n;
+import gaiasky.util.scene2d.OwnCheckBox;
 import gaiasky.util.scene2d.OwnLabel;
 
 /**
- * GUI window to choose the catalog to use
+ * GUI window to choose the catalogs to load by default.
+ * This is shown at startup if no catalogs are selected and {@link GlobalConf#program#SKIP_CATALOG_CHOOSER} is false.
  * @author tsagrista
  *
  */
-public class ChooseCatalogWindow extends GenericDialog {
+public class CatalogChooserWindow extends GenericDialog {
 
     private DatasetsWidget dw;
     private String assetsLoc;
     private String notice;
+    private OwnCheckBox skipCatalogChooser;
 
-    public ChooseCatalogWindow(Stage stage, Skin skin){
+    public CatalogChooserWindow(Stage stage, Skin skin){
         this(stage, skin, null);
     }
 
-    public ChooseCatalogWindow(Stage stage, Skin skin, String noticeKey) {
+    public CatalogChooserWindow(Stage stage, Skin skin, String noticeKey) {
         super(I18n.txt("gui.dschooser.title"), skin, stage);
         this.notice = I18n.txt(noticeKey);
         assetsLoc = GlobalConf.ASSETS_LOC;
@@ -62,10 +65,17 @@ public class ChooseCatalogWindow extends GenericDialog {
         cell.space(3 * GlobalConf.UI_SCALE_FACTOR);
         cell.padTop(10 * GlobalConf.UI_SCALE_FACTOR);
         cell.setActor(dw.buildDatasetsWidget(catalogFiles));
+
+
+        skipCatalogChooser = new OwnCheckBox(I18n.txt("gui.dschooser.notshow"), skin, pad5);
+        skipCatalogChooser.setChecked(false);
+
+        bottom.add(skipCatalogChooser).right().row();
     }
 
     @Override
     protected void accept() {
+        GlobalConf.program.CATALOG_CHOOSER = skipCatalogChooser.isChecked() ? GlobalConf.ProgramConf.ShowCriterion.NEVER : GlobalConf.program.CATALOG_CHOOSER;
         // Update setting
         if (dw != null && dw.cbs != null) {
             GlobalConf.data.CATALOG_JSON_FILES.clear();
