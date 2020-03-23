@@ -95,7 +95,7 @@ public class CollapsiblePane extends Table {
         detachIcon.addListener(new OwnTextTooltip(I18n.bundle.get("gui.tooltip.detach.group"), skin));
 
         // Question icon
-        Label questionLabel = new OwnLabel("(?)", skin, "question");
+        OwnLabel questionLabel = new OwnLabel("(?)", skin, "question");
         if (shortcut != null && !shortcut.isEmpty())
             questionLabel.addListener(new OwnTextHotkeyTooltip(labelText, shortcut, skin));
 

@@ -584,7 +584,7 @@
   },
   "com.badlogic.gdx.scenes.scene2d.ui.Label$LabelStyle": {
     "object-name": {
-      "font": "ui-11",
+      "font": "ui-10",
       "fontColor": "red"
     },
     "header": {

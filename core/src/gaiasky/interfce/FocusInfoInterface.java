@@ -25,9 +25,7 @@ import gaiasky.util.format.NumberFormatFactory;
 import gaiasky.util.math.MathUtilsd;
 import gaiasky.util.math.Vector2d;
 import gaiasky.util.math.Vector3d;
-import gaiasky.util.scene2d.OwnLabel;
-import gaiasky.util.scene2d.OwnTextIconButton;
-import gaiasky.util.scene2d.OwnTextTooltip;
+import gaiasky.util.scene2d.*;
 
 /**
  * Part of the user interface which holds the information on the current focus
@@ -45,6 +43,7 @@ public class FocusInfoInterface extends TableGuiInterface implements IObserver {
     protected OwnLabel pointerName, pointerLonLat, pointerRADEC, viewRADEC;
     protected OwnLabel camName, camVel, camPos, lonLatLabel, RADECPointerLabel, RADECViewLabel, appmagLabel, absmagLabel;
     protected OwnLabel rulerName, rulerName0, rulerName1, rulerDist;
+    protected OwnLabel focusIdExpand;
 
     protected HorizontalGroup focusNameGroup;
 
@@ -91,6 +90,8 @@ public class FocusInfoInterface extends TableGuiInterface implements IObserver {
         focusName = new OwnLabel("", skin, "hud-header");
         focusType = new OwnLabel("", skin, "hud-subheader");
         focusId = new OwnLabel("", skin, "hud");
+        focusIdExpand = new OwnLabel("(?)", skin, "question");
+        focusIdExpand.setVisible(false);
         focusNames = new Table(skin);
         focusRA = new OwnLabel("", skin, "hud");
         focusDEC = new OwnLabel("", skin, "hud");
@@ -194,6 +195,7 @@ public class FocusInfoInterface extends TableGuiInterface implements IObserver {
 
         float w = 130 * GlobalConf.UI_SCALE_FACTOR;
         focusId.setWidth(w);
+
         focusRA.setWidth(w);
         focusDEC.setWidth(w);
         focusMuAlpha.setWidth(w);
@@ -205,13 +207,12 @@ public class FocusInfoInterface extends TableGuiInterface implements IObserver {
         camVel.setWidth(w);
 
         /** FOCUS INFO **/
-
         focusInfo.add(focusNameGroup).left().colspan(2).padBottom(pad5);
         focusInfo.row();
         focusInfo.add(focusType).left().padBottom(pad5).colspan(2);
         focusInfo.row();
         focusInfo.add(new OwnLabel("ID", skin, "hud")).left();
-        focusInfo.add(focusId).left().padLeft(pad15);
+        focusInfo.add(hg(focusId, focusIdExpand)).left().padLeft(pad15);
         focusInfo.row();
         focusInfo.add(new OwnLabel(I18n.txt("gui.focusinfo.names"), skin, "hud")).left().padBottom(pad5);
         focusInfo.add(focusNames).left().padBottom(pad5).padLeft(pad15);
@@ -305,6 +306,12 @@ public class FocusInfoInterface extends TableGuiInterface implements IObserver {
         EventManager.instance.subscribe(this, Events.FOCUS_CHANGED, Events.FOCUS_INFO_UPDATED, Events.CAMERA_MOTION_UPDATED, Events.CAMERA_MODE_CMD, Events.LON_LAT_UPDATED, Events.RA_DEC_UPDATED, Events.RULER_ATTACH_0, Events.RULER_ATTACH_1, Events.RULER_CLEAR, Events.RULER_DIST);
     }
 
+    private HorizontalGroup hg(Actor... actors){
+        HorizontalGroup hg = new HorizontalGroup();
+        for(Actor a : actors)
+            hg.addActor(a);
+        return hg;
+    }
     private void scaleFonts(SnapshotArray<Actor> a, float scl) {
         for (Actor actor : a) {
             if (actor instanceof Group) {
@@ -333,7 +340,10 @@ public class FocusInfoInterface extends TableGuiInterface implements IObserver {
             }
             currentFocus = focus;
 
+            final int focusFieldMaxLength = GlobalConf.UI_SCALE_FACTOR < 1.5 ? 17 : 20;
+
             // ID
+            boolean cappedId = false;
             String id = "";
             if (focus instanceof IStarFocus) {
                 IStarFocus sf = (IStarFocus) focus;
@@ -345,6 +355,11 @@ public class FocusInfoInterface extends TableGuiInterface implements IObserver {
             }
             if (id.length() == 0) {
                 id = "-";
+            }
+            String idString = id;
+            if(id.length() > focusFieldMaxLength) {
+                idString = TextUtils.capString(id, focusFieldMaxLength);
+                cappedId = true;
             }
 
             // Link
@@ -368,7 +383,17 @@ public class FocusInfoInterface extends TableGuiInterface implements IObserver {
             pointerLonLat.setText("-/-");
 
             // Id, names
-            focusId.setText(id);
+            focusId.setText(idString);
+            focusId.clearListeners();
+            if(cappedId){
+                focusId.addListener(new OwnTextTooltip(id, skin));
+                focusIdExpand.addListener(new OwnTextTooltip(id, skin));
+                focusIdExpand.setVisible(true);
+            } else {
+                focusIdExpand.clearListeners();
+                focusIdExpand.setVisible(false);
+            }
+
             String objectName = focus.getName();
             focusName.setText(objectName);
 
@@ -380,9 +405,12 @@ public class FocusInfoInterface extends TableGuiInterface implements IObserver {
                 int chars = 0;
                 for (int i = 0; i < names.length; i++) {
                     String name = names[i];
-                    OwnLabel nl = new OwnLabel(name, skin, "object-name");
+                    String nameCapped = TextUtils.capString(name, focusFieldMaxLength);
+                    OwnLabel nl = new OwnLabel(nameCapped, skin, "object-name");
+                    if(nameCapped.length() != name.length())
+                        nl.addListener(new OwnTextTooltip(name, skin));
                     hg.addActor(nl);
-                    chars += name.length() + 1;
+                    chars += nameCapped.length() + 1;
                     if(i < names.length - 1){
                         hg.addActor(new OwnLabel(", ", skin));
                         chars++;
