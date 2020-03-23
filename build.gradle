@@ -118,58 +118,58 @@ project(":core") {
         // *****************************
         // GENERATE SKINS (PackTextures)
         // *****************************
-        //compile "com.badlogicgames.gdx:gdx-tools:$gdxVersion"
+        //implementation "com.badlogicgames.gdx:gdx-tools:$gdxVersion"
 
         // ************
         // REGULAR DEPS
         // ************
-        compile group: "org.lwjgl", name: "lwjgl", version: "$lwjglVersion"
-        compile group: "org.lwjgl", name: "lwjgl-glfw", version: "$lwjglVersion"
-        compile group: "org.lwjgl", name: "lwjgl-jemalloc", version: "$lwjglVersion"
-        compile group: "org.lwjgl", name: "lwjgl-opengl", version: "$lwjglVersion"
-        compile group: "org.lwjgl", name: "lwjgl-openal", version: "$lwjglVersion"
+        implementation group: "org.lwjgl", name: "lwjgl", version: "$lwjglVersion"
+        implementation group: "org.lwjgl", name: "lwjgl-glfw", version: "$lwjglVersion"
+        implementation group: "org.lwjgl", name: "lwjgl-jemalloc", version: "$lwjglVersion"
+        implementation group: "org.lwjgl", name: "lwjgl-opengl", version: "$lwjglVersion"
+        implementation group: "org.lwjgl", name: "lwjgl-openal", version: "$lwjglVersion"
         
-        compile group: "org.lwjgl", name: "lwjgl-openvr", version: "$lwjglVersion"
-        compile "org.lwjgl:lwjgl-openvr:$lwjglVersion:natives-linux"
-        compile "org.lwjgl:lwjgl-openvr:$lwjglVersion:natives-windows"
-        compile "org.lwjgl:lwjgl-openvr:$lwjglVersion:natives-macos"
+        implementation group: "org.lwjgl", name: "lwjgl-openvr", version: "$lwjglVersion"
+        implementation "org.lwjgl:lwjgl-openvr:$lwjglVersion:natives-linux"
+        implementation "org.lwjgl:lwjgl-openvr:$lwjglVersion:natives-windows"
+        implementation "org.lwjgl:lwjgl-openvr:$lwjglVersion:natives-macos"
 
-        compile "com.badlogicgames.gdx:gdx:$gdxVersion"
-        compile "com.badlogicgames.gdx:gdx-backend-lwjgl3:$gdxVersion"
-        compile "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-desktop"
-        compile "com.badlogicgames.gdx:gdx-controllers-lwjgl3:$gdxVersion"
+        implementation "com.badlogicgames.gdx:gdx:$gdxVersion"
+        implementation "com.badlogicgames.gdx:gdx-backend-lwjgl3:$gdxVersion"
+        implementation "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-desktop"
+        implementation "com.badlogicgames.gdx:gdx-controllers-lwjgl3:$gdxVersion"
 
-        compile "uk.co.electronstudio.sdl2gdx:sdl2gdx:$sdl2gdxVersion"
+        implementation "uk.co.electronstudio.sdl2gdx:sdl2gdx:$sdl2gdxVersion"
 
-        compile group: "commons-io", name: "commons-io", version: "$commonsioVersion"
-        compile "org.apache.commons:commons-compress:$compressVersion"
-        compile "com.beust:jcommander:$jcommanderVersion"
-        compile "net.jafama:jafama:$jafamaVersion"
+        implementation group: "commons-io", name: "commons-io", version: "$commonsioVersion"
+        implementation "org.apache.commons:commons-compress:$compressVersion"
+        implementation "com.beust:jcommander:$jcommanderVersion"
+        implementation "net.jafama:jafama:$jafamaVersion"
         
-        compile group: "net.sf.py4j", name: "py4j", version: "$py4jVersion"
-        compile group: "com.github.oshi", name: "oshi-core", version: "$oshiVersion"
-        compile group: "org.astrogrid", name: "jsamp", version: "$jsampVersion"
+        implementation group: "net.sf.py4j", name: "py4j", version: "$py4jVersion"
+        implementation group: "com.github.oshi", name: "oshi-core", version: "$oshiVersion"
+        implementation group: "org.astrogrid", name: "jsamp", version: "$jsampVersion"
 
         // ****************
         // REST SERVER DEPS
         // ****************
-        compile "org.slf4j:slf4j-nop:$slf4jVersion"
-        //compile "org.slf4j:slf4j-simple:$slf4jVersion"
-        compile "com.sparkjava:spark-core:$sparkjavaVersion"
-        compile "com.google.code.gson:gson:$gsonVersion"
-        compile "junit:junit:4.12"
+        implementation "org.slf4j:slf4j-nop:$slf4jVersion"
+        //implementation "org.slf4j:slf4j-simple:$slf4jVersion"
+        implementation "com.sparkjava:spark-core:$sparkjavaVersion"
+        implementation "com.google.code.gson:gson:$gsonVersion"
+        implementation "junit:junit:4.12"
 
         // *************
         // INTERNAL DEPS
         // *************
-        compile files("lib/stil.jar",
+        implementation files("lib/stil.jar",
                         "../assets")
     }
 
     jar {
         manifest {
             attributes "Implementation-Title": "Gaia Sky",
-            "Implementation-Version": version
+            "Implementation-Version": archiveVersion
         }
         from("../assets") {
             include "font/main-font.fnt"
