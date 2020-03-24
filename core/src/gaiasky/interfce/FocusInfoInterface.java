@@ -340,7 +340,7 @@ public class FocusInfoInterface extends TableGuiInterface implements IObserver {
             }
             currentFocus = focus;
 
-            final int focusFieldMaxLength = GlobalConf.UI_SCALE_FACTOR < 1.5 ? 17 : 20;
+            final int focusFieldMaxLength = !GlobalConf.isHiDPI() ? 17 : 20;
 
             // ID
             boolean cappedId = false;

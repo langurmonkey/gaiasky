@@ -33,7 +33,7 @@ public class DatasetLoadDialog extends GenericDialog {
         pad5 = 5f * GlobalConf.UI_SCALE_FACTOR;
         pad10 = 10f * GlobalConf.UI_SCALE_FACTOR;
         pad15 = 15f * GlobalConf.UI_SCALE_FACTOR;
-        sliderWidth = GlobalConf.UI_SCALE_FACTOR < 1.5f ? 370f * GlobalConf.UI_SCALE_FACTOR : 415f * GlobalConf.UI_SCALE_FACTOR;
+        sliderWidth = !GlobalConf.isHiDPI() ? 370f * GlobalConf.UI_SCALE_FACTOR : 415f * GlobalConf.UI_SCALE_FACTOR;
         fieldWidth = 180f * GlobalConf.UI_SCALE_FACTOR;
         titleWidth = 180f * GlobalConf.UI_SCALE_FACTOR;
 

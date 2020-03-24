@@ -58,6 +58,9 @@ public class DatasetsWidget {
     }
 
     public Actor buildDatasetsWidget(Array<FileHandle> catalogFiles, boolean scrollOn) {
+        return buildDatasetsWidget(catalogFiles, scrollOn, 40);
+    }
+    public Actor buildDatasetsWidget(Array<FileHandle> catalogFiles, boolean scrollOn, int maxCharsDescription) {
         float pad = 3 * GlobalConf.UI_SCALE_FACTOR;
 
         JsonReader reader = new JsonReader();
@@ -130,7 +133,7 @@ public class DatasetsWidget {
             // Description
             HorizontalGroup descGroup = new HorizontalGroup();
             descGroup.space(pad * 2f);
-            String shortDesc = TextUtils.capString(desc != null ? desc : "", 40);
+            String shortDesc = TextUtils.capString(desc != null ? desc : "", maxCharsDescription);
             OwnLabel description = new OwnLabel(shortDesc, skin);
             // Info
             OwnImageButton imgTooltip = new OwnImageButton(skin, "tooltip");

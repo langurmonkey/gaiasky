@@ -183,8 +183,6 @@ public class MWModelRenderSystem extends ImmediateRenderSystem implements IObser
      * @return
      */
     private GpuData convertDataToGpu(Array<? extends ParticleBean> data, ColorGenerator cg, PType type) {
-        float hiDpiScaleFactor = GlobalConf.UI_SCALE_FACTOR;
-
         GpuData ad = new GpuData();
 
         int vertexSize = 3 + 1 + 3;
@@ -206,7 +204,7 @@ public class MWModelRenderSystem extends ImmediateRenderSystem implements IObser
 
                 // SIZE, TYPE, TEX LAYER
                 double starSize = star.data[3];
-                ad.vertices[ad.vertexIdx + additionalOffset] = (float) (starSize * hiDpiScaleFactor);
+                ad.vertices[ad.vertexIdx + additionalOffset] = (float) (starSize * GlobalConf.UI_SCALE_FACTOR);
                 ad.vertices[ad.vertexIdx + additionalOffset + 1] = (float) type.id;
                 ad.vertices[ad.vertexIdx + additionalOffset + 2] = (float) type.layers[StdRandom.uniform(nLayers)];
 

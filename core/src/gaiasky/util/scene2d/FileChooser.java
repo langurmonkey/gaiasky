@@ -121,7 +121,7 @@ public class FileChooser extends GenericDialog {
     public void build() {
         scrollPaneWidth = 600 * GlobalConf.UI_SCALE_FACTOR;
         scrollPanelHeight = 450 * GlobalConf.UI_SCALE_FACTOR;
-        maxPathLength = GlobalConf.UI_SCALE_FACTOR > 1.5f ? 9.5f : 5.5f;
+        maxPathLength = GlobalConf.isHiDPI() ? 9.5f : 5.5f;
 
         content.top().left();
         content.defaults().space(5 * GlobalConf.UI_SCALE_FACTOR);

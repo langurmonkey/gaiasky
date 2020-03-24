@@ -31,7 +31,7 @@ public class UCDParser {
     private static String[] pos2cartcolnames = new String[] { "y", "Y" };
     private static String[] distcolnames = new String[] { "dist", "distance" };
     private static String[] pos3cartcolnames = new String[] { "z", "Z" };
-    private static String[] pllxcolnames = new String[] { "plx", "parallax", "pllx" };
+    private static String[] pllxcolnames = new String[] { "plx", "parallax", "pllx", "par" };
     private static String[] magcolnames = new String[] { "phot_g_mean_mag", "mag", "bmag", "gmag" };
     private static String[] colorcolnames = new String[] { "b_v", "v_i", "bp_rp", "bp_g", "g_rp", "ci" };
     private static String[] pmracolnames = new String[] { "pmra", "pmalpha", "pm_ra" };

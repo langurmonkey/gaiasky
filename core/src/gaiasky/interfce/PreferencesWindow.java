@@ -125,7 +125,7 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         float contentw = 700 * GlobalConf.UI_SCALE_FACTOR;
         float contenth = 700 * GlobalConf.UI_SCALE_FACTOR;
         final float tawidth = 600 * GlobalConf.UI_SCALE_FACTOR;
-        float tabwidth = (GlobalConf.UI_SCALE_FACTOR > 1.5 ? 180 : 220) * GlobalConf.UI_SCALE_FACTOR;
+        float tabwidth = (GlobalConf.isHiDPI() ? 180 : 220) * GlobalConf.UI_SCALE_FACTOR;
         float textwidth = 65 * GlobalConf.UI_SCALE_FACTOR;
         float scrollh = 400 * GlobalConf.UI_SCALE_FACTOR;
         float controlsscrollw = 450 * GlobalConf.UI_SCALE_FACTOR;
@@ -1579,7 +1579,7 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         String assetsLoc = GlobalConf.ASSETS_LOC;
         dw = new DatasetsWidget(skin, assetsLoc);
         Array<FileHandle> catalogFiles = dw.buildCatalogFiles();
-        Actor dataSource = dw.buildDatasetsWidget(catalogFiles, false);
+        Actor dataSource = dw.buildDatasetsWidget(catalogFiles, false, 20);
 
         // CATALOG CHOOSER SHOW CRITERIA
         OwnLabel titleCatChooser = new OwnLabel(I18n.txt("gui.data.dschooser.title"), skin, "help-title");

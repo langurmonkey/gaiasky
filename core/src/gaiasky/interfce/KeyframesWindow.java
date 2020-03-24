@@ -295,8 +295,8 @@ public class KeyframesWindow extends GenericDialog implements IObserver {
         rightScroll = new OwnScrollPane(keyframesTable, skin, "minimalist-nobg");
         rightScroll.setExpand(true);
         rightScroll.setScrollingDisabled(true, false);
-        rightScroll.setHeight((GlobalConf.UI_SCALE_FACTOR > 1.5f ? 100 : 110) * GlobalConf.UI_SCALE_FACTOR);
-        rightScroll.setWidth((GlobalConf.UI_SCALE_FACTOR > 1.5f ? 360 : 390) * GlobalConf.UI_SCALE_FACTOR);
+        rightScroll.setHeight((GlobalConf.isHiDPI() ? 100 : 110) * GlobalConf.UI_SCALE_FACTOR);
+        rightScroll.setWidth((GlobalConf.isHiDPI() ? 360 : 390) * GlobalConf.UI_SCALE_FACTOR);
         rightScroll.setFadeScrollBars(true);
 
         right.add(keyframesTitle).top().left().padBottom(pad).row();
@@ -624,7 +624,7 @@ public class KeyframesWindow extends GenericDialog implements IObserver {
     private Cell addFrameSeconds(Keyframe kf, double prevT, int index, Table table) {
         // Seconds
         OwnLabel secondsL = new OwnLabel(secondsFormatter.format(prevT + kf.seconds), skin, "hud-header");
-        secondsL.setWidth((GlobalConf.UI_SCALE_FACTOR > 1.5f ? 60f : 75f) * GlobalConf.UI_SCALE_FACTOR);
+        secondsL.setWidth((GlobalConf.isHiDPI() ? 60f : 75f) * GlobalConf.UI_SCALE_FACTOR);
         Cell secondsCell;
         if (secondsCells.containsKey(kf))
             secondsCell = secondsCells.get(kf);
@@ -649,7 +649,7 @@ public class KeyframesWindow extends GenericDialog implements IObserver {
                         secondsL.clear();
                         secondsCells.get(kf).clearActor();
                         OwnTextField secondsInput = new OwnTextField(valText, skin, new FloatValidator(0.0001f, 500f));
-                        secondsInput.setWidth((GlobalConf.UI_SCALE_FACTOR > 1.5f ? 55f : 75f) * GlobalConf.UI_SCALE_FACTOR);
+                        secondsInput.setWidth((GlobalConf.isHiDPI() ? 55f : 75f) * GlobalConf.UI_SCALE_FACTOR);
                         secondsInput.selectAll();
                         stage.setKeyboardFocus(secondsInput);
                         editing.setSeconds(kf, index, secondsInput, prevT);
@@ -695,7 +695,7 @@ public class KeyframesWindow extends GenericDialog implements IObserver {
     private Cell addFrameName(Keyframe kf, int index, Table table) {
         // Seconds
         OwnLabel nameL = new OwnLabel((index + 1) + ": " + kf.name, skin);
-        nameL.setWidth((GlobalConf.UI_SCALE_FACTOR > 1.5f ? 100f : 130f) * GlobalConf.UI_SCALE_FACTOR);
+        nameL.setWidth((GlobalConf.isHiDPI() ? 100f : 130f) * GlobalConf.UI_SCALE_FACTOR);
         Cell nameCell;
         if (namesCells.containsKey(kf))
             nameCell = namesCells.get(kf);
@@ -724,7 +724,7 @@ public class KeyframesWindow extends GenericDialog implements IObserver {
                     LengthValidator lengthValidator = new LengthValidator(0, 15);
                     RegexpValidator nameValidator = new RegexpValidator(lengthValidator, "^[^*&%\\+\\=\\\\\\/@#\\$&\\*()~]*$");
                     OwnTextField nameInput = new OwnTextField(valText, skin, nameValidator);
-                    nameInput.setWidth((GlobalConf.UI_SCALE_FACTOR > 1.5f ? 100f : 130f) * GlobalConf.UI_SCALE_FACTOR);
+                    nameInput.setWidth((GlobalConf.isHiDPI() ? 100f : 130f) * GlobalConf.UI_SCALE_FACTOR);
                     nameInput.selectAll();
                     stage.setKeyboardFocus(nameInput);
                     editing.setName(kf, index, nameInput);

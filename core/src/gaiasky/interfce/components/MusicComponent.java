@@ -173,7 +173,7 @@ public class MusicComponent extends GuiComponent implements IObserver {
     }
 
     private int getTrackWindowSize() {
-        return GlobalConf.UI_SCALE_FACTOR > 1.5f ? 20 : 14;
+        return GlobalConf.isHiDPI() ? 20 : 14;
     }
 
     private float getVolumePercentage() {

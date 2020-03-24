@@ -122,7 +122,7 @@ public class DownloadDataWindow extends GenericDialog {
         me.acceptButton.setDisabled(false);
         float pad = 2f * GlobalConf.UI_SCALE_FACTOR;
         float padLarge = 9f * GlobalConf.UI_SCALE_FACTOR;
-        float minW = GlobalConf.UI_SCALE_FACTOR == 1 ? 550f : 650f;
+        float minW = !GlobalConf.isHiDPI() ? 550f : 650f;
 
         float buttonPad = 1f * GlobalConf.UI_SCALE_FACTOR;
         Cell<Actor> topCell = content.add((Actor) null).left().top();
@@ -243,7 +243,7 @@ public class DownloadDataWindow extends GenericDialog {
                 // Add dataset to desc table
                 OwnCheckBox cb = new OwnCheckBox(dataset.name, skin, "title", pad * 2f);
                 cb.left();
-                cb.setMinWidth(GlobalConf.UI_SCALE_FACTOR < 1.5f ? 245f * GlobalConf.UI_SCALE_FACTOR : 160f * GlobalConf.UI_SCALE_FACTOR);
+                cb.setMinWidth(!GlobalConf.isHiDPI() ? 245f * GlobalConf.UI_SCALE_FACTOR : 160f * GlobalConf.UI_SCALE_FACTOR);
                 cb.setChecked(dataset.mustDownload);
                 cb.setDisabled(dataset.cbDisabled);
                 cb.addListener((event) -> {
@@ -274,7 +274,7 @@ public class DownloadDataWindow extends GenericDialog {
                 HorizontalGroup descGroup = new HorizontalGroup();
                 descGroup.space(padLarge);
                 OwnLabel desc = new OwnLabel(dataset.shortDescription, skin);
-                desc.setWidth(GlobalConf.UI_SCALE_FACTOR < 1.5f ? 200f * GlobalConf.UI_SCALE_FACTOR : 140f * GlobalConf.UI_SCALE_FACTOR);
+                desc.setWidth(!GlobalConf.isHiDPI() ? 200f * GlobalConf.UI_SCALE_FACTOR : 140f * GlobalConf.UI_SCALE_FACTOR);
                 // Info
                 OwnImageButton imgTooltip = new OwnImageButton(skin, "tooltip");
                 imgTooltip.addListener(new OwnTextTooltip(dataset.description, skin, 10));
@@ -400,7 +400,7 @@ public class DownloadDataWindow extends GenericDialog {
         datasetsScroll.setSmoothScrolling(false);
         datasetsScroll.setFadeScrollBars(false);
         datasetsScroll.setHeight(Math.min(Gdx.graphics.getHeight() * 0.45f, 750f * GlobalConf.UI_SCALE_FACTOR));
-        datasetsScroll.setWidth(Math.min(Gdx.graphics.getWidth() * 0.9f, GlobalConf.UI_SCALE_FACTOR > 1.4f ? 600f * GlobalConf.UI_SCALE_FACTOR : 750f * GlobalConf.UI_SCALE_FACTOR));
+        datasetsScroll.setWidth(Math.min(Gdx.graphics.getWidth() * 0.9f, GlobalConf.isHiDPI() ? 600f * GlobalConf.UI_SCALE_FACTOR : 750f * GlobalConf.UI_SCALE_FACTOR));
 
         downloadTable.add(datasetsScroll).top().left().padBottom(padLarge).colspan(2).row();
 

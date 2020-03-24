@@ -73,6 +73,10 @@ public class GlobalConf {
         logger.debug("GUI scale factor set to " + GlobalConf.UI_SCALE_FACTOR);
     }
 
+    public static boolean isHiDPI(){
+        return UI_SCALE_FACTOR > 1.5f;
+    }
+
     public interface IConf {
     }
 
