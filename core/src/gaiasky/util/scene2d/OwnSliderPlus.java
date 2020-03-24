@@ -89,7 +89,7 @@ public class OwnSliderPlus extends Slider {
     public void setMapValues(float mapMin, float mapMax) {
         this.mapMin = mapMin;
         this.mapMax = mapMax;
-        this.map = mapMin != getMinValue() && mapMax != getMaxValue();
+        this.map = mapMin != getMinValue() || mapMax != getMaxValue();
     }
 
     public void removeMapValues() {

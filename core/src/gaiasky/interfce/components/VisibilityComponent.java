@@ -36,11 +36,11 @@ public class VisibilityComponent extends GuiComponent implements IObserver {
     private ComponentType[] visibilityEntities;
     private boolean[] visible;
     private CheckBox pmArrowheads;
-    private Slider pmNumFactorSlider, pmLenFactorSlider;
+    private OwnSliderPlus pmNumFactorSlider, pmLenFactorSlider;
     private SelectBox<ComboBoxBean> pmColorMode;
     private Button pmToggleButton;
-    private Label pmLabel, pmNumFactor, pmLenFactor, pmNumFactorLabel, pmLenFactorLabel, pmColorModeLabel;
-    private VerticalGroup pmNumFactorGroup, pmLenFactorGroup, pmColorModeGroup;
+    private Label pmLabel, pmColorModeLabel;
+    private VerticalGroup pmColorModeGroup;
     private VerticalGroup pmGroup;
     private boolean sendEvents = true;
 
@@ -57,7 +57,7 @@ public class VisibilityComponent extends GuiComponent implements IObserver {
     public void initialize() {
         float space4 = 4f * GlobalConf.UI_SCALE_FACTOR;
         float space2 = 2f * GlobalConf.UI_SCALE_FACTOR;
-        float sliderWidth = 120f * GlobalConf.UI_SCALE_FACTOR;
+        float sliderWidth = 180 * GlobalConf.UI_SCALE_FACTOR;
         int visTableCols = 5;
         final Table visibilityTable = new Table(skin);
         visibilityTable.setName("visibility table");
@@ -127,39 +127,22 @@ public class VisibilityComponent extends GuiComponent implements IObserver {
 
 
         // NUM FACTOR
-        pmNumFactorLabel = new Label(I18n.txt("gui.pmnumfactor"), skin, "default");
-        pmNumFactor = new OwnLabel(Integer.toString((int) (MathUtilsd.lint(GlobalConf.scene.PM_NUM_FACTOR, Constants.MIN_PM_NUM_FACTOR, Constants.MAX_PM_NUM_FACTOR, Constants.MIN_SLIDER_1, Constants.MAX_SLIDER))), skin);
-
-        pmNumFactorSlider = new OwnSlider(Constants.MIN_SLIDER_1, Constants.MAX_SLIDER, 1, false, skin);
+        pmNumFactorSlider = new OwnSliderPlus(I18n.txt("gui.pmnumfactor"), Constants.MIN_SLIDER_1, Constants.MAX_SLIDER, Constants.SLIDER_STEP_SMALL, Constants.MIN_PM_NUM_FACTOR, Constants.MAX_PM_NUM_FACTOR, skin);
         pmNumFactorSlider.setName("proper motion vectors number factor");
         pmNumFactorSlider.setWidth(sliderWidth);
-        pmNumFactorSlider.setValue(MathUtilsd.lint(GlobalConf.scene.PM_NUM_FACTOR, Constants.MIN_PM_NUM_FACTOR, Constants.MAX_PM_NUM_FACTOR, Constants.MIN_SLIDER_1, Constants.MAX_SLIDER));
+        pmNumFactorSlider.setMappedValue(GlobalConf.scene.PM_NUM_FACTOR);
         pmNumFactorSlider.addListener(event -> {
             if (event instanceof ChangeEvent) {
                 if (sendEvents) {
-                    EventManager.instance.post(Events.PM_NUM_FACTOR_CMD, MathUtilsd.lint(pmNumFactorSlider.getValue(), Constants.MIN_SLIDER_1, Constants.MAX_SLIDER, Constants.MIN_PM_NUM_FACTOR, Constants.MAX_PM_NUM_FACTOR), true);
-                    pmNumFactor.setText(Integer.toString((int) pmNumFactorSlider.getValue()));
+                    EventManager.instance.post(Events.PM_NUM_FACTOR_CMD, pmNumFactorSlider.getMappedValue(), true);
                 }
                 return true;
             }
             return false;
         });
 
-        pmNumFactorGroup = new VerticalGroup();
-        pmNumFactorGroup.space(space2);
-        pmNumFactorGroup.align(Align.left).columnAlign(Align.left);
-        HorizontalGroup pnfg = new HorizontalGroup();
-        pnfg.space(space4);
-        pnfg.addActor(pmNumFactorSlider);
-        pnfg.addActor(pmNumFactor);
-        pmNumFactorGroup.addActor(pmNumFactorLabel);
-        pmNumFactorGroup.addActor(pnfg);
-
         // LEN FACTOR
-        pmLenFactorLabel = new Label(I18n.txt("gui.pmlenfactor"), skin, "default");
-        pmLenFactor = new OwnLabel(Integer.toString(Math.round(GlobalConf.scene.PM_LEN_FACTOR)), skin);
-
-        pmLenFactorSlider = new OwnSlider(Constants.MIN_PM_LEN_FACTOR, Constants.MAX_PM_LEN_FACTOR, 0.5f, false, skin);
+        pmLenFactorSlider = new OwnSliderPlus(I18n.txt("gui.pmlenfactor"), Constants.MIN_PM_LEN_FACTOR, Constants.MAX_PM_LEN_FACTOR, Constants.SLIDER_STEP_SMALL, skin);
         pmLenFactorSlider.setName("proper motion vectors number factor");
         pmLenFactorSlider.setWidth(sliderWidth);
         pmLenFactorSlider.setValue(GlobalConf.scene.PM_LEN_FACTOR);
@@ -167,21 +150,11 @@ public class VisibilityComponent extends GuiComponent implements IObserver {
             if (event instanceof ChangeEvent) {
                 if (sendEvents) {
                     EventManager.instance.post(Events.PM_LEN_FACTOR_CMD, pmLenFactorSlider.getValue(), true);
-                    pmLenFactor.setText(Integer.toString(Math.round(pmLenFactorSlider.getValue())));
                 }
                 return true;
             }
             return false;
         });
-        pmLenFactorGroup = new VerticalGroup();
-        pmLenFactorGroup.space(space2);
-        pmLenFactorGroup.align(Align.left).columnAlign(Align.left);
-        HorizontalGroup plfg = new HorizontalGroup();
-        plfg.space(space4);
-        plfg.addActor(pmLenFactorSlider);
-        plfg.addActor(pmLenFactor);
-        pmLenFactorGroup.addActor(pmLenFactorLabel);
-        pmLenFactorGroup.addActor(plfg);
 
         // PM COLOR MODE
         pmColorModeLabel = new Label(I18n.txt("gui.pm.colormode"), skin, "default");
@@ -196,6 +169,7 @@ public class VisibilityComponent extends GuiComponent implements IObserver {
         };
         pmColorMode = new OwnSelectBox<>(skin);
         pmColorMode.setItems(cms);
+        pmColorMode.setWidth(sliderWidth);
         pmColorMode.setSelectedIndex(GlobalConf.scene.PM_COLOR_MODE);
         pmColorMode.setName("proper motion color mode");
         pmColorMode.addListener((event) -> {
@@ -246,14 +220,14 @@ public class VisibilityComponent extends GuiComponent implements IObserver {
     private void velocityVectorsEnabled(boolean state){
         if(state) {
             pmGroup.addActor(pmLabel);
-            pmGroup.addActor(pmNumFactorGroup);
-            pmGroup.addActor(pmLenFactorGroup);
+            pmGroup.addActor(pmNumFactorSlider);
+            pmGroup.addActor(pmLenFactorSlider);
             pmGroup.addActor(pmColorModeGroup);
             pmGroup.addActor(pmArrowheads);
         }else{
             pmGroup.removeActor(pmLabel);
-            pmGroup.removeActor(pmNumFactorGroup);
-            pmGroup.removeActor(pmLenFactorGroup);
+            pmGroup.removeActor(pmNumFactorSlider);
+            pmGroup.removeActor(pmLenFactorSlider);
             pmGroup.removeActor(pmColorModeGroup);
             pmGroup.removeActor(pmArrowheads);
         }
@@ -285,7 +259,6 @@ public class VisibilityComponent extends GuiComponent implements IObserver {
                 sendEvents = false;
                 float value = (Float) data[0];
                 pmLenFactorSlider.setValue(value);
-                pmLenFactorLabel.setText(Integer.toString(Math.round(value)));
                 sendEvents = true;
             }
             break;
@@ -294,9 +267,7 @@ public class VisibilityComponent extends GuiComponent implements IObserver {
             if (!interf) {
                 sendEvents = false;
                 float value = (Float) data[0];
-                float val = MathUtilsd.lint(value, Constants.MIN_PM_NUM_FACTOR, Constants.MAX_PM_NUM_FACTOR, Constants.MIN_SLIDER_1, Constants.MAX_SLIDER);
-                pmNumFactorSlider.setValue(val);
-                pmNumFactor.setText(Integer.toString((int) val));
+                pmNumFactorSlider.setMappedValue(value);
                 sendEvents = true;
             }
             break;

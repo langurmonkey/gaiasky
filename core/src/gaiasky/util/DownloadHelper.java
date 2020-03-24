@@ -26,7 +26,6 @@ import java.security.MessageDigest;
 public class DownloadHelper {
     private static final Log logger = Logger.getLogger(DownloadHelper.class);
 
-
     /*
      * Spawns a new thread which downloads the file from the given location, running the
      * progress {@link ProgressRunnable} while downloading, and running the finish {@link java.lang.Runnable}
