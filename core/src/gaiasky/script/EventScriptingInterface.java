@@ -2306,11 +2306,19 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
         return loadStarClusterDataset(dsName, path, particleColor, ComponentType.Clusters.toString(), fadeIn, fadeOut, sync);
     }
 
+    public boolean loadStarClusterDataset(String dsName, String path, List particleColor, List fadeIn, List fadeOut, boolean sync) {
+        return loadStarClusterDataset(dsName, path, dArray(particleColor), dArray(fadeIn), dArray(fadeOut), sync);
+    }
+
     @Override
     public boolean loadStarClusterDataset(String dsName, String path, double[] particleColor, String ct, double[] fadeIn, double[] fadeOut, boolean sync) {
         ComponentType compType = ComponentType.valueOf(ct);
         DatasetOptions dops = DatasetOptions.getStarClusterDatasetOptions(dsName, particleColor, compType, fadeIn, fadeOut);
         return loadDataset(dsName, path, CatalogInfoType.SCRIPT, dops, sync);
+    }
+
+    public boolean loadStarClusterDataset(String dsName, String path, List particleColor, String ct, List fadeIn, List fadeOut, boolean sync) {
+        return loadStarClusterDataset(dsName, path, dArray(particleColor), ct, dArray(fadeIn), dArray(fadeOut), sync);
     }
 
     private boolean loadDatasetImmediate(String dsName, String path, CatalogInfoType type, boolean sync) {
@@ -2400,7 +2408,7 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
                             fn.setFadein(dops.fadeIn);
                             fn.setFadeout(dops.fadeOut);
                             fn.setParent("Universe");
-                            fn.setColor(dops.labelColor);
+                            fn.setColor(dops.particleColor);
                             fn.setCt(dops.ct.toString());
                             fn.setPosition(new double[]{0, 0, 0});
                             fn.doneLoading(manager);
