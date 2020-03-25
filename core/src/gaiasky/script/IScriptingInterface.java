@@ -1836,7 +1836,7 @@ public interface IScriptingInterface {
     boolean loadParticleDataset(String dsName, String path, double profileDecay, double[] particleColor, double colorNoise, double[] labelColor, double particleSize, double[] particleSizeLimits, String ct, double[] fadeIn, double[] fadeOut, boolean sync);
 
     /**
-     * Loads a star cluser dataset from a CSV file. The file needs the columns with the
+     * Loads a star cluster dataset from a CSV file. The file needs the columns with the
      * following names: name, ra, dec, dist, pmra, pmdec, radius, radvel.
      * The call can be made synchronous or asynchronous.
      * If <code>sync</code> is true, the call waits until the dataset is loaded and then returns.
@@ -1854,7 +1854,7 @@ public interface IScriptingInterface {
     boolean loadStarClusterDataset(String dsName, String path, double[] particleColor, double[] fadeIn, double[] fadeOut, boolean sync);
 
     /**
-     * Loads a star cluser dataset from a CSV file. The file needs the columns with the
+     * Loads a star cluster dataset from a CSV file. The file needs the columns with the
      * following names: name, ra, dec, dist, pmra, pmdec, radius, radvel.
      * The call can be made synchronous or asynchronous.
      * If <code>sync</code> is true, the call waits until the dataset is loaded and then returns.
