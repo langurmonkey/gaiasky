@@ -12,6 +12,7 @@ import gaiasky.data.ISceneGraphLoader;
 import gaiasky.data.stars.AbstractCatalogLoader;
 import gaiasky.scenegraph.StarCluster;
 import gaiasky.util.*;
+import gaiasky.util.coord.AstroUtils;
 import gaiasky.util.coord.Coordinates;
 import gaiasky.util.math.Vector3d;
 import gaiasky.util.parse.Parser;
@@ -31,8 +32,8 @@ import java.util.Map;
  * <li>ra[deg]: {@link gaiasky.util.ucd.UCDParser#racolnames}</li>
  * <li>de[deg]: {@link gaiasky.util.ucd.UCDParser#decolnames}</li>
  * <li>dist[pc]: {@link gaiasky.util.ucd.UCDParser#distcolnames}</li>
- * <li>pmra[deg/yr]: {@link gaiasky.util.ucd.UCDParser#pmracolnames}</li>
- * <li>pmde[deg/yr]: {@link gaiasky.util.ucd.UCDParser#pmdeccolnames}</li>
+ * <li>pmra[mas/yr]: {@link gaiasky.util.ucd.UCDParser#pmracolnames}</li>
+ * <li>pmde[mas/yr]: {@link gaiasky.util.ucd.UCDParser#pmdeccolnames}</li>
  * <li>rv[km/s]: {@link gaiasky.util.ucd.UCDParser#radvelcolnames}</li>
  * <li>radius[deg]: {@link gaiasky.util.ucd.UCDParser#radiuscolnames}</li>
  * <li>nstars: {@link gaiasky.util.ucd.UCDParser#nstarscolnames}</li>
@@ -66,20 +67,24 @@ public class StarClusterLoader extends AbstractCatalogLoader implements ISceneGr
                         String[] tokens = line.split(",");
                         String name = tokens[0];
                         double ra = getDouble(tokens, ClusterProperties.RA, indices);
+                        double rarad = Math.toRadians(ra);
                         double dec = getDouble(tokens, ClusterProperties.DEC, indices);
-                        double dist = getDouble(tokens, ClusterProperties.DIST, indices) * Constants.PC_TO_U;
-                        double mualpha = getDouble(tokens, ClusterProperties.PMRA, indices);
+                        double decrad = Math.toRadians(dec);
+                        double distpc = getDouble(tokens, ClusterProperties.DIST, indices);
+                        double dist = distpc * Constants.PC_TO_U;
+                        double mualphastar = getDouble(tokens, ClusterProperties.PMRA, indices);
                         double mudelta = getDouble(tokens, ClusterProperties.PMDE, indices);
                         double radvel = getDouble(tokens, ClusterProperties.RV, indices);
                         double radius = getDouble(tokens, ClusterProperties.RADIUS, indices);
                         int nstars = getInteger(tokens, ClusterProperties.NSTARS, indices);
 
-                        Vector3d pos = Coordinates.sphericalToCartesian(Math.toRadians(ra), Math.toRadians(dec), dist, new Vector3d());
-                        Vector3d pm = Coordinates.sphericalToCartesian(Math.toRadians(ra + mualpha), Math.toRadians(dec + mudelta), dist + radvel * Constants.KM_TO_U / Nature.S_TO_Y, new Vector3d());
-                        pm.sub(pos);
+
+                        Vector3d pos = Coordinates.sphericalToCartesian(rarad, decrad, dist, new Vector3d());
+
+                        Vector3d pm = AstroUtils.properMotionsToCartesian(mualphastar, mudelta, radvel, Math.toRadians(ra), Math.toRadians(dec), distpc);
 
                         Vector3d posSph = new Vector3d((float) ra, (float) dec, (float) dist);
-                        Vector3 pmSph = new Vector3((float) (mualpha * Nature.DEG_TO_MILLARCSEC), (float) (mudelta * Nature.DEG_TO_MILLARCSEC), (float) radvel);
+                        Vector3 pmSph = new Vector3((float) (mualphastar), (float) (mudelta), (float) radvel);
 
                         StarCluster c = new StarCluster(name, parentName != null ? parentName : "MWSC", pos, pm, posSph, pmSph, radius, nstars);
 

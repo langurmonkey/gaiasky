@@ -420,6 +420,7 @@ public class SceneGraphRenderer extends AbstractRenderer implements IProcessRend
         // Fonts - all of these are distance field fonts
         BitmapFont font3d = manager.get("font/main-font.fnt");
         BitmapFont font2d = manager.get("font/font2d.fnt");
+        font2d.getData().setScale(0.5f);
         BitmapFont fontTitles = manager.get("font/font-titles.fnt");
 
         // Sprites

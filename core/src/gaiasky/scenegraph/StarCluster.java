@@ -54,8 +54,6 @@ public class StarCluster extends AbstractPositionEntity implements IFocus, IProp
 
     private static final double TH_ANGLE = Math.toRadians(0.6);
     private static final double TH_ANGLE_OVERLAP = Math.toRadians(0.7);
-    private static IntModel model;
-    private static Matrix4 modelTransform;
     private static Texture clusterTex;
 
     private ModelComponent mc;
@@ -88,6 +86,9 @@ public class StarCluster extends AbstractPositionEntity implements IFocus, IProp
      * opacity is <code>1-fadeAlpha</code>
      **/
     protected float fadeAlpha;
+
+    private IntModel model;
+    private Matrix4 modelTransform;
 
     public StarCluster() {
         super();
