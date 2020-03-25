@@ -51,8 +51,8 @@ public class ConstelBoundariesLoader<T extends SceneGraphNode> implements IScene
                     String line;
                     ConstellationBoundaries boundary = new ConstellationBoundaries();
                     boundary.ct = new ComponentTypes(ComponentType.Boundaries);
-                    List<List<Vector3d>> list = new ArrayList<List<Vector3d>>();
-                    List<Vector3d> buffer = new ArrayList<Vector3d>(4);
+                    List<List<Vector3d>> list = new ArrayList<>();
+                    List<Vector3d> buffer = new ArrayList<>(4);
                     String lastName = "";
                     int interp = 0;
                     while ((line = br.readLine()) != null) {
@@ -65,7 +65,7 @@ public class ConstelBoundariesLoader<T extends SceneGraphNode> implements IScene
                             if (!name.equals(lastName)) {
                                 // New line
                                 list.add(buffer);
-                                buffer = new ArrayList<Vector3d>(20);
+                                buffer = new ArrayList<>(20);
                                 lastName = name;
                             }
 

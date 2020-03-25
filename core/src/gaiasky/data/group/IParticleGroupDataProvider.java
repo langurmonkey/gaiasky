@@ -11,7 +11,7 @@ import gaiasky.scenegraph.ParticleGroup.ParticleBean;
 import java.io.InputStream;
 
 /**
- * Data provider for a particle vgroup.
+ * Data provider for a particle group.
  *
  * @author tsagrista
  */

@@ -12,6 +12,9 @@ import gaiasky.GaiaSky;
 import gaiasky.util.format.INumberFormat;
 import gaiasky.util.format.NumberFormatFactory;
 
+import java.util.Arrays;
+import java.util.concurrent.atomic.AtomicBoolean;
+
 public class TextUtils {
 
     public static String surround(String in, String pre, String post) {
@@ -197,5 +200,19 @@ public class TextUtils {
             suffixesNew[i] = suffixes[1];
         suffixesNew[suffixes.length] = suffixAdditional;
         return concatAll(base, suffixesNew);
+    }
+
+    public static boolean contains(String[] list, String key){
+        return contains(list, key, false);
+    }
+
+    public static boolean contains(String[] list, String key, boolean ignoreCase) {
+        AtomicBoolean contained = new AtomicBoolean(false);
+        Arrays.stream(list).forEach(candidate -> {
+           if(ignoreCase ? candidate.equalsIgnoreCase(key) : candidate.equals(key)){
+               contained.set(true);
+           }
+        });
+        return contained.get();
     }
 }

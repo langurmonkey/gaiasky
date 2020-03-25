@@ -34,9 +34,21 @@ public class DatasetOptions {
         return dops;
     }
 
+    public static DatasetOptions getStarClusterDatasetOptions(String catalogName, double[] particleColor, ComponentType ct, double[] fadeIn, double[] fadeOut){
+        DatasetOptions dops = new DatasetOptions();
+        dops.type = DatasetLoadType.CLUSTERS;
+        dops.catalogName = catalogName;
+        dops.particleColor = particleColor;
+        dops.ct = ct;
+        dops.fadeIn = fadeIn;
+        dops.fadeOut = fadeOut;
+        return dops;
+    }
+
     public enum DatasetLoadType {
         PARTICLES,
-        STARS
+        STARS,
+        CLUSTERS
     }
 
     public DatasetLoadType type;
@@ -51,6 +63,9 @@ public class DatasetOptions {
 
     // Stars
     public double magnitudeScale;
+
+    // Star clusters
+    public String catalogName;
 
     // All
     public double[] labelColor;

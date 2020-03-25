@@ -58,14 +58,15 @@ public class StarCluster extends AbstractPositionEntity implements IFocus, IProp
     private static Matrix4 modelTransform;
     private static Texture clusterTex;
 
-    // Label and model colors
-    private static float[] col = new float[] { 0.9f, 0.9f, 0.2f, 1.0f };
-
     private ModelComponent mc;
 
-    /** Proper motion in units/year **/
+    /**
+     * Proper motion in units/year
+     **/
     protected Vector3d pm;
-    /** Proper motion in mas/year **/
+    /**
+     * Proper motion in mas/year
+     **/
     protected Vector3 pmSph;
 
     protected float[] labelcolor;
@@ -96,6 +97,10 @@ public class StarCluster extends AbstractPositionEntity implements IFocus, IProp
     }
 
     public StarCluster(String name, String parentName, Vector3d pos, Vector3d pm, Vector3d posSph, Vector3 pmSph, double raddeg, int nstars) {
+        this(name, parentName, pos, pm, posSph, pmSph, raddeg, nstars, new float[]{0.93f, 0.93f, 0.3f, 1f});
+    }
+
+    public StarCluster(String name, String parentName, Vector3d pos, Vector3d pm, Vector3d posSph, Vector3 pmSph, double raddeg, int nstars, float[] color) {
         this();
         this.parentName = parentName;
         this.setName(name.replace("_", " "));
@@ -106,7 +111,7 @@ public class StarCluster extends AbstractPositionEntity implements IFocus, IProp
         this.dist = posSph.z;
         this.raddeg = raddeg;
         this.nstars = nstars;
-        this.labelcolor = new float[] { col[0], col[1], col[2], 1.0f };
+        this.setColor(color);
     }
 
     public void initModel() {
@@ -115,7 +120,7 @@ public class StarCluster extends AbstractPositionEntity implements IFocus, IProp
             clusterTex.setFilter(TextureFilter.MipMapLinearNearest, TextureFilter.Linear);
         }
         if (model == null) {
-            Material mat = new Material(new BlendingAttribute(GL20.GL_ONE, GL20.GL_ONE), new ColorAttribute(ColorAttribute.Diffuse, col[0], col[1], col[2], col[3]));
+            Material mat = new Material(new BlendingAttribute(GL20.GL_ONE, GL20.GL_ONE), new ColorAttribute(ColorAttribute.Diffuse, cc[0], cc[1], cc[2], cc[3]));
             IntModelBuilder modelBuilder = ModelCache.cache.mb;
             modelBuilder.begin();
             // create part
@@ -157,9 +162,21 @@ public class StarCluster extends AbstractPositionEntity implements IFocus, IProp
         initModel();
     }
 
+    @Override
+    public void setColor(double[] color) {
+        super.setColor(color);
+        this.labelcolor = new float[]{cc[0], cc[1], cc[2], cc[3]};
+    }
+
+    @Override
+    public void setColor(float[] color) {
+        super.setColor(color);
+        this.labelcolor = new float[]{cc[0], cc[1], cc[2], cc[3]};
+    }
+
     /**
      * Updates the local transform matrix.
-     * 
+     *
      * @param time
      */
     @Override
@@ -242,7 +259,7 @@ public class StarCluster extends AbstractPositionEntity implements IFocus, IProp
         Vector3 aux = aux3f1.get();
         shader.setUniformf("u_pos", translation.put(aux));
         shader.setUniformf("u_size", size);
-        shader.setUniformf("u_color", col[0] * fa, col[1] * fa, col[2] * fa, col[3] * alpha * opacity * 3.5f);
+        shader.setUniformf("u_color", cc[0] * fa, cc[1] * fa, cc[2] * fa, cc[3] * alpha * opacity * 3.5f);
         // Sprite.render
         mesh.render(shader, GL20.GL_TRIANGLES, 0, 6);
     }
@@ -341,7 +358,7 @@ public class StarCluster extends AbstractPositionEntity implements IFocus, IProp
 
     /**
      * Adds all the children that are focusable objects to the list.
-     * 
+     *
      * @param list
      */
     public void addFocusableObjects(Array<IFocus> list) {
@@ -462,12 +479,12 @@ public class StarCluster extends AbstractPositionEntity implements IFocus, IProp
     }
 
     @Override
-    public double getClosestDistToCamera(){
+    public double getClosestDistToCamera() {
         return getDistToCamera();
     }
 
     @Override
-    public Vector3d getClosestAbsolutePos(Vector3d out){
+    public Vector3d getClosestAbsolutePos(Vector3d out) {
         return getAbsolutePosition(out);
     }
 
@@ -496,7 +513,7 @@ public class StarCluster extends AbstractPositionEntity implements IFocus, IProp
     }
 
     @Override
-    public float getTextOpacity(){
+    public float getTextOpacity() {
         return getOpacity();
     }
 

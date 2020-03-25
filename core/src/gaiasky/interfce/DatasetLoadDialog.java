@@ -19,23 +19,27 @@ import gaiasky.util.validator.TextFieldComparatorValidator;
 
 public class DatasetLoadDialog extends GenericDialog {
 
-    public OwnCheckBox particles, stars, fadeIn, fadeOut;
-    public OwnTextField magnitudeScale, fadeInMin, fadeInMax, fadeOutMin, fadeOutMax, profileDecay;
+    public OwnCheckBox particles, stars, clusters, fadeIn, fadeOut;
+    public OwnTextField dsName, magnitudeScale, fadeInMin, fadeInMax, fadeOutMin, fadeOutMax, profileDecay;
     public OwnSliderPlus particleSize, colorNoise;
     public ColorPicker particleColor, labelColor;
     public OwnSelectBox<ComponentType> componentType;
 
-    private float pad5, pad10, pad15, sliderWidth, fieldWidth, titleWidth;
+    private String fileName;
 
-    public DatasetLoadDialog(String title, Skin skin, Stage ui) {
+    private float pad5, pad10, pad15, sliderWidth, fieldWidth, titleWidth, cpSize;
+
+    public DatasetLoadDialog(String title, String fileName, Skin skin, Stage ui) {
         super(title, skin, ui);
 
+        this.fileName = fileName;
         pad5 = 5f * GlobalConf.UI_SCALE_FACTOR;
         pad10 = 10f * GlobalConf.UI_SCALE_FACTOR;
         pad15 = 15f * GlobalConf.UI_SCALE_FACTOR;
         sliderWidth = !GlobalConf.isHiDPI() ? 370f * GlobalConf.UI_SCALE_FACTOR : 415f * GlobalConf.UI_SCALE_FACTOR;
         fieldWidth = 180f * GlobalConf.UI_SCALE_FACTOR;
         titleWidth = 180f * GlobalConf.UI_SCALE_FACTOR;
+        cpSize = 20f * GlobalConf.UI_SCALE_FACTOR;
 
         setAcceptText(I18n.txt("gui.ok"));
         setCancelText(I18n.txt("gui.cancel"));
@@ -44,7 +48,7 @@ public class DatasetLoadDialog extends GenericDialog {
     }
 
     public DatasetLoadDialog(Skin skin, Stage ui) {
-        this(I18n.txt("gui.dsload.title"), skin, ui);
+        this(I18n.txt("gui.dsload.title"), "", skin, ui);
     }
 
     @Override
@@ -87,18 +91,37 @@ public class DatasetLoadDialog extends GenericDialog {
             return false;
         });
         particles.setChecked(false);
-        content.add(particles).left().padBottom(pad10 * 2f).row();
+        content.add(particles).left().padBottom(pad10).row();
 
-        new ButtonGroup<>(particles, stars);
+        clusters = new OwnCheckBox(I18n.txt("gui.dsload.clusters"), skin, "radio", pad5);
+        clusters.addListener(event -> {
+            if (event instanceof ChangeEvent) {
+                if (clusters.isChecked()) {
+                    container.clear();
+                    addStarClustersWidget(container);
+                    pack();
+                }
+                return true;
+            }
+            return false;
+        });
+        clusters.setChecked(false);
+        content.add(clusters).left().padBottom(pad10 * 2f).row();
+
+        new ButtonGroup<>(particles, stars, clusters);
 
         content.add(cont).left();
     }
 
     private void addStarsWidget(Table container) {
-        float cpsize = 20f * GlobalConf.UI_SCALE_FACTOR;
-
         OwnLabel starProps = new OwnLabel(I18n.txt("gui.dsload.stars.properties"), skin, "hud-subheader");
         container.add(starProps).colspan(2).left().padTop(pad15).padBottom(pad10).row();
+
+        // Name
+        addFileName(container);
+
+        // Label color
+        addLabelColor(container);
 
         // Magnitude multiplier
         FloatValidator sclValidator = new FloatValidator(0.1f, 100f);
@@ -107,30 +130,21 @@ public class DatasetLoadDialog extends GenericDialog {
         container.add(new OwnLabel(I18n.txt("gui.dsload.magnitude.scale"), skin, titleWidth)).left().padRight(pad10).padBottom(pad10);
         container.add(GuiUtils.tooltipHg(magnitudeScale, "gui.dsload.magnitude.scale.tooltip", skin)).left().padBottom(pad10).row();
 
-        // Label color
-        labelColor = new ColorPicker(new float[] { 0.8f, 0.7f, 0.2f, 1f }, stage, skin);
-        container.add(new OwnLabel(I18n.txt("gui.dsload.color.label"), skin, titleWidth)).left().padRight(pad10).padBottom(pad5);
-        Table lc = new Table(skin);
-        lc.add(labelColor).size(cpsize);
-        container.add(GuiUtils.tooltipHg(lc, "gui.dsload.color.label.tooltip", skin)).left().padBottom(pad5).row();
 
         // Fade
         addFadeAttributes(container);
     }
 
     private void addParticlesWidget(Table container) {
-        float cpsize = 20f * GlobalConf.UI_SCALE_FACTOR;
 
         OwnLabel particleProps = new OwnLabel(I18n.txt("gui.dsload.particles.properties"), skin, "hud-subheader");
         container.add(particleProps).colspan(2).left().padTop(pad15).padBottom(pad10).row();
 
+        // Name
+        addFileName(container);
+
         // Particle color
-        particleColor = new ColorPicker(new float[] { 0.3f, 0.3f, 1f, 1f }, stage, skin);
-        particleColor.setNewColorRunnable(() -> {
-            updateFrameBuffer();
-        });
-        container.add(new OwnLabel(I18n.txt("gui.dsload.color"), skin, titleWidth)).left().padRight(pad10).padBottom(pad5);
-        container.add(particleColor).size(cpsize).left().padBottom(pad5).row();
+        addParticleColor(container);
 
         // Color noise
         colorNoise = new OwnSliderPlus(I18n.txt("gui.dsload.color.noise"), Constants.MIN_COLOR_NOISE, Constants.MAX_COLOR_NOISE, Constants.SLIDER_STEP_TINY, false, skin);
@@ -147,14 +161,7 @@ public class DatasetLoadDialog extends GenericDialog {
         container.add(GuiUtils.tooltipHg(colorNoise, "gui.dsload.color.noise.tooltip", skin)).colspan(2).left().padBottom(pad15).row();
 
         // Label color
-        labelColor = new ColorPicker(new float[] { 0.3f, 0.3f, 1f, 1f }, stage, skin);
-        labelColor.setNewColorRunnable(() -> {
-            updateFrameBuffer();
-        });
-        container.add(new OwnLabel(I18n.txt("gui.dsload.color.label"), skin, titleWidth)).left().padRight(pad10).padBottom(pad5);
-        Table lc = new Table(skin);
-        lc.add(labelColor).size(cpsize);
-        container.add(GuiUtils.tooltipHg(lc, "gui.dsload.color.label.tooltip", skin)).left().padBottom(pad5).row();
+        addLabelColor(container);
 
         // Particle size
         particleSize = new OwnSliderPlus(I18n.txt("gui.dsload.size"), Constants.MIN_PARTICLE_SIZE, Constants.MAX_PARTICLE_SIZE, Constants.SLIDER_STEP_SMALL, false, skin);
@@ -182,11 +189,60 @@ public class DatasetLoadDialog extends GenericDialog {
         componentType = new OwnSelectBox(skin);
         componentType.setWidth(fieldWidth);
         componentType.setItems(componentTypes);
+        componentType.setSelected(ComponentType.Galaxies);
         container.add(new OwnLabel(I18n.txt("gui.dsload.ct"), skin, titleWidth)).left().padRight(pad10).padBottom(pad5);
         container.add(componentType).left().padBottom(pad5).row();
 
         // Fade
         addFadeAttributes(container);
+    }
+
+    private void addStarClustersWidget(Table container) {
+        OwnLabel clustersProps = new OwnLabel(I18n.txt("gui.dsload.clusters.properties"), skin, "hud-subheader");
+        container.add(clustersProps).colspan(2).left().padTop(pad15).padBottom(pad10).row();
+
+        // Name
+        addFileName(container);
+
+        // Particle color
+        addParticleColor(container);
+
+        // Component type
+        ComponentType[] componentTypes = new ComponentType[] { ComponentType.Others, ComponentType.Stars, ComponentType.Galaxies, ComponentType.Clusters, ComponentType.Asteroids, ComponentType.Locations };
+        componentType = new OwnSelectBox(skin);
+        componentType.setWidth(fieldWidth);
+        componentType.setItems(componentTypes);
+        componentType.setSelected(ComponentType.Clusters);
+        container.add(new OwnLabel(I18n.txt("gui.dsload.ct"), skin, titleWidth)).left().padRight(pad10).padBottom(pad5);
+        container.add(componentType).left().padBottom(pad5).row();
+
+        // Fade
+        addFadeAttributes(container);
+
+    }
+
+    private void addFileName(Table container){
+        dsName = new OwnTextField(fileName, skin);
+        dsName.setWidth(fieldWidth);
+        container.add(new OwnLabel(I18n.txt("gui.dsload.name"), skin, titleWidth)).left().padRight(pad10).padBottom(pad10);
+        container.add(dsName).left().padBottom(pad10).row();
+    }
+
+    private void addParticleColor(Table container){
+        particleColor = new ColorPicker(new float[] { 0.3f, 0.3f, 1f, 1f }, stage, skin);
+        particleColor.setNewColorRunnable(() -> {
+            updateFrameBuffer();
+        });
+        container.add(new OwnLabel(I18n.txt("gui.dsload.color"), skin, titleWidth)).left().padRight(pad10).padBottom(pad5);
+        container.add(particleColor).size(cpSize).left().padBottom(pad5).row();
+    }
+
+    private void addLabelColor(Table container){
+        labelColor = new ColorPicker(new float[] { 0.3f, 0.3f, 1f, 1f }, stage, skin);
+        container.add(new OwnLabel(I18n.txt("gui.dsload.color.label"), skin, titleWidth)).left().padRight(pad10).padBottom(pad5);
+        Table lc = new Table(skin);
+        lc.add(labelColor).size(cpSize);
+        container.add(GuiUtils.tooltipHg(lc, "gui.dsload.color.label.tooltip", skin)).left().padBottom(pad5).row();
     }
 
     private void addFadeAttributes(Table container) {
@@ -294,7 +350,7 @@ public class DatasetLoadDialog extends GenericDialog {
         if (stars.isChecked()) {
             dops.type = DatasetOptions.DatasetLoadType.STARS;
             dops.magnitudeScale = magnitudeScale.getDoubleValue(1);
-        } else {
+        } else if(particles.isChecked()) {
             dops.type = DatasetOptions.DatasetLoadType.PARTICLES;
             dops.ct = componentType.getSelected();
             dops.profileDecay = profileDecay.getDoubleValue(5d);
@@ -302,7 +358,13 @@ public class DatasetLoadDialog extends GenericDialog {
             dops.particleColorNoise = colorNoise.getValue();
             dops.particleSize = particleSize.getValue();
             dops.particleSizeLimits = new double[] { 2.5d, Math.min(100d, 5d * dops.particleSize) };
+        } else if (clusters.isChecked()){
+            dops.type = DatasetOptions.DatasetLoadType.CLUSTERS;
+            dops.ct = componentType.getSelected();
+            dops.particleColor = particleColor.getPickedColorDouble();
         }
+        // Common properties
+        dops.catalogName = dsName.getText();
         dops.labelColor = labelColor.getPickedColorDouble();
         addFadeInfo(dops);
 

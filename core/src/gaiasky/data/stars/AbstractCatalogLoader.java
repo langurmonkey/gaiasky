@@ -23,12 +23,13 @@ public abstract class AbstractCatalogLoader {
     public String[] files;
     public List<CatalogFilter> filters;
 
-    /**
-     * Name
-     */
+    /** Name **/
     protected String name;
     /** Description **/
     protected String description;
+
+    // Default parent name
+    protected String parentName;
 
     public void initialize(String[] files) {
         this.files = files;
@@ -69,6 +70,10 @@ public abstract class AbstractCatalogLoader {
                 return true;
         }
         return false;
+    }
+
+    public void setParentName(String parentName){
+        this.parentName = parentName;
     }
 
     public void setName(String name) {

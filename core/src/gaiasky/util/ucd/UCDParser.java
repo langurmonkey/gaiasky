@@ -6,6 +6,7 @@
 package gaiasky.util.ucd;
 
 import com.badlogic.gdx.utils.Array;
+import gaiasky.util.TextUtils;
 import gaiasky.util.ucd.UCD.UCDType;
 import gaiasky.util.units.Position.PositionType;
 import uk.ac.starlink.table.ColumnInfo;
@@ -18,25 +19,76 @@ import java.util.Set;
 
 /**
  * Parses the ucds of a star table and builds some metadata on
- * the relevant quantities for gaia sky (position, proper motion, magnitudes, colors, etc.)
+ * the relevant quantities for Gaia Sky (position, proper motion, magnitudes, colors, etc.)
  *
  * @author tsagrista
  */
 public class UCDParser {
-    private static String[] idcolnames = new String[] { "hip", "id", "source_id", "tycho2_id" };
-    private static String[] namecolnames = new String[] { "name", "proper", "proper_name", "common_name", "designation" };
-    private static String[] pos1colnames = new String[] { "ra", "right_ascension", "rightascension", "alpha" };
-    private static String[] pos1cartcolnames = new String[] { "x", "X" };
-    private static String[] pos2colnames = new String[] { "dec", "de", "declination", "delta" };
-    private static String[] pos2cartcolnames = new String[] { "y", "Y" };
-    private static String[] distcolnames = new String[] { "dist", "distance" };
-    private static String[] pos3cartcolnames = new String[] { "z", "Z" };
-    private static String[] pllxcolnames = new String[] { "plx", "parallax", "pllx", "par" };
-    private static String[] magcolnames = new String[] { "phot_g_mean_mag", "mag", "bmag", "gmag" };
-    private static String[] colorcolnames = new String[] { "b_v", "v_i", "bp_rp", "bp_g", "g_rp", "ci" };
-    private static String[] pmracolnames = new String[] { "pmra", "pmalpha", "pm_ra" };
-    private static String[] pmdeccolnames = new String[] { "pmdec", "pmdelta", "pm_dec", "pm_de" };
-    private static String[] radvelcolnames = new String[] { "radial_velocity", "radvel", "rv" };
+    public static String[] idcolnames = new String[] { "hip", "id", "source_id", "tycho2_id" };
+    public static String[] namecolnames = new String[] { "name", "proper", "proper_name", "common_name", "designation" };
+    public static String[] racolnames = new String[] { "ra", "right_ascension", "rightascension", "alpha", "raj2000" };
+    public static String[] xcolnames = new String[] { "x", "X" };
+    public static String[] decolnames = new String[] { "dec", "de", "declination", "delta", "dej2000" };
+    public static String[] ycolnames = new String[] { "y", "Y" };
+    public static String[] distcolnames = new String[] { "dist", "distance" };
+    public static String[] zcolnames = new String[] { "z", "Z" };
+    public static String[] pllxcolnames = new String[] { "plx", "parallax", "pllx", "par" };
+    public static String[] magcolnames = new String[] { "phot_g_mean_mag", "mag", "bmag", "gmag" };
+    public static String[] colorcolnames = new String[] { "b_v", "v_i", "bp_rp", "bp_g", "g_rp", "ci" };
+    public static String[] pmracolnames = new String[] { "pmra", "pmalpha", "pm_ra" };
+    public static String[] pmdeccolnames = new String[] { "pmdec", "pmdelta", "pm_dec", "pm_de" };
+    public static String[] radvelcolnames = new String[] { "radial_velocity", "radvel", "rv" };
+    public static String[] radiuscolnames = new String[] { "radius", "rcluster", "radi" };
+    public static String[] nstarscolnames = new String[] { "n", "nstars", "n_stars", "n_star" };
+
+    public static boolean isName(String colname){
+        return TextUtils.contains(namecolnames, colname);
+    }
+    public static boolean isId(String colname){
+        return TextUtils.contains(idcolnames, colname);
+    }
+    public static boolean isRa(String colname){
+        return TextUtils.contains(racolnames, colname);
+    }
+    public static boolean isX(String colname){
+        return TextUtils.contains(xcolnames, colname);
+    }
+    public static boolean isDec(String colname){
+        return TextUtils.contains(decolnames, colname);
+    }
+    public static boolean isY(String colname){
+        return TextUtils.contains(ycolnames, colname);
+    }
+    public static boolean isDist(String colname){
+        return TextUtils.contains(distcolnames, colname);
+    }
+    public static boolean isZ(String colname){
+        return TextUtils.contains(zcolnames, colname);
+    }
+    public static boolean isPllx(String colname){
+        return TextUtils.contains(pllxcolnames, colname);
+    }
+    public static boolean isMag(String colname){
+        return TextUtils.contains(magcolnames, colname);
+    }
+    public static boolean isColor(String colname){
+        return TextUtils.contains(colorcolnames, colname);
+    }
+    public static boolean isPmra(String colname){
+        return TextUtils.contains(pmracolnames, colname);
+    }
+    public static boolean isPmde(String colname){
+        return TextUtils.contains(pmdeccolnames, colname);
+    }
+    public static boolean isRadvel(String colname){
+        return TextUtils.contains(radvelcolnames, colname);
+    }
+    public static boolean isRadius(String colname){
+        return TextUtils.contains(radiuscolnames, colname);
+    }
+    public static boolean isNstars(String colname){
+        return TextUtils.contains(nstarscolnames, colname);
+    }
 
     public Map<UCDType, Set<UCD>> ucdmap;
 
@@ -141,11 +193,11 @@ public class UCDParser {
                         switch (coord) {
                         case "ra":
                             setDefaultUnit(candidate, "deg");
-                            add(candidate, pos1colnames, this.POS1);
+                            add(candidate, racolnames, this.POS1);
                             break;
                         case "dec":
                             setDefaultUnit(candidate, "deg");
-                            add(candidate, pos2colnames, this.POS2);
+                            add(candidate, decolnames, this.POS2);
                             break;
                         }
                         break;
@@ -190,9 +242,9 @@ public class UCDParser {
         }
         if (this.POS1.isEmpty() || this.POS2.isEmpty()) {
             // Try to work out from names
-            this.POS1 = getByColNames(pos1colnames, "deg");
+            this.POS1 = getByColNames(racolnames, "deg");
             if (!this.POS1.isEmpty()) {
-                this.POS2 = getByColNames(pos2colnames, "deg");
+                this.POS2 = getByColNames(decolnames, "deg");
                 this.POS3 = getByColNames(distcolnames, "pc");
                 if (this.POS3.isEmpty()) {
                     this.POS3 = getByColNames(pllxcolnames, "mas");
@@ -200,9 +252,9 @@ public class UCDParser {
             }
             // Try cartesian
             if (this.POS1.isEmpty() || this.POS2.isEmpty()) {
-                this.POS1 = getByColNames(pos1cartcolnames, "pc");
-                this.POS2 = getByColNames(pos2cartcolnames, "pc");
-                this.POS3 = getByColNames(pos3cartcolnames, "pc");
+                this.POS1 = getByColNames(xcolnames, "pc");
+                this.POS2 = getByColNames(ycolnames, "pc");
+                this.POS3 = getByColNames(zcolnames, "pc");
             }
         }
 
@@ -312,7 +364,7 @@ public class UCDParser {
 
     public PositionType getPositionType(UCD pos1, UCD pos2, UCD pos3) {
         if (pos1.ucd == null || pos2.ucd == null) {
-            return PositionType.valueOf("EQ_SPH_" + (pos3 == null ? "PLX" : (contains(distcolnames, pos3.colname) ? "DIST" : "PLX")));
+            return PositionType.valueOf("EQ_SPH_" + (pos3 == null ? "PLX" : (isDist(pos3.colname) ? "DIST" : "PLX")));
         }
         String meaning = pos1.ucd[0][1];
         String postypestr = null, disttype = null;
@@ -370,7 +422,7 @@ public class UCDParser {
                 Set<UCD> set = ucdmap.get(type);
                 // Check column names
                 for (UCD candidate : set) {
-                    if (contains(colnames, candidate.colname)) {
+                    if (TextUtils.contains(colnames, candidate.colname)) {
                         if (defaultunit != null && (candidate.unit == null || candidate.unit.isEmpty()))
                             candidate.unit = defaultunit;
                         candidates.add(candidate);
@@ -391,7 +443,7 @@ public class UCDParser {
      * @param list      The list to add
      */
     private void add(UCD candidate, String[] colnames, Array<UCD> list) {
-        if (candidate.colname != null && contains(colnames, candidate.colname)) {
+        if (candidate.colname != null && TextUtils.contains(colnames, candidate.colname)) {
             list.insert(0, candidate);
         } else {
             list.add(candidate);
@@ -450,13 +502,6 @@ public class UCDParser {
         return false;
     }
 
-    private boolean contains(String[] list, String key) {
-        for (String candidate : list) {
-            if (candidate.equals(key))
-                return true;
-        }
-        return false;
-    }
 
     private void addToMap(UCD ucd) {
         if (!ucdmap.containsKey(ucd.type)) {

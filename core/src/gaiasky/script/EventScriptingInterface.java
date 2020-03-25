@@ -15,6 +15,7 @@ import com.badlogic.gdx.scenes.scene2d.Group;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.TimeUtils;
 import gaiasky.GaiaSky;
+import gaiasky.data.cluster.StarClusterLoader;
 import gaiasky.data.group.DatasetOptions;
 import gaiasky.data.group.STILDataProvider;
 import gaiasky.desktop.util.SysUtils;
@@ -31,6 +32,7 @@ import gaiasky.scenegraph.camera.CameraManager.CameraMode;
 import gaiasky.scenegraph.camera.NaturalCamera;
 import gaiasky.screenshot.ImageRenderer;
 import gaiasky.util.*;
+import gaiasky.util.CatalogInfo.CatalogInfoType;
 import gaiasky.util.Logger.Log;
 import gaiasky.util.color.ColourUtils;
 import gaiasky.util.coord.Coordinates;
@@ -61,7 +63,7 @@ import java.util.concurrent.atomic.AtomicReference;
  *
  * @author Toni Sagrista
  */
-@SuppressWarnings({ "unused", "WeakerAccess", "SwitchStatementWithTooFewBranches", "SingleStatementInBlock", "SameParameterValue" })
+@SuppressWarnings({"unused", "WeakerAccess", "SwitchStatementWithTooFewBranches", "SingleStatementInBlock", "SameParameterValue"})
 public class EventScriptingInterface implements IScriptingInterface, IObserver {
     private static final Log logger = Logger.getLogger(EventScriptingInterface.class);
 
@@ -305,7 +307,7 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
 
     @Override
     public void setCameraPosition(double x, double y, double z) {
-        setCameraPosition(new double[] { x, y, z });
+        setCameraPosition(new double[]{x, y, z});
     }
 
     public void setCameraPosition(final List vec) {
@@ -315,7 +317,7 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
     @Override
     public double[] getCameraPosition() {
         Vector3d campos = GaiaSky.instance.cam.getPos();
-        return new double[] { campos.x * Constants.U_TO_KM, campos.y * Constants.U_TO_KM, campos.z * Constants.U_TO_KM };
+        return new double[]{campos.x * Constants.U_TO_KM, campos.y * Constants.U_TO_KM, campos.z * Constants.U_TO_KM};
     }
 
     @Override
@@ -330,7 +332,7 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
     @Override
     public double[] getCameraDirection() {
         Vector3d camdir = GaiaSky.instance.cam.getDirection();
-        return new double[] { camdir.x, camdir.y, camdir.z };
+        return new double[]{camdir.x, camdir.y, camdir.z};
     }
 
     @Override
@@ -346,7 +348,7 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
     @Override
     public double[] getCameraUp() {
         Vector3d camup = GaiaSky.instance.cam.getUp();
-        return new double[] { camup.x, camup.y, camup.z };
+        return new double[]{camup.x, camup.y, camup.z};
     }
 
     @Override
@@ -1345,7 +1347,7 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
         if (sgn instanceof IFocus) {
             IFocus obj = (IFocus) sgn;
             obj.getAbsolutePosition(name.toLowerCase(), aux3d1);
-            return new double[] { aux3d1.x, aux3d1.y, aux3d1.z };
+            return new double[]{aux3d1.x, aux3d1.y, aux3d1.z};
         }
         return null;
     }
@@ -1435,7 +1437,7 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
 
     @Override
     public void removeObject(final int id) {
-        GaiaSky.postRunnable(() -> em.post(Events.REMOVE_OBJECTS, new int[] { id }));
+        GaiaSky.postRunnable(() -> em.post(Events.REMOVE_OBJECTS, new int[]{id}));
     }
 
     @Override
@@ -1529,7 +1531,7 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
                 y += parent.getY();
                 parent = parent.getParent();
             }
-            return new float[] { x, y, actor.getWidth(), actor.getHeight() };
+            return new float[]{x, y, actor.getWidth(), actor.getHeight()};
         } else {
             return null;
         }
@@ -1575,7 +1577,7 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
 
     @Override
     public void preloadTexture(String path) {
-        preloadTextures(new String[] { path });
+        preloadTextures(new String[]{path});
     }
 
     @Override
@@ -1616,16 +1618,16 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
             Object monitor = new Object();
             IObserver watcher = (event, data) -> {
                 switch (event) {
-                case CAMERA_PLAY_INFO:
-                    Boolean status = (Boolean) data[0];
-                    if (!status) {
-                        synchronized (monitor) {
-                            monitor.notify();
+                    case CAMERA_PLAY_INFO:
+                        Boolean status = (Boolean) data[0];
+                        if (!status) {
+                            synchronized (monitor) {
+                                monitor.notify();
+                            }
                         }
-                    }
-                    break;
-                default:
-                    break;
+                        break;
+                    default:
+                        break;
                 }
             };
             em.subscribe(watcher, Events.CAMERA_PLAY_INFO);
@@ -1683,7 +1685,7 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
         }
 
         private Pathd<Vector3d> getPathd(Vector3d p0, double[] p1) {
-            Vector3d[] points = new Vector3d[] { new Vector3d(p0), new Vector3d(p1[0], p1[1], p1[2]) };
+            Vector3d[] points = new Vector3d[]{new Vector3d(p0), new Vector3d(p1[0], p1[1], p1[2])};
             return new Lineard<>(points);
         }
 
@@ -1844,33 +1846,33 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
     public double[] galacticToInternalCartesian(double l, double b, double r) {
         Vector3d pos = Coordinates.sphericalToCartesian(l * Nature.TO_RAD, b * Nature.TO_RAD, r * Constants.KM_TO_U, new Vector3d());
         pos.mul(Coordinates.galacticToEquatorial());
-        return new double[] { pos.x, pos.y, pos.z };
+        return new double[]{pos.x, pos.y, pos.z};
     }
 
     @Override
     public double[] eclipticToInternalCartesian(double l, double b, double r) {
         Vector3d pos = Coordinates.sphericalToCartesian(l * Nature.TO_RAD, b * Nature.TO_RAD, r * Constants.KM_TO_U, new Vector3d());
         pos.mul(Coordinates.eclipticToEquatorial());
-        return new double[] { pos.x, pos.y, pos.z };
+        return new double[]{pos.x, pos.y, pos.z};
     }
 
     @Override
     public double[] equatorialToInternalCartesian(double ra, double dec, double r) {
         Vector3d pos = Coordinates.sphericalToCartesian(ra * Nature.TO_RAD, dec * Nature.TO_RAD, r * Constants.KM_TO_U, new Vector3d());
-        return new double[] { pos.x, pos.y, pos.z };
+        return new double[]{pos.x, pos.y, pos.z};
     }
 
     public double[] internalCartesianToEquatorial(double x, double y, double z) {
         Vector3d in = aux3d1.set(x, y, z);
         Vector3d out = aux3d2;
         Coordinates.cartesianToSpherical(in, out);
-        return new double[] { out.x * Nature.TO_DEG, out.y * Nature.TO_DEG, in.len() };
+        return new double[]{out.x * Nature.TO_DEG, out.y * Nature.TO_DEG, in.len()};
     }
 
     @Override
     public double[] equatorialCartesianToInternalCartesian(double[] eq, double kmFactor) {
         aux3d1.set(eq).scl(kmFactor).scl(Constants.KM_TO_U);
-        return new double[] { aux3d1.y, aux3d1.z, aux3d1.x };
+        return new double[]{aux3d1.y, aux3d1.z, aux3d1.x};
     }
 
     public double[] equatorialCartesianToInternalCartesian(final List eq, double kmFactor) {
@@ -1969,7 +1971,7 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
 
     @Override
     public void setHDRToneMappingType(String type) {
-        if (checkString(type, new String[] { "auto", "AUTO", "exposure", "EXPOSURE", "none", "NONE" }, "tone mapping type"))
+        if (checkString(type, new String[]{"auto", "AUTO", "exposure", "EXPOSURE", "none", "NONE"}, "tone mapping type"))
             GaiaSky.postRunnable(() -> em.post(Events.TONEMAPPING_TYPE_CMD, GlobalConf.PostprocessConf.ToneMapping.valueOf(type.toUpperCase()), false));
     }
 
@@ -2224,15 +2226,15 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
 
     @Override
     public boolean loadDataset(String dsName, String absolutePath) {
-        return loadDataset(dsName, absolutePath, CatalogInfo.CatalogInfoType.SCRIPT, true);
+        return loadDataset(dsName, absolutePath, CatalogInfoType.SCRIPT, true);
     }
 
     @Override
     public boolean loadDataset(String dsName, String path, boolean sync) {
-        return loadDataset(dsName, path, CatalogInfo.CatalogInfoType.SCRIPT, sync);
+        return loadDataset(dsName, path, CatalogInfoType.SCRIPT, sync);
     }
 
-    public boolean loadDataset(String dsName, String path, CatalogInfo.CatalogInfoType type, boolean sync) {
+    public boolean loadDataset(String dsName, String path, CatalogInfoType type, boolean sync) {
         if (sync) {
             return loadDatasetImmediate(dsName, path, type, true);
         } else {
@@ -2242,7 +2244,7 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
         }
     }
 
-    public boolean loadDataset(String dsName, String path, CatalogInfo.CatalogInfoType type, DatasetOptions dops, boolean sync) {
+    public boolean loadDataset(String dsName, String path, CatalogInfoType type, DatasetOptions dops, boolean sync) {
         if (sync) {
             return loadDatasetImmediate(dsName, path, type, dops, true);
         } else {
@@ -2252,7 +2254,7 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
         }
     }
 
-    public boolean loadDataset(String dsName, DataSource ds, CatalogInfo.CatalogInfoType type, DatasetOptions dops, boolean sync) {
+    public boolean loadDataset(String dsName, DataSource ds, CatalogInfoType type, DatasetOptions dops, boolean sync) {
         if (sync) {
             return loadDatasetImmediate(dsName, ds, type, dops, true);
         } else {
@@ -2264,21 +2266,21 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
 
     @Override
     public boolean loadStarDataset(String dsName, String path, double magnitudeScale, double[] labelColor, double[] fadeIn, double[] fadeOut, boolean sync) {
-        return loadStarDataset(dsName, path, CatalogInfo.CatalogInfoType.SCRIPT, magnitudeScale, labelColor, fadeIn, fadeOut, sync);
+        return loadStarDataset(dsName, path, CatalogInfoType.SCRIPT, magnitudeScale, labelColor, fadeIn, fadeOut, sync);
     }
 
     public boolean loadStarDataset(String dsName, String path, double magnitudeScale, final List labelColor, final List fadeIn, final List fadeOut, boolean sync) {
         return loadStarDataset(dsName, path, magnitudeScale, dArray(labelColor), dArray(fadeIn), dArray(fadeOut), sync);
     }
 
-    public boolean loadStarDataset(String dsName, String path, CatalogInfo.CatalogInfoType type, double magnitudeScale, double[] labelColor, double[] fadeIn, double[] fadeOut, boolean sync) {
+    public boolean loadStarDataset(String dsName, String path, CatalogInfoType type, double magnitudeScale, double[] labelColor, double[] fadeIn, double[] fadeOut, boolean sync) {
         DatasetOptions dops = DatasetOptions.getStarDatasetOptions(magnitudeScale, labelColor, fadeIn, fadeOut);
         return loadDataset(dsName, path, type, dops, sync);
     }
 
     @Override
     public boolean loadParticleDataset(String dsName, String path, double profileDecay, double[] particleColor, double colorNoise, double[] labelColor, double particleSize, String ct, double[] fadeIn, double[] fadeOut, boolean sync) {
-        return loadParticleDataset(dsName, path, profileDecay, particleColor, colorNoise, labelColor, particleSize, new double[] { 1.5d, 100d }, ct, fadeIn, fadeOut, sync);
+        return loadParticleDataset(dsName, path, profileDecay, particleColor, colorNoise, labelColor, particleSize, new double[]{1.5d, 100d}, ct, fadeIn, fadeOut, sync);
     }
 
     public boolean loadParticleDataset(String dsName, String path, double profileDecay, double[] particleColor, double colorNoise, double[] labelColor, double particleSize, double[] sizeLimits, String ct, double[] fadeIn, double[] fadeOut, boolean sync) {
@@ -2291,19 +2293,31 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
     }
 
     public boolean loadParticleDataset(String dsName, String path, double profileDecay, double[] particleColor, double colorNoise, double[] labelColor, double particleSize, double[] sizeLimits, ComponentType ct, double[] fadeIn, double[] fadeOut, boolean sync) {
-        return loadParticleDataset(dsName, path, CatalogInfo.CatalogInfoType.SCRIPT, profileDecay, particleColor, colorNoise, labelColor, particleSize, sizeLimits, ct, fadeIn, fadeOut, sync);
+        return loadParticleDataset(dsName, path, CatalogInfoType.SCRIPT, profileDecay, particleColor, colorNoise, labelColor, particleSize, sizeLimits, ct, fadeIn, fadeOut, sync);
     }
 
-    public boolean loadParticleDataset(String dsName, String path, CatalogInfo.CatalogInfoType type, double profileDecay, double[] particleColor, double colorNoise, double[] labelColor, double particleSize, double[] sizeLimits, ComponentType ct, double[] fadeIn, double[] fadeOut, boolean sync) {
+    public boolean loadParticleDataset(String dsName, String path, CatalogInfoType type, double profileDecay, double[] particleColor, double colorNoise, double[] labelColor, double particleSize, double[] sizeLimits, ComponentType ct, double[] fadeIn, double[] fadeOut, boolean sync) {
         DatasetOptions dops = DatasetOptions.getParticleDatasetOptions(profileDecay, particleColor, colorNoise, labelColor, particleSize, sizeLimits, ct, fadeIn, fadeOut);
         return loadDataset(dsName, path, type, dops, sync);
     }
 
-    private boolean loadDatasetImmediate(String dsName, String path, CatalogInfo.CatalogInfoType type, boolean sync) {
+    @Override
+    public boolean loadStarClusterDataset(String dsName, String path, double[] particleColor, double[] fadeIn, double[] fadeOut, boolean sync) {
+        return loadStarClusterDataset(dsName, path, particleColor, ComponentType.Clusters.toString(), fadeIn, fadeOut, sync);
+    }
+
+    @Override
+    public boolean loadStarClusterDataset(String dsName, String path, double[] particleColor, String ct, double[] fadeIn, double[] fadeOut, boolean sync) {
+        ComponentType compType = ComponentType.valueOf(ct);
+        DatasetOptions dops = DatasetOptions.getStarClusterDatasetOptions(dsName, particleColor, compType, fadeIn, fadeOut);
+        return loadDataset(dsName, path, CatalogInfoType.SCRIPT, dops, sync);
+    }
+
+    private boolean loadDatasetImmediate(String dsName, String path, CatalogInfoType type, boolean sync) {
         return loadDatasetImmediate(dsName, path, type, null, sync);
     }
 
-    private boolean loadDatasetImmediate(String dsName, String path, CatalogInfo.CatalogInfoType type, DatasetOptions dops, boolean sync) {
+    private boolean loadDatasetImmediate(String dsName, String path, CatalogInfoType type, DatasetOptions dops, boolean sync) {
         Path p = Paths.get(path);
         if (Files.exists(p) && Files.isReadable(p)) {
             try {
@@ -2317,48 +2331,100 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
         return false;
     }
 
-    private boolean loadDatasetImmediate(String dsName, DataSource ds, CatalogInfo.CatalogInfoType type, DatasetOptions dops, boolean sync) {
+    private Array<ParticleBean> loadParticleBeans(DataSource ds, DatasetOptions dops) {
+        STILDataProvider provider = new STILDataProvider();
+        provider.setDatasetOptions(dops);
+        @SuppressWarnings("unchecked") Array<ParticleBean> data = (Array<ParticleBean>) provider.loadData(ds, 1.0f);
+        return data;
+    }
+
+    private boolean loadDatasetImmediate(String dsName, DataSource ds, CatalogInfoType type, DatasetOptions dops, boolean sync) {
         try {
             logger.info(I18n.txt("notif.catalog.loading", dsName));
-            STILDataProvider provider = new STILDataProvider();
-            provider.setDatasetOptions(dops);
-            @SuppressWarnings("unchecked") Array<ParticleBean> data = (Array<ParticleBean>) provider.loadData(ds, 1.0f);
 
-            // Create star/particle group
-            if (data != null && data.size > 0 && checkString(dsName, "datasetName")) {
+            // Create star/particle group or star clusters
+            if (checkString(dsName, "datasetName")) {
                 if (dops == null || dops.type == DatasetOptions.DatasetLoadType.STARS) {
-                    // STAR GROUP
-                    AtomicReference<StarGroup> starGroup = new AtomicReference<>();
-                    GaiaSky.postRunnable(() -> {
-                        starGroup.set(StarGroup.getStarGroup(dsName, data, dops));
+                    Array<ParticleBean> data = loadParticleBeans(ds, dops);
+                    if (data != null && !data.isEmpty()) {
+                        // STAR GROUP
+                        AtomicReference<StarGroup> starGroup = new AtomicReference<>();
+                        GaiaSky.postRunnable(() -> {
+                            starGroup.set(StarGroup.getStarGroup(dsName, data, dops));
 
-                        // Catalog info
-                        CatalogInfo ci = new CatalogInfo(dsName, ds.getName(), null, type, 1.5f, starGroup.get());
-                        EventManager.instance.post(Events.CATALOG_ADD, ci, true);
+                            // Catalog info
+                            CatalogInfo ci = new CatalogInfo(dsName, ds.getName(), null, type, 1.5f, starGroup.get());
+                            EventManager.instance.post(Events.CATALOG_ADD, ci, true);
 
-                        logger.info(data.size + " stars loaded");
-                    });
-                    // Sync waiting until the node is in the scene graph
-                    while (sync && (starGroup.get() == null || !starGroup.get().inSceneGraph)) {
-                        sleepFrames(1);
+                            logger.info(data.size + " stars loaded");
+                        });
+                        // Sync waiting until the node is in the scene graph
+                        while (sync && (starGroup.get() == null || !starGroup.get().inSceneGraph)) {
+                            sleepFrames(1);
+                        }
                     }
-                } else {
+                } else if (dops == null || dops.type == DatasetOptions.DatasetLoadType.PARTICLES) {
                     // PARTICLE GROUP
-                    AtomicReference<ParticleGroup> particleGroup = new AtomicReference<>();
-                    GaiaSky.postRunnable(() -> {
-                        particleGroup.set(ParticleGroup.getParticleGroup(dsName, data, dops));
+                    Array<ParticleBean> data = loadParticleBeans(ds, dops);
+                    if (data != null && !data.isEmpty()) {
+                        AtomicReference<ParticleGroup> particleGroup = new AtomicReference<>();
+                        GaiaSky.postRunnable(() -> {
+                            particleGroup.set(ParticleGroup.getParticleGroup(dsName, data, dops));
 
-                        // Catalog info
-                        CatalogInfo ci = new CatalogInfo(dsName, ds.getName(), null, type, 1.5f, particleGroup.get());
-                        EventManager.instance.post(Events.CATALOG_ADD, ci, true);
+                            // Catalog info
+                            CatalogInfo ci = new CatalogInfo(dsName, ds.getName(), null, type, 1.5f, particleGroup.get());
+                            EventManager.instance.post(Events.CATALOG_ADD, ci, true);
 
-                        logger.info(data.size + " particles loaded");
-                    });
-                    // Sync waiting until the node is in the scene graph
-                    while (sync && (particleGroup.get() == null || !particleGroup.get().inSceneGraph)) {
-                        sleepFrames(1);
+                            logger.info(data.size + " particles loaded");
+                        });
+                        // Sync waiting until the node is in the scene graph
+                        while (sync && (particleGroup.get() == null || !particleGroup.get().inSceneGraph)) {
+                            sleepFrames(1);
+                        }
                     }
+                } else if (dops == null || dops.type == DatasetOptions.DatasetLoadType.CLUSTERS) {
+                    // STAR CLUSTERS
+                    if (ds instanceof FileDataSource) {
+                        FileDataSource fds = (FileDataSource) ds;
+                        StarClusterLoader scl = new StarClusterLoader();
+                        scl.setName(dsName);
+                        scl.setParentName(dsName);
+                        scl.initialize(new String[]{fds.getFile().getAbsolutePath()});
+                        Array<StarCluster> data = scl.loadData();
 
+                        AtomicReference<FadeNode> scNode = new AtomicReference<>();
+                        GaiaSky.postRunnable(() -> {
+                            // Create fade node
+                            FadeNode fn = new FadeNode();
+                            fn.setName(dsName);
+                            fn.setFadein(dops.fadeIn);
+                            fn.setFadeout(dops.fadeOut);
+                            fn.setParent("Universe");
+                            fn.setColor(dops.labelColor);
+                            fn.setCt(dops.ct.toString());
+                            fn.setPosition(new double[]{0, 0, 0});
+                            fn.doneLoading(manager);
+                            scNode.set(fn);
+
+                            // Catalog info
+                            CatalogInfo ci = new CatalogInfo(dsName, ds.getName(), null, type, 1.5f, scNode.get());
+                            EventManager.instance.post(Events.CATALOG_ADD, ci, true);
+                            // Add all clusters to scene graph
+                            data.forEach(cluster -> {
+                                cluster.setColor(dops.particleColor);
+                                cluster.doneLoading(manager);
+                                EventManager.instance.post(Events.SCENE_GRAPH_ADD_OBJECT_CMD, cluster, true);
+                            });
+
+                            logger.info(data.size + " star clusters loaded");
+                        });
+                        // Sync waiting until the node is in the scene graph
+                        while (sync && (scNode.get() == null || !scNode.get().inSceneGraph)) {
+                            sleepFrames(1);
+                        }
+                    } else {
+                        logger.error("Only file data sources supported for star clusters");
+                    }
                 }
                 // One extra flush frame
                 sleepFrames(1);
@@ -2640,25 +2706,25 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
     @Override
     public void notify(Events event, Object... data) {
         switch (event) {
-        case INPUT_EVENT:
-            inputCode = (Integer) data[0];
-            break;
-        case FRAME_TICK:
-            // New frame
-            frameNumber = (Long) data[0];
-            synchronized (frameMonitor) {
-                frameMonitor.notify();
-            }
-            break;
-        case DISPOSE:
-            // Stop all
-            for (AtomicBoolean stop : stops) {
-                if (stop != null)
-                    stop.set(true);
-            }
-            break;
-        default:
-            break;
+            case INPUT_EVENT:
+                inputCode = (Integer) data[0];
+                break;
+            case FRAME_TICK:
+                // New frame
+                frameNumber = (Long) data[0];
+                synchronized (frameMonitor) {
+                    frameMonitor.notify();
+                }
+                break;
+            case DISPOSE:
+                // Stop all
+                for (AtomicBoolean stop : stops) {
+                    if (stop != null)
+                        stop.set(true);
+                }
+                break;
+            default:
+                break;
         }
 
     }

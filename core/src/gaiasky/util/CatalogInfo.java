@@ -5,7 +5,12 @@
 
 package gaiasky.util;
 
+import gaiasky.event.EventManager;
+import gaiasky.event.Events;
 import gaiasky.scenegraph.FadeNode;
+import gaiasky.scenegraph.ParticleGroup;
+import gaiasky.scenegraph.StarGroup;
+import gaiasky.scenegraph.octreewrapper.OctreeWrapper;
 import gaiasky.util.Logger.Log;
 import gaiasky.util.color.ColourUtils;
 import gaiasky.util.filter.Filter;
@@ -14,7 +19,7 @@ import gaiasky.util.filter.attrib.IAttribute;
 import java.time.Instant;
 
 public class CatalogInfo {
-    private static final Log logger =Logger.getLogger(CatalogInfo.class);
+    private static final Log logger = Logger.getLogger(CatalogInfo.class);
     private static int colorIndexSequence = 0;
 
 
@@ -71,14 +76,14 @@ public class CatalogInfo {
         }
     }
 
-    public boolean isVisible(){
-        if(this.object != null){
+    public boolean isVisible() {
+        if (this.object != null) {
             return this.object.isVisible();
         }
         return true;
     }
 
-    public void setColor(float r, float g, float b, float a){
+    public void setColor(float r, float g, float b, float a) {
         this.hlColor[0] = r;
         this.hlColor[1] = g;
         this.hlColor[2] = b;
@@ -86,16 +91,16 @@ public class CatalogInfo {
         highlight(highlighted);
     }
 
-    public void setHlColor(float[] hlColor){
+    public void setHlColor(float[] hlColor) {
         this.plainColor = true;
         setColor(hlColor[0], hlColor[1], hlColor[2], hlColor[3]);
     }
 
-    public float[] getHlColor(){
+    public float[] getHlColor() {
         return hlColor;
     }
 
-    public void setHlColormap(int cmapIndex, IAttribute cmapAttribute, double cmapMin, double cmapMax){
+    public void setHlColormap(int cmapIndex, IAttribute cmapAttribute, double cmapMin, double cmapMax) {
         this.plainColor = false;
         this.hlCmapIndex = cmapIndex;
         this.hlCmapAttribute = cmapAttribute;
@@ -104,12 +109,12 @@ public class CatalogInfo {
         highlight(highlighted);
     }
 
-    public void setHlSizeFactor(float hlSizeFactor){
+    public void setHlSizeFactor(float hlSizeFactor) {
         this.hlSizeFactor = hlSizeFactor;
         highlight(highlighted);
     }
 
-    public void setHlAllVisible(boolean allVisible){
+    public void setHlAllVisible(boolean allVisible) {
         this.hlAllVisible = allVisible;
         highlight(highlighted);
     }
@@ -120,21 +125,32 @@ public class CatalogInfo {
     public void removeCatalog() {
         if (this.object != null) {
             logger.info("Removing dataset " + name);
+            if(!isRegular()) {
+                EventManager.instance.post(Events.SCENE_GRAPH_REMOVE_OBJECT_CMD, this.object, true);
+            }
             this.object.dispose();
         }
     }
 
     /**
      * Highlight the dataset using the dataset's own color index
+     *
      * @param hl Whether to highlight or not
      */
-    public void highlight(boolean hl){
+    public void highlight(boolean hl) {
         this.highlighted = hl;
-        if(plainColor) {
+        if (plainColor) {
             object.highlight(hl, hlColor);
-        }else{
+        } else {
             object.highlight(hl, hlCmapIndex, hlCmapAttribute, hlCmapMin, hlCmapMax);
         }
+    }
+
+    /**
+     * @return True if this is a catalog of stars or particles, false otherwise (star clusters)
+     */
+    public boolean isRegular() {
+        return this.object instanceof ParticleGroup || this.object instanceof StarGroup || this.object instanceof OctreeWrapper;
     }
 
 }

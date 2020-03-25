@@ -319,7 +319,7 @@ public class GuiRegistry implements IObserver {
                                 // Load selected file
                                 try {
                                     String fileName = result.getFileName().toString();
-                                    final DatasetLoadDialog dld = new DatasetLoadDialog(I18n.txt("gui.dsload.title") + ": " + fileName, skin, ui);
+                                    final DatasetLoadDialog dld = new DatasetLoadDialog(I18n.txt("gui.dsload.title") + ": " + fileName, fileName, skin, ui);
                                     Runnable doLoad = () -> {
                                         try {
                                             DatasetOptions dops = dld.generateDatasetOptions();
