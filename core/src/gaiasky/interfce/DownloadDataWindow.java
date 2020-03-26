@@ -243,7 +243,7 @@ public class DownloadDataWindow extends GenericDialog {
                 // Add dataset to desc table
                 OwnCheckBox cb = new OwnCheckBox(dataset.name, skin, "title", pad * 2f);
                 cb.left();
-                cb.setMinWidth(!GlobalConf.isHiDPI() ? 245f * GlobalConf.UI_SCALE_FACTOR : 160f * GlobalConf.UI_SCALE_FACTOR);
+                cb.setMinWidth(!GlobalConf.isHiDPI() ? 220f * GlobalConf.UI_SCALE_FACTOR : 160f * GlobalConf.UI_SCALE_FACTOR);
                 cb.setChecked(dataset.mustDownload);
                 cb.setDisabled(dataset.cbDisabled);
                 cb.addListener((event) -> {
@@ -301,7 +301,7 @@ public class DownloadDataWindow extends GenericDialog {
                 }
 
                 OwnLabel vers = new OwnLabel(vstring, skin);
-                vers.setWidth(20f * GlobalConf.UI_SCALE_FACTOR);
+                vers.setWidth(50f * GlobalConf.UI_SCALE_FACTOR);
                 if (!dataset.exists) {
                     vers.addListener(new OwnTextTooltip(I18n.txt("gui.download.version.server", Integer.toString(dataset.serverVersion)), skin, 10));
                 } else if (dataset.outdated) {
@@ -500,7 +500,7 @@ public class DownloadDataWindow extends GenericDialog {
             Trio<DatasetDesc, OwnCheckBox, OwnLabel> trio = toDownload.get(current);
             DatasetDesc currentDataset = trio.getFirst();
             String name = currentDataset.name;
-            String url = currentDataset.file;
+            String url = currentDataset.file.replace("@mirror-url@", GlobalConf.program.MIRROR_URL);
             String type = currentDataset.type;
 
             FileHandle tempDownload = Gdx.files.absolute(GlobalConf.data.DATA_LOCATION + "/temp.tar.gz");
@@ -743,7 +743,7 @@ public class DownloadDataWindow extends GenericDialog {
         label.setText(I18n.txt("gui.download.status.outdated"));
         label.setColor(1, 1, 0, 1);
         if (ds.releaseNotes != null && !ds.releaseNotes.isEmpty()) {
-            label.setText(label.getText() + " (i)");
+            label.setText(label.getText());
             label.addListener(new OwnTextTooltip(I18n.txt("gui.download.releasenotes", ds.releaseNotes), skin, 10));
         }
     }

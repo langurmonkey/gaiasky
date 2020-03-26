@@ -874,6 +874,7 @@ public class GlobalConf {
         public String VERSION_LAST_VERSION;
         public String VERSION_CHECK_URL;
 
+        public String MIRROR_URL = "http://gaia.ari.uni-heidelberg.de/gaiasky/files/autodownload/";
         public String DATA_DESCRIPTOR_URL;
         public String UI_THEME;
         public String SCRIPT_LOCATION;

@@ -43,7 +43,7 @@
       ],
       "md5": "a6ad8e450f68c7df533564bdb33dd62b",
       "description": "Default data pack for Gaia Sky - Contains the Solar System, constellations, NBG, SDSS, meshes and more",
-      "file": "http://gaia.ari.uni-heidelberg.de/gaiasky/files/autodownload/basedata/000_20180829/gaiasky_data.tar.gz"
+      "file": "@mirror-url@basedata/000_20180829/gaiasky_data.tar.gz"
     },
     {
       "name": "default-data",
@@ -84,7 +84,7 @@
       ],
       "md5": "17ea4bf3ff1e5e68c1df4fc6248b6b57",
       "description": "Default data pack for Gaia Sky - For Gaia Sky 2.1.5 and above. Contains the Solar System, constellations, meshes and more",
-      "file": "http://gaia.ari.uni-heidelberg.de/gaiasky/files/autodownload/basedata/001_20181129/gaiasky_data.tar.gz"
+      "file": "@mirror-url@basedata/001_20181129/gaiasky_data.tar.gz"
     },
     {
       "name": "default-data",
@@ -125,7 +125,7 @@
       ],
       "md5": "4bb17a415ffe456f027e8373bf2c6321",
       "description": "Default data pack for Gaia Sky - For Gaia Sky 2.1.5 and above. Contains the Solar System, constellations, meshes and more",
-      "file": "http://gaia.ari.uni-heidelberg.de/gaiasky/files/autodownload/basedata/002_20190611/gaiasky_data.tar.gz"
+      "file": "@mirror-url@basedata/002_20190611/gaiasky_data.tar.gz"
     },
     {
       "name": "default-data",
@@ -182,7 +182,7 @@
       ],
       "sha256": "bc8ce42a31076c4962ae7cb5e5fa1e43d837367ddd9c4dd60383b52b4c734eb2",
       "description": "Default data pack for Gaia Sky - For Gaia Sky 2.2.0 and above. Contains the Solar System, constellations, meshes and more",
-      "file": "http://gaia.ari.uni-heidelberg.de/gaiasky/files/autodownload/basedata/004_20190614_v020200/gaiasky_data.tar.gz"
+      "file": "@mirror-url@basedata/004_20190614_v020200/gaiasky_data.tar.gz"
     },
     {
       "name": "default-data",
@@ -239,7 +239,7 @@
       ],
       "sha256": "06b4a45e2aea8f537b69661b21d114ca99a21d61bb439ea3e8585839110fffc3",
       "description": "Default data pack for Gaia Sky - For Gaia Sky 2.2.2 and above. Contains the Solar System, constellations, meshes and more",
-      "file": "http://gaia.ari.uni-heidelberg.de/gaiasky/files/autodownload/basedata/005_20191004/gaiasky_data.tar.gz"
+      "file": "@mirror-url@basedata/005_20191004/gaiasky_data.tar.gz"
     },
     {
       "name": "default-data",
@@ -297,7 +297,64 @@
       "sha256": "0e671cb3fc9490a9f175f692186875a8588ce7ce3e58bdc35b49157b30497364",
       "description": "Default data pack for Gaia Sky - For Gaia Sky 2.2.2 and above. Contains the Solar System, constellations, meshes and more",
       "releasenotes": "Increase number of gas particles in Milky Way, and tweak their color",
-      "file": "http://gaia.ari.uni-heidelberg.de/gaiasky/files/autodownload/basedata/006_20191104/gaiasky_data.tar.gz"
+      "file": "@mirror-url@basedata/006_20191104/gaiasky_data.tar.gz"
+    },
+    {
+      "name": "default-data",
+      "type": "data-pack",
+      "version": 7,
+      "mingsversion": 20206,
+      "size": 54515760,
+      "check": "data-main.json",
+      "data": [
+        "asteroids-dr2.json",
+        "asteroids.json",
+        "attitudexml",
+        "constellations",
+        "countries",
+        "data-main.json",
+        "extra.json",
+        "galaxy",
+        "locations-earth.json",
+        "locations.json",
+        "locations-moon.json",
+        "meshes/dr2/meshes_dust",
+        "meshes/dr2/meshes_hii",
+        "models",
+        "moons.json",
+        "autoload-meshes-dr2-dust.json",
+        "autoload-meshes-dr2-hii.json",
+        "oort",
+        "orbit",
+        "orbits-asteroid.json",
+        "orbits-asteroids-dr2.json",
+        "orbits-moon.json",
+        "orbits-planet.json",
+        "orbits-satellite.json",
+        "planets.json",
+        "satellites.json",
+        "tex/base/*-low.jpg",
+        "tex/base/*-med.jpg",
+        "tex/base/*-low.png",
+        "tex/base/*-med.png",
+        "tex/base/all-mild-specular.jpg",
+        "tex/base/attitudeindicator.png",
+        "tex/base/cluster-tex.png",
+        "tex/base/debug-color.jpg",
+        "tex/base/debug-height.jpg",
+        "tex/base/lenscolor.png",
+        "tex/base/lensstarburst.jpg",
+        "tex/base/lut.jpg",
+        "tex/base/sso.png",
+        "tex/base/star.jpg",
+        "tex/base/static.jpg",
+        "tex/base/telescopebeam.png",
+        "tex/skybox/gaiasky"
+      ],
+      "sha256": "96218611232206e3309b4bb0709b07a41836b2be4c52950089b97de51e510dab",
+      "description": "Default data pack for Gaia Sky - For Gaia Sky 2.2.6 and above. Contains the Solar System, constellations, meshes and more",
+      "releasenotes": "Remove Milky Way Star Clusters catalog, it has its own download now.",
+      "file": "@mirror-url@basedata/007_20200326/gaiasky_data.tar.gz"
     },
     {
       "name": "hi-res-textures",
@@ -310,7 +367,7 @@
       ],
       "description": "High resolution textures - High resolution texture pack including some 4K and 8K textures for planet surfaces and asteroids.",
       "md5sum": "4a33a91e16d799645960294dd7c4c179",
-      "file": "http://gaia.ari.uni-heidelberg.de/gaiasky/files/autodownload/tex/000_20180904/hi-res-texture-pack.tar.gz"
+      "file": "@mirror-url@tex/000_20180904/hi-res-texture-pack.tar.gz"
     },
     {
       "name": "hi-res-textures",
@@ -325,7 +382,7 @@
       ],
       "description": "High resolution textures - High resolution texture pack including some 4K and 8K textures for planet surfaces and asteroids.",
       "md5": "7e480c26e0126336b5776d2c26be466d",
-      "file": "http://gaia.ari.uni-heidelberg.de/gaiasky/files/autodownload/tex/001_20181129/hi-res-texture-pack.tar.gz"
+      "file": "@mirror-url@tex/001_20181129/hi-res-texture-pack.tar.gz"
     },
     {
       "name": "hi-res-textures",
@@ -343,7 +400,7 @@
       ],
       "description": "High resolution textures - High resolution texture pack including some 4K and 8K textures for planet surfaces and asteroids.",
       "sha256": "e620090efc6464422d2468abf795d246ef489b46f7d97f0bc7294aad099bb93c",
-      "file": "http://gaia.ari.uni-heidelberg.de/gaiasky/files/autodownload/tex/002_20190614_v020200/hi-res-texture-pack.tar.gz"
+      "file": "@mirror-url@tex/002_20190614_v020200/hi-res-texture-pack.tar.gz"
     },
     {
       "name": "hi-res-textures",
@@ -361,7 +418,7 @@
       ],
       "description": "High resolution textures - High resolution texture pack including some 4K and 8K textures for planet surfaces and asteroids.",
       "sha256": "08d9b3300ad356c7e29683dd87d67542d2b5394174a7afc723bffae0a64f6a4d",
-      "file": "http://gaia.ari.uni-heidelberg.de/gaiasky/files/autodownload/tex/003_20191014/hi-res-texture-pack.tar.gz"
+      "file": "@mirror-url@tex/003_20191014/hi-res-texture-pack.tar.gz"
     },
     {
       "name": "catalog-dr2-verysmall",
@@ -376,7 +433,7 @@
       ],
       "description": "Gaia DR2 very small - 5%/0.5% parallax relative errors for bright/faint stars, includes Hipparcos - 5.1 million stars",
       "sha256": "e0c7acf94db78f807df6b6324d16ca7217f5d2f3d2012b72dc5372c73829dde8",
-      "file": "http://gaia.ari.uni-heidelberg.de/gaiasky/files/autodownload/dr2/004_20190402/catalog-dr2-verysmall.tar.gz"
+      "file": "@mirror-url@dr2/004_20190402/catalog-dr2-verysmall.tar.gz"
     },
     {
       "name": "catalog-dr2-small",
@@ -391,7 +448,7 @@
       ],
       "description": "Gaia DR2 small - 10%/0.5% parallax relative errors for bright/faint stars, includes Hipparcos - 6.7 million stars",
       "sha256": "6b8135ac3311998f9635dbc76a28b2d5308c723effd6ace6c1991ea8e0222757",
-      "file": "http://gaia.ari.uni-heidelberg.de/gaiasky/files/autodownload/dr2/004_20190402/catalog-dr2-small.tar.gz"
+      "file": "@mirror-url@dr2/004_20190402/catalog-dr2-small.tar.gz"
     },
     {
       "name": "catalog-dr2-default",
@@ -406,7 +463,7 @@
       ],
       "sha256": "1130ccae4c669979cdef0fff70682dad055cb019722a476a7de20f6a577561d7",
       "description": "Gaia DR2 default - 20%/0.5% parallax relative errors for bright/faint stars, includes Hipparcos - 7.5 million stars",
-      "file": "http://gaia.ari.uni-heidelberg.de/gaiasky/files/autodownload/dr2/004_20190402/catalog-dr2-default.tar.gz"
+      "file": "@mirror-url@dr2/004_20190402/catalog-dr2-default.tar.gz"
     },
     {
       "name": "catalog-dr2-bright",
@@ -421,7 +478,7 @@
       ],
       "description": "Gaia DR2 bright - 90% parallax relative errors for bright stars, includes Hipparcos - 7.7 million stars",
       "sha256": "c5e17092b7dfff196a60af97373d6325095fcff178c83f5bb43f01a02311c333",
-      "file": "http://gaia.ari.uni-heidelberg.de/gaiasky/files/autodownload/dr2/004_20190402/catalog-dr2-bright.tar.gz"
+      "file": "@mirror-url@dr2/004_20190402/catalog-dr2-bright.tar.gz"
     },
     {
       "name": "catalog-dr2-large",
@@ -436,7 +493,7 @@
       ],
       "description": "Gaia DR2 large - 50%/12.5% parallax relative errors for bright/faint stars, includes Hipparcos - 97 million stars",
       "sha256": "2fcce87622c3c3da9e637d5075209c3e328580a38d8bea1ef142ce9b52104103",
-      "file": "http://gaia.ari.uni-heidelberg.de/gaiasky/files/autodownload/dr2/004_20190402/catalog-dr2-large.tar.gz"
+      "file": "@mirror-url@dr2/004_20190402/catalog-dr2-large.tar.gz"
     },
     {
       "name": "catalog-dr2-ratherlarge",
@@ -451,7 +508,7 @@
       ],
       "description": "Gaia DR2 rather large - 50% parallax relative error, includes Hipparcos - 400 million stars",
       "sha256": "0ba5ba5b102491f41d6f20cc51b590328bf2b46002094f7bf43f2a6c17098a0b",
-      "file": "http://gaia.ari.uni-heidelberg.de/gaiasky/files/autodownload/dr2/004_20190402/catalog-dr2-ratherlarge.tar.gz"
+      "file": "@mirror-url@dr2/004_20190402/catalog-dr2-ratherlarge.tar.gz"
     },
     {
       "name": "catalog-dr2-verylarge",
@@ -466,7 +523,7 @@
       ],
       "description": "Gaia DR2 very large - 90%/90% parallax relative errors for bright/faint stars, includes Hipparcos - 601 million stars",
       "sha256": "bb22351914e2139c6713a46c8623ba8274ec9f72a5f2ac8be92d34bb13b8bf61",
-      "file": "http://gaia.ari.uni-heidelberg.de/gaiasky/files/autodownload/dr2/004_20190402/catalog-dr2-verylarge.tar.gz"
+      "file": "@mirror-url@dr2/004_20190402/catalog-dr2-verylarge.tar.gz"
     },
     {
       "name": "catalog-dr2-extralarge",
@@ -482,7 +539,7 @@
       "description": "Gaia DR2 complete - Based on bayesian geometric distances of Bayler-Jones et al., includes Hipparcos - 1.33 billion stars",
       "link": "https://arxiv.org/abs/1804.10121",
       "sha256": "e7dec539021343f97184ebd0b5c7eab77595bb0f01655d39888a8da9baa24e63",
-      "file": "http://gaia.ari.uni-heidelberg.de/gaiasky/files/autodownload/dr2/004_20190402/catalog-dr2-extralarge.tar.gz"
+      "file": "@mirror-url@dr2/004_20190402/catalog-dr2-extralarge.tar.gz"
     },
     {
       "name": "catalog-dr2-ruwe",
@@ -498,7 +555,7 @@
       "description": "Gaia DR2 ruwe - Based on Re-normalised Unit Weight Errors, where RUWE < 1.4, includes Hipparcos - 92 million stars",
       "link": "https://www.cosmos.esa.int/web/gaia/dr2-known-issues#Astrometry2vs5p",
       "sha256": "54d6e488ed2c5d9f59a761706d5bc7b341ae9b7d3f4b92beebf85c8ba8f9a11c",
-      "file": "http://gaia.ari.uni-heidelberg.de/gaiasky/files/autodownload/dr2/004_20190402/catalog-dr2-ruwe.tar.gz"
+      "file": "@mirror-url@dr2/004_20190402/catalog-dr2-ruwe.tar.gz"
     },
     {
       "name": "catalog-whitedwarfs",
@@ -514,7 +571,7 @@
       "description": "GDR2 white dwarfs - White dwarfs catalog based on GDR2 by Gentile Fusillo et al. 2018, MNRAS 482, 4579 - Brightnesses increased by 10 mag - 177955 stars",
       "link": "http://adsabs.harvard.edu/abs/2019MNRAS.482.4570G",
       "sha256": "73473bbc6718ae64bd3a9de5bdd2c00fcf3d75ce318af4b4e334a06e7c1408a9",
-      "file": "http://gaia.ari.uni-heidelberg.de/gaiasky/files/autodownload/whitedwarfs/000_20181217/catalog-wd.tar.gz"
+      "file": "@mirror-url@whitedwarfs/000_20181217/catalog-wd.tar.gz"
     },
     {
       "name": "catalog-hipparcos-newred",
@@ -530,7 +587,7 @@
       "description": "Hipparcos - Hipparcos new reduction (van Leeuwen, 2007), already included in all DR2 catalogs - 177955 stars",
       "link": "http://adsabs.harvard.edu/abs/2007ASSL..350.....V",
       "sha256": "31cfcba1b5ee633514f72cc7fee6a50a579dc639d89345720e2c3c861af843b1",
-      "file": "http://gaia.ari.uni-heidelberg.de/gaiasky/files/autodownload/hipparcos/001_20181218/catalog-hipparcos-newreduction.tar.gz"
+      "file": "@mirror-url@hipparcos/001_20181218/catalog-hipparcos-newreduction.tar.gz"
     },
     {
       "name": "catalog-hipparcos-newred",
@@ -547,7 +604,7 @@
       "description": "Hipparcos - Hipparcos new reduction (van Leeuwen, 2007) with curated star names, already included in all DR2 catalogs - 177955 stars",
       "link": "http://adsabs.harvard.edu/abs/2007ASSL..350.....V",
       "sha256": "7c22dfec8f16e8342c6556384c4a715d55a2095430203b27411b69552efc7cbc",
-      "file": "http://gaia.ari.uni-heidelberg.de/gaiasky/files/autodownload/hipparcos/002_20200204/catalog-hipparcos-newreduction.tar.gz"
+      "file": "@mirror-url@hipparcos/002_20200204/catalog-hipparcos-newreduction.tar.gz"
     },
     {
       "name": "catalog-nbg",
@@ -563,7 +620,7 @@
       ],
       "description": "NBG catalog - Nearby Galaxies Catalog - 870 galaxies",
       "md5": "b1a829727bef8b703d465b2104e92178",
-      "file": "http://gaia.ari.uni-heidelberg.de/gaiasky/files/autodownload/galaxies/002_20181213/nbg-galaxies.tar.gz"
+      "file": "@mirror-url@galaxies/002_20181213/nbg-galaxies.tar.gz"
     },
     {
       "name": "catalog-nbg",
@@ -579,7 +636,7 @@
       ],
       "description": "NBG catalog - Nearby Galaxies Catalog, contains M87 black hole - 870 galaxies",
       "sha256": "cf1f56feb25abb964e31afc798a57179547ffa640e92894da349990e048f71f9",
-      "file": "http://gaia.ari.uni-heidelberg.de/gaiasky/files/autodownload/galaxies/003_20190411/nbg-galaxies.tar.gz"
+      "file": "@mirror-url@galaxies/003_20190411/nbg-galaxies.tar.gz"
     },
     {
       "name": "catalog-sdss-12",
@@ -594,7 +651,7 @@
       ],
       "description": "SDSS DR12 - Part of Sloan Digital Sky Survey DR12 - 500000 galaxies",
       "md5": "20b3c704b297d5c8ec4f10eb31465915",
-      "file": "http://gaia.ari.uni-heidelberg.de/gaiasky/files/autodownload/galaxies/000_20181129/sdss-12-galaxies.tar.gz"
+      "file": "@mirror-url@galaxies/000_20181129/sdss-12-galaxies.tar.gz"
     },
     {
       "name": "catalog-sdss-12",
@@ -609,7 +666,7 @@
       ],
       "description": "SDSS DR12 - Part of Sloan Digital Sky Survey DR12 - 500000 galaxies",
       "sha256": "0dbcc97b166dc0ffadcafe542c2293376d58ebd9a9f5b12150a9eaaea6a5e543",
-      "file": "http://gaia.ari.uni-heidelberg.de/gaiasky/files/autodownload/galaxies/004_20190621/sdss-12-galaxies.tar.gz"
+      "file": "@mirror-url@galaxies/004_20190621/sdss-12-galaxies.tar.gz"
     },
     {
       "name": "catalog-sdss-12",
@@ -624,7 +681,7 @@
       ],
       "description": "SDSS DR12 - Part of Sloan Digital Sky Survey DR12 - 500000 galaxies",
       "sha256": "bb8650412d9269f28ba97a2d73ac6442986f6163a403e52d1da765534c22b335",
-      "file": "http://gaia.ari.uni-heidelberg.de/gaiasky/files/autodownload/galaxies/005_20190904/sdss-12-galaxies.tar.gz"
+      "file": "@mirror-url@galaxies/005_20190904/sdss-12-galaxies.tar.gz"
     },
     {
       "name": "catalog-sdss-14",
@@ -639,7 +696,7 @@
       ],
       "description": "SDSS DR14 - Sloan Digital Sky Survey DR14 - 3.9 million galaxies",
       "md5": "0477808710c71cfeac3bc318683b855b",
-      "file": "http://gaia.ari.uni-heidelberg.de/gaiasky/files/autodownload/galaxies/000_20181129/sdss-14-galaxies.tar.gz"
+      "file": "@mirror-url@galaxies/000_20181129/sdss-14-galaxies.tar.gz"
     },
     {
       "name": "catalog-sdss-14",
@@ -654,7 +711,7 @@
       ],
       "description": "SDSS DR14 - Sloan Digital Sky Survey DR14 - 3.9 million galaxies",
       "sha256": "3a72ffcf112408366160c143c4579503d83ebb6b8ee5a130ea2087488ac42a54",
-      "file": "http://gaia.ari.uni-heidelberg.de/gaiasky/files/autodownload/galaxies/004_20190621/sdss-14-galaxies.tar.gz"
+      "file": "@mirror-url@galaxies/004_20190621/sdss-14-galaxies.tar.gz"
     },
     {
       "name": "catalog-sdss-14",
@@ -669,7 +726,7 @@
       ],
       "description": "SDSS DR14 - Sloan Digital Sky Survey DR14 - 3.9 million galaxies",
       "sha256": "8f37ad1c82cb31092a87fb984ce8c15c3486625963d6491c6e91c463f7cf6cfe",
-      "file": "http://gaia.ari.uni-heidelberg.de/gaiasky/files/autodownload/galaxies/005_20190904/sdss-14-galaxies.tar.gz"
+      "file": "@mirror-url@galaxies/005_20190904/sdss-14-galaxies.tar.gz"
     },
     {
       "name": "catalog-nebulae",
@@ -684,7 +741,7 @@
       ],
       "description": "Nebulae - A few nebulae with textures",
       "sha256": "36586bb45b2560f49ff0eb44dc0cfe9fd719e052a0411c3283d43f552c5e33d6",
-      "file": "http://gaia.ari.uni-heidelberg.de/gaiasky/files/autodownload/nebulae/001_20181129/nebulae.tar.gz"
+      "file": "@mirror-url@nebulae/001_20181129/nebulae.tar.gz"
     },
     {
       "name": "catalog-nebulae",
@@ -699,7 +756,22 @@
       ],
       "description": "Nebulae - A few nebulae with textures",
       "sha256": "b303f8988e5d4e5f1e5da19297b71c6f11a93fdcf6105f4a37008cdeb8b3d3f8",
-      "file": "http://gaia.ari.uni-heidelberg.de/gaiasky/files/autodownload/nebulae/002_20190726/nebulae.tar.gz"
+      "file": "@mirror-url@nebulae/002_20190726/nebulae.tar.gz"
+    },
+    {
+      "name": "catalog-mwsc",
+      "type": "catalog",
+      "version": 1,
+      "mingsversion": 20206,
+      "size": 208327,
+      "check": "autoload-mwsc.json",
+      "data": [
+        "autoload-mwsc.json",
+        "mwsc"
+      ],
+      "description": "MWSC - Milky Way Star Clusters catalog",
+      "sha256" : "d64a87a04416a84c90000568d255088575b1c7480cef4906def773451f031125",
+      "file": "@mirror-url@clusters/001_20200326/mwsc-clusters.tar.gz"
     },
     {
       "name": "mesh-dr2-hot-very",
@@ -713,7 +785,7 @@
       ],
       "description": "Very ionizing star map - Isosurfaces of very ionizing hot OB stars",
       "sha256" : "db6235802ee21b228b921452e79ecf73f2ebe3b4f9377173630cee570c1fe7d2",
-      "file": "http://gaia.ari.uni-heidelberg.de/gaiasky/files/autodownload/meshes/000_20180904/meshes-dr2-hot-very.tar.gz"
+      "file": "@mirror-url@meshes/000_20180904/meshes-dr2-hot-very.tar.gz"
     },
     {
       "name": "mesh-dr2-hot-some",
@@ -727,7 +799,7 @@
       ],
       "description": "Some ionizing star map - Isosurfaces of somewhat ionizing hot OB stars",
       "sha256" : "fa24c69a57c9a6f2e74ad9adf8c72a3e551a69ad4a0038da9e84fe04b94977d0",
-      "file": "http://gaia.ari.uni-heidelberg.de/gaiasky/files/autodownload/meshes/000_20180904/meshes-dr2-hot-some.tar.gz"
+      "file": "@mirror-url@meshes/000_20180904/meshes-dr2-hot-some.tar.gz"
     },
     {
       "name": "mesh-dr2-hot-non",
@@ -741,7 +813,7 @@
       ],
       "description": "Nonionizing star map - Isosurfaces of non-ionizing hot OB stars (x <= 50)",
       "sha256" : "969faf43cc8ae1769f59af6d5944b4988276e95da63d64fb22ef57359639bd7b",
-      "file": "http://gaia.ari.uni-heidelberg.de/gaiasky/files/autodownload/meshes/000_20180904/meshes-dr2-hot-non.tar.gz"
+      "file": "@mirror-url@meshes/000_20180904/meshes-dr2-hot-non.tar.gz"
     },
     {
       "name": "mesh-dr2-hot-non-medium",
@@ -755,7 +827,7 @@
       ],
       "description": "Nonionizing star map - Isosurfaces of very ionizing hot OB stars (25 < x <= 50)",
       "sha256" : "305d748806be5b13a2abaeb1307cdda9e5ebec2f5895bc8505c55c91757b2aa8",
-      "file": "http://gaia.ari.uni-heidelberg.de/gaiasky/files/autodownload/meshes/000_20180904/meshes-dr2-hot-non-medium.tar.gz"
+      "file": "@mirror-url@meshes/000_20180904/meshes-dr2-hot-non-medium.tar.gz"
     }
   ]
 }

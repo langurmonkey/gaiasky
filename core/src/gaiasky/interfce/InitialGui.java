@@ -89,7 +89,6 @@ public class InitialGui extends AbstractGui {
                      * - no catalogs found in data folder, or
                      * - new versions of current datasets found
                      */
-
                     DataDescriptor dd = DataDescriptorUtils.instance().buildDatasetsDescriptor(dataDescriptor);
                     if (datasetsDownload || !basicDataPresent() || catalogFiles.size == 0 || dd.updatesAvailable) {
                         // No catalog files, display downloader
