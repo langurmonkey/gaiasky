@@ -10,7 +10,7 @@ import gaiasky.scenegraph.ParticleGroup.ParticleBean;
 import gaiasky.util.tree.OctreeNode;
 
 /**
- * Interface to be implemented by all algorithms that create a vgroup of virtual
+ * Interface to be implemented by all algorithms that create a group of virtual
  * particles for an octant.
  * 
  * @author Toni Sagrista

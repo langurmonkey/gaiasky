@@ -978,7 +978,7 @@ public class SceneGraphRenderer extends AbstractRenderer implements IProcessRend
         int size = renderProcesses.size;
         for (int i = 0; i < size; i++) {
             IRenderSystem process = renderProcesses.get(i);
-            // If we have no render vgroup, this means all the info is already in
+            // If we have no render group, this means all the info is already in
             // the render system. No lists needed
             if (process.getRenderGroup() != null) {
                 Array<IRenderable> l = render_lists.get(process.getRenderGroup().ordinal());
@@ -1009,7 +1009,7 @@ public class SceneGraphRenderer extends AbstractRenderer implements IProcessRend
         for (int i = 0; i < size; i++) {
             IRenderSystem process = renderProcesses.get(i);
             if (clazz.isInstance(process)) {
-                // If we have no render vgroup, this means all the info is already in
+                // If we have no render group, this means all the info is already in
                 // the render system. No lists needed
                 if (process.getRenderGroup() != null) {
                     Array<IRenderable> l = render_lists.get(process.getRenderGroup().ordinal());

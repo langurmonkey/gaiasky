@@ -224,10 +224,10 @@ public class ObjectsComponent extends GuiComponent implements IObserver {
 
     private Group visibilitySwitcher(Class<? extends FadeNode> clazz, String title, String id) {
         float componentWidth = 160 * GlobalConf.UI_SCALE_FACTOR;
-        VerticalGroup objectsVgroup = new VerticalGroup();
-        objectsVgroup.space(space4);
-        objectsVgroup.left();
-        objectsVgroup.columnLeft();
+        VerticalGroup objectsgroup = new VerticalGroup();
+        objectsgroup.space(space4);
+        objectsgroup.left();
+        objectsgroup.columnLeft();
         Array<SceneGraphNode> objects = new Array<>();
         List<OwnCheckBox> cbs = new ArrayList<>();
         sg.getRoot().getChildrenByType(clazz, objects);
@@ -267,18 +267,18 @@ public class ObjectsComponent extends GuiComponent implements IObserver {
                 objectHgroup.addActor(meshDescTooltip);
             }
 
-            objectsVgroup.addActor(objectHgroup);
+            objectsgroup.addActor(objectHgroup);
             cbs.add(cb);
         }
 
-        objectsVgroup.pack();
-        OwnScrollPane scrollPane = new OwnScrollPane(objectsVgroup, skin, "minimalist-nobg");
+        objectsgroup.pack();
+        OwnScrollPane scrollPane = new OwnScrollPane(objectsgroup, skin, "minimalist-nobg");
         scrollPane.setName(id + " scroll");
 
         scrollPane.setFadeScrollBars(false);
         scrollPane.setScrollingDisabled(true, false);
 
-        scrollPane.setHeight(Math.min(100 * GlobalConf.UI_SCALE_FACTOR, objectsVgroup.getHeight()));
+        scrollPane.setHeight(Math.min(100 * GlobalConf.UI_SCALE_FACTOR, objectsgroup.getHeight()));
         scrollPane.setWidth(componentWidth);
 
         HorizontalGroup buttons = new HorizontalGroup();

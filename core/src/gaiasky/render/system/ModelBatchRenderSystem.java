@@ -34,7 +34,7 @@ public class ModelBatchRenderSystem extends AbstractRenderSystem {
      * Creates a new model batch render component.
      * 
      * @param rg
-     *            The render vgroup.
+     *            The render group.
      * @param alphas
      *            The alphas list.
      * @param batch

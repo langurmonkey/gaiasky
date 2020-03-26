@@ -53,7 +53,7 @@ import java.util.Set;
 
 /**
  * Generates an octree of star groups. Each octant should have only one object,
- * a star vgroup.
+ * a star group.
  *
  * @author tsagrista
  */
@@ -76,7 +76,7 @@ public class OctreeGeneratorRun {
         }
     }
 
-    @Parameter(names = { "-l", "--loader" }, description = "Name of the star vgroup loader class") private String loaderClass = null;
+    @Parameter(names = { "-l", "--loader" }, description = "Name of the star group loader class") private String loaderClass = null;
 
     @Parameter(names = { "-i", "--input" }, description = "Location of the input catalog") private String input = null;
 
@@ -200,7 +200,7 @@ public class OctreeGeneratorRun {
 
         if (loaderClass != null) {
             /* CATALOG */
-            String fullLoaderClass = "gaiasky.data.vgroup." + loaderClass;
+            String fullLoaderClass = "gaiasky.data.group." + loaderClass;
             IStarGroupDataProvider loader = (IStarGroupDataProvider) Class.forName(fullLoaderClass).getDeclaredConstructor().newInstance();
             loader.setParallaxErrorFactorFaint(pllxerrfaint);
             loader.setParallaxErrorFactorBright(pllxerrbright);

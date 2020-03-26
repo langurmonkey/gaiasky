@@ -30,7 +30,6 @@ import java.util.Map;
  * <ul>
  * <li>name: {@link gaiasky.util.ucd.UCDParser#idcolnames}</li>
  * <li>ra[deg]: {@link gaiasky.util.ucd.UCDParser#racolnames}</li>
- * <li>de[deg]: {@link gaiasky.util.ucd.UCDParser#decolnames}</li>
  * <li>dist[pc]: {@link gaiasky.util.ucd.UCDParser#distcolnames}</li>
  * <li>pmra[mas/yr]: {@link gaiasky.util.ucd.UCDParser#pmracolnames}</li>
  * <li>pmde[mas/yr]: {@link gaiasky.util.ucd.UCDParser#pmdeccolnames}</li>

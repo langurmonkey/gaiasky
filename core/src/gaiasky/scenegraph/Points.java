@@ -13,7 +13,7 @@ import gaiasky.util.GlobalConf;
 import gaiasky.util.math.Vector3d;
 
 /**
- * A vgroup of points
+ * A group of points
  */
 public class Points extends VertsObject implements IPointRenderable {
 

@@ -72,7 +72,7 @@ public class SphericalGrid extends BackgroundModel implements IAnnotationsRender
 
     @Override
     protected void addToRenderLists(ICamera camera) {
-        // Render vgroup never changes
+        // Render group never changes
         // Add to toRender list
         addToRender(this, RenderGroup.MODEL_VERT_GRID);
         addToRender(this, RenderGroup.FONT_ANNOTATION);

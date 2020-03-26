@@ -83,7 +83,7 @@ public class FadeNode extends AbstractPositionEntity {
     private long lastStateChangeTimeMs = 0;
 
     /**
-     * Information on the catalog this fade node represents (particle vgroup, octree, etc.)
+     * Information on the catalog this fade node represents (particle group, octree, etc.)
      */
     protected CatalogInfo catalogInfo = null;
 

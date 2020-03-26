@@ -128,7 +128,7 @@ public class UncertaintiesHandler implements IObserver {
         pg.setLabelposition(new double[] { 0, 0, 0 });
         pg.setCt("Others");
         pg.setParent("Universe");
-        pg.setProvider("gaiasky.data.vgroup.UncertaintiesProvider");
+        pg.setProvider("gaiasky.data.group.UncertaintiesProvider");
         pg.setDatafile(path + source_id + ".csv");
         pg.initialize();
         return pg;

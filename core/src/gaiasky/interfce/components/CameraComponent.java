@@ -292,8 +292,8 @@ public class CameraComponent extends GuiComponent implements IObserver {
         VerticalGroup cameraGroup = new VerticalGroup().align(Align.left).columnAlign(Align.left);
         cameraGroup.space(space6);
 
-        cameraGroup.addActor(vgroup(modeLabel, cameraMode, space2));
-        cameraGroup.addActor(vgroup(new Label(I18n.txt("gui.camera.speedlimit"), skin, "default"), cameraSpeedLimit, space2));
+        cameraGroup.addActor(group(modeLabel, cameraMode, space2));
+        cameraGroup.addActor(group(new Label(I18n.txt("gui.camera.speedlimit"), skin, "default"), cameraSpeedLimit, space2));
         cameraGroup.addActor(fieldOfView);
         cameraGroup.addActor(cameraSpeed);
         cameraGroup.addActor(rotateSpeed);
@@ -301,7 +301,7 @@ public class CameraComponent extends GuiComponent implements IObserver {
         cameraGroup.addActor(cinematic);
         cameraGroup.addActor(focusLock);
         cameraGroup.addActor(orientationLock);
-        cameraGroup.addActor(vgroup(new Label("", skin), buttonGroup, space2));
+        cameraGroup.addActor(group(new Label("", skin), buttonGroup, space2));
 
         component = cameraGroup;
 

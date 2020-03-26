@@ -46,7 +46,7 @@ import java.util.TreeMap;
 /**
  * Represents a single star. Currently only the Sun uses this class.
  *
- * @deprecated Move Sun to star vgroup
+ * @deprecated Move Sun to star group
  * @author tsagrista
  *
  */

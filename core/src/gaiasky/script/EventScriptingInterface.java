@@ -2394,40 +2394,27 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
                     // STAR CLUSTERS
                     if (ds instanceof FileDataSource) {
                         FileDataSource fds = (FileDataSource) ds;
-                        StarClusterLoader scl = new StarClusterLoader();
-                        scl.setName(dsName);
-                        scl.setParentName(dsName);
-                        scl.initialize(new String[]{fds.getFile().getAbsolutePath()});
-                        Array<StarCluster> data = scl.loadData();
+                        GenericCatalog scc = new GenericCatalog();
+                        scc.setName(dops.catalogName);
+                        scc.setDescription(dsName);
+                        scc.setParent("Universe");
+                        scc.setFadein(dops.fadeIn);
+                        scc.setFadeout(dops.fadeOut);
+                        scc.setColor(dops.particleColor);
+                        scc.setCt(dops.ct.toString());
+                        scc.setPosition(new double[]{0,0,0});
 
-                        AtomicReference<FadeNode> scNode = new AtomicReference<>();
+                        scc.setDatafile(fds.getFile().getAbsolutePath());
+                        scc.setProvider(StarClusterLoader.class.getName());
+
                         GaiaSky.postRunnable(() -> {
-                            // Create fade node
-                            FadeNode fn = new FadeNode();
-                            fn.setName(dsName);
-                            fn.setFadein(dops.fadeIn);
-                            fn.setFadeout(dops.fadeOut);
-                            fn.setParent("Universe");
-                            fn.setColor(dops.particleColor);
-                            fn.setCt(dops.ct.toString());
-                            fn.setPosition(new double[]{0, 0, 0});
-                            fn.doneLoading(manager);
-                            scNode.set(fn);
-
-                            // Catalog info
-                            CatalogInfo ci = new CatalogInfo(dsName, ds.getName(), null, type, 1.5f, scNode.get());
-                            EventManager.instance.post(Events.CATALOG_ADD, ci, true);
-                            // Add all clusters to scene graph
-                            data.forEach(cluster -> {
-                                cluster.setColor(dops.particleColor);
-                                cluster.doneLoading(manager);
-                                EventManager.instance.post(Events.SCENE_GRAPH_ADD_OBJECT_CMD, cluster, true);
-                            });
-
-                            logger.info(data.size + " star clusters loaded");
+                            scc.initialize();
+                            SceneGraphNode.insert(scc, true);
+                            scc.doneLoading(manager);
+                            //logger.info(scc.children.size + " star clusters loaded");
                         });
                         // Sync waiting until the node is in the scene graph
-                        while (sync && (scNode.get() == null || !scNode.get().inSceneGraph)) {
+                        while (sync && (!scc.inSceneGraph)) {
                             sleepFrames(1);
                         }
                     } else {

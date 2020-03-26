@@ -33,7 +33,7 @@ public class SDSSDataProvider implements IParticleGroupDataProvider {
     }
 
     public Array<ParticleBean> loadData(String file, double factor) {
-        Array<ParticleBean> pointData = (Array<ParticleBean>) loadDataMapped(GlobalConf.data.dataFile(file), factor);
+        Array<ParticleBean> pointData = loadDataMapped(GlobalConf.data.dataFile(file), factor);
         if (pointData != null)
             logger.info(I18n.bundle.format("notif.nodeloader", pointData.size, file));
 

@@ -15,7 +15,7 @@ import gaiasky.util.math.Vector3d;
 import gaiasky.util.time.ITimeFrameProvider;
 
 /**
- * Represents a vgroup of vertices which are sent to the GPU in a VBO
+ * Represents a group of vertices which are sent to the GPU in a VBO
  *
  * @author tsagrista
  */
@@ -31,7 +31,7 @@ public class VertsObject extends AbstractPositionEntity implements IGPUVertsRend
 
     protected int glPrimitive;
 
-    /** The render vgroup **/
+    /** The render group **/
     protected RenderGroup renderGroup;
 
     /** Whether to close the polyline (connect end point to start point) or not **/

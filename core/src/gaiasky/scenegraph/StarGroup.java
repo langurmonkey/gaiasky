@@ -959,16 +959,18 @@ public class StarGroup extends ParticleGroup implements ILineRenderable, IStarFo
     public void updateMetadata(ITimeFrameProvider time, ICamera camera) {
         Vector3d camPos = camera.getPos();
         double deltaYears = AstroUtils.getMsSince(time.getTime(), epoch_jd) * Nature.MS_TO_Y;
-        int n = pointData.size;
-        for (int i = 0; i < n; i++) {
-            StarBean d = (StarBean) pointData.get(i);
+        if(pointData != null) {
+            int n = pointData.size;
+            for (int i = 0; i < n; i++) {
+                StarBean d = (StarBean) pointData.get(i);
 
-            // Pm
-            Vector3d dx = aux3d2.get().set(d.pmx(), d.pmy(), d.pmz()).scl(deltaYears);
-            // Pos
-            Vector3d x = aux3d1.get().set(d.x(), d.y(), d.z()).add(dx);
+                // Pm
+                Vector3d dx = aux3d2.get().set(d.pmx(), d.pmy(), d.pmz()).scl(deltaYears);
+                // Pos
+                Vector3d x = aux3d1.get().set(d.x(), d.y(), d.z()).add(dx);
 
-            metadata[i] = filter(i) ? (-(((d.size() * Constants.STAR_SIZE_FACTOR) / camPos.dst(x)) / camera.getFovFactor()) * GlobalConf.scene.STAR_BRIGHTNESS) : Double.MAX_VALUE;
+                metadata[i] = filter(i) ? (-(((d.size() * Constants.STAR_SIZE_FACTOR) / camPos.dst(x)) / camera.getFovFactor()) * GlobalConf.scene.STAR_BRIGHTNESS) : Double.MAX_VALUE;
+            }
         }
     }
 }

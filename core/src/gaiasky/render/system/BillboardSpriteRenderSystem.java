@@ -37,7 +37,7 @@ public class BillboardSpriteRenderSystem extends AbstractRenderSystem {
      * Creates a new billboard quad render component
      * 
      * @param rg
-     *            The render vgroup
+     *            The render group
      * @param alphas
      *            The alphas list
      * @param programs

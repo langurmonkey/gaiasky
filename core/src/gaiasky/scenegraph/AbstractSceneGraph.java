@@ -40,7 +40,7 @@ public abstract class AbstractSceneGraph implements ISceneGraph {
     protected int[] objectsPerThread;
     /** Does it contain an octree **/
     protected boolean hasOctree;
-    /** Does it contain a star vgroup **/
+    /** Does it contain a star group **/
     protected boolean hasStarGroup;
 
     private Vector3d aux3d1;
@@ -62,7 +62,7 @@ public abstract class AbstractSceneGraph implements ISceneGraph {
      * @param nodes        The list of nodes
      * @param time         The time provider
      * @param hasOctree    Whether the list of nodes contains an octree
-     * @param hasStarGroup Whether the list contains a star vgroup
+     * @param hasStarGroup Whether the list contains a star group
      */
     @Override
     public void initialize(Array<SceneGraphNode> nodes, ITimeFrameProvider time, boolean hasOctree, boolean hasStarGroup) {
@@ -73,7 +73,7 @@ public abstract class AbstractSceneGraph implements ISceneGraph {
 
         // Octree
         this.hasOctree = hasOctree;
-        // Star vgroup
+        // Star group
         this.hasStarGroup = hasStarGroup;
 
         // Initialize stringToNode and starMap maps
@@ -106,13 +106,12 @@ public abstract class AbstractSceneGraph implements ISceneGraph {
 
     public void insert(SceneGraphNode node, boolean addToIndex) {
         SceneGraphNode parent = getNode(node.parentName);
+        if (addToIndex) {
+            addToIndex(node, stringToNode);
+        }
         if (parent != null) {
             parent.addChild(node, true);
             node.setUp();
-
-            if (addToIndex) {
-                addToIndex(node, stringToNode);
-            }
         } else {
             throw new RuntimeException("Parent of node " + node.names[0] + " not found: " + node.parentName);
         }
@@ -121,12 +120,11 @@ public abstract class AbstractSceneGraph implements ISceneGraph {
     public void remove(SceneGraphNode node, boolean removeFromIndex) {
         if (node != null && node.parent != null) {
             node.parent.removeChild(node, true);
-
-            if (removeFromIndex) {
-                removeFromIndex(node, stringToNode);
-            }
         } else {
             throw new RuntimeException("Given node is null");
+        }
+        if (removeFromIndex) {
+            removeFromIndex(node, stringToNode);
         }
     }
 
@@ -304,7 +302,7 @@ public abstract class AbstractSceneGraph implements ISceneGraph {
             return root.numChildren;
         } else {
             int n = root.numChildren - 1;
-            // This assumes the star vgroup is in the first level of the scene graph, right below universe
+            // This assumes the star group is in the first level of the scene graph, right below universe
             for (SceneGraphNode sgn : root.children) {
                 if (sgn instanceof StarGroup)
                     n += sgn.getStarCount();

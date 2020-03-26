@@ -57,70 +57,130 @@ public class SceneGraphNode implements IStarContainer, IPosition {
     protected static TLV3 aux3f1 = new TLV3(), aux3f2 = new TLV3(), aux3f3 = new TLV3(), aux3f4 = new TLV3();
 
     /**
-     * Describes to which render vgroup this node belongs at a particular time
+     * Describes to which render group this node belongs at a particular time
      * step.
      */
     public enum RenderGroup {
-        /** Using normal shader for per-pixel lighting **/
+        /**
+         * Using normal shader for per-pixel lighting
+         **/
         MODEL_PIX(0),
-        /** Using default shader, no normal map **/
+        /**
+         * Using default shader, no normal map
+         **/
         MODEL_VERT(1),
-        /** IntShader - stars **/
+        /**
+         * IntShader - stars
+         **/
         BILLBOARD_STAR(2),
-        /** IntShader - galaxies **/
+        /**
+         * IntShader - galaxies
+         **/
         BILLBOARD_GAL(3),
-        /** IntShader - front (planets, satellites...) **/
+        /**
+         * IntShader - front (planets, satellites...)
+         **/
         BILLBOARD_SSO(4),
-        /** Billboard with custom texture **/
+        /**
+         * Billboard with custom texture
+         **/
         BILLBOARD_TEX(5),
-        /** Single pixel **/
+        /**
+         * Single pixel
+         **/
         POINT_STAR(6),
-        /** Line **/
+        /**
+         * Line
+         **/
         LINE(7),
-        /** Annotations **/
+        /**
+         * Annotations
+         **/
         FONT_ANNOTATION(8),
-        /** Atmospheres of planets **/
+        /**
+         * Atmospheres of planets
+         **/
         MODEL_ATM(9),
-        /** Label **/
+        /**
+         * Label
+         **/
         FONT_LABEL(10),
-        /** Model star **/
+        /**
+         * Model star
+         **/
         MODEL_VERT_STAR(11),
-        /** Galaxy as a whole **/
+        /**
+         * Galaxy as a whole
+         **/
         GALAXY(12),
-        /** Model close up **/
+        /**
+         * Model close up
+         **/
         MODEL_CLOSEUP(13),
-        /** Beams **/
+        /**
+         * Beams
+         **/
         MODEL_VERT_BEAM(14),
-        /** Particle grup **/
+        /**
+         * Particle grup
+         **/
         PARTICLE_GROUP(15),
-        /** Star grup **/
+        /**
+         * Star grup
+         **/
         STAR_GROUP(16),
-        /** Shapes **/
+        /**
+         * Shapes
+         **/
         SHAPE(17),
-        /** Regular billboard sprite **/
+        /**
+         * Regular billboard sprite
+         **/
         BILLBOARD_SPRITE(18),
-        /** Line GPU **/
+        /**
+         * Line GPU
+         **/
         LINE_GPU(19),
-        /** Particle positions from orbital elements **/
+        /**
+         * Particle positions from orbital elements
+         **/
         PARTICLE_ORBIT_ELEMENTS(20),
-        /** Transparent additive-blended meshes **/
+        /**
+         * Transparent additive-blended meshes
+         **/
         MODEL_VERT_ADDITIVE(21),
-        /** Grids shader **/
+        /**
+         * Grids shader
+         **/
         MODEL_VERT_GRID(22),
-        /** Clouds **/
+        /**
+         * Clouds
+         **/
         MODEL_CLOUD(23),
-        /** Point **/
+        /**
+         * Point
+         **/
         POINT(24),
-        /** Point GPU **/
+        /**
+         * Point GPU
+         **/
         POINT_GPU(25),
-        /** Opaque meshes (dust, etc.) **/
+        /**
+         * Opaque meshes (dust, etc.)
+         **/
         MODEL_PIX_DUST(26),
-        /** Tessellated model **/
+        /**
+         * Tessellated model
+         **/
         MODEL_PIX_TESS(27),
-        /** Only diffuse **/
+        /**
+         * Only diffuse
+         **/
         MODEL_DIFFUSE(28),
 
-        /** None **/
+        /**
+         * None
+         **/
         NONE(-1);
 
         private int index;
@@ -161,10 +221,28 @@ public class SceneGraphNode implements IStarContainer, IPosition {
 
     }
 
-    /** Reference to scene graph **/
+    /**
+     * Reference to scene graph
+     **/
     public static ISceneGraph sg;
 
-    /** The internal identifier **/
+    /**
+     * Inserts the given node into the default scene graph, if it exists.
+     * @param node The node to insert
+     * @param addToIndex Whether to add to the index
+     * @return True if it was inserted, false otherwise
+     */
+    public static boolean insert(SceneGraphNode node, boolean addToIndex) {
+        if (sg != null) {
+            sg.insert(node, addToIndex);
+            return true;
+        }
+        return false;
+    }
+
+    /**
+     * The internal identifier
+     **/
     public long id = -1;
 
     /**
@@ -259,7 +337,7 @@ public class SceneGraphNode implements IStarContainer, IPosition {
     }
 
     public SceneGraphNode(String name, SceneGraphNode parent) {
-        this(new String[] { name }, parent);
+        this(new String[]{name}, parent);
     }
 
     public SceneGraphNode(String name) {
@@ -368,6 +446,8 @@ public class SceneGraphNode implements IStarContainer, IPosition {
     public void add(List<? extends SceneGraphNode> children) {
         add(children.toArray(new SceneGraphNode[children.size()]));
     }
+
+
 
     /**
      * Inserts the list of nodes under the parents that match each node's name.
@@ -513,7 +593,7 @@ public class SceneGraphNode implements IStarContainer, IPosition {
         if (names != null)
             names[0] = name;
         else
-            names = new String[] { name };
+            names = new String[]{name};
     }
 
     /**
@@ -647,7 +727,6 @@ public class SceneGraphNode implements IStarContainer, IPosition {
     }
 
     public void setUp() {
-
     }
 
     public void setCt(String ct) {
@@ -755,10 +834,10 @@ public class SceneGraphNode implements IStarContainer, IPosition {
     }
 
     /**
-     * Adds the given renderable to the given render vgroup list
+     * Adds the given renderable to the given render group list
      *
      * @param renderable The renderable to add
-     * @param rg         The render vgroup that identifies the renderable list
+     * @param rg         The render group that identifies the renderable list
      * @return True if added, false otherwise
      */
     protected boolean addToRender(IRenderable renderable, RenderGroup rg) {
@@ -771,10 +850,10 @@ public class SceneGraphNode implements IStarContainer, IPosition {
     }
 
     /**
-     * Removes the given renderable from the given render vgroup list.
+     * Removes the given renderable from the given render group list.
      *
      * @param renderable The renderable to remove
-     * @param rg         The render vgroup to remove from
+     * @param rg         The render group to remove from
      * @return True if removed, false otherwise
      */
     protected boolean removeFromRender(IRenderable renderable, RenderGroup rg) {

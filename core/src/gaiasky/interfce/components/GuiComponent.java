@@ -51,7 +51,7 @@ public abstract class GuiComponent {
      */
     public abstract void dispose();
 
-    protected VerticalGroup vgroup(Actor ac1, Actor ac2, float sp){
+    protected VerticalGroup group(Actor ac1, Actor ac2, float sp){
         VerticalGroup vg = new VerticalGroup().align(Align.left).columnAlign(Align.left);
         vg.space(sp);
         vg.addActor(ac1);

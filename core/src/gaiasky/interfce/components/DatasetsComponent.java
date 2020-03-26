@@ -119,7 +119,7 @@ public class DatasetsComponent extends GuiComponent implements IObserver {
         controls.addActor(rubbish);
 
         // Dataset table
-        Table t = new Table();
+        Table t = new Table(skin);
         // Color picker
         ColormapPicker cp = new ColormapPicker(ci.name, ci.hlColor, ci, stage, skin);
         cp.addListener(new TextTooltip(I18n.txt("gui.tooltip.dataset.highlight.color.select"), skin));
@@ -140,7 +140,8 @@ public class DatasetsComponent extends GuiComponent implements IObserver {
             t.add(nameLabel).left().padBottom(pad);
             t.add(cp).size(18f * GlobalConf.UI_SCALE_FACTOR).right().padBottom(pad).row();
         } else {
-            t.add(nameLabel).colspan(2).left().padBottom(pad).row();
+            t.add(nameLabel).left().padBottom(pad);
+            t.add().size(18f * GlobalConf.UI_SCALE_FACTOR).right().padBottom(pad).row();
         }
         if(ci.isRegular()) {
             t.add(controls).left().padBottom(pad);
@@ -148,8 +149,12 @@ public class DatasetsComponent extends GuiComponent implements IObserver {
         }else{
             t.add(controls).colspan(2).left().padBottom(pad).row();
         }
-        t.add(new OwnLabel(I18n.txt("gui.dataset.type") + ": " + ci.type.toString(), skin)).colspan(2).left().row();
-        t.add(new OwnLabel(TextUtils.capString(ci.description, GlobalConf.isHiDPI() ? 24 : 22), skin)).left().expandX();
+        int cap = GlobalConf.isHiDPI() ? 24 : 23;
+        String types = ci.type.toString() + " / " + ci.object.ct.toString();
+        OwnLabel typesLabel = new OwnLabel(TextUtils.capString(types, cap), skin);
+        typesLabel.addListener(new OwnTextTooltip(types, skin));
+        t.add(typesLabel).colspan(2).left().row();
+        t.add(new OwnLabel(TextUtils.capString(ci.description, cap), skin)).left().expandX();
         Link info = new Link("(i)", skin.get("link", Label.LabelStyle.class), null);
         info.addListener(new OwnTextTooltip(ci.description, skin));
         t.add(info).left().padLeft(pad);
