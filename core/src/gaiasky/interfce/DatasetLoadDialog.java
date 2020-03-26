@@ -27,7 +27,7 @@ public class DatasetLoadDialog extends GenericDialog {
 
     private String fileName;
 
-    private float pad5, pad10, pad15, sliderWidth, fieldWidth, titleWidth, cpSize;
+    private float pad5, pad10, pad15, sliderWidth, fieldWidth, titleWidth, cpSize, taWidth;
 
     public DatasetLoadDialog(String title, String fileName, Skin skin, Stage ui) {
         super(title, skin, ui);
@@ -40,6 +40,7 @@ public class DatasetLoadDialog extends GenericDialog {
         fieldWidth = 180f * GlobalConf.UI_SCALE_FACTOR;
         titleWidth = 180f * GlobalConf.UI_SCALE_FACTOR;
         cpSize = 20f * GlobalConf.UI_SCALE_FACTOR;
+        taWidth = 500 * GlobalConf.UI_SCALE_FACTOR;
 
         setAcceptText(I18n.txt("gui.ok"));
         setCancelText(I18n.txt("gui.cancel"));
@@ -201,6 +202,17 @@ public class DatasetLoadDialog extends GenericDialog {
         OwnLabel clustersProps = new OwnLabel(I18n.txt("gui.dsload.clusters.properties"), skin, "hud-subheader");
         container.add(clustersProps).colspan(2).left().padTop(pad15).padBottom(pad10).row();
 
+        // Info
+        String scInfoStr = I18n.txt("gui.dsload.clusters.info") + '\n';
+        int scLines = GlobalResources.countOccurrences(scInfoStr, '\n');
+        TextArea scInfo = new OwnTextArea(scInfoStr, skin, "info");
+        scInfo.setDisabled(true);
+        scInfo.setPrefRows(scLines + 1);
+        scInfo.setWidth(taWidth);
+        scInfo.clearListeners();
+
+        container.add(scInfo).colspan(2).left().padTop(pad5).padBottom(pad10).row();
+
         // Name
         addFileName(container);
 
@@ -246,7 +258,6 @@ public class DatasetLoadDialog extends GenericDialog {
     }
 
     private void addFadeAttributes(Table container) {
-        final float tawidth = 500 * GlobalConf.UI_SCALE_FACTOR;
 
         OwnLabel fadeLabel = new OwnLabel(I18n.txt("gui.dsload.fade"), skin, "hud-subheader");
         container.add(fadeLabel).colspan(2).left().padTop(pad15).padBottom(pad10).row();
@@ -257,7 +268,7 @@ public class DatasetLoadDialog extends GenericDialog {
         TextArea fadeInfo = new OwnTextArea(ssInfoStr, skin, "info");
         fadeInfo.setDisabled(true);
         fadeInfo.setPrefRows(ssLines + 1);
-        fadeInfo.setWidth(tawidth);
+        fadeInfo.setWidth(taWidth);
         fadeInfo.clearListeners();
 
         container.add(fadeInfo).colspan(2).left().padTop(pad5).padBottom(pad10).row();
