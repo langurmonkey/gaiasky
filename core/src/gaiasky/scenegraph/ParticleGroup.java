@@ -765,7 +765,7 @@ public class ParticleGroup extends FadeNode implements I3DTextRenderable, IFocus
 
     @Override
     public float[] textColour() {
-        return labelColour;
+        return labelcolor;
     }
 
     @Override

@@ -55,10 +55,11 @@ public class GenericCatalog extends FadeNode {
                 provider.setName(dsName);
                 clusters = provider.loadData();
                 clusters.forEach(object -> {
-                    AbstractPositionEntity cluster = (AbstractPositionEntity) object;
-                    cluster.setParent(dsName);
-                    cluster.setColor(this.cc);
-                    cluster.initialize();
+                    AbstractPositionEntity ape = (AbstractPositionEntity) object;
+                    ape.setParent(dsName);
+                    ape.setColor(this.cc);
+                    ape.setLabelcolor(this.labelcolor != null ? this.labelcolor.clone() : this.cc.clone());
+                    ape.initialize();
                 });
             }
 

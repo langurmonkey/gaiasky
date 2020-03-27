@@ -227,7 +227,7 @@ public class MeshObject extends FadeNode implements IModelRenderable, I3DTextRen
 
     @Override
     public float[] textColour() {
-        return labelColour;
+        return labelcolor;
     }
 
     @Override

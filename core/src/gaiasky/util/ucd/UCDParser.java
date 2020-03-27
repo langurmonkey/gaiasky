@@ -35,8 +35,8 @@ public class UCDParser {
     public static String[] pllxcolnames = new String[] { "plx", "parallax", "pllx", "par" };
     public static String[] magcolnames = new String[] { "phot_g_mean_mag", "mag", "bmag", "gmag" };
     public static String[] colorcolnames = new String[] { "b_v", "v_i", "bp_rp", "bp_g", "g_rp", "ci" };
-    public static String[] pmracolnames = new String[] { "pmra", "pmalpha", "pm_ra" };
-    public static String[] pmdeccolnames = new String[] { "pmdec", "pmdelta", "pm_dec", "pm_de" };
+    public static String[] pmracolnames = new String[] { "pmra", "pmalpha", "pm_ra", "mualpha" };
+    public static String[] pmdeccolnames = new String[] { "pmdec", "pmdelta", "pm_dec", "pm_de", "mudelta" };
     public static String[] radvelcolnames = new String[] { "radial_velocity", "radvel", "rv" };
     public static String[] radiuscolnames = new String[] { "radius", "rcluster", "radi" };
     public static String[] nstarscolnames = new String[] { "n", "nstars", "n_stars", "n_star" };

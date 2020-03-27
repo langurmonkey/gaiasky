@@ -2311,14 +2311,35 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
     }
 
     @Override
+    public boolean loadStarClusterDataset(String dsName, String path, double[] particleColor, double[] labelColor, double[] fadeIn, double[] fadeOut, boolean sync) {
+        return loadStarClusterDataset(dsName, path, particleColor, labelColor, ComponentType.Clusters.toString(), fadeIn, fadeOut, sync);
+    }
+
+    public boolean loadStarClusterDataset(String dsName, String path, List particleColor, List labelColor, List fadeIn, List fadeOut, boolean sync) {
+        return loadStarClusterDataset(dsName, path, dArray(particleColor), dArray(labelColor), dArray(fadeIn), dArray(fadeOut), sync);
+    }
+
+
+    @Override
     public boolean loadStarClusterDataset(String dsName, String path, double[] particleColor, String ct, double[] fadeIn, double[] fadeOut, boolean sync) {
         ComponentType compType = ComponentType.valueOf(ct);
-        DatasetOptions dops = DatasetOptions.getStarClusterDatasetOptions(dsName, particleColor, compType, fadeIn, fadeOut);
+        DatasetOptions dops = DatasetOptions.getStarClusterDatasetOptions(dsName, particleColor, particleColor.clone(), compType, fadeIn, fadeOut);
         return loadDataset(dsName, path, CatalogInfoType.SCRIPT, dops, sync);
     }
 
     public boolean loadStarClusterDataset(String dsName, String path, List particleColor, String ct, List fadeIn, List fadeOut, boolean sync) {
         return loadStarClusterDataset(dsName, path, dArray(particleColor), ct, dArray(fadeIn), dArray(fadeOut), sync);
+    }
+
+    @Override
+    public boolean loadStarClusterDataset(String dsName, String path, double[] particleColor, double[] labelColor, String ct, double[] fadeIn, double[] fadeOut, boolean sync) {
+        ComponentType compType = ComponentType.valueOf(ct);
+        DatasetOptions dops = DatasetOptions.getStarClusterDatasetOptions(dsName, particleColor, labelColor, compType, fadeIn, fadeOut);
+        return loadDataset(dsName, path, CatalogInfoType.SCRIPT, dops, sync);
+    }
+
+    public boolean loadStarClusterDataset(String dsName, String path, List particleColor, List labelColor, String ct, List fadeIn, List fadeOut, boolean sync) {
+        return loadStarClusterDataset(dsName, path, dArray(particleColor), dArray(labelColor), ct, dArray(fadeIn), dArray(fadeOut), sync);
     }
 
     private boolean loadDatasetImmediate(String dsName, String path, CatalogInfoType type, boolean sync) {
@@ -2401,6 +2422,7 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
                         scc.setFadein(dops.fadeIn);
                         scc.setFadeout(dops.fadeOut);
                         scc.setColor(dops.particleColor);
+                        scc.setLabelcolor(dops.labelColor);
                         scc.setCt(dops.ct.toString());
                         scc.setPosition(new double[]{0,0,0});
 
@@ -2411,7 +2433,7 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
                             scc.initialize();
                             SceneGraphNode.insert(scc, true);
                             scc.doneLoading(manager);
-                            //logger.info(scc.children.size + " star clusters loaded");
+                            logger.info(scc.children.size + " star clusters loaded");
                         });
                         // Sync waiting until the node is in the scene graph
                         while (sync && (!scc.inSceneGraph)) {

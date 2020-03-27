@@ -175,6 +175,16 @@ public class StarCluster extends AbstractPositionEntity implements IFocus, IProp
         this.labelcolor = new float[]{cc[0], cc[1], cc[2], cc[3]};
     }
 
+    @Override
+    public void setLabelcolor(double[] labelcolor) {
+        this.labelcolor = GlobalResources.toFloatArray(labelcolor);
+    }
+
+    @Override
+    public void setLabelcolor(float[] labelcolor) {
+        this.labelcolor = labelcolor;
+    }
+
     /**
      * Updates the local transform matrix.
      *

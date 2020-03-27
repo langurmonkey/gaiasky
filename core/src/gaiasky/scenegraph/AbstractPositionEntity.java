@@ -470,4 +470,7 @@ public abstract class AbstractPositionEntity extends SceneGraphNode {
         return pos;
     }
 
+    public void setLabelcolor(float[] labelColor){}
+    public void setLabelcolor(double[] labelColor){}
+
 }

@@ -49,7 +49,7 @@ public class FadeNode extends AbstractPositionEntity {
     /**
      * Colour of label
      */
-    protected float[] labelColour;
+    protected float[] labelcolor;
 
     /**
      * The current distance at each cycle, in internal units
@@ -210,8 +210,14 @@ public class FadeNode extends AbstractPositionEntity {
      *
      * @param labelcolor
      */
+    @Override
     public void setLabelcolor(double[] labelcolor) {
-        this.labelColour = GlobalResources.toFloatArray(labelcolor);
+        this.labelcolor = GlobalResources.toFloatArray(labelcolor);
+    }
+
+    @Override
+    public void setLabelcolor(float[] labelcolor) {
+        this.labelcolor = labelcolor;
     }
 
     public void setPositionobjectname(String po) {

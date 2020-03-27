@@ -39,9 +39,9 @@ public class Text2D extends FadeNode implements I3DTextRenderable, IShapeRendera
         EventManager.instance.subscribe(this, Events.UI_THEME_RELOAD_INFO);
 
         LabelStyle headerStyle = GlobalResources.skin.get("header", LabelStyle.class);
-        labelColour[0] = headerStyle.fontColor.r;
-        labelColour[1] = headerStyle.fontColor.g;
-        labelColour[2] = headerStyle.fontColor.b;
+        labelcolor[0] = headerStyle.fontColor.r;
+        labelcolor[1] = headerStyle.fontColor.g;
+        labelcolor[2] = headerStyle.fontColor.b;
     }
 
     public void updateLocal(ITimeFrameProvider time, ICamera camera) {
@@ -127,7 +127,7 @@ public class Text2D extends FadeNode implements I3DTextRenderable, IShapeRendera
 
     @Override
     public float[] textColour() {
-        return labelColour;
+        return labelcolor;
     }
 
     @Override
@@ -187,9 +187,9 @@ public class Text2D extends FadeNode implements I3DTextRenderable, IShapeRendera
             Skin skin = (Skin) data[0];
             // Get new theme color and put it in the label colour
             LabelStyle headerStyle = skin.get("header", LabelStyle.class);
-            labelColour[0] = headerStyle.fontColor.r;
-            labelColour[1] = headerStyle.fontColor.g;
-            labelColour[2] = headerStyle.fontColor.b;
+            labelcolor[0] = headerStyle.fontColor.r;
+            labelcolor[1] = headerStyle.fontColor.g;
+            labelcolor[2] = headerStyle.fontColor.b;
             break;
         default:
             break;

@@ -219,6 +219,9 @@ public class DatasetLoadDialog extends GenericDialog {
         // Particle color
         addParticleColor(container);
 
+        // Label color
+        addLabelColor(container);
+
         // Component type
         ComponentType[] componentTypes = new ComponentType[] { ComponentType.Others, ComponentType.Stars, ComponentType.Galaxies, ComponentType.Clusters, ComponentType.Asteroids, ComponentType.Locations };
         componentType = new OwnSelectBox(skin);

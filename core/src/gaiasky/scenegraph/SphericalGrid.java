@@ -89,7 +89,7 @@ public class SphericalGrid extends BackgroundModel implements IAnnotationsRender
         float stepAngle = 360f / divisionsU;
         alpha *= ANNOTATIONS_ALPHA;
 
-        font.setColor(labelColour[0], labelColour[1], labelColour[2], labelColour[3] * alpha);
+        font.setColor(labelcolor[0], labelcolor[1], labelcolor[2], labelcolor[3] * alpha);
 
         Vector3 vroffset = aux3f4.get();
         if (GlobalConf.runtime.OPENVR) {

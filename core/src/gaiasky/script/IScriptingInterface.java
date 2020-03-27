@@ -1782,7 +1782,7 @@ public interface IScriptingInterface {
      * @param dsName         The name of the dataset.
      * @param path           Absolute path (or relative to the working path of Gaia Sky) to the <code>.vot</code> file to load.
      * @param magnitudeScale Scale factor to apply to the star magnitudes.
-     * @param labelColor     The color of the dataset label, as an array of {red, green, blue, alpha} where each element is in [0,1].
+     * @param labelColor     The color of the labels, as an array of {red, green, blue, alpha} where each element is in [0,1].
      * @param fadeIn         Two values which represent the fade in mapping distances (in parsecs, as distance from camera to the Sun) of this dataset.
      * @param fadeOut        Two values which represent the fade out mapping distances (in parsecs, as distance from camera to the Sun) of this dataset.
      * @param sync           Whether the load must happen synchronously or asynchronously.
@@ -1802,7 +1802,7 @@ public interface IScriptingInterface {
      * @param profileDecay  The profile decay of the particles as in 1 - distCentre^decay.
      * @param particleColor The base color of the particles, as an array of {red, green, blue, alpha} where each element is in [0,1].
      * @param colorNoise    In [0,1], the noise to apply to the color so that each particle gets a slightly different tone. Set to 0 so that all particles get the same color.
-     * @param labelColor    The color of the dataset label, as an array of {red, green, blue, alpha} where each element is in [0,1].
+     * @param labelColor    The color of the labels, as an array of {red, green, blue, alpha} where each element is in [0,1].
      * @param particleSize  The size of the particles in pixels.
      * @param ct            The name of the component type to use (see {@link gaiasky.render.ComponentTypes.ComponentType}).
      * @param fadeIn        Two values which represent the fade in mapping distances (in parsecs, as distance from camera to the Sun) of this dataset.
@@ -1824,7 +1824,7 @@ public interface IScriptingInterface {
      * @param profileDecay       The profile decay of the particles as in 1 - distCentre^decay.
      * @param particleColor      The base color of the particles, as an array of {red, green, blue, alpha} where each element is in [0,1].
      * @param colorNoise         In [0,1], the noise to apply to the color so that each particle gets a slightly different tone. Set to 0 so that all particles get the same color.
-     * @param labelColor         The color of the dataset label, as an array of {red, green, blue, alpha} where each element is in [0,1].
+     * @param labelColor         The color of the labels, as an array of {red, green, blue, alpha} where each element is in [0,1].
      * @param particleSize       The size of the particles in pixels.
      * @param particleSizeLimits The minimum and maximum size of the particles in pixels.
      * @param ct                 The name of the component type to use (see {@link gaiasky.render.ComponentTypes.ComponentType}).
@@ -1837,18 +1837,19 @@ public interface IScriptingInterface {
 
     /**
      * Loads a star cluster dataset from a CSV file. The file needs the columns with the
-     * following names: name, ra, dec, dist, pmra, pmdec, radius, radvel.
+     * following names: name, ra, dec, dist, pmra, pmdec, radius, radvel. Uses the same color for
+     * clusters and labels.
      * The call can be made synchronous or asynchronous.
      * If <code>sync</code> is true, the call waits until the dataset is loaded and then returns.
      * If <code>sync</code> is false, the loading happens in a new thread and
      * the call returns immediately. It includes some parameters to apply to the new star group.
      *
-     * @param dsName The name of the dataset.
-     * @param path Absolute path (or relative to the working path of Gaia Sky) to the <code>.vot</code> file to load.
-     * @param particleColor The base color of the particles, as an array of {red, green, blue, alpha} where each element is in [0,1].
-     * @param fadeIn             Two values which represent the fade in mapping distances (in parsecs, as distance from camera to the Sun) of this dataset.
-     * @param fadeOut            Two values which represent the fade out mapping distances (in parsecs, as distance from camera to the Sun) of this dataset.
-     * @param sync               Whether the load must happen synchronously or asynchronously.
+     * @param dsName        The name of the dataset.
+     * @param path          Absolute path (or relative to the working path of Gaia Sky) to the <code>.vot</code> file to load.
+     * @param particleColor The base color of the particles and labels, as an array of {red, green, blue, alpha} where each element is in [0,1].
+     * @param fadeIn        Two values which represent the fade in mapping distances (in parsecs, as distance from camera to the Sun) of this dataset.
+     * @param fadeOut       Two values which represent the fade out mapping distances (in parsecs, as distance from camera to the Sun) of this dataset.
+     * @param sync          Whether the load must happen synchronously or asynchronously.
      * @return False if the dataset could not be loaded (sync mode). True if it could not be loaded (sync mode), or <code>sync</code> is false.
      */
     boolean loadStarClusterDataset(String dsName, String path, double[] particleColor, double[] fadeIn, double[] fadeOut, boolean sync);
@@ -1861,16 +1862,56 @@ public interface IScriptingInterface {
      * If <code>sync</code> is false, the loading happens in a new thread and
      * the call returns immediately. It includes some parameters to apply to the new star group.
      *
-     * @param dsName The name of the dataset.
-     * @param path Absolute path (or relative to the working path of Gaia Sky) to the <code>.vot</code> file to load.
+     * @param dsName        The name of the dataset.
+     * @param path          Absolute path (or relative to the working path of Gaia Sky) to the <code>.vot</code> file to load.
      * @param particleColor The base color of the particles, as an array of {red, green, blue, alpha} where each element is in [0,1].
-     * @param ct                 The name of the component type to use (see {@link gaiasky.render.ComponentTypes.ComponentType}).
-     * @param fadeIn             Two values which represent the fade in mapping distances (in parsecs, as distance from camera to the Sun) of this dataset.
-     * @param fadeOut            Two values which represent the fade out mapping distances (in parsecs, as distance from camera to the Sun) of this dataset.
-     * @param sync               Whether the load must happen synchronously or asynchronously.
+     * @param labelColor    The color of the labels, as an array of {red, green, blue, alpha} where each element is in [0,1].
+     * @param fadeIn        Two values which represent the fade in mapping distances (in parsecs, as distance from camera to the Sun) of this dataset.
+     * @param fadeOut       Two values which represent the fade out mapping distances (in parsecs, as distance from camera to the Sun) of this dataset.
+     * @param sync          Whether the load must happen synchronously or asynchronously.
+     * @return False if the dataset could not be loaded (sync mode). True if it could not be loaded (sync mode), or <code>sync</code> is false.
+     */
+    boolean loadStarClusterDataset(String dsName, String path, double[] particleColor, double[] labelColor, double[] fadeIn, double[] fadeOut, boolean sync);
+
+    /**
+     * Loads a star cluster dataset from a CSV file. The file needs the columns with the
+     * following names: name, ra, dec, dist, pmra, pmdec, radius, radvel. Uses the same color
+     * for clusters and labels.
+     * The call can be made synchronous or asynchronous.
+     * If <code>sync</code> is true, the call waits until the dataset is loaded and then returns.
+     * If <code>sync</code> is false, the loading happens in a new thread and
+     * the call returns immediately. It includes some parameters to apply to the new star group.
+     *
+     * @param dsName        The name of the dataset.
+     * @param path          Absolute path (or relative to the working path of Gaia Sky) to the <code>.vot</code> file to load.
+     * @param particleColor The base color of the particles and labels, as an array of {red, green, blue, alpha} where each element is in [0,1].
+     * @param ct            The name of the component type to use (see {@link gaiasky.render.ComponentTypes.ComponentType}).
+     * @param fadeIn        Two values which represent the fade in mapping distances (in parsecs, as distance from camera to the Sun) of this dataset.
+     * @param fadeOut       Two values which represent the fade out mapping distances (in parsecs, as distance from camera to the Sun) of this dataset.
+     * @param sync          Whether the load must happen synchronously or asynchronously.
      * @return False if the dataset could not be loaded (sync mode). True if it could not be loaded (sync mode), or <code>sync</code> is false.
      */
     boolean loadStarClusterDataset(String dsName, String path, double[] particleColor, String ct, double[] fadeIn, double[] fadeOut, boolean sync);
+
+    /**
+     * Loads a star cluster dataset from a CSV file. The file needs the columns with the
+     * following names: name, ra, dec, dist, pmra, pmdec, radius, radvel.
+     * The call can be made synchronous or asynchronous.
+     * If <code>sync</code> is true, the call waits until the dataset is loaded and then returns.
+     * If <code>sync</code> is false, the loading happens in a new thread and
+     * the call returns immediately. It includes some parameters to apply to the new star group.
+     *
+     * @param dsName        The name of the dataset.
+     * @param path          Absolute path (or relative to the working path of Gaia Sky) to the <code>.vot</code> file to load.
+     * @param particleColor The base color of the particles and labels, as an array of {red, green, blue, alpha} where each element is in [0,1].
+     * @param labelColor    The color of the labels, as an array of {red, green, blue, alpha} where each element is in [0,1].
+     * @param ct            The name of the component type to use (see {@link gaiasky.render.ComponentTypes.ComponentType}).
+     * @param fadeIn        Two values which represent the fade in mapping distances (in parsecs, as distance from camera to the Sun) of this dataset.
+     * @param fadeOut       Two values which represent the fade out mapping distances (in parsecs, as distance from camera to the Sun) of this dataset.
+     * @param sync          Whether the load must happen synchronously or asynchronously.
+     * @return False if the dataset could not be loaded (sync mode). True if it could not be loaded (sync mode), or <code>sync</code> is false.
+     */
+    boolean loadStarClusterDataset(String dsName, String path, double[] particleColor, double[] labelColor, String ct, double[] fadeIn, double[] fadeOut, boolean sync);
 
     /**
      * Removes the dataset identified by the given name, if it exists.

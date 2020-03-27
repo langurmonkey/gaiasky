@@ -34,11 +34,12 @@ public class DatasetOptions {
         return dops;
     }
 
-    public static DatasetOptions getStarClusterDatasetOptions(String catalogName, double[] particleColor, ComponentType ct, double[] fadeIn, double[] fadeOut){
+    public static DatasetOptions getStarClusterDatasetOptions(String catalogName, double[] particleColor, double[] labelColor, ComponentType ct, double[] fadeIn, double[] fadeOut){
         DatasetOptions dops = new DatasetOptions();
         dops.type = DatasetLoadType.CLUSTERS;
         dops.catalogName = catalogName;
         dops.particleColor = particleColor;
+        dops.labelColor = labelColor;
         dops.ct = ct;
         dops.fadeIn = fadeIn;
         dops.fadeOut = fadeOut;
