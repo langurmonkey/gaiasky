@@ -32,9 +32,9 @@ public class DateDialog extends CollapsibleWindow {
     private final OwnWindow me;
     private final Stage stage;
 
-    private final TextField day, year, hour, min, sec;
+    private final OwnTextField day, year, hour, min, sec;
     private final SelectBox<String> month;
-    private final TextButton setNow;
+    private final OwnTextButton setNow;
     private final Color defaultColor;
 
     public DateDialog(Stage stage, Skin skin) {
@@ -59,6 +59,7 @@ public class DateDialog extends CollapsibleWindow {
 
         /** DAY GROUP **/
         HorizontalGroup dayGroup = new HorizontalGroup();
+        dayGroup.space(pad);
         day = new OwnTextField("", skin);
         day.setMaxLength(2);
         day.setWidth(40 * GlobalConf.UI_SCALE_FACTOR);
@@ -97,12 +98,13 @@ public class DateDialog extends CollapsibleWindow {
         dayGroup.addActor(new OwnLabel("/", skin));
         dayGroup.addActor(year);
 
-        add(new OwnLabel(I18n.bundle.get("gui.time.date") + " (dd/MM/yyyy):", skin)).pad(5, 5, 0, 5).right();
+        add(new OwnLabel(I18n.bundle.get("gui.time.date") + " (dd/MM/yyyy):", skin)).pad(pad, pad, 0, pad * 2).right();
         add(dayGroup).pad(pad, 0, 0, pad);
         row();
 
         /** HOUR GROUP **/
         HorizontalGroup hourGroup = new HorizontalGroup();
+        hourGroup.space(pad);
         hour = new OwnTextField("", skin);
         hour.setMaxLength(2);
         hour.setWidth(40 * GlobalConf.UI_SCALE_FACTOR);
@@ -151,7 +153,7 @@ public class DateDialog extends CollapsibleWindow {
         hourGroup.addActor(new OwnLabel(":", skin));
         hourGroup.addActor(sec);
 
-        add(new OwnLabel(I18n.bundle.get("gui.time.time") + " (hh:mm:ss):", skin)).pad(5, 5, 0, 5).right();
+        add(new OwnLabel(I18n.bundle.get("gui.time.time") + " (hh:mm:ss):", skin)).pad(pad, pad, 0, pad * 2).right();
         add(hourGroup).pad(pad, 0, 0, pad);
         row();
 
