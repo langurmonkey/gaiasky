@@ -28,7 +28,7 @@ import java.util.Map;
  * column names, however, are:
  *
  * <ul>
- * <li>name: {@link gaiasky.util.ucd.UCDParser#idcolnames}</li>
+ * <li>name: {@link gaiasky.util.ucd.UCDParser#idcolnames}, separate multiple names with '|'</li>
  * <li>ra[deg]: {@link gaiasky.util.ucd.UCDParser#racolnames}</li>
  * <li>dist[pc]: {@link gaiasky.util.ucd.UCDParser#distcolnames}</li>
  * <li>pmra[mas/yr]: {@link gaiasky.util.ucd.UCDParser#pmracolnames}</li>
@@ -64,7 +64,7 @@ public class StarClusterLoader extends AbstractCatalogLoader implements ISceneGr
                     while ((line = br.readLine()) != null) {
                         // Add galaxy
                         String[] tokens = line.split(",");
-                        String name = tokens[0];
+                        String[] names = parseName(tokens[0]);
                         double ra = getDouble(tokens, ClusterProperties.RA, indices);
                         double rarad = Math.toRadians(ra);
                         double dec = getDouble(tokens, ClusterProperties.DEC, indices);
@@ -85,7 +85,7 @@ public class StarClusterLoader extends AbstractCatalogLoader implements ISceneGr
                         Vector3d posSph = new Vector3d((float) ra, (float) dec, (float) dist);
                         Vector3 pmSph = new Vector3((float) (mualphastar), (float) (mudelta), (float) radvel);
 
-                        StarCluster c = new StarCluster(name, parentName != null ? parentName : "MWSC", pos, pm, posSph, pmSph, radius, nstars);
+                        StarCluster c = new StarCluster(names, parentName != null ? parentName : "MWSC", pos, pm, posSph, pmSph, radius, nstars);
 
                         clusters.add(c);
                     }
@@ -108,6 +108,13 @@ public class StarClusterLoader extends AbstractCatalogLoader implements ISceneGr
 
         Logger.getLogger(this.getClass()).info(I18n.bundle.format("notif.catalog.init", clusters.size));
         return clusters;
+    }
+
+    private String[] parseName(String name){
+        String[] names = name.split("\\|");
+        for(int i = 0; i < names.length; i++)
+            names[i] = names[i].strip().replace("_", " ");
+        return names;
     }
 
     private String get(String[] tokens, ClusterProperties prop, Map<ClusterProperties, Integer> indices) {

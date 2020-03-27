@@ -97,14 +97,14 @@ public class StarCluster extends AbstractPositionEntity implements IFocus, IProp
         this.pmSph = new Vector3();
     }
 
-    public StarCluster(String name, String parentName, Vector3d pos, Vector3d pm, Vector3d posSph, Vector3 pmSph, double raddeg, int nstars) {
-        this(name, parentName, pos, pm, posSph, pmSph, raddeg, nstars, new float[]{0.93f, 0.93f, 0.3f, 1f});
+    public StarCluster(String[] names, String parentName, Vector3d pos, Vector3d pm, Vector3d posSph, Vector3 pmSph, double raddeg, int nstars) {
+        this(names, parentName, pos, pm, posSph, pmSph, raddeg, nstars, new float[]{0.93f, 0.93f, 0.3f, 1f});
     }
 
-    public StarCluster(String name, String parentName, Vector3d pos, Vector3d pm, Vector3d posSph, Vector3 pmSph, double raddeg, int nstars, float[] color) {
+    public StarCluster(String[] names, String parentName, Vector3d pos, Vector3d pm, Vector3d posSph, Vector3 pmSph, double raddeg, int nstars, float[] color) {
         this();
         this.parentName = parentName;
-        this.setName(name.replace("_", " "));
+        this.setNames(names);
         this.pos = pos;
         this.posSph.set((float) posSph.x, (float) posSph.y);
         this.pm = pm;
