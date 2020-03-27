@@ -55,7 +55,7 @@ public class FocusInfoInterface extends TableGuiInterface implements IObserver {
 
     INumberFormat nf, sf;
 
-    float pad3, pad5, pad10, pad15, bw;
+    float pad1, pad3, pad5, pad10, pad15, bw;
 
     public FocusInfoInterface(Skin skin) {
         this(skin, false);
@@ -69,12 +69,13 @@ public class FocusInfoInterface extends TableGuiInterface implements IObserver {
         nf = NumberFormatFactory.getFormatter("##0.##");
         sf = NumberFormatFactory.getFormatter("#0.##E0");
 
-        float buttonSize = 15 * GlobalConf.UI_SCALE_FACTOR;
-        float imgSize = 15 * GlobalConf.UI_SCALE_FACTOR;
-        pad15 = 15 * GlobalConf.UI_SCALE_FACTOR;
-        pad10 = 10 * GlobalConf.UI_SCALE_FACTOR;
-        pad5 = 5 * GlobalConf.UI_SCALE_FACTOR;
-        pad3 = 3 * GlobalConf.UI_SCALE_FACTOR;
+        float buttonSize = 15f * GlobalConf.UI_SCALE_FACTOR;
+        float imgSize = 15f * GlobalConf.UI_SCALE_FACTOR;
+        pad15 = 15f * GlobalConf.UI_SCALE_FACTOR;
+        pad10 = 10f * GlobalConf.UI_SCALE_FACTOR;
+        pad5 = 5f * GlobalConf.UI_SCALE_FACTOR;
+        pad3 = 3f * GlobalConf.UI_SCALE_FACTOR;
+        pad1 = 1f * GlobalConf.UI_SCALE_FACTOR;
 
         focusInfo = new Table();
         focusInfo.pad(pad5);
@@ -400,8 +401,6 @@ public class FocusInfoInterface extends TableGuiInterface implements IObserver {
             focusNames.clearChildren();
             String[] names = focus.getNames();
             if (names != null && names.length > 0) {
-                HorizontalGroup hg = new HorizontalGroup();
-                hg.space(pad3);
                 int chars = 0;
                 for (int i = 0; i < names.length; i++) {
                     String name = names[i];
@@ -409,22 +408,16 @@ public class FocusInfoInterface extends TableGuiInterface implements IObserver {
                     OwnLabel nl = new OwnLabel(nameCapped, skin, "object-name");
                     if(nameCapped.length() != name.length())
                         nl.addListener(new OwnTextTooltip(name, skin));
-                    hg.addActor(nl);
+                    focusNames.add(nl).left().padRight(pad1);
                     chars += nameCapped.length() + 1;
                     if(i < names.length - 1){
-                        hg.addActor(new OwnLabel(", ", skin));
+                        focusNames.add(new OwnLabel(",", skin)).left().padRight(pad5);
                         chars++;
                     }
                     if (i < names.length - 1 && chars > 14) {
-                        focusNames.add(hg).left();
                         focusNames.row();
-                        hg = new HorizontalGroup();
-                        hg.space(pad3);
                         chars = 0;
                     }
-                }
-                if(!hg.hasParent()){
-                    focusNames.add(hg).left();
                 }
             } else {
                 focusNames.add(new OwnLabel("-", skin));

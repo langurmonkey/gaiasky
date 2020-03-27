@@ -83,7 +83,7 @@ public class DownloadDataWindow extends GenericDialog {
     private OwnLabel currentDownloadFile, downloadSpeed;
     private OwnScrollPane datasetsScroll;
     private Cell<OwnTextButton> cancelCell;
-    private float scrollX = 0, scrollY = 0;
+    private float scrollX = 0f, scrollY = 0f;
 
     private Color highlight;
 
