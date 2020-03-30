@@ -12,6 +12,7 @@ import com.badlogic.gdx.utils.Align;
 import gaiasky.event.EventManager;
 import gaiasky.event.Events;
 import gaiasky.event.IObserver;
+import gaiasky.interfce.ControlsWindow;
 import gaiasky.interfce.KeyBindings;
 import gaiasky.interfce.beans.ComboBoxBean;
 import gaiasky.render.ComponentTypes.ComponentType;
@@ -57,9 +58,12 @@ public class VisibilityComponent extends GuiComponent implements IObserver {
     public void initialize() {
         float space4 = 4f * GlobalConf.UI_SCALE_FACTOR;
         float space2 = 2f * GlobalConf.UI_SCALE_FACTOR;
-        float sliderWidth = 180 * GlobalConf.UI_SCALE_FACTOR;
+        float contentWidth = ControlsWindow.getContentWidth();
+        float buttonPadHor = (GlobalConf.isHiDPI() ? 6f : 4f) * GlobalConf.UI_SCALE_FACTOR;
+        float buttonPadVert = (GlobalConf.isHiDPI() ? 2.5f : 2.2f) * GlobalConf.UI_SCALE_FACTOR;
         int visTableCols = 5;
         final Table visibilityTable = new Table(skin);
+
         visibilityTable.setName("visibility table");
         visibilityTable.top().left();
         buttonMap = new HashMap<>();
@@ -80,7 +84,7 @@ public class VisibilityComponent extends GuiComponent implements IObserver {
                     button.setName(ct.key);
                     // Tooltip (with or without hotkey)
                     String hk = KeyBindings.instance.getStringKeys("action.toggle/" + ct.key);
-                    if(hk != null){
+                    if (hk != null) {
                         button.addListener(new OwnTextHotkeyTooltip(TextUtils.capitalise(ct.getName()), hk, skin));
                     } else {
                         button.addListener(new OwnTextTooltip(TextUtils.capitalise(ct.getName()), skin));
@@ -98,9 +102,12 @@ public class VisibilityComponent extends GuiComponent implements IObserver {
                         }
                         return false;
                     });
-                    visibilityTable.add(button).pad(GlobalConf.UI_SCALE_FACTOR).left();
+                    Cell c = visibilityTable.add(button).padBottom(buttonPadVert).left();
+
                     if ((i + 1) % visTableCols == 0) {
-                        visibilityTable.row().padBottom(2f * GlobalConf.UI_SCALE_FACTOR);
+                        visibilityTable.row();
+                    } else {
+                        c.padRight(buttonPadHor);
                     }
                     buttons.add(button);
                 }
@@ -129,7 +136,7 @@ public class VisibilityComponent extends GuiComponent implements IObserver {
         // NUM FACTOR
         pmNumFactorSlider = new OwnSliderPlus(I18n.txt("gui.pmnumfactor"), Constants.MIN_SLIDER_1, Constants.MAX_SLIDER, Constants.SLIDER_STEP_SMALL, Constants.MIN_PM_NUM_FACTOR, Constants.MAX_PM_NUM_FACTOR, skin);
         pmNumFactorSlider.setName("proper motion vectors number factor");
-        pmNumFactorSlider.setWidth(sliderWidth);
+        pmNumFactorSlider.setWidth(contentWidth);
         pmNumFactorSlider.setMappedValue(GlobalConf.scene.PM_NUM_FACTOR);
         pmNumFactorSlider.addListener(event -> {
             if (event instanceof ChangeEvent) {
@@ -144,7 +151,7 @@ public class VisibilityComponent extends GuiComponent implements IObserver {
         // LEN FACTOR
         pmLenFactorSlider = new OwnSliderPlus(I18n.txt("gui.pmlenfactor"), Constants.MIN_PM_LEN_FACTOR, Constants.MAX_PM_LEN_FACTOR, Constants.SLIDER_STEP_SMALL, skin);
         pmLenFactorSlider.setName("proper motion vectors number factor");
-        pmLenFactorSlider.setWidth(sliderWidth);
+        pmLenFactorSlider.setWidth(contentWidth);
         pmLenFactorSlider.setValue(GlobalConf.scene.PM_LEN_FACTOR);
         pmLenFactorSlider.addListener(event -> {
             if (event instanceof ChangeEvent) {
@@ -159,7 +166,7 @@ public class VisibilityComponent extends GuiComponent implements IObserver {
         // PM COLOR MODE
         pmColorModeLabel = new Label(I18n.txt("gui.pm.colormode"), skin, "default");
 
-        ComboBoxBean[] cms = new ComboBoxBean[] {
+        ComboBoxBean[] cms = new ComboBoxBean[]{
                 new ComboBoxBean(I18n.txt("gui.pm.colormode.dir"), 0),
                 new ComboBoxBean(I18n.txt("gui.pm.colormode.speed"), 1),
                 new ComboBoxBean(I18n.txt("gui.pm.colormode.hasrv"), 2),
@@ -169,7 +176,7 @@ public class VisibilityComponent extends GuiComponent implements IObserver {
         };
         pmColorMode = new OwnSelectBox<>(skin);
         pmColorMode.setItems(cms);
-        pmColorMode.setWidth(sliderWidth);
+        pmColorMode.setWidth(contentWidth);
         pmColorMode.setSelectedIndex(GlobalConf.scene.PM_COLOR_MODE);
         pmColorMode.setName("proper motion color mode");
         pmColorMode.addListener((event) -> {
@@ -217,14 +224,14 @@ public class VisibilityComponent extends GuiComponent implements IObserver {
     }
 
 
-    private void velocityVectorsEnabled(boolean state){
-        if(state) {
+    private void velocityVectorsEnabled(boolean state) {
+        if (state) {
             pmGroup.addActor(pmLabel);
             pmGroup.addActor(pmNumFactorSlider);
             pmGroup.addActor(pmLenFactorSlider);
             pmGroup.addActor(pmColorModeGroup);
             pmGroup.addActor(pmArrowheads);
-        }else{
+        } else {
             pmGroup.removeActor(pmLabel);
             pmGroup.removeActor(pmNumFactorSlider);
             pmGroup.removeActor(pmLenFactorSlider);
@@ -236,60 +243,60 @@ public class VisibilityComponent extends GuiComponent implements IObserver {
     @Override
     public void notify(Events event, Object... data) {
         switch (event) {
-        case TOGGLE_VISIBILITY_CMD:
-            boolean interf = (Boolean) data[1];
-            if (!interf) {
-                String key = (String) data[0];
-                Button b = buttonMap.get(key);
+            case TOGGLE_VISIBILITY_CMD:
+                boolean interf = (Boolean) data[1];
+                if (!interf) {
+                    String key = (String) data[0];
+                    Button b = buttonMap.get(key);
 
-                if (b != null) {
-                    b.setProgrammaticChangeEvents(false);
-                    if (data.length == 3) {
-                        b.setChecked((Boolean) data[2]);
-                    } else {
-                        b.setChecked(!b.isChecked());
+                    if (b != null) {
+                        b.setProgrammaticChangeEvents(false);
+                        if (data.length == 3) {
+                            b.setChecked((Boolean) data[2]);
+                        } else {
+                            b.setChecked(!b.isChecked());
+                        }
+                        b.setProgrammaticChangeEvents(true);
                     }
-                    b.setProgrammaticChangeEvents(true);
                 }
-            }
-            break;
-        case PM_LEN_FACTOR_CMD:
-            interf = (Boolean) data[1];
-            if (!interf) {
-                sendEvents = false;
-                float value = (Float) data[0];
-                pmLenFactorSlider.setValue(value);
-                sendEvents = true;
-            }
-            break;
-        case PM_NUM_FACTOR_CMD:
-            interf = (Boolean) data[1];
-            if (!interf) {
-                sendEvents = false;
-                float value = (Float) data[0];
-                pmNumFactorSlider.setMappedValue(value);
-                sendEvents = true;
-            }
-            break;
-        case PM_COLOR_MODE_CMD:
-            interf = (Boolean) data[1];
-            if (!interf) {
-                sendEvents = false;
-                pmColorMode.setSelectedIndex((Integer) data[0]);
-                sendEvents = true;
-            }
-            break;
-        case PM_ARROWHEADS_CMD:
-            interf = (Boolean) data[1];
-            if (!interf) {
-                sendEvents = false;
-                pmArrowheads.setChecked((boolean) data[0]);
-                sendEvents = true;
-            }
+                break;
+            case PM_LEN_FACTOR_CMD:
+                interf = (Boolean) data[1];
+                if (!interf) {
+                    sendEvents = false;
+                    float value = (Float) data[0];
+                    pmLenFactorSlider.setValue(value);
+                    sendEvents = true;
+                }
+                break;
+            case PM_NUM_FACTOR_CMD:
+                interf = (Boolean) data[1];
+                if (!interf) {
+                    sendEvents = false;
+                    float value = (Float) data[0];
+                    pmNumFactorSlider.setMappedValue(value);
+                    sendEvents = true;
+                }
+                break;
+            case PM_COLOR_MODE_CMD:
+                interf = (Boolean) data[1];
+                if (!interf) {
+                    sendEvents = false;
+                    pmColorMode.setSelectedIndex((Integer) data[0]);
+                    sendEvents = true;
+                }
+                break;
+            case PM_ARROWHEADS_CMD:
+                interf = (Boolean) data[1];
+                if (!interf) {
+                    sendEvents = false;
+                    pmArrowheads.setChecked((boolean) data[0]);
+                    sendEvents = true;
+                }
 
-            break;
-        default:
-            break;
+                break;
+            default:
+                break;
         }
 
     }

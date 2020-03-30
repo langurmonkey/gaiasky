@@ -22,6 +22,8 @@ public class OwnScrollPane extends ScrollPane {
     private float ownwidth = 0f, ownheight = 0f;
     // Whether to expand pane if possible
     private boolean expand = false;
+    // Whether to bubble events
+    private boolean bubbles = true;
 
     /**
      * @param widget May be null.
@@ -50,10 +52,15 @@ public class OwnScrollPane extends ScrollPane {
         }
 
         // FOCUS_MODE listener
+        setFocusModeListener();
+    }
+
+    private void setFocusModeListener(){
+        // FOCUS_MODE listener
         addListener((e) -> {
             if (e instanceof InputEvent) {
                 InputEvent ie = (InputEvent) e;
-                e.setBubbles(false);
+                e.setBubbles(bubbles);
                 if (ie.getType() == InputEvent.Type.enter && this.getStage() != null) {
                     return this.getStage().setScrollFocus(this);
                 } else if (ie.getType() == InputEvent.Type.exit && this.getStage() != null) {
@@ -97,6 +104,12 @@ public class OwnScrollPane extends ScrollPane {
         } else {
             return super.getPrefWidth();
         }
+    }
+
+    @Override
+    public void layout() {
+        super.layout();
+        this.bubbles = !isScrollX() && !isScrollY();
     }
 
     @Override

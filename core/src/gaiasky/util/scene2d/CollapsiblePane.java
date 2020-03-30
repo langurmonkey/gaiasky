@@ -46,6 +46,7 @@ public class CollapsiblePane extends Table {
      * @param stage             The main stage.
      * @param labelText         The text of the label.
      * @param content           The content actor.
+     * @param width             The preferred width of this pane.
      * @param skin              The skin to use.
      * @param labelStyle        The style of the label.
      * @param expandButtonStyle The style of the expand icon.
@@ -54,7 +55,7 @@ public class CollapsiblePane extends Table {
      * @param topIcons          List of top icons that will be added between the label and the
      *                          expand/detach icons.
      */
-    public CollapsiblePane(final Stage stage, final String labelText, final Actor content, final Skin skin, String labelStyle, String expandButtonStyle, String detachButtonStyle, boolean expanded, String shortcut, Actor... topIcons) {
+    public CollapsiblePane(final Stage stage, final String labelText, final Actor content, float width, final Skin skin, String labelStyle, String expandButtonStyle, String detachButtonStyle, boolean expanded, String shortcut, Actor... topIcons) {
         super(skin);
         this.stage = stage;
         this.labelText = labelText;
@@ -99,7 +100,7 @@ public class CollapsiblePane extends Table {
         if (shortcut != null && !shortcut.isEmpty())
             questionLabel.addListener(new OwnTextHotkeyTooltip(labelText, shortcut, skin));
 
-        Table headerTable = new Table();
+        Table headerTable = new Table(skin);
 
         HorizontalGroup titleGroup = new HorizontalGroup();
         titleGroup.space(4f * GlobalConf.UI_SCALE_FACTOR);
@@ -128,8 +129,8 @@ public class CollapsiblePane extends Table {
         headerTable.add().expandX();
         headerTable.add(headerGroupRight).right();
 
-        add(headerTable).padBottom(this.space).prefWidth(220 * GlobalConf.UI_SCALE_FACTOR).row();
-        contentCell = add().prefHeight(0).prefWidth(220 * GlobalConf.UI_SCALE_FACTOR);
+        add(headerTable).padBottom(this.space).width(width).row();
+        contentCell = add().prefHeight(0).width(width);
 
         if (expanded)
             contentCell.setActor(content);
@@ -195,13 +196,14 @@ public class CollapsiblePane extends Table {
      * @param stage     The main stage.
      * @param labelText The text of the label.
      * @param content   The content actor.
+     * @param width             The preferred width of this pane.
      * @param skin      The skin to use.
      * @param shortcut  The keyboard shortcut to use.
      * @param topIcons  List of top icons that will be added between the label and the
      *                  expand/detach icons.
      */
-    public CollapsiblePane(Stage stage, String labelText, final Actor content, Skin skin, boolean expanded, String shortcut, Actor... topIcons) {
-        this(stage, labelText, content, skin, "header", "expand-collapse", "detach", expanded, shortcut, topIcons);
+    public CollapsiblePane(Stage stage, String labelText, final Actor content, float width, Skin skin, boolean expanded, String shortcut, Actor... topIcons) {
+        this(stage, labelText, content, width, skin, "header", "expand-collapse", "detach", expanded, shortcut, topIcons);
     }
 
     private CollapsibleWindow createWindow(String labelText, final Actor content, Skin skin, Stage stage, float x, float y) {
@@ -211,26 +213,22 @@ public class CollapsiblePane extends Table {
         window.add(content).row();
 
         /** Close button **/
-        TextButton close = new OwnTextButton(I18n.bundle.get("gui.close"), skin, "default");
+        OwnTextButton close = new OwnTextButton(I18n.bundle.get("gui.close"), skin, "default");
         close.setName("close");
-        close.addListener(new EventListener() {
-            @Override
-            public boolean handle(Event event) {
-                if (event instanceof ChangeEvent) {
-                    lastx = window.getX();
-                    lasty = window.getY();
-                    window.remove();
-                    dialogWindow = null;
-                    expandIcon.setDisabled(false);
-                    detachIcon.setDisabled(false);
-                    return true;
-                }
-
-                return false;
+        close.addListener(event -> {
+            if (event instanceof ChangeEvent) {
+                lastx = window.getX();
+                lasty = window.getY();
+                window.remove();
+                dialogWindow = null;
+                expandIcon.setDisabled(false);
+                detachIcon.setDisabled(false);
+                return true;
             }
 
+            return false;
         });
-        Container<Button> closeContainer = new Container<Button>(close);
+        Container<Button> closeContainer = new Container<>(close);
         close.setSize(70, 20);
         closeContainer.align(Align.right);
 

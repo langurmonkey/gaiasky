@@ -32,6 +32,16 @@ import java.util.List;
 import java.util.Map;
 
 public class ControlsWindow extends CollapsibleWindow implements IObserver {
+
+    /**
+     * Content width. To be used in all components.
+     *
+     * @return The width of the content.
+     */
+    public static float getContentWidth() {
+        return 190f * GlobalConf.UI_SCALE_FACTOR;
+    }
+
     /**
      * The user interface stage
      */
@@ -54,7 +64,9 @@ public class ControlsWindow extends CollapsibleWindow implements IObserver {
     private ComponentType[] visibilityEntities;
     private boolean[] visible;
 
-    /** Access panes **/
+    /**
+     * Access panes
+     **/
     private Map<String, CollapsiblePane> panes;
 
     public ControlsWindow(String title, Skin skin, Stage ui) {
@@ -99,7 +111,7 @@ public class ControlsWindow extends CollapsibleWindow implements IObserver {
 
         String shortcut = KeyBindings.instance.getStringKeys("action.expandcollapse.pane/gui.time");
 
-        CollapsiblePane time = new CollapsiblePane(ui, I18n.txt("gui.time"), timeComponent.getActor(), skin, true, shortcut, playstop);
+        CollapsiblePane time = new CollapsiblePane(ui, I18n.txt("gui.time"), timeComponent.getActor(), getContentWidth(), skin, true, shortcut, playstop);
         time.align(Align.left);
         mainActors.add(time);
         panes.put(timeComponent.getClass().getSimpleName(), time);
@@ -150,7 +162,7 @@ public class ControlsWindow extends CollapsibleWindow implements IObserver {
 
         shortcut = KeyBindings.instance.getStringKeys("action.expandcollapse.pane/gui.camera");
 
-        CollapsiblePane camera = new CollapsiblePane(ui, I18n.txt("gui.camera"), cameraComponent.getActor(), skin, false, shortcut, recCamera, recKeyframeCamera, playCamera);
+        CollapsiblePane camera = new CollapsiblePane(ui, I18n.txt("gui.camera"), cameraComponent.getActor(), getContentWidth(), skin, false, shortcut, recCamera, recKeyframeCamera, playCamera);
         camera.align(Align.left);
         mainActors.add(camera);
         panes.put(cameraComponent.getClass().getSimpleName(), camera);
@@ -162,7 +174,7 @@ public class ControlsWindow extends CollapsibleWindow implements IObserver {
 
         shortcut = KeyBindings.instance.getStringKeys("action.expandcollapse.pane/gui.visibility");
 
-        CollapsiblePane visibility = new CollapsiblePane(ui, I18n.txt("gui.visibility"), visibilityComponent.getActor(), skin, false, shortcut);
+        CollapsiblePane visibility = new CollapsiblePane(ui, I18n.txt("gui.visibility"), visibilityComponent.getActor(), getContentWidth(), skin, false, shortcut);
         visibility.align(Align.left);
         mainActors.add(visibility);
         panes.put(visibilityComponent.getClass().getSimpleName(), visibility);
@@ -173,7 +185,7 @@ public class ControlsWindow extends CollapsibleWindow implements IObserver {
 
         shortcut = KeyBindings.instance.getStringKeys("action.expandcollapse.pane/gui.lighting");
 
-        CollapsiblePane visualEffects = new CollapsiblePane(ui, I18n.txt("gui.lighting"), visualEffectsComponent.getActor(), skin, false, shortcut);
+        CollapsiblePane visualEffects = new CollapsiblePane(ui, I18n.txt("gui.lighting"), visualEffectsComponent.getActor(), getContentWidth(), skin, false, shortcut);
         visualEffects.align(Align.left);
         mainActors.add(visualEffects);
         panes.put(visualEffectsComponent.getClass().getSimpleName(), visualEffects);
@@ -184,7 +196,7 @@ public class ControlsWindow extends CollapsibleWindow implements IObserver {
 
         shortcut = KeyBindings.instance.getStringKeys("action.expandcollapse.pane/gui.dataset.title");
 
-        CollapsiblePane datasets = new CollapsiblePane(ui, I18n.txt("gui.dataset.title"), datasetsComponent.getActor(), skin, false, shortcut);
+        CollapsiblePane datasets = new CollapsiblePane(ui, I18n.txt("gui.dataset.title"), datasetsComponent.getActor(), getContentWidth(), skin, false, shortcut);
         datasets.align(Align.left);
         mainActors.add(datasets);
         panes.put(datasetsComponent.getClass().getSimpleName(), datasets);
@@ -196,7 +208,7 @@ public class ControlsWindow extends CollapsibleWindow implements IObserver {
 
         shortcut = KeyBindings.instance.getStringKeys("action.expandcollapse.pane/gui.objects");
 
-        CollapsiblePane objects = new CollapsiblePane(ui, I18n.txt("gui.objects"), objectsComponent.getActor(), skin, false, shortcut);
+        CollapsiblePane objects = new CollapsiblePane(ui, I18n.txt("gui.objects"), objectsComponent.getActor(), getContentWidth(), skin, false, shortcut);
         objects.align(Align.left);
         mainActors.add(objects);
         panes.put(objectsComponent.getClass().getSimpleName(), objects);
@@ -218,7 +230,7 @@ public class ControlsWindow extends CollapsibleWindow implements IObserver {
 
         shortcut = KeyBindings.instance.getStringKeys("action.expandcollapse.pane/gui.music");
 
-        CollapsiblePane music = new CollapsiblePane(ui, I18n.txt("gui.music"), musicComponent.getActor(), skin, false, shortcut, musicActors);
+        CollapsiblePane music = new CollapsiblePane(ui, I18n.txt("gui.music"), musicComponent.getActor(), getContentWidth(), skin, false, shortcut, musicActors);
         music.align(Align.left);
         mainActors.add(music);
         panes.put(musicComponent.getClass().getSimpleName(), music);
@@ -232,7 +244,7 @@ public class ControlsWindow extends CollapsibleWindow implements IObserver {
         map.setName("map");
         map.setChecked(GlobalConf.program.DISPLAY_MINIMAP);
         String minimapHotkey = kb.getStringKeys("action.toggle/gui.minimap.title");
-        map.addListener(new OwnTextHotkeyTooltip(I18n.txt("gui.map"),minimapHotkey, skin));
+        map.addListener(new OwnTextHotkeyTooltip(I18n.txt("gui.map"), minimapHotkey, skin));
         map.addListener(event -> {
             if (event instanceof ChangeEvent) {
                 EventManager.instance.post(Events.SHOW_MINIMAP_ACTION, map.isChecked(), true);
@@ -383,78 +395,78 @@ public class ControlsWindow extends CollapsibleWindow implements IObserver {
     @Override
     public void notify(Events event, Object... data) {
         switch (event) {
-        case TIME_STATE_CMD:
-            // Pause has been toggled, update playstop button only if this does
-            // not come from this interface
-            if (!(Boolean) data[1]) {
-                playstop.setCheckedNoFire((Boolean) data[0]);
-            }
-            break;
-        case GUI_SCROLL_POSITION_CMD:
-            this.windowScroll.setScrollY((float) data[0]);
-            break;
-        case GUI_FOLD_CMD:
-            boolean collapse;
-            if (data.length >= 1) {
-                collapse = (boolean) data[0];
-            } else {
-                // Toggle
-                collapse = !isCollapsed();
-            }
-            if (collapse) {
-                collapse();
-            } else {
-                expand();
-            }
-            break;
-        case GUI_MOVE_CMD:
-            float x = (float) data[0];
-            float y = (float) data[1];
-            float width = Gdx.graphics.getWidth();
-            float height = Gdx.graphics.getHeight();
-            float windowWidth = getWidth();
-            float windowHeight = getHeight();
+            case TIME_STATE_CMD:
+                // Pause has been toggled, update playstop button only if this does
+                // not come from this interface
+                if (!(Boolean) data[1]) {
+                    playstop.setCheckedNoFire((Boolean) data[0]);
+                }
+                break;
+            case GUI_SCROLL_POSITION_CMD:
+                this.windowScroll.setScrollY((float) data[0]);
+                break;
+            case GUI_FOLD_CMD:
+                boolean collapse;
+                if (data.length >= 1) {
+                    collapse = (boolean) data[0];
+                } else {
+                    // Toggle
+                    collapse = !isCollapsed();
+                }
+                if (collapse) {
+                    collapse();
+                } else {
+                    expand();
+                }
+                break;
+            case GUI_MOVE_CMD:
+                float x = (float) data[0];
+                float y = (float) data[1];
+                float width = Gdx.graphics.getWidth();
+                float height = Gdx.graphics.getHeight();
+                float windowWidth = getWidth();
+                float windowHeight = getHeight();
 
-            x = MathUtilsd.clamp(x * width, 0, width - windowWidth);
-            y = MathUtilsd.clamp(y * height - windowHeight, 0, height - windowHeight);
+                x = MathUtilsd.clamp(x * width, 0, width - windowWidth);
+                y = MathUtilsd.clamp(y * height - windowHeight, 0, height - windowHeight);
 
-            setPosition(Math.round(x), Math.round(y));
+                setPosition(Math.round(x), Math.round(y));
 
-            break;
-        case RECALCULATE_OPTIONS_SIZE:
-            recalculateSize();
-            break;
-        case EXPAND_PANE_CMD:
-            String paneName = (String) data[0];
-            CollapsiblePane pane = panes.get(paneName);
-            pane.expandPane();
-            break;
-        case COLLAPSE_PANE_CMD:
-            paneName = (String) data[0];
-            pane = panes.get(paneName);
-            pane.collapsePane();
-            break;
-        case TOGGLE_EXPANDCOLLAPSE_PANE_CMD:
-            paneName = (String) data[0];
-            pane = panes.get(paneName);
-            pane.togglePane();
-            break;
-        case SHOW_MINIMAP_ACTION:
-            boolean show = (Boolean) data[0];
-            boolean ui = (Boolean) data[1];
-            if (!ui) {
+                break;
+            case RECALCULATE_OPTIONS_SIZE:
+                recalculateSize();
+                break;
+            case EXPAND_PANE_CMD:
+                String paneName = (String) data[0];
+                CollapsiblePane pane = panes.get(paneName);
+                pane.expandPane();
+                break;
+            case COLLAPSE_PANE_CMD:
+                paneName = (String) data[0];
+                pane = panes.get(paneName);
+                pane.collapsePane();
+                break;
+            case TOGGLE_EXPANDCOLLAPSE_PANE_CMD:
+                paneName = (String) data[0];
+                pane = panes.get(paneName);
+                pane.togglePane();
+                break;
+            case SHOW_MINIMAP_ACTION:
+                boolean show = (Boolean) data[0];
+                boolean ui = (Boolean) data[1];
+                if (!ui) {
+                    map.setProgrammaticChangeEvents(false);
+                    map.setChecked(show);
+                    map.setProgrammaticChangeEvents(true);
+                }
+                break;
+            case TOGGLE_MINIMAP:
                 map.setProgrammaticChangeEvents(false);
-                map.setChecked(show);
+                map.setChecked(!map.isChecked());
                 map.setProgrammaticChangeEvents(true);
-            }
-            break;
-        case TOGGLE_MINIMAP:
-            map.setProgrammaticChangeEvents(false);
-            map.setChecked(!map.isChecked());
-            map.setProgrammaticChangeEvents(true);
-            break;
-        default:
-            break;
+                break;
+            default:
+                break;
         }
 
     }

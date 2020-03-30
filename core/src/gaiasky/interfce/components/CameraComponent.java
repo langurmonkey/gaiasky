@@ -13,6 +13,7 @@ import com.badlogic.gdx.utils.Array;
 import gaiasky.event.EventManager;
 import gaiasky.event.Events;
 import gaiasky.event.IObserver;
+import gaiasky.interfce.ControlsWindow;
 import gaiasky.interfce.KeyBindings;
 import gaiasky.interfce.beans.CameraComboBoxBean;
 import gaiasky.scenegraph.camera.CameraManager.CameraMode;
@@ -41,7 +42,7 @@ public class CameraComponent extends GuiComponent implements IObserver {
 
     @Override
     public void initialize() {
-        float width = 180 * GlobalConf.UI_SCALE_FACTOR;
+        float contentWidth = ControlsWindow.getContentWidth();
 
         cinematic = new OwnCheckBox(I18n.txt("gui.camera.cinematic"), skin, pad);
         cinematic.setName("cinematic camera");
@@ -62,7 +63,7 @@ public class CameraComponent extends GuiComponent implements IObserver {
         }
         cameraMode = new OwnSelectBox<>(skin);
         cameraMode.setName("camera mode");
-        cameraMode.setWidth(width);
+        cameraMode.setWidth(contentWidth);
         cameraMode.setItems(cameraOptions);
         cameraMode.addListener(event -> {
             if (event instanceof ChangeEvent) {
@@ -166,7 +167,7 @@ public class CameraComponent extends GuiComponent implements IObserver {
         fieldOfView = new OwnSliderPlus(I18n.txt("gui.camera.fov"), Constants.MIN_FOV, Constants.MAX_FOV, Constants.SLIDER_STEP, false, skin);
         fieldOfView.setValueSuffix("°");
         fieldOfView.setName("field of view");
-        fieldOfView.setWidth(width);
+        fieldOfView.setWidth(contentWidth);
         fieldOfView.setValue(GlobalConf.scene.CAMERA_FOV);
         fieldOfView.addListener(event -> {
             if (fovFlag && event instanceof ChangeEvent && !SlaveManager.projectionActive()) {
@@ -202,7 +203,7 @@ public class CameraComponent extends GuiComponent implements IObserver {
 
         cameraSpeedLimit = new OwnSelectBox<>(skin);
         cameraSpeedLimit.setName("camera speed limit");
-        cameraSpeedLimit.setWidth(width);
+        cameraSpeedLimit.setWidth(contentWidth);
         cameraSpeedLimit.setItems(speedLimits);
         cameraSpeedLimit.addListener(event -> {
             if (event instanceof ChangeEvent) {
@@ -217,7 +218,7 @@ public class CameraComponent extends GuiComponent implements IObserver {
         /** CAMERA SPEED **/
         cameraSpeed = new OwnSliderPlus(I18n.txt("gui.camera.speed"), Constants.MIN_SLIDER, Constants.MAX_SLIDER, Constants.SLIDER_STEP, Constants.MIN_CAM_SPEED, Constants.MAX_CAM_SPEED, skin);
         cameraSpeed.setName("camera speed");
-        cameraSpeed.setWidth(width);
+        cameraSpeed.setWidth(contentWidth);
         cameraSpeed.setMappedValue(GlobalConf.scene.CAMERA_SPEED);
         cameraSpeed.addListener(event -> {
             if (!fieldLock && event instanceof ChangeEvent) {
@@ -230,7 +231,7 @@ public class CameraComponent extends GuiComponent implements IObserver {
         /** ROTATION SPEED **/
         rotateSpeed = new OwnSliderPlus(I18n.txt("gui.rotation.speed"), Constants.MIN_SLIDER, Constants.MAX_SLIDER, Constants.SLIDER_STEP, Constants.MIN_ROT_SPEED, Constants.MAX_ROT_SPEED, skin);
         rotateSpeed.setName("rotate speed");
-        rotateSpeed.setWidth(width);
+        rotateSpeed.setWidth(contentWidth);
         rotateSpeed.setMappedValue(GlobalConf.scene.ROTATION_SPEED);
         rotateSpeed.addListener(event -> {
             if (!fieldLock && event instanceof ChangeEvent) {
@@ -243,7 +244,7 @@ public class CameraComponent extends GuiComponent implements IObserver {
         /** TURNING SPEED **/
         turnSpeed = new OwnSliderPlus(I18n.txt("gui.turn.speed"), Constants.MIN_SLIDER, Constants.MAX_SLIDER, Constants.SLIDER_STEP, Constants.MIN_TURN_SPEED, Constants.MAX_TURN_SPEED, skin);
         turnSpeed.setName("turn speed");
-        turnSpeed.setWidth(width);
+        turnSpeed.setWidth(contentWidth);
         turnSpeed.setMappedValue(GlobalConf.scene.TURNING_SPEED);
         turnSpeed.addListener(event -> {
             if (!fieldLock && event instanceof ChangeEvent) {

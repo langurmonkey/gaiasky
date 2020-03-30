@@ -53,11 +53,11 @@ public class TimeComponent extends GuiComponent implements IObserver {
         // Time
         date = new OwnLabel("date UT", skin, "mono");
         date.setName("label date");
-        date.setWidth(150f * GlobalConf.UI_SCALE_FACTOR);
+        date.setWidth(165f * GlobalConf.UI_SCALE_FACTOR);
 
         time = new OwnLabel("time UT", skin, "mono");
         time.setName("label time");
-        time.setWidth(150f * GlobalConf.UI_SCALE_FACTOR);
+        time.setWidth(165f * GlobalConf.UI_SCALE_FACTOR);
 
         dateEdit = new OwnTextIconButton("", skin, "edit");
         dateEdit.addListener(event -> {
@@ -102,8 +102,9 @@ public class TimeComponent extends GuiComponent implements IObserver {
 
         timeWarp = new OwnLabel(TextUtils.getFormattedTimeWarp(), skin, "warp");
         timeWarp.setName("time warp");
+        timeWarp.setAlignment(Align.center);
         Container<Label> wrapWrapper = new Container<>(timeWarp);
-        wrapWrapper.width(80f * GlobalConf.UI_SCALE_FACTOR);
+        wrapWrapper.width(120f * GlobalConf.UI_SCALE_FACTOR);
         wrapWrapper.align(Align.center);
 
         VerticalGroup timeGroup = new VerticalGroup().align(Align.left).columnAlign(Align.left).space(3 * GlobalConf.UI_SCALE_FACTOR).padTop(3 * GlobalConf.UI_SCALE_FACTOR);

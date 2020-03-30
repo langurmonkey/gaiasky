@@ -13,6 +13,7 @@ import com.badlogic.gdx.utils.Align;
 import gaiasky.event.EventManager;
 import gaiasky.event.Events;
 import gaiasky.event.IObserver;
+import gaiasky.interfce.ControlsWindow;
 import gaiasky.util.Constants;
 import gaiasky.util.GlobalConf;
 import gaiasky.util.I18n;
@@ -37,11 +38,11 @@ public class VisualEffectsComponent extends GuiComponent implements IObserver {
     }
 
     public void initialize() {
-        float sliderWidth = 180 * GlobalConf.UI_SCALE_FACTOR;
+        float contentWidth = ControlsWindow.getContentWidth();
         /** Star brightness **/
         starBrightness = new OwnSliderPlus(I18n.txt("gui.starbrightness"), Constants.MIN_SLIDER, Constants.MAX_SLIDER, Constants.SLIDER_STEP, Constants.MIN_STAR_BRIGHT, Constants.MAX_STAR_BRIGHT, skin);
         starBrightness.setName("star brightness");
-        starBrightness.setWidth(sliderWidth);
+        starBrightness.setWidth(contentWidth);
         starBrightness.setMappedValue(GlobalConf.scene.STAR_BRIGHTNESS);
         starBrightness.addListener(event -> {
             if (event instanceof ChangeEvent && hackProgrammaticChangeEvents) {
@@ -54,7 +55,7 @@ public class VisualEffectsComponent extends GuiComponent implements IObserver {
         /** Star size **/
         starSize = new OwnSliderPlus(I18n.txt("gui.star.size"), Constants.MIN_STAR_POINT_SIZE, Constants.MAX_STAR_POINT_SIZE, Constants.STEP_STAR_POINT_SIZE, skin);
         starSize.setName("star size");
-        starSize.setWidth(sliderWidth);
+        starSize.setWidth(contentWidth);
         starSize.setMappedValue(GlobalConf.scene.STAR_POINT_SIZE);
         starSize.addListener(event -> {
             if (flag && event instanceof ChangeEvent) {
@@ -67,7 +68,7 @@ public class VisualEffectsComponent extends GuiComponent implements IObserver {
         /** Star opacity **/
         starOpacity = new OwnSliderPlus(I18n.txt("gui.star.opacity"), Constants.MIN_STAR_MIN_OPACITY, Constants.MAX_STAR_MIN_OPACITY, Constants.SLIDER_STEP_TINY, skin);
         starOpacity.setName("star opacity");
-        starOpacity.setWidth(sliderWidth);
+        starOpacity.setWidth(contentWidth);
         starOpacity.setMappedValue(GlobalConf.scene.STAR_MIN_OPACITY);
         starOpacity.addListener(event -> {
             if (event instanceof ChangeEvent && hackProgrammaticChangeEvents) {
@@ -80,7 +81,7 @@ public class VisualEffectsComponent extends GuiComponent implements IObserver {
         /** Ambient light **/
         ambientLight = new OwnSliderPlus(I18n.txt("gui.light.ambient"), Constants.MIN_AMBIENT_LIGHT, Constants.MAX_AMBIENT_LIGHT, Constants.SLIDER_STEP_TINY, skin);
         ambientLight.setName("ambient light");
-        ambientLight.setWidth(sliderWidth);
+        ambientLight.setWidth(contentWidth);
         ambientLight.setMappedValue(GlobalConf.scene.AMBIENT_LIGHT);
         ambientLight.addListener(event -> {
             if (event instanceof ChangeEvent) {
@@ -93,7 +94,7 @@ public class VisualEffectsComponent extends GuiComponent implements IObserver {
         /** Label size **/
         labelSize = new OwnSliderPlus(I18n.txt("gui.label.size"), Constants.MIN_LABEL_SIZE, Constants.MAX_LABEL_SIZE, Constants.SLIDER_STEP_TINY, skin);
         labelSize.setName("label size");
-        labelSize.setWidth(sliderWidth);
+        labelSize.setWidth(contentWidth);
         labelSize.setMappedValue(GlobalConf.scene.LABEL_SIZE_FACTOR);
         labelSize.addListener(event -> {
             if (event instanceof ChangeEvent && hackProgrammaticChangeEvents) {
@@ -107,7 +108,7 @@ public class VisualEffectsComponent extends GuiComponent implements IObserver {
         /** Line width **/
         lineWidth = new OwnSliderPlus(I18n.txt("gui.line.width"), Constants.MIN_LINE_WIDTH, Constants.MAX_LINE_WIDTH, Constants.SLIDER_STEP_TINY, Constants.MIN_LINE_WIDTH, Constants.MAX_LINE_WIDTH, skin);
         lineWidth.setName("line width");
-        lineWidth.setWidth(sliderWidth);
+        lineWidth.setWidth(contentWidth);
         lineWidth.setMappedValue(GlobalConf.scene.LINE_WIDTH_FACTOR);
         lineWidth.addListener(event -> {
             if (event instanceof ChangeEvent && hackProgrammaticChangeEvents) {
@@ -121,7 +122,7 @@ public class VisualEffectsComponent extends GuiComponent implements IObserver {
         /** Elevation multiplier **/
         elevMult = new OwnSliderPlus(I18n.txt("gui.elevation.multiplier"), Constants.MIN_ELEVATION_MULT, Constants.MAX_ELEVATION_MULT, 0.1f, false, skin);
         elevMult.setName("elevation mult");
-        elevMult.setWidth(sliderWidth);
+        elevMult.setWidth(contentWidth);
         elevMult.setValue((float) MathUtilsd.roundAvoid(GlobalConf.scene.ELEVATION_MULTIPLIER, 1));
         elevMult.addListener(event -> {
             if (event instanceof ChangeEvent) {

@@ -20,6 +20,7 @@ import gaiasky.GaiaSky;
 import gaiasky.event.EventManager;
 import gaiasky.event.Events;
 import gaiasky.event.IObserver;
+import gaiasky.interfce.ControlsWindow;
 import gaiasky.scenegraph.*;
 import gaiasky.scenegraph.camera.CameraManager.CameraMode;
 import gaiasky.scenegraph.camera.NaturalCamera;
@@ -59,10 +60,10 @@ public class ObjectsComponent extends GuiComponent implements IObserver {
 
     @Override
     public void initialize() {
-        float componentWidth = 160 * GlobalConf.UI_SCALE_FACTOR;
+        float contentWidth = ControlsWindow.getContentWidth();
         searchBox = new OwnTextField("", skin);
         searchBox.setName("search box");
-        searchBox.setWidth(componentWidth);
+        searchBox.setWidth(contentWidth);
         searchBox.setMessageText(I18n.txt("gui.objects.search"));
         searchBox.addListener(event -> {
             if (event instanceof InputEvent) {
@@ -187,7 +188,7 @@ public class ObjectsComponent extends GuiComponent implements IObserver {
         focusListScrollPane.setScrollingDisabled(true, false);
 
         focusListScrollPane.setHeight(100 * GlobalConf.UI_SCALE_FACTOR);
-        focusListScrollPane.setWidth(componentWidth);
+        focusListScrollPane.setWidth(contentWidth);
 
         /*
          * MESHES

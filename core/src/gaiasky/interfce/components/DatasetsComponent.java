@@ -13,6 +13,7 @@ import gaiasky.event.EventManager;
 import gaiasky.event.Events;
 import gaiasky.event.IObserver;
 import gaiasky.interfce.ColormapPicker;
+import gaiasky.interfce.ControlsWindow;
 import gaiasky.interfce.DatasetPreferencesWindow;
 import gaiasky.util.*;
 import gaiasky.util.scene2d.*;
@@ -170,7 +171,7 @@ public class DatasetsComponent extends GuiComponent implements IObserver {
         scroll.setFadeScrollBars(false);
         scroll.setOverscroll(false, false);
         scroll.setSmoothScrolling(true);
-        scroll.setWidth(175 * GlobalConf.UI_SCALE_FACTOR);
+        scroll.setWidth(ControlsWindow.getContentWidth());
         scroll.setHeight(GlobalConf.isHiDPI() ? 125 : 75);
 
         //ciGroup.addActor(controls);
