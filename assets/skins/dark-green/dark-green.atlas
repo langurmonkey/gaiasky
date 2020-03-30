@@ -20,21 +20,21 @@ audio-bwd
   index: -1
 audio-fwd
   rotate: false
-  xy: 263, 61
+  xy: 281, 79
   size: 14, 14
   orig: 14, 14
   offset: 0, 0
   index: -1
 audio-pause
   rotate: false
-  xy: 281, 79
+  xy: 299, 97
   size: 14, 14
   orig: 14, 14
   offset: 0, 0
   index: -1
 audio-play
   rotate: false
-  xy: 299, 97
+  xy: 317, 115
   size: 14, 14
   orig: 14, 14
   offset: 0, 0
@@ -84,14 +84,14 @@ bin-icon-grey
   index: -1
 bin-s-icon
   rotate: false
-  xy: 317, 115
+  xy: 227, 7
   size: 14, 14
   orig: 14, 14
   offset: 0, 0
   index: -1
 bin-s-icon-grey
   rotate: false
-  xy: 227, 7
+  xy: 245, 25
   size: 14, 14
   orig: 14, 14
   offset: 0, 0
@@ -353,7 +353,7 @@ default-select-disabled
   index: -1
 default-slider
   rotate: false
-  xy: 253, 5
+  xy: 622, 176
   size: 7, 11
   split: 0, 0, 0, 0
   orig: 7, 11
@@ -413,7 +413,7 @@ detach-icon
   index: -1
 disabled-icon
   rotate: false
-  xy: 243, 8
+  xy: 608, 135
   size: 8, 8
   orig: 8, 8
   offset: 0, 0
@@ -462,7 +462,7 @@ eye-icon
   index: -1
 eye-s-off
   rotate: false
-  xy: 245, 26
+  xy: 263, 44
   size: 14, 14
   orig: 14, 14
   offset: 0, 0
@@ -2140,198 +2140,205 @@ iconic-star
   orig: 16, 16
   offset: 0, 0
   index: -1
-iconic-sun
+iconic-star-gray
   rotate: false
   xy: 119, 5
   size: 16, 16
   orig: 16, 16
   offset: 0, 0
   index: -1
-iconic-tablet
+iconic-sun
   rotate: false
   xy: 137, 23
   size: 16, 16
   orig: 16, 16
   offset: 0, 0
   index: -1
-iconic-tag
+iconic-tablet
   rotate: false
   xy: 155, 41
   size: 16, 16
   orig: 16, 16
   offset: 0, 0
   index: -1
-iconic-tags
+iconic-tag
   rotate: false
   xy: 173, 59
   size: 16, 16
   orig: 16, 16
   offset: 0, 0
   index: -1
-iconic-target
+iconic-tags
   rotate: false
   xy: 191, 77
   size: 16, 16
   orig: 16, 16
   offset: 0, 0
   index: -1
-iconic-task
+iconic-target
   rotate: false
   xy: 209, 95
   size: 16, 16
   orig: 16, 16
   offset: 0, 0
   index: -1
-iconic-terminal
+iconic-task
   rotate: false
   xy: 227, 113
   size: 16, 16
   orig: 16, 16
   offset: 0, 0
   index: -1
-iconic-text
+iconic-terminal
   rotate: false
   xy: 137, 5
   size: 16, 16
   orig: 16, 16
   offset: 0, 0
   index: -1
-iconic-thumb-down
+iconic-text
   rotate: false
   xy: 155, 23
   size: 16, 16
   orig: 16, 16
   offset: 0, 0
   index: -1
-iconic-thumb-up
+iconic-thumb-down
   rotate: false
   xy: 173, 41
   size: 16, 16
   orig: 16, 16
   offset: 0, 0
   index: -1
-iconic-timer
+iconic-thumb-up
   rotate: false
   xy: 191, 59
   size: 16, 16
   orig: 16, 16
   offset: 0, 0
   index: -1
-iconic-transfer
+iconic-timer
   rotate: false
   xy: 209, 77
   size: 16, 16
   orig: 16, 16
   offset: 0, 0
   index: -1
-iconic-trash
+iconic-transfer
   rotate: false
   xy: 227, 95
   size: 16, 16
   orig: 16, 16
   offset: 0, 0
   index: -1
-iconic-underline
+iconic-trash
   rotate: false
   xy: 245, 113
   size: 16, 16
   orig: 16, 16
   offset: 0, 0
   index: -1
-iconic-vertical-align-bottom
+iconic-underline
   rotate: false
   xy: 155, 5
   size: 16, 16
   orig: 16, 16
   offset: 0, 0
   index: -1
-iconic-vertical-align-center
+iconic-vertical-align-bottom
   rotate: false
   xy: 173, 23
   size: 16, 16
   orig: 16, 16
   offset: 0, 0
   index: -1
-iconic-vertical-align-top
+iconic-vertical-align-center
   rotate: false
   xy: 191, 41
   size: 16, 16
   orig: 16, 16
   offset: 0, 0
   index: -1
-iconic-video
+iconic-vertical-align-top
   rotate: false
   xy: 209, 59
   size: 16, 16
   orig: 16, 16
   offset: 0, 0
   index: -1
-iconic-volume-high
+iconic-video
   rotate: false
   xy: 227, 77
   size: 16, 16
   orig: 16, 16
   offset: 0, 0
   index: -1
-iconic-volume-low
+iconic-volume-high
   rotate: false
   xy: 245, 95
   size: 16, 16
   orig: 16, 16
   offset: 0, 0
   index: -1
-iconic-volume-off
+iconic-volume-low
   rotate: false
   xy: 263, 113
   size: 16, 16
   orig: 16, 16
   offset: 0, 0
   index: -1
-iconic-warning
+iconic-volume-off
   rotate: false
   xy: 173, 5
   size: 16, 16
   orig: 16, 16
   offset: 0, 0
   index: -1
-iconic-wifi
+iconic-warning
   rotate: false
   xy: 191, 23
   size: 16, 16
   orig: 16, 16
   offset: 0, 0
   index: -1
-iconic-wrench
+iconic-wifi
   rotate: false
   xy: 209, 41
   size: 16, 16
   orig: 16, 16
   offset: 0, 0
   index: -1
-iconic-x
+iconic-wrench
   rotate: false
   xy: 227, 59
   size: 16, 16
   orig: 16, 16
   offset: 0, 0
   index: -1
-iconic-yen
+iconic-x
   rotate: false
   xy: 245, 77
   size: 16, 16
   orig: 16, 16
   offset: 0, 0
   index: -1
-iconic-zoom-in
+iconic-yen
   rotate: false
   xy: 263, 95
   size: 16, 16
   orig: 16, 16
   offset: 0, 0
   index: -1
-iconic-zoom-out
+iconic-zoom-in
   rotate: false
   xy: 281, 113
+  size: 16, 16
+  orig: 16, 16
+  offset: 0, 0
+  index: -1
+iconic-zoom-out
+  rotate: false
+  xy: 191, 5
   size: 16, 16
   orig: 16, 16
   offset: 0, 0
@@ -2375,7 +2382,7 @@ light-grey
   index: -1
 link
   rotate: false
-  xy: 191, 5
+  xy: 209, 23
   size: 16, 16
   orig: 16, 16
   offset: 0, 0
@@ -2396,7 +2403,7 @@ map-icon
   index: -1
 minus-icon
   rotate: false
-  xy: 608, 135
+  xy: 631, 179
   size: 8, 8
   orig: 8, 8
   offset: 0, 0
@@ -2410,7 +2417,7 @@ no-input
   index: -1
 open
   rotate: false
-  xy: 209, 23
+  xy: 227, 41
   size: 16, 16
   orig: 16, 16
   offset: 0, 0
@@ -2424,21 +2431,21 @@ open-icon
   index: -1
 pause-icon
   rotate: false
-  xy: 227, 41
+  xy: 245, 59
   size: 16, 16
   orig: 16, 16
   offset: 0, 0
   index: -1
 play-icon
   rotate: false
-  xy: 245, 59
+  xy: 263, 77
   size: 16, 16
   orig: 16, 16
   offset: 0, 0
   index: -1
 plus-icon
   rotate: false
-  xy: 622, 165
+  xy: 622, 166
   size: 8, 8
   orig: 8, 8
   offset: 0, 0
@@ -2490,7 +2497,7 @@ progress-knob-before
   index: -1
 question-mark
   rotate: false
-  xy: 245, 42
+  xy: 263, 60
   size: 15, 15
   orig: 15, 15
   offset: 0, 0
@@ -2532,28 +2539,28 @@ radio-on-disabled
   index: -1
 rec-icon-gray
   rotate: false
-  xy: 263, 77
+  xy: 281, 95
   size: 16, 16
   orig: 16, 16
   offset: 0, 0
   index: -1
 rec-icon-red
   rotate: false
-  xy: 281, 95
+  xy: 299, 113
   size: 16, 16
   orig: 16, 16
   offset: 0, 0
   index: -1
 rec-key-icon-gray
   rotate: false
-  xy: 299, 113
+  xy: 209, 5
   size: 16, 16
   orig: 16, 16
   offset: 0, 0
   index: -1
 rec-key-icon-red
   rotate: false
-  xy: 209, 5
+  xy: 227, 23
   size: 16, 16
   orig: 16, 16
   offset: 0, 0
@@ -2567,7 +2574,7 @@ reload
   index: -1
 save
   rotate: false
-  xy: 227, 23
+  xy: 245, 41
   size: 16, 16
   orig: 16, 16
   offset: 0, 0
@@ -2596,7 +2603,7 @@ sc-engine-power-down-checked
   index: -1
 sc-engine-power-knob
   rotate: false
-  xy: 245, 18
+  xy: 263, 36
   size: 13, 6
   orig: 13, 6
   offset: 0, 0
@@ -2617,7 +2624,7 @@ sc-engine-power-up
   index: -1
 sc-engine-power-up-checked
   rotate: false
-  xy: 608, 173
+  xy: 261, 22
   size: 12, 12
   orig: 12, 12
   offset: 0, 0
@@ -2695,7 +2702,7 @@ script-stop
   index: -1
 scrollbar-bg
   rotate: false
-  xy: 622, 146
+  xy: 641, 180
   size: 8, 7
   split: 2, 2, 2, 2
   orig: 8, 7
@@ -2703,7 +2710,7 @@ scrollbar-bg
   index: -1
 scrollbar-knob
   rotate: false
-  xy: 618, 136
+  xy: 632, 170
   size: 6, 7
   split: 2, 2, 2, 2
   orig: 6, 7
@@ -2767,7 +2774,7 @@ table-bg-inv
   index: -1
 textfield-disabled
   rotate: false
-  xy: 608, 159
+  xy: 608, 173
   size: 12, 12
   split: 2, 2, 2, 2
   orig: 12, 12
@@ -2796,14 +2803,14 @@ transparent
   index: -1
 tree-minus
   rotate: false
-  xy: 608, 145
+  xy: 608, 159
   size: 12, 12
   orig: 12, 12
   offset: 0, 0
   index: -1
 tree-plus
   rotate: false
-  xy: 622, 175
+  xy: 608, 145
   size: 12, 12
   orig: 12, 12
   offset: 0, 0
@@ -2831,14 +2838,14 @@ white
   index: -1
 window-collapse
   rotate: false
-  xy: 636, 179
+  xy: 622, 156
   size: 8, 8
   orig: 8, 8
   offset: 0, 0
   index: -1
 window-expand
   rotate: false
-  xy: 622, 155
+  xy: 622, 146
   size: 8, 8
   orig: 8, 8
   offset: 0, 0

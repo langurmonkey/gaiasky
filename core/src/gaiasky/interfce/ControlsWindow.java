@@ -202,16 +202,16 @@ public class ControlsWindow extends CollapsibleWindow implements IObserver {
         panes.put(datasetsComponent.getClass().getSimpleName(), datasets);
 
         /** ----OBJECTS TREE---- **/
-        ObjectsComponent objectsComponent = new ObjectsComponent(skin, ui);
-        objectsComponent.setSceneGraph(sg);
-        objectsComponent.initialize();
+        BookmarksComponent bookmarksComponent = new BookmarksComponent(skin, ui);
+        bookmarksComponent.setSceneGraph(sg);
+        bookmarksComponent.initialize();
 
         shortcut = KeyBindings.instance.getStringKeys("action.expandcollapse.pane/gui.objects");
 
-        CollapsiblePane objects = new CollapsiblePane(ui, I18n.txt("gui.objects"), objectsComponent.getActor(), getContentWidth(), skin, false, shortcut);
+        CollapsiblePane objects = new CollapsiblePane(ui, I18n.txt("gui.bookmarks"), bookmarksComponent.getActor(), getContentWidth(), skin, false, shortcut);
         objects.align(Align.left);
         mainActors.add(objects);
-        panes.put(objectsComponent.getClass().getSimpleName(), objects);
+        panes.put(bookmarksComponent.getClass().getSimpleName(), objects);
 
         /** ----GAIA SCAN GROUP---- **/
         //	GaiaComponent gaiaComponent = new GaiaComponent(skin, ui);

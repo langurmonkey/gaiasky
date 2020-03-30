@@ -334,6 +334,9 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
         // Initialise dataset updater
         DatasetUpdater.initialize();
 
+        // Bookmarks
+        BookmarksManager.initialize();
+
         // Load slave assets
         SlaveManager.load(manager);
 

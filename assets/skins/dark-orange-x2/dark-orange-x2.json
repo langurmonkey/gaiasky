@@ -246,6 +246,15 @@
     }
   },
   "gaiasky.util.scene2d.OwnTextIconButton$TextIconButtonStyle": {
+    "eye": {
+      "imageUp": "iconic-eye"
+    },
+    "audio": {
+      "imageUp": "iconic-audio"
+    },
+    "ban": {
+      "imageUp": "iconic-ban"
+    },
     "home": {
       "imageUp": "iconic-home"
     },
@@ -363,6 +372,10 @@
     }
   },
   "com.badlogic.gdx.scenes.scene2d.ui.ImageButton$ImageButtonStyle": {
+    "bookmark": {
+      "imageUp": "iconic-star-gray",
+      "imageChecked": "iconic-star"
+    },
     "edit": {
       "imageUp": "edit-icon"
     },

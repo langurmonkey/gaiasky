@@ -37,13 +37,15 @@ public class SysUtils {
             Files.createDirectories(getDefaultScreenshotsDir());
             Files.createDirectories(getDefaultTmpDir());
             Files.createDirectories(getDefaultMappingsDir());
-        }catch(IOException e){
-           logger.error(e);
+            Files.createDirectories(getDefaultBookmarksDir());
+        } catch (IOException e) {
+            logger.error(e);
         }
     }
 
     private static String OS;
     private static boolean linux, mac, windows, unix, solaris;
+
     static {
         OS = System.getProperty("os.name").toLowerCase();
         linux = OS.indexOf("linux") >= 0;
@@ -146,6 +148,7 @@ public class SysUtils {
     private static final String FRAMES_DIR_NAME = "frames";
     private static final String MUSIC_DIR_NAME = "music";
     private static final String MAPPINGS_DIR_NAME = "mappings";
+    private static final String BOOKMARKS_DIR_NAME = "bookmarks";
     private static final String MPCDI_DIR_NAME = "mpcdi";
     private static final String DATA_DIR_NAME = "data";
     private static final String TMP_DIR_NAME = "tmp";
@@ -196,9 +199,24 @@ public class SysUtils {
         return getConfigDir().resolve(MAPPINGS_DIR_NAME);
     }
 
-    public static String getMappingsDirName(){
+    public static String getMappingsDirName() {
+
         return MAPPINGS_DIR_NAME;
     }
+
+    /**
+     * Gets a file pointer to the bookmarks directory.
+     *
+     * @return A pointer to the Gaia Sky bookmarks directory
+     */
+    public static Path getDefaultBookmarksDir() {
+        return getConfigDir().resolve(BOOKMARKS_DIR_NAME);
+    }
+
+    public static String getBookmarksDirName() {
+        return BOOKMARKS_DIR_NAME;
+    }
+
 
     /**
      * Gets a file pointer to the mpcdi directory.
@@ -257,11 +275,11 @@ public class SysUtils {
      *
      * @return The default cache directory
      */
-    public static Path getCacheDir(){
-        if(isLinux()){
+    public static Path getCacheDir() {
+        if (isLinux()) {
             return getXdgCacheHome().resolve(GAIASKY_DIR_NAME);
         } else {
-           return getDataDir();
+            return getDataDir();
         }
     }
 
@@ -284,7 +302,7 @@ public class SysUtils {
     private static Path getXdgDataHome() {
         String dataHome = System.getenv("XDG_DATA_HOME");
         if (dataHome == null || dataHome.isEmpty()) {
-            return Paths.get(System.getProperty("user.home"),".local", "share");
+            return Paths.get(System.getProperty("user.home"), ".local", "share");
         } else {
             return Paths.get(dataHome);
         }
@@ -310,11 +328,11 @@ public class SysUtils {
 
     public static double getJavaVersion() {
         String version = System.getProperty("java.version");
-        if(version.contains(("."))) {
+        if (version.contains(("."))) {
             int pos = version.indexOf('.');
             pos = version.indexOf('.', pos + 1);
             return Double.parseDouble(version.substring(0, pos));
-        }else{
+        } else {
             return Double.parseDouble(version);
         }
     }

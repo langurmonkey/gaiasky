@@ -85,6 +85,11 @@ public enum Events {
      **/
     ANTIALIASING_CMD,
 
+    /** Add bookmark. Contains the object **/
+    BOOKMARKS_ADD,
+    /** Remove bookmark. Contains the object **/
+    BOOKMARKS_REMOVE,
+
     /**
      * Empty event which informs that background loading is active
      **/

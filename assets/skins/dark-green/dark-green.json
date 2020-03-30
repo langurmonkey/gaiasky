@@ -372,6 +372,10 @@
     }
   },
   "com.badlogic.gdx.scenes.scene2d.ui.ImageButton$ImageButtonStyle": {
+    "bookmark": {
+      "imageUp": "iconic-star-gray",
+      "imageChecked": "iconic-star"
+    },
     "edit": {
       "imageUp": "edit-icon"
     },

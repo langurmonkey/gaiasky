@@ -1,0 +1,11 @@
+# Bookmarks file for Gaia Sky, one bookmark per line
+Sun
+Earth
+Moon
+Mercury
+Venus
+Mars
+Jupiter
+Saturn
+Uranus
+Neptune
