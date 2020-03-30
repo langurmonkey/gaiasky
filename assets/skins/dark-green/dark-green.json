@@ -246,6 +246,15 @@
     }
   },
   "gaiasky.util.scene2d.OwnTextIconButton$TextIconButtonStyle": {
+    "eye": {
+      "imageUp": "iconic-eye"
+    },
+    "audio": {
+      "imageUp": "iconic-audio"
+    },
+    "ban": {
+      "imageUp": "iconic-ban"
+    },
     "home": {
       "imageUp": "iconic-home"
     },

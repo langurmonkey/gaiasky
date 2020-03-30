@@ -18,6 +18,7 @@ import gaiasky.desktop.util.SysUtils;
 import gaiasky.event.EventManager;
 import gaiasky.event.Events;
 import gaiasky.event.IObserver;
+import gaiasky.scenegraph.ISceneGraph;
 import gaiasky.scenegraph.camera.CameraManager;
 import gaiasky.script.EventScriptingInterface;
 import gaiasky.util.*;
@@ -222,6 +223,11 @@ public class GuiRegistry implements IObserver {
     private KeyframesWindow keyframesWindow;
 
     /**
+     * Individual visibility
+     */
+    private IndividualVisibilityWindow indVisWindow;
+
+    /**
      * Mode change info popup
      */
     public Table modeChangeTable;
@@ -243,7 +249,7 @@ public class GuiRegistry implements IObserver {
         super();
         this.skin = skin;
         // Windows which are visible from any GUI
-        EventManager.instance.subscribe(this, Events.SHOW_QUIT_ACTION, Events.SHOW_ABOUT_ACTION, Events.SHOW_LOAD_CATALOG_ACTION, Events.SHOW_PREFERENCES_ACTION, Events.SHOW_KEYFRAMES_WINDOW_ACTION, Events.SHOW_SLAVE_CONFIG_ACTION, Events.UI_THEME_RELOAD_INFO, Events.MODE_POPUP_CMD, Events.DISPLAY_GUI_CMD, Events.CAMERA_MODE_CMD, Events.UI_RELOAD_CMD);
+        EventManager.instance.subscribe(this, Events.SHOW_QUIT_ACTION, Events.SHOW_ABOUT_ACTION, Events.SHOW_LOAD_CATALOG_ACTION, Events.SHOW_PREFERENCES_ACTION, Events.SHOW_KEYFRAMES_WINDOW_ACTION, Events.SHOW_SLAVE_CONFIG_ACTION, Events.UI_THEME_RELOAD_INFO, Events.MODE_POPUP_CMD, Events.DISPLAY_GUI_CMD, Events.CAMERA_MODE_CMD, Events.UI_RELOAD_CMD, Events.SHOW_INDIVIDUAL_VISIBILITY_ACTION);
     }
 
     public void dispose() {
@@ -287,6 +293,14 @@ public class GuiRegistry implements IObserver {
                     break;
                 case SHOW_PREFERENCES_ACTION:
                     (new PreferencesWindow(ui, skin)).show(ui);
+                    break;
+                case SHOW_INDIVIDUAL_VISIBILITY_ACTION:
+                    if (indVisWindow == null) {
+                        final ISceneGraph sg = GaiaSky.instance.sg;
+                        indVisWindow = new IndividualVisibilityWindow(sg, ui, skin);
+                    }
+                    if (!indVisWindow.isVisible() || !indVisWindow.hasParent())
+                        indVisWindow.show(ui);
                     break;
                 case SHOW_SLAVE_CONFIG_ACTION:
                     if (MasterManager.hasSlaves()) {

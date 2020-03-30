@@ -9,14 +9,17 @@ import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener.ChangeEvent;
 import com.badlogic.gdx.utils.Align;
+import gaiasky.GaiaSky;
 import gaiasky.event.EventManager;
 import gaiasky.event.Events;
 import gaiasky.event.IObserver;
 import gaiasky.interfce.ControlsWindow;
+import gaiasky.interfce.IndividualVisibilityWindow;
 import gaiasky.interfce.KeyBindings;
 import gaiasky.interfce.beans.ComboBoxBean;
 import gaiasky.render.ComponentTypes.ComponentType;
 import gaiasky.render.SceneGraphRenderer;
+import gaiasky.scenegraph.ISceneGraph;
 import gaiasky.util.Constants;
 import gaiasky.util.GlobalConf;
 import gaiasky.util.I18n;
@@ -214,11 +217,24 @@ public class VisibilityComponent extends GuiComponent implements IObserver {
         });
         velocityVectorsEnabled(SceneGraphRenderer.instance.isOn(ComponentType.VelocityVectors));
 
+        // INDIVIDUAL VISIBILITY
+        OwnTextIconButton individualVisibility = new OwnTextIconButton(I18n.txt("gui.visibility.individual"), skin, "eye");
+        individualVisibility.padLeft(space2);
+        individualVisibility.padRight(space2);
+        individualVisibility.addListener(event -> {
+            if(event instanceof ChangeEvent) {
+                EventManager.instance.post(Events.SHOW_INDIVIDUAL_VISIBILITY_ACTION);
+                return true;
+            }
+            return false;
+        });
+
         // Set button width to max width
         visibilityTable.pack();
 
-        visibilityTable.row().padBottom(3 * GlobalConf.UI_SCALE_FACTOR);
-        visibilityTable.add(pmGroup).padTop(4 * GlobalConf.UI_SCALE_FACTOR).align(Align.left).colspan(visTableCols);
+        visibilityTable.left().row();
+        visibilityTable.add(individualVisibility).center().padTop(pad).colspan(visTableCols).row();
+        visibilityTable.add(pmGroup).left().padTop(pad).colspan(visTableCols);
 
         component = visibilityTable;
     }

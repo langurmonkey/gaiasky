@@ -21,6 +21,7 @@ import gaiasky.event.EventManager;
 import gaiasky.event.Events;
 import gaiasky.event.IObserver;
 import gaiasky.interfce.ControlsWindow;
+import gaiasky.interfce.IndividualVisibilityWindow;
 import gaiasky.scenegraph.*;
 import gaiasky.scenegraph.camera.CameraManager.CameraMode;
 import gaiasky.scenegraph.camera.NaturalCamera;
@@ -36,7 +37,6 @@ import java.util.Map;
 
 public class ObjectsComponent extends GuiComponent implements IObserver {
     private static final Log logger = Logger.getLogger(ObjectsComponent.class);
-    boolean list = true;
 
     protected ISceneGraph sg;
 
@@ -191,16 +191,6 @@ public class ObjectsComponent extends GuiComponent implements IObserver {
         focusListScrollPane.setWidth(contentWidth);
 
         /*
-         * MESHES
-         */
-        Group meshesGroup = visibilitySwitcher(MeshObject.class, I18n.txt("gui.meshes"), "meshes");
-
-        /*
-         * CONSTELLATIONS
-         */
-        Group constelGroup = visibilitySwitcher(Constellation.class, I18n.txt("element.constellations"), "constellation");
-
-        /*
          * ADD TO CONTENT
          */
 
@@ -211,113 +201,10 @@ public class ObjectsComponent extends GuiComponent implements IObserver {
         }
         objectsGroup.addActor(infoTable);
 
-        if (meshesGroup != null) {
-            objectsGroup.addActor(meshesGroup);
-        }
-
-        if (constelGroup != null) {
-            objectsGroup.addActor(constelGroup);
-        }
-
         component = objectsGroup;
 
     }
 
-    private Group visibilitySwitcher(Class<? extends FadeNode> clazz, String title, String id) {
-        float componentWidth = 160 * GlobalConf.UI_SCALE_FACTOR;
-        VerticalGroup objectsgroup = new VerticalGroup();
-        objectsgroup.space(space4);
-        objectsgroup.left();
-        objectsgroup.columnLeft();
-        Array<SceneGraphNode> objects = new Array<>();
-        List<OwnCheckBox> cbs = new ArrayList<>();
-        sg.getRoot().getChildrenByType(clazz, objects);
-        Array<String> names = new Array<>(objects.size);
-        Map<String, IVisibilitySwitch> cmap = new HashMap<>();
-
-        for (SceneGraphNode object : objects) {
-            // Omit stars with no proper names
-            if (object.getName() != null && !GlobalResources.isNumeric(object.getName())) {
-                names.add(object.getName());
-                cmap.put(object.getName(), (IVisibilitySwitch) object);
-            }
-        }
-        names.sort();
-
-        for (String name : names) {
-            HorizontalGroup objectHgroup = new HorizontalGroup();
-            objectHgroup.space(space4);
-            objectHgroup.left();
-            OwnCheckBox cb = new OwnCheckBox(name, skin, space4);
-            IVisibilitySwitch obj = cmap.get(name);
-            cb.setChecked(obj.isVisible());
-
-            cb.addListener((event) -> {
-                if (event instanceof ChangeEvent && cmap.containsKey(name)) {
-                    GaiaSky.postRunnable(() -> obj.setVisible(cb.isChecked()));
-                    return true;
-                }
-                return false;
-            });
-
-            objectHgroup.addActor(cb);
-            // Tooltips
-            if (obj.getDescription() != null) {
-                ImageButton meshDescTooltip = new OwnImageButton(skin, "tooltip");
-                meshDescTooltip.addListener(new OwnTextTooltip((obj.getDescription() == null || obj.getDescription().isEmpty() ? "No description" : obj.getDescription()), skin));
-                objectHgroup.addActor(meshDescTooltip);
-            }
-
-            objectsgroup.addActor(objectHgroup);
-            cbs.add(cb);
-        }
-
-        objectsgroup.pack();
-        OwnScrollPane scrollPane = new OwnScrollPane(objectsgroup, skin, "minimalist-nobg");
-        scrollPane.setName(id + " scroll");
-
-        scrollPane.setFadeScrollBars(false);
-        scrollPane.setScrollingDisabled(true, false);
-
-        scrollPane.setHeight(Math.min(100 * GlobalConf.UI_SCALE_FACTOR, objectsgroup.getHeight()));
-        scrollPane.setWidth(componentWidth);
-
-        HorizontalGroup buttons = new HorizontalGroup();
-        buttons.space(space4);
-        OwnTextButton selAll = new OwnTextButton(I18n.txt("gui.select.all"), skin);
-        selAll.pad(space2, space8, space2, space8);
-        selAll.setHeight(18 * GlobalConf.UI_SCALE_FACTOR);
-        selAll.addListener((event) -> {
-            if (event instanceof ChangeEvent) {
-                GaiaSky.postRunnable(() -> cbs.stream().forEach((i) -> i.setChecked(true)));
-                return true;
-            }
-            return false;
-        });
-        OwnTextButton selNone = new OwnTextButton(I18n.txt("gui.select.none"), skin);
-        selNone.pad(space2, space8, space2, space8);
-        selNone.setHeight(18 * GlobalConf.UI_SCALE_FACTOR);
-        selNone.addListener((event) -> {
-            if (event instanceof ChangeEvent) {
-                GaiaSky.postRunnable(() -> cbs.stream().forEach((i) -> i.setChecked(false)));
-                return true;
-            }
-            return false;
-        });
-        buttons.addActor(selAll);
-        buttons.addActor(selNone);
-
-        VerticalGroup group = new VerticalGroup();
-        group.left();
-        group.columnLeft();
-        group.space(space4);
-
-        group.addActor(new OwnLabel(TextUtils.trueCapitalise(title), skin, "header"));
-        group.addActor(scrollPane);
-        group.addActor(buttons);
-
-        return objects.size == 0 ? null : group;
-    }
 
     public void setSceneGraph(ISceneGraph sg) {
         this.sg = sg;

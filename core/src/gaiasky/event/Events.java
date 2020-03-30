@@ -936,6 +936,8 @@ public enum Events {
     SHOW_PLAYCAMERA_ACTION,
 
     SHOW_PREFERENCES_ACTION,
+
+    SHOW_INDIVIDUAL_VISIBILITY_ACTION,
     /**
      * Quit action, can contain optional Runnable to run on accept()
      **/
