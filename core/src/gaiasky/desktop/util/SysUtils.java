@@ -193,7 +193,7 @@ public class SysUtils {
      * @return A pointer to the Gaia Sky mappings directory
      */
     public static Path getDefaultMappingsDir() {
-        return getDataDir().resolve(MAPPINGS_DIR_NAME);
+        return getConfigDir().resolve(MAPPINGS_DIR_NAME);
     }
 
     public static String getMappingsDirName(){
