@@ -207,6 +207,7 @@ public class BookmarksComponent extends GuiComponent implements IObserver {
                                 EventManager.instance.post(Events.CAMERA_MODE_CMD, CameraMode.FOCUS_MODE, true);
                                 EventManager.instance.post(Events.FOCUS_CHANGE_CMD, focus, true);
                             });
+                            info(null, null);
                         } else if (timeOverflow) {
                             info(I18n.txt("gui.objects.search.timerange.1", text), I18n.txt("gui.objects.search.timerange.2"));
                         } else {
@@ -254,7 +255,9 @@ public class BookmarksComponent extends GuiComponent implements IObserver {
             infoMessage2.setText(info2);
             info(true);
         }
+        infoTable.pack();
     }
+
 
     private void info(boolean visible) {
         if (visible) {

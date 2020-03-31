@@ -124,8 +124,8 @@ public class CollapsiblePane extends Table {
         //headerGroupRight.addActor(expandIcon);
         headerGroupRight.addActor(detachIcon);
 
-        headerTable.add(titleGroup).left().padRight(4 * GlobalConf.UI_SCALE_FACTOR);
-        headerTable.add(headerGroupLeft).left().pad(4 * GlobalConf.UI_SCALE_FACTOR);
+        headerTable.add(titleGroup).left().padRight(4f * GlobalConf.UI_SCALE_FACTOR);
+        headerTable.add(headerGroupLeft).left().pad(4f * GlobalConf.UI_SCALE_FACTOR);
         headerTable.add().expandX();
         headerTable.add(headerGroupRight).right();
 
@@ -210,7 +210,10 @@ public class CollapsiblePane extends Table {
         final CollapsibleWindow window = new CollapsibleWindow(labelText, skin);
         window.align(Align.center);
 
-        window.add(content).row();
+        OwnScrollPane contentScroll = new OwnScrollPane(content, skin, "minimalist-nobg");
+        contentScroll.setSize(content.getWidth(), content.getHeight() * 1.1f);
+
+        window.add(contentScroll).pad(5f * GlobalConf.UI_SCALE_FACTOR).row();
 
         /** Close button **/
         OwnTextButton close = new OwnTextButton(I18n.bundle.get("gui.close"), skin, "default");
@@ -229,10 +232,10 @@ public class CollapsiblePane extends Table {
             return false;
         });
         Container<Button> closeContainer = new Container<>(close);
-        close.setSize(70, 20);
+        close.setWidth(70f * GlobalConf.UI_SCALE_FACTOR);
         closeContainer.align(Align.right);
 
-        window.add(closeContainer).pad(5, 0, 0, 0).bottom().right();
+        window.add(closeContainer).pad(5f * GlobalConf.UI_SCALE_FACTOR).bottom().right();
         window.getTitleTable().align(Align.left);
         window.align(Align.left);
         window.pack();
