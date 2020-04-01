@@ -392,6 +392,9 @@ public class KeyBindings {
         // Expand/collapse objects pane
         addAction(new ProgramAction("action.expandcollapse.pane/gui.objects", () -> EventManager.instance.post(Events.TOGGLE_EXPANDCOLLAPSE_PANE_CMD, "ObjectsComponent"), noCleanMode));
 
+        // Expand/collapse bookmarks pane
+        addAction(new ProgramAction("action.expandcollapse.pane/gui.bookmarks", () -> EventManager.instance.post(Events.TOGGLE_EXPANDCOLLAPSE_PANE_CMD, "BookmarksComponent"), noCleanMode));
+
         // Expand/collapse music pane
         addAction(new ProgramAction("action.expandcollapse.pane/gui.music", () -> EventManager.instance.post(Events.TOGGLE_EXPANDCOLLAPSE_PANE_CMD, "MusicComponent"), noCleanMode));
 

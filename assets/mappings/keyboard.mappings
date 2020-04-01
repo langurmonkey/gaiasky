@@ -111,7 +111,7 @@ action.expandcollapse.pane/gui.camera       = ALT_L C
 action.expandcollapse.pane/gui.visibility   = ALT_L V
 action.expandcollapse.pane/gui.lighting     = ALT_L L
 action.expandcollapse.pane/gui.dataset.title= ALT_L D
-action.expandcollapse.pane/gui.objects      = ALT_L O
+action.expandcollapse.pane/gui.bookmarks    = ALT_L B
 action.expandcollapse.pane/gui.music        = ALT_L M
 
 # Master/slave

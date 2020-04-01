@@ -5,7 +5,10 @@
 
 package gaiasky.interfce.components;
 
+import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.Input;
 import com.badlogic.gdx.Input.Keys;
+import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.InputEvent.Type;
@@ -19,6 +22,7 @@ import gaiasky.event.EventManager;
 import gaiasky.event.Events;
 import gaiasky.event.IObserver;
 import gaiasky.interfce.BookmarksManager;
+import gaiasky.interfce.BookmarksManager.BNode;
 import gaiasky.interfce.ControlsWindow;
 import gaiasky.scenegraph.IFocus;
 import gaiasky.scenegraph.ISceneGraph;
@@ -27,22 +31,24 @@ import gaiasky.scenegraph.camera.CameraManager.CameraMode;
 import gaiasky.scenegraph.camera.NaturalCamera;
 import gaiasky.util.*;
 import gaiasky.util.Logger.Log;
-import gaiasky.util.scene2d.OwnLabel;
-import gaiasky.util.scene2d.OwnScrollPane;
-import gaiasky.util.scene2d.OwnTextField;
+import gaiasky.util.scene2d.*;
 
 public class BookmarksComponent extends GuiComponent implements IObserver {
     private static final Log logger = Logger.getLogger(BookmarksComponent.class);
+    static private final Vector2 tmpCoords = new Vector2();
 
     protected ISceneGraph sg;
 
-    protected List<String> bookmarksList;
+    protected Tree<TreeNode, String> bookmarksTree;
     protected TextField searchBox;
     protected OwnScrollPane bookmarksScrollPane;
 
     protected Table infoTable;
     protected Cell infoCell1, infoCell2;
     protected OwnLabel infoMessage1, infoMessage2;
+
+    private boolean events = true;
+    private Actor lastEntered;
 
     public BookmarksComponent(Skin skin, Stage stage) {
         super(skin, stage);
@@ -111,53 +117,66 @@ public class BookmarksComponent extends GuiComponent implements IObserver {
         /*
          * OBJECTS
          */
-
-        logger.info(I18n.txt("notif.sgtree.init"));
-
-        bookmarksList = new List<>(skin);
-        bookmarksList.setName("objects list");
-
-        reloadBookmarks();
-
-        java.util.List<String> bms = BookmarksManager.getBookmarks();
-        Array<String> bookmarks = new Array<>(bms.size());
-        for (String bookmark : bms)
-            bookmarks.add(bookmark);
-
-
-        bookmarksList.setItems(bookmarks);
-        bookmarksList.pack();//
-        bookmarksList.addListener(event -> {
-            if (event instanceof ChangeEvent) {
-                ChangeEvent ce = (ChangeEvent) event;
-                Actor actor = ce.getTarget();
-                @SuppressWarnings("unchecked") final String text = ((List<String>) actor).getSelected().toLowerCase().trim();
-                if (sg.containsNode(text)) {
-                    SceneGraphNode node = sg.getNode(text);
-                    if (node instanceof IFocus) {
-                        IFocus focus = (IFocus) node;
-                        boolean timeOverflow = focus.isCoordinatesTimeOverflow();
-                        boolean ctOn = GaiaSky.instance.isOn(focus.getCt());
-                        if (!timeOverflow && ctOn) {
-                            GaiaSky.postRunnable(() -> {
-                                EventManager.instance.post(Events.CAMERA_MODE_CMD, CameraMode.FOCUS_MODE, true);
-                                EventManager.instance.post(Events.FOCUS_CHANGE_CMD, focus, true);
-                            });
-                        } else if (timeOverflow) {
-                            info(I18n.txt("gui.objects.search.timerange.1", text), I18n.txt("gui.objects.search.timerange.2"));
+        bookmarksTree = new Tree(skin);
+        bookmarksTree.setName("bookmarks tree");
+        reloadBookmarksTree();
+        bookmarksTree.addListener(event -> {
+            if (events)
+                if (event instanceof ChangeEvent) {
+                    ChangeEvent ce = (ChangeEvent) event;
+                    Actor actor = ce.getTarget();
+                    TreeNode selected = (TreeNode) ((Tree) actor).getSelectedNode();
+                    if (!selected.hasChildren()) {
+                        String name = selected.getValue();
+                        if (sg.containsNode(name)) {
+                            SceneGraphNode node = sg.getNode(name);
+                            if (node instanceof IFocus) {
+                                IFocus focus = (IFocus) node;
+                                boolean timeOverflow = focus.isCoordinatesTimeOverflow();
+                                boolean ctOn = GaiaSky.instance.isOn(focus.getCt());
+                                if (!timeOverflow && ctOn) {
+                                    GaiaSky.postRunnable(() -> {
+                                        EventManager.instance.post(Events.CAMERA_MODE_CMD, CameraMode.FOCUS_MODE, true);
+                                        EventManager.instance.post(Events.FOCUS_CHANGE_CMD, focus, true);
+                                    });
+                                    info(null, null);
+                                } else if (timeOverflow) {
+                                    info(I18n.txt("gui.objects.search.timerange.1", name), I18n.txt("gui.objects.search.timerange.2"));
+                                } else {
+                                    info(I18n.txt("gui.objects.search.invisible.1", name), I18n.txt("gui.objects.search.invisible.2", focus.getCt().toString()));
+                                }
+                            }
                         } else {
-                            info(I18n.txt("gui.objects.search.invisible.1", text), I18n.txt("gui.objects.search.invisible.2", focus.getCt().toString()));
+                            info(null, null);
                         }
                     }
-                } else {
-                    info(null, null);
+                    return true;
+                } else if (event instanceof InputEvent) {
+                    InputEvent ie = (InputEvent) event;
+                    ie.toCoordinates(event.getListenerActor(), tmpCoords);
+                    if (ie.getType() == Type.touchDown && ie.getButton() == Input.Buttons.RIGHT) {
+                        TreeNode target = bookmarksTree.getNodeAt(tmpCoords.y);
+                        // Context menu!
+                        if (target != null){
+                            //selectBookmark(target.getValue(), true);
+                            logger.info(target.getValue());
+
+                            GaiaSky.postRunnable(()-> {
+                                ContextMenu cm = new ContextMenu(skin, "default");
+                                MenuItem newFolder = new MenuItem("New folder...", skin);
+                                MenuItem move = new MenuItem("Move " + target.getValue() + "...", skin);
+                                cm.addItem(move);
+                                cm.addItem(newFolder);
+
+                                cm.showMenu(stage, Gdx.input.getX(ie.getPointer()), Gdx.graphics.getHeight() - Gdx.input.getY(ie.getPointer()));
+                            });
+                        }
+                    }
                 }
-                return true;
-            }
             return false;
         });
 
-        bookmarksScrollPane = new OwnScrollPane(bookmarksList, skin, "minimalist-nobg");
+        bookmarksScrollPane = new OwnScrollPane(bookmarksTree, skin, "minimalist-nobg");
         bookmarksScrollPane.setName("bookmarks scroll");
 
         bookmarksScrollPane.setFadeScrollBars(false);
@@ -180,65 +199,73 @@ public class BookmarksComponent extends GuiComponent implements IObserver {
 
     }
 
-    public void reloadBookmarks() {
-        java.util.List<String> bms = BookmarksManager.getBookmarks();
-        Array<String> bookmarks = new Array<>(bms.size());
-        for (String bookmark : bms)
-            bookmarks.add(bookmark);
+    private class TreeNode extends Tree.Node<TreeNode, String, OwnLabel> {
 
-
-        bookmarksList.getSelection().setProgrammaticChangeEvents(false);
-        bookmarksList.setItems(bookmarks);
-        bookmarksList.getSelection().setProgrammaticChangeEvents(true);
-        bookmarksList.pack();//
-        bookmarksList.addListener(event -> {
-            if (event instanceof ChangeEvent) {
-                ChangeEvent ce = (ChangeEvent) event;
-                Actor actor = ce.getTarget();
-                @SuppressWarnings("unchecked") final String text = ((List<String>) actor).getSelected().toLowerCase().trim();
-                if (sg.containsNode(text)) {
-                    SceneGraphNode node = sg.getNode(text);
-                    if (node instanceof IFocus) {
-                        IFocus focus = (IFocus) node;
-                        boolean timeOverflow = focus.isCoordinatesTimeOverflow();
-                        boolean ctOn = GaiaSky.instance.isOn(focus.getCt());
-                        if (!timeOverflow && ctOn) {
-                            GaiaSky.postRunnable(() -> {
-                                EventManager.instance.post(Events.CAMERA_MODE_CMD, CameraMode.FOCUS_MODE, true);
-                                EventManager.instance.post(Events.FOCUS_CHANGE_CMD, focus, true);
-                            });
-                            info(null, null);
-                        } else if (timeOverflow) {
-                            info(I18n.txt("gui.objects.search.timerange.1", text), I18n.txt("gui.objects.search.timerange.2"));
-                        } else {
-                            info(I18n.txt("gui.objects.search.invisible.1", text), I18n.txt("gui.objects.search.invisible.2", focus.getCt().toString()));
-                        }
-                    }
-                } else {
-                    info(null, null);
-                }
-                return true;
-            }
-            return false;
-        });
+        public TreeNode(String text, Skin skin) {
+            super(new OwnLabel(text, skin));
+            setValue(text);
+        }
     }
 
-    public void selectBookmark(String bookmark) {
-        bookmarksList.getSelection().items().clear();
-        if (bookmark != null) {
-            // Select without firing events, do not use set()
-            bookmarksList.getSelection().items().add(bookmark);
+    public void reloadBookmarksTree() {
+        java.util.List<BNode> bms = BookmarksManager.getBookmarks();
+        for (BNode bookmark : bms) {
+            TreeNode node = new TreeNode(bookmark.name, skin);
+            bookmarksTree.add(node);
+            genSubtree(node, bookmark);
+        }
+        bookmarksTree.pack();
+    }
 
-            Array<String> items = bookmarksList.getItems();
-            int itemIdx = items.indexOf(bookmark, false);
-            if (itemIdx >= 0) {
-                bookmarksList.getSelection().setProgrammaticChangeEvents(false);
-                bookmarksList.setSelectedIndex(itemIdx);
-                bookmarksList.getSelection().setProgrammaticChangeEvents(true);
-                float itemHeight = bookmarksList.getItemHeight();
-                bookmarksScrollPane.setScrollY(itemIdx * itemHeight);
+    private void genSubtree(TreeNode parent, BNode bookmark){
+        if(bookmark.children != null && !bookmark.children.isEmpty()){
+            for(BNode child : bookmark.children){
+                TreeNode tn = new TreeNode(child.name, skin);
+                parent.add(tn);
+                genSubtree(tn, child);
             }
         }
+    }
+
+    public void selectBookmark(String bookmark, boolean fire) {
+        if (bookmark != null || bookmarksTree.getSelectedValue() != bookmark) {
+            boolean bkup = events;
+            events = fire;
+            // Select without firing events, do not use set()
+            TreeNode node = bookmarksTree.findNode(bookmark);
+            if (node != null) {
+                bookmarksTree.getSelection().set(node);
+                node.expandTo();
+                scrollTo(node);
+            }
+
+            events = bkup;
+        }
+    }
+
+    private void scrollTo(TreeNode node) {
+        float y = getYPosition(bookmarksTree.getNodes(), node, 0f);
+        bookmarksScrollPane.setScrollY(y);
+    }
+
+    private float getYPosition(Array<TreeNode> nodes, TreeNode node, float accumY) {
+        if (nodes == null || nodes.isEmpty())
+            return accumY;
+
+        for (TreeNode n : nodes) {
+            if (n != node) {
+                accumY += n.getHeight() + bookmarksTree.getYSpacing();
+                if (n.isExpanded()) {
+                    accumY += getYPosition(n.getChildren(), node, 0f);
+                }
+            } else {
+                // Found it!
+                return accumY;
+            }
+            if (n.isAscendantOf(node))
+                break;
+        }
+        return accumY;
     }
 
     public void setSceneGraph(ISceneGraph sg) {
@@ -284,16 +311,16 @@ public class BookmarksComponent extends GuiComponent implements IObserver {
                 // Select only if data[1] is true
                 if (sgn != null) {
                     SceneGraphNode node = (SceneGraphNode) data[0];
-                    selectBookmark(node.getName());
+                    selectBookmark(node.getName(), false);
                 }
                 break;
             case BOOKMARKS_ADD:
-                reloadBookmarks();
-                selectBookmark(((SceneGraphNode) data[0]).getName());
+                reloadBookmarksTree();
+                selectBookmark(((SceneGraphNode) data[0]).getName(), false);
                 break;
             case BOOKMARKS_REMOVE:
-                reloadBookmarks();
-                selectBookmark(null);
+                reloadBookmarksTree();
+                selectBookmark(null, false);
                 break;
             default:
                 break;

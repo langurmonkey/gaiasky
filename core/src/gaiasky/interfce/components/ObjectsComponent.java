@@ -115,8 +115,6 @@ public class ObjectsComponent extends GuiComponent implements IObserver {
         /*
          * OBJECTS
          */
-        logger.info(I18n.txt("notif.sgtree.init"));
-
         final com.badlogic.gdx.scenes.scene2d.ui.List<String> focusList = new com.badlogic.gdx.scenes.scene2d.ui.List<>(skin);
         focusList.setName("objects list");
         Array<IFocus> focusableObjects = sg.getFocusableObjects();
@@ -171,7 +169,6 @@ public class ObjectsComponent extends GuiComponent implements IObserver {
             return false;
         });
         objectsList = focusList;
-        logger.info(I18n.txt("notif.sgtree.initialised"));
 
         focusListScrollPane = new OwnScrollPane(objectsList, skin, "minimalist-nobg");
         focusListScrollPane.setName("objects list scroll");
