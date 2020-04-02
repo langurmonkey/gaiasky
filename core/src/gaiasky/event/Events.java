@@ -87,8 +87,10 @@ public enum Events {
 
     /** Add bookmark. Contains the object **/
     BOOKMARKS_ADD,
-    /** Remove bookmark. Contains the object **/
+    /** Remove bookmark. Contains the object and a boolean indicating if this is a folder **/
     BOOKMARKS_REMOVE,
+    /** Moves the bookmark 1 to a child of bookmark 2 **/
+    BOOKMARKS_MOVE,
 
     /**
      * Empty event which informs that background loading is active

@@ -146,12 +146,13 @@ public class FocusInfoInterface extends TableGuiInterface implements IObserver {
 
         // Bookmark
         bookmark = new OwnImageButton(skin, "bookmark");
+        bookmark.addListener(new OwnTextTooltip(I18n.txt("gui.bookmark"), skin));
         bookmark.addListener(event -> {
             if (currentFocus != null && event instanceof ChangeEvent) {
                 if (bookmark.isChecked())
-                    EventManager.instance.post(Events.BOOKMARKS_ADD, currentFocus);
+                    EventManager.instance.post(Events.BOOKMARKS_ADD, currentFocus.getName(), false);
                 else
-                    EventManager.instance.post(Events.BOOKMARKS_REMOVE, currentFocus);
+                    EventManager.instance.post(Events.BOOKMARKS_REMOVE, currentFocus.getName());
             }
             return false;
         });
@@ -399,7 +400,7 @@ public class FocusInfoInterface extends TableGuiInterface implements IObserver {
 
                 // Bookmark
                 bookmark.setProgrammaticChangeEvents(false);
-                bookmark.setChecked(BookmarksManager.instance().isBookmark(currentFocus.getName()));
+                bookmark.setChecked(BookmarksManager.instance().containsName(currentFocus.getName()));
                 bookmark.setProgrammaticChangeEvents(true);
 
                 // Id, names

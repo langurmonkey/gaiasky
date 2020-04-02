@@ -711,8 +711,10 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
 
     @Override
     public void dispose() {
-        if (saveState)
+        if (saveState) {
             ConfInit.instance.persistGlobalConf(new File(System.getProperty("properties.file")));
+            BookmarksManager.instance.persistBookmarks();
+        }
 
         if (vrContext != null)
             vrContext.dispose();

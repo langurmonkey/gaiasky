@@ -39,7 +39,7 @@ public class SearchDialog extends GenericDialog {
     private ISceneGraph sg;
 
     public SearchDialog(Skin skin, Stage ui,  final ISceneGraph sg) {
-        super(I18n.bundle.get("gui.objects.search"), skin, ui);
+        super(I18n.txt("gui.objects.search"), skin, ui);
         this.sg = sg;
 
         setAcceptText(I18n.txt("gui.close"));
@@ -54,7 +54,7 @@ public class SearchDialog extends GenericDialog {
         // Info message
         searchInput = new OwnTextField("", skin);
         searchInput.setWidth(300 * GlobalConf.UI_SCALE_FACTOR);
-        searchInput.setMessageText(I18n.bundle.get("gui.objects.search"));
+        searchInput.setMessageText(I18n.txt("gui.objects.search"));
         searchInput.addListener(event -> {
             if (event instanceof InputEvent) {
                 InputEvent ie = (InputEvent) event;

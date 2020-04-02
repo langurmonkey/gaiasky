@@ -15,6 +15,7 @@ import com.badlogic.gdx.scenes.scene2d.InputEvent.Type;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener.ChangeEvent;
+import com.badlogic.gdx.scenes.scene2d.utils.Drawable;
 import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.Array;
 import gaiasky.GaiaSky;
@@ -24,6 +25,8 @@ import gaiasky.event.IObserver;
 import gaiasky.interfce.BookmarksManager;
 import gaiasky.interfce.BookmarksManager.BNode;
 import gaiasky.interfce.ControlsWindow;
+import gaiasky.interfce.GenericDialog;
+import gaiasky.interfce.NewBookmarkFolderDialog;
 import gaiasky.scenegraph.IFocus;
 import gaiasky.scenegraph.ISceneGraph;
 import gaiasky.scenegraph.SceneGraphNode;
@@ -32,6 +35,8 @@ import gaiasky.scenegraph.camera.NaturalCamera;
 import gaiasky.util.*;
 import gaiasky.util.Logger.Log;
 import gaiasky.util.scene2d.*;
+
+import java.util.List;
 
 public class BookmarksComponent extends GuiComponent implements IObserver {
     private static final Log logger = Logger.getLogger(BookmarksComponent.class);
@@ -126,7 +131,7 @@ public class BookmarksComponent extends GuiComponent implements IObserver {
                     ChangeEvent ce = (ChangeEvent) event;
                     Actor actor = ce.getTarget();
                     TreeNode selected = (TreeNode) ((Tree) actor).getSelectedNode();
-                    if (!selected.hasChildren()) {
+                    if (selected != null && !selected.hasChildren()) {
                         String name = selected.getValue();
                         if (sg.containsNode(name)) {
                             SceneGraphNode node = sg.getNode(name);
@@ -157,16 +162,70 @@ public class BookmarksComponent extends GuiComponent implements IObserver {
                     if (ie.getType() == Type.touchDown && ie.getButton() == Input.Buttons.RIGHT) {
                         TreeNode target = bookmarksTree.getNodeAt(tmpCoords.y);
                         // Context menu!
-                        if (target != null){
+                        if (target != null) {
                             //selectBookmark(target.getValue(), true);
                             logger.info(target.getValue());
 
-                            GaiaSky.postRunnable(()-> {
+                            GaiaSky.postRunnable(() -> {
                                 ContextMenu cm = new ContextMenu(skin, "default");
-                                MenuItem newFolder = new MenuItem("New folder...", skin);
-                                MenuItem move = new MenuItem("Move " + target.getValue() + "...", skin);
-                                cm.addItem(move);
+                                // New folder...
+                                BNode parent = target.node.getFirstFolderAncestor();
+                                String parentName = "/" + (parent == null ? "" : parent.path.toString());
+                                MenuItem newFolder = new MenuItem(I18n.txt("gui.bookmark.context.newfolder", parentName), skin);
+                                newFolder.addListener(evt -> {
+                                    if (evt instanceof ChangeEvent) {
+                                        NewBookmarkFolderDialog nbfd = new NewBookmarkFolderDialog(parent.path.toString(), skin, stage);
+                                        nbfd.setAcceptRunnable(() -> {
+                                            String folderName = nbfd.input.getText();
+                                            EventManager.instance.post(Events.BOOKMARKS_ADD, parent.path.resolve(folderName).toString(), true);
+                                            reloadBookmarksTree();
+                                        });
+                                        nbfd.show(stage);
+                                        return true;
+                                    }
+                                    return false;
+                                });
                                 cm.addItem(newFolder);
+                                // Delete
+                                MenuItem delete = new MenuItem(I18n.txt("gui.bookmark.context.delete", target.getValue()), skin);
+                                delete.addListener(evt -> {
+                                    if (evt instanceof ChangeEvent) {
+                                        EventManager.instance.post(Events.BOOKMARKS_REMOVE, target.node.path.toString());
+                                        reloadBookmarksTree();
+                                        return true;
+                                    }
+                                    return false;
+                                });
+                                cm.addItem(delete);
+
+                                cm.add(new Separator(skin, "menu")).padTop(2).padBottom(2).fill().expand().row();
+                                // Move to...
+                                MenuItem move = new MenuItem(I18n.txt("gui.bookmark.context.move", target.getValue(), "/"), skin);
+                                move.addListener(evt -> {
+                                    if (evt instanceof ChangeEvent) {
+                                        EventManager.instance.post(Events.BOOKMARKS_MOVE, target.node, null);
+                                        reloadBookmarksTree();
+                                        return true;
+                                    }
+                                    return false;
+                                });
+                                cm.addItem(move);
+                                List<BNode> folders = BookmarksManager.instance.getFolders();
+                                for (BNode folder : folders) {
+                                    if (!target.node.isDescendantOf(folder)) {
+                                        MenuItem mv = new MenuItem(I18n.txt("gui.bookmark.context.move", target.getValue(), "/" + folder.path.toString()), skin);
+                                        mv.addListener(evt -> {
+                                            if (evt instanceof ChangeEvent) {
+                                                EventManager.instance.post(Events.BOOKMARKS_MOVE, target.node, folder);
+                                                reloadBookmarksTree();
+                                                return true;
+                                            }
+                                            return false;
+                                        });
+                                        cm.addItem(mv);
+                                    }
+                                }
+
 
                                 cm.showMenu(stage, Gdx.input.getX(ie.getPointer()), Gdx.graphics.getHeight() - Gdx.input.getY(ie.getPointer()));
                             });
@@ -200,27 +259,30 @@ public class BookmarksComponent extends GuiComponent implements IObserver {
     }
 
     private class TreeNode extends Tree.Node<TreeNode, String, OwnLabel> {
+        public BNode node;
 
-        public TreeNode(String text, Skin skin) {
-            super(new OwnLabel(text, skin));
-            setValue(text);
+        public TreeNode(BNode node, Skin skin) {
+            super(new OwnLabel(node.name, skin));
+            this.node = node;
+            setValue(node.name);
         }
     }
 
     public void reloadBookmarksTree() {
         java.util.List<BNode> bms = BookmarksManager.getBookmarks();
+        bookmarksTree.clearChildren();
         for (BNode bookmark : bms) {
-            TreeNode node = new TreeNode(bookmark.name, skin);
+            TreeNode node = new TreeNode(bookmark, skin);
             bookmarksTree.add(node);
             genSubtree(node, bookmark);
         }
         bookmarksTree.pack();
     }
 
-    private void genSubtree(TreeNode parent, BNode bookmark){
-        if(bookmark.children != null && !bookmark.children.isEmpty()){
-            for(BNode child : bookmark.children){
-                TreeNode tn = new TreeNode(child.name, skin);
+    private void genSubtree(TreeNode parent, BNode bookmark) {
+        if (bookmark.children != null && !bookmark.children.isEmpty()) {
+            for (BNode child : bookmark.children) {
+                TreeNode tn = new TreeNode(child, skin);
                 parent.add(tn);
                 genSubtree(tn, child);
             }
@@ -315,8 +377,9 @@ public class BookmarksComponent extends GuiComponent implements IObserver {
                 }
                 break;
             case BOOKMARKS_ADD:
+                String name = (String) data[0];
                 reloadBookmarksTree();
-                selectBookmark(((SceneGraphNode) data[0]).getName(), false);
+                selectBookmark(name, false);
                 break;
             case BOOKMARKS_REMOVE:
                 reloadBookmarksTree();
