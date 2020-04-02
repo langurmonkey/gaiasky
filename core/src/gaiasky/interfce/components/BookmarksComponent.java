@@ -39,7 +39,6 @@ import gaiasky.util.scene2d.*;
 import java.util.List;
 
 public class BookmarksComponent extends GuiComponent implements IObserver {
-    private static final Log logger = Logger.getLogger(BookmarksComponent.class);
     static private final Vector2 tmpCoords = new Vector2();
 
     protected ISceneGraph sg;
@@ -167,8 +166,6 @@ public class BookmarksComponent extends GuiComponent implements IObserver {
                         // Context menu!
                         if (target != null) {
                             //selectBookmark(target.getValue(), true);
-                            logger.info(target.getValue());
-
                             GaiaSky.postRunnable(() -> {
                                 ContextMenu cm = new ContextMenu(skin, "default");
                                 // New folder...
@@ -232,6 +229,29 @@ public class BookmarksComponent extends GuiComponent implements IObserver {
 
                                 cm.showMenu(stage, Gdx.input.getX(ie.getPointer()), Gdx.graphics.getHeight() - Gdx.input.getY(ie.getPointer()));
                             });
+                        } else {
+                            // New folder
+                            GaiaSky.postRunnable(() -> {
+                                ContextMenu cm = new ContextMenu(skin, "default");
+                                // New folder...
+                                String parentName = "/";
+                                MenuItem newFolder = new MenuItem(I18n.txt("gui.bookmark.context.newfolder", parentName), skin);
+                                newFolder.addListener(evt -> {
+                                    if (evt instanceof ChangeEvent) {
+                                        NewBookmarkFolderDialog nbfd = new NewBookmarkFolderDialog("/", skin, stage);
+                                        nbfd.setAcceptRunnable(() -> {
+                                            String folderName = nbfd.input.getText();
+                                            EventManager.instance.post(Events.BOOKMARKS_ADD, folderName, true);
+                                            reloadBookmarksTree();
+                                        });
+                                        nbfd.show(stage);
+                                        return true;
+                                    }
+                                    return false;
+                                });
+                                cm.addItem(newFolder);
+                                cm.showMenu(stage, Gdx.input.getX(ie.getPointer()), Gdx.graphics.getHeight() - Gdx.input.getY(ie.getPointer()));
+                            });
                         }
                     }
                 }
@@ -276,7 +296,7 @@ public class BookmarksComponent extends GuiComponent implements IObserver {
         bookmarksTree.clearChildren();
         for (BNode bookmark : bms) {
             TreeNode node = new TreeNode(bookmark, skin);
-            if(bookmark.folder)
+            if (bookmark.folder)
                 node.setIcon(folderIcon);
             else
                 node.setIcon(bookmarkIcon);
@@ -291,7 +311,7 @@ public class BookmarksComponent extends GuiComponent implements IObserver {
         if (bookmark.children != null && !bookmark.children.isEmpty()) {
             for (BNode child : bookmark.children) {
                 TreeNode tn = new TreeNode(child, skin);
-                if(child.folder)
+                if (child.folder)
                     tn.setIcon(folderIcon);
                 else
                     tn.setIcon(bookmarkIcon);
