@@ -207,7 +207,7 @@ public abstract class AbstractPositionEntity extends SceneGraphNode {
 
     /**
      * Returns the absolute position of this entity in the native coordinates
-     * (equatorial system)
+     * (equatorial system) and internal units
      *
      * @param out Auxiliary vector to put the result in
      * @return The vector with the position

@@ -53,10 +53,13 @@ public class BookmarksComponent extends GuiComponent implements IObserver {
     protected OwnLabel infoMessage1, infoMessage2;
 
     private boolean events = true;
-    private Actor lastEntered;
+
+    private Drawable folderIcon, bookmarkIcon;
 
     public BookmarksComponent(Skin skin, Stage stage) {
         super(skin, stage);
+        folderIcon = skin.getDrawable("iconic-folder-small");
+        bookmarkIcon = skin.getDrawable("iconic-bookmark-small");
         EventManager.instance.subscribe(this, Events.FOCUS_CHANGED, Events.BOOKMARKS_ADD, Events.BOOKMARKS_REMOVE);
     }
 
@@ -273,6 +276,10 @@ public class BookmarksComponent extends GuiComponent implements IObserver {
         bookmarksTree.clearChildren();
         for (BNode bookmark : bms) {
             TreeNode node = new TreeNode(bookmark, skin);
+            if(bookmark.folder)
+                node.setIcon(folderIcon);
+            else
+                node.setIcon(bookmarkIcon);
             bookmarksTree.add(node);
             genSubtree(node, bookmark);
         }
@@ -280,9 +287,14 @@ public class BookmarksComponent extends GuiComponent implements IObserver {
     }
 
     private void genSubtree(TreeNode parent, BNode bookmark) {
+        Drawable folderDrawable = skin.getDrawable("open");
         if (bookmark.children != null && !bookmark.children.isEmpty()) {
             for (BNode child : bookmark.children) {
                 TreeNode tn = new TreeNode(child, skin);
+                if(child.folder)
+                    tn.setIcon(folderIcon);
+                else
+                    tn.setIcon(bookmarkIcon);
                 parent.add(tn);
                 genSubtree(tn, child);
             }

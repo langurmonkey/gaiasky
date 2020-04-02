@@ -391,21 +391,21 @@ default-window
   index: -1
 detach-disabled-icon
   rotate: false
-  xy: 676, 223
+  xy: 712, 223
   size: 13, 13
   orig: 13, 13
   offset: 0, 0
   index: -1
 detach-icon
   rotate: false
-  xy: 691, 223
+  xy: 727, 223
   size: 13, 13
   orig: 13, 13
   offset: 0, 0
   index: -1
 disabled-icon
   rotate: false
-  xy: 706, 223
+  xy: 742, 223
   size: 13, 13
   orig: 13, 13
   offset: 0, 0
@@ -984,6 +984,13 @@ iconic-bookmark
   orig: 26, 26
   offset: 0, 0
   index: -1
+iconic-bookmark-small
+  rotate: false
+  xy: 676, 220
+  size: 16, 16
+  orig: 16, 16
+  offset: 0, 0
+  index: -1
 iconic-box
   rotate: false
   xy: 100, 95
@@ -1514,6 +1521,13 @@ iconic-folder
   xy: 368, 167
   size: 26, 26
   orig: 26, 26
+  offset: 0, 0
+  index: -1
+iconic-folder-small
+  rotate: false
+  xy: 694, 220
+  size: 16, 16
+  orig: 16, 16
   offset: 0, 0
   index: -1
 iconic-fork
@@ -2395,7 +2409,7 @@ map-icon
   index: -1
 minus-icon
   rotate: false
-  xy: 721, 223
+  xy: 757, 223
   size: 13, 13
   orig: 13, 13
   offset: 0, 0
@@ -2437,7 +2451,7 @@ play-icon
   index: -1
 plus-icon
   rotate: false
-  xy: 736, 223
+  xy: 772, 223
   size: 13, 13
   orig: 13, 13
   offset: 0, 0
@@ -2694,7 +2708,7 @@ script-stop
   index: -1
 scrollbar-bg
   rotate: false
-  xy: 781, 225
+  xy: 817, 225
   size: 13, 11
   split: 3, 3, 3, 3
   orig: 13, 11
@@ -2702,7 +2716,7 @@ scrollbar-bg
   index: -1
 scrollbar-knob
   rotate: false
-  xy: 796, 225
+  xy: 832, 225
   size: 10, 11
   split: 3, 3, 3, 3
   orig: 10, 11
@@ -2752,7 +2766,7 @@ separator-menu
   index: -1
 sub-menu
   rotate: false
-  xy: 808, 225
+  xy: 844, 225
   size: 6, 11
   orig: 6, 11
   offset: 0, 0
@@ -2838,14 +2852,14 @@ white
   index: -1
 window-collapse
   rotate: false
-  xy: 751, 223
+  xy: 787, 223
   size: 13, 13
   orig: 13, 13
   offset: 0, 0
   index: -1
 window-expand
   rotate: false
-  xy: 766, 223
+  xy: 802, 223
   size: 13, 13
   orig: 13, 13
   offset: 0, 0

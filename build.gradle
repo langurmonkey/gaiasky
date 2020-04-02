@@ -118,7 +118,7 @@ project(":core") {
         // *****************************
         // GENERATE SKINS (PackTextures)
         // *****************************
-        //implementation "com.badlogicgames.gdx:gdx-tools:$gdxVersion"
+        implementation "com.badlogicgames.gdx:gdx-tools:$gdxVersion"
 
         // ************
         // REGULAR DEPS
