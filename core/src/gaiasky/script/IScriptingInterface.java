@@ -1334,6 +1334,16 @@ public interface IScriptingInterface {
     void cameraTransition(double[] camPos, double[] camDir, double[] camUp, double seconds);
 
     /**
+     * Same as {@link IScriptingInterface#cameraTransition(double[], double[], double[], double)} but the
+     * camera position is given in Km.
+     * @param camPos The target camera position in Km.
+     * @param camDir The target camera direction vector.
+     * @param camUp The target camera up vector.
+     * @param seconds The duration of the transition in seconds.
+     */
+    void cameraTransitionKm(double[] camPos, double[] camDir, double[] camUp, double seconds);
+
+    /**
      * Creates a smooth transition from the current camera state to the given camera state {camPos, camDir, camUp} in
      * the given number of seconds. Optionally, the transition may be run synchronously or asynchronously to the
      * current script.
@@ -2051,6 +2061,13 @@ public interface IScriptingInterface {
      */
     double internalUnitsToKilometres(double internalUnits);
 
+    /**
+     * Converts the array in internal units to Kilometers.
+     *
+     * @param internalUnits The array in internal units.
+     * @return The array in Kilometers.
+     */
+    double[] internalUnitsToKilometres(double[] internalUnits);
     /**
      * Converts the metres to internal units.
      *

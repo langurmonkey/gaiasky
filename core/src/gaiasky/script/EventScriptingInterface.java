@@ -1717,6 +1717,19 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
     }
 
     @Override
+    public void cameraTransitionKm(double[] camPos, double[] camDir, double[] camUp, double seconds) {
+        cameraTransition(internalUnitsToKilometres(camPos), camDir, camUp, seconds, true);
+    }
+
+    public void cameraTransitionKm(List camPos, List camDir, List camUp, double seconds) {
+        cameraTransitionKm(dArray(camPos), dArray(camDir), dArray(camUp), seconds);
+    }
+
+    public void cameraTransitionKm(List camPos, List camDir, List camUp, long seconds) {
+        cameraTransitionKm(camPos, camDir, camUp, (double) seconds);
+    }
+
+    @Override
     public void cameraTransition(double[] camPos, double[] camDir, double[] camUp, double seconds) {
         cameraTransition(camPos, camDir, camUp, seconds, true);
     }
@@ -2634,6 +2647,23 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
     @Override
     public double internalUnitsToKilometres(double internalUnits) {
         return internalUnits * Constants.U_TO_KM;
+    }
+
+    @Override
+    public double[] internalUnitsToKilometres(double[] internalUnits) {
+        double[] result = new double[internalUnits.length];
+        for(int i = 0; i < internalUnits.length; i++){
+            result[i] = internalUnitsToKilometres(internalUnits[i]);
+        }
+        return result;
+    }
+
+    public double[] internalUnitsToKilometres(List internalUnits) {
+        double[] result = new double[internalUnits.size()];
+        for(int i = 0; i < internalUnits.size(); i++){
+            result[i] = internalUnitsToKilometres((double) internalUnits.get(i));
+        }
+        return result;
     }
 
     @Override
