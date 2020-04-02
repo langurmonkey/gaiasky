@@ -890,7 +890,14 @@ public class ParticleGroup extends FadeNode implements I3DTextRenderable, IFocus
     }
 
     public Vector3d getAbsolutePosition(String name, Vector3d out) {
-        return getAbsolutePosition(out);
+        if (index.containsKey(name)) {
+            int idx = index.get(name, 0);
+            ParticleBean pb = pointData.get(idx);
+            out.set(pb.x(), pb.y(), pb.z());
+            return out;
+        } else {
+            return null;
+        }
     }
 
     // Same position
