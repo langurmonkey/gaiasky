@@ -107,7 +107,7 @@ public class SphericalGrid extends BackgroundModel implements IAnnotationsRender
             if (auxf.dot(camera.getCamera().direction.nor()) > 0) {
                 auxf.add(camera.getCamera().position).scl((float) Constants.DISTANCE_SCALE_FACTOR).add(vroffset);
                 camera.getCamera().project(auxf);
-                font.draw(spriteBatch, Integer.toString(angle), auxf.x, auxf.y);
+                font.draw(spriteBatch, angle(angle), auxf.x, auxf.y);
             }
 
         }
@@ -120,18 +120,25 @@ public class SphericalGrid extends BackgroundModel implements IAnnotationsRender
                 if (auxf.dot(camera.getCamera().direction.nor()) > 0) {
                     auxf.add(camera.getCamera().position).scl((float) Constants.DISTANCE_SCALE_FACTOR).add(vroffset);
                     camera.getCamera().project(auxf);
-                    font.draw(spriteBatch, Integer.toString(angle), auxf.x, auxf.y);
+                    font.draw(spriteBatch, angleSign(angle), auxf.x, auxf.y);
                 }
                 auxf.set(Coordinates.sphericalToCartesian(0, Math.toRadians(-angle), -1f, auxd).valuesf()).mul(annotTransform).nor();
                 effectsPos(auxf, camera);
                 if (auxf.dot(camera.getCamera().direction.nor()) > 0) {
                     auxf.add(camera.getCamera().position).scl((float) Constants.DISTANCE_SCALE_FACTOR).add(vroffset);
                     camera.getCamera().project(auxf);
-                    font.draw(spriteBatch, Integer.toString(angle), auxf.x, auxf.y);
+                    font.draw(spriteBatch, angleSign(angle), auxf.x, auxf.y);
                 }
             }
         }
 
+    }
+
+    private String angle(int angle){
+        return angle + "°";
+    }
+    private String angleSign(int angle){
+        return (angle >= 0 ? "+" : "-") + Math.abs(angle) + "°";
     }
 
     private void effectsPos(Vector3 auxf, ICamera camera) {
