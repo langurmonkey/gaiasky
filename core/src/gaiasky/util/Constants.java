@@ -159,9 +159,9 @@ public class Constants {
     public static final int MAX_MOTION_BLUR = 85;
 
     /** Maximum fov value, in degrees **/
-    public static final int MAX_FOV = 95;
+    public static final float MAX_FOV = 95f;
     /** Minimum fov value, in degrees **/
-    public static final int MIN_FOV = 2;
+    public static final float MIN_FOV = 2f;
 
     /** Maximum camera speed **/
     public static final float MAX_CAM_SPEED = 10f;

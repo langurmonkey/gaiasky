@@ -24,9 +24,7 @@ import gaiasky.util.scene2d.OwnSliderPlus;
 
 public class VisualEffectsComponent extends GuiComponent implements IObserver {
 
-    protected OwnSliderPlus starBrightness, starSize, starOpacity, ambientLight, labelSize, lineWidth, elevMult;
-
-    protected INumberFormat nf;
+    private OwnSliderPlus starBrightness, starSize, starOpacity, ambientLight, labelSize, lineWidth, elevMult;
 
     boolean flag = true;
 
@@ -34,13 +32,12 @@ public class VisualEffectsComponent extends GuiComponent implements IObserver {
 
     public VisualEffectsComponent(Skin skin, Stage stage) {
         super(skin, stage);
-        this.nf = NumberFormatFactory.getFormatter("#0.0");
     }
 
     public void initialize() {
         float contentWidth = ControlsWindow.getContentWidth();
         /** Star brightness **/
-        starBrightness = new OwnSliderPlus(I18n.txt("gui.starbrightness"), Constants.MIN_SLIDER, Constants.MAX_SLIDER, Constants.SLIDER_STEP, Constants.MIN_STAR_BRIGHT, Constants.MAX_STAR_BRIGHT, skin);
+        starBrightness = new OwnSliderPlus(I18n.txt("gui.starbrightness"), Constants.MIN_SLIDER, Constants.MAX_SLIDER, Constants.SLIDER_STEP_SMALL, Constants.MIN_STAR_BRIGHT, Constants.MAX_STAR_BRIGHT, skin);
         starBrightness.setName("star brightness");
         starBrightness.setWidth(contentWidth);
         starBrightness.setMappedValue(GlobalConf.scene.STAR_BRIGHTNESS);

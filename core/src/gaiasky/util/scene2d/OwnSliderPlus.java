@@ -23,7 +23,7 @@ public class OwnSliderPlus extends Slider {
     private float mapMin, mapMax;
     private boolean map = false;
     private Skin skin;
-    private OwnLabel title, value;
+    private OwnLabel titleLabel, valueLabel;
     private boolean displayValueMapped = false;
     private String valuePrefix, valueSuffix;
     private float padX = 3f * GlobalConf.UI_SCALE_FACTOR;
@@ -63,15 +63,15 @@ public class OwnSliderPlus extends Slider {
         setMapValues(mapMin, mapMax);
 
         if (title != null && !title.isEmpty()) {
-            this.title = new OwnLabel(title, skin);
+            this.titleLabel = new OwnLabel(title, skin);
         } else {
-            this.title = null;
+            this.titleLabel = null;
         }
 
-        this.value = new OwnLabel(getValueString(), skin);
+        this.valueLabel = new OwnLabel(getValueString(), skin);
         this.addListener((event) -> {
             if (event instanceof ChangeEvent) {
-                this.value.setText(getValueString());
+                this.valueLabel.setText(getValueString());
                 return true;
             }
             return false;
@@ -170,13 +170,13 @@ public class OwnSliderPlus extends Slider {
     @Override
     public void draw(Batch batch, float parentAlpha) {
         super.draw(batch, parentAlpha);
-        if (title != null) {
-            title.setPosition(getX() + padX, getY() + padY);
-            title.draw(batch, parentAlpha);
+        if (titleLabel != null) {
+            titleLabel.setPosition(getX() + padX, getY() + padY);
+            titleLabel.draw(batch, parentAlpha);
         }
-        if (value != null) {
-            value.setPosition(getX() + getPrefWidth() - (value.getPrefWidth() + padX * 2f), getY() + padY);
-            value.draw(batch, parentAlpha);
+        if (valueLabel != null) {
+            valueLabel.setPosition(getX() + getPrefWidth() - (valueLabel.getPrefWidth() + padX * 2f), getY() + padY);
+            valueLabel.draw(batch, parentAlpha);
         }
     }
 

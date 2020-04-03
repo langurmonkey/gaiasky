@@ -1597,7 +1597,7 @@ public class GlobalConf {
             case FOV_CHANGED_CMD:
                 if (!SlaveManager.projectionActive()) {
                     boolean checkMax = data.length == 1 || (boolean) data[1];
-                    CAMERA_FOV = MathUtilsd.clamp(((Float) data[0]).intValue(), Constants.MIN_FOV, checkMax ? Constants.MAX_FOV : 179);
+                    CAMERA_FOV = MathUtilsd.clamp((Float) data[0], Constants.MIN_FOV, checkMax ? Constants.MAX_FOV : 179f);
                 }
                 break;
             case PM_NUM_FACTOR_CMD:

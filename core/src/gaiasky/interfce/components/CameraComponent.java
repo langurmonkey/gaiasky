@@ -18,6 +18,8 @@ import gaiasky.interfce.KeyBindings;
 import gaiasky.interfce.beans.CameraComboBoxBean;
 import gaiasky.scenegraph.camera.CameraManager.CameraMode;
 import gaiasky.util.*;
+import gaiasky.util.format.INumberFormat;
+import gaiasky.util.format.NumberFormatFactory;
 import gaiasky.util.gdx.contrib.postprocess.effects.CubemapProjections.CubemapProjection;
 import gaiasky.util.scene2d.*;
 
@@ -37,7 +39,6 @@ public class CameraComponent extends GuiComponent implements IObserver {
 
     public CameraComponent(Skin skin, Stage stage) {
         super(skin, stage);
-        EventManager.instance.subscribe(this, Events.CAMERA_MODE_CMD, Events.ROTATION_SPEED_CMD, Events.TURNING_SPEED_CMD, Events.CAMERA_SPEED_CMD, Events.SPEED_LIMIT_CMD, Events.STEREOSCOPIC_CMD, Events.FOV_CHANGE_NOTIFICATION, Events.CUBEMAP_CMD, Events.CAMERA_CINEMATIC_CMD, Events.ORIENTATION_LOCK_CMD, Events.PLANETARIUM_CMD);
     }
 
     @Override
@@ -77,7 +78,6 @@ public class CameraComponent extends GuiComponent implements IObserver {
         });
 
         List<Button> buttonList = new ArrayList<>();
-       // Group<Button> buttonGroup = new Group<>();
 
         Image icon3d = new Image(skin.getDrawable("3d-icon"));
         button3d = new OwnTextIconButton("", icon3d, skin, "toggle");
@@ -164,7 +164,7 @@ public class CameraComponent extends GuiComponent implements IObserver {
         if(GlobalConf.program.isMaster())
             buttonList.add(buttonMaster);
 
-        fieldOfView = new OwnSliderPlus(I18n.txt("gui.camera.fov"), Constants.MIN_FOV, Constants.MAX_FOV, Constants.SLIDER_STEP, false, skin);
+        fieldOfView = new OwnSliderPlus(I18n.txt("gui.camera.fov"), Constants.MIN_FOV, Constants.MAX_FOV, Constants.SLIDER_STEP_SMALL, false, skin);
         fieldOfView.setValueSuffix("°");
         fieldOfView.setName("field of view");
         fieldOfView.setWidth(contentWidth);
@@ -307,6 +307,7 @@ public class CameraComponent extends GuiComponent implements IObserver {
         component = cameraGroup;
 
         cameraGroup.pack();
+        EventManager.instance.subscribe(this, Events.CAMERA_MODE_CMD, Events.ROTATION_SPEED_CMD, Events.TURNING_SPEED_CMD, Events.CAMERA_SPEED_CMD, Events.SPEED_LIMIT_CMD, Events.STEREOSCOPIC_CMD, Events.FOV_CHANGE_NOTIFICATION, Events.CUBEMAP_CMD, Events.CAMERA_CINEMATIC_CMD, Events.ORIENTATION_LOCK_CMD, Events.PLANETARIUM_CMD);
     }
 
     @Override
