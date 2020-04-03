@@ -85,10 +85,12 @@ public enum Events {
      **/
     ANTIALIASING_CMD,
 
-    /** Add bookmark. Contains the object **/
+    /** Add bookmark. Contains the path and a boolean indicating if it is a folder **/
     BOOKMARKS_ADD,
-    /** Remove bookmark. Contains the object and a boolean indicating if this is a folder **/
+    /** Remove bookmark. Contains the path to remove **/
     BOOKMARKS_REMOVE,
+    /** Remove all bookmarks with the given name, irrespective of the path. **/
+    BOOKMARKS_REMOVE_ALL,
     /** Moves the bookmark 1 to a child of bookmark 2 **/
     BOOKMARKS_MOVE,
 

@@ -108,7 +108,7 @@ public class BookmarksManager implements IObserver {
 
     private BookmarksManager() {
         initDefault();
-        EventManager.instance.subscribe(this, Events.BOOKMARKS_ADD, Events.BOOKMARKS_REMOVE, Events.BOOKMARKS_MOVE);
+        EventManager.instance.subscribe(this, Events.BOOKMARKS_ADD, Events.BOOKMARKS_REMOVE, Events.BOOKMARKS_REMOVE_ALL, Events.BOOKMARKS_MOVE);
     }
 
     private void initDefault() {
@@ -306,9 +306,9 @@ public class BookmarksManager implements IObserver {
      * Remove all bookmarks with the given name.
      *
      * @param name The name to remove.
-     * @return True if removed one or more bookmarks.
+     * @return Number of removed bookmarks.
      */
-    public synchronized boolean removeBookmarksByName(String name) {
+    public synchronized int removeBookmarksByName(String name) {
         int nRemoved = 0;
         if (bookmarks != null && !bookmarks.isEmpty()) {
             Iterator<BNode> it = bookmarks.iterator();
@@ -324,9 +324,9 @@ public class BookmarksManager implements IObserver {
                     nRemoved += removeBookmarksByNameRec(name, bookmark, it);
                 }
             }
-            return nRemoved > 0;
+            return nRemoved;
         }
-        return false;
+        return 0;
     }
 
     private synchronized int removeBookmarksByNameRec(String name, BNode bookmark, Iterator<BNode> itr) {
@@ -360,6 +360,11 @@ public class BookmarksManager implements IObserver {
                 name = (String) data[0];
                 if (removeBookmark(name))
                     logger.info("Bookmark removed: " + name);
+                break;
+            case BOOKMARKS_REMOVE_ALL:
+                name = (String) data[0];
+                int removed = removeBookmarksByName(name);
+                logger.info(removed + " bookmarks with name " + name + " removed");
                 break;
             case BOOKMARKS_MOVE:
                 BNode src = (BNode) data[0];

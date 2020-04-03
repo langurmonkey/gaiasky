@@ -59,7 +59,7 @@ public class BookmarksComponent extends GuiComponent implements IObserver {
         super(skin, stage);
         folderIcon = skin.getDrawable("iconic-folder-small");
         bookmarkIcon = skin.getDrawable("iconic-bookmark-small");
-        EventManager.instance.subscribe(this, Events.FOCUS_CHANGED, Events.BOOKMARKS_ADD, Events.BOOKMARKS_REMOVE);
+        EventManager.instance.subscribe(this, Events.FOCUS_CHANGED, Events.BOOKMARKS_ADD, Events.BOOKMARKS_REMOVE, Events.BOOKMARKS_REMOVE_ALL);
     }
 
     @Override
@@ -414,8 +414,8 @@ public class BookmarksComponent extends GuiComponent implements IObserver {
                 selectBookmark(name, false);
                 break;
             case BOOKMARKS_REMOVE:
+            case BOOKMARKS_REMOVE_ALL:
                 reloadBookmarksTree();
-                selectBookmark(null, false);
                 break;
             default:
                 break;

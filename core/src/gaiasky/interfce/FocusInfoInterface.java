@@ -152,7 +152,7 @@ public class FocusInfoInterface extends TableGuiInterface implements IObserver {
                 if (bookmark.isChecked())
                     EventManager.instance.post(Events.BOOKMARKS_ADD, currentFocus.getName(), false);
                 else
-                    EventManager.instance.post(Events.BOOKMARKS_REMOVE, currentFocus.getName());
+                    EventManager.instance.post(Events.BOOKMARKS_REMOVE_ALL, currentFocus.getName());
             }
             return false;
         });
