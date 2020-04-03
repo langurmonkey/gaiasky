@@ -11,6 +11,7 @@ import gaiasky.event.EventManager;
 import gaiasky.event.Events;
 import gaiasky.event.IObserver;
 import gaiasky.scenegraph.IFocus;
+import gaiasky.scenegraph.SceneGraphNode;
 import gaiasky.scenegraph.camera.CameraManager.CameraMode;
 import gaiasky.util.GlobalConf;
 import gaiasky.util.I18n;
@@ -130,11 +131,20 @@ public class TopInfoInterface extends TableGuiInterface implements IObserver {
             }
             break;
         case FOCUS_CHANGE_CMD:
-            IFocus f = (IFocus) data[0];
-            String candidate = f.getCandidateName();
-            lastFocusName = TextUtils.capString(candidate, maxNameLen);
-            focus.setText("focus: " + lastFocusName);
-            s1.setText("|");
+            IFocus f = null;
+            if(data[0] instanceof String){
+                SceneGraphNode sgn = GaiaSky.instance.sg.getNode((String) data[0]);
+                if (sgn instanceof IFocus)
+                    f = (IFocus) sgn;
+            } else {
+                f = (IFocus) data[0];
+            }
+            if(f != null) {
+                String candidate = f.getCandidateName();
+                lastFocusName = TextUtils.capString(candidate, maxNameLen);
+                focus.setText("focus: " + lastFocusName);
+                s1.setText("|");
+            }
             break;
         default:
             break;

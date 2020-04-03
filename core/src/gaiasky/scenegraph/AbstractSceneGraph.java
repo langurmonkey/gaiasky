@@ -252,7 +252,7 @@ public abstract class AbstractSceneGraph implements ISceneGraph {
 
     public SceneGraphNode getNode(String name) {
         //return root.getNode(name);
-        name = name.toLowerCase().trim();
+        name = name.toLowerCase().strip();
         SceneGraphNode node = stringToNode.get(name);
         if (node != null && node instanceof StarGroup)
             ((StarGroup) node).getFocus(name);

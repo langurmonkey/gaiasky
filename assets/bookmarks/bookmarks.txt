@@ -1,14 +1,65 @@
-# Bookmarks file for Gaia Sky, one bookmark per line
-SolarSystem/Sun
-SolarSystem/Earth
-SolarSystem/Moon
-SolarSystem/Mercury
-SolarSystem/Venus
-SolarSystem/Mars
-SolarSystem/Phobos
-SolarSystem/Deimos
-SolarSystem/Jupiter
-SolarSystem/Saturn
-SolarSystem/Uranus
-SolarSystem/Neptune
-Sirius
+# Bookmarks file for Gaia Sky, one bookmark per line, folder separator: '/', comments: '#'
+Stars/Sirius
+Stars/Betelgeuse
+Star Clusters/Pleiades
+Star Clusters/Hyades
+Satellites/Gaia
+Solar System/Sun
+Solar System/Earth
+Solar System/Mercury
+Solar System/Venus
+Solar System/Mars
+Solar System/Phobos
+Solar System/Deimos
+Solar System/Jupiter
+Solar System/Saturn
+Solar System/Uranus
+Solar System/Neptune
+Solar System/Moons/Moon
+Solar System/Moons/Phobos
+Solar System/Moons/Deimos
+Solar System/Moons/Amalthea
+Solar System/Moons/Io
+Solar System/Moons/Europa
+Solar System/Moons/Ganymede
+Solar System/Moons/Callisto
+Solar System/Moons/Prometheus
+Solar System/Moons/Titan
+Solar System/Moons/Rhea
+Solar System/Moons/Dione
+Solar System/Moons/Tethys
+Solar System/Moons/Enceladus
+Solar System/Moons/Mimas
+Solar System/Moons/Janus
+Stars/Sirius
+Stars/Betelgeuse
+Star Clusters/Pleiades
+Star Clusters/Hyades
+Satellites/Gaia
+Solar System/Sun
+Solar System/Earth
+Solar System/Mercury
+Solar System/Venus
+Solar System/Mars
+Solar System/Phobos
+Solar System/Deimos
+Solar System/Jupiter
+Solar System/Saturn
+Solar System/Uranus
+Solar System/Neptune
+Solar System/Moons/Moon
+Solar System/Moons/Phobos
+Solar System/Moons/Deimos
+Solar System/Moons/Amalthea
+Solar System/Moons/Io
+Solar System/Moons/Europa
+Solar System/Moons/Ganymede
+Solar System/Moons/Callisto
+Solar System/Moons/Prometheus
+Solar System/Moons/Titan
+Solar System/Moons/Rhea
+Solar System/Moons/Dione
+Solar System/Moons/Tethys
+Solar System/Moons/Enceladus
+Solar System/Moons/Mimas
+Solar System/Moons/Janus

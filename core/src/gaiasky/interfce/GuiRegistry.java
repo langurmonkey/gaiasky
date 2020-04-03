@@ -19,6 +19,7 @@ import gaiasky.event.EventManager;
 import gaiasky.event.Events;
 import gaiasky.event.IObserver;
 import gaiasky.scenegraph.ISceneGraph;
+import gaiasky.scenegraph.ParticleGroup;
 import gaiasky.scenegraph.camera.CameraManager;
 import gaiasky.script.EventScriptingInterface;
 import gaiasky.util.*;
@@ -336,12 +337,30 @@ public class GuiRegistry implements IObserver {
                                     final DatasetLoadDialog dld = new DatasetLoadDialog(I18n.txt("gui.dsload.title") + ": " + fileName, fileName, skin, ui);
                                     Runnable doLoad = () -> {
                                         try {
-                                            DatasetOptions dops = dld.generateDatasetOptions();
-                                            // Access dld properties
-                                            EventScriptingInterface.instance().loadDataset(fileName, result.toAbsolutePath().toString(), CatalogInfo.CatalogInfoType.UI, dops, false);
-                                            // Open UI datasets
-                                            EventScriptingInterface.instance().maximizeInterfaceWindow();
-                                            EventScriptingInterface.instance().expandGuiComponent("DatasetsComponent");
+                                            Thread t = new Thread(()->{
+                                                DatasetOptions dops = dld.generateDatasetOptions();
+                                                // Access dld properties
+                                                EventScriptingInterface.instance().loadDataset(fileName, result.toAbsolutePath().toString(), CatalogInfo.CatalogInfoType.UI, dops, true);
+                                                // Select first
+                                                CatalogInfo ci = CatalogManager.instance().get(fileName);
+                                                if(ci.object != null) {
+                                                    if(ci.object instanceof ParticleGroup){
+                                                        ParticleGroup pg = (ParticleGroup) ci.object;
+                                                        if(pg.data() != null && !pg.data().isEmpty() && pg.isVisibilityOn()){
+                                                            EventManager.instance.post(Events.CAMERA_MODE_CMD, CameraManager.CameraMode.FOCUS_MODE);
+                                                            EventManager.instance.post(Events.FOCUS_CHANGE_CMD, pg.getRandomParticleName());
+                                                        }
+                                                    } else if(ci.object.children != null && !ci.object.children.isEmpty() && ci.object.children.get(0).isVisibilityOn()){
+                                                        EventManager.instance.post(Events.CAMERA_MODE_CMD, CameraManager.CameraMode.FOCUS_MODE);
+                                                        EventManager.instance.post(Events.FOCUS_CHANGE_CMD, ci.object.children.get(0));
+                                                    }
+                                                    // Open UI datasets
+                                                    EventScriptingInterface.instance().maximizeInterfaceWindow();
+                                                    EventScriptingInterface.instance().expandGuiComponent("DatasetsComponent");
+                                                }
+                                            });
+                                            t.setName("Dataset loader thread (scripting)");
+                                            t.start();
                                         } catch (Exception e) {
                                             logger.error(I18n.txt("notif.error", fileName), e);
                                         }

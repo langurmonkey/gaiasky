@@ -80,6 +80,7 @@ public class CatalogManager implements IObserver {
                     newKey = ci.name + "(" + i +")";
                 }
                 ci.name = newKey;
+                key = newKey;
             }
             // Add to map and list
             ciMap.put(key, ci);

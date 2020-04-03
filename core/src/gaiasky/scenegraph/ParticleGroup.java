@@ -220,7 +220,7 @@ public class ParticleGroup extends FadeNode implements I3DTextRenderable, IFocus
             if (names != null)
                 names[0] = name;
             else
-                names = new String[] { name };
+                names = new String[]{name};
         }
 
         public void addName(String name) {
@@ -268,7 +268,7 @@ public class ParticleGroup extends FadeNode implements I3DTextRenderable, IFocus
     /**
      * Particle size limits, in pixels
      */
-    public double[] particleSizeLimits = new double[] { 3.5d, 800d };
+    public double[] particleSizeLimits = new double[]{3.5d, 800d};
 
     /**
      * Are the data of this group in the GPU memory?
@@ -593,6 +593,20 @@ public class ParticleGroup extends FadeNode implements I3DTextRenderable, IFocus
 
     public ParticleBean get(int index) {
         return pointData.get(index);
+    }
+
+    /**
+     * Gets the name of a random particle in this group
+     *
+     * @return The name of a random particle
+     */
+    public String getRandomParticleName() {
+        if (pointData != null)
+            for (ParticleBean pb : pointData) {
+                if(pb.names != null && pb.names.length > 0)
+                    return pb.names[0];
+            }
+        return null;
     }
 
     /**
@@ -1115,26 +1129,26 @@ public class ParticleGroup extends FadeNode implements I3DTextRenderable, IFocus
     @Override
     public void notify(Events event, Object... data) {
         switch (event) {
-        case FOCUS_CHANGED:
-            if (data[0] instanceof String) {
-                focusIndex = data[0].equals(this.getName()) ? focusIndex : -1;
-            } else {
-                focusIndex = data[0] == this ? focusIndex : -1;
-            }
-            updateFocusDataPos();
-            break;
-        case CAMERA_MOTION_UPDATED:
-            // Check that the particles have names
-            if (updaterTask != null && pointData.get(0).names != null) {
-                final Vector3d currentCameraPos = (Vector3d) data[0];
-                long t = TimeUtils.millis() - lastSortTime;
-                if (!updating && this.opacity > 0 && (t > MIN_UPDATE_TIME_MS * 2 || (lastSortCameraPos.dst(currentCameraPos) > CAM_DX_TH && t > MIN_UPDATE_TIME_MS))) {
-                    updating = DatasetUpdater.execute(updaterTask);
+            case FOCUS_CHANGED:
+                if (data[0] instanceof String) {
+                    focusIndex = data[0].equals(this.getName()) ? focusIndex : -1;
+                } else {
+                    focusIndex = data[0] == this ? focusIndex : -1;
                 }
-            }
-            break;
-        default:
-            break;
+                updateFocusDataPos();
+                break;
+            case CAMERA_MOTION_UPDATED:
+                // Check that the particles have names
+                if (updaterTask != null && pointData.get(0).names != null) {
+                    final Vector3d currentCameraPos = (Vector3d) data[0];
+                    long t = TimeUtils.millis() - lastSortTime;
+                    if (!updating && this.opacity > 0 && (t > MIN_UPDATE_TIME_MS * 2 || (lastSortCameraPos.dst(currentCameraPos) > CAM_DX_TH && t > MIN_UPDATE_TIME_MS))) {
+                        updating = DatasetUpdater.execute(updaterTask);
+                    }
+                }
+                break;
+            default:
+                break;
         }
 
     }
@@ -1363,11 +1377,11 @@ public class ParticleGroup extends FadeNode implements I3DTextRenderable, IFocus
     public static ParticleGroup getParticleGroup(String name, Array<ParticleBean> data, DatasetOptions dops) {
         double[] fadeIn = dops == null || dops.fadeIn == null ? null : dops.fadeIn;
         double[] fadeOut = dops == null || dops.fadeOut == null ? null : dops.fadeOut;
-        double[] particleColor = dops == null || dops.particleColor == null ? new double[] { 1.0, 1.0, 1.0, 1.0 } : dops.particleColor;
+        double[] particleColor = dops == null || dops.particleColor == null ? new double[]{1.0, 1.0, 1.0, 1.0} : dops.particleColor;
         double colorNoise = dops == null ? 0 : dops.particleColorNoise;
-        double[] labelColor = dops == null || dops.labelColor == null ? new double[] { 1.0, 1.0, 1.0, 1.0 } : dops.labelColor;
+        double[] labelColor = dops == null || dops.labelColor == null ? new double[]{1.0, 1.0, 1.0, 1.0} : dops.labelColor;
         double particleSize = dops == null ? 0 : dops.particleSize;
-        double[] minParticleSize = dops == null ? new double[] { 2d, 200d } : dops.particleSizeLimits;
+        double[] minParticleSize = dops == null ? new double[]{2d, 200d} : dops.particleSizeLimits;
         double profileDecay = dops == null ? 1 : dops.profileDecay;
         String ct = dops == null || dops.ct == null ? ComponentType.Galaxies.toString() : dops.ct.toString();
 
