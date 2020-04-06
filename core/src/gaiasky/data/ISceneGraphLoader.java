@@ -9,6 +9,7 @@ import com.badlogic.gdx.utils.Array;
 import gaiasky.scenegraph.SceneGraphNode;
 
 import java.io.FileNotFoundException;
+import java.io.InputStream;
 
 public interface ISceneGraphLoader {
 
@@ -19,5 +20,7 @@ public interface ISceneGraphLoader {
     void setDescription(String description);
 
     void initialize(String[] files) throws RuntimeException;
+
+    void initialize(InputStream is);
 
 }

@@ -12,6 +12,7 @@ import gaiasky.data.ISceneGraphLoader;
 import gaiasky.data.stars.AbstractCatalogLoader;
 import gaiasky.scenegraph.StarCluster;
 import gaiasky.util.*;
+import gaiasky.util.Logger.Log;
 import gaiasky.util.coord.AstroUtils;
 import gaiasky.util.coord.Coordinates;
 import gaiasky.util.math.Vector3d;
@@ -41,6 +42,7 @@ import java.util.Map;
  * @author Toni Sagrista
  */
 public class StarClusterLoader extends AbstractCatalogLoader implements ISceneGraphLoader {
+    private static Log logger = Logger.getLogger(StarClusterLoader.class);
     boolean active = true;
 
     private enum ClusterProperties {
@@ -51,68 +53,81 @@ public class StarClusterLoader extends AbstractCatalogLoader implements ISceneGr
     public Array<StarCluster> loadData() {
         Array<StarCluster> clusters = new Array<>();
 
-        if (active)
-            for (String file : files) {
-                FileHandle f = GlobalConf.data.dataFileHandle(file);
-                InputStream data = f.read();
-                BufferedReader br = new BufferedReader(new InputStreamReader(data));
-
-                try {
-                    String header = br.readLine();
-                    Map<ClusterProperties, Integer> indices = parseHeader(header);
-                    String line;
-                    while ((line = br.readLine()) != null) {
-                        // Add galaxy
-                        String[] tokens = line.split(",");
-                        String[] names = parseName(tokens[0]);
-                        double ra = getDouble(tokens, ClusterProperties.RA, indices);
-                        double rarad = Math.toRadians(ra);
-                        double dec = getDouble(tokens, ClusterProperties.DEC, indices);
-                        double decrad = Math.toRadians(dec);
-                        double distpc = getDouble(tokens, ClusterProperties.DIST, indices);
-                        double dist = distpc * Constants.PC_TO_U;
-                        double mualphastar = getDouble(tokens, ClusterProperties.PMRA, indices);
-                        double mudelta = getDouble(tokens, ClusterProperties.PMDE, indices);
-                        double radvel = getDouble(tokens, ClusterProperties.RV, indices);
-                        double radius = getDouble(tokens, ClusterProperties.RADIUS, indices);
-                        int nstars = getInteger(tokens, ClusterProperties.NSTARS, indices);
-
-
-                        Vector3d pos = Coordinates.sphericalToCartesian(rarad, decrad, dist, new Vector3d());
-
-                        Vector3d pm = AstroUtils.properMotionsToCartesian(mualphastar, mudelta, radvel, Math.toRadians(ra), Math.toRadians(dec), distpc);
-
-                        Vector3d posSph = new Vector3d((float) ra, (float) dec, (float) dist);
-                        Vector3 pmSph = new Vector3((float) (mualphastar), (float) (mudelta), (float) radvel);
-
-                        StarCluster c = new StarCluster(names, parentName != null ? parentName : "MWSC", pos, pm, posSph, pmSph, radius, nstars);
-
-                        clusters.add(c);
-                    }
-
-                    for (StarCluster c : clusters) {
-                        c.initialize();
-                    }
-
-                } catch (IOException e) {
-                    Logger.getLogger(this.getClass()).error(e);
-                } finally {
+        if (active) {
+            if (files != null) {
+                for (String file : files) {
+                    FileHandle f = GlobalConf.data.dataFileHandle(file);
+                    InputStream is = f.read();
                     try {
-                        br.close();
+                        loadCluster(is, clusters);
                     } catch (IOException e) {
-                        Logger.getLogger(this.getClass()).error(e);
-                    }
+                        logger.error(e);
+                    } finally {
+                        try {
+                            is.close();
+                        } catch (IOException e) {
+                            logger.error(e);
+                        }
 
+                    }
+                }
+            } else if (is != null) {
+                try {
+                    loadCluster(is, clusters);
+                } catch (IOException e) {
+                    logger.error(e);
                 }
             }
+        }
 
-        Logger.getLogger(this.getClass()).info(I18n.bundle.format("notif.catalog.init", clusters.size));
+        logger.info(I18n.bundle.format("notif.catalog.init", clusters.size));
         return clusters;
     }
 
-    private String[] parseName(String name){
+    private void loadCluster(InputStream data, Array<StarCluster> clusters) throws IOException {
+        BufferedReader br = new BufferedReader(new InputStreamReader(data));
+
+        String header = br.readLine();
+        Map<ClusterProperties, Integer> indices = parseHeader(header);
+        String line;
+        while ((line = br.readLine()) != null) {
+            // Add galaxy
+            String[] tokens = line.split(",");
+            String[] names = parseName(tokens[0]);
+            double ra = getDouble(tokens, ClusterProperties.RA, indices);
+            double rarad = Math.toRadians(ra);
+            double dec = getDouble(tokens, ClusterProperties.DEC, indices);
+            double decrad = Math.toRadians(dec);
+            double distpc = getDouble(tokens, ClusterProperties.DIST, indices);
+            double dist = distpc * Constants.PC_TO_U;
+            double mualphastar = getDouble(tokens, ClusterProperties.PMRA, indices);
+            double mudelta = getDouble(tokens, ClusterProperties.PMDE, indices);
+            double radvel = getDouble(tokens, ClusterProperties.RV, indices);
+            double radius = getDouble(tokens, ClusterProperties.RADIUS, indices);
+            int nstars = getInteger(tokens, ClusterProperties.NSTARS, indices);
+
+
+            Vector3d pos = Coordinates.sphericalToCartesian(rarad, decrad, dist, new Vector3d());
+
+            Vector3d pm = AstroUtils.properMotionsToCartesian(mualphastar, mudelta, radvel, Math.toRadians(ra), Math.toRadians(dec), distpc);
+
+            Vector3d posSph = new Vector3d((float) ra, (float) dec, (float) dist);
+            Vector3 pmSph = new Vector3((float) (mualphastar), (float) (mudelta), (float) radvel);
+
+            StarCluster c = new StarCluster(names, parentName != null ? parentName : "MWSC", pos, pm, posSph, pmSph, radius, nstars);
+
+            clusters.add(c);
+        }
+
+        for (StarCluster c : clusters) {
+            c.initialize();
+        }
+
+    }
+
+    private String[] parseName(String name) {
         String[] names = name.split("\\|");
-        for(int i = 0; i < names.length; i++)
+        for (int i = 0; i < names.length; i++)
             names[i] = names[i].strip().replace("_", " ");
         return names;
     }

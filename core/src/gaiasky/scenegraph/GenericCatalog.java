@@ -10,6 +10,8 @@ import gaiasky.event.Events;
 import gaiasky.util.CatalogInfo;
 import gaiasky.util.Logger;
 
+import java.io.InputStream;
+
 /**
  * Represents a generic catalog of entities.
  * This entity loads catalog data given a provider and a file, initializes them
@@ -28,6 +30,11 @@ public class GenericCatalog extends FadeNode {
      * Path of data file
      */
     protected String datafile;
+
+    /**
+     * Input stream, if no data file exists
+     */
+    protected InputStream is;
 
     protected Array<? extends SceneGraphNode> clusters;
 
@@ -51,7 +58,11 @@ public class GenericCatalog extends FadeNode {
             if (dataLoad) {
                 Class<?> clazz = Class.forName(provider);
                 ISceneGraphLoader provider = (ISceneGraphLoader) clazz.getConstructor().newInstance();
-                provider.initialize(new String[]{datafile});
+                if(datafile != null)
+                    provider.initialize(new String[]{datafile});
+                else if(is != null)
+                    provider.initialize(is);
+
                 provider.setName(dsName);
                 clusters = provider.loadData();
                 clusters.forEach(object -> {
@@ -114,5 +125,8 @@ public class GenericCatalog extends FadeNode {
 
     public void setDatafile(String datafile) {
         this.datafile = datafile;
+    }
+    public void setInputStream(InputStream is) {
+        this.is = is;
     }
 }

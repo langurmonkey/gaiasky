@@ -339,7 +339,7 @@ public class GuiRegistry implements IObserver {
                                         try {
                                             Thread t = new Thread(()->{
                                                 DatasetOptions dops = dld.generateDatasetOptions();
-                                                // Access dld properties
+                                                // Load dataset
                                                 EventScriptingInterface.instance().loadDataset(fileName, result.toAbsolutePath().toString(), CatalogInfo.CatalogInfoType.UI, dops, true);
                                                 // Select first
                                                 CatalogInfo ci = CatalogManager.instance().get(fileName);
