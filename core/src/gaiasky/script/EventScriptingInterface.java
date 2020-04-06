@@ -1012,7 +1012,7 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
 
                     em.post(Events.CAMERA_FWD, 1d * dt);
                     try {
-                        sleepFrames(1);
+                        sleep(0.5f);
                     } catch (Exception e) {
                         logger.error(e);
                     }
