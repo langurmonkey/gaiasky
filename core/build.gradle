@@ -167,7 +167,7 @@ task copyToLib(dependsOn: createDistDir, description: "Copies the runtime depend
         project.ext.distLib = distLib.getPath()
 
         // Copy deps to dist lib folder
-        ['default'].each { mode ->
+        ['runtimeClasspath'].each { mode ->
             copy {
                 from configurations.getByName(mode).files
                 into project.distLib
