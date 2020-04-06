@@ -340,9 +340,9 @@ public class GuiRegistry implements IObserver {
                                             Thread t = new Thread(()->{
                                                 DatasetOptions dops = dld.generateDatasetOptions();
                                                 // Load dataset
-                                                EventScriptingInterface.instance().loadDataset(fileName, result.toAbsolutePath().toString(), CatalogInfo.CatalogInfoType.UI, dops, true);
+                                                EventScriptingInterface.instance().loadDataset(dops.catalogName, result.toAbsolutePath().toString(), CatalogInfo.CatalogInfoType.UI, dops, true);
                                                 // Select first
-                                                CatalogInfo ci = CatalogManager.instance().get(fileName);
+                                                CatalogInfo ci = CatalogManager.instance().get(dops.catalogName);
                                                 if(ci.object != null) {
                                                     if(ci.object instanceof ParticleGroup){
                                                         ParticleGroup pg = (ParticleGroup) ci.object;

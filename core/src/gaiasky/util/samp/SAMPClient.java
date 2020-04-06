@@ -123,10 +123,10 @@ public class SAMPClient implements IObserver {
                             preventProgrammaticEvents = true;
                             EventManager.instance.post(Events.FOCUS_CHANGE_CMD, pg);
                             preventProgrammaticEvents = false;
-                        } else if(idToNode.getForward(id) instanceof FadeNode){
+                        } else if (idToNode.getForward(id) instanceof FadeNode) {
                             // Star cluster
                             FadeNode fn = idToNode.getForward(id);
-                            if(fn.children != null && fn.children.size > row.intValue()) {
+                            if (fn.children != null && fn.children.size > row.intValue()) {
                                 SceneGraphNode sgn = fn.children.get(row.intValue());
                                 preventProgrammaticEvents = true;
                                 EventManager.instance.post(Events.FOCUS_CHANGE_CMD, sgn);
@@ -274,45 +274,48 @@ public class SAMPClient implements IObserver {
         switch (event) {
             case FOCUS_CHANGED:
                 if (!preventProgrammaticEvents) {
+                    if (conn != null && conn.isConnected()) {
+                        if (data[0] instanceof ParticleGroup) {
+                            ParticleGroup pg = (ParticleGroup) data[0];
+                            if (idToNode.containsValue(pg)) {
+                                String id = idToNode.getBackward(pg);
+                                String url = idToUrl.get(id);
+                                int row = pg.getCandidateIndex();
 
-                    if (data[0] instanceof ParticleGroup) {
-                        ParticleGroup pg = (ParticleGroup) data[0];
-                        if (conn != null && conn.isConnected() && idToNode.containsValue(pg)) {
-                            String id = idToNode.getBackward(pg);
-                            String url = idToUrl.get(id);
-                            int row = pg.getCandidateIndex();
+                                Message msg = new Message("table.highlight.row");
+                                msg.addParam("row", Integer.toString(row));
+                                msg.addParam("table-id", id);
+                                msg.addParam("url", url);
 
-                            Message msg = new Message("table.highlight.row");
-                            msg.addParam("row", Integer.toString(row));
-                            msg.addParam("table-id", id);
-                            msg.addParam("url", url);
-
-                            try {
-                                conn.getConnection().notifyAll(msg);
-                            } catch (SampException e) {
-                                logger.error(e);
+                                try {
+                                    conn.getConnection().notifyAll(msg);
+                                } catch (SampException e) {
+                                    logger.error(e);
+                                }
                             }
-                        }
-                    } else if (data[0] instanceof StarCluster) {
-                        StarCluster sc = (StarCluster) data[0];
-                        if (sc.parent != null && sc.parent instanceof FadeNode) {
-                            // Comes from a catalog
-                            FadeNode parent = (FadeNode) sc.parent;
-                            String id = idToNode.getBackward(parent);
-                            String url = idToUrl.get(id);
-                            int row = parent.children.indexOf(sc, true);
+                        } else if (data[0] instanceof StarCluster) {
+                            StarCluster sc = (StarCluster) data[0];
+                            if (sc.parent != null && sc.parent instanceof FadeNode) {
+                                // Comes from a catalog
+                                FadeNode parent = (FadeNode) sc.parent;
+                                if (idToNode.containsValue(parent)) {
+                                    String id = idToNode.getBackward(parent);
+                                    String url = idToUrl.get(id);
+                                    int row = parent.children.indexOf(sc, true);
 
-                            Message msg = new Message("table.highlight.row");
-                            msg.addParam("row", Integer.toString(row));
-                            msg.addParam("table-id", id);
-                            msg.addParam("url", url);
+                                    Message msg = new Message("table.highlight.row");
+                                    msg.addParam("row", Integer.toString(row));
+                                    msg.addParam("table-id", id);
+                                    msg.addParam("url", url);
 
-                            try {
-                                conn.getConnection().notifyAll(msg);
-                            } catch (SampException e) {
-                                logger.error(e);
+                                    try {
+                                        conn.getConnection().notifyAll(msg);
+                                    } catch (SampException e) {
+                                        logger.error(e);
+                                    }
+                                }
+
                             }
-
                         }
                     }
                 }

@@ -2427,8 +2427,8 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
                 } else if (dops == null || dops.type == DatasetOptions.DatasetLoadType.CLUSTERS) {
                     // STAR CLUSTERS
                     GenericCatalog scc = new GenericCatalog();
-                    scc.setName(dops.catalogName);
-                    scc.setDescription(dsName);
+                    scc.setName(dsName);
+                    scc.setDescription(ds instanceof FileDataSource ? ((FileDataSource)ds).getFile().getAbsolutePath() : dsName);
                     scc.setParent("Universe");
                     scc.setFadein(dops.fadeIn);
                     scc.setFadeout(dops.fadeOut);

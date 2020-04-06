@@ -20,7 +20,6 @@ import gaiasky.util.parse.Parser;
 import gaiasky.util.ucd.UCDParser;
 
 import java.io.*;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -46,7 +45,7 @@ public class StarClusterLoader extends AbstractCatalogLoader implements ISceneGr
     boolean active = true;
 
     private enum ClusterProperties {
-        NAME, RA, DEC, DIST, PMRA, PMDE, RV, RADIUS, NSTARS
+        NAME, RA, DEC, DIST, PLLX, PMRA, PMDE, RV, RADIUS, NSTARS
     }
 
     @Override
@@ -59,7 +58,7 @@ public class StarClusterLoader extends AbstractCatalogLoader implements ISceneGr
                     FileHandle f = GlobalConf.data.dataFileHandle(file);
                     InputStream is = f.read();
                     try {
-                        loadCluster(is, clusters);
+                        loadClusters(is, clusters);
                     } catch (IOException e) {
                         logger.error(e);
                     } finally {
@@ -73,7 +72,7 @@ public class StarClusterLoader extends AbstractCatalogLoader implements ISceneGr
                 }
             } else if (is != null) {
                 try {
-                    loadCluster(is, clusters);
+                    loadClusters(is, clusters);
                 } catch (IOException e) {
                     logger.error(e);
                 }
@@ -84,21 +83,31 @@ public class StarClusterLoader extends AbstractCatalogLoader implements ISceneGr
         return clusters;
     }
 
-    private void loadCluster(InputStream data, Array<StarCluster> clusters) throws IOException {
+    private void loadClusters(InputStream data, Array<StarCluster> clusters) throws IOException {
         BufferedReader br = new BufferedReader(new InputStreamReader(data));
 
         String header = br.readLine();
         Map<ClusterProperties, Integer> indices = parseHeader(header);
+
+        if(!checkIndices(indices)){
+            logger.error("At least 'ra', 'dec', 'pllx'|'dist', 'radius' and 'name' are needed, please check your columns!");
+            return;
+        }
         String line;
         while ((line = br.readLine()) != null) {
             // Add galaxy
             String[] tokens = line.split(",");
-            String[] names = parseName(tokens[0]);
+            String[] names = parseName(tokens[indices.get(ClusterProperties.NAME)]);
             double ra = getDouble(tokens, ClusterProperties.RA, indices);
             double rarad = Math.toRadians(ra);
             double dec = getDouble(tokens, ClusterProperties.DEC, indices);
             double decrad = Math.toRadians(dec);
-            double distpc = getDouble(tokens, ClusterProperties.DIST, indices);
+            double distpc = 0;
+            if(indices.containsKey(ClusterProperties.DIST)) {
+                distpc = getDouble(tokens, ClusterProperties.DIST, indices);
+            }else if(indices.containsKey(ClusterProperties.PLLX)){
+                distpc = 1000d / getDouble(tokens, ClusterProperties.PLLX, indices);
+            }
             double dist = distpc * Constants.PC_TO_U;
             double mualphastar = getDouble(tokens, ClusterProperties.PMRA, indices);
             double mudelta = getDouble(tokens, ClusterProperties.PMDE, indices);
@@ -168,6 +177,8 @@ public class StarClusterLoader extends AbstractCatalogLoader implements ISceneGr
                 indices.put(ClusterProperties.DEC, i);
             else if (UCDParser.isDist(token))
                 indices.put(ClusterProperties.DIST, i);
+            else if (UCDParser.isPllx(token))
+                indices.put(ClusterProperties.PLLX, i);
             else if (UCDParser.isPmra(token))
                 indices.put(ClusterProperties.PMRA, i);
             else if (UCDParser.isPmde(token))
@@ -183,6 +194,14 @@ public class StarClusterLoader extends AbstractCatalogLoader implements ISceneGr
         }
 
         return indices;
+    }
+
+    private boolean checkIndices(Map<ClusterProperties, Integer> indices){
+        return indices.containsKey(ClusterProperties.RA)
+                && indices.containsKey(ClusterProperties.DEC)
+                && (indices.containsKey(ClusterProperties.DIST) || indices.containsKey(ClusterProperties.PLLX))
+                && indices.containsKey(ClusterProperties.RADIUS)
+                && indices.containsKey(ClusterProperties.NAME);
     }
 
 }
