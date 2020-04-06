@@ -305,10 +305,9 @@ public class GaiaSkyDesktop implements IObserver {
 
         // Launch app
         GaiaSky gs = null;
-        Lwjgl3Application app = null;
         try {
             gs = new GaiaSky(gsArgs.download, gsArgs.catalogChooser, gsArgs.vr, gsArgs.externalView, gsArgs.noScriptingServer);
-            app = new Lwjgl3Application(gs, cfg);
+            new Lwjgl3Application(gs, cfg);
         } catch (GdxRuntimeException e) {
             if (!JAVA_VERSION_FLAG) {
                 if (!gs.windowCreated) {
@@ -324,7 +323,7 @@ public class GaiaSkyDesktop implements IObserver {
                     cfg.useOpenGL3(true, 3, 2);
 
                     gs = new GaiaSky(gsArgs.download, gsArgs.catalogChooser, gsArgs.vr, gsArgs.externalView, gsArgs.noScriptingServer);
-                    app = new Lwjgl3Application(gs, cfg);
+                    new Lwjgl3Application(gs, cfg);
                 } else {
                     logger.error("Gaia Sky crashed, please report the bug at " + GlobalConf.REPO_ISSUES);
                 }

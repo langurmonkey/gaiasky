@@ -45,7 +45,11 @@ public final class OpenVR {
 
     static {
         String libName = Platform.mapLibraryNameBundled("lwjgl_openvr");
+
+        // lwjgl 3.2.3
         Library.loadSystem(System::load, System::loadLibrary, OpenVR.class, "org.lwjgl.openvr", libName);
+
+        // lwjgl 3.2.2
         //Library.loadSystem(System::load, System::loadLibrary, OpenVR.class, libName);
     }
 

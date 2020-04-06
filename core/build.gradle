@@ -167,7 +167,7 @@ task copyToLib(dependsOn: createDistDir, description: "Copies the runtime depend
         project.ext.distLib = distLib.getPath()
 
         // Copy deps to dist lib folder
-        ['runtime'].each { mode ->
+        ['default'].each { mode ->
             copy {
                 from configurations.getByName(mode).files
                 into project.distLib
@@ -187,6 +187,7 @@ task copyToLib(dependsOn: createDistDir, description: "Copies the runtime depend
         delete project.distLib + '/img'
         delete project.distLib + '/music'
         delete project.distLib + '/mappings'
+        delete project.distLib + '/bookmarks'
         delete project.distLib + '/rest-static'
         delete project.distLib + '/scripts'
         delete project.distLib + '/shader'
@@ -257,6 +258,13 @@ task dist(dependsOn: gaiaskyJar, description: "Compiles the project, creates the
             into "$distDir/mappings"
         }
 
+        // Copy bookmarks
+        mkdir "$distDir/bookmarks"
+        copy {
+            from "../assets/bookmarks"
+            into "$distDir/bookmarks"
+        }
+
         // Copy rest-static
         mkdir "$distDir/rest-static"
         copy {
@@ -281,6 +289,7 @@ task dist(dependsOn: gaiaskyJar, description: "Compiles the project, creates the
             from "$baseDir/"
             into "$distDir"
             include "README.md"
+            include "VR.md"
             include "LICENSE"
             include "AUTHORS"
         }
