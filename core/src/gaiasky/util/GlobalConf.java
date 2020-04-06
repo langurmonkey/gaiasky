@@ -42,6 +42,10 @@ import java.util.List;
 public class GlobalConf {
     private static final Log logger = Logger.getLogger(GlobalConf.class);
 
+    // Assets location for this instance of Gaia Sky
+    // macOS needs fully qualified paths when run as an app (GaiaSky.app), that's why we use the getAbsolutePath() part
+    public static final String ASSETS_LOC = (new File(System.getProperty("assets.location") != null ? System.getProperty("assets.location") : ".")).getAbsolutePath();
+
     public static String APPLICATION_NAME = "Gaia Sky";
     public static String APPLICATION_NAME_TITLE = "G a i a   S k y";
     public static final String APPLICATION_SHORT_NAME = "gaiasky";
@@ -49,7 +53,7 @@ public class GlobalConf {
     public static final String WEBPAGE_DOWNLOADS = "https://www.zah.uni-heidelberg.de/gaia/outreach/gaiasky/downloads";
     public static final String DOCUMENTATION = "http://gaia.ari.uni-heidelberg.de/gaiasky/docs/html/latest";
     public static final String REPOSITORY = "https://gitlab.com/langurmonkey/gaiasky";
-    public static final String ICON_URL = REPOSITORY + "/blob/master/assets/icon/gs_064.png?raw=true";
+    public static final String ICON_URL = "file://" + ASSETS_LOC + "/icon/gs_064.png";
     public static final String REPO_ISSUES = REPOSITORY + "/issues";
     public static final String AUTHOR_NAME = "Toni Sagristà Sellés";
     public static final String AUTHOR_NAME_PLAIN = "Toni Sagrista Selles";
@@ -57,9 +61,6 @@ public class GlobalConf {
     public static final String AUTHOR_AFFILIATION = "Universität Heidelberg, Zentrum für Astronomie, Astronomisches Rechen-Institut";
     public static final String AUTHOR_AFFILIATION_PLAIN = "Universitaet Heidelberg, Zentrum fuer Astronomie, Astronomisches Rechen-Institut";
 
-    // Assets location for this instance of Gaia Sky
-    // macOS needs fully qualified paths when run as an app (GaiaSky.app), that's why we use the getAbsolutePath() part
-    public static final String ASSETS_LOC = (new File(System.getProperty("assets.location") != null ? System.getProperty("assets.location") : ".")).getAbsolutePath();
 
     // Interface scale factor (for HiDPI)
     public static float UI_SCALE_FACTOR = -1.0f;
