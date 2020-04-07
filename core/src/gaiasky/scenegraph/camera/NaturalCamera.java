@@ -1432,6 +1432,11 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
                     if (octant != null && octant.getRoot() == octree.root) {
                         found = true;
                     }
+                } else if (data[0] instanceof GenericCatalog){
+                    GenericCatalog gc = (GenericCatalog) data[0];
+                    if(gc.children != null && gc.children.contains((SceneGraphNode) this.focus, true)){
+                        found = true;
+                    }
                 }
                 if (found) {
                     // Set camera  free

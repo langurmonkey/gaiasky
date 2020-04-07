@@ -160,6 +160,7 @@ public class SAMPClient implements IObserver {
                             ParticleGroup pg = (ParticleGroup) fn;
                             pg.setFocusIndex(row);
                             preventProgrammaticEvents = true;
+                            EventManager.instance.post(Events.CAMERA_MODE_CMD, CameraManager.CameraMode.FOCUS_MODE);
                             EventManager.instance.post(Events.FOCUS_CHANGE_CMD, pg);
                             preventProgrammaticEvents = false;
                         }
