@@ -7,6 +7,7 @@ package gaiasky.data;
 
 import com.badlogic.gdx.utils.Array;
 import gaiasky.scenegraph.SceneGraphNode;
+import uk.ac.starlink.util.DataSource;
 
 import java.io.FileNotFoundException;
 import java.io.InputStream;
@@ -21,6 +22,6 @@ public interface ISceneGraphLoader {
 
     void initialize(String[] files) throws RuntimeException;
 
-    void initialize(InputStream is);
+    void initialize(DataSource ds);
 
 }

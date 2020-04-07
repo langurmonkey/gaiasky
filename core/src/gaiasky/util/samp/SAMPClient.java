@@ -91,9 +91,7 @@ public class SAMPClient implements IObserver {
 
                 boolean loaded = loadVOTable(url, id, name);
 
-                if (loaded) {
-                    logger.info("VOTable " + name + " loaded successfully");
-                } else {
+                if (!loaded) {
                     logger.info("Error loading VOTable " + name);
                 }
 

@@ -17,6 +17,7 @@ import gaiasky.util.GlobalConf;
 import gaiasky.util.I18n;
 import gaiasky.util.Logger;
 import gaiasky.util.parse.Parser;
+import uk.ac.starlink.util.DataSource;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -33,7 +34,7 @@ public class ConstellationsLoader<T extends SceneGraphNode> implements ISceneGra
     }
 
     @Override
-    public void initialize(InputStream is) {
+    public void initialize(DataSource ds) {
     }
 
     @Override

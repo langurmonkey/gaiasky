@@ -2436,7 +2436,7 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
                     scc.setLabelcolor(dops.labelColor);
                     scc.setCt(dops.ct.toString());
                     scc.setPosition(new double[]{0, 0, 0});
-                    scc.setInputStream(ds.getInputStream());
+                    scc.setDataSource(ds);
                     scc.setProvider(StarClusterLoader.class.getName());
 
                     GaiaSky.postRunnable(() -> {

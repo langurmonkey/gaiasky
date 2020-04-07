@@ -18,14 +18,22 @@ import gaiasky.util.coord.Coordinates;
 import gaiasky.util.math.Vector3d;
 import gaiasky.util.parse.Parser;
 import gaiasky.util.ucd.UCDParser;
+import uk.ac.starlink.table.ColumnInfo;
+import uk.ac.starlink.table.RowSequence;
+import uk.ac.starlink.table.StarTable;
+import uk.ac.starlink.table.StarTableFactory;
+import uk.ac.starlink.table.formats.AsciiTableBuilder;
+import uk.ac.starlink.table.formats.CsvTableBuilder;
+import uk.ac.starlink.util.DataSource;
 
 import java.io.*;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
- * Loads the star cluster catalogs in CSV format. The column order is not important. The
- * column names, however, are:
+ * Loads the star cluster catalogs from CSV files or STIL data sources. The column order is not important. The
+ * column names, however, must be:
  *
  * <ul>
  * <li>name: {@link gaiasky.util.ucd.UCDParser#idcolnames}, separate multiple names with '|'</li>
@@ -58,7 +66,7 @@ public class StarClusterLoader extends AbstractCatalogLoader implements ISceneGr
                     FileHandle f = GlobalConf.data.dataFileHandle(file);
                     InputStream is = f.read();
                     try {
-                        loadClusters(is, clusters);
+                        loadClustersCsv(is, clusters);
                     } catch (IOException e) {
                         logger.error(e);
                     } finally {
@@ -70,9 +78,9 @@ public class StarClusterLoader extends AbstractCatalogLoader implements ISceneGr
 
                     }
                 }
-            } else if (is != null) {
+            } else if (dataSource != null) {
                 try {
-                    loadClusters(is, clusters);
+                    loadClustersStil(dataSource, clusters);
                 } catch (IOException e) {
                     logger.error(e);
                 }
@@ -83,13 +91,71 @@ public class StarClusterLoader extends AbstractCatalogLoader implements ISceneGr
         return clusters;
     }
 
-    private void loadClusters(InputStream data, Array<StarCluster> clusters) throws IOException {
+    /**
+     * Loads clusters from a STIL data source.
+     * @param ds The data source.
+     * @param clusters The clusters list.
+     * @throws IOException
+     */
+    private void loadClustersStil(DataSource ds, Array<StarCluster> clusters) throws IOException {
+        // Add extra builders
+        StarTableFactory factory = new StarTableFactory();
+        List builders = factory.getDefaultBuilders();
+        builders.add(new CsvTableBuilder());
+        builders.add(new AsciiTableBuilder());
+
+        // Try to load
+        StarTable table = factory.makeStarTable(ds);
+
+        Map<ClusterProperties, Integer> indices = parseHeader(table);
+
+        if (!checkIndices(indices)) {
+            logger.error("At least 'ra', 'dec', 'pllx'|'dist', 'radius' and 'name' are needed, please check your columns!");
+            return;
+        }
+        long rows = table.getRowCount();
+        RowSequence rs = table.getRowSequence();
+        while (rs.next()) {
+            Object[] row = rs.getRow();
+            String[] names = parseName(row[indices.get(ClusterProperties.NAME)].toString());
+            double ra = getDouble(row, ClusterProperties.RA, indices);
+            double rarad = Math.toRadians(ra);
+            double dec = getDouble(row, ClusterProperties.DEC, indices);
+            double decrad = Math.toRadians(dec);
+            double distpc = 0;
+            if (indices.containsKey(ClusterProperties.DIST)) {
+                distpc = getDouble(row, ClusterProperties.DIST, indices);
+            } else if (indices.containsKey(ClusterProperties.PLLX)) {
+                distpc = 1000d / getDouble(row, ClusterProperties.PLLX, indices);
+            }
+            double dist = distpc * Constants.PC_TO_U;
+            double mualphastar = getDouble(row, ClusterProperties.PMRA, indices);
+            double mudelta = getDouble(row, ClusterProperties.PMDE, indices);
+            double radvel = getDouble(row, ClusterProperties.RV, indices);
+            double radius = getDouble(row, ClusterProperties.RADIUS, indices);
+            int nstars = getInteger(row, ClusterProperties.NSTARS, indices);
+
+            addCluster(names, ra, rarad, dec, decrad, dist, distpc, mualphastar, mudelta, radvel, radius, nstars, clusters);
+        }
+
+        for (StarCluster c : clusters) {
+            c.initialize();
+        }
+    }
+
+    /**
+     * Loads clusters from a CSV file directly.
+     * @param data The CSV file input stream.
+     * @param clusters The clusters list.
+     * @throws IOException
+     */
+    private void loadClustersCsv(InputStream data, Array<StarCluster> clusters) throws IOException {
         BufferedReader br = new BufferedReader(new InputStreamReader(data));
 
         String header = br.readLine();
         Map<ClusterProperties, Integer> indices = parseHeader(header);
 
-        if(!checkIndices(indices)){
+        if (!checkIndices(indices)) {
             logger.error("At least 'ra', 'dec', 'pllx'|'dist', 'radius' and 'name' are needed, please check your columns!");
             return;
         }
@@ -103,9 +169,9 @@ public class StarClusterLoader extends AbstractCatalogLoader implements ISceneGr
             double dec = getDouble(tokens, ClusterProperties.DEC, indices);
             double decrad = Math.toRadians(dec);
             double distpc = 0;
-            if(indices.containsKey(ClusterProperties.DIST)) {
+            if (indices.containsKey(ClusterProperties.DIST)) {
                 distpc = getDouble(tokens, ClusterProperties.DIST, indices);
-            }else if(indices.containsKey(ClusterProperties.PLLX)){
+            } else if (indices.containsKey(ClusterProperties.PLLX)) {
                 distpc = 1000d / getDouble(tokens, ClusterProperties.PLLX, indices);
             }
             double dist = distpc * Constants.PC_TO_U;
@@ -115,23 +181,26 @@ public class StarClusterLoader extends AbstractCatalogLoader implements ISceneGr
             double radius = getDouble(tokens, ClusterProperties.RADIUS, indices);
             int nstars = getInteger(tokens, ClusterProperties.NSTARS, indices);
 
-
-            Vector3d pos = Coordinates.sphericalToCartesian(rarad, decrad, dist, new Vector3d());
-
-            Vector3d pm = AstroUtils.properMotionsToCartesian(mualphastar, mudelta, radvel, Math.toRadians(ra), Math.toRadians(dec), distpc);
-
-            Vector3d posSph = new Vector3d((float) ra, (float) dec, (float) dist);
-            Vector3 pmSph = new Vector3((float) (mualphastar), (float) (mudelta), (float) radvel);
-
-            StarCluster c = new StarCluster(names, parentName != null ? parentName : "MWSC", pos, pm, posSph, pmSph, radius, nstars);
-
-            clusters.add(c);
+            addCluster(names, ra, rarad, dec, decrad, dist, distpc, mualphastar, mudelta, radvel, radius, nstars, clusters);
         }
 
         for (StarCluster c : clusters) {
             c.initialize();
         }
 
+    }
+
+    private void addCluster(String[] names, double ra, double rarad, double dec, double decrad, double dist, double distpc, double mualphastar, double mudelta, double radvel, double radius, int nstars, Array<StarCluster> clusters){
+        Vector3d pos = Coordinates.sphericalToCartesian(rarad, decrad, dist, new Vector3d());
+
+        Vector3d pm = AstroUtils.properMotionsToCartesian(mualphastar, mudelta, radvel, Math.toRadians(ra), Math.toRadians(dec), distpc);
+
+        Vector3d posSph = new Vector3d((float) ra, (float) dec, (float) dist);
+        Vector3 pmSph = new Vector3((float) (mualphastar), (float) (mudelta), (float) radvel);
+
+        StarCluster c = new StarCluster(names, parentName != null ? parentName : "MWSC", pos, pm, posSph, pmSph, radius, nstars);
+
+        clusters.add(c);
     }
 
     private String[] parseName(String name) {
@@ -145,6 +214,11 @@ public class StarClusterLoader extends AbstractCatalogLoader implements ISceneGr
         return (!indices.containsKey(prop) || tokens[indices.get(prop)].isEmpty()) ? null : tokens[indices.get(prop)];
     }
 
+    private Object get(Object[] row, ClusterProperties prop, Map<ClusterProperties, Integer> indices) {
+        return (!indices.containsKey(prop) || row[indices.get(prop)] == null) ? null : row[indices.get(prop)];
+    }
+
+
     private double getDouble(String[] tokens, ClusterProperties prop, Map<ClusterProperties, Integer> indices) {
         String s = get(tokens, prop, indices);
         if (s != null)
@@ -152,10 +226,24 @@ public class StarClusterLoader extends AbstractCatalogLoader implements ISceneGr
         return 0;
     }
 
+    private double getDouble(Object[] row, ClusterProperties prop, Map<ClusterProperties, Integer> indices) {
+        Object obj = get(row, prop, indices);
+        if(obj != null)
+            return ((Number) obj).doubleValue();
+        return 0;
+    }
+
     private int getInteger(String[] tokens, ClusterProperties prop, Map<ClusterProperties, Integer> indices) {
         String s = get(tokens, prop, indices);
         if (s != null)
             return Parser.parseInt(s);
+        return 0;
+    }
+
+    private int getInteger(Object[] row, ClusterProperties prop, Map<ClusterProperties, Integer> indices) {
+        Object s = get(row, prop, indices);
+        if (s != null)
+            return ((Number)s).intValue();
         return 0;
     }
 
@@ -196,12 +284,46 @@ public class StarClusterLoader extends AbstractCatalogLoader implements ISceneGr
         return indices;
     }
 
-    private boolean checkIndices(Map<ClusterProperties, Integer> indices){
+    private boolean checkIndices(Map<ClusterProperties, Integer> indices) {
         return indices.containsKey(ClusterProperties.RA)
                 && indices.containsKey(ClusterProperties.DEC)
                 && (indices.containsKey(ClusterProperties.DIST) || indices.containsKey(ClusterProperties.PLLX))
                 && indices.containsKey(ClusterProperties.RADIUS)
                 && indices.containsKey(ClusterProperties.NAME);
+    }
+
+    private Map<ClusterProperties, Integer> parseHeader(StarTable table) {
+        Map<ClusterProperties, Integer> indices = new HashMap<>();
+
+        int ncols = table.getColumnCount();
+
+        for (int i = 0; i < ncols; i++) {
+            ColumnInfo ci = table.getColumnInfo(i);
+            String cName = ci.getName();
+
+            if (UCDParser.isName(cName))
+                indices.put(ClusterProperties.NAME, i);
+            else if (UCDParser.isRa(cName))
+                indices.put(ClusterProperties.RA, i);
+            else if (UCDParser.isDec(cName))
+                indices.put(ClusterProperties.DEC, i);
+            else if (UCDParser.isDist(cName))
+                indices.put(ClusterProperties.DIST, i);
+            else if (UCDParser.isPllx(cName))
+                indices.put(ClusterProperties.PLLX, i);
+            else if (UCDParser.isPmra(cName))
+                indices.put(ClusterProperties.PMRA, i);
+            else if (UCDParser.isPmde(cName))
+                indices.put(ClusterProperties.PMDE, i);
+            else if (UCDParser.isRadvel(cName))
+                indices.put(ClusterProperties.RV, i);
+            else if (UCDParser.isRadius(cName))
+                indices.put(ClusterProperties.RADIUS, i);
+            else if (UCDParser.isNstars(cName))
+                indices.put(ClusterProperties.NSTARS, i);
+        }
+
+        return indices;
     }
 
 }

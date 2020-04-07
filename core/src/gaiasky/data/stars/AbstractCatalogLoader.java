@@ -8,6 +8,7 @@ package gaiasky.data.stars;
 import com.badlogic.gdx.utils.Array;
 import gaiasky.scenegraph.CelestialBody;
 import gaiasky.scenegraph.SceneGraphNode;
+import uk.ac.starlink.util.DataSource;
 
 import java.io.FileNotFoundException;
 import java.io.InputStream;
@@ -24,8 +25,8 @@ public abstract class AbstractCatalogLoader {
     public String[] files;
     public List<CatalogFilter> filters;
 
-    /** Input stream, if any **/
-    public InputStream is;
+    /** Data source, if using that instead of **/
+    public DataSource dataSource;
 
     /** Name **/
     protected String name;
@@ -40,8 +41,8 @@ public abstract class AbstractCatalogLoader {
         this.filters = new ArrayList<>(0);
     }
 
-    public void initialize(InputStream is) {
-        this.is = is;
+    public void initialize(DataSource ds) {
+        this.dataSource = ds;
     }
 
     public abstract Array<? extends SceneGraphNode> loadData() throws FileNotFoundException;

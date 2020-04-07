@@ -22,6 +22,7 @@ import gaiasky.util.Logger;
 import gaiasky.util.Logger.Log;
 import gaiasky.util.tree.LoadStatus;
 import gaiasky.util.tree.OctreeNode;
+import uk.ac.starlink.util.DataSource;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -115,7 +116,7 @@ public abstract class StreamingOctreeLoader implements IObserver, ISceneGraphLoa
     }
 
     @Override
-    public void initialize(InputStream is) {
+    public void initialize(DataSource ds) {
     }
 
     @Override
