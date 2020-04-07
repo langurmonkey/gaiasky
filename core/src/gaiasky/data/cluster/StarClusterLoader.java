@@ -18,6 +18,11 @@ import gaiasky.util.coord.Coordinates;
 import gaiasky.util.math.Vector3d;
 import gaiasky.util.parse.Parser;
 import gaiasky.util.ucd.UCDParser;
+import gaiasky.util.units.Quantity;
+import gaiasky.util.units.Quantity.Angle;
+import gaiasky.util.units.Quantity.Angle.AngleUnit;
+import gaiasky.util.units.Quantity.Length;
+import gaiasky.util.units.Quantity.Length.LengthUnit;
 import uk.ac.starlink.table.ColumnInfo;
 import uk.ac.starlink.table.RowSequence;
 import uk.ac.starlink.table.StarTable;
@@ -113,26 +118,25 @@ public class StarClusterLoader extends AbstractCatalogLoader implements ISceneGr
             logger.error("At least 'ra', 'dec', 'pllx'|'dist', 'radius' and 'name' are needed, please check your columns!");
             return;
         }
-        long rows = table.getRowCount();
         RowSequence rs = table.getRowSequence();
         while (rs.next()) {
             Object[] row = rs.getRow();
             String[] names = parseName(row[indices.get(ClusterProperties.NAME)].toString());
-            double ra = getDouble(row, ClusterProperties.RA, indices);
+            double ra = getDouble(row, ClusterProperties.RA, indices, table, "deg");
             double rarad = Math.toRadians(ra);
-            double dec = getDouble(row, ClusterProperties.DEC, indices);
+            double dec = getDouble(row, ClusterProperties.DEC, indices, table, "deg");
             double decrad = Math.toRadians(dec);
             double distpc = 0;
             if (indices.containsKey(ClusterProperties.DIST)) {
-                distpc = getDouble(row, ClusterProperties.DIST, indices);
+                distpc = getDouble(row, ClusterProperties.DIST, indices, table, "pc");
             } else if (indices.containsKey(ClusterProperties.PLLX)) {
-                distpc = 1000d / getDouble(row, ClusterProperties.PLLX, indices);
+                distpc = 1000d / getDouble(row, ClusterProperties.PLLX, indices, table, "mas");
             }
             double dist = distpc * Constants.PC_TO_U;
-            double mualphastar = getDouble(row, ClusterProperties.PMRA, indices);
-            double mudelta = getDouble(row, ClusterProperties.PMDE, indices);
-            double radvel = getDouble(row, ClusterProperties.RV, indices);
-            double radius = getDouble(row, ClusterProperties.RADIUS, indices);
+            double mualphastar = getDouble(row, ClusterProperties.PMRA, indices, table, "mas/yr");
+            double mudelta = getDouble(row, ClusterProperties.PMDE, indices, table, "mas/yr");
+            double radvel = getDouble(row, ClusterProperties.RV, indices, table, "km/s");
+            double radius = getDouble(row, ClusterProperties.RADIUS, indices, table, "deg");
             int nstars = getInteger(row, ClusterProperties.NSTARS, indices);
 
             addCluster(names, ra, rarad, dec, decrad, dist, distpc, mualphastar, mudelta, radvel, radius, nstars, clusters);
@@ -226,10 +230,27 @@ public class StarClusterLoader extends AbstractCatalogLoader implements ISceneGr
         return 0;
     }
 
-    private double getDouble(Object[] row, ClusterProperties prop, Map<ClusterProperties, Integer> indices) {
-        Object obj = get(row, prop, indices);
-        if(obj != null)
-            return ((Number) obj).doubleValue();
+    private double getDouble(Object[] row, ClusterProperties prop, Map<ClusterProperties, Integer> indices, StarTable table, String defaultUnit) {
+        Integer idx = indices.get(prop);
+        if(idx != null) {
+            ColumnInfo col = table.getColumnInfo(idx);
+            String unit = (col.getUnitString() != null && !col.getUnitString().isBlank() ? col.getUnitString() : defaultUnit);
+            Object obj = get(row, prop, indices);
+            if (obj != null) {
+                double val = ((Number) obj).doubleValue();
+                if (Angle.isAngle(unit)) {
+                    Angle angle = new Angle(val, unit);
+                    return angle.get(AngleUnit.valueOf(defaultUnit.toUpperCase()));
+                } else if (Length.isLength(unit)) {
+                    Length length = new Length(val, unit);
+                    return length.get(LengthUnit.valueOf(defaultUnit.toUpperCase()));
+                } else {
+                    // We just assume default unit
+                    return val;
+                }
+
+            }
+        }
         return 0;
     }
 

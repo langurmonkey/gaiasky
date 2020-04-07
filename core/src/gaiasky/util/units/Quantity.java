@@ -17,6 +17,16 @@ import gaiasky.util.units.Quantity.Length.LengthUnit;
 public class Quantity {
 
     public static class Length {
+
+        public static boolean isLength(String unit){
+            try{
+                parseLength(unit);
+                return true;
+            }catch(Exception e){
+                return false;
+            }
+        }
+
         public enum LengthUnit {
             /** Millimetres **/
             MM(1d / 1000d),
@@ -58,6 +68,15 @@ public class Quantity {
     }
 
     public static class Angle {
+
+        public static boolean isAngle(String unit){
+            try{
+                parseAngle(unit);
+                return true;
+            }catch(Exception e){
+                return false;
+            }
+        }
 
         public enum AngleUnit {
             /** Degrees **/
@@ -108,6 +127,15 @@ public class Quantity {
 
     public static class Brightness {
 
+        public static boolean isBrightness(String unit){
+            try{
+                parseMag(unit);
+                return true;
+            }catch(Exception e){
+                return false;
+            }
+        }
+
         public enum BrightnessUnit {
             MAG(1d);
 
@@ -134,7 +162,7 @@ public class Quantity {
 
     }
 
-    private static LengthUnit parseLength(String unit) {
+    private static LengthUnit parseLength(String unit) throws IllegalArgumentException {
         // Check format 'measure[unit]'
         if (unit.matches("[^\\[\\]]+\\[[^\\[\\]]+]")) {
             return LengthUnit.valueOf(unit.substring(unit.indexOf('[') + 1, unit.indexOf(']')).toUpperCase()); //-V6009
@@ -143,7 +171,7 @@ public class Quantity {
         }
     }
 
-    private static AngleUnit parseAngle(String unit) {
+    private static AngleUnit parseAngle(String unit) throws IllegalArgumentException {
         // Check format 'measure[unit]'
         if (unit.matches("[^\\[\\]]+\\[[^\\[\\]]+]")) {
             return AngleUnit.valueOf(unit.substring(unit.indexOf('[') + 1, unit.indexOf(']')).toUpperCase()); //-V6009
@@ -152,7 +180,7 @@ public class Quantity {
         }
     }
 
-    private static BrightnessUnit parseMag(String unit) {
+    private static BrightnessUnit parseMag(String unit) throws IllegalArgumentException {
         // Check format 'measure[unit]'
         if (unit.matches("[^\\[\\]]+\\[[^\\[\\]]+]")) {
             return BrightnessUnit.valueOf(unit.substring(unit.indexOf('[') + 1, unit.indexOf(']')).toUpperCase()); //-V6009
