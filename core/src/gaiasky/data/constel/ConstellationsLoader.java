@@ -17,17 +17,24 @@ import gaiasky.util.GlobalConf;
 import gaiasky.util.I18n;
 import gaiasky.util.Logger;
 import gaiasky.util.parse.Parser;
+import uk.ac.starlink.util.DataSource;
 
 import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
 
 public class ConstellationsLoader<T extends SceneGraphNode> implements ISceneGraphLoader {
     private static final String separator = "[\\t,]";
     String[] files;
 
+    @Override
     public void initialize(String[] files) {
         this.files = files;
+    }
+
+    @Override
+    public void initialize(DataSource ds) {
     }
 
     @Override

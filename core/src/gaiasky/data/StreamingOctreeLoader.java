@@ -22,8 +22,10 @@ import gaiasky.util.Logger;
 import gaiasky.util.Logger.Log;
 import gaiasky.util.tree.LoadStatus;
 import gaiasky.util.tree.OctreeNode;
+import uk.ac.starlink.util.DataSource;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.Comparator;
 import java.util.Queue;
 import java.util.Timer;
@@ -111,6 +113,10 @@ public abstract class StreamingOctreeLoader implements IObserver, ISceneGraphLoa
         loadedIds = new long[maxLoadedIds];
 
         EventManager.instance.subscribe(this, Events.DISPOSE, Events.PAUSE_BACKGROUND_LOADING, Events.RESUME_BACKGROUND_LOADING);
+    }
+
+    @Override
+    public void initialize(DataSource ds) {
     }
 
     @Override

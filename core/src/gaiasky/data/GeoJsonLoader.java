@@ -15,6 +15,9 @@ import gaiasky.scenegraph.SceneGraphNode;
 import gaiasky.util.GlobalConf;
 import gaiasky.util.I18n;
 import gaiasky.util.Logger;
+import uk.ac.starlink.util.DataSource;
+
+import java.io.InputStream;
 
 /**
  * Loads GeoJson files to Area objects
@@ -30,6 +33,10 @@ public class GeoJsonLoader<T extends SceneGraphNode> implements ISceneGraphLoade
     @Override
     public void initialize(String[] files) {
         filePaths = files;
+    }
+
+    @Override
+    public void initialize(DataSource ds) {
     }
 
     @Override

@@ -2426,34 +2426,28 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
                     }
                 } else if (dops == null || dops.type == DatasetOptions.DatasetLoadType.CLUSTERS) {
                     // STAR CLUSTERS
-                    if (ds instanceof FileDataSource) {
-                        FileDataSource fds = (FileDataSource) ds;
-                        GenericCatalog scc = new GenericCatalog();
-                        scc.setName(dops.catalogName);
-                        scc.setDescription(dsName);
-                        scc.setParent("Universe");
-                        scc.setFadein(dops.fadeIn);
-                        scc.setFadeout(dops.fadeOut);
-                        scc.setColor(dops.particleColor);
-                        scc.setLabelcolor(dops.labelColor);
-                        scc.setCt(dops.ct.toString());
-                        scc.setPosition(new double[]{0,0,0});
+                    GenericCatalog scc = new GenericCatalog();
+                    scc.setName(dsName);
+                    scc.setDescription(ds instanceof FileDataSource ? ((FileDataSource)ds).getFile().getAbsolutePath() : dsName);
+                    scc.setParent("Universe");
+                    scc.setFadein(dops.fadeIn);
+                    scc.setFadeout(dops.fadeOut);
+                    scc.setColor(dops.particleColor);
+                    scc.setLabelcolor(dops.labelColor);
+                    scc.setCt(dops.ct.toString());
+                    scc.setPosition(new double[]{0, 0, 0});
+                    scc.setDataSource(ds);
+                    scc.setProvider(StarClusterLoader.class.getName());
 
-                        scc.setDatafile(fds.getFile().getAbsolutePath());
-                        scc.setProvider(StarClusterLoader.class.getName());
-
-                        GaiaSky.postRunnable(() -> {
-                            scc.initialize();
-                            SceneGraphNode.insert(scc, true);
-                            scc.doneLoading(manager);
-                            logger.info(scc.children.size + " star clusters loaded");
-                        });
-                        // Sync waiting until the node is in the scene graph
-                        while (sync && (!scc.inSceneGraph)) {
-                            sleepFrames(1);
-                        }
-                    } else {
-                        logger.error("Only file data sources supported for star clusters");
+                    GaiaSky.postRunnable(() -> {
+                        scc.initialize();
+                        SceneGraphNode.insert(scc, true);
+                        scc.doneLoading(manager);
+                        logger.info(scc.children.size + " star clusters loaded");
+                    });
+                    // Sync waiting until the node is in the scene graph
+                    while (sync && (!scc.inSceneGraph)) {
+                        sleepFrames(1);
                     }
                 }
                 // One extra flush frame
@@ -2463,10 +2457,12 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
                 // No data has been loaded
                 return false;
             }
-        } catch (Exception e) {
+        } catch (
+                Exception e) {
             logger.error(e);
             return false;
         }
+
     }
 
     @Override
@@ -2652,7 +2648,7 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
     @Override
     public double[] internalUnitsToKilometres(double[] internalUnits) {
         double[] result = new double[internalUnits.length];
-        for(int i = 0; i < internalUnits.length; i++){
+        for (int i = 0; i < internalUnits.length; i++) {
             result[i] = internalUnitsToKilometres(internalUnits[i]);
         }
         return result;
@@ -2660,7 +2656,7 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
 
     public double[] internalUnitsToKilometres(List internalUnits) {
         double[] result = new double[internalUnits.size()];
-        for(int i = 0; i < internalUnits.size(); i++){
+        for (int i = 0; i < internalUnits.size(); i++) {
             result[i] = internalUnitsToKilometres((double) internalUnits.get(i));
         }
         return result;

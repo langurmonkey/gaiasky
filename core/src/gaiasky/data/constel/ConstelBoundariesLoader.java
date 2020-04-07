@@ -19,9 +19,11 @@ import gaiasky.util.Logger;
 import gaiasky.util.coord.Coordinates;
 import gaiasky.util.math.Vector3d;
 import gaiasky.util.parse.Parser;
+import uk.ac.starlink.util.DataSource;
 
 import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
@@ -32,8 +34,13 @@ public class ConstelBoundariesLoader<T extends SceneGraphNode> implements IScene
     private static final int INTERPOLATED_MOD = 3;
     private String[] files;
 
+    @Override
     public void initialize(String[] files) {
         this.files = files;
+    }
+
+    @Override
+    public void initialize(DataSource ds) {
     }
 
     @Override

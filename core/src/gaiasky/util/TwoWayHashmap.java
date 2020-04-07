@@ -40,4 +40,22 @@ public class TwoWayHashmap<K extends Object, V extends Object> {
     public synchronized boolean containsValue(V value){
         return backward.containsKey(value);
     }
+
+    public synchronized boolean removeKey(K key) {
+        V value = forward.get(key);
+        return remove(key, value);
+    }
+    public synchronized boolean removeValue(V value) {
+        K key = backward.get(value);
+        return remove(key, value);
+    }
+
+    private synchronized boolean remove(K key, V value) {
+        if(value != null && key != null){
+            forward.remove(key);
+            backward.remove(value);
+            return true;
+        }
+        return false;
+    }
 }
