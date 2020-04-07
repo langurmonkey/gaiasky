@@ -162,13 +162,19 @@ public class CamRecorder implements IObserver {
                 }
 
                 if (m == RecorderState.RECORDING) {
+                    String filename;
+                    if(data.length > 1 && data[1] != null && !((String)data[1]).isBlank()){
+                        filename = (String) data[1];
+                    } else {
+                       filename = df.format(new Date());
+                    }
                     // We start recording, prepare buffer!
                     if (mode == RecorderState.RECORDING) {
                         logger.info(I18n.bundle.get("error.camerarecord.already"));
                         return;
                     }
                     // Annotate by date
-                    f = SysUtils.getDefaultCameraDir().resolve(df.format(new Date()) + ".gsc");
+                    f = SysUtils.getDefaultCameraDir().resolve(filename + ".gsc");
                     if (Files.exists(f)) {
                         try {
                             Files.delete(f);

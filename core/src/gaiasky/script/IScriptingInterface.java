@@ -1281,10 +1281,22 @@ public interface IScriptingInterface {
     boolean waitFocus(String name, long timeoutMs);
 
     /**
-     * Starts recording the camera path to a temporary file. This command has no
+     * Starts recording the camera path to an auto-generated file in the default
+     * camera folder. This command has no
      * effect if the camera is already being recorded.
      */
     void startRecordingCameraPath();
+
+    /**
+     * Starts recording a camera path with the given filename. The filename
+     * is without extension or path. The final path with the camera file, after
+     * invoking {@link IScriptingInterface#stopRecordingCameraPath()}, is:
+     * <br /><br />
+     * <code>{@link IScriptingInterface#getDefaultCameraDir()} + "/" + filename + ".gsc"</code>
+     * <br /><br />
+     * This command has no effect if the camera is already being recorded.
+     */
+    void startRecordingCameraPath(String fileName);
 
     /**
      * Stops the current camera recording. This command has no effect if the

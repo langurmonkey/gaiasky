@@ -1138,7 +1138,7 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
             ModelComponent.setAmbientLight((float) data[0]);
             break;
         case RECORD_CAMERA_CMD:
-            if (data != null) {
+            if (data != null && data.length > 0) {
                 camRecording = (Boolean) data[0];
             } else {
                 camRecording = !camRecording;

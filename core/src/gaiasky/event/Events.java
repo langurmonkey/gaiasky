@@ -780,7 +780,7 @@ public enum Events {
     RECALCULATE_OPTIONS_SIZE,
     /**
      * Issues the command to enable camera recording. Contains the boolean
-     * indicating the state (may be null) and a boolean indicating whether this
+     * indicating the state (on/off), a file name (null for auto-generated) and a boolean indicating whether this
      * comes from the interface.
      **/
     RECORD_CAMERA_CMD,

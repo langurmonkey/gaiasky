@@ -43,7 +43,6 @@ public class OwnImageButton extends ImageButton {
 
     public void setCheckedNoFire(boolean isChecked) {
         this.setProgrammaticChangeEvents(false);
-        // Check
         this.setChecked(isChecked);
         this.setProgrammaticChangeEvents(true);
     }

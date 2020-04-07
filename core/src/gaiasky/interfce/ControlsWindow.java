@@ -80,7 +80,7 @@ public class ControlsWindow extends CollapsibleWindow implements IObserver {
         septexreg.getTexture().setWrap(TextureWrap.Repeat, TextureWrap.ClampToEdge);
         this.separator = new TiledDrawable(septexreg);
 
-        EventManager.instance.subscribe(this, Events.TIME_STATE_CMD, Events.GUI_SCROLL_POSITION_CMD, Events.GUI_FOLD_CMD, Events.GUI_MOVE_CMD, Events.RECALCULATE_OPTIONS_SIZE, Events.EXPAND_PANE_CMD, Events.COLLAPSE_PANE_CMD, Events.TOGGLE_EXPANDCOLLAPSE_PANE_CMD, Events.SHOW_MINIMAP_ACTION, Events.TOGGLE_MINIMAP);
+        EventManager.instance.subscribe(this, Events.TIME_STATE_CMD, Events.GUI_SCROLL_POSITION_CMD, Events.GUI_FOLD_CMD, Events.GUI_MOVE_CMD, Events.RECALCULATE_OPTIONS_SIZE, Events.EXPAND_PANE_CMD, Events.COLLAPSE_PANE_CMD, Events.TOGGLE_EXPANDCOLLAPSE_PANE_CMD, Events.SHOW_MINIMAP_ACTION, Events.TOGGLE_MINIMAP, Events.RECORD_CAMERA_CMD);
     }
 
     public void initialize() {
@@ -123,7 +123,7 @@ public class ControlsWindow extends CollapsibleWindow implements IObserver {
         recCamera.setChecked(GlobalConf.runtime.RECORD_CAMERA);
         recCamera.addListener(event -> {
             if (event instanceof ChangeEvent) {
-                EventManager.instance.post(Events.RECORD_CAMERA_CMD, recCamera.isChecked(), true);
+                EventManager.instance.post(Events.RECORD_CAMERA_CMD, recCamera.isChecked(), null, true);
                 return true;
             }
             return false;
@@ -464,6 +464,13 @@ public class ControlsWindow extends CollapsibleWindow implements IObserver {
                 map.setProgrammaticChangeEvents(false);
                 map.setChecked(!map.isChecked());
                 map.setProgrammaticChangeEvents(true);
+                break;
+            case RECORD_CAMERA_CMD:
+                boolean state = (Boolean) data[0];
+                ui = (Boolean) data[2];
+                if(!ui){
+                    recCamera.setCheckedNoFire(state);
+                }
                 break;
             default:
                 break;
