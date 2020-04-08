@@ -163,6 +163,11 @@ public class Constants {
     /** Minimum fov value, in degrees **/
     public static final float MIN_FOV = 2f;
 
+    /** Minimum limit/frame/camrec fps value **/
+    public static final double MIN_FPS = 1d;
+    /** Maximum limit/frame/camrec fps value **/
+    public static final double MAX_FPS = 1000d;
+
     /** Maximum camera speed **/
     public static final float MAX_CAM_SPEED = 10f;
     /** Minimum camera speed **/

@@ -8,22 +8,31 @@ package gaiasky.interfce;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import gaiasky.desktop.util.camera.CameraKeyframeManager;
+import gaiasky.event.EventManager;
+import gaiasky.event.Events;
 import gaiasky.interfce.beans.ComboBoxBean;
+import gaiasky.util.Constants;
 import gaiasky.util.GlobalConf;
 import gaiasky.util.I18n;
+import gaiasky.util.format.INumberFormat;
+import gaiasky.util.format.NumberFormatFactory;
+import gaiasky.util.parse.Parser;
 import gaiasky.util.scene2d.OwnLabel;
 import gaiasky.util.scene2d.OwnSelectBox;
 import gaiasky.util.scene2d.OwnTextField;
+import gaiasky.util.validator.DoubleValidator;
 import gaiasky.util.validator.IntValidator;
 
 public class KeyframePreferencesWindow extends GenericDialog {
 
-    OwnSelectBox<ComboBoxBean> posMethod, orientationMethod;
-    OwnTextField camrecFps;
+    private OwnSelectBox<ComboBoxBean> posMethod, orientationMethod;
+    public OwnTextField camrecFps;
+    private INumberFormat nf3;
 
     public KeyframePreferencesWindow(Stage stage, Skin skin) {
         super(I18n.txt("gui.keyframes.preferences"), skin, stage);
         setModal(true);
+        this.nf3 = NumberFormatFactory.getFormatter("0.000");
 
         setAcceptText(I18n.txt("gui.saveprefs"));
         setCancelText(I18n.txt("gui.cancel"));
@@ -40,8 +49,8 @@ public class KeyframePreferencesWindow extends GenericDialog {
 
         // fps
         OwnLabel camfpsLabel = new OwnLabel(I18n.txt("gui.target.fps"), skin);
-        camrecFps = new OwnTextField(Integer.toString(GlobalConf.frame.CAMERA_REC_TARGET_FPS), skin, new IntValidator(1, 200));
-        camrecFps.setWidth(150 * GlobalConf.UI_SCALE_FACTOR);
+        camrecFps = new OwnTextField(nf3.format(GlobalConf.frame.CAMERA_REC_TARGET_FPS), skin, new DoubleValidator(Constants.MIN_FPS, Constants.MAX_FPS));
+        camrecFps.setWidth(150f * GlobalConf.UI_SCALE_FACTOR);
 
         OwnLabel interpTitle = new OwnLabel(I18n.txt("gui.keyframes.interp"), skin, "hud-header");
 
@@ -85,7 +94,7 @@ public class KeyframePreferencesWindow extends GenericDialog {
 
     @Override
     protected void accept() {
-        GlobalConf.frame.CAMERA_REC_TARGET_FPS = Integer.parseInt(camrecFps.getText());
+        EventManager.instance.post(Events.CAMRECORDER_FPS_CMD, Parser.parseDouble(camrecFps.getText()));
         GlobalConf.frame.KF_PATH_TYPE_POSITION = CameraKeyframeManager.PathType.values()[posMethod.getSelectedIndex()];
         GlobalConf.frame.KF_PATH_TYPE_ORIENTATION = CameraKeyframeManager.PathType.values()[orientationMethod.getSelectedIndex()];
     }

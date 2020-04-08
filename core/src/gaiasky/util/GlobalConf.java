@@ -498,7 +498,7 @@ public class GlobalConf {
         /**
          * Toggles the record camera
          */
-        private int backupLimitFps = 0;
+        private double backupLimitFps = 0;
         public void toggleRecord(Boolean rec) {
             if (rec != null) {
                 RECORD_CAMERA = rec;
@@ -539,11 +539,11 @@ public class GlobalConf {
         /**
          * The number of images per second to produce
          **/
-        public int RENDER_TARGET_FPS;
+        public double RENDER_TARGET_FPS;
         /**
          * The target FPS when recording the camera
          **/
-        public int CAMERA_REC_TARGET_FPS;
+        public double CAMERA_REC_TARGET_FPS;
         /**
          * Automatically activate frame output system when playing camera file
          **/
@@ -587,7 +587,7 @@ public class GlobalConf {
         public CameraKeyframeManager.PathType KF_PATH_TYPE_ORIENTATION;
 
         public FrameConf() {
-            EventManager.instance.subscribe(this, Events.CONFIG_FRAME_OUTPUT_CMD, Events.FRAME_OUTPUT_CMD);
+            EventManager.instance.subscribe(this, Events.CONFIG_FRAME_OUTPUT_CMD, Events.FRAME_OUTPUT_CMD, Events.CAMRECORDER_FPS_CMD);
         }
 
         public boolean isSimpleMode() {
@@ -598,7 +598,7 @@ public class GlobalConf {
             return FRAME_MODE.equals(ScreenshotMode.redraw);
         }
 
-        public void initialize(int rENDER_WIDTH, int rENDER_HEIGHT, int rENDER_TARGET_FPS, int cAMERA_REC_TARGET_FPS, boolean aUTO_FRAME_OUTPUT_CAMERA_PLAY, String rENDER_FOLDER, String rENDER_FILE_NAME, boolean rENDER_SCREENSHOT_TIME, boolean rENDER_OUTPUT, ScreenshotMode fRAME_MODE, ImageFormat fRAME_FORMAT, float fRAME_QUALITY, CameraKeyframeManager.PathType kF_PATH_TYPE_POSITION, CameraKeyframeManager.PathType kF_PATH_TYPE_ORIENTATION) {
+        public void initialize(int rENDER_WIDTH, int rENDER_HEIGHT, double rENDER_TARGET_FPS, double cAMERA_REC_TARGET_FPS, boolean aUTO_FRAME_OUTPUT_CAMERA_PLAY, String rENDER_FOLDER, String rENDER_FILE_NAME, boolean rENDER_SCREENSHOT_TIME, boolean rENDER_OUTPUT, ScreenshotMode fRAME_MODE, ImageFormat fRAME_FORMAT, float fRAME_QUALITY, CameraKeyframeManager.PathType kF_PATH_TYPE_POSITION, CameraKeyframeManager.PathType kF_PATH_TYPE_ORIENTATION) {
             RENDER_WIDTH = rENDER_WIDTH;
             RENDER_HEIGHT = rENDER_HEIGHT;
             RENDER_TARGET_FPS = rENDER_TARGET_FPS;
@@ -622,7 +622,7 @@ public class GlobalConf {
                     boolean updateFrameSize = RENDER_WIDTH != (int) data[0] || RENDER_HEIGHT != (int) data[1];
                     RENDER_WIDTH = (int) data[0];
                     RENDER_HEIGHT = (int) data[1];
-                    RENDER_TARGET_FPS = (int) data[2];
+                    RENDER_TARGET_FPS = (double) data[2];
                     RENDER_FOLDER = (String) data[3];
                     RENDER_FILE_NAME = (String) data[4];
 
@@ -652,6 +652,9 @@ public class GlobalConf {
                     if (!RENDER_OUTPUT && GaiaSky.instance != null) {
                         EventManager.instance.post(Events.FLUSH_FRAMES);
                     }
+                    break;
+                case CAMRECORDER_FPS_CMD:
+                    CAMERA_REC_TARGET_FPS = (Double) data[0];
                     break;
                 default:
                     break;
@@ -746,7 +749,7 @@ public class GlobalConf {
         }
     }
 
-    public static class ScreenConf implements IConf {
+    public static class ScreenConf implements IConf, IObserver {
 
         public int SCREEN_WIDTH;
         public int SCREEN_HEIGHT;
@@ -758,10 +761,14 @@ public class GlobalConf {
         public boolean FULLSCREEN;
         public boolean RESIZABLE;
         public boolean VSYNC;
-        public int LIMIT_FPS;
+        public double LIMIT_FPS;
         public boolean SCREEN_OUTPUT = true;
 
-        public void initialize(int sCREEN_WIDTH, int sCREEN_HEIGHT, int fULLSCREEN_WIDTH, int fULLSCREEN_HEIGHT, boolean fULLSCREEN, boolean rESIZABLE, boolean vSYNC, boolean sCREEN_OUTPUT, int lIMIT_FPS) {
+        public ScreenConf(){
+            EventManager.instance.subscribe(this, Events.LIMIT_FPS_CMD);
+        }
+
+        public void initialize(int sCREEN_WIDTH, int sCREEN_HEIGHT, int fULLSCREEN_WIDTH, int fULLSCREEN_HEIGHT, boolean fULLSCREEN, boolean rESIZABLE, boolean vSYNC, boolean sCREEN_OUTPUT, double lIMIT_FPS) {
             SCREEN_WIDTH = sCREEN_WIDTH;
             SCREEN_HEIGHT = sCREEN_HEIGHT;
             BACKBUFFER_WIDTH = sCREEN_WIDTH;
@@ -793,6 +800,16 @@ public class GlobalConf {
             }
         }
 
+        @Override
+        public void notify(Events event, Object... data) {
+            switch(event){
+                case LIMIT_FPS_CMD:
+                    LIMIT_FPS = (Double) data[0];
+                    break;
+                default:
+                    break;
+            }
+        }
     }
 
     public static class ProgramConf implements IConf, IObserver {

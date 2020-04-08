@@ -125,19 +125,19 @@ public class DesktopConfInit extends ConfInit {
 
         /** PERFORMANCE CONF **/
         PerformanceConf pc = new PerformanceConf();
-        boolean MULTITHREADING = Boolean.parseBoolean(p.getProperty("global.conf.multithreading"));
+        boolean MULTITHREADING = Parser.parseBoolean(p.getProperty("global.conf.multithreading"));
         String propNumthreads = p.getProperty("global.conf.numthreads");
-        int NUMBER_THREADS = Integer.parseInt((propNumthreads == null || propNumthreads.isEmpty()) ? "0" : propNumthreads);
+        int NUMBER_THREADS = Parser.parseInt((propNumthreads == null || propNumthreads.isEmpty()) ? "0" : propNumthreads);
         pc.initialize(MULTITHREADING, NUMBER_THREADS);
 
         /** POSTPROCESS CONF **/
         PostprocessConf ppc = new PostprocessConf();
-        Antialias POSTPROCESS_ANTIALIAS = ppc.getAntialias(Integer.parseInt(p.getProperty("postprocess.antialiasing")));
+        Antialias POSTPROCESS_ANTIALIAS = ppc.getAntialias(Parser.parseInt(p.getProperty("postprocess.antialiasing")));
         float POSTPROCESS_BLOOM_INTENSITY = Parser.parseFloat(p.getProperty("postprocess.bloom.intensity"));
         boolean POSTPROCESS_MOTION_BLUR = Parser.parseFloat(p.getProperty("postprocess.motionblur")) > 0;
-        boolean POSTPROCESS_LENS_FLARE = Boolean.parseBoolean(p.getProperty("postprocess.lensflare"));
-        boolean POSTPROCESS_LIGHT_SCATTERING = Boolean.parseBoolean(p.getProperty("postprocess.lightscattering", "false"));
-        boolean POSTPROCESS_FISHEYE = Boolean.parseBoolean(p.getProperty("postprocess.fisheye", "false"));
+        boolean POSTPROCESS_LENS_FLARE = Parser.parseBoolean(p.getProperty("postprocess.lensflare"));
+        boolean POSTPROCESS_LIGHT_SCATTERING = Parser.parseBoolean(p.getProperty("postprocess.lightscattering", "false"));
+        boolean POSTPROCESS_FISHEYE = Parser.parseBoolean(p.getProperty("postprocess.fisheye", "false"));
         float POSTPROCESS_BRIGHTNESS = Parser.parseFloat(p.getProperty("postprocess.brightness", "0"));
         float POSTPROCESS_CONTRAST = Parser.parseFloat(p.getProperty("postprocess.contrast", "1"));
         float POSTPROCESS_HUE = Parser.parseFloat(p.getProperty("postprocess.hue", "1"));
@@ -165,8 +165,8 @@ public class DesktopConfInit extends ConfInit {
 
         String OBJECTS_JSON_FILE = p.getProperty("data.json.objects");
 
-        boolean REAL_GAIA_ATTITUDE = Boolean.parseBoolean(p.getProperty("data.attitude.real"));
-        boolean HIGH_ACCURACY_POSITIONS = Boolean.parseBoolean(p.getProperty("data.highaccuracy.positions", "false"));
+        boolean REAL_GAIA_ATTITUDE = Parser.parseBoolean(p.getProperty("data.attitude.real"));
+        boolean HIGH_ACCURACY_POSITIONS = Parser.parseBoolean(p.getProperty("data.highaccuracy.positions", "false"));
 
         float LIMIT_MAG_LOAD;
         if (p.getProperty("data.limit.mag") != null && !p.getProperty("data.limit.mag").isEmpty()) {
@@ -182,7 +182,7 @@ public class DesktopConfInit extends ConfInit {
         ProgramConf prc = new ProgramConf();
         String LOCALE = p.getProperty("program.locale");
 
-        boolean SHOW_DEBUG_INFO = Boolean.parseBoolean(p.getProperty("program.debuginfo"));
+        boolean SHOW_DEBUG_INFO = Parser.parseBoolean(p.getProperty("program.debuginfo"));
         Instant LAST_CHECKED;
         try {
             LAST_CHECKED = df.parse(p.getProperty("program.lastchecked"));
@@ -197,25 +197,25 @@ public class DesktopConfInit extends ConfInit {
         GlobalConf.updateScaleFactor(UI_THEME.endsWith("x2") ? 1.6f : 1f);
         String SCRIPT_LOCATION = p.getProperty("program.scriptlocation").isEmpty() ? System.getProperty("user.dir") + File.separatorChar + "scripts" : p.getProperty("program.scriptlocation");
         SCRIPT_LOCATION = SCRIPT_LOCATION.replaceAll("\\\\", "/");
-        int REST_PORT = Integer.parseInt(p.getProperty("program.restport", "-1"));
+        int REST_PORT = Parser.parseInt(p.getProperty("program.restport", "-1"));
 
-        boolean STEREOSCOPIC_MODE = Boolean.parseBoolean(p.getProperty("program.stereoscopic"));
-        StereoProfile STEREO_PROFILE = StereoProfile.values()[Integer.parseInt(p.getProperty("program.stereoscopic.profile"))];
-        boolean CUBEMAP_MODE = Boolean.parseBoolean(p.getProperty("program.cubemap", "false"));
+        boolean STEREOSCOPIC_MODE = Parser.parseBoolean(p.getProperty("program.stereoscopic"));
+        StereoProfile STEREO_PROFILE = StereoProfile.values()[Parser.parseInt(p.getProperty("program.stereoscopic.profile"))];
+        boolean CUBEMAP_MODE = Parser.parseBoolean(p.getProperty("program.cubemap", "false"));
         CubemapProjection CUBEMAP_PROJECTION = CubemapProjection.valueOf(p.getProperty("program.cubemap.projection", "equirectangular").toUpperCase());
-        int CUBEMAP_FACE_RESOLUTION = Integer.parseInt(p.getProperty("program.cubemap.face.resolution", "1500"));
+        int CUBEMAP_FACE_RESOLUTION = Parser.parseInt(p.getProperty("program.cubemap.face.resolution", "1500"));
         float PLANETARIUM_APERTURE = Parser.parseFloat(p.getProperty("program.planetarium.aperture", "180.0"));
         float PLANETARIUM_ANGLE = Parser.parseFloat(p.getProperty("program.planetarium.angle", "50.0"));
-        boolean DISPLAY_HUD = Boolean.parseBoolean(p.getProperty("program.display.hud", "false"));
-        boolean DISPLAY_POINTER_COORDS = Boolean.parseBoolean(p.getProperty("program.pointer.coords.display", "true"));
+        boolean DISPLAY_HUD = Parser.parseBoolean(p.getProperty("program.display.hud", "false"));
+        boolean DISPLAY_POINTER_COORDS = Parser.parseBoolean(p.getProperty("program.pointer.coords.display", "true"));
         String catChoos = p.getProperty("program.catalog.chooser", "default");
         if(catChoos.equalsIgnoreCase("true") || catChoos.equalsIgnoreCase("false"))
             catChoos = "default";
         ShowCriterion CATALOG_CHOOSER = ShowCriterion.valueOf(catChoos.toUpperCase());
-        boolean DISPLAY_MINIMAP = Boolean.parseBoolean(p.getProperty("program.display.minimap", "true"));
+        boolean DISPLAY_MINIMAP = Parser.parseBoolean(p.getProperty("program.display.minimap", "true"));
         float MINIMAP_SIZE = MathUtilsd.clamp(Parser.parseFloat(p.getProperty("program.minimap.size", "220.0")), Constants.MIN_MINIMAP_SIZE, Constants.MAX_MINIMAP_SIZE);
-        boolean NET_MASTER = Boolean.parseBoolean(p.getProperty("program.net.master", "false"));
-        boolean NET_SLAVE = Boolean.parseBoolean(p.getProperty("program.net.slave", "false"));
+        boolean NET_MASTER = Parser.parseBoolean(p.getProperty("program.net.master", "false"));
+        boolean NET_SLAVE = Parser.parseBoolean(p.getProperty("program.net.slave", "false"));
         String NET_SLAVE_CONFIG = p.getProperty("program.net.slave.config", "");
         float NET_SLAVE_YAW = Parser.parseFloat(p.getProperty("program.net.slave.yaw", "NaN"));
         float NET_SLAVE_PITCH = Parser.parseFloat(p.getProperty("program.net.slave.pitch", "NaN"));
@@ -223,10 +223,10 @@ public class DesktopConfInit extends ConfInit {
         String NET_SLAVE_WARP = p.getProperty("program.net.slave.warp", "");
         String NET_SLAVE_BLEND = p.getProperty("program.net.slave.blend", "");
         String LAST_FOLDER_LOCATION = p.getProperty("program.last.filesystem.location");
-        boolean EXIT_CONFIRMATION = Boolean.parseBoolean(p.getProperty("program.exit.confirmation", "true"));
+        boolean EXIT_CONFIRMATION = Parser.parseBoolean(p.getProperty("program.exit.confirmation", "true"));
 
         // Pointer guides
-        boolean DISPLAY_POINTER_GUIDES = Boolean.parseBoolean(p.getProperty("program.pointer.guides.display", "false"));
+        boolean DISPLAY_POINTER_GUIDES = Parser.parseBoolean(p.getProperty("program.pointer.guides.display", "false"));
         float[] POINTER_GUIDES_COLOR = Parser.parseFloatArray(p.getProperty("program.pointer.guides.color", "[1.0,1.0,1.0,0.3]"));
         float POINTER_GUIDES_WIDTH = Parser.parseFloat(p.getProperty("program.pointer.guides.width", "1.5"));
 
@@ -258,23 +258,23 @@ public class DesktopConfInit extends ConfInit {
         float STAR_BRIGHTNESS_POWER = Parser.parseFloat(p.getProperty("scene.star.brightness.pow", "1.0"));
         float AMBIENT_LIGHT = Parser.parseFloat(p.getProperty("scene.ambient"));
         float CAMERA_FOV = Parser.parseFloat(p.getProperty("scene.camera.fov"));
-        int CAMERA_SPEED_LIMIT_IDX = Integer.parseInt(p.getProperty("scene.camera.speedlimit"));
+        int CAMERA_SPEED_LIMIT_IDX = Parser.parseInt(p.getProperty("scene.camera.speedlimit"));
         float CAMERA_SPEED = Parser.parseFloat(p.getProperty("scene.camera.focus.vel"));
-        boolean FOCUS_LOCK = Boolean.parseBoolean(p.getProperty("scene.focuslock"));
-        boolean FOCUS_LOCK_ORIENTATION = Boolean.parseBoolean(p.getProperty("scene.focuslock.orientation", "false"));
+        boolean FOCUS_LOCK = Parser.parseBoolean(p.getProperty("scene.focuslock"));
+        boolean FOCUS_LOCK_ORIENTATION = Parser.parseBoolean(p.getProperty("scene.focuslock.orientation", "false"));
         float TURNING_SPEED = Parser.parseFloat(p.getProperty("scene.camera.turn.vel"));
         float ROTATION_SPEED = Parser.parseFloat(p.getProperty("scene.camera.rotate.vel"));
         float LABEL_SIZE_FACTOR = Parser.parseFloat(p.getProperty("scene.label.size"));
         float LABEL_NUMBER_FACTOR = Parser.parseFloat(p.getProperty("scene.label.number"));
         float LINE_WIDTH_FACTOR = Parser.parseFloat(p.getProperty("scene.line.width", "1.0"));
-        double STAR_TH_ANGLE_QUAD = Double.parseDouble(p.getProperty("scene.star.threshold.quad"));
-        double STAR_TH_ANGLE_POINT = Double.parseDouble(p.getProperty("scene.star.threshold.point"));
-        double STAR_TH_ANGLE_NONE = Double.parseDouble(p.getProperty("scene.star.threshold.none"));
+        double STAR_TH_ANGLE_QUAD = Parser.parseDouble(p.getProperty("scene.star.threshold.quad"));
+        double STAR_TH_ANGLE_POINT = Parser.parseDouble(p.getProperty("scene.star.threshold.point"));
+        double STAR_TH_ANGLE_NONE = Parser.parseDouble(p.getProperty("scene.star.threshold.none"));
         float POINT_ALPHA_MIN = Parser.parseFloat(p.getProperty("scene.point.alpha.min"));
         float POINT_ALPHA_MAX = Parser.parseFloat(p.getProperty("scene.point.alpha.max"));
-        int ORBIT_RENDERER = Integer.parseInt(p.getProperty("scene.renderer.orbit", "0"));
-        int LINE_RENDERER = Integer.parseInt(p.getProperty("scene.renderer.line"));
-        boolean OCTREE_PARTICLE_FADE = Boolean.parseBoolean(p.getProperty("scene.octree.particle.fade"));
+        int ORBIT_RENDERER = Parser.parseInt(p.getProperty("scene.renderer.orbit", "0"));
+        int LINE_RENDERER = Parser.parseInt(p.getProperty("scene.renderer.line"));
+        boolean OCTREE_PARTICLE_FADE = Parser.parseBoolean(p.getProperty("scene.octree.particle.fade"));
         float OCTANT_THRESHOLD_0 = Parser.parseFloat(p.getProperty("scene.octant.threshold.0"));
         float OCTANT_THRESHOLD_1 = Parser.parseFloat(p.getProperty("scene.octant.threshold.1"));
         // Limiting draw distance in 32-bit JVM
@@ -286,17 +286,17 @@ public class DesktopConfInit extends ConfInit {
         float PM_NUM_FACTOR = Parser.parseFloat(p.getProperty("scene.propermotion.numfactor", "20.0"));
         float PM_LEN_FACTOR = Parser.parseFloat(p.getProperty("scene.propermotion.lenfactor", "1E1"));
         long N_PM_STARS = Long.parseLong(p.getProperty("scene.propermotion.maxnumber", "-1"));
-        int PM_COLOR_MODE = Integer.parseInt(p.getProperty("scene.propermotion.colormode", "0"));
-        boolean PM_ARROWHEADS = Boolean.parseBoolean(p.getProperty("scene.propermotion.arrowheads", "true"));
-        boolean GALAXY_3D = Boolean.parseBoolean(p.getProperty("scene.galaxy.3d", "true"));
-        boolean CROSSHAIR_FOCUS = Boolean.parseBoolean(p.getProperty("scene.crosshair.focus", "true"));
-        boolean CROSSHAIR_CLOSEST = Boolean.parseBoolean(p.getProperty("scene.crosshair.closest", "true"));
-        boolean CROSSHAIR_HOME = Boolean.parseBoolean(p.getProperty("scene.crosshair.home", "true"));
-        boolean CINEMATIC_CAMERA = Boolean.parseBoolean(p.getProperty("scene.camera.cinematic", "false"));
-        boolean FREE_CAMERA_TARGET_MODE_ON = Boolean.parseBoolean(p.getProperty("scene.camera.free.targetmode", "false"));
-        boolean SHADOW_MAPPING = Boolean.parseBoolean(p.getProperty("scene.shadowmapping", "true"));
-        int SHADOW_MAPPING_N_SHADOWS = MathUtilsd.clamp(Integer.parseInt(p.getProperty("scene.shadowmapping.nshadows", "2")), 0, 4);
-        int SHADOW_MAPPING_RESOLUTION = Integer.parseInt(p.getProperty("scene.shadowmapping.resolution", "512"));
+        int PM_COLOR_MODE = Parser.parseInt(p.getProperty("scene.propermotion.colormode", "0"));
+        boolean PM_ARROWHEADS = Parser.parseBoolean(p.getProperty("scene.propermotion.arrowheads", "true"));
+        boolean GALAXY_3D = Parser.parseBoolean(p.getProperty("scene.galaxy.3d", "true"));
+        boolean CROSSHAIR_FOCUS = Parser.parseBoolean(p.getProperty("scene.crosshair.focus", "true"));
+        boolean CROSSHAIR_CLOSEST = Parser.parseBoolean(p.getProperty("scene.crosshair.closest", "true"));
+        boolean CROSSHAIR_HOME = Parser.parseBoolean(p.getProperty("scene.crosshair.home", "true"));
+        boolean CINEMATIC_CAMERA = Parser.parseBoolean(p.getProperty("scene.camera.cinematic", "false"));
+        boolean FREE_CAMERA_TARGET_MODE_ON = Parser.parseBoolean(p.getProperty("scene.camera.free.targetmode", "false"));
+        boolean SHADOW_MAPPING = Parser.parseBoolean(p.getProperty("scene.shadowmapping", "true"));
+        int SHADOW_MAPPING_N_SHADOWS = MathUtilsd.clamp(Parser.parseInt(p.getProperty("scene.shadowmapping.nshadows", "2")), 0, 4);
+        int SHADOW_MAPPING_RESOLUTION = Parser.parseInt(p.getProperty("scene.shadowmapping.resolution", "512"));
         long MAX_LOADED_STARS = Long.parseLong(p.getProperty("scene.octree.maxstars", "10000000"));
         // Limiting number of stars in 32-bit JVM
         if (ARCH.equals("32")) {
@@ -309,15 +309,15 @@ public class DesktopConfInit extends ConfInit {
         for (ComponentType ct : cts) {
             String key = "scene.visibility." + ct.name();
             if (p.containsKey(key)) {
-                VISIBILITY[ct.ordinal()] = Boolean.parseBoolean(p.getProperty(key));
+                VISIBILITY[ct.ordinal()] = Parser.parseBoolean(p.getProperty(key));
             }
         }
         float STAR_POINT_SIZE = Parser.parseFloat(p.getProperty("scene.star.point.size", "-1.0"));
-        boolean LAZY_TEXTURE_INIT = Boolean.parseBoolean(p.getProperty("scene.lazy.texture", "true"));
-        boolean LAZY_MESH_INIT = Boolean.parseBoolean(p.getProperty("scene.lazy.mesh", "true"));
+        boolean LAZY_TEXTURE_INIT = Parser.parseBoolean(p.getProperty("scene.lazy.texture", "true"));
+        boolean LAZY_MESH_INIT = Parser.parseBoolean(p.getProperty("scene.lazy.mesh", "true"));
         ElevationType ELEVATION_TYPE = ElevationType.valueOf(p.getProperty("scene.elevation.type", "tessellation").toUpperCase());
-        double ELEVATION_MULTIPLIER = Double.parseDouble(p.getProperty("scene.elevation.multiplier", "1.0"));
-        double TESSELLATION_QUALITY = Double.parseDouble(p.getProperty("scene.tessellation.quality", "4.0"));
+        double ELEVATION_MULTIPLIER = Parser.parseDouble(p.getProperty("scene.elevation.multiplier", "1.0"));
+        double TESSELLATION_QUALITY = Parser.parseDouble(p.getProperty("scene.tessellation.quality", "4.0"));
 
         // Hardcoded for now
         double DIST_SCALE_DESKTOP = 1d;
@@ -337,12 +337,12 @@ public class DesktopConfInit extends ConfInit {
         }
         String RENDER_FOLDER = renderFolder.replaceAll("\\\\", "/");
         String RENDER_FILE_NAME = p.getProperty("graphics.render.filename");
-        int RENDER_WIDTH = Integer.parseInt(p.getProperty("graphics.render.width"));
-        int RENDER_HEIGHT = Integer.parseInt(p.getProperty("graphics.render.height"));
-        int RENDER_TARGET_FPS = Integer.parseInt(p.getProperty("graphics.render.targetfps", "60"));
-        int CAMERA_REC_TARGET_FPS = Integer.parseInt(p.getProperty("graphics.camera.recording.targetfps", "60"));
-        boolean AUTO_FRAME_OUTPUT_CAMERA_PLAY = Boolean.parseBoolean(p.getProperty("graphics.camera.recording.frameoutputauto", "false"));
-        boolean RENDER_SCREENSHOT_TIME = Boolean.parseBoolean(p.getProperty("graphics.render.time"));
+        int RENDER_WIDTH = Parser.parseInt(p.getProperty("graphics.render.width"));
+        int RENDER_HEIGHT = Parser.parseInt(p.getProperty("graphics.render.height"));
+        double RENDER_TARGET_FPS = Parser.parseDouble(p.getProperty("graphics.render.targetfps", "60.0"));
+        double CAMERA_REC_TARGET_FPS = Parser.parseDouble(p.getProperty("graphics.camera.recording.targetfps", "60.0"));
+        boolean AUTO_FRAME_OUTPUT_CAMERA_PLAY = Parser.parseBoolean(p.getProperty("graphics.camera.recording.frameoutputauto", "false"));
+        boolean RENDER_SCREENSHOT_TIME = Parser.parseBoolean(p.getProperty("graphics.render.time"));
 
         ScreenshotMode FRAME_MODE = ScreenshotMode.valueOf(p.getProperty("graphics.render.mode"));
         ImageFormat FRAME_FORMAT = ImageFormat.valueOf(p.getProperty("graphics.render.format", "jpg").toUpperCase());
@@ -355,15 +355,15 @@ public class DesktopConfInit extends ConfInit {
         fc.initialize(RENDER_WIDTH, RENDER_HEIGHT, RENDER_TARGET_FPS, CAMERA_REC_TARGET_FPS, AUTO_FRAME_OUTPUT_CAMERA_PLAY, RENDER_FOLDER, RENDER_FILE_NAME, RENDER_SCREENSHOT_TIME, RENDER_SCREENSHOT_TIME, FRAME_MODE, FRAME_FORMAT, FRAME_QUALITY, KF_POS, KF_ORI);
 
         /** SCREEN CONF **/
-        int SCREEN_WIDTH = Integer.parseInt(p.getProperty("graphics.screen.width"));
-        int SCREEN_HEIGHT = Integer.parseInt(p.getProperty("graphics.screen.height"));
-        int FULLSCREEN_WIDTH = Integer.parseInt(p.getProperty("graphics.screen.fullscreen.width"));
-        int FULLSCREEN_HEIGHT = Integer.parseInt(p.getProperty("graphics.screen.fullscreen.height"));
-        boolean FULLSCREEN = Boolean.parseBoolean(p.getProperty("graphics.screen.fullscreen"));
-        boolean RESIZABLE = Boolean.parseBoolean(p.getProperty("graphics.screen.resizable"));
-        boolean VSYNC = Boolean.parseBoolean(p.getProperty("graphics.screen.vsync"));
-        int LIMIT_FPS = Integer.parseInt(p.getProperty("graphics.limit.fps", "0"));
-        boolean SCREEN_OUTPUT = Boolean.parseBoolean(p.getProperty("graphics.screen.screenoutput"));
+        int SCREEN_WIDTH = Parser.parseInt(p.getProperty("graphics.screen.width"));
+        int SCREEN_HEIGHT = Parser.parseInt(p.getProperty("graphics.screen.height"));
+        int FULLSCREEN_WIDTH = Parser.parseInt(p.getProperty("graphics.screen.fullscreen.width"));
+        int FULLSCREEN_HEIGHT = Parser.parseInt(p.getProperty("graphics.screen.fullscreen.height"));
+        boolean FULLSCREEN = Parser.parseBoolean(p.getProperty("graphics.screen.fullscreen"));
+        boolean RESIZABLE = Parser.parseBoolean(p.getProperty("graphics.screen.resizable"));
+        boolean VSYNC = Parser.parseBoolean(p.getProperty("graphics.screen.vsync"));
+        double LIMIT_FPS = Parser.parseDouble(p.getProperty("graphics.limit.fps", "0.0"));
+        boolean SCREEN_OUTPUT = Parser.parseBoolean(p.getProperty("graphics.screen.screenoutput"));
         ScreenConf scrc = new ScreenConf();
         scrc.initialize(SCREEN_WIDTH, SCREEN_HEIGHT, FULLSCREEN_WIDTH, FULLSCREEN_HEIGHT, FULLSCREEN, RESIZABLE, VSYNC, SCREEN_OUTPUT, LIMIT_FPS);
 
@@ -377,8 +377,8 @@ public class DesktopConfInit extends ConfInit {
             screenshotFolder = p.getProperty("screenshot.folder");
         }
         String SCREENSHOT_FOLDER = screenshotFolder.replaceAll("\\\\", "/");
-        int SCREENSHOT_WIDTH = Integer.parseInt(p.getProperty("screenshot.width"));
-        int SCREENSHOT_HEIGHT = Integer.parseInt(p.getProperty("screenshot.height"));
+        int SCREENSHOT_WIDTH = Parser.parseInt(p.getProperty("screenshot.width"));
+        int SCREENSHOT_HEIGHT = Parser.parseInt(p.getProperty("screenshot.height"));
         ScreenshotMode SCREENSHOT_MODE = ScreenshotMode.valueOf(p.getProperty("screenshot.mode"));
         ImageFormat SCREENSHOT_FORMAT = ImageFormat.valueOf(p.getProperty("screenshot.format", "jpg").toUpperCase());
         float SCREENSHOT_QUALITY = Parser.parseFloat(p.getProperty("screenshot.quality", "0.93"));
@@ -388,8 +388,8 @@ public class DesktopConfInit extends ConfInit {
         /** CONTROLS CONF **/
         ControlsConf cc = new ControlsConf();
         String CONTROLLER_MAPPINGS_FILE = p.getProperty("controls.mappings.file", "mappings/xbox360.controller");
-        boolean INVERT_LOOK_Y_AXIS = Boolean.parseBoolean(p.getProperty("controls.invert.y", "true"));
-        boolean DEBUG_MODE = Boolean.parseBoolean(p.getProperty("controls.debugmode", "false"));
+        boolean INVERT_LOOK_Y_AXIS = Parser.parseBoolean(p.getProperty("controls.invert.y", "true"));
+        boolean DEBUG_MODE = Parser.parseBoolean(p.getProperty("controls.debugmode", "false"));
         String[] CONTROLLER_BLACKLIST = GlobalResources.parseWhitespaceSeparatedList(p.getProperty("controls.blacklist"));
 
         cc.initialize(CONTROLLER_MAPPINGS_FILE, INVERT_LOOK_Y_AXIS, DEBUG_MODE, CONTROLLER_BLACKLIST);
@@ -397,9 +397,9 @@ public class DesktopConfInit extends ConfInit {
         /** SPACECRAFT CONF **/
         SpacecraftConf scc = new SpacecraftConf();
         float sC_RESPONSIVENESS = MathUtilsd.lint(Parser.parseFloat(p.getProperty("spacecraft.responsiveness", "0.1")), 0, 1, Constants.MIN_SC_RESPONSIVENESS, Constants.MAX_SC_RESPONSIVENESS);
-        boolean sC_VEL_TO_DIRECTION = Boolean.parseBoolean(p.getProperty("spacecraft.velocity.direction", "false"));
+        boolean sC_VEL_TO_DIRECTION = Parser.parseBoolean(p.getProperty("spacecraft.velocity.direction", "false"));
         float sC_HANDLING_FRICTION = Parser.parseFloat(p.getProperty("spacecraft.handling.friction", "0.37"));
-        boolean sC_SHOW_AXES = Boolean.parseBoolean(p.getProperty("spacecraft.show.axes", "false"));
+        boolean sC_SHOW_AXES = Parser.parseBoolean(p.getProperty("spacecraft.show.axes", "false"));
 
         scc.initialize(sC_RESPONSIVENESS, sC_VEL_TO_DIRECTION, sC_HANDLING_FRICTION, sC_SHOW_AXES);
 
@@ -457,8 +457,8 @@ public class DesktopConfInit extends ConfInit {
         p.setProperty("graphics.render.filename", GlobalConf.frame.RENDER_FILE_NAME);
         p.setProperty("graphics.render.width", Integer.toString(GlobalConf.frame.RENDER_WIDTH));
         p.setProperty("graphics.render.height", Integer.toString(GlobalConf.frame.RENDER_HEIGHT));
-        p.setProperty("graphics.render.targetfps", Integer.toString(GlobalConf.frame.RENDER_TARGET_FPS));
-        p.setProperty("graphics.camera.recording.targetfps", Integer.toString(GlobalConf.frame.CAMERA_REC_TARGET_FPS));
+        p.setProperty("graphics.render.targetfps", Double.toString(GlobalConf.frame.RENDER_TARGET_FPS));
+        p.setProperty("graphics.camera.recording.targetfps", Double.toString(GlobalConf.frame.CAMERA_REC_TARGET_FPS));
         p.setProperty("graphics.camera.recording.frameoutputauto", Boolean.toString(GlobalConf.frame.AUTO_FRAME_OUTPUT_CAMERA_PLAY));
         p.setProperty("graphics.camera.keyframe.path.position", GlobalConf.frame.KF_PATH_TYPE_POSITION.toString());
         p.setProperty("graphics.camera.keyframe.path.orientation", GlobalConf.frame.KF_PATH_TYPE_ORIENTATION.toString());
@@ -484,7 +484,7 @@ public class DesktopConfInit extends ConfInit {
         p.setProperty("graphics.screen.fullscreen", Boolean.toString(Gdx.graphics.isFullscreen()));
         p.setProperty("graphics.screen.resizable", Boolean.toString(GlobalConf.screen.RESIZABLE));
         p.setProperty("graphics.screen.vsync", Boolean.toString(GlobalConf.screen.VSYNC));
-        p.setProperty("graphics.limit.fps", Integer.toString(GlobalConf.screen.LIMIT_FPS));
+        p.setProperty("graphics.limit.fps", Double.toString(GlobalConf.screen.LIMIT_FPS));
         p.setProperty("graphics.screen.screenoutput", Boolean.toString(GlobalConf.screen.SCREEN_OUTPUT));
 
         /** PROGRAM **/

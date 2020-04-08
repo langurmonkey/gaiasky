@@ -41,11 +41,9 @@ import gaiasky.util.datadesc.DataDescriptorUtils;
 import gaiasky.util.format.INumberFormat;
 import gaiasky.util.format.NumberFormatFactory;
 import gaiasky.util.math.MathUtilsd;
+import gaiasky.util.parse.Parser;
 import gaiasky.util.scene2d.*;
-import gaiasky.util.validator.FloatValidator;
-import gaiasky.util.validator.IValidator;
-import gaiasky.util.validator.IntValidator;
-import gaiasky.util.validator.RegexpValidator;
+import gaiasky.util.validator.*;
 
 import java.io.File;
 import java.io.IOException;
@@ -270,8 +268,8 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         vsync.setChecked(GlobalConf.screen.VSYNC);
 
         // LIMIT FPS
-        limitfpsValidator = new IntValidator(1, 1000);
-        limitFps = new OwnTextField(Integer.toString(MathUtils.clamp(GlobalConf.screen.LIMIT_FPS, 1, 1000)), skin, limitfpsValidator);
+        limitfpsValidator = new DoubleValidator(Constants.MIN_FPS, Constants.MAX_FPS);
+        limitFps = new OwnTextField(nf3.format(MathUtilsd.clamp(GlobalConf.screen.LIMIT_FPS, Constants.MIN_FPS, Constants.MAX_FPS)), skin, limitfpsValidator);
         limitFps.setDisabled(GlobalConf.screen.LIMIT_FPS == 0);
 
         limitfpsCb = new OwnCheckBox(I18n.txt("gui.limitfps"), skin, "default", pad5);
@@ -1281,7 +1279,7 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
 
         // FPS
         OwnLabel fpsLabel = new OwnLabel(I18n.txt("gui.target.fps"), skin);
-        frameoutputFps = new OwnTextField(Integer.toString(GlobalConf.frame.RENDER_TARGET_FPS), skin, new IntValidator(1, 200));
+        frameoutputFps = new OwnTextField(nf3.format(GlobalConf.frame.RENDER_TARGET_FPS), skin, new DoubleValidator(Constants.MIN_FPS, Constants.MAX_FPS));
         frameoutputFps.setWidth(textwidth * 3f);
 
         // Size
@@ -1386,7 +1384,7 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
 
         // fps
         OwnLabel camfpsLabel = new OwnLabel(I18n.txt("gui.target.fps"), skin);
-        camrecFps = new OwnTextField(Integer.toString(GlobalConf.frame.CAMERA_REC_TARGET_FPS), skin, new IntValidator(1, 200));
+        camrecFps = new OwnTextField(nf3.format(GlobalConf.frame.CAMERA_REC_TARGET_FPS), skin, new DoubleValidator(Constants.MIN_FPS, Constants.MAX_FPS));
         camrecFps.setWidth(textwidth * 3f);
         OwnImageButton camrecFpsTooltip = new OwnImageButton(skin, "tooltip");
         camrecFpsTooltip.addListener(new OwnTextTooltip(I18n.txt("gui.tooltip.playcamera.targetfps"), skin));
@@ -1937,9 +1935,9 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         }
 
         if (limitfpsCb.isChecked()) {
-            GlobalConf.screen.LIMIT_FPS = Integer.parseInt(limitFps.getText());
+            EventManager.instance.post(Events.LIMIT_FPS_CMD, Parser.parseDouble(limitFps.getText()));
         } else {
-            GlobalConf.screen.LIMIT_FPS = 0;
+            EventManager.instance.post(Events.LIMIT_FPS_CMD, 0.0);
         }
 
         // Orbit renderer
@@ -2059,12 +2057,12 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         boolean foupdate = fow != GlobalConf.frame.RENDER_WIDTH || foh != GlobalConf.frame.RENDER_HEIGHT || !prev.equals(GlobalConf.frame.FRAME_MODE);
         GlobalConf.frame.RENDER_WIDTH = fow;
         GlobalConf.frame.RENDER_HEIGHT = foh;
-        GlobalConf.frame.RENDER_TARGET_FPS = Integer.parseInt(frameoutputFps.getText());
+        GlobalConf.frame.RENDER_TARGET_FPS = Parser.parseDouble(frameoutputFps.getText());
         if (foupdate)
             EventManager.instance.post(Events.FRAME_SIZE_UDPATE, GlobalConf.frame.RENDER_WIDTH, GlobalConf.frame.RENDER_HEIGHT);
 
         // Camera recording
-        GlobalConf.frame.CAMERA_REC_TARGET_FPS = Integer.parseInt(camrecFps.getText());
+        EventManager.instance.post(Events.CAMRECORDER_FPS_CMD, Parser.parseDouble(camrecFps.getText()));
         GlobalConf.frame.AUTO_FRAME_OUTPUT_CAMERA_PLAY = cbAutoCamrec.isChecked();
 
         // Cubemap resolution (same as plResolution)

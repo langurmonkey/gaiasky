@@ -836,13 +836,31 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
             });
     }
 
+    @Override
+    public void setLimitFps(double limitFps) {
+        if(checkNum(limitFps, Constants.MIN_FPS, Constants.MAX_FPS, "limitFps")){
+            em.post(Events.LIMIT_FPS_CMD, limitFps);
+        }
+
+    }
+
+    @Override
+    public void setLimitFps(int limitFps) {
+        setLimitFps((double) limitFps);
+    }
+
     public void setMinStarOpacity(int opacity) {
         setMinStarOpacity((float) opacity);
     }
 
     @Override
     public void configureFrameOutput(int width, int height, int fps, String folder, String namePrefix) {
-        if (checkNum(width, 1, Integer.MAX_VALUE, "width") && checkNum(height, 1, Integer.MAX_VALUE, "height") && checkNum(fps, 1, Integer.MAX_VALUE, "FPS") && checkString(folder, "folder") && checkString(namePrefix, "namePrefix")) {
+        configureFrameOutput(width, height, (double) fps, folder, namePrefix);
+    }
+
+    @Override
+    public void configureFrameOutput(int width, int height, double fps, String folder, String namePrefix) {
+        if (checkNum(width, 1, Integer.MAX_VALUE, "width") && checkNum(height, 1, Integer.MAX_VALUE, "height") && checkNum(fps, Constants.MIN_FPS, Constants.MAX_FPS, "FPS") && checkString(folder, "folder") && checkString(namePrefix, "namePrefix")) {
             em.post(Events.FRAME_OUTPUT_MODE_CMD, GlobalConf.ScreenshotMode.redraw);
             em.post(Events.CONFIG_FRAME_OUTPUT_CMD, width, height, fps, folder, namePrefix);
         }
@@ -870,12 +888,12 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
     }
 
     @Override
-    public int getFrameOutputFps() {
+    public double getFrameOutputFps() {
         return GlobalConf.frame.RENDER_TARGET_FPS;
     }
 
     @Override
-    public int getRenderOutputFps() {
+    public double getRenderOutputFps() {
         return getFrameOutputFps();
     }
 
@@ -1568,6 +1586,13 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
         return false;
     }
 
+    @Override
+    public void setCameraRecorderFps(double targetFps) {
+        if(checkNum(targetFps, Constants.MIN_FPS, Constants.MAX_FPS, "targetFps")){
+            em.post(Events.CAMRECORDER_FPS_CMD, targetFps);
+        }
+    }
+
     private Texture getTexture(String path) {
         if (textures == null || !textures.containsKey(path)) {
             preloadTexture(path);
@@ -1615,6 +1640,11 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
     }
 
     @Override
+    public void playCameraPath(String file, boolean sync){
+        runCameraPath(file, sync);
+    }
+
+    @Override
     public void runCameraPath(String file, boolean sync) {
         em.post(Events.PLAY_CAMERA_CMD, file);
 
@@ -1645,6 +1675,11 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
                 }
             }
         }
+    }
+
+    @Override
+    public void playCameraPath(String file){
+        runCameraPath(file);
     }
 
     @Override

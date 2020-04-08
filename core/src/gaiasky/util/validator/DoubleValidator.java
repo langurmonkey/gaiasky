@@ -7,34 +7,34 @@ package gaiasky.util.validator;
 
 import gaiasky.util.parse.Parser;
 
-public class FloatValidator extends CallbackValidator {
+public class DoubleValidator extends CallbackValidator {
 
-    private float min;
-    private float max;
+    private double min;
+    private double max;
 
-    public FloatValidator(float min, float max) {
+    public DoubleValidator(double min, double max) {
         this(null, min, max);
     }
 
-    public FloatValidator(IValidator parent, float min, float max) {
+    public DoubleValidator(IValidator parent, double min, double max) {
         super(parent);
         this.min = min;
         this.max = max;
     }
 
-    public float getMin() {
+    public double getMin() {
         return min;
     }
 
-    public float getMax() {
+    public double getMax() {
         return max;
     }
 
     @Override
     protected boolean validateLocal(String value) {
-        Float val;
+        Double val;
         try {
-            val = Parser.parseFloat(value);
+            val = Parser.parseDouble(value);
         } catch (NumberFormatException e) {
             return false;
         }

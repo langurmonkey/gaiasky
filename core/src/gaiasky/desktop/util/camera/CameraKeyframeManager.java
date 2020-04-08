@@ -196,7 +196,7 @@ public class CameraKeyframeManager implements IObserver {
 
         /** Frame counter **/
         long frames = 0;
-        long frameRate = GlobalConf.frame.CAMERA_REC_TARGET_FPS;
+        double frameRate = GlobalConf.frame.CAMERA_REC_TARGET_FPS;
 
         try {
             Files.createFile(f);
@@ -298,7 +298,7 @@ public class CameraKeyframeManager implements IObserver {
     }
 
     private PathPart[] positionsToPathParts(Array<Keyframe> keyframes, PathType pathType) {
-        long frameRate = GlobalConf.frame.CAMERA_REC_TARGET_FPS;
+        double frameRate = GlobalConf.frame.CAMERA_REC_TARGET_FPS;
         Array<Array<Vector3d>> positionsSep = new Array<>();
         Array<Vector3d> current = new Array<>();
         Array<Double> times = new Array<>();

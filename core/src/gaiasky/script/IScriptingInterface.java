@@ -891,6 +891,17 @@ public interface IScriptingInterface {
     void setProjectionFov(float fov);
 
     /**
+     * Limits the frame rate of Gaia Sky.
+     * @param limitFps The new maximum frame rate as a double-precision floating point number. Set zero or negative to unlimited.
+     */
+    void setLimitFps(double limitFps);
+
+    /**
+     * Limits the frame rate of Gaia Sky.
+     * @param limitFps The new maximum frame rate as an integer number. Set zero or negative to unlimited.
+     */
+    void setLimitFps(int limitFps);
+    /**
      * Configures the frame output system, setting the resolution of the images,
      * the target frames per second, the output folder and the image name
      * prefix.
@@ -917,6 +928,19 @@ public interface IScriptingInterface {
      * @param namePrefix The file name prefix.
      */
     void configureFrameOutput(int width, int height, int fps, String folder, String namePrefix);
+
+    /**
+     * Configures the frame output system, setting the resolution of the images,
+     * the target frames per second, the output folder and the image name
+     * prefix. This function sets the frame output mode to 'redraw'.
+     *
+     * @param width      Width of images.
+     * @param height     Height of images.
+     * @param fps        Target frames per second (number of images per second).
+     * @param folder     The output folder path.
+     * @param namePrefix The file name prefix.
+     */
+    void configureFrameOutput(int width, int height, double fps, String folder, String namePrefix);
 
     /**
      * Sets the frame output mode. Possible values are 'redraw' or 'simple'.
@@ -952,14 +976,14 @@ public interface IScriptingInterface {
      * @deprecated Use {@link IScriptingInterface#getFrameOutputFps()} instead.
      */
     @Deprecated
-    int getRenderOutputFps();
+    double getRenderOutputFps();
 
     /**
      * Gets the current FPS setting in the frame output system.
      *
      * @return The FPS setting.
      */
-    int getFrameOutputFps();
+    double getFrameOutputFps();
 
     /**
      * Activates or deactivates the image output system. If called with true,
@@ -1274,11 +1298,19 @@ public interface IScriptingInterface {
      * Blocks the script until the focus is the object indicated by the name.
      * There is an optional time out.
      *
-     * @param name      The name of the focus to wait for
+     * @param name      The name of the focus to wait for.
      * @param timeoutMs Timeout in ms to wait. Set negative to disable timeout.
      * @return True if the timeout ran out. False otherwise.
      */
     boolean waitFocus(String name, long timeoutMs);
+
+    /**
+     * Sets the target frame rate of the camera recorder. This will cap the frame rate of Gaia
+     * Sky to this value while the camera is recording. When playing the camera file
+     * back, you are responsible to set the right frame rate.
+     * @param targetFps The target frame rate for the camera recorder.
+     */
+    void setCameraRecorderFps(double targetFps);
 
     /**
      * Starts recording the camera path to an auto-generated file in the default
@@ -1321,6 +1353,11 @@ public interface IScriptingInterface {
     void runCameraPath(String file);
 
     /**
+     * Alias for {@link IScriptingInterface#runCameraPath(String)}
+     */
+    void playCameraPath(String file);
+
+    /**
      * Runs a .gsc camera path file and returns immediately. This
      * function accepts a boolean indicating whether to wait for the
      * camera path file to finish or not.
@@ -1330,6 +1367,11 @@ public interface IScriptingInterface {
      *             file to finish. Otherwise, it returns immediately.
      */
     void runCameraPath(String file, boolean sync);
+
+    /**
+     * Alias for {@link IScriptingInterface#runCameraPath(String, boolean)}
+     */
+    void playCameraPath(String file, boolean sync);
 
     /**
      * Creates a smooth transition from the current camera state to the given camera state {camPos, camDir, camUp} in

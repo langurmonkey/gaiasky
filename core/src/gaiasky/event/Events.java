@@ -193,6 +193,11 @@ public enum Events {
     CAMERA_UP_CMD,
 
     /**
+     * Limits the frame rate, contains a double with the new limit frame rate
+     */
+    LIMIT_FPS_CMD,
+
+    /**
      * A new catalog has been loaded. Contains the new catalog info object
      **/
     CATALOG_ADD,
@@ -784,6 +789,10 @@ public enum Events {
      * comes from the interface.
      **/
     RECORD_CAMERA_CMD,
+    /**
+     * Sets the target frame rate for the camera recorder. Contains a double with the frame rate.
+     */
+    CAMRECORDER_FPS_CMD,
     /**
      * Reloads the inputListener mappings. Contains the path to the new mappings
      * file.
