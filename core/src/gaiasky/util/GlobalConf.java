@@ -498,11 +498,21 @@ public class GlobalConf {
         /**
          * Toggles the record camera
          */
+        private int backupLimitFps = 0;
         public void toggleRecord(Boolean rec) {
             if (rec != null) {
                 RECORD_CAMERA = rec;
             } else {
                 RECORD_CAMERA = !RECORD_CAMERA;
+            }
+
+            if(RECORD_CAMERA){
+                // Activation, set limit FPS
+                backupLimitFps = screen.LIMIT_FPS;
+                screen.LIMIT_FPS = frame.CAMERA_REC_TARGET_FPS;
+            } else {
+                // Deactivation, remove limit
+                screen.LIMIT_FPS = backupLimitFps;
             }
         }
 

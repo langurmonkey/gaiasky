@@ -77,7 +77,7 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
     private INumberFormat nf3, nf1;
 
     private CheckBox fullscreen, windowed, vsync, limitfpsCb, multithreadCb,
-                    lodFadeCb, cbAutoCamrec, real, nsl, report,
+                    lodFadeCb, cbAutoCamrec, real, nsl,
                     inverty, highAccuracyPositions, shadowsCb,
                     hidpiCb, pointerCoords, datasetChooserDefault, datasetChooserAlways, datasetChooserNever, debugInfo,
                     crosshairFocusCb, crosshairClosestCb, crosshairHomeCb, pointerGuidesCb,
@@ -88,7 +88,8 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
     private OwnSelectBox<ElevationComboBoxBean> elevationSb;
     private OwnSelectBox<String> theme;
     private OwnSelectBox<FileComboBoxBean> controllerMappings;
-    private OwnTextField widthField, heightField, sswidthField, ssheightField, frameoutputPrefix, frameoutputFps, fowidthField, foheightField, camrecFps, cmResolution, plResolution, plAperture, plAngle, smResolution, limitFps;
+    private OwnTextField widthField, heightField, sswidthField, ssheightField, frameoutputPrefix, frameoutputFps, fowidthField,
+            foheightField, camrecFps, cmResolution, plResolution, plAperture, plAngle, smResolution, limitFps;
     private OwnSlider lodTransitions, tessQuality, minimapSize, pointerGuidesWidth;
     private OwnTextButton screenshotsLocation, frameoutputLocation;
     private ColorPicker pointerGuidesColor;
@@ -1387,6 +1388,8 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         OwnLabel camfpsLabel = new OwnLabel(I18n.txt("gui.target.fps"), skin);
         camrecFps = new OwnTextField(Integer.toString(GlobalConf.frame.CAMERA_REC_TARGET_FPS), skin, new IntValidator(1, 200));
         camrecFps.setWidth(textwidth * 3f);
+        OwnImageButton camrecFpsTooltip = new OwnImageButton(skin, "tooltip");
+        camrecFpsTooltip.addListener(new OwnTextTooltip(I18n.txt("gui.tooltip.playcamera.targetfps"), skin));
 
         // Keyframe preferences
         Button keyframePrefs = new OwnTextIconButton(I18n.txt("gui.keyframes.preferences"), skin, "preferences");
@@ -1411,22 +1414,23 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         cbAutoCamrec = new OwnCheckBox(I18n.txt("gui.camerarec.frameoutput"), skin, "default", pad5);
         cbAutoCamrec.setChecked(GlobalConf.frame.AUTO_FRAME_OUTPUT_CAMERA_PLAY);
         cbAutoCamrec.addListener(new OwnTextTooltip(I18n.txt("gui.tooltip.playcamera.frameoutput"), skin));
-        OwnImageButton camrecTooltip = new OwnImageButton(skin, "tooltip");
-        camrecTooltip.addListener(new OwnTextTooltip(I18n.txt("gui.tooltip.playcamera.frameoutput"), skin));
+        OwnImageButton camrecAutoTooltip = new OwnImageButton(skin, "tooltip");
+        camrecAutoTooltip.addListener(new OwnTextTooltip(I18n.txt("gui.tooltip.playcamera.frameoutput"), skin));
 
         HorizontalGroup cbGroup = new HorizontalGroup();
         cbGroup.space(pad5);
         cbGroup.addActor(cbAutoCamrec);
-        cbGroup.addActor(camrecTooltip);
+        cbGroup.addActor(camrecAutoTooltip);
 
         // LABELS
         labels.add(camfpsLabel);
 
         // Add to table
         camrec.add(camfpsLabel).left().padRight(pad5 * 4).padBottom(pad5);
-        camrec.add(camrecFps).left().expandX().padBottom(pad5).row();
-        camrec.add(cbGroup).colspan(2).left().padBottom(pad5 * 2).row();
-        camrec.add(keyframePrefs).colspan(2).left().row();
+        camrec.add(camrecFps).left().expandX().padBottom(pad5);
+        camrec.add(camrecFpsTooltip).left().padLeft(pad5).padBottom(pad5).row();
+        camrec.add(cbGroup).colspan(3).left().padBottom(pad5 * 2).row();
+        camrec.add(keyframePrefs).colspan(3).left().row();
 
         // Add to content
         contentCamera.add(titleCamrec).left().padBottom(pad5 * 2).row();
@@ -1726,7 +1730,6 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         // Add to table
         stats.add(debugInfo).left().padBottom(pad5).row();
         stats.add(exitConfirmation).left().padBottom(pad5).row();
-        stats.add(report).left().padBottom(pad5 * 5).row();
         stats.add(warningLabel).left().padBottom(pad5).row();
         stats.add(reloadDefaults).left();
 
