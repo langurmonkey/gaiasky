@@ -104,33 +104,41 @@ public class CamRecorder implements IObserver {
             case PLAYING:
                 if (is != null) {
                     try {
-                        String line;
-                        if ((line = is.readLine()) != null) {
-                            String[] tokens = line.split("\\s+");
-                            EventManager.instance.post(Events.TIME_CHANGE_CMD, Instant.ofEpochMilli(Parser.parseLong(tokens[0])));
+                        while(true) {
+                            String line = is.readLine();
+                            if (line != null) {
+                                line = line.strip();
+                                if(!line.startsWith("#")) {
+                                    String[] tokens = line.split("\\s+");
+                                    EventManager.instance.post(Events.TIME_CHANGE_CMD, Instant.ofEpochMilli(Parser.parseLong(tokens[0])));
 
-                            dir.set(Parser.parseDouble(tokens[4]), Parser.parseDouble(tokens[5]), Parser.parseDouble(tokens[6]));
-                            upp.set(Parser.parseDouble(tokens[7]), Parser.parseDouble(tokens[8]), Parser.parseDouble(tokens[9]));
+                                    dir.set(Parser.parseDouble(tokens[4]), Parser.parseDouble(tokens[5]), Parser.parseDouble(tokens[6]));
+                                    upp.set(Parser.parseDouble(tokens[7]), Parser.parseDouble(tokens[8]), Parser.parseDouble(tokens[9]));
 
-                            position.set(Parser.parseDouble(tokens[1]), Parser.parseDouble(tokens[2]), Parser.parseDouble(tokens[3]));
-                            direction.set(dir);
-                            up.set(upp);
+                                    position.set(Parser.parseDouble(tokens[1]), Parser.parseDouble(tokens[2]), Parser.parseDouble(tokens[3]));
+                                    direction.set(dir);
+                                    up.set(upp);
+                                    break;
+                                }else{
+                                    // Skip comment, next line
+                                }
+                            } else {
+                                // Finish off
+                                is.close();
+                                is = null;
+                                mode = RecorderState.IDLE;
+                                // Stop camera
+                                EventManager.instance.post(Events.CAMERA_STOP);
+                                // Post notification
+                                logger.info(I18n.bundle.get("notif.cameraplay.done"));
 
-                        } else {
-                            // Finish off
-                            is.close();
-                            is = null;
-                            mode = RecorderState.IDLE;
-                            // Stop camera
-                            EventManager.instance.post(Events.CAMERA_STOP);
-                            // Post notification
-                            logger.info(I18n.bundle.get("notif.cameraplay.done"));
+                                // Issue message informing playing has stopped
+                                EventManager.instance.post(Events.CAMERA_PLAY_INFO, false);
 
-                            // Issue message informing playing has stopped
-                            EventManager.instance.post(Events.CAMERA_PLAY_INFO, false);
-
-                            // Stop frame output if it is on!
-                            EventManager.instance.post(Events.FRAME_OUTPUT_CMD, false);
+                                // Stop frame output if it is on!
+                                EventManager.instance.post(Events.FRAME_OUTPUT_CMD, false);
+                                break;
+                            }
                         }
                     } catch (IOException e) {
                         logger.error(e);
@@ -185,6 +193,11 @@ public class CamRecorder implements IObserver {
                     try {
                         Files.createFile(f);
                         os = new BufferedWriter(new FileWriter(f.toFile()));
+                        // Print header
+                        os.append("#time_ms").append(sep).append("pos_x").append(sep).append("pos_y").append(sep).append("pos_z").append(sep);
+                        os.append("dir_x").append(sep).append("dir_y").append(sep).append("dir_z").append(sep);
+                        os.append("up_x").append(sep).append("up_y").append(sep).append("up_z").append(sep);
+                        os.append("\n");
                     } catch (IOException e) {
                         logger.error(e);
                         return;
