@@ -1845,7 +1845,7 @@ public interface IScriptingInterface {
      *
      * @param dsName         The name of the dataset.
      * @param path           Absolute path (or relative to the working path of Gaia Sky) to the <code>.vot</code> file to load.
-     * @param magnitudeScale Scale factor to apply to the star magnitudes.
+     * @param magnitudeScale Scaling additive factor to apply to the star magnitudes, as in <code>appmag = appmag - magnitudeScale</code>.
      * @param labelColor     The color of the labels, as an array of {red, green, blue, alpha} where each element is in [0,1].
      * @param fadeIn         Two values which represent the fade in mapping distances (in parsecs, as distance from camera to the Sun) of this dataset.
      * @param fadeOut        Two values which represent the fade out mapping distances (in parsecs, as distance from camera to the Sun) of this dataset.
