@@ -43,7 +43,7 @@ jar {
 }
 
 install4j {
-    installDir = file('/home/tsagrista/Programs/install4j7')
+    installDir = file('/home/tsagrista/Programs/install4j8')
 }
 
 sourceSets {
