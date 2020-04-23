@@ -68,15 +68,17 @@ public class OwnTextHotkeyTooltip extends Tooltip<Table> {
 
         label = new Label(text, skin);
 
-        labelHotkey = new Label("[" + hotkey + "]", skin, "hotkey");
+        if (hotkey != null)
+            labelHotkey = new Label("[" + hotkey + "]", skin, "hotkey");
 
-        table.add(label).padRight(10f);
-        table.add(labelHotkey);
+        table.add(label).padRight(labelHotkey != null ? 10f : 0f);
+        if (labelHotkey != null)
+            table.add(labelHotkey);
 
         getContainer().setActor(table);
         getContainer().width(new Value() {
             public float get(Actor context) {
-                return Math.min(manager.maxWidth, label.getGlyphLayout().width + 10f + labelHotkey.getGlyphLayout().width);
+                return Math.min(manager.maxWidth, label.getGlyphLayout().width + 10f + (labelHotkey != null ? labelHotkey.getGlyphLayout().width : 0f));
             }
         });
 

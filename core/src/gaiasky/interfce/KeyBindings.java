@@ -211,6 +211,15 @@ public class KeyBindings {
         // show preferences dialog
         addAction(new ProgramAction("action.preferences", () -> EventManager.instance.post(Events.SHOW_PREFERENCES_ACTION), noCleanMode));
 
+        // minimap toggle
+        addAction(new ProgramAction("action.toggle/gui.minimap.title", () -> EventManager.instance.post(Events.TOGGLE_MINIMAP), noCleanMode));
+
+        // load catalog
+        addAction(new ProgramAction("action.loadcatalog", () -> EventManager.instance.post(Events.SHOW_LOAD_CATALOG_ACTION), noCleanMode));
+
+        // show log dialog
+        addAction(new ProgramAction("action.log", () -> EventManager.instance.post(Events.SHOW_LOG_ACTION), noCleanMode));
+
         // show play camera dialog
         //addAction(new ProgramAction("action.playcamera", () ->
         //        EventManager.instance.post(Events.SHOW_PLAYCAMERA_ACTION), fullGuiCondition), Keys.C);
@@ -370,9 +379,6 @@ public class KeyBindings {
 
         // Back home
         addAction(new ProgramAction("action.home", () -> EventManager.instance.post(Events.HOME_CMD)));
-
-        // Minimap toggle
-        addAction(new ProgramAction("action.toggle/gui.minimap.title", () -> EventManager.instance.post(Events.TOGGLE_MINIMAP), noCleanMode));
 
         // Expand/collapse time pane
         addAction(new ProgramAction("action.expandcollapse.pane/gui.time", () -> EventManager.instance.post(Events.TOGGLE_EXPANDCOLLAPSE_PANE_CMD, "TimeComponent"), noCleanMode));

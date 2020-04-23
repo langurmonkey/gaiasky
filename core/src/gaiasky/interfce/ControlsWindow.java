@@ -254,7 +254,7 @@ public class ControlsWindow extends CollapsibleWindow implements IObserver {
         Button load = new OwnTextIconButton("", skin, "load");
         load.setSize(bw, bh);
         load.setName("loadcatalog");
-        load.addListener(new OwnTextTooltip(I18n.txt("gui.loadcatalog"), skin));
+        load.addListener(new OwnTextHotkeyTooltip(I18n.txt("gui.loadcatalog"), kb.getStringKeys("action.loadcatalog"), skin));
         load.addListener(event -> {
             if (event instanceof ChangeEvent) {
                 EventManager.instance.post(Events.SHOW_LOAD_CATALOG_ACTION);
@@ -275,7 +275,7 @@ public class ControlsWindow extends CollapsibleWindow implements IObserver {
         Button showLog = new OwnTextIconButton("", skin, "log");
         showLog.setSize(bw, bh);
         showLog.setName("show log");
-        showLog.addListener(new OwnTextTooltip(I18n.txt("gui.tooltip.log"), skin));
+        showLog.addListener(new OwnTextHotkeyTooltip(I18n.txt("gui.tooltip.log"), kb.getStringKeys("action.log"), skin));
         showLog.addListener((event) -> {
             if (event instanceof ChangeEvent) {
                 EventManager.instance.post(Events.SHOW_LOG_ACTION);

@@ -21,6 +21,12 @@ action.home                                 = HOME
 # Preferences
 action.preferences                          = P
 
+# Show log
+action.log                                  = L
+
+# Load catalog
+action.loadcatalog                          = CTRL_L O
+
 #action.playcamera                          = C
 
 # Visibility toggles
