@@ -20,6 +20,7 @@ import gaiasky.event.Events;
 import gaiasky.util.GlobalConf;
 import gaiasky.util.GlobalResources;
 import gaiasky.util.I18n;
+import gaiasky.util.math.StdRandom;
 import gaiasky.util.scene2d.OwnLabel;
 import gaiasky.util.scene2d.OwnTextIconButton;
 
@@ -127,29 +128,61 @@ public class LoadingGui extends AbstractGui {
 
     }
 
+
+    private long waitTime = 1400;
     @Override
     public void update(double dt) {
         super.update(dt);
         // Fibonacci numbers
         long currTime = System.currentTimeMillis();
-        if(currTime - lastUpdateTime > 200){
-            i++;
-            BigInteger next;
-            if(i == 0l){
-                next = BigInteger.ZERO;
-            }else if (i == 1l){
-                next = BigInteger.ONE;
-            } else {
-                next = m1.add(m2);
-            }
-            spin.setText(next.toString());
-            m2 = m1;
-            m1 = next;
-
-
-
+        if(currTime - lastUpdateTime > waitTime){
+            randomFunnyText();
             lastUpdateTime = currTime;
+            waitTime = StdRandom.uniform(800, 3000);
         }
+    }
+
+    /** Return the i fibonacci number **/
+    private void fibonacci(){
+        i++;
+        BigInteger next;
+        if(i == 0l){
+            next = BigInteger.ZERO;
+        }else if (i == 1l){
+            next = BigInteger.ONE;
+        } else {
+            next = m1.add(m2);
+        }
+        m2 = m1;
+        m1 = next;
+
+        spin.setText(next.toString());
+    }
+
+    private final String[] loadingTexts = new String[]{
+            "Looking for more stars...",
+            "Initializing flux capacitor...",
+            "Setting up continuum transfunctioner...",
+            "Pumping up atmospheres...",
+            "Creating more rocky planets...",
+            "Buying more RAM online...",
+            "Burning excess fat...",
+            "Tracing planetary orbits...",
+            "Dodging asteroids...",
+            "Introducing molecular clouds...",
+            "Modelling dust maps...",
+            "Caching distant galaxies...",
+            "Listening to the sound of space...",
+            "Following lonely star...",
+            "Restoring Vulcan planet...",
+            "Tuning gravity strength...",
+            "Adjusting fundamental physical constants...",
+            "Assigning moons to planets...",
+            "Censing extraterrestrials..."
+    };
+    private void randomFunnyText(){
+        int rndIdx = StdRandom.uniform(loadingTexts.length);
+        spin.setText(loadingTexts[rndIdx]);
     }
 
     private void reset(){
