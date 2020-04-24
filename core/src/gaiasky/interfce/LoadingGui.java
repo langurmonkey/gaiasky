@@ -180,7 +180,9 @@ public class LoadingGui extends AbstractGui {
             "Adjusting fundamental physical constants...",
             "Assigning moons to planets...",
             "Registering extraterrestrials...",
-            "Synchronizing spatiotemporal serendipities..."
+            "Synchronizing spatiotemporal serendipities...",
+            "Extracting anomalous materials...",
+            "Computing interesting manifolds..."
     };
     private void randomFunnyText(){
         spin.setText(loadingTexts[StdRandom.uniform(loadingTexts.length)]);
