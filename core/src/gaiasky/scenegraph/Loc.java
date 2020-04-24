@@ -10,28 +10,38 @@ import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
+import com.badlogic.gdx.utils.Array;
 import gaiasky.GaiaSky;
 import gaiasky.render.I3DTextRenderable;
+import gaiasky.render.ILineRenderable;
 import gaiasky.render.RenderingContext;
 import gaiasky.render.system.FontRenderSystem;
+import gaiasky.render.system.LineRenderSystem;
 import gaiasky.scenegraph.camera.ICamera;
+import gaiasky.scenegraph.camera.NaturalCamera;
+import gaiasky.scenegraph.component.RotationComponent;
 import gaiasky.util.Constants;
 import gaiasky.util.GlobalResources;
 import gaiasky.util.gdx.g2d.ExtSpriteBatch;
 import gaiasky.util.gdx.shader.ExtShaderProgram;
 import gaiasky.util.gravwaves.RelativisticEffectsManager;
+import gaiasky.util.math.Quaterniond;
 import gaiasky.util.math.Vector3d;
 import gaiasky.util.time.ITimeFrameProvider;
 import net.jafama.FastMath;
 
-public class Loc extends AbstractPositionEntity implements I3DTextRenderable {
+public class Loc extends AbstractPositionEntity implements IFocus, I3DTextRenderable, ILineRenderable {
     private static final float LOWER_LIMIT = 3e-4f;
     private static final float UPPER_LIMIT = 3e-3f;
 
-    /** The display name **/
+    /**
+     * The display name
+     **/
     String displayName;
 
-    /** Longitude and latitude **/
+    /**
+     * Longitude and latitude
+     **/
     Vector2 location;
     Vector3 location3d;
     /**
@@ -40,27 +50,31 @@ public class Loc extends AbstractPositionEntity implements I3DTextRenderable {
      **/
     float distFactor = 1f;
 
+    // Size in Km
+    float sizeKm;
+
     public Loc() {
-        cc = new float[] { 1f, 1f, 1f, 1f };
+        cc = new float[]{1f, 1f, 1f, 1f};
         localTransform = new Matrix4();
         location3d = new Vector3();
     }
 
     public void initialize() {
-
+        this.sizeKm = (float) (this.size * Constants.U_TO_KM);
     }
 
     @Override
     protected void addToRenderLists(ICamera camera) {
         if (renderText() && isVisibilityOn()) {
             addToRender(this, RenderGroup.FONT_LABEL);
+            //addToRender(this, RenderGroup.LINE);
         }
     }
 
     @Override
     public void updateLocal(ITimeFrameProvider time, ICamera camera) {
 
-        if (((ModelBody) parent).viewAngle > ((ModelBody) parent).THRESHOLD_QUAD() * 30f) {
+        if (((ModelBody) parent).viewAngle > ((ModelBody) parent).THRESHOLD_QUAD() * 30f || camera.isFocus(this)) {
             updateLocalValues(time, camera);
 
             this.translation.add(pos);
@@ -77,7 +91,6 @@ public class Loc extends AbstractPositionEntity implements I3DTextRenderable {
 
     @Override
     public void updateLocalValues(ITimeFrameProvider time, ICamera camera) {
-
         ModelBody papa = (ModelBody) parent;
         papa.setToLocalTransform(distFactor, localTransform, false);
 
@@ -89,6 +102,11 @@ public class Loc extends AbstractPositionEntity implements I3DTextRenderable {
 
         location3d.mul(localTransform);
 
+    }
+
+    @Override
+    public Vector3d getAbsolutePosition(Vector3d out) {
+        return super.getAbsolutePosition(out);
     }
 
     public Vector2 getLocation() {
@@ -116,7 +134,6 @@ public class Loc extends AbstractPositionEntity implements I3DTextRenderable {
      */
     @Override
     public void render(ExtSpriteBatch batch, ExtShaderProgram shader, FontRenderSystem sys, RenderingContext rc, ICamera camera) {
-
         Vector3d pos = aux3d1.get();
         textPosition(camera, pos);
         shader.setUniformf("u_viewAngle", (float) (viewAngleApparent * ((ModelBody) parent).locVaMultiplier * Constants.U_TO_KM));
@@ -138,7 +155,7 @@ public class Loc extends AbstractPositionEntity implements I3DTextRenderable {
 
     @Override
     public float textScale() {
-        return 1e-4f / textSize() * (float) Constants.DISTANCE_SCALE_FACTOR;
+        return sizeKm * 1e-7f / textSize() * (float) Constants.DISTANCE_SCALE_FACTOR;
     }
 
     @Override
@@ -166,7 +183,7 @@ public class Loc extends AbstractPositionEntity implements I3DTextRenderable {
 
     /**
      * Sets the absolute size of this entity
-     * 
+     *
      * @param size
      */
     public void setSize(Double size) {
@@ -184,16 +201,127 @@ public class Loc extends AbstractPositionEntity implements I3DTextRenderable {
     @Override
     public void setName(String name) {
         super.setName(name);
-        this.displayName = '\u02D9' + " " + name;
+        this.displayName = "˟ " + name;
     }
 
     @Override
-    public float getTextOpacity(){
+    public float getTextOpacity() {
         return getOpacity();
     }
 
     @Override
     public boolean mustAddToIndex() {
+        return false;
+    }
+
+    @Override
+    public float getLineWidth() {
+        return 1.0f;
+    }
+
+    @Override
+    public void render(LineRenderSystem renderer, ICamera camera, float alpha) {
+        Vector3d pos = aux3d1.get();
+        textPosition(camera, pos);
+
+        Vector3 v = aux3f1.get();
+        pos.put(v);
+        camera.getCamera().project(v);
+        v.set(v.x + 5, renderer.rc.h() - v.y + 5, v.z);
+        v.z = (float) pos.z;
+        camera.getCamera().unproject(v);
+
+        renderer.addLine(this, pos.x, pos.y, pos.z, v.x, v.y, v.z, 0.5f, 0.5f, 1f, 1f);
+    }
+
+    @Override
+    public int getGlPrimitive() {
+        return GL20.GL_LINES;
+    }
+
+    @Override
+    public long getCandidateId() {
+        return getId();
+    }
+
+    @Override
+    public String getClosestName() {
+        return getName();
+    }
+
+    @Override
+    public String getCandidateName() {
+        return getName();
+    }
+
+    @Override
+    public boolean isActive() {
+        return false;
+    }
+
+    @Override
+    public boolean withinMagLimit() {
+        return true;
+    }
+
+    @Override
+    public Vector3d getClosestAbsolutePos(Vector3d out) {
+        getAbsolutePosition(out);
+        return out;
+    }
+
+    @Override
+    public double getClosestDistToCamera() {
+        return distToCamera;
+    }
+
+    @Override
+    public double getCandidateViewAngleApparent() {
+        return viewAngleApparent;
+    }
+
+    @Override
+    public float getAppmag() {
+        return 0;
+    }
+
+    @Override
+    public float getAbsmag() {
+        return 0;
+    }
+
+    @Override
+    public RotationComponent getRotationComponent() {
+        return null;
+    }
+
+    @Override
+    public Quaterniond getOrientationQuaternion() {
+        return null;
+    }
+
+    @Override
+    public void addHit(int screenX, int screenY, int w, int h, int pxdist, NaturalCamera camera, Array<IFocus> hits) {
+
+    }
+
+    @Override
+    public void addHit(Vector3d p0, Vector3d p1, NaturalCamera camera, Array<IFocus> hits) {
+
+    }
+
+    @Override
+    public void makeFocus() {
+
+    }
+
+    @Override
+    public IFocus getFocus(String name) {
+        return this;
+    }
+
+    @Override
+    public boolean isCoordinatesTimeOverflow() {
         return false;
     }
 }
