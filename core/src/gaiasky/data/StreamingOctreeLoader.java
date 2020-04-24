@@ -63,18 +63,28 @@ public abstract class StreamingOctreeLoader implements IObserver, ISceneGraphLoa
 
     public static StreamingOctreeLoader instance;
 
-    /** Current number of stars that are loaded **/
+    /**
+     * Current number of stars that are loaded
+     **/
     protected int nLoadedStars = 0;
-    /** Max number of stars loaded at once **/
+    /**
+     * Max number of stars loaded at once
+     **/
     protected final long maxLoadedStars;
 
-    /** The octant loading queue **/
+    /**
+     * The octant loading queue
+     **/
     protected Queue<OctreeNode> toLoadQueue;
 
-    /** Whether loading is paused or not **/
+    /**
+     * Whether loading is paused or not
+     **/
     protected boolean loadingPaused = false;
 
-    /** Last time of a queue clear event went through **/
+    /**
+     * Last time of a queue clear event went through
+     **/
     protected long lastQueueClearMs = 0;
 
     // Dataset name and description
@@ -86,14 +96,18 @@ public abstract class StreamingOctreeLoader implements IObserver, ISceneGraphLoa
      **/
     protected Queue<OctreeNode> toUnloadQueue;
 
-    /** Loaded octant ids, for logging **/
+    /**
+     * Loaded octant ids, for logging
+     **/
     protected long[] loadedIds;
     protected int loadedObjects;
     protected int maxLoadedIds, idxLoadedIds;
 
     protected String metadata, particles;
 
-    /** Daemon thread that gets the data loading requests and serves them **/
+    /**
+     * Daemon thread that gets the data loading requests and serves them
+     **/
     protected DaemonLoader daemon;
 
     public StreamingOctreeLoader() {
@@ -269,14 +283,18 @@ public abstract class StreamingOctreeLoader implements IObserver, ISceneGraphLoa
             }
     }
 
-    /** Adds a list of octants to the queue to be loaded **/
+    /**
+     * Adds a list of octants to the queue to be loaded
+     **/
     public void addToQueue(OctreeNode... octants) {
         for (OctreeNode octant : octants) {
             addToQueue(octant);
         }
     }
 
-    /** Puts it at the end of the toUnloadQueue **/
+    /**
+     * Puts it at the end of the toUnloadQueue
+     **/
     public void touchOctant(OctreeNode octant) {
         // Since higher levels are always observed, or 'touched',
         // it follows naturally that lower levels will always be kept
@@ -377,10 +395,10 @@ public abstract class StreamingOctreeLoader implements IObserver, ISceneGraphLoa
      * @param octreeWrapper
      */
     public void unloadOctant(OctreeNode octant, final AbstractOctreeWrapper octreeWrapper) {
-        synchronized (octant) {
-            Array<AbstractPositionEntity> objects = octant.objects;
-            if (objects != null) {
-                GaiaSky.postRunnable(() -> {
+        Array<AbstractPositionEntity> objects = octant.objects;
+        if (objects != null) {
+            GaiaSky.postRunnable(() -> {
+                synchronized (octant) {
                     try {
                         for (AbstractPositionEntity object : objects) {
                             int count = object.getStarCount();
@@ -395,13 +413,12 @@ public abstract class StreamingOctreeLoader implements IObserver, ISceneGraphLoa
                         }
                         objects.clear();
                         octant.setStatus(LoadStatus.NOT_LOADED);
-                    }catch(Exception e){
+                    } catch (Exception e) {
                         logger.error("Error disposing octant's objects " + octant.pageId, e);
                         logger.info(GlobalConf.APPLICATION_NAME + " will attempt to continue");
                     }
-                });
-            }
-
+                }
+            });
         }
     }
 
@@ -520,28 +537,29 @@ public abstract class StreamingOctreeLoader implements IObserver, ISceneGraphLoa
                 }
             }
         }
+
     }
 
     @Override
     public void notify(Events event, Object... data) {
         switch (event) {
-        case PAUSE_BACKGROUND_LOADING:
-            loadingPaused = true;
-            clearQueue();
-            logger.info("Background data loading thread paused");
-            break;
-        case RESUME_BACKGROUND_LOADING:
-            loadingPaused = false;
-            clearQueue();
-            logger.info("Background data loading thread resumed");
-            break;
-        case DISPOSE:
-            if (daemon != null) {
-                daemon.stopDaemon();
-            }
-            break;
-        default:
-            break;
+            case PAUSE_BACKGROUND_LOADING:
+                loadingPaused = true;
+                clearQueue();
+                logger.info("Background data loading thread paused");
+                break;
+            case RESUME_BACKGROUND_LOADING:
+                loadingPaused = false;
+                clearQueue();
+                logger.info("Background data loading thread resumed");
+                break;
+            case DISPOSE:
+                if (daemon != null) {
+                    daemon.stopDaemon();
+                }
+                break;
+            default:
+                break;
         }
 
     }
