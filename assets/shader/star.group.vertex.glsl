@@ -9,8 +9,7 @@ in vec4 a_color;
 // Additional attributes:
 // x - size
 // y - magnitude
-// z - colmap_attribute_value
-in vec3 a_additional;
+in vec2 a_additional;
 
 uniform int u_t; // time in days since epoch
 uniform mat4 u_projModelView;
@@ -20,6 +19,8 @@ uniform int u_cubemap;
 
 uniform vec2 u_pointAlpha;
 uniform vec2 u_thAnglePoint;
+
+uniform float u_brPow;
 
 // VR scale factor
 uniform float u_vrScale;
@@ -88,7 +89,7 @@ void main() {
 
     vec4 gpos = u_projModelView * vec4(pos, 1.0);
     gl_Position = gpos;
-    gl_PointSize = u_alphaSizeFovBr.y * sizefactor;
+    gl_PointSize = pow(a_additional.x, u_brPow) * sizefactor;
 
     #ifdef velocityBufferFlag
     velocityBuffer(gpos, a_position, dist, pm, vec2(500.0, 3000.0), 1.0);
