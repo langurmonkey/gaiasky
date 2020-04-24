@@ -21,7 +21,7 @@ import gaiasky.scenegraph.component.RotationComponent;
 import gaiasky.util.Constants;
 import gaiasky.util.GlobalConf;
 import gaiasky.util.GlobalResources;
-import gaiasky.util.color.ColourUtils;
+import gaiasky.util.color.ColorUtils;
 import gaiasky.util.gdx.g2d.ExtSpriteBatch;
 import gaiasky.util.gdx.mesh.IntMesh;
 import gaiasky.util.gdx.shader.ExtShaderProgram;
@@ -303,7 +303,7 @@ public abstract class CelestialBody extends AbstractPositionEntity implements I3
             transits = Math.max(0, transits + (int) Math.signum(time.getDt()));
             lastTransitIncrease = time.getTime().toEpochMilli();
             // Update transit colour
-            ColourUtils.colormap_long_rainbow(ColourUtils.normalize(transits, 0, 30), this.ccTransit);
+            ColorUtils.colormap_long_rainbow(ColorUtils.normalize(transits, 0, 30), this.ccTransit);
         }
     }
 

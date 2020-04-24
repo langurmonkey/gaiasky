@@ -17,7 +17,7 @@ import gaiasky.event.IObserver;
 import gaiasky.util.GlobalConf;
 import gaiasky.util.I18n;
 import gaiasky.util.TextUtils;
-import gaiasky.util.color.ColourUtils;
+import gaiasky.util.color.ColorUtils;
 import gaiasky.util.format.INumberFormat;
 import gaiasky.util.format.NumberFormatFactory;
 import gaiasky.util.scene2d.*;
@@ -73,7 +73,7 @@ public class DebugInterface extends TableGuiInterface implements IObserver {
         extra = new Table(skin);
 
         Link toggleSize = new Link(maximized ? "(-)" : "(+)", skin, null);
-        toggleSize.setColor(ColourUtils.gYellowC);
+        toggleSize.setColor(ColorUtils.gYellowC);
         toggleSize.addListener(new ClickListener() {
             public void clicked(InputEvent event, float x, float y) {
                 if (maximized) {

@@ -27,7 +27,7 @@ import gaiasky.scenegraph.camera.CameraManager;
 import gaiasky.util.GlobalConf;
 import gaiasky.util.I18n;
 import gaiasky.util.Logger;
-import gaiasky.util.color.ColourUtils;
+import gaiasky.util.color.ColorUtils;
 import gaiasky.util.format.DateFormatFactory;
 import gaiasky.util.format.IDateFormat;
 import gaiasky.util.format.INumberFormat;
@@ -815,9 +815,9 @@ public class KeyframesWindow extends GenericDialog implements IObserver {
                     keyframesPathObject.refreshData();
                     if (keyframesPathObject.selected == kf) {
                         if (seam.isChecked())
-                            keyframesPathObject.selectedKnot.setColor(ColourUtils.gRed);
+                            keyframesPathObject.selectedKnot.setColor(ColorUtils.gRed);
                         else
-                            keyframesPathObject.selectedKnot.setColor(ColourUtils.gWhite);
+                            keyframesPathObject.selectedKnot.setColor(ColorUtils.gWhite);
 
                     }
                 });

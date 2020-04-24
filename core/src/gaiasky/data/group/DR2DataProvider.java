@@ -12,7 +12,7 @@ import gaiasky.scenegraph.ParticleGroup.ParticleBean;
 import gaiasky.scenegraph.StarGroup.StarBean;
 import gaiasky.util.*;
 import gaiasky.util.Logger.Log;
-import gaiasky.util.color.ColourUtils;
+import gaiasky.util.color.ColorUtils;
 import gaiasky.util.coord.AstroUtils;
 import gaiasky.util.coord.Coordinates;
 import gaiasky.util.format.INumberFormat;
@@ -303,7 +303,7 @@ public class DR2DataProvider extends AbstractStarGroupDataProvider {
                                 teff = MathUtilsd.lint(xp, 1.5, 15, 3521.6, 3000);
                             }
                         }
-                        float[] rgb = ColourUtils.teffToRGB(teff);
+                        float[] rgb = ColorUtils.teffToRGB(teff);
                         double col = Color.toFloatBits(rgb[0], rgb[1], rgb[2], 1.0f);
 
                         point[StarBean.I_HIP] = -1;

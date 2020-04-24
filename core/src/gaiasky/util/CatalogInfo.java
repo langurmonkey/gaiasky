@@ -12,7 +12,7 @@ import gaiasky.scenegraph.ParticleGroup;
 import gaiasky.scenegraph.StarGroup;
 import gaiasky.scenegraph.octreewrapper.OctreeWrapper;
 import gaiasky.util.Logger.Log;
-import gaiasky.util.color.ColourUtils;
+import gaiasky.util.color.ColorUtils;
 import gaiasky.util.filter.Filter;
 import gaiasky.util.filter.attrib.IAttribute;
 
@@ -65,7 +65,7 @@ public class CatalogInfo {
         this.hlColor = new float[4];
         this.hlSizeFactor = hlSizeFactor;
         this.hlAllVisible = true;
-        System.arraycopy(ColourUtils.getColorFromIndex(colorIndexSequence++), 0, this.hlColor, 0, 4);
+        System.arraycopy(ColorUtils.getColorFromIndex(colorIndexSequence++), 0, this.hlColor, 0, 4);
 
         this.object.setCatalogInfo(this);
     }

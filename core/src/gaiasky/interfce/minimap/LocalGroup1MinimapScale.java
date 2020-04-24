@@ -17,7 +17,7 @@ import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer.ShapeType;
 import gaiasky.util.Constants;
 import gaiasky.util.I18n;
-import gaiasky.util.color.ColourUtils;
+import gaiasky.util.color.ColorUtils;
 import gaiasky.util.coord.Coordinates;
 import gaiasky.util.math.MathUtilsd;
 import gaiasky.util.math.Vector3d;
@@ -66,7 +66,7 @@ public class LocalGroup1MinimapScale extends AbstractMinimapScale {
         addGalaxy(i++, "KK196", 200.44, -45.06, 3.98);
 
 
-        galc = ColourUtils.gBlueC;
+        galc = ColorUtils.gBlueC;
         gals = 3f;
     }
 

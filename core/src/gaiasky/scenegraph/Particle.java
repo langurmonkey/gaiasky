@@ -24,7 +24,7 @@ import gaiasky.scenegraph.camera.ICamera;
 import gaiasky.util.Constants;
 import gaiasky.util.GlobalConf;
 import gaiasky.util.Nature;
-import gaiasky.util.color.ColourUtils;
+import gaiasky.util.color.ColorUtils;
 import gaiasky.util.coord.AstroUtils;
 import gaiasky.util.gdx.IntModelBatch;
 import gaiasky.util.math.Vector2d;
@@ -289,7 +289,7 @@ public class Particle extends CelestialBody implements IStarFocus, ILineRenderab
      */
     protected void setRGB(float bv) {
         if (cc == null)
-            cc = ColourUtils.BVtoRGB(bv);
+            cc = ColorUtils.BVtoRGB(bv);
         setColor2Data();
     }
 

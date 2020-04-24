@@ -5,7 +5,7 @@
 
 package gaiasky.util.validator;
 
-import gaiasky.util.color.ColourUtils;
+import gaiasky.util.color.ColorUtils;
 
 public class HexColorValidator implements IValidator {
     private boolean alpha = false;
@@ -18,9 +18,9 @@ public class HexColorValidator implements IValidator {
     public boolean validate(String value) {
         try {
             if (alpha) {
-                ColourUtils.hexToRgba(value);
+                ColorUtils.hexToRgba(value);
             } else {
-                ColourUtils.hexToRgb(value);
+                ColorUtils.hexToRgb(value);
             }
             return true;
         } catch (Exception e) {

@@ -8,7 +8,7 @@ package gaiasky.util.color;
 import com.badlogic.gdx.graphics.Color;
 import gaiasky.util.math.MathUtilsd;
 
-public class ColourUtils {
+public class ColorUtils {
 
     /*
      * LETS DEFINE SOME COLORS
@@ -46,10 +46,10 @@ public class ColourUtils {
     /**
      * Highlight color array for datasets
      **/
-    public static float[][] hlColor = new float[][] { gBlue, gRed, gYellow, gGreen, gPink, aOrange, tPurple, ddBrown, ddMagenta };
+    public static float[][] colorArray = new float[][] { gBlue, gRed, gYellow, gGreen, gPink, aOrange, tPurple, ddBrown, ddMagenta };
 
     public static float[] getColorFromIndex(int idx) {
-        return hlColor[idx % hlColor.length];
+        return colorArray[idx % colorArray.length];
     }
 
     public static String rgbaToHex(float[] color) {

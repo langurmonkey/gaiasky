@@ -23,7 +23,7 @@ import gaiasky.event.IObserver;
 import gaiasky.scenegraph.camera.ICamera;
 import gaiasky.util.*;
 import gaiasky.util.Logger.Log;
-import gaiasky.util.color.ColourUtils;
+import gaiasky.util.color.ColorUtils;
 import gaiasky.util.gdx.model.IntModel;
 import gaiasky.util.gdx.model.IntModelInstance;
 
@@ -207,7 +207,7 @@ public class ModelComponent implements Disposable, IObserver {
             }
             // Add skybox to materials if reflection present
             for (Material mat : model.materials) {
-                if (mat.has(ColorAttribute.Reflection) && !ColourUtils.isZero(((ColorAttribute) mat.get(ColorAttribute.Reflection)).color)) {
+                if (mat.has(ColorAttribute.Reflection) && !ColorUtils.isZero(((ColorAttribute) mat.get(ColorAttribute.Reflection)).color)) {
                     SkyboxComponent.prepareSkybox();
                     mat.set(new CubemapAttribute(CubemapAttribute.EnvironmentMap, SkyboxComponent.skybox));
                 }

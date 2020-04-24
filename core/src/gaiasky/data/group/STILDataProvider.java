@@ -12,7 +12,7 @@ import gaiasky.scenegraph.ParticleGroup.ParticleBean;
 import gaiasky.scenegraph.StarGroup.StarBean;
 import gaiasky.util.*;
 import gaiasky.util.Logger.Log;
-import gaiasky.util.color.ColourUtils;
+import gaiasky.util.color.ColorUtils;
 import gaiasky.util.coord.AstroUtils;
 import gaiasky.util.coord.Coordinates;
 import gaiasky.util.math.MathUtilsd;
@@ -240,7 +240,7 @@ public class STILDataProvider extends AbstractStarGroupDataProvider {
                             // Default color
                             color = 0.656f;
                         }
-                        float[] rgb = ColourUtils.BVtoRGB(color);
+                        float[] rgb = ColorUtils.BVtoRGB(color);
                         double col = Color.toFloatBits(rgb[0], rgb[1], rgb[2], 1.0f);
 
                         /* IDENTIFIER AND NAME */

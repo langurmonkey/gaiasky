@@ -26,7 +26,7 @@ import gaiasky.scenegraph.ParticleGroup.ParticleBean;
 import gaiasky.scenegraph.StarGroup;
 import gaiasky.scenegraph.octreewrapper.OctreeWrapper;
 import gaiasky.util.*;
-import gaiasky.util.color.ColourUtils;
+import gaiasky.util.color.ColorUtils;
 import gaiasky.util.filter.attrib.*;
 import gaiasky.util.format.INumberFormat;
 import gaiasky.util.format.NumberFormatFactory;
@@ -584,7 +584,7 @@ public class ColormapPicker extends ColorPickerAbstract {
 
             /* Hex */
             IValidator hval = new HexColorValidator(true);
-            hexfield = new OwnTextField(ColourUtils.rgbaToHex(color), skin, hval);
+            hexfield = new OwnTextField(ColorUtils.rgbaToHex(color), skin, hval);
             hexfield.setWidth(sliderLen);
 
             /* Color table */
@@ -634,7 +634,7 @@ public class ColormapPicker extends ColorPickerAbstract {
                 @Override
                 public void changed(ChangeEvent event, Actor actor) {
                     if (changeEvents && hexfield.isValid()) {
-                        float[] newcol = ColourUtils.hexToRgba(hexfield.getText());
+                        float[] newcol = ColorUtils.hexToRgba(hexfield.getText());
                         System.arraycopy(newcol, 0, color, 0, newcol.length);
                         cpd.updateColor(true, true, false);
                     }
@@ -703,7 +703,7 @@ public class ColormapPicker extends ColorPickerAbstract {
             }
             // Update hex
             if (updateHex)
-                hexfield.setText(ColourUtils.rgbaToHex(color));
+                hexfield.setText(ColorUtils.rgbaToHex(color));
 
             // Update image
             newColorImage.setColor(color[0], color[1], color[2], color[3]);

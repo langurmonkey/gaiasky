@@ -34,7 +34,7 @@ import gaiasky.screenshot.ImageRenderer;
 import gaiasky.util.*;
 import gaiasky.util.CatalogInfo.CatalogInfoType;
 import gaiasky.util.Logger.Log;
-import gaiasky.util.color.ColourUtils;
+import gaiasky.util.color.ColorUtils;
 import gaiasky.util.coord.Coordinates;
 import gaiasky.util.filter.attrib.AttributeUCD;
 import gaiasky.util.filter.attrib.IAttribute;
@@ -2569,7 +2569,7 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
 
     @Override
     public boolean highlightDataset(String dsName, int colorIndex, boolean highlight) {
-        float[] color = ColourUtils.getColorFromIndex(colorIndex);
+        float[] color = ColorUtils.getColorFromIndex(colorIndex);
         return highlightDataset(dsName, color[0], color[1], color[2], color[3], highlight);
     }
 

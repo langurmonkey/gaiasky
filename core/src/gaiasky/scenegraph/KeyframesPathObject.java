@@ -28,7 +28,7 @@ import gaiasky.scenegraph.camera.NaturalCamera;
 import gaiasky.util.Constants;
 import gaiasky.util.GlobalConf;
 import gaiasky.util.GlobalResources;
-import gaiasky.util.color.ColourUtils;
+import gaiasky.util.color.ColorUtils;
 import gaiasky.util.gdx.g2d.ExtSpriteBatch;
 import gaiasky.util.gdx.shader.ExtShaderProgram;
 import gaiasky.util.gravwaves.RelativisticEffectsManager;
@@ -106,7 +106,7 @@ public class KeyframesPathObject extends VertsObject implements I3DTextRenderabl
         path = new Polyline(RenderGroup.LINE);
         path.setName("Keyframes.path");
         path.ct = this.ct;
-        path.setColor(ColourUtils.gGreen);
+        path.setColor(ColorUtils.gGreen);
         path.setClosedLoop(false);
         path.setPrimitiveSize(0.5f * ss);
         path.initialize();
@@ -114,7 +114,7 @@ public class KeyframesPathObject extends VertsObject implements I3DTextRenderabl
         segments = new Polyline(RenderGroup.LINE);
         segments.setName("Keyframes.segments");
         segments.ct = this.ct;
-        segments.setColor(ColourUtils.gYellow);
+        segments.setColor(ColorUtils.gYellow);
         segments.setClosedLoop(false);
         segments.setPrimitiveSize(0.6f * ss);
         segments.initialize();
@@ -122,7 +122,7 @@ public class KeyframesPathObject extends VertsObject implements I3DTextRenderabl
         knots = new Points(RenderGroup.POINT);
         knots.setName("Keyframes.knots");
         knots.ct = this.ct;
-        knots.setColor(ColourUtils.gWhite);
+        knots.setColor(ColorUtils.gWhite);
         knots.setClosedLoop(false);
         knots.setPrimitiveSize(8f * ss);
         knots.initialize();
@@ -130,7 +130,7 @@ public class KeyframesPathObject extends VertsObject implements I3DTextRenderabl
         knotsSeam = new Points(RenderGroup.POINT);
         knotsSeam.setName("Keyframes.knots.seam");
         knotsSeam.ct = this.ct;
-        knotsSeam.setColor(ColourUtils.gRed);
+        knotsSeam.setColor(ColorUtils.gRed);
         knotsSeam.setClosedLoop(false);
         knotsSeam.setPrimitiveSize(8f * ss);
         knotsSeam.initialize();
@@ -138,7 +138,7 @@ public class KeyframesPathObject extends VertsObject implements I3DTextRenderabl
         selectedKnot = new Points(RenderGroup.POINT);
         selectedKnot.setName("Keyframes.selknot");
         selectedKnot.ct = this.ct;
-        selectedKnot.setColor(ColourUtils.gPink);
+        selectedKnot.setColor(ColorUtils.gPink);
         selectedKnot.setClosedLoop(false);
         selectedKnot.setPrimitiveSize(12f * ss);
         selectedKnot.setDepth(false);
@@ -147,7 +147,7 @@ public class KeyframesPathObject extends VertsObject implements I3DTextRenderabl
         highlightedKnot = new Points(RenderGroup.POINT);
         highlightedKnot.setName("Keyframes.highknot");
         highlightedKnot.ct = this.ct;
-        highlightedKnot.setColor(ColourUtils.gYellow);
+        highlightedKnot.setColor(ColorUtils.gYellow);
         highlightedKnot.setClosedLoop(false);
         highlightedKnot.setPrimitiveSize(12f * ss);
         highlightedKnot.setDepth(false);
@@ -344,7 +344,7 @@ public class KeyframesPathObject extends VertsObject implements I3DTextRenderabl
         VertsObject dir = new Polyline(RenderGroup.LINE);
         dir.setName("Keyframes.dir" + idx);
         dir.ct = this.ct;
-        dir.setColor(ColourUtils.gRed);
+        dir.setColor(ColorUtils.gRed);
         dir.setClosedLoop(false);
         dir.setPrimitiveSize(0.6f * ss);
         dir.initialize();
@@ -352,7 +352,7 @@ public class KeyframesPathObject extends VertsObject implements I3DTextRenderabl
         VertsObject up = new Polyline(RenderGroup.LINE);
         up.setName("Keyframes.up" + idx);
         up.ct = this.ct;
-        up.setColor(ColourUtils.gBlue);
+        up.setColor(ColorUtils.gBlue);
         up.setClosedLoop(false);
         up.setPrimitiveSize(0.6f * ss);
         up.initialize();
@@ -467,9 +467,9 @@ public class KeyframesPathObject extends VertsObject implements I3DTextRenderabl
         selected = kf;
         selectedKnot.setPoints(kf.pos.values());
         if (selected.seam) {
-            selectedKnot.setColor(ColourUtils.gRed);
+            selectedKnot.setColor(ColorUtils.gRed);
         } else {
-            selectedKnot.setColor(ColourUtils.gPink);
+            selectedKnot.setColor(ColorUtils.gPink);
         }
         int i = keyframes.indexOf(kf, true) * 2;
         if (i >= 0) {
@@ -627,12 +627,12 @@ public class KeyframesPathObject extends VertsObject implements I3DTextRenderabl
 
     @Override
     public float[] textColour() {
-        return ColourUtils.gPink;
+        return ColorUtils.gPink;
     }
 
     public float[] textColour(Keyframe kf) {
         if (kf == highlighted)
-            return ColourUtils.gYellow;
+            return ColorUtils.gYellow;
         else
             return textColour();
     }

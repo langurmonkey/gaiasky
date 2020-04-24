@@ -20,6 +20,7 @@ import gaiasky.event.Events;
 import gaiasky.util.GlobalConf;
 import gaiasky.util.GlobalResources;
 import gaiasky.util.I18n;
+import gaiasky.util.color.ColorUtils;
 import gaiasky.util.math.StdRandom;
 import gaiasky.util.scene2d.OwnLabel;
 import gaiasky.util.scene2d.OwnTextIconButton;
@@ -165,8 +166,8 @@ public class LoadingGui extends AbstractGui {
             "Setting up continuum transfunctioner...",
             "Pumping up atmospheres...",
             "Creating more rocky planets...",
-            "Buying more RAM online...",
-            "Burning excess fat...",
+            "Downloading RAM modules...",
+            "Fitting GPU performance curves...",
             "Tracing planetary orbits...",
             "Dodging asteroids...",
             "Introducing molecular clouds...",
@@ -178,11 +179,11 @@ public class LoadingGui extends AbstractGui {
             "Tuning gravity strength...",
             "Adjusting fundamental physical constants...",
             "Assigning moons to planets...",
-            "Censing extraterrestrials..."
+            "Registering extraterrestrials...",
+            "Synchronizing spatiotemporal serendipities..."
     };
     private void randomFunnyText(){
-        int rndIdx = StdRandom.uniform(loadingTexts.length);
-        spin.setText(loadingTexts[rndIdx]);
+        spin.setText(loadingTexts[StdRandom.uniform(loadingTexts.length)]);
     }
 
     private void reset(){

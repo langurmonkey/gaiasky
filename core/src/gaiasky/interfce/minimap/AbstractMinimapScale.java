@@ -15,7 +15,7 @@ import gaiasky.GaiaSky;
 import gaiasky.interfce.IMinimapScale;
 import gaiasky.scenegraph.camera.ICamera;
 import gaiasky.util.GlobalConf;
-import gaiasky.util.color.ColourUtils;
+import gaiasky.util.color.ColorUtils;
 import gaiasky.util.math.Matrix4d;
 import gaiasky.util.math.Vector2d;
 import gaiasky.util.math.Vector3d;
@@ -67,7 +67,7 @@ public abstract class AbstractMinimapScale implements IMinimapScale {
         this.extentDown = extentDown;
 
         this.suns = 5f;
-        this.camc = ColourUtils.gRedC;
+        this.camc = ColorUtils.gRedC;
         this.camp = new float[4];
         this.camd = new float[4];
         float h = 1f;
