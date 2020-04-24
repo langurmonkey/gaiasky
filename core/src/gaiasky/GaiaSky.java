@@ -167,7 +167,7 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
     /**
      * The user interfaces
      */
-    public IGui initialGui, loadingGui, loadingGuiVR, mainGui, spacecraftGui, stereoGui, debugGui;
+    public IGui initialGui, loadingGui, loadingGuiVR, mainGui, spacecraftGui, stereoGui, debugGui, crashGui;
 
     /**
      * List of GUIs
@@ -861,15 +861,28 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
         }
     };
 
+    // Has the application crashed?
+    private boolean crashed = false;
+
     @Override
     public void render() {
         try {
-            // Run the render process
-            renderProcess.run();
+            if (!crashed) {
+                // Run the render process
+                renderProcess.run();
+            } else if (crashGui != null) {
+                // Crash information
+                renderGui(crashGui);
+            }
         } catch (Throwable t) {
+            // Report the crash
             CrashReporter.reportCrash(t, logger);
-            // Quit
-            Gdx.app.exit();
+            // Set up crash window
+            crashGui = new CrashGui(t);
+            crashGui.initialize(manager);
+            Gdx.input.setInputProcessor(crashGui.getGuiStage());
+            // Flag up
+            crashed = true;
         }
 
         // Create UI window if needed
