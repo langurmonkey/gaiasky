@@ -184,9 +184,14 @@ public class Constants {
     public static final float MIN_TURN_SPEED = 2e2f;
 
     /** Minimum star brightness **/
-    public static final float MIN_STAR_BRIGHT = 0.1f;
+    public static final float MIN_STAR_BRIGHTNESS = 0.001f;
     /** Maximum star brightness **/
-    public static final float MAX_STAR_BRIGHT = 25f;
+    public static final float MAX_STAR_BRIGHTNESS = 1f;
+
+    /** Minimum star pixel size **/
+    public static final float MIN_STAR_POINT_SIZE = 0.01f;
+    /** Maximum star pixel size **/
+    public static final float MAX_STAR_POINT_SIZE = 4f;
 
     /** Minimum number factor for proper motion vectors **/
     public static final float MIN_PM_NUM_FACTOR = 1f;
@@ -202,13 +207,6 @@ public class Constants {
     public static final float MIN_LOD_TRANS_ANGLE_DEG = 0f;
     /** Maximum angle where the LOD transitions end **/
     public static final float MAX_LOD_TRANS_ANGLE_DEG = 120f;
-
-    /** Minimum star pixel size **/
-    public static final float MIN_STAR_POINT_SIZE = 0.1f;
-    /** Maximum star pixel size **/
-    public static final float MAX_STAR_POINT_SIZE = 20;
-    /** Step to increase/decrease **/
-    public static final float STEP_STAR_POINT_SIZE = 0.1f;
 
     /** Min ambient light **/
     public static final float MIN_AMBIENT_LIGHT = 0f;
