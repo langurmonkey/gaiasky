@@ -1697,11 +1697,11 @@ public class GlobalConf {
                     STAR_POINT_SIZE = (float) data[0];
                     break;
                 case STAR_POINT_SIZE_INCREASE_CMD:
-                    float size = Math.min(STAR_POINT_SIZE + Constants.STEP_STAR_POINT_SIZE, Constants.MAX_STAR_POINT_SIZE);
+                    float size = Math.min(STAR_POINT_SIZE + Constants.SLIDER_STEP_TINY, Constants.MAX_STAR_POINT_SIZE);
                     EventManager.instance.post(Events.STAR_POINT_SIZE_CMD, size, false);
                     break;
                 case STAR_POINT_SIZE_DECREASE_CMD:
-                    size = Math.max(STAR_POINT_SIZE - Constants.STEP_STAR_POINT_SIZE, Constants.MIN_STAR_POINT_SIZE);
+                    size = Math.max(STAR_POINT_SIZE - Constants.SLIDER_STEP_TINY, Constants.MIN_STAR_POINT_SIZE);
                     EventManager.instance.post(Events.STAR_POINT_SIZE_CMD, size, false);
                     break;
                 case STAR_POINT_SIZE_RESET_CMD:
