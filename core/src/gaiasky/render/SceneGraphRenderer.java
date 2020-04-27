@@ -60,6 +60,7 @@ import org.lwjgl.opengl.GL30;
 import org.lwjgl.opengl.GL40;
 
 import java.nio.IntBuffer;
+import java.nio.file.Path;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Map;
@@ -485,7 +486,7 @@ public class SceneGraphRenderer extends AbstractRenderer implements IProcessRend
         annotationsProc.addPostRunnables(clearDepthR);
 
         // BILLBOARD STARS
-        billboardStarsProc = new BillboardStarRenderSystem(RenderGroup.BILLBOARD_STAR, alphas, starBillboardShaders, GlobalResources.unpackTexName("data/tex/base/star-tex-03*.png"), ComponentType.Stars.ordinal());
+        billboardStarsProc = new BillboardStarRenderSystem(RenderGroup.BILLBOARD_STAR, alphas, starBillboardShaders, GlobalConf.assetsFile("img/star/star-tex-03.png"), ComponentType.Stars.ordinal());
         billboardStarsProc.addPreRunnables(additiveBlendR, noDepthTestR);
         lpu = new LightPositionUpdater();
         billboardStarsProc.addPostRunnables(lpu);

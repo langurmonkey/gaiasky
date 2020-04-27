@@ -552,7 +552,7 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
         EventManager.instance.post(Events.VISIBILITY_OF_COMPONENTS, SceneGraphRenderer.visible);
 
         // Key bindings
-        inputMultiplexer.addProcessor(new KeyInputController(Gdx.input));
+        inputMultiplexer.addProcessor(new KeyboardInputController(Gdx.input));
 
         EventManager.instance.post(Events.SCENE_GRAPH_LOADED, sg);
 
@@ -867,6 +867,8 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
     @Override
     public void render() {
         try {
+            if(Gdx.input.isKeyPressed(Input.Keys.ESCAPE))
+                logger.info("ESC");
             if (!crashed) {
                 // Run the render process
                 renderProcess.run();

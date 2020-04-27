@@ -22,7 +22,7 @@ import java.util.Set;
  * @author tsagrista
  *
  */
-public class KeyInputController extends InputAdapter {
+public class KeyboardInputController extends InputAdapter {
 
     public KeyBindings mappings;
     /** Holds the pressed keys at any moment **/
@@ -30,7 +30,7 @@ public class KeyInputController extends InputAdapter {
 
     private Input input;
 
-    public KeyInputController(Input input) {
+    public KeyboardInputController(Input input) {
         super();
         this.input = input;
         pressedKeys = new HashSet<>();
@@ -74,4 +74,9 @@ public class KeyInputController extends InputAdapter {
 
     }
 
+    @Override
+    public boolean keyTyped(char character) {
+        System.out.println("KEY: " + character);
+        return super.keyTyped(character);
+    }
 }

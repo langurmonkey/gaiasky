@@ -80,8 +80,8 @@ void main() {
         pos = computeGravitationalWaves(pos, u_gw, u_gwmat3, u_ts, u_omgw, u_hterms);
     #endif // gravitationalWaves
 
-    float viewAngleApparent = atan((a_additional.x * u_alphaSizeFovBr.w) / dist) / u_alphaSizeFovBr.z;
-    float opacity = clamp(lint2(viewAngleApparent, u_thAnglePoint.x, u_thAnglePoint.y, u_pointAlpha.x, u_pointAlpha.y), 0.0, 1.0);
+    float viewAngleApparent = atan((a_additional.x * u_alphaSizeFovBr.w) / dist);
+    float opacity = pow(lint2(viewAngleApparent / u_alphaSizeFovBr.z, u_thAnglePoint.x, u_thAnglePoint.y, u_pointAlpha.x, u_pointAlpha.y), 1.1);
 
     float fadeout = smoothstep(dist, l0, l1);
 
@@ -89,7 +89,7 @@ void main() {
 
     vec4 gpos = u_projModelView * vec4(pos, 1.0);
     gl_Position = gpos;
-    gl_PointSize = pow(viewAngleApparent * 1e8, u_brPow) * u_alphaSizeFovBr.y * sizefactor / u_alphaSizeFovBr.z;
+    gl_PointSize = pow(viewAngleApparent * .5e8, u_brPow) * u_alphaSizeFovBr.y * sizefactor / u_alphaSizeFovBr.z;
 
     #ifdef velocityBufferFlag
     velocityBuffer(gpos, a_position, dist, pm, vec2(500.0, 3000.0), 1.0);

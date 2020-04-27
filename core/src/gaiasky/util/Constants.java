@@ -184,14 +184,19 @@ public class Constants {
     public static final float MIN_TURN_SPEED = 2e2f;
 
     /** Minimum star brightness **/
-    public static final float MIN_STAR_BRIGHTNESS = 0.001f;
+    public static final float MIN_STAR_BRIGHTNESS = 0.05f;
     /** Maximum star brightness **/
-    public static final float MAX_STAR_BRIGHTNESS = 1f;
+    public static final float MAX_STAR_BRIGHTNESS = 4f;
 
     /** Minimum star pixel size **/
-    public static final float MIN_STAR_POINT_SIZE = 0.01f;
+    public static final float MIN_STAR_POINT_SIZE = 0.1f;
     /** Maximum star pixel size **/
-    public static final float MAX_STAR_POINT_SIZE = 4f;
+    public static final float MAX_STAR_POINT_SIZE = 25f;
+
+    /** Minimum star minimum opacity **/
+    public static final float MIN_STAR_MIN_OPACITY = 0.0f;
+    /** Maximum star minimum opacity **/
+    public static final float MAX_STAR_MIN_OPACITY = 1.0f;
 
     /** Minimum number factor for proper motion vectors **/
     public static final float MIN_PM_NUM_FACTOR = 1f;
@@ -218,11 +223,6 @@ public class Constants {
     /** Maximum spacecraft responsiveness **/
     public static final float MAX_SC_RESPONSIVENESS = .5e7f;
 
-    /** Minimum star minimum opacity **/
-    public static final float MIN_STAR_MIN_OPACITY = 0.0f;
-    /** Maximum star minimum opacity **/
-    public static final float MAX_STAR_MIN_OPACITY = 2.0f;
-
     public static final float MIN_BRIGHTNESS = -1.0f;
     public static final float MAX_BRIGHTNESS = 1.0f;
 
@@ -241,7 +241,7 @@ public class Constants {
     public static final float MIN_EXPOSURE = 0.0f;
     public static final float MAX_EXPOSURE = 10.0f;
 
-    public static final float MIN_LABEL_SIZE = 0.1f;
+    public static final float MIN_LABEL_SIZE = 0.5f;
     public static final float MAX_LABEL_SIZE = 2.3f;
 
     public static final float MIN_LINE_WIDTH = 0f;

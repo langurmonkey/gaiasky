@@ -46,6 +46,9 @@ public class GlobalConf {
     // Assets location for this instance of Gaia Sky
     // macOS needs fully qualified paths when run as an app (GaiaSky.app), that's why we use the getAbsolutePath() part
     public static final String ASSETS_LOC = (new File(System.getProperty("assets.location") != null ? System.getProperty("assets.location") : ".")).getAbsolutePath();
+    public static String assetsFile(String relativeAssetsLoc){
+        return Path.of(ASSETS_LOC, relativeAssetsLoc).toString();
+    }
 
     public static String APPLICATION_NAME = "Gaia Sky";
     public static String APPLICATION_NAME_TITLE = "G a i a   S k y";
