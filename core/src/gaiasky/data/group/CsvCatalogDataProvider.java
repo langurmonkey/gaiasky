@@ -47,7 +47,10 @@ public class CsvCatalogDataProvider extends AbstractStarGroupDataProvider {
     private static final String separator = comma;
 
     private enum ColId {
-        sourceid, ra, dec, pllx, ra_err, dec_err, pllx_err, pmra, pmdec, radvel, pmra_err, pmdec_err, radvel_err, gmag, bpmag, rpmag, ref_epoch, teff, radius, ag, ebp_min_rp
+        sourceid, ra, dec, pllx, ra_err, dec_err,
+        pllx_err, pmra, pmdec, radvel, pmra_err,
+        pmdec_err, radvel_err, gmag, bpmag, rpmag, bp_rp,
+        ref_epoch, teff, radius, ag, ebp_min_rp, ruwe
     }
 
     private Map<ColId, Integer> indexMap;
@@ -59,7 +62,7 @@ public class CsvCatalogDataProvider extends AbstractStarGroupDataProvider {
             return -1;
     }
 
-    private boolean hasIdx(ColId colId){
+    private boolean hasIdx(ColId colId) {
         return indexMap != null && indexMap.containsKey(colId) && indexMap.get(colId) >= 0;
     }
 
@@ -110,8 +113,8 @@ public class CsvCatalogDataProvider extends AbstractStarGroupDataProvider {
         int c = 0;
         ColId[] colIds = ColId.values();
         for (String col : cols) {
-            for(ColId colId : colIds){
-                if(!col.strip().isBlank() && col.strip().equals(colId.toString())){
+            for (ColId colId : colIds) {
+                if (!col.strip().isBlank() && col.strip().equals(colId.toString())) {
                     indexMap.put(colId, c);
                     break;
                 }
@@ -130,7 +133,7 @@ public class CsvCatalogDataProvider extends AbstractStarGroupDataProvider {
 
 
     public Array<ParticleBean> loadData(String file, double factor, boolean compat) {
-        initLists(10000000);
+        initLists(1000000);
 
         FileHandle f = GlobalConf.data.dataFileHandle(file);
         if (f.isDirectory()) {

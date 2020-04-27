@@ -10,6 +10,7 @@ import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.utils.I18NBundle;
 import gaiasky.util.Logger.Log;
 
+import java.nio.file.Path;
 import java.util.Locale;
 import java.util.MissingResourceException;
 
@@ -31,6 +32,10 @@ public class I18n {
         if (bundle == null) {
             forceInit(Gdx.files.internal("i18n/gsbundle"));
         }
+    }
+
+    public static void initialize(Path path) {
+        forceInit(Gdx.files.absolute(path.toAbsolutePath().toString()));
     }
 
     public static void initialize(FileHandle fh) {

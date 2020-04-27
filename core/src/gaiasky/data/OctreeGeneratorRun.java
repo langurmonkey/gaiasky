@@ -43,6 +43,8 @@ import gaiasky.util.tree.OctreeNode;
 import java.io.*;
 import java.lang.reflect.InvocationTargetException;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
@@ -139,8 +141,8 @@ public class OctreeGeneratorRun {
             if (!outFolder.endsWith("/"))
                 outFolder += "/";
 
-            File outfolderFile = new File(outFolder);
-            outfolderFile.mkdirs();
+            Path outPath = Path.of(outFolder);
+            Files.createDirectories(outPath);
 
             // Assets location
             String ASSETS_LOC = GlobalConf.ASSETS_LOC;
@@ -157,14 +159,14 @@ public class OctreeGeneratorRun {
             DateFormatFactory.initialize(new DesktopDateFormatFactory());
 
             // Initialize i18n
-            I18n.initialize(new FileHandle(ASSETS_LOC + "i18n/gsbundle"));
+            I18n.initialize(Path.of(ASSETS_LOC, "i18n/gsbundle"));
 
             // Initialize configuration
-            File dummyv = new File(ASSETS_LOC + "data/dummyversion");
-            if (!dummyv.exists()) {
-                dummyv = new File(ASSETS_LOC + "dummyversion");
+            Path dummyv = Path.of(ASSETS_LOC, "data/dummyversion");
+            if (!Files.exists(dummyv)) {
+                dummyv = Path.of(ASSETS_LOC, "dummyversion");
             }
-            ConfInit.initialize(new DesktopConfInit(new FileInputStream(new File(ASSETS_LOC + "conf/global.properties")), new FileInputStream(dummyv)));
+            ConfInit.initialize(new DesktopConfInit(new FileInputStream(Path.of(ASSETS_LOC, "conf/global.properties").toFile()), new FileInputStream(dummyv.toFile())));
 
             OctreeNode root = generateOctree();
 
@@ -250,7 +252,7 @@ public class OctreeGeneratorRun {
                 stil.setMustLoadIds(mustLoad);
             }
 
-            Array<ParticleBean> listHip = stil.loadData("data/catalog/hipparcos/hip.vot");
+            Array<ParticleBean> listHip = stil.loadData("data/catalog/hipparcos/hipparcos.vot");
 
             // Update names
             if (hipNames != null) {
