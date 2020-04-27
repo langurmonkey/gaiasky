@@ -100,7 +100,11 @@ public class StarGroup extends ParticleGroup implements ILineRenderable, IStarFo
         }
 
         public StarBean(double[] data, Long id, String name) {
-            this(data, id, new String[] { name });
+            this(data, id, new String[]{name});
+        }
+
+        public StarBean(double[] data, Long id, String name, Map<UCD, Double> extra) {
+            this(data, id, new String[]{name}, extra);
         }
 
         public double pmx() {
@@ -268,17 +272,17 @@ public class StarGroup extends ParticleGroup implements ILineRenderable, IStarFo
     private int getNCloseupStars() {
         int n;
         switch (GlobalConf.scene.GRAPHICS_QUALITY) {
-        case ULTRA:
-        case HIGH:
-            n = 100;
-            break;
-        case NORMAL:
-            n = 80;
-            break;
-        case LOW:
-        default:
-            n = 60;
-            break;
+            case ULTRA:
+            case HIGH:
+                n = 100;
+                break;
+            case NORMAL:
+                n = 80;
+                break;
+            case LOW:
+            default:
+                n = 60;
+                break;
         }
         return Math.min(n, pointData.size);
     }
@@ -518,77 +522,77 @@ public class StarGroup extends ParticleGroup implements ILineRenderable, IStarFo
                     double maxSpeedKms = 100;
                     float r, g, b;
                     switch (GlobalConf.scene.PM_COLOR_MODE) {
-                    case 0:
-                    default:
-                        // DIRECTION
-                        // Normalize, each component is in [-1:1], map to [0:1] and to a color channel
-                        ppm.nor();
-                        r = (float) (ppm.x + 1d) / 2f;
-                        g = (float) (ppm.y + 1d) / 2f;
-                        b = (float) (ppm.z + 1d) / 2f;
-                        break;
-                    case 1:
-                        // LENGTH
-                        ppm.set(star.pmx(), star.pmy(), star.pmz());
-                        // Units/year to Km/s
-                        ppm.scl(Constants.U_TO_KM / Nature.Y_TO_S);
-                        double len = MathUtilsd.clamp(ppm.len(), 0d, maxSpeedKms) / maxSpeedKms;
-                        ColorUtils.colormap_long_rainbow((float) (1 - len), rgba);
-                        r = rgba[0];
-                        g = rgba[1];
-                        b = rgba[2];
-                        break;
-                    case 2:
-                        // HAS RADIAL VELOCITY - blue: stars with RV, red: stars without RV
-                        if (star.radvel() != 0) {
-                            r = ColorUtils.gBlue[0] + 0.2f;
-                            g = ColorUtils.gBlue[1] + 0.4f;
-                            b = ColorUtils.gBlue[2] + 0.4f;
-                        } else {
-                            r = ColorUtils.gRed[0] + 0.4f;
-                            g = ColorUtils.gRed[1] + 0.2f;
-                            b = ColorUtils.gRed[2] + 0.2f;
-                        }
-                        break;
-                    case 3:
-                        // REDSHIFT from Sun - blue: -100 Km/s, red: 100 Km/s
-                        double rav = star.radvel();
-                        if (rav != 0) {
-                            double max = maxSpeedKms;
-                            // rv in [0:1]
-                            double rv = ((MathUtilsd.clamp(rav, -max, max) / max) + 1) / 2;
-                            ColorUtils.colormap_blue_white_red((float) rv, rgba);
-                            r = rgba[0];
-                            g = rgba[1];
-                            b = rgba[2];
-                        } else {
-                            r = g = b = 1;
-                        }
-                        break;
-                    case 4:
-                        // REDSHIFT from Camera - blue: -100 Km/s, red: 100 Km/s
-                        if (ppm.len2() != 0) {
-                            double max = maxSpeedKms;
+                        case 0:
+                        default:
+                            // DIRECTION
+                            // Normalize, each component is in [-1:1], map to [0:1] and to a color channel
+                            ppm.nor();
+                            r = (float) (ppm.x + 1d) / 2f;
+                            g = (float) (ppm.y + 1d) / 2f;
+                            b = (float) (ppm.z + 1d) / 2f;
+                            break;
+                        case 1:
+                            // LENGTH
                             ppm.set(star.pmx(), star.pmy(), star.pmz());
                             // Units/year to Km/s
                             ppm.scl(Constants.U_TO_KM / Nature.Y_TO_S);
-                            Vector3d camstar = aux3d4.get().set(p1);
-                            double pr = ppm.dot(camstar.nor());
-                            double projection = ((MathUtilsd.clamp(pr, -max, max) / max) + 1) / 2;
-                            ColorUtils.colormap_blue_white_red((float) projection, rgba);
+                            double len = MathUtilsd.clamp(ppm.len(), 0d, maxSpeedKms) / maxSpeedKms;
+                            ColorUtils.colormap_long_rainbow((float) (1 - len), rgba);
                             r = rgba[0];
                             g = rgba[1];
                             b = rgba[2];
-                        } else {
-                            r = g = b = 1;
-                        }
-                        break;
-                    case 5:
-                        // SINGLE COLOR
-                        r = ColorUtils.gBlue[0] + 0.2f;
-                        g = ColorUtils.gBlue[1] + 0.4f;
-                        b = ColorUtils.gBlue[2] + 0.4f;
-                        break;
+                            break;
+                        case 2:
+                            // HAS RADIAL VELOCITY - blue: stars with RV, red: stars without RV
+                            if (star.radvel() != 0) {
+                                r = ColorUtils.gBlue[0] + 0.2f;
+                                g = ColorUtils.gBlue[1] + 0.4f;
+                                b = ColorUtils.gBlue[2] + 0.4f;
+                            } else {
+                                r = ColorUtils.gRed[0] + 0.4f;
+                                g = ColorUtils.gRed[1] + 0.2f;
+                                b = ColorUtils.gRed[2] + 0.2f;
+                            }
+                            break;
+                        case 3:
+                            // REDSHIFT from Sun - blue: -100 Km/s, red: 100 Km/s
+                            double rav = star.radvel();
+                            if (rav != 0) {
+                                double max = maxSpeedKms;
+                                // rv in [0:1]
+                                double rv = ((MathUtilsd.clamp(rav, -max, max) / max) + 1) / 2;
+                                ColorUtils.colormap_blue_white_red((float) rv, rgba);
+                                r = rgba[0];
+                                g = rgba[1];
+                                b = rgba[2];
+                            } else {
+                                r = g = b = 1;
+                            }
+                            break;
+                        case 4:
+                            // REDSHIFT from Camera - blue: -100 Km/s, red: 100 Km/s
+                            if (ppm.len2() != 0) {
+                                double max = maxSpeedKms;
+                                ppm.set(star.pmx(), star.pmy(), star.pmz());
+                                // Units/year to Km/s
+                                ppm.scl(Constants.U_TO_KM / Nature.Y_TO_S);
+                                Vector3d camstar = aux3d4.get().set(p1);
+                                double pr = ppm.dot(camstar.nor());
+                                double projection = ((MathUtilsd.clamp(pr, -max, max) / max) + 1) / 2;
+                                ColorUtils.colormap_blue_white_red((float) projection, rgba);
+                                r = rgba[0];
+                                g = rgba[1];
+                                b = rgba[2];
+                            } else {
+                                r = g = b = 1;
+                            }
+                            break;
+                        case 5:
+                            // SINGLE COLOR
+                            r = ColorUtils.gBlue[0] + 0.2f;
+                            g = ColorUtils.gBlue[1] + 0.4f;
+                            b = ColorUtils.gBlue[2] + 0.4f;
+                            break;
                     }
 
                     // Clamp
@@ -736,11 +740,11 @@ public class StarGroup extends ParticleGroup implements ILineRenderable, IStarFo
         // Super handles FOCUS_CHANGED and CAMERA_MOTION_UPDATED event
         super.notify(event, data);
         switch (event) {
-        case GRAPHICS_QUALITY_UPDATED:
-            this.N_CLOSEUP_STARS = getNCloseupStars();
-            break;
-        default:
-            break;
+            case GRAPHICS_QUALITY_UPDATED:
+                this.N_CLOSEUP_STARS = getNCloseupStars();
+                break;
+            default:
+                break;
         }
     }
 
@@ -896,8 +900,8 @@ public class StarGroup extends ParticleGroup implements ILineRenderable, IStarFo
      */
     public static StarGroup getStarGroup(String name, Array<ParticleBean> data, DatasetOptions dops) {
         double[] fadeIn = dops == null || dops.fadeIn == null ? null : dops.fadeIn;
-        double[] fadeOut = dops == null || dops.fadeOut == null ? new double[] { 2e3, 1e5 } : dops.fadeOut;
-        double[] labelColor = dops == null || dops.labelColor == null ? new double[] { 1.0, 1.0, 1.0, 1.0 } : dops.labelColor;
+        double[] fadeOut = dops == null || dops.fadeOut == null ? new double[]{2e3, 1e5} : dops.fadeOut;
+        double[] labelColor = dops == null || dops.labelColor == null ? new double[]{1.0, 1.0, 1.0, 1.0} : dops.labelColor;
 
         StarGroup sg = new StarGroup();
         sg.setName(name.replace("%%SGID%%", Long.toString(sg.id)));
@@ -905,9 +909,9 @@ public class StarGroup extends ParticleGroup implements ILineRenderable, IStarFo
         sg.setFadein(fadeIn);
         sg.setFadeout(fadeOut);
         sg.setLabelcolor(labelColor);
-        sg.setColor(new double[] { 1.0, 1.0, 1.0, 0.25 });
+        sg.setColor(new double[]{1.0, 1.0, 1.0, 0.25});
         sg.setSize(6.0);
-        sg.setLabelposition(new double[] { 0.0, -5.0e7, -4e8 });
+        sg.setLabelposition(new double[]{0.0, -5.0e7, -4e8});
         sg.setCt("Stars");
         sg.setData(data);
         sg.doneLoading(null);
@@ -937,11 +941,11 @@ public class StarGroup extends ParticleGroup implements ILineRenderable, IStarFo
         StarGroup sg = new StarGroup();
         sg.setName(name.replace("%%SGID%%", Long.toString(sg.id)));
         sg.setParent("Universe");
-        sg.setFadeout(new double[] { 2e3, 1e5 });
-        sg.setLabelcolor(new double[] { 1.0, 1.0, 1.0, 1.0 });
-        sg.setColor(new double[] { 1.0, 1.0, 1.0, 0.25 });
+        sg.setFadeout(new double[]{2e3, 1e5});
+        sg.setLabelcolor(new double[]{1.0, 1.0, 1.0, 1.0});
+        sg.setColor(new double[]{1.0, 1.0, 1.0, 0.25});
         sg.setSize(6.0);
-        sg.setLabelposition(new double[] { 0.0, -5.0e7, -4e8 });
+        sg.setLabelposition(new double[]{0.0, -5.0e7, -4e8});
         sg.setCt("Stars");
         sg.setData(data);
         if (fullInit)
@@ -959,7 +963,7 @@ public class StarGroup extends ParticleGroup implements ILineRenderable, IStarFo
     public void updateMetadata(ITimeFrameProvider time, ICamera camera) {
         Vector3d camPos = camera.getPos();
         double deltaYears = AstroUtils.getMsSince(time.getTime(), epoch_jd) * Nature.MS_TO_Y;
-        if(pointData != null) {
+        if (pointData != null) {
             int n = pointData.size;
             for (int i = 0; i < n; i++) {
                 StarBean d = (StarBean) pointData.get(i);

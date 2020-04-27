@@ -21,6 +21,7 @@ import gaiasky.util.io.ByteBufferInputStream;
 import gaiasky.util.math.MathUtilsd;
 import gaiasky.util.math.Vector3d;
 import gaiasky.util.parse.Parser;
+import gaiasky.util.ucd.UCD;
 
 import java.io.*;
 import java.nio.MappedByteBuffer;
@@ -45,26 +46,6 @@ public class CsvCatalogDataProvider extends AbstractStarGroupDataProvider {
     private static final String comma = ",";
 
     private static final String separator = comma;
-
-    private enum ColId {
-        sourceid, ra, dec, pllx, ra_err, dec_err,
-        pllx_err, pmra, pmdec, radvel, pmra_err,
-        pmdec_err, radvel_err, gmag, bpmag, rpmag, bp_rp,
-        ref_epoch, teff, radius, ag, ebp_min_rp, ruwe
-    }
-
-    private Map<ColId, Integer> indexMap;
-
-    private int idx(ColId colId) {
-        if (indexMap != null && indexMap.containsKey(colId))
-            return indexMap.get(colId);
-        else
-            return -1;
-    }
-
-    private boolean hasIdx(ColId colId) {
-        return indexMap != null && indexMap.containsKey(colId) && indexMap.get(colId) >= 0;
-    }
 
 
     /**
@@ -213,6 +194,9 @@ public class CsvCatalogDataProvider extends AbstractStarGroupDataProvider {
 
         // Check that parallax exists (5-param solution), otherwise we have no distance
         if (!tokens[idx(ColId.pllx)].isEmpty()) {
+            /** Extra attributes **/
+            Map<UCD, Double> extra = new HashMap<>();
+
             /** ID **/
             long sourceid = Parser.parseLong(tokens[idx(ColId.sourceid)]);
             boolean mustLoad = mustLoad(sourceid);
@@ -222,6 +206,8 @@ public class CsvCatalogDataProvider extends AbstractStarGroupDataProvider {
             double pllx = Parser.parseDouble(tokens[idx(ColId.pllx)]) + parallaxZeroPoint;
             double pllxerr = Parser.parseDouble(tokens[idx(ColId.pllx_err)]);
             double appmag = Parser.parseDouble(tokens[idx(ColId.gmag)]);
+            extra.put(new UCD("pllx_err", ColId.pllx_err.toString(), "", 0), pllxerr);
+
 
             // Keep only stars with relevant parallaxes
             if (mustLoad || acceptParallax(appmag, pllx, pllxerr)) {
@@ -230,13 +216,17 @@ public class CsvCatalogDataProvider extends AbstractStarGroupDataProvider {
                 double distpc = (1000d / pllx);
                 double geodistpc = getGeoDistance(sourceid);
 
+                float ruweVal = getRuweValue(sourceid, tokens);
                 if (!mustLoad && !ruwe.isNaN()) {
                     // RUWE test!
-                    float ruweVal = getRuweValue(sourceid);
                     if (ruweVal > ruwe) {
                         // Do not accept
                         return false;
                     }
+                }
+                // Add ruwe to extra
+                if (!Float.isNaN(ruweVal)) {
+                    extra.put(new UCD("ruwe", ColId.ruwe.toString(), "", 0), (double) ruweVal);
                 }
 
                 // If we have geometric distances, we only accept those, otherwise, accept all
@@ -354,7 +344,7 @@ public class CsvCatalogDataProvider extends AbstractStarGroupDataProvider {
                         point[StarBean.I_APPMAG] = appmag;
                         point[StarBean.I_ABSMAG] = absmag;
 
-                        list.add(new StarBean(point, sourceid, name));
+                        list.add(new StarBean(point, sourceid, name, extra));
 
                         int appClamp = (int) MathUtilsd.clamp(appmag, 0, 21);
                         countsPerMag[appClamp] += 1;
@@ -432,5 +422,4 @@ public class CsvCatalogDataProvider extends AbstractStarGroupDataProvider {
         }
         return null;
     }
-
 }

@@ -27,12 +27,33 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.zip.GZIPInputStream;
 
 public abstract class AbstractStarGroupDataProvider implements IStarGroupDataProvider {
     protected static Log logger = Logger.getLogger(AbstractStarGroupDataProvider.class);
     public static double NEGATIVE_DIST = 1 * Constants.M_TO_U;
+
+    public enum ColId {
+        sourceid, ra, dec, pllx, ra_err, dec_err,
+        pllx_err, pmra, pmdec, radvel, pmra_err,
+        pmdec_err, radvel_err, gmag, bpmag, rpmag, bp_rp,
+        ref_epoch, teff, radius, ag, ebp_min_rp, ruwe
+    }
+
+    protected Map<ColId, Integer> indexMap;
+
+    protected int idx(ColId colId) {
+        if (indexMap != null && indexMap.containsKey(colId))
+            return indexMap.get(colId);
+        else
+            return -1;
+    }
+
+    protected boolean hasIdx(ColId colId) {
+        return indexMap != null && indexMap.containsKey(colId) && indexMap.get(colId) >= 0;
+    }
 
     protected Array<ParticleBean> list;
     protected LongMap<double[]> sphericalPositions;
@@ -158,10 +179,11 @@ public abstract class AbstractStarGroupDataProvider implements IStarGroupDataPro
 
     /**
      * Returns whether the star must be loaded or not
+     *
      * @param id The star ID
      * @return Whether the star with the given ID must be loaded
      */
-    protected boolean mustLoad(long id){
+    protected boolean mustLoad(long id) {
         return mustLoadIds == null || mustLoadIds.contains(id);
     }
 
@@ -198,9 +220,12 @@ public abstract class AbstractStarGroupDataProvider implements IStarGroupDataPro
         }
     }
 
-    protected float getRuweValue(long sourceId){
-        if(ruweValues != null && ruweValues.containsKey(sourceId))
+    protected float getRuweValue(long sourceId, String[] tokens) {
+        if (hasIdx(ColId.ruwe)) {
+            return Parser.parseFloat(tokens[idx(ColId.ruwe)]);
+        } else if (ruweValues != null && ruweValues.containsKey(sourceId)) {
             return ruweValues.get(sourceId);
+        }
         return Float.NaN;
     }
 
@@ -380,7 +405,7 @@ public abstract class AbstractStarGroupDataProvider implements IStarGroupDataPro
     @Override
     public void setRUWEFile(String RUWEFile) {
         this.ruweFile = RUWEFile;
-        if(this.ruweFile != null)
+        if (this.ruweFile != null)
             loadRuweFile();
     }
 
@@ -390,7 +415,7 @@ public abstract class AbstractStarGroupDataProvider implements IStarGroupDataPro
     }
 
     private void loadRuweFile() {
-        if(ruweFile != null) {
+        if (ruweFile != null) {
             ruweValues = new LargeLongMap<Float>(20);
             logger.info("Loading RUWE values from " + ruweFile);
 
@@ -406,18 +431,18 @@ public abstract class AbstractStarGroupDataProvider implements IStarGroupDataPro
     }
 
     private void loadRuweFile(Path p) throws IOException {
-            InputStream fileStream = new FileInputStream(p.toFile());
-            InputStream gzipStream = new GZIPInputStream(fileStream);
-            BufferedReader br = new BufferedReader(new InputStreamReader(gzipStream));
-            String line;
-            while ((line = br.readLine()) != null) {
-                String[] tokens = line.split("\\s+");
-                Long sourceId = Parser.parseLong(tokens[0].trim());
-                Double ruweVal = Parser.parseDouble(tokens[1].trim());
-                ruweValues.put(sourceId, ruweVal.floatValue());
+        InputStream fileStream = new FileInputStream(p.toFile());
+        InputStream gzipStream = new GZIPInputStream(fileStream);
+        BufferedReader br = new BufferedReader(new InputStreamReader(gzipStream));
+        String line;
+        while ((line = br.readLine()) != null) {
+            String[] tokens = line.split("\\s+");
+            Long sourceId = Parser.parseLong(tokens[0].trim());
+            Double ruweVal = Parser.parseDouble(tokens[1].trim());
+            ruweValues.put(sourceId, ruweVal.floatValue());
 
-            }
-            br.close();
+        }
+        br.close();
     }
 
     private void loadGeometricDistances() {

@@ -5,6 +5,8 @@
 
 package gaiasky.util.ucd;
 
+import java.util.Objects;
+
 /**
  * Very naive class that represents and UCD and does the parsing.
  * @author tsagrista
@@ -59,6 +61,17 @@ public class UCD {
     @Override
     public String toString() {
         return colname + (this.originalucd == null ? "" : " - " + this.originalucd);
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        UCD ucd = (UCD) o;
+        return index == ucd.index &&
+                originalucd.equals(ucd.originalucd) &&
+                colname.equals(ucd.colname) &&
+                unit.equals(ucd.unit);
     }
 
 }

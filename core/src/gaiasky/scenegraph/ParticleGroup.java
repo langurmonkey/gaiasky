@@ -235,6 +235,31 @@ public class ParticleGroup extends FadeNode implements I3DTextRenderable, IFocus
                     setName(name);
                 }
         }
+
+        public boolean hasExtra(String name){
+            if(extra != null){
+                Set<UCD> ucds = extra.keySet();
+                for(UCD ucd : ucds){
+                    if(ucd.originalucd.equals(name) || ucd.colname.equals(name)){
+                       return true;
+                    }
+                }
+            }
+            return false;
+        }
+
+        public double getExtra(String name){
+            if(extra != null){
+                Set<UCD> ucds = extra.keySet();
+                for(UCD ucd : ucds){
+                    if(ucd.originalucd.equals(name) || ucd.colname.equals(name)){
+                        return extra.get(ucd);
+                    }
+                }
+            }
+            return Double.NaN;
+        }
+
     }
 
     // Sequence id
