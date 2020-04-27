@@ -16,9 +16,8 @@ import java.io.OutputStream;
 
 /**
  * Loads and writes star groups
- * 
- * @author Toni Sagrista
  *
+ * @author Toni Sagrista
  */
 public class StarGroupBinaryIO implements IStarGroupIO {
 
@@ -31,28 +30,33 @@ public class StarGroupBinaryIO implements IStarGroupIO {
     /**
      * Writes the list to the output stream. The list must contain a single star
      * group.
-     * 
-     * @param list
-     *            The list with the star group to write
-     * @param out
-     *            The output stream to write to
+     *
+     * @param list The list with the star group to write
+     * @param out  The output stream to write to
      */
     public void writeParticles(Array<AbstractPositionEntity> list, OutputStream out) {
+        writeParticles(list, out, true);
+    }
+
+    public void writeParticles(Array<AbstractPositionEntity> list, OutputStream out, boolean compat) {
         if (list.size > 0) {
             StarGroup sg = (StarGroup) list.get(0);
-            provider.writeData(sg.data(), out);
+            provider.writeData(sg.data(), out, compat);
         }
     }
 
     /**
      * Reads a single star group from the given input stream.
-     * 
-     * @param in
-     *            The input stream to read the star group from
+     *
+     * @param in The input stream to read the star group from
      * @return A list with a single star group object
      */
     public Array<AbstractPositionEntity> readParticles(InputStream in) {
-        Array<ParticleBean> data = provider.loadData(in, 1.0);
+        return readParticles(in, true);
+    }
+
+    public Array<AbstractPositionEntity> readParticles(InputStream in, boolean compat) {
+        Array<ParticleBean> data = provider.loadData(in, 1.0, compat);
         StarGroup sg = new StarGroup();
         sg.setData(data);
 

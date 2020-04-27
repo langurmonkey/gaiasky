@@ -28,51 +28,40 @@ import java.nio.channels.FileChannel;
 import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.Comparator;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.zip.GZIPInputStream;
 
 /**
- * Loads the DR2 catalog in CSV format
+ * Loads star catalogs in CSV format
  * <p>
  * Source position and corresponding errors are in radians, parallax in mas and
  * proper motion in mas/yr.
  *
  * @author Toni Sagrista
  */
-public class DR2DataProvider extends AbstractStarGroupDataProvider {
-    private static final Log logger = Logger.getLogger(DR2DataProvider.class);
+public class CsvCatalogDataProvider extends AbstractStarGroupDataProvider {
+    private static final Log logger = Logger.getLogger(CsvCatalogDataProvider.class);
     private static final String comma = ",";
 
     private static final String separator = comma;
 
-    /**
-     * INDICES:
-     * <p>
-     * source_id ra[deg] dec[deg] parallax[mas] ra_err[mas] dec_err[mas]
-     * pllx_err[mas] mualpha[mas/yr] mudelta[mas/yr] radvel[km/s]
-     * mualpha_err[mas/yr] mudelta_err[mas/yr] radvel_err[km/s] gmag[mag]
-     * bp[mag] rp[mag] ref_epoch[julian years]
-     */
-    private static final int IDX_SOURCE_ID = 0;
-    private static final int IDX_RA = 1;
-    private static final int IDX_DEC = 2;
-    private static final int IDX_PLLX = 3;
-    private static final int IDX_RA_ERR = 4;
-    private static final int IDX_DEC_ERR = 5;
-    private static final int IDX_PLLX_ERR = 6;
-    private static final int IDX_MUALPHA = 7;
-    private static final int IDX_MUDELTA = 8;
-    private static final int IDX_RADVEL = 9;
-    private static final int IDX_MUALPHA_ERR = 10;
-    private static final int IDX_MUDELTA_ERR = 11;
-    private static final int IDX_RADVEL_ERR = 12;
-    private static final int IDX_G_MAG = 13;
-    private static final int IDX_BP_MAG = 14;
-    private static final int IDX_RP_MAG = 15;
-    private static final int IDX_REF_EPOCH = 16;
-    private static final int IDX_TEFF = 17;
-    private static final int IDX_RADIUS = 18;
-    private static final int IDX_A_G = 19;
-    private static final int IDX_E_BP_MIN_RP = 20;
+    private enum ColId {
+        sourceid, ra, dec, pllx, ra_err, dec_err, pllx_err, pmra, pmdec, radvel, pmra_err, pmdec_err, radvel_err, gmag, bpmag, rpmag, ref_epoch, teff, radius, ag, ebp_min_rp
+    }
+
+    private Map<ColId, Integer> indexMap;
+
+    private int idx(ColId colId) {
+        if (indexMap != null && indexMap.containsKey(colId))
+            return indexMap.get(colId);
+        else
+            return -1;
+    }
+
+    private boolean hasIdx(ColId colId){
+        return indexMap != null && indexMap.containsKey(colId) && indexMap.get(colId) >= 0;
+    }
 
 
     /**
@@ -85,10 +74,50 @@ public class DR2DataProvider extends AbstractStarGroupDataProvider {
      */
     private INumberFormat nf;
 
-    public DR2DataProvider() {
+    public CsvCatalogDataProvider() {
         super();
+        indexMap = new HashMap<>();
         countsPerMag = new long[22];
         nf = NumberFormatFactory.getFormatter("###.##");
+    }
+
+    /**
+     * Default columns for DR2
+     */
+    public void setDR2Columns() {
+        setColumns(ColId.sourceid.toString(), ColId.ra.toString(), ColId.dec.toString(), ColId.pllx.toString(),
+                ColId.ra_err.toString(), ColId.dec_err.toString(), ColId.pllx_err.toString(), ColId.pmra.toString(),
+                ColId.pmdec.toString(), ColId.radvel.toString(), ColId.pmra_err.toString(), ColId.pmdec_err.toString(),
+                ColId.pllx_err.toString(), ColId.gmag.toString(), ColId.bpmag.toString(), ColId.rpmag.toString(), ColId.ref_epoch.toString());
+    }
+
+    /**
+     * Set the CSV columns to work out the indices, as a comma-separated string
+     *
+     * @param columns Columns
+     */
+    public void setColumns(String columns) {
+        String[] cols = columns.strip().split(comma);
+        setColumns(cols);
+    }
+
+    /**
+     * Set the CSV columns to work out the indices, as a comma-separated string
+     *
+     * @param cols The columns
+     */
+    public void setColumns(String... cols) {
+        int c = 0;
+        ColId[] colIds = ColId.values();
+        for (String col : cols) {
+            for(ColId colId : colIds){
+                if(!col.strip().isBlank() && col.strip().equals(colId.toString())){
+                    indexMap.put(colId, c);
+                    break;
+                }
+            }
+            c++;
+        }
     }
 
     public void setFileNumberCap(int cap) {
@@ -100,7 +129,7 @@ public class DR2DataProvider extends AbstractStarGroupDataProvider {
     }
 
 
-    public Array<ParticleBean> loadData(String file, double factor) {
+    public Array<ParticleBean> loadData(String file, double factor, boolean compat) {
         initLists(10000000);
 
         FileHandle f = GlobalConf.data.dataFileHandle(file);
@@ -131,7 +160,7 @@ public class DR2DataProvider extends AbstractStarGroupDataProvider {
         return list;
     }
 
-    public Array<ParticleBean> loadData(InputStream is, double factor) {
+    public Array<ParticleBean> loadData(InputStream is, double factor, boolean compat) {
         initLists(100000);
 
         loadFileIs(is, factor, new LongWrap(0l), new LongWrap(0l));
@@ -180,17 +209,16 @@ public class DR2DataProvider extends AbstractStarGroupDataProvider {
         double[] point = new double[StarBean.SIZE + 3];
 
         // Check that parallax exists (5-param solution), otherwise we have no distance
-        if (!tokens[IDX_PLLX].isEmpty()) {
+        if (!tokens[idx(ColId.pllx)].isEmpty()) {
             /** ID **/
-            long sourceid = Parser.parseLong(tokens[IDX_SOURCE_ID]);
+            long sourceid = Parser.parseLong(tokens[idx(ColId.sourceid)]);
             boolean mustLoad = mustLoad(sourceid);
 
             /** PARALLAX **/
             // Add the zero point to the parallax
-            double pllx = Parser.parseDouble(tokens[IDX_PLLX]) + parallaxZeroPoint;
-            //pllx = 0.0200120072;
-            double pllxerr = Parser.parseDouble(tokens[IDX_PLLX_ERR]);
-            double appmag = Parser.parseDouble(tokens[IDX_G_MAG]);
+            double pllx = Parser.parseDouble(tokens[idx(ColId.pllx)]) + parallaxZeroPoint;
+            double pllxerr = Parser.parseDouble(tokens[idx(ColId.pllx_err)]);
+            double appmag = Parser.parseDouble(tokens[idx(ColId.gmag)]);
 
             // Keep only stars with relevant parallaxes
             if (mustLoad || acceptParallax(appmag, pllx, pllxerr)) {
@@ -220,19 +248,19 @@ public class DR2DataProvider extends AbstractStarGroupDataProvider {
                         String name = String.valueOf(sourceid);
 
                         /** RA and DEC **/
-                        double ra = Parser.parseDouble(tokens[IDX_RA]);
-                        double dec = Parser.parseDouble(tokens[IDX_DEC]);
+                        double ra = Parser.parseDouble(tokens[idx(ColId.ra)]);
+                        double dec = Parser.parseDouble(tokens[idx(ColId.dec)]);
                         double rarad = Math.toRadians(ra);
                         double decrad = Math.toRadians(dec);
                         // If distance is negative due to mustLoad, we need to be able to retrieve sph pos later on, so we use 1 m to mark it
                         Vector3d pos = Coordinates.sphericalToCartesian(rarad, decrad, Math.max(dist, NEGATIVE_DIST), new Vector3d());
 
                         /** PROPER MOTIONS in mas/yr **/
-                        double mualphastar = Parser.parseDouble(tokens[IDX_MUALPHA]);
-                        double mudelta = Parser.parseDouble(tokens[IDX_MUDELTA]);
+                        double mualphastar = Parser.parseDouble(tokens[idx(ColId.pmra)]);
+                        double mudelta = Parser.parseDouble(tokens[idx(ColId.pmdec)]);
 
                         /** RADIAL VELOCITY in km/s **/
-                        double radvel = Parser.parseDouble(tokens[IDX_RADVEL]);
+                        double radvel = Parser.parseDouble(tokens[idx(ColId.radvel)]);
                         if (Double.isNaN(radvel)) {
                             radvel = 0;
                         }
@@ -245,9 +273,9 @@ public class DR2DataProvider extends AbstractStarGroupDataProvider {
                         // Galactic latitude in radians
                         double magcorraux = 0;
                         if (magCorrections) {
-                            if (tokens.length >= 20 && !tokens[IDX_A_G].isEmpty()) {
+                            if (hasIdx(ColId.ag) && !tokens[idx(ColId.ag)].isEmpty()) {
                                 // Take extinction from database
-                                ag = Parser.parseDouble(tokens[IDX_A_G]);
+                                ag = Parser.parseDouble(tokens[idx(ColId.ag)]);
                             } else {
                                 // Compute extinction analytically
                                 Vector3d posgal = new Vector3d(pos);
@@ -273,9 +301,9 @@ public class DR2DataProvider extends AbstractStarGroupDataProvider {
                         // Reddening
                         double ebr = 0;
                         if (magCorrections) {
-                            if (tokens.length >= 21 && !tokens[IDX_E_BP_MIN_RP].isEmpty()) {
+                            if (hasIdx(ColId.ebp_min_rp) && !tokens[idx(ColId.ebp_min_rp)].isEmpty()) {
                                 // Take reddening from table
-                                ebr = Parser.parseDouble(tokens[IDX_E_BP_MIN_RP]);
+                                ebr = Parser.parseDouble(tokens[idx(ColId.ebp_min_rp)]);
                             } else {
                                 // Compute reddening analtytically
                                 ebr = magcorraux * 2.9e-4;
@@ -285,15 +313,15 @@ public class DR2DataProvider extends AbstractStarGroupDataProvider {
                         }
 
                         // XP = BP - RP - Reddening
-                        float bp = (float) Parser.parseDouble(tokens[IDX_BP_MAG].trim());
-                        float rp = (float) Parser.parseDouble(tokens[IDX_RP_MAG].trim());
+                        float bp = (float) Parser.parseDouble(tokens[idx(ColId.bpmag)].trim());
+                        float rp = (float) Parser.parseDouble(tokens[idx(ColId.rpmag)].trim());
                         double xp = bp - rp - ebr;
 
                         // See Gaia broad band photometry (https://doi.org/10.1051/0004-6361/201015441)
                         double teff;
-                        if (tokens.length > 18 && !tokens[IDX_TEFF].isEmpty()) {
+                        if (tokens.length > 18 && !tokens[idx(ColId.teff)].isEmpty()) {
                             // Use database Teff
-                            teff = Parser.parseDouble(tokens[IDX_TEFF]);
+                            teff = Parser.parseDouble(tokens[idx(ColId.teff)]);
                         } else {
                             // Compute Teff from XP color
                             if (xp <= 1.5) {
@@ -307,9 +335,6 @@ public class DR2DataProvider extends AbstractStarGroupDataProvider {
                         double col = Color.toFloatBits(rgb[0], rgb[1], rgb[2], 1.0f);
 
                         point[StarBean.I_HIP] = -1;
-                        //point[StarBean.I_TYC1] = -1;
-                        //point[StarBean.I_TYC2] = -1;
-                        //point[StarBean.I_TYC3] = -1;
                         point[StarBean.I_X] = pos.x;
                         point[StarBean.I_Y] = pos.y;
                         point[StarBean.I_Z] = pos.z;
@@ -328,8 +353,8 @@ public class DR2DataProvider extends AbstractStarGroupDataProvider {
 
                         list.add(new StarBean(point, sourceid, name));
 
-                        int appClmp = (int) MathUtilsd.clamp(appmag, 0, 21);
-                        countsPerMag[appClmp] += 1;
+                        int appClamp = (int) MathUtilsd.clamp(appmag, 0, 21);
+                        countsPerMag[appClamp] += 1;
                         return true;
                     }
                 }
@@ -353,7 +378,7 @@ public class DR2DataProvider extends AbstractStarGroupDataProvider {
     }
 
     @Override
-    public Array<ParticleBean> loadDataMapped(String file, double factor) {
+    public Array<ParticleBean> loadDataMapped(String file, double factor, boolean compat) {
         return loadDataMapped(file, factor, -1, -1);
     }
 

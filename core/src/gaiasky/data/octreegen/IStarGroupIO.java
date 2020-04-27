@@ -15,6 +15,8 @@ import java.io.OutputStream;
 public interface IStarGroupIO {
 
     void writeParticles(Array<AbstractPositionEntity> list, OutputStream out);
+    void writeParticles(Array<AbstractPositionEntity> list, OutputStream out, boolean compat);
 
     Array<AbstractPositionEntity> readParticles(InputStream in) throws FileNotFoundException;
+    Array<AbstractPositionEntity> readParticles(InputStream in, boolean compat) throws FileNotFoundException;
 }

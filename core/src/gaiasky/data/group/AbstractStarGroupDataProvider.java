@@ -124,8 +124,6 @@ public abstract class AbstractStarGroupDataProvider implements IStarGroupDataPro
 
     /**
      * Initialises the lists and structures given number of elements
-     *
-     * @param elems
      */
     protected void initLists(int elems) {
         list = new Array<>(elems);
@@ -136,6 +134,27 @@ public abstract class AbstractStarGroupDataProvider implements IStarGroupDataPro
         sphericalPositions = new LongMap<>();
         colors = new LongMap<>();
     }
+
+    @Override
+    public Array<ParticleBean> loadData(String file) {
+        return loadData(file, 1.0f);
+    }
+
+    @Override
+    public Array<ParticleBean> loadData(String file, double factor) {
+        return loadData(file, factor, true);
+    }
+
+    @Override
+    public Array<ParticleBean> loadData(InputStream is, double factor) {
+        return loadData(is, factor, true);
+    }
+
+    @Override
+    public Array<ParticleBean> loadDataMapped(String file, double factor) {
+        return loadDataMapped(file, factor, true);
+    }
+
 
     /**
      * Returns whether the star must be loaded or not
@@ -221,6 +240,9 @@ public abstract class AbstractStarGroupDataProvider implements IStarGroupDataPro
         return countLines(is);
     }
 
+    public void setColumns(String columns) {
+
+    }
 
     @Override
     public void setMustLoadIds(Set<Long> ids) {

@@ -67,19 +67,14 @@ public class STILDataProvider extends AbstractStarGroupDataProvider {
     }
 
     @Override
-    public Array<ParticleBean> loadData(String file) {
-        return loadData(file, 1.0f);
-    }
-
-    @Override
-    public Array<ParticleBean> loadData(String file, double factor) {
+    public Array<ParticleBean> loadData(String file, double factor, boolean compat) {
         logger.info(I18n.bundle.format("notif.datafile", file));
         try {
-            loadData(new FileDataSource(GlobalConf.data.dataFile(file)), factor);
+            loadData(new FileDataSource(GlobalConf.data.dataFile(file)), factor, compat);
         } catch (Exception e1) {
             try {
                 logger.info("File " + file + " not found in data folder, trying relative path");
-                loadData(new FileDataSource(file), factor);
+                loadData(new FileDataSource(file), factor, compat);
             } catch (Exception e2) {
                 logger.error(e1);
                 logger.error(e2);
@@ -131,6 +126,10 @@ public class STILDataProvider extends AbstractStarGroupDataProvider {
     }
 
     public Array<? extends ParticleBean> loadData(DataSource ds, double factor) {
+        return loadData(ds, factor, true);
+    }
+
+    public Array<? extends ParticleBean> loadData(DataSource ds, double factor, boolean compat) {
 
         try {
             // Add extra builders
@@ -375,13 +374,13 @@ public class STILDataProvider extends AbstractStarGroupDataProvider {
     }
 
     @Override
-    public Array<ParticleBean> loadData(InputStream is, double factor) {
+    public Array<ParticleBean> loadData(InputStream is, double factor, boolean compat) {
         // TODO Auto-generated method stub
         return null;
     }
 
     @Override
-    public Array<ParticleBean> loadDataMapped(String file, double factor) {
+    public Array<ParticleBean> loadDataMapped(String file, double factor, boolean compat) {
         return null;
     }
 

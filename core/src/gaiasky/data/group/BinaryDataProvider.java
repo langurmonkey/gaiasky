@@ -24,33 +24,32 @@ import java.nio.channels.FileChannel;
 public class BinaryDataProvider extends AbstractStarGroupDataProvider {
 
     @Override
-    public Array<ParticleBean> loadData(String file) {
-        return loadData(file, 1d);
-    }
-
-    @Override
-    public Array<ParticleBean> loadData(String file, double factor) {
+    public Array<ParticleBean> loadData(String file, double factor, boolean compatibility) {
         logger.info(I18n.bundle.format("notif.datafile", file));
-        loadDataMapped(file, factor);
+        loadDataMapped(file, factor, compatibility);
         logger.info(I18n.bundle.format("notif.nodeloader", list.size, file));
 
         return list;
     }
 
+
     @Override
-    public Array<ParticleBean> loadData(InputStream is, double factor) {
-        list = readData(is);
+    public Array<ParticleBean> loadData(InputStream is, double factor, boolean compatibility) {
+        list = readData(is, compatibility);
         return list;
     }
 
     public void writeData(Array<? extends ParticleBean> data, OutputStream out) {
+        writeData(data, out, true);
+    }
+    public void writeData(Array<? extends ParticleBean> data, OutputStream out, boolean compat) {
         // Wrap the FileOutputStream with a DataOutputStream
         DataOutputStream data_out = new DataOutputStream(out);
         try {
             // Size of stars
             data_out.writeInt(data.size);
             for (ParticleBean sb : data) {
-                writeStarBean((StarBean) sb, data_out);
+                writeStarBean((StarBean) sb, data_out, compat);
             }
 
         } catch (Exception e) {
@@ -66,6 +65,18 @@ public class BinaryDataProvider extends AbstractStarGroupDataProvider {
     }
 
     protected void writeStarBean(StarBean sb, DataOutputStream out) throws IOException {
+        writeStarBean(sb, out, true);
+    }
+
+    /**
+     * Write the star bean to the output stream
+     *
+     * @param sb     The star bean
+     * @param out    The output stream
+     * @param compat Use compatibility with DR1/DR2 model (with tycho ids)
+     * @throws IOException
+     */
+    protected void writeStarBean(StarBean sb, DataOutputStream out, boolean compat) throws IOException {
         // Double
         for (int i = 0; i < StarBean.I_APPMAG; i++) {
             out.writeDouble(sb.data[i]);
@@ -77,11 +88,14 @@ public class BinaryDataProvider extends AbstractStarGroupDataProvider {
         // Int
         out.writeInt((int) sb.data[StarBean.I_HIP]);
 
-        // 3 integers, keep compatibility
-        out.writeInt(-1);
-        out.writeInt(-1);
-        out.writeInt(-1);
+        if (compat) {
+            // 3 integers, keep compatibility
+            out.writeInt(-1);
+            out.writeInt(-1);
+            out.writeInt(-1);
+        }
 
+        // Long
         out.writeLong(sb.id);
 
         String namesConcat = sb.namesConcat();
@@ -90,6 +104,10 @@ public class BinaryDataProvider extends AbstractStarGroupDataProvider {
     }
 
     public Array<ParticleBean> readData(InputStream in) {
+        return readData(in, true);
+    }
+
+    public Array<ParticleBean> readData(InputStream in, boolean compat) {
         Array<ParticleBean> data = null;
         DataInputStream data_in = new DataInputStream(in);
 
@@ -98,7 +116,7 @@ public class BinaryDataProvider extends AbstractStarGroupDataProvider {
             int size = data_in.readInt();
             data = new Array<>(size);
             for (int i = 0; i < size; i++) {
-                data.add(readStarBean(data_in));
+                data.add(readStarBean(data_in, compat));
             }
 
         } catch (IOException e) {
@@ -115,6 +133,18 @@ public class BinaryDataProvider extends AbstractStarGroupDataProvider {
     }
 
     protected StarBean readStarBean(DataInputStream in) throws IOException {
+        return readStarBean(in, true);
+    }
+
+    /**
+     * Read a star bean from input stream
+     *
+     * @param in     Input stream
+     * @param compat Use compatibility with DR1/DR2 model (with tycho ids)
+     * @return The star bean
+     * @throws IOException
+     */
+    protected StarBean readStarBean(DataInputStream in, boolean compat) throws IOException {
         double[] data = new double[StarBean.SIZE];
         // Double
         for (int i = 0; i < StarBean.I_APPMAG; i++) {
@@ -131,10 +161,12 @@ public class BinaryDataProvider extends AbstractStarGroupDataProvider {
         // Int
         data[StarBean.I_HIP] = in.readInt();
 
-        // Skip unused tycho numbers, 3 Integers
-        in.readInt();
-        in.readInt();
-        in.readInt();
+        if (compat) {
+            // Skip unused tycho numbers, 3 Integers
+            in.readInt();
+            in.readInt();
+            in.readInt();
+        }
 
         Long id = in.readLong();
         int nameLength = in.readInt();
@@ -145,7 +177,8 @@ public class BinaryDataProvider extends AbstractStarGroupDataProvider {
         return new StarBean(data, id, names);
     }
 
-    public Array<ParticleBean> loadDataMapped(String file, double factor) {
+    @Override
+    public Array<ParticleBean> loadDataMapped(String file, double factor, boolean compat) {
         try {
             FileChannel fc = new RandomAccessFile(GlobalConf.data.dataFile(file), "r").getChannel();
 
@@ -154,7 +187,7 @@ public class BinaryDataProvider extends AbstractStarGroupDataProvider {
             int size = mem.getInt();
             list = new Array<>(size);
             for (int i = 0; i < size; i++) {
-                list.add(readStarBean(mem));
+                list.add(readStarBean(mem, factor, compat));
             }
 
             fc.close();
@@ -167,11 +200,13 @@ public class BinaryDataProvider extends AbstractStarGroupDataProvider {
         return null;
     }
 
-    public StarBean readStarBean(MappedByteBuffer mem) {
+    public StarBean readStarBean(MappedByteBuffer mem, double factor, boolean compat) {
         double[] data = new double[StarBean.SIZE];
         // Double
         for (int i = 0; i < StarBean.I_APPMAG; i++) {
             data[i] = mem.getDouble();
+            if (i < 3)
+                data[i] *= factor;
             if (i < 6)
                 data[i] *= Constants.DISTANCE_SCALE_FACTOR;
         }
@@ -184,10 +219,12 @@ public class BinaryDataProvider extends AbstractStarGroupDataProvider {
         // Int
         data[StarBean.I_HIP] = mem.getInt();
 
-        // Skip unused tycho numbers, 3 Integers
-        mem.getInt();
-        mem.getInt();
-        mem.getInt();
+        if (compat) {
+            // Skip unused tycho numbers, 3 Integers
+            mem.getInt();
+            mem.getInt();
+            mem.getInt();
+        }
 
         Long id = mem.getLong();
         int nameLength = mem.getInt();

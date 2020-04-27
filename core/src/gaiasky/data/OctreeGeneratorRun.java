@@ -118,6 +118,10 @@ public class OctreeGeneratorRun {
 
     @Parameter(names = "--ruwe-file", description = "Location of gzipped file containing the RUWE value for each source id") private String ruweFile = null;
 
+    @Parameter(names = "--columns", description = "Column name list separated by commas, in order of appearance, if loading using the CSVCatalogDataProvider") private String columns = null;
+
+    @Parameter(names = "--compat-mode", description = "Use compatibility mode (DR1/DR2), where the files have tycho ids") private boolean compatibilityMode = false;
+
     @Parameter(names = { "-h", "--help" }, help = true) private boolean help = false;
 
     protected Map<Long, float[]> colors;
@@ -129,7 +133,6 @@ public class OctreeGeneratorRun {
 
     public void run() {
         try {
-
             if (outFolder == null) {
                 outFolder = System.getProperty("java.io.tmpdir");
             }
@@ -202,6 +205,7 @@ public class OctreeGeneratorRun {
             /* CATALOG */
             String fullLoaderClass = "gaiasky.data.group." + loaderClass;
             IStarGroupDataProvider loader = (IStarGroupDataProvider) Class.forName(fullLoaderClass).getDeclaredConstructor().newInstance();
+            loader.setColumns(columns);
             loader.setParallaxErrorFactorFaint(pllxerrfaint);
             loader.setParallaxErrorFactorBright(pllxerrbright);
             loader.setParallaxZeroPoint(pllxzeropoint);
@@ -385,7 +389,7 @@ public class OctreeGeneratorRun {
         /** WRITE PARTICLES **/
         IStarGroupIO particleWriter = serialized ? new StarGroupSerializedIO() : new StarGroupBinaryIO();
         particlesFolder.mkdirs();
-        writeParticlesToFiles(particleWriter, octree);
+        writeParticlesToFiles(particleWriter, octree, compatibilityMode);
 
         long writingMs = TimeUtils.millis();
         double writingSecs = (writingMs - generatingMs) / 1000.0;
@@ -439,18 +443,21 @@ public class OctreeGeneratorRun {
     }
 
     private void writeParticlesToFiles(IStarGroupIO particleWriter, OctreeNode current) throws IOException {
+        writeParticlesToFiles(particleWriter, current, true);
+    }
+    private void writeParticlesToFiles(IStarGroupIO particleWriter, OctreeNode current, boolean compat) throws IOException {
         // Write current
         if (current.ownObjects > 0) {
             File particles = new File(outFolder + "/particles/", "particles_" + String.format("%06d", current.pageId) + ".bin");
             logger.info("Writing " + current.ownObjects + " particles of node " + current.pageId + " to " + particles.getAbsolutePath());
-            particleWriter.writeParticles(current.objects, new BufferedOutputStream(new FileOutputStream(particles)));
+            particleWriter.writeParticles(current.objects, new BufferedOutputStream(new FileOutputStream(particles)), compat);
         }
 
         // Write each child
         if (current.childrenCount > 0)
             for (OctreeNode child : current.children) {
                 if (child != null)
-                    writeParticlesToFiles(particleWriter, child);
+                    writeParticlesToFiles(particleWriter, child, compat);
             }
     }
 

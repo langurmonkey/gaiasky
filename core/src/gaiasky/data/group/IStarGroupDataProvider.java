@@ -5,8 +5,11 @@
 
 package gaiasky.data.group;
 
+import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.LongMap;
+import gaiasky.scenegraph.ParticleGroup;
 
+import java.io.InputStream;
 import java.util.Set;
 
 /**
@@ -17,6 +20,37 @@ import java.util.Set;
  */
 public interface IStarGroupDataProvider extends IParticleGroupDataProvider {
     LongMap<float[]> getColors();
+
+
+    /**
+     * Loads the data applying a factor using a memory mapped file for improved speed.
+     *
+     * @param file   The file to load
+     * @param factor Factor to apply to the positions
+     * @param compatibility Use compatibility mode (DR1/DR2)
+     * @return Array of particle beans
+     */
+    Array<ParticleGroup.ParticleBean> loadDataMapped(String file, double factor, boolean compatibility);
+
+    /**
+     * Loads the data applying a factor.
+     *
+     * @param file   The file to load
+     * @param factor Factor to apply to the positions
+     * @param compatibility Use compatibility mode (DR1/DR2)
+     * @return Array of particle beans
+     */
+    Array<ParticleGroup.ParticleBean> loadData(String file, double factor, boolean compatibility);
+
+    /**
+     * Loads the data applying a factor.
+     *
+     * @param is     Input stream to load the data from
+     * @param factor Factor to apply to the positions
+     * @param compatibility Use compatibility mode (DR1/DR2)
+     * @return Array of particle beans
+     */
+    Array<ParticleGroup.ParticleBean> loadData(InputStream is, double factor, boolean compatibility);
 
     /**
      * <p>
@@ -106,4 +140,11 @@ public interface IStarGroupDataProvider extends IParticleGroupDataProvider {
      * @param ids The ids that must be loaded
      */
     void setMustLoadIds(Set<Long>ids);
+
+    /**
+     * List of column names, separated by commas, indicating the position of each
+     * field to load
+     * @param columns The column name list
+     */
+    void setColumns(String columns);
 }
