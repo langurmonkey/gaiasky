@@ -7,9 +7,7 @@ sourceCompatibility = 11
 sourceSets {
     main {
         java {
-            srcDir 'src'
-            // Only enable when building desktop Gaia Sky
-            //exclude "**/rest/**"
+            srcDirs = ['src']
         }
     }
 }
