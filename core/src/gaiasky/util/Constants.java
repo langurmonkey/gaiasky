@@ -155,9 +155,6 @@ public class Constants {
     /** Default step value for sliders (tiny) **/
     public static final float SLIDER_STEP_TINY = 0.01f;
 
-    /** Max motion blur value **/
-    public static final int MAX_MOTION_BLUR = 85;
-
     /** Maximum fov value, in degrees **/
     public static final float MAX_FOV = 95f;
     /** Minimum fov value, in degrees **/
