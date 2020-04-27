@@ -424,23 +424,27 @@ public class FocusInfoInterface extends TableGuiInterface implements IObserver {
                 String[] names = focus.getNames();
                 if (names != null && names.length > 0) {
                     int chars = 0;
+                    HorizontalGroup currGroup = new HorizontalGroup();
                     for (int i = 0; i < names.length; i++) {
                         String name = names[i];
                         String nameCapped = TextUtils.capString(name, focusFieldMaxLength);
                         OwnLabel nl = new OwnLabel(nameCapped, skin, "object-name");
                         if (nameCapped.length() != name.length())
                             nl.addListener(new OwnTextTooltip(name, skin));
-                        focusNames.add(nl).left().padRight(pad1);
+                        currGroup.addActor(nl);
                         chars += nameCapped.length() + 1;
                         if (i < names.length - 1) {
-                            focusNames.add(new OwnLabel(",", skin)).left().padRight(pad5);
+                            currGroup.addActor(new OwnLabel(", ", skin));
                             chars++;
                         }
                         if (i < names.length - 1 && chars > 14) {
-                            focusNames.row();
+                            focusNames.add(currGroup).left().row();
+                            currGroup = new HorizontalGroup();
                             chars = 0;
                         }
                     }
+                    if (chars > 0)
+                        focusNames.add(currGroup).left();
                 } else {
                     focusNames.add(new OwnLabel("-", skin));
                 }
