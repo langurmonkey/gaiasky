@@ -181,7 +181,7 @@ public class Constants {
     public static final float MIN_TURN_SPEED = 2e2f;
 
     /** Minimum star brightness **/
-    public static final float MIN_STAR_BRIGHTNESS = 0.05f;
+    public static final float MIN_STAR_BRIGHTNESS = 0.4f;
     /** Maximum star brightness **/
     public static final float MAX_STAR_BRIGHTNESS = 4f;
 

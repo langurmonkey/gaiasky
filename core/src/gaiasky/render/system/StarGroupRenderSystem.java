@@ -141,7 +141,7 @@ public class StarGroupRenderSystem extends ImmediateRenderSystem implements IObs
                                     }
 
                                     // SIZE, APPMAG
-                                    tempVerts[curr.vertexIdx + additionalOffset + 0] = (float) (Math.pow(sb.size(), GlobalConf.scene.STAR_BRIGHTNESS_POWER) * Constants.STAR_SIZE_FACTOR) * starGroup.highlightedSizeFactor();
+                                    tempVerts[curr.vertexIdx + additionalOffset + 0] = (float) (Math.pow(sb.size(), 1) * Constants.STAR_SIZE_FACTOR) * starGroup.highlightedSizeFactor();
                                     tempVerts[curr.vertexIdx + additionalOffset + 1] = (float) sb.appmag();
 
                                     // POSITION [u]
@@ -184,7 +184,7 @@ public class StarGroupRenderSystem extends ImmediateRenderSystem implements IObs
                             shaderProgram.setUniformi("u_cubemap", GlobalConf.program.CUBEMAP_MODE ? 1 : 0);
                             shaderProgram.setUniformf("u_magLimit", GlobalConf.runtime.LIMIT_MAG_RUNTIME);
                             shaderProgram.setUniformf("u_thAnglePoint", 0f, 1.5e-8f * camera.getFovFactor());
-                            shaderProgram.setUniformf("u_brPow", 0.5f);
+                            shaderProgram.setUniformf("u_brPow", GlobalConf.scene.STAR_BRIGHTNESS_POWER);
 
                             // Rel, grav, z-buffer, etc.
                             addEffectsUniforms(shaderProgram, camera);

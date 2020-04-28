@@ -867,8 +867,6 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
     @Override
     public void render() {
         try {
-            if(Gdx.input.isKeyPressed(Input.Keys.ESCAPE))
-                logger.info("ESC");
             if (!crashed) {
                 // Run the render process
                 renderProcess.run();
