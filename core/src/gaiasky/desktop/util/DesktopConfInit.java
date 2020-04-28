@@ -256,7 +256,7 @@ public class DesktopConfInit extends ConfInit {
         long OBJECT_FADE_MS = Long.parseLong(p.getProperty("scene.object.fadems"));
         float STAR_BRIGHTNESS = Parser.parseFloat(p.getProperty("scene.star.brightness"));
         float STAR_BRIGHTNESS_POWER = Parser.parseFloat(p.getProperty("scene.star.brightness.pow", "1.0"));
-        int STAR_TEX_INDEX = 3;
+        int STAR_TEX_INDEX = Parser.parseInt(p.getProperty("scene.star.tex.index", "3"));
         float AMBIENT_LIGHT = Parser.parseFloat(p.getProperty("scene.ambient"));
         float CAMERA_FOV = Parser.parseFloat(p.getProperty("scene.camera.fov"));
         int CAMERA_SPEED_LIMIT_IDX = Parser.parseInt(p.getProperty("scene.camera.speedlimit"));
