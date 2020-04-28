@@ -80,7 +80,7 @@ public class DesktopPostProcessor implements IPostProcessor, IObserver {
 
     public void initialize(AssetManager manager) {
         this.manager = manager;
-        starTextureName = GlobalConf.data.dataFile(GlobalResources.unpackTexName("data/tex/base/star-tex-02*.png"));
+        starTextureName = GlobalConf.scene.getStarTexture();
         lensDirtName = GlobalConf.data.dataFile(GlobalResources.unpackTexName("data/tex/base/lensdirt*.jpg"));
         lensColorName = GlobalConf.data.dataFile("data/tex/base/lenscolor.png");
         lensStarburstName = GlobalConf.data.dataFile("data/tex/base/lensstarburst.jpg");

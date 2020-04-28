@@ -275,7 +275,7 @@ public class MasterManager implements IObserver {
             }
             break;
         case STAR_BRIGHTNESS_CMD:
-            float brightness = MathUtilsd.lint((float) data[0], Constants.MIN_STAR_BRIGHT, Constants.MAX_STAR_BRIGHT, Constants.MIN_SLIDER, Constants.MAX_SLIDER);
+            float brightness = MathUtilsd.lint((float) data[0], Constants.MIN_STAR_BRIGHTNESS, Constants.MAX_STAR_BRIGHTNESS, Constants.MIN_SLIDER, Constants.MAX_SLIDER);
             String sbr = Float.toString(brightness);
             i = 0;
             for (String slave : slaves) {

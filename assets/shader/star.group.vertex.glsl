@@ -9,8 +9,7 @@ in vec4 a_color;
 // Additional attributes:
 // x - size
 // y - magnitude
-// z - colmap_attribute_value
-in vec3 a_additional;
+in vec2 a_additional;
 
 uniform int u_t; // time in days since epoch
 uniform mat4 u_projModelView;
@@ -20,6 +19,8 @@ uniform int u_cubemap;
 
 uniform vec2 u_pointAlpha;
 uniform vec2 u_thAnglePoint;
+
+uniform float u_brPow;
 
 // VR scale factor
 uniform float u_vrScale;
@@ -79,16 +80,16 @@ void main() {
         pos = computeGravitationalWaves(pos, u_gw, u_gwmat3, u_ts, u_omgw, u_hterms);
     #endif // gravitationalWaves
 
-    float viewAngleApparent = atan((a_additional.x * u_alphaSizeFovBr.w) / dist) / u_alphaSizeFovBr.z;
-    float opacity = pow(lint2(viewAngleApparent, u_thAnglePoint.x, u_thAnglePoint.y, u_pointAlpha.x, u_pointAlpha.y), 1.1);
+    float viewAngleApparent = atan((a_additional.x * u_alphaSizeFovBr.w) / dist);
+    float opacity = pow(lint2(viewAngleApparent / u_alphaSizeFovBr.z, u_thAnglePoint.x, u_thAnglePoint.y, u_pointAlpha.x, u_pointAlpha.y), 1.1);
 
     float fadeout = smoothstep(dist, l0, l1);
 
-    v_col = vec4(a_color.rgb, opacity * u_alphaSizeFovBr.x * fadeout);
+    v_col = vec4(a_color.rgb, clamp(opacity * u_alphaSizeFovBr.x * fadeout, 0.0, 1.0));
 
     vec4 gpos = u_projModelView * vec4(pos, 1.0);
     gl_Position = gpos;
-    gl_PointSize = u_alphaSizeFovBr.y * sizefactor;
+    gl_PointSize = pow(viewAngleApparent * .5e8, u_brPow) * u_alphaSizeFovBr.y * sizefactor / u_alphaSizeFovBr.z;
 
     #ifdef velocityBufferFlag
     velocityBuffer(gpos, a_position, dist, pm, vec2(500.0, 3000.0), 1.0);

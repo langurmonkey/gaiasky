@@ -155,9 +155,6 @@ public class Constants {
     /** Default step value for sliders (tiny) **/
     public static final float SLIDER_STEP_TINY = 0.01f;
 
-    /** Max motion blur value **/
-    public static final int MAX_MOTION_BLUR = 85;
-
     /** Maximum fov value, in degrees **/
     public static final float MAX_FOV = 95f;
     /** Minimum fov value, in degrees **/
@@ -184,9 +181,19 @@ public class Constants {
     public static final float MIN_TURN_SPEED = 2e2f;
 
     /** Minimum star brightness **/
-    public static final float MIN_STAR_BRIGHT = 0.1f;
+    public static final float MIN_STAR_BRIGHTNESS = 0.4f;
     /** Maximum star brightness **/
-    public static final float MAX_STAR_BRIGHT = 25f;
+    public static final float MAX_STAR_BRIGHTNESS = 4f;
+
+    /** Minimum star pixel size **/
+    public static final float MIN_STAR_POINT_SIZE = 0.1f;
+    /** Maximum star pixel size **/
+    public static final float MAX_STAR_POINT_SIZE = 25f;
+
+    /** Minimum star minimum opacity **/
+    public static final float MIN_STAR_MIN_OPACITY = 0.0f;
+    /** Maximum star minimum opacity **/
+    public static final float MAX_STAR_MIN_OPACITY = 1.0f;
 
     /** Minimum number factor for proper motion vectors **/
     public static final float MIN_PM_NUM_FACTOR = 1f;
@@ -203,13 +210,6 @@ public class Constants {
     /** Maximum angle where the LOD transitions end **/
     public static final float MAX_LOD_TRANS_ANGLE_DEG = 120f;
 
-    /** Minimum star pixel size **/
-    public static final float MIN_STAR_POINT_SIZE = 0.1f;
-    /** Maximum star pixel size **/
-    public static final float MAX_STAR_POINT_SIZE = 20;
-    /** Step to increase/decrease **/
-    public static final float STEP_STAR_POINT_SIZE = 0.1f;
-
     /** Min ambient light **/
     public static final float MIN_AMBIENT_LIGHT = 0f;
     /** Max ambient light **/
@@ -219,11 +219,6 @@ public class Constants {
     public static final float MIN_SC_RESPONSIVENESS = .5e6f;
     /** Maximum spacecraft responsiveness **/
     public static final float MAX_SC_RESPONSIVENESS = .5e7f;
-
-    /** Minimum star minimum opacity **/
-    public static final float MIN_STAR_MIN_OPACITY = 0.0f;
-    /** Maximum star minimum opacity **/
-    public static final float MAX_STAR_MIN_OPACITY = 2.0f;
 
     public static final float MIN_BRIGHTNESS = -1.0f;
     public static final float MAX_BRIGHTNESS = 1.0f;
@@ -243,7 +238,7 @@ public class Constants {
     public static final float MIN_EXPOSURE = 0.0f;
     public static final float MAX_EXPOSURE = 10.0f;
 
-    public static final float MIN_LABEL_SIZE = 0.1f;
+    public static final float MIN_LABEL_SIZE = 0.5f;
     public static final float MAX_LABEL_SIZE = 2.3f;
 
     public static final float MIN_LINE_WIDTH = 0f;

@@ -438,7 +438,7 @@ public class StarGroup extends ParticleGroup implements ILineRenderable, IStarFo
 
             Vector3 pos = lpos.put(aux3f3.get());
             shader.setUniformf("u_pos", pos);
-            shader.setUniformf("u_size", (float) fuzzySize);
+            shader.setUniformf("u_size", (float) fuzzySize * 50f);
 
             shader.setUniformf("u_color", c.r, c.g, c.b, alpha);
             shader.setUniformf("u_distance", (float) distToCamera);
@@ -638,25 +638,25 @@ public class StarGroup extends ParticleGroup implements ILineRenderable, IStarFo
             int n = Math.min(pointData.size, N_CLOSEUP_STARS * 5);
             for (int i = 0; i < n; i++) {
                 StarBean star = (StarBean) pointData.get(active[i]);
-                Vector3d lpos = fetchPosition(star, camera.getPos(), aux3d1.get(), currDeltaYears);
-                float distToCamera = (float) lpos.len();
+                Vector3d starPosition = fetchPosition(star, camera.getPos(), aux3d1.get(), currDeltaYears);
+                float distToCamera = (float) starPosition.len();
                 float radius = (float) getRadius(active[i]);
-                float viewAngle = (float) (((radius / distToCamera) / camera.getFovFactor()) * GlobalConf.scene.STAR_BRIGHTNESS);
+                float viewAngle = (float) (((radius / distToCamera) / camera.getFovFactor()) * GlobalConf.scene.STAR_BRIGHTNESS * 6f);
 
-                if (camera.isVisible(GaiaSky.instance.time, viewAngle, lpos, distToCamera)) {
-                    render2DLabel(batch, shader, rc, sys.font2d, camera, star.names[0], lpos);
+                if (camera.isVisible(GaiaSky.instance.time, viewAngle, starPosition, distToCamera)) {
+                    render2DLabel(batch, shader, rc, sys.font2d, camera, star.names[0], starPosition);
                 }
             }
         } else {
             for (int i = 0; i < N_CLOSEUP_STARS; i++) {
                 StarBean star = (StarBean) pointData.get(active[i]);
-                Vector3d lpos = fetchPosition(star, camera.getPos(), aux3d1.get(), currDeltaYears);
-                float distToCamera = (float) lpos.len();
+                Vector3d starPosition = fetchPosition(star, camera.getPos(), aux3d1.get(), currDeltaYears);
+                float distToCamera = (float) starPosition.len();
                 float radius = (float) getRadius(active[i]);
-                float viewAngle = (float) (((radius / distToCamera) / camera.getFovFactor()) * GlobalConf.scene.STAR_BRIGHTNESS);
+                float viewAngle = (float) (((radius / distToCamera) / camera.getFovFactor()) * GlobalConf.scene.STAR_BRIGHTNESS * 2f);
 
-                if (viewAngle >= thOverFactor && camera.isVisible(GaiaSky.instance.time, viewAngle, lpos, distToCamera) && distToCamera > radius * 100) {
-                    textPosition(camera, lpos, distToCamera, radius);
+                if (viewAngle >= thOverFactor && camera.isVisible(GaiaSky.instance.time, viewAngle, starPosition, distToCamera) && distToCamera > radius * 100) {
+                    textPosition(camera, starPosition, distToCamera, radius);
 
                     shader.setUniformf("u_viewAngle", viewAngle);
                     shader.setUniformf("u_viewAnglePow", 1f);
@@ -665,7 +665,7 @@ public class StarGroup extends ParticleGroup implements ILineRenderable, IStarFo
                     float textSize = (float) FastMath.tanh(viewAngle) * distToCamera * 1e5f;
                     float alpha = Math.min((float) FastMath.atan(textSize / distToCamera), 1.e-3f);
                     textSize = (float) FastMath.tan(alpha) * distToCamera * 0.5f;
-                    render3DLabel(batch, shader, sys.fontDistanceField, camera, rc, star.names[0], lpos, textScale() * camera.getFovFactor(), textSize * camera.getFovFactor());
+                    render3DLabel(batch, shader, sys.fontDistanceField, camera, rc, star.names[0], starPosition, textScale() * camera.getFovFactor(), textSize * camera.getFovFactor());
 
                 }
             }

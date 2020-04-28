@@ -8,9 +8,11 @@ package gaiasky.render.system;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.PerspectiveCamera;
+import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.VertexAttribute;
 import com.badlogic.gdx.graphics.VertexAttributes.Usage;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer.ShapeType;
+import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.Array;
 import gaiasky.GaiaSky;
@@ -26,13 +28,17 @@ import gaiasky.scenegraph.camera.FovCamera;
 import gaiasky.scenegraph.camera.ICamera;
 import gaiasky.util.Constants;
 import gaiasky.util.GlobalConf;
+import gaiasky.util.GlobalResources;
 import gaiasky.util.Nature;
 import gaiasky.util.color.Colormap;
 import gaiasky.util.comp.DistToCameraComparator;
 import gaiasky.util.coord.AstroUtils;
 import gaiasky.util.gdx.mesh.IntMesh;
 import gaiasky.util.gdx.shader.ExtShaderProgram;
+import gaiasky.util.math.MathUtilsd;
 import org.lwjgl.opengl.GL30;
+
+import java.nio.file.Path;
 
 public class StarGroupRenderSystem extends ImmediateRenderSystem implements IObserver {
     private final double BRIGHTNESS_FACTOR;
@@ -42,6 +48,8 @@ public class StarGroupRenderSystem extends ImmediateRenderSystem implements IObs
     private float[] pointAlpha, alphaSizeFovBr, pointAlphaHl;
     private Colormap cmap;
 
+    private Texture starTex;
+
     public StarGroupRenderSystem(RenderGroup rg, float[] alphas, ExtShaderProgram[] shaders) {
         super(rg, alphas, shaders);
         BRIGHTNESS_FACTOR = 10;
@@ -50,8 +58,14 @@ public class StarGroupRenderSystem extends ImmediateRenderSystem implements IObs
         this.pointAlphaHl = new float[] { 2, 4 };
         this.aux1 = new Vector3();
         cmap = new Colormap();
+        setStarTexture(GlobalConf.scene.getStarTexture());
 
         EventManager.instance.subscribe(this, Events.STAR_MIN_OPACITY_CMD, Events.DISPOSE_STAR_GROUP_GPU_MESH);
+    }
+
+    public void setStarTexture(String starTexture) {
+        starTex = new Texture(GlobalConf.data.dataFileHandle(starTexture), true);
+        starTex.setFilter(Texture.TextureFilter.Linear, Texture.TextureFilter.Linear);
     }
 
     @Override
@@ -59,10 +73,9 @@ public class StarGroupRenderSystem extends ImmediateRenderSystem implements IObs
         Gdx.gl.glEnable(GL30.GL_POINT_SPRITE);
         Gdx.gl.glEnable(GL30.GL_VERTEX_PROGRAM_POINT_SIZE);
 
-        pointAlpha = new float[] { GlobalConf.scene.STAR_MIN_OPACITY, GlobalConf.scene.STAR_MIN_OPACITY + GlobalConf.scene.POINT_ALPHA_MAX };
+        pointAlpha = new float[] { GlobalConf.scene.STAR_MIN_OPACITY, GlobalConf.scene.POINT_ALPHA_MAX };
 
         ExtShaderProgram shaderProgram = getShaderProgram();
-        ICamera camera = GaiaSky.instance.cam;
         shaderProgram.begin();
         // Uniforms that rarely change
         shaderProgram.end();
@@ -100,7 +113,7 @@ public class StarGroupRenderSystem extends ImmediateRenderSystem implements IObs
         if (renderables.size > 0) {
 
             ExtShaderProgram shaderProgram = getShaderProgram();
-            float ps = GlobalConf.getStarPointSize();
+            float starPointSize = GlobalConf.getStarPointSize();
 
             shaderProgram.begin();
             for (IRenderable renderable : renderables) {
@@ -127,8 +140,8 @@ public class StarGroupRenderSystem extends ImmediateRenderSystem implements IObs
                                         tempVerts[curr.vertexIdx + curr.colorOffset] = starGroup.getColor(i);
                                     }
 
-                                    // SIZE, APPMAG, CMAP VALUE
-                                    tempVerts[curr.vertexIdx + additionalOffset + 0] = (float) (Math.pow(sb.size(), GlobalConf.scene.STAR_BRIGHTNESS_POWER) * Constants.STAR_SIZE_FACTOR) * starGroup.highlightedSizeFactor();
+                                    // SIZE, APPMAG
+                                    tempVerts[curr.vertexIdx + additionalOffset + 0] = (float) (Math.pow(sb.size(), 1) * Constants.STAR_SIZE_FACTOR) * starGroup.highlightedSizeFactor();
                                     tempVerts[curr.vertexIdx + additionalOffset + 1] = (float) sb.appmag();
 
                                     // POSITION [u]
@@ -159,6 +172,11 @@ public class StarGroupRenderSystem extends ImmediateRenderSystem implements IObs
                         if (curr != null) {
                             int fovMode = camera.getMode().getGaiaFovMode();
 
+                            if (starTex != null) {
+                                starTex.bind(0);
+                                shaderProgram.setUniformi("u_starTex", 0);
+                            }
+
                             shaderProgram.setUniform2fv("u_pointAlpha", starGroup.isHighlighted() && starGroup.getCatalogInfo().hlAllVisible ? pointAlphaHl : pointAlpha, 0, 2);
                             shaderProgram.setUniformMatrix("u_projModelView", camera.getCamera().combined);
                             shaderProgram.setUniformf("u_camPos", camera.getPos().put(aux1));
@@ -166,12 +184,13 @@ public class StarGroupRenderSystem extends ImmediateRenderSystem implements IObs
                             shaderProgram.setUniformi("u_cubemap", GlobalConf.program.CUBEMAP_MODE ? 1 : 0);
                             shaderProgram.setUniformf("u_magLimit", GlobalConf.runtime.LIMIT_MAG_RUNTIME);
                             shaderProgram.setUniformf("u_thAnglePoint", 0f, 1.5e-8f * camera.getFovFactor());
+                            shaderProgram.setUniformf("u_brPow", GlobalConf.scene.STAR_BRIGHTNESS_POWER);
 
                             // Rel, grav, z-buffer, etc.
                             addEffectsUniforms(shaderProgram, camera);
 
                             alphaSizeFovBr[0] = starGroup.opacity * alphas[starGroup.ct.getFirstOrdinal()];
-                            alphaSizeFovBr[1] = (fovMode == 0 ? (GlobalConf.program.isStereoFullWidth() ? 1f : 2f) : 10f) * ps * rc.scaleFactor * starGroup.highlightedSizeFactor();
+                            alphaSizeFovBr[1] = (fovMode == 0 ? (GlobalConf.program.isStereoFullWidth() ? 1f : 2f) : 10f) * starPointSize * rc.scaleFactor * starGroup.highlightedSizeFactor();
                             alphaSizeFovBr[2] = camera.getFovFactor();
                             alphaSizeFovBr[3] = (float) (GlobalConf.scene.STAR_BRIGHTNESS * BRIGHTNESS_FACTOR);
                             shaderProgram.setUniform4fv("u_alphaSizeFovBr", alphaSizeFovBr, 0, 4);
@@ -206,7 +225,7 @@ public class StarGroupRenderSystem extends ImmediateRenderSystem implements IObs
         attributes.add(new VertexAttribute(Usage.Position, 3, ExtShaderProgram.POSITION_ATTRIBUTE));
         attributes.add(new VertexAttribute(Usage.Tangent, 3, "a_pm"));
         attributes.add(new VertexAttribute(Usage.ColorPacked, 4, ExtShaderProgram.COLOR_ATTRIBUTE));
-        attributes.add(new VertexAttribute(Usage.Generic, 3, "a_additional"));
+        attributes.add(new VertexAttribute(Usage.Generic, 2, "a_additional"));
 
         VertexAttribute[] array = new VertexAttribute[attributes.size];
         for (int i = 0; i < attributes.size; i++)
@@ -219,7 +238,6 @@ public class StarGroupRenderSystem extends ImmediateRenderSystem implements IObs
         switch (event) {
         case STAR_MIN_OPACITY_CMD:
             pointAlpha[0] = (float) data[0];
-            pointAlpha[1] = (float) data[0] + GlobalConf.scene.POINT_ALPHA_MAX;
             for (ExtShaderProgram p : programs) {
                 if (p != null && p.isCompiled()) {
                     GaiaSky.postRunnable(() -> {

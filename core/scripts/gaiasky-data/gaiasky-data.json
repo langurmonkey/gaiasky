@@ -304,7 +304,7 @@
       "type": "data-pack",
       "version": 7,
       "mingsversion": 20206,
-      "size": 56735549,
+      "size": 57073503,
       "check": "data-main.json",
       "data": [
         "asteroids-dr2.json",
@@ -347,11 +347,13 @@
         "tex/base/lut.jpg",
         "tex/base/sso.png",
         "tex/base/star.jpg",
+        "tex/base/star-tex*.png",
         "tex/base/static.jpg",
         "tex/base/telescopebeam.png",
+        "tex/base/mw-sprites",
         "tex/skybox/gaiasky"
       ],
-      "sha256": "6633fae7880df70b65434a9236a59fabc33178c9eb586a785e8876687bbcebbd",
+      "sha256": "66a0a2a9b78221fce13c935f31fff0c803e6ad5c0fc329af2557c466e6afae51",
       "description": "Default data pack for Gaia Sky - For Gaia Sky 2.2.6 and above. Contains the Solar System, constellations, meshes and more",
       "releasenotes": "Remove Milky Way Star Clusters catalog, it has its own download now. Add new textures for Pluto and Ceres. Tweak atmosphere parameters. Increase sphere complexities.",
       "file": "@mirror-url@basedata/007_20200326/gaiasky_data.tar.gz"
@@ -425,7 +427,7 @@
       "type": "texture-pack",
       "version": 4,
       "mingsversion": 20206,
-      "size": 247840133,
+      "size": 247555665,
       "check": "hi-res-tex-desc.json",
       "data": [
         "hi-res-tex-desc.json",
@@ -435,8 +437,8 @@
         "tex/base/*-ultra.png"
       ],
       "description": "High resolution textures - High resolution texture pack including some 4K and 8K textures for planet surfaces and asteroids.",
-      "releasenotes": "Add high resolution base and normal textures for Ceres and Pluto",
-      "sha256": "dbc744fa45aea76113244a64ee574fe6b568378a87f5f4fa65c3ec63346ebc06",
+      "releasenotes": "Add high resolution base and normal textures for Ceres and Pluto, remove hi-res star textures",
+      "sha256": "12db0408a4a7a05f09b05c854f6d053428f80fa3a95f304e5a4dadb076c75d0b",
       "file": "@mirror-url@tex/004_20200423/hi-res-texture-pack.tar.gz"
     },
     {

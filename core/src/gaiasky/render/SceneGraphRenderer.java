@@ -60,6 +60,7 @@ import org.lwjgl.opengl.GL30;
 import org.lwjgl.opengl.GL40;
 
 import java.nio.IntBuffer;
+import java.nio.file.Path;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Map;
@@ -78,17 +79,25 @@ public class SceneGraphRenderer extends AbstractRenderer implements IProcessRend
         instance.initialize(manager);
     }
 
-    /** Contains the flags representing each type's visibility **/
+    /**
+     * Contains the flags representing each type's visibility
+     **/
     public static ComponentTypes visible;
-    /** Contains the last update time of each of the flags **/
+    /**
+     * Contains the last update time of each of the flags
+     **/
     public static long[] times;
-    /** Alpha values for each type **/
+    /**
+     * Alpha values for each type
+     **/
     public static float[] alphas;
 
     private ExtShaderProgram[] starGroupShaders, particleGroupShaders, particleEffectShaders, orbitElemShaders, pointShaders, lineShaders, lineQuadShaders, lineGpuShaders, galaxyPointShaders, starPointShaders, galShaders, spriteShaders, starBillboardShaders;
     private AssetDescriptor<ExtShaderProgram>[] starGroupDesc, particleGroupDesc, particleEffectDesc, orbitElemDesc, pointDesc, lineDesc, lineQuadDesc, lineGpuDesc, galaxyPointDesc, starPointDesc, galDesc, spriteDesc, starBillboardDesc;
 
-    /** Render lists for all render groups **/
+    /**
+     * Render lists for all render groups
+     **/
     public static Array<Array<IRenderable>> render_lists;
 
     // Two model batches, for front (models), back and atmospheres
@@ -98,7 +107,9 @@ public class SceneGraphRenderer extends AbstractRenderer implements IProcessRend
 
     private RenderSystemRunnable depthTestR, additiveBlendR, noDepthTestR, regularBlendR, noDepthWritesR, depthWritesR, clearDepthR, noBlendR;
 
-    /** The particular current scene graph renderer **/
+    /**
+     * The particular current scene graph renderer
+     **/
     private ISGR sgr;
     /**
      * Renderers vector, with 0 = normal, 1 = stereoscopic, 2 = FOV, 3 = cubemap
@@ -162,11 +173,11 @@ public class SceneGraphRenderer extends AbstractRenderer implements IProcessRend
         ExtShaderProgram.pedantic = false;
 
         /* DATA LOAD */
-        String[] defines = GlobalResources.combinations(new String[] { "#define velocityBufferFlag\n", "#define relativisticEffects\n", "#define gravitationalWaves\n" });
-        String[] names = GlobalResources.combinations(new String[] { "Velbuff", "Rel", "Grav" });
+        String[] defines = GlobalResources.combinations(new String[]{"#define velocityBufferFlag\n", "#define relativisticEffects\n", "#define gravitationalWaves\n"});
+        String[] names = GlobalResources.combinations(new String[]{"Velbuff", "Rel", "Grav"});
         // Color mapping in shaders
-        String[] definesCmap = GlobalResources.combinations(new String[] { "#define velocityBufferFlag\n", "#define relativisticEffects\n", "#define gravitationalWaves\n", "#define colorMap\n" });
-        String[] namesCmap = GlobalResources.combinations(new String[] { "Velbuff", "Rel", "Grav", "Colmap" });
+        String[] definesCmap = GlobalResources.combinations(new String[]{"#define velocityBufferFlag\n", "#define relativisticEffects\n", "#define gravitationalWaves\n", "#define colorMap\n"});
+        String[] namesCmap = GlobalResources.combinations(new String[]{"Velbuff", "Rel", "Grav", "Colmap"});
 
         // Add shaders to load (no providers)
         starBillboardDesc = loadShader(manager, "shader/star.billboard.vertex.glsl", "shader/star.billboard.fragment.glsl", TextUtils.concatAll("star.billboard", names), defines);
@@ -291,7 +302,7 @@ public class SceneGraphRenderer extends AbstractRenderer implements IProcessRend
         int maxTexSize = intBuffer.get();
         logger.info("Max texture size: " + maxTexSize + "^2 pixels");
 
-        String[] names = GlobalResources.combinations(new String[] { " (vel)", " (rel)", " (grav)" });
+        String[] names = GlobalResources.combinations(new String[]{" (vel)", " (rel)", " (grav)"});
 
         /*
           STAR BILLBOARD SHADER
@@ -485,7 +496,7 @@ public class SceneGraphRenderer extends AbstractRenderer implements IProcessRend
         annotationsProc.addPostRunnables(clearDepthR);
 
         // BILLBOARD STARS
-        billboardStarsProc = new BillboardStarRenderSystem(RenderGroup.BILLBOARD_STAR, alphas, starBillboardShaders, GlobalResources.unpackTexName("data/tex/base/star-tex-02*.png"), ComponentType.Stars.ordinal());
+        billboardStarsProc = new BillboardStarRenderSystem(RenderGroup.BILLBOARD_STAR, alphas, starBillboardShaders, GlobalConf.scene.getStarTexture(), ComponentType.Stars.ordinal());
         billboardStarsProc.addPreRunnables(additiveBlendR, noDepthTestR);
         lpu = new LightPositionUpdater();
         billboardStarsProc.addPostRunnables(lpu);
@@ -718,34 +729,34 @@ public class SceneGraphRenderer extends AbstractRenderer implements IProcessRend
             Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT | GL20.GL_DEPTH_BUFFER_BIT);
 
             //if (!GlobalConf.program.CUBEMAP360_MODE) {
-                // Render billboard stars
-                billboardStarsProc.render(stars, camera, 0, null);
+            // Render billboard stars
+            billboardStarsProc.render(stars, camera, 0, null);
 
-                // Render models
-                mbPixelLightingOpaque.begin(camera.getCamera());
-                for (IRenderable model : models) {
+            // Render models
+            mbPixelLightingOpaque.begin(camera.getCamera());
+            for (IRenderable model : models) {
+                if (model instanceof ModelBody) {
+                    ModelBody mb = (ModelBody) model;
+                    mb.render(mbPixelLightingOpaque, 1, 0, false);
+                }
+            }
+            mbPixelLightingOpaque.end();
+
+            // Render tessellated models
+            if (modelsTess.size > 0) {
+                mbPixelLightingOpaqueTessellation.begin(camera.getCamera());
+                for (IRenderable model : modelsTess) {
                     if (model instanceof ModelBody) {
                         ModelBody mb = (ModelBody) model;
-                        mb.render(mbPixelLightingOpaque, 1, 0, false);
+                        mb.render(mbPixelLightingOpaqueTessellation, 1, 0, false);
                     }
                 }
-                mbPixelLightingOpaque.end();
-
-                // Render tessellated models
-                if (modelsTess.size > 0) {
-                    mbPixelLightingOpaqueTessellation.begin(camera.getCamera());
-                    for (IRenderable model : modelsTess) {
-                        if (model instanceof ModelBody) {
-                            ModelBody mb = (ModelBody) model;
-                            mb.render(mbPixelLightingOpaqueTessellation, 1, 0, false);
-                        }
-                    }
-                    mbPixelLightingOpaqueTessellation.end();
-                }
+                mbPixelLightingOpaqueTessellation.end();
+            }
             //}
 
             // Set texture to updater
-            if(lpu != null){
+            if (lpu != null) {
                 lpu.setGlowTexture(fb.getColorBufferTexture());
             }
 
@@ -954,7 +965,7 @@ public class SceneGraphRenderer extends AbstractRenderer implements IProcessRend
         sgr.render(this, camera, t, rw, rh, tw, th, fb, ppb);
     }
 
-    public ISGR getCurrentSGR(){
+    public ISGR getCurrentSGR() {
         return sgr;
     }
 
@@ -1070,88 +1081,88 @@ public class SceneGraphRenderer extends AbstractRenderer implements IProcessRend
     @Override
     public void notify(Events event, final Object... data) {
         switch (event) {
-        case TOGGLE_VISIBILITY_CMD:
-            ComponentType ct = ComponentType.getFromKey((String) data[0]);
-            if (ct != null) {
-                int idx = ct.ordinal();
-                if (data.length == 3) {
-                    // We have the boolean
-                    boolean currvis = visible.get(ct.ordinal());
-                    boolean newvis = (boolean) data[2];
-                    if (currvis != newvis) {
-                        // Only update if visibility different
-                        if (newvis)
-                            visible.set(ct.ordinal());
-                        else
-                            visible.clear(ct.ordinal());
+            case TOGGLE_VISIBILITY_CMD:
+                ComponentType ct = ComponentType.getFromKey((String) data[0]);
+                if (ct != null) {
+                    int idx = ct.ordinal();
+                    if (data.length == 3) {
+                        // We have the boolean
+                        boolean currvis = visible.get(ct.ordinal());
+                        boolean newvis = (boolean) data[2];
+                        if (currvis != newvis) {
+                            // Only update if visibility different
+                            if (newvis)
+                                visible.set(ct.ordinal());
+                            else
+                                visible.clear(ct.ordinal());
+                            times[idx] = (long) (GaiaSky.instance.getT() * 1000f);
+                        }
+                    } else {
+                        // Only toggle
+                        visible.flip(ct.ordinal());
                         times[idx] = (long) (GaiaSky.instance.getT() * 1000f);
                     }
-                } else {
-                    // Only toggle
-                    visible.flip(ct.ordinal());
-                    times[idx] = (long) (GaiaSky.instance.getT() * 1000f);
                 }
-            }
-            break;
+                break;
 
-        case PIXEL_RENDERER_UPDATE:
-            GaiaSky.postRunnable(() -> {
-                AbstractRenderSystem.POINT_UPDATE_FLAG = true;
-                // updatePixelRenderSystem();
-            });
-            break;
-        case LINE_RENDERER_UPDATE:
-            GaiaSky.postRunnable(() -> updateLineRenderSystem());
-            break;
-        case STEREOSCOPIC_CMD:
-            boolean stereo = (Boolean) data[0];
-            if (stereo)
-                sgr = sgrs[SGR_STEREO_IDX];
-            else {
-                if (GlobalConf.runtime.OPENVR)
-                    sgr = sgrs[SGR_OPENVR_IDX];
-                else
-                    sgr = sgrs[SGR_DEFAULT_IDX];
-            }
-            break;
-        case CUBEMAP_CMD:
-            boolean cubemap = (Boolean) data[0];
-            if (cubemap) {
-                sgr = sgrs[SGR_CUBEMAP_IDX];
-            } else {
-                if (GlobalConf.runtime.OPENVR)
-                    sgr = sgrs[SGR_OPENVR_IDX];
-                else
-                    sgr = sgrs[SGR_DEFAULT_IDX];
-            }
-            break;
-        case CAMERA_MODE_CMD:
-            CameraMode cm = (CameraMode) data[0];
-            if (cm.isGaiaFov())
-                sgr = sgrs[SGR_FOV_IDX];
-            else {
-                if (GlobalConf.runtime.OPENVR)
-                    sgr = sgrs[SGR_OPENVR_IDX];
-                else if (GlobalConf.program.STEREOSCOPIC_MODE)
+            case PIXEL_RENDERER_UPDATE:
+                GaiaSky.postRunnable(() -> {
+                    AbstractRenderSystem.POINT_UPDATE_FLAG = true;
+                    // updatePixelRenderSystem();
+                });
+                break;
+            case LINE_RENDERER_UPDATE:
+                GaiaSky.postRunnable(() -> updateLineRenderSystem());
+                break;
+            case STEREOSCOPIC_CMD:
+                boolean stereo = (Boolean) data[0];
+                if (stereo)
                     sgr = sgrs[SGR_STEREO_IDX];
-                else if (GlobalConf.program.CUBEMAP_MODE)
+                else {
+                    if (GlobalConf.runtime.OPENVR)
+                        sgr = sgrs[SGR_OPENVR_IDX];
+                    else
+                        sgr = sgrs[SGR_DEFAULT_IDX];
+                }
+                break;
+            case CUBEMAP_CMD:
+                boolean cubemap = (Boolean) data[0];
+                if (cubemap) {
                     sgr = sgrs[SGR_CUBEMAP_IDX];
-                else
-                    sgr = sgrs[SGR_DEFAULT_IDX];
+                } else {
+                    if (GlobalConf.runtime.OPENVR)
+                        sgr = sgrs[SGR_OPENVR_IDX];
+                    else
+                        sgr = sgrs[SGR_DEFAULT_IDX];
+                }
+                break;
+            case CAMERA_MODE_CMD:
+                CameraMode cm = (CameraMode) data[0];
+                if (cm.isGaiaFov())
+                    sgr = sgrs[SGR_FOV_IDX];
+                else {
+                    if (GlobalConf.runtime.OPENVR)
+                        sgr = sgrs[SGR_OPENVR_IDX];
+                    else if (GlobalConf.program.STEREOSCOPIC_MODE)
+                        sgr = sgrs[SGR_STEREO_IDX];
+                    else if (GlobalConf.program.CUBEMAP_MODE)
+                        sgr = sgrs[SGR_CUBEMAP_IDX];
+                    else
+                        sgr = sgrs[SGR_DEFAULT_IDX];
 
-            }
-            break;
-        case REBUILD_SHADOW_MAP_DATA_CMD:
-            buildShadowMapData();
-            break;
-        case LIGHT_SCATTERING_CMD:
-            boolean glow = (Boolean) data[0];
-            if (glow) {
-                buildGlowData();
-            }
-            break;
-        default:
-            break;
+                }
+                break;
+            case REBUILD_SHADOW_MAP_DATA_CMD:
+                buildShadowMapData();
+                break;
+            case LIGHT_SCATTERING_CMD:
+                boolean glow = (Boolean) data[0];
+                if (glow) {
+                    buildGlowData();
+                }
+                break;
+            default:
+                break;
         }
     }
 

@@ -140,7 +140,7 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
     /**
      * The direction point to seek
      */
-    private Vector3d lastvel;
+    private Vector3d lastVel;
     /**
      * FOCUS_MODE position
      **/
@@ -265,7 +265,7 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
         vertical = new Vector3d();
 
         friction = new Vector3d();
-        lastvel = new Vector3d();
+        lastVel = new Vector3d();
         focusPos = new Vector3d();
         freeTargetPos = new Vector3d();
         freeTargetOn = false;
@@ -1028,7 +1028,7 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
             }
 
             // Velocity changed direction
-            if (lastvel.dot(vel) < 0) {
+            if (lastVel.dot(vel) < 0) {
                 vel.setZero();
             }
 
@@ -1049,7 +1049,7 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
 
             accel.setZero();
 
-            lastvel.set(vel);
+            lastVel.set(vel);
             force.setZero();
         }
         posinv.set(pos).scl(-1);

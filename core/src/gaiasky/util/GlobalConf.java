@@ -47,6 +47,10 @@ public class GlobalConf {
     // macOS needs fully qualified paths when run as an app (GaiaSky.app), that's why we use the getAbsolutePath() part
     public static final String ASSETS_LOC = (new File(System.getProperty("assets.location") != null ? System.getProperty("assets.location") : ".")).getAbsolutePath();
 
+    public static String assetsFile(String relativeAssetsLoc) {
+        return Path.of(ASSETS_LOC, relativeAssetsLoc).toString();
+    }
+
     public static String APPLICATION_NAME = "Gaia Sky";
     public static String APPLICATION_NAME_TITLE = "G a i a   S k y";
     public static final String APPLICATION_SHORT_NAME = "gaiasky";
@@ -61,6 +65,7 @@ public class GlobalConf {
     public static final String AUTHOR_EMAIL = "tsagrista@ari.uni-heidelberg.de";
     public static final String AUTHOR_AFFILIATION = "Universität Heidelberg, Zentrum für Astronomie, Astronomisches Rechen-Institut";
     public static final String AUTHOR_AFFILIATION_PLAIN = "Universitaet Heidelberg, Zentrum fuer Astronomie, Astronomisches Rechen-Institut";
+
     static {
         // Initialize icon: if running from source, use icon in assets/icon, otherwise, use global icon
         Path iconPath = Path.of(ASSETS_LOC + "/icon/gs_064.png");
@@ -499,6 +504,7 @@ public class GlobalConf {
          * Toggles the record camera
          */
         private double backupLimitFps = 0;
+
         public void toggleRecord(Boolean rec) {
             if (rec != null) {
                 RECORD_CAMERA = rec;
@@ -506,7 +512,7 @@ public class GlobalConf {
                 RECORD_CAMERA = !RECORD_CAMERA;
             }
 
-            if(RECORD_CAMERA){
+            if (RECORD_CAMERA) {
                 // Activation, set limit FPS
                 backupLimitFps = screen.LIMIT_FPS;
                 screen.LIMIT_FPS = frame.CAMERA_REC_TARGET_FPS;
@@ -764,7 +770,7 @@ public class GlobalConf {
         public double LIMIT_FPS;
         public boolean SCREEN_OUTPUT = true;
 
-        public ScreenConf(){
+        public ScreenConf() {
             EventManager.instance.subscribe(this, Events.LIMIT_FPS_CMD);
         }
 
@@ -802,7 +808,7 @@ public class GlobalConf {
 
         @Override
         public void notify(Events event, Object... data) {
-            switch(event){
+            switch (event) {
                 case LIMIT_FPS_CMD:
                     LIMIT_FPS = (Double) data[0];
                     break;
@@ -1457,6 +1463,10 @@ public class GlobalConf {
          * This value is used to modulate the star brightness as in final_brightness = brightness^power
          */
         public float STAR_BRIGHTNESS_POWER;
+        /**
+         * Star texture index (01, 02, 03)
+         */
+        public int STAR_TEX_INDEX;
 
         /**
          * Particle fade in/out flag for octree-backed catalogs. WARNING: This
@@ -1497,14 +1507,12 @@ public class GlobalConf {
             EventManager.instance.subscribe(this, Events.TOGGLE_VISIBILITY_CMD, Events.FOCUS_LOCK_CMD, Events.ORIENTATION_LOCK_CMD, Events.STAR_BRIGHTNESS_CMD, Events.PM_LEN_FACTOR_CMD, Events.PM_NUM_FACTOR_CMD, Events.PM_COLOR_MODE_CMD, Events.PM_ARROWHEADS_CMD, Events.FOV_CHANGED_CMD, Events.CAMERA_SPEED_CMD, Events.ROTATION_SPEED_CMD, Events.TURNING_SPEED_CMD, Events.SPEED_LIMIT_CMD, Events.TRANSIT_COLOUR_CMD, Events.ONLY_OBSERVED_STARS_CMD, Events.COMPUTE_GAIA_SCAN_CMD, Events.OCTREE_PARTICLE_FADE_CMD, Events.STAR_POINT_SIZE_CMD, Events.STAR_POINT_SIZE_INCREASE_CMD, Events.STAR_POINT_SIZE_DECREASE_CMD, Events.STAR_POINT_SIZE_RESET_CMD, Events.STAR_MIN_OPACITY_CMD, Events.AMBIENT_LIGHT_CMD, Events.GALAXY_3D_CMD, Events.CROSSHAIR_FOCUS_CMD, Events.CROSSHAIR_CLOSEST_CMD, Events.CROSSHAIR_HOME_CMD, Events.CAMERA_CINEMATIC_CMD, Events.LABEL_SIZE_CMD, Events.LINE_WIDTH_CMD, Events.ELEVATION_MUTLIPLIER_CMD, Events.ELEVATION_TYPE_CMD, Events.TESSELLATION_QUALITY_CMD);
         }
 
-        public void initialize(String sTARTUP_OBJECT, GraphicsQuality gRAPHICS_QUALITY, long oBJECT_FADE_MS, float sTAR_BRIGHTNESS, float sTAR_BRIGHTNESS_POWER, float aMBIENT_LIGHT, float cAMERA_FOV, float cAMERA_SPEED, float tURNING_SPEED, float rOTATION_SPEED, int cAMERA_SPEED_LIMIT_IDX, boolean fOCUS_LOCK, boolean fOCUS_LOCK_ORIENTATION, float lABEL_SIZE_FACTOR, float lABEL_NUMBER_FACTOR, float lINE_WIDTH_FACTOR, boolean[] vISIBILITY, int oRBIT_RENDERER, int lINE_RENDERER,
-                               double sTAR_TH_ANGLE_NONE, double sTAR_TH_ANGLE_POINT, double sTAR_TH_ANGLE_QUAD, float pOINT_ALPHA_MIN, float pOINT_ALPHA_MAX, boolean oCTREE_PARTICLE_FADE, float oCTANT_TH_ANGLE_0, float oCTANT_TH_ANGLE_1, float pM_NUM_FACTOR, float pM_LEN_FACTOR, long n_PM_STARS, int pM_COLOR_MODE, boolean pM_ARROWHEADS, float sTAR_POINT_SIZE, boolean gALAXY_3D, int cUBEMAP_FACE_RESOLUTION, boolean cROSSHAIR_FOCUS, boolean cROSSHAIR_CLOSEST, boolean cROSSHAIR_HOME, boolean cINEMATIC_CAMERA,
+        public void initialize(String sTARTUP_OBJECT, GraphicsQuality gRAPHICS_QUALITY, long oBJECT_FADE_MS, float sTAR_BRIGHTNESS, float sTAR_BRIGHTNESS_POWER, int sTAR_TEX_INDEX, float aMBIENT_LIGHT, float cAMERA_FOV, float cAMERA_SPEED, float tURNING_SPEED, float rOTATION_SPEED, int cAMERA_SPEED_LIMIT_IDX, boolean fOCUS_LOCK, boolean fOCUS_LOCK_ORIENTATION, float lABEL_SIZE_FACTOR, float lABEL_NUMBER_FACTOR, float lINE_WIDTH_FACTOR, boolean[] vISIBILITY, int oRBIT_RENDERER, int lINE_RENDERER,
+                               double sTAR_TH_ANGLE_NONE, double sTAR_TH_ANGLE_POINT, double sTAR_TH_ANGLE_QUAD, float pOINT_ALPHA_MIN, float pOINT_ALPHA_MAX, boolean oCTREE_PARTICLE_FADE, float oCTANT_TH_ANGLE_0, float oCTANT_TH_ANGLE_1, float pM_NUM_FACTOR, float pM_LEN_FACTOR, long n_PM_STARS, int pM_COLOR_MODE, boolean pM_ARROWHEADS, float sTAR_POINT_SIZE, boolean gALAXY_3D, boolean cROSSHAIR_FOCUS, boolean cROSSHAIR_CLOSEST, boolean cROSSHAIR_HOME, boolean cINEMATIC_CAMERA,
                                boolean lAZY_TEXTURE_INIT, boolean lAZY_MESH_INIT, boolean fREE_CAMERA_TARGET_MODE_ON, boolean sHADOW_MAPPING, int sHADOW_MAPPING_N_SHADOWS, int sHADOW_MAPPING_RESOLUTION, long mAX_LOADED_STARS, ElevationType eLEVATION_TYPE, double eLEVATION_MULTIPLIER, double tESSELLATION_QUALITY, double dIST_SCALE_DESKTOP, double dIST_SCALE_VR) {
             STARTUP_OBJECT = sTARTUP_OBJECT;
             GRAPHICS_QUALITY = gRAPHICS_QUALITY;
             OBJECT_FADE_MS = oBJECT_FADE_MS;
-            STAR_BRIGHTNESS = sTAR_BRIGHTNESS;
-            STAR_BRIGHTNESS_POWER = sTAR_BRIGHTNESS_POWER;
             AMBIENT_LIGHT = aMBIENT_LIGHT;
             CAMERA_FOV = cAMERA_FOV;
             CAMERA_SPEED = cAMERA_SPEED;
@@ -1524,7 +1532,6 @@ public class GlobalConf {
             STAR_THRESHOLD_NONE = sTAR_TH_ANGLE_NONE;
             STAR_THRESHOLD_POINT = sTAR_TH_ANGLE_POINT;
             STAR_THRESHOLD_QUAD = sTAR_TH_ANGLE_QUAD;
-            STAR_MIN_OPACITY = pOINT_ALPHA_MIN;
             POINT_ALPHA_MAX = pOINT_ALPHA_MAX;
             OCTREE_PARTICLE_FADE = oCTREE_PARTICLE_FADE;
             OCTANT_THRESHOLD_0 = oCTANT_TH_ANGLE_0;
@@ -1534,8 +1541,12 @@ public class GlobalConf {
             N_PM_STARS = n_PM_STARS;
             PM_COLOR_MODE = pM_COLOR_MODE;
             PM_ARROWHEADS = pM_ARROWHEADS;
+            STAR_BRIGHTNESS = sTAR_BRIGHTNESS;
+            STAR_BRIGHTNESS_POWER = sTAR_BRIGHTNESS_POWER;
             STAR_POINT_SIZE = sTAR_POINT_SIZE;
             STAR_POINT_SIZE_BAK = STAR_POINT_SIZE;
+            STAR_MIN_OPACITY = pOINT_ALPHA_MIN;
+            STAR_TEX_INDEX = sTAR_TEX_INDEX;
             GALAXY_3D = gALAXY_3D;
             CROSSHAIR_FOCUS = cROSSHAIR_FOCUS;
             CROSSHAIR_CLOSEST = cROSSHAIR_CLOSEST;
@@ -1697,11 +1708,11 @@ public class GlobalConf {
                     STAR_POINT_SIZE = (float) data[0];
                     break;
                 case STAR_POINT_SIZE_INCREASE_CMD:
-                    float size = Math.min(STAR_POINT_SIZE + Constants.STEP_STAR_POINT_SIZE, Constants.MAX_STAR_POINT_SIZE);
+                    float size = Math.min(STAR_POINT_SIZE + Constants.SLIDER_STEP_TINY, Constants.MAX_STAR_POINT_SIZE);
                     EventManager.instance.post(Events.STAR_POINT_SIZE_CMD, size, false);
                     break;
                 case STAR_POINT_SIZE_DECREASE_CMD:
-                    size = Math.max(STAR_POINT_SIZE - Constants.STEP_STAR_POINT_SIZE, Constants.MIN_STAR_POINT_SIZE);
+                    size = Math.max(STAR_POINT_SIZE - Constants.SLIDER_STEP_TINY, Constants.MIN_STAR_POINT_SIZE);
                     EventManager.instance.post(Events.STAR_POINT_SIZE_CMD, size, false);
                     break;
                 case STAR_POINT_SIZE_RESET_CMD:
@@ -1751,6 +1762,23 @@ public class GlobalConf {
 
         public boolean isQuadLineRenderer() {
             return LINE_RENDERER == 1;
+        }
+
+        public String getStarTexture() {
+            String starTexIdx = String.format("%02d", STAR_TEX_INDEX);
+            String texture = GlobalConf.data.dataFile(GlobalResources.unpackTexName("data/tex/base/star-tex-" + starTexIdx + "*.png"));
+            if (!Files.exists(Path.of(texture))) {
+                // Fall back
+                for (int i = 3; i > 0; i--) {
+                    starTexIdx = String.format("%02d", i);
+                    texture = GlobalConf.data.dataFile(GlobalResources.unpackTexName("data/tex/base/star-tex-" + starTexIdx + "*.png"));
+                    if (Files.exists(Path.of(texture)))
+                        return texture;
+                }
+            } else {
+                return texture;
+            }
+            return null;
         }
 
     }

@@ -17,8 +17,6 @@ import gaiasky.interfce.ControlsWindow;
 import gaiasky.util.Constants;
 import gaiasky.util.GlobalConf;
 import gaiasky.util.I18n;
-import gaiasky.util.format.INumberFormat;
-import gaiasky.util.format.NumberFormatFactory;
 import gaiasky.util.math.MathUtilsd;
 import gaiasky.util.scene2d.OwnSliderPlus;
 
@@ -37,7 +35,7 @@ public class VisualEffectsComponent extends GuiComponent implements IObserver {
     public void initialize() {
         float contentWidth = ControlsWindow.getContentWidth();
         /** Star brightness **/
-        starBrightness = new OwnSliderPlus(I18n.txt("gui.starbrightness"), Constants.MIN_SLIDER, Constants.MAX_SLIDER, Constants.SLIDER_STEP_SMALL, Constants.MIN_STAR_BRIGHT, Constants.MAX_STAR_BRIGHT, skin);
+        starBrightness = new OwnSliderPlus(I18n.txt("gui.starbrightness"), Constants.MIN_SLIDER, Constants.MAX_SLIDER, Constants.SLIDER_STEP_TINY, Constants.MIN_STAR_BRIGHTNESS, Constants.MAX_STAR_BRIGHTNESS, skin);
         starBrightness.setName("star brightness");
         starBrightness.setWidth(contentWidth);
         starBrightness.setMappedValue(GlobalConf.scene.STAR_BRIGHTNESS);
@@ -50,7 +48,7 @@ public class VisualEffectsComponent extends GuiComponent implements IObserver {
         });
 
         /** Star size **/
-        starSize = new OwnSliderPlus(I18n.txt("gui.star.size"), Constants.MIN_STAR_POINT_SIZE, Constants.MAX_STAR_POINT_SIZE, Constants.STEP_STAR_POINT_SIZE, skin);
+        starSize = new OwnSliderPlus(I18n.txt("gui.star.size"), Constants.MIN_STAR_POINT_SIZE, Constants.MAX_STAR_POINT_SIZE, Constants.SLIDER_STEP_TINY, skin);
         starSize.setName("star size");
         starSize.setWidth(contentWidth);
         starSize.setMappedValue(GlobalConf.scene.STAR_POINT_SIZE);
