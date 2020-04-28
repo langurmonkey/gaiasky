@@ -304,7 +304,7 @@
       "type": "data-pack",
       "version": 7,
       "mingsversion": 20206,
-      "size": 57308931,
+      "size": 56687343,
       "check": "data-main.json",
       "data": [
         "asteroids-dr2.json",
@@ -347,13 +347,12 @@
         "tex/base/lut.jpg",
         "tex/base/sso.png",
         "tex/base/star.jpg",
-        "tex/base/star-tex*.png",
         "tex/base/static.jpg",
         "tex/base/telescopebeam.png",
         "tex/base/mw-sprites",
         "tex/skybox/gaiasky"
       ],
-      "sha256": "6101dc6ae8a5040899216cd64ddd2edd736dcf948ced42af4420b821a862c512",
+      "sha256": "606a16833ab973e0eb05e8fc6d0e971668d3730f46d6c1d1546a684e2ac52fe6",
       "description": "Default data pack for Gaia Sky - For Gaia Sky 2.2.6 and above. Contains the Solar System, constellations, meshes and more",
       "releasenotes": "Remove Milky Way Star Clusters catalog, it has its own download now. Add new textures for Pluto and Ceres. Tweak atmosphere parameters. Increase sphere complexities.",
       "file": "@mirror-url@basedata/007_20200326/gaiasky_data.tar.gz"

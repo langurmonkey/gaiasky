@@ -254,8 +254,9 @@ public class DesktopConfInit extends ConfInit {
         }
         String STARTUP_OBJECT = p.getProperty("scene.object.startup", "Earth");
         long OBJECT_FADE_MS = Long.parseLong(p.getProperty("scene.object.fadems"));
-        float STAR_BRIGHTNESS = Parser.parseFloat(p.getProperty("scene.star.brightness"));
-        float STAR_BRIGHTNESS_POWER = Parser.parseFloat(p.getProperty("scene.star.brightness.pow", "1.0"));
+        float STAR_BRIGHTNESS = Parser.parseFloat(p.getProperty("scene.star.brightness", "2.0"));
+        float STAR_BRIGHTNESS_POWER = Parser.parseFloat(p.getProperty("scene.star.brightness.pow", "0.65"));
+        float STAR_POINT_SIZE = Parser.parseFloat(p.getProperty("scene.star.point.size", "4.7"));
         int STAR_TEX_INDEX = Parser.parseInt(p.getProperty("scene.star.tex.index", "3"));
         float AMBIENT_LIGHT = Parser.parseFloat(p.getProperty("scene.ambient"));
         float CAMERA_FOV = Parser.parseFloat(p.getProperty("scene.camera.fov"));
@@ -313,7 +314,6 @@ public class DesktopConfInit extends ConfInit {
                 VISIBILITY[ct.ordinal()] = Parser.parseBoolean(p.getProperty(key));
             }
         }
-        float STAR_POINT_SIZE = Parser.parseFloat(p.getProperty("scene.star.point.size", "-1.0"));
         boolean LAZY_TEXTURE_INIT = Parser.parseBoolean(p.getProperty("scene.lazy.texture", "true"));
         boolean LAZY_MESH_INIT = Parser.parseBoolean(p.getProperty("scene.lazy.mesh", "true"));
         ElevationType ELEVATION_TYPE = ElevationType.valueOf(p.getProperty("scene.elevation.type", "tessellation").toUpperCase());
