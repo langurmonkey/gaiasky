@@ -426,7 +426,7 @@
       "type": "texture-pack",
       "version": 4,
       "mingsversion": 20206,
-      "size": 247555665,
+      "size": 248244619,
       "check": "hi-res-tex-desc.json",
       "data": [
         "hi-res-tex-desc.json",
@@ -437,7 +437,7 @@
       ],
       "description": "High resolution textures - High resolution texture pack including some 4K and 8K textures for planet surfaces and asteroids.",
       "releasenotes": "Add high resolution base and normal textures for Ceres and Pluto, remove hi-res star textures",
-      "sha256": "12db0408a4a7a05f09b05c854f6d053428f80fa3a95f304e5a4dadb076c75d0b",
+      "sha256": "50dc78c2a840589303e7f124573748bd49d75bc7eaa618ba3da081868d288d85",
       "file": "@mirror-url@tex/004_20200423/hi-res-texture-pack.tar.gz"
     },
     {
