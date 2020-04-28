@@ -58,7 +58,7 @@ public class StarGroupRenderSystem extends ImmediateRenderSystem implements IObs
         this.pointAlphaHl = new float[] { 2, 4 };
         this.aux1 = new Vector3();
         cmap = new Colormap();
-        setStarTexture(GlobalConf.assetsFile("img/star/star-tex-03.png"));
+        setStarTexture(GlobalConf.scene.getStarTexture());
 
         EventManager.instance.subscribe(this, Events.STAR_MIN_OPACITY_CMD, Events.DISPOSE_STAR_GROUP_GPU_MESH);
     }
