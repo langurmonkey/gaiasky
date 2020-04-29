@@ -1,7 +1,7 @@
 #version 330 core
 
 #include shader/lib_logdepthbuff.glsl
-#include shader/lib_star.glsl
+//#include shader/lib_star.glsl
 
 // UNIFORMS
 uniform float u_ar;

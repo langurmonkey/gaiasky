@@ -402,7 +402,7 @@ public class StarGroup extends ParticleGroup implements ILineRenderable, IStarFo
         double thupOverFovfactor = Constants.THRESHOLD_UP / camera.getFovFactor();
         double thdownOverFovfactor = Constants.THRESHOLD_DOWN / camera.getFovFactor();
         double innerRad = 0.006 + GlobalConf.scene.STAR_POINT_SIZE * 0.008;
-        float alph = alpha * this.opacity;
+        alpha = alpha * this.opacity;
 
         /** GENERAL UNIFORMS **/
         shader.setUniformf("u_thpoint", (float) GlobalConf.scene.STAR_THRESHOLD_POINT * camera.getFovFactor());
@@ -413,11 +413,11 @@ public class StarGroup extends ParticleGroup implements ILineRenderable, IStarFo
         /** RENDER ACTUAL STARS **/
         boolean focusRendered = false;
         for (int i = 0; i < N_CLOSEUP_STARS; i++) {
-            renderCloseupStar(active[i], camera, shader, mesh, thpointTimesFovfactor, thupOverFovfactor, thdownOverFovfactor, alph);
+            renderCloseupStar(active[i], camera, shader, mesh, thpointTimesFovfactor, thupOverFovfactor, thdownOverFovfactor, alpha);
             focusRendered = focusRendered || active[i] == focusIndex;
         }
         if (focus != null && !focusRendered) {
-            renderCloseupStar(focusIndex, camera, shader, mesh, thpointTimesFovfactor, thupOverFovfactor, thdownOverFovfactor, alph);
+            renderCloseupStar(focusIndex, camera, shader, mesh, thpointTimesFovfactor, thupOverFovfactor, thdownOverFovfactor, alpha);
         }
 
     }
@@ -428,15 +428,15 @@ public class StarGroup extends ParticleGroup implements ILineRenderable, IStarFo
         StarBean star = (StarBean) pointData.get(idx);
         double size = getSize(idx);
         double radius = size * Constants.STAR_SIZE_FACTOR;
-        Vector3d lpos = fetchPosition(star, camera.getPos(), aux3d1.get(), currDeltaYears);
-        double distToCamera = lpos.len();
+        Vector3d starPos = fetchPosition(star, camera.getPos(), aux3d1.get(), currDeltaYears);
+        double distToCamera = starPos.len();
         double viewAngle = (radius / distToCamera) / camera.getFovFactor();
 
         Color.abgr8888ToColor(c, getColor(idx));
         if (viewAngle >= thpointTimesFovfactor) {
             double fuzzySize = getFuzzyRenderSize(size, radius, distToCamera, viewAngle, thdownOverFovfactor, thupOverFovfactor);
 
-            Vector3 pos = lpos.put(aux3f3.get());
+            Vector3 pos = starPos.put(aux3f3.get());
             shader.setUniformf("u_pos", pos);
             shader.setUniformf("u_size", (float) fuzzySize);
 
