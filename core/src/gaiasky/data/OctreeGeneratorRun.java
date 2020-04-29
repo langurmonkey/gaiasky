@@ -7,13 +7,11 @@ package gaiasky.data;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.backends.lwjgl3.Lwjgl3Files;
-import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.TimeUtils;
 import com.beust.jcommander.JCommander;
 import com.beust.jcommander.Parameter;
 import gaiasky.data.group.AbstractStarGroupDataProvider;
-import gaiasky.data.group.AbstractStarGroupDataProvider.ColId;
 import gaiasky.data.group.IStarGroupDataProvider;
 import gaiasky.data.group.STILDataProvider;
 import gaiasky.data.octreegen.IStarGroupIO;
@@ -40,7 +38,6 @@ import gaiasky.util.format.NumberFormatFactory;
 import gaiasky.util.math.Vector3d;
 import gaiasky.util.parse.Parser;
 import gaiasky.util.tree.OctreeNode;
-import gaiasky.util.ucd.UCD;
 
 import java.io.*;
 import java.lang.reflect.InvocationTargetException;
@@ -56,8 +53,7 @@ import java.util.Map;
 import java.util.Set;
 
 /**
- * Generates an octree of star groups. Each octant should have only one object,
- * a star group.
+ * Generates an octree of star groups.
  *
  * @author tsagrista
  */
@@ -92,9 +88,6 @@ public class OctreeGeneratorRun {
     @Parameter(names = "--maxpart", description = "Maximum number of objects in an octant")
     private int maxPart = 100000;
 
-    @Parameter(names = "--serialized", description = "Use the java serialization method instead of the binary format to output the particle files")
-    private boolean serialized = false;
-
     @Parameter(names = "--pllxerrfaint", description = "Parallax error factor for faint (gmag>=13.1) stars, acceptance criteria as a percentage of parallax error with respect to parallax, in [0..1]")
     private double pllxerrfaint = 0.125;
 
@@ -104,7 +97,7 @@ public class OctreeGeneratorRun {
     @Parameter(names = "--pllxzeropoint", description = "Zero point value for the parallax in mas")
     private double pllxzeropoint = 0d;
 
-    @Parameter(names = {"-c", "--magcorrections"}, description = "Flag to apply magnitude and color corrections for extinction and reddening")
+    @Parameter(names = {"-c", "--magcorrections"}, description = "Flag to apply magnitude and color corrections for extinction and reddening, if available")
     private boolean magCorrections = false;
 
     @Parameter(names = {"-p", "--postprocess"}, description = "Low object count nodes (<=100) will be merged with their parents if parents have less than 1000 objects. Avoids very large and mostly empty subtrees")
@@ -122,13 +115,13 @@ public class OctreeGeneratorRun {
     @Parameter(names = "--nfiles", description = "Caps the number of data files to load. Defaults to unlimited")
     private int fileNumCap = -1;
 
-    @Parameter(names = {"--hip", "--addhip"}, description = "Add the Hipparcos catalog on top of the catalog provided by -l")
+    @Parameter(names = {"--hip", "--addhip"}, description = "Add the Hipparcos catalog on top of the catalog provided by -l (hip location is data/catalog/hipparcos/hipparcos.vot)")
     private boolean addHip = false;
 
     @Parameter(names = "--hip-names", description = "Directory containing HIP names files (Name_To_HIP.dat, Var_To_HIP.dat, etc.), in case the HIP catalog does not already provide them")
     private String hipNamesDir = null;
 
-    @Parameter(names = "--xmatchfile", description = "Crossmatch file with source_id to hip, only if --hip is enabled")
+    @Parameter(names = "--xmatchfile", description = "Crossmatch file between Gaia and HIP, containing source_id to hip data, only if --hip is enabled")
     private String xmatchFile = null;
 
     @Parameter(names = "--geodistfile", description = "Use this file or directory to lookup distances. Argument is a file or directory with files of of <sourceid, dist[pc]>. If this argument is used, both --pllxerrfaint and --pllxerrbright are ignored")
@@ -146,8 +139,11 @@ public class OctreeGeneratorRun {
     @Parameter(names = "--columns", description = "Column name list separated by commas, in order of appearance, if loading using the CSVCatalogDataProvider")
     private String columns = null;
 
-    @Parameter(names = "--compat-mode", description = "Use compatibility mode (DR1/DR2), where the files have tycho ids")
+    @Parameter(names = "--compat-mode", description = "Use the compatibility mode format (DR1/DR2), where the files have tycho ids")
     private boolean compatibilityMode = false;
+
+    @Parameter(names = "--serialized", description = "Use java serialization instead of the binary format to output particle files")
+    private boolean serialized = false;
 
     @Parameter(names = {"-h", "--help"}, help = true)
     private boolean help = false;
@@ -227,7 +223,7 @@ public class OctreeGeneratorRun {
 
         Array<ParticleBean> listLoader = null, list = null;
         Map<Long, Integer> xmatchTable = null;
-        long[] cpm = null;
+        long[] countsPerMagGaia = null;
 
         if (loaderClass != null) {
             /* CATALOG */
@@ -243,7 +239,7 @@ public class OctreeGeneratorRun {
             loader.setGeoDistancesFile(geodistFile);
             loader.setRUWEFile(ruweFile);
             loader.setRUWECap(ruwe);
-            cpm = loader.getCountsPerMag();
+            countsPerMagGaia = loader.getCountsPerMag();
 
             if (addHip && xmatchFile != null && !xmatchFile.isEmpty()) {
                 // Load xmatchTable
@@ -259,13 +255,6 @@ public class OctreeGeneratorRun {
         }
 
         if (addHip) {
-            // Load Hipparcos star names
-            HipNames hipNames = null;
-            if (hipNamesDir != null) {
-                hipNames = new HipNames();
-                hipNames.load(Paths.get(hipNamesDir));
-            }
-
             /* HIPPARCOS */
             STILDataProvider stil = new STILDataProvider();
 
@@ -280,8 +269,11 @@ public class OctreeGeneratorRun {
 
             Array<ParticleBean> listHip = stil.loadData("data/catalog/hipparcos/hipparcos.vot");
 
-            // Update names
-            if (hipNames != null) {
+            // Update HIP names using external source, if needed
+            if (hipNamesDir != null) {
+                HipNames hipNames = new HipNames();
+                hipNames.load(Paths.get(hipNamesDir));
+
                 Map<Integer, Array<String>> hn = hipNames.getHipNames();
                 for (ParticleBean pb : listHip) {
                     StarBean star = (StarBean) pb;
@@ -293,15 +285,17 @@ public class OctreeGeneratorRun {
                 }
             }
 
-            // Create hip map
-            long[] cpmhip = stil.getCountsPerMag();
-            combineCpm(cpm, cpmhip);
+            // Combine counts per magnitude
+            long[] countsPerMagHip = stil.getCountsPerMag();
+            combineCountsPerMag(countsPerMagGaia, countsPerMagHip);
+
+            // Create HIP map
             Map<Integer, StarBean> hipMap = new HashMap<>();
             for (ParticleBean star : listHip) {
                 hipMap.put(((StarBean) star).hip(), (StarBean) star);
             }
 
-            /* Check x-match file */
+            // Check x-match file
             int hipnum = listHip.size;
             int starhits = 0;
             int notFoundHipStars = 0;
@@ -367,6 +361,7 @@ public class OctreeGeneratorRun {
                                 hipStar.data[StarBean.I_ABSMAG] = gaiaStar.absmag();
                                 hipStar.data[StarBean.I_COL] = gaiaStar.col();
                                 hipStar.data[StarBean.I_SIZE] = gaiaStar.size();
+                                hipStar.addNames(gaiaStar.names);
                                 starhits++;
                             }
                         } else {
@@ -433,12 +428,12 @@ public class OctreeGeneratorRun {
 
         int[][] stats = octree.stats();
         NumberFormat formatter = new DecimalFormat("##########0.0000");
-        if (cpm != null) {
+        if (countsPerMagGaia != null) {
             logger.info("=================");
             logger.info("STAR COUNTS STATS");
             logger.info("=================");
-            for (int level = 0; level < cpm.length; level++) {
-                logger.info("Magnitude " + level + ": " + cpm[level] + " stars (" + formatter.format((double) cpm[level] * 100d / (double) list.size) + "%)");
+            for (int level = 0; level < countsPerMagGaia.length; level++) {
+                logger.info("Magnitude " + level + ": " + countsPerMagGaia[level] + " stars (" + formatter.format((double) countsPerMagGaia[level] * 100d / (double) list.size) + "%)");
             }
             logger.info();
         }
@@ -466,7 +461,7 @@ public class OctreeGeneratorRun {
         return octree;
     }
 
-    private long[] combineCpm(long[] cpm1, long[] cpm2) {
+    private long[] combineCountsPerMag(long[] cpm1, long[] cpm2) {
         if (cpm1 == null)
             return cpm2;
         else if (cpm2 == null)

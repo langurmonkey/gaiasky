@@ -15,15 +15,13 @@ import gaiasky.scenegraph.StarGroup.StarBean;
 import gaiasky.util.Logger;
 import gaiasky.util.Logger.Log;
 
-import java.io.FileNotFoundException;
-import java.io.InputStream;
-import java.io.ObjectOutputStream;
-import java.io.OutputStream;
+import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Loads and writes star groups
+ * Loads and writes star groups using java's default {@link ObjectOutputStream} and
+ * {@link ObjectInputStream} through {@link SerializedDataProvider}
  * 
  * @author Toni Sagrista
  *

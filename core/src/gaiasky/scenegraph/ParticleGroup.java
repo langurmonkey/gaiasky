@@ -224,6 +224,7 @@ public class ParticleGroup extends FadeNode implements I3DTextRenderable, IFocus
         }
 
         public void addName(String name) {
+            name = name.strip();
             if (!hasName(name))
                 if (names != null) {
                     // Extend array
@@ -234,6 +235,11 @@ public class ParticleGroup extends FadeNode implements I3DTextRenderable, IFocus
                 } else {
                     setName(name);
                 }
+        }
+
+        public void addNames(String... names) {
+            for(String name : names)
+                addName(name);
         }
 
         public boolean hasExtra(String name){
