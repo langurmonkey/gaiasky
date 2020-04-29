@@ -53,7 +53,7 @@ out vec4 v_col;
 void main() {
 	// Lengths
 	float l0 = len0 * u_vrScale;
-	float l1 = l0 * 100.0;
+	float l1 = l0 * 2e3;
 
     vec3 pos = a_position - u_camPos;
 
@@ -83,19 +83,19 @@ void main() {
     float viewAngleApparent = atan((a_additional.x * u_alphaSizeFovBr.w) / dist);
     float opacity = pow(lint2(viewAngleApparent / u_alphaSizeFovBr.z, u_thAnglePoint.x, u_thAnglePoint.y, u_pointAlpha.x, u_pointAlpha.y), 1.1);
 
-    float fadeout = smoothstep(dist, l0, l1);
+    float boundaryFade = smoothstep(l0, l1, dist);
 
-    v_col = vec4(a_color.rgb, clamp(opacity * u_alphaSizeFovBr.x * fadeout, 0.0, 1.0));
+    v_col = vec4(a_color.rgb, clamp(opacity * u_alphaSizeFovBr.x * boundaryFade, 0.0, 1.0));
 
     vec4 gpos = u_projModelView * vec4(pos, 1.0);
     gl_Position = gpos;
-    gl_PointSize = pow(viewAngleApparent * .5e8, u_brPow) * u_alphaSizeFovBr.y * sizefactor / u_alphaSizeFovBr.z;
+    gl_PointSize = max(pow(viewAngleApparent * .5e8, u_brPow) * u_alphaSizeFovBr.y * sizefactor / u_alphaSizeFovBr.z, 1.0);
 
     #ifdef velocityBufferFlag
     velocityBuffer(gpos, a_position, dist, pm, vec2(500.0, 3000.0), 1.0);
     #endif
 
-    if(dist < len0 * u_vrScale || a_additional.y > u_magLimit){
+    if(dist < l0 || a_additional.y > u_magLimit){
         // The pixels of this star will be discarded in the fragment shader
         v_col = vec4(0.0, 0.0, 0.0, 0.0);
     }

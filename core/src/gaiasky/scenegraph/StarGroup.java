@@ -438,7 +438,7 @@ public class StarGroup extends ParticleGroup implements ILineRenderable, IStarFo
 
             Vector3 pos = lpos.put(aux3f3.get());
             shader.setUniformf("u_pos", pos);
-            shader.setUniformf("u_size", (float) fuzzySize * 50f);
+            shader.setUniformf("u_size", (float) fuzzySize);
 
             shader.setUniformf("u_color", c.r, c.g, c.b, alpha);
             shader.setUniformf("u_distance", (float) distToCamera);
@@ -461,7 +461,7 @@ public class StarGroup extends ParticleGroup implements ILineRenderable, IStarFo
             computedSize = (size * (dist / radius) * Constants.THRESHOLD_DOWN);
         }
         // Change the factor at the end here to control the stray light of stars
-        computedSize *= GlobalConf.scene.STAR_BRIGHTNESS * 0.1;
+        computedSize *= GlobalConf.scene.STAR_BRIGHTNESS * 0.3;
 
         return computedSize;
     }
