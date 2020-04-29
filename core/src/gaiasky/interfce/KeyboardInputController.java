@@ -73,10 +73,4 @@ public class KeyboardInputController extends InputAdapter {
         return false;
 
     }
-
-    @Override
-    public boolean keyTyped(char character) {
-        System.out.println("KEY: " + character);
-        return super.keyTyped(character);
-    }
 }
