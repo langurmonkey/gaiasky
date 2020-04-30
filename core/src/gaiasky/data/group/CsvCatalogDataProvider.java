@@ -123,7 +123,10 @@ public class CsvCatalogDataProvider extends AbstractStarGroupDataProvider {
         if (f.isDirectory()) {
             long numFiles = 0;
             try {
-                numFiles = GlobalResources.fileCount(Paths.get(file));
+                if(fileNumberCap > 0)
+                    numFiles = Math.min(GlobalResources.fileCount(Paths.get(file)), fileNumberCap);
+                else
+                    numFiles = GlobalResources.fileCount(Paths.get(file));
             } catch (IOException e) {
                 logger.error("Error counting files in dir: " + file);
             }
