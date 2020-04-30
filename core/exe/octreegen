@@ -36,10 +36,8 @@ OPTS="$OPTS -Xms64g -Xmx512g"
 
 # Parallel GC 
 #OPTS="$OPTS -XX:+UseParallelGC"
-# CMS GC
-OPTS="$OPTS -XX:+UseConcMarkSweepGC"
 # G1 GC
-#OPTS="$OPTS -XX:+UseG1GC"
+OPTS="$OPTS -XX:+UseG1GC"
 
 # GC debug only
 #OPTS="$OPTS -verbose:gc -XX:+PrintGCDetails"

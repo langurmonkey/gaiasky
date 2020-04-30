@@ -67,7 +67,7 @@ public class OctreeGeneratorRun {
         arguments = args;
         OctreeGeneratorRun ogt = new OctreeGeneratorRun();
         jc = JCommander.newBuilder().addObject(ogt).build();
-        jc.setProgramName("OctreeGeneratorTest");
+        jc.setProgramName("OctreeGeneratorRun");
         jc.parse(args);
         if (ogt.help) {
             jc.usage();
@@ -136,7 +136,7 @@ public class OctreeGeneratorRun {
     @Parameter(names = "--ruwe-file", description = "Location of gzipped file containing the RUWE value for each source id, if the main catalog does not provide them")
     private String ruweFile = null;
 
-    @Parameter(names = "--columns", description = "Column name list separated by commas, in order of appearance, if loading using the CSVCatalogDataProvider")
+    @Parameter(names = "--columns", description = "Column name list separated by commas, in order of appearance, if loading using the CSVCatalogDataProvider (see AbstractStarGroupDataProvider.ColId)")
     private String columns = null;
 
     @Parameter(names = "--compat-mode", description = "Use the compatibility mode format (DR1/DR2), where the files have tycho ids")
@@ -208,9 +208,7 @@ public class OctreeGeneratorRun {
                 }
             }
         } catch (Exception e) {
-            StringWriter sw = new StringWriter();
-            e.printStackTrace(new PrintWriter(sw));
-            logger.error(e, sw.toString());
+            logger.error(e);
         }
     }
 

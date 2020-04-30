@@ -81,6 +81,9 @@ public class CsvCatalogDataProvider extends AbstractStarGroupDataProvider {
      * @param columns Columns
      */
     public void setColumns(String columns) {
+        if(columns == null || columns.length() == 0){
+            throw new RuntimeException("Please provide a list of columns");
+        }
         String[] cols = columns.strip().split(comma);
         setColumns(cols);
     }

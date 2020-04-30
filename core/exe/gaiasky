@@ -48,8 +48,6 @@ OPTS="$OPTS -Xms2g -Xmx4g"
 
 # Parallel GC 
 #OPTS="$OPTS -XX:+UseParallelGC"
-# CMS GC, deprecated since Java9
-#OPTS="$OPTS -XX:+UseConcMarkSweepGC"
 # G1 GC
 OPTS="$OPTS -XX:+UseG1GC"
 

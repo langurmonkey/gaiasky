@@ -258,7 +258,7 @@ public class ParticleGroup extends FadeNode implements I3DTextRenderable, IFocus
             if(extra != null){
                 Set<UCD> ucds = extra.keySet();
                 for(UCD ucd : ucds){
-                    if(ucd.originalucd.equals(name) || ucd.colname.equals(name)){
+                    if((ucd.originalucd != null && ucd.originalucd.equals(name)) || (ucd.colname != null && ucd.colname.equals(name))){
                         return extra.get(ucd);
                     }
                 }
