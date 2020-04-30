@@ -380,11 +380,11 @@ public class CsvCatalogDataProvider extends AbstractStarGroupDataProvider {
 
     /**
      * Uses memory mapped files to load catalog files.
-     * This is not working right now
      *
-     * @param file
-     * @param factor
-     * @param fileNumber
+     * @param file The file to load
+     * @param factor Position factor
+     * @param fileNumber File number
+     * @param totalFiles Total number of files
      * @return
      */
     public Array<ParticleBean> loadDataMapped(String file, double factor, int fileNumber, long totalFiles) {

@@ -216,7 +216,6 @@ public class OctreeGeneratorRun {
         long startMs = TimeUtils.millis();
 
         OctreeGeneratorParams ogp = new OctreeGeneratorParams(maxPart, sunCentre, postprocess, childCount, parentCount);
-        //IOctreeGenerator og = new OctreeGeneratorPart(ogp);
         IOctreeGenerator og = new OctreeGeneratorMag(ogp);
 
         Array<ParticleBean> listLoader = null, list = null;
