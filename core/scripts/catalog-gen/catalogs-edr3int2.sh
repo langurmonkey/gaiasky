@@ -25,14 +25,14 @@ TORUN=("small" "default")
 # Column names (see ColId)
 COLS="sourceid,ra,dec,pllx,ra_err,dec_err,pllx_err,pmra,pmdec,radvel,gmag,bpmag,rpmag,ruwe,ref_epoch"
 
-function run() {
+function generate() {
   echo "GENERATING: $DSNAME"
   echo "Input: $DR_LOC/csv/"
   echo "Output: $DR_LOC/out/$DSNAME/"
   echo "Log: $LOGS_LOC/$DSNAME.out"
   echo "Cmd: $CMD"
 
-  nohup $( eval $CMD ) > $LOGS_LOC/$DSNAME.out
+  $( eval $CMD )
 }
 
 function contains() {
@@ -51,54 +51,55 @@ function contains() {
 # SMALL
 if [ $(contains "${TORUN[@]}" "small") == "y" ]; then
   DSNAME="001_$(date +'%Y%m%d')_edr3int2-small"
-  nohup $GSDIR/octreegen --loader CsvCatalogDataProvider --input $DR_LOC/csv/ --output $DR_LOC/out/$DSNAME/ --maxpart 100000 --pllxerrbright 0.1 --pllxerrfaint 0.005 --hip --pllxzeropoint -0.02 --magcorrections --xmatchfile $GSDIR/data/gdr2hip/gdr2-hip-xmatch-all.csv --columns $COLS  > $LOGS_LOC/$DSNAME.out
+  CMD="nohup $GSDIR/octreegen --loader CsvCatalogDataProvider --input $DR_LOC/csv/ --output $DR_LOC/out/$DSNAME/ --maxpart 100000 --pllxerrbright 0.1 --pllxerrfaint 0.005 --hip --pllxzeropoint -0.02 --magcorrections --xmatchfile $GSDIR/data/gdr2hip/gdr2-hip-xmatch-all.csv --columns $COLS  > $LOGS_LOC/$DSNAME.out"
+  generate
 fi
 
 # DEFAULT
 if [ $(contains "${TORUN[@]}" "default") == "y" ]; then
   DSNAME="002_$(date +'%Y%m%d')_edr3int2-default"
-  echo "Generating $DSNAME"
-  nohup $GSDIR/octreegen --loader CsvCatalogDataProvider --input $DR_LOC/gc/csv/ --output $DR_LOC/out/$DSNAME/ --maxpart 100000 --pllxerrbright 0.2 --pllxerrfaint 0.005 --hip --pllxzeropoint -0.02 --magcorrections --xmatchfile $GSDIR/data/gdr2hip/gdr2-hip-xmatch-all.csv --columns $COLS > $LOGS_LOC/$DSNAME.out
+  CMD="nohup $GSDIR/octreegen --loader CsvCatalogDataProvider --input $DR_LOC/gc/csv/ --output $DR_LOC/out/$DSNAME/ --maxpart 100000 --pllxerrbright 0.2 --pllxerrfaint 0.005 --hip --pllxzeropoint -0.02 --magcorrections --xmatchfile $GSDIR/data/gdr2hip/gdr2-hip-xmatch-all.csv --columns $COLS > $LOGS_LOC/$DSNAME.out"
+  generate
 fi
 
 # BRIGHT
 if [ $(contains "${TORUN[@]}" "bright") == "y" ]; then
   DSNAME="003_$(date +'%Y%m%d')_edr3int2-bright"
-  echo "Generating $DSNAME"
-  nohup $GSDIR/octreegen --loader CsvCatalogDataProvider --input $DR_LOC/gc/csv/ --output $DR_LOC/out/$DSNAME/ --maxpart 100000 --pllxerrbright 0.9 --pllxerrfaint 0.0 --hip --pllxzeropoint -0.02 --magcorrections --xmatchfile $GSDIR/data/gdr2hip/gdr2-hip-xmatch-all.csv --columns $COLS > $LOGS_LOC/$DSNAME.out
+  CMD="nohup $GSDIR/octreegen --loader CsvCatalogDataProvider --input $DR_LOC/gc/csv/ --output $DR_LOC/out/$DSNAME/ --maxpart 100000 --pllxerrbright 0.9 --pllxerrfaint 0.0 --hip --pllxzeropoint -0.02 --magcorrections --xmatchfile $GSDIR/data/gdr2hip/gdr2-hip-xmatch-all.csv --columns $COLS > $LOGS_LOC/$DSNAME.out"
+  generate
 fi
 
 # LARGE
 if [ $(contains "${TORUN[@]}" "large") == "y" ]; then
   DSNAME="004_$(date +'%Y%m%d')_edr3int2-large"
-  echo "Generating $DSNAME"
-  nohup $GSDIR/octreegen --loader CsvCatalogDataProvider --input $DR_LOC/gc/csv/ --output $DR_LOC/out/$DSNAME/ --maxpart 100000 --pllxerrbright 0.5 --pllxerrfaint 0.125 --hip --pllxzeropoint -0.02 --magcorrections --xmatchfile $GSDIR/data/gdr2hip/gdr2-hip-xmatch-all.csv --columns $COLS > $LOGS_LOC/$DSNAME.out
+  CMD="nohup $GSDIR/octreegen --loader CsvCatalogDataProvider --input $DR_LOC/gc/csv/ --output $DR_LOC/out/$DSNAME/ --maxpart 100000 --pllxerrbright 0.5 --pllxerrfaint 0.125 --hip --pllxzeropoint -0.02 --magcorrections --xmatchfile $GSDIR/data/gdr2hip/gdr2-hip-xmatch-all.csv --columns $COLS > $LOGS_LOC/$DSNAME.out"
+  generate
 fi
 
 # VERYLARGE
 if [ $(contains "${TORUN[@]}" "verylarge") == "y" ]; then
   DSNAME="005_$(date +'%Y%m%d')_edr3int2-verylarge"
-  echo "Generating $DSNAME"
-  nohup $GSDIR/octreegen --loader CsvCatalogDataProvider --input $DR_LOC/gc/csv/ --output $DR_LOC/out/$DSNAME/ --maxpart 100000 --pllxerrbright 0.9 --pllxerrfaint 0.9 --hip --pllxzeropoint -0.02 --postprocess --childcount 10000 --parentcount 50000 --magcorrections --xmatchfile $GSDIR/data/gdr2hip/gdr2-hip-xmatch-all.csv --columns $COLS > $LOGS_LOC/$DSNAME.out
+  CMD="nohup $GSDIR/octreegen --loader CsvCatalogDataProvider --input $DR_LOC/gc/csv/ --output $DR_LOC/out/$DSNAME/ --maxpart 100000 --pllxerrbright 0.9 --pllxerrfaint 0.9 --hip --pllxzeropoint -0.02 --postprocess --childcount 10000 --parentcount 50000 --magcorrections --xmatchfile $GSDIR/data/gdr2hip/gdr2-hip-xmatch-all.csv --columns $COLS > $LOGS_LOC/$DSNAME.out"
+  generate
 fi
 
 # EXTRALARGE
 if [ $(contains "${TORUN[@]}" "extralarge") == "y" ]; then
   DSNAME="006_$(date +'%Y%m%d')_edr3int2-extralarge"
-  echo "Generating $DSNAME"
-  nohup $GSDIR/octreegen --loader CsvCatalogDataProvider --input $DR_LOC/gc/csv/ --output $DR_LOC/out/$DSNAME/ --maxpart 100000 --hip --pllxzeropoint -0.02 --geodistfile $DR_BASE/geo_distances/ --postprocess --childcount 10000 --parentcount 50000 --magcorrections --xmatchfile $GSDIR/data/gdr2hip/gdr2-hip-xmatch-all.csv --columns $COLS > $LOGS_LOC/$DSNAME.out
+  CMD="nohup $GSDIR/octreegen --loader CsvCatalogDataProvider --input $DR_LOC/gc/csv/ --output $DR_LOC/out/$DSNAME/ --maxpart 100000 --hip --pllxzeropoint -0.02 --geodistfile $DR_BASE/geo_distances/ --postprocess --childcount 10000 --parentcount 50000 --magcorrections --xmatchfile $GSDIR/data/gdr2hip/gdr2-hip-xmatch-all.csv --columns $COLS > $LOGS_LOC/$DSNAME.out"
+  generate
 fi
 
 # RATHERLARGE
 if [ $(contains "${TORUN[@]}" "ratherlarge") == "y" ]; then
   DSNAME="007_$(date +'%Y%m%d')_edr3int2-ratherlarge"
-  echo "Generating $DSNAME"
-  nohup $GSDIR/octreegen --loader CsvCatalogDataProvider --input $DR_LOC/gc/csv/ --output $DR_LOC/out/$DSNAME/ --maxpart 100000 --pllxerrbright 0.5 --pllxerrfaint 0.5 --hip --pllxzeropoint -0.02 --postprocess --childcount 1000 --parentcount 50000 --magcorrections --xmatchfile $GSDIR/data/gdr2hip/gdr2-hip-xmatch-all.csv --columns $COLS > $LOGS_LOC/$DSNAME.out
+  CMD="nohup $GSDIR/octreegen --loader CsvCatalogDataProvider --input $DR_LOC/gc/csv/ --output $DR_LOC/out/$DSNAME/ --maxpart 100000 --pllxerrbright 0.5 --pllxerrfaint 0.5 --hip --pllxzeropoint -0.02 --postprocess --childcount 1000 --parentcount 50000 --magcorrections --xmatchfile $GSDIR/data/gdr2hip/gdr2-hip-xmatch-all.csv --columns $COLS > $LOGS_LOC/$DSNAME.out"
+  generate
 fi
 
 # RUWE
 if [ $(contains "${TORUN[@]}" "ruwe") == "y" ]; then
   DSNAME="008_$(date +'%Y%m%d')_edr3int2-ruwe"
-  echo "Generating $DSNAME"
-  nohup $GSDIR/octreegen --loader CsvCatalogDataProvider --input $DR_LOC/gc/csv/ --output $DR_LOC/out/$DSNAME/ --maxpart 100000 --ruwe 1.4 --ruwe-file $DR_BASE/ruwe/ruwes.txt.gz --hip --pllxzeropoint -0.02 --postprocess --childcount 1000 --parentcount 50000 --magcorrections --xmatchfile $GSDIR/data/gdr2hip/gdr2-hip-xmatch-all.csv > $LOGS_LOC/$DSNAME.out
+  CMD="nohup $GSDIR/octreegen --loader CsvCatalogDataProvider --input $DR_LOC/gc/csv/ --output $DR_LOC/out/$DSNAME/ --maxpart 100000 --ruwe 1.4 --ruwe-file $DR_BASE/ruwe/ruwes.txt.gz --hip --pllxzeropoint -0.02 --postprocess --childcount 1000 --parentcount 50000 --magcorrections --xmatchfile $GSDIR/data/gdr2hip/gdr2-hip-xmatch-all.csv > $LOGS_LOC/$DSNAME.out"
+  generate
 fi
