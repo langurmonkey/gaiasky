@@ -32,7 +32,7 @@ fi
 #OPTS="$OPTS -Dproperties.file=$GSDIRESC/conf/global.properties"
 
 # Memory
-OPTS="$OPTS -Xms60g -Xmx160g"
+OPTS="$OPTS -Xms64g -Xmx512g"
 
 # Parallel GC 
 #OPTS="$OPTS -XX:+UseParallelGC"
@@ -55,7 +55,7 @@ OPTS="$OPTS -Dassets.location=$GSDIR/"
 # Run.
 #
 
-CMD="$JAVA $OPTS -cp \"$LIB_PATH\" gaiasky.data.OctreeGroupGeneratorTest $@"
+CMD="$JAVA $OPTS -cp \"$LIB_PATH\" gaiasky.data.OctreeGroupGeneratorRun $@"
 echo "$CMD"
 
 ( cd "$GSDIR" && eval $CMD )
