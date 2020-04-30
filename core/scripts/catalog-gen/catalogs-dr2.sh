@@ -26,49 +26,57 @@ function contains() {
 }
 
 # SMALL
-if [ $(contains "${A[@]}" "small") == "y" ]; then
+if [ $(contains "${TORUN[@]}" "small") == "y" ]; then
   DSNAME="001_$(date +'%Y%m%d')_dr2-small"
+  echo "Generating $DSNAME"
   nohup ./octreegen --loader CsvCatalogDataProvider --input $DR_LOC/csv/ --output $DR_LOC/out/$DSNAME/ --maxpart 100000 --pllxerrbright 0.1 --pllxerrfaint 0.005 --hip --pllxzeropoint -0.029 --magcorrections --xmatchfile $GS_LOC/data/gdr2hip/gdr2-hip-xmatch-all.csv > $LOGS_LOC/$DSNAME.out
 fi
 
 # DEFAULT
-if [ $(contains "${A[@]}" "default") == "y" ]; then
+if [ $(contains "${TORUN[@]}" "default") == "y" ]; then
   DSNAME="002_$(date +'%Y%m%d')_dr2-default"
+  echo "Generating $DSNAME"
   nohup ./octreegen --loader CsvCatalogDataProvider --input $DR_LOC/csv/ --output $DR_LOC/out/$DSNAME/ --maxpart 100000 --pllxerrbright 0.2 --pllxerrfaint 0.005 --hip --pllxzeropoint -0.029 --magcorrections --xmatchfile $GS_LOC/data/gdr2hip/gdr2-hip-xmatch-all.csv > $LOGS_LOC/$DSNAME.out
 fi
 
 # BRIGHT
-if [ $(contains "${A[@]}" "bright") == "y" ]; then
+if [ $(contains "${TORUN[@]}" "bright") == "y" ]; then
   DSNAME="003_$(date +'%Y%m%d')_dr2-bright"
+  echo "Generating $DSNAME"
   nohup ./octreegen --loader CsvCatalogDataProvider --input $DR_LOC/csv/ --output $DR_LOC/out/$DSNAME/ --maxpart 100000 --pllxerrbright 0.9 --pllxerrfaint 0.0 --hip --pllxzeropoint -0.029 --magcorrections --xmatchfile $GS_LOC/data/gdr2hip/gdr2-hip-xmatch-all.csv > $LOGS_LOC/$DSNAME.out
 fi
 
 # LARGE
-if [ $(contains "${A[@]}" "large") == "y" ]; then
+if [ $(contains "${TORUN[@]}" "large") == "y" ]; then
   DSNAME="004_$(date +'%Y%m%d')_dr2-large"
+  echo "Generating $DSNAME"
   nohup ./octreegen --loader CsvCatalogDataProvider --input $DR_LOC/csv/ --output $DR_LOC/out/$DSNAME/ --maxpart 100000 --pllxerrbright 0.5 --pllxerrfaint 0.125 --hip --pllxzeropoint -0.029 --magcorrections --xmatchfile $GS_LOC/data/gdr2hip/gdr2-hip-xmatch-all.csv > $LOGS_LOC/$DSNAME.out
 fi
 
 # VERYLARGE
-if [ $(contains "${A[@]}" "verylarge") == "y" ]; then
+if [ $(contains "${TORUN[@]}" "verylarge") == "y" ]; then
   DSNAME="005_$(date +'%Y%m%d')_dr2-verylarge"
+  echo "Generating $DSNAME"
   nohup ./octreegen --loader CsvCatalogDataProvider --input $DR_LOC/csv/ --output $DR_LOC/out/$DSNAME/ --maxpart 100000 --pllxerrbright 0.9 --pllxerrfaint 0.9 --hip --pllxzeropoint -0.029 --postprocess --childcount 10000 --parentcount 50000 --magcorrections --xmatchfile $GS_LOC/data/gdr2hip/gdr2-hip-xmatch-all.csv > $LOGS_LOC/$DSNAME.out
 fi
 
 # EXTRALARGE
-if [ $(contains "${A[@]}" "extralarge") == "y" ]; then
+if [ $(contains "${TORUN[@]}" "extralarge") == "y" ]; then
   DSNAME="006_$(date +'%Y%m%d')_dr2-extralarge"
+  echo "Generating $DSNAME"
   nohup ./octreegen --loader CsvCatalogDataProvider --input $DR_LOC/csv/ --output $DR_LOC/out/$DSNAME/ --maxpart 100000 --hip --pllxzeropoint -0.029 --geodistfile $DR_BASE/geo_distances/ --postprocess --childcount 10000 --parentcount 50000 --magcorrections --xmatchfile $GS_LOC/data/gdr2hip/gdr2-hip-xmatch-all.csv > $LOGS_LOC/$DSNAME.out
 fi
 
 # RATHERLARGE
-if [ $(contains "${A[@]}" "ratherlarge") == "y" ]; then
+if [ $(contains "${TORUN[@]}" "ratherlarge") == "y" ]; then
   DSNAME="007_$(date +'%Y%m%d')_dr2-ratherlarge"
+  echo "Generating $DSNAME"
   nohup ./octreegen --loader CsvCatalogDataProvider --input $DR_LOC/csv/ --output $DR_LOC/out/$DSNAME/ --maxpart 100000 --pllxerrbright 0.5 --pllxerrfaint 0.5 --hip --pllxzeropoint -0.029 --postprocess --childcount 1000 --parentcount 50000 --magcorrections --xmatchfile $GS_LOC/data/gdr2hip/gdr2-hip-xmatch-all.csv > $LOGS_LOC/$DSNAME.out
 fi
 
 # RUWE
-if [ $(contains "${A[@]}" "ruwe") == "y" ]; then
+if [ $(contains "${TORUN[@]}" "ruwe") == "y" ]; then
   DSNAME="008_$(date +'%Y%m%d')_dr2-ruwe"
+  echo "Generating $DSNAME"
   nohup ./octreegen --loader CsvCatalogDataProvider --input $DR_LOC/csv/ --output $DR_LOC/out/$DSNAME/ --maxpart 100000 --ruwe 1.4 --ruwe-file $DR_BASE/ruwe/ruwes.txt.gz --hip --pllxzeropoint -0.029 --postprocess --childcount 1000 --parentcount 50000 --magcorrections --xmatchfile $GS_LOC/data/gdr2hip/gdr2-hip-xmatch-all.csv > $LOGS_LOC/$DSNAME.out
 fi
