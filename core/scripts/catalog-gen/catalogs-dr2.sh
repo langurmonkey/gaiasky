@@ -3,6 +3,23 @@
 # This script runs the generation of all LOD DR2 catalogs
 # You must copy this script to your $GS folder for it to work properly
 
+usage() {
+    echo "Usage: $0 catalog_1 catalog_2 ... [-h]"
+    echo "    catalog_n: small, default, bright, large, verylarge, extralarge, ratherlarge, ruwe"
+    echo
+    echo "    OPTIONS:"
+    echo "       -h    show this help"
+    1>&2; exit 1
+}
+
+while getopts "h" arg; do
+  case $arg in
+    h)
+      usage 
+      ;;
+  esac
+done
+
 # Get script path
 SOURCE="${BASH_SOURCE[0]}"
 while [ -h "$SOURCE" ]; do # resolve $SOURCE until the file is no longer a symlink
@@ -18,9 +35,16 @@ DATA_LOC="$HOME/gaiadata"
 DR_BASE="$DATA_LOC/DR2"
 DR_LOC="$DR_LOC/dr2"
 
-# Add here the names of the datasets to generate
+# Datasets to generate. Passed via arguments.
 # Values: small, default, bright, large, verylarge, extralarge, ratherlarge, ruwe
-TORUN=("small" "default")
+if [ "$#" -eq 0 ]; then
+    TORUN=("small" "default")
+    echo "Using default catalog list: ${TORUN[*]}"
+else
+    TORUN=( "$@" )
+    echo "Using user catalog list: ${TORUN[*]}"
+fi
+
 
 # Column names (see ColId)
 COLS="sourceid,ra,dec,pllx,ra_err,dec_err,pllx_err,pmra,pmdec,radvel,pmra_err,pmdec_err,radvel_err,gmag,bpmag,rpmag,ref_epoch,teff,radius,ag,ebp_min_rp"
