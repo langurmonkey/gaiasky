@@ -421,6 +421,7 @@ public abstract class AbstractStarGroupDataProvider implements IStarGroupDataPro
     @Override
     public void setAdditionalFiles(String additionalFiles) {
         this.additionalFiles = additionalFiles.split(",");
+        this.additional = new ArrayList<>();
         if (additionalFiles != null && this.additionalFiles.length > 0)
             loadAdditional();
     }
