@@ -272,9 +272,11 @@ public class CsvCatalogDataProvider extends AbstractStarGroupDataProvider {
                         // Galactic latitude in radians
                         double magcorraux = 0;
                         if (magCorrections) {
-                            if (hasIdx(ColId.ag) && !tokens[idx(ColId.ag)].isEmpty()) {
+                            if (hasCol(ColId.ag) && !tokens[idx(ColId.ag)].isEmpty()) {
                                 // Take extinction from database
                                 ag = Parser.parseDouble(tokens[idx(ColId.ag)]);
+                            }else if(hasAdditional(ColId.ag, sourceid)){
+                                ag = getAdditionalValue(ColId.ag, sourceid);
                             } else {
                                 // Compute extinction analytically
                                 Vector3d posgal = new Vector3d(pos);
@@ -300,9 +302,12 @@ public class CsvCatalogDataProvider extends AbstractStarGroupDataProvider {
                         // Reddening
                         double ebr = 0;
                         if (magCorrections) {
-                            if (hasIdx(ColId.ebp_min_rp) && !tokens[idx(ColId.ebp_min_rp)].isEmpty()) {
+                            if (hasCol(ColId.ebp_min_rp) && !tokens[idx(ColId.ebp_min_rp)].isEmpty()) {
                                 // Take reddening from table
                                 ebr = Parser.parseDouble(tokens[idx(ColId.ebp_min_rp)]);
+                            }else if(hasAdditional(ColId.ebp_min_rp, sourceid)){
+                                // From additional
+                                ebr = getAdditionalValue(ColId.ebp_min_rp, sourceid);
                             } else {
                                 // Compute reddening analtytically
                                 ebr = magcorraux * 2.9e-4;

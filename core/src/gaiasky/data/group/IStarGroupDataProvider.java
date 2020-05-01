@@ -101,6 +101,12 @@ public interface IStarGroupDataProvider extends IParticleGroupDataProvider {
     void setMagCorrections(boolean magCorrections);
 
     /**
+     * Set location of additional columns file or directory
+     * @param additionalFile File or directory with additional columns per sourceId
+     */
+    void setAdditionalFile(String additionalFile);
+
+    /**
      * Sets the location of the geometric distances file or directory
      *
      * @param geoDistFile File or directory with geometric distances per sourceId

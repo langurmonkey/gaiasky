@@ -139,6 +139,9 @@ public class OctreeGeneratorRun {
     @Parameter(names = "--columns", description = "Column name list separated by commas, in order of appearance, if loading using the CSVCatalogDataProvider (see AbstractStarGroupDataProvider.ColId)")
     private String columns = null;
 
+    @Parameter(names = "--additional", description = "CSV file with additional columns (matched by name) of main catalog. The file can be gzipped and must contain a Gaia sourceid column in the first position")
+    private String additionalFile = null;
+
     @Parameter(names = "--compat-mode", description = "Use the compatibility mode format (DR1/DR2), where the files have tycho ids")
     private boolean compatibilityMode = false;
 
@@ -233,6 +236,7 @@ public class OctreeGeneratorRun {
             loader.setFileNumberCap(fileNumCap);
             loader.setMagCorrections(magCorrections);
             loader.setDistanceCap(distcap);
+            loader.setAdditionalFile(additionalFile);
             loader.setGeoDistancesFile(geodistFile);
             loader.setRUWEFile(ruweFile);
             loader.setRUWECap(ruwe);
