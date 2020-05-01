@@ -236,7 +236,8 @@ public class CsvCatalogDataProvider extends AbstractStarGroupDataProvider {
                 }
 
                 // If we have geometric distances, we only accept those, otherwise, accept all
-                if (mustLoad || !hasGeoDistances() || (hasGeoDistances() && hasGeoDistance(sourceid))) {
+                boolean geodist = hasAdditionalColumn(ColId.geodist);
+                if (mustLoad || !geodist || (geodist && hasAdditional(ColId.geodist, sourceid))) {
                     distpc = geodistpc > 0 ? geodistpc : distpc;
 
                     if (mustLoad || acceptDistance(distpc)) {

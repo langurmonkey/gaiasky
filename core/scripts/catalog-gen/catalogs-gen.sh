@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 # This script runs catalogs defined in catalogs-def.json. It needs to be called
-# with some variables set: LOGS_LOC, DATA_LOC, DR_BASE, DR_LOC, COLS
+# with some variables set: LOGS_LOC, DATA_LOC, DR_BASE, DR_LOC, COLS, CATDEF
 # Dependencies: jq
 # You must copy this script and the definition to your $GS folder for it to work properly
 
@@ -75,24 +75,24 @@ function contains() {
     return 1
 }
 
-NCAT=$(jq '.catalogs | length' $GSDIR/catalogs-def.json)
+NCAT=$(jq '.catalogs | length' $CATDEF)
 
 for ((j=0;j<NCAT;j++)); do
     # Get catalog name
-    NAME=$(jq ".catalogs[$j].name" $GSDIR/catalogs-def.json)
+    NAME=$(jq ".catalogs[$j].name" $CATDEF)
     # Remove quotes
     NAME=$(sed -e 's/^"//' -e 's/"$//' <<<"$NAME")
     if [ $(contains "${TORUN[@]}" "$NAME") == "y" ]; then
         DSNAME="00$j-$(date +'%Y%m%d')-edr3int2-$NAME"
         echo $DSNAME
         CMD="nohup $GSDIR/octreegen --loader CsvCatalogDataProvider --input $DR_LOC/csv/ --output $DR_LOC/out/$DSNAME/"
-        NATTR=$(jq ".catalogs[$j] | length" $GSDIR/catalogs-def.json)
+        NATTR=$(jq ".catalogs[$j] | length" $CATDEF)
         for ((k=0;k<NATTR;k++)); do
-            KEY=$(jq ".catalogs[$j] | keys[$k]" $GSDIR/catalogs-def.json)
+            KEY=$(jq ".catalogs[$j] | keys[$k]" $CATDEF)
             # Remove quotes
             KEY=$(sed -e 's/^"//' -e 's/"$//' <<<"$KEY")
             if [ "$KEY" != "name" ]; then
-                VAL=$(jq ".catalogs[$j].$KEY" $GSDIR/catalogs-def.json)
+                VAL=$(jq ".catalogs[$j].$KEY" $CATDEF)
                 # Remove quotes
                 VAL=$(sed -e 's/^"//' -e 's/"$//' <<<"$VAL")
                 #echo "$KEY -> $VAL"

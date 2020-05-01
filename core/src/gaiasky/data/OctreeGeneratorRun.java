@@ -124,23 +124,17 @@ public class OctreeGeneratorRun {
     @Parameter(names = "--xmatchfile", description = "Crossmatch file between Gaia and HIP, containing source_id to hip data, only if --hip is enabled")
     private String xmatchFile = null;
 
-    @Parameter(names = "--geodistfile", description = "Use this file or directory to lookup distances. Argument is a file or directory with files of of <sourceid, dist[pc]>. If this argument is used, both --pllxerrfaint and --pllxerrbright are ignored")
-    private String geodistFile = null;
-
     @Parameter(names = "--distcap", description = "Specifies a maximum distance in parsecs. Stars beyond this distance are not loaded")
     private double distcap = Long.MAX_VALUE;
 
     @Parameter(names = "--ruwe", description = "RUWE threshold value. All stars with a RUWE larger than this value will not be used. Also, if present, --pllxerrfaint and --pllxerrbright are ignored")
     private double ruwe = Double.NaN;
 
-    @Parameter(names = "--ruwe-file", description = "Location of gzipped file containing the RUWE value for each source id, if the main catalog does not provide them")
-    private String ruweFile = null;
-
     @Parameter(names = "--columns", description = "Column name list separated by commas, in order of appearance, if loading using the CSVCatalogDataProvider (see AbstractStarGroupDataProvider.ColId)")
     private String columns = null;
 
-    @Parameter(names = "--additional", description = "File or folder with (optionally gzipped) csv files containing additional columns (matched by name) of main catalog. The file can be gzipped and must contain a Gaia sourceid column in the first position")
-    private String additionalFile = null;
+    @Parameter(names = "--additional", description = "Comma-separated list of files or folders with (optionally gzipped) csv files containing additional columns (matched by name) of main catalog. The file can be gzipped and must contain a Gaia sourceid column in the first position")
+    private String additionalFiles = null;
 
     @Parameter(names = "--compat-mode", description = "Use the compatibility mode format (DR1/DR2), where the files have tycho ids")
     private boolean compatibilityMode = false;
@@ -236,9 +230,7 @@ public class OctreeGeneratorRun {
             loader.setFileNumberCap(fileNumCap);
             loader.setMagCorrections(magCorrections);
             loader.setDistanceCap(distcap);
-            loader.setAdditionalFile(additionalFile);
-            loader.setGeoDistancesFile(geodistFile);
-            loader.setRUWEFile(ruweFile);
+            loader.setAdditionalFiles(additionalFiles);
             loader.setRUWECap(ruwe);
             countsPerMagGaia = loader.getCountsPerMag();
 

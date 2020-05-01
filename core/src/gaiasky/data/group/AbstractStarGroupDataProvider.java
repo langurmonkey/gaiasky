@@ -56,8 +56,6 @@ public abstract class AbstractStarGroupDataProvider implements IStarGroupDataPro
     protected LongMap<double[]> sphericalPositions;
     protected LongMap<float[]> colors;
     protected long[] countsPerMag;
-    protected LargeLongMap<Double> geoDistances = null;
-    protected LargeLongMap<Float> ruweValues = null;
     protected Set<Long> mustLoadIds = null;
 
     public class AdditionalCols {
@@ -83,40 +81,42 @@ public abstract class AbstractStarGroupDataProvider implements IStarGroupDataPro
         }
     }
 
-    protected AdditionalCols additional;
-    protected boolean hasAdditional(ColId col, Long sourceid){
-        return getAdditionalValue(col, sourceid) != null;
+    protected List<AdditionalCols> additional;
+
+    protected boolean hasAdditional(ColId col, Long sourceId) {
+        return getAdditionalValue(col, sourceId) != null;
     }
-    protected boolean hasAdditionalCol(ColId col){
-        return additional != null && additional.hasCol(col);
+
+    protected boolean hasAdditionalColumn(ColId col) {
+        for (AdditionalCols add : additional) {
+            if (add != null && add.hasCol(col))
+                return true;
+        }
+        return false;
     }
-    protected Double getAdditionalValue(ColId col, Long sourceid){
-        return additional != null ? additional.get(col, sourceid) : null;
+
+    protected Double getAdditionalValue(ColId col, Long sourceId) {
+        for (AdditionalCols add : additional) {
+            if (add != null && add.hasCol(col)) {
+                Double d = add.get(col, sourceId);
+                if (d != null)
+                    return d;
+            }
+        }
+        return null;
     }
 
     /**
-     * CSV file with additional columns to be matched by sourceid with the main catalog
+     * Files or folders with optionally gzipped CSVs containing additional columns to be matched by sourceid with the main catalog. Column names must comport
+     * to {@link ColId}
      */
-    protected String additionalFile = null;
-    /**
-     * Points to the location of a file or directory which contains a set of <sourceId, distance[pc]>
-     */
-    protected String geoDistFile = null;
-
-    /**
-     * Location of gzipped file with <sourceId, RUWE>
-     */
-    protected String ruweFile = null;
+    protected String[] additionalFiles = null;
+    private String additionalSplit = ",";
 
     /**
      * RUWE cap value. Will accept all stars with star_ruwe <= ruwe
      */
     protected Double ruwe = Double.NaN;
-
-    /**
-     * Errors (negative or nan values) reading geometric distance files
-     */
-    protected long geoDistErrors = 0;
 
     /**
      * Distance cap in parsecs
@@ -245,7 +245,7 @@ public abstract class AbstractStarGroupDataProvider implements IStarGroupDataPro
      */
     protected boolean acceptParallax(double appmag, double pllx, double pllxerr) {
         // If geometric distances are present, always accept, we use distances directly
-        if (geoDistances != null)
+        if (hasAdditionalColumn(ColId.geodist))
             return true;
 
         if (adaptiveParallax && appmag < 13.1) {
@@ -258,26 +258,22 @@ public abstract class AbstractStarGroupDataProvider implements IStarGroupDataPro
     protected float getRuweValue(long sourceId, String[] tokens) {
         if (hasCol(ColId.ruwe)) {
             return Parser.parseFloat(tokens[idx(ColId.ruwe)]);
-        } else if (hasAdditional(ColId.ruwe, sourceId)){
+        } else if (hasAdditional(ColId.ruwe, sourceId)) {
             return getAdditionalValue(ColId.ruwe, sourceId).floatValue();
-        } else if (ruweValues != null && ruweValues.containsKey(sourceId)) {
-            return ruweValues.get(sourceId);
         }
         return Float.NaN;
     }
 
     /**
-     * Gets the distance in parsecs to the star from the geometric distances
+     * Gets the distance in parsecs to the star from the additional columns
      * map, if it exists. Otherwise, it returns a negative value.
      *
      * @param sourceId The source id of the source
      * @return The geometric distance in parsecs if it exists, -1 otherwise.
      */
     protected double getGeoDistance(long sourceId) {
-        if(hasAdditional(ColId.geodist, sourceId)) {
+        if (hasAdditional(ColId.geodist, sourceId)) {
             return getAdditionalValue(ColId.geodist, sourceId);
-        }else if (geoDistances != null && geoDistances.containsKey(sourceId)) {
-            return geoDistances.get(sourceId);
         }
         return -1;
     }
@@ -290,14 +286,6 @@ public abstract class AbstractStarGroupDataProvider implements IStarGroupDataPro
      */
     protected boolean acceptDistance(double distance) {
         return distance <= distCap;
-    }
-
-    protected boolean hasGeoDistance(long sourceId) {
-        return geoDistances != null && geoDistances.containsKey(sourceId);
-    }
-
-    protected boolean hasGeoDistances() {
-        return geoDistances != null && !geoDistances.isEmpty();
     }
 
     protected int countLines(FileHandle f) throws IOException {
@@ -431,17 +419,10 @@ public abstract class AbstractStarGroupDataProvider implements IStarGroupDataPro
     }
 
     @Override
-    public void setAdditionalFile(String additionalFile) {
-        this.additionalFile = additionalFile;
-        if (additionalFile != null)
+    public void setAdditionalFiles(String additionalFiles) {
+        this.additionalFiles = additionalFiles.split(",");
+        if (additionalFiles != null && this.additionalFiles.length > 0)
             loadAdditional();
-    }
-
-    @Override
-    public void setGeoDistancesFile(String geoDistFile) {
-        this.geoDistFile = geoDistFile;
-        if (geoDistFile != null)
-            loadGeometricDistances();
     }
 
     @Override
@@ -450,31 +431,28 @@ public abstract class AbstractStarGroupDataProvider implements IStarGroupDataPro
     }
 
     @Override
-    public void setRUWEFile(String RUWEFile) {
-        this.ruweFile = RUWEFile;
-        if (this.ruweFile != null)
-            loadRuweFile();
-    }
-
-    @Override
     public void setRUWECap(double RUWE) {
         this.ruwe = RUWE;
     }
 
     private void loadAdditional() {
-        additional = new AdditionalCols();
-        additional.indices = new HashMap<>();
-        additional.values = new LargeLongMap<>(10);
+        for(String additionalFile : additionalFiles) {
+            additionalSplit = ",";
+            AdditionalCols addit = new AdditionalCols();
+            addit.indices = new HashMap<>();
+            addit.values = new LargeLongMap<>(10);
 
-        logger.info("Loading additional columns from " + additionalFile);
+            logger.info("Loading additional columns from " + additionalFile);
 
-        Path f = Paths.get(additionalFile);
-        loadAdditional(f);
+            Path f = Paths.get(additionalFile);
+            loadAdditional(f, addit);
+            additional.add(addit);
 
-        logger.info(additional.indices.size() + " additional columns loaded for " + additional.values.size() + " stars");
+            logger.info(addit.indices.size() + " additional columns loaded for " + addit.values.size() + " stars");
+        }
     }
 
-    private void loadAdditional(Path f) {
+    private void loadAdditional(Path f, AdditionalCols addit) {
         if (Files.isDirectory(f, LinkOption.NOFOLLOW_LINKS)) {
             File[] files = f.toFile().listFiles();
             int nfiles = files.length;
@@ -484,37 +462,37 @@ public abstract class AbstractStarGroupDataProvider implements IStarGroupDataPro
                 if (nfiles > 60 && i % mod == 0) {
                     logger.info("Loading file " + i + "/" + nfiles);
                 }
-                loadAdditional(file.toPath());
+                loadAdditional(file.toPath(), addit);
                 i++;
             }
         } else {
             try {
-                loadAdditionalFile(f);
+                loadAdditionalFile(f, addit);
             } catch (Exception e) {
                 logger.error(e);
             }
         }
     }
 
-    private String split = ",";
 
     /**
-     * Loads a single file, optionally gzipped
+     * Loads a single file, optionally gzipped into the given {@link AdditionalCols}
      *
      * @param f The path
+     * @param addit The {@link AdditionalCols} instance
      * @throws IOException
      * @throws RuntimeException
      */
-    private void loadAdditionalFile(Path f) throws IOException, RuntimeException {
+    private void loadAdditionalFile(Path f, AdditionalCols addit) throws IOException, RuntimeException {
         InputStream data = new FileInputStream(f.toFile());
         if (f.toString().endsWith(".gz"))
             data = new GZIPInputStream(data);
         BufferedReader br = new BufferedReader(new InputStreamReader(data));
         // Read header
-        String[] header = br.readLine().strip().split(split);
+        String[] header = br.readLine().strip().split(additionalSplit);
         if (header.length < 2) {
-            split = "\\s+";
-            header = br.readLine().strip().split(split);
+            additionalSplit = "\\s+";
+            header = br.readLine().strip().split(additionalSplit);
         }
         int i = 0;
         for (String col : header) {
@@ -523,8 +501,8 @@ public abstract class AbstractStarGroupDataProvider implements IStarGroupDataPro
                 logger.error("First column: " + col + ", should be: " + ColId.sourceid.name());
                 throw new RuntimeException("Additional columns file must contain a sourceid in the first column");
             }
-            if (i > 0 && !additional.indices.containsKey(col)) {
-                additional.indices.put(col, i-1);
+            if (i > 0 && !addit.indices.containsKey(col)) {
+                addit.indices.put(col, i - 1);
             }
             i++;
         }
@@ -533,19 +511,19 @@ public abstract class AbstractStarGroupDataProvider implements IStarGroupDataPro
         i = 0;
         try {
             while ((line = br.readLine()) != null) {
-                String[] tokens = line.split(split);
+                String[] tokens = line.split(additionalSplit);
                 Long sourceId = Parser.parseLong(tokens[0].trim());
                 double[] vals = new double[n];
                 for (int j = 1; j <= n; j++) {
                     if (tokens[j] != null && !tokens[j].strip().isBlank()) {
                         Double val = Parser.parseDouble(tokens[j].strip());
-                        vals[j-1] = val;
+                        vals[j - 1] = val;
                     } else {
                         // No value
-                        vals[j-1] = Double.NaN;
+                        vals[j - 1] = Double.NaN;
                     }
                 }
-                additional.values.put(sourceId, vals);
+                addit.values.put(sourceId, vals);
                 i++;
             }
             br.close();
@@ -555,95 +533,4 @@ public abstract class AbstractStarGroupDataProvider implements IStarGroupDataPro
         }
     }
 
-    private void loadRuweFile() {
-        if (ruweFile != null) {
-            ruweValues = new LargeLongMap<Float>(20);
-            logger.info("Loading RUWE values from " + ruweFile);
-
-            Path f = Paths.get(ruweFile);
-            try {
-                loadRuweFile(f);
-                logger.info(ruweValues.size() + " RUWE values loaded");
-            } catch (Exception e) {
-                logger.error(e, "Loading RUWE file failed: " + f.toString());
-            }
-
-        }
-    }
-
-    private void loadRuweFile(Path p) throws IOException {
-        InputStream fileStream = new FileInputStream(p.toFile());
-        InputStream gzipStream = new GZIPInputStream(fileStream);
-        BufferedReader br = new BufferedReader(new InputStreamReader(gzipStream));
-        String line;
-        while ((line = br.readLine()) != null) {
-            String[] tokens = line.split("\\s+");
-            Long sourceId = Parser.parseLong(tokens[0].trim());
-            Double ruweVal = Parser.parseDouble(tokens[1].trim());
-            ruweValues.put(sourceId, ruweVal.floatValue());
-
-        }
-        br.close();
-    }
-
-    private void loadGeometricDistances() {
-        geoDistances = new LargeLongMap<Double>(10);
-        geoDistErrors = 0;
-
-        logger.info("Loading geometric distances from " + geoDistFile);
-
-        Path f = Paths.get(geoDistFile);
-        loadGeometricDistances(f);
-
-        logger.info(geoDistances.size() + " geometric distances loaded (" + geoDistErrors + " negative or nan values)");
-    }
-
-    private void loadGeometricDistances(Path f) {
-        if (Files.isDirectory(f, LinkOption.NOFOLLOW_LINKS)) {
-            File[] files = f.toFile().listFiles();
-            int nfiles = files.length;
-            int mod = nfiles / 20;
-            int i = 1;
-            for (File file : files) {
-                if (i % mod == 0) {
-                    logger.info("Loading file " + i + "/" + nfiles);
-                }
-                loadGeometricDistances(file.toPath());
-                i++;
-            }
-        } else {
-            try {
-                loadGeometricDistanceFile(f);
-            } catch (Exception e) {
-                logger.error(e, "Loading failed: " + f.toString());
-            }
-        }
-    }
-
-    private void loadGeometricDistanceFile(Path f) throws IOException, RuntimeException {
-        InputStream data = new FileInputStream(f.toFile());
-        BufferedReader br = new BufferedReader(new InputStreamReader(data));
-        // Skip header
-        br.readLine();
-        String line;
-        int i = 0;
-        try {
-            while ((line = br.readLine()) != null) {
-                String[] tokens = line.split("\\s+");
-                Long sourceId = Parser.parseLong(tokens[0].trim());
-                Double dist = Parser.parseDouble(tokens[1].trim());
-                if (!dist.isNaN() && dist >= 0) {
-                    geoDistances.put(sourceId, dist);
-                } else {
-                    logger.debug("Distance " + i + " is NaN or negative: " + dist + " (file " + f.toString() + ")");
-                    geoDistErrors++;
-                }
-                i++;
-            }
-            br.close();
-        } catch (Exception e) {
-            logger.error(e);
-            br.close();
-        }
-    }
 }

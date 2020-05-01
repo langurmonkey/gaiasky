@@ -104,21 +104,7 @@ public interface IStarGroupDataProvider extends IParticleGroupDataProvider {
      * Set location of additional columns file or directory
      * @param additionalFile File or directory with additional columns per sourceId
      */
-    void setAdditionalFile(String additionalFile);
-
-    /**
-     * Sets the location of the geometric distances file or directory
-     *
-     * @param geoDistFile File or directory with geometric distances per sourceId
-     */
-    void setGeoDistancesFile(String geoDistFile);
-
-    /**
-     * Sets the location of the gzipped RUWE file
-     *
-     * @param RUWEFile Gzipped file with RUWE values for each source id
-     */
-    void setRUWEFile(String RUWEFile);
+    void setAdditionalFiles(String additionalFile);
 
     /**
      * Sets the RUWE criteria. RUWE file must have been set

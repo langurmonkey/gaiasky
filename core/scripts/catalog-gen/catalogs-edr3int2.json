@@ -1,0 +1,103 @@
+{
+    "catalogs" : [
+        {
+            "name" : "small",
+            "maxpart" : 100000,
+            "pllxerrbright" : 0.1,
+            "pllxerrfaint" : 0.005,
+            "pllxzeropoint" : -0.02,
+            "magcorrections" : null,
+            "additional" : "$GSDIR/data/dr2-ag-e/",
+            "hip" : null,
+            "xmatchfile" : "$GSDIR/data/gdr2hip/gdr2-hip-xmatch-all.csv"
+        },
+        {
+            "name" : "default",
+            "maxpart" : 100000,
+            "pllxerrbright" : 0.2,
+            "pllxerrfaint" : 0.005,
+            "pllxzeropoint" : -0.02,
+            "magcorrections" : null,
+            "additional" : "$GSDIR/data/dr2-ag-e/",
+            "hip" : null,
+            "xmatchfile" : "$GSDIR/data/gdr2hip/gdr2-hip-xmatch-all.csv"
+        },
+        {
+            "name" : "bright",
+            "maxpart" : 100000,
+            "pllxerrbright" : 0.9,
+            "pllxerrfaint" : 0.0,
+            "pllxzeropoint" : -0.02,
+            "magcorrections" : null,
+            "additional" : "$GSDIR/data/dr2-ag-e/",
+            "hip" : null,
+            "xmatchfile" : "$GSDIR/data/gdr2hip/gdr2-hip-xmatch-all.csv"
+        },
+        {
+            "name" : "large",
+            "maxpart" : 100000,
+            "pllxerrbright" : 0.5,
+            "pllxerrfaint" : 0.125,
+            "pllxzeropoint" : -0.02,
+            "magcorrections" : null,
+            "additional" : "$GSDIR/data/dr2-ag-e/",
+            "hip" : null,
+            "xmatchfile" : "$GSDIR/data/gdr2hip/gdr2-hip-xmatch-all.csv"
+        },
+        {
+            "name" : "verylarge",
+            "maxpart" : 100000,
+            "pllxerrbright" : 0.9,
+            "pllxerrfaint" : 0.9,
+            "pllxzeropoint" : -0.02,
+            "postprocess" : null,
+            "childcount" : 10000,
+            "parentcount" : 50000,
+            "magcorrections" : null,
+            "additional" : "$GSDIR/data/dr2-ag-e/",
+            "hip" : null,
+            "xmatchfile" : "$GSDIR/data/gdr2hip/gdr2-hip-xmatch-all.csv"
+        },
+        {
+            "name" : "extralarge",
+            "maxpart" : 100000,
+            "pllxzeropoint" : -0.02,
+            "geodistfile" : "$DR_BASE/geo_distances/",
+            "postprocess" : null,
+            "childcount" : 10000,
+            "parentcount" : 50000,
+            "magcorrections" : null,
+            "additional" : "$GSDIR/data/dr2-ag-e/",
+            "hip" : null,
+            "xmatchfile" : "$GSDIR/data/gdr2hip/gdr2-hip-xmatch-all.csv"
+        },
+        {
+            "name" : "ratherlarge",
+            "maxpart" : 100000,
+            "pllxerrbright" : 0.5,
+            "pllxerrfaint" : 0.5,
+            "pllxzeropoint" : -0.02,
+            "postprocess" : null,
+            "childcount" : 1000,
+            "parentcount" : 50000,
+            "magcorrections" : null,
+            "additional" : "$GSDIR/data/dr2-ag-e/",
+            "hip" : null,
+            "xmatchfile" : "$GSDIR/data/gdr2hip/gdr2-hip-xmatch-all.csv"
+        },
+        {
+            "name" : "ruwe",
+            "maxpart" : 100000,
+            "ruwe" : 1.4,
+            "pllxzeropoint" : -0.02,
+            "postprocess" : null,
+            "childcount" : 1000,
+            "parentcount" : 50000,
+            "magcorrections" : null,
+            "additional" : "$GSDIR/data/dr2-ag-e/",
+            "hip" : null,
+            "xmatchfile" : "$GSDIR/data/gdr2hip/gdr2-hip-xmatch-all.csv"
+        }
+
+    ]
+}
