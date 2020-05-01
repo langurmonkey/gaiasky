@@ -2,6 +2,15 @@
 
 # Generates DR2 catalogs
 
+# Get script path
+SOURCE="${BASH_SOURCE[0]}"
+while [ -h "$SOURCE" ]; do # resolve $SOURCE until the file is no longer a symlink
+  GSDIR="$( cd -P "$( dirname "$SOURCE" )" && pwd )"
+  SOURCE="$(readlink "$SOURCE")"
+  [[ $SOURCE != /* ]] && SOURCE="$GSDIR/$SOURCE" # if $SOURCE was a relative symlink, we need to resolve it relative to the path where the symlink file was located
+done
+GSDIR="$( cd -P "$( dirname "$SOURCE" )" && pwd )"
+
 # Locations
 LOGS_LOC="$GSDIR/dr2_logs"
 DATA_LOC="$HOME/gaiadata"

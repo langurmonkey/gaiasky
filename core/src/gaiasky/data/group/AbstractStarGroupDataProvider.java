@@ -481,7 +481,7 @@ public abstract class AbstractStarGroupDataProvider implements IStarGroupDataPro
             int mod = nfiles / 20;
             int i = 1;
             for (File file : files) {
-                if (i % mod == 0) {
+                if (nfiles > 60 && i % mod == 0) {
                     logger.info("Loading file " + i + "/" + nfiles);
                 }
                 loadAdditional(file.toPath());
@@ -491,7 +491,7 @@ public abstract class AbstractStarGroupDataProvider implements IStarGroupDataPro
             try {
                 loadAdditionalFile(f);
             } catch (Exception e) {
-                logger.error(e, "Loading failed: " + f.toString());
+                logger.error(e);
             }
         }
     }
@@ -507,7 +507,7 @@ public abstract class AbstractStarGroupDataProvider implements IStarGroupDataPro
      */
     private void loadAdditionalFile(Path f) throws IOException, RuntimeException {
         InputStream data = new FileInputStream(f.toFile());
-        if (f.endsWith(".gz"))
+        if (f.toString().endsWith(".gz"))
             data = new GZIPInputStream(data);
         BufferedReader br = new BufferedReader(new InputStreamReader(data));
         // Read header
@@ -520,10 +520,11 @@ public abstract class AbstractStarGroupDataProvider implements IStarGroupDataPro
         for (String col : header) {
             col = col.strip();
             if (i == 0 && !col.equals(ColId.sourceid.name())) {
+                logger.error("First column: " + col + ", should be: " + ColId.sourceid.name());
                 throw new RuntimeException("Additional columns file must contain a sourceid in the first column");
             }
             if (i > 0 && !additional.indices.containsKey(col)) {
-                additional.indices.put(col, i);
+                additional.indices.put(col, i-1);
             }
             i++;
         }
@@ -538,10 +539,10 @@ public abstract class AbstractStarGroupDataProvider implements IStarGroupDataPro
                 for (int j = 1; j <= n; j++) {
                     if (tokens[j] != null && !tokens[j].strip().isBlank()) {
                         Double val = Parser.parseDouble(tokens[j].strip());
-                        vals[j] = val;
+                        vals[j-1] = val;
                     } else {
                         // No value
-                        vals[j] = Double.NaN;
+                        vals[j-1] = Double.NaN;
                     }
                 }
                 additional.values.put(sourceId, vals);
