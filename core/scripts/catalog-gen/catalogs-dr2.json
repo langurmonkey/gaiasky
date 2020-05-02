@@ -8,7 +8,7 @@
             "pllxzeropoint" : -0.02,
             "magcorrections" : null,
             "hip" : null,
-            "xmatchfile" : "$GSDIR/data/gdr2hip/gdr2-hip-xmatch-all.csv"
+            "xmatchfile" : "$DATA_LOC/data/gdr2hip/gdr2-hip-xmatch-all.csv"
         },
         {
             "name" : "default",
@@ -18,7 +18,7 @@
             "pllxzeropoint" : -0.02,
             "magcorrections" : null,
             "hip" : null,
-            "xmatchfile" : "$GSDIR/data/gdr2hip/gdr2-hip-xmatch-all.csv"
+            "xmatchfile" : "$DATA_LOC/data/gdr2hip/gdr2-hip-xmatch-all.csv"
         },
         {
             "name" : "bright",
@@ -28,7 +28,7 @@
             "pllxzeropoint" : -0.02,
             "magcorrections" : null,
             "hip" : null,
-            "xmatchfile" : "$GSDIR/data/gdr2hip/gdr2-hip-xmatch-all.csv"
+            "xmatchfile" : "$DATA_LOC/data/gdr2hip/gdr2-hip-xmatch-all.csv"
         },
         {
             "name" : "large",
@@ -38,7 +38,7 @@
             "pllxzeropoint" : -0.02,
             "magcorrections" : null,
             "hip" : null,
-            "xmatchfile" : "$GSDIR/data/gdr2hip/gdr2-hip-xmatch-all.csv"
+            "xmatchfile" : "$DATA_LOC/data/gdr2hip/gdr2-hip-xmatch-all.csv"
         },
         {
             "name" : "verylarge",
@@ -51,7 +51,7 @@
             "parentcount" : 50000,
             "magcorrections" : null,
             "hip" : null,
-            "xmatchfile" : "$GSDIR/data/gdr2hip/gdr2-hip-xmatch-all.csv"
+            "xmatchfile" : "$DATA_LOC/data/gdr2hip/gdr2-hip-xmatch-all.csv"
         },
         {
             "name" : "extralarge",
@@ -63,7 +63,7 @@
             "parentcount" : 50000,
             "magcorrections" : null,
             "hip" : null,
-            "xmatchfile" : "$GSDIR/data/gdr2hip/gdr2-hip-xmatch-all.csv"
+            "xmatchfile" : "$DATA_LOC/data/gdr2hip/gdr2-hip-xmatch-all.csv"
         },
         {
             "name" : "ratherlarge",
@@ -76,7 +76,7 @@
             "parentcount" : 50000,
             "magcorrections" : null,
             "hip" : null,
-            "xmatchfile" : "$GSDIR/data/gdr2hip/gdr2-hip-xmatch-all.csv"
+            "xmatchfile" : "$DATA_LOC/data/gdr2hip/gdr2-hip-xmatch-all.csv"
         },
         {
             "name" : "ruwe",
@@ -89,7 +89,7 @@
             "parentcount" : 50000,
             "magcorrections" : null,
             "hip" : null,
-            "xmatchfile" : "$GSDIR/data/gdr2hip/gdr2-hip-xmatch-all.csv"
+            "xmatchfile" : "$DATA_LOC/data/gdr2hip/gdr2-hip-xmatch-all.csv"
         }
 
     ]

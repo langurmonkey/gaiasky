@@ -7,9 +7,9 @@
             "pllxerrfaint" : 0.015,
             "pllxzeropoint" : -0.02,
             "magcorrections" : null,
-            "additional" : "$GSDIR/data/dr2-ag-e/",
+            "additional" : "$DATA_LOC/data/dr2-ag-e/",
             "hip" : null,
-            "xmatchfile" : "$GSDIR/data/gdr2hip/gdr2-hip-xmatch-all.csv"
+            "xmatchfile" : "$DATA_LOC/data/gdr2hip/gdr2-hip-xmatch-all.csv"
         },
         {
             "name" : "small",
@@ -18,9 +18,9 @@
             "pllxerrfaint" : 0.005,
             "pllxzeropoint" : -0.02,
             "magcorrections" : null,
-            "additional" : "$GSDIR/data/dr2-ag-e/",
+            "additional" : "$DATA_LOC/data/dr2-ag-e/",
             "hip" : null,
-            "xmatchfile" : "$GSDIR/data/gdr2hip/gdr2-hip-xmatch-all.csv"
+            "xmatchfile" : "$DATA_LOC/data/gdr2hip/gdr2-hip-xmatch-all.csv"
         },
         {
             "name" : "medium",
@@ -29,9 +29,9 @@
             "pllxerrfaint" : 0.02,
             "pllxzeropoint" : -0.02,
             "magcorrections" : null,
-            "additional" : "$GSDIR/data/dr2-ag-e/",
+            "additional" : "$DATA_LOC/data/dr2-ag-e/",
             "hip" : null,
-            "xmatchfile" : "$GSDIR/data/gdr2hip/gdr2-hip-xmatch-all.csv"
+            "xmatchfile" : "$DATA_LOC/data/gdr2hip/gdr2-hip-xmatch-all.csv"
         },
         {
             "name" : "large",
@@ -40,9 +40,9 @@
             "pllxerrfaint" : 0.125,
             "pllxzeropoint" : -0.02,
             "magcorrections" : null,
-            "additional" : "$GSDIR/data/dr2-ag-e/",
+            "additional" : "$DATA_LOC/data/dr2-ag-e/",
             "hip" : null,
-            "xmatchfile" : "$GSDIR/data/gdr2hip/gdr2-hip-xmatch-all.csv"
+            "xmatchfile" : "$DATA_LOC/data/gdr2hip/gdr2-hip-xmatch-all.csv"
         },
         {
             "name" : "verylarge",
@@ -54,9 +54,9 @@
             "childcount" : 1000,
             "parentcount" : 50000,
             "magcorrections" : null,
-            "additional" : "$GSDIR/data/dr2-ag-e/",
+            "additional" : "$DATA_LOC/data/dr2-ag-e/",
             "hip" : null,
-            "xmatchfile" : "$GSDIR/data/gdr2hip/gdr2-hip-xmatch-all.csv"
+            "xmatchfile" : "$DATA_LOC/data/gdr2hip/gdr2-hip-xmatch-all.csv"
         },
         {
             "name" : "extralarge",
@@ -68,9 +68,9 @@
             "childcount" : 10000,
             "parentcount" : 50000,
             "magcorrections" : null,
-            "additional" : "$GSDIR/data/dr2-ag-e/",
+            "additional" : "$DATA_LOC/data/dr2-ag-e/",
             "hip" : null,
-            "xmatchfile" : "$GSDIR/data/gdr2hip/gdr2-hip-xmatch-all.csv"
+            "xmatchfile" : "$DATA_LOC/data/gdr2hip/gdr2-hip-xmatch-all.csv"
         },
         {
             "name" : "bright",
@@ -79,9 +79,9 @@
             "pllxerrfaint" : 0.0,
             "pllxzeropoint" : -0.02,
             "magcorrections" : null,
-            "additional" : "$GSDIR/data/dr2-ag-e/",
+            "additional" : "$DATA_LOC/data/dr2-ag-e/",
             "hip" : null,
-            "xmatchfile" : "$GSDIR/data/gdr2hip/gdr2-hip-xmatch-all.csv"
+            "xmatchfile" : "$DATA_LOC/data/gdr2hip/gdr2-hip-xmatch-all.csv"
         },
         {
             "name" : "ruwe",
@@ -92,9 +92,9 @@
             "childcount" : 1000,
             "parentcount" : 50000,
             "magcorrections" : null,
-            "additional" : "$GSDIR/data/dr2-ag-e/",
+            "additional" : "$DATA_LOC/data/dr2-ag-e/",
             "hip" : null,
-            "xmatchfile" : "$GSDIR/data/gdr2hip/gdr2-hip-xmatch-all.csv"
+            "xmatchfile" : "$DATA_LOC/data/gdr2hip/gdr2-hip-xmatch-all.csv"
         },
         {
             "name" : "full",
@@ -105,9 +105,9 @@
             "childcount" : 10000,
             "parentcount" : 50000,
             "magcorrections" : null,
-            "additional" : "$GSDIR/data/dr2-ag-e/",
+            "additional" : "$DATA_LOC/data/dr2-ag-e/",
             "hip" : null,
-            "xmatchfile" : "$GSDIR/data/gdr2hip/gdr2-hip-xmatch-all.csv"
+            "xmatchfile" : "$DATA_LOC/data/gdr2hip/gdr2-hip-xmatch-all.csv"
         }
     ]
 }
