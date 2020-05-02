@@ -47,10 +47,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 /**
  * Generates an octree of star groups.
@@ -442,16 +439,25 @@ public class OctreeGeneratorRun {
             logger.info("   Level " + level + ": " + levelinfo[0] + " octants, " + levelinfo[1] + " stars (" + formatter.format((double) levelinfo[1] * 100d / (double) list.size) + "%)");
             level++;
         }
+
         logger.info();
         logger.info("================");
         logger.info("FINAL TIME STATS");
         logger.info("================");
-        logger.info("Loading: " + loadingSecs + " seconds");
-        logger.info("Generating: " + generatingSecs + " seconds");
-        logger.info("Writing: " + writingSecs + " seconds");
-        logger.info("Total: " + totalSecs + " seconds");
+        logger.info("Loading: " + loadingSecs + " secs (" + formatTimeSecs((long) loadingSecs) + ")");
+        logger.info("Generating: " + generatingSecs + " secs (" + formatTimeSecs((long) generatingSecs) + ")");
+        logger.info("Writing: " + writingSecs + " secs (" + formatTimeSecs((long) writingSecs) + ")");
+        logger.info("Total: " + totalSecs + " secs (" + formatTimeSecs((long) totalSecs) + ")");
 
         return octree;
+    }
+
+    private String formatTimeSecs(long secs) {
+        long hours = secs / 3600l;
+        long minutes = (secs % 3600l) / 60l;
+        long seconds = secs % 60l;
+
+        return String.format(Locale.getDefault(), "%dh %dm %ds", hours, minutes, seconds);
     }
 
     private long[] combineCountsPerMag(long[] cpm1, long[] cpm2) {
