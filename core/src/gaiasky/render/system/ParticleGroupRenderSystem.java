@@ -99,7 +99,7 @@ public class ParticleGroupRenderSystem extends ImmediateRenderSystem implements 
                             double dmax = particleGroup.getMaxDistance();
 
                             ensureTempVertsSize(particleGroup.size() * curr.vertexSize);
-                            int n = particleGroup.data().size;
+                            int n = particleGroup.data().size();
                             int nadded = 0;
                             for (int i = 0; i < n; i++) {
                                 if (particleGroup.filter(i)) {

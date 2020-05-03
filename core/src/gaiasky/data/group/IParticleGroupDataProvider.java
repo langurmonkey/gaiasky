@@ -9,6 +9,7 @@ import com.badlogic.gdx.utils.Array;
 import gaiasky.scenegraph.ParticleGroup.ParticleBean;
 
 import java.io.InputStream;
+import java.util.List;
 
 /**
  * Data provider for a particle group.
@@ -22,7 +23,7 @@ public interface IParticleGroupDataProvider {
      * @param file The file to load
      * @return Array of particle beans
      */
-    Array<ParticleBean> loadData(String file);
+    List<ParticleBean> loadData(String file);
 
     /**
      * Loads the data applying a factor using a memory mapped file for improved speed.
@@ -31,7 +32,7 @@ public interface IParticleGroupDataProvider {
      * @param factor Factor to apply to the positions
      * @return Array of particle beans
      */
-    Array<ParticleBean> loadDataMapped(String file, double factor);
+    List<ParticleBean> loadDataMapped(String file, double factor);
 
     /**
      * Loads the data applying a factor.
@@ -40,7 +41,7 @@ public interface IParticleGroupDataProvider {
      * @param factor Factor to apply to the positions
      * @return Array of particle beans
      */
-    Array<ParticleBean> loadData(String file, double factor);
+    List<ParticleBean> loadData(String file, double factor);
 
     /**
      * Loads the data applying a factor.
@@ -49,7 +50,7 @@ public interface IParticleGroupDataProvider {
      * @param factor Factor to apply to the positions
      * @return Array of particle beans
      */
-    Array<ParticleBean> loadData(InputStream is, double factor);
+    List<ParticleBean> loadData(InputStream is, double factor);
 
     /**
      * Sets a cap on the number of files to load. Set to 0 or negative for

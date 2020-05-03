@@ -27,10 +27,9 @@ import java.io.*;
 import java.nio.MappedByteBuffer;
 import java.nio.channels.FileChannel;
 import java.nio.file.Paths;
-import java.util.Arrays;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
+import java.util.concurrent.atomic.AtomicLong;
+import java.util.function.Consumer;
 import java.util.zip.GZIPInputStream;
 
 /**
@@ -58,6 +57,12 @@ public class CsvCatalogDataProvider extends AbstractStarGroupDataProvider {
      */
     private INumberFormat nf;
 
+    /**
+     * Load lines in parallel
+     */
+    private boolean parallel = true;
+    private int parallelBufferSize = 200000;
+
     public CsvCatalogDataProvider() {
         super();
         indexMap = new HashMap<>();
@@ -81,7 +86,7 @@ public class CsvCatalogDataProvider extends AbstractStarGroupDataProvider {
      * @param columns Columns
      */
     public void setColumns(String columns) {
-        if(columns == null || columns.length() == 0){
+        if (columns == null || columns.length() == 0) {
             throw new RuntimeException("Please provide a list of columns");
         }
         String[] cols = columns.strip().split(comma);
@@ -111,19 +116,19 @@ public class CsvCatalogDataProvider extends AbstractStarGroupDataProvider {
         fileNumberCap = cap;
     }
 
-    public Array<ParticleBean> loadData(String file) {
+    public List<ParticleBean> loadData(String file) {
         return loadData(file, 1d);
     }
 
 
-    public Array<ParticleBean> loadData(String file, double factor, boolean compat) {
+    public List<ParticleBean> loadData(String file, double factor, boolean compat) {
         initLists(1000000);
 
         FileHandle f = GlobalConf.data.dataFileHandle(file);
         if (f.isDirectory()) {
             long numFiles = 0;
             try {
-                if(fileNumberCap > 0)
+                if (fileNumberCap > 0)
                     numFiles = Math.min(GlobalResources.fileCount(Paths.get(file)), fileNumberCap);
                 else
                     numFiles = GlobalResources.fileCount(Paths.get(file));
@@ -146,34 +151,43 @@ public class CsvCatalogDataProvider extends AbstractStarGroupDataProvider {
         } else {
             logger.warn("File skipped: " + f.path());
         }
-        logger.info(I18n.bundle.format("notif.nodeloader", list.size, f.path()));
+        logger.info(I18n.bundle.format("notif.nodeloader", list.size(), f.path()));
         return list;
     }
 
-    public Array<ParticleBean> loadData(InputStream is, double factor, boolean compat) {
+    public List<ParticleBean> loadData(InputStream is, double factor, boolean compat) {
         initLists(100000);
 
-        loadFileIs(is, factor, new LongWrap(0l), new LongWrap(0l));
+        loadFileIs(is, factor, new AtomicLong(0l), new AtomicLong(0l));
 
         return list;
     }
 
-    public void loadFileIs(InputStream is, double factor, LongWrap addedStars, LongWrap discardedStars) {
+    public void loadFileIs(InputStream is, double factor, AtomicLong addedStars, AtomicLong discardedStars) {
         // Simple case
         InputStream data = is;
         BufferedReader br = new BufferedReader(new InputStreamReader(data));
         try {
+            List<String> lineBuffer = new ArrayList<>(parallelBufferSize);
             int i = 0;
             String line;
             while ((line = br.readLine()) != null) {
-                // Skip first line
-                if (i > 0) {
-                    // Add star
-                    if (addStar(line)) {
-                        addedStars.value++;
-                    } else {
-                        discardedStars.value++;
-                    }
+                // Add to buffer
+                if (i > 0)
+                    lineBuffer.add(line);
+                if (lineBuffer.size() >= parallelBufferSize) {
+                    Consumer<String> c = (l) -> {
+                        if (addStar(l))
+                            addedStars.incrementAndGet();
+                        else
+                            discardedStars.incrementAndGet();
+                    };
+                    if (parallel)
+                        lineBuffer.parallelStream().forEach(c);
+                    else
+                        lineBuffer.stream().forEach(c);
+
+                    lineBuffer.clear();
                 }
                 i++;
             }
@@ -276,7 +290,7 @@ public class CsvCatalogDataProvider extends AbstractStarGroupDataProvider {
                             if (hasCol(ColId.ag) && !tokens[idx(ColId.ag)].isEmpty()) {
                                 // Take extinction from database
                                 ag = Parser.parseDouble(tokens[idx(ColId.ag)]);
-                            }else if(hasAdditional(ColId.ag, sourceid)){
+                            } else if (hasAdditional(ColId.ag, sourceid)) {
                                 ag = getAdditionalValue(ColId.ag, sourceid);
                             } else {
                                 // Compute extinction analytically
@@ -306,7 +320,7 @@ public class CsvCatalogDataProvider extends AbstractStarGroupDataProvider {
                             if (hasCol(ColId.ebp_min_rp) && !tokens[idx(ColId.ebp_min_rp)].isEmpty()) {
                                 // Take reddening from table
                                 ebr = Parser.parseDouble(tokens[idx(ColId.ebp_min_rp)]);
-                            }else if(hasAdditional(ColId.ebp_min_rp, sourceid)){
+                            } else if (hasAdditional(ColId.ebp_min_rp, sourceid)) {
                                 // From additional
                                 ebr = getAdditionalValue(ColId.ebp_min_rp, sourceid);
                             } else {
@@ -368,35 +382,21 @@ public class CsvCatalogDataProvider extends AbstractStarGroupDataProvider {
         return false;
     }
 
-    private class LongWrap {
-        public Long value;
-
-        public LongWrap(Long val) {
-            this.value = val;
-        }
-
-        @Override
-        public String toString() {
-            return Long.toString(value);
-        }
-
-    }
-
     @Override
-    public Array<ParticleBean> loadDataMapped(String file, double factor, boolean compat) {
+    public List<ParticleBean> loadDataMapped(String file, double factor, boolean compat) {
         return loadDataMapped(file, factor, -1, -1);
     }
 
     /**
      * Uses memory mapped files to load catalog files.
      *
-     * @param file The file to load
-     * @param factor Position factor
+     * @param file       The file to load
+     * @param factor     Position factor
      * @param fileNumber File number
      * @param totalFiles Total number of files
      * @return
      */
-    public Array<ParticleBean> loadDataMapped(String file, double factor, int fileNumber, long totalFiles) {
+    public List<ParticleBean> loadDataMapped(String file, double factor, int fileNumber, long totalFiles) {
         boolean gz = file.endsWith(".gz");
         String fileName = file.substring(file.lastIndexOf('/') + 1);
         FileChannel fc = null;
@@ -412,14 +412,14 @@ public class CsvCatalogDataProvider extends AbstractStarGroupDataProvider {
                     logger.error(e);
                 }
             }
-            LongWrap addedStars = new LongWrap(0l);
-            LongWrap discardedStars = new LongWrap(0l);
+            AtomicLong addedStars = new AtomicLong(0l);
+            AtomicLong discardedStars = new AtomicLong(0l);
             loadFileIs(data, factor, addedStars, discardedStars);
 
             if (fileNumber >= 0 && totalFiles >= 0)
-                logger.info(fileNumber + "/" + totalFiles + " (" + nf.format((double) fileNumber * 100d / (double) totalFiles) + "%): " + fileName + " --> " + addedStars.value + "/" + (addedStars.value + discardedStars.value) + " stars (" + nf.format(100d * (double) addedStars.value / (double) (addedStars.value + discardedStars.value)) + "%)");
+                logger.info(fileNumber + "/" + totalFiles + " (" + nf.format((double) fileNumber * 100d / (double) totalFiles) + "%): " + fileName + " --> " + addedStars.get() + "/" + (addedStars.get() + discardedStars.get()) + " stars (" + nf.format(100d * (double) addedStars.get() / (double) (addedStars.get() + discardedStars.get())) + "%)");
             else
-                logger.info(fileName + " --> " + addedStars.value + "/" + (addedStars.value + discardedStars.value) + " stars (" + nf.format(100d * (double) addedStars.value / (double) (addedStars.value + discardedStars.value)) + "%)");
+                logger.info(fileName + " --> " + addedStars.get() + "/" + (addedStars.get() + discardedStars.get()) + " stars (" + nf.format(100d * (double) addedStars.get() / (double) (addedStars.get() + discardedStars.get())) + "%)");
 
             return list;
         } catch (Exception e) {
@@ -433,5 +433,13 @@ public class CsvCatalogDataProvider extends AbstractStarGroupDataProvider {
                 }
         }
         return null;
+    }
+
+    public void setParallel(boolean parallel) {
+        this.parallel = parallel;
+    }
+
+    public void setParallelBufferSize(int size) {
+        this.parallelBufferSize = size;
     }
 }

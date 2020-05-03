@@ -15,6 +15,8 @@ import gaiasky.util.I18n;
 import java.io.*;
 import java.nio.MappedByteBuffer;
 import java.nio.channels.FileChannel;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Reads arrays of star beans from binary files, usually to go in an octree.
@@ -24,30 +26,30 @@ import java.nio.channels.FileChannel;
 public class BinaryDataProvider extends AbstractStarGroupDataProvider {
 
     @Override
-    public Array<ParticleBean> loadData(String file, double factor, boolean compatibility) {
+    public List<ParticleBean> loadData(String file, double factor, boolean compatibility) {
         logger.info(I18n.bundle.format("notif.datafile", file));
         loadDataMapped(file, factor, compatibility);
-        logger.info(I18n.bundle.format("notif.nodeloader", list.size, file));
+        logger.info(I18n.bundle.format("notif.nodeloader", list.size(), file));
 
         return list;
     }
 
 
     @Override
-    public Array<ParticleBean> loadData(InputStream is, double factor, boolean compatibility) {
+    public List<ParticleBean> loadData(InputStream is, double factor, boolean compatibility) {
         list = readData(is, compatibility);
         return list;
     }
 
-    public void writeData(Array<? extends ParticleBean> data, OutputStream out) {
+    public void writeData(List<? extends ParticleBean> data, OutputStream out) {
         writeData(data, out, true);
     }
-    public void writeData(Array<? extends ParticleBean> data, OutputStream out, boolean compat) {
+    public void writeData(List<? extends ParticleBean> data, OutputStream out, boolean compat) {
         // Wrap the FileOutputStream with a DataOutputStream
         DataOutputStream data_out = new DataOutputStream(out);
         try {
             // Size of stars
-            data_out.writeInt(data.size);
+            data_out.writeInt(data.size());
             for (ParticleBean sb : data) {
                 writeStarBean((StarBean) sb, data_out, compat);
             }
@@ -103,18 +105,18 @@ public class BinaryDataProvider extends AbstractStarGroupDataProvider {
         out.writeChars(namesConcat);
     }
 
-    public Array<ParticleBean> readData(InputStream in) {
+    public List<ParticleBean> readData(InputStream in) {
         return readData(in, true);
     }
 
-    public Array<ParticleBean> readData(InputStream in, boolean compat) {
-        Array<ParticleBean> data = null;
+    public List<ParticleBean> readData(InputStream in, boolean compat) {
+        List<ParticleBean> data = null;
         DataInputStream data_in = new DataInputStream(in);
 
         try {
             // Read size of stars
             int size = data_in.readInt();
-            data = new Array<>(size);
+            data = new ArrayList<>(size);
             for (int i = 0; i < size; i++) {
                 data.add(readStarBean(data_in, compat));
             }
@@ -178,14 +180,14 @@ public class BinaryDataProvider extends AbstractStarGroupDataProvider {
     }
 
     @Override
-    public Array<ParticleBean> loadDataMapped(String file, double factor, boolean compat) {
+    public List<ParticleBean> loadDataMapped(String file, double factor, boolean compat) {
         try {
             FileChannel fc = new RandomAccessFile(GlobalConf.data.dataFile(file), "r").getChannel();
 
             MappedByteBuffer mem = fc.map(FileChannel.MapMode.READ_ONLY, 0, fc.size());
             // Read size of stars
             int size = mem.getInt();
-            list = new Array<>(size);
+            list = new ArrayList<>(size);
             for (int i = 0; i < size; i++) {
                 list.add(readStarBean(mem, factor, compat));
             }

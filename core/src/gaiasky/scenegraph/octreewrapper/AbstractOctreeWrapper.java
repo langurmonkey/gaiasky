@@ -37,7 +37,7 @@ public abstract class AbstractOctreeWrapper extends FadeNode implements Iterable
 
     public OctreeNode root;
     /** Roulette list with the objects to process **/
-    protected Array<SceneGraphNode> roulette;
+    protected List<SceneGraphNode> roulette;
     public Map<AbstractPositionEntity, OctreeNode> parenthood;
     /** The number of objects added to render in the last frame **/
     protected int lastNumberObjects = 0;
@@ -80,7 +80,7 @@ public abstract class AbstractOctreeWrapper extends FadeNode implements Iterable
      */
     private void addObjectsDeep(OctreeNode octant, SceneGraphNode root) {
         if (octant.objects != null) {
-            root.add(octant.objects.items);
+            root.add(octant.objects);
             for (AbstractPositionEntity sgn : octant.objects) {
                 parenthood.put(sgn, octant);
             }

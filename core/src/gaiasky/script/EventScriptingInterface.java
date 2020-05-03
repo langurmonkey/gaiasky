@@ -2413,10 +2413,10 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
         return false;
     }
 
-    private Array<ParticleBean> loadParticleBeans(DataSource ds, DatasetOptions dops) {
+    private List<ParticleBean> loadParticleBeans(DataSource ds, DatasetOptions dops) {
         STILDataProvider provider = new STILDataProvider();
         provider.setDatasetOptions(dops);
-        @SuppressWarnings("unchecked") Array<ParticleBean> data = (Array<ParticleBean>) provider.loadData(ds, 1.0f);
+        @SuppressWarnings("unchecked") List<ParticleBean> data = (List<ParticleBean>) provider.loadData(ds, 1.0f);
         return data;
     }
 
@@ -2427,7 +2427,7 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
             // Create star/particle group or star clusters
             if (checkString(dsName, "datasetName")) {
                 if (dops == null || dops.type == DatasetOptions.DatasetLoadType.STARS) {
-                    Array<ParticleBean> data = loadParticleBeans(ds, dops);
+                    List<ParticleBean> data = loadParticleBeans(ds, dops);
                     if (data != null && !data.isEmpty()) {
                         // STAR GROUP
                         AtomicReference<StarGroup> starGroup = new AtomicReference<>();
@@ -2438,7 +2438,7 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
                             CatalogInfo ci = new CatalogInfo(dsName, ds.getName(), null, type, 1.5f, starGroup.get());
                             EventManager.instance.post(Events.CATALOG_ADD, ci, true);
 
-                            logger.info(data.size + " stars loaded");
+                            logger.info(data.size() + " stars loaded");
                         });
                         // Sync waiting until the node is in the scene graph
                         while (sync && (starGroup.get() == null || !starGroup.get().inSceneGraph)) {
@@ -2447,7 +2447,7 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
                     }
                 } else if (dops == null || dops.type == DatasetOptions.DatasetLoadType.PARTICLES) {
                     // PARTICLE GROUP
-                    Array<ParticleBean> data = loadParticleBeans(ds, dops);
+                    List<ParticleBean> data = loadParticleBeans(ds, dops);
                     if (data != null && !data.isEmpty()) {
                         AtomicReference<ParticleGroup> particleGroup = new AtomicReference<>();
                         GaiaSky.postRunnable(() -> {
@@ -2457,7 +2457,7 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
                             CatalogInfo ci = new CatalogInfo(dsName, ds.getName(), null, type, 1.5f, particleGroup.get());
                             EventManager.instance.post(Events.CATALOG_ADD, ci, true);
 
-                            logger.info(data.size + " particles loaded");
+                            logger.info(data.size() + " particles loaded");
                         });
                         // Sync waiting until the node is in the scene graph
                         while (sync && (particleGroup.get() == null || !particleGroup.get().inSceneGraph)) {

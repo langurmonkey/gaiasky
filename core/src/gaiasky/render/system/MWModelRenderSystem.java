@@ -31,6 +31,8 @@ import gaiasky.util.math.StdRandom;
 import gaiasky.util.tree.LoadStatus;
 import org.lwjgl.opengl.GL30;
 
+import java.util.List;
+
 public class MWModelRenderSystem extends ImmediateRenderSystem implements IObserver {
     private static final String texFolder = "data/galaxy/sprites/";
 
@@ -182,13 +184,13 @@ public class MWModelRenderSystem extends ImmediateRenderSystem implements IObser
      * @param type The type
      * @return
      */
-    private GpuData convertDataToGpu(Array<? extends ParticleBean> data, ColorGenerator cg, PType type) {
+    private GpuData convertDataToGpu(List<? extends ParticleBean> data, ColorGenerator cg, PType type) {
         GpuData ad = new GpuData();
 
         int vertexSize = 3 + 1 + 3;
         int colorOffset = 3;
         int additionalOffset = 4;
-        ad.vertices = new float[data.size * vertexSize];
+        ad.vertices = new float[data.size() * vertexSize];
 
         int nLayers = type.layers.length;
 

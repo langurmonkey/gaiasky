@@ -38,12 +38,14 @@ import gaiasky.util.math.Vector3d;
 import gaiasky.util.time.ITimeFrameProvider;
 import gaiasky.util.tree.LoadStatus;
 
+import java.util.List;
+
 public class MilkyWay extends AbstractPositionEntity implements I3DTextRenderable {
     float[] labelColour = new float[] { 1f, 1f, 1f, 1f };
     String transformName;
     Matrix4 coordinateSystem;
 
-    public Array<? extends ParticleBean> starData, bulgeData, dustData, hiiData, gasData;
+    public List<? extends ParticleBean> starData, bulgeData, dustData, hiiData, gasData;
     protected String provider;
     public GalaxydataComponent gc;
 
@@ -119,12 +121,12 @@ public class MilkyWay extends AbstractPositionEntity implements I3DTextRenderabl
         Vector3 aux = new Vector3();
         Vector3 pos3 = pos.toVector3();
 
-        Array<? extends ParticleBean>[] all = new Array[]{starData, hiiData, dustData, bulgeData, gasData};
+        List<? extends ParticleBean>[] all = new List[]{starData, hiiData, dustData, bulgeData, gasData};
 
         // Transform all
-        for(Array<? extends ParticleBean> a : all){
+        for(List<? extends ParticleBean> a : all){
             if(a != null){
-                for (int i = 0; i < a.size; i++) {
+                for (int i = 0; i < a.size(); i++) {
                     double[] pointf = a.get(i).data;
 
                     aux.set((float) pointf[0], (float) pointf[2], (float) pointf[1]);

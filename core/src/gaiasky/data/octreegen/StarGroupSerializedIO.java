@@ -44,12 +44,12 @@ public class StarGroupSerializedIO implements IStarGroupIO {
      * @param out
      *            The output stream to write to
      */
-    public void writeParticles(Array<AbstractPositionEntity> list, OutputStream out) {
+    public void writeParticles(List<AbstractPositionEntity> list, OutputStream out) {
         writeParticles(list, out, true);
     }
 
-    public void writeParticles(Array<AbstractPositionEntity> list, OutputStream out, boolean compat) {
-        if (list.size > 0) {
+    public void writeParticles(List<AbstractPositionEntity> list, OutputStream out, boolean compat) {
+        if (list.size() > 0) {
             StarGroup sg = (StarGroup) list.get(0);
             List<StarBean> l = new ArrayList<>(sg.size());
             for (ParticleBean p : sg.data()) {
@@ -74,16 +74,16 @@ public class StarGroupSerializedIO implements IStarGroupIO {
      *            The input stream to read the star group from
      * @return A list with a single star group object
      */
-    public Array<AbstractPositionEntity> readParticles(InputStream in) throws FileNotFoundException {
+    public List<AbstractPositionEntity> readParticles(InputStream in) throws FileNotFoundException {
         return readParticles(in, true);
     }
 
-    public Array<AbstractPositionEntity> readParticles(InputStream in, boolean compat) throws FileNotFoundException {
-        Array<ParticleBean> data = provider.loadData(in, 1.0, compat);
+    public List<AbstractPositionEntity> readParticles(InputStream in, boolean compat) throws FileNotFoundException {
+        List<ParticleBean> data = provider.loadData(in, 1.0, compat);
         StarGroup sg = new StarGroup();
         sg.setData(data);
 
-        Array<AbstractPositionEntity> l = new Array<>(1);
+        List<AbstractPositionEntity> l = new ArrayList<>(1);
         l.add(sg);
         return l;
     }

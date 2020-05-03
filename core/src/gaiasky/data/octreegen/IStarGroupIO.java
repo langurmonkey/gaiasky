@@ -5,18 +5,18 @@
 
 package gaiasky.data.octreegen;
 
-import com.badlogic.gdx.utils.Array;
 import gaiasky.scenegraph.AbstractPositionEntity;
 
 import java.io.FileNotFoundException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.List;
 
 public interface IStarGroupIO {
 
-    void writeParticles(Array<AbstractPositionEntity> list, OutputStream out);
-    void writeParticles(Array<AbstractPositionEntity> list, OutputStream out, boolean compat);
+    void writeParticles(List<AbstractPositionEntity> list, OutputStream out);
+    void writeParticles(List<AbstractPositionEntity> list, OutputStream out, boolean compat);
 
-    Array<AbstractPositionEntity> readParticles(InputStream in) throws FileNotFoundException;
-    Array<AbstractPositionEntity> readParticles(InputStream in, boolean compat) throws FileNotFoundException;
+    List<AbstractPositionEntity> readParticles(InputStream in) throws FileNotFoundException;
+    List<AbstractPositionEntity> readParticles(InputStream in, boolean compat) throws FileNotFoundException;
 }

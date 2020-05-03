@@ -212,7 +212,7 @@ public class OctreeGeneratorRun {
         OctreeGeneratorParams ogp = new OctreeGeneratorParams(maxPart, sunCentre, postprocess, childCount, parentCount);
         IOctreeGenerator og = new OctreeGeneratorMag(ogp);
 
-        Array<ParticleBean> listLoader = null, list = null;
+        List<ParticleBean> listLoader = null, list = null;
         Map<Long, Integer> xmatchTable = null;
         long[] countsPerMagGaia = null;
 
@@ -257,7 +257,7 @@ public class OctreeGeneratorRun {
                 stil.setMustLoadIds(mustLoad);
             }
 
-            Array<ParticleBean> listHip = stil.loadData("data/catalog/hipparcos/hipparcos.vot");
+            List<ParticleBean> listHip = stil.loadData("data/catalog/hipparcos/hipparcos.vot");
 
             // Update HIP names using external source, if needed
             if (hipNamesDir != null) {
@@ -286,7 +286,7 @@ public class OctreeGeneratorRun {
             }
 
             // Check x-match file
-            int hipnum = listHip.size;
+            int hipnum = listHip.size();
             int starhits = 0;
             int notFoundHipStars = 0;
 
@@ -379,7 +379,7 @@ public class OctreeGeneratorRun {
         double loadingSecs = ((loadingMs - startMs) / 1000.0);
         logger.info("TIME STATS: Data loaded in " + loadingSecs + " seconds");
 
-        logger.info("Generating octree with " + list.size + " actual stars");
+        logger.info("Generating octree with " + list.size() + " actual stars");
 
         OctreeNode octree = og.generateOctree(list);
 
@@ -423,7 +423,7 @@ public class OctreeGeneratorRun {
             logger.info("STAR COUNTS STATS");
             logger.info("=================");
             for (int level = 0; level < countsPerMagGaia.length; level++) {
-                logger.info("Magnitude " + level + ": " + countsPerMagGaia[level] + " stars (" + formatter.format((double) countsPerMagGaia[level] * 100d / (double) list.size) + "%)");
+                logger.info("Magnitude " + level + ": " + countsPerMagGaia[level] + " stars (" + formatter.format((double) countsPerMagGaia[level] * 100d / (double) list.size()) + "%)");
             }
             logger.info();
         }
@@ -432,11 +432,11 @@ public class OctreeGeneratorRun {
         logger.info("OCTREE STATS");
         logger.info("============");
         logger.info("Octants: " + octree.numNodes());
-        logger.info("Particles: " + list.size);
+        logger.info("Particles: " + list.size());
         logger.info("Depth: " + octree.getMaxDepth());
         int level = 0;
         for (int[] levelinfo : stats) {
-            logger.info("   Level " + level + ": " + levelinfo[0] + " octants, " + levelinfo[1] + " stars (" + formatter.format((double) levelinfo[1] * 100d / (double) list.size) + "%)");
+            logger.info("   Level " + level + ": " + levelinfo[0] + " octants, " + levelinfo[1] + " stars (" + formatter.format((double) levelinfo[1] * 100d / (double) list.size()) + "%)");
             level++;
         }
 

@@ -16,15 +16,16 @@ import gaiasky.util.math.Vector3d;
 import gaiasky.util.tree.OctreeNode;
 
 import java.util.Iterator;
+import java.util.List;
 
 public interface IOctreeGenerator {
     Log logger = Logger.getLogger(IOctreeGenerator.class);
 
-    OctreeNode generateOctree(Array<ParticleBean> catalog);
+    OctreeNode generateOctree(List<ParticleBean> catalog);
 
     int getDiscarded();
 
-    static OctreeNode startGeneration(Array<ParticleBean> catalog, OctreeGeneratorParams params) {
+    static OctreeNode startGeneration(List<ParticleBean> catalog, OctreeGeneratorParams params) {
         
         logger.info("Starting generation of octree");
 

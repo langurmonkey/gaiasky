@@ -21,17 +21,17 @@ public class SerializedDataProvider extends AbstractStarGroupDataProvider {
     public SerializedDataProvider() {
     }
 
-    public Array<ParticleBean> loadData(String file, double factor, boolean compat) {
+    public List<ParticleBean> loadData(String file, double factor, boolean compat) {
         logger.info(I18n.bundle.format("notif.datafile", file));
 
         FileHandle f = GlobalConf.data.dataFileHandle(file);
         loadData(f.read(), factor, compat);
-        logger.info(I18n.bundle.format("notif.nodeloader", list.size, file));
+        logger.info(I18n.bundle.format("notif.nodeloader", list.size(), file));
 
         return list;
     }
 
-    public Array<ParticleBean> loadData(InputStream is, double factor, boolean compat) {
+    public List<ParticleBean> loadData(InputStream is, double factor, boolean compat) {
         try {
             ObjectInputStream ois = new ObjectInputStream(is);
             @SuppressWarnings("unchecked")
@@ -55,7 +55,7 @@ public class SerializedDataProvider extends AbstractStarGroupDataProvider {
     }
 
     @Override
-    public Array<ParticleBean> loadDataMapped(String file, double factor, boolean compat) {
+    public List<ParticleBean> loadDataMapped(String file, double factor, boolean compat) {
         // TODO Auto-generated method stub
         return null;
     }

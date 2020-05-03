@@ -22,6 +22,7 @@ import gaiasky.util.math.Vector3d;
 import gaiasky.util.time.ITimeFrameProvider;
 import gaiasky.util.tree.IPosition;
 
+import java.util.List;
 import java.util.Set;
 
 public abstract class AbstractSceneGraph implements ISceneGraph {
@@ -145,7 +146,7 @@ public abstract class AbstractSceneGraph implements ISceneGraph {
                     }
                 }
             } else if (node instanceof StarGroup) {
-                Array<ParticleBean> stars = ((StarGroup) node).data();
+                List<ParticleBean> stars = ((StarGroup) node).data();
                 for (ParticleBean pb : stars) {
                     StarBean s = (StarBean) pb;
                     if (s.hip() > 0) {
@@ -171,7 +172,7 @@ public abstract class AbstractSceneGraph implements ISceneGraph {
                 }
             } else if (node instanceof StarGroup) {
                 StarGroup sg = (StarGroup) node;
-                Array<ParticleBean> arr = sg.data();
+                List<ParticleBean> arr = sg.data();
                 if (arr != null) {
                     for (ParticleBean pb : arr) {
                         StarBean sb = (StarBean) pb;

@@ -52,7 +52,7 @@ public abstract class AbstractStarGroupDataProvider implements IStarGroupDataPro
         return indexMap != null && indexMap.containsKey(colId) && indexMap.get(colId) >= 0;
     }
 
-    protected Array<ParticleBean> list;
+    protected List<ParticleBean> list;
     protected LongMap<double[]> sphericalPositions;
     protected LongMap<float[]> colors;
     protected long[] countsPerMag;
@@ -88,6 +88,8 @@ public abstract class AbstractStarGroupDataProvider implements IStarGroupDataPro
     }
 
     protected boolean hasAdditionalColumn(ColId col) {
+        if(additional == null)
+            return false;
         for (AdditionalCols add : additional) {
             if (add != null && add.hasCol(col))
                 return true;
@@ -96,6 +98,8 @@ public abstract class AbstractStarGroupDataProvider implements IStarGroupDataPro
     }
 
     protected Double getAdditionalValue(ColId col, Long sourceId) {
+        if(additional == null)
+            return null;
         for (AdditionalCols add : additional) {
             if (add != null && add.hasCol(col)) {
                 Double d = add.get(col, sourceId);
@@ -182,7 +186,7 @@ public abstract class AbstractStarGroupDataProvider implements IStarGroupDataPro
      * Initialises the lists and structures given number of elements
      */
     protected void initLists(int elems) {
-        list = new Array<>(elems);
+        list = Collections.synchronizedList(new ArrayList<>(elems));
     }
 
     protected void initLists() {
@@ -192,22 +196,22 @@ public abstract class AbstractStarGroupDataProvider implements IStarGroupDataPro
     }
 
     @Override
-    public Array<ParticleBean> loadData(String file) {
+    public List<ParticleBean> loadData(String file) {
         return loadData(file, 1.0f);
     }
 
     @Override
-    public Array<ParticleBean> loadData(String file, double factor) {
+    public List<ParticleBean> loadData(String file, double factor) {
         return loadData(file, factor, true);
     }
 
     @Override
-    public Array<ParticleBean> loadData(InputStream is, double factor) {
+    public List<ParticleBean> loadData(InputStream is, double factor) {
         return loadData(is, factor, true);
     }
 
     @Override
-    public Array<ParticleBean> loadDataMapped(String file, double factor) {
+    public List<ParticleBean> loadDataMapped(String file, double factor) {
         return loadDataMapped(file, factor, true);
     }
 
@@ -219,7 +223,7 @@ public abstract class AbstractStarGroupDataProvider implements IStarGroupDataPro
      * @return Whether the star with the given ID must be loaded
      */
     protected boolean mustLoad(long id) {
-        return mustLoadIds == null || mustLoadIds.contains(id);
+        return mustLoadIds != null && mustLoadIds.contains(id);
     }
 
     /**
@@ -327,17 +331,17 @@ public abstract class AbstractStarGroupDataProvider implements IStarGroupDataPro
         return (count == 0 && !empty) ? 1 : count;
     }
 
-    protected void dumpToDisk(Array<StarBean> data, String filename, String format) {
+    protected void dumpToDisk(List<StarBean> data, String filename, String format) {
         if (format.equals("bin"))
             dumpToDiskBin(data, filename, false);
         else if (format.equals("csv"))
             dumpToDiskCsv(data, filename);
     }
 
-    protected void dumpToDiskBin(Array<StarBean> data, String filename, boolean serialized) {
+    protected void dumpToDiskBin(List<StarBean> data, String filename, boolean serialized) {
         if (serialized) {
             // Use java serialization method
-            List<StarBean> l = new ArrayList<StarBean>(data.size);
+            List<StarBean> l = new ArrayList<>(data.size());
             for (StarBean p : data)
                 l.add(p);
 
@@ -362,7 +366,7 @@ public abstract class AbstractStarGroupDataProvider implements IStarGroupDataPro
         }
     }
 
-    protected void dumpToDiskCsv(Array<StarBean> data, String filename) {
+    protected void dumpToDiskCsv(List<StarBean> data, String filename) {
         String sep = "' ";
         try {
             PrintWriter writer = new PrintWriter(filename, StandardCharsets.UTF_8);

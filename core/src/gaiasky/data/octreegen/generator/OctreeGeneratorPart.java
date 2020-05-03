@@ -11,9 +11,7 @@ import gaiasky.scenegraph.ParticleGroup.ParticleBean;
 import gaiasky.scenegraph.StarGroup.StarBean;
 import gaiasky.util.tree.OctreeNode;
 
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Greedy generator where octants in a level are filled up with as many
@@ -36,17 +34,17 @@ public class OctreeGeneratorPart implements IOctreeGenerator {
         this.params = params;
     }
 
-    public OctreeNode generateOctree(Array<ParticleBean> catalog) {
+    public OctreeNode generateOctree(List<ParticleBean> catalog) {
         OctreeNode root = IOctreeGenerator.startGeneration(catalog, params);
 
         Array<OctreeNode>[] octantsPerLevel = new Array[25];
         octantsPerLevel[0] = new Array<>(1);
         octantsPerLevel[0].add(root);
 
-        Map<OctreeNode, Array<ParticleBean>> inputLists = new HashMap<>();
+        Map<OctreeNode, List<ParticleBean>> inputLists = new HashMap<>();
         inputLists.put(root, catalog);
 
-        treatLevel(inputLists, 0, octantsPerLevel, MathUtils.clamp((float) aggregation.getMaxPart() / (float) catalog.size, 0f, 1f));
+        treatLevel(inputLists, 0, octantsPerLevel, MathUtils.clamp((float) aggregation.getMaxPart() / (float) catalog.size(), 0f, 1f));
 
         root.updateNumbers();
 
@@ -62,7 +60,7 @@ public class OctreeGeneratorPart implements IOctreeGenerator {
      * @param octantsPerLevel Octants of each level
      * @param percentage Percentage
      */
-    private void treatLevel(Map<OctreeNode, Array<ParticleBean>> inputLists, int level, Array<OctreeNode>[] octantsPerLevel, float percentage) {
+    private void treatLevel(Map<OctreeNode, List<ParticleBean>> inputLists, int level, Array<OctreeNode>[] octantsPerLevel, float percentage) {
         logger.info("Generating level " + level);
         Array<OctreeNode> levelOctants = octantsPerLevel[level];
 
@@ -72,9 +70,9 @@ public class OctreeGeneratorPart implements IOctreeGenerator {
         Iterator<OctreeNode> it = levelOctants.iterator();
         while (it.hasNext()) {
             OctreeNode octant = it.next();
-            Array<ParticleBean> list = inputLists.get(octant);
+            List<ParticleBean> list = inputLists.get(octant);
 
-            if (list.size == 0) {
+            if (list.size() == 0) {
                 // Empty node, remove
                 it.remove();
                 octant.remove();
@@ -115,13 +113,13 @@ public class OctreeGeneratorPart implements IOctreeGenerator {
             int maxSublevelObjs = 0;
             double maxSublevelMag = Double.MAX_VALUE;
             double minSublevelMag = 0;
-            Map<OctreeNode, Array<ParticleBean>> lists = new HashMap<>();
+            Map<OctreeNode, List<ParticleBean>> lists = new HashMap<>();
 
             for (OctreeNode octant : octantsPerLevel[level + 1]) {
-                Array<ParticleBean> list = intersect(inputLists.get(octant.parent), octant);
+                List<ParticleBean> list = intersect(inputLists.get(octant.parent), octant);
                 lists.put(octant, list);
-                if (list.size > maxSublevelObjs) {
-                    maxSublevelObjs = list.size;
+                if (list.size() > maxSublevelObjs) {
+                    maxSublevelObjs = list.size();
                 }
                 // Adapt levels by magnitude
                 for (ParticleBean pb : list) {
@@ -149,8 +147,8 @@ public class OctreeGeneratorPart implements IOctreeGenerator {
      * @param box
      * @return
      */
-    private Array<ParticleBean> intersect(Array<ParticleBean> stars, OctreeNode box) {
-        Array<ParticleBean> result = new Array<>();
+    private List<ParticleBean> intersect(List<ParticleBean> stars, OctreeNode box) {
+        List<ParticleBean> result = new ArrayList<>();
         for (ParticleBean star : stars) {
             if (((StarBean) star).octant == null && box.box.contains(star.data[StarBean.I_X], star.data[StarBean.I_Y], star.data[StarBean.I_Z])) {
                 result.add(star);

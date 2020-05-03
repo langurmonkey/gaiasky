@@ -67,7 +67,7 @@ public class STILDataProvider extends AbstractStarGroupDataProvider {
     }
 
     @Override
-    public Array<ParticleBean> loadData(String file, double factor, boolean compat) {
+    public List<ParticleBean> loadData(String file, double factor, boolean compat) {
         logger.info(I18n.bundle.format("notif.datafile", file));
         try {
             loadData(new FileDataSource(GlobalConf.data.dataFile(file)), factor, compat);
@@ -80,7 +80,7 @@ public class STILDataProvider extends AbstractStarGroupDataProvider {
                 logger.error(e2);
             }
         }
-        logger.info(I18n.bundle.format("notif.nodeloader", list.size, file));
+        logger.info(I18n.bundle.format("notif.nodeloader", list.size(), file));
         return list;
     }
 
@@ -125,11 +125,11 @@ public class STILDataProvider extends AbstractStarGroupDataProvider {
         return null;
     }
 
-    public Array<? extends ParticleBean> loadData(DataSource ds, double factor) {
+    public List<? extends ParticleBean> loadData(DataSource ds, double factor) {
         return loadData(ds, factor, true);
     }
 
-    public Array<? extends ParticleBean> loadData(DataSource ds, double factor, boolean compat) {
+    public List<? extends ParticleBean> loadData(DataSource ds, double factor, boolean compat) {
 
         try {
             // Add extra builders
@@ -374,13 +374,13 @@ public class STILDataProvider extends AbstractStarGroupDataProvider {
     }
 
     @Override
-    public Array<ParticleBean> loadData(InputStream is, double factor, boolean compat) {
+    public List<ParticleBean> loadData(InputStream is, double factor, boolean compat) {
         // TODO Auto-generated method stub
         return null;
     }
 
     @Override
-    public Array<ParticleBean> loadDataMapped(String file, double factor, boolean compat) {
+    public List<ParticleBean> loadDataMapped(String file, double factor, boolean compat) {
         return null;
     }
 

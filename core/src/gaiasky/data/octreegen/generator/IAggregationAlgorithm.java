@@ -9,6 +9,8 @@ import com.badlogic.gdx.utils.Array;
 import gaiasky.scenegraph.ParticleGroup.ParticleBean;
 import gaiasky.util.tree.OctreeNode;
 
+import java.util.List;
+
 /**
  * Interface to be implemented by all algorithms that create a group of virtual
  * particles for an octant.
@@ -31,7 +33,7 @@ public interface IAggregationAlgorithm {
      *            The percentage of objects to be included in the octant.
      * @return True if we are in a leaf.
      */
-    boolean sample(Array<ParticleBean> inputStars, OctreeNode octant, float percentage);
+    boolean sample(List<ParticleBean> inputStars, OctreeNode octant, float percentage);
 
     /**
      * Gets the maximum number of particles in a single node

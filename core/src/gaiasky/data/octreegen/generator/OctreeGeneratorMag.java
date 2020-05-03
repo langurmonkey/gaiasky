@@ -38,23 +38,23 @@ public class OctreeGeneratorMag implements IOctreeGenerator {
     }
 
     @Override
-    public OctreeNode generateOctree(Array<ParticleBean> catalog) {
+    public OctreeNode generateOctree(List<ParticleBean> catalog) {
         root = IOctreeGenerator.startGeneration(catalog, params);
 
         // Holds all octree nodes indexed by id
         LongMap<OctreeNode> idMap = new LongMap<>();
         idMap.put(root.pageId, root);
 
-        Map<OctreeNode, Array<ParticleBean>> sbMap = new HashMap<>();
+        Map<OctreeNode, List<ParticleBean>> sbMap = new HashMap<>();
 
-        logger.info("Sorting source catalog with " + catalog.size + " stars");
+        logger.info("Sorting source catalog with " + catalog.size() + " stars");
         catalog.sort(comp);
         logger.info("Catalog sorting done");
 
         int catalogIndex = 0;
         for (int level = 0; level < 25; level++) {
-            logger.info("Generating level " + level + " (" + (catalog.size - catalogIndex) + " stars left)");
-            while (catalogIndex < catalog.size) {
+            logger.info("Generating level " + level + " (" + (catalog.size() - catalogIndex) + " stars left)");
+            while (catalogIndex < catalog.size()) {
                 // Add star beans to octants till we reach max capacity
                 StarBean sb = (StarBean) catalog.get(catalogIndex++);
                 double x = sb.data[StarBean.I_X];
@@ -79,7 +79,7 @@ public class OctreeGeneratorMag implements IOctreeGenerator {
                 }
             }
 
-            if (catalogIndex >= catalog.size) {
+            if (catalogIndex >= catalog.size()) {
                 // All stars added -> FINISHED
                 break;
             }
@@ -101,15 +101,15 @@ public class OctreeGeneratorMag implements IOctreeGenerator {
             for (int i = n - 1; i >= 0; i--) {
                 OctreeNode current = (OctreeNode) nodes[i];
                 if (current.parent != null && sbMap.containsKey(current) && sbMap.containsKey(current.parent)) {
-                    Array<ParticleBean> childrenArr = sbMap.get(current);
-                    Array<ParticleBean> parentArr = sbMap.get(current.parent);
-                    if (childrenArr.size <= params.childCount && parentArr.size <= params.parentCount) {
+                    List<ParticleBean> childrenArr = sbMap.get(current);
+                    List<ParticleBean> parentArr = sbMap.get(current.parent);
+                    if (childrenArr.size() <= params.childCount && parentArr.size() <= params.parentCount) {
                         // Merge children nodes with parent nodes, remove children
                         parentArr.addAll(childrenArr);
                         sbMap.remove(current);
                         current.remove();
                         mergedNodes++;
-                        mergedObjects += childrenArr.size;
+                        mergedObjects += childrenArr.size();
                     }
                 }
             }
@@ -122,7 +122,7 @@ public class OctreeGeneratorMag implements IOctreeGenerator {
         // Tree is ready, create star groups
         Set<OctreeNode> nodes = sbMap.keySet();
         for (OctreeNode node : nodes) {
-            Array<ParticleBean> list = sbMap.get(node);
+            List<ParticleBean> list = (List<ParticleBean>) sbMap.get(node);
             StarGroup sg = new StarGroup();
             sg.setData(list, false);
             node.add(sg);
@@ -192,14 +192,14 @@ public class OctreeGeneratorMag implements IOctreeGenerator {
         return current;
     }
 
-    private int addStarToNode(StarBean sb, OctreeNode node, Map<OctreeNode, Array<ParticleBean>> map) {
+    private int addStarToNode(StarBean sb, OctreeNode node, Map<OctreeNode, List<ParticleBean>> map) {
         if (!map.containsKey(node)) {
             // Array of a fraction of max part (four array resizes gives max part)
-            map.put(node, new Array<>((int) Math.round(this.params.maxPart * 0.10662224073)));
+            map.put(node, new ArrayList<>((int) Math.round(this.params.maxPart * 0.10662224073)));
         }
-        Array<ParticleBean> array = map.get(node);
+        List<ParticleBean> array = map.get(node);
         array.add(sb);
-        return array.size;
+        return array.size();
     }
 
     @Override

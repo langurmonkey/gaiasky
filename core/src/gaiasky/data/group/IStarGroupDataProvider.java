@@ -5,11 +5,11 @@
 
 package gaiasky.data.group;
 
-import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.LongMap;
-import gaiasky.scenegraph.ParticleGroup;
+import gaiasky.scenegraph.ParticleGroup.ParticleBean;
 
 import java.io.InputStream;
+import java.util.List;
 import java.util.Set;
 
 /**
@@ -30,7 +30,7 @@ public interface IStarGroupDataProvider extends IParticleGroupDataProvider {
      * @param compatibility Use compatibility mode (DR1/DR2)
      * @return Array of particle beans
      */
-    Array<ParticleGroup.ParticleBean> loadDataMapped(String file, double factor, boolean compatibility);
+    List<ParticleBean> loadDataMapped(String file, double factor, boolean compatibility);
 
     /**
      * Loads the data applying a factor.
@@ -40,7 +40,7 @@ public interface IStarGroupDataProvider extends IParticleGroupDataProvider {
      * @param compatibility Use compatibility mode (DR1/DR2)
      * @return Array of particle beans
      */
-    Array<ParticleGroup.ParticleBean> loadData(String file, double factor, boolean compatibility);
+    List<ParticleBean> loadData(String file, double factor, boolean compatibility);
 
     /**
      * Loads the data applying a factor.
@@ -50,7 +50,7 @@ public interface IStarGroupDataProvider extends IParticleGroupDataProvider {
      * @param compatibility Use compatibility mode (DR1/DR2)
      * @return Array of particle beans
      */
-    Array<ParticleGroup.ParticleBean> loadData(InputStream is, double factor, boolean compatibility);
+    List<ParticleBean> loadData(InputStream is, double factor, boolean compatibility);
 
     /**
      * <p>

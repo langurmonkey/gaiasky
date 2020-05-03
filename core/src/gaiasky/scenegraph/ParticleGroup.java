@@ -274,7 +274,7 @@ public class ParticleGroup extends FadeNode implements I3DTextRenderable, IFocus
     /**
      * List that contains the point data. It contains only [x y z]
      */
-    protected Array<ParticleBean> pointData;
+    protected List<ParticleBean> pointData;
 
     /**
      * Fully qualified name of data provider class
@@ -517,7 +517,7 @@ public class ParticleGroup extends FadeNode implements I3DTextRenderable, IFocus
             for (ParticleBean point : data()) {
                 pos.add(point.x(), point.y(), point.z());
             }
-            pos.scl(1d / pointData.size);
+            pos.scl(1d / pointData.size());
         }
     }
 
@@ -536,12 +536,12 @@ public class ParticleGroup extends FadeNode implements I3DTextRenderable, IFocus
         super.doneLoading(manager);
 
         // Metadata
-        metadata = new double[pointData.size];
+        metadata = new double[pointData.size()];
 
         // Initialise indices list with natural order
-        indices1 = new Integer[pointData.size];
-        indices2 = new Integer[pointData.size];
-        for (int i = 0; i < pointData.size; i++) {
+        indices1 = new Integer[pointData.size()];
+        indices2 = new Integer[pointData.size()];
+        for (int i = 0; i < pointData.size(); i++) {
             indices1[i] = i;
             indices2[i] = i;
         }
@@ -557,15 +557,15 @@ public class ParticleGroup extends FadeNode implements I3DTextRenderable, IFocus
      *
      * @return The data list
      */
-    public Array<? extends ParticleBean> data() {
+    public List<? extends ParticleBean> data() {
         return pointData;
     }
 
-    public void setData(Array<ParticleBean> pointData) {
+    public void setData(List<ParticleBean> pointData) {
         setData(pointData, true);
     }
 
-    public void setData(Array<ParticleBean> pointData, boolean regenerateIndex) {
+    public void setData(List<ParticleBean> pointData, boolean regenerateIndex) {
         this.pointData = pointData;
 
         // Regenerate index
@@ -587,9 +587,9 @@ public class ParticleGroup extends FadeNode implements I3DTextRenderable, IFocus
      * @param pointData The data
      * @return An map{string,int} mapping names to indices
      */
-    public ObjectIntMap<String> generateIndex(Array<? extends ParticleBean> pointData) {
+    public ObjectIntMap<String> generateIndex(List<? extends ParticleBean> pointData) {
         ObjectIntMap<String> index = new ObjectIntMap<>();
-        int n = pointData.size;
+        int n = pointData.size();
         for (int i = 0; i < n; i++) {
             ParticleBean pb = pointData.get(i);
             if (pb.names != null) {
@@ -655,7 +655,7 @@ public class ParticleGroup extends FadeNode implements I3DTextRenderable, IFocus
     public Vector3d computeGeomCentre(boolean forceRecompute) {
         if (pointData != null && (forceRecompute || geomCentre == null)) {
             geomCentre = new Vector3d(0, 0, 0);
-            int n = pointData.size;
+            int n = pointData.size();
             for (int i = 0; i < n; i++) {
                 ParticleBean pb = pointData.get(i);
                 geomCentre.add(pb.x(), pb.y(), pb.z());
@@ -671,7 +671,7 @@ public class ParticleGroup extends FadeNode implements I3DTextRenderable, IFocus
      * @return The number of objects
      */
     public int size() {
-        return pointData.size;
+        return pointData.size();
     }
 
     public void update(ITimeFrameProvider time, final Vector3d parentTransform, ICamera camera, float opacity) {
@@ -739,7 +739,7 @@ public class ParticleGroup extends FadeNode implements I3DTextRenderable, IFocus
         // Particle labels
         float thOverFactor = 1e-15f;
 
-        for (int i = 0; i < Math.min(50, pointData.size); i++) {
+        for (int i = 0; i < Math.min(50, pointData.size()); i++) {
             ParticleBean pb = pointData.get(active[i]);
             if (pb.names != null) {
                 Vector3d lpos = fetchPosition(pb, camera.getPos(), aux3d1.get(), 0);
@@ -894,7 +894,7 @@ public class ParticleGroup extends FadeNode implements I3DTextRenderable, IFocus
 
     @Override
     public int getStarCount() {
-        return pointData.size;
+        return pointData.size();
     }
 
     public boolean isActive() {
@@ -1042,7 +1042,7 @@ public class ParticleGroup extends FadeNode implements I3DTextRenderable, IFocus
     }
 
     public void addHit(int screenX, int screenY, int w, int h, int pxdist, NaturalCamera camera, Array<IFocus> hits) {
-        int n = pointData.size;
+        int n = pointData.size();
         if (GaiaSky.instance.isOn(ct) && this.opacity > 0) {
             Array<Pair<Integer, Double>> temporalHits = new Array<>();
             for (int i = 0; i < n; i++) {
@@ -1111,7 +1111,7 @@ public class ParticleGroup extends FadeNode implements I3DTextRenderable, IFocus
     }
 
     public void addHit(Vector3d p0, Vector3d p1, NaturalCamera camera, Array<IFocus> hits) {
-        int n = pointData.size;
+        int n = pointData.size();
         if (GaiaSky.instance.isOn(ct) && this.opacity > 0) {
             Vector3d beamDir = new Vector3d();
             Array<Pair<Integer, Double>> temporalHits = new Array<Pair<Integer, Double>>();
@@ -1196,7 +1196,7 @@ public class ParticleGroup extends FadeNode implements I3DTextRenderable, IFocus
     }
 
     public void setFocusIndex(int index) {
-        if (index >= 0 && index < pointData.size) {
+        if (index >= 0 && index < pointData.size()) {
             candidateFocusIndex = index;
             makeFocus();
         }
@@ -1405,7 +1405,7 @@ public class ParticleGroup extends FadeNode implements I3DTextRenderable, IFocus
      * @param dops The dataset options
      * @return A new particle group with the given parameters
      */
-    public static ParticleGroup getParticleGroup(String name, Array<ParticleBean> data, DatasetOptions dops) {
+    public static ParticleGroup getParticleGroup(String name, List<ParticleBean> data, DatasetOptions dops) {
         double[] fadeIn = dops == null || dops.fadeIn == null ? null : dops.fadeIn;
         double[] fadeOut = dops == null || dops.fadeOut == null ? null : dops.fadeOut;
         double[] particleColor = dops == null || dops.particleColor == null ? new double[]{1.0, 1.0, 1.0, 1.0} : dops.particleColor;
@@ -1443,7 +1443,7 @@ public class ParticleGroup extends FadeNode implements I3DTextRenderable, IFocus
      */
     public void updateMetadata(ITimeFrameProvider time, ICamera camera) {
         Vector3d camPos = camera.getPos();
-        int n = pointData.size;
+        int n = pointData.size();
         for (int i = 0; i < n; i++) {
             ParticleBean d = pointData.get(i);
             // Pos

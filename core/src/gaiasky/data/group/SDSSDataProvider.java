@@ -21,6 +21,8 @@ import java.nio.CharBuffer;
 import java.nio.MappedByteBuffer;
 import java.nio.channels.FileChannel;
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Loads SDSS data from a text file with a series of [ra, dec, z]
@@ -28,21 +30,21 @@ import java.nio.charset.StandardCharsets;
 public class SDSSDataProvider implements IParticleGroupDataProvider {
     private static final Log logger = Logger.getLogger(SDSSDataProvider.class);
 
-    public Array<ParticleBean> loadData(String file) {
+    public List<ParticleBean> loadData(String file) {
         return loadData(file, 1d);
     }
 
-    public Array<ParticleBean> loadData(String file, double factor) {
-        Array<ParticleBean> pointData = loadDataMapped(GlobalConf.data.dataFile(file), factor);
+    public List<ParticleBean> loadData(String file, double factor) {
+        List<ParticleBean> pointData = loadDataMapped(GlobalConf.data.dataFile(file), factor);
         if (pointData != null)
-            logger.info(I18n.bundle.format("notif.nodeloader", pointData.size, file));
+            logger.info(I18n.bundle.format("notif.nodeloader", pointData.size(), file));
 
         return pointData;
     }
 
     @Override
-    public Array<ParticleBean> loadData(InputStream is, double factor) {
-        Array<ParticleBean> pointData = new Array<>();
+    public List<ParticleBean> loadData(InputStream is, double factor) {
+        List<ParticleBean> pointData = new ArrayList<>();
 
         try {
             BufferedReader br = new BufferedReader(new InputStreamReader(is));
@@ -57,7 +59,7 @@ public class SDSSDataProvider implements IParticleGroupDataProvider {
         return pointData;
     }
 
-    private void loadFromBufferedReader(BufferedReader br, Array<ParticleBean> pointData) throws IOException {
+    private void loadFromBufferedReader(BufferedReader br, List<ParticleBean> pointData) throws IOException {
         String line;
         int tokenslen;
         while ((line = br.readLine()) != null) {
@@ -92,8 +94,8 @@ public class SDSSDataProvider implements IParticleGroupDataProvider {
     }
 
     @Override
-    public Array<ParticleBean> loadDataMapped(String file, double factor) {
-        Array<ParticleBean> pointData = new Array<>();
+    public List<ParticleBean> loadDataMapped(String file, double factor) {
+        List<ParticleBean> pointData = new ArrayList<>();
 
         try {
             FileChannel fc = new RandomAccessFile(file, "r").getChannel();

@@ -50,6 +50,7 @@ import gaiasky.util.time.ITimeFrameProvider;
 import gaiasky.util.ucd.UCD;
 import net.jafama.FastMath;
 
+import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
@@ -236,7 +237,7 @@ public class StarGroup extends ParticleGroup implements ILineRenderable, IStarFo
                 factor = 1d;
 
             // Set data, generate index
-            Array<ParticleBean> l = provider.loadData(datafile, factor);
+            List<ParticleBean> l = provider.loadData(datafile, factor);
             this.setData(l);
 
         } catch (Exception e) {
@@ -260,11 +261,11 @@ public class StarGroup extends ParticleGroup implements ILineRenderable, IStarFo
      * @return The data list
      */
     @SuppressWarnings("unchecked")
-    public Array<ParticleBean> data() {
+    public List<ParticleBean> data() {
         return pointData;
     }
 
-    public void setData(Array<ParticleBean> pointData, boolean regenerateIndex) {
+    public void setData(List<ParticleBean> pointData, boolean regenerateIndex) {
         super.setData(pointData, regenerateIndex);
         this.N_CLOSEUP_STARS = getNCloseupStars();
     }
@@ -284,7 +285,7 @@ public class StarGroup extends ParticleGroup implements ILineRenderable, IStarFo
                 n = 60;
                 break;
         }
-        return Math.min(n, pointData.size);
+        return Math.min(n, pointData.size());
     }
 
     /**
@@ -500,7 +501,7 @@ public class StarGroup extends ParticleGroup implements ILineRenderable, IStarFo
     public void render(LineRenderSystem renderer, ICamera camera, float alpha) {
         alpha *= SceneGraphRenderer.alphas[ComponentTypes.ComponentType.VelocityVectors.ordinal()];
         float thPointTimesFovFactor = (float) GlobalConf.scene.STAR_THRESHOLD_POINT * camera.getFovFactor();
-        int n = (int) Math.min(getMaxProperMotionLines(), pointData.size);
+        int n = (int) Math.min(getMaxProperMotionLines(), pointData.size());
         for (int i = n - 1; i >= 0; i--) {
             StarBean star = (StarBean) pointData.get(active[i]);
             if ((star.radvel() == 0 && !rvLines) || (star.radvel() != 0 && rvLines)) {
@@ -635,7 +636,7 @@ public class StarGroup extends ParticleGroup implements ILineRenderable, IStarFo
         float thOverFactor = (float) (GlobalConf.scene.STAR_THRESHOLD_POINT / GlobalConf.scene.LABEL_NUMBER_FACTOR / camera.getFovFactor());
 
         if (camera.getCurrent() instanceof FovCamera) {
-            int n = Math.min(pointData.size, N_CLOSEUP_STARS * 5);
+            int n = Math.min(pointData.size(), N_CLOSEUP_STARS * 5);
             for (int i = 0; i < n; i++) {
                 StarBean star = (StarBean) pointData.get(active[i]);
                 Vector3d starPosition = fetchPosition(star, camera.getPos(), aux3d1.get(), currDeltaYears);
@@ -898,7 +899,7 @@ public class StarGroup extends ParticleGroup implements ILineRenderable, IStarFo
      * @param dops The dataset options
      * @return A new star group with the given parameters
      */
-    public static StarGroup getStarGroup(String name, Array<ParticleBean> data, DatasetOptions dops) {
+    public static StarGroup getStarGroup(String name, List<ParticleBean> data, DatasetOptions dops) {
         double[] fadeIn = dops == null || dops.fadeIn == null ? null : dops.fadeIn;
         double[] fadeOut = dops == null || dops.fadeOut == null ? new double[]{2e3, 1e5} : dops.fadeOut;
         double[] labelColor = dops == null || dops.labelColor == null ? new double[]{1.0, 1.0, 1.0, 1.0} : dops.labelColor;
@@ -925,7 +926,7 @@ public class StarGroup extends ParticleGroup implements ILineRenderable, IStarFo
      * @param data The data of the star group
      * @return A new star group with sane parameters
      */
-    public static StarGroup getDefaultStarGroup(String name, Array<ParticleBean> data) {
+    public static StarGroup getDefaultStarGroup(String name, List<ParticleBean> data) {
         return getDefaultStarGroup(name, data, true);
     }
 
@@ -937,7 +938,7 @@ public class StarGroup extends ParticleGroup implements ILineRenderable, IStarFo
      * @param fullInit Initializes the group right away
      * @return A new star group with sane parameters
      */
-    public static StarGroup getDefaultStarGroup(String name, Array<ParticleBean> data, boolean fullInit) {
+    public static StarGroup getDefaultStarGroup(String name, List<ParticleBean> data, boolean fullInit) {
         StarGroup sg = new StarGroup();
         sg.setName(name.replace("%%SGID%%", Long.toString(sg.id)));
         sg.setParent("Universe");
@@ -964,7 +965,7 @@ public class StarGroup extends ParticleGroup implements ILineRenderable, IStarFo
         Vector3d camPos = camera.getPos();
         double deltaYears = AstroUtils.getMsSince(time.getTime(), epoch_jd) * Nature.MS_TO_Y;
         if (pointData != null) {
-            int n = pointData.size;
+            int n = pointData.size();
             for (int i = 0; i < n; i++) {
                 StarBean d = (StarBean) pointData.get(i);
 

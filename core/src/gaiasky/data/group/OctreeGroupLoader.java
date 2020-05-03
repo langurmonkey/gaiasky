@@ -6,7 +6,6 @@
 package gaiasky.data.group;
 
 import com.badlogic.gdx.files.FileHandle;
-import com.badlogic.gdx.utils.Array;
 import gaiasky.GaiaSky;
 import gaiasky.data.StreamingOctreeLoader;
 import gaiasky.data.octreegen.MetadataBinaryIO;
@@ -26,6 +25,7 @@ import gaiasky.util.tree.LoadStatus;
 import gaiasky.util.tree.OctreeNode;
 
 import java.io.IOException;
+import java.util.List;
 
 /**
  * Implements the loading and streaming of octree nodes from files. This version
@@ -109,7 +109,7 @@ public class OctreeGroupLoader extends StreamingOctreeLoader {
             return false;
         }
         @SuppressWarnings("unchecked")
-        Array<ParticleBean> data =  particleReader.loadDataMapped(octantFile.path(), 1.0, compatibilityMode);
+        List<ParticleBean> data =  particleReader.loadDataMapped(octantFile.path(), 1.0, compatibilityMode);
         StarGroup sg = StarGroup.getDefaultStarGroup("stargroup-%%SGID%%", data, fullInit);
         sg.setCatalogInfoBare(octreeWrapper.getCatalogInfo());
 

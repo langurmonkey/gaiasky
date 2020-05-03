@@ -26,10 +26,7 @@ import uk.ac.starlink.util.DataSource;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.Comparator;
-import java.util.Queue;
-import java.util.Timer;
-import java.util.TimerTask;
+import java.util.*;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.PriorityBlockingQueue;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -395,7 +392,7 @@ public abstract class StreamingOctreeLoader implements IObserver, ISceneGraphLoa
      * @param octreeWrapper
      */
     public void unloadOctant(OctreeNode octant, final AbstractOctreeWrapper octreeWrapper) {
-        Array<AbstractPositionEntity> objects = octant.objects;
+        List<AbstractPositionEntity> objects = octant.objects;
         if (objects != null) {
             GaiaSky.postRunnable(() -> {
                 synchronized (octant) {
@@ -507,7 +504,7 @@ public abstract class StreamingOctreeLoader implements IObserver, ISceneGraphLoa
                             if (octant != null && octant.getStatus() == LoadStatus.LOADED) {
                                 loader.unloadOctant(octant, octreeWrapper);
                             }
-                            if (octant != null && octant.objects != null && octant.objects.size > 0) {
+                            if (octant != null && octant.objects != null && octant.objects.size() > 0) {
                                 AbstractPositionEntity sg = octant.objects.get(0);
                                 nUnloaded += sg.getStarCount();
                                 if (nStars - nUnloaded < loader.maxLoadedStars * 0.85) {

@@ -6,7 +6,6 @@
 package gaiasky.data.group;
 
 import com.badlogic.gdx.files.FileHandle;
-import com.badlogic.gdx.utils.Array;
 import gaiasky.scenegraph.ParticleGroup.ParticleBean;
 import gaiasky.util.Constants;
 import gaiasky.util.GlobalConf;
@@ -20,31 +19,33 @@ import gaiasky.util.parse.Parser;
 import java.io.BufferedReader;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.util.ArrayList;
+import java.util.List;
 
 public class UncertaintiesProvider implements IParticleGroupDataProvider {
     private static final Log logger = Logger.getLogger(UncertaintiesProvider.class);
     
     @Override
-    public Array<ParticleBean> loadData(String file) {
+    public List<ParticleBean> loadData(String file) {
         return loadData(file, 1);
     }
 
     @Override
-    public Array<ParticleBean> loadData(String file, double factor) {
+    public List<ParticleBean> loadData(String file, double factor) {
 
         FileHandle f = GlobalConf.data.dataFileHandle(file);
         @SuppressWarnings("unchecked")
-        Array<ParticleBean> pointData = (Array<ParticleBean>) loadData(f.read(), factor);
+        List<ParticleBean> pointData = loadData(f.read(), factor);
 
         if (pointData != null)
-            logger.info(I18n.bundle.format("notif.nodeloader", pointData.size, file));
+            logger.info(I18n.bundle.format("notif.nodeloader", pointData.size(), file));
 
         return pointData;
     }
 
     @Override
-    public Array<ParticleBean> loadData(InputStream is, double factor) {
-        Array<ParticleBean> pointData = new Array<ParticleBean>();
+    public List<ParticleBean> loadData(InputStream is, double factor) {
+        List<ParticleBean> pointData = new ArrayList<>();
         try {
             int tokenslen;
             BufferedReader br = new BufferedReader(new InputStreamReader(is));
@@ -86,7 +87,7 @@ public class UncertaintiesProvider implements IParticleGroupDataProvider {
     }
 
     @Override
-    public Array<ParticleBean> loadDataMapped(String file, double factor) {
+    public List<ParticleBean> loadDataMapped(String file, double factor) {
         // TODO Auto-generated method stub
         return null;
     }

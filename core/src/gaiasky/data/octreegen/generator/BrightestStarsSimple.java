@@ -12,7 +12,9 @@ import gaiasky.scenegraph.StarGroup;
 import gaiasky.scenegraph.StarGroup.StarBean;
 import gaiasky.util.tree.OctreeNode;
 
+import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.List;
 
 public class BrightestStarsSimple implements IAggregationAlgorithm {
     /** Maximum number of objects in the densest node of a level **/
@@ -32,11 +34,11 @@ public class BrightestStarsSimple implements IAggregationAlgorithm {
     }
 
     @Override
-    public boolean sample(Array<ParticleBean> inputStars, OctreeNode octant, float percentage) {
+    public boolean sample(List<ParticleBean> inputStars, OctreeNode octant, float percentage) {
         StarGroup sg = new StarGroup();
-        Array<ParticleBean> data = new Array<>();
+        List<ParticleBean> data = new ArrayList<>();
 
-        int nInput = inputStars.size;
+        int nInput = inputStars.size();
         inputStars.sort(comp);
 
         int added = 0;
@@ -54,7 +56,7 @@ public class BrightestStarsSimple implements IAggregationAlgorithm {
             sg.octant = octant;
             sg.octantId = octant.pageId;
         }
-        return added == inputStars.size;
+        return added == inputStars.size();
 
     }
 

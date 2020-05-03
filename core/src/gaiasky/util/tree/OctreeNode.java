@@ -23,10 +23,7 @@ import gaiasky.util.Pair;
 import gaiasky.util.math.*;
 import net.jafama.FastMath;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Map;
-import java.util.TreeSet;
+import java.util.*;
 
 /**
  * Octree node implementation which contains a list of {@link IPosition} objects
@@ -78,7 +75,7 @@ public class OctreeNode implements ILineRenderable {
     /** Children nodes **/
     public OctreeNode[] children = new OctreeNode[8];
     /** List of objects **/
-    public Array<AbstractPositionEntity> objects;
+    public List<AbstractPositionEntity> objects;
 
     private double radius;
     /** If observed, the view angle in radians of this octant **/
@@ -258,7 +255,7 @@ public class OctreeNode implements ILineRenderable {
     }
 
     public boolean containsObject(AbstractPositionEntity object){
-        boolean has = this.objects.contains(object, true);
+        boolean has = this.objects.contains(object);
         if(!has && children != null && childrenCount > 0){
             for(OctreeNode child : children){
                 if(child != null) {
@@ -311,23 +308,23 @@ public class OctreeNode implements ILineRenderable {
 
     public boolean add(AbstractPositionEntity e) {
         if (objects == null)
-            objects = new Array<AbstractPositionEntity>(false, 1);
+            objects = new ArrayList<>(1);
         objects.add(e);
-        ownObjects = e instanceof ParticleGroup ? objects.size - 1 + ((ParticleGroup) e).size() : objects.size;
+        ownObjects = e instanceof ParticleGroup ? objects.size() - 1 + ((ParticleGroup) e).size() : objects.size();
         return true;
     }
 
-    public boolean addAll(Array<AbstractPositionEntity> l) {
+    public boolean addAll(List<AbstractPositionEntity> l) {
         if (objects == null)
-            objects = new Array<AbstractPositionEntity>(false, l.size);
+            objects = new ArrayList<>(l.size());
         objects.addAll(l);
-        ownObjects = objects.size;
+        ownObjects = objects.size();
         return true;
     }
 
-    public void setObjects(Array<AbstractPositionEntity> l) {
+    public void setObjects(List<AbstractPositionEntity> l) {
         this.objects = l;
-        ownObjects = objects.size;
+        ownObjects = objects.size();
     }
 
     public boolean insert(AbstractPositionEntity e, int level) {
@@ -407,7 +404,7 @@ public class OctreeNode implements ILineRenderable {
         } else {
             str.append("[ownobj: ");
         }
-        str.append(objects != null ? objects.size : "0").append("/").append(ownObjects).append(", recobj: ").append(nObjects).append(", nchld: ").append(childrenCount).append("] ").append(status).append("\n");
+        str.append(objects != null ? objects.size() : "0").append("/").append(ownObjects).append(", recobj: ").append(nObjects).append(", nchld: ").append(childrenCount).append("] ").append(status).append("\n");
 
         if (childrenCount > 0 && rec) {
             for (OctreeNode child : children) {
@@ -550,7 +547,7 @@ public class OctreeNode implements ILineRenderable {
      * @param opacity
      *            The opacity to set.
      */
-    public void update(Vector3d parentTransform, ICamera cam, Array<SceneGraphNode> roulette, float opacity) {
+    public void update(Vector3d parentTransform, ICamera cam, List<SceneGraphNode> roulette, float opacity) {
         parentTransform.put(transform);
         this.opacity = opacity;
         this.observed = false;
@@ -603,7 +600,7 @@ public class OctreeNode implements ILineRenderable {
         }
     }
 
-    private void addObjectsTo(Array<SceneGraphNode> roulette) {
+    private void addObjectsTo(List<SceneGraphNode> roulette) {
         if (objects != null) {
             roulette.addAll(objects);
             for (SceneGraphNode obj : objects) {

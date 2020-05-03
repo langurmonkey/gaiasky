@@ -12,7 +12,9 @@ import gaiasky.scenegraph.ParticleGroup.ParticleBean;
 import gaiasky.scenegraph.StarGroup;
 import gaiasky.util.tree.OctreeNode;
 
+import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.List;
 
 public class BrightestStars implements IAggregationAlgorithm {
     /** Maximum depth of the octree **/
@@ -53,13 +55,13 @@ public class BrightestStars implements IAggregationAlgorithm {
     }
 
     @Override
-    public boolean sample(Array<ParticleBean> inputStars, OctreeNode octant, float percentage) {
+    public boolean sample(List<ParticleBean> inputStars, OctreeNode octant, float percentage) {
         // Calculate nObjects for this octant based on maxObjs and the MAX_PART
-        int nInput = inputStars.size;
+        int nInput = inputStars.size();
         int nObjects = MathUtils.clamp(Math.round(nInput * percentage), 1, Integer.MAX_VALUE);
 
         StarGroup sg = new StarGroup();
-        Array<ParticleBean> data = new Array<>();
+        List<ParticleBean> data = new ArrayList<>();
 
         if (nInput <= MIN_PART || octant.depth >= MAX_DEPTH) {
             if (!DISCARD) {
@@ -104,7 +106,7 @@ public class BrightestStars implements IAggregationAlgorithm {
             inputStars.sort(comp);
             int added = 0;
             int i = 0;
-            while (added < nObjects && i < inputStars.size) {
+            while (added < nObjects && i < inputStars.size()) {
                 ParticleBean s = inputStars.get(i);
                 if (s.octant == null) {
                     // Add star
@@ -121,7 +123,7 @@ public class BrightestStars implements IAggregationAlgorithm {
                 sg.octantId = octant.pageId;
             }
             // It is leaf if we added all the stars
-            return added == inputStars.size;
+            return added == inputStars.size();
         }
 
     }

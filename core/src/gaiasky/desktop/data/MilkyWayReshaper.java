@@ -25,6 +25,7 @@ import gaiasky.util.format.NumberFormatFactory;
 import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.List;
 
 public class MilkyWayReshaper {
     private static final Logger.Log logger = Logger.getLogger(MilkyWayReshaper.class);
@@ -70,7 +71,7 @@ public class MilkyWayReshaper {
 
                 // Load
                 PointDataProvider provider = new PointDataProvider();
-                Array<? extends ParticleBean> particles = provider.loadData(fileIn);
+                List<? extends ParticleBean> particles = provider.loadData(fileIn);
 
                 String out = GlobalConf.data.dataFile(fileOut);
                 if (Files.exists(Paths.get(out))) {
@@ -78,7 +79,7 @@ public class MilkyWayReshaper {
                     continue;
                 }
 
-                if (particles.size > 0) {
+                if (particles.size() > 0) {
                     FileWriter fw = new FileWriter(out);
                     int ntokens = particles.get(0).data.length;
                     if (ntokens == 3) {
