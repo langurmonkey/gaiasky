@@ -7,7 +7,7 @@
             "pllxerrfaint" : 0.005,
             "pllxzeropoint" : -0.02,
             "magcorrections" : null,
-            "hip" : null,
+            "hip" : "$DATA_LOC/data/catalog/hipparcos/hipparcos.vot",
             "xmatchfile" : "$DATA_LOC/data/gdr2hip/gdr2-hip-xmatch-all.csv"
         },
         {
@@ -17,7 +17,7 @@
             "pllxerrfaint" : 0.005,
             "pllxzeropoint" : -0.02,
             "magcorrections" : null,
-            "hip" : null,
+            "hip" : "$DATA_LOC/data/catalog/hipparcos/hipparcos.vot",
             "xmatchfile" : "$DATA_LOC/data/gdr2hip/gdr2-hip-xmatch-all.csv"
         },
         {
@@ -27,7 +27,7 @@
             "pllxerrfaint" : 0.0,
             "pllxzeropoint" : -0.02,
             "magcorrections" : null,
-            "hip" : null,
+            "hip" : "$DATA_LOC/data/catalog/hipparcos/hipparcos.vot",
             "xmatchfile" : "$DATA_LOC/data/gdr2hip/gdr2-hip-xmatch-all.csv"
         },
         {
@@ -37,7 +37,7 @@
             "pllxerrfaint" : 0.125,
             "pllxzeropoint" : -0.02,
             "magcorrections" : null,
-            "hip" : null,
+            "hip" : "$DATA_LOC/data/catalog/hipparcos/hipparcos.vot",
             "xmatchfile" : "$DATA_LOC/data/gdr2hip/gdr2-hip-xmatch-all.csv"
         },
         {
@@ -50,7 +50,7 @@
             "childcount" : 10000,
             "parentcount" : 50000,
             "magcorrections" : null,
-            "hip" : null,
+            "hip" : "$DATA_LOC/data/catalog/hipparcos/hipparcos.vot",
             "xmatchfile" : "$DATA_LOC/data/gdr2hip/gdr2-hip-xmatch-all.csv"
         },
         {
@@ -62,7 +62,7 @@
             "childcount" : 10000,
             "parentcount" : 50000,
             "magcorrections" : null,
-            "hip" : null,
+            "hip" : "$DATA_LOC/data/catalog/hipparcos/hipparcos.vot",
             "xmatchfile" : "$DATA_LOC/data/gdr2hip/gdr2-hip-xmatch-all.csv"
         },
         {
@@ -75,7 +75,7 @@
             "childcount" : 1000,
             "parentcount" : 50000,
             "magcorrections" : null,
-            "hip" : null,
+            "hip" : "$DATA_LOC/data/catalog/hipparcos/hipparcos.vot",
             "xmatchfile" : "$DATA_LOC/data/gdr2hip/gdr2-hip-xmatch-all.csv"
         },
         {
@@ -88,7 +88,7 @@
             "childcount" : 1000,
             "parentcount" : 50000,
             "magcorrections" : null,
-            "hip" : null,
+            "hip" : "$DATA_LOC/data/catalog/hipparcos/hipparcos.vot",
             "xmatchfile" : "$DATA_LOC/data/gdr2hip/gdr2-hip-xmatch-all.csv"
         }
 

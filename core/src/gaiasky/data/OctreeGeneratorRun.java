@@ -109,11 +109,11 @@ public class OctreeGeneratorRun {
     @Parameter(names = {"-s", "--suncentre", "--suncenter"}, description = "Make the Sun the centre of the octree")
     private boolean sunCentre = false;
 
-    @Parameter(names = "--nfiles", description = "Caps the number of data files to load. Defaults to unlimited")
+    @Parameter(names = "--nfiles", description = "Data file number cap. Defaults to unlimited")
     private int fileNumCap = -1;
 
-    @Parameter(names = {"--hip", "--addhip"}, description = "Add the Hipparcos catalog on top of the catalog provided by -l (hip location is data/catalog/hipparcos/hipparcos.vot)")
-    private boolean addHip = false;
+    @Parameter(names = {"--hip"}, description = "Location (absolute or relative to data folder \"data/...\") of the Hipparcos catalog to add on top of the catalog provided by -l")
+    private String hip = null;
 
     @Parameter(names = "--hip-names", description = "Directory containing HIP names files (Name_To_HIP.dat, Var_To_HIP.dat, etc.), in case the HIP catalog does not already provide them")
     private String hipNamesDir = null;
@@ -121,7 +121,7 @@ public class OctreeGeneratorRun {
     @Parameter(names = "--xmatchfile", description = "Crossmatch file between Gaia and HIP, containing source_id to hip data, only if --hip is enabled")
     private String xmatchFile = null;
 
-    @Parameter(names = "--distcap", description = "Specifies a maximum distance in parsecs. Stars beyond this distance are not loaded")
+    @Parameter(names = "--distcap", description = "Maximum distance in parsecs. Stars beyond this distance are not loaded")
     private double distcap = Long.MAX_VALUE;
 
     @Parameter(names = "--ruwe", description = "RUWE threshold value. All stars with a RUWE larger than this value will not be used. Also, if present, --pllxerrfaint and --pllxerrbright are ignored")
@@ -133,7 +133,7 @@ public class OctreeGeneratorRun {
     @Parameter(names = "--additional", description = "Comma-separated list of files or folders with (optionally gzipped) csv files containing additional columns (matched by name) of main catalog. The file can be gzipped and must contain a Gaia sourceid column in the first position")
     private String additionalFiles = null;
 
-    @Parameter(names = "--compat-mode", description = "Use the compatibility mode format (DR1/DR2), where the files have tycho ids")
+    @Parameter(names = "--compat-mode", description = "Use compatibility mode format (DR1/DR2), where the files have tycho ids")
     private boolean compatibilityMode = false;
 
     @Parameter(names = "--serialized", description = "Use java serialization instead of the binary format to output particle files")
@@ -231,7 +231,7 @@ public class OctreeGeneratorRun {
             loader.setRUWECap(ruwe);
             countsPerMagGaia = loader.getCountsPerMag();
 
-            if (addHip && xmatchFile != null && !xmatchFile.isEmpty()) {
+            if (hip != null && xmatchFile != null && !xmatchFile.isEmpty()) {
                 // Load xmatchTable
                 xmatchTable = readXmatchTable(xmatchFile);
                 if (!xmatchTable.isEmpty()) {
@@ -244,20 +244,20 @@ public class OctreeGeneratorRun {
             listLoader = loader.loadData(input);
         }
 
-        if (addHip) {
+        if (hip != null) {
             /* HIPPARCOS */
             STILDataProvider stil = new STILDataProvider();
 
             // All hip stars for which we have a Gaia star, bypass plx >= 0 condition in STILDataProvider
             if (xmatchTable != null) {
                 Set<Long> mustLoad = new HashSet<>();
-                for (int hip : xmatchTable.values()) {
-                    mustLoad.add(Long.valueOf(hip));
+                for (int hipNumber : xmatchTable.values()) {
+                    mustLoad.add(Long.valueOf(hipNumber));
                 }
                 stil.setMustLoadIds(mustLoad);
             }
 
-            Array<ParticleBean> listHip = stil.loadData("data/catalog/hipparcos/hipparcos.vot");
+            Array<ParticleBean> listHip = stil.loadData(hip);
 
             // Update HIP names using external source, if needed
             if (hipNamesDir != null) {
