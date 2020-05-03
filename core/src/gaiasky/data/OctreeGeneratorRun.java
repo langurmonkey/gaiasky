@@ -94,8 +94,8 @@ public class OctreeGeneratorRun {
     @Parameter(names = "--pllxzeropoint", description = "Zero point value for the parallax in mas")
     private double pllxzeropoint = 0d;
 
-    @Parameter(names = {"-c", "--magcorrections"}, description = "Flag to apply magnitude and color corrections for extinction and reddening, if available")
-    private boolean magCorrections = false;
+    @Parameter(names = {"-c", "--nomagcorrections"}, description = "Flag to skip magnitude and color corrections for extinction and reddening")
+    private boolean magCorrections = true;
 
     @Parameter(names = {"-p", "--postprocess"}, description = "Low object count nodes (<=100) will be merged with their parents if parents have less than 1000 objects. Avoids very large and mostly empty subtrees")
     private boolean postprocess = false;
