@@ -131,7 +131,7 @@ public class StarGroupRenderSystem extends ImmediateRenderSystem implements IObs
                                 if (starGroup.filter(i)) {
                                     StarBean sb = (StarBean) starGroup.data().get(i);
                                     if(!Double.isFinite(sb.size())){
-                                        logger.warn("Star " + sb.id + " has a non-finite size");
+                                        logger.debug("Star " + sb.id + " has a non-finite size");
                                         continue;
                                     }
                                     // COLOR
