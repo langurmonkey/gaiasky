@@ -28,43 +28,56 @@ import java.time.temporal.ChronoField;
  */
 public class AstroUtils {
 
-    /** Julian date of J2000 epoch (julian days since January 1, 4713 BCE) **/
-    static final public double JD_J2000 = 2451545.; // Julian Date of J2000
+    /**
+     * Julian date of J2000 epoch (julian days since January 1, 4713 BCE)
+     **/
+    static final public double JD_J2000 = getJulianDate(2000.0);
     /**
      * Julian date of reference epoch J2015.0 = JD2455197.5 =
      * 2015-01-01T00:00:00
      **/
-    static final public double JD_J2015 = 2457023.500000;
+    static final public double JD_J2015 = getJulianDate(2015.0);
 
     /**
      * Julian date of the Gaia DR2 reference epoch, J2015.5 = JD2455197.5 =
      * 2015-01-01T00:00:00
      **/
-    static final public double JD_J2015_5 = JD_J2015 + 365.25 / 2.0;
+    static final public double JD_J2015_5 = getJulianDate(2015.5);
 
-    /** Julian date of TGAS epoch 2010-01-01T00:00:00 **/
-    static final public double JD_J2010 = 2455197.5;
+    /**
+     * Julian date of TGAS epoch 2010-01-01T00:00:00
+     **/
+    static final public double JD_J2010 = getJulianDate(2010.0);
 
-    /** Julian date of B1900 epoch */
-    static final public double JD_B1900 = 2415020.31352;// Julian Date of B1900
-    /** Milliseconds of J2000 in the scale of java.util.Date **/
+    /**
+     * Milliseconds of J2000 in the scale of java.util.Date
+     **/
     public static final long J2000_MS;
+
+    /**
+     * Get julian date from a double reference epoch
+     * @param refEpoch The reference epoch
+     * @return The julian date
+     */
+    public static double getJulianDate(double refEpoch) {
+        int year = (int) refEpoch;
+        double part = refEpoch - year;
+        return getJulianDate(year, 1, 1, 0, 0, 0, 0, true) + 365.25 * part;
+    }
 
     static {
         Instant d = (LocalDateTime.of(2000, 1, 1, 0, 0, 0)).toInstant(ZoneOffset.UTC);
         J2000_MS = d.toEpochMilli();
     }
 
-    /** Julian date cache, since most dates are used more than once **/
+    /**
+     * Julian date cache, since most dates are used more than once
+     **/
     private static LruCache<Long, Double> jdcache = new LruCache<>(50);
 
-    // Earth equatorial radius in Km
-    public static final float EARTH_RADIUS = 6378.1370f;
-
-    // Standard gravitational parameter (GM) of SOL
-    public static final double MU_SOL = 1.32712440041e20;
-
-    /** Initialize nsl Sun **/
+    /**
+     * Initialize nsl Sun
+     **/
     private static final NslSun nslSun = new NslSun();
 
     private static final Vector3d aux3 = new Vector3d();
@@ -307,7 +320,7 @@ public class AstroUtils {
         double sumladd = 3958.0 * trigo.sin(Math.toRadians(A1)) + 1962.0 * trigo.sin(Math.toRadians(Lp - F)) + 318.0 * trigo.sin(Math.toRadians(A2));
         suml += sumladd;
 
-        return new double[] { suml, sumr };
+        return new double[]{suml, sumr};
 
     }
 
@@ -342,19 +355,19 @@ public class AstroUtils {
      * Moon. The unit is 0.000001 degree for Sum(l), and 0.001 km for Sum(r).
      * Multiple of D M M' F CoeffSine CoeffCosine
      */
-    private static final double[][] table47a = { { 0, 0, 1, 0, 6288774.0, -20905355 }, { 2, 0, -1, 0, 1274027, -3699111 }, { 2, 0, 0, 0, 658314, -2955968 }, { 0, 0, 2, 0, 213618, -569925 }, { 0, 1, 0, 0, -185116, 48888 }, { 0, 0, 0, 2, -114332, -3149 }, { 2, 0, -2, 0, 58793, 246158 }, { 2, -1, -1, 0, 57066.0, -152138 }, { 2, 0, 1, 0, 53322, -170733 }, { 2, -1, 0, 0, 45758, -204586 }, { 0, 1, -1, 0, -40923, -129620 }, { 1, 0, 0, 0, -34720, 108743 }, { 0, 1, 1, 0, -30383, 104755 },
-            { 2, 0, 0, -2, 15327, 10321 }, { 0, 0, 1, 2, -12528, 0 }, { 0, 0, 1, -2, 10980, 79661 }, { 4, 0, -1, 0, 10675, -34782 }, { 0, 0, 3, 0, 10034, -23210 }, { 4, 0, -2, 0, 8548, -21636 }, { 2, 1, -1, 0, -7888, 24208 }, { 2, 1, 0, 0, -6766, 30824 }, { 1, 0, -1, 0, -5163, -8379 }, { 1, 1, 0, 0, 4987, -16675 }, { 2, -1, 1, 0, 4036, -12831 }, { 2, 0, 2, 0, 3994, -10445 }, { 4, 0, 0, 0, 3861, -11650 }, { 2, 0, -3, 0, 3665, 14403 }, { 0, 1, -2, 0, -2689, -7003 }, { 2, 0, -1, 2, -2602, 0 },
-            { 2, -1, -2, 0, 2390, 10056 }, { 1, 0, 1, 0, -2348, 6322 }, { 2, -2, 0, 0, 2236, -9884 }, { 0, 1, 2, 0, -2120, 5751 }, { 0, 2, 0, 0, -2069, 0 }, { 2, -2, -1, 0, 2048, -4950 }, { 2, 0, 1, -2, -1773, 4130 }, { 2, 0, 0, 2, -1595, 0 }, { 4, -1, -1, 0, 1215, -3958 }, { 0, 0, 2, 2, -1110, 0 }, { 3, 0, -1, 0, -892, 3258 }, { 2, 1, 1, 0, -810, 2616 }, { 4, -1, -2, 0, 759, -1897 }, { 0, 2, -1, 0, -713, -2117 }, { 2, 2, -1, 0, -700, 2354 }, { 2, 1, -2, 0, 691, 0 }, { 2, -1, 0, -2, 596, 0 },
-            { 4, 0, 1, 0, 549, -1423 }, { 0, 0, 4, 0, 537, -1117 }, { 4, -1, 0, 0, 520, -1571 }, { 1, 0, -2, 0, -487, -1739 }, { 2, 1, 0, -2, -399, 0 }, { 0, 0, 2, -2, -381, -4421 }, { 1, 1, 1, 0, 351, 0 }, { 3, 0, -2, 0, -340, 0 }, { 4, 0, -3, 0, 330, 0 }, { 2, -1, 2, 0, 327, 0 }, { 0, 2, 1, 0, -323, 1165 }, { 1, 1, -1, 0, 299, 0 }, { 2, 0, 3, 0, 294, 0 }, { 2, 0, -1, -2, 0, 8752 } };
+    private static final double[][] table47a = {{0, 0, 1, 0, 6288774.0, -20905355}, {2, 0, -1, 0, 1274027, -3699111}, {2, 0, 0, 0, 658314, -2955968}, {0, 0, 2, 0, 213618, -569925}, {0, 1, 0, 0, -185116, 48888}, {0, 0, 0, 2, -114332, -3149}, {2, 0, -2, 0, 58793, 246158}, {2, -1, -1, 0, 57066.0, -152138}, {2, 0, 1, 0, 53322, -170733}, {2, -1, 0, 0, 45758, -204586}, {0, 1, -1, 0, -40923, -129620}, {1, 0, 0, 0, -34720, 108743}, {0, 1, 1, 0, -30383, 104755},
+            {2, 0, 0, -2, 15327, 10321}, {0, 0, 1, 2, -12528, 0}, {0, 0, 1, -2, 10980, 79661}, {4, 0, -1, 0, 10675, -34782}, {0, 0, 3, 0, 10034, -23210}, {4, 0, -2, 0, 8548, -21636}, {2, 1, -1, 0, -7888, 24208}, {2, 1, 0, 0, -6766, 30824}, {1, 0, -1, 0, -5163, -8379}, {1, 1, 0, 0, 4987, -16675}, {2, -1, 1, 0, 4036, -12831}, {2, 0, 2, 0, 3994, -10445}, {4, 0, 0, 0, 3861, -11650}, {2, 0, -3, 0, 3665, 14403}, {0, 1, -2, 0, -2689, -7003}, {2, 0, -1, 2, -2602, 0},
+            {2, -1, -2, 0, 2390, 10056}, {1, 0, 1, 0, -2348, 6322}, {2, -2, 0, 0, 2236, -9884}, {0, 1, 2, 0, -2120, 5751}, {0, 2, 0, 0, -2069, 0}, {2, -2, -1, 0, 2048, -4950}, {2, 0, 1, -2, -1773, 4130}, {2, 0, 0, 2, -1595, 0}, {4, -1, -1, 0, 1215, -3958}, {0, 0, 2, 2, -1110, 0}, {3, 0, -1, 0, -892, 3258}, {2, 1, 1, 0, -810, 2616}, {4, -1, -2, 0, 759, -1897}, {0, 2, -1, 0, -713, -2117}, {2, 2, -1, 0, -700, 2354}, {2, 1, -2, 0, 691, 0}, {2, -1, 0, -2, 596, 0},
+            {4, 0, 1, 0, 549, -1423}, {0, 0, 4, 0, 537, -1117}, {4, -1, 0, 0, 520, -1571}, {1, 0, -2, 0, -487, -1739}, {2, 1, 0, -2, -399, 0}, {0, 0, 2, -2, -381, -4421}, {1, 1, 1, 0, 351, 0}, {3, 0, -2, 0, -340, 0}, {4, 0, -3, 0, 330, 0}, {2, -1, 2, 0, 327, 0}, {0, 2, 1, 0, -323, 1165}, {1, 1, -1, 0, 299, 0}, {2, 0, 3, 0, 294, 0}, {2, 0, -1, -2, 0, 8752}};
 
     /**
      * Periodic terms for the latitude of the Moon (Sum(b)). The unit is
      * 0.000001 degree. Multiple of D M M' F Coefficient of the sine of the
      * argument
      */
-    private static final double[][] table47b = { { 0, 0, 0, 1, 5128122 }, { 0, 0, 1, 1, 280602 }, { 0, 0, 1, -1, 277693 }, { 2, 0, 0, -1, 173237 }, { 2, 0, -1, 1, 55413 }, { 2, 0, -1, -1, 46271 }, { 2, 0, 0, 1, 32573 }, { 0, 0, 2, 1, 17198 }, { 2, 0, 1, -1, 9266 }, { 0, 0, 2, -1, 8822 }, { 2, -1, 0, -1, 8216 }, { 2, 0, -2, -1, 4324 }, { 2, 0, 1, 1, 4200 }, { 2, 1, 0, -1, -3359 }, { 2, -1, -1, 1, 2463 }, { 2, -1, 0, 1, 2211 }, { 2, -1, -1, -1, 2065 }, { 0, 1, -1, -1, -1870 },
-            { 4, 0, -1, -1, 1828 }, { 0, 1, 0, 1, -1794 }, { 0, 0, 0, 3, -1749 }, { 0, 1, -1, 1, -1565 }, { 1, 0, 0, 1, -1491 }, { 0, 1, 1, 1, -1475 }, { 0, 1, 1, -1, -1410 }, { 0, 1, 0, -1, -1344 }, { 1, 0, 0, -1, -1335 }, { 0, 0, 3, 1, 1107 }, { 4, 0, 0, -1, 1021 }, { 4, 0, -1, 1, 833 }, { 0, 0, 1, -3, 777 }, { 4, 0, -2, 1, 671 }, { 2, 0, 0, -3, 607 }, { 2, 0, 2, -1, 596 }, { 2, -1, 1, -1, 491 }, { 2, 0, -2, 1, -451 }, { 0, 0, 3, -1, 439 }, { 2, 0, 2, 1, 422 }, { 2, 0, -3, -1, 421 },
-            { 2, 1, -1, 1, -366 }, { 2, 1, 0, 1, -351 }, { 4, 0, 0, 1, 331 }, { 2, -1, 1, 1, 315 }, { 2, -2, 0, -1, 302 }, { 0, 0, 1, 3, -283 }, { 2, 1, 1, -1, -229 }, { 1, 1, 0, -1, 223 }, { 1, 1, 0, 1, 223 }, { 0, 1, -2, -1, -220 }, { 2, 1, -1, -1, -220 }, { 1, 0, 1, 1, -185 }, { 2, -1, -2, -1, 181 }, { 0, 1, 2, 1, -177 }, { 4, 0, -2, -1, 176 }, { 4, -1, -1, -1, 166 }, { 1, 0, 1, -1, -164 }, { 4, 0, 1, -1, 132 }, { 1, 0, -1, -1, -119 }, { 4, -1, 0, -1, 115 }, { 2, -2, 0, 1, 107 } };
+    private static final double[][] table47b = {{0, 0, 0, 1, 5128122}, {0, 0, 1, 1, 280602}, {0, 0, 1, -1, 277693}, {2, 0, 0, -1, 173237}, {2, 0, -1, 1, 55413}, {2, 0, -1, -1, 46271}, {2, 0, 0, 1, 32573}, {0, 0, 2, 1, 17198}, {2, 0, 1, -1, 9266}, {0, 0, 2, -1, 8822}, {2, -1, 0, -1, 8216}, {2, 0, -2, -1, 4324}, {2, 0, 1, 1, 4200}, {2, 1, 0, -1, -3359}, {2, -1, -1, 1, 2463}, {2, -1, 0, 1, 2211}, {2, -1, -1, -1, 2065}, {0, 1, -1, -1, -1870},
+            {4, 0, -1, -1, 1828}, {0, 1, 0, 1, -1794}, {0, 0, 0, 3, -1749}, {0, 1, -1, 1, -1565}, {1, 0, 0, 1, -1491}, {0, 1, 1, 1, -1475}, {0, 1, 1, -1, -1410}, {0, 1, 0, -1, -1344}, {1, 0, 0, -1, -1335}, {0, 0, 3, 1, 1107}, {4, 0, 0, -1, 1021}, {4, 0, -1, 1, 833}, {0, 0, 1, -3, 777}, {4, 0, -2, 1, 671}, {2, 0, 0, -3, 607}, {2, 0, 2, -1, 596}, {2, -1, 1, -1, 491}, {2, 0, -2, 1, -451}, {0, 0, 3, -1, 439}, {2, 0, 2, 1, 422}, {2, 0, -3, -1, 421},
+            {2, 1, -1, 1, -366}, {2, 1, 0, 1, -351}, {4, 0, 0, 1, 331}, {2, -1, 1, 1, 315}, {2, -2, 0, -1, 302}, {0, 0, 1, 3, -283}, {2, 1, 1, -1, -229}, {1, 1, 0, -1, 223}, {1, 1, 0, 1, 223}, {0, 1, -2, -1, -220}, {2, 1, -1, -1, -220}, {1, 0, 1, 1, -185}, {2, -1, -2, -1, 181}, {0, 1, 2, 1, -177}, {4, 0, -2, -1, 176}, {4, -1, -1, -1, 166}, {1, 0, 1, -1, -164}, {4, 0, 1, -1, 132}, {1, 0, -1, -1, -119}, {4, -1, 0, -1, 115}, {2, -2, 0, 1, 107}};
 
     /**
      * Returns a vector with the heliocentric ecliptic latitude and longitude in
@@ -370,22 +383,22 @@ public class AstroUtils {
     public static Vector3d getEclipticCoordinates(String body, Instant instant, Vector3d out, boolean highAccuracy) {
 
         switch (body) {
-        case "Moon":
-            return new MoonAACoordinates().getEclipticSphericalCoordinates(instant, out);
-        case "Pluto":
-            return new PlutoCoordinates().getEclipticSphericalCoordinates(instant, out);
-        default:
-            double tau = tau(getJulianDateCache(instant));
+            case "Moon":
+                return new MoonAACoordinates().getEclipticSphericalCoordinates(instant, out);
+            case "Pluto":
+                return new PlutoCoordinates().getEclipticSphericalCoordinates(instant, out);
+            default:
+                double tau = tau(getJulianDateCache(instant));
 
-            iVSOP87 coor = VSOP87.instance.getVOSP87(body);
-            coor.setHighAccuracy(highAccuracy);
-            double L = (coor.L0(tau) + coor.L1(tau) + coor.L2(tau) + coor.L3(tau) + coor.L4(tau) + coor.L5(tau));
-            double B = (coor.B0(tau) + coor.B1(tau) + coor.B2(tau) + coor.B3(tau) + coor.B4(tau) + coor.B5(tau));
-            double R = (coor.R0(tau) + coor.R1(tau) + coor.R2(tau) + coor.R3(tau) + coor.R4(tau) + coor.R5(tau));
-            R = R * Constants.AU_TO_U;
+                iVSOP87 coor = VSOP87.instance.getVOSP87(body);
+                coor.setHighAccuracy(highAccuracy);
+                double L = (coor.L0(tau) + coor.L1(tau) + coor.L2(tau) + coor.L3(tau) + coor.L4(tau) + coor.L5(tau));
+                double B = (coor.B0(tau) + coor.B1(tau) + coor.B2(tau) + coor.B3(tau) + coor.B4(tau) + coor.B5(tau));
+                double R = (coor.R0(tau) + coor.R1(tau) + coor.R2(tau) + coor.R3(tau) + coor.R4(tau) + coor.R5(tau));
+                R = R * Constants.AU_TO_U;
 
-            out.set(L, B, R);
-            return out;
+                out.set(L, B, R);
+                return out;
         }
     }
 
@@ -529,7 +542,7 @@ public class AstroUtils {
         double dayFraction = julianDate - J;
         int[] df = getDayQuantities(dayFraction);
 
-        return new int[] { Y, M, D, df[0], df[1], df[2], df[3] };
+        return new int[]{Y, M, D, df[0], df[1], df[2], df[3]};
 
     }
 
@@ -620,7 +633,7 @@ public class AstroUtils {
         double minf = (hourf - (int) hourf) * 60.0;
         double secf = (minf - (int) minf) * 60.0;
         double nanosf = (secf - (int) secf) * 1.0E9;
-        return new int[] { (int) hourf, (int) minf, (int) secf, (int) nanosf };
+        return new int[]{(int) hourf, (int) minf, (int) secf, (int) nanosf};
     }
 
     /**

@@ -70,7 +70,7 @@ public class FocusInfoInterface extends TableGuiInterface implements IObserver {
         sf = NumberFormatFactory.getFormatter("#0.##E0");
 
         float buttonSize = 15f * GlobalConf.UI_SCALE_FACTOR;
-        float imgSize = 15f * GlobalConf.UI_SCALE_FACTOR;
+        float imgSize = 18f * GlobalConf.UI_SCALE_FACTOR;
         pad15 = 15f * GlobalConf.UI_SCALE_FACTOR;
         pad10 = 10f * GlobalConf.UI_SCALE_FACTOR;
         pad5 = 5f * GlobalConf.UI_SCALE_FACTOR;
@@ -124,7 +124,7 @@ public class FocusInfoInterface extends TableGuiInterface implements IObserver {
         Button pointerImgBtn2 = new OwnTextIconButton("", skin, "pointer");
         pointerImgBtn2.setSize(imgSize, imgSize);
         pointerImgBtn2.addListener(new OwnTextTooltip(I18n.txt("gui.focusinfo.pointer"), skin));
-        Button viewImgBtn = new OwnTextIconButton("", skin, "view");
+        Button viewImgBtn = new OwnTextIconButton("", skin, "eye");
         viewImgBtn.setSize(imgSize, imgSize);
         viewImgBtn.addListener(new OwnTextTooltip(I18n.txt("gui.focusinfo.view"), skin));
 

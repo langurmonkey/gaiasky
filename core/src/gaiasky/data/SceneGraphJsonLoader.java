@@ -11,6 +11,7 @@ import com.badlogic.gdx.utils.JsonReader;
 import com.badlogic.gdx.utils.JsonValue;
 import com.badlogic.gdx.utils.reflect.ClassReflection;
 import com.badlogic.gdx.utils.reflect.Constructor;
+import com.badlogic.gdx.utils.reflect.Method;
 import com.badlogic.gdx.utils.reflect.ReflectionException;
 import gaiasky.scenegraph.ISceneGraph;
 import gaiasky.scenegraph.SceneGraphNode;
@@ -19,6 +20,8 @@ import gaiasky.scenegraph.octreewrapper.AbstractOctreeWrapper;
 import gaiasky.util.I18n;
 import gaiasky.util.Logger;
 import gaiasky.util.Logger.Log;
+import gaiasky.util.TextUtils;
+import gaiasky.util.coord.IBodyCoordinates;
 import gaiasky.util.time.ITimeFrameProvider;
 
 import java.io.FileNotFoundException;
@@ -26,13 +29,13 @@ import java.io.FileNotFoundException;
 public class SceneGraphJsonLoader {
     private static Log logger = Logger.getLogger(SceneGraphJsonLoader.class);
 
-    public static ISceneGraph loadSceneGraph(FileHandle[] jsonFiles, ITimeFrameProvider time, boolean multithreading, int maxThreads) throws FileNotFoundException, ReflectionException {
+    public static ISceneGraph loadSceneGraph(FileHandle[] jsonFiles, ITimeFrameProvider time, boolean multithreading, int maxThreads) throws FileNotFoundException, ReflectionException, NoSuchMethodException {
         ISceneGraph sg = null;
         try {
-            logger.info(I18n.txt("notif.loading","JSON data descriptor files:"));
-            for(FileHandle fh : jsonFiles){
+            logger.info(I18n.txt("notif.loading", "JSON data descriptor files:"));
+            for (FileHandle fh : jsonFiles) {
                 logger.info("\t" + fh.path() + " - exists: " + fh.exists());
-                if(!fh.exists()){
+                if (!fh.exists()) {
                     logger.error(I18n.txt("error.loading.notexistent", fh.path()));
                 }
             }
@@ -44,7 +47,7 @@ public class SceneGraphJsonLoader {
                 JsonValue model = jsonReader.parse(jsonFile.read());
 
                 // Must have a 'data' element
-                if(model.has("data")) {
+                if (model.has("data")) {
                     String name = model.get("name") != null ? model.get("name").asString() : null;
                     String desc = model.get("description") != null ? model.get("description").asString() : null;
 
@@ -67,6 +70,32 @@ public class SceneGraphJsonLoader {
 
                             // Init loader
                             loader.initialize(files);
+
+                            JsonValue curr = filesJson;
+                            while (curr.next != null) {
+                                curr = curr.next;
+                                String nameAttr = curr.name;
+                                Object val = null;
+                                Class valueClass = null;
+                                if (curr.isDouble()) {
+                                    val = curr.asDouble();
+                                    valueClass = Double.class;
+                                } else if (curr.isString()) {
+                                    val = curr.asString();
+                                    valueClass = String.class;
+                                } else if (curr.isNumber()) {
+                                    val = curr.asLong();
+                                    valueClass = Long.class;
+                                }
+                                if (val != null) {
+                                    String methodName = "set" + TextUtils.propertyToMethodName(nameAttr);
+                                    Method m = searchMethod(methodName, valueClass, clazz);
+                                    if (m != null)
+                                        m.invoke(loader, val);
+                                    else
+                                        logger.error("ERROR: No method " + methodName + "(" + valueClass.getName() + ") in class " + clazz + " or its superclass/interfaces.");
+                                }
+                            }
 
                             // Load data
                             Array<? extends SceneGraphNode> data = loader.loadData();
@@ -97,12 +126,13 @@ public class SceneGraphJsonLoader {
                 if (node instanceof AbstractOctreeWrapper) {
                     hasOctree = true;
                     AbstractOctreeWrapper aow = (AbstractOctreeWrapper) node;
-                    for (SceneGraphNode n : aow.children) {
-                        if (n instanceof StarGroup) {
-                            hasStarGroup = true;
-                            break;
+                    if (aow.children != null)
+                        for (SceneGraphNode n : aow.children) {
+                            if (n instanceof StarGroup) {
+                                hasStarGroup = true;
+                                break;
+                            }
                         }
-                    }
                 }
 
                 if (node instanceof StarGroup)
@@ -117,6 +147,31 @@ public class SceneGraphJsonLoader {
             throw e;
         }
         return sg;
+    }
+
+    /**
+     * Searches for the given method with the given class. If none is found, it looks for fitting methods
+     * with the classe's interfaces and superclasses recursively.
+     *
+     * @param methodName
+     * @param clazz
+     * @return
+     */
+    private static Method searchMethod(String methodName, Class<?> clazz, Class<?> source) {
+        Method m = null;
+        try {
+            m = ClassReflection.getMethod(source, methodName, clazz);
+        } catch (ReflectionException e) {
+            try {
+                if (methodName.contains("setCoordinates")) {
+                    // Special case
+                    m = ClassReflection.getMethod(source, methodName, IBodyCoordinates.class);
+                }
+            } catch (ReflectionException e1) {
+                logger.error(e1);
+            }
+        }
+        return m;
     }
 
 }

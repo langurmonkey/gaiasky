@@ -84,7 +84,8 @@ public abstract class AbstractStarGroupDataProvider implements IStarGroupDataPro
     protected List<AdditionalCols> additional;
 
     protected boolean hasAdditional(ColId col, Long sourceId) {
-        return getAdditionalValue(col, sourceId) != null;
+        Double val = getAdditionalValue(col, sourceId);
+        return val != null && !Double.isNaN(val) && !Double.isInfinite(val);
     }
 
     protected boolean hasAdditionalColumn(ColId col) {
@@ -251,8 +252,9 @@ public abstract class AbstractStarGroupDataProvider implements IStarGroupDataPro
         // If geometric distances are present, always accept, we use distances directly
         if (hasAdditionalColumn(ColId.geodist))
             return true;
-
-        if (adaptiveParallax && appmag < 13.1) {
+        if (!Double.isFinite(appmag)) {
+            return false;
+        } else if (adaptiveParallax && appmag < 13.1) {
             return pllx >= 0 && pllxerr < pllx * parallaxErrorFactorBright && pllxerr <= 1;
         } else {
             return pllx >= 0 && pllxerr < pllx * parallaxErrorFactorFaint && pllxerr <= 1;

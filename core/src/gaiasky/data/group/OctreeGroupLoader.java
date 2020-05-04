@@ -21,6 +21,7 @@ import gaiasky.util.GlobalConf;
 import gaiasky.util.I18n;
 import gaiasky.util.Logger;
 import gaiasky.util.Logger.Log;
+import gaiasky.util.coord.AstroUtils;
 import gaiasky.util.tree.LoadStatus;
 import gaiasky.util.tree.OctreeNode;
 
@@ -31,7 +32,7 @@ import java.util.List;
  * Implements the loading and streaming of octree nodes from files. This version
  * loads star groups using the
  * {@link gaiasky.data.group.SerializedDataProvider}
- * 
+ *
  * @author tsagrista
  */
 public class OctreeGroupLoader extends StreamingOctreeLoader {
@@ -48,8 +49,15 @@ public class OctreeGroupLoader extends StreamingOctreeLoader {
      */
     private Boolean compatibilityMode = true;
 
-    /** Binary particle reader **/
+    /**
+     * Binary particle reader
+     **/
     private IStarGroupDataProvider particleReader;
+
+    /**
+     * Epoch of stars loaded through this
+     */
+    private double epoch = AstroUtils.JD_J2015_5;
 
     public OctreeGroupLoader() {
         instance = this;
@@ -109,8 +117,9 @@ public class OctreeGroupLoader extends StreamingOctreeLoader {
             return false;
         }
         @SuppressWarnings("unchecked")
-        List<ParticleBean> data =  particleReader.loadDataMapped(octantFile.path(), 1.0, compatibilityMode);
+        List<ParticleBean> data = particleReader.loadDataMapped(octantFile.path(), 1.0, compatibilityMode);
         StarGroup sg = StarGroup.getDefaultStarGroup("stargroup-%%SGID%%", data, fullInit);
+        sg.setEpoch(epoch);
         sg.setCatalogInfoBare(octreeWrapper.getCatalogInfo());
 
         synchronized (octant) {
@@ -134,6 +143,10 @@ public class OctreeGroupLoader extends StreamingOctreeLoader {
         }
         return true;
 
+    }
+
+    public void setEpoch(Double epoch) {
+        this.epoch = AstroUtils.getJulianDate(epoch);
     }
 
 }

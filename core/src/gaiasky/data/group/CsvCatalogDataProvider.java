@@ -305,12 +305,14 @@ public class CsvCatalogDataProvider extends AbstractStarGroupDataProvider {
                             }
                         }
                         // Apply extinction
-                        appmag -= ag;
-                        double absmag = appmag - 5 * Math.log10((distpc <= 0 ? 10 : distpc)) + 5;
+                        if(Double.isFinite(ag))
+                            appmag -= ag;
+
+                        double absmag = appmag - 5.0 * Math.log10((distpc <= 0 ? 10 : distpc)) + 5.0;
                         // Pseudo-luminosity. Usually L = L0 * 10^(-0.4*Mbol). We omit M0 and approximate Mbol = M
-                        double pseudoL = Math.pow(10, -0.4 * absmag);
+                        double pseudoL = Math.pow(10.0, -0.4 * absmag);
                         double sizeFactor = Nature.PC_TO_M * Constants.ORIGINAL_M_TO_U * 0.15;
-                        double size = Math.min((Math.pow(pseudoL, 0.45) * sizeFactor), 1e10);
+                        double size = Math.min((Math.pow(pseudoL, 0.45) * sizeFactor), 1.0e10);
                         //double radius = tokens.length >= 19 && !tokens[IDX_RADIUS]].isEmpty() ? Parser.parseDouble(tokens[IDX_RADIUS]]) * Constants.Ro_TO_U : size * Constants.STAR_SIZE_FACTOR;
 
                         /** COLOR, we use the tycBV map if present **/

@@ -130,6 +130,10 @@ public class StarGroupRenderSystem extends ImmediateRenderSystem implements IObs
                             for (int i = 0; i < n; i++) {
                                 if (starGroup.filter(i)) {
                                     StarBean sb = (StarBean) starGroup.data().get(i);
+                                    if(!Double.isFinite(sb.size())){
+                                        logger.warn("Star " + sb.id + " has a non-finite size");
+                                        continue;
+                                    }
                                     // COLOR
                                     if (hlCmap) {
                                         // Color map
@@ -141,7 +145,7 @@ public class StarGroupRenderSystem extends ImmediateRenderSystem implements IObs
                                     }
 
                                     // SIZE, APPMAG
-                                    tempVerts[curr.vertexIdx + additionalOffset + 0] = (float) (Math.pow(sb.size(), 1) * Constants.STAR_SIZE_FACTOR) * starGroup.highlightedSizeFactor();
+                                    tempVerts[curr.vertexIdx + additionalOffset + 0] = (float) (sb.size() * Constants.STAR_SIZE_FACTOR) * starGroup.highlightedSizeFactor();
                                     tempVerts[curr.vertexIdx + additionalOffset + 1] = (float) sb.appmag();
 
                                     // POSITION [u]
