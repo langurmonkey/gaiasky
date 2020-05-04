@@ -230,11 +230,12 @@ public class BinaryDataProvider extends AbstractStarGroupDataProvider {
 
         Long id = mem.getLong();
         int nameLength = mem.getInt();
-        StringBuilder name = new StringBuilder();
+        StringBuilder namesConcat = new StringBuilder();
         for (int i = 0; i < nameLength; i++)
-            name.append(mem.getChar());
+            namesConcat.append(mem.getChar());
+        String[] names = namesConcat.toString().split(Constants.nameSeparator);
 
-        return new StarBean(data, id, name.toString());
+        return new StarBean(data, id, names);
     }
 
 }

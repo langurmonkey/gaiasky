@@ -88,7 +88,7 @@ public abstract class AbstractStarGroupDataProvider implements IStarGroupDataPro
     }
 
     protected boolean hasAdditionalColumn(ColId col) {
-        if(additional == null)
+        if (additional == null)
             return false;
         for (AdditionalCols add : additional) {
             if (add != null && add.hasCol(col))
@@ -98,7 +98,7 @@ public abstract class AbstractStarGroupDataProvider implements IStarGroupDataPro
     }
 
     protected Double getAdditionalValue(ColId col, Long sourceId) {
-        if(additional == null)
+        if (additional == null)
             return null;
         for (AdditionalCols add : additional) {
             if (add != null && add.hasCol(col)) {
@@ -424,10 +424,12 @@ public abstract class AbstractStarGroupDataProvider implements IStarGroupDataPro
 
     @Override
     public void setAdditionalFiles(String additionalFiles) {
-        this.additionalFiles = additionalFiles.split(",");
-        this.additional = new ArrayList<>();
-        if (additionalFiles != null && this.additionalFiles.length > 0)
-            loadAdditional();
+        if (additionalFiles != null && !additionalFiles.isBlank()) {
+            this.additionalFiles = additionalFiles.split(",");
+            this.additional = new ArrayList<>();
+            if (additionalFiles != null && this.additionalFiles.length > 0)
+                loadAdditional();
+        }
     }
 
     @Override
@@ -441,7 +443,7 @@ public abstract class AbstractStarGroupDataProvider implements IStarGroupDataPro
     }
 
     private void loadAdditional() {
-        for(String additionalFile : additionalFiles) {
+        for (String additionalFile : additionalFiles) {
             additionalSplit = ",";
             AdditionalCols addit = new AdditionalCols();
             addit.indices = new HashMap<>();
@@ -483,7 +485,7 @@ public abstract class AbstractStarGroupDataProvider implements IStarGroupDataPro
     /**
      * Loads a single file, optionally gzipped into the given {@link AdditionalCols}
      *
-     * @param f The path
+     * @param f     The path
      * @param addit The {@link AdditionalCols} instance
      * @throws IOException
      * @throws RuntimeException
