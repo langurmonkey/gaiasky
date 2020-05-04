@@ -90,7 +90,7 @@ void main() {
     vec4 gpos = u_projModelView * vec4(pos, 1.0);
     gl_Position = gpos;
     float size = pow(viewAngleApparent * .5e8, u_brPow) * u_alphaSizeFovBr.y * sizefactor / u_alphaSizeFovBr.z;
-    gl_PointSize = clamp(size, 2.0, 100.0);
+    gl_PointSize = clamp(size, 3.0, 100.0);
 
     #ifdef velocityBufferFlag
     velocityBuffer(gpos, a_position, dist, pm, vec2(500.0, 3000.0), 1.0);
