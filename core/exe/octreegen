@@ -32,7 +32,7 @@ fi
 #OPTS="$OPTS -Dproperties.file=$GSDIRESC/conf/global.properties"
 
 # Memory
-OPTS="$OPTS -Xms64g -Xmx512g"
+OPTS="$OPTS -Xms256g -Xmx1200g"
 
 # Parallel GC 
 #OPTS="$OPTS -XX:+UseParallelGC"
