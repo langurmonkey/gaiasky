@@ -53,14 +53,9 @@ echo "CATALOG_FILE: $CATALOG_FILE"
 # PARSE DATA AND CHECK VALUES
 
 # Get size in bytes of dataset
-SIZE_BYTES=$(set -- $(du -b --max-depth=1 $LOCATION) && echo $3)
+SIZE_BYTES=$(set -- $(du -b --max-depth=1 $LOCATION) && AUXVAR=$(( $# - 1 )) && echo ${!AUXVAR})
 # Get particles
-NOBJECTS=$(set -- $(grep Particles: $LOCATION/log) && echo $6)
-re='^[0-9]+$'
-if ! [[ $NOBJECTS =~ $re ]] ; then
-  NOBJECTS=$(set -- $(grep Particles: $LOCATION/log) && echo $7)
-fi
-
+NOBJECTS=$(set -- $(grep Particles: $LOCATION/log) && echo ${!#})
 
 # Check values
 if [ -z "$VERSION" ]; then
