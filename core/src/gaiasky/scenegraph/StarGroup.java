@@ -653,7 +653,7 @@ public class StarGroup extends ParticleGroup implements ILineRenderable, IStarFo
                 Vector3d starPosition = fetchPosition(star, camera.getPos(), aux3d1.get(), currDeltaYears);
                 float distToCamera = (float) starPosition.len();
                 float radius = (float) getRadius(active[i]);
-                float viewAngle = (float) (((radius / distToCamera) / camera.getFovFactor()) * GlobalConf.scene.STAR_BRIGHTNESS * 2f);
+                float viewAngle = (float) (((radius / distToCamera) / camera.getFovFactor()) * GlobalConf.scene.STAR_BRIGHTNESS * 1.5f);
 
                 if (viewAngle >= thOverFactor && camera.isVisible(GaiaSky.instance.time, viewAngle, starPosition, distToCamera) && distToCamera > radius * 100) {
                     textPosition(camera, starPosition, distToCamera, radius);

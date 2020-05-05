@@ -272,8 +272,8 @@ public class DesktopConfInit extends ConfInit {
         double STAR_TH_ANGLE_QUAD = Parser.parseDouble(p.getProperty("scene.star.threshold.quad"));
         double STAR_TH_ANGLE_POINT = Parser.parseDouble(p.getProperty("scene.star.threshold.point"));
         double STAR_TH_ANGLE_NONE = Parser.parseDouble(p.getProperty("scene.star.threshold.none"));
-        float POINT_ALPHA_MIN = Parser.parseFloat(p.getProperty("scene.point.alpha.min"));
-        float POINT_ALPHA_MAX = Parser.parseFloat(p.getProperty("scene.point.alpha.max"));
+        float STAR_MIN_OPACITY = Parser.parseFloat(p.getProperty("scene.point.alpha.min"));
+        float STAR_MAX_OPACITY = Parser.parseFloat(p.getProperty("scene.point.alpha.max"));
         int ORBIT_RENDERER = Parser.parseInt(p.getProperty("scene.renderer.orbit", "0"));
         int LINE_RENDERER = Parser.parseInt(p.getProperty("scene.renderer.line"));
         boolean OCTREE_PARTICLE_FADE = Parser.parseBoolean(p.getProperty("scene.octree.particle.fade"));
@@ -325,7 +325,7 @@ public class DesktopConfInit extends ConfInit {
         double DIST_SCALE_VR = 1e6d;
 
         SceneConf sc = new SceneConf();
-        sc.initialize(STARTUP_OBJECT, GRAPHICS_QUALITY, OBJECT_FADE_MS, STAR_BRIGHTNESS, STAR_BRIGHTNESS_POWER, STAR_TEX_INDEX, AMBIENT_LIGHT, CAMERA_FOV, CAMERA_SPEED, TURNING_SPEED, ROTATION_SPEED, CAMERA_SPEED_LIMIT_IDX, FOCUS_LOCK, FOCUS_LOCK_ORIENTATION, LABEL_SIZE_FACTOR, LABEL_NUMBER_FACTOR, LINE_WIDTH_FACTOR, VISIBILITY, ORBIT_RENDERER, LINE_RENDERER, STAR_TH_ANGLE_NONE, STAR_TH_ANGLE_POINT, STAR_TH_ANGLE_QUAD, POINT_ALPHA_MIN, POINT_ALPHA_MAX, OCTREE_PARTICLE_FADE, OCTANT_THRESHOLD_0, OCTANT_THRESHOLD_1, PM_NUM_FACTOR, PM_LEN_FACTOR, N_PM_STARS, PM_COLOR_MODE, PM_ARROWHEADS, STAR_POINT_SIZE, GALAXY_3D, CROSSHAIR_FOCUS, CROSSHAIR_CLOSEST, CROSSHAIR_HOME, CINEMATIC_CAMERA, LAZY_TEXTURE_INIT, LAZY_MESH_INIT, FREE_CAMERA_TARGET_MODE_ON, SHADOW_MAPPING, SHADOW_MAPPING_N_SHADOWS, SHADOW_MAPPING_RESOLUTION, MAX_LOADED_STARS, ELEVATION_TYPE, ELEVATION_MULTIPLIER, TESSELLATION_QUALITY, DIST_SCALE_DESKTOP, DIST_SCALE_VR);
+        sc.initialize(STARTUP_OBJECT, GRAPHICS_QUALITY, OBJECT_FADE_MS, STAR_BRIGHTNESS, STAR_BRIGHTNESS_POWER, STAR_TEX_INDEX, AMBIENT_LIGHT, CAMERA_FOV, CAMERA_SPEED, TURNING_SPEED, ROTATION_SPEED, CAMERA_SPEED_LIMIT_IDX, FOCUS_LOCK, FOCUS_LOCK_ORIENTATION, LABEL_SIZE_FACTOR, LABEL_NUMBER_FACTOR, LINE_WIDTH_FACTOR, VISIBILITY, ORBIT_RENDERER, LINE_RENDERER, STAR_TH_ANGLE_NONE, STAR_TH_ANGLE_POINT, STAR_TH_ANGLE_QUAD, STAR_MIN_OPACITY, STAR_MAX_OPACITY, OCTREE_PARTICLE_FADE, OCTANT_THRESHOLD_0, OCTANT_THRESHOLD_1, PM_NUM_FACTOR, PM_LEN_FACTOR, N_PM_STARS, PM_COLOR_MODE, PM_ARROWHEADS, STAR_POINT_SIZE, GALAXY_3D, CROSSHAIR_FOCUS, CROSSHAIR_CLOSEST, CROSSHAIR_HOME, CINEMATIC_CAMERA, LAZY_TEXTURE_INIT, LAZY_MESH_INIT, FREE_CAMERA_TARGET_MODE_ON, SHADOW_MAPPING, SHADOW_MAPPING_N_SHADOWS, SHADOW_MAPPING_RESOLUTION, MAX_LOADED_STARS, ELEVATION_TYPE, ELEVATION_MULTIPLIER, TESSELLATION_QUALITY, DIST_SCALE_DESKTOP, DIST_SCALE_VR);
 
         /** FRAME CONF **/
         String renderFolder;
@@ -541,7 +541,7 @@ public class DesktopConfInit extends ConfInit {
         p.setProperty("scene.star.threshold.none", Double.toString(GlobalConf.scene.STAR_THRESHOLD_NONE));
         p.setProperty("scene.star.point.size", Float.toString(GlobalConf.scene.STAR_POINT_SIZE));
         p.setProperty("scene.point.alpha.min", Float.toString(GlobalConf.scene.STAR_MIN_OPACITY));
-        p.setProperty("scene.point.alpha.max", Float.toString(GlobalConf.scene.POINT_ALPHA_MAX));
+        p.setProperty("scene.point.alpha.max", Float.toString(GlobalConf.scene.STAR_MAX_OPACITY));
         p.setProperty("scene.renderer.orbit", Integer.toString(GlobalConf.scene.ORBIT_RENDERER));
         p.setProperty("scene.renderer.line", Integer.toString(GlobalConf.scene.LINE_RENDERER));
         p.setProperty("scene.octree.particle.fade", Boolean.toString(GlobalConf.scene.OCTREE_PARTICLE_FADE));

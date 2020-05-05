@@ -52,7 +52,7 @@ public class StarPointRenderSystem extends ImmediateRenderSystem implements IObs
         Gdx.gl.glEnable(GL30.GL_POINT_SPRITE);
         Gdx.gl.glEnable(GL30.GL_VERTEX_PROGRAM_POINT_SIZE);
 
-        pointAlpha = new float[] { GlobalConf.scene.STAR_MIN_OPACITY, GlobalConf.scene.STAR_MIN_OPACITY + GlobalConf.scene.POINT_ALPHA_MAX };
+        pointAlpha = new float[] { GlobalConf.scene.STAR_MIN_OPACITY, GlobalConf.scene.STAR_MAX_OPACITY};
 
         for (ExtShaderProgram p : programs) {
             if (p != null) {

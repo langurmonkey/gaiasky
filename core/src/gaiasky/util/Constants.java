@@ -193,7 +193,7 @@ public class Constants {
     /** Minimum star minimum opacity **/
     public static final float MIN_STAR_MIN_OPACITY = 0.0f;
     /** Maximum star minimum opacity **/
-    public static final float MAX_STAR_MIN_OPACITY = 1.0f;
+    public static final float MAX_STAR_MIN_OPACITY = 0.95f;
 
     /** Minimum number factor for proper motion vectors **/
     public static final float MIN_PM_NUM_FACTOR = 1f;

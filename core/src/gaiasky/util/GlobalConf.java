@@ -1445,7 +1445,7 @@ public class GlobalConf {
         public double STAR_THRESHOLD_QUAD;
 
         public float STAR_MIN_OPACITY;
-        public float POINT_ALPHA_MAX;
+        public float STAR_MAX_OPACITY;
 
         /**
          * Size of stars rendered as point primitives
@@ -1508,7 +1508,7 @@ public class GlobalConf {
         }
 
         public void initialize(String sTARTUP_OBJECT, GraphicsQuality gRAPHICS_QUALITY, long oBJECT_FADE_MS, float sTAR_BRIGHTNESS, float sTAR_BRIGHTNESS_POWER, int sTAR_TEX_INDEX, float aMBIENT_LIGHT, float cAMERA_FOV, float cAMERA_SPEED, float tURNING_SPEED, float rOTATION_SPEED, int cAMERA_SPEED_LIMIT_IDX, boolean fOCUS_LOCK, boolean fOCUS_LOCK_ORIENTATION, float lABEL_SIZE_FACTOR, float lABEL_NUMBER_FACTOR, float lINE_WIDTH_FACTOR, boolean[] vISIBILITY, int oRBIT_RENDERER, int lINE_RENDERER,
-                               double sTAR_TH_ANGLE_NONE, double sTAR_TH_ANGLE_POINT, double sTAR_TH_ANGLE_QUAD, float pOINT_ALPHA_MIN, float pOINT_ALPHA_MAX, boolean oCTREE_PARTICLE_FADE, float oCTANT_TH_ANGLE_0, float oCTANT_TH_ANGLE_1, float pM_NUM_FACTOR, float pM_LEN_FACTOR, long n_PM_STARS, int pM_COLOR_MODE, boolean pM_ARROWHEADS, float sTAR_POINT_SIZE, boolean gALAXY_3D, boolean cROSSHAIR_FOCUS, boolean cROSSHAIR_CLOSEST, boolean cROSSHAIR_HOME, boolean cINEMATIC_CAMERA,
+                               double sTAR_TH_ANGLE_NONE, double sTAR_TH_ANGLE_POINT, double sTAR_TH_ANGLE_QUAD, float sTAR_MIN_OPACITY, float sTAR_MAX_OPACITY, boolean oCTREE_PARTICLE_FADE, float oCTANT_TH_ANGLE_0, float oCTANT_TH_ANGLE_1, float pM_NUM_FACTOR, float pM_LEN_FACTOR, long n_PM_STARS, int pM_COLOR_MODE, boolean pM_ARROWHEADS, float sTAR_POINT_SIZE, boolean gALAXY_3D, boolean cROSSHAIR_FOCUS, boolean cROSSHAIR_CLOSEST, boolean cROSSHAIR_HOME, boolean cINEMATIC_CAMERA,
                                boolean lAZY_TEXTURE_INIT, boolean lAZY_MESH_INIT, boolean fREE_CAMERA_TARGET_MODE_ON, boolean sHADOW_MAPPING, int sHADOW_MAPPING_N_SHADOWS, int sHADOW_MAPPING_RESOLUTION, long mAX_LOADED_STARS, ElevationType eLEVATION_TYPE, double eLEVATION_MULTIPLIER, double tESSELLATION_QUALITY, double dIST_SCALE_DESKTOP, double dIST_SCALE_VR) {
             STARTUP_OBJECT = sTARTUP_OBJECT;
             GRAPHICS_QUALITY = gRAPHICS_QUALITY;
@@ -1532,7 +1532,6 @@ public class GlobalConf {
             STAR_THRESHOLD_NONE = sTAR_TH_ANGLE_NONE;
             STAR_THRESHOLD_POINT = sTAR_TH_ANGLE_POINT;
             STAR_THRESHOLD_QUAD = sTAR_TH_ANGLE_QUAD;
-            POINT_ALPHA_MAX = pOINT_ALPHA_MAX;
             OCTREE_PARTICLE_FADE = oCTREE_PARTICLE_FADE;
             OCTANT_THRESHOLD_0 = oCTANT_TH_ANGLE_0;
             OCTANT_THRESHOLD_1 = oCTANT_TH_ANGLE_1;
@@ -1545,7 +1544,8 @@ public class GlobalConf {
             STAR_BRIGHTNESS_POWER = sTAR_BRIGHTNESS_POWER;
             STAR_POINT_SIZE = sTAR_POINT_SIZE;
             STAR_POINT_SIZE_BAK = STAR_POINT_SIZE;
-            STAR_MIN_OPACITY = pOINT_ALPHA_MIN;
+            STAR_MIN_OPACITY = sTAR_MIN_OPACITY;
+            STAR_MAX_OPACITY = sTAR_MAX_OPACITY;
             STAR_TEX_INDEX = sTAR_TEX_INDEX;
             GALAXY_3D = gALAXY_3D;
             CROSSHAIR_FOCUS = cROSSHAIR_FOCUS;

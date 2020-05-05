@@ -12,7 +12,6 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.VertexAttribute;
 import com.badlogic.gdx.graphics.VertexAttributes.Usage;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer.ShapeType;
-import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.Array;
 import gaiasky.GaiaSky;
@@ -28,17 +27,13 @@ import gaiasky.scenegraph.camera.FovCamera;
 import gaiasky.scenegraph.camera.ICamera;
 import gaiasky.util.Constants;
 import gaiasky.util.GlobalConf;
-import gaiasky.util.GlobalResources;
 import gaiasky.util.Nature;
 import gaiasky.util.color.Colormap;
 import gaiasky.util.comp.DistToCameraComparator;
 import gaiasky.util.coord.AstroUtils;
 import gaiasky.util.gdx.mesh.IntMesh;
 import gaiasky.util.gdx.shader.ExtShaderProgram;
-import gaiasky.util.math.MathUtilsd;
 import org.lwjgl.opengl.GL30;
-
-import java.nio.file.Path;
 
 public class StarGroupRenderSystem extends ImmediateRenderSystem implements IObserver {
     private final double BRIGHTNESS_FACTOR;
@@ -54,7 +49,7 @@ public class StarGroupRenderSystem extends ImmediateRenderSystem implements IObs
         super(rg, alphas, shaders);
         BRIGHTNESS_FACTOR = 10;
         this.comp = new DistToCameraComparator<>();
-        this.alphaSizeFovBr = new float[4];
+        this.alphaSizeFovBr = new float[3];
         this.pointAlphaHl = new float[] { 2, 4 };
         this.aux1 = new Vector3();
         cmap = new Colormap();
@@ -73,7 +68,7 @@ public class StarGroupRenderSystem extends ImmediateRenderSystem implements IObs
         Gdx.gl.glEnable(GL30.GL_POINT_SPRITE);
         Gdx.gl.glEnable(GL30.GL_VERTEX_PROGRAM_POINT_SIZE);
 
-        pointAlpha = new float[] { GlobalConf.scene.STAR_MIN_OPACITY, GlobalConf.scene.POINT_ALPHA_MAX };
+        pointAlpha = new float[] { GlobalConf.scene.STAR_MIN_OPACITY, GlobalConf.scene.STAR_MAX_OPACITY};
 
         ExtShaderProgram shaderProgram = getShaderProgram();
         shaderProgram.begin();
@@ -187,17 +182,16 @@ public class StarGroupRenderSystem extends ImmediateRenderSystem implements IObs
                             shaderProgram.setUniformf("u_camDir", camera.getCamera().direction);
                             shaderProgram.setUniformi("u_cubemap", GlobalConf.program.CUBEMAP_MODE ? 1 : 0);
                             shaderProgram.setUniformf("u_magLimit", GlobalConf.runtime.LIMIT_MAG_RUNTIME);
-                            shaderProgram.setUniformf("u_thAnglePoint", 0f, 1.5e-8f * camera.getFovFactor());
+                            shaderProgram.setUniformf("u_thAnglePoint", 1e-10f, 1.5e-8f);
                             shaderProgram.setUniformf("u_brPow", GlobalConf.scene.STAR_BRIGHTNESS_POWER);
 
                             // Rel, grav, z-buffer, etc.
                             addEffectsUniforms(shaderProgram, camera);
 
                             alphaSizeFovBr[0] = starGroup.opacity * alphas[starGroup.ct.getFirstOrdinal()];
-                            alphaSizeFovBr[1] = (fovMode == 0 ? (GlobalConf.program.isStereoFullWidth() ? 1f : 2f) : 10f) * starPointSize * rc.scaleFactor * starGroup.highlightedSizeFactor();
-                            alphaSizeFovBr[2] = camera.getFovFactor();
-                            alphaSizeFovBr[3] = (float) (GlobalConf.scene.STAR_BRIGHTNESS * BRIGHTNESS_FACTOR);
-                            shaderProgram.setUniform4fv("u_alphaSizeFovBr", alphaSizeFovBr, 0, 4);
+                            alphaSizeFovBr[1] = ((fovMode == 0 ? (GlobalConf.program.isStereoFullWidth() ? 1f : 2f) : 10f) * starPointSize * rc.scaleFactor * starGroup.highlightedSizeFactor()) / camera.getFovFactor();
+                            alphaSizeFovBr[2] = (float) (GlobalConf.scene.STAR_BRIGHTNESS * BRIGHTNESS_FACTOR);
+                            shaderProgram.setUniform3fv("u_alphaSizeFovBr", alphaSizeFovBr, 0, 3);
 
                             // Days since epoch
                             shaderProgram.setUniformi("u_t", (int) (AstroUtils.getMsSince(GaiaSky.instance.time.getTime(), starGroup.getEpoch()) * Nature.MS_TO_D));
@@ -242,15 +236,6 @@ public class StarGroupRenderSystem extends ImmediateRenderSystem implements IObs
         switch (event) {
         case STAR_MIN_OPACITY_CMD:
             pointAlpha[0] = (float) data[0];
-            for (ExtShaderProgram p : programs) {
-                if (p != null && p.isCompiled()) {
-                    GaiaSky.postRunnable(() -> {
-                        p.begin();
-                        p.setUniform2fv("u_pointAlpha", pointAlpha, 0, 2);
-                        p.end();
-                    });
-                }
-            }
             break;
         case DISPOSE_STAR_GROUP_GPU_MESH:
             Integer meshIdx = (Integer) data[0];

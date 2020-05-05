@@ -35,11 +35,10 @@ uniform float u_magLimit = 22.0;
 #include shader/lib_gravwaves.glsl
 #endif // gravitationalWaves
 
-// 0 - alpha
-// 1 - point size
-// 2 - fov factor
-// 3 - star brightness
-uniform vec4 u_alphaSizeFovBr;
+// x - alpha
+// y - point size/fov factor
+// z - star brightness
+uniform vec3 u_alphaSizeFovBr;
 
 out vec4 v_col;
 
@@ -80,8 +79,8 @@ void main() {
         pos = computeGravitationalWaves(pos, u_gw, u_gwmat3, u_ts, u_omgw, u_hterms);
     #endif // gravitationalWaves
 
-    float viewAngleApparent = atan((a_additional.x * u_alphaSizeFovBr.w) / dist);
-    float opacity = pow(lint2(viewAngleApparent / u_alphaSizeFovBr.z, u_thAnglePoint.x, u_thAnglePoint.y, u_pointAlpha.x, u_pointAlpha.y), 1.1);
+    float viewAngleApparent = atan((a_additional.x * u_alphaSizeFovBr.z) / dist);
+    float opacity = lint(viewAngleApparent, u_thAnglePoint.x, u_thAnglePoint.y, u_pointAlpha.x, u_pointAlpha.y);
 
     float boundaryFade = smoothstep(l0, l1, dist);
 
@@ -89,8 +88,7 @@ void main() {
 
     vec4 gpos = u_projModelView * vec4(pos, 1.0);
     gl_Position = gpos;
-    float size = pow(viewAngleApparent * .5e8, u_brPow) * u_alphaSizeFovBr.y * sizefactor / u_alphaSizeFovBr.z;
-    gl_PointSize = clamp(size, 3.0, 100.0);
+    gl_PointSize = max(4.0, pow(viewAngleApparent * .5e8, u_brPow) * u_alphaSizeFovBr.y * sizefactor);
 
     #ifdef velocityBufferFlag
     velocityBuffer(gpos, a_position, dist, pm, vec2(500.0, 3000.0), 1.0);
