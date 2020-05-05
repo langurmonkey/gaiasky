@@ -62,49 +62,37 @@ function generate() {
   $( eval $CMD )
 }
 
-function contains() {
-    local n=$#
-    local value=${!n}
-    for ((i=1;i < $#;i++)) {
-        if [ "${!i}" == "${value}" ]; then
-            echo "y"
-            return 0
-        fi
-    }
-    echo "n"
-    return 1
-}
-
 NCAT=$(jq '.catalogs | length' $CATDEF)
 
-for ((j=0;j<NCAT;j++)); do
-    # Get catalog name
-    NAME=$(jq ".catalogs[$j].name" $CATDEF)
-    # Remove quotes
-    NAME=$(sed -e 's/^"//' -e 's/"$//' <<<"$NAME")
-    if [ $(contains "${TORUN[@]}" "$NAME") == "y" ]; then
-        DSNAME="00$j-$(date +'%Y%m%d')-edr3int2-$NAME"
-        echo $DSNAME
-        CMD="nohup $GSDIR/octreegen --loader CsvCatalogDataProvider --input $DR_LOC/csv/ --output $DR_LOC/out/$DSNAME/"
-        NATTR=$(jq ".catalogs[$j] | length" $CATDEF)
-        for ((k=0;k<NATTR;k++)); do
-            KEY=$(jq ".catalogs[$j] | keys[$k]" $CATDEF)
-            # Remove quotes
-            KEY=$(sed -e 's/^"//' -e 's/"$//' <<<"$KEY")
-            if [ "$KEY" != "name" ]; then
-                VAL=$(jq ".catalogs[$j].$KEY" $CATDEF)
+for CURRENT_CATALOG in "${TORUN[@]}"; do
+    for ((j=0;j<NCAT;j++)); do
+        # Get catalog name
+        NAME=$(jq ".catalogs[$j].name" $CATDEF)
+        # Remove quotes
+        NAME=$(sed -e 's/^"//' -e 's/"$//' <<<"$NAME")
+        if [ "$NAME" == "$CURRENT_CATALOG" ]; then
+            DSNAME="00$j-$(date +'%Y%m%d')-edr3int2-$NAME"
+            echo $DSNAME
+            CMD="nohup $GSDIR/octreegen --loader CsvCatalogDataProvider --input $DR_LOC/csv/ --output $DR_LOC/out/$DSNAME/"
+            NATTR=$(jq ".catalogs[$j] | length" $CATDEF)
+            for ((k=0;k<NATTR;k++)); do
+                KEY=$(jq ".catalogs[$j] | keys[$k]" $CATDEF)
                 # Remove quotes
-                VAL=$(sed -e 's/^"//' -e 's/"$//' <<<"$VAL")
-                #echo "$KEY -> $VAL"
-                if [ "$VAL" == "null" ]; then
-                    CMD="$CMD --$KEY"
-                else
-                    CMD="$CMD --$KEY $VAL"
+                KEY=$(sed -e 's/^"//' -e 's/"$//' <<<"$KEY")
+                if [ "$KEY" != "name" ]; then
+                    VAL=$(jq ".catalogs[$j].$KEY" $CATDEF)
+                    # Remove quotes
+                    VAL=$(sed -e 's/^"//' -e 's/"$//' <<<"$VAL")
+                    #echo "$KEY -> $VAL"
+                    if [ "$VAL" == "null" ]; then
+                        CMD="$CMD --$KEY"
+                    else
+                        CMD="$CMD --$KEY $VAL"
+                    fi
                 fi
-            fi
-        done
-        CMD="$CMD --columns $COLS --nfiles $NFILES > $LOGS_LOC/$DSNAME.out"
-        generate
-    fi
+            done
+            CMD="$CMD --columns $COLS --nfiles $NFILES > $LOGS_LOC/$DSNAME.out"
+            generate
+        fi
+    done
 done
-
