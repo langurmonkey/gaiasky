@@ -53,7 +53,7 @@ Windows [here](https://zah.uni-heidelberg.de/gaia/outreach/gaiasky/downloads/).
 
 In order to compile and run Gaia Sky from source, you need the following installed in your system:
 
-- `JDK11`
+- `JDK11+`
 - `git`
 
 First, clone the [GitLab](https://gitlab.com/langurmonkey/gaiasky) repository:
@@ -69,7 +69,7 @@ $  cd gaiasky
 $  ./gaiasky
 ```
 
-On Windows, you can do:
+On Windows, open PowerShell, make sure your `$JAVA_HOME` environment variable points to a valid JDK11+ installation, and run:
 
 ```
 .\gradlew.bat core:run
