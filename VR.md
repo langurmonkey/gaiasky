@@ -1,11 +1,11 @@
-# Gaia Sky VR
+# Gaia Sky Virtual Reality
 
-*This file is only concerned with Gaia Sky VR. If you are looking for the regular desktop Gaia Sky, [check this out](README.md).*
-
-The most up-to-date information on Gaia Sky VR is available in the official documentation:
+The most up-to-date information on Gaia Sky VR, as well as how to install and run it, is available in the official Gaia Sky VR documentation:
 
 - [Gaia Sky VR documentation](http://gaia.ari.uni-heidelberg.de/gaiasky/docs/html/latest/Gaia-sky-vr.html)
 
 ##  More info
 
-The project's main README file is [here](README.md).
+- [Gaia Sky documentation](http://gaia.ari.uni-heidelberg.de/gaiasky/docs/html/latest)
+- [The project's main README file](README.md)
+- [Gaia Sky website](https://www.zah.uni-heidelberg.de/institutes/ari/gaia/outreach/gaiasky/)
