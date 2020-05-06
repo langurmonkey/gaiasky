@@ -132,11 +132,9 @@ public class DatasetsComponent extends GuiComponent implements IObserver {
         });
         colorMap.put(ci.name, cp);
 
-        String name = TextUtils.capString(ci.name, 17);
+        String name = TextUtils.capString(ci.name, 18);
         OwnLabel nameLabel = new OwnLabel(TextUtils.capString(ci.name, GlobalConf.isHiDPI() ? 23 : 16), skin, "hud-subheader");
-        if (!ci.name.equals(name)) {
-            nameLabel.addListener(new OwnTextTooltip(ci.name, skin));
-        }
+        nameLabel.addListener(new OwnTextTooltip(ci.name, skin));
         if (ci.isRegular()) {
             t.add(nameLabel).left().padBottom(pad);
             t.add(cp).size(18f * GlobalConf.UI_SCALE_FACTOR).right().padBottom(pad).row();
@@ -144,10 +142,10 @@ public class DatasetsComponent extends GuiComponent implements IObserver {
             t.add(nameLabel).left().padBottom(pad);
             t.add().size(18f * GlobalConf.UI_SCALE_FACTOR).right().padBottom(pad).row();
         }
-        if(ci.isRegular()) {
+        if (ci.isRegular()) {
             t.add(controls).left().padBottom(pad);
             t.add(mark).right().padBottom(pad).row();
-        }else{
+        } else {
             t.add(controls).colspan(2).left().padBottom(pad).row();
         }
         int cap = GlobalConf.isHiDPI() ? 24 : 23;

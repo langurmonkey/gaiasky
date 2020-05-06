@@ -167,6 +167,12 @@ public class CsvCatalogDataProvider extends AbstractStarGroupDataProvider {
         // Simple case
         InputStream data = is;
         BufferedReader br = new BufferedReader(new InputStreamReader(data));
+        Consumer<String> c = (l) -> {
+            if (addStar(l))
+                addedStars.incrementAndGet();
+            else
+                discardedStars.incrementAndGet();
+        };
         try {
             List<String> lineBuffer = new ArrayList<>(parallelBufferSize);
             int i = 0;
@@ -176,20 +182,21 @@ public class CsvCatalogDataProvider extends AbstractStarGroupDataProvider {
                 if (i > 0)
                     lineBuffer.add(line);
                 if (lineBuffer.size() >= parallelBufferSize) {
-                    Consumer<String> c = (l) -> {
-                        if (addStar(l))
-                            addedStars.incrementAndGet();
-                        else
-                            discardedStars.incrementAndGet();
-                    };
                     if (parallel)
                         lineBuffer.parallelStream().forEach(c);
                     else
                         lineBuffer.stream().forEach(c);
-
                     lineBuffer.clear();
                 }
                 i++;
+            }
+            // Flush resting
+            if(lineBuffer.size() > 0){
+                if (parallel)
+                    lineBuffer.parallelStream().forEach(c);
+                else
+                    lineBuffer.stream().forEach(c);
+                lineBuffer.clear();
             }
         } catch (IOException e) {
             logger.error(e);
