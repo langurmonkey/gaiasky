@@ -1025,28 +1025,32 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
     }
 
     public void resizeImmediate(final int width, final int height, boolean resizePostProcessors, boolean resizeRenderSys, boolean resizeGuis) {
-        if (!initialized) {
-            if (initialGui != null)
-                initialGui.resize(width, height);
-            if (loadingGui != null)
-                loadingGui.resizeImmediate(width, height);
-        } else {
-            int bw = Math.round(width * GlobalConf.screen.BACKBUFFER_SCALE);
-            int bh = Math.round(height * GlobalConf.screen.BACKBUFFER_SCALE);
-            if (resizePostProcessors)
-                pp.resizeImmediate(bw, bh);
+        try {
+            if (!initialized) {
+                if (initialGui != null)
+                    initialGui.resize(width, height);
+                if (loadingGui != null)
+                    loadingGui.resizeImmediate(width, height);
+            } else {
+                int bw = Math.round(width * GlobalConf.screen.BACKBUFFER_SCALE);
+                int bh = Math.round(height * GlobalConf.screen.BACKBUFFER_SCALE);
+                if (resizePostProcessors)
+                    pp.resizeImmediate(bw, bh);
 
-            if (resizeGuis)
-                for (IGui gui : guis)
-                    gui.resizeImmediate(width, height);
+                if (resizeGuis)
+                    for (IGui gui : guis)
+                        gui.resizeImmediate(width, height);
 
-            sgr.resize(width, height, resizeRenderSys);
+                sgr.resize(width, height, resizeRenderSys);
 
-            GlobalConf.screen.resize(width, height);
+                GlobalConf.screen.resize(width, height);
+            }
+
+            cam.updateAngleEdge(width, height);
+            cam.resize(width, height);
+        }catch(Exception e){
+            // TODO This try-catch block is a provisional fix for Windows, as GLFW crashe when minimizing with lwjgl 2.3.3 and libgdx 1.9.10
         }
-
-        cam.updateAngleEdge(width, height);
-        cam.resize(width, height);
     }
 
     /**
