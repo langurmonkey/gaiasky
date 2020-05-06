@@ -331,8 +331,8 @@ public class MWModelRenderSystem extends ImmediateRenderSystem implements IObser
 
                     // Stars
                     shaderProgram.setUniformf("u_maxPointSize", maxSizes[PType.STAR.ordinal()]);
-                    shaderProgram.setUniformf("u_sizeFactor", (float) (2.5e11 / fovf));
-                    shaderProgram.setUniformf("u_intensity", 0.8f);
+                    shaderProgram.setUniformf("u_sizeFactor", (float) (0.3e11 / fovf));
+                    shaderProgram.setUniformf("u_intensity", 2.5f);
                     stars.mesh.render(shaderProgram, ShapeType.Point.getGlType());
 
                     shaderProgram.end();
