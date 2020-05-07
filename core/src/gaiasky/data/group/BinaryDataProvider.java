@@ -5,7 +5,6 @@
 
 package gaiasky.data.group;
 
-import com.badlogic.gdx.utils.Array;
 import gaiasky.scenegraph.ParticleGroup.ParticleBean;
 import gaiasky.scenegraph.StarGroup.StarBean;
 import gaiasky.util.Constants;
@@ -175,7 +174,7 @@ public class BinaryDataProvider extends AbstractStarGroupDataProvider {
         StringBuilder namesConcat = new StringBuilder();
         for (int i = 0; i < nameLength; i++)
             namesConcat.append(in.readChar());
-        String[] names = namesConcat.toString().split(Constants.nameSeparator);
+        String[] names = namesConcat.toString().split(Constants.nameSeparatorRegex);
         return new StarBean(data, id, names);
     }
 
@@ -233,7 +232,7 @@ public class BinaryDataProvider extends AbstractStarGroupDataProvider {
         StringBuilder namesConcat = new StringBuilder();
         for (int i = 0; i < nameLength; i++)
             namesConcat.append(mem.getChar());
-        String[] names = namesConcat.toString().split(Constants.nameSeparator);
+        String[] names = namesConcat.toString().split(Constants.nameSeparatorRegex);
 
         return new StarBean(data, id, names);
     }

@@ -6,6 +6,7 @@
 package gaiasky.data.util;
 
 import com.badlogic.gdx.utils.Array;
+import gaiasky.util.Constants;
 import gaiasky.util.Logger;
 import gaiasky.util.Logger.Log;
 import gaiasky.util.parse.Parser;
@@ -53,7 +54,7 @@ public class HipNames {
             try (Stream<String> lines = Files.lines(path)) {
                 lines.forEach(line -> {
                     try {
-                        String[] tokens = line.split("\\|");
+                        String[] tokens = line.split(Constants.nameSeparatorRegex);
                         String name = tokens[0].trim().replace("_", " ");
                         int hip = Parser.parseInt(tokens[1].trim());
                         if (hipNames.containsKey(hip)) {

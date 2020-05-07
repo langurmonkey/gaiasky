@@ -382,7 +382,7 @@ public abstract class AbstractStarGroupDataProvider implements IStarGroupDataPro
                 double z = star.y();
                 gal.set(x, y, z).scl(Constants.U_TO_KM);
                 gal.mul(Coordinates.equatorialToGalactic());
-                writer.println(TextUtils.concatenate("|", star.names) + sep + x + sep + y + sep + z + sep + star.absmag() + sep + star.appmag() + sep + col[0] + sep + col[1] + sep + col[2]);
+                writer.println(TextUtils.concatenate(Constants.nameSeparator, star.names) + sep + x + sep + y + sep + z + sep + star.absmag() + sep + star.appmag() + sep + col[0] + sep + col[1] + sep + col[2]);
                 n++;
             }
             writer.close();

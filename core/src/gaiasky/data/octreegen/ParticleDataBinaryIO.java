@@ -144,7 +144,7 @@ public class ParticleDataBinaryIO {
                     }
                     String namesConcat = sb.toString();
 
-                    String[] names = namesConcat.split(Constants.nameSeparator);
+                    String[] names = namesConcat.split(Constants.nameSeparatorRegex);
                     float appmag = data_in.readFloat();
                     float absmag = data_in.readFloat();
                     float colorbv = data_in.readFloat();

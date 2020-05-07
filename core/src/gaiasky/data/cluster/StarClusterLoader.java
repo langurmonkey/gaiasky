@@ -208,7 +208,7 @@ public class StarClusterLoader extends AbstractCatalogLoader implements ISceneGr
     }
 
     private String[] parseName(String name) {
-        String[] names = name.split("\\|");
+        String[] names = name.split(Constants.nameSeparatorRegex);
         for (int i = 0; i < names.length; i++)
             names[i] = names[i].strip().replace("_", " ");
         return names;

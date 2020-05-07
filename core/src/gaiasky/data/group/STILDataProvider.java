@@ -266,7 +266,7 @@ public class STILDataProvider extends AbstractStarGroupDataProvider {
                         } else {
                             // We have name
                             Pair<UCD, String> namePair = getStringUcd(ucdp.NAME, row);
-                            names = namePair.getSecond().split("\\|");
+                            names = namePair.getSecond().split(Constants.nameSeparatorRegex);
                             // Take care of HIP stars
                             if (!ucdp.ID.isEmpty()) {
                                 Pair<UCD, String> idpair = getStringUcd(ucdp.ID, row);

@@ -271,12 +271,10 @@ public class OctreeGeneratorMag implements IOctreeGenerator {
 
                 }
             }
-            // Max is always half side away from min
+            // Max is always a half side away from min
             max.set(min.x + hs, min.y + hs, min.z + hs);
             hs = hs / 2d;
         }
-
-        //return id;
         return (long) Arrays.hashCode(hashv);
     }
 
