@@ -8,7 +8,7 @@
             "pllxzeropoint" : -0.02,
             "additional" : "$DATA_LOC/data/dr2-ag-e/",
             "hip" : "$DATA_LOC/data/catalog/hipparcos/hipparcos.vot",
-            "xmatchfile" : "$DATA_LOC/data/gdr2hip/gdr2-hip-xmatch-all.csv"
+            "xmatchfile" : "$DATA_LOC/data/edr3int1-hip/edr3int1-hip-xmatch.csv"
         },
         {
             "name" : "small",
@@ -18,7 +18,7 @@
             "pllxzeropoint" : -0.02,
             "additional" : "$DATA_LOC/data/dr2-ag-e/",
             "hip" : "$DATA_LOC/data/catalog/hipparcos/hipparcos.vot",
-            "xmatchfile" : "$DATA_LOC/data/gdr2hip/gdr2-hip-xmatch-all.csv"
+            "xmatchfile" : "$DATA_LOC/data/edr3int1-hip/edr3int1-hip-xmatch.csv"
         },
         {
             "name" : "medium",
@@ -28,7 +28,7 @@
             "pllxzeropoint" : -0.02,
             "additional" : "$DATA_LOC/data/dr2-ag-e/",
             "hip" : "$DATA_LOC/data/catalog/hipparcos/hipparcos.vot",
-            "xmatchfile" : "$DATA_LOC/data/gdr2hip/gdr2-hip-xmatch-all.csv"
+            "xmatchfile" : "$DATA_LOC/data/edr3int1-hip/edr3int1-hip-xmatch.csv"
         },
         {
             "name" : "large",
@@ -38,7 +38,7 @@
             "pllxzeropoint" : -0.02,
             "additional" : "$DATA_LOC/data/dr2-ag-e/",
             "hip" : "$DATA_LOC/data/catalog/hipparcos/hipparcos.vot",
-            "xmatchfile" : "$DATA_LOC/data/gdr2hip/gdr2-hip-xmatch-all.csv"
+            "xmatchfile" : "$DATA_LOC/data/edr3int1-hip/edr3int1-hip-xmatch.csv"
         },
         {
             "name" : "verylarge",
@@ -51,7 +51,7 @@
             "parentcount" : 50000,
             "additional" : "$DATA_LOC/data/dr2-ag-e/",
             "hip" : "$DATA_LOC/data/catalog/hipparcos/hipparcos.vot",
-            "xmatchfile" : "$DATA_LOC/data/gdr2hip/gdr2-hip-xmatch-all.csv"
+            "xmatchfile" : "$DATA_LOC/data/edr3int1-hip/edr3int1-hip-xmatch.csv"
         },
         {
             "name" : "extralarge",
@@ -64,7 +64,7 @@
             "parentcount" : 50000,
             "additional" : "$DATA_LOC/data/dr2-ag-e/",
             "hip" : "$DATA_LOC/data/catalog/hipparcos/hipparcos.vot",
-            "xmatchfile" : "$DATA_LOC/data/gdr2hip/gdr2-hip-xmatch-all.csv"
+            "xmatchfile" : "$DATA_LOC/data/edr3int1-hip/edr3int1-hip-xmatch.csv"
         },
         {
             "name" : "bright",
@@ -74,7 +74,7 @@
             "pllxzeropoint" : -0.02,
             "additional" : "$DATA_LOC/data/dr2-ag-e/",
             "hip" : "$DATA_LOC/data/catalog/hipparcos/hipparcos.vot",
-            "xmatchfile" : "$DATA_LOC/data/gdr2hip/gdr2-hip-xmatch-all.csv"
+            "xmatchfile" : "$DATA_LOC/data/edr3int1-hip/edr3int1-hip-xmatch.csv"
         },
         {
             "name" : "ruwe",
@@ -86,7 +86,7 @@
             "parentcount" : 50000,
             "additional" : "$DATA_LOC/data/dr2-ag-e/",
             "hip" : "$DATA_LOC/data/catalog/hipparcos/hipparcos.vot",
-            "xmatchfile" : "$DATA_LOC/data/gdr2hip/gdr2-hip-xmatch-all.csv"
+            "xmatchfile" : "$DATA_LOC/data/edr3int1-hip/edr3int1-hip-xmatch.csv"
         },
         {
             "name" : "full",
@@ -98,7 +98,7 @@
             "parentcount" : 50000,
             "additional" : "$DATA_LOC/data/dr2-ag-e/",
             "hip" : "$DATA_LOC/data/catalog/hipparcos/hipparcos.vot",
-            "xmatchfile" : "$DATA_LOC/data/gdr2hip/gdr2-hip-xmatch-all.csv"
+            "xmatchfile" : "$DATA_LOC/data/edr3int1-hip/edr3int1-hip-xmatch.csv"
         }
     ]
 }
