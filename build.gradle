@@ -36,14 +36,10 @@ allprojects {
         maven { url "https://mvnrepository.com/artifact/xmlrpc/xmlrpc" }
         maven { url "http://nexus.vamdc.org/nexus/content/repositories/releases" }
     }
-
-    eclipse {
-        classpath { downloadSources=true }
-    }
 }
 
 project(":core") {
-    apply plugin: "java"
+    apply plugin: "java-library"
 
     def cmd = "git describe --abbrev=0 --tags HEAD"
     def proc = cmd.execute()
@@ -111,52 +107,52 @@ project(":core") {
         // *****************************
         // GENERATE SKINS (PackTextures)
         // *****************************
-        //implementation "com.badlogicgames.gdx:gdx-tools:$gdxVersion"
+        //api "com.badlogicgames.gdx:gdx-tools:$gdxVersion"
 
         // ************
         // REGULAR DEPS
         // ************
-        implementation group: "org.lwjgl", name: "lwjgl", version: "$lwjglVersion"
-        implementation group: "org.lwjgl", name: "lwjgl-glfw", version: "$lwjglVersion"
-        implementation group: "org.lwjgl", name: "lwjgl-jemalloc", version: "$lwjglVersion"
-        implementation group: "org.lwjgl", name: "lwjgl-opengl", version: "$lwjglVersion"
-        implementation group: "org.lwjgl", name: "lwjgl-openal", version: "$lwjglVersion"
+        api group: "org.lwjgl", name: "lwjgl", version: "$lwjglVersion"
+        api group: "org.lwjgl", name: "lwjgl-glfw", version: "$lwjglVersion"
+        api group: "org.lwjgl", name: "lwjgl-jemalloc", version: "$lwjglVersion"
+        api group: "org.lwjgl", name: "lwjgl-opengl", version: "$lwjglVersion"
+        api group: "org.lwjgl", name: "lwjgl-openal", version: "$lwjglVersion"
         
-        implementation group: "org.lwjgl", name: "lwjgl-openvr", version: "$lwjglVersion"
-        implementation "org.lwjgl:lwjgl-openvr:$lwjglVersion:natives-linux"
-        implementation "org.lwjgl:lwjgl-openvr:$lwjglVersion:natives-windows"
-        implementation "org.lwjgl:lwjgl-openvr:$lwjglVersion:natives-macos"
+        api group: "org.lwjgl", name: "lwjgl-openvr", version: "$lwjglVersion"
+        api "org.lwjgl:lwjgl-openvr:$lwjglVersion:natives-linux"
+        api "org.lwjgl:lwjgl-openvr:$lwjglVersion:natives-windows"
+        api "org.lwjgl:lwjgl-openvr:$lwjglVersion:natives-macos"
 
-        implementation "com.badlogicgames.gdx:gdx:$gdxVersion"
-        implementation "com.badlogicgames.gdx:gdx-backend-lwjgl3:$gdxVersion"
-        implementation "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-desktop"
-        implementation "com.badlogicgames.gdx:gdx-controllers-lwjgl3:$gdxVersion"
+        api "com.badlogicgames.gdx:gdx:$gdxVersion"
+        api "com.badlogicgames.gdx:gdx-backend-lwjgl3:$gdxVersion"
+        api "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-desktop"
+        api "com.badlogicgames.gdx:gdx-controllers-lwjgl3:$gdxVersion"
 
-        implementation "uk.co.electronstudio.sdl2gdx:sdl2gdx:$sdl2gdxVersion"
+        api "uk.co.electronstudio.sdl2gdx:sdl2gdx:$sdl2gdxVersion"
 
-        implementation group: "commons-io", name: "commons-io", version: "$commonsioVersion"
-        implementation "org.apache.commons:commons-compress:$compressVersion"
-        implementation "com.beust:jcommander:$jcommanderVersion"
-        implementation "net.jafama:jafama:$jafamaVersion"
+        api group: "commons-io", name: "commons-io", version: "$commonsioVersion"
+        api "org.apache.commons:commons-compress:$compressVersion"
+        api "com.beust:jcommander:$jcommanderVersion"
+        api "net.jafama:jafama:$jafamaVersion"
         
-        implementation group: "net.sf.py4j", name: "py4j", version: "$py4jVersion"
-        implementation group: "com.github.oshi", name: "oshi-core", version: "$oshiVersion"
-        implementation group: "org.astrogrid", name: "jsamp", version: "$jsampVersion"
+        api group: "net.sf.py4j", name: "py4j", version: "$py4jVersion"
+        api group: "com.github.oshi", name: "oshi-core", version: "$oshiVersion"
+        api group: "org.astrogrid", name: "jsamp", version: "$jsampVersion"
 
         // ****************
         // REST SERVER DEPS
         // ****************
-        implementation "org.slf4j:slf4j-nop:$slf4jVersion"
-        //implementation "org.slf4j:slf4j-simple:$slf4jVersion"
-        implementation "com.sparkjava:spark-core:$sparkjavaVersion"
-        implementation "com.google.code.gson:gson:$gsonVersion"
-        implementation "junit:junit:4.12"
+        api "org.slf4j:slf4j-nop:$slf4jVersion"
+        //api "org.slf4j:slf4j-simple:$slf4jVersion"
+        api "com.sparkjava:spark-core:$sparkjavaVersion"
+        api "com.google.code.gson:gson:$gsonVersion"
+        api "junit:junit:4.12"
 
         // *************
         // INTERNAL DEPS
         // *************
-        implementation files("lib/stil.jar",
-                        "../assets")
+        api files("lib/stil.jar",
+                "../assets")
     }
 
     jar {
@@ -185,8 +181,5 @@ project(":core") {
     }
 
 }
-
-tasks.eclipse.doLast { delete ".project" }
-
 
 task createWrapper(type: Wrapper) { gradleVersion = "5.6.2" }
