@@ -42,7 +42,7 @@ uniform vec3 u_alphaSizeFovBr;
 
 out vec4 v_col;
 
-#define len0 170000.0
+#define len0 20000.0
 #define day_to_year 1.0 / 365.25
 
 #ifdef velocityBufferFlag
@@ -52,7 +52,7 @@ out vec4 v_col;
 void main() {
 	// Lengths
 	float l0 = len0 * u_vrScale;
-	float l1 = l0 * 2e3;
+	float l1 = l0 * 1e3;
 
     vec3 pos = a_position - u_camPos;
 

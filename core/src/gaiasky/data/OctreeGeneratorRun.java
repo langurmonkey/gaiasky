@@ -312,10 +312,13 @@ public class OctreeGeneratorRun {
                             Double hipPllxErr = hipStar.getExtra("e_plx");
 
                             if (gaiaPllxErr <= hipPllxErr) {
+                                // SIZE
+                                double size = gaiaStar.size();
                                 // POSITION
                                 double x = gaiaStar.x(), y = gaiaStar.y(), z = gaiaStar.z();
                                 aux1.set(x, y, z);
-                                if (Math.abs(aux1.len() - AbstractStarGroupDataProvider.NEGATIVE_DIST) < 1e-10) {
+                                boolean negativeGaiaDistance = Math.abs(aux1.len() - AbstractStarGroupDataProvider.NEGATIVE_DIST) < 1e-10;
+                                if (negativeGaiaDistance) {
                                     // Negative distance in Gaia star!
                                     // Use Gaia position, HIP distance
 
@@ -335,6 +338,8 @@ public class OctreeGeneratorRun {
                                     x = aux2.x;
                                     y = aux2.y;
                                     z = aux2.z;
+
+                                    size = hipStar.size();
                                 }
 
                                 hipStar.id = gaiaStar.id;
@@ -350,7 +355,7 @@ public class OctreeGeneratorRun {
                                 hipStar.data[StarBean.I_APPMAG] = gaiaStar.appmag();
                                 hipStar.data[StarBean.I_ABSMAG] = gaiaStar.absmag();
                                 hipStar.data[StarBean.I_COL] = gaiaStar.col();
-                                hipStar.data[StarBean.I_SIZE] = gaiaStar.size();
+                                hipStar.data[StarBean.I_SIZE] = size;
                                 hipStar.addNames(gaiaStar.names);
                                 starhits++;
                             }
