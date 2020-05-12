@@ -193,11 +193,12 @@ public class OctreeGeneratorMag implements IOctreeGenerator {
     }
 
     private int addStarToNode(StarBean sb, OctreeNode node, Map<OctreeNode, List<ParticleBean>> map) {
-        if (!map.containsKey(node)) {
-            // Array of a fraction of max part (four array resizes gives max part)
-            map.put(node, new ArrayList<>((int) Math.round(this.params.maxPart * 0.10662224073)));
-        }
         List<ParticleBean> array = map.get(node);
+        if (array == null) {
+            // Array of a fraction of max part (four array resizes gives max part)
+            array = new ArrayList<>((int) Math.round(this.params.maxPart * 0.10662224073));
+            map.put(node, array);
+        }
         array.add(sb);
         return array.size();
     }
