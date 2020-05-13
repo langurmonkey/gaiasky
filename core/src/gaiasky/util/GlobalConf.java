@@ -294,7 +294,9 @@ public class GlobalConf {
                         mpi.addMapping("Back to normal mode", "CTRL", "P");
                         mpi.addMapping("Switch planetarium mode type", "CTRL", "SHIFT", "P");
 
-                        EventManager.instance.post(Events.MODE_POPUP_CMD, mpi, 120f);
+                        EventManager.instance.post(Events.MODE_POPUP_CMD, mpi, "planetarium", 120f);
+                    } else {
+                        EventManager.instance.post(Events.MODE_POPUP_CMD, null, "planetarium");
                     }
                     break;
                 case BRIGHTNESS_CMD:
@@ -1109,6 +1111,14 @@ public class GlobalConf {
             return CUBEMAP_MODE && CUBEMAP_PROJECTION.isPanorama();
         }
 
+        /**
+         * Checks whether we are in fixed fov mode (slave, planetarium, panorama)
+         * @return Whether we are in a fixed-fov mode
+         */
+        public boolean isFixedFov(){
+            return isPanorama() || isPlanetarium();
+        }
+
         @Override
         public void notify(Events event, Object... data) {
             switch (event) {
@@ -1143,7 +1153,9 @@ public class GlobalConf {
                             mpi.addMapping("Back to normal mode", "CTRL", "P");
                         }
 
-                        EventManager.instance.post(Events.MODE_POPUP_CMD, mpi, 120f);
+                        EventManager.instance.post(Events.MODE_POPUP_CMD, mpi, "cubemap", 120f);
+                    } else {
+                        EventManager.instance.post(Events.MODE_POPUP_CMD, null, "cubemap");
                     }
                     break;
                 case CUBEMAP_PROJECTION_CMD:

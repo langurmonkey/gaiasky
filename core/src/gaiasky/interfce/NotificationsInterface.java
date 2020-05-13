@@ -330,21 +330,23 @@ public class NotificationsInterface extends TableGuiInterface implements IObserv
                 break;
             case MODE_POPUP_CMD:
                 ModePopupInfo mpi = (ModePopupInfo) data[0];
-                addMessage(mpi.title);
-                addMessage(mpi.header);
-                for (Pair<String[], String> p : mpi.mappings) {
-                    String[] keys = p.getFirst();
-                    String action = p.getSecond();
-                    StringBuilder msg = new StringBuilder();
-                    msg.append("<");
-                    for (int i = 0; i < keys.length; i++) {
-                        msg.append(keys[i].toUpperCase());
-                        if (i < keys.length - 1) {
-                            msg.append("+");
+                if(mpi != null) {
+                    addMessage(mpi.title);
+                    addMessage(mpi.header);
+                    for (Pair<String[], String> p : mpi.mappings) {
+                        String[] keys = p.getFirst();
+                        String action = p.getSecond();
+                        StringBuilder msg = new StringBuilder();
+                        msg.append("<");
+                        for (int i = 0; i < keys.length; i++) {
+                            msg.append(keys[i].toUpperCase());
+                            if (i < keys.length - 1) {
+                                msg.append("+");
+                            }
                         }
+                        msg.append("> " + action);
+                        addMessage(msg.toString());
                     }
-                    msg.append("> " + action);
-                    addMessage(msg.toString());
                 }
                 break;
             default:

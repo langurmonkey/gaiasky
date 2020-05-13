@@ -46,7 +46,7 @@ public abstract class StreamingOctreeLoader implements IObserver, ISceneGraphLoa
     /**
      * Default load queue size in octants
      */
-    protected static final int LOAD_QUEUE_MAX_SIZE = 10000;
+    protected static final int LOAD_QUEUE_MAX_SIZE = 100;
 
     /**
      * Minimum time to pass to be able to clear the queue again
@@ -108,12 +108,12 @@ public abstract class StreamingOctreeLoader implements IObserver, ISceneGraphLoa
     protected DaemonLoader daemon;
 
     public StreamingOctreeLoader() {
-        // TODO Use memory info to work this figure out
+        // TODO Use memory info to figure this out
         // We assume 1Gb of graphics memory
         // GPU ~ 32 byte/star
         // CPU ~ 136 byte/star
         maxLoadedStars = GlobalConf.scene.MAX_LOADED_STARS;
-        logger.info(this.getClass().getSimpleName(), "Maximum loaded stars setting: " + maxLoadedStars);
+        logger.info("Maximum loaded stars setting: " + maxLoadedStars);
 
         Comparator<OctreeNode> depthComparator = Comparator.comparingInt((OctreeNode o) -> o.depth);
         toLoadQueue = new PriorityBlockingQueue<>(LOAD_QUEUE_MAX_SIZE, depthComparator);
@@ -273,19 +273,13 @@ public abstract class StreamingOctreeLoader implements IObserver, ISceneGraphLoa
 
     public void addToQueue(OctreeNode octant) {
         // Add only if there is room
-        if (!loadingPaused)
-            if (toLoadQueue.size() < LOAD_QUEUE_MAX_SIZE - 1) {
-                toLoadQueue.add(octant);
-                octant.setStatus(LoadStatus.QUEUED);
+        if (!loadingPaused) {
+            if (toLoadQueue.size() >= LOAD_QUEUE_MAX_SIZE) {
+                OctreeNode out = toLoadQueue.poll();
+                out.setStatus(LoadStatus.NOT_LOADED);
             }
-    }
-
-    /**
-     * Adds a list of octants to the queue to be loaded
-     **/
-    public void addToQueue(OctreeNode... octants) {
-        for (OctreeNode octant : octants) {
-            addToQueue(octant);
+            toLoadQueue.add(octant);
+            octant.setStatus(LoadStatus.QUEUED);
         }
     }
 

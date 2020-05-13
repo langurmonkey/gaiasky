@@ -107,7 +107,7 @@ public class GameMouseKbdListener extends MouseKbdListener implements IObserver 
             mpi.addMapping("Toggle mouse capture", "SHIFT", "CTRL", "L");
             mpi.addMapping("Go back to focus mode", "1");
 
-            EventManager.instance.post(Events.MODE_POPUP_CMD, mpi, 120f);
+            EventManager.instance.post(Events.MODE_POPUP_CMD, mpi, "gamemode", 120f);
         });
     }
 
@@ -115,6 +115,7 @@ public class GameMouseKbdListener extends MouseKbdListener implements IObserver 
     public void deactivate() {
         // Release mouse
         setMouseCapture(false);
+        EventManager.instance.post(Events.MODE_POPUP_CMD, null, "gamemode");
         prevValid = false;
     }
 

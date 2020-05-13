@@ -557,8 +557,9 @@ public class OctreeNode implements ILineRenderable {
         // View angle is normalized to 40 degrees when the octant is exactly the size of the screen height, regardless of the camera fov
         viewAngle = Math.atan(radius / distToCamera) * 2;
 
-        float th0 = GlobalConf.scene.OCTANT_THRESHOLD_0;
-        float th1 = GlobalConf.scene.OCTANT_THRESHOLD_1;
+        float cf = MathUtilsd.clamp(cam.getFovFactor() * 2.5f, 0.15f, 1f);
+        float th0 = GlobalConf.scene.OCTANT_THRESHOLD_0 * cf;
+        float th1 = GlobalConf.scene.OCTANT_THRESHOLD_1 * cf;
 
         if (viewAngle < th0) {
             // Not observed

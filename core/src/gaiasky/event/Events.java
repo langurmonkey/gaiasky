@@ -606,7 +606,8 @@ public enum Events {
      **/
     LON_LAT_UPDATED,
     /**
-     * Opens a new popup window with information on the new mode. Contains a ModePopupInfo object.
+     * Opens a new popup window with information on the new mode. Contains a ModePopupInfo object (null to remove), a name
+     * and the number of seconds until the popup disappears.
      */
     MODE_POPUP_CMD,
     /**

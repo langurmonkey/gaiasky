@@ -1193,7 +1193,9 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
                     mpi.addMapping("Back to normal mode", "CTRL", "S");
                     mpi.addMapping("Switch stereo profile", "CTRL", "SHIFT", "S");
 
-                    EventManager.instance.post(Events.MODE_POPUP_CMD, mpi, 120f);
+                    EventManager.instance.post(Events.MODE_POPUP_CMD, mpi, "stereo", 120f);
+                } else {
+                    EventManager.instance.post(Events.MODE_POPUP_CMD, null, "stereo");
                 }
 
                 break;

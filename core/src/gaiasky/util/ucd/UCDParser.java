@@ -435,7 +435,7 @@ public class UCDParser {
 
     /**
      * Adds the given UCD to the list. If the column name of the candidates is in
-     * the given array of colnames, then it is added at the position 0, otherwise, it is
+     * the given array of column names, then it is added at the position 0, otherwise, it is
      * added at the back of the list.
      *
      * @param candidate The candidate UCD object

@@ -154,7 +154,7 @@ public class SGROpenVR extends SGRAbstract implements ISGR, IObserver {
                     EventManager.instance.post(Events.FOV_CHANGED_CMD, fov);
                 } else {
                     // Default
-                    logger.info("Setting fov to default value: " + fov);
+                    logger.info("Setting fov to default value: " + 89f);
                     EventManager.instance.post(Events.FOV_CHANGED_CMD, 89f);
                 }
             } catch (Exception e) {

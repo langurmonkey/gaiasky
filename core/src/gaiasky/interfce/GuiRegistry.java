@@ -337,20 +337,20 @@ public class GuiRegistry implements IObserver {
                                     final DatasetLoadDialog dld = new DatasetLoadDialog(I18n.txt("gui.dsload.title") + ": " + fileName, fileName, skin, ui);
                                     Runnable doLoad = () -> {
                                         try {
-                                            Thread t = new Thread(()->{
+                                            Thread t = new Thread(() -> {
                                                 DatasetOptions dops = dld.generateDatasetOptions();
                                                 // Load dataset
                                                 EventScriptingInterface.instance().loadDataset(dops.catalogName, result.toAbsolutePath().toString(), CatalogInfo.CatalogInfoType.UI, dops, true);
                                                 // Select first
                                                 CatalogInfo ci = CatalogManager.instance().get(dops.catalogName);
-                                                if(ci.object != null) {
-                                                    if(ci.object instanceof ParticleGroup){
+                                                if (ci.object != null) {
+                                                    if (ci.object instanceof ParticleGroup) {
                                                         ParticleGroup pg = (ParticleGroup) ci.object;
-                                                        if(pg.data() != null && !pg.data().isEmpty() && pg.isVisibilityOn()){
+                                                        if (pg.data() != null && !pg.data().isEmpty() && pg.isVisibilityOn()) {
                                                             EventManager.instance.post(Events.CAMERA_MODE_CMD, CameraManager.CameraMode.FOCUS_MODE);
                                                             EventManager.instance.post(Events.FOCUS_CHANGE_CMD, pg.getRandomParticleName());
                                                         }
-                                                    } else if(ci.object.children != null && !ci.object.children.isEmpty() && ci.object.children.get(0).isVisibilityOn()){
+                                                    } else if (ci.object.children != null && !ci.object.children.isEmpty() && ci.object.children.get(0).isVisibilityOn()) {
                                                         EventManager.instance.post(Events.CAMERA_MODE_CMD, CameraManager.CameraMode.FOCUS_MODE);
                                                         EventManager.instance.post(Events.FOCUS_CHANGE_CMD, ci.object.children.get(0));
                                                     }
@@ -410,54 +410,66 @@ public class GuiRegistry implements IObserver {
                 case MODE_POPUP_CMD:
                     if (GlobalConf.runtime.DISPLAY_GUI) {
                         ModePopupInfo mpi = (ModePopupInfo) data[0];
-                        Float seconds = (Float) data[1];
-                        float pad10 = 10f * GlobalConf.UI_SCALE_FACTOR;
-                        float pad5 = 5f * GlobalConf.UI_SCALE_FACTOR;
-                        float pad3 = 3f * GlobalConf.UI_SCALE_FACTOR;
-                        if (modeChangeTable != null) {
-                            modeChangeTable.remove();
-                        }
-                        modeChangeTable = new Table(skin);
-                        modeChangeTable.setBackground("table-bg");
-                        modeChangeTable.pad(pad10);
+                        String name = (String) data[1];
 
-                        // Fill up table
-                        OwnLabel ttl = new OwnLabel(mpi.title, skin, "hud-header");
-                        modeChangeTable.add(ttl).left().padBottom(pad10).row();
-
-                        OwnLabel dsc = new OwnLabel(mpi.header, skin);
-                        modeChangeTable.add(dsc).left().padBottom(pad5 * 3f).row();
-
-                        Table keysTable = new Table(skin);
-                        for (Pair<String[], String> m : mpi.mappings) {
-                            HorizontalGroup keysGroup = new HorizontalGroup();
-                            keysGroup.space(pad3);
-                            String[] keys = m.getFirst();
-                            String action = m.getSecond();
-                            for (int i = 0; i < keys.length; i++) {
-                                TextButton key = new TextButton(keys[i], skin, "key");
-                                key.pad(pad5);
-                                keysGroup.addActor(key);
-                                if (i < keys.length - 1) {
-                                    keysGroup.addActor(new OwnLabel("+", skin));
-                                }
+                        if (mpi != null) {
+                            // Add
+                            Float seconds = (Float) data[2];
+                            float pad10 = 10f * GlobalConf.UI_SCALE_FACTOR;
+                            float pad5 = 5f * GlobalConf.UI_SCALE_FACTOR;
+                            float pad3 = 3f * GlobalConf.UI_SCALE_FACTOR;
+                            if (modeChangeTable != null) {
+                                modeChangeTable.remove();
                             }
-                            keysTable.add(keysGroup).right().padBottom(pad5).padRight(pad10 * 2f);
-                            keysTable.add(new OwnLabel(action, skin)).left().padBottom(pad5).row();
+                            modeChangeTable = new Table(skin);
+                            modeChangeTable.setName("mct-" + name);
+                            modeChangeTable.setBackground("table-bg");
+                            modeChangeTable.pad(pad10);
+
+                            // Fill up table
+                            OwnLabel ttl = new OwnLabel(mpi.title, skin, "hud-header");
+                            modeChangeTable.add(ttl).left().padBottom(pad10).row();
+
+                            OwnLabel dsc = new OwnLabel(mpi.header, skin);
+                            modeChangeTable.add(dsc).left().padBottom(pad5 * 3f).row();
+
+                            Table keysTable = new Table(skin);
+                            for (Pair<String[], String> m : mpi.mappings) {
+                                HorizontalGroup keysGroup = new HorizontalGroup();
+                                keysGroup.space(pad3);
+                                String[] keys = m.getFirst();
+                                String action = m.getSecond();
+                                for (int i = 0; i < keys.length; i++) {
+                                    TextButton key = new TextButton(keys[i], skin, "key");
+                                    key.pad(pad5);
+                                    keysGroup.addActor(key);
+                                    if (i < keys.length - 1) {
+                                        keysGroup.addActor(new OwnLabel("+", skin));
+                                    }
+                                }
+                                keysTable.add(keysGroup).right().padBottom(pad5).padRight(pad10 * 2f);
+                                keysTable.add(new OwnLabel(action, skin)).left().padBottom(pad5).row();
+                            }
+                            modeChangeTable.add(keysTable).center().row();
+                            modeChangeTable.add(new OwnLabel("ESC - close this", skin, "mono")).right().padTop(pad10 * 2f);
+
+                            modeChangeTable.pack();
+
+                            // Add table to UI
+                            Container mct = new Container<>(modeChangeTable);
+                            mct.setFillParent(true);
+                            mct.top();
+                            mct.pad(pad10 * 2, 0, 0, 0);
+                            ui.addActor(mct);
+
+                            startModePopupInfoThread(modeChangeTable, seconds);
+                        } else {
+                            // Remove
+                            if (modeChangeTable != null && modeChangeTable.hasParent() &&  modeChangeTable.getName().equals("mct-" + name)){
+                                modeChangeTable.remove();
+                                modeChangeTable = null;
+                            }
                         }
-                        modeChangeTable.add(keysTable).center().row();
-                        modeChangeTable.add(new OwnLabel("ESC - close this", skin, "mono")).right().padTop(pad10 * 2f);
-
-                        modeChangeTable.pack();
-
-                        // Add table to UI
-                        Container mct = new Container<>(modeChangeTable);
-                        mct.setFillParent(true);
-                        mct.top();
-                        mct.pad(pad10 * 2, 0, 0, 0);
-                        ui.addActor(mct);
-
-                        startModePopupInfoThread(modeChangeTable, seconds);
                     }
                     break;
                 case DISPLAY_GUI_CMD:
