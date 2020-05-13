@@ -807,6 +807,8 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
     public void addRotateMovement(double deltaX, double deltaY, boolean focusLookKeyPressed, boolean acceleration) {
         // Just update yaw with X and pitch with Y
         if (parent.mode.equals(CameraMode.FREE_MODE)) {
+            deltaX *= fovFactor;
+            deltaY *= fovFactor;
             addYaw(deltaX, acceleration);
             addPitch(deltaY, acceleration);
         } else if (parent.mode.equals(CameraMode.FOCUS_MODE)) {
