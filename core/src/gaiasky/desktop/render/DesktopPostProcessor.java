@@ -421,9 +421,9 @@ public class DesktopPostProcessor implements IPostProcessor, IObserver {
     private float getGlowTextureScale(double starBrightness, float starSize, float fovFactor, boolean cubemap) {
         if(cubemap) {
             float ts = (float) starBrightness * starSize * 7e-2f / fovFactor;
-            return Math.min(ts * 0.2f, 4e-1f);
+            return Math.min(ts * 0.2f, 5e-1f);
         }else{
-            return 0.5f;
+            return (float) starBrightness * 0.2f;
         }
     }
 
