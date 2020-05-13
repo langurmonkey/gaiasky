@@ -62,7 +62,7 @@ public class STILDataProvider extends AbstractStarGroupDataProvider {
         initLists();
     }
 
-    public void setDatasetOptions(DatasetOptions dops){
+    public void setDatasetOptions(DatasetOptions dops) {
         this.dops = dops;
     }
 
@@ -146,6 +146,7 @@ public class STILDataProvider extends AbstractStarGroupDataProvider {
             ucdp.parse(table);
 
             if (ucdp.haspos) {
+                int nInvalidPllx = 0;
                 int i = 0;
                 RowSequence rs = table.getRowSequence();
                 while (rs.next()) {
@@ -158,25 +159,29 @@ public class STILDataProvider extends AbstractStarGroupDataProvider {
                         Pair<UCD, Double> c;
                         String unitc;
 
-                        if (ucdp.POS3.isEmpty() || getDoubleUcd(ucdp.POS3, row) == null) {
+                        Pair<UCD, Double> pos3 = getDoubleUcd(ucdp.POS3, row);
+                        // Check missing pos3 -> Use default parallax
+                        if (ucdp.POS3.isEmpty() || pos3 == null || pos3.getSecond() == null || !Double.isFinite(pos3.getSecond())) {
                             c = new Pair<>(null, 0.04);
                             unitc = "mas";
+                            nInvalidPllx++;
                         } else {
                             c = getDoubleUcd(ucdp.POS3, row);
                             unitc = c.getFirst().unit;
                         }
 
                         PositionType pt = ucdp.getPositionType(a.getFirst(), b.getFirst(), c.getFirst());
-                        // Check negative parallaxes. What to do?
-                        // Simply ignore object
+                        // Check negative parallaxes -> Use default for consistency
                         if (pt.isParallax() && (c.getSecond() == null || c.getSecond().isNaN() || c.getSecond() <= 0)) {
-                            skip = true;
+                            c.setSecond(0.04);
+                            unitc = "mas";
+                            nInvalidPllx++;
                         }
 
                         Position p = new Position(a.getSecond(), a.getFirst().unit, b.getSecond(), b.getFirst().unit, c.getSecond(), unitc, pt);
 
                         double distpc = p.gsposition.len();
-                        if((pt.isParallax() && c.getSecond() <= 0) || !Double.isFinite(distpc) || distpc < 0){
+                        if ((pt.isParallax() && c.getSecond() <= 0) || !Double.isFinite(distpc) || distpc < 0) {
                             // Next
                             break;
                         }
@@ -251,7 +256,7 @@ public class STILDataProvider extends AbstractStarGroupDataProvider {
                             if (!ucdp.ID.isEmpty()) {
                                 // We have ID
                                 Pair<UCD, String> namePair = getStringUcd(ucdp.ID, row);
-                                names = new String[] { namePair.getSecond() };
+                                names = new String[]{namePair.getSecond()};
                                 if (namePair.getFirst().colname.equalsIgnoreCase("hip")) {
                                     hip = Integer.valueOf(namePair.getSecond());
                                     id = (long) hip;
@@ -261,7 +266,7 @@ public class STILDataProvider extends AbstractStarGroupDataProvider {
                             } else {
                                 // Emtpy ID
                                 id = ++starid;
-                                names = new String[] { id.toString() };
+                                names = new String[]{id.toString()};
                             }
                         } else {
                             // We have name
@@ -293,9 +298,9 @@ public class STILDataProvider extends AbstractStarGroupDataProvider {
 
                         // Populate provider lists
                         colors.put(id, rgb);
-                        sphericalPositions.put(id, new double[] { sph.x, sph.y, sph.z });
+                        sphericalPositions.put(id, new double[]{sph.x, sph.y, sph.z});
 
-                        if(dops == null || dops.type == DatasetOptions.DatasetLoadType.STARS) {
+                        if (dops == null || dops.type == DatasetOptions.DatasetLoadType.STARS) {
                             double[] point = new double[StarBean.SIZE + 3];
                             point[StarBean.I_HIP] = hip;
                             point[StarBean.I_X] = p.gsposition.x;
@@ -320,7 +325,7 @@ public class STILDataProvider extends AbstractStarGroupDataProvider {
 
                             int appclmp = (int) MathUtilsd.clamp(appmag, 0, 21);
                             countsPerMag[appclmp] += 1;
-                        } else if(dops.type == DatasetOptions.DatasetLoadType.PARTICLES){
+                        } else if (dops.type == DatasetOptions.DatasetLoadType.PARTICLES) {
                             double[] point = new double[3];
                             point[ParticleBean.I_X] = p.gsposition.x;
                             point[ParticleBean.I_Y] = p.gsposition.y;
@@ -341,6 +346,9 @@ public class STILDataProvider extends AbstractStarGroupDataProvider {
                     }
                     i++;
                 }
+                if (nInvalidPllx > 0) {
+                    logger.warn("Found " + nInvalidPllx + " rows with nonexistent or negative parallax. Using the default 0.04 mas for them.");
+                }
             } else {
                 logger.error("Table not loaded: Position not found");
             }
@@ -352,7 +360,7 @@ public class STILDataProvider extends AbstractStarGroupDataProvider {
         return list;
     }
 
-    private Map<UCD, Double> addExtraAttributes(UCDParser ucdp, Object[] row){
+    private Map<UCD, Double> addExtraAttributes(UCDParser ucdp, Object[] row) {
         // Extra
         Map<UCD, Double> extraAttributes = null;
         for (UCD extra : ucdp.extra) {
@@ -361,9 +369,9 @@ public class STILDataProvider extends AbstractStarGroupDataProvider {
                 val = ((Number) row[extra.index]).doubleValue();
             } catch (Exception e) {
                 Object o = row[extra.index];
-                if(o instanceof Character){
-                   Character c = (Character) o;
-                   val = (double) c.charValue();
+                if (o instanceof Character) {
+                    Character c = (Character) o;
+                    val = (double) c.charValue();
                 }
             }
             if (extraAttributes == null)

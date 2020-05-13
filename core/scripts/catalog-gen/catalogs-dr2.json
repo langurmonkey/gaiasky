@@ -1,18 +1,18 @@
 {
     "catalogs" : [
         {
-            "name" : "small",
+            "name" : "default",
             "maxpart" : 100000,
-            "pllxerrbright" : 0.1,
+            "pllxerrbright" : 0.2,
             "pllxerrfaint" : 0.005,
             "pllxzeropoint" : -0.02,
             "hip" : "$DATA_LOC/data/catalog/hipparcos/hipparcos.vot",
             "xmatchfile" : "$DATA_LOC/data/gdr2hip/gdr2-hip-xmatch-all.csv"
         },
         {
-            "name" : "default",
+            "name" : "small",
             "maxpart" : 100000,
-            "pllxerrbright" : 0.2,
+            "pllxerrbright" : 0.1,
             "pllxerrfaint" : 0.005,
             "pllxzeropoint" : -0.02,
             "hip" : "$DATA_LOC/data/catalog/hipparcos/hipparcos.vot",

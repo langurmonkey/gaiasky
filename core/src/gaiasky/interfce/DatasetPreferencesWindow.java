@@ -74,7 +74,7 @@ public class DatasetPreferencesWindow extends GenericDialog {
         content.add(new OwnLabel(I18n.txt("gui.dataset.highlight"), skin, "hud-header")).left().colspan(2).padBottom(pad).row();
 
         // Point size
-        IValidator pointSizeValidator = new FloatValidator(0.5f, 5.0f);
+        IValidator pointSizeValidator = new FloatValidator(0.5f, 15.0f);
         pointSize = new OwnTextField(Float.toString(ci.hlSizeFactor), skin, pointSizeValidator);
         content.add(new OwnLabel(I18n.txt("gui.dataset.highlight.size"), skin)).left().padRight(pad).padBottom(pad);
         content.add(pointSize).left().padRight(pad).padBottom(pad).row();

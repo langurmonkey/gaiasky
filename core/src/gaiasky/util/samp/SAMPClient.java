@@ -119,6 +119,7 @@ public class SAMPClient implements IObserver {
                             ParticleGroup pg = (ParticleGroup) idToNode.getForward(id);
                             pg.setFocusIndex(row.intValue());
                             preventProgrammaticEvents = true;
+                            EventManager.instance.post(Events.CAMERA_MODE_CMD, CameraMode.FOCUS_MODE);
                             EventManager.instance.post(Events.FOCUS_CHANGE_CMD, pg);
                             preventProgrammaticEvents = false;
                         } else if (idToNode.getForward(id) instanceof FadeNode) {
@@ -127,6 +128,7 @@ public class SAMPClient implements IObserver {
                             if (fn.children != null && fn.children.size > row.intValue()) {
                                 SceneGraphNode sgn = fn.children.get(row.intValue());
                                 preventProgrammaticEvents = true;
+                                EventManager.instance.post(Events.CAMERA_MODE_CMD, CameraMode.FOCUS_MODE);
                                 EventManager.instance.post(Events.FOCUS_CHANGE_CMD, sgn);
                                 preventProgrammaticEvents = false;
                             } else {
