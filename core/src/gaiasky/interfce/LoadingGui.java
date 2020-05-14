@@ -20,6 +20,7 @@ import gaiasky.event.Events;
 import gaiasky.util.GlobalConf;
 import gaiasky.util.GlobalResources;
 import gaiasky.util.I18n;
+import gaiasky.util.LoadingTextGenerator;
 import gaiasky.util.color.ColorUtils;
 import gaiasky.util.math.StdRandom;
 import gaiasky.util.scene2d.OwnLabel;
@@ -139,7 +140,7 @@ public class LoadingGui extends AbstractGui {
         if(currTime - lastUpdateTime > waitTime){
             randomFunnyText();
             lastUpdateTime = currTime;
-            waitTime = StdRandom.uniform(800, 3000);
+            waitTime = StdRandom.uniform(1500, 3000);
         }
     }
 
@@ -160,32 +161,8 @@ public class LoadingGui extends AbstractGui {
         spin.setText(next.toString());
     }
 
-    private final String[] loadingTexts = new String[]{
-            "Looking for more stars...",
-            "Initializing flux capacitor...",
-            "Setting up continuum transfunctioner...",
-            "Pumping up atmospheres...",
-            "Creating more rocky planets...",
-            "Downloading RAM modules...",
-            "Fitting GPU performance curves...",
-            "Tracing planetary orbits...",
-            "Dodging asteroids...",
-            "Introducing molecular clouds...",
-            "Modelling dust maps...",
-            "Caching distant galaxies...",
-            "Listening to the sound of space...",
-            "Following lonely star...",
-            "Restoring Vulcan planet...",
-            "Tuning gravity strength...",
-            "Adjusting fundamental physical constants...",
-            "Assigning moons to planets...",
-            "Registering extraterrestrials...",
-            "Synchronizing spatiotemporal serendipities...",
-            "Extracting anomalous materials...",
-            "Computing interesting manifolds..."
-    };
     private void randomFunnyText(){
-        spin.setText(loadingTexts[StdRandom.uniform(loadingTexts.length)]);
+        spin.setText(LoadingTextGenerator.next());
     }
 
     private void reset(){
