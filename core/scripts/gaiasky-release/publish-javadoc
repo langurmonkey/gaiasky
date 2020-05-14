@@ -5,6 +5,10 @@ if [[ $# -eq 0 ]] ; then
     echo "Usage: $0 [tag|latest]"
     exit 1
 fi
+if [ -z $JAVA_HOME ]; then 
+    echo "JAVA_HOME is unset, please set it"
+    exit 1
+fi
 
 if [[ $1 = "-h" ]] || [[ $1 = "--help" ]] ; then
     echo "Usage: $0 [tag|latest]"
@@ -38,20 +42,24 @@ git -C $SRCDIR checkout $CO
 # Generate javadoc
 mkdir -p "/tmp/javadoc/$VERSION"
 
-#CLASSPATH_LIB_DIR="$(find $GS/releases -maxdepth 1 -type d -name 'gaiasky-*' -print -quit)/lib"
-#echo "Using classpath: $CLASSPATH_LIB_DIR"
-#$JAVA_HOME/bin/javadoc -html4 -d "/tmp/javadoc/$VERSION" -sourcepath "$SRCDIR" -classpath "$CLASSPATH_LIB_DIR/*" -subpackages gaia
-/usr/lib/jvm/java-8-openjdk-amd64/bin/javadoc -d "/tmp/javadoc/$VERSION" -sourcepath "$SRCDIR" -subpackages gaia
+CLASSPATH_LIB_DIR="$(find $GS/releases -maxdepth 1 -type d -name 'gaiasky-*' -print -quit)/lib"
+if [ -z $CLASSPATH_LIB_DIR ]; then 
+    echo "Please build at least one version of Gaia Sky (gradlew core:dist) and try again"
+    exit 1
+fi
+
+
+echo "Using classpath: $CLASSPATH_LIB_DIR"
+$JAVA_HOME/bin/javadoc -d "/tmp/javadoc/$VERSION" -sourcepath "$SRCDIR" -classpath "$CLASSPATH_LIB_DIR/*" -subpackages gaiasky
 
 
 # Copy to server
 echo "Copying directory /tmp/javadoc/$VERSION to tsagrista@mintaka:/dataB/gaiasky/docs/javadoc/$VERSION"
     
-ssh tsagrista@mintaka "mkdir -p /dataB/gaiasky/docs/javadoc/$VERSION"
-( cd "/tmp/javadoc/$VERSION" ; rsync -r * "tsagrista@mintaka:/dataB/gaiasky/docs/javadoc/$VERSION" )
+rsync -avh "/tmp/javadoc/$VERSION" "tsagrista@mintaka:/dataB/gaiasky/docs/javadoc/"
 
 # Clean up
-rm -rf /tmp/javadoc
+#rm -rf /tmp/javadoc
 
 # Update listing
 COMMAND="~/bin/dir2html '/dataB/gaiasky/docs/javadoc/' '/javadoc' 'gaia.ari.uni-heidelberg.de/gaiasky' 'Gaia Sky javadoc'"
