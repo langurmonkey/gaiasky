@@ -3,6 +3,17 @@
 [Full changelog](https://gitlab.com/langurmonkey/gaiasky/compare/2.2.5...HEAD)
 
 ### Bug Fixes
+- camera turn depends on fov
+- stars with negative parallaxes use default
+- load VO table crash on Windows
+- program crash when minimizing in windows
+- do not assume default location for hip, pass as argument
+- file count value when max number of files is specified
+- safecheck to prevent window sizes of 0x0 on resize events with AMD graphics on windows
+- transition from point to billboard in star shading
+- remove rounding in generic dialog positioning for smooth rendering
+- adjust brightness scalings, remove unused variables and parameters
+- wrong synchronize location in streaming octree loader
 - camera mode change in SAMP select row call
 - goToObject() skip fix
 - SAMP local icon to work with dev version and releases
@@ -15,12 +26,23 @@
 - double stars caused by incorrect shading
 
 ### Build System
+- fix publish-javadoc script
+- update build script to latest gradle version
+- more robust way to get size and nobjects from generated catalogs
+- improve catalog generation scripts for faster deployment
+- add/update scripts to build catalogs
+- fix build files
+- add catalogpack script
+- update build and installer scripts to install4j8
 - update data descriptor with new base and hi-res texture packs
 - add bookmarks and VR.md to build, update modes to gradle 6.x
 - update to gradle 6.2.2, prepare build files for gradle 7
 - pkgbuild epoch set to 2 by default
 
 ### Code Refactoring
+- use java collections instead of libgdx's, implement parallel loading in octree gen
+- update DR2 loader to generic csv loader. Add compatibility mode to binary data format for tycho ids (tgas/DR2)
+- ColourUtils -> ColorUtils
 - use local application icon for SAMP
 - move default location of mappings file to config folder
 - fix spacing in focus info interface names
@@ -29,11 +51,24 @@
 - move all file operations to nio (Path)
 
 ### Documentation
+- update gaiasky VR info in repo
+- improve run from source for Windows in readme file
 - update VR docs and readme file to include new VR build
 - fix setCameraSpeedLimit() API docs
 - fix typos in comments for star/particle groups
 
 ### Features
+- better random text generator
+- fov-based visibility, autoremove popups
+- adjust size and intensity of stars in milky way model
+- add ref epoch to catalog descriptors and loaders
+- magnitude and color corrections (reddening, extinction) are now applied by default if ag and ebp_min_rp are available. Flag is now needed to explicitly deactivate them
+- redefine eDR3 catalogs
+- add procedural star shader, muted for now
+- new star shading method
+- replace fibonacci numbers for made-up phrases
+- update distance font to include more characters
+- add crash window with tips and instructions on how to fix/report the problem
 - add shortucts for 'show log' and 'open catalog'
 - make all limit/target frame rates floating-point numbers
 - comments in camera path files: prepend '#' to comment
