@@ -2,6 +2,9 @@
 ## [Unreleased](https://gitlab.com/langurmonkey/gaiasky/tree/master)
 [Full changelog](https://gitlab.com/langurmonkey/gaiasky/compare/2.2.6...HEAD)
 
+### Documentation
+- add package-info package documentation, update changelog
+
 
 <a name="2.2.6"></a>
 ## [2.2.6](https://gitlab.com/langurmonkey/gaiasky/tree/2.2.5) (2020-05-15)
@@ -12,7 +15,7 @@
 - stars with negative parallaxes use default [#329](https://gitlab.com/langurmonkey/gaiasky/issues/329) 
 - load VO table crash on Windows [#329](https://gitlab.com/langurmonkey/gaiasky/issues/329) 
 - program crash when minimizing in windows [#333](https://gitlab.com/langurmonkey/gaiasky/issues/333) 
-- do not assume default location for hip, pass as agrument 
+- do not assume default location for hip, pass as argument 
 - file count value when max number of files is specified 
 - safecheck to prevent window sizes of 0x0 on resize events with AMD graphics on windows 
 - transition from point to billboard in star shading 

@@ -62,7 +62,7 @@ public class SearchDialog extends GenericDialog {
                     if (ie.getKeyCode() == Keys.ESCAPE || ie.getKeyCode() == Keys.ENTER) {
                         me.remove();
                         return true;
-                    } else if (!searchInput.getText().equals(currentInputText)) {
+                    } else if (!searchInput.getText().equals(currentInputText) && !searchInput.getText().isBlank()) {
                         // Process only if text changed
                         currentInputText = searchInput.getText();
                         String name = currentInputText.toLowerCase().trim();
