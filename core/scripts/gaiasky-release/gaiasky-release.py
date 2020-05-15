@@ -157,5 +157,6 @@ if __name__ == '__main__':
         print(" > Add new release to gitlab: https://gitlab.com/langurmonkey/gaiasky/-/releases")
         print(" > Create new docs tag (%s) and generate the docs: %s/docs/bin/publish-docs" % (arguments.tag, arguments.gs_folder))
         print(" > Build AUR package (do 'makepkg --printsrcinfo > .SRCINFO') and commit AUR git repository")
+        print(" > Upload javadoc for new version (publish-javadoc %s && publish-javadoc latest)" % arguments.tag)
         print()
         print(">DONE<")
